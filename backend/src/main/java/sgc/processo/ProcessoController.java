@@ -10,9 +10,9 @@ import org.springframework.security.access.prepost.*;
 import org.springframework.security.core.annotation.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.*;
+import sgc.comum.erros.*;
 import sgc.organizacao.model.*;
 import sgc.processo.dto.*;
-import sgc.comum.erros.ErroValidacao;
 import sgc.processo.model.*;
 import sgc.subprocesso.model.*;
 

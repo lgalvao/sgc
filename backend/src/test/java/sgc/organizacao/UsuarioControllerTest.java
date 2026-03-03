@@ -13,10 +13,10 @@ import org.springframework.security.test.web.servlet.request.*;
 import org.springframework.test.context.bean.override.mockito.*;
 import org.springframework.test.web.servlet.*;
 import org.springframework.test.web.servlet.request.*;
+import sgc.comum.erros.*;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
-import sgc.comum.erros.*;
 import sgc.seguranca.*;
 
 import java.util.*;

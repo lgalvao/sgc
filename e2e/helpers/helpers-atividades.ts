@@ -1,4 +1,5 @@
 import {expect, type Page} from '@playwright/test';
+import {limparNotificacoes} from './helpers-navegacao.js';
 
 async function garantirContextoSubprocesso(page: Page) {
     const cardEdicao = page.getByTestId('card-subprocesso-atividades');
@@ -116,8 +117,6 @@ export async function removerConhecimento(page: Page, atividadeDescricao: string
 
     await expect(card.getByText(conhecimento)).toBeHidden();
 }
-
-import {limparNotificacoes} from './helpers-navegacao.js';
 
 export async function disponibilizarCadastro(page: Page) {
     await limparNotificacoes(page);

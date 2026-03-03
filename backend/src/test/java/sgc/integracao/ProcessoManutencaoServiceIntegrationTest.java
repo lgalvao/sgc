@@ -2,10 +2,11 @@ package sgc.integracao;
 
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.*;
-import sgc.processo.dto.*;
 import sgc.comum.erros.*;
+import sgc.processo.dto.*;
 import sgc.processo.model.*;
 import sgc.processo.service.*;
+
 import java.time.*;
 import java.util.*;
 

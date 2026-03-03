@@ -4,9 +4,9 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
-import sgc.organizacao.service.*;
-import sgc.organizacao.model.*;
 import sgc.comum.erros.*;
+import sgc.organizacao.model.*;
+import sgc.organizacao.service.*;
 import sgc.processo.model.*;
 import sgc.subprocesso.service.*;
 

@@ -1,5 +1,5 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
-import {flushPromises, mount, type DOMWrapper} from "@vue/test-utils";
+import {type DOMWrapper, flushPromises, mount} from "@vue/test-utils";
 import Processo from "@/views/ProcessoDetalheView.vue";
 import {createTestingPinia} from "@pinia/testing";
 import {useProcessosStore} from "@/stores/processos";

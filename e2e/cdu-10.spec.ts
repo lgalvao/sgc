@@ -19,7 +19,12 @@ import {
     fecharHistoricoAnalise,
     homologarCadastroMapeamento
 } from './helpers/helpers-analise.js';
-import {fazerLogout, limparNotificacoes, navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
+import {
+    fazerLogout,
+    limparNotificacoes,
+    navegarParaSubprocesso,
+    verificarPaginaPainel
+} from './helpers/helpers-navegacao.js';
 
 async function verificarPaginaSubprocesso(page: Page, unidade: string) {
     await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${unidade}(?:/)?$`));

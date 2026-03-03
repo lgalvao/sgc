@@ -1,28 +1,24 @@
 package sgc.processo.service;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.comum.erros.ErroAcessoNegado;
-import sgc.organizacao.UsuarioFacade;
-import sgc.organizacao.model.Usuario;
-import sgc.processo.ProcessoFacade;
-import sgc.processo.dto.AcaoEmBlocoRequest;
-import sgc.processo.model.AcaoProcesso;
-import sgc.seguranca.SgcPermissionEvaluator;
-import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SituacaoSubprocesso;
-import sgc.subprocesso.service.SubprocessoService;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.*;
+import org.mockito.*;
+import org.mockito.junit.jupiter.*;
+import sgc.comum.erros.*;
+import sgc.organizacao.*;
+import sgc.organizacao.model.*;
+import sgc.processo.*;
+import sgc.processo.dto.*;
+import sgc.processo.model.*;
+import sgc.seguranca.*;
+import sgc.subprocesso.model.*;
+import sgc.subprocesso.service.*;
 
-import java.util.List;
+import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("ProcessoFacade - Erros AcaoEmBloco")

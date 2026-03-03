@@ -2,17 +2,17 @@ package sgc.integracao;
 
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.*;
+import org.springframework.test.util.*;
 import org.springframework.transaction.annotation.*;
 import sgc.fixture.*;
 import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
 import sgc.organizacao.model.*;
 import sgc.processo.model.*;
+import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.*;
-import sgc.subprocesso.dto.CompetenciaRequest;
 
-import org.springframework.test.util.ReflectionTestUtils;
 import java.time.*;
 import java.util.*;
 

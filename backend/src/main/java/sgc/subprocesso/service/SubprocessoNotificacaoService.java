@@ -1,24 +1,18 @@
 package sgc.subprocesso.service;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.thymeleaf.context.Context;
-import org.thymeleaf.spring6.SpringTemplateEngine;
+import lombok.*;
+import org.springframework.stereotype.*;
+import org.thymeleaf.context.*;
+import org.thymeleaf.spring6.*;
+import sgc.alerta.*;
+import sgc.organizacao.dto.*;
+import sgc.organizacao.model.*;
+import sgc.organizacao.service.*;
+import sgc.subprocesso.dto.*;
+import sgc.subprocesso.model.*;
 
-import sgc.alerta.AlertaFacade;
-import sgc.alerta.EmailService;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.dto.UnidadeResponsavelDto;
-import sgc.organizacao.service.ResponsavelUnidadeService;
-import sgc.organizacao.service.UsuarioService;
-import sgc.subprocesso.dto.NotificacaoCommand;
-import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.TipoTransicao;
-
-import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.time.format.*;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor

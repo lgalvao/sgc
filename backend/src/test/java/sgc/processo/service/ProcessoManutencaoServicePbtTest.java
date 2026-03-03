@@ -1,11 +1,12 @@
 package sgc.processo.service;
 
 import net.jqwik.api.*;
+import sgc.comum.erros.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
 import sgc.processo.dto.*;
-import sgc.comum.erros.*;
 import sgc.processo.model.*;
+
 import java.time.*;
 import java.util.*;
 

@@ -1,23 +1,19 @@
 package sgc.processo.service;
 
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
-import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.organizacao.service.UnidadeService;
-import sgc.organizacao.model.Unidade;
-import sgc.processo.dto.AtualizarProcessoRequest;
-import sgc.processo.dto.CriarProcessoRequest;
-import sgc.comum.erros.ErroValidacao;
-import sgc.processo.model.Processo;
-import sgc.processo.model.ProcessoRepo;
-import sgc.processo.model.SituacaoProcesso;
-import sgc.processo.model.TipoProcesso;
+import org.mockito.junit.jupiter.*;
+import sgc.comum.erros.*;
+import sgc.organizacao.model.*;
+import sgc.organizacao.service.*;
+import sgc.processo.dto.*;
+import sgc.processo.model.*;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import java.time.*;
+import java.util.*;
+
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)

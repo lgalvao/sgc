@@ -2,9 +2,9 @@ package sgc.integracao;
 
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.*;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.authentication.*;
+import org.springframework.security.core.authority.*;
+import org.springframework.security.core.context.*;
 import org.springframework.transaction.annotation.*;
 import sgc.mapa.model.*;
 import sgc.organizacao.model.*;

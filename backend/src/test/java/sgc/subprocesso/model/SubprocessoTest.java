@@ -1,13 +1,15 @@
 package sgc.subprocesso.model;
 
 import org.junit.jupiter.api.*;
-import sgc.comum.erros.ErroValidacao;
 import org.junit.jupiter.params.*;
 import org.junit.jupiter.params.provider.*;
+import sgc.comum.erros.*;
 import sgc.mapa.model.*;
 import sgc.organizacao.model.*;
 import sgc.processo.model.*;
+
 import java.time.*;
+
 import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("Entidade: Subprocesso")
