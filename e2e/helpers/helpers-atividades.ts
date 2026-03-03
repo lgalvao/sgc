@@ -117,10 +117,16 @@ export async function removerConhecimento(page: Page, atividadeDescricao: string
     await expect(card.getByText(conhecimento)).toBeHidden();
 }
 
+import {limparNotificacoes} from './helpers-navegacao.js';
+
 export async function disponibilizarCadastro(page: Page) {
+    await limparNotificacoes(page);
     await page.getByTestId('btn-cad-atividades-disponibilizar').click();
 
     // Garantir que o modal apareça e o botão de confirmação esteja pronto
+    const modal = page.getByRole('dialog');
+    await expect(modal).toBeVisible();
+    
     const btnConfirmar = page.getByTestId('btn-confirmar-disponibilizacao');
     await expect(btnConfirmar).toBeVisible();
     await btnConfirmar.click();

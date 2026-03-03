@@ -15,6 +15,7 @@
     </template>
     <template #footer>
       <BButton
+          data-testid="btn-disponibilizar-revisao-cancelar"
           variant="secondary"
           @click="emit('fechar')"
       >

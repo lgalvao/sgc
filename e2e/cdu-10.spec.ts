@@ -170,12 +170,14 @@ test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conh
             await expect(erroInline).toContainText(/conhecimento/i);
 
             await adicionarConhecimento(page, atividadeIncompleta, 'Conhecimento Corretivo');
+            await limparNotificacoes(page);
             await page.getByTestId('btn-cad-atividades-disponibilizar').click();
             await expect(page.getByTestId('btn-confirmar-disponibilizacao')).toBeVisible();
-            await page.getByRole('button', {name: 'Cancelar'}).click();
+            await page.getByTestId('btn-disponibilizar-revisao-cancelar').click();
         });
 
         await test.step('3. Cenário 2: Caminho feliz - Disponibilizar revisão', async () => {
+            await limparNotificacoes(page);
             await page.getByTestId('btn-cad-atividades-disponibilizar').click();
             const modalConfirmacao = page.getByRole('dialog');
             await expect(modalConfirmacao.getByText('Disponibilização da revisão do cadastro')).toBeVisible();
@@ -269,8 +271,9 @@ test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conh
         });
 
         await test.step('6. Cenário 5: Cancelar disponibilização', async () => {
+            await limparNotificacoes(page);
             await page.getByTestId('btn-cad-atividades-disponibilizar').click();
-            await page.getByRole('button', {name: 'Cancelar'}).click();
+            await page.getByTestId('btn-disponibilizar-revisao-cancelar').click();
             await expect(page.getByRole('dialog')).toBeHidden();
             await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos'})).toBeVisible();
         });

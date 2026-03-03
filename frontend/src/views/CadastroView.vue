@@ -406,7 +406,7 @@ async function disponibilizarCadastro() {
         scrollParaPrimeiroErro();
       }
     } catch {
-      feedbackStore.show("Erro na validação", "Não foi possível validar o cadastro.", "danger");
+      // O withErrorHandling já notificou o erro se necessário ou ele será exibido via erroGlobal
     } finally {
       loadingValidacao.value = false;
     }
