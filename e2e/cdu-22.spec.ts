@@ -30,7 +30,11 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
     const atividade1 = `Atividade Bloco ${timestamp}`;
 
 
-    test('Preparacao 1: Admin cria e inicia processo de mapeamento', async ({page, cleanupAutomatico}) => {
+    test('Preparacao 1: Admin cria e inicia processo de mapeamento', async ({
+                                                                                page,
+                                                                                autenticadoComoAdmin,
+                                                                                cleanupAutomatico
+                                                                            }) => {
 
 
         await criarProcesso(page, {
@@ -53,7 +57,10 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro', async ({page}) => {
+    test('Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro', async ({
+                                                                                        page,
+                                                                                        autenticadoComoChefeSecao221
+                                                                                    }) => {
 
 
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
@@ -69,7 +76,7 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
     });
 
 
-    test('Cenario 1: GESTOR abre modal e cancela aceite em bloco', async ({page}) => {
+    test('Cenario 1: GESTOR abre modal e cancela aceite em bloco', async ({page, autenticadoComoGestorCoord22}) => {
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
 
@@ -89,7 +96,10 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
     });
 
-    test('Cenario 2: GESTOR confirma aceite em bloco e retorna ao painel', async ({page}) => {
+    test('Cenario 2: GESTOR confirma aceite em bloco e retorna ao painel', async ({
+                                                                                      page,
+                                                                                      autenticadoComoGestorCoord22
+                                                                                  }) => {
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         const btnAceitar = page.getByRole('button', {name: /Aceitar em Bloco/i}).first();
         await expect(btnAceitar).toBeVisible();

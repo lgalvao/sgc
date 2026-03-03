@@ -10,7 +10,11 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
     const CHEFE_UNIDADE = USUARIOS.CHEFE_ASSESSORIA_11.titulo;
     const SENHA_CHEFE = USUARIOS.CHEFE_ASSESSORIA_11.senha;
 
-    test('Cenário 1: Processo de Mapeamento (Fluxo Completo + Importação)', async ({page, cleanupAutomatico}) => {
+    test('Cenário 1: Processo de Mapeamento (Fluxo Completo + Importação)', async ({
+                                                                                       page,
+                                                                                       autenticadoComoAdmin,
+                                                                                       cleanupAutomatico
+                                                                                   }) => {
         const timestamp = Date.now();
         const descricaoProcesso = `Processo CDU-08 Map ${timestamp}`;
 
@@ -52,7 +56,6 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
         });
 
         const atividade1 = `Atividade 1 ${timestamp}`;
-
         await test.step('3. Adicionar Atividade e Conhecimento', async () => {
             await AtividadeHelpers.adicionarAtividade(page, atividade1);
 
@@ -89,7 +92,7 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
         });
     });
 
-    test('Cenário 2: Processo de Revisão (Botão Impacto)', async ({page}) => {
+    test('Cenário 2: Processo de Revisão (Botão Impacto)', async ({page, autenticadoComoAdmin}) => {
         const timestamp = Date.now();
         const descricao = `Processo CDU-08 Rev ${timestamp}`;
         const UNIDADE_REVISAO = 'ASSESSORIA_12';

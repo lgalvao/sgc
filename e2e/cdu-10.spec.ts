@@ -28,7 +28,7 @@ async function verificarPaginaSubprocesso(page: Page, unidade: string) {
 test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conhecimentos', () => {
     const UNIDADE_ALVO = 'SECAO_221';
 
-    test('Fluxo completo de revisão de cadastro', async ({page, cleanupAutomatico}) => {
+    test('Fluxo completo de revisão de cadastro', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
         const timestamp = Date.now();
         const descProcessoMapeamento = `Map 10 ${timestamp}`;
         const descProcessoRevisao = `Rev 10 ${timestamp}`;

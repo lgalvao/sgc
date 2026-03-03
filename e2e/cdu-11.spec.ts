@@ -33,7 +33,11 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
 
     // PREPARAÇÃO - Criar processo de mapeamento com atividades disponibilizadas
 
-    test('Preparacao 1: Admin cria e inicia processo de mapeamento', async ({page, cleanupAutomatico}) => {
+    test('Preparacao 1: Admin cria e inicia processo de mapeamento', async ({
+                                                                                page,
+                                                                                autenticadoComoAdmin,
+                                                                                cleanupAutomatico
+                                                                            }) => {
 
 
         await criarProcesso(page, {
@@ -61,7 +65,10 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 2: Chefe adiciona atividades e conhecimentos, e disponibiliza cadastro', async ({page}) => {
+    test('Preparacao 2: Chefe adiciona atividades e conhecimentos, e disponibiliza cadastro', async ({
+                                                                                                         page,
+                                                                                                         autenticadoComoChefeSecao211
+                                                                                                     }) => {
 
 
         await acessarSubprocessoChefeDireto(page, descProcessoMapeamento, UNIDADE_ALVO);
@@ -88,7 +95,10 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
 
     // TESTES PRINCIPAIS - CDU-11
 
-    test('Cenario 1: ADMIN visualiza cadastro clicando na unidade subordinada', async ({page}) => {
+    test('Cenario 1: ADMIN visualiza cadastro clicando na unidade subordinada', async ({
+                                                                                           page,
+                                                                                           autenticadoComoAdmin
+                                                                                       }) => {
 
 
         await expect(page.getByTestId('tbl-processos').getByText(descProcessoMapeamento).first()).toBeVisible();
@@ -128,7 +138,10 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await expect(page.getByText(conhecimento3)).toBeVisible();
     });
 
-    test('Cenario 2: CHEFE visualiza cadastro diretamente (sem navegar por unidades)', async ({page}) => {
+    test('Cenario 2: CHEFE visualiza cadastro diretamente (sem navegar por unidades)', async ({
+                                                                                                  page,
+                                                                                                  autenticadoComoChefeSecao211
+                                                                                              }) => {
 
 
         await page.getByTestId('tbl-processos').getByText(descProcessoMapeamento).first().click();
@@ -153,7 +166,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await expect(page.getByText(conhecimento3)).toBeVisible();
     });
 
-    test('Cenario 3: Visualizar processo finalizado', async ({page}) => {
+    test('Cenario 3: Visualizar processo finalizado', async ({page, autenticadoComoGestorCoord21}) => {
         // Preparar: Admin homologa o cadastro
         await acessarSubprocessoGestor(page, descProcessoMapeamento, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
@@ -271,7 +284,11 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await expect(page.getByText(atividadeB)).toBeVisible();
     });
 
-    test('Cenario 4: CHEFE visualiza cadastro de processo finalizado', async ({page, cleanupAutomatico}) => {
+    test('Cenario 4: CHEFE visualiza cadastro de processo finalizado', async ({
+                                                                                  page,
+                                                                                  autenticadoComoChefeSecao211,
+                                                                                  cleanupAutomatico
+                                                                              }) => {
         // Registrar cleanup aqui pois é o último teste que depende deste processo
         if (processoMapeamentoId > 0) cleanupAutomatico.registrar(processoMapeamentoId);
 

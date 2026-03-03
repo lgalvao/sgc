@@ -10,7 +10,7 @@ import {expect, test} from './fixtures/complete-fixtures.js';
  */
 test.describe.serial('CDU-31 - Configurar sistema', () => {
 
-    test('Cenários CDU-31: ADMIN navega e altera configurações do sistema', async ({page}) => {
+    test('Cenários CDU-31: ADMIN navega e altera configurações do sistema', async ({page, autenticadoComoAdmin}) => {
         // Cenario 1: Navegação para parâmetros
         await page.getByTestId('btn-parametros').click();
         await expect(page).toHaveURL(/\/parametros/);

@@ -10,7 +10,7 @@ import {expect, test} from './fixtures/complete-fixtures.js';
  */
 test.describe.serial('CDU-30 - Manter Administradores', () => {
 
-    test('Cenários CDU-30: ADMIN acessa e visualiza lista de administradores', async ({page}) => {
+    test('Cenários CDU-30: ADMIN acessa e visualiza lista de administradores', async ({page, autenticadoComoAdmin}) => {
         // Cenario 1: Navegação para página de administradores
         await page.getByTestId('btn-administradores').click();
         await expect(page).toHaveURL(/\/administradores/);
@@ -24,7 +24,7 @@ test.describe.serial('CDU-30 - Manter Administradores', () => {
 
         // Verificar que tabela tem dados (pelo menos o próprio admin)
         const linhas = tabela.locator('tbody tr');
-        expect(linhas.count()).not.toBe(0);
+        await expect(linhas.count()).not.toBe(0);
 
         // Verificar botão de adicionar administrador
         const btnAdicionar = page.getByRole('button', {name: /Adicionar|Novo/i});

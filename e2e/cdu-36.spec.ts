@@ -10,7 +10,7 @@ import {expect, test} from './fixtures/complete-fixtures.js';
  */
 test.describe.serial('CDU-36 - Gerar relatório de mapas', () => {
 
-    test('Cenários CDU-36: ADMIN navega e gera relatórios de mapas', async ({page}) => {
+    test('Cenários CDU-36: ADMIN navega e gera relatórios de mapas', async ({page, autenticadoComoAdmin}) => {
         // Cenario 1: Navegação para página de relatórios
         await page.getByRole('link', {name: /Relatórios/i}).click();
         await expect(page).toHaveURL(/\/relatorios/);

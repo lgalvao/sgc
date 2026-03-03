@@ -69,7 +69,11 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
 
 
 
-    test('Fase 1.1: ADMIN cria e inicia processo de Mapeamento', async ({page, cleanupAutomatico}) => {
+    test('Fase 1.1: ADMIN cria e inicia processo de Mapeamento', async ({
+                                                                            page,
+                                                                            autenticadoComoAdmin,
+                                                                            cleanupAutomatico
+                                                                        }) => {
         await passo1_AdminCriaEIniciaProcessoMapeamento(page, descProcMapeamento);
         // Capturar ID do processo para cleanup
         await page.goto('/painel');
@@ -116,7 +120,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await homologarCadastroMapeamento(page);
     });
 
-    test('Fase 1.5: ADMIN adiciona competências e disponibiliza mapa', async ({page}) => {
+    test('Fase 1.5: ADMIN adiciona competências e disponibiliza mapa', async ({page, autenticadoComoAdmin}) => {
 
         await acessarSubprocessoAdmin(page, descProcMapeamento, UNIDADE_ALVO);
         await navegarParaMapa(page);
@@ -125,7 +129,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Fase 1.6: CHEFE valida mapa', async ({page}) => {
+    test('Fase 1.6: CHEFE valida mapa', async ({page, autenticadoComoAdmin}) => {
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
         await acessarSubprocessoChefeDireto(page, descProcMapeamento, UNIDADE_ALVO);
         await navegarParaMapa(page);
@@ -158,7 +162,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Fase 2: Iniciar processo de Revisão', async ({page, cleanupAutomatico}) => {
+    test('Fase 2: Iniciar processo de Revisão', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
         // Login as Admin
 
 

@@ -38,7 +38,7 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {
     const atividade1 = `Atividade Homol ${timestamp}`;
 
 
-    test('Preparacao 1: Admin cria e inicia processo', async ({page, cleanupAutomatico}) => {
+    test('Preparacao 1: Admin cria e inicia processo', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
 
 
         await criarProcesso(page, {
@@ -61,7 +61,7 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Preparacao 2: Chefe disponibiliza cadastro', async ({page}) => {
+    test('Preparacao 2: Chefe disponibiliza cadastro', async ({page, autenticadoComoChefeSecao221}) => {
 
 
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
@@ -91,7 +91,7 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {
     });
 
 
-    test('Cenario 1: ADMIN abre modal e cancela homologação em bloco', async ({page}) => {
+    test('Cenario 1: ADMIN abre modal e cancela homologação em bloco', async ({page, autenticadoComoAdmin}) => {
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
 
@@ -111,7 +111,7 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
     });
 
-    test('Cenario 2: ADMIN confirma homologação em bloco e permanece na tela', async ({page}) => {
+    test('Cenario 2: ADMIN confirma homologação em bloco e permanece na tela', async ({page, autenticadoComoAdmin}) => {
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         const btnHomologar = page.getByRole('button', {name: /Homologar em Bloco/i}).first();
         await expect(btnHomologar).toBeVisible();

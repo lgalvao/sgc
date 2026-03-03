@@ -274,7 +274,6 @@ test.describe('Smoke Test - Sistema SGC', () => {
             await page.waitForTimeout(500);
             const cardDisponibilizado = page.locator('.atividade-card').first();
             if (await cardDisponibilizado.isVisible().catch(() => false)) {
-                // Atividade visível
             }
         });
 
@@ -488,7 +487,6 @@ test.describe('Smoke Test - Sistema SGC', () => {
             await page.waitForTimeout(100);
             const cardCompetencia = page.locator('.competencia-card').first();
             if (await cardCompetencia.isVisible().catch(() => false)) {
-                // Competência visível
             }
         });
     });
@@ -758,7 +756,6 @@ test.describe('Smoke Test - Sistema SGC', () => {
                 // Tabela de processos finalizados
                 const tabela = page.locator('table');
                 if (await tabela.isVisible().catch(() => false)) {
-                    // Tabela visível
                 }
             }
         });
@@ -776,7 +773,6 @@ test.describe('Smoke Test - Sistema SGC', () => {
             // Seção de configurações do sistema (CDU-31)
             const inputDiasInativacao = page.getByTestId('inp-config-dias-inativacao');
             if (await inputDiasInativacao.isVisible().catch(() => false)) {
-                // Configuração visível
             }
 
             // Página de administradores (CDU-30)
@@ -810,18 +806,15 @@ test.describe('Smoke Test - Sistema SGC', () => {
                     await page.waitForTimeout(300);
                     const modalRelatorio = page.locator('.modal-content').first();
                     if (await modalRelatorio.isVisible().catch(() => false)) {
-                        // Modal visível
                     }
 
                     const filtroTipo = page.getByTestId('sel-filtro-tipo');
                     if (await filtroTipo.isVisible().catch(() => false)) {
-                        // Filtro visível
                     }
 
                     // Verificar botão de exportação
                     const btnExportar = page.getByRole('button', {name: /Exportar|PDF|CSV/i});
                     if (await btnExportar.isVisible().catch(() => false)) {
-                        // Botão visível
                     }
 
                     await page.getByRole('button', {name: /Fechar|Cancelar|Close|Cancel/i}).first().click().catch(() => {

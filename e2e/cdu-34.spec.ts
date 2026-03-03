@@ -24,7 +24,7 @@ test.describe.serial('CDU-34 - Enviar lembrete de prazo', () => {
     let processoId: number;
 
 
-    test('Preparacao: Admin cria e inicia processo', async ({page, cleanupAutomatico}) => {
+    test('Preparacao: Admin cria e inicia processo', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
         await criarProcesso(page, {
             descricao: descProcesso,
             tipo: 'MAPEAMENTO', diasLimite: 5,
@@ -45,7 +45,10 @@ test.describe.serial('CDU-34 - Enviar lembrete de prazo', () => {
     });
 
 
-    test('Cenario principal: ADMIN envia lembrete e sistema registra histórico/alerta', async ({page}) => {
+    test('Cenario principal: ADMIN envia lembrete e sistema registra histórico/alerta', async ({
+                                                                                                   page,
+                                                                                                   autenticadoComoAdmin
+                                                                                               }) => {
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
 
@@ -64,7 +67,10 @@ test.describe.serial('CDU-34 - Enviar lembrete de prazo', () => {
         await expect(page.getByTestId('tbl-movimentacoes')).toContainText('Lembrete de prazo enviado');
     });
 
-    test('Cenario complementar: unidade de destino visualiza alerta de lembrete no painel', async ({page}) => {
+    test('Cenario complementar: unidade de destino visualiza alerta de lembrete no painel', async ({
+                                                                                                       page,
+                                                                                                       autenticadoComoChefeAssessoria22
+                                                                                                   }) => {
         const tabelaAlertas = page.getByTestId('tbl-alertas');
         await expect(tabelaAlertas).toBeVisible();
         await expect(tabelaAlertas).toContainText(descProcesso);

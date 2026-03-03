@@ -1,9 +1,18 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcesso, extrairProcessoId, verificarDetalhesProcesso} from './helpers/helpers-processos.js';
+import type {Page} from '@playwright/test';
 
 test.describe('CDU-04 - Iniciar Processo', () => {
 
-    test('Deve iniciar um processo e validar criação de subprocessos e alertas', async ({page, cleanupAutomatico}) => {
+    test('Deve iniciar um processo e validar criação de subprocessos e alertas', async ({
+                                                                                            page,
+                                                                                            autenticadoComoAdmin,
+                                                                                            cleanupAutomatico
+                                                                                        }: {
+        page: Page,
+        autenticadoComoAdmin: void,
+        cleanupAutomatico: any
+    }) => {
         const descricao = `CDU-04 Iniciar - ${Date.now()}`;
 
         await criarProcesso(page, {

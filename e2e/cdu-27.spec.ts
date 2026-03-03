@@ -25,7 +25,7 @@ test.describe.serial('CDU-27 - Alterar data limite de subprocesso', () => {
     let processoId: number;
 
 
-    test('Preparacao: Admin cria e inicia processo', async ({page, cleanupAutomatico}) => {
+    test('Preparacao: Admin cria e inicia processo', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
 
 
         await criarProcesso(page, {
@@ -49,7 +49,7 @@ test.describe.serial('CDU-27 - Alterar data limite de subprocesso', () => {
     });
 
 
-    test('Cenario 1: ADMIN navega para detalhes do subprocesso', async ({page}) => {
+    test('Cenario 1: ADMIN navega para detalhes do subprocesso', async ({page, autenticadoComoAdmin}) => {
         // CDU-27: Passos 1-2
 
 
@@ -60,7 +60,7 @@ test.describe.serial('CDU-27 - Alterar data limite de subprocesso', () => {
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toBeVisible();
     });
 
-    test('Cenario 2: ADMIN altera data limite e recebe confirmação', async ({page}) => {
+    test('Cenario 2: ADMIN altera data limite e recebe confirmação', async ({page, autenticadoComoAdmin}) => {
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, UNIDADE_1);
 

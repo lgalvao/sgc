@@ -27,7 +27,7 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
     const timestamp = Date.now();
     const descProcesso = `Proc 9 ${timestamp}`;
 
-    test('Fluxo completo de disponibilização e devolução', async ({page}) => {
+    test('Fluxo completo de disponibilização e devolução', async ({page, autenticadoComoAdmin}) => {
 
         await test.step('Preparação: Admin cria e inicia processo', async () => {
             await criarProcesso(page, {

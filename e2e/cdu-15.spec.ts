@@ -38,7 +38,7 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
     const CONHECIMENTO_1 = `Conhecimento 1 ${timestamp}`;
     const CONHECIMENTO_2 = `Conhecimento 2 ${timestamp}`;
 
-    test('Preparacao: Criar processo e homologar cadastro de atividades', async ({page}) => {
+    test('Preparacao: Criar processo e homologar cadastro de atividades', async ({page, autenticadoComoAdmin}) => {
         // 1. Admin cria e inicia processo
         await criarProcesso(page, {
             descricao: descProcesso,
@@ -86,7 +86,7 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro homologado/i);
     });
 
-    test('Cenários CDU-15: Fluxo completo de manutenção do mapa pelo ADMIN', async ({page}) => {
+    test('Cenários CDU-15: Fluxo completo de manutenção do mapa pelo ADMIN', async ({page, autenticadoComoAdmin}) => {
         // CT-00 e CT-01: Acessar Edição e verificar elementos
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
         await navegarParaMapa(page);
