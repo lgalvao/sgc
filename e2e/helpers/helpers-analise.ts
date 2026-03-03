@@ -16,7 +16,7 @@ import {verificarPaginaPainel} from './helpers-navegacao.js';
 export async function acessarSubprocessoGestor(page: Page, descricaoProcesso: string, siglaUnidade: string) {
     await expect(page).toHaveURL(/\/painel$/);
     const row = page.getByTestId('tbl-processos').locator('tr', {hasText: descricaoProcesso});
-    await expect(row).toBeVisible({timeout: 15000});
+    await expect(row).toBeVisible();
     await row.click();
 
     await expect(page).toHaveURL(/\/processo\/\d+/);

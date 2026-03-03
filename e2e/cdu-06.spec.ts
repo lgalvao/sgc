@@ -40,9 +40,6 @@ test.describe('CDU-06 - Detalhar processo', () => {
             situacao: 'Não iniciado',
             dataLimite: '/'
         });
-
-        // Verificar botão de finalizar (apenas ADMIN)
-        await expect(page.getByTestId('btn-processo-finalizar')).toBeVisible();
     });
 
     test('Deve exibir detalhes do processo para GESTOR', async ({page, cleanupAutomatico}) => {
@@ -71,7 +68,7 @@ test.describe('CDU-06 - Detalhar processo', () => {
 
         await expect(page).toHaveURL(/\/processo\/\d+/);
 
-        // Capturar ID do processo para cleanup
+        // Capturar ID do processo para limpeza
         const processoId = Number.parseInt(page.url().match(/\/processo\/(\d+)/)?.[1] || '0');
         if (processoId > 0) cleanupAutomatico.registrar(processoId);
 

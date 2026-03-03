@@ -29,7 +29,6 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
                 iniciar: true
             });
 
-            // Capturar ID para cleanup
             await page.getByTestId('tbl-processos').getByText(descricaoProcesso).first().click();
             await expect(page).toHaveURL(/\/processo\/\d+/);
             const processoId = await extrairProcessoId(page);
@@ -58,8 +57,6 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
         const atividade1 = `Atividade 1 ${timestamp}`;
         await test.step('3. Adicionar Atividade e Conhecimento', async () => {
             await AtividadeHelpers.adicionarAtividade(page, atividade1);
-
-            // Verifica mudança de status
             await AtividadeHelpers.verificarSituacaoSubprocesso(page, 'Cadastro em andamento');
 
             const conhecimento1 = `Conhecimento 1 ${timestamp}`;

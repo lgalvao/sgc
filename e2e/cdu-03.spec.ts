@@ -144,7 +144,7 @@ test.describe('CDU-03 - Manter Processo', () => {
         await page.getByRole('dialog').getByRole('button', {name: 'Remover'}).click();
 
         await expect(page).toHaveURL(/\/painel/);
-        await expect(page.getByTestId('tbl-processos').getByText(descricao)).not.toBeVisible();
+        await expect(page.getByTestId('tbl-processos').getByText(descricao)).toBeHidden();
     });
 
     test('Deve validar regras de seleção em cascata na árvore de unidades', async ({page, autenticadoComoAdmin}: {
@@ -292,7 +292,7 @@ test.describe('CDU-03 - Manter Processo', () => {
         await page.getByTestId('inp-processo-descricao').fill(descricao);
         await page.getByRole('button', {name: 'Cancelar'}).click();
         await expect(page).toHaveURL(/\/painel/);
-        await expect(page.getByText(descricao)).not.toBeVisible();
+        await expect(page.getByText(descricao)).toBeHidden();
 
 
         await criarProcesso(page, {
@@ -317,7 +317,7 @@ test.describe('CDU-03 - Manter Processo', () => {
         await page.getByTestId('tbl-processos').getByText(descricao).first().click();
         await page.getByTestId('btn-processo-remover').click();
         await page.getByTestId('btn-modal-confirmacao-cancelar').click();
-        await expect(page.getByText(`Remover o processo '${descricao}'?`)).not.toBeVisible();
+        await expect(page.getByText(`Remover o processo '${descricao}'?`)).toBeHidden();
 
         // 4. Confirmar remoção e validar mensagem
         await page.getByTestId('btn-processo-remover').click();

@@ -39,8 +39,9 @@ export default [
             "@typescript-eslint/no-unused-vars": [
                 "warn",
                 {
-                    argsIgnorePattern: "^_+$",
-                    varsIgnorePattern: "^_+$",
+                    "argsIgnorePattern": "^_|autenticado|cleanup",
+                    "varsIgnorePattern": "^_|autenticado|cleanup",
+                    "caughtErrorsIgnorePattern": "^e$"
                 },
             ],
             "no-console": "off",
@@ -63,7 +64,11 @@ export default [
             "playwright/no-wait-for-timeout": "off",
             "playwright/no-conditional-in-test": "off",
             "playwright/expect-expect": "off",
-            "@typescript-eslint/no-unused-vars": "off"
+            "@typescript-eslint/no-unused-vars": ["warn", {
+                "argsIgnorePattern": "^_|autenticado|cleanup",
+                "varsIgnorePattern": "^_|autenticado|cleanup",
+                "caughtErrorsIgnorePattern": "^e$"
+            }],
         }
     },
     eslintConfigPrettier,

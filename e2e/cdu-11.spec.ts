@@ -31,8 +31,6 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
 
     let processoMapeamentoId: number;
 
-    // PREPARAÇÃO - Criar processo de mapeamento com atividades disponibilizadas
-
     test('Preparacao 1: Admin cria e inicia processo de mapeamento', async ({
                                                                                 page,
                                                                                 autenticadoComoAdmin,
@@ -48,17 +46,12 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
             expandir: ['SECRETARIA_2', 'COORD_21']
         });
 
-        // Selecionar o processo na tabela para obter o ID
-
         const linhaProcesso = page.getByTestId('tbl-processos').locator('tr').filter({has: page.getByText(descProcessoMapeamento)});
-
         await linhaProcesso.click();
         await expect(page.getByTestId('inp-processo-descricao')).toHaveValue(descProcessoMapeamento);
         await expect(page.getByText('Carregando unidades...')).toBeHidden();
-        processoMapeamentoId = await extrairProcessoId(page);
-        // Não registrar cleanup aqui pois os testes seguintes dependem deste processo (serial)
-        // O registro será feito no último cenário.
 
+        processoMapeamentoId = await extrairProcessoId(page);
         await page.getByTestId('btn-processo-iniciar').click();
         await page.getByTestId('btn-iniciar-processo-confirmar').click();
 
@@ -69,7 +62,6 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
                                                                                                          page,
                                                                                                          autenticadoComoChefeSecao211
                                                                                                      }) => {
-
 
         await acessarSubprocessoChefeDireto(page, descProcessoMapeamento, UNIDADE_ALVO);
 
@@ -142,7 +134,6 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
                                                                                                   page,
                                                                                                   autenticadoComoChefeSecao211
                                                                                               }) => {
-
 
         await page.getByTestId('tbl-processos').getByText(descProcessoMapeamento).first().click();
 
@@ -291,9 +282,6 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
                                                                               }) => {
         // Registrar cleanup aqui pois é o último teste que depende deste processo
         if (processoMapeamentoId > 0) cleanupAutomatico.registrar(processoMapeamentoId);
-
-        // Mesmo cenário mas com perfil CHEFE - deve ir direto para subprocesso
-
 
         // Clicar no processo finalizado
         await page.getByTestId('tbl-processos').getByText(descProcessoMapeamento).first().click();

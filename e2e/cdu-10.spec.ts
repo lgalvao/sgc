@@ -19,7 +19,7 @@ import {
     fecharHistoricoAnalise,
     homologarCadastroMapeamento
 } from './helpers/helpers-analise.js';
-import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
+import {fazerLogout, navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 
 async function verificarPaginaSubprocesso(page: Page, unidade: string) {
     await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${unidade}(?:/)?$`));
@@ -71,33 +71,33 @@ test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conh
             await acessarSubprocessoGestor(page, descProcessoMapeamento, UNIDADE_ALVO);
             await navegarParaAtividadesVisualizacao(page);
             await aceitarCadastroMapeamento(page, 'Aceite intermediário COORD_22');
+            await fazerLogout(page);
 
             await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
             await acessarSubprocessoGestor(page, descProcessoMapeamento, UNIDADE_ALVO);
             await navegarParaAtividadesVisualizacao(page);
             await aceitarCadastroMapeamento(page, 'Aceite intermediário SECRETARIA_2');
+            await fazerLogout(page);
 
             // Admin homologa cadastro
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
             await page.getByTestId('tbl-processos').getByText(descProcessoMapeamento).first().click();
-            const linhaUnidade = page.getByRole('row', {name: UNIDADE_ALVO});
-            await expect(linhaUnidade).toContainText(/Disponibilizado/i);
-            await linhaUnidade.click();
-
+            await navegarParaSubprocesso(page, UNIDADE_ALVO);
             await navegarParaAtividadesVisualizacao(page);
             await homologarCadastroMapeamento(page);
 
             // Admin adiciona competências e disponibiliza mapa
-            await page.goto('/painel');
-            await page.getByTestId('tbl-processos').getByText(descProcessoMapeamento).first().click();
-            await navegarParaSubprocesso(page, UNIDADE_ALVO);
             await navegarParaMapa(page);
             await criarCompetencia(page, `Competência Mapeamento 1 ${timestamp}`, [`Atividade Mapeamento 1 ${timestamp}`]);
             await criarCompetencia(page, `Competência Mapeamento 2 ${timestamp}`, [`Atividade Mapeamento 2 ${timestamp}`]);
-            await page.getByTestId('btn-cad-mapa-disponibilizar').click();
+
+            // Usar force: true para clicar mesmo que o toast de sucesso esteja por cima (top-right)
+            await page.getByTestId('btn-cad-mapa-disponibilizar').click({force: true});
+            const modal = page.getByTestId('mdl-disponibilizar-mapa');
+            await expect(modal).toBeVisible();
             await page.getByTestId('inp-disponibilizar-mapa-data').fill('2030-12-31');
             await page.getByTestId('btn-disponibilizar-mapa-confirmar').click();
-            await expect(page).toHaveURL(/\/painel/);
+            await verificarPaginaPainel(page);
 
             // Chefe valida mapa
             await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
@@ -105,8 +105,7 @@ test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conh
             await navegarParaMapa(page);
             await page.getByTestId('btn-mapa-validar').click();
             await page.getByTestId('btn-validar-mapa-confirmar').click();
-            await expect(page).toHaveURL(/\/vis-mapa/);
-            await page.goto('/painel');
+            await fazerLogout(page);
 
             // Aceites intermediários para Mapa
             await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
@@ -114,20 +113,18 @@ test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conh
             await navegarParaMapa(page);
             await page.getByTestId('btn-mapa-homologar-aceite').click();
             await page.getByTestId('btn-aceite-mapa-confirmar').click();
+            await fazerLogout(page);
 
             await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
             await acessarSubprocessoGestor(page, descProcessoMapeamento, UNIDADE_ALVO);
             await navegarParaMapa(page);
             await page.getByTestId('btn-mapa-homologar-aceite').click();
             await page.getByTestId('btn-aceite-mapa-confirmar').click();
+            await fazerLogout(page);
 
             // Admin homologa mapa e finaliza processo
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
             await acessarSubprocessoAdmin(page, descProcessoMapeamento, UNIDADE_ALVO);
-            if (/\/processo\/\d+$/.test(page.url())) {
-                await page.getByRole('row', {name: new RegExp(UNIDADE_ALVO)}).click();
-            }
-            await verificarPaginaSubprocesso(page, UNIDADE_ALVO);
             await navegarParaMapa(page);
             await page.getByTestId('btn-mapa-homologar-aceite').click();
             await page.getByTestId('btn-aceite-mapa-confirmar').click();
@@ -191,7 +188,12 @@ test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conh
 
             await expect(page.getByText(/Revisão do cadastro de atividades disponibilizada/i).first()).toBeVisible();
             await verificarPaginaPainel(page);
-            await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
+
+            // Verificar alerta para o gestor superior
+            await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
+            await expect(page.getByTestId('tbl-alertas')).toContainText(`Revisão do cadastro da unidade ${UNIDADE_ALVO} disponibilizada para análise`);
+
+            await acessarSubprocessoGestor(page, descProcessoRevisao, UNIDADE_ALVO);
             await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Revisão d[oe] cadastro disponibilizada/i);
             await expect(page.getByTestId('tbl-movimentacoes')).toContainText(/Disponibilização da revisão do cadastro de atividades/i);
         });
@@ -206,7 +208,14 @@ test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conh
             await page.getByTestId('btn-devolucao-cadastro-confirmar').click({force: true});
             await verificarPaginaPainel(page);
 
+            // Verificar movimentação de devolução
+            await acessarSubprocessoGestor(page, descProcessoRevisao, UNIDADE_ALVO);
+            await expect(page.getByTestId('tbl-movimentacoes')).toContainText(/Devolução da revisão do cadastro para ajustes/i);
+
+            // Verificar alerta para o chefe da unidade
             await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
+            await expect(page.getByTestId('tbl-alertas')).toContainText(`Revisão do cadastro da unidade ${UNIDADE_ALVO} devolvida para ajustes`);
+
             await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
             await navegarParaAtividades(page);
             const modal = await abrirHistoricoAnalise(page);
@@ -228,6 +237,10 @@ test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conh
             await page.getByTestId('btn-devolucao-cadastro-confirmar').click({force: true});
             await verificarPaginaPainel(page);
 
+            // Verificar movimentação de devolução (2ª vez)
+            await acessarSubprocessoGestor(page, descProcessoRevisao, UNIDADE_ALVO);
+            await expect(page.getByTestId('tbl-movimentacoes')).toContainText(/Devolução da revisão do cadastro para ajustes/i);
+
             await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
             await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
             await navegarParaAtividades(page);
@@ -245,8 +258,11 @@ test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conh
             await page.getByTestId('btn-devolucao-cadastro-confirmar').click({force: true});
             await verificarPaginaPainel(page);
 
-            // Chefe verifica que histórico tem apenas a última devolução
+            // Verificar alerta da 3ª devolução
             await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
+            await expect(page.getByTestId('tbl-alertas')).toContainText(`Revisão do cadastro da unidade ${UNIDADE_ALVO} devolvida para ajustes`);
+
+            // Chefe verifica que histórico tem apenas a última devolução
             await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
             await navegarParaAtividades(page);
             const modal = await abrirHistoricoAnalise(page);

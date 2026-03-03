@@ -10,11 +10,10 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
     const GESTOR_UNIDADE = USUARIOS.GESTOR_COORD_21.titulo;
     const SENHA_GESTOR = USUARIOS.GESTOR_COORD_21.senha;
 
-    test('Deve exibir detalhes do subprocesso para ADMIN, GESTOR e CHEFE', async ({
-                                                                                      page,
-                                                                                      autenticadoComoAdmin,
-                                                                                      cleanupAutomatico
-                                                                                  }) => {
+    test('Deve exibir detalhes do subprocesso para ADMIN, GESTOR e CHEFE', async (
+        {
+            page, autenticadoComoAdmin, cleanupAutomatico
+        }) => {
         const timestamp = Date.now();
         const descricao = `Processo CDU-07 ${timestamp}`;
 
@@ -32,6 +31,7 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
             situacao: 'Em andamento',
             tipo: 'Mapeamento'
         });
+
         await page.getByTestId('tbl-processos').getByText(descricao, {exact: true}).first().click();
         const processoId = Number.parseInt(page.url().match(/\/processo\/(\d+)/)?.[1] || '0');
         if (processoId > 0) cleanupAutomatico.registrar(processoId);
@@ -42,6 +42,7 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
             situacao: 'Não iniciado',
             prazo: '/'
         });
+
         await expect(page.locator('[data-testid="card-subprocesso-atividades"], [data-testid="card-subprocesso-atividades-vis"]').first()).toBeVisible();
         await expect(page.getByRole('heading', {name: 'Movimentações'})).toBeVisible();
         await expect(page.locator('table tbody tr')).not.toHaveCount(0);
@@ -56,6 +57,7 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
         await login(page, CHEFE_UNIDADE, SENHA_CHEFE);
         await page.getByTestId('tbl-processos').getByText(descricao, {exact: true}).first().click();
         await expect(page).toHaveURL(new RegExp(`/processo/\\d+/${UNIDADE_ALVO}$`));
+
         await verificarDetalhesSubprocesso(page, {
             sigla: UNIDADE_ALVO,
             situacao: 'Não iniciado',

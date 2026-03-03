@@ -15,10 +15,6 @@ import {
 } from './helpers/helpers-analise.js';
 import {fazerLogout} from './helpers/helpers-navegacao.js';
 
-async function verificarPaginaSubprocesso(page: Page) {
-    await expect(page).toHaveURL(/\/processo\/\d+\/SECAO_221$/);
-}
-
 test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecimentos', () => {
     const UNIDADE_ALVO = 'SECAO_221';
     const USUARIO_CHEFE = USUARIOS.CHEFE_SECAO_221.titulo;

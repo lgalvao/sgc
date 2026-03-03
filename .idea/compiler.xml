@@ -16,6 +16,7 @@
     <bytecodeTargetLevel target="21" />
   </component>
   <component name="JavacSettings">
+    <option name="GENERATE_NO_WARNINGS" value="true" />
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="sgc.backend" options="-parameters -Xlint:unchecked -Xlint:deprecation" />
       <module name="sgc.backend.main" options="-parameters -Xlint:unchecked -Xlint:deprecation" />

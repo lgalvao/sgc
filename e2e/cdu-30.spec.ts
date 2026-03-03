@@ -24,7 +24,8 @@ test.describe.serial('CDU-30 - Manter Administradores', () => {
 
         // Verificar que tabela tem dados (pelo menos o próprio admin)
         const linhas = tabela.locator('tbody tr');
-        await expect(linhas.count()).not.toBe(0);
+        const count = await linhas.count();
+        expect(count).not.toBe(0);
 
         // Verificar botão de adicionar administrador
         const btnAdicionar = page.getByRole('button', {name: /Adicionar|Novo/i});

@@ -39,7 +39,7 @@ export async function criarProcesso(page: Page, options: {
         const checkbox = page.getByTestId(`chk-arvore-unidade-${u}`);
         await expect(checkbox).toBeVisible();
         if (!await checkbox.isEnabled()) {
-            await expect(checkbox).toBeEnabled({timeout: 5000}).catch(() => {
+            await expect(checkbox).toBeEnabled().catch(() => {
                 // segue para validar estado final após a janela de espera
             });
         }

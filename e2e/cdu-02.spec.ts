@@ -103,7 +103,7 @@ test.describe('CDU-02 - Visualizar Painel', () => {
             );
 
             // Verifica que o processo NÃO está visível para GESTOR
-            await expect(page.getByTestId('tbl-processos').getByText(descricaoProcesso)).not.toBeVisible();
+            await expect(page.getByTestId('tbl-processos').getByText(descricaoProcesso)).toBeHidden();
         });
 
 
@@ -179,7 +179,7 @@ test.describe('CDU-02 - Visualizar Painel', () => {
             autenticadoComoGestor: void
         }) => {
             await test.step('Verificar restrições de botões e mensagens de tabela vazia', async () => {
-                await expect(page.getByTestId('btn-painel-criar-processo')).not.toBeVisible();
+                await expect(page.getByTestId('btn-painel-criar-processo')).toBeHidden();
                 await expect(page.getByTestId('tbl-processos')).toBeVisible();
                 await expect(page.getByTestId('empty-state-processos')).toBeVisible();
             });

@@ -56,11 +56,11 @@ test.describe('CDU-01 - Realizar login e exibir estrutura das telas', () => {
 
         // Deve ver 'Minha unidade' em vez de 'Unidades'
         await expect(page.getByRole('link', {name: 'Minha unidade'})).toBeVisible();
-        await expect(page.getByRole('link', {name: 'Unidades'})).not.toBeVisible();
+        await expect(page.getByRole('link', {name: 'Unidades'})).toBeHidden();
 
         // Não deve ver configurações administrativas
-        await expect(page.getByTestId('btn-parametros')).not.toBeVisible();
-        await expect(page.getByTestId('btn-administradores')).not.toBeVisible();
+        await expect(page.getByTestId('btn-parametros')).toBeHidden();
+        await expect(page.getByTestId('btn-administradores')).toBeHidden();
     });
 
     test('Deve exibir barra de navegação com restrições para CHEFE', async ({
@@ -75,11 +75,11 @@ test.describe('CDU-01 - Realizar login e exibir estrutura das telas', () => {
 
         // Deve ver 'Minha unidade' em vez de 'Unidades'
         await expect(page.getByRole('link', {name: 'Minha unidade'})).toBeVisible();
-        await expect(page.getByRole('link', {name: 'Unidades'})).not.toBeVisible();
+        await expect(page.getByRole('link', {name: 'Unidades'})).toBeHidden();
 
         // Não deve ver configurações administrativas
-        await expect(page.getByTestId('btn-parametros')).not.toBeVisible();
-        await expect(page.getByTestId('btn-administradores')).not.toBeVisible();
+        await expect(page.getByTestId('btn-parametros')).toBeHidden();
+        await expect(page.getByTestId('btn-administradores')).toBeHidden();
     });
 
     test('Deve exibir barra de navegação com restrições para SERVIDOR', async ({
@@ -94,11 +94,11 @@ test.describe('CDU-01 - Realizar login e exibir estrutura das telas', () => {
 
         // Deve ver 'Minha unidade' em vez de 'Unidades'
         await expect(page.getByRole('link', {name: 'Minha unidade'})).toBeVisible();
-        await expect(page.getByRole('link', {name: 'Unidades'})).not.toBeVisible();
+        await expect(page.getByRole('link', {name: 'Unidades'})).toBeHidden();
 
         // Não deve ver configurações administrativas
-        await expect(page.getByTestId('btn-parametros')).not.toBeVisible();
-        await expect(page.getByTestId('btn-administradores')).not.toBeVisible();
+        await expect(page.getByTestId('btn-parametros')).toBeHidden();
+        await expect(page.getByTestId('btn-administradores')).toBeHidden();
     });
 
     test('Deve exibir informações do usuário e controles', async ({page, autenticadoComoAdmin}: {
