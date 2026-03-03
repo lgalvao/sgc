@@ -23,8 +23,9 @@ A mesma filosofia de redução de fragmentação e de complexidade desnecessári
 
 * **Gerenciamento de Estado Simplificado (Pinia):**
   * Estratégias complexas de gerenciamento de estado global e sincronização de dados/cache local são **overkill** devido ao baixo volume de usuários e acessos esporádicos.
-  * Lojas Pinia excessivamente complexas (como `usuarios.ts` e `atividades.ts`) devem ser refatoradas.
-  * Em vez de tentar replicar toda a base de dados em memória local do navegador, opte por chamadas diretas às APIs ou gerenciamento de estado local (`refs`, `composables`) atrelado estritamente à view atual.
+  * Lojas Pinia excessivamente complexas (como `mapas.ts`, `atividades.ts`, `subprocessos.ts`, `processos.ts`, `diagnosticos.ts`, e `atribuicoes.ts`) atuam, em grande parte, como pass-throughs para os serviços (Services). Elas replicam o estado da API sem necessidade, adicionando complexidade e duplicação de lógica, e devem ser refatoradas ou removidas.
+  * Para uma aplicação de pequeno porte (5-10 usuários) com fluxos focados em um único usuário por tela, armazenar dados transientes ou de sessão (como `mapas` e `atividades`) em um estado global Pinia é desnecessário. O uso de `ref`s padrão do Vue ou `composables` simples que consultam as APIs diretamente (via Services) é muito mais eficiente e limpo.
+  * **Nova Regra:** O Pinia deve ser estritamente reservado para o estado global real da aplicação, tais como autenticação (`perfil.ts`), usuário atual logado (`usuarios.ts`), configurações globais da aplicação (`configuracoes.ts`), e estado global de UI/notificações (`feedback.ts`, `alertas.ts`).
 * **Fim dos Mapeadores Manuais:**
   * Os diretórios e arquivos de `mappers` (anteriormente em `frontend/src/mappers/`) foram removidos.
   * **Nova Regra:** Os Services do front-end agora lidam diretamente com os DTOs crus (Raw DTOs) retornados pelo back-end, contendo o mínimo de lógica de transformação e mapeamento interno. A view/componente deve se adaptar ao formato de transporte.
