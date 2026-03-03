@@ -3,7 +3,6 @@
       :fade="false"
       :model-value="mostrar"
       centered
-      hide-footer
       size="lg"
       title="Importação de atividades"
       @hide="fechar"

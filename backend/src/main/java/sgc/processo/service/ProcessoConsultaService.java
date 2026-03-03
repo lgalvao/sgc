@@ -41,16 +41,7 @@ public class ProcessoConsultaService {
     }
 
     public List<Processo> processosFinalizados() {
-        Usuario usuario = usuarioService.usuarioAutenticado();
-        Perfil perfil = usuario.getPerfilAtivo();
-        Long unidadeCodigo = usuario.getUnidadeAtivaCodigo();
-
-        if (perfil == Perfil.ADMIN) {
-            return processoRepo.listarPorSituacaoComParticipantes(SituacaoProcesso.FINALIZADO);
-        } else {
-            List<Long> unidadesAcesso = processoValidacaoService.buscarCodigosDescendentes(unidadeCodigo);
-            return processoRepo.listarPorSituacaoEUnidadeCodigos(SituacaoProcesso.FINALIZADO, unidadesAcesso);
-        }
+        return processoRepo.listarPorSituacaoComParticipantes(SituacaoProcesso.FINALIZADO);
     }
 
     public Page<Processo> processos(Pageable pageable) {

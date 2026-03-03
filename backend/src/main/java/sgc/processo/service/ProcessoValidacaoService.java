@@ -25,6 +25,7 @@ public class ProcessoValidacaoService {
     private final UnidadeService unidadeService;
     private final UsuarioFacade usuarioService;
     private final SubprocessoValidacaoService validacaoService;
+    private final ProcessoRepo processoRepo;
 
     // ---- Validações de negócio ----
 
@@ -112,6 +113,12 @@ public class ProcessoValidacaoService {
         boolean isGestorOuChefe = authentication.getAuthorities().stream()
                 .anyMatch(a -> "ROLE_GESTOR".equals(a.getAuthority()) || "ROLE_CHEFE".equals(a.getAuthority()));
         if (!isGestorOuChefe) return false;
+
+        // Permitir visualização de processos FINALIZADOS para importação
+        Optional<Processo> processoOpt = processoRepo.findById(codProcesso);
+        if (processoOpt.isPresent() && processoOpt.get().getSituacao() == SituacaoProcesso.FINALIZADO) {
+            return true;
+        }
 
         List<PerfilDto> perfis = usuarioService.buscarPerfisUsuario(username);
         if (perfis.isEmpty()) return false;
