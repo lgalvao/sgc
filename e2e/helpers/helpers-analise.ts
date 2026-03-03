@@ -1,5 +1,5 @@
 import {expect, type Page} from '@playwright/test';
-import {verificarPaginaPainel} from './helpers-navegacao.js';
+import {verificarPaginaPainel, limparNotificacoes} from './helpers-navegacao.js';
 
 // Re-exportar para manter compatibilidade com imports existentes
 
@@ -166,6 +166,7 @@ export async function fecharHistoricoAnalise(page: Page) {
  * Função genérica para devolução de cadastro/revisão
  */
 async function realizarDevolucao(page: Page, mensagemSucesso: string | RegExp, observacao: string = '') {
+    await limparNotificacoes(page);
     await page.getByTestId('btn-acao-devolver').click();
     await expect(page.getByRole('dialog')).toBeVisible();
     await expect(page.getByText(/Confirma a devolução.*para ajustes/i)).toBeVisible();
@@ -214,6 +215,7 @@ export async function cancelarDevolucao(page: Page) {
  * Função genérica para aceite de cadastro/revisão (GESTOR)
  */
 async function realizarAceite(page: Page, mensagemSucesso: string | RegExp, observacao: string = '') {
+    await limparNotificacoes(page);
     await page.getByTestId('btn-acao-analisar-principal').click();
     await expect(page.getByRole('dialog')).toBeVisible();
     await expect(page.getByText(/Confirma o aceite/i)).toBeVisible();

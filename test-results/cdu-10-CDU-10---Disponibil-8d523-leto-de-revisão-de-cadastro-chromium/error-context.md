@@ -1,0 +1,144 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - link "Pular para o conteúdo principal" [ref=e3] [cursor=pointer]:
+      - /url: "#main-content"
+    - generic [ref=e4]:
+      - navigation [ref=e5]:
+        - generic [ref=e6]:
+          - link "SGC" [ref=e7] [cursor=pointer]:
+            - /url: /painel
+          - generic [ref=e8]:
+            - list [ref=e9]:
+              - listitem [ref=e10]:
+                - link "Painel" [ref=e11] [cursor=pointer]:
+                  - /url: /painel
+                  - generic [ref=e12]: 
+                  - text: Painel
+              - listitem [ref=e13]:
+                - link "Minha unidade" [ref=e14] [cursor=pointer]:
+                  - /url: /unidade/17
+                  - generic [ref=e15]: 
+                  - text: Minha unidade
+              - listitem [ref=e16]:
+                - link "Relatórios" [ref=e17] [cursor=pointer]:
+                  - /url: /relatorios
+                  - generic [ref=e18]: 
+                  - text: Relatórios
+              - listitem [ref=e19]:
+                - link "Histórico" [ref=e20] [cursor=pointer]:
+                  - /url: /historico
+                  - generic [ref=e21]: 
+                  - text: Histórico
+            - list [ref=e22]:
+              - listitem [ref=e23]:
+                - link "GESTOR - COORD_22" [ref=e24]:
+                  - /url: "#"
+                  - generic [ref=e25]:
+                    - generic [ref=e26]: 
+                    - generic [ref=e27]: GESTOR - COORD_22
+              - listitem "Sair" [ref=e28]:
+                - link [ref=e29] [cursor=pointer]:
+                  - /url: "#"
+                  - generic [ref=e30]: 
+      - generic [ref=e33]:
+        - button "Voltar" [ref=e34] [cursor=pointer]:
+          - generic [ref=e35]: 
+        - navigation "breadcrumb" [ref=e36]:
+          - list [ref=e37]:
+            - listitem [ref=e38]:
+              - link "Início" [ref=e39] [cursor=pointer]:
+                - /url: /painel
+                - generic [ref=e40]: 
+                - generic [ref=e41]: Início
+            - listitem [ref=e42]:
+              - text: ›
+              - link "Detalhes do processo" [ref=e43] [cursor=pointer]:
+                - /url: /processo/202
+            - listitem [ref=e44]:
+              - text: ›
+              - generic [ref=e45]: SECAO_221
+      - main [ref=e46]:
+        - generic [ref=e48]:
+          - generic [ref=e49]:
+            - generic [ref=e50]:
+              - generic [ref=e51]:
+                - heading "SECAO_221" [level=2] [ref=e52]
+                - paragraph [ref=e53]: Seção 221
+              - button "Enviar lembrete" [ref=e55] [cursor=pointer]:
+                - generic [ref=e56]: 
+                - text: Enviar lembrete
+            - generic [ref=e58]:
+              - paragraph [ref=e59]:
+                - strong [ref=e60]: "Processo:"
+                - text: Rev 10 1772561020967
+              - paragraph [ref=e61]: Situação:Revisão do cadastro disponibilizada
+              - paragraph [ref=e62]:
+                - strong [ref=e63]: "Titular:"
+                - text: Tina Turner
+              - paragraph [ref=e64]:
+                - generic [ref=e65]:
+                  - generic [ref=e66]: 
+                  - link "2018" [ref=e67] [cursor=pointer]:
+                    - /url: tel:2018
+                - generic [ref=e68]:
+                  - generic [ref=e69]: 
+                  - link "tina.turner@tre-pe.jus.br" [ref=e70] [cursor=pointer]:
+                    - /url: mailto:tina.turner@tre-pe.jus.br
+          - generic [ref=e71]:
+            - button "Atividades e conhecimentos Visualização das atividades e conhecimentos da unidade" [ref=e73] [cursor=pointer]:
+              - generic [ref=e75]:
+                - heading "Atividades e conhecimentos" [level=4] [ref=e76]
+                - paragraph [ref=e77]: Visualização das atividades e conhecimentos da unidade
+            - button "Mapa de Competências Visualização do mapa de competências técnicas" [ref=e79] [cursor=pointer]:
+              - generic [ref=e81]:
+                - heading "Mapa de Competências" [level=4] [ref=e82]
+                - paragraph [ref=e83]: Visualização do mapa de competências técnicas
+          - generic [ref=e84]:
+            - heading "Movimentações" [level=4] [ref=e85]
+            - table [ref=e87]:
+              - rowgroup [ref=e88]:
+                - row "Data/hora Origem Destino Descrição" [ref=e89]:
+                  - columnheader "Data/hora" [ref=e90]
+                  - columnheader "Origem" [ref=e91]
+                  - columnheader "Destino" [ref=e92]
+                  - columnheader "Descrição" [ref=e93]
+              - rowgroup [ref=e94]:
+                - row "03/03/2026 15:04 SECAO_221 COORD_22 Disponibilização da revisão do cadastro de atividades" [ref=e95]:
+                  - cell "03/03/2026 15:04" [ref=e96]
+                  - cell "SECAO_221" [ref=e97]
+                  - cell "COORD_22" [ref=e98]
+                  - cell "Disponibilização da revisão do cadastro de atividades" [ref=e99]
+                - row "03/03/2026 15:04 COORD_22 SECAO_221 Devolução da revisão do cadastro para ajustes" [ref=e100]:
+                  - cell "03/03/2026 15:04" [ref=e101]
+                  - cell "COORD_22" [ref=e102]
+                  - cell "SECAO_221" [ref=e103]
+                  - cell "Devolução da revisão do cadastro para ajustes" [ref=e104]
+                - row "03/03/2026 15:04 SECAO_221 COORD_22 Disponibilização da revisão do cadastro de atividades" [ref=e105]:
+                  - cell "03/03/2026 15:04" [ref=e106]
+                  - cell "SECAO_221" [ref=e107]
+                  - cell "COORD_22" [ref=e108]
+                  - cell "Disponibilização da revisão do cadastro de atividades" [ref=e109]
+                - row "03/03/2026 15:04 COORD_22 SECAO_221 Devolução da revisão do cadastro para ajustes" [ref=e110]:
+                  - cell "03/03/2026 15:04" [ref=e111]
+                  - cell "COORD_22" [ref=e112]
+                  - cell "SECAO_221" [ref=e113]
+                  - cell "Devolução da revisão do cadastro para ajustes" [ref=e114]
+                - row "03/03/2026 15:04 SECAO_221 COORD_22 Disponibilização da revisão do cadastro de atividades" [ref=e115]:
+                  - cell "03/03/2026 15:04" [ref=e116]
+                  - cell "SECAO_221" [ref=e117]
+                  - cell "COORD_22" [ref=e118]
+                  - cell "Disponibilização da revisão do cadastro de atividades" [ref=e119]
+                - row "03/03/2026 15:04 ADMIN SECAO_221 Processo iniciado" [ref=e120]:
+                  - cell "03/03/2026 15:04" [ref=e121]
+                  - cell "ADMIN" [ref=e122]
+                  - cell "SECAO_221" [ref=e123]
+                  - cell "Processo iniciado" [ref=e124]
+      - contentinfo [ref=e125]:
+        - generic [ref=e126]:
+          - generic [ref=e127]: Versão 1.0.0
+          - generic [ref=e128]: © SESEL/COSIS/TRE-PE
+  - text:  
+```

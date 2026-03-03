@@ -212,7 +212,8 @@ test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conh
 
             // Verificar alerta para o chefe da unidade
             await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
-            await expect(page.getByTestId('tbl-alertas')).toContainText(`Revisão do cadastro da unidade ${UNIDADE_ALVO} devolvida para ajustes`);
+            await limparNotificacoes(page);
+            await expect(page.getByTestId('tbl-alertas').locator('tr', { hasText: `Revisão do cadastro da unidade ${UNIDADE_ALVO} devolvida para ajustes` })).toBeVisible();
 
             await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
             await navegarParaAtividades(page);
@@ -237,7 +238,7 @@ test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conh
 
             // Verificar movimentação de devolução (2ª vez)
             await acessarSubprocessoGestor(page, descProcessoRevisao, UNIDADE_ALVO);
-            await expect(page.getByTestId('tbl-movimentacoes')).toContainText(/Devolução da revisão do cadastro para ajustes/i);
+            await expect(page.getByTestId('tbl-movimentacoes').locator('tr', { hasText: /Devolução da revisão do cadastro para ajustes/i }).first()).toBeVisible();
 
             await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
             await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
@@ -258,7 +259,8 @@ test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conh
 
             // Verificar alerta da 3ª devolução
             await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
-            await expect(page.getByTestId('tbl-alertas')).toContainText(`Revisão do cadastro da unidade ${UNIDADE_ALVO} devolvida para ajustes`);
+            await limparNotificacoes(page);
+            await expect(page.getByTestId('tbl-alertas').locator('tr', { hasText: `Revisão do cadastro da unidade ${UNIDADE_ALVO} devolvida para ajustes` }).first()).toBeVisible();
 
             // Chefe verifica que histórico tem apenas a última devolução
             await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
