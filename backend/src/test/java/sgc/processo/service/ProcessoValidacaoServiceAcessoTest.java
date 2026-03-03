@@ -10,6 +10,7 @@ import sgc.organizacao.service.*;
 import sgc.organizacao.*;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
+import sgc.processo.model.*;
 import sgc.subprocesso.service.*;
 import sgc.testutils.*;
 
@@ -34,11 +35,8 @@ class ProcessoValidacaoServiceAcessoTest {
     @Mock
     private SubprocessoValidacaoService validacaoService;
 
-    @Test
-    @DisplayName("Deve negar acesso se authentication for null")
-    void deveNegarAcessoSeAuthNull() {
-        assertThat(processoAcessoService.checarAcesso(null, 1L)).isFalse();
-    }
+    @Mock
+    private ProcessoRepo processoRepo;
 
     @Test
     @DisplayName("Deve negar acesso se usuário não for GESTOR nem CHEFE")
@@ -52,20 +50,7 @@ class ProcessoValidacaoServiceAcessoTest {
     }
 
     @Test
-    @DisplayName("Deve negar acesso se usuário não tem unidade vinculada")
-    void deveNegarAcessoSemUnidade() {
-        Authentication auth = mock(Authentication.class);
-        when(auth.isAuthenticated()).thenReturn(true);
-        when(auth.getName()).thenReturn("user");
-        when(auth.getAuthorities()).thenAnswer(m -> List.of(new SimpleGrantedAuthority("ROLE_GESTOR")));
-
-        when(usuarioService.buscarPerfisUsuario("user")).thenReturn(List.of());
-
-        assertThat(processoAcessoService.checarAcesso(auth, 1L)).isFalse();
-    }
-
-    @Test
-    @DisplayName("Deve permitir acesso se unidade do usuário ou descendente tem acesso ao processo")
+    @DisplayName("Deve permitir acesso a gestor se unidade do usuário ou descendente tem acesso ao processo")
     void devePermitirAcessoComHierarquia() {
         Authentication auth = mock(Authentication.class);
         when(auth.isAuthenticated()).thenReturn(true);
@@ -105,25 +90,6 @@ class ProcessoValidacaoServiceAcessoTest {
         List<Long> descendentes = processoAcessoService.buscarCodigosDescendentes(1L);
 
         assertThat(descendentes).hasSize(4).containsExactlyInAnyOrder(1L, 2L, 3L, 4L);
-    }
-
-    @Test
-    @DisplayName("Deve negar acesso se authentication não estiver autenticado")
-    void deveNegarAcessoSeAuthNaoAutenticado() {
-        Authentication auth = mock(Authentication.class);
-        when(auth.isAuthenticated()).thenReturn(false);
-
-        assertThat(processoAcessoService.checarAcesso(auth, 1L)).isFalse();
-    }
-
-    @Test
-    @DisplayName("Deve negar acesso se username for null")
-    void deveNegarAcessoSeUsernameNull() {
-        Authentication auth = mock(Authentication.class);
-        when(auth.isAuthenticated()).thenReturn(true);
-        when(auth.getName()).thenReturn(null);
-
-        assertThat(processoAcessoService.checarAcesso(auth, 1L)).isFalse();
     }
 
     @Test

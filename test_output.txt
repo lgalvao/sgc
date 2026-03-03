@@ -1,0 +1,84 @@
+[2m[WebServer] [22m[SMTP] Servidor SMTP local executando na porta 1025
+[2m[WebServer] [22m[BACKEND] INFO  ValidadorDadosOrgService.run:80: Dados organizacionais validados com sucesso. 18 unidades verificadas.
+[2m[WebServer] [22m[FRONTEND]   [32m[1mVITE[22m v7.3.1[39m  [2mready in [0m[1m2855[22m[2m[0m ms[22m
+[2m[WebServer] [22m[FRONTEND]   [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5173[22m/[39m
+[2m[WebServer] [22m[FRONTEND] [2m  [32m➜[39m  [1mNetwork[22m[2m: use [22m[1m--host[22m[2m to expose[22m
+[2m[WebServer] [22m>>> Frontend, Backend e SMTP no ar.
+
+Running 1 test using 1 worker
+
+[2m[WebServer] [22m[BACKEND] INFO  E2eController.resetDatabase:61: Reset do banco de dados concluído.
+[2m[WebServer] [22m[BACKEND] INFO  LoginFacade.entrar:107: Usuário 191919 autorizado: ADMIN-ADMIN
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoManutencaoService.criar:56: Processo 201 criado com 1 unidades participantes
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoNotificacaoService.enviarEmailUnidade:254: E-mail enviado para ADMIN
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoNotificacaoService.enviarEmailUnidade:254: E-mail enviado para COORD_22
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoNotificacaoService.enviarEmailUnidade:254: E-mail enviado para SECAO_221
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoNotificacaoService.enviarEmailUnidade:254: E-mail enviado para SECRETARIA_2
+[2m[WebServer] [22m[BACKEND] WARN  MonitoramentoAspect.monitorarExecucao:27: EXECUCAO LENTA: sgc.processo.service.ProcessoNotificacaoService.emailInicioProcesso levou 581 ms
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoWorkflowService.iniciar:109: Processo de mapeamento 201 iniciado para 1 unidade(s): SECAO_221.
+[2m[WebServer] [22m[BACKEND] WARN  MonitoramentoAspect.monitorarExecucao:27: EXECUCAO LENTA: sgc.processo.service.ProcessoWorkflowService.iniciar levou 679 ms
+[2m[WebServer] [22m[BACKEND] INFO  LoginFacade.entrar:107: Usuário 141414 autorizado: CHEFE-SECAO_221
+[2m[WebServer] [22m[BACKEND] INFO  MapaManutencaoService.criarAtividade:130: Criando atividade no mapa 201: Atividade Mapeamento 1 1772561868349
+[2m[WebServer] [22m[BACKEND] INFO  MapaManutencaoService.criarConhecimento:257: Criando conhecimento na atividade 3000: Conhecimento 1
+[2m[WebServer] [22m[BACKEND] INFO  MapaManutencaoService.criarAtividade:130: Criando atividade no mapa 201: Atividade Mapeamento 2 1772561868349
+[2m[WebServer] [22m[BACKEND] INFO  MapaManutencaoService.criarConhecimento:257: Criando conhecimento na atividade 3001: Conhecimento 2
+[2m[WebServer] [22m[BACKEND] INFO  LoginFacade.entrar:107: Usuário 131313 autorizado: GESTOR-COORD_22
+[2m[WebServer] [22m[BACKEND] INFO  LoginFacade.entrar:107: Usuário 212121 autorizado: GESTOR-SECRETARIA_2
+[2m[WebServer] [22m[BACKEND] INFO  LoginFacade.entrar:107: Usuário 191919 autorizado: ADMIN-ADMIN
+[2m[WebServer] [22m[BACKEND] INFO  MapaManutencaoService.criarCompetenciaComAtividades:215: Criando competência Competência Mapeamento 1 1772561868349 (1 ativ.)
+[2m[WebServer] [22m[BACKEND] INFO  MapaManutencaoService.criarCompetenciaComAtividades:215: Criando competência Competência Mapeamento 2 1772561868349 (1 ativ.)
+[2m[WebServer] [22m[BACKEND] INFO  LoginFacade.entrar:107: Usuário 141414 autorizado: CHEFE-SECAO_221
+[2m[WebServer] [22m[BACKEND] INFO  LoginFacade.entrar:107: Usuário 131313 autorizado: GESTOR-COORD_22
+[2m[WebServer] [22m[BACKEND] INFO  LoginFacade.entrar:107: Usuário 212121 autorizado: GESTOR-SECRETARIA_2
+[2m[WebServer] [22m[BACKEND] INFO  LoginFacade.entrar:107: Usuário 191919 autorizado: ADMIN-ADMIN
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoValidacaoService.validarTodosSubprocessosHomologados:80: Todos os subprocessos do processo 201 estão homologados
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoWorkflowService.tornarMapasVigentes:53: Mapa vigente definido para o processo 201
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoWorkflowService.tornarMapasVigentes:61: Mapa(s) de 1 subprocesso(s) definidos como vigentes.
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoNotificacaoService.enviarEmailUnidadeFinal:186: E-mail de finalização enviado para SECAO_221
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoWorkflowService.finalizar:49: Processo 201 finalizado
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoManutencaoService.criar:56: Processo 202 criado com 1 unidades participantes
+[2m[WebServer] [22m[BACKEND] INFO  SubprocessoService.criarParaRevisao:325: Subprocesso criado para unidade SECAO_221
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoNotificacaoService.enviarEmailUnidade:254: E-mail enviado para ADMIN
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoNotificacaoService.enviarEmailUnidade:254: E-mail enviado para COORD_22
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoNotificacaoService.enviarEmailUnidade:254: E-mail enviado para SECAO_221
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoNotificacaoService.enviarEmailUnidade:254: E-mail enviado para SECRETARIA_2
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoWorkflowService.iniciar:109: Processo de revisao 202 iniciado para 1 unidade(s): SECAO_221.
+[2m[WebServer] [22m[BACKEND] INFO  LoginFacade.entrar:107: Usuário 141414 autorizado: CHEFE-SECAO_221
+[2m[WebServer] [22m[BACKEND] INFO  MapaManutencaoService.criarAtividade:130: Criando atividade no mapa 202: Atividade Revisão Nova 1772561868349
+[2m[WebServer] [22m[BACKEND] INFO  MapaManutencaoService.criarConhecimento:257: Criando conhecimento na atividade 3004: Conhecimento Revisão
+  ✘  1 [chromium] › e2e\cdu-10.spec.ts:31:5 › CDU-10 - Disponibilizar revisão do cadastro de atividades e conhecimentos › Fluxo completo de revisão de cadastro (45.2s)
+
+
+  1) [chromium] › e2e\cdu-10.spec.ts:31:5 › CDU-10 - Disponibilizar revisão do cadastro de atividades e conhecimentos › Fluxo completo de revisão de cadastro › 1. Preparação: Mapeamento completo e Revisão iniciada 
+
+    [31mTest timeout of 45000ms exceeded.[39m
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoHaveText[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator: getByTestId('subprocesso-header__txt-situacao')
+    Expected pattern: [32m/Revisão em andamento/i[39m
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toHaveText" with timeout 2000ms[22m
+    [2m  - waiting for getByTestId('subprocesso-header__txt-situacao')[22m
+
+
+      155 |             await page.getByTestId('btn-cad-atividades-voltar').click();
+      156 |             await verificarPaginaSubprocesso(page, UNIDADE_ALVO);
+    > 157 |             await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Revisão em andamento/i);
+          |                                                                                ^
+      158 |         });
+      159 |
+      160 |         await test.step('2. Cenário 1: Validação - Atividade sem conhecimento', async () => {
+        at C:\sgc\e2e\cdu-10.spec.ts:157:80
+        at C:\sgc\e2e\cdu-10.spec.ts:37:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\cdu-10-CDU-10---Disponibil-8d523-leto-de-revisão-de-cadastro-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\cdu-10-CDU-10---Disponibil-8d523-leto-de-revisão-de-cadastro-chromium\error-context.md
+
+  1 failed
+    [chromium] › e2e\cdu-10.spec.ts:31:5 › CDU-10 - Disponibilizar revisão do cadastro de atividades e conhecimentos › Fluxo completo de revisão de cadastro 

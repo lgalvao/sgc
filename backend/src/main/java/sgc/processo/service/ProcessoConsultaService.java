@@ -25,6 +25,8 @@ public class ProcessoConsultaService {
     private final ComumRepo repo;
     private final SubprocessoService subprocessoService;
     private final UsuarioFacade usuarioService;
+    private final ProcessoValidacaoService processoValidacaoService;
+
     public Processo buscarProcessoCodigo(Long codigo) {
         return repo.buscar(Processo.class, codigo);
     }
@@ -39,7 +41,20 @@ public class ProcessoConsultaService {
     }
 
     public List<Processo> processosFinalizados() {
-        return processoRepo.listarPorSituacaoComParticipantes(SituacaoProcesso.FINALIZADO);
+        Usuario usuario = usuarioService.usuarioAutenticado();
+        if (usuario.getPerfilAtivo() == Perfil.ADMIN) {
+            return processoRepo.listarPorSituacaoComParticipantes(SituacaoProcesso.FINALIZADO);
+        }
+
+        List<Long> unidadesAcesso;
+        if (usuario.getPerfilAtivo() == Perfil.GESTOR) {
+            unidadesAcesso = processoValidacaoService.buscarCodigosDescendentes(usuario.getUnidadeAtivaCodigo());
+        } else {
+            // CHEFE ou outros perfis: apenas sua unidade
+            unidadesAcesso = List.of(usuario.getUnidadeAtivaCodigo());
+        }
+
+        return processoRepo.listarPorSituacaoEUnidadeCodigos(SituacaoProcesso.FINALIZADO, unidadesAcesso);
     }
 
     public Page<Processo> processos(Pageable pageable) {
@@ -47,7 +62,19 @@ public class ProcessoConsultaService {
     }
 
     public List<Processo> processosAndamento() {
-        return processoRepo.findBySituacao(SituacaoProcesso.EM_ANDAMENTO);
+        Usuario usuario = usuarioService.usuarioAutenticado();
+        if (usuario.getPerfilAtivo() == Perfil.ADMIN) {
+            return processoRepo.findBySituacao(SituacaoProcesso.EM_ANDAMENTO);
+        }
+
+        List<Long> unidadesAcesso;
+        if (usuario.getPerfilAtivo() == Perfil.GESTOR) {
+            unidadesAcesso = processoValidacaoService.buscarCodigosDescendentes(usuario.getUnidadeAtivaCodigo());
+        } else {
+            unidadesAcesso = List.of(usuario.getUnidadeAtivaCodigo());
+        }
+
+        return processoRepo.listarPorSituacaoEUnidadeCodigos(SituacaoProcesso.EM_ANDAMENTO, unidadesAcesso);
     }
 
     public Page<Processo> processosIniciadosPorParticipantes(List<Long> unidadeIds, Pageable pageable) {

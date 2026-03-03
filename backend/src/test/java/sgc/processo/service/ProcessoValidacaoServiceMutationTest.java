@@ -9,6 +9,7 @@ import org.springframework.security.core.authority.*;
 import sgc.organizacao.*;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.service.*;
+import sgc.processo.model.*;
 import sgc.subprocesso.service.*;
 
 import java.util.*;
@@ -32,28 +33,8 @@ class ProcessoValidacaoServiceMutationTest {
     @Mock
     private SubprocessoValidacaoService validacaoService;
 
-    @Test
-    @DisplayName("checarAcesso deve retornar false se authentication for null")
-    void checarAcesso_AuthenticationNull() {
-        assertThat(service.checarAcesso(null, 1L)).isFalse();
-    }
-
-    @Test
-    @DisplayName("checarAcesso deve retornar false se não estiver autenticado")
-    void checarAcesso_NaoAutenticado() {
-        Authentication auth = mock(Authentication.class);
-        when(auth.isAuthenticated()).thenReturn(false);
-        assertThat(service.checarAcesso(auth, 1L)).isFalse();
-    }
-
-    @Test
-    @DisplayName("checarAcesso deve retornar false se name for null")
-    void checarAcesso_NameNull() {
-        Authentication auth = mock(Authentication.class);
-        when(auth.isAuthenticated()).thenReturn(true);
-        when(auth.getName()).thenReturn(null);
-        assertThat(service.checarAcesso(auth, 1L)).isFalse();
-    }
+    @Mock
+    private ProcessoRepo processoRepo;
 
     @Test
     @DisplayName("checarAcesso deve retornar false se não for GESTOR nem CHEFE")

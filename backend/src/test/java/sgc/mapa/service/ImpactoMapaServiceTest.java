@@ -39,7 +39,6 @@ class ImpactoMapaServiceTest {
 
     @BeforeEach
     void setUp() {
-        doReturn(true).when(permissionEvaluator).checkPermission(any(), any(), any());
     }
 
     @Test
@@ -60,9 +59,14 @@ class ImpactoMapaServiceTest {
         return u;
     }
 
+    private void mockAcessoLivre() {
+        doReturn(true).when(permissionEvaluator).checkPermission(any(), any(), any());
+    }
+
     @Test
     @DisplayName("Deve retornar sem impacto se não houver mapa vigente")
     void semMapaVigente() {
+        mockAcessoLivre();
         Usuario usuario = usuarioAdmin();
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
@@ -83,6 +87,7 @@ class ImpactoMapaServiceTest {
     @Test
     @DisplayName("Deve detectar atividade inserida")
     void deveDetectarInserida() {
+        mockAcessoLivre();
         Usuario usuario = usuarioAdmin();
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
@@ -120,6 +125,7 @@ class ImpactoMapaServiceTest {
     @Test
     @DisplayName("Deve detectar atividade removida e impacto em competência")
     void deveDetectarRemovida() {
+        mockAcessoLivre();
         Usuario usuario = usuarioAdmin();
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
@@ -165,6 +171,7 @@ class ImpactoMapaServiceTest {
     @Test
     @DisplayName("Deve detectar atividade alterada (conhecimentos diferentes)")
     void deveDetectarAlterada() {
+        mockAcessoLivre();
         Usuario usuario = usuarioAdmin();
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
@@ -211,6 +218,7 @@ class ImpactoMapaServiceTest {
 
     @Test
     void deveDetectarConhecimentosDiferentesComAmbosVazios() {
+        mockAcessoLivre();
         Mapa mapaVigente = Mapa.builder().codigo(100L).build();
         Mapa mapaAtual = Mapa.builder().codigo(200L).build();
         Subprocesso subprocesso = criarSubprocesso(1L, mapaAtual);
@@ -245,6 +253,7 @@ class ImpactoMapaServiceTest {
 
     @Test
     void deveDetectarAtividadesComConhecimentosDiferentes() {
+        mockAcessoLivre();
         Mapa mapaVigente = Mapa.builder().codigo(100L).build();
         Mapa mapaAtual = Mapa.builder().codigo(200L).build();
         Subprocesso subprocesso = criarSubprocesso(1L, mapaAtual);
@@ -302,6 +311,7 @@ class ImpactoMapaServiceTest {
         @Test
         @DisplayName("verificarImpactos: Falha quando mapa do subprocesso não existe")
         void verificarImpactos_MapaSubprocessoInexistente() {
+            mockAcessoLivre();
             Subprocesso sp = new Subprocesso();
             sp.setCodigo(1L);
             sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
@@ -319,6 +329,7 @@ class ImpactoMapaServiceTest {
         @Test
         @DisplayName("verificarImpactos: Atividades duplicadas (mesma descrição) usa handler de colisão")
         void verificarImpactos_AtividadesDuplicadas() {
+            mockAcessoLivre();
             Subprocesso sp = new Subprocesso();
             sp.setCodigo(1L);
             sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
@@ -358,6 +369,7 @@ class ImpactoMapaServiceTest {
         @Test
         @DisplayName("verificarImpactos: Atividade Alterada vinculada a Competencia gera impacto")
         void verificarImpactos_AtividadeAlteradaComCompetencia() {
+            mockAcessoLivre();
             Subprocesso sp = new Subprocesso();
             sp.setCodigo(1L);
             sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);

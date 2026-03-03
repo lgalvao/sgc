@@ -29,7 +29,7 @@ test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conh
     const UNIDADE_ALVO = 'SECAO_221';
 
     test('Fluxo completo de revisão de cadastro', async ({page}) => {
-        test.slow(); // Triplica o timeout — fluxo envolve múltiplos logins e operações
+        test.setTimeout(60000); // Passo 1 é muito pesado
         const timestamp = Date.now();
         const descProcessoMapeamento = `Map 10 ${timestamp}`;
         const descProcessoRevisao = `Rev 10 ${timestamp}`;
@@ -156,6 +156,7 @@ test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conh
             await verificarPaginaSubprocesso(page, UNIDADE_ALVO);
             await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Revisão em andamento/i);
         });
+
 
         await test.step('2. Cenário 1: Validação - Atividade sem conhecimento', async () => {
             await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
