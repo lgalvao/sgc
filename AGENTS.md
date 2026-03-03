@@ -57,10 +57,7 @@ específicas** do projeto que diferem dos padrões genéricos.
 
 Para detalhes técnicos e exemplos de código, consulte:
 
-* **Padrões de Código:**
-    * [Backend Patterns](/backend/etc/regras/backend-padroes.md)
-    * [Frontend Patterns](/frontend/etc/regras/frontend-padroes.md)
-    * [Regras para execução de testes e2e e correção de bugs](/frontend/etc/regras/guia-correcao-e2e.md)
+* [Regras para execução de testes e2e e correção de bugs](/etc/docs/regras-e2e.md)
 
 * **Módulo-Específico:**
     * `README.md` de cada módulo e diretório para responsabilidades específicas

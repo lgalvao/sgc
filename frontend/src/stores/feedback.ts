@@ -17,8 +17,6 @@ export const useFeedbackStore = defineStore('feedback', () => {
     // Referência interna ao controller do Toast
     const toast = ref<ToastController | null>(null);
     const messageQueue = ref<any[]>([]);
-    // Flag para evitar múltiplos toasts simultâneos (debounce)
-    const isProcessing = ref(false);
 
     function init(toastInstance: any) {
         toast.value = toastInstance;
@@ -32,10 +30,12 @@ export const useFeedbackStore = defineStore('feedback', () => {
     }
 
     function show(title: string, message: string, variant: 'success' | 'danger' | 'warning' | 'info' = 'info', autoHideDelay = 3000) {
-        if (isProcessing.value) return;
-
         if (toast.value) {
-            isProcessing.value = true;
+            // Fechar toasts anteriores antes de exibir um novo (política de toast único)
+            document.querySelectorAll('.toast .btn-close').forEach(btn => {
+                (btn as HTMLElement).click();
+            });
+
             toast.value.create({
                 props: {
                     title,
@@ -46,10 +46,6 @@ export const useFeedbackStore = defineStore('feedback', () => {
                     noProgress: true
                 }
             });
-            // Libera o lock após um curto período
-            setTimeout(() => {
-                isProcessing.value = false;
-            }, 100);
         } else {
             // Se o toast ainda não foi injetado (ex: erro na inicialização do app), enfileira
             messageQueue.value.push({title, message, variant, autoHideDelay});
@@ -63,6 +59,7 @@ export const useFeedbackStore = defineStore('feedback', () => {
     };
 });
 
+// TODO Nao deixar nada nunca para compatibilidade!
 // Mantido para compatibilidade
 function close() {
 }

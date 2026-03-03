@@ -21,12 +21,16 @@ import static org.mockito.Mockito.*;
 class ImpactoMapaServiceTest {
     @Mock
     private MapaRepo mapaRepo;
+
     @Mock
     private CompetenciaRepo competenciaRepo;
+
     @Mock
     private MapaManutencaoService mapaManutencaoService;
+
     @Mock
     private SgcPermissionEvaluator permissionEvaluator;
+
     @Mock
     private ComumRepo repo;
 
@@ -35,8 +39,7 @@ class ImpactoMapaServiceTest {
 
     @BeforeEach
     void setUp() {
-        // Default permission behavior for tests unless overridden
-        lenient().doReturn(true).when(permissionEvaluator).checkPermission(any(), any(), any());
+        doReturn(true).when(permissionEvaluator).checkPermission(any(), any(), any());
     }
 
     @Test
@@ -51,7 +54,6 @@ class ImpactoMapaServiceTest {
             impactoMapaService.verificarImpactos(subprocesso, usuario));
     }
 
-    // Helper para criar usuário ADMIN para testes genéricos
     private Usuario usuarioAdmin() {
         Usuario u = new Usuario();
         u.setPerfilAtivo(Perfil.ADMIN);

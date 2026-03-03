@@ -1,5 +1,6 @@
 import {expect, type Page} from '@playwright/test';
 import {calcularDataLimite} from './helpers-processos.js';
+import {limparNotificacoes} from './helpers-navegacao.js';
 
 async function garantirContextoSubprocesso(page: Page) {
     const cardMapa = page.getByTestId('card-subprocesso-mapa-edicao').or(page.getByTestId('card-subprocesso-mapa-visualizacao'));
@@ -52,6 +53,7 @@ export async function abrirModalCriarCompetencia(page: Page) {
 }
 
 export async function criarCompetencia(page: Page, descricao: string, atividades: string[]) {
+    await limparNotificacoes(page);
     await abrirModalCriarCompetencia(page);
 
     const modal = page.getByTestId('mdl-criar-competencia');

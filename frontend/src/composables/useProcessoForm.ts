@@ -24,12 +24,15 @@ export function useProcessoForm(initialData?: Processo) {
     watch(descricao, () => {
         fieldErrors.value.descricao = '';
     });
+
     watch(tipo, () => {
         fieldErrors.value.tipo = '';
     });
+
     watch(dataLimite, () => {
         fieldErrors.value.dataLimite = '';
     });
+
     watch(unidadesSelecionadas, () => {
         fieldErrors.value.unidades = '';
     });
@@ -74,9 +77,7 @@ export function useProcessoForm(initialData?: Processo) {
         dataLimite,
         unidadesSelecionadas,
         fieldErrors,
-
         isFormInvalid,
-
         setFromNormalizedError,
         clearErrors,
         hasErrors,

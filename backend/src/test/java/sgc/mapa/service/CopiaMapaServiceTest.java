@@ -16,13 +16,15 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Testes do Serviço de Cópia de Mapa")
 class CopiaMapaServiceTest {
-
     @Mock
     private ComumRepo repo;
+
     @Mock
     private MapaRepo mapaRepo;
+
     @Mock
     private AtividadeRepo atividadeRepo;
+
     @Mock
     private CompetenciaRepo competenciaRepo;
 

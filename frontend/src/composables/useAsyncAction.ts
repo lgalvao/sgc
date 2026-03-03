@@ -39,7 +39,7 @@ export function useAsyncAction() {
 
     /**
      * Versão que captura erros silenciosamente (não relança).
-     * Útil para operações onde falha não deve interromper o fluxo.
+     * Útil para operações onde uma falha não deve interromper o fluxo.
      */
     async function executarSilencioso<T>(
         acao: () => Promise<T>,

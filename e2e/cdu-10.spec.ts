@@ -1,7 +1,7 @@
 import type {Page} from '@playwright/test';
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
-import {criarProcesso, extrairProcessoId} from './helpers/helpers-processos.js';
+import {criarProcesso} from './helpers/helpers-processos.js';
 import {
     adicionarAtividade,
     adicionarConhecimento,
@@ -19,7 +19,7 @@ import {
     fecharHistoricoAnalise,
     homologarCadastroMapeamento
 } from './helpers/helpers-analise.js';
-import {fazerLogout, navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
+import {fazerLogout, limparNotificacoes, navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 
 async function verificarPaginaSubprocesso(page: Page, unidade: string) {
     await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${unidade}(?:/)?$`));
@@ -28,14 +28,15 @@ async function verificarPaginaSubprocesso(page: Page, unidade: string) {
 test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conhecimentos', () => {
     const UNIDADE_ALVO = 'SECAO_221';
 
-    test('Fluxo completo de revisão de cadastro', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
+    test('Fluxo completo de revisão de cadastro', async ({page}) => {
+        test.slow(); // Triplica o timeout — fluxo envolve múltiplos logins e operações
         const timestamp = Date.now();
         const descProcessoMapeamento = `Map 10 ${timestamp}`;
         const descProcessoRevisao = `Rev 10 ${timestamp}`;
-        let processoRevisaoId: number;
 
         await test.step('1. Preparação: Mapeamento completo e Revisão iniciada', async () => {
             // Admin cria e inicia processo de mapeamento
+            await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
             await criarProcesso(page, {
                 descricao: descProcessoMapeamento,
                 tipo: 'MAPEAMENTO',
@@ -46,9 +47,6 @@ test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conh
 
             const linhaProcessoMap = page.getByTestId('tbl-processos').locator('tr').filter({has: page.getByText(descProcessoMapeamento)});
             await linhaProcessoMap.click();
-
-            const processoMapeamentoId = await extrairProcessoId(page);
-            if (processoMapeamentoId > 0) cleanupAutomatico.registrar(processoMapeamentoId);
 
             await page.getByTestId('btn-processo-iniciar').click();
             await page.getByTestId('btn-iniciar-processo-confirmar').click();
@@ -91,8 +89,8 @@ test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conh
             await criarCompetencia(page, `Competência Mapeamento 1 ${timestamp}`, [`Atividade Mapeamento 1 ${timestamp}`]);
             await criarCompetencia(page, `Competência Mapeamento 2 ${timestamp}`, [`Atividade Mapeamento 2 ${timestamp}`]);
 
-            // Usar force: true para clicar mesmo que o toast de sucesso esteja por cima (top-right)
-            await page.getByTestId('btn-cad-mapa-disponibilizar').click({force: true});
+            await limparNotificacoes(page);
+            await page.getByTestId('btn-cad-mapa-disponibilizar').click();
             const modal = page.getByTestId('mdl-disponibilizar-mapa');
             await expect(modal).toBeVisible();
             await page.getByTestId('inp-disponibilizar-mapa-data').fill('2030-12-31');
@@ -144,8 +142,6 @@ test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conh
             });
             const linhaProcessoRev = page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descProcessoRevisao)});
             await linhaProcessoRev.click();
-            processoRevisaoId = await extrairProcessoId(page);
-            if (processoRevisaoId > 0) cleanupAutomatico.registrar(processoRevisaoId);
             await page.getByTestId('btn-processo-iniciar').click();
             await page.getByTestId('btn-iniciar-processo-confirmar').click();
             await verificarPaginaPainel(page);
@@ -205,7 +201,7 @@ test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conh
             await page.getByTestId('btn-acao-devolver').click();
             const motivoDevolucao = 'Necessário revisar os conhecimentos técnicos.';
             await page.getByTestId('inp-devolucao-cadastro-obs').fill(motivoDevolucao);
-            await page.getByTestId('btn-devolucao-cadastro-confirmar').click({force: true});
+            await page.getByTestId('btn-devolucao-cadastro-confirmar').click();
             await verificarPaginaPainel(page);
 
             // Verificar movimentação de devolução
@@ -234,7 +230,7 @@ test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conh
             await navegarParaAtividadesVisualizacao(page);
             await page.getByTestId('btn-acao-devolver').click();
             await page.getByTestId('inp-devolucao-cadastro-obs').fill('Segunda devolução');
-            await page.getByTestId('btn-devolucao-cadastro-confirmar').click({force: true});
+            await page.getByTestId('btn-devolucao-cadastro-confirmar').click();
             await verificarPaginaPainel(page);
 
             // Verificar movimentação de devolução (2ª vez)
@@ -255,7 +251,7 @@ test.describe('CDU-10 - Disponibilizar revisão do cadastro de atividades e conh
             await navegarParaAtividadesVisualizacao(page);
             await page.getByTestId('btn-acao-devolver').click();
             await page.getByTestId('inp-devolucao-cadastro-obs').fill('Terceira devolução');
-            await page.getByTestId('btn-devolucao-cadastro-confirmar').click({force: true});
+            await page.getByTestId('btn-devolucao-cadastro-confirmar').click();
             await verificarPaginaPainel(page);
 
             // Verificar alerta da 3ª devolução

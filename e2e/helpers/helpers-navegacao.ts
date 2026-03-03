@@ -8,44 +8,25 @@ import {expect, type Page} from '@playwright/test';
  */
 
 /**
- * Limpa notificações (toasts e alertas) da tela.
- * Tenta clicar no botão de fechar (.btn-close) ou pressionar ESC.
+ * Limpa toasts (notificações temporárias) da tela.
+ * Fecha cada toast visível clicando no seu botão "X" e aguarda o fade-out.
  */
 export async function limparNotificacoes(page: Page): Promise<void> {
-    const notificacao = page.locator('.toast, [data-testid="global-alert"]');
-
-    if (await notificacao.count() > 0) {
-        // Tentar clicar no botão de fechar se estiver visível
-        const btnFechar = notificacao.locator('.btn-close').first();
-        if (await btnFechar.isVisible()) {
-            await btnFechar.click();
-        } else {
-            await page.keyboard.press('Escape');
-        }
+    // Fechar todos os toasts visíveis clicando no botão "X" de cada um
+    for (const btnClose of await page.locator('.toast .btn-close').all()) {
+        await btnClose.click().catch(() => {});
     }
-
-    await notificacao.waitFor({state: 'hidden'}).catch(() => {
-        // Ignorar se não sumir no tempo previsto
-    });
+    // Aguardar que todos os toasts sumam da tela (fade-out CSS, máx 3s)
+    await expect(page.locator('.toast')).toHaveCount(0, {timeout: 3000}).catch(() => {});
 }
 
 /**
- * Faz logout do sistema e aguarda redirecionamento para página de login.
- * Limpa notificações antes de clicar para evitar intercepção.
+ * Faz logout do sistema clicando no link "Sair".
+ * Limpa toasts antes para garantir que o botão não está encoberto.
  */
 export async function fazerLogout(page: Page): Promise<void> {
     await limparNotificacoes(page);
-
-    const btnLogout = page.getByTestId('btn-logout');
-    const linkLogout = btnLogout.locator('a').first();
-    if (await btnLogout.isVisible().catch(() => false)) {
-        await linkLogout.click({force: true});
-    }
-
-    if (!page.url().endsWith("/login")) {
-        await page.goto('/login');
-    }
-
+    await page.getByTestId('btn-logout').locator('a').click();
     await expect(page).toHaveURL(/\/login/);
 }
 
