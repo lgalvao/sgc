@@ -10,27 +10,52 @@ export interface FeedbackMessage {
 }
 
 export interface ToastController {
-    create: (options: any) => void;
+    create: (options: {
+        props: {
+            title: string;
+            body: string;
+            variant: string;
+            value: number;
+            pos: string;
+            noProgress: boolean;
+        };
+    }) => void;
 }
 
 export const useFeedbackStore = defineStore('feedback', () => {
     // Referência interna ao controller do Toast
     const toast = ref<ToastController | null>(null);
-    const messageQueue = ref<any[]>([]);
+    const messageQueue = ref<{
+        title: string;
+        message: string;
+        variant: 'success' | 'danger' | 'warning' | 'info';
+        autoHideDelay: number;
+    }[]>([]);
 
-    function init(toastInstance: any) {
+    function init(toastInstance: ToastController) {
         toast.value = toastInstance;
         // Processa mensagens que chegaram antes da inicialização
         if (messageQueue.value.length > 0) {
-            const args = messageQueue.value.shift();
+            const args = messageQueue.value.shift()!;
             show(args.title, args.message, args.variant, args.autoHideDelay);
             // Limpa o resto da fila se o debounce for estrito como nos testes
             messageQueue.value = [];
         }
     }
 
+    const isShowing = ref(false);
+
     function show(title: string, message: string, variant: 'success' | 'danger' | 'warning' | 'info' = 'info', autoHideDelay = 3000) {
+        if (isShowing.value) {
+            return;
+        }
+
         if (toast.value) {
+            isShowing.value = true;
+            setTimeout(() => {
+                isShowing.value = false;
+            }, 500); // Debounce de 500ms para evitar spam
+
             // Fechar toasts anteriores antes de exibir um novo (política de toast único)
             document.querySelectorAll('.toast .btn-close').forEach(btn => {
                 (btn as HTMLElement).click();
