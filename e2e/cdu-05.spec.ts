@@ -196,5 +196,33 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
             situacao: 'Em andamento',
             tipo: 'Revisão'
         });
+
+        // Entrar no processo para verificar se a revisão criou o subprocesso com status "Não iniciado"
+        const linhaProcessoRevisao = page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descProcRevisao)});
+        await linhaProcessoRevisao.click();
+
+        // Verifica status na tabela de participantes e entra no subprocesso
+        const linhaSubprocesso = page.locator('tr', {hasText: UNIDADE_ALVO}).first();
+        await expect(linhaSubprocesso).toContainText('Não iniciado');
+        await linhaSubprocesso.click();
+
+        // Verifica status no header do subprocesso
+        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText('Não iniciado');
+
+        // Verifica se a movimentação correta foi registrada
+        // O texto exato no backend é "Processo iniciado" ou "Revisão do cadastro iniciada" dependendo de como foi registrado
+        const timeline = page.getByTestId('tbl-movimentacoes');
+        // No log o backend diz "Processo de revisao 202 iniciado" ou a UI exibe a movimentação padrão
+        await expect(timeline.getByText(/iniciad/i).first()).toBeVisible();
+    });
+
+    test('Fase 3: CHEFE verifica atividades copiadas na Revisão', async ({page}) => {
+        await login(page, USUARIO_CHEFE, SENHA_CHEFE);
+        await acessarSubprocessoChefeDireto(page, descProcRevisao, UNIDADE_ALVO);
+        await navegarParaAtividades(page);
+
+        // Verifica que a atividade criada na fase de Mapeamento foi copiada corretamente
+        const descAtividade = `Atividade Teste ${timestamp}`;
+        await expect(page.getByText(descAtividade).first()).toBeVisible();
     });
 });
