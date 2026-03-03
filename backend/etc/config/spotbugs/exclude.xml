@@ -32,6 +32,7 @@
     -->
     <Match>
         <Or>
+            <Class name="sgc.mapa.service.MapaManutencaoService"/>
             <Class name="sgc.mapa.MapaFacade"/>
             <Class name="sgc.mapa.AtividadeFacade"/>
             <Class name="sgc.subprocesso.service.crud.SubprocessoCrudService"/>

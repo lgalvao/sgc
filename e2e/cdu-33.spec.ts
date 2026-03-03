@@ -50,6 +50,7 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
 
         await page.getByTestId('btn-processo-iniciar').click();
         await page.getByTestId('btn-iniciar-processo-confirmar').click();
+        await verificarPaginaPainel(page);
 
         // 2. Chefe (SECAO_212) disponibiliza cadastro
         await login(page, USUARIOS.CHEFE_SECAO_212.titulo, USUARIOS.CHEFE_SECAO_212.senha);

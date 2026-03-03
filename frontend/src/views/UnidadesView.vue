@@ -17,10 +17,10 @@
     </div>
 
     <div v-else-if="unidades.length > 0">
-      <TreeTable
-          :columns="colunas"
-          :data="unidadesMapeadas"
-          @row-click="irParaDetalhes"
+      <ArvoreUnidades
+          v-model="selecaoVazia"
+          :modo-selecao="false"
+          :unidades="unidades"
       />
     </div>
 
@@ -43,67 +43,24 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, onMounted} from "vue";
+import {computed, onMounted, ref} from "vue";
 import {BButton, BSpinner} from "bootstrap-vue-next";
-import {useRouter} from "vue-router";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
-import TreeTable from "@/components/comum/TreeTable.vue";
+import ArvoreUnidades from "@/components/unidade/ArvoreUnidades.vue";
 import ErrorAlert from "@/components/comum/ErrorAlert.vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
 import {useUnidadesStore} from "@/stores/unidades";
-import type {Unidade} from "@/types/tipos";
 
-const router = useRouter();
 const unidadesStore = useUnidadesStore();
 const unidades = computed(() => unidadesStore.unidades);
 const erroUnidades = computed(() =>
     unidadesStore.error ? {message: unidadesStore.error} : null
 );
-
-const colunas = [
-  {key: "sigla", label: "Sigla", width: "20%"},
-  {key: "nome", label: "Nome", width: "50%"},
-  {key: "responsavel", label: "Responsável", width: "30%"},
-];
-
-const unidadesMapeadas = computed(() => {
-  return mapUnidades(unidades.value);
-});
-
-function mapUnidades(unidades: Unidade[]): any[] {
-  if (!unidades) return [];
-
-  const result: any[] = [];
-  for (const u of unidades) {
-    if (u.sigla === 'ADMIN') {
-      // Se for ADMIN, promovemos os filhos para o nível atual
-      if (u.filhas) {
-        result.push(...mapUnidades(u.filhas));
-      }
-    } else {
-      result.push({
-        codigo: u.codigo,
-        sigla: u.sigla,
-        nome: u.nome,
-        responsavel: u.responsavel?.nome || u.tituloTitular || "-",
-        children: u.filhas ? mapUnidades(u.filhas) : [],
-        expanded: false
-      });
-    }
-  }
-  return result;
-}
+const selecaoVazia = ref<number[]>([]);
 
 async function carregarUnidades() {
   await unidadesStore.buscarTodasAsUnidades();
-}
-
-function irParaDetalhes(row: any) {
-  router.push({
-    name: "Unidade",
-    params: {codUnidade: row.codigo}
-  });
 }
 
 onMounted(carregarUnidades);

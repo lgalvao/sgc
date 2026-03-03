@@ -107,8 +107,15 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
             await expect(page.getByTestId('btn-mapa-historico-gestor')).toBeVisible();
             await expect(page.getByTestId('btn-mapa-devolver')).toBeVisible();
 
-            // Cancela devolução (passo CDU)
+            // Verifica que o botão de confirmar devolução está desabilitado sem observação
             await page.getByTestId('btn-mapa-devolver').click();
+            await expect(page.getByTestId('btn-devolucao-mapa-confirmar')).toBeDisabled();
+
+            // Verifica que o botão habilita após preencher a observação
+            await page.getByTestId('inp-devolucao-mapa-obs').fill('Observação de devolução');
+            await expect(page.getByTestId('btn-devolucao-mapa-confirmar')).toBeEnabled();
+
+            // Cancela a devolução (passo CDU)
             await page.getByTestId('btn-devolucao-mapa-cancelar').click();
 
             await page.getByTestId('btn-mapa-homologar-aceite').click();

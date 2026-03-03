@@ -660,7 +660,7 @@ public class SubprocessoService {
     }
 
     @Transactional
-    public void importarAtividades(Long codSubprocessoDestino, Long codSubprocessoOrigem) {
+    public void importarAtividades(Long codSubprocessoDestino, Long codSubprocessoOrigem, List<Long> codigosAtividades) {
         final Subprocesso spDestino = repo.buscar(Subprocesso.class, codSubprocessoDestino);
         Usuario usuario = usuarioFacade.usuarioAutenticado();
 
@@ -676,7 +676,7 @@ public class SubprocessoService {
 
         Long codMapaOrigem = spOrigem.getMapa().getCodigo();
         Long codMapaDestino = spDestino.getMapa().getCodigo();
-        copiaMapaService.importarAtividadesDeOutroMapa(codMapaOrigem, codMapaDestino);
+        copiaMapaService.importarAtividadesDeOutroMapa(codMapaOrigem, codMapaDestino, codigosAtividades);
 
         if (spDestino.getSituacao() == SituacaoSubprocesso.NAO_INICIADO) {
             var tipoProcesso = spDestino.getProcesso().getTipo();

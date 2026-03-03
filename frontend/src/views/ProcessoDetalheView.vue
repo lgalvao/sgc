@@ -40,29 +40,9 @@
           @row-click="abrirDetalhesUnidade"/>
 
       <div>
-        <div
-            v-if="podeAceitarBloco || podeHomologarBloco"
-            class="mt-3 d-flex gap-2"
-        >
-          <BButton
-              v-if="podeAceitarBloco"
-              data-testid="btn-acao-bloco-aceitar"
-              variant="outline-primary"
-              @click="abrirModalBloco('aceitar')"
-          >
-            <i aria-hidden="true" class="bi bi-check-circle me-1"/>
-            Aceitar em bloco
-          </BButton>
-          <BButton
-              v-if="podeHomologarBloco"
-              data-testid="btn-acao-bloco-homologar"
-              variant="outline-success"
-              @click="abrirModalBloco('homologar')"
-          >
-            <i aria-hidden="true" class="bi bi-check-all me-1"/>
-            Homologar em bloco
-          </BButton>
-        </div>
+        <p v-if="isProcessoFinalizado" class="mt-3 text-muted">
+          Processo concluído.
+        </p>
         <BButton
             v-if="podeFinalizar"
             class="mt-3"
@@ -129,7 +109,7 @@ import {useProcessosStore} from "@/stores/processos";
 import {usePerfilStore} from "@/stores/perfil";
 import {useFeedbackStore} from "@/stores/feedback";
 import {SituacaoProcesso, SituacaoSubprocesso} from "@/types/tipos";
-import {formatSituacaoProcesso, formatSituacaoSubprocesso} from "@/utils/formatters";
+import {formatSituacaoSubprocesso} from "@/utils/formatters";
 import {logger} from "@/utils";
 
 function flattenUnidades(unidades: any[]): any[] {

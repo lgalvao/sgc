@@ -9,6 +9,7 @@ import sgc.processo.dto.ProcessoDetalheDto.*;
 import sgc.processo.model.*;
 import sgc.seguranca.*;
 import sgc.subprocesso.model.*;
+import sgc.subprocesso.service.*;
 
 import java.util.*;
 

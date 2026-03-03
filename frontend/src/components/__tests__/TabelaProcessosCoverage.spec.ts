@@ -21,13 +21,13 @@ describe('TabelaProcessos Coverage', () => {
     it('handles Space key on row to select process', async () => {
         // Stub BTable to render a row with the bound event handler
         const BTableStub = {
-            props: ['items', 'tbodyTrAttr'],
+            props: ['items', 'tbodyTrAttrs'],
             template: `
                 <table>
                     <tbody>
                         <tr v-for="item in items"
                             :key="item.codigo"
-                            v-bind="tbodyTrAttr(item, 'row')">
+                            v-bind="tbodyTrAttrs ? tbodyTrAttrs(item, 'row') : {}">
                             <td>Row</td>
                         </tr>
                     </tbody>
@@ -59,16 +59,16 @@ describe('TabelaProcessos Coverage', () => {
 
     it('returns empty class/attr for invalid inputs in row functions', async () => {
         const BTableStub = {
-            props: ['items', 'tbodyTrClass', 'tbodyTrAttr'],
+            props: ['items', 'tbodyTrClass', 'tbodyTrAttrs'],
             template: `
                 <div>
                      <!-- Trigger with null item -->
                     <div data-testid="null-item-class" :class="tbodyTrClass ? tbodyTrClass(null, 'row') : ''"></div>
-                    <div data-testid="null-item-attr" v-bind="tbodyTrAttr ? tbodyTrAttr(null, 'row') : {}"></div>
+                    <div data-testid="null-item-attr" v-bind="tbodyTrAttrs ? tbodyTrAttrs(null, 'row') : {}"></div>
 
                     <!-- Trigger with wrong type -->
                     <div data-testid="wrong-type-class" :class="tbodyTrClass ? tbodyTrClass(items[0], 'cell') : ''"></div>
-                    <div data-testid="wrong-type-attr" v-bind="tbodyTrAttr ? tbodyTrAttr(items[0], 'cell') : {}"></div>
+                    <div data-testid="wrong-type-attr" v-bind="tbodyTrAttrs ? tbodyTrAttrs(items[0], 'cell') : {}"></div>
                 </div>
             `
         };

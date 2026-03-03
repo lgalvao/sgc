@@ -87,6 +87,8 @@
             :model-value="modelValue.dataLimite"
             :state="fieldErrors.dataLimite ? false : null"
             data-testid="inp-processo-data-limite"
+            max="2099-12-31"
+            min="2000-01-01"
             required
             type="date"
             @update:model-value="(val) => updateField('dataLimite', String(val))"

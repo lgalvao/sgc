@@ -10,6 +10,7 @@ import sgc.processo.dto.*;
 import sgc.processo.model.*;
 import sgc.seguranca.*;
 import sgc.subprocesso.model.*;
+import sgc.subprocesso.service.*;
 import sgc.testutils.*;
 
 import java.time.*;
@@ -89,7 +90,7 @@ class ProcessoDetalheBuilderTest {
     }
 
     @Test
-    @DisplayName("Deve permitir finalizar quando usuário é admin")
+    @DisplayName("Deve permitir finalizar quando usuário é admin e todos subprocessos homologados")
     void devePermitirFinalizarQuandoUsuarioAdmin() {
 
         Usuario usuario = criarUsuarioMock();

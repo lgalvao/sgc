@@ -12,6 +12,7 @@
         :criterio-ordenacao="criterio"
         :direcao-ordenacao-asc="asc"
         :processos="processosOrdenados"
+        :show-data-finalizacao="true"
         @ordenar="ordenarPor"
         @selecionar-processo="verDetalhes"
     />

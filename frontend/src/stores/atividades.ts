@@ -96,9 +96,10 @@ export const useAtividadesStore = defineStore("atividades", () => {
     async function importarAtividades(
         codSubprocessoDestino: number,
         codSubprocessoOrigem: number,
+        codigosAtividades?: number[],
     ) {
         return withErrorHandling(async () => {
-            await subprocessoService.importarAtividades(codSubprocessoDestino, codSubprocessoOrigem);
+            await subprocessoService.importarAtividades(codSubprocessoDestino, codSubprocessoOrigem, codigosAtividades);
             await buscarAtividadesParaSubprocesso(codSubprocessoDestino);
             const subprocessosStore = useSubprocessosStore();
             await subprocessosStore.buscarSubprocessoDetalhe(codSubprocessoDestino);

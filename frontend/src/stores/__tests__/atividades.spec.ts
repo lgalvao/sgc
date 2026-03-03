@@ -188,7 +188,7 @@ describe("useAtividadesStore", () => {
 
             await context.store.importarAtividades(1, 2);
 
-            expect(subprocessoService.importarAtividades).toHaveBeenCalledWith(1, 2);
+            expect(subprocessoService.importarAtividades).toHaveBeenCalledWith(1, 2, undefined);
         });
 
         it("deve lidar com erros ao importar atividades", async () => {

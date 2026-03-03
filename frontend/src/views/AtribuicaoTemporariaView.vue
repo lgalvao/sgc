@@ -43,6 +43,8 @@
                   id="dataInicio"
                   v-model="dataInicio"
                   data-testid="input-data-inicio"
+                  max="2099-12-31"
+                  min="2000-01-01"
                   required
                   type="date"
               />
@@ -54,6 +56,8 @@
                   id="dataTermino"
                   v-model="dataTermino"
                   data-testid="input-data-termino"
+                  max="2099-12-31"
+                  min="2000-01-01"
                   required
                   type="date"
               />

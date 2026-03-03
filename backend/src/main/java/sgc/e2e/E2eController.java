@@ -147,7 +147,7 @@ public class E2eController {
 
             stmt.execute("SET REFERENTIAL_INTEGRITY TRUE");
             log.info("Limpeza robusta do processo {} concluída.", codigo);
-        } catch (Exception e) {
+        } catch (SQLException e) {
             log.error("Erro na limpeza robusta do processo {}", codigo, e);
             throw new RuntimeException("Falha na limpeza do processo: " + e.getMessage());
         }

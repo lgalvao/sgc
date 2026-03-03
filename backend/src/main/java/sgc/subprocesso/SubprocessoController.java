@@ -257,7 +257,7 @@ public class SubprocessoController {
     @Operation(summary = "Importa atividades de outro subprocesso")
     public Map<String, String> importarAtividades(
             @PathVariable Long id, @RequestBody @Valid ImportarAtividadesRequest request) {
-        subprocessoService.importarAtividades(id, request.codSubprocessoOrigem());
+        subprocessoService.importarAtividades(id, request.codSubprocessoOrigem(), request.codigosAtividades());
         return Map.of("message", "Atividades importadas.");
     }
 
