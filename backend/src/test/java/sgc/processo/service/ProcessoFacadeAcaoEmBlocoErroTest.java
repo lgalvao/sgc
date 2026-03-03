@@ -63,10 +63,10 @@ class ProcessoFacadeAcaoEmBlocoErroTest {
         sp.setCodigo(1L);
         sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
         when(subprocessoService.listarEntidadesPorProcessoEUnidades(10L, List.of(20L))).thenReturn(List.of(sp));
-       .when(permissionEvaluator.checkPermission(eq(usuario), any(List.class), eq("ACEITAR_CADASTRO"))).thenReturn(false);
-       .when(permissionEvaluator.checkPermission(eq(usuario), any(List.class), eq("ACEITAR_MAPA"))).thenReturn(true);
-       .when(permissionEvaluator.checkPermission(eq(usuario), any(List.class), eq("HOMOLOGAR_CADASTRO"))).thenReturn(true);
-       .when(permissionEvaluator.checkPermission(eq(usuario), any(List.class), eq("HOMOLOGAR_MAPA"))).thenReturn(true);
+        when(permissionEvaluator.checkPermission(eq(usuario), any(List.class), eq("ACEITAR_CADASTRO"))).thenReturn(false);
+        when(permissionEvaluator.checkPermission(eq(usuario), any(List.class), eq("ACEITAR_MAPA"))).thenReturn(true);
+        when(permissionEvaluator.checkPermission(eq(usuario), any(List.class), eq("HOMOLOGAR_CADASTRO"))).thenReturn(true);
+        when(permissionEvaluator.checkPermission(eq(usuario), any(List.class), eq("HOMOLOGAR_MAPA"))).thenReturn(true);
 
         AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(List.of(20L), AcaoProcesso.ACEITAR, null);
         assertThrows(ErroAcessoNegado.class, () -> processoFacade.executarAcaoEmBloco(10L, req));
@@ -80,10 +80,10 @@ class ProcessoFacadeAcaoEmBlocoErroTest {
         sp.setCodigo(1L);
         sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO);
         when(subprocessoService.listarEntidadesPorProcessoEUnidades(10L, List.of(20L))).thenReturn(List.of(sp));
-       .when(permissionEvaluator.checkPermission(eq(usuario), any(List.class), eq("ACEITAR_CADASTRO"))).thenReturn(true);
-       .when(permissionEvaluator.checkPermission(eq(usuario), any(List.class), eq("ACEITAR_MAPA"))).thenReturn(false);
-       .when(permissionEvaluator.checkPermission(eq(usuario), any(List.class), eq("HOMOLOGAR_CADASTRO"))).thenReturn(true);
-       .when(permissionEvaluator.checkPermission(eq(usuario), any(List.class), eq("HOMOLOGAR_MAPA"))).thenReturn(true);
+        when(permissionEvaluator.checkPermission(eq(usuario), any(List.class), eq("ACEITAR_CADASTRO"))).thenReturn(true);
+        when(permissionEvaluator.checkPermission(eq(usuario), any(List.class), eq("ACEITAR_MAPA"))).thenReturn(false);
+        when(permissionEvaluator.checkPermission(eq(usuario), any(List.class), eq("HOMOLOGAR_CADASTRO"))).thenReturn(true);
+        when(permissionEvaluator.checkPermission(eq(usuario), any(List.class), eq("HOMOLOGAR_MAPA"))).thenReturn(true);
 
         AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(List.of(20L), AcaoProcesso.ACEITAR, null);
         assertThrows(ErroAcessoNegado.class, () -> processoFacade.executarAcaoEmBloco(10L, req));
@@ -97,10 +97,10 @@ class ProcessoFacadeAcaoEmBlocoErroTest {
         sp.setCodigo(1L);
         sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
         when(subprocessoService.listarEntidadesPorProcessoEUnidades(10L, List.of(20L))).thenReturn(List.of(sp));
-       .when(permissionEvaluator.checkPermission(eq(usuario), any(List.class), eq("ACEITAR_CADASTRO"))).thenReturn(true);
-       .when(permissionEvaluator.checkPermission(eq(usuario), any(List.class), eq("ACEITAR_MAPA"))).thenReturn(true);
-       .when(permissionEvaluator.checkPermission(eq(usuario), any(List.class), eq("HOMOLOGAR_CADASTRO"))).thenReturn(false);
-       .when(permissionEvaluator.checkPermission(eq(usuario), any(List.class), eq("HOMOLOGAR_MAPA"))).thenReturn(true);
+        when(permissionEvaluator.checkPermission(eq(usuario), any(List.class), eq("ACEITAR_CADASTRO"))).thenReturn(true);
+        when(permissionEvaluator.checkPermission(eq(usuario), any(List.class), eq("ACEITAR_MAPA"))).thenReturn(true);
+        when(permissionEvaluator.checkPermission(eq(usuario), any(List.class), eq("HOMOLOGAR_CADASTRO"))).thenReturn(false);
+        when(permissionEvaluator.checkPermission(eq(usuario), any(List.class), eq("HOMOLOGAR_MAPA"))).thenReturn(true);
 
         AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(List.of(20L), AcaoProcesso.HOMOLOGAR, null);
         assertThrows(ErroAcessoNegado.class, () -> processoFacade.executarAcaoEmBloco(10L, req));
@@ -114,10 +114,10 @@ class ProcessoFacadeAcaoEmBlocoErroTest {
         sp.setCodigo(1L);
         sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
         when(subprocessoService.listarEntidadesPorProcessoEUnidades(10L, List.of(20L))).thenReturn(List.of(sp));
-       .when(permissionEvaluator.checkPermission(eq(usuario), any(List.class), eq("ACEITAR_CADASTRO"))).thenReturn(true);
-       .when(permissionEvaluator.checkPermission(eq(usuario), any(List.class), eq("ACEITAR_MAPA"))).thenReturn(true);
-       .when(permissionEvaluator.checkPermission(eq(usuario), any(List.class), eq("HOMOLOGAR_CADASTRO"))).thenReturn(true);
-       .when(permissionEvaluator.checkPermission(eq(usuario), any(List.class), eq("HOMOLOGAR_MAPA"))).thenReturn(false);
+        when(permissionEvaluator.checkPermission(eq(usuario), any(List.class), eq("ACEITAR_CADASTRO"))).thenReturn(true);
+        when(permissionEvaluator.checkPermission(eq(usuario), any(List.class), eq("ACEITAR_MAPA"))).thenReturn(true);
+        when(permissionEvaluator.checkPermission(eq(usuario), any(List.class), eq("HOMOLOGAR_CADASTRO"))).thenReturn(true);
+        when(permissionEvaluator.checkPermission(eq(usuario), any(List.class), eq("HOMOLOGAR_MAPA"))).thenReturn(false);
 
         AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(List.of(20L), AcaoProcesso.HOMOLOGAR, null);
         assertThrows(ErroAcessoNegado.class, () -> processoFacade.executarAcaoEmBloco(10L, req));
