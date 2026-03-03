@@ -100,26 +100,26 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
     }
 
     private boolean checkSubprocesso(Usuario usuario, Subprocesso sp, String acao) {
-        if (sp.getProcesso() != null && sp.getProcesso().getSituacao() == sgc.processo.model.SituacaoProcesso.FINALIZADO) {
-            return !isAcaoEscrita(acao);
-        }
-
         Perfil perfil = usuario.getPerfilAtivo();
         boolean isAdmin = perfil == ADMIN;
         boolean isEscrita = isAcaoEscrita(acao);
 
+        // Exceção: Importação permite ler de outras unidades para obter atividades/conhecimentos
+        if ("CONSULTAR_PARA_IMPORTACAO".equals(acao) && perfil == CHEFE) {
+            // CDU-12/Ajuste: Permitir se o processo estiver finalizado (mapas vigentes)
+            if (sp.getProcesso() != null && sp.getProcesso().getSituacao() == sgc.processo.model.SituacaoProcesso.FINALIZADO) {
+                return true;
+            }
+            return checkHierarquia(usuario, sp.getUnidade());
+        }
+
+        if (sp.getProcesso() != null && sp.getProcesso().getSituacao() == sgc.processo.model.SituacaoProcesso.FINALIZADO) {
+            return !isEscrita;
+        }
+
         // Visualização (Leitura) - Baseada na Hierarquia
         if (!isEscrita) {
             if (isAdmin) return true; // Admin vê tudo
-
-            // Exceção: Importação permite ler de outras unidades para obter atividades/conhecimentos
-            if ("CONSULTAR_PARA_IMPORTACAO".equals(acao) && usuario.getPerfilAtivo() == CHEFE) {
-                // CDU-12/Ajuste: Permitir se o processo estiver finalizado (mapas vigentes)
-                if (sp.getProcesso() != null && sp.getProcesso().getSituacao() == sgc.processo.model.SituacaoProcesso.FINALIZADO) {
-                    return true;
-                }
-                return checkHierarquia(usuario, sp.getUnidade());
-            }
 
             // CDU-12: Exceção à regra de visualização baseada apenas em hierarquia
             if ("VERIFICAR_IMPACTOS".equals(acao)) {

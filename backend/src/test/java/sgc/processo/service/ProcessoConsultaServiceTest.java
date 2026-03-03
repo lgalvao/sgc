@@ -163,6 +163,9 @@ class ProcessoConsultaServiceTest {
     @Test
     @DisplayName("Deve listar processos ativos")
     void deveProcessosAndamento() {
+        Usuario admin = Usuario.builder().perfilAtivo(Perfil.ADMIN).build();
+        when(usuarioService.usuarioAutenticado()).thenReturn(admin);
+
         processoConsultaService.processosAndamento();
         verify(processoRepo).findBySituacao(SituacaoProcesso.EM_ANDAMENTO);
     }
@@ -170,12 +173,12 @@ class ProcessoConsultaServiceTest {
     @Test
     @DisplayName("Deve retornar lista vazia quando não há processos ativos")
     void deveRetornarListaVaziaQuandoNaoHaProcessosAtivos() {
+        Usuario admin = Usuario.builder().perfilAtivo(Perfil.ADMIN).build();
+        when(usuarioService.usuarioAutenticado()).thenReturn(admin);
 
         when(processoRepo.findBySituacao(SituacaoProcesso.EM_ANDAMENTO)).thenReturn(List.of());
 
-
         List<Processo> resultado = processoConsultaService.processosAndamento();
-
 
         assertThat(resultado).isEmpty();
         verify(processoRepo).findBySituacao(SituacaoProcesso.EM_ANDAMENTO);
@@ -184,10 +187,15 @@ class ProcessoConsultaServiceTest {
     @Test
     @DisplayName("Deve retornar lista vazia quando não há processos finalizados")
     void deveRetornarListaVaziaQuandoNaoHaProcessosFinalizados() {
+        Usuario admin = Usuario.builder().perfilAtivo(Perfil.ADMIN).build();
+        when(usuarioService.usuarioAutenticado()).thenReturn(admin);
+
         when(processoRepo.listarPorSituacaoComParticipantes(SituacaoProcesso.FINALIZADO))
                 .thenReturn(List.of());
 
+
         List<Processo> resultado = processoConsultaService.processosFinalizados();
+
 
         assertThat(resultado).isEmpty();
         verify(processoRepo).listarPorSituacaoComParticipantes(SituacaoProcesso.FINALIZADO);
