@@ -23,6 +23,7 @@ export const USUARIOS = {
     CHEFE_SECRETARIA_1: {titulo: '202020', senha: 'senha', perfil: 'CHEFE - SECRETARIA_1'}, // John Lennon (SECRETARIA_1)
     GESTOR_SECRETARIA_1: {titulo: '202020', senha: 'senha', perfil: 'GESTOR - SECRETARIA_1'}, // John Lennon (SECRETARIA_1)
     CHEFE_SECRETARIA_2: {titulo: '212121', senha: 'senha'}, // George Harrison (Secretaria 2)
+    SERVIDOR: {titulo: '121212', senha: 'senha'}, // Servidor (SECAO_113)
     INVALIDO: {titulo: '999999999', senha: 'senhaerrada'}
 } as const;
 

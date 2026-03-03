@@ -18,6 +18,7 @@ import java.util.*;
 public class ProcessoDetalheBuilder {
     private final SubprocessoRepo subprocessoRepo;
     private final SgcPermissionEvaluator permissionEvaluator;
+    private final SubprocessoValidacaoService subprocessoValidacaoService;
 
     @Transactional(readOnly = true)
     public ProcessoDetalheDto build(Processo processo, Usuario usuario) {
@@ -29,11 +30,17 @@ public class ProcessoDetalheBuilder {
                 .dataCriacao(processo.getDataCriacao())
                 .dataFinalizacao(processo.getDataFinalizacao())
                 .dataLimite(processo.getDataLimite())
-                .podeFinalizar(permissionEvaluator.checkPermission(usuario, processo, "FINALIZAR_PROCESSO"))
+                .podeFinalizar(permissionEvaluator.checkPermission(usuario, processo, "FINALIZAR_PROCESSO")
+                        && subprocessoValidacaoService.validarSubprocessosParaFinalizacao(processo.getCodigo()).valido())
                 .podeHomologarCadastro(permissionEvaluator.checkPermission(usuario, processo, "HOMOLOGAR_CADASTRO_EM_BLOCO"))
                 .podeHomologarMapa(permissionEvaluator.checkPermission(usuario, processo, "HOMOLOGAR_MAPA_EM_BLOCO"))
                 .podeAceitarCadastroBloco(permissionEvaluator.checkPermission(usuario, processo, "ACEITAR_CADASTRO_EM_BLOCO"))
-                .podeDisponibilizarMapaBloco(permissionEvaluator.checkPermission(usuario, processo, "DISPONIBILIZAR_MAPA_EM_BLOCO"))
+                .podeDisponibilizarMapaBloco(permissionEvaluator.checkPermission(usuario, processo, "DISPONIBILIZAR_MAPA_EM_BLOCO")
+                        && subprocessoRepo.countByProcessoCodigoAndSituacaoIn(processo.getCodigo(), List.of(
+                        SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO,
+                        SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO,
+                        SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO
+                )) > 0)
                 .unidades(new ArrayList<>())
                 .build();
 

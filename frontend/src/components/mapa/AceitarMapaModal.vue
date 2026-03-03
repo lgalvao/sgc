@@ -6,7 +6,6 @@
       :title="tituloModal"
       centered
       header-text-variant="white"
-      hide-footer
       @hide="$emit('fecharModal')"
   >
     <div data-testid="body-aceite-mapa">

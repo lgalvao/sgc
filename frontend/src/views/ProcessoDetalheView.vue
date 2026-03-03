@@ -148,8 +148,9 @@ const podeHomologarBloco = computed(() => {
 });
 
 const podeDisponibilizarBloco = computed(() => {
-  return !isProcessoFinalizado.value && (processo.value?.podeDisponibilizarMapaBloco || false)
-      && unidadesElegiveisPorAcao.value.disponibilizar.length > 0;
+  return !isProcessoFinalizado.value &&
+      (processo.value?.podeDisponibilizarMapaBloco || false) &&
+      unidadesElegiveisPorAcao.value.disponibilizar.length > 0;
 });
 
 const mostrarBotoesBloco = computed(() => {

@@ -22,8 +22,8 @@
         </BButton>
 
         <BButton
-            v-if="podeValidar && temHistoricoAnalise"
-            data-testid="btn-mapa-historico"
+            v-if="(podeValidar && temHistoricoAnalise) || podeAnalisar"
+            :data-testid="podeAnalisar ? 'btn-mapa-historico-gestor' : 'btn-mapa-historico'"
             title="Histórico de análise"
             variant="outline-secondary"
             @click="verHistorico"
@@ -40,15 +40,6 @@
             @click="verSugestoes"
         >
           Ver sugestões
-        </BButton>
-        <BButton
-            v-if="podeAnalisar"
-            data-testid="btn-mapa-historico-gestor"
-            title="Histórico de análise"
-            variant="outline-secondary"
-            @click="verHistorico"
-        >
-          Histórico de análise
         </BButton>
         <BButton
             v-if="podeAnalisar"

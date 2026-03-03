@@ -114,7 +114,11 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
 
             // Exceção: Importação permite ler de outras unidades para obter atividades/conhecimentos
             if ("CONSULTAR_PARA_IMPORTACAO".equals(acao) && (usuario.getPerfilAtivo() == CHEFE || usuario.getPerfilAtivo() == GESTOR)) {
-                return true;
+                // CDU-12/Ajuste: Permitir se o processo estiver finalizado (mapas vigentes)
+                if (sp.getProcesso() != null && sp.getProcesso().getSituacao() == sgc.processo.model.SituacaoProcesso.FINALIZADO) {
+                    return true;
+                }
+                return checkHierarquia(usuario, sp.getUnidade());
             }
 
             // CDU-12: Exceção à regra de visualização baseada apenas em hierarquia

@@ -32,6 +32,7 @@ export const test = base.extend<{
     autenticadoComoChefeAssessoria21: void;
     autenticadoComoChefeAssessoria22: void;
     autenticadoComoAdminComPerfil: void;
+    autenticadoComoServidor: void;
 }>({
     autenticadoComoAdmin: async ({page}, use) => {
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
@@ -105,6 +106,11 @@ export const test = base.extend<{
             USUARIOS.ADMIN_2_PERFIS.senha,
             USUARIOS.ADMIN_2_PERFIS.perfil
         );
+        await use();
+    },
+
+    autenticadoComoServidor: async ({page}, use) => {
+        await login(page, USUARIOS.SERVIDOR.titulo, USUARIOS.SERVIDOR.senha);
         await use();
     },
 });

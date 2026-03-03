@@ -41,13 +41,16 @@ test.describe('CDU-01 - Realizar login e exibir estrutura das telas', () => {
         await expect(page.getByRole('link', {name: 'Unidades'})).toBeVisible();
         await expect(page.getByText('Relatórios')).toBeVisible();
         await expect(page.getByText('Histórico')).toBeVisible();
+
+        // Admin deve ver Parâmetros e Administradores
         await expect(page.getByTestId('btn-parametros')).toBeVisible();
+        await expect(page.getByTestId('btn-administradores')).toBeVisible();
     });
 
-    test('Deve exibir barra de navegação com restrições para não-ADMIN', async ({page}: { page: Page }) => {
-        // Usuário 333333 (CHEFE_SECAO_111) não é admin
-        await autenticar(page, USUARIOS.CHEFE_SECAO_111.titulo, USUARIOS.CHEFE_SECAO_111.senha);
-
+    test('Deve exibir barra de navegação com restrições para GESTOR', async ({
+                                                                                page,
+                                                                                autenticadoComoGestor
+                                                                            }: { page: Page, autenticadoComoGestor: void }) => {
         await expect(page.getByRole('link', {name: 'SGC'})).toBeVisible();
         await expect(page.getByText('Painel')).toBeVisible();
 
@@ -55,8 +58,47 @@ test.describe('CDU-01 - Realizar login e exibir estrutura das telas', () => {
         await expect(page.getByRole('link', {name: 'Minha unidade'})).toBeVisible();
         await expect(page.getByRole('link', {name: 'Unidades'})).not.toBeVisible();
 
-        // Não deve ver configurações (engrenagem)
+        // Não deve ver configurações administrativas
         await expect(page.getByTestId('btn-parametros')).not.toBeVisible();
+        await expect(page.getByTestId('btn-administradores')).not.toBeVisible();
+    });
+
+    test('Deve exibir barra de navegação com restrições para CHEFE', async ({
+                                                                                page,
+                                                                                autenticadoComoChefeSecao111
+                                                                            }: {
+        page: Page,
+        autenticadoComoChefeSecao111: void
+    }) => {
+        await expect(page.getByRole('link', {name: 'SGC'})).toBeVisible();
+        await expect(page.getByText('Painel')).toBeVisible();
+
+        // Deve ver 'Minha unidade' em vez de 'Unidades'
+        await expect(page.getByRole('link', {name: 'Minha unidade'})).toBeVisible();
+        await expect(page.getByRole('link', {name: 'Unidades'})).not.toBeVisible();
+
+        // Não deve ver configurações administrativas
+        await expect(page.getByTestId('btn-parametros')).not.toBeVisible();
+        await expect(page.getByTestId('btn-administradores')).not.toBeVisible();
+    });
+
+    test('Deve exibir barra de navegação com restrições para SERVIDOR', async ({
+                                                                                  page,
+                                                                                  autenticadoComoServidor
+                                                                              }: {
+        page: Page,
+        autenticadoComoServidor: void
+    }) => {
+        await expect(page.getByRole('link', {name: 'SGC'})).toBeVisible();
+        await expect(page.getByText('Painel')).toBeVisible();
+
+        // Deve ver 'Minha unidade' em vez de 'Unidades'
+        await expect(page.getByRole('link', {name: 'Minha unidade'})).toBeVisible();
+        await expect(page.getByRole('link', {name: 'Unidades'})).not.toBeVisible();
+
+        // Não deve ver configurações administrativas
+        await expect(page.getByTestId('btn-parametros')).not.toBeVisible();
+        await expect(page.getByTestId('btn-administradores')).not.toBeVisible();
     });
 
     test('Deve exibir informações do usuário e controles', async ({page, autenticadoComoAdmin}: {
@@ -68,6 +110,7 @@ test.describe('CDU-01 - Realizar login e exibir estrutura das telas', () => {
         await expect(page.getByText('ADMIN - ADMIN')).toBeVisible();
 
         await expect(page.getByTestId('btn-parametros')).toBeVisible();
+        await expect(page.getByTestId('btn-administradores')).toBeVisible();
 
         await expect(page.getByTestId('btn-logout')).toBeVisible();
     });

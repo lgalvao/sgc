@@ -23,20 +23,19 @@ Fluxo principal:
    `Título ou senha inválidos.`
 
 6. Caso o usuário seja autenticado, o sistema consulta os perfis e as unidades do usuário nas views do banco de dados.
-   Importante: Um usuário pode estar em várias unidades (ex. substituição, atribuição temporária) e também ter mais de
-   um perfil.
+   **Importante:** Um usuário pode estar em várias unidades (por conta de substituição, atribuição temporária, etc.) e também ter mais de um perfil (por exemplo, ser chefe de uma unidade e administrador do sistema).
 
 7. O sistema determina os perfis disponíveis para o usuário, seguindo estas regras, não exclusivas:
-    - ADMIN: Se usuário estiver cadastrado como administrador do sistema.
-    - GESTOR: Se usuário for responsável por uma unidade intermediária ou interoperacional.
-    - CHEFE: Se usuário for responsável por unidades operacionais, interoperacionais.
-    - SERVIDOR: Se usuário não for o responsável pela sua unidade de lotação.
+    - ADMIN: Se o usuário estiver cadastrado como administrador do sistema.
+    - GESTOR: Se o usuário for responsável por uma unidade intermediária ou interoperacional.
+    - CHEFE: Se o usuário for responsável por uma unidade operacional ou interoperacional.
+    - SERVIDOR: Se o usuário não for o responsável pela sua unidade de lotação.
 
 8. O sistema determina quais pares 'perfil-unidade' se aplicam ao usuário logado, seguindo estas regras:
 
    **Se o usuário possuir apenas um perfil e uma unidade:**
 
-   8.1. o sistema guarda perfil e unidade definidos
+   8.1. O sistema guarda o perfil e a unidade definidos
 
    **Se o usuário possuir múltiplos perfis ou unidades:**
 
@@ -49,17 +48,14 @@ Fluxo principal:
 9. O sistema exibe a estrutura de telas da aplicação, composta pelas seções: `Barra de navegação`, `Conteúdo` e
    `Rodapé`.
 
-   9.1. `A Barra de navegação` é sempre mostrada no topo das telas (exceto para tela de login) e tem as seguintes
-   regras de exibição:
+   9.1. A `Barra de navegação` é sempre mostrada no topo das telas (exceto para tela de login) e tem as seguintes regras de exibição:
 
    9.1.1. Itens principais de navegação:
     - Ícone/logotipo do sistema (abre a tela `Painel`)
     - Link `Painel`, para tela `Painel`
-    - Menu das unidades, de acordo com essas regras:
+    - Menu das unidades, de acordo com as regras:
         - Se ADMIN: Link `Unidades`, para a tela `Unidades`, que apresenta a hierarquia completa de unidades do TRE-PE
-        - Se GESTOR: CHEFE, ou SERVIDOR**: Link `Minha unidade`, para a tela `Detalhe da unidade`, que apresenta os
-          dados
-          da unidade do usuário logado
+        - Se GESTOR: CHEFE, ou SERVIDOR: Link `Minha unidade`, para a tela `Detalhe da unidade`, que apresenta os dados da unidade do usuário logado
     - Link `Relatórios`, para tela `Relatórios`
     - Link `Histórico`, para tela `Histórico de processos`
 
@@ -68,7 +64,7 @@ Fluxo principal:
         - `[Perfil] - [Sigla da unidade]` - Texto fixo, sem interatividade (ex. `CHEFE - SESEL`).
         - `Ícone de logout` - faz logout e mostra tela `Login`
     - Se perfil ADMIN:
-        - Mostrar adicionalmente o `ícone de engrenagem` para acesso à tela `Configurações`
+        - Mostrar adicionalmente dois ícones para acesso as telas  `Configurações` e `Administradores`
 
    9.2. O `Conteúdo` compõe a parte central onde serão 'encaixadas' todas as telas.
 

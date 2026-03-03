@@ -3,7 +3,6 @@
       :fade="false"
       :model-value="mostrarModal"
       centered
-      hide-footer
       title="Alterar data limite"
       @hide="$emit('fecharModal')"
   >
