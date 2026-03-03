@@ -77,7 +77,9 @@ class SgcPermissionEvaluatorCoverageTest {
     @DisplayName("checkSubprocesso - CONSULTAR_PARA_IMPORTACAO permite acesso fora da hierarquia para CHEFE")
     void checkSubprocesso_Importacao_Chefe() {
         Subprocesso sp = criarSubprocesso(1L, 20L); // Unidade diferente
-        sp.setProcesso(new Processo()); // Nao finalizado
+        Processo p = new Processo();
+        p.setSituacao(SituacaoProcesso.FINALIZADO);
+        sp.setProcesso(p);
 
         Usuario user = usuario(Perfil.CHEFE, 10L);
 
