@@ -83,19 +83,17 @@ describe("Unidades.vue", () => {
         expect(store.clearError).toHaveBeenCalled();
     });
 
-    it("deve exibir TreeTable quando houver unidades", () => {
+    it("deve exibir ArvoreUnidades quando houver unidades", () => {
         const wrapper = createWrapper({unidades: mockUnidades});
-        const arvore = wrapper.find("[data-testid='tree-table']");
+        const arvore = wrapper.findComponent({name: 'ArvoreUnidades'});
         expect(arvore.exists()).toBe(true);
-
-        const arvoreComponent = wrapper.findComponent({name: "TreeTable"});
-        expect(arvoreComponent.props("data")).toBeDefined();
+        expect(arvore.props("unidades")).toBeDefined();
     });
 
     it("deve exibir mensagem quando não houver unidades", () => {
         const wrapper = createWrapper({unidades: []});
         expect(wrapper.text()).toContain("Nenhuma unidade encontrada.");
-        expect(wrapper.find("[data-testid='tree-table']").exists()).toBe(false);
+        expect(wrapper.findComponent({name: 'ArvoreUnidades'}).exists()).toBe(false);
     });
 
 });
