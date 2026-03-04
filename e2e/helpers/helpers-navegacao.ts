@@ -9,7 +9,7 @@ import {expect, type Page} from '@playwright/test';
 
 /**
  * Limpa toasts (notificações temporárias) da tela.
- * Fecha cada toast visível clicando no seu botão "X" e aguarda o fade-out.
+ * Fecha cada toast visível clicando no seu botão "X".
  */
 export async function limparNotificacoes(page: Page): Promise<void> {
     // Localizadores para os botões de fechar dos toasts (incluindo BOrchestrator do bootstrap-vue-next)
@@ -24,27 +24,19 @@ export async function limparNotificacoes(page: Page): Promise<void> {
             const buttons = await locator.all();
             for (const btn of buttons) {
                 if (await btn.isVisible()) {
-                    await btn.click({force: true}).catch(() => {});
+                    await btn.click().catch(() => {});
                 }
             }
         } catch (e) {
             // Ignora erros de seleção
         }
     }
-
-    // Aguardar um breve momento para animações de saída se houver algo visível
-    const overlay = page.locator('.toast, .orchestrator-container');
-    if (await overlay.count() > 0) {
-        await page.waitForTimeout(300); // Pequena pausa para animação começar
-    }
 }
 
 /**
  * Faz logout do sistema clicando no link "Sair".
- * Limpa toasts antes para garantir que o botão não está encoberto.
  */
 export async function fazerLogout(page: Page): Promise<void> {
-    await limparNotificacoes(page);
     await page.getByTestId('btn-logout').locator('a').click();
     await expect(page).toHaveURL(/\/login/);
 }

@@ -98,9 +98,4 @@ const shouldShowNavBarExtras = computed(() => {
   max-height: 400px;
   overflow-y: auto;
 }
-
-/* Desce as notificações para não cobrir a barra de navegação */
-.orchestrator-container {
-  margin-top: 4rem !important;
-}
 </style>

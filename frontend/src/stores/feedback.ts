@@ -42,7 +42,7 @@ export const useFeedbackStore = defineStore('feedback', () => {
                     body: message,
                     variant,
                     value: autoHideDelay,
-                    pos: 'top-right',
+                    pos: 'bottom-right',
                     noProgress: true
                 }
             });
