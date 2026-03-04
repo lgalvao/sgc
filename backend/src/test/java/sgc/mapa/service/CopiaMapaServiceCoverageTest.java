@@ -28,6 +28,9 @@ class CopiaMapaServiceCoverageTest {
     @InjectMocks
     private CopiaMapaService service;
 
+    @Captor
+    private ArgumentCaptor<List<Atividade>> atividadesCaptor;
+
     @Test
     @DisplayName("copiarMapaParaUnidade deve lidar com atividade não encontrada no mapa de destino")
     void deveLidarComAtividadeNaoEncontrada() {
@@ -105,10 +108,9 @@ class CopiaMapaServiceCoverageTest {
         service.importarAtividadesDeOutroMapa(mapaOrigemId, mapaDestinoId, List.of(10L));
 
 
-        ArgumentCaptor<List<Atividade>> captor = ArgumentCaptor.forClass(List.class);
-        verify(atividadeRepo).saveAll(captor.capture());
-        assertThat(captor.getValue()).hasSize(1);
-        assertThat(captor.getValue().getFirst().getDescricao()).isEqualTo("Selecionada");
+        verify(atividadeRepo).saveAll(atividadesCaptor.capture());
+        assertThat(atividadesCaptor.getValue()).hasSize(1);
+        assertThat(atividadesCaptor.getValue().getFirst().getDescricao()).isEqualTo("Selecionada");
     }
 
     @Test

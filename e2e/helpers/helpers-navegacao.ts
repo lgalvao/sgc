@@ -12,12 +12,31 @@ import {expect, type Page} from '@playwright/test';
  * Fecha cada toast visível clicando no seu botão "X" e aguarda o fade-out.
  */
 export async function limparNotificacoes(page: Page): Promise<void> {
-    // Fechar todos os toasts visíveis clicando no botão "X" de cada um
-    for (const btnClose of await page.locator('.toast .btn-close').all()) {
-        await btnClose.click().catch(() => {});
+    // Localizadores para os botões de fechar dos toasts (incluindo BOrchestrator do bootstrap-vue-next)
+    const locButtons = [
+        page.locator('.toast .btn-close'),
+        page.locator('.orchestrator-container .btn-close'),
+        page.locator('button[aria-label="Close"]')
+    ];
+
+    for (const locator of locButtons) {
+        try {
+            const buttons = await locator.all();
+            for (const btn of buttons) {
+                if (await btn.isVisible()) {
+                    await btn.click({force: true}).catch(() => {});
+                }
+            }
+        } catch (e) {
+            // Ignora erros de seleção
+        }
     }
-    // Aguardar que todos os toasts sumam da tela (fade-out CSS, máx 3s)
-    await expect(page.locator('.toast')).toHaveCount(0, {timeout: 3000}).catch(() => {});
+
+    // Aguardar um breve momento para animações de saída se houver algo visível
+    const overlay = page.locator('.toast, .orchestrator-container');
+    if (await overlay.count() > 0) {
+        await page.waitForTimeout(300); // Pequena pausa para animação começar
+    }
 }
 
 /**

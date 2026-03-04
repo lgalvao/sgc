@@ -274,13 +274,19 @@ public class SubprocessoService {
     }
 
     public void criarParaMapeamento(Processo processo, Collection<Unidade> unidades, Unidade unidadeOrigem, Usuario usuario) {
+        log.info("Iniciando criação de subprocessos para mapeamento no processo {}", processo.getCodigo());
         List<Unidade> unidadesElegiveis = unidades.stream()
                 .filter(u -> {
                     TipoUnidade tipo = u.getTipo();
                     return tipo == OPERACIONAL || tipo == INTEROPERACIONAL || tipo == RAIZ;
                 }).toList();
 
-        if (unidadesElegiveis.isEmpty()) return;
+        if (unidadesElegiveis.isEmpty()) {
+            log.warn("Nenhuma unidade elegível encontrada para o processo {}", processo.getCodigo());
+            return;
+        }
+
+        log.info("Criando {} subprocessos para o processo {}", unidadesElegiveis.size(), processo.getCodigo());
 
         List<Subprocesso> subprocessos = unidadesElegiveis.stream()
                 .map(unidade -> Subprocesso.builder()
@@ -320,9 +326,9 @@ public class SubprocessoService {
     }
 
     public void criarParaRevisao(Processo processo, Unidade unidade, UnidadeMapa unidadeMapa, Unidade unidadeOrigem, Usuario usuario) {
+        log.info("Criando subprocesso para unidade {} no processo de revisão {}", unidade.getSigla(), processo.getCodigo());
         criarSubprocessoComMapa(processo, unidade, unidadeMapa, unidadeOrigem, usuario,
                 SituacaoSubprocesso.NAO_INICIADO, "Processo iniciado");
-        log.info("Subprocesso criado para unidade {}", unidade.getSigla());
     }
 
     public void criarParaDiagnostico(Processo processo, Unidade unidade, UnidadeMapa unidadeMapa, Unidade unidadeOrigem, Usuario usuario) {
@@ -676,6 +682,8 @@ public class SubprocessoService {
 
         Long codMapaOrigem = spOrigem.getMapa().getCodigo();
         Long codMapaDestino = spDestino.getMapa().getCodigo();
+        log.info("Importando {} atividades do mapa #{} para o mapa #{}", 
+                codigosAtividades != null ? codigosAtividades.size() : "todas as", codMapaOrigem, codMapaDestino);
         copiaMapaService.importarAtividadesDeOutroMapa(codMapaOrigem, codMapaDestino, codigosAtividades);
 
         if (spDestino.getSituacao() == SituacaoSubprocesso.NAO_INICIADO) {

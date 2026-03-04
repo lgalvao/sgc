@@ -43,6 +43,9 @@ public class SubprocessoTransicaoService {
     private static final String SIGLA_ADMIN = "ADMIN";
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
+    private static final String ETAPA_REVISAO = "revisão";
+    private static final String ETAPA_CADASTRO = "cadastro";
+
     private static final Map<TipoProcesso, SituacaoSubprocesso> SITUACAO_MAPA_DISPONIBILIZADO = Map.of(
             MAPEAMENTO, MAPEAMENTO_MAPA_DISPONIBILIZADO,
             REVISAO, REVISAO_MAPA_DISPONIBILIZADO
@@ -150,6 +153,7 @@ public class SubprocessoTransicaoService {
 
     @Transactional
     public void disponibilizarCadastro(Long codSubprocesso, Usuario usuario) {
+        log.info("Disponibilizando cadastro do subprocesso {}", codSubprocesso);
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
         validacaoService.validarSituacaoPermitida(sp, MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         disponibilizar(sp, MAPEAMENTO_CADASTRO_DISPONIBILIZADO, TipoTransicao.CADASTRO_DISPONIBILIZADO, usuario);
@@ -157,6 +161,7 @@ public class SubprocessoTransicaoService {
 
     @Transactional
     public void disponibilizarRevisao(Long codSubprocesso, Usuario usuario) {
+        log.info("Disponibilizando revisão do subprocesso {}", codSubprocesso);
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
         validacaoService.validarSituacaoPermitida(sp, REVISAO_CADASTRO_EM_ANDAMENTO);
         disponibilizar(sp, REVISAO_CADASTRO_DISPONIBILIZADA, TipoTransicao.REVISAO_CADASTRO_DISPONIBILIZADA, usuario);
@@ -201,6 +206,7 @@ public class SubprocessoTransicaoService {
     }
 
     private void executarDisponibilizacaoMapa(Long codSubprocesso, DisponibilizarMapaRequest request, Usuario usuario) {
+        log.info("Disponibilizando mapa do subprocesso {} (Data limite Etapa 2: {})", codSubprocesso, request.dataLimite());
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
         validacaoService.validarSituacaoPermitida(sp,
                 MAPEAMENTO_CADASTRO_HOMOLOGADO, MAPEAMENTO_MAPA_CRIADO, MAPEAMENTO_MAPA_COM_SUGESTOES,
@@ -258,6 +264,7 @@ public class SubprocessoTransicaoService {
 
     @Transactional
     public void apresentarSugestoes(Long codSubprocesso, @Nullable String sugestoes, Usuario usuario) {
+        log.info("Apresentando sugestões para o mapa do subprocesso {}: {}", codSubprocesso, sugestoes);
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
         validacaoService.validarSituacaoPermitida(sp,
                 MAPEAMENTO_MAPA_DISPONIBILIZADO,
@@ -284,6 +291,7 @@ public class SubprocessoTransicaoService {
 
     @Transactional
     public void validarMapa(Long codSubprocesso, Usuario usuario) {
+        log.info("Validando mapa do subprocesso {}", codSubprocesso);
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
         validacaoService.validarSituacaoPermitida(sp, MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO);
 
@@ -306,6 +314,7 @@ public class SubprocessoTransicaoService {
 
     @Transactional
     public void devolverValidacao(Long codSubprocesso, @Nullable String justificativa, Usuario usuario) {
+        log.info("Devolvendo validação do mapa do subprocesso {}. Justificativa: {}", codSubprocesso, justificativa);
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
         validacaoService.validarSituacaoPermitida(sp,
                 MAPEAMENTO_MAPA_COM_SUGESTOES,
@@ -354,6 +363,7 @@ public class SubprocessoTransicaoService {
     }
 
     private void executarAceiteValidacao(Long codSubprocesso, Usuario usuario) {
+        log.info("Aceitando validação do mapa do subprocesso {}", codSubprocesso);
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
         validacaoService.validarSituacaoPermitida(sp,
                 MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO,
@@ -404,6 +414,7 @@ public class SubprocessoTransicaoService {
     }
 
     private void executarHomologacaoValidacao(Long codSubprocesso, Usuario usuario) {
+        log.info("Homologando validação do mapa do subprocesso {}", codSubprocesso);
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
         validacaoService.validarSituacaoPermitida(sp,
                 MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO,
@@ -432,6 +443,7 @@ public class SubprocessoTransicaoService {
     }
 
     private void executarDevolucao(Long codSubprocesso, Usuario usuario, @Nullable String observacoes, boolean isRevisao) {
+        log.info("Devolvendo {} do subprocesso {}. Observações: {}", isRevisao ? ETAPA_REVISAO : ETAPA_CADASTRO, codSubprocesso, observacoes);
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
         SituacaoSubprocesso situacaoAtual = isRevisao ? REVISAO_CADASTRO_DISPONIBILIZADA : MAPEAMENTO_CADASTRO_DISPONIBILIZADO;
         validacaoService.validarSituacaoPermitida(sp, situacaoAtual);
@@ -483,6 +495,7 @@ public class SubprocessoTransicaoService {
     }
 
     private void executarAceite(Long codSubprocesso, Usuario usuario, @Nullable String observacoes, boolean isRevisao) {
+        log.info("Aceitando {} do subprocesso {}. Observações: {}", isRevisao ? ETAPA_REVISAO : ETAPA_CADASTRO, codSubprocesso, observacoes);
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
         SituacaoSubprocesso situacaoAtual = isRevisao ? REVISAO_CADASTRO_DISPONIBILIZADA : MAPEAMENTO_CADASTRO_DISPONIBILIZADO;
         validacaoService.validarSituacaoPermitida(sp, situacaoAtual);
@@ -524,6 +537,7 @@ public class SubprocessoTransicaoService {
     }
 
     private void executarHomologacao(Long codSubprocesso, Usuario usuario, @Nullable String observacoes, boolean isRevisao) {
+        log.info("Homologando {} do subprocesso {}. Observações: {}", isRevisao ? ETAPA_REVISAO : ETAPA_CADASTRO, codSubprocesso, observacoes);
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
         SituacaoSubprocesso situacaoAtual = isRevisao ? REVISAO_CADASTRO_DISPONIBILIZADA : MAPEAMENTO_CADASTRO_DISPONIBILIZADO;
         validacaoService.validarSituacaoPermitida(sp, situacaoAtual);
@@ -568,8 +582,9 @@ public class SubprocessoTransicaoService {
     private void executarReabertura(Long codigo, String justificativa, SituacaoSubprocesso situacaoMinima,
                                     SituacaoSubprocesso novaSituacao, TipoTransicao tipoTransicao, boolean isRevisao) {
 
+        log.info("Reabrindo {} do subprocesso #{} com justificativa: {}", isRevisao ? ETAPA_REVISAO : ETAPA_CADASTRO, codigo, justificativa);
         Subprocesso sp = buscarSubprocesso(codigo);
-        validacaoService.validarSituacaoMinima(sp, situacaoMinima, "Subprocesso ainda está em fase de " + (isRevisao ? "revisão" : "cadastro") + ".");
+        validacaoService.validarSituacaoMinima(sp, situacaoMinima, "Subprocesso ainda está em fase de " + (isRevisao ? ETAPA_REVISAO : ETAPA_CADASTRO) + ".");
 
         Unidade admin = unidadeService.buscarPorSigla(SIGLA_ADMIN);
         Usuario usuario = usuarioFacade.usuarioAutenticado();

@@ -1,0 +1,98 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - link "Pular para o conteúdo principal" [ref=e3] [cursor=pointer]:
+    - /url: "#main-content"
+  - alert [ref=e4]:
+    - generic [ref=e5]:
+      - strong [ref=e6]: Sucesso
+      - button "Close" [ref=e7] [cursor=pointer]
+    - generic [ref=e9]: Aceite registrado
+  - generic [ref=e10]:
+    - navigation [ref=e11]:
+      - generic [ref=e12]:
+        - link "SGC" [ref=e13] [cursor=pointer]:
+          - /url: /painel
+        - generic [ref=e14]:
+          - list [ref=e15]:
+            - listitem [ref=e16]:
+              - link "Painel" [ref=e17] [cursor=pointer]:
+                - /url: /painel
+                - generic [ref=e18]: 
+                - text: Painel
+            - listitem [ref=e19]:
+              - link "Minha unidade" [ref=e20] [cursor=pointer]:
+                - /url: /unidade/14
+                - generic [ref=e21]: 
+                - text: Minha unidade
+            - listitem [ref=e22]:
+              - link "Relatórios" [ref=e23] [cursor=pointer]:
+                - /url: /relatorios
+                - generic [ref=e24]: 
+                - text: Relatórios
+            - listitem [ref=e25]:
+              - link "Histórico" [ref=e26] [cursor=pointer]:
+                - /url: /historico
+                - generic [ref=e27]: 
+                - text: Histórico
+          - list [ref=e28]:
+            - listitem [ref=e29]:
+              - link "GESTOR - COORD_21" [ref=e30]:
+                - /url: "#"
+                - generic [ref=e31]:
+                  - generic [ref=e32]: 
+                  - generic [ref=e33]: GESTOR - COORD_21
+            - listitem "Sair" [ref=e34]:
+              - link [ref=e35] [cursor=pointer]:
+                - /url: "#"
+                - generic [ref=e36]: 
+    - main [ref=e37]:
+      - generic [ref=e38]:
+        - generic [ref=e39]:
+          - heading "Processos" [level=2] [ref=e42]
+          - generic "Lista de processos cadastrados" [ref=e44]:
+            - table [ref=e45]:
+              - rowgroup [ref=e46]:
+                - row "Descrição Tipo Unidades Situação" [ref=e47]:
+                  - columnheader "Descrição" [ref=e48] [cursor=pointer]
+                  - columnheader "Tipo" [ref=e49] [cursor=pointer]
+                  - columnheader "Unidades" [ref=e50]
+                  - columnheader "Situação" [ref=e51] [cursor=pointer]
+              - rowgroup [ref=e52]:
+                - row "Mapeamento para CDU-14 1772644657084 Mapeamento SECAO_211 Em andamento" [ref=e53] [cursor=pointer]:
+                  - cell "Mapeamento para CDU-14 1772644657084" [ref=e54]
+                  - cell "Mapeamento" [ref=e55]
+                  - cell "SECAO_211" [ref=e56]
+                  - cell "Em andamento" [ref=e57]:
+                    - generic [ref=e58]: Em andamento
+        - generic [ref=e59]:
+          - heading "Alertas" [level=2] [ref=e62]
+          - table [ref=e65]:
+            - rowgroup [ref=e66]:
+              - row "Data/Hora Descrição Processo Origem" [ref=e67]:
+                - columnheader "Data/Hora" [ref=e68] [cursor=pointer]
+                - columnheader "Descrição" [ref=e69]
+                - columnheader "Processo" [ref=e70] [cursor=pointer]
+                - columnheader "Origem" [ref=e71]
+            - rowgroup [ref=e72]:
+              - row "04/03/2026 Validação do mapa de competências da unidade SECAO_211 aguardando análise Mapeamento para CDU-14 1772644657084 SECAO_211" [ref=e73] [cursor=pointer]:
+                - cell "04/03/2026" [ref=e74]
+                - cell "Validação do mapa de competências da unidade SECAO_211 aguardando análise" [ref=e75]
+                - cell "Mapeamento para CDU-14 1772644657084" [ref=e76]
+                - cell "SECAO_211" [ref=e77]
+              - row "04/03/2026 Cadastro de atividades/conhecimentos da unidade SECAO_211 disponibilizado para análise Mapeamento para CDU-14 1772644657084 SECAO_211" [ref=e78] [cursor=pointer]:
+                - cell "04/03/2026" [ref=e79]
+                - cell "Cadastro de atividades/conhecimentos da unidade SECAO_211 disponibilizado para análise" [ref=e80]
+                - cell "Mapeamento para CDU-14 1772644657084" [ref=e81]
+                - cell "SECAO_211" [ref=e82]
+              - row "04/03/2026 Início do processo em unidade(s) subordinada(s) Mapeamento para CDU-14 1772644657084 ADMIN" [ref=e83] [cursor=pointer]:
+                - cell "04/03/2026" [ref=e84]
+                - cell "Início do processo em unidade(s) subordinada(s)" [ref=e85]
+                - cell "Mapeamento para CDU-14 1772644657084" [ref=e86]
+                - cell "ADMIN" [ref=e87]
+    - contentinfo [ref=e88]:
+      - generic [ref=e89]:
+        - generic [ref=e90]: Versão 1.0.0
+        - generic [ref=e91]: © SESEL/COSIS/TRE-PE
+```
