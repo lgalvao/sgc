@@ -124,7 +124,10 @@
       <p>{{
           isRevisao ? 'Confirma a devolução da revisão do cadastro para ajustes?' : 'Confirma a devolução do cadastro para ajustes?'
         }}</p>
-      <BFormGroup class="mb-3" label="Observação (obrigatório)" label-for="observacaoDevolucao">
+      <BFormGroup class="mb-3" label-for="observacaoDevolucao">
+        <template #label>
+          Observação <span aria-hidden="true" class="text-danger">*</span>
+        </template>
         <BFormTextarea
             id="observacaoDevolucao"
             v-model="observacaoDevolucao"
