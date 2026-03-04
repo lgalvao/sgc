@@ -152,4 +152,23 @@ class CDU33IntegrationTest extends BaseIntegrationTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest());
     }
+
+    @Test
+    @DisplayName("Não deve permitir reabrir revisão quando em situação insuficiente (ex: Revisão Homologada precoce)")
+    @WithMockAdmin
+    void reabrirRevisaoCadastro_SituacaoInsuficiente_Erro() throws Exception {
+        // Forçar situação que ainda não atingiu REVISAO_MAPA_HOMOLOGADO
+        subprocesso.setSituacaoForcada(REVISAO_CADASTRO_HOMOLOGADA);
+        subprocessoRepo.save(subprocesso);
+        entityManager.flush();
+        entityManager.clear();
+
+        JustificativaRequest request = new JustificativaRequest("Tentativa em estado precoce");
+
+        mockMvc.perform(post(API_REABRIR_REVISAO, subprocesso.getCodigo())
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isUnprocessableEntity());
+    }
 }

@@ -116,7 +116,7 @@ class SubprocessoServiceContextoIntegrationTest extends BaseIntegrationTest {
         assertThat(permissoes.podeHomologarCadastro()).isTrue();
         assertThat(permissoes.podeDevolverCadastro()).isTrue();
         assertThat(permissoes.podeAlterarDataLimite()).isTrue();
-        assertThat(permissoes.podeReabrirCadastro()).isTrue(); // Agora deve ser true (DISPONIBILIZADO >= CADASTRO_HOMOLOGADO)
+        assertThat(permissoes.podeReabrirCadastro()).isFalse(); // Agora deve ser false (DISPONIBILIZADO < MAPA_HOMOLOGADO)
         assertThat(permissoes.podeEnviarLembrete()).isTrue();
     }
 
@@ -154,7 +154,7 @@ class SubprocessoServiceContextoIntegrationTest extends BaseIntegrationTest {
 
         assertThat(permissoes.podeAceitarCadastro()).isTrue();
         assertThat(permissoes.podeDevolverCadastro()).isTrue();
-        assertThat(permissoes.podeEnviarLembrete()).isTrue();
+        assertThat(permissoes.podeEnviarLembrete()).isFalse(); // Agora apenas ADMIN
     }
 
     @Test
