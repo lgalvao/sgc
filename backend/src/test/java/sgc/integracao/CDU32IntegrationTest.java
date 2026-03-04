@@ -70,18 +70,16 @@ class CDU32IntegrationTest extends BaseIntegrationTest {
         processo.setDescricao("Processo CDU-32");
         processo = processoRepo.save(processo);
 
-        // Criar Subprocesso em estado que permite reabertura
-        // (MAPEAMENTO_CADASTRO_HOMOLOGADO)
+        // Criar Subprocesso em estado que permite reabertura (MAPEAMENTO_MAPA_HOMOLOGADO)
         subprocesso = SubprocessoFixture.subprocessoPadrao(processo, unidade);
         subprocesso.setCodigo(null);
-        subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
         subprocesso.setDataLimiteEtapa1(LocalDateTime.now().plusDays(10));
         subprocesso = subprocessoRepo.save(subprocesso);
 
         entityManager.flush();
         entityManager.clear();
 
-        // Reload to attach
         subprocesso = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
     }
 
@@ -89,13 +87,10 @@ class CDU32IntegrationTest extends BaseIntegrationTest {
     @DisplayName("Deve reabrir cadastro com justificativa válida quando ADMIN")
     @WithMockAdmin
     void reabrirCadastro_comoAdmin_sucesso() throws Exception {
-
         JustificativaRequest request = new JustificativaRequest(
                 "Necessário ajustar informações do cadastro");
 
-
-        mockMvc.perform(
-                        post(API_REABRIR_CADASTRO, subprocesso.getCodigo())
+        mockMvc.perform(post(API_REABRIR_CADASTRO, subprocesso.getCodigo())
                                 .with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
@@ -111,10 +106,10 @@ class CDU32IntegrationTest extends BaseIntegrationTest {
         // Verificar se foi criada uma movimentação
         List<Movimentacao> movimentacoes = movimentacaoRepo
                 .findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
+
         assertThat(movimentacoes).isNotEmpty();
-        boolean movimentacaoExiste = movimentacoes.stream()
-                .anyMatch(m -> m.getDescricao() != null &&
-                        m.getDescricao().contains("Reabertura de cadastro"));
+
+        boolean movimentacaoExiste = movimentacoes.stream().anyMatch(m -> m.getDescricao().contains("Reabertura de cadastro"));
         assertThat(movimentacaoExiste).isTrue();
 
         // Verificar se foi criado um alerta
@@ -122,9 +117,7 @@ class CDU32IntegrationTest extends BaseIntegrationTest {
         assertThat(alerts).isNotEmpty();
         boolean alertaExiste = alerts.stream()
                 .anyMatch(a -> a.getUnidadeDestino() != null &&
-                        a.getUnidadeDestino().getCodigo()
-                                .equals(reaberto.getUnidade().getCodigo())
-                        &&
+                        a.getUnidadeDestino().getCodigo().equals(reaberto.getUnidade().getCodigo()) &&
                         a.getDescricao().contains("reaberto"));
         assertThat(alertaExiste).isTrue();
     }
@@ -133,12 +126,9 @@ class CDU32IntegrationTest extends BaseIntegrationTest {
     @DisplayName("Não deve permitir reabrir cadastro sem ser ADMIN")
     @WithMockUser(roles = "GESTOR")
     void reabrirCadastro_semPermissao_proibido() throws Exception {
-
         JustificativaRequest request = new JustificativaRequest("Tentativa sem permissão");
 
-        // When/Then
-        mockMvc.perform(
-                        post(API_REABRIR_CADASTRO, subprocesso.getCodigo())
+        mockMvc.perform(post(API_REABRIR_CADASTRO, subprocesso.getCodigo())
                                 .with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
@@ -149,15 +139,31 @@ class CDU32IntegrationTest extends BaseIntegrationTest {
     @DisplayName("Não deve permitir reabrir cadastro sem justificativa")
     @WithMockAdmin
     void reabrirCadastro_semJustificativa_erro() throws Exception {
-
         JustificativaRequest request = new JustificativaRequest("");
 
-        // When/Then
-        mockMvc.perform(
-                        post(API_REABRIR_CADASTRO, subprocesso.getCodigo())
+        mockMvc.perform(post(API_REABRIR_CADASTRO, subprocesso.getCodigo())
                                 .with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("Não deve permitir reabrir cadastro quando em situação insuficiente (ex: Cadastro Homologado)")
+    @WithMockAdmin
+    void reabrirCadastro_SituacaoInsuficiente_Erro() throws Exception {
+        // Forçar situação que ainda não atingiu MAPA_HOMOLOGADO
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
+        subprocessoRepo.save(subprocesso);
+        entityManager.flush();
+        entityManager.clear();
+
+        JustificativaRequest request = new JustificativaRequest("Tentativa em estado precoce");
+
+        mockMvc.perform(post(API_REABRIR_CADASTRO, subprocesso.getCodigo())
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isUnprocessableEntity());
     }
 }

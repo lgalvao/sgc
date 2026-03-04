@@ -116,8 +116,19 @@ class SubprocessoServiceContextoIntegrationTest extends BaseIntegrationTest {
         assertThat(permissoes.podeHomologarCadastro()).isTrue();
         assertThat(permissoes.podeDevolverCadastro()).isTrue();
         assertThat(permissoes.podeAlterarDataLimite()).isTrue();
-        assertThat(permissoes.podeReabrirCadastro()).isTrue();
+        assertThat(permissoes.podeReabrirCadastro()).isTrue(); // Agora deve ser true (DISPONIBILIZADO >= CADASTRO_HOMOLOGADO)
         assertThat(permissoes.podeEnviarLembrete()).isTrue();
+    }
+
+    @Test
+    @DisplayName("obterPermissoesUI: Deve permitir reabrir cadastro quando em MAPA_HOMOLOGADO")
+    void obterPermissoesUI_AdminPodeReabrirNoEstadoCorreto() {
+        admin.setPerfilAtivo(Perfil.ADMIN);
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
+
+        PermissoesSubprocessoDto permissoes = subprocessoService.obterPermissoesUI(subprocesso, admin);
+
+        assertThat(permissoes.podeReabrirCadastro()).isTrue();
     }
 
     @Test

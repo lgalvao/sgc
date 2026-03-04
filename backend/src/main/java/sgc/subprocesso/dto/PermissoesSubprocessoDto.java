@@ -4,7 +4,7 @@ import lombok.*;
 
 /**
  * DTO que consolida as permissões de UI para um subprocesso,
- * calculado pelo backend com base no perfil do usuário e situação do workflow.
+ * calculado com base no perfil do usuário e localização do subprocesso
  */
 @Builder
 public record PermissoesSubprocessoDto(

@@ -84,6 +84,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             WebRequest request) {
 
         log.warn("Erro de mensagem HTTP não legível: {}", ex.getMessage());
+
         String error = "Requisição JSON malformada";
         return buildResponseEntityObject(new ErroApi(HttpStatus.BAD_REQUEST, error));
     }
@@ -95,7 +96,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             HttpStatusCode status,
             WebRequest request) {
 
-        log.warn("Erro de validação de argumento", ex);
+        log.warn("Erro de validação de argumento", ex.getMessage());
 
         String message = "A requisição contém dados de entrada inválidos.";
         var subErrors = ex.getBindingResult().getFieldErrors().stream().map(

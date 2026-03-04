@@ -178,13 +178,13 @@ public class AlertaFacade {
 
     @Transactional
     public void criarAlertaReaberturaCadastro(Processo processo, Unidade unidade, String justificativa) {
-        String descricao = "Cadastro de atividades reaberto pela ADMIN. Justificativa: %s".formatted(justificativa);
+        String descricao = "Cadastro de atividades reaberto";
         criarAlertaAdmin(processo, unidade, descricao);
     }
 
     @Transactional
     public void criarAlertaReaberturaCadastroSuperior(Processo processo, Unidade superior, Unidade subordinada) {
-        String descricao = "Cadastro da unidade %s reaberto pela ADMIN".formatted(subordinada.getSigla());
+        String descricao = "Cadastro da %s reaberto".formatted(subordinada.getSigla());
         criarAlertaAdmin(processo, superior, descricao);
     }
 

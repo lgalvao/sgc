@@ -14,7 +14,7 @@
 
 2. O usuário clica no botão `Reabrir cadastro`.
 
-3. O sistema abre um modal "Reabrir cadastro" solicitando uma justificativa (obrigatória) para a reabertura.
+3. O sistema abre um modal "Reabertura de cadastro" solicitando uma justificativa (obrigatória) para a reabertura.
 
 4. O usuário informa a justificativa e confirma.
 

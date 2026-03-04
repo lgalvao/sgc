@@ -633,8 +633,8 @@ public class SubprocessoService {
                 .podeHomologarMapa(verificarGerirMapa(mesmaUnidade, isAdmin, situacao))
                 .podeVisualizarImpacto(verificarVisualizarImpacto(temMapaVigente, mesmaUnidade, isChefe, isGestor, isAdmin, situacao))
                 .podeAlterarDataLimite(isAdmin)
-                .podeReabrirCadastro(isAdmin)
-                .podeReabrirRevisao(isAdmin)
+                .podeReabrirCadastro(isAdmin && situacao.ordinal() >= SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO.ordinal() && situacao.name().startsWith("MAPEAMENTO"))
+                .podeReabrirRevisao(isAdmin && situacao.ordinal() >= SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA.ordinal() && situacao.name().startsWith("REVISAO"))
                 .podeEnviarLembrete(isAdmin || isGestor)
                 .build();
     }

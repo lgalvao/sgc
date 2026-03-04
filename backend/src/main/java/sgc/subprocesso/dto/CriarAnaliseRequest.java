@@ -1,5 +1,7 @@
 package sgc.subprocesso.dto;
 
+import org.jspecify.annotations.Nullable;
+
 import jakarta.validation.constraints.*;
 import lombok.*;
 import sgc.comum.model.*;
@@ -11,6 +13,7 @@ public record CriarAnaliseRequest(
         String tituloUsuario,
 
         @Size(max = 500, message = "Observações devem ter no máximo 500 caracteres")
+        @Nullable
         String observacoes,
 
         @NotNull(message = "A sigla da unidade é obrigatória")
@@ -18,6 +21,7 @@ public record CriarAnaliseRequest(
         String siglaUnidade,
 
         @Size(max = 200, message = "Motivo deve ter no máximo 200 caracteres")
+        @Nullable
         String motivo,
 
         @NotNull(message = "A ação é obrigatória")

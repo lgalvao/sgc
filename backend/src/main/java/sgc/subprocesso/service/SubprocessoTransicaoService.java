@@ -77,10 +77,11 @@ public class SubprocessoTransicaoService {
 
     @Transactional
     public void registrarTransicao(RegistrarTransicaoCommand cmd) {
-        Usuario usuario = cmd.usuario() != null ? cmd.usuario() : usuarioFacade.usuarioAutenticado();
+        Usuario usuario = cmd.usuario();
+        Subprocesso sp = cmd.sp();
 
         Movimentacao movimentacao = Movimentacao.builder()
-                .subprocesso(cmd.sp())
+                .subprocesso(sp)
                 .unidadeOrigem(cmd.origem())
                 .unidadeDestino(cmd.destino())
                 .descricao(cmd.tipo().getDescMovimentacao())
@@ -88,11 +89,11 @@ public class SubprocessoTransicaoService {
                 .build();
         movimentacaoRepo.save(movimentacao);
 
-        cmd.sp().setLocalizacaoAtual(cmd.destino() != null ? cmd.destino() : cmd.sp().getUnidade());
-        subprocessoRepo.save(cmd.sp());
+        sp.setLocalizacaoAtual(cmd.destino());
+        subprocessoRepo.save(sp);
         
         notificacaoService.notificarTransicao(NotificacaoCommand.builder()
-                .subprocesso(cmd.sp())
+                .subprocesso(sp)
                 .tipoTransicao(cmd.tipo())
                 .unidadeOrigem(cmd.origem())
                 .unidadeDestino(cmd.destino())
@@ -103,13 +104,13 @@ public class SubprocessoTransicaoService {
     @Transactional
     public void registrarAnaliseETransicao(RegistrarWorkflowCommand cmd) {
         Subprocesso sp = cmd.sp();
-        Usuario usuario = cmd.usuario() != null ? cmd.usuario() : usuarioFacade.usuarioAutenticado();
+        Usuario usuario = cmd.usuario();
 
         CriarAnaliseRequest request = CriarAnaliseRequest.builder()
                 .observacoes(cmd.observacoes())
                 .acao(cmd.tipoAcaoAnalise())
                 .siglaUnidade(cmd.unidadeAnalise().getSigla())
-                .tituloUsuario(usuario != null ? usuario.getTituloEleitoral() : null)
+                .tituloUsuario(usuario.getTituloEleitoral())
                 .motivo(cmd.motivoAnalise())
                 .build();
 
@@ -375,7 +376,7 @@ public class SubprocessoTransicaoService {
                     .acao(TipoAcaoAnalise.ACEITE_MAPEAMENTO)
                     .siglaUnidade(siglaUnidade)
                     .tituloUsuario(usuario.getTituloEleitoral())
-                    .motivo(null)
+                    .motivo("")
                     .build();
 
             criarAnalise(sp, request, TipoAnalise.VALIDACAO);

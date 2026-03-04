@@ -1,3 +1,4 @@
+/* eslint-disable playwright/expect-expect */
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
 import {criarProcesso} from './helpers/helpers-processos.js';
@@ -16,11 +17,6 @@ import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-n
 
 /**
  * CDU-32 - Reabrir cadastro
- *
- * Ator: ADMIN
- *
- * Pré-condições:
- * - Subprocesso com cadastro já disponibilizado ou aceito
  */
 test.describe.serial('CDU-32 - Reabrir cadastro', () => {
     const UNIDADE_1 = 'SECAO_221';

@@ -21,6 +21,10 @@ import static org.assertj.core.api.Assertions.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static sgc.organizacao.model.SituacaoUnidade.*;
+import static sgc.organizacao.model.TipoUnidade.*;
+import static sgc.processo.model.SituacaoProcesso.*;
+import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 
 @Tag("integration")
 @Transactional
@@ -46,7 +50,7 @@ class CDU33IntegrationTest extends BaseIntegrationTest {
             Unidade admin = new Unidade();
             admin.setSigla("ADMIN");
             admin.setNome("Administração");
-            admin.setSituacao(SituacaoUnidade.ATIVA);
+            admin.setSituacao(ATIVA);
             admin.setTipo(TipoUnidade.RAIZ);
             unidadeRepo.save(admin);
         }
@@ -57,8 +61,8 @@ class CDU33IntegrationTest extends BaseIntegrationTest {
             u.setCodigo(1L);
             u.setSigla("TESTE");
             u.setNome("Unidade Teste");
-            u.setSituacao(SituacaoUnidade.ATIVA);
-            u.setTipo(TipoUnidade.OPERACIONAL);
+            u.setSituacao(ATIVA);
+            u.setTipo(OPERACIONAL);
             return unidadeRepo.save(u);
         });
 
@@ -66,22 +70,20 @@ class CDU33IntegrationTest extends BaseIntegrationTest {
         Processo processo = ProcessoFixture.processoPadrao();
         processo.setCodigo(null);
         processo.setTipo(TipoProcesso.REVISAO);
-        processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+        processo.setSituacao(EM_ANDAMENTO);
         processo.setDescricao("Processo CDU-33");
         processo = processoRepo.save(processo);
 
-        // Criar Subprocesso em estado que permite reabertura de revisão
-        // (REVISAO_CADASTRO_HOMOLOGADA)
+        // Criar subprocesso em estado que permita reabertura de revisão (REVISAO_MAPA_HOMOLOGADO)
         subprocesso = SubprocessoFixture.subprocessoPadrao(processo, unidade);
         subprocesso.setCodigo(null);
-        subprocesso.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
         subprocesso.setDataLimiteEtapa1(LocalDateTime.now().plusDays(10));
+        subprocesso.setSituacaoForcada(REVISAO_MAPA_HOMOLOGADO);
         subprocesso = subprocessoRepo.save(subprocesso);
 
         entityManager.flush();
         entityManager.clear();
 
-        // Reload to attach
         subprocesso = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
     }
 
@@ -89,43 +91,39 @@ class CDU33IntegrationTest extends BaseIntegrationTest {
     @DisplayName("Deve reabrir revisão de cadastro com justificativa válida quando ADMIN")
     @WithMockAdmin
     void reabrirRevisaoCadastro_comoAdmin_sucesso() throws Exception {
+        JustificativaRequest request = new JustificativaRequest("Necessário corrigir erros identificados na revisão");
 
-        JustificativaRequest request = new JustificativaRequest(
-                "Necessário corrigir erros identificados na revisão");
-
-
-        mockMvc.perform(
-                        post(API_REABRIR_REVISAO, subprocesso.getCodigo())
-                                .with(csrf())
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(request)))
+        Long codSp = subprocesso.getCodigo();
+        mockMvc.perform(post(API_REABRIR_REVISAO, codSp)
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
-
 
         entityManager.flush();
         entityManager.clear();
 
-        Subprocesso reaberto = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
-        assertThat(reaberto.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+        Subprocesso spReaberto = subprocessoRepo.findById(codSp).orElseThrow();
+        assertThat(spReaberto.getSituacao()).isEqualTo(REVISAO_CADASTRO_EM_ANDAMENTO);
 
         // Verificar se foi criada uma movimentação
-        List<Movimentacao> movimentacoes = movimentacaoRepo
-                .findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
+        List<Movimentacao> movimentacoes = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(codSp);
         assertThat(movimentacoes).isNotEmpty();
         boolean movimentacaoExiste = movimentacoes.stream()
-                .anyMatch(m -> m.getDescricao() != null &&
-                        m.getDescricao().contains("Reabertura de revisão de cadastro"));
+                .anyMatch(m -> m.getDescricao().contains("Reabertura de revisão de cadastro"));
+
         assertThat(movimentacaoExiste).isTrue();
 
         // Verificar se foi criado um alerta
         List<Alerta> alerts = alertaRepo.findAll();
         assertThat(alerts).isNotEmpty();
-        boolean alertaExiste = alerts.stream()
-                .anyMatch(a -> a.getUnidadeDestino() != null &&
-                        a.getUnidadeDestino().getCodigo()
-                                .equals(reaberto.getUnidade().getCodigo())
-                        &&
-                        a.getDescricao().contains("reaberta"));
+        boolean alertaExiste = alerts.stream().anyMatch(a -> {
+            Long unidadeDestinoCodigo = a.getUnidadeDestino().getCodigo();
+            Long unidadeSpReabertoCodigo = spReaberto.getUnidade().getCodigo();
+            return Objects.equals(unidadeDestinoCodigo, unidadeSpReabertoCodigo) &&
+                    a.getDescricao().contains("reaberta");
+        });
+
         assertThat(alertaExiste).isTrue();
     }
 
@@ -133,15 +131,12 @@ class CDU33IntegrationTest extends BaseIntegrationTest {
     @DisplayName("Não deve permitir reabrir revisão de cadastro sem ser ADMIN")
     @WithMockUser(roles = "GESTOR")
     void reabrirRevisaoCadastro_semPermissao_proibido() throws Exception {
-
         JustificativaRequest request = new JustificativaRequest("Tentativa sem permissão");
 
-        // When/Then
-        mockMvc.perform(
-                        post(API_REABRIR_REVISAO, subprocesso.getCodigo())
-                                .with(csrf())
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(request)))
+        mockMvc.perform(post(API_REABRIR_REVISAO, subprocesso.getCodigo())
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isForbidden());
     }
 
@@ -149,15 +144,12 @@ class CDU33IntegrationTest extends BaseIntegrationTest {
     @DisplayName("Não deve permitir reabrir revisão sem justificativa")
     @WithMockAdmin
     void reabrirRevisaoCadastro_semJustificativa_erro() throws Exception {
-
         JustificativaRequest request = new JustificativaRequest("");
 
-        // When/Then
-        mockMvc.perform(
-                        post(API_REABRIR_REVISAO, subprocesso.getCodigo())
-                                .with(csrf())
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(request)))
+        mockMvc.perform(post(API_REABRIR_REVISAO, subprocesso.getCodigo())
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest());
     }
 }
