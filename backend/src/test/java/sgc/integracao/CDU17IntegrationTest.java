@@ -203,7 +203,6 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
         @DisplayName("Não deve disponibilizar mapa se houver atividade sem competência associada")
         @WithMockAdmin
         void disponibilizarMapa_comAtividadeNaoAssociada_retornaBadRequest() throws Exception {
-            // Cria uma nova atividade sem competências para criar o cenário de erro
             Atividade atividadeSolta = Atividade.builder().mapa(mapa).descricao("Atividade Solta").build();
             atividadeRepo.save(atividadeSolta);
 

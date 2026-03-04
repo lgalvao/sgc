@@ -136,7 +136,6 @@ class CDU03IntegrationTest extends BaseIntegrationTest {
                                 .value("Pelo menos uma unidade participante deve ser incluída."));
     }
 
-    // Teste para edição de processo (requer um processo existente)
     @Test
     void testEditarProcesso_sucesso() throws Exception {
 
@@ -165,7 +164,6 @@ class CDU03IntegrationTest extends BaseIntegrationTest {
         AtualizarProcessoRequest editarRequestDTO = criarAtualizarProcessoReq(
                 processoId,
                 "Processo Editado",
-                // Tipo não pode ser alterado na edição, mas é enviado no DTO
                 unidadesEditadas,
                 LocalDateTime.now().plusDays(40) // Nova data limite
         );

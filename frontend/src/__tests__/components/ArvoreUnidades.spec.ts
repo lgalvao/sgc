@@ -3,7 +3,6 @@ import {describe, expect, it} from 'vitest';
 import ArvoreUnidades from '@/components/unidade/ArvoreUnidades.vue';
 import {Unidade} from '@/types/tipos';
 
-// Mock UnidadeTreeNode since it is a child component
 const UnidadeTreeNodeStub = {
     template: '<div><slot></slot></div>',
     props: ['unidade', 'isChecked', 'isExpanded', 'isHabilitado', 'get-estado-selecao', 'on-toggle', 'on-toggle-expand']

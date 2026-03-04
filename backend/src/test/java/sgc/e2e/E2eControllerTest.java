@@ -203,7 +203,6 @@ class E2eControllerTest {
         Assertions.assertNotNull(exception);
         Assertions.assertTrue(exception.getMessage().contains("Arquivo seed.sql não encontrado"));
 
-        // Verifica se tentou carregar ambos os caminhos
         verify(resourceLoader).getResource("file:../e2e/setup/seed.sql");
         verify(resourceLoader).getResource("file:e2e/setup/seed.sql");
     }

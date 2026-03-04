@@ -13,7 +13,6 @@ import {buscarArvoreUnidade} from '@/services/unidadeService';
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 import {logger} from "@/utils";
 
-// Mocks
 const {mockPush, mockUnidadeData, mockUsuario, mockUsuarioResponsavel} = vi.hoisted(() => {
     const u = {
         codigo: 10,

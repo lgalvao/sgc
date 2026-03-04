@@ -1,4 +1,3 @@
-// Mock de package.json
 vi.mock("../package.json", () => ({default: {version: "1.0.0-test"}}));
 
 import {beforeEach, describe, expect, it, vi} from "vitest";
@@ -9,7 +8,6 @@ import {useRoute} from "vue-router";
 import {useFeedbackStore} from "@/stores/feedback";
 import {useToast} from "bootstrap-vue-next";
 
-// Mock de components
 vi.mock("@/components/layout/BarraNavegacao.vue", () => ({default: {template: '<div data-testid="barra-navegacao"></div>'}}));
 vi.mock("@/components/layout/MainNavbar.vue", () => ({default: {template: '<div data-testid="main-navbar"></div>'}}));
 vi.mock("bootstrap-vue-next", async () => {
@@ -21,13 +19,11 @@ vi.mock("bootstrap-vue-next", async () => {
     };
 });
 
-// Mock do router
 vi.mock("vue-router", () => ({
     useRoute: vi.fn(),
     RouterView: {template: '<div data-testid="router-view"></div>'}
 }));
 
-// Mock do sessionStorage
 const sessionStorageMock = (() => {
     let store: Record<string, string> = {};
     return {

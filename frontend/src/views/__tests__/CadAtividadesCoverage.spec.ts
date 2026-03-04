@@ -9,7 +9,6 @@ import {useAnalisesStore} from '@/stores/analises';
 import {useFeedbackStore} from '@/stores/feedback';
 import {SituacaoSubprocesso} from '@/types/tipos';
 
-// Mock router
 const {mockPush} = vi.hoisted(() => ({
     mockPush: vi.fn()
 }));
@@ -90,7 +89,6 @@ describe('CadastroView.vue Coverage', () => {
         const atividadesStore = useAtividadesStore(pinia);
         const subprocessosStore = useSubprocessosStore(pinia);
 
-        // Mock return values
         (subprocessosStore.buscarSubprocessoPorProcessoEUnidade as any).mockResolvedValue(123);
         (atividadesStore.obterAtividadesPorSubprocesso as any).mockReturnValue([
             {codigo: 1, descricao: 'Atividade 1', conhecimentos: []}

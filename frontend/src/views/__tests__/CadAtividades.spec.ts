@@ -12,7 +12,6 @@ import {createTestingPinia} from "@pinia/testing";
 import {nextTick} from "vue";
 import * as useAcessoModule from '@/composables/useAcesso';
 
-// Mocks
 const mocks = vi.hoisted(() => ({
     push: vi.fn(),
     mockRoute: {query: {} as Record<string, string>}
@@ -73,7 +72,6 @@ const AtividadeItemStub = {
     emits: ["remover-atividade", "editar-atividade", "atualizar-atividade", "adicionar-conhecimento", "remover-conhecimento", "editar-conhecimento", "atualizar-conhecimento", "update:atividade", "update:conhecimento"]
 };
 
-// Mock BFormInput to support ref and focus
 const BFormInputStub = {
     template: '<input :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />',
     props: ['modelValue'],
@@ -101,7 +99,6 @@ describe("CadastroView.vue", () => {
     ];
 
     const createWrapper = (isRevisao = false, atividades = mockAtividades) => {
-        // Mock route
         mocks.mockRoute.query = {};
 
         // Setup Pinia with Stubs
@@ -147,7 +144,6 @@ describe("CadastroView.vue", () => {
         subprocessosStore.buscarContextoEdicao.mockResolvedValue(undefined);
         subprocessosStore.disponibilizarCadastro.mockResolvedValue(true);
         subprocessosStore.disponibilizarRevisaoCadastro.mockResolvedValue(true);
-        // Mock validarCadastro to call through to service mock
         subprocessosStore.validarCadastro.mockImplementation((cod: number) => subprocessoService.validarCadastro(cod));
 
         vi.spyOn(useAcessoModule, 'useAcesso').mockReturnValue({

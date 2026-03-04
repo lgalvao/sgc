@@ -184,7 +184,6 @@ class ProcessoNotificacaoServiceCoverageTest {
         sp.setUnidade(u);
         sp.setProcesso(p);
 
-        // Mocking subprocessoService to return a subprocesso
         when(subprocessoService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp));
 
         when(processoRepo.findByIdComParticipantes(codProcesso)).thenReturn(Optional.of(p));

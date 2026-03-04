@@ -18,7 +18,6 @@ class ProcessoManutencaoServicePbtTest {
 
     @Property
     void criar_rejeitaProcessoRevisaoSemMapa(@ForAll("requisicaoRevisaoInvalida") CriarProcessoRequest req) {
-        // Mock dependencies
         ProcessoRepo processoRepo = mock(ProcessoRepo.class);
         UnidadeService unidadeService = mock(UnidadeService.class);
         ProcessoValidacaoService processoValidador = mock(ProcessoValidacaoService.class);
@@ -45,7 +44,6 @@ class ProcessoManutencaoServicePbtTest {
 
     @Property
     void criar_aceitaProcessoValido(@ForAll("requisicaoValida") CriarProcessoRequest req) {
-        // Mock dependencies
         ProcessoRepo processoRepo = mock(ProcessoRepo.class);
         UnidadeService unidadeService = mock(UnidadeService.class);
         ProcessoValidacaoService processoValidador = mock(ProcessoValidacaoService.class);
@@ -75,7 +73,6 @@ class ProcessoManutencaoServicePbtTest {
     @Property
     void atualizar_rejeitaSeNaoForCriado(@ForAll("situacaoNaoCriada") SituacaoProcesso situacao,
                                          @ForAll("requisicaoValidaAtualizar") AtualizarProcessoRequest req) {
-        // Mock dependencies
         ProcessoRepo processoRepo = mock(ProcessoRepo.class);
         UnidadeService unidadeService = mock(UnidadeService.class);
         ProcessoValidacaoService processoValidador = mock(ProcessoValidacaoService.class);
@@ -99,7 +96,6 @@ class ProcessoManutencaoServicePbtTest {
 
     @Property
     void apagar_rejeitaSeNaoForCriado(@ForAll("situacaoNaoCriada") SituacaoProcesso situacao) {
-        // Mock dependencies
         ProcessoRepo processoRepo = mock(ProcessoRepo.class);
         UnidadeService unidadeService = mock(UnidadeService.class);
         ProcessoValidacaoService processoValidador = mock(ProcessoValidacaoService.class);

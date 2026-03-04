@@ -167,7 +167,6 @@ class SituacaoSubprocessoTest {
         assertThat(invocarPodeIniciar(DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO, DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO, TipoProcesso.DIAGNOSTICO)).isTrue();
         assertThat(invocarPodeIniciar(DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO, REVISAO_CADASTRO_EM_ANDAMENTO, TipoProcesso.DIAGNOSTICO)).isFalse();
 
-        // Tipo nulo
         assertThat(invocarPodeIniciar(MAPEAMENTO_CADASTRO_EM_ANDAMENTO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, null)).isFalse();
     }
 

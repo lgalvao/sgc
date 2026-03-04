@@ -1,7 +1,6 @@
 import {afterEach, beforeEach, expect, it, vi} from "vitest";
 import apiClient from "@/axios-setup";
 
-// Mock padrão do axios
 vi.mock("@/axios-setup", () => ({
     default: {
         get: vi.fn(),

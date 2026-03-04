@@ -28,7 +28,6 @@ class ModelExtraTest {
         Unidade u = new Unidade();
         u.setSigla(sigla);
 
-        // Mocking the interface method that the default method calls
         when(unidadeRepo.findBySiglaAndSituacao(sigla, SituacaoUnidade.ATIVA))
                 .thenReturn(Optional.of(u));
 

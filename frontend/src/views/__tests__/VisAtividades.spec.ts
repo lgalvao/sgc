@@ -196,7 +196,6 @@ describe("CadastroVisualizacaoView.vue Coverage", () => {
 
         const subprocessosStore = useSubprocessosStore();
 
-        // Mock throwing error
         vi.spyOn(subprocessosStore, "homologarRevisaoCadastro").mockRejectedValue(new Error("Erro simulado"));
 
         // Force open validation modal state

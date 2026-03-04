@@ -146,7 +146,6 @@ describe("Relatorios.vue", () => {
     it("deve filtrar diagnosticos de gaps por data", async () => {
         wrapper = createWrapper();
 
-        // Mock diagnosticos in RelatoriosView.vue have dates in Aug/Sep 2024
         wrapper.vm.filtroDataInicio = '2024-09-01';
         await nextTick();
 

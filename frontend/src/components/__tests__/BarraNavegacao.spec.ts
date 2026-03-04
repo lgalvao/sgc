@@ -6,7 +6,6 @@ import {Perfil} from "@/types/tipos";
 import BarraNavegacao from "../layout/BarraNavegacao.vue";
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 
-// Mock vue-router
 const mockRouter = {
     back: vi.fn(),
 };

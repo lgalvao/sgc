@@ -4,7 +4,6 @@ import HistoricoView from "@/views/HistoricoView.vue";
 import {createTestingPinia} from "@pinia/testing";
 import {setupComponentTest} from "@/test-utils/componentTestHelpers";
 
-// Mock router
 const {mockPush} = vi.hoisted(() => {
     return {
         mockPush: vi.fn(),

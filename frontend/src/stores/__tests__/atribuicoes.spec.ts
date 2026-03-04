@@ -6,7 +6,6 @@ import {useAtribuicaoTemporariaStore} from "../atribuicoes";
 import {normalizeError} from "@/utils/apiError";
 import {logger} from "@/utils";
 
-// Define mock data shape that matches what the service returns
 const serviceMockData = [
     {
         codigo: 1,
@@ -40,7 +39,6 @@ vi.mock("@/services/atribuicaoTemporariaService", () => ({
     buscarTodasAtribuicoes: vi.fn(),
 }));
 
-// Mock logger
 vi.mock("@/utils", async (importOriginal) => {
     const actual = await importOriginal<any>();
     return {

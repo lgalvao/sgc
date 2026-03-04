@@ -2,7 +2,6 @@ import {describe, expect, it, vi} from "vitest";
 import unidadeRoutes from "../unidade.routes";
 import type {RouteLocationNormalized} from "vue-router";
 
-// Mock views to avoid loading real components which might have dependencies causing timeouts
 vi.mock("@/views/UnidadesView.vue", () => ({default: {name: 'UnidadesView'}}));
 vi.mock("@/views/UnidadeView.vue", () => ({default: {name: 'UnidadeView'}}));
 vi.mock("@/views/MapaView.vue", () => ({default: {name: 'MapaView'}}));

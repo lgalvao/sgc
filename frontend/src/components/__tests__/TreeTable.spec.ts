@@ -5,7 +5,6 @@ import TreeTable from "../comum/TreeTable.vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
 import {setupComponentTest} from "@/test-utils/componentTestHelpers";
 
-// Mock do componente TreeRow
 const mockTreeRow = {template: "<tr><td>Mocked TreeRowItem</td></tr>"};
 
 describe("TreeTable.vue", () => {
@@ -262,12 +261,10 @@ describe("TreeTable.vue", () => {
             global: {stubs: {TreeRowItem: mockTreeRow}},
         });
 
-        // Verifica se EmptyState está presente
         const emptyState = wrapper.findComponent(EmptyState);
         expect(emptyState.exists()).toBe(true);
         expect(emptyState.props('title')).toBe("Nenhum registro encontrado");
 
-        // Verifica se TreeRowItem NÃO está presente
         expect(wrapper.findComponent(TreeRowItem).exists()).toBe(false);
     });
 

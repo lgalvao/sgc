@@ -200,7 +200,6 @@ describe("utilitários", () => {
 
 describe("tratamento de erro em formatDateForInput", () => {
     it("deve retornar string vazia quando as operações de data geram um erro", () => {
-        // Cria uma data que fará com que getFullYear() gere um erro
         const invalidDate = new Date("invalid");
 
         // Isso deve acionar o bloco catch e retornar ''
@@ -211,7 +210,6 @@ describe("tratamento de erro em formatDateForInput", () => {
 
 describe("tratamento de erro em isDateValidAndFuture", () => {
     it("deve retornar false quando as operações de data geram um erro", () => {
-        // Cria uma data que fará com que setHours() gere um erro
         const invalidDate = new Date("invalid");
 
         // Isso deve acionar o bloco catch e retornar false

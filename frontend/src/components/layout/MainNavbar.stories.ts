@@ -22,7 +22,6 @@ export const Admin: Story = {
     render: () => ({
         components: {MainNavbar},
         setup() {
-            // Mocking Pinia and Router
             const pinia = createTestingPinia({
                 createSpy: vi.fn,
                 initialState: {

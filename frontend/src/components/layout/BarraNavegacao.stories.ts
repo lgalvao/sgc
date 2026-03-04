@@ -20,7 +20,6 @@ export const Default: Story = {
     render: () => ({
         components: {BarraNavegacao},
         setup() {
-            // Mocking route and router
             return {};
         },
         template: '<BarraNavegacao />',

@@ -60,7 +60,6 @@ describe("ProcessoFormFields.vue", () => {
         const wrapper = criarWrapper();
         const input = wrapper.find('[data-testid="inp-processo-data-limite"]').element as HTMLInputElement;
 
-        // Mock showPicker
         const showPickerSpy = vi.fn();
         input.showPicker = showPickerSpy;
 

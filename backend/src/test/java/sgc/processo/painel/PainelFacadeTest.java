@@ -131,7 +131,6 @@ class PainelFacadeTest {
         a.setDataHora(LocalDateTime.now());
 
         Page<Alerta> page = new PageImpl<>(List.of(a));
-        // Mock deve esperar sortedPageable que é igual ao sorted passado (pois não entra no if)
         when(alertaFacade.listarPorUnidade(100L, sorted)).thenReturn(page);
         when(alertaFacade.obterDataHoraLeitura(1L, "123")).thenReturn(Optional.of(LocalDateTime.now()));
 
@@ -160,7 +159,6 @@ class PainelFacadeTest {
 
         Page<Alerta> page = new PageImpl<>(List.of(a));
 
-        // Mock deve esperar um pageable SORTED, pois o método aplica sort default
         when(alertaFacade.listarPorUnidade(eq(100L), argThat(p ->
                 p.isPaged() && p.getSort().isSorted() && p.getSort().getOrderFor("dataHora") != null
         ))).thenReturn(page);
