@@ -14,7 +14,7 @@ import {expect, type Page} from '@playwright/test';
 export async function limparNotificacoes(page: Page): Promise<void> {
     // Fechar todos os toasts visíveis clicando no botão "X" de cada um
     for (const btnClose of await page.locator('.toast .btn-close').all()) {
-        await btnClose.click().catch(() => {});
+        await btnClose.click({ force: true }).catch(() => {});
     }
     // Aguardar que todos os toasts sumam da tela (fade-out CSS, máx 3s)
     await expect(page.locator('.toast')).toHaveCount(0, {timeout: 3000}).catch(() => {});
@@ -26,7 +26,7 @@ export async function limparNotificacoes(page: Page): Promise<void> {
  */
 export async function fazerLogout(page: Page): Promise<void> {
     await limparNotificacoes(page);
-    await page.getByTestId('btn-logout').locator('a').click();
+    await page.getByTestId('btn-logout').locator('a').click({ force: true });
     await expect(page).toHaveURL(/\/login/);
 }
 

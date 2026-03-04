@@ -178,7 +178,11 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await verificarPaginaPainel(page);
         await fazerLogout(page);
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
-        await page.getByTestId('tbl-processos').getByText(descProcessoMapeamento).first().click();
+
+        const rowProcessoAdmin = page.getByTestId('tbl-processos').locator('tr', {hasText: descProcessoMapeamento});
+        await expect(rowProcessoAdmin).toBeVisible({ timeout: 15000 });
+        await rowProcessoAdmin.click();
+
         await navegarParaSubprocesso(page, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
         await page.getByTestId('btn-acao-analisar-principal').click();
@@ -217,7 +221,10 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await fazerLogout(page);
         await login(page, USUARIOS.CHEFE_SECAO_211.titulo, USUARIOS.CHEFE_SECAO_211.senha);
 
-        await page.getByTestId('tbl-processos').getByText(descProcessoMapeamento).first().click();
+        const rowProcessoChefe = page.getByTestId('tbl-processos').locator('tr', {hasText: descProcessoMapeamento});
+        await expect(rowProcessoChefe).toBeVisible({ timeout: 15000 });
+        await rowProcessoChefe.click();
+
         await navegarParaMapa(page);
         await page.getByTestId('btn-mapa-validar').click();
         await page.getByTestId('btn-validar-mapa-confirmar').click();
@@ -225,7 +232,9 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
 
         // Aceite COORD_21 (Mapa)
         await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);
-        await page.getByTestId('tbl-processos').getByText(descProcessoMapeamento).first().click();
+        const rowProcessoGestor = page.getByTestId('tbl-processos').locator('tr', {hasText: descProcessoMapeamento});
+        await expect(rowProcessoGestor).toBeVisible({ timeout: 15000 });
+        await rowProcessoGestor.click();
         await navegarParaSubprocesso(page, 'SECAO_211');
         await navegarParaMapa(page);
         await page.getByTestId('btn-mapa-homologar-aceite').click();
@@ -234,7 +243,9 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
 
         // Aceite SECRETARIA_2 (Mapa)
         await loginComPerfil(page, '212121', 'senha', 'GESTOR - SECRETARIA_2');
-        await page.getByTestId('tbl-processos').getByText(descProcessoMapeamento).first().click();
+        const rowProcessoSec = page.getByTestId('tbl-processos').locator('tr', {hasText: descProcessoMapeamento});
+        await expect(rowProcessoSec).toBeVisible({ timeout: 15000 });
+        await rowProcessoSec.click();
         await navegarParaSubprocesso(page, 'SECAO_211');
         await navegarParaMapa(page);
         await page.getByTestId('btn-mapa-homologar-aceite').click();
@@ -245,18 +256,27 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await fazerLogout(page);
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
 
-        await page.getByTestId('tbl-processos').getByText(descProcessoMapeamento).first().click();
+        const rowProcessoAdminHomologa = page.getByTestId('tbl-processos').locator('tr', {hasText: descProcessoMapeamento});
+        await expect(rowProcessoAdminHomologa).toBeVisible({ timeout: 15000 });
+        await rowProcessoAdminHomologa.click();
+
         await navegarParaSubprocesso(page, 'SECAO_211');
         await navegarParaMapa(page);
         await page.getByTestId('btn-mapa-homologar-aceite').click();
         await page.getByTestId('btn-aceite-mapa-confirmar').click();
 
         await page.goto('/painel');
-        await page.getByTestId('tbl-processos').getByText(descProcessoMapeamento).first().click();
+        const rowProcessoAdminFinaliza = page.getByTestId('tbl-processos').locator('tr', {hasText: descProcessoMapeamento});
+        await expect(rowProcessoAdminFinaliza).toBeVisible({ timeout: 15000 });
+        await rowProcessoAdminFinaliza.click();
+
         await page.getByTestId('btn-processo-finalizar').click();
         await page.getByTestId('btn-finalizar-processo-confirmar').click();
         await verificarPaginaPainel(page);
-        await page.getByTestId('tbl-processos').getByText(descProcessoMapeamento).first().click();
+
+        const rowProcessoAdminPosFinalizar = page.getByTestId('tbl-processos').locator('tr', {hasText: descProcessoMapeamento});
+        await expect(rowProcessoAdminPosFinalizar).toBeVisible({ timeout: 15000 });
+        await rowProcessoAdminPosFinalizar.click();
 
         // Verificar que estamos na página de detalhes do processo
         await expect(page).toHaveURL(/\/processo\/\d+$/);
@@ -284,7 +304,9 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         if (processoMapeamentoId > 0) cleanupAutomatico.registrar(processoMapeamentoId);
 
         // Clicar no processo finalizado
-        await page.getByTestId('tbl-processos').getByText(descProcessoMapeamento).first().click();
+        const rowProcessoFinalizado = page.getByTestId('tbl-processos').locator('tr', {hasText: descProcessoMapeamento});
+        await expect(rowProcessoFinalizado).toBeVisible({ timeout: 15000 });
+        await rowProcessoFinalizado.click();
 
         // Verificar que foi diretamente para subprocesso (perfil CHEFE)
         await verificarPaginaSubprocesso(page, UNIDADE_ALVO);
