@@ -79,8 +79,7 @@
     - `Unidade de origem`: ADMIN
     - `Unidade de destino`: [SIGLA_UNIDADE_SUBPROCESSO].
 
-    10.6. O sistema exclui as sugestões apresentadas e o histórico de análise do mapa de competência do subprocesso da
-    unidade.
+    10.6. O sistema exclui as sugestões apresentadas do mapa de competência do subprocesso da unidade.
 
     10.7. O sistema agrupa as unidades selecionadas com suas unidades superiores em todos os níveis da hierarquia,
     notificando estas unidades superiores, com e-mail no modelo abaixo:

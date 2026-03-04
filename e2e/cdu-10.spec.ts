@@ -233,7 +233,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await verificarPaginaPainel(page);
     });
 
-    test('5. Cenário 4: Limpeza de Histórico após nova disponibilização', async ({page}) => {
+    test('5. Cenário 4: Histórico retém as análises após nova disponibilização', async ({page}) => {
         await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
         await acessarSubprocessoGestor(page, descProcessoRevisao, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
@@ -268,13 +268,14 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await limparNotificacoes(page);
         await expect(page.getByTestId('tbl-alertas').locator('tr', { hasText: `Revisão do cadastro da unidade ${UNIDADE_ALVO} devolvida para ajustes` }).first()).toBeVisible();
 
-        // Chefe verifica que histórico tem apenas a última devolução
+        // Chefe verifica que histórico tem TODAS as devoluções (a última primeiro)
         await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
         await navegarParaAtividades(page);
         const modal = await abrirHistoricoAnalise(page);
         await expect(modal.getByTestId('cell-resultado-0')).toHaveText(/Devolu[cç][aã]o/i);
         await expect(modal.getByTestId('cell-observacao-0')).toHaveText('Terceira devolução');
-        await expect(modal.getByTestId('cell-resultado-1')).toBeHidden();
+        await expect(modal.getByTestId('cell-resultado-1')).toHaveText(/Devolu[cç][aã]o/i);
+        await expect(modal.getByTestId('cell-observacao-1')).toHaveText('Segunda devolução');
         await fecharHistoricoAnalise(page);
     });
 

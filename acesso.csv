@@ -1,0 +1,37 @@
+CDU;Atividade;Perfil;Exige localização?;Alvo
+01;Realizar login;TODOS;NÃO;N/A
+02;Visualizar painel;TODOS;NÃO;Subordinadas
+03;Manter processo;ADMIN;SIM;Global
+04;Iniciar processo de mapeamento;ADMIN;SIM;Global
+05;Iniciar processo de revisão;ADMIN;SIM;Global
+06;Detalhar processo;ADMIN, GESTOR;NÃO;Subordinadas
+07;Detalhar subprocesso;TODOS;NÃO;Subordinadas
+08;Manter cadastro (atividades);CHEFE;SIM;Própria
+09;Disponibilizar cadastro;CHEFE;SIM;Própria
+10;Disponibilizar revisão;CHEFE;SIM;Própria
+11;Visualizar cadastro;TODOS;NÃO;Subordinadas
+12;Verificar impactos no mapa;CHEFE, GESTOR, ADMIN;NÃO;Subordinadas
+13;Analisar cadastro;GESTOR, ADMIN;SIM;Abaixo
+14;Analisar revisão;GESTOR, ADMIN;SIM;Abaixo
+15;Manter mapa de competências;ADMIN;SIM;Global
+16;Ajustar mapa de competências;ADMIN;SIM;Global
+17;Disponibilizar mapa;ADMIN;SIM;Global
+18;Visualizar mapa de competências;TODOS;NÃO;Subordinadas
+19;Validar mapa (sugestões/aceite);CHEFE;SIM;Própria
+20;Analisar validação de mapa;GESTOR, ADMIN;SIM;Abaixo
+21;Finalizar processo;ADMIN;SIM;Global
+22;Aceitar cadastros em bloco;GESTOR;SIM;Abaixo
+23;Homologar cadastros em bloco;ADMIN;SIM;Abaixo
+24;Disponibilizar mapas em bloco;ADMIN;SIM;Abaixo
+25;Aceitar validação de mapas em bloco;GESTOR;SIM;Abaixo
+26;Homologar validação em bloco;ADMIN;SIM;Abaixo
+27;Alterar data limite;ADMIN;NÃO;Global
+28;Manter atribuição temporária;ADMIN;NÃO;Global
+29;Consultar histórico;ADMIN, GESTOR, CHEFE;NÃO;Subordinadas
+30;Manter administradores;ADMIN;NÃO;Global
+31;Configurar sistema;ADMIN;NÃO;Global
+32;Reabrir cadastro;ADMIN;SIM;Global
+33;Reabrir revisão de cadastro;ADMIN;SIM;Global
+34;Enviar lembrete de prazo;ADMIN;NÃO;Global
+35;Gerar relatório de andamento;ADMIN;NÃO;Global
+36;Gerar relatório de mapas;ADMIN;NÃO;Global

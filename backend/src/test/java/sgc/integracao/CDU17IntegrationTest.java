@@ -161,7 +161,7 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
             assertThat(alertas).hasSize(1);
 
             List<Analise> analisesRestantes = analiseRepo.findBySubprocessoCodigo(subprocesso.getCodigo());
-            assertThat(analisesRestantes).isEmpty();
+            assertThat(analisesRestantes).hasSize(1);
         }
     }
 

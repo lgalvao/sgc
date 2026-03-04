@@ -79,8 +79,7 @@ características, independentemente de suas filhas.
 
 ### Habilitação vs Elegibilidade
 
-Embora INTERMEDIARIA não seja elegível (não pode participar do processo), seu checkbox deve estar **habilitado** se
-tiver pelo menos uma filha elegível. Isso permite ao usuário selecionar facilmente todas as filhas de uma vez.
+Embora INTERMEDIARIA não seja elegível (não pode participar do processo), seu checkbox deve estar **habilitado** se tiver pelo menos uma filha elegível. Isso permite ao usuário selecionar facilmente todas as filhas de uma vez.
 
 **Regra de Habilitação**:
 
@@ -144,8 +143,7 @@ Quando o formulário é submetido, apenas unidades **não-INTERMEDIARIA** são e
 
 ## Validação Backend
 
-O backend possui validação defensiva que rejeita unidades INTERMEDIARIA. Esta validação nunca deve ser acionada em uso
-normal, pois o frontend já filtra.
+O backend possui validação defensiva que rejeita unidades INTERMEDIARIA. Esta validação nunca deve ser acionada em uso normal, pois o frontend já filtra.
 
 ## Cenários
 

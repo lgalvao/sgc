@@ -160,7 +160,7 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("Deve excluir histórico de análises anteriores quando disponibilizar revisão novamente")
+    @DisplayName("Deve manter histórico de análises anteriores quando disponibilizar revisão novamente")
     void deveExcluirHistoricoAposNovaDisponibilizacao() throws Exception {
         // Preparar: criar atividade com conhecimento para permitir disponibilização
         var competencia = competenciaRepo.save(CompetenciaFixture.competenciaPadrao(subprocessoRevisao.getMapa()));
@@ -226,6 +226,6 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
 
 
         List<Analise> analisesDepois = analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocessoId);
-        assertThat(analisesDepois).isEmpty();
+        assertThat(analisesDepois).hasSize(2); // Histórico é mantido
     }
 }

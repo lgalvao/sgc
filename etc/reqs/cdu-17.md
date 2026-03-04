@@ -95,7 +95,6 @@
     - `Unidade de origem`: ADMIN
     - `Unidade de destino`: [SIGLA_UNIDADE_SUBPROCESSO].
 
-19. O sistema exclui as sugestões apresentadas, assim como o histórico de análise do mapa de competência do subprocesso
-    da unidade.
+19. O sistema exclui as sugestões apresentadas do mapa de competência do subprocesso da unidade.
 
 20. O sistema redireciona para o Painel e mostra confirmação: "Disponibilização do mapa de competências efetuada".

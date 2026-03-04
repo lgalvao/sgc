@@ -124,7 +124,7 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
 
         assertThat(atualizado.getDataFimEtapa1()).isNotNull();
 
-        // 15. Exclusão do Histórico de Análise
-        assertThat(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(SP_CODIGO)).isEmpty();
+        // 15. Manutenção do Histórico de Análise
+        assertThat(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(SP_CODIGO)).isNotEmpty();
     }
 }

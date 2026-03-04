@@ -1,86 +1,81 @@
 # Informações gerais
 
-O Sistema de Gestão de Competências (SGC) visa gerenciar sistematicamente as competências técnicas das unidades
-organizacionais do tribunal. O sistema opera com uma estrutura organizacional hierárquica em que a árvore de unidades
-fica subordinada a uma unidade virtual raiz (sigla ADMIN) a partir da qual os processos de mapeamento, revisão e
-diagnóstico de
-competências são iniciados e concluídos, após passarem pela atuação das demais unidades da hierarquia.
+O Sistema de Gestão de Competências (SGC) tem como objetivo gerenciar as competências técnicas das unidades organizacionais do Tribunal. O sistema opera com uma estrutura organizacional hierárquica em que a árvore de unidades fica subordinada a uma unidade virtual raiz (sigla ADMIN) a partir da qual os processos de mapeamento, revisão e diagnóstico de competências são iniciados e concluídos, após passarem pela atuação das demais unidades da hierarquia.
 
-Os componentes essenciais do sistema incluem atividades, que são ações específicas desempenhadas por cada unidade no
-exercício de suas funções; conhecimentos, que representam o conjunto de conhecimentos técnicos necessários para executar
-cada atividade; competências, que são elementos sintetizantes agrupando atividades relacionadas e são definidos e
-mantidos apenas pela unidade raiz ADMIN; e mapas de competências, que constituem o conjunto consolidado de competências
-associadas a
-uma unidade, resultante do processo de mapeamento.
+Para fins de classificação estrutural (detalhada no Glossário do sistema), as unidades são divididas em:
+- **Unidade operacional**: Unidade de ponta, com mais de um servidor e sem unidades subordinadas.
+- **Unidade intermediária**: Unidade de chefia/gestão, com unidades subordinadas mas apenas um servidor (o titular) lotado.
+- **Unidade interoperacional**: Unidade híbrida (atua tanto como chefia quanto ponta), que possui unidades subordinadas e também mais de um servidor lotado.
 
-O sistema suporta três tipos principais de processos: mapeamento, que representa o processo inicial de coleta
-sistemática das atividades e conhecimentos necessários para cada unidade operacional visando a construção do primeiro
-mapa de competências da unidade; revisão, que consiste na atualização periódica dos mapas de competências vigentes em
-cada unidade considerando as mudanças organizacionais e de atribuições; e diagnóstico, que avalia a importância e
-domínio
-das competências pelos servidores das unidades, identificando lacunas (gaps) e necessidades de capacitação.
+Os componentes essenciais do sistema incluem:
+- **atividades**: ações específicas desempenhadas por cada unidade no exercício de suas funções;
+- **conhecimentos**: conhecimentos técnicos necessários para executar cada atividade (cada atividade terá um ou mais conhecimentos)
+- **competências**: elementos sintetizantes agrupando atividades relacionadas, criadas e mantidas apenas pelo perfil ADMIN;
+- **mapas de competências**: conjunto de competências associadas a uma unidade, resultante do processo de mapeamento, criadas e mantidas apenas pelo perfil ADMIN
+
+O sistema suporta três tipos principais de processos: 
+- **mapeamento**: representa o processo inicial de coleta sistemática das atividades e conhecimentos necessários para cada unidade operacional visando a construção do primeiro mapa de competências da unidade; 
+- **revisão**: consiste na atualização periódica dos mapas de competências vigentes em cada unidade considerando as mudanças organizacionais e de atribuições; 
+- **diagnóstico**: avalia a importância e domínio das competências pelos servidores das unidades, identificando lacunas (gaps) e necessidades de capacitação; **o módulo de diagnóstico ainda está em especificação**.
 
 ## Atores e perfis
 
-O sistema de Gestão de Competências opera com os seguintes perfis de usuários, cujas atribuições e acessos são
-automaticamente reconhecidos com base na condição de responsabilidade ou lotação em uma unidade, de acordo com o SGRH,
-ou por atribuição de responsabilidade temporária realizada no próprio sistema. Caso um usuário acumule mais de um perfil
-ou seja responsável por mais de uma unidade, será necessário selecionar o perfil e a unidade de trabalho após o login.
+O sistema opera com os seguintes perfis de usuários, cujas atribuições e acessos são automaticamente reconhecidos com base na condição de responsabilidade ou lotação em uma unidade, de acordo com o SGRH, ou por atribuição de responsabilidade temporária, ou cadastro como administrador no SGC. Caso um usuário acumule mais de um perfil ou seja responsável por mais de uma unidade, será necessário selecionar o perfil e a unidade de trabalho após o primeiro passo do login.
 
-- **ADMIN**: Administrador do sistema. Esse papel, que deverá ser geralmente exercido por servidores da SEDOC, é
-  responsável por criar, configurar e monitorar processos. Os usuários que logarem com este perfil no sistema estarão
-  associados à unidade raiz ADMIN de maneira a atuar, ao final do processo de validação do cadastro de atividades das
-  unidades,
-  na criação, ajuste e homologação dos mapas de competências assim como na homologação do processo de diagnóstico.
-- **GESTOR**: Responsável por uma unidade intermediária ou interoperacional (exemplo: Coordenador). Pode visualizar e
-  validar as informações cadastradas pelas unidades sob sua gestão, submetendo para análise da unidade superior, ou
-  devolvendo à unidade subordinada para realização de retificações.
-- **CHEFE**: Responsável por uma unidade operacional ou interoperacional. Pode cadastrar as informações de sua unidade
-  em cada processo e submeter essas informações para validação pela unidade superior.
-- **SERVIDOR**: Servidor lotado em uma unidade operacional ou interoperacional. Este papel só atua nos processos de
-  diagnóstico.
-
-O sistema atribuirá simultaneamente os perfis GESTOR e CHEFE para os responsáveis por unidades interoperacionais.
+- **ADMIN**: Administrador do sistema. Esse papel, que será geralmente exercido por servidores da SEDOC, é responsável por criar, configurar e monitorar processos (dos três tipos). Usuários que logarem com este perfil estarão associados à unidade raiz ADMIN. Este perfil é responsável exclusivo por criar e ajustar os mapas de competências.
+- **GESTOR**: Responsável por uma unidade intermediária ou interoperacional (geralmente será um Coordenador ou Secretário). Pode visualizar e validar as informações cadastradas pelas unidades sob sua gestão, submetendo para análise da unidade superior, ou devolvendo à unidade subordinada para realização de retificações. Usários com perfil GESTOR não podem criar nada no sistema -- apenas validam/devolvem/analisam subprocessos.
+- **CHEFE**: Responsável por uma unidade operacional ou interoperacional. Responsável exclusivo por cadastrar atividades e conhecimentos de sua unidade.
+- **SERVIDOR**: Servidor lotado em uma unidade operacional ou interoperacional. Este papel só atua nos processos de diagnóstico.
 
 ## Situações
 
-Os processos e subprocessos mantidos pelo sistema seguem um fluxo previsível, passando por um conjunto de situações que
-varia de acordo com o tipo de processo/subprocesso. Essas situações são referenciadas entre aspas simples (por
-exemplo, 'Não iniciado') nas especificações de casos de uso.
+Os processos e subprocessos mantidos pelo sistema seguem um fluxo que passa por situações que variam de acordo com o tipo de processo/subprocesso. Essas situações são referenciadas entre aspas simples (por exemplo, 'Não iniciado') nas especificações de casos de uso.
 
-### Situações de Processos
+Nos fluxos e situações diagramados a seguir, adotamos as seguintes siglas para os atores de transição:
+- **`udp`** (unidade do processo): A unidade (operacional ou interoperacional) para a qual o mapa será criado, e que é responsável por realizar o cadastro de atividades e conhecimentos.
+- **`int`** (unidade intermediária): A unidade de gestão imediatamente superior na árvore hierárquica, que avalia as informações submetidas pelas unidades a ela subordinadas.
+- **ADMIN**: Unidade raiz administradora (geralmente um servidor da SEDOC).
 
-- Criado: Processo cadastrado, mas não iniciado.
-- Em andamento: Processo foi iniciado e todas as unidades participantes foram notificadas.
-- Finalizado: Mapa de competências homologado para todas as unidades.
+### Situações de Processos (todos os tipos)
 
-### Situações de Subprocessos de Mapeamento
+- **Criado**: Processo cadastrado, mas não iniciado.
+- **Em andamento**: Processo foi iniciado e todas as unidades participantes foram notificadas.
+- **Finalizado**: Mapa de competências homologado para todas as unidades (no caso de mapeamento/revisão).
 
-- Não iniciado: Unidade notificada do início do processo, mas sem nenhum cadastro de atividades salvo.
-- Cadastro em andamento: Cadastro salvo pela unidade mas não marcado como finalizado.
-- Cadastro disponibilizado: Cadastro finalizado, aguardando validação.
-- Cadastro homologado: Cadastro validado na unidade ADMIN.
-- Mapa criado: Unidade ADMIN criou o mapa para a unidade mas ainda não disponibilizou.
-- Mapa disponibilizado: Unidade ADMIN disponibilizou o mapa da unidade para validação.
-- Mapa com sugestões: CHEFE indicou sugestões para o mapa da unidade.
-- Mapa validado: Hierarquia aprovou o mapa disponibilizado pela unidade ADMIN.
-- Mapa homologado: Unidade ADMIN homologou o mapa após a sua validação pela hierarquia da unidade.
+### Situações de subprocessos de Mapeamento
 
-### Situações de Subprocessos de Revisão
+- **Não iniciado**: Unidade notificada do início do processo, mas sem nenhum cadastro de atividades salvo.
+- **Cadastro em andamento**: Cadastro salvo pela unidade mas não marcado como finalizado.
+- **Cadastro disponibilizado**: Cadastro finalizado, aguardando validação.
+- **Cadastro homologado**: Cadastro validado na unidade ADMIN.
+- **Mapa criado**: Perfil ADMIN criou o mapa para a unidade mas ainda não disponibilizou.
+- **Mapa disponibilizado**: Perfil ADMIN disponibilizou o mapa para validação.
+- **Mapa com sugestões**: Perfil CHEFE indicou sugestões para o mapa.
+- **Mapa validado**: Toda a hierarquia aprovou o mapa disponibilizado.
+- **Mapa homologado**: Perfil ADMIN homologou o mapa após a sua validação pela hierarquia.
 
-- Não iniciado: Unidade notificada do início do processo, mas ainda não iniciou a revisão do seu cadastro de atividades.
-- Revisão do cadastro em andamento: Cadastro de atividades da unidade com revisão iniciada.
-- Revisão do cadastro disponibilizada: Revisão do cadastro concluída, aguardando validação.
-- Revisão do cadastro homologada: Revisão do cadastro validada na unidade ADMIN.
-- Mapa ajustado: Unidade ADMIN criou o mapa ajustado para a unidade mas ainda não disponibilizou.
-- Mapa disponibilizado: Unidade ADMIN disponibilizou o mapa ajustado da unidade para validação.
-- Mapa com sugestões: CHEFE indicou sugestões para o mapa da unidade.
-- Mapa validado: Hierarquia aprovou o mapa disponibilizado pela unidade ADMIN.
-- Mapa homologado: Unidade ADMIN homologou o mapa após a sua validação pela hierarquia da unidade.
+### Situações de subprocessos de Revisão
+
+- **Não iniciado**: Unidade foi notificada do início do processo, mas ainda não iniciou a revisão do seu cadastro de atividades.
+- **Revisão do cadastro em andamento**: Foi iniciada a revisão do cadastro de atividades da unidade.
+- **Revisão do cadastro disponibilizada**: Foi concluída a revisão do cadastro de atividades da unidade, aguardando validação.
+- **Revisão do cadastro homologada**: Foi concluída a validação da revisão do cadastro de atividades da unidade.
+- **Mapa ajustado**: Perfil ADMIN criou o mapa ajustado para a unidade mas ainda não o disponibilizou.
+- **Mapa disponibilizado**: Perfil ADMIN disponibilizou o mapa ajustado para validação.
+- **Mapa com sugestões**: Perfil CHEFE indicou sugestões para o mapa.
+- **Mapa validado**: Toda a hierarquia aprovou o mapa disponibilizado.
+- **Mapa homologado**: Perfil ADMIN homologou o mapa após a sua validação por toda a hierarquia.
+
+### Situações de subprocessos de Diagnóstico
+
+- **Não iniciado**: Unidade notificada do início do processo de diagnóstico, mas nenhum questionário ou avaliação foi iniciado.
+- **Autoavaliação em andamento**: Avaliações das competências em preenchimento pelos servidores/responsáveis da unidade.
+- **Monitoramento**: Período de acompanhamento dos gaps identificados.
+- **Concluído**: Avaliações e consolidações do diagnóstico estão totalmente finalizadas.
 
 ```mermaid
 ---
-title: "Processo de Mapeamento: Situações e transições"
+title: "Processo de Mapeamento"
 ---
 
 stateDiagram-v2
@@ -89,10 +84,15 @@ stateDiagram-v2
     [*] --> NaoIniciado
     NaoIniciado --> CadastroEmAndamento: udp iniciou cadastro
 
+    note right of Cadastro
+        udp = unidade do processo
+        int = unidade intermediária
+    end note
+
     state Cadastro {
-        CadastroEmAndamento: Em andamento
-        CadastroDisponibilizado: Disponibilizado
-        CadastroHomologado: Homologado
+        CadastroEmAndamento: Cadastro em andamento
+        CadastroDisponibilizado: Cadastro disponibilizado
+        CadastroHomologado: Cadastro homologado
 
         state DecisaoValidacao <<choice>>
         state DecisaoDevolucao <<choice>>
@@ -114,11 +114,11 @@ stateDiagram-v2
     }
 
     state Mapa {
-        MapaCriado: Criado
-        MapaDisponibilizado: Disponibilizado
-        MapaValidado: Validado
-        MapaComSugestoes: Com sugestões
-        MapaHomologado: Homologado
+        MapaCriado: Mapa criado
+        MapaDisponibilizado: Mapa disponibilizado
+        MapaValidado: Mapa validado
+        MapaComSugestoes: Mapa com sugestões
+        MapaHomologado: Mapa homologado
 
         state DecisaoSugestoes <<choice>>
 
@@ -162,13 +162,19 @@ stateDiagram-v2
 
 ```mermaid
 ---
-title: "Processo de Revisão: Situações e transições (por IA, nao validado)"
+title: "Processo de Revisão"
 ---
+
 stateDiagram-v2
-    NaoIniciado: "Não iniciado"
+    NaoIniciado: Não iniciado
 
     [*] --> NaoIniciado
-    NaoIniciado --> RevisaoEmAndamento: unidade inicia revisão
+    NaoIniciado --> RevisaoEmAndamento: udp inicia revisão
+
+    note right of Cadastro
+        udp = unidade do processo
+        int = unidade intermediária
+    end note
 
     state Cadastro {
         RevisaoEmAndamento: Revisão do cadastro em andamento
@@ -179,19 +185,19 @@ stateDiagram-v2
         state DecisaoDevolucaoCadastro <<choice>>
         state DecisaoValidacaoCadastro <<choice>>
 
-        RevisaoEmAndamento --> RevisaoDisponibilizada: unidade disponibiliza
+        RevisaoEmAndamento --> RevisaoDisponibilizada: udp disponibilizou
 
-        RevisaoDisponibilizada --> DecisaoAcaoCadastro: ADMIN avalia
-        DecisaoAcaoCadastro --> DecisaoDevolucaoCadastro: devolve
-        DecisaoAcaoCadastro --> DecisaoValidacaoCadastro: valida
+        RevisaoDisponibilizada --> DecisaoAcaoCadastro: validou ou devolveu?
+        DecisaoAcaoCadastro --> DecisaoDevolucaoCadastro: devolveu
+        DecisaoAcaoCadastro --> DecisaoValidacaoCadastro: validou
 
-        DecisaoDevolucaoCadastro --> RevisaoEmAndamento: para unidade
-        DecisaoDevolucaoCadastro --> RevisaoDisponibilizada: para ADMIN (ajuste interno)
+        DecisaoDevolucaoCadastro --> RevisaoEmAndamento: para udp?
+        DecisaoDevolucaoCadastro --> RevisaoDisponibilizada: para int?
 
-        DecisaoValidacaoCadastro --> RevisaoHomologada: ADMIN homologa
-        DecisaoValidacaoCadastro --> RevisaoDisponibilizada: para ADMIN (ajuste interno)
+        DecisaoValidacaoCadastro --> RevisaoHomologada: ADMIN?
+        DecisaoValidacaoCadastro --> RevisaoDisponibilizada: int?
 
-        RevisaoHomologada --> MapaAjustado: ADMIN ajusta mapa
+        RevisaoHomologada --> MapaAjustado: ADMIN ajustou mapa
     }
 
     state Mapa {
@@ -202,38 +208,40 @@ stateDiagram-v2
         MapaHomologado: Mapa homologado
 
         state DecisaoSugestoesMapa <<choice>>
+
         state DecisaoAcaoSugestoes <<choice>>
         state DecisaoValidaSugestoes <<choice>>
         state DecisaoDevolveSugestoes <<choice>>
+
         state DecisaoAcaoValidado <<choice>>
         state DecisaoValidaMapa <<choice>>
         state DecisaoDevolveValidacao <<choice>>
 
-        MapaAjustado --> MapaDisponibilizado: ADMIN disponibiliza
-        MapaDisponibilizado --> DecisaoSugestoesMapa: hierarquia avalia
-        DecisaoSugestoesMapa --> MapaComSugestoes: com sugestões
-        DecisaoSugestoesMapa --> MapaValidado: sem sugestões (valida)
-        DecisaoSugestoesMapa --> MapaAjustado: hierarquia devolve para ADMIN (ajuste)
+        MapaAjustado --> MapaDisponibilizado: ADMIN disponibilizou
 
-        MapaComSugestoes --> DecisaoAcaoSugestoes: ADMIN avalia sugestões
-        DecisaoAcaoSugestoes --> DecisaoValidaSugestoes: valida
-        DecisaoAcaoSugestoes --> DecisaoDevolveSugestoes: devolve
+        MapaDisponibilizado --> DecisaoSugestoesMapa: udp tem sugestões?
+        DecisaoSugestoesMapa --> MapaComSugestoes: sim
+        DecisaoSugestoesMapa --> MapaValidado: nao
 
-        DecisaoValidaSugestoes --> MapaAjustado: ADMIN acata e ajusta
-        DecisaoValidaSugestoes --> MapaComSugestoes: para ADMIN (ajuste interno)
+        DecisaoDevolveSugestoes --> MapaComSugestoes: para int?
+        DecisaoDevolveSugestoes --> MapaDisponibilizado: para udp?
 
-        DecisaoDevolveSugestoes --> MapaDisponibilizado: para hierarquia
-        DecisaoDevolveSugestoes --> MapaComSugestoes: para ADMIN (ajuste interno)
+        MapaComSugestoes --> DecisaoAcaoSugestoes: ação?
+        DecisaoAcaoSugestoes --> DecisaoValidaSugestoes: validou
+        DecisaoAcaoSugestoes --> DecisaoDevolveSugestoes: devolveu
 
-        MapaValidado --> DecisaoAcaoValidado: ADMIN avalia mapa validado
-        DecisaoAcaoValidado --> DecisaoValidaMapa: homologa
-        DecisaoAcaoValidado --> DecisaoDevolveValidacao: devolve
+        DecisaoValidaSugestoes --> MapaComSugestoes: int?
+        DecisaoValidaSugestoes --> MapaAjustado: ADMIN?
 
-        DecisaoValidaMapa --> MapaHomologado: ADMIN homologa
-        DecisaoValidaMapa --> MapaValidado: para ADMIN (ajuste interno)
+        DecisaoDevolveValidacao --> MapaValidado: para int?
+        DecisaoDevolveValidacao --> MapaDisponibilizado: para udp?
 
-        DecisaoDevolveValidacao --> MapaDisponibilizado: para hierarquia
-        DecisaoDevolveValidacao --> MapaValidado: para ADMIN (ajuste interno)
+        MapaValidado --> DecisaoAcaoValidado: ação?
+        DecisaoAcaoValidado --> DecisaoValidaMapa: validou
+        DecisaoAcaoValidado --> DecisaoDevolveValidacao: devolveu
+
+        DecisaoValidaMapa --> MapaHomologado: ADMIN?
+        DecisaoValidaMapa --> MapaValidado: int?
     }
 
     MapaHomologado --> [*]

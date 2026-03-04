@@ -73,6 +73,4 @@ Ator: CHEFE
 
 14. O sistema define a data/hora de conclusão da etapa 1 do subprocesso da unidade como sendo a data/hora atual.
 
-15. O sistema exclui o histórico de análise do cadastro do subprocesso da unidade.
-
-16. O sistema redireciona para o Painel, mostrando a mensagem "Cadastro de atividades disponibilizado".
+15. O sistema redireciona para o Painel, mostrando a mensagem "Cadastro de atividades disponibilizado".

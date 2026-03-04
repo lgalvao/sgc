@@ -17,9 +17,9 @@ public enum SituacaoSubprocesso {
     MAPEAMENTO_MAPA_VALIDADO("Mapa validado"),
     MAPEAMENTO_MAPA_HOMOLOGADO("Mapa homologado"),
 
-    REVISAO_CADASTRO_EM_ANDAMENTO("Revisão de cadastro em andamento"),
-    REVISAO_CADASTRO_DISPONIBILIZADA("Revisão de cadastro disponibilizada"),
-    REVISAO_CADASTRO_HOMOLOGADA("Revisão de cadastro homologada"),
+    REVISAO_CADASTRO_EM_ANDAMENTO("Revisão do cadastro em andamento"),
+    REVISAO_CADASTRO_DISPONIBILIZADA("Revisão do cadastro disponibilizada"),
+    REVISAO_CADASTRO_HOMOLOGADA("Revisão do cadastro homologada"),
     REVISAO_MAPA_AJUSTADO("Mapa ajustado"),
     REVISAO_MAPA_DISPONIBILIZADO("Mapa disponibilizado"),
     REVISAO_MAPA_COM_SUGESTOES("Mapa com sugestões"),

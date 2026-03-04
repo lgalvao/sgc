@@ -9,32 +9,25 @@ Ator: CHEFE
 
 ## Fluxo principal
 
-1. No Painel, CHEFE escolhe um processo e, na tela Detalhes do subprocesso, clica no card Mapa de competências.
+1. No `Painel`, o usuário escolhe um processo e, na tela `Detalhes do subprocesso`, clica no card `Mapa de competências`.
 
-2. O sistema mostra a tela Visualização de mapa com os botões Apresentar sugestões e Validar.
+2. O sistema mostra a tela `Visualização de mapa` com os botões `Apresentar sugestões` e `Validar`.
 
-3. Se o subprocesso tiver retornado de análise pelas unidades superiores, deverá ser exibido também o botão Histórico de
-   análise.
+3. Se o subprocesso tiver retornado de análise pelas unidades superiores, deverá ser exibido também o botão `Histórico de análise`.
 
-   3.1. Se CHEFE clicar no botão `Histórico de análise`, o sistema mostra, em tela modal, os dados das análises do mapa
-   realizadas pelas unidades superiores à unidade do subprocesso desde a última disponibilização. As análises deverão
-   ser apresentadas em uma pequena tabela com data/hora, sigla da unidade, resultado ('Devolução' ou 'Aceite') e
-   observações. Essas informações poderão ser usadas como subsídio para a realização da nova validação do mapa.
+   3.1. Se o usuário clicar no botão `Histórico de análise`, o sistema mostra, em tela modal, os dados das análises do mapa realizadas pelas unidades superiores à unidade do subprocesso desde a última disponibilização. As análises deverão ser apresentadas em uma pequena tabela com data/hora, sigla da unidade, resultado ('Devolução' ou 'Aceite') e observações. Essas informações poderão ser usadas como subsídio para a realização da nova validação do mapa.
 
-4. Se usuário clicar em Apresentar sugestões:
+4. Se o usuário clicar em `Apresentar sugestões`:
 
-   4.1. O sistema abre um modal com um campo de texto formatado, para inclusão das sugestões.
+   4.1. O sistema abre um modal "Apresentar sugestões" com um campo de **texto formatado** (obrigatório), para inclusão das sugestões.
 
-    - Se já houver um registro de sugestões para o mapa no subprocesso da unidade, o sistema traz o campo preenchido com
-      essa informação.
+    - Se já houver um registro de sugestões para o mapa no subprocesso da unidade, o sistema traz o campo preenchido com essa informação.
 
    4.2. Usuário fornece as sugestões e clica em `Confirmar`.
 
-   4.3. O sistema armazena as sugestões registradas no mapa do subprocesso da unidade e altera a situação deste para '
-   Mapa com sugestões'.
+   4.3. O sistema armazena as sugestões registradas no mapa do subprocesso da unidade e altera a situação do subprocesso para 'Mapa com sugestões'.
 
-   4.4. O sistema notifica a unidade superior hierárquica da apresentação de sugestões para o mapa, com e-mail no modelo
-   abaixo:
+   4.4. O sistema notifica a unidade superior hierárquica da apresentação de sugestões para o mapa, com e-mail no modelo abaixo:
 
       ```text
       Assunto: SGC: Sugestões apresentadas para o mapa de competências da [SIGLA_UNIDADE_SUBPROCESSO]
@@ -57,13 +50,11 @@ Ator: CHEFE
 
 5. Se usuário clicar em Validar:
 
-   5.1. O sistema mostra diálogo de confirmação: título ''Validação do mapa de competências", mensagem "Confirma a
-   validação do mapa de competências? Essa ação habilita a análise por unidades superiores''/ Botões Confirmar e
-   Cancelar.
+   5.1. O sistema mostra diálogo de confirmação: título ''Validação do mapa de competências", mensagem "Confirma a validação do mapa de competências? Essa ação habilita a análise por unidades superiores''/ Botões `Confirmar` e `Cancelar`.
 
-   5.1.1. Caso CHEFE escolha Cancelar, o sistema interrompe a operação de validação, permanecendo na mesma tela.
+   5.1.1. Caso o usuário escolha `Cancelar`, o sistema interrompe a operação de validação, permanecendo na mesma tela.
 
-   5.2. CHEFE escolhe Confirmar.
+   5.2. O usuário escolhe `Confirmar`.
 
    5.3. O sistema altera a situação do subprocesso da unidade para 'Mapa validado'.
 
@@ -94,10 +85,8 @@ Ator: CHEFE
     - `Data/hora`: Data/hora atual
     - `Unidade origem`: [SIGLA_UNIDADE_SUBPROCESSO]
     - `Unidade destino`: [SIGLA_UNIDADE_SUPERIOR]
-    - `Descrição`: "Apresentação de sugestões para o mapa de competências", ou "Validação do mapa de competências",
-      conforme o caso.
+    - `Descrição`: "Apresentação de sugestões para o mapa de competências", ou "Validação do mapa de competências", conforme o caso.
 
-7. O sistema define a data/hora de conclusão da etapa 2 do subprocesso da unidade como sendo a atual, e exclui o
-   histórico de análise de validação do mapa do subprocesso da unidade.
+7. O sistema define a data/hora de conclusão da etapa 2 do subprocesso da unidade como sendo a atual.
 
-8. O sistema redireciona para o Painel.
+8. O sistema redireciona para o `Painel`.

@@ -145,14 +145,6 @@ public class SubprocessoTransicaoService {
         return analiseRepo.save(analise);
     }
 
-    @Transactional
-    public void removerAnalisesPorSubprocesso(Long codSubprocesso) {
-        List<Analise> analises = analiseRepo.findBySubprocessoCodigo(codSubprocesso);
-        if (!analises.isEmpty()) {
-            analiseRepo.deleteAll(analises);
-        }
-    }
-
     // --- Fluxos de Disposilização ---
 
     @Transactional
@@ -187,7 +179,6 @@ public class SubprocessoTransicaoService {
         sp.setSituacao(novaSituacao);
         sp.setDataFimEtapa1(LocalDateTime.now());
 
-        removerAnalisesPorSubprocesso(sp.getCodigo());
 
         final Unidade destinoFinal = destino;
         registrarTransicao(RegistrarTransicaoCommand.builder()
@@ -221,7 +212,6 @@ public class SubprocessoTransicaoService {
         validacaoService.validarAssociacoesMapa(mapa.getCodigo());
 
         mapa.setSugestoes(null);
-        removerAnalisesPorSubprocesso(codSubprocesso);
 
         String observacoes = request.observacoes();
         if (StringUtils.hasText(observacoes)) {
@@ -281,7 +271,6 @@ public class SubprocessoTransicaoService {
 
         sp.setDataFimEtapa2(LocalDateTime.now());
 
-        removerAnalisesPorSubprocesso(sp.getCodigo());
 
         Unidade destino = sp.getUnidade().getUnidadeSuperior();
         if (destino == null) {

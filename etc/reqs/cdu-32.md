@@ -2,31 +2,34 @@
 
 **Ator:** ADMIN
 
+## Pré-condições
+
+- Login realizado com perfil ADMIN
+- Processo do tipo Mapeamento ou Revisão
+- Ao menos um subprocesso que tenha passado da situação 'Mapa homologado'  
+
 ## Fluxo principal
 
-1. O usuário acessa o Painel.
+1. O usuário acessa o `Painel` e acessa o subprocesso de uma unidade que esteja com a situação 'Mapa homologado ou posterior' (ver situações de subprocessos no arquivo **_intro.md**).
 
-2. O usuário localiza o subprocesso de uma unidade.
+2. O usuário clica no botão `Reabrir cadastro`.
 
-3. O usuário clica no botão `Reabrir cadastro`.
+3. O sistema abre um modal "Reabrir cadastro" solicitando uma justificativa (obrigatória) para a reabertura.
 
-4. O sistema solicita uma justificativa para a reabertura.
+4. O usuário informa a justificativa e confirma.
 
-5. O usuário informa a justificativa e confirma.
+5. O sistema altera a situação do subprocesso para `Cadastro em andamento'.
 
-6. O sistema altera a situação do subprocesso para `MAPEAMENTO_CADASTRO_EM_ANDAMENTO`.
-
-8 sistema registra uma movimentação para o subprocesso com os campos:
+6. sistema registra uma movimentação para o subprocesso com os campos:
 
 - `Data/hora`: Data/hora atual
 - `Unidade origem`: ADMIN
 - `Unidade destino`: [SIGLA_UNIDADE_SUBPROCESSO]
 - `Descrição`: 'Reabertura de cadastro'
-- `Observação`: [JUSTIFICATIVA]
 
-1. O sistema envia notificações por e-mail para a unidade solicitante e unidades superiores.
+1. O sistema envia notificações por e-mail para a unidade do subprocesso e para as suas unidades superiores na hierarquia.
 
-   8.1. Para a unidade solicitante (operacional/interoperacional):
+   8.1. Para a unidade do subprocesso:
 
     ```text
     Assunto: SGC: Reabertura de cadastro de atividades - [SIGLA_UNIDADE]
