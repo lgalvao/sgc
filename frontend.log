@@ -1,0 +1,13 @@
+
+> sgc@1.0.0 dev
+> vite
+
+
+  VITE v7.3.1  ready in 539 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: use --host to expose
+11:03:40 PM [vite] http proxy error: /api/usuarios/autenticar
+AggregateError [ECONNREFUSED]:
+    at internalConnectMultiple (node:net:1193:18)
+    at afterConnectMultiple (node:net:1783:7)

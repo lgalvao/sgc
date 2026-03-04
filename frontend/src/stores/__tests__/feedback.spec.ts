@@ -34,7 +34,7 @@ describe("Feedback Store", () => {
                     body: "Operação realizada",
                     variant: "success",
                     value: 2000,
-                    pos: "top-right",
+                    pos: "bottom-right",
                     noProgress: true,
                 })
             })
