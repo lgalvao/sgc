@@ -255,7 +255,6 @@ import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useFeedbackStore} from "@/stores/feedback";
 import {usePerfil} from "@/composables/usePerfil";
 import {useAcesso} from "@/composables/useAcesso";
-import {TipoProcesso} from "@/types/tipos";
 import logger from "@/utils/logger";
 
 const route = useRoute();
@@ -274,12 +273,22 @@ const codProcesso = computed(() => Number(route.params.codProcesso));
 
 const unidade = computed(() => unidadesStore.unidade);
 
+function buscarUnidadeRecursivo(unidades: any[], siglaAlvo: string): any | null {
+  for (const u of unidades) {
+    if (u.sigla === siglaAlvo) return u;
+    if (u.filhos && u.filhos.length > 0) {
+      const encontrada = buscarUnidadeRecursivo(u.filhos, siglaAlvo);
+      if (encontrada) return encontrada;
+    }
+  }
+  return null;
+}
+
 const subprocesso = computed(() => {
   if (!processosStore.processoDetalhe) return null;
-  return processosStore.processoDetalhe.unidades.find((u) => u.sigla === sigla.value);
+  return buscarUnidadeRecursivo(processosStore.processoDetalhe.unidades, sigla.value);
 });
 
-const processo = computed(() => processosStore.processoDetalhe);
 const codSubprocesso = computed(() => subprocesso.value?.codSubprocesso);
 
 const {
@@ -358,20 +367,14 @@ async function confirmarValidacao() {
   }
 }
 
-async function confirmarAceitacao(observacoes?: string) {
+async function confirmarAceitacao() {
   if (!codSubprocesso.value) return;
   isLoading.value = true;
   const isHomologacao = podeHomologarMapa.value || perfilSelecionado.value === "ADMIN";
 
   try {
     if (isHomologacao) {
-      if (processo.value?.tipo === TipoProcesso.REVISAO) {
-        await subprocessosStore.homologarRevisaoCadastro(codSubprocesso.value, {
-          observacoes: observacoes || "",
-        });
-      } else {
-        await processosStore.homologarValidacao(codSubprocesso.value);
-      }
+      await processosStore.homologarValidacao(codSubprocesso.value);
     } else {
       await processosStore.aceitarValidacao(codSubprocesso.value);
     }
@@ -470,21 +473,9 @@ function verHistorico() {
 onMounted(async () => {
   await unidadesStore.buscarUnidade(sigla.value);
   await processosStore.buscarProcessoDetalhe(codProcesso.value);
-
-  let codSp = codSubprocesso.value;
-
-  // Fallback: se o processoDetalhe não inclui a unidade (ex: perfis não-admin),
-  // buscar o codSubprocesso via subprocessosStore
-  if (!codSp) {
-    codSp = await subprocessosStore.buscarSubprocessoPorProcessoEUnidade(
-        codProcesso.value,
-        sigla.value,
-    ) ?? undefined;
-  }
-
-  if (codSp) {
-    await subprocessosStore.buscarSubprocessoDetalhe(codSp);
-    await mapaStore.buscarMapaVisualizacao(codSp);
+  if (codSubprocesso.value) {
+    await subprocessosStore.buscarSubprocessoDetalhe(codSubprocesso.value);
+    await mapaStore.buscarMapaVisualizacao(codSubprocesso.value);
   }
 });
 
