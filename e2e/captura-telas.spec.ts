@@ -3,10 +3,11 @@ import {expect, test} from './fixtures/base.js';
 import logger from '../frontend/src/utils/logger.js';
 import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
 import {criarProcesso, extrairProcessoId} from './helpers/helpers-processos.js';
-import {navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
+import {fazerLogout, navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
 import {
     adicionarAtividade,
     adicionarConhecimento,
+    disponibilizarCadastro,
     navegarParaAtividades,
     navegarParaAtividadesVisualizacao
 } from './helpers/helpers-atividades.js';
@@ -15,7 +16,7 @@ import {
     acessarSubprocessoChefeDireto,
     acessarSubprocessoGestor
 } from './helpers/helpers-analise.js';
-import {abrirModalCriarCompetencia, navegarParaMapa} from './helpers/helpers-mapas.js';
+import {abrirModalCriarCompetencia, disponibilizarMapa, navegarParaMapa} from './helpers/helpers-mapas.js';
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza.js';
 import * as path from 'node:path';
 import * as fs from 'node:fs';
@@ -204,12 +205,15 @@ test.describe('Captura de Telas - Sistema SGC', () => {
         test('Captura criação e detalhamento de processo', async ({page}) => {
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
-            const descricao = `Processo Detalhado ${Date.now()}`;
+            const timestamp = Date.now();
+            const UNIDADE_ALVO = 'ASSESSORIA_12';
+            const descricao = `Processo Detalhado ${timestamp}`;
+
             await criarProcesso(page, {
                 descricao,
                 tipo: 'MAPEAMENTO',
                 diasLimite: 30,
-                unidade: 'ASSESSORIA_12',
+                unidade: UNIDADE_ALVO,
                 expandir: ['SECRETARIA_1']
             });
 
@@ -232,6 +236,84 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await page.getByTestId('tbl-processos').getByText(descricao).first().click();
             await expect(page).toHaveURL(/\/processo\/\d+/);
             await capturarTela(page, '03-processo', '03-detalhes-processo-iniciado', {fullPage: true});
+
+            // --- Fluxo para habilitar botão Finalizar ---
+
+            // 1. Chefe cadastra e disponibiliza
+            await fazerLogout(page);
+            await login(page, USUARIOS.CHEFE_ASSESSORIA_12.titulo, USUARIOS.CHEFE_ASSESSORIA_12.senha);
+            await acessarSubprocessoChefeDireto(page, descricao, UNIDADE_ALVO);
+            await navegarParaAtividades(page);
+            await adicionarAtividade(page, `Atividade ${timestamp}`);
+            await adicionarConhecimento(page, `Atividade ${timestamp}`, `Conhecimento ${timestamp}`);
+            await capturarTela(page, '03-processo', '03a-cadastro-chefe');
+            await disponibilizarCadastro(page);
+            await fazerLogout(page);
+
+            // 2. Gestor aceita
+            await loginComPerfil(page, USUARIOS.GESTOR_SECRETARIA_1.titulo, USUARIOS.GESTOR_SECRETARIA_1.senha, USUARIOS.GESTOR_SECRETARIA_1.perfil);
+            await acessarSubprocessoGestor(page, descricao, UNIDADE_ALVO);
+            await navegarParaAtividadesVisualizacao(page);
+            await capturarTela(page, '03-processo', '03b-analise-gestor');
+            await page.getByTestId('btn-acao-analisar-principal').click();
+            await page.waitForTimeout(300);
+            await capturarTela(page, '03-processo', '03c-modal-aceite-gestor');
+            await page.getByTestId('inp-aceite-cadastro-obs').fill('Aceite para captura de tela');
+            await page.getByTestId('btn-aceite-cadastro-confirmar').click();
+            await fazerLogout(page);
+
+            // 3. Admin homologa cadastro, cria competência e disponibiliza mapa
+            await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
+            await acessarSubprocessoAdmin(page, descricao, UNIDADE_ALVO);
+            await navegarParaAtividadesVisualizacao(page);
+            await page.getByTestId('btn-acao-analisar-principal').click();
+            await page.waitForTimeout(300);
+            await capturarTela(page, '03-processo', '03d-modal-homologacao-admin');
+            await page.getByTestId('inp-aceite-cadastro-obs').fill('Homologação para captura');
+            await page.getByTestId('btn-aceite-cadastro-confirmar').click();
+
+            await navegarParaMapa(page);
+            await abrirModalCriarCompetencia(page);
+            await page.getByTestId('inp-criar-competencia-descricao').fill(`Competência ${timestamp}`);
+            await page.locator('label').filter({hasText: `Atividade ${timestamp}`}).click();
+            await page.getByTestId('btn-criar-competencia-salvar').click();
+            await capturarTela(page, '03-processo', '03e-mapa-criado');
+            await disponibilizarMapa(page);
+            await fazerLogout(page);
+
+            // 4. Chefe valida mapa
+            await login(page, USUARIOS.CHEFE_ASSESSORIA_12.titulo, USUARIOS.CHEFE_ASSESSORIA_12.senha);
+            await acessarSubprocessoChefeDireto(page, descricao, UNIDADE_ALVO);
+            await navegarParaMapa(page);
+            await page.getByTestId('btn-mapa-validar').click();
+            await page.waitForTimeout(300);
+            await capturarTela(page, '03-processo', '03f-modal-validar-mapa');
+            await page.getByTestId('btn-validar-mapa-confirmar').click();
+            await fazerLogout(page);
+
+            // 5. Gestor aceita mapa
+            await loginComPerfil(page, USUARIOS.GESTOR_SECRETARIA_1.titulo, USUARIOS.GESTOR_SECRETARIA_1.senha, USUARIOS.GESTOR_SECRETARIA_1.perfil);
+            await acessarSubprocessoGestor(page, descricao, UNIDADE_ALVO);
+            await navegarParaMapa(page);
+            await page.getByTestId('btn-mapa-homologar-aceite').click();
+            await page.waitForTimeout(300);
+            await capturarTela(page, '03-processo', '03g-modal-aceite-mapa');
+            await page.getByTestId('btn-aceite-mapa-confirmar').click();
+            await fazerLogout(page);
+
+            // 6. Admin homologa mapa final e testa botão finalizar
+            await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
+            await acessarSubprocessoAdmin(page, descricao, UNIDADE_ALVO);
+            await navegarParaMapa(page);
+            await page.getByTestId('btn-mapa-homologar-aceite').click();
+            await page.waitForTimeout(300);
+            await capturarTela(page, '03-processo', '03h-modal-homologar-mapa');
+            await page.getByTestId('btn-aceite-mapa-confirmar').click();
+
+            await page.goto('/painel');
+            await page.getByTestId('tbl-processos').getByText(descricao).first().click();
+            await expect(page).toHaveURL(/\/processo\/\d+$/);
+            await capturarTela(page, '03-processo', '03i-detalhes-processo-finalizavel', {fullPage: true});
 
             // Modal de finalizar processo
             await page.getByTestId('btn-processo-finalizar').click();

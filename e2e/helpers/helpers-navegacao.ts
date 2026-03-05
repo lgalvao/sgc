@@ -31,6 +31,9 @@ export async function fazerLogout(page: Page): Promise<void> {
     // Disparar click via JS para evitar bloqueio por toast sobreposto
     await page.getByTestId('btn-logout').locator('a').dispatchEvent('click');
     await expect(page).toHaveURL(/\/login/);
+    
+    // Limpar possíveis toasts de "Não Autorizado" ou "Sessão expirada" que aparecem no teardown
+    await limparNotificacoes(page);
 }
 
 /**

@@ -1,4 +1,5 @@
 import {Page} from '@playwright/test';
+import {limparNotificacoes} from './helpers-navegacao.js';
 
 /**
  * Credenciais de usuários para testes E2E
@@ -37,6 +38,7 @@ export async function login(page: Page, usuario: string, senha: string) {
     await page.goto('/login');
     await autenticar(page, usuario, senha);
     await page.waitForURL(/\/painel(?:\?|$)/);
+    await limparNotificacoes(page);
 }
 
 export async function loginComPerfil(page: Page, usuario: string, senha: string, perfilUnidade: string) {
@@ -45,4 +47,5 @@ export async function loginComPerfil(page: Page, usuario: string, senha: string,
     await page.getByTestId('sel-login-perfil').selectOption({label: perfilUnidade});
     await page.getByTestId('btn-login-entrar').click();
     await page.waitForURL(/\/painel(?:\?|$)/);
+    await limparNotificacoes(page);
 }

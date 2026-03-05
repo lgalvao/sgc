@@ -22,8 +22,7 @@ O projeto segue uma arquitetura **Modular Monolith** no backend e **Component-Ba
 
 **Documentação Essencial:**
 
-* **[AGENTS.md](AGENTS.md)**: **Leitura obrigatória** para desenvolvedores e agentes de IA. Contém convenções de código,
-  padrões de projeto e regras fundamentais.
+* **[AGENTS.md](AGENTS.md)**: **Leitura obrigatória** para desenvolvedores e agentes de IA. Contém convenções de código, padrões de projeto e regras fundamentais.
 * **[backend/README.md](backend/README.md)**: Arquitetura detalhada do backend, módulos e comunicação.
 * **[frontend/README.md](frontend/README.md)**: Arquitetura do frontend, estrutura de pastas e componentes.
 
@@ -52,7 +51,7 @@ sgc/
 
 ### Desenvolvimento
 
-1. **Backend (testes e2e):**
+1. **Backend (testes e2e)**
 
     ```bash
     cd backend

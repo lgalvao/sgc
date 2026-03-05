@@ -269,8 +269,7 @@ public class MapaManutencaoService {
     @Transactional
     public void atualizarConhecimento(Long codAtividade, Long codConhecimento, AtualizarConhecimentoRequest request) {
         String descricao = request.descricao();
-
-        log.info("Atualizando conhecimento {} na atividade {}: {}", codConhecimento, codAtividade, descricao);
+        log.info("Atualizando conhecimento {} na atividade {}", codConhecimento, codAtividade);
 
         Conhecimento existente = repo.buscar(Conhecimento.class, Map.of("codigo", codConhecimento, "atividade.codigo", codAtividade));
         if (!existente.getDescricao().equalsIgnoreCase(descricao)) {
