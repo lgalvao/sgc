@@ -23,8 +23,9 @@ A mesma filosofia de redução de fragmentação e de complexidade desnecessári
 
 * **Gerenciamento de Estado Simplificado (Pinia):**
   * Estratégias complexas de gerenciamento de estado global e sincronização de dados/cache local são **overkill** devido ao baixo volume de usuários e acessos esporádicos.
-  * Lojas Pinia excessivamente complexas (como `usuarios.ts` e `atividades.ts`) devem ser refatoradas.
-  * Em vez de tentar replicar toda a base de dados em memória local do navegador, opte por chamadas diretas às APIs ou gerenciamento de estado local (`refs`, `composables`) atrelado estritamente à view atual.
+  * **Remoção de Stores Pass-through:** Lojas Pinia que atuam meramente como proxies para chamadas de API ou caches redundantes (como `atividades.ts`, `mapas.ts`, `subprocessos.ts`, `processos.ts` e `usuarios.ts`) adicionam fragmentação e complexidade desnecessárias. Elas devem ser progressivamente removidas ou refatoradas.
+  * Em vez de tentar replicar toda a base de dados em memória local do navegador, opte por chamadas diretas aos Services usando estado local (ex: `refs` ou `composables`) atrelado estritamente à view/componente atual.
+  * **Nova Regra:** O Pinia deve ser reservado estritamente para **estado verdadeiramente global** (ex: dados de sessão do usuário logado, estado de autenticação, notificações/toasts globais da UI).
 * **Fim dos Mapeadores Manuais:**
   * Os diretórios e arquivos de `mappers` (anteriormente em `frontend/src/mappers/`) foram removidos.
   * **Nova Regra:** Os Services do front-end agora lidam diretamente com os DTOs crus (Raw DTOs) retornados pelo back-end, contendo o mínimo de lógica de transformação e mapeamento interno. A view/componente deve se adaptar ao formato de transporte.
