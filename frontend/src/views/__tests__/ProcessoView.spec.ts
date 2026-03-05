@@ -427,6 +427,38 @@ describe("Processo.vue", () => {
         expect(modalSpies.setErro).toHaveBeenCalledWith(errorMsg);
     });
 
+    it("deve exibir apenas o botão aceitar para perfil Gestor (sem homologar e sem disponibilizar)", async () => {
+        wrapper = createWrapper();
+        perfilStore = usePerfilStore();
+        processosStore = useProcessosStore();
+
+        perfilStore.$patch({perfis: [Perfil.GESTOR]});
+        processosStore.$patch({processoDetalhe: mockProcesso});
+
+        await nextTick();
+        await flushPromises();
+
+        expect(wrapper.find("button.btn-success").exists()).toBe(true);
+        expect(wrapper.find("button.btn-warning").exists()).toBe(false);
+        expect(wrapper.find("button.btn-info").exists()).toBe(false);
+    });
+
+    it("deve exibir botões homologar e disponibilizar para perfil Admin (sem aceitar)", async () => {
+        wrapper = createWrapper();
+        perfilStore = usePerfilStore();
+        processosStore = useProcessosStore();
+
+        perfilStore.$patch({perfis: [Perfil.ADMIN]});
+        processosStore.$patch({processoDetalhe: mockProcesso});
+
+        await nextTick();
+        await flushPromises();
+
+        expect(wrapper.find("button.btn-warning").exists()).toBe(true);
+        expect(wrapper.find("button.btn-info").exists()).toBe(true);
+        expect(wrapper.find("button.btn-success").exists()).toBe(false);
+    });
+
     it("deve redirecionar para detalhes da unidade ao clicar na tabela (Gestor)", async () => {
         wrapper = createWrapper();
         perfilStore = usePerfilStore();

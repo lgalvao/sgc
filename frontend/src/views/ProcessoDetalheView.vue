@@ -128,7 +128,6 @@ const router = useRouter();
 const processosStore = useProcessosStore();
 const perfilStore = usePerfilStore();
 const feedbackStore = useFeedbackStore();
-
 const codProcesso = Number(route.params.codProcesso || route.query.codProcesso);
 const modalBlocoRef = ref<any>(null);
 const mostrarModalFinalizacao = ref(false);
@@ -137,18 +136,13 @@ const acaoBlocoAtual = ref<"aceitar" | "homologar" | "disponibilizar">("aceitar"
 const processo = computed(() => processosStore.processoDetalhe);
 const participantesHierarquia = computed(() => processo.value?.unidades || []);
 
-const podeAceitarBloco = computed(() => {
-  return !isProcessoFinalizado.value && (processo.value?.podeAceitarCadastroBloco || false)
-      && unidadesElegiveisPorAcao.value.aceitar.length > 0;
-});
+const podeAceitarBloco = computed(() => perfilStore.isGestor);
 
-const podeHomologarBloco = computed(() => {
-  return !isProcessoFinalizado.value && (processo.value?.podeHomologarCadastro || processo.value?.podeHomologarMapa || false)
-      && unidadesElegiveisPorAcao.value.homologar.length > 0;
-});
+const podeHomologarBloco = computed(() => perfilStore.isAdmin);
 
 const podeDisponibilizarBloco = computed(() => {
-  return !isProcessoFinalizado.value &&
+  return perfilStore.isAdmin &&
+      !isProcessoFinalizado.value &&
       (processo.value?.podeDisponibilizarMapaBloco || false) &&
       unidadesElegiveisPorAcao.value.disponibilizar.length > 0;
 });
