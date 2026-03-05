@@ -3,32 +3,24 @@
 Se um testes end to end falhar, geralmente será por uma dessas causas:
 
 - As expectativas do teste estão erradas.
-- Dados nao estão presentes no banco de dados
+- Dados nao estão presentes no banco de dados.
 - Elementos esperados não estão sendo mostrados porque alguma validação falhou no backend.
 - A funcionalidade ainda não foi implementada completamente ou corretamente.
+- Um elemento transiente (toast, modal) está sobrepondo o alvo do click. Neste caso, investigue se o componente frontend está configurado corretamente (auto-hide, posição).
 
-Nunca será porque um elemento não deve tempo de carregar ou renderizar. Então **aumentar o timeout NAO RESOLVERÁ NADA**!
-Esse sistema está rodando localmente, com um banco H2 em memória. Tudo é rápido. Se um elemento nao aparece, é por
-alguns dos motivos indicados acima.
+Nunca será porque um elemento não teve tempo de carregar ou renderizar. Então **aumentar o timeout NAO RESOLVERÁ NADA**! Esse sistema está rodando localmente, com um banco H2 em memória. Tudo é rápido. Se um elemento nao aparece, é por alguns dos motivos indicados acima.
 
-Os testes e2e estão sendo usados para confirmar a implementação das funcionalidades do sistema. Portanto, se um teste
-falhar, isso será um sinal de que devemos investigar as causas indicadas acima -- e corrigir o problema usando com base
-a saída dos testes.
+Os testes e2e estão sendo usados para confirmar a implementação das funcionalidades do sistema. Portanto, se um teste falhar, isso será um sinal de que devemos investigar as causas indicadas acima -- e corrigir o problema usando com base a saída dos testes.
 
-Ao rodar os testes e2e, tanto o frontend como o backend serão construídos e executados, e os logs de ambos serão
-mostrados durante os testes. Então nao se preocupe em rodar o backend ou frontend separadamente.
+Ao rodar os testes e2e, tanto o frontend como o backend serão construídos e executados, e os logs de ambos serão mostrados durante os testes. Então nao se preocupe em rodar o backend ou frontend separadamente.
 
-Os testes que falharem geram arquivos `error-context.md`, com a situacao da tela no momento da falha -- nao deixe de ler
-esses arquivos.
+Os testes que falharem geram arquivos `error-context.md`, com a situacao da tela no momento da falha -- nao deixe de ler esses arquivos.
 
 ## Regras para execução de testes E2E
 
-- **NUNCA rode apenas um cenário isolado**: Muitos testes usam `test.describe.serial()`, o que significa que os cenários
-  dependem da execução sequencial dos anteriores. Rodar um cenário isolado causará falhas.
-- **Sempre redirecione a saída para um arquivo**: Use `> resultado.txt 2>&1` ao rodar testes E2E para capturar toda a
-  saída (stdout e stderr) em um arquivo de texto.
-- **Use grep para analisar resultados**: Após redirecionar para arquivo, use `grep` para filtrar e analisar partes
-  específicas da saída, como erros, logs do backend, ou mensagens específicas.
+- **NUNCA rode apenas um cenário isolado**: Muitos testes usam `test.describe.serial()`, o que significa que os cenários dependem da execução sequencial dos anteriores. Rodar um cenário isolado causará falhas.
+- **Sempre redirecione a saída para um arquivo**: Use `> resultado.txt 2>&1` ao rodar testes E2E para capturar toda a saída (stdout e stderr) em um arquivo de texto.
+- **Use grep para analisar resultados**: Após redirecionar para arquivo, use `grep` para filtrar e analisar partes específicas da saída, como erros, logs do backend, ou mensagens específicas.
 
 ## Helpers Disponíveis
 
@@ -36,12 +28,12 @@ Os helpers estão organizados em arquivos especializados no diretório `e2e/help
 
 | Arquivo                 | Responsabilidade                                                                                                     |
 |-------------------------|----------------------------------------------------------------------------------------------------------------------|
-| `helpers-auth.ts`       | Login, logout, credenciais de usuários (`USUARIOS`)                                                                  |
-| `helpers-navegacao.ts`  | Funções de navegação e verificação de páginas (`fazerLogout`, `verificarPaginaPainel`, `verificarPaginaSubprocesso`) |
-| `helpers-processos.ts`  | Criar e verificar processos (`criarProcesso`, `calcularDataLimite`)                                                  |
-| `helpers-atividades.ts` | Adicionar/editar atividades e conhecimentos                                                                          |
-| `helpers-mapas.ts`      | Criar competências e disponibilizar mapas                                                                            |
-| `helpers-analise.ts`    | Funções de análise de cadastro (aceite, devolução, homologação)                                                      |
+| `helpers-auth.ts`       | Login e credenciais (`login`, `loginComPerfil`, `autenticar`, `USUARIOS`)                                            |
+| `helpers-navegacao.ts`  | Navegação entre páginas (`fazerLogout`, `limparNotificacoes`, `verificarPaginaPainel`, `navegarParaSubprocesso`)      |
+| `helpers-processos.ts`  | Criar e verificar processos (`criarProcesso`, `extrairProcessoId`, `verificarProcessoNaTabela`, `verificarDetalhesProcesso`, `verificarDetalhesSubprocesso`) |
+| `helpers-atividades.ts` | Atividades, conhecimentos e impactos (`adicionarAtividade`, `adicionarConhecimento`, `editarAtividade`, `removerAtividade`, `disponibilizarCadastro`, `abrirModalImpactoEdicao`, `abrirModalImpactoVisualizacao`, `verificarBotaoImpactoAusenteEdicao`, `verificarBotaoImpactoAusenteDireto`) |
+| `helpers-mapas.ts`      | Competências e mapas (`navegarParaMapa`, `criarCompetencia`, `editarCompetencia`, `excluirCompetenciaConfirmando`, `disponibilizarMapa`) |
+| `helpers-analise.ts`    | Análise de cadastro — navegação (`acessarSubprocessoGestor`, `acessarSubprocessoChefeDireto`, `acessarSubprocessoAdmin`), aceite (`aceitarCadastroMapeamento`, `aceitarRevisao`), devolução (`devolverCadastroMapeamento`, `devolverRevisao`, `cancelarDevolucao`), homologação (`homologarCadastroMapeamento`, `homologarCadastroRevisaoComImpacto`, `cancelarHomologacao`), histórico (`abrirHistoricoAnalise`, `abrirHistoricoAnaliseVisualizacao`, `fecharHistoricoAnalise`) |
 
 **IMPORTANTE**: Sempre use os helpers centralizados ao invés de definir funções locais nos arquivos de teste.
 
@@ -52,3 +44,49 @@ Os helpers estão organizados em arquivos especializados no diretório `e2e/help
 - ✅ USE `waitFor()` para elementos do DOM
 - ✅ USE `expect().toHaveURL()` para verificar navegação
 - ❌ NUNCA use `waitForTimeout()` em testes funcionais (permitido apenas em `captura-telas.spec.ts` para animações)
+
+## Princípios para Helpers
+
+Helpers devem ser **lineares e assertivos**. Se algo inesperado acontece, o teste deve falhar imediatamente.
+
+- ❌ NUNCA use `.catch(() => false)` ou `try/catch` para engolir erros silenciosamente — isso esconde bugs. Exceção: `.catch(() => {})` no click de toasts que podem auto-fechar entre `isVisible` e `click` é aceitável, pois o toast desaparecer é o resultado desejado.
+- ❌ NUNCA use fallbacks com múltiplas estratégias (ex: "se não encontrar X, tenta Y, depois Z") — isso torna os testes não-determinísticos.
+- ❌ NUNCA use `if (await element.isVisible())` para decidir qual caminho seguir **quando o teste deveria saber qual caminho está testando**. Exceção: quando a UI legítimamente mostra variantes (ex: botão empty-state vs botão normal em `abrirModalCriarCompetencia`, ou card de edição vs visualização em `navegarParaMapa`), usar `.or()` ou `isVisible()` é aceitável.
+- ✅ Use funções separadas para contextos diferentes (ex: `abrirModalImpactoEdicao` vs `abrirModalImpactoVisualizacao`).
+- ✅ Se um parâmetro é necessário para navegação determinística, torne-o obrigatório (ex: `siglaUnidade`).
+
+## Debugging de Testes E2E
+
+### Investigar a causa raiz primeiro
+
+Quando um teste falha por um elemento estar "obstruído" ou "não encontrado", **investigue por que** antes de adicionar workarounds. Exemplos:
+
+- Se um toast está bloqueando um botão, verifique se o toast está configurado corretamente (auto-hide, posição). O problema pode ser no frontend, não no teste.
+- Se um modal ainda está aberto, verifique se a ação anterior realmente completou. O problema pode ser que o teste não esperou a ação terminar.
+
+### Ler os logs do Playwright com atenção
+
+O Playwright fornece logs detalhados no "Call log" de cada erro. Eles mostram:
+
+- O **elemento exato** que está interceptando (`<button class="btn-close">` from `<div class="orchestrator-container">`)
+- Os **atributos do elemento** (ex: `value="3000"` revelou que o prop name estava errado)
+- O **número de retries** e o motivo de cada falha
+
+Leia esses logs **antes** de tentar corrigir. A resposta geralmente está lá.
+
+### Ler os `error-context.md` gerados
+
+Testes que falham geram um snapshot do DOM em `error-context.md`. Esse snapshot mostra a **estrutura real** do DOM no momento da falha — use-o para verificar se seus seletores CSS estão corretos.
+
+### `force: true` vs `dispatchEvent`
+
+- `click({force: true})` — Pula as verificações de "actionability" (visibilidade, sobreposição) mas ainda dispara o evento nas coordenadas do elemento. **Não garante** que o handler do Vue será acionado se o elemento clicado (ex: `<li>`) não é o mesmo que recebe o evento (ex: `<a>` dentro do `<li>`).
+- `dispatchEvent('click')` — Dispara o evento DOM diretamente no elemento, ignorando completamente sobreposições visuais. **Garante** que o handler será acionado. Usar para casos como o `fazerLogout`, onde um toast pode sobrepor o botão.
+
+### Rodar os testes localmente
+
+Não tente adivinhar o problema — rode o teste e leia a saída:
+
+```bash
+npx playwright test e2e/cdu-XX.spec.ts > resultado.txt 2>&1
+```

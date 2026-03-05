@@ -54,7 +54,7 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
 
         // 2. Chefe (SECAO_212) disponibiliza cadastro
         await login(page, USUARIOS.CHEFE_SECAO_212.titulo, USUARIOS.CHEFE_SECAO_212.senha);
-        await acessarSubprocessoChefeDireto(page, descMapeamento);
+        await acessarSubprocessoChefeDireto(page, descMapeamento, UNIDADE_ALVO);
         await navegarParaAtividades(page);
         await adicionarAtividade(page, `Ativ Map ${timestamp}`);
         await adicionarConhecimento(page, `Ativ Map ${timestamp}`, 'Conhecimento Unico Map');
@@ -84,7 +84,7 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
 
         // 5. Chefe valida mapa
         await login(page, USUARIOS.CHEFE_SECAO_212.titulo, USUARIOS.CHEFE_SECAO_212.senha);
-        await acessarSubprocessoChefeDireto(page, descMapeamento);
+        await acessarSubprocessoChefeDireto(page, descMapeamento, UNIDADE_ALVO);
         await navegarParaMapa(page);
         await page.getByTestId('btn-mapa-validar').click();
         await page.getByTestId('btn-validar-mapa-confirmar').click();
@@ -141,7 +141,7 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
     });
 
     test('Preparacao 2: Chefe disponibiliza revisão de cadastro', async ({page, autenticadoComoChefeSecao212}) => {
-        await acessarSubprocessoChefeDireto(page, descRevisao);
+        await acessarSubprocessoChefeDireto(page, descRevisao, UNIDADE_ALVO);
         await navegarParaAtividades(page);
 
         await adicionarAtividade(page, `Atividade Rev ${timestamp}`);

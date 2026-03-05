@@ -41,8 +41,8 @@ export const useFeedbackStore = defineStore('feedback', () => {
                     title,
                     body: message,
                     variant,
-                    value: autoHideDelay,
-                    pos: 'bottom-right',
+                    modelValue: autoHideDelay,
+                    pos: 'bottom-end',
                     noProgress: true
                 }
             });

@@ -212,7 +212,7 @@ public class MapaManutencaoService {
 
     @Transactional
     public void criarCompetenciaComAtividades(Mapa mapa, String descricao, List<Long> codigosAtividades) {
-        log.info("Criando competência {} ({} ativ.)", descricao, codigosAtividades.size());
+        log.info("Criando competência {}", descricao);
         Competencia competencia = Competencia.builder()
                 .descricao(descricao)
                 .mapa(mapa)

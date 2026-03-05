@@ -15,113 +15,64 @@ import {limparNotificacoes, verificarPaginaPainel} from './helpers-navegacao.js'
  */
 export async function acessarSubprocessoGestor(page: Page, descricaoProcesso: string, siglaUnidade: string) {
     await expect(page).toHaveURL(/\/painel$/);
+
     const row = page.getByTestId('tbl-processos').locator('tr', {hasText: descricaoProcesso});
     await expect(row).toBeVisible();
     await row.click();
 
     await expect(page).toHaveURL(/\/processo\/\d+/);
 
-    if (siglaUnidade) {
-        const match = /\/processo\/(\d+)/.exec(page.url());
-        if (match) {
-            const processoId = match[1];
-            const targetUrl = `/processo/${processoId}/${siglaUnidade}`;
-            if (!page.url().endsWith(`/${siglaUnidade}`)) {
-                await page.goto(targetUrl);
-            }
-            await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${siglaUnidade}$`));
-            return;
-        }
+    const match = /\/processo\/(\d+)/.exec(page.url());
+    expect(match).not.toBeNull();
+    const processoId = match![1];
+
+    if (!page.url().endsWith(`/${siglaUnidade}`)) {
+        await page.goto(`/processo/${processoId}/${siglaUnidade}`);
     }
 
-    // Fallback original para casos sem sigla ou falha na extração
-    const headingUnidades = page.getByRole('heading', {name: /Unidades participantes/i});
-    if (await headingUnidades.isVisible().catch(() => false)) {
-        const tabela = page.getByTestId('tbl-tree');
-        const celulaUnidade = tabela.getByRole('cell', {name: new RegExp(String.raw`^\s*${siglaUnidade}\b`, 'i')}).first();
-        await expect(celulaUnidade).toBeVisible();
-        await celulaUnidade.click();
-        await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${siglaUnidade}$`));
-        return;
-    } else if (/\/processo\/\d+$/.test(page.url())) {
-        const primeiraLinha = page.locator('tbody tr').first();
-        if (await primeiraLinha.isVisible().catch(() => false)) {
-            await primeiraLinha.click();
-        }
-    }
-
-    await expect(page).toHaveURL(/\/processo\/\d+(?:\/\w+)?$/);
+    await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${siglaUnidade}$`));
 }
 
 /**
  * Acessa subprocesso como CHEFE (vai direto ao subprocesso)
  */
-export async function acessarSubprocessoChefeDireto(page: Page, descricaoProcesso: string, siglaUnidade: string = '') {
-    // Garantir que estamos no painel e que carregou
+export async function acessarSubprocessoChefeDireto(page: Page, descricaoProcesso: string, siglaUnidade: string) {
     await expect(page).toHaveURL(/\/painel$/);
 
-    // Aguardar o processo aparecer na tabela antes de clicar
     const linhaProcesso = page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descricaoProcesso)});
     await expect(linhaProcesso).toBeVisible();
-
-    // Clicar na linha da tabela que contém o processo
     await linhaProcesso.click();
 
-    // Aguardar navegação para uma página de processo
     await expect(page).toHaveURL(/\/processo\/\d+/);
 
-    // Navegação robusta: extrair ID e navegar explicitamente se necessário
-    if (siglaUnidade) {
-        const match = /\/processo\/(\d+)/.exec(page.url());
-        if (match) {
-            const processoId = match[1];
-            const targetUrl = `/processo/${processoId}/${siglaUnidade}`;
-            // Se ainda não estiver na URL correta, forçar navegação
-            if (!page.url().endsWith(`/${siglaUnidade}`)) {
-                await page.goto(targetUrl);
-            }
-            await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${siglaUnidade}$`));
-        }
-    } else if (/\/processo\/\d+$/.test(page.url())) {
-        const linhaUnidade = page.locator('tbody tr').first();
-        if (await linhaUnidade.isVisible().catch(() => false)) {
-            await linhaUnidade.click();
-        }
-        await expect(page).toHaveURL(/\/processo\/\d+(?:\/\w+)?$/);
+    const match = /\/processo\/(\d+)/.exec(page.url());
+    expect(match).not.toBeNull();
+    const processoId = match![1];
+
+    if (!page.url().endsWith(`/${siglaUnidade}`)) {
+        await page.goto(`/processo/${processoId}/${siglaUnidade}`);
     }
+
+    await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${siglaUnidade}$`));
 }
 
 /**
  * Acessa subprocesso como ADMIN (via lista de unidades)
  */
 export async function acessarSubprocessoAdmin(page: Page, descricaoProcesso: string, siglaUnidade: string) {
-    if (!await page.getByText(descricaoProcesso).first().isVisible().catch(() => false)) {
-        await page.goto('/painel');
-    }
+    await expect(page).toHaveURL(/\/painel$/);
+
     await expect(page.getByTestId('tbl-processos').getByText(descricaoProcesso).first()).toBeVisible();
     await page.getByTestId('tbl-processos').getByText(descricaoProcesso).first().click();
 
-    const headingUnidades = page.getByRole('heading', {name: /Unidades participantes/i});
-    await expect(headingUnidades).toBeVisible();
+    await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
 
-    // Navegação robusta: extrair ID e navegar explicitamente
-    if (siglaUnidade) {
-        const match = /\/processo\/(\d+)/.exec(page.url());
-        if (match) {
-            const processoId = match[1];
-            const targetUrl = `/processo/${processoId}/${siglaUnidade}`;
-            await page.goto(targetUrl);
-            await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${siglaUnidade}$`));
-        } else {
-            // Fallback se não conseguir extrair ID (improvável)
-            const row = page.locator('tr').filter({hasText: new RegExp(String.raw`^\s*${siglaUnidade}(?:\s+-\s+|\b)`, 'i')}).first();
-            await expect(row).toBeVisible();
-            await row.click({force: true});
-            await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${siglaUnidade}$`));
-        }
-    } else {
-        await expect(page).toHaveURL(/\/processo\/\d+(?:\/\w+)?$/);
-    }
+    const match = /\/processo\/(\d+)/.exec(page.url());
+    expect(match).not.toBeNull();
+    const processoId = match![1];
+
+    await page.goto(`/processo/${processoId}/${siglaUnidade}`);
+    await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${siglaUnidade}$`));
 }
 
 // Funções de Histórico de Análise

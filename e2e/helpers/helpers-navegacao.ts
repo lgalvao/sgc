@@ -12,23 +12,13 @@ import {expect, type Page} from '@playwright/test';
  * Fecha cada toast visível clicando no seu botão "X".
  */
 export async function limparNotificacoes(page: Page): Promise<void> {
-    // Localizadores para os botões de fechar dos toasts (incluindo BOrchestrator do bootstrap-vue-next)
-    const locButtons = [
-        page.locator('.toast .btn-close'),
-        page.locator('.orchestrator-container .btn-close'),
-        page.locator('button[aria-label="Close"]')
-    ];
-
-    for (const locator of locButtons) {
-        try {
-            const buttons = await locator.all();
-            for (const btn of buttons) {
-                if (await btn.isVisible()) {
-                    await btn.click().catch(() => {});
-                }
-            }
-        } catch (e) {
-            // Ignora erros de seleção
+    // BOrchestrator renderiza toasts como role="alert" dentro de .orchestrator-container
+    const closeButtons = page.locator('.toast .btn-close, .orchestrator-container .btn-close, [role="alert"] .btn-close');
+    const count = await closeButtons.count();
+    for (let i = 0; i < count; i++) {
+        const btn = closeButtons.nth(i);
+        if (await btn.isVisible()) {
+            await btn.click().catch(() => {}); // Toast pode auto-fechar entre isVisible e click
         }
     }
 }
@@ -37,7 +27,9 @@ export async function limparNotificacoes(page: Page): Promise<void> {
  * Faz logout do sistema clicando no link "Sair".
  */
 export async function fazerLogout(page: Page): Promise<void> {
-    await page.getByTestId('btn-logout').locator('a').click();
+    await page.keyboard.press('Escape');
+    // Disparar click via JS para evitar bloqueio por toast sobreposto
+    await page.getByTestId('btn-logout').locator('a').dispatchEvent('click');
     await expect(page).toHaveURL(/\/login/);
 }
 

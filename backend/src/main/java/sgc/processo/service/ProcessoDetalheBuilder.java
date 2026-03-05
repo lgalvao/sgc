@@ -37,9 +37,8 @@ public class ProcessoDetalheBuilder {
                 .podeAceitarCadastroBloco(permissionEvaluator.checkPermission(usuario, processo, "ACEITAR_CADASTRO_EM_BLOCO"))
                 .podeDisponibilizarMapaBloco(permissionEvaluator.checkPermission(usuario, processo, "DISPONIBILIZAR_MAPA_EM_BLOCO")
                         && subprocessoRepo.countByProcessoCodigoAndSituacaoIn(processo.getCodigo(), List.of(
-                        SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO,
-                        SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO,
-                        SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO
+                        SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO,
+                        SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO
                 )) > 0)
                 .unidades(new ArrayList<>())
                 .build();

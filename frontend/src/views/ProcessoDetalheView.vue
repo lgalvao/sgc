@@ -182,8 +182,7 @@ const unidadesElegiveisPorAcao = computed(() => {
     ),
     disponibilizar: unidades.filter(u =>
         u.situacaoSubprocesso === SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO ||
-        u.situacaoSubprocesso === SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO ||
-        u.situacaoSubprocesso === SituacaoSubprocesso.NAO_INICIADO
+        u.situacaoSubprocesso === SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO
     )
   };
 });

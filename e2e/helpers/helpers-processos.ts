@@ -38,16 +38,9 @@ export async function criarProcesso(page: Page, options: {
     for (const u of unidades) {
         const checkbox = page.getByTestId(`chk-arvore-unidade-${u}`);
         await expect(checkbox).toBeVisible();
-        if (!await checkbox.isEnabled()) {
-            await expect(checkbox).toBeEnabled().catch(() => {
-                // segue para validar estado final após a janela de espera
-            });
-        }
+        await expect(checkbox).toBeEnabled();
         // Só marca se não estiver marcado (pode já estar marcado se o pai foi selecionado)
         if (!await checkbox.isChecked()) {
-            if (!await checkbox.isEnabled()) {
-                throw new Error(`Unidade ${u} não está selecionável para criação do processo.`);
-            }
             await checkbox.check();
         }
     }

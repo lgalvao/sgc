@@ -67,7 +67,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
                                                                                         page,
                                                                                         autenticadoComoChefeSecao211
                                                                                     }) => {
-        await acessarSubprocessoChefeDireto(page, descProcessoMapeamento);
+        await acessarSubprocessoChefeDireto(page, descProcessoMapeamento, UNIDADE_ALVO);
         await navegarParaAtividades(page);
 
         await adicionarAtividade(page, atividadeBase1);
@@ -87,7 +87,6 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
     });
 
     test('Preparacao 3: Gestores aceitam cadastro', async ({page, autenticadoComoGestorCoord21}) => {
-        console.log('-> Gestores (COORD e SEC) aceitando cadastro...');
         await acessarSubprocessoGestor(page, descProcessoMapeamento, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
         await aceitarCadastroMapeamento(page);
@@ -121,7 +120,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
     });
 
     test('Preparacao 5: Chefe valida mapa', async ({page, autenticadoComoChefeSecao211}) => {
-        await acessarSubprocessoChefeDireto(page, descProcessoMapeamento);
+        await acessarSubprocessoChefeDireto(page, descProcessoMapeamento, UNIDADE_ALVO);
         await navegarParaMapa(page);
 
         await page.getByTestId('btn-mapa-validar').click();
@@ -185,7 +184,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
     });
 
     test('Preparacao 8: Chefe revisa atividades com alterações', async ({page, autenticadoComoChefeSecao211}) => {
-        await acessarSubprocessoChefeDireto(page, descProcessoRevisao);
+        await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
         await navegarParaAtividades(page);
 
         await expect(page.getByText(atividadeBase1)).toBeVisible();

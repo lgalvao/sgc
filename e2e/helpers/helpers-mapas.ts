@@ -2,37 +2,13 @@ import {expect, type Page} from '@playwright/test';
 import {calcularDataLimite} from './helpers-processos.js';
 import {limparNotificacoes} from './helpers-navegacao.js';
 
-async function garantirContextoSubprocesso(page: Page) {
-    const cardMapa = page.getByTestId('card-subprocesso-mapa-edicao').or(page.getByTestId('card-subprocesso-mapa-visualizacao'));
-    if (await cardMapa.first().isVisible()) {
-        return;
-    }
-
-    if (/\/processo\/\d+$/.test(page.url())) {
-        const linhaUnidade = page.getByRole('row')
-            .filter({has: page.getByRole('cell')})
-            .first();
-        if (await linhaUnidade.isVisible().catch(() => false)) {
-            await linhaUnidade.click();
-        }
-    }
-}
-
 export async function navegarParaMapa(page: Page) {
-    if (/\/vis-mapa$/.test(page.url())) {
-        await expect(page.getByRole('heading', {name: /Mapa de competências/i})).toBeVisible();
-        return;
-    }
-
-    await garantirContextoSubprocesso(page);
     const cardEdicao = page.getByTestId('card-subprocesso-mapa-edicao');
     const cardVisualizacao = page.getByTestId('card-subprocesso-mapa-visualizacao');
 
     await expect(cardEdicao.or(cardVisualizacao)).toBeVisible();
 
     const cardAlvo = (await cardEdicao.isVisible()) ? cardEdicao : cardVisualizacao;
-
-    await expect(cardAlvo).toBeVisible();
     await cardAlvo.click();
     await expect(page.getByRole('heading', {name: /Mapa de competências/i})).toBeVisible();
 }

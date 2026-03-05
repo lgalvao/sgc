@@ -5,8 +5,7 @@
 ## Pré-condições
 
 - Usuário logado com perfil ADMIN.
-- Processo de mapeamento com ao menos uma unidade com subprocesso na situação 'Mapa criado' ou processo de revisão com
-  ao menos uma unidade com subprocesso na situação 'Mapa ajustado'.
+- Processo de mapeamento com ao menos uma unidade com subprocesso na situação 'Mapa criado' ou processo de revisão com ao menos uma unidade com subprocesso na situação 'Mapa ajustado'.
 
 ## Fluxo principal
 

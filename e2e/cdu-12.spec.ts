@@ -2,7 +2,8 @@ import {expect, test} from './fixtures/complete-fixtures.js';
 import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
 import {criarProcesso, extrairProcessoId} from './helpers/helpers-processos.js';
 import {
-    abrirModalImpacto,
+    abrirModalImpactoEdicao,
+    abrirModalImpactoVisualizacao,
     adicionarAtividade,
     adicionarConhecimento,
     editarAtividade,
@@ -181,7 +182,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await adicionarConhecimento(page, novaAtividade, novoConhecimento);
 
         await verificarBotaoImpactoDropdown(page);
-        await abrirModalImpacto(page);
+        await abrirModalImpactoEdicao(page);
         await expect(page.locator('.modal-content').getByText(novaAtividade)).toBeVisible();
         await expect(page.locator('.modal-content').getByText(novoConhecimento)).toBeVisible();
         await fecharModalImpacto(page);
@@ -190,13 +191,13 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         const descNova = `Atividade Base 2 Editada ${timestamp}`;
         await editarAtividade(page, `Atividade Base 2 ${timestamp}`, descNova);
         await adicionarConhecimento(page, `Atividade Base 1 ${timestamp}`, `Conhecimento Extra ${timestamp}`);
-        await abrirModalImpacto(page);
+        await abrirModalImpactoEdicao(page);
         await expect(page.locator('.modal-content').getByText(`Competência 2 ${timestamp}`)).toBeVisible();
         await expect(page.locator('.modal-content').getByText(`Competência 1 ${timestamp}`)).toBeVisible();
         await fecharModalImpacto(page);
 
         await removerAtividade(page, `Atividade Base 3 ${timestamp}`);
-        await abrirModalImpacto(page);
+        await abrirModalImpactoEdicao(page);
         await expect(page.locator('.modal-content').getByText(`Competência 3 ${timestamp}`)).toBeVisible();
         await fecharModalImpacto(page);
 
@@ -215,7 +216,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await acessarSubprocessoGestor(page, descProcessoRevisao, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
         await verificarBotaoImpactoDireto(page);
-        await abrirModalImpacto(page);
+        await abrirModalImpactoVisualizacao(page);
         await expect(page.locator('.modal-content').getByText('Competências impactadas')).toBeVisible();
         await fecharModalImpacto(page);
         await aceitarRevisao(page, 'Aceite revisão COORD_21');
@@ -232,7 +233,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descProcessoRevisao)}).click();
         await navegarParaSubprocesso(page, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
-        await abrirModalImpacto(page);
+        await abrirModalImpactoVisualizacao(page);
         await expect(page.locator('.modal-content').getByText('Competências impactadas')).toBeVisible();
         await fecharModalImpacto(page);
 

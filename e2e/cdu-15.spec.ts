@@ -57,7 +57,7 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
 
         // 2. Chefe adiciona atividades e conhecimentos
         await login(page, USUARIOS.CHEFE_SECAO_211.titulo, USUARIOS.CHEFE_SECAO_211.senha);
-        await acessarSubprocessoChefeDireto(page, descProcesso);
+        await acessarSubprocessoChefeDireto(page, descProcesso, UNIDADE_ALVO);
         await navegarParaAtividades(page);
         await adicionarAtividade(page, ATIVIDADE_1);
         await adicionarConhecimento(page, ATIVIDADE_1, CONHECIMENTO_1);

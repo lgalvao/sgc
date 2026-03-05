@@ -67,15 +67,14 @@ public class SubprocessoTransicaoService {
         return subprocessoRepo.findByIdWithMapaAndAtividades(codigo).orElseThrow();
     }
 
+    // TODO varias verificacoes de nulos que deveriam ser impossiveis aqui!
     private Unidade obterUnidadeLocalizacao(Subprocesso sp) {
         if (sp.getLocalizacaoAtual() != null) return sp.getLocalizacaoAtual();
-        if (sp.getCodigo() == null) {
-            return sp.getUnidade();
-        }
+        if (sp.getCodigo() == null) return sp.getUnidade();
+        
         List<Movimentacao> movs = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo());
-        if (movs.isEmpty()) {
-            return sp.getUnidade();
-        }
+        if (movs.isEmpty()) return sp.getUnidade();
+
         Unidade destino = movs.getFirst().getUnidadeDestino();
         return (destino != null) ? destino : sp.getUnidade();
     }
@@ -206,7 +205,7 @@ public class SubprocessoTransicaoService {
     }
 
     private void executarDisponibilizacaoMapa(Long codSubprocesso, DisponibilizarMapaRequest request, Usuario usuario) {
-        log.info("Disponibilizando mapa do subprocesso {} (Data limite Etapa 2: {})", codSubprocesso, request.dataLimite());
+        log.info("Disponibilizando mapa do subprocesso {}", codSubprocesso);
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
         validacaoService.validarSituacaoPermitida(sp,
                 MAPEAMENTO_CADASTRO_HOMOLOGADO, MAPEAMENTO_MAPA_CRIADO, MAPEAMENTO_MAPA_COM_SUGESTOES,
@@ -314,7 +313,8 @@ public class SubprocessoTransicaoService {
 
     @Transactional
     public void devolverValidacao(Long codSubprocesso, @Nullable String justificativa, Usuario usuario) {
-        log.info("Devolvendo validação do mapa do subprocesso {}. Justificativa: {}", codSubprocesso, justificativa);
+        log.info("Devolvendo validação do mapa do subprocesso {}", codSubprocesso);
+
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
         validacaoService.validarSituacaoPermitida(sp,
                 MAPEAMENTO_MAPA_COM_SUGESTOES,
@@ -443,7 +443,7 @@ public class SubprocessoTransicaoService {
     }
 
     private void executarDevolucao(Long codSubprocesso, Usuario usuario, @Nullable String observacoes, boolean isRevisao) {
-        log.info("Devolvendo {} do subprocesso {}. Observações: {}", isRevisao ? ETAPA_REVISAO : ETAPA_CADASTRO, codSubprocesso, observacoes);
+        log.info("Devolvendo {} do subprocesso {}", isRevisao ? ETAPA_REVISAO : ETAPA_CADASTRO, codSubprocesso);
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
         SituacaoSubprocesso situacaoAtual = isRevisao ? REVISAO_CADASTRO_DISPONIBILIZADA : MAPEAMENTO_CADASTRO_DISPONIBILIZADO;
         validacaoService.validarSituacaoPermitida(sp, situacaoAtual);
@@ -495,7 +495,7 @@ public class SubprocessoTransicaoService {
     }
 
     private void executarAceite(Long codSubprocesso, Usuario usuario, @Nullable String observacoes, boolean isRevisao) {
-        log.info("Aceitando {} do subprocesso {}. Observações: {}", isRevisao ? ETAPA_REVISAO : ETAPA_CADASTRO, codSubprocesso, observacoes);
+        log.info("Aceitando {} do subprocesso {}", isRevisao ? ETAPA_REVISAO : ETAPA_CADASTRO, codSubprocesso);
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
         SituacaoSubprocesso situacaoAtual = isRevisao ? REVISAO_CADASTRO_DISPONIBILIZADA : MAPEAMENTO_CADASTRO_DISPONIBILIZADO;
         validacaoService.validarSituacaoPermitida(sp, situacaoAtual);
@@ -537,7 +537,7 @@ public class SubprocessoTransicaoService {
     }
 
     private void executarHomologacao(Long codSubprocesso, Usuario usuario, @Nullable String observacoes, boolean isRevisao) {
-        log.info("Homologando {} do subprocesso {}. Observações: {}", isRevisao ? ETAPA_REVISAO : ETAPA_CADASTRO, codSubprocesso, observacoes);
+        log.info("Homologando {} do subprocesso {}", isRevisao ? ETAPA_REVISAO : ETAPA_CADASTRO, codSubprocesso);
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
         SituacaoSubprocesso situacaoAtual = isRevisao ? REVISAO_CADASTRO_DISPONIBILIZADA : MAPEAMENTO_CADASTRO_DISPONIBILIZADO;
         validacaoService.validarSituacaoPermitida(sp, situacaoAtual);

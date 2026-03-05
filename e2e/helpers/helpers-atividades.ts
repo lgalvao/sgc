@@ -1,27 +1,10 @@
 import {expect, type Page} from '@playwright/test';
 import {limparNotificacoes} from './helpers-navegacao.js';
 
-async function garantirContextoSubprocesso(page: Page) {
-    const cardEdicao = page.getByTestId('card-subprocesso-atividades');
-    const cardVisualizacao = page.getByTestId('card-subprocesso-atividades-vis');
-
-    // Tenta aguardar um pouco se não estiver no contexto, para evitar avisos falsos em navegações lentas
-    try {
-        await expect(cardEdicao.or(cardVisualizacao).first()).toBeVisible({timeout: 2000});
-        return;
-    } catch {
-        // Se após 2s não estiver visível, verifica a URL
-        if (!/\/processo\/\d+\/[A-Z0-9_]+$/.test(page.url())) {
-            console.warn(`[Aviso] navegarParaAtividades chamado fora de um contexto de subprocesso: ${page.url()}`);
-        }
-    }
-}
-
 export async function navegarParaAtividades(page: Page) {
-    const testId = 'card-subprocesso-atividades';
-    await garantirContextoSubprocesso(page);
-    await expect(page.getByTestId(testId)).toBeVisible();
-    await page.getByTestId(testId).click();
+    const card = page.getByTestId('card-subprocesso-atividades');
+    await expect(card).toBeVisible();
+    await card.click();
     await page.waitForURL(/\/cadastro$/);
 
     await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos', level: 2})).toBeVisible();
@@ -29,17 +12,9 @@ export async function navegarParaAtividades(page: Page) {
 }
 
 export async function navegarParaAtividadesVisualizacao(page: Page) {
-    await garantirContextoSubprocesso(page);
-    const cardVisualizacao = page.getByTestId('card-subprocesso-atividades-vis');
-    const cardCadastro = page.getByTestId('card-subprocesso-atividades');
-    const cardGenerico = page.getByRole('button', {name: /Atividades e conhecimentos/i}).first();
-    const cardAlvo = await cardVisualizacao.isVisible().catch(() => false)
-        ? cardVisualizacao
-        : await cardCadastro.isVisible().catch(() => false)
-            ? cardCadastro
-            : cardGenerico;
-    await expect(cardAlvo).toBeVisible();
-    await cardAlvo.click();
+    const card = page.getByTestId('card-subprocesso-atividades-vis');
+    await expect(card).toBeVisible();
+    await card.click();
     await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos'})).toBeVisible();
 }
 
@@ -148,30 +123,26 @@ export async function verificarBotaoImpactoDireto(page: Page) {
     await expect(page.getByTestId('cad-atividades__btn-impactos-mapa-visualizacao')).toBeVisible();
 }
 
-export async function verificarBotaoImpactoAusente(page: Page) {
-    const btnImpactoEdicao = page.getByTestId('cad-atividades__btn-impactos-mapa-edicao');
-    const btnImpactoVis = page.getByTestId('cad-atividades__btn-impactos-mapa-visualizacao');
-    const btnImpacto = btnImpactoEdicao.or(btnImpactoVis);
-
+export async function verificarBotaoImpactoAusenteEdicao(page: Page) {
     const btnMaisAcoes = page.getByTestId('btn-mais-acoes');
-    if (await btnMaisAcoes.isVisible()) {
-        await btnMaisAcoes.click();
-        await expect(btnImpacto).toBeHidden();
-        // Clicar novamente para fechar
-        await btnMaisAcoes.click();
-    } else {
-        await expect(btnImpacto).toBeHidden();
-    }
+    await expect(btnMaisAcoes).toBeVisible();
+    await btnMaisAcoes.click();
+    await expect(page.getByTestId('cad-atividades__btn-impactos-mapa-edicao')).toBeHidden();
+    await btnMaisAcoes.click();
 }
 
-export async function abrirModalImpacto(page: Page) {
-    const btnMaisAcoes = page.getByTestId('btn-mais-acoes');
-    if (await btnMaisAcoes.isVisible()) {
-        await btnMaisAcoes.click();
-        await page.getByTestId('cad-atividades__btn-impactos-mapa-edicao').click();
-    } else {
-        await page.getByTestId('cad-atividades__btn-impactos-mapa-visualizacao').click();
-    }
+export async function verificarBotaoImpactoAusenteDireto(page: Page) {
+    await expect(page.getByTestId('cad-atividades__btn-impactos-mapa-visualizacao')).toBeHidden();
+}
+
+export async function abrirModalImpactoEdicao(page: Page) {
+    await page.getByTestId('btn-mais-acoes').click();
+    await page.getByTestId('cad-atividades__btn-impactos-mapa-edicao').click();
+    await expect(page.getByRole('dialog')).toBeVisible();
+}
+
+export async function abrirModalImpactoVisualizacao(page: Page) {
+    await page.getByTestId('cad-atividades__btn-impactos-mapa-visualizacao').click();
     await expect(page.getByRole('dialog')).toBeVisible();
 }
 
