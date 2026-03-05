@@ -60,7 +60,6 @@ vi.mock("@/services/unidadeService", () => ({
     buscarUnidadePorSigla: vi.fn(),
 }));
 
-
 vi.mock("@/components/mapa/CriarCompetenciaModal.vue", () => ({
     __esModule: true,
     default: {
@@ -167,7 +166,6 @@ const CompetenciaCardStub = {
     `,
     emits: ['editar', 'excluir', 'remover-atividade']
 };
-
 
 describe("MapaView.vue", () => {
     const mockAtividades = [

@@ -86,7 +86,6 @@ describe("ImportarAtividadesModal", () => {
         await selects[1].setValue("10");
         await flushPromises();
 
-        // Find and check the checkbox for the activity
         await (wrapper.find('input[type="checkbox"]') as any).setChecked(true);
 
         // Now, the button should be enabled
@@ -115,7 +114,6 @@ describe("ImportarAtividadesModal", () => {
         await wrapper.setProps({mostrar: false});
         await wrapper.setProps({mostrar: true});
 
-        // Check if reset
         expect((wrapper.vm as any).processoSelecionadoId).toBeNull();
     });
 

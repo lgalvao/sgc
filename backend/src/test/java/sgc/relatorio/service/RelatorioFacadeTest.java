@@ -72,7 +72,6 @@ class RelatorioFacadeTest {
         verify(document, atLeastOnce()).add(any());
     }
 
-
     @Test
     @DisplayName("Deve gerar relatório de mapas completo")
     void deveGerarRelatorioMapasCompleto() throws DocumentException {
@@ -143,7 +142,6 @@ class RelatorioFacadeTest {
         verify(document, atLeastOnce()).add(any());
     }
 
-
     @Test
     @DisplayName("Deve processar competência sem atividades")
     void deveProcessarCompetenciaSemAtividades() throws DocumentException {
@@ -201,7 +199,6 @@ class RelatorioFacadeTest {
         verify(document, atLeastOnce()).add(any());
     }
 
-
     @Test
     @DisplayName("Deve cobrir erro ao gerar PDF")
     void deveCobrirErroGerarPdf() throws DocumentException {
@@ -229,6 +226,5 @@ class RelatorioFacadeTest {
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("Erro ao gerar PDF");
     }
-
 
 }

@@ -54,9 +54,7 @@ class ProcessoWorkflowServicePbtTest {
         when(processoValidador.getMensagemErroUnidadesSemMapa(any())).thenReturn(Optional.empty());
         when(processoRepo.findUnidadeCodigosBySituacaoAndUnidadeCodigosIn(any(), any())).thenReturn(List.of());
 
-
         workflowService.iniciar(processo.getCodigo(), codsUnidadesParam, usuario);
-
 
         if (processo.getTipo() == TipoProcesso.MAPEAMENTO) {
             verify(subprocessoService, times(1)).criarParaMapeamento(eq(processo), any(), any(), eq(usuario));

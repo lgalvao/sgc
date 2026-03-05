@@ -52,7 +52,6 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
     void setup() {
         // Setup Programático - Não depende do data.sql
 
-
         // Raiz
         unidadeRaiz = UnidadeFixture.unidadePadrao();
         unidadeRaiz.setCodigo(null); // Auto-increment
@@ -72,7 +71,6 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
         unidadeFilha2.setNome("Unidade Filha 2 Teste");
         unidadeFilha2.setUnidadeSuperior(unidadeRaiz);
         unidadeFilha2 = unidadeRepo.save(unidadeFilha2);
-
 
         processoRaiz = ProcessoFixture.processoEmAndamento();
         processoRaiz.setCodigo(null);

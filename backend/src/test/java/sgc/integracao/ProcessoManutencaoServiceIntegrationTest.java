@@ -129,7 +129,6 @@ class ProcessoManutencaoServiceIntegrationTest extends BaseIntegrationTest {
         void deveLancarErroAoAtualizarProcessoEmAndamento() {
             Processo p = processoRepo.findById(50000L).orElseThrow();
 
-
             AtualizarProcessoRequest request = AtualizarProcessoRequest.builder()
                     .codigo(p.getCodigo())
                     .descricao("Atualizada")
@@ -166,7 +165,6 @@ class ProcessoManutencaoServiceIntegrationTest extends BaseIntegrationTest {
         @DisplayName("Deve lançar erro ao apagar processo fora da situação CRIADO")
         void deveLancarErroAoApagarProcessoEmAndamento() {
             Processo p = processoRepo.findById(50000L).orElseThrow();
-
 
             assertThatThrownBy(() -> service.apagar(p.getCodigo()))
                     .isInstanceOf(ErroValidacao.class);

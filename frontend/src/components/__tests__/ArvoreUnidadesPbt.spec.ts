@@ -39,7 +39,6 @@ const flatten = (nodes: Unidade[]): Unidade[] => {
 describe('ArvoreUnidades Property-Based Tests', () => {
 
     it('should satisfy Monotonicity: Selecting a parent selects all eligible children', () => {
-        // We generate a fixed structure but vary the interactions
         const tree = generateTree(3, 2, 0);
         const allNodes = flatten(tree);
 
@@ -59,9 +58,7 @@ describe('ArvoreUnidades Property-Based Tests', () => {
 
                 const targetNode = allNodes[nodeIndex];
 
-
                 vm.toggle(targetNode, true);
-
 
                 expect(vm.isChecked(targetNode.codigo)).toBe(true);
 
@@ -181,7 +178,6 @@ describe('ArvoreUnidades Property-Based Tests', () => {
 
                     selectedNodes.forEach(node => {
                         expect(node.isElegivel).toBe(true);
-                        // Implicitly checks INTERMEDIARIA is not selected because we forced isElegivel=false for them.
                         expect(node.tipo).not.toBe('INTERMEDIARIA');
                     });
                 }

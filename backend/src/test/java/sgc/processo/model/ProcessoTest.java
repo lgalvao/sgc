@@ -31,7 +31,6 @@ class ProcessoTest {
             SituacaoProcesso situacao = SituacaoProcesso.CRIADO;
             LocalDateTime dataCriacao = LocalDateTime.now();
 
-
             Processo novoProcesso = Processo.builder()
                     .descricao(descricao)
                     .tipo(tipo)
@@ -39,7 +38,6 @@ class ProcessoTest {
                     .dataCriacao(dataCriacao)
                     .build();
             novoProcesso.setCodigo(codigo);
-
 
             assertThat(novoProcesso.getCodigo()).isEqualTo(codigo);
             assertThat(novoProcesso.getDescricao()).isEqualTo(descricao);
@@ -57,14 +55,12 @@ class ProcessoTest {
             SituacaoProcesso situacao = SituacaoProcesso.CRIADO;
             LocalDateTime dataLimite = LocalDateTime.now().plusDays(30);
 
-
             Processo novoProcesso = Processo.builder()
                     .descricao(descricao)
                     .tipo(tipo)
                     .situacao(situacao)
                     .dataLimite(dataLimite)
                     .build();
-
 
             assertThat(novoProcesso.getDescricao()).isEqualTo(descricao);
             assertThat(novoProcesso.getTipo()).isEqualTo(tipo);
@@ -85,7 +81,6 @@ class ProcessoTest {
             TipoProcesso tipo = TipoProcesso.MAPEAMENTO;
             List<UnidadeProcesso> participantes = new ArrayList<>();
 
-
             Processo novoProcesso = Processo.builder()
                     .dataCriacao(dataCriacao)
                     .dataFinalizacao(dataFinalizacao)
@@ -95,7 +90,6 @@ class ProcessoTest {
                     .tipo(tipo)
                     .participantes(participantes)
                     .build();
-
 
             assertThat(novoProcesso.getDataCriacao()).isEqualTo(dataCriacao);
             assertThat(novoProcesso.getDataFinalizacao()).isEqualTo(dataFinalizacao);
@@ -117,7 +111,6 @@ class ProcessoTest {
 
             List<UnidadeProcesso> participantes = processo.getParticipantes();
 
-
             assertThat(participantes)
                     .isNotNull()
                     .isEmpty();
@@ -135,10 +128,8 @@ class ProcessoTest {
             unidade2.setCodigo(2L);
             unidade2.setNome("Unidade 2");
 
-
             processo.adicionarParticipantes(Set.of(unidade1));
             processo.adicionarParticipantes(Set.of(unidade2));
-
 
             assertThat(processo.getParticipantes()).hasSize(2);
             assertThat(processo.getParticipantes())
@@ -161,9 +152,7 @@ class ProcessoTest {
             UnidadeProcesso snapshot = UnidadeProcesso.criarSnapshot(processo, unidade);
             novosParticipantes.add(snapshot);
 
-
             processo.setParticipantes(novosParticipantes);
-
 
             assertThat(processo.getParticipantes())
                     .isEqualTo(novosParticipantes)
@@ -180,9 +169,7 @@ class ProcessoTest {
 
             LocalDateTime dataCriacao = LocalDateTime.now();
 
-
             processo.setDataCriacao(dataCriacao);
-
 
             assertThat(processo.getDataCriacao())
                     .isNotNull()
@@ -195,9 +182,7 @@ class ProcessoTest {
 
             LocalDateTime dataFinalizacao = LocalDateTime.now().plusDays(30);
 
-
             processo.setDataFinalizacao(dataFinalizacao);
-
 
             assertThat(processo.getDataFinalizacao()).isEqualTo(dataFinalizacao);
         }
@@ -208,9 +193,7 @@ class ProcessoTest {
 
             LocalDateTime dataLimite = LocalDateTime.now().plusDays(15);
 
-
             processo.setDataLimite(dataLimite);
-
 
             assertThat(processo.getDataLimite())
                     .isEqualTo(dataLimite);
@@ -226,7 +209,6 @@ class ProcessoTest {
 
             processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
 
-
             assertThat(processo.getSituacao()).isEqualTo(SituacaoProcesso.EM_ANDAMENTO);
         }
 
@@ -235,7 +217,6 @@ class ProcessoTest {
         void deveConfigurarTipoDoProcesso() {
 
             processo.setTipo(TipoProcesso.REVISAO);
-
 
             assertThat(processo.getTipo()).isEqualTo(TipoProcesso.REVISAO);
         }
@@ -270,9 +251,7 @@ class ProcessoTest {
 
             String descricao = "Mapeamento de Competências 2024";
 
-
             processo.setDescricao(descricao);
-
 
             assertThat(processo.getDescricao()).isEqualTo(descricao);
         }

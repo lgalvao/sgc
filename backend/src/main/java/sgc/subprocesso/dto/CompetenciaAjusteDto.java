@@ -18,7 +18,6 @@ public class CompetenciaAjusteDto {
     private final Long codCompetencia;
     private final String nome;
 
-
     @Builder.Default
     private final List<AtividadeAjusteDto> atividades = List.of();
 }

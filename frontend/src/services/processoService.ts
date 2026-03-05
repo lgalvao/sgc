@@ -37,7 +37,6 @@ export function mapProcessoDetalheDtoToFrontend(dto: ProcessoDetalheDto): Proces
     } as Processo;
 }
 
-
 export async function criarProcesso(
     request: CriarProcessoRequest,
 ): Promise<Processo> {

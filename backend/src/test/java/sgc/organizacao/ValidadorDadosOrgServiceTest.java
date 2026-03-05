@@ -136,7 +136,6 @@ class ValidadorDadosOrgServiceTest {
         }
     }
 
-
     @Nested
     @DisplayName("Cenários de Violação")
     class CenariosViolacao {

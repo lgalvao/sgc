@@ -137,9 +137,7 @@ class E2eControllerTest {
         assertCount("sgc.vw_unidade", 1);
         assertCount("sgc.vw_usuario", 1);
 
-
         controller.limparProcessoComDependentes(100L);
-
 
         assertCount("sgc.processo", 0);
         assertCount("sgc.subprocesso", 0);
@@ -171,13 +169,11 @@ class E2eControllerTest {
         assertCount("sgc.vw_unidade WHERE codigo=888", 1);
         assertCount("sgc.processo WHERE codigo=888", 1);
 
-
         try {
             controller.resetDatabase();
         } catch (RuntimeException e) {
             // Na implementação real do resetDatabase, ele desativa constraints.
         }
-
 
         assertCount("sgc.vw_unidade WHERE codigo=888", 0);
         assertCount("sgc.processo WHERE codigo=888", 0);
@@ -238,9 +234,7 @@ class E2eControllerTest {
         proc.setCodigo(100L);
         when(processoFacade.criar(any(CriarProcessoRequest.class))).thenReturn(proc);
 
-
         Processo result = controller.criarProcessoMapeamento(req);
-
 
         assertEquals(100L, result.getCodigo());
         verify(processoFacade).criar(any(CriarProcessoRequest.class));
@@ -262,9 +256,7 @@ class E2eControllerTest {
         when(processoFacade.criar(any(CriarProcessoRequest.class))).thenReturn(proc);
         when(processoFacade.obterEntidadePorId(100L)).thenReturn(proc);
 
-
         Processo result = controller.criarProcessoRevisao(req);
-
 
         assertEquals(100L, result.getCodigo());
         verify(processoFacade).iniciarProcesso(100L, List.of(1L));
@@ -286,9 +278,7 @@ class E2eControllerTest {
         when(processoFacade.criar(any(CriarProcessoRequest.class))).thenReturn(proc);
         when(processoFacade.obterEntidadePorId(100L)).thenReturn(proc);
 
-
         Processo result = controller.criarProcessoMapeamento(req);
-
 
         assertEquals(100L, result.getCodigo());
         verify(processoFacade).iniciarProcesso(100L, List.of(1L));
@@ -373,9 +363,7 @@ class E2eControllerTest {
                 E2eController.ProcessoFixtureRequest.class, TipoProcesso.class);
         method.setAccessible(true);
 
-
         method.invoke(controller, req, TipoProcesso.DIAGNOSTICO);
-
 
         verify(processoFacade).iniciarProcesso(100L, List.of(1L));
     }
@@ -403,9 +391,7 @@ class E2eControllerTest {
                 E2eController.ProcessoFixtureRequest.class, TipoProcesso.class);
         method.setAccessible(true);
 
-
         method.invoke(controller, req, TipoProcesso.MAPEAMENTO);
-
 
         verify(processoFacade).iniciarProcesso(eq(100L), anyList());
     }

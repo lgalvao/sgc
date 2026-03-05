@@ -115,7 +115,6 @@ describe("useAtribuicaoTemporariaStore", () => {
     });
 
     describe("getters", () => {
-        // Populating store manually for getter tests
         beforeEach(() => {
             context.store.atribuicoes = [
                 {

@@ -85,7 +85,6 @@ class CDU01IntegrationTest extends BaseIntegrationTest {
 
         entityManager.clear(); // Clear cache to ensure subsequent reads fetch fresh data including profiles
 
-        // Reload entities to ensure they are managed and up-to-date
         unidadeAdmin = unidadeRepo.findById(unidadeAdmin.getCodigo()).orElseThrow();
         unidadeGestor = unidadeRepo.findById(unidadeGestor.getCodigo()).orElseThrow();
         usuarioAdmin = usuarioRepo.findById(usuarioAdmin.getTituloEleitoral()).orElseThrow();

@@ -35,7 +35,6 @@ class SubprocessoBuscaIntegrationTest extends BaseIntegrationTest {
         unidade.setUnidadeSuperior(raiz);
         unidade = unidadeRepo.save(unidade);
 
-
         processo = Processo.builder()
                 .descricao("Processo Busca")
                 .tipo(TipoProcesso.MAPEAMENTO)
@@ -43,7 +42,6 @@ class SubprocessoBuscaIntegrationTest extends BaseIntegrationTest {
                 .dataLimite(LocalDateTime.now().plusDays(30))
                 .build();
         processoRepo.save(processo);
-
 
         subprocesso = Subprocesso.builder()
                 .unidade(unidade)

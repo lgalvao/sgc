@@ -20,9 +20,7 @@ class ConfigOpenApiCoverageTest {
 
         ConfigOpenApi configOpenApi = new ConfigOpenApi(config);
 
-
         OpenAPI result = configOpenApi.customOpenAPI();
-
 
         assertThat(result.getInfo().getTitle()).isEqualTo("SGC API");
         assertThat(result.getInfo().getDescription()).isEqualTo("Sistema de Gestão de Competências");
@@ -43,9 +41,7 @@ class ConfigOpenApiCoverageTest {
 
         ConfigOpenApi configOpenApi = new ConfigOpenApi(config);
 
-
         OpenAPI result = configOpenApi.customOpenAPI();
-
 
         assertThat(result.getInfo().getTitle()).isEqualTo("Meu Titulo");
         assertThat(result.getInfo().getDescription()).isEqualTo("Minha Descricao");

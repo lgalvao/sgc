@@ -94,7 +94,6 @@ describe('CadastroView.vue Coverage', () => {
             {codigo: 1, descricao: 'Atividade 1', conhecimentos: []}
         ]);
 
-        // Trigger onMounted manually if needed or just wait
         await flushPromises();
         (wrapper.vm as any).codSubprocesso = 123; // Force set
         await wrapper.vm.$nextTick();

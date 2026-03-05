@@ -29,7 +29,6 @@ class ProcessoDetalheBuilderCoverageTest {
     @InjectMocks
     private ProcessoDetalheBuilder builder;
 
-
     @Test
     @DisplayName("build deve mapear subprocesso e mapa quando existem")
     void deveMapearSubprocessoEMapa() {
@@ -57,15 +56,12 @@ class ProcessoDetalheBuilderCoverageTest {
 
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(codProcesso)).thenReturn(List.of(sp));
 
-
         ProcessoDetalheDto dto = builder.build(processo, new Usuario());
-
 
         assertThat(dto.getUnidades()).hasSize(1);
         ProcessoDetalheDto.UnidadeParticipanteDto result = dto.getUnidades().getFirst();
         assertThat(result.getCodSubprocesso()).isEqualTo(500L);
     }
-
 
     @Test
     @DisplayName("build deve manter unidadeDto quando sp é nulo")
@@ -86,9 +82,7 @@ class ProcessoDetalheBuilderCoverageTest {
 
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(codProcesso)).thenReturn(new ArrayList<>());
 
-
         ProcessoDetalheDto dto = builder.build(processo, new Usuario());
-
 
         assertThat(dto.getUnidades()).hasSize(1);
         assertThat(dto.getUnidades().getFirst().getSigla()).isEqualTo("TESTE");

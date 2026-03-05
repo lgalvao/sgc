@@ -94,7 +94,6 @@ describe("painelService", () => {
             });
         });
 
-
         testErrorHandling(() => service.listarAlertas("123"));
     });
 });

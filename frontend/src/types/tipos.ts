@@ -271,7 +271,6 @@ export interface UnidadeParticipante {
     filhos: UnidadeParticipante[];
 }
 
-
 export interface PermissoesSubprocesso {
     podeEditarCadastro: boolean;
     podeDisponibilizarCadastro: boolean;
@@ -317,7 +316,6 @@ export interface SubprocessoDetalhe {
     elementosProcesso: any[];
     permissoes: PermissoesSubprocesso;
 }
-
 
 export interface MapaVisualizacao {
     codigo: number;
@@ -391,7 +389,6 @@ export interface SubprocessoElegivel {
     unidadeSigla: string;
     situacao: SituacaoSubprocesso;
 }
-
 
 export interface ErroValidacao {
     tipo: string;

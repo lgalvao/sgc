@@ -211,7 +211,6 @@ describe("Processo.vue", () => {
         await nextTick();
         await flushPromises();
 
-        // Check if buttons exist directly as the container class might have changed
         const btnAceitar = wrapper.find("button.btn-success");
         expect(btnAceitar.exists()).toBe(true);
         expect(btnAceitar.text()).toContain("Aceitar em bloco");
@@ -267,7 +266,6 @@ describe("Processo.vue", () => {
         expect(modal.props("titulo")).toBe("Aceitar em Bloco");
     });
 
-
     it("deve executar ação em bloco com sucesso (Aceitar Cadastro)", async () => {
         wrapper = createWrapper();
         perfilStore = usePerfilStore();
@@ -315,7 +313,6 @@ describe("Processo.vue", () => {
         expect(processosStore.executarAcaoBloco).toHaveBeenCalledWith('aceitar', [103], undefined);
     });
 
-
     it("deve executar ação em bloco com sucesso (Homologar Cadastro)", async () => {
         wrapper = createWrapper();
         perfilStore = usePerfilStore();
@@ -353,7 +350,6 @@ describe("Processo.vue", () => {
 
         expect(processosStore.executarAcaoBloco).toHaveBeenCalledWith('homologar', [103], undefined);
     });
-
 
     it("deve executar ação em bloco com sucesso (Disponibilizar)", async () => {
         wrapper = createWrapper();
@@ -518,7 +514,6 @@ describe("Processo.vue", () => {
             }
         });
     });
-
 
     it("deve abrir modal de finalização de processo", async () => {
         wrapper = createWrapper();

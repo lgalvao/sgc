@@ -32,7 +32,6 @@ class ConhecimentoJsonViewTest {
         assertThat(json).contains("\"descricao\":\"Conhecimento Teste\"");
         assertThat(json).contains("\"atividadeCodigo\":1");
 
-
         assertThat(json).doesNotContain("\"atividade\"");
     }
 }

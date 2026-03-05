@@ -49,7 +49,6 @@ export function mapUnidadesArray(arr: any[] = []): Unidade[] {
     return arr.map(mapUnidade);
 }
 
-
 export async function buscarTodasUnidades() {
     return apiGet("/unidades");
 }

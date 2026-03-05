@@ -49,7 +49,6 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        // Ensure Admin user has profile in ADMIN (ID 1)
         jdbcTemplate.update("MERGE INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, unidade_codigo, perfil) KEY(usuario_titulo, unidade_codigo, perfil) VALUES (?, ?, ?)",
                 "111111111111", 1, "ADMIN");
 
@@ -100,7 +99,6 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
         Competencia competencia = Competencia.builder().descricao("Competencia Valida").mapa(mapa).build();
         competencia = competenciaRepo.save(competencia);
 
-        // Associar (ManyToMany manually if needed or via helper methods)
         atividade.getCompetencias().add(competencia);
         atividadeRepo.save(atividade);
 

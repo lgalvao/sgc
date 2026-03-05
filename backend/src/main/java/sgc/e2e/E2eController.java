@@ -175,7 +175,6 @@ public class E2eController {
                         + SQL_SUBPROCESSO_POR_PROCESSO,
                 codigo);
 
-
         if (!mapaIds.isEmpty()) {
             Map<String, Object> params = Map.of("ids", mapaIds);
 

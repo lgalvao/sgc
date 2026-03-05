@@ -39,7 +39,6 @@ class ProcessoNotificacaoServiceCoverageExtraTest {
         proc.setCodigo(1L);
         proc.setDescricao("Processo 1");
 
-
         Unidade u1 = new Unidade();
         u1.setCodigo(10L);
         u1.setSigla("U1");

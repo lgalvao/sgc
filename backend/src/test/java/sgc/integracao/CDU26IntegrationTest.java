@@ -125,14 +125,12 @@ class CDU26IntegrationTest extends BaseIntegrationTest {
                 .subprocessos(subprocessosSelecionados)
                 .build();
 
-
         mockMvc.perform(
                         post("/api/subprocessos/{id}/homologar-validacao-bloco", codigoContexto)
                                 .with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
-
 
         entityManager.flush();
         entityManager.clear();

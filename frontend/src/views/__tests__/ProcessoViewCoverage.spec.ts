@@ -102,7 +102,6 @@ describe("ProcessoViewCoverage.spec.ts", () => {
         }
 
         processosStore = useProcessosStore(pinia) as any;
-        // Ensure action returns promise
         (processosStore.buscarContextoCompleto as any).mockResolvedValue({});
         (processosStore.finalizarProcesso as any).mockResolvedValue({});
         (processosStore.executarAcaoBloco as any).mockResolvedValue({});
@@ -208,7 +207,6 @@ describe("ProcessoViewCoverage.spec.ts", () => {
             params: {codProcesso: "1", siglaUnidade: "U1"}
         }));
     });
-
 
     it("deve lidar com erro na ação em bloco", async () => {
         const wrapper = createWrapper({

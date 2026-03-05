@@ -75,7 +75,6 @@ class CDU34IntegrationTest extends BaseIntegrationTest {
                 .unidadeCodigo(unidade.getCodigo())
                 .build();
 
-
         mockMvc.perform(
                         post("/api/processos/{codigo}/enviar-lembrete", processo.getCodigo())
                                 .with(csrf())
@@ -83,7 +82,6 @@ class CDU34IntegrationTest extends BaseIntegrationTest {
                                 .content(objectMapper.writeValueAsString(request)))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isOk());
-
 
         entityManager.flush();
         entityManager.clear();

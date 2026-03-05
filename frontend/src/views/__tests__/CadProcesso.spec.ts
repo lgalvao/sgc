@@ -144,7 +144,6 @@ describe('ProcessoCadastroView.vue', () => {
         wrapper.vm.unidadesSelecionadas = [1];
         await nextTick();
 
-        // Still disabled because tipo is null
         expect((salvarBtn.element as HTMLButtonElement).disabled).toBe(true);
 
         // Select type
@@ -476,7 +475,6 @@ describe('ProcessoCadastroView.vue', () => {
         expect(wrapper.vm.fieldErrors.unidades).toBe('');
     });
 
-
     it('shows loading spinner when units are loading', async () => {
         const {wrapper} = createWrapper({
             unidades: {
@@ -489,7 +487,6 @@ describe('ProcessoCadastroView.vue', () => {
 
     it('shows alert with multiple errors', async () => {
         const {wrapper} = createWrapper();
-        // Trigger alert manually or via error handling
         (wrapper.vm as any).mostrarAlerta('danger', 'Titulo', 'Corpo', ['Erro 1', 'Erro 2']);
         await nextTick();
 
@@ -572,9 +569,7 @@ describe('ProcessoCadastroView.vue', () => {
 
         await wrapper.find('[data-testid="btn-processo-salvar"]').trigger('click');
 
-        // Wait for async operations and nextTick inside handleApiErrors
         await flushPromises();
-        // The focus logic is inside a nextTick, so we need to wait for it
         await nextTick();
         await nextTick();
 

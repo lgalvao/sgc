@@ -143,7 +143,6 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
         String observacoes = "Favor revisar a atividade X e Y.";
         JustificativaRequest requestBody = new JustificativaRequest(observacoes);
 
-
         mockMvc.perform(
                         post(
                                 "/api/subprocessos/{id}/devolver-cadastro",
@@ -153,7 +152,6 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(requestBody)))
                 .andExpect(status().isOk());
-
 
         entityManager.flush();
         entityManager.clear();
@@ -295,12 +293,10 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
                 .build();
         movimentacaoRepo.saveAndFlush(movRedisponibiliza);
 
-        // Ensure user is configured correctly like in other passing tests
         gestor.setPerfilAtivo(Perfil.GESTOR);
         gestor.setUnidadeAtivaCodigo(unidadeSuperior.getCodigo());
         gestor.setAuthorities(Set.of(Perfil.GESTOR.toGrantedAuthority()));
 
-        // Clear persistence context to ensure controller fetches fresh data (including new movement)
         entityManager.flush();
         entityManager.clear();
 

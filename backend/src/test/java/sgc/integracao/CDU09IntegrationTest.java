@@ -45,7 +45,6 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
         Long SP_CODIGO = 60000L;
         Subprocesso sp = subprocessoRepo.findById(SP_CODIGO).orElseThrow();
 
-
         // Simula uma análise anterior (que deve ser exibida no histórico)
         analiseRepo.saveAndFlush(Analise.builder()
                 .subprocesso(sp)
@@ -67,7 +66,6 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].observacoes", is("Favor ajustar atividades")));
 
-
         // Limpa mapa para garantir que falhe por falta de atividades
         competenciaRepo.deleteByMapa_Codigo(sp.getMapa().getCodigo());
         entityManager.flush();
@@ -76,7 +74,6 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
         mockMvc.perform(post("/api/subprocessos/{id}/cadastro/disponibilizar", SP_CODIGO).with(csrf()))
                 .andExpect(status().isUnprocessableContent())
                 .andExpect(jsonPath("$.message").value("O mapa de competências deve ter ao menos uma atividade cadastrada."));
-
 
         var spEtapa3 = subprocessoRepo.findById(SP_CODIGO).orElseThrow();
         var competencia = competenciaRepo.save(Competencia.builder().descricao("Java").mapa(spEtapa3.getMapa()).build());
@@ -96,7 +93,6 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
         mockMvc.perform(post("/api/subprocessos/{id}/cadastro/disponibilizar", SP_CODIGO).with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.mensagem", is("Cadastro de atividades disponibilizado")));
-
 
         Subprocesso atualizado = subprocessoRepo.findById(SP_CODIGO).orElseThrow();
 

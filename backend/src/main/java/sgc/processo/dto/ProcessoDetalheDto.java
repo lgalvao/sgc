@@ -34,7 +34,6 @@ public class ProcessoDetalheDto {
     private boolean podeAceitarCadastroBloco;
     private boolean podeDisponibilizarMapaBloco;
 
-
     @Getter
     @Setter
     @Builder
@@ -52,7 +51,6 @@ public class ProcessoDetalheDto {
         private LocalDateTime dataLimite;
         private Long mapaCodigo;
         private Long codSubprocesso;
-
 
         public static UnidadeParticipanteDto fromUnidade(Unidade unidade) {
             return UnidadeParticipanteDto.builder()

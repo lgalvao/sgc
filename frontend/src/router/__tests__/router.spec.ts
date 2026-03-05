@@ -22,7 +22,6 @@ vi.mock("@/views/UnidadesView.vue", () => ({default: {name: 'UnidadesView'}}));
 vi.mock("@/views/UnidadeView.vue", () => ({default: {name: 'UnidadeView'}}));
 vi.mock("@/views/AtribuicaoTemporariaView.vue", () => ({default: {name: 'AtribuicaoTemporariaView'}}));
 
-
 vi.mock('@/stores/perfil', () => ({
     usePerfilStore: vi.fn(),
 }));

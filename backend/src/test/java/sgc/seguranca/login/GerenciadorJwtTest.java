@@ -154,7 +154,6 @@ class GerenciadorJwtTest {
         // Simular NPE ao acessar o segredo durante a validação
         when(jwtProperties.secret()).thenReturn(null);
 
-
         Optional<GerenciadorJwt.JwtClaims> result = gerenciador.validarToken("any.token");
 
         assertThat(result).isEmpty();

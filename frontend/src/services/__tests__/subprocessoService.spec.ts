@@ -30,7 +30,6 @@ describe("subprocessoService", () => {
         expect(apiClient.get).toHaveBeenCalledWith("/subprocessos/1/contexto-edicao");
     });
 
-
     it("validarCadastro chama o endpoint correto", async () => {
         vi.mocked(apiClient.get).mockResolvedValue({data: {}});
         await service.validarCadastro(1);

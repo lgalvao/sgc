@@ -47,7 +47,6 @@ class CDU05IntegrationTest extends BaseIntegrationTest {
     @BeforeEach
     void setUp() {
 
-
         unidade = UnidadeFixture.unidadePadrao();
         unidade.setCodigo(null);
         unidade.setSigla("U_REV");
@@ -104,7 +103,6 @@ class CDU05IntegrationTest extends BaseIntegrationTest {
         mapaOriginal.setObservacoesDisponibilizacao("Observações Legadas");
         mapaRepo.save(mapaOriginal);
 
-
         List<Long> unidades = new ArrayList<>();
         unidades.add(unidade.getCodigo());
         CriarProcessoRequest criarRequestDTO = criarCriarProcessoReq("Processo de Revisão para Iniciar",
@@ -129,12 +127,10 @@ class CDU05IntegrationTest extends BaseIntegrationTest {
                         .content(objectMapper.writeValueAsString(iniciarReq)))
                 .andExpect(status().isOk());
 
-
         Processo processo = processoRepo.findByIdComParticipantes(processoId).orElseThrow();
         assertThat(processo.getParticipantes()).hasSize(2); // Unidade alvo + Unidade Superior
         assertThat(processo.getParticipantes().stream().map(UnidadeProcesso::getSigla).toList())
                 .containsExactlyInAnyOrder("U_REV", "U_SUP");
-
 
         List<Subprocesso> subprocessos = subprocessoRepo.findByProcessoCodigo(processoId);
         assertThat(subprocessos).hasSize(1);
@@ -153,7 +149,6 @@ class CDU05IntegrationTest extends BaseIntegrationTest {
         assertThat(competenciasCopiadas).hasSize(1);
         assertThat(competenciasCopiadas.getFirst().getDescricao())
                 .isEqualTo(competenciaOriginal.getDescricao());
-
 
         List<Movimentacao> movs = movimentacaoRepo.findBySubprocessoCodigo(subprocessoCriado.getCodigo());
         assertThat(movs).hasSize(1);
@@ -218,7 +213,6 @@ class CDU05IntegrationTest extends BaseIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(iniciarReq)))
                 .andExpect(status().isOk());
-
 
         mockMvc.perform(post(API_PROCESSOS_ID_INICIAR, processoId)
                         .with(csrf())

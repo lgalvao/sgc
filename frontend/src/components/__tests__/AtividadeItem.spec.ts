@@ -29,7 +29,6 @@ describe("AtividadeItem.vue", () => {
         BCol: {template: '<div class="col"><slot /></div>'},
     };
 
-
     it("deve entrar em modo de edição de atividade e salvar", async () => {
         const mountOptions = getCommonMountOptions({}, commonStubs);
         context.wrapper = mount(AtividadeItem, {
@@ -39,7 +38,6 @@ describe("AtividadeItem.vue", () => {
 
         await context.wrapper.find('[data-testid="btn-editar-atividade"]').trigger('click');
 
-        // Check if input appeared (meaning we are in edit mode)
         const input = context.wrapper.find('[data-testid="inp-editar-atividade"]');
         expect(input.exists()).toBe(true);
 

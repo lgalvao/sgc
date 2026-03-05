@@ -44,7 +44,6 @@ describe("ModalAcaoBloco.vue", () => {
 
     it("deve inicializar e abrir o modal", async () => {
         const wrapper = createWrapper();
-        // Wait for onMounted
         await wrapper.vm.$nextTick();
 
         (wrapper.vm as any).abrir();

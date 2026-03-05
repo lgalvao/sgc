@@ -45,10 +45,8 @@ class EmailModelosServiceTest {
             String siglaUnidade = "UT";
             String nomeProcesso = "Processo Teste";
 
-
             emailModelosService.criarEmailProcessoFinalizadoPorUnidade(
                     siglaUnidade, nomeProcesso);
-
 
             assertEquals("processo-finalizado-por-unidade", templateNameCaptor.getValue());
             Context context = contextCaptor.getValue();
@@ -65,10 +63,8 @@ class EmailModelosServiceTest {
             String nomeProcesso = "Processo Teste";
             List<String> siglas = List.of("SUB1", "SUB2");
 
-
             emailModelosService.criarEmailProcessoFinalizadoUnidadesSubordinadas(
                     siglaUnidade, nomeProcesso, siglas);
-
 
             assertEquals("processo-finalizado-unidades-subordinadas", templateNameCaptor.getValue());
             Context context = contextCaptor.getValue();

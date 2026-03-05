@@ -36,9 +36,7 @@ class AlertaFacadeCoverageTest {
 
         when(alertaService.salvar(any(Alerta.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-
         alertaFacade.criarAlertaCadastroDisponibilizado(processo, unidadeOrigem, unidadeDestino);
-
 
         ArgumentCaptor<Alerta> captor = ArgumentCaptor.forClass(Alerta.class);
         verify(alertaService).salvar(captor.capture());

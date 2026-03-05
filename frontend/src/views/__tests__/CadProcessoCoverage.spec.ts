@@ -136,7 +136,6 @@ describe('ProcessoCadastroView.vue Coverage', () => {
     it('handles error creating process during initiation flow (without existing process)', async () => {
         const {wrapper, processosStore} = createWrapper();
 
-        // Fill form using setValue to ensure reactivity triggers validation
         await wrapper.find('[data-testid="inp-processo-descricao"]').setValue('Teste Inicio');
         wrapper.vm.tipo = 'MAPEAMENTO';
         wrapper.vm.unidadesSelecionadas = [1];

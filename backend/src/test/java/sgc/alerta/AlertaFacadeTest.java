@@ -61,9 +61,7 @@ class AlertaFacadeTest {
             alertaSalvo.setCodigo(100L);
             when(alertaService.salvar(any())).thenReturn(alertaSalvo);
 
-
             Alerta resultado = service.criarAlertaAdmin(p, u, "desc");
-
 
             assertThat(resultado).isNotNull();
             verify(alertaService).salvar(any());
@@ -86,9 +84,7 @@ class AlertaFacadeTest {
 
             when(alertaService.salvar(any())).thenAnswer(i -> i.getArgument(0));
 
-
             service.criarAlertasProcessoIniciado(p, List.of(u));
-
 
             verify(alertaService).salvar(argThat(a -> "Início do processo".equals(a.getDescricao())));
         }
@@ -104,9 +100,7 @@ class AlertaFacadeTest {
 
             when(alertaService.salvar(any())).thenAnswer(i -> i.getArgument(0));
 
-
             List<Alerta> resultado = service.criarAlertasProcessoIniciado(p, List.of(u));
-
 
             assertThat(resultado).hasSize(2);
             verify(alertaService, times(2)).salvar(any());
@@ -128,9 +122,7 @@ class AlertaFacadeTest {
 
             when(alertaService.salvar(any())).thenAnswer(i -> i.getArgument(0));
 
-
             service.criarAlertaCadastroDisponibilizado(p, uOrigem, uDestino);
-
 
             verify(alertaService).salvar(any());
         }
@@ -146,9 +138,7 @@ class AlertaFacadeTest {
 
             when(alertaService.salvar(any())).thenAnswer(i -> i.getArgument(0));
 
-
             service.criarAlertaCadastroDevolvido(p, uDestino, "motivo");
-
 
             verify(alertaService).salvar(any());
         }
@@ -223,9 +213,7 @@ class AlertaFacadeTest {
             when(alertaService.porUnidadeDestino(codUnidade)).thenReturn(List.of(alerta));
             when(alertaService.alertasUsuarios(eq(usuarioTitulo), anyList())).thenReturn(List.of());
 
-
             List<Alerta> resultado = service.alertasPorUsuario(usuarioTitulo);
-
 
             assertThat(resultado).hasSize(1);
             assertThat(resultado.getFirst().getCodigo()).isEqualTo(100L);
@@ -259,9 +247,7 @@ class AlertaFacadeTest {
             when(alertaService.porUnidadeDestino(codUnidade)).thenReturn(List.of(alerta));
             when(alertaService.alertasUsuarios(eq(usuarioTitulo), anyList())).thenReturn(List.of(alertaUsuarioExistente));
 
-
             List<Alerta> resultado = service.alertasPorUsuario(usuarioTitulo);
-
 
             assertThat(resultado).hasSize(1);
             assertThat(resultado.getFirst().getDataHoraLeitura()).isNotNull();

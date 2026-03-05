@@ -98,7 +98,6 @@ public class ArchConsistencyTest {
             })
             .because("Controllers e Services devem estar em pacotes @NullMarked para garantir null-safety");
 
-
     @ArchTest
     static final ArchRule facades_should_have_facade_suffix = classes()
             .that()
@@ -168,7 +167,6 @@ public class ArchConsistencyTest {
             .should()
             .haveSimpleNameEndingWith("Repo")
             .because("Repositories should have 'Repo' suffix for consistency");
-
 
     /**
      * Verifica ausência de ciclos internos nos pacotes workflow de cada módulo.

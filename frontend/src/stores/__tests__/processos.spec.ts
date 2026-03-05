@@ -492,7 +492,6 @@ describe("useProcessosStore", () => {
             });
         });
 
-
         describe("executarAcaoBloco", () => {
             const MOCK_PROCESSO_WITH_UNITS = {
                 codigo: 1,

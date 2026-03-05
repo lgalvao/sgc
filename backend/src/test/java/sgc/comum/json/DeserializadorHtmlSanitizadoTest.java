@@ -31,9 +31,7 @@ class DeserializadorHtmlSanitizadoTest {
         String inputMalicioso = "<script>alert('XSS')</script>Texto limpo";
         when(parser.getValueAsString()).thenReturn(inputMalicioso);
 
-
         String resultado = deserializador.deserialize(parser, context);
-
 
         assertThat(resultado).doesNotContain("<script>", "alert")
                 .contains("Texto limpo");
@@ -46,9 +44,7 @@ class DeserializadorHtmlSanitizadoTest {
         String inputMalicioso = "<img src='x' onerror='alert(1)'>";
         when(parser.getValueAsString()).thenReturn(inputMalicioso);
 
-
         String resultado = deserializador.deserialize(parser, context);
-
 
         assertThat(resultado).doesNotContain("onerror", "alert");
     }
@@ -60,9 +56,7 @@ class DeserializadorHtmlSanitizadoTest {
         String textoSimples = "Este é um texto simples sem tags HTML";
         when(parser.getValueAsString()).thenReturn(textoSimples);
 
-
         String resultado = deserializador.deserialize(parser, context);
-
 
         assertThat(resultado).isEqualTo(textoSimples);
     }
@@ -75,9 +69,7 @@ class DeserializadorHtmlSanitizadoTest {
 
         when(parser.getValueAsString()).thenReturn(input);
 
-
         String resultado = deserializador.deserialize(parser, context);
-
 
         assertThat(resultado).isEqualTo(input);
     }
@@ -89,9 +81,7 @@ class DeserializadorHtmlSanitizadoTest {
         String inputMalicioso = "'; DROP TABLE users; --";
         when(parser.getValueAsString()).thenReturn(inputMalicioso);
 
-
         String resultado = deserializador.deserialize(parser, context);
-
 
         // O sanitizador HTML remove tags, mas texto plano permanece
         assertThat(resultado).isNotNull();
@@ -104,9 +94,7 @@ class DeserializadorHtmlSanitizadoTest {
         String inputMalicioso = "<a href='javascript:alert(1)'>Click me</a>";
         when(parser.getValueAsString()).thenReturn(inputMalicioso);
 
-
         String resultado = deserializador.deserialize(parser, context);
-
 
         assertThat(resultado).doesNotContain("javascript:", "alert");
     }
@@ -119,9 +107,7 @@ class DeserializadorHtmlSanitizadoTest {
         String inputMalicioso = "<iframe src='http://malicious.com'></iframe>Texto";
         when(parser.getValueAsString()).thenReturn(inputMalicioso);
 
-
         String resultado = deserializador.deserialize(parser, context);
-
 
         assertThat(resultado)
                 .doesNotContain("<iframe", "malicious.com")

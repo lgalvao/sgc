@@ -3,9 +3,6 @@
  */
 import {ProcessoResumo, SituacaoProcesso, TipoProcesso} from '@/types/tipos';
 
-/**
- * Creates a mock ProcessoResumo object with default values
- */
 export function createMockProcessoResumo(overrides: Partial<ProcessoResumo> = {}): ProcessoResumo {
     return {
         codigo: 1,

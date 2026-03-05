@@ -128,14 +128,12 @@ class CDU23IntegrationTest extends BaseIntegrationTest {
                 .subprocessos(subprocessosSelecionados)
                 .build();
 
-
         mockMvc.perform(
                         post("/api/subprocessos/{id}/homologar-cadastro-bloco", codigoContexto)
                                 .with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
-
 
         entityManager.flush();
         entityManager.clear();

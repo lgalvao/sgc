@@ -97,7 +97,6 @@ const emit = defineEmits<{
 const isEditing = ref(false);
 const editValue = ref('');
 
-
 function startEdit() {
   editValue.value = props.modelValue;
   isEditing.value = true;

@@ -92,7 +92,6 @@ class CDU04IntegrationTest extends BaseIntegrationTest {
 
         Long processoId = objectMapper.readTree(result.getResponse().getContentAsString()).get("codigo").asLong();
 
-
         IniciarProcessoRequest iniciarReq = new IniciarProcessoRequest(TipoProcesso.MAPEAMENTO,
                 List.of(unidadeLivre.getCodigo()));
 
@@ -102,10 +101,8 @@ class CDU04IntegrationTest extends BaseIntegrationTest {
                         .content(objectMapper.writeValueAsString(iniciarReq)))
                 .andExpect(status().isOk());
 
-
         Processo processo = processoRepo.findById(processoId).orElseThrow();
         assertThat(processo.getSituacao()).isEqualTo(SituacaoProcesso.EM_ANDAMENTO);
-
 
         List<Subprocesso> subprocessos = subprocessoRepo.findByProcessoCodigo(processoId);
         assertThat(subprocessos).hasSize(1);
@@ -121,10 +118,8 @@ class CDU04IntegrationTest extends BaseIntegrationTest {
         List<Competencia> competencias = competenciaRepo.findByMapa_Codigo(sub.getMapa().getCodigo());
         assertThat(competencias).isEmpty();
 
-
         long alertasCount = alertaRepo.count();
         assertThat(alertasCount).isGreaterThan(0);
-
 
         // e não podem ser verificadas diretamente via Mockito
         // O teste de envio de emails está em NotificacaoEmailServiceTest

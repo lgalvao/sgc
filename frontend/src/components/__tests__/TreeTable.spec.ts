@@ -82,7 +82,6 @@ describe("TreeTable.vue", () => {
         const trElements = wrapper.findAll("tbody tr");
         expect(trElements.length).toBeGreaterThan(0);
 
-        // Verify we can find the components
         const treeRows = wrapper.findAllComponents(TreeRowItem);
         expect(treeRows.length).toBeGreaterThan(0);
     });
@@ -124,11 +123,9 @@ describe("TreeTable.vue", () => {
         await wrapper.find("button.btn-outline-primary").trigger("click");
         await wrapper.vm.$nextTick();
 
-        // Verify that more items are now rendered (children are expanded)
         treeRows = wrapper.findAllComponents(TreeRowItem);
         expect(treeRows.length).toBeGreaterThan(initialCount);
 
-        // Verify that the item is expanded
         const expandedItem = (wrapper.vm as any).internalData[0];
         expect(expandedItem.expanded).toBe(true);
     });

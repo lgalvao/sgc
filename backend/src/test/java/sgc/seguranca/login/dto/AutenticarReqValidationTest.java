@@ -38,9 +38,7 @@ class AutenticarReqValidationTest {
                 .senha("senha123")
                 .build();
 
-
         Set<ConstraintViolation<AutenticarRequest>> violations = validator.validate(req);
-
 
         assertThat(violations).isEmpty();
     }
@@ -62,9 +60,7 @@ class AutenticarReqValidationTest {
                 .senha(senhaLonga)
                 .build();
 
-
         Set<ConstraintViolation<AutenticarRequest>> violations = validator.validate(req);
-
 
         assertThat(violations).isNotEmpty();
     }

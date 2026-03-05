@@ -67,8 +67,5 @@ describe("ArvoreUnidades.vue Coverage", () => {
         // Update modelValue with same values (different reference)
         await wrapper.setProps({modelValue: [1]});
 
-
-        // The test above hit the true case.
-        // This test hits the false case.
     });
 });
