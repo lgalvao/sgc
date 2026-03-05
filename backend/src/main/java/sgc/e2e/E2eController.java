@@ -239,8 +239,7 @@ public class E2eController {
         Long subId = jdbcTemplate.queryForObject("SELECT codigo FROM sgc.subprocesso WHERE processo_codigo = ? AND unidade_codigo = ?", Long.class, procId, unidId);
         
         // Mapa
-        jdbcTemplate.update("INSERT INTO sgc.mapa (subprocesso_codigo) VALUES (?)", subId);
-        Long mapaId = jdbcTemplate.queryForObject("SELECT currval('sgc.mapa_codigo_seq')", Long.class);
+        Long mapaId = jdbcTemplate.queryForObject("SELECT codigo FROM sgc.mapa WHERE subprocesso_codigo = ?", Long.class, subId);
         
         // Atividades
         jdbcTemplate.update("INSERT INTO sgc.atividade (mapa_codigo, descricao) VALUES (?, ?)", mapaId, "Atividade Origem A - " + procId);
