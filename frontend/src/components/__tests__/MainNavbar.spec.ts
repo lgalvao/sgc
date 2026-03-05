@@ -5,14 +5,12 @@ import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentT
 import NavBar from "../layout/MainNavbar.vue";
 import {usePerfil} from "@/composables/usePerfil";
 
-// Mock usePerfil
 vi.mock("@/composables/usePerfil");
 
 const {mockPush} = vi.hoisted(() => ({
     mockPush: vi.fn()
 }));
 
-// Mock vue-router to control push and satisfy imports
 vi.mock("vue-router", () => ({
     useRoute: vi.fn(),
     useRouter: () => ({

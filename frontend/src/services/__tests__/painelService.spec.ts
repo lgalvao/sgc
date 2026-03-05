@@ -2,7 +2,6 @@ import {describe, expect, it} from "vitest";
 import {setupServiceTest, testErrorHandling} from "@/test-utils/serviceTestHelpers";
 import * as service from "../painelService";
 
-// Mock do axios no nível do arquivo ainda é necessário se a implementação importa diretamente
 // Mas como setupServiceTest mocka o modulo, e aqui mockamos também, pode haver conflito?
 // Se test-utils/serviceTestHelpers.ts faz vi.mock("@/axios-setup"), e este arquivo também faz...
 // O último a ser executado vence? Ou conflitam?

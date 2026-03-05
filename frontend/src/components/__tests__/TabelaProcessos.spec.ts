@@ -6,7 +6,6 @@ import TabelaProcessos from "../processo/TabelaProcessos.vue";
 import EmptyState from "../comum/EmptyState.vue";
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 
-// Mock de dados de processo
 const mockProcessos: ProcessoResumo[] = [
     {
         codigo: 1,

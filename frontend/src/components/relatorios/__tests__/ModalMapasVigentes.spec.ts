@@ -3,7 +3,6 @@ import {mount} from '@vue/test-utils';
 import ModalMapasVigentes from '../ModalMapasVigentes.vue';
 import * as csvUtils from '@/utils/csv';
 
-// Mock dependencies
 vi.mock('@/utils/csv', () => ({
     gerarCSV: vi.fn(),
     downloadCSV: vi.fn(),

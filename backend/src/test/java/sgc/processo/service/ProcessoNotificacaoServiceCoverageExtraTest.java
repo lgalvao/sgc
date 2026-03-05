@@ -88,7 +88,6 @@ class ProcessoNotificacaoServiceCoverageExtraTest {
 
         notificacaoService.enviarEmailParaSubstituto("sub1", Map.of("sub1", userSub), "assunto", "html", "Unidade Teste");
 
-        // Verifica se a excecao eh capturada sem explodir
         verify(emailService).enviarEmailHtml(anyString(), anyString(), anyString());
     }
 }

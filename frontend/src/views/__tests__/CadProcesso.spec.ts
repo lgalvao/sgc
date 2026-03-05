@@ -7,14 +7,12 @@ import {useProcessosStore} from '@/stores/processos';
 import {useUnidadesStore} from '@/stores/unidades';
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 
-// Mock processoService
 vi.mock('@/services/processoService', () => ({
     criarProcesso: vi.fn(),
     atualizarProcesso: vi.fn(),
     excluirProcesso: vi.fn(),
 }));
 
-// Mock router
 const {mockPush, mockRoute} = vi.hoisted(() => {
     return {
         mockPush: vi.fn(),
@@ -39,7 +37,6 @@ vi.mock('vue-router', () => {
     };
 });
 
-// Mock child components
 const ArvoreUnidadesStub = {
     template: '<div><slot /></div>',
     props: ['unidades', 'modelValue'],
@@ -109,10 +106,8 @@ describe('ProcessoCadastroView.vue', () => {
         vi.clearAllMocks();
         mockRoute.query = {};
 
-        // Importar o mock do service
         processoService = await import('@/services/processoService');
 
-        // Mock window.scrollTo
         window.scrollTo = vi.fn();
 
         // Suppress console.error
@@ -505,7 +500,6 @@ describe('ProcessoCadastroView.vue', () => {
 
     it('shows saving spinner on button', async () => {
         const {wrapper, processosStore} = createWrapper();
-        // Mock slow promise
         processosStore.criarProcesso.mockImplementation(() => new Promise(resolve => setTimeout(resolve, 100)));
 
         wrapper.vm.descricao = 'Teste';
@@ -556,7 +550,6 @@ describe('ProcessoCadastroView.vue', () => {
     it('focuses on the first invalid field when validation errors occur', async () => {
         const {wrapper, processosStore} = createWrapper();
 
-        // Mock document.querySelector to return a mock element with focus method
         const focusMock = vi.fn();
         const mockElement = {focus: focusMock} as unknown as HTMLElement;
         const querySelectorSpy = vi.spyOn(document, 'querySelector').mockReturnValue(mockElement);

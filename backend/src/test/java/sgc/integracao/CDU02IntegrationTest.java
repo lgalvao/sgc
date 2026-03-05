@@ -112,7 +112,6 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
             usuario.setUnidadeAtivaCodigo(unidade.getCodigo());
         }
 
-        // Define authorities como apenas o perfil selecionado para simular o comportamento do FiltroJwt
         Set<GrantedAuthority> authorities = Collections.emptySet();
         if (perfis.length > 0) {
             authorities = Set.of(new SimpleGrantedAuthority("ROLE_" + perfis[0]));

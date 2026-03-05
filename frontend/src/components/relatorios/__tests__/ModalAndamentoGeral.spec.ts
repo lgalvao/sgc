@@ -4,7 +4,6 @@ import ModalAndamentoGeral from '../ModalRelatorioAndamento.vue';
 import * as csvUtils from '@/utils/csv';
 import {SituacaoProcesso, TipoProcesso} from '@/types/tipos';
 
-// Mock dependencies
 vi.mock('@/utils/csv', () => ({
     gerarCSV: vi.fn(),
     downloadCSV: vi.fn(),

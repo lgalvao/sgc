@@ -32,10 +32,8 @@ public class WithMockChefeSecurityContextFactory
             throw new IllegalStateException("Usuário " + titulo + " não possui perfis no data.sql");
         }
 
-        // Define perfil ativo como CHEFE
         usuario.setPerfilAtivo(Perfil.CHEFE);
 
-        // Busca a unidade onde ele é CHEFE
         UsuarioPerfil chefia = atribuicoes.stream()
                 .filter(a -> a.getPerfil() == Perfil.CHEFE)
                 .findFirst()

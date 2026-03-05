@@ -5,7 +5,6 @@ import {diagnosticoService} from '@/services/diagnosticoService';
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 import {useFeedbackStore} from '@/stores/feedback';
 
-// Mocks
 const {mockRouteParams} = vi.hoisted(() => {
     return {mockRouteParams: {value: {codSubprocesso: '10'}}};
 });

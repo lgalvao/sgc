@@ -6,7 +6,6 @@ import {useProcessosStore} from '@/stores/processos';
 import {useUnidadesStore} from '@/stores/unidades';
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 
-// Mock router
 const {mockPush, mockRoute} = vi.hoisted(() => {
     return {
         mockPush: vi.fn(),

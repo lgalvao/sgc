@@ -6,7 +6,6 @@ import {useRoute, useRouter} from 'vue-router';
 import {createTestingPinia} from '@pinia/testing';
 import {Perfil} from '@/types/tipos';
 
-// Mocks
 vi.mock('vue-router', async (importOriginal) => {
     const actual = await importOriginal<typeof import('vue-router')>();
     return {

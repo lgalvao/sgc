@@ -109,7 +109,6 @@ class LimitadorTentativasLoginTest {
             limitadorTeste.verificar("10.0.0." + i);
         }
 
-        // Verifica se atingiu o limite
         assertEquals(limiteTeste, limitadorTeste.getCacheSize());
 
         // Avança o tempo para além da janela (2 minutos)
@@ -159,7 +158,6 @@ class LimitadorTentativasLoginTest {
         // Deve permitir (não lançar erro) pois ele já está sendo rastreado
         assertDoesNotThrow(() -> limitadorTeste.verificar("Ip0"));
 
-        // Verifica se contou a tentativa (Ip0 agora deve ter 2 tentativas)
         // Se eu chamar mais 3 vezes (total 5), deve bloquear na 6ª.
         IntStream.range(0, 3).forEach(i -> limitadorTeste.verificar("Ip0")); // Total 5
         var exception = assertThrows(ErroMuitasTentativas.class, () -> limitadorTeste.verificar("Ip0")); // 6ª

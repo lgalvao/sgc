@@ -71,7 +71,6 @@ class LoginControllerLogInjectionTest {
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk());
 
-        // Verifica se o valor passado para o limitador (e consequentemente para o log) foi sanitizado.
         // Esperamos que não contenha \n ou \r
         verify(limitadorTentativasLogin).verificar("10.0.0.1_INFO User logged in as admin");
     }

@@ -20,7 +20,6 @@ vi.mock("@/utils/logger", () => ({
 vi.mock("bootstrap", () => ({
     Tooltip: class Tooltip {
         dispose() {
-            // Mock dispose method
         }
     },
 

@@ -4,11 +4,9 @@ import type {Alerta} from "@/types/tipos";
 import {useAlertasStore} from "../alertas";
 import {normalizeError} from "@/utils/apiError";
 
-// Mock dos serviços
 vi.mock("@/services/painelService");
 vi.mock("@/services/alertaService");
 
-// Mock do perfilStore para garantir que a mesma instância seja usada
 const mockPerfilStoreValues = {
     usuarioCodigo: "123" as string | null,
     unidadeSelecionada: "456" as string | null,

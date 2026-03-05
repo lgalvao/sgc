@@ -5,10 +5,8 @@ import {usePerfil} from "@/composables/usePerfil";
 import {ref} from "vue";
 import {createTestingPinia} from "@pinia/testing";
 
-// Mock usePerfil
 vi.mock("@/composables/usePerfil");
 
-// Mock vue-router
 const mocks = vi.hoisted(() => ({
     push: vi.fn()
 }));

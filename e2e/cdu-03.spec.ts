@@ -58,7 +58,6 @@ test.describe('CDU-03 - Manter Processo', () => {
         const chkRaizInter = page.getByTestId('chk-arvore-unidade-SECRETARIA_1');
         await chkRaizInter.click();
 
-        // Verifica se a UI exibe alguma confirmação ou mensagem específica sobre interoperabilidade
         // Como o requisito pede para perguntar se é para atividades próprias ou subordinadas, verificamos a existência desse prompt
         const alertaInteroperacional = page.getByText(/atividades próprias ou suas subordinadas/i);
         // Note: Se o sistema ainda não implementa isso, esse passo falhará e destacará o gap para a equipe de dev.

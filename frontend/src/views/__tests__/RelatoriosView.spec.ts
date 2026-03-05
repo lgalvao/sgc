@@ -7,7 +7,6 @@ import {usePerfilStore} from '@/stores/perfil';
 import {createTestingPinia} from '@pinia/testing';
 import {getCommonMountOptions, setupComponentTest} from '@/test-utils/componentTestHelpers';
 
-// Mock URL.createObjectURL
 global.URL.createObjectURL = vi.fn(() => 'blob:mock-url');
 
 describe('Relatorios.vue', () => {

@@ -5,7 +5,6 @@ import MapaView from '@/views/MapaView.vue';
 import {useMapasStore} from '@/stores/mapas';
 import {useSubprocessosStore} from '@/stores/subprocessos';
 
-// Mock router
 vi.mock("vue-router", () => ({
     useRouter: vi.fn(),
     useRoute: vi.fn(() => ({params: {codProcesso: '1', siglaUnidade: 'TEST'}})),

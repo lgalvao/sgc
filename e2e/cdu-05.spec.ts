@@ -209,7 +209,6 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         // Verifica status no header do subprocesso
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText('Não iniciado');
 
-        // Verifica se a movimentação correta foi registrada
         // O texto exato no backend é "Processo iniciado" ou "Revisão do cadastro iniciada" dependendo de como foi registrado
         const timeline = page.getByTestId('tbl-movimentacoes');
         // No log o backend diz "Processo de revisao 202 iniciado" ou a UI exibe a movimentação padrão

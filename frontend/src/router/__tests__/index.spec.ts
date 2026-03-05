@@ -3,7 +3,6 @@ import router from "../index";
 import {createPinia, setActivePinia} from "pinia";
 import {usePerfilStore} from "@/stores/perfil";
 
-// Mock das rotas para evitar problemas de importação nos testes unitários do index
 vi.mock("../main.routes", () => ({default: []}));
 vi.mock("../processo.routes", () => ({default: []}));
 vi.mock("../unidade.routes", () => ({default: []}));

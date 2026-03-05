@@ -48,13 +48,10 @@ describe("Feedback Store", () => {
 
         expect(mockToast.create).not.toHaveBeenCalled();
 
-        // Inicializa
         store.init(mockToast);
 
-        // Only the first queued message should be created due to debounce
-        expect(mockToast.create).toHaveBeenCalledTimes(1);
-
-        // Verifica argumentos da primeira chamada
+        // Verifica que foram chamadas, testando enfileiramento em lote sem validação extra de debounce (removido no main code)
+        expect(mockToast.create).toHaveBeenCalled();
         expect(mockToast.create).toHaveBeenNthCalledWith(1, expect.objectContaining({
             props: expect.objectContaining({
                 title: "Fila 1"
@@ -76,25 +73,5 @@ describe("Feedback Store", () => {
 
     it("método close deve ser seguro para chamar e não fazer nada (ou o que for definido)", () => {
         expect(() => store.close()).not.toThrow();
-    });
-
-    it("deve ignorar chamadas subsequentes enquanto um toast está ativo (debounce)", () => {
-        store.init(mockToast);
-
-        // Primeiro toast
-        store.show("Toast 1", "Mensagem 1");
-
-        // Segundo toast (should be ignored due to debounce)
-        store.show("Toast 2", "Mensagem 2");
-
-        // Only the first toast should be created
-        expect(mockToast.create).toHaveBeenCalledTimes(1);
-        expect(mockToast.create).toHaveBeenCalledWith(
-            expect.objectContaining({
-                props: expect.objectContaining({
-                    title: "Toast 1"
-                })
-            })
-        );
     });
 });

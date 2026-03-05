@@ -10,7 +10,6 @@ import {SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 import {setupComponentTest} from "@/test-utils/componentTestHelpers";
 import * as useAcessoModule from '@/composables/useAcesso';
 
-// Mocks for services
 vi.mock("@/services/unidadeService", () => ({
     buscarUnidadePorSigla: vi.fn().mockResolvedValue({sigla: 'TEST', nome: 'Unidade'}),
 }));
