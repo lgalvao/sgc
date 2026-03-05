@@ -19,7 +19,7 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
                                                                                    }) => {
         const timestamp = Date.now();
         const descricaoProcesso = `Processo CDU-08 Map ${timestamp}`;
-        let processoOrigemDescricao = `Processo Base FINALIZADO ${timestamp}`;
+        const processoOrigemDescricao = `Processo Base FINALIZADO ${timestamp}`;
         let processoOrigemId: number;
 
         await test.step('1. Setup: Criar Processo Origem e Mapeamento Alvo', async () => {

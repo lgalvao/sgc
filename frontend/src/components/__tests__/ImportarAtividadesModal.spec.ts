@@ -53,7 +53,7 @@ describe("ImportarAtividadesModal", () => {
         context.wrapper = mount(ImportarAtividadesModal, {
             ...getCommonMountOptions({
                 processos: {
-                    processosFinalizados: mockProcessos,
+                    processosParaImportacao: mockProcessos,
                     processoDetalhe: mockProcessoDetalhe,
                 },
                 atividades: {
