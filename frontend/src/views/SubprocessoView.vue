@@ -206,7 +206,6 @@ import {useProcessosStore} from "@/stores/processos";
 import {
   type Movimentacao,
   SituacaoProcesso,
-  SituacaoSubprocesso,
   type SubprocessoDetalhe,
   TipoProcesso
 } from "@/types/tipos";
@@ -255,9 +254,7 @@ const {
 } = useAcesso(subprocesso);
 
 const isProcessoFinalizado = computed(() => {
-  return subprocesso.value?.situacao === SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO ||
-      subprocesso.value?.situacao === SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO ||
-      processosStore.processoDetalhe?.situacao === SituacaoProcesso.FINALIZADO;
+  return processosStore.processoDetalhe?.situacao === SituacaoProcesso.FINALIZADO;
 });
 
 const mapa = computed(() => mapaStore.mapaCompleto);

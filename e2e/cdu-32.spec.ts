@@ -8,12 +8,14 @@ import {
     navegarParaAtividades,
     navegarParaAtividadesVisualizacao
 } from './helpers/helpers-atividades.js';
+import {criarCompetencia, disponibilizarMapa, navegarParaMapa} from './helpers/helpers-mapas.js';
 import {
     aceitarCadastroMapeamento,
+    acessarSubprocessoChefeDireto,
     acessarSubprocessoGestor,
     homologarCadastroMapeamento
 } from './helpers/helpers-analise.js';
-import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
+import {fazerLogout, navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 
 /**
  * CDU-32 - Reabrir cadastro
@@ -82,13 +84,55 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
         await homologarCadastroMapeamento(page);
     });
 
+    test('Preparacao 4: ADMIN cria mapa, disponibiliza, chefe valida, gestores aceitam, ADMIN homologa', async ({page, autenticadoComoAdmin}) => {
+        // ADMIN cria competência no mapa
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
+        await navegarParaSubprocesso(page, UNIDADE_1);
+        await navegarParaMapa(page);
+        await criarCompetencia(page, `Competência Reabrir ${timestamp}`, [atividade1]);
+        await disponibilizarMapa(page, '2030-12-31');
+        await fazerLogout(page);
+
+        // Chefe valida mapa
+        await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
+        await acessarSubprocessoChefeDireto(page, descProcesso, UNIDADE_1);
+        await navegarParaMapa(page);
+        await page.getByTestId('btn-mapa-validar').click();
+        await page.getByTestId('btn-validar-mapa-confirmar').click();
+        await fazerLogout(page);
+
+        // Gestor COORD_22 aceita mapa
+        await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
+        await acessarSubprocessoGestor(page, descProcesso, UNIDADE_1);
+        await navegarParaMapa(page);
+        await page.getByTestId('btn-mapa-homologar-aceite').click();
+        await page.getByTestId('btn-aceite-mapa-confirmar').click();
+        await fazerLogout(page);
+
+        // Gestor SECRETARIA_2 aceita mapa
+        await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
+        await acessarSubprocessoGestor(page, descProcesso, UNIDADE_1);
+        await navegarParaMapa(page);
+        await page.getByTestId('btn-mapa-homologar-aceite').click();
+        await page.getByTestId('btn-aceite-mapa-confirmar').click();
+        await fazerLogout(page);
+
+        // ADMIN homologa mapa
+        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
+        await acessarSubprocessoChefeDireto(page, descProcesso, UNIDADE_1);
+        await navegarParaMapa(page);
+        await page.getByTestId('btn-mapa-homologar-aceite').click();
+        await page.getByTestId('btn-aceite-mapa-confirmar').click();
+        await expect(page.getByText(/Homologação efetivada/i).first()).toBeVisible();
+    });
+
 
     test('Cenários CDU-32: ADMIN reabre cadastro', async ({page, autenticadoComoAdmin}) => {
         // Cenario 1 & 2: Navegação e visualização do botão
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, UNIDADE_1);
 
-        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro homologado/i);
+        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa homologado/i);
 
         const btnReabrir = page.getByTestId('btn-reabrir-cadastro');
         await expect(btnReabrir).toBeVisible();

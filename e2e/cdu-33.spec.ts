@@ -7,7 +7,7 @@ import {
     navegarParaAtividadesVisualizacao
 } from './helpers/helpers-atividades.js';
 import {criarCompetencia, disponibilizarMapa, navegarParaMapa} from './helpers/helpers-mapas.js';
-import {verificarPaginaPainel} from './helpers/helpers-navegacao.js';
+import {fazerLogout, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 import {
     aceitarCadastroMapeamento,
     aceitarRevisao,
@@ -170,6 +170,47 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
 
         await expect(page.getByTestId('subprocesso-header__txt-situacao'))
             .toHaveText(/Revisão do cadastro homologada/i);
+    });
+
+    test('Preparacao 4: ADMIN disponibiliza mapa, chefe valida, gestores aceitam, ADMIN homologa', async ({page, autenticadoComoAdmin}) => {
+        // ADMIN cria competência para a atividade adicionada e disponibiliza mapa
+        await acessarSubprocessoChefeDireto(page, descRevisao, UNIDADE_ALVO);
+        await navegarParaMapa(page);
+        await criarCompetencia(page, `Comp Rev ${timestamp}`, [`Atividade Rev ${timestamp}`]);
+        await disponibilizarMapa(page, '2030-12-31');
+        await fazerLogout(page);
+
+        // Chefe valida mapa
+        await login(page, USUARIOS.CHEFE_SECAO_212.titulo, USUARIOS.CHEFE_SECAO_212.senha);
+        await acessarSubprocessoChefeDireto(page, descRevisao, UNIDADE_ALVO);
+        await navegarParaMapa(page);
+        await page.getByTestId('btn-mapa-validar').click();
+        await page.getByTestId('btn-validar-mapa-confirmar').click();
+        await fazerLogout(page);
+
+        // Gestor COORD_21 aceita mapa
+        await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);
+        await acessarSubprocessoGestor(page, descRevisao, UNIDADE_ALVO);
+        await navegarParaMapa(page);
+        await page.getByTestId('btn-mapa-homologar-aceite').click();
+        await page.getByTestId('btn-aceite-mapa-confirmar').click();
+        await fazerLogout(page);
+
+        // Gestor SECRETARIA_2 aceita mapa
+        await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
+        await acessarSubprocessoGestor(page, descRevisao, UNIDADE_ALVO);
+        await navegarParaMapa(page);
+        await page.getByTestId('btn-mapa-homologar-aceite').click();
+        await page.getByTestId('btn-aceite-mapa-confirmar').click();
+        await fazerLogout(page);
+
+        // ADMIN homologa mapa
+        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
+        await acessarSubprocessoChefeDireto(page, descRevisao, UNIDADE_ALVO);
+        await navegarParaMapa(page);
+        await page.getByTestId('btn-mapa-homologar-aceite').click();
+        await page.getByTestId('btn-aceite-mapa-confirmar').click();
+        await expect(page.getByText(/Homologação efetivada/i).first()).toBeVisible();
     });
 
 
