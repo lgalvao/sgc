@@ -33,7 +33,7 @@ public class CopiaMapaService {
     }
 
     @Transactional
-    public void importarAtividadesDeOutroMapa(Long mapaOrigemId, Long mapaDestinoId, List<Long> codigosAtividades) {
+    public int importarAtividadesDeOutroMapa(Long mapaOrigemId, Long mapaDestinoId, List<Long> codigosAtividades) {
         List<Atividade> atividadesOrigem = atividadeRepo.findWithConhecimentosByMapa_Codigo(mapaOrigemId);
 
         if (codigosAtividades != null && !codigosAtividades.isEmpty()) {
@@ -58,6 +58,7 @@ public class CopiaMapaService {
                 .toList();
 
         if (!atividadesParaSalvar.isEmpty()) atividadeRepo.saveAll(atividadesParaSalvar);
+        return atividadesParaSalvar.size();
     }
 
     private Mapa criarNovoMapa() {

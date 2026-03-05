@@ -25,6 +25,7 @@ class E2eControllerCoverageTest {
 
         when(jdbcTemplate.getDataSource()).thenReturn(null);
 
+
         controller.resetDatabase();
 
         // Assert - Não deve lançar exceção nem fazer nada (cobertura da linha 62)

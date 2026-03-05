@@ -221,6 +221,7 @@ public class SubprocessoService {
         return (destino != null) ? destino : sp.getUnidade();
     }
 
+
     @Transactional
     public void atualizarParaEmAndamento(Long mapaCodigo) {
         var subprocesso = subprocessoRepo.findByMapa_Codigo(mapaCodigo).orElseThrow();
@@ -435,6 +436,7 @@ public class SubprocessoService {
                 SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
         return sp;
     }
+
 
     @Transactional
     public void salvarAjustesMapa(Long codSubprocesso, List<CompetenciaAjusteDto> competencias) {
@@ -692,9 +694,12 @@ public class SubprocessoService {
 
         Long codMapaOrigem = spOrigem.getMapa().getCodigo();
         Long codMapaDestino = spDestino.getMapa().getCodigo();
-        int qtdAtividades = codigosAtividades != null ? codigosAtividades.size() : 0;
-        log.info("Importando {} atividades do mapa #{} para o mapa #{}", qtdAtividades, codMapaOrigem, codMapaDestino);
-        copiaMapaService.importarAtividadesDeOutroMapa(codMapaOrigem, codMapaDestino, codigosAtividades);
+        log.info("Importando {} atividades do mapa #{} para o mapa #{}", codigosAtividades != null ? codigosAtividades.size() : "todas as", codMapaOrigem, codMapaDestino);
+        int importadas = copiaMapaService.importarAtividadesDeOutroMapa(codMapaOrigem, codMapaDestino, codigosAtividades);
+
+        if (importadas == 0 && codigosAtividades != null && !codigosAtividades.isEmpty()) {
+            throw new ErroValidacao("Uma ou mais atividades selecionadas já existentes no cadastro não puderam ser importadas.");
+        }
 
         if (spDestino.getSituacao() == SituacaoSubprocesso.NAO_INICIADO) {
             var tipoProcesso = spDestino.getProcesso().getTipo();
@@ -762,6 +767,7 @@ public class SubprocessoService {
                 .toList();
     }
 
+
     @Transactional(readOnly = true)
     public List<AnaliseHistoricoDto> listarHistoricoCadastro(Long codSubprocesso) {
         return listarAnalisesPorSubprocesso(codSubprocesso).stream()
@@ -792,5 +798,6 @@ public class SubprocessoService {
                 .tipo(analise.getTipo())
                 .build();
     }
+
 
 }

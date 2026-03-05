@@ -51,6 +51,7 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
     @BeforeEach
     void setUp() {
 
+
         Unidade raiz = unidadeRepo.findById(1L).orElseThrow();
         Unidade unidadeOrigem = UnidadeFixture.unidadePadrao();
         unidadeOrigem.setCodigo(null);
@@ -65,6 +66,7 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
         unidadeDestino.setNome("Unidade Destino");
         unidadeDestino.setUnidadeSuperior(raiz);
         unidadeDestino = unidadeRepo.save(unidadeDestino);
+
 
         chefe = UsuarioFixture.usuarioPadrao();
         chefe.setTituloEleitoral("888888888888");
@@ -290,6 +292,37 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
             assertThat(atividadesDestino).hasSize(2);
             assertThat(atividadesDestino.stream().map(Atividade::getDescricao).toList())
                     .containsExactlyInAnyOrder("Atividade 1", "Atividade 2");
+        }
+
+        @Test
+        @DisplayName("Deve retornar erro ao importar atividades já existentes no destino (duplicidade)")
+        void deveRetornarErroAoImportarAtividadesJaExistentes() throws Exception {
+            List<Atividade> atividadesOrigem =
+                    atividadeRepo.findByMapa_Codigo(subprocessoOrigem.getMapa().getCodigo());
+
+            Atividade atividadeDuplicada = atividadesOrigem.getFirst();
+
+            Atividade atividadeExistente =
+                    Atividade.builder()
+                            .mapa(subprocessoDestino.getMapa())
+                            .descricao(atividadeDuplicada.getDescricao())
+                            .build();
+            atividadeRepo.save(atividadeExistente);
+
+            ImportarAtividadesRequest request =
+                    new ImportarAtividadesRequest(
+                            subprocessoOrigem.getCodigo(), List.of(atividadeDuplicada.getCodigo()));
+
+            mockMvc.perform(
+                            post(
+                                    "/api/subprocessos/{id}/importar-atividades",
+                                    subprocessoDestino.getCodigo())
+                                    .with(user(chefe))
+                                    .with(csrf())
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isUnprocessableContent())
+                    .andExpect(jsonPath("$.message", containsString("já existentes no cadastro")));
         }
     }
 }

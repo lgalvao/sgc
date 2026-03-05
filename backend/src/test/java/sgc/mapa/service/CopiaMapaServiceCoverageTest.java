@@ -58,7 +58,9 @@ class CopiaMapaServiceCoverageTest {
 
         when(competenciaRepo.findByMapa_Codigo(codMapaOrigem)).thenReturn(List.of(compFonte));
 
+
         service.copiarMapaParaUnidade(codMapaOrigem);
+
 
         verify(competenciaRepo).saveAll(anyList());
     }
@@ -79,7 +81,9 @@ class CopiaMapaServiceCoverageTest {
         when(atividadeRepo.findByMapa_Codigo(mapaDestinoId)).thenReturn(List.of()); // Destino vazio
         when(repo.buscar(Mapa.class, mapaDestinoId)).thenReturn(new Mapa());
 
+
         service.importarAtividadesDeOutroMapa(mapaOrigemId, mapaDestinoId, null);
+
 
         verify(atividadeRepo).saveAll(anyList());
     }
@@ -100,7 +104,9 @@ class CopiaMapaServiceCoverageTest {
         when(atividadeRepo.findByMapa_Codigo(mapaDestinoId)).thenReturn(List.of());
         when(repo.buscar(Mapa.class, mapaDestinoId)).thenReturn(new Mapa());
 
+
         service.importarAtividadesDeOutroMapa(mapaOrigemId, mapaDestinoId, List.of(10L));
+
 
         verify(atividadeRepo).saveAll(atividadesCaptor.capture());
         assertThat(atividadesCaptor.getValue()).hasSize(1);
@@ -121,8 +127,10 @@ class CopiaMapaServiceCoverageTest {
         when(atividadeRepo.findByMapa_Codigo(mapaDestinoId)).thenReturn(List.of());
         when(repo.buscar(Mapa.class, mapaDestinoId)).thenReturn(new Mapa());
 
+
         // ID 999 não existe no mapa de origem — deve ser ignorado sem lançar exceção
         service.importarAtividadesDeOutroMapa(mapaOrigemId, mapaDestinoId, List.of(999L));
+
 
         verify(atividadeRepo, never()).saveAll(anyList());
     }
@@ -141,7 +149,9 @@ class CopiaMapaServiceCoverageTest {
         when(atividadeRepo.findByMapa_Codigo(mapaDestinoId)).thenReturn(List.of(ativDestino));
         when(repo.buscar(Mapa.class, mapaDestinoId)).thenReturn(new Mapa());
 
+
         service.importarAtividadesDeOutroMapa(mapaOrigemId, mapaDestinoId, null);
+
 
         verify(atividadeRepo, never()).saveAll(anyList());
     }
