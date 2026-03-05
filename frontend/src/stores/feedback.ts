@@ -32,13 +32,7 @@ export const useFeedbackStore = defineStore('feedback', () => {
     }
 
     function show(title: string, message: string, variant: 'success' | 'danger' | 'warning' | 'info' = 'info', autoHideDelay = 3000) {
-        const now = Date.now();
-        if (toast.value && (now - lastShowTime.value < DEBOUNCE_MS)) {
-            return;
-        }
-
         if (toast.value) {
-            lastShowTime.value = now;
             // Fechar toasts anteriores antes de exibir um novo (política de toast único)
             document.querySelectorAll('.toast .btn-close').forEach(btn => {
                 (btn as HTMLElement).click();

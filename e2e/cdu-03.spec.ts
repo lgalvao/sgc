@@ -112,9 +112,9 @@ test.describe('CDU-03 - Manter Processo', () => {
         await page.getByTestId('inp-processo-descricao').fill(novaDescricao);
         await page.getByTestId('btn-processo-salvar').click();
 
-        // Validar mensagem "Processo alterado."
-        await expect(page.getByText(/Processo alterado/i).first()).toBeVisible();
+        // Aguardar redirecionamento antes de validar a mensagem para evitar race condition
         await expect(page).toHaveURL(/\/painel/);
+        await expect(page.getByText(/Processo alterado/i).first()).toBeVisible();
         await expect(page.getByText(novaDescricao)).toBeVisible();
 
         await page.getByTestId('tbl-processos').getByText(novaDescricao).first().click();
@@ -304,6 +304,7 @@ test.describe('CDU-03 - Manter Processo', () => {
         });
 
         // Mensagem de sucesso deve estar em um toast
+        await expect(page).toHaveURL(/\/painel/);
         await expect(page.getByText(/Processo criado/i).first()).toBeVisible();
 
         // Capturar ID para cleanup
@@ -322,6 +323,7 @@ test.describe('CDU-03 - Manter Processo', () => {
         // 4. Confirmar remoção e validar mensagem
         await page.getByTestId('btn-processo-remover').click();
         await page.getByRole('dialog').getByRole('button', {name: 'Remover'}).click();
+        await expect(page).toHaveURL(/\/painel/);
         await expect(page.getByText(/removido/i).first()).toBeVisible();
     });
 
