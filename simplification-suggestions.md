@@ -17,6 +17,17 @@ Por conta desse perfil de uso, a grande maioria das diretrizes aplicáveis a apl
 * **Lógica e Validação:** Todas as validações de regras de negócio devem ser movidas dos `Controllers` para os `Services`. O Controller deve manter-se extremamente fino, apenas recebendo a requisição HTTP e repassando para o Service executar a lógica (mantendo coesão).
 * **Testes de Integração vs Testes Unitários:** A estratégia de testes do backend favorece fortemente os Testes de Integração (usando `@SpringBootTest` e H2 em memória) sobre os Testes Unitários altamente "mockados" (e frequentemente frágeis). A maioria das suítes de testes complexas já foi migrada para `*IntegrationTest`.
 
+## Arquitetura e Padrões de Projeto
+
+* **Uso de Interfaces:** Evite a criação de interfaces com apenas uma implementação (ex: `IMeuServico` com `MeuServicoImpl`). Utilize a classe concreta diretamente, a menos que o polimorfismo seja estritamente necessário em tempo de execução.
+* **Complexidade vs Procedural:** Prefira código simples e procedural nos `Services` em vez de aplicar padrões de projeto altamente abstraídos (como Command, Strategy, etc.) de forma prematura e desnecessária.
+* **Excesso de DTOs:** Evite mapeamentos sucessivos e excessivos de DTOs. Onde for prático e seguro, especialmente em operações de leitura simples, retorne os dados com o mínimo de transformações.
+
+## Estrutura de Repositório e Módulos
+
+* **Monolito Coeso:** É desencorajada a tentativa de dividir o back-end em microsserviços ou múltiplos subprojetos granulares no Gradle. O SGC deve permanecer um Monolito Coeso, dada a sua base de usuários pequena.
+* **Fragmentação de Arquivos:** Evite fragmentar lógica altamente relacionada em dezenas de arquivos minúsculos. Um arquivo coeso ligeiramente maior é preferível a múltiplos arquivos pequenos que exigem muita navegação contextual.
+
 ## Diretrizes de Front-end
 
 A mesma filosofia de redução de fragmentação e de complexidade desnecessária aplica-se ao front-end:
@@ -32,3 +43,5 @@ A mesma filosofia de redução de fragmentação e de complexidade desnecessári
 * **Consolidação de Serviços Frontend:**
   * O combate à fragmentação inclui juntar lógicas altamente relacionadas para evitar importações e injeções cruzadas desnecessárias.
   * Exemplo prático: Os serviços `mapaService.ts` e `analiseService.ts` foram unificados no `subprocessoService.ts`.
+* **Componentes Wrapper Desnecessários:** Evite criar componentes "pass-through" (wrappers) que apenas repassam propriedades e eventos para outro componente sem adicionar lógica ou valor real. Use o componente original.
+* **Estado Local e Composables:** Reforçando o ponto do Pinia: utilize `ref`s e a Composition API localmente dentro de componentes, ou agrupe lógica em `composables` (`useFuncao.ts`), em vez de recorrer a estados globais complexos para gerenciar variáveis da tela atual.
