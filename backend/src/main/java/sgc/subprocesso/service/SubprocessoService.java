@@ -694,7 +694,8 @@ public class SubprocessoService {
 
         Long codMapaOrigem = spOrigem.getMapa().getCodigo();
         Long codMapaDestino = spDestino.getMapa().getCodigo();
-        log.info("Importando {} atividades do mapa #{} para o mapa #{}", codigosAtividades.size(), codMapaOrigem, codMapaDestino);
+        int qtdAtividades = codigosAtividades != null ? codigosAtividades.size() : 0;
+        log.info("Importando {} atividades do mapa #{} para o mapa #{}", qtdAtividades, codMapaOrigem, codMapaDestino);
         copiaMapaService.importarAtividadesDeOutroMapa(codMapaOrigem, codMapaDestino, codigosAtividades);
 
         if (spDestino.getSituacao() == SituacaoSubprocesso.NAO_INICIADO) {
