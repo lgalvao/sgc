@@ -56,7 +56,15 @@
               <span class="fw-bold me-1">Situação:</span>
               <span data-testid="subprocesso-header__txt-situacao">{{ formatSituacaoSubprocesso(subprocesso.situacao) }}</span>
             </p>
-            <p><strong>Titular:</strong> {{ subprocesso.titular?.nome || '' }}</p>
+            <p>
+              <span class="fw-bold me-1">Localização atual:</span>
+              <span data-testid="subprocesso-header__txt-localizacao">{{ subprocesso.localizacaoAtual || subprocesso.unidade.sigla }}</span>
+            </p>
+            <p v-if="subprocesso.prazoEtapaAtual">
+              <span class="fw-bold me-1">Prazo para conclusão da etapa atual:</span>
+              <span>{{ formatDataSimples(subprocesso.prazoEtapaAtual) }}</span>
+            </p>
+            <p class="mt-2"><strong>Titular:</strong> {{ subprocesso.titular?.nome || '' }}</p>
             <p class="ms-3 mb-2">
               <span v-if="subprocesso.titular?.ramal" class="me-3">
                 <i aria-hidden="true" class="bi bi-telephone-fill me-1 text-muted"/>
@@ -67,16 +75,21 @@
                 <a :href="`mailto:${subprocesso.titular.email}`">{{ subprocesso.titular.email }}</a>
               </span>
             </p>
-            <template v-if="subprocesso.responsavel?.nome && subprocesso.responsavel?.nome !== subprocesso.titular?.nome">
-              <p class="mt-2"><strong>Responsável:</strong> {{ subprocesso.responsavel?.nome || '' }}</p>
-              <p class="ms-3 mb-0">
-                <span v-if="subprocesso.responsavel?.ramal" class="me-3">
-                  <i aria-hidden="true" class="bi bi-telephone-fill me-1 text-muted"/>
-                  <a :href="`tel:${subprocesso.responsavel.ramal}`">{{ subprocesso.responsavel.ramal }}</a>
+            <template v-if="subprocesso.responsavel?.usuario?.nome && subprocesso.responsavel.usuario.nome !== subprocesso.titular?.nome">
+              <p class="mt-2">
+                <strong>Responsável:</strong> {{ subprocesso.responsavel.usuario.nome || '' }}
+                <span v-if="subprocesso.responsavel.tipo" class="ms-1">
+                  - {{ formatTipoResponsabilidade(subprocesso.responsavel) }}
                 </span>
-                <span v-if="subprocesso.responsavel?.email">
+              </p>
+              <p class="ms-3 mb-0">
+                <span v-if="subprocesso.responsavel.usuario.ramal" class="me-3">
+                  <i aria-hidden="true" class="bi bi-telephone-fill me-1 text-muted"/>
+                  <a :href="`tel:${subprocesso.responsavel.usuario.ramal}`">{{ subprocesso.responsavel.usuario.ramal }}</a>
+                </span>
+                <span v-if="subprocesso.responsavel.usuario.email">
                   <i aria-hidden="true" class="bi bi-envelope-fill me-1 text-muted"/>
-                  <a :href="`mailto:${subprocesso.responsavel.email}`">{{ subprocesso.responsavel.email }}</a>
+                  <a :href="`mailto:${subprocesso.responsavel.usuario.email}`">{{ subprocesso.responsavel.usuario.email }}</a>
                 </span>
               </p>
             </template>
@@ -213,6 +226,22 @@ import {formatDateTimeBR, logger} from "@/utils";
 import {formatSituacaoSubprocesso} from "@/utils/formatters";
 
 const props = defineProps<{ codProcesso: number; siglaUnidade: string }>();
+
+function formatDataSimples(dataStr: string | null): string {
+  if (!dataStr) return '';
+  const data = new Date(dataStr);
+  return data.toLocaleDateString('pt-BR');
+}
+
+function formatTipoResponsabilidade(resp: any): string {
+  if (!resp || !resp.tipo) return '';
+  if (resp.tipo === 'Substituição' && resp.dataFim) {
+    return `Substituição (até ${formatDataSimples(resp.dataFim)})`;
+  } else if (resp.tipo === 'Atribuição temporária' && resp.dataFim) {
+    return `Atrib. temporária (até ${formatDataSimples(resp.dataFim)})`;
+  }
+  return resp.tipo;
+}
 
 const subprocessosStore = useSubprocessosStore();
 const processosStore = useProcessosStore();

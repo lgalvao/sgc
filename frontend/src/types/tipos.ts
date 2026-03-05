@@ -290,13 +290,22 @@ export interface PermissoesSubprocesso {
     podeReabrirCadastro: boolean;
     podeReabrirRevisao: boolean;
     podeEnviarLembrete: boolean;
+    habilitarAcessoCadastro: boolean;
+    habilitarAcessoMapa: boolean;
+}
+
+export interface ResponsavelDto {
+    usuario: Usuario;
+    tipo: string;
+    dataInicio: string;
+    dataFim: string | null;
 }
 
 export interface SubprocessoDetalhe {
     codigo: number;
     unidade: Unidade;
     titular: Usuario;
-    responsavel: Usuario;
+    responsavel: ResponsavelDto;
     situacao: SituacaoSubprocesso;
     localizacaoAtual: string;
     processoDescricao: string;

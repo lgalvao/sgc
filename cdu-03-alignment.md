@@ -1,5 +1,7 @@
 # CDU-03 - Criar processo - Alignment
 
+STATUS: DONE
+
 ## Current Status
 - The test verifies the tree selection logic (indeterminate states, auto-selecting parents).
 - It tests restrictions (preventing selection of units already in an active mapping process).

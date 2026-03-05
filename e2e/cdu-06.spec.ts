@@ -1,15 +1,23 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
-import {login, USUARIOS} from './helpers/helpers-auth.js';
-import {criarProcesso, verificarDetalhesProcesso, verificarUnidadeParticipante} from './helpers/helpers-processos.js';
+import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
+import {
+    criarProcesso,
+    verificarDetalhesProcesso,
+    verificarUnidadeParticipante,
+    extrairProcessoId
+} from './helpers/helpers-processos.js';
+import {adicionarAtividade, adicionarConhecimento, disponibilizarCadastro, navegarParaAtividades} from './helpers/helpers-atividades.js';
+import {acessarSubprocessoChefeDireto} from './helpers/helpers-analise.js';
+import {verificarPaginaPainel, navegarParaSubprocesso, esperarPaginaCadastroProcesso, esperarPaginaDetalhesProcesso} from './helpers/helpers-navegacao.js';
 
 test.describe('CDU-06 - Detalhar processo', () => {
     const UNIDADE_ALVO = 'ASSESSORIA_12';
 
-    test('Deve exibir detalhes do processo para ADMIN', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
+    test('Fase 1: Deve exibir detalhes do processo para ADMIN e ações de unidade', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
         const timestamp = Date.now();
         const descricao = `Processo CDU-06 ${timestamp}`;
 
-        // Criar e iniciar processo
+        // 1. Criar e iniciar processo
         await criarProcesso(page, {
             descricao,
             tipo: 'MAPEAMENTO',
@@ -19,33 +27,44 @@ test.describe('CDU-06 - Detalhar processo', () => {
             iniciar: true
         });
 
-        // Navegar para detalhes do processo
-        await page.getByTestId('tbl-processos').getByRole('row', {name: descricao}).click();
-        await expect(page).toHaveURL(/\/processo\/\d+/);
+        // Capturar ID do processo para cleanup (padrão CDU-04/05)
+        await page.getByTestId('tbl-processos').getByText(descricao).first().click();
+        await esperarPaginaDetalhesProcesso(page);
+        const processoId = await extrairProcessoId(page);
+        cleanupAutomatico.registrar(processoId);
 
-        // Capturar ID do processo para cleanup
-        const processoId = Number.parseInt(page.url().match(/\/processo\/(\d+)/)?.[1] || '0');
-        if (processoId > 0) cleanupAutomatico.registrar(processoId);
-
-        // Verificar detalhes do processo (usando caixa alta conforme observado em reviews)
+        // 3. Verificar detalhes do processo
         await verificarDetalhesProcesso(page, {
             descricao,
             tipo: 'Mapeamento',
             situacao: 'Em andamento'
         });
 
-        // Verificar unidade participante
+        // 4. Verificar unidade participante
         await verificarUnidadeParticipante(page, {
             sigla: 'ASSESSORIA_12',
             situacao: 'Não iniciado',
             dataLimite: '/'
         });
+
+        // 5. [Step 2.2.1] ADMIN deve ver elementos de alteração ao entrar no subprocesso
+        await navegarParaSubprocesso(page, UNIDADE_ALVO);
+        
+        // Botão "Alterar data limite" deve estar visível para Admin
+        await expect(page.getByTestId('btn-alterar-data-limite')).toBeVisible();
+        
+        // Botão "Reabrir cadastro" NÃO deve estar visível pois a situação é "Não iniciado" 
+        // (Regra: requer situação >= MAPEAMENTO_MAPA_HOMOLOGADO)
+        await expect(page.getByTestId('btn-reabrir-cadastro')).toBeHidden();
+        
+        // Botão "Enviar lembrete" deve estar visível
+        await expect(page.getByTestId('btn-enviar-lembrete')).toBeVisible();
     });
 
-    test('Deve exibir detalhes do processo para GESTOR', async ({page, cleanupAutomatico}) => {
+    test('Fase 1b: Deve exibir detalhes do processo para GESTOR e ocultar ações ADMIN', async ({page, cleanupAutomatico}) => {
         const timestamp = Date.now();
         const descricao = `Processo CDU-06 Gestor ${timestamp}`;
-        const UNIDADE_PROCESSO = 'SECAO_111';
+        const UNIDADE_PROCESSO = 'ASSESSORIA_21'; // Subordinada à SECRETARIA_2 (George Harrison)
 
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
@@ -54,23 +73,26 @@ test.describe('CDU-06 - Detalhar processo', () => {
             tipo: 'MAPEAMENTO',
             diasLimite: 30,
             unidade: UNIDADE_PROCESSO,
-            expandir: ['SECRETARIA_1', 'COORD_11'],
+            expandir: ['SECRETARIA_2'],
             iniciar: true
         });
 
+        // Capturar ID para cleanup
+        await page.getByTestId('tbl-processos').getByText(descricao).first().click();
+        await esperarPaginaDetalhesProcesso(page);
+        const processoId = await extrairProcessoId(page);
+        cleanupAutomatico.registrar(processoId);
+
         await page.getByTestId('btn-logout').click();
 
-        await login(page, USUARIOS.GESTOR_COORD.titulo, USUARIOS.GESTOR_COORD.senha);
+        // George Harrison (212121) é Gestor da SECRETARIA_2
+        await loginComPerfil(page, '212121', 'senha', 'GESTOR - SECRETARIA_2');
 
         // Aguardar que o processo apareça no painel
         await expect(page.getByTestId('tbl-processos').getByRole('row', {name: descricao})).toBeVisible();
         await page.getByTestId('tbl-processos').getByRole('row', {name: descricao}).click();
 
-        await expect(page).toHaveURL(/\/processo\/\d+/);
-
-        // Capturar ID do processo para limpeza
-        const processoId = Number.parseInt(page.url().match(/\/processo\/(\d+)/)?.[1] || '0');
-        if (processoId > 0) cleanupAutomatico.registrar(processoId);
+        await esperarPaginaDetalhesProcesso(page, processoId);
 
         await verificarDetalhesProcesso(page, {
             descricao,
@@ -78,6 +100,57 @@ test.describe('CDU-06 - Detalhar processo', () => {
             situacao: 'Em andamento'
         });
 
+        // GESTOR não vê Finalizar Processo
         await expect(page.getByTestId('btn-processo-finalizar')).toBeHidden();
+
+        // GESTOR não vê ações de alteração administrativa no subprocesso
+        await navegarParaSubprocesso(page, UNIDADE_PROCESSO);
+        await expect(page.getByTestId('btn-alterar-data-limite')).toBeHidden();
+        await expect(page.getByTestId('btn-reabrir-cadastro')).toBeHidden();
+    });
+
+    test('Fase 2: Verificar botões de ação em bloco [Step 2.2.2]', async ({page, cleanupAutomatico}) => {
+        const timestamp = Date.now();
+        const descricao = `Bloco CDU-06 ${timestamp}`;
+        const UNIDADE_SUB = 'ASSESSORIA_12';
+
+        // 1. ADMIN cria processo
+        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
+        await criarProcesso(page, {
+            descricao,
+            tipo: 'MAPEAMENTO',
+            diasLimite: 30,
+            unidade: UNIDADE_SUB,
+            expandir: ['SECRETARIA_1'],
+            iniciar: true
+        });
+        
+        // Capturar ID para cleanup
+        await page.getByTestId('tbl-processos').getByText(descricao).first().click();
+        await esperarPaginaDetalhesProcesso(page);
+        const processoId = await extrairProcessoId(page);
+        cleanupAutomatico.registrar(processoId);
+
+        // 2. CHEFE disponibiliza cadastro para habilitar ações em bloco
+        await login(page, USUARIOS.CHEFE_ASSESSORIA_12.titulo, USUARIOS.CHEFE_ASSESSORIA_12.senha);
+        await acessarSubprocessoChefeDireto(page, descricao, UNIDADE_SUB);
+        await navegarParaAtividades(page);
+        await adicionarAtividade(page, `Atividade Bloco ${timestamp}`);
+        await adicionarConhecimento(page, `Atividade Bloco ${timestamp}`, 'Conhecimento Bloco');
+        await disponibilizarCadastro(page);
+        await verificarPaginaPainel(page);
+
+        // 3. ADMIN verifica botão "Homologar em bloco"
+        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
+        await page.getByTestId('tbl-processos').getByText(descricao).first().click();
+        await esperarPaginaDetalhesProcesso(page, processoId);
+        await expect(page.getByRole('button', {name: 'Homologar em bloco'})).toBeVisible();
+
+        // 4. GESTOR verifica botão "Aceitar em bloco"
+        // John Lennon (202020) é Gestor da SECRETARIA_1 (que engloba ASSESSORIA_12)
+        await loginComPerfil(page, '202020', 'senha', 'GESTOR - SECRETARIA_1');
+        await page.getByTestId('tbl-processos').getByText(descricao).first().click();
+        await esperarPaginaDetalhesProcesso(page, processoId);
+        await expect(page.getByRole('button', {name: 'Aceitar em bloco'})).toBeVisible();
     });
 });

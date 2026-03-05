@@ -10,7 +10,7 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
     const GESTOR_UNIDADE = USUARIOS.GESTOR_COORD_21.titulo;
     const SENHA_GESTOR = USUARIOS.GESTOR_COORD_21.senha;
 
-    test('Deve exibir detalhes do subprocesso para ADMIN, GESTOR e CHEFE', async (
+    test('Deve exibir detalhes do subprocesso para ADMIN, GESTOR e CHEFE e respeitar regras de cards', async (
         {
             page, autenticadoComoAdmin, cleanupAutomatico
         }) => {
@@ -40,10 +40,20 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
         await verificarDetalhesSubprocesso(page, {
             sigla: UNIDADE_ALVO,
             situacao: 'Não iniciado',
-            prazo: '/'
+            localizacao: UNIDADE_ALVO
         });
+        
+        await expect(page.getByText('Titular:')).toBeVisible();
 
-        await expect(page.locator('[data-testid="card-subprocesso-atividades"], [data-testid="card-subprocesso-atividades-vis"]').first()).toBeVisible();
+        // Para ADMIN (antes da homologação do cadastro), ambos os cards devem estar desabilitados
+        const cardAtividadesAdmin = page.locator('[data-testid="card-subprocesso-atividades-vis"]');
+        await expect(cardAtividadesAdmin).toBeVisible();
+        await expect(cardAtividadesAdmin).toHaveClass(/disabled-card/);
+        
+        const cardMapaAdmin = page.locator('[data-testid="card-subprocesso-mapa-visualizacao"]');
+        await expect(cardMapaAdmin).toBeVisible();
+        await expect(cardMapaAdmin).toHaveClass(/disabled-card/);
+
         await expect(page.getByRole('heading', {name: 'Movimentações'})).toBeVisible();
         await expect(page.locator('table tbody tr')).not.toHaveCount(0);
 
@@ -52,6 +62,12 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
         await page.getByTestId('tbl-processos').getByText(descricao, {exact: true}).first().click();
         await expect(page).toHaveURL(/\/processo\/\d+$/);
         await expect(page.getByRole('row').filter({has: page.getByRole('cell', {name: UNIDADE_ALVO})})).toBeVisible();
+        await navegarParaSubprocesso(page, UNIDADE_ALVO);
+        
+        // Para GESTOR (antes da disponibilização), cards desabilitados
+        const cardAtividadesGestor = page.locator('[data-testid="card-subprocesso-atividades-vis"]');
+        await expect(cardAtividadesGestor).toBeVisible();
+        await expect(cardAtividadesGestor).toHaveClass(/disabled-card/);
 
         await page.getByTestId('btn-logout').click();
         await login(page, CHEFE_UNIDADE, SENHA_CHEFE);
@@ -61,7 +77,17 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
         await verificarDetalhesSubprocesso(page, {
             sigla: UNIDADE_ALVO,
             situacao: 'Não iniciado',
-            prazo: '/'
+            localizacao: UNIDADE_ALVO
         });
+        
+        // Para CHEFE, card de atividades DEVE estar habilitado para edição
+        const cardAtividadesChefe = page.locator('[data-testid="card-subprocesso-atividades"]');
+        await expect(cardAtividadesChefe).toBeVisible();
+        await expect(cardAtividadesChefe).not.toHaveClass(/disabled-card/);
+        
+        // Mas card de mapa DEVE continuar desabilitado
+        const cardMapaChefe = page.locator('[data-testid="card-subprocesso-mapa-visualizacao"]');
+        await expect(cardMapaChefe).toBeVisible();
+        await expect(cardMapaChefe).toHaveClass(/disabled-card/);
     });
 });

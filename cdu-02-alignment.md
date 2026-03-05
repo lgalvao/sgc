@@ -1,5 +1,7 @@
 # CDU-02 - Visualizar Painel - Alignment
 
+STATUS: DONE
+
 ## Current Status
 - The test verifies the basic structure (Processos and Alertas headers).
 - It verifies table sorting.

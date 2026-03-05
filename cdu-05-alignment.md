@@ -1,4 +1,5 @@
 # CDU-05 - Iniciar processo de revisao - Alignment
+STATUS: DONE
 
 ## Current Status
 - The test runs a massive setup to create a finalized mapping process.

@@ -49,14 +49,19 @@ Os helpers estão organizados em arquivos especializados no diretório `e2e/help
 
 Ao testar elementos que contêm texto, especialmente em tabelas ou listas de mensagens:
 
-- **Cuidado com Substrings**: Se uma mensagem ("Início do processo") é parte de outra ("Início do processo em unidade subordinada"), o Playwright falhará por ambiguidade (strict mode). Use filtros combinados para diferenciar:
+- **Conheça o Componente antes de interagir**: Não assuma padrões de interação genéricos. 
+    - Unidades e processos na árvore usam `TreeTable.vue` e exigem clique no botão de expansão (`btn-toggle-expand-...`).
+    - Atividades e Conhecimentos usam cards (`AtividadeItem.vue`) que já exibem os dados aninhados. **Nao tente clicar em botões de expansão que não existem**.
+- **Evite Ambiguidade com Modais**: O Playwright falhará em modo estrito se `getByText('Rótulo')` encontrar tanto um botão quanto o título de um modal aberto. 
+    - ✅ USE `getByRole('button', { name: 'Rótulo' })` para garantir que está interagindo com o botão e não com o título do modal (`heading`).
+- **Cuidado com Substrings**: Se uma mensagem ("Início do processo") é parte de outra ("Início do processo em unidade subordinada"), use filtros combinados para diferenciar:
   ```typescript
   // Seleciona a linha que tem o texto A, mas NÃO tem a palavra B
   await expect(page.locator('tr', {hasText: 'Início do processo'})
       .filter({hasNotText: 'subordinada'})
   ).toBeVisible();
   ```
-- **Atenção a Textos Ocultos (Accessibility)**: Alguns componentes injetam texto para leitores de tela (ex: `<span class="visually-hidden">Não lido: </span>`). Isso faz com que `exact: true` falhe silenciosamente. Prefira regex ou filtros de conteúdo em vez de matchers exatos em células complexas.
+- **Atenção a Textos Ocultos (Accessibility)**: Alguns componentes injetam texto para leitores de tela. Prefira regex ou filtros de conteúdo em vez de matchers exatos (`exact: true`) em células complexas.
 - **Helpers de Navegação Semântica**: Evite repetir expressões regulares de URL nos testes. Use e mantenha os helpers em `helpers-navegacao.ts` (ex: `esperarPaginaDetalhesProcesso(page, id)`).
 
 ## Nuances de Autenticação
@@ -65,17 +70,12 @@ O comportamento do login varia conforme o tipo de unidade do usuário:
 
 - **Unidades Operacionais/Intermediárias**: Geralmente possuem apenas um perfil e o sistema loga diretamente (Use `login`).
 - **Unidades Interoperacionais**: Podem acumular perfis (ex: Chefe e Gestor), exigindo a escolha em um dropdown após a senha (Use `loginComPerfil`).
+- **Troca de Usuário em Testes Seriais**: Ao usar `test.describe.serial()`, o estado do navegador é mantido entre os cenários. Se o teste N+1 precisa de um usuário diferente do teste N, chame o helper `login` ou `loginComPerfil` explicitamente no início do cenário, mesmo que já use uma fixture. Isso garante a navegação para `/login` e a troca efetiva da sessão.
 - **Dica**: Se o teste falhar esperando pelo seletor de perfil, verifique se o usuário em questão realmente possui múltiplos perfis no `seed.sql`.
 
-### Princípios para Helpers
+### Hierarquia de Unidades
 
-Helpers devem ser **lineares e assertivos**. Se algo inesperado acontece, o teste deve falhar imediatamente.
-
-- ❌ NUNCA use `.catch(() => false)` ou `try/catch` para engolir erros silenciosamente — isso esconde bugs. Exceção: `.catch(() => {})` no click de toasts que podem auto-fechar entre `isVisible` e `click` é aceitável, pois o toast desaparecer é o resultado desejado.
-- ❌ NUNCA use fallbacks com múltiplas estratégias (ex: "se não encontrar X, tenta Y, depois Z") — isso torna os testes não-determinísticos.
-- ❌ NUNCA use `if (await element.isVisible())` para decidir qual caminho seguir **quando o teste deveria saber qual caminho está testando**. Exceção: quando a UI legítimamente mostra variantes (ex: botão empty-state vs botão normal em `abrirModalCriarCompetencia`, ou card de edição vs visualização em `navegarParaMapa`), usar `.or()` ou `isVisible()` é aceitável.
-- ✅ Use funções separadas para contextos diferentes (ex: `abrirModalImpactoEdicao` vs `abrirModalImpactoVisualizacao`).
-- ✅ Se um parâmetro é necessário para navegação determinística, torne-o obrigatório (ex: `siglaUnidade`).
+Ao testar visibilidade de processos para Gestores ou Chefes, **consulte sempre o `e2e/setup/seed.sql`**. Se a unidade do processo não for subordinada à unidade do usuário testado, o sistema (corretamente) não exibirá o registro, causando falha no teste por "elemento não encontrado".
 
 ## Debugging de Testes E2E
 
@@ -86,15 +86,18 @@ Quando um teste falha por um elemento estar "obstruído" ou "não encontrado", *
 - Se um toast está bloqueando um botão, verifique se o toast está configurado corretamente (auto-hide, posição). O problema pode ser no frontend, não no teste.
 - Se um modal ainda está aberto, verifique se a ação anterior realmente completou. O problema pode ser que o teste não esperou a ação terminar.
 
+### Datas e Localização
+
+Sempre use `.toLocaleDateString('pt-BR')` ao comparar datas geradas dinamicamente nos testes (como `Date.now() + dias`) com o conteúdo da tela. O sistema utiliza o padrão brasileiro, e falhas de asserção ocorrem se o teste comparar formatos ISO ou americanos com o que está renderizado.
+
+### Captura de IDs de Processos
+
+**Evite capturar IDs de URLs de criação/edição** logo após salvar. O redirecionamento para o Painel pode ocorrer antes que a URL mude para o formato com ID, ou o ID pode não estar presente na URL de sucesso.
+- ✅ PADRÃO SEGURO: Após criar o processo e voltar ao Painel, localize o registro pela descrição, clique para entrar nos detalhes e então use `await extrairProcessoId(page)` na página de detalhes.
+
 ### Ler os logs do Playwright com atenção
 
-O Playwright fornece logs detalhados no "Call log" de cada erro. Eles mostram:
-
-- O **elemento exato** que está interceptando (`<button class="btn-close">` from `<div class="orchestrator-container">`)
-- Os **atributos do elemento** (ex: `value="3000"` revelou que o prop name estava errado)
-- O **número de retries** e o motivo de cada falha
-
-Leia esses logs **antes** de tentar corrigir. A resposta geralmente está lá.
+O Playwright fornece logs detalhados no "Call log" de cada erro. Eles mostram o elemento exato, atributos e o motivo da falha. Leia esses logs **antes** de tentar corrigir. A resposta geralmente está lá.
 
 ### Ler os `error-context.md` gerados
 
@@ -102,7 +105,7 @@ Testes que falham geram um snapshot do DOM em `error-context.md`. Esse snapshot 
 
 ### `force: true` vs `dispatchEvent`
 
-- `click({force: true})` — Pula as verificações de "actionability" (visibilidade, sobreposição) mas ainda dispara o evento nas coordenadas do elemento. **Não garante** que o handler do Vue será acionado se o elemento clicado (ex: `<li>`) não é o mesmo que recebe o evento (ex: `<a>` dentro do `<li>`).
+- `click({force: true})` — Pula as verificações de "actionability" mas ainda dispara o evento nas coordenadas do elemento. **Não garante** que o handler do Vue será acionado se o elemento clicado (ex: `<li>`) não é o mesmo que recebe o evento (ex: `<a>` dentro do `<li>`).
 - `dispatchEvent('click')` — Dispara o evento DOM diretamente no elemento, ignorando completamente sobreposições visuais. **Garante** que o handler será acionado. Usar para casos como o `fazerLogout`, onde um toast pode sobrepor o botão.
 
 ### Rodar os testes localmente
@@ -115,25 +118,22 @@ npx playwright test e2e/cdu-XX.spec.ts > resultado.txt 2>&1
 
 ## Verificar as pré-condições de estado antes de testar uma ação
 
-Se um teste espera que um botão esteja visível/habilitado mas ele não está, **verifique se o subprocesso está na situação correta para habilitar aquela ação**. O backend determina as permissões com base no estado do subprocesso (ex: `podeReabrirCadastro` requer `>= MAPA_HOMOLOGADO`). Se o teste só progrediu o subprocesso até `CADASTRO_HOMOLOGADO`, o botão não aparecerá.
+Se um teste espera que um botão esteja visível/habilitado mas ele não está, **verifique se o subprocesso está na situação correta para habilitar aquela ação**. O backend determina as permissões com base no estado do subprocesso (ex: `podeReabrirCadastro` requer `>= MAPA_HOMOLOGADO`). 
 
-**Ação:** Leia a lógica de permissões em `SubprocessoService.java` (método `verificarPermissoes`) e confira se o fluxo no teste atinge a situação mínima exigida. Se não, adicione passos de preparação (ex: criar mapa → disponibilizar → validar → aceitar → homologar).
+**Ação:** Leia a lógica de permissões em `SubprocessoService.java` (método `construirPermissoes`) e confira se o fluxo no teste atinge a situação mínima exigida.
 
 ## Testes que revelam bugs no frontend
 
 Nem sempre a falha é do teste — o teste pode estar correto e revelando um **bug real do frontend**. Exemplos encontrados:
 
-- **`isProcessoFinalizado` excessivamente restritivo**: `SubprocessoView.vue` e `SubprocessoCards.vue` tratavam `MAPA_HOMOLOGADO` como "processo finalizado", escondendo botões que deveriam estar visíveis exatamente nesse estado (como "Reabrir cadastro"). O processo só é realmente finalizado quando `SituacaoProcesso.FINALIZADO`.
-
-- **Busca flat em árvore hierárquica**: `MapaVisualizacaoView.vue` usava `.find()` flat no array `processoDetalhe.unidades`, que só contém nós raiz. Unidades folha (ex: `SECAO_212`) ficam aninhadas em `filhos` e nunca eram encontradas, causando `codSubprocesso = null` e mapa vazio. Corrigido com busca recursiva.
-
-- **Endpoint errado para homologação de mapa em revisão**: `MapaVisualizacaoView.confirmarAceitacao` chamava `homologarRevisaoCadastro` (homologação de *cadastro*) para processos de revisão, quando deveria chamar `homologarValidacao` (homologação de *mapa*). Isso fazia o subprocesso regredir ao estado de cadastro ao invés de avançar para `REVISAO_MAPA_HOMOLOGADO`.
+- **`isProcessoFinalizado` excessivamente restritivo**: `SubprocessoView.vue` e `SubprocessoCards.vue` tratavam `MAPA_HOMOLOGADO` como "processo finalizado", escondendo botões.
+- **Busca flat em árvore hierárquica**: `MapaVisualizacaoView.vue` usava `.find()` flat, falhando em unidades aninhadas.
 
 **Ação:** Quando um teste falha em um fluxo que deveria funcionar, investigue também o código do frontend — não apenas o teste.
 
 ## Sempre assertar mensagens de sucesso após ações mutantes
 
-Se um passo de preparação faz uma ação (validar mapa, aceitar, homologar), **adicione uma assertiva para a mensagem de sucesso** (ex: `await expect(page.getByText(/Mapa validado/i).first()).toBeVisible()`). Sem isso, erros silenciosos passam despercebidos — o teste avança mas a ação não foi efetivada no backend. Isso é especialmente importante em fluxos com múltiplos passos sequenciais, onde o passo N+1 depende do sucesso do passo N.
+Se um passo de preparação faz uma ação (validar mapa, aceitar, homologar), **adicione uma assertiva para a mensagem de sucesso** (ex: `await expect(page.getByText(/Mapa validado/i).first()).toBeVisible()`). Sem isso, erros passam despercebidos — o teste avança mas a ação não foi efetivada no backend.
 
 ## Logs do backend nos resultados dos testes
 
@@ -142,5 +142,3 @@ Os logs do backend aparecem na saída dos testes (prefixados com `[WebServer] [B
 ```bash
 grep -i 'subprocesso 202' resultado.txt
 ```
-
-Se uma ação que deveria ter sido executada não aparece nos logs (ex: "Validando mapa do subprocesso 202" ausente), isso indica que o frontend não chamou o backend — provavelmente porque `codSubprocesso` era null ou o endpoint errado foi chamado.

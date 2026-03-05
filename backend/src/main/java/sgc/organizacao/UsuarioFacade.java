@@ -69,6 +69,11 @@ public class UsuarioFacade {
     }
 
     @Transactional(readOnly = true)
+    public ResponsavelDto buscarResponsabilidadeDetalhadaAtual(String sigla) {
+        return responsavelUnidadeService.buscarResponsabilidadeDetalhadaAtual(sigla);
+    }
+
+    @Transactional(readOnly = true)
     public List<PerfilDto> buscarPerfisUsuario(String titulo) {
         return usuarioService.buscarComAtribuicoesOpt(titulo)
                 .map(usuario -> {

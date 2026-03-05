@@ -1,5 +1,7 @@
 # CDU-01 - Realizar login e exibir estrutura das telas - Alignment
 
+STATUS: DONE
+
 ## Current Status
 - The test verifies invalid credentials.
 - It verifies successful login for a single-profile user (GESTOR).

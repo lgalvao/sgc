@@ -535,7 +535,7 @@ public class SubprocessoService {
         String siglaUnidade = sp.getUnidade().getSigla();
         String localizacaoAtual = siglaUnidade;
 
-        Usuario responsavel = usuarioFacade.buscarResponsavelAtual(siglaUnidade);
+        sgc.organizacao.dto.ResponsavelDto responsavel = usuarioFacade.buscarResponsabilidadeDetalhadaAtual(siglaUnidade);
         Usuario titular = usuarioFacade.buscarPorLogin(sp.getUnidade().getTituloTitular());
 
         List<Movimentacao> movs = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo());
@@ -603,6 +603,9 @@ public class SubprocessoService {
         boolean isGestor = perfil == Perfil.GESTOR;
         boolean isAdmin = perfil == Perfil.ADMIN;
 
+        boolean habilitarAcessoCadastro = verificarAcessoCadastroHabilitado(perfil, situacao);
+        boolean habilitarAcessoMapa = verificarAcessoMapaHabilitado(perfil, situacao);
+
         return PermissoesSubprocessoDto.builder()
                 .podeEditarCadastro(mesmaUnidade && isChefe && Set.of(SituacaoSubprocesso.NAO_INICIADO, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO).contains(situacao))
                 .podeDisponibilizarCadastro(mesmaUnidade && isChefe && Set.of(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO).contains(situacao))
@@ -621,7 +624,37 @@ public class SubprocessoService {
                 .podeReabrirCadastro(isAdmin && situacao.ordinal() >= SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO.ordinal() && situacao.name().startsWith("MAPEAMENTO"))
                 .podeReabrirRevisao(isAdmin && situacao.ordinal() >= SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO.ordinal() && situacao.name().startsWith("REVISAO"))
                 .podeEnviarLembrete(isAdmin)
+                .habilitarAcessoCadastro(habilitarAcessoCadastro)
+                .habilitarAcessoMapa(habilitarAcessoMapa)
                 .build();
+    }
+
+    private boolean verificarAcessoCadastroHabilitado(Perfil perfil, SituacaoSubprocesso situacao) {
+        if (perfil == Perfil.CHEFE) return true;
+        
+        if (situacao.name().startsWith("MAPEAMENTO")) {
+            return situacao.ordinal() >= SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO.ordinal();
+        } else if (situacao.name().startsWith("REVISAO")) {
+            return situacao.ordinal() >= SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA.ordinal();
+        }
+        return false;
+    }
+    
+    private boolean verificarAcessoMapaHabilitado(Perfil perfil, SituacaoSubprocesso situacao) {
+        if (perfil == Perfil.ADMIN) {
+            if (situacao.name().startsWith("MAPEAMENTO")) {
+                return situacao.ordinal() >= SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO.ordinal();
+            } else if (situacao.name().startsWith("REVISAO")) {
+                return situacao.ordinal() >= SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA.ordinal();
+            }
+        } else {
+            if (situacao.name().startsWith("MAPEAMENTO")) {
+                return situacao.ordinal() >= SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO.ordinal();
+            } else if (situacao.name().startsWith("REVISAO")) {
+                return situacao.ordinal() >= SituacaoSubprocesso.REVISAO_MAPA_DISPONIBILIZADO.ordinal();
+            }
+        }
+        return false;
     }
 
     private boolean verificarVisualizarImpacto(boolean temMapaVigente, boolean mesmaUnidade, boolean isChefe, boolean isGestor, boolean isAdmin, SituacaoSubprocesso situacao) {

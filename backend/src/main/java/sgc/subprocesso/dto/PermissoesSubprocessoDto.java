@@ -24,6 +24,8 @@ public record PermissoesSubprocessoDto(
         boolean podeAlterarDataLimite,
         boolean podeReabrirCadastro,
         boolean podeReabrirRevisao,
-        boolean podeEnviarLembrete
+        boolean podeEnviarLembrete,
+        boolean habilitarAcessoCadastro,
+        boolean habilitarAcessoMapa
 ) {
 }

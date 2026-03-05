@@ -23,7 +23,11 @@ class CDU07IntegrationTest extends BaseIntegrationTest {
                                 .param("perfil", "ADMIN"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.subprocesso.codUnidade").value(8))
-                .andExpect(jsonPath("$.subprocesso.situacao").value(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO.name()));
+                .andExpect(jsonPath("$.subprocesso.situacao").value(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO.name()))
+                .andExpect(jsonPath("$.responsavel.usuario.tituloEleitoral").exists())
+                .andExpect(jsonPath("$.localizacaoAtual").exists())
+                .andExpect(jsonPath("$.permissoes.habilitarAcessoCadastro").value(false)) // ADMIN não visualiza em CADASTRO_EM_ANDAMENTO
+                .andExpect(jsonPath("$.permissoes.habilitarAcessoMapa").value(false)); // ADMIN não visualiza mapa em CADASTRO_EM_ANDAMENTO
     }
 
     @Test
@@ -35,7 +39,9 @@ class CDU07IntegrationTest extends BaseIntegrationTest {
                                 .param("perfil", "CHEFE")
                                 .param("unidadeUsuario", "8"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.subprocesso.codUnidade").value(8));
+                .andExpect(jsonPath("$.subprocesso.codUnidade").value(8))
+                .andExpect(jsonPath("$.permissoes.habilitarAcessoCadastro").value(true)) // CHEFE sempre tem acesso ao cadastro
+                .andExpect(jsonPath("$.permissoes.habilitarAcessoMapa").value(false)); // CHEFE não visualiza mapa em CADASTRO_EM_ANDAMENTO
     }
 
     @Test

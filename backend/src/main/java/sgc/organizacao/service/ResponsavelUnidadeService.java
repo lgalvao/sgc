@@ -97,6 +97,23 @@ public class ResponsavelUnidadeService {
     }
 
     /**
+     * Busca o responsável atual de uma unidade com detalhes da responsabilidade.
+     */
+    @Transactional(readOnly = true)
+    public ResponsavelDto buscarResponsabilidadeDetalhadaAtual(String siglaUnidade) {
+        Unidade unidade = repo.buscarPorSigla(Unidade.class, siglaUnidade);
+        Responsabilidade resp = repo.buscar(Responsabilidade.class, unidade.getCodigo());
+        Usuario usuario = repo.buscar(Usuario.class, resp.getUsuarioTitulo());
+
+        return ResponsavelDto.builder()
+                .usuario(usuario)
+                .tipo(resp.getTipo())
+                .dataInicio(resp.getDataInicio())
+                .dataFim(resp.getDataFim())
+                .build();
+    }
+
+    /**
      * Busca o responsável (titular e substituto) de uma unidade.
      *
      * @throws ErroEntidadeNaoEncontrada se não houver responsável

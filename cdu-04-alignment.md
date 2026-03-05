@@ -1,5 +1,7 @@
 # CDU-04 - Iniciar processo de mapeamento - Alignment
 
+STATUS: DONE
+
 ## Current Status
 - The test creates a mapping process as ADMIN.
 - It verifies the confirmation modal and initiation flow.

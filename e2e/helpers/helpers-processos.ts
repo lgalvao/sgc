@@ -51,6 +51,7 @@ export async function criarProcesso(page: Page, options: {
     } else {
         await page.getByTestId('btn-processo-salvar').click();
     }
+
     await page.waitForURL('/painel');
 }
 
@@ -114,12 +115,24 @@ export async function verificarUnidadeParticipante(page: Page, unidade: UnidadeP
 export async function verificarDetalhesSubprocesso(page: Page, dados: {
     sigla: string,
     situacao: string,
-    prazo: string | RegExp,
-    titular?: string
+    prazo?: string | RegExp,
+    localizacao?: string,
+    titular?: string,
+    responsavel?: string,
+    tipoResponsabilidade?: string
 }) {
     await expect(page.getByTestId('subprocesso-header__txt-header-unidade')).toContainText(dados.sigla);
     if (dados.titular) {
-        await expect(page.getByText(dados.titular).first()).toBeVisible();
+        await expect(page.getByText(`Titular: ${dados.titular}`).first()).toBeVisible();
+    }
+    if (dados.responsavel) {
+        await expect(page.getByText(`Responsável: ${dados.responsavel}`).first()).toBeVisible();
+    }
+    if (dados.tipoResponsabilidade) {
+        await expect(page.getByText(`- ${dados.tipoResponsabilidade}`).first()).toBeVisible();
+    }
+    if (dados.localizacao) {
+        await expect(page.getByTestId('subprocesso-header__txt-localizacao')).toContainText(dados.localizacao);
     }
     await expect(page.getByText(dados.situacao).first()).toBeVisible();
 }

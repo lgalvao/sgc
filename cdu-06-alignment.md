@@ -1,4 +1,5 @@
 # CDU-06 - Detalhar processo - Alignment
+STATUS:DONE
 
 ## Current Status
 - The test sets up mapping processes.

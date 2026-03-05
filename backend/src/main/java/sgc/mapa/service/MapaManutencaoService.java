@@ -128,8 +128,6 @@ public class MapaManutencaoService {
 
     @Transactional
     public Atividade criarAtividade(CriarAtividadeRequest request) {
-        log.info("Criando atividade no mapa {}: {}", request.mapaCodigo(), request.descricao());
-
         validarDescricaoAtividadeUnica(request.mapaCodigo(), request.descricao());
         Mapa mapa = repo.buscar(Mapa.class, request.mapaCodigo());
         notificarAlteracaoMapa(request.mapaCodigo());
@@ -137,13 +135,12 @@ public class MapaManutencaoService {
         Atividade entidade = Atividade.criarDe(request);
         entidade.setMapa(mapa);
 
+        log.info("Atividade criada no mapa {}", request.mapaCodigo());
         return atividadeRepo.save(entidade);
     }
 
     @Transactional
     public void atualizarAtividade(Long codigo, AtualizarAtividadeRequest request) {
-        log.info("Atualizando atividade {}: {}", codigo, request.descricao());
-
         Atividade existente = repo.buscar(Atividade.class, codigo);
         if (!existente.getDescricao().equalsIgnoreCase(request.descricao())) {
             validarDescricaoAtividadeUnica(existente.getMapa().getCodigo(), request.descricao());
@@ -152,11 +149,11 @@ public class MapaManutencaoService {
 
         existente.atualizarDe(request);
         atividadeRepo.save(existente);
+        log.info("Atividade {} atualizada", codigo);
     }
 
     @Transactional
     public void atualizarDescricoesAtividadeEmBloco(Map<Long, String> descricoesPorId) {
-        log.info("Atualizando descrições de {} atividades em lote", descricoesPorId.size());
         List<Atividade> atividades = atividadeRepo.findAllById(descricoesPorId.keySet());
         Set<Long> mapasAfetados = new HashSet<>();
 
@@ -171,13 +168,14 @@ public class MapaManutencaoService {
 
         atividadeRepo.saveAll(atividades);
         mapasAfetados.forEach(this::notificarAlteracaoMapa);
+        log.info("Atualizando descrições de {} atividades em lote", descricoesPorId.size());
     }
 
     @Transactional
     public void excluirAtividade(Long codAtividade) {
-        log.info("Excluindo atividade {}", codAtividade);
         Atividade atividade = repo.buscar(Atividade.class, codAtividade);
         excluirAtividadeComConhecimentos(atividade);
+        log.info("Atividade {} excluída", codAtividade);
     }
 
     private void excluirAtividadeComConhecimentos(Atividade atividade) {

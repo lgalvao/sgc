@@ -7,11 +7,13 @@
       >
         <BCard
             v-if="podeEditarCadastroFinal"
+            :aria-disabled="!isCadastroHabilitado"
+            :class="{ 'disabled-card': !isCadastroHabilitado }"
+            :tabindex="!isCadastroHabilitado ? -1 : 0"
             class="h-100 card-actionable"
             data-testid="card-subprocesso-atividades"
             role="button"
-            tabindex="0"
-            @click="navegarPara('SubprocessoCadastro')"
+            @click="!isCadastroHabilitado ? null : navegarPara('SubprocessoCadastro')"
             @keydown="handleKeyDown($event, 'SubprocessoCadastro')"
         >
           <div class="card-click-area">
@@ -25,11 +27,13 @@
         </BCard>
         <BCard
             v-else
+            :aria-disabled="!isCadastroHabilitado"
+            :class="{ 'disabled-card': !isCadastroHabilitado }"
+            :tabindex="!isCadastroHabilitado ? -1 : 0"
             class="h-100 card-actionable"
             data-testid="card-subprocesso-atividades-vis"
             role="button"
-            tabindex="0"
-            @click="navegarPara('SubprocessoVisCadastro')"
+            @click="!isCadastroHabilitado ? null : navegarPara('SubprocessoVisCadastro')"
             @keydown="handleKeyDown($event, 'SubprocessoVisCadastro')"
         >
           <div class="card-click-area">
@@ -49,13 +53,13 @@
       >
         <BCard
             v-if="podeEditarMapaFinal"
-            :aria-disabled="!mapa"
-            :class="{ 'disabled-card': !mapa }"
-            :tabindex="!mapa ? -1 : 0"
+            :aria-disabled="!isMapaHabilitado"
+            :class="{ 'disabled-card': !isMapaHabilitado }"
+            :tabindex="!isMapaHabilitado ? -1 : 0"
             class="h-100 card-actionable"
             data-testid="card-subprocesso-mapa-edicao"
             role="button"
-            @click="!mapa ? null : navegarPara('SubprocessoMapa')"
+            @click="!isMapaHabilitado ? null : navegarPara('SubprocessoMapa')"
             @keydown="handleKeyDown($event, 'SubprocessoMapa')"
         >
           <div class="card-click-area">
@@ -69,13 +73,13 @@
         </BCard>
         <BCard
             v-else
-            :aria-disabled="!mapa"
-            :class="{ 'disabled-card': !mapa }"
-            :tabindex="!mapa ? -1 : 0"
+            :aria-disabled="!isMapaHabilitado"
+            :class="{ 'disabled-card': !isMapaHabilitado }"
+            :tabindex="!isMapaHabilitado ? -1 : 0"
             class="h-100 card-actionable"
             data-testid="card-subprocesso-mapa-visualizacao"
             role="button"
-            @click="!mapa ? null : navegarPara('SubprocessoVisMapa')"
+            @click="!isMapaHabilitado ? null : navegarPara('SubprocessoVisMapa')"
             @keydown="handleKeyDown($event, 'SubprocessoVisMapa')"
         >
           <div class="card-click-area">
@@ -168,7 +172,7 @@ import {useRouter} from "vue-router";
 import {computed} from "vue";
 import {useAcesso} from "@/composables/useAcesso";
 import {useSubprocessosStore} from "@/stores/subprocessos";
-import {type Mapa, type MapaCompleto, SituacaoSubprocesso, TipoProcesso,} from "@/types/tipos";
+import {type Mapa, type MapaCompleto, SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 
 const TipoProcessoEnum = TipoProcesso;
 
@@ -183,6 +187,7 @@ const props = defineProps<{
 
 const router = useRouter();
 const subprocessosStore = useSubprocessosStore();
+
 const subprocesso = computed(() => subprocessosStore.subprocessoDetalhe);
 
 const {podeEditarCadastro, podeEditarMapa} = useAcesso(subprocesso);
@@ -194,6 +199,15 @@ const isProcessoFinalizado = computed(() => {
 
 const podeEditarCadastroFinal = computed(() => podeEditarCadastro.value && !isProcessoFinalizado.value);
 const podeEditarMapaFinal = computed(() => podeEditarMapa.value && !isProcessoFinalizado.value);
+
+const isCadastroHabilitado = computed(() => {
+  return subprocesso.value?.permissoes?.habilitarAcessoCadastro ?? false;
+});
+
+const isMapaHabilitado = computed(() => {
+  if (!props.mapa) return false;
+  return subprocesso.value?.permissoes?.habilitarAcessoMapa ?? false;
+});
 
 function navegarPara(routeName: string) {
   router.push({
@@ -221,9 +235,9 @@ function handleKeyDown(event: KeyboardEvent, routeName: string, diag = false) {
     if (diag) {
       navegarParaDiag(routeName);
     } else if (routeName === 'SubprocessoMapa' || routeName === 'SubprocessoVisMapa') {
-      if (props.mapa) navegarPara(routeName);
-    } else {
-      navegarPara(routeName);
+      if (isMapaHabilitado.value) navegarPara(routeName);
+    } else if (routeName === 'SubprocessoCadastro' || routeName === 'SubprocessoVisCadastro') {
+      if (isCadastroHabilitado.value) navegarPara(routeName);
     }
   }
 }
