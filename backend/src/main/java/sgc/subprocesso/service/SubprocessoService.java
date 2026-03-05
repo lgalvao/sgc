@@ -694,8 +694,12 @@ public class SubprocessoService {
 
         Long codMapaOrigem = spOrigem.getMapa().getCodigo();
         Long codMapaDestino = spDestino.getMapa().getCodigo();
-        log.info("Importando {} atividades do mapa #{} para o mapa #{}", codigosAtividades.size(), codMapaOrigem, codMapaDestino);
-        copiaMapaService.importarAtividadesDeOutroMapa(codMapaOrigem, codMapaDestino, codigosAtividades);
+        log.info("Importando {} atividades do mapa #{} para o mapa #{}", codigosAtividades != null ? codigosAtividades.size() : "todas as", codMapaOrigem, codMapaDestino);
+        int importadas = copiaMapaService.importarAtividadesDeOutroMapa(codMapaOrigem, codMapaDestino, codigosAtividades);
+
+        if (importadas == 0 && codigosAtividades != null && !codigosAtividades.isEmpty()) {
+            throw new ErroValidacao("Uma ou mais atividades selecionadas já existentes no cadastro não puderam ser importadas.");
+        }
 
         if (spDestino.getSituacao() == SituacaoSubprocesso.NAO_INICIADO) {
             var tipoProcesso = spDestino.getProcesso().getTipo();
