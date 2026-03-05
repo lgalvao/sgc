@@ -186,6 +186,7 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
         await navegarParaMapa(page);
         await page.getByTestId('btn-mapa-validar').click();
         await page.getByTestId('btn-validar-mapa-confirmar').click();
+        await expect(page.getByText(/Mapa validado/i).first()).toBeVisible();
         await fazerLogout(page);
 
         // Gestor COORD_21 aceita mapa
@@ -194,6 +195,7 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
         await navegarParaMapa(page);
         await page.getByTestId('btn-mapa-homologar-aceite').click();
         await page.getByTestId('btn-aceite-mapa-confirmar').click();
+        await expect(page.getByText(/Aceite registrado/i).first()).toBeVisible();
         await fazerLogout(page);
 
         // Gestor SECRETARIA_2 aceita mapa
@@ -202,6 +204,7 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
         await navegarParaMapa(page);
         await page.getByTestId('btn-mapa-homologar-aceite').click();
         await page.getByTestId('btn-aceite-mapa-confirmar').click();
+        await expect(page.getByText(/Aceite registrado/i).first()).toBeVisible();
         await fazerLogout(page);
 
         // ADMIN homologa mapa

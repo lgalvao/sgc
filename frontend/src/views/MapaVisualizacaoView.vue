@@ -470,9 +470,21 @@ function verHistorico() {
 onMounted(async () => {
   await unidadesStore.buscarUnidade(sigla.value);
   await processosStore.buscarProcessoDetalhe(codProcesso.value);
-  if (codSubprocesso.value) {
-    await subprocessosStore.buscarSubprocessoDetalhe(codSubprocesso.value);
-    await mapaStore.buscarMapaVisualizacao(codSubprocesso.value);
+
+  let codSp = codSubprocesso.value;
+
+  // Fallback: se o processoDetalhe não inclui a unidade (ex: perfis não-admin),
+  // buscar o codSubprocesso via subprocessosStore
+  if (!codSp) {
+    codSp = await subprocessosStore.buscarSubprocessoPorProcessoEUnidade(
+        codProcesso.value,
+        sigla.value,
+    ) ?? undefined;
+  }
+
+  if (codSp) {
+    await subprocessosStore.buscarSubprocessoDetalhe(codSp);
+    await mapaStore.buscarMapaVisualizacao(codSp);
   }
 });
 
