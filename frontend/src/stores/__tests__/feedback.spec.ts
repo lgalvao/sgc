@@ -33,8 +33,8 @@ describe("Feedback Store", () => {
                     title: "Sucesso",
                     body: "Operação realizada",
                     variant: "success",
-                    value: 2000,
-                    pos: "top-right",
+                    modelValue: 2000,
+                    pos: "bottom-end",
                     noProgress: true,
                 })
             })
@@ -69,7 +69,7 @@ describe("Feedback Store", () => {
         expect(mockToast.create).toHaveBeenCalledWith(expect.objectContaining({
             props: expect.objectContaining({
                 variant: 'info',
-                value: 3000
+                modelValue: 3000
             })
         }));
     });

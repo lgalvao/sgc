@@ -587,11 +587,11 @@ describe("Processo.vue", () => {
         await flushPromises();
 
         // Acessamos as computeds via wrapper.vm
-        (wrapper.vm as any).acaoBlocoAtual = "invalido";
-        expect((wrapper.vm as any).tituloModalBloco).toBe("");
-        expect((wrapper.vm as any).textoModalBloco).toBe("");
-        expect((wrapper.vm as any).rotuloBotaoBloco).toBe("");
-        expect((wrapper.vm as any).mensagemSucessoAcaoBloco).toBe("Ação em bloco realizada com sucesso");
+        (wrapper.vm).acaoBlocoAtual = "invalido";
+        expect((wrapper.vm).tituloModalBloco).toBe("");
+        expect((wrapper.vm).textoModalBloco).toBe("");
+        expect((wrapper.vm).rotuloBotaoBloco).toBe("");
+        expect((wrapper.vm).mensagemSucessoAcaoBloco).toBe("Ação em bloco realizada com sucesso");
     });
 
     it("deve achatar unidades recursivamente", async () => {
@@ -602,22 +602,20 @@ describe("Processo.vue", () => {
             unidades: [{
                 codUnidade: 201,
                 sigla: "PAI",
-                situacaoSubprocesso: SituacaoSubprocesso.NAO_INICIADO,
+                situacaoSubprocesso: SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO,
                 filhos: [{
                     codUnidade: 202,
                     sigla: "FILHO",
-                    situacaoSubprocesso: SituacaoSubprocesso.NAO_INICIADO,
+                    situacaoSubprocesso: SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO,
                     filhos: []
                 }]
             }]
         };
         processosStore.$patch({processoDetalhe: processoComFilhos});
 
-        // Mudamos para acao que aceita NAO_INICIADO
-        (wrapper.vm as any).acaoBlocoAtual = 'disponibilizar';
+        (wrapper.vm).acaoBlocoAtual = 'disponibilizar';
         await nextTick();
 
-        // As duas unidades devem ser elegíveis para disponibilizar
-        expect((wrapper.vm as any).unidadesElegiveis).toHaveLength(2);
+        expect((wrapper.vm).unidadesElegiveis).toHaveLength(2);
     });
 });

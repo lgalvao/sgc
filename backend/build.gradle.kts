@@ -62,19 +62,11 @@ dependencies {
     testImplementation("io.rest-assured:rest-assured-all:6.0.0")
     testImplementation("org.apache.groovy:groovy-all:5.0.4")
     testImplementation("com.icegreen:greenmail-junit5:2.1.3")
-
     testImplementation("org.pitest:pitest-junit5-plugin:1.2.3")
-
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.1")
     testImplementation("io.swagger.parser.v3:swagger-parser:2.1.37")
     implementation("org.mozilla:rhino:1.9.0")
     testImplementation("com.atlassian.oai:swagger-request-validator-mockmvc:2.46.0")
-
-    // Dependências básicas com versões mais recentes que as definidas pelo Spring (reduz CVEs)
-    implementation("org.apache.commons:commons-lang3:3.20.0")
-    testImplementation("org.assertj:assertj-core:3.27.7")
-
-    implementation("org.jspecify:jspecify:1.0.0")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 }
 

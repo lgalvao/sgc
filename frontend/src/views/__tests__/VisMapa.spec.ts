@@ -5,7 +5,6 @@ import {createTestingPinia} from '@pinia/testing';
 import VisMapa from '@/views/MapaVisualizacaoView.vue';
 import AceitarMapaModal from "@/components/mapa/AceitarMapaModal.vue";
 import {useProcessosStore} from "@/stores/processos";
-import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useFeedbackStore} from "@/stores/feedback";
 import {SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 import {setupComponentTest} from "@/test-utils/componentTestHelpers";
@@ -81,7 +80,7 @@ describe("VisMapa.vue", () => {
             podeVerPagina: {value: true},
             podeVisualizarMapa: {value: true},
             ...accessOverrides
-        } as any);
+        });
 
         context.wrapper = mount(VisMapa, {
             global: {
@@ -401,7 +400,7 @@ describe("VisMapa.vue", () => {
                 },
             },
         }, "TEST", {podeHomologarMapa: {value: true}});
-        const store = useSubprocessosStore();
+        const store = useProcessosStore();
 
         await wrapper
             .find('[data-testid="btn-mapa-homologar-aceite"]')
@@ -411,9 +410,7 @@ describe("VisMapa.vue", () => {
         const modal = wrapper.findComponent(AceitarMapaModal);
         modal.vm.$emit("confirmar-aceitacao", "Obs homolog");
 
-        expect(store.homologarRevisaoCadastro).toHaveBeenCalledWith(10, {
-            observacoes: "Obs homolog",
-        });
+        expect(store.homologarValidacao).toHaveBeenCalledWith(10);
     });
 
     it("shows historico de analise", async () => {
@@ -569,7 +566,7 @@ describe("VisMapa.vue", () => {
         await wrapper.find('[data-testid="btn-mapa-devolver"]').trigger("click");
         await wrapper.vm.$nextTick();
 
-        (wrapper.vm as any).observacaoDevolucao = "Observação de teste";
+        (wrapper.vm).observacaoDevolucao = "Observação de teste";
         await wrapper.vm.$nextTick();
 
         await wrapper.find('[data-testid="btn-devolucao-mapa-confirmar"]').trigger("click");
