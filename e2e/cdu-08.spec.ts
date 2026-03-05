@@ -13,6 +13,7 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
 
     test('Cenário 1: Processo de Mapeamento (Fluxo Completo + Importação + Auto-save)', async ({
                                                                                        page,
+                                                                                       autenticadoComoAdmin,
                                                                                        request,
                                                                                        cleanupAutomatico
                                                                                    }) => {
@@ -32,7 +33,6 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
             cleanupAutomatico.registrar(processoOrigemId);
 
             // Criar Processo Alvo
-            await login(page, USUARIOS.ADMIN.titulo, USUARIOS.ADMIN.senha);
             await criarProcesso(page, {
                 descricao: descricaoProcesso,
                 tipo: 'MAPEAMENTO',

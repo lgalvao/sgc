@@ -152,8 +152,14 @@ export async function fecharModalImpacto(page: Page) {
 }
 
 export async function selecionarAtividadesParaImportacao(page: Page, processoOrigemDescricao: string, unidadeOrigemSigla: string, atividadesDescricoes: string[]) {
-    await expect(page.getByTestId('btn-empty-state-importar').or(page.getByTestId('btn-cad-atividades-importar'))).toBeVisible();
-    await page.getByTestId('btn-empty-state-importar').or(page.getByTestId('btn-cad-atividades-importar')).first().click();
+    const btnEmptyState = page.getByTestId('btn-empty-state-importar');
+    
+    if (await btnEmptyState.isVisible()) {
+        await btnEmptyState.click();
+    } else {
+        await page.getByTestId('btn-mais-acoes').click();
+        await page.getByTestId('btn-cad-atividades-importar').click();
+    }
 
     const modal = page.getByRole('dialog');
     await expect(modal.getByText('Importação de atividades')).toBeVisible();
