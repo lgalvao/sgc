@@ -90,3 +90,35 @@ Não tente adivinhar o problema — rode o teste e leia a saída:
 ```bash
 npx playwright test e2e/cdu-XX.spec.ts > resultado.txt 2>&1
 ```
+
+## Verificar as pré-condições de estado antes de testar uma ação
+
+Se um teste espera que um botão esteja visível/habilitado mas ele não está, **verifique se o subprocesso está na situação correta para habilitar aquela ação**. O backend determina as permissões com base no estado do subprocesso (ex: `podeReabrirCadastro` requer `>= MAPA_HOMOLOGADO`). Se o teste só progrediu o subprocesso até `CADASTRO_HOMOLOGADO`, o botão não aparecerá.
+
+**Ação:** Leia a lógica de permissões em `SubprocessoService.java` (método `verificarPermissoes`) e confira se o fluxo no teste atinge a situação mínima exigida. Se não, adicione passos de preparação (ex: criar mapa → disponibilizar → validar → aceitar → homologar).
+
+## Testes que revelam bugs no frontend
+
+Nem sempre a falha é do teste — o teste pode estar correto e revelando um **bug real do frontend**. Exemplos encontrados:
+
+- **`isProcessoFinalizado` excessivamente restritivo**: `SubprocessoView.vue` e `SubprocessoCards.vue` tratavam `MAPA_HOMOLOGADO` como "processo finalizado", escondendo botões que deveriam estar visíveis exatamente nesse estado (como "Reabrir cadastro"). O processo só é realmente finalizado quando `SituacaoProcesso.FINALIZADO`.
+
+- **Busca flat em árvore hierárquica**: `MapaVisualizacaoView.vue` usava `.find()` flat no array `processoDetalhe.unidades`, que só contém nós raiz. Unidades folha (ex: `SECAO_212`) ficam aninhadas em `filhos` e nunca eram encontradas, causando `codSubprocesso = null` e mapa vazio. Corrigido com busca recursiva.
+
+- **Endpoint errado para homologação de mapa em revisão**: `MapaVisualizacaoView.confirmarAceitacao` chamava `homologarRevisaoCadastro` (homologação de *cadastro*) para processos de revisão, quando deveria chamar `homologarValidacao` (homologação de *mapa*). Isso fazia o subprocesso regredir ao estado de cadastro ao invés de avançar para `REVISAO_MAPA_HOMOLOGADO`.
+
+**Ação:** Quando um teste falha em um fluxo que deveria funcionar, investigue também o código do frontend — não apenas o teste.
+
+## Sempre assertar mensagens de sucesso após ações mutantes
+
+Se um passo de preparação faz uma ação (validar mapa, aceitar, homologar), **adicione uma assertiva para a mensagem de sucesso** (ex: `await expect(page.getByText(/Mapa validado/i).first()).toBeVisible()`). Sem isso, erros silenciosos passam despercebidos — o teste avança mas a ação não foi efetivada no backend. Isso é especialmente importante em fluxos com múltiplos passos sequenciais, onde o passo N+1 depende do sucesso do passo N.
+
+## Logs do backend nos resultados dos testes
+
+Os logs do backend aparecem na saída dos testes (prefixados com `[WebServer] [BACKEND]`). Use `grep` para verificar se as chamadas de backend esperadas realmente aconteceram:
+
+```bash
+grep -i 'subprocesso 202' resultado.txt
+```
+
+Se uma ação que deveria ter sido executada não aparece nos logs (ex: "Validando mapa do subprocesso 202" ausente), isso indica que o frontend não chamou o backend — provavelmente porque `codSubprocesso` era null ou o endpoint errado foi chamado.
