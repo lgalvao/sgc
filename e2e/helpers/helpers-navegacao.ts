@@ -48,11 +48,15 @@ export async function navegarParaSubprocesso(
     page: Page,
     siglaUnidade: string
 ): Promise<void> {
+    // Aguardar qualquer transição de rota antes de checar a URL
+    await page.waitForURL(/\/processo\/\d+/);
+
     const urlSubprocesso = new RegExp(String.raw`/processo/\d+/${siglaUnidade}$`);
     if (urlSubprocesso.test(page.url())) return;
 
     await expect(page.getByText('Carregando detalhes do processo...').first()).toBeHidden();
-    await expect(page.getByTestId('processo-info')).toBeVisible();
+    const info = page.getByTestId('processo-info');
+    await expect(info).toBeVisible();
 
     const tabela = page.getByTestId('tbl-tree');
     await expect(tabela).toBeVisible();

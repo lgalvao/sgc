@@ -329,7 +329,6 @@ async function salvarProcesso() {
 }
 
 async function abrirModalConfirmacao() {
-  // Validações serão feitas no backend ao criar/iniciar o processo
   mostrarModalConfirmacao.value = true;
 }
 
@@ -340,8 +339,6 @@ async function confirmarIniciarProcesso() {
   let codigoProcesso = processoEditando.value?.codigo;
 
   if (!codigoProcesso) {
-    // Se não houver processo salvo, cria antes de iniciar
-    // Backend valida elegibilidade das unidades
     try {
       const request = construirCriarRequest();
       const novoProcesso = await processosStore.criarProcesso(request);
@@ -360,6 +357,7 @@ async function confirmarIniciarProcesso() {
         tipo.value as TipoProcesso,
         unidadesSelecionadas.value,
     );
+
     feedbackStore.show("Processo iniciado", "O processo foi iniciado com sucesso.", "success");
     await router.push("/painel");
     mostrarModalConfirmacao.value = false;

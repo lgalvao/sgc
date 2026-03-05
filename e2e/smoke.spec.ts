@@ -2,19 +2,22 @@ import {expect, test} from './fixtures/base.js';
 import logger from '../frontend/src/utils/logger.js';
 import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
 import {criarProcesso, extrairProcessoId} from './helpers/helpers-processos.js';
-import {navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
+import {fazerLogout, navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 import {
     adicionarAtividade,
     adicionarConhecimento,
+    disponibilizarCadastro,
     navegarParaAtividades,
     navegarParaAtividadesVisualizacao
 } from './helpers/helpers-atividades.js';
 import {
+    aceitarCadastroMapeamento,
     acessarSubprocessoAdmin,
     acessarSubprocessoChefeDireto,
-    acessarSubprocessoGestor
+    acessarSubprocessoGestor,
+    homologarCadastroMapeamento
 } from './helpers/helpers-analise.js';
-import {abrirModalCriarCompetencia, navegarParaMapa} from './helpers/helpers-mapas.js';
+import {abrirModalCriarCompetencia, disponibilizarMapa, navegarParaMapa} from './helpers/helpers-mapas.js';
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza.js';
 
 /**
@@ -152,14 +155,17 @@ test.describe('Smoke Test - Sistema SGC', () => {
 
     test.describe('03 - Fluxo de Processo', () => {
         test('Captura criação e detalhamento de processo', async ({page}) => {
+            const timestamp = Date.now();
+            const UNIDADE_ALVO = 'ASSESSORIA_12';
+            const descricao = `Processo Detalhado ${timestamp}`;
+
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
-            const descricao = `Processo Detalhado ${Date.now()}`;
             await criarProcesso(page, {
                 descricao,
                 tipo: 'MAPEAMENTO',
                 diasLimite: 30,
-                unidade: 'ASSESSORIA_12',
+                unidade: UNIDADE_ALVO,
                 expandir: ['SECRETARIA_1']
             });
 
@@ -168,19 +174,72 @@ test.describe('Smoke Test - Sistema SGC', () => {
             const processoId = await extrairProcessoId(page);
             if (processoId > 0) cleanup.registrar(processoId);
 
-            // Tela de edição de processo
-
             // Modal de iniciar processo
             await page.getByTestId('btn-processo-iniciar').click();
             await page.waitForTimeout(300);
             await page.getByTestId('btn-iniciar-processo-confirmar').click();
             await expect(page).toHaveURL(/\/painel/);
 
-            // Acessar detalhes do processo iniciado
-            await page.getByTestId('tbl-processos').getByText(descricao).first().click();
-            await expect(page).toHaveURL(/\/processo\/\d+/);
+            // --- Fluxo para habilitar botão Finalizar ---
 
-            // Modal de finalizar processo
+            // 1. Chefe cadastra e disponibiliza
+            await fazerLogout(page);
+            await login(page, USUARIOS.CHEFE_ASSESSORIA_12.titulo, USUARIOS.CHEFE_ASSESSORIA_12.senha);
+            await acessarSubprocessoChefeDireto(page, descricao, UNIDADE_ALVO);
+            await navegarParaAtividades(page);
+            await adicionarAtividade(page, `Atividade ${timestamp}`);
+            await adicionarConhecimento(page, `Atividade ${timestamp}`, `Conhecimento ${timestamp}`);
+            await disponibilizarCadastro(page);
+            await fazerLogout(page);
+
+            // 2. Gestor aceita
+            await loginComPerfil(page, USUARIOS.GESTOR_SECRETARIA_1.titulo, USUARIOS.GESTOR_SECRETARIA_1.senha, USUARIOS.GESTOR_SECRETARIA_1.perfil);
+            await acessarSubprocessoGestor(page, descricao, UNIDADE_ALVO);
+            await navegarParaAtividadesVisualizacao(page);
+            await aceitarCadastroMapeamento(page);
+            await fazerLogout(page);
+
+            // 3. Admin homologa cadastro, cria competência e disponibiliza mapa
+            await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
+            await acessarSubprocessoAdmin(page, descricao, UNIDADE_ALVO);
+            await navegarParaAtividadesVisualizacao(page);
+            await homologarCadastroMapeamento(page);
+            await navegarParaMapa(page);
+            await abrirModalCriarCompetencia(page);
+            await page.getByTestId('inp-criar-competencia-descricao').fill(`Competência ${timestamp}`);
+            await page.locator('label').filter({hasText: `Atividade ${timestamp}`}).click();
+            await page.getByTestId('btn-criar-competencia-salvar').click();
+            await disponibilizarMapa(page);
+            await fazerLogout(page);
+
+            // 4. Chefe valida mapa
+            await login(page, USUARIOS.CHEFE_ASSESSORIA_12.titulo, USUARIOS.CHEFE_ASSESSORIA_12.senha);
+            await acessarSubprocessoChefeDireto(page, descricao, UNIDADE_ALVO);
+            await navegarParaMapa(page);
+            await page.getByTestId('btn-mapa-validar').click();
+            await page.getByTestId('btn-validar-mapa-confirmar').click();
+            await fazerLogout(page);
+
+            // 5. Gestor aceita mapa
+            await loginComPerfil(page, USUARIOS.GESTOR_SECRETARIA_1.titulo, USUARIOS.GESTOR_SECRETARIA_1.senha, USUARIOS.GESTOR_SECRETARIA_1.perfil);
+            await acessarSubprocessoGestor(page, descricao, UNIDADE_ALVO);
+            await navegarParaMapa(page);
+            await page.getByTestId('btn-mapa-homologar-aceite').click();
+            await page.getByTestId('btn-aceite-mapa-confirmar').click();
+            await fazerLogout(page);
+
+            // 6. Admin homologa mapa final e testa botão finalizar
+            await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
+            await acessarSubprocessoAdmin(page, descricao, UNIDADE_ALVO);
+            await navegarParaMapa(page);
+            await page.getByTestId('btn-mapa-homologar-aceite').click();
+            await page.getByTestId('btn-aceite-mapa-confirmar').click();
+
+            await page.goto('/painel');
+            await page.getByTestId('tbl-processos').getByText(descricao).first().click();
+            await expect(page).toHaveURL(/\/processo\/\d+$/);
+
+            // Modal de finalizar processo (Agora o botão deve estar visível)
             await page.getByTestId('btn-processo-finalizar').click();
             await page.waitForTimeout(300);
             await page.getByRole('button', {name: 'Cancelar'}).click();
