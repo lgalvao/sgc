@@ -27,7 +27,6 @@ import {
 import {alterarDataLimiteSubprocesso, reabrirCadastro, reabrirRevisaoCadastro,} from '@/services/processoService';
 import logger from '@/utils/logger';
 
-// Mock Dependencies
 vi.mock('@/services/subprocessoService', () => ({
     buscarContextoEdicao: vi.fn(),
     buscarSubprocessoDetalhe: vi.fn(),
@@ -52,7 +51,6 @@ vi.mock('@/services/cadastroService', () => ({
     homologarRevisaoCadastro: vi.fn(),
 }));
 
-// Mock Stores
 vi.mock('../processos', () => ({
     useProcessosStore: vi.fn(),
 }));
@@ -72,7 +70,6 @@ vi.mock('../feedback', () => ({
     useFeedbackStore: vi.fn(),
 }));
 
-// Mock API Client
 const {mockApiClient} = vi.hoisted(() => ({
     mockApiClient: {
         post: vi.fn().mockResolvedValue({data: {}}),
@@ -88,7 +85,6 @@ vi.mock('@/axios-setup', () => ({
 describe('Subprocessos Store', () => {
     let store: ReturnType<typeof useSubprocessosStore>;
 
-    // Mocks dos stores retornados
     const mockProcessosStore = {
         buscarProcessoDetalhe: vi.fn(),
         processoDetalhe: {codigo: 999},
@@ -239,7 +235,6 @@ describe('Subprocessos Store', () => {
 
             expect(store.subprocessoDetalhe).toMatchObject(mockData.detalhes);
             expect(mockUnidadesStore.unidade).toEqual(mockData.unidade);
-            // Verifica se os dados foram passados corretamente para os outros stores
             expect(mockMapasStore.mapaCompleto).toEqual(mockData.mapa);
             expect(mockAtividadesStore.setAtividadesParaSubprocesso).toHaveBeenCalledWith(
                 1,

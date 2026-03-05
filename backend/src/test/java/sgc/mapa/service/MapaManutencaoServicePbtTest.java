@@ -17,7 +17,6 @@ class MapaManutencaoServicePbtTest {
 
     @Property
     void criarAtividade_deveFalharSeDescricaoDuplicadaNoMapa(@ForAll("descricoesIguais") String[] descricoes) {
-        // Mock dependencies
         AtividadeRepo atividadeRepo = mock(AtividadeRepo.class);
         CompetenciaRepo competenciaRepo = mock(CompetenciaRepo.class);
         ConhecimentoRepo conhecimentoRepo = mock(ConhecimentoRepo.class);

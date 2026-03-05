@@ -8,12 +8,10 @@ import {usePerfilStore} from "@/stores/perfil";
 import {Perfil, SituacaoSubprocesso} from "@/types/tipos";
 import {nextTick} from "vue";
 
-// Define mocks first
 const mocks = vi.hoisted(() => ({
     push: vi.fn(),
 }));
 
-// Mock router
 vi.mock("vue-router", () => ({
     useRoute: () => ({
         params: {
@@ -33,7 +31,6 @@ vi.mock("vue-router", () => ({
     createMemoryHistory: vi.fn(),
 }));
 
-// Mock services that are called DIRECTLY by the component
 vi.mock("@/services/subprocessoService", () => ({
     aceitarCadastroEmBloco: vi.fn(),
     aceitarValidacaoEmBloco: vi.fn(),
@@ -208,7 +205,6 @@ describe("Processo.vue", () => {
         perfilStore = usePerfilStore();
         processosStore = useProcessosStore();
 
-        // Mocking computed getters by manipulating state they depend on
         perfilStore.$patch({perfis: [Perfil.GESTOR, Perfil.ADMIN]});
         processosStore.$patch({processoDetalhe: mockProcesso});
 
@@ -390,7 +386,6 @@ describe("Processo.vue", () => {
         await flushPromises();
 
         const errorMsg = "Falha ao aceitar";
-        // Mock implementation of the action to throw error
         processosStore.executarAcaoBloco.mockRejectedValue(new Error(errorMsg));
 
         const modal = wrapper.findComponent(ModalAcaoBlocoStub);

@@ -4,7 +4,6 @@ import AutoavaliacaoDiagnostico from '@/views/diagnostico/AutoavaliacaoDiagnosti
 import {createTestingPinia} from '@pinia/testing';
 import {setupComponentTest} from '@/test-utils/componentTestHelpers';
 
-// Mocks dos services
 vi.mock('@/services/diagnosticoService', () => ({
     diagnosticoService: {
         buscarMinhasAvaliacoes: vi.fn(),
@@ -21,7 +20,6 @@ vi.mock('@/services/unidadeService', () => ({
     buscarUnidadePorSigla: vi.fn(),
 }));
 
-// Mocks do router
 const mockPush = vi.fn();
 const mockRouteParams = {value: {codSubprocesso: '10', siglaUnidade: 'TEST'}};
 
@@ -76,7 +74,6 @@ describe('AutoavaliacaoDiagnostico.vue', () => {
         mockRouteParams.value = {codSubprocesso: '10', siglaUnidade: 'TEST'};
         mockPush.mockClear();
 
-        // Importar os mocks após vi.clearAllMocks
         const diagMod = await import('@/services/diagnosticoService');
         const subMod = await import('@/services/subprocessoService');
         const unidMod = await import('@/services/unidadeService');
@@ -86,7 +83,6 @@ describe('AutoavaliacaoDiagnostico.vue', () => {
         unidadeService = unidMod;
 
         // Configurar mocks padrão ANTES de qualquer montagem
-        // IMPORTANTE: Retornar cópias para evitar mutação compartilhada entre testes
         (diagnosticoService.buscarMinhasAvaliacoes).mockResolvedValue([
             {competenciaCodigo: 1, importancia: 'N5', dominio: 'N3', observacoes: 'Obs 1'},
             {competenciaCodigo: 2, importancia: '', dominio: '', observacoes: ''}
@@ -400,7 +396,6 @@ describe('AutoavaliacaoDiagnostico.vue', () => {
     });
 
     it('trata erro no onMounted', async () => {
-        // Import store to clear mocks later if needed
         const {useFeedbackStore} = await import('@/stores/feedback');
 
         // SETUP MOCK BEFORE MOUNT

@@ -4,7 +4,6 @@ import ConclusaoDiagnostico from '@/views/diagnostico/ConclusaoDiagnosticoView.v
 import {useFeedbackStore} from '@/stores/feedback';
 import {getCommonMountOptions, setupComponentTest} from '@/test-utils/componentTestHelpers';
 
-// Mocks
 const mockPush = vi.fn();
 const mockRouteParams = {value: {codSubprocesso: '10'}};
 
@@ -69,7 +68,6 @@ describe('ConclusaoDiagnostico.vue', () => {
         vi.clearAllMocks();
         mockRouteParams.value = {codSubprocesso: '10'};
 
-        // Import service after mocks are cleared
         const diagMod = await import('@/services/diagnosticoService');
         diagnosticoService = diagMod.diagnosticoService;
 

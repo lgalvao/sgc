@@ -5,7 +5,6 @@ import mainRoutes from '../main.routes';
 import processoRoutes from '../processo.routes';
 import unidadeRoutes from '../unidade.routes';
 
-// Mock views to avoid loading real components
 vi.mock('@/views/ProcessoCadastroView.vue', () => ({default: {name: 'ProcessoCadastroView'}}));
 vi.mock('@/views/ProcessoDetalheView.vue', () => ({default: {name: 'ProcessoDetalheView'}}));
 vi.mock('@/views/SubprocessoView.vue', () => ({default: {name: 'SubprocessoView'}}));
@@ -19,7 +18,6 @@ vi.mock('@/views/HistoricoView.vue', () => ({default: {name: 'HistoricoView'}}))
 vi.mock('@/views/RelatoriosView.vue', () => ({default: {name: 'RelatoriosView'}}));
 vi.mock('@/views/ParametrosView.vue', () => ({default: {name: 'ParametrosView'}}));
 vi.mock('@/views/AdministradoresView.vue', () => ({default: {name: 'AdministradoresView'}}));
-// Mock Unidade views just in case they are transitively imported
 vi.mock("@/views/UnidadesView.vue", () => ({default: {name: 'UnidadesView'}}));
 vi.mock("@/views/UnidadeView.vue", () => ({default: {name: 'UnidadeView'}}));
 vi.mock("@/views/AtribuicaoTemporariaView.vue", () => ({default: {name: 'AtribuicaoTemporariaView'}}));

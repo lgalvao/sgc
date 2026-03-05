@@ -61,7 +61,6 @@ class ProcessoValidacaoServiceAcessoTest {
                 PerfilDto.builder().unidadeCodigo(1L).build()
         ));
 
-        // Mock hierarquia: 1 -> 101 -> 102
         Unidade u100 = UnidadeTestBuilder.umaDe().comCodigo("1").build();
         Unidade u101 = UnidadeTestBuilder.umaDe().comCodigo("101").comSuperior(u100).build();
         Unidade u102 = UnidadeTestBuilder.umaDe().comCodigo("102").comSuperior(u101).build();

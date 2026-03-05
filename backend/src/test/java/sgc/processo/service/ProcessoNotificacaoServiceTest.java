@@ -66,7 +66,6 @@ class ProcessoNotificacaoServiceTest {
     }
 
     private void mockUnidadeServiceBasico() {
-        // Mock default para evitar NullPointerException nas novas lógicas de unidades superiores
         when(unidadeService.buscarPorId(anyLong())).thenAnswer(invocation -> {
             Long cod = invocation.getArgument(0);
             Unidade u = new Unidade();

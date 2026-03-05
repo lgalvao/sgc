@@ -4,7 +4,6 @@ import CadAtribuicao from '@/views/AtribuicaoTemporariaView.vue';
 import {criarAtribuicaoTemporaria} from '@/services/atribuicaoTemporariaService';
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 
-// Mocks
 const {mockPush, mockFeedbackShow, mockBuscarUnidade, mockBuscarUsuarios} = vi.hoisted(() => {
     return {
         mockPush: vi.fn(),

@@ -60,7 +60,6 @@ vi.mock("@/services/unidadeService", () => ({
     buscarUnidadePorSigla: vi.fn(),
 }));
 
-// Mocks for Async Components - simplified to avoid require issues
 
 vi.mock("@/components/mapa/CriarCompetenciaModal.vue", () => ({
     __esModule: true,
@@ -364,7 +363,6 @@ describe("MapaView.vue", () => {
             mockAtividades as any,
         );
 
-        // Mock SubprocessoService actions (used by store)
         vi.mocked(subprocessoService.adicionarCompetencia).mockResolvedValue(mockMapaCompleto as any);
         vi.mocked(subprocessoService.atualizarCompetencia).mockResolvedValue(mockMapaCompleto as any);
         vi.mocked(subprocessoService.removerCompetencia).mockResolvedValue(mockMapaCompleto as any);
@@ -546,7 +544,6 @@ describe("MapaView.vue", () => {
     });
 
     it("deve tratar erro ao criar competência", async () => {
-        // Mock the service to throw
         const axiosError = {
             isAxiosError: true,
             response: {

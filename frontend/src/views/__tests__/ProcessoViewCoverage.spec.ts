@@ -7,7 +7,6 @@ import {useFeedbackStore} from "@/stores/feedback";
 import {createTestingPinia} from "@pinia/testing";
 import {SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 
-// Mocks
 const mocks = vi.hoisted(() => ({
     push: vi.fn(),
     mockRoute: {params: {codProcesso: "1"}, query: {}}

@@ -12,7 +12,6 @@ import {
     selectFirstCheckbox,
 } from "../uiHelpers";
 
-// Mock services to avoid side effects/heavy init when loading the store
 vi.mock("@/services/atividadeService", () => ({}));
 vi.mock("@/services/subprocessoService", () => ({}));
 vi.mock("@/stores/subprocessos", () => ({useSubprocessosStore: vi.fn()}));

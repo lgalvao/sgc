@@ -7,7 +7,6 @@ import {useFeedbackStore} from "@/stores/feedback";
 import {useRouter} from "vue-router";
 import {Perfil} from "@/types/tipos";
 
-// Mocks
 vi.mock("vue-router", () => ({
     useRouter: vi.fn(),
     createRouter: vi.fn(() => ({
@@ -99,9 +98,7 @@ describe("LoginView.vue", () => {
         const wrapper = mount(LoginView, mountOptions());
         const perfilStore = usePerfilStore();
 
-        // Mock do loginCompleto retornando sucesso
         perfilStore.loginCompleto = vi.fn().mockResolvedValue(true);
-        // Mock de um único perfil
         perfilStore.perfisUnidades = [MOCK_PERFIS[0]];
 
         await wrapper.find('[data-testid="inp-login-usuario"]').setValue("123");
@@ -143,7 +140,6 @@ describe("LoginView.vue", () => {
         await wrapper.find('form').trigger('submit');
 
         expect(routerPushMock).not.toHaveBeenCalled();
-        // Verifica se mudou o passo (aparece o select)
         expect(wrapper.find('[data-testid="sec-login-perfil"]').exists()).toBe(true);
     });
 
@@ -320,7 +316,6 @@ describe("LoginView.vue", () => {
 
         await toggleBtn.trigger("click");
 
-        // Verifica se mudou o tipo do input
         expect(wrapper.find('[data-testid="inp-login-senha"]').attributes("type")).toBe("text");
         expect(wrapper.find('[aria-label="Ocultar senha"]').exists()).toBe(true);
 

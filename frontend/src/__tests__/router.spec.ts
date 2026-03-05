@@ -3,7 +3,6 @@ import {createPinia, setActivePinia} from "pinia";
 import router from "../router";
 import {usePerfilStore} from "@/stores/perfil";
 
-// Mock the views to avoid loading real components
 vi.mock("../views/LoginView.vue", () => ({
     default: {template: "<div>Login</div>"},
 }));

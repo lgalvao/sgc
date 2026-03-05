@@ -20,7 +20,6 @@ const {mockInstance} = vi.hoisted(() => {
     };
 });
 
-// Mock router
 vi.mock("@/router", () => ({
     default: {
         push: vi.fn().mockResolvedValue(undefined),
@@ -30,7 +29,6 @@ vi.mock("@/router", () => ({
     },
 }));
 
-// Mock logger
 vi.mock("@/utils", () => {
     return {
         logger: {
@@ -41,7 +39,6 @@ vi.mock("@/utils", () => {
     }
 });
 
-// Mock axios
 vi.mock("axios", () => {
     return {
         default: {
@@ -56,7 +53,6 @@ describe("axios-setup", () => {
     let responseErrorInterceptor: (error: any) => any;
 
     beforeAll(async () => {
-        // Import axios-setup AFTER mocking its dependencies
         const {setRouter} = await import("../axios-setup"); // Use dynamic import
         setRouter(router as any);
 

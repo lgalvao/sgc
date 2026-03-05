@@ -33,7 +33,6 @@ describe("useUsuariosStore", () => {
     const context = setupStoreTest(useUsuariosStore);
 
     beforeEach(() => {
-        // Inicializa com dados simulados para testes de getters
         context.store.usuarios = mockUsuarios;
     });
 

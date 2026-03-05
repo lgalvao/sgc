@@ -64,7 +64,6 @@ describe("ImportarAtividadesModal", () => {
         });
         wrapper = context.wrapper as VueWrapper<ImportarAtividadesModalVM>;
 
-        // Mock getter that was converted from computed property
         const atividadesStore = useAtividadesStore();
         atividadesStore.obterAtividadesPorSubprocesso = vi.fn((codigo: number) => {
             return mapAtividades.get(codigo) || [];

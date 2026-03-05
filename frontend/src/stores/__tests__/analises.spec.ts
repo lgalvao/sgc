@@ -4,14 +4,12 @@ import type {AnaliseCadastro, AnaliseValidacao} from "@/types/tipos";
 import {useAnalisesStore} from "../analises";
 import {setupStoreTest} from "@/test-utils/storeTestHelpers";
 
-// Mock do service
 vi.mock("@/services/subprocessoService", () => ({
     listarAnalisesCadastro: vi.fn(),
     listarAnalisesValidacao: vi.fn(),
 }));
 
 describe("useAnalisesStore", () => {
-    // Inicializa a store usando o helper centralizado
     const context = setupStoreTest(useAnalisesStore);
 
     it("deve inicializar com listas vazias", () => {

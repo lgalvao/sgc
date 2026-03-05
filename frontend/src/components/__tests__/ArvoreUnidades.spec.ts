@@ -4,7 +4,6 @@ import ArvoreUnidades from "../unidade/ArvoreUnidades.vue";
 import type {Unidade} from "@/types/tipos";
 
 describe("ArvoreUnidades.vue", () => {
-    // Mock data
     const mockUnidades: Unidade[] = [
         {
             codigo: 1,

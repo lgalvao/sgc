@@ -6,7 +6,6 @@ import {useProcessosStore} from "@/stores/processos";
 import {useAlertasStore} from "@/stores/alertas";
 import {useRouter} from "vue-router";
 
-// Mock router
 vi.mock("vue-router", () => ({
     useRouter: vi.fn(),
     createRouter: vi.fn(() => ({

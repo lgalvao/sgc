@@ -7,7 +7,6 @@ import {useFeedbackStore} from '@/stores/feedback';
 import {BAlert, BSpinner} from 'bootstrap-vue-next';
 import * as useAcessoModule from '@/composables/useAcesso';
 
-// Mock child components to avoid rendering them and their dependencies
 const SubprocessoHeaderStub = {template: '<div />'};
 const SubprocessoCardsStub = {template: '<div />'};
 const SubprocessoModalStub = {template: '<div />'};
@@ -178,7 +177,6 @@ describe('SubprocessoView Coverage', () => {
         } as any);
 
         const store = useSubprocessosStore(pinia);
-        // Mock returning an ID to set codSubprocesso
         (store.buscarSubprocessoPorProcessoEUnidade as any).mockResolvedValue(123);
         const feedbackStore = useFeedbackStore(pinia);
 

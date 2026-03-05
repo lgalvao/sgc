@@ -14,7 +14,6 @@ import ImpactoMapaModal from "@/components/mapa/ImpactoMapaModal.vue";
 import * as useAcessoModule from '@/composables/useAcesso';
 import {Perfil} from "@/types/tipos";
 
-// Mocks
 const {pushMock} = vi.hoisted(() => ({pushMock: vi.fn()}));
 
 vi.mock("vue-router", () => ({
@@ -24,7 +23,6 @@ vi.mock("vue-router", () => ({
 
 vi.mock("@/composables/usePerfil", () => ({usePerfil: vi.fn()}));
 
-// Mock services
 vi.mock("@/services/subprocessoService", () => ({
     buscarSubprocessoPorProcessoEUnidade: vi.fn(),
     buscarSubprocessoDetalhe: vi.fn(),
@@ -39,7 +37,6 @@ vi.mock("@/services/analiseService", () => ({
     listarAnalisesCadastro: vi.fn(),
 }));
 
-// Mock processoService
 vi.mock("@/services/processoService", () => ({
     buscarProcessoDetalhe: vi.fn(),
     obterDetalhesProcesso: vi.fn().mockResolvedValue({

@@ -10,7 +10,6 @@ import {SituacaoSubprocesso, TipoProcesso} from '@/types/tipos';
 import * as processoService from '@/services/processoService';
 import * as useAcessoModule from '@/composables/useAcesso';
 
-// Mock child components
 const SubprocessoCardsStub = {
     template: '<div data-testid="subprocesso-cards"></div>',
     props: ['situacao', 'tipoProcesso']
@@ -21,7 +20,6 @@ const SubprocessoModalStub = {
     emits: ['confirmar-alteracao', 'fechar-modal']
 };
 
-// Mock Services
 vi.mock('@/services/processoService', () => ({
     reabrirCadastro: vi.fn(),
     reabrirRevisaoCadastro: vi.fn(),
@@ -118,7 +116,6 @@ describe('SubprocessoView.vue', () => {
         const feedbackStore = useFeedbackStore(pinia);
         const processosStore = useProcessosStore(pinia);
 
-        // Mock implementations
         (store.buscarSubprocessoPorProcessoEUnidade as any).mockImplementation(async () => 10);
         (store.buscarSubprocessoDetalhe as any).mockImplementation(async () => {
             store.subprocessoDetalhe = subprocessoToUse as any;
@@ -127,7 +124,6 @@ describe('SubprocessoView.vue', () => {
         (mapaStore.buscarMapaCompleto as any).mockResolvedValue({});
         (store.alterarDataLimiteSubprocesso as any).mockResolvedValue({});
 
-        // Mock store actions that call services
         (store.reabrirCadastro as any).mockImplementation(async (cod: number, just: string) => {
             try {
                 await (processoService.reabrirCadastro as any)(cod, just);
@@ -149,7 +145,6 @@ describe('SubprocessoView.vue', () => {
             }
         });
 
-        // Mock processos store action that calls service
         (processosStore.enviarLembrete as any).mockImplementation(async (codProcesso: number, codUnidade: number) => {
             try {
                 await (processoService.enviarLembrete as any)(codProcesso, codUnidade);

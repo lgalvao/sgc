@@ -28,7 +28,6 @@ public class WithMockCustomUserSecurityContextFactory
         Unidade unidade = unidadeRepo.findById(customUser.unidadeId())
                 .orElseThrow(() -> new IllegalStateException("Unidade " + customUser.unidadeId() + " não encontrada no data.sql"));
 
-        // Define perfil ativo (pega o primeiro dos informados na anotação)
         if (customUser.perfis().length > 0) {
             principal.setPerfilAtivo(Perfil.valueOf(customUser.perfis()[0]));
         } else {
