@@ -2,7 +2,6 @@ package sgc.subprocesso.service;
 
 import lombok.*;
 import lombok.extern.slf4j.*;
-import org.jspecify.annotations.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.context.annotation.*;
 import org.springframework.stereotype.*;
@@ -26,7 +25,6 @@ import java.util.*;
 import java.util.function.*;
 import java.util.stream.*;
 
-import static java.util.Collections.*;
 import static sgc.organizacao.model.TipoUnidade.*;
 
 @Service
@@ -205,22 +203,6 @@ public class SubprocessoService {
     }
 
     @Transactional(readOnly = true)
-    public List<Atividade> obterAtividadesSemConhecimento(Long codSubprocesso) {
-        Subprocesso sp = buscarSubprocesso(codSubprocesso);
-        return obterAtividadesSemConhecimento(sp.getMapa());
-    }
-
-    public List<Atividade> obterAtividadesSemConhecimento(@Nullable Mapa mapa) {
-        if (mapa == null || mapa.getCodigo() == null) return emptyList();
-
-        List<Atividade> atividades = mapaManutencaoService.atividadesMapaCodigoComConhecimentos(mapa.getCodigo());
-        return atividades.isEmpty()
-                ? emptyList()
-                : atividades.stream().filter(a -> a.getConhecimentos().isEmpty()).toList();
-    }
-
-
-    @Transactional(readOnly = true)
     public ValidacaoCadastroDto validarCadastro(Long codSubprocesso) {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
         return validacaoService.validarCadastro(sp);
@@ -238,7 +220,6 @@ public class SubprocessoService {
         Unidade destino = movs.getFirst().getUnidadeDestino();
         return (destino != null) ? destino : sp.getUnidade();
     }
-
 
 
     @Transactional
@@ -326,7 +307,7 @@ public class SubprocessoService {
     }
 
     public void criarParaRevisao(Processo processo, Unidade unidade, UnidadeMapa unidadeMapa, Unidade unidadeOrigem, Usuario usuario) {
-        log.info("Criando subprocesso para unidade {} no processo de revisão {}", unidade.getSigla(), processo.getCodigo());
+        log.info("Criando subprocesso para unidade {} no processo {}", unidade.getSigla(), processo.getCodigo());
         criarSubprocessoComMapa(processo, unidade, unidadeMapa, unidadeOrigem, usuario,
                 SituacaoSubprocesso.NAO_INICIADO, "Processo iniciado");
     }
@@ -423,7 +404,7 @@ public class SubprocessoService {
 
     private void atualizarSituacaoMapaVazio(Subprocesso subprocesso, boolean ficouVazio) {
         SituacaoSubprocesso situacaoAtual = subprocesso.getSituacao();
-        
+
         if (ficouVazio) {
             if (situacaoAtual == SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO) {
                 subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
@@ -455,7 +436,6 @@ public class SubprocessoService {
                 SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
         return sp;
     }
-
 
 
     @Transactional
@@ -647,8 +627,8 @@ public class SubprocessoService {
     private boolean verificarVisualizarImpacto(boolean temMapaVigente, boolean mesmaUnidade, boolean isChefe, boolean isGestor, boolean isAdmin, SituacaoSubprocesso situacao) {
         return temMapaVigente && (
                 (mesmaUnidade && isChefe && situacao == SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO) ||
-                (mesmaUnidade && isGestor && situacao == SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA) ||
-                (isAdmin && Set.of(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA, SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA, SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO).contains(situacao))
+                        (mesmaUnidade && isGestor && situacao == SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA) ||
+                        (isAdmin && Set.of(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA, SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA, SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO).contains(situacao))
         );
     }
 
@@ -681,8 +661,7 @@ public class SubprocessoService {
 
         Long codMapaOrigem = spOrigem.getMapa().getCodigo();
         Long codMapaDestino = spDestino.getMapa().getCodigo();
-        log.info("Importando {} atividades do mapa #{} para o mapa #{}", 
-                codigosAtividades != null ? codigosAtividades.size() : "todas as", codMapaOrigem, codMapaDestino);
+        log.info("Importando {} atividades do mapa #{} para o mapa #{}", codigosAtividades.size(), codMapaOrigem, codMapaDestino);
         copiaMapaService.importarAtividadesDeOutroMapa(codMapaOrigem, codMapaDestino, codigosAtividades);
 
         if (spDestino.getSituacao() == SituacaoSubprocesso.NAO_INICIADO) {

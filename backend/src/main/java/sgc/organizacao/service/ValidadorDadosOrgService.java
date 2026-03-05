@@ -37,7 +37,6 @@ import static sgc.organizacao.model.TipoUnidade.*;
 @RequiredArgsConstructor
 @Slf4j
 public class ValidadorDadosOrgService implements ApplicationRunner {
-
     private static final Set<TipoUnidade> TIPOS_QUE_PARTICIPAM = Set.of(OPERACIONAL, INTEROPERACIONAL, INTERMEDIARIA);
 
     private final UnidadeRepo unidadeRepo;

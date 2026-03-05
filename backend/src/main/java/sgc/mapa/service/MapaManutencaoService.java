@@ -30,6 +30,7 @@ public class MapaManutencaoService {
             MapaRepo mapaRepo,
             ComumRepo repo,
             @Lazy SubprocessoService subprocessoService) {
+
         this.atividadeRepo = atividadeRepo;
         this.competenciaRepo = competenciaRepo;
         this.conhecimentoRepo = conhecimentoRepo;
@@ -212,7 +213,6 @@ public class MapaManutencaoService {
 
     @Transactional
     public void criarCompetenciaComAtividades(Mapa mapa, String descricao, List<Long> codigosAtividades) {
-        log.info("Criando competência {}", descricao);
         Competencia competencia = Competencia.builder()
                 .descricao(descricao)
                 .mapa(mapa)
@@ -221,11 +221,12 @@ public class MapaManutencaoService {
         prepararCompetenciasAtividades(codigosAtividades, competencia);
         competenciaRepo.save(competencia);
         atividadeRepo.saveAll(competencia.getAtividades());
+
+        log.info("Competência criada");
     }
 
     @Transactional
     public void atualizarCompetencia(Long codigo, String desc, List<Long> atividadesCodigos) {
-        log.info("Atualizando competência {}: {} ({} atividades)", codigo, desc, atividadesCodigos.size());
         Competencia competencia = repo.buscar(Competencia.class, codigo);
         competencia.setDescricao(desc);
 
@@ -238,6 +239,8 @@ public class MapaManutencaoService {
         competenciaRepo.save(competencia);
 
         atividadeRepo.saveAll(competencia.getAtividades());
+
+        log.info("Competência atualizada");
     }
 
     @Transactional
@@ -254,7 +257,6 @@ public class MapaManutencaoService {
 
     @Transactional
     public Conhecimento criarConhecimento(Long codAtividade, CriarConhecimentoRequest request) {
-        log.info("Criando conhecimento na atividade {}: {}", codAtividade, request.descricao());
         validarDescricaoConhecimentoUnica(codAtividade, request.descricao());
         var atividade = repo.buscar(Atividade.class, codAtividade);
         var mapa = atividade.getMapa();
@@ -263,13 +265,14 @@ public class MapaManutencaoService {
         var conhecimento = Conhecimento.criarDe(request);
         conhecimento.setAtividade(atividade);
         atividade.getConhecimentos().add(conhecimento);
+        log.info("Conhecimento criado na atividade {}", codAtividade);
+
         return conhecimentoRepo.save(conhecimento);
     }
 
     @Transactional
     public void atualizarConhecimento(Long codAtividade, Long codConhecimento, AtualizarConhecimentoRequest request) {
         String descricao = request.descricao();
-        log.info("Atualizando conhecimento {} na atividade {}", codConhecimento, codAtividade);
 
         Conhecimento existente = repo.buscar(Conhecimento.class, Map.of("codigo", codConhecimento, "atividade.codigo", codAtividade));
         if (!existente.getDescricao().equalsIgnoreCase(descricao)) {
@@ -281,14 +284,16 @@ public class MapaManutencaoService {
 
         existente.atualizarDe(request);
         conhecimentoRepo.save(existente);
+
+        log.info("Conhecimento atualizado na atividade {}",codAtividade);
     }
 
     @Transactional
     public void excluirConhecimento(Long codAtividade, Long codConhecimento) {
-        log.info("Excluindo conhecimento {} da atividade {}", codConhecimento, codAtividade);
-
         Conhecimento conhecimento = repo.buscar(Conhecimento.class, Map.of("codigo", codConhecimento, "atividade.codigo", codAtividade));
         executarExclusaoConhecimento(conhecimento);
+
+        log.info("Conhecimento excluído da atividade {}", codAtividade);
     }
 
     @Transactional

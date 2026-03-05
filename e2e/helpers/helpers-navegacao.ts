@@ -44,6 +44,38 @@ export async function verificarPaginaPainel(page: Page): Promise<void> {
 }
 
 /**
+ * Aguarda a navegação para a página de painel.
+ */
+export async function esperarPaginaPainel(page: Page): Promise<void> {
+    await page.waitForURL(/\/painel/);
+}
+
+/**
+ * Aguarda a navegação para a página de cadastro de processo (novo ou edição).
+ */
+export async function esperarPaginaCadastroProcesso(page: Page): Promise<void> {
+    await page.waitForURL(/\/processo\/cadastro/);
+}
+
+/**
+ * Aguarda a navegação para a página de detalhes de um processo.
+ */
+export async function esperarPaginaDetalhesProcesso(page: Page, id?: number): Promise<void> {
+    const regex = id ? new RegExp(`\\/processo\\/${id}$`) : /\/processo\/\d+$/;
+    await page.waitForURL(regex);
+}
+
+/**
+ * Aguarda a navegação para a página de detalhes de um subprocesso.
+ */
+export async function esperarPaginaSubprocesso(page: Page, siglaUnidade?: string): Promise<void> {
+    const regex = siglaUnidade 
+        ? new RegExp(`\\/processo\\/\\d+\\/${siglaUnidade}$`) 
+        : /\/processo\/\d+\/[A-Z0-9_]+$/;
+    await page.waitForURL(regex);
+}
+
+/**
  * Navega para um subprocesso clicando na célula da unidade na tabela TreeTable.
  * Se já estiver na página do subprocesso (redirecionamento direto), apenas valida.
  */

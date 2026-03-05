@@ -40,12 +40,34 @@ Os helpers estão organizados em arquivos especializados no diretório `e2e/help
 ### Estratégias de Espera
 
 - ✅ USE `waitForResponse()` para operações de API
-- ✅ USE `waitForURL()` para navegação
+- ✅ USE `waitForURL()` para navegação (ou os helpers semânticos `esperarPagina...`)
 - ✅ USE `waitFor()` para elementos do DOM
 - ✅ USE `expect().toHaveURL()` para verificar navegação
 - ❌ NUNCA use `waitForTimeout()` em testes funcionais (permitido apenas em `captura-telas.spec.ts` para animações)
 
-## Princípios para Helpers
+## Robustez de Seletores e Ambiguidade
+
+Ao testar elementos que contêm texto, especialmente em tabelas ou listas de mensagens:
+
+- **Cuidado com Substrings**: Se uma mensagem ("Início do processo") é parte de outra ("Início do processo em unidade subordinada"), o Playwright falhará por ambiguidade (strict mode). Use filtros combinados para diferenciar:
+  ```typescript
+  // Seleciona a linha que tem o texto A, mas NÃO tem a palavra B
+  await expect(page.locator('tr', {hasText: 'Início do processo'})
+      .filter({hasNotText: 'subordinada'})
+  ).toBeVisible();
+  ```
+- **Atenção a Textos Ocultos (Accessibility)**: Alguns componentes injetam texto para leitores de tela (ex: `<span class="visually-hidden">Não lido: </span>`). Isso faz com que `exact: true` falhe silenciosamente. Prefira regex ou filtros de conteúdo em vez de matchers exatos em células complexas.
+- **Helpers de Navegação Semântica**: Evite repetir expressões regulares de URL nos testes. Use e mantenha os helpers em `helpers-navegacao.ts` (ex: `esperarPaginaDetalhesProcesso(page, id)`).
+
+## Nuances de Autenticação
+
+O comportamento do login varia conforme o tipo de unidade do usuário:
+
+- **Unidades Operacionais/Intermediárias**: Geralmente possuem apenas um perfil e o sistema loga diretamente (Use `login`).
+- **Unidades Interoperacionais**: Podem acumular perfis (ex: Chefe e Gestor), exigindo a escolha em um dropdown após a senha (Use `loginComPerfil`).
+- **Dica**: Se o teste falhar esperando pelo seletor de perfil, verifique se o usuário em questão realmente possui múltiplos perfis no `seed.sql`.
+
+### Princípios para Helpers
 
 Helpers devem ser **lineares e assertivos**. Se algo inesperado acontece, o teste deve falhar imediatamente.
 

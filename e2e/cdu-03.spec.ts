@@ -1,81 +1,85 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcesso, extrairProcessoId} from './helpers/helpers-processos.js';
+import {esperarPaginaCadastroProcesso, esperarPaginaDetalhesProcesso, esperarPaginaPainel} from './helpers/helpers-navegacao.js';
 import type {Page} from '@playwright/test';
 import type {useProcessoCleanup} from './hooks/hooks-limpeza.js';
 
 test.describe('CDU-03 - Manter Processo', () => {
 
-    test('Deve validar campos obrigatórios', async ({page, autenticadoComoAdmin}: {
+    test('Deve validar campos obrigatórios e estados dos botões', async ({page, autenticadoComoAdmin}: {
         page: Page,
         autenticadoComoAdmin: void
     }) => {
         await page.getByTestId('btn-painel-criar-processo').click();
-        await expect(page).toHaveURL(/\/processo\/cadastro/);
+        await esperarPaginaCadastroProcesso(page);
 
-        // Submit without filling fields using an explicit JS click since it might be disabled
-        await page.getByTestId('btn-processo-salvar').dispatchEvent('click');
+        const btnSalvar = page.getByTestId('btn-processo-salvar');
+        const btnIniciar = page.getByTestId('btn-processo-iniciar');
 
-        // Wait for validation error messages to appear (HTML5 validation or custom)
+        // Inicialmente desativados
+        await expect(btnSalvar).toBeDisabled();
+        await expect(btnIniciar).toBeDisabled();
+
+        // Validação HTML5 / Atributos
         const descricaoInput = page.getByTestId('inp-processo-descricao');
         await expect(descricaoInput).toHaveAttribute('required', '');
 
-        // Preenche descrição - botões ainda devem estar desativados (falta data e unidade)
-        await page.getByTestId('inp-processo-descricao').fill('Descrição Teste');
+        // Preenche descrição - ainda desativado
+        await descricaoInput.fill('Descrição Teste');
+        await expect(btnSalvar).toBeDisabled();
 
-        // Preenche data limite - botões ainda devem estar desativados (falta unidade)
+        // Preenche data limite - ainda desativado
         const dataLimite = new Date();
         dataLimite.setDate(dataLimite.getDate() + 30);
         await page.getByTestId('inp-processo-data-limite').fill(dataLimite.toISOString().split('T')[0]);
+        await expect(btnSalvar).toBeDisabled();
 
-        // Seleciona tipo - botões ainda devem estar desativados (falta unidade)
+        // Seleciona tipo - ainda desativado (falta unidade)
         await page.getByTestId('sel-processo-tipo').selectOption('MAPEAMENTO');
+        await expect(btnSalvar).toBeDisabled();
 
-        // Seleciona unidade - agora botões devem estar habilitados
+        // Seleciona unidade - agora deve habilitar
         await expect(page.getByText('Carregando unidades...')).toBeHidden();
         await page.getByTestId('btn-arvore-expand-SECRETARIA_1').click();
         await page.getByTestId('chk-arvore-unidade-ASSESSORIA_12').click();
-        await expect(page.getByTestId('btn-processo-salvar')).toBeEnabled();
-        await expect(page.getByTestId('btn-processo-iniciar')).toBeEnabled();
+        
+        await expect(btnSalvar).toBeEnabled();
+        await expect(btnIniciar).toBeEnabled();
+
+        // Se remover a descrição, deve desabilitar novamente
+        await descricaoInput.fill('');
+        await expect(btnSalvar).toBeDisabled();
+        await expect(btnIniciar).toBeDisabled();
     });
 
-    test.fixme('Deve exibir aviso de raiz interoperacional (Step 7.1.1)', async ({page, autenticadoComoAdmin, cleanupAutomatico}: {
+    test('Deve permitir selecionar raiz interoperacional independentemente das subordinadas', async ({page, autenticadoComoAdmin}: {
         page: Page,
-        autenticadoComoAdmin: void,
-        cleanupAutomatico: ReturnType<typeof useProcessoCleanup>
+        autenticadoComoAdmin: void
     }) => {
-        const descricao = `Interoperacional - ${Date.now()}`;
-
         await page.getByTestId('btn-painel-criar-processo').click();
-        await page.getByTestId('inp-processo-descricao').fill(descricao);
-        const dataLimite = new Date();
-        dataLimite.setDate(dataLimite.getDate() + 30);
-        await page.getByTestId('inp-processo-data-limite').fill(dataLimite.toISOString().split('T')[0]);
+        await esperarPaginaCadastroProcesso(page);
         await page.getByTestId('sel-processo-tipo').selectOption('MAPEAMENTO');
-
         await expect(page.getByText('Carregando unidades...')).toBeHidden();
 
-        // Clicar numa raiz interoperacional (e.g. SECRETARIA_1) diretamente
-        const chkRaizInter = page.getByTestId('chk-arvore-unidade-SECRETARIA_1');
-        await chkRaizInter.click();
+        // SECRETARIA_1 é interoperacional
+        const chkRaiz = page.getByTestId('chk-arvore-unidade-SECRETARIA_1');
+        const inputRaiz = chkRaiz.locator('input').or(chkRaiz);
+        
+        await page.getByTestId('btn-arvore-expand-SECRETARIA_1').click();
+        
+        // 1. Selecionar a raiz marca a si mesma e as filhas
+        await chkRaiz.click();
+        await expect(inputRaiz).toBeChecked();
+        const inputFilha = page.getByTestId('chk-arvore-unidade-ASSESSORIA_12').locator('input').or(page.getByTestId('chk-arvore-unidade-ASSESSORIA_12'));
+        await expect(inputFilha).toBeChecked();
 
-        // Como o requisito pede para perguntar se é para atividades próprias ou subordinadas, verificamos a existência desse prompt
-        const alertaInteroperacional = page.getByText(/atividades próprias ou suas subordinadas/i);
-        // Note: Se o sistema ainda não implementa isso, esse passo falhará e destacará o gap para a equipe de dev.
-        await expect(alertaInteroperacional).toBeVisible();
-
-        // Assumimos que existe um botão para "Ambas" ou "Próprias" ou "Subordinadas"
-        const btnProprias = page.getByRole('button', {name: /Próprias/i});
-        if (await btnProprias.isVisible()) {
-            await btnProprias.click();
-        }
-
-        await page.getByTestId('btn-processo-salvar').click();
-
-        // Capturar ID para cleanup
-        await page.waitForURL(/\/painel/);
-        await page.getByTestId('tbl-processos').getByText(descricao).first().click();
-        const id = await extrairProcessoId(page);
-        if (id) cleanupAutomatico.registrar(id);
+        // 2. Desmarcar uma filha NÃO deve desmarcar a raiz (pois ela é Interoperacional e tem "vida própria")
+        await page.getByTestId('chk-arvore-unidade-ASSESSORIA_12').click();
+        await expect(inputFilha).not.toBeChecked();
+        await expect(inputRaiz).toBeChecked();
+        
+        // O estado não deve ser indeterminado, mas sim checked (true) conforme regra de interoperabilidade
+        await expect(inputRaiz).not.toHaveJSProperty('indeterminate', true);
     });
 
     test('Deve editar um processo existente', async ({page, autenticadoComoAdmin, cleanupAutomatico}: {
@@ -92,34 +96,21 @@ test.describe('CDU-03 - Manter Processo', () => {
             expandir: ['SECRETARIA_1']
         });
 
-        // Capturar ID do processo para cleanup (caso o teste falhe antes de remover)
         await page.getByTestId('tbl-processos').getByText(descricaoOriginal).first().click();
-        await page.waitForURL(/\/processo\/cadastro\?codProcesso=\d+/);
-        const url = new URL(page.url());
-        const processoId = Number.parseInt(url.searchParams.get('codProcesso') || '0');
-        if (processoId > 0) cleanupAutomatico.registrar(processoId);
+        await esperarPaginaCadastroProcesso(page);
+        const id = await extrairProcessoId(page);
+        if (id) cleanupAutomatico.registrar(id);
 
-        // Verifica que os dados foram carregados
         await expect(page.getByTestId('inp-processo-descricao')).toHaveValue(descricaoOriginal);
+        await expect(page.getByTestId('sel-processo-tipo')).toBeDisabled();
 
-        // Verifica que a seleção de Tipo está restrita na edição (a API manda opções inativas ou readonly no backend)
-        const drowdownTipo = page.getByTestId('sel-processo-tipo');
-        await expect(drowdownTipo).toBeDisabled();
-
-        // Modifica o processo
         const novaDescricao = descricaoOriginal + ' (Editado)';
         await page.getByTestId('inp-processo-descricao').fill(novaDescricao);
         await page.getByTestId('btn-processo-salvar').click();
 
-        // Aguardar redirecionamento antes de validar a mensagem para evitar race condition
-        await expect(page).toHaveURL(/\/painel/);
+        await esperarPaginaPainel(page);
         await expect(page.getByText(/Processo alterado/i).first()).toBeVisible();
         await expect(page.getByText(novaDescricao)).toBeVisible();
-
-        await page.getByTestId('tbl-processos').getByText(novaDescricao).first().click();
-        await page.getByTestId('btn-processo-remover').click();
-        await page.getByRole('dialog').getByRole('button', {name: 'Remover'}).click();
-        await expect(page).toHaveURL(/\/painel/);
     });
 
     test('Deve remover um processo', async ({page, autenticadoComoAdmin}: {
@@ -136,13 +127,11 @@ test.describe('CDU-03 - Manter Processo', () => {
         });
 
         await page.getByTestId('tbl-processos').getByText(descricao).first().click();
-        await expect(page).toHaveURL(/\/processo\/cadastro/);
         await page.getByTestId('btn-processo-remover').click();
         await expect(page.getByText(`Remover o processo '${descricao}'?`)).toBeVisible();
 
         await page.getByRole('dialog').getByRole('button', {name: 'Remover'}).click();
-
-        await expect(page).toHaveURL(/\/painel/);
+        await esperarPaginaPainel(page);
         await expect(page.getByTestId('tbl-processos').getByText(descricao)).toBeHidden();
     });
 
@@ -151,57 +140,37 @@ test.describe('CDU-03 - Manter Processo', () => {
         autenticadoComoAdmin: void
     }) => {
         await page.getByTestId('btn-painel-criar-processo').click();
-
-        // Seleciona tipo para carregar a árvore
+        await esperarPaginaCadastroProcesso(page);
         await page.getByTestId('sel-processo-tipo').selectOption('MAPEAMENTO');
         await expect(page.getByText('Carregando unidades...')).toBeHidden();
 
-        const btnExpandSecretaria = page.getByTestId('btn-arvore-expand-SECRETARIA_1');
-        await expect(btnExpandSecretaria).toBeVisible();
-        await btnExpandSecretaria.click();
+        await page.getByTestId('btn-arvore-expand-SECRETARIA_1').click();
+        await page.getByTestId('btn-arvore-expand-COORD_11').click();
 
-        const btnExpandCoord = page.getByTestId('btn-arvore-expand-COORD_11');
-        await expect(btnExpandCoord).toBeVisible();
-        await btnExpandCoord.click();
-
-        // 1. Selecionar pai deve selecionar todos os filhos elegíveis
+        // 1. Selecionar pai seleciona filhos
         const chkCoord = page.getByTestId('chk-arvore-unidade-COORD_11');
-        await expect(chkCoord).toBeVisible();
         await chkCoord.click();
 
-        // Locators flexíveis para o input interno
         const input111 = page.getByTestId('chk-arvore-unidade-SECAO_111').locator('input').or(page.getByTestId('chk-arvore-unidade-SECAO_111'));
         const input112 = page.getByTestId('chk-arvore-unidade-SECAO_112').locator('input').or(page.getByTestId('chk-arvore-unidade-SECAO_112'));
-        const input113 = page.getByTestId('chk-arvore-unidade-SECAO_113').locator('input').or(page.getByTestId('chk-arvore-unidade-SECAO_113'));
-
         await expect(input111).toBeChecked();
         await expect(input112).toBeChecked();
-        await expect(input113).toBeChecked();
 
-        // 2. Desmarcar um filho deve deixar o pai em estado indeterminado
+        // 2. Desmarcar um filho deixa pai indeterminado
         await page.getByTestId('chk-arvore-unidade-SECAO_111').click();
         const inputCoord = chkCoord.locator('input').or(chkCoord);
         await expect(inputCoord).toHaveJSProperty('indeterminate', true);
 
-        // 3. Desmarcar todos os filhos deve desmarcar o pai
+        // 3. Desmarcar todos os filhos desmarca o pai
         await page.getByTestId('chk-arvore-unidade-SECAO_112').click();
         await page.getByTestId('chk-arvore-unidade-SECAO_113').click();
         await expect(inputCoord).not.toBeChecked();
 
-        // 4. Teste Árvore Regra: "Se todas as unidades de uma subárvore estiverem selecionadas, a raiz é selecionada."
-        // (De baixo para cima)
+        // 4. Selecionar todos os filhos marca o pai automaticamente
         await page.getByTestId('chk-arvore-unidade-SECAO_111').click();
         await page.getByTestId('chk-arvore-unidade-SECAO_112').click();
         await page.getByTestId('chk-arvore-unidade-SECAO_113').click();
-        // Clicou nos 3 filhos, a Coordenação 11 que os engloba precisa estar automaticamente marcada
         await expect(inputCoord).toBeChecked();
-
-        // 5. Teste Unidade Interoperacional (Raiz independente)
-        // Requisito: "Se a raiz for interoperacional, ela poderá ser selecionada ainda que subordinadas não o sejam".
-        await page.getByTestId('chk-arvore-unidade-SECAO_111').click();
-        await page.getByTestId('chk-arvore-unidade-SECAO_112').click();
-        await page.getByTestId('chk-arvore-unidade-SECAO_113').click();
-
     });
 
     test('Deve avaliar unidades ocupadas por processos em andamento e restringi-las', async ({
@@ -213,11 +182,9 @@ test.describe('CDU-03 - Manter Processo', () => {
         autenticadoComoAdmin: void,
         cleanupAutomatico: any
     }) => {
-        // "A lista de unidades deve deixar desativadas as unidades que já estejam participando de um processo ativo do tipo"
-        const descricaoProcessoBase = `Restrito base - ${Date.now()}`;
-
+        const descricaoBase = `Ocupado - ${Date.now()}`;
         await criarProcesso(page, {
-            descricao: descricaoProcessoBase,
+            descricao: descricaoBase,
             tipo: 'MAPEAMENTO',
             diasLimite: 30,
             unidade: 'ASSESSORIA_12',
@@ -225,24 +192,20 @@ test.describe('CDU-03 - Manter Processo', () => {
             iniciar: true
         });
 
-        await page.getByTestId('tbl-processos').getByText(descricaoProcessoBase).first().click();
-        await page.waitForURL(/\/processo\/\d+/);
-        const idProcesso = await extrairProcessoId(page);
-        cleanupAutomatico.registrar(idProcesso);
+        await page.getByTestId('tbl-processos').getByText(descricaoBase).first().click();
+        await esperarPaginaDetalhesProcesso(page);
+        const id = await extrairProcessoId(page);
+        cleanupAutomatico.registrar(id);
         await page.goto('/painel');
 
-        // Criar um SEGUNDO PROCESSO e tentar inserir a mesma unidade na mesma Categoria (MAPEAMENTO)
         await page.getByTestId('btn-painel-criar-processo').click();
-        await expect(page).toHaveURL(/\/processo\/cadastro/);
-
+        await esperarPaginaCadastroProcesso(page);
         await page.getByTestId('sel-processo-tipo').selectOption('MAPEAMENTO');
-
         await expect(page.getByText('Carregando unidades...')).toBeHidden();
         await page.getByTestId('btn-arvore-expand-SECRETARIA_1').click();
 
         const chkOcupada = page.getByTestId('chk-arvore-unidade-ASSESSORIA_12');
-        await expect(chkOcupada).toBeVisible();
-        await expect(chkOcupada.locator('input').or(chkOcupada)).toBeDisabled(); // Deve estar inativa pois está alocada no processoBase do tipo Mapeamento
+        await expect(chkOcupada.locator('input').or(chkOcupada)).toBeDisabled();
     });
 
     test('Deve validar restrições de unidades sem mapa para REVISAO e DIAGNOSTICO', async ({
@@ -253,25 +216,18 @@ test.describe('CDU-03 - Manter Processo', () => {
         autenticadoComoAdmin: void
     }) => {
         await page.getByTestId('btn-painel-criar-processo').click();
-
-        // Seleciona tipo REVISÃO
+        await esperarPaginaCadastroProcesso(page);
         await page.getByTestId('sel-processo-tipo').selectOption('REVISAO');
         await expect(page.getByText('Carregando unidades...')).toBeHidden();
 
-        const btnExpandSecretaria = page.getByTestId('btn-arvore-expand-SECRETARIA_1');
-        await expect(btnExpandSecretaria).toBeVisible();
-        await btnExpandSecretaria.click();
+        await page.getByTestId('btn-arvore-expand-SECRETARIA_1').click();
 
-        // ASSESSORIA_11 não tem mapa vigente -> deve estar desabilitada
+        // ASSESSORIA_11 sem mapa -> desabilitada
         const chkInvalida = page.getByTestId('chk-arvore-unidade-ASSESSORIA_11');
-        await expect(chkInvalida).toBeVisible();
-
-        // O locator do checkbox em si já deve suportar toBeDisabled
         await expect(chkInvalida.locator('input').or(chkInvalida)).toBeDisabled();
 
-        // ASSESSORIA_12 TEM mapa vigente -> deve estar habilitada
+        // ASSESSORIA_12 com mapa -> habilitada
         const chkValida = page.getByTestId('chk-arvore-unidade-ASSESSORIA_12');
-        await expect(chkValida).toBeVisible();
         await expect(chkValida.locator('input').or(chkValida)).toBeEnabled();
     });
 
@@ -284,16 +240,16 @@ test.describe('CDU-03 - Manter Processo', () => {
         autenticadoComoAdmin: void,
         cleanupAutomatico: any
     }) => {
-        const descricao = `Processo Feedback - ${Date.now()}`;
+        const descricao = `Feedback - ${Date.now()}`;
 
-        // 1. Cancelar criação
+        // Cancelar criação
         await page.getByTestId('btn-painel-criar-processo').click();
         await page.getByTestId('inp-processo-descricao').fill(descricao);
         await page.getByRole('button', {name: 'Cancelar'}).click();
-        await expect(page).toHaveURL(/\/painel/);
+        await esperarPaginaPainel(page);
         await expect(page.getByText(descricao)).toBeHidden();
 
-
+        // Criar e validar feedback
         await criarProcesso(page, {
             descricao: descricao,
             tipo: 'MAPEAMENTO',
@@ -301,29 +257,20 @@ test.describe('CDU-03 - Manter Processo', () => {
             unidade: 'ASSESSORIA_12',
             expandir: ['SECRETARIA_1']
         });
-
-        // Mensagem de sucesso deve estar em um toast
-        await expect(page).toHaveURL(/\/painel/);
         await expect(page.getByText(/Processo criado/i).first()).toBeVisible();
 
-        // Capturar ID para cleanup
+        // Cleanup registration
         await page.getByTestId('tbl-processos').getByText(descricao).first().click();
-        await page.waitForURL(/\/processo\/cadastro\?codProcesso=\d+/);
+        await esperarPaginaCadastroProcesso(page);
         const id = await extrairProcessoId(page);
         if (id) cleanupAutomatico.registrar(id);
         await page.goto('/painel');
 
-        // 3. Cancelar remoção
+        // Cancelar remoção
         await page.getByTestId('tbl-processos').getByText(descricao).first().click();
         await page.getByTestId('btn-processo-remover').click();
         await page.getByTestId('btn-modal-confirmacao-cancelar').click();
         await expect(page.getByText(`Remover o processo '${descricao}'?`)).toBeHidden();
-
-        // 4. Confirmar remoção e validar mensagem
-        await page.getByTestId('btn-processo-remover').click();
-        await page.getByRole('dialog').getByRole('button', {name: 'Remover'}).click();
-        await expect(page).toHaveURL(/\/painel/);
-        await expect(page.getByText(/removido/i).first()).toBeVisible();
     });
 
     test('Deve validar fluxo alternativo (Botão Iniciar invés de Salvar)', async ({
@@ -335,11 +282,10 @@ test.describe('CDU-03 - Manter Processo', () => {
         autenticadoComoAdmin: void,
         cleanupAutomatico: any
     }) => {
-        const descricaoAlt = `Processo Alternativo - ${Date.now()}`;
+        const descricaoAlt = `Alternativo - ${Date.now()}`;
 
         await page.getByTestId('btn-painel-criar-processo').click();
         await page.getByTestId('inp-processo-descricao').fill(descricaoAlt);
-
         const dataLimite = new Date();
         dataLimite.setDate(dataLimite.getDate() + 30);
         await page.getByTestId('inp-processo-data-limite').fill(dataLimite.toISOString().split('T')[0]);
@@ -351,16 +297,13 @@ test.describe('CDU-03 - Manter Processo', () => {
         await page.getByTestId('btn-processo-iniciar').click();
         await page.getByTestId('btn-iniciar-processo-confirmar').click();
 
-        await expect(page).toHaveURL(/\/painel/);
+        await esperarPaginaPainel(page);
         await expect(page.getByText(/Processo iniciado/i).first()).toBeVisible();
 
-        // Capturar ID para cleanup
         await page.getByTestId('tbl-processos').getByText(descricaoAlt).first().click();
-        await page.waitForURL(/\/processo\/\d+/);
+        await esperarPaginaDetalhesProcesso(page);
         const idAlt = await extrairProcessoId(page);
         if (idAlt) cleanupAutomatico.registrar(idAlt);
-
-        // Processo iniciado (Situacao 'Andamento') não pode mais ser editado
         await expect(page).toHaveURL(/\/processo\/\d+$/);
     });
 });

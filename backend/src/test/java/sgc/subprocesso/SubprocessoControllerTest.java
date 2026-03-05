@@ -76,7 +76,6 @@ class SubprocessoControllerTest {
                     .andExpect(jsonPath("$.mensagem").value("Cadastro de atividades disponibilizado"));
 
             verify(transicaoService).disponibilizarCadastro(eq(1L), any());
-            verify(subprocessoService, never()).obterAtividadesSemConhecimento(anyLong());
         }
 
         @Test

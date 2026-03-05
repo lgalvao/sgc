@@ -163,8 +163,18 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
     });
 
     test('Fase 2: Iniciar processo de Revisão', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
-        // Login as Admin
+        // O login como Admin já foi disparado pela fixture 'autenticadoComoAdmin'
+        // Se houver dúvida se a fixture trocou de usuário em um describe.serial,
+        // podemos chamar o helper explicitamente para garantir a navegação para /login.
+        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
+        // Garante que está no painel e o perfil Admin foi carregado
+        await verificarPaginaPainel(page);
+        await expect(page.getByTestId('btn-painel-criar-processo')).toBeVisible();
+
+        const dataLimiteBase = new Date();
+        dataLimiteBase.setDate(dataLimiteBase.getDate() + 30);
+        const dataLimiteStr = dataLimiteBase.toLocaleDateString('pt-BR');
 
         // Criar processo de REVISÃO
         await criarProcesso(page, {
@@ -201,18 +211,42 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         const linhaProcessoRevisao = page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descProcRevisao)});
         await linhaProcessoRevisao.click();
 
-        // Verifica status na tabela de participantes e entra no subprocesso
+        // Verifica status e data limite na tabela de participantes (Step 9)
         const linhaSubprocesso = page.locator('tr', {hasText: UNIDADE_ALVO}).first();
         await expect(linhaSubprocesso).toContainText('Não iniciado');
+        await expect(linhaSubprocesso).toContainText(dataLimiteStr);
+
+        // Entra no subprocesso
         await linhaSubprocesso.click();
 
         // Verifica status no header do subprocesso
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText('Não iniciado');
 
-        // O texto exato no backend é "Processo iniciado" ou "Revisão do cadastro iniciada" dependendo de como foi registrado
+        // Verifica movimentação (Step 11)
         const timeline = page.getByTestId('tbl-movimentacoes');
-        // No log o backend diz "Processo de revisao 202 iniciado" ou a UI exibe a movimentação padrão
-        await expect(timeline.getByText(/iniciad/i).first()).toBeVisible();
+        await expect(timeline.getByText(/Processo iniciado/i).first()).toBeVisible();
+    });
+
+    test('Fase 2.1: Verificar alertas do processo de Revisão', async ({page}) => {
+        // 1. Verificar Alerta para o CHEFE da unidade alvo (Unidade Operacional - Step 13.1)
+        await login(page, USUARIO_CHEFE, SENHA_CHEFE);
+        await verificarPaginaPainel(page);
+        
+        const tabelaAlertasChefe = page.getByTestId('tbl-alertas');
+        await expect(tabelaAlertasChefe.locator('tr', {hasText: descProcRevisao})
+            .filter({hasText: 'Início do processo'})
+            .filter({hasNotText: 'subordinada'})
+        ).toBeVisible();
+
+        // 2. Verificar Alerta para o GESTOR da SECRETARIA_2 (Unidade Intermediária - Step 13.2)
+        // George Harrison (212121) é Gestor da SECRETARIA_2
+        await loginComPerfil(page, '212121', 'senha', 'GESTOR - SECRETARIA_2');
+        await verificarPaginaPainel(page);
+
+        const tabelaAlertasGestor = page.getByTestId('tbl-alertas');
+        await expect(tabelaAlertasGestor.locator('tr', {hasText: descProcRevisao})
+            .filter({hasText: 'Início do processo em unidade(s) subordinada(s)'})
+        ).toBeVisible();
     });
 
     test('Fase 3: CHEFE verifica atividades copiadas na Revisão', async ({page}) => {
@@ -220,8 +254,12 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await acessarSubprocessoChefeDireto(page, descProcRevisao, UNIDADE_ALVO);
         await navegarParaAtividades(page);
 
-        // Verifica que a atividade criada na fase de Mapeamento foi copiada corretamente
+        // Verifica que a atividade criada na fase de Mapeamento foi copiada corretamente (Step 10)
         const descAtividade = `Atividade Teste ${timestamp}`;
         await expect(page.getByText(descAtividade).first()).toBeVisible();
+
+        // Conhecimentos são exibidos dentro do card da atividade no componente AtividadeItem
+        // Não há necessidade de clicar em um botão de expandir
+        await expect(page.getByText('Conhecimento Teste').first()).toBeVisible();
     });
 });

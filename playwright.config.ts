@@ -5,21 +5,19 @@ import {defineConfig, devices} from '@playwright/test';
 export default defineConfig({
     testDir: './e2e',
     timeout: 20_000,
-    retries: 1,
     workers: 1,
     expect: {timeout: 3_000},
     reporter: 'list',
     use: {
         baseURL: 'http://localhost:5173',
-        trace: 'on-first-retry',
-        video: 'on',
+        trace: 'retain-on-failure',
         screenshot: 'only-on-failure'
     },
     webServer: {
         command: 'node e2e/lifecycle.js',
         url: 'http://localhost:5173',
         reuseExistingServer: true,
-        timeout: 100 * 1000,
+        timeout: 60 * 1000,
         stdout: 'pipe',
         stderr: 'pipe',
     },
