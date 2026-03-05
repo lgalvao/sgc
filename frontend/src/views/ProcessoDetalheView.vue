@@ -17,18 +17,28 @@
         </template>
 
         <template #actions>
-          <BButton v-if="mostrarBotoesBloco && podeAceitarBloco" variant="success" @click="abrirModalBloco('aceitar')">
+          <BButton
+              v-if="podeAceitarBloco"
+              :disabled="isAceitarBlocoDisabled"
+              variant="success"
+              @click="abrirModalBloco('aceitar')">
             Aceitar em bloco
           </BButton>
 
           <BButton
-              v-if="mostrarBotoesBloco && podeHomologarBloco" class="text-white" variant="warning"
+              v-if="podeHomologarBloco"
+              :disabled="isHomologarBlocoDisabled"
+              class="text-white"
+              variant="warning"
               @click="abrirModalBloco('homologar')">
             Homologar em bloco
           </BButton>
 
           <BButton
-              v-if="mostrarBotoesBloco && podeDisponibilizarBloco" class="text-white" variant="info"
+              v-if="podeDisponibilizarBloco"
+              :disabled="isDisponibilizarBlocoDisabled"
+              class="text-white"
+              variant="info"
               @click="abrirModalBloco('disponibilizar')">
             Disponibilizar mapas em bloco
           </BButton>
@@ -143,12 +153,20 @@ const podeHomologarBloco = computed(() => perfilStore.isAdmin);
 const podeDisponibilizarBloco = computed(() => {
   return perfilStore.isAdmin &&
       !isProcessoFinalizado.value &&
-      (processo.value?.podeDisponibilizarMapaBloco || false) &&
-      unidadesElegiveisPorAcao.value.disponibilizar.length > 0;
+      (processo.value?.podeDisponibilizarMapaBloco || false);
 });
 
-const mostrarBotoesBloco = computed(() => {
-  return podeAceitarBloco.value || podeHomologarBloco.value || podeDisponibilizarBloco.value;
+// Estado Disabled
+const isAceitarBlocoDisabled = computed(() => {
+  return unidadesElegiveisPorAcao.value.aceitar.length === 0;
+});
+
+const isHomologarBlocoDisabled = computed(() => {
+  return unidadesElegiveisPorAcao.value.homologar.length === 0;
+});
+
+const isDisponibilizarBlocoDisabled = computed(() => {
+  return unidadesElegiveisPorAcao.value.disponibilizar.length === 0;
 });
 
 const podeFinalizar = computed(() => {
