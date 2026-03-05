@@ -16,7 +16,6 @@ describe("HistoricoView Coverage", () => {
             ],
         });
 
-        // We mock push but we need the router to be functional for initial render
         const pushSpy = vi.spyOn(router, "push");
 
         const wrapper = mount(HistoricoView, {
@@ -50,7 +49,6 @@ describe("HistoricoView Coverage", () => {
         const store = useProcessosStore();
         expect(store.processosFinalizados).toHaveLength(1);
 
-        // Find the row
         const row = wrapper.find("tbody tr.row-processo-1");
         expect(row.exists()).toBe(true);
         expect(row.text()).toContain("Processo Teste");

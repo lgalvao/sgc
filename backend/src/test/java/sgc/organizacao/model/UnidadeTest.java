@@ -15,10 +15,8 @@ class UnidadeTest {
         usuario.setTituloEleitoral("123456789012");
         usuario.setMatricula("12345678");
 
-
         unidade.setTituloTitular(usuario.getTituloEleitoral());
         unidade.setMatriculaTitular(usuario.getMatricula());
-
 
         assertThat(unidade.getTituloTitular()).isEqualTo("123456789012");
         assertThat(unidade.getMatriculaTitular()).isEqualTo("12345678");

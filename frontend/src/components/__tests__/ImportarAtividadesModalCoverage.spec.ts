@@ -86,7 +86,6 @@ describe("ImportarAtividadesModal Coverage", () => {
 
         vm.unidadeSelecionadaId = 10;
         await flushPromises();
-        // Even if not in list, it might try to find it
         vm.unidadeSelecionadaId = null;
         await flushPromises();
         expect(vm.unidadeSelecionada).toBeNull();

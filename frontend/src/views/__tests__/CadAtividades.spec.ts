@@ -229,7 +229,6 @@ describe("CadastroView.vue", () => {
         expect(wrapper.findAllComponents(AtividadeItemStub)).toHaveLength(1);
     });
 
-    // Test case removed/simplified because asserting focus on stubs in VTU/JSDOM is flaky without specific setup
     it("deve adicionar nova atividade", async () => {
         const {wrapper, atividadesStore} = createWrapper();
         await flushPromises();
@@ -245,7 +244,6 @@ describe("CadastroView.vue", () => {
             {descricao: "Nova Atividade"}
         );
 
-        // Check if value was cleared (indicating success flow completed)
         expect(input.element.value).toBe('');
     });
 

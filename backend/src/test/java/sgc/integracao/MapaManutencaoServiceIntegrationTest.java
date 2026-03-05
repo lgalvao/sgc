@@ -229,7 +229,6 @@ class MapaManutencaoServiceIntegrationTest extends BaseIntegrationTest {
             CriarConhecimentoRequest req1 = CriarConhecimentoRequest.builder().descricao("Conhecimento 1").build();
             Conhecimento c1 = service.criarConhecimento(atividade.getCodigo(), req1);
 
-            // Flush and clear cache to ensure DB has the correct state and the entity manager fetches it afresh
             entityManager.flush();
             entityManager.clear();
 
@@ -248,7 +247,6 @@ class MapaManutencaoServiceIntegrationTest extends BaseIntegrationTest {
 
             service.excluirConhecimento(atividade.getCodigo(), c1.getCodigo());
 
-            // Flush to trigger actual DB deletion and clear the persistence context cache to ensure correct check
             entityManager.flush();
             entityManager.clear();
 

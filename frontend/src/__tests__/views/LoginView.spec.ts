@@ -147,7 +147,6 @@ describe("LoginView.vue", () => {
         const wrapper = mount(LoginView, mountOptions());
         const perfilStore = usePerfilStore();
 
-
         perfilStore.loginCompleto = vi.fn().mockResolvedValue(true);
         perfilStore.selecionarPerfilUnidade = vi.fn().mockResolvedValue(true);
         perfilStore.perfisUnidades = MOCK_PERFIS;
@@ -157,7 +156,6 @@ describe("LoginView.vue", () => {
         await wrapper.find('form').trigger('submit');
 
         expect(wrapper.find('[data-testid="sec-login-perfil"]').exists()).toBe(true);
-
 
         // Trigger submit novamente para confirmar seleção
         await wrapper.find('form').trigger('submit');
@@ -253,7 +251,6 @@ describe("LoginView.vue", () => {
         await wrapper.find('[data-testid="inp-login-usuario"]').setValue("123");
         await wrapper.find('[data-testid="inp-login-senha"]').setValue("pass");
         await wrapper.find('form').trigger('submit');
-
 
         expect(wrapper.find('[data-testid="sec-login-perfil"]').exists()).toBe(true);
 

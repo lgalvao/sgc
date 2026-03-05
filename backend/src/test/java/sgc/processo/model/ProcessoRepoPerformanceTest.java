@@ -46,9 +46,7 @@ class ProcessoRepoPerformanceTest {
         entityManager.flush();
         entityManager.clear();
 
-
         List<Processo> processos = processoRepo.listarPorSituacaoComParticipantes(SituacaoProcesso.FINALIZADO);
-
 
         assertThat(processos).isNotEmpty();
 

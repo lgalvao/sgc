@@ -221,7 +221,6 @@ public class SubprocessoService {
         return (destino != null) ? destino : sp.getUnidade();
     }
 
-
     @Transactional
     public void atualizarParaEmAndamento(Long mapaCodigo) {
         var subprocesso = subprocessoRepo.findByMapa_Codigo(mapaCodigo).orElseThrow();
@@ -436,7 +435,6 @@ public class SubprocessoService {
                 SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
         return sp;
     }
-
 
     @Transactional
     public void salvarAjustesMapa(Long codSubprocesso, List<CompetenciaAjusteDto> competencias) {
@@ -763,7 +761,6 @@ public class SubprocessoService {
                 .toList();
     }
 
-
     @Transactional(readOnly = true)
     public List<AnaliseHistoricoDto> listarHistoricoCadastro(Long codSubprocesso) {
         return listarAnalisesPorSubprocesso(codSubprocesso).stream()
@@ -794,6 +791,5 @@ public class SubprocessoService {
                 .tipo(analise.getTipo())
                 .build();
     }
-
 
 }

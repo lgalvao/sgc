@@ -96,7 +96,6 @@ class CDU32IntegrationTest extends BaseIntegrationTest {
                                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
 
-
         entityManager.flush();
         entityManager.clear();
 

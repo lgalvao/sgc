@@ -44,10 +44,8 @@ class ModelCoverageTest {
         u2.setMatriculaTitular("5678");
         u2.setTituloTitular("789012");
 
-
         processo.adicionarParticipantes(Set.of(u1, u2));
         assertThat(processo.getParticipantes()).hasSize(2);
-
 
         // Isso cobre both true/false do removeIf em Proceso.java:86
         processo.sincronizarParticipantes(new HashSet<>(Collections.singletonList(u2)));

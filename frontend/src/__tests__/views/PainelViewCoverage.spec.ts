@@ -69,7 +69,6 @@ describe('PainelView Coverage', () => {
         const processosStore = useProcessosStore(pinia);
         const alertasStore = useAlertasStore(pinia);
 
-        // Wait for onMounted
         await wrapper.vm.$nextTick();
 
         expect(processosStore.buscarProcessosPainel).toHaveBeenCalled();

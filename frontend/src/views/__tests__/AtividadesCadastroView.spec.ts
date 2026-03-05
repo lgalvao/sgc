@@ -115,7 +115,6 @@ function createWrapper(customState = {}, accessOverrides = {}) {
         }
     });
 
-    // Manually set codSubprocesso to ensure buttons depending on it are rendered
     (wrapper.vm as any).codSubprocesso = 123;
 
     return wrapper;

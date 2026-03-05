@@ -73,9 +73,7 @@ class UsuarioFacadeTest {
             configurarAutenticacao(titulo);
             when(usuarioService.buscarComAtribuicoes(titulo)).thenReturn(usuario);
 
-
             Usuario resultado = facade.usuarioAutenticado();
-
 
             assertThat(resultado).isNotNull();
             assertThat(resultado.getTituloEleitoral()).isEqualTo(titulo);
@@ -102,9 +100,7 @@ class UsuarioFacadeTest {
             when(context.getAuthentication()).thenReturn(auth);
             SecurityContextHolder.setContext(context);
 
-
             Usuario resultado = facade.usuarioAutenticado();
-
 
             assertThat(resultado).isSameAs(usuario);
             verifyNoInteractions(usuarioService);
@@ -125,9 +121,7 @@ class UsuarioFacadeTest {
             when(usuarioService.buscarComAtribuicoesOpt(titulo))
                     .thenReturn(Optional.of(usuario));
 
-
             Usuario resultado = facade.carregarUsuarioParaAutenticacao(titulo);
-
 
             assertThat(resultado).isNotNull();
             assertThat(resultado.getTituloEleitoral()).isEqualTo(titulo);
@@ -150,9 +144,7 @@ class UsuarioFacadeTest {
             when(usuarioService.buscarAdministradores()).thenReturn(List.of(admin));
             when(usuarioService.buscarOpt(titulo)).thenReturn(Optional.of(usuario));
 
-
             List<AdministradorDto> resultado = facade.listarAdministradores();
-
 
             assertThat(resultado).hasSize(1);
             assertThat(resultado.getFirst().tituloEleitoral()).isEqualTo(titulo);
@@ -167,9 +159,7 @@ class UsuarioFacadeTest {
 
             when(usuarioService.buscar(titulo)).thenReturn(usuario);
 
-
             AdministradorDto resultado = facade.adicionarAdministrador(titulo);
-
 
             assertThat(resultado).isNotNull();
             verify(usuarioService).adicionarAdministrador(titulo);
@@ -182,9 +172,7 @@ class UsuarioFacadeTest {
             String tituloRemover = "111111";
             String tituloAtual = "222222";
 
-
             facade.removerAdministrador(tituloRemover, tituloAtual);
-
 
             verify(usuarioService).removerAdministrador(tituloRemover);
         }
@@ -212,9 +200,7 @@ class UsuarioFacadeTest {
             when(usuarioService.buscarPorTitulos(titulos))
                     .thenReturn(List.of(usuario1, usuario2));
 
-
             Map<String, Usuario> resultado = facade.buscarUsuariosPorTitulos(titulos);
-
 
             assertThat(resultado).hasSize(2).containsKeys("111111", "222222");
         }

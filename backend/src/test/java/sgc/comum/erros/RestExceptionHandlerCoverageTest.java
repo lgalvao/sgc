@@ -17,9 +17,7 @@ class RestExceptionHandlerCoverageTest {
         ErroInterno ex = new ErroInterno("Messagem interna de teste") {
         };
 
-
         ResponseEntity<?> response = handler.handleErroInterno(ex);
-
 
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -41,9 +39,7 @@ class RestExceptionHandlerCoverageTest {
         }
         ErroTeste ex = new ErroTeste();
 
-
         ResponseEntity<?> response = handler.handleErroNegocio(ex);
-
 
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);

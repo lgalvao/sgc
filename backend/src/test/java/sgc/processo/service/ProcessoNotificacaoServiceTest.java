@@ -161,7 +161,6 @@ class ProcessoNotificacaoServiceTest {
         verify(alertaService).criarAlertasProcessoIniciado(any(), anyList());
     }
 
-
     @Test
     @DisplayName("Deve criar alertas mesmo se não enviar e-mails")
     void deveCriarAlertasMesmoSemEmails() {

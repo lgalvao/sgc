@@ -69,14 +69,12 @@ class CDU27IntegrationTest extends BaseIntegrationTest {
         LocalDate novaData = LocalDate.now().plusDays(20);
         DataRequest request = new DataRequest(novaData);
 
-
         mockMvc.perform(
                         post("/api/subprocessos/{codigo}/data-limite", subprocesso.getCodigo())
                                 .with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
-
 
         entityManager.flush();
         entityManager.clear();

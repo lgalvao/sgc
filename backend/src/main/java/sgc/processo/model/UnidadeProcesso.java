@@ -9,7 +9,6 @@ import sgc.organizacao.model.*;
 import java.io.*;
 import java.time.*;
 
-
 /**
  * Entidade que representa a associação entre um Processo e uma Unidade participante,
  * armazenando um snapshot dos dados da unidade no momento em que o processo foi iniciado.

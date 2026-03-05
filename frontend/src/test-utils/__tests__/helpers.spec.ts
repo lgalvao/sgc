@@ -31,7 +31,6 @@ describe("test-utils/helpers", () => {
     it("prepareFreshAtividadesStore deve retornar uma store com dados", async () => {
         const store = await prepareFreshAtividadesStore();
         expect(store).toBeDefined();
-        // Since we populate with ID 1
         expect(store.atividadesPorSubprocesso.get(1)).toBeDefined();
         expect(store.atividadesPorSubprocesso.get(1).length).toBeGreaterThan(0);
     });

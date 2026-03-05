@@ -172,7 +172,6 @@ class SubprocessoFluxoIntegrationTest extends BaseIntegrationTest {
         sp = subprocessoRepo.findById(spId).orElseThrow();
         assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO);
 
-
         // Situação deve mudar para MAPA_VALIDADO
         // A Disponibilização enviou o processo para a Unidade Superior (RAIZ).
         // Quem valida a disponibilização é o Chefe da Unidade SUPERIOR (que recebeu o processo).
@@ -191,7 +190,6 @@ class SubprocessoFluxoIntegrationTest extends BaseIntegrationTest {
 
         sp = subprocessoRepo.findById(spId).orElseThrow();
         assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
-
 
         // O teste já cobre:
         // - Adicionar competência (Escrita na Unidade Filha)

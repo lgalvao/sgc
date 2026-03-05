@@ -139,14 +139,12 @@ class CDU24IntegrationTest extends BaseIntegrationTest {
                 .dataLimite(LocalDate.now().plusDays(10))
                 .build();
 
-
         mockMvc.perform(
                         post("/api/subprocessos/{id}/disponibilizar-mapa-bloco", codigoContexto)
                                 .with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
-
 
         entityManager.flush();
         entityManager.clear();

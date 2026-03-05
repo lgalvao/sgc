@@ -172,7 +172,6 @@ class MapaSalvamentoServiceTest {
 
         mapaSalvamentoService.salvarMapaCompleto(codMapa, request);
 
-
         assertThat(ativ.getCompetencias()).isEmpty();
     }
 

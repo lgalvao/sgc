@@ -150,7 +150,6 @@ class SubprocessoTest {
         assertThat(sp.getDataLimiteEtapa1()).isEqualTo(dt);
     }
 
-
     @Test
     @DisplayName("Getters NonNull should return values")
     void gettersNonNull() {

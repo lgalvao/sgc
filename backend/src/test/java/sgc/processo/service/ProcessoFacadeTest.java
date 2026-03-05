@@ -90,7 +90,6 @@ class ProcessoFacadeTest {
             verify(processoConsultaService).buscarIdsUnidadesComProcessosAtivos(codigoIgnorar);
         }
 
-
         @Test
         @DisplayName("enviarLembrete deve delegar para processoNotificacaoService")
         void enviarLembrete_DeveDelegar() {
@@ -251,7 +250,6 @@ class ProcessoFacadeTest {
 
             Processo resultado = processoFacade.criar(req);
 
-
             assertThat(resultado).isNotNull();
             verify(processoManutencaoService).criar(req);
         }
@@ -292,9 +290,7 @@ class ProcessoFacadeTest {
             when(processoConsultaService.buscarProcessoCodigo(id)).thenReturn(processo);
             when(processoDetalheBuilder.build(eq(processo), any(Usuario.class))).thenReturn(ProcessoDetalheDto.builder().build());
 
-
             var res = processoFacade.obterDetalhes(id, usuario);
-
 
             assertThat(res).isNotNull();
         }
@@ -350,9 +346,7 @@ class ProcessoFacadeTest {
             when(processoConsultaService.unidadesBloqueadasPorTipo(TipoProcesso.MAPEAMENTO))
                     .thenReturn(List.of(1L));
 
-
             List<Long> bloqueadas = processoFacade.listarUnidadesBloqueadasPorTipo("MAPEAMENTO");
-
 
             assertThat(bloqueadas).contains(1L);
         }
@@ -371,9 +365,7 @@ class ProcessoFacadeTest {
             when(processoConsultaService.subprocessosElegiveis(id))
                     .thenReturn(List.of());
 
-
             var res = processoFacade.obterContextoCompleto(id, usuario);
-
 
             assertThat(res)
                     .isNotNull()
@@ -431,9 +423,7 @@ class ProcessoFacadeTest {
                 when(subprocessoService.listarEntidadesPorProcessoEUnidades(100L, List.of(1L, 2L, 3L))).thenReturn(List.of(sp1, sp2, sp3));
                 doReturn(true).when(permissionEvaluator).checkPermission(eq(usuario), any(), eq("DISPONIBILIZAR_MAPA"));
 
-
                 processoFacade.executarAcaoEmBloco(100L, req);
-
 
                 ArgumentCaptor<DisponibilizarMapaRequest> captor =
                         ArgumentCaptor.forClass(DisponibilizarMapaRequest.class);
@@ -479,9 +469,7 @@ class ProcessoFacadeTest {
                         null
                 );
 
-
                 processoFacade.executarAcaoEmBloco(100L, req);
-
 
                 verify(transicaoService).aceitarCadastroEmBloco(List.of(1L, 2L), usuario);
             }
@@ -508,9 +496,7 @@ class ProcessoFacadeTest {
                         null
                 );
 
-
                 processoFacade.executarAcaoEmBloco(100L, req);
-
 
                 verify(transicaoService).aceitarValidacaoEmBloco(List.of(1L), usuario);
             }
@@ -541,9 +527,7 @@ class ProcessoFacadeTest {
                         null
                 );
 
-
                 processoFacade.executarAcaoEmBloco(100L, req);
-
 
                 verify(transicaoService).homologarCadastroEmBloco(List.of(1L), usuario);
             }
@@ -570,9 +554,7 @@ class ProcessoFacadeTest {
                         null
                 );
 
-
                 processoFacade.executarAcaoEmBloco(100L, req);
-
 
                 verify(transicaoService).homologarValidacaoEmBloco(List.of(1L), usuario);
             }

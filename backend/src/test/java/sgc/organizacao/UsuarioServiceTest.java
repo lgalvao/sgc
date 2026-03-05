@@ -51,7 +51,6 @@ class UsuarioServiceTest {
 
             Optional<Usuario> result = usuarioServiceInternal.buscarOpt(TITULO_ADMIN);
 
-
             assertTrue(result.isPresent());
             assertEquals(TITULO_ADMIN, result.get().getTituloEleitoral());
             assertEquals(NOME_ADMIN, result.get().getNome());
@@ -63,7 +62,6 @@ class UsuarioServiceTest {
 
             var usuario = usuarioService.buscarPorLogin(TITULO_ADMIN);
 
-
             assertNotNull(usuario);
             assertEquals(TITULO_ADMIN, usuario.getTituloEleitoral());
         }
@@ -73,7 +71,6 @@ class UsuarioServiceTest {
         void deveBuscarUsuariosAtivos() {
 
             List<Usuario> result = usuarioServiceInternal.buscarTodos();
-
 
             assertNotNull(result);
             assertFalse(result.isEmpty());
@@ -86,9 +83,7 @@ class UsuarioServiceTest {
 
             List<String> titulos = List.of(TITULO_CHEFE_UNIT2, TITULO_ADMIN);
 
-
             Map<String, Usuario> result = usuarioService.buscarUsuariosPorTitulos(titulos);
-
 
             assertNotNull(result);
             assertEquals(2, result.size());
@@ -105,7 +100,6 @@ class UsuarioServiceTest {
         void deveBuscarUnidadePorCodigo() {
 
             Unidade result = unidadeService2.buscarPorId(COD_UNIT_SEC1);
-
 
             assertNotNull(result);
             assertEquals(COD_UNIT_SEC1, result.getCodigo());
@@ -127,7 +121,6 @@ class UsuarioServiceTest {
 
             List<UnidadeDto> result = hierarquiaService.buscarSubordinadas(COD_UNIT_SEC1);
 
-
             assertNotNull(result);
             assertFalse(result.isEmpty());
             for (UnidadeDto unidade : result) {
@@ -140,7 +133,6 @@ class UsuarioServiceTest {
         void deveConstruirArvoreHierarquica() {
 
             List<UnidadeDto> result = hierarquiaService.buscarArvoreHierarquica();
-
 
             assertNotNull(result);
             assertFalse(result.isEmpty());
@@ -179,7 +171,6 @@ class UsuarioServiceTest {
 
             UnidadeResponsavelDto result = responsavelService.buscarResponsavelUnidade(2L);
 
-
             assertNotNull(result);
             assertEquals(2L, result.unidadeCodigo());
             assertEquals(TITULO_CHEFE_UNIT2, result.titularTitulo());
@@ -190,7 +181,6 @@ class UsuarioServiceTest {
         void deveBuscarUnidadesOndeEhResponsavel() {
 
             List<Long> result = responsavelService.buscarUnidadesOndeEhResponsavel(TITULO_CHEFE_UNIT2);
-
 
             assertNotNull(result);
             assertFalse(result.isEmpty());
@@ -203,9 +193,7 @@ class UsuarioServiceTest {
 
             List<Long> unidades = List.of(2L, 9L);
 
-
             Map<Long, UnidadeResponsavelDto> result = responsavelService.buscarResponsaveisUnidades(unidades);
-
 
             assertNotNull(result);
             assertTrue(result.containsKey(2L));
@@ -223,7 +211,6 @@ class UsuarioServiceTest {
         void deveBuscarPerfisUsuario() {
 
             List<PerfilDto> result = usuarioService.buscarPerfisUsuario(TITULO_CHEFE_UNIT2);
-
 
             assertNotNull(result);
             assertFalse(result.isEmpty());

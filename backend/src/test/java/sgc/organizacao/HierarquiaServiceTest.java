@@ -22,7 +22,6 @@ class HierarquiaServiceTest {
     @InjectMocks
     private HierarquiaService hierarquiaService;
 
-
     @Test
     @DisplayName("Deve retornar true se usuario é responsavel")
     void deveRetornarTrueSeUsuarioResponsavel() {
@@ -118,7 +117,6 @@ class HierarquiaServiceTest {
 
         assertThat(hierarquiaService.isMesmaOuSubordinada(alvo, superior)).isTrue();
     }
-
 
     @Test
     @DisplayName("Deve retornar true quando é superior imediata")

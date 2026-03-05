@@ -266,7 +266,6 @@ defineExpose({
   cursor: not-allowed;
 }
 
-/* Ensure hover effect doesn't happen on disabled cards */
 .card-actionable.disabled-card:hover {
   transform: none;
   box-shadow: none;

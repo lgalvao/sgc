@@ -56,7 +56,6 @@ class LoginControllerLogInjectionTest {
         // O valor original poderia ser algo como: "10.0.0.1\nINFO User logged in as admin"
         String ipMalicioso = "10.0.0.1\nINFO User logged in as admin";
 
-
         AutenticarRequest req = AutenticarRequest.builder()
                 .tituloEleitoral("123")
                 .senha("senha")

@@ -203,7 +203,6 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
         );
     }
 
-
     return {
         subprocessoDetalhe,
         lastError,

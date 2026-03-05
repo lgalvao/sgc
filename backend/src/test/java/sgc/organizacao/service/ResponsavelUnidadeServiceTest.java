@@ -52,9 +52,7 @@ class ResponsavelUnidadeServiceTest {
             when(atribuicaoTemporariaRepo.findAll()).thenReturn(List.of(atribuicao));
             when(repo.buscar(Usuario.class, "123456789012")).thenReturn(usuario);
 
-
             List<AtribuicaoDto> resultado = service.buscarTodasAtribuicoes();
-
 
             assertThat(resultado).hasSize(1);
             assertThat(resultado.getFirst().unidadeCodigo()).isEqualTo(10L);
@@ -91,9 +89,7 @@ class ResponsavelUnidadeServiceTest {
             when(repo.buscar(Unidade.class, codUnidade)).thenReturn(unidade);
             when(repo.buscar(Usuario.class, "123456789012")).thenReturn(usuario);
 
-
             service.criarAtribuicaoTemporaria(codUnidade, request);
-
 
             ArgumentCaptor<AtribuicaoTemporaria> captor = ArgumentCaptor.forClass(AtribuicaoTemporaria.class);
             verify(atribuicaoTemporariaRepo).save(captor.capture());
@@ -134,9 +130,7 @@ class ResponsavelUnidadeServiceTest {
             when(repo.buscar(Responsabilidade.class, 1L)).thenReturn(resp);
             when(repo.buscar(Usuario.class, "123456789012")).thenReturn(usuarioCompleto);
 
-
             Usuario resultado = service.buscarResponsavelAtual(siglaUnidade);
-
 
             assertThat(resultado).isNotNull();
             assertThat(resultado.getTituloEleitoral()).isEqualTo("123456789012");
@@ -174,9 +168,7 @@ class ResponsavelUnidadeServiceTest {
             when(repo.buscar(Usuario.class, "222222222222")).thenReturn(substituto);
             when(repo.buscar(Usuario.class, "111111111111")).thenReturn(titularOficial);
 
-
             UnidadeResponsavelDto resultado = service.buscarResponsavelUnidade(unidadeCodigo);
-
 
             assertThat(resultado).isNotNull();
             assertThat(resultado.titularTitulo()).isEqualTo("111111111111");

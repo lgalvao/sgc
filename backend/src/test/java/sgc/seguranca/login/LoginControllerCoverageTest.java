@@ -41,9 +41,7 @@ class LoginControllerCoverageTest {
         when(loginFacade.autenticar("111111", "senha_errada")).thenReturn(false);
         when(httpRequest.getRemoteAddr()).thenReturn("127.0.0.1");
 
-
         ResponseEntity<Boolean> result = controller.autenticar(request, httpRequest, httpResponse);
-
 
         assertThat(result.getBody()).isFalse();
         verify(httpResponse, never()).addCookie(any()); // Cobertura da linha 64 (branch false)

@@ -17,9 +17,7 @@ class ProcessoPbtTest {
         processo.setParticipantes(new ArrayList<>()); // Inicializa lista vazia
         processo.adicionarParticipantes(unidadesIniciais);
 
-
         processo.sincronizarParticipantes(novasUnidades);
-
 
         List<Long> codigosParticipantes = processo.getCodigosParticipantes();
         List<Long> codigosNovasUnidades = novasUnidades.stream()

@@ -19,7 +19,6 @@ interface ImportarAtividadesRequest {
     codigosAtividades?: number[];
 }
 
-
 export async function importarAtividades(
     codSubprocessoDestino: number,
     codSubprocessoOrigem: number,

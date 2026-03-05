@@ -82,7 +82,6 @@ class MapaAjusteDtoTest {
             MapaAjusteDto dto = MapaAjusteDto.of(
                     subprocesso, analise, List.of(comp), List.of(ativ), List.of(con));
 
-
             assertThat(dto.getCompetencias()).hasSize(1);
             CompetenciaAjusteDto compDto = dto.getCompetencias().getFirst();
             assertThat(compDto.getCodCompetencia()).isEqualTo(1L);

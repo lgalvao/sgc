@@ -170,7 +170,6 @@ class PainelFacadeTest {
         assertThat(result).hasSize(1);
     }
 
-
     @Test
     @DisplayName("Deve lidar com solicitação não paginada")
     void deveLidarComSolicitacaoNaoPaginada() {
@@ -200,15 +199,12 @@ class PainelFacadeTest {
         when(up2.getUnidadeCodigo()).thenReturn(10L); // Mesmo código
         when(up2.getSigla()).thenReturn("U1"); // Mock de sigla
 
-
         when(p.getParticipantes()).thenReturn(List.of(up1, up2));
 
         when(hierarquiaService.buscarMapaHierarquia()).thenReturn(new HashMap<>());
         when(processoFacade.listarTodos(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(p)));
 
-
         Page<ProcessoResumoDto> result = painelFacade.listarProcessos(Perfil.ADMIN, 100L, PageRequest.of(0, 10));
-
 
         assertThat(result.getContent().getFirst().unidadesParticipantes()).contains("U1");
     }
@@ -221,7 +217,6 @@ class PainelFacadeTest {
         when(p.getCodigo()).thenReturn(1L);
         when(p.getSituacao()).thenReturn(SituacaoProcesso.EM_ANDAMENTO);
         when(p.getTipo()).thenReturn(TipoProcesso.MAPEAMENTO);
-
 
         UnidadeProcesso up1 = mock(UnidadeProcesso.class);
         when(up1.getUnidadeCodigo()).thenReturn(1L);
@@ -241,9 +236,7 @@ class PainelFacadeTest {
         when(hierarquiaService.buscarMapaHierarquia()).thenReturn(hierarquia);
         when(processoFacade.listarTodos(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(p)));
 
-
         Page<ProcessoResumoDto> result = painelFacade.listarProcessos(Perfil.ADMIN, 100L, PageRequest.of(0, 10));
-
 
         // Se U2 participa e U1 participa, e U2 é única subordinada de U1, deve mostrar apenas U1
         assertThat(result.getContent().getFirst().unidadesParticipantes()).isEqualTo("U1");

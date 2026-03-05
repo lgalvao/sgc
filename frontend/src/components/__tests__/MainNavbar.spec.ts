@@ -75,7 +75,6 @@ describe("MainNavbar.vue", () => {
 
         ctx.wrapper = mount(NavBar, options);
 
-
         // GESTOR vê "Minha unidade" apontando para sua unidade
         checkLink("Minha unidade", "/unidade/456");
     });
@@ -158,7 +157,6 @@ describe("MainNavbar.vue", () => {
         } else {
             await logoutNavItem.trigger("click");
         }
-
 
         expect(mockPush).toHaveBeenCalledWith("/login");
     });

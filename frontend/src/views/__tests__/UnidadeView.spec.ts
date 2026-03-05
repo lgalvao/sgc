@@ -102,7 +102,6 @@ describe('UnidadeView.vue', () => {
 
     const mockUnidade = mockUnidadeData;
 
-
     const createWrapper = (initialStateOverride = {}) => {
         context.wrapper = mount(UnidadeView, {
             ...getCommonMountOptions(
@@ -273,7 +272,6 @@ describe('UnidadeView.vue', () => {
 
     it('displays error alert when unidadesStore has error', async () => {
         const {wrapper, unidadesStore} = createWrapper();
-        // Since createTestingPinia is used, we can directly modify state or use patch
         unidadesStore.lastError = {message: 'Erro ao carregar unidade'};
         await wrapper.vm.$nextTick();
 
@@ -331,7 +329,6 @@ describe('UnidadeView.vue', () => {
         expect(emailLink.attributes('aria-label')).toBe('Enviar e-mail para test@example.com');
     });
 
-
     it('handles unit with no children safely', async () => {
         const mockUnidadeSemFilhas = {
             ...mockUnidade,
@@ -345,7 +342,6 @@ describe('UnidadeView.vue', () => {
 
         expect(unidadesStore.unidade.filhas).toHaveLength(0);
 
-        // Access computed property explicitly to ensure coverage
         expect((wrapper.vm).dadosFormatadosSubordinadas).toEqual([]);
 
         // Should check that TreeTable is not rendered or data is empty

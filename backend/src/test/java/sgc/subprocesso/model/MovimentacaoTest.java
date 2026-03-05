@@ -32,5 +32,4 @@ class MovimentacaoTest {
         assertThat(mov.getDataHora()).isEqualTo(agora);
     }
 
-
 }

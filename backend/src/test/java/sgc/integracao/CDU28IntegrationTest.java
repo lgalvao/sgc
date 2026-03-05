@@ -58,7 +58,6 @@ class CDU28IntegrationTest extends BaseIntegrationTest {
                 "Férias do titular"
         );
 
-
         mockMvc.perform(
                         post("/api/unidades/{codUnidade}/atribuicoes-temporarias", unidade.getCodigo())
                                 .with(csrf())

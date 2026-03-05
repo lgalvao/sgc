@@ -64,13 +64,11 @@ class ProcessoRepoTest {
 
         entityManager.flush(); // Ensure Persistence
 
-
         Page<Processo> resultado = processoRepo.findDistinctByParticipantes_IdUnidadeCodigoInAndSituacaoNot(
                 List.of(u1.getCodigo()),
                 SituacaoProcesso.CRIADO,
                 PageRequest.of(0, 10)
         );
-
 
         assertThat(resultado.getContent())
                 .hasSize(1)
@@ -95,13 +93,11 @@ class ProcessoRepoTest {
 
         entityManager.flush();
 
-
         Page<Processo> resultado = processoRepo.findDistinctByParticipantes_IdUnidadeCodigoInAndSituacaoNot(
                 List.of(u1.getCodigo()),
                 SituacaoProcesso.CRIADO,
                 PageRequest.of(0, 10)
         );
-
 
         assertThat(resultado.getContent())
                 .hasSize(2)
@@ -121,13 +117,11 @@ class ProcessoRepoTest {
 
         entityManager.flush();
 
-
         Page<Processo> resultado = processoRepo.findDistinctByParticipantes_IdUnidadeCodigoInAndSituacaoNot(
                 List.of(u1.getCodigo(), u2.getCodigo()), // Busco por AMBAS
                 SituacaoProcesso.CRIADO,
                 PageRequest.of(0, 10)
         );
-
 
         assertThat(resultado.getContent())
                 .hasSize(1) // DISTINCT deve garantir apenas 1 resultado
@@ -154,7 +148,6 @@ class ProcessoRepoTest {
                 PageRequest.of(0, 2)
         );
 
-
         assertThat(resultado.getTotalElements()).isEqualTo(5);
         assertThat(resultado.getTotalPages()).isEqualTo(3);
         assertThat(resultado.getContent()).hasSize(2);
@@ -172,13 +165,11 @@ class ProcessoRepoTest {
 
         entityManager.flush();
 
-
         Page<Processo> resultado = processoRepo.findDistinctByParticipantes_IdUnidadeCodigoInAndSituacaoNot(
                 List.of(u1.getCodigo()),
                 SituacaoProcesso.CRIADO,
                 PageRequest.of(0, 10)
         );
-
 
         assertThat(resultado.getContent())
                 .hasSize(2)

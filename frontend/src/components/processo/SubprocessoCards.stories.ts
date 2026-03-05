@@ -17,7 +17,6 @@ const meta: Meta<typeof SubprocessoCards> = {
 export default meta;
 type Story = StoryObj<typeof SubprocessoCards>;
 
-
 const mockMapa = {
     codigo: 1,
     descricao: 'Mapa Teste',

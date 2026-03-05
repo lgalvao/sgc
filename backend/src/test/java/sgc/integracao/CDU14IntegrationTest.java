@@ -84,7 +84,6 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
             return mapaRepo.save(novoMapa);
         });
 
-        // Ensure mapa has at least one atividade with conhecimento for validation
         if (atividadeRepo.findByMapa_Codigo(mapaVigente.getCodigo()).isEmpty()) {
             Atividade atividade = Atividade.builder().mapa(mapaVigente).descricao("Atividade CDU-14 Test")
                     .build();
@@ -217,7 +216,6 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
             assertThat(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocessoId)).hasSize(1);
             assertThat(alertaRepo.findByProcessoCodigo(sp.getProcesso().getCodigo())).hasSize(6);
             assertThat(movimentacaoRepo.findBySubprocessoCodigo(subprocessoId)).hasSize(3);
-
 
             // Esperamos pelo menos 2 e-mails: Início de Processo e Aceite
             aguardarEmail(2);

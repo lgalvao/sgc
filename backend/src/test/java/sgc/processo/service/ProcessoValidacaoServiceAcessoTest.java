@@ -132,7 +132,6 @@ class ProcessoValidacaoServiceAcessoTest {
         when(auth.getName()).thenReturn("multi_perfil_user");
         when(auth.getAuthorities()).thenAnswer(m -> List.of(new SimpleGrantedAuthority("ROLE_GESTOR")));
 
-
         // A implementação com bug pegaria apenas o primeiro (1) e negaria o acesso.
         when(usuarioService.buscarPerfisUsuario("multi_perfil_user")).thenReturn(List.of(
                 PerfilDto.builder().unidadeCodigo(1L).build(),
@@ -143,7 +142,6 @@ class ProcessoValidacaoServiceAcessoTest {
         Unidade u200 = UnidadeTestBuilder.umaDe().comCodigo("200").build();
 
         when(unidadeService.todasComHierarquia()).thenReturn(List.of(u100, u200));
-
 
         // Se a lista de IDs conter 200, acesso é permitido. Se tiver apenas 100, negado.
         when(validacaoService.verificarAcessoUnidadeAoProcesso(eq(1L), anyList())).thenAnswer(invocation -> {

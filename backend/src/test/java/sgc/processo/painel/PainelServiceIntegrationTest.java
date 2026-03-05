@@ -44,7 +44,6 @@ class PainelServiceIntegrationTest {
             );
             processoFacade.criar(reqMapeamento);
 
-
             CriarProcessoRequest reqRevisao = new CriarProcessoRequest(
                     "Processo Revisão Teste",
                     TipoProcesso.REVISAO,
@@ -54,13 +53,11 @@ class PainelServiceIntegrationTest {
             Processo processoRevisao = processoFacade.criar(reqRevisao);
             Long codigoProcessoRevisao = processoRevisao.getCodigo();
 
-
             Page<ProcessoResumoDto> processos = painelService.listarProcessos(
                     Perfil.ADMIN,
                     null,
                     PageRequest.of(0, 20) // Página 0, 20 itens por página
             );
-
 
             List<ProcessoResumoDto> listaProcessos = processos.getContent();
 
@@ -102,13 +99,11 @@ class PainelServiceIntegrationTest {
                 processoFacade.criar(req);
             }
 
-
             Page<ProcessoResumoDto> processos = painelService.listarProcessos(
                     Perfil.ADMIN,
                     null,
                     PageRequest.of(0, 50) // Página grande
             );
-
 
             // (Mais os 2 processos seed do banco)
             assertThat(processos.getTotalElements())
@@ -138,7 +133,6 @@ class PainelServiceIntegrationTest {
             );
             Processo processoRevisao = processoFacade.criar(reqRevisao);
 
-
             Page<ProcessoResumoDto> page = painelService.listarProcessos(Perfil.ADMIN, null, PageRequest.of(0, 50));
             List<ProcessoResumoDto> lista = page.getContent();
 
@@ -149,7 +143,6 @@ class PainelServiceIntegrationTest {
             ProcessoResumoDto dtoRevisao = lista.stream()
                     .filter(p -> p.codigo().equals(processoRevisao.getCodigo()))
                     .findFirst().orElseThrow();
-
 
             assertThat(dtoSeed.linkDestino()).contains(processoSeed.getCodigo().toString());
             assertThat(dtoRevisao.linkDestino()).contains(processoRevisao.getCodigo().toString());

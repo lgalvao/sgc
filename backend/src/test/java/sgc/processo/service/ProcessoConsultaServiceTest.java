@@ -59,9 +59,7 @@ class ProcessoConsultaServiceTest {
                 anyList(), eq(processoIgnorar)
         )).thenReturn(unidadesMock);
 
-
         Set<Long> resultado = processoConsultaService.buscarIdsUnidadesComProcessosAtivos(processoIgnorar);
-
 
         assertThat(resultado).hasSize(3).containsExactlyInAnyOrder(1L, 2L, 3L);
 
@@ -81,9 +79,7 @@ class ProcessoConsultaServiceTest {
                 anyList(), eq(processoIgnorar)
         )).thenReturn(List.of());
 
-
         Set<Long> resultado = processoConsultaService.buscarIdsUnidadesComProcessosAtivos(processoIgnorar);
-
 
         assertThat(resultado).isEmpty();
     }
@@ -106,9 +102,7 @@ class ProcessoConsultaServiceTest {
         when(processoRepo.findUnidadeCodigosBySituacaoAndTipo(SituacaoProcesso.EM_ANDAMENTO, TipoProcesso.REVISAO))
                 .thenReturn(List.of());
 
-
         List<Long> ids = processoConsultaService.unidadesBloqueadasPorTipo(TipoProcesso.REVISAO);
-
 
         assertThat(ids).isEmpty();
     }
@@ -193,9 +187,7 @@ class ProcessoConsultaServiceTest {
         when(processoRepo.listarPorSituacaoComParticipantes(SituacaoProcesso.FINALIZADO))
                 .thenReturn(List.of());
 
-
         List<Processo> resultado = processoConsultaService.processosFinalizados();
-
 
         assertThat(resultado).isEmpty();
         verify(processoRepo).listarPorSituacaoComParticipantes(SituacaoProcesso.FINALIZADO);

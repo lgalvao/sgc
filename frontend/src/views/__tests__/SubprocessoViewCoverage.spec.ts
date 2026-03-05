@@ -147,7 +147,6 @@ describe('SubprocessoView Coverage', () => {
             props: {codProcesso: 1, siglaUnidade: 'TEST'}
         });
 
-        // Trigger manually
         await (wrapper.vm as any).confirmarAlteracaoDataLimite('');
 
         expect(store.alterarDataLimiteSubprocesso).not.toHaveBeenCalled();
@@ -195,9 +194,7 @@ describe('SubprocessoView Coverage', () => {
             props: {codProcesso: 1, siglaUnidade: 'TEST'}
         });
 
-        // Wait for onMounted to set codSubprocesso
         await (wrapper.vm as any).$nextTick();
-
 
         // Call with empty justification
         (wrapper.vm as any).justificativaReabertura = '';

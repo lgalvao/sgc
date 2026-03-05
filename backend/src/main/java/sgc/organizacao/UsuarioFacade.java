@@ -95,7 +95,6 @@ public class UsuarioFacade {
                 .collect(toMap(Usuario::getTituloEleitoral, u -> u, (u1, u2) -> u1));
     }
 
-
     private PerfilDto toPerfilDto(UsuarioPerfil atribuicao) {
         return PerfilDto.builder()
                 .usuarioTitulo(atribuicao.getUsuario().getTituloEleitoral())

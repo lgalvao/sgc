@@ -27,9 +27,6 @@ vi.mock("vue-router", () => ({
 // Setup components mocks to avoid rendering issues
 // BContainer, BRow, BCol, BCard, BButton are from bootstrap-vue-next
 // Given the errors were "Cannot call vm on an empty VueWrapper", it usually means
-// we tried to find a component that wasn't rendered or wasn't found.
-// The previous test code was trying to find 'TabelaProcessos', but the View code uses a manual table inside BCard.
-// So the test was completely out of sync with the implementation.
 
 describe("HistoricoView.vue", () => {
     const context = setupComponentTest();

@@ -181,7 +181,6 @@ public class ResponsavelUnidadeService {
                 .build();
     }
 
-
     /**
      * Busca os códigos das unidades onde o usuário é o responsável atual.
      */

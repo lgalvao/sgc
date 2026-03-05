@@ -115,8 +115,6 @@ export function mapVWUsuariosArray(arr: any[] = []): Usuario[] {
     return arr.map(mapVWUsuarioToUsuario);
 }
 
-
-
 export async function autenticar(
     request: AutenticacaoRequest,
 ): Promise<boolean> {

@@ -34,7 +34,6 @@ class CDU03IntegrationTest extends BaseIntegrationTest {
     @BeforeEach
     void setup() {
 
-        // Create fixtures using saveAndFlush to ensure visibility
         unidade1 = UnidadeFixture.unidadePadrao();
         unidade1.setCodigo(null);
         unidade1.setNome("Unidade 1");
@@ -124,7 +123,6 @@ class CDU03IntegrationTest extends BaseIntegrationTest {
             // Ignore for test purposes
         }
 
-        // Re-add the assertion to keep the test failing, but now we get the output
         mockMvc.perform(
                         post(API_PROCESSOS)
                                 .with(csrf())
@@ -223,7 +221,6 @@ class CDU03IntegrationTest extends BaseIntegrationTest {
         // 2. Remover o processo
         mockMvc.perform(post(API_PROCESSOS + "/{codProcesso}/excluir", processoId).with(csrf()))
                 .andExpect(status().isNoContent()); // 204 No Content para remoção bem-sucedida
-
 
         mockMvc.perform(get(API_PROCESSOS_ID, processoId)).andExpect(status().isNotFound());
     }

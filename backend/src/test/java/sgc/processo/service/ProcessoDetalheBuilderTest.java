@@ -26,7 +26,6 @@ class ProcessoDetalheBuilderTest {
     @Mock
     private SubprocessoRepo subprocessoRepo;
 
-
     @Mock
     private SgcPermissionEvaluator permissionEvaluator;
 
@@ -49,7 +48,6 @@ class ProcessoDetalheBuilderTest {
         usuario.setTituloEleitoral("12345678901");
         return usuario;
     }
-
 
     @Test
     @DisplayName("Deve construir DTO com dados básicos e unidades quando dados válidos")
@@ -77,9 +75,7 @@ class ProcessoDetalheBuilderTest {
 
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(List.of(sp));
 
-
         ProcessoDetalheDto dto = builder.build(processo, usuario);
-
 
         assertThat(dto).isNotNull();
         assertThat(dto.getCodigo()).isEqualTo(1L);
@@ -107,9 +103,7 @@ class ProcessoDetalheBuilderTest {
         when(subprocessoValidacaoService.validarSubprocessosParaFinalizacao(1L))
                 .thenReturn(SubprocessoValidacaoService.ValidationResult.ofValido());
 
-
         ProcessoDetalheDto dto = builder.build(processo, usuario);
-
 
         assertThat(dto.isPodeFinalizar()).isTrue();
     }
@@ -127,9 +121,7 @@ class ProcessoDetalheBuilderTest {
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(Collections.emptyList());
         doReturn(false).when(permissionEvaluator).checkPermission(usuario, processo, "FINALIZAR_PROCESSO");
 
-
         ProcessoDetalheDto dto = builder.build(processo, usuario);
-
 
         assertThat(dto.isPodeFinalizar()).isFalse();
     }
@@ -149,9 +141,7 @@ class ProcessoDetalheBuilderTest {
         when(subprocessoValidacaoService.validarSubprocessosParaFinalizacao(1L))
                 .thenReturn(SubprocessoValidacaoService.ValidationResult.ofInvalido("Subprocessos não homologados"));
 
-
         ProcessoDetalheDto dto = builder.build(processo, usuario);
-
 
         assertThat(dto.isPodeFinalizar()).isFalse();
     }
@@ -172,9 +162,7 @@ class ProcessoDetalheBuilderTest {
         processo.adicionarParticipantes(Set.of(u1, u2));
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(Collections.emptyList());
 
-
         ProcessoDetalheDto dto = builder.build(processo, usuario);
-
 
         assertThat(dto.getUnidades()).hasSize(2);
         assertThat(dto.getUnidades().get(0).getSigla()).isEqualTo("A");
@@ -211,9 +199,7 @@ class ProcessoDetalheBuilderTest {
 
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(List.of(spPai, spFilho));
 
-
         ProcessoDetalheDto dto = builder.build(processo, usuario);
-
 
         assertThat(dto.getUnidades()).hasSize(1); // Somente o pai na raiz
         ProcessoDetalheDto.UnidadeParticipanteDto paiDto = dto.getUnidades().getFirst();
@@ -268,12 +254,10 @@ class ProcessoDetalheBuilderTest {
         Unidade filho = criarUnidade(2L, "FILHO", "FILHO");
         filho.setUnidadeSuperior(pai);
 
-
         processo.adicionarParticipantes(Set.of(filho));
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(Collections.emptyList());
 
         ProcessoDetalheDto dto = builder.build(processo, usuario);
-
 
         assertThat(dto.getUnidades()).hasSize(1);
         assertThat(dto.getUnidades().getFirst().getSigla()).isEqualTo("FILHO");
@@ -304,9 +288,7 @@ class ProcessoDetalheBuilderTest {
 
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(List.of(sp));
 
-
         ProcessoDetalheDto dto = builder.build(processo, usuario);
-
 
         assertThat(dto.getUnidades()).hasSize(1);
     }
@@ -333,9 +315,7 @@ class ProcessoDetalheBuilderTest {
         // Subprocesso existe mas unidade não está em participantes
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(List.of(sp));
 
-
         ProcessoDetalheDto dto = builder.build(processo, usuario);
-
 
         assertThat(dto.getUnidades()).isEmpty();
     }
