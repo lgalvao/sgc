@@ -1,0 +1,119 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - link "Pular para o conteúdo principal" [ref=e3] [cursor=pointer]:
+      - /url: "#main-content"
+    - generic [ref=e4]:
+      - navigation [ref=e5]:
+        - generic [ref=e6]:
+          - link "SGC" [ref=e7] [cursor=pointer]:
+            - /url: /painel
+          - generic [ref=e8]:
+            - list [ref=e9]:
+              - listitem [ref=e10]:
+                - link "Painel" [ref=e11] [cursor=pointer]:
+                  - /url: /painel
+                  - generic [ref=e12]: 
+                  - text: Painel
+              - listitem [ref=e13]:
+                - link "Minha unidade" [ref=e14] [cursor=pointer]:
+                  - /url: /unidade/3
+                  - generic [ref=e15]: 
+                  - text: Minha unidade
+              - listitem [ref=e16]:
+                - link "Relatórios" [ref=e17] [cursor=pointer]:
+                  - /url: /relatorios
+                  - generic [ref=e18]: 
+                  - text: Relatórios
+              - listitem [ref=e19]:
+                - link "Histórico" [ref=e20] [cursor=pointer]:
+                  - /url: /historico
+                  - generic [ref=e21]: 
+                  - text: Histórico
+            - list [ref=e22]:
+              - listitem [ref=e23]:
+                - link "CHEFE - ASSESSORIA_11" [ref=e24]:
+                  - /url: "#"
+                  - generic [ref=e25]:
+                    - generic [ref=e26]: 
+                    - generic [ref=e27]: CHEFE - ASSESSORIA_11
+              - listitem "Sair" [ref=e28]:
+                - link [ref=e29] [cursor=pointer]:
+                  - /url: "#"
+                  - generic [ref=e30]: 
+      - generic [ref=e33]:
+        - button "Voltar" [ref=e34] [cursor=pointer]:
+          - generic [ref=e35]: 
+        - navigation "breadcrumb" [ref=e36]:
+          - list [ref=e37]:
+            - listitem [ref=e38]:
+              - link "Início" [ref=e39] [cursor=pointer]:
+                - /url: /painel
+                - generic [ref=e40]: 
+                - generic [ref=e41]: Início
+            - listitem [ref=e42]:
+              - text: ›
+              - link "ASSESSORIA_11" [ref=e43] [cursor=pointer]:
+                - /url: /processo/202/ASSESSORIA_11
+            - listitem [ref=e44]:
+              - text: ›
+              - generic [ref=e45]: Atividades e conhecimentos
+      - main [ref=e46]:
+        - generic [ref=e47]:
+          - generic [ref=e48]:
+            - generic [ref=e49]:
+              - heading "Atividades e conhecimentos" [level=2] [ref=e50]
+              - paragraph [ref=e51]:
+                - generic [ref=e52]:
+                  - button "Voltar" [ref=e53] [cursor=pointer]:
+                    - generic [ref=e54]: 
+                  - generic [ref=e55]: ASSESSORIA_11 - Assessoria 11
+                  - generic [ref=e56]: Cadastro em andamento
+            - generic [ref=e57]:
+              - generic [ref=e58]:
+                - button "Mais ações" [ref=e59] [cursor=pointer]
+                - text:  
+              - button "Disponibilizar" [ref=e60] [cursor=pointer]:
+                - generic [ref=e61]: 
+                - text: Disponibilizar
+          - generic [ref=e62]:
+            - textbox "Nova atividade" [ref=e64]
+            - generic [ref=e65]:
+              - button "Adicionar atividade" [disabled]:
+                - generic: 
+          - generic [ref=e68]:
+            - generic [ref=e70]:
+              - strong [ref=e72]: Atividade Origem A - 201
+              - generic [ref=e73]:
+                - button "Editar" [ref=e74] [cursor=pointer]:
+                  - generic [ref=e75]: 
+                - 'button "Remover atividade: Atividade Origem A - 201" [ref=e76] [cursor=pointer]':
+                  - generic [ref=e77]: 
+            - generic [ref=e78]:
+              - strong [ref=e80]: Conhecimentos *
+              - generic [ref=e81]:
+                - textbox "Novo conhecimento" [ref=e83]
+                - button "Adicionar conhecimento" [ref=e85] [cursor=pointer]:
+                  - generic [ref=e86]: 
+          - generic [ref=e89]:
+            - generic [ref=e91]:
+              - strong [ref=e93]: Atividade Origem B - 201
+              - generic [ref=e94]:
+                - button "Editar" [ref=e95] [cursor=pointer]:
+                  - generic [ref=e96]: 
+                - 'button "Remover atividade: Atividade Origem B - 201" [ref=e97] [cursor=pointer]':
+                  - generic [ref=e98]: 
+            - generic [ref=e99]:
+              - strong [ref=e101]: Conhecimentos *
+              - generic [ref=e102]:
+                - textbox "Novo conhecimento" [ref=e104]
+                - button "Adicionar conhecimento" [ref=e106] [cursor=pointer]:
+                  - generic [ref=e107]: 
+      - contentinfo [ref=e108]:
+        - generic [ref=e109]:
+          - generic [ref=e110]: Versão 1.0.0
+          - generic [ref=e111]: © SESEL/COSIS/TRE-PE
+  - text:   
+```
