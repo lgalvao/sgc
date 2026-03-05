@@ -97,6 +97,11 @@ public class ProcessoFacade {
     }
 
     @Transactional(readOnly = true)
+    public List<Processo> listarParaImportacao() {
+        return processoConsultaService.processosParaImportacao();
+    }
+
+    @Transactional(readOnly = true)
     public List<Processo> listarAtivos() {
         return processoConsultaService.processosAndamento();
     }

@@ -1,4 +1,5 @@
 # CDU-07 - Detalhar subprocesso - Alignment
+STATUS: DONE
 
 ## Current Status
 - The test verifies that ADMINs, GESTORs, and CHEFEs can access the subprocess details page.

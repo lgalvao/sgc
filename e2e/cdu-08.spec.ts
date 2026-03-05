@@ -4,22 +4,35 @@ import {criarProcesso, extrairProcessoId} from './helpers/helpers-processos.js';
 import * as AtividadeHelpers from './helpers/helpers-atividades.js';
 import {fazerLogout} from './helpers/helpers-navegacao.js';
 import {acessarSubprocessoChefeDireto} from './helpers/helpers-analise.js';
+import {criarProcessoFinalizadoFixture} from "./fixtures/fixtures-processos.js";
 
 test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
     const UNIDADE_ALVO = 'ASSESSORIA_11';
     const CHEFE_UNIDADE = USUARIOS.CHEFE_ASSESSORIA_11.titulo;
     const SENHA_CHEFE = USUARIOS.CHEFE_ASSESSORIA_11.senha;
 
-    test('Cenário 1: Processo de Mapeamento (Fluxo Completo + Importação)', async ({
+    test('Cenário 1: Processo de Mapeamento (Fluxo Completo + Importação + Auto-save)', async ({
                                                                                        page,
-                                                                                       autenticadoComoAdmin,
+                                                                                       request,
                                                                                        cleanupAutomatico
                                                                                    }) => {
         const timestamp = Date.now();
         const descricaoProcesso = `Processo CDU-08 Map ${timestamp}`;
+        let processoOrigemDescricao = `Processo Base FINALIZADO ${timestamp}`;
+        let processoOrigemId: number;
 
-        await test.step('1. Setup: Criar Processo de Mapeamento', async () => {
+        await test.step('1. Setup: Criar Processo Origem e Mapeamento Alvo', async () => {
+            
+            // Criar Processo Finalizado via Fixture (para importação)
+            const procOrigem = await criarProcessoFinalizadoFixture(request, {
+                unidade: 'SECRETARIA_1',
+                descricao: processoOrigemDescricao
+            });
+            processoOrigemId = procOrigem.codigo;
+            cleanupAutomatico.registrar(processoOrigemId);
 
+            // Criar Processo Alvo
+            await login(page, USUARIOS.ADMIN.titulo, USUARIOS.ADMIN.senha);
             await criarProcesso(page, {
                 descricao: descricaoProcesso,
                 tipo: 'MAPEAMENTO',
@@ -39,40 +52,48 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
 
         await test.step('2. Acessar tela de Atividades', async () => {
             await login(page, CHEFE_UNIDADE, SENHA_CHEFE);
-
-            // Navega para o subprocesso usando helper robusto
             await acessarSubprocessoChefeDireto(page, descricaoProcesso, UNIDADE_ALVO);
-
-            // Agora navega para atividades
             await AtividadeHelpers.navegarParaAtividades(page);
-
-            await expect(page.getByTestId('btn-empty-state-importar')).toBeVisible();
-            await page.getByTestId('btn-empty-state-importar').click();
-            const modalImportacao = page.getByRole('dialog');
-            await expect(modalImportacao.getByText('Importação de atividades')).toBeVisible();
-            await modalImportacao.getByTestId('importar-atividades-modal__btn-modal-cancelar').click();
-            await expect(modalImportacao).toBeHidden();
         });
 
-        const atividade1 = `Atividade 1 ${timestamp}`;
-        await test.step('3. Adicionar Atividade e Conhecimento', async () => {
-            await AtividadeHelpers.adicionarAtividade(page, atividade1);
+        await test.step('3. Importar Atividades (Fluxo Positivo e Negativo)', async () => {
+            const atividadeA = `Atividade Origem A - ${processoOrigemId}`;
+            const atividadeB = `Atividade Origem B - ${processoOrigemId}`;
+            
+            // Importar ambas as atividades com sucesso
+            await AtividadeHelpers.importarAtividades(page, processoOrigemDescricao, 'SECRETARIA_1', [atividadeA, atividadeB]);
+
+            // Tentar importar de novo e esperar o erro (Fluxo Negativo / Regra de Duplicidade)
+            await AtividadeHelpers.importarAtividadesComErroDuplicidade(page, processoOrigemDescricao, 'SECRETARIA_1', [atividadeA]);
+        });
+
+        const atividadeManual = `Atividade Manual ${timestamp}`;
+        await test.step('4. Adicionar Manualmente e Validar Auto-save', async () => {
+            await AtividadeHelpers.adicionarAtividade(page, atividadeManual);
             await AtividadeHelpers.verificarSituacaoSubprocesso(page, 'Cadastro em andamento');
 
-            const conhecimento1 = `Conhecimento 1 ${timestamp}`;
-            await AtividadeHelpers.adicionarConhecimento(page, atividade1, conhecimento1);
+            const conhecimento1 = `Conhecimento Manual ${timestamp}`;
+            await AtividadeHelpers.adicionarConhecimento(page, atividadeManual, conhecimento1);
+
+            // Recarregar a página para atestar que os dados estão sendo persistidos
+            await page.reload();
+
+            // Ao recarregar, tudo o que foi inserido precisa estar lá
+            await expect(page.getByText(atividadeManual, { exact: true }).first()).toBeVisible();
+            await expect(page.locator('.group-conhecimento', { hasText: conhecimento1 }).first()).toBeVisible();
+            await expect(page.getByText(`Atividade Origem A - ${processoOrigemId}`, { exact: true }).first()).toBeVisible();
         });
 
-        await test.step('4. Editar e Remover', async () => {
-            const atividade1Editada = `${atividade1} EDITADA`;
-            await AtividadeHelpers.editarAtividade(page, atividade1, atividade1Editada);
+        await test.step('5. Editar e Remover', async () => {
+            const atividadeEditada = `${atividadeManual} EDITADA`;
+            await AtividadeHelpers.editarAtividade(page, atividadeManual, atividadeEditada);
 
-            const conhecimento1 = `Conhecimento 1 ${timestamp}`;
+            const conhecimento1 = `Conhecimento Manual ${timestamp}`;
             const conhecimento1Editado = `${conhecimento1} EDITADO`;
 
-            await AtividadeHelpers.editarConhecimento(page, atividade1Editada, conhecimento1, conhecimento1Editado);
-            await AtividadeHelpers.removerConhecimento(page, atividade1Editada, conhecimento1Editado);
-            await AtividadeHelpers.removerAtividade(page, atividade1Editada);
+            await AtividadeHelpers.editarConhecimento(page, atividadeEditada, conhecimento1, conhecimento1Editado);
+            await AtividadeHelpers.removerConhecimento(page, atividadeEditada, conhecimento1Editado);
+            await AtividadeHelpers.removerAtividade(page, atividadeEditada);
         });
 
         await test.step('6. Verificar Ausência de Botão de Impacto', async () => {
@@ -80,10 +101,6 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
         });
 
         await test.step('7. Disponibilizar', async () => {
-            const ativFinal = `Atividade Final ${timestamp}`;
-            await AtividadeHelpers.adicionarAtividade(page, ativFinal);
-            await AtividadeHelpers.adicionarConhecimento(page, ativFinal, 'Conhecimento Final');
-
             await AtividadeHelpers.disponibilizarCadastro(page);
             await expect(page).toHaveURL(/\/painel/);
         });
@@ -97,7 +114,6 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
         const SENHA_REVISAO = USUARIOS.CHEFE_ASSESSORIA_12.senha;
 
         await test.step('Setup: Criar Processo de Revisão', async () => {
-
             await criarProcesso(page, {
                 descricao,
                 tipo: 'REVISAO',
@@ -111,13 +127,9 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
 
         await test.step('Verificar Botão Impacto', async () => {
             await login(page, CHEFE_REVISAO, SENHA_REVISAO);
-
-            // Navega para o subprocesso usando helper robusto
             await acessarSubprocessoChefeDireto(page, descricao, UNIDADE_REVISAO);
-
             await AtividadeHelpers.navegarParaAtividades(page);
 
-            // Adicionar uma atividade para garantir que o status mude para EM_ANDAMENTO e o botão apareça
             await AtividadeHelpers.adicionarAtividade(page, 'Atividade Trigger');
             await AtividadeHelpers.verificarBotaoImpactoDropdown(page);
             await AtividadeHelpers.abrirModalImpactoEdicao(page);

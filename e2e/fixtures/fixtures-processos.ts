@@ -79,3 +79,31 @@ export async function criarProcessoFixture(
     return await response.json();
 }
 
+/**
+ * Cria um processo de mapeamento via API E2E que já nasce finalizado e com atividades, 
+ * ignorando validações, perfeito para testes de importação.
+ */
+export async function criarProcessoFinalizadoFixture(
+    request: APIRequestContext,
+    options: ProcessoFixtureOptions
+): Promise<ProcessoFixture> {
+    const endpoint = '/e2e/fixtures/processo-finalizado-com-atividades';
+
+    const response = await request.post(`http://localhost:10000${endpoint}`, {
+        data: {
+            unidadeSigla: options.unidade,
+            iniciar: options.iniciar ?? true,
+            descricao: options.descricao ?? `Fixture E2E FINALIZADO ${Date.now()}`,
+            diasLimite: options.diasLimite ?? 30
+        }
+    });
+
+    if (!response.ok()) {
+        throw new Error(
+            `Falha ao criar processo fixture finalizado: ${response.status()} ${response.statusText()}`
+        );
+    }
+
+    return await response.json();
+}
+

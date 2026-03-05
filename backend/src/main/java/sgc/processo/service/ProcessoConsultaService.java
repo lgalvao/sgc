@@ -57,6 +57,10 @@ public class ProcessoConsultaService {
         return processoRepo.listarPorSituacaoEUnidadeCodigos(SituacaoProcesso.FINALIZADO, unidadesAcesso);
     }
 
+    public List<Processo> processosParaImportacao() {
+        return processoRepo.listarPorSituacaoComParticipantes(SituacaoProcesso.FINALIZADO);
+    }
+
     public Page<Processo> processos(Pageable pageable) {
         return processoRepo.findAll(pageable);
     }

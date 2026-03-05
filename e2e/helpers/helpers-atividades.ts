@@ -150,3 +150,48 @@ export async function fecharModalImpacto(page: Page) {
     await page.getByTestId('btn-fechar-impacto').click();
     await expect(page.getByRole('dialog')).toBeHidden();
 }
+
+export async function selecionarAtividadesParaImportacao(page: Page, processoOrigemDescricao: string, unidadeOrigemSigla: string, atividadesDescricoes: string[]) {
+    await expect(page.getByTestId('btn-empty-state-importar').or(page.getByTestId('btn-cad-atividades-importar'))).toBeVisible();
+    await page.getByTestId('btn-empty-state-importar').or(page.getByTestId('btn-cad-atividades-importar')).first().click();
+
+    const modal = page.getByRole('dialog');
+    await expect(modal.getByText('Importação de atividades')).toBeVisible();
+
+    await modal.getByTestId('select-processo').selectOption({ label: processoOrigemDescricao });
+    await expect(modal.getByTestId('select-unidade')).toBeEnabled();
+
+    await modal.getByTestId('select-unidade').selectOption({ label: unidadeOrigemSigla });
+
+    for (const desc of atividadesDescricoes) {
+        await modal.getByText(desc, { exact: true }).check();
+    }
+}
+
+export async function importarAtividades(page: Page, processoOrigemDescricao: string, unidadeOrigemSigla: string, atividadesDescricoes: string[]) {
+    await selecionarAtividadesParaImportacao(page, processoOrigemDescricao, unidadeOrigemSigla, atividadesDescricoes);
+    
+    const modal = page.getByRole('dialog');
+    await modal.getByTestId('btn-importar').click();
+    await expect(modal).toBeHidden();
+
+    // Validar se as atividades aparecem na tela após importar
+    for (const desc of atividadesDescricoes) {
+        await expect(page.getByText(desc, { exact: true }).first()).toBeVisible();
+    }
+}
+
+export async function importarAtividadesComErroDuplicidade(page: Page, processoOrigemDescricao: string, unidadeOrigemSigla: string, atividadesDescricoes: string[]) {
+    await selecionarAtividadesParaImportacao(page, processoOrigemDescricao, unidadeOrigemSigla, atividadesDescricoes);
+    
+    const modal = page.getByRole('dialog');
+    await modal.getByTestId('btn-importar').click();
+
+    // Modal continua aberto e exibe erro
+    await expect(modal).toBeVisible();
+    await expect(modal.getByText(/já existente|não puderam ser importadas/i)).toBeVisible();
+    
+    // Fechar modal para continuar teste
+    await modal.getByTestId('importar-atividades-modal__btn-modal-cancelar').click();
+    await expect(modal).toBeHidden();
+}

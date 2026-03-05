@@ -24,6 +24,7 @@ export const useProcessosStore = defineStore("processos", () => {
     const processosPainelPage = ref<Page<ProcessoResumo>>({} as Page<ProcessoResumo>);
     const processoDetalhe = ref<Processo | null>(null);
     const processosFinalizados = ref<ProcessoResumo[]>([]);
+    const processosParaImportacao = ref<ProcessoResumo[]>([]);
     const subprocessosElegiveis = ref<SubprocessoElegivel[]>([]);
     const {lastError, clearError, withErrorHandling} = useErrorHandler();
 
@@ -52,6 +53,12 @@ export const useProcessosStore = defineStore("processos", () => {
     async function buscarProcessosFinalizados() {
         return withErrorHandling(async () => {
             processosFinalizados.value = await processoService.buscarProcessosFinalizados();
+        });
+    }
+
+    async function buscarProcessosParaImportacao() {
+        return withErrorHandling(async () => {
+            processosParaImportacao.value = await processoService.buscarProcessosParaImportacao();
         });
     }
 
@@ -215,8 +222,10 @@ export const useProcessosStore = defineStore("processos", () => {
         processosPainelPage,
         processoDetalhe,
         processosFinalizados,
+        processosParaImportacao,
         buscarProcessosPainel,
         buscarProcessosFinalizados,
+        buscarProcessosParaImportacao,
         buscarProcessoDetalhe,
         criarProcesso,
         atualizarProcesso,

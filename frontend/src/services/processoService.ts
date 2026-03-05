@@ -52,6 +52,13 @@ export async function buscarProcessosFinalizados(): Promise<ProcessoResumo[]> {
     return response.data;
 }
 
+export async function buscarProcessosParaImportacao(): Promise<ProcessoResumo[]> {
+    const response = await apiClient.get<ProcessoResumo[]>(
+        "/processos/para-importacao",
+    );
+    return response.data;
+}
+
 export async function iniciarProcesso(
     codProcesso: number,
     tipo: string,

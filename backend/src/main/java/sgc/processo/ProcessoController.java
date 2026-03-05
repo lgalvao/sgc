@@ -86,6 +86,13 @@ public class ProcessoController {
         return ResponseEntity.ok(processoFacade.listarFinalizados());
     }
 
+    @GetMapping("/para-importacao")
+    @Operation(summary = "Lista processos finalizados elegíveis para servirem de base de importação de atividades")
+    @JsonView(ProcessoViews.Publica.class)
+    public ResponseEntity<List<Processo>> listarParaImportacao() {
+        return ResponseEntity.ok(processoFacade.listarParaImportacao());
+    }
+
     @GetMapping("/ativos")
     @Operation(summary = "Lista todos os processos com situação EM_ANDAMENTO")
     @JsonView(ProcessoViews.Publica.class)

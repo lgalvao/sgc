@@ -26,7 +26,7 @@
         <BFormSelect
             id="processo-select"
             v-model="processoSelecionadoId"
-            :options="processosStore.processosFinalizados"
+            :options="processosStore.processosParaImportacao"
             data-testid="select-processo"
             text-field="descricao"
             value-field="codigo"
@@ -41,7 +41,7 @@
           </template>
         </BFormSelect>
         <div
-            v-if="!processosStore.processosFinalizados.length"
+            v-if="!processosStore.processosParaImportacao.length"
             class="text-center text-muted mt-3"
         >
           Nenhum processo disponível para importação.
@@ -177,14 +177,14 @@ watch(
     (mostrar) => {
       if (mostrar) {
         resetModal();
-        processosStore.buscarProcessosFinalizados();
+        processosStore.buscarProcessosParaImportacao();
       }
     },
 );
 
 watch(processoSelecionadoId, async (newId) => {
   if (newId) {
-    const processo = processosStore.processosFinalizados.find(
+    const processo = processosStore.processosParaImportacao.find(
         (p) => p.codigo === Number(newId),
     );
     if (processo) {

@@ -222,6 +222,38 @@ public class E2eController {
     }
 
     /**
+     * Cria um processo já finalizado e insere atividades/mapa forçadamente via SQL
+     * para pular o workflow e testar a importação de forma ultra-rápida.
+     */
+    @PostMapping("/fixtures/processo-finalizado-com-atividades")
+    @Transactional
+    @JsonView(ProcessoViews.Publica.class)
+    public Processo criarProcessoFinalizadoComAtividades(@RequestBody ProcessoFixtureRequest request) {
+        Processo processo = executeAsAdmin(() -> criarProcessoFixture(request, TipoProcesso.MAPEAMENTO));
+        Long procId = processo.getCodigo();
+        
+        Unidade unidade = unidadeService.buscarPorSigla(request.unidadeSigla());
+        Long unidId = unidade.getCodigo();
+
+        // Subprocesso
+        Long subId = jdbcTemplate.queryForObject("SELECT codigo FROM sgc.subprocesso WHERE processo_codigo = ? AND unidade_codigo = ?", Long.class, procId, unidId);
+        
+        // Mapa
+        jdbcTemplate.update("INSERT INTO sgc.mapa (subprocesso_codigo) VALUES (?)", subId);
+        Long mapaId = jdbcTemplate.queryForObject("SELECT currval('sgc.mapa_codigo_seq')", Long.class);
+        
+        // Atividades
+        jdbcTemplate.update("INSERT INTO sgc.atividade (mapa_codigo, descricao) VALUES (?, ?)", mapaId, "Atividade Origem A - " + procId);
+        jdbcTemplate.update("INSERT INTO sgc.atividade (mapa_codigo, descricao) VALUES (?, ?)", mapaId, "Atividade Origem B - " + procId);
+
+        // Atualizar status para simular finalização
+        jdbcTemplate.update("UPDATE sgc.subprocesso SET situacao = 'MAPEAMENTO_MAPA_HOMOLOGADO' WHERE codigo = ?", subId);
+        jdbcTemplate.update("UPDATE sgc.processo SET situacao = 'FINALIZADO' WHERE codigo = ?", procId);
+
+        return processoFacade.buscarEntidadePorId(procId);
+    }
+
+    /**
      * Executa uma operação com contexto de segurança ADMIN.
      */
     private <T> T executeAsAdmin(Supplier<T> operation) {
