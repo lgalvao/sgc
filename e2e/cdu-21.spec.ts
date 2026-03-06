@@ -12,9 +12,9 @@ import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-n
 import {aceitarCadastroMapeamento, acessarSubprocessoGestor} from './helpers/helpers-analise.js';
 import {loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
 
-async function acessarSubprocessoChefe(page: Page, descProcesso: string) {
+async function acessarSubprocessoChefe(page: Page, descProcesso: string, siglaUnidade: string) {
     await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
-    await navegarParaSubprocesso(page, UNIDADE_ALVO);
+    await navegarParaSubprocesso(page, siglaUnidade);
 }
 
 test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão', () => {
@@ -124,9 +124,8 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
     });
 
     test('Preparacao 5: Chefe valida o mapa', async ({page, autenticadoComoChefeSecao221}) => {
-
-
-        await acessarSubprocessoChefe(page, descProcesso);
+        await acessarSubprocessoChefe(page, descProcesso, UNIDADE_ALVO);
+        await navegarParaMapa(page);
 
         await page.getByTestId('btn-mapa-validar').click();
         const modal = page.getByRole('dialog');
@@ -134,7 +133,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
         await page.getByTestId('btn-validar-mapa-confirmar').click();
 
         await verificarPaginaPainel(page);
-        await acessarSubprocessoChefe(page, descProcesso);
+        await acessarSubprocessoChefe(page, descProcesso, UNIDADE_ALVO);
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa validado/i);
     });
 

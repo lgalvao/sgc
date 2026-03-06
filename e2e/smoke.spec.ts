@@ -50,13 +50,13 @@ test.describe('Smoke Test - Sistema SGC', () => {
             await page.getByTestId('inp-login-usuario').fill(USUARIOS.INVALIDO.titulo);
             await page.getByTestId('inp-login-senha').fill(USUARIOS.INVALIDO.senha);
             await page.getByTestId('btn-login-entrar').click();
-            await page.waitForTimeout(500);
+            await expect(page.getByTestId('app-alert')).toBeVisible();
 
             // Limpar e fazer login com múltiplos perfis
             await page.getByTestId('inp-login-usuario').fill(USUARIOS.ADMIN_2_PERFIS.titulo);
             await page.getByTestId('inp-login-senha').fill(USUARIOS.ADMIN_2_PERFIS.senha);
             await page.getByTestId('btn-login-entrar').click();
-            await page.waitForTimeout(500);
+            await expect(page.getByTestId('sel-login-perfil')).toBeVisible();
 
             // Login com perfil selecionado
             // Reiniciar a página para garantir estado limpo para a função helper
@@ -84,12 +84,11 @@ test.describe('Smoke Test - Sistema SGC', () => {
             // Expandir árvore de unidades
             await expect(page.getByText('Carregando unidades...')).toBeHidden();
             await page.getByTestId('btn-arvore-expand-SECRETARIA_1').click();
-            await page.waitForTimeout(300);
+            await expect(page.getByTestId('btn-arvore-expand-COORD_11')).toBeVisible();
 
             // Expandir COORD_11 para acessar SECAO_111
-            await page.waitForTimeout(300);
             await page.getByTestId('btn-arvore-expand-COORD_11').click();
-            await page.waitForTimeout(300);
+            await expect(page.getByTestId('chk-arvore-unidade-SECAO_111')).toBeVisible();
 
             // Selecionar múltiplas unidades
             await page.getByTestId('chk-arvore-unidade-ASSESSORIA_11').click();
@@ -176,7 +175,7 @@ test.describe('Smoke Test - Sistema SGC', () => {
 
             // Modal de iniciar processo
             await page.getByTestId('btn-processo-iniciar').click();
-            await page.waitForTimeout(300);
+            await expect(page.getByRole('dialog')).toBeVisible();
             await page.getByTestId('btn-iniciar-processo-confirmar').click();
             await expect(page).toHaveURL(/\/painel/);
 
@@ -241,7 +240,7 @@ test.describe('Smoke Test - Sistema SGC', () => {
 
             // Modal de finalizar processo (Agora o botão deve estar visível)
             await page.getByTestId('btn-processo-finalizar').click();
-            await page.waitForTimeout(300);
+            await expect(page.getByRole('dialog')).toBeVisible();
             await page.getByRole('button', {name: 'Cancelar'}).click();
         });
 
@@ -252,11 +251,11 @@ test.describe('Smoke Test - Sistema SGC', () => {
             await expect(page).toHaveURL(/\/processo\/cadastro/);
 
             // Capturar estado inicial com botões desativados (formulário vazio)
-            await page.waitForTimeout(300);
+            await expect(page.getByTestId('btn-processo-salvar')).toBeDisabled();
 
             // Preencher apenas descrição (botões ainda desativados)
             await page.getByTestId('inp-processo-descricao').fill('Teste Validação');
-            await page.waitForTimeout(300);
+            await expect(page.getByTestId('btn-processo-salvar')).toBeDisabled();
 
             // Selecionar tipo de processo (necessário para carregar árvore de unidades)
             await page.getByTestId('sel-processo-tipo').selectOption('MAPEAMENTO');
@@ -265,14 +264,14 @@ test.describe('Smoke Test - Sistema SGC', () => {
             const dataLimite = new Date();
             dataLimite.setDate(dataLimite.getDate() + 30);
             await page.getByTestId('inp-processo-data-limite').fill(dataLimite.toISOString().split('T')[0]);
-            await page.waitForTimeout(300);
+            await expect(page.getByTestId('btn-processo-salvar')).toBeDisabled();
 
             // Expandir e selecionar unidade (agora botões devem estar ativados)
             await expect(page.getByText('Carregando unidades...')).toBeHidden();
             await page.getByTestId('btn-arvore-expand-SECRETARIA_1').click();
-            await page.waitForTimeout(300);
+            await expect(page.getByTestId('chk-arvore-unidade-ASSESSORIA_11')).toBeVisible();
             await page.getByTestId('chk-arvore-unidade-ASSESSORIA_11').click();
-            await page.waitForTimeout(300);
+            await expect(page.getByTestId('btn-processo-salvar')).toBeEnabled();
         });
     });
 
@@ -332,9 +331,7 @@ test.describe('Smoke Test - Sistema SGC', () => {
             await page.getByTestId('btn-confirmar-disponibilizacao').click();
             await page.waitForTimeout(500);
             const cardDisponibilizado = page.locator('.atividade-card').first();
-            if (await cardDisponibilizado.isVisible().catch(() => false)) {
-                // Atividade visível
-            }
+            await expect(cardDisponibilizado).toBeVisible();
         });
 
         test('Captura estados de validação inline de atividades', async ({page}) => {
@@ -487,7 +484,7 @@ test.describe('Smoke Test - Sistema SGC', () => {
             await page.getByTestId('btn-acao-analisar-principal').click();
             await page.getByTestId('inp-aceite-cadastro-obs').fill('Cadastro muito bem detalhado. Seguindo para a Secretaria.');
             await page.getByTestId('btn-aceite-cadastro-confirmar').click();
-            await expect(page.getByText(/Cadastro aceito/i).first()).toBeVisible();
+            await verificarPaginaPainel(page);
 
             // 2. GESTOR SECRETARIA_1 - Segundo Aceite
             await page.getByTestId('btn-logout').click({force: true});
@@ -497,7 +494,7 @@ test.describe('Smoke Test - Sistema SGC', () => {
             await page.getByTestId('btn-acao-analisar-principal').click();
             await page.getByTestId('inp-aceite-cadastro-obs').fill('Ok. Para homologação do ADMIN.');
             await page.getByTestId('btn-aceite-cadastro-confirmar').click();
-            await expect(page.getByText(/Cadastro aceito/i).first()).toBeVisible();
+            await verificarPaginaPainel(page);
 
             // 3. ADMIN - Homologação Final
             await page.getByTestId('btn-logout').click({force: true});
@@ -546,9 +543,7 @@ test.describe('Smoke Test - Sistema SGC', () => {
             await page.getByTestId('btn-disponibilizar-mapa-confirmar').click();
             await page.waitForTimeout(100);
             const cardCompetencia = page.locator('.competencia-card').first();
-            if (await cardCompetencia.isVisible().catch(() => false)) {
-                // Competência visível
-            }
+            await expect(cardCompetencia).toBeVisible();
         });
     });
 
@@ -671,11 +666,10 @@ test.describe('Smoke Test - Sistema SGC', () => {
 
             // Capturar botão de aceitar em bloco (se visível)
             const btnAceitarBloco = page.getByRole('button', {name: /Aceitar.*Bloco/i});
-            if (await btnAceitarBloco.isVisible().catch(() => false)) {
-                await btnAceitarBloco.click();
-                await page.waitForTimeout(300);
-                await page.getByRole('button', {name: /Cancelar/i}).click();
-            }
+            await expect(btnAceitarBloco).toBeVisible();
+            await btnAceitarBloco.click();
+            await page.waitForTimeout(300);
+            await page.getByRole('button', {name: /Cancelar/i}).click();
 
             // Login como Admin para homologar em bloco
             await page.getByTestId('btn-logout').click();
@@ -686,34 +680,30 @@ test.describe('Smoke Test - Sistema SGC', () => {
 
             // Capturar botão de homologar cadastro em bloco (CDU-23)
             const btnHomologarBloco = page.getByRole('button', {name: /Homologar.*Bloco/i});
-            if (await btnHomologarBloco.isVisible().catch(() => false)) {
-                await btnHomologarBloco.click();
-                await page.waitForTimeout(300);
-                await page.getByRole('button', {name: /Cancelar/i}).click();
-            }
+            await expect(btnHomologarBloco).toBeVisible();
+            await btnHomologarBloco.click();
+            await page.waitForTimeout(300);
+            await page.getByRole('button', {name: /Cancelar/i}).click();
 
             // Capturar botão de disponibilizar mapas em bloco (CDU-24)
             const btnDisponibilizarMapaBloco = page.getByRole('button', {name: /Disponibilizar.*mapa.*Bloco/i});
-            if (await btnDisponibilizarMapaBloco.isVisible().catch(() => false)) {
-                await btnDisponibilizarMapaBloco.click();
-                await page.waitForTimeout(300);
-                await page.getByRole('button', {name: /Cancelar/i}).click();
-            }
+            await expect(btnDisponibilizarMapaBloco).toBeVisible();
+            await btnDisponibilizarMapaBloco.click();
+            await page.waitForTimeout(300);
+            await page.getByRole('button', {name: /Cancelar/i}).click();
 
             // Capturar botões de aceitar/homologar mapa em bloco (CDU-25 e CDU-26 - se visíveis)
             const btnAceitarMapaBloco = page.getByRole('button', {name: /Aceitar.*mapa.*Bloco/i});
-            if (await btnAceitarMapaBloco.isVisible().catch(() => false)) {
-                await btnAceitarMapaBloco.click();
-                await page.waitForTimeout(300);
-                await page.getByRole('button', {name: /Cancelar/i}).click();
-            }
+            await expect(btnAceitarMapaBloco).toBeVisible();
+            await btnAceitarMapaBloco.click();
+            await page.waitForTimeout(300);
+            await page.getByRole('button', {name: /Cancelar/i}).click();
 
             const btnHomologarMapaBloco = page.getByRole('button', {name: /Homologar.*mapa.*Bloco/i});
-            if (await btnHomologarMapaBloco.isVisible().catch(() => false)) {
-                await btnHomologarMapaBloco.click();
-                await page.waitForTimeout(300);
-                await page.getByRole('button', {name: /Cancelar/i}).click();
-            }
+            await expect(btnHomologarMapaBloco).toBeVisible();
+            await btnHomologarMapaBloco.click();
+            await page.waitForTimeout(300);
+            await page.getByRole('button', {name: /Cancelar/i}).click();
         });
     });
 
@@ -745,25 +735,21 @@ test.describe('Smoke Test - Sistema SGC', () => {
 
             // Modal de alterar data limite (CDU-27)
             const btnAlterarData = page.getByRole('button', {name: /Alterar.*data.*limite/i});
-            if (await btnAlterarData.isVisible().catch(() => false)) {
-                await btnAlterarData.click();
-                await page.waitForTimeout(300);
-                await page.getByRole('button', {name: /Cancelar/i}).click();
-            }
+            await expect(btnAlterarData).toBeVisible();
+            await btnAlterarData.click();
+            await page.waitForTimeout(300);
+            await page.getByRole('button', {name: /Cancelar/i}).click();
 
             // Modal de reabrir cadastro (CDU-32)
             const btnReabrirCadastro = page.getByRole('button', {name: /Reabrir.*cadastro/i});
-            if (await btnReabrirCadastro.isVisible().catch(() => false)) {
-                await btnReabrirCadastro.click();
-                await page.waitForTimeout(300);
-                await page.getByRole('button', {name: /Cancelar/i}).click();
-            }
+            await expect(btnReabrirCadastro).toBeVisible();
+            await btnReabrirCadastro.click();
+            await page.waitForTimeout(300);
+            await page.getByRole('button', {name: /Cancelar/i}).click();
 
             // CDU-34: Botão de enviar lembrete (ação direta, sem modal)
             const btnEnviarLembrete = page.getByRole('button', {name: /Enviar.*lembrete/i});
-            if (await btnEnviarLembrete.isVisible().catch(() => false)) {
-                // Apenas capturar o botão visível, não clicar pois executa ação direta
-            }
+            await expect(btnEnviarLembrete).toBeVisible();
         });
     });
 
@@ -774,32 +760,25 @@ test.describe('Smoke Test - Sistema SGC', () => {
 
             // Navegar para página de unidades
             const linkUnidades = page.getByRole('link', {name: /Unidades/i});
-            if (await linkUnidades.isVisible().catch(() => false)) {
-                await linkUnidades.click();
-                await page.waitForTimeout(500);
+            await expect(linkUnidades).toBeVisible();
+            await linkUnidades.click();
+            await page.waitForTimeout(500);
 
-                // Expandir árvore para ver unidades
-                const btnExpand = page.getByTestId('btn-arvore-expand-SECRETARIA_1');
-                if (await btnExpand.isVisible().catch(() => false)) {
-                    await btnExpand.click();
-                    await page.waitForTimeout(300);
-                }
+            const btnExpand = page.getByTestId('btn-arvore-expand-SECRETARIA_1');
+            await expect(btnExpand).toBeVisible();
+            await btnExpand.click();
+            await page.waitForTimeout(300);
 
-                // Clicar em uma unidade para ver detalhes
-                const unidade = page.getByText('SECAO_121').first();
-                if (await unidade.isVisible().catch(() => false)) {
-                    await unidade.click();
-                    await page.waitForTimeout(500);
+            const unidade = page.getByText('SECAO_121').first();
+            await expect(unidade).toBeVisible();
+            await unidade.click();
+            await page.waitForTimeout(500);
 
-                    // Modal de criar atribuição temporária (CDU-28)
-                    const btnCriarAtribuicao = page.getByRole('button', {name: /Criar atribuição|Nova atribuição/i});
-                    if (await btnCriarAtribuicao.isVisible().catch(() => false)) {
-                        await btnCriarAtribuicao.click();
-                        await page.waitForTimeout(300);
-                        await page.getByRole('button', {name: /Cancelar/i}).click();
-                    }
-                }
-            }
+            const btnCriarAtribuicao = page.getByRole('button', {name: /Criar atribuição|Nova atribuição/i});
+            await expect(btnCriarAtribuicao).toBeVisible();
+            await btnCriarAtribuicao.click();
+            await page.waitForTimeout(300);
+            await page.getByRole('button', {name: /Cancelar/i}).click();
         });
     });
 
@@ -810,16 +789,10 @@ test.describe('Smoke Test - Sistema SGC', () => {
 
             // Acessar seção de histórico
             const linkHistorico = page.getByRole('link', {name: /Histórico/i});
-            if (await linkHistorico.isVisible().catch(() => false)) {
-                await linkHistorico.click();
-                await page.waitForTimeout(500);
-
-                // Tabela de processos finalizados
-                const tabela = page.locator('table');
-                if (await tabela.isVisible().catch(() => false)) {
-                    // Tabela visível
-                }
-            }
+            await expect(linkHistorico).toBeVisible();
+            await linkHistorico.click();
+            await page.waitForTimeout(500);
+            await expect(page.locator('table')).toBeVisible();
         });
     });
 
@@ -834,9 +807,7 @@ test.describe('Smoke Test - Sistema SGC', () => {
 
             // Seção de configurações do sistema (CDU-31)
             const inputDiasInativacao = page.getByTestId('inp-config-dias-inativacao');
-            if (await inputDiasInativacao.isVisible().catch(() => false)) {
-                // Configuração visível
-            }
+            await expect(inputDiasInativacao).toBeVisible();
 
             // Página de administradores (CDU-30)
             await page.getByTestId('btn-administradores').click();
@@ -844,11 +815,10 @@ test.describe('Smoke Test - Sistema SGC', () => {
 
             // Botão de adicionar administrador
             const btnAdicionar = page.getByRole('button', {name: /Adicionar|Novo/i});
-            if (await btnAdicionar.isVisible().catch(() => false)) {
-                await btnAdicionar.click();
-                await page.waitForTimeout(300);
-                await page.getByRole('button', {name: /Cancelar/i}).click();
-            }
+            await expect(btnAdicionar).toBeVisible();
+            await btnAdicionar.click();
+            await page.waitForTimeout(300);
+            await page.getByRole('button', {name: /Cancelar/i}).click();
         });
     });
 
@@ -858,47 +828,35 @@ test.describe('Smoke Test - Sistema SGC', () => {
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
             const linkRelatorios = page.getByRole('link', {name: /Relatórios/i});
-            if (await linkRelatorios.isVisible().catch(() => false)) {
-                await linkRelatorios.click();
-                await page.waitForTimeout(500);
+            await expect(linkRelatorios).toBeVisible();
+            await linkRelatorios.click();
+            await page.waitForTimeout(500);
 
-                // Card de relatório de andamento (CDU-35)
-                const cardAndamento = page.getByTestId('card-relatorio-andamento');
-                if (await cardAndamento.isVisible().catch(() => false)) {
-                    await cardAndamento.click();
-                    await page.waitForTimeout(300);
-                    const modalRelatorio = page.locator('.modal-content').first();
-                    if (await modalRelatorio.isVisible().catch(() => false)) {
-                        // Modal visível
-                    }
+            const cardAndamento = page.getByTestId('card-relatorio-andamento');
+            await expect(cardAndamento).toBeVisible();
+            await cardAndamento.click();
+            await page.waitForTimeout(300);
+            const modalRelatorio = page.locator('.modal-content').first();
+            await expect(modalRelatorio).toBeVisible();
 
-                    const filtroTipo = page.getByTestId('sel-filtro-tipo');
-                    if (await filtroTipo.isVisible().catch(() => false)) {
-                        // Filtro visível
-                    }
+            const filtroTipo = page.getByTestId('sel-filtro-tipo');
+            await expect(filtroTipo).toBeVisible();
 
-                    // Verificar botão de exportação
-                    const btnExportar = page.getByRole('button', {name: /Exportar|PDF|CSV/i});
-                    if (await btnExportar.isVisible().catch(() => false)) {
-                        // Botão visível
-                    }
+            const btnExportar = page.getByRole('button', {name: /Exportar|PDF|CSV/i});
+            await expect(btnExportar).toBeVisible();
 
-                    await page.getByRole('button', {name: /Fechar|Cancelar|Close|Cancel/i}).first().click().catch(() => {
-                        // Ignorar erro ao fechar
-                    });
-                    await page.waitForTimeout(300);
-                }
+            await page.getByRole('button', {name: /Fechar|Cancelar|Close|Cancel/i}).first().click().catch(() => {
+                // Ignorar erro ao fechar
+            });
+            await page.waitForTimeout(300);
 
-                // Card de relatório de mapas (CDU-36)
-                const cardMapas = page.getByTestId('card-relatorio-mapas');
-                if (await cardMapas.isVisible().catch(() => false)) {
-                    await cardMapas.click();
-                    await page.waitForTimeout(300);
-                    await page.getByRole('button', {name: /Fechar|Cancelar|Close|Cancel/i}).first().click().catch(() => {
-                        // Ignorar erro ao fechar
-                    });
-                }
-            }
+            const cardMapas = page.getByTestId('card-relatorio-mapas');
+            await expect(cardMapas).toBeVisible();
+            await cardMapas.click();
+            await page.waitForTimeout(300);
+            await page.getByRole('button', {name: /Fechar|Cancelar|Close|Cancel/i}).first().click().catch(() => {
+                // Ignorar erro ao fechar
+            });
         });
     });
 });
