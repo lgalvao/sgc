@@ -163,19 +163,18 @@ function fecharModalAdicionarAdmin() {
 
 async function adicionarAdmin() {
   if (!novoAdminTitulo.value.trim()) {
-    notificacoes.show('Erro', 'Digite um título eleitoral válido', 'warning');
+    notify('Digite um título eleitoral válido', 'warning');
     return;
   }
 
   adicionandoAdmin.value = true;
   try {
     await adicionarAdministrador(novoAdminTitulo.value.trim());
-    notificacoes.show('Sucesso', 'Administrador adicionado com sucesso!', 'success');
     fecharModalAdicionarAdmin();
     await carregarAdministradores();
   } catch (error) {
     const erro = normalizeError(error);
-    notificacoes.show('Erro', erro.message, 'danger');
+    notify(erro.message, 'danger');
   } finally {
     adicionandoAdmin.value = false;
   }
@@ -192,13 +191,12 @@ async function removerAdmin() {
   removendoAdmin.value = adminParaRemover.value.tituloEleitoral;
   try {
     await removerAdministrador(adminParaRemover.value.tituloEleitoral);
-    notificacoes.show('Sucesso', 'Administrador removido com sucesso!', 'success');
     await carregarAdministradores();
     mostrarModalRemoverAdmin.value = false;
     adminParaRemover.value = null;
   } catch (error) {
     const erro = normalizeError(error);
-    notificacoes.show('Erro', erro.message, 'danger');
+    notify(erro.message, 'danger');
   } finally {
     removendoAdmin.value = null;
   }

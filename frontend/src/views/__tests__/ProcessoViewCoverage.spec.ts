@@ -3,7 +3,6 @@ import {flushPromises, mount} from "@vue/test-utils";
 import Processo from "@/views/ProcessoDetalheView.vue";
 import {useProcessosStore} from "@/stores/processos";
 import {usePerfilStore} from "@/stores/perfil";
-import {useFeedbackStore} from "@/stores/feedback";
 import {createTestingPinia} from "@pinia/testing";
 import {SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 
@@ -126,8 +125,6 @@ describe("ProcessoViewCoverage.spec.ts", () => {
 
     it("deve lidar com erro ao finalizar processo", async () => {
         const wrapper = createWrapper();
-        const feedbackStore = useFeedbackStore();
-        vi.spyOn(feedbackStore, "show");
 
         vi.mocked(processosStore.finalizarProcesso).mockRejectedValue(new Error("Erro ao finalizar"));
 
@@ -218,8 +215,6 @@ describe("ProcessoViewCoverage.spec.ts", () => {
                 }
             }
         });
-        const feedbackStore = useFeedbackStore();
-        vi.spyOn(feedbackStore, "show");
 
         const modal = wrapper.findComponent({name: 'ModalAcaoBloco'});
 

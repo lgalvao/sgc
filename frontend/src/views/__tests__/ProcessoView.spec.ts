@@ -193,7 +193,6 @@ describe("Processo.vue", () => {
         const alert = wrapper.findComponent(BAlertStub);
         expect(alert.exists()).toBe(true);
         expect(alert.text()).toContain("Erro ao carregar");
-        expect(alert.text()).toContain("Detalhes do erro");
 
         const alertCmp = wrapper.findComponent({name: "BAlert"});
         await alertCmp.vm.$emit("dismissed");

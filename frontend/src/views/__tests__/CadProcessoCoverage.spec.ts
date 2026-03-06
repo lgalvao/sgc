@@ -128,8 +128,8 @@ describe('ProcessoCadastroView.vue Coverage', () => {
         await (wrapper.vm).salvarProcesso();
         await flushPromises();
 
-        expect(wrapper.vm.alertState.show).toBe(true);
-        expect(wrapper.vm.alertState.errors).toContain('Erro genérico de regra de negócio');
+        expect(wrapper.vm.notificacao).not.toBeNull();
+        expect(wrapper.vm.notificacao?.notification?.details).toContain('Erro genérico de regra de negócio');
         expect(wrapper.vm.fieldErrors.descricao).toBe('Descrição inválida');
     });
 
@@ -155,8 +155,8 @@ describe('ProcessoCadastroView.vue Coverage', () => {
 
         expect(processosStore.criarProcesso).toHaveBeenCalled();
         expect(processosStore.iniciarProcesso).not.toHaveBeenCalled();
-        expect(wrapper.vm.alertState.show).toBe(true);
-        expect(wrapper.vm.alertState.body).toContain('Failed to create');
+        expect(wrapper.vm.notificacao).not.toBeNull();
+        expect(wrapper.vm.notificacao?.notification?.summary).toContain('Failed to create');
         expect(wrapper.vm.isLoading).toBe(false);
     });
 
@@ -181,8 +181,8 @@ describe('ProcessoCadastroView.vue Coverage', () => {
 
         expect(processosStore.criarProcesso).toHaveBeenCalled();
         expect(processosStore.iniciarProcesso).toHaveBeenCalledWith(777, 'MAPEAMENTO', [1]);
-        expect(wrapper.vm.alertState.show).toBe(true);
-        expect(wrapper.vm.alertState.body).toContain('Failed to start');
+        expect(wrapper.vm.notificacao).not.toBeNull();
+        expect(wrapper.vm.notificacao?.notification?.summary).toContain('Failed to start');
         expect(wrapper.vm.isLoading).toBe(false);
     });
 
@@ -221,8 +221,8 @@ describe('ProcessoCadastroView.vue Coverage', () => {
         await flushPromises();
 
         expect((wrapper.vm).mostrarModalRemocao).toBe(false);
-        expect((wrapper.vm).alertState.show).toBe(true);
-        expect((wrapper.vm).alertState.body).toContain('Failed to delete');
+        expect((wrapper.vm).notificacao).not.toBeNull();
+        expect((wrapper.vm).notificacao?.notification?.summary).toContain('Failed to delete');
     });
 
     it('fecharModalRemocao closes the modal', async () => {

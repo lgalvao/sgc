@@ -12,7 +12,16 @@
       {{ store.error }}
     </BAlert>
 
-    <form v-else @submit.prevent="salvar">
+    <template v-else>
+      <AppAlert
+          v-if="notificacao"
+          :dismissible="notificacao.dismissible ?? true"
+          :message="notificacao.message"
+          :variant="notificacao.variant"
+          @dismissed="clear"
+      />
+
+      <form @submit.prevent="salvar">
       <div class="mb-3">
         <label class="form-label" for="diasInativacao">
           Dias para inativação de processos (DIAS_INATIVACAO_PROCESSO) <span aria-hidden="true" class="text-danger">*</span>
@@ -59,6 +68,7 @@
         />
       </div>
     </form>
+    </template>
   </LayoutPadrao>
 </template>
 
@@ -67,12 +77,13 @@ import {onMounted, reactive, ref} from 'vue';
 import {BAlert} from 'bootstrap-vue-next';
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import PageHeader from '@/components/layout/PageHeader.vue';
+import AppAlert from '@/components/comum/AppAlert.vue';
 import LoadingButton from '@/components/comum/LoadingButton.vue';
 import {type Parametro, useConfiguracoesStore} from '@/stores/configuracoes';
 import {useNotification} from '@/composables/useNotification';
 
 const store = useConfiguracoesStore();
-const {notify} = useNotification();
+const {notify, notificacao, clear} = useNotification();
 const salvando = ref(false);
 
 const form = reactive({
@@ -114,7 +125,7 @@ async function salvar() {
   const sucesso = await store.salvarConfiguracoes(paramsToSave);
 
   if (sucesso) {
-    notify('Configurações salvas com sucesso!', 'success');
+    notify('Configurações salvas.', 'success');
   } else {
     notify('Erro ao salvar configurações.', 'danger');
   }

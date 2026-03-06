@@ -3,7 +3,6 @@ import {mount} from "@vue/test-utils";
 import LoginView from "@/views/LoginView.vue";
 import {createTestingPinia} from "@pinia/testing";
 import {usePerfilStore} from "@/stores/perfil";
-import {useFeedbackStore} from "@/stores/feedback";
 import {useRouter} from "vue-router";
 import {Perfil} from "@/types/tipos";
 
@@ -74,19 +73,13 @@ describe("LoginView.vue", () => {
 
     it("deve mostrar erro se campos estiverem vazios", async () => {
         const wrapper = mount(LoginView, mountOptions());
-        const feedbackStore = useFeedbackStore();
 
-        // Limpar campos (já que no DEV mode vêm preenchidos)
         await wrapper.find('[data-testid="inp-login-usuario"]').setValue("");
         await wrapper.find('[data-testid="inp-login-senha"]').setValue("");
 
         await wrapper.find('form').trigger('submit');
 
-        expect(feedbackStore.show).toHaveBeenCalledWith(
-            "Dados incompletos",
-            "Por favor, preencha título e senha.",
-            "danger"
-        );
+        expect(wrapper.text()).toContain("Por favor, preencha título e senha.");
     });
 
     const MOCK_PERFIS = [
@@ -112,7 +105,6 @@ describe("LoginView.vue", () => {
     it("deve exibir erro se login falhar", async () => {
         const wrapper = mount(LoginView, mountOptions());
         const perfilStore = usePerfilStore();
-        const feedbackStore = useFeedbackStore();
 
         perfilStore.loginCompleto = vi.fn().mockResolvedValue(false);
 
@@ -121,11 +113,7 @@ describe("LoginView.vue", () => {
         await wrapper.find('form').trigger('submit');
 
         expect(perfilStore.loginCompleto).toHaveBeenCalled();
-        expect(feedbackStore.show).toHaveBeenCalledWith(
-            "Erro no login",
-            "Título ou senha inválidos.",
-            "danger"
-        );
+        expect(wrapper.text()).toContain("Título ou senha inválidos.");
     });
 
     it("deve avançar para passo 2 se houver múltiplos perfis", async () => {
@@ -167,12 +155,9 @@ describe("LoginView.vue", () => {
     it("deve tratar erro genérico durante o login (catch block)", async () => {
         const wrapper = mount(LoginView, mountOptions());
         const perfilStore = usePerfilStore();
-        const feedbackStore = useFeedbackStore();
 
-        // Simula erro na chamada do store
         perfilStore.loginCompleto = vi.fn().mockRejectedValue(new Error("Erro de rede"));
 
-        // Precisamos mockar console.error para não poluir o output do teste
         const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {
         });
 
@@ -180,46 +165,34 @@ describe("LoginView.vue", () => {
         await wrapper.find('[data-testid="inp-login-senha"]').setValue("pass");
         await wrapper.find('form').trigger('submit');
 
-        // Aguarda a promise rejeitada ser processada
         await new Promise(resolve => setTimeout(resolve, 0));
 
-        expect(feedbackStore.show).toHaveBeenCalledWith(
-            "Erro no sistema",
-            "Ocorreu um erro ao tentar realizar o login.",
-            "danger"
-        );
+        expect(wrapper.text()).toContain("Ocorreu um erro ao tentar realizar o login.");
         consoleSpy.mockRestore();
     });
 
     it("deve exibir erro se nenhum perfil estiver disponível (array vazio)", async () => {
         const wrapper = mount(LoginView, mountOptions());
         const perfilStore = usePerfilStore();
-        const feedbackStore = useFeedbackStore();
 
         perfilStore.loginCompleto = vi.fn().mockResolvedValue(true);
-        perfilStore.perfisUnidades = []; // Array vazio
+        perfilStore.perfisUnidades = [];
 
         await wrapper.find('[data-testid="inp-login-usuario"]').setValue("123");
         await wrapper.find('[data-testid="inp-login-senha"]').setValue("pass");
         await wrapper.find('form').trigger('submit');
 
-        expect(feedbackStore.show).toHaveBeenCalledWith(
-            "Perfis indisponíveis",
-            "Nenhum perfil/unidade disponível para este usuário.",
-            "danger"
-        );
+        expect(wrapper.text()).toContain("Nenhum perfil/unidade disponível para este usuário.");
     });
 
     it("deve tratar erro genérico durante seleção de perfil (step 2)", async () => {
         const wrapper = mount(LoginView, mountOptions());
         const perfilStore = usePerfilStore();
-        const feedbackStore = useFeedbackStore();
 
         perfilStore.loginCompleto = vi.fn().mockResolvedValue(true);
         perfilStore.selecionarPerfilUnidade = vi.fn().mockRejectedValue(new Error("Erro ao selecionar"));
         perfilStore.perfisUnidades = MOCK_PERFIS;
 
-        // Precisamos mockar console.error para não poluir o output do teste
         const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {
         });
 
@@ -229,21 +202,15 @@ describe("LoginView.vue", () => {
 
         await wrapper.find('form').trigger('submit');
 
-        // Aguarda a promise rejeitada ser processada
         await new Promise(resolve => setTimeout(resolve, 0));
 
-        expect(feedbackStore.show).toHaveBeenCalledWith(
-            "Erro",
-            "Falha ao selecionar o perfil.",
-            "danger"
-        );
+        expect(wrapper.text()).toContain("Falha ao selecionar o perfil.");
         consoleSpy.mockRestore();
     });
 
     it("deve exibir erro se tentar submeter passo 2 sem seleção (caso edge)", async () => {
         const wrapper = mount(LoginView, mountOptions());
         const perfilStore = usePerfilStore();
-        const feedbackStore = useFeedbackStore();
 
         perfilStore.loginCompleto = vi.fn().mockResolvedValue(true);
         perfilStore.perfisUnidades = MOCK_PERFIS;
@@ -254,7 +221,6 @@ describe("LoginView.vue", () => {
 
         expect(wrapper.find('[data-testid="sec-login-perfil"]').exists()).toBe(true);
 
-        // Encontra o select pelo componente para emitir o evento
         const select = wrapper.findComponent({name: 'BFormSelect'});
         if (select.exists()) {
             await select.vm.$emit('update:modelValue', null);
@@ -264,11 +230,7 @@ describe("LoginView.vue", () => {
 
         await wrapper.find('form').trigger('submit');
 
-        expect(feedbackStore.show).toHaveBeenCalledWith(
-            "Seleção necessária",
-            "Por favor, selecione um perfil.",
-            "danger"
-        );
+        expect(wrapper.text()).toContain("Por favor, selecione um perfil.");
     });
 
     it("deve exibir aviso de caps lock ativado", async () => {

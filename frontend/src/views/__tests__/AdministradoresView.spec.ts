@@ -3,7 +3,6 @@ import {flushPromises, mount} from "@vue/test-utils";
 import AdministradoresView from "@/views/AdministradoresView.vue";
 import * as administradorService from "@/services/administradorService";
 import {createTestingPinia} from "@pinia/testing";
-import {useNotificacoesStore} from "@/stores/feedback";
 
 vi.mock("@/services/administradorService", () => ({
     listarAdministradores: vi.fn(),
@@ -70,11 +69,10 @@ describe("AdministradoresView.vue", () => {
 
     it("deve abrir modal e adicionar administrador", async () => {
         const wrapper = createWrapper();
-        const notificacoes = useNotificacoesStore();
         await flushPromises();
 
         const addButton = wrapper.find('button[data-testid="btn-abrir-modal-add-admin"]');
-        await addButton.trigger("click"); // Abrir modal
+        await addButton.trigger("click");
 
         const input = wrapper.find('input#usuarioTitulo');
         await input.setValue("333");
@@ -85,16 +83,14 @@ describe("AdministradoresView.vue", () => {
         await flushPromises();
 
         expect(administradorService.adicionarAdministrador).toHaveBeenCalledWith("333");
-        expect(notificacoes.show).toHaveBeenCalledWith("Sucesso", expect.anything(), "success");
     });
 
     it("deve remover administrador", async () => {
         const wrapper = createWrapper();
-        const notificacoes = useNotificacoesStore();
         await flushPromises();
 
         const removeBtn = wrapper.findAll('button').find(b => b.text().includes('Remover'));
-        await removeBtn?.trigger("click"); // Confirmar remoção
+        await removeBtn?.trigger("click");
 
         vi.mocked(administradorService.removerAdministrador).mockResolvedValue({} as any);
 
@@ -102,6 +98,5 @@ describe("AdministradoresView.vue", () => {
         await flushPromises();
 
         expect(administradorService.removerAdministrador).toHaveBeenCalledWith("111");
-        expect(notificacoes.show).toHaveBeenCalledWith("Sucesso", expect.anything(), "success");
     });
 });

@@ -3,12 +3,10 @@ import {createTestingPinia} from '@pinia/testing';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import ParametrosView from '@/views/ParametrosView.vue';
 import {useConfiguracoesStore} from '@/stores/configuracoes';
-import {useNotificacoesStore} from '@/stores/feedback';
 
 describe('ParametrosView', () => {
     let wrapper: any;
     let configuracoesStore: any;
-    let notificacoesStore: any;
 
     const setupWrapper = (initialState: any = {}, storeParams: any[] | null = null) => {
         const pinia = createTestingPinia({
@@ -17,7 +15,6 @@ describe('ParametrosView', () => {
         });
 
         configuracoesStore = useConfiguracoesStore(pinia);
-        notificacoesStore = useNotificacoesStore(pinia);
 
         configuracoesStore.parametros = storeParams !== null ? storeParams : [
             {codigo: 1, chave: 'DIAS_INATIVACAO_PROCESSO', valor: '30', descricao: 'Desc 1'},
@@ -67,7 +64,7 @@ describe('ParametrosView', () => {
         await wrapper.vm.$nextTick();
         await wrapper.find('form').trigger('submit.prevent');
         expect(configuracoesStore.salvarConfiguracoes).toHaveBeenCalled();
-        expect(notificacoesStore.show).toHaveBeenCalledWith('Sucesso', expect.any(String), 'success');
+        expect(wrapper.text()).toContain('Configurações salvas.');
     });
 
     it('deve mostrar erro ao falhar ao salvar', async () => {
@@ -75,7 +72,7 @@ describe('ParametrosView', () => {
         await wrapper.vm.$nextTick();
         configuracoesStore.salvarConfiguracoes.mockResolvedValue(false);
         await wrapper.find('form').trigger('submit.prevent');
-        expect(notificacoesStore.show).toHaveBeenCalledWith('Erro', expect.any(String), 'danger');
+        expect(wrapper.text()).toContain('Erro ao salvar configurações.');
     });
 
     it('deve mostrar loading state', async () => {
