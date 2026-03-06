@@ -25,6 +25,8 @@ vi.mock("@/services/processoService", () => ({
             }
         ]
     }),
+    validarMapa: vi.fn().mockResolvedValue({}),
+    apresentarSugestoes: vi.fn().mockResolvedValue({}),
 }));
 vi.mock("@/services/subprocessoService", () => ({
     buscarSubprocessoDetalhe: vi.fn().mockResolvedValue({}),

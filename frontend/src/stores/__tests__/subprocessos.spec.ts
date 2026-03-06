@@ -7,7 +7,6 @@ import {usePerfilStore} from '../perfil';
 import {useUnidadesStore} from '../unidades';
 import {useMapasStore} from '../mapas';
 import {useAtividadesStore} from '../atividades';
-import {useFeedbackStore} from '../feedback';
 import {
     buscarContextoEdicao,
     buscarSubprocessoDetalhe,
@@ -66,9 +65,6 @@ vi.mock('../mapas', () => ({
 vi.mock('../atividades', () => ({
     useAtividadesStore: vi.fn(),
 }));
-vi.mock('../feedback', () => ({
-    useFeedbackStore: vi.fn(),
-}));
 
 const {mockApiClient} = vi.hoisted(() => ({
     mockApiClient: {
@@ -104,23 +100,17 @@ describe('Subprocessos Store', () => {
     const mockAtividadesStore = {
         setAtividadesParaSubprocesso: vi.fn(),
     };
-    const mockFeedbackStore = {
-        show: vi.fn(),
-    };
 
     beforeEach(() => {
         setActivePinia(createPinia());
 
-        // Reset mocks
         vi.clearAllMocks();
 
-        // Configura retorno dos useStore mocks
         (useProcessosStore as any).mockReturnValue(mockProcessosStore);
         (usePerfilStore as any).mockReturnValue(mockPerfilStore);
         (useUnidadesStore as any).mockReturnValue(mockUnidadesStore);
         (useMapasStore as any).mockReturnValue(mockMapasStore);
         (useAtividadesStore as any).mockReturnValue(mockAtividadesStore);
-        (useFeedbackStore as any).mockReturnValue(mockFeedbackStore);
 
         store = useSubprocessosStore();
     });
@@ -263,7 +253,6 @@ describe('Subprocessos Store', () => {
             const result = await store.disponibilizarCadastro(1);
             expect(result).toBe(true);
             expect(disponibilizarCadastro).toHaveBeenCalledWith(1);
-            expect(mockFeedbackStore.show).toHaveBeenCalledWith(expect.stringContaining("Cadastro"), expect.anything(), 'success');
         });
 
         it('disponibilizarCadastro deve lidar com erro', async () => {
@@ -278,7 +267,6 @@ describe('Subprocessos Store', () => {
             const result = await store.disponibilizarRevisaoCadastro(1);
             expect(result).toBe(true);
             expect(disponibilizarRevisaoCadastro).toHaveBeenCalledWith(1);
-            expect(mockFeedbackStore.show).toHaveBeenCalledWith(expect.stringContaining("Revisão"), expect.anything(), 'success');
         });
 
         it('disponibilizarRevisaoCadastro deve lidar com erro', async () => {
@@ -293,7 +281,6 @@ describe('Subprocessos Store', () => {
             const result = await store.devolverCadastro(1, {observacoes: 'Erro'});
             expect(result).toBe(true);
             expect(devolverCadastro).toHaveBeenCalledWith(1, {observacoes: 'Erro'});
-            expect(mockFeedbackStore.show).toHaveBeenCalledWith(expect.stringContaining("Cadastro"), expect.anything(), 'success');
         });
 
         it('devolverCadastro deve lidar com erro', async () => {
@@ -428,12 +415,11 @@ describe('Subprocessos Store', () => {
     });
 
     describe('reabrirCadastro', () => {
-        it('deve chamar reabrirCadastro service e mostrar feedback', async () => {
+        it('deve chamar reabrirCadastro service', async () => {
             (reabrirCadastro as any).mockResolvedValue({});
             const res = await store.reabrirCadastro(1, 'Justificativa');
             expect(reabrirCadastro).toHaveBeenCalledWith(1, 'Justificativa');
             expect(res).toBe(true);
-            expect(mockFeedbackStore.show).toHaveBeenCalledWith('Cadastro reaberto', expect.any(String), 'success');
         });
     });
 
@@ -443,7 +429,6 @@ describe('Subprocessos Store', () => {
             const res = await store.reabrirRevisaoCadastro(1, 'Justificativa');
             expect(reabrirRevisaoCadastro).toHaveBeenCalledWith(1, 'Justificativa');
             expect(res).toBe(true);
-            expect(mockFeedbackStore.show).toHaveBeenCalledWith('Revisão de cadastro reaberta', expect.any(String), 'success');
         });
     });
 });

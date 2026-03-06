@@ -14,6 +14,14 @@
       Identifique a situação de capacitação para as competências com Gap significativo.
     </BAlert>
 
+    <AppAlert
+        v-if="notificacao"
+        :dismissible="notificacao.dismissible ?? true"
+        :message="notificacao.message"
+        :variant="notificacao.variant"
+        @dismissed="clear"
+    />
+
     <div v-if="loading" class="text-center py-5">
       <BSpinner label="Carregando..."/>
     </div>
@@ -71,6 +79,7 @@ import {useRoute} from 'vue-router';
 import {BAlert, BButton, BFormSelect, BSpinner} from 'bootstrap-vue-next';
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import PageHeader from '@/components/layout/PageHeader.vue';
+import AppAlert from '@/components/comum/AppAlert.vue';
 import {useUnidadesStore} from '@/stores/unidades';
 import {useNotification} from '@/composables/useNotification';
 import {
@@ -91,7 +100,7 @@ const OPCOES_SITUACAO = [
 
 const route = useRoute();
 const unidadesStore = useUnidadesStore();
-const {notify} = useNotification();
+const {notify, notificacao, clear} = useNotification();
 
 const loading = ref(true);
 const codSubprocesso = computed(() => Number(route.params.codSubprocesso));

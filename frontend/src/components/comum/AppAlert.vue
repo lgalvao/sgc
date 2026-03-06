@@ -6,6 +6,7 @@
       :model-value="true"
       :variant="variant"
       class="mb-3"
+      data-testid="app-alert"
       @dismissed="emit('dismissed')"
   >
     <!-- Modo simples -->

@@ -204,7 +204,10 @@ describe('AutoavaliacaoDiagnostico.vue', () => {
     });
 
     it('conclui autoavaliação', async () => {
-        await mountComponent();
+        await mountComponent(undefined, [
+            {competenciaCodigo: 1, importancia: 'N5', dominio: 'N3', observacoes: 'Obs 1'},
+            {competenciaCodigo: 2, importancia: 'N4', dominio: 'N2', observacoes: 'Obs 2'},
+        ]);
         await flushPromises();
         await ctx.wrapper!.vm.$nextTick();
 

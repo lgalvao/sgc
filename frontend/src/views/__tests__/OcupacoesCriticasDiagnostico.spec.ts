@@ -3,7 +3,6 @@ import {flushPromises, mount} from '@vue/test-utils';
 import OcupacoesCriticasDiagnostico from '@/views/diagnostico/OcupacoesCriticasDiagnosticoView.vue';
 import {diagnosticoService} from '@/services/diagnosticoService';
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
-import {useFeedbackStore} from '@/stores/feedback';
 
 const {mockRouteParams} = vi.hoisted(() => {
     return {mockRouteParams: {value: {codSubprocesso: '10'}}};
@@ -140,17 +139,15 @@ describe('OcupacoesCriticasDiagnostico.vue', () => {
         (diagnosticoService.buscarDiagnostico as any).mockRejectedValue(new Error('Load Error'));
 
         context.wrapper = createWrapper();
-        const feedbackStore = useFeedbackStore();
         await flushPromises();
         await context.wrapper.vm.$nextTick();
 
         expect(diagnosticoService.buscarDiagnostico).toHaveBeenCalled();
-        expect(feedbackStore.show).toHaveBeenCalledWith('Erro', expect.stringContaining('Load Error'), 'danger');
+        expect(context.wrapper.text()).toContain('Load Error');
     });
 
     it('shows error when saving fails', async () => {
         context.wrapper = createWrapper();
-        const feedbackStore = useFeedbackStore();
         await flushPromises();
 
         (diagnosticoService.salvarOcupacao as any).mockRejectedValue(new Error('Save Error'));
@@ -160,6 +157,6 @@ describe('OcupacoesCriticasDiagnostico.vue', () => {
         await flushPromises();
         await context.wrapper.vm.$nextTick();
 
-        expect(feedbackStore.show).toHaveBeenCalledWith('Erro', expect.stringContaining('Save Error'), 'danger');
+        expect(context.wrapper.text()).toContain('Save Error');
     });
 });

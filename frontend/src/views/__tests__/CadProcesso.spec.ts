@@ -222,8 +222,8 @@ describe('ProcessoCadastroView.vue', () => {
         await wrapper.find('[data-testid="btn-processo-salvar"]').trigger('click');
         await flushPromises();
 
-        expect(wrapper.vm.alertState.show).toBe(true);
-        expect(wrapper.vm.alertState.body).toContain('Erro validacao');
+        expect(wrapper.vm.notificacao).not.toBeNull();
+        expect(wrapper.vm.notificacao?.notification?.summary).toContain('Erro validacao');
     });
 
     it('updates an existing process', async () => {
@@ -329,8 +329,8 @@ describe('ProcessoCadastroView.vue', () => {
         await wrapper.find('[data-testid="btn-iniciar-processo-confirmar"]').trigger('click');
         await flushPromises();
 
-        expect(wrapper.vm.alertState.show).toBe(true);
-        expect(wrapper.vm.alertState.body).toContain('Erro ao criar');
+        expect(wrapper.vm.notificacao).not.toBeNull();
+        expect(wrapper.vm.notificacao?.notification?.summary).toContain('Erro ao criar');
     });
 
     it('handles error when starting a process (initiation fail)', async () => {
@@ -346,8 +346,8 @@ describe('ProcessoCadastroView.vue', () => {
         await wrapper.find('[data-testid="btn-iniciar-processo-confirmar"]').trigger('click');
         await flushPromises();
 
-        expect(wrapper.vm.alertState.show).toBe(true);
-        expect(wrapper.vm.alertState.body).toContain('Erro ao iniciar');
+        expect(wrapper.vm.notificacao).not.toBeNull();
+        expect(wrapper.vm.notificacao?.notification?.summary).toContain('Erro ao iniciar');
     });
 
     it('handles error when removing a process', async () => {
@@ -360,8 +360,8 @@ describe('ProcessoCadastroView.vue', () => {
         await wrapper.vm.confirmarRemocao();
         await flushPromises();
 
-        expect(wrapper.vm.alertState.show).toBe(true);
-        expect(wrapper.vm.alertState.title).toContain('Erro ao remover processo');
+        expect(wrapper.vm.notificacao).not.toBeNull();
+        expect(wrapper.vm.notificacao?.message).toContain('Não foi possível remover o processo');
     });
 
     it('closes confirmation modal when cancel button is clicked', async () => {
@@ -411,8 +411,8 @@ describe('ProcessoCadastroView.vue', () => {
         expect(wrapper.vm.fieldErrors.tipo).toBe('Tipo inválido');
         expect(wrapper.vm.fieldErrors.dataLimite).toBe('Data inválida');
         expect(wrapper.vm.fieldErrors.unidades).toBe('Selecione ao menos uma unidade');
-        expect(wrapper.vm.alertState.show).toBe(true);
-        expect(wrapper.vm.alertState.errors).toContain('Erro genérico');
+        expect(wrapper.vm.notificacao).not.toBeNull();
+        expect(wrapper.vm.notificacao?.notification?.details).toContain('Erro genérico');
     });
 
     it('handles error without lastError (network/runtime error)', async () => {
@@ -430,8 +430,8 @@ describe('ProcessoCadastroView.vue', () => {
         await wrapper.find('[data-testid="btn-processo-salvar"]').trigger('click');
         await flushPromises();
 
-        expect(wrapper.vm.alertState.show).toBe(true);
-        expect(wrapper.vm.alertState.body).toContain('Não foi possível salvar o processo');
+        expect(wrapper.vm.notificacao).not.toBeNull();
+        expect(wrapper.vm.notificacao?.message).toContain('Não foi possível salvar o processo');
     });
 
     it('does nothing when confirmarRemocao is called without processoEditando', async () => {
@@ -487,12 +487,12 @@ describe('ProcessoCadastroView.vue', () => {
 
     it('shows alert with multiple errors', async () => {
         const {wrapper} = createWrapper();
-        (wrapper.vm as any).mostrarAlerta('danger', 'Titulo', 'Corpo', ['Erro 1', 'Erro 2']);
+        (wrapper.vm as any).notifyStructured('Corpo', ['Erro 1', 'Erro 2'], 'danger');
         await nextTick();
 
-        const alert = wrapper.find('.alert');
-        expect(alert.text()).toContain('Erro 1');
-        expect(alert.text()).toContain('Erro 2');
+        expect(wrapper.vm.notificacao).not.toBeNull();
+        expect(wrapper.vm.notificacao?.notification?.details).toContain('Erro 1');
+        expect(wrapper.vm.notificacao?.notification?.details).toContain('Erro 2');
     });
 
     it('shows saving spinner on button', async () => {
@@ -540,8 +540,7 @@ describe('ProcessoCadastroView.vue', () => {
 
         await flushPromises();
 
-        expect((wrapper.vm as any).alertState?.show).toBe(true);
-        expect((wrapper.vm as any).alertState?.body).toContain('Não foi possível carregar');
+        expect((wrapper.vm as any).notificacao?.message).toContain('Não foi possível carregar');
     });
 
     it('focuses on the first invalid field when validation errors occur', async () => {
