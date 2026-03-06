@@ -67,8 +67,11 @@ withDefaults(defineProps<{
   dismissible?: boolean;
   stackTrace?: string;
 }>(), {
+  message: undefined,
+  notification: undefined,
   variant: 'danger',
   dismissible: true,
+  stackTrace: undefined,
 });
 
 const emit = defineEmits<{

@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import * as subprocessoService from '../subprocessoService';
 import apiClient from '@/axios-setup';
-import * as apiErrorUtils from '@/utils/apiError';
 
 vi.mock('@/axios-setup', () => ({
   default: {
@@ -138,8 +137,8 @@ describe('subprocessoService', () => {
   });
 
   it('disponibilizarMapa', async () => {
-    await subprocessoService.disponibilizarMapa(1, { dataLimiteValidacao: '2025-01-01' });
-    expect(apiClient.post).toHaveBeenCalledWith('/subprocessos/1/disponibilizar-mapa', { dataLimiteValidacao: '2025-01-01' });
+    await subprocessoService.disponibilizarMapa(1, { dataLimite: '2025-01-01', observacoes: '' });
+    expect(apiClient.post).toHaveBeenCalledWith('/subprocessos/1/disponibilizar-mapa', { dataLimite: '2025-01-01', observacoes: '' });
   });
 
   it('adicionarCompetencia', async () => {

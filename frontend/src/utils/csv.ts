@@ -1,6 +1,6 @@
 import Papa from "papaparse";
 
-export type CSVData = Record<string, string | number | undefined>;
+export type CSVData = Record<string, string | number | undefined | null>;
 
 /**
  * Preprocesses value to mitigate CSV Injection (Formula Injection).
