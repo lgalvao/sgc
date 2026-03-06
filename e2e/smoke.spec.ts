@@ -351,6 +351,7 @@ test.describe('Smoke Test - Sistema SGC', () => {
 
             await page.getByTestId('btn-processo-iniciar').click();
             await page.getByTestId('btn-iniciar-processo-confirmar').click();
+            await expect(page).toHaveURL(/\/painel/);
 
             await fazerLogout(page);
             await login(page, USUARIOS.CHEFE_SECAO_212.titulo, USUARIOS.CHEFE_SECAO_212.senha);
@@ -412,7 +413,7 @@ test.describe('Smoke Test - Sistema SGC', () => {
     test.describe('05 - Mapa de Competências', () => {
         test('Captura fluxo de mapa de competências', async ({page}) => {
             const descricao = `Proc Mapa ${Date.now()}`;
-            const UNIDADE_ALVO = 'SECAO_121';
+            const UNIDADE_ALVO = 'ASSESSORIA_12';
 
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
@@ -421,7 +422,7 @@ test.describe('Smoke Test - Sistema SGC', () => {
                 tipo: 'MAPEAMENTO',
                 diasLimite: 30,
                 unidade: UNIDADE_ALVO,
-                expandir: ['SECRETARIA_1', 'COORD_12']
+                expandir: ['SECRETARIA_1']
             });
 
             const linhaProcesso = page.getByTestId('tbl-processos').locator('tr').filter({has: page.getByText(descricao)});
@@ -431,11 +432,12 @@ test.describe('Smoke Test - Sistema SGC', () => {
 
             await page.getByTestId('btn-processo-iniciar').click();
             await page.getByTestId('btn-iniciar-processo-confirmar').click();
+            await expect(page).toHaveURL(/\/painel/);
 
             await fazerLogout(page);
-            await login(page, USUARIOS.CHEFE_SECAO_121.titulo, USUARIOS.CHEFE_SECAO_121.senha);
+            await login(page, USUARIOS.CHEFE_ASSESSORIA_12.titulo, USUARIOS.CHEFE_ASSESSORIA_12.senha);
 
-            await acessarSubprocessoChefeDireto(page, descricao, 'SECAO_121');
+            await acessarSubprocessoChefeDireto(page, descricao, UNIDADE_ALVO);
             await navegarParaAtividades(page);
 
             await adicionarAtividade(page, 'Desenvolvimento Web');
@@ -452,28 +454,18 @@ test.describe('Smoke Test - Sistema SGC', () => {
             await page.getByTestId('btn-confirmar-disponibilizacao').click();
             await verificarPaginaPainel(page);
 
-            // 1. GESTOR COORD_12 - Primeiro Aceite
-            await fazerLogout(page);
-            await login(page, USUARIOS.GESTOR_COORD_12.titulo, USUARIOS.GESTOR_COORD_12.senha);
-
-            await acessarSubprocessoGestor(page, descricao, UNIDADE_ALVO);
-            await navegarParaAtividadesVisualizacao(page);
-            await page.getByTestId('btn-acao-analisar-principal').click();
-            await page.getByTestId('inp-aceite-cadastro-obs').fill('Cadastro muito bem detalhado. Seguindo para a Secretaria.');
-            await page.getByTestId('btn-aceite-cadastro-confirmar').click();
-            await verificarPaginaPainel(page);
-
-            // 2. GESTOR SECRETARIA_1 - Segundo Aceite
+            // 1. GESTOR SECRETARIA_1 - Aceite
             await fazerLogout(page);
             await loginComPerfil(page, USUARIOS.GESTOR_SECRETARIA_1.titulo, USUARIOS.GESTOR_SECRETARIA_1.senha, USUARIOS.GESTOR_SECRETARIA_1.perfil);
+
             await acessarSubprocessoGestor(page, descricao, UNIDADE_ALVO);
             await navegarParaAtividadesVisualizacao(page);
             await page.getByTestId('btn-acao-analisar-principal').click();
-            await page.getByTestId('inp-aceite-cadastro-obs').fill('Ok. Para homologação do ADMIN.');
+            await page.getByTestId('inp-aceite-cadastro-obs').fill('Cadastro muito bem detalhado. Seguindo para homologação.');
             await page.getByTestId('btn-aceite-cadastro-confirmar').click();
             await verificarPaginaPainel(page);
 
-            // 3. ADMIN - Homologação Final
+            // 2. ADMIN - Homologação Final
             await fazerLogout(page);
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
@@ -738,8 +730,9 @@ test.describe('Smoke Test - Sistema SGC', () => {
 
             const btnCriarAtribuicao = page.getByRole('button', {name: /Criar atribuição|Nova atribuição/i});
             await btnCriarAtribuicao.click();
-            await expect(page.getByRole('dialog')).toBeVisible();
-            await page.getByRole('button', {name: /Cancelar/i}).click();
+            await expect(page.getByRole('heading', {name: /Criar atribuição temporária/i})).toBeVisible();
+            await page.getByTestId('btn-cancelar-atribuicao').click();
+            await expect(btnCriarAtribuicao).toBeVisible();
         });
     });
 
@@ -752,7 +745,7 @@ test.describe('Smoke Test - Sistema SGC', () => {
             const linkHistorico = page.getByRole('link', {name: /Histórico/i});
             await expect(linkHistorico).toBeVisible();
             await linkHistorico.click();
-            await expect(page.locator('table')).toBeVisible();
+            await expect(page.getByTestId('tbl-processos')).toBeVisible();
         });
     });
 
