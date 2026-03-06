@@ -62,7 +62,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BButton, BTable} from "bootstrap-vue-next";
+import {BButton, BTable, useToast} from "bootstrap-vue-next";
 import {storeToRefs} from "pinia";
 import {computed, onActivated, onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
@@ -74,11 +74,14 @@ import TabelaProcessos from "@/components/processo/TabelaProcessos.vue";
 import {useAlertasStore} from "@/stores/alertas";
 import {usePerfilStore} from "@/stores/perfil";
 import {useProcessosStore} from "@/stores/processos";
+import {useToastStore} from "@/stores/toast";
 import type {Alerta, ProcessoResumo} from "@/types/tipos";
 
 const perfil = usePerfilStore();
 const processosStore = useProcessosStore();
 const alertasStore = useAlertasStore();
+const toastStore = useToastStore();
+const toast = useToast();
 
 const {processosPainel} = storeToRefs(processosStore);
 const {alertas} = storeToRefs(alertasStore);
@@ -115,6 +118,18 @@ async function carregarDados() {
 }
 
 onMounted(async () => {
+  const pendente = toastStore.consumePending();
+  if (pendente) {
+    toast.create({
+      props: {
+        body: pendente.body,
+        variant: 'success',
+        modelValue: 4000,
+        pos: 'bottom-end',
+        noProgress: true,
+      }
+    });
+  }
   await carregarDados();
 });
 

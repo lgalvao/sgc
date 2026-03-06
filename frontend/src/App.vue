@@ -1,8 +1,7 @@
 <script lang="ts" setup>
-import {computed, ref, watch} from "vue";
+import {computed} from "vue";
 import {useRoute} from "vue-router";
-import {BOrchestrator, useToast} from "bootstrap-vue-next";
-import {useFeedbackStore} from "@/stores/feedback";
+import {BOrchestrator} from "bootstrap-vue-next";
 import pkg from "../package.json";
 import BarraNavegacao from "./components/layout/BarraNavegacao.vue";
 import MainNavbar from "./components/layout/MainNavbar.vue";
@@ -14,41 +13,12 @@ interface PackageJson {
 }
 
 const route = useRoute();
-const feedbackStore = useFeedbackStore();
-const toast = useToast();
-
-feedbackStore.init(toast);
-
-const hideExtrasOnce = ref(false);
-
-function refreshHideFlag() {
-  let came = false;
-  try {
-    came = sessionStorage.getItem("cameFromNavbar") === "1";
-  } catch {
-    // ignore
-  }
-  hideExtrasOnce.value = came;
-  if (came) {
-    try {
-      sessionStorage.removeItem("cameFromNavbar");
-    } catch {
-      // ignore
-    }
-  }
-}
-
-watch(
-    () => route.fullPath,
-    () => refreshHideFlag(),
-    {immediate: true},
-);
 const version = (pkg as PackageJson).version;
 
 const shouldShowNavBarExtras = computed(() => {
   if (route.path === "/login") return false;
   if (route.path === "/painel") return false;
-  return !hideExtrasOnce.value;
+  return true;
 });
 </script>
 

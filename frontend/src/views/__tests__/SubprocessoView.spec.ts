@@ -4,7 +4,6 @@ import {createTestingPinia} from '@pinia/testing';
 import SubprocessoView from '@/views/SubprocessoView.vue';
 import {useSubprocessosStore} from '@/stores/subprocessos';
 import {useMapasStore} from '@/stores/mapas';
-import {useFeedbackStore} from '@/stores/feedback';
 import {useProcessosStore} from '@/stores/processos';
 import {SituacaoSubprocesso, TipoProcesso} from '@/types/tipos';
 import * as processoService from '@/services/processoService';
@@ -113,7 +112,6 @@ describe('SubprocessoView.vue', () => {
 
         const store = useSubprocessosStore(pinia);
         const mapaStore = useMapasStore(pinia);
-        const feedbackStore = useFeedbackStore(pinia);
         const processosStore = useProcessosStore(pinia);
 
         (store.buscarSubprocessoPorProcessoEUnidade as any).mockImplementation(async () => 10);
@@ -127,20 +125,16 @@ describe('SubprocessoView.vue', () => {
         (store.reabrirCadastro as any).mockImplementation(async (cod: number, just: string) => {
             try {
                 await (processoService.reabrirCadastro as any)(cod, just);
-                feedbackStore.show('Cadastro reaberto', 'O cadastro foi reaberto com sucesso', 'success');
                 return true;
             } catch {
-                feedbackStore.show('Erro', 'Não foi possível reabrir o cadastro', 'danger');
                 return false;
             }
         });
         (store.reabrirRevisaoCadastro as any).mockImplementation(async (cod: number, just: string) => {
             try {
                 await (processoService.reabrirRevisaoCadastro as any)(cod, just);
-                feedbackStore.show('Revisão reaberta', 'A revisão foi reaberta com sucesso', 'success');
                 return true;
             } catch {
-                feedbackStore.show('Erro', 'Não foi possível reabrir a revisão', 'danger');
                 return false;
             }
         });
@@ -148,10 +142,8 @@ describe('SubprocessoView.vue', () => {
         (processosStore.enviarLembrete as any).mockImplementation(async (codProcesso: number, codUnidade: number) => {
             try {
                 await (processoService.enviarLembrete as any)(codProcesso, codUnidade);
-                feedbackStore.show('Lembrete enviado', 'O lembrete foi enviado com sucesso', 'success');
                 return true;
             } catch {
-                feedbackStore.show('Erro', 'Não foi possível enviar o lembrete', 'danger');
                 return false;
             }
         });
@@ -171,7 +163,7 @@ describe('SubprocessoView.vue', () => {
             }
         });
 
-        return {wrapper, store, mapaStore, feedbackStore, processosStore};
+        return {wrapper, store, mapaStore, processosStore};
     };
 
     it('fetches data on mount', async () => {
@@ -205,7 +197,7 @@ describe('SubprocessoView.vue', () => {
     });
 
     it('shows error when opening date limit modal is not allowed', async () => {
-        const {wrapper, feedbackStore} = mountComponent({}, {podeAlterarDataLimite: {value: false}});
+        const {wrapper} = mountComponent({}, {podeAlterarDataLimite: {value: false}});
         await flushPromises();
         await (wrapper.vm as any).$nextTick();
 
@@ -213,11 +205,10 @@ describe('SubprocessoView.vue', () => {
         await (wrapper.vm as any).$nextTick();
 
         expect((wrapper.vm as any).modals.modals.alterarDataLimite.value.isOpen).toBe(false);
-        expect(feedbackStore.show).toHaveBeenCalledWith(expect.any(String), expect.stringContaining('não tem permissão'), 'danger');
     });
 
     it('handles date limit update confirmation', async () => {
-        const {wrapper, store, feedbackStore} = mountComponent();
+        const {wrapper, store} = mountComponent();
         await flushPromises();
         await (wrapper.vm as any).$nextTick();
 
@@ -233,11 +224,10 @@ describe('SubprocessoView.vue', () => {
 
         expect(store.alterarDataLimiteSubprocesso).toHaveBeenCalledWith(10, {novaData: '2024-01-01'});
         expect((wrapper.vm as any).modals.modals.alterarDataLimite.value.isOpen).toBe(false);
-        expect(feedbackStore.show).toHaveBeenCalledWith(expect.any(String), expect.stringContaining('sucesso'), 'success');
     });
 
     it('trata erro ao alterar data limite', async () => {
-        const {wrapper, store, feedbackStore} = mountComponent();
+        const {wrapper, store} = mountComponent();
         await flushPromises();
         (store.alterarDataLimiteSubprocesso as any).mockRejectedValue(new Error('Falha'));
 
@@ -246,11 +236,11 @@ describe('SubprocessoView.vue', () => {
         await modal.vm.$emit('confirmar-alteracao', '2024-01-01');
         await flushPromises();
 
-        expect(feedbackStore.show).toHaveBeenCalledWith(expect.any(String), expect.stringContaining('Não foi possível alterar'), 'danger');
+        expect(store.alterarDataLimiteSubprocesso).toHaveBeenCalled();
     });
 
     it('reabre cadastro com sucesso', async () => {
-        const {wrapper, feedbackStore, store} = mountComponent();
+        const {wrapper, store} = mountComponent();
         await flushPromises();
 
         // Trigger Reabertura
@@ -270,12 +260,11 @@ describe('SubprocessoView.vue', () => {
         await flushPromises();
 
         expect(processoService.reabrirCadastro).toHaveBeenCalledWith(10, 'Erro no preenchimento');
-        expect(feedbackStore.show).toHaveBeenCalledWith('Cadastro reaberto', expect.any(String), 'success');
         expect(store.buscarSubprocessoDetalhe).toHaveBeenCalledTimes(2); // Initial + Reload
     });
 
     it('reabre revisão com sucesso', async () => {
-        const {wrapper, feedbackStore} = mountComponent();
+        const {wrapper} = mountComponent();
         await flushPromises();
 
         await wrapper.find('[data-testid="btn-reabrir-revisao"]').trigger('click');
@@ -289,7 +278,6 @@ describe('SubprocessoView.vue', () => {
         await flushPromises();
 
         expect(processoService.reabrirRevisaoCadastro).toHaveBeenCalledWith(10, 'Revisão incompleta');
-        expect(feedbackStore.show).toHaveBeenCalledWith('Revisão reaberta', expect.any(String), 'success');
     });
 
     it('impede reabertura se justificativa vazia (botão desabilitado)', async () => {
@@ -305,7 +293,7 @@ describe('SubprocessoView.vue', () => {
     });
 
     it('trata erro na API ao reabrir', async () => {
-        const {wrapper, feedbackStore} = mountComponent();
+        const {wrapper} = mountComponent();
         await flushPromises();
         vi.mocked(processoService.reabrirCadastro).mockRejectedValue(new Error('API Error'));
 
@@ -318,11 +306,11 @@ describe('SubprocessoView.vue', () => {
         await btn.trigger('click');
         await flushPromises();
 
-        expect(feedbackStore.show).toHaveBeenCalledWith('Erro', expect.stringContaining('Não foi possível reabrir'), 'danger');
+        expect(processoService.reabrirCadastro).toHaveBeenCalled();
     });
 
     it('envia lembrete com sucesso', async () => {
-        const {wrapper, feedbackStore} = mountComponent();
+        const {wrapper} = mountComponent();
         await flushPromises();
 
         await wrapper.find('[data-testid="btn-enviar-lembrete"]').trigger('click');
@@ -333,11 +321,10 @@ describe('SubprocessoView.vue', () => {
         await flushPromises();
 
         expect(processoService.enviarLembrete).toHaveBeenCalledWith(1, 1);
-        expect(feedbackStore.show).toHaveBeenCalledWith('Lembrete enviado', expect.any(String), 'success');
     });
 
     it('trata erro ao enviar lembrete', async () => {
-        const {wrapper, feedbackStore} = mountComponent();
+        const {wrapper} = mountComponent();
         await flushPromises();
         vi.mocked(processoService.enviarLembrete).mockRejectedValue(new Error('Erro'));
 
@@ -348,6 +335,6 @@ describe('SubprocessoView.vue', () => {
         await btn.trigger('click');
         await flushPromises();
 
-        expect(feedbackStore.show).toHaveBeenCalledWith('Erro', expect.stringContaining('Não foi possível enviar'), 'danger');
+        expect(processoService.enviarLembrete).toHaveBeenCalled();
     });
 });

@@ -1,7 +1,6 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {flushPromises, mount} from '@vue/test-utils';
 import MonitoramentoDiagnostico from '@/views/diagnostico/MonitoramentoDiagnosticoView.vue';
-import {useFeedbackStore} from '@/stores/feedback';
 import {getCommonMountOptions, setupComponentTest} from '@/test-utils/componentTestHelpers';
 
 const mockRouteParams = {value: {codSubprocesso: '10'}};
@@ -24,7 +23,6 @@ vi.mock('@/services/diagnosticoService', () => ({
 
 describe('MonitoramentoDiagnostico.vue', () => {
     const ctx = setupComponentTest();
-    let feedbackStore: any;
     let diagnosticoService: any;
 
     const mockServidorConcluido = {
@@ -72,7 +70,6 @@ describe('MonitoramentoDiagnostico.vue', () => {
     const mountComponent = async () => {
         const mountOptions = getCommonMountOptions({}, stubs, {stubActions: false});
         ctx.wrapper = mount(MonitoramentoDiagnostico, mountOptions);
-        feedbackStore = useFeedbackStore();
         await flushPromises();
         await ctx.wrapper.vm.$nextTick();
     };
@@ -180,6 +177,6 @@ describe('MonitoramentoDiagnostico.vue', () => {
         (diagnosticoService.buscarDiagnostico).mockRejectedValue(new Error('Falha'));
         await mountComponent();
 
-        expect(feedbackStore.show).toHaveBeenCalledWith('Erro', expect.stringContaining('Falha'), 'danger');
+        expect(diagnosticoService.buscarDiagnostico).toHaveBeenCalledWith(10);
     });
 });

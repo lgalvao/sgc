@@ -1,7 +1,6 @@
 import axios from "axios";
 import type {Router} from "vue-router";
-import {useFeedbackStore} from "@/stores/feedback";
-import {normalizeError, notifyError, shouldNotifyGlobally} from '@/utils/apiError';
+import {normalizeError, shouldNotifyGlobally} from '@/utils/apiError';
 import {logger} from "@/utils";
 
 let routerInstance: Router | null = null;
@@ -21,30 +20,20 @@ export const apiClient = axios.create({
 });
 
 const handleResponseError = (error: any) => {
-    const feedbackStore = useFeedbackStore();
     const normalized = normalizeError(error);
 
     // Caso especial: 401 - redirecionar para login
     if (normalized.kind === 'unauthorized') {
         const currentPath = routerInstance?.currentRoute?.value?.path;
         if (currentPath !== '/login') {
-            feedbackStore.show(
-                'Não Autorizado',
-                'Sua sessão expirou ou você não está autenticado. Faça login novamente.',
-                'danger'
-            );
             routerInstance?.push('/login').catch(e => logger.error("Erro ao redirecionar:", e));
         }
         return Promise.reject(error);
     }
 
-    // Decidir se mostra toast global baseado no kind
+    // Loga globalmente erros de rede e inesperados para diagnóstico
     if (shouldNotifyGlobally(normalized)) {
-        try {
-            notifyError(normalized);
-        } catch (storeError) {
-            logger.error("Erro ao exibir notificação:", storeError);
-        }
+        logger.error("[axios] Erro global:", normalized.message, normalized.stackTrace || '');
     }
 
     // Sempre rejeitar para permitir tratamento local

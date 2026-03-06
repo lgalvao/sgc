@@ -1,6 +1,13 @@
 <template>
   <LayoutPadrao>
     <PageHeader title="Criar atribuição temporária"/>
+    <AppAlert
+        v-if="notificacao"
+        :dismissible="notificacao.dismissible ?? true"
+        :message="notificacao.message"
+        :variant="notificacao.variant"
+        @dismissed="clear()"
+    />
     <BCard class="mb-4 mt-4">
       <BCardBody>
         <h5 class="card-title mb-3">
@@ -118,7 +125,8 @@ import {logger} from "@/utils";
 import type {Unidade, Usuario} from "@/types/tipos";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import LoadingButton from "@/components/comum/LoadingButton.vue";
-import {useFeedbackStore} from "@/stores/feedback";
+import AppAlert from "@/components/comum/AppAlert.vue";
+import {useNotification} from "@/composables/useNotification";
 import {useUnidadesStore} from "@/stores/unidades";
 import {useUsuariosStore} from "@/stores/usuarios";
 import {useAtribuicaoTemporariaStore} from "@/stores/atribuicoes";
@@ -127,7 +135,7 @@ import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 const props = defineProps<{ codUnidade: number }>();
 
 const router = useRouter();
-const feedbackStore = useFeedbackStore();
+const {notificacao, notify, clear} = useNotification();
 const unidadesStore = useUnidadesStore();
 const usuariosStore = useUsuariosStore();
 const atribuicoesStore = useAtribuicaoTemporariaStore();
@@ -161,11 +169,11 @@ async function criarAtribuicao() {
   if (!unidadeAtual) throw new Error('Invariante violada: unidade não carregada');
   if (!usuarioSelecionado.value) {
     erroUsuario.value = "Selecione um usuário para criar a atribuição.";
-    feedbackStore.show('Erro', 'Selecione um usuário para criar a atribuição.', 'danger');
+    notify('Selecione um usuário para criar a atribuição.', 'danger');
     return;
   }
   if (!dataInicio.value || !dataTermino.value || !justificativa.value.trim()) {
-    feedbackStore.show('Erro', 'Preencha data de início, data de término e justificativa.', 'danger');
+    notify('Preencha data de início, data de término e justificativa.', 'danger');
     return;
   }
   erroUsuario.value = "";
@@ -180,7 +188,7 @@ async function criarAtribuicao() {
       justificativa: justificativa.value
     });
 
-    feedbackStore.show('Sucesso', 'Atribuição criada com sucesso!', 'success');
+    notify('Atribuição criada com sucesso!', 'success');
 
     usuarioSelecionado.value = null;
     dataInicio.value = "";
@@ -188,7 +196,7 @@ async function criarAtribuicao() {
     justificativa.value = "";
   } catch (error) {
     logger.error(error);
-    feedbackStore.show('Erro', 'Falha ao criar atribuição. Tente novamente.', 'danger');
+    notify('Falha ao criar atribuição. Tente novamente.', 'danger');
   } finally {
     isLoading.value = false;
   }

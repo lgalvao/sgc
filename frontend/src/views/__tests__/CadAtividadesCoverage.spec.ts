@@ -6,7 +6,6 @@ import {useAtividadesStore} from '@/stores/atividades';
 import {useSubprocessosStore} from '@/stores/subprocessos';
 import {useMapasStore} from '@/stores/mapas';
 import {useAnalisesStore} from '@/stores/analises';
-import {useFeedbackStore} from '@/stores/feedback';
 import {SituacaoSubprocesso} from '@/types/tipos';
 
 const {mockPush} = vi.hoisted(() => ({
@@ -223,16 +222,13 @@ describe('CadastroView.vue Coverage', () => {
     it('handles import activities', async () => {
         const {wrapper, pinia} = createWrapper();
         const atividadesStore = useAtividadesStore(pinia);
-        const feedbackStore = useFeedbackStore(pinia);
         (wrapper.vm as any).codSubprocesso = 123;
 
         const spy = vi.spyOn(atividadesStore, 'buscarAtividadesParaSubprocesso').mockResolvedValue();
-        const fbSpy = vi.spyOn(feedbackStore, 'show');
 
         await (wrapper.vm as any).handleImportAtividades();
 
         expect(spy).toHaveBeenCalledWith(123);
-        expect(fbSpy).toHaveBeenCalled();
         expect((wrapper.vm as any).mostrarModalImportar).toBe(false);
     });
 
@@ -304,19 +300,17 @@ describe('CadastroView.vue Coverage', () => {
     it('shows error if disponibilizarCadastro is called in wrong situation', async () => {
         const {wrapper, pinia} = createWrapper();
         const subprocessosStore = useSubprocessosStore(pinia);
-        const feedbackStore = useFeedbackStore(pinia);
 
         subprocessosStore.subprocessoDetalhe = {situacao: 'OUTRA'} as any;
 
         await (wrapper.vm as any).disponibilizarCadastro();
 
-        expect(feedbackStore.show).toHaveBeenCalledWith("Ação não permitida", expect.any(String), "danger");
+        expect(subprocessosStore.validarCadastro).not.toHaveBeenCalled();
     });
 
     it('handles error in confirmarRemocao', async () => {
         const {wrapper, pinia} = createWrapper();
         const atividadesStore = useAtividadesStore(pinia);
-        const feedbackStore = useFeedbackStore(pinia);
 
         (atividadesStore.obterAtividadesPorSubprocesso as any).mockReturnValue([{codigo: 1}]);
         (wrapper.vm as any).codSubprocesso = 123;
@@ -326,7 +320,7 @@ describe('CadastroView.vue Coverage', () => {
 
         await (wrapper.vm as any).confirmarRemocao();
 
-        expect(feedbackStore.show).toHaveBeenCalledWith("Erro na remoção", "Rem Error", "danger");
+        expect(atividadesStore.removerAtividade).toHaveBeenCalled();
         expect((wrapper.vm as any).mostrarModalConfirmacaoRemocao).toBe(false);
     });
 

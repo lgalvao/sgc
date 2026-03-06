@@ -1,8 +1,10 @@
 <template>
   <LayoutPadrao>
-    <ErrorAlert
-        :error="processosStore.lastError"
-        @dismiss="processosStore.clearError()"/>
+    <AppAlert
+        v-if="processosStore.lastError"
+        :message="processosStore.lastError.message"
+        variant="danger"
+        @dismissed="processosStore.clearError()"/>
 
     <div v-if="processo">
       <PageHeader
@@ -112,12 +114,13 @@ import ModalAcaoBloco from "@/components/processo/ModalAcaoBloco.vue";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
-import ErrorAlert from "@/components/comum/ErrorAlert.vue";
+import AppAlert from "@/components/comum/AppAlert.vue";
 import ProcessoInfo from "@/components/processo/ProcessoInfo.vue";
 import ProcessoSubprocessosTable from "@/components/processo/ProcessoSubprocessosTable.vue";
 import {useProcessosStore} from "@/stores/processos";
 import {usePerfilStore} from "@/stores/perfil";
-import {useFeedbackStore} from "@/stores/feedback";
+import {useNotification} from "@/composables/useNotification";
+import {useToastStore} from "@/stores/toast";
 import {SituacaoProcesso, SituacaoSubprocesso} from "@/types/tipos";
 import {formatSituacaoSubprocesso} from "@/utils/formatters";
 import {logger} from "@/utils";
@@ -137,7 +140,8 @@ const route = useRoute();
 const router = useRouter();
 const processosStore = useProcessosStore();
 const perfilStore = usePerfilStore();
-const feedbackStore = useFeedbackStore();
+const {notify, clear} = useNotification();
+const toastStore = useToastStore();
 const codProcesso = Number(route.params.codProcesso || route.query.codProcesso);
 const modalBlocoRef = ref<any>(null);
 const mostrarModalFinalizacao = ref(false);
@@ -289,11 +293,11 @@ function finalizarProcesso() {
 async function confirmarFinalizacao() {
   try {
     await processosStore.finalizarProcesso(codProcesso);
-    feedbackStore.show("Sucesso", "Processo finalizado com sucesso", "success");
+    toastStore.setPending("Processo finalizado com sucesso.");
     await router.push("/painel");
   } catch (error: any) {
     const mensagem = processosStore.lastError?.message || error.message || "Ocorreu um erro";
-    feedbackStore.show("Erro ao finalizar", mensagem, "danger");
+    notify(mensagem, 'danger');
   }
 }
 
@@ -307,12 +311,13 @@ async function executarAcaoBloco(dados: { ids: number[], dataLimite?: string }) 
     modalBlocoRef.value?.setProcessando(true);
     await processosStore.executarAcaoBloco(acaoBlocoAtual.value, dados.ids, dados.dataLimite);
 
-    feedbackStore.show("Sucesso", mensagemSucessoAcaoBloco.value, "success");
     modalBlocoRef.value?.fechar();
     if (acaoBlocoAtual.value === "aceitar" || acaoBlocoAtual.value === "disponibilizar") {
+      toastStore.setPending(mensagemSucessoAcaoBloco.value);
       await router.push("/painel");
       return;
     }
+    notify(mensagemSucessoAcaoBloco.value, 'success');
     await processosStore.buscarContextoCompleto(codProcesso);
   } catch (error: any) {
     modalBlocoRef.value?.setErro(error.message || "Erro ao executar ação em bloco");

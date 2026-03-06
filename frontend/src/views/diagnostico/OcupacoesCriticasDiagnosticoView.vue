@@ -72,7 +72,7 @@ import {BAlert, BButton, BFormSelect, BSpinner} from 'bootstrap-vue-next';
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import PageHeader from '@/components/layout/PageHeader.vue';
 import {useUnidadesStore} from '@/stores/unidades';
-import {useFeedbackStore} from '@/stores/feedback';
+import {useNotification} from '@/composables/useNotification';
 import {
   type AvaliacaoServidorDto,
   type DiagnosticoDto,
@@ -91,7 +91,7 @@ const OPCOES_SITUACAO = [
 
 const route = useRoute();
 const unidadesStore = useUnidadesStore();
-const feedbackStore = useFeedbackStore();
+const {notify} = useNotification();
 
 const loading = ref(true);
 const codSubprocesso = computed(() => Number(route.params.codSubprocesso));
@@ -131,7 +131,7 @@ onMounted(async () => {
         .filter(s => s.gaps.length > 0);
 
   } catch (error) {
-    feedbackStore.show('Erro', 'Erro ao carregar ocupações críticas: ' + error, 'danger');
+    notify('Erro ao carregar ocupações críticas: ' + error, 'danger');
   } finally {
     loading.value = false;
   }
@@ -168,7 +168,7 @@ async function salvar(servidorTitulo: string, competenciaCodigo: number, situaca
 
     if (gap) gap.salvo = true;
   } catch (error) {
-    feedbackStore.show('Erro', 'Erro ao salvar ocupação: ' + error, 'danger');
+    notify('Erro ao salvar ocupação: ' + error, 'danger');
   }
 }
 </script>

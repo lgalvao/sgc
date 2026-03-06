@@ -3,35 +3,15 @@
     <PageHeader title="Cadastro de processo"/>
 
     <BForm class="mt-4 col-md-6 col-sm-8 col-12">
-      <BAlert
-          :fade="false"
-          :model-value="alertState.show"
-          :variant="alertState.variant"
-          class="mb-3"
-          dismissible
-          @update:model-value="(val) => val === false && (alertState.show = false)"
-      >
-        <h4 v-if="alertState.title" class="alert-heading">{{ alertState.title }}</h4>
-        <p v-if="alertState.body" class="mb-0">{{ alertState.body }}</p>
-        <ul v-if="alertState.errors && alertState.errors.length > 0" class="mt-2 mb-0">
-          <li v-for="(error, index) in alertState.errors" :key="index">{{ error }}</li>
-        </ul>
-        <div v-if="alertState.stackTrace" class="mt-3">
-          <BButton
-              class="text-muted p-0 border-0 d-block mb-1 text-decoration-none"
-              size="sm"
-              variant="link"
-              @click="showStack = !showStack"
-          >
-            <small>{{ showStack ? 'Ocultar detalhes técnicos' : 'Mostrar detalhes técnicos' }}</small>
-          </BButton>
-          <pre
-              v-if="showStack"
-              class="bg-dark text-light p-2 rounded small overflow-auto"
-              style="max-height: 200px; font-size: 0.75rem;"
-          >{{ alertState.stackTrace }}</pre>
-        </div>
-      </BAlert>
+      <AppAlert
+          v-if="notificacao"
+          :dismissible="notificacao.dismissible ?? true"
+          :message="notificacao.message"
+          :notification="notificacao.notification"
+          :stack-trace="notificacao.stackTrace"
+          :variant="notificacao.variant"
+          @dismissed="clear()"
+      />
 
       <ProcessoFormFields
           ref="formFieldsRef"
@@ -124,7 +104,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BButton, BForm} from "bootstrap-vue-next";
+import {BButton, BForm} from "bootstrap-vue-next";
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import {computed, nextTick, onMounted, ref, watch} from "vue";
 import {useRoute, useRouter} from "vue-router";
@@ -132,12 +112,14 @@ import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import LoadingButton from "@/components/comum/LoadingButton.vue";
 import ProcessoFormFields from "@/components/processo/ProcessoFormFields.vue";
+import AppAlert from "@/components/comum/AppAlert.vue";
 import {logger} from "@/utils";
 import {useProcessoForm} from "@/composables/useProcessoForm";
+import {useNotification} from "@/composables/useNotification";
 
 import {useProcessosStore} from "@/stores/processos";
 import {useUnidadesStore} from "@/stores/unidades";
-import {useFeedbackStore} from "@/stores/feedback";
+import {useToastStore} from "@/stores/toast";
 import {Processo as ProcessoModel, TipoProcesso} from "@/types/tipos";
 
 const {
@@ -174,46 +156,16 @@ const formData = computed({
 const formFieldsRef = ref<InstanceType<typeof ProcessoFormFields> | null>(null);
 
 const isLoading = ref(false);
-const showStack = ref(false);
 const router = useRouter();
 const route = useRoute();
 const processosStore = useProcessosStore();
 const unidadesStore = useUnidadesStore();
-const feedbackStore = useFeedbackStore();
+const toastStore = useToastStore();
+const {notificacao, notify, notifyStructured, clear} = useNotification();
 
 const mostrarModalConfirmacao = ref(false);
 const mostrarModalRemocao = ref(false);
 const processoEditando = ref<ProcessoModel | null>(null);
-
-interface AlertState {
-  show: boolean;
-  variant: 'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'info' | 'light' | 'dark';
-  title: string;
-  body: string;
-  errors?: string[];
-  stackTrace?: string;
-}
-
-const alertState = ref<AlertState>({
-  show: false,
-  variant: 'info',
-  title: '',
-  body: '',
-  errors: [],
-  stackTrace: ''
-});
-
-function mostrarAlerta(variant: AlertState['variant'], title: string, body: string, errors: string[] = [], stackTrace: string = '') {
-  alertState.value = {
-    show: true,
-    variant,
-    title,
-    body,
-    errors,
-    stackTrace
-  };
-  window.scrollTo(0, 0);
-}
 
 const isLoadingData = ref(false);
 
@@ -225,7 +177,7 @@ onMounted(async () => {
       await processosStore.buscarProcessoDetalhe(Number(codProcesso));
       const processo = processosStore.processoDetalhe;
       if (processo) {
-        // Redirect if process is not in CRIADO state (cannot be edited)
+        // Redireciona se o processo não está em situação CRIADO (não pode ser editado)
         if (processo.situacao !== 'CRIADO') {
           await router.push(`/processo/${processo.codigo}`);
           return;
@@ -243,7 +195,7 @@ onMounted(async () => {
         await nextTick();
       }
     } catch (error) {
-      mostrarAlerta('danger', "Erro ao carregar processo", "Não foi possível carregar os detalhes do processo.");
+      notify("Não foi possível carregar os detalhes do processo.", 'danger');
       logger.error("Erro ao carregar processo:", error);
     } finally {
       isLoadingData.value = false;
@@ -271,7 +223,7 @@ watch(tipo, async (novoTipo) => {
 
 function handleApiErrors(error: any, title: string, defaultMsg: string) {
   clearErrors();
-  alertState.value.show = false;
+  clear();
 
   const lastError = processosStore.lastError;
 
@@ -283,9 +235,14 @@ function handleApiErrors(error: any, title: string, defaultMsg: string) {
     const genericErrors = lastError.subErrors?.filter(e => !e.field).map(e => e.message || '') || [];
 
     if (!hasFieldErrors || genericErrors.length > 0) {
-      mostrarAlerta('danger', title, lastError.message || defaultMsg, genericErrors as string[], lastError.stackTrace);
+      notifyStructured(
+          lastError.message || defaultMsg,
+          genericErrors as string[],
+          'danger',
+          lastError.stackTrace || undefined,
+      );
+      window.scrollTo(0, 0);
     } else if (hasFieldErrors) {
-      // Focus on first invalid field
       nextTick(() => {
         const firstInvalid = document.querySelector('.is-invalid') as HTMLElement;
         if (firstInvalid) {
@@ -294,7 +251,7 @@ function handleApiErrors(error: any, title: string, defaultMsg: string) {
       });
     }
   } else {
-    mostrarAlerta('danger', title, defaultMsg, [], (error as any)?.stack || '');
+    notify(defaultMsg, 'danger');
     logger.error(title + ":", error);
   }
   logger.error(title + ":", error);
@@ -312,12 +269,12 @@ async function salvarProcesso() {
           processoEditando.value.codigo,
           request,
       );
-      feedbackStore.show("Processo alterado", "O processo foi alterado com sucesso.", "success");
+      toastStore.setPending("O processo foi alterado com sucesso.");
       await router.push("/painel");
     } else {
       const request = construirCriarRequest();
       await processosStore.criarProcesso(request);
-      feedbackStore.show("Processo criado", "O processo foi criado com sucesso.", "success");
+      toastStore.setPending("O processo foi criado com sucesso.");
       await router.push("/painel");
     }
     limparCampos();
@@ -358,7 +315,7 @@ async function confirmarIniciarProcesso() {
         unidadesSelecionadas.value,
     );
 
-    feedbackStore.show("Processo iniciado", "O processo foi iniciado com sucesso.", "success");
+    toastStore.setPending("O processo foi iniciado com sucesso.");
     await router.push("/painel");
     mostrarModalConfirmacao.value = false;
   } catch (error) {
@@ -384,7 +341,7 @@ async function confirmarRemocao() {
     const descRemovida = processoEditando.value.descricao;
     try {
       await processosStore.removerProcesso(processoEditando.value.codigo);
-      feedbackStore.show("Processo removido", `Processo ${descRemovida} removido`, "success");
+      toastStore.setPending(`Processo ${descRemovida} removido com sucesso.`);
       await router.push("/painel");
       if (!processoEditando.value) {
         limparCampos();

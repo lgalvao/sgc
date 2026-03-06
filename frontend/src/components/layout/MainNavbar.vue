@@ -8,16 +8,16 @@
 
     <BCollapse id="nav-collapse" is-nav>
       <BNavbarNav class="me-auto">
-        <BNavItem to="/painel" @click="setNavbarNavigation">
+        <BNavItem to="/painel">
           <i aria-hidden="true" class="bi bi-house-door me-1"/> Painel
         </BNavItem>
-        <BNavItem :to="linkUnidade" @click="setNavbarNavigation">
+        <BNavItem :to="linkUnidade">
           <i :class="iconUnidade" aria-hidden="true"/> {{ labelUnidade }}
         </BNavItem>
-        <BNavItem to="/relatorios" @click="setNavbarNavigation">
+        <BNavItem to="/relatorios">
           <i aria-hidden="true" class="bi bi-bar-chart-line me-1"/> Relatórios
         </BNavItem>
-        <BNavItem to="/historico" @click="setNavbarNavigation">
+        <BNavItem to="/historico">
           <i aria-hidden="true" class="bi bi-clock-history me-1"/> Histórico
         </BNavItem>
       </BNavbarNav>
@@ -46,7 +46,6 @@
             data-testid="btn-parametros"
             title="Parâmetros do sistema"
             to="/parametros"
-            @click="setNavbarNavigation"
         >
           <i aria-hidden="true" class="bi bi-sliders me-lg-0 me-1"/>
           <span class="d-lg-none">Parâmetros</span>
@@ -59,7 +58,6 @@
             data-testid="btn-administradores"
             title="Administradores do sistema"
             to="/administradores"
-            @click="setNavbarNavigation"
         >
           <i aria-hidden="true" class="bi bi-people me-lg-0 me-1"/>
           <span class="d-lg-none">Administradores</span>
@@ -108,18 +106,10 @@ const labelUnidade = computed(() => isAdmin.value ? 'Unidades' : 'Minha unidade'
 const iconUnidade = computed(() => isAdmin.value ? 'bi bi-diagram-3 me-1' : 'bi bi-person me-1');
 const linkUnidade = computed(() => isAdmin.value ? '/unidades' : `/unidade/${perfilStore.unidadeSelecionada}`);
 
-function setNavbarNavigation() {
-  sessionStorage.setItem("cameFromNavbar", "1");
-}
-
 function handleLogout() {
   perfilStore.logout();
   router.push("/login");
 }
-
-defineExpose({
-  setNavbarNavigation,
-});
 </script>
 
 <style scoped>
