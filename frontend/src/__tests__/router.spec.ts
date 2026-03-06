@@ -36,12 +36,6 @@ vi.mock("../views/DiagnosticoEquipe.vue", () => ({
 vi.mock("../views/OcupacoesCriticas.vue", () => ({
     default: {template: "<div>OcupacoesCriticas</div>"},
 }));
-vi.mock("../views/AutoavaliacaoDiagnosticoView.vue", () => ({
-    default: {template: "<div>AutoavaliacaoDiagnostico</div>"},
-}));
-vi.mock("../views/OcupacoesCriticasDiagnosticoView.vue", () => ({
-    default: {template: "<div>OcupacoesCriticasDiagnostico</div>"},
-}));
 vi.mock("../views/Unidade.vue", () => ({
     default: {template: "<div>Unidade</div>"},
 }));

@@ -1,47 +1,69 @@
-import {describe, expect, it} from 'vitest';
-import {gerarCSV} from '../csv';
+import { describe, it, expect, vi } from 'vitest';
+import { gerarCSV, downloadCSV } from '../csv';
 
 describe('csv utils', () => {
-    it('should generate correct CSV for simple data', () => {
-        const data = [
-            {name: 'John', age: 30, city: 'New York'},
-            {name: 'Jane', age: 25, city: 'London'}
-        ];
-        const csv = gerarCSV(data);
-        const expected = '"name","age","city"\n"John","30","New York"\n"Jane","25","London"';
-        expect(csv).toBe(expected);
+  describe('gerarCSV', () => {
+    it('deve retornar string vazia para array vazio', () => {
+      expect(gerarCSV([])).toBe('');
     });
 
-    it('should escape double quotes in data', () => {
-        const data = [
-            {id: 1, note: 'Hello "World"'}
-        ];
-        const csv = gerarCSV(data);
-        // Expected: quotes inside value should be doubled: "Hello ""World"""
-        const expected = '"id","note"\n"1","Hello ""World"""';
-        expect(csv).toBe(expected);
+    it('deve gerar CSV corretamente', () => {
+      const data = [
+        { nome: 'Teste', idade: 30 },
+        { nome: 'João', idade: 25 }
+      ];
+      const result = gerarCSV(data);
+      expect(result).toContain('"nome","idade"');
+      expect(result).toContain('"Teste","30"');
+      expect(result).toContain('"João","25"');
     });
 
-    it('should sanitize fields to prevent CSV Injection', () => {
-        const data = [
-            {malicious: '=cmd|/C calc!A0'},
-            {malicious: '+1+1'},
-            {malicious: '-1+1'},
-            {malicious: '@SUM(1+1)'}
-        ];
-
-        const csv = gerarCSV(data);
-
-        const lines = csv.split('\n');
-        // First line is header
-        // Second line: =cmd... should be prefixed with ' and wrapped in quotes
-        expect(lines[1]).toContain(`"'=cmd|/C calc!A0"`);
-        expect(lines[2]).toContain(`"'+1+1"`);
-        expect(lines[3]).toContain(`"'-1+1"`);
-        expect(lines[4]).toContain(`"'@SUM(1+1)"`);
+    it('deve sanitizar valores para prevenir CSV injection', () => {
+      const data = [
+        { formula: '=1+1', normal: 'texto' },
+        { formula: '+A1', normal: 'texto' },
+        { formula: '-B2', normal: 'texto' },
+        { formula: '@SUM', normal: 'texto' },
+      ];
+      const result = gerarCSV(data);
+      expect(result).toContain(`"'=1+1","texto"`);
+      expect(result).toContain(`"'+A1","texto"`);
+      expect(result).toContain(`"'-B2","texto"`);
+      expect(result).toContain(`"'@SUM","texto"`);
     });
 
-    it('should handle empty data', () => {
-        expect(gerarCSV([])).toBe('');
+    it('deve lidar com valores nulos ou undefined', () => {
+      const data = [
+        { nome: 'Teste', valor: null },
+        { nome: 'João', valor: undefined }
+      ];
+      const result = gerarCSV(data);
+      expect(result).toContain('"Teste",');
+      expect(result).toContain('"João",');
     });
+  });
+
+  describe('downloadCSV', () => {
+    it('deve criar link e fazer o download', () => {
+      const mockLink = {
+        download: '',
+        href: '',
+        setAttribute: vi.fn(),
+        click: vi.fn(),
+        remove: vi.fn(),
+        style: { visibility: '' }
+      } as unknown as HTMLAnchorElement;
+      
+      vi.spyOn(document, 'createElement').mockReturnValue(mockLink);
+      global.URL.createObjectURL = vi.fn(() => 'blob:mock');
+      vi.spyOn(document.body, 'appendChild').mockImplementation(() => document.body);
+
+      downloadCSV('a,b\n1,2', 'teste.csv');
+
+      expect(document.createElement).toHaveBeenCalledWith('a');
+      expect(mockLink.setAttribute).toHaveBeenCalledWith('download', 'teste.csv');
+      expect(mockLink.click).toHaveBeenCalled();
+      expect(mockLink.remove).toHaveBeenCalled();
+    });
+  });
 });

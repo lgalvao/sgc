@@ -37,6 +37,10 @@ Os testes que falharem geram arquivos `error-context.md`, com a situacao da tela
 - **Fixtures devem reduzir custo estrutural, não esconder comportamento**: Use fixture para pular preparo repetitivo. A ação que está sendo validada no teste deve continuar sendo exercitada pela UI.
 - **Fixtures devem retornar o código do processo**: Isso permite navegar direto para `/processo/{codigo}` ou `/processo/{codigo}/{sigla}` sem depender da listagem do painel.
 - **Quando a listagem não é o alvo do teste, não dependa dela**: Em cenários preparados por fixture, navegar diretamente pela URL do subprocesso é mais estável e mais rápido do que localizar a linha da tabela.
+- **Processo de revisão exige mapa vigente real da unidade**: Para fixtures de revisão/diagnóstico, não basta colocar o subprocesso em uma situação avançada. Se a regra de negócio exigir `mapa vigente`, a preparação precisa materializar esse estado da mesma forma que a aplicação faz em produção.
+- **`MAPA_HOMOLOGADO` não equivale automaticamente a mapa vigente**: Em mapeamento, o mapa só passa a ser vigente de forma confiável após a finalização do processo anterior. Se a validação da revisão falhar com erro de `unidade sem mapa vigente`, investigue o estado de `unidade_mapa`, não timing.
+- **Quando o estado alvo é terminal, prefira endpoint dedicado**: Se o objetivo do teste é validar uma ação final, como reabertura ou permissão liberada apenas após homologação final, crie uma fixture específica para esse estado em vez de encadear vários passos de UI num `serial`.
+- **Toda nova fixture E2E deve nascer com teste de backend**: Ao adicionar endpoint de fixture, cubra-o em teste integrado do backend antes de confiar nele na suíte Playwright. Isso reduz depuração cruzada entre backend e E2E.
 
 ## Helpers Disponíveis
 
@@ -187,6 +191,8 @@ Se um teste espera que um botão esteja visível/habilitado mas ele não está, 
 - `btnReabrirCadastro` só deve ser esperado quando a situação já passou de homologação do mapa.
 - Em testes de relatórios, valide o botão de exportação dentro do dialog correto.
 - Em testes de gestão de unidades, expanda toda a hierarquia necessária antes de esperar a unidade filha.
+- Se o fluxo de revisão precisa apenas chegar ao ponto de `podeReabrirRevisao`, a preparação ideal é fixture em `REVISAO_MAPA_HOMOLOGADO`, não workflow completo por UI.
+- Quando um teste serial estoura o timeout e o erro final aparece em `page.goto('/login')`, suspeite primeiro de orçamento gasto no preparo anterior, e não de problema no login.
 
 ## Testes que revelam bugs no frontend
 

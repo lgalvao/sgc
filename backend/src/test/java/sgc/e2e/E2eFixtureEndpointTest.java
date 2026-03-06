@@ -161,4 +161,28 @@ class E2eFixtureEndpointTest {
                 .andExpect(jsonPath("$.tipo").value("MAPEAMENTO"))
                 .andExpect(jsonPath("$.situacao").value(SituacaoProcesso.EM_ANDAMENTO.name()));
     }
+
+    @Test
+    @DisplayName("Deve permitir criar processo de revisão com mapa homologado via fixture")
+    void devePermitirCriarProcessoRevisaoComMapaHomologadoViaFixture() throws Exception {
+        E2eController.ProcessoFixtureRequest processoMapeamento =
+                new E2eController.ProcessoFixtureRequest(
+                        "Processo Base Mapa Vigente", "ASSESSORIA_12", true, 30);
+        E2eController.ProcessoFixtureRequest processoRevisao =
+                new E2eController.ProcessoFixtureRequest(
+                        "Processo Fixture Revisão Homologada", "ASSESSORIA_12", true, 30);
+
+        mockMvc.perform(post("/e2e/fixtures/processo-finalizado-com-atividades")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(processoMapeamento)))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(post("/e2e/fixtures/processo-revisao-com-mapa-homologado")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(processoRevisao)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.descricao").value("Processo Fixture Revisão Homologada"))
+                .andExpect(jsonPath("$.tipo").value("REVISAO"))
+                .andExpect(jsonPath("$.situacao").value(SituacaoProcesso.EM_ANDAMENTO.name()));
+    }
 }

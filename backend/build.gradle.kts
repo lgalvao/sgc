@@ -21,6 +21,12 @@ extra["mapstruct.version"] = "1.6.3"
 extra["lombok.version"] = "1.18.42"
 extra["jjwt.version"] = "0.13.0"
 
+dependencyManagement {
+    imports {
+        mavenBom("com.fasterxml.jackson:jackson-bom:2.21.1")
+    }
+}
+
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-aspectj")
@@ -63,9 +69,7 @@ dependencies {
     testImplementation("org.apache.groovy:groovy-all:5.0.4")
     testImplementation("com.icegreen:greenmail-junit5:2.1.3")
     testImplementation("org.pitest:pitest-junit5-plugin:1.2.3")
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.2") {
-        exclude(group = "com.fasterxml.jackson.core", module = "jackson-core")
-    }
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.2")
     testImplementation("io.swagger.parser.v3:swagger-parser:2.1.37")
     implementation("org.mozilla:rhino:1.9.0")
     testImplementation("com.atlassian.oai:swagger-request-validator-mockmvc:2.46.0")

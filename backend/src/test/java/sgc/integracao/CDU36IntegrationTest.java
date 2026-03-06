@@ -22,7 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 @DisplayName("CDU-36: Gerar relatório de mapas")
 class CDU36IntegrationTest extends BaseIntegrationTest {
-    private static final String API_REL_MAPAS = "/api/relatorios/mapas/{codProcesso}";
+    private static final String API_REL_MAPAS = "/api/relatorios/mapas/{codProcesso}/exportar";
 
     @Autowired
     private EntityManager entityManager;

@@ -22,7 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 @DisplayName("CDU-35: Gerar relatório de andamento")
 class CDU35IntegrationTest extends BaseIntegrationTest {
-    private static final String API_REL_ANDAMENTO = "/api/relatorios/andamento/{codProcesso}";
+    private static final String API_REL_ANDAMENTO = "/api/relatorios/andamento/{codProcesso}/exportar";
 
     @MockitoBean
     private ResponsavelUnidadeService responsavelService;

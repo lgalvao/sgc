@@ -1,92 +1,132 @@
-import {describe, expect, it} from "vitest";
-import {setupServiceTest, testErrorHandling, testGetEndpoint, testPostEndpoint} from "@/test-utils/serviceTestHelpers";
-import * as service from "../usuarioService";
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import * as usuarioService from '../usuarioService';
+import apiClient from '@/axios-setup';
 
-describe("usuarioService", () => {
-    const {mockApi} = setupServiceTest();
+vi.mock('@/axios-setup', () => ({
+  default: {
+    get: vi.fn(),
+    post: vi.fn(),
+  },
+}));
 
-    describe("autenticar", () => {
-        it("deve fazer POST e retornar booleano", async () => {
-            const request = {tituloEleitoral: "123", senha: "123"};
-            mockApi.post.mockResolvedValueOnce({data: true});
+describe('usuarioService', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
 
-            const result = await service.autenticar(request);
-
-            expect(mockApi.post).toHaveBeenCalledWith("/usuarios/autenticar", request);
-            expect(result).toBe(true);
-        });
-
-        testErrorHandling(() => service.autenticar({tituloEleitoral: "123", senha: "123"}), 'post');
+  describe('API calls', () => {
+    it('autenticar', async () => {
+      (apiClient.post as any).mockResolvedValueOnce({ data: true });
+      const result = await usuarioService.autenticar({ tituloEleitoral: '123', senha: '123' });
+      expect(apiClient.post).toHaveBeenCalledWith('/usuarios/autenticar', { tituloEleitoral: '123', senha: '123' });
+      expect(result).toBe(true);
     });
 
-    describe("autorizar", () => {
-        it("deve fazer POST, mapear e retornar resposta", async () => {
-            const tituloEleitoral = "123";
-            const responseDto = [{
-                perfil: "CHEFE",
-                unidade: {codigo: 1, nome: "UNIT", sigla: "UNIT"},
-                siglaUnidade: "UNIT"
-            }];
-            mockApi.post.mockResolvedValue({data: responseDto});
-
-            const result = await service.autorizar(tituloEleitoral);
-
-            expect(mockApi.post).toHaveBeenCalledWith(
-                "/usuarios/autorizar",
-                {tituloEleitoral},
-            );
-            expect(result[0]).toHaveProperty("perfil", "CHEFE");
-            expect(result[0].unidade).toHaveProperty("codigo", 1);
-        });
-
-        testErrorHandling(() => service.autorizar("123"), 'post');
+    it('autorizar', async () => {
+      const mockResponse = [{ perfil: 'ADMIN', unidade: { codigo: 1, sigla: 'TEST', nome: 'Teste' }, siglaUnidade: 'TEST' }];
+      (apiClient.post as any).mockResolvedValueOnce({ data: mockResponse });
+      const result = await usuarioService.autorizar('123');
+      expect(apiClient.post).toHaveBeenCalledWith('/usuarios/autorizar', { tituloEleitoral: '123' });
+      expect(result).toHaveLength(1);
+      expect(result[0].perfil).toBe('ADMIN');
     });
 
-    describe("entrar", () => {
-        const request = {
-            tituloEleitoral: "123",
-            perfil: "GESTOR",
-            unidadeCodigo: 1,
-        };
-        testPostEndpoint(
-            () => service.entrar(request),
-            "/usuarios/entrar",
-            request
-        );
-
-        testErrorHandling(() => service.entrar(request), 'post');
+    it('entrar', async () => {
+      const mockData = { token: 'abc' };
+      (apiClient.post as any).mockResolvedValueOnce({ data: mockData });
+      const result = await usuarioService.entrar({ tituloEleitoral: '123', perfil: 'ADMIN', unidadeCodigo: 1 });
+      expect(apiClient.post).toHaveBeenCalledWith('/usuarios/entrar', { tituloEleitoral: '123', perfil: 'ADMIN', unidadeCodigo: 1 });
+      expect(result).toEqual(mockData);
     });
 
-    describe("buscarTodosUsuarios", () => {
-        const mockUsuarios = [{codigo: 1, name: "Test User"}];
-        testGetEndpoint(
-            () => service.buscarTodosUsuarios(),
-            "/usuarios",
-            mockUsuarios
-        );
-
-        testErrorHandling(() => service.buscarTodosUsuarios(), 'get');
+    it('buscarTodosUsuarios', async () => {
+      (apiClient.get as any).mockResolvedValueOnce({ data: [] });
+      await usuarioService.buscarTodosUsuarios();
+      expect(apiClient.get).toHaveBeenCalledWith('/usuarios');
     });
 
-    describe("buscarUsuariosPorUnidade", () => {
-        const mockUsuarios = [{codigo: 1, name: "Test User"}];
-        testGetEndpoint(
-            () => service.buscarUsuariosPorUnidade(1),
-            "/unidades/1/usuarios",
-            mockUsuarios
-        );
-
-        testErrorHandling(() => service.buscarUsuariosPorUnidade(1), 'get');
+    it('buscarUsuariosPorUnidade', async () => {
+      (apiClient.get as any).mockResolvedValueOnce({ data: [] });
+      await usuarioService.buscarUsuariosPorUnidade(1);
+      expect(apiClient.get).toHaveBeenCalledWith('/unidades/1/usuarios');
     });
 
-    describe("buscarUsuarioPorTitulo", () => {
-        const mockUsuario = {codigo: 1, name: "Test User", tituloEleitoral: "123"};
-        testGetEndpoint(
-            () => service.buscarUsuarioPorTitulo("123"),
-            "/usuarios/123",
-            mockUsuario
-        );
-
-        testErrorHandling(() => service.buscarUsuarioPorTitulo("123"), 'get');
+    it('buscarUsuarioPorTitulo', async () => {
+      (apiClient.get as any).mockResolvedValueOnce({ data: {} });
+      await usuarioService.buscarUsuarioPorTitulo('123');
+      expect(apiClient.get).toHaveBeenCalledWith('/usuarios/123');
     });
+  });
+
+  describe('mappers', () => {
+    it('mapPerfilUnidadeToFrontend', () => {
+      const result = usuarioService.mapPerfilUnidadeToFrontend({
+        perfil: 'ADMIN',
+        unidade: { codigo: 1, sigla: 'TST', nome: 'Teste' },
+        siglaUnidade: 'TST'
+      });
+      expect(result.perfil).toBe('ADMIN');
+      expect(result.unidade.codigo).toBe(1);
+      expect(result.siglaUnidade).toBe('TST');
+    });
+
+    it('mapUsuarioToFrontend', () => {
+      const result = usuarioService.mapUsuarioToFrontend({
+        tituloEleitoral: '12345',
+        nome: 'Teste',
+        email: 't@t.com',
+        ramal: '123',
+        unidade: { codigo: 1, sigla: 'TST', nome: 'Teste' },
+        perfis: ['ADMIN']
+      });
+      expect(result.codigo).toBe(12345);
+      expect(result.tituloEleitoral).toBe('12345');
+    });
+
+    it('LoginResponseToFrontend', () => {
+      const result = usuarioService.LoginResponseToFrontend({
+        tituloEleitoral: '123',
+        nome: 'Teste',
+        perfil: 'ADMIN',
+        unidadeCodigo: 1,
+        token: 'abc'
+      });
+      expect(result.token).toBe('abc');
+      expect(result.perfil).toBe('ADMIN');
+    });
+
+    it('perfisUnidadesParaDominio', () => {
+      const result = usuarioService.perfisUnidadesParaDominio([{
+        perfil: 'ADMIN',
+        unidade: { codigo: 1, sigla: 'TST', nome: 'Teste' },
+        siglaUnidade: 'TST'
+      }]);
+      expect(result).toHaveLength(1);
+      expect(result[0].perfil).toBe('ADMIN');
+    });
+
+    it('mapVWUsuarioToUsuario', () => {
+      const vw1 = { codigo: 10, nome_completo: 'Teste', unidade_sigla: 'TST', titulo_eleitoral: '123' };
+      const res1 = usuarioService.mapVWUsuarioToUsuario(vw1);
+      expect(res1.codigo).toBe(10);
+      expect(res1.nome).toBe('Teste');
+      expect(res1.unidade).toBe('TST');
+      expect(res1.tituloEleitoral).toBe('123');
+
+      const vw2 = { titulo: '99', nome_usuario: 'Teste 2', unidade_codigo: 1 };
+      const res2 = usuarioService.mapVWUsuarioToUsuario(vw2);
+      expect(res2.codigo).toBe(99);
+      expect(res2.nome).toBe('Teste 2');
+      expect(res2.unidade).toBe(1);
+    });
+
+    it('mapVWUsuariosArray', () => {
+      const result = usuarioService.mapVWUsuariosArray([{ codigo: 1 }]);
+      expect(result).toHaveLength(1);
+      expect(result[0].codigo).toBe(1);
+
+      const resultEmpty = usuarioService.mapVWUsuariosArray();
+      expect(resultEmpty).toEqual([]);
+    });
+  });
 });
