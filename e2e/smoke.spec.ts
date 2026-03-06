@@ -1,6 +1,6 @@
 import {expect, test} from './fixtures/base.js';
 import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
-import {criarProcesso, extrairProcessoId} from './helpers/helpers-processos.js';
+import {criarProcesso, extrairProcessoId, iniciarProcessoPeloCadastro} from './helpers/helpers-processos.js';
 import {fazerLogout, navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 import {
     adicionarAtividade,
@@ -173,10 +173,10 @@ test.describe('Smoke Test - Sistema SGC', () => {
             if (processoId > 0) cleanup.registrar(processoId);
 
             // Modal de iniciar processo
-            await page.getByTestId('btn-processo-iniciar').click();
-            await expect(page.getByRole('dialog')).toBeVisible();
-            await page.getByTestId('btn-iniciar-processo-confirmar').click();
-            await expect(page).toHaveURL(/\/painel/);
+            await iniciarProcessoPeloCadastro(page, {
+                descricao,
+                tipo: 'MAPEAMENTO'
+            });
 
             // --- Fluxo para habilitar botão Finalizar ---
 
@@ -295,9 +295,10 @@ test.describe('Smoke Test - Sistema SGC', () => {
             const processoId = await extrairProcessoId(page);
             if (processoId > 0) cleanup.registrar(processoId);
 
-            await page.getByTestId('btn-processo-iniciar').click();
-            await page.getByTestId('btn-iniciar-processo-confirmar').click();
-            await expect(page).toHaveURL(/\/painel/);
+            await iniciarProcessoPeloCadastro(page, {
+                descricao,
+                tipo: 'MAPEAMENTO'
+            });
 
             // Logout e login como Chefe
             await fazerLogout(page);
@@ -349,9 +350,10 @@ test.describe('Smoke Test - Sistema SGC', () => {
             const processoId = await extrairProcessoId(page);
             if (processoId > 0) cleanup.registrar(processoId);
 
-            await page.getByTestId('btn-processo-iniciar').click();
-            await page.getByTestId('btn-iniciar-processo-confirmar').click();
-            await expect(page).toHaveURL(/\/painel/);
+            await iniciarProcessoPeloCadastro(page, {
+                descricao,
+                tipo: 'MAPEAMENTO'
+            });
 
             await fazerLogout(page);
             await login(page, USUARIOS.CHEFE_SECAO_212.titulo, USUARIOS.CHEFE_SECAO_212.senha);
@@ -430,9 +432,10 @@ test.describe('Smoke Test - Sistema SGC', () => {
             const processoId = await extrairProcessoId(page);
             if (processoId > 0) cleanup.registrar(processoId);
 
-            await page.getByTestId('btn-processo-iniciar').click();
-            await page.getByTestId('btn-iniciar-processo-confirmar').click();
-            await expect(page).toHaveURL(/\/painel/);
+            await iniciarProcessoPeloCadastro(page, {
+                descricao,
+                tipo: 'MAPEAMENTO'
+            });
 
             await fazerLogout(page);
             await login(page, USUARIOS.CHEFE_ASSESSORIA_12.titulo, USUARIOS.CHEFE_ASSESSORIA_12.senha);

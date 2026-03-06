@@ -279,6 +279,17 @@ public class E2eController {
         return criarProcessoMapeamentoComMapaNaSituacao(request, "MAPEAMENTO_MAPA_VALIDADO");
     }
 
+    /**
+     * Cria um processo de mapeamento já iniciado, com mapa preenchido e homologado,
+     * para acelerar cenários E2E que começam na finalização do processo.
+     */
+    @PostMapping("/fixtures/processo-mapeamento-com-mapa-homologado")
+    @Transactional
+    @JsonView(ProcessoViews.Publica.class)
+    public Processo criarProcessoMapeamentoComMapaHomologado(@RequestBody ProcessoFixtureRequest request) {
+        return criarProcessoMapeamentoComMapaNaSituacao(request, "MAPEAMENTO_MAPA_HOMOLOGADO");
+    }
+
     private Processo criarProcessoMapeamentoComMapaNaSituacao(ProcessoFixtureRequest request, String situacaoSubprocesso) {
         ProcessoFixtureRequest requestIniciado = new ProcessoFixtureRequest(
                 request.descricao(), request.unidadeSigla(), true, request.diasLimite());

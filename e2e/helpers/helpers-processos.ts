@@ -1,5 +1,13 @@
 import {expect, type Page} from '@playwright/test';
 
+const ROTULOS_TIPO_PROCESSO = {
+    MAPEAMENTO: 'Mapeamento',
+    REVISAO: 'Revisão',
+    DIAGNOSTICO: 'Diagnóstico'
+} as const;
+
+type TipoProcesso = keyof typeof ROTULOS_TIPO_PROCESSO;
+
 /**
  * Calcula uma data limite N dias no futuro
  */
@@ -14,7 +22,7 @@ export function calcularDataLimite(dias: number): string {
  */
 export async function criarProcesso(page: Page, options: {
     descricao: string;
-    tipo: 'MAPEAMENTO' | 'REVISAO' | 'DIAGNOSTICO';
+    tipo: TipoProcesso;
     diasLimite: number;
     unidade: string | string[];
     expandir?: string[];
@@ -46,13 +54,14 @@ export async function criarProcesso(page: Page, options: {
     }
 
     if (options.iniciar) {
-        await page.getByTestId('btn-processo-iniciar').click();
-        await page.getByTestId('btn-iniciar-processo-confirmar').click();
+        await iniciarProcessoPeloCadastro(page, {
+            descricao: options.descricao,
+            tipo: options.tipo
+        });
     } else {
         await page.getByTestId('btn-processo-salvar').click();
+        await expect(page).toHaveURL(/\/painel(?:\?|$)/);
     }
-
-    await page.waitForURL('/painel');
 }
 
 /**
@@ -76,6 +85,46 @@ export async function verificarProcessoNaTabela(page: Page, options: {
             await expect(linhaProcesso.getByText(unidade)).toBeVisible();
         }
     }
+}
+
+export async function aguardarProcessoNoPainel(page: Page, options: {
+    descricao: string;
+    situacao: string;
+    tipo: TipoProcesso;
+    unidadesParticipantes?: string[];
+}): Promise<void> {
+    await expect(page).toHaveURL(/\/painel(?:\?|$)/);
+    await verificarProcessoNaTabela(page, {
+        descricao: options.descricao,
+        situacao: options.situacao,
+        tipo: ROTULOS_TIPO_PROCESSO[options.tipo],
+        unidadesParticipantes: options.unidadesParticipantes
+    });
+}
+
+export async function iniciarProcessoPeloCadastro(page: Page, options: {
+    descricao: string;
+    tipo: TipoProcesso;
+    unidadesParticipantes?: string[];
+}): Promise<void> {
+    await page.getByTestId('btn-processo-iniciar').click();
+    await confirmarInicioProcessoPeloDialogo(page, options);
+}
+
+export async function confirmarInicioProcessoPeloDialogo(page: Page, options: {
+    descricao: string;
+    tipo: TipoProcesso;
+    unidadesParticipantes?: string[];
+}): Promise<void> {
+    const dialog = page.getByRole('dialog');
+    await expect(dialog).toBeVisible();
+    await dialog.getByTestId('btn-iniciar-processo-confirmar').click();
+    await aguardarProcessoNoPainel(page, {
+        descricao: options.descricao,
+        situacao: 'Em andamento',
+        tipo: options.tipo,
+        unidadesParticipantes: options.unidadesParticipantes
+    });
 }
 
 export interface UnidadeParticipante {

@@ -1,10 +1,8 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {login, USUARIOS} from './helpers/helpers-auth.js';
-import {criarProcesso, extrairProcessoId} from './helpers/helpers-processos.js';
 import * as AtividadeHelpers from './helpers/helpers-atividades.js';
 import {fazerLogout} from './helpers/helpers-navegacao.js';
-import {acessarSubprocessoChefeDireto} from './helpers/helpers-analise.js';
-import {criarProcessoFinalizadoFixture} from "./fixtures/fixtures-processos.js";
+import {criarProcessoFinalizadoFixture, criarProcessoFixture} from './fixtures/fixtures-processos.js';
 
 test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
     const UNIDADE_ALVO = 'ASSESSORIA_11';
@@ -21,6 +19,7 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
         const descricaoProcesso = `Processo CDU-08 Map ${timestamp}`;
         const processoOrigemDescricao = `Processo Base FINALIZADO ${timestamp}`;
         let processoOrigemId: number;
+        let processoAlvoId: number;
 
         await test.step('1. Setup: Criar Processo Origem e Mapeamento Alvo', async () => {
             
@@ -32,27 +31,22 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
             processoOrigemId = procOrigem.codigo;
             cleanupAutomatico.registrar(processoOrigemId);
 
-            // Criar Processo Alvo
-            await criarProcesso(page, {
-                descricao: descricaoProcesso,
-                tipo: 'MAPEAMENTO',
-                diasLimite: 30,
+            const processoAlvo = await criarProcessoFixture(request, {
                 unidade: UNIDADE_ALVO,
-                expandir: ['SECRETARIA_1'],
-                iniciar: true
+                descricao: descricaoProcesso,
+                iniciar: true,
+                diasLimite: 30
             });
-
-            await page.getByTestId('tbl-processos').getByText(descricaoProcesso).first().click();
-            await expect(page).toHaveURL(/\/processo\/\d+/);
-            const processoId = await extrairProcessoId(page);
-            if (processoId > 0) cleanupAutomatico.registrar(processoId);
+            processoAlvoId = processoAlvo.codigo;
+            cleanupAutomatico.registrar(processoAlvoId);
 
             await fazerLogout(page);
         });
 
         await test.step('2. Acessar tela de Atividades', async () => {
             await login(page, CHEFE_UNIDADE, SENHA_CHEFE);
-            await acessarSubprocessoChefeDireto(page, descricaoProcesso, UNIDADE_ALVO);
+            await page.goto(`/processo/${processoAlvoId}/${UNIDADE_ALVO}`);
+            await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processoAlvoId}/${UNIDADE_ALVO}$`));
             await AtividadeHelpers.navegarParaAtividades(page);
         });
 
@@ -106,28 +100,30 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
         });
     });
 
-    test('Cenário 2: Processo de Revisão (Botão Impacto)', async ({page, autenticadoComoAdmin}) => {
+    test('Cenário 2: Processo de Revisão (Botão Impacto)', async ({page, request, cleanupAutomatico}) => {
         const timestamp = Date.now();
         const descricao = `Processo CDU-08 Rev ${timestamp}`;
         const UNIDADE_REVISAO = 'ASSESSORIA_12';
         const CHEFE_REVISAO = USUARIOS.CHEFE_ASSESSORIA_12.titulo;
         const SENHA_REVISAO = USUARIOS.CHEFE_ASSESSORIA_12.senha;
+        let processoRevisaoId: number;
 
         await test.step('Setup: Criar Processo de Revisão', async () => {
-            await criarProcesso(page, {
+            const processoRevisao = await criarProcessoFixture(request, {
+                unidade: UNIDADE_REVISAO,
                 descricao,
                 tipo: 'REVISAO',
-                diasLimite: 30,
-                unidade: UNIDADE_REVISAO,
-                expandir: ['SECRETARIA_1'],
-                iniciar: true
+                iniciar: true,
+                diasLimite: 30
             });
-            await fazerLogout(page);
+            processoRevisaoId = processoRevisao.codigo;
+            cleanupAutomatico.registrar(processoRevisaoId);
         });
 
         await test.step('Verificar Botão Impacto', async () => {
             await login(page, CHEFE_REVISAO, SENHA_REVISAO);
-            await acessarSubprocessoChefeDireto(page, descricao, UNIDADE_REVISAO);
+            await page.goto(`/processo/${processoRevisaoId}/${UNIDADE_REVISAO}`);
+            await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processoRevisaoId}/${UNIDADE_REVISAO}$`));
             await AtividadeHelpers.navegarParaAtividades(page);
 
             await AtividadeHelpers.adicionarAtividade(page, 'Atividade Trigger');

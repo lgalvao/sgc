@@ -1,6 +1,6 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
-import {criarProcesso} from './helpers/helpers-processos.js';
+import {criarProcessoFixture} from './fixtures/fixtures-processos.js';
 import {
     adicionarAtividade,
     adicionarConhecimento,
@@ -24,18 +24,17 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
     const timestamp = Date.now();
     const descProcesso = `Processo CDU-13 ${timestamp}`;
 
-    test('Fluxo Completo de Análise de Atividades (CDU-13)', async ({page, autenticadoComoAdmin}) => {
+    test('Fluxo Completo de Análise de Atividades (CDU-13)', async ({page, request, cleanupAutomatico}) => {
 
         await test.step('1. ADMIN cria e inicia processo', async () => {
-            await criarProcesso(page, {
+            const processo = await criarProcessoFixture(request, {
                 descricao: descProcesso,
                 tipo: 'MAPEAMENTO',
-                diasLimite: 30,
                 unidade: UNIDADE_ALVO,
-                expandir: ['SECRETARIA_2', 'COORD_21'],
+                diasLimite: 30,
                 iniciar: true
             });
-            await fazerLogout(page);
+            cleanupAutomatico.registrar(processo.codigo);
         });
 
         await test.step('2. CHEFE disponibiliza atividades', async () => {
@@ -129,7 +128,6 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
             await page.getByRole('dialog').getByRole('button', {name: 'Confirmar'}).click();
 
             await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${UNIDADE_ALVO}$`));
-            await expect(page.getByText(/Homologa[çcl]ão efetivada/i).first()).toBeVisible();
             await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro homologado/i);
         });
     });

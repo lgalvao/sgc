@@ -1,5 +1,18 @@
 import {expect, type Page} from '@playwright/test';
-import {limparNotificacoes} from './helpers-navegacao.js';
+import {
+    limparNotificacoes,
+    verificarPaginaPainel,
+    verificarToast
+} from './helpers-navegacao.js';
+
+function extrairRotaSubprocesso(page: Page): { codigoProcesso: string; siglaUnidade: string } {
+    const match = /\/processo\/(\d+)\/([A-Z0-9_]+)/.exec(page.url());
+    expect(match).not.toBeNull();
+    return {
+        codigoProcesso: match![1],
+        siglaUnidade: match![2]
+    };
+}
 
 export async function navegarParaAtividades(page: Page) {
     const card = page.getByTestId('card-subprocesso-atividades');
@@ -12,9 +25,9 @@ export async function navegarParaAtividades(page: Page) {
 }
 
 export async function navegarParaAtividadesVisualizacao(page: Page) {
-    const card = page.getByTestId('card-subprocesso-atividades-vis');
-    await expect(card).toBeVisible();
-    await card.click();
+    const {codigoProcesso, siglaUnidade} = extrairRotaSubprocesso(page);
+    await page.goto(`/processo/${codigoProcesso}/${siglaUnidade}/vis-cadastro`);
+    await expect(page).toHaveURL(new RegExp(String.raw`/processo/${codigoProcesso}/${siglaUnidade}/vis-cadastro$`));
     await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos'})).toBeVisible();
 }
 
@@ -56,9 +69,11 @@ export async function editarAtividade(page: Page, descricaoAtual: string, novaDe
 export async function removerAtividade(page: Page, descricao: string) {
     const card = page.locator('.atividade-card', {has: page.getByText(descricao)});
     const row = card.locator('.atividade-hover-row');
+    const btnRemover = card.getByTestId('btn-remover-atividade');
 
     await row.hover();
-    await card.getByTestId('btn-remover-atividade').click({force: true});
+    await expect(btnRemover).toBeVisible();
+    await btnRemover.click();
 
     // Confirmar no modal
     await page.getByTestId('btn-modal-confirmacao-confirmar').click();
@@ -69,10 +84,11 @@ export async function removerAtividade(page: Page, descricao: string) {
 export async function editarConhecimento(page: Page, atividadeDescricao: string, conhecimentoAtual: string, novoConhecimento: string) {
     const card = page.locator('.atividade-card', {has: page.getByText(atividadeDescricao)});
     const linhaConhecimento = card.locator('.group-conhecimento', {hasText: conhecimentoAtual});
+    const btnEditar = linhaConhecimento.getByTestId('btn-editar-conhecimento');
 
     await linhaConhecimento.hover();
-    await expect(linhaConhecimento.getByTestId('btn-editar-conhecimento')).toBeVisible();
-    await linhaConhecimento.getByTestId('btn-editar-conhecimento').click({force: true});
+    await expect(btnEditar).toBeVisible();
+    await btnEditar.click();
 
     await card.getByTestId('inp-editar-conhecimento').fill(novoConhecimento);
     await card.getByTestId('btn-salvar-edicao-conhecimento').click();
@@ -83,9 +99,11 @@ export async function editarConhecimento(page: Page, atividadeDescricao: string,
 export async function removerConhecimento(page: Page, atividadeDescricao: string, conhecimento: string) {
     const card = page.locator('.atividade-card', {has: page.getByText(atividadeDescricao)});
     const linhaConhecimento = card.locator('.group-conhecimento', {hasText: conhecimento});
+    const btnRemover = linhaConhecimento.getByTestId('btn-remover-conhecimento');
 
     await linhaConhecimento.hover();
-    await linhaConhecimento.getByTestId('btn-remover-conhecimento').click({force: true});
+    await expect(btnRemover).toBeVisible();
+    await btnRemover.click();
 
     // Confirmar no modal
     await page.getByTestId('btn-modal-confirmacao-confirmar').click();
@@ -104,6 +122,8 @@ export async function disponibilizarCadastro(page: Page) {
     const btnConfirmar = page.getByTestId('btn-confirmar-disponibilizacao');
     await expect(btnConfirmar).toBeVisible();
     await btnConfirmar.click();
+    await verificarToast(page, /Disponibilizado com sucesso\./i);
+    await verificarPaginaPainel(page);
 }
 
 export async function verificarSituacaoSubprocesso(page: Page, situacao: string) {

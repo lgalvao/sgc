@@ -266,4 +266,22 @@ describe('SubprocessoCards.vue', () => {
         await card.trigger('keydown', {key: 'Enter'});
         expect(pushMock).not.toHaveBeenCalled();
     });
+
+    it('mantem cards de visualizacao habilitados quando o subprocesso esta finalizado', async () => {
+        const wrapper = mountComponent({
+            situacao: 'MAPEAMENTO_MAPA_HOMOLOGADO'
+        }, {
+            podeEditarMapa: false,
+            podeEditarCadastro: false,
+            podeVerPagina: true
+        });
+
+        const cardCadastro = wrapper.find('[data-testid="card-subprocesso-atividades-vis"]');
+        const cardMapa = wrapper.find('[data-testid="card-subprocesso-mapa-visualizacao"]');
+
+        expect(cardCadastro.attributes('aria-disabled')).toBe('false');
+        expect(cardCadastro.attributes('tabindex')).toBe('0');
+        expect(cardMapa.attributes('aria-disabled')).toBe('false');
+        expect(cardMapa.attributes('tabindex')).toBe('0');
+    });
 });

@@ -75,9 +75,6 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
             await navegarParaMapa(page);
             await expect(page.getByText(/Carregando/i)).toBeHidden();
 
-            // Garantir que atividades homologadas apareçam na lista de seleção (esperar componente estabilizar)
-            await page.waitForResponse(resp => resp.url().includes('/atividades-elegiveis') || resp.url().includes('/mapa'));
-
             await criarCompetencia(page, `Comp Map ${timestamp}`, [`Atividade Map ${timestamp}`]);
             await disponibilizarMapa(page, '2030-12-31');
             await fazerLogout(page);

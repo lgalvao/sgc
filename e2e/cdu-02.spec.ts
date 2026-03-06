@@ -5,6 +5,12 @@ import {criarProcesso, extrairProcessoId, verificarProcessoNaTabela} from './hel
 import type {Page} from '@playwright/test';
 import type {useProcessoCleanup} from './hooks/hooks-limpeza.js';
 
+async function registrarProcessoNoCleanup(page: Page, cleanupAutomatico: ReturnType<typeof useProcessoCleanup>) {
+    const processoId = await extrairProcessoId(page);
+    expect(processoId).toBeGreaterThan(0);
+    cleanupAutomatico.registrar(processoId);
+}
+
 test.describe('CDU-02 - Visualizar Painel', () => {
     test.describe('Como ADMIN', () => {
         test('Deve exibir estrutura básica do painel e testar ordenação', async ({page, autenticadoComoAdmin}: {
@@ -55,8 +61,7 @@ test.describe('CDU-02 - Visualizar Painel', () => {
             // Capturar ID do processo para cleanup
             await page.getByTestId('tbl-processos').getByText(descricaoProcesso).first().click();
             await expect(page).toHaveURL(/processo\/cadastro/);
-            const processoId = await extrairProcessoId(page);
-            if (processoId > 0) cleanupAutomatico.registrar(processoId);
+            await registrarProcessoNoCleanup(page, cleanupAutomatico);
             await page.goto('/painel');
 
             await verificarProcessoNaTabela(page, {
@@ -88,8 +93,7 @@ test.describe('CDU-02 - Visualizar Painel', () => {
             // Capturar ID do processo para cleanup
             await page.getByTestId('tbl-processos').getByText(descricaoProcesso).first().click();
             await expect(page).toHaveURL(/processo\/cadastro/);
-            const processoId = await extrairProcessoId(page);
-            if (processoId > 0) cleanupAutomatico.registrar(processoId);
+            await registrarProcessoNoCleanup(page, cleanupAutomatico);
             await page.goto('/painel');
 
             // Verifica que o processo está visível para ADMIN
@@ -159,8 +163,7 @@ test.describe('CDU-02 - Visualizar Painel', () => {
             // Capturar ID do processo para cleanup
             await page.getByTestId('tbl-processos').getByText(descricaoProcesso).first().click();
             await expect(page).toHaveURL(/processo\/cadastro/);
-            const processoId = await extrairProcessoId(page);
-            if (processoId > 0) cleanupAutomatico.registrar(processoId);
+            await registrarProcessoNoCleanup(page, cleanupAutomatico);
             await page.goto('/painel');
 
             // Verifica que o processo foi criado e aparece na tabela

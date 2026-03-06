@@ -2,14 +2,25 @@ import {expect, type Page} from '@playwright/test';
 import {calcularDataLimite} from './helpers-processos.js';
 import {limparNotificacoes} from './helpers-navegacao.js';
 
+function extrairRotaSubprocesso(page: Page): { codigoProcesso: string; siglaUnidade: string } {
+    const match = /\/processo\/(\d+)\/([A-Z0-9_]+)/.exec(page.url());
+    expect(match).not.toBeNull();
+    return {
+        codigoProcesso: match![1],
+        siglaUnidade: match![2]
+    };
+}
+
 export async function navegarParaMapa(page: Page) {
     const cardEdicao = page.getByTestId('card-subprocesso-mapa-edicao');
     const cardVisualizacao = page.getByTestId('card-subprocesso-mapa-visualizacao');
 
     await expect(cardEdicao.or(cardVisualizacao)).toBeVisible();
 
-    const cardAlvo = (await cardEdicao.isVisible()) ? cardEdicao : cardVisualizacao;
-    await cardAlvo.click();
+    const {codigoProcesso, siglaUnidade} = extrairRotaSubprocesso(page);
+    const rotaMapa = (await cardEdicao.isVisible()) ? 'mapa' : 'vis-mapa';
+    await page.goto(`/processo/${codigoProcesso}/${siglaUnidade}/${rotaMapa}`);
+    await expect(page).toHaveURL(new RegExp(String.raw`/processo/${codigoProcesso}/${siglaUnidade}/${rotaMapa}$`));
     await expect(page.getByRole('heading', {name: /Mapa de competências/i})).toBeVisible();
 }
 

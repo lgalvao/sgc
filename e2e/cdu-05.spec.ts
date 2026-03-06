@@ -100,9 +100,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await navegarParaAtividades(page);
         await disponibilizarCadastro(page);
 
-        // Validação: Mensagem de sucesso e redirecionamento para o painel
-        await expect(page.getByText(/Cadastro de atividades disponibilizado/i).first()).toBeVisible();
-        await verificarPaginaPainel(page);
+        // Validação: helper já confirma toast atual e redirecionamento para o painel
     });
 
     test('Fase 1.3b: GESTOR da SECRETARIA_2 registra aceite', async ({page}) => {

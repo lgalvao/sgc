@@ -107,8 +107,11 @@ export async function abrirHistoricoAnaliseVisualizacao(page: Page) {
  * Fecha modal de histórico de análise
  */
 export async function fecharHistoricoAnalise(page: Page) {
-    await page.getByRole('button', {name: 'Fechar'}).click({force: true});
-    await expect(page.locator('.modal-content').filter({hasText: 'Histórico de Análise'})).toBeHidden();
+    const modal = page.locator('.modal-content').filter({hasText: 'Histórico de Análise'});
+    const btnFechar = modal.getByRole('button', {name: 'Fechar'});
+    await expect(btnFechar).toBeVisible();
+    await btnFechar.click();
+    await expect(modal).toBeHidden();
 }
 
 // Funções de Devolução

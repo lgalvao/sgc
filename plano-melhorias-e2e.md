@@ -91,18 +91,19 @@ Em especial:
    - foi simplificado para `ASSESSORIA_12`, com apenas um gestor;
    - havia também corrida após `iniciar processo`, corrigida com espera explícita pelo retorno ao painel.
 
-### Falhas ainda em aberto no `smoke`
+### Situação atual do `smoke`
 
-Na última execução completa registrada em `/tmp/e2e-smoke-full-3.txt`, ainda há falhas nas seções:
+As falhas anteriores nas seções de painel GESTOR/CHEFE foram eliminadas.
 
-1. `02 - Painel Principal › Captura painel GESTOR`
-2. `02 - Painel Principal › Captura painel CHEFE`
+Correção aplicada:
 
-Diagnóstico provável:
+- o helper [e2e/helpers/helpers-processos.ts](/Users/leonardo/sgc/e2e/helpers/helpers-processos.ts) deixou de depender apenas de `waitForURL('/painel')`;
+- agora o fluxo de início espera uma pós-condição observável mais forte:
+  - retorno ao painel;
+  - presença da linha do processo;
+  - situação `Em andamento` na tabela.
 
-- ambos usam `criarProcesso(..., iniciar: true)` seguido de troca de usuário quase imediata;
-- o helper [e2e/helpers/helpers-processos.ts](/Users/leonardo/sgc/e2e/helpers/helpers-processos.ts) espera `waitForURL('/painel')`, mas isso não está garantindo, sozinho, que o fluxo de início do processo terminou de se estabilizar para o próximo usuário;
-- o efeito observado é o mesmo padrão de corrida já corrigido na seção 05.
+Também foi extraído um helper semântico para confirmar o modal de início quando a captura da tela do dialog ainda é necessária.
 
 ### Execuções relevantes já feitas
 
@@ -114,8 +115,15 @@ Diagnóstico provável:
   - verde.
 - `smoke` seção 05 isolada:
   - **1 passed (18.4s)** em `/tmp/e2e-smoke-mapa-2.txt`
-- `smoke` completo mais recente:
-  - ainda com falhas nas seções 02 (gestor e chefe) em `/tmp/e2e-smoke-full-3.txt`
+- `smoke` completo após reforço dos helpers:
+  - **18/18 verde** em `/tmp/e2e-smoke-continue.txt`
+- `captura-telas` completo após fixture homologada:
+  - **21/21 verde** em `/tmp/e2e-captura-continue-2.txt`
+- bloco `cdu-0*.spec.ts` após correções semânticas:
+  - **43 passed** em `/tmp/e2e-bloco-cdu-0.txt`
+- `lint` na raiz:
+  - voltou a executar com `npm run lint` após restaurar dependências do `package.json`
+  - a execução ainda expõe backlog antigo de warnings na suíte E2E (condicionais em testes, testes sem asserções e alguns usos de `force` em helpers legados)
 
 ## Fase 1 - Estabilização Imediata
 
@@ -130,14 +138,22 @@ Diagnóstico provável:
    - gestão de unidades;
    - histórico;
    - fluxo de mapa com hierarquia desnecessariamente profunda.
+7. `smoke.spec.ts` fechado completamente verde em `workers=1`.
+8. `helpers-processos.ts` reforçado com helpers semânticos para:
+   - iniciar processo com validação da linha no painel;
+   - confirmar o modal de início sem repetir seletor cru nos testes.
+9. `captura-telas.spec.ts` parcialmente limpo:
+   - parte dos fluxos de início/logout migrada para helpers;
+   - vários waits funcionais de modal e navegação trocados por expectativas explícitas.
 
 ### Ainda falta concluir
 
-1. Fechar o `smoke.spec.ts` completamente verde.
-2. Remover as corridas restantes nos cenários de painel GESTOR/CHEFE.
-3. Revisar `criarProcesso(..., iniciar: true)` para garantir pós-condição mais forte.
-4. Continuar removendo `waitForTimeout()` substituível do `smoke`.
-5. Aplicar o mesmo padrão de limpeza ao `captura-telas.spec.ts`.
+1. Continuar removendo `waitForTimeout()` substituível do `captura-telas.spec.ts`.
+2. Validar `captura-telas.spec.ts` completo em `workers=1` e classificar falhas/ruídos restantes.
+3. Endereçar o backlog estrutural indicado pelo lint:
+   - `playwright/no-conditional-in-test`;
+   - `playwright/expect-expect`;
+   - `playwright/no-force-option` em helpers legados.
 
 ## Fase 2 - Robustez de Helpers e Fixtures
 
@@ -145,12 +161,31 @@ Diagnóstico provável:
 
 1. Fortalecer o helper [e2e/helpers/helpers-processos.ts](/Users/leonardo/sgc/e2e/helpers/helpers-processos.ts):
    - após `iniciar: true`, garantir estado final observável antes de devolver o controle.
+   - status: **concluído para o fluxo de início do processo no painel**.
 
 2. Extrair helpers compartilhados de fixtures hoje duplicados em `captura-telas`.
 
 3. Continuar trocando preparo profundo por fixture de backend quando:
    - o objetivo do teste não é validar todo o workflow pela UI;
    - o custo de setup estiver empurrando o teste para o limite de `20s`.
+   - status: **aplicado em `cdu-08.spec.ts` para setup de mapeamento/revisão e processo base de importação**.
+4. Considerar helpers semânticos adicionais para modais recorrentes em `captura-telas`:
+   - análise de cadastro;
+   - validação/homologação de mapa;
+   - disponibilização de cadastro.
+
+### Descobertas recentes na rodada por blocos
+
+1. O texto estável pós-disponibilização de cadastro não é mais `Cadastro de atividades disponibilizado` na UI atual.
+   - O frontend hoje publica o toast `Disponibilizado com sucesso.` antes de retornar ao painel.
+   - Os testes do bloco `cdu-0` foram atualizados para validar o toast atual e/ou o estado final no painel, conforme `etc/docs/regras-e2e.md`.
+
+2. `cdu-08.spec.ts` estourava o limite de `20s` por depender demais de setup via UI.
+   - A correção foi migrar o preparo do processo de origem finalizado e dos processos alvo para fixtures backend.
+   - Depois disso, o bloco `cdu-0` ficou verde sem adicionar timeout e sem `force`.
+5. Manter fixtures alinhadas à UI real:
+   - a fixture `mapa validado` não garante mais que o ADMIN verá ação de homologação no `MapaVisualizacaoView`;
+   - para capturas de finalização, o estado útil agora é `mapa homologado`, com processo ainda `EM_ANDAMENTO`.
 
 ## Fase 3 - Limpeza Estrutural do `captura-telas`
 
@@ -164,6 +199,10 @@ O arquivo ainda concentra muitos `waitForTimeout()` válidos para estabilizaçã
 2. Garantir `expect(page).toHaveURL(/\/painel/)` após cada `btn-iniciar-processo-confirmar` que antecede troca de usuário.
 3. Trocar waits de modal por `expect(dialog).toBeVisible()`.
 4. Reduzir waits de 300/500 ms onde a prontidão do DOM já pode ser observada diretamente.
+5. Revisar waits de navegação/menu hoje usados apenas para estabilização visual e substituí-los por URL ou heading observável quando possível.
+6. Separar explicitamente waits visuais legítimos de waits funcionais:
+   - hover e scroll para screenshot podem permanecer;
+   - transição de estado, modal e navegação não devem depender de timeout fixo.
 
 ## Riscos e Cuidados
 
@@ -174,10 +213,13 @@ O arquivo ainda concentra muitos `waitForTimeout()` válidos para estabilizaçã
 
 ## Próximos Passos Recomendados
 
-1. Corrigir no `smoke` as seções 02 (GESTOR e CHEFE), provavelmente reforçando o helper `criarProcesso` para o caso `iniciar: true`.
-2. Rerodar o `smoke` completo até fechar verde.
-3. Aplicar o mesmo padrão de correção no `captura-telas`:
+1. Rerodar e estabilizar `captura-telas.spec.ts` completo em `workers=1`.
+2. Aplicar o mesmo padrão de correção no `captura-telas`:
    - pós-condição de `iniciar processo`;
    - logout via helper;
    - remoção adicional de waits cegos.
-4. Extrair helpers compartilhados para fixtures de backend hoje duplicadas.
+3. Extrair helpers compartilhados para fixtures de backend hoje duplicadas.
+4. Planejar uma fase dedicada de saneamento dos warnings do lint na suíte E2E, priorizando:
+   - remoção de condicionais em testes;
+   - reforço de asserções em cenários hoje muito “fotográficos”;
+   - eliminação de `force` em helpers legados.

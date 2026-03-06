@@ -201,11 +201,13 @@ const podeEditarCadastroFinal = computed(() => podeEditarCadastro.value && !isPr
 const podeEditarMapaFinal = computed(() => podeEditarMapa.value && !isProcessoFinalizado.value);
 
 const isCadastroHabilitado = computed(() => {
+  if (isProcessoFinalizado.value) return true;
   return subprocesso.value?.permissoes?.habilitarAcessoCadastro ?? false;
 });
 
 const isMapaHabilitado = computed(() => {
   if (!props.mapa) return false;
+  if (isProcessoFinalizado.value) return true;
   return subprocesso.value?.permissoes?.habilitarAcessoMapa ?? false;
 });
 

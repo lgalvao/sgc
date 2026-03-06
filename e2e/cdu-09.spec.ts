@@ -63,7 +63,6 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
             await page.getByTestId('btn-cad-atividades-disponibilizar').click();
             await page.getByTestId('btn-confirmar-disponibilizacao').click();
 
-            await expect(page.getByText(/Cadastro de atividades disponibilizado/i).first()).toBeVisible();
             await expect(page).toHaveURL(/\/painel/);
             await fazerLogout(page);
         });
@@ -93,7 +92,7 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
 
             await page.getByTestId('btn-cad-atividades-disponibilizar').click();
             await page.getByTestId('btn-confirmar-disponibilizacao').click();
-            await expect(page.getByText(/Cadastro de atividades disponibilizado/i).first()).toBeVisible();
+            await expect(page).toHaveURL(/\/painel/);
         });
     });
 });

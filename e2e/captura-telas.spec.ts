@@ -1,8 +1,8 @@
 import type {APIRequestContext, Locator, Page} from '@playwright/test';
 import {expect, test} from './fixtures/base.js';
 import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
-import {criarProcesso, extrairProcessoId} from './helpers/helpers-processos.js';
-import {fazerLogout, navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
+import {confirmarInicioProcessoPeloDialogo, criarProcesso, extrairProcessoId, iniciarProcessoPeloCadastro} from './helpers/helpers-processos.js';
+import {fazerLogout, navegarParaSubprocesso, verificarAppAlert, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 import {
     adicionarAtividade,
     adicionarConhecimento,
@@ -57,31 +57,6 @@ async function capturarComponente(elemento: Locator, categoria: string, nome: st
     await elemento.screenshot({path: caminhoCompleto});
 }
 
-async function criarProcessoMapeamentoIniciado(
-    page: Page,
-    cleanup: ReturnType<typeof useProcessoCleanup>,
-    descricao: string,
-    unidadeAlvo: string,
-    expandir: string[]
-) {
-    await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
-    await criarProcesso(page, {
-        descricao,
-        tipo: 'MAPEAMENTO',
-        diasLimite: 30,
-        unidade: unidadeAlvo,
-        expandir
-    });
-
-    await page.getByTestId('tbl-processos').getByText(descricao).first().click();
-    const processoId = await extrairProcessoId(page);
-    if (processoId > 0) cleanup.registrar(processoId);
-
-    await page.getByTestId('btn-processo-iniciar').click();
-    await page.getByTestId('btn-iniciar-processo-confirmar').click();
-    await expect(page).toHaveURL(/\/painel/);
-}
-
 async function criarProcessoMapeamentoIniciadoPorFixture(
     request: APIRequestContext,
     cleanup: ReturnType<typeof useProcessoCleanup>,
@@ -128,13 +103,13 @@ async function criarProcessoMapeamentoComMapaDisponibilizadoPorFixture(
     return processo.codigo;
 }
 
-async function criarProcessoMapeamentoComMapaValidadoPorFixture(
+async function criarProcessoMapeamentoComMapaHomologadoPorFixture(
     request: APIRequestContext,
     cleanup: ReturnType<typeof useProcessoCleanup>,
     descricao: string,
     unidadeSigla: string
 ): Promise<number> {
-    const response = await request.post('/e2e/fixtures/processo-mapeamento-com-mapa-validado', {
+    const response = await request.post('/e2e/fixtures/processo-mapeamento-com-mapa-homologado', {
         data: {
             descricao,
             unidadeSigla,
@@ -144,7 +119,7 @@ async function criarProcessoMapeamentoComMapaValidadoPorFixture(
     });
 
     if (!response.ok()) {
-        throw new Error(`Falha ao criar fixture de mapa validado: ${response.status()} ${await response.text()}`);
+        throw new Error(`Falha ao criar fixture de mapa homologado: ${response.status()} ${await response.text()}`);
     }
     const processo = await response.json() as { codigo: number };
     cleanup.registrar(processo.codigo);
@@ -178,14 +153,14 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await capturarTela(page, '01-seguranca', '01c-login-usuario-preenchido');
             await page.getByTestId('inp-login-senha').fill(USUARIOS.INVALIDO.senha);
             await page.getByTestId('btn-login-entrar').click();
-            await page.waitForTimeout(500);
+            await verificarAppAlert(page);
             await capturarTela(page, '01-seguranca', '02-login-erro-credenciais');
 
             // Limpar e fazer login com múltiplos perfis
             await page.getByTestId('inp-login-usuario').fill(USUARIOS.ADMIN_2_PERFIS.titulo);
             await page.getByTestId('inp-login-senha').fill(USUARIOS.ADMIN_2_PERFIS.senha);
             await page.getByTestId('btn-login-entrar').click();
-            await page.waitForTimeout(500);
+            await expect(page.getByTestId('sel-login-perfil')).toBeVisible();
             await capturarTela(page, '01-seguranca', '03-login-selecao-perfil');
 
             // Login com perfil selecionado
@@ -218,13 +193,12 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             // Expandir árvore de unidades
             await expect(page.getByText('Carregando unidades...')).toBeHidden();
             await page.getByTestId('btn-arvore-expand-SECRETARIA_1').click();
-            await page.waitForTimeout(300);
+            await expect(page.getByTestId('btn-arvore-expand-COORD_11')).toBeVisible();
             await capturarTela(page, '02-painel', '04-arvore-unidades-expandida');
 
             // Expandir COORD_11 para acessar SECAO_111
-            await page.waitForTimeout(300);
             await page.getByTestId('btn-arvore-expand-COORD_11').click();
-            await page.waitForTimeout(300);
+            await expect(page.getByTestId('chk-arvore-unidade-SECAO_111')).toBeVisible();
 
             // Selecionar múltiplas unidades
             await page.getByTestId('chk-arvore-unidade-ASSESSORIA_11').click();
@@ -265,7 +239,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
                 expandir: ['SECRETARIA_1'],
                 iniciar: true
             });
-            await page.getByTestId('btn-logout').click();
+            await fazerLogout(page);
 
             await login(page, USUARIOS.GESTOR_COORD.titulo, USUARIOS.GESTOR_COORD.senha);
             await expect(page.getByTestId('tbl-processos')).toBeVisible();
@@ -285,7 +259,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
                 expandir: ['SECRETARIA_2', 'COORD_21'],
                 iniciar: true
             });
-            await page.getByTestId('btn-logout').click();
+            await fazerLogout(page);
 
             await login(page, USUARIOS.CHEFE_SECAO_211.titulo, USUARIOS.CHEFE_SECAO_211.senha);
             await expect(page.getByTestId('tbl-processos')).toBeVisible();
@@ -320,10 +294,12 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             // Modal de iniciar processo
             await page.getByTestId('btn-processo-iniciar').click();
-            await page.waitForTimeout(300);
+            await expect(page.getByRole('dialog')).toBeVisible();
             await capturarTela(page, '03-processo', '02-modal-iniciar-processo');
-            await page.getByTestId('btn-iniciar-processo-confirmar').click();
-            await expect(page).toHaveURL(/\/painel/);
+            await confirmarInicioProcessoPeloDialogo(page, {
+                descricao,
+                tipo: 'MAPEAMENTO'
+            });
 
             // Acessar detalhes do processo iniciado
             await page.getByTestId('tbl-processos').getByText(descricao).first().click();
@@ -356,7 +332,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await navegarParaAtividadesVisualizacao(page);
             await capturarTela(page, '03-processo', '03b-analise-gestor');
             await page.getByTestId('btn-acao-analisar-principal').click();
-            await page.waitForTimeout(300);
+            await expect(page.getByRole('dialog')).toBeVisible();
             await capturarTela(page, '03-processo', '03c-modal-aceite-gestor');
             await page.getByTestId('inp-aceite-cadastro-obs').fill('Aceite para captura de tela');
             await page.getByTestId('btn-aceite-cadastro-confirmar').click();
@@ -368,7 +344,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processoCodigo}/${unidadeAlvo}$`));
             await navegarParaAtividadesVisualizacao(page);
             await page.getByTestId('btn-acao-analisar-principal').click();
-            await page.waitForTimeout(300);
+            await expect(page.getByRole('dialog')).toBeVisible();
             await capturarTela(page, '03-processo', '03d-modal-homologacao-admin');
             await page.getByTestId('inp-aceite-cadastro-obs').fill('Homologação para captura');
             await page.getByTestId('btn-aceite-cadastro-confirmar').click();
@@ -399,7 +375,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processoCodigo}/${unidadeAlvo}$`));
             await navegarParaMapa(page);
             await page.getByTestId('btn-mapa-validar').click();
-            await page.waitForTimeout(300);
+            await expect(page.getByRole('dialog')).toBeVisible();
             await capturarTela(page, '03-processo', '03f-modal-validar-mapa');
             await page.getByTestId('btn-validar-mapa-confirmar').click();
             await verificarPaginaPainel(page);
@@ -411,12 +387,12 @@ test.describe('Captura de Telas - Sistema SGC', () => {
         // Antes de recolocar esta captura, confirmar no frontend qual ação o GESTOR
         // realmente deve ver nessa situação e em qual tela ela é exposta.
 
-        test('Captura homologacao final do mapa e finalizacao', async ({page, request}) => {
+        test('Captura processo homologado e finalizacao', async ({page, request}) => {
             const timestamp = Date.now();
             const unidadeAlvo = 'SECAO_111';
             const descricao = `Processo Finalizacao ${timestamp}`;
 
-            const processoCodigo = await criarProcessoMapeamentoComMapaValidadoPorFixture(
+            const processoCodigo = await criarProcessoMapeamentoComMapaHomologadoPorFixture(
                 request,
                 cleanup,
                 descricao,
@@ -424,21 +400,13 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             );
 
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
-            await page.goto(`/processo/${processoCodigo}/${unidadeAlvo}`);
-            await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processoCodigo}/${unidadeAlvo}$`));
-            await navegarParaMapa(page);
-            await page.getByTestId('btn-mapa-homologar-aceite').click();
-            await page.waitForTimeout(300);
-            await capturarTela(page, '03-processo', '03h-modal-homologar-mapa');
-            await page.getByTestId('btn-aceite-mapa-confirmar').click();
-
             await page.goto(`/processo/${processoCodigo}`);
             await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processoCodigo}$`));
             await capturarTela(page, '03-processo', '03i-detalhes-processo-finalizavel', {fullPage: true});
 
             // Modal de finalizar processo
             await page.getByTestId('btn-processo-finalizar').click();
-            await page.waitForTimeout(300);
+            await expect(page.getByRole('dialog')).toBeVisible();
             await capturarTela(page, '03-processo', '04-modal-finalizar-processo');
             await page.getByRole('button', {name: 'Cancelar'}).click();
             await capturarTela(page, '03-processo', '05-detalhes-processo-apos-cancelar-finalizacao');
@@ -451,12 +419,14 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await expect(page).toHaveURL(/\/processo\/cadastro/);
 
             // Capturar estado inicial com botões desativados (formulário vazio)
-            await page.waitForTimeout(300);
+            await expect(page.getByTestId('btn-processo-salvar')).toBeDisabled();
+            await expect(page.getByTestId('btn-processo-iniciar')).toBeDisabled();
             await capturarTela(page, '03-processo', '10-botoes-desativados-form-vazio');
 
             // Preencher apenas descrição (botões ainda desativados)
             await page.getByTestId('inp-processo-descricao').fill('Teste Validação');
-            await page.waitForTimeout(300);
+            await expect(page.getByTestId('btn-processo-salvar')).toBeDisabled();
+            await expect(page.getByTestId('btn-processo-iniciar')).toBeDisabled();
             await capturarTela(page, '03-processo', '11-botoes-desativados-falta-data-unidade');
 
             // Selecionar tipo de processo (necessário para carregar árvore de unidades)
@@ -466,15 +436,17 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             const dataLimite = new Date();
             dataLimite.setDate(dataLimite.getDate() + 30);
             await page.getByTestId('inp-processo-data-limite').fill(dataLimite.toISOString().split('T')[0]);
-            await page.waitForTimeout(300);
+            await expect(page.getByTestId('btn-processo-salvar')).toBeDisabled();
+            await expect(page.getByTestId('btn-processo-iniciar')).toBeDisabled();
             await capturarTela(page, '03-processo', '12-botoes-desativados-falta-unidade');
 
             // Expandir e selecionar unidade (agora botões devem estar ativados)
             await expect(page.getByText('Carregando unidades...')).toBeHidden();
             await page.getByTestId('btn-arvore-expand-SECRETARIA_1').click();
-            await page.waitForTimeout(300);
+            await expect(page.getByTestId('chk-arvore-unidade-ASSESSORIA_11')).toBeVisible();
             await page.getByTestId('chk-arvore-unidade-ASSESSORIA_11').click();
-            await page.waitForTimeout(300);
+            await expect(page.getByTestId('btn-processo-salvar')).toBeEnabled();
+            await expect(page.getByTestId('btn-processo-iniciar')).toBeEnabled();
             await capturarTela(page, '03-processo', '13-botoes-ativados-form-completo');
         });
     });
@@ -500,12 +472,13 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             const processoId = await extrairProcessoId(page);
             if (processoId > 0) cleanup.registrar(processoId);
 
-            await page.getByTestId('btn-processo-iniciar').click();
-            await page.getByTestId('btn-iniciar-processo-confirmar').click();
-            await expect(page).toHaveURL(/\/painel/);
+            await iniciarProcessoPeloCadastro(page, {
+                descricao,
+                tipo: 'MAPEAMENTO'
+            });
 
             // Logout e login como Chefe
-            await page.getByTestId('btn-logout').click();
+            await fazerLogout(page);
             await login(page, USUARIOS.CHEFE_SECAO_211.titulo, USUARIOS.CHEFE_SECAO_211.senha);
 
             await page.getByTestId('tbl-processos').getByText(descricao).first().click();
@@ -538,12 +511,11 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             // Tentar disponibilizar sem data
             await page.getByTestId('btn-cad-atividades-disponibilizar').click();
-            await page.waitForTimeout(300);
+            await expect(page.getByRole('dialog')).toBeVisible();
             await capturarTela(page, '04-subprocesso', '08-modal-disponibilizar-atividades');
             await page.getByTestId('btn-confirmar-disponibilizacao').click();
-            await page.waitForTimeout(500);
-            await capturarTela(page, '04-subprocesso', '09-cadastro-atividades-disponibilizado', {fullPage: true});
             await verificarPaginaPainel(page);
+            await capturarTela(page, '04-subprocesso', '09-cadastro-atividades-disponibilizado', {fullPage: true});
         });
 
         test('Captura estados de validação inline de atividades', async ({page}) => {
@@ -565,10 +537,12 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             const processoId = await extrairProcessoId(page);
             if (processoId > 0) cleanup.registrar(processoId);
 
-            await page.getByTestId('btn-processo-iniciar').click();
-            await page.getByTestId('btn-iniciar-processo-confirmar').click();
+            await iniciarProcessoPeloCadastro(page, {
+                descricao,
+                tipo: 'MAPEAMENTO'
+            });
 
-            await page.getByTestId('btn-logout').click();
+            await fazerLogout(page);
             await login(page, USUARIOS.CHEFE_SECAO_212.titulo, USUARIOS.CHEFE_SECAO_212.senha);
 
             await page.getByTestId('tbl-processos').getByText(descricao).first().click();
@@ -666,10 +640,12 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             const processoId = await extrairProcessoId(page);
             if (processoId > 0) cleanup.registrar(processoId);
 
-            await page.getByTestId('btn-processo-iniciar').click();
-            await page.getByTestId('btn-iniciar-processo-confirmar').click();
+            await iniciarProcessoPeloCadastro(page, {
+                descricao,
+                tipo: 'MAPEAMENTO'
+            });
 
-            await page.getByTestId('btn-logout').click();
+            await fazerLogout(page);
             await login(page, USUARIOS.CHEFE_SECAO_121.titulo, USUARIOS.CHEFE_SECAO_121.senha);
 
             await acessarSubprocessoChefeDireto(page, descricao, 'SECAO_121');
@@ -689,7 +665,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await page.waitForTimeout(500);
 
             // 1. GESTOR COORD_12 - Primeiro Aceite
-            await page.getByTestId('btn-logout').click({force: true});
+            await fazerLogout(page);
             await login(page, USUARIOS.GESTOR_COORD_12.titulo, USUARIOS.GESTOR_COORD_12.senha);
 
             await acessarSubprocessoGestor(page, descricao, UNIDADE_ALVO);
@@ -701,7 +677,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await verificarPaginaPainel(page);
 
             // 2. GESTOR SECRETARIA_1 - Segundo Aceite
-            await page.getByTestId('btn-logout').click({force: true});
+            await fazerLogout(page);
             await loginComPerfil(page, USUARIOS.GESTOR_SECRETARIA_1.titulo, USUARIOS.GESTOR_SECRETARIA_1.senha, USUARIOS.GESTOR_SECRETARIA_1.perfil);
             await acessarSubprocessoGestor(page, descricao, UNIDADE_ALVO);
             await navegarParaAtividadesVisualizacao(page);
@@ -712,7 +688,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await verificarPaginaPainel(page);
 
             // 3. ADMIN - Homologação Final
-            await page.getByTestId('btn-logout').click({force: true});
+            await fazerLogout(page);
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
             // Navegar para o subprocesso (admin vê tabela de unidades)
@@ -723,7 +699,6 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             await page.getByTestId('btn-acao-analisar-principal').click();
             await page.getByTestId('btn-aceite-cadastro-confirmar').click();
-            await page.waitForTimeout(100);
 
             // Agora o Mapa deve estar habilitado para edição pelo Admin
             // Navegar para mapa
@@ -731,7 +706,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await capturarTela(page, '05-mapa', '01-mapa-vazio', {fullPage: true});
 
             await abrirModalCriarCompetencia(page);
-            await page.waitForTimeout(100);
+            await expect(page.getByTestId('mdl-criar-competencia')).toBeVisible();
             await capturarTela(page, '05-mapa', '02-modal-criar-competencia');
 
             const competenciaDesc = 'Desenvolvimento de Software';
@@ -745,7 +720,6 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             await page.getByTestId('btn-criar-competencia-salvar').click();
             await expect(modal).toBeHidden();
-            await page.waitForTimeout(100);
             await capturarTela(page, '05-mapa', '05-mapa-com-competencia', {fullPage: true});
 
             // Hover na competência
@@ -756,16 +730,15 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             await expect(page.getByTestId('btn-cad-mapa-disponibilizar')).toBeVisible();
             await page.getByTestId('btn-cad-mapa-disponibilizar').click();
-            await page.waitForTimeout(100);
+            await expect(page.getByRole('dialog')).toBeVisible();
             await capturarTela(page, '05-mapa', '07-modal-disponibilizar-mapa');
 
             const dataLimite = new Date();
             dataLimite.setDate(dataLimite.getDate() + 30);
             await page.getByTestId('inp-disponibilizar-mapa-data').fill(dataLimite.toISOString().split('T')[0]);
             await page.getByTestId('btn-disponibilizar-mapa-confirmar').click();
-            await page.waitForTimeout(100);
-            await capturarTela(page, '05-mapa', '08-mapa-disponibilizado', {fullPage: true});
             await verificarPaginaPainel(page);
+            await capturarTela(page, '05-mapa', '08-mapa-disponibilizado', {fullPage: true});
         });
     });
 
@@ -777,21 +750,21 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             // Parâmetros (se admin)
             await page.getByTestId('btn-parametros').click();
-            await page.waitForTimeout(300);
+            await expect(page).toHaveURL(/\/parametros/);
             await capturarTela(page, '06-navegacao', '02-menu-parametros');
             await page.goto('/painel');
 
             // Seção Unidades (para ADMIN)
             await page.getByText('Unidades').first().click();
-            await page.waitForTimeout(100);
+            await expect(page).toHaveURL(/\/unidades/);
             await capturarTela(page, '06-navegacao', '03-unidades', {fullPage: true});
 
             await page.getByText('Relatórios').click();
-            await page.waitForTimeout(100);
+            await expect(page).toHaveURL(/\/relatorios/);
             await capturarTela(page, '06-navegacao', '04-relatorios', {fullPage: true});
 
             await page.getByText('Histórico').click();
-            await page.waitForTimeout(100);
+            await expect(page).toHaveURL(/\/historico/);
             await capturarTela(page, '06-navegacao', '05-historico', {fullPage: true});
             await capturarComponente(page.getByRole('navigation').first(), '06-navegacao', '05a-barra-lateral');
 
@@ -877,7 +850,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             });
 
             // Login como Chefe da SECAO_111 para disponibilizar cadastro
-            await page.getByTestId('btn-logout').click();
+            await fazerLogout(page);
             await login(page, USUARIOS.CHEFE_SECAO_111.titulo, USUARIOS.CHEFE_SECAO_111.senha);
 
             await page.getByTestId('tbl-processos').getByText(descricao).first().click();
@@ -896,7 +869,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await page.waitForTimeout(500);
 
             // Login como Gestor da COORD_11 para ver botão de aceitar em bloco
-            await page.getByTestId('btn-logout').click();
+            await fazerLogout(page);
             await login(page, USUARIOS.GESTOR_COORD.titulo, USUARIOS.GESTOR_COORD.senha);
 
             await page.getByTestId('tbl-processos').getByText(descricao).first().click();
@@ -912,7 +885,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await page.getByRole('button', {name: /Cancelar/i}).click();
 
             // Login como Admin para homologar em bloco
-            await page.getByTestId('btn-logout').click();
+            await fazerLogout(page);
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
             await page.getByTestId('tbl-processos').getByText(descricao).first().click();
