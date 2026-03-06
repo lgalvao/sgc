@@ -1,0 +1,19 @@
+{"version":8,"type":"context-options","origin":"library","browserName":"","playwrightVersion":"1.58.2","options":{},"platform":"darwin","wallTime":1772824662853,"monotonicTime":16228.2,"sdkLanguage":"javascript","contextId":"request-context@a2e741ba26bf4e7ef638bbb3b1669fbc","title":"smoke.spec.ts:134 › Smoke Test - Sistema SGC › 02 - Painel Principal › Captura painel CHEFE"}
+{"type":"before","callId":"call@259","startTime":16228.825,"class":"APIRequestContext","method":"fetch","params":{"url":"/e2e/reset-database","method":"POST","timeout":0},"stepId":"pw:api@24"}
+{"type":"log","callId":"call@259","time":16229.08,"message":"→ POST http://localhost:5173/e2e/reset-database"}
+{"type":"log","callId":"call@259","time":16229.084,"message":"  user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.7632.6 Safari/537.36"}
+{"type":"log","callId":"call@259","time":16229.085,"message":"  accept: */*"}
+{"type":"log","callId":"call@259","time":16229.086,"message":"  accept-encoding: gzip,deflate,br"}
+{"type":"log","callId":"call@259","time":16229.087,"message":"  x-e2e-worker: 0"}
+{"type":"log","callId":"call@259","time":16238.738,"message":"← 200 OK"}
+{"type":"log","callId":"call@259","time":16238.742,"message":"  vary: Origin, Access-Control-Request-Method, Access-Control-Request-Headers"}
+{"type":"log","callId":"call@259","time":16238.744,"message":"  x-content-type-options: nosniff"}
+{"type":"log","callId":"call@259","time":16238.748,"message":"  x-xss-protection: 0"}
+{"type":"log","callId":"call@259","time":16238.749,"message":"  cache-control: no-cache, no-store, max-age=0, must-revalidate"}
+{"type":"log","callId":"call@259","time":16238.751,"message":"  pragma: no-cache"}
+{"type":"log","callId":"call@259","time":16238.752,"message":"  expires: 0"}
+{"type":"log","callId":"call@259","time":16238.752,"message":"  x-frame-options: DENY"}
+{"type":"log","callId":"call@259","time":16238.753,"message":"  content-length: 0"}
+{"type":"log","callId":"call@259","time":16238.754,"message":"  date: Fri, 06 Mar 2026 19:17:42 GMT"}
+{"type":"log","callId":"call@259","time":16238.755,"message":"  connection: close"}
+{"type":"after","callId":"call@259","endTime":16238.801,"result":{"response":{"url":"http://localhost:5173/e2e/reset-database","status":200,"statusText":"OK","headers":[{"name":"vary","value":"Origin, Access-Control-Request-Method, Access-Control-Request-Headers"},{"name":"x-content-type-options","value":"nosniff"},{"name":"x-xss-protection","value":"0"},{"name":"cache-control","value":"no-cache, no-store, max-age=0, must-revalidate"},{"name":"pragma","value":"no-cache"},{"name":"expires","value":"0"},{"name":"x-frame-options","value":"DENY"},{"name":"content-length","value":"0"},{"name":"date","value":"Fri, 06 Mar 2026 19:17:42 GMT"},{"name":"connection","value":"close"}],"fetchUid":"2aa8c231254e334be087be881ba49b0d"}}}

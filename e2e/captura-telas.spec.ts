@@ -1,6 +1,5 @@
 import type {APIRequestContext, Locator, Page} from '@playwright/test';
 import {expect, test} from './fixtures/base.js';
-import logger from '../frontend/src/utils/logger.js';
 import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
 import {criarProcesso, extrairProcessoId} from './helpers/helpers-processos.js';
 import {fazerLogout, navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
@@ -649,16 +648,6 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
     test.describe('05 - Mapa de Competências', () => {
         test('Captura fluxo de mapa de competências', async ({page}) => {
-            page.on('console', msg => {
-                const type = String(msg.type());
-                const text = msg.text();
-                if (type === 'error' || type === 'warning' || text.includes('NAVEGACAO')) {
-                    if (type === 'error') logger.error(`[Browser Console] ${type}: ${text}`);
-                    else if (type === 'warning' || type === 'warn') logger.warn(`[Browser Console] ${type}: ${text}`);
-                    else logger.info(`[Browser Console] ${type}: ${text}`);
-                }
-            });
-
             const descricao = `Proc Mapa ${Date.now()}`;
             const UNIDADE_ALVO = 'SECAO_121';
 
@@ -1094,19 +1083,22 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await page.waitForTimeout(500);
             await capturarTela(page, '14-relatorios', '01-pagina-relatorios', {fullPage: true});
 
+            const painelAndamento = page.getByRole('tabpanel', {name: /Andamento de processo/i});
             await expect(page.getByRole('tab', {name: /Andamento de processo/i})).toBeVisible();
-            await expect(page.getByLabel(/Selecione o Processo/i)).toBeVisible();
+            await expect(painelAndamento.getByLabel(/Selecione o Processo/i)).toBeVisible();
             await capturarTela(page, '14-relatorios', '02-relatorio-andamento');
 
-            await expect(page.getByRole('button', {name: /Gerar Relatório/i})).toBeVisible();
+            await expect(painelAndamento.getByRole('button', {name: /Gerar Relatório/i})).toBeVisible();
             await capturarTela(page, '14-relatorios', '03-botao-gerar-relatorio');
 
             await page.getByRole('tab', {name: /^Mapas$/i}).click();
             await page.waitForTimeout(300);
-            await expect(page.getByLabel(/Selecione a unidade/i)).toBeVisible();
+            const painelMapas = page.getByRole('tabpanel', {name: /^Mapas$/i});
+            await expect(painelMapas.getByLabel(/Selecione o Processo/i)).toBeVisible();
+            await expect(painelMapas.getByLabel(/Selecione a unidade/i)).toBeVisible();
             await capturarTela(page, '14-relatorios', '04-relatorio-mapas');
 
-            await expect(page.getByRole('button', {name: /Gerar PDF/i})).toBeVisible();
+            await expect(painelMapas.getByRole('button', {name: /Gerar PDF/i})).toBeVisible();
             await capturarTela(page, '14-relatorios', '05-botao-gerar-pdf');
         });
     });

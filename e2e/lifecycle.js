@@ -314,12 +314,21 @@ async function subirInfra() {
     await subirFrontend();
 }
 
+function descreverBackends() {
+    if (WORKER_COUNT === 1) {
+        return `Backend: ${BACKEND_BASE_PORT}`;
+    }
+
+    const portas = Array.from({ length: WORKER_COUNT }, (_, index) => portaBackend(index));
+    return `Backends: ${portas.join(', ')}`;
+}
+
 startSmtpServer();
 
 try {
     await subirInfra();
     lifecycleLogger.info(
-        `>>> Infra E2E no ar com ${WORKER_COUNT} worker(s). Frontend único: ${FRONTEND_PORT}, Backends: ${BACKEND_BASE_PORT}..${BACKEND_BASE_PORT + WORKER_COUNT - 1}`
+        `>>> Infra E2E no ar. Frontend: ${FRONTEND_PORT}. ${descreverBackends()}.`
     );
 } catch (error) {
     lifecycleLogger.error(`Erro ao iniciar infra de testes: ${error && error.message ? error.message : error}`);

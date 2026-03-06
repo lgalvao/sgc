@@ -7,6 +7,10 @@ function obterBaseUrlWorker(workerIndex: number): string {
     return `http://localhost:${portaFrontend}`;
 }
 
+function ehErroEsperadoAutenticacao(url: string, status?: number): boolean {
+    return status === 401 && /\/api\/usuarios\/autorizar$/.test(url);
+}
+
 export const test = base.extend({
     context: async ({browser}, use, testInfo) => {
         const baseURL = obterBaseUrlWorker(testInfo.parallelIndex);
@@ -32,12 +36,18 @@ export const test = base.extend({
         await request.dispose();
     },
 
-    page: async ({page}, use) => {
+        page: async ({page}, use) => {
         // Listener para logs do console
         page.on('console', async msg => {
             const text = msg.text();
+            const locationUrl = msg.location().url || '';
             // Filtrar logs de conexão do Vite para reduzir ruído
             if (text.includes('[vite] connecting...') || text.includes('[vite] connected.')) {
+                return;
+            }
+
+            if (text.includes('Failed to load resource: the server responded with a status of 401')
+                && /\/api\/usuarios\/autorizar$/.test(locationUrl)) {
                 return;
             }
 
@@ -85,6 +95,10 @@ export const test = base.extend({
         // Listener para falhas de rede (4xx, 5xx)
         page.on('response', async response => {
             if (response.status() >= 400) {
+                if (ehErroEsperadoAutenticacao(response.url(), response.status())) {
+                    return;
+                }
+
                 let body: string;
                 try {
                     body = await response.text();

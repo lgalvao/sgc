@@ -1,0 +1,37 @@
+{"version":8,"type":"context-options","origin":"library","browserName":"","playwrightVersion":"1.58.2","options":{},"platform":"darwin","wallTime":1772824679825,"monotonicTime":33199.874,"sdkLanguage":"javascript","contextId":"request-context@9466cac699cb07fc96ac0eca7ea66110","title":"smoke.spec.ts:333 › Smoke Test - Sistema SGC › 04 - Subprocesso e Atividades › Captura estados de validação inline de atividades"}
+{"type":"before","callId":"call@1081","startTime":33200.655,"class":"APIRequestContext","method":"fetch","params":{"url":"/e2e/reset-database","method":"POST","timeout":0},"stepId":"pw:api@24"}
+{"type":"log","callId":"call@1081","time":33200.834,"message":"→ POST http://localhost:5173/e2e/reset-database"}
+{"type":"log","callId":"call@1081","time":33200.838,"message":"  user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.7632.6 Safari/537.36"}
+{"type":"log","callId":"call@1081","time":33200.84,"message":"  accept: */*"}
+{"type":"log","callId":"call@1081","time":33200.84,"message":"  accept-encoding: gzip,deflate,br"}
+{"type":"log","callId":"call@1081","time":33200.841,"message":"  x-e2e-worker: 0"}
+{"type":"log","callId":"call@1081","time":33209.555,"message":"← 200 OK"}
+{"type":"log","callId":"call@1081","time":33209.559,"message":"  vary: Origin, Access-Control-Request-Method, Access-Control-Request-Headers"}
+{"type":"log","callId":"call@1081","time":33209.56,"message":"  x-content-type-options: nosniff"}
+{"type":"log","callId":"call@1081","time":33209.561,"message":"  x-xss-protection: 0"}
+{"type":"log","callId":"call@1081","time":33209.562,"message":"  cache-control: no-cache, no-store, max-age=0, must-revalidate"}
+{"type":"log","callId":"call@1081","time":33209.563,"message":"  pragma: no-cache"}
+{"type":"log","callId":"call@1081","time":33209.564,"message":"  expires: 0"}
+{"type":"log","callId":"call@1081","time":33209.564,"message":"  x-frame-options: DENY"}
+{"type":"log","callId":"call@1081","time":33209.565,"message":"  content-length: 0"}
+{"type":"log","callId":"call@1081","time":33209.566,"message":"  date: Fri, 06 Mar 2026 19:17:59 GMT"}
+{"type":"log","callId":"call@1081","time":33209.57,"message":"  connection: close"}
+{"type":"after","callId":"call@1081","endTime":33209.61,"result":{"response":{"url":"http://localhost:5173/e2e/reset-database","status":200,"statusText":"OK","headers":[{"name":"vary","value":"Origin, Access-Control-Request-Method, Access-Control-Request-Headers"},{"name":"x-content-type-options","value":"nosniff"},{"name":"x-xss-protection","value":"0"},{"name":"cache-control","value":"no-cache, no-store, max-age=0, must-revalidate"},{"name":"pragma","value":"no-cache"},{"name":"expires","value":"0"},{"name":"x-frame-options","value":"DENY"},{"name":"content-length","value":"0"},{"name":"date","value":"Fri, 06 Mar 2026 19:17:59 GMT"},{"name":"connection","value":"close"}],"fetchUid":"70c9474332b9441980958f52cb3508e5"}}}
+{"type":"before","callId":"call@1261","startTime":36775.704,"class":"APIRequestContext","method":"fetch","params":{"url":"/e2e/processo/201/limpar-completo","method":"POST","timeout":0},"stepId":"pw:api@103"}
+{"type":"log","callId":"call@1261","time":36777.006,"message":"→ POST http://localhost:5173/e2e/processo/201/limpar-completo"}
+{"type":"log","callId":"call@1261","time":36777.021,"message":"  user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.7632.6 Safari/537.36"}
+{"type":"log","callId":"call@1261","time":36777.022,"message":"  accept: */*"}
+{"type":"log","callId":"call@1261","time":36777.023,"message":"  accept-encoding: gzip,deflate,br"}
+{"type":"log","callId":"call@1261","time":36777.024,"message":"  x-e2e-worker: 0"}
+{"type":"log","callId":"call@1261","time":36791.975,"message":"← 200 OK"}
+{"type":"log","callId":"call@1261","time":36791.985,"message":"  vary: Origin, Access-Control-Request-Method, Access-Control-Request-Headers"}
+{"type":"log","callId":"call@1261","time":36791.987,"message":"  x-content-type-options: nosniff"}
+{"type":"log","callId":"call@1261","time":36791.993,"message":"  x-xss-protection: 0"}
+{"type":"log","callId":"call@1261","time":36791.994,"message":"  cache-control: no-cache, no-store, max-age=0, must-revalidate"}
+{"type":"log","callId":"call@1261","time":36791.995,"message":"  pragma: no-cache"}
+{"type":"log","callId":"call@1261","time":36791.996,"message":"  expires: 0"}
+{"type":"log","callId":"call@1261","time":36791.997,"message":"  x-frame-options: DENY"}
+{"type":"log","callId":"call@1261","time":36791.998,"message":"  content-length: 0"}
+{"type":"log","callId":"call@1261","time":36791.999,"message":"  date: Fri, 06 Mar 2026 19:18:03 GMT"}
+{"type":"log","callId":"call@1261","time":36792,"message":"  connection: close"}
+{"type":"after","callId":"call@1261","endTime":36792.091,"result":{"response":{"url":"http://localhost:5173/e2e/processo/201/limpar-completo","status":200,"statusText":"OK","headers":[{"name":"vary","value":"Origin, Access-Control-Request-Method, Access-Control-Request-Headers"},{"name":"x-content-type-options","value":"nosniff"},{"name":"x-xss-protection","value":"0"},{"name":"cache-control","value":"no-cache, no-store, max-age=0, must-revalidate"},{"name":"pragma","value":"no-cache"},{"name":"expires","value":"0"},{"name":"x-frame-options","value":"DENY"},{"name":"content-length","value":"0"},{"name":"date","value":"Fri, 06 Mar 2026 19:18:03 GMT"},{"name":"connection","value":"close"}],"fetchUid":"30198e5f3cb7452e9239c386001070eb"}}}

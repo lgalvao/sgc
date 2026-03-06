@@ -1,0 +1,19 @@
+{"version":8,"type":"context-options","origin":"library","browserName":"","playwrightVersion":"1.58.2","options":{},"platform":"darwin","wallTime":1772824676500,"monotonicTime":29875.863,"sdkLanguage":"javascript","contextId":"request-context@3c579fd29a752fc5575177281d0b0abf","title":"smoke.spec.ts:246 › Smoke Test - Sistema SGC › 03 - Fluxo de Processo › Captura validações de formulário"}
+{"type":"before","callId":"call@838","startTime":29876.497,"class":"APIRequestContext","method":"fetch","params":{"url":"/e2e/reset-database","method":"POST","timeout":0},"stepId":"pw:api@24"}
+{"type":"log","callId":"call@838","time":29876.742,"message":"→ POST http://localhost:5173/e2e/reset-database"}
+{"type":"log","callId":"call@838","time":29876.746,"message":"  user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.7632.6 Safari/537.36"}
+{"type":"log","callId":"call@838","time":29876.748,"message":"  accept: */*"}
+{"type":"log","callId":"call@838","time":29876.748,"message":"  accept-encoding: gzip,deflate,br"}
+{"type":"log","callId":"call@838","time":29876.749,"message":"  x-e2e-worker: 0"}
+{"type":"log","callId":"call@838","time":29885.213,"message":"← 200 OK"}
+{"type":"log","callId":"call@838","time":29885.217,"message":"  vary: Origin, Access-Control-Request-Method, Access-Control-Request-Headers"}
+{"type":"log","callId":"call@838","time":29885.218,"message":"  x-content-type-options: nosniff"}
+{"type":"log","callId":"call@838","time":29885.219,"message":"  x-xss-protection: 0"}
+{"type":"log","callId":"call@838","time":29885.22,"message":"  cache-control: no-cache, no-store, max-age=0, must-revalidate"}
+{"type":"log","callId":"call@838","time":29885.221,"message":"  pragma: no-cache"}
+{"type":"log","callId":"call@838","time":29885.222,"message":"  expires: 0"}
+{"type":"log","callId":"call@838","time":29885.223,"message":"  x-frame-options: DENY"}
+{"type":"log","callId":"call@838","time":29885.223,"message":"  content-length: 0"}
+{"type":"log","callId":"call@838","time":29885.224,"message":"  date: Fri, 06 Mar 2026 19:17:56 GMT"}
+{"type":"log","callId":"call@838","time":29885.225,"message":"  connection: close"}
+{"type":"after","callId":"call@838","endTime":29885.269,"result":{"response":{"url":"http://localhost:5173/e2e/reset-database","status":200,"statusText":"OK","headers":[{"name":"vary","value":"Origin, Access-Control-Request-Method, Access-Control-Request-Headers"},{"name":"x-content-type-options","value":"nosniff"},{"name":"x-xss-protection","value":"0"},{"name":"cache-control","value":"no-cache, no-store, max-age=0, must-revalidate"},{"name":"pragma","value":"no-cache"},{"name":"expires","value":"0"},{"name":"x-frame-options","value":"DENY"},{"name":"content-length","value":"0"},{"name":"date","value":"Fri, 06 Mar 2026 19:17:56 GMT"},{"name":"connection","value":"close"}],"fetchUid":"1290dab2e79a3e6692622b7b03afcea1"}}}

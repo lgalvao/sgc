@@ -1,5 +1,4 @@
 import {expect, test} from './fixtures/base.js';
-import logger from '../frontend/src/utils/logger.js';
 import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
 import {criarProcesso, extrairProcessoId} from './helpers/helpers-processos.js';
 import {fazerLogout, navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
@@ -125,7 +124,7 @@ test.describe('Smoke Test - Sistema SGC', () => {
                 expandir: ['SECRETARIA_1'],
                 iniciar: true
             });
-            await page.getByTestId('btn-logout').click();
+            await fazerLogout(page);
 
             await login(page, USUARIOS.GESTOR_COORD.titulo, USUARIOS.GESTOR_COORD.senha);
             await expect(page.getByTestId('tbl-processos')).toBeVisible();
@@ -144,7 +143,7 @@ test.describe('Smoke Test - Sistema SGC', () => {
                 expandir: ['SECRETARIA_2', 'COORD_21'],
                 iniciar: true
             });
-            await page.getByTestId('btn-logout').click();
+            await fazerLogout(page);
 
             await login(page, USUARIOS.CHEFE_SECAO_211.titulo, USUARIOS.CHEFE_SECAO_211.senha);
             await expect(page.getByTestId('tbl-processos')).toBeVisible();
@@ -301,7 +300,7 @@ test.describe('Smoke Test - Sistema SGC', () => {
             await expect(page).toHaveURL(/\/painel/);
 
             // Logout e login como Chefe
-            await page.getByTestId('btn-logout').click();
+            await fazerLogout(page);
             await login(page, USUARIOS.CHEFE_SECAO_211.titulo, USUARIOS.CHEFE_SECAO_211.senha);
 
             await page.getByTestId('tbl-processos').getByText(descricao).first().click();
@@ -323,11 +322,10 @@ test.describe('Smoke Test - Sistema SGC', () => {
 
             // Hover na atividade para ver ações
             await card.locator('.atividade-hover-row').hover();
-            await page.waitForTimeout(300);
 
             // Tentar disponibilizar sem data
             await page.getByTestId('btn-cad-atividades-disponibilizar').click();
-            await page.waitForTimeout(300);
+            await expect(page.getByRole('dialog')).toBeVisible();
             await page.getByTestId('btn-confirmar-disponibilizacao').click();
             await verificarPaginaPainel(page);
         });
@@ -354,7 +352,7 @@ test.describe('Smoke Test - Sistema SGC', () => {
             await page.getByTestId('btn-processo-iniciar').click();
             await page.getByTestId('btn-iniciar-processo-confirmar').click();
 
-            await page.getByTestId('btn-logout').click();
+            await fazerLogout(page);
             await login(page, USUARIOS.CHEFE_SECAO_212.titulo, USUARIOS.CHEFE_SECAO_212.senha);
 
             await page.getByTestId('tbl-processos').getByText(descricao).first().click();
@@ -366,53 +364,43 @@ test.describe('Smoke Test - Sistema SGC', () => {
             // Adicionar primeira atividade SEM conhecimento
             const atividade1 = `Atividade Sem Conhecimento 1 ${Date.now()}`;
             await adicionarAtividade(page, atividade1);
-            await page.waitForTimeout(300);
 
             // Adicionar segunda atividade SEM conhecimento
             const atividade2 = `Atividade Sem Conhecimento 2 ${Date.now()}`;
             await adicionarAtividade(page, atividade2);
-            await page.waitForTimeout(300);
 
             // Adicionar terceira atividade COM conhecimento (para contraste)
             const atividade3 = `Atividade Com Conhecimento ${Date.now()}`;
             await adicionarAtividade(page, atividade3);
             await adicionarConhecimento(page, atividade3, 'Java');
-            await page.waitForTimeout(300);
 
             // Tentar disponibilizar - deve mostrar validação inline
             await page.getByTestId('btn-cad-atividades-disponibilizar').click();
-            await page.waitForTimeout(500); // Aguardar scroll automático
+            await expect(page.getByText(/conhecimento/i).first()).toBeVisible();
 
             // Capturar primeira atividade com erro inline (scroll automático já levou até ela)
 
             // Scroll para segunda atividade com erro
             const card2 = page.locator('.atividade-card', {has: page.getByText(atividade2)});
             await card2.scrollIntoViewIfNeeded();
-            await page.waitForTimeout(300);
 
             // Capturar zoom na mensagem de erro inline
             const primeiroCard = page.locator('.atividade-card', {has: page.getByText(atividade1)});
             await primeiroCard.scrollIntoViewIfNeeded();
-            await page.waitForTimeout(300);
 
             // Capturar apenas o card com erro para detalhe
 
             // Corrigir primeira atividade adicionando conhecimento
             await adicionarConhecimento(page, atividade1, 'Python');
-            await page.waitForTimeout(500);
 
             // Tentar disponibilizar novamente - ainda deve ter erro na atividade 2
             await page.getByTestId('btn-cad-atividades-disponibilizar').click();
-            await page.waitForTimeout(500);
 
             // Corrigir segunda atividade
             await adicionarConhecimento(page, atividade2, 'JavaScript');
-            await page.waitForTimeout(500);
 
             // Tentar disponibilizar - agora deve funcionar
             await page.getByTestId('btn-cad-atividades-disponibilizar').click();
-            await page.waitForTimeout(500);
-
             // Modal de confirmação deve aparecer
             const modalConfirmacao = page.locator('.modal-content').filter({hasText: 'Disponibilização do cadastro'});
 
@@ -423,16 +411,6 @@ test.describe('Smoke Test - Sistema SGC', () => {
 
     test.describe('05 - Mapa de Competências', () => {
         test('Captura fluxo de mapa de competências', async ({page}) => {
-            page.on('console', msg => {
-                const type = String(msg.type());
-                const text = msg.text();
-                if (type === 'error' || type === 'warning' || text.includes('NAVEGACAO')) {
-                    if (type === 'error') logger.error(`[Browser Console] ${type}: ${text}`);
-                    else if (type === 'warning' || type === 'warn') logger.warn(`[Browser Console] ${type}: ${text}`);
-                    else logger.info(`[Browser Console] ${type}: ${text}`);
-                }
-            });
-
             const descricao = `Proc Mapa ${Date.now()}`;
             const UNIDADE_ALVO = 'SECAO_121';
 
@@ -454,7 +432,7 @@ test.describe('Smoke Test - Sistema SGC', () => {
             await page.getByTestId('btn-processo-iniciar').click();
             await page.getByTestId('btn-iniciar-processo-confirmar').click();
 
-            await page.getByTestId('btn-logout').click();
+            await fazerLogout(page);
             await login(page, USUARIOS.CHEFE_SECAO_121.titulo, USUARIOS.CHEFE_SECAO_121.senha);
 
             await acessarSubprocessoChefeDireto(page, descricao, 'SECAO_121');
@@ -470,11 +448,12 @@ test.describe('Smoke Test - Sistema SGC', () => {
 
             // Disponibilizar (como chefe)
             await page.getByTestId('btn-cad-atividades-disponibilizar').click();
+            await expect(page.getByRole('dialog')).toBeVisible();
             await page.getByTestId('btn-confirmar-disponibilizacao').click();
-            await page.waitForTimeout(500);
+            await verificarPaginaPainel(page);
 
             // 1. GESTOR COORD_12 - Primeiro Aceite
-            await page.getByTestId('btn-logout').click({force: true});
+            await fazerLogout(page);
             await login(page, USUARIOS.GESTOR_COORD_12.titulo, USUARIOS.GESTOR_COORD_12.senha);
 
             await acessarSubprocessoGestor(page, descricao, UNIDADE_ALVO);
@@ -485,7 +464,7 @@ test.describe('Smoke Test - Sistema SGC', () => {
             await verificarPaginaPainel(page);
 
             // 2. GESTOR SECRETARIA_1 - Segundo Aceite
-            await page.getByTestId('btn-logout').click({force: true});
+            await fazerLogout(page);
             await loginComPerfil(page, USUARIOS.GESTOR_SECRETARIA_1.titulo, USUARIOS.GESTOR_SECRETARIA_1.senha, USUARIOS.GESTOR_SECRETARIA_1.perfil);
             await acessarSubprocessoGestor(page, descricao, UNIDADE_ALVO);
             await navegarParaAtividadesVisualizacao(page);
@@ -495,7 +474,7 @@ test.describe('Smoke Test - Sistema SGC', () => {
             await verificarPaginaPainel(page);
 
             // 3. ADMIN - Homologação Final
-            await page.getByTestId('btn-logout').click({force: true});
+            await fazerLogout(page);
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
             // Navegar para o subprocesso (admin vê tabela de unidades)
@@ -507,14 +486,13 @@ test.describe('Smoke Test - Sistema SGC', () => {
             await page.getByTestId('btn-acao-analisar-principal').click();
             await page.getByTestId('inp-aceite-cadastro-obs').fill('Homologado sem ressalvas');
             await page.getByTestId('btn-aceite-cadastro-confirmar').click();
-            await page.waitForTimeout(100);
+            await expect(page.getByTestId('card-subprocesso-mapa-edicao')).toBeVisible();
 
             // Agora o Mapa deve estar habilitado para edição pelo Admin
             // Navegar para mapa
             await navegarParaMapa(page);
 
             await abrirModalCriarCompetencia(page);
-            await page.waitForTimeout(100);
 
             const competenciaDesc = 'Desenvolvimento de Software';
             await page.getByTestId('inp-criar-competencia-descricao').fill(competenciaDesc);
@@ -525,15 +503,14 @@ test.describe('Smoke Test - Sistema SGC', () => {
 
             await page.getByTestId('btn-criar-competencia-salvar').click();
             await expect(modal).toBeHidden();
-            await page.waitForTimeout(100);
+            await expect(page.getByText(competenciaDesc)).toBeVisible();
 
             // Hover na competência
             const card = page.locator('.competencia-card', {has: page.getByText(competenciaDesc)});
             await card.hover();
-            await page.waitForTimeout(100);
 
             await page.getByTestId('btn-cad-mapa-disponibilizar').click();
-            await page.waitForTimeout(100);
+            await expect(page.getByTestId('mdl-disponibilizar-mapa')).toBeVisible();
 
             const dataLimite = new Date();
             dataLimite.setDate(dataLimite.getDate() + 30);
@@ -550,21 +527,20 @@ test.describe('Smoke Test - Sistema SGC', () => {
 
             // Parâmetros (se admin)
             await page.getByTestId('btn-parametros').click();
-            await page.waitForTimeout(300);
+            await expect(page.getByLabel(/Dias para inativação de processos/i)).toBeVisible();
             await page.goto('/painel');
 
             // Seção Unidades (para ADMIN)
             await page.getByText('Unidades').first().click();
-            await page.waitForTimeout(100);
+            await expect(page.getByTestId('btn-arvore-expand-SECRETARIA_1')).toBeVisible();
 
             await page.getByText('Relatórios').click();
-            await page.waitForTimeout(100);
+            await expect(page.getByRole('heading', {name: /Relatórios/i})).toBeVisible();
 
             await page.getByText('Histórico').click();
-            await page.waitForTimeout(100);
+            await expect(page.locator('table')).toBeVisible();
 
             await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-            await page.waitForTimeout(100);
         });
     });
 
@@ -635,7 +611,7 @@ test.describe('Smoke Test - Sistema SGC', () => {
             });
 
             // Login como Chefe da SECAO_111 para disponibilizar cadastro
-            await page.getByTestId('btn-logout').click();
+            await fazerLogout(page);
             await login(page, USUARIOS.CHEFE_SECAO_111.titulo, USUARIOS.CHEFE_SECAO_111.senha);
 
             await page.getByTestId('tbl-processos').getByText(descricao).first().click();
@@ -651,10 +627,10 @@ test.describe('Smoke Test - Sistema SGC', () => {
             await page.getByTestId('btn-cad-atividades-disponibilizar').click();
             await expect(page.getByTestId('btn-confirmar-disponibilizacao')).toBeVisible();
             await page.getByTestId('btn-confirmar-disponibilizacao').click();
-            await page.waitForTimeout(500);
+            await verificarPaginaPainel(page);
 
             // Login como Gestor da COORD_11 para ver botão de aceitar em bloco
-            await page.getByTestId('btn-logout').click();
+            await fazerLogout(page);
             await login(page, USUARIOS.GESTOR_COORD.titulo, USUARIOS.GESTOR_COORD.senha);
 
             await page.getByTestId('tbl-processos').getByText(descricao).first().click();
@@ -664,11 +640,11 @@ test.describe('Smoke Test - Sistema SGC', () => {
             const btnAceitarBloco = page.getByRole('button', {name: /Aceitar.*Bloco/i});
             await expect(btnAceitarBloco).toBeVisible();
             await btnAceitarBloco.click();
-            await page.waitForTimeout(300);
+            await expect(page.getByRole('dialog')).toBeVisible();
             await page.getByRole('button', {name: /Cancelar/i}).click();
 
             // Login como Admin para homologar em bloco
-            await page.getByTestId('btn-logout').click();
+            await fazerLogout(page);
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
             await page.getByTestId('tbl-processos').getByText(descricao).first().click();
@@ -678,7 +654,7 @@ test.describe('Smoke Test - Sistema SGC', () => {
             const btnHomologarBloco = page.getByRole('button', {name: /Homologar.*Bloco/i});
             await expect(btnHomologarBloco).toBeVisible();
             await btnHomologarBloco.click();
-            await page.waitForTimeout(300);
+            await expect(page.getByRole('dialog')).toBeVisible();
             await page.getByRole('button', {name: /Cancelar/i}).click();
 
             // Capturar botão de disponibilizar mapas em bloco (CDU-24)
@@ -724,7 +700,7 @@ test.describe('Smoke Test - Sistema SGC', () => {
             const btnAlterarData = page.getByRole('button', {name: /Alterar.*data.*limite/i});
             await expect(btnAlterarData).toBeVisible();
             await btnAlterarData.click();
-            await page.waitForTimeout(300);
+            await expect(page.getByRole('dialog')).toBeVisible();
             await page.getByRole('button', {name: /Cancelar/i}).click();
 
             // Modal de reabrir cadastro (CDU-32)
@@ -746,27 +722,23 @@ test.describe('Smoke Test - Sistema SGC', () => {
             const linkUnidades = page.getByRole('link', {name: /Unidades/i});
             await expect(linkUnidades).toBeVisible();
             await linkUnidades.click();
-            await page.waitForTimeout(500);
+            await expect(page.getByTestId('btn-arvore-expand-SECRETARIA_1')).toBeVisible();
 
             const btnExpand = page.getByTestId('btn-arvore-expand-SECRETARIA_1');
-            await expect(btnExpand).toBeVisible();
             await btnExpand.click();
-            await page.waitForTimeout(300);
+            await expect(page.getByTestId('btn-arvore-expand-COORD_12')).toBeVisible();
 
             const btnExpandCoord12 = page.getByTestId('btn-arvore-expand-COORD_12');
-            await expect(btnExpandCoord12).toBeVisible();
             await btnExpandCoord12.click();
-            await page.waitForTimeout(300);
+            await expect(page.getByText('SECAO_121').first()).toBeVisible();
 
             const unidade = page.getByText('SECAO_121').first();
-            await expect(unidade).toBeVisible();
             await unidade.click();
-            await page.waitForTimeout(500);
+            await expect(page.getByRole('button', {name: /Criar atribuição|Nova atribuição/i})).toBeVisible();
 
             const btnCriarAtribuicao = page.getByRole('button', {name: /Criar atribuição|Nova atribuição/i});
-            await expect(btnCriarAtribuicao).toBeVisible();
             await btnCriarAtribuicao.click();
-            await page.waitForTimeout(300);
+            await expect(page.getByRole('dialog')).toBeVisible();
             await page.getByRole('button', {name: /Cancelar/i}).click();
         });
     });
@@ -780,7 +752,6 @@ test.describe('Smoke Test - Sistema SGC', () => {
             const linkHistorico = page.getByRole('link', {name: /Histórico/i});
             await expect(linkHistorico).toBeVisible();
             await linkHistorico.click();
-            await page.waitForTimeout(500);
             await expect(page.locator('table')).toBeVisible();
         });
     });
@@ -792,7 +763,6 @@ test.describe('Smoke Test - Sistema SGC', () => {
 
             // Página de parâmetros (CDU-31)
             await page.getByTestId('btn-parametros').click();
-            await page.waitForTimeout(500);
 
             // Seção de configurações do sistema (CDU-31)
             const inputDiasInativacao = page.getByLabel(/Dias para inativação de processos/i);
@@ -800,13 +770,12 @@ test.describe('Smoke Test - Sistema SGC', () => {
 
             // Página de administradores (CDU-30)
             await page.getByTestId('btn-administradores').click();
-            await page.waitForTimeout(300);
+            await expect(page.getByRole('button', {name: /Adicionar|Novo/i})).toBeVisible();
 
             // Botão de adicionar administrador
             const btnAdicionar = page.getByRole('button', {name: /Adicionar|Novo/i});
-            await expect(btnAdicionar).toBeVisible();
             await btnAdicionar.click();
-            await page.waitForTimeout(300);
+            await expect(page.getByRole('dialog')).toBeVisible();
             await page.getByRole('button', {name: /Cancelar/i}).click();
         });
     });
@@ -819,16 +788,18 @@ test.describe('Smoke Test - Sistema SGC', () => {
             const linkRelatorios = page.getByRole('link', {name: /Relatórios/i});
             await expect(linkRelatorios).toBeVisible();
             await linkRelatorios.click();
-            await page.waitForTimeout(500);
 
+            const painelAndamento = page.getByRole('tabpanel', {name: /Andamento de processo/i});
             await expect(page.getByRole('heading', {name: /Relatórios/i})).toBeVisible();
             await expect(page.getByRole('tab', {name: /Andamento de processo/i})).toBeVisible();
-            await expect(page.getByLabel(/Selecione o Processo/i)).toBeVisible();
-            await expect(page.getByRole('button', {name: /Gerar Relatório/i})).toBeVisible();
+            await expect(painelAndamento.getByLabel(/Selecione o Processo/i)).toBeVisible();
+            await expect(painelAndamento.getByRole('button', {name: /Gerar Relatório/i})).toBeVisible();
 
             await page.getByRole('tab', {name: /^Mapas$/i}).click();
-            await expect(page.getByLabel(/Selecione a unidade/i)).toBeVisible();
-            await expect(page.getByRole('button', {name: /Gerar PDF/i})).toBeVisible();
+            const painelMapas = page.getByRole('tabpanel', {name: /^Mapas$/i});
+            await expect(painelMapas.getByLabel(/Selecione o Processo/i)).toBeVisible();
+            await expect(painelMapas.getByLabel(/Selecione a unidade/i)).toBeVisible();
+            await expect(painelMapas.getByRole('button', {name: /Gerar PDF/i})).toBeVisible();
         });
     });
 });

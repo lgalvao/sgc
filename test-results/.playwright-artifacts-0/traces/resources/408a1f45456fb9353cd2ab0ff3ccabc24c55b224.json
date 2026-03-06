@@ -1,0 +1,1 @@
+[{"chave":"DIAS_INATIVACAO_PROCESSO","codigo":1,"descricao":"Dias para inativação de processos","valor":"30"},{"chave":"DIAS_ALERTA_NOVO","codigo":2,"descricao":"Dias para indicação de alerta como novo","valor":"3"}]
