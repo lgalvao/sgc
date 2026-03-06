@@ -27,6 +27,28 @@ public class RelatorioFacade {
     private final PdfFactory pdfFactory;
 
     @Transactional(readOnly = true)
+    public List<RelatorioAndamentoDto> obterRelatorioAndamento(Long codProcesso) {
+        List<Subprocesso> subprocessos = subprocessoService.listarEntidadesPorProcesso(codProcesso);
+
+        return subprocessos.stream().map(sp -> {
+            Unidade unidade = sp.getUnidade();
+            UnidadeResponsavelDto respDto = responsavelService.buscarResponsavelUnidade(unidade.getCodigo());
+            String responsavel = respDto.titularNome();
+
+            java.time.LocalDateTime dataMovimentacao = sp.getDataLimiteEtapa1();
+
+            return RelatorioAndamentoDto.builder()
+                    .siglaUnidade(unidade.getSigla())
+                    .nomeUnidade(unidade.getNome())
+                    .situacaoAtual(sp.getSituacao().name())
+                    .dataUltimaMovimentacao(dataMovimentacao)
+                    .responsavel(responsavel)
+                    .titular(responsavel)
+                    .build();
+        }).toList();
+    }
+
+    @Transactional(readOnly = true)
     public void gerarRelatorioAndamento(Long codProcesso, OutputStream outputStream) {
         Processo processo = processoFacade.buscarEntidadePorId(codProcesso);
         List<Subprocesso> subprocessos = subprocessoService.listarEntidadesPorProcesso(codProcesso);

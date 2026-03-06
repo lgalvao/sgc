@@ -1,13 +1,9 @@
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 import {mount} from '@vue/test-utils';
 import Relatorios from '@/views/RelatoriosView.vue';
-import {Perfil, TipoProcesso} from '@/types/tipos';
-import {useProcessosStore} from '@/stores/processos';
-import {usePerfilStore} from '@/stores/perfil';
-import {createTestingPinia} from '@pinia/testing';
+import {TipoProcesso} from '@/types/tipos';
 import {getCommonMountOptions, setupComponentTest} from '@/test-utils/componentTestHelpers';
-
-global.URL.createObjectURL = vi.fn(() => 'blob:mock-url');
+import * as useRelatoriosModule from '@/composables/api/useRelatorios';
 
 describe('Relatorios.vue', () => {
     const ctx = setupComponentTest();
@@ -15,55 +11,50 @@ describe('Relatorios.vue', () => {
     const mockProcessos = [
         {
             codigo: 1,
-            descricao: 'Processo 1',
+            descricao: 'Processo Mapeamento 2024',
             tipo: TipoProcesso.MAPEAMENTO,
             situacao: 'EM_ANDAMENTO',
-            dataCriacao: '2023-01-01T00:00:00',
-            dataLimite: '2023-12-31T00:00:00',
-            unidadeNome: 'Unidade 1'
         },
         {
             codigo: 2,
-            descricao: 'Processo 2',
+            descricao: 'Processo Revisao 2025',
             tipo: TipoProcesso.REVISAO,
             situacao: 'CRIADO',
-            dataCriacao: '2023-06-01T00:00:00',
-            dataLimite: '2023-12-31T00:00:00',
-            unidadeNome: 'Unidade 2'
         }
     ];
 
-    const mockMapa = {
-        codigo: 1,
-        unidade: {sigla: 'TEST'},
-        competencias: [{}, {}]
-    };
+    const mockObterRelatorioAndamento = vi.fn();
+    const mockDownloadRelatorioAndamentoPdf = vi.fn();
+    const mockDownloadRelatorioMapasPdf = vi.fn();
 
     const stubs = {
         BContainer: {template: '<div><slot /></div>'},
-        BCard: {template: '<div class="card" @click="$emit(\'click\')"><slot /></div>'},
+        BCard: {template: '<div class="card"><slot /></div>'},
         BButton: {template: '<button @click="$emit(\'click\')"><slot /></button>'},
-        BModal: {template: '<div v-if="modelValue" data-testid="modal"><slot /></div>', props: ['modelValue']},
+        BTabs: {template: '<div><slot /></div>'},
+        BTab: {template: '<div><slot /></div>'},
         BFormSelect: {
-            template: '<select :value="modelValue" @change="$emit(\'update:modelValue\', $event.target.value)"></select>',
+            template: '<select :value="modelValue" @change="$emit(\'update:modelValue\', Number($event.target.value))"></select>',
             props: ['modelValue', 'options']
         },
-        BFormInput: {
-            template: '<input :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />',
-            props: ['modelValue']
-        },
+        BTable: {template: '<table class="b-table"></table>', props: ['items']},
+        EmptyState: {template: '<div class="empty-state">Vazio</div>'},
+        BSpinner: {template: '<span class="spinner"></span>'}
     };
 
     beforeEach(() => {
         vi.clearAllMocks();
 
+        vi.spyOn(useRelatoriosModule, 'useRelatorios').mockReturnValue({
+            obterRelatorioAndamento: mockObterRelatorioAndamento,
+            downloadRelatorioAndamentoPdf: mockDownloadRelatorioAndamentoPdf,
+            downloadRelatorioMapasPdf: mockDownloadRelatorioMapasPdf
+        });
+
         const mountOptions = getCommonMountOptions({
             processos: {
                 processosPainel: mockProcessos,
-            },
-            mapas: {
-                mapaCompleto: mockMapa,
-            },
+            }
         }, stubs);
 
         ctx.wrapper = mount(Relatorios, mountOptions);
@@ -73,163 +64,51 @@ describe('Relatorios.vue', () => {
         vi.restoreAllMocks();
     });
 
-    it('exibe cards de relatórios', () => {
-        expect(ctx.wrapper!.find('[data-testid="card-relatorio-mapas"]').exists()).toBe(true);
-        expect(ctx.wrapper!.find('[data-testid="card-relatorio-gaps"]').exists()).toBe(true);
-        expect(ctx.wrapper!.find('[data-testid="card-relatorio-andamento"]').exists()).toBe(true);
+    it('deve chamar a api para gerar relatorio de andamento ao clicar no botao', async () => {
+        mockObterRelatorioAndamento.mockResolvedValue([
+            { siglaUnidade: 'U1', responsavel: 'Joao' }
+        ]);
+
+        // Simula selecao de processo (o select em Vue Test Utils com stub pode ser setado no vm)
+        ctx.wrapper!.vm.processoIdSelecionado = 1;
+        await ctx.wrapper!.vm.$nextTick();
+        
+        // Pega todos os botoes. O primeiro é o de Gerar Andamento.
+        const btns = ctx.wrapper!.findAll('button');
+        await btns[0].trigger('click');
+
+        expect(mockObterRelatorioAndamento).toHaveBeenCalledWith(1);
+        await ctx.wrapper!.vm.$nextTick();
+        
+        expect(ctx.wrapper!.vm.relatorioAndamento).toHaveLength(1);
     });
 
-    it('filtra processos', async () => {
-        expect(ctx.wrapper!.vm.processosFiltrados).toHaveLength(2);
+    it('deve chamar a exportacao de pdf de andamento', async () => {
+        mockObterRelatorioAndamento.mockResolvedValue([{ siglaUnidade: 'U1' }]);
 
-        ctx.wrapper!.vm.filtroTipo = TipoProcesso.REVISAO;
+        ctx.wrapper!.vm.processoIdSelecionado = 1;
         await ctx.wrapper!.vm.$nextTick();
+        
+        await ctx.wrapper!.findAll('button')[0].trigger('click'); // Gerar andamento
+        await ctx.wrapper!.vm.$nextTick(); // espera a promise do obterRelatorio
 
-        expect(ctx.wrapper!.vm.processosFiltrados).toHaveLength(1);
-        expect(ctx.wrapper!.vm.processosFiltrados[0].tipo).toBe(TipoProcesso.REVISAO);
+        // O segundo botao so aparece depois que a tabela tem dados
+        const btnsPosQuery = ctx.wrapper!.findAll('button');
+        await btnsPosQuery[1].trigger('click'); // Exportar PDF andamento
 
-        ctx.wrapper!.vm.filtroTipo = '';
-        ctx.wrapper!.vm.filtroDataInicio = '2023-05-01';
-        await ctx.wrapper!.vm.$nextTick();
-
-        expect(ctx.wrapper!.vm.processosFiltrados).toHaveLength(1);
-        expect(ctx.wrapper!.vm.processosFiltrados[0].codigo).toBe(2);
+        expect(mockDownloadRelatorioAndamentoPdf).toHaveBeenCalledWith(1);
     });
 
-    it('abre modais ao clicar nos cards', async () => {
-        await ctx.wrapper!.find('[data-testid="card-relatorio-mapas"]').trigger('click');
-        expect(ctx.wrapper!.vm.mostrarModalMapasVigentes).toBe(true);
-
-        ctx.wrapper!.vm.mostrarModalMapasVigentes = false;
+    it('deve chamar a exportacao de pdf de mapas', async () => {
+        ctx.wrapper!.vm.processoIdSelecionadoMapas = 2;
         await ctx.wrapper!.vm.$nextTick();
+        
+        // O botao de mapas é o ultimo (index 1 antes de ter dados no andamento, ou index 2 se tiver)
+        // Como o andamento ta vazio, temos 2 botoes disponiveis no DOM: [0] = Gerar Andamento, [1] = Gerar PDF Mapas
+        const btns = ctx.wrapper!.findAll('button');
+        await btns[1].trigger('click');
 
-        await ctx.wrapper!.find('[data-testid="card-relatorio-gaps"]').trigger('click');
-        expect(ctx.wrapper!.vm.mostrarModalDiagnosticosGaps).toBe(true);
-
-        ctx.wrapper!.vm.mostrarModalDiagnosticosGaps = false;
-        await ctx.wrapper!.vm.$nextTick();
-
-        await ctx.wrapper!.find('[data-testid="card-relatorio-andamento"]').trigger('click');
-        expect(ctx.wrapper!.vm.mostrarModalAndamentoGeral).toBe(true);
-    });
-
-    it('exporta CSV para Mapas Vigentes', async () => {
-        expect(ctx.wrapper!.vm.mapasVigentes).toHaveLength(1);
-
-        ctx.wrapper!.vm.mostrarModalMapasVigentes = true;
-        await ctx.wrapper!.vm.$nextTick();
-
-        const btn = ctx.wrapper!.find('[data-testid="export-csv-mapas"]');
-
-        const clickSpy = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {
-        });
-        const setAttributeSpy = vi.spyOn(HTMLAnchorElement.prototype, 'setAttribute');
-
-        await btn.trigger('click');
-
-        expect(global.URL.createObjectURL).toHaveBeenCalled();
-        expect(setAttributeSpy).toHaveBeenCalledWith('download', 'mapas-vigentes.csv');
-        expect(clickSpy).toHaveBeenCalled();
-    });
-
-    it('exporta CSV para Diagnósticos Gaps', async () => {
-        ctx.wrapper!.vm.mostrarModalDiagnosticosGaps = true;
-        await ctx.wrapper!.vm.$nextTick();
-
-        const btn = ctx.wrapper!.find('[data-testid="export-csv-diagnosticos"]');
-
-        const clickSpy = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {
-        });
-        const setAttributeSpy = vi.spyOn(HTMLAnchorElement.prototype, 'setAttribute');
-
-        await btn.trigger('click');
-
-        expect(setAttributeSpy).toHaveBeenCalledWith('download', 'diagnosticos-gaps.csv');
-        expect(clickSpy).toHaveBeenCalled();
-    });
-
-    it('exporta CSV para Andamento Geral', async () => {
-        ctx.wrapper!.vm.mostrarModalAndamentoGeral = true;
-        await ctx.wrapper!.vm.$nextTick();
-
-        const btn = ctx.wrapper!.find('[data-testid="export-csv-andamento"]');
-
-        const clickSpy = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {
-        });
-        const setAttributeSpy = vi.spyOn(HTMLAnchorElement.prototype, 'setAttribute');
-
-        await btn.trigger('click');
-
-        expect(setAttributeSpy).toHaveBeenCalledWith('download', 'andamento-geral.csv');
-        expect(clickSpy).toHaveBeenCalled();
-    });
-
-    it('filtra processos por data fim', async () => {
-        ctx.wrapper!.vm.filtroDataInicio = '';
-        ctx.wrapper!.vm.filtroDataFim = '2023-05-01';
-        await ctx.wrapper!.vm.$nextTick();
-
-        expect(ctx.wrapper!.vm.processosFiltrados).toHaveLength(1);
-        expect(ctx.wrapper!.vm.processosFiltrados[0].codigo).toBe(1);
-    });
-
-    it('filtra diagnosticos gaps', async () => {
-        expect(ctx.wrapper!.vm.diagnosticosGapsFiltrados).toHaveLength(4);
-
-        ctx.wrapper!.vm.filtroTipo = TipoProcesso.MAPEAMENTO;
-        await ctx.wrapper!.vm.$nextTick();
-        expect(ctx.wrapper!.vm.diagnosticosGapsFiltrados).toHaveLength(0);
-
-        ctx.wrapper!.vm.filtroTipo = TipoProcesso.DIAGNOSTICO;
-        await ctx.wrapper!.vm.$nextTick();
-        expect(ctx.wrapper!.vm.diagnosticosGapsFiltrados).toHaveLength(4);
-
-        ctx.wrapper!.vm.filtroTipo = '';
-        ctx.wrapper!.vm.filtroDataInicio = '2024-08-01';
-        ctx.wrapper!.vm.filtroDataFim = '2024-08-31';
-        await ctx.wrapper!.vm.$nextTick();
-
-        expect(ctx.wrapper!.vm.diagnosticosGapsFiltrados).toHaveLength(2);
-        expect(ctx.wrapper!.vm.diagnosticosGapsFiltrados.map((d: any) => d.codigo)).toContain(1);
-        expect(ctx.wrapper!.vm.diagnosticosGapsFiltrados.map((d: any) => d.codigo)).toContain(2);
-    });
-
-    it('mapasVigentes retorna vazio se dados incompletos', async () => {
-        const stubsLocal = {
-            BContainer: {template: '<div><slot /></div>'},
-            BCard: {template: '<div class="card"><slot /></div>'},
-            BFormSelect: {template: '<select></select>', props: ['options']},
-            BFormInput: {template: '<input />'},
-        };
-
-        const mountOptions = getCommonMountOptions({
-            mapas: {
-                mapaCompleto: {},
-            },
-        }, stubsLocal);
-
-        const wrapper = mount(Relatorios, mountOptions);
-        expect((wrapper.vm as any).mapasVigentes).toHaveLength(0);
-    });
-
-    it('busca processos no mount se a lista estiver vazia', async () => {
-        const pinia = createTestingPinia({stubActions: false});
-        const processosStore = useProcessosStore(pinia);
-        const perfilStore = usePerfilStore(pinia);
-
-        perfilStore.perfilSelecionado = Perfil.ADMIN;
-        perfilStore.unidadeSelecionada = 1;
-        processosStore.processosPainel = [];
-
-        const spy = vi.spyOn(processosStore, 'buscarProcessosPainel').mockResolvedValue([] as any);
-
-        mount(Relatorios, {
-            global: {
-                plugins: [pinia],
-                stubs: stubs
-            }
-        });
-
-        expect(spy).toHaveBeenCalled();
+        // Passa undefined como unidade pois nao foi selecionada
+        expect(mockDownloadRelatorioMapasPdf).toHaveBeenCalledWith(2, undefined);
     });
 });

@@ -9,6 +9,7 @@ import org.springframework.security.access.prepost.*;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.*;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/relatorios")
@@ -19,17 +20,24 @@ public class RelatorioController {
 
     @GetMapping("/andamento/{codProcesso}")
     @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Gera a visualização em JSON do andamento (CDU-35)")
+    public ResponseEntity<List<RelatorioAndamentoDto>> obterRelatorioAndamento(@PathVariable Long codProcesso) {
+        return ResponseEntity.ok(relatorioService.obterRelatorioAndamento(codProcesso));
+    }
+
+    @GetMapping("/andamento/{codProcesso}/exportar")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Gera relatório de andamento do processo (CDU-35)")
-    public void gerarRelatorioAndamento(@PathVariable Long codProcesso, HttpServletResponse response) throws IOException {
+    public void gerarRelatorioAndamentoPdf(@PathVariable Long codProcesso, HttpServletResponse response) throws IOException {
         response.setContentType(MediaType.APPLICATION_PDF_VALUE);
         response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=relatorio_andamento.pdf");
         relatorioService.gerarRelatorioAndamento(codProcesso, response.getOutputStream());
     }
 
-    @GetMapping("/mapas/{codProcesso}")
+    @GetMapping("/mapas/{codProcesso}/exportar")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Gera relatório consolidado de mapas (CDU-36)")
-    public void gerarRelatorioMapas(@PathVariable Long codProcesso,
+    public void gerarRelatorioMapasPdf(@PathVariable Long codProcesso,
                                     @RequestParam(required = false) Long codUnidade,
                                     HttpServletResponse response) throws IOException {
         response.setContentType(MediaType.APPLICATION_PDF_VALUE);
