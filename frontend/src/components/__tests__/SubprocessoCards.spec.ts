@@ -37,7 +37,13 @@ describe('SubprocessoCards.vue', () => {
                         createSpy: vi.fn,
                         initialState: {
                             subprocessos: {
-                                subprocessoDetalhe: {codigo: 100}
+                                subprocessoDetalhe: {
+                                    codigo: 100,
+                                    permissoes: {
+                                        habilitarAcessoCadastro: true,
+                                        habilitarAcessoMapa: true
+                                    }
+                                }
                             }
                         }
                     })

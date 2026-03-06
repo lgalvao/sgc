@@ -15,7 +15,7 @@ describe("ImportarAtividadesModal Coverage", () => {
     it("exibe mensagem quando não há processos finalizados", async () => {
         context.wrapper = mount(ImportarAtividadesModal, {
             ...getCommonMountOptions({
-                processos: {processosFinalizados: []}
+                processos: {processosParaImportacao: []}
             }),
             props: {mostrar: true, codSubprocessoDestino: 999},
         });
@@ -27,7 +27,7 @@ describe("ImportarAtividadesModal Coverage", () => {
         context.wrapper = mount(ImportarAtividadesModal, {
             ...getCommonMountOptions({
                 processos: {
-                    processosFinalizados: [{codigo: 1}],
+                    processosParaImportacao: [{codigo: 1}],
                     processoDetalhe: {unidades: [{codUnidade: 10}]}
                 }
             }),
@@ -57,7 +57,7 @@ describe("ImportarAtividadesModal Coverage", () => {
             global: {plugins: [pinia]}
         });
 
-        const spy = vi.spyOn(processosStore, 'buscarProcessosFinalizados');
+        const spy = vi.spyOn(processosStore, 'buscarProcessosParaImportacao');
 
         await wrapper.setProps({mostrar: true});
 
@@ -68,7 +68,7 @@ describe("ImportarAtividadesModal Coverage", () => {
     it("lida com seleção de processo e unidade nulos", async () => {
         context.wrapper = mount(ImportarAtividadesModal, {
             ...getCommonMountOptions({
-                processos: {processosFinalizados: [{codigo: 1}]}
+                processos: {processosParaImportacao: [{codigo: 1}]}
             }),
             props: {mostrar: true, codSubprocessoDestino: 999},
         });
@@ -118,7 +118,7 @@ describe("ImportarAtividadesModal Coverage", () => {
         const mockUnidade = {codUnidade: 10, sigla: 'U1', codSubprocesso: 100};
         const mockAtividade = {codigo: 1, descricao: 'A1'};
 
-        processosStore.processosFinalizados = [mockProcesso] as any;
+        processosStore.processosParaImportacao = [mockProcesso] as any;
         processosStore.processoDetalhe = {unidades: [mockUnidade]} as any;
         atividadesStore.obterAtividadesPorSubprocesso = vi.fn().mockReturnValue([mockAtividade]);
         (atividadesStore.importarAtividades as any).mockResolvedValue(undefined);
