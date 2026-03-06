@@ -124,9 +124,9 @@ import {
   removerAdministrador
 } from '@/services/administradorService';
 import {normalizeError} from '@/utils/apiError';
-import {useNotificacoesStore} from '@/stores/feedback';
+import {useNotification} from '@/composables/useNotification';
 
-const notificacoes = useNotificacoesStore();
+const {notify} = useNotification();
 
 const administradores = ref<AdministradorDto[]>([]);
 const carregandoAdmins = ref(false);

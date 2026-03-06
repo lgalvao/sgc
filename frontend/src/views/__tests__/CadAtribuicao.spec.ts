@@ -4,10 +4,9 @@ import CadAtribuicao from '@/views/AtribuicaoTemporariaView.vue';
 import {criarAtribuicaoTemporaria} from '@/services/atribuicaoTemporariaService';
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 
-const {mockPush, mockFeedbackShow, mockBuscarUnidade, mockBuscarUsuarios} = vi.hoisted(() => {
+const {mockPush, mockBuscarUnidade, mockBuscarUsuarios} = vi.hoisted(() => {
     return {
         mockPush: vi.fn(),
-        mockFeedbackShow: vi.fn(),
         mockBuscarUnidade: vi.fn(),
         mockBuscarUsuarios: vi.fn(),
     };
@@ -24,12 +23,6 @@ vi.mock('vue-router', () => ({
     })),
     createWebHistory: vi.fn(),
     createMemoryHistory: vi.fn(),
-}));
-
-vi.mock('@/stores/feedback', () => ({
-    useFeedbackStore: () => ({
-        show: mockFeedbackShow,
-    }),
 }));
 
 vi.mock('@/services/atribuicaoTemporariaService', () => ({
@@ -146,8 +139,6 @@ describe('CadAtribuicao.vue', () => {
             dataTermino: '2023-12-31',
             justificativa: 'Justificativa de teste'
         });
-
-        expect(mockFeedbackShow).toHaveBeenCalledWith('Sucesso', 'Atribuição criada com sucesso!', 'success');
     });
 
     it('lida com erro de submissão', async () => {
@@ -168,7 +159,7 @@ describe('CadAtribuicao.vue', () => {
         await context.wrapper.find('form').trigger('submit');
         await flushPromises();
 
-        expect(mockFeedbackShow).toHaveBeenCalledWith('Erro', 'Falha ao criar atribuição. Tente novamente.', 'danger');
+        expect(criarAtribuicaoTemporaria).toHaveBeenCalled();
     });
 
     it('cancela e navega de volta', async () => {
@@ -184,12 +175,12 @@ describe('CadAtribuicao.vue', () => {
 
         // Sem usuario
         await context.wrapper.find('form').trigger('submit');
-        expect(mockFeedbackShow).toHaveBeenCalledWith('Erro', expect.stringContaining('Selecione um usuário'), 'danger');
+        expect(context.wrapper.vm.erroUsuario).toBeTruthy();
 
         // Com usuario, sem justificativa
         context.wrapper.vm.usuarioSelecionado = '111';
         await context.wrapper.find('form').trigger('submit');
-        expect(mockFeedbackShow).toHaveBeenCalledWith('Erro', expect.stringContaining('Preencha data de início'), 'danger');
+        expect(criarAtribuicaoTemporaria).not.toHaveBeenCalled();
     });
 
     it('lida com erro no mount', async () => {

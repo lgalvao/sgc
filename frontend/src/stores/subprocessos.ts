@@ -23,7 +23,6 @@ import {
 } from "@/services/processoService";
 import {usePerfilStore} from "@/stores/perfil";
 import {useProcessosStore} from "@/stores/processos";
-import {useFeedbackStore} from "@/stores/feedback";
 import {useUnidadesStore} from "@/stores/unidades";
 import {useMapasStore} from "@/stores/mapas";
 import {useAtividadesStore} from "@/stores/atividades";
@@ -43,13 +42,11 @@ import {logger} from "@/utils";
 export const useSubprocessosStore = defineStore("subprocessos", () => {
     const subprocessoDetalhe = ref<SubprocessoDetalhe | null>(null);
     const {lastError, clearError, withErrorHandling} = useErrorHandler();
-    const feedbackStore = useFeedbackStore();
 
-    async function _executarAcao(acao: () => Promise<any>, sucessoMsg: string, _: string): Promise<boolean> {
+    async function _executarAcao(acao: () => Promise<any>, _sucessoMsg: string, _: string): Promise<boolean> {
         try {
             await withErrorHandling(async () => {
                 await acao();
-                feedbackStore.show(sucessoMsg, `${sucessoMsg}.`, 'success');
 
                 const processosStore = useProcessosStore();
                 if (processosStore.processoDetalhe) {

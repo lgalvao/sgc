@@ -4,11 +4,8 @@ import {
     getOrNull,
     isAxiosError,
     normalizeError,
-    notifyError,
     shouldNotifyGlobally
 } from '@/utils/apiError';
-import {useFeedbackStore} from '@/stores/feedback';
-import {createTestingPinia} from '@pinia/testing';
 import logger from '@/utils/logger';
 
 describe('apiError utils', () => {
@@ -81,15 +78,6 @@ describe('apiError utils', () => {
         expect(shouldNotifyGlobally({kind: 'validation'} as any)).toBe(false);
         expect(shouldNotifyGlobally({kind: 'network'} as any)).toBe(true);
         expect(shouldNotifyGlobally({kind: 'forbidden'} as any)).toBe(false);
-    });
-
-    it('notifyError deve chamar o feedbackStore', () => {
-        const pinia = createTestingPinia();
-        const feedbackStore = useFeedbackStore(pinia);
-
-        notifyError({kind: 'notFound', message: 'Op'} as any);
-
-        expect(feedbackStore.show).toHaveBeenCalledWith('Não Encontrado', 'Op', 'danger', 7000);
     });
 
     describe('helper functions', () => {

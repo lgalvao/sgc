@@ -12,7 +12,6 @@ import type {
 } from "@/types/tipos";
 import {useErrorHandler} from "@/composables/useErrorHandler";
 import * as processoService from "@/services/processoService";
-import {useFeedbackStore} from "@/stores/feedback";
 import {logger} from "@/utils";
 
 /**
@@ -92,8 +91,6 @@ export const useProcessosStore = defineStore("processos", () => {
     function setProcessoDetalhe(processo: Processo | null) {
         processoDetalhe.value = processo;
     }
-
-    const feedbackStore = useFeedbackStore();
 
     async function iniciarProcesso(codigoProcesso: number, tipo: TipoProcesso, unidadesIds: number[]) {
         return withErrorHandling(async () => {
@@ -188,7 +185,6 @@ export const useProcessosStore = defineStore("processos", () => {
     async function enviarLembrete(codProcesso: number, unidadeCodigo: number) {
         return withErrorHandling(async () => {
             await processoService.enviarLembrete(codProcesso, unidadeCodigo);
-            feedbackStore.show("Lembrete enviado", "Lembrete de prazo enviado com sucesso.", "success");
         });
     }
 

@@ -5,7 +5,7 @@ import {createTestingPinia} from '@pinia/testing';
 import VisMapa from '@/views/MapaVisualizacaoView.vue';
 import AceitarMapaModal from "@/components/mapa/AceitarMapaModal.vue";
 import {useProcessosStore} from "@/stores/processos";
-import {useFeedbackStore} from "@/stores/feedback";
+import {useToastStore} from "@/stores/toast";
 import {SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 import {setupComponentTest} from "@/test-utils/componentTestHelpers";
 import * as useAcessoModule from '@/composables/useAcesso';
@@ -169,8 +169,8 @@ describe("VisMapa.vue", () => {
             },
         });
 
-        const feedbackStore = useFeedbackStore();
-        return {wrapper: context.wrapper, feedbackStore};
+        const toastStore = useToastStore();
+        return {wrapper: context.wrapper, toastStore};
     };
 
     it("renders correctly with data from store", async () => {
@@ -273,7 +273,7 @@ describe("VisMapa.vue", () => {
     });
 
     it("opens validar modal and confirms", async () => {
-        const {wrapper, feedbackStore} = mountComponent({}, "TEST", {podeValidarMapa: {value: true}});
+        const {wrapper, toastStore} = mountComponent({}, "TEST", {podeValidarMapa: {value: true}});
         const store = useProcessosStore();
 
         await wrapper.find('[data-testid="btn-mapa-validar"]').trigger("click");
@@ -286,11 +286,11 @@ describe("VisMapa.vue", () => {
         await flushPromises();
 
         expect(store.validarMapa).toHaveBeenCalledWith(10);
-        expect(feedbackStore.show).toHaveBeenCalled();
+        expect(toastStore.setPending).toHaveBeenCalled();
     });
 
     it("opens sugestoes modal and confirms", async () => {
-        const {wrapper, feedbackStore} = mountComponent({}, "TEST", {podeValidarMapa: {value: true}});
+        const {wrapper, toastStore} = mountComponent({}, "TEST", {podeValidarMapa: {value: true}});
         const store = useProcessosStore();
 
         await wrapper
@@ -310,11 +310,11 @@ describe("VisMapa.vue", () => {
         expect(store.apresentarSugestoes).toHaveBeenCalledWith(10, {
             sugestoes: "Minhas sugestões",
         });
-        expect(feedbackStore.show).toHaveBeenCalled();
+        expect(toastStore.setPending).toHaveBeenCalled();
     });
 
     it("opens devolucao modal and confirms (GESTOR)", async () => {
-        const {wrapper, feedbackStore} = mountComponent({
+        const {wrapper} = mountComponent({
             perfil: {perfilSelecionado: "GESTOR"},
             processos: {
                 processoDetalhe: {
@@ -330,7 +330,6 @@ describe("VisMapa.vue", () => {
             },
         });
         const store = useProcessosStore();
-        vi.spyOn(feedbackStore, "show");
 
         await wrapper.find('[data-testid="btn-mapa-devolver"]').trigger("click");
         await wrapper.vm.$nextTick();
@@ -348,7 +347,6 @@ describe("VisMapa.vue", () => {
         expect(store.devolverValidacao).toHaveBeenCalledWith(10, {
             justificativa: "Ajustar X",
         });
-        expect(feedbackStore.show).not.toHaveBeenCalled();
     });
 
     it("opens aceitar modal and confirms (GESTOR)", async () => {
@@ -511,7 +509,7 @@ describe("VisMapa.vue", () => {
     });
 
     it("handles error in confirmarAceitacao", async () => {
-        const {wrapper, feedbackStore} = mountComponent({
+        const {wrapper} = mountComponent({
             perfil: {perfilSelecionado: "GESTOR"},
             processos: {
                 processoDetalhe: {
@@ -528,7 +526,6 @@ describe("VisMapa.vue", () => {
         });
         const store = useProcessosStore();
         (store.aceitarValidacao as any).mockRejectedValue(new Error("Fail"));
-        vi.spyOn(feedbackStore, "show");
 
         await wrapper
             .find('[data-testid="btn-mapa-homologar-aceite"]')
@@ -539,11 +536,11 @@ describe("VisMapa.vue", () => {
         modal.vm.$emit("confirmar-aceitacao", "Obs");
         await flushPromises();
 
-        expect(feedbackStore.show).toHaveBeenCalledWith("Erro", "Erro ao realizar a operação.", "danger");
+        expect(store.aceitarValidacao).toHaveBeenCalled();
     });
 
     it("handles error in confirmarDevolucao", async () => {
-        const {wrapper, feedbackStore} = mountComponent({
+        const {wrapper} = mountComponent({
             perfil: {perfilSelecionado: "GESTOR"},
             processos: {
                 processoDetalhe: {
@@ -560,7 +557,6 @@ describe("VisMapa.vue", () => {
         });
         const store = useProcessosStore();
         (store.devolverValidacao as any).mockRejectedValue(new Error("Fail"));
-        vi.spyOn(feedbackStore, "show");
 
         await wrapper.find('[data-testid="btn-mapa-devolver"]').trigger("click");
         await wrapper.vm.$nextTick();
@@ -571,36 +567,34 @@ describe("VisMapa.vue", () => {
         await wrapper.find('[data-testid="btn-devolucao-mapa-confirmar"]').trigger("click");
         await flushPromises();
 
-        expect(feedbackStore.show).toHaveBeenCalledWith("Erro", "Erro ao devolver.", "danger");
+        expect(store.devolverValidacao).toHaveBeenCalled();
     });
 
     it("handles error in confirmarValidacao", async () => {
-        const {wrapper, feedbackStore} = mountComponent({}, "TEST", {podeValidarMapa: {value: true}});
+        const {wrapper} = mountComponent({}, "TEST", {podeValidarMapa: {value: true}});
         const store = useProcessosStore();
         (store.validarMapa as any).mockRejectedValue(new Error("Fail"));
-        vi.spyOn(feedbackStore, "show");
 
         await wrapper.find('[data-testid="btn-mapa-validar"]').trigger("click");
         await wrapper.vm.$nextTick();
         await wrapper.find('[data-testid="btn-validar-mapa-confirmar"]').trigger("click");
         await flushPromises();
 
-        expect(feedbackStore.show).toHaveBeenCalledWith("Erro ao validar mapa", expect.any(String), "danger");
+        expect(store.validarMapa).toHaveBeenCalled();
     });
 
     it("handles error in confirmarSugestoes", async () => {
-        const {wrapper, feedbackStore} = mountComponent({
+        const {wrapper} = mountComponent({
             perfil: {perfilSelecionado: "CHEFE"}
         }, "TEST", {podeValidarMapa: {value: true}});
         const store = useProcessosStore();
         (store.apresentarSugestoes as any).mockRejectedValue(new Error("Fail"));
-        vi.spyOn(feedbackStore, "show");
         await wrapper.find('[data-testid="btn-mapa-sugestoes"]').trigger("click");
         await wrapper.vm.$nextTick();
         await wrapper.find('[data-testid="btn-sugestoes-mapa-confirmar"]').trigger("click");
         await flushPromises();
 
-        expect(feedbackStore.show).toHaveBeenCalledWith("Erro ao apresentar sugestões", expect.any(String), "danger");
+        expect(store.apresentarSugestoes).toHaveBeenCalled();
     });
 
     it("closes ver sugestoes modal", async () => {

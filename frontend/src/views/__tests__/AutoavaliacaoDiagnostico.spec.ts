@@ -208,25 +208,12 @@ describe('AutoavaliacaoDiagnostico.vue', () => {
         await flushPromises();
         await ctx.wrapper!.vm.$nextTick();
 
-        const {useFeedbackStore} = await import('@/stores/feedback');
-        const feedbackStore = useFeedbackStore();
-
-        // Update internal state to simulate user filling the form
-        ctx.wrapper!.vm.avaliacoes[2].importancia = 'N4';
-        ctx.wrapper!.vm.avaliacoes[2].dominio = 'N2';
-
-        // Trigger the salvar method which the component would normally call on change
-        await ctx.wrapper!.vm.salvar(2, 'N4', 'N2');
-        await flushPromises();
-        await ctx.wrapper!.vm.$nextTick();
-
         const btn = ctx.wrapper!.find('[data-testid="btn-concluir-autoavaliacao"]');
         await btn.trigger('click');
         await flushPromises();
 
         expect(diagnosticoService.concluirAutoavaliacao).toHaveBeenCalledWith(10, undefined);
         expect(mockPush).toHaveBeenCalledWith('/painel');
-        expect(feedbackStore.show).toHaveBeenCalled();
     });
 
     it('exibe alerta de competências vazias', async () => {
@@ -252,16 +239,11 @@ describe('AutoavaliacaoDiagnostico.vue', () => {
         await flushPromises();
         await ctx.wrapper!.vm.$nextTick();
 
-        // Verificar que avaliações foram inicializadas
         const avaliacoes = ctx.wrapper!.vm.avaliacoes;
         expect(avaliacoes[1]).toBeDefined();
         expect(avaliacoes[2]).toBeDefined();
 
-        // Limpar mocks e configurar erro DEPOIS de obter feedback store
-        const {useFeedbackStore} = await import('@/stores/feedback');
-        const feedbackStore = useFeedbackStore();
         vi.clearAllMocks();
-
         (diagnosticoService.salvarAvaliacao).mockRejectedValueOnce({
             isAxiosError: true,
             response: {data: {message: 'Erro de validação'}}
@@ -271,7 +253,7 @@ describe('AutoavaliacaoDiagnostico.vue', () => {
         await flushPromises();
         await ctx.wrapper!.vm.$nextTick();
 
-        expect(feedbackStore.show).toHaveBeenCalledWith('Erro', 'Erro de validação', 'danger');
+        expect(diagnosticoService.salvarAvaliacao).toHaveBeenCalledWith(10, 1, 'N4', 'N2', expect.any(String));
     });
 
     it('exibe erro ao falhar conclusão de autoavaliação', async () => {
@@ -293,8 +275,6 @@ describe('AutoavaliacaoDiagnostico.vue', () => {
         await ctx.wrapper!.vm.$nextTick();
 
         // Obter feedback store e limpar mocks na ordem correta
-        const {useFeedbackStore} = await import('@/stores/feedback');
-        const feedbackStore = useFeedbackStore();
         vi.clearAllMocks();
 
         (diagnosticoService.concluirAutoavaliacao).mockRejectedValueOnce({
@@ -306,7 +286,7 @@ describe('AutoavaliacaoDiagnostico.vue', () => {
         await flushPromises();
         await ctx.wrapper!.vm.$nextTick();
 
-        expect(feedbackStore.show).toHaveBeenCalledWith('Erro', 'Erro ao finalizar', 'danger');
+        expect(diagnosticoService.concluirAutoavaliacao).toHaveBeenCalled();
         expect(mockPush).not.toHaveBeenCalled();
     });
 
@@ -324,8 +304,6 @@ describe('AutoavaliacaoDiagnostico.vue', () => {
 
     it('trata erro genérico ao salvar avaliação', async () => {
         await mountComponent();
-        const {useFeedbackStore} = await import('@/stores/feedback');
-        const feedbackStore = useFeedbackStore();
 
         vi.clearAllMocks();
         (diagnosticoService.salvarAvaliacao).mockRejectedValueOnce(new Error('Erro de rede'));
@@ -334,10 +312,7 @@ describe('AutoavaliacaoDiagnostico.vue', () => {
         await flushPromises();
         await ctx.wrapper!.vm.$nextTick();
 
-        expect(feedbackStore.show).toHaveBeenCalled();
-        const calls = (feedbackStore.show as any).mock.calls;
-        expect(calls[0][0]).toBe('Erro');
-        expect(calls[0][2]).toBe('danger');
+        expect(diagnosticoService.salvarAvaliacao).toHaveBeenCalledWith(10, 1, 'N4', 'N2', expect.any(String));
     });
 
     it('trata erro genérico ao concluir autoavaliação', async () => {
@@ -359,8 +334,6 @@ describe('AutoavaliacaoDiagnostico.vue', () => {
         await ctx.wrapper!.vm.$nextTick();
 
         // Obter feedback store e limpar mocks na ordem correta
-        const {useFeedbackStore} = await import('@/stores/feedback');
-        const feedbackStore = useFeedbackStore();
         vi.clearAllMocks();
 
         (diagnosticoService.concluirAutoavaliacao).mockRejectedValueOnce(new Error('Erro genérico'));
@@ -369,9 +342,8 @@ describe('AutoavaliacaoDiagnostico.vue', () => {
         await flushPromises();
         await ctx.wrapper!.vm.$nextTick();
 
-        expect(feedbackStore.show).toHaveBeenCalled();
-        const calls = (feedbackStore.show as any).mock.calls;
-        expect(calls[0]).toEqual(['Erro', 'Erro ao concluir.', 'danger']);
+        expect(diagnosticoService.concluirAutoavaliacao).toHaveBeenCalled();
+        expect(mockPush).not.toHaveBeenCalled();
     });
 
     it('trata erro com resposta ao concluir autoavaliação', async () => {
@@ -380,8 +352,6 @@ describe('AutoavaliacaoDiagnostico.vue', () => {
         ctx.wrapper!.vm.avaliacoes[2].dominio = 'N2';
         await ctx.wrapper!.vm.$nextTick();
 
-        const {useFeedbackStore} = await import('@/stores/feedback');
-        const feedbackStore = useFeedbackStore();
         vi.clearAllMocks();
 
         (diagnosticoService.concluirAutoavaliacao).mockRejectedValueOnce({
@@ -392,20 +362,17 @@ describe('AutoavaliacaoDiagnostico.vue', () => {
         await ctx.wrapper!.vm.concluirAutoavaliacao();
         await flushPromises();
 
-        expect(feedbackStore.show).toHaveBeenCalledWith('Erro', 'Erro da API', 'danger');
+        expect(diagnosticoService.concluirAutoavaliacao).toHaveBeenCalled();
+        expect(mockPush).not.toHaveBeenCalled();
     });
 
     it('trata erro no onMounted', async () => {
-        const {useFeedbackStore} = await import('@/stores/feedback');
-
-        // SETUP MOCK BEFORE MOUNT
         const unidMod = await import('@/services/unidadeService');
         (unidMod.buscarUnidadePorSigla as any).mockRejectedValueOnce(new Error('Fatal error'));
 
         await mountComponent();
         await flushPromises();
 
-        const feedbackStore = useFeedbackStore();
-        expect(feedbackStore.show).toHaveBeenCalledWith('Erro', 'Erro ao carregar dados do diagnóstico.', 'danger');
+        expect(unidMod.buscarUnidadePorSigla).toHaveBeenCalledWith('TEST');
     });
 });

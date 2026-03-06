@@ -69,10 +69,10 @@ import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import PageHeader from '@/components/layout/PageHeader.vue';
 import LoadingButton from '@/components/comum/LoadingButton.vue';
 import {type Parametro, useConfiguracoesStore} from '@/stores/configuracoes';
-import {useNotificacoesStore} from '@/stores/feedback';
+import {useNotification} from '@/composables/useNotification';
 
 const store = useConfiguracoesStore();
-const notificacoes = useNotificacoesStore();
+const {notify} = useNotification();
 const salvando = ref(false);
 
 const form = reactive({
@@ -114,9 +114,9 @@ async function salvar() {
   const sucesso = await store.salvarConfiguracoes(paramsToSave);
 
   if (sucesso) {
-    notificacoes.show('Sucesso', 'Configurações salvas com sucesso!', 'success');
+    notify('Configurações salvas com sucesso!', 'success');
   } else {
-    notificacoes.show('Erro', 'Erro ao salvar configurações.', 'danger');
+    notify('Erro ao salvar configurações.', 'danger');
   }
 
   salvando.value = false;

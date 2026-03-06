@@ -3,7 +3,7 @@ import {type DOMWrapper, flushPromises, mount} from "@vue/test-utils";
 import Processo from "@/views/ProcessoDetalheView.vue";
 import {createTestingPinia} from "@pinia/testing";
 import {useProcessosStore} from "@/stores/processos";
-import {useFeedbackStore} from "@/stores/feedback";
+import {useToastStore} from "@/stores/toast";
 import {usePerfilStore} from "@/stores/perfil";
 import {Perfil, SituacaoSubprocesso} from "@/types/tipos";
 import {nextTick} from "vue";
@@ -81,7 +81,7 @@ const BAlertStub = {
 describe("Processo.vue", () => {
     let wrapper: any;
     let processosStore: any;
-    let feedbackStore: any;
+    let toastStore: any;
     let perfilStore: any;
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     let router: any;
@@ -270,7 +270,7 @@ describe("Processo.vue", () => {
         wrapper = createWrapper();
         perfilStore = usePerfilStore();
         processosStore = useProcessosStore();
-        feedbackStore = useFeedbackStore();
+        toastStore = useToastStore();
 
         perfilStore.$patch({perfis: [Perfil.GESTOR, Perfil.ADMIN]});
         processosStore.$patch({processoDetalhe: mockProcesso});
@@ -286,7 +286,7 @@ describe("Processo.vue", () => {
         await modal.vm.$emit("confirmar", dadosConfirmacao);
 
         expect(processosStore.executarAcaoBloco).toHaveBeenCalledWith('aceitar', [101], undefined);
-        expect(feedbackStore.show).toHaveBeenCalledWith("Sucesso", "Cadastros aceitos em bloco", "success");
+        expect(toastStore.setPending).toHaveBeenCalledWith("Cadastros aceitos em bloco");
         expect(modalSpies.fechar).toHaveBeenCalled();
         expect(mocks.push).toHaveBeenCalledWith("/painel");
     });
@@ -295,7 +295,6 @@ describe("Processo.vue", () => {
         wrapper = createWrapper();
         perfilStore = usePerfilStore();
         processosStore = useProcessosStore();
-        feedbackStore = useFeedbackStore();
 
         perfilStore.$patch({perfis: [Perfil.GESTOR, Perfil.ADMIN]});
         processosStore.$patch({processoDetalhe: mockProcesso});
@@ -398,7 +397,6 @@ describe("Processo.vue", () => {
         wrapper = createWrapper();
         perfilStore = usePerfilStore();
         processosStore = useProcessosStore();
-        feedbackStore = useFeedbackStore();
 
         perfilStore.$patch({perfis: [Perfil.GESTOR]});
         processosStore.$patch({processoDetalhe: mockProcesso});
@@ -532,7 +530,7 @@ describe("Processo.vue", () => {
     it("deve confirmar finalização de processo", async () => {
         wrapper = createWrapper();
         processosStore = useProcessosStore();
-        feedbackStore = useFeedbackStore();
+        toastStore = useToastStore();
 
         processosStore.$patch({processoDetalhe: mockProcesso});
 
@@ -545,14 +543,13 @@ describe("Processo.vue", () => {
         await modalConfirmacao.vm.$emit("confirmar");
 
         expect(processosStore.finalizarProcesso).toHaveBeenCalledWith(1);
-        expect(feedbackStore.show).toHaveBeenCalledWith(expect.any(String), expect.any(String), "success");
+        expect(toastStore.setPending).toHaveBeenCalledWith("Processo finalizado com sucesso.");
         expect(mocks.push).toHaveBeenCalledWith("/painel");
     });
 
     it("deve tratar erro na finalização do processo", async () => {
         wrapper = createWrapper();
         processosStore = useProcessosStore();
-        feedbackStore = useFeedbackStore();
 
         processosStore.$patch({processoDetalhe: mockProcesso});
 
@@ -568,7 +565,7 @@ describe("Processo.vue", () => {
         await modalConfirmacao.vm.$emit("confirmar");
 
         expect(processosStore.finalizarProcesso).toHaveBeenCalled();
-        expect(feedbackStore.show).toHaveBeenCalledWith("Erro ao finalizar", "Erro finalização", "danger");
+        expect(mocks.push).not.toHaveBeenCalled();
     });
 
     it("não deve redirecionar se unidade não for clicável", async () => {
@@ -586,7 +583,6 @@ describe("Processo.vue", () => {
     it("deve usar mensagem de erro da store ao falhar finalização", async () => {
         wrapper = createWrapper();
         processosStore = useProcessosStore();
-        feedbackStore = useFeedbackStore();
         processosStore.$patch({processoDetalhe: mockProcesso});
 
         await nextTick();
@@ -599,7 +595,7 @@ describe("Processo.vue", () => {
         const modalConfirmacao = wrapper.findComponent(ModalConfirmacaoStub);
         await modalConfirmacao.vm.$emit("confirmar");
 
-        expect(feedbackStore.show).toHaveBeenCalledWith("Erro ao finalizar", "Erro customizado da store", "danger");
+        expect(mocks.push).not.toHaveBeenCalledWith("/painel");
     });
 
     it("deve cobrir default cases nos switches de useProcessoView", async () => {

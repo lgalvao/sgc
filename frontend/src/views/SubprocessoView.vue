@@ -1,5 +1,12 @@
 <template>
   <LayoutPadrao>
+    <AppAlert
+        v-if="notificacao"
+        :dismissible="notificacao.dismissible ?? true"
+        :message="notificacao.message"
+        :variant="notificacao.variant"
+        @dismissed="clear()"
+    />
     <div v-if="subprocesso">
       <div data-testid="header-subprocesso">
         <PageHeader
@@ -207,9 +214,10 @@ import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import SubprocessoCards from "@/components/processo/SubprocessoCards.vue";
 import SubprocessoModal from "@/components/processo/SubprocessoModal.vue";
 import ErrorAlert from "@/components/comum/ErrorAlert.vue";
+import AppAlert from "@/components/comum/AppAlert.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import {useMapasStore} from "@/stores/mapas";
-import {useFeedbackStore} from "@/stores/feedback";
+import {useNotification} from "@/composables/useNotification";
 import {useModalManager} from "@/composables/useModalManager";
 import {useLoadingManager} from "@/composables/useLoadingManager";
 
@@ -247,7 +255,7 @@ const subprocessosStore = useSubprocessosStore();
 const processosStore = useProcessosStore();
 
 const mapaStore = useMapasStore();
-const feedbackStore = useFeedbackStore();
+const {notificacao, notify, clear} = useNotification();
 
 // Gerenciamento simplificado de modals e loading com composables
 const modals = useModalManager(['alterarDataLimite', 'reabrir']);
@@ -320,7 +328,7 @@ function abrirModalAlterarDataLimite() {
   if (podeAlterarDataLimite.value) {
     modals.open('alterarDataLimite');
   } else {
-    feedbackStore.show("Ação não permitida", "Você não tem permissão para alterar a data limite.", "danger");
+    notify("Você não tem permissão para alterar a data limite.", 'danger');
   }
 }
 
@@ -340,9 +348,9 @@ async function confirmarAlteracaoDataLimite(novaData: string) {
           {novaData},
       );
       fecharModalAlterarDataLimite();
-      feedbackStore.show("Data limite alterada com sucesso", "A data limite foi alterada com sucesso!", "success");
+      notify("A data limite foi alterada com sucesso!", 'success');
     } catch {
-      feedbackStore.show("Erro ao alterar data limite", "Não foi possível alterar a data limite.", "danger");
+      notify("Não foi possível alterar a data limite.", 'danger');
     }
   });
 }
@@ -367,7 +375,7 @@ function fecharModalReabrir() {
 
 async function confirmarReabertura() {
   if (!codSubprocesso.value || !justificativaReabertura.value.trim()) {
-    feedbackStore.show("Erro", "Justificativa é obrigatória.", "danger");
+    notify("Justificativa é obrigatória.", 'danger');
     return;
   }
 

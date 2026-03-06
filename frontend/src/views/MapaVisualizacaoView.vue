@@ -252,7 +252,8 @@ import {useUnidadesStore} from "@/stores/unidades";
 import {useProcessosStore} from "@/stores/processos";
 import {useAnalisesStore} from "@/stores/analises";
 import {useSubprocessosStore} from "@/stores/subprocessos";
-import {useFeedbackStore} from "@/stores/feedback";
+import {useNotification} from "@/composables/useNotification";
+import {useToastStore} from "@/stores/toast";
 import {usePerfil} from "@/composables/usePerfil";
 import {useAcesso} from "@/composables/useAcesso";
 import logger from "@/utils/logger";
@@ -264,7 +265,8 @@ const mapaStore = useMapasStore();
 const processosStore = useProcessosStore();
 const analisesStore = useAnalisesStore();
 const subprocessosStore = useSubprocessosStore();
-const feedbackStore = useFeedbackStore();
+const {notify} = useNotification();
+const toastStore = useToastStore();
 const {perfilSelecionado} = usePerfil();
 const {mapaVisualizacao: mapa} = storeToRefs(mapaStore);
 
@@ -339,14 +341,10 @@ async function confirmarSugestoes() {
       sugestoes: sugestoes.value,
     });
     fecharModalSugestoes();
-    feedbackStore.show(
-        "Sugestões apresentadas",
-        "Sugestões submetidas para análise da unidade superior",
-        "success"
-    );
+    toastStore.setPending("Sugestões submetidas para análise da unidade superior.");
     await router.push({name: "Painel"});
   } catch {
-    feedbackStore.show("Erro ao apresentar sugestões", "Ocorreu um erro. Tente novamente.", "danger");
+    notify("Ocorreu um erro ao apresentar sugestões. Tente novamente.", 'danger');
   } finally {
     isLoading.value = false;
   }
@@ -358,10 +356,10 @@ async function confirmarValidacao() {
   try {
     await processosStore.validarMapa(codSubprocesso.value);
     fecharModalValidar();
-    feedbackStore.show("Mapa validado", "Mapa validado e submetido para análise da unidade superior", "success");
+    toastStore.setPending("Mapa validado e submetido para análise da unidade superior.");
     await router.push({name: "Painel"});
   } catch {
-    feedbackStore.show("Erro ao validar mapa", "Ocorreu um erro. Tente novamente.", "danger");
+    notify("Ocorreu um erro ao validar o mapa. Tente novamente.", 'danger');
   } finally {
     isLoading.value = false;
   }
@@ -379,15 +377,11 @@ async function confirmarAceitacao() {
       await processosStore.aceitarValidacao(codSubprocesso.value);
     }
     fecharModalAceitar();
-    feedbackStore.show(
-        "Sucesso",
-        isHomologacao ? "Homologação efetivada" : "Aceite registrado",
-        "success",
-    );
+    toastStore.setPending(isHomologacao ? "Homologação efetivada." : "Aceite registrado.");
     await router.push({name: "Painel"});
   } catch (error) {
     logger.error(error);
-    feedbackStore.show("Erro", "Erro ao realizar a operação.", "danger");
+    notify("Erro ao realizar a operação.", 'danger');
   } finally {
     isLoading.value = false;
   }
@@ -401,11 +395,11 @@ async function confirmarDevolucao() {
       justificativa: observacaoDevolucao.value,
     });
     fecharModalDevolucao();
-    feedbackStore.show("Sucesso", "Devolução realizada", "success");
+    toastStore.setPending("Devolução realizada.");
     await router.push({name: "Painel"});
   } catch (error) {
     logger.error(error);
-    feedbackStore.show("Erro", "Erro ao devolver.", "danger");
+    notify("Erro ao devolver.", 'danger');
   } finally {
     isLoading.value = false;
   }

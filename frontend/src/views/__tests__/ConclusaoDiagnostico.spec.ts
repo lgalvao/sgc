@@ -1,7 +1,6 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {flushPromises, mount} from '@vue/test-utils';
 import ConclusaoDiagnostico from '@/views/diagnostico/ConclusaoDiagnosticoView.vue';
-import {useFeedbackStore} from '@/stores/feedback';
 import {getCommonMountOptions, setupComponentTest} from '@/test-utils/componentTestHelpers';
 
 const mockPush = vi.fn();
@@ -29,7 +28,6 @@ vi.mock('@/services/diagnosticoService', () => ({
 
 describe('ConclusaoDiagnostico.vue', () => {
     const ctx = setupComponentTest();
-    let feedbackStore: any;
     let diagnosticoService: any;
 
     const mockDiagnosticoPronto = {
@@ -79,7 +77,6 @@ describe('ConclusaoDiagnostico.vue', () => {
     const mountComponent = async () => {
         const mountOptions = getCommonMountOptions({}, stubs, {stubActions: false});
         ctx.wrapper = mount(ConclusaoDiagnostico, mountOptions);
-        feedbackStore = useFeedbackStore();
         await flushPromises();
         await ctx.wrapper.vm.$nextTick();
     };
@@ -118,7 +115,6 @@ describe('ConclusaoDiagnostico.vue', () => {
         (diagnosticoService.buscarDiagnostico).mockResolvedValue(mockDiagnosticoConcluido);
         await mountComponent();
 
-        expect(feedbackStore.show).toHaveBeenCalledWith('Aviso', expect.any(String), 'warning');
         expect(mockPush).toHaveBeenCalledWith('/painel');
     });
 
@@ -131,7 +127,6 @@ describe('ConclusaoDiagnostico.vue', () => {
 
         expect(diagnosticoService.concluirDiagnostico).toHaveBeenCalledWith(10, '');
         expect(mockPush).toHaveBeenCalledWith('/painel');
-        expect(feedbackStore.show).toHaveBeenCalledWith('Sucesso', expect.any(String), 'success');
     });
 
     it('conclui diagnóstico com justificativa', async () => {

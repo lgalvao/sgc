@@ -141,18 +141,26 @@
               </BFormSelect>
             </div>
 
-            <LoadingButton
-                :loading="isLoading"
-                aria-label="Entrar"
-                class="w-100"
-                data-testid="btn-login-entrar"
-                icon="box-arrow-in-right"
-                loading-text="Entrando..."
-                text="Entrar"
-                type="submit"
-                variant="primary"
-            />
-          </BForm>
+          <LoadingButton
+              :loading="isLoading"
+              aria-label="Entrar"
+              class="w-100"
+              data-testid="btn-login-entrar"
+              icon="box-arrow-in-right"
+              loading-text="Entrando..."
+              text="Entrar"
+              type="submit"
+              variant="primary"
+          />
+          <AppAlert
+              v-if="notificacao"
+              :dismissible="notificacao.dismissible ?? true"
+              :message="notificacao.message"
+              :variant="notificacao.variant"
+              class="mt-3"
+              @dismissed="clear()"
+          />
+        </BForm>
         </BCard>
       </BCol>
     </BRow>
@@ -175,15 +183,16 @@ import {
 import {computed, ref, watch} from "vue";
 import {useRouter} from "vue-router";
 import LoadingButton from "@/components/comum/LoadingButton.vue";
+import AppAlert from "@/components/comum/AppAlert.vue";
 import {logger} from "@/utils";
 import type {PerfilUnidade} from "@/services/usuarioService";
 
 import {usePerfilStore} from "@/stores/perfil";
-import {useFeedbackStore} from "@/stores/feedback";
+import {useNotification} from "@/composables/useNotification";
 
 const router = useRouter();
 const perfilStore = usePerfilStore();
-const feedbackStore = useFeedbackStore();
+const {notificacao, notify, clear} = useNotification();
 
 const titulo = ref(import.meta.env.DEV ? "1" : "");
 const senha = ref(import.meta.env.DEV ? "123" : "");
@@ -224,7 +233,7 @@ const handleLogin = async () => {
 
 const performInitialLogin = async () => {
   if (!titulo.value || !senha.value) {
-    feedbackStore.show("Dados incompletos", "Por favor, preencha título e senha.", "danger");
+    notify("Por favor, preencha título e senha.", 'danger');
     return;
   }
 
@@ -235,14 +244,14 @@ const performInitialLogin = async () => {
     if (sucessoAutenticacao) {
       await handlePostAuth();
     } else {
-      feedbackStore.show("Erro no login", "Título ou senha inválidos.", "danger");
+      notify("Título ou senha inválidos.", 'danger');
     }
   } catch (error: any) {
     logger.error("Erro no login:", error);
     if (error.response?.status === 404 || error.response?.status === 401) {
-      feedbackStore.show("Erro no login", "Título ou senha inválidos.", "danger");
+      notify("Título ou senha inválidos.", 'danger');
     } else {
-      feedbackStore.show("Erro no sistema", "Ocorreu um erro ao tentar realizar o login.", "danger");
+      notify("Ocorreu um erro ao tentar realizar o login.", 'danger');
     }
   } finally {
     isLoading.value = false;
@@ -255,7 +264,7 @@ const handlePostAuth = async () => {
   } else if (perfilStore.perfisUnidades.length === 1) {
     await router.push("/painel");
   } else {
-    feedbackStore.show("Perfis indisponíveis", "Nenhum perfil/unidade disponível para este usuário.", "danger");
+    notify("Nenhum perfil/unidade disponível para este usuário.", 'danger');
   }
 };
 
@@ -270,12 +279,12 @@ const performProfileSelection = async () => {
       await router.push("/painel");
     } catch (error) {
       logger.error("Erro ao selecionar perfil:", error);
-      feedbackStore.show("Erro", "Falha ao selecionar o perfil.", "danger");
+      notify("Falha ao selecionar o perfil.", 'danger');
     } finally {
       isLoading.value = false;
     }
   } else {
-    feedbackStore.show("Seleção necessária", "Por favor, selecione um perfil.", "danger");
+    notify("Por favor, selecione um perfil.", 'danger');
   }
 };
 </script>

@@ -106,12 +106,12 @@ import {useRoute} from 'vue-router';
 import {BButton, BCard, BProgress, BSpinner} from 'bootstrap-vue-next';
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import PageHeader from '@/components/layout/PageHeader.vue';
-import {useFeedbackStore} from '@/stores/feedback';
 import {useDiagnosticosStore} from '@/stores/diagnosticos';
+import {useNotification} from '@/composables/useNotification';
 import type {DiagnosticoDto, ServidorDiagnosticoDto} from '@/services/diagnosticoService';
 
 const route = useRoute();
-const feedbackStore = useFeedbackStore();
+const {notify} = useNotification();
 const diagnosticosStore = useDiagnosticosStore();
 
 const loading = ref(true);
@@ -140,7 +140,7 @@ onMounted(async () => {
     loading.value = true;
     await diagnosticosStore.buscarDiagnostico(codSubprocesso.value);
   } catch (error) {
-    feedbackStore.show('Erro', 'Erro ao carregar monitoramento: ' + error, 'danger');
+    notify('Erro ao carregar monitoramento: ' + error, 'danger');
   } finally {
     loading.value = false;
   }

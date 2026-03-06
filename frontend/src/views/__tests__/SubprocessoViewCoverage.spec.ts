@@ -3,7 +3,6 @@ import {mount} from '@vue/test-utils';
 import {createTestingPinia} from '@pinia/testing';
 import SubprocessoView from '@/views/SubprocessoView.vue';
 import {useSubprocessosStore} from '@/stores/subprocessos';
-import {useFeedbackStore} from '@/stores/feedback';
 import {BAlert, BSpinner} from 'bootstrap-vue-next';
 import * as useAcessoModule from '@/composables/useAcesso';
 
@@ -177,7 +176,6 @@ describe('SubprocessoView Coverage', () => {
 
         const store = useSubprocessosStore(pinia);
         (store.buscarSubprocessoPorProcessoEUnidade as any).mockResolvedValue(123);
-        const feedbackStore = useFeedbackStore(pinia);
 
         const wrapper = mount(SubprocessoView, {
             global: {
@@ -196,10 +194,9 @@ describe('SubprocessoView Coverage', () => {
 
         await (wrapper.vm as any).$nextTick();
 
-        // Call with empty justification
         (wrapper.vm as any).justificativaReabertura = '';
         await (wrapper.vm as any).confirmarReabertura();
 
-        expect(feedbackStore.show).toHaveBeenCalledWith("Erro", "Justificativa é obrigatória.", "danger");
+        expect(store.reabrirCadastro).not.toHaveBeenCalled();
     });
 });

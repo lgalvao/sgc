@@ -179,7 +179,8 @@ import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useMapasStore} from "@/stores/mapas";
 import {useUnidadesStore} from "@/stores/unidades";
 import {useAnalisesStore} from "@/stores/analises";
-import {useFeedbackStore} from "@/stores/feedback";
+import {useNotification} from "@/composables/useNotification";
+import {useToastStore} from "@/stores/toast";
 import {usePerfil} from "@/composables/usePerfil";
 import {useAcesso} from "@/composables/useAcesso";
 import type {Atividade, Conhecimento, CriarConhecimentoRequest, ErroValidacao,} from "@/types/tipos";
@@ -200,7 +201,8 @@ const unidadesStore = useUnidadesStore();
 const subprocessosStore = useSubprocessosStore();
 const analisesStore = useAnalisesStore();
 const mapasStore = useMapasStore();
-const feedbackStore = useFeedbackStore();
+const {notify} = useNotification();
+const toastStore = useToastStore();
 const {impactoMapa: impactos} = storeToRefs(mapasStore);
 
 const {perfilSelecionado} = usePerfil();
@@ -290,7 +292,7 @@ async function confirmarRemocao() {
     mostrarModalConfirmacaoRemocao.value = false;
     dadosRemocao.value = null;
   } catch (e: any) {
-    feedbackStore.show("Erro na remoção", e.message || "Não foi possível remover o item.", "danger");
+    notify(e.message || "Não foi possível remover o item.", 'danger');
     mostrarModalConfirmacaoRemocao.value = false;
   }
 }
@@ -347,7 +349,7 @@ async function handleImportAtividades() {
   if (codSubprocesso.value) {
     await atividadesStore.buscarAtividadesParaSubprocesso(codSubprocesso.value);
   }
-  feedbackStore.show("Importação Concluída", "As atividades foram importadas para o seu mapa.", "success");
+  notify("As atividades foram importadas para o seu mapa.", 'success');
 }
 
 function obterErroParaAtividade(atividadeCodigo: number): string | undefined {
@@ -378,11 +380,7 @@ async function disponibilizarCadastro() {
       : SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO;
 
   if (subprocesso.value?.situacao !== situacaoEsperada) {
-    feedbackStore.show(
-        "Ação não permitida",
-        `Ação permitida apenas na situação: "${situacaoEsperada}".`,
-        "danger",
-    );
+    notify(`Ação permitida apenas na situação: "${situacaoEsperada}".`, 'danger');
     return;
   }
 
@@ -425,6 +423,7 @@ async function confirmarDisponibilizacao() {
 
   mostrarModalConfirmacao.value = false;
   if (sucesso) {
+    toastStore.setPending("Disponibilizado com sucesso.");
     await router.push("/painel");
   }
 }

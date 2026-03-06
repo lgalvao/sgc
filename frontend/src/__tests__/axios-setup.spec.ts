@@ -1,7 +1,6 @@
 import {createPinia, setActivePinia} from "pinia";
 import {afterEach, beforeAll, beforeEach, describe, expect, it, vi} from "vitest";
 import router from "@/router";
-import {useFeedbackStore} from "@/stores/feedback";
 
 // Hoist mock instance so it's shared between module and test
 const {mockInstance} = vi.hoisted(() => {
@@ -99,96 +98,33 @@ describe("axios-setup", () => {
     });
 
     it("interceptor de erro de resposta deve redirecionar para login em caso de 401", async () => {
-        const feedbackStore = useFeedbackStore();
-        vi.spyOn(feedbackStore, "show");
-
         const error = {isAxiosError: true, response: {status: 401, data: {}}};
         await expect(responseErrorInterceptor(error)).rejects.toEqual(error);
-        expect(feedbackStore.show).toHaveBeenCalledWith(
-            "Não Autorizado",
-            expect.stringContaining("Sua sessão expirou"),
-            "danger"
-        );
         expect(router.push).toHaveBeenCalledWith("/login");
     });
 
-    it("interceptor de erro de resposta não deve mostrar erro global para 400, 404, 409, 422", async () => {
-        const feedbackStore = useFeedbackStore();
-        vi.spyOn(feedbackStore, "show");
-
+    it("interceptor de erro de resposta não deve redirecionar para 400, 404, 409, 422", async () => {
         const error = {isAxiosError: true, response: {status: 400, data: {}}};
         await expect(responseErrorInterceptor(error)).rejects.toEqual(error);
-        expect(feedbackStore.show).not.toHaveBeenCalled();
+        expect(router.push).not.toHaveBeenCalled();
     });
 
-    it("interceptor de erro de resposta deve mostrar erro inesperado para 500 com mensagem", async () => {
-        const feedbackStore = useFeedbackStore();
-        vi.spyOn(feedbackStore, "show");
-
+    it("interceptor de erro de resposta deve propagar erro 500", async () => {
         const error = {
             isAxiosError: true,
             response: {status: 500, data: {message: "Server Error"}},
             stack: 'stack'
         };
         await expect(responseErrorInterceptor(error)).rejects.toEqual(error);
-        // Title changed to "Erro Inesperado" in apiError.ts
-        expect(feedbackStore.show).toHaveBeenCalledWith("Erro Inesperado", expect.stringContaining("Server Error"), "danger", 60000);
     });
 
-    it("interceptor de erro de resposta deve mostrar erro genérico para 500 sem mensagem", async () => {
-        const feedbackStore = useFeedbackStore();
-        vi.spyOn(feedbackStore, "show");
-
-        const error = {
-            isAxiosError: true,
-            response: {status: 500, data: {}},
-            stack: 'stack'
-        };
-        await expect(responseErrorInterceptor(error)).rejects.toEqual(error);
-        expect(feedbackStore.show).toHaveBeenCalledWith(
-            "Erro Inesperado",
-            expect.stringContaining("Erro 500: O servidor não retornou uma mensagem detalhada."),
-            "danger",
-            60000
-        );
-    });
-
-    it("interceptor de erro de resposta deve mostrar erro de rede", async () => {
-        const feedbackStore = useFeedbackStore();
-        vi.spyOn(feedbackStore, "show");
-
-        // isAxiosError: true, and no response, but request exists
+    it("interceptor de erro de resposta deve propagar erro de rede", async () => {
         const error = {isAxiosError: true, request: {}, message: "Network Error"};
         await expect(responseErrorInterceptor(error)).rejects.toEqual(error);
-        expect(feedbackStore.show).toHaveBeenCalledWith(
-            "Erro de Rede",
-            expect.stringContaining("Não foi possível conectar"),
-            "danger",
-            7000
-        );
     });
 
-    it("interceptor de erro de resposta deve mostrar erro genérico com propriedade de mensagem", async () => {
-        const feedbackStore = useFeedbackStore();
-        vi.spyOn(feedbackStore, "show");
-
+    it("interceptor de erro de resposta deve propagar erro genérico", async () => {
         const error = new Error("Generic failure");
         await expect(responseErrorInterceptor(error)).rejects.toEqual(error);
-        expect(feedbackStore.show).toHaveBeenCalledWith("Erro Inesperado", expect.stringContaining("Generic failure"), "danger", 60000);
-    });
-
-    it("interceptor de erro de resposta deve tratar erros da store graciosamente", async () => {
-        const feedbackStore = useFeedbackStore();
-        // Simular erro ao chamar show
-        vi.spyOn(feedbackStore, "show").mockImplementation(() => {
-            throw new Error("Store error");
-        });
-
-        const error = new Error("Generic failure");
-
-        await expect(responseErrorInterceptor(error)).rejects.toEqual(error);
-
-        // Verificar que tentou exibir o erro (e falhou)
-        expect(feedbackStore.show).toHaveBeenCalledWith("Erro Inesperado", expect.stringContaining("Generic failure"), "danger", 60000);
     });
 });

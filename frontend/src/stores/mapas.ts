@@ -22,7 +22,6 @@ import type {
 import {defineStore} from "pinia";
 import {ref} from "vue";
 import {useErrorHandler} from "@/composables/useErrorHandler";
-import {useFeedbackStore} from "@/stores/feedback";
 import {useAsyncAction} from "@/composables/useAsyncAction";
 
 export const useMapasStore = defineStore("mapas", () => {
@@ -31,7 +30,6 @@ export const useMapasStore = defineStore("mapas", () => {
     const mapaAjuste = ref<MapaAjuste | null>(null);
     const impactoMapa = ref<ImpactoMapa | null>(null);
     const {lastError, clearError} = useErrorHandler();
-    const feedbackStore = useFeedbackStore();
     const {carregando, erro, executar, executarSilencioso} = useAsyncAction();
 
     async function buscarMapaVisualizacao(codSubprocesso: number) {
@@ -77,28 +75,24 @@ export const useMapasStore = defineStore("mapas", () => {
     async function disponibilizarMapa(codSubprocesso: number, request: DisponibilizarMapaRequest) {
         await executar(async () => {
             await disponibilizarMapaService(codSubprocesso, request);
-            feedbackStore.show("Mapa disponibilizado", "Mapa de competências disponibilizado.", "success");
         }, "Erro ao disponibilizar mapa.");
     }
 
     async function adicionarCompetencia(codSubprocesso: number, competencia: SalvarCompetenciaRequest) {
         await executar(async () => {
             mapaCompleto.value = await adicionarCompetenciaService(codSubprocesso, competencia);
-            feedbackStore.show("Competência adicionada", "Competência adicionada com sucesso.", "success");
         }, "Erro ao adicionar competência.");
     }
 
     async function atualizarCompetencia(codSubprocesso: number, codCompetencia: number, competencia: SalvarCompetenciaRequest) {
         await executar(async () => {
             mapaCompleto.value = await atualizarCompetenciaService(codSubprocesso, codCompetencia, competencia);
-            feedbackStore.show("Competência atualizada", "Competência atualizada com sucesso.", "success");
         }, "Erro ao atualizar competência.");
     }
 
     async function removerCompetencia(codSubprocesso: number, codCompetencia: number) {
         await executar(async () => {
             mapaCompleto.value = await removerCompetenciaService(codSubprocesso, codCompetencia);
-            feedbackStore.show("Competência removida", "Competência removida com sucesso.", "success");
         }, "Erro ao remover competência.");
     }
 

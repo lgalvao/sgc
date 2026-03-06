@@ -5,8 +5,6 @@ import {mount} from "@vue/test-utils";
 import App from "../App.vue";
 import {createTestingPinia} from "@pinia/testing";
 import {useRoute} from "vue-router";
-import {useFeedbackStore} from "@/stores/feedback";
-import {useToast} from "bootstrap-vue-next";
 
 vi.mock("@/components/layout/BarraNavegacao.vue", () => ({default: {template: '<div data-testid="barra-navegacao"></div>'}}));
 vi.mock("@/components/layout/MainNavbar.vue", () => ({default: {template: '<div data-testid="main-navbar"></div>'}}));
@@ -14,7 +12,6 @@ vi.mock("bootstrap-vue-next", async () => {
     const actual = await vi.importActual("bootstrap-vue-next");
     return {
         ...actual,
-        useToast: vi.fn(),
         BOrchestrator: {template: '<div></div>'}
     };
 });
@@ -24,27 +21,9 @@ vi.mock("vue-router", () => ({
     RouterView: {template: '<div data-testid="router-view"></div>'}
 }));
 
-const sessionStorageMock = (() => {
-    let store: Record<string, string> = {};
-    return {
-        getItem: (key: string) => store[key] || null,
-        setItem: (key: string, value: string) => {
-            store[key] = value.toString();
-        },
-        removeItem: (key: string) => {
-            delete store[key];
-        },
-        clear: () => {
-            store = {};
-        }
-    };
-})();
-Object.defineProperty(globalThis, 'sessionStorage', {value: sessionStorageMock});
-
 describe("App.vue", () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        sessionStorage.clear();
     });
 
     it("deve renderizar corretamente na rota /login", () => {
@@ -56,7 +35,7 @@ describe("App.vue", () => {
                 stubs: {
                     BOrchestrator: true,
                     BAlert: true,
-                    'router-view': true // Isso deve renderizar o stub <router-view-stub>
+                    'router-view': true
                 }
             },
         });
@@ -110,42 +89,5 @@ describe("App.vue", () => {
 
         expect(wrapper.find('[data-testid="main-navbar"]').exists()).toBe(true);
         expect(wrapper.find('[data-testid="barra-navegacao"]').exists()).toBe(false);
-    });
-
-    it("deve ocultar BarraNavegacao se sessionStorage indicar cameFromNavbar", () => {
-        (useRoute as any).mockReturnValue({path: "/processo", fullPath: "/processo"});
-        sessionStorage.setItem("cameFromNavbar", "1");
-
-        const wrapper = mount(App, {
-            global: {
-                plugins: [createTestingPinia({createSpy: vi.fn})],
-                stubs: {BOrchestrator: true, BAlert: true, 'router-view': true}
-            },
-        });
-
-        expect(wrapper.find('[data-testid="barra-navegacao"]').exists()).toBe(false);
-        expect(sessionStorage.getItem("cameFromNavbar")).toBeNull();
-    });
-
-    it("deve inicializar feedbackStore com instância do toast", () => {
-        const mockToast = {create: vi.fn()};
-        (useToast as any).mockReturnValue(mockToast);
-        (useRoute as any).mockReturnValue({path: "/painel", fullPath: "/painel"});
-
-        mount(App, {
-            global: {
-                plugins: [createTestingPinia({
-                    createSpy: vi.fn,
-                    stubActions: false // Precisamos que chamadas reais ou simuladas ocorram, mas queremos spy no init
-                })],
-                stubs: {
-                    BOrchestrator: true,
-                    'router-view': true
-                }
-            },
-        });
-
-        const feedbackStore = useFeedbackStore();
-        expect(feedbackStore.init).toHaveBeenCalled();
     });
 });

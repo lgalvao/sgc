@@ -61,14 +61,14 @@ import {computed, onMounted, ref} from 'vue';
 import {useRoute, useRouter} from 'vue-router';
 import {BButton, BCard, BFormGroup, BFormInvalidFeedback, BFormTextarea, BSpinner} from 'bootstrap-vue-next';
 import PageHeader from '@/components/layout/PageHeader.vue';
-import {useFeedbackStore} from '@/stores/feedback';
+import {useNotification} from '@/composables/useNotification';
 import {useDiagnosticosStore} from '@/stores/diagnosticos';
 import type {DiagnosticoDto} from '@/services/diagnosticoService';
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 
 const route = useRoute();
 const router = useRouter();
-const feedbackStore = useFeedbackStore();
+const {notify} = useNotification();
 const diagnosticosStore = useDiagnosticosStore();
 
 const loading = ref(true);
@@ -91,11 +91,11 @@ onMounted(async () => {
     loading.value = true;
     await diagnosticosStore.buscarDiagnostico(codSubprocesso.value);
     if (diagnosticosStore.diagnostico?.situacao === 'CONCLUIDO') {
-      feedbackStore.show('Aviso', 'Este diagnóstico já foi concluído.', 'warning');
+      notify('Este diagnóstico já foi concluído.', 'warning');
       await router.push('/painel');
     }
   } catch (error) {
-    feedbackStore.show('Erro', 'Erro ao carregar dados: ' + error, 'danger');
+    notify('Erro ao carregar dados: ' + error, 'danger');
   } finally {
     loading.value = false;
   }
@@ -104,10 +104,10 @@ onMounted(async () => {
 async function concluir() {
   try {
     await diagnosticosStore.concluirDiagnostico(codSubprocesso.value, justificativa.value);
-    feedbackStore.show('Sucesso', 'Diagnóstico da unidade concluído com sucesso!', 'success');
+    notify('Diagnóstico da unidade concluído com sucesso!', 'success');
     await router.push('/painel');
   } catch (error: any) {
-    feedbackStore.show('Erro', error.response?.data?.message || 'Erro ao concluir.', 'danger');
+    notify(error.response?.data?.message || 'Erro ao concluir.', 'danger');
   }
 }
 </script>

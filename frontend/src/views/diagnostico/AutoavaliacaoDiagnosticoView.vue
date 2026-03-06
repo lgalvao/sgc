@@ -91,7 +91,7 @@ import PageHeader from '@/components/layout/PageHeader.vue';
 import {logger} from '@/utils';
 import {useMapasStore} from '@/stores/mapas';
 import {useUnidadesStore} from '@/stores/unidades';
-import {useFeedbackStore} from '@/stores/feedback';
+import {useNotification} from '@/composables/useNotification';
 import {useDiagnosticosStore} from '@/stores/diagnosticos';
 import type {Competencia} from '@/types/tipos';
 
@@ -109,7 +109,7 @@ const route = useRoute();
 const router = useRouter();
 const mapasStore = useMapasStore();
 const unidadesStore = useUnidadesStore();
-const feedbackStore = useFeedbackStore();
+const {notify} = useNotification();
 const diagnosticosStore = useDiagnosticosStore();
 
 const loading = ref(true);
@@ -158,7 +158,7 @@ onMounted(async () => {
       };
     });
   } catch (error) {
-    feedbackStore.show('Erro', 'Erro ao carregar dados do diagnóstico.', 'danger');
+    notify('Erro ao carregar dados do diagnóstico.', 'danger');
     logger.error(error);
   } finally {
     loading.value = false;
@@ -180,7 +180,7 @@ async function salvar(competenciaCodigo: number, importancia: string, dominio: s
     avaliacoes.value[competenciaCodigo].salvo = true;
   } catch (error: any) {
     const msg = error.response?.data?.message || error.message || 'Erro ao salvar avaliação.';
-    feedbackStore.show('Erro', msg, 'danger');
+    notify(msg, 'danger');
   }
 }
 
@@ -189,10 +189,10 @@ async function concluirAutoavaliacao() {
 
   try {
     await diagnosticosStore.concluirAutoavaliacao(codSubprocesso.value);
-    feedbackStore.show('Sucesso', 'Autoavaliação concluída com sucesso!', 'success');
+    notify('Autoavaliação concluída com sucesso!', 'success');
     await router.push('/painel');
   } catch (error: any) {
-    feedbackStore.show('Erro', error.response?.data?.message || 'Erro ao concluir.', 'danger');
+    notify(error.response?.data?.message || 'Erro ao concluir.', 'danger');
   }
 }
 </script>

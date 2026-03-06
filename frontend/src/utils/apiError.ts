@@ -1,4 +1,3 @@
-import {useFeedbackStore} from '@/stores/feedback';
 import logger from '@/utils/logger';
 
 export interface ApiErrorPayload {
@@ -104,39 +103,6 @@ export function isAxiosError(error: unknown): error is import('axios').AxiosErro
         'isAxiosError' in error &&
         (error as any).isAxiosError === true
     );
-}
-
-/**
- * Exibe notificação de erro global (toast) baseado no tipo de erro.
- * Use para erros que devem ser mostrados globalmente (não inline).
- */
-export function notifyError(normalized: NormalizedError): void {
-    const feedbackStore = useFeedbackStore();
-
-    // Títulos padrão por tipo
-    const titles: Record<ErrorKind, string> = {
-        validation: 'Erro de Validação',
-        notFound: 'Não Encontrado',
-        conflict: 'Conflito',
-        unauthorized: 'Não Autorizado',
-        forbidden: 'Acesso Negado',
-        network: 'Erro de Rede',
-        unexpected: 'Erro Inesperado'
-    };
-
-    const title = titles[normalized.kind];
-
-    let fullMessage = normalized.message;
-    if (normalized.stackTrace) {
-        fullMessage += '\n\n--- DETALHES TÉCNICOS (Stack Trace) ---\n' + normalized.stackTrace;
-    } else if (normalized.traceId) {
-        fullMessage += '\n\nTrace ID: ' + normalized.traceId;
-    }
-
-    // Aumentar o tempo de exibição para permitir leitura de detalhes técnicos (60s se tiver stacktrace)
-    const autoHideDelay = normalized.stackTrace ? 60000 : 7000;
-
-    feedbackStore.show(title, fullMessage, 'danger', autoHideDelay);
 }
 
 /**

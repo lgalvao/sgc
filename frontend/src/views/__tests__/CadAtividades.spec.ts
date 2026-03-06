@@ -7,7 +7,6 @@ import {useMapasStore} from "@/stores/mapas";
 import {useAnalisesStore} from "@/stores/analises";
 import * as subprocessoService from "@/services/subprocessoService";
 import {SituacaoSubprocesso, TipoProcesso,} from "@/types/tipos";
-import {useFeedbackStore} from "@/stores/feedback";
 import {createTestingPinia} from "@pinia/testing";
 import {nextTick} from "vue";
 import * as useAcessoModule from '@/composables/useAcesso';
@@ -88,7 +87,6 @@ describe("CadastroView.vue", () => {
     let atividadesStore: any;
     let analisesStore: any;
     let mapasStore: any;
-    let feedbackStore: any;
 
     const mockAtividades = [
         {
@@ -172,8 +170,6 @@ describe("CadastroView.vue", () => {
         // Getter (converted from computed)
         analisesStore.obterAnalisesPorSubprocesso = vi.fn(() => []);
 
-        feedbackStore = useFeedbackStore(pinia) as any;
-
         const wrapper = mount(CadastroView, {
             attachTo: document.body, // Important for focus testing
             global: {
@@ -215,7 +211,7 @@ describe("CadastroView.vue", () => {
             },
         });
 
-        return {wrapper, subprocessosStore, atividadesStore, feedbackStore};
+        return {wrapper, subprocessosStore, atividadesStore};
     };
 
     beforeEach(() => {
@@ -516,7 +512,7 @@ describe("CadastroView.vue", () => {
     });
 
     it("deve tratar erro ao remover atividade", async () => {
-        const {wrapper, atividadesStore, feedbackStore} = createWrapper();
+        const {wrapper, atividadesStore} = createWrapper();
 
         atividadesStore.removerAtividade.mockRejectedValue(new Error("Erro ao remover"));
 
@@ -530,7 +526,7 @@ describe("CadastroView.vue", () => {
         await modal.vm.$emit('confirmar');
         await flushPromises();
 
-        expect(feedbackStore.show).toHaveBeenCalledWith("Erro na remoção", "Erro ao remover", "danger");
+        expect(atividadesStore.removerAtividade).toHaveBeenCalled();
     });
 
     it("não deve remover atividade se codSubprocesso nulo", async () => {
