@@ -67,8 +67,9 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
 
-        await expect(page.getByText(/Cadastro de atividades disponibilizado/i).first()).toBeVisible();
         await verificarPaginaPainel(page);
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
+        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro disponibilizado/i);
     });
 
     test('Preparacao 3: Gestores aceitam cadastro', async ({page, autenticadoComoGestorCoord22}) => {
@@ -98,7 +99,9 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
         await disponibilizarMapa(page, '2030-12-31');
 
         await verificarPaginaPainel(page);
-        await expect(page.getByText(/Mapa disponibilizado/i)).toBeVisible();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
+        await navegarParaSubprocesso(page, UNIDADE_ALVO);
+        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa disponibilizado/i);
     });
 
     // TESTES PRINCIPAIS - CDU-19
@@ -134,8 +137,6 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
         await page.getByTestId('btn-validar-mapa-confirmar').click();
 
         await verificarPaginaPainel(page);
-        await expect(page.getByText(/Mapa validado/i).first()).toBeVisible();
-
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa validado/i);
     });

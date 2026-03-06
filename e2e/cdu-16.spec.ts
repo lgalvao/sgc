@@ -82,8 +82,9 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
 
-        await expect(page.getByText(/Cadastro de atividades disponibilizado/i).first()).toBeVisible();
         await verificarPaginaPainel(page);
+        await acessarSubprocessoChefeDireto(page, descProcessoMapeamento, UNIDADE_ALVO);
+        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro disponibilizado/i);
     });
 
     test('Preparacao 3: Gestores aceitam cadastro', async ({page, autenticadoComoGestorCoord21}) => {
@@ -115,8 +116,9 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
         await criarCompetencia(page, competencia3, [atividadeBase3]);
 
         await disponibilizarMapa(page, '2030-12-31');
-        await expect(page.getByText(/Mapa disponibilizado/i)).toBeVisible();
         await verificarPaginaPainel(page);
+        await acessarSubprocessoAdmin(page, descProcessoMapeamento, UNIDADE_ALVO);
+        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa disponibilizado/i);
     });
 
     test('Preparacao 5: Chefe valida mapa', async ({page, autenticadoComoChefeSecao211}) => {
@@ -127,7 +129,8 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
         await page.getByTestId('btn-validar-mapa-confirmar').click();
 
         await verificarPaginaPainel(page);
-        await expect(page.getByText(/Mapa validado/i).first()).toBeVisible();
+        await acessarSubprocessoChefeDireto(page, descProcessoMapeamento, UNIDADE_ALVO);
+        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa validado/i);
     });
 
     test('Preparacao 6: Gestores aceitam mapa', async ({page, autenticadoComoGestorCoord21}) => {
@@ -201,8 +204,9 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
 
-        await expect(page.getByText(/Revisão do cadastro de atividades disponibilizada/i).first()).toBeVisible();
         await verificarPaginaPainel(page);
+        await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
+        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Revisão do cadastro disponibilizada/i);
     });
 
     test('Preparacao 9: Gestores e Admin aceitam revisão', async ({page, autenticadoComoGestorCoord21}) => {

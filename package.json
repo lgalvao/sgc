@@ -7,6 +7,7 @@
     "test": "npm test --prefix frontend",
     "test:unit": "npm run test:unit --prefix frontend",
     "test:e2e": "env -u NO_COLOR playwright test",
+    "test:e2e:2w": "env -u NO_COLOR E2E_WORKERS=2 playwright test",
     "test:e2e:poc": "env -u NO_COLOR E2E_WORKERS=2 playwright test",
     "test:e2e:captura": "playwright test e2e/captura-telas.spec.ts",
     "typecheck": "npm run typecheck --prefix frontend && npm run typecheck:e2e",

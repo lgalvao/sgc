@@ -77,8 +77,9 @@ test('Deve criar processo', async ({page, autenticadoComoAdmin}) => {
 
 ### Pré-requisitos
 
-* Backend rodando em `http://localhost:10000` (perfil `e2e` recomendado para endpoints de reset).
-* Frontend rodando em `http://localhost:5173`.
+* Não é necessário subir frontend/backend manualmente para a suíte Playwright padrão.
+* Os testes iniciam a infraestrutura E2E automaticamente via `playwright.config.ts` e `e2e/lifecycle.js`.
+* Para paralelismo isolado, usamos frontend único e 1 backend por worker.
 
 ### Comandos
 
@@ -89,8 +90,8 @@ npm install
 # Rodar todos os testes (Headless)
 npm run test:e2e
 
-# Rodar PoC com 2 workers isolados (1 stack por worker)
-E2E_WORKERS=2 npm run test:e2e
+# Rodar com 2 workers isolados (configuração atualmente validada)
+npm run test:e2e:2w
 
 # Rodar com interface gráfica (UI Mode)
 npx playwright test --ui
@@ -108,15 +109,17 @@ O backend possui um perfil específico (`e2e`) que habilita endpoints auxiliares
 
 Consulte `backend/src/main/java/sgc/e2e/README.md` para mais detalhes.
 
-## ♻️ Isolamento Por Worker (PoC)
+## ♻️ Isolamento Por Worker
 
 Para paralelismo com isolamento de estado, a infraestrutura E2E suporta:
 
-* 1 backend + 1 frontend por worker.
+* 1 frontend único compartilhado.
+* 1 backend por worker.
 * Banco H2 em memória dedicado por worker (`sgc-e2e-w{index}`).
 * Portas dedicadas por worker:
   * Backend: `10000 + workerIndex`
-  * Frontend: `5173 + workerIndex`
+  * Frontend único: `5173`
+* Configuração validada até aqui: `2 workers`.
 
 ## 🤝 Padrões de Contribuição
 

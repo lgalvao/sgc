@@ -14,7 +14,7 @@ import {loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
 
 async function acessarSubprocessoChefe(page: Page, descProcesso: string) {
     await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
-    await navegarParaMapa(page);
+    await navegarParaSubprocesso(page, UNIDADE_ALVO);
 }
 
 test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão', () => {
@@ -75,8 +75,9 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
 
-        await expect(page.getByText(/Cadastro de atividades disponibilizado/i).first()).toBeVisible();
         await verificarPaginaPainel(page);
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
+        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro disponibilizado/i);
     });
 
     test('Preparacao 2a: Gestor COORD_22 aceita cadastro', async ({page, autenticadoComoGestorCoord22}) => {
@@ -117,7 +118,9 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
         await disponibilizarMapa(page, '2030-12-31');
 
         await verificarPaginaPainel(page);
-        await expect(page.getByText(/Mapa disponibilizado/i)).toBeVisible();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
+        await navegarParaSubprocesso(page, UNIDADE_ALVO);
+        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa disponibilizado/i);
     });
 
     test('Preparacao 5: Chefe valida o mapa', async ({page, autenticadoComoChefeSecao221}) => {
@@ -131,7 +134,8 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
         await page.getByTestId('btn-validar-mapa-confirmar').click();
 
         await verificarPaginaPainel(page);
-        await expect(page.getByText(/Mapa validado/i).first()).toBeVisible();
+        await acessarSubprocessoChefe(page, descProcesso);
+        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa validado/i);
     });
 
     test('Preparacao 6: Gestor registra aceite do mapa', async ({page, autenticadoComoGestorCoord22}) => {

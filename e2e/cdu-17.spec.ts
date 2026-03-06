@@ -70,8 +70,9 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
 
-        await expect(page.getByText(/Cadastro de atividades disponibilizado/i).first()).toBeVisible();
         await verificarPaginaPainel(page);
+        await page.goto(`/processo/${processoId}/${UNIDADE_ALVO}`);
+        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro disponibilizado/i);
     });
 
     test('Preparacao 3: Gestores aceitam cadastro', async ({page, autenticadoComoGestorCoord21}) => {
@@ -133,6 +134,8 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
         // Cenario 4: Disponibilizar com sucesso
         await disponibilizarMapa(page, '2030-12-31');
         await verificarPaginaPainel(page);
-        await expect(page.getByText(/Mapa disponibilizado/i).first()).toBeVisible();
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
+        await navegarParaSubprocesso(page, 'SECAO_211');
+        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa disponibilizado/i);
     });
 });
