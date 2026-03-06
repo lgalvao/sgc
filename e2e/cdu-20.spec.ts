@@ -1,5 +1,5 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
-import {criarProcesso} from './helpers/helpers-processos.js';
+import {criarProcessoFixture} from './fixtures/fixtures-processos.js';
 import {
     adicionarAtividade,
     adicionarConhecimento,
@@ -27,17 +27,16 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
     const competencia1 = `Competência 1 ${timestamp}`;
     const competencia2 = `Competência 2 ${timestamp}`;
 
-    test('Fluxo completo de validação de mapa', async ({page, autenticadoComoAdmin}) => {
+    test('Fluxo completo de validação de mapa', async ({page, request, cleanupAutomatico}) => {
         await test.step('1. ADMIN cria processo e CHEFE disponibiliza', async () => {
-            await criarProcesso(page, {
+            const processo = await criarProcessoFixture(request, {
                 descricao: descProcesso,
                 tipo: 'MAPEAMENTO',
                 diasLimite: 30,
                 unidade: UNIDADE_ALVO,
-                expandir: ['SECRETARIA_2', 'COORD_22'],
                 iniciar: true
             });
-            await fazerLogout(page);
+            cleanupAutomatico.registrar(processo.codigo);
 
             await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
             await acessarSubprocessoChefeDireto(page, descProcesso, UNIDADE_ALVO);

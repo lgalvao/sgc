@@ -121,8 +121,9 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {
         await expect(modal).toHaveClass(/show/);
         await modal.getByRole('button', {name: /Homologar Selecionados/i}).click();
 
-        await expect(page.getByText(/Cadastros homologados em bloco/i).first()).toBeVisible();
         await expect(page).toHaveURL(/\/processo\/\d+$/);
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
+        await expect(btnHomologar).toBeDisabled();
+        await expect(page.getByRole('row', {name: /SECAO_221 - Seção 221 Cadastro homologado/i})).toBeVisible();
     });
 });
