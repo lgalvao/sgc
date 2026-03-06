@@ -60,7 +60,7 @@ export async function criarProcessoFixture(
         ? '/e2e/fixtures/processo-mapeamento'
         : '/e2e/fixtures/processo-revisao';
 
-    const response = await request.post(`http://localhost:10000${endpoint}`, {
+    const response = await request.post(endpoint, {
         data: {
             unidadeSigla: options.unidade,
             iniciar: options.iniciar ?? false,
@@ -89,7 +89,7 @@ export async function criarProcessoFinalizadoFixture(
 ): Promise<ProcessoFixture> {
     const endpoint = '/e2e/fixtures/processo-finalizado-com-atividades';
 
-    const response = await request.post(`http://localhost:10000${endpoint}`, {
+    const response = await request.post(endpoint, {
         data: {
             unidadeSigla: options.unidade,
             iniciar: options.iniciar ?? true,
@@ -106,4 +106,3 @@ export async function criarProcessoFinalizadoFixture(
 
     return await response.json();
 }
-

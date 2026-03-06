@@ -2,7 +2,36 @@ import {test as base} from '@playwright/test';
 // Use the project's centralized logger for consistent formatting
 import logger from '../../frontend/src/utils/logger.js';
 
+function obterBaseUrlWorker(workerIndex: number): string {
+    const portaFrontend = Number.parseInt(process.env.E2E_FRONTEND_PORT || '5173', 10);
+    return `http://localhost:${portaFrontend}`;
+}
+
 export const test = base.extend({
+    context: async ({browser}, use, testInfo) => {
+        const baseURL = obterBaseUrlWorker(testInfo.parallelIndex);
+        const context = await browser.newContext({
+            baseURL,
+            extraHTTPHeaders: {
+                'x-e2e-worker': String(testInfo.parallelIndex)
+            }
+        });
+        await use(context);
+        await context.close();
+    },
+
+    request: async ({playwright}, use, testInfo) => {
+        const baseURL = obterBaseUrlWorker(testInfo.parallelIndex);
+        const request = await playwright.request.newContext({
+            baseURL,
+            extraHTTPHeaders: {
+                'x-e2e-worker': String(testInfo.parallelIndex)
+            }
+        });
+        await use(request);
+        await request.dispose();
+    },
+
     page: async ({page}, use) => {
         // Listener para logs do console
         page.on('console', async msg => {

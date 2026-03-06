@@ -1,6 +1,7 @@
 package sgc.e2e;
 
 import org.springframework.context.annotation.*;
+import org.springframework.beans.factory.annotation.*;
 import org.springframework.http.*;
 import org.springframework.security.access.expression.method.*;
 import org.springframework.security.config.annotation.method.configuration.*;
@@ -28,6 +29,16 @@ import java.util.*;
 @EnableMethodSecurity
 @Profile("e2e")
 public class E2eSecurityConfig {
+    private final List<String> origensPermitidas;
+
+    public E2eSecurityConfig(
+            @Value("${CORS_ALLOWED_ORIGINS:http://localhost:5173,http://localhost:4173}") String origensPermitidasCsv
+    ) {
+        this.origensPermitidas = Arrays.stream(origensPermitidasCsv.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isBlank())
+                .toList();
+    }
 
     @Bean
     public FiltroJwt filtroJwt(GerenciadorJwt gerenciadorJwt, UsuarioFacade usuarioFacade) {
@@ -67,7 +78,7 @@ public class E2eSecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(request -> {
                     CorsConfiguration config = new CorsConfiguration();
-                    config.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:4173"));
+                    config.setAllowedOrigins(origensPermitidas);
                     config.setAllowedMethods(List.of("GET", "POST", "OPTIONS"));
                     config.setAllowedHeaders(List.of("*"));
                     config.setAllowCredentials(true);

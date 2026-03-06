@@ -1,6 +1,6 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
-import {criarProcesso} from './helpers/helpers-processos.js';
+import {criarProcesso, verificarProcessoNaTabela} from './helpers/helpers-processos.js';
 import {
     aceitarCadastroMapeamento,
     acessarSubprocessoAdmin,
@@ -53,7 +53,11 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
 
         await page.getByTestId('btn-processo-iniciar').click();
         await page.getByTestId('btn-iniciar-processo-confirmar').click();
-        await expect(page.getByText('Processo iniciado')).toBeVisible();
+        await verificarProcessoNaTabela(page, {
+            descricao: descProcesso,
+            situacao: 'Em andamento',
+            tipo: 'Mapeamento'
+        });
 
         // 2. Chefe adiciona atividades e conhecimentos
         await login(page, USUARIOS.CHEFE_SECAO_211.titulo, USUARIOS.CHEFE_SECAO_211.senha);
@@ -120,6 +124,10 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
         await disponibilizarMapa(page);
 
         await expect(page).toHaveURL(/\/painel/);
-        await expect(page.getByText(/Mapa disponibilizado/i)).toBeVisible();
+        await verificarProcessoNaTabela(page, {
+            descricao: descProcesso,
+            situacao: 'Em andamento',
+            tipo: 'Mapeamento'
+        });
     });
 });

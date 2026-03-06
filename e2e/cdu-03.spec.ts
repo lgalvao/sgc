@@ -1,6 +1,11 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
-import {criarProcesso, extrairProcessoId} from './helpers/helpers-processos.js';
-import {esperarPaginaCadastroProcesso, esperarPaginaDetalhesProcesso, esperarPaginaPainel} from './helpers/helpers-navegacao.js';
+import {criarProcesso, extrairProcessoId, verificarProcessoNaTabela} from './helpers/helpers-processos.js';
+import {
+    esperarPaginaCadastroProcesso,
+    esperarPaginaDetalhesProcesso,
+    esperarPaginaPainel,
+    verificarToast
+} from './helpers/helpers-navegacao.js';
 import type {Page} from '@playwright/test';
 import type {useProcessoCleanup} from './hooks/hooks-limpeza.js';
 
@@ -109,7 +114,7 @@ test.describe('CDU-03 - Manter Processo', () => {
         await page.getByTestId('btn-processo-salvar').click();
 
         await esperarPaginaPainel(page);
-        await expect(page.getByText(/Processo alterado/i).first()).toBeVisible();
+        await verificarToast(page, /alterado com sucesso/i);
         await expect(page.getByText(novaDescricao)).toBeVisible();
     });
 
@@ -132,6 +137,7 @@ test.describe('CDU-03 - Manter Processo', () => {
 
         await page.getByRole('dialog').getByRole('button', {name: 'Remover'}).click();
         await esperarPaginaPainel(page);
+        await verificarToast(page, /removido com sucesso/i);
         await expect(page.getByTestId('tbl-processos').getByText(descricao)).toBeHidden();
     });
 
@@ -257,7 +263,11 @@ test.describe('CDU-03 - Manter Processo', () => {
             unidade: 'ASSESSORIA_12',
             expandir: ['SECRETARIA_1']
         });
-        await expect(page.getByText(/Processo criado/i).first()).toBeVisible();
+        await verificarProcessoNaTabela(page, {
+            descricao,
+            situacao: 'Criado',
+            tipo: 'Mapeamento'
+        });
 
         // Cleanup registration
         await page.getByTestId('tbl-processos').getByText(descricao).first().click();
@@ -298,7 +308,11 @@ test.describe('CDU-03 - Manter Processo', () => {
         await page.getByTestId('btn-iniciar-processo-confirmar').click();
 
         await esperarPaginaPainel(page);
-        await expect(page.getByText(/Processo iniciado/i).first()).toBeVisible();
+        await verificarProcessoNaTabela(page, {
+            descricao: descricaoAlt,
+            situacao: 'Em andamento',
+            tipo: 'Mapeamento'
+        });
 
         await page.getByTestId('tbl-processos').getByText(descricaoAlt).first().click();
         await esperarPaginaDetalhesProcesso(page);

@@ -1,6 +1,6 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
-import {criarProcesso, extrairProcessoId} from './helpers/helpers-processos.js';
+import {criarProcesso, extrairProcessoId, verificarProcessoNaTabela} from './helpers/helpers-processos.js';
 import {
     abrirModalImpactoEdicao,
     abrirModalImpactoVisualizacao,
@@ -61,7 +61,11 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
 
         await page.getByTestId('btn-processo-iniciar').click();
         await page.getByTestId('btn-iniciar-processo-confirmar').click();
-        await expect(page.getByText(/Processo iniciado/i).first()).toBeVisible();
+        await verificarProcessoNaTabela(page, {
+            descricao: descProcessoMapeamento,
+            situacao: 'Em andamento',
+            tipo: 'Mapeamento'
+        });
         await limparNotificacoes(page);
 
         // 2. FASE CADASTRO: Chefe preenche atividades e disponibiliza (Localização: SECAO_211 -> COORD_21)
@@ -164,7 +168,11 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
 
         await page.getByTestId('btn-processo-iniciar').click();
         await page.getByTestId('btn-iniciar-processo-confirmar').click();
-        await expect(page.getByText(/Processo iniciado/i).first()).toBeVisible();
+        await verificarProcessoNaTabela(page, {
+            descricao: descProcessoRevisao,
+            situacao: 'Em andamento',
+            tipo: 'Revisão'
+        });
     });
 
     // FLUXO DE VERIFICAÇÃO DE IMPACTOS (Tramitação)

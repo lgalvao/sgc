@@ -1,6 +1,12 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
-import {criarProcesso, extrairProcessoId, verificarDetalhesProcesso} from './helpers/helpers-processos.js';
-import {esperarPaginaCadastroProcesso, esperarPaginaDetalhesProcesso, esperarPaginaPainel, esperarPaginaSubprocesso} from './helpers/helpers-navegacao.js';
+import {criarProcesso, extrairProcessoId, verificarDetalhesProcesso, verificarProcessoNaTabela} from './helpers/helpers-processos.js';
+import {
+    esperarPaginaCadastroProcesso,
+    esperarPaginaDetalhesProcesso,
+    esperarPaginaPainel,
+    esperarPaginaSubprocesso,
+    verificarToast
+} from './helpers/helpers-navegacao.js';
 import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
 import type {Page} from '@playwright/test';
 
@@ -46,7 +52,12 @@ test.describe('CDU-04 - Iniciar Processo', () => {
 
         // Aguarda toast e redirect
         await esperarPaginaPainel(page);
-        await expect(page.getByText(/Processo iniciado/i).first()).toBeVisible();
+        await verificarToast(page, /iniciado com sucesso/i);
+        await verificarProcessoNaTabela(page, {
+            descricao,
+            situacao: 'Em andamento',
+            tipo: 'Mapeamento'
+        });
 
         // 3. Verificar Detalhes do Processo (Snapshot e Subprocessos)
         await page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descricao)}).click();

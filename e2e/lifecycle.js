@@ -11,12 +11,15 @@ const __dirname = path.dirname(__filename);
 
 const BACKEND_DIR = path.resolve(__dirname, '../backend');
 const FRONTEND_DIR = path.resolve(__dirname, '../frontend');
-const BACKEND_PORT = 10000;
-const FRONTEND_PORT = 5173;
-const SMTP_PORT = 1025;
 
-let backendProcess;
-let frontendProcess;
+const WORKER_COUNT = Number.parseInt(process.env.WORKER_COUNT || '1', 10);
+const BACKEND_BASE_PORT = Number.parseInt(process.env.E2E_BACKEND_BASE_PORT || '10000', 10);
+const FRONTEND_PORT = Number.parseInt(process.env.E2E_FRONTEND_PORT || '5173', 10);
+const SMTP_PORT = Number.parseInt(process.env.E2E_SMTP_PORT || '1025', 10);
+const DB_NAME_PREFIX = process.env.E2E_DB_NAME_PREFIX || 'sgc-e2e-w';
+
+const backendProcessos = [];
+const frontendProcessos = [];
 let smtpServer;
 
 // Criar/limpar arquivo de log ao iniciar
@@ -81,12 +84,12 @@ const LOG_FILTERS = [
     // Warnings do Lombok
     /WARNING:/,
 
-    /^> Task :/, 
+    /^> Task :/,
     /logStarted/,
-    /UP-TO-DATE/, 
+    /UP-TO-DATE/,
     /Starting a Gradle Daemon.*Daemons could not be reused/,
     /Reusing configuration cache/,
-    /Starting/, 
+    /Starting/,
 
     // Spring Boot - Inicialização
     /The following.*profile.*is active/,
@@ -127,7 +130,6 @@ function log(prefix, data) {
     lines.forEach(line => {
         const trimmed = line.trim();
         if (trimmed && !shouldFilterLog(line)) {
-            // Use lifecycleLogger to keep console + file in sync
             lifecycleLogger.info(`[${prefix}] ${line}`);
         }
     });
@@ -135,8 +137,23 @@ function log(prefix, data) {
 
 const isWindows = process.platform === 'win32';
 
-function startBackend() {
-    // Ensure gradlew is executable (Unix only)
+function normalizarEnv(baseEnv = process.env) {
+    const env = {...baseEnv};
+    if (env.FORCE_COLOR && env.NO_COLOR) {
+        delete env.FORCE_COLOR;
+    }
+    return env;
+}
+
+function portaBackend(workerIndex) {
+    return BACKEND_BASE_PORT + workerIndex;
+}
+
+function dbUrl(workerIndex) {
+    return `jdbc:h2:mem:${DB_NAME_PREFIX}${workerIndex};DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE`;
+}
+
+function startBackend(workerIndex) {
     if (!isWindows) {
         fs.chmodSync(path.join(BACKEND_DIR, 'gradlew'), '755');
     }
@@ -144,20 +161,29 @@ function startBackend() {
     const gradlewExecutable = isWindows ? 'gradlew.bat' : './gradlew';
     const gradlewPath = path.resolve(BACKEND_DIR, `../${gradlewExecutable}`);
 
+    const backendPort = portaBackend(workerIndex);
+    const argsAplicacao = [
+        `--server.port=${backendPort}`,
+        `--spring.datasource.url=${dbUrl(workerIndex)}`,
+        `--CORS_ALLOWED_ORIGINS=http://localhost:${FRONTEND_PORT},http://localhost:4173`
+    ].join(' ');
+
     const spawnOptions = {
         cwd: BACKEND_DIR,
         shell: isWindows,
-        stdio: ['ignore', 'pipe', 'pipe']
+        stdio: ['ignore', 'pipe', 'pipe'],
+        env: normalizarEnv()
     };
 
-    backendProcess = spawn(gradlewPath, ['bootRun', '-PENV=e2e'], spawnOptions);
+    const backendProcess = spawn(gradlewPath, ['bootRun', '-PENV=e2e', `--args=${argsAplicacao}`], spawnOptions);
+    backendProcessos.push(backendProcess);
 
-    backendProcess.stdout.on('data', data => log('BACKEND', data));
-    backendProcess.stderr.on('data', data => log('BACKEND_ERR', data));
+    backendProcess.stdout.on('data', data => log(`BACKEND-${workerIndex}`, data));
+    backendProcess.stderr.on('data', data => log(`BACKEND_ERR-${workerIndex}`, data));
 
     backendProcess.on('exit', code => {
         if (code !== 0 && code !== null) {
-            lifecycleLogger.error(`Backend exited with code ${code}`);
+            lifecycleLogger.error(`Backend w${workerIndex} saiu com código ${code}`);
             process.exit(code);
         }
     });
@@ -169,17 +195,27 @@ function startFrontend() {
     const spawnOptions = {
         cwd: FRONTEND_DIR,
         shell: isWindows,
-        stdio: ['ignore', 'pipe', 'pipe']
+        stdio: ['ignore', 'pipe', 'pipe'],
+        env: {
+            ...normalizarEnv(),
+            E2E_BACKEND_BASE_PORT: String(BACKEND_BASE_PORT),
+            E2E_WORKER_COUNT: String(WORKER_COUNT)
+        }
     };
 
-    frontendProcess = spawn(npmExecutable, ['run', 'dev'], spawnOptions);
+    const frontendProcess = spawn(
+        npmExecutable,
+        ['run', 'dev', '--', '--port', String(FRONTEND_PORT)],
+        spawnOptions
+    );
+    frontendProcessos.push(frontendProcess);
 
     frontendProcess.stdout.on('data', data => log('FRONTEND', data));
     frontendProcess.stderr.on('data', data => log('FRONTEND_ERR', data));
 
     frontendProcess.on('exit', code => {
         if (code !== 0 && code !== null) {
-            lifecycleLogger.error(`Frontend exited with code ${code}`);
+            lifecycleLogger.error(`Frontend saiu com código ${code}`);
             process.exit(code);
         }
     });
@@ -188,12 +224,11 @@ function startFrontend() {
 function startSmtpServer() {
     smtpServer = new SMTPServer({
         authOptional: true,
-        onData(stream, session, callback) {
+        onData(stream, _session, callback) {
             stream.on('data', () => {
                 // Consumir dados
             });
             stream.on('end', () => {
-                // log('SMTP', `E-mail recebido de ${session.envelope.mailFrom.address} para ${session.envelope.rcptTo.map(r => r.address).join(', ')}`);
                 callback();
             });
         }
@@ -208,10 +243,10 @@ function startSmtpServer() {
     });
 }
 
-function stopProcess(proc, isWindows) {
+function stopProcess(proc, windows) {
     if (!proc) return;
     try {
-        if (isWindows) {
+        if (windows) {
             execSync(`taskkill /pid ${proc.pid} /T /F`, {stdio: 'ignore'});
         } else {
             process.kill(-proc.pid);
@@ -222,15 +257,13 @@ function stopProcess(proc, isWindows) {
 }
 
 function cleanup() {
-    // Encerrar apenas processos iniciados, preservando Gradle Daemons
-    stopProcess(backendProcess, isWindows);
-    stopProcess(frontendProcess, isWindows);
+    for (const p of backendProcessos) stopProcess(p, isWindows);
+    for (const p of frontendProcessos) stopProcess(p, isWindows);
     if (smtpServer) {
         smtpServer.close();
     }
 }
 
-// Handle exit signals
 process.on('SIGINT', () => {
     cleanup();
     process.exit();
@@ -245,13 +278,15 @@ process.on('exit', () => {
     cleanup();
 });
 
-function checkBackendHealth() {
+function checkHttpHealth(url, expectedMin, expectedMax) {
     return new Promise((resolve) => {
         const check = () => {
-            // Uso de http intencional para health check local (localhost).
-            // O ambiente de desenvolvimento local não utiliza HTTPS por padrão.
-            const req = http.get(`http://localhost:${BACKEND_PORT}/`, (res) => {
-                if (res.statusCode >= 200 && res.statusCode < 500) resolve(); else setTimeout(check, 1000);
+            const req = http.get(url, (res) => {
+                if (res.statusCode >= expectedMin && res.statusCode < expectedMax) {
+                    resolve();
+                } else {
+                    setTimeout(check, 1000);
+                }
             });
             req.on('error', () => setTimeout(check, 1000));
             req.end();
@@ -260,27 +295,32 @@ function checkBackendHealth() {
     });
 }
 
-function checkFrontendHealth() {
-    return new Promise((resolve) => {
-        const check = () => {
-            // Uso de http intencional para health check local (localhost).
-            const req = http.get(`http://localhost:${FRONTEND_PORT}`, (res) => {
-                if (res.statusCode >= 200 && res.statusCode < 400) resolve(); else setTimeout(check, 1000);
-            });
-            req.on('error', () => setTimeout(check, 1000));
-            req.end();
-        };
-        check();
-    });
+async function subirBackends() {
+    for (let i = 0; i < WORKER_COUNT; i++) {
+        startBackend(i);
+    }
+    for (let i = 0; i < WORKER_COUNT; i++) {
+        await checkHttpHealth(`http://localhost:${portaBackend(i)}/`, 200, 500);
+    }
 }
 
-startBackend();
-startSmtpServer();
-try {
-    await checkBackendHealth();
+async function subirFrontend() {
     startFrontend();
-    await checkFrontendHealth();
-    lifecycleLogger.info('>>> Frontend, Backend e SMTP no ar.');
+    await checkHttpHealth(`http://localhost:${FRONTEND_PORT}`, 200, 400);
+}
+
+async function subirInfra() {
+    await subirBackends();
+    await subirFrontend();
+}
+
+startSmtpServer();
+
+try {
+    await subirInfra();
+    lifecycleLogger.info(
+        `>>> Infra E2E no ar com ${WORKER_COUNT} worker(s). Frontend único: ${FRONTEND_PORT}, Backends: ${BACKEND_BASE_PORT}..${BACKEND_BASE_PORT + WORKER_COUNT - 1}`
+    );
 } catch (error) {
     lifecycleLogger.error(`Erro ao iniciar infra de testes: ${error && error.message ? error.message : error}`);
     process.exit(1);

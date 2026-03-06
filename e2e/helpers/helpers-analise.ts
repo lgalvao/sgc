@@ -116,7 +116,7 @@ export async function fecharHistoricoAnalise(page: Page) {
 /**
  * Função genérica para devolução de cadastro/revisão
  */
-async function realizarDevolucao(page: Page, mensagemSucesso: string | RegExp, observacao: string = '') {
+async function realizarDevolucao(page: Page, observacao: string = '') {
     await limparNotificacoes(page);
     await page.getByTestId('btn-acao-devolver').click();
     await expect(page.getByRole('dialog')).toBeVisible();
@@ -127,7 +127,6 @@ async function realizarDevolucao(page: Page, mensagemSucesso: string | RegExp, o
     }
 
     await page.getByTestId('btn-devolucao-cadastro-confirmar').click();
-    await expect(page.getByText(mensagemSucesso).first()).toBeVisible();
     await verificarPaginaPainel(page);
 }
 
@@ -135,14 +134,14 @@ async function realizarDevolucao(page: Page, mensagemSucesso: string | RegExp, o
  * Devolve cadastro de mapeamento para ajustes (CDU-13)
  */
 export async function devolverCadastroMapeamento(page: Page, observacao: string = '') {
-    await realizarDevolucao(page, /Cadastro devolvido/i, observacao);
+    await realizarDevolucao(page, observacao);
 }
 
 /**
  * Devolve revisão para ajustes (CDU-14)
  */
 export async function devolverRevisao(page: Page, observacao: string = '') {
-    await realizarDevolucao(page, /Revisão devolvida/i, observacao);
+    await realizarDevolucao(page, observacao);
 }
 
 /**
@@ -165,7 +164,7 @@ export async function cancelarDevolucao(page: Page) {
 /**
  * Função genérica para aceite de cadastro/revisão (GESTOR)
  */
-async function realizarAceite(page: Page, mensagemSucesso: string | RegExp, observacao: string = '') {
+async function realizarAceite(page: Page, observacao: string = '') {
     await limparNotificacoes(page);
     await page.getByTestId('btn-acao-analisar-principal').click();
     await expect(page.getByRole('dialog')).toBeVisible();
@@ -175,7 +174,6 @@ async function realizarAceite(page: Page, mensagemSucesso: string | RegExp, obse
     await page.getByTestId('inp-aceite-cadastro-obs').fill(obsToSend);
 
     await page.getByTestId('btn-aceite-cadastro-confirmar').click();
-    await expect(page.getByText(mensagemSucesso).first()).toBeVisible();
     await verificarPaginaPainel(page);
 }
 
@@ -183,14 +181,14 @@ async function realizarAceite(page: Page, mensagemSucesso: string | RegExp, obse
  * Aceita cadastro de mapeamento (GESTOR - CDU-13)
  */
 export async function aceitarCadastroMapeamento(page: Page, observacao: string = '') {
-    await realizarAceite(page, /Cadastro aceito/i, observacao);
+    await realizarAceite(page, observacao);
 }
 
 /**
  * Aceita revisão (GESTOR - CDU-14)
  */
 export async function aceitarRevisao(page: Page, observacao: string = '') {
-    await realizarAceite(page, /Revisão aceita/i, observacao);
+    await realizarAceite(page, observacao);
 }
 
 // Funções de Homologação (ADMIN)

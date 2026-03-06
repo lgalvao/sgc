@@ -2,22 +2,25 @@
 
 import {defineConfig, devices} from '@playwright/test';
 
+const workers = Number.parseInt(process.env.E2E_WORKERS || '1', 10);
+const frontendPort = Number.parseInt(process.env.E2E_FRONTEND_PORT || '5173', 10);
+
 export default defineConfig({
     testDir: './e2e',
     timeout: 20_000,
-    workers: 1,
+    workers,
     expect: {timeout: 3_000},
     reporter: 'list',
     use: {
-        baseURL: 'http://localhost:5173',
+        baseURL: `http://localhost:${frontendPort}`,
         trace: 'retain-on-failure',
         screenshot: 'only-on-failure'
     },
     webServer: {
-        command: 'node e2e/lifecycle.js',
-        url: 'http://localhost:5173',
+        command: `env -u NO_COLOR WORKER_COUNT=${workers} node e2e/lifecycle.js`,
+        url: `http://localhost:${frontendPort}`,
         reuseExistingServer: true,
-        timeout: 60 * 1000,
+        timeout: 120 * 1000,
         stdout: 'pipe',
         stderr: 'pipe',
     },

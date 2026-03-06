@@ -89,6 +89,9 @@ npm install
 # Rodar todos os testes (Headless)
 npm run test:e2e
 
+# Rodar PoC com 2 workers isolados (1 stack por worker)
+E2E_WORKERS=2 npm run test:e2e
+
 # Rodar com interface gráfica (UI Mode)
 npx playwright test --ui
 
@@ -104,6 +107,16 @@ O backend possui um perfil específico (`e2e`) que habilita endpoints auxiliares
 * **Fixtures:** `/e2e/fixtures/*` (Cria dados complexos via API para pular etapas repetitivas na UI).
 
 Consulte `backend/src/main/java/sgc/e2e/README.md` para mais detalhes.
+
+## ♻️ Isolamento Por Worker (PoC)
+
+Para paralelismo com isolamento de estado, a infraestrutura E2E suporta:
+
+* 1 backend + 1 frontend por worker.
+* Banco H2 em memória dedicado por worker (`sgc-e2e-w{index}`).
+* Portas dedicadas por worker:
+  * Backend: `10000 + workerIndex`
+  * Frontend: `5173 + workerIndex`
 
 ## 🤝 Padrões de Contribuição
 

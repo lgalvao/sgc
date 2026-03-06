@@ -24,6 +24,39 @@ export async function limparNotificacoes(page: Page): Promise<void> {
 }
 
 /**
+ * Verifica toast exibido pelo BOrchestrator (notificação transitória).
+ * Use em fluxos com navegação após ação mutante.
+ */
+export async function verificarToast(page: Page, mensagem?: string | RegExp): Promise<void> {
+    const toast = page.locator('.orchestrator-container .toast').first();
+    await expect(toast).toBeVisible();
+    if (mensagem) {
+        await expect(toast).toContainText(mensagem);
+    }
+}
+
+/**
+ * Verifica alerta inline do componente AppAlert.
+ * Use em fluxos sem navegação (erros/avisos persistentes na própria tela).
+ */
+export async function verificarAppAlert(page: Page, mensagem?: string | RegExp): Promise<void> {
+    const alerta = page.getByTestId('app-alert').first();
+    await expect(alerta).toBeVisible();
+    if (mensagem) {
+        await expect(alerta).toContainText(mensagem);
+    }
+}
+
+/**
+ * Verifica mensagem persistente na tabela de alertas do painel.
+ */
+export async function verificarAlertaPainel(page: Page, mensagem: string | RegExp): Promise<void> {
+    const tabelaAlertas = page.getByTestId('tbl-alertas');
+    await expect(tabelaAlertas).toBeVisible();
+    await expect(tabelaAlertas).toContainText(mensagem);
+}
+
+/**
  * Faz logout do sistema clicando no link "Sair".
  */
 export async function fazerLogout(page: Page): Promise<void> {
