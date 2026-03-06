@@ -113,4 +113,36 @@ class E2eFixtureEndpointTest {
                 .andExpect(jsonPath("$.descricao", containsString("Processo Fixture E2E")))
                 .andExpect(jsonPath("$.descricao", containsString("MAPEAMENTO")));
     }
+
+    @Test
+    @DisplayName("Deve permitir criar processo de mapeamento com mapa disponibilizado via fixture")
+    void devePermitirCriarProcessoMapeamentoComMapaDisponibilizadoViaFixture() throws Exception {
+        E2eController.ProcessoFixtureRequest request =
+                new E2eController.ProcessoFixtureRequest(
+                        "Processo Fixture Mapa Disponibilizado", "ASSESSORIA_12", true, 30);
+
+        mockMvc.perform(post("/e2e/fixtures/processo-mapeamento-com-mapa-disponibilizado")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.descricao").value("Processo Fixture Mapa Disponibilizado"))
+                .andExpect(jsonPath("$.tipo").value("MAPEAMENTO"))
+                .andExpect(jsonPath("$.situacao").value(SituacaoProcesso.EM_ANDAMENTO.name()));
+    }
+
+    @Test
+    @DisplayName("Deve permitir criar processo de mapeamento com mapa validado via fixture")
+    void devePermitirCriarProcessoMapeamentoComMapaValidadoViaFixture() throws Exception {
+        E2eController.ProcessoFixtureRequest request =
+                new E2eController.ProcessoFixtureRequest(
+                        "Processo Fixture Mapa Validado", "ASSESSORIA_12", true, 30);
+
+        mockMvc.perform(post("/e2e/fixtures/processo-mapeamento-com-mapa-validado")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.descricao").value("Processo Fixture Mapa Validado"))
+                .andExpect(jsonPath("$.tipo").value("MAPEAMENTO"))
+                .andExpect(jsonPath("$.situacao").value(SituacaoProcesso.EM_ANDAMENTO.name()));
+    }
 }

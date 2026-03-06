@@ -21,6 +21,22 @@ Os testes que falharem geram arquivos `error-context.md`, com a situacao da tela
 - **NUNCA rode apenas um cenário isolado**: Muitos testes usam `test.describe.serial()`, o que significa que os cenários dependem da execução sequencial dos anteriores. Rodar um cenário isolado causará falhas.
 - **Sempre redirecione a saída para um arquivo**: Use `> resultado.txt 2>&1` ao rodar testes E2E para capturar toda a saída (stdout e stderr) em um arquivo de texto.
 - **Use grep para analisar resultados**: Após redirecionar para arquivo, use `grep` para filtrar e analisar partes específicas da saída, como erros, logs do backend, ou mensagens específicas.
+- **Não misture variáveis ao depurar**: Se o objetivo é corrigir semântica de um arquivo legado ou `serial`, rode com `--workers=1` primeiro. Valide o paralelismo só depois que o arquivo estiver verde isoladamente.
+- **Paralelismo atual comprovado**: A arquitetura E2E já suporta frontend único + backend por worker. Até o momento, o nível validado de forma estável é **2 workers**. Não assuma que `4` ou `8` estão prontos sem prova.
+
+## Paralelismo e infraestrutura
+
+- **Frontend não precisa subir por worker**: O modelo viável é um frontend único compartilhado e um backend isolado por worker.
+- **Isolamento por worker precisa ser explícito**: O backend, banco em memória e portas devem ser separados por índice de worker. Se o roteamento do worker estiver errado, a interferência aparece como falha funcional aleatória.
+- **Banco por worker não implica múltiplos `seed.sql`**: O `seed.sql` é único. O que muda é a instância do banco em memória por worker, não o conteúdo do seed.
+- **Não tente provar escalabilidade por intuição**: Se `2 workers` funcionam, isso sugere que `4` podem funcionar, mas não prova. Gargalos de bootstrap, portas, arquivos temporários e serviços compartilhados só aparecem quando testados.
+
+## Fixtures e preparação de estado
+
+- **Prefira fixtures de backend para preparar estados profundos**: Se o teste precisa chegar a `MAPA_DISPONIBILIZADO`, `MAPA_VALIDADO` ou outro estado tardio apenas para capturar uma tela, use endpoint E2E/fixure em vez de montar todo o workflow pela UI.
+- **Fixtures devem reduzir custo estrutural, não esconder comportamento**: Use fixture para pular preparo repetitivo. A ação que está sendo validada no teste deve continuar sendo exercitada pela UI.
+- **Fixtures devem retornar o código do processo**: Isso permite navegar direto para `/processo/{codigo}` ou `/processo/{codigo}/{sigla}` sem depender da listagem do painel.
+- **Quando a listagem não é o alvo do teste, não dependa dela**: Em cenários preparados por fixture, navegar diretamente pela URL do subprocesso é mais estável e mais rápido do que localizar a linha da tabela.
 
 ## Helpers Disponíveis
 
@@ -44,6 +60,22 @@ Os helpers estão organizados em arquivos especializados no diretório `e2e/help
 - ✅ USE `waitFor()` para elementos do DOM
 - ✅ USE `expect().toHaveURL()` para verificar navegação
 - ❌ NUNCA use `waitForTimeout()` em testes funcionais (permitido apenas em `captura-telas.spec.ts` para animações)
+- ❌ NÃO resolva tempo de execução alto com timeout maior. Se um teste isolado estoura `20s`, o normal é quebrá-lo em testes menores ou introduzir fixture de preparo.
+
+## Antipadrões que devem ser evitados
+
+- **Nunca use `if (await locator.isVisible().catch(() => false))`**:
+  - Isso engole erro real.
+  - Isso transforma falha em silêncio.
+  - Isso costuma produzir teste que “passa” sem validar nada.
+- **Nunca use assertiva genérica com `ou` para mascarar estado indefinido**:
+  - Se dois estados são possíveis, descubra por que.
+  - Se ambos forem realmente válidos, modele isso explicitamente no cenário, não com uma asserção vaga.
+- **Não use helpers compartilhados para assertar mensagens genéricas**:
+  - Exemplo ruim: helper sempre esperar “mensagem de sucesso”.
+  - O helper deve validar só o que o fluxo garante em todos os usos.
+- **Não mantenha texto legado em asserções**:
+  - Depois de refatorações de notificação, frases como “Cadastro aceito” ou “Mapa disponibilizado” podem deixar de ser estáveis mesmo com a funcionalidade correta.
 
 ## Robustez de Seletores e Ambiguidade
 
@@ -63,6 +95,12 @@ Ao testar elementos que contêm texto, especialmente em tabelas ou listas de men
   ```
 - **Atenção a Textos Ocultos (Accessibility)**: Alguns componentes injetam texto para leitores de tela. Prefira regex ou filtros de conteúdo em vez de matchers exatos (`exact: true`) em células complexas.
 - **Helpers de Navegação Semântica**: Evite repetir expressões regulares de URL nos testes. Use e mantenha os helpers em `helpers-navegacao.ts` (ex: `esperarPaginaDetalhesProcesso(page, id)`).
+- **Prefira papel e escopo semântico em modais**:
+  - Use `page.getByRole('dialog')` em vez de `.modal-content` quando possível.
+  - Ao buscar botões de modal, faça a busca dentro do dialog.
+- **Seletor por `data-testid` errado é defeito do teste, não de timing**:
+  - Exemplo prático: `sel-login-perfil` é o seletor correto; `sel-perfil` não é.
+  - Em formulários sem `data-testid`, use label real (`getByLabel(...)`) em vez de inventar um test id.
 
 ## Nuances de Autenticação
 
@@ -76,6 +114,18 @@ O comportamento do login varia conforme o tipo de unidade do usuário:
 ### Hierarquia de Unidades
 
 Ao testar visibilidade de processos para Gestores ou Chefes, **consulte sempre o `e2e/setup/seed.sql`**. Se a unidade do processo não for subordinada à unidade do usuário testado, o sistema (corretamente) não exibirá o registro, causando falha no teste por "elemento não encontrado".
+
+## Notificações: toast vs alert
+
+- **Toast e alert não são equivalentes**:
+  - `toast` deve ser validado só quando o fluxo realmente o produz de forma estável, tipicamente após mutação seguida de navegação.
+  - `AppAlert` tende a ser o mecanismo correto para erros e avisos inline.
+- **Se a aplicação redireciona para o painel após a ação, prefira validar a navegação/estado final** em vez de texto transitório.
+- **Após refatorações de notificação, revise helpers compartilhados**:
+  - Um helper que antes esperava sucesso em toast pode passar a estar errado para metade dos fluxos.
+- **Ruído esperado deve ser reconhecido como tal**:
+  - No teste de login inválido, `401` no backend e no network log é esperado.
+  - Isso não deve ser tratado como falha funcional do cenário.
 
 ## Debugging de Testes E2E
 
@@ -98,6 +148,15 @@ Sempre use `.toLocaleDateString('pt-BR')` ao comparar datas geradas dinamicament
 ### Ler os logs do Playwright com atenção
 
 O Playwright fornece logs detalhados no "Call log" de cada erro. Eles mostram o elemento exato, atributos e o motivo da falha. Leia esses logs **antes** de tentar corrigir. A resposta geralmente está lá.
+
+### Diferenciar falha real de ruído
+
+- Um teste pode passar e ainda gerar logs de browser warning/error.
+- Antes de “limpar os warnings”, classifique:
+  - erro esperado do cenário negativo;
+  - warning de framework disparado por erro já tratado;
+  - defeito real novo.
+- Não silencie logs reais só para deixar a saída bonita.
 
 ### Ler os `error-context.md` gerados
 
@@ -122,6 +181,13 @@ Se um teste espera que um botão esteja visível/habilitado mas ele não está, 
 
 **Ação:** Leia a lógica de permissões em `SubprocessoService.java` (método `construirPermissoes`) e confira se o fluxo no teste atinge a situação mínima exigida.
 
+### Regras práticas observadas nesta sessão
+
+- Se o cenário preparou apenas cadastro disponibilizado/homologado, botões de ação em bloco de mapa devem estar **ocultos**, não “talvez visíveis”.
+- `btnReabrirCadastro` só deve ser esperado quando a situação já passou de homologação do mapa.
+- Em testes de relatórios, valide o botão de exportação dentro do dialog correto.
+- Em testes de gestão de unidades, expanda toda a hierarquia necessária antes de esperar a unidade filha.
+
 ## Testes que revelam bugs no frontend
 
 Nem sempre a falha é do teste — o teste pode estar correto e revelando um **bug real do frontend**. Exemplos encontrados:
@@ -134,6 +200,11 @@ Nem sempre a falha é do teste — o teste pode estar correto e revelando um **b
 ## Sempre assertar mensagens de sucesso após ações mutantes
 
 Se um passo de preparação faz uma ação (validar mapa, aceitar, homologar), **adicione uma assertiva para a mensagem de sucesso** (ex: `await expect(page.getByText(/Mapa validado/i).first()).toBeVisible()`). Sem isso, erros passam despercebidos — o teste avança mas a ação não foi efetivada no backend.
+
+**Atualização importante**: se a mensagem não é estável após refatoração de notificações, substitua essa assertiva por uma validação de:
+- navegação correta;
+- estado do subprocesso;
+- botão/permissão esperado na tela seguinte.
 
 ## Logs do backend nos resultados dos testes
 

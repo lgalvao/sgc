@@ -1,47 +1,55 @@
-# Sugestões de Simplificação e Anti-Overengineering (SGC)
+# Plano de Simplificação e Anti-Overengineering (SGC)
 
-Este documento centraliza as diretrizes arquiteturais focadas na **simplificação radical** e na prevenção do overengineering no projeto SGC.
+Este documento centraliza as tarefas pendentes e diretrizes arquiteturais para a simplificação contínua do projeto SGC. Como o sistema visa um ambiente de intranet (5 a 10 usuários simultâneos), o foco exclusivo é manutenibilidade, pragmatismo e entrega de valor.
 
-## Contexto do Sistema
+## 🛡️ Princípios de Execução da Refatoração (Anti-Otimismo)
 
-O SGC é uma aplicação de escopo restrito, projetada para ser utilizada em uma intranet por no **máximo 5 a 10 usuários simultâneos**.
+Historicamente, tentativas de simplificação falharam ou foram abandonadas no meio do caminho porque a complexidade real (regras de negócio escondidas, acoplamentos não triviais) foi subestimada. Para evitar isso, **todas as refatorações** devem seguir rigorosamente os princípios abaixo:
 
-Por conta desse perfil de uso, a grande maioria das diretrizes aplicáveis a aplicações de alta escalabilidade, com múltiplas camadas de abstração e super-modularização **não se aplica**. O foco principal deve ser a manutenibilidade, a clareza do código e a redução de complexidade desnecessária. A adoção de práticas rígidas de separação de camadas deve ser evitada quando isso gerar apenas código boilerplate ou burocracia técnica (ex: mapeamento excessivo de dados entre camadas que já representam o mesmo conceito).
+1. **Investigação Profunda Antes da Execução:** Nunca assumir que uma camada (ex: uma Facade ou Store) é "apenas pass-through" sem mapear 100% dos métodos e dependências. Se houver lógica de negócio escondida lá, o plano muda de "deletar" para "mover para o Service/Composable".
+2. **Refatoração Incremental (Baby Steps):** Não tentar remover todas as Facades ou Stores de uma vez. A refatoração deve ser feita **Caso de Uso por Caso de Uso** ou **Endpoint por Endpoint**, garantindo que os Testes de Integração ou E2E continuem passando a cada micro-commit.
+3. **Respeito ao Legado Estável (ROI de Refatoração):** Se um código é feio ou overengineered, mas funciona perfeitamente, tem alta cobertura de testes e raramente é alterado, **não mexa**. O esforço de simplificação deve focar primariamente nas áreas de código que atrapalham ativamente o desenvolvimento de novas features hoje.
+4. **Fallback Rápido:** Se durante a execução for descoberto que a complexidade é muito maior que o estimado, a tarefa deve ser pausada, o plano reavaliado e a mudança revertida. Não forçar refatorações que quebram o design atual pela metade.
 
-## Diretrizes Gerais e Back-end
+## 🔨 Tarefas Pendentes - Back-end
 
-* **Remoção de Facades Redundantes:** O padrão inicial de envolver todos os fluxos em classes `*Facade` gerou uma camada pass-through sem valor agregado em diversos módulos.
-  * **Concluído:** `SubprocessoFacade` e `AnaliseFacade` já foram removidos, com a lógica sendo tratada diretamente pelo `SubprocessoService`.
-  * **A Fazer:** Remover Facades remanescentes que não agregam valor (como `OrganizacaoFacade`, `UsuarioFacade` e `LoginFacade`).
-  * **Nova Regra:** Os `Controllers` devem injetar diretamente os `Services` apropriados (ex: `UnidadeService`, `UsuarioService`).
-* **Lógica e Validação:** Todas as validações de regras de negócio devem ser movidas dos `Controllers` para os `Services`. O Controller deve manter-se extremamente fino, apenas recebendo a requisição HTTP e repassando para o Service executar a lógica (mantendo coesão).
-* **Testes de Integração vs Testes Unitários:** A estratégia de testes do backend favorece fortemente os Testes de Integração (usando `@SpringBootTest` e H2 em memória) sobre os Testes Unitários altamente "mockados" (e frequentemente frágeis). A maioria das suítes de testes complexas já foi migrada para `*IntegrationTest`.
+* **[ ] Remover Facades Remanescentes:**
+  * **Ação:** Eliminar classes como `UsuarioFacade`, `LoginFacade`, `ProcessoFacade`, `AtividadeFacade`, `AlertaFacade`, `PainelFacade` e `RelatorioFacade`.
+  * **Como:** Modificar os `Controllers` para injetarem e chamarem diretamente as dependências dos `Services`. Os Facades não agregam valor e atrasam a leitura do código agindo como pass-through.
 
-## Arquitetura e Padrões de Projeto
+* **[ ] Minimizar Múltiplas Transformações de DTO:**
+  * **Ação:** Onde a segurança permitir, reduzir ou consolar DTOs.
+  * **Como:** Para operações exclusivas de leitura, evitar o peso de várias camadas de Mapeadores. Se um Service pode retornar diretamente o formato adequado da visão para a tela listar sem expor dados internos sigilosos, utilize essa via rápida.
 
-* **Uso de Interfaces:** Evite a criação de interfaces com apenas uma implementação (ex: `IMeuServico` com `MeuServicoImpl`). Utilize a classe concreta diretamente, a menos que o polimorfismo seja estritamente necessário em tempo de execução.
-* **Complexidade vs Procedural:** Prefira código simples e procedural nos `Services` em vez de aplicar padrões de projeto altamente abstraídos (como Command, Strategy, etc.) de forma prematura e desnecessária.
-* **Excesso de DTOs:** Evite mapeamentos sucessivos e excessivos de DTOs. Onde for prático e seguro, especialmente em operações de leitura simples, retorne os dados com o mínimo de transformações.
+## 🔨 Tarefas Pendentes - Front-end
 
-## Estrutura de Repositório e Módulos
+* **[ ] Remoção Progressiva dos Stores Pinia "Pass-through":**
+  * **Ação:** Eliminar as stores do diretório `frontend/src/stores/` que não guardam estado global (`atividades.ts`, `mapas.ts`, `subprocessos.ts`, `processos.ts`, `usuarios.ts` etc.).
+  * **Como:** Substituir nos componentes de view o uso dessas lojas por chamadas diretas aos Services usando estado local Reactivo. O Pinia agora deve ser destinado **só a variáveis globais imutáveis/compartilhadas**, como Autenticação, Tema da UI e Menu.
 
-* **Monolito Coeso:** É desencorajada a tentativa de dividir o back-end em microsserviços ou múltiplos subprojetos granulares no Gradle. O SGC deve permanecer um Monolito Coeso, dada a sua base de usuários pequena.
-* **Fragmentação de Arquivos:** Evite fragmentar lógica altamente relacionada em dezenas de arquivos minúsculos. Um arquivo coeso ligeiramente maior é preferível a múltiplos arquivos pequenos que exigem muita navegação contextual.
+* **[ ] Limpar Componentes UI "Wrappers" Desnecessários:**
+  * **Ação:** Identificar componentes criados pelo time que servem unicamente como ponte para componentes nativos, sem abstrair muita inteligência.
+  * **Como:** Renderizar o componente ou biblioteca fundamental da UI nativamente na View, poupando uma camada visual inútil do Virtual DOM.
 
-## Diretrizes de Front-end
+* **[ ] Migrar Lógica de Relatórios (Resquícios do Protótipo Vue) para o Back-end:**
+  * **Ação:** O componente `RelatoriosView.vue` ainda possui dados *Mockados* (`diagnosticosGaps`) misturados com lógica pesada de filtragem por data (`isWithinInterval`) e tipo de processo no lado do cliente (`computed > processosFiltrados`).
+  * **Como:** O Back-end deve prover um endpoint consolidado estritamente para relatórios (ex: `/api/relatorios/painel` aceitando `dataInicio` e `dataFim`), devolvendo os contadores prontos. O front-end não deve baixar listas completas e fazer `reduce`/`filter` na memória local.
 
-A mesma filosofia de redução de fragmentação e de complexidade desnecessária aplica-se ao front-end:
+* **[ ] Consolidar Variáveis de Permissão Globais do Frontend:**
+  * **Ação:** O frontend utiliza propriedades como `perfilStore.isAdmin` ou `perfilStore.isGestor` para tomar decisões genéricas de UI (ex: exibir o botão "Criar Processo" no Menu ou no Painel).
+  * **Como:** Embora o backend proteja a API, o frontend replica parte da semântica de RBAC para renderizar a interface. Devemos mover essas verificações para composables padronizadas (`useAcessoGlobal` ou similar) ou delegar a configuração do menu/dashboard inicial para o payload de login do backend (retornando as permissões de UI daquele usuário ativo), eliminando verificações locais de strings `"ADMIN"` ou `"GESTOR"` soltas por views como `PainelView.vue`.
 
-* **Gerenciamento de Estado Simplificado (Pinia):**
-  * Estratégias complexas de gerenciamento de estado global e sincronização de dados/cache local são **overkill** devido ao baixo volume de usuários e acessos esporádicos.
-  * **Remoção de Stores Pass-through:** Lojas Pinia que atuam meramente como proxies para chamadas de API ou caches redundantes (como `atividades.ts`, `mapas.ts`, `subprocessos.ts`, `processos.ts` e `usuarios.ts`) adicionam fragmentação e complexidade desnecessárias. Elas devem ser progressivamente removidas ou refatoradas.
-  * Em vez de tentar replicar toda a base de dados em memória local do navegador, opte por chamadas diretas aos Services usando estado local (ex: `refs` ou `composables`) atrelado estritamente à view/componente atual.
-  * **Nova Regra:** O Pinia deve ser reservado estritamente para **estado verdadeiramente global** (ex: dados de sessão do usuário logado, estado de autenticação, notificações/toasts globais da UI).
-* **Fim dos Mapeadores Manuais:**
-  * Os diretórios e arquivos de `mappers` (anteriormente em `frontend/src/mappers/`) foram removidos.
-  * **Nova Regra:** Os Services do front-end agora lidam diretamente com os DTOs crus (Raw DTOs) retornados pelo back-end, contendo o mínimo de lógica de transformação e mapeamento interno. A view/componente deve se adaptar ao formato de transporte.
-* **Consolidação de Serviços Frontend:**
-  * O combate à fragmentação inclui juntar lógicas altamente relacionadas para evitar importações e injeções cruzadas desnecessárias.
-  * Exemplo prático: Os serviços `mapaService.ts` e `analiseService.ts` foram unificados no `subprocessoService.ts`.
-* **Componentes Wrapper Desnecessários:** Evite criar componentes "pass-through" (wrappers) que apenas repassam propriedades e eventos para outro componente sem adicionar lógica ou valor real. Use o componente original.
-* **Estado Local e Composables:** Reforçando o ponto do Pinia: utilize `ref`s e a Composition API localmente dentro de componentes, ou agrupe lógica em `composables` (`useFuncao.ts`), em vez de recorrer a estados globais complexos para gerenciar variáveis da tela atual.
+## Impacto nos Testes (Mapeamento)
+A simplificação arquitetural exigirá a adaptação das suítes de teste:
+
+* **Backend (Remoção de Facades):**
+  * Testes unitários dedicados às Facades (`UsuarioFacadeTest`, etc., se existirem) serão removidos.
+  * Testes de Unidade dos **Controllers** precisarão ter seus mocks atualizados (injetando os `Services` ou `UseCases` diretamente, ao invés de `Facades`).
+  * Testes de Integração (E2E/API) não devem sofrer impacto lógico, pois a interface da API (JSON/HTTP) não muda, apenas o roteamento interno do Controller para o Service.
+
+* **Frontend (Remoção da Pinia "Pass-through"):**
+  * Os **12 arquivos de teste** dentro de `frontend/src/stores/__tests__` (ex: `processos.spec.ts`, `atividades.spec.ts`) serão **deletados**, reduzindo a carga de manutenção de testes que apenas validavam repasse de dados.
+  * Testes de Componentes (Views como `PainelView.spec.ts`) precisarão ser refatorados: onde antes se fazia o mock da dependência global da Pinia (`mockStore()`), passará a ser feito o mock da Composable de API ou da chamada de serviço correspondente.
+
+* **Frontend (Refatoração de Relatórios):**
+  * Testes para `RelatoriosView.spec.ts` deixarão de valer a lógica de filtro de data e mock local, focando exclusivamente na verificação de que o componente renderiza corretamente os dados fornecidos pelo novo endpoint do backend.

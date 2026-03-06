@@ -258,6 +258,64 @@ public class E2eController {
     }
 
     /**
+     * Cria um processo de mapeamento já iniciado, com mapa preenchido e disponibilizado,
+     * para acelerar cenários E2E que começam na validação do mapa.
+     */
+    @PostMapping("/fixtures/processo-mapeamento-com-mapa-disponibilizado")
+    @Transactional
+    @JsonView(ProcessoViews.Publica.class)
+    public Processo criarProcessoMapeamentoComMapaDisponibilizado(@RequestBody ProcessoFixtureRequest request) {
+        return criarProcessoMapeamentoComMapaNaSituacao(request, "MAPEAMENTO_MAPA_DISPONIBILIZADO");
+    }
+
+    /**
+     * Cria um processo de mapeamento já iniciado, com mapa preenchido e validado,
+     * para acelerar cenários E2E que começam no aceite final do mapa.
+     */
+    @PostMapping("/fixtures/processo-mapeamento-com-mapa-validado")
+    @Transactional
+    @JsonView(ProcessoViews.Publica.class)
+    public Processo criarProcessoMapeamentoComMapaValidado(@RequestBody ProcessoFixtureRequest request) {
+        return criarProcessoMapeamentoComMapaNaSituacao(request, "MAPEAMENTO_MAPA_VALIDADO");
+    }
+
+    private Processo criarProcessoMapeamentoComMapaNaSituacao(ProcessoFixtureRequest request, String situacaoSubprocesso) {
+        ProcessoFixtureRequest requestIniciado = new ProcessoFixtureRequest(
+                request.descricao(), request.unidadeSigla(), true, request.diasLimite());
+        Processo processo = executeAsAdmin(() -> criarProcessoFixture(requestIniciado, TipoProcesso.MAPEAMENTO));
+
+        Long procId = processo.getCodigo();
+        Unidade unidade = unidadeService.buscarPorSigla(request.unidadeSigla());
+        Long unidId = unidade.getCodigo();
+        Long subId = jdbcTemplate.queryForObject(
+                "SELECT codigo FROM sgc.subprocesso WHERE processo_codigo = ? AND unidade_codigo = ?",
+                Long.class, procId, unidId);
+        Long mapaId = jdbcTemplate.queryForObject(
+                "SELECT codigo FROM sgc.mapa WHERE subprocesso_codigo = ?",
+                Long.class, subId);
+
+        String sufixo = " - " + procId;
+        jdbcTemplate.update("INSERT INTO sgc.atividade (mapa_codigo, descricao) VALUES (?, ?)",
+                mapaId, "Atividade Fixture" + sufixo);
+        Long atividadeId = jdbcTemplate.queryForObject(
+                "SELECT codigo FROM sgc.atividade WHERE mapa_codigo = ? AND descricao = ?",
+                Long.class, mapaId, "Atividade Fixture" + sufixo);
+
+        jdbcTemplate.update("INSERT INTO sgc.conhecimento (atividade_codigo, descricao) VALUES (?, ?)",
+                atividadeId, "Conhecimento Fixture" + sufixo);
+        jdbcTemplate.update("INSERT INTO sgc.competencia (mapa_codigo, descricao) VALUES (?, ?)",
+                mapaId, "Competência Fixture" + sufixo);
+        Long competenciaId = jdbcTemplate.queryForObject(
+                "SELECT codigo FROM sgc.competencia WHERE mapa_codigo = ? AND descricao = ?",
+                Long.class, mapaId, "Competência Fixture" + sufixo);
+        jdbcTemplate.update("INSERT INTO sgc.competencia_atividade (atividade_codigo, competencia_codigo) VALUES (?, ?)",
+                atividadeId, competenciaId);
+        jdbcTemplate.update("UPDATE sgc.subprocesso SET situacao = ? WHERE codigo = ?", situacaoSubprocesso, subId);
+
+        return processoFacade.buscarEntidadePorId(procId);
+    }
+
+    /**
      * Executa uma operação com contexto de segurança ADMIN.
      */
     private <T> T executeAsAdmin(Supplier<T> operation) {

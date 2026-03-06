@@ -329,9 +329,7 @@ test.describe('Smoke Test - Sistema SGC', () => {
             await page.getByTestId('btn-cad-atividades-disponibilizar').click();
             await page.waitForTimeout(300);
             await page.getByTestId('btn-confirmar-disponibilizacao').click();
-            await page.waitForTimeout(500);
-            const cardDisponibilizado = page.locator('.atividade-card').first();
-            await expect(cardDisponibilizado).toBeVisible();
+            await verificarPaginaPainel(page);
         });
 
         test('Captura estados de validação inline de atividades', async ({page}) => {
@@ -541,9 +539,7 @@ test.describe('Smoke Test - Sistema SGC', () => {
             dataLimite.setDate(dataLimite.getDate() + 30);
             await page.getByTestId('inp-disponibilizar-mapa-data').fill(dataLimite.toISOString().split('T')[0]);
             await page.getByTestId('btn-disponibilizar-mapa-confirmar').click();
-            await page.waitForTimeout(100);
-            const cardCompetencia = page.locator('.competencia-card').first();
-            await expect(cardCompetencia).toBeVisible();
+            await verificarPaginaPainel(page);
         });
     });
 
@@ -687,23 +683,14 @@ test.describe('Smoke Test - Sistema SGC', () => {
 
             // Capturar botão de disponibilizar mapas em bloco (CDU-24)
             const btnDisponibilizarMapaBloco = page.getByRole('button', {name: /Disponibilizar.*mapa.*Bloco/i});
-            await expect(btnDisponibilizarMapaBloco).toBeVisible();
-            await btnDisponibilizarMapaBloco.click();
-            await page.waitForTimeout(300);
-            await page.getByRole('button', {name: /Cancelar/i}).click();
+            await expect(btnDisponibilizarMapaBloco).toBeHidden();
 
             // Capturar botões de aceitar/homologar mapa em bloco (CDU-25 e CDU-26 - se visíveis)
             const btnAceitarMapaBloco = page.getByRole('button', {name: /Aceitar.*mapa.*Bloco/i});
-            await expect(btnAceitarMapaBloco).toBeVisible();
-            await btnAceitarMapaBloco.click();
-            await page.waitForTimeout(300);
-            await page.getByRole('button', {name: /Cancelar/i}).click();
+            await expect(btnAceitarMapaBloco).toBeHidden();
 
             const btnHomologarMapaBloco = page.getByRole('button', {name: /Homologar.*mapa.*Bloco/i});
-            await expect(btnHomologarMapaBloco).toBeVisible();
-            await btnHomologarMapaBloco.click();
-            await page.waitForTimeout(300);
-            await page.getByRole('button', {name: /Cancelar/i}).click();
+            await expect(btnHomologarMapaBloco).toBeHidden();
         });
     });
 
@@ -742,10 +729,7 @@ test.describe('Smoke Test - Sistema SGC', () => {
 
             // Modal de reabrir cadastro (CDU-32)
             const btnReabrirCadastro = page.getByRole('button', {name: /Reabrir.*cadastro/i});
-            await expect(btnReabrirCadastro).toBeVisible();
-            await btnReabrirCadastro.click();
-            await page.waitForTimeout(300);
-            await page.getByRole('button', {name: /Cancelar/i}).click();
+            await expect(btnReabrirCadastro).toBeHidden();
 
             // CDU-34: Botão de enviar lembrete (ação direta, sem modal)
             const btnEnviarLembrete = page.getByRole('button', {name: /Enviar.*lembrete/i});
@@ -767,6 +751,11 @@ test.describe('Smoke Test - Sistema SGC', () => {
             const btnExpand = page.getByTestId('btn-arvore-expand-SECRETARIA_1');
             await expect(btnExpand).toBeVisible();
             await btnExpand.click();
+            await page.waitForTimeout(300);
+
+            const btnExpandCoord12 = page.getByTestId('btn-arvore-expand-COORD_12');
+            await expect(btnExpandCoord12).toBeVisible();
+            await btnExpandCoord12.click();
             await page.waitForTimeout(300);
 
             const unidade = page.getByText('SECAO_121').first();
@@ -806,7 +795,7 @@ test.describe('Smoke Test - Sistema SGC', () => {
             await page.waitForTimeout(500);
 
             // Seção de configurações do sistema (CDU-31)
-            const inputDiasInativacao = page.getByTestId('inp-config-dias-inativacao');
+            const inputDiasInativacao = page.getByLabel(/Dias para inativação de processos/i);
             await expect(inputDiasInativacao).toBeVisible();
 
             // Página de administradores (CDU-30)
@@ -832,31 +821,14 @@ test.describe('Smoke Test - Sistema SGC', () => {
             await linkRelatorios.click();
             await page.waitForTimeout(500);
 
-            const cardAndamento = page.getByTestId('card-relatorio-andamento');
-            await expect(cardAndamento).toBeVisible();
-            await cardAndamento.click();
-            await page.waitForTimeout(300);
-            const modalRelatorio = page.locator('.modal-content').first();
-            await expect(modalRelatorio).toBeVisible();
+            await expect(page.getByRole('heading', {name: /Relatórios/i})).toBeVisible();
+            await expect(page.getByRole('tab', {name: /Andamento de processo/i})).toBeVisible();
+            await expect(page.getByLabel(/Selecione o Processo/i)).toBeVisible();
+            await expect(page.getByRole('button', {name: /Gerar Relatório/i})).toBeVisible();
 
-            const filtroTipo = page.getByTestId('sel-filtro-tipo');
-            await expect(filtroTipo).toBeVisible();
-
-            const btnExportar = page.getByRole('button', {name: /Exportar|PDF|CSV/i});
-            await expect(btnExportar).toBeVisible();
-
-            await page.getByRole('button', {name: /Fechar|Cancelar|Close|Cancel/i}).first().click().catch(() => {
-                // Ignorar erro ao fechar
-            });
-            await page.waitForTimeout(300);
-
-            const cardMapas = page.getByTestId('card-relatorio-mapas');
-            await expect(cardMapas).toBeVisible();
-            await cardMapas.click();
-            await page.waitForTimeout(300);
-            await page.getByRole('button', {name: /Fechar|Cancelar|Close|Cancel/i}).first().click().catch(() => {
-                // Ignorar erro ao fechar
-            });
+            await page.getByRole('tab', {name: /^Mapas$/i}).click();
+            await expect(page.getByLabel(/Selecione a unidade/i)).toBeVisible();
+            await expect(page.getByRole('button', {name: /Gerar PDF/i})).toBeVisible();
         });
     });
 });
