@@ -201,7 +201,6 @@ describe("CadastroVisualizacaoView.vue Coverage", () => {
         // Force open validation modal state
         (wrapper.vm as any).mostrarModalValidar = true;
 
-        // Trigger validation
         try {
             await (wrapper.vm as any).confirmarValidacao();
         } catch {

@@ -165,7 +165,6 @@ describe("CadastroView.vue", () => {
         await wrapper.find('[data-testid="btn-cad-atividades-disponibilizar"]').trigger("click");
         await flushPromises();
 
-        // Confirm in modal
         const modal = wrapper.findComponent(ConfirmacaoDisponibilizacaoModal);
         await modal.vm.$emit('confirmar');
 

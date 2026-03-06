@@ -224,7 +224,6 @@ class ProcessoTest {
         @Test
         @DisplayName("Deve permitir todas as situações válidas")
         void devePermitirTodasAsSituacoesValidas() {
-            // Arrange & Act & Assert
             for (SituacaoProcesso situacao : SituacaoProcesso.values()) {
                 processo.setSituacao(situacao);
                 assertThat(processo.getSituacao()).isEqualTo(situacao);
@@ -234,7 +233,6 @@ class ProcessoTest {
         @Test
         @DisplayName("Deve permitir todos os tipos válidos")
         void devePermitirTodosOsTiposValidos() {
-            // Arrange & Act & Assert
             for (TipoProcesso tipo : TipoProcesso.values()) {
                 processo.setTipo(tipo);
                 assertThat(processo.getTipo()).isEqualTo(tipo);

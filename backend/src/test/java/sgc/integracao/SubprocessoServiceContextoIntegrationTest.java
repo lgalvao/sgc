@@ -161,7 +161,6 @@ class SubprocessoServiceContextoIntegrationTest extends BaseIntegrationTest {
     @DisplayName("obterPermissoesUI: Deve testar visualização de impacto em REVISAO")
     void obterPermissoesUI_VisualizarImpacto() {
         // Unidade 8 established in data.sql has a mapping in UNIDADE_MAPA (mapa_vigente_codigo=1)
-        // This should make temMapaVigente=true
         
         admin.setPerfilAtivo(Perfil.ADMIN);
         subprocesso.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);

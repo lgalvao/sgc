@@ -76,7 +76,6 @@ class MapaAjusteDtoTest {
             comp.setDescricao("Comp 1");
             comp.setAtividades(Set.of(ativ));
 
-            // Execute
             Analise analise = new Analise();
             analise.setObservacoes("");
             MapaAjusteDto dto = MapaAjusteDto.of(

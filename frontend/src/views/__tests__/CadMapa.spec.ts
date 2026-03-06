@@ -369,7 +369,6 @@ describe("MapaView.vue", () => {
     });
 
     afterEach(() => {
-        // cleanup
     });
 
     it("deve carregar dados no mount", async () => {

@@ -104,7 +104,6 @@ describe("useAlertasStore", () => {
 
         describe("marcarAlertaComoLido", () => {
             it("deve realizar update otimista e chamar alertaService sem recarregar tudo", async () => {
-                // Setup initial state
                 context.store.alertas = [structuredClone(mockAlerta)];
                 alertaService.marcarComoLido.mockResolvedValue();
 
@@ -120,7 +119,6 @@ describe("useAlertasStore", () => {
             });
 
             it("deve reverter estado em caso de falha do serviço", async () => {
-                // Setup initial state
                 context.store.alertas = [structuredClone(mockAlerta)];
 
                 alertaService.marcarComoLido.mockRejectedValue(

@@ -28,7 +28,6 @@ class E2eControllerCoverageTest {
 
         controller.resetDatabase();
 
-        // Assert - Não deve lançar exceção nem fazer nada (cobertura da linha 62)
         verify(jdbcTemplate).getDataSource();
     }
 

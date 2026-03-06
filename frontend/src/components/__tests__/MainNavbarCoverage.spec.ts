@@ -27,7 +27,6 @@ vi.mock("vue-router", () => ({
 }));
 
 describe("MainNavbar.vue Coverage", () => {
-    // Setup default mock for usePerfil
     vi.mocked(usePerfil).mockReturnValue({
         perfilSelecionado: ref("GESTOR"),
         unidadeSelecionada: ref("Unidade Teste"),

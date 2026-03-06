@@ -50,7 +50,6 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
 
     @BeforeEach
     void setup() {
-        // Setup Programático - Não depende do data.sql
 
         // Raiz
         unidadeRaiz = UnidadeFixture.unidadePadrao();

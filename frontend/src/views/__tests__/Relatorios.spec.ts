@@ -70,7 +70,6 @@ describe("Relatorios.vue", () => {
         wrapper = createWrapper(initialState);
         processosStore = useProcessosStore();
 
-        // Trigger onMounted
         await flushPromises();
 
         expect(processosStore.buscarProcessosPainel).toHaveBeenCalled();

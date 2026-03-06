@@ -50,7 +50,6 @@ describe('TabelaProcessos Coverage', () => {
         });
 
         const row = wrapper.find('tr');
-        // Trigger space key
         await row.trigger('keydown', {key: ' '});
 
         expect(wrapper.emitted('selecionarProcesso')).toBeTruthy();

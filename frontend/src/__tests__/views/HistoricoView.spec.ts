@@ -24,7 +24,6 @@ vi.mock("vue-router", () => ({
     createMemoryHistory: vi.fn(),
 }));
 
-// Setup components mocks to avoid rendering issues
 // BContainer, BRow, BCol, BCard, BButton are from bootstrap-vue-next
 // Given the errors were "Cannot call vm on an empty VueWrapper", it usually means
 
@@ -85,7 +84,6 @@ describe("HistoricoView.vue", () => {
         await flushPromises();
 
         const rows = context.wrapper.findAll('tbody tr');
-        // We have 2 processes mocked in initial state.
         expect(rows.length).toBe(2);
         expect(rows[0].text()).toContain("Proc B");
         expect(rows[1].text()).toContain("Proc A");

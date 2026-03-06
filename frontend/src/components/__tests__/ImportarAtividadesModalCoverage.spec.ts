@@ -130,13 +130,11 @@ describe("ImportarAtividadesModal Coverage", () => {
 
         const vm = wrapper.vm as any;
 
-        // Trigger processoSelecionadoId watch via select
         const selects = wrapper.findAll('select');
         await selects[0].setValue(1);
         await flushPromises();
         expect(vm.processoSelecionado).toEqual(mockProcesso);
 
-        // Trigger unidadeSelecionadaId watch via select
         await selects[1].setValue(10);
         await flushPromises();
         expect(vm.unidadeSelecionada).toEqual(mockUnidade);

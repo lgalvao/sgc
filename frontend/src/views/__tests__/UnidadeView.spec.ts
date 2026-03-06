@@ -299,7 +299,6 @@ describe('UnidadeView.vue', () => {
     });
 
     it('renders clickable contact links for titular', async () => {
-        // Setup mock user with contact info
         const mockUserWithContact = {
             ...mockUsuario,
             ramal: '1234',

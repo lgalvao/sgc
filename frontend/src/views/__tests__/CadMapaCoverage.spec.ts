@@ -83,7 +83,6 @@ describe('MapaView Coverage', () => {
 
         await wrapper.vm.$nextTick(); // Wait for mount
 
-        // Trigger
         await (wrapper.vm as any).abrirModalImpacto();
 
         expect(mapasStore.buscarImpactoMapa).not.toHaveBeenCalled();
@@ -108,7 +107,6 @@ describe('MapaView Coverage', () => {
         (mapasStore.buscarImpactoMapa as any).mockResolvedValue(undefined);
         (wrapper.vm as any).codSubprocesso = 456;
 
-        // Trigger
         await (wrapper.vm as any).abrirModalImpacto();
 
         expect(mapasStore.buscarImpactoMapa).toHaveBeenCalledWith(456);

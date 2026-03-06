@@ -43,14 +43,12 @@ class CDU01IntegrationTest extends BaseIntegrationTest {
     @BeforeEach
     void setUp() {
 
-        // Setup Unidade Admin
         unidadeAdmin = UnidadeFixture.unidadePadrao();
         unidadeAdmin.setCodigo(null);
         unidadeAdmin.setSigla("ADM-UNIT-TEST");
         unidadeAdmin.setNome("Unidade Admin Teste");
         unidadeAdmin = unidadeRepo.saveAndFlush(unidadeAdmin);
 
-        // Setup Usuario Admin
         usuarioAdmin = UsuarioFixture.usuarioComPerfil(unidadeAdmin, Perfil.ADMIN);
         usuarioAdmin.setTituloEleitoral("999999990001");
         usuarioAdmin.setNome("Admin User Teste");
@@ -61,14 +59,12 @@ class CDU01IntegrationTest extends BaseIntegrationTest {
                 "INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo) VALUES (?, ?, ?)",
                 usuarioAdmin.getTituloEleitoral(), "ADMIN", unidadeAdmin.getCodigo());
 
-        // Setup Unidade Gestor
         unidadeGestor = UnidadeFixture.unidadePadrao();
         unidadeGestor.setCodigo(null);
         unidadeGestor.setSigla("GES-UNIT-TEST");
         unidadeGestor.setNome("Unidade Gestor Teste");
         unidadeGestor = unidadeRepo.saveAndFlush(unidadeGestor);
 
-        // Setup Usuario Gestor
         usuarioGestor = UsuarioFixture.usuarioPadrao();
         usuarioGestor.setTituloEleitoral("999999990002");
         usuarioGestor.setNome("Gestor User Teste");

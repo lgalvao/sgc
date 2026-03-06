@@ -118,7 +118,6 @@ describe("ImportarAtividadesModal", () => {
     });
 
     it("deve lidar com erro na importação", async () => {
-        // Setup selection
         const selects = wrapper.findAllComponents(BFormSelect as any);
         await selects[0].setValue("1");
         await flushPromises();

@@ -97,13 +97,11 @@ describe('CadastroView.vue Coverage', () => {
         (wrapper.vm as any).codSubprocesso = 123; // Force set
         await wrapper.vm.$nextTick();
 
-        // Trigger removal via stub
         await wrapper.find('.btn-rem-at').trigger('click');
 
         expect((wrapper.vm as any).dadosRemocao).toEqual({tipo: 'atividade', index: 0});
         expect((wrapper.vm as any).mostrarModalConfirmacaoRemocao).toBe(true);
 
-        // Confirm removal
         const spy = vi.spyOn(atividadesStore, 'removerAtividade').mockResolvedValue({} as any);
         await wrapper.find('.btn-conf').trigger('click');
 
@@ -125,7 +123,6 @@ describe('CadastroView.vue Coverage', () => {
         (wrapper.vm as any).codSubprocesso = 123;
         await wrapper.vm.$nextTick();
 
-        // Trigger removal of knowledge
         await wrapper.find('.btn-rem-con').trigger('click');
 
         expect((wrapper.vm as any).dadosRemocao).toEqual({tipo: 'conhecimento', index: 0, conhecimentoCodigo: 100});

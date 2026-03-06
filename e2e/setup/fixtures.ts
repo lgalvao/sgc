@@ -1,5 +1,4 @@
 import {test as base} from '@playwright/test';
-// Note: import uses .js extension because tests run with Node's ESM resolution (nodenext)
 import logger from '../../frontend/src/utils/logger.js';
 
 // Extend base test to automatically log console messages

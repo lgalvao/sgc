@@ -83,11 +83,8 @@ class SituacaoSubprocessoTest {
     @Test
     @DisplayName("Deve testar ramos da verificação de prefixo (MAPEAMENTO)")
     void testRamosPrefixoMapeamento() {
-        // this != NAO_INICIADO && nova != NAO_INICIADO
-        // this.name().startsWith("MAPEAMENTO") && !nova.name().startsWith("MAPEAMENTO") -> false
         assertThat(MAPEAMENTO_CADASTRO_EM_ANDAMENTO.podeTransicionarPara(REVISAO_CADASTRO_EM_ANDAMENTO, TipoProcesso.MAPEAMENTO)).isFalse();
 
-        // this.name().startsWith("MAPEAMENTO") && nova.name().startsWith("MAPEAMENTO") -> prossegue para switch
         assertThat(MAPEAMENTO_CADASTRO_EM_ANDAMENTO.podeTransicionarPara(MAPEAMENTO_CADASTRO_DISPONIBILIZADO, TipoProcesso.MAPEAMENTO)).isTrue();
     }
 

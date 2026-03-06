@@ -99,7 +99,6 @@ describe("CadastroView.vue", () => {
     const createWrapper = (isRevisao = false, atividades = mockAtividades) => {
         mocks.mockRoute.query = {};
 
-        // Setup Pinia with Stubs
         const pinia = createTestingPinia({
             createSpy: vi.fn,
             initialState: {

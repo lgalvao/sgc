@@ -62,7 +62,6 @@ describe("AtividadeItem.vue", () => {
         expect(input.exists()).toBe(true);
         await input.setValue('Novo Conhecimento');
 
-        // Trigger submit on the form directly
         await context.wrapper.find('[data-testid="form-novo-conhecimento"]').trigger('submit');
 
         expect(context.wrapper!.emitted('adicionar-conhecimento')).toBeTruthy();

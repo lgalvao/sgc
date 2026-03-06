@@ -126,7 +126,6 @@ class ProcessoNotificacaoServiceCoverageTest {
         sub.setSituacao(SituacaoUnidade.ATIVA);
         sub.setUnidadeSuperior(inter);
 
-        // Setup para processarFinalizacaoProcesso
         p.adicionarParticipantes(Set.of(inter, sub));
 
         when(processoRepo.findByIdComParticipantes(codProcesso)).thenReturn(Optional.of(p));
@@ -156,7 +155,6 @@ class ProcessoNotificacaoServiceCoverageTest {
         inter.setTipo(TipoUnidade.INTERMEDIARIA);
         inter.setSituacao(SituacaoUnidade.ATIVA);
 
-        // Setup para processarFinalizacaoProcesso
         p.adicionarParticipantes(Set.of(inter));
 
         when(processoRepo.findByIdComParticipantes(codProcesso)).thenReturn(Optional.of(p));

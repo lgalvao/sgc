@@ -36,7 +36,6 @@ class ProcessoManutencaoServicePbtTest {
         });
         when(processoValidador.getMensagemErroUnidadesSemMapa(any())).thenReturn(Optional.of("Erro: Unidade sem mapa"));
 
-        // Act & Assert
         assertThatThrownBy(() -> service.criar(req))
                 .isInstanceOf(ErroValidacao.class)
                 .hasMessage("Erro: Unidade sem mapa");
@@ -86,7 +85,6 @@ class ProcessoManutencaoServicePbtTest {
 
         when(processoConsultaService.buscarProcessoCodigo(anyLong())).thenReturn(processo);
 
-        // Act & Assert
         assertThatThrownBy(() -> service.atualizar(1L, req))
                 .isInstanceOf(ErroValidacao.class)
                 .hasMessage("Apenas processos na situação 'CRIADO' podem ser editados.");
@@ -109,7 +107,6 @@ class ProcessoManutencaoServicePbtTest {
 
         when(processoConsultaService.buscarProcessoCodigo(anyLong())).thenReturn(processo);
 
-        // Act & Assert
         assertThatThrownBy(() -> service.apagar(1L))
                 .isInstanceOf(ErroValidacao.class)
                 .hasMessage("Apenas processos na situação 'CRIADO' podem ser removidos.");

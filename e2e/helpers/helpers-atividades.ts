@@ -60,7 +60,6 @@ export async function removerAtividade(page: Page, descricao: string) {
     await row.hover();
     await card.getByTestId('btn-remover-atividade').click({force: true});
 
-    // Confirmar no modal
     await page.getByTestId('btn-modal-confirmacao-confirmar').click();
 
     await expect(page.getByText(descricao)).toBeHidden();
@@ -87,7 +86,6 @@ export async function removerConhecimento(page: Page, atividadeDescricao: string
     await linhaConhecimento.hover();
     await linhaConhecimento.getByTestId('btn-remover-conhecimento').click({force: true});
 
-    // Confirmar no modal
     await page.getByTestId('btn-modal-confirmacao-confirmar').click();
 
     await expect(card.getByText(conhecimento)).toBeHidden();
