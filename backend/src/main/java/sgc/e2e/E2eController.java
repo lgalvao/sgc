@@ -14,11 +14,13 @@ import org.springframework.security.core.context.*;
 import org.springframework.transaction.annotation.*;
 import org.springframework.web.bind.annotation.*;
 import sgc.comum.erros.*;
+import sgc.mapa.model.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
 import sgc.processo.*;
 import sgc.processo.dto.*;
 import sgc.processo.model.*;
+import sgc.subprocesso.model.*;
 
 import javax.sql.*;
 import java.sql.*;
@@ -38,15 +40,22 @@ public class E2eController {
     private final JdbcTemplate jdbcTemplate;
     private final NamedParameterJdbcTemplate namedJdbcTemplate;
     private final ProcessoFacade processoFacade;
+    private final ProcessoRepo processoRepo;
+    private final SubprocessoRepo subprocessoRepo;
+    private final MapaRepo mapaRepo;
     private final UnidadeService unidadeService;
     private final ResourceLoader resourceLoader;
 
     public E2eController(JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedJdbcTemplate,
-                         ProcessoFacade processoFacade, UnidadeService unidadeService,
+                         ProcessoFacade processoFacade, ProcessoRepo processoRepo,
+                         SubprocessoRepo subprocessoRepo, MapaRepo mapaRepo, UnidadeService unidadeService,
                          ResourceLoader resourceLoader) {
         this.jdbcTemplate = jdbcTemplate;
         this.namedJdbcTemplate = namedJdbcTemplate;
         this.processoFacade = processoFacade;
+        this.processoRepo = processoRepo;
+        this.subprocessoRepo = subprocessoRepo;
+        this.mapaRepo = mapaRepo;
         this.unidadeService = unidadeService;
         this.resourceLoader = resourceLoader;
     }
@@ -298,7 +307,7 @@ public class E2eController {
     @Transactional
     @JsonView(ProcessoViews.Publica.class)
     public Processo criarProcessoRevisaoComMapaHomologado(@RequestBody ProcessoFixtureRequest request) {
-        return criarProcessoNaSituacao(request, TipoProcesso.REVISAO, "REVISAO_MAPA_HOMOLOGADO");
+        return executeAsAdmin(() -> criarProcessoRevisaoHomologadoFixture(request));
     }
 
     private Processo criarProcessoMapeamentoComMapaNaSituacao(ProcessoFixtureRequest request, String situacaoSubprocesso) {
@@ -339,6 +348,52 @@ public class E2eController {
         jdbcTemplate.update("UPDATE sgc.subprocesso SET situacao = ? WHERE codigo = ?", situacaoSubprocesso, subId);
 
         return processoFacade.buscarEntidadePorId(procId);
+    }
+
+    private Processo criarProcessoRevisaoHomologadoFixture(ProcessoFixtureRequest request) {
+        if (request.unidadeSigla().isBlank()) {
+            throw new ErroValidacao("Unidade é obrigatória");
+        }
+
+        Unidade unidade = unidadeService.buscarPorSigla(request.unidadeSigla());
+        int diasLimite = request.diasLimite() != null ? request.diasLimite() : 30;
+        LocalDateTime agora = LocalDateTime.now();
+
+        Processo processo = new Processo();
+        processo.setDescricao(descricaoFixture(request, TipoProcesso.REVISAO));
+        processo.setTipo(TipoProcesso.REVISAO);
+        processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+        processo.setDataCriacao(agora);
+        processo.setDataLimite(LocalDate.now().plusDays(diasLimite).atStartOfDay());
+        processo.adicionarParticipantes(Set.of(unidade));
+        processo = processoRepo.saveAndFlush(processo);
+
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setProcesso(processo);
+        subprocesso.setUnidade(unidade);
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO);
+        subprocesso.setDataLimiteEtapa1(agora.plusDays(diasLimite));
+        subprocesso.setDataFimEtapa1(agora);
+        subprocesso = subprocessoRepo.saveAndFlush(subprocesso);
+
+        Mapa mapa = new Mapa();
+        mapa.setSubprocesso(subprocesso);
+        mapa.setDataHoraDisponibilizado(agora.minusHours(1));
+        mapa.setDataHoraHomologado(agora);
+        mapa = mapaRepo.saveAndFlush(mapa);
+
+        subprocesso.setMapa(mapa);
+        subprocessoRepo.saveAndFlush(subprocesso);
+
+        return processoFacade.buscarEntidadePorId(processo.getCodigo());
+    }
+
+    private String descricaoFixture(ProcessoFixtureRequest request, TipoProcesso tipo) {
+        String descReq = request.descricao();
+        if (descReq != null && !descReq.isBlank()) {
+            return descReq;
+        }
+        return "Processo Fixture E2E " + tipo.name() + " " + System.currentTimeMillis();
     }
 
     /**
