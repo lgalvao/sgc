@@ -17,18 +17,14 @@ test.describe.serial('CDU-31 - Configurar sistema', () => {
         await expect(page.getByRole('heading', {name: 'Parâmetros', exact: true})).toBeVisible();
 
         // Cenario 2: Visualizar configurações editáveis
-        const formInputs = page.locator('input[type="number"], input[type="text"]');
-        await expect(formInputs.first()).toBeVisible();
-        await expect(page.getByRole('button', {name: /Salvar/i})).toBeVisible();
+        await expect(page.getByLabel(/Dias para inativação de processos/i)).toBeVisible();
+        await expect(page.getByLabel(/Dias para indicação de alerta como novo/i)).toBeVisible();
+        await expect(page.getByRole('button', {name: /Salvar Configurações/i})).toBeVisible();
 
         // Cenario 3: Salvar configurações
-        const primeiroInput = page.locator('input[type="number"]').first();
-        if (await primeiroInput.count() > 0) {
-            await primeiroInput.clear();
-            await primeiroInput.fill('30');
-        }
-
-        await page.getByRole('button', {name: /Salvar/i}).click();
-        await expect(page.getByText('Configurações salvas com sucesso!')).toBeVisible();
+        await page.getByLabel(/Dias para inativação de processos/i).fill('30');
+        await page.getByLabel(/Dias para indicação de alerta como novo/i).fill('3');
+        await page.getByRole('button', {name: /Salvar Configurações/i}).click();
+        await expect(page.getByText('Configurações salvas.')).toBeVisible();
     });
 });

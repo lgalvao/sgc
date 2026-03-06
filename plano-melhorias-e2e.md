@@ -183,6 +183,9 @@ Também foi extraído um helper semântico para confirmar o modal de início qua
 2. `cdu-08.spec.ts` estourava o limite de `20s` por depender demais de setup via UI.
    - A correção foi migrar o preparo do processo de origem finalizado e dos processos alvo para fixtures backend.
    - Depois disso, o bloco `cdu-0` ficou verde sem adicionar timeout e sem `force`.
+
+3. Em ações em bloco, as pré-condições documentadas em `etc/reqs` precisam prevalecer sobre suposições do teste.
+   - Os CDUs de aceite/homologação em bloco devem espelhar o mesmo encadeamento de aceite/homologação usado em fluxos como `cdu-21`, `cdu-25` e `cdu-26`.
 5. Manter fixtures alinhadas à UI real:
    - a fixture `mapa validado` não garante mais que o ADMIN verá ação de homologação no `MapaVisualizacaoView`;
    - para capturas de finalização, o estado útil agora é `mapa homologado`, com processo ainda `EM_ANDAMENTO`.

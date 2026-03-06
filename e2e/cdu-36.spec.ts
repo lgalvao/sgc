@@ -1,4 +1,5 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
+import {criarProcessoMapaHomologadoFixture} from './fixtures/fixtures-processos.js';
 
 /**
  * CDU-36 - Gerar relatório de mapas
@@ -10,22 +11,38 @@ import {expect, test} from './fixtures/complete-fixtures.js';
  */
 test.describe.serial('CDU-36 - Gerar relatório de mapas', () => {
 
-    test('Cenários CDU-36: ADMIN navega e gera relatórios de mapas', async ({page, autenticadoComoAdmin}) => {
+    test('Cenários CDU-36: ADMIN navega e gera relatórios de mapas', async ({page, request, autenticadoComoAdmin, cleanupAutomatico}) => {
+        const descricaoProcesso = `Relatório CDU-36 ${Date.now()}`;
+        const processo = await criarProcessoMapaHomologadoFixture(request, {
+            descricao: descricaoProcesso,
+            unidade: 'ASSESSORIA_12',
+            diasLimite: 30
+        });
+        cleanupAutomatico.registrar(processo.codigo);
+
+        await page.goto('/painel');
+        await expect(page.getByTestId('tbl-processos').getByText(descricaoProcesso).first()).toBeVisible();
+
         // Cenario 1: Navegação para página de relatórios
         await page.getByRole('link', {name: /Relatórios/i}).click();
         await expect(page).toHaveURL(/\/relatorios/);
         await expect(page.getByRole('heading', {name: /Relatórios/i})).toBeVisible();
 
-        // Cenario 2: Exibir card de relatório de mapas
-        await expect(page.getByTestId('card-relatorio-mapas')).toBeVisible();
+        await page.getByRole('tab', {name: 'Mapas'}).click();
 
-        // Cenario 3: Abrir modal de Mapas Vigentes
-        await page.getByTestId('card-relatorio-mapas').click();
-        const modal = page.getByRole('dialog');
-        await expect(modal).toBeVisible();
-        await expect(modal.getByRole('heading', {name: /Mapas Vigentes/i})).toBeVisible();
+        const selectProcesso = page.getByLabel('Selecione o Processo').last();
+        const selectUnidade = page.getByLabel('Selecione a unidade');
+        const botaoGerar = page.getByRole('button', {name: 'Gerar PDF'});
+        await expect(selectProcesso).toBeVisible();
+        await expect(selectUnidade).toBeVisible();
+        await expect(botaoGerar).toBeDisabled();
 
-        // Cenario 4: Botão de exportação está disponível
-        await expect(page.getByRole('button', {name: /Exportar CSV/i})).toBeVisible();
+        await selectProcesso.selectOption({label: descricaoProcesso});
+        await expect(botaoGerar).toBeEnabled();
+
+        const downloadPromise = page.waitForEvent('download');
+        await botaoGerar.click();
+        const download = await downloadPromise;
+        await expect(download.suggestedFilename()).toContain(`relatorio-mapas-${processo.codigo}.pdf`);
     });
 });

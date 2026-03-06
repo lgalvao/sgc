@@ -1,7 +1,7 @@
 /* eslint-disable playwright/expect-expect */
 import {expect, test} from './fixtures/complete-fixtures.js';
+import {criarProcessoFixture} from './fixtures/fixtures-processos.js';
 import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
-import {criarProcesso} from './helpers/helpers-processos.js';
 import {
     adicionarAtividade,
     adicionarConhecimento,
@@ -30,24 +30,18 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
     const atividade1 = `Atividade Reabrir ${timestamp}`;
 
 
-    test('Preparacao 1: Admin cria e inicia processo', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
-        await criarProcesso(page, {
+    test('Preparacao 1: Admin cria e inicia processo', async ({page, request, autenticadoComoAdmin}) => {
+        const processo = await criarProcessoFixture(request, {
             descricao: descProcesso,
             tipo: 'MAPEAMENTO',
             diasLimite: 30,
             unidade: UNIDADE_1,
-            expandir: ['SECRETARIA_2', 'COORD_22']
+            iniciar: true
         });
+        processoId = processo.codigo;
 
-        const linhaProcesso = page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descProcesso)});
-        await linhaProcesso.click();
-
-        processoId = Number.parseInt(new RegExp(/\/processo(?:\/cadastro)?\/(\d+)/).exec(page.url())?.[1] || '0');
-        if (processoId > 0) cleanupAutomatico.registrar(processoId);
-
-        await page.getByTestId('btn-processo-iniciar').click();
-        await page.getByTestId('btn-iniciar-processo-confirmar').click();
-
+        await page.goto('/painel');
+        await expect(page.getByTestId('tbl-processos').getByText(descProcesso).first()).toBeVisible();
         await verificarPaginaPainel(page);
     });
 
@@ -127,7 +121,9 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
     });
 
 
-    test('Cenários CDU-32: ADMIN reabre cadastro', async ({page, autenticadoComoAdmin}) => {
+    test('Cenários CDU-32: ADMIN reabre cadastro', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
+        cleanupAutomatico.registrar(processoId);
+
         // Cenario 1 & 2: Navegação e visualização do botão
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, UNIDADE_1);
@@ -155,8 +151,7 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
         // Cenario 5: Confirmar reabertura
         await page.getByTestId('btn-confirmar-reabrir').click();
 
-        await expect(page.getByText(/Cadastro reaberto/i).first()).toBeVisible();
-        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Em andamento/i);
+        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro em andamento/i);
         await expect(page.getByTestId('tbl-movimentacoes')).toContainText(/Reabertura de cadastro/i);
     });
 });

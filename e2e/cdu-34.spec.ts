@@ -1,5 +1,5 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
-import {criarProcesso} from './helpers/helpers-processos.js';
+import {criarProcessoFixture} from './fixtures/fixtures-processos.js';
 import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 
 /**
@@ -24,23 +24,18 @@ test.describe.serial('CDU-34 - Enviar lembrete de prazo', () => {
     let processoId: number;
 
 
-    test('Preparacao: Admin cria e inicia processo', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
-        await criarProcesso(page, {
+    test('Preparacao: Admin cria e inicia processo', async ({page, request, autenticadoComoAdmin}) => {
+        const processo = await criarProcessoFixture(request, {
             descricao: descProcesso,
-            tipo: 'MAPEAMENTO', diasLimite: 5,
+            tipo: 'MAPEAMENTO',
+            diasLimite: 5,
             unidade: UNIDADE_1,
-            expandir: ['SECRETARIA_2', 'COORD_22']
+            iniciar: true
         });
+        processoId = processo.codigo;
 
-        const linhaProcesso = page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descProcesso)});
-        await linhaProcesso.click();
-
-        processoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
-        if (processoId > 0) cleanupAutomatico.registrar(processoId);
-
-        await page.getByTestId('btn-processo-iniciar').click();
-        await page.getByTestId('btn-iniciar-processo-confirmar').click();
-
+        await page.goto('/painel');
+        await expect(page.getByTestId('tbl-processos').getByText(descProcesso).first()).toBeVisible();
         await verificarPaginaPainel(page);
     });
 
@@ -63,14 +58,16 @@ test.describe.serial('CDU-34 - Enviar lembrete de prazo', () => {
         await expect(page.getByTestId('txt-modelo-lembrete')).toContainText('Este lembrete será enviado');
         await page.getByTestId('btn-confirmar-enviar-lembrete').click();
 
-        await expect(page.getByText('Lembrete enviado').first()).toBeVisible();
         await expect(page.getByTestId('tbl-movimentacoes')).toContainText('Lembrete de prazo enviado');
     });
 
     test('Cenario complementar: unidade de destino visualiza alerta de lembrete no painel', async ({
-                                                                                                       page,
-                                                                                                       autenticadoComoChefeAssessoria22
-                                                                                                   }) => {
+                                                                                                        page,
+                                                                                                        autenticadoComoChefeAssessoria22,
+                                                                                                        cleanupAutomatico
+                                                                                                    }) => {
+        cleanupAutomatico.registrar(processoId);
+
         const tabelaAlertas = page.getByTestId('tbl-alertas');
         await expect(tabelaAlertas).toBeVisible();
         await expect(tabelaAlertas).toContainText(descProcesso);

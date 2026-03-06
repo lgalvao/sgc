@@ -6,9 +6,9 @@
       <profile name="Gradle Imported" enabled="true">
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
-          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.18.42/8365263844ebb62398e0dc33057ba10ba472d3b8/lombok-1.18.42.jar" />
-          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.hibernate.validator/hibernate-validator-annotation-processor/8.0.1.Final/8094be40a387df929a791c57539dfc6c8c948c27/hibernate-validator-annotation-processor-8.0.1.Final.jar" />
-          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.springframework.boot/spring-boot-configuration-processor/4.0.3/2a99f38cd5093f37120cbaefe05fbbee425a2f91/spring-boot-configuration-processor-4.0.3.jar" />
+          <entry name="$PROJECT_DIR$/../.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.18.42/8365263844ebb62398e0dc33057ba10ba472d3b8/lombok-1.18.42.jar" />
+          <entry name="$PROJECT_DIR$/../.gradle/caches/modules-2/files-2.1/org.hibernate.validator/hibernate-validator-annotation-processor/9.1.0.Final/a4e121746317e1bd41ea3c86868ab322664ee57c/hibernate-validator-annotation-processor-9.1.0.Final.jar" />
+          <entry name="$PROJECT_DIR$/../.gradle/caches/modules-2/files-2.1/org.springframework.boot/spring-boot-configuration-processor/4.0.3/2a99f38cd5093f37120cbaefe05fbbee425a2f91/spring-boot-configuration-processor-4.0.3.jar" />
         </processorPath>
         <module name="sgc.backend.main" />
       </profile>

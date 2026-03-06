@@ -106,3 +106,28 @@ export async function criarProcessoFinalizadoFixture(
 
     return await response.json();
 }
+
+/**
+ * Cria um processo de mapeamento já com mapa homologado via API E2E.
+ */
+export async function criarProcessoMapaHomologadoFixture(
+    request: APIRequestContext,
+    options: ProcessoFixtureOptions
+): Promise<ProcessoFixture> {
+    const response = await request.post('/e2e/fixtures/processo-mapeamento-com-mapa-homologado', {
+        data: {
+            unidadeSigla: options.unidade,
+            iniciar: options.iniciar ?? true,
+            descricao: options.descricao ?? `Fixture E2E MAPA_HOMOLOGADO ${Date.now()}`,
+            diasLimite: options.diasLimite ?? 30
+        }
+    });
+
+    if (!response.ok()) {
+        throw new Error(
+            `Falha ao criar processo fixture com mapa homologado: ${response.status()} ${response.statusText()}`
+        );
+    }
+
+    return await response.json();
+}

@@ -290,10 +290,25 @@ public class E2eController {
         return criarProcessoMapeamentoComMapaNaSituacao(request, "MAPEAMENTO_MAPA_HOMOLOGADO");
     }
 
+    /**
+     * Cria um processo de revisão já iniciado, com mapa preenchido e homologado,
+     * para acelerar cenários E2E que começam após o encerramento da revisão.
+     */
+    @PostMapping("/fixtures/processo-revisao-com-mapa-homologado")
+    @Transactional
+    @JsonView(ProcessoViews.Publica.class)
+    public Processo criarProcessoRevisaoComMapaHomologado(@RequestBody ProcessoFixtureRequest request) {
+        return criarProcessoNaSituacao(request, TipoProcesso.REVISAO, "REVISAO_MAPA_HOMOLOGADO");
+    }
+
     private Processo criarProcessoMapeamentoComMapaNaSituacao(ProcessoFixtureRequest request, String situacaoSubprocesso) {
+        return criarProcessoNaSituacao(request, TipoProcesso.MAPEAMENTO, situacaoSubprocesso);
+    }
+
+    private Processo criarProcessoNaSituacao(ProcessoFixtureRequest request, TipoProcesso tipo, String situacaoSubprocesso) {
         ProcessoFixtureRequest requestIniciado = new ProcessoFixtureRequest(
                 request.descricao(), request.unidadeSigla(), true, request.diasLimite());
-        Processo processo = executeAsAdmin(() -> criarProcessoFixture(requestIniciado, TipoProcesso.MAPEAMENTO));
+        Processo processo = executeAsAdmin(() -> criarProcessoFixture(requestIniciado, tipo));
 
         Long procId = processo.getCodigo();
         Unidade unidade = unidadeService.buscarPorSigla(request.unidadeSigla());

@@ -31,12 +31,12 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-mail")
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
     implementation("jakarta.servlet:jakarta.servlet-api")
+    implementation("tools.jackson.core:jackson-core:3.1.0")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
     testImplementation("org.springframework.boot:spring-boot-test-autoconfigure")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
-
     runtimeOnly("com.oracle.database.jdbc:ojdbc11:23.26.1.0.0")
     implementation("com.h2database:h2")
 
@@ -44,7 +44,7 @@ dependencies {
     annotationProcessor("org.projectlombok:lombok:${property("lombok.version")}")
     testCompileOnly("org.projectlombok:lombok:${property("lombok.version")}")
     annotationProcessor("org.projectlombok:lombok")
-    annotationProcessor("org.hibernate.validator:hibernate-validator-annotation-processor:8.0.1.Final")
+    annotationProcessor("org.hibernate.validator:hibernate-validator-annotation-processor:9.1.0.Final")
 
     implementation("com.github.librepdf:openpdf:3.0.0")
 
@@ -63,7 +63,9 @@ dependencies {
     testImplementation("org.apache.groovy:groovy-all:5.0.4")
     testImplementation("com.icegreen:greenmail-junit5:2.1.3")
     testImplementation("org.pitest:pitest-junit5-plugin:1.2.3")
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.1")
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.2") {
+        exclude(group = "com.fasterxml.jackson.core", module = "jackson-core")
+    }
     testImplementation("io.swagger.parser.v3:swagger-parser:2.1.37")
     implementation("org.mozilla:rhino:1.9.0")
     testImplementation("com.atlassian.oai:swagger-request-validator-mockmvc:2.46.0")
