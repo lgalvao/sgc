@@ -1,6 +1,6 @@
 # Testes End-to-End (E2E)
 
-Este diretório contém a suite de testes automatizados de ponta a ponta, implementada com **Playwright**.
+Este diretório contém a suite de testes automatizados de ponta a ponta, implementada com **Playwright 1.58.2**.
 
 ## 🎯 Objetivo
 
@@ -93,11 +93,14 @@ npm run test:e2e
 # Rodar com 2 workers isolados (configuração atualmente validada)
 npm run test:e2e:2w
 
+# Rodar captura de telas
+npm run test:e2e:captura
+
 # Rodar com interface gráfica (UI Mode)
 npx playwright test --ui
 
 # Rodar um arquivo específico
-npx playwright test cdu-01.spec.ts
+npx playwright test e2e/cdu-01.spec.ts
 ```
 
 ## 🛠️ Suporte no Backend
