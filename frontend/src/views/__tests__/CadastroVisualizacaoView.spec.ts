@@ -159,7 +159,7 @@ describe('CadastroVisualizacaoView.vue', () => {
     it('deve confirmar aceite do cadastro (nao homologacao)', async () => {
       wrapper = createWrapper();
       const subprocessosStore = useSubprocessosStore();
-      subprocessosStore.aceitarCadastro.mockResolvedValueOnce(true);
+      vi.mocked(subprocessosStore.aceitarCadastro).mockResolvedValueOnce(true);
       
       await flushPromises();
       
@@ -191,7 +191,7 @@ describe('CadastroVisualizacaoView.vue', () => {
       
       wrapper = createWrapper();
       const subprocessosStore = useSubprocessosStore();
-      subprocessosStore.homologarCadastro.mockResolvedValueOnce(true);
+      vi.mocked(subprocessosStore.homologarCadastro).mockResolvedValueOnce(true);
       
       await flushPromises();
       
@@ -226,7 +226,7 @@ describe('CadastroVisualizacaoView.vue', () => {
       });
       
       const subprocessosStore = useSubprocessosStore();
-      subprocessosStore.aceitarRevisaoCadastro.mockResolvedValueOnce(true);
+      vi.mocked(subprocessosStore.aceitarRevisaoCadastro).mockResolvedValueOnce(true);
       
       await flushPromises();
       
@@ -251,7 +251,7 @@ describe('CadastroVisualizacaoView.vue', () => {
       });
       
       const subprocessosStore = useSubprocessosStore();
-      subprocessosStore.homologarRevisaoCadastro.mockResolvedValueOnce(true);
+      vi.mocked(subprocessosStore.homologarRevisaoCadastro).mockResolvedValueOnce(true);
       
       await flushPromises();
       
@@ -298,7 +298,7 @@ describe('CadastroVisualizacaoView.vue', () => {
 
       wrapper = createWrapper();
       const subprocessosStore = useSubprocessosStore();
-      subprocessosStore.devolverCadastro.mockResolvedValueOnce(true);
+      vi.mocked(subprocessosStore.devolverCadastro).mockResolvedValueOnce(true);
       
       await flushPromises();
       
@@ -331,7 +331,7 @@ describe('CadastroVisualizacaoView.vue', () => {
       });
       
       const subprocessosStore = useSubprocessosStore();
-      subprocessosStore.devolverRevisaoCadastro.mockResolvedValueOnce(true);
+      vi.mocked(subprocessosStore.devolverRevisaoCadastro).mockResolvedValueOnce(true);
       
       await flushPromises();
       

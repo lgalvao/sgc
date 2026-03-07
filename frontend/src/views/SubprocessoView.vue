@@ -231,6 +231,7 @@ import {
   TipoProcesso
 } from "@/types/tipos";
 import {formatDateTimeBR, logger} from "@/utils";
+import {normalizeError} from "@/utils/apiError";
 import {formatSituacaoSubprocesso} from "@/utils/formatters";
 
 const props = defineProps<{ codProcesso: number; siglaUnidade: string }>();
@@ -320,7 +321,9 @@ onMounted(async () => {
     }
   } catch (error: any) {
     const errorBody = error.response?.data || error.message;
-    logger.error(`Erro ao carregar detalhes do subprocesso:`, error, errorBody);
+    if (normalizeError(error).kind !== 'unauthorized') {
+      logger.error(`Erro ao carregar detalhes do subprocesso:`, error, errorBody);
+    }
   }
 });
 

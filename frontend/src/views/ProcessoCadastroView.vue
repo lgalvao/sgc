@@ -114,6 +114,7 @@ import LoadingButton from "@/components/comum/LoadingButton.vue";
 import ProcessoFormFields from "@/components/processo/ProcessoFormFields.vue";
 import AppAlert from "@/components/comum/AppAlert.vue";
 import {logger} from "@/utils";
+import {normalizeError, shouldNotifyGlobally} from "@/utils/apiError";
 import {useProcessoForm} from "@/composables/useProcessoForm";
 import {useNotification} from "@/composables/useNotification";
 
@@ -252,9 +253,12 @@ function handleApiErrors(error: any, title: string, defaultMsg: string) {
     }
   } else {
     notify(defaultMsg, 'danger');
+  }
+
+  const erroNormalizado = normalizeError(error);
+  if (shouldNotifyGlobally(erroNormalizado)) {
     logger.error(title + ":", error);
   }
-  logger.error(title + ":", error);
 }
 
 async function salvarProcesso() {
@@ -319,7 +323,6 @@ async function confirmarIniciarProcesso() {
     await router.push("/painel");
     mostrarModalConfirmacao.value = false;
   } catch (error) {
-    console.error("Erro ao iniciar processo:", error);
     mostrarModalConfirmacao.value = false;
     handleApiErrors(error, "Erro ao iniciar processo", "Não foi possível iniciar o processo. Tente novamente.");
   } finally {

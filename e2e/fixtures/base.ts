@@ -11,6 +11,21 @@ function ehErroEsperadoAutenticacao(url: string, status?: number): boolean {
     return status === 401 && /\/api\/usuarios\/autorizar$/.test(url);
 }
 
+function ehErroEsperadoImportacaoDuplicada(url: string, status?: number, method?: string, body?: string): boolean {
+    return status === 422
+        && method === 'POST'
+        && /\/api\/subprocessos\/\d+\/importar-atividades$/.test(url)
+        && !!body
+        && body.includes('"code":"VALIDACAO"')
+        && body.includes('já existentes no cadastro');
+}
+
+function ehRuidoAutenticacaoEmDetalhes(url: string, status?: number, method?: string): boolean {
+    return status === 401
+        && method === 'GET'
+        && /\/api\/processos\/\d+\/detalhes$/.test(url);
+}
+
 export const test = base.extend({
     context: async ({browser}, use, testInfo) => {
         const baseURL = obterBaseUrlWorker(testInfo.parallelIndex);
@@ -37,6 +52,8 @@ export const test = base.extend({
     },
 
         page: async ({page}, use) => {
+        let ultimoRuidoAutenticacaoDetalhesEm = 0;
+
         // Listener para logs do console
         page.on('console', async msg => {
             const text = msg.text();
@@ -48,6 +65,16 @@ export const test = base.extend({
 
             if (text.includes('Failed to load resource: the server responded with a status of 401')
                 && /\/api\/usuarios\/autorizar$/.test(locationUrl)) {
+                return;
+            }
+
+            if (text.includes('Failed to load resource: the server responded with a status of 422')
+                && /\/api\/subprocessos\/\d+\/importar-atividades$/.test(locationUrl)) {
+                return;
+            }
+
+            if (text.includes('Failed to load resource: the server responded with a status of 401')
+                && /\/api\/processos\/\d+\/detalhes$/.test(locationUrl)) {
                 return;
             }
 
@@ -77,6 +104,13 @@ export const test = base.extend({
                 expandedArgs = text; // Fallback
             }
 
+            if (type === 'error'
+                && text.includes('%cerror')
+                && Date.now() - ultimoRuidoAutenticacaoDetalhesEm < 2_000
+                && (expandedArgs.includes('"name":"AxiosError"') || expandedArgs === 'null')) {
+                return;
+            }
+
             // Map Playwright console types to logger methods
             if (type === 'error') {
                 logger.error(`[BROWSER ${type.toUpperCase()}] ${expandedArgs || text}`);
@@ -104,6 +138,17 @@ export const test = base.extend({
                     body = await response.text();
                 } catch (e) {
                     body = '[Erro ao ler corpo]';
+                }
+
+                if (ehErroEsperadoImportacaoDuplicada(response.url(), response.status(), response.request().method(), body)) {
+                    logger.info(`[NETWORK EXPECTED] ${response.status()} ${response.request().method()} ${response.url()}`);
+                    return;
+                }
+
+                if (ehRuidoAutenticacaoEmDetalhes(response.url(), response.status(), response.request().method())) {
+                    ultimoRuidoAutenticacaoDetalhesEm = Date.now();
+                    logger.info(`[NETWORK EXPECTED] ${response.status()} ${response.request().method()} ${response.url()}`);
+                    return;
                 }
 
                 logger.warn(`[NETWORK ERROR] ${response.status()} ${response.request().method()} ${response.url()}`);

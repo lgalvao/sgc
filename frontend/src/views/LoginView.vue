@@ -185,6 +185,7 @@ import {useRouter} from "vue-router";
 import LoadingButton from "@/components/comum/LoadingButton.vue";
 import AppAlert from "@/components/comum/AppAlert.vue";
 import {logger} from "@/utils";
+import {normalizeError} from "@/utils/apiError";
 import type {PerfilUnidade} from "@/services/usuarioService";
 
 import {usePerfilStore} from "@/stores/perfil";
@@ -243,11 +244,15 @@ const performInitialLogin = async () => {
 
     if (sucessoAutenticacao) {
       await handlePostAuth();
-    } else {
-      notify("Título ou senha inválidos.", 'danger');
-    }
+      } else {
+        notify("Título ou senha inválidos.", 'danger');
+      }
   } catch (error: any) {
-    logger.error("Erro no login:", error);
+    const erroNormalizado = normalizeError(error);
+    if (erroNormalizado.kind !== 'notFound' && erroNormalizado.kind !== 'unauthorized') {
+      logger.error("Erro no login:", error);
+    }
+
     if (error.response?.status === 404 || error.response?.status === 401) {
       notify("Título ou senha inválidos.", 'danger');
     } else {

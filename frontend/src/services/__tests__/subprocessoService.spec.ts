@@ -138,8 +138,8 @@ describe('subprocessoService', () => {
   });
 
   it('disponibilizarMapa', async () => {
-    await subprocessoService.disponibilizarMapa(1, { dataLimiteValidacao: '2025-01-01' });
-    expect(apiClient.post).toHaveBeenCalledWith('/subprocessos/1/disponibilizar-mapa', { dataLimiteValidacao: '2025-01-01' });
+    await subprocessoService.disponibilizarMapa(1, { dataLimite: '2025-01-01', observacoes: 'teste' });
+    expect(apiClient.post).toHaveBeenCalledWith('/subprocessos/1/disponibilizar-mapa', { dataLimite: '2025-01-01', observacoes: 'teste' });
   });
 
   it('adicionarCompetencia', async () => {

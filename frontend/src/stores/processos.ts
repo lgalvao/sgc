@@ -12,6 +12,7 @@ import type {
 } from "@/types/tipos";
 import {useErrorHandler} from "@/composables/useErrorHandler";
 import * as processoService from "@/services/processoService";
+import {normalizeError} from "@/utils/apiError";
 import {logger} from "@/utils";
 
 /**
@@ -202,7 +203,9 @@ export const useProcessosStore = defineStore("processos", () => {
             setProcessoDetalhe(data);
             subprocessosElegiveis.value = data.elegiveis;
         }, (err) => {
-            logger.error(`Erro ao buscar contexto completo para processo ${codigoProcesso}:`, err);
+            if (normalizeError(err).kind !== 'unauthorized') {
+                logger.error(`Erro ao buscar contexto completo para processo ${codigoProcesso}:`, err);
+            }
         });
     }
 
