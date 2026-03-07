@@ -298,7 +298,6 @@ const {
   podeAceitarMapa,
   podeDevolverMapa,
   podeHomologarMapa,
-  podeApresentarSugestoes,
   podeVerSugestoes: podeMostrarVerSugestoes
 } = useAcesso(computed(() => subprocessosStore.subprocessoDetalhe));
 
