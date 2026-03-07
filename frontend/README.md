@@ -18,12 +18,12 @@ A aplicação estará disponível em `http://localhost:5173`.
 
 O frontend utiliza uma arquitetura baseada em componentes com **Vue.js 3** e **TypeScript**.
 
-* **Framework:** Vue.js 3.5 (Composition API, `<script setup>`)
-* **Linguagem:** TypeScript
+* **Framework:** Vue.js 3.5.28 (Composition API, `<script setup>`)
+* **Linguagem:** TypeScript 5.9.3
 * **Estado:** Pinia (Setup Stores)
 * **Roteamento:** Vue Router (Modularizado)
 * **UI:** BootstrapVueNext + Bootstrap 5
-* **Build:** Vite
+* **Build:** Vite 7.3.1
 * **HTTP:** Axios (com interceptors para JWT)
 * **Testes:** Vitest (Unitários) + Playwright (E2E)
 * **Qualidade:** ESLint + TypeScript (typecheck)
@@ -52,7 +52,7 @@ O frontend utiliza uma arquitetura baseada em componentes com **Vue.js 3** e **T
 ### Unitários (Vitest)
 
 ```bash
-npm test
+npm run test:unit
 ```
 
 ### Type Check
@@ -65,6 +65,14 @@ npm run typecheck
 
 ```bash
 npm run lint
+```
+
+### Qualidade Completa
+
+Para executar testes, linting e typecheck de uma vez:
+
+```bash
+npm run quality:all
 ```
 
 ### E2E (Playwright)

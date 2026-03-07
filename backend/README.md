@@ -10,7 +10,7 @@ organizada em pacotes representando domínios específicos.
 A aplicação segue uma arquitetura **Modular Monolith** construída com:
 
 * **Java 21**: Linguagem base.
-* **Spring Boot 4.0.1**: Framework de aplicação (GA).
+* **Spring Boot 4.0.3**: Framework de aplicação (GA).
 * **Hibernate/JPA**: Persistência de dados.
 * **Oracle**: Banco de dados de produção.
 * **H2 Database**: Banco de dados em memória para testes e desenvolvimento local rápido.
