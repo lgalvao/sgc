@@ -281,6 +281,7 @@ export interface PermissoesSubprocesso {
     podeDisponibilizarMapa: boolean;
     podeValidarMapa: boolean;
     podeApresentarSugestoes: boolean;
+    podeVerSugestoes: boolean;
     podeDevolverMapa: boolean;
     podeAceitarMapa: boolean;
     podeHomologarMapa: boolean;

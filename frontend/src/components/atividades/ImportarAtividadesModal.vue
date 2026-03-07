@@ -218,12 +218,23 @@ function resetModal() {
   atividadesSelecionadas.value = [];
 }
 
+function flattenUnidades(unidades: UnidadeParticipante[]): UnidadeParticipante[] {
+  const result: UnidadeParticipante[] = [];
+  for (const u of unidades) {
+    result.push(u);
+    if (u.filhos) {
+      result.push(...flattenUnidades(u.filhos));
+    }
+  }
+  return result;
+}
+
 async function selecionarProcesso(processo: ProcessoResumo | null) {
   processoSelecionado.value = processo;
   if (processo) {
     await processosStore.buscarProcessoDetalhe(processo.codigo);
     unidadesParticipantes.value =
-        processosStore.processoDetalhe?.unidades || [];
+        flattenUnidades(processosStore.processoDetalhe?.unidades || []);
   } else {
     unidadesParticipantes.value = [];
   }

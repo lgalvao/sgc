@@ -75,6 +75,7 @@ describe("VisMapa.vue", () => {
         vi.spyOn(useAcessoModule, 'useAcesso').mockReturnValue({
             podeValidarMapa: {value: true},
             podeApresentarSugestoes: {value: true},
+            podeVerSugestoes: {value: false},
             podeAceitarMapa: {value: true},
             podeDevolverMapa: {value: true},
             podeHomologarMapa: {value: false},

@@ -22,6 +22,7 @@ export function useAcesso(subprocessoRef: Ref<SubprocessoDetalhe | null> | Subpr
     const podeDisponibilizarMapa = computed(() => getSubprocesso()?.permissoes?.podeDisponibilizarMapa ?? false);
     const podeValidarMapa = computed(() => getSubprocesso()?.permissoes?.podeValidarMapa ?? false);
     const podeApresentarSugestoes = computed(() => getSubprocesso()?.permissoes?.podeApresentarSugestoes ?? false);
+    const podeVerSugestoes = computed(() => getSubprocesso()?.permissoes?.podeVerSugestoes ?? false);
     const podeDevolverMapa = computed(() => getSubprocesso()?.permissoes?.podeDevolverMapa ?? false);
     const podeAceitarMapa = computed(() => getSubprocesso()?.permissoes?.podeAceitarMapa ?? false);
     const podeHomologarMapa = computed(() => getSubprocesso()?.permissoes?.podeHomologarMapa ?? false);
@@ -43,6 +44,7 @@ export function useAcesso(subprocessoRef: Ref<SubprocessoDetalhe | null> | Subpr
         podeDisponibilizarMapa,
         podeValidarMapa,
         podeApresentarSugestoes,
+        podeVerSugestoes,
         podeDevolverMapa,
         podeAceitarMapa,
         podeHomologarMapa,
