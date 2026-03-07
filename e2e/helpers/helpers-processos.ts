@@ -14,7 +14,10 @@ type TipoProcesso = keyof typeof ROTULOS_TIPO_PROCESSO;
 export function calcularDataLimite(dias: number): string {
     const dataLimite = new Date();
     dataLimite.setDate(dataLimite.getDate() + dias);
-    return dataLimite.toISOString().split('T')[0];
+    const ano = dataLimite.getFullYear();
+    const mes = String(dataLimite.getMonth() + 1).padStart(2, '0');
+    const dia = String(dataLimite.getDate()).padStart(2, '0');
+    return `${ano}-${mes}-${dia}`;
 }
 
 /**

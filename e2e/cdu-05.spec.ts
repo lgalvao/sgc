@@ -170,10 +170,6 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await verificarPaginaPainel(page);
         await expect(page.getByTestId('btn-painel-criar-processo')).toBeVisible();
 
-        const dataLimiteBase = new Date();
-        dataLimiteBase.setDate(dataLimiteBase.getDate() + 30);
-        const dataLimiteStr = dataLimiteBase.toLocaleDateString('pt-BR');
-
         // Criar processo de REVISÃO
         await criarProcesso(page, {
             descricao: descProcRevisao,
@@ -188,6 +184,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await expect(page).toHaveURL(/\/processo\/cadastro/);
         const processoRevisaoId = Number.parseInt(page.url().match(/\/processo\/cadastro\/(\d+)/)?.[1] || '0');
         if (processoRevisaoId > 0) cleanupAutomatico.registrar(processoRevisaoId);
+        const dataLimiteStr = (await page.getByTestId('inp-processo-data-limite').inputValue()).split('-').reverse().join('/');
 
         await expect(page.getByTestId('inp-processo-descricao')).toHaveValue(descProcRevisao);
         await page.getByTestId('btn-processo-iniciar').click();

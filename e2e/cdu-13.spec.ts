@@ -20,115 +20,89 @@ import {fazerLogout, navegarParaSubprocesso} from './helpers/helpers-navegacao.j
 
 test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos', () => {
     const UNIDADE_ALVO = 'SECAO_211';
-
     const timestamp = Date.now();
     const descProcesso = `Processo CDU-13 ${timestamp}`;
+    const descAtividade = `Atividade ${timestamp}`;
 
-    test('Fluxo Completo de Análise de Atividades (CDU-13)', async ({page, request, cleanupAutomatico}) => {
-
-        await test.step('1. ADMIN cria e inicia processo', async () => {
-            const processo = await criarProcessoFixture(request, {
-                descricao: descProcesso,
-                tipo: 'MAPEAMENTO',
-                unidade: UNIDADE_ALVO,
-                diasLimite: 30,
-                iniciar: true
-            });
-            cleanupAutomatico.registrar(processo.codigo);
+    test('Preparacao 1: ADMIN cria e inicia processo', async ({request}) => {
+        await criarProcessoFixture(request, {
+            descricao: descProcesso,
+            tipo: 'MAPEAMENTO',
+            unidade: UNIDADE_ALVO,
+            diasLimite: 30,
+            iniciar: true
         });
+    });
 
-        await test.step('2. CHEFE disponibiliza atividades', async () => {
-            await login(page, USUARIOS.CHEFE_SECAO_211.titulo, USUARIOS.CHEFE_SECAO_211.senha);
-            await acessarSubprocessoChefeDireto(page, descProcesso, UNIDADE_ALVO);
-            await navegarParaAtividades(page);
+    test('Preparacao 2: CHEFE disponibiliza atividades', async ({page}) => {
+        await login(page, USUARIOS.CHEFE_SECAO_211.titulo, USUARIOS.CHEFE_SECAO_211.senha);
+        await acessarSubprocessoChefeDireto(page, descProcesso, UNIDADE_ALVO);
+        await navegarParaAtividades(page);
 
-            await adicionarAtividade(page, `Atividade ${timestamp}`);
-            await adicionarConhecimento(page, `Atividade ${timestamp}`, 'Conhecimento A');
+        await adicionarAtividade(page, descAtividade);
+        await adicionarConhecimento(page, descAtividade, 'Conhecimento A');
 
-            await page.getByTestId('btn-cad-atividades-disponibilizar').click();
-            await page.getByTestId('btn-confirmar-disponibilizacao').click();
+        await page.getByTestId('btn-cad-atividades-disponibilizar').click();
+        await page.getByTestId('btn-confirmar-disponibilizacao').click();
+        await expect(page).toHaveURL(/\/painel/);
+    });
 
-            await expect(page).toHaveURL(/\/painel/);
-            await fazerLogout(page);
-        });
+    test('Preparacao 3: GESTOR COORD_21 aceita e SECRETARIA_2 devolve', async ({page}) => {
+        await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);
+        await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
+        await navegarParaAtividadesVisualizacao(page);
+        await aceitarCadastroMapeamento(page, 'Ok pela Coordenação');
 
-        await test.step('3. GESTOR COORD_21 aceita (sobe para Secretaria)', async () => {
-            await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);
-            await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
-            await navegarParaAtividadesVisualizacao(page);
+        await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
+        await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
+        await navegarParaAtividadesVisualizacao(page);
+        await devolverCadastroMapeamento(page, 'Dados incompletos para a Secretaria');
+    });
 
-            await aceitarCadastroMapeamento(page, 'Ok pela Coordenação');
+    test('Preparacao 4: GESTOR COORD_21 devolve para origem', async ({page}) => {
+        await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);
+        await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
+        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro disponibilizado/i);
 
-            await expect(page).toHaveURL(/\/painel/);
-            await fazerLogout(page);
-        });
+        await navegarParaAtividadesVisualizacao(page);
+        await devolverCadastroMapeamento(page, 'Corrigir conforme Secretaria');
+    });
 
-        await test.step('4. GESTOR SECRETARIA_2 devolve (desce para Coordenação)', async () => {
-            await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
-            await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
-            await navegarParaAtividadesVisualizacao(page);
+    test('Preparacao 5: CHEFE ajusta e redisponibiliza', async ({page}) => {
+        await login(page, USUARIOS.CHEFE_SECAO_211.titulo, USUARIOS.CHEFE_SECAO_211.senha);
+        await acessarSubprocessoChefeDireto(page, descProcesso, UNIDADE_ALVO);
+        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro em andamento/i);
 
-            await devolverCadastroMapeamento(page, 'Dados incompletos para a Secretaria');
+        await navegarParaAtividades(page);
+        const modal = await abrirHistoricoAnalise(page);
+        await expect(modal.getByTestId('cell-resultado-0')).toHaveText(/Devolu[cç][aã]o/i);
+        await expect(modal.getByTestId('cell-observacao-0')).toHaveText('Corrigir conforme Secretaria');
+        await fecharHistoricoAnalise(page);
 
-            await expect(page).toHaveURL(/\/painel/);
-            await fazerLogout(page);
-        });
+        await page.getByTestId('btn-cad-atividades-disponibilizar').click();
+        await page.getByTestId('btn-confirmar-disponibilizacao').click();
+        await expect(page).toHaveURL(/\/painel/);
+    });
 
-        await test.step('5. GESTOR COORD_21 vê o processo de volta e devolve para SEÇÃO (origem)', async () => {
-            await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);
-            await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
+    test('Cenarios CDU-13: Hierarquia aceita e ADMIN homologa', async ({page}) => {
+        await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);
+        await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
+        await navegarParaAtividadesVisualizacao(page);
+        await aceitarCadastroMapeamento(page, 'Ok final 1');
 
-            // Verificar situação (continua disponibilizado, pois não chegou na unidade dona)
-            await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro disponibilizado/i);
+        await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
+        await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
+        await navegarParaAtividadesVisualizacao(page);
+        await aceitarCadastroMapeamento(page, 'Ok final 2');
 
-            await navegarParaAtividadesVisualizacao(page);
-            await devolverCadastroMapeamento(page, 'Corrigir conforme Secretaria');
-            await fazerLogout(page);
-        });
+        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
+        await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
+        await navegarParaSubprocesso(page, UNIDADE_ALVO);
+        await navegarParaAtividadesVisualizacao(page);
+        await page.getByTestId('btn-acao-analisar-principal').click();
+        await page.getByRole('dialog').getByRole('button', {name: 'Confirmar'}).click();
 
-        await test.step('6. CHEFE vê processo "Em andamento" para ajustes', async () => {
-            await login(page, USUARIOS.CHEFE_SECAO_211.titulo, USUARIOS.CHEFE_SECAO_211.senha);
-            await acessarSubprocessoChefeDireto(page, descProcesso, UNIDADE_ALVO);
-
-            await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro em andamento/i);
-
-            await navegarParaAtividades(page);
-            const modal = await abrirHistoricoAnalise(page);
-            await expect(modal.getByTestId('cell-resultado-0')).toHaveText(/Devolu[cç][aã]o/i);
-            await expect(modal.getByTestId('cell-observacao-0')).toHaveText('Corrigir conforme Secretaria');
-            await fecharHistoricoAnalise(page);
-
-            // Disponibilizar novamente para permitir aceite final
-            await page.getByTestId('btn-cad-atividades-disponibilizar').click();
-            await page.getByTestId('btn-confirmar-disponibilizacao').click();
-            await fazerLogout(page);
-        });
-
-        await test.step('7. ACEITE FINAL -> ADMIN homologa', async () => {
-            await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);
-            await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
-            await navegarParaAtividadesVisualizacao(page);
-            await aceitarCadastroMapeamento(page, 'Ok final 1');
-            await fazerLogout(page);
-
-            // Secretaria aceita (move para ADMIN)
-            await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
-            await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
-            await navegarParaAtividadesVisualizacao(page);
-            await aceitarCadastroMapeamento(page, 'Ok final 2');
-            await fazerLogout(page);
-
-            await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
-            await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
-            await navegarParaSubprocesso(page, UNIDADE_ALVO);
-            await navegarParaAtividadesVisualizacao(page);
-
-            // Clicar Homologar (conforme perfil ADMIN)
-            await page.getByTestId('btn-acao-analisar-principal').click();
-            await page.getByRole('dialog').getByRole('button', {name: 'Confirmar'}).click();
-
-            await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${UNIDADE_ALVO}$`));
-            await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro homologado/i);
-        });
+        await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${UNIDADE_ALVO}$`));
+        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro homologado/i);
     });
 });

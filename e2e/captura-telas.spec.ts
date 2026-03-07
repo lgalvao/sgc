@@ -247,19 +247,9 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await capturarTela(page, '02-painel', '10-painel-gestor', {fullPage: true});
         });
 
-        test('Captura painel CHEFE', async ({page}) => {
-            // Criar processo para o Chefe primeiro como ADMIN
-            await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
+        test('Captura painel CHEFE', async ({page, request}) => {
             const desc = `Processo Chefe ${Date.now()}`;
-            await criarProcesso(page, {
-                descricao: desc,
-                tipo: 'MAPEAMENTO',
-                diasLimite: 30,
-                unidade: 'SECAO_211', // Unidade do Chefe
-                expandir: ['SECRETARIA_2', 'COORD_21'],
-                iniciar: true
-            });
-            await fazerLogout(page);
+            await criarProcessoMapeamentoIniciadoPorFixture(request, cleanup, desc, 'SECAO_211');
 
             await login(page, USUARIOS.CHEFE_SECAO_211.titulo, USUARIOS.CHEFE_SECAO_211.senha);
             await expect(page.getByTestId('tbl-processos')).toBeVisible();

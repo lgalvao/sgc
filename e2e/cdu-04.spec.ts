@@ -24,10 +24,6 @@ test.describe('CDU-04 - Iniciar Processo', () => {
         cleanupAutomatico: any
     }) => {
         const descricao = `CDU-04 Iniciar - ${Date.now()}`;
-        const dataLimiteBase = new Date();
-        dataLimiteBase.setDate(dataLimiteBase.getDate() + 15);
-        const dataLimiteStr = dataLimiteBase.toISOString().split('T')[0];
-
         // 1. Criar processo como ADMIN
         await criarProcesso(page, {
             descricao: descricao,
@@ -43,6 +39,7 @@ test.describe('CDU-04 - Iniciar Processo', () => {
         await esperarPaginaCadastroProcesso(page);
         const processoId = await extrairProcessoId(page);
         cleanupAutomatico.registrar(processoId);
+        const dataLimiteStr = await page.getByTestId('inp-processo-data-limite').inputValue();
 
         // 2. Iniciar processo
         await page.getByTestId('btn-processo-iniciar').click();
