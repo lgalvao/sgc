@@ -106,4 +106,4 @@ Os requisitos do sistema estão documentados em casos de uso (CDUs) no diretóri
 
 * **Processo de Mapeamento**: Criação e definição de mapas de competências.
 * **Revisão**: Fluxo de aprovação e ajuste de mapas.
-* **Diagnóstico**: Avaliação de proficiência e identificação de gaps.
+* **Diagnóstico**: Avaliação de proficiência e identificação de gaps (apenas referencias breves -- requisitos serao incluídos em releases posteriores). 
