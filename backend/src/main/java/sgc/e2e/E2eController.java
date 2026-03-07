@@ -3,6 +3,7 @@ package sgc.e2e;
 import com.fasterxml.jackson.annotation.*;
 import lombok.extern.slf4j.*;
 import org.jspecify.annotations.*;
+import org.springframework.beans.factory.annotation.*;
 import org.springframework.context.annotation.*;
 import org.springframework.core.io.*;
 import org.springframework.jdbc.core.*;
@@ -46,6 +47,7 @@ public class E2eController {
     private final UnidadeService unidadeService;
     private final ResourceLoader resourceLoader;
 
+    @Autowired
     public E2eController(JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedJdbcTemplate,
                          ProcessoFacade processoFacade, ProcessoRepo processoRepo,
                          SubprocessoRepo subprocessoRepo, MapaRepo mapaRepo, UnidadeService unidadeService,
@@ -58,6 +60,12 @@ public class E2eController {
         this.mapaRepo = mapaRepo;
         this.unidadeService = unidadeService;
         this.resourceLoader = resourceLoader;
+    }
+
+    public E2eController(JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedJdbcTemplate,
+                         ProcessoFacade processoFacade, UnidadeService unidadeService,
+                         ResourceLoader resourceLoader) {
+        this(jdbcTemplate, namedJdbcTemplate, processoFacade, null, null, null, unidadeService, resourceLoader);
     }
 
     @PostMapping("/reset-database")

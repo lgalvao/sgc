@@ -211,10 +211,19 @@ export async function importarAtividadesComErroDuplicidade(page: Page, processoO
     await selecionarAtividadesParaImportacao(page, processoOrigemDescricao, unidadeOrigemSigla, atividadesDescricoes);
     
     const modal = page.getByRole('dialog');
+    const respostaImportacao = page.waitForResponse(response =>
+        response.request().method() === 'POST' &&
+        response.url().includes('/importar-atividades') &&
+        response.status() === 422
+    );
     await modal.getByTestId('btn-importar').click();
+    const response = await respostaImportacao;
+    const corpo = await response.text();
 
     // Modal continua aberto e exibe erro
     await expect(modal).toBeVisible();
+    expect(corpo).toContain('"code":"VALIDACAO"');
+    expect(corpo).toContain('já existentes no cadastro');
     await expect(modal.getByText(/já existente|não puderam ser importadas/i)).toBeVisible();
     
     // Fechar modal para continuar teste
