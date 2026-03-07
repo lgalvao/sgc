@@ -32,11 +32,13 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@chialab/vitest-axe": "^0.19.1",
     "@eslint/js": "^10.0.1",
     "@pinia/testing": "^1.0.3",
     "@storybook/addon-docs": "^10.2.13",
     "@storybook/addon-links": "^10.2.13",
     "@storybook/vue3-vite": "^10.2.13",
+    "@testing-library/vue": "^8.1.0",
     "@types/bootstrap": "^5.2.10",
     "@types/node": "^25.3.2",
     "@types/papaparse": "^5.5.2",
@@ -49,6 +51,7 @@
     "@vitest/ui": "^4.0.0",
     "@vue/test-utils": "^2.4.6",
     "@vue/typescript-plugin": "^3.2.5",
+    "axe-core": "^4.11.1",
     "consola": "^3.4.2",
     "eslint": "^10.0.2",
     "eslint-config-prettier": "^10.1.8",

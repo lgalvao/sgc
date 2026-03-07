@@ -43,7 +43,7 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
     const subprocessoDetalhe = ref<SubprocessoDetalhe | null>(null);
     const {lastError, clearError, withErrorHandling} = useErrorHandler();
 
-    async function _executarAcao(acao: () => Promise<any>, _sucessoMsg: string, _: string): Promise<boolean> {
+    async function _executarAcao(acao: () => Promise<any>): Promise<boolean> {
         try {
             await withErrorHandling(async () => {
                 await acao();
@@ -186,17 +186,13 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
 
     async function reabrirCadastro(codSubprocesso: number, justificativa: string) {
         return _executarAcao(
-            () => serviceReabrirCadastro(codSubprocesso, justificativa),
-            "Cadastro reaberto",
-            "Erro ao reabrir cadastro",
+            () => serviceReabrirCadastro(codSubprocesso, justificativa)
         );
     }
 
     async function reabrirRevisaoCadastro(codSubprocesso: number, justificativa: string) {
         return _executarAcao(
-            () => serviceReabrirRevisaoCadastro(codSubprocesso, justificativa),
-            "Revisão de cadastro reaberta",
-            "Erro ao reabrir revisão",
+            () => serviceReabrirRevisaoCadastro(codSubprocesso, justificativa)
         );
     }
 
@@ -214,54 +210,38 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
         reabrirRevisaoCadastro,
         disponibilizarCadastro: (codSubprocesso: number) =>
             _executarAcao(
-                () => disponibilizarCadastro(codSubprocesso),
-                "Cadastro de atividades disponibilizado",
-                "Erro ao disponibilizar",
+                () => disponibilizarCadastro(codSubprocesso)
             ),
         disponibilizarRevisaoCadastro: (codSubprocesso: number) =>
             _executarAcao(
-                () => disponibilizarRevisaoCadastro(codSubprocesso),
-                "Revisão do cadastro de atividades disponibilizada",
-                "Erro ao disponibilizar",
+                () => disponibilizarRevisaoCadastro(codSubprocesso)
             ),
         devolverCadastro: (codSubprocesso: number, req: DevolverCadastroRequest) =>
             _executarAcao(
-                () => devolverCadastro(codSubprocesso, req),
-                "Cadastro devolvido",
-                "Erro ao devolver",
+                () => devolverCadastro(codSubprocesso, req)
             ),
         aceitarCadastro: (codSubprocesso: number, req: AceitarCadastroRequest) =>
             _executarAcao(
-                () => aceitarCadastro(codSubprocesso, req),
-                "Cadastro aceito",
-                "Erro ao aceitar",
+                () => aceitarCadastro(codSubprocesso, req)
             ),
         homologarCadastro: async (codSubprocesso: number, req: HomologarCadastroRequest) => {
             const ok = await _executarAcao(
-                () => homologarCadastro(codSubprocesso, req),
-                "Homologação efetivada",
-                "Erro ao homologar",
+                () => homologarCadastro(codSubprocesso, req)
             );
             if (ok) await buscarSubprocessoDetalhe(codSubprocesso);
             return ok;
         },
         devolverRevisaoCadastro: (codSubprocesso: number, req: DevolverCadastroRequest) =>
             _executarAcao(
-                () => devolverRevisaoCadastro(codSubprocesso, req),
-                "Revisão devolvida",
-                "Erro ao devolver",
+                () => devolverRevisaoCadastro(codSubprocesso, req)
             ),
         aceitarRevisaoCadastro: (codSubprocesso: number, req: AceitarCadastroRequest) =>
             _executarAcao(
-                () => aceitarRevisaoCadastro(codSubprocesso, req),
-                "Revisão aceita",
-                "Erro ao aceitar",
+                () => aceitarRevisaoCadastro(codSubprocesso, req)
             ),
         homologarRevisaoCadastro: async (codSubprocesso: number, req: HomologarCadastroRequest) => {
             const ok = await _executarAcao(
-                () => homologarRevisaoCadastro(codSubprocesso, req),
-                "Revisão homologada",
-                "Erro ao homologar",
+                () => homologarRevisaoCadastro(codSubprocesso, req)
             );
             if (ok) await buscarSubprocessoDetalhe(codSubprocesso);
             return ok;

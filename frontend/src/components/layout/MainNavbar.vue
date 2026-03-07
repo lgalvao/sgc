@@ -24,8 +24,6 @@
 
       <!-- Right aligned nav items -->
       <BNavbarNav class="ms-auto">
-        <!-- Divisor visível apenas quando colapsado -->
-        <div class="d-lg-none border-top border-secondary my-2 w-100"></div>
 
         <BNavItem
             v-b-tooltip.hover.bottom="{ title: perfilStore.usuarioNome || 'Usuário', disabled: isMobile }"
@@ -41,37 +39,43 @@
 
         <BNavItem
             v-if="perfilStore.perfilSelecionado === 'ADMIN'"
-            aria-label="Parâmetros do sistema"
             class="me-lg-1"
             data-testid="btn-parametros"
             title="Parâmetros do sistema"
             to="/parametros"
         >
-          <i aria-hidden="true" class="bi bi-sliders me-lg-0 me-1"/>
-          <span class="d-lg-none">Parâmetros</span>
+          <template #default>
+            <span class="visually-hidden">Parâmetros do sistema</span>
+            <i aria-hidden="true" class="bi bi-sliders me-lg-0 me-1"/>
+            <span aria-hidden="true" class="d-lg-none">Parâmetros</span>
+          </template>
         </BNavItem>
 
         <BNavItem
             v-if="perfilStore.perfilSelecionado === 'ADMIN'"
-            aria-label="Administradores do sistema"
             class="me-lg-1"
             data-testid="btn-administradores"
             title="Administradores do sistema"
             to="/administradores"
         >
-          <i aria-hidden="true" class="bi bi-people me-lg-0 me-1"/>
-          <span class="d-lg-none">Administradores</span>
+          <template #default>
+            <span class="visually-hidden">Administradores do sistema</span>
+            <i aria-hidden="true" class="bi bi-people me-lg-0 me-1"/>
+            <span aria-hidden="true" class="d-lg-none">Administradores</span>
+          </template>
         </BNavItem>
 
         <BNavItem
-            aria-label="Sair"
             class="me-lg-0"
             data-testid="btn-logout"
             title="Sair"
             @click.prevent="handleLogout"
         >
-          <i aria-hidden="true" class="bi bi-box-arrow-right me-lg-0 me-1"/>
-          <span class="d-lg-none">Sair</span>
+          <template #default>
+            <span class="visually-hidden">Sair</span>
+            <i aria-hidden="true" class="bi bi-box-arrow-right me-lg-0 me-1"/>
+            <span aria-hidden="true" class="d-lg-none">Sair</span>
+          </template>
         </BNavItem>
       </BNavbarNav>
     </BCollapse>
