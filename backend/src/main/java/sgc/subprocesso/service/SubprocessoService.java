@@ -616,6 +616,7 @@ public class SubprocessoService {
                 .podeDisponibilizarMapa(mesmaUnidade && isAdmin && Set.of(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO, SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO, SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES, SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA, SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO, SituacaoSubprocesso.REVISAO_MAPA_COM_SUGESTOES).contains(situacao))
                 .podeValidarMapa(mesmaUnidade && isChefe && Set.of(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO, SituacaoSubprocesso.REVISAO_MAPA_DISPONIBILIZADO).contains(situacao))
                 .podeApresentarSugestoes(mesmaUnidade && isChefe && Set.of(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO, SituacaoSubprocesso.REVISAO_MAPA_DISPONIBILIZADO).contains(situacao))
+                .podeVerSugestoes(mesmaUnidade && (isGestor || isAdmin) && Set.of(SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES, SituacaoSubprocesso.REVISAO_MAPA_COM_SUGESTOES).contains(situacao))
                 .podeDevolverMapa(verificarGerirMapa(mesmaUnidade, isGestor || isAdmin, situacao))
                 .podeAceitarMapa(verificarGerirMapa(mesmaUnidade, isGestor, situacao))
                 .podeHomologarMapa(verificarGerirMapa(mesmaUnidade, isAdmin, situacao))

@@ -17,6 +17,7 @@ public record PermissoesSubprocessoDto(
         boolean podeDisponibilizarMapa,
         boolean podeValidarMapa,
         boolean podeApresentarSugestoes,
+        boolean podeVerSugestoes,
         boolean podeDevolverMapa,
         boolean podeAceitarMapa,
         boolean podeHomologarMapa,

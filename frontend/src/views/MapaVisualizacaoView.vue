@@ -298,7 +298,8 @@ const {
   podeAceitarMapa,
   podeDevolverMapa,
   podeHomologarMapa,
-  podeApresentarSugestoes
+  podeApresentarSugestoes,
+  podeVerSugestoes: podeMostrarVerSugestoes
 } = useAcesso(computed(() => subprocessosStore.subprocessoDetalhe));
 
 const podeValidar = computed(() => podeValidarMapa.value);
@@ -309,7 +310,7 @@ const podeAnalisar = computed(() => {
       podeHomologarMapa.value
   );
 });
-const podeVerSugestoes = computed(() => podeApresentarSugestoes.value);
+const podeVerSugestoes = computed(() => podeMostrarVerSugestoes.value);
 
 const historicoAnalise = computed(() => {
   return analisesStore.analisesCadastro || [];
