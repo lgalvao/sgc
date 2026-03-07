@@ -68,19 +68,10 @@ export default [// 1. Ignore files
             "vuejs-accessibility/label-has-for": [
                 "error",
                 {
-                    components: ["Label"],
-                    controlComponents: [
-                        "BFormInput",
-                        "BFormSelect",
-                        "BFormTextarea",
-                        "BFormCheckbox",
-                        "BFormDatepicker",
-                        "BFormSpinbutton",
-                        "BFormTags"
-                    ],
-                    required: {
-                        some: ["nesting", "id"],
-                    },
+                    components: ["BFormInput", "BFormSelect", "BFormTextarea", "BFormCheckbox", "BFormRadio"],
+                    controlComponents: ["BFormInput", "BFormSelect", "BFormTextarea"],
+                    required: { some: ["nesting", "id"] },
+                    allowChildren: false,
                 },
             ],
         },

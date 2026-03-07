@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import * as subprocessoService from '../subprocessoService';
 import apiClient from '@/axios-setup';
-import * as apiErrorUtils from '@/utils/apiError';
 
 vi.mock('@/axios-setup', () => ({
   default: {

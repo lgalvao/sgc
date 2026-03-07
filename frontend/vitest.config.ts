@@ -11,7 +11,7 @@ export default defineConfig({
         testTimeout: 15000,
         include: ["src/**/*.{test,spec}.{js,ts}"],
         exclude: ["node_modules", "dist", "**/*.d.ts", "src/main.ts", "**/*.config.*", "src/visual-capture/capture.test.ts"],
-        setupFiles: ["./vitest.setup.ts"],
+        setupFiles: ["./vitest.setup.ts", "./src/test/a11y-setup.ts"],
         coverage: {
             provider: "v8",
             reporter: ["json", "text", "html", "lcov"],
