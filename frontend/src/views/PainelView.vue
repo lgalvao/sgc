@@ -72,27 +72,57 @@ import PageHeader from "@/components/layout/PageHeader.vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
 import {formatDateBR} from "@/utils";
 import TabelaProcessos from "@/components/processo/TabelaProcessos.vue";
-import {useAlertasStore} from "@/stores/alertas";
 import {usePerfilStore} from "@/stores/perfil";
 import {usePerfil} from "@/composables/usePerfil";
 import {useProcessosStore} from "@/stores/processos";
 import {useToastStore} from "@/stores/toast";
 import type {Alerta, ProcessoResumo} from "@/types/tipos";
+import * as painelService from "@/services/painelService";
+import type {Page} from "@/services/painelService";
+import * as alertaService from "@/services/alertaService";
 
 const perfilStore = usePerfilStore();
 const perfil = usePerfil();
 const processosStore = useProcessosStore();
-const alertasStore = useAlertasStore();
 const toastStore = useToastStore();
 const toast = useToast();
 
 const {processosPainel} = storeToRefs(processosStore);
-const {alertas} = storeToRefs(alertasStore);
+const alertas = ref<Alerta[]>([]);
+const alertasPage = ref<Page<Alerta>>({} as Page<Alerta>);
 
 const router = useRouter();
 
 const criterio = ref<keyof ProcessoResumo>("descricao");
 const asc = ref(true);
+
+async function buscarAlertas(
+    usuarioCodigo: string,
+    unidade: number,
+    page: number,
+    size: number,
+    sort?: "data" | "processo",
+    order?: "asc" | "desc",
+) {
+  const response = await painelService.listarAlertas(usuarioCodigo, unidade, page, size, sort, order);
+  alertas.value = response.content;
+  alertasPage.value = response;
+}
+
+async function marcarAlertaComoLido(idAlerta: number): Promise<boolean> {
+  const originalAlertas = JSON.parse(JSON.stringify(alertas.value));
+  const index = alertas.value.findIndex(a => a.codigo === idAlerta);
+  if (index !== -1) {
+    alertas.value[index].dataHoraLeitura = new Date().toISOString();
+  }
+  try {
+    await alertaService.marcarComoLido(idAlerta);
+    return true;
+  } catch {
+    alertas.value = originalAlertas;
+    return false;
+  }
+}
 
 async function carregarDados() {
   if (perfil.perfilSelecionado.value && perfilStore.unidadeSelecionada) {
@@ -107,7 +137,7 @@ async function carregarDados() {
 
     if (perfilStore.usuarioCodigo) {
       promises.push(
-          alertasStore.buscarAlertas(
+          buscarAlertas(
               perfilStore.usuarioCodigo,
               Number(perfilStore.unidadeSelecionada),
               0,
@@ -176,7 +206,7 @@ function ordenarAlertasPor(campo: "data" | "processo") {
     alertaAsc.value = campo !== "data";
   }
   if (perfilStore.usuarioCodigo) {
-    alertasStore.buscarAlertas(
+    buscarAlertas(
         perfilStore.usuarioCodigo,
         Number(perfilStore.unidadeSelecionada),
         0,

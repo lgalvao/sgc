@@ -4,7 +4,6 @@ import UnidadeView from '@/views/UnidadeView.vue';
 import EmptyState from '@/components/comum/EmptyState.vue';
 import {BAlert} from 'bootstrap-vue-next';
 import {useUnidadesStore} from '@/stores/unidades';
-import {useAtribuicaoTemporariaStore} from '@/stores/atribuicoes';
 import {usePerfilStore} from '@/stores/perfil';
 import {useMapasStore} from '@/stores/mapas';
 import {buscarUsuarioPorTitulo} from '@/services/usuarioService';
@@ -94,7 +93,6 @@ describe('UnidadeView.vue', () => {
     });
 
     let unidadesStore: any;
-    let atribuicaoStore: any;
     let perfilStore: any;
     let mapasStore: any;
 
@@ -106,9 +104,6 @@ describe('UnidadeView.vue', () => {
                 {
                     unidades: {
                         unidade: null,
-                    },
-                    atribuicoes: {
-                        atribuicoes: [],
                     },
                     perfil: {
                         perfilSelecionado: 'USER',
@@ -134,7 +129,6 @@ describe('UnidadeView.vue', () => {
         });
 
         unidadesStore = useUnidadesStore();
-        atribuicaoStore = useAtribuicaoTemporariaStore();
         perfilStore = usePerfilStore();
         mapasStore = useMapasStore();
 
@@ -144,9 +138,8 @@ describe('UnidadeView.vue', () => {
         }
 
         vi.spyOn(unidadesStore, 'buscarArvoreUnidade').mockResolvedValue(null);
-        vi.spyOn(atribuicaoStore, 'buscarAtribuicoes').mockResolvedValue(null);
 
-        return {wrapper: context.wrapper, unidadesStore, atribuicaoStore, perfilStore, mapasStore};
+        return {wrapper: context.wrapper, unidadesStore, perfilStore, mapasStore};
     };
 
     it('fetches data on mount', async () => {

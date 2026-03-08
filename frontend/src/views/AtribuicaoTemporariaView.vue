@@ -129,7 +129,7 @@ import AppAlert from "@/components/comum/AppAlert.vue";
 import {useNotification} from "@/composables/useNotification";
 import {useUnidadesStore} from "@/stores/unidades";
 import {buscarUsuariosPorUnidade} from "@/services/usuarioService";
-import {useAtribuicaoTemporariaStore} from "@/stores/atribuicoes";
+import {criarAtribuicaoTemporaria} from "@/services/atribuicaoTemporariaService";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 
 const props = defineProps<{ codUnidade: number }>();
@@ -137,7 +137,6 @@ const props = defineProps<{ codUnidade: number }>();
 const router = useRouter();
 const {notificacao, notify, clear} = useNotification();
 const unidadesStore = useUnidadesStore();
-const atribuicoesStore = useAtribuicaoTemporariaStore();
 const codUnidade = computed(() => props.codUnidade);
 
 const unidade = ref<Unidade | null>(null);
@@ -180,7 +179,7 @@ async function criarAtribuicao() {
   isLoading.value = true;
 
   try {
-    await atribuicoesStore.criarAtribuicaoTemporaria(unidadeAtual.codigo, {
+    await criarAtribuicaoTemporaria(unidadeAtual.codigo, {
       tituloEleitoralUsuario: usuarioSelecionado.value,
       dataInicio: dataInicio.value,
       dataTermino: dataTermino.value,
