@@ -64,9 +64,6 @@ describe('AppAlert.vue', () => {
       }
     });
 
-    // Encontra o alert (interno do Bootstrap-Vue-Next) e aciona dismiss, mas mockar é díficil.
-    // O componente emite @dismissed que emite pro pai.
-    // Vamos simular o próprio emit do component ou vm.emit
     wrapper.vm.$emit('dismissed');
     expect(wrapper.emitted().dismissed).toBeTruthy();
   });

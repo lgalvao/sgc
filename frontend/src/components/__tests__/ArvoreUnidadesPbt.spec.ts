@@ -130,7 +130,6 @@ describe('ArvoreUnidades Property-Based Tests', () => {
         const treeStructure = generateTree(3, 2, 0); // ~14 nodes
         const allNodesStructure = flatten(treeStructure);
 
-        // We need as many random properties as nodes
         const numNodes = allNodesStructure.length;
 
         fc.assert(

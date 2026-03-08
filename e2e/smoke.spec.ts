@@ -178,7 +178,6 @@ test.describe('Smoke Test - Sistema SGC', () => {
                 tipo: 'MAPEAMENTO'
             });
 
-            // --- Fluxo para habilitar botão Finalizar ---
 
             // 1. Chefe cadastra e disponibiliza
             await fazerLogout(page);
