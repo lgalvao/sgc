@@ -132,7 +132,6 @@ import {useRoute, useRouter} from "vue-router";
 import {usePerfil} from "@/composables/usePerfil";
 import {useAcesso} from "@/composables/useAcesso";
 import {useFormErrors} from '@/composables/useFormErrors';
-import {useAtividadesStore} from "@/stores/atividades";
 import {useMapasStore} from "@/stores/mapas";
 import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useUnidadesStore} from "@/stores/unidades";
@@ -149,7 +148,6 @@ const route = useRoute();
 const router = useRouter();
 const mapasStore = useMapasStore();
 const {mapaCompleto, impactoMapa: impactos} = storeToRefs(mapasStore);
-const atividadesStore = useAtividadesStore();
 const subprocessosStore = useSubprocessosStore();
 const subprocesso = computed(() => subprocessosStore.subprocessoDetalhe);
 const unidadesStore = useUnidadesStore();
@@ -188,17 +186,14 @@ onMounted(async () => {
 
   if (id) {
     codSubprocesso.value = id;
-    await Promise.all([
-      subprocessosStore.buscarContextoEdicao(id),
-      atividadesStore.buscarAtividadesParaSubprocesso(id)
-    ]);
+    const data = await subprocessosStore.buscarContextoEdicao(id);
+    if (data && data.atividadesDisponiveis) {
+      atividades.value = data.atividadesDisponiveis;
+    }
   }
 });
 
-const atividades = computed<Atividade[]>(() => {
-  if (!codSubprocesso.value) return [];
-  return atividadesStore.obterAtividadesPorSubprocesso(codSubprocesso.value) || [];
-});
+const atividades = ref<Atividade[]>([]);
 
 const competencias = computed(() => mapaCompleto.value?.competencias || []);
 const competenciaSendoEditada = ref<Competencia | null>(null);
@@ -272,7 +267,10 @@ async function adicionarCompetenciaEFecharModal(dados: { descricao: string; ativ
       await mapasStore.adicionarCompetencia(codSubprocesso.value as number, request);
     }
 
-    await subprocessosStore.buscarContextoEdicao(codSubprocesso.value as number);
+    const data = await subprocessosStore.buscarContextoEdicao(codSubprocesso.value as number);
+    if (data && data.atividadesDisponiveis) {
+      atividades.value = data.atividadesDisponiveis;
+    }
 
     fecharModalCriarNovaCompetencia();
   } catch {
@@ -296,7 +294,10 @@ async function confirmarExclusaoCompetencia() {
           codSubprocesso.value as number,
           competenciaParaExcluir.value.codigo,
       );
-      await subprocessosStore.buscarContextoEdicao(codSubprocesso.value as number);
+      const data = await subprocessosStore.buscarContextoEdicao(codSubprocesso.value as number);
+      if (data && data.atividadesDisponiveis) {
+        atividades.value = data.atividadesDisponiveis;
+      }
       fecharModalExcluirCompetencia();
     } catch {
       handleErrors(mapasStore);

@@ -6,7 +6,6 @@ import {useProcessosStore} from '../processos';
 import {usePerfilStore} from '../perfil';
 import {useUnidadesStore} from '../unidades';
 import {useMapasStore} from '../mapas';
-import {useAtividadesStore} from '../atividades';
 import {
     buscarContextoEdicao,
     buscarSubprocessoDetalhe,
@@ -62,9 +61,6 @@ vi.mock('../unidades', () => ({
 vi.mock('../mapas', () => ({
     useMapasStore: vi.fn(),
 }));
-vi.mock('../atividades', () => ({
-    useAtividadesStore: vi.fn(),
-}));
 
 const {mockApiClient} = vi.hoisted(() => ({
     mockApiClient: {
@@ -97,9 +93,6 @@ describe('Subprocessos Store', () => {
     const mockMapasStore = {
         mapaCompleto: null,
     };
-    const mockAtividadesStore = {
-        setAtividadesParaSubprocesso: vi.fn(),
-    };
 
     beforeEach(() => {
         setActivePinia(createPinia());
@@ -110,7 +103,6 @@ describe('Subprocessos Store', () => {
         (usePerfilStore as any).mockReturnValue(mockPerfilStore);
         (useUnidadesStore as any).mockReturnValue(mockUnidadesStore);
         (useMapasStore as any).mockReturnValue(mockMapasStore);
-        (useAtividadesStore as any).mockReturnValue(mockAtividadesStore);
 
         store = useSubprocessosStore();
     });
@@ -226,10 +218,6 @@ describe('Subprocessos Store', () => {
             expect(store.subprocessoDetalhe).toMatchObject(mockData.detalhes);
             expect(mockUnidadesStore.unidade).toEqual(mockData.unidade);
             expect(mockMapasStore.mapaCompleto).toEqual(mockData.mapa);
-            expect(mockAtividadesStore.setAtividadesParaSubprocesso).toHaveBeenCalledWith(
-                1,
-                mockData.atividadesDisponiveis
-            );
         });
 
         it('deve falhar se não houver perfil', async () => {

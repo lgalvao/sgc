@@ -1,30 +1,25 @@
 import {ref} from 'vue';
-import {useAtividadesStore} from '@/stores/atividades';
 import type {CriarAtividadeRequest} from '@/types/tipos';
+import * as atividadeService from '@/services/atividadeService';
 
 export function useAtividadeForm() {
     const novaAtividade = ref('');
     const loadingAdicionar = ref(false);
-    const atividadesStore = useAtividadesStore();
 
     async function adicionarAtividade(
         codSubprocesso: number,
         codMapa: number
-    ): Promise<boolean> {
-        if (!novaAtividade.value?.trim()) return false;
+    ): Promise<any> {
+        if (!novaAtividade.value?.trim()) return null;
 
         loadingAdicionar.value = true;
         try {
             const request: CriarAtividadeRequest = {
                 descricao: novaAtividade.value.trim(),
             };
-            await atividadesStore.adicionarAtividade(
-                codSubprocesso,
-                codMapa,
-                request
-            );
+            const response = await atividadeService.criarAtividade(request, codMapa);
             novaAtividade.value = '';
-            return true;
+            return response;
         } finally {
             loadingAdicionar.value = false;
         }

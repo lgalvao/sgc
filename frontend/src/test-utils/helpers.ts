@@ -33,29 +33,6 @@ export function getMockAtividadesData(): Atividade[] {
 }
 
 /**
- * Prepara uma instância de Pinia ativa e retorna a store de atividades "fresca".
- * Usa importActual para garantir que a store real seja importada após mocks terem sido aplicados.
- */
-export async function prepareFreshAtividadesStore() {
-    setActivePinia(createPinia());
-    const {useAtividadesStore: useAtividadesStoreActual} =
-        (await vi.importActual("../stores/atividades")) as {
-            useAtividadesStore: () => any;
-        };
-    const store = useAtividadesStoreActual();
-    const initialAtividades = getMockAtividadesData();
-
-    // Populate the Map with a dummy subprocess ID (e.g., 1)
-    const mockAtividades = initialAtividades.map((a: Atividade) => ({
-        ...a,
-        conhecimentos: a.conhecimentos.map((c: any) => ({...c})),
-    }));
-    store.atividadesPorSubprocesso.set(1, mockAtividades);
-
-    return store;
-}
-
-/**
  * Inicializa e ativa uma instância de Pinia retornando-a.
  * Uso: const pinia = initPinia();
  */

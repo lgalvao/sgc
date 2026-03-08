@@ -25,10 +25,8 @@ import {usePerfilStore} from "@/stores/perfil";
 import {useProcessosStore} from "@/stores/processos";
 import {useUnidadesStore} from "@/stores/unidades";
 import {useMapasStore} from "@/stores/mapas";
-import {useAtividadesStore} from "@/stores/atividades";
 import type {
     AceitarCadastroRequest,
-    Atividade,
     DevolverCadastroRequest,
     HomologarCadastroRequest,
     MapaCompleto,
@@ -158,9 +156,7 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
             const mapasStore = useMapasStore();
             mapasStore.mapaCompleto = data.mapa as MapaCompleto;
 
-            const atividadesStore = useAtividadesStore();
-            const atividadesMapped = (data.atividadesDisponiveis || []) as Atividade[];
-            atividadesStore.setAtividadesParaSubprocesso(codigo, atividadesMapped);
+            return data;
         });
     }
 

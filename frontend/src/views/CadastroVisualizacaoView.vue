@@ -153,7 +153,6 @@ import HistoricoAnaliseModal from "@/components/processo/HistoricoAnaliseModal.v
 import ImpactoMapaModal from "@/components/mapa/ImpactoMapaModal.vue";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
-import {useAtividadesStore} from "@/stores/atividades";
 import {useUnidadesStore} from "@/stores/unidades";
 import {useProcessosStore} from "@/stores/processos";
 import {useAnalisesStore} from "@/stores/analises";
@@ -165,6 +164,7 @@ import type {
   HomologarCadastroRequest,
   Unidade,
   UnidadeParticipante,
+  Atividade
 } from "@/types/tipos";
 import {TipoProcesso} from "@/types/tipos";
 import {useAcesso} from "@/composables/useAcesso";
@@ -175,7 +175,6 @@ const props = defineProps<{
 }>();
 
 const router = useRouter();
-const atividadesStore = useAtividadesStore();
 const unidadesStore = useUnidadesStore();
 const processosStore = useProcessosStore();
 const analisesStore = useAnalisesStore();
@@ -232,10 +231,7 @@ const isHomologacao = computed(() => podeHomologarCadastro.value);
 
 const codSubprocesso = computed(() => subprocesso.value?.codSubprocesso);
 
-const atividades = computed(() => {
-  if (codSubprocesso.value === undefined) return [];
-  return atividadesStore.obterAtividadesPorSubprocesso(codSubprocesso.value) || [];
-});
+const atividades = ref<Atividade[]>([]);
 
 const processoAtual = computed(() => processosStore.processoDetalhe);
 const isRevisao = computed(() => processoAtual.value?.tipo === TipoProcesso.REVISAO);
@@ -384,10 +380,10 @@ async function confirmarDevolucao() {
 onMounted(async () => {
   await processosStore.buscarProcessoDetalhe(codProcesso.value);
   if (codSubprocesso.value) {
-    await Promise.all([
-      atividadesStore.buscarAtividadesParaSubprocesso(codSubprocesso.value),
-      subprocessosStore.buscarSubprocessoDetalhe(codSubprocesso.value)
-    ]);
+    const data = await subprocessosStore.buscarContextoEdicao(codSubprocesso.value);
+    if (data && data.atividadesDisponiveis) {
+      atividades.value = data.atividadesDisponiveis;
+    }
   }
 });
 

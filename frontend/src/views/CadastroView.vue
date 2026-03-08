@@ -174,7 +174,6 @@ import ErrorAlert from "@/components/comum/ErrorAlert.vue";
 import AtividadeItem from "@/components/atividades/AtividadeItem.vue";
 import CadAtividadeForm from "@/components/atividades/CadAtividadeForm.vue";
 import {useAtividadeForm} from "@/composables/useAtividadeForm";
-import {useAtividadesStore} from "@/stores/atividades";
 import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useMapasStore} from "@/stores/mapas";
 import {useUnidadesStore} from "@/stores/unidades";
@@ -187,6 +186,9 @@ import type {Atividade, Conhecimento, CriarConhecimentoRequest, ErroValidacao,} 
 import {Perfil, SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 import logger from "@/utils/logger";
 import {formatSituacaoSubprocesso} from "@/utils/formatters";
+import * as atividadeService from "@/services/atividadeService";
+import * as subprocessoService from "@/services/subprocessoService";
+import {useErrorHandler} from "@/composables/useErrorHandler";
 
 type DadosRemocao = { tipo: "atividade" | "conhecimento"; index: number; conhecimentoCodigo?: number } | null;
 
@@ -196,7 +198,6 @@ const props = defineProps<{
 }>();
 
 const router = useRouter();
-const atividadesStore = useAtividadesStore();
 const unidadesStore = useUnidadesStore();
 const subprocessosStore = useSubprocessosStore();
 const analisesStore = useAnalisesStore();
@@ -216,10 +217,8 @@ const {podeEditarCadastro, podeDisponibilizarCadastro, podeVisualizarImpacto} = 
 const isRevisao = computed(() => subprocesso.value?.tipoProcesso === TipoProcesso.REVISAO);
 const podeVerImpacto = computed(() => podeVisualizarImpacto.value);
 
-const atividades = computed(() => {
-  if (codSubprocesso.value === null) return [];
-  return atividadesStore.obterAtividadesPorSubprocesso(codSubprocesso.value);
-});
+const atividades = ref<Atividade[]>([]);
+const {withErrorHandling, lastError} = useErrorHandler();
 
 const historicoAnalises = computed(() => {
   return analisesStore.analisesCadastro || [];
@@ -256,14 +255,30 @@ const erroGlobalFormatado = computed(() =>
     erroGlobal.value ? {message: erroGlobal.value} : null
 );
 
+function processarRespostaLocal(response: any) {
+  if (response?.atividadesAtualizadas) {
+    atividades.value = response.atividadesAtualizadas;
+  }
+  if (response?.subprocesso) {
+    subprocessosStore.atualizarStatusLocal({
+      ...response.subprocesso,
+      permissoes: response.permissoes
+    });
+  }
+}
+
 async function adicionarAtividade(): Promise<boolean> {
   if (codMapa.value && codSubprocesso.value) {
     try {
-      const sucesso = await adicionarAtividadeAction(codSubprocesso.value, codMapa.value);
-      if (sucesso) erroNovaAtividade.value = null;
-      return sucesso;
+      const response = await withErrorHandling(() => adicionarAtividadeAction(codSubprocesso.value!, codMapa.value!));
+      if (response) {
+        processarRespostaLocal(response);
+        erroNovaAtividade.value = null;
+        return true;
+      }
+      return false;
     } catch {
-      erroNovaAtividade.value = atividadesStore.lastError?.message || "Não foi possível adicionar atividade.";
+      erroNovaAtividade.value = lastError.value?.message || "Não foi possível adicionar atividade.";
       return false;
     }
   }
@@ -282,17 +297,22 @@ async function confirmarRemocao() {
   const {tipo, index, conhecimentoCodigo} = dadosRemocao.value;
 
   try {
-    if (tipo === "atividade") {
-      const atividadeRemovida = atividades.value[index];
-      await atividadesStore.removerAtividade(codSubprocesso.value, atividadeRemovida.codigo);
-    } else if (tipo === "conhecimento" && conhecimentoCodigo !== undefined) {
-      const atividade = atividades.value[index];
-      await atividadesStore.removerConhecimento(codSubprocesso.value, atividade.codigo, conhecimentoCodigo);
-    }
+    await withErrorHandling(async () => {
+      if (tipo === "atividade") {
+        const atividadeRemovida = atividades.value[index];
+        const response = await atividadeService.excluirAtividade(atividadeRemovida.codigo);
+        processarRespostaLocal(response);
+      } else if (tipo === "conhecimento" && conhecimentoCodigo !== undefined) {
+        const atividade = atividades.value[index];
+        const response = await atividadeService.excluirConhecimento(atividade.codigo, conhecimentoCodigo);
+        processarRespostaLocal(response);
+      }
+    });
     mostrarModalConfirmacaoRemocao.value = false;
     dadosRemocao.value = null;
   } catch (e: any) {
-    notify(e.message || "Não foi possível remover o item.", 'danger');
+    const err = lastError.value?.message || e.message;
+    notify(err || "Não foi possível remover o item.", 'danger');
     mostrarModalConfirmacaoRemocao.value = false;
   }
 }
@@ -305,7 +325,14 @@ async function salvarEdicaoAtividade(codigo: number, descricao: string) {
         ...atividadeOriginal,
         descricao: descricao.trim(),
       };
-      await atividadesStore.atualizarAtividade(codSubprocesso.value, codigo, atividadeAtualizada);
+      try {
+        await withErrorHandling(async () => {
+          const response = await atividadeService.atualizarAtividade(codigo, atividadeAtualizada);
+          processarRespostaLocal(response);
+        });
+      } catch {
+        notify("Falha ao salvar edição da atividade.", "danger");
+      }
     }
   }
 }
@@ -317,7 +344,14 @@ async function adicionarConhecimento(idx: number, descricao: string) {
     const request: CriarConhecimentoRequest = {
       descricao: descricao.trim(),
     };
-    await atividadesStore.adicionarConhecimento(codSubprocesso.value, atividade.codigo, request);
+    try {
+      await withErrorHandling(async () => {
+        const response = await atividadeService.criarConhecimento(atividade.codigo, request);
+        processarRespostaLocal(response);
+      });
+    } catch {
+      notify("Falha ao adicionar conhecimento.", "danger");
+    }
   }
 }
 
@@ -335,19 +369,27 @@ async function salvarEdicaoConhecimento(atividadeCodigo: number, conhecimentoCod
       codigo: conhecimentoCodigo,
       descricao: descricao.trim(),
     };
-    await atividadesStore.atualizarConhecimento(
-        codSubprocesso.value,
-        atividadeCodigo,
-        conhecimentoCodigo,
-        conhecimentoAtualizado,
-    );
+    try {
+      await withErrorHandling(async () => {
+        const response = await atividadeService.atualizarConhecimento(
+            atividadeCodigo,
+            conhecimentoCodigo,
+            conhecimentoAtualizado,
+        );
+        processarRespostaLocal(response);
+      });
+    } catch {
+      notify("Falha ao atualizar conhecimento.", "danger");
+    }
   }
 }
 
 async function handleImportAtividades() {
   mostrarModalImportar.value = false;
   if (codSubprocesso.value) {
-    await atividadesStore.buscarAtividadesParaSubprocesso(codSubprocesso.value);
+    await withErrorHandling(async () => {
+      atividades.value = await subprocessoService.listarAtividades(codSubprocesso.value!);
+    });
   }
   notify("As atividades foram importadas para o seu mapa.", 'success');
 }
@@ -459,7 +501,10 @@ onMounted(async () => {
 
   if (id) {
     codSubprocesso.value = id;
-    await subprocessosStore.buscarContextoEdicao(id);
+    const data = await subprocessosStore.buscarContextoEdicao(id);
+    if (data && data.atividadesDisponiveis) {
+      atividades.value = data.atividadesDisponiveis;
+    }
   } else {
     logger.error("[CadAtividades] ERRO: Subprocesso não encontrado!");
   }

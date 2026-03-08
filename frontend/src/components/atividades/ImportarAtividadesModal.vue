@@ -136,8 +136,8 @@
 import {BAlert, BButton, BFormCheckbox, BFormSelect, BFormSelectOption, BModal, BSpinner} from "bootstrap-vue-next";
 import {onMounted, ref, watch} from "vue";
 import {useApi} from "@/composables/useApi";
-import {useAtividadesStore} from "@/stores/atividades";
 import {useProcessosStore} from "@/stores/processos";
+import * as subprocessoService from "@/services/subprocessoService";
 import {type Atividade, type ProcessoResumo, type UnidadeParticipante,} from "@/types/tipos";
 
 const props = defineProps<{
@@ -151,14 +151,13 @@ const emit = defineEmits<{
 }>();
 
 const processosStore = useProcessosStore();
-const atividadesStore = useAtividadesStore();
 
 const {
   execute: executarImportacao,
   error: erroImportacao,
   isLoading: importando,
   clearError: limparErroImportacao,
-} = useApi(atividadesStore.importarAtividades);
+} = useApi(subprocessoService.importarAtividades);
 
 const processoSelecionado = ref<ProcessoResumo | null>(null);
 const processoSelecionadoId = ref<number | null>(null);
@@ -245,12 +244,12 @@ async function selecionarProcesso(processo: ProcessoResumo | null) {
 async function selecionarUnidade(unidadePu: UnidadeParticipante | null) {
   unidadeSelecionada.value = unidadePu;
   if (unidadePu) {
-    await atividadesStore.buscarAtividadesParaSubprocesso(unidadePu.codSubprocesso);
-    const atividadesDaOutraUnidade =
-        atividadesStore.obterAtividadesPorSubprocesso(unidadePu.codSubprocesso);
-    atividadesParaImportar.value = atividadesDaOutraUnidade
-        ? [...atividadesDaOutraUnidade]
-        : [];
+    try {
+      const atividadesDaOutraUnidade = await subprocessoService.listarAtividades(unidadePu.codSubprocesso);
+      atividadesParaImportar.value = atividadesDaOutraUnidade ? [...atividadesDaOutraUnidade] : [];
+    } catch {
+      atividadesParaImportar.value = [];
+    }
   } else {
     atividadesParaImportar.value = [];
   }
