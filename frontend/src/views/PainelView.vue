@@ -165,7 +165,6 @@ function abrirDetalhesProcesso(processo: ProcessoResumo | undefined) {
   }
 }
 
-// Ordenação de alertas por coluna (CDU-02 - cabeçalho "Processo" e padrão por data desc)
 const alertaCriterio = ref<"data" | "processo">("data");
 const alertaAsc = ref(false); // false = desc (padrão por data/hora)
 

@@ -147,10 +147,17 @@
       </div>
     </div>
     <div v-else-if="subprocessosStore.lastError" class="py-2">
-      <ErrorAlert
-          :error="subprocessosStore.lastError"
-          @dismiss="subprocessosStore.clearError()"
-      />
+      <BAlert
+          :model-value="true"
+          variant="danger"
+          dismissible
+          @dismissed="subprocessosStore.clearError()"
+      >
+        {{ subprocessosStore.lastError.message }}
+        <div v-if="subprocessosStore.lastError.details">
+          <small>Detalhes: {{ subprocessosStore.lastError.details }}</small>
+        </div>
+      </BAlert>
     </div>
     <div v-else class="text-center py-5">
       <BSpinner label="Carregando informações da unidade..." variant="primary"/>
@@ -213,7 +220,6 @@ import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import SubprocessoCards from "@/components/processo/SubprocessoCards.vue";
 import SubprocessoModal from "@/components/processo/SubprocessoModal.vue";
-import ErrorAlert from "@/components/comum/ErrorAlert.vue";
 import AppAlert from "@/components/comum/AppAlert.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import {useMapasStore} from "@/stores/mapas";

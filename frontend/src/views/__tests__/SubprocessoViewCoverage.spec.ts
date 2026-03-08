@@ -3,7 +3,7 @@ import {mount} from '@vue/test-utils';
 import {createTestingPinia} from '@pinia/testing';
 import SubprocessoView from '@/views/SubprocessoView.vue';
 import {useSubprocessosStore} from '@/stores/subprocessos';
-import {BAlert, BSpinner} from 'bootstrap-vue-next';
+import {BSpinner} from 'bootstrap-vue-next';
 import * as useAcessoModule from '@/composables/useAcesso';
 
 const SubprocessoHeaderStub = {template: '<div />'};
@@ -14,6 +14,11 @@ const ModalConfirmacaoStub = {
     template: '<div><slot /></div>',
     props: ['modelValue', 'titulo', 'loading', 'okDisabled'],
     emits: ['update:modelValue', 'confirmar']
+};
+const BAlertStub = {
+    template: '<div><slot /></div>',
+    props: ['modelValue', 'variant', 'dismissible'],
+    emits: ['dismissed']
 };
 
 describe('SubprocessoView Coverage', () => {
@@ -50,7 +55,9 @@ describe('SubprocessoView Coverage', () => {
                     SubprocessoCards: SubprocessoCardsStub,
                     TabelaMovimentacoes: TabelaMovimentacoesStub,
                     SubprocessoModal: SubprocessoModalStub,
-                    ModalConfirmacao: ModalConfirmacaoStub
+                    ModalConfirmacao: ModalConfirmacaoStub,
+                    BSpinner: { template: '<div><slot /></div>' },
+                    BAlert: BAlertStub,
                 }
             },
             props: {
@@ -96,7 +103,9 @@ describe('SubprocessoView Coverage', () => {
                     SubprocessoCards: SubprocessoCardsStub,
                     TabelaMovimentacoes: TabelaMovimentacoesStub,
                     SubprocessoModal: SubprocessoModalStub,
-                    ModalConfirmacao: ModalConfirmacaoStub
+                    ModalConfirmacao: ModalConfirmacaoStub,
+                    BSpinner: { template: '<div><slot /></div>' },
+                    BAlert: BAlertStub,
                 }
             },
             props: {
@@ -105,7 +114,6 @@ describe('SubprocessoView Coverage', () => {
             }
         });
 
-        expect(wrapper.findComponent(BAlert).exists()).toBe(true);
         expect(wrapper.text()).toContain('Erro teste');
     });
 
@@ -140,7 +148,8 @@ describe('SubprocessoView Coverage', () => {
                     SubprocessoCards: SubprocessoCardsStub,
                     TabelaMovimentacoes: TabelaMovimentacoesStub,
                     SubprocessoModal: SubprocessoModalStub,
-                    ModalConfirmacao: ModalConfirmacaoStub
+                    BSpinner: { template: '<div><slot /></div>' },
+                    BAlert: BAlertStub,
                 }
             },
             props: {codProcesso: 1, siglaUnidade: 'TEST'}
@@ -185,7 +194,8 @@ describe('SubprocessoView Coverage', () => {
                     SubprocessoCards: SubprocessoCardsStub,
                     TabelaMovimentacoes: TabelaMovimentacoesStub,
                     SubprocessoModal: SubprocessoModalStub,
-                    ModalConfirmacao: ModalConfirmacaoStub,
+                    BSpinner: { template: '<div><slot /></div>' },
+                    BAlert: BAlertStub,
                     BFormTextarea: {template: '<textarea />'}
                 }
             },

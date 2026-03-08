@@ -1,9 +1,17 @@
 <template>
   <LayoutPadrao>
-    <ErrorAlert
-        :error="unidadesStore.lastError"
-        @dismiss="unidadesStore.clearError()"
-    />
+    <BAlert
+        v-if="unidadesStore.lastError"
+        :model-value="true"
+        variant="danger"
+        dismissible
+        @dismissed="unidadesStore.clearError()"
+    >
+      {{ unidadesStore.lastError.message }}
+      <div v-if="unidadesStore.lastError.details">
+        <small>Detalhes: {{ unidadesStore.lastError.details }}</small>
+      </div>
+    </BAlert>
 
     <div v-if="unidade">
       <PageHeader :title="`${unidade.sigla} - ${unidade.nome}`">
@@ -102,14 +110,13 @@
 </template>
 
 <script lang="ts" setup>
-import {BButton, BCard, BCardBody, BCol, BRow} from "bootstrap-vue-next";
+import {BAlert, BButton, BCard, BCardBody, BCol, BRow} from "bootstrap-vue-next";
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import {computed, onMounted, ref, watch} from "vue";
 import {useRouter} from "vue-router";
 import type {Unidade, Usuario} from "@/types/tipos";
 import TreeTable from "@/components/comum/TreeTable.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
-import ErrorAlert from "@/components/comum/ErrorAlert.vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
 import {useUnidadesStore} from "@/stores/unidades";
 import {usePerfilStore} from "@/stores/perfil";

@@ -6,10 +6,15 @@
       </template>
     </PageHeader>
 
-    <ErrorAlert
-        :error="erroUnidades"
-        @dismiss="unidadesStore.clearError()"
-    />
+    <BAlert
+        v-if="erroUnidades"
+        :model-value="true"
+        variant="danger"
+        dismissible
+        @dismissed="unidadesStore.clearError()"
+    >
+      {{ erroUnidades.message }}
+    </BAlert>
 
     <div v-if="unidadesStore.isLoading" class="text-center py-5">
       <BSpinner label="Carregando unidades..." variant="primary"/>
@@ -44,11 +49,10 @@
 
 <script lang="ts" setup>
 import {computed, onMounted, ref} from "vue";
-import {BButton, BSpinner} from "bootstrap-vue-next";
+import {BButton, BSpinner, BAlert} from "bootstrap-vue-next";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import ArvoreUnidades from "@/components/unidade/ArvoreUnidades.vue";
-import ErrorAlert from "@/components/comum/ErrorAlert.vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
 import {useUnidadesStore} from "@/stores/unidades";
 

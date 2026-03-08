@@ -31,10 +31,15 @@
       </template>
     </PageHeader>
 
-    <ErrorAlert
-        :error="mapasStore.erro ? { message: mapasStore.erro } : null"
-        @dismiss="mapasStore.erro = null"
-    />
+    <BAlert
+        v-if="mapasStore.erro"
+        :model-value="true"
+        variant="danger"
+        dismissible
+        @dismissed="mapasStore.erro = null"
+    >
+      {{ mapasStore.erro }}
+    </BAlert>
 
     <div v-if="unidade">
       <div v-if="competencias.length === 0" class="mb-4 mt-3">
@@ -119,11 +124,10 @@
 </template>
 
 <script lang="ts" setup>
-import {BButton} from "bootstrap-vue-next";
+import {BAlert, BButton} from "bootstrap-vue-next";
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import PageHeader from "@/components/layout/PageHeader.vue";
 import LoadingButton from "@/components/comum/LoadingButton.vue";
-import ErrorAlert from "@/components/comum/ErrorAlert.vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
 import CompetenciaCard from "@/components/mapa/CompetenciaCard.vue";
 import {storeToRefs} from "pinia";

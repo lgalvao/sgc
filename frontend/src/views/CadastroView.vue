@@ -66,10 +66,15 @@
       </template>
     </PageHeader>
 
-    <ErrorAlert
-        :error="erroGlobalFormatado"
-        @dismiss="erroGlobal = null"
-    />
+    <BAlert
+        v-if="erroGlobalFormatado"
+        :model-value="true"
+        variant="danger"
+        dismissible
+        @dismissed="erroGlobal = null"
+    >
+      {{ erroGlobalFormatado.message }}
+    </BAlert>
 
     <CadAtividadeForm
         ref="atividadeFormRef"
@@ -108,11 +113,11 @@
           :atividade="atividade"
           :erro-validacao="obterErroParaAtividade(atividade.codigo)"
           :pode-editar="!!podeEditarCadastro"
-          @atualizar-atividade="(desc) => salvarEdicaoAtividade(atividade.codigo, desc)"
+          @atualizar-atividade="(desc: string) => salvarEdicaoAtividade(atividade.codigo, desc)"
           @remover-atividade="() => removerAtividade(idx)"
-          @adicionar-conhecimento="(desc) => adicionarConhecimento(idx, desc)"
-          @atualizar-conhecimento="(idC, desc) => salvarEdicaoConhecimento(atividade.codigo, idC, desc)"
-          @remover-conhecimento="(idC) => removerConhecimento(idx, idC)"
+          @adicionar-conhecimento="(desc: string) => adicionarConhecimento(idx, desc)"
+          @atualizar-conhecimento="(idC: number, desc: string) => salvarEdicaoConhecimento(atividade.codigo, idC, desc)"
+          @remover-conhecimento="(idC: number) => removerConhecimento(idx, idC)"
       />
     </div>
 
@@ -156,7 +161,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BButton, BDropdown, BDropdownItem} from "bootstrap-vue-next";
+import {BAlert, BButton, BDropdown, BDropdownItem} from "bootstrap-vue-next";
 import {computed, nextTick, onMounted, ref, watch} from "vue";
 import {useRouter} from "vue-router";
 import {storeToRefs} from "pinia";
@@ -170,8 +175,6 @@ import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import LoadingButton from "@/components/comum/LoadingButton.vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
-import ErrorAlert from "@/components/comum/ErrorAlert.vue";
-import AtividadeItem from "@/components/atividades/AtividadeItem.vue";
 import CadAtividadeForm from "@/components/atividades/CadAtividadeForm.vue";
 import {useAtividadeForm} from "@/composables/useAtividadeForm";
 import {useSubprocessosStore} from "@/stores/subprocessos";
@@ -302,7 +305,7 @@ async function confirmarRemocao() {
         const atividadeRemovida = atividades.value[index];
         const response = await atividadeService.excluirAtividade(atividadeRemovida.codigo);
         processarRespostaLocal(response);
-      } else if (tipo === "conhecimento" && !conhecimentoCodigo) {
+      } else if (tipo === "conhecimento" && conhecimentoCodigo !== undefined) {
         const atividade = atividades.value[index];
         const response = await atividadeService.excluirConhecimento(atividade.codigo, conhecimentoCodigo);
         processarRespostaLocal(response);
@@ -355,7 +358,7 @@ async function adicionarConhecimento(idx: number, descricao: string) {
   }
 }
 
-function removerConhecimento(idx: number, conhecimentoCodigo: number) {
+function removerConhecimento(idx: number, conhecimentoCodigo?: number) {
   if (!codSubprocesso.value) return;
   dadosRemocao.value = {tipo: "conhecimento", index: idx, conhecimentoCodigo};
   mostrarModalConfirmacaoRemocao.value = true;
