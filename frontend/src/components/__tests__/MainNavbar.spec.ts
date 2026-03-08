@@ -4,6 +4,7 @@ import {ref} from "vue";
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 import NavBar from "../layout/MainNavbar.vue";
 import {usePerfil} from "@/composables/usePerfil";
+
 vi.mock("@/composables/usePerfil");
 
 const {mockPush} = vi.hoisted(() => ({

@@ -1,305 +1,90 @@
-import type {Page} from '@playwright/test';
 import {expect, test} from './fixtures/complete-fixtures.js';
-import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
-import {criarProcesso, extrairProcessoId} from './helpers/helpers-processos.js';
+import {criarProcessoMapaDisponibilizadoFixture, criarProcessoFinalizadoFixture} from './fixtures/fixtures-processos.js';
 import {
-    adicionarAtividade,
-    adicionarConhecimento,
-    navegarParaAtividades,
     navegarParaAtividadesVisualizacao
 } from './helpers/helpers-atividades.js';
-import {acessarSubprocessoChefeDireto, acessarSubprocessoGestor} from './helpers/helpers-analise.js';
-import {abrirModalCriarCompetencia, navegarParaMapa} from './helpers/helpers-mapas.js';
-import {fazerLogout, navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
-
-async function verificarPaginaSubprocesso(page: Page, unidade: string) {
-    await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${unidade}$`));
-}
+import {navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
 
 test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos', () => {
-    const UNIDADE_ALVO = 'SECAO_211';
-    const USUARIO_ADMIN = USUARIOS.ADMIN_1_PERFIL.titulo;
-    const SENHA_ADMIN = USUARIOS.ADMIN_1_PERFIL.senha;
+    
+    test.describe('Em Processo em Andamento', () => {
+        const UNIDADE_ALVO = 'SECAO_111';
+        let processoId: number;
+        let descProcesso: string;
 
-    const timestamp = Date.now();
-    const descProcessoMapeamento = `Map 11 ${timestamp}`;
-    const atividadeA = `Atividade A ${timestamp}`;
-    const atividadeB = `Atividade B ${timestamp}`;
-    const conhecimento1 = 'Conhecimento 1';
-    const conhecimento2 = 'Conhecimento 2';
-    const conhecimento3 = 'Conhecimento 3';
-
-    let processoMapeamentoId: number;
-
-    test('Preparacao 1: Admin cria e inicia processo de mapeamento', async ({
-                                                                                page,
-                                                                                autenticadoComoAdmin,
-                                                                                cleanupAutomatico
-                                                                            }) => {
-
-
-        await criarProcesso(page, {
-            descricao: descProcessoMapeamento,
-            tipo: 'MAPEAMENTO',
-            diasLimite: 30,
-            unidade: UNIDADE_ALVO,
-            expandir: ['SECRETARIA_2', 'COORD_21']
+        test('Preparacao: Criar processo disponibilizado', async ({request}) => {
+            const processo = await criarProcessoMapaDisponibilizadoFixture(request, {
+                unidade: UNIDADE_ALVO
+            });
+            processoId = processo.codigo;
+            descProcesso = processo.descricao;
         });
 
-        const linhaProcesso = page.getByTestId('tbl-processos').locator('tr').filter({has: page.getByText(descProcessoMapeamento)});
-        await linhaProcesso.click();
-        await expect(page.getByTestId('inp-processo-descricao')).toHaveValue(descProcessoMapeamento);
-        await expect(page.getByText('Carregando unidades...')).toBeHidden();
+        test('Fluxo ADMIN/GESTOR: Navega via Detalhes do Processo (Passo 2)', async ({page, autenticadoComoAdmin}) => {
+            // 1. No Painel, o usuário clica no processo em andamento
+            await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
 
-        processoMapeamentoId = await extrairProcessoId(page);
-        await page.getByTestId('btn-processo-iniciar').click();
-        await page.getByTestId('btn-iniciar-processo-confirmar').click();
+            // 2.1. O sistema mostra a tela Detalhes do processo
+            await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processoId}$`));
 
-        await verificarPaginaPainel(page);
+            // 2.2. Usuário clica em uma unidade subordinada
+            await navegarParaSubprocesso(page, UNIDADE_ALVO);
+
+            // 2.3. O sistema mostra a tela Detalhes do subprocesso
+            await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processoId}/${UNIDADE_ALVO}$`));
+
+            // 4. Na tela de Detalhes do subprocesso, usuário clica no card Atividades e conhecimentos.
+            // 5. O sistema apresenta a tela Atividades e conhecimentos
+            await navegarParaAtividadesVisualizacao(page);
+
+            // 6. Verificação dos dados
+            await expect(page.locator('.unidade-sigla').getByText(UNIDADE_ALVO)).toBeVisible();
+            await expect(page.getByText(/Atividade Fixture/)).toBeVisible();
+            await expect(page.getByText(/Conhecimento Fixture/)).toBeVisible();
+        });
+
+        test('Fluxo CHEFE/SERVIDOR: Navega direto para Detalhes do Subprocesso (Passo 3)', async ({page, autenticadoComoChefeSecao111}) => {
+            // 1. No Painel, o usuário clica no processo em andamento
+            await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
+
+            // 3.1. O sistema exibe a tela Detalhes do subprocesso com os dados da unidade do usuário
+            await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processoId}/${UNIDADE_ALVO}$`));
+
+            // 4. Na tela de Detalhes do subprocesso, usuário clica no card Atividades e conhecimentos.
+            await navegarParaAtividadesVisualizacao(page);
+
+            // 6. Verificação dos dados
+            await expect(page.locator('.unidade-sigla').getByText(UNIDADE_ALVO)).toBeVisible();
+            await expect(page.getByText(/Atividade Fixture/)).toBeVisible();
+        });
     });
 
-    test('Preparacao 2: Chefe adiciona atividades e conhecimentos, e disponibiliza cadastro', async ({
-                                                                                                         page,
-                                                                                                         autenticadoComoChefeSecao211
-                                                                                                     }) => {
+    test.describe('Em Processo Finalizado', () => {
+        const UNIDADE_ALVO = 'SECAO_112';
+        let processoId: number;
+        let descProcesso: string;
 
-        await acessarSubprocessoChefeDireto(page, descProcessoMapeamento, UNIDADE_ALVO);
+        test('Preparacao: Criar processo finalizado', async ({request}) => {
+            const processo = await criarProcessoFinalizadoFixture(request, {
+                unidade: UNIDADE_ALVO
+            });
+            processoId = processo.codigo;
+            descProcesso = processo.descricao;
+        });
 
-        // Chefe vai direto para subprocesso
-        await verificarPaginaSubprocesso(page, UNIDADE_ALVO);
-        await navegarParaAtividades(page);
+        test('Fluxo ADMIN: Visualizar em processo finalizado', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
+            if (processoId > 0) cleanupAutomatico.registrar(processoId);
 
-        // Adicionar primeira atividade com dois conhecimentos
-        await adicionarAtividade(page, atividadeA);
-        await adicionarConhecimento(page, atividadeA, conhecimento1);
-        await adicionarConhecimento(page, atividadeA, conhecimento2);
+            // 1. No Painel, o usuário clica no processo finalizado
+            await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
 
-        // Adicionar segunda atividade com um conhecimento
-        await adicionarAtividade(page, atividadeB);
-        await adicionarConhecimento(page, atividadeB, conhecimento3);
+            // 2. Navegação até a visualização
+            await navegarParaSubprocesso(page, UNIDADE_ALVO);
+            await navegarParaAtividadesVisualizacao(page);
 
-        await page.getByTestId('btn-cad-atividades-disponibilizar').click();
-        await page.getByTestId('btn-confirmar-disponibilizacao').click();
-
-        await verificarPaginaPainel(page);
-    });
-
-    // TESTES PRINCIPAIS - CDU-11
-
-    test('Cenario 1: ADMIN visualiza cadastro clicando na unidade subordinada', async ({
-                                                                                           page,
-                                                                                           autenticadoComoAdmin
-                                                                                       }) => {
-
-
-        await expect(page.getByTestId('tbl-processos').getByText(descProcessoMapeamento).first()).toBeVisible();
-        await page.getByTestId('tbl-processos').getByText(descProcessoMapeamento).first().click();
-
-        // Aguardar página de Detalhes do processo carregar
-        await expect(page).toHaveURL(/\/processo\/\d+$/);
-        await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
-
-        const tabela = page.getByTestId('tbl-tree');
-        await expect(tabela).toBeVisible();
-
-        // Clicar na célula SECAO_211 dentro da tabela de unidades
-        const celula = tabela.getByRole('cell', {name: 'SECAO_211'}).first();
-        await expect(celula).toBeVisible();
-        await celula.click();
-
-        // Aguardar navegação para Detalhes do subprocesso
-        await expect(page).toHaveURL(/\/processo\/\d+\/\w+$/);
-
-        await navegarParaAtividadesVisualizacao(page);
-        await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos', exact: true})).toBeVisible();
-
-        await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos'})).toBeVisible();
-
-        // Verificar que continua no subprocesso da unidade alvo
-        await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${UNIDADE_ALVO}/`));
-
-        // Verificar que as atividades estão apresentadas como tabelas
-        // Cada atividade aparece com descrição como cabeçalho
-        await expect(page.getByText(atividadeA)).toBeVisible();
-        await expect(page.getByText(atividadeB)).toBeVisible();
-
-        // Verificar que os conhecimentos estão listados dentro das atividades
-        await expect(page.getByText(conhecimento1)).toBeVisible();
-        await expect(page.getByText(conhecimento2)).toBeVisible();
-        await expect(page.getByText(conhecimento3)).toBeVisible();
-    });
-
-    test('Cenario 2: CHEFE visualiza cadastro diretamente (sem navegar por unidades)', async ({
-                                                                                                  page,
-                                                                                                  autenticadoComoChefeSecao211
-                                                                                              }) => {
-
-        await page.getByTestId('tbl-processos').getByText(descProcessoMapeamento).first().click();
-
-        // Verifica que foi diretamente para o subprocesso (sem passar pela lista de unidades)
-        await verificarPaginaSubprocesso(page, UNIDADE_ALVO);
-
-        await navegarParaAtividadesVisualizacao(page);
-
-        await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos'})).toBeVisible();
-
-        // Verificar que continua no subprocesso da unidade alvo
-        await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${UNIDADE_ALVO}/`));
-
-        // Verificar atividades aparecem como tabelas com descrição
-        await expect(page.getByText(atividadeA)).toBeVisible();
-        await expect(page.getByText(atividadeB)).toBeVisible();
-
-        // Verificar conhecimentos dentro das atividades
-        await expect(page.getByText(conhecimento1)).toBeVisible();
-        await expect(page.getByText(conhecimento2)).toBeVisible();
-        await expect(page.getByText(conhecimento3)).toBeVisible();
-    });
-
-    test('Cenario 3.1.1: Aceite COORD_21 (Cadastro)', async ({page}) => {
-        await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);
-        await acessarSubprocessoGestor(page, descProcessoMapeamento, UNIDADE_ALVO);
-        await navegarParaAtividadesVisualizacao(page);
-        await page.getByTestId('btn-acao-analisar-principal').click();
-        await page.getByTestId('inp-aceite-cadastro-obs').fill('Aceite para finalização do cenário');
-        await page.getByTestId('btn-aceite-cadastro-confirmar').click();
-        await verificarPaginaPainel(page);
-    });
-
-    test('Cenario 3.1.2: Aceite SECRETARIA_2 (Cadastro)', async ({page}) => {
-        await loginComPerfil(page, '212121', 'senha', 'GESTOR - SECRETARIA_2');
-        await acessarSubprocessoGestor(page, descProcessoMapeamento, UNIDADE_ALVO);
-        await navegarParaAtividadesVisualizacao(page);
-        await page.getByTestId('btn-acao-analisar-principal').click();
-        await page.getByTestId('inp-aceite-cadastro-obs').fill('Aceite Secretaria 2');
-        await page.getByTestId('btn-aceite-cadastro-confirmar').click();
-        await verificarPaginaPainel(page);
-    });
-
-    test('Cenario 3.1.3: ADMIN homologa cadastro', async ({page}) => {
-        await login(page, USUARIO_ADMIN, SENHA_ADMIN);
-        await page.getByTestId('tbl-processos').getByText(descProcessoMapeamento).first().click();
-        await navegarParaSubprocesso(page, UNIDADE_ALVO);
-        await navegarParaAtividadesVisualizacao(page);
-        await page.getByTestId('btn-acao-analisar-principal').click();
-        await page.getByTestId('inp-aceite-cadastro-obs').fill('Homologado para finalização do cenário');
-        await page.getByTestId('btn-aceite-cadastro-confirmar').click();
-        await expect(page.getByText(/Cadastro homologado/i).first()).toBeVisible();
-    });
-
-    test('Cenario 3.2: ADMIN disponibiliza Mapa', async ({page}) => {
-        await login(page, USUARIO_ADMIN, SENHA_ADMIN);
-        await page.getByTestId('tbl-processos').getByText(descProcessoMapeamento).first().click();
-        await navegarParaSubprocesso(page, UNIDADE_ALVO);
-
-        // Adicionar competências e disponibilizar mapa
-        await navegarParaMapa(page);
-
-        await abrirModalCriarCompetencia(page);
-        await page.getByTestId('inp-criar-competencia-descricao').fill(`Competência 1 ${timestamp}`);
-        await page.getByText(atividadeA).click();
-        await page.getByTestId('btn-criar-competencia-salvar').click();
-        await expect(page.getByTestId('mdl-criar-competencia')).toBeHidden();
-
-        // Adicionar competência para a segunda atividade (obrigatório)
-        await abrirModalCriarCompetencia(page);
-        await page.getByTestId('inp-criar-competencia-descricao').fill(`Competência 2 ${timestamp}`);
-        await page.getByText(atividadeB).click();
-        await page.getByTestId('btn-criar-competencia-salvar').click();
-        await expect(page.getByTestId('mdl-criar-competencia')).toBeHidden();
-
-        await page.getByTestId('btn-cad-mapa-disponibilizar').click();
-        await page.getByTestId('inp-disponibilizar-mapa-data').fill('2030-12-31');
-        await page.getByTestId('btn-disponibilizar-mapa-confirmar').click();
-        await expect(page.getByTestId('mdl-disponibilizar-mapa')).toBeHidden();
-
-        // Aguardar redirecionamento para o painel
-        await verificarPaginaPainel(page);
-    });
-
-    test('Cenario 3.3.1: Chefe valida mapa', async ({page}) => {
-        await login(page, USUARIOS.CHEFE_SECAO_211.titulo, USUARIOS.CHEFE_SECAO_211.senha);
-        await page.getByTestId('tbl-processos').getByText(descProcessoMapeamento).first().click();
-        await navegarParaMapa(page);
-        await page.getByTestId('btn-mapa-validar').click();
-        await page.getByTestId('btn-validar-mapa-confirmar').click();
-        await expect(page.getByText(/Mapa validado/i).first()).toBeVisible();
-    });
-
-    test('Cenario 3.3.2: Aceite COORD_21 (Mapa)', async ({page}) => {
-        await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);
-        await page.getByTestId('tbl-processos').getByText(descProcessoMapeamento).first().click();
-        await navegarParaSubprocesso(page, 'SECAO_211');
-        await navegarParaMapa(page);
-        await page.getByTestId('btn-mapa-homologar-aceite').click();
-        await page.getByTestId('btn-aceite-mapa-confirmar').click();
-        await verificarPaginaPainel(page);
-    });
-
-    test('Cenario 3.3.3: Aceite SECRETARIA_2 (Mapa)', async ({page}) => {
-        await loginComPerfil(page, '212121', 'senha', 'GESTOR - SECRETARIA_2');
-        await page.getByTestId('tbl-processos').getByText(descProcessoMapeamento).first().click();
-        await navegarParaSubprocesso(page, 'SECAO_211');
-        await navegarParaMapa(page);
-        await page.getByTestId('btn-mapa-homologar-aceite').click();
-        await page.getByTestId('btn-aceite-mapa-confirmar').click();
-        await verificarPaginaPainel(page);
-    });
-
-    test('Cenario 3.3.4: Admin homologa mapa', async ({page}) => {
-        await login(page, USUARIO_ADMIN, SENHA_ADMIN);
-        await page.getByTestId('tbl-processos').getByText(descProcessoMapeamento).first().click();
-        await navegarParaSubprocesso(page, 'SECAO_211');
-        await navegarParaMapa(page);
-        await page.getByTestId('btn-mapa-homologar-aceite').click();
-        await page.getByTestId('btn-aceite-mapa-confirmar').click();
-        await expect(page.getByText(/Homologação efetivada/i).first()).toBeVisible();
-    });
-
-    test('Cenario 3.4: Finalizar e Visualizar', async ({page}) => {
-        await login(page, USUARIO_ADMIN, SENHA_ADMIN);
-        await page.getByTestId('tbl-processos').getByText(descProcessoMapeamento).first().click();
-        await page.getByTestId('btn-processo-finalizar').click();
-        await page.getByTestId('btn-finalizar-processo-confirmar').click();
-        await verificarPaginaPainel(page);
-        await page.getByTestId('tbl-processos').getByText(descProcessoMapeamento).first().click();
-
-        // Verificar que estamos na página de detalhes do processo
-        await expect(page).toHaveURL(/\/processo\/\d+$/);
-
-        // Verificar que a tabela de unidades está visível
-        await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
-
-        // Clicar na linha da unidade
-        await navegarParaSubprocesso(page, 'SECAO_211');
-
-        // O card deve estar visível para visualização em processo finalizado
-        await navegarParaAtividadesVisualizacao(page);
-
-        await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos', exact: true})).toBeVisible();
-        await expect(page.getByText(atividadeA)).toBeVisible();
-        await expect(page.getByText(atividadeB)).toBeVisible();
-    });
-
-    test('Cenario 4: CHEFE visualiza cadastro de processo finalizado', async ({
-                                                                                  page,
-                                                                                  autenticadoComoChefeSecao211,
-                                                                                  cleanupAutomatico
-                                                                              }) => {
-        // Registrar cleanup aqui pois é o último teste que depende deste processo
-        if (processoMapeamentoId > 0) cleanupAutomatico.registrar(processoMapeamentoId);
-
-        // Clicar no processo finalizado
-        await page.getByTestId('tbl-processos').getByText(descProcessoMapeamento).first().click();
-
-        // Verificar que foi diretamente para subprocesso (perfil CHEFE)
-        await verificarPaginaSubprocesso(page, UNIDADE_ALVO);
-
-        await navegarParaAtividadesVisualizacao(page);
-
-        await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos'})).toBeVisible();
-        await expect(page.getByText(atividadeA)).toBeVisible();
-        await expect(page.getByText(conhecimento1)).toBeVisible();
-        await expect(page.getByText(conhecimento2)).toBeVisible();
+            // 6. Verificação
+            await expect(page.locator('.unidade-sigla').getByText(UNIDADE_ALVO)).toBeVisible();
+            await expect(page.getByText(/Atividade Origem/).first()).toBeVisible();
+        });
     });
 });

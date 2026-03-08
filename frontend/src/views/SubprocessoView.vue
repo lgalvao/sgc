@@ -230,12 +230,7 @@ import {useLoadingManager} from "@/composables/useLoadingManager";
 import {useAcesso} from "@/composables/useAcesso";
 import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useProcessosStore} from "@/stores/processos";
-import {
-  type Movimentacao,
-  SituacaoProcesso,
-  type SubprocessoDetalhe,
-  TipoProcesso
-} from "@/types/tipos";
+import {type Movimentacao, SituacaoProcesso, type SubprocessoDetalhe, TipoProcesso} from "@/types/tipos";
 import {formatDateTimeBR, logger} from "@/utils";
 import {normalizeError} from "@/utils/apiError";
 import {formatSituacaoSubprocesso} from "@/utils/formatters";

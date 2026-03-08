@@ -26,17 +26,18 @@ export function calcularDataLimite(dias: number): string {
 export async function criarProcesso(page: Page, options: {
     descricao: string;
     tipo: TipoProcesso;
-    diasLimite: number;
+    diasLimite?: number;
     unidade: string | string[];
     expandir?: string[];
     iniciar?: boolean;
 }): Promise<void> {
+    const dias = options.diasLimite ?? 30;
     await page.getByTestId('btn-painel-criar-processo').click();
     await expect(page).toHaveURL(/\/processo\/cadastro/);
 
     await page.getByTestId('inp-processo-descricao').fill(options.descricao);
     await page.getByTestId('sel-processo-tipo').selectOption(options.tipo);
-    await page.getByTestId('inp-processo-data-limite').fill(calcularDataLimite(options.diasLimite));
+    await page.getByTestId('inp-processo-data-limite').fill(calcularDataLimite(dias));
 
     await expect(page.getByText('Carregando unidades...')).toBeHidden();
     if (options.expandir) {

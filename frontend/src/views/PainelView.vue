@@ -78,8 +78,8 @@ import {usePerfil} from "@/composables/usePerfil";
 import {useProcessosStore} from "@/stores/processos";
 import {useToastStore} from "@/stores/toast";
 import type {Alerta, ProcessoResumo} from "@/types/tipos";
-import * as painelService from "@/services/painelService";
 import type {Page} from "@/services/painelService";
+import * as painelService from "@/services/painelService";
 
 const perfilStore = usePerfilStore();
 const perfil = usePerfil();

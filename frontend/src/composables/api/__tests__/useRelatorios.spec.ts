@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { useRelatorios } from '../useRelatorios';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {useRelatorios} from '../useRelatorios';
 import apiClient from '@/axios-setup';
 
 vi.mock('@/axios-setup', () => ({

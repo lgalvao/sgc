@@ -1,5 +1,5 @@
 import {mount} from '@vue/test-utils';
-import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
 import BarraNavegacao from '@/components/layout/BarraNavegacao.vue';
 import {useRoute, useRouter} from 'vue-router';
 import {useUnidadeAtual} from '@/composables/useUnidadeAtual';

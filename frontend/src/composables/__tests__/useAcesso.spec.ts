@@ -1,7 +1,7 @@
-import { describe, it, expect } from 'vitest';
-import { useAcesso } from '../useAcesso';
-import { ref } from 'vue';
-import type { SubprocessoDetalhe } from '@/types/tipos';
+import {describe, expect, it} from 'vitest';
+import {useAcesso} from '../useAcesso';
+import {ref} from 'vue';
+import type {SubprocessoDetalhe} from '@/types/tipos';
 
 describe('useAcesso', () => {
   it('deve retornar false por padrao quando permissoes sao nulas', () => {

@@ -36,7 +36,7 @@ public class CopiaMapaService {
     public int importarAtividadesDeOutroMapa(Long mapaOrigemId, Long mapaDestinoId, List<Long> codigosAtividades) {
         List<Atividade> atividadesOrigem = atividadeRepo.findWithConhecimentosByMapa_Codigo(mapaOrigemId);
 
-        if (codigosAtividades != null && !codigosAtividades.isEmpty()) {
+        if (!codigosAtividades.isEmpty()) {
             Set<Long> filtro = new HashSet<>(codigosAtividades);
             Set<Long> encontrados = atividadesOrigem.stream().map(Atividade::getCodigo).collect(java.util.stream.Collectors.toSet());
             Set<Long> naoEncontrados = new HashSet<>(filtro);

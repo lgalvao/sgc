@@ -96,7 +96,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             HttpStatusCode status,
             WebRequest request) {
 
-        log.warn("Erro de validação de argumento", ex.getMessage());
+        log.warn("Erro de validação de argumento: {}", ex.getMessage());
 
         String message = "A requisição contém dados de entrada inválidos.";
         var subErrors = ex.getBindingResult().getFieldErrors().stream().map(

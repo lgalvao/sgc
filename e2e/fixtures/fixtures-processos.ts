@@ -108,6 +108,81 @@ export async function criarProcessoFinalizadoFixture(
 }
 
 /**
+ * Cria um processo de mapeamento já com cadastro disponibilizado via API E2E.
+ */
+export async function criarProcessoCadastroDisponibilizadoFixture(
+    request: APIRequestContext,
+    options: ProcessoFixtureOptions
+): Promise<ProcessoFixture> {
+    const response = await request.post('/e2e/fixtures/processo-mapeamento-com-cadastro-disponibilizado', {
+        data: {
+            unidadeSigla: options.unidade,
+            iniciar: options.iniciar ?? true,
+            descricao: options.descricao ?? `Fixture E2E CADASTRO_DISPONIBILIZADO ${Date.now()}`,
+            diasLimite: options.diasLimite ?? 30
+        }
+    });
+
+    if (!response.ok()) {
+        throw new Error(
+            `Falha ao criar processo fixture com cadastro disponibilizado: ${response.status()} ${response.statusText()}`
+        );
+    }
+
+    return await response.json();
+}
+
+/**
+ * Cria um processo de mapeamento já com mapa disponibilizado via API E2E.
+ */
+export async function criarProcessoMapaDisponibilizadoFixture(
+    request: APIRequestContext,
+    options: ProcessoFixtureOptions
+): Promise<ProcessoFixture> {
+    const response = await request.post('/e2e/fixtures/processo-mapeamento-com-mapa-disponibilizado', {
+        data: {
+            unidadeSigla: options.unidade,
+            iniciar: options.iniciar ?? true,
+            descricao: options.descricao ?? `Fixture E2E MAPA_DISPONIBILIZADO ${Date.now()}`,
+            diasLimite: options.diasLimite ?? 30
+        }
+    });
+
+    if (!response.ok()) {
+        throw new Error(
+            `Falha ao criar processo fixture com mapa disponibilizado: ${response.status()} ${response.statusText()}`
+        );
+    }
+
+    return await response.json();
+}
+
+/**
+ * Cria um processo de mapeamento já com mapa validado via API E2E.
+ */
+export async function criarProcessoMapaValidadoFixture(
+    request: APIRequestContext,
+    options: ProcessoFixtureOptions
+): Promise<ProcessoFixture> {
+    const response = await request.post('/e2e/fixtures/processo-mapeamento-com-mapa-validado', {
+        data: {
+            unidadeSigla: options.unidade,
+            iniciar: options.iniciar ?? true,
+            descricao: options.descricao ?? `Fixture E2E MAPA_VALIDADO ${Date.now()}`,
+            diasLimite: options.diasLimite ?? 30
+        }
+    });
+
+    if (!response.ok()) {
+        throw new Error(
+            `Falha ao criar processo fixture com mapa validado: ${response.status()} ${response.statusText()}`
+        );
+    }
+
+    return await response.json();
+}
+
+/**
  * Cria um processo de mapeamento já com mapa homologado via API E2E.
  */
 export async function criarProcessoMapaHomologadoFixture(

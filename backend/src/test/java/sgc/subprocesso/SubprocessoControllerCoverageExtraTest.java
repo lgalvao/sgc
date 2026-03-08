@@ -13,7 +13,6 @@ import sgc.comum.ComumDtos.*;
 import sgc.comum.erros.*;
 import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
-
 import sgc.organizacao.service.*;
 import sgc.seguranca.*;
 import sgc.subprocesso.dto.*;

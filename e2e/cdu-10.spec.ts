@@ -1,7 +1,7 @@
 import type {Page} from '@playwright/test';
 import {expect, test} from './fixtures/complete-fixtures.js';
-import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
-import {criarProcesso} from './helpers/helpers-processos.js';
+import {login, USUARIOS} from './helpers/helpers-auth.js';
+import {criarProcessoFinalizadoFixture, criarProcessoFixture} from './fixtures/fixtures-processos.js';
 import {
     adicionarAtividade,
     adicionarConhecimento,
@@ -9,22 +9,13 @@ import {
     navegarParaAtividades,
     navegarParaAtividadesVisualizacao
 } from './helpers/helpers-atividades.js';
-import {criarCompetencia, navegarParaMapa} from './helpers/helpers-mapas.js';
 import {
     abrirHistoricoAnalise,
-    aceitarCadastroMapeamento,
-    acessarSubprocessoAdmin,
     acessarSubprocessoChefeDireto,
     acessarSubprocessoGestor,
-    fecharHistoricoAnalise,
-    homologarCadastroMapeamento
+    fecharHistoricoAnalise
 } from './helpers/helpers-analise.js';
-import {
-    fazerLogout,
-    limparNotificacoes,
-    navegarParaSubprocesso,
-    verificarPaginaPainel
-} from './helpers/helpers-navegacao.js';
+import {limparNotificacoes, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 
 async function verificarPaginaSubprocesso(page: Page, unidade: string) {
     await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${unidade}(?:/)?$`));
@@ -33,122 +24,25 @@ async function verificarPaginaSubprocesso(page: Page, unidade: string) {
 test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades e conhecimentos', () => {
     const UNIDADE_ALVO = 'SECAO_221';
     const timestamp = Date.now();
-    const descProcessoMapeamento = `Map 10 ${timestamp}`;
     const descProcessoRevisao = `Rev 10 ${timestamp}`;
 
-    test('1. Preparação: Mapeamento completo e Revisão iniciada', async ({page}) => {
-        test.setTimeout(45000); // Passo inicial ainda é longo, mas reduzido de 60s
-        // Admin cria e inicia processo de mapeamento
-        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
-        await criarProcesso(page, {
-            descricao: descProcessoMapeamento,
-            tipo: 'MAPEAMENTO',
-            diasLimite: 30,
+    test('1. Preparação: Mapeamento completo e Revisão iniciada', async ({request}) => {
+        // Criar processo mapeamento finalizado (gera mapa vigente)
+        await criarProcessoFinalizadoFixture(request, {
             unidade: UNIDADE_ALVO,
-            expandir: ['SECRETARIA_2', 'COORD_22']
+            descricao: `Base Map 10 ${timestamp}`
         });
 
-        const linhaProcessoMap = page.getByTestId('tbl-processos').locator('tr').filter({has: page.getByText(descProcessoMapeamento)});
-        await linhaProcessoMap.click();
-
-        await page.getByTestId('btn-processo-iniciar').click();
-        await page.getByTestId('btn-iniciar-processo-confirmar').click();
-        await verificarPaginaPainel(page);
-
-        // Chefe adiciona atividades e disponibiliza cadastro
-        await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
-        await acessarSubprocessoChefeDireto(page, descProcessoMapeamento, UNIDADE_ALVO);
-        await navegarParaAtividades(page);
-        await adicionarAtividade(page, `Atividade Mapeamento 1 ${timestamp}`);
-        await adicionarConhecimento(page, `Atividade Mapeamento 1 ${timestamp}`, 'Conhecimento 1');
-        await adicionarAtividade(page, `Atividade Mapeamento 2 ${timestamp}`);
-        await adicionarConhecimento(page, `Atividade Mapeamento 2 ${timestamp}`, 'Conhecimento 2');
-        await page.getByTestId('btn-cad-atividades-disponibilizar').click();
-        await page.getByTestId('btn-confirmar-disponibilizacao').click();
-        await verificarPaginaPainel(page);
-
-        // Aceites intermediários para Cadastro
-        await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
-        await acessarSubprocessoGestor(page, descProcessoMapeamento, UNIDADE_ALVO);
-        await navegarParaAtividadesVisualizacao(page);
-        await aceitarCadastroMapeamento(page, 'Aceite intermediário COORD_22');
-        await fazerLogout(page);
-
-        await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
-        await acessarSubprocessoGestor(page, descProcessoMapeamento, UNIDADE_ALVO);
-        await navegarParaAtividadesVisualizacao(page);
-        await aceitarCadastroMapeamento(page, 'Aceite intermediário SECRETARIA_2');
-        await fazerLogout(page);
-
-        // Admin homologa cadastro
-        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
-        await page.getByTestId('tbl-processos').getByText(descProcessoMapeamento).first().click();
-        await navegarParaSubprocesso(page, UNIDADE_ALVO);
-        await navegarParaAtividadesVisualizacao(page);
-        await homologarCadastroMapeamento(page);
-
-        // Admin adiciona competências e disponibiliza mapa
-        await navegarParaMapa(page);
-        await criarCompetencia(page, `Competência Mapeamento 1 ${timestamp}`, [`Atividade Mapeamento 1 ${timestamp}`]);
-        await criarCompetencia(page, `Competência Mapeamento 2 ${timestamp}`, [`Atividade Mapeamento 2 ${timestamp}`]);
-
-        await limparNotificacoes(page);
-        await page.getByTestId('btn-cad-mapa-disponibilizar').click();
-        const modal = page.getByTestId('mdl-disponibilizar-mapa');
-        await expect(modal).toBeVisible();
-        await page.getByTestId('inp-disponibilizar-mapa-data').fill('2030-12-31');
-        await page.getByTestId('btn-disponibilizar-mapa-confirmar').click();
-        await verificarPaginaPainel(page);
-
-        // Chefe valida mapa
-        await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
-        await acessarSubprocessoChefeDireto(page, descProcessoMapeamento, UNIDADE_ALVO);
-        await navegarParaMapa(page);
-        await page.getByTestId('btn-mapa-validar').click();
-        await page.getByTestId('btn-validar-mapa-confirmar').click();
-        await fazerLogout(page);
-
-        // Aceites intermediários para Mapa
-        await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
-        await acessarSubprocessoGestor(page, descProcessoMapeamento, UNIDADE_ALVO);
-        await navegarParaMapa(page);
-        await page.getByTestId('btn-mapa-homologar-aceite').click();
-        await page.getByTestId('btn-aceite-mapa-confirmar').click();
-        await fazerLogout(page);
-
-        await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
-        await acessarSubprocessoGestor(page, descProcessoMapeamento, UNIDADE_ALVO);
-        await navegarParaMapa(page);
-        await page.getByTestId('btn-mapa-homologar-aceite').click();
-        await page.getByTestId('btn-aceite-mapa-confirmar').click();
-        await fazerLogout(page);
-
-        // Admin homologa mapa e finaliza processo
-        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
-        await acessarSubprocessoAdmin(page, descProcessoMapeamento, UNIDADE_ALVO);
-        await navegarParaMapa(page);
-        await page.getByTestId('btn-mapa-homologar-aceite').click();
-        await page.getByTestId('btn-aceite-mapa-confirmar').click();
-        await verificarPaginaPainel(page);
-        await page.getByTestId('tbl-processos').getByText(descProcessoMapeamento).first().click();
-        await page.getByTestId('btn-processo-finalizar').click();
-        await page.getByTestId('btn-finalizar-processo-confirmar').click();
-        await verificarPaginaPainel(page);
-
-        // Admin cria e inicia processo de revisão
-        await criarProcesso(page, {
+        // Criar processo de revisão
+        await criarProcessoFixture(request, {
             descricao: descProcessoRevisao,
             tipo: 'REVISAO',
-            diasLimite: 30,
             unidade: UNIDADE_ALVO,
-            expandir: ['SECRETARIA_2', 'COORD_22']
+            iniciar: true
         });
-        const linhaProcessoRev = page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descProcessoRevisao)});
-        await linhaProcessoRev.click();
-        await page.getByTestId('btn-processo-iniciar').click();
-        await page.getByTestId('btn-iniciar-processo-confirmar').click();
-        await verificarPaginaPainel(page);
+    });
 
+    test('1.1. Preparação: Chefe revisa atividades', async ({page}) => {
         // Chefe revisa atividades (muda situação para EM_ANDAMENTO)
         await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
         await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);

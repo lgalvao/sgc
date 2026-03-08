@@ -1,5 +1,5 @@
-import { describe, it, expect, vi } from 'vitest';
-import { gerarCSV, downloadCSV } from '../csv';
+import {describe, expect, it, vi} from 'vitest';
+import {downloadCSV, gerarCSV} from '../csv';
 
 describe('csv utils', () => {
   describe('gerarCSV', () => {

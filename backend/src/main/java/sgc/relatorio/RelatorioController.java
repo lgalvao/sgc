@@ -9,7 +9,7 @@ import org.springframework.security.access.prepost.*;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.*;
-import java.util.List;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/relatorios")

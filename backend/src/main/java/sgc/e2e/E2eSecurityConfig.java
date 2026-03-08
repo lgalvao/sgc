@@ -1,7 +1,7 @@
 package sgc.e2e;
 
-import org.springframework.context.annotation.*;
 import org.springframework.beans.factory.annotation.*;
+import org.springframework.context.annotation.*;
 import org.springframework.http.*;
 import org.springframework.security.access.expression.method.*;
 import org.springframework.security.config.annotation.method.configuration.*;

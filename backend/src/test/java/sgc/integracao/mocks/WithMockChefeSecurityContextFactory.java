@@ -21,7 +21,7 @@ public class WithMockChefeSecurityContextFactory
     private UsuarioPerfilRepo usuarioPerfilRepo;
 
     @Override
-    public @Nullable SecurityContext createSecurityContext(@NonNull WithMockChefe annotation) {
+    public SecurityContext createSecurityContext(@NonNull WithMockChefe annotation) {
         String titulo = annotation.value();
         Usuario usuario = usuarioRepo.findById(titulo)
                 .orElseThrow(() -> new IllegalStateException("Usuário não encontrado no data.sql: " + titulo));

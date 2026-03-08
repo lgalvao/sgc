@@ -37,10 +37,6 @@ class ImpactoMapaServiceTest {
     @InjectMocks
     private ImpactoMapaService impactoMapaService;
 
-    @BeforeEach
-    void setUp() {
-    }
-
     @Test
     @DisplayName("verificarImpactos - deve lancar ErroAcessoNegado quando nao tiver permissao")
     void verificarImpactosDeveLancarErroAcessoNegado() {

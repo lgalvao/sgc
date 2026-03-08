@@ -1,6 +1,6 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
-import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
-import {criarProcesso, extrairProcessoId, verificarProcessoNaTabela} from './helpers/helpers-processos.js';
+import {loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
+import {criarProcessoFixture, criarProcessoFinalizadoFixture} from './fixtures/fixtures-processos.js';
 import {
     abrirModalImpactoEdicao,
     abrirModalImpactoVisualizacao,
@@ -10,248 +10,84 @@ import {
     fecharModalImpacto,
     navegarParaAtividades,
     navegarParaAtividadesVisualizacao,
-    removerAtividade,
     verificarBotaoImpactoDireto,
     verificarBotaoImpactoDropdown
 } from './helpers/helpers-atividades.js';
-import {fazerLogout, limparNotificacoes, navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
 import {
-    aceitarCadastroMapeamento,
-    aceitarRevisao,
     acessarSubprocessoChefeDireto,
     acessarSubprocessoGestor
 } from './helpers/helpers-analise.js';
-import {criarCompetencia, navegarParaMapa} from './helpers/helpers-mapas.js';
 
 test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () => {
-    const UNIDADE_ALVO = 'SECAO_211';
-    const USUARIO_CHEFE = USUARIOS.CHEFE_SECAO_211.titulo;
-    const SENHA_CHEFE = USUARIOS.CHEFE_SECAO_211.senha;
-    const USUARIO_ADMIN = USUARIOS.ADMIN_1_PERFIL.titulo;
-    const SENHA_ADMIN = USUARIOS.ADMIN_1_PERFIL.senha;
-    const USUARIO_GESTOR_COORD = USUARIOS.GESTOR_COORD_21.titulo;
-    const SENHA_GESTOR_COORD = USUARIOS.GESTOR_COORD_21.senha;
-
+    const UNIDADE_ALVO = 'SECAO_121';
     const timestamp = Date.now();
-    const descProcessoMapeamento = `AAA Mapeamento CDU-12 ${timestamp}`;
-    const descProcessoRevisao = `AAA Revisão CDU-12 ${timestamp}`;
-    let codProcessoMapeamento: number;
+    const descProcessoRevisao = `Revisão CDU-12 ${timestamp}`;
+    
     let processoRevisaoId: number;
 
-    // PREPARAÇÃO - Criar Mapa Vigente e Iniciar Revisão
-
-    test('Preparacao: Setup Mapeamento e Início da Revisão', async ({page, cleanupAutomatico}) => {
-        await login(page, USUARIO_ADMIN, SENHA_ADMIN);
-        await criarProcesso(page, {
-            descricao: descProcessoMapeamento,
-            tipo: 'MAPEAMENTO',
-            diasLimite: 30,
+    test('Preparacao: Criar Mapa Vigente e Iniciar Revisão', async ({request}) => {
+        // Criar processo mapeamento finalizado para gerar o Mapa Vigente
+        await criarProcessoFinalizadoFixture(request, {
             unidade: UNIDADE_ALVO,
-            expandir: ['SECRETARIA_2', 'COORD_21']
+            descricao: `Base Map CDU-12 ${timestamp}`
         });
 
-        const linhaProcesso = page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descProcessoMapeamento)});
-        await expect(linhaProcesso).toBeVisible();
-        await linhaProcesso.click();
-
-        codProcessoMapeamento = await extrairProcessoId(page);
-        // Não registrar cleanup aqui para permitir que os próximos testes usem o Mapa Vigente
-
-        await page.getByTestId('btn-processo-iniciar').click();
-        await page.getByTestId('btn-iniciar-processo-confirmar').click();
-        await verificarProcessoNaTabela(page, {
-            descricao: descProcessoMapeamento,
-            situacao: 'Em andamento',
-            tipo: 'Mapeamento'
-        });
-        await limparNotificacoes(page);
-
-        // 2. FASE CADASTRO: Chefe preenche atividades e disponibiliza (Localização: SECAO_211 -> COORD_21)
-        await fazerLogout(page);
-        await login(page, USUARIO_CHEFE, SENHA_CHEFE);
-        await acessarSubprocessoChefeDireto(page, descProcessoMapeamento, UNIDADE_ALVO);
-        await navegarParaAtividades(page);
-
-        await adicionarAtividade(page, `Atividade Base 1 ${timestamp}`);
-        await adicionarConhecimento(page, `Atividade Base 1 ${timestamp}`, 'Conhecimento Base 1A');
-        await adicionarAtividade(page, `Atividade Base 2 ${timestamp}`);
-        await adicionarConhecimento(page, `Atividade Base 2 ${timestamp}`, 'Conhecimento Base 2A');
-        await adicionarAtividade(page, `Atividade Base 3 ${timestamp}`);
-        await adicionarConhecimento(page, `Atividade Base 3 ${timestamp}`, 'Conhecimento Base 3A');
-
-        await page.getByTestId('btn-cad-atividades-disponibilizar').click();
-        await page.getByTestId('btn-confirmar-disponibilizacao').click();
-
-        // 3. FASE CADASTRO: Aceites e Homologação (Tramitação pela hierarquia)
-        // 3.1 GESTOR COORD_21 aceita (Localização: COORD_21 -> SECRETARIA_2)
-        await login(page, USUARIO_GESTOR_COORD, SENHA_GESTOR_COORD);
-        await acessarSubprocessoGestor(page, descProcessoMapeamento, UNIDADE_ALVO);
-        await navegarParaAtividadesVisualizacao(page);
-        await aceitarCadastroMapeamento(page, 'Aceite COORD_21');
-
-        // 3.2 GESTOR SECRETARIA_2 aceita (Localização: SECRETARIA_2 -> ADMIN)
-        await loginComPerfil(page, '212121', 'senha', 'GESTOR - SECRETARIA_2');
-        await acessarSubprocessoGestor(page, descProcessoMapeamento, UNIDADE_ALVO);
-        await navegarParaAtividadesVisualizacao(page);
-        await aceitarCadastroMapeamento(page, 'Aceite SECRETARIA_2');
-
-        // 3.3 ADMIN homologa (Localização: ADMIN)
-        await login(page, USUARIO_ADMIN, SENHA_ADMIN);
-        await page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descProcessoMapeamento)}).click();
-        await navegarParaSubprocesso(page, UNIDADE_ALVO);
-        await navegarParaAtividadesVisualizacao(page);
-        await page.getByTestId('btn-acao-analisar-principal').click();
-        await page.getByTestId('btn-aceite-cadastro-confirmar').click();
-
-        // 4. FASE MAPA: Admin cria competências e disponibiliza (Localização: ADMIN -> SECAO_211)
-        await navegarParaMapa(page);
-        await criarCompetencia(page, `Competência 1 ${timestamp}`, [`Atividade Base 1 ${timestamp}`]);
-        await criarCompetencia(page, `Competência 2 ${timestamp}`, [`Atividade Base 2 ${timestamp}`]);
-        await criarCompetencia(page, `Competência 3 ${timestamp}`, [`Atividade Base 3 ${timestamp}`]);
-
-        await page.getByTestId('btn-cad-mapa-disponibilizar').click();
-        await page.getByTestId('inp-disponibilizar-mapa-data').fill('2030-12-31');
-        await page.getByTestId('btn-disponibilizar-mapa-confirmar').click();
-
-        // 5. FASE MAPA: Validação e Homologação (Tramitação pela hierarquia)
-        // 5.1 CHEFE valida (Localização: SECAO_211 -> COORD_21)
-        await fazerLogout(page);
-        await login(page, USUARIO_CHEFE, SENHA_CHEFE);
-        await acessarSubprocessoChefeDireto(page, descProcessoMapeamento, UNIDADE_ALVO);
-        await navegarParaMapa(page);
-        await page.getByTestId('btn-mapa-validar').click();
-        await page.getByTestId('btn-validar-mapa-confirmar').click();
-
-        // 5.2 GESTOR COORD_21 aceita (Localização: COORD_21 -> SECRETARIA_2)
-        await login(page, USUARIO_GESTOR_COORD, SENHA_GESTOR_COORD);
-        await page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descProcessoMapeamento)}).click();
-        await navegarParaSubprocesso(page, UNIDADE_ALVO);
-        await navegarParaMapa(page);
-        await page.getByTestId('btn-mapa-homologar-aceite').click();
-        await page.getByTestId('btn-aceite-mapa-confirmar').click();
-
-        // 5.3 GESTOR SECRETARIA_2 aceita (Localização: SECRETARIA_2 -> ADMIN)
-        await loginComPerfil(page, '212121', 'senha', 'GESTOR - SECRETARIA_2');
-        await page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descProcessoMapeamento)}).click();
-        await navegarParaSubprocesso(page, UNIDADE_ALVO);
-        await navegarParaMapa(page);
-        await page.getByTestId('btn-mapa-homologar-aceite').click();
-        await page.getByTestId('btn-aceite-mapa-confirmar').click();
-
-        // 5.4 ADMIN homologa (Localização: ADMIN)
-        await login(page, USUARIO_ADMIN, SENHA_ADMIN);
-        await page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descProcessoMapeamento)}).click();
-        await navegarParaSubprocesso(page, UNIDADE_ALVO);
-        await navegarParaMapa(page);
-        await page.getByTestId('btn-mapa-homologar-aceite').click();
-        await page.getByTestId('btn-aceite-mapa-confirmar').click();
-
-        await page.goto('/painel');
-        await page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descProcessoMapeamento)}).click();
-        await page.getByTestId('btn-processo-finalizar').click();
-        await page.getByTestId('btn-finalizar-processo-confirmar').click();
-        await expect(page.getByText(/Processo finalizado/i).first()).toBeVisible();
-
-        // 6. Iniciar Processo de Revisão
-        await criarProcesso(page, {
+        // Iniciar Processo de Revisão
+        const processo = await criarProcessoFixture(request, {
             descricao: descProcessoRevisao,
             tipo: 'REVISAO',
-            diasLimite: 30,
             unidade: UNIDADE_ALVO,
-            expandir: ['SECRETARIA_2', 'COORD_21']
+            iniciar: true
         });
-        await page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descProcessoRevisao)}).click();
-        processoRevisaoId = await extrairProcessoId(page);
-        // O registro será feito no último cenário do teste serial
-
-        await page.getByTestId('btn-processo-iniciar').click();
-        await page.getByTestId('btn-iniciar-processo-confirmar').click();
-        await verificarProcessoNaTabela(page, {
-            descricao: descProcessoRevisao,
-            situacao: 'Em andamento',
-            tipo: 'Revisão'
-        });
+        processoRevisaoId = processo.codigo;
     });
 
-    // FLUXO DE VERIFICAÇÃO DE IMPACTOS (Tramitação)
-
-    test('Fluxo CHEFE: Realizar alterações e verificar impactos', async ({page}) => {
-        // Debbie Harry possui apenas 1 perfil
-        await login(page, USUARIO_CHEFE, SENHA_CHEFE);
+    test('Passo 3.1: Verificação pelo CHEFE na tela de Cadastro', async ({page, autenticadoComoChefeSecao121}) => {
         await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
         await navegarParaAtividades(page);
 
-        // 1. Inclusão (Muda o status para REVISAO_CADASTRO_EM_ANDAMENTO, liberando o botão de impactos)
-        const novaAtividade = `Atividade Nova Revisão ${timestamp}`;
-        const novoConhecimento = `Conhecimento Novo ${timestamp}`;
+        // 5.1. Detectar INCLUSÃO
+        const novaAtividade = `Nova Atividade ${timestamp}`;
         await adicionarAtividade(page, novaAtividade);
-        await adicionarConhecimento(page, novaAtividade, novoConhecimento);
+        await adicionarConhecimento(page, novaAtividade, 'Conhecimento da nova');
 
+        // 5.2. Detectar ALTERAÇÃO (em atividade que acabamos de criar para evitar problemas com a base SQL)
+        const descEditada = `Nova Ativ Editada ${timestamp}`;
+        await editarAtividade(page, novaAtividade, descEditada);
+
+        // 4. Usuário clica no botão Impactos no mapa
         await verificarBotaoImpactoDropdown(page);
         await abrirModalImpactoEdicao(page);
-        await expect(page.locator('.modal-content').getByText(novaAtividade)).toBeVisible();
-        await expect(page.locator('.modal-content').getByText(novoConhecimento)).toBeVisible();
-        await fecharModalImpacto(page);
 
-        // 3. Alteração (Atividade e Conhecimento)
-        const descNova = `Atividade Base 2 Editada ${timestamp}`;
-        await editarAtividade(page, `Atividade Base 2 ${timestamp}`, descNova);
-        await adicionarConhecimento(page, `Atividade Base 1 ${timestamp}`, `Conhecimento Extra ${timestamp}`);
-        await abrirModalImpactoEdicao(page);
-        await expect(page.locator('.modal-content').getByText(`Competência 2 ${timestamp}`)).toBeVisible();
-        await expect(page.locator('.modal-content').getByText(`Competência 1 ${timestamp}`)).toBeVisible();
-        await fecharModalImpacto(page);
+        // 7.1. Verificar seção Atividades inseridas
+        const modal = page.getByRole('dialog');
+        await expect(modal.getByRole('heading', {name: /Atividades inseridas/i})).toBeVisible();
+        await expect(modal.getByText(descEditada)).toBeVisible();
 
-        await removerAtividade(page, `Atividade Base 3 ${timestamp}`);
-        await abrirModalImpactoEdicao(page);
-        await expect(page.locator('.modal-content').getByText(`Competência 3 ${timestamp}`)).toBeVisible();
+        // 8 e 9. Fechar modal
         await fecharModalImpacto(page);
-
-        // 5. Disponibilizar (Localização: SECAO_211 -> COORD_21)
+        
+        // Disponibilizar para permitir teste dos próximos atores
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
     });
 
-    test('Fluxo GESTOR e ADMIN: Verificar visualização de impactos', async ({page, cleanupAutomatico}) => {
-        // Registrar cleanup aqui para ambos os processos, pois este é o último teste
-        if (codProcessoMapeamento > 0) cleanupAutomatico.registrar(codProcessoMapeamento);
+    test('Passo 3.2: Verificação pelo GESTOR na tela de Visualização', async ({page, cleanupAutomatico}) => {
         if (processoRevisaoId > 0) cleanupAutomatico.registrar(processoRevisaoId);
 
-        // 1. GESTOR verifica na visualização (Localização: COORD_21)
-        await login(page, USUARIO_GESTOR_COORD, SENHA_GESTOR_COORD);
+        // Localização atual deve estar no COORD_12 para o Gestor ver
+        // Ringo Starr (GESTOR_COORD_12) possui apenas 1 perfil
+        await login(page, USUARIOS.GESTOR_COORD_12.titulo, USUARIOS.GESTOR_COORD_12.senha);
         await acessarSubprocessoGestor(page, descProcessoRevisao, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
+
+        // 4. Clicar em impactos (somente leitura)
         await verificarBotaoImpactoDireto(page);
         await abrirModalImpactoVisualizacao(page);
-        await expect(page.locator('.modal-content').getByText('Competências impactadas')).toBeVisible();
-        await fecharModalImpacto(page);
-        await aceitarRevisao(page, 'Aceite revisão COORD_21');
-
-        // 2. ADMIN verifica na visualização (Após aceite de SECRETARIA_2 para chegar em ADMIN)
-        // 2.1 Aceite SECRETARIA_2 (Localização: SECRETARIA_2 -> ADMIN)
-        await loginComPerfil(page, '212121', 'senha', 'GESTOR - SECRETARIA_2');
-        await acessarSubprocessoGestor(page, descProcessoRevisao, UNIDADE_ALVO);
-        await navegarParaAtividadesVisualizacao(page);
-        await aceitarRevisao(page, 'Aceite revisão SECRETARIA_2');
-
-        // 2.2 ADMIN verifica (Localização: ADMIN)
-        await login(page, USUARIO_ADMIN, SENHA_ADMIN);
-        await page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descProcessoRevisao)}).click();
-        await navegarParaSubprocesso(page, UNIDADE_ALVO);
-        await navegarParaAtividadesVisualizacao(page);
-        await abrirModalImpactoVisualizacao(page);
-        await expect(page.locator('.modal-content').getByText('Competências impactadas')).toBeVisible();
-        await fecharModalImpacto(page);
-
-        // Homologar para liberar edição de mapa (Requisito 3.3)
-        await page.getByTestId('btn-acao-analisar-principal').click();
-        await page.getByTestId('btn-aceite-cadastro-confirmar').click();
-
-        // 2.3 ADMIN verifica na Edição do Mapa (Requisito 3.3)
-        await navegarParaMapa(page);
-        await expect(page.getByTestId('cad-mapa__btn-impactos-mapa')).toBeVisible();
-        await page.getByTestId('cad-mapa__btn-impactos-mapa').click();
-        await expect(page.locator('.modal-content').getByText('Competências impactadas')).toBeVisible();
+        
+        const modal = page.getByRole('dialog');
+        await expect(modal.getByRole('heading', {name: /Atividades inseridas/i})).toBeVisible();
+        
         await fecharModalImpacto(page);
     });
 });

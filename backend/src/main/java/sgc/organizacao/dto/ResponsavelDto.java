@@ -1,8 +1,9 @@
 package sgc.organizacao.dto;
 
-import lombok.Builder;
-import sgc.organizacao.model.Usuario;
-import java.time.LocalDateTime;
+import lombok.*;
+import sgc.organizacao.model.*;
+
+import java.time.*;
 
 @Builder
 public record ResponsavelDto(

@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest';
-import { render } from '@testing-library/vue';
-import { run } from 'axe-core';
+import {describe, expect, it} from 'vitest';
+import {render} from '@testing-library/vue';
+import {run} from 'axe-core';
 import AppAlert from './AppAlert.vue';
 
 describe('AppAlert A11y', () => {

@@ -71,7 +71,7 @@ public class ProcessoWorkflowService {
         Set<Unidade> unidadesParaProcessar;
 
         if (tipo == TipoProcesso.REVISAO) {
-            if (codsUnidadesParam == null || codsUnidadesParam.isEmpty()) {
+            if (codsUnidadesParam.isEmpty()) {
                 throw new ErroValidacao("A lista de unidades é obrigatória para iniciar o processo de revisão.");
             }
             codigosUnidades = codsUnidadesParam;

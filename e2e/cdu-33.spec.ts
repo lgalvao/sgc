@@ -1,7 +1,10 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
-import {criarProcessoMapaHomologadoFixture, criarProcessoRevisaoMapaHomologadoFixture} from './fixtures/fixtures-processos.js';
+import {
+    criarProcessoMapaHomologadoFixture,
+    criarProcessoRevisaoMapaHomologadoFixture
+} from './fixtures/fixtures-processos.js';
 import {verificarPaginaPainel} from './helpers/helpers-navegacao.js';
-import {USUARIOS, login} from './helpers/helpers-auth.js';
+import {login, USUARIOS} from './helpers/helpers-auth.js';
 
 /**
  * CDU-33 - Reabrir revisão de cadastro

@@ -88,14 +88,14 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, ref } from "vue";
-import { BButton, BCard, BCol, BFormGroup, BFormSelect, BRow, BSpinner, BTable, BTabs, BTab } from "bootstrap-vue-next";
+import {computed, onMounted, ref} from "vue";
+import {BButton, BCard, BCol, BFormGroup, BFormSelect, BRow, BSpinner, BTab, BTable, BTabs} from "bootstrap-vue-next";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
-import { useProcessosStore } from "@/stores/processos";
-import { useNotification } from "@/composables/useNotification";
-import { useRelatorios } from "@/composables/api/useRelatorios";
+import {useProcessosStore} from "@/stores/processos";
+import {useNotification} from "@/composables/useNotification";
+import {useRelatorios} from "@/composables/api/useRelatorios";
 
 const processosStore = useProcessosStore();
 const { notify } = useNotification();

@@ -1,15 +1,15 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { 
-  buscarTodasUnidades, 
-  buscarUnidadePorSigla, 
-  buscarUnidadePorCodigo, 
-  buscarArvoreComElegibilidade,
-  buscarArvoreUnidade,
-  buscarSubordinadas,
-  buscarSuperior,
-  mapUnidadeSnapshot,
-  mapUnidade,
-  mapUnidadesArray
+import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {
+    buscarArvoreComElegibilidade,
+    buscarArvoreUnidade,
+    buscarSubordinadas,
+    buscarSuperior,
+    buscarTodasUnidades,
+    buscarUnidadePorCodigo,
+    buscarUnidadePorSigla,
+    mapUnidade,
+    mapUnidadesArray,
+    mapUnidadeSnapshot
 } from '../unidadeService';
 import * as apiUtils from '@/utils/apiUtils';
 

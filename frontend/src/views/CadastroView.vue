@@ -185,13 +185,13 @@ import {useToastStore} from "@/stores/toast";
 import {usePerfil} from "@/composables/usePerfil";
 import {useAcesso} from "@/composables/useAcesso";
 import {
-  SituacaoSubprocesso,
-  TipoProcesso,
-  type Atividade,
   type AnaliseCadastro,
+  type Atividade,
   type Conhecimento,
   type CriarConhecimentoRequest,
   type ErroValidacao,
+  SituacaoSubprocesso,
+  TipoProcesso,
   type Unidade
 } from "@/types/tipos";
 import logger from "@/utils/logger";

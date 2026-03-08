@@ -11,8 +11,8 @@ class ClassMetrics {
     constructor(data) {
         this.package = data.PACKAGE;
         this.name = data.CLASS;
-        this.instructionsCovered = Number.parseInt(data.INSTRUCTION_COVERED || 0, 10);
-        this.instructionsMissed = Number.parseInt(data.INSTRUCTION_MISSED || 0, 10);
+
+
         this.branchesCovered = Number.parseInt(data.BRANCH_COVERED || 0, 10);
         this.branchesMissed = Number.parseInt(data.BRANCH_MISSED || 0, 10);
         this.linesCovered = Number.parseInt(data.LINE_COVERED || 0, 10);

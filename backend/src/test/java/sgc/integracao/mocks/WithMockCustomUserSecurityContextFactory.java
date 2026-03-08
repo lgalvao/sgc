@@ -20,7 +20,7 @@ public class WithMockCustomUserSecurityContextFactory
     private UsuarioRepo usuarioRepo;
 
     @Override
-    public @Nullable SecurityContext createSecurityContext(@NonNull WithMockCustomUser customUser) {
+    public SecurityContext createSecurityContext(@NonNull WithMockCustomUser customUser) {
         String titulo = customUser.tituloEleitoral();
         Usuario principal = usuarioRepo.findById(titulo)
                 .orElseThrow(() -> new IllegalStateException("Usuário não encontrado no data.sql: " + titulo));

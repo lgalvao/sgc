@@ -59,7 +59,7 @@ export default [
     },
     // Exceções para o arquivo de captura de telas e smoke tests
     {
-        files: ["e2e/captura-telas.spec.ts", "e2e/smoke.spec.ts"],
+        files: ["e2e/captura.spec.ts", "e2e/smoke.spec.ts"],
         rules: {
             "playwright/no-wait-for-timeout": "off",
             "playwright/no-conditional-in-test": "off",

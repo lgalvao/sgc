@@ -2,13 +2,22 @@ import {expect, test} from './fixtures/complete-fixtures.js';
 import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
 import {
     criarProcesso,
+    extrairProcessoId,
     verificarDetalhesProcesso,
-    verificarUnidadeParticipante,
-    extrairProcessoId
+    verificarUnidadeParticipante
 } from './helpers/helpers-processos.js';
-import {adicionarAtividade, adicionarConhecimento, disponibilizarCadastro, navegarParaAtividades} from './helpers/helpers-atividades.js';
+import {
+    adicionarAtividade,
+    adicionarConhecimento,
+    disponibilizarCadastro,
+    navegarParaAtividades
+} from './helpers/helpers-atividades.js';
 import {acessarSubprocessoChefeDireto} from './helpers/helpers-analise.js';
-import {verificarPaginaPainel, navegarParaSubprocesso, esperarPaginaDetalhesProcesso} from './helpers/helpers-navegacao.js';
+import {
+    esperarPaginaDetalhesProcesso,
+    navegarParaSubprocesso,
+    verificarPaginaPainel
+} from './helpers/helpers-navegacao.js';
 
 test.describe('CDU-06 - Detalhar processo', () => {
     const UNIDADE_ALVO = 'ASSESSORIA_12';

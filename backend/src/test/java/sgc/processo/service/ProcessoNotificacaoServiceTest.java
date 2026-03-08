@@ -61,10 +61,6 @@ class ProcessoNotificacaoServiceTest {
         return p;
     }
 
-    @BeforeEach
-    void setUp() {
-    }
-
     private void mockUnidadeServiceBasico() {
         when(unidadeService.buscarPorId(anyLong())).thenAnswer(invocation -> {
             Long cod = invocation.getArgument(0);

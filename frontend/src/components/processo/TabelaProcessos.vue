@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import {BButton, BTable, BBadge} from "bootstrap-vue-next";
+import {BBadge, BButton, BTable} from "bootstrap-vue-next";
 import {computed} from "vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
-import {SituacaoProcesso, type ProcessoResumo} from "@/types/tipos";
+import {type ProcessoResumo, SituacaoProcesso} from "@/types/tipos";
 import {formatDate, formatSituacaoProcesso, formatTipoProcesso} from "@/utils/formatters";
 
 function getBadgeVariant(situacao: SituacaoProcesso | string) {

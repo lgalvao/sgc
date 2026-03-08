@@ -1,5 +1,5 @@
-import { describe, it, expect, vi } from 'vitest';
-import { apiGet, apiPost } from '../apiUtils';
+import {describe, expect, it, vi} from 'vitest';
+import {apiGet, apiPost} from '../apiUtils';
 import apiClient from '@/axios-setup';
 
 vi.mock('@/axios-setup', () => ({

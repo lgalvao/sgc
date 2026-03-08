@@ -88,6 +88,7 @@ import {computed, onMounted, onUnmounted, ref} from "vue";
 import {useRouter} from "vue-router";
 import {usePerfil} from "@/composables/usePerfil";
 import {usePerfilStore} from "@/stores/perfil";
+
 const router = useRouter();
 const perfilStore = usePerfilStore();
 

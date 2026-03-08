@@ -159,11 +159,11 @@ import {useSubprocessosStore} from "@/stores/subprocessos";
 import type {
   AceitarCadastroRequest,
   AnaliseCadastro,
+  Atividade,
   DevolverCadastroRequest,
   HomologarCadastroRequest,
   Unidade,
-  UnidadeParticipante,
-  Atividade
+  UnidadeParticipante
 } from "@/types/tipos";
 import {TipoProcesso} from "@/types/tipos";
 import {useAcesso} from "@/composables/useAcesso";

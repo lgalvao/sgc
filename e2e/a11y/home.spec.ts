@@ -1,5 +1,5 @@
-import { test, expect } from '../fixtures/a11y.js';
-import { login, USUARIOS } from '../helpers/helpers-auth.js';
+import {expect, test} from '../fixtures/a11y.js';
+import {login, USUARIOS} from '../helpers/helpers-auth.js';
 
 test.describe('Accessibility Checks (WCAG)', () => {
 

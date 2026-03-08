@@ -31,13 +31,13 @@ Os testes que falharem geram arquivos `error-context.md`, com a situacao da tela
 - **Banco por worker não implica múltiplos `seed.sql`**: O `seed.sql` é único. O que muda é a instância do banco em memória por worker, não o conteúdo do seed.
 - **Não tente provar escalabilidade por intuição**: Se `2 workers` funcionam, isso sugere que `4` podem funcionar, mas não prova. Gargalos de bootstrap, portas, arquivos temporários e serviços compartilhados só aparecem quando testados.
 
-## Fixtures e preparação de estado
+## Fixtures e preparação de estado (State-Jumping)
 
-- **Prefira fixtures de backend para preparar estados profundos**: Se o teste precisa chegar a `MAPA_DISPONIBILIZADO`, `MAPA_VALIDADO` ou outro estado tardio apenas para capturar uma tela, use endpoint E2E/fixure em vez de montar todo o workflow pela UI.
+- **Prefira fixtures de backend para preparar estados profundos**: Se o teste precisa chegar a `MAPA_DISPONIBILIZADO`, `MAPA_VALIDADO` ou outro estado tardio apenas para capturar uma tela, use endpoint E2E/fixure (via `E2eController`) em vez de montar todo o workflow pela UI. Isso é o conceito de **State-Jumping**.
 - **Fixtures devem reduzir custo estrutural, não esconder comportamento**: Use fixture para pular preparo repetitivo. A ação que está sendo validada no teste deve continuar sendo exercitada pela UI.
 - **Fixtures devem retornar o código do processo**: Isso permite navegar direto para `/processo/{codigo}` ou `/processo/{codigo}/{sigla}` sem depender da listagem do painel.
 - **Quando a listagem não é o alvo do teste, não dependa dela**: Em cenários preparados por fixture, navegar diretamente pela URL do subprocesso é mais estável e mais rápido do que localizar a linha da tabela.
-- **Processo de revisão exige mapa vigente real da unidade**: Para fixtures de revisão/diagnóstico, não basta colocar o subprocesso em uma situação avançada. Se a regra de negócio exigir `mapa vigente`, a preparação precisa materializar esse estado da mesma forma que a aplicação faz em produção.
+- **Processo de revisão exige mapa vigente real da unidade**: Para fixtures de revisão/diagnóstico, não basta colocar o subprocesso em uma situação avançada. Se a regra de negócio exigir `mapa vigente`, a preparação precisa materializar esse estado (processo anterior finalizado) da mesma forma que a aplicação faz em produção.
 - **`MAPA_HOMOLOGADO` não equivale automaticamente a mapa vigente**: Em mapeamento, o mapa só passa a ser vigente de forma confiável após a finalização do processo anterior. Se a validação da revisão falhar com erro de `unidade sem mapa vigente`, investigue o estado de `unidade_mapa`, não timing.
 - **Quando o estado alvo é terminal, prefira endpoint dedicado**: Se o objetivo do teste é validar uma ação final, como reabertura ou permissão liberada apenas após homologação final, crie uma fixture específica para esse estado em vez de encadear vários passos de UI num `serial`.
 - **Toda nova fixture E2E deve nascer com teste de backend**: Ao adicionar endpoint de fixture, cubra-o em teste integrado do backend antes de confiar nele na suíte Playwright. Isso reduz depuração cruzada entre backend e E2E.
@@ -63,7 +63,7 @@ Os helpers estão organizados em arquivos especializados no diretório `e2e/help
 - ✅ USE `waitForURL()` para navegação (ou os helpers semânticos `esperarPagina...`)
 - ✅ USE `waitFor()` para elementos do DOM
 - ✅ USE `expect().toHaveURL()` para verificar navegação
-- ❌ NUNCA use `waitForTimeout()` em testes funcionais (permitido apenas em `captura-telas.spec.ts` para animações)
+- ❌ NUNCA use `waitForTimeout()` em testes funcionais (permitido apenas em `captura.spec.ts` para animações)
 - ❌ NÃO resolva tempo de execução alto com timeout maior. Se um teste isolado estoura `20s`, o normal é quebrá-lo em testes menores ou introduzir fixture de preparo.
 
 ## Antipadrões que devem ser evitados
@@ -88,6 +88,9 @@ Ao testar elementos que contêm texto, especialmente em tabelas ou listas de men
 - **Conheça o Componente antes de interagir**: Não assuma padrões de interação genéricos. 
     - Unidades e processos na árvore usam `TreeTable.vue` e exigem clique no botão de expansão (`btn-toggle-expand-...`).
     - Atividades e Conhecimentos usam cards (`AtividadeItem.vue`) que já exibem os dados aninhados. **Nao tente clicar em botões de expansão que não existem**.
+- **Seletores Escopados (Scoped & Semantic)**: Evite `page.getByText('SIGLA')` global se o texto aparecer em múltiplos lugares (breadcrumbs, menus, títulos).
+  - ✅ USE: `page.locator('.unidade-sigla').getByText(UNIDADE_ALVO)`
+  - ✅ USE: `page.locator('.header-context').getByText('Texto')`
 - **Evite Ambiguidade com Modais**: O Playwright falhará em modo estrito se `getByText('Rótulo')` encontrar tanto um botão quanto o título de um modal aberto. 
     - ✅ USE `getByRole('button', { name: 'Rótulo' })` para garantir que está interagindo com o botão e não com o título do modal (`heading`).
 - **Cuidado com Substrings**: Se uma mensagem ("Início do processo") é parte de outra ("Início do processo em unidade subordinada"), use filtros combinados para diferenciar:
@@ -98,21 +101,24 @@ Ao testar elementos que contêm texto, especialmente em tabelas ou listas de men
   ).toBeVisible();
   ```
 - **Atenção a Textos Ocultos (Accessibility)**: Alguns componentes injetam texto para leitores de tela. Prefira regex ou filtros de conteúdo em vez de matchers exatos (`exact: true`) em células complexas.
-- **Helpers de Navegação Semântica**: Evite repetir expressões regulares de URL nos testes. Use e mantenha os helpers em `helpers-navegacao.ts` (ex: `esperarPaginaDetalhesProcesso(page, id)`).
-- **Prefira papel e escopo semântico em modais**:
-  - Use `page.getByRole('dialog')` em vez de `.modal-content` quando possível.
-  - Ao buscar botões de modal, faça a busca dentro do dialog.
-- **Seletor por `data-testid` errado é defeito do teste, não de timing**:
-  - Exemplo prático: `sel-login-perfil` é o seletor correto; `sel-perfil` não é.
-  - Em formulários sem `data-testid`, use label real (`getByLabel(...)`) em vez de inventar um test id.
+- **Use `data-testid` oficial**: Consulte o componente Vue para usar o ID correto (ex: `inp-editar-atividade`, não `inp-editar-atividade-descricao`).
 
-## Nuances de Autenticação
+## Resiliência em Componentes Dinâmicos (Hover/Inline)
+
+Componentes como `InlineEditor` (usados em Atividades) dependem de estados transientes que podem ser instáveis em CI:
+
+- **Botoes que aparecem no Hover**: Use `click({ force: true })` para interagir com botões de edição/remoção que só aparecem visualmente via CSS `:hover`. O Playwright pode falhar ao tentar simular o mouse em ambiente headless.
+- **Transição de Estado de Edição**: Ao clicar para editar, a estrutura do DOM do card pode mudar. Busque o input resultante **globalmente na página** (`page.getByTestId('...')`) em vez de restringir a busca dentro do locator do card que disparou o evento.
+- **Aguarde a Visibilidade**: Sempre use `await input.waitFor({ state: 'visible' })` após o clique de edição antes de tentar preencher (`fill`).
+
+## Nuances de Autenticação e Jornada do Ator
 
 O comportamento do login varia conforme o tipo de unidade do usuário:
 
+- **Siga o Fluxo do Requisito Rigorosamente**: Se o CDU diz "O usuário clica no Painel", faça o teste clicar no Painel, mesmo que `page.goto()` seja mais rápido. Isso valida permissões e SPAs.
 - **Unidades Operacionais/Intermediárias**: Geralmente possuem apenas um perfil e o sistema loga diretamente (Use `login`).
 - **Unidades Interoperacionais**: Podem acumular perfis (ex: Chefe e Gestor), exigindo a escolha em um dropdown após a senha (Use `loginComPerfil`).
-- **Troca de Usuário em Testes Seriais**: Ao usar `test.describe.serial()`, o estado do navegador é mantido entre os cenários. Se o teste N+1 precisa de um usuário diferente do teste N, chame o helper `login` ou `loginComPerfil` explicitamente no início do cenário, mesmo que já use uma fixture. Isso garante a navegação para `/login` e a troca efetiva da sessão.
+- **Troca de Usuário em Testes Seriais**: Ao usar `test.describe.serial()`, o estado do navegador é mantido entre os cenários. Se o teste N+1 precisa de um usuário diferente do teste N, chame o helper `login` ou `loginComPerfil` explicitamente no início do cenário, mesmo que já use uma fixture.
 - **Dica**: Se o teste falhar esperando pelo seletor de perfil, verifique se o usuário em questão realmente possui múltiplos perfis no `seed.sql`.
 
 ### Hierarquia de Unidades
@@ -125,11 +131,6 @@ Ao testar visibilidade de processos para Gestores ou Chefes, **consulte sempre o
   - `toast` deve ser validado só quando o fluxo realmente o produz de forma estável, tipicamente após mutação seguida de navegação.
   - `AppAlert` tende a ser o mecanismo correto para erros e avisos inline.
 - **Se a aplicação redireciona para o painel após a ação, prefira validar a navegação/estado final** em vez de texto transitório.
-- **Após refatorações de notificação, revise helpers compartilhados**:
-  - Um helper que antes esperava sucesso em toast pode passar a estar errado para metade dos fluxos.
-- **Ruído esperado deve ser reconhecido como tal**:
-  - No teste de login inválido, `401` no backend e no network log é esperado.
-  - Isso não deve ser tratado como falha funcional do cenário.
 
 ## Debugging de Testes E2E
 
@@ -142,91 +143,36 @@ Quando um teste falha por um elemento estar "obstruído" ou "não encontrado", *
 
 ### Datas e Localização
 
-Sempre use `.toLocaleDateString('pt-BR')` ao comparar datas geradas dinamicamente nos testes (como `Date.now() + dias`) com o conteúdo da tela. O sistema utiliza o padrão brasileiro, e falhas de asserção ocorrem se o teste comparar formatos ISO ou americanos com o que está renderizado.
+Sempre use `.toLocaleDateString('pt-BR')` ao comparar datas geradas dinamicamente nos testes (como `Date.now() + dias`) com o conteúdo da tela. O sistema utiliza o padrão brasileiro.
 
 ### Captura de IDs de Processos
 
-**Evite capturar IDs de URLs de criação/edição** logo após salvar. O redirecionamento para o Painel pode ocorrer antes que a URL mude para o formato com ID, ou o ID pode não estar presente na URL de sucesso.
+**Evite capturar IDs de URLs de criação/edição** logo após salvar. O redirecionamento para o Painel pode ocorrer antes que a URL mude para o formato com ID.
 - ✅ PADRÃO SEGURO: Após criar o processo e voltar ao Painel, localize o registro pela descrição, clique para entrar nos detalhes e então use `await extrairProcessoId(page)` na página de detalhes.
-
-### Ler os logs do Playwright com atenção
-
-O Playwright fornece logs detalhados no "Call log" de cada erro. Eles mostram o elemento exato, atributos e o motivo da falha. Leia esses logs **antes** de tentar corrigir. A resposta geralmente está lá.
-
-### Diferenciar falha real de ruído
-
-- Um teste pode passar e ainda gerar logs de browser warning/error.
-- Antes de “limpar os warnings”, classifique:
-  - erro esperado do cenário negativo;
-  - warning de framework disparado por erro já tratado;
-  - defeito real novo.
-- Não silencie logs reais só para deixar a saída bonita.
-
-### Ler os `error-context.md` gerados
-
-Testes que falham geram um snapshot do DOM em `error-context.md`. Esse snapshot mostra a **estrutura real** do DOM no momento da falha — use-o para verificar se seus seletores CSS estão corretos.
 
 ### `force: true` vs `dispatchEvent`
 
-- `click({force: true})` — Pula as verificações de "actionability" mas ainda dispara o evento nas coordenadas do elemento. **Não garante** que o handler do Vue será acionado se o elemento clicado (ex: `<li>`) não é o mesmo que recebe o evento (ex: `<a>` dentro do `<li>`).
-- `dispatchEvent('click')` — Dispara o evento DOM diretamente no elemento, ignorando completamente sobreposições visuais. **Garante** que o handler será acionado. Usar para casos como o `fazerLogout`, onde um toast pode sobrepor o botão.
+- `click({force: true})` — Pula as verificações de "actionability" mas ainda dispara o evento nas coordenadas do elemento. Útil para elementos ocultos por hover.
+- `dispatchEvent('click')` — Dispara o evento DOM diretamente no elemento, ignorando completamente sobreposições visuais. Usar para casos como o `fazerLogout`, onde um toast pode sobrepor o botão.
 
-### Rodar os testes localmente
+### Verificar as pré-condições de estado antes de testar uma ação
 
-Não tente adivinhar o problema — rode o teste e leia a saída:
+Se um teste espera que um botão esteja visível/habilitado mas ele não está, **verifique se o subprocesso está na situação correta**. O backend determina as permissões com base no estado do subprocesso (ex: `podeReabrirCadastro` requer `>= MAPA_HOMOLOGADO`). 
 
-```bash
-npx playwright test e2e/cdu-XX.spec.ts > resultado.txt 2>&1
-```
+**Ação:** Leia a lógica de permissões em `SubprocessoService.java` (método `construirPermissoes`).
 
-## Verificar as pré-condições de estado antes de testar uma ação
-
-Se um teste espera que um botão esteja visível/habilitado mas ele não está, **verifique se o subprocesso está na situação correta para habilitar aquela ação**. O backend determina as permissões com base no estado do subprocesso (ex: `podeReabrirCadastro` requer `>= MAPA_HOMOLOGADO`). 
-
-**Ação:** Leia a lógica de permissões em `SubprocessoService.java` (método `construirPermissoes`) e confira se o fluxo no teste atinge a situação mínima exigida.
-
-### Regras práticas observadas nesta sessão
-
-- Se o cenário preparou apenas cadastro disponibilizado/homologado, botões de ação em bloco de mapa devem estar **ocultos**, não “talvez visíveis”.
-- `btnReabrirCadastro` só deve ser esperado quando a situação já passou de homologação do mapa.
-- Em testes de relatórios, valide o botão de exportação dentro do dialog correto.
-- Em testes de gestão de unidades, expanda toda a hierarquia necessária antes de esperar a unidade filha.
-- Se o fluxo de revisão precisa apenas chegar ao ponto de `podeReabrirRevisao`, a preparação ideal é fixture em `REVISAO_MAPA_HOMOLOGADO`, não workflow completo por UI.
-- Quando um teste serial estoura o timeout e o erro final aparece em `page.goto('/login')`, suspeite primeiro de orçamento gasto no preparo anterior, e não de problema no login.
-
-## Testes que revelam bugs no frontend
+## Testes que revelam bugs no frontend (Histórico)
 
 Nem sempre a falha é do teste — o teste pode estar correto e revelando um **bug real do frontend**. Exemplos encontrados:
 
-- **`isProcessoFinalizado` excessivamente restritivo**: `SubprocessoView.vue` e `SubprocessoCards.vue` tratavam `MAPA_HOMOLOGADO` como "processo finalizado", escondendo botões.
+- **`isProcessoFinalizado` excessivamente restritivo**: `SubprocessoView.vue` tratava `MAPA_HOMOLOGADO` como "processo finalizado", escondendo botões.
 - **Busca flat em árvore hierárquica**: `MapaVisualizacaoView.vue` usava `.find()` flat, falhando em unidades aninhadas.
-
-**Ação:** Quando um teste falha em um fluxo que deveria funcionar, investigue também o código do frontend — não apenas o teste.
-
-## Sempre assertar mensagens de sucesso após ações mutantes
-
-Se um passo de preparação faz uma ação (validar mapa, aceitar, homologar), **adicione uma assertiva para a mensagem de sucesso** (ex: `await expect(page.getByText(/Mapa validado/i).first()).toBeVisible()`). Sem isso, erros passam despercebidos — o teste avança mas a ação não foi efetivada no backend.
-
-**Atualização importante**: se a mensagem não é estável após refatoração de notificações, substitua essa assertiva por uma validação de:
-- navegação correta;
-- estado do subprocesso;
-- botão/permissão esperado na tela seguinte.
-
-## Logs do backend nos resultados dos testes
-
-Os logs do backend aparecem na saída dos testes (prefixados com `[WebServer] [BACKEND]`). Use `grep` para verificar se as chamadas de backend esperadas realmente aconteceram:
-
-```
 
 ## Lições aprendidas em correções recentes
 
 - **Evite locators com prefixo de tag desnecessário**:
-    - ❌ `page.locator('table[data-testid="tbl-processos"]')` falha se o `data-testid` for movido para uma `div` de wrapper (comum em componentes de terceiros como `BTable`).
+    - ❌ `page.locator('table[data-testid="tbl-processos"]')` falha se o `data-testid` for movido para uma `div`.
     - ✅ USE `page.locator('[data-testid="tbl-processos"]')` para ser agnóstico à tag.
 - **H2: Cuidado com `TRUNCATE` e `REFERENTIAL_INTEGRITY FALSE`**:
-    - Em bancos H2, o comando `TRUNCATE TABLE` pode corromper `CHECK` constraints (especialmente em visualizações simuladas como tabelas no schema de teste) se a integridade referencial estiver desabilitada no momento.
-    - Se encontrar `JdbcSQLIntegrityConstraintViolationException: Check constraint invalid` após um reset de banco, substitua o `TRUNCATE` por `DELETE FROM`.
-- **Navegação pós-criação**:
-    - Após criar um registro (`page.getByTestId('btn-...-salvar').click()`), certifique-se de que o teste aguarda a volta para a página esperada (`/painel`) antes de tentar interagir com a tabela. O uso de `await expect(page).toHaveURL(...)` ou `page.waitForURL(...)` é essencial.
-- **Robustez em Clicks de Linha**:
-    - Antes de clicar em uma linha da tabela (`tabela.locator('tr').filter(...).click()`), prefira adicionar um `await linha.waitFor({ state: 'visible' })`. Em ambientes de teste, a linha pode estar presente no DOM mas ainda não "clicável" devido a re-renderizações do Vue/Bootstrap.
+    - Se encontrar `JdbcSQLIntegrityConstraintViolationException` após um reset, substitua o `TRUNCATE` por `DELETE FROM`.
+- **Navegação pós-criação**: Use `await expect(page).toHaveURL(...)` ou `page.waitForURL(...)` após o `click` de salvar.

@@ -1,5 +1,10 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
-import {criarProcesso, extrairProcessoId, verificarDetalhesProcesso, verificarProcessoNaTabela} from './helpers/helpers-processos.js';
+import {
+    criarProcesso,
+    extrairProcessoId,
+    verificarDetalhesProcesso,
+    verificarProcessoNaTabela
+} from './helpers/helpers-processos.js';
 import {
     esperarPaginaCadastroProcesso,
     esperarPaginaDetalhesProcesso,

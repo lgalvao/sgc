@@ -1,12 +1,12 @@
-import { describe, it, expect } from 'vitest';
+import {describe, expect, it} from 'vitest';
 import {
-  formatDate,
-  formatSituacaoProcesso,
-  formatTipoProcesso,
-  formatSituacaoSubprocesso,
-  formatNumeroCsvBR
+    formatDate,
+    formatNumeroCsvBR,
+    formatSituacaoProcesso,
+    formatSituacaoSubprocesso,
+    formatTipoProcesso
 } from '../formatters';
-import { SituacaoProcesso, SituacaoSubprocesso, TipoProcesso } from '@/types/tipos';
+import {SituacaoProcesso, SituacaoSubprocesso, TipoProcesso} from '@/types/tipos';
 
 describe('formatters', () => {
   describe('formatDate', () => {

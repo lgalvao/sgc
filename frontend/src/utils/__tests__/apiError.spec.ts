@@ -1,11 +1,5 @@
 import {describe, expect, it, vi} from 'vitest';
-import {
-    existsOrFalse,
-    getOrNull,
-    isAxiosError,
-    normalizeError,
-    shouldNotifyGlobally
-} from '@/utils/apiError';
+import {existsOrFalse, getOrNull, isAxiosError, normalizeError, shouldNotifyGlobally} from '@/utils/apiError';
 import logger from '@/utils/logger';
 
 describe('apiError utils', () => {

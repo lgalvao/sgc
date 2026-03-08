@@ -1,9 +1,9 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { mount, flushPromises } from '@vue/test-utils';
-import { createTestingPinia } from '@pinia/testing';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {flushPromises, mount} from '@vue/test-utils';
+import {createTestingPinia} from '@pinia/testing';
 import HistoricoView from '../HistoricoView.vue';
-import { useRouter } from 'vue-router';
-import { useProcessosStore } from '@/stores/processos';
+import {useRouter} from 'vue-router';
+import {useProcessosStore} from '@/stores/processos';
 
 vi.mock('vue-router', () => ({
   useRouter: vi.fn(() => ({

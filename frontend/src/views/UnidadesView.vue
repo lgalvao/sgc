@@ -49,7 +49,7 @@
 
 <script lang="ts" setup>
 import {computed, onMounted, ref} from "vue";
-import {BButton, BSpinner, BAlert} from "bootstrap-vue-next";
+import {BAlert, BButton, BSpinner} from "bootstrap-vue-next";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import ArvoreUnidades from "@/components/unidade/ArvoreUnidades.vue";

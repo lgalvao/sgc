@@ -1,8 +1,7 @@
 package sgc.subprocesso.dto;
 
-import org.jspecify.annotations.Nullable;
-
 import lombok.*;
+import org.jspecify.annotations.*;
 import sgc.organizacao.model.*;
 import sgc.subprocesso.model.*;
 

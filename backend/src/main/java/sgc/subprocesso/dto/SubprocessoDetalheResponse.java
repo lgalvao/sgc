@@ -1,7 +1,7 @@
 package sgc.subprocesso.dto;
 
 import lombok.*;
-import sgc.organizacao.dto.ResponsavelDto;
+import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
 import sgc.subprocesso.model.*;
 

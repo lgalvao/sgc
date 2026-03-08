@@ -23,6 +23,7 @@ export const test = base.extend<{
     autenticadoComoGestorCoord21: void;
     autenticadoComoGestorCoord22: void;
     autenticadoComoChefeSecao111: void;
+    autenticadoComoChefeSecao112: void;
     autenticadoComoChefeSecao211: void;
     autenticadoComoChefeSecao212: void;
     autenticadoComoChefeSecao221: void;
@@ -56,6 +57,11 @@ export const test = base.extend<{
 
     autenticadoComoChefeSecao111: async ({page}, use) => {
         await login(page, USUARIOS.CHEFE_SECAO_111.titulo, USUARIOS.CHEFE_SECAO_111.senha);
+        await use();
+    },
+
+    autenticadoComoChefeSecao112: async ({page}, use) => {
+        await login(page, USUARIOS.CHEFE_SECAO_112.titulo, USUARIOS.CHEFE_SECAO_112.senha);
         await use();
     },
 

@@ -1,12 +1,7 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
-import {criarProcessoFixture} from './fixtures/fixtures-processos.js';
-import {
-    adicionarAtividade,
-    adicionarConhecimento,
-    navegarParaAtividades,
-    navegarParaAtividadesVisualizacao
-} from './helpers/helpers-atividades.js';
+import {criarProcessoCadastroDisponibilizadoFixture} from './fixtures/fixtures-processos.js';
+import {navegarParaAtividades, navegarParaAtividadesVisualizacao} from './helpers/helpers-atividades.js';
 import {
     abrirHistoricoAnalise,
     aceitarCadastroMapeamento,
@@ -20,31 +15,16 @@ import {navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
 
 test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos', () => {
     const UNIDADE_ALVO = 'SECAO_211';
-    const timestamp = Date.now();
-    const descProcesso = `Processo CDU-13 ${timestamp}`;
-    const descAtividade = `Atividade ${timestamp}`;
+    
+    let processoId: number;
+    let descProcesso: string;
 
-    test('Preparacao 1: ADMIN cria e inicia processo', async ({request}) => {
-        await criarProcessoFixture(request, {
-            descricao: descProcesso,
-            tipo: 'MAPEAMENTO',
-            unidade: UNIDADE_ALVO,
-            diasLimite: 30,
-            iniciar: true
+    test('Preparacao: Criar processo via fixture', async ({request}) => {
+        const processo = await criarProcessoCadastroDisponibilizadoFixture(request, {
+            unidade: UNIDADE_ALVO
         });
-    });
-
-    test('Preparacao 2: CHEFE disponibiliza atividades', async ({page}) => {
-        await login(page, USUARIOS.CHEFE_SECAO_211.titulo, USUARIOS.CHEFE_SECAO_211.senha);
-        await acessarSubprocessoChefeDireto(page, descProcesso, UNIDADE_ALVO);
-        await navegarParaAtividades(page);
-
-        await adicionarAtividade(page, descAtividade);
-        await adicionarConhecimento(page, descAtividade, 'Conhecimento A');
-
-        await page.getByTestId('btn-cad-atividades-disponibilizar').click();
-        await page.getByTestId('btn-confirmar-disponibilizacao').click();
-        await expect(page).toHaveURL(/\/painel/);
+        processoId = processo.codigo;
+        descProcesso = processo.descricao;
     });
 
     test('Preparacao 3: GESTOR COORD_21 aceita e SECRETARIA_2 devolve', async ({page}) => {

@@ -270,7 +270,22 @@ public class E2eController {
         jdbcTemplate.update("UPDATE sgc.subprocesso SET situacao = 'MAPEAMENTO_MAPA_HOMOLOGADO' WHERE codigo = ?", subId);
         jdbcTemplate.update("UPDATE sgc.processo SET situacao = 'FINALIZADO' WHERE codigo = ?", procId);
 
+        // Tornar mapa vigente na unidade
+        jdbcTemplate.update("DELETE FROM sgc.unidade_mapa WHERE unidade_codigo = ?", unidId);
+        jdbcTemplate.update("INSERT INTO sgc.unidade_mapa (unidade_codigo, mapa_vigente_codigo) VALUES (?, ?)", unidId, mapaId);
+
         return processoFacade.buscarEntidadePorId(procId);
+    }
+
+    /**
+     * Cria um processo de mapeamento já iniciado, com cadastro preenchido e disponibilizado,
+     * para acelerar cenários E2E que começam na análise do cadastro.
+     */
+    @PostMapping("/fixtures/processo-mapeamento-com-cadastro-disponibilizado")
+    @Transactional
+    @JsonView(ProcessoViews.Publica.class)
+    public Processo criarProcessoMapeamentoComCadastroDisponibilizado(@RequestBody ProcessoFixtureRequest request) {
+        return criarProcessoMapeamentoComMapaNaSituacao(request, "MAPEAMENTO_CADASTRO_DISPONIBILIZADO");
     }
 
     /**
@@ -328,6 +343,7 @@ public class E2eController {
 
         Long procId = processo.getCodigo();
         Unidade unidade = unidadeService.buscarPorSigla(request.unidadeSigla());
+        Long superiorId = unidade.getUnidadeSuperior().getCodigo();
         Long unidId = unidade.getCodigo();
         Long subId = jdbcTemplate.queryForObject(
                 "SELECT codigo FROM sgc.subprocesso WHERE processo_codigo = ? AND unidade_codigo = ?",
@@ -352,7 +368,19 @@ public class E2eController {
                 Long.class, mapaId, "Competência Fixture" + sufixo);
         jdbcTemplate.update("INSERT INTO sgc.competencia_atividade (atividade_codigo, competencia_codigo) VALUES (?, ?)",
                 atividadeId, competenciaId);
+        
         jdbcTemplate.update("UPDATE sgc.subprocesso SET situacao = ? WHERE codigo = ?", situacaoSubprocesso, subId);
+
+        // Definir localização:
+        // Se for DISPONIBILIZADO (cadastro ou mapa), volta para a unidade do usuário (Chefe)
+        // Se for homologado ou validado, vai para a unidade superior (Gestor)
+        Long destinoId = superiorId;
+        if (situacaoSubprocesso.endsWith("_DISPONIBILIZADO")) {
+            destinoId = unidId;
+        }
+
+        jdbcTemplate.update("INSERT INTO sgc.movimentacao (subprocesso_codigo, unidade_origem_codigo, unidade_destino_codigo, usuario_titulo, data_hora, descricao) " +
+                "VALUES (?, ?, ?, '111111', ?, ?)", subId, unidId, destinoId, LocalDateTime.now(), "Movimentação automática via fixture");
 
         return processoFacade.buscarEntidadePorId(procId);
     }

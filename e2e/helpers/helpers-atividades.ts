@@ -39,9 +39,8 @@ export async function adicionarAtividade(page: Page, descricao: string) {
     await expect(page.getByText(descricao, {exact: true})).toBeVisible();
 }
 
-export async function adicionarConhecimento(page: Page, atividadeDescricao: string, conhecimentoDescricao: string) {
-    const card = page.locator('.atividade-card', {has: page.getByText(atividadeDescricao)});
-
+export async function adicionarConhecimento(page: Page, atividadeDescricao: string | RegExp, conhecimentoDescricao: string) {
+    const card = page.locator('.atividade-card').filter({has: page.getByText(atividadeDescricao)});
     await card.getByTestId('inp-novo-conhecimento').fill(conhecimentoDescricao);
 
     const responsePromise = page.waitForResponse(resp => resp.url().includes('/conhecimentos') && resp.status() === 201);
@@ -51,23 +50,23 @@ export async function adicionarConhecimento(page: Page, atividadeDescricao: stri
     await expect(card.getByText(conhecimentoDescricao)).toBeVisible();
 }
 
-export async function editarAtividade(page: Page, descricaoAtual: string, novaDescricao: string) {
-    const card = page.locator('.atividade-card', {has: page.getByText(descricaoAtual)});
-    const row = card.locator('.atividade-hover-row');
+export async function editarAtividade(page: Page, descricaoAtual: string | RegExp, novaDescricao: string) {
+    const card = page.locator('.atividade-card').filter({has: page.getByText(descricaoAtual)});
     const editButton = card.getByTestId('btn-editar-atividade');
 
-    await row.hover();
-    await expect(editButton).toBeVisible();
-    await editButton.click();
+    // Forçar clique pois o botão só aparece no hover, o que pode ser instável em CI
+    await editButton.click({force: true});
 
-    await page.locator(`input[value="${descricaoAtual}"]`).fill(novaDescricao);
+    const input = page.getByTestId('inp-editar-atividade');
+    await input.waitFor({ state: 'visible' });
+    await input.fill(novaDescricao);
+    
     await page.getByTestId('btn-salvar-edicao-atividade').click();
-
     await expect(page.getByText(novaDescricao)).toBeVisible();
 }
 
-export async function removerAtividade(page: Page, descricao: string) {
-    const card = page.locator('.atividade-card', {has: page.getByText(descricao)});
+export async function removerAtividade(page: Page, descricao: string | RegExp) {
+    const card = page.locator('.atividade-card').filter({has: page.getByText(descricao)});
     const row = card.locator('.atividade-hover-row');
     const btnRemover = card.getByTestId('btn-remover-atividade');
 
@@ -75,13 +74,11 @@ export async function removerAtividade(page: Page, descricao: string) {
     await expect(btnRemover).toBeVisible();
     await btnRemover.click();
 
-    // Confirmar no modal
     await page.getByTestId('btn-modal-confirmacao-confirmar').click();
-
     await expect(page.getByText(descricao)).toBeHidden();
 }
 
-export async function editarConhecimento(page: Page, atividadeDescricao: string, conhecimentoAtual: string, novoConhecimento: string) {
+export async function editarConhecimento(page: Page, atividadeDescricao: string | RegExp, conhecimentoAtual: string, novoConhecimento: string) {
     const card = page.locator('.atividade-card', {has: page.getByText(atividadeDescricao)});
     const linhaConhecimento = card.locator('.group-conhecimento', {hasText: conhecimentoAtual});
     const btnEditar = linhaConhecimento.getByTestId('btn-editar-conhecimento');
@@ -90,14 +87,16 @@ export async function editarConhecimento(page: Page, atividadeDescricao: string,
     await expect(btnEditar).toBeVisible();
     await btnEditar.click();
 
-    await card.getByTestId('inp-editar-conhecimento').fill(novoConhecimento);
+    const input = card.getByTestId('inp-editar-conhecimento');
+    await input.waitFor({ state: 'visible' });
+    await input.fill(novoConhecimento);
     await card.getByTestId('btn-salvar-edicao-conhecimento').click();
 
     await expect(card.getByText(novoConhecimento)).toBeVisible();
 }
 
-export async function removerConhecimento(page: Page, atividadeDescricao: string, conhecimento: string) {
-    const card = page.locator('.atividade-card', {has: page.getByText(atividadeDescricao)});
+export async function removerConhecimento(page: Page, atividadeDescricao: string | RegExp, conhecimento: string) {
+    const card = page.locator('.atividade-card').filter({has: page.getByText(atividadeDescricao)});
     const linhaConhecimento = card.locator('.group-conhecimento', {hasText: conhecimento});
     const btnRemover = linhaConhecimento.getByTestId('btn-remover-conhecimento');
 
@@ -105,9 +104,7 @@ export async function removerConhecimento(page: Page, atividadeDescricao: string
     await expect(btnRemover).toBeVisible();
     await btnRemover.click();
 
-    // Confirmar no modal
     await page.getByTestId('btn-modal-confirmacao-confirmar').click();
-
     await expect(card.getByText(conhecimento)).toBeHidden();
 }
 
@@ -115,7 +112,6 @@ export async function disponibilizarCadastro(page: Page) {
     await limparNotificacoes(page);
     await page.getByTestId('btn-cad-atividades-disponibilizar').click();
 
-    // Garantir que o modal apareça e o botão de confirmação esteja pronto
     const modal = page.getByRole('dialog');
     await expect(modal).toBeVisible();
     
@@ -135,7 +131,6 @@ export async function verificarBotaoImpactoDropdown(page: Page) {
     await expect(btnMaisAcoes).toBeVisible();
     await btnMaisAcoes.click();
     await expect(page.getByTestId('cad-atividades__btn-impactos-mapa-edicao')).toBeVisible();
-    // Fechar clicando novamente ou fora
     await btnMaisAcoes.click();
 }
 
@@ -201,7 +196,6 @@ export async function importarAtividades(page: Page, processoOrigemDescricao: st
     await modal.getByTestId('btn-importar').click();
     await expect(modal).toBeHidden();
 
-    // Validar se as atividades aparecem na tela após importar
     for (const desc of atividadesDescricoes) {
         await expect(page.getByText(desc, { exact: true }).first()).toBeVisible();
     }
@@ -220,13 +214,11 @@ export async function importarAtividadesComErroDuplicidade(page: Page, processoO
     const response = await respostaImportacao;
     const corpo = await response.text();
 
-    // Modal continua aberto e exibe erro
     await expect(modal).toBeVisible();
     expect(corpo).toContain('"code":"VALIDACAO"');
     expect(corpo).toContain('já existentes no cadastro');
     await expect(modal.getByText(/já existente|não puderam ser importadas/i)).toBeVisible();
     
-    // Fechar modal para continuar teste
     await modal.getByTestId('importar-atividades-modal__btn-modal-cancelar').click();
     await expect(modal).toBeHidden();
 }

@@ -1,8 +1,8 @@
 package sgc.relatorio;
 
-import lombok.Builder;
+import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.*;
 
 @Builder
 public record RelatorioAndamentoDto(
