@@ -48,6 +48,37 @@ class RelatorioFacadeTest {
     private RelatorioFacade relatorioService;
 
     @Test
+    @DisplayName("Deve obter relatório de andamento com dados corretos")
+    void deveObterRelatorioAndamento() {
+        Processo p = new Processo();
+        p.setDescricao("Proc Teste");
+
+        Unidade u = new Unidade();
+        u.setSigla("U1");
+        u.setNome("Unidade 1");
+        u.setCodigo(1L);
+
+        Subprocesso sp = new Subprocesso();
+        sp.setUnidade(u);
+        sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+        sp.setDataLimiteEtapa1(java.time.LocalDateTime.of(2023, 10, 10, 10, 0));
+
+        when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
+        when(responsavelService.buscarResponsavelUnidade(1L)).thenReturn(UnidadeResponsavelDto.builder().titularNome("Resp").build());
+
+        List<RelatorioAndamentoDto> resultado = relatorioService.obterRelatorioAndamento(1L);
+
+        assertThat(resultado).hasSize(1);
+        RelatorioAndamentoDto dto = resultado.get(0);
+        assertThat(dto.siglaUnidade()).isEqualTo("U1");
+        assertThat(dto.nomeUnidade()).isEqualTo("Unidade 1");
+        assertThat(dto.situacaoAtual()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO.name());
+        assertThat(dto.dataUltimaMovimentacao()).isEqualTo(java.time.LocalDateTime.of(2023, 10, 10, 10, 0));
+        assertThat(dto.responsavel()).isEqualTo("Resp");
+        assertThat(dto.titular()).isEqualTo("Resp");
+    }
+
+    @Test
     @DisplayName("Deve gerar relatório de andamento")
     void deveGerarRelatorioAndamento() throws DocumentException {
         when(pdfFactory.createDocument()).thenReturn(document);

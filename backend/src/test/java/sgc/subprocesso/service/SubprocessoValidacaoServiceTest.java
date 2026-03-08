@@ -4,7 +4,11 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
+import sgc.mapa.model.*;
+import sgc.mapa.service.MapaManutencaoService;
+import sgc.subprocesso.dto.ValidacaoCadastroDto;
 import sgc.subprocesso.model.*;
+import sgc.comum.erros.ErroValidacao;
 
 import java.util.*;
 
@@ -18,8 +22,157 @@ class SubprocessoValidacaoServiceTest {
     @Mock
     private SubprocessoRepo subprocessoRepo;
 
+    @Mock
+    private MapaManutencaoService mapaManutencaoService;
+
     @InjectMocks
     private SubprocessoValidacaoService validacaoService;
+
+    @Nested
+    @DisplayName("validarExistenciaAtividades")
+    class ValidarExistenciaAtividades {
+
+        @Test
+        @DisplayName("deve lançar erro se mapa for nulo")
+        void erroSemMapa() {
+            Subprocesso sp = new Subprocesso();
+            assertThatThrownBy(() -> validacaoService.validarExistenciaAtividades(sp))
+                .isInstanceOf(ErroValidacao.class)
+                .hasMessageContaining("não possui mapa associado");
+        }
+    }
+
+    @Nested
+    @DisplayName("validarCadastro")
+    class ValidarCadastro {
+
+        @Test
+        @DisplayName("deve retornar inválido se não tiver mapa")
+        void invalidoSemMapa() {
+            Subprocesso sp = new Subprocesso();
+            ValidacaoCadastroDto dto = validacaoService.validarCadastro(sp);
+            assertThat(dto.valido()).isFalse();
+            assertThat(dto.erros()).hasSize(1);
+            assertThat(dto.erros().get(0).tipo()).isEqualTo("SEM_MAPA");
+        }
+
+        @Test
+        @DisplayName("deve retornar inválido se mapa não tiver atividades")
+        void invalidoSemAtividades() {
+            Subprocesso sp = new Subprocesso();
+            Mapa mapa = new Mapa();
+            mapa.setCodigo(1L);
+            sp.setMapa(mapa);
+            when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(1L)).thenReturn(List.of());
+
+            ValidacaoCadastroDto dto = validacaoService.validarCadastro(sp);
+            assertThat(dto.valido()).isFalse();
+            assertThat(dto.erros()).hasSize(1);
+            assertThat(dto.erros().get(0).tipo()).isEqualTo("SEM_ATIVIDADES");
+        }
+
+        @Test
+        @DisplayName("deve retornar inválido se atividade não tiver conhecimentos")
+        void invalidoAtividadeSemConhecimento() {
+            Subprocesso sp = new Subprocesso();
+            Mapa mapa = new Mapa();
+            mapa.setCodigo(1L);
+            sp.setMapa(mapa);
+
+            Atividade a = new Atividade();
+            a.setCodigo(10L);
+            a.setDescricao("A1");
+            a.setConhecimentos(Set.of());
+
+            when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(1L)).thenReturn(List.of(a));
+
+            ValidacaoCadastroDto dto = validacaoService.validarCadastro(sp);
+            assertThat(dto.valido()).isFalse();
+            assertThat(dto.erros()).hasSize(1);
+            assertThat(dto.erros().get(0).tipo()).isEqualTo("ATIVIDADE_SEM_CONHECIMENTO");
+        }
+
+        @Test
+        @DisplayName("deve retornar válido se tudo estiver correto")
+        void validoTudoCorreto() {
+            Subprocesso sp = new Subprocesso();
+            Mapa mapa = new Mapa();
+            mapa.setCodigo(1L);
+            sp.setMapa(mapa);
+
+            Atividade a = new Atividade();
+            a.setCodigo(10L);
+            a.setDescricao("A1");
+            Conhecimento c = new Conhecimento();
+            c.setDescricao("C1");
+            a.setConhecimentos(Set.of(c));
+
+            when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(1L)).thenReturn(List.of(a));
+
+            ValidacaoCadastroDto dto = validacaoService.validarCadastro(sp);
+            assertThat(dto.valido()).isTrue();
+            assertThat(dto.erros()).isEmpty();
+        }
+    }
+
+    @Nested
+    @DisplayName("validarSituacaoPermitida")
+    class ValidarSituacaoPermitida {
+
+        @Test
+        @DisplayName("deve lançar erro se situacao for nula")
+        void erroSituacaoNula() {
+            Subprocesso sp = new Subprocesso();
+            sp.setSituacao(null); // Explicitly ensuring null
+            assertThatThrownBy(() -> validacaoService.validarSituacaoPermitida(sp, Set.of(SituacaoSubprocesso.NAO_INICIADO)))
+                .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @Test
+        @DisplayName("deve lançar erro se permitidas for vazio")
+        void erroPermitidasVazia() {
+            Subprocesso sp = new Subprocesso();
+            sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
+            assertThatThrownBy(() -> validacaoService.validarSituacaoPermitida(sp, Set.of()))
+                .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @Test
+        @DisplayName("deve lançar erro de validacao se situacao nao permitida")
+        void erroSituacaoNaoPermitida() {
+            Subprocesso sp = new Subprocesso();
+            sp.setSituacaoForcada(SituacaoSubprocesso.NAO_INICIADO);
+            assertThatThrownBy(() -> validacaoService.validarSituacaoPermitida(sp, Set.of(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO)))
+                .isInstanceOf(ErroValidacao.class);
+        }
+
+        @Test
+        @DisplayName("não deve lançar erro se situacao permitida")
+        void sucessoSituacaoPermitida() {
+            Subprocesso sp = new Subprocesso();
+            sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+            validacaoService.validarSituacaoPermitida(sp, Set.of(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO));
+        }
+
+        @Test
+        @DisplayName("deve lançar erro se varargs vazio")
+        void erroVarargsVazio() {
+            Subprocesso sp = new Subprocesso();
+            sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
+            assertThatThrownBy(() -> validacaoService.validarSituacaoPermitida(sp))
+                .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @Test
+        @DisplayName("deve usar a mensagem fornecida no erro")
+        void usaMensagemFornecida() {
+            Subprocesso sp = new Subprocesso();
+            sp.setSituacaoForcada(SituacaoSubprocesso.NAO_INICIADO);
+            assertThatThrownBy(() -> validacaoService.validarSituacaoPermitida(sp, "Msg Custom", SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO))
+                .isInstanceOf(ErroValidacao.class)
+                .hasMessage("Msg Custom");
+        }
+    }
 
     @Nested
     @DisplayName("verificarAcessoUnidadeAoProcesso")
