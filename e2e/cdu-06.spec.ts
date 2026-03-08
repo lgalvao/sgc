@@ -22,7 +22,7 @@ import {
 test.describe('CDU-06 - Detalhar processo', () => {
     const UNIDADE_ALVO = 'ASSESSORIA_12';
 
-    test('Fase 1: Deve exibir detalhes do processo para ADMIN e ações de unidade', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
+    test('Fase 1: Deve exibir detalhes do processo para ADMIN e ações de unidade', async ({page, autenticadoComoAdmin}) => {
         const timestamp = Date.now();
         const descricao = `Processo CDU-06 ${timestamp}`;
 
@@ -36,11 +36,10 @@ test.describe('CDU-06 - Detalhar processo', () => {
             iniciar: true
         });
 
-        // Capturar ID do processo para cleanup (padrão CDU-04/05)
+        // Capturar ID do processo
         await page.getByTestId('tbl-processos').getByText(descricao).first().click();
         await esperarPaginaDetalhesProcesso(page);
         const processoId = await extrairProcessoId(page);
-        cleanupAutomatico.registrar(processoId);
 
         // 3. Verificar detalhes do processo
         await verificarDetalhesProcesso(page, {
@@ -70,7 +69,7 @@ test.describe('CDU-06 - Detalhar processo', () => {
         await expect(page.getByTestId('btn-enviar-lembrete')).toBeVisible();
     });
 
-    test('Fase 1b: Deve exibir detalhes do processo para GESTOR e ocultar ações ADMIN', async ({page, cleanupAutomatico}) => {
+    test('Fase 1b: Deve exibir detalhes do processo para GESTOR e ocultar ações ADMIN', async ({page}) => {
         const timestamp = Date.now();
         const descricao = `Processo CDU-06 Gestor ${timestamp}`;
         const UNIDADE_PROCESSO = 'ASSESSORIA_21'; // Subordinada à SECRETARIA_2 (George Harrison)
@@ -78,7 +77,7 @@ test.describe('CDU-06 - Detalhar processo', () => {
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
         await criarProcesso(page, {
-            descricao,
+            descricao: descricao,
             tipo: 'MAPEAMENTO',
             diasLimite: 30,
             unidade: UNIDADE_PROCESSO,
@@ -86,11 +85,10 @@ test.describe('CDU-06 - Detalhar processo', () => {
             iniciar: true
         });
 
-        // Capturar ID para cleanup
+        // Capturar ID do processo
         await page.getByTestId('tbl-processos').getByText(descricao).first().click();
         await esperarPaginaDetalhesProcesso(page);
         const processoId = await extrairProcessoId(page);
-        cleanupAutomatico.registrar(processoId);
 
         await page.getByTestId('btn-logout').click();
 
@@ -118,7 +116,7 @@ test.describe('CDU-06 - Detalhar processo', () => {
         await expect(page.getByTestId('btn-reabrir-cadastro')).toBeHidden();
     });
 
-    test('Fase 2: Verificar botões de ação em bloco [Step 2.2.2]', async ({page, cleanupAutomatico}) => {
+    test('Fase 2: Verificar botões de ação em bloco [Step 2.2.2]', async ({page}) => {
         const timestamp = Date.now();
         const descricao = `Bloco CDU-06 ${timestamp}`;
         const UNIDADE_SUB = 'ASSESSORIA_12';
@@ -134,11 +132,10 @@ test.describe('CDU-06 - Detalhar processo', () => {
             iniciar: true
         });
         
-        // Capturar ID para cleanup
+        // Capturar ID do processo
         await page.getByTestId('tbl-processos').getByText(descricao).first().click();
         await esperarPaginaDetalhesProcesso(page);
         const processoId = await extrairProcessoId(page);
-        cleanupAutomatico.registrar(processoId);
 
         // 2. CHEFE disponibiliza cadastro para habilitar ações em bloco
         await login(page, USUARIOS.CHEFE_ASSESSORIA_12.titulo, USUARIOS.CHEFE_ASSESSORIA_12.senha);

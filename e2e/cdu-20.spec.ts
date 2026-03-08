@@ -44,9 +44,7 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
         await expect(page).toHaveURL(/\/painel/);
     });
 
-    test('Cenario 2: ADMIN homologa final', async ({page, cleanupAutomatico}) => {
-        if (processoId > 0) cleanupAutomatico.registrar(processoId);
-
+    test('Cenario 2: ADMIN homologa final', async ({page}) => {
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, UNIDADE_ALVO);

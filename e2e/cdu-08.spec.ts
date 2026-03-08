@@ -12,8 +12,7 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
     test('Cenário 1: Processo de Mapeamento (Fluxo Completo + Importação + Auto-save)', async ({
                                                                                        page,
                                                                                        autenticadoComoAdmin,
-                                                                                       request,
-                                                                                       cleanupAutomatico
+                                                                                       request
                                                                                    }) => {
         const timestamp = Date.now();
         const descricaoProcesso = `Processo CDU-08 Map ${timestamp}`;
@@ -29,7 +28,6 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
                 descricao: processoOrigemDescricao
             });
             processoOrigemId = procOrigem.codigo;
-            cleanupAutomatico.registrar(processoOrigemId);
 
             const processoAlvo = await criarProcessoFixture(request, {
                 unidade: UNIDADE_ALVO,
@@ -38,7 +36,6 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
                 diasLimite: 30
             });
             processoAlvoId = processoAlvo.codigo;
-            cleanupAutomatico.registrar(processoAlvoId);
 
             await fazerLogout(page);
         });
@@ -101,7 +98,7 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
         });
     });
 
-    test('Cenário 2: Processo de Revisão (Botão Impacto)', async ({page, request, cleanupAutomatico}) => {
+    test('Cenário 2: Processo de Revisão (Botão Impacto)', async ({page, request}) => {
         const timestamp = Date.now();
         const descricao = `Processo CDU-08 Rev ${timestamp}`;
         const UNIDADE_REVISAO = 'ASSESSORIA_12';
@@ -118,7 +115,6 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
                 diasLimite: 30
             });
             processoRevisaoId = processoRevisao.codigo;
-            cleanupAutomatico.registrar(processoRevisaoId);
         });
 
         await test.step('Verificar Botão Impacto', async () => {

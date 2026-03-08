@@ -1,8 +1,6 @@
 import type {Page} from '@playwright/test';
 import {test as base} from './auth-fixtures.js';
 import {criarProcesso} from '../helpers/helpers-processos.js';
-import {useProcessoCleanup} from '../hooks/hooks-limpeza.js';
-import logger from "../../frontend/src/utils/logger.js";
 
 /**
  * Contexto de fixture com processo criado automaticamente
@@ -13,25 +11,21 @@ export interface ProcessoContext {
         codigo: number;
         descricao: string;
     };
-    /** Cleanup registrado automaticamente */
-    cleanup: ReturnType<typeof useProcessoCleanup>;
 }
 
 /**
- * Fixtures de processo para eliminar duplicação de setup/cleanup em testes E2E.
+ * Fixtures de processo para eliminar duplicação de setup em testes E2E.
  *
  * Automatiza:
- * - Reset de database no beforeAll
+ * - Reset de database no beforeAll (via complete-fixtures se usado)
  * - Criação de processo padrão no beforeEach
- * - Registro automático para cleanup
- * - Limpeza automática no afterEach
  *
  * @example
  * ```typescript
  * import {test, expect} from './fixtures/processo-fixtures.js';
  *
  * test('Deve editar processo', async ({page, processoFixture}) => {
- *   // Já tem um processo criado e registrado para cleanup!
+ *   // Já tem um processo criado!
  *   await page.goto(`/processo/cadastro?codProcesso=${processoFixture.codigo}`);
  *   await page.getByTestId('inp-processo-descricao').fill('Nova descrição');
  *   await page.getByTestId('btn-processo-salvar').click();
@@ -64,21 +58,6 @@ export const test = base.extend<ProcessoContext>({
         await page.goto('/painel');
 
         await use({codigo, descricao});
-
-        // Cleanup automático via endpoint E2E
-        try {
-            const response = await page.request.post(`/e2e/processo/${codigo}/limpar`);
-            if (!response.ok()) {
-                logger.warn(`Falha no cleanup do processo ${codigo}: ${response.status()}`);
-            }
-        } catch (error) {
-            logger.warn(`Erro no cleanup do processo ${codigo}: ${error}`);
-        }
-    },
-
-    cleanup: async ({}, use) => {
-        const cleanup = useProcessoCleanup();
-        await use(cleanup);
     }
 });
 

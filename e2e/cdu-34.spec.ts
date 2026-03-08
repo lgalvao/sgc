@@ -63,11 +63,8 @@ test.describe.serial('CDU-34 - Enviar lembrete de prazo', () => {
 
     test('Cenario complementar: unidade de destino visualiza alerta de lembrete no painel', async ({
                                                                                                         page,
-                                                                                                        autenticadoComoChefeAssessoria22,
-                                                                                                        cleanupAutomatico
+                                                                                                        autenticadoComoChefeAssessoria22
                                                                                                     }) => {
-        cleanupAutomatico.registrar(processoId);
-
         const tabelaAlertas = page.getByTestId('tbl-alertas');
         await expect(tabelaAlertas).toBeVisible();
         await expect(tabelaAlertas).toContainText(descProcesso);

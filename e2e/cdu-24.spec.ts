@@ -19,7 +19,7 @@ import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
 test.describe('CDU-24 - Disponibilizar mapas em bloco', () => {
     const UNIDADE_1 = 'SECAO_221';
 
-    test('Fluxo completo: De criação de processo à disponibilização em bloco', async ({page, cleanupAutomatico}) => {
+    test('Fluxo completo: De criação de processo à disponibilização em bloco', async ({page}) => {
         const timestamp = Date.now();
         const descProcesso = `Mapeamento CDU-24 ${timestamp}`;
         const atividade1 = `Atividade Mapa ${timestamp}`;
@@ -37,8 +37,6 @@ test.describe('CDU-24 - Disponibilizar mapas em bloco', () => {
 
         const linhaProcesso = page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descProcesso)});
         await linhaProcesso.click();
-        const processoId = Number.parseInt(new RegExp(/\/processo(?:\/cadastro)?\/(\d+)/).exec(page.url())?.[1] || '0');
-        if (processoId > 0) cleanupAutomatico.registrar(processoId);
 
         await page.getByTestId('btn-processo-iniciar').click();
         await page.getByTestId('btn-iniciar-processo-confirmar').click();

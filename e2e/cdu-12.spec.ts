@@ -72,9 +72,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
     });
 
-    test('Passo 3.2: Verificação pelo GESTOR na tela de Visualização', async ({page, cleanupAutomatico}) => {
-        if (processoRevisaoId > 0) cleanupAutomatico.registrar(processoRevisaoId);
-
+    test('Passo 3.2: Verificação pelo GESTOR na tela de Visualização', async ({page}) => {
         // Localização atual deve estar no COORD_12 para o Gestor ver
         // Ringo Starr (GESTOR_COORD_12) possui apenas 1 perfil
         await login(page, USUARIOS.GESTOR_COORD_12.titulo, USUARIOS.GESTOR_COORD_12.senha);

@@ -11,14 +11,13 @@ import {criarProcessoMapaHomologadoFixture} from './fixtures/fixtures-processos.
  */
 test.describe.serial('CDU-36 - Gerar relatório de mapas', () => {
 
-    test('Cenários CDU-36: ADMIN navega e gera relatórios de mapas', async ({page, request, autenticadoComoAdmin, cleanupAutomatico}) => {
+    test('Cenários CDU-36: ADMIN navega e gera relatórios de mapas', async ({page, request, autenticadoComoAdmin}) => {
         const descricaoProcesso = `Relatório CDU-36 ${Date.now()}`;
         const processo = await criarProcessoMapaHomologadoFixture(request, {
             descricao: descricaoProcesso,
             unidade: 'ASSESSORIA_12',
             diasLimite: 30
         });
-        cleanupAutomatico.registrar(processo.codigo);
 
         await page.goto('/painel');
         await expect(page.getByTestId('tbl-processos').getByText(descricaoProcesso).first()).toBeVisible();

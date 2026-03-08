@@ -25,7 +25,7 @@ test.describe.serial('CDU-27 - Alterar data limite de subprocesso', () => {
     let processoId: number;
 
 
-    test('Preparacao: Admin cria e inicia processo', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
+    test('Preparacao: Admin cria e inicia processo', async ({page, autenticadoComoAdmin}) => {
 
 
         await criarProcesso(page, {
@@ -40,7 +40,6 @@ test.describe.serial('CDU-27 - Alterar data limite de subprocesso', () => {
         await linhaProcesso.click();
 
         processoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
-        if (processoId > 0) cleanupAutomatico.registrar(processoId);
 
         await page.getByTestId('btn-processo-iniciar').click();
         await page.getByTestId('btn-iniciar-processo-confirmar').click();

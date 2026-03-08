@@ -1,15 +1,8 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {login, USUARIOS} from './helpers/helpers-auth.js';
 import {fazerLogout} from './helpers/helpers-navegacao.js';
-import {criarProcesso, extrairProcessoId, verificarProcessoNaTabela} from './helpers/helpers-processos.js';
+import {criarProcesso, verificarProcessoNaTabela} from './helpers/helpers-processos.js';
 import type {Page} from '@playwright/test';
-import type {useProcessoCleanup} from './hooks/hooks-limpeza.js';
-
-async function registrarProcessoNoCleanup(page: Page, cleanupAutomatico: ReturnType<typeof useProcessoCleanup>) {
-    const processoId = await extrairProcessoId(page);
-    expect(processoId).toBeGreaterThan(0);
-    cleanupAutomatico.registrar(processoId);
-}
 
 test.describe('CDU-02 - Visualizar Painel', () => {
     test.describe('Como ADMIN', () => {
@@ -43,10 +36,9 @@ test.describe('CDU-02 - Visualizar Painel', () => {
             });
         });
 
-        test('Deve criar processo e visualizá-lo na tabela', async ({page, autenticadoComoAdmin, cleanupAutomatico}: {
+        test('Deve criar processo e visualizá-lo na tabela', async ({page, autenticadoComoAdmin}: {
             page: Page,
-            autenticadoComoAdmin: void,
-            cleanupAutomatico: ReturnType<typeof useProcessoCleanup>
+            autenticadoComoAdmin: void
         }) => {
             const descricaoProcesso = `Processo E2E - ${Date.now()}`;
 
@@ -58,13 +50,7 @@ test.describe('CDU-02 - Visualizar Painel', () => {
                 expandir: ['SECRETARIA_2']
             });
 
-            // Capturar ID do processo para cleanup
-            const tabelaPainel = page.locator('[data-testid="tbl-processos"]');
-            const linha1 = tabelaPainel.locator('tr').filter({hasText: descricaoProcesso}).first();
-            await linha1.waitFor({state: 'visible'});
-            await linha1.click();
-            await expect(page).toHaveURL(/processo\/cadastro/);
-            await registrarProcessoNoCleanup(page, cleanupAutomatico);
+            // Verifica que o processo aparece na tabela
             await page.goto('/painel');
 
             await verificarProcessoNaTabela(page, {
@@ -76,12 +62,10 @@ test.describe('CDU-02 - Visualizar Painel', () => {
 
         test('Processos "Criado" devem aparecer apenas para ADMIN', async ({
                                                                                page,
-                                                                               autenticadoComoAdmin,
-                                                                               cleanupAutomatico
+                                                                               autenticadoComoAdmin
                                                                            }: {
             page: Page,
-            autenticadoComoAdmin: void,
-            cleanupAutomatico: ReturnType<typeof useProcessoCleanup>
+            autenticadoComoAdmin: void
         }) => {
             const descricaoProcesso = `Processo Criado - ${Date.now()}`;
 
@@ -93,16 +77,8 @@ test.describe('CDU-02 - Visualizar Painel', () => {
                 expandir: ['SECRETARIA_1']
             });
 
-            // Capturar ID do processo para cleanup
-            const tabelaPainelP = page.locator('[data-testid="tbl-processos"]');
-            const linha2 = tabelaPainelP.locator('tr').filter({hasText: descricaoProcesso}).first();
-            await linha2.waitFor({state: 'visible'});
-            await linha2.click();
-            await expect(page).toHaveURL(/processo\/cadastro/);
-            await registrarProcessoNoCleanup(page, cleanupAutomatico);
-            await page.goto('/painel');
-
             // Verifica que o processo está visível para ADMIN
+            await page.goto('/painel');
             const tabelaAdmin = page.locator('[data-testid="tbl-processos"]');
             await expect(tabelaAdmin.locator('tr').filter({hasText: descricaoProcesso}).first()).toBeVisible();
 
@@ -121,12 +97,10 @@ test.describe('CDU-02 - Visualizar Painel', () => {
 
         test('Não deve incluir unidades INTERMEDIARIAS na seleção', async ({
                                                                                page,
-                                                                               autenticadoComoAdmin,
-                                                                               cleanupAutomatico
+                                                                               autenticadoComoAdmin
                                                                            }: {
             page: Page,
-            autenticadoComoAdmin: void,
-            cleanupAutomatico: ReturnType<typeof useProcessoCleanup>
+            autenticadoComoAdmin: void
         }) => {
             await page.getByTestId('btn-painel-criar-processo').click();
             await expect(page).toHaveURL(/\/processo\/cadastro/);
@@ -167,15 +141,6 @@ test.describe('CDU-02 - Visualizar Painel', () => {
             await page.getByTestId('btn-processo-salvar').click();
 
             await expect(page).toHaveURL(/\/painel/);
-
-            // Capturar ID do processo para cleanup
-            const tabelaPainelF = page.locator('[data-testid="tbl-processos"]');
-            const linhaF = tabelaPainelF.locator('tr').filter({hasText: descricaoProcesso}).first();
-            await linhaF.waitFor({state: 'visible'});
-            await linhaF.click();
-            await expect(page).toHaveURL(/processo\/cadastro/);
-            await registrarProcessoNoCleanup(page, cleanupAutomatico);
-            await page.goto('/painel');
 
             // Verifica que o processo foi criado e aparece na tabela
             await verificarProcessoNaTabela(page, {

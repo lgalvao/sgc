@@ -32,8 +32,7 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
 
     test('Preparacao 1: Admin cria e inicia processo de mapeamento', async ({
                                                                                 page,
-                                                                                autenticadoComoAdmin,
-                                                                                cleanupAutomatico
+                                                                                autenticadoComoAdmin
                                                                             }) => {
 
 
@@ -49,7 +48,6 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
         await linhaProcesso.click();
 
         processoId = Number.parseInt(new RegExp(/\/processo(?:\/cadastro)?\/(\d+)/).exec(page.url())?.[1] || '0');
-        if (processoId > 0) cleanupAutomatico.registrar(processoId);
 
         await page.getByTestId('btn-processo-iniciar').click();
         await page.getByTestId('btn-iniciar-processo-confirmar').click();

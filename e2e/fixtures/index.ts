@@ -14,24 +14,23 @@
  * });
  * ```
  *
- * ### 2. Testes com Processo (criação + cleanup)
+ * ### 2. Testes com Processo (criação automática)
  * ```typescript
  * import {test, expect} from './fixtures/processo-fixtures.js';
  *
- * test('Teste com processo', async ({page, processoFixture, cleanup}) => {
+ * test('Teste com processo', async ({page, processoFixture}) => {
  *   // Processo criado automaticamente!
  *   await page.goto(`/processo/${processoFixture.codigo}`);
  * });
  * ```
  *
- * ### 3. Testes Completos (database + auth + cleanup)
+ * ### 3. Testes Completos (database + auth)
  * ```typescript
  * import {test, expect} from './fixtures/complete-fixtures.js';
  *
- * test('Teste completo', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
- *   // Database resetada + login + cleanup configurado!
+ * test('Teste completo', async ({page, autenticadoComoAdmin}) => {
+ *   // Database resetada + login automático!
  *   await criarProcesso(page, {...});
- *   cleanupAutomatico.registrar(codigo);
  * });
  * ```
  *
