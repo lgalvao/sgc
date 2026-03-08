@@ -43,6 +43,6 @@ test.describe.serial('CDU-36 - Gerar relatório de mapas', () => {
         const downloadPromise = page.waitForEvent('download');
         await botaoGerar.click();
         const download = await downloadPromise;
-        await expect(download.suggestedFilename()).toContain(`relatorio-mapas-${processo.codigo}.pdf`);
+        expect(download.suggestedFilename()).toContain(`relatorio-mapas-${processo.codigo}.pdf`);
     });
 });

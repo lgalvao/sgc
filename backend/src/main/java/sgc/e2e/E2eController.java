@@ -371,11 +371,13 @@ public class E2eController {
         
         jdbcTemplate.update("UPDATE sgc.subprocesso SET situacao = ? WHERE codigo = ?", situacaoSubprocesso, subId);
 
-        // Definir localização:
-        // Se for DISPONIBILIZADO (cadastro ou mapa), volta para a unidade do usuário (Chefe)
-        // Se for homologado ou validado, vai para a unidade superior (Gestor)
+        // Definir localização baseada na situação para que os botões de ação apareçam para o ator correto:
+        // 1. Cadastro Disponibilizado -> Gestor (superiorId)
+        // 2. Mapa Disponibilizado -> Chefe (unidId) para validação
+        // 3. Mapa Validado -> Gestor (superiorId) para análise
+        // 4. Homologados -> Unidade (unidId)
         Long destinoId = superiorId;
-        if (situacaoSubprocesso.endsWith("_DISPONIBILIZADO")) {
+        if (situacaoSubprocesso.equals("MAPEAMENTO_MAPA_DISPONIBILIZADO") || situacaoSubprocesso.endsWith("_HOMOLOGADO")) {
             destinoId = unidId;
         }
 

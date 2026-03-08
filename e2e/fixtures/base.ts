@@ -2,7 +2,7 @@ import {test as base} from '@playwright/test';
 // Use the project's centralized logger for consistent formatting
 import logger from '../../frontend/src/utils/logger.js';
 
-function obterBaseUrlWorker(workerIndex: number): string {
+function obterBaseUrlWorker(_workerIndex: number): string {
     const portaFrontend = Number.parseInt(process.env.E2E_FRONTEND_PORT || '5173', 10);
     return `http://localhost:${portaFrontend}`;
 }

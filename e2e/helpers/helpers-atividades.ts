@@ -55,6 +55,7 @@ export async function editarAtividade(page: Page, descricaoAtual: string | RegEx
     const editButton = card.getByTestId('btn-editar-atividade');
 
     // Forçar clique pois o botão só aparece no hover, o que pode ser instável em CI
+    // eslint-disable-next-line playwright/no-force-option
     await editButton.click({force: true});
 
     const input = page.getByTestId('inp-editar-atividade');

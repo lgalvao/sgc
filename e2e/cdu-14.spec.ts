@@ -26,8 +26,6 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
     const descProcesso = `Processo CDU-14 ${timestamp}`;
     const atividadeRevisao = `Atividade Rev ${timestamp}`;
 
-    let processoId: number;
-
     test('Preparacao 1: Base de dados com Mapa Vigente e Revisão Iniciada', async ({request}) => {
         // Criar processo mapeamento finalizado (gera mapa vigente)
         await criarProcessoFinalizadoFixture(request, {
@@ -42,7 +40,6 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
             unidade: UNIDADE_ALVO,
             iniciar: true
         });
-        processoId = processo.codigo;
     });
 
     test('Preparacao 4: CHEFE revisa e disponibiliza', async ({page}) => {

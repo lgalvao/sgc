@@ -1,5 +1,5 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
-import {loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
+import {login, USUARIOS} from './helpers/helpers-auth.js';
 import {criarProcessoFixture, criarProcessoFinalizadoFixture} from './fixtures/fixtures-processos.js';
 import {
     abrirModalImpactoEdicao,
