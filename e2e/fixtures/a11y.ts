@@ -6,10 +6,10 @@ export const test = base.extend<{ makeAxeBuilder: () => AxeBuilder }>({
     const makeAxeBuilder = () =>
       new AxeBuilder({ page })
         .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
-        .disableRules(['list']) // Known BVN violation for dropdown/nav components
+        .disableRules(['list']); // Known BVN violation for dropdown/nav components
 
-    await use(makeAxeBuilder)
+    await use(makeAxeBuilder);
   },
-})
+});
 
 export { expect } from '@playwright/test';
