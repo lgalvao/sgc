@@ -55,9 +55,8 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
     });
 
 
-    test('Cenários CDU-33: ADMIN reabre revisão de cadastro', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
-        cleanupAutomatico.registrar(mappingPid);
-        cleanupAutomatico.registrar(revisaoPid);
+    test('Cenários CDU-33: ADMIN reabre revisão de cadastro', async ({page, autenticadoComoAdmin}) => {
+
 
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
         await page.goto(`/processo/${revisaoPid}/${UNIDADE_ALVO}`);

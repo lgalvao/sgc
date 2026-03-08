@@ -6,10 +6,7 @@ import type {Page} from '@playwright/test';
 
 test.describe('CDU-02 - Visualizar Painel', () => {
     test.describe('Como ADMIN', () => {
-        test('Deve exibir estrutura básica do painel e testar ordenação', async ({page, autenticadoComoAdmin}: {
-            page: Page,
-            autenticadoComoAdmin: void
-        }) => {
+        test('Deve exibir estrutura básica do painel e testar ordenação', async ({page, autenticadoComoAdmin}) => {
             await test.step('Verificar seções principais', async () => {
                 await expect(page.getByTestId('txt-painel-titulo-processos')).toBeVisible();
                 await expect(page.getByTestId('txt-painel-titulo-processos')).toHaveText('Processos');
@@ -36,10 +33,7 @@ test.describe('CDU-02 - Visualizar Painel', () => {
             });
         });
 
-        test('Deve criar processo e visualizá-lo na tabela', async ({page, autenticadoComoAdmin}: {
-            page: Page,
-            autenticadoComoAdmin: void
-        }) => {
+        test('Deve criar processo e visualizá-lo na tabela', async ({page, autenticadoComoAdmin}) => {
             const descricaoProcesso = `Processo E2E - ${Date.now()}`;
 
             await criarProcesso(page, {
@@ -63,10 +57,7 @@ test.describe('CDU-02 - Visualizar Painel', () => {
         test('Processos "Criado" devem aparecer apenas para ADMIN', async ({
                                                                                page,
                                                                                autenticadoComoAdmin
-                                                                           }: {
-            page: Page,
-            autenticadoComoAdmin: void
-        }) => {
+                                                                           }) => {
             const descricaoProcesso = `Processo Criado - ${Date.now()}`;
 
             await criarProcesso(page, {
@@ -98,10 +89,7 @@ test.describe('CDU-02 - Visualizar Painel', () => {
         test('Não deve incluir unidades INTERMEDIARIAS na seleção', async ({
                                                                                page,
                                                                                autenticadoComoAdmin
-                                                                           }: {
-            page: Page,
-            autenticadoComoAdmin: void
-        }) => {
+                                                                           }) => {
             await page.getByTestId('btn-painel-criar-processo').click();
             await expect(page).toHaveURL(/\/processo\/cadastro/);
 
@@ -153,10 +141,7 @@ test.describe('CDU-02 - Visualizar Painel', () => {
     });
 
     test.describe('Como GESTOR', () => {
-        test('Deve validar visualização, alertas e ordenação', async ({page, autenticadoComoGestor}: {
-            page: Page,
-            autenticadoComoGestor: void
-        }) => {
+        test('Deve validar visualização, alertas e ordenação', async ({page, autenticadoComoGestor}) => {
             await test.step('Verificar restrições de botões e mensagens de tabela vazia', async () => {
                 await expect(page.getByTestId('btn-painel-criar-processo')).toBeHidden();
                 await expect(page.locator('[data-testid="tbl-processos"]')).toBeVisible();

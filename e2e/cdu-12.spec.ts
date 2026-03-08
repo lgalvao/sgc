@@ -14,6 +14,7 @@ import {
     verificarBotaoImpactoDropdown
 } from './helpers/helpers-atividades.js';
 import {acessarSubprocessoChefeDireto, acessarSubprocessoGestor} from './helpers/helpers-analise.js';
+import { login } from './helpers/helpers-auth.js';
 
 test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () => {
     const UNIDADE_ALVO = 'SECAO_121';
@@ -69,8 +70,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
     });
 
-    test('Passo 3.2: Verificação pelo GESTOR na tela de Visualização', async ({page, cleanupAutomatico}) => {
-        if (processoRevisaoId > 0) cleanupAutomatico.registrar(processoRevisaoId);
+    test('Passo 3.2: Verificação pelo GESTOR na tela de Visualização', async ({page}) => {
 
         // Localização atual deve estar no COORD_12 para o Gestor ver
         // Ringo Starr (GESTOR_COORD_12) possui apenas 1 perfil

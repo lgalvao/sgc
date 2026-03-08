@@ -6,15 +6,10 @@ import {
     esperarPaginaPainel,
     verificarToast
 } from './helpers/helpers-navegacao.js';
-import type {Page} from '@playwright/test';
-import type {useProcessoCleanup} from './hooks/hooks-limpeza.js';
 
 test.describe('CDU-03 - Manter Processo', () => {
 
-    test('Deve validar campos obrigatórios e estados dos botões', async ({page, autenticadoComoAdmin}: {
-        page: Page,
-        autenticadoComoAdmin: void
-    }) => {
+    test('Deve validar campos obrigatórios e estados dos botões', async ({page, autenticadoComoAdmin}) => {
         await page.getByTestId('btn-painel-criar-processo').click();
         await esperarPaginaCadastroProcesso(page);
 
@@ -57,10 +52,7 @@ test.describe('CDU-03 - Manter Processo', () => {
         await expect(btnIniciar).toBeDisabled();
     });
 
-    test('Deve permitir selecionar raiz interoperacional independentemente das subordinadas', async ({page, autenticadoComoAdmin}: {
-        page: Page,
-        autenticadoComoAdmin: void
-    }) => {
+    test('Deve permitir selecionar raiz interoperacional independentemente das subordinadas', async ({page, autenticadoComoAdmin}) => {
         await page.getByTestId('btn-painel-criar-processo').click();
         await esperarPaginaCadastroProcesso(page);
         await page.getByTestId('sel-processo-tipo').selectOption('MAPEAMENTO');
@@ -87,11 +79,7 @@ test.describe('CDU-03 - Manter Processo', () => {
         await expect(inputRaiz).not.toHaveJSProperty('indeterminate', true);
     });
 
-    test('Deve editar um processo existente', async ({page, autenticadoComoAdmin, cleanupAutomatico}: {
-        page: Page,
-        autenticadoComoAdmin: void,
-        cleanupAutomatico: ReturnType<typeof useProcessoCleanup>
-    }) => {
+    test('Deve editar um processo existente', async ({page, autenticadoComoAdmin}) => {
         const descricaoOriginal = `Processo para Edição - ${Date.now()}`;
         await criarProcesso(page, {
             descricao: descricaoOriginal,
@@ -103,9 +91,7 @@ test.describe('CDU-03 - Manter Processo', () => {
 
         await page.getByTestId('tbl-processos').getByText(descricaoOriginal).first().click();
         await esperarPaginaCadastroProcesso(page);
-        const id = await extrairProcessoId(page);
-        if (id) cleanupAutomatico.registrar(id);
-
+        await extrairProcessoId(page);
         await expect(page.getByTestId('inp-processo-descricao')).toHaveValue(descricaoOriginal);
         await expect(page.getByTestId('sel-processo-tipo')).toBeDisabled();
 
@@ -118,10 +104,7 @@ test.describe('CDU-03 - Manter Processo', () => {
         await expect(page.getByText(novaDescricao)).toBeVisible();
     });
 
-    test('Deve remover um processo', async ({page, autenticadoComoAdmin}: {
-        page: Page,
-        autenticadoComoAdmin: void
-    }) => {
+    test('Deve remover um processo', async ({page, autenticadoComoAdmin}) => {
         const descricao = `Processo para Remoção - ${Date.now()}`;
         await criarProcesso(page, {
             descricao: descricao,
@@ -141,10 +124,7 @@ test.describe('CDU-03 - Manter Processo', () => {
         await expect(page.getByTestId('tbl-processos').getByText(descricao)).toBeHidden();
     });
 
-    test('Deve validar regras de seleção em cascata na árvore de unidades', async ({page, autenticadoComoAdmin}: {
-        page: Page,
-        autenticadoComoAdmin: void
-    }) => {
+    test('Deve validar regras de seleção em cascata na árvore de unidades', async ({page, autenticadoComoAdmin}) => {
         await page.getByTestId('btn-painel-criar-processo').click();
         await esperarPaginaCadastroProcesso(page);
         await page.getByTestId('sel-processo-tipo').selectOption('MAPEAMENTO');
@@ -181,13 +161,8 @@ test.describe('CDU-03 - Manter Processo', () => {
 
     test('Deve avaliar unidades ocupadas por processos em andamento e restringi-las', async ({
                                                                                                  page,
-                                                                                                 autenticadoComoAdmin,
-                                                                                                 cleanupAutomatico
-                                                                                             }: {
-        page: Page,
-        autenticadoComoAdmin: void,
-        cleanupAutomatico: any
-    }) => {
+                                                                                                 autenticadoComoAdmin
+                                                                                             }) => {
         const descricaoBase = `Ocupado - ${Date.now()}`;
         await criarProcesso(page, {
             descricao: descricaoBase,
@@ -201,7 +176,7 @@ test.describe('CDU-03 - Manter Processo', () => {
         await page.getByTestId('tbl-processos').getByText(descricaoBase).first().click();
         await esperarPaginaDetalhesProcesso(page);
         const id = await extrairProcessoId(page);
-        cleanupAutomatico.registrar(id);
+
         await page.goto('/painel');
 
         await page.getByTestId('btn-painel-criar-processo').click();
@@ -217,10 +192,7 @@ test.describe('CDU-03 - Manter Processo', () => {
     test('Deve validar restrições de unidades sem mapa para REVISAO e DIAGNOSTICO', async ({
                                                                                                page,
                                                                                                autenticadoComoAdmin
-                                                                                           }: {
-        page: Page,
-        autenticadoComoAdmin: void
-    }) => {
+                                                                                           }) => {
         await page.getByTestId('btn-painel-criar-processo').click();
         await esperarPaginaCadastroProcesso(page);
         await page.getByTestId('sel-processo-tipo').selectOption('REVISAO');
@@ -239,13 +211,8 @@ test.describe('CDU-03 - Manter Processo', () => {
 
     test('Deve validar fluxos de cancelamento e mensagens de feedback', async ({
                                                                                    page,
-                                                                                   autenticadoComoAdmin,
-                                                                                   cleanupAutomatico
-                                                                               }: {
-        page: Page,
-        autenticadoComoAdmin: void,
-        cleanupAutomatico: any
-    }) => {
+                                                                                   autenticadoComoAdmin
+                                                                               }) => {
         const descricao = `Feedback - ${Date.now()}`;
 
         // Cancelar criação
@@ -273,7 +240,7 @@ test.describe('CDU-03 - Manter Processo', () => {
         await page.getByTestId('tbl-processos').getByText(descricao).first().click();
         await esperarPaginaCadastroProcesso(page);
         const id = await extrairProcessoId(page);
-        if (id) cleanupAutomatico.registrar(id);
+
         await page.goto('/painel');
 
         // Cancelar remoção
@@ -285,13 +252,8 @@ test.describe('CDU-03 - Manter Processo', () => {
 
     test('Deve validar fluxo alternativo (Botão Iniciar invés de Salvar)', async ({
                                                                                       page,
-                                                                                      autenticadoComoAdmin,
-                                                                                      cleanupAutomatico
-                                                                                  }: {
-        page: Page,
-        autenticadoComoAdmin: void,
-        cleanupAutomatico: any
-    }) => {
+                                                                                      autenticadoComoAdmin
+                                                                                  }) => {
         const descricaoAlt = `Alternativo - ${Date.now()}`;
 
         await page.getByTestId('btn-painel-criar-processo').click();
@@ -317,7 +279,7 @@ test.describe('CDU-03 - Manter Processo', () => {
         await page.getByTestId('tbl-processos').getByText(descricaoAlt).first().click();
         await esperarPaginaDetalhesProcesso(page);
         const idAlt = await extrairProcessoId(page);
-        if (idAlt) cleanupAutomatico.registrar(idAlt);
+
         await expect(page).toHaveURL(/\/processo\/\d+$/);
     });
 });

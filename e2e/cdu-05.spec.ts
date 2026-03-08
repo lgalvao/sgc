@@ -72,15 +72,14 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
 
     test('Fase 1.1: ADMIN cria e inicia processo de Mapeamento', async ({
                                                                             page,
-                                                                            autenticadoComoAdmin,
-                                                                            cleanupAutomatico
+                                                                            autenticadoComoAdmin
                                                                         }) => {
         await passo1_AdminCriaEIniciaProcessoMapeamento(page, descProcMapeamento);
         // Capturar ID do processo para cleanup
         await page.goto('/painel');
         await page.getByTestId('tbl-processos').getByText(descProcMapeamento).first().click();
         const processoMapeamentoId = Number.parseInt(new RegExp(/\/processo\/(\d+)/).exec(page.url())?.[1] || '0');
-        if (processoMapeamentoId > 0) cleanupAutomatico.registrar(processoMapeamentoId);
+
     });
 
     test('Fase 1.2: CHEFE adiciona atividades e conhecimentos', async ({page}) => {
@@ -161,7 +160,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Fase 2: Iniciar processo de Revisão', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
+    test('Fase 2: Iniciar processo de Revisão', async ({page, autenticadoComoAdmin}) => {
         // O login como Admin já foi disparado pela fixture 'autenticadoComoAdmin'
         // Se houver dúvida se a fixture trocou de usuário em um describe.serial,
         // podemos chamar o helper explicitamente para garantir a navegação para /login.
@@ -184,7 +183,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await page.getByTestId('tbl-processos').getByText(descProcRevisao).first().click();
         await expect(page).toHaveURL(/\/processo\/cadastro/);
         const processoRevisaoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
-        if (processoRevisaoId > 0) cleanupAutomatico.registrar(processoRevisaoId);
+
         const dataLimiteStr = (await page.getByTestId('inp-processo-data-limite').inputValue()).split('-').reverse().join('/');
 
         await expect(page.getByTestId('inp-processo-descricao')).toHaveValue(descProcRevisao);

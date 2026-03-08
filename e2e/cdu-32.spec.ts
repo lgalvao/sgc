@@ -28,8 +28,6 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
     let processoId: number;
 
     const atividade1 = `Atividade Reabrir ${timestamp}`;
-
-
     test('Preparacao 1: Admin cria e inicia processo', async ({page, request, autenticadoComoAdmin}) => {
         const processo = await criarProcessoFixture(request, {
             descricao: descProcesso,
@@ -121,8 +119,7 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
     });
 
 
-    test('Cenários CDU-32: ADMIN reabre cadastro', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
-        cleanupAutomatico.registrar(processoId);
+    test('Cenários CDU-32: ADMIN reabre cadastro', async ({page, autenticadoComoAdmin}) => {
 
         // Cenario 1 & 2: Navegação e visualização do botão
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();

@@ -26,7 +26,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
     const timestamp = Date.now();
     const descProcessoRevisao = `Rev 10 ${timestamp}`;
 
-    test('1. Preparação: Mapeamento completo e Revisão iniciada', async ({request}) => {
+    test.beforeAll(async ({request}) => {
         // Criar processo mapeamento finalizado (gera mapa vigente)
         await criarProcessoFinalizadoFixture(request, {
             unidade: UNIDADE_ALVO,

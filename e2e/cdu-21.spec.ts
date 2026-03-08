@@ -35,8 +35,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
 
     test('Preparacao 1: Admin cria e inicia processo de mapeamento', async ({
                                                                                 page,
-                                                                                autenticadoComoAdmin,
-                                                                                cleanupAutomatico
+                                                                                autenticadoComoAdmin
                                                                             }) => {
 
         await criarProcesso(page, {
@@ -240,9 +239,8 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
         // (Processo finalizado não aparece na lista de processos ativos)
     });
 
-    test('Cenario 4: Verificar ausência de botões em processo finalizado', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
+    test('Cenario 4: Verificar ausência de botões em processo finalizado', async ({page, autenticadoComoAdmin}) => {
         // Issue #1220: Garantir que botões de ação não aparecem para processos finalizados
-        if (processoId > 0) cleanupAutomatico.registrar(processoId);
 
         await page.goto(`/processo/${processoId}`);
 

@@ -73,8 +73,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
             descProcesso = processo.descricao;
         });
 
-        test('Fluxo ADMIN: Visualizar em processo finalizado', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
-            if (processoId > 0) cleanupAutomatico.registrar(processoId);
+        test('Fluxo ADMIN: Visualizar em processo finalizado', async ({page, autenticadoComoAdmin}) => {
 
             // 1. No Painel, o usuário clica no processo finalizado
             await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();

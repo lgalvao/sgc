@@ -1,15 +1,6 @@
 import {expect, type Page} from '@playwright/test';
 import {limparNotificacoes, verificarPaginaPainel} from './helpers-navegacao.js';
 
-// Re-exportar para manter compatibilidade com imports existentes
-
-
-/**
- * Helpers para análise de cadastro de atividades (CDU-13 e CDU-14)
- */
-
-// Funções de Navegação
-
 /**
  * Acessa subprocesso como GESTOR (via lista de unidades)
  */
@@ -194,8 +185,6 @@ export async function aceitarRevisao(page: Page, observacao: string = '') {
     await realizarAceite(page, observacao);
 }
 
-// Funções de Homologação (ADMIN)
-
 /**
  * Homologa cadastro (ADMIN) - Mapeamento
  */
@@ -213,41 +202,4 @@ export async function homologarCadastroMapeamento(page: Page) {
 
     await expect(page).toHaveURL(/\/processo\/\d+\/\w+$/);
 }
-
-export async function homologarCadastroRevisaoComImpacto(page: Page) {
-    await page.getByTestId('btn-acao-analisar-principal').click();
-
-    // Aguardar modal aparecer
-    await expect(page.getByRole('dialog')).toBeVisible();
-
-    await expect(page.getByText(/Confirma a homologação do cadastro de atividades e conhecimentos/i)).toBeVisible();
-
-    await page.getByTestId('inp-aceite-cadastro-obs').fill('Homologado sem ressalvas');
-
-    await page.getByTestId('btn-aceite-cadastro-confirmar').click();
-    await expect(page.getByText(/Revisão d[oe] cadastro homologada/i).first()).toBeVisible();
-
-    // Verifica redirecionamento para tela de detalhes do subprocesso
-    await expect(page).toHaveURL(/\/processo\/\d+\/\w+$/);
-
-    // Verificar situação após homologação
-    await expect(page.getByTestId('subprocesso-header__txt-situacao'))
-        .toHaveText(/Revisão d[oe] cadastro homologada/i);
-}
-
-/**
- * Cancela homologação
- */
-export async function cancelarHomologacao(page: Page) {
-    await page.getByTestId('btn-acao-analisar-principal').click();
-
-    // Verificar modal de homologação
-    await expect(page.getByRole('dialog')).toBeVisible();
-
-    await page.getByRole('button', {name: 'Cancelar'}).click();
-
-    // Verificar que modal fechou
-    await expect(page.getByRole('dialog')).toBeHidden();
-}
-
 export {fazerLogout, verificarPaginaPainel} from './helpers-navegacao.js';
