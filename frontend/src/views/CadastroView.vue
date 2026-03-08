@@ -302,7 +302,7 @@ async function confirmarRemocao() {
         const atividadeRemovida = atividades.value[index];
         const response = await atividadeService.excluirAtividade(atividadeRemovida.codigo);
         processarRespostaLocal(response);
-      } else if (tipo === "conhecimento" && conhecimentoCodigo !== undefined) {
+      } else if (tipo === "conhecimento" && !conhecimentoCodigo) {
         const atividade = atividades.value[index];
         const response = await atividadeService.excluirConhecimento(atividade.codigo, conhecimentoCodigo);
         processarRespostaLocal(response);

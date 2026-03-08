@@ -113,9 +113,7 @@ async function salvar() {
     chave: 'DIAS_INATIVACAO_PROCESSO',
     descricao: 'Dias para inativação de processos',
     valor: form.diasInativacao.toString()
-  });
-
-  paramsToSave.push({
+  }, {
     codigo: findCodigo('DIAS_ALERTA_NOVO'),
     chave: 'DIAS_ALERTA_NOVO',
     descricao: 'Dias para indicação de alerta como novo',

@@ -87,6 +87,3 @@ onMounted(() => {
   carregarHistorico();
 });
 </script>
-
-<style scoped>
-</style>

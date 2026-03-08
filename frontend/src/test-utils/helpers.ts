@@ -1,5 +1,4 @@
 import {createPinia, setActivePinia} from "pinia";
-import {vi} from "vitest";
 import type {Atividade} from "@/types/tipos";
 
 /**

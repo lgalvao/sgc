@@ -66,6 +66,3 @@ async function carregarUnidades() {
 onMounted(carregarUnidades);
 
 </script>
-
-<style scoped>
-</style>
