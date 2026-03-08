@@ -3,8 +3,13 @@ import {flushPromises, mount} from '@vue/test-utils';
 import {nextTick} from 'vue';
 import ProcessoCadastroView from '@/views/ProcessoCadastroView.vue';
 import {useProcessosStore} from '@/stores/processos';
-import {useUnidadesStore} from '@/stores/unidades';
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
+import * as unidadeService from '@/services/unidadeService';
+
+vi.mock('@/services/unidadeService', () => ({
+    buscarArvoreComElegibilidade: vi.fn().mockResolvedValue([]),
+    mapUnidadesArray: vi.fn((arr) => arr || []),
+}));
 
 const {mockPush, mockRoute} = vi.hoisted(() => {
     return {
@@ -52,10 +57,6 @@ describe('ProcessoCadastroView.vue Coverage', () => {
         context.wrapper = mount(ProcessoCadastroView, {
             ...getCommonMountOptions(
                 {
-                    unidades: {
-                        unidades: [],
-                        isLoading: false
-                    },
                     processos: {
                         processoDetalhe: null,
                         lastError: null
@@ -87,15 +88,15 @@ describe('ProcessoCadastroView.vue Coverage', () => {
         });
 
         processosStore = useProcessosStore();
-        const unidadesStore = useUnidadesStore();
-        return {wrapper: context.wrapper, processosStore, unidadesStore};
+        return {wrapper: context.wrapper, processosStore};
     };
 
     beforeEach(() => {
         vi.clearAllMocks();
         mockRoute.query = {};
+        vi.mocked(unidadeService.buscarArvoreComElegibilidade).mockResolvedValue([]);
+        vi.mocked(unidadeService.mapUnidadesArray).mockImplementation((arr) => arr || []);
         window.scrollTo = vi.fn();
-        // Silenciar console.error para evitar ruído nos testes que disparam erros esperados
         vi.spyOn(console, 'error').mockImplementation(() => {
         });
     });
@@ -245,13 +246,11 @@ describe('ProcessoCadastroView.vue Coverage', () => {
 
     it('triggers search for units if type changes', async () => {
         const {wrapper} = createWrapper();
-        const unidadesStore = (wrapper.vm).unidadesStore;
-        vi.spyOn(unidadesStore, 'buscarUnidadesParaProcesso').mockResolvedValue(undefined);
 
         (wrapper.vm).tipo = 'MAPEAMENTO';
         await nextTick();
 
-        expect(unidadesStore.buscarUnidadesParaProcesso).toHaveBeenCalledWith('MAPEAMENTO', undefined);
+        expect(unidadeService.buscarArvoreComElegibilidade).toHaveBeenCalledWith('MAPEAMENTO', undefined);
     });
 
     it('populates fields when loading an existing process', async () => {
@@ -265,7 +264,7 @@ describe('ProcessoCadastroView.vue Coverage', () => {
             unidades: [{codUnidade: 1}, {codUnidade: 2}]
         };
 
-        const {wrapper, unidadesStore} = createWrapper({
+        const {wrapper} = createWrapper({
             processos: {
                 processoDetalhe: mockProcesso
             }
@@ -277,6 +276,6 @@ describe('ProcessoCadastroView.vue Coverage', () => {
         expect((wrapper.vm).tipo).toBe('MAPEAMENTO');
         expect((wrapper.vm).dataLimite).toBe('2023-12-31');
         expect((wrapper.vm).unidadesSelecionadas).toEqual([1, 2]);
-        expect(unidadesStore.buscarUnidadesParaProcesso).toHaveBeenCalledWith('MAPEAMENTO', 123);
+        expect(unidadeService.buscarArvoreComElegibilidade).toHaveBeenCalledWith('MAPEAMENTO', 123);
     });
 });

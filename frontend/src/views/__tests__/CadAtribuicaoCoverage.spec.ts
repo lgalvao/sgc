@@ -2,8 +2,7 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {flushPromises, mount} from '@vue/test-utils';
 import CadAtribuicao from '@/views/AtribuicaoTemporariaView.vue';
 import {getCommonMountOptions} from "@/test-utils/componentTestHelpers";
-import {useUnidadesStore} from '@/stores/unidades';
-import {createTestingPinia} from '@pinia/testing';
+import * as unidadeService from '@/services/unidadeService';
 
 vi.mock('vue-router', () => ({
     useRouter: () => ({
@@ -18,15 +17,21 @@ vi.mock('vue-router', () => ({
     createMemoryHistory: vi.fn(),
 }));
 
-describe('CadAtribuicao Coverage', () => {
-    let pinia: any;
+vi.mock('@/services/unidadeService', () => ({
+    buscarUnidadePorCodigo: vi.fn(),
+}));
 
+vi.mock('@/services/usuarioService', () => ({
+    buscarUsuariosPorUnidade: vi.fn().mockResolvedValue([]),
+}));
+
+describe('CadAtribuicao Coverage', () => {
     function criarWrapper(props = {codUnidade: 1}) {
         return mount(CadAtribuicao, {
             ...getCommonMountOptions(),
             props,
             global: {
-                plugins: [pinia],
+                plugins: [],
                 stubs: {
                     LayoutPadrao: true,
                     BContainer: true,
@@ -47,17 +52,14 @@ describe('CadAtribuicao Coverage', () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
-        pinia = createTestingPinia({
-            createSpy: vi.fn,
-            stubActions: false
-        });
+        vi.mocked(unidadeService.buscarUnidadePorCodigo).mockResolvedValue({
+            codigo: 1, sigla: 'TEST', nome: 'Unidade Teste'
+        } as any);
     });
 
     it('deve lidar com erro no onMounted', async () => {
-        const unidadesStore = useUnidadesStore();
-        vi.spyOn(unidadesStore, 'buscarUnidadePorCodigo').mockRejectedValue(new Error('Erro ao buscar unidade'));
-        vi.spyOn(console, 'error').mockImplementation(() => {
-        });
+        vi.mocked(unidadeService.buscarUnidadePorCodigo).mockRejectedValueOnce(new Error('Erro ao buscar unidade'));
+        vi.spyOn(console, 'error').mockImplementation(() => {});
 
         const wrapper = criarWrapper();
         await flushPromises();
@@ -69,7 +71,6 @@ describe('CadAtribuicao Coverage', () => {
         const wrapper = criarWrapper();
         await flushPromises();
 
-        // Forçar estado onde unidade ou usuarioSelecionado é nulo
         (wrapper.vm as any).unidade = null;
         (wrapper.vm as any).usuarioSelecionado = null;
 

@@ -1,8 +1,8 @@
 import {computed} from 'vue';
 import {type RouteLocationNamedRaw, type RouteLocationNormalizedLoaded} from 'vue-router';
 import {usePerfilStore} from '@/stores/perfil';
-import {useUnidadesStore} from '@/stores/unidades';
 import {Perfil} from '@/types/tipos';
+import {useUnidadeAtual} from '@/composables/useUnidadeAtual';
 
 export interface Breadcrumb {
     label: string;
@@ -12,7 +12,7 @@ export interface Breadcrumb {
 
 export function useBreadcrumbs(route: RouteLocationNormalizedLoaded) {
     const perfil = usePerfilStore();
-    const unidadesStore = useUnidadesStore();
+    const {unidadeAtual} = useUnidadeAtual();
 
     const getProcessoBreadcrumbs = (
         codProcesso: string,
@@ -72,9 +72,8 @@ export function useBreadcrumbs(route: RouteLocationNormalizedLoaded) {
     ): Breadcrumb[] => {
         const crumbs: Breadcrumb[] = [];
         if (codUnidade && isUnidadeRoute) {
-            const siglaUnidadeStore = unidadesStore.unidade?.sigla;
             crumbs.push({
-                label: siglaUnidadeStore || `Unidade ${codUnidade}`,
+                label: unidadeAtual.value?.sigla || `Unidade ${codUnidade}`,
                 to: routeName === "Unidade" ? undefined : {name: "Unidade", params: {codUnidade}},
             });
 

@@ -246,7 +246,6 @@ import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import AceitarMapaModal from "@/components/mapa/AceitarMapaModal.vue";
 import HistoricoAnaliseModal from "@/components/processo/HistoricoAnaliseModal.vue";
-import {useUnidadesStore} from "@/stores/unidades";
 import {useProcessosStore} from "@/stores/processos";
 import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useNotification} from "@/composables/useNotification";
@@ -256,11 +255,11 @@ import {useAcesso} from "@/composables/useAcesso";
 import logger from "@/utils/logger";
 import {listarAnalisesCadastro} from "@/services/analiseService";
 import {obterMapaVisualizacao} from "@/services/mapaService";
-import type {AnaliseCadastro, MapaVisualizacao} from "@/types/tipos";
+import {buscarUnidadePorSigla as buscarUnidadeServico} from "@/services/unidadeService";
+import type {AnaliseCadastro, MapaVisualizacao, Unidade} from "@/types/tipos";
 
 const route = useRoute();
 const router = useRouter();
-const unidadesStore = useUnidadesStore();
 const processosStore = useProcessosStore();
 const subprocessosStore = useSubprocessosStore();
 const {notify} = useNotification();
@@ -272,7 +271,7 @@ const analisesCadastro = ref<AnaliseCadastro[]>([]);
 const sigla = computed(() => route.params.siglaUnidade as string);
 const codProcesso = computed(() => Number(route.params.codProcesso));
 
-const unidade = computed(() => unidadesStore.unidade);
+const unidade = ref<Unidade | null>(null);
 
 function buscarUnidadeRecursivo(unidades: any[], siglaAlvo: string): any | null {
   for (const u of unidades) {
@@ -464,7 +463,8 @@ function verHistorico() {
 }
 
 onMounted(async () => {
-  await unidadesStore.buscarUnidade(sigla.value);
+  const response = await buscarUnidadeServico(sigla.value);
+  unidade.value = response as Unidade;
   await processosStore.buscarProcessoDetalhe(codProcesso.value);
   if (codSubprocesso.value) {
     await subprocessosStore.buscarSubprocessoDetalhe(codSubprocesso.value);

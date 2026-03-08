@@ -127,7 +127,7 @@ import PageHeader from "@/components/layout/PageHeader.vue";
 import LoadingButton from "@/components/comum/LoadingButton.vue";
 import AppAlert from "@/components/comum/AppAlert.vue";
 import {useNotification} from "@/composables/useNotification";
-import {useUnidadesStore} from "@/stores/unidades";
+import {buscarUnidadePorCodigo as buscarUnidadeServico} from "@/services/unidadeService";
 import {buscarUsuariosPorUnidade} from "@/services/usuarioService";
 import {criarAtribuicaoTemporaria} from "@/services/atribuicaoTemporariaService";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
@@ -136,7 +136,6 @@ const props = defineProps<{ codUnidade: number }>();
 
 const router = useRouter();
 const {notificacao, notify, clear} = useNotification();
-const unidadesStore = useUnidadesStore();
 const codUnidade = computed(() => props.codUnidade);
 
 const unidade = ref<Unidade | null>(null);
@@ -151,8 +150,8 @@ const erroUsuario = ref("");
 
 onMounted(async () => {
   try {
-    await unidadesStore.buscarUnidadePorCodigo(codUnidade.value);
-    unidade.value = unidadesStore.unidade as Unidade;
+    const response = await buscarUnidadeServico(codUnidade.value);
+    unidade.value = response as Unidade;
     if (unidade.value) {
       usuarios.value = await buscarUsuariosPorUnidade(unidade.value.codigo);
     }

@@ -179,13 +179,12 @@ import CadAtividadeForm from "@/components/atividades/CadAtividadeForm.vue";
 import {useAtividadeForm} from "@/composables/useAtividadeForm";
 import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useMapasStore} from "@/stores/mapas";
-import {useUnidadesStore} from "@/stores/unidades";
 import {useNotification} from "@/composables/useNotification";
 import {useToastStore} from "@/stores/toast";
 import {usePerfil} from "@/composables/usePerfil";
 import {useAcesso} from "@/composables/useAcesso";
 import type {Atividade, AnaliseCadastro, Conhecimento, CriarConhecimentoRequest, ErroValidacao,} from "@/types/tipos";
-import {SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
+import {SituacaoSubprocesso, TipoProcesso, type Unidade} from "@/types/tipos";
 import logger from "@/utils/logger";
 import {formatSituacaoSubprocesso} from "@/utils/formatters";
 import * as atividadeService from "@/services/atividadeService";
@@ -201,7 +200,6 @@ const props = defineProps<{
 }>();
 
 const router = useRouter();
-const unidadesStore = useUnidadesStore();
 const subprocessosStore = useSubprocessosStore();
 const mapasStore = useMapasStore();
 const {notify} = useNotification();
@@ -214,7 +212,8 @@ const codSubprocesso = ref<number | null>(null);
 
 const codMapa = computed(() => mapasStore.mapaCompleto?.codigo || null);
 const subprocesso = computed(() => subprocessosStore.subprocessoDetalhe);
-const nomeUnidade = computed(() => unidadesStore.unidade?.nome || "");
+const unidade = ref<Unidade | null>(null);
+const nomeUnidade = computed(() => unidade.value?.nome || "");
 const {podeEditarCadastro, podeDisponibilizarCadastro, podeVisualizarImpacto} = useAcesso(subprocesso);
 const isRevisao = computed(() => subprocesso.value?.tipoProcesso === TipoProcesso.REVISAO);
 const podeVerImpacto = computed(() => podeVisualizarImpacto.value);
@@ -505,8 +504,13 @@ onMounted(async () => {
   if (id) {
     codSubprocesso.value = id;
     const data = await subprocessosStore.buscarContextoEdicao(id);
-    if (data && data.atividadesDisponiveis) {
-      atividades.value = data.atividadesDisponiveis;
+    if (data) {
+      if (data.atividadesDisponiveis) {
+        atividades.value = data.atividadesDisponiveis;
+      }
+      if (data.unidade) {
+        unidade.value = data.unidade as Unidade;
+      }
     }
   } else {
     logger.error("[CadAtividades] ERRO: Subprocesso não encontrado!");

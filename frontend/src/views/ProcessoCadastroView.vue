@@ -18,8 +18,8 @@
           v-model="formData"
           :field-errors="fieldErrors"
           :is-edit="!!processoEditando"
-          :is-loading-unidades="unidadesStore.isLoading"
-          :unidades="unidadesStore.unidades"
+          :is-loading-unidades="isLoadingUnidades"
+          :unidades="unidades"
       />
 
       <div class="d-flex justify-content-between">
@@ -119,9 +119,9 @@ import {useProcessoForm} from "@/composables/useProcessoForm";
 import {useNotification} from "@/composables/useNotification";
 
 import {useProcessosStore} from "@/stores/processos";
-import {useUnidadesStore} from "@/stores/unidades";
 import {useToastStore} from "@/stores/toast";
-import {Processo as ProcessoModel, TipoProcesso} from "@/types/tipos";
+import {buscarArvoreComElegibilidade, mapUnidadesArray} from "@/services/unidadeService";
+import {Processo as ProcessoModel, TipoProcesso, type Unidade} from "@/types/tipos";
 
 const {
   descricao,
@@ -160,9 +160,23 @@ const isLoading = ref(false);
 const router = useRouter();
 const route = useRoute();
 const processosStore = useProcessosStore();
-const unidadesStore = useUnidadesStore();
 const toastStore = useToastStore();
 const {notificacao, notify, notifyStructured, clear} = useNotification();
+
+const unidades = ref<Unidade[]>([]);
+const isLoadingUnidades = ref(false);
+
+async function buscarUnidadesParaProcesso(tipoProcesso: string, codProcesso?: number) {
+  isLoadingUnidades.value = true;
+  try {
+    const response = await buscarArvoreComElegibilidade(tipoProcesso, codProcesso);
+    unidades.value = mapUnidadesArray(response as any);
+  } catch (err: any) {
+    logger.error("Erro ao buscar unidades:", err);
+  } finally {
+    isLoadingUnidades.value = false;
+  }
+}
 
 const mostrarModalConfirmacao = ref(false);
 const mostrarModalRemocao = ref(false);
@@ -189,7 +203,7 @@ onMounted(async () => {
         tipo.value = processo.tipo as any;
         dataLimite.value = processo.dataLimite.split("T")[0];
         unidadesSelecionadas.value = processo.unidades.map((u) => u.codUnidade);
-        await unidadesStore.buscarUnidadesParaProcesso(
+        await buscarUnidadesParaProcesso(
             processo.tipo,
             processo.codigo,
         );
@@ -202,7 +216,7 @@ onMounted(async () => {
       isLoadingData.value = false;
     }
   } else if (tipo.value) {
-    await unidadesStore.buscarUnidadesParaProcesso(tipo.value);
+    await buscarUnidadesParaProcesso(tipo.value);
   }
 
   // Auto-focus na descrição ao carregar
@@ -218,7 +232,7 @@ watch(tipo, async (novoTipo) => {
       ? processoEditando.value.codigo
       : undefined;
   if (novoTipo) {
-    await unidadesStore.buscarUnidadesParaProcesso(novoTipo, codProcesso);
+    await buscarUnidadesParaProcesso(novoTipo, codProcesso);
   }
 });
 

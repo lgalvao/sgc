@@ -23,7 +23,6 @@ import {
 } from "@/services/processoService";
 import {usePerfilStore} from "@/stores/perfil";
 import {useProcessosStore} from "@/stores/processos";
-import {useUnidadesStore} from "@/stores/unidades";
 import {useMapasStore} from "@/stores/mapas";
 import type {
     AceitarCadastroRequest,
@@ -149,9 +148,6 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
             const data = await serviceBuscarContextoEdicao(codigo, perfil, codUnidade as number);
             const detalhesDto = data.detalhes || data;
             subprocessoDetalhe.value = mapSubprocessoDetalheDtoToModel(detalhesDto);
-
-            const unidadesStore = useUnidadesStore();
-            unidadesStore.unidade = data.unidade;
 
             const mapasStore = useMapasStore();
             mapasStore.mapaCompleto = data.mapa as MapaCompleto;

@@ -1,16 +1,20 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {flushPromises, mount} from '@vue/test-utils';
 import {nextTick} from 'vue';
-import {createTestingPinia} from '@pinia/testing';
 import ProcessoCadastroView from '@/views/ProcessoCadastroView.vue';
 import {useProcessosStore} from '@/stores/processos';
-import {useUnidadesStore} from '@/stores/unidades';
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
+import * as unidadeService from '@/services/unidadeService';
 
 vi.mock('@/services/processoService', () => ({
     criarProcesso: vi.fn(),
     atualizarProcesso: vi.fn(),
     excluirProcesso: vi.fn(),
+}));
+
+vi.mock('@/services/unidadeService', () => ({
+    buscarArvoreComElegibilidade: vi.fn().mockResolvedValue([]),
+    mapUnidadesArray: vi.fn((arr) => arr || []),
 }));
 
 const {mockPush, mockRoute} = vi.hoisted(() => {
@@ -46,17 +50,11 @@ const ArvoreUnidadesStub = {
 describe('ProcessoCadastroView.vue', () => {
     const context = setupComponentTest();
     let processosStore: any;
-    let unidadesStore: any;
-    let processoService: any;
 
     const createWrapper = (initialState = {}) => {
         context.wrapper = mount(ProcessoCadastroView, {
             ...getCommonMountOptions(
                 {
-                    unidades: {
-                        unidades: [],
-                        isLoading: false
-                    },
                     processos: {
                         processoDetalhe: null,
                         lastError: null
@@ -97,20 +95,20 @@ describe('ProcessoCadastroView.vue', () => {
         });
 
         processosStore = useProcessosStore();
-        unidadesStore = useUnidadesStore();
 
-        return {wrapper: context.wrapper, processosStore, unidadesStore};
+        return {wrapper: context.wrapper, processosStore};
     };
 
     beforeEach(async () => {
         vi.clearAllMocks();
         mockRoute.query = {};
+        vi.mocked(unidadeService.buscarArvoreComElegibilidade).mockResolvedValue([]);
+        vi.mocked(unidadeService.mapUnidadesArray).mockImplementation((arr) => arr || []);
 
-        processoService = await import('@/services/processoService');
+        await import('@/services/processoService');
 
         window.scrollTo = vi.fn();
 
-        // Suppress console.error
         vi.spyOn(console, 'error').mockImplementation(() => {
         });
     });
@@ -118,7 +116,7 @@ describe('ProcessoCadastroView.vue', () => {
     it('renders correctly in creation mode', async () => {
         const {wrapper} = createWrapper();
         expect(wrapper.find('h2').text()).toBe('Cadastro de processo');
-        expect(unidadesStore.buscarUnidadesParaProcesso).not.toHaveBeenCalled();
+        expect(unidadeService.buscarArvoreComElegibilidade).not.toHaveBeenCalled();
         expect(wrapper.find('[data-testid="btn-processo-salvar"]').exists()).toBe(true);
         expect(wrapper.find('[data-testid="btn-processo-remover"]').exists()).toBe(false);
     });
@@ -306,10 +304,10 @@ describe('ProcessoCadastroView.vue', () => {
     });
 
     it('updates unit list when type changes', async () => {
-        const {wrapper, unidadesStore} = createWrapper();
+        const {wrapper} = createWrapper();
         wrapper.vm.tipo = 'REVISAO';
         await nextTick();
-        expect(unidadesStore.buscarUnidadesParaProcesso).toHaveBeenCalledWith('REVISAO', undefined);
+        expect(unidadeService.buscarArvoreComElegibilidade).toHaveBeenCalledWith('REVISAO', undefined);
     });
 
     it('handles error when starting a new process (creation fail)', async () => {
@@ -436,7 +434,8 @@ describe('ProcessoCadastroView.vue', () => {
 
     it('does nothing when confirmarRemocao is called without processoEditando', async () => {
         const {wrapper} = createWrapper();
-        vi.spyOn(processoService, 'excluirProcesso');
+        const processoServiceModule = await import('@/services/processoService');
+        vi.spyOn(processoServiceModule, 'excluirProcesso');
 
         wrapper.vm.processoEditando = null;
         wrapper.vm.mostrarModalRemocao = true;
@@ -445,7 +444,7 @@ describe('ProcessoCadastroView.vue', () => {
         await wrapper.vm.confirmarRemocao();
         await flushPromises();
 
-        expect(processoService.excluirProcesso).not.toHaveBeenCalled();
+        expect(processoServiceModule.excluirProcesso).not.toHaveBeenCalled();
         expect(wrapper.vm.mostrarModalRemocao).toBe(false);
     });
 
@@ -476,12 +475,10 @@ describe('ProcessoCadastroView.vue', () => {
     });
 
     it('shows loading spinner when units are loading', async () => {
-        const {wrapper} = createWrapper({
-            unidades: {
-                isLoading: true,
-                unidades: []
-            }
-        });
+        vi.mocked(unidadeService.buscarArvoreComElegibilidade).mockReturnValueOnce(new Promise(() => {}));
+        const {wrapper} = createWrapper();
+        wrapper.vm.tipo = 'MAPEAMENTO';
+        await nextTick();
         expect(wrapper.text()).toContain('Carregando unidades...');
     });
 
@@ -513,8 +510,9 @@ describe('ProcessoCadastroView.vue', () => {
 
     it('handles error when loading process details on mount', async () => {
         mockRoute.query = {codProcesso: '123'};
-
-        const pinia = createTestingPinia({stubActions: true});
+        // Need to set mock BEFORE mount since buscarProcessoDetalhe fires in onMounted
+        const {createTestingPinia} = await import('@pinia/testing');
+        const pinia = createTestingPinia({stubActions: true, createSpy: vi.fn});
         const store = useProcessosStore(pinia);
         (store.buscarProcessoDetalhe as any).mockRejectedValue(new Error('Load Error'));
 
@@ -533,9 +531,7 @@ describe('ProcessoCadastroView.vue', () => {
                 BFormInvalidFeedback: {template: '<div></div>'},
                 LoadingButton: {template: '<button><slot /></button>'}
             }),
-            global: {
-                plugins: [pinia]
-            }
+            global: {plugins: [pinia]}
         });
 
         await flushPromises();

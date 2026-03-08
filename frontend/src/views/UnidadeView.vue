@@ -1,15 +1,15 @@
 <template>
   <LayoutPadrao>
     <BAlert
-        v-if="unidadesStore.lastError"
+        v-if="lastError"
         :model-value="true"
         variant="danger"
         dismissible
-        @dismissed="unidadesStore.clearError()"
+        @dismissed="clearError()"
     >
-      {{ unidadesStore.lastError.message }}
-      <div v-if="unidadesStore.lastError.details">
-        <small>Detalhes: {{ unidadesStore.lastError.details }}</small>
+      {{ lastError.message }}
+      <div v-if="lastError.details">
+        <small>Detalhes: {{ lastError.details }}</small>
       </div>
     </BAlert>
 
@@ -118,8 +118,9 @@ import type {Unidade, Usuario} from "@/types/tipos";
 import TreeTable from "@/components/comum/TreeTable.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
-import {useUnidadesStore} from "@/stores/unidades";
+import {buscarArvoreUnidade as buscarArvoreUnidadeServico} from "@/services/unidadeService";
 import {usePerfil} from "@/composables/usePerfil";
+import {useUnidadeAtual} from "@/composables/useUnidadeAtual";
 import {useMapasStore} from "@/stores/mapas";
 import {buscarUsuarioPorTitulo} from "@/services/usuarioService";
 import {logger} from "@/utils";
@@ -127,23 +128,31 @@ import {logger} from "@/utils";
 const props = defineProps<{ codUnidade: number }>();
 
 const router = useRouter();
-const unidadesStore = useUnidadesStore();
 const {isAdmin} = usePerfil();
 const mapasStore = useMapasStore();
+const {definirUnidadeAtual} = useUnidadeAtual();
 
+const unidade = ref<Unidade | null>(null);
 const titularDetalhes = ref<Usuario | null>(null);
+const lastError = ref<{message: string; details?: string} | null>(null);
 
-const unidade = computed(() => unidadesStore.unidade);
+function clearError() {
+  lastError.value = null;
+}
+
 const mapaVigente = computed(() => mapasStore.mapaCompleto);
 
 async function carregarDados() {
   try {
-    await unidadesStore.buscarArvoreUnidade(props.codUnidade);
+    const response = await buscarArvoreUnidadeServico(props.codUnidade);
+    unidade.value = response as Unidade;
+    definirUnidadeAtual(unidade.value);
 
     if (unidade.value?.tituloTitular) {
       titularDetalhes.value = await buscarUsuarioPorTitulo(unidade.value.tituloTitular);
     }
-  } catch (error) {
+  } catch (error: any) {
+    lastError.value = {message: error.message || "Erro ao carregar unidade"};
     logger.error("Erro ao carregar dados da unidade:", error);
   }
 }

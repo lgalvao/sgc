@@ -3,7 +3,6 @@ import {flushPromises, mount} from '@vue/test-utils';
 import UnidadeView from '@/views/UnidadeView.vue';
 import EmptyState from '@/components/comum/EmptyState.vue';
 import {BAlert} from 'bootstrap-vue-next';
-import {useUnidadesStore} from '@/stores/unidades';
 import {usePerfilStore} from '@/stores/perfil';
 import {useMapasStore} from '@/stores/mapas';
 import {buscarUsuarioPorTitulo} from '@/services/usuarioService';
@@ -92,7 +91,6 @@ describe('UnidadeView.vue', () => {
         (buscarArvoreUnidade as any).mockResolvedValue(mockUnidadeData);
     });
 
-    let unidadesStore: any;
     let perfilStore: any;
     let mapasStore: any;
 
@@ -102,9 +100,6 @@ describe('UnidadeView.vue', () => {
         context.wrapper = mount(UnidadeView, {
             ...getCommonMountOptions(
                 {
-                    unidades: {
-                        unidade: null,
-                    },
                     perfil: {
                         perfilSelecionado: 'USER',
                     },
@@ -128,31 +123,19 @@ describe('UnidadeView.vue', () => {
             },
         });
 
-        unidadesStore = useUnidadesStore();
         perfilStore = usePerfilStore();
         mapasStore = useMapasStore();
 
-        const override = initialStateOverride as any;
-        if (override.unidades?.unidade) {
-            unidadesStore.unidade = override.unidades.unidade;
-        }
-
-        vi.spyOn(unidadesStore, 'buscarArvoreUnidade').mockResolvedValue(null);
-
-        return {wrapper: context.wrapper, unidadesStore, perfilStore, mapasStore};
+        return {wrapper: context.wrapper, perfilStore, mapasStore};
     };
 
     it('fetches data on mount', async () => {
-        const {unidadesStore} = createWrapper();
-        expect(unidadesStore.buscarArvoreUnidade).toHaveBeenCalledWith(1);
+        createWrapper();
+        expect(buscarArvoreUnidade).toHaveBeenCalledWith(1);
     });
 
     it('renders unit details correctly', async () => {
-        const {wrapper} = createWrapper({
-            unidades: {
-                unidade: mockUnidade
-            }
-        });
+        const {wrapper} = createWrapper();
 
         await wrapper.vm.$nextTick();
         await flushPromises();
@@ -162,11 +145,8 @@ describe('UnidadeView.vue', () => {
     });
 
     it('renders "Criar atribuição" button only for ADMIN', async () => {
-        const {wrapper, perfilStore} = createWrapper({
-            unidades: {
-                unidade: mockUnidade
-            }
-        });
+        const {wrapper, perfilStore} = createWrapper();
+        await flushPromises();
         perfilStore.perfilSelecionado = 'ADMIN';
         await wrapper.vm.$nextTick();
         expect(wrapper.find('[data-testid="unidade-view__btn-criar-atribuicao"]').exists()).toBe(true);
@@ -177,11 +157,8 @@ describe('UnidadeView.vue', () => {
     });
 
     it('navigates to create assignment', async () => {
-        const {wrapper, perfilStore} = createWrapper({
-            unidades: {
-                unidade: mockUnidade
-            }
-        });
+        const {wrapper, perfilStore} = createWrapper();
+        await flushPromises();
         perfilStore.perfilSelecionado = 'ADMIN';
         await wrapper.vm.$nextTick();
 
@@ -194,12 +171,9 @@ describe('UnidadeView.vue', () => {
             ...mockUnidade,
             responsavel: mockUsuarioResponsavel
         };
+        (buscarArvoreUnidade as any).mockResolvedValueOnce(unidadeComResponsavel);
 
-        const {wrapper} = createWrapper({
-            unidades: {
-                unidade: unidadeComResponsavel
-            }
-        });
+        const {wrapper} = createWrapper();
 
         await wrapper.vm.$nextTick();
         await flushPromises();
@@ -208,11 +182,8 @@ describe('UnidadeView.vue', () => {
     });
 
     it('renders subordinate units tree table', async () => {
-        const {wrapper} = createWrapper({
-            unidades: {
-                unidade: mockUnidade
-            }
-        });
+        const {wrapper} = createWrapper();
+        await flushPromises();
         await wrapper.vm.$nextTick();
 
         const treeTable = wrapper.findComponent(TreeTableStub);
@@ -220,11 +191,8 @@ describe('UnidadeView.vue', () => {
     });
 
     it('navigates to subordinate unit on row click', async () => {
-        const {wrapper} = createWrapper({
-            unidades: {
-                unidade: mockUnidade
-            }
-        });
+        const {wrapper} = createWrapper();
+        await flushPromises();
         await wrapper.vm.$nextTick();
 
         const treeTable = wrapper.findComponent(TreeTableStub);
@@ -234,11 +202,8 @@ describe('UnidadeView.vue', () => {
     });
 
     it('renders and clicks "Mapa vigente" button when map exists', async () => {
-        const {wrapper, mapasStore} = createWrapper({
-            unidades: {
-                unidade: mockUnidade
-            }
-        });
+        const {wrapper, mapasStore} = createWrapper();
+        await flushPromises();
         mapasStore.mapaCompleto = {subprocessoCodigo: 99};
         await wrapper.vm.$nextTick();
 
@@ -252,36 +217,26 @@ describe('UnidadeView.vue', () => {
         });
     });
 
-    it('displays error alert when unidadesStore has error', async () => {
-        const {wrapper, unidadesStore} = createWrapper();
-        unidadesStore.lastError = {message: 'Erro ao carregar unidade'};
-        await wrapper.vm.$nextTick();
+    it('displays error alert when fetching unit fails', async () => {
+        (buscarArvoreUnidade as any).mockRejectedValueOnce(new Error('Erro ao carregar unidade'));
+        const {wrapper} = createWrapper();
+        await flushPromises();
 
         const alert = wrapper.findComponent(BAlert);
         expect(alert.exists()).toBe(true);
         expect(wrapper.text()).toContain('Erro ao carregar unidade');
-
-        // Test dismiss
-        vi.spyOn(unidadesStore, 'clearError');
-        alert.vm.$emit('dismissed');
-        expect(unidadesStore.clearError).toHaveBeenCalled();
     });
 
     it('logs error when fetching titular fails', async () => {
         (buscarUsuarioPorTitulo as any).mockRejectedValue(new Error('Fetch error'));
 
-        createWrapper({
-            unidades: {
-                unidade: {...mockUnidade, tituloTitular: '123'}
-            }
-        });
+        createWrapper();
         await flushPromises();
 
         expect(logger.error).toHaveBeenCalledWith('Erro ao carregar dados da unidade:', expect.any(Error));
     });
 
     it('renders clickable contact links for titular', async () => {
-        // Setup mock user with contact info
         const mockUserWithContact = {
             ...mockUsuario,
             ramal: '1234',
@@ -289,22 +244,16 @@ describe('UnidadeView.vue', () => {
         };
         (buscarUsuarioPorTitulo as any).mockResolvedValue(mockUserWithContact);
 
-        const {wrapper} = createWrapper({
-            unidades: {
-                unidade: mockUnidade
-            }
-        });
+        const {wrapper} = createWrapper();
 
         await wrapper.vm.$nextTick();
         await flushPromises();
 
-        // Check Ramal Link
         const ramalLink = wrapper.find('a[href="tel:1234"]');
         expect(ramalLink.exists()).toBe(true);
         expect(ramalLink.text()).toBe('1234');
         expect(ramalLink.attributes('aria-label')).toBe('Ligar para 1234');
 
-        // Check Email Link
         const emailLink = wrapper.find('a[href="mailto:test@example.com"]');
         expect(emailLink.exists()).toBe(true);
         expect(emailLink.text()).toBe('test@example.com');
@@ -318,26 +267,21 @@ describe('UnidadeView.vue', () => {
         };
         (buscarArvoreUnidade as any).mockResolvedValue(mockUnidadeSemFilhas);
 
-        const {wrapper, unidadesStore} = createWrapper();
+        const {wrapper} = createWrapper();
         await wrapper.vm.$nextTick();
         await flushPromises();
 
-        expect(unidadesStore.unidade.filhas).toHaveLength(0);
+        expect((wrapper.vm as any).dadosFormatadosSubordinadas).toEqual([]);
 
-        expect((wrapper.vm).dadosFormatadosSubordinadas).toEqual([]);
-
-        // Should check that TreeTable is not rendered or data is empty
         const treeTable = wrapper.findComponent(TreeTableStub);
         expect(treeTable.exists()).toBe(false);
     });
 
     it('handles null unit gracefully', async () => {
         (buscarArvoreUnidade as any).mockResolvedValue(null);
-        const {wrapper, unidadesStore} = createWrapper();
+        const {wrapper} = createWrapper();
         await wrapper.vm.$nextTick();
         await flushPromises();
-
-        expect(unidadesStore.unidade).toBeNull();
 
         expect(wrapper.findComponent(EmptyState).exists()).toBe(true);
     });

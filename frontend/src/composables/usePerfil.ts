@@ -1,34 +1,14 @@
 import {computed} from "vue";
 import {usePerfilStore} from "@/stores/perfil";
-import {useUnidadesStore} from "@/stores/unidades";
-import {Perfil, type Unidade} from "@/types/tipos";
-
-// Função auxiliar para achatar a hierarquia de unidades
-function flattenUnidades(unidades: Unidade[]): Unidade[] {
-    let flat: Unidade[] = [];
-    unidades.forEach((u: Unidade) => {
-        flat.push(u);
-        if (u.filhas && u.filhas.length > 0) flat = flat.concat(flattenUnidades(u.filhas));
-    });
-    return flat;
-}
+import {Perfil} from "@/types/tipos";
 
 export function usePerfil() {
     const perfilStore = usePerfilStore();
-    const unidadesStore = useUnidadesStore();
-
-    const unidadesFlat = computed<Unidade[]>(() => flattenUnidades(unidadesStore.unidades),);
 
     const perfilSelecionado = computed(() => perfilStore.perfilSelecionado);
 
     const unidadeSelecionada = computed(() => {
-        if (perfilStore.unidadeSelecionadaSigla) {
-            return perfilStore.unidadeSelecionadaSigla;
-        }
-        const unidadeObj = unidadesFlat.value.find(
-            (u) => u.codigo === perfilStore.unidadeSelecionada,
-        );
-        return unidadeObj?.sigla || perfilStore.unidadeSelecionada;
+        return perfilStore.unidadeSelecionadaSigla || perfilStore.unidadeSelecionada;
     });
 
     const isAdmin = computed(() => perfilStore.perfilSelecionado === Perfil.ADMIN);
