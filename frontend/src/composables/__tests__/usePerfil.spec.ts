@@ -1,13 +1,11 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import {usePerfilStore} from "@/stores/perfil";
 import {useUnidadesStore} from "@/stores/unidades";
-import {useUsuariosStore} from "@/stores/usuarios";
 import {initPinia} from "@/test-utils/helpers";
 import {Perfil} from "@/types/tipos";
 import {usePerfil} from "../usePerfil";
 
 vi.mock("@/stores/perfil");
-vi.mock("@/stores/usuarios");
 vi.mock("@/stores/unidades");
 
 describe("usePerfil", () => {
@@ -32,40 +30,7 @@ describe("usePerfil", () => {
         expect(unidadeSelecionada.value).toBe("TESTE");
     });
 
-    it("deve retornar o servidor logado com os dados corretos", () => {
-        vi.mocked(usePerfilStore).mockReturnValue({
-            usuarioCodigo: "1",
-            perfilSelecionado: Perfil.GESTOR,
-            unidadeSelecionada: 456,
-        } as any);
 
-        vi.mocked(useUsuariosStore).mockReturnValue({
-            obterUsuarioPorTitulo: (titulo: string) => ({tituloEleitoral: titulo, nome: "Usuário Teste"}),
-        } as any);
-
-        const {servidorLogado} = usePerfil();
-
-        expect(servidorLogado.value).toEqual({
-            tituloEleitoral: "1",
-            nome: "Usuário Teste",
-            perfil: Perfil.GESTOR,
-            unidade: 456,
-        });
-    });
-
-    it("deve retornar null se servidorLogado não encontrar usuário", () => {
-        vi.mocked(usePerfilStore).mockReturnValue({
-            usuarioCodigo: "999",
-        } as any);
-
-        vi.mocked(useUsuariosStore).mockReturnValue({
-            obterUsuarioPorTitulo: () => null,
-        } as any);
-
-        const {servidorLogado} = usePerfil();
-
-        expect(servidorLogado.value).toBeNull();
-    });
 
     it("deve retornar unidadeSelecionada como ID se sigla não encontrada e unidades vazias", () => {
         vi.mocked(usePerfilStore).mockReturnValue({

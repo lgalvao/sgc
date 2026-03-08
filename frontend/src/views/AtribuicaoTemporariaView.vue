@@ -128,7 +128,7 @@ import LoadingButton from "@/components/comum/LoadingButton.vue";
 import AppAlert from "@/components/comum/AppAlert.vue";
 import {useNotification} from "@/composables/useNotification";
 import {useUnidadesStore} from "@/stores/unidades";
-import {useUsuariosStore} from "@/stores/usuarios";
+import {buscarUsuariosPorUnidade} from "@/services/usuarioService";
 import {useAtribuicaoTemporariaStore} from "@/stores/atribuicoes";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 
@@ -137,7 +137,6 @@ const props = defineProps<{ codUnidade: number }>();
 const router = useRouter();
 const {notificacao, notify, clear} = useNotification();
 const unidadesStore = useUnidadesStore();
-const usuariosStore = useUsuariosStore();
 const atribuicoesStore = useAtribuicaoTemporariaStore();
 const codUnidade = computed(() => props.codUnidade);
 
@@ -156,7 +155,7 @@ onMounted(async () => {
     await unidadesStore.buscarUnidadePorCodigo(codUnidade.value);
     unidade.value = unidadesStore.unidade as Unidade;
     if (unidade.value) {
-      usuarios.value = await usuariosStore.buscarUsuariosPorUnidade(unidade.value.codigo);
+      usuarios.value = await buscarUsuariosPorUnidade(unidade.value.codigo);
     }
   } catch (error) {
     erroUsuario.value = "Falha ao carregar dados da unidade ou usuários.";

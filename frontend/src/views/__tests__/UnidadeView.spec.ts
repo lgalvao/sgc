@@ -6,7 +6,6 @@ import ErrorAlert from '@/components/comum/ErrorAlert.vue';
 import {useUnidadesStore} from '@/stores/unidades';
 import {useAtribuicaoTemporariaStore} from '@/stores/atribuicoes';
 import {usePerfilStore} from '@/stores/perfil';
-import {useUsuariosStore} from '@/stores/usuarios';
 import {useMapasStore} from '@/stores/mapas';
 import {buscarUsuarioPorTitulo} from '@/services/usuarioService';
 import {buscarArvoreUnidade} from '@/services/unidadeService';
@@ -97,7 +96,6 @@ describe('UnidadeView.vue', () => {
     let unidadesStore: any;
     let atribuicaoStore: any;
     let perfilStore: any;
-    let usuariosStore: any;
     let mapasStore: any;
 
     const mockUnidade = mockUnidadeData;
@@ -114,9 +112,6 @@ describe('UnidadeView.vue', () => {
                     },
                     perfil: {
                         perfilSelecionado: 'USER',
-                    },
-                    usuarios: {
-                        usuarios: [],
                     },
                     mapas: {
                         mapaCompleto: null,
@@ -140,7 +135,6 @@ describe('UnidadeView.vue', () => {
         unidadesStore = useUnidadesStore();
         atribuicaoStore = useAtribuicaoTemporariaStore();
         perfilStore = usePerfilStore();
-        usuariosStore = useUsuariosStore();
         mapasStore = useMapasStore();
 
         const override = initialStateOverride as any;
@@ -151,13 +145,7 @@ describe('UnidadeView.vue', () => {
         vi.spyOn(unidadesStore, 'buscarArvoreUnidade').mockResolvedValue(null);
         vi.spyOn(atribuicaoStore, 'buscarAtribuicoes').mockResolvedValue(null);
 
-        usuariosStore.obterUsuarioPorId = vi.fn().mockImplementation((codigo: number) => {
-            if (codigo === 10) return mockUsuario;
-            if (codigo === 20) return mockUsuarioResponsavel;
-            return null;
-        });
-
-        return {wrapper: context.wrapper, unidadesStore, atribuicaoStore, perfilStore, usuariosStore, mapasStore};
+        return {wrapper: context.wrapper, unidadesStore, atribuicaoStore, perfilStore, mapasStore};
     };
 
     it('fetches data on mount', async () => {

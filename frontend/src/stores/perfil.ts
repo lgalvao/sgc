@@ -6,6 +6,10 @@ import * as usuarioService from "../services/usuarioService";
 import {useErrorHandler} from "@/composables/useErrorHandler";
 import {useLocalStorage} from "@/composables/useLocalStorage";
 
+function definirToken(token: string) {
+    localStorage.setItem("jwtToken", token);
+}
+
 export const usePerfilStore = defineStore("perfil", () => {
     // Estados sincronizados com localStorage usando composable
     const usuarioCodigo = useLocalStorage<string | null>("usuarioCodigo", null);
@@ -18,9 +22,6 @@ export const usePerfilStore = defineStore("perfil", () => {
     // Estados não persistidos
     const perfisUnidades = ref<PerfilUnidade[]>([]);
     const {lastError, clearError, withErrorHandling} = useErrorHandler();
-
-    const isAdmin = computed(() => perfis.value.includes("ADMIN" as Perfil));
-    const isGestor = computed(() => perfis.value.includes("GESTOR" as Perfil));
 
     // Map para lookup O(1) de perfil -> unidade
     const perfilUnidadeMap = computed(() =>
@@ -49,10 +50,6 @@ export const usePerfilStore = defineStore("perfil", () => {
             usuarioNome.value = nome;
             // localStorage.setItem removido - sincronização automática
         }
-    }
-
-    function definirToken(token: string) {
-        localStorage.setItem("jwtToken", token);
     }
 
     function definirPerfis(novosPerfis: Perfil[]) {
@@ -149,8 +146,6 @@ export const usePerfilStore = defineStore("perfil", () => {
         usuarioNome,
         perfisUnidades,
         perfis,
-        isAdmin,
-        isGestor,
         unidadeAtual,
         lastError,
         clearError,

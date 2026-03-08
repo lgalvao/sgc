@@ -1,7 +1,6 @@
 import {computed} from "vue";
 import {usePerfilStore} from "@/stores/perfil";
 import {useUnidadesStore} from "@/stores/unidades";
-import {useUsuariosStore} from "@/stores/usuarios";
 import {type Unidade} from "@/types/tipos";
 
 // Função auxiliar para achatar a hierarquia de unidades
@@ -16,21 +15,9 @@ function flattenUnidades(unidades: Unidade[]): Unidade[] {
 
 export function usePerfil() {
     const perfilStore = usePerfilStore();
-    const usuariosStore = useUsuariosStore();
     const unidadesStore = useUnidadesStore();
 
     const unidadesFlat = computed<Unidade[]>(() => flattenUnidades(unidadesStore.unidades),);
-
-    const servidorLogado = computed(() => {
-        if (!perfilStore.usuarioCodigo) return null;
-        const usuario = usuariosStore.obterUsuarioPorTitulo(perfilStore.usuarioCodigo);
-        if (!usuario) return null;
-        return {
-            ...usuario,
-            perfil: perfilStore.perfilSelecionado,
-            unidade: perfilStore.unidadeSelecionada,
-        };
-    });
 
     const perfilSelecionado = computed(() => perfilStore.perfilSelecionado);
 
@@ -45,7 +32,6 @@ export function usePerfil() {
     });
 
     return {
-        servidorLogado,
         perfilSelecionado,
         unidadeSelecionada,
     };

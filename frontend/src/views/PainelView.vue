@@ -6,7 +6,7 @@
       <PageHeader title="Processos" title-test-id="txt-painel-titulo-processos">
         <template #actions>
           <BButton
-              v-if="perfil.isAdmin"
+              v-if="acesso.podeCriarProcesso"
               :to="{ name: 'CadProcesso' }"
               data-testid="btn-painel-criar-processo"
               variant="outline-primary"
@@ -19,7 +19,7 @@
           :compacto="true"
           :criterio-ordenacao="criterio"
           :direcao-ordenacao-asc="asc"
-          :mostrar-cta-vazio="perfil.isAdmin"
+          :mostrar-cta-vazio="acesso.podeVisualizarTabelaCtaVazio"
           :processos="processosOrdenados"
           @ordenar="ordenarPor"
           @selecionar-processo="abrirDetalhesProcesso"
@@ -76,9 +76,11 @@ import {useAlertasStore} from "@/stores/alertas";
 import {usePerfilStore} from "@/stores/perfil";
 import {useProcessosStore} from "@/stores/processos";
 import {useToastStore} from "@/stores/toast";
+import {useAcessoGlobal} from "@/composables/useAcessoGlobal";
 import type {Alerta, ProcessoResumo} from "@/types/tipos";
 
 const perfil = usePerfilStore();
+const acesso = useAcessoGlobal();
 const processosStore = useProcessosStore();
 const alertasStore = useAlertasStore();
 const toastStore = useToastStore();

@@ -121,6 +121,7 @@ import {useProcessosStore} from "@/stores/processos";
 import {usePerfilStore} from "@/stores/perfil";
 import {useNotification} from "@/composables/useNotification";
 import {useToastStore} from "@/stores/toast";
+import {useAcessoGlobal} from "@/composables/useAcessoGlobal";
 import {SituacaoProcesso, SituacaoSubprocesso} from "@/types/tipos";
 import {formatSituacaoSubprocesso} from "@/utils/formatters";
 import {logger} from "@/utils";
@@ -140,6 +141,7 @@ const route = useRoute();
 const router = useRouter();
 const processosStore = useProcessosStore();
 const perfilStore = usePerfilStore();
+const acessoGlobal = useAcessoGlobal();
 const {notify} = useNotification();
 const toastStore = useToastStore();
 const codProcesso = Number(route.params.codProcesso || route.query.codProcesso);
@@ -150,12 +152,12 @@ const acaoBlocoAtual = ref<"aceitar" | "homologar" | "disponibilizar">("aceitar"
 const processo = computed(() => processosStore.processoDetalhe);
 const participantesHierarquia = computed(() => processo.value?.unidades || []);
 
-const podeAceitarBloco = computed(() => perfilStore.isGestor);
+const podeAceitarBloco = computed(() => acessoGlobal.isGlobalGestor);
 
-const podeHomologarBloco = computed(() => perfilStore.isAdmin);
+const podeHomologarBloco = computed(() => acessoGlobal.podeHomologarBlocoGlobal);
 
 const podeDisponibilizarBloco = computed(() => {
-  return perfilStore.isAdmin &&
+  return acessoGlobal.isGlobalAdmin &&
       !isProcessoFinalizado.value &&
       (processo.value?.podeDisponibilizarMapaBloco || false);
 });

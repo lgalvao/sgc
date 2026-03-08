@@ -38,7 +38,7 @@
         </BNavItem>
 
         <BNavItem
-            v-if="perfilStore.perfilSelecionado === 'ADMIN'"
+            v-if="acesso.podeAcessarTodasUnidades"
             class="me-lg-1"
             data-testid="btn-parametros"
             title="Parâmetros do sistema"
@@ -52,7 +52,7 @@
         </BNavItem>
 
         <BNavItem
-            v-if="perfilStore.perfilSelecionado === 'ADMIN'"
+            v-if="acesso.podeAcessarTodasUnidades"
             class="me-lg-1"
             data-testid="btn-administradores"
             title="Administradores do sistema"
@@ -88,9 +88,11 @@ import {computed, onMounted, onUnmounted, ref} from "vue";
 import {useRouter} from "vue-router";
 import {usePerfil} from "@/composables/usePerfil";
 import {usePerfilStore} from "@/stores/perfil";
+import {useAcessoGlobal} from "@/composables/useAcessoGlobal";
 
 const router = useRouter();
 const perfilStore = usePerfilStore();
+const acesso = useAcessoGlobal();
 
 const {perfilSelecionado, unidadeSelecionada} = usePerfil();
 
@@ -105,7 +107,7 @@ const isMobile = computed(() => windowWidth.value < 992);
 
 // Para ADMIN: mostra "Unidades" e direciona para a árvore completa
 // Para outros perfis: mostra "Minha unidade" e direciona para unidade do usuário
-const isAdmin = computed(() => perfilStore.perfilSelecionado === 'ADMIN');
+const isAdmin = computed(() => acesso.podeAcessarTodasUnidades);
 const labelUnidade = computed(() => isAdmin.value ? 'Unidades' : 'Minha unidade');
 const iconUnidade = computed(() => isAdmin.value ? 'bi bi-diagram-3 me-1' : 'bi bi-person me-1');
 const linkUnidade = computed(() => isAdmin.value ? '/unidades' : `/unidade/${perfilStore.unidadeSelecionada}`);
