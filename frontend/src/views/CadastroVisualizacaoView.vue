@@ -153,7 +153,6 @@ import HistoricoAnaliseModal from "@/components/processo/HistoricoAnaliseModal.v
 import ImpactoMapaModal from "@/components/mapa/ImpactoMapaModal.vue";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
-import {useUnidadesStore} from "@/stores/unidades";
 import {useProcessosStore} from "@/stores/processos";
 import {useMapasStore} from "@/stores/mapas";
 import {useSubprocessosStore} from "@/stores/subprocessos";
@@ -176,7 +175,6 @@ const props = defineProps<{
 }>();
 
 const router = useRouter();
-const unidadesStore = useUnidadesStore();
 const processosStore = useProcessosStore();
 const mapasStore = useMapasStore();
 const subprocessosStore = useSubprocessosStore();
@@ -185,19 +183,7 @@ const {impactoMapa: impactos} = storeToRefs(mapasStore);
 const unidadeId = computed(() => props.sigla);
 const codProcesso = computed(() => Number(props.codProcesso));
 
-const unidade = computed(() => {
-  function buscarUnidade(unidades: Unidade[], sigla: string): Unidade | undefined {
-    for (const u of unidades) {
-      if (u.sigla === sigla) return u;
-      if (u.filhas?.length) {
-        const encontrada = buscarUnidade(u.filhas, sigla);
-        if (encontrada) return encontrada;
-      }
-    }
-  }
-
-  return buscarUnidade(unidadesStore.unidades as Unidade[], unidadeId.value);
-});
+const unidade = ref<Unidade | null>(null);
 
 const siglaUnidade = computed(() => unidade.value?.sigla || unidadeId.value);
 const nomeUnidade = computed(() => (unidade.value?.nome ? `${unidade.value.nome}` : ""));
@@ -383,8 +369,13 @@ onMounted(async () => {
   await processosStore.buscarProcessoDetalhe(codProcesso.value);
   if (codSubprocesso.value) {
     const data = await subprocessosStore.buscarContextoEdicao(codSubprocesso.value);
-    if (data && data.atividadesDisponiveis) {
-      atividades.value = data.atividadesDisponiveis;
+    if (data) {
+      if (data.atividadesDisponiveis) {
+        atividades.value = data.atividadesDisponiveis;
+      }
+      if (data.unidade) {
+        unidade.value = data.unidade as Unidade;
+      }
     }
   }
 });

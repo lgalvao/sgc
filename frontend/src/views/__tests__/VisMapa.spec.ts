@@ -210,18 +210,10 @@ describe("VisMapa.vue", () => {
 
     it("resolves nested unit from store", async () => {
         await router.push("/processo/1/CHILD/vis-mapa");
+        const unidadeService = await import("@/services/unidadeService");
+        vi.mocked(unidadeService.buscarUnidadePorSigla).mockResolvedValueOnce({sigla: "CHILD", nome: "Child Unit", filhas: []} as any);
         const {wrapper} = mountComponent(
             {
-                unidades: {
-                    unidades: [
-                        {
-                            sigla: "PARENT",
-                            nome: "Parent Unit",
-                            filhas: [{sigla: "CHILD", nome: "Child Unit", filhas: []}],
-                        },
-                    ],
-                    unidade: {sigla: "CHILD", nome: "Child Unit", filhas: []},
-                },
                 processos: {
                     processoDetalhe: {
                         unidades: [
@@ -236,7 +228,7 @@ describe("VisMapa.vue", () => {
             },
             "CHILD",
         );
-        await wrapper.vm.$nextTick();
+        await flushPromises();
 
         expect(wrapper.find('[data-testid="txt-header-unidade"]').text()).toContain(
             "CHILD - Child Unit",
@@ -478,13 +470,10 @@ describe("VisMapa.vue", () => {
     });
 
     it("does not show content if unit not found", async () => {
-        const {wrapper} = mountComponent({
-            unidades: {
-                unidades: [], // empty list
-                unidade: null
-            }
-        });
-        await wrapper.vm.$nextTick();
+        const unidadeService = await import("@/services/unidadeService");
+        vi.mocked(unidadeService.buscarUnidadePorSigla).mockResolvedValueOnce(null as any);
+        const {wrapper} = mountComponent({});
+        await flushPromises();
         expect(wrapper.text()).toContain("Unidade não encontrada");
     });
 
@@ -494,7 +483,7 @@ describe("VisMapa.vue", () => {
                 mapaVisualizacao: {competencias: []} // empty
             }
         });
-        await wrapper.vm.$nextTick();
+        await flushPromises();
         expect(wrapper.text()).toContain("Nenhuma competência cadastrada");
     });
 

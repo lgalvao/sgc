@@ -3,7 +3,7 @@ import {mount} from '@vue/test-utils';
 import {createTestingPinia} from '@pinia/testing';
 import PainelView from '@/views/PainelView.vue';
 import {useProcessosStore} from '@/stores/processos';
-import {useAlertasStore} from '@/stores/alertas';
+import * as painelService from '@/services/painelService';
 import {useRouter} from 'vue-router';
 
 vi.mock("vue-router", () => ({
@@ -18,6 +18,13 @@ vi.mock("vue-router", () => ({
     createMemoryHistory: vi.fn(),
 }));
 
+const mockPageVazia = {content: [], totalPages: 0, totalElements: 0, number: 0, size: 10, first: true, last: true, empty: true};
+
+vi.mock("@/services/painelService", () => ({
+    listarProcessos: vi.fn(),
+    listarAlertas: vi.fn(),
+}));
+
 describe('PainelView Coverage', () => {
     let routerPushMock: any;
 
@@ -27,6 +34,7 @@ describe('PainelView Coverage', () => {
         (useRouter as any).mockReturnValue({
             push: routerPushMock,
         });
+        (painelService.listarAlertas as any).mockResolvedValue(mockPageVazia);
     });
 
     const commonStubs = {
@@ -52,10 +60,9 @@ describe('PainelView Coverage', () => {
                 perfil: {
                     perfilSelecionado: 'GESTOR',
                     unidadeSelecionada: 1,
-                    usuarioCodigo: null // Simulating missing user code
+                    usuarioCodigo: null
                 },
                 processos: {processosPainel: []},
-                alertas: {alertas: []}
             }
         });
 
@@ -67,12 +74,10 @@ describe('PainelView Coverage', () => {
         });
 
         const processosStore = useProcessosStore(pinia);
-        const alertasStore = useAlertasStore(pinia);
-
         await wrapper.vm.$nextTick();
 
         expect(processosStore.buscarProcessosPainel).toHaveBeenCalled();
-        expect(alertasStore.buscarAlertas).not.toHaveBeenCalled();
+        expect(painelService.listarAlertas).not.toHaveBeenCalled();
     });
 
     it('ordenarAlertasPor does nothing when usuarioCodigo is missing', async () => {
@@ -85,7 +90,6 @@ describe('PainelView Coverage', () => {
                     usuarioCodigo: null
                 },
                 processos: {processosPainel: []},
-                alertas: {alertas: []}
             }
         });
 
@@ -96,12 +100,12 @@ describe('PainelView Coverage', () => {
             }
         });
 
-        const alertasStore = useAlertasStore(pinia);
+        vi.clearAllMocks();
+        (painelService.listarAlertas as any).mockResolvedValue(mockPageVazia);
 
-        // Call the method directly to trigger the branch
         await (wrapper.vm as any).ordenarAlertasPor('processo');
 
-        expect(alertasStore.buscarAlertas).not.toHaveBeenCalled();
+        expect(painelService.listarAlertas).not.toHaveBeenCalled();
     });
 
     it('ordenarPor toggles asc/desc correctly', async () => {
@@ -114,7 +118,6 @@ describe('PainelView Coverage', () => {
                     usuarioCodigo: 1
                 },
                 processos: {processosPainel: []},
-                alertas: {alertas: []}
             }
         });
 

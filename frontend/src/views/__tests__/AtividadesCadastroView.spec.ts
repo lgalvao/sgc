@@ -91,9 +91,6 @@ function createWrapper(customState = {}, accessOverrides = {}) {
                     perfil: {
                         perfilSelecionado: Perfil.CHEFE,
                     },
-                    unidades: {
-                        unidade: {codigo: 1, sigla: "TESTE", nome: "Teste"},
-                    },
                     subprocessos: {
                         subprocessoDetalhe: {
                             codigo: 123,
@@ -117,6 +114,7 @@ function createWrapper(customState = {}, accessOverrides = {}) {
     });
 
     (wrapper.vm as any).codSubprocesso = 123;
+    (wrapper.vm as any).unidade = {sigla: "TESTE", nome: "Teste"};
 
     return wrapper;
 }

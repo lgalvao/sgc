@@ -7,8 +7,6 @@ import {normalizeError} from "@/utils/apiError";
 
 vi.mock("@/services/painelService");
 vi.mock("@/services/processoService");
-vi.mock("../unidades", () => ({useUnidadesStore: vi.fn(() => ({}))}));
-vi.mock("../alertas", () => ({useAlertasStore: vi.fn(() => ({}))}));
 
 describe("useProcessosStore", () => {
     const context = setupStoreTest(useProcessosStore);

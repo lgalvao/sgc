@@ -11,12 +11,12 @@
         :model-value="true"
         variant="danger"
         dismissible
-        @dismissed="unidadesStore.clearError()"
+        @dismissed="clearError()"
     >
       {{ erroUnidades.message }}
     </BAlert>
 
-    <div v-if="unidadesStore.isLoading" class="text-center py-5">
+    <div v-if="isLoading" class="text-center py-5">
       <BSpinner label="Carregando unidades..." variant="primary"/>
       <p class="mt-2 text-muted">Carregando árvore de unidades...</p>
     </div>
@@ -54,17 +54,34 @@ import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import ArvoreUnidades from "@/components/unidade/ArvoreUnidades.vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
-import {useUnidadesStore} from "@/stores/unidades";
+import {buscarTodasUnidades, mapUnidadesArray} from "@/services/unidadeService";
+import type {Unidade} from "@/types/tipos";
 
-const unidadesStore = useUnidadesStore();
-const unidades = computed(() => unidadesStore.unidades);
+const unidades = ref<Unidade[]>([]);
+const isLoading = ref(false);
+const erro = ref<string | null>(null);
+
 const erroUnidades = computed(() =>
-    unidadesStore.error ? {message: unidadesStore.error} : null
+    erro.value ? {message: erro.value} : null
 );
+
+function clearError() {
+  erro.value = null;
+}
+
 const selecaoVazia = ref<number[]>([]);
 
 async function carregarUnidades() {
-  await unidadesStore.buscarTodasAsUnidades();
+  isLoading.value = true;
+  erro.value = null;
+  try {
+    const response = await buscarTodasUnidades();
+    unidades.value = mapUnidadesArray(response as any);
+  } catch (err: any) {
+    erro.value = err.message || "Erro ao buscar unidades";
+  } finally {
+    isLoading.value = false;
+  }
 }
 
 onMounted(carregarUnidades);

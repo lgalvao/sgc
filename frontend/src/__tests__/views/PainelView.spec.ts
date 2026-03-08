@@ -3,7 +3,7 @@ import {flushPromises, mount} from "@vue/test-utils";
 import PainelView from "@/views/PainelView.vue";
 import {createTestingPinia} from "@pinia/testing";
 import {useProcessosStore} from "@/stores/processos";
-import {useAlertasStore} from "@/stores/alertas";
+import * as painelService from "@/services/painelService";
 import {useRouter} from "vue-router";
 
 vi.mock("vue-router", () => ({
@@ -17,6 +17,13 @@ vi.mock("vue-router", () => ({
     createMemoryHistory: vi.fn(),
 }));
 
+const mockPageVazia = {content: [], totalPages: 0, totalElements: 0, number: 0, size: 10, first: true, last: true, empty: true};
+
+vi.mock("@/services/painelService", () => ({
+    listarProcessos: vi.fn(),
+    listarAlertas: vi.fn(),
+}));
+
 describe("PainelView.vue", () => {
     let routerPushMock: any;
 
@@ -26,6 +33,7 @@ describe("PainelView.vue", () => {
         (useRouter as any).mockReturnValue({
             push: routerPushMock,
         });
+        (painelService.listarAlertas as any).mockResolvedValue(mockPageVazia);
     });
 
     const initialState = {
@@ -38,9 +46,6 @@ describe("PainelView.vue", () => {
         processos: {
             processosPainel: []
         },
-        alertas: {
-            alertas: []
-        }
     };
 
     const mountOptions = (customState = {}) => ({
@@ -51,7 +56,6 @@ describe("PainelView.vue", () => {
                     initialState: {
                         perfil: {...initialState.perfil, ...(customState as any).perfil},
                         processos: {...initialState.processos, ...(customState as any).processos},
-                        alertas: {...initialState.alertas, ...(customState as any).alertas},
                     },
                     stubActions: true,
                 }),
@@ -89,12 +93,11 @@ describe("PainelView.vue", () => {
     it("deve carregar dados ao montar se perfil estiver selecionado", async () => {
         const wrapper = mount(PainelView, mountOptions());
         const processosStore = useProcessosStore();
-        const alertasStore = useAlertasStore();
 
         await wrapper.vm.$nextTick();
 
         expect(processosStore.buscarProcessosPainel).toHaveBeenCalledWith("ADMIN", 1, 0, 10);
-        expect(alertasStore.buscarAlertas).toHaveBeenCalledWith(100, 1, 0, 10);
+        expect(painelService.listarAlertas).toHaveBeenCalledWith(100, 1, 0, 10, undefined, undefined);
     });
 
     it("não deve carregar dados se perfil não estiver selecionado", async () => {
@@ -102,12 +105,11 @@ describe("PainelView.vue", () => {
             perfil: {perfilSelecionado: null, unidadeSelecionada: null}
         }));
         const processosStore = useProcessosStore();
-        const alertasStore = useAlertasStore();
 
         await wrapper.vm.$nextTick();
 
         expect(processosStore.buscarProcessosPainel).not.toHaveBeenCalled();
-        expect(alertasStore.buscarAlertas).not.toHaveBeenCalled();
+        expect(painelService.listarAlertas).not.toHaveBeenCalled();
     });
 
     it("deve mostrar botão de criar processo apenas para admin", async () => {
@@ -129,6 +131,7 @@ describe("PainelView.vue", () => {
         const processosStore = useProcessosStore();
 
         vi.clearAllMocks(); // Limpa chamadas do onMounted
+        (painelService.listarAlertas as any).mockResolvedValue(mockPageVazia);
 
         await wrapper.findComponent({name: 'TabelaProcessos'}).vm.$emit('ordenar', 'dataCriacao');
 
@@ -153,17 +156,17 @@ describe("PainelView.vue", () => {
 
     it("deve reordenar alertas", async () => {
         const wrapper = mount(PainelView, mountOptions());
-        const alertasStore = useAlertasStore();
 
         // Aguarda onMounted/onActivated
         await wrapper.vm.$nextTick();
         await flushPromises();
 
         vi.clearAllMocks(); // Limpa chamadas do onMounted
+        (painelService.listarAlertas as any).mockResolvedValue(mockPageVazia);
 
         await (wrapper.vm as any).handleSortChangeAlertas({sortBy: {key: 'processo'}, sortDesc: false});
 
-        expect(alertasStore.buscarAlertas).toHaveBeenLastCalledWith(
+        expect(painelService.listarAlertas).toHaveBeenLastCalledWith(
             100, 1, 0, 10, "processo", "asc"
         );
     });

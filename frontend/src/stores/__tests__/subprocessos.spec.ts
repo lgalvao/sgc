@@ -4,7 +4,6 @@ import {useSubprocessosStore} from '../subprocessos';
 import {SituacaoSubprocesso} from '@/types/tipos';
 import {useProcessosStore} from '../processos';
 import {usePerfilStore} from '../perfil';
-import {useUnidadesStore} from '../unidades';
 import {useMapasStore} from '../mapas';
 import {
     buscarContextoEdicao,
@@ -55,9 +54,6 @@ vi.mock('../processos', () => ({
 vi.mock('../perfil', () => ({
     usePerfilStore: vi.fn(),
 }));
-vi.mock('../unidades', () => ({
-    useUnidadesStore: vi.fn(),
-}));
 vi.mock('../mapas', () => ({
     useMapasStore: vi.fn(),
 }));
@@ -87,9 +83,6 @@ describe('Subprocessos Store', () => {
         perfisUnidades: [] as any[],
         unidadeAtual: null as number | null,
     };
-    const mockUnidadesStore = {
-        unidade: null,
-    };
     const mockMapasStore = {
         mapaCompleto: null,
     };
@@ -101,7 +94,6 @@ describe('Subprocessos Store', () => {
 
         (useProcessosStore as any).mockReturnValue(mockProcessosStore);
         (usePerfilStore as any).mockReturnValue(mockPerfilStore);
-        (useUnidadesStore as any).mockReturnValue(mockUnidadesStore);
         (useMapasStore as any).mockReturnValue(mockMapasStore);
 
         store = useSubprocessosStore();
@@ -216,7 +208,6 @@ describe('Subprocessos Store', () => {
             await store.buscarContextoEdicao(1);
 
             expect(store.subprocessoDetalhe).toMatchObject(mockData.detalhes);
-            expect(mockUnidadesStore.unidade).toEqual(mockData.unidade);
             expect(mockMapasStore.mapaCompleto).toEqual(mockData.mapa);
         });
 

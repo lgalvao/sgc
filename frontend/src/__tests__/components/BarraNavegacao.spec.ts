@@ -1,7 +1,8 @@
 import {mount} from '@vue/test-utils';
-import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 import BarraNavegacao from '@/components/layout/BarraNavegacao.vue';
 import {useRoute, useRouter} from 'vue-router';
+import {useUnidadeAtual} from '@/composables/useUnidadeAtual';
 
 import {createTestingPinia} from '@pinia/testing';
 import {Perfil} from '@/types/tipos';
@@ -33,6 +34,8 @@ describe('BarraNavegacao.vue', () => {
     let mockRouter: any;
 
     beforeEach(() => {
+        const {definirUnidadeAtual} = useUnidadeAtual();
+        definirUnidadeAtual(null);
         mockRoute = {
             path: '/some/path',
             name: 'SomeRoute',
@@ -137,11 +140,12 @@ describe('BarraNavegacao.vue', () => {
         });
 
         it('deve mostrar breadcrumbs para rotas de Unidade (não-ADMIN vê Minha unidade)', () => {
+            const {definirUnidadeAtual} = useUnidadeAtual();
+            definirUnidadeAtual({codigo: 10, sigla: 'MINHA_UNIDADE'} as any);
             mockRoute.name = 'Unidade';
             mockRoute.params = {codUnidade: '10'};
             const wrapper = mountComponent({
                 perfil: {perfilSelecionado: Perfil.GESTOR},
-                unidades: {unidade: {codigo: 10, sigla: 'MINHA_UNIDADE'}}
             });
             const items = wrapper.findAllComponents(BBreadcrumbItemStub);
             // Home -> MINHA_UNIDADE -> Minha unidade (Título da pagina)
@@ -151,11 +155,12 @@ describe('BarraNavegacao.vue', () => {
         });
 
         it('deve mostrar breadcrumbs para rotas de Unidade (ADMIN vê Unidades)', () => {
+            const {definirUnidadeAtual} = useUnidadeAtual();
+            definirUnidadeAtual({codigo: 1, sigla: 'ADMIN'} as any);
             mockRoute.name = 'Unidade';
             mockRoute.params = {codUnidade: '1'};
             const wrapper = mountComponent({
                 perfil: {perfilSelecionado: Perfil.ADMIN},
-                unidades: {unidade: {codigo: 1, sigla: 'ADMIN'}}
             });
             const items = wrapper.findAllComponents(BBreadcrumbItemStub);
             // Home -> ADMIN -> Unidades
@@ -169,7 +174,6 @@ describe('BarraNavegacao.vue', () => {
             mockRoute.params = {codUnidade: '99'};
             const wrapper = mountComponent({
                 perfil: {perfilSelecionado: Perfil.GESTOR},
-                unidades: {unidade: null}
             });
             const items = wrapper.findAllComponents(BBreadcrumbItemStub);
             // Home -> Unidade 99 -> Minha unidade
@@ -218,11 +222,11 @@ describe('BarraNavegacao.vue', () => {
         });
 
         it('deve adicionar breadcrumb final para Mapa (Rota de Unidade)', () => {
+            const {definirUnidadeAtual} = useUnidadeAtual();
+            definirUnidadeAtual({codigo: 10, sigla: 'TESTE'} as any);
             mockRoute.name = 'Mapa';
             mockRoute.params = {codUnidade: '10'};
-            const wrapper = mountComponent({
-                unidades: {unidade: {codigo: 10, sigla: 'TESTE'}}
-            });
+            const wrapper = mountComponent({});
             const items = wrapper.findAllComponents(BBreadcrumbItemStub);
             // Home -> TESTE -> Mapa de competências
             expect(items[2].text()).toBe('Mapa de competências');

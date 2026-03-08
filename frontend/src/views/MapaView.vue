@@ -138,8 +138,7 @@ import {useAcesso} from "@/composables/useAcesso";
 import {useFormErrors} from '@/composables/useFormErrors';
 import {useMapasStore} from "@/stores/mapas";
 import {useSubprocessosStore} from "@/stores/subprocessos";
-import {useUnidadesStore} from "@/stores/unidades";
-import type {Atividade, Competencia, SalvarCompetenciaRequest} from "@/types/tipos";
+import type {Atividade, Competencia, SalvarCompetenciaRequest, Unidade} from "@/types/tipos";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import {formatSituacaoSubprocesso} from "@/utils/formatters";
 
@@ -154,7 +153,6 @@ const mapasStore = useMapasStore();
 const {mapaCompleto, impactoMapa: impactos} = storeToRefs(mapasStore);
 const subprocessosStore = useSubprocessosStore();
 const subprocesso = computed(() => subprocessosStore.subprocessoDetalhe);
-const unidadesStore = useUnidadesStore();
 usePerfil();
 
 const codProcesso = computed(() => Number(route.params.codProcesso));
@@ -179,7 +177,7 @@ function fecharModalImpacto() {
   mostrarModalImpacto.value = false;
 }
 
-const unidade = computed(() => unidadesStore.unidade);
+const unidade = ref<Unidade | null>(null);
 const codSubprocesso = ref<number | null>(null);
 
 onMounted(async () => {
@@ -191,8 +189,13 @@ onMounted(async () => {
   if (id) {
     codSubprocesso.value = id;
     const data = await subprocessosStore.buscarContextoEdicao(id);
-    if (data && data.atividadesDisponiveis) {
-      atividades.value = data.atividadesDisponiveis;
+    if (data) {
+      if (data.atividadesDisponiveis) {
+        atividades.value = data.atividadesDisponiveis;
+      }
+      if (data.unidade) {
+        unidade.value = data.unidade as Unidade;
+      }
     }
   }
 });
