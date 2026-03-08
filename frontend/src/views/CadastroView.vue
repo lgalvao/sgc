@@ -180,17 +180,17 @@ import {useAtividadeForm} from "@/composables/useAtividadeForm";
 import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useMapasStore} from "@/stores/mapas";
 import {useUnidadesStore} from "@/stores/unidades";
-import {useAnalisesStore} from "@/stores/analises";
 import {useNotification} from "@/composables/useNotification";
 import {useToastStore} from "@/stores/toast";
 import {usePerfil} from "@/composables/usePerfil";
 import {useAcesso} from "@/composables/useAcesso";
-import type {Atividade, Conhecimento, CriarConhecimentoRequest, ErroValidacao,} from "@/types/tipos";
+import type {Atividade, AnaliseCadastro, Conhecimento, CriarConhecimentoRequest, ErroValidacao,} from "@/types/tipos";
 import {SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 import logger from "@/utils/logger";
 import {formatSituacaoSubprocesso} from "@/utils/formatters";
 import * as atividadeService from "@/services/atividadeService";
 import * as subprocessoService from "@/services/subprocessoService";
+import {listarAnalisesCadastro} from "@/services/analiseService";
 import {useErrorHandler} from "@/composables/useErrorHandler";
 
 type DadosRemocao = { tipo: "atividade" | "conhecimento"; index: number; conhecimentoCodigo?: number } | null;
@@ -203,7 +203,6 @@ const props = defineProps<{
 const router = useRouter();
 const unidadesStore = useUnidadesStore();
 const subprocessosStore = useSubprocessosStore();
-const analisesStore = useAnalisesStore();
 const mapasStore = useMapasStore();
 const {notify} = useNotification();
 const toastStore = useToastStore();
@@ -221,10 +220,11 @@ const isRevisao = computed(() => subprocesso.value?.tipoProcesso === TipoProcess
 const podeVerImpacto = computed(() => podeVisualizarImpacto.value);
 
 const atividades = ref<Atividade[]>([]);
+const analisesCadastro = ref<AnaliseCadastro[]>([]);
 const {withErrorHandling, lastError} = useErrorHandler();
 
 const historicoAnalises = computed(() => {
-  return analisesStore.analisesCadastro || [];
+  return analisesCadastro.value || [];
 });
 
 const {novaAtividade, loadingAdicionar, adicionarAtividade: adicionarAtividadeAction} = useAtividadeForm();
@@ -475,7 +475,7 @@ async function confirmarDisponibilizacao() {
 
 async function abrirModalHistorico() {
   if (codSubprocesso.value) {
-    await analisesStore.carregarHistorico(codSubprocesso.value);
+    analisesCadastro.value = await listarAnalisesCadastro(codSubprocesso.value);
   }
   mostrarModalHistorico.value = true;
 }
