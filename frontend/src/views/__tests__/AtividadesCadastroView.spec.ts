@@ -167,6 +167,7 @@ describe("CadastroView.vue", () => {
         // Confirm in modal
         const modal = wrapper.findComponent(ConfirmacaoDisponibilizacaoModal);
         modal.vm.$emit('confirmar');
+        await flushPromises();
 
         expect(subprocessosStore.disponibilizarCadastro).toHaveBeenCalledWith(123);
         expect(pushMock).toHaveBeenCalledWith("/painel");

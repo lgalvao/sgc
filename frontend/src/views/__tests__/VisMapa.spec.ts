@@ -478,6 +478,7 @@ describe("VisMapa.vue", () => {
     });
 
     it("shows empty state if no map", async () => {
+        vi.mocked(mapaServiceModule.obterMapaVisualizacao).mockResolvedValue({competencias: []} as any);
         const {wrapper} = mountComponent({
             mapas: {
                 mapaVisualizacao: {competencias: []} // empty

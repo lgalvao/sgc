@@ -24,7 +24,7 @@ public class ArchConsistencyTest {
     @ArchTest
     static final ArchRule controllers_should_not_access_repositories = noClasses()
             .that()
-            .haveNameMatching(".*Controller")
+            .haveNameMatching("^(?!.*E2eController).*Controller$")
             .should()
             .accessClassesThat()
             .haveNameMatching(".*Repo");

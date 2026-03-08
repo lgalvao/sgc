@@ -214,7 +214,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BButton, BCard, BCardBody, BFormTextarea, BSpinner, BTable} from "bootstrap-vue-next";
+import {BAlert, BButton, BCard, BCardBody, BFormTextarea, BSpinner, BTable} from "bootstrap-vue-next";
 import {computed, onMounted, ref} from "vue";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";

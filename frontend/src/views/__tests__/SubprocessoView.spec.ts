@@ -63,7 +63,6 @@ describe('SubprocessoView.vue', () => {
     };
 
     const additionalStubs = {
-        BContainer: {template: '<div><slot /></div>'},
         SubprocessoCards: SubprocessoCardsStub,
         SubprocessoModal: SubprocessoModalStub,
         BModal: {
@@ -76,7 +75,8 @@ describe('SubprocessoView.vue', () => {
             props: ['modelValue'],
             emits: ['update:modelValue']
         },
-        BButton: {template: '<button :disabled="disabled"><slot /></button>', props: ['disabled']}
+        BButton: {template: '<button :disabled="disabled"><slot /></button>', props: ['disabled']},
+        BAlert: {template: '<div><slot /></div>', props: ['variant', 'dismissible', 'modelValue']}
     };
 
     beforeEach(() => {

@@ -176,6 +176,7 @@ import PageHeader from "@/components/layout/PageHeader.vue";
 import LoadingButton from "@/components/comum/LoadingButton.vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
 import CadAtividadeForm from "@/components/atividades/CadAtividadeForm.vue";
+import AtividadeItem from "@/components/atividades/AtividadeItem.vue";
 import {useAtividadeForm} from "@/composables/useAtividadeForm";
 import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useMapasStore} from "@/stores/mapas";
@@ -183,8 +184,16 @@ import {useNotification} from "@/composables/useNotification";
 import {useToastStore} from "@/stores/toast";
 import {usePerfil} from "@/composables/usePerfil";
 import {useAcesso} from "@/composables/useAcesso";
-import type {Atividade, AnaliseCadastro, Conhecimento, CriarConhecimentoRequest, ErroValidacao,} from "@/types/tipos";
-import {SituacaoSubprocesso, TipoProcesso, type Unidade} from "@/types/tipos";
+import {
+  SituacaoSubprocesso,
+  TipoProcesso,
+  type Atividade,
+  type AnaliseCadastro,
+  type Conhecimento,
+  type CriarConhecimentoRequest,
+  type ErroValidacao,
+  type Unidade
+} from "@/types/tipos";
 import logger from "@/utils/logger";
 import {formatSituacaoSubprocesso} from "@/utils/formatters";
 import * as atividadeService from "@/services/atividadeService";
