@@ -1,10 +1,16 @@
 <script lang="ts" setup>
-import {BButton, BTable} from "bootstrap-vue-next";
+import {BButton, BTable, BBadge} from "bootstrap-vue-next";
 import {computed} from "vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
-import BadgeSituacao from "@/components/comum/BadgeSituacao.vue";
-import type {ProcessoResumo} from "@/types/tipos";
+import {SituacaoProcesso, type ProcessoResumo} from "@/types/tipos";
 import {formatDate, formatSituacaoProcesso, formatTipoProcesso} from "@/utils/formatters";
+
+function getBadgeVariant(situacao: SituacaoProcesso | string) {
+  if (situacao === SituacaoProcesso.FINALIZADO) return "success";
+  if (situacao === SituacaoProcesso.EM_ANDAMENTO) return "primary";
+  if (situacao === SituacaoProcesso.CRIADO) return "secondary";
+  return "dark";
+}
 
 const props = defineProps<{
   processos: ProcessoResumo[];
@@ -126,7 +132,9 @@ defineExpose({fields});
       </template>
 
       <template #cell(situacao)="{ item }">
-        <BadgeSituacao :situacao="item.situacao" :texto="formatSituacaoProcesso(item.situacao)"/>
+        <BBadge :variant="getBadgeVariant(item.situacao)" data-testid="badge-situacao">
+          {{ formatSituacaoProcesso(item.situacao) }}
+        </BBadge>
       </template>
 
       <template #cell(tipo)="{ item }">

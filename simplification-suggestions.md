@@ -27,9 +27,7 @@ Historicamente, tentativas de simplificação falharam ou foram abandonadas no m
   * **Ação:** Eliminar as stores do diretório `frontend/src/stores/` que não guardam estado global (`atividades.ts`, `mapas.ts`, `subprocessos.ts`, `processos.ts`, `usuarios.ts` etc.).
   * **Como:** Substituir nos componentes de view o uso dessas lojas por chamadas diretas aos Services usando estado local Reactivo. O Pinia agora deve ser destinado **só a variáveis globais imutáveis/compartilhadas**, como Autenticação, Tema da UI e Menu.
 
-* **[ ] Limpar Componentes UI "Wrappers" Desnecessários:**
-  * **Ação:** Identificar componentes criados pelo time que servem unicamente como ponte para componentes nativos, sem abstrair muita inteligência.
-  * **Como:** Renderizar o componente ou biblioteca fundamental da UI nativamente na View, poupando uma camada visual inútil do Virtual DOM.
+
 
 * **[ ] Migrar Lógica de Relatórios (Resquícios do Protótipo Vue) para o Back-end:**
   * **Ação:** O componente `RelatoriosView.vue` ainda possui dados *Mockados* (`diagnosticosGaps`) misturados com lógica pesada de filtragem por data (`isWithinInterval`) e tipo de processo no lado do cliente (`computed > processosFiltrados`).

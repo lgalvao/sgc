@@ -2,7 +2,7 @@ import {describe, expect, it, vi} from 'vitest';
 import {flushPromises, mount} from '@vue/test-utils';
 import UnidadeView from '@/views/UnidadeView.vue';
 import EmptyState from '@/components/comum/EmptyState.vue';
-import ErrorAlert from '@/components/comum/ErrorAlert.vue';
+import {BAlert} from 'bootstrap-vue-next';
 import {useUnidadesStore} from '@/stores/unidades';
 import {useAtribuicaoTemporariaStore} from '@/stores/atribuicoes';
 import {usePerfilStore} from '@/stores/perfil';
@@ -123,6 +123,7 @@ describe('UnidadeView.vue', () => {
                     BCard: {template: '<div><slot /></div>'},
                     BCardBody: {template: '<div><slot /></div>'},
                     BButton: {template: '<button @click="$emit(\'click\')"><slot /></button>'},
+                    BAlert: {template: '<div><slot /></div>', emits: ['dismissed']},
                     TreeTable: TreeTableStub,
                 },
                 {stubActions: false}
@@ -263,13 +264,13 @@ describe('UnidadeView.vue', () => {
         unidadesStore.lastError = {message: 'Erro ao carregar unidade'};
         await wrapper.vm.$nextTick();
 
-        const alert = wrapper.findComponent(ErrorAlert);
+        const alert = wrapper.findComponent(BAlert);
         expect(alert.exists()).toBe(true);
-        expect(alert.props('error')).toEqual({message: 'Erro ao carregar unidade'});
+        expect(wrapper.text()).toContain('Erro ao carregar unidade');
 
         // Test dismiss
         vi.spyOn(unidadesStore, 'clearError');
-        alert.vm.$emit('dismiss');
+        alert.vm.$emit('dismissed');
         expect(unidadesStore.clearError).toHaveBeenCalled();
     });
 
