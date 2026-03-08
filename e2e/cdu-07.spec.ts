@@ -33,7 +33,7 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
         });
 
         await page.getByTestId('tbl-processos').getByText(descricao, {exact: true}).first().click();
-        const processoId = Number.parseInt(page.url().match(/\/processo\/(\d+)/)?.[1] || '0');
+        const processoId = Number.parseInt(new RegExp(/\/processo\/(\d+)/).exec(page.url())?.[1] || '0');
         if (processoId > 0) cleanupAutomatico.registrar(processoId);
         await navegarParaSubprocesso(page, UNIDADE_ALVO);
 
@@ -72,7 +72,7 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
         await page.getByTestId('btn-logout').click();
         await login(page, CHEFE_UNIDADE, SENHA_CHEFE);
         await page.getByTestId('tbl-processos').getByText(descricao, {exact: true}).first().click();
-        await expect(page).toHaveURL(new RegExp(`/processo/\\d+/${UNIDADE_ALVO}$`));
+        await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${UNIDADE_ALVO}$`));
 
         await verificarDetalhesSubprocesso(page, {
             sigla: UNIDADE_ALVO,

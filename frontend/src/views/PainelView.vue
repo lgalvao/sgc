@@ -36,6 +36,7 @@
             :striped="alertas.length > 0"
             :tbody-tr-props="rowAttrAlerta"
             :tbody-tr-class="rowClassAlerta"
+            aria-label="Alertas"
             data-testid="tbl-alertas"
             hover
             responsive
@@ -79,7 +80,6 @@ import {useToastStore} from "@/stores/toast";
 import type {Alerta, ProcessoResumo} from "@/types/tipos";
 import * as painelService from "@/services/painelService";
 import type {Page} from "@/services/painelService";
-import * as alertaService from "@/services/alertaService";
 
 const perfilStore = usePerfilStore();
 const perfil = usePerfil();
@@ -109,20 +109,6 @@ async function buscarAlertas(
   alertasPage.value = response;
 }
 
-async function marcarAlertaComoLido(idAlerta: number): Promise<boolean> {
-  const originalAlertas = JSON.parse(JSON.stringify(alertas.value));
-  const index = alertas.value.findIndex(a => a.codigo === idAlerta);
-  if (index !== -1) {
-    alertas.value[index].dataHoraLeitura = new Date().toISOString();
-  }
-  try {
-    await alertaService.marcarComoLido(idAlerta);
-    return true;
-  } catch {
-    alertas.value = originalAlertas;
-    return false;
-  }
-}
 
 async function carregarDados() {
   if (perfil.perfilSelecionado.value && perfilStore.unidadeSelecionada) {

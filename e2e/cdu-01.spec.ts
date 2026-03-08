@@ -37,10 +37,10 @@ test.describe('CDU-01 - Realizar login e exibir estrutura das telas', () => {
         // Login como ADMIN (191919) via fixture
 
         await expect(page.getByRole('link', {name: 'SGC'})).toBeVisible();
-        await expect(page.getByText('Painel')).toBeVisible();
+        await expect(page.getByRole('link', {name: 'Painel'})).toBeVisible();
         await expect(page.getByRole('link', {name: 'Unidades'})).toBeVisible();
-        await expect(page.getByText('Relatórios')).toBeVisible();
-        await expect(page.getByText('Histórico')).toBeVisible();
+        await expect(page.getByRole('link', {name: 'Relatórios'})).toBeVisible();
+        await expect(page.getByRole('link', {name: 'Histórico'})).toBeVisible();
 
         // Admin deve ver Parâmetros e Administradores
         await expect(page.getByTestId('btn-parametros')).toBeVisible();
@@ -52,7 +52,7 @@ test.describe('CDU-01 - Realizar login e exibir estrutura das telas', () => {
                                                                                 autenticadoComoGestor
                                                                             }: { page: Page, autenticadoComoGestor: void }) => {
         await expect(page.getByRole('link', {name: 'SGC'})).toBeVisible();
-        await expect(page.getByText('Painel')).toBeVisible();
+        await expect(page.getByRole('link', {name: 'Painel'})).toBeVisible();
 
         // Deve ver 'Minha unidade' em vez de 'Unidades'
         await expect(page.getByRole('link', {name: 'Minha unidade'})).toBeVisible();
@@ -71,7 +71,7 @@ test.describe('CDU-01 - Realizar login e exibir estrutura das telas', () => {
         autenticadoComoChefeSecao111: void
     }) => {
         await expect(page.getByRole('link', {name: 'SGC'})).toBeVisible();
-        await expect(page.getByText('Painel')).toBeVisible();
+        await expect(page.getByRole('link', {name: 'Painel'})).toBeVisible();
 
         // Deve ver 'Minha unidade' em vez de 'Unidades'
         await expect(page.getByRole('link', {name: 'Minha unidade'})).toBeVisible();
@@ -90,7 +90,7 @@ test.describe('CDU-01 - Realizar login e exibir estrutura das telas', () => {
         autenticadoComoServidor: void
     }) => {
         await expect(page.getByRole('link', {name: 'SGC'})).toBeVisible();
-        await expect(page.getByText('Painel')).toBeVisible();
+        await expect(page.getByRole('link', {name: 'Painel'})).toBeVisible();
 
         // Deve ver 'Minha unidade' em vez de 'Unidades'
         await expect(page.getByRole('link', {name: 'Minha unidade'})).toBeVisible();

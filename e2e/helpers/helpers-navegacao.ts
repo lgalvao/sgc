@@ -64,7 +64,6 @@ export async function fazerLogout(page: Page): Promise<void> {
     // Disparar click via JS para evitar bloqueio por toast sobreposto
     await page.getByTestId('btn-logout').locator('a').dispatchEvent('click');
     await expect(page).toHaveURL(/\/login/);
-    await page.waitForLoadState('load');
 
     // Limpar possíveis toasts de "Não Autorizado" ou "Sessão expirada" que aparecem no teardown
     await limparNotificacoes(page);
@@ -95,7 +94,7 @@ export async function esperarPaginaCadastroProcesso(page: Page): Promise<void> {
  * Aguarda a navegação para a página de detalhes de um processo.
  */
 export async function esperarPaginaDetalhesProcesso(page: Page, id?: number): Promise<void> {
-    const regex = id ? new RegExp(`\\/processo\\/${id}$`) : /\/processo\/\d+$/;
+    const regex = id ? new RegExp(String.raw`\/processo\/${id}$`) : /\/processo\/\d+$/;
     await page.waitForURL(regex);
 }
 
@@ -104,7 +103,7 @@ export async function esperarPaginaDetalhesProcesso(page: Page, id?: number): Pr
  */
 export async function esperarPaginaSubprocesso(page: Page, siglaUnidade?: string): Promise<void> {
     const regex = siglaUnidade 
-        ? new RegExp(`\\/processo\\/\\d+\\/${siglaUnidade}$`) 
+        ? new RegExp(String.raw`\/processo\/\d+\/${siglaUnidade}$`) 
         : /\/processo\/\d+\/[A-Z0-9_]+$/;
     await page.waitForURL(regex);
 }

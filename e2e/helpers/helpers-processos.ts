@@ -76,10 +76,12 @@ export async function verificarProcessoNaTabela(page: Page, options: {
     tipo: string;
     unidadesParticipantes?: string[];
 }): Promise<void> {
-    await expect(page.getByTestId('tbl-processos')).toBeVisible();
-    await expect(page.getByTestId('tbl-processos').getByText(options.descricao).first()).toBeVisible();
-
-    const linhaProcesso = page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(options.descricao)});
+    const tabela = page.locator('[data-testid="tbl-processos"]');
+    await expect(tabela).toBeVisible();
+    
+    // Localizar a linha que contém a descrição do processo
+    const linhaProcesso = tabela.locator('tr').filter({hasText: options.descricao}).first();
+    await expect(linhaProcesso).toBeVisible();
     await expect(linhaProcesso.getByText(options.situacao)).toBeVisible();
     await expect(linhaProcesso.getByText(options.tipo, {exact: true})).toBeVisible();
 

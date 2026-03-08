@@ -156,26 +156,27 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await expect(page.getByText(conhecimento3)).toBeVisible();
     });
 
-    test('Cenario 3: Visualizar processo finalizado', async ({page, autenticadoComoGestorCoord21}) => {
-        // Preparar: Admin homologa o cadastro
+    test('Cenario 3.1.1: Aceite COORD_21 (Cadastro)', async ({page}) => {
+        await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);
         await acessarSubprocessoGestor(page, descProcessoMapeamento, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
         await page.getByTestId('btn-acao-analisar-principal').click();
         await page.getByTestId('inp-aceite-cadastro-obs').fill('Aceite para finalização do cenário');
         await page.getByTestId('btn-aceite-cadastro-confirmar').click();
-
         await verificarPaginaPainel(page);
+    });
 
-        // Aceite SECRETARIA_2 (Cadastro)
+    test('Cenario 3.1.2: Aceite SECRETARIA_2 (Cadastro)', async ({page}) => {
         await loginComPerfil(page, '212121', 'senha', 'GESTOR - SECRETARIA_2');
         await acessarSubprocessoGestor(page, descProcessoMapeamento, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
         await page.getByTestId('btn-acao-analisar-principal').click();
         await page.getByTestId('inp-aceite-cadastro-obs').fill('Aceite Secretaria 2');
         await page.getByTestId('btn-aceite-cadastro-confirmar').click();
-
         await verificarPaginaPainel(page);
-        await fazerLogout(page);
+    });
+
+    test('Cenario 3.1.3: ADMIN homologa cadastro', async ({page}) => {
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
         await page.getByTestId('tbl-processos').getByText(descProcessoMapeamento).first().click();
         await navegarParaSubprocesso(page, UNIDADE_ALVO);
@@ -184,7 +185,10 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await page.getByTestId('inp-aceite-cadastro-obs').fill('Homologado para finalização do cenário');
         await page.getByTestId('btn-aceite-cadastro-confirmar').click();
         await expect(page.getByText(/Cadastro homologado/i).first()).toBeVisible();
-        await page.goto('/painel');
+    });
+
+    test('Cenario 3.2: ADMIN disponibiliza Mapa', async ({page}) => {
+        await login(page, USUARIO_ADMIN, SENHA_ADMIN);
         await page.getByTestId('tbl-processos').getByText(descProcessoMapeamento).first().click();
         await navegarParaSubprocesso(page, UNIDADE_ALVO);
 
@@ -209,20 +213,20 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await page.getByTestId('btn-disponibilizar-mapa-confirmar').click();
         await expect(page.getByTestId('mdl-disponibilizar-mapa')).toBeHidden();
 
-        // Aguardar redirecionamento para o painel e verificar mensagem de sucesso
+        // Aguardar redirecionamento para o painel
         await verificarPaginaPainel(page);
+    });
 
-        // Chefe valida mapa
-        await fazerLogout(page);
+    test('Cenario 3.3.1: Chefe valida mapa', async ({page}) => {
         await login(page, USUARIOS.CHEFE_SECAO_211.titulo, USUARIOS.CHEFE_SECAO_211.senha);
-
         await page.getByTestId('tbl-processos').getByText(descProcessoMapeamento).first().click();
         await navegarParaMapa(page);
         await page.getByTestId('btn-mapa-validar').click();
         await page.getByTestId('btn-validar-mapa-confirmar').click();
         await expect(page.getByText(/Mapa validado/i).first()).toBeVisible();
+    });
 
-        // Aceite COORD_21 (Mapa)
+    test('Cenario 3.3.2: Aceite COORD_21 (Mapa)', async ({page}) => {
         await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);
         await page.getByTestId('tbl-processos').getByText(descProcessoMapeamento).first().click();
         await navegarParaSubprocesso(page, 'SECAO_211');
@@ -230,8 +234,9 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await page.getByTestId('btn-mapa-homologar-aceite').click();
         await page.getByTestId('btn-aceite-mapa-confirmar').click();
         await verificarPaginaPainel(page);
+    });
 
-        // Aceite SECRETARIA_2 (Mapa)
+    test('Cenario 3.3.3: Aceite SECRETARIA_2 (Mapa)', async ({page}) => {
         await loginComPerfil(page, '212121', 'senha', 'GESTOR - SECRETARIA_2');
         await page.getByTestId('tbl-processos').getByText(descProcessoMapeamento).first().click();
         await navegarParaSubprocesso(page, 'SECAO_211');
@@ -239,18 +244,20 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         await page.getByTestId('btn-mapa-homologar-aceite').click();
         await page.getByTestId('btn-aceite-mapa-confirmar').click();
         await verificarPaginaPainel(page);
+    });
 
-        // Admin homologa mapa e finaliza processo
-        await fazerLogout(page);
+    test('Cenario 3.3.4: Admin homologa mapa', async ({page}) => {
         await login(page, USUARIO_ADMIN, SENHA_ADMIN);
-
         await page.getByTestId('tbl-processos').getByText(descProcessoMapeamento).first().click();
         await navegarParaSubprocesso(page, 'SECAO_211');
         await navegarParaMapa(page);
         await page.getByTestId('btn-mapa-homologar-aceite').click();
         await page.getByTestId('btn-aceite-mapa-confirmar').click();
+        await expect(page.getByText(/Homologação efetivada/i).first()).toBeVisible();
+    });
 
-        await page.goto('/painel');
+    test('Cenario 3.4: Finalizar e Visualizar', async ({page}) => {
+        await login(page, USUARIO_ADMIN, SENHA_ADMIN);
         await page.getByTestId('tbl-processos').getByText(descProcessoMapeamento).first().click();
         await page.getByTestId('btn-processo-finalizar').click();
         await page.getByTestId('btn-finalizar-processo-confirmar').click();
@@ -269,7 +276,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         // O card deve estar visível para visualização em processo finalizado
         await navegarParaAtividadesVisualizacao(page);
 
-        await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos'})).toBeVisible();
+        await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos', exact: true})).toBeVisible();
         await expect(page.getByText(atividadeA)).toBeVisible();
         await expect(page.getByText(atividadeB)).toBeVisible();
     });

@@ -17,9 +17,9 @@ export function usePerfil() {
     const isServidor = computed(() => perfilStore.perfilSelecionado === Perfil.SERVIDOR);
 
     const podeAcessoGeralAdminGestor = computed(() => isAdmin.value || isGestor.value);
-    const podeCriarProcesso = computed(() => isAdmin.value || isGestor.value);
+    const podeCriarProcesso = computed(() => isAdmin.value);
     const podeAcessarTodasUnidades = computed(() => isAdmin.value);
-    const podeVisualizarTabelaCtaVazio = computed(() => isAdmin.value || isGestor.value);
+    const podeVisualizarTabelaCtaVazio = computed(() => isAdmin.value);
 
     // Aliases for specific blocks or legacy naming if needed
     const isGlobalAdmin = isAdmin;

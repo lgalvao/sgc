@@ -117,7 +117,7 @@ const LOG_FILTERS = [
     /NotificacaoEmailServiceMock.*ATIVADO/,
     /E-mails serão mockados/,
 
-    // eslint-disable-next-line no-control-regex
+     
     /^\s*$/
 ];
 

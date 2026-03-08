@@ -16,7 +16,7 @@ import {
     devolverCadastroMapeamento,
     fecharHistoricoAnalise,
 } from './helpers/helpers-analise.js';
-import {fazerLogout, navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
+import {navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
 
 test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos', () => {
     const UNIDADE_ALVO = 'SECAO_211';

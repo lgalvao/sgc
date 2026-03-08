@@ -1,3 +1,4 @@
+/* eslint-disable playwright/expect-expect */
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcesso} from './helpers/helpers-processos.js';
 import {

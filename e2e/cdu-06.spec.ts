@@ -8,7 +8,7 @@ import {
 } from './helpers/helpers-processos.js';
 import {adicionarAtividade, adicionarConhecimento, disponibilizarCadastro, navegarParaAtividades} from './helpers/helpers-atividades.js';
 import {acessarSubprocessoChefeDireto} from './helpers/helpers-analise.js';
-import {verificarPaginaPainel, navegarParaSubprocesso, esperarPaginaCadastroProcesso, esperarPaginaDetalhesProcesso} from './helpers/helpers-navegacao.js';
+import {verificarPaginaPainel, navegarParaSubprocesso, esperarPaginaDetalhesProcesso} from './helpers/helpers-navegacao.js';
 
 test.describe('CDU-06 - Detalhar processo', () => {
     const UNIDADE_ALVO = 'ASSESSORIA_12';

@@ -416,13 +416,12 @@ class E2eControllerTest {
         }
 
         @Test
-        @DisplayName("limparTabela: Deve tentar DELETE se TRUNCATE falhar")
-        void limparTabela_TruncateFalha_TentaDelete() throws Exception {
+        @DisplayName("limparTabela: Deve usar DELETE para evitar bug do H2 com constraints")
+        void limparTabela_UsaDelete() throws Exception {
             try (Connection conn = mock(Connection.class);
                  Statement stmt = mock(Statement.class)) {
 
                 when(stmt.execute(anyString())).thenReturn(true);
-                doThrow(new SQLException("Erro H2")).when(stmt).execute(argThat(s -> s != null && s.contains("TRUNCATE")));
 
                 DataSource ds = mock(DataSource.class);
                 when(jdbcTemplateMock.getDataSource()).thenAnswer(i -> ds);
@@ -437,7 +436,7 @@ class E2eControllerTest {
 
                 controllerIsolado.resetDatabase();
 
-                verify(stmt).execute(argThat(s -> s != null && s.contains("TRUNCATE")));
+                verify(stmt, never()).execute(argThat(s -> s != null && s.contains("TRUNCATE")));
                 verify(stmt).execute(contains("DELETE FROM sgc.TABELA_TESTE"));
             }
         }

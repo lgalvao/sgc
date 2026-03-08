@@ -1,6 +1,6 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcessoMapaHomologadoFixture, criarProcessoRevisaoMapaHomologadoFixture} from './fixtures/fixtures-processos.js';
-import {fazerLogout, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
+import {verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 import {USUARIOS, login} from './helpers/helpers-auth.js';
 
 /**

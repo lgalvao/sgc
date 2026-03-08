@@ -108,10 +108,9 @@ public class E2eController {
     private void limparTabela(Statement stmt, String table) throws SQLException {
         log.debug("Limpando tabela: sgc.{}", table);
         try {
-            stmt.execute("TRUNCATE TABLE sgc." + table + " RESTART IDENTITY");
-        } catch (Exception e) {
-            log.warn("Não foi possível truncar tabela {}, tentando DELETE: {}", table, e.getMessage());
             stmt.execute("DELETE FROM sgc." + table);
+        } catch (Exception e) {
+            log.warn("Erro ao limpar tabela {}: {}", table, e.getMessage());
         }
     }
 

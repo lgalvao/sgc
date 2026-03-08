@@ -62,6 +62,7 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
         });
 
         const atividadeManual = `Atividade Manual ${timestamp}`;
+
         await test.step('4. Adicionar Manualmente e Validar Auto-save', async () => {
             await AtividadeHelpers.adicionarAtividade(page, atividadeManual);
             await AtividadeHelpers.verificarSituacaoSubprocesso(page, 'Cadastro em andamento');

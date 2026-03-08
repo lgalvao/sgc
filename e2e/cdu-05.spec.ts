@@ -1,3 +1,4 @@
+/* eslint-disable playwright/expect-expect */
 import type {Page} from '@playwright/test';
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
@@ -78,7 +79,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         // Capturar ID do processo para cleanup
         await page.goto('/painel');
         await page.getByTestId('tbl-processos').getByText(descProcMapeamento).first().click();
-        const processoMapeamentoId = Number.parseInt(page.url().match(/\/processo\/(\d+)/)?.[1] || '0');
+        const processoMapeamentoId = Number.parseInt(new RegExp(/\/processo\/(\d+)/).exec(page.url())?.[1] || '0');
         if (processoMapeamentoId > 0) cleanupAutomatico.registrar(processoMapeamentoId);
     });
 
@@ -182,7 +183,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         // Capturar ID do processo para cleanup
         await page.getByTestId('tbl-processos').getByText(descProcRevisao).first().click();
         await expect(page).toHaveURL(/\/processo\/cadastro/);
-        const processoRevisaoId = Number.parseInt(page.url().match(/\/processo\/cadastro\/(\d+)/)?.[1] || '0');
+        const processoRevisaoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
         if (processoRevisaoId > 0) cleanupAutomatico.registrar(processoRevisaoId);
         const dataLimiteStr = (await page.getByTestId('inp-processo-data-limite').inputValue()).split('-').reverse().join('/');
 

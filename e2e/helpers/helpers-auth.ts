@@ -35,9 +35,7 @@ export async function autenticar(page: Page, usuario: string, senha: string) {
 }
 
 export async function login(page: Page, usuario: string, senha: string) {
-    if (!page.url().includes('/login')) {
-        await page.goto('/login');
-    }
+    await page.goto('/login');
     await autenticar(page, usuario, senha);
     await page.waitForURL(/\/painel(?:\?|$)/);
     await limparNotificacoes(page);

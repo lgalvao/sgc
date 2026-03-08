@@ -1,3 +1,4 @@
+/* eslint-disable playwright/expect-expect */
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcesso} from './helpers/helpers-processos.js';
 import {
@@ -26,6 +27,7 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
 
     // PREPARAÇÃO - Criar mapa disponibilizado para CHEFE validar
 
+     
     test('Preparacao 1: Admin cria e inicia processo de mapeamento', async ({
                                                                                 page,
                                                                                 autenticadoComoAdmin,

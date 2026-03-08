@@ -216,6 +216,17 @@ Se um passo de preparação faz uma ação (validar mapa, aceitar, homologar), *
 
 Os logs do backend aparecem na saída dos testes (prefixados com `[WebServer] [BACKEND]`). Use `grep` para verificar se as chamadas de backend esperadas realmente aconteceram:
 
-```bash
-grep -i 'subprocesso 202' resultado.txt
 ```
+
+## Lições aprendidas em correções recentes
+
+- **Evite locators com prefixo de tag desnecessário**:
+    - ❌ `page.locator('table[data-testid="tbl-processos"]')` falha se o `data-testid` for movido para uma `div` de wrapper (comum em componentes de terceiros como `BTable`).
+    - ✅ USE `page.locator('[data-testid="tbl-processos"]')` para ser agnóstico à tag.
+- **H2: Cuidado com `TRUNCATE` e `REFERENTIAL_INTEGRITY FALSE`**:
+    - Em bancos H2, o comando `TRUNCATE TABLE` pode corromper `CHECK` constraints (especialmente em visualizações simuladas como tabelas no schema de teste) se a integridade referencial estiver desabilitada no momento.
+    - Se encontrar `JdbcSQLIntegrityConstraintViolationException: Check constraint invalid` após um reset de banco, substitua o `TRUNCATE` por `DELETE FROM`.
+- **Navegação pós-criação**:
+    - Após criar um registro (`page.getByTestId('btn-...-salvar').click()`), certifique-se de que o teste aguarda a volta para a página esperada (`/painel`) antes de tentar interagir com a tabela. O uso de `await expect(page).toHaveURL(...)` ou `page.waitForURL(...)` é essencial.
+- **Robustez em Clicks de Linha**:
+    - Antes de clicar em uma linha da tabela (`tabela.locator('tr').filter(...).click()`), prefira adicionar um `await linha.waitFor({ state: 'visible' })`. Em ambientes de teste, a linha pode estar presente no DOM mas ainda não "clicável" devido a re-renderizações do Vue/Bootstrap.
