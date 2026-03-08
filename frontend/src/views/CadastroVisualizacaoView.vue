@@ -155,11 +155,11 @@ import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import {useUnidadesStore} from "@/stores/unidades";
 import {useProcessosStore} from "@/stores/processos";
-import {useAnalisesStore} from "@/stores/analises";
 import {useMapasStore} from "@/stores/mapas";
 import {useSubprocessosStore} from "@/stores/subprocessos";
 import type {
   AceitarCadastroRequest,
+  AnaliseCadastro,
   DevolverCadastroRequest,
   HomologarCadastroRequest,
   Unidade,
@@ -168,6 +168,7 @@ import type {
 } from "@/types/tipos";
 import {TipoProcesso} from "@/types/tipos";
 import {useAcesso} from "@/composables/useAcesso";
+import {listarAnalisesCadastro} from "@/services/analiseService";
 
 const props = defineProps<{
   codProcesso: number | string;
@@ -177,7 +178,6 @@ const props = defineProps<{
 const router = useRouter();
 const unidadesStore = useUnidadesStore();
 const processosStore = useProcessosStore();
-const analisesStore = useAnalisesStore();
 const mapasStore = useMapasStore();
 const subprocessosStore = useSubprocessosStore();
 const {impactoMapa: impactos} = storeToRefs(mapasStore);
@@ -236,8 +236,10 @@ const atividades = ref<Atividade[]>([]);
 const processoAtual = computed(() => processosStore.processoDetalhe);
 const isRevisao = computed(() => processoAtual.value?.tipo === TipoProcesso.REVISAO);
 
+const analisesCadastro = ref<AnaliseCadastro[]>([]);
+
 const historicoAnalises = computed(() => {
-  return analisesStore.analisesCadastro || [];
+  return analisesCadastro.value || [];
 });
 
 const loadingImpacto = ref(false);
@@ -275,7 +277,7 @@ function fecharModalImpacto() {
 
 async function abrirModalHistoricoAnalise() {
   if (codSubprocesso.value) {
-    await analisesStore.carregarHistorico(codSubprocesso.value);
+    analisesCadastro.value = await listarAnalisesCadastro(codSubprocesso.value);
   }
   mostrarModalHistoricoAnalise.value = true;
 }

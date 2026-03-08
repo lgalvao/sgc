@@ -23,15 +23,20 @@ Historicamente, tentativas de simplificação falharam ou foram abandonadas no m
 
 ## 🔨 Tarefas Pendentes - Front-end
 
-* **[ ] Remoção Progressiva dos Stores Pinia "Pass-through":**
+* **[~] Remoção Progressiva dos Stores Pinia "Pass-through":**
   * **Ação:** Eliminar as stores do diretório `frontend/src/stores/` que não guardam estado global (`atividades.ts`, `mapas.ts`, `subprocessos.ts`, `processos.ts`, `usuarios.ts` etc.).
   * **Como:** Substituir nos componentes de view o uso dessas lojas por chamadas diretas aos Services usando estado local Reactivo. O Pinia agora deve ser destinado **só a variáveis globais imutáveis/compartilhadas**, como Autenticação, Tema da UI e Menu.
+  * **Progresso:**
+    * **[x] `analises.ts` removida** — `CadastroView.vue`, `MapaVisualizacaoView.vue` e `CadastroVisualizacaoView.vue` agora usam `analiseService` diretamente. `analises.spec.ts` deletado.
+    * **[x] `mapaService.ts` criado** — `MapaVisualizacaoView.vue` usa `obterMapaVisualizacao` diretamente (sem `mapas.ts` para visualização).
+    * **[ ] Continuar com demais stores** (`mapas.ts` (ações de edição), `atribuicoes.ts`, `diagnosticos.ts`, `analises validação`, etc.)
 
 
 
-* **[ ] Migrar Lógica de Relatórios (Resquícios do Protótipo Vue) para o Back-end:**
+* **[x] Migrar Lógica de Relatórios (Resquícios do Protótipo Vue) para o Back-end:**
   * **Ação:** O componente `RelatoriosView.vue` ainda possui dados *Mockados* (`diagnosticosGaps`) misturados com lógica pesada de filtragem por data (`isWithinInterval`) e tipo de processo no lado do cliente (`computed > processosFiltrados`).
   * **Como:** O Back-end deve prover um endpoint consolidado estritamente para relatórios (ex: `/api/relatorios/painel` aceitando `dataInicio` e `dataFim`), devolvendo os contadores prontos. O front-end não deve baixar listas completas e fazer `reduce`/`filter` na memória local.
+  * **Concluído:** `RelatoriosView.vue` foi refatorado para usar composable `useRelatorios` com endpoints `/relatorios/andamento` e `/relatorios/mapas`. Sem lógica de filtro local.
 
 * **[ ] Consolidar Variáveis de Permissão Globais do Frontend:**
   * **Ação:** O frontend utiliza propriedades como `perfilStore.isAdmin` ou `perfilStore.isGestor` para tomar decisões genéricas de UI (ex: exibir o botão "Criar Processo" no Menu ou no Painel).
@@ -46,8 +51,10 @@ A simplificação arquitetural exigirá a adaptação das suítes de teste:
   * Testes de Integração (E2E/API) não devem sofrer impacto lógico, pois a interface da API (JSON/HTTP) não muda, apenas o roteamento interno do Controller para o Service.
 
 * **Frontend (Remoção da Pinia "Pass-through"):**
-  * Os **12 arquivos de teste** dentro de `frontend/src/stores/__tests__` (ex: `processos.spec.ts`, `atividades.spec.ts`) serão **deletados**, reduzindo a carga de manutenção de testes que apenas validavam repasse de dados.
-  * Testes de Componentes (Views como `PainelView.spec.ts`) precisarão ser refatorados: onde antes se fazia o mock da dependência global da Pinia (`mockStore()`), passará a ser feito o mock da Composable de API ou da chamada de serviço correspondente.
+  * Os arquivos de teste dentro de `frontend/src/stores/__tests__` serão **deletados** progressivamente à medida que as stores são removidas.
+  * `analises.spec.ts` já foi **deletado** (store `analises.ts` removida).
+  * Testes de Componentes (Views) são atualizados para mockar os services diretamente em vez das stores.
+  * Exemplo: `AtividadesCadastroView.spec.ts` e `VisMapa.spec.ts` já usam `vi.mock("@/services/analiseService")` e `vi.mock("@/services/mapaService")`.
 
 * **Frontend (Refatoração de Relatórios):**
   * Testes para `RelatoriosView.spec.ts` deixarão de valer a lógica de filtro de data e mock local, focando exclusivamente na verificação de que o componente renderiza corretamente os dados fornecidos pelo novo endpoint do backend.

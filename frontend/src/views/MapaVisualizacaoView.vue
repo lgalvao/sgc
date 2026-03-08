@@ -240,35 +240,34 @@
 import {BButton, BCard, BFormTextarea, BModal} from "bootstrap-vue-next";
 import {computed, onMounted, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
-import {storeToRefs} from "pinia";
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import EmptyState from "@/components/comum/EmptyState.vue";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import AceitarMapaModal from "@/components/mapa/AceitarMapaModal.vue";
 import HistoricoAnaliseModal from "@/components/processo/HistoricoAnaliseModal.vue";
-import {useMapasStore} from "@/stores/mapas";
 import {useUnidadesStore} from "@/stores/unidades";
 import {useProcessosStore} from "@/stores/processos";
-import {useAnalisesStore} from "@/stores/analises";
 import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useNotification} from "@/composables/useNotification";
 import {useToastStore} from "@/stores/toast";
 import {usePerfil} from "@/composables/usePerfil";
 import {useAcesso} from "@/composables/useAcesso";
 import logger from "@/utils/logger";
+import {listarAnalisesCadastro} from "@/services/analiseService";
+import {obterMapaVisualizacao} from "@/services/mapaService";
+import type {AnaliseCadastro, MapaVisualizacao} from "@/types/tipos";
 
 const route = useRoute();
 const router = useRouter();
 const unidadesStore = useUnidadesStore();
-const mapaStore = useMapasStore();
 const processosStore = useProcessosStore();
-const analisesStore = useAnalisesStore();
 const subprocessosStore = useSubprocessosStore();
 const {notify} = useNotification();
 const toastStore = useToastStore();
 const {perfilSelecionado, isAdmin} = usePerfil();
-const {mapaVisualizacao: mapa} = storeToRefs(mapaStore);
+const mapa = ref<MapaVisualizacao | null>(null);
+const analisesCadastro = ref<AnaliseCadastro[]>([]);
 
 const sigla = computed(() => route.params.siglaUnidade as string);
 const codProcesso = computed(() => Number(route.params.codProcesso));
@@ -312,7 +311,7 @@ const podeAnalisar = computed(() => {
 const podeVerSugestoes = computed(() => podeMostrarVerSugestoes.value);
 
 const historicoAnalise = computed(() => {
-  return analisesStore.analisesCadastro || [];
+  return analisesCadastro.value || [];
 });
 
 const temHistoricoAnalise = computed(() => historicoAnalise.value.length > 0);
@@ -451,7 +450,7 @@ function fecharModalDevolucao() {
 
 async function abrirModalHistorico() {
   if (codSubprocesso.value) {
-    await analisesStore.carregarHistorico(codSubprocesso.value);
+    analisesCadastro.value = await listarAnalisesCadastro(codSubprocesso.value);
   }
   mostrarModalHistorico.value = true;
 }
@@ -469,7 +468,7 @@ onMounted(async () => {
   await processosStore.buscarProcessoDetalhe(codProcesso.value);
   if (codSubprocesso.value) {
     await subprocessosStore.buscarSubprocessoDetalhe(codSubprocesso.value);
-    await mapaStore.buscarMapaVisualizacao(codSubprocesso.value);
+    mapa.value = await obterMapaVisualizacao(codSubprocesso.value);
   }
 });
 

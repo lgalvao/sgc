@@ -9,6 +9,7 @@ import {useToastStore} from "@/stores/toast";
 import {SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 import {setupComponentTest} from "@/test-utils/componentTestHelpers";
 import * as useAcessoModule from '@/composables/useAcesso';
+import * as mapaServiceModule from '@/services/mapaService';
 
 vi.mock("@/services/unidadeService", () => ({
     buscarUnidadePorSigla: vi.fn().mockResolvedValue({sigla: 'TEST', nome: 'Unidade'}),
@@ -139,10 +140,6 @@ describe("VisMapa.vue", () => {
                                 perfilSelecionado: "CHEFE",
                                 ...initialState["perfil"],
                             },
-                            analises: {
-                                analisesPorSubprocesso: new Map(),
-                                ...initialState["analises"],
-                            },
                             subprocessos: {
                                 subprocessoDetalhe: {
                                     codigo: 10,
@@ -177,8 +174,28 @@ describe("VisMapa.vue", () => {
     };
 
     it("renders correctly with data from store", async () => {
+        vi.mocked(mapaServiceModule.obterMapaVisualizacao).mockResolvedValue({
+            codigo: 1,
+            descricao: "Mapa Test",
+            competencias: [
+                {
+                    codigo: 1,
+                    descricao: "Competencia 1",
+                    atividades: [
+                        {
+                            codigo: 1,
+                            descricao: "Atividade 1",
+                            conhecimentos: [
+                                {codigo: 1, descricao: "Conhecimento 1"},
+                            ],
+                        },
+                    ],
+                },
+            ],
+            sugestoes: "Sugestoes do mapa",
+        } as any);
         const {wrapper} = mountComponent();
-        await wrapper.vm.$nextTick();
+        await flushPromises();
 
         expect(wrapper.find('[data-testid="vis-mapa__txt-competencia-descricao"]').text()).toBe(
             "Competencia 1",

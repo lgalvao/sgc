@@ -4,7 +4,7 @@ import {beforeEach, describe, expect, it, vi} from "vitest";
 import {ref} from "vue";
 import * as usePerfilModule from "@/composables/usePerfil";
 import * as subprocessoService from "@/services/subprocessoService";
-import {useAnalisesStore} from "@/stores/analises";
+import * as analiseService from "@/services/analiseService";
 import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useMapasStore} from "@/stores/mapas";
 import CadastroView from "@/views/CadastroView.vue";
@@ -177,13 +177,12 @@ describe("CadastroView.vue", () => {
     it("carrega histórico ao abrir modal", async () => {
         const wrapper = createWrapper();
         await wrapper.vm.$nextTick();
-        const analisesStore = useAnalisesStore();
-        analisesStore.carregarHistorico = vi.fn();
+        vi.mocked(analiseService.listarAnalisesCadastro).mockResolvedValue([]);
 
         await wrapper.find('[data-testid="btn-cad-atividades-historico"]').trigger("click");
         await flushPromises();
 
-        expect(analisesStore.carregarHistorico).toHaveBeenCalledWith(123);
+        expect(analiseService.listarAnalisesCadastro).toHaveBeenCalledWith(123);
         expect(wrapper.findComponent(HistoricoAnaliseModal).exists()).toBe(true);
     });
 
