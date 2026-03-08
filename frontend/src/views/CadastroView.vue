@@ -186,7 +186,7 @@ import {useToastStore} from "@/stores/toast";
 import {usePerfil} from "@/composables/usePerfil";
 import {useAcesso} from "@/composables/useAcesso";
 import type {Atividade, Conhecimento, CriarConhecimentoRequest, ErroValidacao,} from "@/types/tipos";
-import {Perfil, SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
+import {SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 import logger from "@/utils/logger";
 import {formatSituacaoSubprocesso} from "@/utils/formatters";
 import * as atividadeService from "@/services/atividadeService";
@@ -209,8 +209,8 @@ const {notify} = useNotification();
 const toastStore = useToastStore();
 const {impactoMapa: impactos} = storeToRefs(mapasStore);
 
-const {perfilSelecionado} = usePerfil();
-const isChefe = computed(() => perfilSelecionado.value === Perfil.CHEFE);
+const perfil = usePerfil();
+const isChefe = computed(() => perfil.isChefe.value);
 const codSubprocesso = ref<number | null>(null);
 
 const codMapa = computed(() => mapasStore.mapaCompleto?.codigo || null);

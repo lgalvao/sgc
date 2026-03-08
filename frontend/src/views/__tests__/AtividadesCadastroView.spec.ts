@@ -79,6 +79,7 @@ function createWrapper(customState = {}, accessOverrides = {}) {
 
     vi.mocked(usePerfilModule.usePerfil).mockReturnValue({
         perfilSelecionado: ref(Perfil.CHEFE),
+        isChefe: ref(true),
     } as any);
 
     const wrapper = mount(CadastroView, {
@@ -167,7 +168,7 @@ describe("CadastroView.vue", () => {
 
         // Confirm in modal
         const modal = wrapper.findComponent(ConfirmacaoDisponibilizacaoModal);
-        await modal.vm.$emit('confirmar');
+        modal.vm.$emit('confirmar');
 
         expect(subprocessosStore.disponibilizarCadastro).toHaveBeenCalledWith(123);
         expect(pushMock).toHaveBeenCalledWith("/painel");

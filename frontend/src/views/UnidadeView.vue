@@ -27,7 +27,7 @@
             />Mapa vigente
           </BButton>
           <BButton
-              v-if="perfilStore.perfilSelecionado === 'ADMIN'"
+              v-if="isAdmin"
               class="ms-2"
               data-testid="unidade-view__btn-criar-atribuicao"
               variant="outline-primary"
@@ -119,7 +119,7 @@ import TreeTable from "@/components/comum/TreeTable.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
 import {useUnidadesStore} from "@/stores/unidades";
-import {usePerfilStore} from "@/stores/perfil";
+import {usePerfil} from "@/composables/usePerfil";
 import {useMapasStore} from "@/stores/mapas";
 import {buscarUsuarioPorTitulo} from "@/services/usuarioService";
 import {logger} from "@/utils";
@@ -128,7 +128,7 @@ const props = defineProps<{ codUnidade: number }>();
 
 const router = useRouter();
 const unidadesStore = useUnidadesStore();
-const perfilStore = usePerfilStore();
+const {isAdmin} = usePerfil();
 const mapasStore = useMapasStore();
 
 const titularDetalhes = ref<Usuario | null>(null);

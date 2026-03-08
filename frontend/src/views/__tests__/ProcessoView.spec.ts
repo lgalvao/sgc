@@ -204,23 +204,23 @@ describe("Processo.vue", () => {
         perfilStore = usePerfilStore();
         processosStore = useProcessosStore();
 
-        perfilStore.$patch({perfis: [Perfil.GESTOR, Perfil.ADMIN]});
         processosStore.$patch({processoDetalhe: mockProcesso});
 
+        // Test GESTOR buttons
+        perfilStore.$patch({perfilSelecionado: Perfil.GESTOR});
         await nextTick();
         await flushPromises();
 
-        const btnAceitar = wrapper.find("button.btn-success");
-        expect(btnAceitar.exists()).toBe(true);
-        expect(btnAceitar.text()).toContain("Aceitar em bloco");
+        expect(wrapper.find("button.btn-success").exists()).toBe(true);
+        expect(wrapper.find("button.btn-success").text()).toContain("Aceitar em bloco");
 
-        // Homologar
-        const btnHomologar = wrapper.find("button.btn-warning");
-        expect(btnHomologar.exists()).toBe(true);
+        // Test ADMIN buttons
+        perfilStore.$patch({perfilSelecionado: Perfil.ADMIN});
+        await nextTick();
+        await flushPromises();
 
-        // Disponibilizar
-        const btnDisponibilizar = wrapper.find("button.btn-info");
-        expect(btnDisponibilizar.exists()).toBe(true);
+        expect(wrapper.find("button.btn-warning").exists()).toBe(true);
+        expect(wrapper.find("button.btn-info").exists()).toBe(true);
     });
 
     it("não deve exibir botões de ação em bloco duplicados (apenas um conjunto)", async () => {
@@ -228,9 +228,10 @@ describe("Processo.vue", () => {
         perfilStore = usePerfilStore();
         processosStore = useProcessosStore();
 
-        perfilStore.$patch({perfis: [Perfil.GESTOR, Perfil.ADMIN]});
         processosStore.$patch({processoDetalhe: mockProcesso});
 
+        // Test GESTOR
+        perfilStore.$patch({perfilSelecionado: Perfil.GESTOR});
         await nextTick();
         await flushPromises();
 
@@ -238,6 +239,11 @@ describe("Processo.vue", () => {
             (b: DOMWrapper<Element>) => b.text().includes("Aceitar em bloco")
         );
         expect(botoesAceitar.length).toBe(1);
+
+        // Test ADMIN
+        perfilStore.$patch({perfilSelecionado: Perfil.ADMIN});
+        await nextTick();
+        await flushPromises();
 
         const botoesHomologar = wrapper.findAll("button.btn-warning").filter(
             (b: DOMWrapper<Element>) => b.text().includes("Homologar em bloco")
@@ -250,7 +256,7 @@ describe("Processo.vue", () => {
         perfilStore = usePerfilStore();
         processosStore = useProcessosStore();
 
-        perfilStore.$patch({perfis: [Perfil.GESTOR, Perfil.ADMIN]});
+        perfilStore.$patch({perfilSelecionado: Perfil.GESTOR});
         processosStore.$patch({processoDetalhe: mockProcesso});
 
         await nextTick();
@@ -271,7 +277,7 @@ describe("Processo.vue", () => {
         processosStore = useProcessosStore();
         toastStore = useToastStore();
 
-        perfilStore.$patch({perfis: [Perfil.GESTOR, Perfil.ADMIN]});
+        perfilStore.$patch({perfilSelecionado: Perfil.GESTOR});
         processosStore.$patch({processoDetalhe: mockProcesso});
 
         await nextTick();
@@ -295,7 +301,7 @@ describe("Processo.vue", () => {
         perfilStore = usePerfilStore();
         processosStore = useProcessosStore();
 
-        perfilStore.$patch({perfis: [Perfil.GESTOR, Perfil.ADMIN]});
+        perfilStore.$patch({perfilSelecionado: Perfil.GESTOR});
         processosStore.$patch({processoDetalhe: mockProcesso});
 
         await nextTick();
@@ -315,7 +321,7 @@ describe("Processo.vue", () => {
         wrapper = createWrapper();
         perfilStore = usePerfilStore();
         processosStore = useProcessosStore();
-        perfilStore.$patch({perfis: [Perfil.ADMIN]});
+        perfilStore.$patch({perfilSelecionado: Perfil.ADMIN});
         processosStore.$patch({processoDetalhe: mockProcesso});
 
         await nextTick();
@@ -334,7 +340,7 @@ describe("Processo.vue", () => {
         wrapper = createWrapper();
         perfilStore = usePerfilStore();
         processosStore = useProcessosStore();
-        perfilStore.$patch({perfis: [Perfil.ADMIN]});
+        perfilStore.$patch({perfilSelecionado: Perfil.ADMIN});
         processosStore.$patch({processoDetalhe: mockProcesso});
 
         await nextTick();
@@ -353,7 +359,7 @@ describe("Processo.vue", () => {
         wrapper = createWrapper();
         perfilStore = usePerfilStore();
         processosStore = useProcessosStore();
-        perfilStore.$patch({perfis: [Perfil.ADMIN]});
+        perfilStore.$patch({perfilSelecionado: Perfil.ADMIN});
         processosStore.$patch({processoDetalhe: mockProcesso});
 
         await nextTick();
@@ -373,7 +379,7 @@ describe("Processo.vue", () => {
         perfilStore = usePerfilStore();
         processosStore = useProcessosStore();
 
-        perfilStore.$patch({perfis: [Perfil.GESTOR, Perfil.ADMIN]});
+        perfilStore.$patch({perfilSelecionado: Perfil.GESTOR});
         processosStore.$patch({processoDetalhe: mockProcesso});
 
         await nextTick();
@@ -397,7 +403,7 @@ describe("Processo.vue", () => {
         perfilStore = usePerfilStore();
         processosStore = useProcessosStore();
 
-        perfilStore.$patch({perfis: [Perfil.GESTOR]});
+        perfilStore.$patch({perfilSelecionado: Perfil.GESTOR});
         processosStore.$patch({processoDetalhe: mockProcesso});
 
         await nextTick();
@@ -420,7 +426,7 @@ describe("Processo.vue", () => {
         perfilStore = usePerfilStore();
         processosStore = useProcessosStore();
 
-        perfilStore.$patch({perfis: [Perfil.GESTOR]});
+        perfilStore.$patch({perfilSelecionado: Perfil.GESTOR});
         processosStore.$patch({processoDetalhe: mockProcesso});
 
         await nextTick();
@@ -436,7 +442,7 @@ describe("Processo.vue", () => {
         perfilStore = usePerfilStore();
         processosStore = useProcessosStore();
 
-        perfilStore.$patch({perfis: [Perfil.ADMIN]});
+        perfilStore.$patch({perfilSelecionado: Perfil.ADMIN});
         processosStore.$patch({processoDetalhe: mockProcesso});
 
         await nextTick();
@@ -492,7 +498,6 @@ describe("Processo.vue", () => {
         perfilStore.$patch({
             perfilSelecionado: Perfil.SERVIDOR,
             unidadeSelecionada: 999,
-            perfis: [Perfil.SERVIDOR]
         });
         processosStore.$patch({processoDetalhe: mockProcesso});
 

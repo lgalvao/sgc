@@ -267,7 +267,7 @@ const analisesStore = useAnalisesStore();
 const subprocessosStore = useSubprocessosStore();
 const {notify} = useNotification();
 const toastStore = useToastStore();
-const {perfilSelecionado} = usePerfil();
+const {perfilSelecionado, isAdmin} = usePerfil();
 const {mapaVisualizacao: mapa} = storeToRefs(mapaStore);
 
 const sigla = computed(() => route.params.siglaUnidade as string);
@@ -368,7 +368,7 @@ async function confirmarValidacao() {
 async function confirmarAceitacao() {
   if (!codSubprocesso.value) return;
   isLoading.value = true;
-  const isHomologacao = podeHomologarMapa.value || perfilSelecionado.value === "ADMIN";
+  const isHomologacao = podeHomologarMapa.value || isAdmin.value;
 
   try {
     if (isHomologacao) {

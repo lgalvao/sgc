@@ -4,10 +4,7 @@ import {ref} from "vue";
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 import NavBar from "../layout/MainNavbar.vue";
 import {usePerfil} from "@/composables/usePerfil";
-import {useAcessoGlobal} from "@/composables/useAcessoGlobal";
-
 vi.mock("@/composables/usePerfil");
-vi.mock("@/composables/useAcessoGlobal");
 
 const {mockPush} = vi.hoisted(() => ({
     mockPush: vi.fn()
@@ -41,6 +38,9 @@ describe("MainNavbar.vue", () => {
             servidorLogado: ref({nome: "Usuario Teste"}),
             perfilSelecionado: ref("GESTOR"),
             unidadeSelecionada: ref("Unidade Teste"),
+            podeAcessarTodasUnidades: ref(false),
+            isAdmin: ref(false),
+            isGestor: ref(true),
         } as any);
     });
 
@@ -50,10 +50,12 @@ describe("MainNavbar.vue", () => {
         expect(link?.exists()).toBe(true);
         expect(link?.props().to).toBe(to);
     };
-
     it("deve navegar para a rota correta ao clicar nos links do menu (ADMIN)", async () => {
-        vi.mocked(useAcessoGlobal).mockReturnValue({
-            podeAcessarTodasUnidades: true
+        vi.mocked(usePerfil).mockReturnValue({
+            perfilSelecionado: ref("ADMIN"),
+            unidadeSelecionada: ref("TRE-PR"),
+            podeAcessarTodasUnidades: ref(true),
+            isAdmin: ref(true),
         } as any);
 
         const options = getCommonMountOptions({
@@ -74,8 +76,11 @@ describe("MainNavbar.vue", () => {
     });
 
     it("deve navegar para a unidade do usuário ao clicar em 'Minha unidade' (não-ADMIN)", async () => {
-        vi.mocked(useAcessoGlobal).mockReturnValue({
-            podeAcessarTodasUnidades: false
+        vi.mocked(usePerfil).mockReturnValue({
+            perfilSelecionado: ref("GESTOR"),
+            unidadeSelecionada: ref("456"),
+            podeAcessarTodasUnidades: ref(false),
+            isAdmin: ref(false),
         } as any);
 
         const options = getCommonMountOptions({
@@ -93,13 +98,16 @@ describe("MainNavbar.vue", () => {
     });
 
     it("deve exibir o perfil e a unidade do usuário", async () => {
-        vi.mocked(useAcessoGlobal).mockReturnValue({
-            podeAcessarTodasUnidades: false
+        vi.mocked(usePerfil).mockReturnValue({
+            perfilSelecionado: ref("CHEFE"),
+            unidadeSelecionada: ref("TRE-PR"),
+            podeAcessarTodasUnidades: ref(false),
         } as any);
 
         vi.mocked(usePerfil).mockReturnValue({
             perfilSelecionado: ref("CHEFE"),
             unidadeSelecionada: ref("TRE-PR"),
+            podeAcessarTodasUnidades: ref(false),
         } as any);
 
         const options = getCommonMountOptions({
@@ -118,8 +126,11 @@ describe("MainNavbar.vue", () => {
     });
 
     it("deve exibir e navegar pelo ícone de parâmetros para o perfil ADMIN", async () => {
-        vi.mocked(useAcessoGlobal).mockReturnValue({
-            podeAcessarTodasUnidades: true
+        vi.mocked(usePerfil).mockReturnValue({
+            perfilSelecionado: ref("ADMIN"),
+            unidadeSelecionada: ref("456"),
+            podeAcessarTodasUnidades: ref(true),
+            isAdmin: ref(true),
         } as any);
 
         const options = getCommonMountOptions({
@@ -148,8 +159,11 @@ describe("MainNavbar.vue", () => {
     });
 
     it("NÃO deve exibir os ícones de parâmetros e administradores para perfis diferentes de ADMIN", async () => {
-        vi.mocked(useAcessoGlobal).mockReturnValue({
-            podeAcessarTodasUnidades: false
+        vi.mocked(usePerfil).mockReturnValue({
+            perfilSelecionado: ref("GESTOR"),
+            unidadeSelecionada: ref("456"),
+            podeAcessarTodasUnidades: ref(false),
+            isAdmin: ref(false),
         } as any);
 
         const options = getCommonMountOptions({
@@ -168,8 +182,11 @@ describe("MainNavbar.vue", () => {
     });
 
     it("deve chamar router.push ao fazer logout", async () => {
-        vi.mocked(useAcessoGlobal).mockReturnValue({
-            podeAcessarTodasUnidades: true
+        vi.mocked(usePerfil).mockReturnValue({
+            perfilSelecionado: ref("ADMIN"),
+            unidadeSelecionada: ref("456"),
+            podeAcessarTodasUnidades: ref(true),
+            isAdmin: ref(true),
         } as any);
 
         const options = getCommonMountOptions({

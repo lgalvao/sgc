@@ -6,7 +6,7 @@
       <PageHeader title="Processos" title-test-id="txt-painel-titulo-processos">
         <template #actions>
           <BButton
-              v-if="acesso.podeCriarProcesso"
+              v-if="perfil.podeCriarProcesso.value"
               :to="{ name: 'CadProcesso' }"
               data-testid="btn-painel-criar-processo"
               variant="outline-primary"
@@ -19,7 +19,7 @@
           :compacto="true"
           :criterio-ordenacao="criterio"
           :direcao-ordenacao-asc="asc"
-          :mostrar-cta-vazio="acesso.podeVisualizarTabelaCtaVazio"
+          :mostrar-cta-vazio="perfil.podeVisualizarTabelaCtaVazio.value"
           :processos="processosOrdenados"
           @ordenar="ordenarPor"
           @selecionar-processo="abrirDetalhesProcesso"
@@ -74,13 +74,13 @@ import {formatDateBR} from "@/utils";
 import TabelaProcessos from "@/components/processo/TabelaProcessos.vue";
 import {useAlertasStore} from "@/stores/alertas";
 import {usePerfilStore} from "@/stores/perfil";
+import {usePerfil} from "@/composables/usePerfil";
 import {useProcessosStore} from "@/stores/processos";
 import {useToastStore} from "@/stores/toast";
-import {useAcessoGlobal} from "@/composables/useAcessoGlobal";
 import type {Alerta, ProcessoResumo} from "@/types/tipos";
 
-const perfil = usePerfilStore();
-const acesso = useAcessoGlobal();
+const perfilStore = usePerfilStore();
+const perfil = usePerfil();
 const processosStore = useProcessosStore();
 const alertasStore = useAlertasStore();
 const toastStore = useToastStore();
@@ -95,21 +95,21 @@ const criterio = ref<keyof ProcessoResumo>("descricao");
 const asc = ref(true);
 
 async function carregarDados() {
-  if (perfil.perfilSelecionado && perfil.unidadeSelecionada) {
+  if (perfil.perfilSelecionado.value && perfilStore.unidadeSelecionada) {
     const promises: Promise<any>[] = [
       processosStore.buscarProcessosPainel(
-          perfil.perfilSelecionado,
-          Number(perfil.unidadeSelecionada),
+          perfil.perfilSelecionado.value,
+          Number(perfilStore.unidadeSelecionada),
           0,
           10,
       ), // Paginação inicial
     ];
 
-    if (perfil.usuarioCodigo) {
+    if (perfilStore.usuarioCodigo) {
       promises.push(
           alertasStore.buscarAlertas(
-              perfil.usuarioCodigo,
-              Number(perfil.unidadeSelecionada),
+              perfilStore.usuarioCodigo,
+              Number(perfilStore.unidadeSelecionada),
               0,
               10,
           ), // Paginação inicial
@@ -150,8 +150,8 @@ function ordenarPor(campo: keyof ProcessoResumo) {
     asc.value = true;
   }
   processosStore.buscarProcessosPainel(
-      perfil.perfilSelecionado!,
-      Number(perfil.unidadeSelecionada),
+      perfil.perfilSelecionado.value!,
+      Number(perfilStore.unidadeSelecionada),
       0,
       10,
       criterio.value,
@@ -175,10 +175,10 @@ function ordenarAlertasPor(campo: "data" | "processo") {
     alertaCriterio.value = campo;
     alertaAsc.value = campo !== "data";
   }
-  if (perfil.usuarioCodigo) {
+  if (perfilStore.usuarioCodigo) {
     alertasStore.buscarAlertas(
-        perfil.usuarioCodigo,
-        Number(perfil.unidadeSelecionada),
+        perfilStore.usuarioCodigo,
+        Number(perfilStore.unidadeSelecionada),
         0,
         10,
         alertaCriterio.value,

@@ -31,7 +31,8 @@ describe("MainNavbar.vue Coverage", () => {
     vi.mocked(usePerfil).mockReturnValue({
         perfilSelecionado: ref("GESTOR"),
         unidadeSelecionada: ref("Unidade Teste"),
-        usuarioNome: ref("User")
+        usuarioNome: ref("User"),
+        podeAcessarTodasUnidades: ref(false)
     } as any);
 
     it("deve atualizar isMobile ao redimensionar a janela", async () => {
@@ -56,20 +57,20 @@ describe("MainNavbar.vue Coverage", () => {
         expect((wrapper.vm as any).isMobile).toBe(false);
 
         // Resize to mobile
-        window.innerWidth = 500;
-        window.dispatchEvent(new Event('resize'));
+        globalThis.innerWidth = 500;
+        globalThis.dispatchEvent(new Event('resize'));
 
         expect((wrapper.vm as any).isMobile).toBe(true);
 
         // Resize back to desktop
-        window.innerWidth = 1200;
-        window.dispatchEvent(new Event('resize'));
+        globalThis.innerWidth = 1200;
+        globalThis.dispatchEvent(new Event('resize'));
 
         expect((wrapper.vm as any).isMobile).toBe(false);
     });
 
     it("deve remover event listener ao desmontar", async () => {
-        const removeEventListenerSpy = vi.spyOn(window, 'removeEventListener');
+        const removeEventListenerSpy = vi.spyOn(globalThis, 'removeEventListener');
 
         const wrapper = mount(MainNavbar, {
             global: {

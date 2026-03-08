@@ -18,7 +18,7 @@ Historicamente, tentativas de simplificação falharam ou foram abandonadas no m
   * **Como:** Modificar os `Controllers` para injetarem e chamarem diretamente as dependências dos `Services`. Os Facades não agregam valor e atrasam a leitura do código agindo como pass-through.
 
 * **[ ] Minimizar Múltiplas Transformações de DTO:**
-  * **Ação:** Onde a segurança permitir, reduzir ou consolar DTOs.
+  * **Ação:** Onde a segurança permitir, reduzir ou consolidar DTOs.
   * **Como:** Para operações exclusivas de leitura, evitar o peso de várias camadas de Mapeadores. Se um Service pode retornar diretamente o formato adequado da visão para a tela listar sem expor dados internos sigilosos, utilize essa via rápida.
 
 ## 🔨 Tarefas Pendentes - Front-end
