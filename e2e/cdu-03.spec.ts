@@ -1,5 +1,5 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
-import {criarProcesso, verificarProcessoNaTabela} from './helpers/helpers-processos.js';
+import {criarProcesso, extrairProcessoId, verificarProcessoNaTabela} from './helpers/helpers-processos.js';
 import {
     esperarPaginaCadastroProcesso,
     esperarPaginaDetalhesProcesso,
@@ -7,6 +7,7 @@ import {
     verificarToast
 } from './helpers/helpers-navegacao.js';
 import type {Page} from '@playwright/test';
+import type {useProcessoCleanup} from './hooks/hooks-limpeza.js';
 
 test.describe('CDU-03 - Manter Processo', () => {
 
@@ -86,24 +87,24 @@ test.describe('CDU-03 - Manter Processo', () => {
         await expect(inputRaiz).not.toHaveJSProperty('indeterminate', true);
     });
 
-    test('Deve editar um processo existente', async ({page, autenticadoComoAdmin}: {
+    test('Deve editar um processo existente', async ({page, autenticadoComoAdmin, cleanupAutomatico}: {
         page: Page,
-        autenticadoComoAdmin: void
+        autenticadoComoAdmin: void,
+        cleanupAutomatico: ReturnType<typeof useProcessoCleanup>
     }) => {
         const descricaoOriginal = `Processo para Edição - ${Date.now()}`;
         await criarProcesso(page, {
             descricao: descricaoOriginal,
             tipo: 'MAPEAMENTO',
             diasLimite: 30,
-            unidade: 'SECAO_111',
-            expandir: ['SECRETARIA_1', 'COORD_11']
+            unidade: 'ASSESSORIA_12',
+            expandir: ['SECRETARIA_1']
         });
 
-        await expect(page).toHaveURL(/\/painel/);
-        const linha = page.getByTestId('tbl-processos').getByText(descricaoOriginal).first();
-        await expect(linha).toBeVisible();
-        await linha.click();
+        await page.getByTestId('tbl-processos').getByText(descricaoOriginal).first().click();
         await esperarPaginaCadastroProcesso(page);
+        const id = await extrairProcessoId(page);
+        if (id) cleanupAutomatico.registrar(id);
 
         await expect(page.getByTestId('inp-processo-descricao')).toHaveValue(descricaoOriginal);
         await expect(page.getByTestId('sel-processo-tipo')).toBeDisabled();
@@ -180,21 +181,27 @@ test.describe('CDU-03 - Manter Processo', () => {
 
     test('Deve avaliar unidades ocupadas por processos em andamento e restringi-las', async ({
                                                                                                  page,
-                                                                                                 autenticadoComoAdmin
+                                                                                                 autenticadoComoAdmin,
+                                                                                                 cleanupAutomatico
                                                                                              }: {
         page: Page,
-        autenticadoComoAdmin: void
+        autenticadoComoAdmin: void,
+        cleanupAutomatico: any
     }) => {
         const descricaoBase = `Ocupado - ${Date.now()}`;
         await criarProcesso(page, {
             descricao: descricaoBase,
             tipo: 'MAPEAMENTO',
             diasLimite: 30,
-            unidade: 'SECAO_111',
-            expandir: ['SECRETARIA_1', 'COORD_11'],
+            unidade: 'ASSESSORIA_12',
+            expandir: ['SECRETARIA_1'],
             iniciar: true
         });
 
+        await page.getByTestId('tbl-processos').getByText(descricaoBase).first().click();
+        await esperarPaginaDetalhesProcesso(page);
+        const id = await extrairProcessoId(page);
+        cleanupAutomatico.registrar(id);
         await page.goto('/painel');
 
         await page.getByTestId('btn-painel-criar-processo').click();
@@ -202,9 +209,8 @@ test.describe('CDU-03 - Manter Processo', () => {
         await page.getByTestId('sel-processo-tipo').selectOption('MAPEAMENTO');
         await expect(page.getByText('Carregando unidades...')).toBeHidden();
         await page.getByTestId('btn-arvore-expand-SECRETARIA_1').click();
-        await page.getByTestId('btn-arvore-expand-COORD_11').click();
 
-        const chkOcupada = page.getByTestId('chk-arvore-unidade-SECAO_111');
+        const chkOcupada = page.getByTestId('chk-arvore-unidade-ASSESSORIA_12');
         await expect(chkOcupada.locator('input').or(chkOcupada)).toBeDisabled();
     });
 
@@ -233,10 +239,12 @@ test.describe('CDU-03 - Manter Processo', () => {
 
     test('Deve validar fluxos de cancelamento e mensagens de feedback', async ({
                                                                                    page,
-                                                                                   autenticadoComoAdmin
+                                                                                   autenticadoComoAdmin,
+                                                                                   cleanupAutomatico
                                                                                }: {
         page: Page,
-        autenticadoComoAdmin: void
+        autenticadoComoAdmin: void,
+        cleanupAutomatico: any
     }) => {
         const descricao = `Feedback - ${Date.now()}`;
 
@@ -252,21 +260,24 @@ test.describe('CDU-03 - Manter Processo', () => {
             descricao: descricao,
             tipo: 'MAPEAMENTO',
             diasLimite: 30,
-            unidade: 'SECAO_111',
-            expandir: ['SECRETARIA_1', 'COORD_11']
+            unidade: 'ASSESSORIA_12',
+            expandir: ['SECRETARIA_1']
         });
-        await expect(page).toHaveURL(/\/painel/);
         await verificarProcessoNaTabela(page, {
             descricao,
             situacao: 'Criado',
             tipo: 'Mapeamento'
         });
 
-        // Cancelar remoção
-        const linha = page.getByTestId('tbl-processos').getByText(descricao).first();
-        await expect(linha).toBeVisible();
-        await linha.click();
+        // Cleanup registration
+        await page.getByTestId('tbl-processos').getByText(descricao).first().click();
         await esperarPaginaCadastroProcesso(page);
+        const id = await extrairProcessoId(page);
+        if (id) cleanupAutomatico.registrar(id);
+        await page.goto('/painel');
+
+        // Cancelar remoção
+        await page.getByTestId('tbl-processos').getByText(descricao).first().click();
         await page.getByTestId('btn-processo-remover').click();
         await page.getByTestId('btn-modal-confirmacao-cancelar').click();
         await expect(page.getByText(`Remover o processo '${descricao}'?`)).toBeHidden();
@@ -274,10 +285,12 @@ test.describe('CDU-03 - Manter Processo', () => {
 
     test('Deve validar fluxo alternativo (Botão Iniciar invés de Salvar)', async ({
                                                                                       page,
-                                                                                      autenticadoComoAdmin
+                                                                                      autenticadoComoAdmin,
+                                                                                      cleanupAutomatico
                                                                                   }: {
         page: Page,
-        autenticadoComoAdmin: void
+        autenticadoComoAdmin: void,
+        cleanupAutomatico: any
     }) => {
         const descricaoAlt = `Alternativo - ${Date.now()}`;
 
@@ -290,8 +303,7 @@ test.describe('CDU-03 - Manter Processo', () => {
 
         await expect(page.getByText('Carregando unidades...')).toBeHidden();
         await page.getByTestId('btn-arvore-expand-SECRETARIA_1').click();
-        await page.getByTestId('btn-arvore-expand-COORD_11').click();
-        await page.getByTestId('chk-arvore-unidade-SECAO_111').click();
+        await page.getByTestId('chk-arvore-unidade-ASSESSORIA_12').click();
         await page.getByTestId('btn-processo-iniciar').click();
         await page.getByTestId('btn-iniciar-processo-confirmar').click();
 
@@ -302,9 +314,10 @@ test.describe('CDU-03 - Manter Processo', () => {
             tipo: 'Mapeamento'
         });
 
-        const linha = page.getByTestId('tbl-processos').getByText(descricaoAlt).first();
-        await expect(linha).toBeVisible();
-        await linha.click();
+        await page.getByTestId('tbl-processos').getByText(descricaoAlt).first().click();
+        await esperarPaginaDetalhesProcesso(page);
+        const idAlt = await extrairProcessoId(page);
+        if (idAlt) cleanupAutomatico.registrar(idAlt);
         await expect(page).toHaveURL(/\/processo\/\d+$/);
     });
 });

@@ -30,7 +30,8 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
 
     test('Preparacao 1: Admin cria e inicia processo de mapeamento', async ({
                                                                                 page,
-                                                                                autenticadoComoAdmin
+                                                                                autenticadoComoAdmin,
+                                                                                cleanupAutomatico
                                                                             }) => {
         await criarProcesso(page, {
             descricao: descProcesso,
@@ -108,8 +109,10 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
 
     test('Cenários CDU-17: Fluxo completo de disponibilização do mapa pelo ADMIN', async ({
                                                                                               page,
-                                                                                              autenticadoComoAdmin
+                                                                                              autenticadoComoAdmin,
+                                                                                              cleanupAutomatico
                                                                                           }) => {
+        if (processoId > 0) cleanupAutomatico.registrar(processoId);
         // Cenario 1: Navegação
         await expect(page.getByTestId('tbl-processos').getByText(descProcesso).first()).toBeVisible();
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();

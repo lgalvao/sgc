@@ -1,9 +1,5 @@
 import {expect, type Page} from '@playwright/test';
-import {
-    limparNotificacoes,
-    verificarPaginaPainel,
-    verificarToast
-} from './helpers-navegacao.js';
+import {limparNotificacoes, verificarPaginaPainel, verificarToast} from './helpers-navegacao.js';
 
 function extrairRotaSubprocesso(page: Page): { codigoProcesso: string; siglaUnidade: string } {
     const match = /\/processo\/(\d+)\/([A-Z0-9_]+)/.exec(page.url());
@@ -55,7 +51,6 @@ export async function editarAtividade(page: Page, descricaoAtual: string | RegEx
     const editButton = card.getByTestId('btn-editar-atividade');
 
     // Forçar clique pois o botão só aparece no hover, o que pode ser instável em CI
-    // eslint-disable-next-line playwright/no-force-option
     await editButton.click({force: true});
 
     const input = page.getByTestId('inp-editar-atividade');

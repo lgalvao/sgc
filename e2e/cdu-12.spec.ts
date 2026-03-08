@@ -1,6 +1,6 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
-import {login, USUARIOS} from './helpers/helpers-auth.js';
-import {criarProcessoFixture, criarProcessoFinalizadoFixture} from './fixtures/fixtures-processos.js';
+import {USUARIOS} from './helpers/helpers-auth.js';
+import {criarProcessoFinalizadoFixture, criarProcessoFixture} from './fixtures/fixtures-processos.js';
 import {
     abrirModalImpactoEdicao,
     abrirModalImpactoVisualizacao,
@@ -13,10 +13,7 @@ import {
     verificarBotaoImpactoDireto,
     verificarBotaoImpactoDropdown
 } from './helpers/helpers-atividades.js';
-import {
-    acessarSubprocessoChefeDireto,
-    acessarSubprocessoGestor
-} from './helpers/helpers-analise.js';
+import {acessarSubprocessoChefeDireto, acessarSubprocessoGestor} from './helpers/helpers-analise.js';
 
 test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () => {
     const UNIDADE_ALVO = 'SECAO_121';
@@ -72,7 +69,9 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
     });
 
-    test('Passo 3.2: Verificação pelo GESTOR na tela de Visualização', async ({page}) => {
+    test('Passo 3.2: Verificação pelo GESTOR na tela de Visualização', async ({page, cleanupAutomatico}) => {
+        if (processoRevisaoId > 0) cleanupAutomatico.registrar(processoRevisaoId);
+
         // Localização atual deve estar no COORD_12 para o Gestor ver
         // Ringo Starr (GESTOR_COORD_12) possui apenas 1 perfil
         await login(page, USUARIOS.GESTOR_COORD_12.titulo, USUARIOS.GESTOR_COORD_12.senha);

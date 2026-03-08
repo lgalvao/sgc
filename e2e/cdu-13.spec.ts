@@ -16,12 +16,14 @@ import {navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
 test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos', () => {
     const UNIDADE_ALVO = 'SECAO_211';
     
+    let processoId: number;
     let descProcesso: string;
 
     test('Preparacao: Criar processo via fixture', async ({request}) => {
         const processo = await criarProcessoCadastroDisponibilizadoFixture(request, {
             unidade: UNIDADE_ALVO
         });
+        processoId = processo.codigo;
         descProcesso = processo.descricao;
     });
 

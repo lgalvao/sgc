@@ -20,8 +20,14 @@ test.describe('CDU-04 - Iniciar Processo', () => {
     test('Deve iniciar um processo e validar criação de subprocessos e alertas', async ({
                                                                                             page,
                                                                                             browser,
-                                                                                            autenticadoComoAdmin
-                                                                                        }) => {
+                                                                                            autenticadoComoAdmin,
+                                                                                            cleanupAutomatico
+                                                                                        }: {
+        page: Page,
+        browser: any,
+        autenticadoComoAdmin: void,
+        cleanupAutomatico: any
+    }) => {
         const descricao = `CDU-04 Iniciar - ${Date.now()}`;
         // 1. Criar processo como ADMIN
         await criarProcesso(page, {
@@ -37,6 +43,7 @@ test.describe('CDU-04 - Iniciar Processo', () => {
         await page.getByTestId('tbl-processos').getByText(descricao).first().click();
         await esperarPaginaCadastroProcesso(page);
         const processoId = await extrairProcessoId(page);
+        cleanupAutomatico.registrar(processoId);
         const dataLimiteStr = await page.getByTestId('inp-processo-data-limite').inputValue();
 
         // 2. Iniciar processo

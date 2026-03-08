@@ -4,11 +4,11 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
+import sgc.comum.erros.*;
 import sgc.mapa.model.*;
-import sgc.mapa.service.MapaManutencaoService;
-import sgc.subprocesso.dto.ValidacaoCadastroDto;
+import sgc.mapa.service.*;
+import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
-import sgc.comum.erros.ErroValidacao;
 
 import java.util.*;
 

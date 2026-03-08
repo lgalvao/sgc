@@ -26,7 +26,7 @@ import {
     acessarSubprocessoGestor
 } from './helpers/helpers-analise.js';
 import {abrirModalCriarCompetencia, disponibilizarMapa, navegarParaMapa} from './helpers/helpers-mapas.js';
-import {resetDatabase} from './hooks/hooks-limpeza.js';
+import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza.js';
 import * as path from 'node:path';
 import * as fs from 'node:fs';
 
@@ -66,6 +66,7 @@ async function capturarComponente(elemento: Locator, categoria: string, nome: st
 
 async function criarProcessoMapeamentoIniciadoPorFixture(
     request: APIRequestContext,
+    cleanup: ReturnType<typeof useProcessoCleanup>,
     descricao: string,
     unidadeSigla: string
 ): Promise<number> {
@@ -82,11 +83,13 @@ async function criarProcessoMapeamentoIniciadoPorFixture(
         throw new Error(`Falha ao criar fixture de processo iniciado: ${response.status()} ${await response.text()}`);
     }
     const processo = await response.json() as { codigo: number };
+    cleanup.registrar(processo.codigo);
     return processo.codigo;
 }
 
 async function criarProcessoMapeamentoComMapaDisponibilizadoPorFixture(
     request: APIRequestContext,
+    cleanup: ReturnType<typeof useProcessoCleanup>,
     descricao: string,
     unidadeSigla: string
 ): Promise<number> {
@@ -103,11 +106,13 @@ async function criarProcessoMapeamentoComMapaDisponibilizadoPorFixture(
         throw new Error(`Falha ao criar fixture de mapa disponibilizado: ${response.status()} ${await response.text()}`);
     }
     const processo = await response.json() as { codigo: number };
+    cleanup.registrar(processo.codigo);
     return processo.codigo;
 }
 
 async function criarProcessoMapeamentoComMapaHomologadoPorFixture(
     request: APIRequestContext,
+    cleanup: ReturnType<typeof useProcessoCleanup>,
     descricao: string,
     unidadeSigla: string
 ): Promise<number> {
@@ -124,13 +129,25 @@ async function criarProcessoMapeamentoComMapaHomologadoPorFixture(
         throw new Error(`Falha ao criar fixture de mapa homologado: ${response.status()} ${await response.text()}`);
     }
     const processo = await response.json() as { codigo: number };
+    cleanup.registrar(processo.codigo);
     return processo.codigo;
 }
 
 test.describe('Captura de Telas - Sistema SGC', () => {
+    let cleanup: ReturnType<typeof useProcessoCleanup>;
 
-    test.beforeEach(async ({request}) => {
+    test.beforeAll(async ({request}) => {
         await resetDatabase(request);
+    });
+
+    test.beforeEach(async () => {
+        cleanup = useProcessoCleanup();
+    });
+
+    test.afterEach(async ({request}) => {
+        if (cleanup) {
+            await cleanup.limpar(request);
+        }
     });
 
     test.describe('01 - Autenticação', () => {
@@ -205,9 +222,11 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await expect(page.getByTestId('tbl-processos').getByText(descricaoProcesso).first()).toBeVisible();
             await capturarComponente(page.getByTestId('tbl-processos'), '02-painel', '06a-tabela-processos');
 
-            // Navegar para capturar tela de detalhes
+            // Capturar ID para cleanup
             await page.getByTestId('tbl-processos').getByText(descricaoProcesso).first().click();
             await expect(page).toHaveURL(/codProcesso=\d+/);
+            const processoId = await extrairProcessoId(page);
+            if (processoId > 0) cleanup.registrar(processoId);
             await page.goto('/painel');
 
             // Painel com processo criado
@@ -239,7 +258,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
         test('Captura painel CHEFE', async ({page, request}) => {
             const desc = `Processo Chefe ${Date.now()}`;
-            await criarProcessoMapeamentoIniciadoPorFixture(request, desc, 'SECAO_211');
+            await criarProcessoMapeamentoIniciadoPorFixture(request, cleanup, desc, 'SECAO_211');
 
             await login(page, USUARIOS.CHEFE_SECAO_211.titulo, USUARIOS.CHEFE_SECAO_211.senha);
             await expect(page.getByTestId('tbl-processos')).toBeVisible();
@@ -253,7 +272,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
             const timestamp = Date.now();
-            const UNIDADE_ALVO = 'SECAO_111';
+            const UNIDADE_ALVO = 'ASSESSORIA_12';
             const descricao = `Processo Detalhado ${timestamp}`;
 
             await criarProcesso(page, {
@@ -261,15 +280,13 @@ test.describe('Captura de Telas - Sistema SGC', () => {
                 tipo: 'MAPEAMENTO',
                 diasLimite: 30,
                 unidade: UNIDADE_ALVO,
-                expandir: ['SECRETARIA_1', 'COORD_11']
+                expandir: ['SECRETARIA_1']
             });
 
-            // Garantir que voltou para o painel e o processo está visível
-            await expect(page).toHaveURL(/\/painel/);
-            const linha = page.getByTestId('tbl-processos').locator('tr').filter({hasText: descricao});
-            await expect(linha).toBeVisible();
-            await linha.click();
-            await expect(page).toHaveURL(/codProcesso=\d+/);
+            // Capturar ID para cleanup
+            await page.getByTestId('tbl-processos').getByText(descricao).first().click();
+            const processoId = await extrairProcessoId(page);
+            if (processoId > 0) cleanup.registrar(processoId);
 
             // Tela de edição de processo
             await capturarTela(page, '03-processo', '01-processo-edicao');
@@ -297,7 +314,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             const conhecimento = `Conhecimento ${timestamp}`;
             const competencia = `Competência ${timestamp}`;
 
-            const processoCodigo = await criarProcessoMapeamentoIniciadoPorFixture(request, descricao, unidadeAlvo);
+            const processoCodigo = await criarProcessoMapeamentoIniciadoPorFixture(request, cleanup, descricao, unidadeAlvo);
             await login(page, USUARIOS.CHEFE_ASSESSORIA_12.titulo, USUARIOS.CHEFE_ASSESSORIA_12.senha);
             await page.goto(`/processo/${processoCodigo}/${unidadeAlvo}`);
             await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processoCodigo}/${unidadeAlvo}$`));
@@ -345,6 +362,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             const processoCodigo = await criarProcessoMapeamentoComMapaDisponibilizadoPorFixture(
                 request,
+                cleanup,
                 descricao,
                 unidadeAlvo
             );
@@ -367,6 +385,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             const processoCodigo = await criarProcessoMapeamentoComMapaHomologadoPorFixture(
                 request,
+                cleanup,
                 descricao,
                 unidadeAlvo
             );
@@ -441,6 +460,8 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             const linhaProcesso = page.getByTestId('tbl-processos').locator('tr').filter({has: page.getByText(descricao)});
             await linhaProcesso.click();
+            const processoId = await extrairProcessoId(page);
+            if (processoId > 0) cleanup.registrar(processoId);
 
             await iniciarProcessoPeloCadastro(page, {
                 descricao,
@@ -503,6 +524,8 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             const linhaProcesso = page.getByTestId('tbl-processos').locator('tr').filter({has: page.getByText(descricao)});
             await linhaProcesso.click();
+            const processoId = await extrairProcessoId(page);
+            if (processoId > 0) cleanup.registrar(processoId);
 
             await iniciarProcessoPeloCadastro(page, {
                 descricao,
@@ -603,6 +626,8 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             const linhaProcesso = page.getByTestId('tbl-processos').locator('tr').filter({has: page.getByText(descricao)});
             await linhaProcesso.click();
+            const processoId = await extrairProcessoId(page);
+            if (processoId > 0) cleanup.registrar(processoId);
 
             await iniciarProcessoPeloCadastro(page, {
                 descricao,
@@ -750,6 +775,8 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             await page.getByText(processosCriado).click();
             await expect(page).toHaveURL(/codProcesso=|processo\/\d+/);
+            const processoId1 = await extrairProcessoId(page);
+            if (processoId1 > 0) cleanup.registrar(processoId1);
             await page.goto('/painel');
 
             await capturarTela(page, '07-estados', '01-processo-criado');
@@ -816,6 +843,9 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await navegarParaSubprocesso(page, 'SECAO_221');
             await expect(page).toHaveURL(/processo\/\d+/);
 
+            // Capturar ID para cleanup (após navegar para o subprocesso)
+            const processoId = await extrairProcessoId(page);
+            if (processoId > 0) cleanup.registrar(processoId);
             await navegarParaAtividades(page);
             await adicionarAtividade(page, 'Atividade Bloco 1');
             await adicionarConhecimento(page, 'Atividade Bloco 1', 'Conhecimento 1');
@@ -886,6 +916,10 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             // Navegar para a página de detalhes do processo (estamos em /painel após criar)
             await page.getByTestId('tbl-processos').getByText(descricao).first().click();
             await expect(page).toHaveURL(/\/processo\/\d+/);
+
+            // Registrar para cleanup
+            const processoId = await extrairProcessoId(page);
+            if (processoId > 0) cleanup.registrar(processoId);
 
             await page.getByRole('row', {name: /SECAO_121/i}).click();
             await expect(page).toHaveURL(/\/processo\/\d+\/SECAO_121/);

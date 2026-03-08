@@ -121,7 +121,9 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
     });
 
 
-    test('Cenários CDU-32: ADMIN reabre cadastro', async ({page, autenticadoComoAdmin}) => {
+    test('Cenários CDU-32: ADMIN reabre cadastro', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
+        cleanupAutomatico.registrar(processoId);
+
         // Cenario 1 & 2: Navegação e visualização do botão
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, UNIDADE_1);

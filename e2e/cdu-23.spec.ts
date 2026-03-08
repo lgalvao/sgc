@@ -39,7 +39,7 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {
     const atividade1 = `Atividade Homol ${timestamp}`;
 
 
-    test('Preparacao 1: Admin cria e inicia processo', async ({page, autenticadoComoAdmin}) => {
+    test('Preparacao 1: Admin cria e inicia processo', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
 
 
         await criarProcesso(page, {
@@ -54,6 +54,7 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {
         await linhaProcesso.click();
 
         processoId = Number.parseInt(new RegExp(/\/processo(?:\/cadastro)?\/(\d+)/).exec(page.url())?.[1] || '0');
+        if (processoId > 0) cleanupAutomatico.registrar(processoId);
 
         await page.getByTestId('btn-processo-iniciar').click();
         await page.getByTestId('btn-iniciar-processo-confirmar').click();

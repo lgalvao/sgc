@@ -1,8 +1,9 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
-import {criarProcessoMapaDisponibilizadoFixture, criarProcessoFinalizadoFixture} from './fixtures/fixtures-processos.js';
 import {
-    navegarParaAtividadesVisualizacao
-} from './helpers/helpers-atividades.js';
+    criarProcessoFinalizadoFixture,
+    criarProcessoMapaDisponibilizadoFixture
+} from './fixtures/fixtures-processos.js';
+import {navegarParaAtividadesVisualizacao} from './helpers/helpers-atividades.js';
 import {navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
 
 test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos', () => {
@@ -72,7 +73,9 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
             descProcesso = processo.descricao;
         });
 
-        test('Fluxo ADMIN: Visualizar em processo finalizado', async ({page, autenticadoComoAdmin}) => {
+        test('Fluxo ADMIN: Visualizar em processo finalizado', async ({page, autenticadoComoAdmin, cleanupAutomatico}) => {
+            if (processoId > 0) cleanupAutomatico.registrar(processoId);
+
             // 1. No Painel, o usuário clica no processo finalizado
             await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
 

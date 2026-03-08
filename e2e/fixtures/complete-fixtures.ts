@@ -19,7 +19,6 @@ import {resetDatabase} from '../hooks/hooks-limpeza.js';
  * });
  * ```
  */
-
 import * as fs from 'node:fs';
 
 const arquivosSerialResetados = new Set<string>();

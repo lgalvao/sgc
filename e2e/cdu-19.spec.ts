@@ -30,7 +30,8 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
      
     test('Preparacao 1: Admin cria e inicia processo de mapeamento', async ({
                                                                                 page,
-                                                                                autenticadoComoAdmin
+                                                                                autenticadoComoAdmin,
+                                                                                cleanupAutomatico
                                                                             }) => {
         await criarProcesso(page, {
             descricao: descProcesso,
@@ -44,6 +45,7 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
         await linhaProcesso.click();
 
         processoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
+        if (processoId > 0) cleanupAutomatico.registrar(processoId);
 
         await page.getByTestId('btn-processo-iniciar').click();
         await page.getByTestId('btn-iniciar-processo-confirmar').click();

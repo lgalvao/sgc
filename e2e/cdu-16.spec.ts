@@ -42,7 +42,8 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
 
     test('Preparacao 1: Admin cria e inicia processo de mapeamento', async ({
                                                                                 page,
-                                                                                autenticadoComoAdmin
+                                                                                autenticadoComoAdmin,
+                                                                                cleanupAutomatico
                                                                             }) => {
         await criarProcesso(page, {
             descricao: descProcessoMapeamento,
@@ -54,6 +55,8 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
 
         const linhaProcesso = page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descProcessoMapeamento)});
         await linhaProcesso.click();
+
+        processoMapeamentoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
 
         await page.getByTestId('btn-processo-iniciar').click();
         await page.getByTestId('btn-iniciar-processo-confirmar').click();
@@ -148,7 +151,8 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
 
     test('Preparacao 7: Admin homologa mapa, finaliza e inicia revisão', async ({
                                                                                     page,
-                                                                                    autenticadoComoAdmin
+                                                                                    autenticadoComoAdmin,
+                                                                                    cleanupAutomatico
                                                                                 }) => {
         // Homologação e finalização do Mapeamento
         await acessarSubprocessoAdmin(page, descProcessoMapeamento, UNIDADE_ALVO);
@@ -173,6 +177,10 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
 
         const linhaProcesso = page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descProcessoRevisao)});
         await linhaProcesso.click();
+
+        processoRevisaoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
+        if (processoMapeamentoId > 0) cleanupAutomatico.registrar(processoMapeamentoId);
+        if (processoRevisaoId > 0) cleanupAutomatico.registrar(processoRevisaoId);
 
         await page.getByTestId('btn-processo-iniciar').click();
         await page.getByTestId('btn-iniciar-processo-confirmar').click();
