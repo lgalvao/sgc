@@ -1,4 +1,4 @@
-/* eslint-disable playwright/expect-expect */
+ 
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcessoFixture} from './fixtures/fixtures-processos.js';
 import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
@@ -25,25 +25,28 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
 
     const timestamp = Date.now();
     const descProcesso = `Mapeamento CDU-32 ${timestamp}`;
-    let processoId: number;
 
     const atividade1 = `Atividade Reabrir ${timestamp}`;
-    test('Preparacao 1: Admin cria e inicia processo', async ({page, request, autenticadoComoAdmin}) => {
-        const processo = await criarProcessoFixture(request, {
+
+    test('Setup UI', async ({page, request}) => {
+
+        // Preparacao 1: Admin cria e inicia processo
+        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
+        await criarProcessoFixture(request, {
             descricao: descProcesso,
             tipo: 'MAPEAMENTO',
             diasLimite: 30,
             unidade: UNIDADE_1,
             iniciar: true
         });
-        processoId = processo.codigo;
 
         await page.goto('/painel');
         await expect(page.getByTestId('tbl-processos').getByText(descProcesso).first()).toBeVisible();
         await verificarPaginaPainel(page);
-    });
+        await fazerLogout(page);
 
-    test('Preparacao 2: Chefe disponibiliza cadastro', async ({page, autenticadoComoChefeSecao221}) => {
+        // Preparacao 2: Chefe disponibiliza cadastro
+        await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaAtividades(page);
 
@@ -54,30 +57,28 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
 
         await verificarPaginaPainel(page);
-    });
+        await fazerLogout(page);
 
-    test('Preparacao 3: Gestores e ADMIN aceitam e homologam cadastro', async ({
-                                                                                   page,
-                                                                                   autenticadoComoGestorCoord22
-                                                                               }) => {
+        // Preparacao 3: Gestores e ADMIN aceitam e homologam cadastro
+        await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_1);
         await navegarParaAtividadesVisualizacao(page);
         await aceitarCadastroMapeamento(page, 'Aceite intermediário COORD_22');
+        await fazerLogout(page);
 
         await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_1);
         await navegarParaAtividadesVisualizacao(page);
         await aceitarCadastroMapeamento(page, 'Aceite intermediário SECRETARIA_2');
+        await fazerLogout(page);
 
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, UNIDADE_1);
         await page.getByTestId('card-subprocesso-atividades-vis').click();
         await homologarCadastroMapeamento(page);
-    });
 
-    test('Preparacao 4: ADMIN cria mapa, disponibiliza, chefe valida, gestores aceitam, ADMIN homologa', async ({page, autenticadoComoAdmin}) => {
-        // ADMIN cria competência no mapa
+        // Preparacao 4: ADMIN cria mapa, disponibiliza, chefe valida, gestores aceitam, ADMIN homologa
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, UNIDADE_1);
         await navegarParaMapa(page);
@@ -117,7 +118,6 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
         await page.getByTestId('btn-aceite-mapa-confirmar').click();
         await expect(page.getByText(/Homologação efetivada/i).first()).toBeVisible();
     });
-
 
     test('Cenários CDU-32: ADMIN reabre cadastro', async ({page, autenticadoComoAdmin}) => {
 

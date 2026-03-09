@@ -26,26 +26,22 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
     const descProcesso = `Processo CDU-14 ${timestamp}`;
     const atividadeRevisao = `Atividade Rev ${timestamp}`;
 
-    let processoId: number;
+    test('Setup UI', async ({page, request}) => {
 
-    test('Preparacao 1: Base de dados com Mapa Vigente e Revisão Iniciada', async ({request}) => {
-        // Criar processo mapeamento finalizado (gera mapa vigente)
+        // Preparacao 1: Base de dados com Mapa Vigente e Revisão Iniciada
         await criarProcessoFinalizadoFixture(request, {
             unidade: UNIDADE_ALVO,
             descricao: `Base Map CDU-14 ${timestamp}`
         });
 
-        // Criar processo de revisão
-        const processo = await criarProcessoFixture(request, {
+        await criarProcessoFixture(request, {
             descricao: descProcesso,
             tipo: 'REVISAO',
             unidade: UNIDADE_ALVO,
             iniciar: true
         });
-        processoId = processo.codigo;
-    });
 
-    test('Preparacao 4: CHEFE revisa e disponibiliza', async ({page}) => {
+        // Preparacao 4: CHEFE revisa e disponibiliza
         await login(page, USUARIOS.CHEFE_SECAO_212.titulo, USUARIOS.CHEFE_SECAO_212.senha);
         await acessarSubprocessoChefeDireto(page, descProcesso, UNIDADE_ALVO);
         await navegarParaAtividades(page);
@@ -55,29 +51,27 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
 
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
-    });
 
-    test('Preparacao 5: GESTOR visualiza histórico, impactos e devolve', async ({page}) => {
+        // Preparacao 5: GESTOR visualiza histórico, impactos e devolve
         await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
 
-        const modal = await abrirHistoricoAnaliseVisualizacao(page);
-        await expect(modal).toBeVisible();
+        const modalVisualizacao = await abrirHistoricoAnaliseVisualizacao(page);
+        await expect(modalVisualizacao).toBeVisible();
         await fecharHistoricoAnalise(page);
 
         await verificarBotaoImpactoDireto(page);
         await devolverRevisao(page, 'Favor revisar as competências associadas');
-    });
 
-    test('Preparacao 6: CHEFE vê devolução, ajusta e redisponibiliza', async ({page}) => {
+        // Preparacao 6: CHEFE vê devolução, ajusta e redisponibiliza
         await login(page, USUARIOS.CHEFE_SECAO_212.titulo, USUARIOS.CHEFE_SECAO_212.senha);
         await acessarSubprocessoChefeDireto(page, descProcesso, UNIDADE_ALVO);
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Revisão em andamento/i);
 
         await navegarParaAtividades(page);
-        const modal = await abrirHistoricoAnalise(page);
-        await expect(modal.getByTestId('cell-resultado-0')).toHaveText(/Devolu[cç][aã]o/i);
+        const modalAnalise = await abrirHistoricoAnalise(page);
+        await expect(modalAnalise.getByTestId('cell-resultado-0')).toHaveText(/Devolu[cç][aã]o/i);
         await fecharHistoricoAnalise(page);
 
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();

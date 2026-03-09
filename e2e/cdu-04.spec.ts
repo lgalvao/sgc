@@ -13,7 +13,6 @@ import {
     verificarToast
 } from './helpers/helpers-navegacao.js';
 import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
-import type {Page} from '@playwright/test';
 
 test.describe('CDU-04 - Iniciar Processo', () => {
 

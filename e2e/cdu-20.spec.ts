@@ -8,15 +8,14 @@ import {navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
 test.describe.serial('CDU-20 - Analisar validação de mapa de competências', () => {
     const UNIDADE_ALVO = 'ASSESSORIA_11';
 
-    let processoId: number;
-    let descProcesso: string;
+    const timestamp = Date.now();
+    const descProcesso = `Processo CDU-20 ${timestamp}`;
 
-    test('Preparacao: Criar processo via fixture', async ({request}) => {
-        const processo = await criarProcessoMapaValidadoFixture(request, {
-            unidade: UNIDADE_ALVO
+    test('Setup Data', async ({request}) => {
+        await criarProcessoMapaValidadoFixture(request, {
+            unidade: UNIDADE_ALVO,
+            descricao: descProcesso
         });
-        processoId = processo.codigo;
-        descProcesso = processo.descricao;
     });
 
     test('Cenario 1: GESTOR SECRETARIA_1 analisa e aceita', async ({page}) => {

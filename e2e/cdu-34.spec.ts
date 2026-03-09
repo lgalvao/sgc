@@ -21,18 +21,16 @@ test.describe.serial('CDU-34 - Enviar lembrete de prazo', () => {
 
     const timestamp = Date.now();
     const descProcesso = `Mapeamento CDU-34 ${timestamp}`;
-    let processoId: number;
 
 
     test('Preparacao: Admin cria e inicia processo', async ({page, request, autenticadoComoAdmin}) => {
-        const processo = await criarProcessoFixture(request, {
+        await criarProcessoFixture(request, {
             descricao: descProcesso,
             tipo: 'MAPEAMENTO',
             diasLimite: 5,
             unidade: UNIDADE_1,
             iniciar: true
         });
-        processoId = processo.codigo;
 
         await page.goto('/painel');
         await expect(page.getByTestId('tbl-processos').getByText(descProcesso).first()).toBeVisible();

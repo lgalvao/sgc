@@ -13,7 +13,7 @@ test.describe.serial('CDU-35 - Gerar relatório de andamento', () => {
 
     test('Cenários CDU-35: ADMIN navega e gera relatórios de andamento', async ({page, request, autenticadoComoAdmin}) => {
         const descricaoProcesso = `Relatório CDU-35 ${Date.now()}`;
-        const processo = await criarProcessoFixture(request, {
+        await criarProcessoFixture(request, {
             descricao: descricaoProcesso,
             tipo: 'MAPEAMENTO',
             unidade: 'ASSESSORIA_12',

@@ -29,9 +29,7 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
 
     const atividade1 = `Atividade Bloco ${timestamp}`;
 
-    test.beforeAll(async ({browser}) => {
-        const page = await browser.newPage();
-
+    test('Setup UI', async ({page}) => {
         // Preparacao 1: Admin cria e inicia processo de mapeamento
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
@@ -64,8 +62,6 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
 
         await verificarPaginaPainel(page);
-
-        await page.close();
     });
 
     test('Cenario 1: GESTOR abre modal e cancela aceite em bloco', async ({page, autenticadoComoGestorCoord22}) => {

@@ -1,4 +1,3 @@
-/* eslint-disable playwright/expect-expect */
 import type {Page} from '@playwright/test';
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcesso} from './helpers/helpers-processos.js';
@@ -40,14 +39,14 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
 
     const timestamp = Date.now();
     const descProcesso = `Mapeamento CDU-26 ${timestamp}`;
-    let processoId: number;
 
     const atividade1 = `Atividade Homol ${timestamp}`;
     const competencia1 = `Competência Homol ${timestamp}`;
 
+    test('Setup UI', async ({page, request}) => {
 
-    test('Preparacao 1: Admin cria e inicia processo', async ({page, autenticadoComoAdmin}) => {
-
+        // Preparacao 1: Admin cria e inicia processo
+        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
         await criarProcesso(page, {
             descricao: descProcesso,
@@ -60,16 +59,13 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
         const linhaProcesso = page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descProcesso)});
         await linhaProcesso.click();
 
-        processoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
-
         await page.getByTestId('btn-processo-iniciar').click();
         await page.getByTestId('btn-iniciar-processo-confirmar').click();
 
         await verificarPaginaPainel(page);
-    });
 
-    test('Preparacao 2: Chefe disponibiliza cadastro', async ({page, autenticadoComoChefeSecao221}) => {
-
+        // Preparacao 2: Chefe disponibiliza cadastro
+        await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
 
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaAtividades(page);
@@ -81,24 +77,21 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
 
         await verificarPaginaPainel(page);
-    });
 
-    test('Preparacao 2a: Gestor COORD_22 aceita cadastro', async ({page}) => {
+        // Preparacao 2a: Gestor COORD_22 aceita cadastro
         await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_1);
         await navegarParaAtividadesVisualizacao(page);
         await aceitarCadastroMapeamento(page);
-    });
 
-    test('Preparacao 2b: Gestor SECRETARIA_2 aceita cadastro', async ({page}) => {
+        // Preparacao 2b: Gestor SECRETARIA_2 aceita cadastro
         await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_1);
         await navegarParaAtividadesVisualizacao(page);
         await aceitarCadastroMapeamento(page);
-    });
 
-    test('Preparacao 3: Admin homologa cadastro e cria mapa', async ({page, autenticadoComoAdmin}) => {
-
+        // Preparacao 3: Admin homologa cadastro e cria mapa
+        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, UNIDADE_1);
@@ -112,10 +105,9 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
         await criarCompetencia(page, competencia1, [atividade1]);
         await disponibilizarMapa(page, '2030-12-31');
         await verificarPaginaPainel(page);
-    });
 
-    test('Preparacao 4: Chefe valida o mapa', async ({page, autenticadoComoChefeSecao221}) => {
-
+        // Preparacao 4: Chefe valida o mapa
+        await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
 
         await acessarSubprocessoChefe(page, descProcesso);
 
@@ -124,9 +116,8 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
         await page.getByTestId('btn-validar-mapa-confirmar').click();
 
         await verificarPaginaPainel(page);
-    });
 
-    test('Preparacao 4a: Gestor COORD_22 aceita mapa', async ({page}) => {
+        // Preparacao 4a: Gestor COORD_22 aceita mapa
         await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_1);
         await navegarParaMapa(page);
@@ -136,9 +127,8 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
         await page.getByTestId('btn-aceite-mapa-confirmar').click();
 
         await verificarPaginaPainel(page);
-    });
 
-    test('Preparacao 4b: Gestor SECRETARIA_2 aceita mapa', async ({page}) => {
+        // Preparacao 4b: Gestor SECRETARIA_2 aceita mapa
         await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_1);
         await navegarParaMapa(page);
@@ -150,10 +140,7 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
         await verificarPaginaPainel(page);
     });
 
-
     test('Cenario 1: ADMIN visualiza botão Homologar Mapa em Bloco', async ({page, autenticadoComoAdmin}) => {
-
-
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
 
@@ -163,8 +150,6 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
     });
 
     test('Cenario 2: ADMIN abre modal de homologação de mapa em bloco', async ({page, autenticadoComoAdmin}) => {
-
-
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
 
         const btnHomologar = page.getByRole('button', {name: /^Homologar em bloco$/i}).first();
@@ -182,8 +167,6 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
     });
 
     test('Cenario 3: Cancelar homologação de mapa em bloco', async ({page, autenticadoComoAdmin}) => {
-
-
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
 
         const btnHomologar = page.getByRole('button', {name: /^Homologar em bloco$/i}).first();

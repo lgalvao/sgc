@@ -10,15 +10,14 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
     
     test.describe('Em Processo em Andamento', () => {
         const UNIDADE_ALVO = 'SECAO_111';
-        let processoId: number;
-        let descProcesso: string;
+        const timestamp = Date.now();
+        const descProcesso = `Processo Finalizado CDU-11 ${timestamp}`;
 
-        test('Preparacao: Criar processo disponibilizado', async ({request}) => {
-            const processo = await criarProcessoMapaDisponibilizadoFixture(request, {
-                unidade: UNIDADE_ALVO
+        test('Setup Data', async ({request}) => {
+            await criarProcessoFinalizadoFixture(request, {
+                unidade: UNIDADE_ALVO,
+                descricao: descProcesso
             });
-            processoId = processo.codigo;
-            descProcesso = processo.descricao;
         });
 
         test('Fluxo ADMIN/GESTOR: Navega via Detalhes do Processo (Passo 2)', async ({page, autenticadoComoAdmin}) => {
@@ -26,13 +25,13 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
             await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
 
             // 2.1. O sistema mostra a tela Detalhes do processo
-            await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processoId}$`));
+            await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+$`));
 
             // 2.2. Usuário clica em uma unidade subordinada
             await navegarParaSubprocesso(page, UNIDADE_ALVO);
 
             // 2.3. O sistema mostra a tela Detalhes do subprocesso
-            await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processoId}/${UNIDADE_ALVO}$`));
+            await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${UNIDADE_ALVO}$`));
 
             // 4. Na tela de Detalhes do subprocesso, usuário clica no card Atividades e conhecimentos.
             // 5. O sistema apresenta a tela Atividades e conhecimentos
@@ -49,7 +48,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
             await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
 
             // 3.1. O sistema exibe a tela Detalhes do subprocesso com os dados da unidade do usuário
-            await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processoId}/${UNIDADE_ALVO}$`));
+            await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${UNIDADE_ALVO}$`));
 
             // 4. Na tela de Detalhes do subprocesso, usuário clica no card Atividades e conhecimentos.
             await navegarParaAtividadesVisualizacao(page);
@@ -61,18 +60,17 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
     });
 
     test.describe('Em Processo Finalizado', () => {
-        const UNIDADE_ALVO = 'SECAO_112';
-        let processoId: number;
-        let descProcesso: string;
+        const UNIDADE_ALVO = 'SECAO_111';
+        const timestamp = Date.now();
+        const descProcesso = `Processo Mapeamento CDU-11 ${timestamp}`;
 
-        test('Preparacao: Criar processo finalizado', async ({request}) => {
-            const processo = await criarProcessoFinalizadoFixture(request, {
-                unidade: UNIDADE_ALVO
+        test('Setup Data', async ({request}) => {
+            await criarProcessoFixture(request, {
+                unidade: UNIDADE_ALVO,
+                iniciar: true,
+                descricao: descProcesso
             });
-            processoId = processo.codigo;
-            descProcesso = processo.descricao;
         });
-
         test('Fluxo ADMIN: Visualizar em processo finalizado', async ({page, autenticadoComoAdmin}) => {
 
             // 1. No Painel, o usuário clica no processo finalizado

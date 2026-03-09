@@ -56,10 +56,8 @@ test.describe.serial('CDU-29 - Consultar histórico de processos', () => {
         // Verificar que a tabela ou lista está presente
         // Colunas esperadas: Processo, Tipo, Finalizado em, Unidades participantes
         const tabela = page.locator('table');
-        if (await tabela.count() > 0) {
-            const headers = tabela.locator('th');
-            await expect(headers.filter({hasText: /Processo|Descrição/i})).toBeVisible();
-            await expect(headers.filter({hasText: /Tipo/i})).toBeVisible();
-        }
+        const headers = tabela.locator('th');
+        await expect(headers.filter({hasText: /Processo|Descrição/i})).toBeVisible();
+        await expect(headers.filter({hasText: /Tipo/i})).toBeVisible();
     });
 });

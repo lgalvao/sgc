@@ -1,6 +1,7 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcesso} from './helpers/helpers-processos.js';
 import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
+import {login, USUARIOS} from './helpers/helpers-auth.js';
 
 /**
  * CDU-27 - Alterar data limite de subprocesso
@@ -22,11 +23,9 @@ test.describe.serial('CDU-27 - Alterar data limite de subprocesso', () => {
     const UNIDADE_1 = 'SECAO_221';
     const timestamp = Date.now();
     const descProcesso = `Mapeamento CDU-27 ${timestamp}`;
-    let processoId: number;
 
-
-    test('Preparacao: Admin cria e inicia processo', async ({page, autenticadoComoAdmin}) => {
-
+    test('Setup UI', async ({page, request}) => {
+        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
         await criarProcesso(page, {
             descricao: descProcesso,
@@ -38,8 +37,6 @@ test.describe.serial('CDU-27 - Alterar data limite de subprocesso', () => {
 
         const linhaProcesso = page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descProcesso)});
         await linhaProcesso.click();
-
-        processoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
 
         await page.getByTestId('btn-processo-iniciar').click();
         await page.getByTestId('btn-iniciar-processo-confirmar').click();

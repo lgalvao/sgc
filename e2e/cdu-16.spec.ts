@@ -26,8 +26,6 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
     const timestamp = Date.now();
     const descProcessoMapeamento = `Mapeamento CDU-16 ${timestamp}`;
     const descProcessoRevisao = `Revisão CDU-16 ${timestamp}`;
-    let processoMapeamentoId: number;
-    let processoRevisaoId: number;
 
     // Atividades e competências para os testes
     const atividadeBase1 = `Atividade Base 1 ${timestamp}`;
@@ -54,8 +52,6 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
 
         const linhaProcesso = page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descProcessoMapeamento)});
         await linhaProcesso.click();
-
-        processoMapeamentoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
 
         await page.getByTestId('btn-processo-iniciar').click();
         await page.getByTestId('btn-iniciar-processo-confirmar').click();
@@ -175,8 +171,6 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
 
         const linhaProcesso = page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descProcessoRevisao)});
         await linhaProcesso.click();
-
-        processoRevisaoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
 
 
         await page.getByTestId('btn-processo-iniciar').click();

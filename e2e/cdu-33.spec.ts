@@ -20,18 +20,17 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
     const timestamp = Date.now();
     const descMapeamento = `Mapeamento Pre-CDU-33 ${timestamp}`;
     const descRevisao = `Revisão CDU-33 ${timestamp}`;
-    let mappingPid = 0;
     let revisaoPid = 0;
 
-    // PREPARAÇÃO 0 - CRIAR MAPA VIGENTE
+    test('Setup UI', async ({page, request}) => {
 
-    test('Preparacao 0: Criar e finalizar Mapeamento', async ({page, request, autenticadoComoAdmin}) => {
-        const processo = await criarProcessoMapaHomologadoFixture(request, {
+        // PREPARAÇÃO 0 - CRIAR MAPA VIGENTE
+        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
+        await criarProcessoMapaHomologadoFixture(request, {
             descricao: descMapeamento,
             diasLimite: 30,
             unidade: UNIDADE_ALVO
         });
-        mappingPid = processo.codigo;
 
         await page.goto('/painel');
         await expect(page.getByTestId('tbl-processos').getByText(descMapeamento).first()).toBeVisible();
@@ -39,10 +38,8 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
         await page.getByTestId('btn-processo-finalizar').click();
         await page.getByTestId('btn-finalizar-processo-confirmar').click();
         await verificarPaginaPainel(page);
-    });
 
-
-    test('Preparacao 1: Admin cria revisão já homologada', async ({page, request, autenticadoComoAdmin}) => {
+        // Preparacao 1: Admin cria revisão já homologada
         const processo = await criarProcessoRevisaoMapaHomologadoFixture(request, {
             descricao: descRevisao,
             diasLimite: 30,
@@ -54,9 +51,7 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa homologado/i);
     });
 
-
     test('Cenários CDU-33: ADMIN reabre revisão de cadastro', async ({page, autenticadoComoAdmin}) => {
-
 
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
         await page.goto(`/processo/${revisaoPid}/${UNIDADE_ALVO}`);

@@ -78,7 +78,6 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         // Capturar ID do processo para cleanup
         await page.goto('/painel');
         await page.getByTestId('tbl-processos').getByText(descProcMapeamento).first().click();
-        const processoMapeamentoId = Number.parseInt(new RegExp(/\/processo\/(\d+)/).exec(page.url())?.[1] || '0');
 
     });
 
@@ -182,7 +181,6 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         // Capturar ID do processo para cleanup
         await page.getByTestId('tbl-processos').getByText(descProcRevisao).first().click();
         await expect(page).toHaveURL(/\/processo\/cadastro/);
-        const processoRevisaoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
 
         const dataLimiteStr = (await page.getByTestId('inp-processo-data-limite').inputValue()).split('-').reverse().join('/');
 

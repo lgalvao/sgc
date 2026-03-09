@@ -2,7 +2,6 @@ import {expect, test} from './fixtures/complete-fixtures.js';
 import {login, USUARIOS} from './helpers/helpers-auth.js';
 import {fazerLogout} from './helpers/helpers-navegacao.js';
 import {criarProcesso, verificarProcessoNaTabela} from './helpers/helpers-processos.js';
-import type {Page} from '@playwright/test';
 
 test.describe('CDU-02 - Visualizar Painel', () => {
     test.describe('Como ADMIN', () => {
@@ -46,11 +45,13 @@ test.describe('CDU-02 - Visualizar Painel', () => {
 
             // Verifica que o processo aparece na tabela
             await page.goto('/painel');
+            await expect(page).toHaveURL(/\/painel/);
 
+            // Valida que o processo criado aparece na tabela do painel principal
             await verificarProcessoNaTabela(page, {
                 descricao: descricaoProcesso,
-                situacao: 'Criado',
-                tipo: 'Mapeamento'
+                tipo: 'Mapeamento',
+                situacao: 'Em andamento'
             });
         });
 
@@ -129,6 +130,7 @@ test.describe('CDU-02 - Visualizar Painel', () => {
             await page.getByTestId('btn-processo-salvar').click();
 
             await expect(page).toHaveURL(/\/painel/);
+            await page.goto('/painel');
 
             // Verifica que o processo foi criado e aparece na tabela
             await verificarProcessoNaTabela(page, {

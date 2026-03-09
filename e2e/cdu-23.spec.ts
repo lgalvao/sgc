@@ -1,4 +1,4 @@
-/* eslint-disable playwright/expect-expect */
+ 
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcesso} from './helpers/helpers-processos.js';
 import {
@@ -34,14 +34,12 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {
 
     const timestamp = Date.now();
     const descProcesso = `Mapeamento CDU-23 ${timestamp}`;
-    let processoId: number;
 
     const atividade1 = `Atividade Homol ${timestamp}`;
 
-
-    test('Preparacao 1: Admin cria e inicia processo', async ({page, autenticadoComoAdmin}) => {
-
-
+    test('Setup UI', async ({page}) => {
+        // Preparacao 1: Admin cria e inicia processo
+        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
         await criarProcesso(page, {
             descricao: descProcesso,
             tipo: 'MAPEAMENTO',
@@ -53,17 +51,13 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {
         const linhaProcesso = page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descProcesso)});
         await linhaProcesso.click();
 
-        processoId = Number.parseInt(new RegExp(/\/processo(?:\/cadastro)?\/(\d+)/).exec(page.url())?.[1] || '0');
-
         await page.getByTestId('btn-processo-iniciar').click();
         await page.getByTestId('btn-iniciar-processo-confirmar').click();
 
         await verificarPaginaPainel(page);
-    });
 
-    test('Preparacao 2: Chefe disponibiliza cadastro', async ({page, autenticadoComoChefeSecao221}) => {
-
-
+        // Preparacao 2: Chefe disponibiliza cadastro
+        await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaAtividades(page);
 
@@ -74,22 +68,19 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
 
         await verificarPaginaPainel(page);
-    });
 
-    test('Preparacao 2a: Gestor COORD_22 aceita cadastro', async ({page}) => {
+        // Preparacao 2a: Gestor COORD_22 aceita cadastro
         await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_1);
         await navegarParaAtividadesVisualizacao(page);
         await aceitarCadastroMapeamento(page);
-    });
 
-    test('Preparacao 2b: Gestor SECRETARIA_2 aceita cadastro', async ({page}) => {
+        // Preparacao 2b: Gestor SECRETARIA_2 aceita cadastro
         await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_1);
         await navegarParaAtividadesVisualizacao(page);
         await aceitarCadastroMapeamento(page);
     });
-
 
     test('Cenario 1: ADMIN abre modal e cancela homologação em bloco', async ({page, autenticadoComoAdmin}) => {
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();

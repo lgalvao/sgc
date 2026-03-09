@@ -16,18 +16,16 @@ import {navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
 test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos', () => {
     const UNIDADE_ALVO = 'SECAO_211';
     
-    let processoId: number;
     let descProcesso: string;
 
-    test('Preparacao: Criar processo via fixture', async ({request}) => {
+    test.beforeAll(async ({request, browser}) => {
         const processo = await criarProcessoCadastroDisponibilizadoFixture(request, {
             unidade: UNIDADE_ALVO
         });
-        processoId = processo.codigo;
         descProcesso = processo.descricao;
-    });
 
-    test('Preparacao 3: GESTOR COORD_21 aceita e SECRETARIA_2 devolve', async ({page}) => {
+        const page = await browser.newPage();
+
         await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
@@ -37,18 +35,14 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
         await devolverCadastroMapeamento(page, 'Dados incompletos para a Secretaria');
-    });
 
-    test('Preparacao 4: GESTOR COORD_21 devolve para origem', async ({page}) => {
         await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro disponibilizado/i);
 
         await navegarParaAtividadesVisualizacao(page);
         await devolverCadastroMapeamento(page, 'Corrigir conforme Secretaria');
-    });
 
-    test('Preparacao 5: CHEFE ajusta e redisponibiliza', async ({page}) => {
         await login(page, USUARIOS.CHEFE_SECAO_211.titulo, USUARIOS.CHEFE_SECAO_211.senha);
         await acessarSubprocessoChefeDireto(page, descProcesso, UNIDADE_ALVO);
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro em andamento/i);

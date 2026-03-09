@@ -1,4 +1,4 @@
-/* eslint-disable playwright/expect-expect */
+ 
 import type {Page} from '@playwright/test';
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcesso} from './helpers/helpers-processos.js';
@@ -41,15 +41,14 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
 
     const timestamp = Date.now();
     const descProcesso = `Mapeamento CDU-25 ${timestamp}`;
-    let processoId: number;
 
     const atividade1 = `Atividade Val ${timestamp}`;
     const competencia1 = `Competência Val ${timestamp}`;
 
+    test('Setup UI', async ({page, request}) => {
 
-    test('Preparacao 1: Admin cria e inicia processo', async ({page, autenticadoComoAdmin}) => {
-
-
+        // Preparacao 1: Admin cria e inicia processo
+        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
         await criarProcesso(page, {
             descricao: descProcesso,
             tipo: 'MAPEAMENTO',
@@ -61,16 +60,12 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
         const linhaProcesso = page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descProcesso)});
         await linhaProcesso.click();
 
-        processoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
-
         await page.getByTestId('btn-processo-iniciar').click();
         await page.getByTestId('btn-iniciar-processo-confirmar').click();
 
         await verificarPaginaPainel(page);
-    });
 
-    test('Preparacao 2: Chefe disponibiliza cadastro', async ({page}) => {
-
+        // Preparacao 2: Chefe disponibiliza cadastro
         await login(page, USUARIOS.CHEFE_SECAO_211.titulo, USUARIOS.CHEFE_SECAO_211.senha);
 
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
@@ -83,25 +78,21 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
 
         await verificarPaginaPainel(page);
-    });
 
-    test('Preparacao 2a: Gestor COORD_21 aceita cadastro', async ({page}) => {
+        // Preparacao 2a: Gestor COORD_21 aceita cadastro
         await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_1);
         await navegarParaAtividadesVisualizacao(page);
         await aceitarCadastroMapeamento(page);
-    });
 
-    test('Preparacao 2b: Gestor SECRETARIA_2 aceita cadastro', async ({page}) => {
+        // Preparacao 2b: Gestor SECRETARIA_2 aceita cadastro
         await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_1);
         await navegarParaAtividadesVisualizacao(page);
         await aceitarCadastroMapeamento(page);
-    });
 
-    test('Preparacao 3: Admin homologa cadastro e cria mapa', async ({page, autenticadoComoAdmin}) => {
-
-
+        // Preparacao 3: Admin homologa cadastro e cria mapa
+        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, UNIDADE_1);
         await page.getByTestId('card-subprocesso-atividades-vis').click();
@@ -114,10 +105,8 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
         await criarCompetencia(page, competencia1, [atividade1]);
         await disponibilizarMapa(page, '2030-12-31');
         await verificarPaginaPainel(page);
-    });
 
-    test('Preparacao 4: Chefe valida o mapa', async ({page}) => {
-
+        // Preparacao 4: Chefe valida o mapa
         await login(page, USUARIOS.CHEFE_SECAO_211.titulo, USUARIOS.CHEFE_SECAO_211.senha);
 
         await acessarSubprocessoChefe(page, descProcesso);
@@ -128,7 +117,6 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
 
         await verificarPaginaPainel(page);
     });
-
 
     test('Cenario 1: GESTOR acessa processo com mapa validado', async ({page}) => {
         await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);

@@ -20,10 +20,8 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
     const UNIDADE_ALVO = 'SECAO_121';
     const timestamp = Date.now();
     const descProcessoRevisao = `Revisão CDU-12 ${timestamp}`;
-    
-    let processoRevisaoId: number;
 
-    test('Preparacao: Criar Mapa Vigente e Iniciar Revisão', async ({request}) => {
+    test('Setup Data', async ({request}) => {
         // Criar processo mapeamento finalizado para gerar o Mapa Vigente
         await criarProcessoFinalizadoFixture(request, {
             unidade: UNIDADE_ALVO,
@@ -31,13 +29,12 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         });
 
         // Iniciar Processo de Revisão
-        const processo = await criarProcessoFixture(request, {
+        await criarProcessoFixture(request, {
             descricao: descProcessoRevisao,
             tipo: 'REVISAO',
             unidade: UNIDADE_ALVO,
             iniciar: true
         });
-        processoRevisaoId = processo.codigo;
     });
 
     test('Passo 3.1: Verificação pelo CHEFE na tela de Cadastro', async ({page, autenticadoComoChefeSecao121}) => {

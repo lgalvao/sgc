@@ -17,7 +17,6 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
 
     const timestamp = Date.now();
     const descProcesso = `Mapeamento CDU-19 ${timestamp}`;
-    let processoId = 0;
 
     // Atividades e competências para os testes
     const atividade1 = `Atividade 1 ${timestamp}`;
@@ -42,8 +41,6 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
 
         const linhaProcesso = page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descProcesso)});
         await linhaProcesso.click();
-
-        processoId = Number.parseInt(new RegExp(/\/processo\/cadastro\/(\d+)/).exec(page.url())?.[1] || '0');
 
         await page.getByTestId('btn-processo-iniciar').click();
         await page.getByTestId('btn-iniciar-processo-confirmar').click();

@@ -175,7 +175,7 @@ test.describe('CDU-03 - Manter Processo', () => {
 
         await page.getByTestId('tbl-processos').getByText(descricaoBase).first().click();
         await esperarPaginaDetalhesProcesso(page);
-        const id = await extrairProcessoId(page);
+        await extrairProcessoId(page);
 
         await page.goto('/painel');
 
@@ -239,7 +239,7 @@ test.describe('CDU-03 - Manter Processo', () => {
         // Cleanup registration
         await page.getByTestId('tbl-processos').getByText(descricao).first().click();
         await esperarPaginaCadastroProcesso(page);
-        const id = await extrairProcessoId(page);
+        await extrairProcessoId(page);
 
         await page.goto('/painel');
 
@@ -278,7 +278,7 @@ test.describe('CDU-03 - Manter Processo', () => {
 
         await page.getByTestId('tbl-processos').getByText(descricaoAlt).first().click();
         await esperarPaginaDetalhesProcesso(page);
-        const idAlt = await extrairProcessoId(page);
+        await extrairProcessoId(page);
 
         await expect(page).toHaveURL(/\/processo\/\d+$/);
     });

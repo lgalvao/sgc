@@ -26,7 +26,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
     const timestamp = Date.now();
     const descProcessoRevisao = `Rev 10 ${timestamp}`;
 
-    test.beforeAll(async ({request}) => {
+    test.beforeAll(async ({request, browser}) => {
         // Criar processo mapeamento finalizado (gera mapa vigente)
         await criarProcessoFinalizadoFixture(request, {
             unidade: UNIDADE_ALVO,
@@ -40,9 +40,8 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
             unidade: UNIDADE_ALVO,
             iniciar: true
         });
-    });
 
-    test('1.1. Preparação: Chefe revisa atividades', async ({page}) => {
+        const page = await browser.newPage();
         // Chefe revisa atividades (muda situação para EM_ANDAMENTO)
         await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
         await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
