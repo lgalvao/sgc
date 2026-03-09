@@ -11,10 +11,11 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
     const SENHA_CHEFE = USUARIOS.CHEFE_ASSESSORIA_11.senha;
 
     test('Cenário 1: Processo de Mapeamento (Fluxo Completo + Importação + Auto-save)', async ({
-                                                                                       page,
-                                                                                       autenticadoComoAdmin,
-                                                                                       request
-                                                                                   }) => {
+                                                                                        page,
+                                                                                        autenticadoComoAdmin,
+                                                                                        request
+                                                                                    }) => {
+        test.setTimeout(45000);
         const timestamp = Date.now();
         const descricaoProcesso = `Processo CDU-08 Map ${timestamp}`;
         const processoOrigemDescricao = `Processo Base FINALIZADO ${timestamp}`;

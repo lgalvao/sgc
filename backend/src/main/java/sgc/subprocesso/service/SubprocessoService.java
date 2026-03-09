@@ -746,6 +746,15 @@ public class SubprocessoService {
         return todasAtividades.stream().map(this::mapAtividadeToDto).toList();
     }
 
+    @Transactional(readOnly = true)
+    public List<AtividadeDto> listarAtividadesParaImportacao(Long codSubprocesso) {
+        Subprocesso subprocesso = subprocessoRepo.findByIdWithMapaAndAtividades(codSubprocesso).orElseThrow();
+        if (subprocesso.getProcesso() == null || subprocesso.getProcesso().getSituacao() != SituacaoProcesso.FINALIZADO) {
+            throw new ErroValidacao("A importação de atividades só permite subprocessos de processos finalizados.");
+        }
+        return listarAtividadesSubprocesso(codSubprocesso);
+    }
+
     private void validarSituacaoParaImportacao(Subprocesso sp) {
         SituacaoSubprocesso situacaoSp = sp.getSituacao();
 

@@ -41,6 +41,12 @@ describe('subprocessoService', () => {
     expect(apiClient.get).toHaveBeenCalledWith('/subprocessos/1/contexto-edicao');
   });
 
+  it('listarAtividadesParaImportacao', async () => {
+    (apiClient.get as any).mockResolvedValueOnce({ data: [] });
+    await subprocessoService.listarAtividadesParaImportacao(1);
+    expect(apiClient.get).toHaveBeenCalledWith('/subprocessos/1/atividades-importacao');
+  });
+
   it('validarCadastro', async () => {
     (apiClient.get as any).mockResolvedValueOnce({ data: { isValid: true } });
     await subprocessoService.validarCadastro(1);

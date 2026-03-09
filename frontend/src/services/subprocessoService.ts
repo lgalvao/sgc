@@ -39,6 +39,11 @@ export async function listarAtividades(codSubprocesso: number): Promise<Atividad
     return response.data.atividadesDisponiveis as Atividade[];
 }
 
+export async function listarAtividadesParaImportacao(codSubprocesso: number): Promise<Atividade[]> {
+    const response = await apiClient.get<Atividade[]>(`/subprocessos/${codSubprocesso}/atividades-importacao`);
+    return response.data;
+}
+
 export async function validarCadastro(codSubprocesso: number): Promise<ValidacaoCadastro> {
     const response = await apiClient.get<ValidacaoCadastro>(`/subprocessos/${codSubprocesso}/validar-cadastro`);
     return response.data;
