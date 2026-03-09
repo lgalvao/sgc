@@ -1,6 +1,7 @@
 import {test as base} from '@playwright/test';
 // Use the project's centralized logger for consistent formatting
 import logger from '../../frontend/src/utils/logger.js';
+import {useProcessoCleanup} from '../hooks/hooks-limpeza.js';
 
 function obterBaseUrlWorker(_workerIndex: number): string {
     const portaFrontend = Number.parseInt(process.env.E2E_FRONTEND_PORT || '5173', 10);
@@ -26,7 +27,9 @@ function ehRuidoAutenticacaoEmDetalhes(url: string, status?: number, method?: st
         && /\/api\/processos\/\d+\/detalhes$/.test(url);
 }
 
-export const test = base.extend({
+export const test = base.extend<{
+    cleanupAutomatico: ReturnType<typeof useProcessoCleanup>;
+}>({
     context: async ({browser}, use, testInfo) => {
         const baseURL = obterBaseUrlWorker(testInfo.parallelIndex);
         const context = await browser.newContext({
@@ -161,6 +164,12 @@ export const test = base.extend({
         });
 
         await use(page);
+    },
+
+    cleanupAutomatico: async ({request}, use) => {
+        const cleanup = useProcessoCleanup();
+        await use(cleanup);
+        await cleanup.limpar(request);
     },
 });
 
