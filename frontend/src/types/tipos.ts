@@ -266,6 +266,7 @@ export interface UnidadeParticipante {
     codSubprocesso: number;
     codUnidadeSuperior?: number;
     situacaoSubprocesso: SituacaoSubprocesso;
+    localizacaoAtualCodigo?: number;
     dataLimite: string;
     mapaCodigo?: number;
     filhos: UnidadeParticipante[];

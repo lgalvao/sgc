@@ -2,6 +2,8 @@ import {test as base} from '@playwright/test';
 // Use the project's centralized logger for consistent formatting
 import logger from '../../frontend/src/utils/logger.js';
 import {useProcessoCleanup} from '../hooks/hooks-limpeza.js';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 
 function obterBaseUrlWorker(_workerIndex: number): string {
     const portaFrontend = Number.parseInt(process.env.E2E_FRONTEND_PORT || '5173', 10);
@@ -54,8 +56,9 @@ export const test = base.extend<{
         await request.dispose();
     },
 
-        page: async ({page}, use) => {
+    page: async ({page}, use, testInfo) => {
         let ultimoRuidoAutenticacaoDetalhesEm = 0;
+        const logs: string[] = [];
 
         // Listener para logs do console
         page.on('console', async msg => {
@@ -114,6 +117,9 @@ export const test = base.extend<{
                 return;
             }
 
+            const logEntry = `[${type.toUpperCase()}] ${expandedArgs || text}`;
+            logs.push(logEntry);
+
             // Map Playwright console types to logger methods
             if (type === 'error') {
                 logger.error(`[BROWSER ${type.toUpperCase()}] ${expandedArgs || text}`);
@@ -126,7 +132,9 @@ export const test = base.extend<{
 
         // Listener para erros não tratados da página
         page.on('pageerror', error => {
-            logger.error(`[BROWSER UNCAUGHT ERROR] ${error && error.stack ? error.stack : error}`);
+            const stack = error && error.stack ? error.stack : error;
+            logs.push(`[UNCAUGHT ERROR] ${stack}`);
+            logger.error(`[BROWSER UNCAUGHT ERROR] ${stack}`);
         });
 
         // Listener para falhas de rede (4xx, 5xx)
@@ -154,16 +162,54 @@ export const test = base.extend<{
                     return;
                 }
 
-                logger.warn(`[NETWORK ERROR] ${response.status()} ${response.request().method()} ${response.url()}`);
+                const networkLog = `[NETWORK ERROR] ${response.status()} ${response.request().method()} ${response.url()}`;
+                logs.push(networkLog);
+                logger.warn(networkLog);
+                
                 if (body && body.length < 2000) {
+                    logs.push(`[NETWORK BODY] ${body}`);
                     logger.info(`[NETWORK BODY] ${body}`);
                 } else if (body) {
+                    logs.push(`[NETWORK BODY] ${body.substring(0, 500)}...`);
                     logger.info(`[NETWORK BODY] ${body.substring(0, 500)}...`);
                 }
             }
         });
 
         await use(page);
+
+        // Se o teste falhar, gera o arquivo error-context.md
+        if (testInfo.status !== testInfo.expectedStatus && testInfo.status !== 'skipped') {
+            const contextContent = [
+                `# Contexto de Erro: ${testInfo.title}`,
+                '',
+                `**URL:** ${page.url()}`,
+                `**Título:** ${await page.title()}`,
+                '',
+                '## Logs do Navegador',
+                '```',
+                ...logs,
+                '```',
+                '',
+                '## HTML Page Snapshot (Body)',
+                '```html',
+                await page.evaluate(() => document.body.innerHTML.substring(0, 5000)),
+                '```'
+            ].join('\n');
+
+            if (!fs.existsSync(testInfo.outputDir)) {
+                fs.mkdirSync(testInfo.outputDir, {recursive: true});
+            }
+            const filePath = path.join(testInfo.outputDir, 'error-context.md');
+            fs.writeFileSync(filePath, contextContent);
+            
+            // Registra o arquivo como um anexo para aparecer no report do Playwright
+            testInfo.attachments.push({
+                name: 'error-context',
+                contentType: 'text/markdown',
+                path: filePath
+            });
+        }
     },
 
     cleanupAutomatico: async ({request}, use) => {

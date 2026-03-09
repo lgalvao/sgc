@@ -18,13 +18,11 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
     
     let descProcesso: string;
 
-    test.beforeAll(async ({request, browser}) => {
+    test('1. Setup: Preparar processo e devoluções iniciais', async ({request, page}) => {
         const processo = await criarProcessoCadastroDisponibilizadoFixture(request, {
             unidade: UNIDADE_ALVO
         });
         descProcesso = processo.descricao;
-
-        const page = await browser.newPage();
 
         await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);

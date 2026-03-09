@@ -17,8 +17,10 @@ import java.util.*;
 @RequiredArgsConstructor
 public class ProcessoDetalheBuilder {
     private final SubprocessoRepo subprocessoRepo;
+    private final MovimentacaoRepo movimentacaoRepo;
     private final SgcPermissionEvaluator permissionEvaluator;
     private final SubprocessoValidacaoService subprocessoValidacaoService;
+    private final ProcessoValidacaoService processoValidacaoService;
 
     @Transactional(readOnly = true)
     public ProcessoDetalheDto build(Processo processo, Usuario usuario) {
@@ -44,21 +46,29 @@ public class ProcessoDetalheBuilder {
                 .build();
 
         List<Subprocesso> subprocessos = subprocessoRepo.findByProcessoCodigoWithUnidade(processo.getCodigo());
-        montarHierarquiaUnidades(dto, processo, subprocessos);
+        montarHierarquiaUnidades(dto, processo, subprocessos, usuario);
 
         return dto;
     }
 
     private void montarHierarquiaUnidades(
-            ProcessoDetalheDto dto, Processo processo, List<Subprocesso> subprocessos) {
+            ProcessoDetalheDto dto, Processo processo, List<Subprocesso> subprocessos, Usuario usuario) {
         Map<Long, UnidadeParticipanteDto> mapaUnidades = new HashMap<>();
         Map<Long, Subprocesso> mapaSubprocessos = new HashMap<>();
+
+        Set<Long> unidadesAcesso = (usuario.getPerfilAtivo() == Perfil.ADMIN)
+                ? null
+                : new HashSet<>(processoValidacaoService.buscarCodigosDescendentes(usuario.getUnidadeAtivaCodigo()));
 
         for (Subprocesso sp : subprocessos) {
             mapaSubprocessos.put(sp.getUnidade().getCodigo(), sp);
         }
 
         for (UnidadeProcesso participante : processo.getParticipantes()) {
+            if (unidadesAcesso != null && !unidadesAcesso.contains(participante.getUnidadeCodigo())) {
+                continue;
+            }
+
             UnidadeParticipanteDto unidadeDto = UnidadeParticipanteDto.fromSnapshot(participante);
             Subprocesso sp = mapaSubprocessos.get(participante.getUnidadeCodigo());
             if (sp != null) {
@@ -66,6 +76,7 @@ public class ProcessoDetalheBuilder {
                 unidadeDto.setDataLimite(sp.getDataLimiteEtapa1());
                 unidadeDto.setCodSubprocesso(sp.getCodigo());
                 if (sp.getMapa() != null) unidadeDto.setMapaCodigo(sp.getMapa().getCodigo());
+                unidadeDto.setLocalizacaoAtualCodigo(obterUnidadeLocalizacao(sp).getCodigo());
             }
             mapaUnidades.put(participante.getUnidadeCodigo(), unidadeDto);
         }
@@ -81,5 +92,16 @@ public class ProcessoDetalheBuilder {
         Comparator<UnidadeParticipanteDto> comparator = Comparator.comparing(UnidadeParticipanteDto::getSigla);
         dto.getUnidades().sort(comparator);
         mapaUnidades.values().forEach(unidadeDto -> unidadeDto.getFilhos().sort(comparator));
+    }
+    private Unidade obterUnidadeLocalizacao(Subprocesso sp) {
+        if (sp.getLocalizacaoAtual() != null) return sp.getLocalizacaoAtual();
+
+        Unidade localizacao = movimentacaoRepo.findFirstBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo())
+                .filter(m -> m.getUnidadeDestino() != null)
+                .map(Movimentacao::getUnidadeDestino)
+                .orElse(sp.getUnidade());
+
+        sp.setLocalizacaoAtual(localizacao);
+        return localizacao;
     }
 }

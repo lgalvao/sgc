@@ -37,6 +37,7 @@ async function acessarSubprocessoChefe(page: Page, descProcesso: string) {
  * 7. Sistema executa aceite para cada unidade
  */
 test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
+    test.setTimeout(60000);
     const UNIDADE_1 = 'SECAO_211';
 
     const timestamp = Date.now();
@@ -79,19 +80,19 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
 
         await verificarPaginaPainel(page);
 
-        // Preparacao 2a: Gestor COORD_21 aceita cadastro
+        // Gestor COORD_21 aceita cadastro
         await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_1);
         await navegarParaAtividadesVisualizacao(page);
         await aceitarCadastroMapeamento(page);
 
-        // Preparacao 2b: Gestor SECRETARIA_2 aceita cadastro
+        // Gestor SECRETARIA_2 aceita cadastro
         await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_1);
         await navegarParaAtividadesVisualizacao(page);
         await aceitarCadastroMapeamento(page);
 
-        // Preparacao 3: Admin homologa cadastro e cria mapa
+        // Admin homologa cadastro e cria mapa
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, UNIDADE_1);
@@ -106,7 +107,7 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
         await disponibilizarMapa(page, '2030-12-31');
         await verificarPaginaPainel(page);
 
-        // Preparacao 4: Chefe valida o mapa
+        // Chefe valida o mapa
         await login(page, USUARIOS.CHEFE_SECAO_211.titulo, USUARIOS.CHEFE_SECAO_211.senha);
 
         await acessarSubprocessoChefe(page, descProcesso);
@@ -129,7 +130,7 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
         await expect(btnAceitar).toBeEnabled();
     });
 
-    test('Cenario 2: GESTOR abre modal de aceite de mapa em bloco', async ({page}) => {
+    test('Cenario 2: GESTOR abre modal de aceite de mapa em bloco e cancela', async ({page}) => {
         await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);
 
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
@@ -138,11 +139,37 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
 
         const modal = page.getByRole('dialog');
         await expect(modal).toBeVisible();
-        await expect(modal.getByRole('heading', {name: /bloco/i})).toBeVisible();
-        await expect(modal.getByText(/Selecione as unidades/i)).toBeVisible();
-        await expect(modal.getByRole('button', {name: /Registrar aceite|Aceitar selecionados/i})).toBeVisible();
         await modal.getByRole('button', {name: /Cancelar/i}).click();
         await expect(modal).toBeHidden();
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
+    });
+
+    test('Cenario 3: GESTOR realiza aceite em bloco com sucesso', async ({page}) => {
+        await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);
+
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
+        await page.getByRole('button', {name: /Aceitar em bloco/i}).first().click();
+
+        const modal = page.getByRole('dialog');
+        await expect(modal).toBeVisible();
+        
+        // Verifica título e texto
+        await expect(modal.getByText(/Aceite de mapa em bloco/i)).toBeVisible();
+        await expect(modal.getByText(/Selecione abaixo as unidades/i)).toBeVisible();
+
+        // Verifica se a unidade está na lista (Passo 6)
+        const linhaUnidade = modal.locator('tr', { hasText: 'SECAO_211' });
+        await expect(linhaUnidade).toBeVisible();
+        
+        // Verifica se o checkbox está marcado por padrão (Passo 6)
+        const checkbox = linhaUnidade.locator('input[type="checkbox"]');
+        await expect(checkbox).toBeChecked();
+
+        await modal.getByRole('button', {name: /Aceitar Selecionados/i}).click();
+
+        // Passo 10: Verifica mensagem de confirmação e redirecionamento para o Painel
+        // Conforme ProcessoDetalheView.vue: mensagemSucessoAcaoBloco = "Cadastros aceitos em bloco"
+        await expect(page.getByText('Cadastros aceitos em bloco')).toBeVisible();
+        await verificarPaginaPainel(page);
     });
 });

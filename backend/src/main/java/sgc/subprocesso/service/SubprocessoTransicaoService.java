@@ -22,10 +22,14 @@ import java.util.*;
 
 import static sgc.processo.model.TipoProcesso.*;
 import static sgc.subprocesso.model.SituacaoSubprocesso.*;
+import static sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA;
+import static sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA;
+import static sgc.subprocesso.model.TipoTransicao.*;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class SubprocessoTransicaoService {
     private final SubprocessoRepo subprocessoRepo;
     private final MovimentacaoRepo movimentacaoRepo;
@@ -67,11 +71,10 @@ public class SubprocessoTransicaoService {
         return subprocessoRepo.findByIdWithMapaAndAtividades(codigo).orElseThrow();
     }
 
-    // TODO varias verificacoes de nulos que deveriam ser impossiveis aqui!
     private Unidade obterUnidadeLocalizacao(Subprocesso sp) {
         if (sp.getLocalizacaoAtual() != null) return sp.getLocalizacaoAtual();
         if (sp.getCodigo() == null) return sp.getUnidade();
-        
+
         List<Movimentacao> movs = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo());
         if (movs.isEmpty()) return sp.getUnidade();
 
@@ -79,7 +82,6 @@ public class SubprocessoTransicaoService {
         return (destino != null) ? destino : sp.getUnidade();
     }
 
-    @Transactional
     public void registrarTransicao(RegistrarTransicaoCommand cmd) {
         Usuario usuario = cmd.usuario();
         Subprocesso sp = cmd.sp();
@@ -95,7 +97,7 @@ public class SubprocessoTransicaoService {
 
         sp.setLocalizacaoAtual(cmd.destino());
         subprocessoRepo.save(sp);
-        
+
         notificacaoService.notificarTransicao(NotificacaoCommand.builder()
                 .subprocesso(sp)
                 .tipoTransicao(cmd.tipo())
@@ -105,8 +107,7 @@ public class SubprocessoTransicaoService {
                 .build());
     }
 
-    @Transactional
-    public void registrarAnaliseETransicao(RegistrarWorkflowCommand cmd) {
+    public void registrarAnalise(RegistrarWorkflowCommand cmd) {
         Subprocesso sp = cmd.sp();
         Usuario usuario = cmd.usuario();
 
@@ -132,7 +133,6 @@ public class SubprocessoTransicaoService {
                 .build());
     }
 
-    @Transactional
     public Analise criarAnalise(Subprocesso sp, CriarAnaliseRequest request, TipoAnalise tipo) {
         Unidade unidadeEntidade = unidadeService.buscarPorSigla(request.siglaUnidade());
 
@@ -158,7 +158,6 @@ public class SubprocessoTransicaoService {
         disponibilizar(sp, MAPEAMENTO_CADASTRO_DISPONIBILIZADO, TipoTransicao.CADASTRO_DISPONIBILIZADO, usuario);
     }
 
-    @Transactional
     public void disponibilizarRevisao(Long codSubprocesso, Usuario usuario) {
         log.info("Disponibilizando revisão do subprocesso {}", codSubprocesso);
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
@@ -169,9 +168,10 @@ public class SubprocessoTransicaoService {
     private void disponibilizar(Subprocesso sp, SituacaoSubprocesso novaSituacao,
                                 TipoTransicao transicao, Usuario usuario) {
 
-        List<sgc.mapa.model.Atividade> atividades = mapaManutencaoService.atividadesMapaCodigoComConhecimentos(sp.getMapa().getCodigo());
-        List<sgc.mapa.model.Atividade> atividadesSemConhecimento = atividades.isEmpty() ? List.of() : atividades.stream().filter(a -> a.getConhecimentos().isEmpty()).toList();
-        
+        Mapa mapa = sp.getMapa();
+        List<Atividade> atividades = mapaManutencaoService.atividadesMapaCodigoComConhecimentos(mapa.getCodigo());
+        List<Atividade> atividadesSemConhecimento = atividades.isEmpty() ? List.of() : atividades.stream().filter(a -> a.getConhecimentos().isEmpty()).toList();
+
         validacaoService.validarRequisitosNegocioParaDisponibilizacao(sp, atividadesSemConhecimento);
 
         Unidade origem = sp.getUnidade();
@@ -207,9 +207,15 @@ public class SubprocessoTransicaoService {
     private void executarDisponibilizacaoMapa(Long codSubprocesso, DisponibilizarMapaRequest request, Usuario usuario) {
         log.info("Disponibilizando mapa do subprocesso {}", codSubprocesso);
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
+
         validacaoService.validarSituacaoPermitida(sp,
-                MAPEAMENTO_CADASTRO_HOMOLOGADO, MAPEAMENTO_MAPA_CRIADO, MAPEAMENTO_MAPA_COM_SUGESTOES,
-                REVISAO_CADASTRO_HOMOLOGADA, REVISAO_MAPA_AJUSTADO, REVISAO_MAPA_COM_SUGESTOES);
+                MAPEAMENTO_CADASTRO_HOMOLOGADO,
+                MAPEAMENTO_MAPA_CRIADO,
+                MAPEAMENTO_MAPA_COM_SUGESTOES,
+                REVISAO_CADASTRO_HOMOLOGADA,
+                REVISAO_MAPA_AJUSTADO,
+                REVISAO_MAPA_COM_SUGESTOES
+        );
 
         validacaoService.validarMapaParaDisponibilizacao(sp);
 
@@ -238,7 +244,6 @@ public class SubprocessoTransicaoService {
                 .build());
     }
 
-    @Transactional
     public void submeterMapaAjustado(Long codSubprocesso, SubmeterMapaAjustadoRequest request, Usuario usuario) {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
         validacaoService.validarSituacaoPermitida(sp, REVISAO_CADASTRO_HOMOLOGADA, REVISAO_MAPA_AJUSTADO);
@@ -263,7 +268,6 @@ public class SubprocessoTransicaoService {
 
     @Transactional
     public void apresentarSugestoes(Long codSubprocesso, @Nullable String sugestoes, Usuario usuario) {
-        log.info("Apresentando sugestões para o mapa do subprocesso {}: {}", codSubprocesso, sugestoes);
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
         validacaoService.validarSituacaoPermitida(sp,
                 MAPEAMENTO_MAPA_DISPONIBILIZADO,
@@ -286,11 +290,12 @@ public class SubprocessoTransicaoService {
                 .usuario(usuario)
                 .observacoes(sugestoes)
                 .build());
+
+        log.info("Sugestões aresentadas para mapa do SP {}: {}", codSubprocesso, sugestoes);
     }
 
     @Transactional
     public void validarMapa(Long codSubprocesso, Usuario usuario) {
-        log.info("Validando mapa do subprocesso {}", codSubprocesso);
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
         validacaoService.validarSituacaoPermitida(sp, MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO);
 
@@ -309,12 +314,11 @@ public class SubprocessoTransicaoService {
                 .destino(destino)
                 .usuario(usuario)
                 .build());
+
+        log.info("Validado mapa do SP {}", codSubprocesso);
     }
 
-    @Transactional
     public void devolverValidacao(Long codSubprocesso, @Nullable String justificativa, Usuario usuario) {
-        log.info("Devolvendo validação do mapa do subprocesso {}", codSubprocesso);
-
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
         validacaoService.validarSituacaoPermitida(sp,
                 MAPEAMENTO_MAPA_COM_SUGESTOES,
@@ -349,25 +353,25 @@ public class SubprocessoTransicaoService {
                 .observacoes(justificativa)
                 .build();
 
-        registrarAnaliseETransicao(workflowCommand);
+        registrarAnalise(workflowCommand);
+        log.info("Devolvida validação do mapa do SP {}", codSubprocesso);
     }
 
-    @Transactional
     public void aceitarValidacao(Long codSubprocesso, Usuario usuario) {
         executarAceiteValidacao(codSubprocesso, usuario);
     }
 
-    @Transactional
     public void aceitarValidacaoEmBloco(List<Long> subprocessoCodigos, Usuario usuario) {
         subprocessoCodigos.forEach(codSubprocesso -> executarAceiteValidacao(codSubprocesso, usuario));
     }
 
     private void executarAceiteValidacao(Long codSubprocesso, Usuario usuario) {
-        log.info("Aceitando validação do mapa do subprocesso {}", codSubprocesso);
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
         validacaoService.validarSituacaoPermitida(sp,
-                MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO,
-                REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO);
+                MAPEAMENTO_MAPA_COM_SUGESTOES,
+                MAPEAMENTO_MAPA_VALIDADO,
+                REVISAO_MAPA_COM_SUGESTOES,
+                REVISAO_MAPA_VALIDADO);
 
         Unidade unidadeAtual = obterUnidadeLocalizacao(sp);
         Unidade proximaUnidade = unidadeAtual.getUnidadeSuperior();
@@ -388,7 +392,7 @@ public class SubprocessoTransicaoService {
             subprocessoRepo.save(sp);
         } else {
             SituacaoSubprocesso novaSituacao = SITUACAO_MAPA_VALIDADO.get(sp.getProcesso().getTipo());
-            registrarAnaliseETransicao(RegistrarWorkflowCommand.builder()
+            registrarAnalise(RegistrarWorkflowCommand.builder()
                     .sp(sp)
                     .novaSituacao(novaSituacao)
                     .tipoTransicao(TipoTransicao.MAPA_VALIDACAO_ACEITA)
@@ -401,14 +405,14 @@ public class SubprocessoTransicaoService {
                     .motivoAnalise("Aceite da validação")
                     .build());
         }
+
+        log.info("Validação aceita para mapa do SP {}", codSubprocesso);
     }
 
-    @Transactional
     public void homologarValidacao(Long codSubprocesso, Usuario usuario) {
         executarHomologacaoValidacao(codSubprocesso, usuario);
     }
 
-    @Transactional
     public void homologarValidacaoEmBloco(List<Long> subprocessoCodigos, Usuario usuario) {
         subprocessoCodigos.forEach(codSubprocesso -> executarHomologacaoValidacao(codSubprocesso, usuario));
     }
@@ -432,12 +436,10 @@ public class SubprocessoTransicaoService {
                 .build());
     }
 
-    @Transactional
     public void devolverCadastro(Long codSubprocesso, Usuario usuario, @Nullable String observacoes) {
         executarDevolucao(codSubprocesso, usuario, observacoes, false);
     }
 
-    @Transactional
     public void devolverRevisaoCadastro(Long codSubprocesso, Usuario usuario, @Nullable String observacoes) {
         executarDevolucao(codSubprocesso, usuario, observacoes, true);
     }
@@ -464,7 +466,7 @@ public class SubprocessoTransicaoService {
             sp.setDataFimEtapa1(null);
         }
 
-        registrarAnaliseETransicao(RegistrarWorkflowCommand.builder()
+        registrarAnalise(RegistrarWorkflowCommand.builder()
                 .sp(sp)
                 .novaSituacao(novaSituacao)
                 .tipoTransicao(isRevisao ? TipoTransicao.REVISAO_CADASTRO_DEVOLVIDA : TipoTransicao.CADASTRO_DEVOLVIDO)
@@ -479,12 +481,10 @@ public class SubprocessoTransicaoService {
                 .build());
     }
 
-    @Transactional
     public void aceitarCadastro(Long codSubprocesso, Usuario usuario, @Nullable String observacoes) {
         executarAceite(codSubprocesso, usuario, observacoes, false);
     }
 
-    @Transactional
     public void aceitarRevisaoCadastro(Long codSubprocesso, Usuario usuario, @Nullable String observacoes) {
         executarAceite(codSubprocesso, usuario, observacoes, true);
     }
@@ -506,7 +506,7 @@ public class SubprocessoTransicaoService {
             unidadeDestino = unidadeAtual;
         }
 
-        registrarAnaliseETransicao(RegistrarWorkflowCommand.builder()
+        registrarAnalise(RegistrarWorkflowCommand.builder()
                 .sp(sp)
                 .novaSituacao(situacaoAtual)
                 .tipoTransicao(isRevisao ? TipoTransicao.REVISAO_CADASTRO_ACEITA : TipoTransicao.CADASTRO_ACEITO)
@@ -521,19 +521,21 @@ public class SubprocessoTransicaoService {
                 .build());
     }
 
-    @Transactional
     public void homologarCadastro(Long codSubprocesso, Usuario usuario, @Nullable String observacoes) {
         executarHomologacao(codSubprocesso, usuario, observacoes, false);
     }
 
-    @Transactional
     public void homologarRevisaoCadastro(Long codSubprocesso, Usuario usuario, @Nullable String observacoes) {
         executarHomologacao(codSubprocesso, usuario, observacoes, true);
     }
 
-    @Transactional
     public void homologarCadastroEmBloco(List<Long> subprocessoCodigos, Usuario usuario) {
-        subprocessoCodigos.forEach(codSubprocesso -> executarHomologacao(codSubprocesso, usuario, "Homologação em bloco", false));
+        subprocessoCodigos.forEach(codSubprocesso -> executarHomologacao(
+                codSubprocesso,
+                usuario,
+                "Homologação em bloco",
+                false)
+        );
     }
 
     private void executarHomologacao(Long codSubprocesso, Usuario usuario, @Nullable String observacoes, boolean isRevisao) {
@@ -567,24 +569,29 @@ public class SubprocessoTransicaoService {
         }
     }
 
-    @Transactional
     public void reabrirCadastro(Long codigo, String justificativa) {
         executarReabertura(codigo, justificativa, MAPEAMENTO_MAPA_HOMOLOGADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
                 TipoTransicao.CADASTRO_REABERTO, false);
     }
 
-    @Transactional
     public void reabrirRevisaoCadastro(Long codigo, String justificativa) {
-        executarReabertura(codigo, justificativa, REVISAO_MAPA_HOMOLOGADO, REVISAO_CADASTRO_EM_ANDAMENTO,
-                TipoTransicao.REVISAO_CADASTRO_REABERTA, true);
+        executarReabertura(codigo,
+                justificativa,
+                REVISAO_MAPA_HOMOLOGADO,
+                REVISAO_CADASTRO_EM_ANDAMENTO,
+                REVISAO_CADASTRO_REABERTA,
+                true
+        );
     }
 
     private void executarReabertura(Long codigo, String justificativa, SituacaoSubprocesso situacaoMinima,
                                     SituacaoSubprocesso novaSituacao, TipoTransicao tipoTransicao, boolean isRevisao) {
 
-        log.info("Reabrindo {} do subprocesso #{} com justificativa: {}", isRevisao ? ETAPA_REVISAO : ETAPA_CADASTRO, codigo, justificativa);
         Subprocesso sp = buscarSubprocesso(codigo);
-        validacaoService.validarSituacaoMinima(sp, situacaoMinima, "Subprocesso ainda está em fase de " + (isRevisao ? ETAPA_REVISAO : ETAPA_CADASTRO) + ".");
+        validacaoService.validarSituacaoMinima(sp,
+                situacaoMinima,
+                "Subprocesso ainda está em fase de %s.".formatted(isRevisao ? ETAPA_REVISAO : ETAPA_CADASTRO)
+        );
 
         Unidade admin = unidadeService.buscarPorSigla(SIGLA_ADMIN);
         Usuario usuario = usuarioFacade.usuarioAutenticado();
@@ -602,6 +609,7 @@ public class SubprocessoTransicaoService {
                 .build());
 
         enviarAlertasReabertura(sp, justificativa, isRevisao);
+        log.info("Reaberto {} do SP {}", isRevisao ? ETAPA_REVISAO : ETAPA_CADASTRO, codigo);
     }
 
     private void enviarAlertasReabertura(Subprocesso sp, String justificativa, boolean isRevisao) {
@@ -625,7 +633,6 @@ public class SubprocessoTransicaoService {
         }
     }
 
-    @Transactional
     public void alterarDataLimite(Long codSubprocesso, LocalDate novaDataLimite) {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
         SituacaoSubprocesso s = sp.getSituacao();
@@ -644,8 +651,9 @@ public class SubprocessoTransicaoService {
 
         String novaDataStr = novaDataLimite.format(DATE_FORMATTER);
         String assunto = "SGC: Data limite alterada";
-        String corpo = ("Prezado(a) responsável pela %s," + "%n%n" +
-                "A data limite da etapa atual no processo %s foi alterada para %s.%n")
+        String corpo = ("""
+                Prezado(a) responsável pela %s,%n%n\
+                A data limite da etapa atual no processo %s foi alterada para %s.%n""")
                 .formatted(sp.getUnidade().getSigla(), sp.getProcesso().getDescricao(), novaDataStr);
 
         emailService.enviarEmail(sp.getUnidade().getSigla(), assunto, corpo);
@@ -654,27 +662,24 @@ public class SubprocessoTransicaoService {
         alertaService.criarAlertaAlteracaoDataLimite(sp.getProcesso(), sp.getUnidade(), novaDataStr, etapa);
     }
 
-    @Transactional
     public void atualizarParaEmAndamento(Long mapaCodigo) {
         var subprocesso = subprocessoRepo.findByMapa_Codigo(mapaCodigo).orElseThrow();
         if (subprocesso.getSituacao() == NAO_INICIADO) {
-            var tipoProcesso = subprocesso.getProcesso().getTipo();
-
-            if (tipoProcesso == MAPEAMENTO) {
+            TipoProcesso tipo = subprocesso.getProcesso().getTipo();
+            if (tipo == MAPEAMENTO) {
                 subprocesso.setSituacao(MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
                 subprocessoRepo.save(subprocesso);
-            } else if (tipoProcesso == REVISAO) {
+            } else if (tipo == REVISAO) {
                 subprocesso.setSituacao(REVISAO_CADASTRO_EM_ANDAMENTO);
                 subprocessoRepo.save(subprocesso);
             }
         }
     }
 
-    @Transactional
     public void registrarMovimentacaoLembrete(Long codSubprocesso) {
         Subprocesso subprocesso = buscarSubprocesso(codSubprocesso);
         Usuario usuario = usuarioFacade.usuarioAutenticado();
-        var unidadeAdmin = unidadeService.buscarPorSigla(SIGLA_ADMIN);
+        Unidade unidadeAdmin = unidadeService.buscarPorSigla(SIGLA_ADMIN);
 
         movimentacaoRepo.save(Movimentacao.builder()
                 .subprocesso(subprocesso)

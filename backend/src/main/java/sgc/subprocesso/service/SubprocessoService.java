@@ -26,16 +26,16 @@ import java.util.function.*;
 import java.util.stream.*;
 
 import static sgc.organizacao.model.TipoUnidade.*;
+import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class SubprocessoService {
-
     private static final String SIGLA_ADMIN = "ADMIN";
     private static final String NOME_ENTIDADE = "Subprocesso";
     private static final Set<SituacaoSubprocesso> SITUACOES_PERMITIDAS_IMPORTACAO = Set.of(
-            SituacaoSubprocesso.NAO_INICIADO, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+            NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, REVISAO_CADASTRO_EM_ANDAMENTO);
     private final ComumRepo repo;
     private final AnaliseRepo analiseRepo;
     private final UnidadeService unidadeService;
@@ -175,8 +175,15 @@ public class SubprocessoService {
     }
 
     @Transactional(readOnly = true)
-    public List<Subprocesso> listarPorProcessoUnidadeESituacoes(Long processoId, Long unidadeId, List<SituacaoSubprocesso> situacoes) {
-        return subprocessoRepo.findByProcessoCodigoAndUnidadeCodigoAndSituacaoInWithUnidade(processoId, unidadeId, situacoes);
+    public List<Subprocesso> listarPorProcessoEUnidadeCodigosESituacoes(Long processoId, List<Long> unidadeIds, List<SituacaoSubprocesso> situacoes) {
+        return subprocessoRepo.findByProcessoCodigoAndUnidadeCodigoInWithUnidade(processoId, unidadeIds).stream()
+                .filter(sp -> situacoes.contains(sp.getSituacao()))
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<Subprocesso> listarPorProcessoUnidadeESituacoes(Long codProcesso, Long codUnidade, List<SituacaoSubprocesso> situacoes) {
+        return subprocessoRepo.findByProcessoCodigoAndUnidadeCodigoAndSituacaoInWithUnidade(codProcesso, codUnidade, situacoes);
     }
 
     private void processarAlteracoes(Subprocesso sp, AtualizarSubprocessoRequest request) {
@@ -225,14 +232,14 @@ public class SubprocessoService {
     @Transactional
     public void atualizarParaEmAndamento(Long mapaCodigo) {
         var subprocesso = subprocessoRepo.findByMapa_Codigo(mapaCodigo).orElseThrow();
-        if (subprocesso.getSituacao() == SituacaoSubprocesso.NAO_INICIADO) {
+        if (subprocesso.getSituacao() == NAO_INICIADO) {
             var tipoProcesso = subprocesso.getProcesso().getTipo();
 
             if (tipoProcesso == TipoProcesso.MAPEAMENTO) {
-                subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+                subprocesso.setSituacao(MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
                 subprocessoRepo.save(subprocesso);
             } else if (tipoProcesso == TipoProcesso.REVISAO) {
-                subprocesso.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+                subprocesso.setSituacao(REVISAO_CADASTRO_EM_ANDAMENTO);
                 subprocessoRepo.save(subprocesso);
             }
         }
@@ -274,7 +281,7 @@ public class SubprocessoService {
                         .processo(processo)
                         .unidade(unidade)
                         .mapa(null)
-                        .situacao(SituacaoSubprocesso.NAO_INICIADO)
+                        .situacao(NAO_INICIADO)
                         .dataLimiteEtapa1(processo.getDataLimite())
                         .build())
                 .map(Subprocesso.class::cast)
@@ -309,7 +316,7 @@ public class SubprocessoService {
     public void criarParaRevisao(Processo processo, Unidade unidade, UnidadeMapa unidadeMapa, Unidade unidadeOrigem, Usuario usuario) {
         log.info("Criando subprocesso para unidade {} no processo {}", unidade.getSigla(), processo.getCodigo());
         criarSubprocessoComMapa(processo, unidade, unidadeMapa, unidadeOrigem, usuario,
-                SituacaoSubprocesso.NAO_INICIADO, "Processo iniciado");
+                NAO_INICIADO, "Processo iniciado");
     }
 
     public void criarParaDiagnostico(Processo processo, Unidade unidade, UnidadeMapa unidadeMapa, Unidade unidadeOrigem, Usuario usuario) {
@@ -607,8 +614,8 @@ public class SubprocessoService {
         boolean habilitarAcessoMapa = verificarAcessoMapaHabilitado(perfil, situacao);
 
         return PermissoesSubprocessoDto.builder()
-                .podeEditarCadastro(mesmaUnidade && isChefe && Set.of(SituacaoSubprocesso.NAO_INICIADO, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO).contains(situacao))
-                .podeDisponibilizarCadastro(mesmaUnidade && isChefe && Set.of(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO).contains(situacao))
+                .podeEditarCadastro(mesmaUnidade && isChefe && Set.of(NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, REVISAO_CADASTRO_EM_ANDAMENTO).contains(situacao))
+                .podeDisponibilizarCadastro(mesmaUnidade && isChefe && Set.of(MAPEAMENTO_CADASTRO_EM_ANDAMENTO, REVISAO_CADASTRO_EM_ANDAMENTO).contains(situacao))
                 .podeDevolverCadastro(mesmaUnidade && (isGestor || isAdmin) && Set.of(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO, SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA).contains(situacao))
                 .podeAceitarCadastro(mesmaUnidade && isGestor && Set.of(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO, SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA).contains(situacao))
                 .podeHomologarCadastro(mesmaUnidade && isAdmin && Set.of(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO, SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA).contains(situacao))
@@ -632,7 +639,7 @@ public class SubprocessoService {
 
     private boolean verificarAcessoCadastroHabilitado(Perfil perfil, SituacaoSubprocesso situacao) {
         if (perfil == Perfil.CHEFE) return true;
-        
+
         if (situacao.name().startsWith("MAPEAMENTO")) {
             return situacao.ordinal() >= SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO.ordinal();
         } else if (situacao.name().startsWith("REVISAO")) {
@@ -640,7 +647,7 @@ public class SubprocessoService {
         }
         return false;
     }
-    
+
     private boolean verificarAcessoMapaHabilitado(Perfil perfil, SituacaoSubprocesso situacao) {
         if (perfil == Perfil.ADMIN) {
             if (situacao.name().startsWith("MAPEAMENTO")) {
@@ -660,7 +667,7 @@ public class SubprocessoService {
 
     private boolean verificarVisualizarImpacto(boolean temMapaVigente, boolean mesmaUnidade, boolean isChefe, boolean isGestor, boolean isAdmin, SituacaoSubprocesso situacao) {
         return temMapaVigente && (
-                (mesmaUnidade && isChefe && situacao == SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO) ||
+                (mesmaUnidade && isChefe && situacao == REVISAO_CADASTRO_EM_ANDAMENTO) ||
                         (mesmaUnidade && isGestor && situacao == SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA) ||
                         (isAdmin && Set.of(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA, SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA, SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO).contains(situacao))
         );
@@ -668,8 +675,8 @@ public class SubprocessoService {
 
     private boolean verificarEditarMapa(boolean mesmaUnidade, boolean isAdmin, SituacaoSubprocesso situacao) {
         return mesmaUnidade && isAdmin && Set.of(
-                SituacaoSubprocesso.NAO_INICIADO, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO,
-                SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO, SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES, SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO,
+                NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO,
+                SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO, SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES, REVISAO_CADASTRO_EM_ANDAMENTO,
                 SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA, SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO, SituacaoSubprocesso.REVISAO_MAPA_COM_SUGESTOES,
                 SituacaoSubprocesso.DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO).contains(situacao);
     }
@@ -702,11 +709,11 @@ public class SubprocessoService {
             throw new ErroValidacao("Uma ou mais atividades selecionadas já existentes no cadastro não puderam ser importadas.");
         }
 
-        if (spDestino.getSituacao() == SituacaoSubprocesso.NAO_INICIADO) {
+        if (spDestino.getSituacao() == NAO_INICIADO) {
             var tipoProcesso = spDestino.getProcesso().getTipo();
             switch (tipoProcesso) {
-                case MAPEAMENTO -> spDestino.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
-                case REVISAO -> spDestino.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+                case MAPEAMENTO -> spDestino.setSituacao(MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+                case REVISAO -> spDestino.setSituacao(REVISAO_CADASTRO_EM_ANDAMENTO);
                 default -> log.debug("Tipo de processo {} não requer atualização de situação.", tipoProcesso);
             }
             subprocessoRepo.save(spDestino);

@@ -51,6 +51,7 @@ public class ProcessoDetalheDto {
         private LocalDateTime dataLimite;
         private Long mapaCodigo;
         private Long codSubprocesso;
+        private Long localizacaoAtualCodigo;
 
         public static UnidadeParticipanteDto fromUnidade(Unidade unidade) {
             return UnidadeParticipanteDto.builder()

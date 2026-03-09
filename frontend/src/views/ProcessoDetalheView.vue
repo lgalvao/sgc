@@ -185,12 +185,17 @@ const isProcessoFinalizado = computed(() => {
 
 const unidadesElegiveisPorAcao = computed(() => {
   const unidades = flattenUnidades(participantesHierarquia.value);
+  const unidadeAtual = perfilStore.unidadeAtual;
+
   return {
     aceitar: unidades.filter(u =>
-        u.situacaoSubprocesso === SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO ||
-        u.situacaoSubprocesso === SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO ||
-        u.situacaoSubprocesso === SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA ||
-        u.situacaoSubprocesso === SituacaoSubprocesso.REVISAO_MAPA_VALIDADO
+        (u.situacaoSubprocesso === SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO ||
+            u.situacaoSubprocesso === SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO ||
+            u.situacaoSubprocesso === SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES ||
+            u.situacaoSubprocesso === SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA ||
+            u.situacaoSubprocesso === SituacaoSubprocesso.REVISAO_MAPA_VALIDADO ||
+            u.situacaoSubprocesso === SituacaoSubprocesso.REVISAO_MAPA_COM_SUGESTOES) &&
+        (isGlobalAdmin.value || u.localizacaoAtualCodigo === unidadeAtual)
     ),
     homologar: unidades.filter(u =>
         u.situacaoSubprocesso === SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO ||
@@ -221,7 +226,7 @@ const idsElegiveis = computed(() => unidadesElegiveis.value.map(u => u.codigo));
 const tituloModalBloco = computed(() => {
   switch (acaoBlocoAtual.value) {
     case "aceitar":
-      return "Aceitar em Bloco";
+      return "Aceite de mapa em bloco";
     case "homologar":
       return "Homologar em Bloco";
     case "disponibilizar":
@@ -234,7 +239,7 @@ const tituloModalBloco = computed(() => {
 const textoModalBloco = computed(() => {
   switch (acaoBlocoAtual.value) {
     case "aceitar":
-      return "Selecione as unidades para aceitar o cadastro/mapa em bloco:";
+      return "Selecione abaixo as unidades para aceitar o cadastro/mapa em bloco:";
     case "homologar":
       return "Selecione as unidades para homologar o cadastro/mapa em bloco:";
     case "disponibilizar":

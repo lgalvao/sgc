@@ -113,9 +113,18 @@ public class ProcessoConsultaService {
                     .toList();
         }
 
-        return subprocessoService.listarPorProcessoUnidadeESituacoes(codProcesso, usuario.getUnidadeAtivaCodigo(),
+        List<Long> unidadesAcesso;
+        if (usuario.getPerfilAtivo() == Perfil.GESTOR) {
+            unidadesAcesso = processoValidacaoService.buscarCodigosDescendentes(usuario.getUnidadeAtivaCodigo());
+        } else {
+            unidadesAcesso = List.of(usuario.getUnidadeAtivaCodigo());
+        }
+
+        return subprocessoService.listarPorProcessoEUnidadeCodigosESituacoes(codProcesso, unidadesAcesso,
                         List.of(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
-                                SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA))
+                                SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA,
+                                SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO,
+                                SituacaoSubprocesso.REVISAO_MAPA_VALIDADO))
                 .stream()
                 .map(this::toElegivelDto)
                 .toList();

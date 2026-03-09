@@ -369,11 +369,11 @@ onMounted(async () => {
   await processosStore.buscarProcessoDetalhe(codProcesso.value);
   
   // Tenta obter o ID do subprocesso de forma robusta
-  let id = codSubprocesso.value;
-  if (!id && subprocesso.value?.codUnidade) {
+  let id: number | null | undefined = codSubprocesso.value;
+  if (!id && subprocesso.value) {
     id = await subprocessosStore.buscarSubprocessoPorProcessoEUnidade(
         codProcesso.value,
-        subprocesso.value.codUnidade,
+        subprocesso.value.sigla,
     );
   }
 

@@ -17,8 +17,8 @@ export default defineConfig({
     reporter: 'list',
     use: {
         baseURL: `http://localhost:${frontendPort}`,
-        trace: 'retain-on-failure',
-        screenshot: 'only-on-failure'
+        trace: 'off',
+        screenshot: 'off'
     },
     webServer: {
         command: `node e2e/lifecycle.js`,
