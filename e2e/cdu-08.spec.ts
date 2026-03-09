@@ -6,7 +6,7 @@ import {criarProcessoFinalizadoFixture, criarProcessoFixture} from './fixtures/f
 
 test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
     const UNIDADE_ALVO = 'ASSESSORIA_11';
-    const UNIDADE_ORIGEM = 'SECRETARIA_1';
+    const UNIDADE_ORIGEM = 'ASSESSORIA_12';
     const CHEFE_UNIDADE = USUARIOS.CHEFE_ASSESSORIA_11.titulo;
     const SENHA_CHEFE = USUARIOS.CHEFE_ASSESSORIA_11.senha;
 

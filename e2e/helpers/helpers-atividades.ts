@@ -180,21 +180,41 @@ export async function selecionarAtividadesParaImportacao(page: Page, processoOri
     const selectUnidade = modal.getByTestId('select-unidade');
     await expect(selectUnidade).toBeEnabled();
 
-    const valorOpcaoUnidade = await expect.poll(async () => {
-        return await selectUnidade.locator('option').evaluateAll((options, sigla) => {
+    let valorOpcaoUnidade: string | null = null;
+    await expect.poll(async () => {
+        valorOpcaoUnidade = await selectUnidade.locator('option').evaluateAll((options, sigla) => {
             const opcao = options.find(option => option.textContent?.includes(sigla as string));
             return opcao?.getAttribute('value') ?? null;
         }, unidadeOrigemSigla);
+        return valorOpcaoUnidade;
     }, { timeout: 10000 }).not.toBeNull();
 
+    const respostaAtividades = page.waitForResponse(response =>
+        response.request().method() === 'GET' &&
+        response.url().includes('/atividades-importacao')
+    );
     await selectUnidade.evaluate((elemento, valor) => {
         const select = elemento as HTMLSelectElement;
         select.value = String(valor);
+        select.dispatchEvent(new Event('input', { bubbles: true }));
         select.dispatchEvent(new Event('change', { bubbles: true }));
     }, valorOpcaoUnidade);
+    const response = await respostaAtividades;
+    expect(response.ok()).toBeTruthy();
+
+    await expect.poll(async () => {
+        const quantidadeCheckboxes = await modal.locator('input[type="checkbox"]').count();
+        const estadoVazio = await modal.getByText('Nenhuma atividade encontrada para esta unidade/processo.').isVisible()
+            .catch(() => false);
+        return quantidadeCheckboxes > 0 || estadoVazio;
+    }, { timeout: 10000 }).toBeTruthy();
 
     for (const desc of atividadesDescricoes) {
-        await modal.getByText(desc, { exact: true }).check();
+        const checkbox = modal.locator('.form-check')
+            .filter({ hasText: desc })
+            .locator('input[type="checkbox"]');
+        await expect(checkbox).toBeVisible();
+        await checkbox.check();
     }
 }
 
