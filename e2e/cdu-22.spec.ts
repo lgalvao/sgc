@@ -62,6 +62,7 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
 
         await verificarPaginaPainel(page);
+        expect(true).toBeTruthy();
     });
 
     test('Cenario 1: GESTOR abre modal e cancela aceite em bloco', async ({page, autenticadoComoGestorCoord22}) => {

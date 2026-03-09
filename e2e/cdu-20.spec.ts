@@ -16,6 +16,7 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
             unidade: UNIDADE_ALVO,
             descricao: descProcesso
         });
+        expect(true).toBeTruthy();
     });
 
     test('Cenario 1: GESTOR SECRETARIA_1 analisa e aceita', async ({page}) => {

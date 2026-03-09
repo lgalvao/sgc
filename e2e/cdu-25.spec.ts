@@ -45,7 +45,7 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
     const atividade1 = `Atividade Val ${timestamp}`;
     const competencia1 = `Competência Val ${timestamp}`;
 
-    test('Setup UI', async ({page, request}) => {
+    test('Setup UI', async ({page}) => {
 
         // Preparacao 1: Admin cria e inicia processo
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);

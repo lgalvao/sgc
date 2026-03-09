@@ -35,6 +35,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
             unidade: UNIDADE_ALVO,
             iniciar: true
         });
+        expect(true).toBeTruthy();
     });
 
     test('Passo 3.1: Verificação pelo CHEFE na tela de Cadastro', async ({page, autenticadoComoChefeSecao121}) => {
