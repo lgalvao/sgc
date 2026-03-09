@@ -7,7 +7,6 @@ Este diretório contém a documentação do sistema, requisitos (Casos de Uso), 
 - **`docs/`**: Documentação técnica detalhada, padrões de projeto, diretrizes de design, e regras de acesso.
 - **`reqs/`**: Especificações de requisitos funcionais documentados como Casos de Uso (CDU-XX). Esta é a fonte de verdade para as regras de negócio e fluxos do sistema.
 - **`scripts/`**: Scripts utilitários para CI/CD, verificação de qualidade, relatórios de cobertura, etc.
-- **`_diagramas_sequencia.md`**: Diagramas de sequência da arquitetura do sistema.
 
 ## Notas Importantes
 
