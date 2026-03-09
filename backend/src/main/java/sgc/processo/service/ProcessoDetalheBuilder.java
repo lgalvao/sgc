@@ -12,6 +12,7 @@ import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.*;
 
 import java.util.*;
+import java.util.stream.*;
 
 @Service
 @RequiredArgsConstructor
@@ -20,7 +21,7 @@ public class ProcessoDetalheBuilder {
     private final MovimentacaoRepo movimentacaoRepo;
     private final SgcPermissionEvaluator permissionEvaluator;
     private final SubprocessoValidacaoService subprocessoValidacaoService;
-    private final ProcessoValidacaoService processoValidacaoService;
+    private final UnidadeRepo unidadeRepo;
 
     @Transactional(readOnly = true)
     public ProcessoDetalheDto build(Processo processo, Usuario usuario) {
@@ -56,9 +57,7 @@ public class ProcessoDetalheBuilder {
         Map<Long, UnidadeParticipanteDto> mapaUnidades = new HashMap<>();
         Map<Long, Subprocesso> mapaSubprocessos = new HashMap<>();
 
-        Set<Long> unidadesAcesso = (usuario.getPerfilAtivo() == Perfil.ADMIN)
-                ? null
-                : new HashSet<>(processoValidacaoService.buscarCodigosDescendentes(usuario.getUnidadeAtivaCodigo()));
+        Set<Long> unidadesAcesso = obterUnidadesAcesso(processo, usuario);
 
         for (Subprocesso sp : subprocessos) {
             mapaSubprocessos.put(sp.getUnidade().getCodigo(), sp);
@@ -93,6 +92,50 @@ public class ProcessoDetalheBuilder {
         dto.getUnidades().sort(comparator);
         mapaUnidades.values().forEach(unidadeDto -> unidadeDto.getFilhos().sort(comparator));
     }
+
+    private Set<Long> obterUnidadesAcesso(Processo processo, Usuario usuario) {
+        if (usuario.getPerfilAtivo() == Perfil.ADMIN) {
+            return null;
+        }
+
+        Long codUnidadeAtiva = usuario.getUnidadeAtivaCodigo();
+        if (codUnidadeAtiva == null) {
+            return Set.of();
+        }
+
+        if (usuario.getPerfilAtivo() != Perfil.GESTOR) {
+            return Set.of(codUnidadeAtiva);
+        }
+
+        return buscarDescendentesNaHierarquia(processo.getParticipantes(), codUnidadeAtiva);
+    }
+
+    private Set<Long> buscarDescendentesNaHierarquia(List<UnidadeProcesso> participantes, Long codRaiz) {
+        Map<Long, List<Long>> filhosPorPai = unidadeRepo.findAllWithHierarquia().stream()
+                .filter(unidade -> unidade.getUnidadeSuperior() != null)
+                .collect(Collectors.groupingBy(
+                        unidade -> unidade.getUnidadeSuperior().getCodigo(),
+                        Collectors.mapping(Unidade::getCodigo, Collectors.toList())
+                ));
+
+        Set<Long> codigosSubarvore = new HashSet<>();
+        Queue<Long> fila = new ArrayDeque<>();
+        fila.add(codRaiz);
+
+        while (!fila.isEmpty()) {
+            Long atual = fila.poll();
+            if (!codigosSubarvore.add(atual)) {
+                continue;
+            }
+            fila.addAll(filhosPorPai.getOrDefault(atual, List.of()));
+        }
+
+        return participantes.stream()
+                .map(UnidadeProcesso::getUnidadeCodigo)
+                .filter(codigosSubarvore::contains)
+                .collect(Collectors.toSet());
+    }
+
     private Unidade obterUnidadeLocalizacao(Subprocesso sp) {
         if (sp.getLocalizacaoAtual() != null) return sp.getLocalizacaoAtual();
 

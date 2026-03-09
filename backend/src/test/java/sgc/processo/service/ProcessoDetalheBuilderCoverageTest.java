@@ -24,10 +24,23 @@ class ProcessoDetalheBuilderCoverageTest {
     private SubprocessoRepo subprocessoRepo;
 
     @Mock
+    private MovimentacaoRepo movimentacaoRepo;
+
+    @Mock
     private SgcPermissionEvaluator permissionEvaluator;
+
+    @Mock
+    private UnidadeRepo unidadeRepo;
 
     @InjectMocks
     private ProcessoDetalheBuilder builder;
+
+    private Usuario criarUsuarioAdmin() {
+        Usuario usuario = new Usuario();
+        usuario.setPerfilAtivo(Perfil.ADMIN);
+        usuario.setUnidadeAtivaCodigo(100L);
+        return usuario;
+    }
 
     @Test
     @DisplayName("build deve mapear subprocesso e mapa quando existem")
@@ -53,10 +66,9 @@ class ProcessoDetalheBuilderCoverageTest {
         sp.setMapa(Mapa.builder().codigo(900L).build());
 
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(codProcesso)).thenReturn(List.of(sp));
+        when(movimentacaoRepo.findFirstBySubprocessoCodigoOrderByDataHoraDesc(500L)).thenReturn(Optional.empty());
 
-        when(subprocessoRepo.findByProcessoCodigoWithUnidade(codProcesso)).thenReturn(List.of(sp));
-
-        ProcessoDetalheDto dto = builder.build(processo, new Usuario());
+        ProcessoDetalheDto dto = builder.build(processo, criarUsuarioAdmin());
 
         assertThat(dto.getUnidades()).hasSize(1);
         ProcessoDetalheDto.UnidadeParticipanteDto result = dto.getUnidades().getFirst();
@@ -80,9 +92,7 @@ class ProcessoDetalheBuilderCoverageTest {
 
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(codProcesso)).thenReturn(new ArrayList<>());
 
-        when(subprocessoRepo.findByProcessoCodigoWithUnidade(codProcesso)).thenReturn(new ArrayList<>());
-
-        ProcessoDetalheDto dto = builder.build(processo, new Usuario());
+        ProcessoDetalheDto dto = builder.build(processo, criarUsuarioAdmin());
 
         assertThat(dto.getUnidades()).hasSize(1);
         assertThat(dto.getUnidades().getFirst().getSigla()).isEqualTo("TESTE");

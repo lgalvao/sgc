@@ -62,6 +62,7 @@ export interface UnidadeParticipanteDto {
     situacaoSubprocesso?: string;
     dataLimite?: string;
     mapaCodigo?: number;
+    localizacaoAtualCodigo?: number;
     filhos?: UnidadeParticipanteDto[];
 }
 

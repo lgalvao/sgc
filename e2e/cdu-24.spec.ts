@@ -81,11 +81,13 @@ test.describe('CDU-24 - Disponibilizar mapas em bloco', () => {
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         
         // Validação da UI da ação em bloco
-        const btnDisponibilizar = page.getByRole('button', {name: /Disponibilizar.*Bloco/i}).first();
+        const btnDisponibilizar = page.getByRole('button', {name: /Disponibilizar mapas de competência em bloco/i}).first();
         await expect(btnDisponibilizar).toBeEnabled();
         await btnDisponibilizar.click();
 
         const modal = page.locator('#modal-acao-bloco');
+        await expect(modal.getByText(/Disponibilização de mapa em bloco/i)).toBeVisible();
+        await expect(modal.getByText(/Selecione abaixo as unidades cujos mapas deverão ser disponibilizados/i)).toBeVisible();
         await expect(modal.getByLabel(/Data Limite/i)).toBeVisible();
 
         const data = new Date();
@@ -95,7 +97,7 @@ test.describe('CDU-24 - Disponibilizar mapas em bloco', () => {
         const dd = String(data.getDate()).padStart(2, '0');
         await modal.getByLabel(/Data Limite/i).fill(`${yyyy}-${mm}-${dd}`);
 
-        await modal.getByRole('button', {name: /Disponibilizar Selecionados/i}).click();
+        await modal.getByRole('button', {name: /^Disponibilizar$/i}).click();
         await expect(page.getByText(/Mapas de competências disponibilizados em bloco/i).first()).toBeVisible();
         await expect(page).toHaveURL(/\/painel/);
     });

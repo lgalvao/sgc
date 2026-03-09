@@ -145,17 +145,17 @@ test.describe('CDU-06 - Detalhar processo', () => {
         await disponibilizarCadastro(page);
         await verificarPaginaPainel(page);
 
-        // 3. ADMIN verifica botão "Homologar em bloco"
+        // 3. ADMIN verifica botão "Homologar cadastro em bloco"
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
         await page.getByTestId('tbl-processos').getByText(descricao).first().click();
         await esperarPaginaDetalhesProcesso(page, processoId);
-        await expect(page.getByRole('button', {name: 'Homologar em bloco'})).toBeVisible();
+        await expect(page.getByRole('button', {name: 'Homologar cadastro em bloco'})).toBeVisible();
 
-        // 4. GESTOR verifica botão "Aceitar em bloco"
+        // 4. GESTOR verifica botão "Aceitar cadastro em bloco"
         // John Lennon (202020) é Gestor da SECRETARIA_1 (que engloba ASSESSORIA_12)
         await loginComPerfil(page, '202020', 'senha', 'GESTOR - SECRETARIA_1');
         await page.getByTestId('tbl-processos').getByText(descricao).first().click();
         await esperarPaginaDetalhesProcesso(page, processoId);
-        await expect(page.getByRole('button', {name: 'Aceitar em bloco'})).toBeVisible();
+        await expect(page.getByRole('button', {name: 'Aceitar cadastro em bloco'})).toBeVisible();
     });
 });

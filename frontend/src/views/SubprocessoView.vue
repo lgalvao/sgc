@@ -394,6 +394,12 @@ async function confirmarReabertura() {
     if (sucesso) {
       fecharModalReabrir();
       await subprocessosStore.buscarSubprocessoDetalhe(codSubprocesso.value!);
+      notify(
+          tipoReabertura.value === 'cadastro'
+              ? 'Cadastro reaberto com sucesso'
+              : 'Revisão de cadastro reaberta com sucesso',
+          'success',
+      );
     }
   });
 }

@@ -330,6 +330,32 @@ class ProcessoFacadeTest {
         }
 
         @Test
+        @DisplayName("Deve listar unidades para importacao sem aplicar filtro de detalhe")
+        void deveListarUnidadesParaImportacao() {
+            Processo processo = ProcessoFixture.processoPadrao();
+            processo.setSituacao(SituacaoProcesso.FINALIZADO);
+
+            Unidade unidade = Unidade.builder().codigo(10L).sigla("SECRETARIA_1").nome("Secretaria 1").build();
+            Subprocesso subprocesso = Subprocesso.builder()
+                    .codigo(20L)
+                    .unidade(unidade)
+                    .situacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO)
+                    .build();
+
+            when(processoConsultaService.buscarProcessoComParticipantes(100L)).thenReturn(processo);
+            when(subprocessoService.listarEntidadesPorProcessoEUnidades(eq(100L), anyList()))
+                    .thenReturn(List.of(subprocesso));
+
+            List<ProcessoDetalheDto.UnidadeParticipanteDto> resultado =
+                    processoFacade.listarUnidadesParaImportacao(100L);
+
+            assertThat(resultado).singleElement().satisfies(unidadeDto -> {
+                assertThat(unidadeDto.getSigla()).isEqualTo("SECRETARIA_1");
+                assertThat(unidadeDto.getCodSubprocesso()).isEqualTo(20L);
+            });
+        }
+
+        @Test
         @DisplayName("Deve listar todos com paginação")
         void deveListarTodosPaginado() {
             Pageable pageable = Pageable.unpaged();

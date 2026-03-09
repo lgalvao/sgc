@@ -138,7 +138,7 @@ import {onMounted, ref, watch} from "vue";
 import {useApi} from "@/composables/useApi";
 import {useProcessosStore} from "@/stores/processos";
 import * as subprocessoService from "@/services/subprocessoService";
-import {type Atividade, type ProcessoResumo, type UnidadeParticipante,} from "@/types/tipos";
+import {type Atividade, type ProcessoResumo, type UnidadeImportacao,} from "@/types/tipos";
 
 const props = defineProps<{
   mostrar: boolean;
@@ -161,8 +161,8 @@ const {
 
 const processoSelecionado = ref<ProcessoResumo | null>(null);
 const processoSelecionadoId = ref<number | null>(null);
-const unidadesParticipantes = ref<UnidadeParticipante[]>([]);
-const unidadeSelecionada = ref<UnidadeParticipante | null>(null);
+const unidadesParticipantes = ref<UnidadeImportacao[]>([]);
+const unidadeSelecionada = ref<UnidadeImportacao | null>(null);
 const unidadeSelecionadaId = ref<number | null>(null);
 const atividadesParaImportar = ref<Atividade[]>([]);
 const atividadesSelecionadas = ref<Atividade[]>([]);
@@ -217,23 +217,10 @@ function resetModal() {
   atividadesSelecionadas.value = [];
 }
 
-function flattenUnidades(unidades: UnidadeParticipante[]): UnidadeParticipante[] {
-  const result: UnidadeParticipante[] = [];
-  for (const u of unidades) {
-    result.push(u);
-    if (u.filhos) {
-      result.push(...flattenUnidades(u.filhos));
-    }
-  }
-  return result;
-}
-
 async function selecionarProcesso(processo: ProcessoResumo | null) {
   processoSelecionado.value = processo;
   if (processo) {
-    await processosStore.buscarProcessoDetalhe(processo.codigo);
-    unidadesParticipantes.value =
-        flattenUnidades(processosStore.processoDetalhe?.unidades || []);
+    unidadesParticipantes.value = await processosStore.buscarUnidadesParaImportacao(processo.codigo);
   } else {
     unidadesParticipantes.value = [];
   }
@@ -241,11 +228,11 @@ async function selecionarProcesso(processo: ProcessoResumo | null) {
   unidadeSelecionadaId.value = null;
 }
 
-async function selecionarUnidade(unidadePu: UnidadeParticipante | null) {
+async function selecionarUnidade(unidadePu: UnidadeImportacao | null) {
   unidadeSelecionada.value = unidadePu;
   if (unidadePu) {
     try {
-      const atividadesDaOutraUnidade = await subprocessoService.listarAtividades(unidadePu.codSubprocesso);
+      const atividadesDaOutraUnidade = await subprocessoService.listarAtividadesParaImportacao(unidadePu.codSubprocesso);
       atividadesParaImportar.value = atividadesDaOutraUnidade ? [...atividadesDaOutraUnidade] : [];
     } catch {
       atividadesParaImportar.value = [];

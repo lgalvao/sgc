@@ -272,6 +272,18 @@ export interface UnidadeParticipante {
     filhos: UnidadeParticipante[];
 }
 
+export interface UnidadeImportacao {
+    nome: string;
+    sigla: string;
+    codUnidade: number;
+    codSubprocesso: number;
+    codUnidadeSuperior?: number;
+    situacaoSubprocesso?: SituacaoSubprocesso;
+    localizacaoAtualCodigo?: number;
+    dataLimite?: string;
+    mapaCodigo?: number;
+}
+
 export interface PermissoesSubprocesso {
     podeEditarCadastro: boolean;
     podeDisponibilizarCadastro: boolean;
@@ -386,7 +398,8 @@ export interface DisponibilizarMapaRequest {
 }
 
 export interface SubprocessoElegivel {
-    codSubprocesso: number;
+    codigo: number;
+    unidadeCodigo: number;
     unidadeNome: string;
     unidadeSigla: string;
     situacao: SituacaoSubprocesso;

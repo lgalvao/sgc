@@ -24,7 +24,7 @@
               :disabled="isAceitarBlocoDisabled"
               variant="success"
               @click="abrirModalBloco('aceitar')">
-            Aceitar em bloco
+            {{ rotuloAcaoAceitarBloco }}
           </BButton>
 
           <BButton
@@ -33,7 +33,7 @@
               class="text-white"
               variant="warning"
               @click="abrirModalBloco('homologar')">
-            Homologar em bloco
+            {{ rotuloAcaoHomologarBloco }}
           </BButton>
 
           <BButton
@@ -42,7 +42,7 @@
               class="text-white"
               variant="info"
               @click="abrirModalBloco('disponibilizar')">
-            Disponibilizar mapas em bloco
+            {{ rotuloAcaoDisponibilizarBloco }}
           </BButton>
         </template>
       </PageHeader>
@@ -126,6 +126,8 @@ import {SituacaoProcesso, SituacaoSubprocesso} from "@/types/tipos";
 import {formatSituacaoSubprocesso} from "@/utils/formatters";
 import {logger} from "@/utils";
 
+type ContextoBloco = "cadastro" | "validacao" | "misto";
+
 function flattenUnidades(unidades: any[]): any[] {
   let result: any[] = [];
   for (const u of unidades) {
@@ -148,13 +150,20 @@ const codProcesso = Number(route.params.codProcesso || route.query.codProcesso);
 const modalBlocoRef = ref<any>(null);
 const mostrarModalFinalizacao = ref(false);
 const acaoBlocoAtual = ref<"aceitar" | "homologar" | "disponibilizar">("aceitar");
+const processandoAcaoBloco = ref(false);
 
 const processo = computed(() => processosStore.processoDetalhe);
 const participantesHierarquia = computed(() => processo.value?.unidades || []);
+const subprocessosElegiveis = computed(() => processosStore.subprocessosElegiveis || []);
 
-const podeAceitarBloco = computed(() => isGlobalGestor.value);
+const podeAceitarBloco = computed(() => {
+  return isGlobalGestor.value && (processo.value?.podeAceitarCadastroBloco ?? false);
+});
 
-const podeHomologarBloco = computed(() => podeHomologarBlocoGlobal.value);
+const podeHomologarBloco = computed(() => {
+  return podeHomologarBlocoGlobal.value &&
+      ((processo.value?.podeHomologarCadastro ?? false) || (processo.value?.podeHomologarMapa ?? false));
+});
 
 const podeDisponibilizarBloco = computed(() => {
   return isGlobalAdmin.value &&
@@ -164,15 +173,15 @@ const podeDisponibilizarBloco = computed(() => {
 
 // Estado Disabled
 const isAceitarBlocoDisabled = computed(() => {
-  return unidadesElegiveisPorAcao.value.aceitar.length === 0;
+  return processandoAcaoBloco.value || unidadesElegiveisPorAcao.value.aceitar.length === 0;
 });
 
 const isHomologarBlocoDisabled = computed(() => {
-  return unidadesElegiveisPorAcao.value.homologar.length === 0;
+  return processandoAcaoBloco.value || unidadesElegiveisPorAcao.value.homologar.length === 0;
 });
 
 const isDisponibilizarBlocoDisabled = computed(() => {
-  return unidadesElegiveisPorAcao.value.disponibilizar.length === 0;
+  return processandoAcaoBloco.value || unidadesElegiveisPorAcao.value.disponibilizar.length === 0;
 });
 
 const podeFinalizar = computed(() => {
@@ -183,30 +192,107 @@ const isProcessoFinalizado = computed(() => {
   return processo.value?.situacao === SituacaoProcesso.FINALIZADO;
 });
 
+function isSituacaoAceiteCadastro(situacao: SituacaoSubprocesso) {
+  return situacao === SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO ||
+      situacao === SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA;
+}
+
+function isSituacaoAceiteValidacao(situacao: SituacaoSubprocesso) {
+  return situacao === SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO ||
+      situacao === SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES ||
+      situacao === SituacaoSubprocesso.REVISAO_MAPA_VALIDADO ||
+      situacao === SituacaoSubprocesso.REVISAO_MAPA_COM_SUGESTOES;
+}
+
+function isSituacaoHomologacaoCadastro(situacao: SituacaoSubprocesso) {
+  return situacao === SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO ||
+      situacao === SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA;
+}
+
+function isSituacaoHomologacaoValidacao(situacao: SituacaoSubprocesso) {
+  return situacao === SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO ||
+      situacao === SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES ||
+      situacao === SituacaoSubprocesso.REVISAO_MAPA_VALIDADO ||
+      situacao === SituacaoSubprocesso.REVISAO_MAPA_COM_SUGESTOES;
+}
+
+function isSituacaoDisponibilizacaoMapa(situacao: SituacaoSubprocesso) {
+  return situacao === SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO ||
+      situacao === SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO;
+}
+
+function obterSituacao(item: { situacaoSubprocesso?: SituacaoSubprocesso, situacao?: SituacaoSubprocesso }) {
+  return item.situacaoSubprocesso ?? item.situacao;
+}
+
+function obterContextoBloco(unidades: any[]): ContextoBloco {
+  const temCadastro = unidades.some(u => {
+    const situacao = obterSituacao(u);
+    return situacao ? isSituacaoAceiteCadastro(situacao) || isSituacaoHomologacaoCadastro(situacao) : false;
+  });
+  const temValidacao = unidades.some(u => {
+    const situacao = obterSituacao(u);
+    return situacao ? isSituacaoAceiteValidacao(situacao) || isSituacaoHomologacaoValidacao(situacao) : false;
+  });
+
+  if (temCadastro && !temValidacao) {
+    return "cadastro";
+  }
+  if (temValidacao && !temCadastro) {
+    return "validacao";
+  }
+  return "misto";
+}
+
+function obterUnidadesContextoAcao(acao: "aceitar" | "homologar" | "disponibilizar", ids?: number[]) {
+  const unidadesAcao = unidadesElegiveisPorAcao.value[acao] ?? [];
+  if (!ids || ids.length === 0) {
+    return unidadesAcao;
+  }
+  return unidadesAcao.filter(unidade => ids.includes(unidade.unidadeCodigo));
+}
+
+function obterContextoAtualAcao(acao: "aceitar" | "homologar" | "disponibilizar", ids?: number[]): ContextoBloco {
+  return obterContextoBloco(obterUnidadesContextoAcao(acao, ids));
+}
+
+function obterMensagemSucesso(
+    acao: "aceitar" | "homologar" | "disponibilizar",
+    contexto: ContextoBloco
+) {
+  switch (acao) {
+    case "aceitar":
+      switch (contexto) {
+        case "cadastro":
+          return "Cadastros aceitos em bloco";
+        case "validacao":
+          return "Mapas aceitos em bloco";
+        default:
+          return "Aceites registrados em bloco";
+      }
+    case "homologar":
+      switch (contexto) {
+        case "cadastro":
+          return "Cadastros homologados em bloco";
+        case "validacao":
+          return "Mapas de competências homologados em bloco";
+        default:
+          return "Homologações registradas em bloco";
+      }
+    case "disponibilizar":
+      return "Mapas de competências disponibilizados em bloco";
+    default:
+      return "Ação em bloco realizada com sucesso";
+  }
+}
+
 const unidadesElegiveisPorAcao = computed(() => {
-  const unidades = flattenUnidades(participantesHierarquia.value);
-  const unidadeAtual = perfilStore.unidadeAtual;
+  const unidades = subprocessosElegiveis.value;
 
   return {
-    aceitar: unidades.filter(u =>
-        (u.situacaoSubprocesso === SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO ||
-            u.situacaoSubprocesso === SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO ||
-            u.situacaoSubprocesso === SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES ||
-            u.situacaoSubprocesso === SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA ||
-            u.situacaoSubprocesso === SituacaoSubprocesso.REVISAO_MAPA_VALIDADO ||
-            u.situacaoSubprocesso === SituacaoSubprocesso.REVISAO_MAPA_COM_SUGESTOES) &&
-        (isGlobalAdmin.value || u.localizacaoAtualCodigo === unidadeAtual)
-    ),
-    homologar: unidades.filter(u =>
-        u.situacaoSubprocesso === SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO ||
-        u.situacaoSubprocesso === SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO ||
-        u.situacaoSubprocesso === SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA ||
-        u.situacaoSubprocesso === SituacaoSubprocesso.REVISAO_MAPA_VALIDADO
-    ),
-    disponibilizar: unidades.filter(u =>
-        u.situacaoSubprocesso === SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO ||
-        u.situacaoSubprocesso === SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO
-    )
+    aceitar: unidades.filter(u => isSituacaoAceiteCadastro(u.situacao) || isSituacaoAceiteValidacao(u.situacao)),
+    homologar: unidades.filter(u => isSituacaoHomologacaoCadastro(u.situacao) || isSituacaoHomologacaoValidacao(u.situacao)),
+    disponibilizar: unidades.filter(u => isSituacaoDisponibilizacaoMapa(u.situacao))
   };
 });
 
@@ -214,23 +300,66 @@ const unidadesElegiveis = computed(() => {
   const elegiveis = unidadesElegiveisPorAcao.value[acaoBlocoAtual.value];
   if (!elegiveis) return [];
   return elegiveis.map(u => ({
-    codigo: u.codUnidade,
-    sigla: u.sigla,
-    nome: u.nome,
-    situacao: formatSituacaoSubprocesso(u.situacaoSubprocesso)
+    codigo: u.unidadeCodigo,
+    sigla: u.unidadeSigla,
+    nome: u.unidadeNome,
+    situacao: formatSituacaoSubprocesso(u.situacao)
   }));
 });
 
 const idsElegiveis = computed(() => unidadesElegiveis.value.map(u => u.codigo));
 
+const contextoAceiteBloco = computed<ContextoBloco>(() => obterContextoBloco(unidadesElegiveisPorAcao.value.aceitar));
+const contextoHomologacaoBloco = computed<ContextoBloco>(() => obterContextoBloco(unidadesElegiveisPorAcao.value.homologar));
+
+const rotuloAcaoAceitarBloco = computed(() => {
+  switch (contextoAceiteBloco.value) {
+    case "cadastro":
+      return "Aceitar cadastro em bloco";
+    case "validacao":
+      return "Aceitar mapas em bloco";
+    default:
+      return "Registrar aceite em bloco";
+  }
+});
+
+const rotuloAcaoHomologarBloco = computed(() => {
+  switch (contextoHomologacaoBloco.value) {
+    case "cadastro":
+      return "Homologar cadastro em bloco";
+    case "validacao":
+      return "Homologar mapa de competências em bloco";
+    default:
+      return "Homologar em bloco";
+  }
+});
+
+const rotuloAcaoDisponibilizarBloco = computed(() => {
+  return "Disponibilizar mapas de competência em bloco";
+});
+
 const tituloModalBloco = computed(() => {
   switch (acaoBlocoAtual.value) {
     case "aceitar":
-      return "Aceite de mapa em bloco";
+      switch (contextoAceiteBloco.value) {
+        case "cadastro":
+          return "Aceite de cadastro em bloco";
+        case "validacao":
+          return "Aceite de mapas em bloco";
+        default:
+          return "Aceite em bloco";
+      }
     case "homologar":
-      return "Homologar em Bloco";
+      switch (contextoHomologacaoBloco.value) {
+        case "cadastro":
+          return "Homologação de cadastro em bloco";
+        case "validacao":
+          return "Homologação de mapa em bloco";
+        default:
+          return "Homologação em bloco";
+      }
     case "disponibilizar":
-      return "Disponibilizar Mapas em Bloco";
+      return "Disponibilização de mapa em bloco";
     default:
       return "";
   }
@@ -239,11 +368,25 @@ const tituloModalBloco = computed(() => {
 const textoModalBloco = computed(() => {
   switch (acaoBlocoAtual.value) {
     case "aceitar":
-      return "Selecione abaixo as unidades para aceitar o cadastro/mapa em bloco:";
+      switch (contextoAceiteBloco.value) {
+        case "cadastro":
+          return "Selecione as unidades cujos cadastros deverão ser aceitos:";
+        case "validacao":
+          return "Selecione as unidades para aceite dos mapas correspondentes";
+        default:
+          return "Selecione as unidades para registrar o aceite correspondente.";
+      }
     case "homologar":
-      return "Selecione as unidades para homologar o cadastro/mapa em bloco:";
+      switch (contextoHomologacaoBloco.value) {
+        case "cadastro":
+          return "Selecione abaixo as unidades cujos cadastros deverão ser homologados:";
+        case "validacao":
+          return "Selecione abaixo as unidades cujos mapas deverão ser homologados:";
+        default:
+          return "Selecione as unidades para homologação em bloco.";
+      }
     case "disponibilizar":
-      return "Selecione as unidades para disponibilizar os mapas em bloco:";
+      return "Selecione abaixo as unidades cujos mapas deverão ser disponibilizados:";
     default:
       return "";
   }
@@ -252,27 +395,21 @@ const textoModalBloco = computed(() => {
 const rotuloBotaoBloco = computed(() => {
   switch (acaoBlocoAtual.value) {
     case "aceitar":
-      return "Aceitar Selecionados";
+      return "Registrar aceite";
     case "homologar":
-      return "Homologar Selecionados";
+      return "Homologar";
     case "disponibilizar":
-      return "Disponibilizar Selecionados";
+      return "Disponibilizar";
     default:
       return "";
   }
 });
 
 const mensagemSucessoAcaoBloco = computed(() => {
-  switch (acaoBlocoAtual.value) {
-    case "aceitar":
-      return "Cadastros aceitos em bloco";
-    case "homologar":
-      return "Cadastros homologados em bloco";
-    case "disponibilizar":
-      return "Mapas de competências disponibilizados em bloco";
-    default:
-      return "Ação em bloco realizada com sucesso";
-  }
+  const contexto = acaoBlocoAtual.value === "homologar"
+      ? contextoHomologacaoBloco.value
+      : contextoAceiteBloco.value;
+  return obterMensagemSucesso(acaoBlocoAtual.value, contexto);
 });
 
 async function abrirDetalhesUnidade(row: any) {
@@ -315,20 +452,29 @@ function abrirModalBloco(acao: "aceitar" | "homologar" | "disponibilizar") {
 
 async function executarAcaoBloco(dados: { ids: number[], dataLimite?: string }) {
   try {
+    processandoAcaoBloco.value = true;
     modalBlocoRef.value?.setProcessando(true);
+    const contextoExecucao = obterContextoAtualAcao(acaoBlocoAtual.value, dados.ids);
+    const mensagemSucesso = obterMensagemSucesso(acaoBlocoAtual.value, contextoExecucao);
     await processosStore.executarAcaoBloco(acaoBlocoAtual.value, dados.ids, dados.dataLimite);
 
     modalBlocoRef.value?.fechar();
-    if (acaoBlocoAtual.value === "aceitar" || acaoBlocoAtual.value === "disponibilizar") {
-      toastStore.setPending(mensagemSucessoAcaoBloco.value);
+    const deveRedirecionarPainel = acaoBlocoAtual.value === "aceitar" ||
+        acaoBlocoAtual.value === "disponibilizar" ||
+        (acaoBlocoAtual.value === "homologar" && contextoExecucao === "validacao");
+
+    if (deveRedirecionarPainel) {
+      toastStore.setPending(mensagemSucesso);
       await router.push("/painel");
       return;
     }
-    notify(mensagemSucessoAcaoBloco.value, 'success');
+    notify(mensagemSucesso, 'success');
     await processosStore.buscarContextoCompleto(codProcesso);
   } catch (error: any) {
     modalBlocoRef.value?.setErro(error.message || "Erro ao executar ação em bloco");
     modalBlocoRef.value?.setProcessando(false);
+  } finally {
+    processandoAcaoBloco.value = false;
   }
 }
 
@@ -344,6 +490,9 @@ defineExpose({
   acaoBlocoAtual,
   unidadesElegiveis,
   perfilStore,
+  rotuloAcaoAceitarBloco,
+  rotuloAcaoHomologarBloco,
+  rotuloAcaoDisponibilizarBloco,
   tituloModalBloco,
   textoModalBloco,
   rotuloBotaoBloco,

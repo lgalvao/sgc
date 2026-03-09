@@ -72,7 +72,7 @@ Servidor titular ou substituto da titularidade de uma unidade organizacional, de
 
 ## SEDOC
 
-Seção de desenvolvimento organizacional e capacitação. Principal unidade usuária do sistema no contexto dos processos de mapeamento, de revisão e de diagnóstico. Os seus servidores geralmente terão o perfil ADMIN, embora possam logar com na sua unidade (SEDOC), com outro perfil aplicavel (CHEFE, GESTOR ou SERVIDOR)
+Seção de desenvolvimento organizacional e capacitação. Principal unidade usuária do sistema no contexto dos processos de mapeamento, de revisão e de diagnóstico. Os seus servidores geralmente terão o perfil ADMIN, embora possam logar na sua unidade SEDOC e outro perfil aplicavel (geralmente CHEFE ou SERVIDOR)
 
 ## SGRH
 

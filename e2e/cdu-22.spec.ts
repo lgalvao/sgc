@@ -69,15 +69,15 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
 
-        const btnAceitar = page.getByRole('button', {name: /Aceitar em Bloco/i}).first();
+        const btnAceitar = page.getByRole('button', {name: /Aceitar cadastro em bloco/i}).first();
         await expect(btnAceitar).toBeVisible();
         await expect(btnAceitar).toBeEnabled();
         await btnAceitar.click();
 
         const modal = page.locator('#modal-acao-bloco');
         await expect(modal).toHaveClass(/show/);
-        await expect(modal.getByText(/Aceitar em Bloco/i)).toBeVisible();
-        await expect(modal.getByText(/Selecione as unidades/i)).toBeVisible();
+        await expect(modal.getByText(/Aceite de cadastro em bloco/i)).toBeVisible();
+        await expect(modal.getByText(/Selecione as unidades cujos cadastros deverão ser aceitos/i)).toBeVisible();
         await expect(modal.locator('table')).toBeVisible();
         await modal.getByRole('button', {name: /Cancelar/i}).click();
 
@@ -90,13 +90,13 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
                                                                                       autenticadoComoGestorCoord22
                                                                                   }) => {
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
-        const btnAceitar = page.getByRole('button', {name: /Aceitar em Bloco/i}).first();
+        const btnAceitar = page.getByRole('button', {name: /Aceitar cadastro em bloco/i}).first();
         await expect(btnAceitar).toBeVisible();
         await btnAceitar.click();
 
         const modal = page.locator('#modal-acao-bloco');
         await expect(modal).toHaveClass(/show/);
-        await modal.getByRole('button', {name: /Aceitar Selecionados/i}).click();
+        await modal.getByRole('button', {name: /Registrar aceite/i}).click();
 
         await expect(page.getByText(/Cadastros aceitos em bloco/i).first()).toBeVisible();
         await expect(page).toHaveURL(/\/painel/);

@@ -87,15 +87,15 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
 
-        const btnHomologar = page.getByRole('button', {name: /Homologar em Bloco/i}).first();
+        const btnHomologar = page.getByRole('button', {name: /Homologar cadastro em bloco/i}).first();
         await expect(btnHomologar).toBeVisible();
         await expect(btnHomologar).toBeEnabled();
         await btnHomologar.click();
 
         const modal = page.locator('#modal-acao-bloco');
         await expect(modal).toHaveClass(/show/);
-        await expect(modal.getByText(/Homologar em Bloco/i)).toBeVisible();
-        await expect(modal.getByText(/Selecione as unidades/i)).toBeVisible();
+        await expect(modal.getByText(/Homologação de cadastro em bloco/i)).toBeVisible();
+        await expect(modal.getByText(/Selecione abaixo as unidades cujos cadastros deverão ser homologados/i)).toBeVisible();
         await expect(modal.locator('table')).toBeVisible();
         await modal.getByRole('button', {name: /Cancelar/i}).click();
 
@@ -105,13 +105,13 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {
 
     test('Cenario 2: ADMIN confirma homologação em bloco e permanece na tela', async ({page, autenticadoComoAdmin}) => {
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
-        const btnHomologar = page.getByRole('button', {name: /Homologar em Bloco/i}).first();
+        const btnHomologar = page.getByRole('button', {name: /Homologar cadastro em bloco/i}).first();
         await expect(btnHomologar).toBeVisible();
         await btnHomologar.click();
 
         const modal = page.locator('#modal-acao-bloco');
         await expect(modal).toHaveClass(/show/);
-        await modal.getByRole('button', {name: /Homologar Selecionados/i}).click();
+        await modal.getByRole('button', {name: /^Homologar$/i}).click();
 
         await expect(page).toHaveURL(/\/processo\/\d+$/);
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();

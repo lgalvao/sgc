@@ -5,6 +5,7 @@ import type {
     ProcessoResumo,
     Subprocesso,
     SubprocessoElegivel,
+    UnidadeImportacao,
     UnidadeParticipante
 } from "@/types/tipos";
 import type {ProcessoDetalheDto, UnidadeParticipanteDto} from "@/types/dtos";
@@ -56,6 +57,23 @@ export async function buscarProcessosParaImportacao(): Promise<ProcessoResumo[]>
         "/processos/para-importacao",
     );
     return response.data;
+}
+
+export async function buscarUnidadesParaImportacao(codProcesso: number): Promise<UnidadeImportacao[]> {
+    const response = await apiClient.get<UnidadeParticipanteDto[]>(
+        `/processos/${codProcesso}/unidades-importacao`,
+    );
+    return response.data.map((dto) => ({
+        nome: dto.nome ?? '',
+        sigla: dto.sigla ?? '',
+        codUnidade: dto.codUnidade,
+        codSubprocesso: dto.codSubprocesso ?? 0,
+        codUnidadeSuperior: dto.codUnidadeSuperior,
+        situacaoSubprocesso: dto.situacaoSubprocesso as UnidadeImportacao["situacaoSubprocesso"],
+        dataLimite: dto.dataLimite ?? undefined,
+        mapaCodigo: dto.mapaCodigo ?? undefined,
+        localizacaoAtualCodigo: dto.localizacaoAtualCodigo ?? undefined,
+    }));
 }
 
 export async function iniciarProcesso(

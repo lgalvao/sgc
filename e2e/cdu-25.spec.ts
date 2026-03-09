@@ -125,7 +125,7 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
 
-        const btnAceitar = page.getByRole('button', {name: /Aceitar em bloco/i}).first();
+        const btnAceitar = page.getByRole('button', {name: /Aceitar mapas em bloco/i}).first();
         await expect(btnAceitar).toBeVisible();
         await expect(btnAceitar).toBeEnabled();
     });
@@ -134,7 +134,7 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
         await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);
 
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
-        const btnAceitar = page.getByRole('button', {name: /Aceitar em bloco/i}).first();
+        const btnAceitar = page.getByRole('button', {name: /Aceitar mapas em bloco/i}).first();
         await btnAceitar.click();
 
         const modal = page.getByRole('dialog');
@@ -148,14 +148,14 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
         await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);
 
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
-        await page.getByRole('button', {name: /Aceitar em bloco/i}).first().click();
+        await page.getByRole('button', {name: /Aceitar mapas em bloco/i}).first().click();
 
         const modal = page.getByRole('dialog');
         await expect(modal).toBeVisible();
         
         // Verifica título e texto
-        await expect(modal.getByText(/Aceite de mapa em bloco/i)).toBeVisible();
-        await expect(modal.getByText(/Selecione abaixo as unidades/i)).toBeVisible();
+        await expect(modal.getByText(/Aceite de mapas em bloco/i)).toBeVisible();
+        await expect(modal.getByText(/Selecione as unidades para aceite dos mapas correspondentes/i)).toBeVisible();
 
         // Verifica se a unidade está na lista (Passo 6)
         const linhaUnidade = modal.locator('tr', { hasText: 'SECAO_211' });
@@ -165,11 +165,9 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
         const checkbox = linhaUnidade.locator('input[type="checkbox"]');
         await expect(checkbox).toBeChecked();
 
-        await modal.getByRole('button', {name: /Aceitar Selecionados/i}).click();
+        await modal.getByRole('button', {name: /Registrar aceite/i}).click();
 
-        // Passo 10: Verifica mensagem de confirmação e redirecionamento para o Painel
-        // Conforme ProcessoDetalheView.vue: mensagemSucessoAcaoBloco = "Cadastros aceitos em bloco"
-        await expect(page.getByText('Cadastros aceitos em bloco')).toBeVisible();
+        await expect(page.getByText('Mapas aceitos em bloco')).toBeVisible();
         await verificarPaginaPainel(page);
     });
 });

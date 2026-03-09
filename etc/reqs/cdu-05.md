@@ -9,12 +9,12 @@ Pré-condições:
 
 Fluxo principal:
 
-1. No Painel, ADMIN clica em um processo de revisão que esteja na situação 'Criado'.
+1. No Painel, o usuário clica em um processo de revisão que esteja na situação 'Criado'.
 
 2. O sistema muda para a tela `Cadastro de processo`. Os campos aparecem preenchidos com as informações do processo
    selecionado.
 
-3. ADMIN clica no botão `Iniciar processo`.
+3. O usuário clica no botão `Iniciar processo`.
 
 4. O sistema mostra diálogo de confirmação: "Ao iniciar o processo, não será mais possível editá-lo ou removê-lo e todas
    as unidades participantes serão notificadas por e-mail.", botões Confirmar e Cancelar.
@@ -22,7 +22,7 @@ Fluxo principal:
 5. Caso o usuário escolha o botão Cancelar, o sistema interrompe a operação de iniciação do processo, permanecendo na
    mesma tela.
 
-6. ADMIN confirma.
+6. O usuário confirma.
 
 7. O sistema armazena internamente uma cópia da árvore de unidades participantes ('snapshot') e a vincula com o
    processo, a fim de preservar a hierarquia de unidades vigente, no momento da iniciação do processo.
@@ -37,8 +37,8 @@ Fluxo principal:
     - `Observações`: Campo de texto formatado reservado para registro de informações futuras pelo perfil ADMIN.
 
 10. O sistema cria internamente uma cópia do mapa de competências vigente, juntamente com as suas respectivas atividades
-    e conhecimentos, de cada unidade operacional ou interoperacional participante, vinculando essa cópia ao subprocesso
-    da unidade.
+    e conhecimentos, para cada unidade operacional ou interoperacional participante, vinculando cada cópia ao subprocesso
+    da unidade correspondente.
 
 11. O sistema registra uma movimentação para cada subprocesso criado com os campos:
     - `Data/hora`: Data/hora atual

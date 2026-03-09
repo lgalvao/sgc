@@ -5,8 +5,31 @@ import {createTestingPinia} from "@pinia/testing";
 import {useProcessosStore} from "@/stores/processos";
 import {useToastStore} from "@/stores/toast";
 import {usePerfilStore} from "@/stores/perfil";
-import {Perfil, SituacaoSubprocesso} from "@/types/tipos";
+import {Perfil, SituacaoSubprocesso, type SubprocessoElegivel} from "@/types/tipos";
 import {nextTick} from "vue";
+
+type UnidadeParticipanteMock = {
+    codUnidade: number;
+    sigla: string;
+    nome: string;
+    situacaoSubprocesso: SituacaoSubprocesso;
+    localizacaoAtualCodigo: number;
+    codSubprocesso: number;
+    filhos: UnidadeParticipanteMock[];
+};
+
+type ProcessoDetalheMock = {
+    codigo: number;
+    descricao: string;
+    tipo: string;
+    situacao: string;
+    podeHomologarCadastro: boolean;
+    podeHomologarMapa: boolean;
+    podeAceitarCadastroBloco: boolean;
+    podeDisponibilizarMapaBloco: boolean;
+    podeFinalizar: boolean;
+    unidades: UnidadeParticipanteMock[];
+};
 
 const mocks = vi.hoisted(() => ({
     push: vi.fn(),
@@ -95,7 +118,7 @@ describe("Processo.vue", () => {
         BBadge: {template: '<span><slot /></span>'},
     };
 
-    const mockProcesso = {
+    const mockProcesso: ProcessoDetalheMock = {
         codigo: 1,
         descricao: "Processo de Teste",
         tipo: "REVISAO",
@@ -111,6 +134,7 @@ describe("Processo.vue", () => {
                 sigla: "UNI1",
                 nome: "Unidade 1",
                 situacaoSubprocesso: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
+                localizacaoAtualCodigo: 999,
                 codSubprocesso: 1001,
                 filhos: [],
             },
@@ -119,6 +143,7 @@ describe("Processo.vue", () => {
                 sigla: "UNI2",
                 nome: "Unidade 2",
                 situacaoSubprocesso: SituacaoSubprocesso.NAO_INICIADO,
+                localizacaoAtualCodigo: 999,
                 codSubprocesso: 1002,
                 filhos: [],
             },
@@ -127,6 +152,7 @@ describe("Processo.vue", () => {
                 sigla: "UNI3",
                 nome: "Unidade 3",
                 situacaoSubprocesso: SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO,
+                localizacaoAtualCodigo: 999,
                 codSubprocesso: 1003,
                 filhos: [],
             },
@@ -135,10 +161,42 @@ describe("Processo.vue", () => {
                 sigla: "UNI4",
                 nome: "Unidade 4",
                 situacaoSubprocesso: SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO,
+                localizacaoAtualCodigo: 999,
                 codSubprocesso: 1004,
                 filhos: [],
             }
         ]
+    };
+
+    const mockElegiveis: SubprocessoElegivel[] = [
+        {
+            codigo: 1001,
+            unidadeCodigo: 101,
+            unidadeSigla: "UNI1",
+            unidadeNome: "Unidade 1",
+            situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
+        },
+        {
+            codigo: 1003,
+            unidadeCodigo: 103,
+            unidadeSigla: "UNI3",
+            unidadeNome: "Unidade 3",
+            situacao: SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO,
+        },
+        {
+            codigo: 1004,
+            unidadeCodigo: 104,
+            unidadeSigla: "UNI4",
+            unidadeNome: "Unidade 4",
+            situacao: SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO,
+        }
+    ];
+
+    const aplicarContextoProcesso = (processo: ProcessoDetalheMock = mockProcesso, elegiveis: SubprocessoElegivel[] = mockElegiveis) => {
+        processosStore.$patch({
+            processoDetalhe: processo,
+            subprocessosElegiveis: elegiveis,
+        });
     };
 
     const createWrapper = () => {
@@ -169,7 +227,7 @@ describe("Processo.vue", () => {
     it("deve carregar e exibir os detalhes do processo ao montar", async () => {
         wrapper = createWrapper();
         processosStore = useProcessosStore();
-        processosStore.$patch({processoDetalhe: mockProcesso});
+        aplicarContextoProcesso();
 
         await flushPromises();
 
@@ -204,15 +262,15 @@ describe("Processo.vue", () => {
         perfilStore = usePerfilStore();
         processosStore = useProcessosStore();
 
-        processosStore.$patch({processoDetalhe: mockProcesso});
+        aplicarContextoProcesso();
 
         // Test GESTOR buttons
-        perfilStore.$patch({perfilSelecionado: Perfil.GESTOR});
+        perfilStore.$patch({perfilSelecionado: Perfil.GESTOR, unidadeSelecionada: 999});
         await nextTick();
         await flushPromises();
 
         expect(wrapper.find("button.btn-success").exists()).toBe(true);
-        expect(wrapper.find("button.btn-success").text()).toContain("Aceitar em bloco");
+        expect(wrapper.find("button.btn-success").text()).toContain("Registrar aceite em bloco");
 
         // Test ADMIN buttons
         perfilStore.$patch({perfilSelecionado: Perfil.ADMIN});
@@ -228,15 +286,15 @@ describe("Processo.vue", () => {
         perfilStore = usePerfilStore();
         processosStore = useProcessosStore();
 
-        processosStore.$patch({processoDetalhe: mockProcesso});
+        aplicarContextoProcesso();
 
         // Test GESTOR
-        perfilStore.$patch({perfilSelecionado: Perfil.GESTOR});
+        perfilStore.$patch({perfilSelecionado: Perfil.GESTOR, unidadeSelecionada: 999});
         await nextTick();
         await flushPromises();
 
         const botoesAceitar = wrapper.findAll("button.btn-success").filter(
-            (b: DOMWrapper<Element>) => b.text().includes("Aceitar em bloco")
+            (b: DOMWrapper<Element>) => b.text().includes("Registrar aceite em bloco")
         );
         expect(botoesAceitar.length).toBe(1);
 
@@ -256,8 +314,8 @@ describe("Processo.vue", () => {
         perfilStore = usePerfilStore();
         processosStore = useProcessosStore();
 
-        perfilStore.$patch({perfilSelecionado: Perfil.GESTOR});
-        processosStore.$patch({processoDetalhe: mockProcesso});
+        perfilStore.$patch({perfilSelecionado: Perfil.GESTOR, unidadeSelecionada: 999});
+        aplicarContextoProcesso();
 
         await nextTick();
         await flushPromises();
@@ -267,8 +325,7 @@ describe("Processo.vue", () => {
 
         const modal = wrapper.findComponent(ModalAcaoBlocoStub);
         expect(modal.exists()).toBe(true);
-        expect(modalSpies.abrir).toHaveBeenCalled();
-        expect(modal.props("titulo")).toBe("Aceitar em Bloco");
+        expect(modal.props("titulo")).toBe("Aceite em bloco");
     });
 
     it("deve executar ação em bloco com sucesso (Aceitar Cadastro)", async () => {
@@ -277,8 +334,8 @@ describe("Processo.vue", () => {
         processosStore = useProcessosStore();
         toastStore = useToastStore();
 
-        perfilStore.$patch({perfilSelecionado: Perfil.GESTOR});
-        processosStore.$patch({processoDetalhe: mockProcesso});
+        perfilStore.$patch({perfilSelecionado: Perfil.GESTOR, unidadeSelecionada: 999});
+        aplicarContextoProcesso();
 
         await nextTick();
         await flushPromises();
@@ -301,8 +358,8 @@ describe("Processo.vue", () => {
         perfilStore = usePerfilStore();
         processosStore = useProcessosStore();
 
-        perfilStore.$patch({perfilSelecionado: Perfil.GESTOR});
-        processosStore.$patch({processoDetalhe: mockProcesso});
+        perfilStore.$patch({perfilSelecionado: Perfil.GESTOR, unidadeSelecionada: 999});
+        aplicarContextoProcesso();
 
         await nextTick();
         await flushPromises();
@@ -315,6 +372,59 @@ describe("Processo.vue", () => {
         await modal.vm.$emit("confirmar", dadosConfirmacao);
 
         expect(processosStore.executarAcaoBloco).toHaveBeenCalledWith('aceitar', [103], undefined);
+        expect(modal.props("titulo")).toBe("Aceite em bloco");
+    });
+
+    it("deve usar textos de CDU-22 quando houver apenas cadastro elegível para aceite", async () => {
+        wrapper = createWrapper();
+        perfilStore = usePerfilStore();
+        processosStore = useProcessosStore();
+
+        perfilStore.$patch({perfilSelecionado: Perfil.GESTOR, unidadeSelecionada: 999});
+        aplicarContextoProcesso(
+            {
+                ...mockProcesso,
+                unidades: [mockProcesso.unidades[0]]
+            },
+            [mockElegiveis[0]]
+        );
+
+        await nextTick();
+        await flushPromises();
+
+        expect(wrapper.find("button.btn-success").text()).toContain("Aceitar cadastro em bloco");
+        await wrapper.find("button.btn-success").trigger("click");
+        expect((wrapper.vm).tituloModalBloco).toBe("Aceite de cadastro em bloco");
+        expect((wrapper.vm).textoModalBloco).toBe("Selecione as unidades cujos cadastros deverão ser aceitos:");
+        expect((wrapper.vm).rotuloBotaoBloco).toBe("Registrar aceite");
+        expect((wrapper.vm).mensagemSucessoAcaoBloco).toBe("Cadastros aceitos em bloco");
+    });
+
+    it("deve usar textos de CDU-25 quando houver apenas validacao elegível para aceite", async () => {
+        wrapper = createWrapper();
+        perfilStore = usePerfilStore();
+        processosStore = useProcessosStore();
+
+        perfilStore.$patch({perfilSelecionado: Perfil.GESTOR, unidadeSelecionada: 999});
+        aplicarContextoProcesso(
+            {
+                ...mockProcesso,
+                unidades: [{
+                    ...mockProcesso.unidades[2]
+                }]
+            },
+            [mockElegiveis[1]]
+        );
+
+        await nextTick();
+        await flushPromises();
+
+        expect(wrapper.find("button.btn-success").text()).toContain("Aceitar mapas em bloco");
+        await wrapper.find("button.btn-success").trigger("click");
+        expect((wrapper.vm).tituloModalBloco).toBe("Aceite de mapas em bloco");
+        expect((wrapper.vm).textoModalBloco).toBe("Selecione as unidades para aceite dos mapas correspondentes");
+        expect((wrapper.vm).rotuloBotaoBloco).toBe("Registrar aceite");
+        expect((wrapper.vm).mensagemSucessoAcaoBloco).toBe("Mapas aceitos em bloco");
     });
 
     it("deve executar ação em bloco com sucesso (Homologar Cadastro)", async () => {
@@ -322,7 +432,7 @@ describe("Processo.vue", () => {
         perfilStore = usePerfilStore();
         processosStore = useProcessosStore();
         perfilStore.$patch({perfilSelecionado: Perfil.ADMIN});
-        processosStore.$patch({processoDetalhe: mockProcesso});
+        aplicarContextoProcesso();
 
         await nextTick();
         await flushPromises();
@@ -334,6 +444,7 @@ describe("Processo.vue", () => {
         await modal.vm.$emit("confirmar", {ids: [101]});
 
         expect(processosStore.executarAcaoBloco).toHaveBeenCalledWith('homologar', [101], undefined);
+        expect(modal.props("titulo")).toBe("Homologação em bloco");
     });
 
     it("deve executar ação em bloco com sucesso (Homologar Validação)", async () => {
@@ -341,7 +452,7 @@ describe("Processo.vue", () => {
         perfilStore = usePerfilStore();
         processosStore = useProcessosStore();
         perfilStore.$patch({perfilSelecionado: Perfil.ADMIN});
-        processosStore.$patch({processoDetalhe: mockProcesso});
+        aplicarContextoProcesso();
 
         await nextTick();
         await flushPromises();
@@ -355,12 +466,70 @@ describe("Processo.vue", () => {
         expect(processosStore.executarAcaoBloco).toHaveBeenCalledWith('homologar', [103], undefined);
     });
 
+    it("deve usar textos de CDU-23 quando houver apenas cadastro elegível para homologacao", async () => {
+        wrapper = createWrapper();
+        perfilStore = usePerfilStore();
+        processosStore = useProcessosStore();
+
+        perfilStore.$patch({perfilSelecionado: Perfil.ADMIN});
+        aplicarContextoProcesso(
+            {
+                ...mockProcesso,
+                unidades: [mockProcesso.unidades[0]]
+            },
+            [mockElegiveis[0]]
+        );
+
+        await nextTick();
+        await flushPromises();
+
+        await wrapper.find("button.btn-warning").trigger("click");
+        expect(wrapper.find("button.btn-warning").text()).toContain("Homologar cadastro em bloco");
+        expect((wrapper.vm).tituloModalBloco).toBe("Homologação de cadastro em bloco");
+        expect((wrapper.vm).textoModalBloco).toBe("Selecione abaixo as unidades cujos cadastros deverão ser homologados:");
+        expect((wrapper.vm).rotuloBotaoBloco).toBe("Homologar");
+        expect((wrapper.vm).mensagemSucessoAcaoBloco).toBe("Cadastros homologados em bloco");
+    });
+
+    it("deve usar textos de CDU-26 quando houver apenas validacao elegível para homologacao", async () => {
+        wrapper = createWrapper();
+        perfilStore = usePerfilStore();
+        processosStore = useProcessosStore();
+        toastStore = useToastStore();
+
+        perfilStore.$patch({perfilSelecionado: Perfil.ADMIN});
+        aplicarContextoProcesso(
+            {
+                ...mockProcesso,
+                unidades: [{
+                    ...mockProcesso.unidades[2]
+                }]
+            },
+            [mockElegiveis[1]]
+        );
+
+        await nextTick();
+        await flushPromises();
+
+        expect(wrapper.find("button.btn-warning").text()).toContain("Homologar mapa de competências em bloco");
+        await wrapper.find("button.btn-warning").trigger("click");
+        expect((wrapper.vm).tituloModalBloco).toBe("Homologação de mapa em bloco");
+        expect((wrapper.vm).textoModalBloco).toBe("Selecione abaixo as unidades cujos mapas deverão ser homologados:");
+        expect((wrapper.vm).rotuloBotaoBloco).toBe("Homologar");
+        expect((wrapper.vm).mensagemSucessoAcaoBloco).toBe("Mapas de competências homologados em bloco");
+
+        const modal = wrapper.findComponent(ModalAcaoBlocoStub);
+        await modal.vm.$emit("confirmar", {ids: [103]});
+        expect(toastStore.setPending).toHaveBeenCalledWith("Mapas de competências homologados em bloco");
+        expect(mocks.push).toHaveBeenCalledWith("/painel");
+    });
+
     it("deve executar ação em bloco com sucesso (Disponibilizar)", async () => {
         wrapper = createWrapper();
         perfilStore = usePerfilStore();
         processosStore = useProcessosStore();
         perfilStore.$patch({perfilSelecionado: Perfil.ADMIN});
-        processosStore.$patch({processoDetalhe: mockProcesso});
+        aplicarContextoProcesso();
 
         await nextTick();
         await flushPromises();
@@ -372,6 +541,8 @@ describe("Processo.vue", () => {
         await modal.vm.$emit("confirmar", {ids: [104], dataLimite: '2024-12-31'});
 
         expect(processosStore.executarAcaoBloco).toHaveBeenCalledWith('disponibilizar', [104], '2024-12-31');
+        expect(wrapper.find("button.btn-info").text()).toContain("Disponibilizar mapas de competência em bloco");
+        expect(modal.props("titulo")).toBe("Disponibilização de mapa em bloco");
     });
 
     it("deve lidar com erro na execução da ação em bloco", async () => {
@@ -379,8 +550,8 @@ describe("Processo.vue", () => {
         perfilStore = usePerfilStore();
         processosStore = useProcessosStore();
 
-        perfilStore.$patch({perfilSelecionado: Perfil.GESTOR});
-        processosStore.$patch({processoDetalhe: mockProcesso});
+        perfilStore.$patch({perfilSelecionado: Perfil.GESTOR, unidadeSelecionada: 999});
+        aplicarContextoProcesso();
 
         await nextTick();
         await flushPromises();
@@ -403,8 +574,8 @@ describe("Processo.vue", () => {
         perfilStore = usePerfilStore();
         processosStore = useProcessosStore();
 
-        perfilStore.$patch({perfilSelecionado: Perfil.GESTOR});
-        processosStore.$patch({processoDetalhe: mockProcesso});
+        perfilStore.$patch({perfilSelecionado: Perfil.GESTOR, unidadeSelecionada: 999});
+        aplicarContextoProcesso();
 
         await nextTick();
         await flushPromises();
@@ -426,8 +597,8 @@ describe("Processo.vue", () => {
         perfilStore = usePerfilStore();
         processosStore = useProcessosStore();
 
-        perfilStore.$patch({perfilSelecionado: Perfil.GESTOR});
-        processosStore.$patch({processoDetalhe: mockProcesso});
+        perfilStore.$patch({perfilSelecionado: Perfil.GESTOR, unidadeSelecionada: 999});
+        aplicarContextoProcesso();
 
         await nextTick();
         await flushPromises();
@@ -443,7 +614,7 @@ describe("Processo.vue", () => {
         processosStore = useProcessosStore();
 
         perfilStore.$patch({perfilSelecionado: Perfil.ADMIN});
-        processosStore.$patch({processoDetalhe: mockProcesso});
+        aplicarContextoProcesso();
 
         await nextTick();
         await flushPromises();
@@ -462,7 +633,7 @@ describe("Processo.vue", () => {
             perfilSelecionado: Perfil.GESTOR,
             perfis: [Perfil.GESTOR]
         });
-        processosStore.$patch({processoDetalhe: mockProcesso});
+        aplicarContextoProcesso();
 
         await nextTick();
         await flushPromises();
@@ -499,7 +670,7 @@ describe("Processo.vue", () => {
             perfilSelecionado: Perfil.SERVIDOR,
             unidadeSelecionada: 999,
         });
-        processosStore.$patch({processoDetalhe: mockProcesso});
+        aplicarContextoProcesso();
 
         await nextTick();
         await flushPromises();
@@ -520,7 +691,7 @@ describe("Processo.vue", () => {
     it("deve abrir modal de finalização de processo", async () => {
         wrapper = createWrapper();
         processosStore = useProcessosStore();
-        processosStore.$patch({processoDetalhe: mockProcesso});
+        aplicarContextoProcesso();
 
         await nextTick();
         await flushPromises();
@@ -536,7 +707,7 @@ describe("Processo.vue", () => {
         processosStore = useProcessosStore();
         toastStore = useToastStore();
 
-        processosStore.$patch({processoDetalhe: mockProcesso});
+        aplicarContextoProcesso();
 
         await nextTick();
         await flushPromises();
@@ -555,7 +726,7 @@ describe("Processo.vue", () => {
         wrapper = createWrapper();
         processosStore = useProcessosStore();
 
-        processosStore.$patch({processoDetalhe: mockProcesso});
+        aplicarContextoProcesso();
 
         // Force error on the spy
         processosStore.finalizarProcesso.mockRejectedValue(new Error("Erro finalização"));
@@ -575,7 +746,7 @@ describe("Processo.vue", () => {
     it("não deve redirecionar se unidade não for clicável", async () => {
         wrapper = createWrapper();
         processosStore = useProcessosStore();
-        processosStore.$patch({processoDetalhe: mockProcesso});
+        aplicarContextoProcesso();
         await flushPromises();
 
         const treeTable = wrapper.findComponent(TreeTableStub);
@@ -587,7 +758,7 @@ describe("Processo.vue", () => {
     it("deve usar mensagem de erro da store ao falhar finalização", async () => {
         wrapper = createWrapper();
         processosStore = useProcessosStore();
-        processosStore.$patch({processoDetalhe: mockProcesso});
+        aplicarContextoProcesso();
 
         await nextTick();
         await flushPromises();
@@ -605,7 +776,7 @@ describe("Processo.vue", () => {
     it("deve cobrir default cases nos switches de useProcessoView", async () => {
         wrapper = createWrapper();
         processosStore = useProcessosStore();
-        processosStore.$patch({processoDetalhe: mockProcesso});
+        aplicarContextoProcesso();
         await flushPromises();
 
         // Acessamos as computeds via wrapper.vm
@@ -624,16 +795,37 @@ describe("Processo.vue", () => {
             unidades: [{
                 codUnidade: 201,
                 sigla: "PAI",
+                nome: "Unidade Pai",
                 situacaoSubprocesso: SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO,
+                localizacaoAtualCodigo: 999,
+                codSubprocesso: 2001,
                 filhos: [{
                     codUnidade: 202,
                     sigla: "FILHO",
+                    nome: "Unidade Filho",
                     situacaoSubprocesso: SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO,
+                    localizacaoAtualCodigo: 999,
+                    codSubprocesso: 2002,
                     filhos: []
                 }]
             }]
         };
-        processosStore.$patch({processoDetalhe: processoComFilhos});
+        aplicarContextoProcesso(processoComFilhos, [
+            {
+                codigo: 2001,
+                unidadeCodigo: 201,
+                unidadeSigla: "PAI",
+                unidadeNome: "Unidade Pai",
+                situacao: SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO,
+            },
+            {
+                codigo: 2002,
+                unidadeCodigo: 202,
+                unidadeSigla: "FILHO",
+                unidadeNome: "Unidade Filho",
+                situacao: SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO,
+            }
+        ]);
 
         (wrapper.vm).acaoBlocoAtual = 'disponibilizar';
         await nextTick();

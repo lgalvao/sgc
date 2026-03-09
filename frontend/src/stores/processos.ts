@@ -9,6 +9,7 @@ import type {
     ProcessoResumo,
     SubprocessoElegivel,
     TipoProcesso,
+    UnidadeImportacao,
 } from "@/types/tipos";
 import {useErrorHandler} from "@/composables/useErrorHandler";
 import * as processoService from "@/services/processoService";
@@ -59,6 +60,12 @@ export const useProcessosStore = defineStore("processos", () => {
     async function buscarProcessosParaImportacao() {
         return withErrorHandling(async () => {
             processosParaImportacao.value = await processoService.buscarProcessosParaImportacao();
+        });
+    }
+
+    async function buscarUnidadesParaImportacao(codigoProcesso: number): Promise<UnidadeImportacao[]> {
+        return withErrorHandling(async () => {
+            return await processoService.buscarUnidadesParaImportacao(codigoProcesso);
         });
     }
 
@@ -225,6 +232,7 @@ export const useProcessosStore = defineStore("processos", () => {
         buscarProcessosPainel,
         buscarProcessosFinalizados,
         buscarProcessosParaImportacao,
+        buscarUnidadesParaImportacao,
         buscarProcessoDetalhe,
         criarProcesso,
         atualizarProcesso,

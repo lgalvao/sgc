@@ -27,10 +27,16 @@ class ProcessoDetalheBuilderTest {
     private SubprocessoRepo subprocessoRepo;
 
     @Mock
+    private MovimentacaoRepo movimentacaoRepo;
+
+    @Mock
     private SgcPermissionEvaluator permissionEvaluator;
 
     @Mock
     private SubprocessoValidacaoService subprocessoValidacaoService;
+
+    @Mock
+    private UnidadeRepo unidadeRepo;
 
     @InjectMocks
     private ProcessoDetalheBuilder builder;
@@ -46,6 +52,8 @@ class ProcessoDetalheBuilderTest {
     private Usuario criarUsuarioMock() {
         Usuario usuario = new Usuario();
         usuario.setTituloEleitoral("12345678901");
+        usuario.setPerfilAtivo(Perfil.ADMIN);
+        usuario.setUnidadeAtivaCodigo(1L);
         return usuario;
     }
 
@@ -74,6 +82,7 @@ class ProcessoDetalheBuilderTest {
         sp.setMapa(new Mapa());
 
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(List.of(sp));
+        when(movimentacaoRepo.findFirstBySubprocessoCodigoOrderByDataHoraDesc(100L)).thenReturn(Optional.empty());
 
         ProcessoDetalheDto dto = builder.build(processo, usuario);
 
@@ -186,18 +195,21 @@ class ProcessoDetalheBuilderTest {
         processo.adicionarParticipantes(Set.of(pai, filho));
 
         Subprocesso spPai = new Subprocesso();
+        spPai.setCodigo(100L);
         spPai.setUnidade(pai);
         spPai.setSituacaoForcada(SituacaoSubprocesso.NAO_INICIADO);
         spPai.setMapa(new Mapa());
         spPai.getMapa().setCodigo(100L);
 
         Subprocesso spFilho = new Subprocesso();
+        spFilho.setCodigo(101L);
         spFilho.setUnidade(filho);
         spFilho.setSituacaoForcada(SituacaoSubprocesso.NAO_INICIADO);
         spFilho.setMapa(new Mapa());
         spFilho.getMapa().setCodigo(101L);
 
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(List.of(spPai, spFilho));
+        when(movimentacaoRepo.findFirstBySubprocessoCodigoOrderByDataHoraDesc(anyLong())).thenReturn(Optional.empty());
 
         ProcessoDetalheDto dto = builder.build(processo, usuario);
 
@@ -287,6 +299,7 @@ class ProcessoDetalheBuilderTest {
         sp.setMapa(null); // Mapa nulo
 
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(List.of(sp));
+        when(movimentacaoRepo.findFirstBySubprocessoCodigoOrderByDataHoraDesc(100L)).thenReturn(Optional.empty());
 
         ProcessoDetalheDto dto = builder.build(processo, usuario);
 
@@ -318,6 +331,37 @@ class ProcessoDetalheBuilderTest {
         ProcessoDetalheDto dto = builder.build(processo, usuario);
 
         assertThat(dto.getUnidades()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("Deve limitar visualização do gestor à sua unidade e subordinadas participantes")
+    void deveLimitarVisualizacaoDoGestorASuaUnidadeESubordinadasParticipantes() {
+
+        Usuario usuario = criarUsuarioMock();
+        usuario.setPerfilAtivo(Perfil.GESTOR);
+        usuario.setUnidadeAtivaCodigo(2L);
+
+        Processo processo = new Processo();
+        processo.setCodigo(1L);
+        processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+        processo.setTipo(TipoProcesso.MAPEAMENTO);
+
+        Unidade raiz = criarUnidade(1L, "RAIZ", "Raiz");
+        Unidade gestor = criarUnidade(2L, "GEST", "Gestor");
+        gestor.setUnidadeSuperior(raiz);
+        Unidade subordinada = criarUnidade(3L, "SUB", "Subordinada");
+        subordinada.setUnidadeSuperior(gestor);
+        Unidade outra = criarUnidade(4L, "OUT", "Outra");
+        outra.setUnidadeSuperior(raiz);
+
+        processo.adicionarParticipantes(Set.of(subordinada, outra));
+        when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(raiz, gestor, subordinada, outra));
+        when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(Collections.emptyList());
+
+        ProcessoDetalheDto dto = builder.build(processo, usuario);
+
+        assertThat(dto.getUnidades()).hasSize(1);
+        assertThat(dto.getUnidades().getFirst().getSigla()).isEqualTo("SUB");
     }
 
     @Test

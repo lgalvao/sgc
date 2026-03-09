@@ -144,7 +144,7 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
 
-        const btnHomologar = page.getByRole('button', {name: /^Homologar em bloco$/i}).first();
+        const btnHomologar = page.getByRole('button', {name: /^Homologar mapa de competências em bloco$/i}).first();
         await expect(btnHomologar).toBeVisible();
         await expect(btnHomologar).toBeEnabled();
     });
@@ -152,16 +152,17 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
     test('Cenario 2: ADMIN abre modal de homologação de mapa em bloco', async ({page, autenticadoComoAdmin}) => {
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
 
-        const btnHomologar = page.getByRole('button', {name: /^Homologar em bloco$/i}).first();
+        const btnHomologar = page.getByRole('button', {name: /^Homologar mapa de competências em bloco$/i}).first();
         await expect(btnHomologar).toBeVisible();
         await btnHomologar.click();
 
         const modal = page.getByRole('dialog');
         await expect(modal).toBeVisible();
-        await expect(modal.getByText(/Homologar/i).first()).toBeVisible();
+        await expect(modal.getByText(/Homologação de mapa em bloco/i)).toBeVisible();
+        await expect(modal.getByText(/Selecione abaixo as unidades cujos mapas deverão ser homologados/i)).toBeVisible();
         await expect(modal.locator('table')).toBeVisible();
         await expect(modal.getByRole('button', {name: /Cancelar/i})).toBeVisible();
-        await expect(modal.getByRole('button', {name: /Homologar/i})).toBeVisible();
+        await expect(modal.getByRole('button', {name: /^Homologar$/i})).toBeVisible();
 
         await modal.getByRole('button', {name: /Cancelar/i}).click();
     });
@@ -169,7 +170,7 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
     test('Cenario 3: Cancelar homologação de mapa em bloco', async ({page, autenticadoComoAdmin}) => {
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
 
-        const btnHomologar = page.getByRole('button', {name: /^Homologar em bloco$/i}).first();
+        const btnHomologar = page.getByRole('button', {name: /^Homologar mapa de competências em bloco$/i}).first();
         await expect(btnHomologar).toBeVisible();
         await btnHomologar.click();
 

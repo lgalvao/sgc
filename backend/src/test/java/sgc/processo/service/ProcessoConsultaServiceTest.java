@@ -131,7 +131,7 @@ class ProcessoConsultaServiceTest {
     }
 
     @Test
-    @DisplayName("Deve listar subprocessos para Usuário Comum por Unidade")
+    @DisplayName("Deve listar subprocessos para gestor pela subarvore de unidades")
     void deveListarParaUsuarioComum() {
         Usuario user = Usuario.builder()
                 .tituloEleitoral("user")
@@ -146,7 +146,9 @@ class ProcessoConsultaServiceTest {
         Subprocesso s1 = Subprocesso.builder().situacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO).unidade(u1).build();
         s1.setCodigo(1L);
 
-        when(subprocessoService.listarPorProcessoUnidadeESituacoes(eq(1L), eq(100L), anyList())).thenReturn(List.of(s1));
+        when(processoValidacaoService.buscarCodigosDescendentes(100L)).thenReturn(List.of(100L, 101L));
+        when(subprocessoService.listarPorProcessoEUnidadeCodigosESituacoes(eq(1L), eq(List.of(100L, 101L)), anyList()))
+                .thenReturn(List.of(s1));
 
         List<SubprocessoElegivelDto> res = processoConsultaService.subprocessosElegiveis(1L);
 

@@ -177,9 +177,21 @@ export async function selecionarAtividadesParaImportacao(page: Page, processoOri
     await expect(modal.getByText('Importação de atividades')).toBeVisible();
 
     await modal.getByTestId('select-processo').selectOption({ label: processoOrigemDescricao });
-    await expect(modal.getByTestId('select-unidade')).toBeEnabled();
+    const selectUnidade = modal.getByTestId('select-unidade');
+    await expect(selectUnidade).toBeEnabled();
 
-    await modal.getByTestId('select-unidade').selectOption({ label: unidadeOrigemSigla });
+    const valorOpcaoUnidade = await expect.poll(async () => {
+        return await selectUnidade.locator('option').evaluateAll((options, sigla) => {
+            const opcao = options.find(option => option.textContent?.includes(sigla as string));
+            return opcao?.getAttribute('value') ?? null;
+        }, unidadeOrigemSigla);
+    }, { timeout: 10000 }).not.toBeNull();
+
+    await selectUnidade.evaluate((elemento, valor) => {
+        const select = elemento as HTMLSelectElement;
+        select.value = String(valor);
+        select.dispatchEvent(new Event('change', { bubbles: true }));
+    }, valorOpcaoUnidade);
 
     for (const desc of atividadesDescricoes) {
         await modal.getByText(desc, { exact: true }).check();

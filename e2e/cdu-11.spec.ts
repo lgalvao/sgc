@@ -1,7 +1,7 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {
-    criarProcessoFinalizadoFixture,
-    criarProcessoFixture
+    criarProcessoCadastroDisponibilizadoFixture,
+    criarProcessoFinalizadoFixture
 } from './fixtures/fixtures-processos.js';
 import {navegarParaAtividadesVisualizacao} from './helpers/helpers-atividades.js';
 import {navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
@@ -11,10 +11,10 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
     test.describe('Em Processo em Andamento', () => {
         const UNIDADE_ALVO = 'SECAO_111';
         const timestamp = Date.now();
-        const descProcesso = `Processo Finalizado CDU-11 ${timestamp}`;
+        const descProcesso = `Processo Em Andamento CDU-11 ${timestamp}`;
 
         test('Setup Data', async ({request}) => {
-            await criarProcessoFinalizadoFixture(request, {
+            await criarProcessoCadastroDisponibilizadoFixture(request, {
                 unidade: UNIDADE_ALVO,
                 descricao: descProcesso
             });
@@ -40,6 +40,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
 
             // 6. Verificação dos dados
             await expect(page.locator('.unidade-sigla').getByText(UNIDADE_ALVO)).toBeVisible();
+            await expect(page.locator('.unidade-nome')).toContainText(/\S+/);
             await expect(page.getByText(/Atividade Fixture/)).toBeVisible();
             await expect(page.getByText(/Conhecimento Fixture/)).toBeVisible();
         });
@@ -56,19 +57,20 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
 
             // 6. Verificação dos dados
             await expect(page.locator('.unidade-sigla').getByText(UNIDADE_ALVO)).toBeVisible();
+            await expect(page.locator('.unidade-nome')).toContainText(/\S+/);
             await expect(page.getByText(/Atividade Fixture/)).toBeVisible();
+            await expect(page.getByText(/Conhecimento Fixture/)).toBeVisible();
         });
     });
 
     test.describe('Em Processo Finalizado', () => {
-        const UNIDADE_ALVO = 'SECAO_111';
+        const UNIDADE_ALVO = 'SECAO_112';
         const timestamp = Date.now();
         const descProcesso = `Processo Mapeamento CDU-11 ${timestamp}`;
 
         test('Setup Data', async ({request}) => {
-            await criarProcessoFixture(request, {
+            await criarProcessoFinalizadoFixture(request, {
                 unidade: UNIDADE_ALVO,
-                iniciar: true,
                 descricao: descProcesso
             });
             expect(true).toBeTruthy();
@@ -85,7 +87,9 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
 
             // 6. Verificação
             await expect(page.locator('.unidade-sigla').getByText(UNIDADE_ALVO)).toBeVisible();
+            await expect(page.locator('.unidade-nome')).toContainText(/\S+/);
             await expect(page.getByText(/Atividade Origem/).first()).toBeVisible();
+            await expect(page.getByText(/Conhecimento [AB]/).first()).toBeVisible();
         });
     });
 });

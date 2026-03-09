@@ -6,6 +6,7 @@ import {criarProcessoFinalizadoFixture, criarProcessoFixture} from './fixtures/f
 
 test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
     const UNIDADE_ALVO = 'ASSESSORIA_11';
+    const UNIDADE_ORIGEM = 'SECRETARIA_1';
     const CHEFE_UNIDADE = USUARIOS.CHEFE_ASSESSORIA_11.titulo;
     const SENHA_CHEFE = USUARIOS.CHEFE_ASSESSORIA_11.senha;
 
@@ -24,7 +25,7 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
             
             // Criar Processo Finalizado via Fixture (para importação)
             const procOrigem = await criarProcessoFinalizadoFixture(request, {
-                unidade: 'SECRETARIA_1',
+                unidade: UNIDADE_ORIGEM,
                 descricao: processoOrigemDescricao
             });
             processoOrigemId = procOrigem.codigo;
@@ -52,10 +53,10 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
             const atividadeB = `Atividade Origem B - ${processoOrigemId}`;
             
             // Importar ambas as atividades com sucesso
-            await AtividadeHelpers.importarAtividades(page, processoOrigemDescricao, 'SECRETARIA_1', [atividadeA, atividadeB]);
+            await AtividadeHelpers.importarAtividades(page, processoOrigemDescricao, UNIDADE_ORIGEM, [atividadeA, atividadeB]);
 
             // Tentar importar de novo e esperar o erro (Fluxo Negativo / Regra de Duplicidade)
-            await AtividadeHelpers.importarAtividadesComErroDuplicidade(page, processoOrigemDescricao, 'SECRETARIA_1', [atividadeA]);
+            await AtividadeHelpers.importarAtividadesComErroDuplicidade(page, processoOrigemDescricao, UNIDADE_ORIGEM, [atividadeA]);
         });
 
         const atividadeManual = `Atividade Manual ${timestamp}`;

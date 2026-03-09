@@ -93,6 +93,14 @@ public class ProcessoController {
         return ResponseEntity.ok(processoFacade.listarParaImportacao());
     }
 
+    @GetMapping("/{codigo}/unidades-importacao")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Lista todas as unidades participantes de um processo finalizado para importação")
+    public ResponseEntity<List<ProcessoDetalheDto.UnidadeParticipanteDto>> listarUnidadesParaImportacao(
+            @PathVariable Long codigo) {
+        return ResponseEntity.ok(processoFacade.listarUnidadesParaImportacao(codigo));
+    }
+
     @GetMapping("/ativos")
     @Operation(summary = "Lista todos os processos com situação EM_ANDAMENTO")
     @JsonView(ProcessoViews.Publica.class)

@@ -102,6 +102,31 @@ public class ProcessoFacade {
     }
 
     @Transactional(readOnly = true)
+    public List<ProcessoDetalheDto.UnidadeParticipanteDto> listarUnidadesParaImportacao(Long codProcesso) {
+        Processo processo = processoConsultaService.buscarProcessoComParticipantes(codProcesso);
+        if (processo.getSituacao() != SituacaoProcesso.FINALIZADO) {
+            throw new ErroValidacao("A importação de atividades só permite usar processos finalizados.");
+        }
+
+        return subprocessoService.listarEntidadesPorProcessoEUnidades(codProcesso, processo.getCodigosParticipantes())
+                .stream()
+                .map(subprocesso -> {
+                    ProcessoDetalheDto.UnidadeParticipanteDto dto =
+                            ProcessoDetalheDto.UnidadeParticipanteDto.fromUnidade(subprocesso.getUnidade());
+                    dto.setCodSubprocesso(subprocesso.getCodigo());
+                    dto.setSituacaoSubprocesso(subprocesso.getSituacao());
+                    dto.setDataLimite(subprocesso.getDataLimiteEtapa1());
+                    dto.setMapaCodigo(subprocesso.getMapa() != null ? subprocesso.getMapa().getCodigo() : null);
+                    dto.setLocalizacaoAtualCodigo(subprocesso.getLocalizacaoAtual() != null
+                            ? subprocesso.getLocalizacaoAtual().getCodigo()
+                            : null);
+                    return dto;
+                })
+                .sorted(Comparator.comparing(ProcessoDetalheDto.UnidadeParticipanteDto::getSigla))
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
     public List<Processo> listarAtivos() {
         return processoConsultaService.processosAndamento();
     }
@@ -153,6 +178,7 @@ public class ProcessoFacade {
     public void executarAcaoEmBloco(Long codProcesso, AcaoEmBlocoRequest req) {
         Usuario usuario = usuarioService.usuarioAutenticado();
         List<Subprocesso> subprocessos = subprocessoService.listarEntidadesPorProcessoEUnidades(codProcesso, req.unidadeCodigos());
+        validarSelecaoAcoesEmBloco(req.unidadeCodigos(), subprocessos);
 
         if (req.acao() == DISPONIBILIZAR) {
             if (!permissionEvaluator.checkPermission(usuario, subprocessos, "DISPONIBILIZAR_MAPA")) {
@@ -168,6 +194,21 @@ public class ProcessoFacade {
         }
 
         processarAcoesAceiteHomologacao(req, usuario, subprocessos);
+    }
+
+    private void validarSelecaoAcoesEmBloco(List<Long> unidadesSelecionadas, List<Subprocesso> subprocessos) {
+        Set<Long> unidadesSolicitadas = new HashSet<>(unidadesSelecionadas);
+        Set<Long> unidadesEncontradas = subprocessos.stream()
+                .map(sp -> sp.getUnidade().getCodigo())
+                .collect(HashSet::new, HashSet::add, HashSet::addAll);
+
+        if (unidadesSolicitadas.isEmpty()) {
+            throw new ErroValidacao("Selecione ao menos uma unidade para executar a ação em bloco.");
+        }
+
+        if (!unidadesEncontradas.equals(unidadesSolicitadas)) {
+            throw new ErroValidacao("Há unidades selecionadas que não pertencem ao processo ou não estão disponíveis para a ação em bloco.");
+        }
     }
 
     private void processarAcoesAceiteHomologacao(AcaoEmBlocoRequest req, Usuario usuario, List<Subprocesso> subprocessos) {
@@ -222,6 +263,7 @@ public class ProcessoFacade {
     private void categorizarPorAcao(AcaoEmBlocoRequest req, Subprocesso sp,
                                     List<Long> idsAceitarCad, List<Long> idsAceitarVal,
                                     List<Long> idsHomolCad, List<Long> idsHomolVal) {
+
         Long codId = sp.getCodigo();
         boolean isCadastro = isSituacaoCadastro(sp.getSituacao());
 
@@ -246,18 +288,17 @@ public class ProcessoFacade {
                                     List<Long> idsHomologarCadastro,
                                     List<Long> idsHomologarValidacao) {
 
-        if (!idsAceitarCadastro.isEmpty()) {
+        if (!idsAceitarCadastro.isEmpty())
             transicaoService.aceitarCadastroEmBloco(idsAceitarCadastro, usuario);
-        }
-        if (!idsAceitarValidacao.isEmpty()) {
+
+        if (!idsAceitarValidacao.isEmpty())
             transicaoService.aceitarValidacaoEmBloco(idsAceitarValidacao, usuario);
-        }
-        if (!idsHomologarCadastro.isEmpty()) {
+
+        if (!idsHomologarCadastro.isEmpty())
             transicaoService.homologarCadastroEmBloco(idsHomologarCadastro, usuario);
-        }
-        if (!idsHomologarValidacao.isEmpty()) {
+
+        if (!idsHomologarValidacao.isEmpty())
             transicaoService.homologarValidacaoEmBloco(idsHomologarValidacao, usuario);
-        }
     }
 
     private boolean isSituacaoCadastro(SituacaoSubprocesso situacao) {

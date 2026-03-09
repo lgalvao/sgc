@@ -131,6 +131,13 @@ public class SubprocessoController {
         return ResponseEntity.ok(subprocessoService.obterContextoEdicao(id));
     }
 
+    @GetMapping("/{id}/atividades-importacao")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Lista atividades de um subprocesso fonte para importação")
+    public ResponseEntity<List<AtividadeDto>> listarAtividadesParaImportacao(@PathVariable Long id) {
+        return ResponseEntity.ok(subprocessoService.listarAtividadesParaImportacao(id));
+    }
+
     @GetMapping("/{id}/validar-cadastro")
     @PreAuthorize("hasPermission(#id, 'Subprocesso', 'VISUALIZAR_SUBPROCESSO')")
     @Operation(summary = "Valida se o cadastro está pronto para disponibilização")
