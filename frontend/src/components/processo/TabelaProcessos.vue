@@ -49,18 +49,20 @@ const fields = computed(() => {
   return baseFields;
 });
 
-const internalSortBy = computed({
-  get: () => [{key: props.criterioOrdenacao, order: (props.direcaoOrdenacaoAsc ? 'asc' : 'desc') as any}],
-  set: (val: any) => {
-    const sortBy = Array.isArray(val) ? val[0] : val;
-    if (sortBy?.key) {
+const internalSortBy = computed(() => [{
+  key: props.criterioOrdenacao,
+  order: (props.direcaoOrdenacaoAsc ? 'asc' : 'desc') as any
+}]);
+
+function handleSortChange(val: any) {
+  const sortBy = Array.isArray(val) ? val[0] : val;
+  if (sortBy?.key) {
+    // Só emite se for realmente diferente do estado atual vindo das props
+    if (sortBy.key !== props.criterioOrdenacao || (sortBy.order === 'asc') !== props.direcaoOrdenacaoAsc) {
       emit("ordenar", sortBy.key);
-    } else {
-      // Se val for vazio (estado 'none'), forçamos a alternância no critério atual
-      emit("ordenar", props.criterioOrdenacao);
     }
   }
-});
+}
 
 function handleSelecionarProcesso(processo: any) {
   const item = processo?.item || processo;
@@ -74,6 +76,7 @@ function rowClass(item: ProcessoResumo | null, type: string) {
 function rowAttr(item: ProcessoResumo | null, type: string) {
   if (item && type === 'row') {
     return {
+      'data-testid': `row-processo-${item.codigo}`,
       tabindex: "0",
       style: {cursor: "pointer"},
       onKeydown: (e: KeyboardEvent) => {
@@ -94,9 +97,9 @@ defineExpose({fields});
 <template>
   <div class="table-responsive">
     <BTable
-        v-model:sort-by="internalSortBy"
         :fields="fields"
         :items="processos"
+        :sort-by="internalSortBy"
         :tbody-tr-attrs="rowAttr"
         :tbody-tr-class="rowClass"
         aria-label="Lista de processos cadastrados"
@@ -106,6 +109,7 @@ defineExpose({fields});
         show-empty
         stacked="md"
         @row-clicked="handleSelecionarProcesso"
+        @update:sort-by="handleSortChange"
     >
 
       <template #empty>

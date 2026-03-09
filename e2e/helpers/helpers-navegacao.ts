@@ -129,7 +129,7 @@ export async function navegarParaSubprocesso(
     const tabela = page.getByTestId('tbl-tree');
     await expect(tabela).toBeVisible();
 
-    const celula = tabela.getByRole('cell', {name: siglaUnidade}).first();
+    const celula = tabela.getByRole('cell', {name: new RegExp(`^${siglaUnidade}\\b`)}).first();
     await expect(celula).toBeVisible();
     await celula.click();
 

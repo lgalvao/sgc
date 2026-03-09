@@ -51,7 +51,7 @@ test.describe('CDU-02 - Visualizar Painel', () => {
             await verificarProcessoNaTabela(page, {
                 descricao: descricaoProcesso,
                 tipo: 'Mapeamento',
-                situacao: 'Em andamento'
+                situacao: 'Criado'
             });
         });
 

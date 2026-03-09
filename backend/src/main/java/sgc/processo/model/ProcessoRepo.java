@@ -36,18 +36,12 @@ public interface ProcessoRepo extends JpaRepository<Processo, Long> {
      * Busca processos onde as unidades participantes incluem as unidades especificadas
      * e o processo não está na situação especificada.
      */
-    @Query(value = """
+    @Query("""
             SELECT DISTINCT p FROM Processo p
             JOIN p.participantes up
             WHERE up.id.unidadeCodigo IN :codigos
             AND p.situacao <> :situacao
-            """,
-            countQuery = """
-                    SELECT COUNT(DISTINCT p) FROM Processo p
-                    JOIN p.participantes up
-                    WHERE up.id.unidadeCodigo IN :codigos
-                    AND p.situacao <> :situacao
-                    """)
+            """)
     Page<Processo> findDistinctByParticipantes_IdUnidadeCodigoInAndSituacaoNot(
             @Param("codigos") List<Long> codigos,
             @Param("situacao") SituacaoProcesso situacao,

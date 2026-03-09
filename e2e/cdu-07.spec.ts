@@ -59,7 +59,7 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
         await login(page, GESTOR_UNIDADE, SENHA_GESTOR);
         await page.getByTestId('tbl-processos').getByText(descricao, {exact: true}).first().click();
         await expect(page).toHaveURL(/\/processo\/\d+$/);
-        await expect(page.getByRole('row').filter({has: page.getByRole('cell', {name: UNIDADE_ALVO})})).toBeVisible();
+        await expect(page.getByRole('row').filter({has: page.getByRole('cell', {name: new RegExp(`^${UNIDADE_ALVO}\\b`)})})).toBeVisible();
         await navegarParaSubprocesso(page, UNIDADE_ALVO);
         
         // Para GESTOR (antes da disponibilização), cards desabilitados

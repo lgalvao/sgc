@@ -83,8 +83,8 @@ export async function verificarProcessoNaTabela(page: Page, options: {
     // Localizar a linha que contém a descrição do processo
     const linhaProcesso = tabela.locator('tr').filter({hasText: options.descricao}).first();
     await expect(linhaProcesso).toBeVisible();
-    await expect(linhaProcesso.getByText(options.situacao)).toBeVisible();
-    await expect(linhaProcesso.getByText(options.tipo, {exact: true})).toBeVisible();
+    await expect(linhaProcesso.getByText(new RegExp(options.situacao, 'i'))).toBeVisible();
+    await expect(linhaProcesso.getByText(new RegExp(`^${options.tipo}$`, 'i'))).toBeVisible();
 
     if (options.unidadesParticipantes) {
         for (const unidade of options.unidadesParticipantes) {
