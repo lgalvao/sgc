@@ -28,9 +28,3 @@ Migrar para uma estratégia de **Salto de Estado**:
 2. **Foco no Teste**: O teste de UI deve focar exclusivamente na funcionalidade alvo daquele passo (ex: testar apenas a tela de Homologação, assumindo que o processo já "nasceu" pronto para ser homologado).
 3. **Resultado**: Testes mais curtos, independentes, paralelizáveis e muito menos suscetíveis a falhas em cascata (*Flakiness*).
 
----
-
-## Histórico de Conclusões
-- [X] **Estratégia de Reset Híbrido**: Implementado `resetDatabase` automático por teste (normal) e por arquivo (serial).
-- [X] **Limpeza Técnica**: Removidas variáveis `processoId` e imports de `cleanupAutomatico` em toda a suíte.
-- [X] **Saneamento do Linter**: Suíte com zero avisos/erros de ESLint.
