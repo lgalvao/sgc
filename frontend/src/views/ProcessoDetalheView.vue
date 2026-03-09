@@ -128,17 +128,6 @@ import {logger} from "@/utils";
 
 type ContextoBloco = "cadastro" | "validacao" | "misto";
 
-function flattenUnidades(unidades: any[]): any[] {
-  let result: any[] = [];
-  for (const u of unidades) {
-    result.push(u);
-    if (u.filhos && u.filhos.length > 0) {
-      result = result.concat(flattenUnidades(u.filhos));
-    }
-  }
-  return result;
-}
-
 const route = useRoute();
 const router = useRouter();
 const processosStore = useProcessosStore();
