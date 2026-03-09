@@ -33,11 +33,7 @@ import sgc.mapa.model.MapaRepo;
 import sgc.organizacao.model.UnidadeRepo;
 import sgc.organizacao.model.UsuarioRepo;
 
-import java.time.LocalDateTime;
-
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest(classes = Sgc.class)
@@ -318,8 +314,6 @@ class SubprocessoTransicaoServiceCoverageIntegrationTest {
             sp.setMapa(mapa);
             subprocessoRepo.saveAndFlush(sp);
 
-            // Atividade mock to pass logic validation
-            sgc.mapa.model.Atividade mockAtiv = new sgc.mapa.model.Atividade();
             when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(mapa.getCodigo()))
                     .thenReturn(java.util.List.of());
 

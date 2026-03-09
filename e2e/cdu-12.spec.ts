@@ -14,7 +14,6 @@ import {
     verificarBotaoImpactoDropdown
 } from './helpers/helpers-atividades.js';
 import {acessarSubprocessoChefeDireto, acessarSubprocessoGestor} from './helpers/helpers-analise.js';
-import { login } from './helpers/helpers-auth.js';
 
 test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () => {
     const UNIDADE_ALVO = 'SECAO_121';

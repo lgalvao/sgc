@@ -10,7 +10,6 @@ import sgc.mapa.model.Competencia;
 import sgc.mapa.model.Conhecimento;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.service.MapaManutencaoService;
-import sgc.subprocesso.dto.ValidacaoCadastroDto;
 import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.SubprocessoRepo;
@@ -18,7 +17,6 @@ import sgc.subprocesso.model.SubprocessoRepo;
 import java.util.List;
 import java.util.Set;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 

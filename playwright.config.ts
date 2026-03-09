@@ -1,8 +1,12 @@
 // noinspection JSUnusedGlobalSymbols
 
+if (process.env.NO_COLOR) {
+    delete process.env.NO_COLOR;
+}
+
 import {defineConfig, devices} from '@playwright/test';
 
-const workers = Number.parseInt(process.env.E2E_WORKERS || '1', 10);
+const workers = 1;
 const frontendPort = Number.parseInt(process.env.E2E_FRONTEND_PORT || '5173', 10);
 
 export default defineConfig({
@@ -17,7 +21,7 @@ export default defineConfig({
         screenshot: 'only-on-failure'
     },
     webServer: {
-        command: `env -u NO_COLOR WORKER_COUNT=${workers} node e2e/lifecycle.js`,
+        command: `node e2e/lifecycle.js`,
         url: `http://localhost:${frontendPort}`,
         reuseExistingServer: true,
         timeout: 120 * 1000,

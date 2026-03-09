@@ -12,7 +12,7 @@ const __dirname = path.dirname(__filename);
 const BACKEND_DIR = path.resolve(__dirname, '../backend');
 const FRONTEND_DIR = path.resolve(__dirname, '../frontend');
 
-const WORKER_COUNT = Number.parseInt(process.env.WORKER_COUNT || '1', 10);
+const WORKER_COUNT = 1;
 const BACKEND_BASE_PORT = Number.parseInt(process.env.E2E_BACKEND_BASE_PORT || '10000', 10);
 const FRONTEND_PORT = Number.parseInt(process.env.E2E_FRONTEND_PORT || '5173', 10);
 const SMTP_PORT = Number.parseInt(process.env.E2E_SMTP_PORT || '1025', 10);
@@ -145,15 +145,15 @@ function normalizarEnv(baseEnv = process.env) {
     return env;
 }
 
-function portaBackend(workerIndex) {
-    return BACKEND_BASE_PORT + workerIndex;
+function portaBackend() {
+    return BACKEND_BASE_PORT;
 }
 
-function dbUrl(workerIndex) {
-    return `jdbc:h2:mem:${DB_NAME_PREFIX}${workerIndex};DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE`;
+function dbUrl() {
+    return `jdbc:h2:mem:${DB_NAME_PREFIX};DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE`;
 }
 
-function startBackend(workerIndex) {
+function startBackend() {
     if (!isWindows) {
         fs.chmodSync(path.join(BACKEND_DIR, 'gradlew'), '755');
     }
@@ -161,10 +161,10 @@ function startBackend(workerIndex) {
     const gradlewExecutable = isWindows ? 'gradlew.bat' : './gradlew';
     const gradlewPath = path.resolve(BACKEND_DIR, `../${gradlewExecutable}`);
 
-    const backendPort = portaBackend(workerIndex);
+    const backendPort = portaBackend();
     const argsAplicacao = [
         `--server.port=${backendPort}`,
-        `--spring.datasource.url=${dbUrl(workerIndex)}`,
+        `--spring.datasource.url=${dbUrl()}`,
         `--CORS_ALLOWED_ORIGINS=http://localhost:${FRONTEND_PORT},http://localhost:4173`
     ].join(' ');
 
@@ -175,15 +175,15 @@ function startBackend(workerIndex) {
         env: normalizarEnv()
     };
 
-    const backendProcess = spawn(gradlewPath, ['bootRun', '-PENV=e2e', `--args=${argsAplicacao}`], spawnOptions);
+    const backendProcess = spawn(gradlewPath, ['bootRun', '-PENV=e2e', `--args="${argsAplicacao}"`], spawnOptions);
     backendProcessos.push(backendProcess);
 
-    backendProcess.stdout.on('data', data => log(`BACKEND-${workerIndex}`, data));
-    backendProcess.stderr.on('data', data => log(`BACKEND_ERR-${workerIndex}`, data));
+    backendProcess.stdout.on('data', data => log(`BACKEND`, data));
+    backendProcess.stderr.on('data', data => log(`BACKEND_ERR`, data));
 
     backendProcess.on('exit', code => {
         if (code !== 0 && code !== null) {
-            lifecycleLogger.error(`Backend w${workerIndex} saiu com código ${code}`);
+            lifecycleLogger.error(`Backend saiu com código ${code}`);
             process.exit(code);
         }
     });
@@ -199,7 +199,7 @@ function startFrontend() {
         env: {
             ...normalizarEnv(),
             E2E_BACKEND_BASE_PORT: String(BACKEND_BASE_PORT),
-            E2E_WORKER_COUNT: String(WORKER_COUNT)
+            E2E_WORKER_COUNT: '1'
         }
     };
 
@@ -296,12 +296,8 @@ function checkHttpHealth(url, expectedMin, expectedMax) {
 }
 
 async function subirBackends() {
-    for (let i = 0; i < WORKER_COUNT; i++) {
-        startBackend(i);
-    }
-    for (let i = 0; i < WORKER_COUNT; i++) {
-        await checkHttpHealth(`http://localhost:${portaBackend(i)}/`, 200, 500);
-    }
+    startBackend();
+    await checkHttpHealth(`http://localhost:${portaBackend()}/`, 200, 500);
 }
 
 async function subirFrontend() {
@@ -315,12 +311,7 @@ async function subirInfra() {
 }
 
 function descreverBackends() {
-    if (WORKER_COUNT === 1) {
-        return `Backend: ${BACKEND_BASE_PORT}`;
-    }
-
-    const portas = Array.from({ length: WORKER_COUNT }, (_, index) => portaBackend(index));
-    return `Backends: ${portas.join(', ')}`;
+    return `Backend: ${BACKEND_BASE_PORT}`;
 }
 
 startSmtpServer();
