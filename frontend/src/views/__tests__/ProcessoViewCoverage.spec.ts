@@ -273,11 +273,15 @@ describe("ProcessoViewCoverage.spec.ts", () => {
                         {
                             codUnidade: 1,
                             sigla: "A",
-                            situacaoSubprocesso: SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA
+                            situacaoSubprocesso: SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA,
+                            localizacaoAtualCodigo: 100
                         }, // Eligible
                         {codUnidade: 2, sigla: "B", situacaoSubprocesso: "OUTRO"}
                     ]
                 }
+            },
+            perfil: {
+                unidadeAtual: 100
             }
         });
         (wrapper.vm as any).acaoBlocoAtual = 'aceitar';

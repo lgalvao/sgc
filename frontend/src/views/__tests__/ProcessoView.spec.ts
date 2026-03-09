@@ -262,13 +262,16 @@ describe("Processo.vue", () => {
         await nextTick();
         await flushPromises();
 
-        const btnAceitar = wrapper.find("button.btn-success");
-        await btnAceitar.trigger("click");
+        const botoesAceitar = wrapper.findAll("button.btn-success").filter(
+            (b: DOMWrapper<Element>) => b.text().includes("Aceitar em bloco")
+        );
+        expect(botoesAceitar.length).toBeGreaterThan(0);
+        await botoesAceitar[0].trigger("click");
+        await nextTick();
 
         const modal = wrapper.findComponent(ModalAcaoBlocoStub);
         expect(modal.exists()).toBe(true);
-        expect(modalSpies.abrir).toHaveBeenCalled();
-        expect(modal.props("titulo")).toBe("Aceitar em Bloco");
+        expect(modal.props("titulo")).toBe("Aceite de mapa em bloco");
     });
 
     it("deve executar ação em bloco com sucesso (Aceitar Cadastro)", async () => {

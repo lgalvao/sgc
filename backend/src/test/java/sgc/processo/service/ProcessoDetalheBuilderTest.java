@@ -32,6 +32,12 @@ class ProcessoDetalheBuilderTest {
     @Mock
     private SubprocessoValidacaoService subprocessoValidacaoService;
 
+    @Mock
+    private ProcessoValidacaoService processoValidacaoService;
+
+    @Mock
+    private sgc.subprocesso.model.MovimentacaoRepo movimentacaoRepo;
+
     @InjectMocks
     private ProcessoDetalheBuilder builder;
 
@@ -46,6 +52,8 @@ class ProcessoDetalheBuilderTest {
     private Usuario criarUsuarioMock() {
         Usuario usuario = new Usuario();
         usuario.setTituloEleitoral("12345678901");
+        usuario.setPerfilAtivo(Perfil.GESTOR);
+        usuario.setUnidadeAtivaCodigo(1L);
         return usuario;
     }
 
@@ -54,6 +62,7 @@ class ProcessoDetalheBuilderTest {
     void deveConstruirDtoQuandoDadosValidos() {
 
         Usuario usuario = criarUsuarioMock();
+        when(processoValidacaoService.buscarCodigosDescendentes(any())).thenReturn(List.of(1L, 2L, 3L, 10L));
         Processo processo = new Processo();
         processo.setCodigo(1L);
         processo.setDescricao("Processo Teste");
@@ -151,6 +160,7 @@ class ProcessoDetalheBuilderTest {
     void deveVerificarOrdenacaoDasUnidades() {
 
         Usuario usuario = criarUsuarioMock();
+        when(processoValidacaoService.buscarCodigosDescendentes(any())).thenReturn(List.of(1L, 2L, 3L));
         Processo processo = new Processo();
         processo.setCodigo(1L);
         processo.setTipo(TipoProcesso.MAPEAMENTO);
@@ -174,6 +184,7 @@ class ProcessoDetalheBuilderTest {
     void deveConstruirDtoComHierarquiaParticipantes() {
 
         Usuario usuario = criarUsuarioMock();
+        when(processoValidacaoService.buscarCodigosDescendentes(any())).thenReturn(List.of(1L, 2L, 3L));
         Processo processo = new Processo();
         processo.setCodigo(1L);
         processo.setTipo(TipoProcesso.MAPEAMENTO);
@@ -245,6 +256,7 @@ class ProcessoDetalheBuilderTest {
     @DisplayName("Deve lidar com unidade filha cujo pai não está nos participantes")
     void deveLidarComPaiNaoParticipanteNaHierarquia() {
         Usuario usuario = criarUsuarioMock();
+        when(processoValidacaoService.buscarCodigosDescendentes(any())).thenReturn(List.of(1L, 2L, 3L));
         Processo processo = new Processo();
         processo.setCodigo(1L);
         processo.setTipo(TipoProcesso.MAPEAMENTO);
@@ -268,6 +280,7 @@ class ProcessoDetalheBuilderTest {
     void deveLidarComSubprocessoSemMapa() {
 
         Usuario usuario = criarUsuarioMock();
+        when(processoValidacaoService.buscarCodigosDescendentes(any())).thenReturn(List.of(10L));
         Processo processo = new Processo();
         processo.setCodigo(1L);
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);

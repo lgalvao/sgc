@@ -139,6 +139,7 @@ class ProcessoConsultaServiceTest {
                 .unidadeAtivaCodigo(100L)
                 .build();
         when(usuarioService.usuarioAutenticado()).thenReturn(user);
+        when(processoValidacaoService.buscarCodigosDescendentes(100L)).thenReturn(List.of(100L));
 
         Unidade u1 = Unidade.builder().nome("U1").sigla("S1").situacao(SituacaoUnidade.ATIVA).build();
         u1.setCodigo(100L);
@@ -146,7 +147,7 @@ class ProcessoConsultaServiceTest {
         Subprocesso s1 = Subprocesso.builder().situacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO).unidade(u1).build();
         s1.setCodigo(1L);
 
-        when(subprocessoService.listarPorProcessoUnidadeESituacoes(eq(1L), eq(100L), anyList())).thenReturn(List.of(s1));
+        when(subprocessoService.listarPorProcessoEUnidadeCodigosESituacoes(eq(1L), eq(List.of(100L)), anyList())).thenReturn(List.of(s1));
 
         List<SubprocessoElegivelDto> res = processoConsultaService.subprocessosElegiveis(1L);
 

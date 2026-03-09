@@ -29,10 +29,17 @@ class ProcessoDetalheBuilderCoverageTest {
     @InjectMocks
     private ProcessoDetalheBuilder builder;
 
+    @Mock
+    private ProcessoValidacaoService processoValidacaoService;
+
+    @Mock
+    private sgc.subprocesso.model.MovimentacaoRepo movimentacaoRepo;
+
     @Test
     @DisplayName("build deve mapear subprocesso e mapa quando existem")
     void deveMapearSubprocessoEMapa() {
 
+        when(processoValidacaoService.buscarCodigosDescendentes(any())).thenReturn(List.of(100L));
         Long codProcesso = 1L;
         Processo processo = new Processo();
         processo.setCodigo(codProcesso);
@@ -67,6 +74,7 @@ class ProcessoDetalheBuilderCoverageTest {
     @DisplayName("build deve manter unidadeDto quando sp é nulo")
     void deveManterUnidadeDtoQuandoSpNulo() {
 
+        when(processoValidacaoService.buscarCodigosDescendentes(any())).thenReturn(List.of(100L));
         Long codProcesso = 1L;
         Processo processo = new Processo();
         processo.setCodigo(codProcesso);
