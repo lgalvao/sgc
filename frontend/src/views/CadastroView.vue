@@ -250,12 +250,24 @@ const loadingValidacao = ref(false);
 const errosValidacao = ref<ErroValidacao[]>([]);
 const erroGlobal = ref<string | null>(null);
 const atividadeRefs = new Map<number, Element>();
+let timeoutLimparErros: ReturnType<typeof setTimeout> | null = null;
+
+function timeoutLimpezaErros() {
+  if (timeoutLimparErros) clearTimeout(timeoutLimparErros);
+  timeoutLimparErros = setTimeout(() => {
+    errosValidacao.value = [];
+    erroGlobal.value = null;
+  }, 6000);
+}
 
 const mapaErros = computed(() => {
   const mapa = new Map<number, string>();
   errosValidacao.value.forEach((erro) => {
     if (erro.atividadeCodigo) {
-      mapa.set(erro.atividadeCodigo, erro.mensagem);
+      const atividade = atividades.value.find(a => a.codigo === erro.atividadeCodigo);
+      if (!atividade || !atividade.conhecimentos || atividade.conhecimentos.length === 0) {
+        mapa.set(erro.atividadeCodigo, erro.mensagem);
+      }
     }
   });
   return mapa;
@@ -455,6 +467,7 @@ async function disponibilizarCadastro() {
 
         await nextTick();
         scrollParaPrimeiroErro();
+        timeoutLimpezaErros();
       }
     } catch {
       // O withErrorHandling já notificou o erro se necessário ou ele será exibido via erroGlobal
