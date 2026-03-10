@@ -59,10 +59,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
 
         const atividadeIncompleta = `Atividade Incompleta ${timestamp}`;
         await adicionarAtividade(page, atividadeIncompleta);
-        await page.getByTestId('btn-cad-atividades-disponibilizar').click();
-        const erroInline = page.getByTestId('atividade-erro-validacao');
-        await expect(erroInline).toBeVisible();
-        await expect(erroInline).toContainText(/conhecimento/i);
+        await expect(page.getByTestId('btn-cad-atividades-disponibilizar')).toBeDisabled();
 
         await adicionarConhecimento(page, atividadeIncompleta, 'Conhecimento Corretivo');
         await limparNotificacoes(page);

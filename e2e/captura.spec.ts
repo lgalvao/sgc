@@ -559,27 +559,24 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await page.waitForTimeout(300);
             await capturarTela(page, '04-subprocesso', '22-mix-atividades-com-sem-conhecimento', {fullPage: true});
 
-            // Tentar disponibilizar - deve mostrar validação inline
-            await page.getByTestId('btn-cad-atividades-disponibilizar').click();
-            await page.waitForTimeout(500); // Aguardar scroll automático
+            // Sem conhecimento em todas as atividades, o botão deve permanecer desabilitado
+            await expect(page.getByTestId('btn-cad-atividades-disponibilizar')).toBeDisabled();
+            await capturarTela(page, '04-subprocesso', '23-botao-disponibilizar-desabilitado-sem-conhecimento', {fullPage: true});
 
-            // Capturar primeira atividade com erro inline (scroll automático já levou até ela)
-            await capturarTela(page, '04-subprocesso', '23-validacao-inline-primeira-atividade', {fullPage: true});
-
-            // Scroll para segunda atividade com erro
+            // Scroll para segunda atividade sem conhecimento
             const card2 = page.locator('.atividade-card', {has: page.getByText(atividade2)});
             await card2.scrollIntoViewIfNeeded();
             await page.waitForTimeout(300);
-            await capturarTela(page, '04-subprocesso', '24-validacao-inline-segunda-atividade');
+            await capturarTela(page, '04-subprocesso', '24-segunda-atividade-sem-conhecimento');
 
-            // Capturar zoom na mensagem de erro inline
+            // Capturar detalhe do card sem conhecimento
             const primeiroCard = page.locator('.atividade-card', {has: page.getByText(atividade1)});
             await primeiroCard.scrollIntoViewIfNeeded();
             await page.waitForTimeout(300);
 
-            // Capturar apenas o card com erro para detalhe
+            // Capturar apenas o card para detalhe
             await primeiroCard.screenshot({
-                path: path.join(SCREENSHOTS_DIR, '04-subprocesso--25-detalhe-card-com-erro.png')
+                path: path.join(SCREENSHOTS_DIR, '04-subprocesso--25-detalhe-card-sem-conhecimento.png')
             });
 
             // Corrigir primeira atividade adicionando conhecimento
@@ -587,10 +584,9 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await page.waitForTimeout(500);
             await capturarTela(page, '04-subprocesso', '26-erro-desaparece-apos-correcao', {fullPage: true});
 
-            // Tentar disponibilizar novamente - ainda deve ter erro na atividade 2
-            await page.getByTestId('btn-cad-atividades-disponibilizar').click();
-            await page.waitForTimeout(500);
-            await capturarTela(page, '04-subprocesso', '27-validacao-apenas-atividade-restante');
+            // Ainda deve permanecer bloqueado porque a atividade 2 continua sem conhecimento
+            await expect(page.getByTestId('btn-cad-atividades-disponibilizar')).toBeDisabled();
+            await capturarTela(page, '04-subprocesso', '27-botao-ainda-desabilitado-com-atividade-restante');
 
             // Corrigir segunda atividade
             await adicionarConhecimento(page, atividade2, 'JavaScript');
@@ -887,7 +883,8 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             // Capturar botão de disponibilizar mapas em bloco (CDU-24)
             const btnDisponibilizarMapaBloco = page.getByRole('button', {name: /Disponibilizar.*mapa.*Bloco/i});
-            await expect(btnDisponibilizarMapaBloco).toBeHidden();
+            await expect(btnDisponibilizarMapaBloco).toBeVisible();
+            await expect(btnDisponibilizarMapaBloco).toBeDisabled();
 
             // Capturar botões de aceitar/homologar mapa em bloco (CDU-25 e CDU-26 - se visíveis)
             const btnAceitarMapaBloco = page.getByRole('button', {name: /Aceitar.*mapa.*Bloco/i});

@@ -33,6 +33,11 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
             });
             processoOrigemId = procOrigem.codigo;
 
+            await criarProcessoFinalizadoFixture(request, {
+                unidade: 'ASSESSORIA_21',
+                descricao: processoOrigem2Descricao
+            });
+
             const processoAlvo = await criarProcessoFixture(request, {
                 unidade: UNIDADE_ALVO,
                 descricao: descricaoProcesso,

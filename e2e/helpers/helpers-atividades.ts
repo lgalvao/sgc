@@ -272,9 +272,13 @@ export async function selecionarAtividadesParaImportacao(page: Page, processoOri
     }
 }
 
-export async function importarAtividades(page: Page, processoOrigemDescricao: string, unidadeOrigemSigla: string, atividadesDescricoes: string[]) {
+export async function importarAtividades(page: Page,
+                                         processoOrigemDescricao: string,
+                                         unidadeOrigemSigla: string,
+                                         atividadesDescricoes: string[]) {
+
     await selecionarAtividadesParaImportacao(page, processoOrigemDescricao, unidadeOrigemSigla, atividadesDescricoes);
-    
+
     const modal = page.getByRole('dialog');
     await modal.getByTestId('btn-importar').click();
     await expect(modal).toBeHidden();

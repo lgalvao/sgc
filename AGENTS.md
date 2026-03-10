@@ -22,7 +22,7 @@ específicas** do projeto que diferem dos padrões genéricos.
     * `GET` para consultas.
     * `POST` para criação.
     * `POST` com sufixo semanticamente claro para atualizações, ações de workflow e exclusão (ex:
-      `/api/processos/{id}/iniciar`, `/api/processos/{id}/excluir`).
+      `/api/processos/{codigo}/iniciar`, `/api/processos/{codigo}/excluir`).
 * **Persistence:** Tabelas em `UPPER_CASE`, colunas em `snake_case`. Enums como `STRING`.
 * **Controle de Acesso (Security):**
     * Baseado nas regras documentadas em [`regras-acesso.md`](/etc/docs/regras-acesso.md):
@@ -30,7 +30,6 @@ específicas** do projeto que diferem dos padrões genéricos.
         * **Escrita**: Localização Atual do Subprocesso (com algumas exceções para admin)
     * **Implementação:** `SgcPermissionEvaluator` (implementa `PermissionEvaluator` do Spring Security)
     * **Controllers:** Use `@PreAuthorize("hasPermission(#codigo, 'Subprocesso', 'ACAO')")` para verificações
-    * **Services:** NÃO DEVEM fazer verificações de acesso diretas
     * **Hierarquia:** `HierarquiaService` para verificações de hierarquia de unidades
     * **Perfis:** `ADMIN`, `GESTOR`, `CHEFE`, `SERVIDOR` (ver `regras-acesso.md` para detalhes)
 
@@ -38,7 +37,6 @@ específicas** do projeto que diferem dos padrões genéricos.
 
 * **Padrão de componentes:** Use `<script setup lang="ts">` e **BootstrapVueNext**.
 * **Estado:** **Pinia** utilizando "Setup Stores" (com `ref` e `computed`).
-* **Camadas:** `View -> Store -> Service -> API`.
 * **Erros:** Use `normalizeError` em services/stores. Componentes decidem como exibir (preferencialmente `BAlert` inline
   para erros de negócio).
 * **Roteamento:** Modularizado (cada módulo tem seu arquivo `.routes.ts`).
@@ -50,7 +48,7 @@ específicas** do projeto que diferem dos padrões genéricos.
 ## 4. Comandos e Testes
 
 * **Backend:** `./gradlew :backend:test` (JUnit 6 + Mockito + H2).
-* **Frontend:** `npm run typecheck`, `npm run lint`, `npm run test:unit` (Vitest).
+* **Frontend:** `npm run typecheck` (inclui e2e), `npm run lint` (inclui e2e), `npm run test:unit` (Vitest).
 * **E2E:** Playwright (consulte `/e2e/README.md`).
 
 ## 6. Referências e Padrões Detalhados

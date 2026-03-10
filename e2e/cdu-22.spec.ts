@@ -127,12 +127,9 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
             descricao: descProcesso2,
             tipo: 'MAPEAMENTO',
             diasLimite: 30,
-            unidade: 'SECAO_111',
+            unidade: ['SECAO_111', 'SECAO_121'],
             expandir: ['SECRETARIA_1', 'COORD_11', 'COORD_12']
         });
-
-        // Selecionar SECAO_121 também
-        await page.getByTestId('chk-unidade-SECAO_121').click();
 
         const linhaProcesso = page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descProcesso2)});
         await linhaProcesso.click();
