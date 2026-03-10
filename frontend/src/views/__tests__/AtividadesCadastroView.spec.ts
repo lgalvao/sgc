@@ -50,7 +50,15 @@ vi.mock("@/services/processoService", () => ({
 const stubs = {
     LayoutPadrao: {template: '<div><slot /></div>'},
     PageHeader: {template: '<div><slot /><slot name="actions" /></div>'},
-    LoadingButton: {template: '<button :data-testid="$attrs[\'data-testid\']" @click="$emit(\'click\')"><slot /></button>'},
+    LoadingButton: {
+        props: {
+            disabled: {
+                type: Boolean,
+                default: false,
+            }
+        },
+        template: '<button :data-testid="$attrs[\'data-testid\']" v-bind="disabled ? { disabled: true } : {}" @click="$emit(\'click\')"><slot /></button>'
+    },
     BButton: {template: '<button :data-testid="$attrs[\'data-testid\']" @click="$emit(\'click\')"><slot /></button>'},
     BDropdown: {template: '<div><slot /></div>'},
     BDropdownItem: {template: '<div :data-testid="$attrs[\'data-testid\']" @click="$emit(\'click\')"><slot /></div>'},
@@ -147,9 +155,16 @@ describe("CadastroView.vue", () => {
         (wrapper.vm as any).atividades = [{codigo: 1, conhecimentos: [{codigo: 1}]}];
         await wrapper.vm.$nextTick();
         const subprocessosStore = useSubprocessosStore();
+        subprocessosStore.subprocessoDetalhe = {
+            codigo: 123,
+            situacao: "MAPEAMENTO_CADASTRO_EM_ANDAMENTO",
+            tipoProcesso: "MAPEAMENTO",
+            unidade: {sigla: "TESTE"},
+            permissoes: {}
+        } as any;
         subprocessosStore.validarCadastro = vi.fn().mockResolvedValue({valido: true});
 
-        await wrapper.find('[data-testid="btn-cad-atividades-disponibilizar"]').trigger("click");
+        await (wrapper.vm as any).disponibilizarCadastro();
 
         expect(subprocessosStore.validarCadastro).toHaveBeenCalledWith(123);
         expect((wrapper.vm as any).mostrarModalConfirmacao).toBe(true);
@@ -161,14 +176,19 @@ describe("CadastroView.vue", () => {
         (wrapper.vm as any).atividades = [{codigo: 1, conhecimentos: [{codigo: 1}]}];
         await wrapper.vm.$nextTick();
         const subprocessosStore = useSubprocessosStore();
+        subprocessosStore.subprocessoDetalhe = {
+            codigo: 123,
+            situacao: "MAPEAMENTO_CADASTRO_EM_ANDAMENTO",
+            tipoProcesso: "MAPEAMENTO",
+            unidade: {sigla: "TESTE"},
+            permissoes: {}
+        } as any;
         subprocessosStore.validarCadastro = vi.fn().mockResolvedValue({valido: true});
         subprocessosStore.disponibilizarCadastro = vi.fn().mockResolvedValue(true);
 
-        // Open modal first
-        await wrapper.find('[data-testid="btn-cad-atividades-disponibilizar"]').trigger("click");
+        await (wrapper.vm as any).disponibilizarCadastro();
         await flushPromises();
 
-        // Confirm in modal
         const modal = wrapper.findComponent(ConfirmacaoDisponibilizacaoModal);
         modal.vm.$emit('confirmar');
         await flushPromises();
@@ -234,5 +254,46 @@ describe("CadastroView.vue", () => {
 
         const btn = wrapper.find('[data-testid="btn-cad-atividades-disponibilizar"]');
         expect(btn.attributes('disabled')).toBeUndefined();
+    });
+
+    it("mantem botão visivel e desabilitado quando chefe pode editar mas ainda nao pode disponibilizar", async () => {
+        const wrapper = createWrapper({}, {
+            podeEditarCadastro: ref(true),
+            podeDisponibilizarCadastro: ref(false),
+            podeVisualizarImpacto: ref(true),
+        });
+        await flushPromises();
+
+        const btn = wrapper.find('[data-testid="btn-cad-atividades-disponibilizar"]');
+        expect(btn.exists()).toBe(true);
+        expect(btn.attributes('disabled')).toBeDefined();
+    });
+
+    it("recarrega contexto completo apos importar atividades", async () => {
+        const wrapper = createWrapper();
+        await flushPromises();
+        const subprocessosStore = useSubprocessosStore();
+        subprocessosStore.buscarContextoEdicao = vi.fn().mockResolvedValue({
+            detalhes: {
+                subprocesso: {
+                    codigo: 123,
+                    situacao: "MAPEAMENTO_CADASTRO_EM_ANDAMENTO",
+                    unidade: {sigla: "TESTE"},
+                },
+                permissoes: {
+                    podeEditarCadastro: true,
+                    podeDisponibilizarCadastro: true,
+                },
+            },
+            atividadesDisponiveis: [{codigo: 2, descricao: "Atividade importada", conhecimentos: [{codigo: 2, descricao: "Conhecimento importado"}]}],
+            unidade: {sigla: "TESTE", nome: "Teste"}
+        } as any);
+
+        await (wrapper.vm as any).handleImportAtividades();
+
+        expect(subprocessosStore.buscarContextoEdicao).toHaveBeenCalledWith(123);
+        expect((wrapper.vm as any).atividades).toEqual([
+            {codigo: 2, descricao: "Atividade importada", conhecimentos: [{codigo: 2, descricao: "Conhecimento importado"}]}
+        ]);
     });
 });

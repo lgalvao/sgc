@@ -54,8 +54,8 @@
         </BDropdown>
 
         <LoadingButton
-            v-if="!!podeDisponibilizarCadastro"
-            :disabled="!habilitarDisponibilizar"
+            v-if="mostrarBotaoDisponibilizar"
+            :disabled="botaoDisponibilizarDesabilitado"
             :loading="loadingValidacao"
             data-testid="btn-cad-atividades-disponibilizar"
             icon="check-lg"
@@ -227,6 +227,7 @@ const nomeUnidade = computed(() => unidade.value?.nome || "");
 const {podeEditarCadastro, podeDisponibilizarCadastro, podeVisualizarImpacto} = useAcesso(subprocesso);
 const isRevisao = computed(() => subprocesso.value?.tipoProcesso === TipoProcesso.REVISAO);
 const podeVerImpacto = computed(() => podeVisualizarImpacto.value);
+const mostrarBotaoDisponibilizar = computed(() => !!codSubprocesso.value && isChefe.value && !!podeEditarCadastro.value);
 
 const atividades = ref<Atividade[]>([]);
 
@@ -234,6 +235,7 @@ const habilitarDisponibilizar = computed(() => {
   if (atividades.value.length === 0) return false;
   return atividades.value.every(a => a.conhecimentos && a.conhecimentos.length > 0);
 });
+const botaoDisponibilizarDesabilitado = computed(() => !podeDisponibilizarCadastro.value || !habilitarDisponibilizar.value);
 
 const analisesCadastro = ref<AnaliseCadastro[]>([]);
 
@@ -433,7 +435,14 @@ async function handleImportAtividades() {
   mostrarModalImportar.value = false;
   if (codSubprocesso.value) {
     await withErrorHandling(async () => {
-      atividades.value = await subprocessoService.listarAtividades(codSubprocesso.value!);
+      const data = await subprocessosStore.buscarContextoEdicao(codSubprocesso.value);
+      if (data) {
+        sincronizarEstadoInicialContexto(data);
+        atividades.value = data.atividadesDisponiveis ?? [];
+        if (data.unidade) {
+          unidade.value = data.unidade as Unidade;
+        }
+      }
     });
   }
   notify("As atividades foram importadas para o seu mapa.", 'success');
