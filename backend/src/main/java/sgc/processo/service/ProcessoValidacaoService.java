@@ -27,7 +27,6 @@ public class ProcessoValidacaoService {
     private final SubprocessoValidacaoService validacaoService;
     private final ProcessoRepo processoRepo;
 
-    // ---- Validações de negócio ----
 
     /**
      * Valida se todas as unidades especificadas possuem mapa vigente.
@@ -101,7 +100,6 @@ public class ProcessoValidacaoService {
         return Optional.empty();
     }
 
-    // ---- Controle de acesso ----
 
     @Transactional(readOnly = true)
     public boolean checarAcesso(@Nullable Authentication authentication, Long codProcesso) {

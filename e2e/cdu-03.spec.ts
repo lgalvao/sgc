@@ -16,7 +16,6 @@ test.describe('CDU-03 - Manter Processo', () => {
         const btnSalvar = page.getByTestId('btn-processo-salvar');
         const btnIniciar = page.getByTestId('btn-processo-iniciar');
 
-        // Inicialmente desativados
         await expect(btnSalvar).toBeDisabled();
         await expect(btnIniciar).toBeDisabled();
 
@@ -215,7 +214,6 @@ test.describe('CDU-03 - Manter Processo', () => {
                                                                                }) => {
         const descricao = `Feedback - ${Date.now()}`;
 
-        // Cancelar criação
         await page.getByTestId('btn-painel-criar-processo').click();
         await page.getByTestId('inp-processo-descricao').fill(descricao);
         await page.getByRole('button', {name: 'Cancelar'}).click();
@@ -236,14 +234,12 @@ test.describe('CDU-03 - Manter Processo', () => {
             tipo: 'Mapeamento'
         });
 
-        // Cleanup registration
         await page.getByTestId('tbl-processos').getByText(descricao).first().click();
         await esperarPaginaCadastroProcesso(page);
         await extrairProcessoId(page);
 
         await page.goto('/painel');
 
-        // Cancelar remoção
         await page.getByTestId('tbl-processos').getByText(descricao).first().click();
         await page.getByTestId('btn-processo-remover').click();
         await page.getByTestId('btn-modal-confirmacao-cancelar').click();

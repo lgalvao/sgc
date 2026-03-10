@@ -101,18 +101,15 @@ const processosStore = useProcessosStore();
 const { notify } = useNotification();
 const { obterRelatorioAndamento, downloadRelatorioAndamentoPdf, downloadRelatorioMapasPdf } = useRelatorios();
 
-// Tabs Config
 const processoIdSelecionado = ref<number | null>(null);
 const processoIdSelecionadoMapas = ref<number | null>(null);
 const unidadeIdSelecionadaMapas = ref<number | null>(null);
 
-// Loading states
 const gerandoAndamento = ref(false);
 const gerandoMapas = ref(false);
 
 const relatorioAndamento = ref<any[]>([]);
 
-// Options
 const opcoesProcessos = computed(() => {
   const processos = processosStore.processosPainel || [];
   return [
