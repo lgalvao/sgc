@@ -22,6 +22,15 @@
         </BButton>
 
         <BButton
+            v-if="podeVerSugestoes"
+            data-testid="btn-mapa-ver-sugestoes"
+            title="Ver sugestões"
+            variant="outline-info"
+            @click="verSugestoes"
+        >
+          Ver sugestões
+        </BButton>
+        <BButton
             v-if="(podeValidar && temHistoricoAnalise) || podeAnalisar"
             :data-testid="podeAnalisar ? 'btn-mapa-historico-gestor' : 'btn-mapa-historico'"
             title="Histórico de análise"
@@ -29,17 +38,6 @@
             @click="verHistorico"
         >
           Histórico de análise
-        </BButton>
-
-        <BButton
-            v-if="podeAnalisar"
-            v-show="podeVerSugestoes"
-            data-testid="btn-mapa-ver-sugestoes"
-            title="Ver sugestões"
-            variant="outline-info"
-            @click="verSugestoes"
-        >
-          Ver sugestões
         </BButton>
         <BButton
             v-if="podeAnalisar"

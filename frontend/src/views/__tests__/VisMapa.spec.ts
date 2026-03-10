@@ -457,6 +457,11 @@ describe("VisMapa.vue", () => {
                     ],
                 },
             },
+        }, "TEST", {
+            podeVerSugestoes: {value: true},
+            podeAceitarMapa: {value: false},
+            podeDevolverMapa: {value: false},
+            podeHomologarMapa: {value: false},
         });
         await wrapper.vm.$nextTick();
 
@@ -611,9 +616,10 @@ describe("VisMapa.vue", () => {
         const {wrapper} = mountComponent({
             perfil: {perfilSelecionado: "GESTOR"},
         }, "TEST", {
-            podeAnalisar: {value: true},
-            podeApresentarSugestoes: {value: true},
-            podeAceitarMapa: {value: true}
+            podeVerSugestoes: {value: true},
+            podeAceitarMapa: {value: false},
+            podeDevolverMapa: {value: false},
+            podeHomologarMapa: {value: false}
         });
         await flushPromises();
 
