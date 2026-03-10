@@ -208,11 +208,14 @@ describe("ProcessoViewCoverage.spec.ts", () => {
     it("deve lidar com erro na ação em bloco", async () => {
         const wrapper = createWrapper({
             processos: {
-                processoDetalhe: {
-                    unidades: [
-                        {codUnidade: 1, sigla: "A", situacaoSubprocesso: "QUALQUER"}
-                    ]
-                }
+                subprocessosElegiveis: [
+                    {
+                        unidadeCodigo: 1,
+                        unidadeSigla: "A",
+                        unidadeNome: "Unidade A",
+                        situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO
+                    }
+                ]
             }
         });
 
@@ -233,12 +236,20 @@ describe("ProcessoViewCoverage.spec.ts", () => {
     it("deve calcular unidades elegíveis para Disponibilizar", async () => {
         const wrapper = createWrapper({
             processos: {
-                processoDetalhe: {
-                    unidades: [
-                        {codUnidade: 1, sigla: "A", situacaoSubprocesso: SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO}, // Eligible
-                        {codUnidade: 2, sigla: "B", situacaoSubprocesso: "OUTRO"}
-                    ]
-                }
+                subprocessosElegiveis: [
+                    {
+                        unidadeCodigo: 1,
+                        unidadeSigla: "A",
+                        unidadeNome: "Unidade A",
+                        situacao: SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO
+                    }, // Eligible
+                    {
+                        unidadeCodigo: 2,
+                        unidadeSigla: "B",
+                        unidadeNome: "Unidade B",
+                        situacao: "OUTRO"
+                    }
+                ]
             }
         });
         (wrapper.vm as any).acaoBlocoAtual = 'disponibilizar';
@@ -249,16 +260,20 @@ describe("ProcessoViewCoverage.spec.ts", () => {
     it("deve calcular unidades elegíveis para Homologar", async () => {
         const wrapper = createWrapper({
             processos: {
-                processoDetalhe: {
-                    unidades: [
-                        {
-                            codUnidade: 1,
-                            sigla: "A",
-                            situacaoSubprocesso: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO
-                        }, // Eligible
-                        {codUnidade: 2, sigla: "B", situacaoSubprocesso: "OUTRO"}
-                    ]
-                }
+                subprocessosElegiveis: [
+                    {
+                        unidadeCodigo: 1,
+                        unidadeSigla: "A",
+                        unidadeNome: "Unidade A",
+                        situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO
+                    }, // Eligible
+                    {
+                        unidadeCodigo: 2,
+                        unidadeSigla: "B",
+                        unidadeNome: "Unidade B",
+                        situacao: "OUTRO"
+                    }
+                ]
             }
         });
         (wrapper.vm as any).acaoBlocoAtual = 'homologar';
@@ -268,16 +283,20 @@ describe("ProcessoViewCoverage.spec.ts", () => {
     it("deve calcular unidades elegíveis para Aceitar (incluindo REVISAO_DISPONIBILIZADA)", async () => {
         const wrapper = createWrapper({
             processos: {
-                processoDetalhe: {
-                    unidades: [
-                        {
-                            codUnidade: 1,
-                            sigla: "A",
-                            situacaoSubprocesso: SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA
-                        }, // Eligible
-                        {codUnidade: 2, sigla: "B", situacaoSubprocesso: "OUTRO"}
-                    ]
-                }
+                subprocessosElegiveis: [
+                    {
+                        unidadeCodigo: 1,
+                        unidadeSigla: "A",
+                        unidadeNome: "Unidade A",
+                        situacao: SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA
+                    }, // Eligible
+                    {
+                        unidadeCodigo: 2,
+                        unidadeSigla: "B",
+                        unidadeNome: "Unidade B",
+                        situacao: "OUTRO"
+                    }
+                ]
             }
         });
         (wrapper.vm as any).acaoBlocoAtual = 'aceitar';
