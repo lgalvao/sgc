@@ -135,7 +135,7 @@
         ok-title="Confirmar"
         test-id-cancelar="btn-sugestoes-mapa-cancelar"
         test-id-confirmar="btn-sugestoes-mapa-confirmar"
-        titulo="Apresentar Sugestões"
+        titulo="Apresentar sugestões"
         @confirmar="confirmarSugestoes"
         @shown="() => sugestoesTextareaRef?.$el?.focus()"
     >
@@ -149,8 +149,9 @@
             ref="sugestoesTextareaRef"
             v-model="sugestoes"
             data-testid="inp-sugestoes-mapa-texto"
-            placeholder="Digite suas sugestões para o mapa de competências..."
+            placeholder="Digite as sugestões para o mapa de competências"
             rows="5"
+            required
         />
       </div>
     </ModalConfirmacao>

@@ -105,9 +105,10 @@ public class SubprocessoService {
         return subprocessoRepo.findByProcessoCodigoWithUnidade(codProcesso);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public SubprocessoSituacaoDto obterStatus(Long codSubprocesso) {
         Subprocesso subprocesso = buscarSubprocesso(codSubprocesso);
+        reconciliarSituacaoCadastro(subprocesso);
         return SubprocessoSituacaoDto.builder()
                 .codigo(subprocesso.getCodigo())
                 .situacao(subprocesso.getSituacao())
@@ -232,9 +233,17 @@ public class SubprocessoService {
     @Transactional
     public void atualizarParaEmAndamento(Long mapaCodigo) {
         var subprocesso = subprocessoRepo.findByMapa_Codigo(mapaCodigo).orElseThrow();
-        if (subprocesso.getSituacao() == NAO_INICIADO) {
-            var tipoProcesso = subprocesso.getProcesso().getTipo();
+        boolean temAtividades = !mapaManutencaoService.atividadesMapaCodigoSemRels(mapaCodigo).isEmpty();
+        SituacaoSubprocesso situacaoAtual = subprocesso.getSituacao();
+        TipoProcesso tipoProcesso = subprocesso.getProcesso().getTipo();
 
+        if (!temAtividades && Set.of(MAPEAMENTO_CADASTRO_EM_ANDAMENTO, REVISAO_CADASTRO_EM_ANDAMENTO).contains(situacaoAtual)) {
+            subprocesso.setSituacaoForcada(NAO_INICIADO);
+            subprocessoRepo.save(subprocesso);
+            return;
+        }
+
+        if (temAtividades && situacaoAtual == NAO_INICIADO) {
             if (tipoProcesso == TipoProcesso.MAPEAMENTO) {
                 subprocesso.setSituacao(MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
                 subprocessoRepo.save(subprocesso);
@@ -535,6 +544,7 @@ public class SubprocessoService {
 
     public SubprocessoDetalheResponse obterDetalhes(Long codigo, Usuario usuarioAutenticado) {
         Subprocesso sp = subprocessoRepo.findByIdWithMapaAndAtividades(codigo).orElseThrow();
+        reconciliarSituacaoCadastro(sp);
         return obterDetalhes(sp, usuarioAutenticado);
     }
 
@@ -569,10 +579,11 @@ public class SubprocessoService {
                 .build();
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public ContextoEdicaoResponse obterContextoEdicao(Long codSubprocesso) {
         Usuario usuario = usuarioFacade.usuarioAutenticado();
         Subprocesso sp = subprocessoRepo.findByIdWithMapaAndAtividades(codSubprocesso).orElseThrow();
+        reconciliarSituacaoCadastro(sp);
         SubprocessoDetalheResponse detalhes = obterDetalhes(sp, usuario);
 
         Unidade unidadeSp = sp.getUnidade();
@@ -585,6 +596,35 @@ public class SubprocessoService {
                 mapaManutencaoService.mapaCompletoSubprocesso(codSubprocesso),
                 atividades
         );
+    }
+
+    private void reconciliarSituacaoCadastro(Subprocesso subprocesso) {
+        if (subprocesso.getMapa() == null) {
+            return;
+        }
+
+        TipoProcesso tipoProcesso = subprocesso.getProcesso().getTipo();
+        if (!Set.of(TipoProcesso.MAPEAMENTO, TipoProcesso.REVISAO).contains(tipoProcesso)) {
+            return;
+        }
+
+        boolean temAtividades = !mapaManutencaoService.atividadesMapaCodigoSemRels(subprocesso.getMapa().getCodigo()).isEmpty();
+        SituacaoSubprocesso situacaoAtual = subprocesso.getSituacao();
+
+        if (temAtividades && situacaoAtual == NAO_INICIADO) {
+            if (tipoProcesso == TipoProcesso.MAPEAMENTO) {
+                subprocesso.setSituacao(MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+            } else {
+                subprocesso.setSituacao(REVISAO_CADASTRO_EM_ANDAMENTO);
+            }
+            subprocessoRepo.save(subprocesso);
+            return;
+        }
+
+        if (!temAtividades && Set.of(MAPEAMENTO_CADASTRO_EM_ANDAMENTO, REVISAO_CADASTRO_EM_ANDAMENTO).contains(situacaoAtual)) {
+            subprocesso.setSituacaoForcada(NAO_INICIADO);
+            subprocessoRepo.save(subprocesso);
+        }
     }
 
     public PermissoesSubprocessoDto obterPermissoesUI(Subprocesso sp, Usuario usuario) {

@@ -221,7 +221,7 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
         assertThat(movimentacaoAceite.getUnidadeDestino().getSigla())
                 .isEqualTo(unidadeSuperior.getSigla());
         assertThat(movimentacaoAceite.getDescricao())
-                .isEqualTo("Cadastro de atividades e conhecimentos aceito");
+                .isEqualTo("Cadastro aceito");
     }
 
     @Test

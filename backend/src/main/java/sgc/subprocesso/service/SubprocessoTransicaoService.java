@@ -666,7 +666,14 @@ public class SubprocessoTransicaoService {
 
     public void atualizarParaEmAndamento(Long mapaCodigo) {
         var subprocesso = subprocessoRepo.findByMapa_Codigo(mapaCodigo).orElseThrow();
-        if (subprocesso.getSituacao() == NAO_INICIADO) {
+        boolean temAtividades = !mapaManutencaoService.atividadesMapaCodigoSemRels(mapaCodigo).isEmpty();
+        if (!temAtividades && Set.of(MAPEAMENTO_CADASTRO_EM_ANDAMENTO, REVISAO_CADASTRO_EM_ANDAMENTO).contains(subprocesso.getSituacao())) {
+            subprocesso.setSituacaoForcada(NAO_INICIADO);
+            subprocessoRepo.save(subprocesso);
+            return;
+        }
+
+        if (temAtividades && subprocesso.getSituacao() == NAO_INICIADO) {
             TipoProcesso tipo = subprocesso.getProcesso().getTipo();
             if (tipo == MAPEAMENTO) {
                 subprocesso.setSituacao(MAPEAMENTO_CADASTRO_EM_ANDAMENTO);

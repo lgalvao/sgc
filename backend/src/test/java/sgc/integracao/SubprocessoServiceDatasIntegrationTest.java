@@ -5,10 +5,12 @@ import org.springframework.beans.factory.annotation.*;
 import org.springframework.transaction.annotation.*;
 import sgc.fixture.*;
 import sgc.mapa.model.*;
+import sgc.mapa.service.MapaManutencaoService;
 import sgc.organizacao.model.*;
 import sgc.processo.model.*;
 import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.*;
+import sgc.mapa.dto.*;
 
 import java.time.*;
 
@@ -27,6 +29,9 @@ class SubprocessoServiceDatasIntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private MapaRepo mapaRepo;
+
+    @Autowired
+    private MapaManutencaoService mapaManutencaoService;
 
     private Processo processo;
     private Subprocesso subprocesso;
@@ -98,6 +103,7 @@ class SubprocessoServiceDatasIntegrationTest extends BaseIntegrationTest {
     void atualizarParaEmAndamento_Mapeamento() {
         subprocessoRepo.save(subprocesso);
         subprocessoRepo.flush();
+        mapaManutencaoService.criarAtividade(new CriarAtividadeRequest(subprocesso.getMapa().getCodigo(), "Atividade inicial"));
 
         subprocessoService.atualizarParaEmAndamento(subprocesso.getMapa().getCodigo());
 
@@ -113,10 +119,31 @@ class SubprocessoServiceDatasIntegrationTest extends BaseIntegrationTest {
 
         subprocessoRepo.save(subprocesso);
         subprocessoRepo.flush();
+        mapaManutencaoService.criarAtividade(new CriarAtividadeRequest(subprocesso.getMapa().getCodigo(), "Atividade inicial revisao"));
 
         subprocessoService.atualizarParaEmAndamento(subprocesso.getMapa().getCodigo());
 
         Subprocesso atualizado = subprocessoService.buscarSubprocesso(subprocesso.getCodigo());
         assertThat(atualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+    }
+
+    @Test
+    @DisplayName("atualizarParaEmAndamento: deve voltar para NAO_INICIADO quando nao houver mais atividades")
+    void atualizarParaEmAndamento_SemAtividades() {
+        subprocessoRepo.save(subprocesso);
+        subprocessoRepo.flush();
+
+        mapaManutencaoService.criarAtividade(new CriarAtividadeRequest(subprocesso.getMapa().getCodigo(), "Atividade temporaria"));
+        subprocessoRepo.flush();
+
+        subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+        subprocessoRepo.saveAndFlush(subprocesso);
+
+        mapaManutencaoService.atividadesMapaCodigoSemRels(subprocesso.getMapa().getCodigo())
+                .forEach(atividade -> mapaManutencaoService.excluirAtividade(atividade.getCodigo()));
+        subprocessoRepo.flush();
+
+        Subprocesso atualizado = subprocessoService.buscarSubprocesso(subprocesso.getCodigo());
+        assertThat(atualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.NAO_INICIADO);
     }
 }

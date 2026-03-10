@@ -62,6 +62,21 @@ export async function editarAtividade(page: Page, descricaoAtual: string | RegEx
     await expect(page.getByText(novaDescricao)).toBeVisible();
 }
 
+export async function cancelarEdicaoAtividade(page: Page, descricaoAtual: string | RegExp, textoCancelado: string) {
+    const card = page.locator('.atividade-card').filter({has: page.getByText(descricaoAtual)});
+    const editButton = card.getByTestId('btn-editar-atividade');
+
+    // eslint-disable-next-line playwright/no-force-option
+    await editButton.click({force: true});
+
+    const input = page.getByTestId('inp-editar-atividade');
+    await input.waitFor({ state: 'visible' });
+    await input.fill(textoCancelado);
+    
+    await page.getByTestId('btn-cancelar-edicao-atividade').click();
+    await expect(page.getByText(descricaoAtual)).toBeVisible();
+}
+
 export async function removerAtividade(page: Page, descricao: string | RegExp) {
     const card = page.locator('.atividade-card').filter({has: page.getByText(descricao)});
     const row = card.locator('.atividade-hover-row');
@@ -71,6 +86,8 @@ export async function removerAtividade(page: Page, descricao: string | RegExp) {
     await expect(btnRemover).toBeVisible();
     await btnRemover.click();
 
+    const dialog = page.getByRole('dialog');
+    await expect(dialog.getByText('Confirma a remoção desta atividade e todos os conhecimentos associados?')).toBeVisible();
     await page.getByTestId('btn-modal-confirmacao-confirmar').click();
     await expect(page.getByText(descricao)).toBeHidden();
 }
@@ -92,6 +109,23 @@ export async function editarConhecimento(page: Page, atividadeDescricao: string 
     await expect(card.getByText(novoConhecimento)).toBeVisible();
 }
 
+export async function cancelarEdicaoConhecimento(page: Page, atividadeDescricao: string | RegExp, conhecimentoAtual: string, textoCancelado: string) {
+    const card = page.locator('.atividade-card', {has: page.getByText(atividadeDescricao)});
+    const linhaConhecimento = card.locator('.group-conhecimento', {hasText: conhecimentoAtual});
+    const btnEditar = linhaConhecimento.getByTestId('btn-editar-conhecimento');
+
+    await linhaConhecimento.hover();
+    await expect(btnEditar).toBeVisible();
+    await btnEditar.click();
+
+    const input = card.getByTestId('inp-editar-conhecimento');
+    await input.waitFor({ state: 'visible' });
+    await input.fill(textoCancelado);
+    
+    await card.getByTestId('btn-cancelar-edicao-conhecimento').click();
+    await expect(card.getByText(conhecimentoAtual)).toBeVisible();
+}
+
 export async function removerConhecimento(page: Page, atividadeDescricao: string | RegExp, conhecimento: string) {
     const card = page.locator('.atividade-card').filter({has: page.getByText(atividadeDescricao)});
     const linhaConhecimento = card.locator('.group-conhecimento', {hasText: conhecimento});
@@ -101,6 +135,8 @@ export async function removerConhecimento(page: Page, atividadeDescricao: string
     await expect(btnRemover).toBeVisible();
     await btnRemover.click();
 
+    const dialog = page.getByRole('dialog');
+    await expect(dialog.getByText('Confirma a remoção deste conhecimento?')).toBeVisible();
     await page.getByTestId('btn-modal-confirmacao-confirmar').click();
     await expect(card.getByText(conhecimento)).toBeHidden();
 }
@@ -128,6 +164,14 @@ export async function verificarBotaoImpactoDropdown(page: Page) {
     await expect(btnMaisAcoes).toBeVisible();
     await btnMaisAcoes.click();
     await expect(page.getByTestId('cad-atividades__btn-impactos-mapa-edicao')).toBeVisible();
+    await btnMaisAcoes.click();
+}
+
+export async function verificarBotaoHistoricoAnalise(page: Page) {
+    const btnMaisAcoes = page.getByTestId('btn-mais-acoes');
+    await expect(btnMaisAcoes).toBeVisible();
+    await btnMaisAcoes.click();
+    await expect(page.getByTestId('btn-cad-atividades-historico')).toBeVisible();
     await btnMaisAcoes.click();
 }
 
@@ -250,4 +294,37 @@ export async function importarAtividadesComErroDuplicidade(page: Page, processoO
     
     await modal.getByTestId('importar-atividades-modal__btn-modal-cancelar').click();
     await expect(modal).toBeHidden();
+}
+
+export async function verificarOpcoesImportacao(page: Page, processosEsperados: string[], unidadesEsperadas: string[]) {
+    const btnEmptyState = page.getByTestId('btn-empty-state-importar');
+    
+    if (await btnEmptyState.isVisible()) {
+        await btnEmptyState.click();
+    } else {
+        await page.getByTestId('btn-mais-acoes').click();
+        await page.getByTestId('btn-cad-atividades-importar').click();
+    }
+
+    const modal = page.getByRole('dialog');
+    await expect(modal.getByText('Importação de atividades')).toBeVisible();
+
+    const selectProcesso = modal.getByTestId('select-processo');
+    for (const proc of processosEsperados) {
+        await expect(selectProcesso.locator('option', { hasText: proc })).toBeVisible();
+    }
+    
+    if (processosEsperados.length > 0) {
+        await selectProcesso.selectOption({ label: processosEsperados[0] });
+    }
+
+    const selectUnidade = modal.getByTestId('select-unidade');
+    await expect(selectUnidade).toBeEnabled();
+
+    await expect.poll(async () => {
+        const options = await selectUnidade.locator('option').allTextContents();
+        return unidadesEsperadas.every(u => options.some(opt => opt.includes(u)));
+    }, { timeout: 10000 }).toBeTruthy();
+
+    await modal.getByTestId('importar-atividades-modal__btn-modal-cancelar').click();
 }

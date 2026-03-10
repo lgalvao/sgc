@@ -23,7 +23,7 @@ public enum TipoTransicao {
     ),
 
     CADASTRO_ACEITO(
-            "Cadastro de atividades e conhecimentos aceito",
+            "Cadastro aceito",
             "Cadastro de atividades da unidade %s submetido para análise",
             "aceite-cadastro",
             "aceite-cadastro-superior"

@@ -130,7 +130,7 @@ describe("CadastroView.vue", () => {
                 unidade: {sigla: "TESTE"}
             },
             mapa: {codigo: 100},
-            atividadesDisponiveis: [],
+            atividadesDisponiveis: [{codigo: 1, descricao: "Ativ 1", conhecimentos: [{codigo: 1, descricao: "Conhecimento 1"}]}],
             unidade: {sigla: "TESTE", nome: "Teste"}
         } as any);
     });
@@ -143,6 +143,8 @@ describe("CadastroView.vue", () => {
 
     it("chama validação antes de disponibilizar", async () => {
         const wrapper = createWrapper();
+        await flushPromises();
+        (wrapper.vm as any).atividades = [{codigo: 1, conhecimentos: [{codigo: 1}]}];
         await wrapper.vm.$nextTick();
         const subprocessosStore = useSubprocessosStore();
         subprocessosStore.validarCadastro = vi.fn().mockResolvedValue({valido: true});
@@ -155,6 +157,8 @@ describe("CadastroView.vue", () => {
 
     it("confirma disponibilização e redireciona", async () => {
         const wrapper = createWrapper();
+        await flushPromises();
+        (wrapper.vm as any).atividades = [{codigo: 1, conhecimentos: [{codigo: 1}]}];
         await wrapper.vm.$nextTick();
         const subprocessosStore = useSubprocessosStore();
         subprocessosStore.validarCadastro = vi.fn().mockResolvedValue({valido: true});
@@ -175,7 +179,7 @@ describe("CadastroView.vue", () => {
 
     it("carrega histórico ao abrir modal", async () => {
         const wrapper = createWrapper();
-        await wrapper.vm.$nextTick();
+        await flushPromises();
         vi.mocked(analiseService.listarAnalisesCadastro).mockResolvedValue([]);
 
         await wrapper.find('[data-testid="btn-cad-atividades-historico"]').trigger("click");
@@ -187,7 +191,7 @@ describe("CadastroView.vue", () => {
 
     it("carrega impacto ao abrir modal", async () => {
         const wrapper = createWrapper();
-        await wrapper.vm.$nextTick();
+        await flushPromises();
         const mapasStore = useMapasStore();
         mapasStore.buscarImpactoMapa = vi.fn().mockResolvedValue(null);
 
@@ -209,7 +213,7 @@ describe("CadastroView.vue", () => {
             conhecimentos: []
         }];
 
-        await wrapper.vm.$nextTick();
+        await flushPromises();
 
         const btn = wrapper.find('[data-testid="btn-cad-atividades-disponibilizar"]');
         expect(btn.attributes('disabled')).toBeDefined();
@@ -226,7 +230,7 @@ describe("CadastroView.vue", () => {
             conhecimentos: [{codigo: 1, descricao: "Conhecimento 1"}]
         }];
 
-        await wrapper.vm.$nextTick();
+        await flushPromises();
 
         const btn = wrapper.find('[data-testid="btn-cad-atividades-disponibilizar"]');
         expect(btn.attributes('disabled')).toBeUndefined();

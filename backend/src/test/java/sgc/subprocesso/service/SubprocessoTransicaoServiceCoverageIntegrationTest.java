@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.Sgc;
 import sgc.alerta.AlertaFacade;
 import sgc.alerta.EmailService;
+import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Mapa;
 import sgc.mapa.service.ImpactoMapaService;
 import sgc.mapa.service.MapaManutencaoService;
@@ -240,6 +241,11 @@ class SubprocessoTransicaoServiceCoverageIntegrationTest {
             mapa = mapaRepo.saveAndFlush(mapa);
 
             Long mapaCodigo = mapa.getCodigo();
+            Atividade atividade = Atividade.builder()
+                    .descricao("Atividade inicial")
+                    .mapa(mapa)
+                    .build();
+            when(mapaManutencaoService.atividadesMapaCodigoSemRels(mapaCodigo)).thenReturn(java.util.List.of(atividade));
 
             transicaoService.atualizarParaEmAndamento(mapaCodigo);
             Subprocesso atualizado = subprocessoRepo.findById(sp.getCodigo()).orElseThrow();
@@ -270,10 +276,45 @@ class SubprocessoTransicaoServiceCoverageIntegrationTest {
             mapa = mapaRepo.saveAndFlush(mapa);
 
             Long mapaCodigo = mapa.getCodigo();
+            Atividade atividade = Atividade.builder()
+                    .descricao("Atividade inicial revisao")
+                    .mapa(mapa)
+                    .build();
+            when(mapaManutencaoService.atividadesMapaCodigoSemRels(mapaCodigo)).thenReturn(java.util.List.of(atividade));
 
             transicaoService.atualizarParaEmAndamento(mapaCodigo);
             Subprocesso atualizado = subprocessoRepo.findById(sp.getCodigo()).orElseThrow();
             assertThat(atualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+        }
+
+        @Test
+        @DisplayName("deve voltar para nao iniciado quando o mapa ficar sem atividades")
+        void voltaParaNaoIniciadoSemAtividades() {
+            Processo proc = new Processo();
+            proc.setDescricao("Proc");
+            proc.setTipo(TipoProcesso.MAPEAMENTO);
+            proc = processoRepo.save(proc);
+
+            Unidade uSp = new Unidade();
+            uSp.setSigla("U4");
+            uSp = unidadeRepo.save(uSp);
+
+            Subprocesso sp = new Subprocesso();
+            sp.setProcesso(proc);
+            sp.setUnidade(uSp);
+            sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+            sp = subprocessoRepo.saveAndFlush(sp);
+
+            Mapa mapa = new Mapa();
+            mapa.setSugestoes("Sugestoes");
+            mapa.setSubprocesso(sp);
+            mapa = mapaRepo.saveAndFlush(mapa);
+
+            when(mapaManutencaoService.atividadesMapaCodigoSemRels(mapa.getCodigo())).thenReturn(java.util.Collections.emptyList());
+            transicaoService.atualizarParaEmAndamento(mapa.getCodigo());
+
+            Subprocesso atualizado = subprocessoRepo.findById(sp.getCodigo()).orElseThrow();
+            assertThat(atualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.NAO_INICIADO);
         }
     }
 

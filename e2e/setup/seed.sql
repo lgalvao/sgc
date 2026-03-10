@@ -306,6 +306,58 @@ VALUES (200001, 'Competência Técnica 1', 200);
 INSERT INTO sgc.competencia_atividade (atividade_codigo, competencia_codigo)
 VALUES (2001, 200001);
 
+-- Dados para teste manual de cadastro em andamento na SECAO_221
+-- Processo 150
+INSERT INTO sgc.processo (codigo, data_criacao, data_finalizacao, data_limite, descricao, situacao, tipo)
+VALUES (150, CURRENT_TIMESTAMP, NULL, CURRENT_TIMESTAMP + INTERVAL '30' DAY,
+        'Processo Seed SECAO_221 - Cadastro em andamento', 'EM_ANDAMENTO', 'MAPEAMENTO');
+
+-- UnidadeProcesso (Unit 18 - SECAO_221)
+INSERT INTO sgc.unidade_processo (processo_codigo, unidade_codigo, situacao, nome, sigla, tipo, matricula_titular,
+                                  titulo_titular, data_inicio_titularidade, unidade_superior_codigo)
+VALUES (150, 18, 'ATIVA', 'Seção 221', 'SECAO_221', 'OPERACIONAL', '00141414', '141414',
+        CURRENT_TIMESTAMP, 17);
+
+-- Subprocesso 150
+INSERT INTO sgc.subprocesso (codigo, processo_codigo, unidade_codigo, situacao, data_limite_etapa1)
+VALUES (150, 150, 18, 'MAPEAMENTO_CADASTRO_EM_ANDAMENTO', CURRENT_TIMESTAMP + INTERVAL '30' DAY);
+
+-- Mapa do subprocesso 150
+INSERT INTO sgc.mapa (codigo, subprocesso_codigo, data_hora_disponibilizado, data_hora_homologado, sugestoes)
+VALUES (150, 150, NULL, NULL, NULL);
+
+-- Atividades e conhecimentos para o mapa 150 (SECAO_221)
+INSERT INTO sgc.atividade (codigo, descricao, mapa_codigo)
+VALUES (1501, 'Atender demandas administrativas da unidade', 150);
+INSERT INTO sgc.conhecimento (codigo, descricao, atividade_codigo)
+VALUES (150101, 'Fluxo interno de atendimento administrativo', 1501);
+INSERT INTO sgc.conhecimento (codigo, descricao, atividade_codigo)
+VALUES (150102, 'Uso do sistema de protocolo', 1501);
+
+INSERT INTO sgc.atividade (codigo, descricao, mapa_codigo)
+VALUES (1502, 'Elaborar minutas e comunicados internos', 150);
+INSERT INTO sgc.conhecimento (codigo, descricao, atividade_codigo)
+VALUES (150201, 'Padrao de redacao institucional', 1502);
+INSERT INTO sgc.conhecimento (codigo, descricao, atividade_codigo)
+VALUES (150202, 'Tramitacao de documentos no SGC', 1502);
+
+INSERT INTO sgc.atividade (codigo, descricao, mapa_codigo)
+VALUES (1503, 'Acompanhar indicadores e pendencias da secao', 150);
+INSERT INTO sgc.conhecimento (codigo, descricao, atividade_codigo)
+VALUES (150301, 'Painel de acompanhamento processual', 1503);
+INSERT INTO sgc.conhecimento (codigo, descricao, atividade_codigo)
+VALUES (150302, 'Consolidacao de informacoes da unidade', 1503);
+
+-- Competências para o mapa 150 (SECAO_221)
+INSERT INTO sgc.competencia (codigo, descricao, mapa_codigo)
+VALUES (1501, 'Gestão operacional da seção', 150);
+INSERT INTO sgc.competencia_atividade (atividade_codigo, competencia_codigo)
+VALUES (1501, 1501);
+INSERT INTO sgc.competencia_atividade (atividade_codigo, competencia_codigo)
+VALUES (1502, 1501);
+INSERT INTO sgc.competencia_atividade (atividade_codigo, competencia_codigo)
+VALUES (1503, 1501);
+
 -- Unidade Isolada para Teste de Diagnóstico (Garante 100% de conclusão com Mock User)
 
 INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo, titulo_titular,
@@ -400,6 +452,11 @@ INSERT INTO sgc.movimentacao (codigo, subprocesso_codigo, unidade_origem_codigo,
                               data_hora, descricao)
 VALUES (9, 200, 2, 1, '202020', CURRENT_TIMESTAMP - INTERVAL '2' DAY, 'Mapa de competências homologado');
 
+-- Subprocesso 150 (Unidade 18 - SECAO_221)
+INSERT INTO sgc.movimentacao (codigo, subprocesso_codigo, unidade_origem_codigo, unidade_destino_codigo, usuario_titulo,
+                              data_hora, descricao)
+VALUES (10, 150, 18, 18, '141414', CURRENT_TIMESTAMP - INTERVAL '1' DAY, 'Cadastro de atividades iniciado');
+
 -- Reset identity sequences to prevent ID conflicts with test data
 -- This ensures auto-generated IDs start above the manually inserted ones
 ALTER TABLE sgc.processo
@@ -415,4 +472,4 @@ ALTER TABLE sgc.conhecimento
 ALTER TABLE sgc.competencia
     ALTER COLUMN codigo RESTART WITH 3000;
 ALTER TABLE sgc.movimentacao
-    ALTER COLUMN codigo RESTART WITH 10;
+    ALTER COLUMN codigo RESTART WITH 20;

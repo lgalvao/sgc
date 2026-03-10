@@ -6,7 +6,9 @@ import org.springframework.security.authentication.*;
 import org.springframework.security.core.authority.*;
 import org.springframework.security.core.context.*;
 import org.springframework.transaction.annotation.*;
+import sgc.mapa.dto.CriarAtividadeRequest;
 import sgc.mapa.model.*;
+import sgc.mapa.service.MapaManutencaoService;
 import sgc.organizacao.model.*;
 import sgc.processo.model.*;
 import sgc.subprocesso.dto.*;
@@ -28,6 +30,9 @@ class SubprocessoServiceContextoIntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private UsuarioRepo usuarioRepo;
+
+    @Autowired
+    private MapaManutencaoService mapaManutencaoService;
 
     private Unidade unidade;
     private Usuario admin;
@@ -89,6 +94,19 @@ class SubprocessoServiceContextoIntegrationTest extends BaseIntegrationTest {
         assertThat(contexto.detalhes()).isNotNull();
         assertThat(contexto.mapa()).isNotNull();
         assertThat(contexto.atividadesDisponiveis()).isNotNull();
+    }
+
+    @Test
+    @DisplayName("obterContextoEdicao: Deve corrigir situacao para cadastro em andamento quando houver atividades")
+    void obterContextoEdicao_DeveReconciliarSituacaoComAtividades() {
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.NAO_INICIADO);
+        subprocessoRepo.saveAndFlush(subprocesso);
+        mapaManutencaoService.criarAtividade(new CriarAtividadeRequest(subprocesso.getMapa().getCodigo(), "Atividade existente"));
+
+        ContextoEdicaoResponse contexto = subprocessoService.obterContextoEdicao(subprocesso.getCodigo());
+
+        assertThat(contexto.detalhes().subprocesso().getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+        assertThat(subprocessoService.buscarSubprocesso(subprocesso.getCodigo()).getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
     }
 
     @Test

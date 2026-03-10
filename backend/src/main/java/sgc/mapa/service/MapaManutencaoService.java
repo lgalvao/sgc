@@ -130,13 +130,14 @@ public class MapaManutencaoService {
     public Atividade criarAtividade(CriarAtividadeRequest request) {
         validarDescricaoAtividadeUnica(request.mapaCodigo(), request.descricao());
         Mapa mapa = repo.buscar(Mapa.class, request.mapaCodigo());
-        notificarAlteracaoMapa(request.mapaCodigo());
 
         Atividade entidade = Atividade.criarDe(request);
         entidade.setMapa(mapa);
 
         log.info("Atividade criada no mapa {}", request.mapaCodigo());
-        return atividadeRepo.save(entidade);
+        Atividade atividadeSalva = atividadeRepo.save(entidade);
+        notificarAlteracaoMapa(request.mapaCodigo());
+        return atividadeSalva;
     }
 
     @Transactional
@@ -145,10 +146,10 @@ public class MapaManutencaoService {
         if (!existente.getDescricao().equalsIgnoreCase(request.descricao())) {
             validarDescricaoAtividadeUnica(existente.getMapa().getCodigo(), request.descricao());
         }
-        notificarAlteracaoMapa(existente.getMapa().getCodigo());
 
         existente.atualizarDe(request);
         atividadeRepo.save(existente);
+        notificarAlteracaoMapa(existente.getMapa().getCodigo());
         log.info("Atividade {} atualizada", codigo);
     }
 
@@ -180,12 +181,12 @@ public class MapaManutencaoService {
 
     private void excluirAtividadeComConhecimentos(Atividade atividade) {
         var mapa = atividade.getMapa();
-        notificarAlteracaoMapa(mapa.getCodigo());
 
         List<Conhecimento> conhecimentos = conhecimentoRepo.findByAtividade_Codigo(atividade.getCodigo());
         conhecimentoRepo.deleteAll(conhecimentos);
 
         atividadeRepo.delete(atividade);
+        notificarAlteracaoMapa(mapa.getCodigo());
     }
 
     @Transactional
@@ -258,14 +259,15 @@ public class MapaManutencaoService {
         validarDescricaoConhecimentoUnica(codAtividade, request.descricao());
         var atividade = repo.buscar(Atividade.class, codAtividade);
         var mapa = atividade.getMapa();
-        notificarAlteracaoMapa(mapa.getCodigo());
 
         var conhecimento = Conhecimento.criarDe(request);
         conhecimento.setAtividade(atividade);
         atividade.getConhecimentos().add(conhecimento);
         log.info("Conhecimento criado na atividade {}", codAtividade);
 
-        return conhecimentoRepo.save(conhecimento);
+        Conhecimento conhecimentoSalvo = conhecimentoRepo.save(conhecimento);
+        notificarAlteracaoMapa(mapa.getCodigo());
+        return conhecimentoSalvo;
     }
 
     @Transactional
@@ -278,10 +280,10 @@ public class MapaManutencaoService {
         }
 
         var mapa = existente.getAtividade().getMapa();
-        notificarAlteracaoMapa(mapa.getCodigo());
 
         existente.atualizarDe(request);
         conhecimentoRepo.save(existente);
+        notificarAlteracaoMapa(mapa.getCodigo());
 
         log.info("Conhecimento atualizado na atividade {}",codAtividade);
     }
@@ -301,9 +303,9 @@ public class MapaManutencaoService {
 
     private void executarExclusaoConhecimento(Conhecimento conhecimento) {
         Mapa mapa = conhecimento.getAtividade().getMapa();
-        notificarAlteracaoMapa(mapa.getCodigo());
         conhecimento.getAtividade().getConhecimentos().remove(conhecimento);
         conhecimentoRepo.delete(conhecimento);
+        notificarAlteracaoMapa(mapa.getCodigo());
     }
 
     private void prepararCompetenciasAtividades(List<Long> codigosAtividades, Competencia competencia) {

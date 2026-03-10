@@ -298,6 +298,20 @@ function processarRespostaLocal(response: any) {
   }
 }
 
+function sincronizarEstadoInicialContexto(data: any) {
+  const subprocessoContexto = data?.detalhes?.subprocesso ?? data?.subprocesso;
+  const permissoesContexto = data?.detalhes?.permissoes ?? data?.permissoes;
+
+  if (!subprocessoContexto || !permissoesContexto) {
+    return;
+  }
+
+  processarRespostaLocal({
+    subprocesso: subprocessoContexto,
+    permissoes: permissoesContexto
+  });
+}
+
 async function adicionarAtividade(): Promise<boolean> {
   if (codMapa.value && codSubprocesso.value) {
     try {
@@ -535,6 +549,7 @@ onMounted(async () => {
     codSubprocesso.value = id;
     const data = await subprocessosStore.buscarContextoEdicao(id);
     if (data) {
+      sincronizarEstadoInicialContexto(data);
       if (data.atividadesDisponiveis) {
         atividades.value = data.atividadesDisponiveis;
       }
