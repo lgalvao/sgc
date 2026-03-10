@@ -33,7 +33,6 @@ class ProcessoWorkflowServiceTest {
     @Mock private ProcessoValidacaoService processoValidador;
     @Mock private ProcessoNotificacaoService notificacaoService;
 
-    // ---- Finalizar ----
 
     @Test
     @DisplayName("Deve finalizar processo com sucesso")
@@ -88,7 +87,6 @@ class ProcessoWorkflowServiceTest {
         verify(notificacaoService).emailFinalizacaoProcesso(codigo);
     }
 
-    // ---- Iniciar ----
 
     @Test
     @DisplayName("Deve iniciar processo de mapeamento para unidades participantes")

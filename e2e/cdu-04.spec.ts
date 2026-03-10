@@ -22,7 +22,6 @@ test.describe('CDU-04 - Iniciar Processo', () => {
                                                                                             autenticadoComoAdmin
                                                                                         }) => {
         const descricao = `CDU-04 Iniciar - ${Date.now()}`;
-        // 1. Criar processo como ADMIN
         await criarProcesso(page, {
             descricao: descricao,
             tipo: 'MAPEAMENTO',
@@ -32,7 +31,6 @@ test.describe('CDU-04 - Iniciar Processo', () => {
             iniciar: false
         });
 
-        // Capturar ID
         await page.getByTestId('tbl-processos').getByText(descricao).first().click();
         await esperarPaginaCadastroProcesso(page);
         const processoId = await extrairProcessoId(page);
@@ -54,7 +52,6 @@ test.describe('CDU-04 - Iniciar Processo', () => {
             tipo: 'Mapeamento'
         });
 
-        // 3. Verificar Detalhes do Processo (Snapshot e Subprocessos)
         await page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descricao)}).click();
         await esperarPaginaDetalhesProcesso(page, processoId);
 
@@ -64,13 +61,10 @@ test.describe('CDU-04 - Iniciar Processo', () => {
             situacao: 'Em andamento'
         });
 
-        // 4. Validar dados iniciais dos subprocessos (Step 9)
         const linhaAss11 = page.locator('tr', {hasText: 'ASSESSORIA_11'}).first();
         await expect(linhaAss11).toContainText('Não iniciado');
-        // Verifica se a data limite foi copiada (Step 9)
         await expect(linhaAss11).toContainText(dataLimiteStr.split('-').reverse().join('/'));
 
-        // 5. Validar Movimentações (Step 11)
         await linhaAss11.click();
         await esperarPaginaSubprocesso(page, 'ASSESSORIA_11');
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText('Não iniciado');
@@ -78,7 +72,6 @@ test.describe('CDU-04 - Iniciar Processo', () => {
         const timeline = page.getByTestId('tbl-movimentacoes');
         await expect(timeline.getByText(/Processo iniciado/i)).toBeVisible();
 
-        // 6. Validar Alertas (Step 14) para Unidade Operacional
         const contextoChefeAss11 = await browser.newContext();
         const paginaChefeAss11 = await contextoChefeAss11.newPage();
         await login(paginaChefeAss11, USUARIOS.CHEFE_ASSESSORIA_11.titulo, USUARIOS.CHEFE_ASSESSORIA_11.senha);

@@ -69,7 +69,6 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
     }
 
 
-
     test('Fase 1.1: ADMIN cria e inicia processo de Mapeamento', async ({
                                                                             page,
                                                                             autenticadoComoAdmin
@@ -221,7 +220,6 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
     });
 
     test('Fase 2.1: Verificar alertas do processo de Revisão', async ({page}) => {
-        // 1. Verificar Alerta para o CHEFE da unidade alvo (Unidade Operacional - Step 13.1)
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
         await verificarPaginaPainel(page);
         

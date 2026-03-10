@@ -27,15 +27,7 @@ const test = base.extend<{
     resetAutomatico: void;
 }>({
     resetAutomatico: [async ({request}, use, testInfo) => {
-        // Detecta de forma mais agressiva se a suíte é serial.
-        // O Playwright testInfo não tem metadata.serial de forma nativa na maioria das vezes.
-        // Então usamos o titlePath, nome do arquivo ou verificamos se a primeira string do path (título da suíte) indica um fluxo serial.
-        // CDUs que sabemos ser seriais (podemos listar caso a string falhe): CDU-05, CDU-06 (parcial), etc.
-        // A melhor forma no contexto do Playwright é ver se o titlePath raiz (describe principal) foi marcado ou se é um teste que a gente SABE que não pode resetar.
         
-        // Estratégia: No SGC, a maioria dos testes de 'revisao' (como CDU-05) ou fluxos longos usam .serial.
-        // Verificamos a presença de 'describe.serial' no arquivo que o testInfo indica, mas como não podemos ler arquivo aqui de forma síncrona,
-        // vamos usar o titlePath ou nome do arquivo.
         
         const fileContent = fs.readFileSync(testInfo.file, 'utf-8');
         const ehSerial = fileContent.includes('test.describe.serial');
