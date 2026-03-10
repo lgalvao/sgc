@@ -178,7 +178,7 @@ Atores: GESTOR e ADMIN
     - `Data/hora`: Data/hora atual
     - `Unidade origem`: 'ADMIN'
     - `Unidade destino`: 'ADMIN'
-    - `Descrição`: 'Cadastro de atividades e conhecimentos homologado'
+    - `Descrição`: 'Cadastro homologado'
 
     12.3.5. O sistema altera a situação do subprocesso da unidade para 'Revisão do cadastro homologada'.
 

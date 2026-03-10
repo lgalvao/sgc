@@ -87,7 +87,7 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
 
-        const btnHomologar = page.getByRole('button', {name: /Homologar cadastro em bloco/i}).first();
+        const btnHomologar = page.getByRole('button', {name: /Homologar em bloco/i}).first();
         await expect(btnHomologar).toBeVisible();
         await expect(btnHomologar).toBeEnabled();
         await btnHomologar.click();
@@ -105,7 +105,7 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {
 
     test('Cenario 2: ADMIN confirma homologação em bloco e permanece na tela', async ({page, autenticadoComoAdmin}) => {
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
-        const btnHomologar = page.getByRole('button', {name: /Homologar cadastro em bloco/i}).first();
+        const btnHomologar = page.getByRole('button', {name: /Homologar em bloco/i}).first();
         await expect(btnHomologar).toBeVisible();
         await btnHomologar.click();
 

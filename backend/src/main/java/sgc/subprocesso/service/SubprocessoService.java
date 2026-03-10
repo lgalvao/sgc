@@ -237,20 +237,23 @@ public class SubprocessoService {
         SituacaoSubprocesso situacaoAtual = subprocesso.getSituacao();
         TipoProcesso tipoProcesso = subprocesso.getProcesso().getTipo();
 
-        if (!temAtividades && Set.of(MAPEAMENTO_CADASTRO_EM_ANDAMENTO, REVISAO_CADASTRO_EM_ANDAMENTO).contains(situacaoAtual)) {
+        if (tipoProcesso == TipoProcesso.REVISAO) {
+            if (situacaoAtual == NAO_INICIADO) {
+                subprocesso.setSituacao(REVISAO_CADASTRO_EM_ANDAMENTO);
+                subprocessoRepo.save(subprocesso);
+            }
+            return;
+        }
+
+        if (!temAtividades && situacaoAtual == MAPEAMENTO_CADASTRO_EM_ANDAMENTO) {
             subprocesso.setSituacaoForcada(NAO_INICIADO);
             subprocessoRepo.save(subprocesso);
             return;
         }
 
         if (temAtividades && situacaoAtual == NAO_INICIADO) {
-            if (tipoProcesso == TipoProcesso.MAPEAMENTO) {
-                subprocesso.setSituacao(MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
-                subprocessoRepo.save(subprocesso);
-            } else if (tipoProcesso == TipoProcesso.REVISAO) {
-                subprocesso.setSituacao(REVISAO_CADASTRO_EM_ANDAMENTO);
-                subprocessoRepo.save(subprocesso);
-            }
+            subprocesso.setSituacao(MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+            subprocessoRepo.save(subprocesso);
         }
     }
 
@@ -604,7 +607,7 @@ public class SubprocessoService {
         }
 
         TipoProcesso tipoProcesso = subprocesso.getProcesso().getTipo();
-        if (!Set.of(TipoProcesso.MAPEAMENTO, TipoProcesso.REVISAO).contains(tipoProcesso)) {
+        if (tipoProcesso != TipoProcesso.MAPEAMENTO) {
             return;
         }
 
@@ -612,16 +615,12 @@ public class SubprocessoService {
         SituacaoSubprocesso situacaoAtual = subprocesso.getSituacao();
 
         if (temAtividades && situacaoAtual == NAO_INICIADO) {
-            if (tipoProcesso == TipoProcesso.MAPEAMENTO) {
-                subprocesso.setSituacao(MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
-            } else {
-                subprocesso.setSituacao(REVISAO_CADASTRO_EM_ANDAMENTO);
-            }
+            subprocesso.setSituacao(MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
             subprocessoRepo.save(subprocesso);
             return;
         }
 
-        if (!temAtividades && Set.of(MAPEAMENTO_CADASTRO_EM_ANDAMENTO, REVISAO_CADASTRO_EM_ANDAMENTO).contains(situacaoAtual)) {
+        if (!temAtividades && situacaoAtual == MAPEAMENTO_CADASTRO_EM_ANDAMENTO) {
             subprocesso.setSituacaoForcada(NAO_INICIADO);
             subprocessoRepo.save(subprocesso);
         }

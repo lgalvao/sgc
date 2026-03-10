@@ -31,7 +31,7 @@ Atores: ADMIN e GESTOR
    2.2.2. Caso existam unidades subordinadas cujos subprocessos estejam localizados na unidade do usuário, os seguintes
    botões poderão ser apresentados:
 
-    - Aceitar/Homologar cadastro em bloco, se existirem unidades subordinadas com subprocesso na situação 'Cadastro
+    - Aceitar/Homologar em bloco, se existirem unidades subordinadas com subprocesso na situação 'Cadastro
       disponibilizado' (processo de mapeamento) ou 'Revisão do cadastro disponibilizada' (processo de revisão)  (ver
       caso de uso Aceitar/homologar cadastro em bloco).
    

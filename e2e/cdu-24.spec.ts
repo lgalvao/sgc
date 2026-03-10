@@ -81,7 +81,7 @@ test.describe('CDU-24 - Disponibilizar mapas em bloco', () => {
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         
         // Validação da UI da ação em bloco
-        const btnDisponibilizar = page.getByRole('button', {name: /Disponibilizar mapas de competência em bloco/i}).first();
+        const btnDisponibilizar = page.getByRole('button', {name: /Disponibilizar mapas em bloco/i}).first();
         await expect(btnDisponibilizar).toBeEnabled();
         await btnDisponibilizar.click();
 

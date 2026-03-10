@@ -17,7 +17,7 @@
    disponibilizados.
 
 4. Na seção de unidades participantes, abaixo da árvore de unidades, o sistema mostra o botão
-   `Disponibilizar mapas de competência em bloco`.
+   `Disponibilizar mapas em bloco`.
 
 5. O sistema abre modal de confirmação, com os elementos a seguir:
 

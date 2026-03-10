@@ -667,21 +667,25 @@ public class SubprocessoTransicaoService {
     public void atualizarParaEmAndamento(Long mapaCodigo) {
         var subprocesso = subprocessoRepo.findByMapa_Codigo(mapaCodigo).orElseThrow();
         boolean temAtividades = !mapaManutencaoService.atividadesMapaCodigoSemRels(mapaCodigo).isEmpty();
-        if (!temAtividades && Set.of(MAPEAMENTO_CADASTRO_EM_ANDAMENTO, REVISAO_CADASTRO_EM_ANDAMENTO).contains(subprocesso.getSituacao())) {
+        TipoProcesso tipo = subprocesso.getProcesso().getTipo();
+
+        if (tipo == REVISAO) {
+            if (subprocesso.getSituacao() == NAO_INICIADO) {
+                subprocesso.setSituacao(REVISAO_CADASTRO_EM_ANDAMENTO);
+                subprocessoRepo.save(subprocesso);
+            }
+            return;
+        }
+
+        if (!temAtividades && subprocesso.getSituacao() == MAPEAMENTO_CADASTRO_EM_ANDAMENTO) {
             subprocesso.setSituacaoForcada(NAO_INICIADO);
             subprocessoRepo.save(subprocesso);
             return;
         }
 
         if (temAtividades && subprocesso.getSituacao() == NAO_INICIADO) {
-            TipoProcesso tipo = subprocesso.getProcesso().getTipo();
-            if (tipo == MAPEAMENTO) {
-                subprocesso.setSituacao(MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
-                subprocessoRepo.save(subprocesso);
-            } else if (tipo == REVISAO) {
-                subprocesso.setSituacao(REVISAO_CADASTRO_EM_ANDAMENTO);
-                subprocessoRepo.save(subprocesso);
-            }
+            subprocesso.setSituacao(MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+            subprocessoRepo.save(subprocesso);
         }
     }
 

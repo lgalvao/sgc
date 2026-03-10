@@ -149,7 +149,7 @@ As seções a seguir detalham os atores, pré-condições e ações permitidas p
     * Alterar situação do subprocesso de unidade específica (ex: reabrir cadastro).
     * Finalizar processo.
 * **ADMIN/GESTOR**:
-    * Acessar `Aceitar/Homologar cadastro em bloco` (se houver pendências).
+    * Acessar `Aceitar/Homologar em bloco` (se houver pendências).
     * Acessar `Aceitar/Homologar mapa em bloco` (se houver pendências).
     * Clicar em unidade para ver detalhes do subprocesso (CDU-07).
 

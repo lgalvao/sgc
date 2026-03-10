@@ -110,6 +110,25 @@ class SubprocessoServiceContextoIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
+    @DisplayName("obterContextoEdicao: Nao deve promover revisao para em andamento apenas por haver atividades copiadas")
+    void obterContextoEdicao_NaoDevePromoverRevisaoComAtividadesCopiadas() {
+        processo.setTipo(TipoProcesso.REVISAO);
+        processoRepo.saveAndFlush(processo);
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.NAO_INICIADO);
+        subprocessoRepo.saveAndFlush(subprocesso);
+        Atividade atividade = Atividade.builder()
+                .descricao("Atividade copiada")
+                .mapa(subprocesso.getMapa())
+                .build();
+        atividadeRepo.saveAndFlush(atividade);
+
+        ContextoEdicaoResponse contexto = subprocessoService.obterContextoEdicao(subprocesso.getCodigo());
+
+        assertThat(contexto.detalhes().subprocesso().getSituacao()).isEqualTo(SituacaoSubprocesso.NAO_INICIADO);
+        assertThat(subprocessoService.buscarSubprocesso(subprocesso.getCodigo()).getSituacao()).isEqualTo(SituacaoSubprocesso.NAO_INICIADO);
+    }
+
+    @Test
     @DisplayName("obterPermissoesUI: Deve retornar todas as permissões falsas se o processo estiver FINALIZADO")
     void obterPermissoesUI_ProcessoFinalizado() {
         processo.setSituacao(SituacaoProcesso.FINALIZADO);

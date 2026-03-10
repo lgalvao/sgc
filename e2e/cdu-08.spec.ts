@@ -39,12 +39,6 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
             });
             processoOrigem2Id = procOrigem2.codigo;
 
-            // Criar um processo prévio para a unidade alvo ter atividades prévias no mapa de competências
-            await criarProcessoFinalizadoFixture(request, {
-                unidade: UNIDADE_ALVO,
-                descricao: `Processo Previo Alvo ${timestamp}`
-            });
-
             const processoAlvo = await criarProcessoFixture(request, {
                 unidade: UNIDADE_ALVO,
                 descricao: descricaoProcesso,
@@ -63,9 +57,10 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
             await AtividadeHelpers.navegarParaAtividades(page);
         });
 
-        await test.step('2.1 Verificar pré-preenchimento (Passo 4)', async () => {
-            // Como criamos um processo finalizado prévio, já deve haver alguma atividade carregada
-            await expect(page.locator('.atividade-card').first()).toBeVisible();
+        await test.step('2.1 Verificar estado inicial do mapeamento', async () => {
+            await expect(page.getByTestId('cad-atividades-empty-state')).toBeVisible();
+            await AtividadeHelpers.verificarSituacaoSubprocesso(page, 'Não iniciado');
+            await AtividadeHelpers.verificarBotaoDisponibilizar(page, false);
         });
 
         await test.step('3. Importar Atividades (Fluxo Múltiplo e Negativo)', async () => {
@@ -77,6 +72,10 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
 
             // Importar ambas as atividades com sucesso
             await AtividadeHelpers.importarAtividades(page, processoOrigemDescricao, UNIDADE_ORIGEM, [atividadeA, atividadeB]);
+
+            // A importação deve atualizar imediatamente a situação e habilitar a disponibilização
+            await AtividadeHelpers.verificarSituacaoSubprocesso(page, 'Cadastro em andamento');
+            await AtividadeHelpers.verificarBotaoDisponibilizar(page, true);
 
             // Tentar importar de novo e esperar o erro (Fluxo Negativo / Regra de Duplicidade)
             await AtividadeHelpers.importarAtividadesComErroDuplicidade(page, processoOrigemDescricao, UNIDADE_ORIGEM, [atividadeA]);

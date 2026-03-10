@@ -5,7 +5,7 @@ O teste E2E cobre:
 
 - **Setup completo**: Criação de processo, adição de atividades, disponibilização de cadastro, aceites de cadastro por GESTORs, homologação de cadastro por ADMIN (Fluxo completo até "Cadastro homologado").
 - **Criação de mapa**: ADMIN cria competência associada à atividade (passo 10 do fluxo).
-- **Passos 4-5**: Navegação ao processo, identificação de unidades com mapas criados, clique em "Disponibilizar mapas de competência em bloco", abertura de modal (Fluxo completo).
+- **Passos 4-5**: Navegação ao processo, identificação de unidades com mapas criados, clique em "Disponibilizar mapas em bloco", abertura de modal (Fluxo completo).
 - **Passo 5 - Validação de modal**:
   - Título "Disponibilização de mapa em bloco"
   - Texto "Selecione abaixo as unidades cujos mapas deverão ser disponibilizados"

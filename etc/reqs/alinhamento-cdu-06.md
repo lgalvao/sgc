@@ -17,7 +17,7 @@ O teste `cdu-06.spec.ts` cobre os seguintes cenários:
 - ✅ Botões "Alterar data limite" e "Reabrir cadastro" ocultos para GESTOR em subprocesso
 
 **Fase 2 - Ações em bloco (passo 2.2.2):**
-- ✅ Botão "Homologar cadastro em bloco" exibido para ADMIN quando há subprocessos em "Cadastro disponibilizado"
+- ✅ Botão "Homologar em bloco" exibido para ADMIN quando há subprocessos em "Cadastro disponibilizado"
 - ✅ Botão "Aceitar cadastro em bloco" exibido para GESTOR quando há subprocessos em "Cadastro disponibilizado"
 
 ## Lacunas em relação ao requisito
@@ -48,7 +48,7 @@ O teste `cdu-06.spec.ts` cobre os seguintes cenários:
    - Que estes botões aparecem apenas para ADMIN
 
 7. **Botões de ação em bloco (passo 2.2.2)**: O requisito descreve condições para exibição de botões:
-   - "Aceitar/Homologar cadastro em bloco" se existirem unidades subordinadas com subprocesso em "Cadastro disponibilizado" (MAPEAMENTO) ou "Revisão do cadastro disponibilizada" (REVISAO)
+   - "Aceitar/Homologar em bloco" se existirem unidades subordinadas com subprocesso em "Cadastro disponibilizado" (MAPEAMENTO) ou "Revisão do cadastro disponibilizada" (REVISAO)
    - "Aceitar/Homologar mapa em bloco" se existirem subprocessos em "Mapa validado" ou "Mapa com sugestões"
 
    O teste valida apenas o primeiro tipo (cadastro em bloco). Não testa:

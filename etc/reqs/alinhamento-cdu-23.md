@@ -5,7 +5,7 @@ O teste E2E cobre:
 
 - **Setup de dados**: Criação de processo, adição de atividades por CHEFE, disponibilização de cadastro, aceite de cadastro por GESTORs (Setup UI).
 - **Passos 1-2**: Navegação de ADMIN ao painel, acesso ao processo, exibição de tela "Detalhes do processo" (Cenário 1).
-- **Passo 3**: Verificação de presença do botão "Homologar cadastro em bloco" na seção "Unidades participantes" (Cenário 1).
+- **Passo 3**: Verificação de presença do botão "Homologar em bloco" na seção "Unidades participantes" (Cenário 1).
 - **Passo 4**: Clique no botão (Cenário 1).
 - **Passo 5**: Abertura de modal com:
   - Título "Homologação de cadastro em bloco"
@@ -16,7 +16,7 @@ O teste E2E cobre:
 - **Passos 7-9**: Confirmação da homologação (Cenário 2):
   - Clique em "Homologar"
   - Permanência na tela Detalhes do processo
-  - Validação de que botão "Homologar cadastro em bloco" fica desabilitado
+  - Validação de que botão "Homologar em bloco" fica desabilitado
   - Validação de que subprocesso SECAO_221 exibe situação "Cadastro homologado"
 
 ## Lacunas em relação ao requisito
@@ -34,7 +34,7 @@ O teste **NÃO cobre**:
     - Data/hora: Data/hora atual
     - Unidade origem: "ADMIN"
     - Unidade destino: "ADMIN"
-    - Descrição: "Cadastro de atividades e conhecimentos homologado"
+    - Descrição: "Cadastro homologado"
     - Teste não valida se movimentação foi registrada
   
   - 8.2: Alteração de situação para "Cadastro homologado"

@@ -253,7 +253,7 @@ class SubprocessoTransicaoServiceCoverageIntegrationTest {
         }
 
         @Test
-        @DisplayName("deve atualizar para revisao em andamento se revisao e nao iniciado")
+        @DisplayName("deve atualizar para revisao em andamento apos alteracao")
         void revisaoEmAndamento() {
             Processo proc = new Processo();
             proc.setDescricao("Proc");

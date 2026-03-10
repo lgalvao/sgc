@@ -1,5 +1,7 @@
 # Alinhamento CDU-08 - Manter cadastro de atividades e conhecimentos
 
+SITUACAO: Cobertura melhorada -- PENDENTE validação.
+
 ## Cobertura atual do teste
 O teste `cdu-08.spec.ts` em dois cenários:
 

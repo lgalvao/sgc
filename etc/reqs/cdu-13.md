@@ -153,7 +153,7 @@ um campo para preenchimento de uma observação opcional e os botões Confirmar 
     - `Data/hora`: Data/hora atual
     - `Unidade origem`: 'ADMIN'
     - `Unidade destino`: 'ADMIN'
-    - `Descrição`: 'Cadastro de atividades e conhecimentos homologado'
+    - `Descrição`: 'Cadastro homologado'
 
    11.6. O sistema altera a situação do subprocesso da unidade para 'Cadastro homologado'.
 

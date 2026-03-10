@@ -484,7 +484,7 @@ describe("Processo.vue", () => {
         await flushPromises();
 
         await wrapper.find("button.btn-warning").trigger("click");
-        expect(wrapper.find("button.btn-warning").text()).toContain("Homologar cadastro em bloco");
+        expect(wrapper.find("button.btn-warning").text()).toContain("Homologar em bloco");
         expect((wrapper.vm).tituloModalBloco).toBe("Homologação de cadastro em bloco");
         expect((wrapper.vm).textoModalBloco).toBe("Selecione abaixo as unidades cujos cadastros deverão ser homologados:");
         expect((wrapper.vm).rotuloBotaoBloco).toBe("Homologar");
@@ -541,7 +541,7 @@ describe("Processo.vue", () => {
         await modal.vm.$emit("confirmar", {ids: [104], dataLimite: '2024-12-31'});
 
         expect(processosStore.executarAcaoBloco).toHaveBeenCalledWith('disponibilizar', [104], '2024-12-31');
-        expect(wrapper.find("button.btn-info").text()).toContain("Disponibilizar mapas de competência em bloco");
+        expect(wrapper.find("button.btn-info").text()).toContain("Disponibilizar mapas em bloco");
         expect(modal.props("titulo")).toBe("Disponibilização de mapa em bloco");
     });
 

@@ -112,7 +112,7 @@ class SubprocessoServiceDatasIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("atualizarParaEmAndamento: deve atualizar de NAO_INICIADO para REVISAO_CADASTRO_EM_ANDAMENTO (REVISAO)")
+    @DisplayName("atualizarParaEmAndamento: deve atualizar revisao para em andamento apos alteracao")
     void atualizarParaEmAndamento_Revisao() {
         processo.setTipo(TipoProcesso.REVISAO);
         processoRepo.save(processo);

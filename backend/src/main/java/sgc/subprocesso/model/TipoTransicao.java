@@ -30,7 +30,7 @@ public enum TipoTransicao {
     ),
 
     CADASTRO_HOMOLOGADO(
-            "Cadastro de atividades e conhecimentos homologado",
+            "Cadastro homologado",
             null,
             null,
             null

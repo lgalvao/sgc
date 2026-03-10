@@ -318,7 +318,7 @@ const rotuloAcaoAceitarBloco = computed(() => {
 const rotuloAcaoHomologarBloco = computed(() => {
   switch (contextoHomologacaoBloco.value) {
     case "cadastro":
-      return "Homologar cadastro em bloco";
+      return "Homologar em bloco";
     case "validacao":
       return "Homologar mapa de competências em bloco";
     default:
@@ -327,7 +327,7 @@ const rotuloAcaoHomologarBloco = computed(() => {
 });
 
 const rotuloAcaoDisponibilizarBloco = computed(() => {
-  return "Disponibilizar mapas de competência em bloco";
+  return "Disponibilizar mapas em bloco";
 });
 
 const tituloModalBloco = computed(() => {

@@ -433,9 +433,10 @@ async function salvarEdicaoConhecimento(atividadeCodigo: number, conhecimentoCod
 
 async function handleImportAtividades() {
   mostrarModalImportar.value = false;
-  if (codSubprocesso.value) {
+  const codigoSubprocesso = codSubprocesso.value;
+  if (codigoSubprocesso !== null) {
     await withErrorHandling(async () => {
-      const data = await subprocessosStore.buscarContextoEdicao(codSubprocesso.value);
+      const data = await subprocessosStore.buscarContextoEdicao(codigoSubprocesso);
       if (data) {
         sincronizarEstadoInicialContexto(data);
         atividades.value = data.atividadesDisponiveis ?? [];

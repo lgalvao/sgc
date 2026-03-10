@@ -159,6 +159,16 @@ export async function verificarSituacaoSubprocesso(page: Page, situacao: string)
     await expect(page.getByTestId('cad-atividades__txt-badge-situacao')).toHaveText(new RegExp(situacao, 'i'));
 }
 
+export async function verificarBotaoDisponibilizar(page: Page, habilitado: boolean) {
+    const botao = page.getByTestId('btn-cad-atividades-disponibilizar');
+    await expect(botao).toBeVisible();
+    if (habilitado) {
+        await expect(botao).toBeEnabled();
+    } else {
+        await expect(botao).toBeDisabled();
+    }
+}
+
 export async function verificarBotaoImpactoDropdown(page: Page) {
     const btnMaisAcoes = page.getByTestId('btn-mais-acoes');
     await expect(btnMaisAcoes).toBeVisible();
@@ -310,9 +320,10 @@ export async function verificarOpcoesImportacao(page: Page, processosEsperados: 
     await expect(modal.getByText('Importação de atividades')).toBeVisible();
 
     const selectProcesso = modal.getByTestId('select-processo');
-    for (const proc of processosEsperados) {
-        await expect(selectProcesso.locator('option', { hasText: proc })).toBeVisible();
-    }
+    await expect.poll(async () => {
+        const options = await selectProcesso.locator('option').allTextContents();
+        return processosEsperados.every(proc => options.some(opt => opt.includes(proc)));
+    }, { timeout: 10000 }).toBeTruthy();
     
     if (processosEsperados.length > 0) {
         await selectProcesso.selectOption({ label: processosEsperados[0] });
