@@ -115,35 +115,33 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
         await expect(btnAceitarSecHabilitado).toBeEnabled();
     });
 
-    test('Cenario 4: Múltiplas unidades disponibilizadas, botão desabilitado para gestor de 2 níveis acima', async ({page}) => {
+    test('Cenario 4: Múltiplas unidades disponibilizadas, botão desabilitado para gestor de nível superior (itens com intermediários)', async ({page}) => {
         const timestamp2 = Date.now();
         const descProcesso2 = `Mapeamento Multi CDU-22 ${timestamp2}`;
         
-        // 1. Admin cria processo com SECAO_221 e SECAO_211
+        // 1. Admin cria processo com SECAO_111 e SECAO_121
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
         await criarProcesso(page, {
             descricao: descProcesso2,
             tipo: 'MAPEAMENTO',
             diasLimite: 30,
-            unidade: 'SECAO_221',
-            expandir: ['SECRETARIA_2', 'COORD_22']
+            unidade: 'SECAO_111',
+            expandir: ['SECRETARIA_1', 'COORD_11', 'COORD_12']
         });
 
-        // Expansão manual adicional para garantir visibilidade da SECAO_211
-        // SECRETARIA_2 -> COORD_21 -> SECAO_211
-        await page.getByTestId('btn-arvore-expand-COORD_21').click();
-        await page.getByTestId('chk-unidade-SECAO_211').click();
+        // Selecionar SECAO_121 também
+        await page.getByTestId('chk-unidade-SECAO_121').click();
 
         const linhaProcesso = page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descProcesso2)});
         await linhaProcesso.click();
         await page.getByTestId('btn-processo-iniciar').click();
         await page.getByTestId('btn-iniciar-processo-confirmar').click();
 
-        // 2. Chefes de ambas unidades disponibilizam
+        // 2. Chefes disponibilizam
         const chefes = [
-            {user: USUARIOS.CHEFE_SECAO_221, atividade: `Ativ 221 ${timestamp2}`},
-            {user: USUARIOS.CHEFE_SECAO_211, atividade: `Ativ 211 ${timestamp2}`}
+            {user: USUARIOS.CHEFE_SECAO_111, atividade: `Ativ 111 ${timestamp2}`},
+            {user: USUARIOS.CHEFE_SECAO_121, atividade: `Ativ 121 ${timestamp2}`}
         ];
 
         for (const chefe of chefes) {
@@ -157,12 +155,13 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
             await verificarPaginaPainel(page);
         }
 
-        // 3. Logar como GESTOR SECRETARIA_2. O botão deve estar visível mas DESABILITADO
-        await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
+        // 3. Logar como GESTOR SECRETARIA_1. O botão deve estar visível mas DESABILITADO
+        // Porque os itens estão com COORD_11 e COORD_12
+        await loginComPerfil(page, USUARIOS.GESTOR_SECRETARIA_1.titulo, USUARIOS.GESTOR_SECRETARIA_1.senha, 'GESTOR - SECRETARIA_1');
         await page.getByTestId('tbl-processos').getByText(descProcesso2).first().click();
 
-        const btnAceitarSec = page.getByTestId('btn-processo-aceitar-bloco');
-        await expect(btnAceitarSec).toBeVisible();
-        await expect(btnAceitarSec).toBeDisabled();
+        const btnAceitar = page.getByTestId('btn-processo-aceitar-bloco');
+        await expect(btnAceitar).toBeVisible();
+        await expect(btnAceitar).toBeDisabled();
     });
 });
