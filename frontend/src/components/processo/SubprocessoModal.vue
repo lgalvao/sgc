@@ -10,12 +10,11 @@
         description="Selecione uma data futura"
         label="Nova data limite"
     >
-      <BFormInput
+      <InputData
           v-model="novaDataLimite"
           :min="dataLimiteMinima"
           data-testid="input-nova-data-limite"
           max="2099-12-31"
-          type="date"
       />
       <template #description>
         Data limite atual: {{ dataLimiteAtualFormatada }}
@@ -51,7 +50,8 @@
 </template>
 
 <script lang="ts" setup>
-import {BButton, BFormGroup, BFormInput, BModal} from "bootstrap-vue-next";
+import {BButton, BFormGroup, BModal} from "bootstrap-vue-next";
+import InputData from "@/components/comum/InputData.vue";
 import {computed, ref, watch} from "vue";
 import {formatDateBR, formatDateForInput, isDateValidAndFuture, parseDate,} from "@/utils";
 

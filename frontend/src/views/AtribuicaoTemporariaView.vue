@@ -46,27 +46,25 @@
           <div class="row">
             <div class="col-md-6 mb-3">
               <label class="form-label" for="dataInicio">Data de Início</label>
-              <BFormInput
+              <InputData
                   id="dataInicio"
                   v-model="dataInicio"
                   data-testid="input-data-inicio"
                   max="2099-12-31"
                   min="2000-01-01"
                   required
-                  type="date"
               />
             </div>
 
             <div class="col-md-6 mb-3">
               <label class="form-label" for="dataTermino">Data de Término</label>
-              <BFormInput
+              <InputData
                   id="dataTermino"
                   v-model="dataTermino"
                   data-testid="input-data-termino"
                   max="2099-12-31"
                   min="2000-01-01"
                   required
-                  type="date"
               />
             </div>
           </div>
@@ -113,7 +111,6 @@ import {
   BCard,
   BCardBody,
   BForm,
-  BFormInput,
   BFormInvalidFeedback,
   BFormSelect,
   BFormSelectOption,
@@ -126,6 +123,7 @@ import type {Unidade, Usuario} from "@/types/tipos";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import LoadingButton from "@/components/comum/LoadingButton.vue";
 import AppAlert from "@/components/comum/AppAlert.vue";
+import InputData from "@/components/comum/InputData.vue";
 import {useNotification} from "@/composables/useNotification";
 import {buscarUnidadePorCodigo as buscarUnidadeServico} from "@/services/unidadeService";
 import {buscarUsuariosPorUnidade} from "@/services/usuarioService";

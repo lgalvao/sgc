@@ -15,7 +15,14 @@
 
           <div v-if="mostrarDataLimite" class="mb-3">
             <label class="form-label required" for="dataLimiteBloco">Data Limite</label>
-            <input id="dataLimiteBloco" v-model="dataLimite" class="form-control" max="2099-12-31" min="2000-01-01" required type="date">
+            <InputData
+                id="dataLimiteBloco"
+                v-model="dataLimite"
+                data-testid="inp-data-limite-bloco"
+                max="2099-12-31"
+                min="2000-01-01"
+                required
+            />
           </div>
 
           <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
@@ -76,6 +83,7 @@
 <script lang="ts" setup>
 import {computed, onMounted, ref, watch} from 'vue';
 import {Modal} from 'bootstrap';
+import InputData from '@/components/comum/InputData.vue';
 
 export interface UnidadeSelecao {
   codigo: number;

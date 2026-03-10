@@ -80,23 +80,17 @@
         Data limite <span aria-hidden="true" class="text-danger">*</span>
       </template>
 
-      <BInputGroup>
-        <BFormInput
-            id="dataLimite"
-            ref="inputDataLimiteRef"
-            :model-value="modelValue.dataLimite"
-            :state="fieldErrors.dataLimite ? false : null"
-            data-testid="inp-processo-data-limite"
-            max="2099-12-31"
-            min="2000-01-01"
-            required
-            type="date"
-            @update:model-value="(val) => updateField('dataLimite', String(val))"
-        />
-        <BInputGroupText class="cursor-pointer" @click="abrirCalendario">
-          <i class="bi bi-calendar-event"></i>
-        </BInputGroupText>
-      </BInputGroup>
+      <InputData
+          id="dataLimite"
+          ref="inputDataLimiteRef"
+          :model-value="modelValue.dataLimite"
+          :state="fieldErrors.dataLimite ? false : null"
+          data-testid="inp-processo-data-limite"
+          max="2099-12-31"
+          min="2000-01-01"
+          required
+          @update:model-value="(val) => updateField('dataLimite', String(val))"
+      />
 
       <BFormInvalidFeedback :state="fieldErrors.dataLimite ? false : null">
         {{ fieldErrors.dataLimite }}
@@ -117,6 +111,7 @@ import {
 } from "bootstrap-vue-next";
 import {nextTick, ref, watch} from "vue";
 import ArvoreUnidades from "@/components/unidade/ArvoreUnidades.vue";
+import InputData from "@/components/comum/InputData.vue";
 import type {Unidade} from "@/types/tipos";
 import {TipoProcesso} from "@/types/tipos";
 import {useValidacao} from "@/composables/useValidacao";

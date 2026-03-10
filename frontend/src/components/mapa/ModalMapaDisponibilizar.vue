@@ -20,14 +20,13 @@
           class="form-label"
           for="dataLimite"
       >Data limite para validação</label>
-      <BFormInput
+      <InputData
           id="dataLimite"
           v-model="dataLimiteValidacao"
           :state="fieldErrors?.dataLimite ? false : null"
           data-testid="inp-disponibilizar-mapa-data"
           max="2099-12-31"
           min="2000-01-01"
-          type="date"
       />
       <BFormInvalidFeedback :state="fieldErrors?.dataLimite ? false : null">
         {{ fieldErrors?.dataLimite }}
@@ -75,9 +74,10 @@
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BFormInput, BFormInvalidFeedback, BFormTextarea} from "bootstrap-vue-next";
+import {BAlert, BFormInvalidFeedback, BFormTextarea} from "bootstrap-vue-next";
 import LoadingButton from "@/components/comum/LoadingButton.vue";
 import ModalPadrao from "@/components/comum/ModalPadrao.vue";
+import InputData from "@/components/comum/InputData.vue";
 import {ref, watch} from "vue";
 
 const props = defineProps<{
