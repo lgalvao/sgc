@@ -32,6 +32,7 @@ export const test = base.extend<{
     autenticadoComoChefeAssessoria12: void;
     autenticadoComoChefeAssessoria21: void;
     autenticadoComoChefeAssessoria22: void;
+    autenticadoComoGestorSecretaria2: void;
     autenticadoComoAdminComPerfil: void;
     autenticadoComoServidor: void;
 }>({
@@ -52,6 +53,11 @@ export const test = base.extend<{
 
     autenticadoComoGestorCoord22: async ({page}, use) => {
         await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
+        await use();
+    },
+
+    autenticadoComoGestorSecretaria2: async ({page}, use) => {
+        await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
         await use();
     },
 

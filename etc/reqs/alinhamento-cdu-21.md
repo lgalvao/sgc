@@ -17,7 +17,7 @@ O teste **NÃO cobre**:
   - Teste não valida a verificação dessa condição
   - Teste não cobre cenário onde nem todos os subprocessos estão homologados (passo 5 - mensagem de erro)
 
-- **Passo 5**: Mensagem de erro condicional - "Não é possível encerrar o processo enquanto houver unidades com mapa de competência ainda não homologado"
+- **Passo 5**: Mensagem de erro condicional - "Não é possível finalizar o processo enquanto houver unidades com mapa de competência ainda não homologado"
   - Teste não tenta finalizar processo com subprocesso em outro estado
   - Teste não valida mensagem de erro exata
 
@@ -51,7 +51,7 @@ O teste **NÃO cobre**:
 ## Alterações necessárias no teste E2E
 1. **Adicionar validação de verificação de pré-requisito (Passo 4-5)**:
    - Criar novo teste que tenta finalizar processo com subprocesso em situação diferente de "Mapa homologado"
-   - Validar mensagem de erro exata: "Não é possível encerrar o processo enquanto houver unidades com mapa de competência ainda não homologado"
+   - Validar mensagem de erro exata: "Não é possível finalizar o processo enquanto houver unidades com mapa de competência ainda não homologado"
 
 2. **Aprimorar validação do diálogo de confirmação (Passo 6)**:
    - Validar título exato: "Finalização de processo"

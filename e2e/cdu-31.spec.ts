@@ -12,7 +12,7 @@ test.describe.serial('CDU-31 - Configurar sistema', () => {
 
     test('Cenários CDU-31: ADMIN navega e altera configurações do sistema', async ({page, autenticadoComoAdmin}) => {
         // Cenario 1: Navegação para parâmetros
-        await page.getByTestId('btn-parametros').click();
+        await page.getByTestId('btn-configuracoes').click();
         await expect(page).toHaveURL(/\/parametros/);
         await expect(page.getByRole('heading', {name: 'Parâmetros', exact: true})).toBeVisible();
 

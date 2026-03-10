@@ -106,16 +106,16 @@ class HierarquiaServiceTest {
     void deveRetornarTrueParaMesmaUnidade() {
         Unidade unidade = criarUnidade(1L, null);
 
-        assertThat(hierarquiaService.isMesmaOuSubordinada(unidade, unidade)).isTrue();
+        assertThat(hierarquiaService.ehMesmaOuSubordinada(unidade, unidade)).isTrue();
     }
 
     @Test
     @DisplayName("Deve retornar true para unidade subordinada em isMesmaOuSubordinada")
-    void deveRetornarTrueParaUnidadeSubordinadaEmIsMesmaOuSubordinada() {
+    void deveRetornarTrueParaUnidadeSubordinadaEmEhMesmaOuSubordinada() {
         Unidade superior = criarUnidade(1L, null);
         Unidade alvo = criarUnidade(2L, superior);
 
-        assertThat(hierarquiaService.isMesmaOuSubordinada(alvo, superior)).isTrue();
+        assertThat(hierarquiaService.ehMesmaOuSubordinada(alvo, superior)).isTrue();
     }
 
     @Test

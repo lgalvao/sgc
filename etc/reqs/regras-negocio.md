@@ -43,13 +43,13 @@ Este documento consolida todas as regras de negócio do Sistema de Gestão de Co
 **RN-01.04** — Unidades do tipo **SEM_EQUIPE** não participam de processos de mapeamento, revisão ou diagnóstico e não possuem responsável atribuído pelo sistema.
 > Fonte: `views/view-03-unidade.md` (RN-VIEW03-03), `views/view-05-responsabilidade.md` (RN-VIEW05-01)
 
-**RN-01.05** — Unidades do tipo **INTERMEDIÁRIA** não cadastram atividades e conhecimentos; seu papel é exclusivamente o de validar os cadastros e mapas das unidades subordinadas.
+**RN-01.05** — Unidades do tipo **INTERMEDIÁRIA** não cadastram atividades e conhecimentos; seu papel no sistema é exclusivamente o de validar os cadastros e mapas das unidades subordinadas.
 > Fonte: `_intro.md`, `_intro-glossario.md`, `cdu-04.md` (passo 9)
 
-**RN-01.06** — As **Centrais de Atendimento ao Eleitor (CAEs)** têm como unidade superior, na hierarquia do SGC, a Zona Eleitoral sob sua responsabilidade vigente, conforme dados do CORAU. Se não houver zona atribuída, a unidade superior fica nula.
+**RN-01.06** — As **Centrais de Atendimento ao Eleitor (CAEs)** têm como unidade superior, na hierarquia do SGC, a Zona Eleitoral sob sua responsabilidade vigente, conforme dados do SIGMA (esquema CORAU). Se não houver zona atribuída, a unidade superior fica nula.
 > Fonte: `views/view-02-zona-resp-central.md` (RN-VIEW02-01), `views/view-03-unidade.md` (RN-VIEW03-04)
 
-**RN-01.07** — Ao iniciar um processo, o sistema armazena uma cópia (snapshot) da árvore de unidades participantes vigente no momento do início, preservando a hierarquia mesmo que posteriormente haja mudanças organizacionais no SGRH.
+**RN-01.07** — Ao iniciar um processo, o sistema armazena uma cópia profunda (snapshot) da árvore de unidades participantes vigente no momento do início, preservando a hierarquia mesmo que posteriormente haja mudanças organizacionais no SGRH.
 > Fonte: `cdu-04.md` (passo 7), `cdu-05.md` (passo 7), `views/view-03-unidade.md` (CU-VIEW03-04)
 
 **RN-01.08** — Unidades extintas (situação iniciada com 'E' no SGRH) são consideradas **INATIVAS** e não aparecem na árvore de unidades ativa, não podendo participar de processos.
@@ -74,38 +74,38 @@ Este documento consolida todas as regras de negócio do Sistema de Gestão de Co
 **RN-02.05** — O perfil **SERVIDOR** é atribuído automaticamente a todo servidor lotado em uma unidade operacional ou interoperacional que não seja o responsável pela unidade. Servidores participam apenas de processos de diagnóstico.
 > Fonte: `_intro.md`, `cdu-01.md` (passo 7), `views/view-06-usuario-perfil-unidade.md` (RN-VIEW06-05)
 
-**RN-02.06** — O responsável de uma unidade **INTEROPERACIONAL** acumula os perfis **GESTOR** e **CHEFE** simultaneamente, podendo alternar entre eles após o login.
+**RN-02.06** — O responsável de uma unidade **INTEROPERACIONAL** acumula os perfis **GESTOR** e **CHEFE**, podendo escolher entre eles no momento de login.
 > Fonte: `_intro.md`, `views/view-06-usuario-perfil-unidade.md` (RN-VIEW06-04, RN-VIEW06-06)
 
-**RN-02.07** — Os perfis são dinâmicos: ao mudar de responsável (por fim de substituição, atribuição temporária ou mudança de titular no SGRH), os perfis são automaticamente reatribuídos sem intervenção manual. A perda de lotação ativa implica perda imediata de todos os perfis.
+**RN-02.07** — Os perfis são dinâmicos: ao mudar de responsável (por fim de substituição, atribuição temporária ou mudança de titular no SGRH), os perfis são automaticamente reatribuídos sem intervenção manual (isso porque os dados de perfil são determinados através de views baseadas no SGRH e em dados do SGC, sendo atualizadas automaticamente no Oracle). A perda de lotação ativa implica perda imediata de todos os perfis.
 > Fonte: `views/view-06-usuario-perfil-unidade.md` (Mudanças Dinâmicas), `views/view-05-responsabilidade.md`
 
-**RN-02.08** — O perfil **GESTOR** não pode criar nenhuma informação no sistema; ele apenas valida, devolve ou encaminha subprocessos.
+**RN-02.08** — O perfil **GESTOR** não cadastra nenhuma informação no sistema; ele apenas valida, devolve ou encaminha subprocessos.
 > Fonte: `_intro.md` (descrição do perfil GESTOR)
 
-**RN-02.09** — O cadastro de atividades e conhecimentos é responsabilidade exclusiva do perfil **CHEFE**. Nem mesmo o ADMIN pode realizar essa operação.
+**RN-02.09** — O cadastro de atividades e conhecimentos é responsabilidade exclusiva do perfil **CHEFE** e restrito a sua unidade organizacional. Nem mesmo o ADMIN pode realizar essa operação.
 > Fonte: `_intro.md`, `_intro-glossario.md` (Atividade), `cdu-08.md`
 
-**RN-02.10** — A identificação única dos usuários no sistema é o **título de eleitor**, que é permanente e utilizado como chave primária e no processo de login. A matrícula funcional pode mudar ao longo da carreira.
+**RN-02.10** — A identificação única dos usuários no sistema é o **título de eleitor**, que é permanente e utilizado como chave primária e no processo de login.
 > Fonte: `views/view-04-usuario.md` (RN-VIEW04-01)
 
 ---
 
 ## 3. Autenticação e Login
 
-**RN-03.01** — A autenticação é realizada através do **Sistema Acesso AD do TRE-PE**, usando número de título de eleitor e senha de rede. O SGC não gerencia senhas.
+**RN-03.01** — A autenticação é realizada através do **Sistema Acesso AD** do TRE-PE, usando número do título de eleitor e senha de rede. O SGC não gerencia senhas.
 > Fonte: `cdu-01.md` (passo 4), `_intro-glossario.md` (Acesso TRE-PE)
 
-**RN-03.02** — Após autenticação bem-sucedida, o sistema consulta os dados de lotação e responsabilidade do usuário nas views do banco de dados para determinar os perfis disponíveis.
+**RN-03.02** — Após autenticação bem-sucedida, o sistema consulta os dados de lotação e de responsabilidades do usuário nas views do banco de dados para determinar os pares perfil/unidade disponíveis.
 > Fonte: `cdu-01.md` (passos 6–7)
 
-**RN-03.03** — Se o usuário autenticado possuir apenas um perfil e uma unidade, o sistema seleciona automaticamente esse par perfil/unidade sem exibir tela de seleção.
+**RN-03.03** — Se o usuário autenticado possuir apenas um perfil e uma unidade, o sistema seleciona automaticamente esse par perfil/unidade sem mostrar um passo adicional de seleção .
 > Fonte: `cdu-01.md` (passo 8.1)
 
-**RN-03.04** — Se o usuário possuir múltiplos perfis ou unidades, o sistema exibe uma tela de seleção para que ele escolha com qual perfil/unidade deseja atuar na sessão.
+**RN-03.04** — Se o usuário possuir múltiplos perfis ou unidades, o sistema mostra um campo obrigatório para seleção, para que o usuario escolha com qual perfil/unidade deseja atuar na sessão.
 > Fonte: `cdu-01.md` (passos 8.2–8.4)
 
-**RN-03.05** — Somente usuários com lotação ativa no SGRH e credenciais válidas podem acessar o sistema. A perda da lotação ativa implica perda imediata do acesso.
+**RN-03.05** — Somente usuários com lotação ativa no SGRH e credenciais válidas podem acessar o sistema. A perda da lotação ativa (no SGRH) implica perda imediata do acesso.
 > Fonte: `cdu-01.md` (pré-condições), `views/view-04-usuario.md` (RN-VIEW04-02)
 
 **RN-03.06** — Caso o usuário não seja autenticado pelas credenciais fornecidas, o sistema exibe a mensagem: **"Título ou senha inválidos."**
@@ -124,10 +124,10 @@ Este documento consolida todas as regras de negócio do Sistema de Gestão de Co
 **RN-04.03** — Um processo passa pelas seguintes situações: **'Criado'** → **'Em andamento'** → **'Finalizado'**.
 > Fonte: `_intro.md` (Situações de Processos)
 
-**RN-04.04** — Processos na situação **'Criado'** podem ser editados ou removidos. Após iniciados (situação 'Em andamento'), não podem ser mais editados nem removidos.
+**RN-04.04** — Processos na situação **'Criado'** podem ser editados ou removidos. Após iniciados (situação 'Em andamento' ou 'Finalizado'), não podem ser mais editados nem removidos.
 > Fonte: `cdu-03.md`, `cdu-04.md` (passo 4)
 
-**RN-04.05** — A remoção de um processo só é possível quando ele está na situação **'Criado'** e é permanente (não pode ser desfeita).
+**RN-04.05** — A remoção de um processo só é possível quando ele está na situação **'Criado'**.
 > Fonte: `cdu-03.md` (Remoção de processo)
 
 **RN-04.06** — Para processos do tipo **Revisão** ou **Diagnóstico**, só podem ser selecionadas unidades que já possuam **mapa de competências vigente** (ou seja, que já passaram por pelo menos um processo de mapeamento concluído). Caso contrário, o sistema exibe: *"Não é possível incluir em processos de revisão ou diagnóstico, unidades que ainda não passaram por processo de mapeamento."*
@@ -136,38 +136,39 @@ Este documento consolida todas as regras de negócio do Sistema de Gestão de Co
 **RN-04.07** — Uma unidade **não pode participar de dois processos ativos do mesmo tipo simultaneamente**. A lista de unidades disponíveis para seleção deve marcar como não selecionáveis as unidades já participando de processo ativo do mesmo tipo.
 > Fonte: `cdu-03.md` (passo 2 — campo Unidades participantes), `design/arvore-unidades.md` (Elegibilidade)
 
-**RN-04.08** — Unidades do tipo **INTERMEDIÁRIA** nunca participam diretamente de um processo como unidade com subprocesso; elas participam apenas no papel de validadoras da hierarquia. Na seleção de unidades, o comportamento da árvore filtra automaticamente as INTERMEDIÁRIAS antes do envio ao backend.
+**RN-04.08** — Unidades do tipo **INTERMEDIÁRIA** nunca participam diretamente de um processo como unidade com subprocesso; elas participam apenas no papel de validadoras na hierarquia. Na seleção de unidades, o comportamento da árvore filtra automaticamente as INTERMEDIÁRIAS antes do envio ao backend (porém mostra as unidades para facilitar o entendi,m.
 > Fonte: `cdu-04.md` (passo 9), `design/arvore-unidades.md` (Filtro Transparente)
 
-**RN-04.09** — Ao **iniciar** um processo, o sistema notifica por e-mail e cria alertas para todas as unidades participantes (operacionais/interoperacionais recebem notificação de início; intermediárias e interoperacionais recebem também notificação consolidada sobre suas subordinadas).
+**RN-04.09** — Ao se iniciar um processo de qualquer tipo, o sistema notifica por e-mail e cria alertas para todas as unidades participantes (operacionais e interoperacionais recebem notificação de início; intermediárias recebem notificação consolidada sobre suas subordinadas).
 > Fonte: `cdu-04.md` (passos 12–13), `cdu-05.md` (passos 12–13)
 
-**RN-04.10** — Ao iniciar um processo de **Mapeamento**, o sistema cria para cada unidade operacional/interoperacional um subprocesso na situação **'Não iniciado'** e um mapa de competências vazio vinculado a esse subprocesso.
+**RN-04.10** — Ao se iniciar um processo de **Mapeamento**, o sistema cria, para cada unidade operacional/interoperacional participante, um subprocesso na situação **'Não iniciado'** e um mapa de competências vazio vinculado a esse subprocesso.
 > Fonte: `cdu-04.md` (passos 9–10)
 
-**RN-04.11** — Ao iniciar um processo de **Revisão**, o sistema cria para cada unidade operacional/interoperacional um subprocesso na situação **'Não iniciado'** e copia o mapa de competências vigente da unidade (com todas as atividades e conhecimentos) para esse subprocesso.
+**RN-04.11** — Ao se iniciar um processo de **Revisão**, o sistema cria, para cada unidade operacional/interoperacional participante, um subprocesso na situação **'Não iniciado'** e copia o mapa de competências vigente da unidade (com todos seus dados de atividades e conhecimentos) para esse subprocesso.
 > Fonte: `cdu-05.md` (passos 9–10)
 
-**RN-04.12** — Um processo pode ser **finalizado** pelo ADMIN somente quando **todos** os subprocessos das unidades participantes estiverem na situação **'Mapa homologado'**. Caso contrário, o sistema exibe: *"Não é possível encerrar o processo enquanto houver unidades com mapa de competência ainda não homologado."*
+**RN-04.12** — Um processo pode ser **finalizado** pelo ADMIN somente quando **todos** os subprocessos das unidades participantes estiverem na situação **'Mapa homologado'**. Caso contrário, o sistema mostra: *"Não é possível finalizar o processo enquanto houver unidades com mapa de competências ainda não homologado."*
 > Fonte: `cdu-21.md` (passos 4–5)
 
-**RN-04.13** — Ao finalizar um processo de mapeamento ou revisão, os mapas de competências dos subprocessos tornam-se os **mapas vigentes** das respectivas unidades, e todas as unidades participantes são notificadas por e-mail.
+**RN-04.13** — Ao finalizar um processo de mapeamento ou de revisão, os mapas de competências dos subprocessos tornam-se os **mapas vigentes** das respectivas unidades, e todas as unidades participantes são notificadas por e-mail.
 > Fonte: `cdu-21.md` (passos 8–9)
 
-**RN-04.14** — Processos são considerados **ativos** enquanto não finalizados, ou enquanto finalizados há menos de `DIAS_INATIVACAO_PROCESSO` dias (padrão: 10 dias). Após esse prazo, o processo fica **inativo** e disponível apenas em consulta via Histórico de processos.
+**RN-04.14** — Processos são considerados **ativos** enquanto não finalizados, ou enquanto finalizados há menos de `DIAS_INATIVACAO_PROCESSO` dias (configuração do sistema, padrão 10 dias). Após esse prazo, o processo fica **inativo** e disponível apenas em consulta via a tela `Histórico de processos`.
 > Fonte: `_intro-glossario.md` (Processos ativos/inativos), `cdu-31.md`
 
 ---
 
 ## 5. Subprocessos — Situações e Fluxo
 
-**RN-05.01** — Cada processo possui um subprocesso por unidade operacional ou interoperacional participante. O subprocesso registra o progresso da unidade dentro do processo.
+**RN-05.01** — Cada processo possui um subprocesso por unidade operacional ou interoperacional participante. O subprocesso, entre outras coisas, registra o progresso da unidade dentro do processo.
 > Fonte: `_intro.md`, `_intro-glossario.md` (Subprocesso)
 
-**RN-05.02** — A **localização atual do subprocesso** é determinada pela unidade de destino da última movimentação registrada. Ela é fundamental para determinar quem pode atuar sobre o subprocesso em cada momento.
+**RN-05.02** — A **localização atual** do subprocesso é determinada pela unidade de destino da última movimentação registrada. Ela é fundamental para determinar quem pode atuar no subprocesso em cada momento.
 > Fonte: `_intro-glossario.md` (Localização atual de subprocesso), `cdu-07.md` (passo 2.1.5)
 
-**RN-05.03** — As situações de subprocessos de **Mapeamento** são, em ordem de progressão: `'Não iniciado'` → `'Cadastro em andamento'` → `'Cadastro disponibilizado'` → `'Cadastro homologado'` → `'Mapa criado'` → `'Mapa disponibilizado'` → (`'Mapa com sugestões'` ou) `'Mapa validado'` → `'Mapa homologado'`.
+**RN-05.03** — As situações de subprocessos de **Mapeamento** são, em ordem de progressão: 
+`'Não iniciado'` → `'Cadastro em andamento'` → `'Cadastro disponibilizado'` → `'Cadastro homologado'` → `'Mapa criado'` → `'Mapa disponibilizado'` → (`'Mapa com sugestões'` ou) `'Mapa validado'` → `'Mapa homologado'`.
 > Fonte: `_intro.md` (Situações de subprocessos de Mapeamento)
 
 **RN-05.04** — As situações de subprocessos de **Revisão** são, em ordem de progressão: `'Não iniciado'` → `'Revisão do cadastro em andamento'` → `'Revisão do cadastro disponibilizada'` → `'Revisão do cadastro homologada'` → `'Mapa ajustado'` → `'Mapa disponibilizado'` → (`'Mapa com sugestões'` ou) `'Mapa validado'` → `'Mapa homologado'`.
@@ -182,10 +183,10 @@ Este documento consolida todas as regras de negócio do Sistema de Gestão de Co
 **RN-05.07** — O ADMIN pode **alterar a data limite** de qualquer subprocesso em andamento. A alteração gera notificação por e-mail e alerta para a unidade do subprocesso.
 > Fonte: `cdu-27.md`
 
-**RN-05.08** — O ADMIN pode **reabrir o cadastro** de um subprocesso (mapeamento) que tenha passado da situação 'Mapa homologado', retornando-o para 'Cadastro em andamento'. A reabertura exige justificativa obrigatória e notifica a unidade e suas superiores.
+**RN-05.08** — O ADMIN pode **reabrir o cadastro** de um subprocesso de Mapeamento, desde que tenha passado da situação 'Mapa homologado', retornando-o para 'Cadastro em andamento'. A reabertura exige **justificativa** obrigatória e notifica a unidade e suas superiores.
 > Fonte: `cdu-32.md`
 
-**RN-05.09** — O ADMIN pode **reabrir a revisão de cadastro** de um subprocesso (revisão) que tenha avançado, retornando-o para 'Revisão do cadastro em andamento'. A reabertura exige justificativa obrigatória e notifica a unidade e suas superiores.
+**RN-05.09** — O ADMIN pode **reabrir a revisão de cadastro** de um subprocesso de Revisão, que tenha passado da situacao 'Mapa homologado', retornando-o para 'Revisão do cadastro em andamento'. A reabertura exige **justificativa** obrigatória e notifica a unidade e suas superiores.
 > Fonte: `cdu-33.md`
 
 **RN-05.10** — No processo de **devolução** para ajustes (seja de cadastro ou de mapa), o sistema identifica a unidade de devolução como sendo a **unidade de origem da última movimentação** do subprocesso.
@@ -386,7 +387,7 @@ Este documento consolida todas as regras de negócio do Sistema de Gestão de Co
 **RN-14.03** — O usuário que recebe uma atribuição temporária passa a ter os direitos do perfil **CHEFE** durante o período da atribuição. A atribuição tem prioridade sobre os dados de titularidade lidos do SGRH.
 > Fonte: `cdu-28.md` (passo 11)
 
-**RN-14.04** — Ao criar uma atribuição temporária, o sistema notifica por e-mail o servidor beneficiário e cria um alerta pessoal endereçado a ele.
+**RN-14.04** — Ao criar uma atribuição temporária, o sistema notifica por e-mail o servidor atribuídoe cria um alerta pessoal endereçado a ele.
 > Fonte: `cdu-28.md` (passos 9–10)
 
 **RN-14.05** — A hierarquia de precedência para determinação do responsável efetivo de uma unidade é: (1) **Atribuição temporária** (maior prioridade, cadastrada no SGC) > (2) **Substituição formal** (do SGRH) > (3) **Titularidade** (menor prioridade, do SGRH).
@@ -443,52 +444,52 @@ Este documento consolida todas as regras de negócio do Sistema de Gestão de Co
 
 ## Referência das Fontes
 
-| Arquivo | Conteúdo |
-|---|---|
-| `_intro.md` | Introdução geral, tipos de processo, situações de processos e subprocessos, perfis de usuário |
-| `_intro-glossario.md` | Glossário de termos do sistema |
-| `cdu-01.md` | Login e estrutura de telas |
-| `cdu-02.md` | Visualizar Painel |
-| `cdu-03.md` | Manter processo (criação, edição, remoção) |
-| `cdu-04.md` | Iniciar processo de mapeamento |
-| `cdu-05.md` | Iniciar processo de revisão |
-| `cdu-06.md` | Detalhar processo |
-| `cdu-07.md` | Detalhar subprocesso |
-| `cdu-08.md` | Manter cadastro de atividades e conhecimentos |
-| `cdu-09.md` | Disponibilizar cadastro de atividades (mapeamento) |
-| `cdu-10.md` | Disponibilizar revisão do cadastro de atividades |
-| `cdu-11.md` | Visualizar cadastro de atividades e conhecimentos |
-| `cdu-12.md` | Verificar impactos no mapa de competências |
-| `cdu-13.md` | Analisar cadastro de atividades (mapeamento) |
-| `cdu-14.md` | Analisar revisão de cadastro de atividades |
-| `cdu-15.md` | Manter mapa de competências (mapeamento) |
-| `cdu-16.md` | Ajustar mapa de competências (revisão) |
-| `cdu-17.md` | Disponibilizar mapa de competências |
-| `cdu-18.md` | Visualizar mapa de competências |
-| `cdu-19.md` | Validar mapa de competências (CHEFE) |
-| `cdu-20.md` | Analisar validação de mapa de competências (GESTOR/ADMIN) |
-| `cdu-21.md` | Finalizar processo de mapeamento ou revisão |
-| `cdu-22.md` | Aceitar cadastros em bloco (GESTOR) |
-| `cdu-23.md` | Homologar cadastros em bloco (ADMIN) |
-| `cdu-24.md` | Disponibilizar mapas de competências em bloco (ADMIN) |
-| `cdu-25.md` | Aceitar validação de mapas em bloco (GESTOR) |
-| `cdu-26.md` | Homologar validação de mapas em bloco (ADMIN) |
-| `cdu-27.md` | Alterar data limite de subprocesso |
-| `cdu-28.md` | Manter atribuição temporária |
-| `cdu-29.md` | Consultar histórico de processos |
-| `cdu-30.md` | Manter administradores |
-| `cdu-31.md` | Configurar sistema |
-| `cdu-32.md` | Reabrir cadastro |
-| `cdu-33.md` | Reabrir revisão de cadastro |
-| `cdu-34.md` | Enviar lembrete de prazo |
-| `cdu-35.md` | Gerar relatório de andamento |
-| `cdu-36.md` | Gerar relatório de mapas |
-| `views/views-indice.md` | Índice das views do sistema |
-| `views/view-01-vinculacao-unidade.md` | VW_VINCULACAO_UNIDADE |
-| `views/view-02-zona-resp-central.md` | VW_ZONA_RESP_CENTRAL |
-| `views/view-03-unidade.md` | VW_UNIDADE |
-| `views/view-04-usuario.md` | VW_USUARIO |
-| `views/view-05-responsabilidade.md` | VW_RESPONSABILIDADE |
-| `views/view-06-usuario-perfil-unidade.md` | VW_USUARIO_PERFIL_UNIDADE |
-| `design/arvore-unidades.md` | Especificação da árvore de seleção de unidades |
-| `design/breadcrumbs.md` | Especificação da barra de navegação/breadcrumbs |
+| Arquivo                                   | Conteúdo                                                                                      |
+|-------------------------------------------|-----------------------------------------------------------------------------------------------|
+| `_intro.md`                               | Introdução geral, tipos de processo, situações de processos e subprocessos, perfis de usuário |
+| `_intro-glossario.md`                     | Glossário de termos do sistema                                                                |
+| `cdu-01.md`                               | Login e estrutura de telas                                                                    |
+| `cdu-02.md`                               | Visualizar Painel                                                                             |
+| `cdu-03.md`                               | Manter processo (criação, edição, remoção)                                                    |
+| `cdu-04.md`                               | Iniciar processo de mapeamento                                                                |
+| `cdu-05.md`                               | Iniciar processo de revisão                                                                   |
+| `cdu-06.md`                               | Detalhar processo                                                                             |
+| `cdu-07.md`                               | Detalhar subprocesso                                                                          |
+| `cdu-08.md`                               | Manter cadastro de atividades e conhecimentos                                                 |
+| `cdu-09.md`                               | Disponibilizar cadastro de atividades (mapeamento)                                            |
+| `cdu-10.md`                               | Disponibilizar revisão do cadastro de atividades                                              |
+| `cdu-11.md`                               | Visualizar cadastro de atividades e conhecimentos                                             |
+| `cdu-12.md`                               | Verificar impactos no mapa de competências                                                    |
+| `cdu-13.md`                               | Analisar cadastro de atividades (mapeamento)                                                  |
+| `cdu-14.md`                               | Analisar revisão de cadastro de atividades                                                    |
+| `cdu-15.md`                               | Manter mapa de competências (mapeamento)                                                      |
+| `cdu-16.md`                               | Ajustar mapa de competências (revisão)                                                        |
+| `cdu-17.md`                               | Disponibilizar mapa de competências                                                           |
+| `cdu-18.md`                               | Visualizar mapa de competências                                                               |
+| `cdu-19.md`                               | Validar mapa de competências (CHEFE)                                                          |
+| `cdu-20.md`                               | Analisar validação de mapa de competências (GESTOR/ADMIN)                                     |
+| `cdu-21.md`                               | Finalizar processo de mapeamento ou revisão                                                   |
+| `cdu-22.md`                               | Aceitar cadastros em bloco (GESTOR)                                                           |
+| `cdu-23.md`                               | Homologar cadastros em bloco (ADMIN)                                                          |
+| `cdu-24.md`                               | Disponibilizar mapas de competências em bloco (ADMIN)                                         |
+| `cdu-25.md`                               | Aceitar validação de mapas em bloco (GESTOR)                                                  |
+| `cdu-26.md`                               | Homologar validação de mapas em bloco (ADMIN)                                                 |
+| `cdu-27.md`                               | Alterar data limite de subprocesso                                                            |
+| `cdu-28.md`                               | Manter atribuição temporária                                                                  |
+| `cdu-29.md`                               | Consultar histórico de processos                                                              |
+| `cdu-30.md`                               | Manter administradores                                                                        |
+| `cdu-31.md`                               | Configurar sistema                                                                            |
+| `cdu-32.md`                               | Reabrir cadastro                                                                              |
+| `cdu-33.md`                               | Reabrir revisão de cadastro                                                                   |
+| `cdu-34.md`                               | Enviar lembrete de prazo                                                                      |
+| `cdu-35.md`                               | Gerar relatório de andamento                                                                  |
+| `cdu-36.md`                               | Gerar relatório de mapas                                                                      |
+| `views/views-indice.md`                   | Índice das views do sistema                                                                   |
+| `views/view-01-vinculacao-unidade.md`     | VW_VINCULACAO_UNIDADE                                                                         |
+| `views/view-02-zona-resp-central.md`      | VW_ZONA_RESP_CENTRAL                                                                          |
+| `views/view-03-unidade.md`                | VW_UNIDADE                                                                                    |
+| `views/view-04-usuario.md`                | VW_USUARIO                                                                                    |
+| `views/view-05-responsabilidade.md`       | VW_RESPONSABILIDADE                                                                           |
+| `views/view-06-usuario-perfil-unidade.md` | VW_USUARIO_PERFIL_UNIDADE                                                                     |
+| `design/arvore-unidades.md`               | Especificação da árvore de seleção de unidades                                                |
+| `design/breadcrumbs.md`                   | Especificação da barra de navegação/breadcrumbs                                               |

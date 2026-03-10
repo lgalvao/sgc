@@ -55,6 +55,7 @@
 
         <LoadingButton
             v-if="!!podeDisponibilizarCadastro"
+            :disabled="!habilitarDisponibilizar"
             :loading="loadingValidacao"
             data-testid="btn-cad-atividades-disponibilizar"
             icon="check-lg"
@@ -228,7 +229,14 @@ const isRevisao = computed(() => subprocesso.value?.tipoProcesso === TipoProcess
 const podeVerImpacto = computed(() => podeVisualizarImpacto.value);
 
 const atividades = ref<Atividade[]>([]);
+
+const habilitarDisponibilizar = computed(() => {
+  if (atividades.value.length === 0) return false;
+  return atividades.value.every(a => a.conhecimentos && a.conhecimentos.length > 0);
+});
+
 const analisesCadastro = ref<AnaliseCadastro[]>([]);
+
 const {withErrorHandling, lastError} = useErrorHandler();
 
 const historicoAnalises = computed(() => {

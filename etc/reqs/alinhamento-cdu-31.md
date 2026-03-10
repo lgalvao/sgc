@@ -2,7 +2,7 @@
 
 ## Cobertura atual do teste
 O teste E2E (cdu-31.spec.ts) cobre:
-- Navegação para página de parâmetros via botão `btn-parametros`
+- Navegação para página de parâmetros via botão `btn-configuracoes`
 - Verificação da URL `/parametros` e heading "Parâmetros"
 - Visualização dos dois campos editáveis: "Dias para inativação de processos" e "Dias para indicação de alerta como novo"
 - Verificação do botão "Salvar Configurações"
@@ -24,5 +24,5 @@ O teste E2E (cdu-31.spec.ts) cobre:
 
 ## Notas e inconsistências do requisito
 - O requisito menciona "mostra mensagem de confirmação", mas a forma exata não é especificada (tooltip, snackbar, modal, etc.). O teste valida "Configurações salvas.", confirmando que é uma mensagem de texto simples.
-- O requisito não especifica onde está o botão de configurações ("engrenagem na barra de navegação"), apenas que é um botão. O teste usa `btn-parametros`, que pode estar no menu de navegação, não especificando sua localização exata na UI.
+- O requisito não especifica onde está o botão de configurações ("engrenagem na barra de navegação"), apenas que é um botão. O teste usa `btn-configuracoes`, que pode estar no menu de navegação, não especificando sua localização exata na UI.
 - Não está claro se as duas configurações são as ÚNICAS configurações do sistema ou se há outras que não devem ser alteradas pelo usuário.

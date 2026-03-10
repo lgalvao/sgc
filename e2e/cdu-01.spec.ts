@@ -39,7 +39,7 @@ test.describe('CDU-01 - Realizar login e exibir estrutura das telas', () => {
         await expect(page.getByRole('link', {name: 'Histórico'})).toBeVisible();
 
         // Admin deve ver Parâmetros e Administradores
-        await expect(page.getByTestId('btn-parametros')).toBeVisible();
+        await expect(page.getByTestId('btn-configuracoes')).toBeVisible();
         await expect(page.getByTestId('btn-administradores')).toBeVisible();
     });
 
@@ -55,7 +55,7 @@ test.describe('CDU-01 - Realizar login e exibir estrutura das telas', () => {
         await expect(page.getByRole('link', {name: 'Unidades'})).toBeHidden();
 
         // Não deve ver configurações administrativas
-        await expect(page.getByTestId('btn-parametros')).toBeHidden();
+        await expect(page.getByTestId('btn-configuracoes')).toBeHidden();
         await expect(page.getByTestId('btn-administradores')).toBeHidden();
     });
 
@@ -71,7 +71,7 @@ test.describe('CDU-01 - Realizar login e exibir estrutura das telas', () => {
         await expect(page.getByRole('link', {name: 'Unidades'})).toBeHidden();
 
         // Não deve ver configurações administrativas
-        await expect(page.getByTestId('btn-parametros')).toBeHidden();
+        await expect(page.getByTestId('btn-configuracoes')).toBeHidden();
         await expect(page.getByTestId('btn-administradores')).toBeHidden();
     });
 
@@ -87,7 +87,7 @@ test.describe('CDU-01 - Realizar login e exibir estrutura das telas', () => {
         await expect(page.getByRole('link', {name: 'Unidades'})).toBeHidden();
 
         // Não deve ver configurações administrativas
-        await expect(page.getByTestId('btn-parametros')).toBeHidden();
+        await expect(page.getByTestId('btn-configuracoes')).toBeHidden();
         await expect(page.getByTestId('btn-administradores')).toBeHidden();
     });
 
@@ -96,7 +96,7 @@ test.describe('CDU-01 - Realizar login e exibir estrutura das telas', () => {
 
         await expect(page.getByText('ADMIN - ADMIN')).toBeVisible();
 
-        await expect(page.getByTestId('btn-parametros')).toBeVisible();
+        await expect(page.getByTestId('btn-configuracoes')).toBeVisible();
         await expect(page.getByTestId('btn-administradores')).toBeVisible();
 
         await expect(page.getByTestId('btn-logout')).toBeVisible();

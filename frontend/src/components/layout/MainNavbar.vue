@@ -40,7 +40,7 @@
         <BNavItem
             v-if="podeAcessarTodasUnidades"
             class="me-lg-1"
-            data-testid="btn-parametros"
+            data-testid="btn-configuracoes"
             title="Parâmetros do sistema"
             to="/parametros"
         >

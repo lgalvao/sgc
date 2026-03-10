@@ -144,7 +144,7 @@ describe("MainNavbar.vue", () => {
 
         ctx.wrapper = mount(NavBar, options);
 
-        const parametrosNavItem = ctx.wrapper.find('[data-testid="btn-parametros"]');
+        const parametrosNavItem = ctx.wrapper.find('[data-testid="btn-configuracoes"]');
         expect(parametrosNavItem.exists()).toBe(true);
 
         const link = parametrosNavItem.findComponent(RouterLinkStub);
@@ -177,7 +177,7 @@ describe("MainNavbar.vue", () => {
 
         ctx.wrapper = mount(NavBar, options);
 
-        const settingsIcon = ctx.wrapper.find('[data-testid="btn-parametros"]');
+        const settingsIcon = ctx.wrapper.find('[data-testid="btn-configuracoes"]');
         expect(settingsIcon.exists()).toBe(false);
         expect(ctx.wrapper.find('[data-testid="btn-administradores"]').exists()).toBe(false);
     });

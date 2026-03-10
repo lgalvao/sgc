@@ -1,7 +1,9 @@
 # Alinhamento CDU-01 - Realizar login e exibir estrutura das telas
 
 ## Cobertura atual do teste
+
 O teste `cdu-01.spec.ts` cobre os seguintes cenários:
+
 - ✅ Autenticação com credenciais inválidas e exibição da mensagem de erro
 - ✅ Login bem-sucedido com perfil único (GESTOR_COORD_11)
 - ✅ Seleção de perfil quando há múltiplos perfis/unidades (ADMIN com 2 perfis)
@@ -13,11 +15,13 @@ O teste `cdu-01.spec.ts` cobre os seguintes cenários:
 - ✅ Exibição de rodapé com texto "© SESEL/COSIS/TRE-PE"
 
 ## Lacunas em relação ao requisito
+
 1. **Autenticação via API AD não verificada**: O requisito especifica (passo 4) que o sistema deve verificar credenciais através da API do "Sistema Acesso AD" do TRE-PE. O teste apenas valida que a mensagem de erro é exibida, sem validar o mecanismo de integração com AD.
 
 2. **Consultoria de perfis e unidades não explícita**: O requisito menciona (passo 6) consulta às views do banco de dados para recuperar perfis e unidades. O teste não valida este comportamento internamente.
 
 3. **Regras de determinação de perfis não todas cobertas**: O requisito (passo 7) descreve 4 regras específicas para determinar perfis (ADMIN, GESTOR, CHEFE, SERVIDOR). O teste não cobre explicitamente:
+   
    - Um usuário com múltiplas unidades sendo testado (apenas testa múltiplos perfis)
    - A regra de "não responsável pela unidade" (SERVIDOR) não há um teste específico validando que apenas servidores sem responsabilidade recebem este perfil
 
@@ -31,11 +35,10 @@ O teste `cdu-01.spec.ts` cobre os seguintes cenários:
 
 8. **Ícone de logout não completamente testado**: O teste valida que `btn-logout` está visível, mas não valida que clicar nele faz logout e mostra a tela Login novamente.
 
-9. **Mensagem "Configurações" vs "Parâmetros"**: O requisito (passo 9.1.2) menciona um ícone para tela "Configurações", mas o teste busca por `btn-parametros`. Verificar se há inconsistência de nomenclatura.
-
-10. **Rodapé incompleto**: O requisito (passo 9.3) menciona "Desenvolvido por SESEL/COSIS/TRE-PE", o teste verifica "© SESEL/COSIS/TRE-PE", faltando "Desenvolvido por" e também não valida a informação de versão do sistema.
+9. **Rodapé incompleto**: O requisito (passo 9.3) menciona "Desenvolvido por SESEL/COSIS/TRE-PE", o teste verifica "© SESEL/COSIS/TRE-PE", faltando "Desenvolvido por" e também não valida a informação de versão do sistema.
 
 ## Alterações necessárias no teste E2E
+
 - Adicionar teste que valida login com um usuário que possui múltiplas unidades mas apenas um perfil
 - Adicionar teste que valida o comportamento do ícone logout (clique e redirecionamento para Login)
 - Adicionar teste que valida navegação ao clicar no ícone/logo SGC (deve abrir Painel)
@@ -46,6 +49,7 @@ O teste `cdu-01.spec.ts` cobre os seguintes cenários:
 - Adicionar validação de que a tela `Painel` é exibida inicialmente (passo 10 do requisito)
 
 ## Notas e inconsistências do requisito
+
 - Há possível inconsistência de nomenclatura entre "Configurações" (requisito) e "Parâmetros" (teste)
 - O requisito é claro quanto às regras de determinação de perfis (passo 7), mas não descreve como o sistema diferencia um SERVIDOR de outros perfis em múltiplas situações de hierarquia
 - O requisito menciona "Reabertura do cadastro de atividades" (referência futura a CDU-06), sugerindo interdependência com outros CDUs

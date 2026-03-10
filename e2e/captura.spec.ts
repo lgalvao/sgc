@@ -735,7 +735,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await capturarTela(page, '06-navegacao', '01-menu-principal');
 
             // Parâmetros (se admin)
-            await page.getByTestId('btn-parametros').click();
+            await page.getByTestId('btn-configuracoes').click();
             await expect(page).toHaveURL(/\/parametros/);
             await capturarTela(page, '06-navegacao', '02-menu-parametros');
             await page.goto('/painel');
@@ -999,7 +999,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
         test('Captura página de configurações e administradores', async ({page}) => {
             // Página de parâmetros (CDU-31)
-            await page.getByTestId('btn-parametros').click();
+            await page.getByTestId('btn-configuracoes').click();
             await page.waitForTimeout(500);
             await capturarTela(page, '13-configuracoes', '01-pagina-parametros', {fullPage: true});
 

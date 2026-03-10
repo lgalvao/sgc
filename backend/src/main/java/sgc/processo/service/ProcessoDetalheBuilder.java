@@ -22,9 +22,13 @@ public class ProcessoDetalheBuilder {
     private final SgcPermissionEvaluator permissionEvaluator;
     private final SubprocessoValidacaoService subprocessoValidacaoService;
     private final UnidadeRepo unidadeRepo;
+    private final SubprocessoService subprocessoService;
 
     @Transactional(readOnly = true)
     public ProcessoDetalheDto build(Processo processo, Usuario usuario) {
+        List<Subprocesso> subprocessos = subprocessoRepo.findByProcessoCodigoWithUnidade(processo.getCodigo());
+        Set<Long> unidadesAcesso = obterUnidadesAcesso(processo, usuario);
+
         ProcessoDetalheDto dto = ProcessoDetalheDto.builder()
                 .codigo(processo.getCodigo())
                 .descricao(processo.getDescricao())
@@ -38,26 +42,19 @@ public class ProcessoDetalheBuilder {
                 .podeHomologarCadastro(permissionEvaluator.checkPermission(usuario, processo, "HOMOLOGAR_CADASTRO_EM_BLOCO"))
                 .podeHomologarMapa(permissionEvaluator.checkPermission(usuario, processo, "HOMOLOGAR_MAPA_EM_BLOCO"))
                 .podeAceitarCadastroBloco(permissionEvaluator.checkPermission(usuario, processo, "ACEITAR_CADASTRO_EM_BLOCO"))
-                .podeDisponibilizarMapaBloco(permissionEvaluator.checkPermission(usuario, processo, "DISPONIBILIZAR_MAPA_EM_BLOCO")
-                        && subprocessoRepo.countByProcessoCodigoAndSituacaoIn(processo.getCodigo(), List.of(
-                        SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO,
-                        SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO
-                )) > 0)
+                .podeDisponibilizarMapaBloco(permissionEvaluator.checkPermission(usuario, processo, "DISPONIBILIZAR_MAPA_EM_BLOCO"))
                 .unidades(new ArrayList<>())
                 .build();
 
-        List<Subprocesso> subprocessos = subprocessoRepo.findByProcessoCodigoWithUnidade(processo.getCodigo());
-        montarHierarquiaUnidades(dto, processo, subprocessos, usuario);
+        montarHierarquiaUnidades(dto, processo, subprocessos, unidadesAcesso);
 
         return dto;
     }
 
     private void montarHierarquiaUnidades(
-            ProcessoDetalheDto dto, Processo processo, List<Subprocesso> subprocessos, Usuario usuario) {
+            ProcessoDetalheDto dto, Processo processo, List<Subprocesso> subprocessos, Set<Long> unidadesAcesso) {
         Map<Long, UnidadeParticipanteDto> mapaUnidades = new HashMap<>();
         Map<Long, Subprocesso> mapaSubprocessos = new HashMap<>();
-
-        Set<Long> unidadesAcesso = obterUnidadesAcesso(processo, usuario);
 
         for (Subprocesso sp : subprocessos) {
             mapaSubprocessos.put(sp.getUnidade().getCodigo(), sp);

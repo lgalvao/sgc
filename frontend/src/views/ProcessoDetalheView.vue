@@ -21,7 +21,8 @@
         <template #actions>
           <BButton
               v-if="podeAceitarBloco"
-              :disabled="isAceitarBlocoDisabled"
+              :disabled="!habilitarAceiteBloco"
+              data-testid="btn-processo-aceitar-bloco"
               variant="success"
               @click="abrirModalBloco('aceitar')">
             {{ rotuloAcaoAceitarBloco }}
@@ -29,8 +30,9 @@
 
           <BButton
               v-if="podeHomologarBloco"
-              :disabled="isHomologarBlocoDisabled"
+              :disabled="!habilitarHomologacaoBloco"
               class="text-white"
+              data-testid="btn-processo-homologar-bloco"
               variant="warning"
               @click="abrirModalBloco('homologar')">
             {{ rotuloAcaoHomologarBloco }}
@@ -38,8 +40,9 @@
 
           <BButton
               v-if="podeDisponibilizarBloco"
-              :disabled="isDisponibilizarBlocoDisabled"
+              :disabled="!habilitarDisponibilizacaoBloco"
               class="text-white"
+              data-testid="btn-processo-disponibilizar-bloco"
               variant="info"
               @click="abrirModalBloco('disponibilizar')">
             {{ rotuloAcaoDisponibilizarBloco }}
@@ -160,17 +163,17 @@ const podeDisponibilizarBloco = computed(() => {
       (processo.value?.podeDisponibilizarMapaBloco || false);
 });
 
-// Estado Disabled
-const isAceitarBlocoDisabled = computed(() => {
-  return processandoAcaoBloco.value || unidadesElegiveisPorAcao.value.aceitar.length === 0;
+// Habilitação dos Botões (Português)
+const habilitarAceiteBloco = computed(() => {
+  return !processandoAcaoBloco.value && unidadesElegiveisPorAcao.value.aceitar.length > 0;
 });
 
-const isHomologarBlocoDisabled = computed(() => {
-  return processandoAcaoBloco.value || unidadesElegiveisPorAcao.value.homologar.length === 0;
+const habilitarHomologacaoBloco = computed(() => {
+  return !processandoAcaoBloco.value && unidadesElegiveisPorAcao.value.homologar.length > 0;
 });
 
-const isDisponibilizarBlocoDisabled = computed(() => {
-  return processandoAcaoBloco.value || unidadesElegiveisPorAcao.value.disponibilizar.length === 0;
+const habilitarDisponibilizacaoBloco = computed(() => {
+  return !processandoAcaoBloco.value && unidadesElegiveisPorAcao.value.disponibilizar.length > 0;
 });
 
 const podeFinalizar = computed(() => {

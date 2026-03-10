@@ -177,8 +177,8 @@ public class SubprocessoTransicaoService {
         Unidade origem = sp.getUnidade();
         Unidade destino = origem.getUnidadeSuperior();
         if (destino == null) {
-            log.warn("Unidade {} não possui superior. Usando a própria unidade como destino.", origem.getSigla());
-            destino = origem;
+            log.info("Unidade {} não possui superior. Encaminhando para unidade central ADMIN.", origem.getSigla());
+            destino = unidadeService.buscarPorSigla(SIGLA_ADMIN);
         }
 
         sp.setSituacao(novaSituacao);
@@ -502,8 +502,10 @@ public class SubprocessoTransicaoService {
 
         Unidade unidadeAtual = obterUnidadeLocalizacao(sp);
         Unidade unidadeDestino = unidadeAtual.getUnidadeSuperior();
+        
         if (unidadeDestino == null) {
-            unidadeDestino = unidadeAtual;
+            log.info("Unidade {} não possui superior direto. Encaminhando para a unidade raiz ADMIN.", unidadeAtual.getSigla());
+            unidadeDestino = unidadeService.buscarPorSigla(SIGLA_ADMIN);
         }
 
         registrarAnalise(RegistrarWorkflowCommand.builder()

@@ -215,7 +215,7 @@ public class SubprocessoService {
         return validacaoService.validarCadastro(sp);
     }
 
-    private Unidade obterUnidadeLocalizacao(Subprocesso sp) {
+    public Unidade obterUnidadeLocalizacao(Subprocesso sp) {
         if (sp.getLocalizacaoAtual() != null) return sp.getLocalizacaoAtual();
         if (sp.getCodigo() == null) {
             return sp.getUnidade();

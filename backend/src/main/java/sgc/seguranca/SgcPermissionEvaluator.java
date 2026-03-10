@@ -15,6 +15,7 @@ import java.io.*;
 import java.util.*;
 
 import static sgc.organizacao.model.Perfil.*;
+import static sgc.processo.model.SituacaoProcesso.*;
 
 /**
  * Avaliador central de permissões do SGC.
@@ -27,13 +28,30 @@ import static sgc.organizacao.model.Perfil.*;
 @RequiredArgsConstructor
 @Slf4j
 public class SgcPermissionEvaluator implements PermissionEvaluator {
-
-    // Ações de Escrita que exigem Localização
-    private static final Set<String> ACOES_ESCRITA = Set.of(
-            "EDITAR_CADASTRO", "DISPONIBILIZAR_CADASTRO", "DEVOLVER_CADASTRO", "ACEITAR_CADASTRO", "HOMOLOGAR_CADASTRO",
-            "EDITAR_REVISAO_CADASTRO", "DISPONIBILIZAR_REVISAO_CADASTRO", "DEVOLVER_REVISAO_CADASTRO", "ACEITAR_REVISAO_CADASTRO", "HOMOLOGAR_REVISAO_CADASTRO",
-            "EDITAR_MAPA", "DISPONIBILIZAR_MAPA", "APRESENTAR_SUGESTOES", "VALIDAR_MAPA", "DEVOLVER_MAPA", "ACEITAR_MAPA", "HOMOLOGAR_MAPA", "AJUSTAR_MAPA",
-            "REALIZAR_AUTOAVALIACAO", "IMPORTAR_ATIVIDADES", "ALTERAR_DATA_LIMITE", "REABRIR_CADASTRO", "REABRIR_REVISAO", "ENVIAR_LEMBRETE_PROCESSO"
+    private static final Set<String> ACOES_DEPENDENTES_LOCALIZACAO = Set.of(
+            "EDITAR_CADASTRO",
+            "DISPONIBILIZAR_CADASTRO",
+            "DEVOLVER_CADASTRO",
+            "ACEITAR_CADASTRO",
+            "HOMOLOGAR_CADASTRO",
+            "EDITAR_REVISAO_CADASTRO",
+            "DISPONIBILIZAR_REVISAO_CADASTRO",
+            "DEVOLVER_REVISAO_CADASTRO",
+            "ACEITAR_REVISAO_CADASTRO",
+            "HOMOLOGAR_REVISAO_CADASTRO",
+            "EDITAR_MAPA",
+            "DISPONIBILIZAR_MAPA",
+            "APRESENTAR_SUGESTOES",
+            "VALIDAR_MAPA",
+            "DEVOLVER_MAPA",
+            "ACEITAR_MAPA",
+            "HOMOLOGAR_MAPA",
+            "AJUSTAR_MAPA",
+            "REALIZAR_AUTOAVALIACAO",
+            "IMPORTAR_ATIVIDADES",
+            "ALTERAR_DATA_LIMITE",
+            "REABRIR_CADASTRO",
+            "REABRIR_REVISAO"
     );
     private final SubprocessoRepo subprocessoRepo;
     private final MovimentacaoRepo movimentacaoRepo;
@@ -51,7 +69,6 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
         }
 
         String acao = (String) permission;
-
         if (targetDomainObject instanceof Subprocesso sp) {
             return checkSubprocesso(usuario, sp, acao);
         } else if (targetDomainObject instanceof Processo p) {
@@ -101,46 +118,45 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
 
     private boolean checkSubprocesso(Usuario usuario, Subprocesso sp, String acao) {
         Perfil perfil = usuario.getPerfilAtivo();
-        boolean isAdmin = perfil == ADMIN;
-        boolean isEscrita = isAcaoEscrita(acao);
+        boolean ehAdmin = perfil == ADMIN;
+        boolean dependeLocalizacao = dependeLocalizacao(acao);
 
-        // Exceção: Importação permite ler de outras unidades para obter atividades/conhecimentos
+        Processo processo = sp.getProcesso();
+        SituacaoProcesso sitProcesso = processo.getSituacao();
         if ("CONSULTAR_PARA_IMPORTACAO".equals(acao) && perfil == CHEFE) {
-            // CDU-12/Ajuste: Permitir se o processo estiver finalizado (mapas vigentes)
-            if (sp.getProcesso() != null && sp.getProcesso().getSituacao() == sgc.processo.model.SituacaoProcesso.FINALIZADO) {
+            if (sitProcesso == FINALIZADO) {
                 return true;
             }
             return checkHierarquia(usuario, sp.getUnidade());
         }
-
-        if (sp.getProcesso() != null && sp.getProcesso().getSituacao() == sgc.processo.model.SituacaoProcesso.FINALIZADO) {
-            return !isEscrita;
+        if (sitProcesso == FINALIZADO) {
+            return !dependeLocalizacao;
         }
 
         // Visualização (Leitura) - Baseada na Hierarquia
-        if (!isEscrita) {
-            if (isAdmin) return true; // Admin vê tudo
-
-            // CDU-12: Exceção à regra de visualização baseada apenas em hierarquia
+        if (!dependeLocalizacao) {
+            if (ehAdmin) return true; // Admin vê tudo
             if ("VERIFICAR_IMPACTOS".equals(acao)) {
-                return true; // Permitir visualização se for verificação de impactos (controle de estado feito no serviço)
+                return true; // controle de estado feito no serviço
             }
-
             return checkHierarquia(usuario, sp.getUnidade());
         }
 
-        // 2. Validação de Perfil (RBAC) para ações de escrita
+        // Validação de Perfil para ações de escrita
         if (!checkPerfil(usuario, acao)) {
             return false;
         }
 
-        // 3. Execução (Escrita) - Baseada na Localização Atual (Regra de Ouro)
-        // O usuário só pode executar se o subprocesso estiver na sua unidade
+        // Execução Baseada na Localização Atual - só pode executar se o subprocesso estiver na sua unidade
         Unidade localizacao = obterUnidadeLocalizacao(sp);
         boolean permitido = Objects.equals(usuario.getUnidadeAtivaCodigo(), localizacao.getCodigo());
         if (!permitido) {
-            log.debug("Acesso de ESCRITA negado para a ação '{}'. Usuário: {} (Unidade Ativa: {}). Subprocesso {} localizado em {}.",
-                    acao, usuario.getTituloEleitoral(), usuario.getUnidadeAtivaCodigo(), sp.getCodigo(), localizacao.getCodigo());
+            log.info("Acesso negado para a ação '{}'. Usuário: {} (Unidade Ativa: {}). Subprocesso {} localizado em {}.",
+                    acao,
+                    usuario.getTituloEleitoral(),
+                    usuario.getUnidadeAtivaCodigo(),
+                    sp.getCodigo(),
+                    localizacao.getCodigo());
         }
         return permitido;
     }
@@ -157,23 +173,23 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
         if (acao.startsWith("DEVOLVER")) {
             return perfil == ADMIN || perfil == GESTOR;
         }
-
-        // Ações de Mapa exclusivas de ADMIN
-        if (Set.of("EDITAR_MAPA", "DISPONIBILIZAR_MAPA", "AJUSTAR_MAPA").contains(acao)) {
+        if (Set.of("EDITAR_MAPA",
+                "DISPONIBILIZAR_MAPA",
+                "AJUSTAR_MAPA").contains(acao)) {
             return perfil == ADMIN;
         }
-
-        // Ações de validação de mapa (Chefe)
-        if (Set.of("APRESENTAR_SUGESTOES", "VALIDAR_MAPA").contains(acao)) {
+        if (Set.of("APRESENTAR_SUGESTOES",
+                "VALIDAR_MAPA").contains(acao)) {
+            return perfil == CHEFE;
+        }
+        if (Set.of("EDITAR_CADASTRO",
+                "DISPONIBILIZAR_CADASTRO",
+                "EDITAR_REVISAO_CADASTRO",
+                "DISPONIBILIZAR_REVISAO_CADASTRO",
+                "IMPORTAR_ATIVIDADES").contains(acao)) {
             return perfil == CHEFE;
         }
 
-        // Ações de Cadastro (Chefe)
-        if (Set.of("EDITAR_CADASTRO", "DISPONIBILIZAR_CADASTRO", "EDITAR_REVISAO_CADASTRO", "DISPONIBILIZAR_REVISAO_CADASTRO", "IMPORTAR_ATIVIDADES").contains(acao)) {
-            return perfil == CHEFE;
-        }
-
-        // Verificar impactos (Todos, mas depende da localização)
         if ("VERIFICAR_IMPACTOS".equals(acao)) {
             return perfil == CHEFE || perfil == GESTOR || perfil == ADMIN;
         }
@@ -181,23 +197,18 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
         return true;
     }
 
-    private boolean checkProcesso(Usuario usuario, @Nullable Processo processo, String acao) {
-        if (processo != null && processo.getSituacao() == sgc.processo.model.SituacaoProcesso.FINALIZADO) {
-            return "VISUALIZAR_PROCESSO".equals(acao);
+    private boolean checkProcesso(Usuario usuario, Processo processo, String acao) {
+        Perfil perfil = usuario.getPerfilAtivo();
+        if ("VISUALIZAR_PROCESSO".equals(acao)) return true;
+
+        if (perfil == GESTOR) {
+            return Objects.equals("ACEITAR_CADASTRO_EM_BLOCO", acao);
         }
 
-        Perfil perfil = usuario.getPerfilAtivo();
-        // Regras para Processo (baseadas em Perfil)
-        boolean isAdmin = perfil == ADMIN;
-        if (isAdmin) return true; // Admin faz tudo no Processo
-
-        // Gestor e Chefe podem ver e realizar ações em bloco
-        if (perfil == GESTOR || perfil == CHEFE) {
+        if (perfil == ADMIN) {
             return Set.of(
-                    "VISUALIZAR_PROCESSO",
                     "HOMOLOGAR_CADASTRO_EM_BLOCO",
                     "HOMOLOGAR_MAPA_EM_BLOCO",
-                    "ACEITAR_CADASTRO_EM_BLOCO",
                     "DISPONIBILIZAR_MAPA_EM_BLOCO"
             ).contains(acao);
         }
@@ -205,8 +216,8 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
         return false;
     }
 
-    private boolean isAcaoEscrita(String acao) {
-        return ACOES_ESCRITA.contains(acao);
+    private boolean dependeLocalizacao(String acao) {
+        return ACOES_DEPENDENTES_LOCALIZACAO.contains(acao);
     }
 
     private boolean checkHierarquia(Usuario usuario, Unidade unidadeAlvo) {
@@ -217,9 +228,9 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
 
         // Gestor vê sua unidade e subordinadas
         if (usuario.getPerfilAtivo() == GESTOR) {
-            // Assume-se que o usuário logado tem sua unidade ativa carregada ou acessível via código
+            // TODO complicado demais
             Unidade unidadeUsuario = Unidade.builder().codigo(usuario.getUnidadeAtivaCodigo()).build();
-            return hierarquiaService.isMesmaOuSubordinada(unidadeAlvo, unidadeUsuario);
+            return hierarquiaService.ehMesmaOuSubordinada(unidadeAlvo, unidadeUsuario);
         }
 
         log.info("Acesso negado por hierarquia para {} (Perfil: {}, Unidade Ativa: {}). Unidade alvo: {}.",
@@ -230,9 +241,9 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
     private Unidade obterUnidadeLocalizacao(Subprocesso sp) {
         if (sp.getLocalizacaoAtual() != null) return sp.getLocalizacaoAtual();
 
-        if (sp.getCodigo() == null) return sp.getUnidade();
-
-        Unidade localizacao = movimentacaoRepo.findFirstBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo()).filter(m -> m.getUnidadeDestino() != null).map(Movimentacao::getUnidadeDestino).orElse(sp.getUnidade());
+        Unidade localizacao = movimentacaoRepo.findFirstBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo())
+                .map(Movimentacao::getUnidadeDestino)
+                .orElse(sp.getUnidade());
 
         sp.setLocalizacaoAtual(localizacao);
         return localizacao;

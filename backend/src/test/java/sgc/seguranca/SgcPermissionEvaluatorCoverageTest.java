@@ -175,7 +175,7 @@ class SgcPermissionEvaluatorCoverageTest {
 
         Usuario user = usuario(Perfil.GESTOR, 10L);
 
-        when(hierarquiaService.isMesmaOuSubordinada(any(), any())).thenReturn(true);
+        when(hierarquiaService.ehMesmaOuSubordinada(any(), any())).thenReturn(true);
 
         boolean result = evaluator.checkPermission(user, sp, "VISUALIZAR");
         assertThat(result).isTrue();
@@ -189,7 +189,7 @@ class SgcPermissionEvaluatorCoverageTest {
 
         Usuario user = usuario(Perfil.GESTOR, 10L);
 
-        when(hierarquiaService.isMesmaOuSubordinada(any(), any())).thenReturn(false);
+        when(hierarquiaService.ehMesmaOuSubordinada(any(), any())).thenReturn(false);
 
         boolean result = evaluator.checkPermission(user, sp, "VISUALIZAR");
         assertThat(result).isFalse();

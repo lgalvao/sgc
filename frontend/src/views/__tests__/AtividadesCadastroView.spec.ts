@@ -197,4 +197,38 @@ describe("CadastroView.vue", () => {
         expect(mapasStore.buscarImpactoMapa).toHaveBeenCalledWith(123);
         expect(wrapper.findComponent(ImpactoMapaModal).exists()).toBe(true);
     });
+
+    it("desabilita botão disponibilizar se houver atividades sem conhecimentos", async () => {
+        const wrapper = createWrapper();
+        await flushPromises();
+
+        // Atividade sem conhecimentos
+        (wrapper.vm as any).atividades = [{
+            codigo: 1,
+            descricao: "Atividade 1",
+            conhecimentos: []
+        }];
+
+        await wrapper.vm.$nextTick();
+
+        const btn = wrapper.find('[data-testid="btn-cad-atividades-disponibilizar"]');
+        expect(btn.attributes('disabled')).toBeDefined();
+    });
+
+    it("habilita botão disponibilizar se todas atividades tiverem conhecimentos", async () => {
+        const wrapper = createWrapper();
+        await flushPromises();
+
+        // Atividade com conhecimentos
+        (wrapper.vm as any).atividades = [{
+            codigo: 1,
+            descricao: "Atividade 1",
+            conhecimentos: [{codigo: 1, descricao: "Conhecimento 1"}]
+        }];
+
+        await wrapper.vm.$nextTick();
+
+        const btn = wrapper.find('[data-testid="btn-cad-atividades-disponibilizar"]');
+        expect(btn.attributes('disabled')).toBeUndefined();
+    });
 });

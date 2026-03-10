@@ -30,7 +30,7 @@ public class HierarquiaService {
         return false;
     }
 
-    public boolean isMesmaOuSubordinada(Unidade alvo, Unidade superior) {
+    public boolean ehMesmaOuSubordinada(Unidade alvo, Unidade superior) {
         if (Objects.equals(alvo.getCodigo(), superior.getCodigo())) return true;
 
         return isSubordinada(alvo, superior);

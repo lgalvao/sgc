@@ -99,33 +99,44 @@ public class ProcessoConsultaService {
 
     public List<SubprocessoElegivelDto> subprocessosElegiveis(Long codProcesso) {
         Usuario usuario = usuarioService.usuarioAutenticado();
+        Long codUnidadeUsuario = usuario.getUnidadeAtivaCodigo();
 
+        List<Subprocesso> subprocessos;
         if (usuario.getPerfilAtivo() == Perfil.ADMIN) {
-            return subprocessoService.listarPorProcessoESituacoes(codProcesso,
-                            List.of(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
-                                    SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA,
-                                    SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO,
-                                    SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO,
-                                    SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO,
-                                    SituacaoSubprocesso.REVISAO_MAPA_VALIDADO))
-                    .stream()
-                    .map(this::toElegivelDto)
-                    .toList();
-        }
-
-        List<Long> unidadesAcesso;
-        if (usuario.getPerfilAtivo() == Perfil.GESTOR) {
-            unidadesAcesso = processoValidacaoService.buscarCodigosDescendentes(usuario.getUnidadeAtivaCodigo());
+            subprocessos = subprocessoService.listarEntidadesPorProcesso(codProcesso);
         } else {
-            unidadesAcesso = List.of(usuario.getUnidadeAtivaCodigo());
+            List<Long> unidadesAcesso;
+            if (usuario.getPerfilAtivo() == Perfil.GESTOR) {
+                unidadesAcesso = processoValidacaoService.buscarCodigosDescendentes(codUnidadeUsuario);
+            } else {
+                unidadesAcesso = List.of(codUnidadeUsuario);
+            }
+            subprocessos = subprocessoService.listarEntidadesPorProcessoEUnidades(codProcesso, unidadesAcesso);
         }
 
-        return subprocessoService.listarPorProcessoEUnidadeCodigosESituacoes(codProcesso, unidadesAcesso,
-                        List.of(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
-                                SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA,
-                                SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO,
-                                SituacaoSubprocesso.REVISAO_MAPA_VALIDADO))
-                .stream()
+        return subprocessos.stream()
+                .filter(sp -> {
+                    SituacaoSubprocesso s = sp.getSituacao();
+                    // Elegível para ACEITE (Cadastro Disponibilizado ou Fluxo de Mapa Validado/Sugestões)
+                    boolean situacaoAceite = (s == SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO ||
+                            s == SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA ||
+                            (s.ordinal() >= SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES.ordinal() &&
+                                    s.ordinal() <= SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO.ordinal()) ||
+                            (s.ordinal() >= SituacaoSubprocesso.REVISAO_MAPA_COM_SUGESTOES.ordinal() &&
+                                    s.ordinal() <= SituacaoSubprocesso.REVISAO_MAPA_VALIDADO.ordinal()));
+
+                    // Elegível para DISPONIBILIZAÇÃO (Cadastro Homologado ou Mapa Criado/Ajustado)
+                    boolean situacaoDisp = (s == SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO ||
+                            s == SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO ||
+                            s == SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA ||
+                            s == SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
+
+                    if (!situacaoAceite && !situacaoDisp) return false;
+
+                    // Regra de Ouro: Localização atual deve ser a unidade do usuário (exceto para ADMIN que vê tudo)
+                    return usuario.getPerfilAtivo() == Perfil.ADMIN ||
+                            Objects.equals(subprocessoService.obterUnidadeLocalizacao(sp).getCodigo(), codUnidadeUsuario);
+                })
                 .map(this::toElegivelDto)
                 .toList();
     }

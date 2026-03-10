@@ -18,7 +18,7 @@ Ator: ADMIN
 4. O sistema verifica se todos os subprocessos das unidades operacionais e interoperacionais participantes estão na
    situação 'Mapa homologado'.
 
-5. Caso negativo, o sistema exibe a mensagem "Não é possível encerrar o processo enquanto houver unidades com mapa de
+5. Caso negativo, o sistema exibe a mensagem "Não é possível finalizar o processo enquanto houver unidades com mapa de
    competência ainda não homologado".
 
 6. Caso positivo, sistema mostra diálogo de confirmação: título "Finalização de processo", mensagem "Confirma a
