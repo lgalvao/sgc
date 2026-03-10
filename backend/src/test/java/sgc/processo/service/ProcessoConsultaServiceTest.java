@@ -122,7 +122,7 @@ class ProcessoConsultaServiceTest {
                 .build();
         s1.setCodigo(1L);
 
-        when(subprocessoService.listarPorProcessoESituacoes(eq(1L), anyList())).thenReturn(List.of(s1));
+        when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(s1));
 
         List<SubprocessoElegivelDto> res = processoConsultaService.subprocessosElegiveis(1L);
 
@@ -147,8 +147,9 @@ class ProcessoConsultaServiceTest {
         s1.setCodigo(1L);
 
         when(processoValidacaoService.buscarCodigosDescendentes(100L)).thenReturn(List.of(100L, 101L));
-        when(subprocessoService.listarPorProcessoEUnidadeCodigosESituacoes(eq(1L), eq(List.of(100L, 101L)), anyList()))
+        when(subprocessoService.listarEntidadesPorProcessoEUnidades(1L, List.of(100L, 101L)))
                 .thenReturn(List.of(s1));
+        when(subprocessoService.obterUnidadeLocalizacao(s1)).thenReturn(u1);
 
         List<SubprocessoElegivelDto> res = processoConsultaService.subprocessosElegiveis(1L);
 

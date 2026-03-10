@@ -144,7 +144,7 @@ const emit = defineEmits<{
 
 const inputDescricaoRef = ref<InstanceType<typeof BFormInput> | null>(null);
 const selectTipoRef = ref<any>(null);
-const inputDataLimiteRef = ref<InstanceType<typeof BFormInput> | null>(null);
+const inputDataLimiteRef = ref<InstanceType<typeof InputData> | null>(null);
 const containerUnidadesRef = ref<HTMLElement | null>(null);
 const {obterPrimeiroCampoComErro, possuiErros} = useValidacao();
 
@@ -193,7 +193,7 @@ function focarPrimeiroErro() {
       containerUnidadesRef.value?.focus?.();
       return;
     case "dataLimite":
-      inputDataLimiteRef.value?.$el?.focus?.();
+      inputDataLimiteRef.value?.focus?.();
       return;
     default:
       return;

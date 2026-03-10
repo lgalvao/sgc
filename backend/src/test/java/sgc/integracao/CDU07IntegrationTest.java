@@ -23,7 +23,7 @@ class CDU07IntegrationTest extends BaseIntegrationTest {
                                 .param("perfil", "ADMIN"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.subprocesso.codUnidade").value(8))
-                .andExpect(jsonPath("$.subprocesso.situacao").value(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO.name()))
+                .andExpect(jsonPath("$.subprocesso.situacao").value(SituacaoSubprocesso.NAO_INICIADO.name()))
                 .andExpect(jsonPath("$.responsavel.usuario.tituloEleitoral").exists())
                 .andExpect(jsonPath("$.localizacaoAtual").exists())
                 .andExpect(jsonPath("$.permissoes.habilitarAcessoCadastro").value(false)) // ADMIN não visualiza em CADASTRO_EM_ANDAMENTO

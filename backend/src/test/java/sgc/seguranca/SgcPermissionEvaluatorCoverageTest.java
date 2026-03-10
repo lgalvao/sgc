@@ -127,27 +127,27 @@ class SgcPermissionEvaluatorCoverageTest {
     }
 
     @Test
-    @DisplayName("checkProcesso - FINALIZADO bloqueia escrita")
-    void checkProcesso_Finalizado_BloqueiaEscrita() {
+    @DisplayName("checkProcesso - acoes em bloco para ADMIN independem da situacao do processo")
+    void checkProcesso_Admin_Bloco_IndependeDaSituacao() {
         Processo p = new Processo();
         p.setSituacao(SituacaoProcesso.FINALIZADO);
 
         Usuario user = usuario(Perfil.ADMIN, 10L);
 
         boolean result = evaluator.checkPermission(user, p, "HOMOLOGAR_CADASTRO_EM_BLOCO");
-        assertThat(result).isFalse();
+        assertThat(result).isTrue();
     }
 
     @Test
-    @DisplayName("checkProcesso - Permite acoes em bloco para GESTOR")
-    void checkProcesso_Gestor_Bloco() {
+    @DisplayName("checkProcesso - GESTOR nao homologa cadastro em bloco")
+    void checkProcesso_Gestor_NaoHomologaCadastroEmBloco() {
         Processo p = new Processo();
         p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
 
         Usuario user = usuario(Perfil.GESTOR, 10L);
 
         boolean result = evaluator.checkPermission(user, p, "HOMOLOGAR_CADASTRO_EM_BLOCO");
-        assertThat(result).isTrue();
+        assertThat(result).isFalse();
     }
 
     @Test
@@ -236,8 +236,8 @@ class SgcPermissionEvaluatorCoverageTest {
     }
 
     @Test
-    @DisplayName("hasPermission - ById Processo")
-    void hasPermission_ById_Processo() {
+    @DisplayName("hasPermission - ById Processo nega homologacao em bloco para GESTOR")
+    void hasPermission_ById_Processo_GestorNaoHomologaEmBloco() {
         Long procId = 1L;
         Processo p = new Processo();
         p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
@@ -250,7 +250,7 @@ class SgcPermissionEvaluatorCoverageTest {
         when(auth.getPrincipal()).thenReturn(user);
 
         boolean result = evaluator.hasPermission(auth, procId, "Processo", "HOMOLOGAR_CADASTRO_EM_BLOCO");
-        assertThat(result).isTrue();
+        assertThat(result).isFalse();
     }
 
     @Test

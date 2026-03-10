@@ -2,6 +2,14 @@
 
 O **Showboat** é uma ferramenta de linha de comando projetada para criar documentos de demonstração executáveis em formato Markdown. Ele combina comentários, blocos de código e a captura automática de suas saídas, servindo tanto como documentação quanto como prova de trabalho reproduzível.
 
+## Instalação
+
+Você pode instalar o Showboat globalmente através do npm:
+
+```bash
+npm install -g showboat
+```
+
 ## Comandos Principais
 
 ### Gerenciamento de Documento

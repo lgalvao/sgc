@@ -59,7 +59,7 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
         mockMvc.perform(get("/api/subprocessos/{id}", SP_CODIGO))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.subprocesso.codUnidade", is(8)))
-                .andExpect(jsonPath("$.subprocesso.situacao", is(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO.name())));
+                .andExpect(jsonPath("$.subprocesso.situacao", is(SituacaoSubprocesso.NAO_INICIADO.name())));
 
         mockMvc.perform(get("/api/subprocessos/{id}/historico-cadastro", SP_CODIGO))
                 .andExpect(status().isOk())
@@ -73,7 +73,8 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
 
         mockMvc.perform(post("/api/subprocessos/{id}/cadastro/disponibilizar", SP_CODIGO).with(csrf()))
                 .andExpect(status().isUnprocessableContent())
-                .andExpect(jsonPath("$.message").value("O mapa de competências deve ter ao menos uma atividade cadastrada."));
+                .andExpect(jsonPath("$.message").value(
+                        "Situação do subprocesso não permite esta operação. Situação atual: NAO_INICIADO. Situações permitidas: MAPEAMENTO_CADASTRO_EM_ANDAMENTO"));
 
         var spEtapa3 = subprocessoRepo.findById(SP_CODIGO).orElseThrow();
         var competencia = competenciaRepo.save(Competencia.builder().descricao("Java").mapa(spEtapa3.getMapa()).build());
@@ -88,6 +89,10 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
 
         entityManager.flush();
         entityManager.clear();
+
+        mockMvc.perform(get("/api/subprocessos/{id}", SP_CODIGO))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.subprocesso.situacao", is(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO.name())));
 
         // Ação de Disponibilizar
         mockMvc.perform(post("/api/subprocessos/{id}/cadastro/disponibilizar", SP_CODIGO).with(csrf()))

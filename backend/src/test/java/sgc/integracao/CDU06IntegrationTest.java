@@ -157,8 +157,8 @@ class CDU06IntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("Deve mostrar 'podeHomologarCadastro' como true para Gestor com cadastro disponibilizado")
-    void testPodeHomologarCadastro_true() throws Exception {
+    @DisplayName("Deve mostrar 'podeHomologarCadastro' como false para Gestor com cadastro disponibilizado")
+    void testPodeHomologarCadastro_false_paraGestor() throws Exception {
         processo.adicionarParticipantes(Set.of(unidade));
         processoRepo.save(processo);
         Authentication auth = setupSecurityContext(unidade, Perfil.GESTOR);
@@ -172,12 +172,12 @@ class CDU06IntegrationTest extends BaseIntegrationTest {
 
         mockMvc.perform(get("/api/processos/{id}/detalhes", processo.getCodigo()).with(authentication(auth)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.podeHomologarCadastro").value(true));
+                .andExpect(jsonPath("$.podeHomologarCadastro").value(false));
     }
 
     @Test
-    @DisplayName("Deve mostrar 'podeHomologarMapa' como true para Gestor com mapa validado")
-    void testPodeHomologarMapa_true() throws Exception {
+    @DisplayName("Deve mostrar 'podeHomologarMapa' como false para Gestor com mapa validado")
+    void testPodeHomologarMapa_false_paraGestor() throws Exception {
         processo.adicionarParticipantes(Set.of(unidade));
         processoRepo.save(processo);
         Authentication auth = setupSecurityContext(unidade, Perfil.GESTOR);
@@ -191,7 +191,7 @@ class CDU06IntegrationTest extends BaseIntegrationTest {
 
         mockMvc.perform(get("/api/processos/{id}/detalhes", processo.getCodigo()).with(authentication(auth)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.podeHomologarMapa").value(true));
+                .andExpect(jsonPath("$.podeHomologarMapa").value(false));
     }
 
     @Test

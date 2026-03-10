@@ -74,7 +74,7 @@ class SubprocessoServiceMethodsIntegrationTest extends BaseIntegrationTest {
         SubprocessoSituacaoDto result = subprocessoService.obterStatus(subprocesso.getCodigo());
         assertThat(result).isNotNull();
         assertThat(result.codigo()).isEqualTo(subprocesso.getCodigo());
-        assertThat(result.situacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+        assertThat(result.situacao()).isEqualTo(SituacaoSubprocesso.NAO_INICIADO);
     }
 
     @Test

@@ -200,6 +200,9 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
     private boolean checkProcesso(Usuario usuario, Processo processo, String acao) {
         Perfil perfil = usuario.getPerfilAtivo();
         if ("VISUALIZAR_PROCESSO".equals(acao)) return true;
+        if ("FINALIZAR_PROCESSO".equals(acao)) {
+            return perfil == ADMIN && processo.getSituacao() != FINALIZADO;
+        }
 
         if (perfil == GESTOR) {
             return Objects.equals("ACEITAR_CADASTRO_EM_BLOCO", acao);

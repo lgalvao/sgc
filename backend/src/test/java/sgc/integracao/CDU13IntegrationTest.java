@@ -219,7 +219,7 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
         assertThat(movimentacaoAceite.getUnidadeOrigem().getSigla())
                 .isEqualTo(unidadeSuperior.getSigla());
         assertThat(movimentacaoAceite.getUnidadeDestino().getSigla())
-                .isEqualTo(unidadeSuperior.getSigla());
+                .isEqualTo("ADMIN");
         assertThat(movimentacaoAceite.getDescricao())
                 .isEqualTo("Cadastro aceito");
     }

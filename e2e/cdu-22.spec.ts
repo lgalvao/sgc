@@ -48,6 +48,7 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
         await page.getByTestId('btn-iniciar-processo-confirmar').click();
 
         await verificarPaginaPainel(page);
+        await expect(page.getByTestId('tbl-processos').getByText(descProcesso).first()).toBeVisible();
 
         // Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro
         await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);

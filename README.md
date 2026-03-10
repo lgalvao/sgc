@@ -16,9 +16,9 @@ O projeto segue uma arquitetura **Modular Monolith** no backend e **Component-Ba
 
 | Camada       | Tecnologias Principais                                             |
 |--------------|--------------------------------------------------------------------|
-| **Backend**  | Java 21, Spring Boot 4.0.3, Hibernate 7, H2 (testes)/Oracle (produção) |
-| **Frontend** | Vue.js 3.5.28, TypeScript 5.9.3, Vite 7.3.1, Pinia, BootstrapVueNext   |
-| **Testes**   | JUnit, Mockito, Vitest, Playwright 1.58.2                              |
+| **Backend**  | Java 21, Spring Boot 4, Hibernate 7, H2 (testes)/Oracle (produção) |
+| **Frontend** | Vue.js 3.5, TypeScript 5.9, Vite 7.3, Pinia, BootstrapVueNext      |
+| **Testes**   | JUnit, Mockito, Vitest, Playwright 1.58, Storybook                 |
 
 **Documentação Essencial:**
 

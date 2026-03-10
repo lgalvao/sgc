@@ -1,3 +1,5 @@
+// noinspection JSUnusedLocalSymbols
+
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {login, USUARIOS} from './helpers/helpers-auth.js';
 import * as AtividadeHelpers from './helpers/helpers-atividades.js';
@@ -15,13 +17,11 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
                                                                                         autenticadoComoAdmin,
                                                                                         request
                                                                                     }) => {
-        test.setTimeout(45000);
         const timestamp = Date.now();
         const descricaoProcesso = `Processo CDU-08 Map ${timestamp}`;
         const processoOrigemDescricao = `Processo Base FINALIZADO ${timestamp}`;
         const processoOrigem2Descricao = `Processo Base FINALIZADO 2 ${timestamp}`;
         let processoOrigemId: number;
-        let processoOrigem2Id: number;
         let processoAlvoId: number;
 
         await test.step('1. Setup: Criar Processos Origem e Mapeamento Alvo', async () => {
@@ -32,12 +32,6 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
                 descricao: processoOrigemDescricao
             });
             processoOrigemId = procOrigem.codigo;
-
-            const procOrigem2 = await criarProcessoFinalizadoFixture(request, {
-                unidade: 'ASSESSORIA_21',
-                descricao: processoOrigem2Descricao
-            });
-            processoOrigem2Id = procOrigem2.codigo;
 
             const processoAlvo = await criarProcessoFixture(request, {
                 unidade: UNIDADE_ALVO,
