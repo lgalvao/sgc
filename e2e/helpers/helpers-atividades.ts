@@ -306,7 +306,10 @@ export async function importarAtividadesComErroDuplicidade(page: Page, processoO
     await expect(modal).toBeHidden();
 }
 
-export async function verificarOpcoesImportacao(page: Page, processosEsperados: string[], unidadesEsperadas: string[]) {
+export async function verificarOpcoesImportacao(
+    page: Page,
+    opcoesEsperadas: Array<{ processo: string; unidades: string[] }>
+) {
     const btnEmptyState = page.getByTestId('btn-empty-state-importar');
     
     if (await btnEmptyState.isVisible()) {
@@ -320,22 +323,22 @@ export async function verificarOpcoesImportacao(page: Page, processosEsperados: 
     await expect(modal.getByText('Importação de atividades')).toBeVisible();
 
     const selectProcesso = modal.getByTestId('select-processo');
+    const processosEsperados = opcoesEsperadas.map(opcao => opcao.processo);
     await expect.poll(async () => {
         const options = await selectProcesso.locator('option').allTextContents();
         return processosEsperados.every(proc => options.some(opt => opt.includes(proc)));
     }, { timeout: 10000 }).toBeTruthy();
-    
-    if (processosEsperados.length > 0) {
-        await selectProcesso.selectOption({ label: processosEsperados[0] });
-    }
 
     const selectUnidade = modal.getByTestId('select-unidade');
-    await expect(selectUnidade).toBeEnabled();
+    for (const opcao of opcoesEsperadas) {
+        await selectProcesso.selectOption({ label: opcao.processo });
+        await expect(selectUnidade).toBeEnabled();
 
-    await expect.poll(async () => {
-        const options = await selectUnidade.locator('option').allTextContents();
-        return unidadesEsperadas.every(u => options.some(opt => opt.includes(u)));
-    }, { timeout: 10000 }).toBeTruthy();
+        await expect.poll(async () => {
+            const options = await selectUnidade.locator('option').allTextContents();
+            return opcao.unidades.every(unidade => options.some(opt => opt.includes(unidade)));
+        }, { timeout: 10000 }).toBeTruthy();
+    }
 
     await modal.getByTestId('importar-atividades-modal__btn-modal-cancelar').click();
 }

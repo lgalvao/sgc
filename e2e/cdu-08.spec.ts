@@ -68,7 +68,10 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
             const atividadeB = `Atividade Origem B - ${processoOrigemId}`;
             
             // Verificar se múltiplos processos/unidades (operacionais/interoperacionais) aparecem nas opções (Passo 13.1 e 13.3)
-            await AtividadeHelpers.verificarOpcoesImportacao(page, [processoOrigemDescricao, processoOrigem2Descricao], [UNIDADE_ORIGEM, 'ASSESSORIA_21']);
+            await AtividadeHelpers.verificarOpcoesImportacao(page, [
+                { processo: processoOrigemDescricao, unidades: [UNIDADE_ORIGEM] },
+                { processo: processoOrigem2Descricao, unidades: ['ASSESSORIA_21'] }
+            ]);
 
             // Importar ambas as atividades com sucesso
             await AtividadeHelpers.importarAtividades(page, processoOrigemDescricao, UNIDADE_ORIGEM, [atividadeA, atividadeB]);
