@@ -470,6 +470,7 @@ describe("Processo.vue", () => {
         wrapper = createWrapper();
         perfilStore = usePerfilStore();
         processosStore = useProcessosStore();
+        toastStore = useToastStore();
 
         perfilStore.$patch({perfilSelecionado: Perfil.ADMIN});
         aplicarContextoProcesso(
@@ -489,6 +490,14 @@ describe("Processo.vue", () => {
         expect((wrapper.vm).textoModalBloco).toBe("Selecione abaixo as unidades cujos cadastros deverão ser homologados:");
         expect((wrapper.vm).rotuloBotaoBloco).toBe("Homologar");
         expect((wrapper.vm).mensagemSucessoAcaoBloco).toBe("Cadastros homologados em bloco");
+
+        const modal = wrapper.findComponent(ModalAcaoBlocoStub);
+        await modal.vm.$emit("confirmar", {ids: [101]});
+        await flushPromises();
+
+        expect(toastStore.setPending).not.toHaveBeenCalled();
+        expect(mocks.push).not.toHaveBeenCalledWith("/painel");
+        expect(wrapper.find('[data-testid="app-alert"]').text()).toContain("Cadastros homologados em bloco");
     });
 
     it("deve usar textos de CDU-26 quando houver apenas validacao elegível para homologacao", async () => {
