@@ -47,11 +47,7 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
             "ACEITAR_MAPA",
             "HOMOLOGAR_MAPA",
             "AJUSTAR_MAPA",
-            "REALIZAR_AUTOAVALIACAO",
-            "IMPORTAR_ATIVIDADES",
-            "ALTERAR_DATA_LIMITE",
-            "REABRIR_CADASTRO",
-            "REABRIR_REVISAO"
+            "IMPORTAR_ATIVIDADES"
     );
     private final SubprocessoRepo subprocessoRepo;
     private final MovimentacaoRepo movimentacaoRepo;

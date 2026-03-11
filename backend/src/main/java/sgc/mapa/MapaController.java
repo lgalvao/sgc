@@ -22,6 +22,7 @@ import java.util.*;
 @RequestMapping("/api/mapas")
 @RequiredArgsConstructor
 @Tag(name = "Mapas", description = "Endpoints para gerenciamento de mapas de competências")
+@PreAuthorize("isAuthenticated()")
 public class MapaController {
     private final MapaManutencaoService mapaManutencaoService;
 

@@ -21,6 +21,7 @@ import java.util.*;
 @RequestMapping("/api/atividades")
 @RequiredArgsConstructor
 @Tag(name = "Atividades", description = "Gerenciamento de atividades e seus conhecimentos")
+@PreAuthorize("isAuthenticated()")
 public class AtividadeController {
     private final AtividadeFacade atividadeFacade;
 
@@ -38,7 +39,7 @@ public class AtividadeController {
      * Cria uma nova atividade no sistema.
      */
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")
+    @PreAuthorize("hasRole('CHEFE')")
     @Operation(summary = "Cria uma atividade")
     public ResponseEntity<AtividadeOperacaoResponse> criar(@Valid @RequestBody CriarAtividadeRequest request) {
         AtividadeOperacaoResponse resp = atividadeFacade.criarAtividade(request);
@@ -50,7 +51,7 @@ public class AtividadeController {
      * Atualiza os dados de uma atividade existente.
      */
     @PostMapping("/{codigo}/atualizar")
-    @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")
+    @PreAuthorize("hasRole('CHEFE')")
     @Operation(summary = "Atualiza atividade existente")
     public ResponseEntity<AtividadeOperacaoResponse> atualizar(@PathVariable Long codigo,
                                                                @RequestBody @Valid AtualizarAtividadeRequest request) {
@@ -62,7 +63,7 @@ public class AtividadeController {
      * Exclui uma atividade do sistema.
      */
     @PostMapping("/{codAtividade}/excluir")
-    @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")
+    @PreAuthorize("hasRole('CHEFE')")
     @Operation(summary = "Exclui uma atividade")
     public ResponseEntity<AtividadeOperacaoResponse> excluir(@PathVariable Long codAtividade) {
         AtividadeOperacaoResponse response = atividadeFacade.excluirAtividade(codAtividade);
@@ -83,7 +84,7 @@ public class AtividadeController {
      * Adiciona um novo conhecimento a uma atividade existente.
      */
     @PostMapping("/{codAtividade}/conhecimentos")
-    @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")
+    @PreAuthorize("hasRole('CHEFE')")
     @Operation(summary = "Cria um conhecimento para uma atividade")
     public ResponseEntity<AtividadeOperacaoResponse> criarConhecimento(
             @PathVariable Long codAtividade,
@@ -98,7 +99,7 @@ public class AtividadeController {
      * Atualiza um conhecimento existente dentro de uma atividade.
      */
     @PostMapping("/{codAtividade}/conhecimentos/{codConhecimento}/atualizar")
-    @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")
+    @PreAuthorize("hasRole('CHEFE')")
     @Operation(summary = "Atualiza um conhecimento existente em uma atividade")
     public ResponseEntity<AtividadeOperacaoResponse> atualizarConhecimento(
             @PathVariable Long codAtividade,
@@ -115,7 +116,7 @@ public class AtividadeController {
      * Exclui um conhecimento de uma atividade.
      */
     @PostMapping("/{codAtividade}/conhecimentos/{codConhecimento}/excluir")
-    @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")
+    @PreAuthorize("hasRole('CHEFE')")
     @Operation(summary = "Exclui um conhecimento de uma atividade")
     public ResponseEntity<AtividadeOperacaoResponse> excluirConhecimento(
             @PathVariable Long codAtividade,

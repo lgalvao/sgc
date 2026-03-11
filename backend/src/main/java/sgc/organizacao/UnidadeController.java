@@ -23,6 +23,7 @@ import static sgc.processo.model.TipoProcesso.*;
 @RequestMapping("/api/unidades")
 @RequiredArgsConstructor
 @Validated
+@PreAuthorize("isAuthenticated()")
 public class UnidadeController {
     private final UnidadeService unidadeService;
     private final UnidadeHierarquiaService hierarquiaService;

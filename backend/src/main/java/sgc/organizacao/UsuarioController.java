@@ -20,6 +20,7 @@ import java.util.*;
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Usuários", description = "Gerenciamento de usuários e administradores")
+@PreAuthorize("isAuthenticated()")
 public class UsuarioController {
     private final UsuarioFacade usuarioFacade;
     private final UsuarioService usuarioService;

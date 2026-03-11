@@ -29,6 +29,7 @@ import java.util.*;
 @RequiredArgsConstructor
 @Tag(name = "Subprocessos", description = "Endpoints unificados para gerenciamento de subprocessos, cadastro, mapa e validação")
 @Slf4j
+@PreAuthorize("isAuthenticated()")
 public class SubprocessoController {
 
     private final SubprocessoService subprocessoService;
