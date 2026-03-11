@@ -1,6 +1,6 @@
 import {expect, type Page} from '@playwright/test';
 import {calcularDataLimite} from './helpers-processos.js';
-import {limparNotificacoes} from './helpers-navegacao.js';
+import {limparNotificacoes, verificarPaginaPainel, verificarToast} from './helpers-navegacao.js';
 
 function extrairRotaSubprocesso(page: Page): { codigoProcesso: string; siglaUnidade: string } {
     const match = /\/processo\/(\d+)\/([A-Z0-9_]+)/.exec(page.url());
@@ -154,5 +154,7 @@ export async function disponibilizarMapa(page: Page, dataLimite?: string) {
     await page.getByTestId('inp-disponibilizar-mapa-data').fill(data);
     await page.getByTestId('btn-disponibilizar-mapa-confirmar').click();
 
-    await expect(modal).toBeHidden();
+    await expect(modal).toBeHidden({timeout: 15000});
+    await verificarPaginaPainel(page);
+    await verificarToast(page, /Disponibilização do mapa de competências efetuada/i);
 }

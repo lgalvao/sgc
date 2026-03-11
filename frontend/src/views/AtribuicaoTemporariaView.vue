@@ -183,7 +183,7 @@ async function criarAtribuicao() {
       justificativa: justificativa.value
     });
 
-    notify('Atribuição criada com sucesso!', 'success');
+    notify('Atribuição criada', 'success');
 
     usuarioSelecionado.value = null;
     dataInicio.value = "";

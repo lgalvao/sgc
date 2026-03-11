@@ -138,6 +138,7 @@ import {useAcesso} from "@/composables/useAcesso";
 import {useFormErrors} from '@/composables/useFormErrors';
 import {useMapasStore} from "@/stores/mapas";
 import {useSubprocessosStore} from "@/stores/subprocessos";
+import {useToastStore} from "@/stores/toast";
 import type {Atividade, Competencia, SalvarCompetenciaRequest, Unidade} from "@/types/tipos";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import {formatSituacaoSubprocesso} from "@/utils/formatters";
@@ -152,6 +153,7 @@ const router = useRouter();
 const mapasStore = useMapasStore();
 const {mapaCompleto, impactoMapa: impactos} = storeToRefs(mapasStore);
 const subprocessosStore = useSubprocessosStore();
+const toastStore = useToastStore();
 const subprocesso = computed(() => subprocessosStore.subprocessoDetalhe);
 usePerfil();
 
@@ -345,8 +347,9 @@ async function disponibilizarMapa(payload: { dataLimite: string; observacoes: st
   loadingDisponibilizacao.value = true;
 
   try {
-    await mapasStore.disponibilizarMapa(codSubprocesso.value, payload);
+    await mapasStore.disponibilizarMapa(codSubprocesso.value as number, payload);
     fecharModalDisponibilizar();
+    toastStore.setPending("Disponibilização do mapa de competências efetuada");
     await router.push({name: "Painel"});
   } catch {
     handleErrors(mapasStore);

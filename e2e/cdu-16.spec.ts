@@ -112,7 +112,6 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
         await criarCompetencia(page, competencia3, [atividadeBase3]);
 
         await disponibilizarMapa(page, '2030-12-31');
-        await verificarPaginaPainel(page);
         await acessarSubprocessoAdmin(page, descProcessoMapeamento, UNIDADE_ALVO);
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa disponibilizado/i);
     });

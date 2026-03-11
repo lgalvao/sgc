@@ -132,7 +132,6 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
 
         // Cenario 4: Disponibilizar com sucesso
         await disponibilizarMapa(page, '2030-12-31');
-        await verificarPaginaPainel(page);
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, 'SECAO_211');
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa disponibilizado/i);

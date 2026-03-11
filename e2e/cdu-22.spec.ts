@@ -116,50 +116,85 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
         await expect(btnAceitarSecHabilitado).toBeEnabled();
     });
 
-    test('Cenario 4: Múltiplas unidades disponibilizadas, botão desabilitado para gestor de nível superior (itens com intermediários)', async ({page}) => {
+    test('Cenário 4: Validar isolamento hierárquico no aceite em bloco (gestor da secretaria só aceita em bloco quando estiver na sua mesa)', async ({page}) => {
         const timestamp2 = Date.now();
-        const descProcesso2 = `Mapeamento Multi CDU-22 ${timestamp2}`;
-        
-        // 1. Admin cria processo com SECAO_111 e SECAO_121
+        const descProcesso2 = `Mapeamento Erro Hierarquia CDU-22 ${timestamp2}`;
+
+        // 1. Admin cria e inicia processo selecionando ASSESSORIA_11 e SECAO_111
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
         await criarProcesso(page, {
             descricao: descProcesso2,
             tipo: 'MAPEAMENTO',
             diasLimite: 30,
-            unidade: ['SECAO_111', 'SECAO_121'],
-            expandir: ['SECRETARIA_1', 'COORD_11', 'COORD_12']
+            unidade: ['ASSESSORIA_11', 'SECAO_111'],
+            expandir: ['SECRETARIA_1', 'COORD_11'],
+            iniciar: true
         });
 
-        const linhaProcesso = page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descProcesso2)});
-        await linhaProcesso.click();
-        await page.getByTestId('btn-processo-iniciar').click();
-        await page.getByTestId('btn-iniciar-processo-confirmar').click();
+        // 2. Chefe ASSESSORIA_11 (David Bowie) disponibiliza cadastro
+        await login(page, USUARIOS.CHEFE_ASSESSORIA_11.titulo, USUARIOS.CHEFE_ASSESSORIA_11.senha);
+        await page.getByTestId('tbl-processos').getByText(descProcesso2).first().click();
+        await navegarParaAtividades(page);
+        await adicionarAtividade(page, `Ativ ASSESSORIA_11 ${timestamp2}`);
+        await adicionarConhecimento(page, `Ativ ASSESSORIA_11 ${timestamp2}`, 'Conhecimento 11');
+        await page.getByTestId('btn-cad-atividades-disponibilizar').click();
+        await page.getByTestId('btn-confirmar-disponibilizacao').click();
+        await verificarPaginaPainel(page);
 
-        // 2. Chefes disponibilizam
-        const chefes = [
-            {user: USUARIOS.CHEFE_SECAO_111, atividade: `Ativ 111 ${timestamp2}`},
-            {user: USUARIOS.CHEFE_SECAO_121, atividade: `Ativ 121 ${timestamp2}`}
-        ];
+        // 3. Chefe SECAO_111 (Chefe Seção 111) disponibiliza cadastro
+        await login(page, USUARIOS.CHEFE_SECAO_111.titulo, USUARIOS.CHEFE_SECAO_111.senha);
+        await page.getByTestId('tbl-processos').getByText(descProcesso2).first().click();
+        await navegarParaAtividades(page);
+        await adicionarAtividade(page, `Ativ SECAO_111 ${timestamp2}`);
+        await adicionarConhecimento(page, `Ativ SECAO_111 ${timestamp2}`, 'Conhecimento 111');
+        await page.getByTestId('btn-cad-atividades-disponibilizar').click();
+        await page.getByTestId('btn-confirmar-disponibilizacao').click();
+        await verificarPaginaPainel(page);
 
-        for (const chefe of chefes) {
-            await login(page, chefe.user.titulo, chefe.user.senha);
-            await page.getByTestId('tbl-processos').getByText(descProcesso2).first().click();
-            await navegarParaAtividades(page);
-            await adicionarAtividade(page, chefe.atividade);
-            await adicionarConhecimento(page, chefe.atividade, 'Conhecimento Multi');
-            await page.getByTestId('btn-cad-atividades-disponibilizar').click();
-            await page.getByTestId('btn-confirmar-disponibilizacao').click();
-            await verificarPaginaPainel(page);
-        }
-
-        // 3. Logar como GESTOR SECRETARIA_1. O botão deve estar visível mas DESABILITADO
-        // Porque os itens estão com COORD_11 e COORD_12
+        // 4. Logar como GESTOR SECRETARIA_1 e validar o modal de aceite em bloco
+        // Ele deve ver a ASSESSORIA_11 (subordinada direta)
+        // Ele NÃO deve ver a SECAO_111 (está na mesa da COORD_11)
         await loginComPerfil(page, USUARIOS.GESTOR_SECRETARIA_1.titulo, USUARIOS.GESTOR_SECRETARIA_1.senha, 'GESTOR - SECRETARIA_1');
         await page.getByTestId('tbl-processos').getByText(descProcesso2).first().click();
 
         const btnAceitar = page.getByTestId('btn-processo-aceitar-bloco');
         await expect(btnAceitar).toBeVisible();
-        await expect(btnAceitar).toBeDisabled();
+        await expect(btnAceitar).toBeEnabled();
+        await btnAceitar.click();
+
+        const modal = page.locator('#modal-acao-bloco');
+        await expect(modal).toBeVisible();
+
+        // Validação CRÍTICA: ASSESSORIA_11 deve estar presente, SECAO_111 deve estar AUSENTE
+        await expect(modal.getByText('ASSESSORIA_11')).toBeVisible();
+        await expect(modal.getByText('SECAO_111')).toBeHidden();
+
+        await modal.getByRole('button', {name: /Cancelar/i}).click();
+
+        // 5. Gestor COORD_11 (GESTOR_COORD) faz o aceite em bloco da SECAO_111
+        await login(page, USUARIOS.GESTOR_COORD.titulo, USUARIOS.GESTOR_COORD.senha);
+        await page.getByTestId('tbl-processos').getByText(descProcesso2).first().click();
+        
+        await page.getByTestId('btn-processo-aceitar-bloco').click();
+        await page.locator('#modal-acao-bloco').getByRole('button', {name: /Registrar aceite/i}).click();
+        await expect(page.getByText(/Cadastros aceitos em bloco/i).first()).toBeVisible();
+
+        // 6. Logar novamente como GESTOR SECRETARIA_1
+        // Agora ele deve ver AMBAS as unidades no modal de aceite em bloco
+        await loginComPerfil(page, USUARIOS.GESTOR_SECRETARIA_1.titulo, USUARIOS.GESTOR_SECRETARIA_1.senha, 'GESTOR - SECRETARIA_1');
+        await page.getByTestId('tbl-processos').getByText(descProcesso2).first().click();
+
+        await page.getByTestId('btn-processo-aceitar-bloco').click();
+        const modalFinal = page.locator('#modal-acao-bloco');
+        await expect(modalFinal).toBeVisible();
+
+        // Agora ambas devem estar visíveis
+        await expect(modalFinal.getByText('ASSESSORIA_11')).toBeVisible();
+        await expect(modalFinal.getByText('SECAO_111')).toBeVisible();
+
+        // Registrar aceite em bloco pela SECRETARIA_1
+        await modalFinal.getByRole('button', {name: /Registrar aceite/i}).click();
+        await expect(page.getByText(/Cadastros aceitos em bloco/i).first()).toBeVisible();
     });
 });

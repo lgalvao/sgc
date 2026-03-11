@@ -12,7 +12,7 @@ import {
     acessarSubprocessoChefeDireto,
     acessarSubprocessoGestor
 } from './helpers/helpers-analise.js';
-import {fazerLogout} from './helpers/helpers-navegacao.js';
+import {fazerLogout, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 
 test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecimentos', () => {
     const UNIDADE_ALVO = 'SECAO_221';
@@ -60,7 +60,7 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
             await page.getByTestId('btn-cad-atividades-disponibilizar').click();
             await page.getByTestId('btn-confirmar-disponibilizacao').click();
 
-            await expect(page).toHaveURL(/\/painel/);
+            await verificarPaginaPainel(page);
             await fazerLogout(page);
         });
 
@@ -74,7 +74,7 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
             await page.getByTestId('inp-devolucao-cadastro-obs').fill(motivo);
             await page.getByTestId('btn-devolucao-cadastro-confirmar').click();
 
-            await expect(page).toHaveURL(/\/painel/);
+            await verificarPaginaPainel(page);
             await fazerLogout(page);
 
             await login(page, USUARIO_CHEFE, SENHA_CHEFE);
@@ -89,7 +89,7 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
 
             await page.getByTestId('btn-cad-atividades-disponibilizar').click();
             await page.getByTestId('btn-confirmar-disponibilizacao').click();
-            await expect(page).toHaveURL(/\/painel/);
+            await verificarPaginaPainel(page);
         });
     });
 });

@@ -4,14 +4,10 @@
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">{{ titulo }}</h5>
-          <button aria-label="Fechar" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+          <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
         </div>
         <div class="modal-body">
-          <p class="mb-3">{{ texto }}</p>
-
-          <div v-if="erro" class="alert alert-danger mb-3">
-            {{ erro }}
-          </div>
+          <p v-if="texto">{{ texto }}</p>
 
           <div v-if="mostrarDataLimite" class="mb-3">
             <label class="form-label required" for="dataLimiteBloco">Data Limite</label>
@@ -25,53 +21,59 @@
             />
           </div>
 
-          <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
-            <table class="table table-sm table-hover">
-              <thead>
+          <div v-if="erroLocal" class="alert alert-danger mb-3">
+            {{ erroLocal }}
+          </div>
+
+          <div class="table-responsive">
+            <table class="table table-sm table-hover border">
+              <thead class="table-light">
               <tr>
                 <th style="width: 40px">
                   <input
-                      :checked="todosSelecionados"
-                      :disabled="processando"
+                      :checked="todasSelecionadas"
                       class="form-check-input"
                       type="checkbox"
-                      @change="toggleTodos"
+                      @change="alternarTodas"
                   >
                 </th>
-                <th>Sigla</th>
-                <th>Nome</th>
+                <th>Unidade</th>
                 <th>Situação</th>
               </tr>
               </thead>
               <tbody>
-              <tr v-for="unidade in unidades" :key="unidade.codigo">
+              <tr v-for="u in unidades" :key="u.codigo">
                 <td>
                   <input
-                      v-model="selecionadosLocal"
-                      :disabled="processando"
-                      :value="unidade.codigo"
+                      v-model="selecionadas"
+                      :value="u.codigo"
                       class="form-check-input"
                       type="checkbox"
                   >
                 </td>
-                <td>{{ unidade.sigla }}</td>
-                <td>{{ unidade.nome }}</td>
-                <td>{{ unidade.situacao }}</td>
+                <td>{{ u.sigla }} - {{ u.nome }}</td>
+                <td>{{ u.situacao }}</td>
+              </tr>
+              <tr v-if="unidades.length === 0">
+                <td class="text-center py-3 text-muted" colspan="3">
+                  Nenhuma unidade elegível encontrada.
+                </td>
               </tr>
               </tbody>
             </table>
           </div>
         </div>
-        <div class="modal-footer">
-          <button :disabled="processando" class="btn btn-secondary" data-bs-dismiss="modal" type="button">Cancelar
+          <div class="modal-footer">
+          <button :disabled="processando" class="btn btn-secondary" data-bs-dismiss="modal" type="button">
+            Cancelar
           </button>
           <button
-              :disabled="processando || selecionadosLocal.length === 0"
+              :disabled="processando || selecionadas.length === 0"
               class="btn btn-primary"
               type="button"
               @click="confirmar"
           >
-            <output v-if="processando" aria-hidden="true" class="spinner-border spinner-border-sm me-2"></output>
+            <span v-if="processando" class="spinner-border spinner-border-sm me-1" role="status"></span>
             {{ rotuloBotao }}
           </button>
         </div>
@@ -85,98 +87,90 @@ import {computed, onMounted, ref, watch} from 'vue';
 import {Modal} from 'bootstrap';
 import InputData from '@/components/comum/InputData.vue';
 
-export interface UnidadeSelecao {
+interface UnidadeBloco {
   codigo: number;
   sigla: string;
   nome: string;
   situacao: string;
-  selecionada?: boolean; // For compatibility if passed from parent with this prop
 }
 
 const props = defineProps<{
   id: string;
   titulo: string;
-  texto: string;
+  texto?: string;
   rotuloBotao: string;
-  unidades: UnidadeSelecao[];
-  unidadesPreSelecionadas: number[];
+  unidades: UnidadeBloco[];
+  unidadesPreSelecionadas?: number[];
   mostrarDataLimite?: boolean;
 }>();
 
 const emit = defineEmits<{
-  'confirmar': [dados: { ids: number[], dataLimite?: string }];
+  (e: 'confirmar', data: { ids: number[]; dataLimite?: string }): void;
 }>();
 
 const modalElement = ref<HTMLElement | null>(null);
 const modalInstance = ref<Modal | null>(null);
-const selecionadosLocal = ref<number[]>([]);
+const selecionadas = ref<number[]>([]);
+const dataLimite = ref('');
 const processando = ref(false);
-const erro = ref<string | null>(null);
-const dataLimite = ref<string>('');
+const erroLocal = ref('');
 
-const todosSelecionados = computed(() => {
-  return props.unidades.length > 0 && selecionadosLocal.value.length === props.unidades.length;
+const todasSelecionadas = computed(() => {
+  return props.unidades.length > 0 && selecionadas.value.length === props.unidades.length;
 });
 
-function toggleTodos(e: Event) {
-  const checked = (e.target as HTMLInputElement).checked;
-  if (checked) {
-    selecionadosLocal.value = props.unidades.map(u => u.codigo);
+function alternarTodas() {
+  if (todasSelecionadas.value) {
+    selecionadas.value = [];
   } else {
-    selecionadosLocal.value = [];
+    selecionadas.value = props.unidades.map(u => u.codigo);
   }
-}
-
-function confirmar() {
-  if (props.mostrarDataLimite && !dataLimite.value) {
-    erro.value = "A data limite é obrigatória.";
-    return;
-  }
-
-  processando.value = true;
-  erro.value = null;
-
-  emit('confirmar', {
-    ids: selecionadosLocal.value,
-    dataLimite: props.mostrarDataLimite ? dataLimite.value : undefined
-  });
 }
 
 function abrir() {
+  erroLocal.value = '';
+  processando.value = false;
   modalInstance.value?.show();
 }
 
 function fechar() {
   modalInstance.value?.hide();
-  processando.value = false;
-  erro.value = null;
-  dataLimite.value = '';
 }
 
-function setProcessando(val: boolean) {
-  processando.value = val;
+function setProcessando(valor: boolean) {
+  processando.value = valor;
 }
 
-function setErro(msg: string | null) {
-  erro.value = msg;
+function setErro(msg: string) {
+  erroLocal.value = msg;
 }
-defineExpose({
-  abrir,
-  fechar,
-  setProcessando,
-  setErro,
-  todosSelecionados,
-  confirmar
-});
+
+function confirmar() {
+  if (props.mostrarDataLimite && !dataLimite.value) {
+    erroLocal.value = "A data limite é obrigatória";
+    return;
+  }
+  emit('confirmar', {
+    ids: selecionadas.value,
+    dataLimite: props.mostrarDataLimite ? dataLimite.value : undefined
+  });
+}
 
 watch(() => props.unidadesPreSelecionadas, (newVal) => {
-  selecionadosLocal.value = [...newVal];
+  selecionadas.value = [...(newVal || [])];
 }, {immediate: true});
 
 onMounted(() => {
   if (modalElement.value) {
     modalInstance.value = new Modal(modalElement.value);
   }
+});
+
+defineExpose({
+  abrir,
+  fechar,
+  setProcessando,
+  setErro
 });
 </script>
 

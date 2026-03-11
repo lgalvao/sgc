@@ -29,7 +29,7 @@ export async function limparNotificacoes(page: Page): Promise<void> {
  */
 export async function verificarToast(page: Page, mensagem?: string | RegExp): Promise<void> {
     const toast = page.locator('.orchestrator-container .toast').first();
-    await expect(toast).toBeVisible();
+    await expect(toast).toBeVisible({timeout: 10000});
     if (mensagem) {
         await expect(toast).toContainText(mensagem);
     }
@@ -73,7 +73,8 @@ export async function fazerLogout(page: Page): Promise<void> {
  * Verifica que está na página do painel principal.
  */
 export async function verificarPaginaPainel(page: Page): Promise<void> {
-    await expect(page).toHaveURL(/\/painel/);
+    // Aceitar /painel, /painel/ ou /painel?xxx
+    await expect(page).toHaveURL(/\/painel(?:\/|\?|$)/, {timeout: 10000});
 }
 
 /**

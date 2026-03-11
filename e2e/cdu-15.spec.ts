@@ -123,7 +123,6 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
         await criarCompetencia(page, compFinal, [ATIVIDADE_1, ATIVIDADE_2]);
         await disponibilizarMapa(page);
 
-        await expect(page).toHaveURL(/\/painel/);
         await verificarProcessoNaTabela(page, {
             descricao: descProcesso,
             situacao: 'Em andamento',
