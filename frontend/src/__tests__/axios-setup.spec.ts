@@ -55,7 +55,6 @@ describe("axios-setup", () => {
         const {setRouter} = await import("../axios-setup"); // Use dynamic import
         setRouter(router as any);
 
-        // Access interceptors from the hoisted mock instance
         const requestUseCalls = mockInstance.interceptors.request.use.mock.calls;
         const responseUseCalls = mockInstance.interceptors.response.use.mock.calls;
 
@@ -64,10 +63,9 @@ describe("axios-setup", () => {
             requestErrorInterceptor = requestUseCalls[0][1];
         }
         if (responseUseCalls.length > 0) {
-            // responseUseCalls[0][0] is success handler (identity)
             responseErrorInterceptor = responseUseCalls[0][1];
         }
-    }, 30000); // Increased timeout to 30s
+    }, 10000); 
 
     beforeEach(async () => {
         setActivePinia(createPinia());

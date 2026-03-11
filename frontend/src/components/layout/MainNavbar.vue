@@ -38,7 +38,7 @@
         </BNavItem>
 
         <BNavItem
-            v-if="podeAcessarTodasUnidades"
+            v-if="isAdmin"
             class="me-lg-1"
             data-testid="btn-configuracoes"
             title="Parâmetros do sistema"
@@ -52,7 +52,7 @@
         </BNavItem>
 
         <BNavItem
-            v-if="podeAcessarTodasUnidades"
+            v-if="isAdmin"
             class="me-lg-1"
             data-testid="btn-administradores"
             title="Administradores do sistema"
@@ -92,7 +92,7 @@ import {usePerfilStore} from "@/stores/perfil";
 const router = useRouter();
 const perfilStore = usePerfilStore();
 
-const {perfilSelecionado, unidadeSelecionada, podeAcessarTodasUnidades} = usePerfil();
+const {perfilSelecionado, unidadeSelecionada, podeAcessarTodasUnidades, isAdmin} = usePerfil();
 
 // Controle reativo de largura para desabilitar tooltips no mobile
 const windowWidth = ref(window.innerWidth);
