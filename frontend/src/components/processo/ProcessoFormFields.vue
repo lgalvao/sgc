@@ -105,9 +105,7 @@ import {
   BFormInput,
   BFormInvalidFeedback,
   BFormSelect,
-  BFormSelectOption,
-  BInputGroup,
-  BInputGroupText
+  BFormSelectOption
 } from "bootstrap-vue-next";
 import {nextTick, ref, watch} from "vue";
 import ArvoreUnidades from "@/components/unidade/ArvoreUnidades.vue";
@@ -159,17 +157,6 @@ function updateField<K extends keyof ProcessoFormData>(field: K, value: Processo
     ...props.modelValue,
     [field]: value
   });
-}
-
-function abrirCalendario() {
-  if (inputDataLimiteRef.value?.$el) {
-    const input = inputDataLimiteRef.value.$el as HTMLInputElement;
-    if (typeof input.showPicker === 'function') {
-      input.showPicker();
-    } else {
-      input.focus();
-    }
-  }
 }
 
 function focarPrimeiroErro() {
