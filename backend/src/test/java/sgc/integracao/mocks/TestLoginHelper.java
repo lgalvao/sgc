@@ -39,7 +39,6 @@ public class TestLoginHelper {
             throw new IllegalStateException("Cookie de pré-autenticação não encontrado");
         }
 
-        // 2. Autorizar (não precisa do resultado, mas faz parte do fluxo)
         AutorizarRequest autorizarRequest = new AutorizarRequest(titulo);
         mockMvc.perform(post("/api/usuarios/autorizar")
                         .cookie(preAuthCookie)

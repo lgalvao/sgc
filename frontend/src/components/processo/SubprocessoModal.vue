@@ -86,7 +86,6 @@ const isDataValida = computed(() => {
   return isDateValidAndFuture(parseDate(novaDataLimite.value));
 });
 
-// Watch para mostrarModal e inicializar quando abrir
 watch(
     () => props.mostrarModal,
     (novoValor: boolean) => {
