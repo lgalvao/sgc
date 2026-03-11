@@ -37,8 +37,7 @@ específicas** do projeto que diferem dos padrões genéricos.
 
 * **Padrão de componentes:** Use `<script setup lang="ts">` e **BootstrapVueNext**.
 * **Estado:** **Pinia** utilizando "Setup Stores" (com `ref` e `computed`).
-* **Erros:** Use `normalizeError` em services/stores. Componentes decidem como exibir (preferencialmente `BAlert` inline
-  para erros de negócio).
+* **Erros:** Use `normalizeError` em services/stores. Componentes decidem como exibir (preferencialmente `BAlert` inline para erros de negócio).
 * **Roteamento:** Modularizado (cada módulo tem seu arquivo `.routes.ts`).
 * **Logging:**
     * **NAO** use `console.log`, `console.warn`, ou `console.debug` em código de produção
@@ -51,9 +50,9 @@ específicas** do projeto que diferem dos padrões genéricos.
 * **Frontend:** `npm run typecheck` (inclui e2e), `npm run lint` (inclui e2e), `npm run test:unit` (Vitest).
 * **E2E:** Playwright (consulte `/e2e/README.md`).
 
-### Referências e Padrões Detalhados
+### Referências e Padrões
 
-Para detalhes técnicos e exemplos de código, consulte:
+Para detalhes técnicos, consulte:
 
 * Regras para execução de testes e2e e correção de bugs: /etc/docs/regras-e2e.md
 * README.md de cada módulo e diretório para responsabilidades específicas

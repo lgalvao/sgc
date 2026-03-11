@@ -14,11 +14,11 @@ O projeto segue uma arquitetura **Modular Monolith** no backend e **Component-Ba
 
 ### Stack Principal
 
-| Camada       | Tecnologias Principais                                             |
-|--------------|--------------------------------------------------------------------|
-| **Backend**  | Java 21, Spring Boot 4, Hibernate 7, H2 (testes)/Oracle (produção) |
-| **Frontend** | Vue.js 3.5, TypeScript 5.9, Vite 7.3, Pinia, BootstrapVueNext      |
-| **Testes**   | JUnit, Mockito, Vitest, Playwright 1.58, Storybook                 |
+| Camada       | Tecnologias Principais                                              |
+|--------------|---------------------------------------------------------------------|
+| **Backend**  | Java 21, Spring Boot 4, Hibernate 7, H2 (testes)/Oracle (produção)  |
+| **Frontend** | Vue.js 3.5, TypeScript 5.9, Vite 7.3, Pinia 3, BootstrapVueNext 0.4 |
+| **Testes**   | JUnit, Mockito, Vitest, Playwright 1.5, Storybook 10                |
 
 **Documentação Essencial:**
 
@@ -84,14 +84,14 @@ O projeto possui uma suite abrangente de testes e verificações de qualidade.
 
 ### Execução de Testes
 
-| Tipo                   | Comando                              | Descrição                                        |
-|------------------------|--------------------------------------|--------------------------------------------------|
-| **Todos Backend**      | `./gradlew :backend:test`            | Executa suite completa (Unitários + Integração). |
-| **Unitários Backend**  | `./gradlew :backend:unitTest`        | Executa apenas testes isolados (Rápido).         |
-| **Integração Backend** | `./gradlew :backend:integrationTest` | Executa apenas fluxos completos (Mais lento).    |
-| **Unitários Frontend** | `cd frontend && npm run test:unit`   | Vitest para componentes e lógica.                |
-| **End-to-End (E2E)**   | `npm run test:e2e`                   | Playwright simulando fluxos reais.               |
-| **Type Check**         | `npm run typecheck`                  | Verificação de erros de tipos para frontend e E2E|
+| Tipo                   | Comando                              | Descrição                                         |
+|------------------------|--------------------------------------|---------------------------------------------------|
+| **Todos Backend**      | `./gradlew :backend:test`            | Executa suite completa (Unitários + Integração).  |
+| **Unitários Backend**  | `./gradlew :backend:unitTest`        | Executa apenas testes isolados (Rápido).          |
+| **Integração Backend** | `./gradlew :backend:integrationTest` | Executa apenas fluxos completos (Mais lento).     |
+| **Unitários Frontend** | `cd frontend && npm run test:unit`   | Vitest para componentes e lógica.                 |
+| **End-to-End (E2E)**   | `npm run test:e2e`                   | Playwright simulando fluxos reais.                |
+| **Type Check**         | `npm run typecheck`                  | Verificação de erros de tipos para frontend e E2E |
 
 ### Verificação de qualidade
 

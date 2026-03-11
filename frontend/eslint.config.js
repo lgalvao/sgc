@@ -1,7 +1,5 @@
-// For more info, see https://github.com/storybookjs/eslint-plugin-storybook#configuration-flat-config-format
 import storybook from "eslint-plugin-storybook";
 
-// eslint.config.js
 import globals from "globals";
 import pluginJs from "@eslint/js";
 import tseslint from "typescript-eslint";
@@ -10,7 +8,7 @@ import vueParser from "vue-eslint-parser";
 import eslintConfigPrettier from "eslint-config-prettier";
 import pluginVueA11y from "eslint-plugin-vuejs-accessibility";
 
-export default [// 1. Ignore files
+export default [
     {
         ignores: ["dist/", "node_modules/", "*.config.js"],
     }, {
@@ -22,16 +20,16 @@ export default [// 1. Ignore files
                 ...globals.node,
             },
         },
-    }, // 2b. Allow console in test files
+    },
     {
         files: ["**/*.test.ts", "**/*.spec.ts", "**/__tests__/**"],
         rules: {
             "no-console": "off",
         },
-    }, // 3. ESLint's recommended rules
-    pluginJs.configs.recommended, // 4. TypeScript-specific configuration
+    },
+    pluginJs.configs.recommended,
     ...tseslint.configs.recommended, {
-        files: ["**/*.ts", "**/*.tsx", "**/*.vue"],
+        files: ["**/*.ts", "**/*.vue"],
         languageOptions: {
             parser: tseslint.parser,
             parserOptions: {
@@ -50,7 +48,7 @@ export default [// 1. Ignore files
                 },
             ],
         },
-    }, // 5. Vue-specific configuration
+    },
     ...pluginVue.configs["flat/recommended"], ...pluginVueA11y.configs["flat/recommended"], {
         files: ["**/*.vue"],
         languageOptions: {
@@ -75,12 +73,10 @@ export default [// 1. Ignore files
                 },
             ],
         },
-    }, // 6. Custom overrides
+    },
     {
         rules: {
-            // Prevent console.* in production code (use logger instead)
-            // Allows console.error for critical errors that should always be visible
             "no-console": ["error", {allow: ["error"]}],
         },
-    }, // 7. Prettier integration
+    },
     eslintConfigPrettier, ...storybook.configs["flat/recommended"]];
