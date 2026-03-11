@@ -17,6 +17,7 @@ import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
 import sgc.processo.model.*;
 import sgc.seguranca.*;
+import static sgc.seguranca.AcaoPermissao.*;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
 
@@ -729,13 +730,13 @@ public class SubprocessoService {
         final Subprocesso spDestino = repo.buscar(Subprocesso.class, codSubprocessoDestino);
         Usuario usuario = usuarioFacade.usuarioAutenticado();
 
-        if (!permissionEvaluator.checkPermission(usuario, spDestino, "EDITAR_CADASTRO")) {
+        if (!permissionEvaluator.verificarPermissao(usuario, spDestino, EDITAR_CADASTRO)) {
             throw new ErroAcessoNegado("Usuário não tem permissão para importar atividades.");
         }
         validarSituacaoParaImportacao(spDestino);
 
         Subprocesso spOrigem = repo.buscar(Subprocesso.class, codSubprocessoOrigem);
-        if (!permissionEvaluator.checkPermission(usuario, spOrigem, "CONSULTAR_PARA_IMPORTACAO")) {
+        if (!permissionEvaluator.verificarPermissao(usuario, spOrigem, CONSULTAR_PARA_IMPORTACAO)) {
             throw new ErroAcessoNegado("Usuário não tem permissão para consultar o subprocesso de origem.");
         }
 

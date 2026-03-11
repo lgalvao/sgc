@@ -16,6 +16,7 @@ import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import static sgc.seguranca.AcaoPermissao.*;
 
 @ExtendWith(MockitoExtension.class)
 class ImpactoMapaServiceTest {
@@ -43,7 +44,7 @@ class ImpactoMapaServiceTest {
         Subprocesso subprocesso = new Subprocesso();
         Usuario usuario = new Usuario();
 
-        doReturn(false).when(permissionEvaluator).checkPermission(usuario, subprocesso, "VERIFICAR_IMPACTOS");
+        doReturn(false).when(permissionEvaluator).verificarPermissao(usuario, subprocesso, VERIFICAR_IMPACTOS);
 
         assertThrows(sgc.comum.erros.ErroAcessoNegado.class, () ->
             impactoMapaService.verificarImpactos(subprocesso, usuario));
@@ -56,7 +57,7 @@ class ImpactoMapaServiceTest {
     }
 
     private void mockAcessoLivre() {
-        doReturn(true).when(permissionEvaluator).checkPermission(any(), any(), any());
+        doReturn(true).when(permissionEvaluator).verificarPermissao(any(), any(), any());
     }
 
     @Test

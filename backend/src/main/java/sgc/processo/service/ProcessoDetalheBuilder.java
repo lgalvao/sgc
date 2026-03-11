@@ -8,6 +8,7 @@ import sgc.processo.dto.*;
 import sgc.processo.dto.ProcessoDetalheDto.*;
 import sgc.processo.model.*;
 import sgc.seguranca.*;
+import static sgc.seguranca.AcaoPermissao.*;
 import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.*;
 
@@ -37,12 +38,12 @@ public class ProcessoDetalheBuilder {
                 .dataCriacao(processo.getDataCriacao())
                 .dataFinalizacao(processo.getDataFinalizacao())
                 .dataLimite(processo.getDataLimite())
-                .podeFinalizar(permissionEvaluator.checkPermission(usuario, processo, "FINALIZAR_PROCESSO")
+                .podeFinalizar(permissionEvaluator.verificarPermissao(usuario, processo, FINALIZAR_PROCESSO)
                         && subprocessoValidacaoService.validarSubprocessosParaFinalizacao(processo.getCodigo()).valido())
-                .podeHomologarCadastro(permissionEvaluator.checkPermission(usuario, processo, "HOMOLOGAR_CADASTRO_EM_BLOCO"))
-                .podeHomologarMapa(permissionEvaluator.checkPermission(usuario, processo, "HOMOLOGAR_MAPA_EM_BLOCO"))
-                .podeAceitarCadastroBloco(permissionEvaluator.checkPermission(usuario, processo, "ACEITAR_CADASTRO_EM_BLOCO"))
-                .podeDisponibilizarMapaBloco(permissionEvaluator.checkPermission(usuario, processo, "DISPONIBILIZAR_MAPA_EM_BLOCO"))
+                .podeHomologarCadastro(permissionEvaluator.verificarPermissao(usuario, processo, HOMOLOGAR_CADASTRO_EM_BLOCO))
+                .podeHomologarMapa(permissionEvaluator.verificarPermissao(usuario, processo, HOMOLOGAR_MAPA_EM_BLOCO))
+                .podeAceitarCadastroBloco(permissionEvaluator.verificarPermissao(usuario, processo, ACEITAR_CADASTRO_EM_BLOCO))
+                .podeDisponibilizarMapaBloco(permissionEvaluator.verificarPermissao(usuario, processo, DISPONIBILIZAR_MAPA_EM_BLOCO))
                 .unidades(new ArrayList<>())
                 .build();
 

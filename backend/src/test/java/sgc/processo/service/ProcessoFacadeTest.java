@@ -27,6 +27,7 @@ import java.util.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import static sgc.seguranca.AcaoPermissao.*;
 import static sgc.processo.model.AcaoProcesso.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -447,7 +448,7 @@ class ProcessoFacadeTest {
                 Subprocesso sp2 = Subprocesso.builder().codigo(1002L).unidade(Unidade.builder().codigo(2L).build()).build();
                 Subprocesso sp3 = Subprocesso.builder().codigo(1003L).unidade(Unidade.builder().codigo(3L).build()).build();
                 when(subprocessoService.listarEntidadesPorProcessoEUnidades(100L, List.of(1L, 2L, 3L))).thenReturn(List.of(sp1, sp2, sp3));
-                doReturn(true).when(permissionEvaluator).checkPermission(eq(usuario), any(), eq("DISPONIBILIZAR_MAPA"));
+                doReturn(true).when(permissionEvaluator).verificarPermissao(eq(usuario), any(), eq(DISPONIBILIZAR_MAPA));
 
                 processoFacade.executarAcaoEmBloco(100L, req);
 
@@ -487,7 +488,7 @@ class ProcessoFacadeTest {
                         .build();
 
                 when(subprocessoService.listarEntidadesPorProcessoEUnidades(100L, List.of(10L, 20L))).thenReturn(List.of(sp1, sp2));
-                doReturn(true).when(permissionEvaluator).checkPermission(eq(usuario), any(), eq("ACEITAR_CADASTRO"));
+                doReturn(true).when(permissionEvaluator).verificarPermissao(eq(usuario), any(), eq(ACEITAR_CADASTRO));
 
                 AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(
                         List.of(10L, 20L),
@@ -514,7 +515,7 @@ class ProcessoFacadeTest {
                         .build();
 
                 when(subprocessoService.listarEntidadesPorProcessoEUnidades(100L, List.of(10L))).thenReturn(List.of(sp1));
-                doReturn(true).when(permissionEvaluator).checkPermission(eq(usuario), any(), eq("ACEITAR_MAPA"));
+                doReturn(true).when(permissionEvaluator).verificarPermissao(eq(usuario), any(), eq(ACEITAR_MAPA));
 
                 AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(
                         List.of(10L),
@@ -545,7 +546,7 @@ class ProcessoFacadeTest {
                         .build();
 
                 when(subprocessoService.listarEntidadesPorProcessoEUnidades(100L, List.of(10L))).thenReturn(List.of(sp1));
-                doReturn(true).when(permissionEvaluator).checkPermission(eq(usuario), any(), eq("HOMOLOGAR_CADASTRO"));
+                doReturn(true).when(permissionEvaluator).verificarPermissao(eq(usuario), any(), eq(HOMOLOGAR_CADASTRO));
 
                 AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(
                         List.of(10L),
@@ -572,7 +573,7 @@ class ProcessoFacadeTest {
                         .build();
 
                 when(subprocessoService.listarEntidadesPorProcessoEUnidades(100L, List.of(10L))).thenReturn(List.of(sp1));
-                doReturn(true).when(permissionEvaluator).checkPermission(eq(usuario), any(), eq("HOMOLOGAR_MAPA"));
+                doReturn(true).when(permissionEvaluator).verificarPermissao(eq(usuario), any(), eq(HOMOLOGAR_MAPA));
 
                 AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(
                         List.of(10L),

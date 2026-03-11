@@ -13,6 +13,7 @@ import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import static sgc.seguranca.AcaoPermissao.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("SgcPermissionEvaluator - Cobertura")
@@ -46,8 +47,8 @@ class SgcPermissionEvaluatorCoverageTest {
     }
 
     @Test
-    @DisplayName("checkSubprocesso - Processo FINALIZADO bloqueia escrita")
-    void checkSubprocesso_Finalizado_BloqueiaEscrita() {
+    @DisplayName("verificarSubprocesso - Processo FINALIZADO bloqueia escrita")
+    void verificarSubprocesso_Finalizado_BloqueiaEscrita() {
         Subprocesso sp = criarSubprocesso(1L, 10L);
         Processo p = new Processo();
         p.setSituacao(SituacaoProcesso.FINALIZADO);
@@ -55,98 +56,97 @@ class SgcPermissionEvaluatorCoverageTest {
 
         Usuario user = usuario(Perfil.ADMIN, 10L);
 
-        boolean result = evaluator.checkPermission(user, sp, "EDITAR_CADASTRO");
+        boolean result = evaluator.verificarPermissao(user, sp, EDITAR_CADASTRO);
         assertThat(result).isFalse();
     }
 
     @Test
-    @DisplayName("checkSubprocesso - Processo FINALIZADO permite leitura")
-    void checkSubprocesso_Finalizado_PermiteLeitura() {
+    @DisplayName("verificarSubprocesso - Processo FINALIZADO permite leitura")
+    void verificarSubprocesso_Finalizado_PermiteLeitura() {
         Subprocesso sp = criarSubprocesso(1L, 10L);
         Processo p = new Processo();
         p.setSituacao(SituacaoProcesso.FINALIZADO);
         sp.setProcesso(p);
 
-        Usuario user = usuario(Perfil.ADMIN, 10L); // Admin ve tudo
+        Usuario user = usuario(Perfil.ADMIN, 10L);
 
-        boolean result = evaluator.checkPermission(user, sp, "VISUALIZAR");
+        boolean result = evaluator.verificarPermissao(user, sp, VISUALIZAR_SUBPROCESSO);
         assertThat(result).isTrue();
     }
 
     @Test
-    @DisplayName("checkSubprocesso - CONSULTAR_PARA_IMPORTACAO permite acesso fora da hierarquia para CHEFE")
-    void checkSubprocesso_Importacao_Chefe() {
-        Subprocesso sp = criarSubprocesso(1L, 20L); // Unidade diferente
+    @DisplayName("verificarSubprocesso - CONSULTAR_PARA_IMPORTACAO permite acesso fora da hierarquia para CHEFE")
+    void verificarSubprocesso_Importacao_Chefe() {
+        Subprocesso sp = criarSubprocesso(1L, 20L);
         Processo p = new Processo();
         p.setSituacao(SituacaoProcesso.FINALIZADO);
         sp.setProcesso(p);
 
         Usuario user = usuario(Perfil.CHEFE, 10L);
 
-        boolean result = evaluator.checkPermission(user, sp, "CONSULTAR_PARA_IMPORTACAO");
+        boolean result = evaluator.verificarPermissao(user, sp, CONSULTAR_PARA_IMPORTACAO);
         assertThat(result).isTrue();
     }
 
     @Test
-    @DisplayName("checkSubprocesso - VERIFICAR_IMPACTOS permite visualizacao para GESTOR")
-    void checkSubprocesso_Impactos_Gestor() {
+    @DisplayName("verificarSubprocesso - VERIFICAR_IMPACTOS permite visualizacao para GESTOR")
+    void verificarSubprocesso_Impactos_Gestor() {
         Subprocesso sp = criarSubprocesso(1L, 20L);
         sp.setProcesso(new Processo());
 
         Usuario user = usuario(Perfil.GESTOR, 10L);
 
-        boolean result = evaluator.checkPermission(user, sp, "VERIFICAR_IMPACTOS");
+        boolean result = evaluator.verificarPermissao(user, sp, VERIFICAR_IMPACTOS);
         assertThat(result).isTrue();
     }
 
     @Test
-    @DisplayName("checkSubprocesso - Escrita falha se localizacao diferente da unidade usuario")
-    void checkSubprocesso_Escrita_LocalizacaoDiferente() {
+    @DisplayName("verificarSubprocesso - Escrita falha se localizacao diferente da unidade usuario")
+    void verificarSubprocesso_Escrita_LocalizacaoDiferente() {
         Subprocesso sp = criarSubprocesso(1L, 10L);
         sp.setProcesso(new Processo());
-        sp.setLocalizacaoAtual(Unidade.builder().codigo(20L).build()); // Localizacao difere da unidade origem e do usuario
+        sp.setLocalizacaoAtual(Unidade.builder().codigo(20L).build());
 
-        Usuario user = usuario(Perfil.CHEFE, 10L); // Chefe na unidade 10
+        Usuario user = usuario(Perfil.CHEFE, 10L);
 
-        // Acao de escrita
-        boolean result = evaluator.checkPermission(user, sp, "EDITAR_CADASTRO");
+        boolean result = evaluator.verificarPermissao(user, sp, EDITAR_CADASTRO);
         assertThat(result).isFalse();
     }
 
     @Test
-    @DisplayName("checkSubprocesso - Escrita sucesso se localizacao igual unidade usuario")
-    void checkSubprocesso_Escrita_LocalizacaoIgual() {
+    @DisplayName("verificarSubprocesso - Escrita sucesso se localizacao igual unidade usuario")
+    void verificarSubprocesso_Escrita_LocalizacaoIgual() {
         Subprocesso sp = criarSubprocesso(1L, 10L);
         sp.setProcesso(new Processo());
         sp.setLocalizacaoAtual(Unidade.builder().codigo(10L).build());
 
-        Usuario user = usuario(Perfil.CHEFE, 10L); // Chefe deve editar cadastro
+        Usuario user = usuario(Perfil.CHEFE, 10L);
 
-        boolean result = evaluator.checkPermission(user, sp, "EDITAR_CADASTRO");
+        boolean result = evaluator.verificarPermissao(user, sp, EDITAR_CADASTRO);
         assertThat(result).isTrue();
     }
 
     @Test
-    @DisplayName("checkProcesso - acoes em bloco para ADMIN independem da situacao do processo")
-    void checkProcesso_Admin_Bloco_IndependeDaSituacao() {
+    @DisplayName("verificarProcesso - acoes em bloco para ADMIN independem da situacao do processo")
+    void verificarProcesso_Admin_Bloco_IndependeDaSituacao() {
         Processo p = new Processo();
         p.setSituacao(SituacaoProcesso.FINALIZADO);
 
         Usuario user = usuario(Perfil.ADMIN, 10L);
 
-        boolean result = evaluator.checkPermission(user, p, "HOMOLOGAR_CADASTRO_EM_BLOCO");
+        boolean result = evaluator.verificarPermissao(user, p, HOMOLOGAR_CADASTRO_EM_BLOCO);
         assertThat(result).isTrue();
     }
 
     @Test
-    @DisplayName("checkProcesso - GESTOR nao homologa cadastro em bloco")
-    void checkProcesso_Gestor_NaoHomologaCadastroEmBloco() {
+    @DisplayName("verificarProcesso - GESTOR nao homologa cadastro em bloco")
+    void verificarProcesso_Gestor_NaoHomologaCadastroEmBloco() {
         Processo p = new Processo();
         p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
 
         Usuario user = usuario(Perfil.GESTOR, 10L);
 
-        boolean result = evaluator.checkPermission(user, p, "HOMOLOGAR_CADASTRO_EM_BLOCO");
+        boolean result = evaluator.verificarPermissao(user, p, HOMOLOGAR_CADASTRO_EM_BLOCO);
         assertThat(result).isFalse();
     }
 
@@ -155,21 +155,19 @@ class SgcPermissionEvaluatorCoverageTest {
     void obterUnidadeLocalizacao_Fallback() {
         Subprocesso sp = criarSubprocesso(1L, 10L);
         sp.setProcesso(new Processo());
-        // sp.localizacaoAtual is null
 
         when(movimentacaoRepo.findFirstBySubprocessoCodigoOrderByDataHoraDesc(1L)).thenReturn(Optional.empty());
 
         Usuario user = usuario(Perfil.CHEFE, 10L);
-        // Deve usar unidade do sp (10L) que é igual a do usuario -> allow
-        boolean result = evaluator.checkPermission(user, sp, "EDITAR_CADASTRO");
+        boolean result = evaluator.verificarPermissao(user, sp, EDITAR_CADASTRO);
 
         assertThat(result).isTrue();
         assertThat(sp.getLocalizacaoAtual().getCodigo()).isEqualTo(10L);
     }
 
     @Test
-    @DisplayName("checkHierarquia - GESTOR usa hierarquia service")
-    void checkHierarquia_Gestor() {
+    @DisplayName("verificarHierarquia - GESTOR usa hierarquia service")
+    void verificarHierarquia_Gestor() {
         Subprocesso sp = criarSubprocesso(1L, 20L);
         sp.setProcesso(new Processo());
 
@@ -177,13 +175,13 @@ class SgcPermissionEvaluatorCoverageTest {
 
         when(hierarquiaService.ehMesmaOuSubordinada(any(), any())).thenReturn(true);
 
-        boolean result = evaluator.checkPermission(user, sp, "VISUALIZAR");
+        boolean result = evaluator.verificarPermissao(user, sp, VISUALIZAR_SUBPROCESSO);
         assertThat(result).isTrue();
     }
 
     @Test
-    @DisplayName("checkHierarquia - GESTOR nega acesso se nao subordinada")
-    void checkHierarquia_Gestor_NaoSubordinada() {
+    @DisplayName("verificarHierarquia - GESTOR nega acesso se nao subordinada")
+    void verificarHierarquia_Gestor_NaoSubordinada() {
         Subprocesso sp = criarSubprocesso(1L, 20L);
         sp.setProcesso(new Processo());
 
@@ -191,7 +189,7 @@ class SgcPermissionEvaluatorCoverageTest {
 
         when(hierarquiaService.ehMesmaOuSubordinada(any(), any())).thenReturn(false);
 
-        boolean result = evaluator.checkPermission(user, sp, "VISUALIZAR");
+        boolean result = evaluator.verificarPermissao(user, sp, VISUALIZAR_SUBPROCESSO);
         assertThat(result).isFalse();
     }
 
@@ -208,7 +206,6 @@ class SgcPermissionEvaluatorCoverageTest {
 
         Usuario user = usuario(Perfil.CHEFE, 10L);
 
-        // Using the interface method directly
         org.springframework.security.core.Authentication auth = mock(org.springframework.security.core.Authentication.class);
         when(auth.getPrincipal()).thenReturn(user);
 
@@ -254,26 +251,26 @@ class SgcPermissionEvaluatorCoverageTest {
     }
 
     @Test
-    @DisplayName("checkPerfil - ADMIN actions")
-    void checkPerfil_MapActions_Admin() {
+    @DisplayName("verificarPerfil - Ações de ADMIN para mapa")
+    void verificarPerfil_MapActions_Admin() {
         Usuario user = usuario(Perfil.ADMIN, 10L);
         Subprocesso sp = criarSubprocesso(1L, 10L);
         sp.setProcesso(new Processo());
         sp.setLocalizacaoAtual(Unidade.builder().codigo(10L).build());
 
-        assertThat(evaluator.checkPermission(user, sp, "EDITAR_MAPA")).isTrue();
-        assertThat(evaluator.checkPermission(user, sp, "HOMOLOGAR_MAPA")).isTrue();
+        assertThat(evaluator.verificarPermissao(user, sp, EDITAR_MAPA)).isTrue();
+        assertThat(evaluator.verificarPermissao(user, sp, HOMOLOGAR_MAPA)).isTrue();
     }
 
     @Test
-    @DisplayName("checkPerfil - CHEFE actions")
-    void checkPerfil_MapActions_Chefe() {
+    @DisplayName("verificarPerfil - Ações de CHEFE para mapa")
+    void verificarPerfil_MapActions_Chefe() {
         Usuario user = usuario(Perfil.CHEFE, 10L);
         Subprocesso sp = criarSubprocesso(1L, 10L);
         sp.setProcesso(new Processo());
         sp.setLocalizacaoAtual(Unidade.builder().codigo(10L).build());
 
-        assertThat(evaluator.checkPermission(user, sp, "VALIDAR_MAPA")).isTrue();
-        assertThat(evaluator.checkPermission(user, sp, "HOMOLOGAR_MAPA")).isFalse();
+        assertThat(evaluator.verificarPermissao(user, sp, VALIDAR_MAPA)).isTrue();
+        assertThat(evaluator.verificarPermissao(user, sp, HOMOLOGAR_MAPA)).isFalse();
     }
 }

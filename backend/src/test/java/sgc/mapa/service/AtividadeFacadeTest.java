@@ -18,6 +18,7 @@ import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import static sgc.seguranca.AcaoPermissao.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("AtividadeFacade")
@@ -114,7 +115,7 @@ class AtividadeFacadeTest {
             ));
             when(subprocessoService.buscarSubprocesso(subCodigo)).thenReturn(subprocesso);
 
-            doReturn(true).when(permissionEvaluator).checkPermission(any(Usuario.class), any(Subprocesso.class), anyString());
+            doReturn(true).when(permissionEvaluator).verificarPermissao(any(Usuario.class), any(Subprocesso.class), any(AcaoPermissao.class));
 
             AtividadeOperacaoResponse result = atividadeFacade.criarAtividade(request);
 
@@ -157,7 +158,7 @@ class AtividadeFacadeTest {
             when(subprocessoService.listarAtividadesSubprocesso(subCodigo)).thenReturn(Collections.emptyList());
             when(subprocessoService.buscarSubprocesso(subCodigo)).thenReturn(subprocesso);
 
-            doReturn(true).when(permissionEvaluator).checkPermission(any(Usuario.class), any(Subprocesso.class), anyString());
+            doReturn(true).when(permissionEvaluator).verificarPermissao(any(Usuario.class), any(Subprocesso.class), any(AcaoPermissao.class));
 
             AtividadeOperacaoResponse result = atividadeFacade.atualizarAtividade(atividadeCodigo, request);
 
@@ -195,7 +196,7 @@ class AtividadeFacadeTest {
             when(subprocessoService.listarAtividadesSubprocesso(subCodigo)).thenReturn(Collections.emptyList());
             when(subprocessoService.buscarSubprocesso(subCodigo)).thenReturn(subprocesso);
 
-            doReturn(true).when(permissionEvaluator).checkPermission(any(Usuario.class), any(Subprocesso.class), anyString());
+            doReturn(true).when(permissionEvaluator).verificarPermissao(any(Usuario.class), any(Subprocesso.class), any(AcaoPermissao.class));
 
             AtividadeOperacaoResponse result = atividadeFacade.excluirAtividade(atividadeCodigo);
 
@@ -244,7 +245,7 @@ class AtividadeFacadeTest {
             ));
             when(subprocessoService.buscarSubprocesso(subCodigo)).thenReturn(subprocesso);
 
-            doReturn(true).when(permissionEvaluator).checkPermission(any(Usuario.class), any(Subprocesso.class), anyString());
+            doReturn(true).when(permissionEvaluator).verificarPermissao(any(Usuario.class), any(Subprocesso.class), any(AcaoPermissao.class));
 
             ResultadoOperacaoConhecimento result = atividadeFacade.criarConhecimento(atividadeCodigo, request);
 
@@ -287,7 +288,7 @@ class AtividadeFacadeTest {
             when(subprocessoService.listarAtividadesSubprocesso(subCodigo)).thenReturn(Collections.emptyList());
             when(subprocessoService.buscarSubprocesso(subCodigo)).thenReturn(subprocesso);
 
-            doReturn(true).when(permissionEvaluator).checkPermission(any(Usuario.class), any(Subprocesso.class), anyString());
+            doReturn(true).when(permissionEvaluator).verificarPermissao(any(Usuario.class), any(Subprocesso.class), any(AcaoPermissao.class));
 
             AtividadeOperacaoResponse result = atividadeFacade.atualizarConhecimento(atividadeCodigo, conhecimentoCodigo, request);
 
@@ -326,7 +327,7 @@ class AtividadeFacadeTest {
             when(subprocessoService.listarAtividadesSubprocesso(subCodigo)).thenReturn(Collections.emptyList());
             when(subprocessoService.buscarSubprocesso(subCodigo)).thenReturn(subprocesso);
 
-            doReturn(true).when(permissionEvaluator).checkPermission(any(Usuario.class), any(Subprocesso.class), anyString());
+            doReturn(true).when(permissionEvaluator).verificarPermissao(any(Usuario.class), any(Subprocesso.class), any(AcaoPermissao.class));
 
             AtividadeOperacaoResponse result = atividadeFacade.excluirConhecimento(atividadeCodigo, conhecimentoCodigo);
 
@@ -349,7 +350,7 @@ class AtividadeFacadeTest {
 
             when(subprocessoService.obterEntidadePorCodigoMapa(mapaCodigo)).thenReturn(subprocesso);
             when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
-            when(permissionEvaluator.checkPermission(usuario, subprocesso, "EDITAR_CADASTRO")).thenReturn(false);
+            when(permissionEvaluator.verificarPermissao(usuario, subprocesso, EDITAR_CADASTRO)).thenReturn(false);
 
             assertThrows(sgc.comum.erros.ErroAcessoNegado.class, () ->
                 atividadeFacade.criarAtividade(new CriarAtividadeRequest(mapaCodigo, "Descricao")));
@@ -366,7 +367,7 @@ class AtividadeFacadeTest {
 
             when(subprocessoService.obterEntidadePorCodigoMapa(mapaCodigo)).thenReturn(subprocesso);
             when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
-            when(permissionEvaluator.checkPermission(usuario, subprocesso, "EDITAR_CADASTRO")).thenReturn(true);
+            when(permissionEvaluator.verificarPermissao(usuario, subprocesso, EDITAR_CADASTRO)).thenReturn(true);
 
             assertThrows(sgc.comum.erros.ErroValidacao.class, () ->
                 atividadeFacade.criarAtividade(new CriarAtividadeRequest(mapaCodigo, "Descricao")));

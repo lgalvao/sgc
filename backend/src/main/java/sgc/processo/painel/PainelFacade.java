@@ -24,10 +24,10 @@ import static java.util.stream.Collectors.*;
 @Transactional(readOnly = true)
 @Slf4j
 public class PainelFacade {
-    private final ProcessoFacade processoFacade;
     private final AlertaFacade alertaService;
     private final UnidadeHierarquiaService hierarquiaService;
     private final UnidadeService unidadeService;
+    private final ProcessoFacade processoFacade;
 
     /**
      * Lista processos com base no perfil e na unidade do usuário.

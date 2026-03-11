@@ -15,7 +15,7 @@ import java.net.*;
 import java.util.*;
 
 /**
- * Controlador REST para gerenciar Atividades e seus Conhecimentos associados.
+ * Gerencia Atividades e seus Conhecimentos associados.
  */
 @RestController
 @RequestMapping("/api/atividades")
@@ -33,6 +33,16 @@ public class AtividadeController {
     @Operation(summary = "Obtém uma atividade pelo código")
     public ResponseEntity<Atividade> obterPorId(@PathVariable Long codAtividade) {
         return ResponseEntity.ok(atividadeFacade.obterAtividadePorId(codAtividade));
+    }
+
+    /**
+     * Lista todos os conhecimentos associados a uma atividade específica.
+     */
+    @GetMapping("/{codAtividade}/conhecimentos")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Lista todos os conhecimentos de uma atividade")
+    public ResponseEntity<List<Conhecimento>> listarConhecimentos(@PathVariable Long codAtividade) {
+        return ResponseEntity.ok(atividadeFacade.listarConhecimentosPorAtividade(codAtividade));
     }
 
     /**
@@ -71,17 +81,7 @@ public class AtividadeController {
     }
 
     /**
-     * Lista todos os conhecimentos associados a uma atividade específica.
-     */
-    @GetMapping("/{codAtividade}/conhecimentos")
-    @PreAuthorize("isAuthenticated()")
-    @Operation(summary = "Lista todos os conhecimentos de uma atividade")
-    public ResponseEntity<List<Conhecimento>> listarConhecimentos(@PathVariable Long codAtividade) {
-        return ResponseEntity.ok(atividadeFacade.listarConhecimentosPorAtividade(codAtividade));
-    }
-
-    /**
-     * Adiciona um novo conhecimento a uma atividade existente.
+     * Adiciona um conhecimento a uma atividade existente.
      */
     @PostMapping("/{codAtividade}/conhecimentos")
     @PreAuthorize("hasRole('CHEFE')")
