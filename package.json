@@ -15,7 +15,7 @@
     "@axe-core/playwright": "^4.11.1",
     "@eslint/js": "^9.21.0",
     "@playwright/test": "^1.58.2",
-    "@types/node": "^25.3.5",
+    "@types/node": "^25.4.0",
     "@types/smtp-server": "^3.5.12",
     "@vitest/browser-preview": "^4.0.18",
     "axe-playwright": "^2.2.2",
@@ -26,7 +26,7 @@
     "globals": "^16.5.0",
     "smtp-server": "^3.18.1",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.56.1"
+    "typescript-eslint": "^8.57.0"
   },
   "dependencies": {
     "xml2js": "^0.6.2"

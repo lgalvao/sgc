@@ -12,13 +12,11 @@ export default [
             "frontend/**",
             "backend/**",
             ".gradle/**",
-            "build/**",
-            "*.config.js"
+            "build/**"
         ],
     },
     pluginJs.configs.recommended,
     ...tseslint.configs.recommended,
-    // Configuração global para Node.js (scripts em etc/scripts e arquivos de config)
     {
         files: ["etc/scripts/**/*.js", "etc/scripts/**/*.mjs", "*.config.js", "e2e/**/*.js", "summarize-lint.js"],
         languageOptions: {
@@ -27,7 +25,6 @@ export default [
             },
         },
     },
-    // Configuração específica para testes Playwright
     {
         files: ["e2e/**/*.ts"],
         plugins: {
@@ -57,18 +54,10 @@ export default [
             },
         },
     },
-    // Exceções para o arquivo de captura de telas e smoke tests
     {
         files: ["e2e/captura.spec.ts", "e2e/smoke.spec.ts"],
         rules: {
-            "playwright/no-wait-for-timeout": "off",
-            "playwright/no-conditional-in-test": "off",
-            "playwright/expect-expect": "off",
-            "@typescript-eslint/no-unused-vars": ["warn", {
-                "argsIgnorePattern": "^_|autenticado|cleanup",
-                "varsIgnorePattern": "^_|autenticado|cleanup",
-                "caughtErrorsIgnorePattern": "^e$"
-            }],
+            "playwright/expect-expect": "off"
         }
     },
     eslintConfigPrettier,

@@ -128,22 +128,21 @@ tasks.withType<Test> {
     addTestListener(object : TestListener {
         override fun beforeSuite(suite: TestDescriptor) {}
         override fun afterSuite(suite: TestDescriptor, result: TestResult) {
-            // Exibir resumo apenas para a suite raiz (nível do projeto)
             if (suite.parent == null) {
                 val output = """
-                    |  Resultado: ${result.resultType}
-                    |  Total:     ${result.testCount} testes executados
-                    |  + Passou:   ${result.successfulTestCount}
-                    |  - Falhou:   ${result.failedTestCount}
-                    |  ○ Ignorado: ${result.skippedTestCount}
-                    |  Tempo:     ${(result.endTime - result.startTime) / 1000.0}s
+                    |  Result: ${result.resultType}
+                    |  Total:     ${result.testCount} tests run
+                    |  + Passed:   ${result.successfulTestCount}
+                    |  - Failed:   ${result.failedTestCount}
+                    |  ^ Ignored: ${result.skippedTestCount}
+                    |  Time:     ${(result.endTime - result.startTime) / 1000.0}s
                 """.trimMargin()
                 println(output)
 
                 if (showSlowTests && slowTests.isNotEmpty()) {
-                    println("\nTestes mais lentos (>2s):")
+                    println("\nSlowest tests (>2s):")
                     slowTests.sortedByDescending { it.second }
-                        .take(10)
+                        .take(5)
                         .forEach { (name, time) ->
                             println("  - ${time}ms: $name")
                         }

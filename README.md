@@ -46,12 +46,18 @@ sgc/
 
 ### Pré-requisitos
 
-* JDK 21
-* Node.js 25.3.3+
+* JDK 21+
+* Node.js 25+
 
 ### Desenvolvimento
 
-1. **Backend (testes e2e)**
+1. **Stack completa com perfil e2e**
+
+   ```bash
+   node e1e/lifecycle.js
+   ```
+
+2. **Backend (definir perfil com -PENV)**
 
     ```bash
     cd backend
@@ -60,7 +66,7 @@ sgc/
 
    A API estará disponível em `http://localhost:10000`.
 
-2. **Frontend:**
+3. **Frontend:**
 
     ```bash
     cd frontend
@@ -104,6 +110,6 @@ Os relatórios são gerados em:
 
 Os requisitos do sistema estão documentados em casos de uso (CDUs) no diretório `etc/reqs/`.
 
-* **Processo de Mapeamento**: Criação e definição de mapas de competências.
+* **Mapeamento**: Criação e definição de mapas de competências.
 * **Revisão**: Fluxo de aprovação e ajuste de mapas.
-* **Diagnóstico**: Avaliação de proficiência e identificação de gaps (apenas referencias breves -- requisitos serao incluídos em releases posteriores). 
+* **Diagnóstico**: Avaliação de competências e identificação de gaps (apenas referências breves; requisitos serão incluídos em releases futuros). 
