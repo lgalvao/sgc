@@ -23,7 +23,7 @@ public class ProcessoDetalheBuilder {
     private final SubprocessoValidacaoService subprocessoValidacaoService;
     private final UnidadeRepo unidadeRepo;
     private final SubprocessoService subprocessoService;
-
+        //teste
     @Transactional(readOnly = true)
     public ProcessoDetalheDto build(Processo processo, Usuario usuario) {
         List<Subprocesso> subprocessos = subprocessoRepo.findByProcessoCodigoWithUnidade(processo.getCodigo());
