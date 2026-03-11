@@ -6,6 +6,15 @@
         variant="danger"
         @dismissed="processosStore.clearError()"/>
 
+    <AppAlert
+        v-if="notificacao"
+        :dismissible="notificacao.dismissible ?? true"
+        :message="notificacao.message"
+        :notification="notificacao.notification"
+        :stack-trace="notificacao.stackTrace"
+        :variant="notificacao.variant"
+        @dismissed="clear()"/>
+
     <div v-if="processo">
       <PageHeader
           :title="processo.descricao"
@@ -136,7 +145,7 @@ const router = useRouter();
 const processosStore = useProcessosStore();
 const perfilStore = usePerfilStore();
 const {isGlobalGestor, podeHomologarBlocoGlobal, isGlobalAdmin} = usePerfil();
-const {notify} = useNotification();
+const {notificacao, notify, clear} = useNotification();
 const toastStore = useToastStore();
 const codProcesso = Number(route.params.codProcesso || route.query.codProcesso);
 const modalBlocoRef = ref<any>(null);

@@ -66,13 +66,11 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
             const atividadeA = `Atividade Origem A - ${processoOrigemId}`;
             const atividadeB = `Atividade Origem B - ${processoOrigemId}`;
             
-            // Verificar se múltiplos processos/unidades (operacionais/interoperacionais) aparecem nas opções (Passo 13.1 e 13.3)
             await AtividadeHelpers.verificarOpcoesImportacao(page, [
                 { processo: processoOrigemDescricao, unidades: [UNIDADE_ORIGEM] },
                 { processo: processoOrigem2Descricao, unidades: ['ASSESSORIA_21'] }
             ]);
 
-            // Importar ambas as atividades com sucesso
             await AtividadeHelpers.importarAtividades(page, processoOrigemDescricao, UNIDADE_ORIGEM, [atividadeA, atividadeB]);
 
             // A importação deve atualizar imediatamente a situação e habilitar a disponibilização
@@ -86,10 +84,8 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
         const atividadeManual = `Atividade Manual ${timestamp}`;
 
         await test.step('4. Flexibilidade de Fluxo, Cadastro Manual e Validar Auto-save', async () => {
-            // Adicionando várias atividades antes dos conhecimentos (Passo 10.1 flexibilidade)
             await AtividadeHelpers.adicionarAtividade(page, atividadeManual);
             
-            // Validar mudança de situação após primeira ação (Passo 14)
             await AtividadeHelpers.verificarSituacaoSubprocesso(page, 'Cadastro em andamento');
 
             const atividadeManual2 = `Atividade Manual 2 ${timestamp}`;
@@ -115,24 +111,19 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
             const atividadeEditada = `${atividadeManual} EDITADA`;
             const atividadeCancelada = `${atividadeManual} CANCELADA`;
             
-            // Cancelar edição da atividade (Passo 11.1.2)
             await AtividadeHelpers.cancelarEdicaoAtividade(page, atividadeManual, atividadeCancelada);
-            // Editar a atividade de fato (Passo 11.1.1)
             await AtividadeHelpers.editarAtividade(page, atividadeManual, atividadeEditada);
 
             const conhecimento1 = `Conhecimento Manual ${timestamp}`;
             const conhecimentoCancelado = `${conhecimento1} CANCELADO`;
             const conhecimento1Editado = `${conhecimento1} EDITADO`;
 
-            // Cancelar edição do conhecimento (Passo 12.1-12.2)
             await AtividadeHelpers.cancelarEdicaoConhecimento(page, atividadeEditada, conhecimento1, conhecimentoCancelado);
             // Editar de fato
             await AtividadeHelpers.editarConhecimento(page, atividadeEditada, conhecimento1, conhecimento1Editado);
             
-            // Remover conhecimento com diálogo (Passo 12.2)
             await AtividadeHelpers.removerConhecimento(page, atividadeEditada, conhecimento1Editado);
             
-            // Remover atividade com cascata (Passo 11.2)
             await AtividadeHelpers.removerAtividade(page, atividadeEditada);
         });
 

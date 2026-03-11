@@ -251,10 +251,8 @@ public class E2eController {
         Unidade unidade = unidadeService.buscarPorSigla(request.unidadeSigla());
         Long unidId = unidade.getCodigo();
 
-        // Subprocesso
         Long subId = jdbcTemplate.queryForObject("SELECT codigo FROM sgc.subprocesso WHERE processo_codigo = ? AND unidade_codigo = ?", Long.class, procId, unidId);
         
-        // Mapa
         Long mapaId = jdbcTemplate.queryForObject("SELECT codigo FROM sgc.mapa WHERE subprocesso_codigo = ?", Long.class, subId);
         
         // Atividades com conhecimentos associados

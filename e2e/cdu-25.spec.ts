@@ -157,11 +157,9 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
         await expect(modal.getByText(/Aceite de mapas em bloco/i)).toBeVisible();
         await expect(modal.getByText(/Selecione as unidades para aceite dos mapas correspondentes/i)).toBeVisible();
 
-        // Verifica se a unidade está na lista (Passo 6)
         const linhaUnidade = modal.locator('tr', { hasText: 'SECAO_211' });
         await expect(linhaUnidade).toBeVisible();
         
-        // Verifica se o checkbox está marcado por padrão (Passo 6)
         const checkbox = linhaUnidade.locator('input[type="checkbox"]');
         await expect(checkbox).toBeChecked();
 

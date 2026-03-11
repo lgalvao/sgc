@@ -85,7 +85,6 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
             await navegarParaSubprocesso(page, UNIDADE_ALVO);
             await navegarParaAtividadesVisualizacao(page);
 
-            // 6. Verificação
             await expect(page.locator('.unidade-sigla').getByText(UNIDADE_ALVO)).toBeVisible();
             await expect(page.locator('.unidade-nome')).toContainText(/\S+/);
             await expect(page.getByText(/Atividade Origem/).first()).toBeVisible();

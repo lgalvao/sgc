@@ -26,7 +26,6 @@ test.describe('CDU-06 - Detalhar processo', () => {
         const timestamp = Date.now();
         const descricao = `Processo CDU-06 ${timestamp}`;
 
-        // 1. Criar e iniciar processo
         await criarProcesso(page, {
             descricao,
             tipo: 'MAPEAMENTO',
@@ -40,14 +39,12 @@ test.describe('CDU-06 - Detalhar processo', () => {
         await page.getByTestId('tbl-processos').getByText(descricao).first().click();
         await esperarPaginaDetalhesProcesso(page);
 
-        // 3. Verificar detalhes do processo
         await verificarDetalhesProcesso(page, {
             descricao,
             tipo: 'Mapeamento',
             situacao: 'Em andamento'
         });
 
-        // 4. Verificar unidade participante
         await verificarUnidadeParticipante(page, {
             sigla: 'ASSESSORIA_12',
             situacao: 'Não iniciado',
