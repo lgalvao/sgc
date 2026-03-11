@@ -1,1 +1,1 @@
-npm run typecheck; npm run lint; Set-Location frontend; npx vitest run; Set-Location ..
+Set-Location frontend; npm run typecheck; npm run lint; npx vitest run; Set-Location ..

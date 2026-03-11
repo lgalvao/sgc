@@ -1,3 +1,2 @@
-npm update -g
-npm update --save
+npm update -g; npm update --save
 Set-Location frontend ; npm update --save ; Set-Location ..

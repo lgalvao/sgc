@@ -130,7 +130,7 @@ public class UsuarioFacade {
         }
 
         usuarioService.removerAdministrador(usuarioTitulo);
-        log.info("Administrador {} removido com sucesso", usuarioTitulo);
+        log.info("Administrador {} removido.", usuarioTitulo);
     }
 
     private AdministradorDto toAdministradorDto(Usuario usuario) {
