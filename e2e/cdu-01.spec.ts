@@ -12,7 +12,6 @@ test.describe('CDU-01 - Realizar login e exibir estrutura das telas', () => {
     });
 
     test('Deve realizar login com sucesso (Perfil Único)', async ({page}) => {
-        // Usuário 222222 (GESTOR_COORD_11) tem apenas um perfil
         await autenticar(page, USUARIOS.GESTOR_COORD.titulo, USUARIOS.GESTOR_COORD.senha);
 
         await expect(page.getByText('GESTOR - COORD_11')).toBeVisible();

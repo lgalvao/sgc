@@ -42,7 +42,6 @@ describe('AppAlert.vue', () => {
       }
     });
 
-    // import.meta.env.DEV in vitest is usually true by default
     expect(wrapper.text()).toContain('Mostrar detalhes técnicos');
 
     // Múltiplos buttons podem existir se fosse notificação estruturada, mas é modo simples
