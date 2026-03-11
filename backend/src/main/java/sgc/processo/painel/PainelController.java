@@ -16,6 +16,7 @@ import sgc.processo.dto.*;
 @RequestMapping("/api/painel")
 @RequiredArgsConstructor
 @Tag(name = "Painel", description = "Endpoints para o painel de controle (dashboard)")
+@PreAuthorize("isAuthenticated()")
 public class PainelController {
     private final PainelFacade painelFacade;
 

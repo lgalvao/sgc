@@ -15,6 +15,7 @@ import java.util.*;
 @RequestMapping("/api/relatorios")
 @RequiredArgsConstructor
 @Tag(name = "Relatórios", description = "Endpoints para geração de relatórios em PDF")
+@PreAuthorize("isAuthenticated()")
 public class RelatorioController {
     private final RelatorioFacade relatorioService;
 

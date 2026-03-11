@@ -1,427 +1,261 @@
-# Controle de Acesso e Regras de Negócio - SGC
+# Controle de Acesso e Regras de Negócio — SGC
+
+> Documento consolidado e validado contra o código-fonte em 11/03/2026.
+> Fonte de verdade: [`SgcPermissionEvaluator.java`](file:///c:/sgc/backend/src/main/java/sgc/seguranca/SgcPermissionEvaluator.java), controllers e facades.
+
+---
+
+## 1. Visão Geral
+
+O sistema de acesso do SGC baseia-se em dois eixos:
+
+| Eixo | O que controla | Critério |
+|------|---------------|----------|
+| **Hierarquia** | Visualização (Leitura) | Unidade Responsável do subprocesso |
+| **Localização** | Execução (Escrita) | Localização Atual do subprocesso |
+
+**Regra de Ouro:** O usuário só pode executar ações de escrita em um subprocesso se este estiver **localizado na sua unidade ativa** — incluindo o perfil ADMIN.
+
+---
+
+## 2. Perfis de Acesso
+
+| Perfil | Escopo de visualização | Responsabilidades principais |
+|--------|----------------------|------------------------------|
+| **ADMIN** | Todo o sistema | Criar/editar processos, iniciar, homologar cadastros e mapas, criar admins, configurar sistema, gerar relatórios |
+| **GESTOR** | Sua unidade + subordinadas (recursivo) | Aceitar cadastros e mapas, devolver para ajustes |
+| **CHEFE** | Apenas sua unidade | Cadastrar atividades/conhecimentos, disponibilizar cadastro, validar mapa, apresentar sugestões |
+| **SERVIDOR** | Apenas sua unidade | Participar de diagnósticos (autoavaliação) |
+
+---
+
+## 3. Regras de Visualização (Leitura)
+
+Validadas no método `checkHierarquia` do `SgcPermissionEvaluator`:
+
+- **ADMIN:** `return true` — acesso global.
+- **GESTOR:** `hierarquiaService.ehMesmaOuSubordinada(unidadeAlvo, unidadeUsuario)` — vê sua unidade e todas as subordinadas.
+- **CHEFE / SERVIDOR:** `usuario.getUnidadeAtivaCodigo() == unidadeAlvo.getCodigo()` — vê apenas sua própria unidade.
 
-Este documento consolida as regras de acesso e atividades permitidas para cada perfil e contexto do subprocesso.
+### Exceção: VERIFICAR_IMPACTOS
 
-## Resumo Executivo: Visão vs. Execução
+A ação `VERIFICAR_IMPACTOS` **não depende de localização** no Evaluator (apenas retorna `true` se o perfil for CHEFE, GESTOR ou ADMIN). O controle fino de em quais situações cada perfil pode ver os impactos é feito no **serviço** (`ImpactoMapaService`), não no Evaluator.
+
+---
+
+## 4. Regras de Execução (Escrita)
+
+### 4.1 Ações dependentes de localização
 
-O sistema de acesso do SGC baseia-se em um conjunto simples, mas rígido, de regras de fluxo de trabalho ditadas por dois
-eixos distintos: **Hierarquia** e **Situação/Localização**.
+Definidas na constante `ACOES_DEPENDENTES_LOCALIZACAO` do Evaluator. Para **todas** elas, a regra é:
 
-A regra de ouro que norteia toda a arquitetura de acesso é a separação entre *pertencimento* e *localização*:
+```
+usuario.getUnidadeAtivaCodigo() == localizacaoAtual(subprocesso).getCodigo()
+```
 
-1. **Unidade Responsável (Quem é o dono):** Define as **Regras de Visualização (Leitura)**. Um usuário pode visualizar
-   qualquer subprocesso que pertença à sua unidade ou às unidades subordinadas a ele, independentemente de onde o
-   subprocesso esteja "estacionado" no fluxo de trabalho.
-2. **Localização Atual (Com quem está a bola):** Define as **Regras de Execução (Escrita)**. Como um documento físico
-   tramitando entre mesas, um usuário **só pode executar ações** (editar, aceitar, devolver, homologar) se o subprocesso
-   estiver fisicamente "na sua mesa" (localizado na sua unidade).
-    * *Exemplo Clássico:* Nem mesmo um ADMIN global pode alterar ou aprovar um rascunho de um CHEFE se o CHEFE não tiver
-      apertado o botão "Disponibilizar" para enviar o subprocesso adiante.
+Adicionalmente, o `checkPerfil` verifica se o perfil do usuário é compatível com a ação:
 
-Essa dicotomia permite substituir interceptadores de segurança complexos por duas checagens lógicas diretas e
-universais.
+| Ação | Perfil necessário | CDU |
+|------|-------------------|-----|
+| `EDITAR_CADASTRO` | CHEFE | 08 |
+| `DISPONIBILIZAR_CADASTRO` | CHEFE | 09 |
+| `EDITAR_REVISAO_CADASTRO` | CHEFE | 08 |
+| `DISPONIBILIZAR_REVISAO_CADASTRO` | CHEFE | 10 |
+| `IMPORTAR_ATIVIDADES` | CHEFE | 08 |
+| `DEVOLVER_CADASTRO` | ADMIN, GESTOR | 13 |
+| `DEVOLVER_REVISAO_CADASTRO` | ADMIN, GESTOR | 14 |
+| `ACEITAR_CADASTRO` | GESTOR | 13 |
+| `ACEITAR_REVISAO_CADASTRO` | GESTOR | 14 |
+| `HOMOLOGAR_CADASTRO` | ADMIN | 13 |
+| `HOMOLOGAR_REVISAO_CADASTRO` | ADMIN | 14 |
+| `EDITAR_MAPA` | ADMIN | 15 |
+| `DISPONIBILIZAR_MAPA` | ADMIN | 17 |
+| `AJUSTAR_MAPA` | ADMIN | 16 |
+| `APRESENTAR_SUGESTOES` | CHEFE | 19 |
+| `VALIDAR_MAPA` | CHEFE | 19 |
+| `DEVOLVER_MAPA` | ADMIN, GESTOR | 20 |
+| `ACEITAR_MAPA` | GESTOR | 20 |
+| `HOMOLOGAR_MAPA` | ADMIN | 20 |
 
-## Perfis de Acesso
+### 4.2 Ações administrativas (sem dependência de localização)
 
-* **ADMIN**: Administrador do sistema (lotado, independentemente do real usuário logado, na unidade raiz - sigla '
-  ADMIN').
-    * *Responsabilidades*: Criar e iniciar processos, editar processos (desde que não tenham sido iniciados), criar e
-      ajustar mapas de competências, homologar cadastros, criar outros administradores, homologar mapas, homologar
-      diagnósticos, editar configurações do sistema.
-    * *Escopo*: Todo o sistema, para visualização.
+Protegidas com `@PreAuthorize("hasRole('ADMIN')")` diretamente no controller:
 
-* **GESTOR**: Responsável por unidade intermediária ou interoperacional (ex: Coordenador).
-    * *Responsabilidades*: Visualizar e validar informações das unidades subordinadas, submeter para análise superior,
-      devolver para ajustes (com ou sem observações).
-    * *Escopo*: Unidades sob sua hierarquia (recursivamente)
+| Endpoint | Ação | CDU |
+|----------|------|-----|
+| `POST /api/processos` | Criar processo | 03 |
+| `POST /api/processos/{codigo}/atualizar` | Editar processo | 03 |
+| `POST /api/processos/{codigo}/excluir` | Excluir processo | 03 |
+| `POST /api/processos/{codigo}/iniciar` | Iniciar processo | 04/05 |
+| `POST /api/processos/{codigo}/finalizar` | Finalizar processo | 21 |
+| `POST /api/processos/{codigo}/enviar-lembrete` | Enviar lembrete de prazo | 34 |
+| `POST /api/subprocessos/{id}/data-limite` | Alterar data limite | 27 |
+| `POST /api/subprocessos/{id}/reabrir-cadastro` | Reabrir cadastro | 32 |
+| `POST /api/subprocessos/{id}/reabrir-revisao-cadastro` | Reabrir revisão | 33 |
+| `POST /api/subprocessos` | Criar subprocesso | — |
+| `POST /api/subprocessos/{id}/atualizar` | Atualizar subprocesso | — |
+| `POST /api/subprocessos/{id}/excluir` | Excluir subprocesso | — |
+| `GET /api/subprocessos` | Listar subprocessos | — |
+| `GET /api/configuracoes` | Listar configurações | 31 |
+| `POST /api/configuracoes` | Atualizar configurações | 31 |
+| `GET /api/usuarios/administradores` | Listar administradores | 30 |
+| `POST /api/usuarios/administradores` | Adicionar administrador | 30 |
+| `POST /api/usuarios/administradores/{titulo}/remover` | Remover administrador | 30 |
+| `POST /api/unidades/{cod}/atribuicoes-temporarias` | Criar atribuição temporária | 28 |
+| `GET /api/unidades/atribuicoes` | Listar atribuições | 28 |
+| `GET /api/relatorios/andamento/{cod}` | Relatório de andamento | 35 |
+| `GET /api/relatorios/andamento/{cod}/exportar` | Exportar relatório andamento | 35 |
+| `GET /api/relatorios/mapas/{cod}/exportar` | Exportar relatório de mapas | 36 |
+| `POST /api/mapas` | Criar mapa | 15 |
+| `POST /api/mapas/{cod}/atualizar` | Atualizar mapa | 15 |
+| `POST /api/mapas/{cod}/excluir` | Excluir mapa | 15 |
 
-* **CHEFE**: Responsável por unidade operacional ou interoperacional.
-    * *Responsabilidades*: Cadastrar atividades e conhecimento, submeter para validação superior.
-    * *Escopo*: Sua unidade de responsabilidade.
+---
 
-* **SERVIDOR**: Servidor lotado em unidade operacional/interoperacional.
-    * *Responsabilidades*: Participar de processos de diagnóstico (autoavaliação).
-    * *Escopo*: Sua própria avaliação no contexto de sua unidade.
+## 5. Ações em Bloco
 
-## Conceito: Localização do Subprocesso
+### 5.1 Via endpoints dedicados no SubprocessoController
 
-Cada subprocesso pertence a uma **Unidade responsável** (quem executa o trabalho) e possui uma **Localização atual** (
-onde o processo está "parado" aguardando uma ação).
+| Endpoint | Ação (Evaluator) | Perfil | CDU |
+|----------|-------------------|--------|-----|
+| `POST /aceitar-cadastro-bloco` | `ACEITAR_CADASTRO` (por subprocesso) | GESTOR | 22 |
+| `POST /homologar-cadastro-bloco` | `HOMOLOGAR_CADASTRO` (por subprocesso) | ADMIN | 23 |
+| `POST /disponibilizar-mapa-bloco` | `DISPONIBILIZAR_MAPA` (por subprocesso) | ADMIN | 24 |
+| `POST /aceitar-validacao-bloco` | `ACEITAR_MAPA` (por subprocesso) | GESTOR | 25 |
+| `POST /homologar-validacao-bloco` | `HOMOLOGAR_MAPA` (por subprocesso) | ADMIN | 26 |
+
+### 5.2 Via endpoint genérico no ProcessoController
 
-* **Unidade responsável**: É a unidade dona do subprocesso (ex: SECAO_111). Define quem tem visibilidade sobre o item e
-  pode cadastrar atividades e conhecimentos para ela (quando o subprocesso estiver na situação pertinente).
+`POST /api/processos/{codigo}/acao-em-bloco` — protegido com `hasAnyRole('ADMIN', 'GESTOR')`.
 
-* **Localização atual**: É a unidade onde o fluxo de trabalho se encontra no momento (ex: SECAO_111, COORD_11,
-  SECRETARIA_1 ADMIN). Define quem pode executar ações de alteração de estado. A localização muda conforme as ações de
-  envio (Disponibilizar, Aceitar, Devolver etc.). Essencialmente, qualquer ação que gera uma movimentação muda a
-  localização atual de um subprocesso
+A `ProcessoFacade.executarAcaoEmBloco()` faz a verificação fina de permissão internamente via
+`permissionEvaluator.checkPermission()`, categorizando cada subprocesso na ação correta (aceitar cadastro, aceitar mapa, homologar cadastro, homologar mapa, ou disponibilizar mapa).
 
-## Regras Gerais de Acesso
+### 5.3 Permissões no nível de Processo (checkProcesso)
 
-O sistema aplica regras distintas para visualizar informações e para executar ações que alteram o estado dos processos e
-subprocessos.
+O `checkProcesso` do Evaluator valida ações a nível de processo (não subprocesso):
 
-### 1. Visualização (Leitura)
+| Ação | Perfil | Condição extra |
+|------|--------|----------------|
+| `VISUALIZAR_PROCESSO` | Qualquer | — |
+| `FINALIZAR_PROCESSO` | ADMIN | Processo não pode estar `FINALIZADO` |
+| `ACEITAR_CADASTRO_EM_BLOCO` | GESTOR | — |
+| `HOMOLOGAR_CADASTRO_EM_BLOCO` | ADMIN | — |
+| `HOMOLOGAR_MAPA_EM_BLOCO` | ADMIN | — |
+| `DISPONIBILIZAR_MAPA_EM_BLOCO` | ADMIN | — |
 
-A permissão de visualização é baseada na **Hierarquia da Unidade Responsável**. Se o usuário logado tiver permissão
-sobre a unidade responsável pelo subprocesso, poderá vê-lo, independentemente de onde o subprocesso esteja localizado.
+---
 
-* **ADMIN**: Visualiza todos os subprocessos de todas as unidades.
-* **GESTOR**: Visualiza subprocessos da sua própria unidade e de todas as unidades subordinadas.
-* **CHEFE**: Visualiza apenas os subprocessos da sua unidade.
-* **⚠️ Exceções**: Algumas ações de leitura, como a **Verificação de Impactos (CDU-12)**, possuem restrições
-  situacionais adicionais baseadas no perfil e na localização (ex: CHEFE só vê em 'Andamento', GESTOR só vê se estiver '
-  Disponibilizado' na sua unidade).
+## 6. Atividades e Conhecimentos (AtividadeFacade)
 
-### 2. Execução (Escrita e Movimentação)
+O `AtividadeController` usa `hasRole('CHEFE')` para CRUD de atividades e conhecimentos. A verificação fina é feita na
+`AtividadeFacade.verificarPermissaoEdicao()`:
 
-A permissão para alterar dados ou mudar a situação do subprocesso (ex: Homologar, Devolver, Validar) é estritamente
-baseada na **Localização Atual**.
+1. **Permissão de localização:** Checa `EDITAR_CADASTRO` via `permissionEvaluator` (CHEFE + localização).
+2. **Validação de situação:** Permite edição apenas nas seguintes situações do subprocesso:
+    - `NAO_INICIADO`
+    - `MAPEAMENTO_CADASTRO_EM_ANDAMENTO`
+    - `REVISAO_CADASTRO_EM_ANDAMENTO`
+    - `MAPEAMENTO_MAPA_CRIADO`
+    - `MAPEAMENTO_MAPA_COM_SUGESTOES`
+    - `REVISAO_MAPA_AJUSTADO`
+    - `REVISAO_MAPA_COM_SUGESTOES`
 
-* **Regra de Ouro**: O usuário só pode executar ações no subprocesso, se o subprocesso estiver **localizado na sua
-  unidade de trabalho atual** -- mesmo para o perfil ADMIN.
-* **ADMIN**: O perfil de Administrador **não isenta** o usuário desta regra. Para que um ADMIN possa homologar um
-  cadastro, o cadastro deve ter sido enviado (disponibilizado/aceito) até chegar à unidade do ADMIN (Raiz). O ADMIN não
-  pode intervir em um processo que ainda está localizado na unidade do Chefe.
+---
 
-## Detalhamento por Caso de Uso (CDU)
+## 7. Importação de Atividades
 
-As seções a seguir detalham os atores, pré-condições e ações permitidas para cada Caso de Uso.
+- `POST /subprocessos/{id}/importar-atividades` — protegido com `hasPermission(#id, 'Subprocesso', 'IMPORTAR_ATIVIDADES')`.
+- `IMPORTAR_ATIVIDADES` exige perfil **CHEFE** + localização.
+- `GET /subprocessos/{id}/atividades-importacao` — protegido com `isAuthenticated()`.
+- A ação `CONSULTAR_PARA_IMPORTACAO` no Evaluator permite que CHEFE consulte subprocessos finalizados ou da sua hierarquia.
 
-### CDU-01 - Realizar login e exibir estrutura das telas
+---
 
-**Atores**: Qualquer usuário autenticado (ADMIN, GESTOR, CHEFE, SERVIDOR).
-**Ações**:
+## 8. Situações do Subprocesso
 
-* Realizar login via credenciais de rede.
-* Selecionar perfil e unidade de trabalho (se houver múltiplos).
-* Visualizar menu e estrutura de telas correspondente ao perfil.
+### 8.1 Mapeamento
 
-### CDU-02 - Visualizar Painel
+```
+NAO_INICIADO → MAPEAMENTO_CADASTRO_EM_ANDAMENTO → MAPEAMENTO_CADASTRO_DISPONIBILIZADO
+    → MAPEAMENTO_CADASTRO_HOMOLOGADO → MAPEAMENTO_MAPA_CRIADO → MAPEAMENTO_MAPA_DISPONIBILIZADO
+    → MAPEAMENTO_MAPA_COM_SUGESTOES / MAPEAMENTO_MAPA_VALIDADO → MAPEAMENTO_MAPA_HOMOLOGADO
+```
 
-**Atores**: Todos os perfis.
-**Ações**:
+### 8.2 Revisão
 
-* **Todos**:
-    * Visualizar tabela de processos ativos (limitado à hierarquia do usuário) e alertas.
-* **ADMIN**:
-    * Visualizar processos na situação 'Criado'.
-    * Visualizar/clicar no botão `Criar processo` (leva ao CDU-03).
-    * Visualizar/clicar em processo 'Criado' para editar (leva ao CDU-03).
-* **ADMIN/GESTOR**: Clicar em processos 'Em andamento'/'Finalizado' para ver detalhes do processo (CDU-06).
-* **CHEFE/SERVIDOR**: Clicar em processos 'Em andamento'/'Finalizado' para ver detalhes do subprocesso da própria
-  unidade (CDU-07).
+```
+NAO_INICIADO → REVISAO_CADASTRO_EM_ANDAMENTO → REVISAO_CADASTRO_DISPONIBILIZADA
+    → REVISAO_CADASTRO_HOMOLOGADA → REVISAO_MAPA_AJUSTADO → REVISAO_MAPA_DISPONIBILIZADO
+    → REVISAO_MAPA_COM_SUGESTOES / REVISAO_MAPA_VALIDADO → REVISAO_MAPA_HOMOLOGADO
+```
 
-### CDU-03 - Manter processo
+### 8.3 Diagnóstico
 
-**Atores**: ADMIN.
-**Ações**:
+```
+NAO_INICIADO → DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO → DIAGNOSTICO_MONITORAMENTO → DIAGNOSTICO_CONCLUIDO
+```
 
-* Criar novo processo (Mapeamento, Revisão, Diagnóstico).
-* Editar processo (apenas se situação 'Criado').
-* Remover processo (apenas se situação 'Criado').
-* Selecionar unidades participantes (árvore hierárquica).
+### 8.4 Situações do Processo
 
-### CDU-04 - Iniciar processo de mapeamento
+```
+CRIADO → EM_ANDAMENTO → FINALIZADO
+```
 
-**Atores**: ADMIN.
-**Ações**:
+---
 
-* Iniciar processo na situação 'Criado'.
-* *Efeito*: Muda situação para 'Em andamento', cria subprocessos 'Não iniciado' para unidades, envia notificações.
+## 9. Proteção de Endpoints
 
-### CDU-05 - Iniciar processo de revisão
+Todos os controllers (exceto `LoginController`, que é público por natureza) possuem `@PreAuthorize("isAuthenticated()")`
+no nível da classe. Endpoints individuais podem ter restrições mais específicas (`hasRole`, `hasPermission`) que
+**sobrescrevem** a regra da classe.
 
-**Atores**: ADMIN.
-**Ações**:
+| Controller | Proteção de classe |
+|-----------|-------------------|
+| `ProcessoController` | `isAuthenticated()` |
+| `SubprocessoController` | `isAuthenticated()` |
+| `UnidadeController` | `isAuthenticated()` |
+| `UsuarioController` | `isAuthenticated()` |
+| `AtividadeController` | `isAuthenticated()` |
+| `MapaController` | `isAuthenticated()` |
+| `PainelController` | `isAuthenticated()` |
+| `RelatorioController` | `isAuthenticated()` |
+| `AlertaController` | `isAuthenticated()` |
+| `ConfiguracaoController` | *(individual em cada método)* |
+| `LoginController` | *(sem proteção — endpoint público)* |
 
-* Iniciar processo de revisão na situação 'Criado'.
-* *Efeito*: Cria cópia do mapa vigente, cria subprocessos, envia notificações.
+---
 
-### CDU-06 - Detalhar processo
+## 10. Regras de Frontend
 
-**Atores**: ADMIN, GESTOR.
-**Ações**:
+As ações devem seguir essas diretrizes na UI:
 
-* Visualizar dados do processo e lista de unidades participantes (subárvore).
-* **ADMIN**:
-    * Alterar data limite de unidade específica.
-    * Alterar situação do subprocesso de unidade específica (ex: reabrir cadastro).
-    * Finalizar processo.
-* **ADMIN/GESTOR**:
-    * Acessar `Aceitar/Homologar em bloco` (se houver pendências).
-    * Acessar `Aceitar/Homologar mapa em bloco` (se houver pendências).
-    * Clicar em unidade para ver detalhes do subprocesso (CDU-07).
+- **Esconder:** Se o perfil ativo **nunca** tem permissão para a ação (ex: botão "Criar Processo" para CHEFE).
+- **Desabilitar:** Se o perfil permite, mas a **situação** ou **localização** atual impede (ex: botão "Disponibilizar" visível mas desabilitado quando o subprocesso não está na unidade do usuário — com tooltip explicativo).
 
-### CDU-07 - Detalhar subprocesso
+---
 
-**Atores**: Todos os perfis.
-**Ações**:
+## 11. Implementação Técnica
 
-* Visualizar dados da unidade, movimentações e prazos.
-* **CHEFE**: Acesso ao card `Atividades e conhecimentos` sempre habilitado.
-* **ADMIN**: Acesso ao card `Mapa de competências` habilitado após homologação.
+### Anotações `@PreAuthorize`
 
-### CDU-08 - Manter cadastro de atividades e conhecimentos
+```java
+// Ações de fluxo — validação completa (perfil + localização):
+@PreAuthorize("hasPermission(#id, 'Subprocesso', 'ACEITAR_CADASTRO')")
 
-**Atores**: CHEFE.
-**Pré-condições**: Situação 'Não iniciado', 'Cadastro em andamento' ou 'Revisão... em andamento'. Unidade do usuário.
-**Ações**:
+// Ações administrativas — apenas perfil:
+@PreAuthorize("hasRole('ADMIN')")
 
-* Adicionar, editar, remover atividades e conhecimentos.
-* Importar atividades de processos anteriores.
-* *Nota*: Salvamento é automático.
+// Ações em bloco — validação por cada subprocesso:
+@PreAuthorize("hasPermission(#request.subprocessos, 'Subprocesso', 'ACEITAR_MAPA')")
 
-### CDU-09 - Disponibilizar cadastro de atividades e conhecimentos
+// Acesso a detalhes de processo — admin ou hierarquia:
+@PreAuthorize("hasRole('ADMIN') or @processoFacade.checarAcesso(authentication, #codigo)")
+```
 
-**Atores**: CHEFE.
-**Pré-condições**: Processo Mapeamento. Situação 'Cadastro em andamento'.
-**Ações**:
+### Localização do Subprocesso
 
-* Visualizar histórico de análise (se houve devolução).
-* Disponibilizar cadastro (envia para unidade superior/ADMIN).
-* *Efeito*: Situação muda para 'Cadastro disponibilizado'.
-
-### CDU-10 - Disponibilizar revisão do cadastro de atividades e conhecimentos
-
-**Atores**: CHEFE.
-**Pré-condições**: Processo Revisão. Situação 'Revisão do cadastro em andamento'.
-**Ações**:
-
-* Visualizar histórico de análise.
-* Disponibilizar revisão (envia para unidade superior/ADMIN).
-* *Efeito*: Situação muda para 'Revisão do cadastro disponibilizada'.
-
-### CDU-11 - Visualizar cadastro de atividades e conhecimentos
-
-**Atores**: Todos os perfis.
-**Ações**:
-
-* Visualizar lista de atividades e conhecimentos (somente leitura).
-
-### CDU-12 - Verificar impactos no mapa de competências
-
-**Atores**: CHEFE, GESTOR, ADMIN.
-**Pré-condições**:
-
-* **CHEFE**: Situação 'Revisão do cadastro em andamento'.
-* **GESTOR**: Situação 'Revisão do cadastro disponibilizada' (na sua unidade).
-* **ADMIN**: Situação 'Revisão do cadastro homologada' ou 'Mapa ajustado'.
-  **Ações**:
-* Visualizar comparação (diff) entre mapa vigente e revisão atual (inclusões, remoções, alterações).
-
-### CDU-13 - Analisar cadastro de atividades e conhecimentos
-
-**Atores**: GESTOR, ADMIN.
-**Pré-condições**: Processo Mapeamento. Situação 'Cadastro disponibilizado'. Localização na unidade do usuário.
-**Ações**:
-
-* Visualizar histórico de análise.
-* **Devolver para ajustes** (envia de volta para unidade inferior).
-* **GESTOR**: Registrar aceite (envia para unidade superior).
-* **ADMIN**: Homologar (finaliza cadastro, muda para 'Cadastro homologado').
-
-### CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos
-
-**Atores**: GESTOR, ADMIN.
-**Pré-condições**: Processo Revisão. Situação 'Revisão... disponibilizada'. Localização na unidade do usuário.
-**Ações**:
-
-* Verificar impactos no mapa (CDU-12).
-* Visualizar histórico de análise.
-* **Devolver para ajustes** (envia de volta para unidade inferior).
-* **GESTOR**: Registrar aceite (envia para unidade superior).
-* **ADMIN**: Homologar (finaliza revisão, muda para 'Revisão... homologada').
-
-### CDU-15 - Manter mapa de competências
-
-**Atores**: ADMIN.
-**Pré-condições**: Situação 'Cadastro homologado' ou 'Mapa criado'.
-**Ações**:
-
-* Criar, editar, excluir competências.
-* Associar atividades às competências.
-* Disponibilizar (leva ao CDU-17).
-
-### CDU-16 - Ajustar mapa de competências
-
-**Atores**: ADMIN.
-**Pré-condições**: Processo Revisão. Situação 'Revisão... homologada' ou 'Mapa ajustado'.
-**Ações**:
-
-* Verificar impactos no mapa.
-* Ajustar competências/atividades (mesmo fluxo de CDU-15).
-* Disponibilizar (leva ao CDU-17).
-
-### CDU-17 - Disponibilizar mapa de competências
-
-**Atores**: ADMIN.
-**Pré-condições**: Situação 'Mapa criado' ou 'Mapa ajustado'.
-**Ações**:
-
-* Validar mapa (regras de consistência).
-* Definir data limite para validação.
-* Disponibilizar (envia para unidades subordinadas).
-* *Efeito*: Muda situação para 'Mapa disponibilizado'.
-
-### CDU-18 - Visualizar mapa de competências
-
-**Atores**: Todos os perfis.
-**Ações**:
-
-* Visualizar mapa (competências, atividades, conhecimentos).
-
-### CDU-19 - Validar mapa de competências
-
-**Atores**: CHEFE.
-**Pré-condições**: Situação 'Mapa disponibilizado'.
-**Ações**:
-
-* Visualizar mapa.
-* Apresentar sugestões (muda para 'Mapa com sugestões', envia para superior).
-* Validar (muda para 'Mapa validado', envia para superior).
-* Visualizar histórico de análise (se houve devolução).
-
-### CDU-20 - Analisar validação de mapa de competências
-
-**Atores**: GESTOR, ADMIN.
-**Pré-condições**: Situação 'Mapa validado' ou 'Mapa com sugestões'. Localização na unidade do usuário.
-**Ações**:
-
-* Visualizar mapa e sugestões (se houver).
-* **Devolver para ajustes** (envia de volta para unidade inferior, muda para 'Mapa disponibilizado').
-* **GESTOR**: Registrar aceite (envia para unidade superior).
-* **ADMIN**: Homologar (muda para 'Mapa homologado').
-
-### CDU-21 - Finalizar processo de mapeamento ou de revisão
-
-**Atores**: ADMIN.
-**Pré-condições**: Processo 'Em andamento'. Todas as unidades 'Mapa homologado'.
-**Ações**:
-
-* Finalizar processo.
-* *Efeito*: Mapas tornam-se vigentes. Situação muda para 'Finalizado'.
-
-### CDU-22 - Aceitar cadastros em bloco
-
-**Atores**: GESTOR.
-**Pré-condições**: Unidades subordinadas com 'Cadastro disponibilizado' ou 'Revisão... disponibilizada' na unidade do
-usuário.
-**Ações**:
-
-* Selecionar múltiplas unidades.
-* Registrar aceite em bloco.
-
-### CDU-23 - Homologar cadastros em bloco
-
-**Atores**: ADMIN.
-**Pré-condições**: Unidades subordinadas com 'Cadastro disponibilizado' ou 'Revisão... disponibilizada' na unidade do
-usuário (ADMIN).
-**Ações**:
-
-* Selecionar múltiplas unidades.
-* Homologar em bloco (muda para 'Cadastro homologado' ou 'Revisão... homologada').
-
-### CDU-24 - Disponibilizar mapas de competências em bloco
-
-**Atores**: ADMIN.
-**Pré-condições**: Unidades com 'Mapa criado' ou 'Mapa ajustado'.
-**Ações**:
-
-* Selecionar múltiplas unidades.
-* Disponibilizar em bloco (valida mapas, define data limite, muda para 'Mapa disponibilizado').
-
-### CDU-25 - Aceitar validação de mapas de competências em bloco
-
-**Atores**: GESTOR.
-**Pré-condições**: Unidades com 'Mapa validado' ou 'Mapa com sugestões' na unidade do usuário.
-**Ações**:
-
-* Selecionar múltiplas unidades.
-* Registrar aceite em bloco.
-
-### CDU-26 - Homologar validação de mapas de competências em bloco
-
-**Atores**: ADMIN.
-**Pré-condições**: Unidades com 'Mapa validado' ou 'Mapa com sugestões' na unidade do usuário (ADMIN).
-**Ações**:
-
-* Selecionar múltiplas unidades.
-* Homologar em bloco (muda para 'Mapa homologado').
-
-### CDU-27 - Alterar data limite de subprocesso
-
-**Atores**: ADMIN.
-**Pré-condições**: Processo não finalizado.
-**Ações**:
-
-* Alterar data limite de um subprocesso específico.
-
-### CDU-28 - Manter atribuição temporária
-
-**Atores**: ADMIN.
-**Ações**:
-
-* Criar atribuição temporária de perfil CHEFE para um servidor em uma unidade.
-* Definir período e justificativa.
-
-### CDU-29 - Consultar histórico de processos
-
-**Atores**: ADMIN, GESTOR, CHEFE.
-**Ações**:
-
-* Visualizar lista de processos finalizados.
-* Ver detalhes de processos finalizados (somente leitura).
-
-### CDU-30 - Manter Administradores
-
-**Atores**: ADMIN.
-**Ações**:
-
-* Adicionar novo administrador (por título eleitoral).
-* Remover administrador existente.
-
-### CDU-31 - Configurar sistema
-
-**Atores**: ADMIN.
-**Ações**:
-
-* Alterar configurações globais (Dias para inativação de processo, Dias para alerta novo).
-
-### CDU-32 - Reabrir cadastro
-
-**Atores**: ADMIN.
-**Ações**:
-
-* Reabrir cadastro de atividades de uma unidade.
-* *Efeito*: Situação muda para 'Cadastro em andamento'. Envia notificação.
-
-### CDU-33 - Reabrir revisão de cadastro
-
-**Atores**: ADMIN.
-**Ações**:
-
-* Reabrir revisão de cadastro de uma unidade.
-* *Efeito*: Situação muda para 'Revisão do cadastro em andamento'. Envia notificação.
-
-### CDU-34 - Enviar lembrete de prazo
-
-**Atores**: ADMIN.
-**Ações**:
-
-* Selecionar unidades com pendências.
-* Enviar e-mail de lembrete de prazo.
-
-### CDU-35 - Gerar relatório de andamento
-
-**Atores**: ADMIN.
-**Ações**:
-
-* Visualizar e exportar (PDF) relatório de andamento de processo.
-
-### CDU-36 - Gerar relatório de mapas
-
-**Atores**: ADMIN.
-**Ações**:
-
-* Visualizar e exportar (PDF) mapas de competências consolidados.
+A localização é obtida via `obterUnidadeLocalizacao()`:
+1. Se `sp.getLocalizacaoAtual()` não é null, usa este valor (cache).
+2. Senão, busca a última movimentação (`movimentacaoRepo.findFirstBySubprocessoCodigoOrderByDataHoraDesc`).
+3. Se não houver movimentação, assume a unidade do subprocesso (posição inicial).

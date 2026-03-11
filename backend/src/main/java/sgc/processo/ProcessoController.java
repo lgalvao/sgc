@@ -27,6 +27,7 @@ import java.util.*;
 @RequestMapping("/api/processos")
 @RequiredArgsConstructor
 @Tag(name = "Processos", description = "Endpoints para gerenciamento de processos de mapeamento, revisão e diagnóstico")
+@PreAuthorize("isAuthenticated()")
 public class ProcessoController {
     private final ProcessoFacade processoFacade;
 
@@ -183,7 +184,7 @@ public class ProcessoController {
     }
 
     @PostMapping("/{codigo}/acao-em-bloco")
-    @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR')")
     @Operation(summary = "Executa ação em bloco para um processo")
     public ResponseEntity<Void> executarAcaoEmBloco(
             @PathVariable Long codigo,
