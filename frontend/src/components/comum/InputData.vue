@@ -1,8 +1,8 @@
 <template>
   <BInputGroup>
     <BFormInput
-        ref="inputRef"
         :id="id"
+        ref="inputRef"
         :model-value="modelValue"
         :state="state"
         :data-testid="dataTestid"

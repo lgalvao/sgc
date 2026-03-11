@@ -198,7 +198,6 @@ import {
 import logger from "@/utils/logger";
 import {formatSituacaoSubprocesso} from "@/utils/formatters";
 import * as atividadeService from "@/services/atividadeService";
-import * as subprocessoService from "@/services/subprocessoService";
 import {listarAnalisesCadastro} from "@/services/analiseService";
 import {useErrorHandler} from "@/composables/useErrorHandler";
 

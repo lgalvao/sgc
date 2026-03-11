@@ -88,7 +88,7 @@ const LOG_FILTERS = [
     /UP-TO-DATE/,
     /Starting a Gradle Daemon.*Daemons could not be reused/,
     /Reusing configuration cache/,
-    /Starting/,
+    /Starting \w+Application/,
 
     // Spring Boot - Inicialização
     /The following.*profile.*is active/,
@@ -101,7 +101,7 @@ const LOG_FILTERS = [
 
     // Vite - Inicialização
     /^> sgc@.*dev$/,
-    /^> vite$/,
+    /^> vite/,
     /VITE v.* ready in/,
     /➜ {2}Local:/,
     /➜ {2}Network:/,
@@ -127,14 +127,21 @@ function shouldFilterLog(line) {
 function log(prefix, data) {
     const lines = data.toString().split('\n');
     lines.forEach(line => {
-        const trimmed = line.trim();
-        if (trimmed && !shouldFilterLog(line)) {
-            lifecycleLogger.info(`[${prefix}] ${line}`);
+        const stripped = stripAnsi(line);
+        const trimmed = stripped.trim();
+        if (trimmed && !shouldFilterLog(stripped)) {
+            lifecycleLogger.info(`[${prefix}] ${stripped}`);
         }
     });
 }
 
 const isWindows = process.platform === 'win32';
+
+// eslint-disable-next-line no-control-regex
+const ANSI_COLOR_REGEX = /\x1b\[[0-9;]*m/g;
+function stripAnsi(str) {
+    return str.replace(ANSI_COLOR_REGEX, '');
+}
 
 function normalizarEnv(baseEnv = process.env) {
     const env = {...baseEnv};
@@ -294,12 +301,25 @@ function checkHttpHealth(url, expectedMin, expectedMax) {
     });
 }
 
+function checkPortFree(port) {
+    return new Promise((resolve, reject) => {
+        const req = http.get(`http://localhost:${port}/`, (res) => {
+            res.resume();
+            reject(new Error(`Porta ${port} já está em uso. Encerre o processo antes de iniciar os testes.`));
+        });
+        req.on('error', () => resolve());
+        req.end();
+    });
+}
+
 async function subirBackends() {
+    await checkPortFree(portaBackend());
     startBackend();
     await checkHttpHealth(`http://localhost:${portaBackend()}/`, 200, 500);
 }
 
 async function subirFrontend() {
+    await checkPortFree(FRONTEND_PORT);
     startFrontend();
     await checkHttpHealth(`http://localhost:${FRONTEND_PORT}`, 200, 400);
 }
@@ -318,7 +338,7 @@ startSmtpServer();
 try {
     await subirInfra();
     lifecycleLogger.info(
-        `>>> Infra E2E no ar. Frontend: ${FRONTEND_PORT}. ${descreverBackends()}.`
+        `>>> Infra E2E no ar. Frontend: http://localhost:${FRONTEND_PORT}. ${descreverBackends()}.`
     );
 } catch (error) {
     lifecycleLogger.error(`Erro ao iniciar infra de testes: ${error && error.message ? error.message : error}`);
