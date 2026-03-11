@@ -38,3 +38,13 @@ This document outlines strategies for simplifying the SGC codebase, reducing ove
 
 - **Avoid Overengineering**: Always evaluate if a pattern or abstraction is necessary for the current scale and requirements. If it only serves "future-proofing" for scenarios unlikely to occur in this specific intranet context, remove it.
 - **Code Cleanliness**: Remove conversational AI artifacts, obvious comments that just repeat code logic, redundant Javadoc/JSDoc tags, and visual separator lines. The code should be self-documenting as much as possible.
+
+### Avoid Over-layered Architecture
+- **Do not use Hexagonal/Onion Architecture**: For a small intranet application, strictly segregating domain models from frameworks is unnecessary and counterproductive. It is perfectly acceptable and encouraged to use Spring Data JPA annotations (`@Entity`, `@Table`, etc.) directly on domain models.
+- **Direct Repository Access**: For simple CRUD operations with no additional business logic, Controllers can safely inject and use Spring Data Repositories directly, skipping the Service layer entirely to reduce boilerplate.
+
+### Simplify Object Creation
+- **Avoid Builders and Factories for Simple Objects**: Remove classes like `PdfFactory` or `ProcessoDetalheBuilder` if they merely instantiate objects or assemble them straightforwardly. Use constructors or static factory methods on the entity/DTO itself.
+
+### Frontend Component Granularity
+- **Avoid Over-modularization**: Do not create highly granular Vue components for trivial UI elements (e.g., creating a dedicated component for a single standard button or input field) unless it encapsulates significant reusable logic or specific styling that cannot be achieved with standard BootstrapVueNext components or utility classes.
