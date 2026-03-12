@@ -10,15 +10,15 @@
     />
     <BCard class="mb-4 mt-4">
       <BCardBody>
-        <h5 class="card-title mb-3">
+        <BCardTitle class="mb-3">
           {{ unidade?.sigla }} - {{ unidade?.nome }}
-        </h5>
+        </BCardTitle>
         <BForm @submit.prevent="criarAtribuicao">
-          <div class="mb-3">
-            <label
-                class="form-label"
-                for="usuario"
-            >Usuário</label>
+          <BFormGroup
+              label="Usuário"
+              label-for="usuario"
+              class="mb-3"
+          >
             <BFormSelect
                 id="usuario"
                 v-model="usuarioSelecionado"
@@ -34,53 +34,55 @@
                     :value="null"
                     disabled
                 >
-                  Selecione um usuário
+                   Selecione um usuário
                 </BFormSelectOption>
               </template>
             </BFormSelect>
             <BFormInvalidFeedback :state="erroUsuario ? false : null">
               {{ erroUsuario }}
             </BFormInvalidFeedback>
-          </div>
+          </BFormGroup>
 
-          <div class="row">
-            <div class="col-md-6 mb-3">
-              <label class="form-label" for="dataInicio">Data de Início</label>
-              <InputData
-                  id="dataInicio"
-                  v-model="dataInicio"
-                  data-testid="input-data-inicio"
-                  max="2099-12-31"
-                  min="2000-01-01"
-                  required
-              />
-            </div>
+          <BRow>
+            <BCol md="6" class="mb-3">
+              <BFormGroup label="Data de Início" label-for="dataInicio">
+                <InputData
+                    id="dataInicio"
+                    v-model="dataInicio"
+                    data-testid="input-data-inicio"
+                    max="2099-12-31"
+                    min="2000-01-01"
+                    required
+                />
+              </BFormGroup>
+            </BCol>
 
-            <div class="col-md-6 mb-3">
-              <label class="form-label" for="dataTermino">Data de Término</label>
-              <InputData
-                  id="dataTermino"
-                  v-model="dataTermino"
-                  data-testid="input-data-termino"
-                  max="2099-12-31"
-                  min="2000-01-01"
-                  required
-              />
-            </div>
-          </div>
+            <BCol md="6" class="mb-3">
+              <BFormGroup label="Data de Término" label-for="dataTermino">
+                <InputData
+                    id="dataTermino"
+                    v-model="dataTermino"
+                    data-testid="input-data-termino"
+                    max="2099-12-31"
+                    min="2000-01-01"
+                    required
+                />
+              </BFormGroup>
+            </BCol>
+          </BRow>
 
-          <div class="mb-3">
-            <label
-                class="form-label"
-                for="justificativa"
-            >Justificativa</label>
+          <BFormGroup
+              label="Justificativa"
+              label-for="justificativa"
+              class="mb-3"
+          >
             <BFormTextarea
                 id="justificativa"
                 v-model="justificativa"
                 data-testid="textarea-justificativa"
                 required
             />
-          </div>
+          </BFormGroup>
           <LoadingButton
               :loading="isLoading"
               data-testid="cad-atribuicao__btn-criar-atribuicao"
@@ -110,11 +112,15 @@ import {
   BButton,
   BCard,
   BCardBody,
+  BCardTitle,
+  BCol,
   BForm,
+  BFormGroup,
   BFormInvalidFeedback,
   BFormSelect,
   BFormSelectOption,
-  BFormTextarea
+  BFormTextarea,
+  BRow
 } from "bootstrap-vue-next";
 import {computed, onMounted, ref} from "vue";
 import {useRouter} from "vue-router";

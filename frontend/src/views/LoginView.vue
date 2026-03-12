@@ -27,18 +27,17 @@
               data-testid="form-login"
               @submit.prevent="handleLogin"
           >
-            <div class="mb-3">
-              <label
-                  class="form-label"
-                  data-testid="lbl-login-usuario"
-                  for="titulo"
-              >
+            <BFormGroup
+                label-for="titulo"
+                class="mb-3"
+            >
+              <template #label>
                 <i
                     aria-hidden="true"
                     class="bi bi-person-circle me-2"
                 />
                 Título eleitoral <span aria-hidden="true" class="text-danger">*</span>
-              </label>
+              </template>
               <!-- eslint-disable vuejs-accessibility/no-autofocus -->
               <BFormInput
                   id="titulo"
@@ -54,19 +53,18 @@
                   type="text"
               />
               <!-- eslint-enable vuejs-accessibility/no-autofocus -->
-            </div>
-            <div class="mb-3">
-              <label
-                  class="form-label"
-                  data-testid="lbl-login-senha"
-                  for="senha"
-              >
+            </BFormGroup>
+            <BFormGroup
+                label-for="senha"
+                class="mb-3"
+            >
+              <template #label>
                 <i
                     aria-hidden="true"
                     class="bi bi-key me-2"
                 />
                 Senha <span aria-hidden="true" class="text-danger">*</span>
-              </label>
+              </template>
               <BInputGroup>
                 <BFormInput
                     id="senha"
@@ -96,32 +94,28 @@
                   </BButton>
                 </template>
               </BInputGroup>
-              <div
+              <BAlert
                   v-if="capsLockAtivado"
-                  class="text-warning small mt-1 d-flex align-items-center"
+                  :model-value="true"
+                  variant="warning"
+                  class="small mt-1 py-1 px-2 mb-0"
                   data-testid="alert-caps-lock"
-                  role="alert"
               >
                 <i
                     aria-hidden="true"
                     class="bi bi-exclamation-triangle-fill me-1"
                 />
                 Caps Lock ativado
-              </div>
-            </div>
+              </BAlert>
+            </BFormGroup>
 
-            <div
+            <BFormGroup
                 v-if="loginStep === 2 && perfisUnidadesDisponiveis.length > 1"
+                label="Selecione o perfil e a unidade"
+                label-for="par"
                 class="mb-3"
                 data-testid="sec-login-perfil"
             >
-              <label
-                  class="form-label"
-                  data-testid="lbl-login-perfil"
-                  for="par"
-              >
-                Selecione o perfil e a unidade
-              </label>
               <BFormSelect
                   id="par"
                   v-model="parSelecionado"
@@ -139,7 +133,7 @@
                   </BFormSelectOption>
                 </template>
               </BFormSelect>
-            </div>
+            </BFormGroup>
 
           <LoadingButton
               :loading="isLoading"
@@ -169,11 +163,13 @@
 
 <script lang="ts" setup>
 import {
+  BAlert,
   BButton,
   BCard,
   BCol,
   BContainer,
   BForm,
+  BFormGroup,
   BFormInput,
   BFormSelect,
   BFormSelectOption,

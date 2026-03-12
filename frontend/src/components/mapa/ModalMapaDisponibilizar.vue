@@ -15,11 +15,13 @@
     <BAlert v-if="fieldErrors?.generic" :model-value="true" variant="danger" class="mb-3">
       {{ fieldErrors.generic }}
     </BAlert>
-    <div class="mb-3">
-      <label
-          class="form-label"
-          for="dataLimite"
-      >Data limite para validação</label>
+    <BFormGroup
+        label="Data limite para validação"
+        label-for="dataLimite"
+        :state="fieldErrors?.dataLimite ? false : null"
+        :invalid-feedback="fieldErrors?.dataLimite"
+        class="mb-3"
+    >
       <InputData
           id="dataLimite"
           v-model="dataLimiteValidacao"
@@ -28,15 +30,14 @@
           max="2099-12-31"
           min="2000-01-01"
       />
-      <BFormInvalidFeedback :state="fieldErrors?.dataLimite ? false : null">
-        {{ fieldErrors?.dataLimite }}
-      </BFormInvalidFeedback>
-    </div>
-    <div class="mb-3">
-      <label
-          class="form-label"
-          for="observacoes"
-      >Observações</label>
+    </BFormGroup>
+    <BFormGroup
+        label="Observações"
+        label-for="observacoes"
+        :state="fieldErrors?.observacoes ? false : null"
+        :invalid-feedback="fieldErrors?.observacoes"
+        class="mb-3"
+    >
       <BFormTextarea
           id="observacoes"
           v-model="observacoesDisponibilizacao"
@@ -45,10 +46,7 @@
           placeholder="Digite observações sobre a disponibilização..."
           rows="3"
       />
-      <BFormInvalidFeedback :state="fieldErrors?.observacoes ? false : null">
-        {{ fieldErrors?.observacoes }}
-      </BFormInvalidFeedback>
-    </div>
+    </BFormGroup>
     <BAlert
         v-if="notificacao"
         :fade="false"
@@ -74,7 +72,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BFormInvalidFeedback, BFormTextarea} from "bootstrap-vue-next";
+import {BAlert, BFormGroup, BFormTextarea} from "bootstrap-vue-next";
 import LoadingButton from "@/components/comum/LoadingButton.vue";
 import ModalPadrao from "@/components/comum/ModalPadrao.vue";
 import InputData from "@/components/comum/InputData.vue";

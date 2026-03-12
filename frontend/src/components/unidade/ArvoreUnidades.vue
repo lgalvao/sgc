@@ -1,21 +1,21 @@
 <template>
   <div class="arvore-unidades">
     <div v-if="modoSelecao && unidadesExibidas.length > 0" class="d-flex gap-2 mb-2">
-      <button
+      <BButton
           aria-label="Selecionar todas as unidades elegíveis"
-          class="btn btn-sm btn-outline-primary"
-          type="button"
+          size="sm"
+          variant="outline-primary"
           @click="selecionarTodas">
         <i aria-hidden="true" class="bi bi-check-all me-1"/>
-      </button>
+      </BButton>
 
-      <button
+      <BButton
           aria-label="Desmarcar todas as unidades"
-          class="btn btn-sm btn-outline-secondary"
-          type="button"
+          size="sm"
+          variant="outline-secondary"
           @click="deselecionarTodas">
         <i aria-hidden="true" class="bi bi-x-lg me-1"/>
-      </button>
+      </BButton>
     </div>
 
     <UnidadeTreeNode
@@ -35,6 +35,7 @@
 
 <script lang="ts" setup>
 import {computed, ref, watch} from "vue";
+import {BButton} from "bootstrap-vue-next";
 import type {Unidade} from "@/types/tipos";
 import UnidadeTreeNode from "./UnidadeTreeNode.vue";
 

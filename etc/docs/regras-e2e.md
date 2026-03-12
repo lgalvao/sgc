@@ -144,35 +144,3 @@ Quando um teste falha por um elemento estar "obstruído" ou "não encontrado", *
 ### Datas e Localização
 
 Sempre use `.toLocaleDateString('pt-BR')` ao comparar datas geradas dinamicamente nos testes (como `Date.now() + dias`) com o conteúdo da tela. O sistema utiliza o padrão brasileiro.
-
-### Captura de IDs de Processos
-
-**Evite capturar IDs de URLs de criação/edição** logo após salvar. O redirecionamento para o Painel pode ocorrer antes que a URL mude para o formato com ID.
-- ✅ PADRÃO SEGURO: Após criar o processo e voltar ao Painel, localize o registro pela descrição, clique para entrar nos detalhes e então use `await extrairProcessoId(page)` na página de detalhes.
-
-### `force: true` vs `dispatchEvent`
-
-- `click({force: true})` — Pula as verificações de "actionability" mas ainda dispara o evento nas coordenadas do elemento. Útil para elementos ocultos por hover.
-- `dispatchEvent('click')` — Dispara o evento DOM diretamente no elemento, ignorando completamente sobreposições visuais. Usar para casos como o `fazerLogout`, onde um toast pode sobrepor o botão.
-
-### Verificar as pré-condições de estado antes de testar uma ação
-
-Se um teste espera que um botão esteja visível/habilitado mas ele não está, **verifique se o subprocesso está na situação correta**. O backend determina as permissões com base no estado do subprocesso (ex: `podeReabrirCadastro` requer `>= MAPA_HOMOLOGADO`). 
-
-**Ação:** Leia a lógica de permissões em `SubprocessoService.java` (método `construirPermissoes`).
-
-## Testes que revelam bugs no frontend (Histórico)
-
-Nem sempre a falha é do teste — o teste pode estar correto e revelando um **bug real do frontend**. Exemplos encontrados:
-
-- **`isProcessoFinalizado` excessivamente restritivo**: `SubprocessoView.vue` tratava `MAPA_HOMOLOGADO` como "processo finalizado", escondendo botões.
-- **Busca flat em árvore hierárquica**: `MapaVisualizacaoView.vue` usava `.find()` flat, falhando em unidades aninhadas.
-
-## Lições aprendidas em correções recentes
-
-- **Evite locators com prefixo de tag desnecessário**:
-    - ❌ `page.locator('table[data-testid="tbl-processos"]')` falha se o `data-testid` for movido para uma `div`.
-    - ✅ USE `page.locator('[data-testid="tbl-processos"]')` para ser agnóstico à tag.
-- **H2: Cuidado com `TRUNCATE` e `REFERENTIAL_INTEGRITY FALSE`**:
-    - Se encontrar `JdbcSQLIntegrityConstraintViolationException` após um reset, substitua o `TRUNCATE` por `DELETE FROM`.
-- **Navegação pós-criação**: Use `await expect(page).toHaveURL(...)` ou `page.waitForURL(...)` após o `click` de salvar.

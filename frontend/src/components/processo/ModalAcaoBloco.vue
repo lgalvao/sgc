@@ -1,5 +1,6 @@
 <template>
   <BModal
+      :id="id"
       v-model="mostrar"
       :title="titulo"
       size="lg"

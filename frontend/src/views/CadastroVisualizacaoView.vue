@@ -54,9 +54,9 @@
         no-body
     >
       <BCardBody class="py-2">
-        <div class="card-title d-flex align-items-center atividade-edicao-row position-relative group-atividade atividade-hover-row atividade-titulo-card">
+        <BCardTitle class="d-flex align-items-center atividade-edicao-row position-relative group-atividade atividade-hover-row atividade-titulo-card">
           <strong class="atividade-descricao" data-testid="txt-atividade-descricao">{{ atividade.descricao }}</strong>
-        </div>
+        </BCardTitle>
         <div class="mt-3 ms-3">
           <div
               v-for="(conhecimento) in atividade.conhecimentos"
@@ -144,7 +144,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BButton, BCard, BCardBody, BFormGroup, BFormInvalidFeedback, BFormTextarea} from "bootstrap-vue-next";
+import {BButton, BCard, BCardBody, BCardTitle, BFormGroup, BFormInvalidFeedback, BFormTextarea} from "bootstrap-vue-next";
 import {computed, onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
 import {storeToRefs} from "pinia";

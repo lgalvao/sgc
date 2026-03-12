@@ -29,37 +29,27 @@
       />
     </div>
 
-    <div v-else class="table-responsive">
-      <table class="table table-striped table-hover">
-        <thead>
-        <tr>
-          <th>Nome</th>
-          <th>Título Eleitoral</th>
-          <th>Matrícula</th>
-          <th>Unidade</th>
-          <th class="text-end">Ações</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr v-for="admin in administradores" :key="admin.tituloEleitoral">
-          <td>{{ admin.nome }}</td>
-          <td>{{ admin.tituloEleitoral }}</td>
-          <td>{{ admin.matricula }}</td>
-          <td>{{ admin.unidadeSigla }}</td>
-          <td class="text-end">
-            <LoadingButton
-                :loading="removendoAdmin === admin.tituloEleitoral"
-                icon="trash"
-                size="sm"
-                text="Remover"
-                variant="outline-danger"
-                @click="confirmarRemocao(admin)"
-            />
-          </td>
-        </tr>
-        </tbody>
-      </table>
-    </div>
+    <BTable
+        v-else
+        :fields="camposAdmins"
+        :items="administradores"
+        striped
+        hover
+        responsive
+    >
+      <template #cell(acoes)="{ item }">
+        <div class="text-end">
+          <LoadingButton
+              :loading="removendoAdmin === item.tituloEleitoral"
+              icon="trash"
+              size="sm"
+              text="Remover"
+              variant="outline-danger"
+              @click="confirmarRemocao(item)"
+          />
+        </div>
+      </template>
+    </BTable>
 
     <!-- Modal: Adicionar administrador -->
     <ModalConfirmacao
@@ -72,22 +62,24 @@
         @confirmar="adicionarAdmin"
         @shown="() => inputTituloRef?.focus()"
     >
-      <div class="mb-3">
-        <label class="form-label" for="usuarioTitulo">Título <span
-aria-hidden="true"
-                                                                   class="text-danger">*</span></label>
-        <input
+      <BFormGroup
+          label-for="usuarioTitulo"
+          class="mb-3"
+      >
+        <template #label>
+          Título <span aria-hidden="true" class="text-danger">*</span>
+        </template>
+        <BFormInput
             id="usuarioTitulo"
             ref="inputTituloRef"
             v-model="novoAdminTitulo"
-            class="form-control"
             maxlength="12"
             placeholder="Digite o título eleitoral"
             required
             type="text"
             @keydown.enter.prevent="adicionarAdmin"
         />
-      </div>
+      </BFormGroup>
     </ModalConfirmacao>
 
     <!-- Modal: Remover Administrador -->
@@ -109,7 +101,7 @@ aria-hidden="true"
 
 <script lang="ts" setup>
 import {onMounted, ref} from 'vue';
-import {BAlert, BButton, BSpinner} from 'bootstrap-vue-next';
+import {BAlert, BButton, BFormGroup, BFormInput, BSpinner, BTable} from 'bootstrap-vue-next';
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import PageHeader from '@/components/layout/PageHeader.vue';
 import EmptyState from '@/components/comum/EmptyState.vue';
@@ -135,7 +127,15 @@ const mostrarModalRemoverAdmin = ref(false);
 const adminParaRemover = ref<AdministradorDto | null>(null);
 const novoAdminTitulo = ref('');
 const adicionandoAdmin = ref(false);
-const inputTituloRef = ref<HTMLInputElement | null>(null);
+const inputTituloRef = ref<InstanceType<typeof BFormInput> | null>(null);
+
+const camposAdmins = [
+  {key: 'nome', label: 'Nome'},
+  {key: 'tituloEleitoral', label: 'Título Eleitoral'},
+  {key: 'matricula', label: 'Matrícula'},
+  {key: 'unidadeSigla', label: 'Unidade'},
+  {key: 'acoes', label: 'Ações', thClass: 'text-end'},
+];
 
 async function carregarAdministradores() {
   carregandoAdmins.value = true;
