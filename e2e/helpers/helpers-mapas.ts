@@ -154,7 +154,7 @@ export async function disponibilizarMapa(page: Page, dataLimite?: string) {
     await page.getByTestId('inp-disponibilizar-mapa-data').fill(data);
     await page.getByTestId('btn-disponibilizar-mapa-confirmar').click();
 
-    await expect(modal).toBeHidden({timeout: 15000});
+    await expect(modal).toBeHidden();
     await verificarPaginaPainel(page);
     await verificarToast(page, /Disponibilização do mapa de competências efetuada/i);
 }

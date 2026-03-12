@@ -4,7 +4,7 @@
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">{{ titulo }}</h5>
-          <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+          <button aria-label="Fechar" class="btn-close" data-bs-dismiss="modal" type="button"></button>
         </div>
         <div class="modal-body">
           <p v-if="texto">{{ texto }}</p>
@@ -42,17 +42,17 @@
               </tr>
               </thead>
               <tbody>
-              <tr v-for="u in unidades" :key="u.codigo">
+              <tr v-for="unidade in unidades" :key="unidade.codigo">
                 <td>
                   <input
-                      v-model="selecionadas"
-                      :value="u.codigo"
+                      v-model="selecionadosLocal"
+                      :value="unidade.codigo"
                       class="form-check-input"
                       type="checkbox"
                   >
                 </td>
-                <td>{{ u.sigla }} - {{ u.nome }}</td>
-                <td>{{ u.situacao }}</td>
+                <td>{{ unidade.sigla }} - {{ unidade.nome }}</td>
+                <td>{{ unidade.situacao }}</td>
               </tr>
               <tr v-if="unidades.length === 0">
                 <td class="text-center py-3 text-muted" colspan="3">
@@ -68,7 +68,7 @@
             Cancelar
           </button>
           <button
-              :disabled="processando || selecionadas.length === 0"
+              :disabled="processando || selecionadosLocal.length === 0"
               class="btn btn-primary"
               type="button"
               @click="confirmar"
@@ -110,20 +110,20 @@ const emit = defineEmits<{
 
 const modalElement = ref<HTMLElement | null>(null);
 const modalInstance = ref<Modal | null>(null);
-const selecionadas = ref<number[]>([]);
+const selecionadosLocal = ref<number[]>([]);
 const dataLimite = ref('');
 const processando = ref(false);
 const erroLocal = ref('');
 
 const todasSelecionadas = computed(() => {
-  return props.unidades.length > 0 && selecionadas.value.length === props.unidades.length;
+  return props.unidades.length > 0 && selecionadosLocal.value.length === props.unidades.length;
 });
 
 function alternarTodas() {
   if (todasSelecionadas.value) {
-    selecionadas.value = [];
+    selecionadosLocal.value = [];
   } else {
-    selecionadas.value = props.unidades.map(u => u.codigo);
+    selecionadosLocal.value = props.unidades.map(u => u.codigo);
   }
 }
 
@@ -151,13 +151,13 @@ function confirmar() {
     return;
   }
   emit('confirmar', {
-    ids: selecionadas.value,
+    ids: selecionadosLocal.value,
     dataLimite: props.mostrarDataLimite ? dataLimite.value : undefined
   });
 }
 
 watch(() => props.unidadesPreSelecionadas, (newVal) => {
-  selecionadas.value = [...(newVal || [])];
+  selecionadosLocal.value = [...(newVal || [])];
 }, {immediate: true});
 
 onMounted(() => {

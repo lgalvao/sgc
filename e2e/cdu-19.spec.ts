@@ -95,6 +95,7 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
 
         await disponibilizarMapa(page, '2030-12-31');
 
+        await verificarPaginaPainel(page);
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, UNIDADE_ALVO);
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa disponibilizado/i);

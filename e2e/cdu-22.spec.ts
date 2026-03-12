@@ -153,8 +153,8 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
         await verificarPaginaPainel(page);
 
         // 4. Logar como GESTOR SECRETARIA_1 e validar o modal de aceite em bloco
-        // Ele deve ver a ASSESSORIA_11 (subordinada direta)
-        // Ele NÃO deve ver a SECAO_111 (está na mesa da COORD_11)
+        // Ele deve ver, apenas, a ASSESSORIA_11 (porque está na sua mesa)
+        // Ele NÃO deve ver a SECAO_111 (porque está na mesa da COORD_11)
         await loginComPerfil(page, USUARIOS.GESTOR_SECRETARIA_1.titulo, USUARIOS.GESTOR_SECRETARIA_1.senha, 'GESTOR - SECRETARIA_1');
         await page.getByTestId('tbl-processos').getByText(descProcesso2).first().click();
 
