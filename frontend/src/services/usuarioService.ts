@@ -161,3 +161,10 @@ export async function buscarUsuarioPorTitulo(
     const response = await apiClient.get(`/usuarios/${titulo}`);
     return response.data;
 }
+
+export async function pesquisarUsuarios(termo: string): Promise<Usuario[]> {
+    const response = await apiClient.get(`/usuarios/pesquisar`, {
+        params: {termo}
+    });
+    return response.data;
+}

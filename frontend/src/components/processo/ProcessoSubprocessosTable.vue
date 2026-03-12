@@ -38,6 +38,7 @@ function mapUnidades(unidades: UnidadeParticipante[]): any[] {
     unidadeAtual: `${u.sigla} - ${u.nome}`,
     sigla: u.sigla,
     situacao: formatSituacaoSubprocesso(u.situacaoSubprocesso),
+    situacaoTooltip: formatSituacaoSubprocesso(u.situacaoSubprocesso),
     dataLimite: formatDate(u.dataLimite, false),
     children: u.filhos ? mapUnidades(u.filhos) : [],
     expanded: true,

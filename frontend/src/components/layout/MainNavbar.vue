@@ -32,7 +32,7 @@
           <div class="d-flex align-items-center">
             <i aria-hidden="true" class="bi bi-person-circle me-2"/>
             <div class="user-info-text">
-              <span class="d-lg-inline">{{ perfilSelecionado }} - {{ unidadeSelecionada }}</span>
+              <span class="d-lg-inline">{{ isAdmin ? 'ADMIN' : `${perfilSelecionado} - ${unidadeSelecionada}` }}</span>
             </div>
           </div>
         </BNavItem>

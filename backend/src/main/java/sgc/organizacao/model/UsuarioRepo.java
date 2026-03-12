@@ -20,4 +20,11 @@ public interface UsuarioRepo extends JpaRepository<Usuario, String> {
             WHERE u.tituloEleitoral IN :titulos
             """)
     List<Usuario> findByIdInWithAtribuicoes(@Param("titulos") List<String> titulos);
+
+    @Query("""
+            SELECT u FROM Usuario u
+            WHERE LOWER(u.nome) LIKE LOWER(CONCAT('%', :termo, '%'))
+            OR u.matricula LIKE CONCAT('%', :termo, '%')
+            """)
+    List<Usuario> searchByNomeOrMatricula(@Param("termo") String termo);
 }

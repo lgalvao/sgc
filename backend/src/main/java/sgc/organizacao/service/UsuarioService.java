@@ -50,6 +50,10 @@ public class UsuarioService {
         return usuarioRepo.findAllById(titulos);
     }
 
+    public List<Usuario> buscarPorNomeOuMatricula(String termo) {
+        return usuarioRepo.searchByNomeOrMatricula(termo);
+    }
+
     public List<UsuarioPerfil> buscarPerfis(String usuarioTitulo) {
         return usuarioPerfilRepo.findByUsuarioTitulo(usuarioTitulo);
     }

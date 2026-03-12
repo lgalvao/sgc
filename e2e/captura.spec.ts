@@ -38,30 +38,114 @@ import * as fs from 'node:fs';
 // Diretório onde as screenshots serão salvas
 const SCREENSHOTS_DIR = path.join(process.cwd(), 'screenshots');
 
-// Criar diretório se não existir
-if (fs.existsSync(SCREENSHOTS_DIR)) {
-    fs.rmSync(SCREENSHOTS_DIR, {recursive: true, force: true});
+// Criar diretório se não existir, tratando erro de permissão no Windows
+try {
+    if (fs.existsSync(SCREENSHOTS_DIR)) {
+        // No Windows, rmSync pode falhar se a pasta estiver aberta no Explorer ou sendo indexada
+        fs.rmSync(SCREENSHOTS_DIR, {recursive: true, force: true});
+    }
+} catch (error) {
+    console.warn(`Aviso: Não foi possível remover o diretório de screenshots (EPERM). Tentando continuar...`);
 }
+
 if (!fs.existsSync(SCREENSHOTS_DIR)) {
-    fs.mkdirSync(SCREENSHOTS_DIR, {recursive: true});
+    try {
+        fs.mkdirSync(SCREENSHOTS_DIR, {recursive: true});
+    } catch (error) {
+        console.error(`Erro crítico: Não foi possível criar o diretório de screenshots: ${error.message}`);
+    }
 }
 
 /**
  * Helper para capturar screenshot com nome organizado
  */
 async function capturarTela(page: Page, categoria: string, nome: string, opcoes?: { fullPage?: boolean }) {
+    const url = page.url();
+    const isFullPage = opcoes?.fullPage ?? true;
+
+    // Injetar banner com a URL no RODAPÉ
+    await page.evaluate(({urlText, fullPage}) => {
+        const id = 'sgc-url-banner';
+        let banner = document.getElementById(id);
+        if (!banner) {
+            banner = document.createElement('div');
+            banner.id = id;
+            document.body.appendChild(banner);
+        }
+
+        Object.assign(banner.style, {
+            position: fullPage ? 'relative' : 'fixed',
+            bottom: '0',
+            left: '0',
+            width: '100%',
+            backgroundColor: '#222',
+            color: '#0f0', // Verde limão para alto contraste
+            fontSize: '11px',
+            padding: '4px 10px',
+            zIndex: '999999',
+            fontFamily: 'monospace',
+            borderTop: '1px solid #444',
+            opacity: '1',
+            textAlign: 'left',
+            boxSizing: 'border-box',
+            marginTop: fullPage ? '10px' : '0'
+        });
+        banner.textContent = `URL: ${urlText}`;
+        
+        if (fullPage) {
+            document.body.appendChild(banner); // Move para o final do body
+        }
+    }, {urlText: url, fullPage: isFullPage});
+
     const nomeArquivo = `${categoria}--${nome}.png`;
     const caminhoCompleto = path.join(SCREENSHOTS_DIR, nomeArquivo);
+    
+    // Pequena espera para garantir que o banner e renderização estabilizem
+    await page.waitForTimeout(100);
+    
     await page.screenshot({
         path: caminhoCompleto,
-        fullPage: opcoes?.fullPage ?? true // Alterado para true por padrão
+        fullPage: isFullPage
+    });
+
+    // Remover banner após a captura
+    await page.evaluate(() => {
+        const banner = document.getElementById('sgc-url-banner');
+        if (banner) banner.remove();
     });
 }
 
 async function capturarComponente(elemento: Locator, categoria: string, nome: string) {
+    const url = elemento.page().url();
+
+    // Para componentes, adicionamos um selo discreto no final
+    await elemento.evaluate((el, urlText) => {
+        const banner = document.createElement('div');
+        banner.id = 'sgc-url-banner-comp';
+        Object.assign(banner.style, {
+            backgroundColor: '#222',
+            color: '#0f0',
+            fontSize: '10px',
+            padding: '2px 6px',
+            fontFamily: 'monospace',
+            marginTop: '5px',
+            display: 'block',
+            width: '100%',
+            boxSizing: 'border-box',
+            borderTop: '1px solid #444'
+        });
+        banner.textContent = `URL: ${urlText}`;
+        el.appendChild(banner);
+    }, url);
+
     const nomeArquivo = `${categoria}--${nome}.png`;
     const caminhoCompleto = path.join(SCREENSHOTS_DIR, nomeArquivo);
     await elemento.screenshot({path: caminhoCompleto});
+
+    await elemento.evaluate((el) => {
+        const banner = el.querySelector('#sgc-url-banner-comp');
+        if (banner) banner.remove();
+    });
 }
 
 async function criarProcessoMapeamentoIniciadoPorFixture(

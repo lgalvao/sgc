@@ -64,11 +64,11 @@ Fluxo principal:
         - `[Perfil] - [Sigla da unidade]` - Texto fixo, sem interatividade (ex. `CHEFE - SESEL`).
         - `Ícone de logout` - faz logout e mostra tela `Login`
     - Se perfil ADMIN:
+        - Mostrar apenas 'ADMIN' sem a sigla da unidade
         - Mostrar adicionalmente dois ícones para acesso as telas  `Configurações` e `Administradores`
 
    9.2. O `Conteúdo` compõe a parte central onde serão 'encaixadas' todas as telas.
 
-   9.3. O `Rodapé` é a seção localizada na parte inferior das telas (exceto na tela de login), em que aparecerá a
-   informação da versão do sistema assim como a informação `Desenvolvido por SESEL/COSIS/TRE-PE`.
+   9.3. O `Rodapé` é a seção localizada na parte inferior das telas (exceto na tela de login), em que aparecerá a informação da versão do sistema assim como a informação `© SESEL/COSIS/TRE-PE`.
 
 10. O sistema mostra inicialmente a tela `Painel`.
