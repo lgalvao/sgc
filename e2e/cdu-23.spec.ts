@@ -1,15 +1,9 @@
  
 import {expect, test} from './fixtures/complete-fixtures.js';
-import {criarProcesso} from './helpers/helpers-processos.js';
-import {
-    adicionarAtividade,
-    adicionarConhecimento,
-    navegarParaAtividades,
-    navegarParaAtividadesVisualizacao
-} from './helpers/helpers-atividades.js';
-import {verificarPaginaPainel} from './helpers/helpers-navegacao.js';
+import {criarProcessoCadastroDisponibilizadoFixture} from './fixtures/fixtures-processos.js';
+import {navegarParaAtividadesVisualizacao} from './helpers/helpers-atividades.js';
 import {aceitarCadastroMapeamento, acessarSubprocessoGestor} from './helpers/helpers-analise.js';
-import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
+import {loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
 
 /**
  * CDU-23 - Homologar cadastros em bloco
@@ -35,51 +29,24 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {
     const timestamp = Date.now();
     const descProcesso = `Mapeamento CDU-23 ${timestamp}`;
 
-    const atividade1 = `Atividade Homol ${timestamp}`;
-
-    test('Setup UI', async ({page}) => {
-        // Preparacao 1: Admin cria e inicia processo
-        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
-        await criarProcesso(page, {
+    test('Setup Data', async ({request}) => {
+        await criarProcessoCadastroDisponibilizadoFixture(request, {
             descricao: descProcesso,
-            tipo: 'MAPEAMENTO',
-            diasLimite: 30,
-            unidade: UNIDADE_1,
-            expandir: ['SECRETARIA_2', 'COORD_22']
+            unidade: UNIDADE_1
         });
+        expect(true).toBeTruthy();
+    });
 
-        const linhaProcesso = page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descProcesso)});
-        await linhaProcesso.click();
-
-        await page.getByTestId('btn-processo-iniciar').click();
-        await page.getByTestId('btn-iniciar-processo-confirmar').click();
-
-        await verificarPaginaPainel(page);
-
-        // Preparacao 2: Chefe disponibiliza cadastro
-        await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
-        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
-        await navegarParaAtividades(page);
-
-        await adicionarAtividade(page, atividade1);
-        await adicionarConhecimento(page, atividade1, 'Conhecimento Homol 1');
-
-        await page.getByTestId('btn-cad-atividades-disponibilizar').click();
-        await page.getByTestId('btn-confirmar-disponibilizacao').click();
-
-        await verificarPaginaPainel(page);
-
-        // Preparacao 2a: Gestor COORD_22 aceita cadastro
-        await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
+    test('Setup Aceites', async ({page, autenticadoComoGestorCoord22}) => {
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_1);
         await navegarParaAtividadesVisualizacao(page);
         await aceitarCadastroMapeamento(page);
 
-        // Preparacao 2b: Gestor SECRETARIA_2 aceita cadastro
         await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_1);
         await navegarParaAtividadesVisualizacao(page);
         await aceitarCadastroMapeamento(page);
+
         expect(true).toBeTruthy();
     });
 

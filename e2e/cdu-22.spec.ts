@@ -1,4 +1,5 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
+import {criarProcessoCadastroDisponibilizadoFixture} from './fixtures/fixtures-processos.js';
 import {criarProcesso} from './helpers/helpers-processos.js';
 import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades.js';
 import {verificarPaginaPainel} from './helpers/helpers-navegacao.js';
@@ -27,42 +28,12 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
     const timestamp = Date.now();
     const descProcesso = `Mapeamento CDU-22 ${timestamp}`;
 
-    const atividade1 = `Atividade Bloco ${timestamp}`;
-
-    test('Cria processo, cadastra atividades e disponibiliza cadastro', async ({page}) => {
-        // Preparacao 1: Admin cria e inicia processo de mapeamento
-        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
-
-        await criarProcesso(page, {
+    test('Setup Data', async ({request}) => {
+        await criarProcessoCadastroDisponibilizadoFixture(request, {
             descricao: descProcesso,
-            tipo: 'MAPEAMENTO',
-            diasLimite: 30,
-            unidade: UNIDADE_1,
-            expandir: ['SECRETARIA_2', 'COORD_22']
+            unidade: UNIDADE_1
         });
-
-        const linhaProcesso = page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descProcesso)});
-        await linhaProcesso.click();
-
-        await page.getByTestId('btn-processo-iniciar').click();
-        await page.getByTestId('btn-iniciar-processo-confirmar').click();
-
-        await verificarPaginaPainel(page);
-        await expect(page.getByTestId('tbl-processos').getByText(descProcesso).first()).toBeVisible();
-
-        // Preparacao 2: Chefe adiciona atividades e disponibiliza cadastro
-        await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
-
-        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
-        await navegarParaAtividades(page);
-
-        await adicionarAtividade(page, atividade1);
-        await adicionarConhecimento(page, atividade1, 'Conhecimento Bloco 1');
-
-        await page.getByTestId('btn-cad-atividades-disponibilizar').click();
-        await page.getByTestId('btn-confirmar-disponibilizacao').click();
-
-        await verificarPaginaPainel(page);
+        expect(true).toBeTruthy();
     });
 
     test('Cenario 1: GESTOR abre modal e cancela aceite em bloco', async ({page, autenticadoComoGestorCoord22}) => {
@@ -119,7 +90,7 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
     test('Cenario 4: Múltiplas unidades disponibilizadas, botão desabilitado para gestor de nível superior (itens com intermediários)', async ({page}) => {
         const timestamp2 = Date.now();
         const descProcesso2 = `Mapeamento Multi CDU-22 ${timestamp2}`;
-        
+
         // 1. Admin cria processo com SECAO_111 e SECAO_121
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 

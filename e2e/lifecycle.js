@@ -166,6 +166,7 @@ function startBackend() {
         `--spring.datasource.url=${dbUrl()}`,
         `--CORS_ALLOWED_ORIGINS=http://localhost:${FRONTEND_PORT},http://localhost:4173`
     ].join(' ');
+    const argsGradle = isWindows ? `--args="${argsAplicacao}"` : `--args=${argsAplicacao}`;
 
     const spawnOptions = {
         cwd: BACKEND_DIR,
@@ -174,7 +175,7 @@ function startBackend() {
         env: normalizarEnv()
     };
 
-    const backendProcess = spawn(gradlewPath, ['bootRun', '-PENV=e2e', `--args="${argsAplicacao}"`], spawnOptions);
+    const backendProcess = spawn(gradlewPath, ['bootRun', '-PENV=e2e', argsGradle], spawnOptions);
     backendProcessos.push(backendProcess);
 
     backendProcess.stdout.on('data', data => log(`BACKEND`, data));

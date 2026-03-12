@@ -37,6 +37,7 @@ import java.util.stream.*;
 @Slf4j
 public class E2eController {
     private static final String SQL_SUBPROCESSO_POR_PROCESSO = " sgc.subprocesso WHERE processo_codigo = ?)";
+    private static final String TITULO_USUARIO_FIXTURE_ADMIN = "111111";
 
     private final JdbcTemplate jdbcTemplate;
     private final NamedParameterJdbcTemplate namedJdbcTemplate;
@@ -319,6 +320,17 @@ public class E2eController {
     }
 
     /**
+     * Cria um processo de mapeamento já iniciado, com cadastro homologado pelo admin
+     * e atividades suficientes para iniciar a montagem do mapa pela UI.
+     */
+    @PostMapping("/fixtures/processo-mapeamento-com-cadastro-homologado")
+    @Transactional
+    @JsonView(ProcessoViews.Publica.class)
+    public Processo criarProcessoMapeamentoComCadastroHomologado(@RequestBody ProcessoFixtureRequest request) {
+        return executeAsAdmin(() -> criarProcessoMapeamentoCadastroHomologadoFixture(request));
+    }
+
+    /**
      * Cria um processo de revisão já iniciado, com mapa preenchido e homologado,
      * para acelerar cenários E2E que começam após o encerramento da revisão.
      */
@@ -327,6 +339,17 @@ public class E2eController {
     @JsonView(ProcessoViews.Publica.class)
     public Processo criarProcessoRevisaoComMapaHomologado(@RequestBody ProcessoFixtureRequest request) {
         return executeAsAdmin(() -> criarProcessoRevisaoHomologadoFixture(request));
+    }
+
+    /**
+     * Cria um processo de revisão já iniciado, com cadastro homologado pelo admin
+     * e mapa vigente prévio suficiente para exibir impactos na tela de ajuste.
+     */
+    @PostMapping("/fixtures/processo-revisao-com-cadastro-homologado")
+    @Transactional
+    @JsonView(ProcessoViews.Publica.class)
+    public Processo criarProcessoRevisaoComCadastroHomologado(@RequestBody ProcessoFixtureRequest request) {
+        return executeAsAdmin(() -> criarProcessoRevisaoCadastroHomologadoFixture(request));
     }
 
     private Processo criarProcessoMapeamentoComMapaNaSituacao(ProcessoFixtureRequest request, String situacaoSubprocesso) {
@@ -384,6 +407,28 @@ public class E2eController {
         return processoFacade.buscarEntidadePorId(procId);
     }
 
+    private Processo criarProcessoMapeamentoCadastroHomologadoFixture(ProcessoFixtureRequest request) {
+        ProcessoFixtureRequest requestIniciado = new ProcessoFixtureRequest(
+                request.descricao(), request.unidadeSigla(), true, request.diasLimite());
+        Processo processo = criarProcessoFixture(requestIniciado, TipoProcesso.MAPEAMENTO);
+
+        Long procId = processo.getCodigo();
+        Unidade unidade = unidadeService.buscarPorSigla(request.unidadeSigla());
+        Unidade admin = unidadeService.buscarPorSigla("ADMIN");
+        Long subId = jdbcTemplate.queryForObject(
+                "SELECT codigo FROM sgc.subprocesso WHERE processo_codigo = ? AND unidade_codigo = ?",
+                Long.class, procId, unidade.getCodigo());
+        Long mapaId = jdbcTemplate.queryForObject(
+                "SELECT codigo FROM sgc.mapa WHERE subprocesso_codigo = ?",
+                Long.class, subId);
+
+        inserirAtividadesFixtureMapaSemCompetencias(mapaId);
+        jdbcTemplate.update("UPDATE sgc.subprocesso SET situacao = 'MAPEAMENTO_CADASTRO_HOMOLOGADO' WHERE codigo = ?", subId);
+        registrarMovimentacaoFixture(subId, admin.getCodigo(), admin.getCodigo(), "Cadastro homologado via fixture");
+
+        return processoFacade.buscarEntidadePorId(procId);
+    }
+
     private Processo criarProcessoRevisaoHomologadoFixture(ProcessoFixtureRequest request) {
         if (request.unidadeSigla().isBlank()) {
             throw new ErroValidacao("Unidade é obrigatória");
@@ -422,6 +467,106 @@ public class E2eController {
         return processoFacade.buscarEntidadePorId(processo.getCodigo());
     }
 
+    private Processo criarProcessoRevisaoCadastroHomologadoFixture(ProcessoFixtureRequest request) {
+        if (request.unidadeSigla().isBlank()) {
+            throw new ErroValidacao("Unidade é obrigatória");
+        }
+
+        int diasLimite = request.diasLimite() != null ? request.diasLimite() : 30;
+        Unidade unidade = unidadeService.buscarPorSigla(request.unidadeSigla());
+        Unidade admin = unidadeService.buscarPorSigla("ADMIN");
+
+        ProcessoFixtureRequest requestMapeamento = new ProcessoFixtureRequest(
+                "Mapa Base Fixture " + System.currentTimeMillis(), request.unidadeSigla(), true, diasLimite);
+        Processo processoMapeamento = criarProcessoFixture(requestMapeamento, TipoProcesso.MAPEAMENTO);
+        Long procMapeamentoId = processoMapeamento.getCodigo();
+        Long subMapeamentoId = jdbcTemplate.queryForObject(
+                "SELECT codigo FROM sgc.subprocesso WHERE processo_codigo = ? AND unidade_codigo = ?",
+                Long.class, procMapeamentoId, unidade.getCodigo());
+        Long mapaVigenteId = jdbcTemplate.queryForObject(
+                "SELECT codigo FROM sgc.mapa WHERE subprocesso_codigo = ?",
+                Long.class, subMapeamentoId);
+
+        Long atividadeBase1Id = inserirAtividadeComConhecimento(mapaVigenteId, "Atividade Fixture 1", "Conhecimento Fixture 1A");
+        Long atividadeBase2Id = inserirAtividadeComConhecimento(mapaVigenteId, "Atividade Fixture 2", "Conhecimento Fixture 2A");
+        Long atividadeBase3Id = inserirAtividadeComConhecimento(mapaVigenteId, "Atividade Fixture 3", "Conhecimento Fixture 3A");
+
+        inserirCompetenciaComAtividade(mapaVigenteId, "Competência Fixture 1", atividadeBase1Id);
+        inserirCompetenciaComAtividade(mapaVigenteId, "Competência Fixture 2", atividadeBase2Id);
+        inserirCompetenciaComAtividade(mapaVigenteId, "Competência Fixture 3", atividadeBase3Id);
+
+        jdbcTemplate.update("UPDATE sgc.subprocesso SET situacao = 'MAPEAMENTO_MAPA_HOMOLOGADO' WHERE codigo = ?", subMapeamentoId);
+        jdbcTemplate.update("UPDATE sgc.processo SET situacao = 'FINALIZADO' WHERE codigo = ?", procMapeamentoId);
+        jdbcTemplate.update("DELETE FROM sgc.unidade_mapa WHERE unidade_codigo = ?", unidade.getCodigo());
+        jdbcTemplate.update("INSERT INTO sgc.unidade_mapa (unidade_codigo, mapa_vigente_codigo) VALUES (?, ?)",
+                unidade.getCodigo(), mapaVigenteId);
+
+        ProcessoFixtureRequest requestRevisao = new ProcessoFixtureRequest(
+                request.descricao(), request.unidadeSigla(), true, diasLimite);
+        Processo processoRevisao = criarProcessoFixture(requestRevisao, TipoProcesso.REVISAO);
+        Long procRevisaoId = processoRevisao.getCodigo();
+        Long subRevisaoId = jdbcTemplate.queryForObject(
+                "SELECT codigo FROM sgc.subprocesso WHERE processo_codigo = ? AND unidade_codigo = ?",
+                Long.class, procRevisaoId, unidade.getCodigo());
+        Long mapaRevisaoId = jdbcTemplate.queryForObject(
+                "SELECT codigo FROM sgc.mapa WHERE subprocesso_codigo = ?",
+                Long.class, subRevisaoId);
+
+        Long atividadeRevisao2Id = jdbcTemplate.queryForObject(
+                "SELECT codigo FROM sgc.atividade WHERE mapa_codigo = ? AND descricao = ?",
+                Long.class, mapaRevisaoId, "Atividade Fixture 2");
+        jdbcTemplate.update("DELETE FROM sgc.conhecimento WHERE atividade_codigo = ?", atividadeRevisao2Id);
+        jdbcTemplate.update("INSERT INTO sgc.conhecimento (atividade_codigo, descricao) VALUES (?, ?)",
+                atividadeRevisao2Id, "Conhecimento Fixture 2B");
+
+        Long atividadeRemovidaId = jdbcTemplate.queryForObject(
+                "SELECT codigo FROM sgc.atividade WHERE mapa_codigo = ? AND descricao = ?",
+                Long.class, mapaRevisaoId, "Atividade Fixture 3");
+        jdbcTemplate.update("DELETE FROM sgc.conhecimento WHERE atividade_codigo = ?", atividadeRemovidaId);
+        jdbcTemplate.update("DELETE FROM sgc.competencia_atividade WHERE atividade_codigo = ?", atividadeRemovidaId);
+        jdbcTemplate.update("DELETE FROM sgc.atividade WHERE codigo = ?", atividadeRemovidaId);
+        jdbcTemplate.update("DELETE FROM sgc.competencia WHERE mapa_codigo = ? AND descricao = ?",
+                mapaRevisaoId, "Competência Fixture 3");
+
+        inserirAtividadeComConhecimento(mapaRevisaoId, "Atividade Nova Revisão Fixture", "Conhecimento Novo");
+        jdbcTemplate.update("UPDATE sgc.subprocesso SET situacao = 'REVISAO_CADASTRO_HOMOLOGADA' WHERE codigo = ?", subRevisaoId);
+        registrarMovimentacaoFixture(subRevisaoId, admin.getCodigo(), admin.getCodigo(), "Revisão homologada via fixture");
+
+        return processoFacade.buscarEntidadePorId(procRevisaoId);
+    }
+
+    private void inserirAtividadesFixtureMapaSemCompetencias(Long mapaId) {
+        inserirAtividadeComConhecimento(mapaId, "Atividade Fixture 1", "Conhecimento Fixture 1A");
+        inserirAtividadeComConhecimento(mapaId, "Atividade Fixture 2", "Conhecimento Fixture 2A");
+        inserirAtividadeComConhecimento(mapaId, "Atividade Fixture 3", "Conhecimento Fixture 3A");
+    }
+
+    private Long inserirAtividadeComConhecimento(Long mapaId, String atividade, String conhecimento) {
+        jdbcTemplate.update("INSERT INTO sgc.atividade (mapa_codigo, descricao) VALUES (?, ?)", mapaId, atividade);
+        Long atividadeId = jdbcTemplate.queryForObject(
+                "SELECT codigo FROM sgc.atividade WHERE mapa_codigo = ? AND descricao = ?",
+                Long.class, mapaId, atividade);
+        jdbcTemplate.update("INSERT INTO sgc.conhecimento (atividade_codigo, descricao) VALUES (?, ?)", atividadeId, conhecimento);
+        return atividadeId;
+    }
+
+    private void inserirCompetenciaComAtividade(Long mapaId, String competencia, Long atividadeId) {
+        jdbcTemplate.update("INSERT INTO sgc.competencia (mapa_codigo, descricao) VALUES (?, ?)", mapaId, competencia);
+        Long competenciaId = jdbcTemplate.queryForObject(
+                "SELECT codigo FROM sgc.competencia WHERE mapa_codigo = ? AND descricao = ?",
+                Long.class, mapaId, competencia);
+        jdbcTemplate.update(
+                "INSERT INTO sgc.competencia_atividade (atividade_codigo, competencia_codigo) VALUES (?, ?)",
+                atividadeId, competenciaId);
+    }
+
+    private void registrarMovimentacaoFixture(Long subId, Long origemId, Long destinoId, String descricao) {
+        jdbcTemplate.update(
+                "INSERT INTO sgc.movimentacao (subprocesso_codigo, unidade_origem_codigo, unidade_destino_codigo, usuario_titulo, data_hora, descricao) " +
+                        "VALUES (?, ?, ?, ?, ?, ?)",
+                subId, origemId, destinoId, TITULO_USUARIO_FIXTURE_ADMIN, LocalDateTime.now(), descricao);
+    }
+
     private String descricaoFixture(ProcessoFixtureRequest request, TipoProcesso tipo) {
         String descReq = request.descricao();
         if (descReq != null && !descReq.isBlank()) {
@@ -435,7 +580,7 @@ public class E2eController {
      */
     private <T> T executeAsAdmin(Supplier<T> operation) {
         var auth = new UsernamePasswordAuthenticationToken(
-                "111111",
+                TITULO_USUARIO_FIXTURE_ADMIN,
                 null,
                 List.of(new SimpleGrantedAuthority("ROLE_ADMIN")));
 

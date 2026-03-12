@@ -1,7 +1,6 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
-import {criarProcesso} from './helpers/helpers-processos.js';
-import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
-import {login, USUARIOS} from './helpers/helpers-auth.js';
+import {criarProcessoFixture} from './fixtures/fixtures-processos.js';
+import {navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
 
 /**
  * CDU-27 - Alterar data limite de subprocesso
@@ -24,24 +23,12 @@ test.describe.serial('CDU-27 - Alterar data limite de subprocesso', () => {
     const timestamp = Date.now();
     const descProcesso = `Mapeamento CDU-27 ${timestamp}`;
 
-    test('Setup UI', async ({page}) => {
-        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
-
-        await criarProcesso(page, {
+    test('Setup Data', async ({request}) => {
+        await criarProcessoFixture(request, {
             descricao: descProcesso,
-            tipo: 'MAPEAMENTO',
-            diasLimite: 30,
             unidade: UNIDADE_1,
-            expandir: ['SECRETARIA_2', 'COORD_22']
+            iniciar: true
         });
-
-        const linhaProcesso = page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descProcesso)});
-        await linhaProcesso.click();
-
-        await page.getByTestId('btn-processo-iniciar').click();
-        await page.getByTestId('btn-iniciar-processo-confirmar').click();
-
-        await verificarPaginaPainel(page);
         expect(true).toBeTruthy();
     });
 
