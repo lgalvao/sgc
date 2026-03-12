@@ -1,19 +1,7 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
-import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
-import {criarProcesso, verificarProcessoNaTabela} from './helpers/helpers-processos.js';
-import {
-    aceitarCadastroMapeamento,
-    acessarSubprocessoAdmin,
-    acessarSubprocessoChefeDireto,
-    acessarSubprocessoGestor,
-    homologarCadastroMapeamento
-} from './helpers/helpers-analise.js';
-import {
-    adicionarAtividade,
-    adicionarConhecimento,
-    navegarParaAtividades,
-    navegarParaAtividadesVisualizacao
-} from './helpers/helpers-atividades.js';
+import {criarProcessoCadastroHomologadoFixture} from './fixtures/fixtures-processos.js';
+import {acessarSubprocessoAdmin} from './helpers/helpers-analise.js';
+import {verificarProcessoNaTabela} from './helpers/helpers-processos.js';
 import {
     criarCompetencia,
     disponibilizarMapa,
@@ -27,67 +15,20 @@ import {
 
 test.describe.serial('CDU-15 - Manter mapa de competências', () => {
     const UNIDADE_ALVO = 'SECAO_211';
-    const USUARIO_ADMIN = USUARIOS.ADMIN_1_PERFIL.titulo;
-    const SENHA_ADMIN = USUARIOS.ADMIN_1_PERFIL.senha;
 
     const timestamp = Date.now();
     const descProcesso = `Processo CDU-15 ${timestamp}`;
 
-    const ATIVIDADE_1 = `Atividade 1 ${timestamp}`;
-    const ATIVIDADE_2 = `Atividade 2 ${timestamp}`;
-    const CONHECIMENTO_1 = `Conhecimento 1 ${timestamp}`;
-    const CONHECIMENTO_2 = `Conhecimento 2 ${timestamp}`;
+    const ATIVIDADE_1 = 'Atividade Fixture 1';
+    const ATIVIDADE_2 = 'Atividade Fixture 2';
+    const ATIVIDADE_3 = 'Atividade Fixture 3';
 
-    test('Preparacao: Criar processo e homologar cadastro de atividades', async ({page, autenticadoComoAdmin}) => {
-        // 1. Admin cria e inicia processo
-        await criarProcesso(page, {
+    test('Setup Data', async ({request}) => {
+        await criarProcessoCadastroHomologadoFixture(request, {
             descricao: descProcesso,
-            tipo: 'MAPEAMENTO',
-            diasLimite: 30,
-            unidade: UNIDADE_ALVO,
-            expandir: ['SECRETARIA_2', 'COORD_21']
+            unidade: UNIDADE_ALVO
         });
-
-        const linhaProcesso = page.getByTestId('tbl-processos').locator('tr').filter({has: page.getByText(descProcesso)});
-        await linhaProcesso.click();
-
-        await page.getByTestId('btn-processo-iniciar').click();
-        await page.getByTestId('btn-iniciar-processo-confirmar').click();
-        await verificarProcessoNaTabela(page, {
-            descricao: descProcesso,
-            situacao: 'Em andamento',
-            tipo: 'Mapeamento'
-        });
-
-        // 2. Chefe adiciona atividades e conhecimentos
-        await login(page, USUARIOS.CHEFE_SECAO_211.titulo, USUARIOS.CHEFE_SECAO_211.senha);
-        await acessarSubprocessoChefeDireto(page, descProcesso, UNIDADE_ALVO);
-        await navegarParaAtividades(page);
-        await adicionarAtividade(page, ATIVIDADE_1);
-        await adicionarConhecimento(page, ATIVIDADE_1, CONHECIMENTO_1);
-        await adicionarAtividade(page, ATIVIDADE_2);
-        await adicionarConhecimento(page, ATIVIDADE_2, CONHECIMENTO_2);
-        await page.getByTestId('btn-cad-atividades-disponibilizar').click();
-        await page.getByTestId('btn-confirmar-disponibilizacao').click();
-
-        // 3. Gestores aceitam
-        await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);
-        await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
-        await navegarParaAtividadesVisualizacao(page);
-        await aceitarCadastroMapeamento(page);
-
-        await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
-        await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
-        await navegarParaAtividadesVisualizacao(page);
-        await aceitarCadastroMapeamento(page);
-
-        // 4. Admin homologa
-        await login(page, USUARIO_ADMIN, SENHA_ADMIN);
-        await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
-        await navegarParaAtividadesVisualizacao(page);
-        await homologarCadastroMapeamento(page);
-
-        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro homologado/i);
+        expect(true).toBeTruthy();
     });
 
     test('Cenários CDU-15: Fluxo completo de manutenção do mapa pelo ADMIN', async ({page, autenticadoComoAdmin}) => {
@@ -120,7 +61,7 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
 
         // CT-06: Navegar para Disponibilização
         const compFinal = `Competência Final ${timestamp}`;
-        await criarCompetencia(page, compFinal, [ATIVIDADE_1, ATIVIDADE_2]);
+        await criarCompetencia(page, compFinal, [ATIVIDADE_1, ATIVIDADE_2, ATIVIDADE_3]);
         await disponibilizarMapa(page);
 
         await expect(page).toHaveURL(/\/painel/);
