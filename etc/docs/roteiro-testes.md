@@ -147,7 +147,7 @@ A hierarquia percorrida pelo subprocesso é:
     * Na tela **Detalhes do processo**, clique na `Seção 221`.
     * Clique no card **Atividades e conhecimentos**.
     * Clique em **Homologar**.
-    * No diálogo de confirmação (título "Homologação do cadastro de atividades e conhecimentos"), clique em **Confirmar
+    * No diálogo de confirmação (título "Homologação do cadastro"), clique em **Confirmar
       **.
     * ✅ **Resultado Esperado:** O sistema redireciona para a tela **Detalhes do subprocesso** com a mensagem "
       Homologação efetivada". A situação do subprocesso muda para "Cadastro homologado".

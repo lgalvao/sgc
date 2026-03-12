@@ -34,25 +34,28 @@
     </div>
 
     <template #footer>
-      <BButton
-          :disabled="loading"
-          data-testid="btn-aceite-mapa-cancelar"
-          variant="secondary"
-          @click="$emit('fecharModal')"
-      >
-        <i aria-hidden="true" class="bi bi-x-circle me-1"/>
-        Cancelar
-      </BButton>
-      <BButton
-          :disabled="loading"
-          data-testid="btn-aceite-mapa-confirmar"
-          variant="success"
-          @click="$emit('confirmarAceitacao', observacao)"
-      >
-        <BSpinner v-if="loading" aria-hidden="true" class="me-1" small/>
-        <i v-else aria-hidden="true" class="bi bi-check-circle me-1"/>
-        {{ loading ? 'Processando...' : 'Aceitar' }}
-      </BButton>
+      <div class="d-flex justify-content-end w-100 gap-3 align-items-center">
+        <BButton
+            :disabled="loading"
+            class="text-decoration-none text-secondary fw-medium btn-cancelar-link"
+            data-testid="btn-aceite-mapa-cancelar"
+            variant="link"
+            @click="$emit('fecharModal')"
+        >
+          <i aria-hidden="true" class="bi bi-x-circle me-1"/>
+          Cancelar
+        </BButton>
+        <BButton
+            :disabled="loading"
+            data-testid="btn-aceite-mapa-confirmar"
+            variant="success"
+            @click="$emit('confirmarAceitacao', observacao)"
+        >
+          <BSpinner v-if="loading" aria-hidden="true" class="me-1" small/>
+          <i v-else aria-hidden="true" class="bi bi-check-circle me-1"/>
+          {{ loading ? 'Processando...' : 'Aceitar' }}
+        </BButton>
+      </div>
     </template>
   </BModal>
 </template>
@@ -96,5 +99,16 @@ const corpoModal = computed(() => {
 .form-control:focus {
   border-color: var(--bs-success);
   box-shadow: 0 0 0 0.2rem rgba(var(--bs-success-rgb), 0.25);
+}
+
+.btn-cancelar-link {
+  padding: 0.375rem 0.75rem;
+  transition: all 0.2s;
+  border-radius: 0.375rem;
+}
+
+.btn-cancelar-link:hover {
+  color: var(--bs-emphasis-color) !important;
+  background-color: var(--bs-secondary-bg);
 }
 </style>

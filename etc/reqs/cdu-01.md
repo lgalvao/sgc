@@ -2,14 +2,12 @@
 
 Ator: Qualquer pessoa autorizada a acessar o sistema (com qualquer dos perfis).
 
-Ator secundário: Sistema Acesso do TRE-PE
-
-Pré-condições:
+## Pré-condições:
 
 - Usuário deve possuir credenciais válidas (título e senha de rede no TRE-PE)
 - Usuário deve estar cadastrado no SGRH com lotação ativa em alguma unidade
 
-Fluxo principal:
+## Fluxo principal:
 
 1. O usuário acessa o sistema
 
@@ -45,8 +43,7 @@ Fluxo principal:
 
    8.4. O sistema guarda o perfil e a unidade definidos
 
-9. O sistema exibe a estrutura de telas da aplicação, composta pelas seções: `Barra de navegação`, `Conteúdo` e
-   `Rodapé`.
+9. O sistema exibe a estrutura de telas da aplicação, composta pelas seções: `Barra de navegação`, `Conteúdo` e `Rodapé`.
 
    9.1. A `Barra de navegação` é sempre mostrada no topo das telas (exceto para tela de login) e tem as seguintes regras de exibição:
 

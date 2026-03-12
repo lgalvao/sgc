@@ -6,7 +6,7 @@ import {limparNotificacoes} from './helpers-navegacao.js';
  * Baseado nos dados de e2e/setup/seed.sql
  */
 export const USUARIOS = {
-    ADMIN_2_PERFIS: {titulo: '111111', senha: 'senha', perfil: 'ADMIN - ADMIN'},
+    ADMIN_2_PERFIS: {titulo: '111111', senha: 'senha', perfil: 'ADMIN'},
     ADMIN_1_PERFIL: {titulo: '191919', senha: 'senha'},
     GESTOR_COORD: {titulo: '222222', senha: 'senha'}, // GESTOR_COORD_11 (COORD_11)
     GESTOR_COORD_21: {titulo: '999999', senha: 'senha'}, // Roger Waters (COORD_21)

@@ -75,24 +75,13 @@
         @submit="handleAdicionarAtividade"
     />
 
-    <!-- Empty State -->
     <EmptyState
         v-if="atividades?.length === 0"
-        :description="`Não há atividades cadastradas. Utilize o campo acima para adicionar uma nova atividade${isChefe ? ' ou importe de outro processo' : ''}.`"
+        :description="`Não há atividades cadastradas. Utilize o campo acima para adicionar uma nova atividade ou importe de outro processo.`"
         data-testid="cad-atividades-empty-state"
         icon="bi-list-check"
         title="Lista de atividades"
     >
-      <BButton
-          v-if="isChefe"
-          :disabled="!podeEditarCadastro"
-          data-testid="btn-empty-state-importar"
-          size="sm"
-          variant="outline-primary"
-          @click="mostrarModalImportar = true"
-      >
-        <i aria-hidden="true" class="bi bi-upload me-2"/> Importar atividades
-      </BButton>
     </EmptyState>
 
     <div
@@ -514,7 +503,7 @@ async function confirmarDisponibilizacao() {
 
   mostrarModalConfirmacao.value = false;
   if (sucesso) {
-    toastStore.setPending("Disponibilizado com sucesso.");
+    toastStore.setPending("Cadastro disponibilizado.");
     await router.push("/painel");
   }
 }

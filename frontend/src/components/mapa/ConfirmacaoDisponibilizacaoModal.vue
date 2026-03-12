@@ -14,20 +14,23 @@
       </p>
     </template>
     <template #footer>
-      <BButton
-          data-testid="btn-disponibilizar-revisao-cancelar"
-          variant="secondary"
-          @click="emit('fechar')"
-      >
-        Cancelar
-      </BButton>
-      <BButton
-          data-testid="btn-confirmar-disponibilizacao"
-          variant="success"
-          @click="emit('confirmar')"
-      >
-        Confirmar
-      </BButton>
+      <div class="d-flex justify-content-end w-100 gap-3 align-items-center">
+        <BButton
+            class="text-decoration-none text-secondary fw-medium btn-cancelar-link"
+            data-testid="btn-disponibilizar-revisao-cancelar"
+            variant="link"
+            @click="emit('fechar')"
+        >
+          Cancelar
+        </BButton>
+        <BButton
+            data-testid="btn-confirmar-disponibilizacao"
+            variant="success"
+            @click="emit('confirmar')"
+        >
+          Confirmar
+        </BButton>
+      </div>
     </template>
   </BModal>
 </template>
@@ -45,3 +48,16 @@ const emit = defineEmits<{
   (e: 'confirmar'): void;
 }>();
 </script>
+
+<style scoped>
+.btn-cancelar-link {
+  padding: 0.375rem 0.75rem;
+  transition: all 0.2s;
+  border-radius: 0.375rem;
+}
+
+.btn-cancelar-link:hover {
+  color: var(--bs-emphasis-color) !important;
+  background-color: var(--bs-secondary-bg);
+}
+</style>

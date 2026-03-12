@@ -164,8 +164,8 @@ Atores: GESTOR e ADMIN
 
     12.3. Caso contrário (impactos detectados):
 
-    12.3.1. O sistema abre um diálogo de confirmação (título `Homologação do cadastro de atividades e conhecimentos`)
-    com a mensagem "Confirma a homologação do cadastro de atividades e conhecimentos?" e os botões `Confirmar` e
+    12.3.1. O sistema abre um diálogo de confirmação (título `Homologação do cadastro`)
+    com a mensagem "Confirma a homologação?" e os botões `Confirmar` e
     `Cancelar`.
 
     12.3.2. Caso o usuário escolha o botão `Cancelar`, o sistema interrompe a operação de homologação do cadastro,

@@ -3,7 +3,6 @@
       :fade="false"
       :model-value="mostrar"
       centered
-      hide-footer
       size="lg"
       title="Impacto no Mapa de Competências"
       @hide="fechar">
@@ -134,14 +133,17 @@
     </BAlert>
 
     <template #footer>
-      <BButton
-          data-testid="btn-fechar-impacto"
-          type="button"
-          variant="secondary"
-          @click="fechar"
-      >
-        Fechar
-      </BButton>
+      <div class="d-flex justify-content-end w-100 gap-3 align-items-center">
+        <BButton
+            class="text-decoration-none text-secondary fw-medium btn-cancelar-link"
+            data-testid="btn-fechar-impacto"
+            type="button"
+            variant="link"
+            @click="fechar"
+        >
+          Fechar
+        </BButton>
+      </div>
     </template>
   </BModal>
 </template>
@@ -178,3 +180,16 @@ function fechar() {
   emit("fechar");
 }
 </script>
+
+<style scoped>
+.btn-cancelar-link {
+  padding: 0.375rem 0.75rem;
+  transition: all 0.2s;
+  border-radius: 0.375rem;
+}
+
+.btn-cancelar-link:hover {
+  color: var(--bs-emphasis-color) !important;
+  background-color: var(--bs-secondary-bg);
+}
+</style>

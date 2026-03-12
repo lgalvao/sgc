@@ -191,9 +191,9 @@ export async function aceitarRevisao(page: Page, observacao: string = '') {
 export async function homologarCadastroMapeamento(page: Page) {
     await page.getByTestId('btn-acao-analisar-principal').click();
 
-    // Modal: "Homologação do cadastro de atividades e conhecimentos"
+    // Modal: "Homologação do cadastro"
     await expect(page.getByRole('dialog')).toBeVisible();
-    await expect(page.getByText(/Confirma a homologação do cadastro de atividades e conhecimentos/i)).toBeVisible();
+    await expect(page.getByText(/Confirma a Homologação do cadastro/i)).toBeVisible();
 
     await page.getByTestId('inp-aceite-cadastro-obs').fill('Homologado sem ressalvas');
 

@@ -486,75 +486,63 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await page.getByRole('button', {name: 'Cancelar'}).click();
             await capturarTela(page, '03-processo', '05-detalhes-processo-apos-cancelar-finalizacao');
         });
+    });
 
-        test('Captura validações de formulário', async ({page}) => {
+    test.describe('04 - Subprocesso e Atividades', () => {
+        test('Captura fluxo completo de atividades (incluindo validações de form)', async ({page}) => {
+            const descricao = `Proc Atividades ${Date.now()}`;
+            const UNIDADE_ALVO = 'SECAO_211';
+
+            // 1. Início: Validações de Formulário (Admin)
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
-
             await page.getByTestId('btn-painel-criar-processo').click();
             await expect(page).toHaveURL(/\/processo\/cadastro/);
 
-            // Capturar estado inicial com botões desativados (formulário vazio)
+            // Estado inicial vazio
             await expect(page.getByTestId('btn-processo-salvar')).toBeDisabled();
-            await expect(page.getByTestId('btn-processo-iniciar')).toBeDisabled();
             await capturarTela(page, '03-processo', '10-botoes-desativados-form-vazio');
 
-            // Preencher apenas descrição (botões ainda desativados)
-            await page.getByTestId('inp-processo-descricao').fill('Teste Validação');
+            // Preencher descrição
+            await page.getByTestId('inp-processo-descricao').fill(descricao);
             await expect(page.getByTestId('btn-processo-salvar')).toBeDisabled();
-            await expect(page.getByTestId('btn-processo-iniciar')).toBeDisabled();
             await capturarTela(page, '03-processo', '11-botoes-desativados-falta-data-unidade');
 
-            // Selecionar tipo de processo (necessário para carregar árvore de unidades)
+            // Selecionar tipo
             await page.getByTestId('sel-processo-tipo').selectOption('MAPEAMENTO');
 
-            // Preencher data limite (botões ainda desativados - falta unidade)
+            // Preencher data
             const dataLimite = new Date();
             dataLimite.setDate(dataLimite.getDate() + 30);
             await page.getByTestId('inp-processo-data-limite').fill(dataLimite.toISOString().split('T')[0]);
             await expect(page.getByTestId('btn-processo-salvar')).toBeDisabled();
-            await expect(page.getByTestId('btn-processo-iniciar')).toBeDisabled();
             await capturarTela(page, '03-processo', '12-botoes-desativados-falta-unidade');
 
-            // Expandir e selecionar unidade (agora botões devem estar ativados)
+            // Selecionar unidade e validar ativação
             await expect(page.getByText('Carregando unidades...')).toBeHidden();
-            await page.getByTestId('btn-arvore-expand-SECRETARIA_1').click();
-            await expect(page.getByTestId('chk-arvore-unidade-ASSESSORIA_11')).toBeVisible();
-            await page.getByTestId('chk-arvore-unidade-ASSESSORIA_11').click();
+            await page.getByTestId('btn-arvore-expand-SECRETARIA_2').click();
+            await expect(page.getByTestId('btn-arvore-expand-COORD_21')).toBeVisible();
+            await page.getByTestId('btn-arvore-expand-COORD_21').click();
+            await expect(page.getByTestId('chk-arvore-unidade-SECAO_211')).toBeVisible();
+            await page.getByTestId('chk-arvore-unidade-SECAO_211').click();
             await expect(page.getByTestId('btn-processo-salvar')).toBeEnabled();
-            await expect(page.getByTestId('btn-processo-iniciar')).toBeEnabled();
             await capturarTela(page, '03-processo', '13-botoes-ativados-form-completo');
-        });
-    });
 
-    test.describe('04 - Subprocesso e Atividades', () => {
-        test('Captura fluxo completo de atividades', async ({page}) => {
-            const descricao = `Proc Atividades ${Date.now()}`;
-            const UNIDADE_ALVO = 'SECAO_211';
-
-            // Admin cria processo
-            await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
-
-            await criarProcesso(page, {
-                descricao,
-                tipo: 'MAPEAMENTO',
-                diasLimite: 30,
-                unidade: UNIDADE_ALVO,
-                expandir: ['SECRETARIA_2', 'COORD_21']
-            });
-
-            const linhaProcesso = page.getByTestId('tbl-processos').locator('tr').filter({has: page.getByText(descricao)});
-            await linhaProcesso.click();
-            const processoId = await extrairProcessoId(page);
-            if (processoId > 0) cleanup.registrar(processoId);
-
-            await iniciarProcessoPeloCadastro(page, {
+            // 2. Iniciar Processo
+            await page.getByTestId('btn-processo-iniciar').click();
+            await confirmarInicioProcessoPeloDialogo(page, {
                 descricao,
                 tipo: 'MAPEAMENTO'
             });
 
-            // login como Chefe
-            await login(page, USUARIOS.CHEFE_SECAO_211.titulo, USUARIOS.CHEFE_SECAO_211.senha);
+            // Registrar para cleanup
+            const linhaProcesso = page.getByTestId('tbl-processos').locator('tr').filter({has: page.getByText(descricao)});
+            await linhaProcesso.click();
+            await page.waitForURL(/\/processo\/\d+/);
+            const processoId = await extrairProcessoId(page);
+            if (processoId > 0) cleanup.registrar(processoId);
 
+            // 3. Login como Chefe para Fluxo de Atividades
+            await login(page, USUARIOS.CHEFE_SECAO_211.titulo, USUARIOS.CHEFE_SECAO_211.senha);
             await page.getByTestId('tbl-processos').getByText(descricao).first().click();
             await navegarParaSubprocesso(page, UNIDADE_ALVO);
             await capturarTela(page, '04-subprocesso', '01-dashboard-subprocesso', {fullPage: true});
@@ -1027,12 +1015,10 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
     // ADMIN - CONSULTAS E CONFIGURAÇÕES
     test.describe('Admin - Consultas e Configurações', () => {
-        test.beforeEach(async ({page}) => {
+        test('Captura telas administrativas (Unidades, Histórico, Configurações e Relatórios)', async ({page}) => {
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
-        });
 
-        test('Captura página de unidades e atribuição temporária', async ({page}) => {
-            // Navegar para página de unidades
+            // 1. Unidades e Atribuição Temporária
             const linkUnidades = page.getByRole('link', {name: /Unidades/i});
             await expect(linkUnidades).toBeVisible();
             await linkUnidades.click();
@@ -1062,10 +1048,8 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await page.waitForTimeout(300);
             await capturarTela(page, '11-unidades', '04-modal-criar-atribuicao');
             await page.getByRole('button', {name: /Cancelar/i}).click();
-        });
 
-        test('Captura seção de histórico', async ({page}) => {
-            // Acessar seção de histórico
+            // 2. Histórico
             const linkHistorico = page.getByRole('link', {name: /Histórico/i});
             await expect(linkHistorico).toBeVisible();
             await linkHistorico.click();
@@ -1076,34 +1060,28 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await expect(tabela).toBeVisible();
             await capturarTela(page, '12-historico', '02-tabela-processos-finalizados', {fullPage: true});
             await capturarComponente(tabela.first(), '12-historico', '03-tabela-processos-finalizados-detalhe');
-        });
 
-        test('Captura página de configurações e administradores', async ({page}) => {
-            // Página de parâmetros (CDU-31)
+            // 3. Configurações e Administradores
             await page.getByTestId('btn-configuracoes').click();
             await page.waitForTimeout(500);
             await capturarTela(page, '13-configuracoes', '01-pagina-parametros', {fullPage: true});
 
-            // Seção de configurações do sistema (CDU-31)
             const inputDiasInativacao = page.getByLabel(/Dias para inativação de processos/i);
             await expect(inputDiasInativacao).toBeVisible();
             await capturarTela(page, '13-configuracoes', '02-config-sistema');
 
-            // Página de administradores (CDU-30)
             await page.getByTestId('btn-administradores').click();
             await page.waitForTimeout(500);
             await capturarTela(page, '13-configuracoes', '03-lista-administradores', {fullPage: true});
 
-            // Botão de adicionar administrador
             const btnAdicionar = page.getByRole('button', {name: /Adicionar|Novo/i});
             await expect(btnAdicionar).toBeVisible();
             await btnAdicionar.click();
             await page.waitForTimeout(300);
             await capturarTela(page, '13-configuracoes', '04-modal-adicionar-administrador');
             await page.getByRole('button', {name: /Cancelar/i}).click();
-        });
 
-        test('Captura página e modais de relatórios', async ({page}) => {
+            // 4. Relatórios
             const linkRelatorios = page.getByRole('link', {name: /Relatórios/i});
             await expect(linkRelatorios).toBeVisible();
             await linkRelatorios.click();

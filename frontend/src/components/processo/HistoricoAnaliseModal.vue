@@ -3,7 +3,6 @@
       :fade="false"
       :model-value="mostrar"
       centered
-      hide-footer
       size="lg"
       title="Histórico de Análises"
       @hide="fechar"
@@ -54,13 +53,16 @@
       </template>
     </div>
     <template #footer>
-      <BButton
-          data-testid="btn-modal-fechar"
-          variant="secondary"
-          @click="fechar"
-      >
-        Fechar
-      </BButton>
+      <div class="d-flex justify-content-end w-100 gap-3 align-items-center">
+        <BButton
+            class="text-decoration-none text-secondary fw-medium btn-cancelar-link"
+            data-testid="btn-modal-fechar"
+            variant="link"
+            @click="fechar"
+        >
+          Fechar
+        </BButton>
+      </div>
     </template>
   </BModal>
 </template>
@@ -97,5 +99,14 @@ function fechar() {
 </script>
 
 <style scoped>
-/* Estilos específicos para o modal, se necessário */
+.btn-cancelar-link {
+  padding: 0.375rem 0.75rem;
+  transition: all 0.2s;
+  border-radius: 0.375rem;
+}
+
+.btn-cancelar-link:hover {
+  color: var(--bs-emphasis-color) !important;
+  background-color: var(--bs-secondary-bg);
+}
 </style>

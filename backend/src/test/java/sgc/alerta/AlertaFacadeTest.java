@@ -111,9 +111,8 @@ class AlertaFacadeTest {
     @DisplayName("Métodos: criação de alertas específicos")
     class AlertasEspecificos {
         @Test
-        @DisplayName("Deve criar alerta de cadastro disponibilizado com sucesso")
+        @DisplayName("Deve criar alerta de cadastro disponibilizado")
         void deveCriarAlertaCadastroDisponibilizado() {
-
             Processo p = new Processo();
             p.setDescricao("P");
             Unidade uOrigem = new Unidade();
