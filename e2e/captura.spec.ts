@@ -52,7 +52,7 @@ if (!fs.existsSync(SCREENSHOTS_DIR)) {
     try {
         fs.mkdirSync(SCREENSHOTS_DIR, {recursive: true});
     } catch (error) {
-        console.error(`Erro crítico: Não foi possível criar o diretório de screenshots: ${error.message}`);
+        console.error(`Erro crítico: Não foi possível criar o diretório de screenshots: ${error instanceof Error ? error.message : String(error)}`);
     }
 }
 

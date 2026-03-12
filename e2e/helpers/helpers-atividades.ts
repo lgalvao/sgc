@@ -170,19 +170,11 @@ export async function verificarBotaoDisponibilizar(page: Page, habilitado: boole
 }
 
 export async function verificarBotaoImpactoDropdown(page: Page) {
-    const btnMaisAcoes = page.getByTestId('btn-mais-acoes');
-    await expect(btnMaisAcoes).toBeVisible();
-    await btnMaisAcoes.click();
     await expect(page.getByTestId('cad-atividades__btn-impactos-mapa-edicao')).toBeVisible();
-    await btnMaisAcoes.click();
 }
 
 export async function verificarBotaoHistoricoAnalise(page: Page) {
-    const btnMaisAcoes = page.getByTestId('btn-mais-acoes');
-    await expect(btnMaisAcoes).toBeVisible();
-    await btnMaisAcoes.click();
     await expect(page.getByTestId('btn-cad-atividades-historico')).toBeVisible();
-    await btnMaisAcoes.click();
 }
 
 export async function verificarBotaoImpactoDireto(page: Page) {
@@ -190,11 +182,7 @@ export async function verificarBotaoImpactoDireto(page: Page) {
 }
 
 export async function verificarBotaoImpactoAusenteEdicao(page: Page) {
-    const btnMaisAcoes = page.getByTestId('btn-mais-acoes');
-    await expect(btnMaisAcoes).toBeVisible();
-    await btnMaisAcoes.click();
     await expect(page.getByTestId('cad-atividades__btn-impactos-mapa-edicao')).toBeHidden();
-    await btnMaisAcoes.click();
 }
 
 export async function verificarBotaoImpactoAusenteDireto(page: Page) {
@@ -202,7 +190,6 @@ export async function verificarBotaoImpactoAusenteDireto(page: Page) {
 }
 
 export async function abrirModalImpactoEdicao(page: Page) {
-    await page.getByTestId('btn-mais-acoes').click();
     await page.getByTestId('cad-atividades__btn-impactos-mapa-edicao').click();
     await expect(page.getByRole('dialog')).toBeVisible();
 }
@@ -223,7 +210,6 @@ export async function selecionarAtividadesParaImportacao(page: Page, processoOri
     if (await btnEmptyState.isVisible()) {
         await btnEmptyState.click();
     } else {
-        await page.getByTestId('btn-mais-acoes').click();
         await page.getByTestId('btn-cad-atividades-importar').click();
     }
 
@@ -319,7 +305,6 @@ export async function verificarOpcoesImportacao(
     if (await btnEmptyState.isVisible()) {
         await btnEmptyState.click();
     } else {
-        await page.getByTestId('btn-mais-acoes').click();
         await page.getByTestId('btn-cad-atividades-importar').click();
     }
 

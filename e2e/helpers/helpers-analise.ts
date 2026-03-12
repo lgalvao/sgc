@@ -72,9 +72,6 @@ export async function acessarSubprocessoAdmin(page: Page, descricaoProcesso: str
  * Abre modal de histórico de análise (tela de edição - CadAtividades)
  */
 export async function abrirHistoricoAnalise(page: Page) {
-    // Dropdown "Mais ações" deve ser aberto primeiro
-    await page.getByTestId('btn-mais-acoes').click();
-    // Aguardar o item do menu estar visível
     const itemHistorico = page.getByTestId('btn-cad-atividades-historico');
     await expect(itemHistorico).toBeVisible();
     await itemHistorico.click();
@@ -193,7 +190,7 @@ export async function homologarCadastroMapeamento(page: Page) {
 
     // Modal: "Homologação do cadastro"
     await expect(page.getByRole('dialog')).toBeVisible();
-    await expect(page.getByText(/Confirma a Homologação do cadastro/i)).toBeVisible();
+    await expect(page.getByText(/Confirma a homologação\?/i)).toBeVisible();
 
     await page.getByTestId('inp-aceite-cadastro-obs').fill('Homologado sem ressalvas');
 

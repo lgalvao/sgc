@@ -25,7 +25,8 @@ test.describe('CDU-01 - Realizar login e exibir estrutura das telas', () => {
             USUARIOS.ADMIN_2_PERFIS.perfil
         );
 
-        await expect(page.getByText('ADMIN - ADMIN')).toBeVisible();
+        // Para perfil ADMIN, a navbar exibe apenas 'ADMIN' (sem unidade)
+        await expect(page.locator('.user-info-text').getByText('ADMIN')).toBeVisible();
     });
 
     test('Deve exibir barra de navegação após login como ADMIN', async ({page, autenticadoComoAdmin}) => {
@@ -93,7 +94,8 @@ test.describe('CDU-01 - Realizar login e exibir estrutura das telas', () => {
     test('Deve exibir informações do usuário e controles', async ({page, autenticadoComoAdmin}) => {
         // Login como ADMIN (191919)
 
-        await expect(page.getByText('ADMIN - ADMIN')).toBeVisible();
+        // Para perfil ADMIN, a navbar exibe apenas 'ADMIN' (sem unidade)
+        await expect(page.locator('.user-info-text').getByText('ADMIN')).toBeVisible();
 
         await expect(page.getByTestId('btn-configuracoes')).toBeVisible();
         await expect(page.getByTestId('btn-administradores')).toBeVisible();
