@@ -66,7 +66,7 @@ describe("ImpactoMapaModal.vue", () => {
 
         expect(wrapper.text()).toContain("Atividades Removidas");
         expect(wrapper.text()).toContain("Atividade Removida");
-        const item = wrapper.find('[data-testid="lista-atividades-removidas"] li strong');
+        const item = wrapper.find('[data-testid="lista-atividades-removidas"] strong');
         expect(item.classes()).toContain("text-decoration-line-through");
     });
 

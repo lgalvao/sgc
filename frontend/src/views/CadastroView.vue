@@ -14,12 +14,12 @@
             <i aria-hidden="true" class="bi bi-arrow-left"/>
           </BButton>
           <span>{{ sigla }} - {{ nomeUnidade }}</span>
-          <span
+          <BBadge
               v-if="subprocesso"
-              :class="badgeClass(subprocesso.situacao)"
-              class="badge fs-6"
+              :variant="badgeVariant(subprocesso.situacao)"
+              class="fs-6"
               data-testid="cad-atividades__txt-badge-situacao"
-          >{{ formatSituacaoSubprocesso(subprocesso.situacao) }}</span>
+          >{{ formatSituacaoSubprocesso(subprocesso.situacao) }}</BBadge>
         </div>
       </template>
       <template #actions>
@@ -165,7 +165,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BButton, BDropdown, BDropdownItem} from "bootstrap-vue-next";
+import {BAlert, BButton, BDropdown, BDropdownItem, BBadge} from "bootstrap-vue-next";
 import {computed, nextTick, onMounted, ref, watch} from "vue";
 import {useRouter} from "vue-router";
 import {storeToRefs} from "pinia";
@@ -205,6 +205,12 @@ import {listarAnalisesCadastro} from "@/services/analiseService";
 import {useErrorHandler} from "@/composables/useErrorHandler";
 
 type DadosRemocao = { tipo: "atividade" | "conhecimento"; index: number; conhecimentoCodigo?: number } | null;
+
+function badgeVariant(situacao: SituacaoSubprocesso): any {
+  const cls = badgeClass(situacao);
+  const match = cls.match(/bg-(\w+)/);
+  return match ? match[1] : 'secondary';
+}
 
 const props = defineProps<{
   codProcesso: number | string;

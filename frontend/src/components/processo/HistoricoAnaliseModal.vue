@@ -10,9 +10,7 @@
   >
     <div data-testid="modal-historico-body">
       <div v-if="loading" class="text-center py-4">
-        <output aria-label="Carregando dados" class="spinner-border text-primary">
-          <span class="visually-hidden">Carregando...</span>
-        </output>
+        <BSpinner label="Carregando dados" variant="primary" />
       </div>
       <template v-else>
         <BAlert
@@ -68,7 +66,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BButton, BModal, BTable} from "bootstrap-vue-next";
+import {BAlert, BButton, BModal, BTable, BSpinner} from "bootstrap-vue-next";
 import type {AnaliseCadastro, AnaliseValidacao} from "@/types/tipos";
 import {formatDateTimeBR} from "@/utils/dateUtils";
 

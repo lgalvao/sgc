@@ -34,10 +34,11 @@
             :variant="(okVariant || variant || 'primary') as any"
             @click="confirmar"
         >
-          <output
+          <BSpinner
               v-if="loading"
               aria-hidden="true"
-              class="spinner-border spinner-border-sm me-1"
+              class="me-1"
+              small
           />
           {{ loading ? (okTitle === 'Confirmar' ? 'Processando...' : okTitle) : okTitle }}
         </BButton>
@@ -47,7 +48,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BButton, BModal} from "bootstrap-vue-next";
+import {BButton, BModal, BSpinner} from "bootstrap-vue-next";
 import {computed, ref} from "vue";
 
 const props = withDefaults(defineProps<{

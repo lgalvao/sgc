@@ -14,9 +14,7 @@
     </PageHeader>
 
     <div v-if="carregandoAdmins" class="text-center py-4">
-      <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Carregando...</span>
-      </div>
+      <BSpinner label="Carregando..." variant="primary" />
     </div>
 
     <BAlert v-else-if="erroAdmins" :model-value="true" variant="danger">
@@ -111,7 +109,7 @@ aria-hidden="true"
 
 <script lang="ts" setup>
 import {onMounted, ref} from 'vue';
-import {BAlert, BButton} from 'bootstrap-vue-next';
+import {BAlert, BButton, BSpinner} from 'bootstrap-vue-next';
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import PageHeader from '@/components/layout/PageHeader.vue';
 import EmptyState from '@/components/comum/EmptyState.vue';

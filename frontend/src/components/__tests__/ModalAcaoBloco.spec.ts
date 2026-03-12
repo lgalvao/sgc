@@ -1,26 +1,12 @@
-import {beforeEach, describe, expect, it, vi} from "vitest";
-import {mount} from "@vue/test-utils";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { mount } from "@vue/test-utils";
 import ModalAcaoBloco from "../processo/ModalAcaoBloco.vue";
-
-const {mockShow, mockHide} = vi.hoisted(() => ({
-    mockShow: vi.fn(),
-    mockHide: vi.fn(),
-}));
-
-vi.mock("bootstrap", () => {
-    return {
-        Modal: class {
-            show = mockShow;
-            hide = mockHide;
-            dispose = vi.fn();
-        }
-    };
-});
+import { BButton } from "bootstrap-vue-next";
 
 describe("ModalAcaoBloco.vue", () => {
     const mockUnidades = [
-        {codigo: 1, sigla: "U1", nome: "Unidade 1", situacao: "Pendente"},
-        {codigo: 2, sigla: "U2", nome: "Unidade 2", situacao: "Pendente"},
+        { codigo: 1, sigla: "U1", nome: "Unidade 1", situacao: "Pendente" },
+        { codigo: 2, sigla: "U2", nome: "Unidade 2", situacao: "Pendente" },
     ];
 
     const defaultProps = {
@@ -33,9 +19,28 @@ describe("ModalAcaoBloco.vue", () => {
     };
 
     const createWrapper = (props = {}) => {
-        return mount(ModalAcaoBloco, {
-            props: {...defaultProps, ...props},
+        const wrapper = mount(ModalAcaoBloco, {
+            props: { ...defaultProps, ...props },
+            global: {
+                stubs: {
+                    BModal: {
+                        template: '<div><slot /><slot name="footer" /></div>'
+                    },
+                    BTable: false,
+                    BFormCheckbox: false,
+                    BButton: false,
+                    BSpinner: true,
+                    BAlert: {
+                        template: '<div><slot /></div>'
+                    },
+                    BFormGroup: {
+                        template: '<div><slot /></div>'
+                    },
+                    InputData: true
+                }
+            }
         });
+        return wrapper;
     };
 
     beforeEach(() => {
@@ -47,16 +52,20 @@ describe("ModalAcaoBloco.vue", () => {
         await wrapper.vm.$nextTick();
 
         (wrapper.vm as any).abrir();
-        expect(mockShow).toHaveBeenCalled();
+        expect((wrapper.vm as any).mostrar).toBe(true);
     });
 
     it("deve selecionar/deselecionar todas as unidades", async () => {
         const wrapper = createWrapper();
+        (wrapper.vm as any).abrir();
+        await wrapper.vm.$nextTick();
+
         const checkboxTodos = wrapper.find('thead input[type="checkbox"]');
+        expect(checkboxTodos.exists()).toBe(true);
 
         await checkboxTodos.setValue(true);
-        // Checking DOM:
         const checkboxes = wrapper.findAll('tbody input[type="checkbox"]');
+        expect(checkboxes.length).toBe(2);
         expect((checkboxes[0].element as HTMLInputElement).checked).toBe(true);
         expect((checkboxes[1].element as HTMLInputElement).checked).toBe(true);
 
@@ -64,17 +73,25 @@ describe("ModalAcaoBloco.vue", () => {
         expect((checkboxes[0].element as HTMLInputElement).checked).toBe(false);
     });
 
-    it("deve inicializar com unidades pré-selecionadas", () => {
-        const wrapper = createWrapper({unidadesPreSelecionadas: [1]});
+    it("deve inicializar com unidades pré-selecionadas", async () => {
+        const wrapper = createWrapper({ unidadesPreSelecionadas: [1] });
+        (wrapper.vm as any).abrir();
+        await wrapper.vm.$nextTick();
+
         const checkboxes = wrapper.findAll('tbody input[type="checkbox"]');
+        expect(checkboxes.length).toBe(2);
         expect((checkboxes[0].element as HTMLInputElement).checked).toBe(true); // U1
         expect((checkboxes[1].element as HTMLInputElement).checked).toBe(false); // U2
     });
 
     it("deve emitir 'confirmar' com os IDs selecionados", async () => {
-        const wrapper = createWrapper({unidadesPreSelecionadas: [2]});
+        const wrapper = createWrapper({ unidadesPreSelecionadas: [2] });
+        (wrapper.vm as any).abrir();
+        await wrapper.vm.$nextTick();
 
-        await wrapper.find('.btn-primary').trigger('click');
+        const btnConfirmar = wrapper.findAllComponents(BButton).find(b => b.text().includes("Confirmar"));
+        expect(btnConfirmar?.exists()).toBe(true);
+        await btnConfirmar?.trigger('click');
 
         expect(wrapper.emitted('confirmar')).toBeTruthy();
         expect(wrapper.emitted('confirmar')![0][0]).toEqual({
@@ -88,15 +105,19 @@ describe("ModalAcaoBloco.vue", () => {
             unidadesPreSelecionadas: [1],
             mostrarDataLimite: true
         });
+        (wrapper.vm as any).abrir();
+        await wrapper.vm.$nextTick();
 
-        // Try confirming without date
-        await wrapper.find('.btn-primary').trigger('click');
+        const btnConfirmar = wrapper.findAllComponents(BButton).find(b => b.text().includes("Confirmar"));
+        await btnConfirmar?.trigger('click');
+        
         expect(wrapper.emitted('confirmar')).toBeFalsy();
         expect(wrapper.text()).toContain("A data limite é obrigatória");
 
-        // Set date
-        await wrapper.find('#dataLimiteBloco').setValue('2024-12-31');
-        await wrapper.find('.btn-primary').trigger('click');
+        (wrapper.vm as any).dataLimite = '2024-12-31';
+        await wrapper.vm.$nextTick();
+        
+        await btnConfirmar?.trigger('click');
 
         expect(wrapper.emitted('confirmar')).toBeTruthy();
         expect(wrapper.emitted('confirmar')![0][0]).toEqual({
@@ -107,12 +128,16 @@ describe("ModalAcaoBloco.vue", () => {
 
     it("deve fechar o modal e limpar estado", () => {
         const wrapper = createWrapper();
-        // Simulate open state with error and processing
+        (wrapper.vm as any).abrir();
         (wrapper.vm as any).setProcessando(true);
         (wrapper.vm as any).setErro("Erro");
 
         (wrapper.vm as any).fechar();
 
-        expect(mockHide).toHaveBeenCalled();
+        expect((wrapper.vm as any).mostrar).toBe(false);
+        expect((wrapper.vm as any).processando).toBe(false);
+        expect((wrapper.vm as any).erro).toBe(null);
     });
 });
+
+

@@ -99,15 +99,16 @@
               </div>
               <div v-if="atividade.conhecimentos && atividade.conhecimentos.length > 0" class="ms-4 mt-2">
                 <div class="d-flex flex-wrap gap-2">
-                  <span
+                  <BBadge
                       v-for="c in atividade.conhecimentos"
                       :key="c.codigo"
-                      class="badge bg-white text-dark border fw-normal py-1 px-2"
+                      variant="light"
+                      class="bg-white text-dark border fw-normal py-1 px-2"
                       data-testid="txt-conhecimento-item"
                   >
                     <i aria-hidden="true" class="bi bi-book me-1 text-info"/>
                     {{ c.descricao }}
-                  </span>
+                  </BBadge>
                 </div>
               </div>
             </div>
@@ -236,7 +237,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BButton, BCard, BFormTextarea, BModal} from "bootstrap-vue-next";
+import {BButton, BCard, BFormTextarea, BModal, BBadge} from "bootstrap-vue-next";
 import {computed, onMounted, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';

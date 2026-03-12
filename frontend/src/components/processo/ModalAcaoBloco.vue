@@ -1,88 +1,69 @@
 <template>
-  <div :id="id" ref="modalElement" aria-hidden="true" class="modal fade" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">{{ titulo }}</h5>
-          <button aria-label="Fechar" class="btn-close" data-bs-dismiss="modal" type="button"></button>
-        </div>
-        <div class="modal-body">
-          <p class="mb-3">{{ texto }}</p>
+  <BModal
+      v-model="mostrar"
+      :title="titulo"
+      size="lg"
+      @hide="fechar"
+  >
+    <p class="mb-3">{{ texto }}</p>
 
-          <div v-if="erro" class="alert alert-danger mb-3">
-            {{ erro }}
-          </div>
+    <BAlert v-if="erro" :model-value="true" variant="danger" class="mb-3">
+      {{ erro }}
+    </BAlert>
 
-          <div v-if="mostrarDataLimite" class="mb-3">
-            <label class="form-label required" for="dataLimiteBloco">Data Limite</label>
-            <InputData
-                id="dataLimiteBloco"
-                v-model="dataLimite"
-                data-testid="inp-data-limite-bloco"
-                max="2099-12-31"
-                min="2000-01-01"
-                required
-            />
-          </div>
-
-          <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
-            <table class="table table-sm table-hover">
-              <thead>
-              <tr>
-                <th style="width: 40px">
-                  <input
-                      :checked="todosSelecionados"
-                      :disabled="processando"
-                      class="form-check-input"
-                      type="checkbox"
-                      @change="toggleTodos"
-                  >
-                </th>
-                <th>Sigla</th>
-                <th>Nome</th>
-                <th>Situação</th>
-              </tr>
-              </thead>
-              <tbody>
-              <tr v-for="unidade in unidades" :key="unidade.codigo">
-                <td>
-                  <input
-                      v-model="selecionadosLocal"
-                      :disabled="processando"
-                      :value="unidade.codigo"
-                      class="form-check-input"
-                      type="checkbox"
-                  >
-                </td>
-                <td>{{ unidade.sigla }}</td>
-                <td>{{ unidade.nome }}</td>
-                <td>{{ unidade.situacao }}</td>
-              </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button :disabled="processando" class="btn btn-secondary" data-bs-dismiss="modal" type="button">Cancelar
-          </button>
-          <button
-              :disabled="processando || selecionadosLocal.length === 0"
-              class="btn btn-primary"
-              type="button"
-              @click="confirmar"
-          >
-            <output v-if="processando" aria-hidden="true" class="spinner-border spinner-border-sm me-2"></output>
-            {{ rotuloBotao }}
-          </button>
-        </div>
-      </div>
+    <div v-if="mostrarDataLimite" class="mb-3">
+      <BFormGroup label="Data Limite" label-for="dataLimiteBloco" label-class="required">
+        <InputData
+            id="dataLimiteBloco"
+            v-model="dataLimite"
+            data-testid="inp-data-limite-bloco"
+            max="2099-12-31"
+            min="2000-01-01"
+            required
+        />
+      </BFormGroup>
     </div>
-  </div>
+
+    <BTable
+        :items="unidades"
+        :fields="campos"
+        small
+        hover
+        responsive
+        sticky-header="300px"
+    >
+      <template #head(selecao)>
+        <BFormCheckbox
+            v-model="todosSelecionados"
+            :disabled="processando"
+        />
+      </template>
+      <template #cell(selecao)="{ item }">
+        <BFormCheckbox
+            v-model="selecionadosLocal"
+            :disabled="processando"
+            :value="item.codigo"
+        />
+      </template>
+    </BTable>
+
+    <template #footer>
+      <BButton :disabled="processando" variant="secondary" @click="fechar">Cancelar</BButton>
+      <BButton
+          :disabled="processando || selecionadosLocal.length === 0"
+          variant="primary"
+          @click="confirmar"
+      >
+        <BSpinner v-if="processando" aria-hidden="true" class="me-2" small />
+        {{ rotuloBotao }}
+      </BButton>
+    </template>
+  </BModal>
 </template>
 
 <script lang="ts" setup>
-import {computed, onMounted, ref, watch} from 'vue';
-import {Modal} from 'bootstrap';
+import { computed, ref, watch } from 'vue';
+import { BModal, BTable, BFormCheckbox, BAlert, BButton, BSpinner, BFormGroup } from 'bootstrap-vue-next';
 import InputData from '@/components/comum/InputData.vue';
 
 export interface UnidadeSelecao {
@@ -107,25 +88,31 @@ const emit = defineEmits<{
   'confirmar': [dados: { ids: number[], dataLimite?: string }];
 }>();
 
-const modalElement = ref<HTMLElement | null>(null);
-const modalInstance = ref<Modal | null>(null);
+const mostrar = ref(false);
 const selecionadosLocal = ref<number[]>([]);
 const processando = ref(false);
 const erro = ref<string | null>(null);
 const dataLimite = ref<string>('');
 
-const todosSelecionados = computed(() => {
-  return props.unidades.length > 0 && selecionadosLocal.value.length === props.unidades.length;
-});
+const campos = [
+  { key: 'selecao', label: '', thStyle: { width: '40px' } },
+  { key: 'sigla', label: 'Sigla' },
+  { key: 'nome', label: 'Nome' },
+  { key: 'situacao', label: 'Situação' }
+];
 
-function toggleTodos(e: Event) {
-  const checked = (e.target as HTMLInputElement).checked;
-  if (checked) {
-    selecionadosLocal.value = props.unidades.map(u => u.codigo);
-  } else {
-    selecionadosLocal.value = [];
+const todosSelecionados = computed({
+  get() {
+    return props.unidades.length > 0 && selecionadosLocal.value.length === props.unidades.length;
+  },
+  set(val: boolean) {
+    if (val) {
+      selecionadosLocal.value = props.unidades.map(u => u.codigo);
+    } else {
+      selecionadosLocal.value = [];
+    }
   }
-}
+});
 
 function confirmar() {
   if (props.mostrarDataLimite && !dataLimite.value) {
@@ -143,11 +130,11 @@ function confirmar() {
 }
 
 function abrir() {
-  modalInstance.value?.show();
+  mostrar.value = true;
 }
 
 function fechar() {
-  modalInstance.value?.hide();
+  mostrar.value = false;
   processando.value = false;
   erro.value = null;
   dataLimite.value = '';
@@ -160,6 +147,7 @@ function setProcessando(val: boolean) {
 function setErro(msg: string | null) {
   erro.value = msg;
 }
+
 defineExpose({
   abrir,
   fechar,
@@ -171,17 +159,11 @@ defineExpose({
 
 watch(() => props.unidadesPreSelecionadas, (newVal) => {
   selecionadosLocal.value = [...newVal];
-}, {immediate: true});
-
-onMounted(() => {
-  if (modalElement.value) {
-    modalInstance.value = new Modal(modalElement.value);
-  }
-});
+}, { immediate: true });
 </script>
 
 <style scoped>
-.required:after {
+:deep(.required:after) {
   content: " *";
   color: red;
 }

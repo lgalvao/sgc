@@ -230,8 +230,8 @@ no nível da classe. Endpoints individuais podem ter restrições mais específi
 
 As ações devem seguir essas diretrizes na UI:
 
-- **Esconder:** Se o perfil ativo **nunca** tem permissão para a ação (ex: botão "Criar Processo" para CHEFE).
-- **Desabilitar:** Se o perfil permite, mas a **situação** ou **localização** atual impede (ex: botão "Disponibilizar" visível mas desabilitado quando o subprocesso não está na unidade do usuário — com tooltip explicativo).
+- **Esconder:** Se o perfil ativo **nunca** tem permissão para a ação (ex: botão "Criar processo" para CHEFE).
+- **Desabilitar:** Se o perfil permite, mas a **situação** ou a **localização** atual impede (ex: botão "Disponibilizar" visível mas desabilitado quando o subprocesso não está na unidade do usuário — com tooltip explicativo).
 
 ---
 

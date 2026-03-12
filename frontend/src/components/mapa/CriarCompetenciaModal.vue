@@ -8,9 +8,9 @@
       size="lg"
       @hide="fechar"
   >
-    <div v-if="fieldErrors?.generic" class="alert alert-danger mb-4">
+    <BAlert v-if="fieldErrors?.generic" :model-value="true" variant="danger" class="mb-4">
       {{ fieldErrors.generic }}
-    </div>
+    </BAlert>
 
     <div class="mb-4">
       <h5>Descrição</h5>
@@ -50,14 +50,15 @@
                 data-testid="chk-criar-competencia-atividade"
             >
               {{ atividade.descricao }}
-              <span
+              <BBadge
                   v-if="atividade.conhecimentos.length > 0"
                   v-b-tooltip.html.right="getConhecimentosModal(atividade)"
-                  class="badge bg-secondary ms-2"
+                  variant="secondary"
+                  class="ms-2"
                   data-testid="cad-mapa__txt-badge-conhecimentos-2"
               >
                 {{ atividade.conhecimentos.length }}
-              </span>
+              </BBadge>
             </BFormCheckbox>
           </BCardBody>
         </BCard>
@@ -98,6 +99,8 @@ import {
   BFormInvalidFeedback,
   BFormTextarea,
   BModal,
+  BAlert,
+  BBadge,
 } from "bootstrap-vue-next";
 import {nextTick, ref, watch} from "vue";
 import type {Atividade, Competencia} from "@/types/tipos";

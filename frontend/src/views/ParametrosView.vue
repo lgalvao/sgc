@@ -3,9 +3,7 @@
     <PageHeader title="Parâmetros" />
 
     <div v-if="store.loading" class="text-center py-4">
-      <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Carregando...</span>
-      </div>
+      <BSpinner label="Carregando..." variant="primary" />
     </div>
 
     <BAlert v-else-if="store.error" :model-value="true" variant="danger">
@@ -74,7 +72,7 @@
 
 <script lang="ts" setup>
 import {onMounted, reactive, ref} from 'vue';
-import {BAlert} from 'bootstrap-vue-next';
+import {BAlert, BSpinner} from 'bootstrap-vue-next';
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import PageHeader from '@/components/layout/PageHeader.vue';
 import AppAlert from '@/components/comum/AppAlert.vue';
