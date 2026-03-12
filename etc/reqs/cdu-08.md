@@ -16,13 +16,13 @@ Ator: CHEFE
 
 3. O usuário clica no card `Atividades e conhecimentos`.
 
-4. O sistema apresenta a tela `Cadastro de atividades e conhecimentos` da unidade. Se o mapa de competências da unidade do subprocesso já tiver atividades cadastradas, a tela virá previamente preenchida com essas informações.
+4. O sistema apresenta a tela `Cadastro de atividades e conhecimentos` da unidade. Se o mapa de competências da unidade do subprocesso já tiver atividades cadastradas, a tela virá preenchida com as informações atuais do mapa.
 
-5. Se o processo for de **revisão**, deverá ser exibido o botão `Impacto no mapa`, a partir do qual será possível avaliar o efeito das alterações realizadas nas atividades e/ou conhecimentos sobre o mapa de competências do subprocesso (ver caso de uso `Verificar impactos no mapa de competências`).
+5. Se o processo for de **Revisão**, deverá ser exibido o botão `Impacto no mapa`, a partir do qual será possível avaliar o efeito das alterações realizadas nas atividades e/ou conhecimentos sobre o mapa de competências do subprocesso (ver caso de uso `Verificar impactos no mapa de competências`).
 
-6. Para incluir uma nova atividade, CHEFE fornece a descrição da atividade, e clica no botão de adição.
+6. Para incluir uma atividade, o usuário fornece a descrição da atividade, e clica no botão de adição.
 
-7. O sistema adiciona atividade e mostra campo para adição de conhecimento abaixo da atividade.
+7. O sistema adiciona a atividade e mostra o campo para adição de conhecimento abaixo da atividade.
 
 8. O usuário fornece a descrição do conhecimento e clica no botão de adição correspondente.
 
@@ -30,9 +30,9 @@ Ator: CHEFE
 
    9.1. Deve ser indicada claramente a associação entre o conhecimento e a atividade, indentando os conhecimentos da atividade abaixo da descrição desta.
 
-10. CHEFE repete o fluxo de adição de atividades/conhecimentos.
+10. O usuário repete o fluxo de adição de atividades/conhecimentos.
 
-    10.1. Pode-se incluir primeiro várias atividades e depois os conhecimentos correspondentes; ou trabalhar em uma atividade por vez até concluir todos os seus conhecimentos. O sistema deve permitir os dois modos de trabalho.
+    10.1. O usuário pode incluir primeiro várias atividades e depois os conhecimentos correspondentes; ou trabalhar em uma atividade por vez até concluir todos os seus conhecimentos. O sistema deve permitir os dois modos de trabalho.
 
 11. Para cada atividade já cadastrada, ao passar o mouse, o sistema exibe botões de edição e remoção.
 
@@ -74,8 +74,8 @@ Ator: CHEFE
 
     13.7.2. Caso haja coincidência entre a descrição de uma atividade selecionada com a de alguma atividade cadastrada na unidade, o sistema informa que uma ou mais atividades não puderam ser importadas por já existirem no cadastro, mas procede sem levantar erros.
 
-14. Se, no momento da criação/edição/importação de qualquer informação, a situação do subprocesso da unidade ainda estiver 'Não iniciado', O sistema altera a situação para 'Cadastro em andamento', no caso de processo de mapeamento,ou 'Revisão do cadastro em andamento', no caso de processo de revisão.
+14. Se, no momento da criação/edição/importação de qualquer informação, a situação do subprocesso da unidade ainda estiver 'Não iniciado', O sistema altera a situação para 'Cadastro em andamento', no caso de processo de mapeamento; ou a situação 'Revisão do cadastro em andamento', no caso de processo de revisão.
 
-15. Após finalizar o cadastro das atividades e conhecimentos, o CHEFE poderá clicar em `Disponibilizar` (ver caso de uso `Disponibilizar cadastro de atividades e conhecimentos`, ou o caso de uso `Disponibilizar revisão do cadastro`, conforme o caso), ou simplesmente navegar para outra área do sistema.
+15. Após finalizar o cadastro de atividades e conhecimentos, o usuário poderá clicar em `Disponibilizar` (ver caso de uso `Disponibilizar cadastro de atividades e conhecimentos`, ou o caso de uso `Disponibilizar revisão do cadastro`); o usuário pode também simplesmente navegar para outra área do sistema, sem a necessidade de gravar as informações de alguma maneira, pois a gravação do cadastro é feita automaticamente, a cada mudança.
 
     15.1. Após cada ação de criação, edição ou exclusão, as informações deverão ser salvas automaticamente e vinculadas ao mapa de competências do subprocesso, não sendo necessária nenhuma ação adicional para garantir a persistência dessa informação.

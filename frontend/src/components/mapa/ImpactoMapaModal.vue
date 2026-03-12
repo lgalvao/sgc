@@ -8,9 +8,7 @@
       title="Impacto no Mapa de Competências"
       @hide="fechar">
     <div v-if="loading" class="text-center p-4">
-      <output aria-label="Verificando impactos" class="spinner-border text-primary">
-        <span class="visually-hidden">Carregando...</span>
-      </output>
+      <BSpinner label="Carregando..." variant="primary" />
       <p class="mt-2">
         Verificando impactos...
       </p>
@@ -27,11 +25,10 @@
           <h5 class="text-success mb-3">
             <i aria-hidden="true" class="bi bi-plus-circle me-2"/>Atividades Inseridas
           </h5>
-          <ul class="list-group" data-testid="lista-atividades-inseridas">
-            <li
+          <BListGroup data-testid="lista-atividades-inseridas">
+            <BListGroupItem
                 v-for="ativ in impacto.atividadesInseridas"
                 :key="ativ.codigo"
-                class="list-group-item"
             >
               <strong>{{ ativ.descricao }}</strong>
               <div
@@ -50,8 +47,8 @@
               >
                 <small class="text-muted">Vinculada a: {{ ativ.competenciasVinculadas.join(', ') }}</small>
               </div>
-            </li>
-          </ul>
+            </BListGroupItem>
+          </BListGroup>
         </div>
 
         <!-- Removidas -->
@@ -59,11 +56,11 @@
           <h5 class="text-danger mb-3">
             <i aria-hidden="true" class="bi bi-dash-circle me-2"/>Atividades Removidas
           </h5>
-          <ul class="list-group" data-testid="lista-atividades-removidas">
-            <li v-for="ativ in impacto.atividadesRemovidas" :key="ativ.codigo" class="list-group-item">
+          <BListGroup data-testid="lista-atividades-removidas">
+            <BListGroupItem v-for="ativ in impacto.atividadesRemovidas" :key="ativ.codigo">
               <strong class="text-decoration-line-through text-muted">{{ ativ.descricao }}</strong>
-            </li>
-          </ul>
+            </BListGroupItem>
+          </BListGroup>
         </div>
 
         <!-- Alteradas -->
@@ -74,11 +71,10 @@
           <h5 class="text-primary mb-3">
             <i aria-hidden="true" class="bi bi-pencil me-2"/>Atividades Alteradas
           </h5>
-          <ul class="list-group" data-testid="lista-atividades-alteradas">
-            <li
+          <BListGroup data-testid="lista-atividades-alteradas">
+            <BListGroupItem
                 v-for="ativ in impacto.atividadesAlteradas"
-                :key="ativ.codigo"
-                class="list-group-item">
+                :key="ativ.codigo">
               <div class="d-flex flex-column">
                 <strong>{{ ativ.descricao }}</strong>
                 <small
@@ -86,8 +82,8 @@
                     class="text-muted"
                 >Anterior: {{ ativ.descricaoAnterior }}</small>
               </div>
-            </li>
-          </ul>
+            </BListGroupItem>
+          </BListGroup>
         </div>
 
         <!-- Competencias -->
@@ -108,21 +104,21 @@
             <template #header>
               <strong>{{ comp.descricao }}</strong>
             </template>
-            <ul class="list-group list-group-flush">
-              <li
+            <BListGroup flush>
+              <BListGroupItem
                   v-for="(ativ, idx) in comp.atividadesAfetadas"
                   :key="idx"
-                  class="list-group-item text-muted small"
+                  class="text-muted small"
               >
                 <i aria-hidden="true" class="bi bi-dot me-1"/> Impactada por: {{ ativ }}
-              </li>
-              <li
+              </BListGroupItem>
+              <BListGroupItem
                   v-if="comp.tiposImpacto && comp.tiposImpacto.length > 0"
-                  class="list-group-item text-muted small fst-italic"
+                  class="text-muted small fst-italic"
               >
                 Tipos de Impacto: {{ comp.tiposImpacto.map(formatTipoImpacto).join(', ') }}
-              </li>
-            </ul>
+              </BListGroupItem>
+            </BListGroup>
           </BCard>
         </div>
       </div>
@@ -151,7 +147,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BButton, BCard, BModal} from "bootstrap-vue-next";
+import {BAlert, BButton, BCard, BModal, BListGroup, BListGroupItem, BSpinner} from "bootstrap-vue-next";
 import {type ImpactoMapa, TipoImpactoCompetencia} from "@/types/tipos";
 
 interface Props {

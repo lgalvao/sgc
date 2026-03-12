@@ -51,14 +51,15 @@
           <BCardBody class="d-flex align-items-center">
                   <span class="atividade-associada-descricao me-2 d-flex align-items-center">
                     {{ atividade.descricao }}
-                    <span
+                    <BBadge
                         v-if="(atividade.conhecimentos?.length ?? 0) > 0"
                         v-b-tooltip.html.top="getConhecimentosTooltip(atividade.codigo)"
-                        class="badge bg-secondary ms-2"
+                        variant="secondary"
+                        class="ms-2"
                         data-testid="cad-mapa__txt-badge-conhecimentos-1"
                     >
                       {{ atividade.conhecimentos.length }}
-                    </span>
+                    </BBadge>
                   </span>
             <BButton
                 v-if="podeEditar !== false"
@@ -81,7 +82,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BButton, BCard, BCardBody, BCardHeader} from "bootstrap-vue-next";
+import {BButton, BCard, BCardBody, BCardHeader, BBadge} from "bootstrap-vue-next";
 import type {Atividade, Competencia} from "@/types/tipos";
 
 const props = defineProps<{

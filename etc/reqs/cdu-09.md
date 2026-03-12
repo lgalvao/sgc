@@ -9,49 +9,46 @@ Ator: CHEFE
 
 ## Fluxo principal
 
-1. No Painel, CHEFE clica no processo de mapeamento na situação 'Em andamento'.
+1. No Painel, o usuário escolhe um processo de mapeamento na situação 'Em andamento'.
 
 2. O sistema mostra tela `Detalhes do subprocesso` da unidade.
 
-3. CHEFE clica em `Atividades e Conhecimentos`.
+3. O usuário clica no card `Atividades e conhecimentos`.
 
-4. O sistema mostra tela `Cadastro de atividades e conhecimentos`, preenchida com os dados cadastrados até o momento.
+4. O sistema mostra a tela `Cadastro de atividades e conhecimentos`, preenchida com os dados cadastrados até o momento.
 
-5. Se o subprocesso tiver retornado de análise pelas unidades superiores, deverá ser exibido, além dos botões fixos da
+5. Se o subprocesso já tiver sido disponibilizado anteriormente e estiver localizado em unidade diferente da unidade ativa do usuário, o sistema mostra um alerta fixo no topo da tela com o texto: "Cadastro disponibilizado para análise pelas unidades superiores.", não permitindo edição ou disponibilização.
+
+6. Se o subprocesso tiver retornado de análise pelas unidades superiores, deverá ser exibido, além dos botões fixos da
    tela, o botão `Histórico de análise`.
 
-   5.1. Se CHEFE clicar no botão `Histórico de análise`, o sistema mostra, em tela modal, os dados das análises do
+   6.1. Se o usuário clicar no botão `Histórico de análise`, o sistema mostra, em tela modal, os dados das análises do
    cadastro realizadas pelas unidades superiores desde a última disponibilização.
 
-   5.1.1. As análises deverão ser apresentadas em uma pequena tabela com data/hora, sigla da unidade, resultado ('
-   Devolução' ou 'Aceite') e observações. Essas informações poderão ser usadas como subsídio para ajustes no cadastro,
-   antes da realização de nova disponibilização.
+   6.1.1. As análises deverão ser apresentadas em uma pequena tabela com data/hora, sigla da unidade, resultado ('Devolução' ou 'Aceite') e observações. Essas informações poderão ser usadas como subsídio para ajustes no cadastro pelo usuário, antes da realização de nova disponibilização.
 
-6. CHEFE escolhe `Disponibilizar`.
+7. O usuário escolhe `Disponibilizar`.
 
-7. O sistema verifica se todas as atividades têm ao menos um conhecimento associado.
+8. O sistema verifica se todas as atividades têm ao menos um conhecimento associado.
 
-   7.1. Caso negativo, indica quais atividades estão precisando de adição de conhecimentos e interrompe a operação de
-   disponibilização, permanecendo na mesma tela.
+   8.1. Se houver esses problemas de validação, o sistema indica quais atividades estão precisando de adição de conhecimentos e interrompe a operação de disponibilização, permanecendo na mesma tela.
 
-8. O sistema mostra diálogo de confirmação: título `Disponibilização do cadastro`, mensagem "Confirma a finalização e a
-   disponibilização do cadastro? Essa ação bloqueia a edição e habilita a análise do cadastro por unidades superiores"
-   e botões `Confirmar` e `Cancelar`.
+9. O sistema mostra um diálogo de confirmação com título "Disponibilização do cadastro", com mensagem "Confirma a finalização e a disponibilização do cadastro? Essa ação bloqueia a edição e habilita a análise do cadastro por unidades superiores", além dos botões `Confirmar` e `Cancelar`.
 
-   8.1. Caso CHEFE escolha `Cancelar`, o sistema interrompe a operação de disponibilização, permanecendo na mesma tela.
+   9.1. Caso o usuário escolha `Cancelar`, o sistema interrompe a operação de disponibilização, permanecendo na mesma tela.
 
-9. CHEFE escolhe `Confirmar`.
+10. O usuário escolhe `Confirmar`.
 
-10. O sistema altera a situação do subprocesso da unidade para 'Cadastro disponibilizado'
+11. O sistema altera a situação do subprocesso da unidade para 'Cadastro disponibilizado'
 
-11. O sistema registra uma movimentação para o subprocesso com os campos:
+12. O sistema registra uma movimentação para o subprocesso com os campos:
 
     - `Data/hora`: Data/hora atual
     - `Unidade origem`: [SIGLA_UNIDADE_SUBPROCESSO]
     - `Unidade destino`: [SIGLA_UNIDADE_SUPERIOR]
     - `Descrição`: 'Disponibilização do cadastro de atividades'
 
-12. O sistema notifica a unidade superior hierárquica quanto à disponibilização, com e-mail no modelo abaixo:
+13. O sistema notifica a unidade superior hierárquica quanto à disponibilização, com e-mail no modelo abaixo:
 
     ```text
     Assunto: SGC: Cadastro de atividades e conhecimentos disponibilizado: [SIGLA_UNIDADE_SUBPROCESSO]
@@ -62,7 +59,7 @@ Ator: CHEFE
     A análise desse cadastro já pode ser realizada no O sistema de Gestão de Competências ([URL_SISTEMA]).
     ```
 
-13. O sistema cria internamente um alerta:
+14. O sistema cria internamente um alerta:
 
     - `Descrição`: "Cadastro de atividades/conhecimentos da unidade [SIGLA_UNIDADE_SUBPROCESSO] disponibilizado para
       análise"
@@ -71,6 +68,6 @@ Ator: CHEFE
     - `Unidade de origem`: [SIGLA_UNIDADE_SUBPROCESSO]
     - `Unidade de destino`: [SIGLA_UNIDADE_SUPERIOR].
 
-14. O sistema define a data/hora de conclusão da etapa 1 do subprocesso da unidade como sendo a data/hora atual.
+15. O sistema define a data/hora de conclusão da etapa 1 do subprocesso da unidade como sendo a data/hora atual.
 
-15. O sistema redireciona para o Painel, mostrando a mensagem "Cadastro de atividades disponibilizado".
+16. O sistema redireciona para o Painel, mostrando a mensagem "Cadastro de atividades disponibilizado".

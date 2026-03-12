@@ -12,9 +12,9 @@
       @confirmar="disponibilizar"
       @fechar="fechar"
   >
-    <div v-if="fieldErrors?.generic" class="alert alert-danger mb-3">
+    <BAlert v-if="fieldErrors?.generic" :model-value="true" variant="danger" class="mb-3">
       {{ fieldErrors.generic }}
-    </div>
+    </BAlert>
     <div class="mb-3">
       <label
           class="form-label"
