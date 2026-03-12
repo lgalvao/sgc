@@ -128,7 +128,6 @@ public class E2eController {
     @PostMapping("/processo/{codigo}/limpar-completo")
     @Transactional
     public void limparProcessoCompleto(@PathVariable Long codigo) {
-        log.info("Limpando processo {} (modo robusto)", codigo);
         DataSource dataSource = jdbcTemplate.getDataSource();
         if (dataSource == null) return;
 
