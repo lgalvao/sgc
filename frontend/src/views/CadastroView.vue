@@ -70,6 +70,15 @@
     </PageHeader>
 
     <BAlert
+        v-if="mostrarAlertaDisponibilizado"
+        :model-value="true"
+        data-testid="cad-atividades__alerta-disponibilizado"
+        variant="info"
+    >
+      <i aria-hidden="true" class="bi bi-info-circle me-2"/>Cadastro disponibilizado para análise pelas unidades superiores.
+    </BAlert>
+
+    <BAlert
         v-if="erroGlobalFormatado"
         :model-value="true"
         variant="danger"
@@ -235,6 +244,17 @@ const nomeUnidade = computed(() => unidade.value?.nome || "");
 const {podeEditarCadastro, podeDisponibilizarCadastro, podeVisualizarImpacto} = useAcesso(subprocesso);
 const isRevisao = computed(() => subprocesso.value?.tipoProcesso === TipoProcesso.REVISAO);
 const podeVerImpacto = computed(() => podeVisualizarImpacto.value);
+
+const mostrarAlertaDisponibilizado = computed(() => {
+  const sp = subprocesso.value;
+  if (!sp) return false;
+  const situacoesDisponibilizado = [
+    SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
+    SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA,
+  ];
+  return situacoesDisponibilizado.includes(sp.situacao) &&
+      sp.localizacaoAtual !== sp.unidade.sigla;
+});
 
 const atividades = ref<Atividade[]>([]);
 

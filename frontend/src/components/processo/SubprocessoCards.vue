@@ -58,7 +58,7 @@
         >
           <div class="card-click-area">
             <BCardTitle>
-              Mapa de Competências
+              Mapa de competências
             </BCardTitle>
             <BCardText class="text-muted">
               Mapa de competências técnicas da unidade
@@ -66,7 +66,7 @@
           </div>
         </BCard>
         <BCard
-            v-else
+            v-else-if="mapaHabilitado"
             class="h-100 card-actionable"
             data-testid="card-subprocesso-mapa-visualizacao"
             role="button"
@@ -76,10 +76,24 @@
         >
           <div class="card-click-area">
             <BCardTitle>
-              Mapa de Competências
+              Mapa de competências
             </BCardTitle>
             <BCardText class="text-muted">
               Visualização do mapa de competências técnicas
+            </BCardText>
+          </div>
+        </BCard>
+        <BCard
+            v-else
+            class="h-100 card-disabled"
+            data-testid="card-subprocesso-mapa-desabilitado"
+        >
+          <div class="card-click-area">
+            <BCardTitle class="text-muted">
+              Mapa de competências
+            </BCardTitle>
+            <BCardText class="text-muted">
+              Mapa de competências técnicas da unidade
             </BCardText>
           </div>
         </BCard>
@@ -186,10 +200,11 @@ const subprocesso = computed(() => subprocessosStore.subprocessoDetalhe);
 
 const isProcessoFinalizado = computed(() => processosStore.processoDetalhe?.situacao === SituacaoProcesso.FINALIZADO);
 
-const {podeEditarCadastro, podeEditarMapa} = useAcesso(subprocesso);
+const {podeEditarCadastro, podeEditarMapa, habilitarAcessoMapa} = useAcesso(subprocesso);
 
 const podeEditarCadastroFinal = computed(() => podeEditarCadastro.value && !isProcessoFinalizado.value);
 const podeEditarMapaFinal = computed(() => podeEditarMapa.value && !isProcessoFinalizado.value);
+const mapaHabilitado = computed(() => habilitarAcessoMapa.value);
 
 function navegarPara(routeName: string) {
   router.push({
@@ -248,5 +263,10 @@ defineExpose({
 
 .card-click-area {
   height: 100%;
+}
+
+.card-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 </style>
