@@ -43,11 +43,11 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
         
         await expect(page.getByText('Titular:')).toBeVisible();
 
-        // Para ADMIN (antes da homologação do cadastro), ambos os cards devem estar no modo de visualização
+        // Para ADMIN (antes da homologação do cadastro), o card de mapa deve estar desabilitado
         const cardAtividadesAdmin = page.locator('[data-testid="card-subprocesso-atividades-vis"]');
         await expect(cardAtividadesAdmin).toBeVisible();
-        
-        const cardMapaAdmin = page.locator('[data-testid="card-subprocesso-mapa-visualizacao"]');
+
+        const cardMapaAdmin = page.locator('[data-testid="card-subprocesso-mapa-desabilitado"]');
         await expect(cardMapaAdmin).toBeVisible();
 
         await expect(page.getByRole('heading', {name: 'Movimentações'})).toBeVisible();
@@ -78,9 +78,9 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
         // Para CHEFE, card de atividades DEVE estar em modo de edição
         const cardAtividadesChefe = page.locator('[data-testid="card-subprocesso-atividades"]');
         await expect(cardAtividadesChefe).toBeVisible();
-        
-        // Mas card de mapa DEVE continuar em modo visualização
-        const cardMapaChefe = page.locator('[data-testid="card-subprocesso-mapa-visualizacao"]');
+
+        // Mas card de mapa deve estar desabilitado (homologação ainda não ocorreu)
+        const cardMapaChefe = page.locator('[data-testid="card-subprocesso-mapa-desabilitado"]');
         await expect(cardMapaChefe).toBeVisible();
     });
 });

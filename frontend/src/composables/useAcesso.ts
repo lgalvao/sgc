@@ -38,6 +38,8 @@ export function useAcesso(subprocessoRef: Ref<SubprocessoDetalhe | null> | Subpr
     const podeReabrirRevisao = computed(() => getSubprocesso()?.permissoes?.podeReabrirRevisao ?? false);
     const podeEnviarLembrete = computed(() => getSubprocesso()?.permissoes?.podeEnviarLembrete ?? false);
 
+    const habilitarAcessoMapa = computed(() => getSubprocesso()?.permissoes?.habilitarAcessoMapa ?? false);
+
     return {
         podeEditarCadastro,
         podeDisponibilizarCadastro,
@@ -58,6 +60,7 @@ export function useAcesso(subprocessoRef: Ref<SubprocessoDetalhe | null> | Subpr
         podeAlterarDataLimite,
         podeReabrirCadastro,
         podeReabrirRevisao,
-        podeEnviarLembrete
+        podeEnviarLembrete,
+        habilitarAcessoMapa
     };
 }

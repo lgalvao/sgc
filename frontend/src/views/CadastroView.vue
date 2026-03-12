@@ -43,7 +43,7 @@
         </BButton>
 
         <LoadingButton
-              v-if="isChefe"
+            v-if="isChefe"
             :disabled="botaoDisponibilizarDesabilitado"
             :loading="loadingValidacao"
             data-testid="btn-cad-atividades-disponibilizar"
