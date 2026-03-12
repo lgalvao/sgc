@@ -75,7 +75,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
         // Issue #1220: Garantir que botões de ação não aparecem para processos finalizados
 
         await page.goto(`/processo/${processoId}`);
-
+        await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
 
         await expect(page.getByText(/Processo concluído/i)).toBeVisible();
 

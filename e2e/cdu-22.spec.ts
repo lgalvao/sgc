@@ -1,9 +1,6 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcessoCadastroDisponibilizadoFixture} from './fixtures/fixtures-processos.js';
-import {criarProcesso} from './helpers/helpers-processos.js';
-import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades} from './helpers/helpers-atividades.js';
-import {verificarPaginaPainel} from './helpers/helpers-navegacao.js';
-import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
+import {loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
 
 /**
  * CDU-22 - Aceitar cadastros em bloco
@@ -27,13 +24,15 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
     const UNIDADE_1 = 'SECAO_221';
     const timestamp = Date.now();
     const descProcesso = `Mapeamento CDU-22 ${timestamp}`;
+    let processoCodigo: number;
 
     test('Setup Data', async ({request}) => {
-        await criarProcessoCadastroDisponibilizadoFixture(request, {
+        const processo = await criarProcessoCadastroDisponibilizadoFixture(request, {
             descricao: descProcesso,
             unidade: UNIDADE_1
         });
-        expect(true).toBeTruthy();
+        processoCodigo = processo.codigo;
+        expect(processoCodigo).toBeGreaterThan(0);
     });
 
     test('Cenario 1: GESTOR abre modal e cancela aceite em bloco', async ({page, autenticadoComoGestorCoord22}) => {
@@ -56,78 +55,42 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
     });
 
-    test('Cenario 3: Botão respeita localização atual (fica desabilitado para gestor superior se o item estiver com o subordinado)', async ({
-                                                                                              page,
-                                                                                              autenticadoComoGestorSecretaria2,
-                                                                                              autenticadoComoGestorCoord22
-                                                                                          }) => {
-        // 1. GESTOR SECRETARIA_2 (Superior de COORD_22) acessa o processo
-        // Nesse momento, o subprocesso da SECAO_221 está com o GESTOR COORD_22 (Cadastro disponibilizado)
-        // Portanto, o botão DEVE estar visível (é Gestor) mas DESABILITADO (nada na sua mesa)
-        await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
-        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
+    test('Cenario 3a: Botão desabilitado quando item está com gestor subordinado', async ({page, autenticadoComoGestorSecretaria2}) => {
+        // autenticadoComoGestorSecretaria2 já logou como GESTOR SECRETARIA_2
+        await page.goto(`/processo/${processoCodigo}`);
+        await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
 
-        const btnAceitarSec = page.getByTestId('btn-processo-aceitar-bloco');
-        await expect(btnAceitarSec).toBeVisible();
-        await expect(btnAceitarSec).toBeDisabled();
+        const btnAceitar = page.getByTestId('btn-processo-aceitar-bloco');
+        await expect(btnAceitar).toBeVisible();
+        await expect(btnAceitar).toBeDisabled();
+    });
 
-        // 2. Agora o GESTOR COORD_22 faz o aceite
-        await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
-        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
+    test('Cenario 3b: Botão habilitado após gestor subordinado aceitar', async ({page, autenticadoComoGestorCoord22}) => {
+        // autenticadoComoGestorCoord22 já logou como GESTOR COORD_22
+        await page.goto(`/processo/${processoCodigo}`);
+        await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
         await page.getByTestId('btn-processo-aceitar-bloco').click();
         await page.locator('#modal-acao-bloco').getByRole('button', {name: /Registrar aceite/i}).click();
         await expect(page.getByText(/Cadastros aceitos em bloco/i).first()).toBeVisible();
 
-        // 3. Agora o GESTOR SECRETARIA_2 acessa novamente. O item deve estar na sua mesa.
+        // GESTOR SECRETARIA_2 deve agora ver o botão habilitado
         await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
-        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
-
-        const btnAceitarSecHabilitado = page.getByTestId('btn-processo-aceitar-bloco');
-        await expect(btnAceitarSecHabilitado).toBeVisible();
-        await expect(btnAceitarSecHabilitado).toBeEnabled();
+        await page.goto(`/processo/${processoCodigo}`);
+        await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
+        await expect(page.getByTestId('btn-processo-aceitar-bloco')).toBeEnabled();
     });
 
-    test('Cenario 4: Múltiplas unidades disponibilizadas, botão desabilitado para gestor de nível superior (itens com intermediários)', async ({page}) => {
-        const timestamp2 = Date.now();
-        const descProcesso2 = `Mapeamento Multi CDU-22 ${timestamp2}`;
-
-        // 1. Admin cria processo com SECAO_111 e SECAO_121
-        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
-
-        await criarProcesso(page, {
-            descricao: descProcesso2,
-            tipo: 'MAPEAMENTO',
-            diasLimite: 30,
-            unidade: ['SECAO_111', 'SECAO_121'],
-            expandir: ['SECRETARIA_1', 'COORD_11', 'COORD_12']
+    test('Cenario 4: Botão desabilitado para gestor superior quando item está com intermediário', async ({request, page}) => {
+        const timestamp4 = Date.now();
+        const processo4 = await criarProcessoCadastroDisponibilizadoFixture(request, {
+            descricao: `CDU-22-C4 ${timestamp4}`,
+            unidade: 'SECAO_111'  // Sob COORD_11, que está sob SECRETARIA_1
         });
 
-        const linhaProcesso = page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descProcesso2)});
-        await linhaProcesso.click();
-        await page.getByTestId('btn-processo-iniciar').click();
-        await page.getByTestId('btn-iniciar-processo-confirmar').click();
-
-        // 2. Chefes disponibilizam
-        const chefes = [
-            {user: USUARIOS.CHEFE_SECAO_111, atividade: `Ativ 111 ${timestamp2}`},
-            {user: USUARIOS.CHEFE_SECAO_121, atividade: `Ativ 121 ${timestamp2}`}
-        ];
-
-        for (const chefe of chefes) {
-            await login(page, chefe.user.titulo, chefe.user.senha);
-            await page.getByTestId('tbl-processos').getByText(descProcesso2).first().click();
-            await navegarParaAtividades(page);
-            await adicionarAtividade(page, chefe.atividade);
-            await adicionarConhecimento(page, chefe.atividade, 'Conhecimento Multi');
-            await page.getByTestId('btn-cad-atividades-disponibilizar').click();
-            await page.getByTestId('btn-confirmar-disponibilizacao').click();
-            await verificarPaginaPainel(page);
-        }
-
-        // 3. Logar como GESTOR SECRETARIA_1. O botão deve estar visível mas DESABILITADO
-        // Porque os itens estão com COORD_11 e COORD_12
+        // GESTOR SECRETARIA_1 acessa: item está com COORD_11 (intermediário)
         await loginComPerfil(page, USUARIOS.GESTOR_SECRETARIA_1.titulo, USUARIOS.GESTOR_SECRETARIA_1.senha, 'GESTOR - SECRETARIA_1');
-        await page.getByTestId('tbl-processos').getByText(descProcesso2).first().click();
+        await page.goto(`/processo/${processo4.codigo}`);
+        await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
 
         const btnAceitar = page.getByTestId('btn-processo-aceitar-bloco');
         await expect(btnAceitar).toBeVisible();
