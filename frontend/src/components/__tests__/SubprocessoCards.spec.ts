@@ -24,6 +24,7 @@ describe('SubprocessoCards.vue', () => {
         vi.spyOn(useAcessoModule, 'useAcesso').mockReturnValue({
             podeEditarMapa: ref(accessOverrides.podeEditarMapa ?? true),
             podeEditarCadastro: ref(accessOverrides.podeEditarCadastro ?? true),
+            habilitarAcessoMapa: ref(accessOverrides.habilitarAcessoMapa ?? true),
             podeVisualizarMapa: ref(accessOverrides.podeVisualizarMapa ?? true),
             podeVisualizarDiagnostico: ref(accessOverrides.podeVisualizarDiagnostico ?? false),
             podeVerPagina: ref(accessOverrides.podeVerPagina ?? true),
@@ -155,6 +156,19 @@ describe('SubprocessoCards.vue', () => {
             name: 'SubprocessoVisMapa',
             params: {codProcesso: 1, siglaUnidade: 'TESTE'}
         });
+    });
+
+    it('renderiza card de mapa desabilitado quando acesso ao mapa não está habilitado', async () => {
+        pushMock.mockClear();
+        const wrapper = mountComponent({}, {podeEditarMapa: false, habilitarAcessoMapa: false});
+
+        expect(wrapper.find('[data-testid="card-subprocesso-mapa-desabilitado"]').exists()).toBe(true);
+        expect(wrapper.find('[data-testid="card-subprocesso-mapa-edicao"]').exists()).toBe(false);
+        expect(wrapper.find('[data-testid="card-subprocesso-mapa-visualizacao"]').exists()).toBe(false);
+
+        // Card desabilitado não deve navegar ao clicar
+        await wrapper.find('[data-testid="card-subprocesso-mapa-desabilitado"]').trigger('click');
+        expect(pushMock).not.toHaveBeenCalled();
     });
 
     it('renderiza cards de diagnostico e navega corretamente', async () => {

@@ -25,6 +25,7 @@ describe('useAcesso', () => {
     expect(acesso.podeReabrirCadastro.value).toBe(false);
     expect(acesso.podeReabrirRevisao.value).toBe(false);
     expect(acesso.podeEnviarLembrete.value).toBe(false);
+    expect(acesso.habilitarAcessoMapa.value).toBe(false);
   });
 
   it('deve mapear permissoes corretamente a partir do backend', () => {
@@ -46,7 +47,8 @@ describe('useAcesso', () => {
         podeAlterarDataLimite: false,
         podeReabrirCadastro: true,
         podeReabrirRevisao: false,
-        podeEnviarLembrete: true
+        podeEnviarLembrete: true,
+        habilitarAcessoMapa: true
       }
     } as unknown as SubprocessoDetalhe);
     
@@ -69,6 +71,7 @@ describe('useAcesso', () => {
     expect(acesso.podeReabrirCadastro.value).toBe(true);
     expect(acesso.podeReabrirRevisao.value).toBe(false);
     expect(acesso.podeEnviarLembrete.value).toBe(true);
+    expect(acesso.habilitarAcessoMapa.value).toBe(true);
   });
 
   it('deve lidar com input não-ref (objeto direto)', () => {
