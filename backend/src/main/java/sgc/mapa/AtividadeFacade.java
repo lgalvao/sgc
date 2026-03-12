@@ -11,6 +11,7 @@ import sgc.mapa.service.*;
 import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 import sgc.seguranca.*;
+import static sgc.seguranca.AcaoPermissao.*;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.*;
@@ -113,7 +114,7 @@ public class AtividadeFacade {
     private void verificarPermissaoEdicao(Long mapaCodigo, Usuario usuario) {
         Subprocesso sp = subprocessoService.obterEntidadePorCodigoMapa(mapaCodigo);
 
-        if (!permissionEvaluator.checkPermission(usuario, sp, "EDITAR_CADASTRO")) {
+        if (!permissionEvaluator.verificarPermissao(usuario, sp, EDITAR_CADASTRO)) {
             throw new ErroAcessoNegado("Usuário não tem permissão para editar atividades neste subprocesso.");
         }
 

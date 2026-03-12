@@ -601,13 +601,19 @@ describe("Processo.vue", () => {
         expect(modalSpies.setErro).toHaveBeenCalledWith(errorMsg);
     });
 
-    it("deve exibir apenas o botão aceitar para perfil Gestor (sem homologar e sem disponibilizar)", async () => {
+    it("deve exibir apenas o botão aceitar quando permissões do processo focam nisso (ex: Gestor)", async () => {
         wrapper = createWrapper();
         perfilStore = usePerfilStore();
         processosStore = useProcessosStore();
 
         perfilStore.$patch({perfilSelecionado: Perfil.GESTOR, unidadeSelecionada: 999});
-        aplicarContextoProcesso();
+        aplicarContextoProcesso({
+            ...mockProcesso,
+            podeAceitarCadastroBloco: true,
+            podeHomologarCadastro: false,
+            podeHomologarMapa: false,
+            podeDisponibilizarMapaBloco: false,
+        });
 
         await nextTick();
         await flushPromises();
@@ -617,13 +623,19 @@ describe("Processo.vue", () => {
         expect(wrapper.find("button.btn-info").exists()).toBe(false);
     });
 
-    it("deve exibir botões homologar e disponibilizar para perfil Admin (sem aceitar)", async () => {
+    it("deve exibir botões homologar e disponibilizar quando permissões focam nisso (ex: Admin)", async () => {
         wrapper = createWrapper();
         perfilStore = usePerfilStore();
         processosStore = useProcessosStore();
 
         perfilStore.$patch({perfilSelecionado: Perfil.ADMIN});
-        aplicarContextoProcesso();
+        aplicarContextoProcesso({
+            ...mockProcesso,
+            podeAceitarCadastroBloco: false,
+            podeHomologarCadastro: true,
+            podeHomologarMapa: true,
+            podeDisponibilizarMapaBloco: true,
+        });
 
         await nextTick();
         await flushPromises();

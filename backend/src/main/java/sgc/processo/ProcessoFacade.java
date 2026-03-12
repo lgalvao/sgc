@@ -13,6 +13,7 @@ import sgc.processo.dto.*;
 import sgc.processo.model.*;
 import sgc.processo.service.*;
 import sgc.seguranca.*;
+import static sgc.seguranca.AcaoPermissao.*;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.*;
@@ -181,7 +182,7 @@ public class ProcessoFacade {
         validarSelecaoAcoesEmBloco(req.unidadeCodigos(), subprocessos);
 
         if (req.acao() == DISPONIBILIZAR) {
-            if (!permissionEvaluator.checkPermission(usuario, subprocessos, "DISPONIBILIZAR_MAPA")) {
+            if (!permissionEvaluator.verificarPermissao(usuario, subprocessos, DISPONIBILIZAR_MAPA)) {
                 throw new ErroAcessoNegado("Usuário não tem permissão para disponibilizar mapas para algumas unidades selecionadas.");
             }
             List<Long> ids = subprocessos.stream().map(Subprocesso::getCodigo).toList();
@@ -236,25 +237,25 @@ public class ProcessoFacade {
 
         if (!idsAceitarCadastro.isEmpty()) {
             List<Subprocesso> alvos = idsAceitarCadastro.stream().map(mapSubprocessos::get).toList();
-            if (!permissionEvaluator.checkPermission(usuario, alvos, "ACEITAR_CADASTRO")) {
+            if (!permissionEvaluator.verificarPermissao(usuario, alvos, ACEITAR_CADASTRO)) {
                 throw new ErroAcessoNegado("Sem permissão para aceitar alguns cadastros selecionados.");
             }
         }
         if (!idsAceitarValidacao.isEmpty()) {
             List<Subprocesso> alvos = idsAceitarValidacao.stream().map(mapSubprocessos::get).toList();
-            if (!permissionEvaluator.checkPermission(usuario, alvos, "ACEITAR_MAPA")) {
+            if (!permissionEvaluator.verificarPermissao(usuario, alvos, ACEITAR_MAPA)) {
                 throw new ErroAcessoNegado("Sem permissão para aceitar alguns mapas selecionados.");
             }
         }
         if (!idsHomologarCadastro.isEmpty()) {
             List<Subprocesso> alvos = idsHomologarCadastro.stream().map(mapSubprocessos::get).toList();
-            if (!permissionEvaluator.checkPermission(usuario, alvos, "HOMOLOGAR_CADASTRO")) {
+            if (!permissionEvaluator.verificarPermissao(usuario, alvos, HOMOLOGAR_CADASTRO)) {
                 throw new ErroAcessoNegado("Sem permissão para homologar alguns cadastros selecionados.");
             }
         }
         if (!idsHomologarValidacao.isEmpty()) {
             List<Subprocesso> alvos = idsHomologarValidacao.stream().map(mapSubprocessos::get).toList();
-            if (!permissionEvaluator.checkPermission(usuario, alvos, "HOMOLOGAR_MAPA")) {
+            if (!permissionEvaluator.verificarPermissao(usuario, alvos, HOMOLOGAR_MAPA)) {
                 throw new ErroAcessoNegado("Sem permissão para homologar alguns mapas selecionados.");
             }
         }

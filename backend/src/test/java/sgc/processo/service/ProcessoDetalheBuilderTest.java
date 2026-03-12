@@ -18,6 +18,7 @@ import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import static sgc.seguranca.AcaoPermissao.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("ProcessoDetalheBuilder")
@@ -108,7 +109,7 @@ class ProcessoDetalheBuilderTest {
         processo.setSituacao(SituacaoProcesso.CRIADO);
         processo.adicionarParticipantes(Set.of());
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(Collections.emptyList());
-        doReturn(true).when(permissionEvaluator).checkPermission(usuario, processo, "FINALIZAR_PROCESSO");
+        doReturn(true).when(permissionEvaluator).verificarPermissao(usuario, processo, FINALIZAR_PROCESSO);
         when(subprocessoValidacaoService.validarSubprocessosParaFinalizacao(1L))
                 .thenReturn(SubprocessoValidacaoService.ValidationResult.ofValido());
 
@@ -128,7 +129,7 @@ class ProcessoDetalheBuilderTest {
         processo.setSituacao(SituacaoProcesso.CRIADO);
         processo.adicionarParticipantes(Set.of());
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(Collections.emptyList());
-        doReturn(false).when(permissionEvaluator).checkPermission(usuario, processo, "FINALIZAR_PROCESSO");
+        doReturn(false).when(permissionEvaluator).verificarPermissao(usuario, processo, FINALIZAR_PROCESSO);
 
         ProcessoDetalheDto dto = builder.build(processo, usuario);
 
@@ -146,7 +147,7 @@ class ProcessoDetalheBuilderTest {
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
         processo.adicionarParticipantes(Set.of());
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(1L)).thenReturn(Collections.emptyList());
-        doReturn(true).when(permissionEvaluator).checkPermission(usuario, processo, "FINALIZAR_PROCESSO");
+        doReturn(true).when(permissionEvaluator).verificarPermissao(usuario, processo, FINALIZAR_PROCESSO);
         when(subprocessoValidacaoService.validarSubprocessosParaFinalizacao(1L))
                 .thenReturn(SubprocessoValidacaoService.ValidationResult.ofInvalido("Subprocessos não homologados"));
 
@@ -230,7 +231,7 @@ class ProcessoDetalheBuilderTest {
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
         processo.adicionarParticipantes(Set.of());
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(any())).thenReturn(Collections.emptyList());
-        doReturn(false).when(permissionEvaluator).checkPermission(any(Usuario.class), any(Processo.class), anyString());
+        doReturn(false).when(permissionEvaluator).verificarPermissao(any(Usuario.class), any(Processo.class), any(AcaoPermissao.class));
 
         ProcessoDetalheDto dto = builder.build(processo, usuario);
         assertThat(dto.isPodeHomologarCadastro()).isFalse();
@@ -247,7 +248,7 @@ class ProcessoDetalheBuilderTest {
         Unidade u1 = criarUnidade(1L, "U1", "U1");
         processo.adicionarParticipantes(Set.of(u1));
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(any())).thenReturn(Collections.emptyList());
-        doReturn(false).when(permissionEvaluator).checkPermission(any(Usuario.class), any(Processo.class), anyString());
+        doReturn(false).when(permissionEvaluator).verificarPermissao(any(Usuario.class), any(Processo.class), any(AcaoPermissao.class));
 
         ProcessoDetalheDto dto = builder.build(processo, usuario);
         assertThat(dto.isPodeHomologarCadastro()).isFalse();
@@ -374,7 +375,7 @@ class ProcessoDetalheBuilderTest {
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
         processo.adicionarParticipantes(Set.of());
         when(subprocessoRepo.findByProcessoCodigoWithUnidade(any())).thenReturn(Collections.emptyList());
-        doReturn(false).when(permissionEvaluator).checkPermission(any(Usuario.class), any(Processo.class), anyString());
+        doReturn(false).when(permissionEvaluator).verificarPermissao(any(Usuario.class), any(Processo.class), any(AcaoPermissao.class));
 
         ProcessoDetalheDto dto = builder.build(processo, usuario);
 

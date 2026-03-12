@@ -21,11 +21,6 @@ export function usePerfil() {
     const podeAcessarTodasUnidades = computed(() => isAdmin.value);
     const podeVisualizarTabelaCtaVazio = computed(() => isAdmin.value);
 
-    // Aliases for specific blocks or legacy naming if needed
-    const isGlobalAdmin = isAdmin;
-    const isGlobalGestor = isGestor;
-    const podeHomologarBlocoGlobal = isAdmin;
-
     return {
         perfilSelecionado,
         unidadeSelecionada,
@@ -37,8 +32,5 @@ export function usePerfil() {
         podeCriarProcesso,
         podeAcessarTodasUnidades,
         podeVisualizarTabelaCtaVazio,
-        isGlobalAdmin,
-        isGlobalGestor,
-        podeHomologarBlocoGlobal,
     };
 }

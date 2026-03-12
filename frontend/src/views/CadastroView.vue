@@ -39,6 +39,7 @@
           </BDropdownItem>
           <BDropdownItem
               v-if="isChefe"
+              :disabled="!podeEditarCadastro"
               data-testid="btn-cad-atividades-historico"
               @click="abrirModalHistorico"
           >
@@ -46,6 +47,7 @@
           </BDropdownItem>
           <BDropdownItem
               v-if="isChefe"
+              :disabled="!podeEditarCadastro"
               data-testid="btn-cad-atividades-importar"
               @click="mostrarModalImportar = true"
           >
@@ -54,7 +56,7 @@
         </BDropdown>
 
         <LoadingButton
-            v-if="mostrarBotaoDisponibilizar"
+              v-if="isChefe"
             :disabled="botaoDisponibilizarDesabilitado"
             :loading="loadingValidacao"
             data-testid="btn-cad-atividades-disponibilizar"
@@ -96,6 +98,7 @@
     >
       <BButton
           v-if="isChefe"
+          :disabled="!podeEditarCadastro"
           data-testid="btn-empty-state-importar"
           size="sm"
           variant="outline-primary"
@@ -226,7 +229,6 @@ const nomeUnidade = computed(() => unidade.value?.nome || "");
 const {podeEditarCadastro, podeDisponibilizarCadastro, podeVisualizarImpacto} = useAcesso(subprocesso);
 const isRevisao = computed(() => subprocesso.value?.tipoProcesso === TipoProcesso.REVISAO);
 const podeVerImpacto = computed(() => podeVisualizarImpacto.value);
-const mostrarBotaoDisponibilizar = computed(() => !!codSubprocesso.value && isChefe.value && !!podeEditarCadastro.value);
 
 const atividades = ref<Atividade[]>([]);
 

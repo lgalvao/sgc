@@ -91,7 +91,6 @@ tasks.named<org.springframework.boot.gradle.tasks.run.BootRun>("bootRun") {
     val env = (project.findProperty("ENV") ?: System.getProperty("spring.profiles.active"))?.toString() ?: "test"
     val envFile = rootProject.file(".env.$env")
 
-    // Define o perfil Spring automaticamente baseado no ENV
     systemProperty("spring.profiles.active", env)
     println("Perfil Spring ativado: $env")
 

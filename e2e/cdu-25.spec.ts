@@ -37,7 +37,6 @@ async function acessarSubprocessoChefe(page: Page, descProcesso: string) {
  * 7. Sistema executa aceite para cada unidade
  */
 test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
-    test.setTimeout(60000);
     const UNIDADE_1 = 'SECAO_211';
 
     const timestamp = Date.now();

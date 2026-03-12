@@ -133,24 +133,23 @@ import {useProcessosStore} from "@/stores/processos";
 import {usePerfilStore} from "@/stores/perfil";
 import {useNotification} from "@/composables/useNotification";
 import {useToastStore} from "@/stores/toast";
-import {usePerfil} from "@/composables/usePerfil";
 import {SituacaoProcesso, SituacaoSubprocesso} from "@/types/tipos";
 import {formatSituacaoSubprocesso} from "@/utils/formatters";
 import {logger} from "@/utils";
 
 type ContextoBloco = "cadastro" | "validacao" | "misto";
+type AcaoBloco = "aceitar" | "homologar" | "disponibilizar";
 
 const route = useRoute();
 const router = useRouter();
 const processosStore = useProcessosStore();
 const perfilStore = usePerfilStore();
-const {isGlobalGestor, podeHomologarBlocoGlobal, isGlobalAdmin} = usePerfil();
 const {notificacao, notify, clear} = useNotification();
 const toastStore = useToastStore();
 const codProcesso = Number(route.params.codProcesso || route.query.codProcesso);
 const modalBlocoRef = ref<any>(null);
 const mostrarModalFinalizacao = ref(false);
-const acaoBlocoAtual = ref<"aceitar" | "homologar" | "disponibilizar">("aceitar");
+const acaoBlocoAtual = ref<AcaoBloco>("aceitar");
 const processandoAcaoBloco = ref(false);
 
 const processo = computed(() => processosStore.processoDetalhe);
@@ -158,21 +157,17 @@ const participantesHierarquia = computed(() => processo.value?.unidades || []);
 const subprocessosElegiveis = computed(() => processosStore.subprocessosElegiveis || []);
 
 const podeAceitarBloco = computed(() => {
-  return isGlobalGestor.value && (processo.value?.podeAceitarCadastroBloco ?? false);
+  return processo.value?.podeAceitarCadastroBloco ?? false;
 });
 
 const podeHomologarBloco = computed(() => {
-  return podeHomologarBlocoGlobal.value &&
-      ((processo.value?.podeHomologarCadastro ?? false) || (processo.value?.podeHomologarMapa ?? false));
+  return (processo.value?.podeHomologarCadastro ?? false) || (processo.value?.podeHomologarMapa ?? false);
 });
 
 const podeDisponibilizarBloco = computed(() => {
-  return isGlobalAdmin.value &&
-      !isProcessoFinalizado.value &&
-      (processo.value?.podeDisponibilizarMapaBloco || false);
+  return !isProcessoFinalizado.value && (processo.value?.podeDisponibilizarMapaBloco || false);
 });
 
-// Habilitação dos Botões (Português)
 const habilitarAceiteBloco = computed(() => {
   return !processandoAcaoBloco.value && unidadesElegiveisPorAcao.value.aceitar.length > 0;
 });
@@ -193,24 +188,12 @@ const isProcessoFinalizado = computed(() => {
   return processo.value?.situacao === SituacaoProcesso.FINALIZADO;
 });
 
-function isSituacaoAceiteCadastro(situacao: SituacaoSubprocesso) {
+function isSituacaoCadastroPronto(situacao: SituacaoSubprocesso) {
   return situacao === SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO ||
       situacao === SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA;
 }
 
-function isSituacaoAceiteValidacao(situacao: SituacaoSubprocesso) {
-  return situacao === SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO ||
-      situacao === SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES ||
-      situacao === SituacaoSubprocesso.REVISAO_MAPA_VALIDADO ||
-      situacao === SituacaoSubprocesso.REVISAO_MAPA_COM_SUGESTOES;
-}
-
-function isSituacaoHomologacaoCadastro(situacao: SituacaoSubprocesso) {
-  return situacao === SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO ||
-      situacao === SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA;
-}
-
-function isSituacaoHomologacaoValidacao(situacao: SituacaoSubprocesso) {
+function isSituacaoMapaValidadoOuAjustado(situacao: SituacaoSubprocesso) {
   return situacao === SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO ||
       situacao === SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES ||
       situacao === SituacaoSubprocesso.REVISAO_MAPA_VALIDADO ||
@@ -229,11 +212,11 @@ function obterSituacao(item: { situacaoSubprocesso?: SituacaoSubprocesso, situac
 function obterContextoBloco(unidades: any[]): ContextoBloco {
   const temCadastro = unidades.some(u => {
     const situacao = obterSituacao(u);
-    return situacao ? isSituacaoAceiteCadastro(situacao) || isSituacaoHomologacaoCadastro(situacao) : false;
+    return situacao ? isSituacaoCadastroPronto(situacao) : false;
   });
   const temValidacao = unidades.some(u => {
     const situacao = obterSituacao(u);
-    return situacao ? isSituacaoAceiteValidacao(situacao) || isSituacaoHomologacaoValidacao(situacao) : false;
+    return situacao ? isSituacaoMapaValidadoOuAjustado(situacao) : false;
   });
 
   if (temCadastro && !temValidacao) {
@@ -245,7 +228,7 @@ function obterContextoBloco(unidades: any[]): ContextoBloco {
   return "misto";
 }
 
-function obterUnidadesContextoAcao(acao: "aceitar" | "homologar" | "disponibilizar", ids?: number[]) {
+function obterUnidadesContextoAcao(acao: AcaoBloco, ids?: number[]) {
   const unidadesAcao = unidadesElegiveisPorAcao.value[acao] ?? [];
   if (!ids || ids.length === 0) {
     return unidadesAcao;
@@ -253,12 +236,12 @@ function obterUnidadesContextoAcao(acao: "aceitar" | "homologar" | "disponibiliz
   return unidadesAcao.filter(unidade => ids.includes(unidade.unidadeCodigo));
 }
 
-function obterContextoAtualAcao(acao: "aceitar" | "homologar" | "disponibilizar", ids?: number[]): ContextoBloco {
+function obterContextoAtualAcao(acao: AcaoBloco, ids?: number[]): ContextoBloco {
   return obterContextoBloco(obterUnidadesContextoAcao(acao, ids));
 }
 
 function obterMensagemSucesso(
-    acao: "aceitar" | "homologar" | "disponibilizar",
+    acao: AcaoBloco,
     contexto: ContextoBloco
 ) {
   switch (acao) {
@@ -291,8 +274,8 @@ const unidadesElegiveisPorAcao = computed(() => {
   const unidades = subprocessosElegiveis.value;
 
   return {
-    aceitar: unidades.filter(u => isSituacaoAceiteCadastro(u.situacao) || isSituacaoAceiteValidacao(u.situacao)),
-    homologar: unidades.filter(u => isSituacaoHomologacaoCadastro(u.situacao) || isSituacaoHomologacaoValidacao(u.situacao)),
+    aceitar: unidades.filter(u => isSituacaoCadastroPronto(u.situacao) || isSituacaoMapaValidadoOuAjustado(u.situacao)),
+    homologar: unidades.filter(u => isSituacaoCadastroPronto(u.situacao) || isSituacaoMapaValidadoOuAjustado(u.situacao)),
     disponibilizar: unidades.filter(u => isSituacaoDisponibilizacaoMapa(u.situacao))
   };
 });
@@ -446,7 +429,7 @@ async function confirmarFinalizacao() {
   }
 }
 
-function abrirModalBloco(acao: "aceitar" | "homologar" | "disponibilizar") {
+function abrirModalBloco(acao: AcaoBloco) {
   acaoBlocoAtual.value = acao;
   modalBlocoRef.value?.abrir();
 }

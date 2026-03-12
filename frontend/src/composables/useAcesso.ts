@@ -18,6 +18,8 @@ export function useAcesso(subprocessoRef: Ref<SubprocessoDetalhe | null> | Subpr
     const podeAceitarCadastro = computed(() => getSubprocesso()?.permissoes?.podeAceitarCadastro ?? false);
     const podeHomologarCadastro = computed(() => getSubprocesso()?.permissoes?.podeHomologarCadastro ?? false);
 
+    const podeAnalisarCadastro = computed(() => podeDevolverCadastro.value || podeAceitarCadastro.value || podeHomologarCadastro.value);
+
     const podeEditarMapa = computed(() => getSubprocesso()?.permissoes?.podeEditarMapa ?? false);
     const podeDisponibilizarMapa = computed(() => getSubprocesso()?.permissoes?.podeDisponibilizarMapa ?? false);
     const podeValidarMapa = computed(() => getSubprocesso()?.permissoes?.podeValidarMapa ?? false);
@@ -26,6 +28,8 @@ export function useAcesso(subprocessoRef: Ref<SubprocessoDetalhe | null> | Subpr
     const podeDevolverMapa = computed(() => getSubprocesso()?.permissoes?.podeDevolverMapa ?? false);
     const podeAceitarMapa = computed(() => getSubprocesso()?.permissoes?.podeAceitarMapa ?? false);
     const podeHomologarMapa = computed(() => getSubprocesso()?.permissoes?.podeHomologarMapa ?? false);
+
+    const podeAnalisarMapa = computed(() => podeDevolverMapa.value || podeAceitarMapa.value || podeHomologarMapa.value);
 
     const podeVisualizarImpacto = computed(() => getSubprocesso()?.permissoes?.podeVisualizarImpacto ?? false);
 
@@ -40,6 +44,7 @@ export function useAcesso(subprocessoRef: Ref<SubprocessoDetalhe | null> | Subpr
         podeDevolverCadastro,
         podeAceitarCadastro,
         podeHomologarCadastro,
+        podeAnalisarCadastro,
         podeEditarMapa,
         podeDisponibilizarMapa,
         podeValidarMapa,
@@ -48,6 +53,7 @@ export function useAcesso(subprocessoRef: Ref<SubprocessoDetalhe | null> | Subpr
         podeDevolverMapa,
         podeAceitarMapa,
         podeHomologarMapa,
+        podeAnalisarMapa,
         podeVisualizarImpacto,
         podeAlterarDataLimite,
         podeReabrirCadastro,

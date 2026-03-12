@@ -20,6 +20,7 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
+import static sgc.seguranca.AcaoPermissao.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("ProcessoFacade - Erros AcaoEmBloco")
@@ -55,7 +56,7 @@ class ProcessoFacadeAcaoEmBlocoErroTest {
         when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
         Subprocesso sp = criarSubprocesso(1L, 20L, SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
         when(subprocessoService.listarEntidadesPorProcessoEUnidades(10L, List.of(20L))).thenReturn(List.of(sp));
-        when(permissionEvaluator.checkPermission(eq(usuario), any(List.class), eq("DISPONIBILIZAR_MAPA"))).thenReturn(false);
+        when(permissionEvaluator.verificarPermissao(eq(usuario), any(List.class), eq(DISPONIBILIZAR_MAPA))).thenReturn(false);
 
         AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(List.of(20L), AcaoProcesso.DISPONIBILIZAR, LocalDate.now().plusDays(30));
         assertThrows(ErroAcessoNegado.class, () -> processoFacade.executarAcaoEmBloco(10L, req));
@@ -68,7 +69,7 @@ class ProcessoFacadeAcaoEmBlocoErroTest {
 
         Subprocesso sp = criarSubprocesso(1L, 20L, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
         when(subprocessoService.listarEntidadesPorProcessoEUnidades(10L, List.of(20L))).thenReturn(List.of(sp));
-        when(permissionEvaluator.checkPermission(eq(usuario), any(List.class), eq("ACEITAR_CADASTRO"))).thenReturn(false);
+        when(permissionEvaluator.verificarPermissao(eq(usuario), any(List.class), eq(ACEITAR_CADASTRO))).thenReturn(false);
 
         AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(List.of(20L), AcaoProcesso.ACEITAR, LocalDate.now().plusDays(30));
         assertThrows(ErroAcessoNegado.class, () -> processoFacade.executarAcaoEmBloco(10L, req));
@@ -81,7 +82,7 @@ class ProcessoFacadeAcaoEmBlocoErroTest {
 
         Subprocesso sp = criarSubprocesso(1L, 20L, SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
         when(subprocessoService.listarEntidadesPorProcessoEUnidades(10L, List.of(20L))).thenReturn(List.of(sp));
-        when(permissionEvaluator.checkPermission(eq(usuario), any(List.class), eq("ACEITAR_MAPA"))).thenReturn(false);
+        when(permissionEvaluator.verificarPermissao(eq(usuario), any(List.class), eq(ACEITAR_MAPA))).thenReturn(false);
 
         AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(List.of(20L), AcaoProcesso.ACEITAR, LocalDate.now().plusDays(30));
         assertThrows(ErroAcessoNegado.class, () -> processoFacade.executarAcaoEmBloco(10L, req));
@@ -95,7 +96,7 @@ class ProcessoFacadeAcaoEmBlocoErroTest {
         Subprocesso sp = criarSubprocesso(1L, 20L, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
 
         when(subprocessoService.listarEntidadesPorProcessoEUnidades(10L, List.of(20L))).thenReturn(List.of(sp));
-        when(permissionEvaluator.checkPermission(eq(usuario), any(List.class), eq("HOMOLOGAR_CADASTRO"))).thenReturn(false);
+        when(permissionEvaluator.verificarPermissao(eq(usuario), any(List.class), eq(HOMOLOGAR_CADASTRO))).thenReturn(false);
 
         AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(List.of(20L), AcaoProcesso.HOMOLOGAR, LocalDate.now().plusDays(30));
         assertThrows(ErroAcessoNegado.class, () -> processoFacade.executarAcaoEmBloco(10L, req));
@@ -108,7 +109,7 @@ class ProcessoFacadeAcaoEmBlocoErroTest {
 
         Subprocesso sp = criarSubprocesso(1L, 20L, SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
         when(subprocessoService.listarEntidadesPorProcessoEUnidades(10L, List.of(20L))).thenReturn(List.of(sp));
-        when(permissionEvaluator.checkPermission(eq(usuario), any(List.class), eq("HOMOLOGAR_MAPA"))).thenReturn(false);
+        when(permissionEvaluator.verificarPermissao(eq(usuario), any(List.class), eq(HOMOLOGAR_MAPA))).thenReturn(false);
 
         AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(List.of(20L), AcaoProcesso.HOMOLOGAR, LocalDate.now().plusDays(30));
         assertThrows(ErroAcessoNegado.class, () -> processoFacade.executarAcaoEmBloco(10L, req));

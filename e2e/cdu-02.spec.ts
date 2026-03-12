@@ -21,8 +21,7 @@ test.describe('CDU-02 - Visualizar Painel', () => {
                 const tabelaProcessos = page.locator('[data-testid="tbl-processos"]');
                 const cabecalhoDescricao = tabelaProcessos.locator('th', {hasText: 'Descrição'}).first();
 
-                // Aguarda o estado inicial de ordenação (pode ser ascending ou descending dependendo do backend, mas o componente define asc inicialmente)
-                await expect(cabecalhoDescricao).toHaveAttribute('aria-sort', /ascending|descending|none/, {timeout: 5000});
+                await expect(cabecalhoDescricao).toHaveAttribute('aria-sort', /ascending|descending|none/);
 
                 await cabecalhoDescricao.click();
                 await expect(cabecalhoDescricao).toHaveAttribute('aria-sort', /ascending|descending/);

@@ -9,6 +9,7 @@ import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
 import sgc.organizacao.model.*;
 import sgc.seguranca.*;
+import static sgc.seguranca.AcaoPermissao.*;
 import sgc.subprocesso.model.*;
 
 import java.util.*;
@@ -26,7 +27,7 @@ public class ImpactoMapaService {
     private final SgcPermissionEvaluator permissionEvaluator;
     @Transactional(readOnly = true)
     public ImpactoMapaResponse verificarImpactos(Subprocesso subprocesso, Usuario usuario) {
-        if (!permissionEvaluator.checkPermission(usuario, subprocesso, "VERIFICAR_IMPACTOS")) {
+        if (!permissionEvaluator.verificarPermissao(usuario, subprocesso, VERIFICAR_IMPACTOS)) {
             throw new ErroAcessoNegado("Usuário não tem permissão para verificar impactos.");
         }
 
