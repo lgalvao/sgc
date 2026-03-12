@@ -2,20 +2,20 @@
   <div>
     <div class="unidade-node">
       <!-- Expansor ANTES do checkbox -->
-      <button
+      <BButton
           v-if="unidade.filhas && unidade.filhas.length > 0"
           :aria-expanded="isExpanded(unidade)"
           :aria-label="isExpanded(unidade) ? `Recolher ${unidade.sigla}` : `Expandir ${unidade.sigla}`"
           :data-testid="`btn-arvore-expand-${unidade.sigla}`"
           class="expansor"
-          type="button"
+          variant="link"
           @click="onToggleExpand(unidade)"
       >
         <i
             :class="isExpanded(unidade) ? 'bi bi-caret-down-fill' : 'bi bi-caret-right-fill'"
             aria-hidden="true"
         />
-      </button>
+      </BButton>
       <span v-else class="expansor-placeholder"></span>
 
       <!-- Checkbox com label (Modo Seleção) -->
@@ -74,7 +74,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BFormCheckbox} from "bootstrap-vue-next";
+import {BButton, BFormCheckbox} from "bootstrap-vue-next";
 import type {Unidade} from "@/types/tipos";
 
 interface Props {

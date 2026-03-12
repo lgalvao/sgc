@@ -138,11 +138,11 @@
         @confirmar="confirmarSugestoes"
         @shown="() => sugestoesTextareaRef?.$el?.focus()"
     >
-      <div class="mb-3">
-        <label
-            class="form-label"
-            for="sugestoesTextarea"
-        >Sugestões para o mapa de competências:</label>
+      <BFormGroup
+          label="Sugestões para o mapa de competências:"
+          label-for="sugestoesTextarea"
+          class="mb-3"
+      >
         <BFormTextarea
             id="sugestoesTextarea"
             ref="sugestoesTextareaRef"
@@ -152,7 +152,7 @@
             rows="5"
             required
         />
-      </div>
+      </BFormGroup>
     </ModalConfirmacao>
 
     <BModal
@@ -162,11 +162,11 @@
         hide-footer
         title="Sugestões"
     >
-      <div class="mb-3">
-        <label
-            class="form-label"
-            for="sugestoesVisualizacao"
-        >Sugestões registradas para o mapa de competências:</label>
+      <BFormGroup
+          label="Sugestões registradas para o mapa de competências:"
+          label-for="sugestoesVisualizacao"
+          class="mb-3"
+      >
         <BFormTextarea
             id="sugestoesVisualizacao"
             v-model="sugestoesVisualizacao"
@@ -174,7 +174,7 @@
             readonly
             rows="5"
         />
-      </div>
+      </BFormGroup>
       <template #footer>
         <BButton
             data-testid="btn-ver-sugestoes-mapa-fechar"
@@ -212,11 +212,11 @@
         @shown="() => observacaoDevolucaoRef?.$el?.focus()"
     >
       <p>Confirma a devolução da validação do mapa para ajustes?</p>
-      <div class="mb-3">
-        <label
-            class="form-label"
-            for="observacaoDevolucao"
-        >Observação:</label>
+      <BFormGroup
+          label="Observação:"
+          label-for="observacaoDevolucao"
+          class="mb-3"
+      >
         <BFormTextarea
             id="observacaoDevolucao"
             ref="observacaoDevolucaoRef"
@@ -225,7 +225,7 @@
             placeholder="Digite observações sobre a devolução..."
             rows="3"
         />
-      </div>
+      </BFormGroup>
     </ModalConfirmacao>
 
     <HistoricoAnaliseModal
@@ -237,7 +237,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BButton, BCard, BFormTextarea, BModal, BBadge} from "bootstrap-vue-next";
+import {BButton, BCard, BFormGroup, BFormTextarea, BModal, BBadge} from "bootstrap-vue-next";
 import {computed, onMounted, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';

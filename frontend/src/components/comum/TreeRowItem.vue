@@ -12,25 +12,26 @@
         :key="column.key"
         :style="index === 0 ? { paddingLeft: (level * 1.25) + 'rem' } : {}"
     >
-      <button
+      <BButton
           v-if="index === 0 && item.children && item.children.length > 0"
           :aria-expanded="item.expanded"
           :aria-label="item.expanded ? 'Recolher' : 'Expandir'"
           :data-testid="`btn-toggle-expand-${item.codigo}`"
-          class="btn btn-link p-0 toggle-icon text-decoration-none border-0"
-          type="button"
+          class="p-0 toggle-icon text-decoration-none border-0"
+          variant="link"
           @click.stop="toggleExpand(item.codigo)"
           @keydown.enter.stop="toggleExpand(item.codigo)"
           @keydown.space.stop="toggleExpand(item.codigo)"
       >
         <i :class="['bi', item.expanded ? 'bi-chevron-down' : 'bi-chevron-right']" aria-hidden="true"/>
-      </button>
+      </BButton>
       {{ item[column.key] }}
     </td>
   </tr>
 </template>
 
 <script lang="ts" setup>
+import {BButton} from "bootstrap-vue-next";
 interface Column {
   key: string;
 }

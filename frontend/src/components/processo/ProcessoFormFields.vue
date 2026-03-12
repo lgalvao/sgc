@@ -62,7 +62,11 @@
             @update:model-value="updateField('unidadesSelecionadas', $event)"
         />
         <div v-else class="text-center py-3">
-          <span class="spinner-border spinner-border-sm me-2"/>
+          <BSpinner
+              aria-hidden="true"
+              class="me-2"
+              small
+          />
           Carregando unidades...
         </div>
       </div>
@@ -105,7 +109,8 @@ import {
   BFormInput,
   BFormInvalidFeedback,
   BFormSelect,
-  BFormSelectOption
+  BFormSelectOption,
+  BSpinner
 } from "bootstrap-vue-next";
 import {nextTick, ref, watch} from "vue";
 import ArvoreUnidades from "@/components/unidade/ArvoreUnidades.vue";

@@ -28,10 +28,11 @@
               :variant="variantAcao"
               @click="emit('confirmar')"
           >
-            <output
+            <BSpinner
                 v-if="loading"
                 aria-hidden="true"
-                class="spinner-border spinner-border-sm me-1"
+                class="me-1"
+                small
             />
             {{ loading ? textoAcaoCarregando : textoAcao }}
           </BButton>
@@ -42,7 +43,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BButton, BModal} from "bootstrap-vue-next";
+import {BButton, BModal, BSpinner} from "bootstrap-vue-next";
 import {computed} from "vue";
 
 const props = withDefaults(defineProps<{

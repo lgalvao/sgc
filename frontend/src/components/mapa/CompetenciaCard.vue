@@ -5,12 +5,12 @@
       no-body
   >
     <BCardHeader class="d-flex justify-content-between align-items-center">
-      <div class="card-title fs-5 mb-0">
+      <BCardTitle class="fs-5 mb-0">
         <strong
             class="competencia-descricao"
             data-testid="cad-mapa__txt-competencia-descricao"
         > {{ competencia.descricao }}</strong>
-      </div>
+      </BCardTitle>
       <div class="d-flex gap-1">
         <BButton
             v-if="podeEditar !== false"
@@ -82,7 +82,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BButton, BCard, BCardBody, BCardHeader, BBadge} from "bootstrap-vue-next";
+import {BButton, BCard, BCardBody, BCardHeader, BCardTitle, BBadge} from "bootstrap-vue-next";
 import type {Atividade, Competencia} from "@/types/tipos";
 
 const props = defineProps<{

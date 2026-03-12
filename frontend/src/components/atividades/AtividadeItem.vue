@@ -5,9 +5,9 @@
       no-body
   >
     <BCardBody class="py-2 position-relative">
-      <div
+      <BCardTitle
           :class="{'atividade-hover-row': !emEdicao}"
-          class="card-title d-flex align-items-center atividade-titulo-card"
+          class="d-flex align-items-center atividade-titulo-card"
       >
         <InlineEditor
             :can-edit="podeEditar"
@@ -40,7 +40,7 @@
             </BButton>
           </template>
         </InlineEditor>
-      </div>
+      </BCardTitle>
 
       <!-- Mensagem de erro inline -->
       <BAlert
@@ -95,10 +95,10 @@
         </div>
         <BForm
             v-if="podeEditar"
-            class="row g-2 align-items-center"
             data-testid="form-novo-conhecimento"
             @submit.prevent="adicionarConhecimento"
         >
+          <BRow class="g-2 align-items-center">
           <BCol>
             <BFormInput
                 v-model="novoConhecimento"
@@ -125,6 +125,7 @@
               />
             </BButton>
           </BCol>
+          </BRow>
         </BForm>
       </div>
     </BCardBody>
@@ -132,7 +133,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BButton, BCard, BCardBody, BCol, BForm, BFormInput} from "bootstrap-vue-next";
+import {BAlert, BButton, BCard, BCardBody, BCardTitle, BCol, BForm, BFormInput, BRow} from "bootstrap-vue-next";
 import {ref} from "vue";
 import type {Atividade} from "@/types/tipos";
 import InlineEditor from "@/components/comum/InlineEditor.vue";

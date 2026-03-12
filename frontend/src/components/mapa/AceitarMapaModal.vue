@@ -12,10 +12,14 @@
       <p v-if="perfil === 'ADMIN'">
         {{ corpoModal }}
       </p>
-      <div v-else class="mb-3">
-        <label class="form-label" for="observacao-textarea">
+      <BFormGroup
+          v-else
+          label-for="observacao-textarea"
+          class="mb-3"
+      >
+        <template #label>
           Observações <span class="text-muted small">(opcional)</span>
-        </label>
+        </template>
         <BFormTextarea
             id="observacao-textarea"
             v-model="observacao"
@@ -23,11 +27,10 @@
             placeholder="Digite suas observações sobre o mapa..."
             rows="4"
         />
-        <div class="form-text">
-          As observações serão registradas junto com a validação do
-          mapa.
-        </div>
-      </div>
+        <BFormText>
+          As observações serão registradas junto com a validação do mapa.
+        </BFormText>
+      </BFormGroup>
     </div>
 
     <template #footer>
@@ -55,7 +58,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BButton, BFormTextarea, BModal, BSpinner} from "bootstrap-vue-next";
+import {BButton, BFormGroup, BFormText, BFormTextarea, BModal, BSpinner} from "bootstrap-vue-next";
 import {computed, ref} from "vue";
 
 interface Props {
