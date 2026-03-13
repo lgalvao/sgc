@@ -12,6 +12,9 @@ function extrairRotaSubprocesso(page: Page): { codigoProcesso: string; siglaUnid
 }
 
 export async function navegarParaMapa(page: Page) {
+    // Aguardar o carregamento do subprocesso antes de verificar os cards
+    await expect(page.getByTestId('header-subprocesso')).toBeVisible();
+
     const cardEdicao = page.getByTestId('card-subprocesso-mapa-edicao');
     const cardVisualizacao = page.getByTestId('card-subprocesso-mapa-visualizacao');
 

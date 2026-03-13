@@ -46,34 +46,34 @@ class CDU23IntegrationTest extends BaseIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        // Criar Unidades
+        // Criar unidades
         Long idSuperior = 5000L;
         Long idUnidade1 = 5001L;
         Long idUnidade2 = 5002L;
 
         String sqlInsertUnidade = "INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-        jdbcTemplate.update(sqlInsertUnidade, idSuperior, "Coordenação Homologação", "COORD-HOMOLOG", "INTERMEDIARIA", "ATIVA", null, null);
-        jdbcTemplate.update(sqlInsertUnidade, idUnidade1, "Unidade Homolog 1", "UNID-HOMOLOG-1", "OPERACIONAL", "ATIVA", idSuperior, null);
-        jdbcTemplate.update(sqlInsertUnidade, idUnidade2, "Unidade Homolog 2", "UNID-HOMOLOG-2", "OPERACIONAL", "ATIVA", idSuperior, null);
+        jdbcTemplate.update(sqlInsertUnidade, idSuperior, "Coordenação homologação", "COORD-HOMOLOG", "INTERMEDIARIA", "ATIVA", null, null);
+        jdbcTemplate.update(sqlInsertUnidade, idUnidade1, "Unidade homolog 1", "UNID-HOMOLOG-1", "OPERACIONAL", "ATIVA", idSuperior, null);
+        jdbcTemplate.update(sqlInsertUnidade, idUnidade2, "Unidade homolog 2", "UNID-HOMOLOG-2", "OPERACIONAL", "ATIVA", idSuperior, null);
 
         unidade1 = unidadeRepo.findById(idUnidade1).orElseThrow();
         unidade2 = unidadeRepo.findById(idUnidade2).orElseThrow();
 
-        // Criar Usuário
+        // Criar usuário
         Usuario admin = UsuarioFixture.usuarioPadrao();
         admin.setTituloEleitoral("999999999999");
         usuarioRepo.save(admin);
 
-        // Criar Processo
+        // Criar processo
         processo = ProcessoFixture.processoPadrao();
         processo.setCodigo(null);
         processo.setTipo(TipoProcesso.MAPEAMENTO);
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
-        processo.setDescricao("Processo Homologação CDU-23");
+        processo.setDescricao("Processo homologação CDU-23");
         processo = processoRepo.save(processo);
 
-        // Criar Subprocessos
+        // Criar subprocessos
         subprocesso1 = SubprocessoFixture.subprocessoPadrao(processo, unidade1);
         subprocesso1.setCodigo(null);
         subprocesso1.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
@@ -138,7 +138,7 @@ class CDU23IntegrationTest extends BaseIntegrationTest {
         entityManager.flush();
         entityManager.clear();
 
-        // Verify Subprocesso 1
+        // Verify subprocesso 1
         Subprocesso s1 = subprocessoRepo.findById(subprocesso1.getCodigo()).orElseThrow();
         assertThat(s1.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
 
@@ -146,7 +146,7 @@ class CDU23IntegrationTest extends BaseIntegrationTest {
         assertThat(movs1).isNotEmpty();
         assertThat(movs1.getFirst().getDescricao()).contains("homologado");
 
-        // Verify Subprocesso 2
+        // Verify subprocesso 2
         Subprocesso s2 = subprocessoRepo.findById(subprocesso2.getCodigo()).orElseThrow();
         assertThat(s2.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
 

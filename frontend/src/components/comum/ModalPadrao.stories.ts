@@ -32,7 +32,7 @@ export const Default: Story = {
         },
         template: `
       <div>
-        <button class="btn btn-primary" @click="show = true">Abrir Modal</button>
+        <button class="btn btn-primary" @click="show = true">Abrir modal</button>
         <ModalPadrao v-bind="args" v-model="show">
           <p>Conteúdo interno do modal. Você pode colocar qualquer elemento aqui.</p>
         </ModalPadrao>
@@ -44,7 +44,7 @@ export const Default: Story = {
 export const Carregando: Story = {
     args: {
         modelValue: true,
-        titulo: 'Salvando Alterações',
+        titulo: 'Salvando alterações',
         loading: true,
         textoAcaoCarregando: 'Salvando...',
     },
@@ -65,7 +65,7 @@ export const Carregando: Story = {
 export const Grande: Story = {
     args: {
         modelValue: true,
-        titulo: 'Visualização Detalhada',
+        titulo: 'Visualização detalhada',
         tamanho: 'lg',
     },
     render: (args) => ({
@@ -87,7 +87,7 @@ export const Grande: Story = {
 export const Perigo: Story = {
     args: {
         modelValue: true,
-        titulo: 'Excluir Item',
+        titulo: 'Excluir item',
         textoAcao: 'Excluir',
         variantAcao: 'danger',
     },

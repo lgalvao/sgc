@@ -2,7 +2,7 @@ import {beforeEach, describe, expect, it} from 'vitest';
 import {createPinia, setActivePinia} from 'pinia';
 import {useToastStore} from '../toast';
 
-describe('Toast Store', () => {
+describe('Toast store', () => {
   beforeEach(() => {
     setActivePinia(createPinia());
   });

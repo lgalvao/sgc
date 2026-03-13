@@ -7,10 +7,10 @@ O teste E2E (cdu-35.spec.ts) cobre:
 - Navegação para página de Relatórios (via link "Relatórios")
 - Validação de URL `/relatorios` e heading "Relatórios"
 - Localização de select "Selecione o Processo"
-- Validação inicial: botão "Gerar Relatório" desabilitado
+- Validação inicial: botão "Gerar relatório" desabilitado
 - Seleção do processo criado no select
-- Validação: botão "Gerar Relatório" habilitado após seleção
-- Clique em "Gerar Relatório"
+- Validação: botão "Gerar relatório" habilitado após seleção
+- Clique em "Gerar relatório"
 - Validação de visualização de tabela de relatório
 - Validação de visualização de botão "PDF"
 

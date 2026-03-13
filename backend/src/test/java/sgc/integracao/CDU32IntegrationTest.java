@@ -51,18 +51,18 @@ class CDU32IntegrationTest extends BaseIntegrationTest {
             unidadeRepo.save(admin);
         }
 
-        // Obter Unidade
+        // Obter unidade
         Unidade unidade = unidadeRepo.findById(1L).orElseGet(() -> {
             Unidade u = new Unidade();
             u.setCodigo(1L);
             u.setSigla("TESTE");
-            u.setNome("Unidade Teste");
+            u.setNome("Unidade teste");
             u.setSituacao(SituacaoUnidade.ATIVA);
             u.setTipo(TipoUnidade.OPERACIONAL);
             return unidadeRepo.save(u);
         });
 
-        // Criar Processo
+        // Criar processo
         Processo processo = ProcessoFixture.processoPadrao();
         processo.setCodigo(null);
         processo.setTipo(TipoProcesso.MAPEAMENTO);
@@ -70,7 +70,7 @@ class CDU32IntegrationTest extends BaseIntegrationTest {
         processo.setDescricao("Processo CDU-32");
         processo = processoRepo.save(processo);
 
-        // Criar Subprocesso em estado que permite reabertura (MAPEAMENTO_MAPA_HOMOLOGADO)
+        // Criar subprocesso em estado que permite reabertura (MAPEAMENTO_MAPA_HOMOLOGADO)
         subprocesso = SubprocessoFixture.subprocessoPadrao(processo, unidade);
         subprocesso.setCodigo(null);
         subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
@@ -148,7 +148,7 @@ class CDU32IntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("Não deve permitir reabrir cadastro quando em situação insuficiente (ex: Cadastro Homologado)")
+    @DisplayName("Não deve permitir reabrir cadastro quando em situação insuficiente (ex: Cadastro homologado)")
     @WithMockAdmin
     void reabrirCadastro_SituacaoInsuficiente_Erro() throws Exception {
         // Forçar situação que ainda não atingiu MAPA_HOMOLOGADO

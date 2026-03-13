@@ -2,7 +2,7 @@
 
 Contém funções puras e auxiliares que não dependem do estado do Vue ou de componentes específicos.
 
-## Utilitários Disponíveis
+## Utilitários disponíveis
 
 * **`apiUtils.ts`**: Helpers para manipulação de URLs, parâmetros de consulta e tratamento de respostas brutas.
 * **`apiError.ts`**: Definições de classes de erro customizadas para falhas de rede e API.
@@ -17,5 +17,5 @@ Contém funções puras e auxiliares que não dependem do estado do Vue ou de co
 ## Princípios
 
 1. **Pureza**: As funções devem ser preferencialmente puras (mesma entrada sempre gera mesma saída).
-2. **Sem Efeitos Colaterais**: Evite manipular o DOM ou estado global diretamente aqui.
+2. **Sem efeitos colaterais**: Evite manipular o DOM ou estado global diretamente aqui.
 3. **Testabilidade**: Devem ser facilmente testáveis de forma isolada.

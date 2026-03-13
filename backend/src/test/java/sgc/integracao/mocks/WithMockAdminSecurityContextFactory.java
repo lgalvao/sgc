@@ -26,11 +26,11 @@ public class WithMockAdminSecurityContextFactory
     public SecurityContext createSecurityContext(@NonNull WithMockAdmin customUser) {
         String tituloAdmin = "111111111111"; // Título padrão Admin no data.sql
         Usuario principal = usuarioRepo.findById(tituloAdmin)
-                .orElseThrow(() -> new IllegalStateException("Usuário Admin (111111111111) não encontrado no data.sql"));
+                .orElseThrow(() -> new IllegalStateException("Usuário admin (111111111111) não encontrado no data.sql"));
 
         var atribuicoes = usuarioPerfilRepo.findByUsuarioTitulo(tituloAdmin);
         if (atribuicoes.isEmpty()) {
-            throw new IllegalStateException("Usuário Admin não possui perfis no data.sql");
+            throw new IllegalStateException("Usuário admin não possui perfis no data.sql");
         }
 
         principal.setPerfilAtivo(Perfil.ADMIN);

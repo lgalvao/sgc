@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         WithMockChefeSecurityContextFactory.class,
 })
 @Transactional
-@DisplayName("CDU-10: Disponibilizar Revisão do Cadastro de Atividades e Conhecimentos")
+@DisplayName("CDU-10: Disponibilizar revisão do Cadastro de Atividades e Conhecimentos")
 class CDU10IntegrationTest extends BaseIntegrationTest {
     @Autowired
     private ConhecimentoRepo conhecimentoRepo;
@@ -69,7 +69,7 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
         usuarioSuperior.setUnidadeLotacao(unidadeSuperior);
         usuarioSuperior = usuarioRepo.saveAndFlush(usuarioSuperior);
 
-        // 3. Configurar Perfil e Titularidade
+        // 3. Configurar perfil e Titularidade
         setupUsuarioPerfil(usuarioChefe, unidadeChefe, Perfil.CHEFE);
         definirTitular(unidadeChefe, usuarioChefe);
         definirTitular(unidadeSuperior, usuarioSuperior);
@@ -205,7 +205,7 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
         mov.setUnidadeDestino(sp.getUnidade());
         mov.setDataHora(LocalDateTime.now().plusSeconds(1)); // Ensure it's later
         mov.setDescricao("Devolução simulada");
-        // Usuario Superior
+        // Usuario superior
         Usuario usuarioSuperior = usuarioRepo.findById("666666666666").get();
         mov.setUsuario(usuarioSuperior);
         movimentacaoRepo.saveAndFlush(mov);

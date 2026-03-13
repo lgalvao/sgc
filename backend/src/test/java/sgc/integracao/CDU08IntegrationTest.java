@@ -56,21 +56,21 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
         Unidade unidadeOrigem = UnidadeFixture.unidadePadrao();
         unidadeOrigem.setCodigo(null);
         unidadeOrigem.setSigla("U_ORIG");
-        unidadeOrigem.setNome("Unidade Origem");
+        unidadeOrigem.setNome("Unidade origem");
         unidadeOrigem.setUnidadeSuperior(raiz);
         unidadeOrigem = unidadeRepo.save(unidadeOrigem);
 
         Unidade unidadeDestino = UnidadeFixture.unidadePadrao();
         unidadeDestino.setCodigo(null);
         unidadeDestino.setSigla("U_DEST");
-        unidadeDestino.setNome("Unidade Destino");
+        unidadeDestino.setNome("Unidade destino");
         unidadeDestino.setUnidadeSuperior(raiz);
         unidadeDestino = unidadeRepo.save(unidadeDestino);
 
 
         chefe = UsuarioFixture.usuarioPadrao();
         chefe.setTituloEleitoral("888888888888");
-        chefe.setNome("Chefe Destino");
+        chefe.setNome("Chefe destino");
         chefe.setUnidadeLotacao(unidadeDestino);
         chefe = usuarioRepo.save(chefe);
 
@@ -90,9 +90,9 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
         Authentication auth = new UsernamePasswordAuthenticationToken(chefe, null, chefe.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(auth);
 
-        // 3. Processo Origem (FINALIZADO) - Permite importação de qualquer unidade
+        // 3. Processo origem (FINALIZADO) - Permite importação de qualquer unidade
         Processo processoOrigem = Processo.builder()
-                .descricao("Processo Origem Finalizado")
+                .descricao("Processo origem finalizado")
                 .tipo(TipoProcesso.MAPEAMENTO)
                 .situacao(SituacaoProcesso.FINALIZADO)
                 .dataLimite(LocalDateTime.now().minusDays(30))
@@ -121,9 +121,9 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
         conhecimentoRepo.save(Conhecimento.builder().descricao("Conhecimento 2.1").atividade(atividade2).build());
         conhecimentoRepo.save(Conhecimento.builder().descricao("Conhecimento 2.2").atividade(atividade2).build());
 
-        // 4. Processo Destino (EM ANDAMENTO)
+        // 4. Processo destino (EM ANDAMENTO)
         Processo processoDestino = Processo.builder()
-                .descricao("Processo Destino Ativo")
+                .descricao("Processo destino ativo")
                 .tipo(TipoProcesso.MAPEAMENTO)
                 .situacao(SituacaoProcesso.EM_ANDAMENTO)
                 .dataLimite(LocalDateTime.now().plusDays(30))

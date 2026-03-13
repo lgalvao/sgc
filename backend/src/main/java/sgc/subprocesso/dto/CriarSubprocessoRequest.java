@@ -10,7 +10,7 @@ import java.time.*;
  *
  * <p>
  * Usado exclusivamente como entrada de API para o endpoint de criação.
- * A validação Bean Validation é aplicada neste DTO.
+ * A validação Bean validation é aplicada neste DTO.
  */
 @Builder
 public record CriarSubprocessoRequest(

@@ -45,18 +45,18 @@ class SubprocessoServiceEmailIntegrationTest extends BaseIntegrationTest {
         unidade = UnidadeFixture.unidadePadrao();
         unidade.setCodigo(null);
         unidade.setSigla("TEST_EMAIL_ORIG");
-        unidade.setNome("Unidade Email Origem");
+        unidade.setNome("Unidade email origem");
         unidade = unidadeRepo.save(unidade);
 
         unidadeDestino = UnidadeFixture.unidadePadrao();
         unidadeDestino.setCodigo(null);
         unidadeDestino.setSigla("TEST_EMAIL_DEST");
-        unidadeDestino.setNome("Unidade Email Destino");
+        unidadeDestino.setNome("Unidade email destino");
         unidadeDestino = unidadeRepo.save(unidadeDestino);
 
         admin = usuarioRepo.findById("111111111111").orElseThrow();
 
-        // Setup Responsabilidade for units using JDBC to bypass Hibernate @Immutable / null identifier issues
+        // Setup responsabilidade for units using JDBC to bypass Hibernate @Immutable / null identifier issues
         jdbcTemplate.update(
                 "INSERT INTO sgc.vw_responsabilidade (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio) VALUES (?, ?, ?, ?, ?)",
                 unidade.getCodigo(), admin.getTituloEleitoral(), admin.getMatricula(), "TITULAR", LocalDateTime.now()
@@ -68,7 +68,7 @@ class SubprocessoServiceEmailIntegrationTest extends BaseIntegrationTest {
         );
 
         Processo processo = Processo.builder()
-                .descricao("Processo Teste Email")
+                .descricao("Processo teste email")
                 .tipo(TipoProcesso.MAPEAMENTO)
                 .situacao(SituacaoProcesso.EM_ANDAMENTO)
                 .dataLimite(LocalDateTime.now().plusDays(30))

@@ -14,7 +14,7 @@ import {
 } from './helpers/helpers-navegacao.js';
 import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
 
-test.describe('CDU-04 - Iniciar Processo', () => {
+test.describe('CDU-04 - Iniciar processo', () => {
 
     test('Deve iniciar um processo e validar criação de subprocessos e alertas', async ({
                                                                                             page,
@@ -83,10 +83,10 @@ test.describe('CDU-04 - Iniciar Processo', () => {
         ).toBeVisible();
         await contextoChefeAss11.close();
 
-        // 7. Validar Alertas (Step 14) para Unidade Interoperacional (SECRETARIA_1)
-        // John Lennon (SECRETARIA_1) deve receber alertas tanto como Chefe quanto como Gestor
+        // 7. Validar alertas (Step 14) para Unidade interoperacional (SECRETARIA_1)
+        // John lennon (SECRETARIA_1) deve receber alertas tanto como Chefe quanto como Gestor
 
-        // 7.1. Como CHEFE (Unidade Operacional)
+        // 7.1. Como CHEFE (Unidade operacional)
         const contextoChefeSec1 = await browser.newContext();
         const paginaChefeSec1 = await contextoChefeSec1.newPage();
         await loginComPerfil(paginaChefeSec1, USUARIOS.CHEFE_SECRETARIA_1.titulo, USUARIOS.CHEFE_SECRETARIA_1.senha, USUARIOS.CHEFE_SECRETARIA_1.perfil);
@@ -98,7 +98,7 @@ test.describe('CDU-04 - Iniciar Processo', () => {
         ).toBeVisible();
         await contextoChefeSec1.close();
 
-        // 7.2. Como GESTOR (Unidade Intermediária) - deve ver alerta sobre subordinada (ASSESSORIA_11)
+        // 7.2. Como GESTOR (Unidade intermediária) - deve ver alerta sobre subordinada (ASSESSORIA_11)
         const contextoGestorSec1 = await browser.newContext();
         const paginaGestorSec1 = await contextoGestorSec1.newPage();
         await loginComPerfil(paginaGestorSec1, USUARIOS.GESTOR_SECRETARIA_1.titulo, USUARIOS.GESTOR_SECRETARIA_1.senha, USUARIOS.GESTOR_SECRETARIA_1.perfil);

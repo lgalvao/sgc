@@ -5,7 +5,7 @@
 ## Pré-condições
 
 - Login realizado com perfil ADMIN
-- Tela Painel aberta
+- Tela painel aberta
 
 ## Fluxo principal
 

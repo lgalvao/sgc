@@ -33,5 +33,5 @@ O teste E2E (cdu-36.spec.ts) abrange:
 ## Notas e inconsistências do requisito
 - Requisito menciona filtro "Unidade (Opcional)", mas lógica em CDU-36 parece exigir que Processo seja selecionado primeiro (linha 17 especifica "Obrigatório"). Teste valida que processo habilita botão, mas não testa se unidade é realmente opcional (gerar sem selecionar).
 - Estrutura do PDF no requisito é hierárquica: Unidade → Competência → Atividades → Conhecimentos. Teste não valida essa hierarquia, apenas download.
-- Requisito não especifica se "Mapas" refere-se a Mapas Homologados ou Mapas em qualquer situação. Setup do teste usa `criarProcessoMapaHomologadoFixture`, sugerindo apenas mapas homologados são relevantes.
+- Requisito não especifica se "Mapas" refere-se a Mapas homologados ou Mapas em qualquer situação. Setup do teste usa `criarProcessoMapaHomologadoFixture`, sugerindo apenas mapas homologados são relevantes.
 - Linha 20 do teste seleciona `.last()` para select de processo, sugerindo que há múltiplos selects na página (um na aba Andamento CDU-35, outro na aba Mapas CDU-36). Requisito não esclarece a estrutura da página de Relatórios.

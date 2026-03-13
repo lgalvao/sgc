@@ -65,4 +65,4 @@ Fluxo principal:
 
 14. O sistema define a data/hora de conclusão da Etapa 1 do subprocesso da unidade como sendo a data/hora atual.
 
-15. O sistema redireciona para o `Painel`, e mostra a mensagem "Revisão do cadastro de atividades disponibilizada".
+15. O sistema redireciona para o `Painel`, e mostra a mensagem "Revisão do cadastro disponibilizada".

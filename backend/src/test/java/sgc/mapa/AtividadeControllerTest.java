@@ -46,7 +46,7 @@ class AtividadeControllerTest {
         void deveObterPorId() throws Exception {
             Atividade response = Atividade.builder()
                     .codigo(1L)
-                    .descricao("Atividade Teste")
+                    .descricao("Atividade teste")
                     .mapa(Mapa.builder().codigo(10L).build())
                     .conhecimentos(new LinkedHashSet<>())
                     .competencias(new HashSet<>())

@@ -16,7 +16,7 @@ type Story = StoryObj<typeof ModalAcaoBloco>;
 
 const mockUnidades = [
     {codigo: 1, sigla: 'DITEC', nome: 'Diretoria de Tecnologia', situacao: 'EM_ANDAMENTO'},
-    {codigo: 2, sigla: 'DIRAD', nome: 'Diretoria Administrativa', situacao: 'EM_ANDAMENTO'},
+    {codigo: 2, sigla: 'DIRAD', nome: 'Diretoria administrativa', situacao: 'EM_ANDAMENTO'},
     {codigo: 3, sigla: 'PRES', nome: 'Presidência', situacao: 'PENDENTE'},
     {codigo: 4, sigla: 'CODES', nome: 'Coordenação de Sistemas', situacao: 'EM_ANDAMENTO'},
 ];
@@ -24,9 +24,9 @@ const mockUnidades = [
 export const AceiteEmBloco: Story = {
     args: {
         id: 'modal-aceite-bloco',
-        titulo: 'Aceitar Unidades em Bloco',
+        titulo: 'Aceitar unidades em Bloco',
         texto: 'Selecione as unidades que deseja aceitar o mapeamento de competências.',
-        rotuloBotao: 'Aceitar Selecionadas',
+        rotuloBotao: 'Aceitar selecionadas',
         unidades: mockUnidades,
         unidadesPreSelecionadas: [1, 2],
         mostrarDataLimite: false,
@@ -40,7 +40,7 @@ export const AceiteEmBloco: Story = {
         },
         template: `
       <div>
-        <button class="btn btn-primary" @click="abrir">Abrir Aceite em Bloco</button>
+        <button class="btn btn-primary" @click="abrir">Abrir aceite em Bloco</button>
         <ModalAcaoBloco v-bind="args" ref="modalRef" />
       </div>
     `,
@@ -50,9 +50,9 @@ export const AceiteEmBloco: Story = {
 export const AlterarDataLimiteEmBloco: Story = {
     args: {
         id: 'modal-data-bloco',
-        titulo: 'Alterar Data Limite em Bloco',
+        titulo: 'Alterar data limite em Bloco',
         texto: 'Selecione as unidades para as quais deseja alterar a data limite do processo.',
-        rotuloBotao: 'Alterar Datas',
+        rotuloBotao: 'Alterar datas',
         unidades: mockUnidades,
         unidadesPreSelecionadas: [],
         mostrarDataLimite: true,
@@ -66,7 +66,7 @@ export const AlterarDataLimiteEmBloco: Story = {
         },
         template: `
       <div>
-        <button class="btn btn-warning" @click="abrir">Alterar Datas em Bloco</button>
+        <button class="btn btn-warning" @click="abrir">Alterar datas em Bloco</button>
         <ModalAcaoBloco v-bind="args" ref="modalRef" />
       </div>
     `,

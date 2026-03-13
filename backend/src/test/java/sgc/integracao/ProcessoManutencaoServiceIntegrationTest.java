@@ -83,7 +83,7 @@ class ProcessoManutencaoServiceIntegrationTest extends BaseIntegrationTest {
         void deveLancarErroAoCriarSemMapa() {
             LocalDateTime dataLimite = LocalDateTime.now().plusDays(30);
             CriarProcessoRequest request = CriarProcessoRequest.builder()
-                    .descricao("Processo de Revisão Falho")
+                    .descricao("Processo de Revisão falho")
                     .tipo(TipoProcesso.REVISAO)
                     .dataLimiteEtapa1(dataLimite)
 
@@ -150,7 +150,7 @@ class ProcessoManutencaoServiceIntegrationTest extends BaseIntegrationTest {
         @DisplayName("Deve apagar processo na situação CRIADO com sucesso")
         void deveApagarProcessoCriadoComSucesso() {
             Processo criado = service.criar(CriarProcessoRequest.builder()
-                    .descricao("A Apagar")
+                    .descricao("A apagar")
                     .tipo(TipoProcesso.MAPEAMENTO)
                     .dataLimiteEtapa1(LocalDateTime.now().plusDays(30))
                     .unidades(List.of(1L))

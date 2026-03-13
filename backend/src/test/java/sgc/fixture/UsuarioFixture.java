@@ -8,10 +8,10 @@ public class UsuarioFixture {
         Usuario usuario = new Usuario();
         usuario.setTituloEleitoral("123456789012");
         usuario.setMatricula("12345678"); // Campo obrigatório para VW_USUARIO
-        usuario.setNome("Usuário Teste");
+        usuario.setNome("Usuário teste");
         usuario.setEmail("teste@example.com");
         usuario.setRamal("1234");
-        // Unidade Lotacao Default
+        // Unidade lotacao default
         usuario.setUnidadeLotacao(UnidadeFixture.unidadePadrao());
         return usuario;
     }

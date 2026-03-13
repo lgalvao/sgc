@@ -36,13 +36,13 @@ class MovimentacaoRepoPerformanceTest {
 
         Unidade uOrigem = new Unidade();
         uOrigem.setSigla("UO");
-        uOrigem.setNome("Unidade Origem");
+        uOrigem.setNome("Unidade origem");
         uOrigem.setTipo(TipoUnidade.OPERACIONAL);
         uOrigem = unidadeRepo.save(uOrigem);
 
         Unidade uDestino = new Unidade();
         uDestino.setSigla("UD");
-        uDestino.setNome("Unidade Destino");
+        uDestino.setNome("Unidade destino");
         uDestino.setTipo(TipoUnidade.OPERACIONAL);
         uDestino = unidadeRepo.save(uDestino);
 

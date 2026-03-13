@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class UsuarioServiceTest {
 
     private static final String TITULO_ADMIN = "111111111111";
-    private static final String NOME_ADMIN = "Admin Teste";
+    private static final String NOME_ADMIN = "Admin teste";
 
     private static final Long COD_UNIT_SEC1 = 2L;
     private static final String NOME_UNIT_SEC1 = "Secretaria de Informática e Comunicações";
@@ -220,7 +220,7 @@ class UsuarioServiceTest {
     }
 
     @Nested
-    @DisplayName("Cobertura Extra")
+    @DisplayName("Cobertura extra")
     class CoberturaExtra {
         @Test
         @DisplayName("Deve buscar responsáveis ignorando unidades sem chefe")

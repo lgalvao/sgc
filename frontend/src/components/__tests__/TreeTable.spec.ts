@@ -34,10 +34,10 @@ describe("TreeTable.vue", () => {
 
     it("deve renderizar o título corretamente", () => {
         const wrapper = mount(TreeTable, {
-            props: {data: [], columns: [], title: "Meu Título"},
+            props: {data: [], columns: [], title: "Meu título"},
             global: {stubs: {TreeRowItem: mockTreeRow}},
         });
-        expect(wrapper.find("h4").text()).toBe("Meu Título");
+        expect(wrapper.find("h4").text()).toBe("Meu título");
     });
 
     it("não deve renderizar o título se não for fornecido", () => {
@@ -110,7 +110,7 @@ describe("TreeTable.vue", () => {
             props: {
                 data: dataWithChildren,
                 columns: mockColumns,
-                title: "Test Title",
+                title: "Test title",
             },
         });
         await wrapper.vm.$nextTick();
@@ -143,7 +143,7 @@ describe("TreeTable.vue", () => {
             props: {
                 data: dataWithChildren,
                 columns: mockColumns,
-                title: "Test Title",
+                title: "Test title",
             },
         });
 

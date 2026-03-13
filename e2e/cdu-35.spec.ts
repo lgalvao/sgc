@@ -30,7 +30,7 @@ test.describe.serial('CDU-35 - Gerar relatório de andamento', () => {
         await expect(page.getByRole('heading', {name: /Relatórios/i})).toBeVisible();
 
         const selectProcesso = page.getByLabel('Selecione o Processo').first();
-        const botaoGerar = page.getByRole('button', {name: 'Gerar Relatório'});
+        const botaoGerar = page.getByRole('button', {name: 'Gerar relatório'});
         await expect(selectProcesso).toBeVisible();
         await expect(botaoGerar).toBeDisabled();
 

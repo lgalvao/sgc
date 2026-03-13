@@ -191,7 +191,7 @@ export const test = base.extend<{
                 ...logs,
                 '```',
                 '',
-                '## HTML Page Snapshot (Body)',
+                '## HTML Page snapshot (Body)',
                 '```html',
                 await page.evaluate(() => document.body.innerHTML.substring(0, 5000)),
                 '```'

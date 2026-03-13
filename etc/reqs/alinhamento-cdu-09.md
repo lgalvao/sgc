@@ -9,7 +9,7 @@ O teste `cdu-09.spec.ts` cobre:
 - Adição de conhecimento corrige validação
 - Cancelamento do diálogo de confirmação
 
-**Cenário 2: Caminho Feliz**
+**Cenário 2: Caminho feliz**
 - Adição de atividade com conhecimento
 - Clique em "Disponibilizar"
 - Apresentação de diálogo de confirmação (título "Disponibilização do cadastro", mensagem sobre finalização e análise) (passo 8)

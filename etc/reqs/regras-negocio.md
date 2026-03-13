@@ -6,7 +6,7 @@ Este documento consolida todas as regras de negócio do Sistema de Gestão de Co
 
 ## Índice
 
-1. [Estrutura Organizacional e Tipos de Unidade](#1-estrutura-organizacional-e-tipos-de-unidade)
+1. [Estrutura organizacional e Tipos de Unidade](#1-estrutura-organizacional-e-tipos-de-unidade)
 2. [Perfis de Usuário e Permissões](#2-perfis-de-usuário-e-permissões)
 3. [Autenticação e Login](#3-autenticação-e-login)
 4. [Processos — Criação e Ciclo de Vida](#4-processos--criação-e-ciclo-de-vida)
@@ -19,13 +19,13 @@ Este documento consolida todas as regras de negócio do Sistema de Gestão de Co
 11. [Histórico de Processos](#11-histórico-de-processos)
 12. [Relatórios](#12-relatórios)
 13. [Administração do Sistema](#13-administração-do-sistema)
-14. [Atribuição Temporária de Responsabilidade](#14-atribuição-temporária-de-responsabilidade)
-15. [Integração com Sistemas Externos (SGRH e CORAU)](#15-integração-com-sistemas-externos-sgrh-e-corau)
+14. [Atribuição temporária de Responsabilidade](#14-atribuição-temporária-de-responsabilidade)
+15. [Integração com Sistemas externos (SGRH e CORAU)](#15-integração-com-sistemas-externos-sgrh-e-corau)
 16. [Views do Sistema](#16-views-do-sistema)
 
 ---
 
-## 1. Estrutura Organizacional e Tipos de Unidade
+## 1. Estrutura organizacional e Tipos de Unidade
 
 **RN-01.01** — A árvore de unidades organizacionais está subordinada a uma unidade virtual raiz de sigla **ADMIN** (código fixo 1), que não existe no SGRH e é criada artificialmente pelo sistema.
 > Fonte: `_intro.md`, `_intro-glossario.md` (Unidade raiz), `views/view-03-unidade.md` (RN-VIEW03-01)
@@ -46,7 +46,7 @@ Este documento consolida todas as regras de negócio do Sistema de Gestão de Co
 **RN-01.05** — Unidades do tipo **INTERMEDIÁRIA** não cadastram atividades e conhecimentos; seu papel no sistema é exclusivamente o de validar os cadastros e mapas das unidades subordinadas.
 > Fonte: `_intro.md`, `_intro-glossario.md`, `cdu-04.md` (passo 9)
 
-**RN-01.06** — As **Centrais de Atendimento ao Eleitor (CAEs)** têm como unidade superior, na hierarquia do SGC, a Zona Eleitoral sob sua responsabilidade vigente, conforme dados do SIGMA (esquema CORAU). Se não houver zona atribuída, a unidade superior fica nula.
+**RN-01.06** — As **Centrais de Atendimento ao Eleitor (CAEs)** têm como unidade superior, na hierarquia do SGC, a Zona eleitoral sob sua responsabilidade vigente, conforme dados do SIGMA (esquema CORAU). Se não houver zona atribuída, a unidade superior fica nula.
 > Fonte: `views/view-02-zona-resp-central.md` (RN-VIEW02-01), `views/view-03-unidade.md` (RN-VIEW03-04)
 
 **RN-01.07** — Ao iniciar um processo, o sistema armazena uma cópia profunda (snapshot) da árvore de unidades participantes vigente no momento do início, preservando a hierarquia mesmo que posteriormente haja mudanças organizacionais no SGRH.
@@ -78,7 +78,7 @@ Este documento consolida todas as regras de negócio do Sistema de Gestão de Co
 > Fonte: `_intro.md`, `views/view-06-usuario-perfil-unidade.md` (RN-VIEW06-04, RN-VIEW06-06)
 
 **RN-02.07** — Os perfis são dinâmicos: ao mudar de responsável (por fim de substituição, atribuição temporária ou mudança de titular no SGRH), os perfis são automaticamente reatribuídos sem intervenção manual (isso porque os dados de perfil são determinados através de views baseadas no SGRH e em dados do SGC, sendo atualizadas automaticamente no Oracle). A perda de lotação ativa implica perda imediata de todos os perfis.
-> Fonte: `views/view-06-usuario-perfil-unidade.md` (Mudanças Dinâmicas), `views/view-05-responsabilidade.md`
+> Fonte: `views/view-06-usuario-perfil-unidade.md` (Mudanças dinâmicas), `views/view-05-responsabilidade.md`
 
 **RN-02.08** — O perfil **GESTOR** não cadastra nenhuma informação no sistema; ele apenas valida, devolve ou encaminha subprocessos.
 > Fonte: `_intro.md` (descrição do perfil GESTOR)
@@ -93,7 +93,7 @@ Este documento consolida todas as regras de negócio do Sistema de Gestão de Co
 
 ## 3. Autenticação e Login
 
-**RN-03.01** — A autenticação é realizada através do **Sistema Acesso AD** do TRE-PE, usando número do título de eleitor e senha de rede. O SGC não gerencia senhas.
+**RN-03.01** — A autenticação é realizada através do **Sistema acesso AD** do TRE-PE, usando número do título de eleitor e senha de rede. O SGC não gerencia senhas.
 > Fonte: `cdu-01.md` (passo 4), `_intro-glossario.md` (Acesso TRE-PE)
 
 **RN-03.02** — Após autenticação bem-sucedida, o sistema consulta os dados de lotação e de responsabilidades do usuário nas views do banco de dados para determinar os pares perfil/unidade disponíveis.
@@ -137,7 +137,7 @@ Este documento consolida todas as regras de negócio do Sistema de Gestão de Co
 > Fonte: `cdu-03.md` (passo 2 — campo Unidades participantes), `design/arvore-unidades.md` (Elegibilidade)
 
 **RN-04.08** — Unidades do tipo **INTERMEDIÁRIA** nunca participam diretamente de um processo como unidade com subprocesso; elas participam apenas no papel de validadoras na hierarquia. Na seleção de unidades, o comportamento da árvore filtra automaticamente as INTERMEDIÁRIAS antes do envio ao backend (porém mostra as unidades para facilitar o entendi,m.
-> Fonte: `cdu-04.md` (passo 9), `design/arvore-unidades.md` (Filtro Transparente)
+> Fonte: `cdu-04.md` (passo 9), `design/arvore-unidades.md` (Filtro transparente)
 
 **RN-04.09** — Ao se iniciar um processo de qualquer tipo, o sistema notifica por e-mail e cria alertas para todas as unidades participantes (operacionais e interoperacionais recebem notificação de início; intermediárias recebem notificação consolidada sobre suas subordinadas).
 > Fonte: `cdu-04.md` (passos 12–13), `cdu-05.md` (passos 12–13)
@@ -323,7 +323,7 @@ Este documento consolida todas as regras de negócio do Sistema de Gestão de Co
 
 ## 10. Painel e Visibilidade de Processos
 
-**RN-10.01** — O Painel exibe apenas os processos que incluam a unidade do usuário e/ou suas unidades subordinadas entre as participantes.
+**RN-10.01** — O painel exibe apenas os processos que incluam a unidade do usuário e/ou suas unidades subordinadas entre as participantes.
 > Fonte: `cdu-02.md` (passo 2)
 
 **RN-10.02** — Processos na situação **'Criado'** são exibidos no Painel **apenas** para o perfil ADMIN.
@@ -342,10 +342,10 @@ Este documento consolida todas as regras de negócio do Sistema de Gestão de Co
 **RN-11.01** — O **Histórico de processos** é acessível pelos perfis ADMIN, GESTOR e CHEFE (não pelo SERVIDOR).
 > Fonte: `cdu-29.md` (pré-condições)
 
-**RN-11.02** — O Histórico exibe apenas processos com situação **'Finalizado'**. Processos inativos (finalizados há mais de `DIAS_INATIVACAO_PROCESSO` dias) só aparecem no Histórico, não mais no Painel.
+**RN-11.02** — O histórico exibe apenas processos com situação **'Finalizado'**. Processos inativos (finalizados há mais de `DIAS_INATIVACAO_PROCESSO` dias) só aparecem no Histórico, não mais no Painel.
 > Fonte: `cdu-29.md`, `_intro-glossario.md` (Processos ativos/inativos)
 
-**RN-11.03** — O Histórico de processos permite apenas **consulta**, sem nenhum botão de ação ou possibilidade de alteração.
+**RN-11.03** — O histórico de processos permite apenas **consulta**, sem nenhum botão de ação ou possibilidade de alteração.
 > Fonte: `cdu-29.md` (passo 4)
 
 ---
@@ -376,7 +376,7 @@ Este documento consolida todas as regras de negócio do Sistema de Gestão de Co
 
 ---
 
-## 14. Atribuição Temporária de Responsabilidade
+## 14. Atribuição temporária de Responsabilidade
 
 **RN-14.01** — O perfil **ADMIN** pode criar atribuições temporárias de responsabilidade para servidores de uma unidade, definindo obrigatoriamente: servidor, data de início, data de término e justificativa.
 > Fonte: `cdu-28.md` (passos 5–7)
@@ -398,7 +398,7 @@ Este documento consolida todas as regras de negócio do Sistema de Gestão de Co
 
 ---
 
-## 15. Integração com Sistemas Externos (SGRH e CORAU)
+## 15. Integração com Sistemas externos (SGRH e CORAU)
 
 **RN-15.01** — O sistema consome dados do **SGRH (SRH2)** em tempo real via views de banco de dados. Não há sincronização periódica; toda consulta reflete o estado atual do SGRH.
 > Fonte: `views/views-indice.md` (Sincronização e Atualização)
@@ -425,7 +425,7 @@ Este documento consolida todas as regras de negócio do Sistema de Gestão de Co
 **RN-16.01 (VW_VINCULACAO_UNIDADE)** — Esta view rastreia o histórico de sucessões de unidades organizacionais (extinções e reestruturações), permitindo identificar qual unidade atual sucedeu unidades históricas. É usada para auditoria de processos históricos e migração de dados.
 > Fonte: `views/view-01-vinculacao-unidade.md`
 
-**RN-16.02 (VW_ZONA_RESP_CENTRAL)** — Esta view mapeia as Centrais de Atendimento ao Eleitor (CAEs) para as Zonas Eleitorais sob sua responsabilidade vigente, integrando dados do SGRH e do CORAU. É essencial para determinar a posição hierárquica das CAEs na árvore de unidades.
+**RN-16.02 (VW_ZONA_RESP_CENTRAL)** — Esta view mapeia as Centrais de Atendimento ao Eleitor (CAEs) para as Zonas eleitorais sob sua responsabilidade vigente, integrando dados do SGRH e do CORAU. É essencial para determinar a posição hierárquica das CAEs na árvore de unidades.
 > Fonte: `views/view-02-zona-resp-central.md`
 
 **RN-16.03 (VW_UNIDADE)** — View principal de unidades do sistema. Consolida dados do SGRH, enriquece com classificação de tipo (RAIZ, SEM_EQUIPE, OPERACIONAL, INTEROPERACIONAL, INTERMEDIÁRIA), titularidade, situação e hierarquia ajustada (incluindo a unidade virtual ADMIN e o ajuste de CAEs).
@@ -449,7 +449,7 @@ Este documento consolida todas as regras de negócio do Sistema de Gestão de Co
 | `_intro.md`                               | Introdução geral, tipos de processo, situações de processos e subprocessos, perfis de usuário |
 | `_intro-glossario.md`                     | Glossário de termos do sistema                                                                |
 | `cdu-01.md`                               | Login e estrutura de telas                                                                    |
-| `cdu-02.md`                               | Visualizar Painel                                                                             |
+| `cdu-02.md`                               | Visualizar painel                                                                             |
 | `cdu-03.md`                               | Manter processo (criação, edição, remoção)                                                    |
 | `cdu-04.md`                               | Iniciar processo de mapeamento                                                                |
 | `cdu-05.md`                               | Iniciar processo de revisão                                                                   |

@@ -29,6 +29,6 @@ O teste E2E (cdu-32.spec.ts) abrange:
 - Considerar adicionar cenários de erro: tentar reabrir já aberto, tentar sem permissão, justificativa muito longa/vazia
 
 ## Notas e inconsistências do requisito
-- Requisito menciona "Processo do tipo Mapeamento ou Revisão" mas pré-condição especifica "Processo do tipo Mapeamento ou Revisão" e "Ao menos um subprocesso que tenha passado da situação 'Mapa homologado'". Para Revisão, a situação equivalente seria explícita?
+- Requisito menciona "Processo do tipo Mapeamento ou Revisão" mas pré-condição especifica "Processo do tipo Mapeamento ou Revisão" e "Ao menos um subprocesso que tenha passado da situação 'Mapa homologado'". Para revisão, a situação equivalente seria explícita?
 - Campo "Unidade origem" na movimentação é listado como "ADMIN" (linha 26), mas não está claro se é o login ADMIN ou se é uma representação literal da string "ADMIN".
 - Testes de e-mail dependem de infraestrutura de envio; não fica claro se E2E deve validar efetivamente ou apenas UI.

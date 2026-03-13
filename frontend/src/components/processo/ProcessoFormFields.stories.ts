@@ -22,7 +22,7 @@ const mockUnidades = [
         sigla: 'PRES',
         filhas: [
             {codigo: 2, nome: 'Diretoria de Tecnologia', sigla: 'DITEC'},
-            {codigo: 3, nome: 'Diretoria Administrativa', sigla: 'DIRAD'},
+            {codigo: 3, nome: 'Diretoria administrativa', sigla: 'DIRAD'},
         ],
     },
 ];
@@ -54,7 +54,7 @@ export const NovoProcesso: Story = {
 export const Preenchido: Story = {
     args: {
         modelValue: {
-            descricao: 'Mapeamento Anual de Competências 2025',
+            descricao: 'Mapeamento anual de Competências 2025',
             tipo: TipoProcesso.MAPEAMENTO,
             unidadesSelecionadas: [2],
             dataLimite: '2025-12-31',

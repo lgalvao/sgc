@@ -86,15 +86,15 @@ const LOG_FILTERS = [
     /^> Task :/,
     /logStarted/,
     /UP-TO-DATE/,
-    /Starting a Gradle Daemon.*Daemons could not be reused/,
+    /Starting a Gradle daemon.*Daemons could not be reused/,
     /Reusing configuration cache/,
     /Starting/,
 
     // Spring Boot - Inicialização
     /The following.*profile.*is active/,
-    /Initializing Spring/,
-    /Initializing Spring embedded WebApplicationContext/,
-    /Initializing Spring DispatcherServlet/,
+    /Initializing spring/,
+    /Initializing spring embedded WebApplicationContext/,
+    /Initializing spring DispatcherServlet/,
     /Started .* in .* seconds/,
     /Tomcat started on port/,
     /Tomcat initialized with port/,
@@ -166,6 +166,7 @@ function startBackend() {
         `--spring.datasource.url=${dbUrl()}`,
         `--CORS_ALLOWED_ORIGINS=http://localhost:${FRONTEND_PORT},http://localhost:4173`
     ].join(' ');
+    const argsGradle = isWindows ? `--args="${argsAplicacao}"` : `--args=${argsAplicacao}`;
 
     const spawnOptions = {
         cwd: BACKEND_DIR,
@@ -174,7 +175,7 @@ function startBackend() {
         env: normalizarEnv()
     };
 
-    const backendProcess = spawn(gradlewPath, ['bootRun', '-PENV=e2e', `--args="${argsAplicacao}"`], spawnOptions);
+    const backendProcess = spawn(gradlewPath, ['bootRun', '-PENV=e2e', argsGradle], spawnOptions);
     backendProcessos.push(backendProcess);
 
     backendProcess.stdout.on('data', data => log(`BACKEND`, data));

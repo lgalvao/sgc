@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(SubprocessoController.class)
 @Import(RestExceptionHandler.class)
-@DisplayName("SubprocessoController - Cobertura Extra")
+@DisplayName("SubprocessoController - Cobertura extra")
 class SubprocessoControllerCoverageExtraTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());

@@ -3,9 +3,9 @@
 Este documento consolida as especificações de requisitos das 6 views principais do SGC, que fornecem dados essenciais de
 unidades organizacionais, usuários, responsabilidades e perfis de acesso.
 
-## Visão Geral
+## Visão geral
 
-As views do sistema integram dados do **Sistema de Gestão de Recursos Humanos (SGRH)** e do **Sistema CORAU (SIGMA)**
+As views do sistema integram dados do **Sistema de Gestão de Recursos humanos (SGRH)** e do **Sistema CORAU (SIGMA)**
 com dados próprios do SGC, fornecendo uma camada de abstração que:
 
 1. Isola o SGC das estruturas internas dos sistemas externos
@@ -13,7 +13,7 @@ com dados próprios do SGC, fornecendo uma camada de abstração que:
 3. Garante consistência de dados em todo o sistema
 4. Facilita manutenção e evolução do modelo de dados
 
-## Views Documentadas
+## Views documentadas
 
 ### 1. VW_VINCULACAO_UNIDADE
 
@@ -39,7 +39,7 @@ com dados próprios do SGC, fornecendo uma camada de abstração que:
 
 **Arquivo:** [view-02-zona-resp-central.md](view-02-zona-resp-central.md)
 
-**Finalidade:** Mapeamento entre Centrais de Atendimento ao Eleitor (CAEs) e Zonas Eleitorais sob sua responsabilidade.
+**Finalidade:** Mapeamento entre Centrais de Atendimento ao Eleitor (CAEs) e Zonas eleitorais sob sua responsabilidade.
 
 **Colunas principais:**
 
@@ -224,7 +224,7 @@ unidades.
 
 ## Fluxo de Dados no Login
 
-1. **Autenticação:** Sistema Acesso TRE-PE valida título e senha
+1. **Autenticação:** Sistema acesso TRE-PE valida título e senha
 2. **Verificação de lotação:** Consulta `VW_USUARIO` para confirmar lotação ativa
 3. **Determinação de perfis:** Consulta `VW_USUARIO_PERFIL_UNIDADE`
 4. **Seleção de contexto:** Usuário escolhe perfil e unidade (se múltiplas opções)
@@ -232,14 +232,14 @@ unidades.
 
 ## Sincronização e Atualização
 
-### Dados do SGRH (Tempo Real)
+### Dados do SGRH (Tempo real)
 
 - **Unidades:** `VW_UNIDADE`, `VW_VINCULACAO_UNIDADE`
 - **Servidores:** `VW_USUARIO`
 - **Titularidades:** `VW_UNIDADE`, `VW_RESPONSABILIDADE`
 - **Substituições:** `VW_RESPONSABILIDADE`
 
-### Dados do CORAU (Tempo Real)
+### Dados do CORAU (Tempo real)
 
 - **CAEs e Zonas:** `VW_ZONA_RESP_CENTRAL`
 - **Responsabilidades territoriais:** `VW_ZONA_RESP_CENTRAL`
@@ -249,7 +249,7 @@ unidades.
 - **Administradores:** `ADMINISTRADOR` (manual)
 - **Atribuições temporárias:** `ATRIBUICAO_TEMPORARIA` (cadastro via ADMIN)
 
-## Permissões Necessárias
+## Permissões necessárias
 
 ### No SGRH (SRH2)
 
@@ -280,12 +280,12 @@ GRANT SELECT ON CORAU.CT_ZONA TO SGC;
 - **VW_UNIDADE:** Base para árvore de unidades e múltiplas operações
 - **VW_USUARIO:** Consultada frequentemente para exibição de dados
 
-### Views de Consulta Ocasional
+### Views de Consulta ocasional
 
 - **VW_VINCULACAO_UNIDADE:** Usada principalmente para auditoria e relatórios históricos
 - **VW_ZONA_RESP_CENTRAL:** Consultada na construção de `VW_UNIDADE`
 
-### Índices Recomendados
+### Índices recomendados
 
 Nas tabelas base do SGRH (se possível):
 
@@ -333,24 +333,24 @@ Nas tabelas do SGC:
 - **Permissões SGRH/CORAU:** Mantidas pelo time de infraestrutura/DBA
 - **Dados em ADMINISTRADOR e ATRIBUICAO_TEMPORARIA:** Mantidos por usuários ADMIN
 
-### Alterações Permitidas
+### Alterações permitidas
 
 - ✅ Adicionar colunas às views (com valores DEFAULT ou NULL)
 - ✅ Otimizar queries internas (desde que resultado seja idêntico)
 - ✅ Criar views materializadas para performance
 
-### Alterações Restritas
+### Alterações restritas
 
 - ⚠️ Renomear colunas: Requer atualização de todo código que usa a view
 - ⚠️ Mudar tipos de dados: Pode quebrar aplicações dependentes
 - ⚠️ Alterar lógica de cálculo: Pode afetar regras de negócio
 
-### Alterações Proibidas
+### Alterações proibidas
 
 - ❌ Remover colunas: Quebra compatibilidade
 - ❌ Mudar significado de colunas existentes: Corrompe lógica de negócio
 
-## Documentação Relacionada
+## Documentação relacionada
 
 - **Glossário:** [_intro-glossario.md](_intro-glossario.md) - Definições de termos usados
 - **Introdução:** [_intro.md](_intro.md) - Visão geral do sistema e perfis

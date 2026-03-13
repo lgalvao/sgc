@@ -37,8 +37,8 @@ class ProcessoControllerTest {
     protected static final String API_PROCESSOS_999 = "/api/processos/999";
     protected static final String CODIGO_JSON_PATH = "$.codigo";
     protected static final String DESCRICAO_JSON_PATH = "$.descricao";
-    protected static final String PROCESSO_ATUALIZADO = "Processo Atualizado";
-    private static final String NOVO_PROCESSO = "Novo Processo";
+    protected static final String PROCESSO_ATUALIZADO = "Processo atualizado";
+    private static final String NOVO_PROCESSO = "Novo processo";
 
     @MockitoBean
     private ProcessoFacade processoFacade;
@@ -114,7 +114,7 @@ class ProcessoControllerTest {
 
         @Test
         @WithMockUser(roles = "ADMIN")
-        @DisplayName("Deve retornar 400 Bad Request quando processo é inválido (descrição vazia)")
+        @DisplayName("Deve retornar 400 Bad request quando processo é inválido (descrição vazia)")
         void deveRetornarBadRequestQuandoProcessoInvalido() throws Exception {
 
             var req =
@@ -142,7 +142,7 @@ class ProcessoControllerTest {
                     Processo.builder()
                             .codigo(1L)
                             .dataCriacao(LocalDateTime.now())
-                            .descricao("Processo Teste")
+                            .descricao("Processo teste")
                             .situacao(SituacaoProcesso.CRIADO)
                             .tipo(TipoProcesso.MAPEAMENTO)
                             .build();
@@ -152,7 +152,7 @@ class ProcessoControllerTest {
             mockMvc.perform(get(API_PROCESSOS_1))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath(CODIGO_JSON_PATH).value(1L))
-                    .andExpect(jsonPath(DESCRICAO_JSON_PATH).value("Processo Teste"));
+                    .andExpect(jsonPath(DESCRICAO_JSON_PATH).value("Processo teste"));
 
             verify(processoFacade).obterPorId(1L);
         }
@@ -165,7 +165,7 @@ class ProcessoControllerTest {
             var dto =
                     ProcessoDetalheDto.builder()
                             .codigo(1L)
-                            .descricao("Processo Detalhado")
+                            .descricao("Processo detalhado")
                             .tipo(TipoProcesso.MAPEAMENTO.name())
                             .situacao(SituacaoProcesso.CRIADO)
                             .dataCriacao(LocalDateTime.now())
@@ -176,7 +176,7 @@ class ProcessoControllerTest {
             mockMvc.perform(get("/api/processos/1/detalhes"))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath(CODIGO_JSON_PATH).value(1L))
-                    .andExpect(jsonPath("$.descricao").value("Processo Detalhado"));
+                    .andExpect(jsonPath("$.descricao").value("Processo detalhado"));
 
             verify(processoFacade).obterDetalhes(eq(1L), any(Usuario.class));
         }
@@ -193,7 +193,7 @@ class ProcessoControllerTest {
 
         @Test
         @WithMockUser(roles = "ADMIN")
-        @DisplayName("Deve retornar 404 Not Found quando processo não existe")
+        @DisplayName("Deve retornar 404 Not found quando processo não existe")
         void deveRetornarNotFoundQuandoProcessoNaoExiste() throws Exception {
 
             when(processoFacade.obterPorId(999L)).thenReturn(Optional.empty());
@@ -252,7 +252,7 @@ class ProcessoControllerTest {
         @DisplayName("Deve retornar 200 OK ao iniciar mapeamento com sucesso")
         void deveRetornarOkAoIniciarMapeamentoQuandoValido() throws Exception {
             IniciarProcessoRequest req = new IniciarProcessoRequest(TipoProcesso.MAPEAMENTO, List.of(1L));
-            Processo processo = Processo.builder().codigo(1L).descricao("Processo Teste").build();
+            Processo processo = Processo.builder().codigo(1L).descricao("Processo teste").build();
 
             when(processoFacade.obterEntidadePorId(1L)).thenReturn(processo);
             when(processoFacade.iniciarProcesso(eq(1L), anyList())).thenReturn(List.of());
@@ -264,7 +264,7 @@ class ProcessoControllerTest {
                                     .content(objectMapper.writeValueAsString(req)))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.codigo").value(1L))
-                    .andExpect(jsonPath("$.descricao").value("Processo Teste"));
+                    .andExpect(jsonPath("$.descricao").value("Processo teste"));
 
             verify(processoFacade).iniciarProcesso(1L, List.of(1L));
         }
@@ -312,7 +312,7 @@ class ProcessoControllerTest {
     }
 
     @Nested
-    @DisplayName("Novas Listagens e Status")
+    @DisplayName("Novas listagens e Status")
     class NovasListagens {
         @Test
         @WithMockUser(roles = "ADMIN")
@@ -390,7 +390,7 @@ class ProcessoControllerTest {
     }
 
     @Nested
-    @DisplayName("Cobertura Extra")
+    @DisplayName("Cobertura extra")
     class CoberturaExtra {
         // Usar mocks manuais para testes isolados
         private ProcessoController controller;

@@ -1,6 +1,6 @@
 # Informações gerais
 
-O Sistema de Gestão de Competências (SGC) tem como objetivo gerenciar as competências técnicas das unidades organizacionais do Tribunal. O sistema opera com uma estrutura organizacional hierárquica em que a árvore de unidades fica subordinada a uma unidade virtual raiz (sigla ADMIN) a partir da qual os processos de mapeamento, revisão e diagnóstico de competências são iniciados e concluídos, após passarem pela atuação das demais unidades da hierarquia.
+O sistema de Gestão de Competências (SGC) tem como objetivo gerenciar as competências técnicas das unidades organizacionais do Tribunal. O sistema opera com uma estrutura organizacional hierárquica em que a árvore de unidades fica subordinada a uma unidade virtual raiz (sigla ADMIN) a partir da qual os processos de mapeamento, revisão e diagnóstico de competências são iniciados e concluídos, após passarem pela atuação das demais unidades da hierarquia.
 
 Para fins de classificação estrutural (detalhada no Glossário do sistema), as unidades são divididas em:
 - **Unidade operacional**: Unidade de ponta, com mais de um servidor e sem unidades subordinadas.

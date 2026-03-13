@@ -1,6 +1,6 @@
-# Pacote E2E (End-to-End Testing Support)
+# Pacote E2E (End-to-End testing support)
 
-## Visão Geral
+## Visão geral
 
 O pacote `e2e` (backend) fornece **endpoints auxiliares e configurações específicas para testes end-to-end** (E2E).
 
@@ -15,7 +15,7 @@ O objetivo deste pacote é facilitar a automação de testes, permitindo:
    `/e2e/reset-database`).
 2. **Criação de Fixtures:** Endpoints para criar cenários complexos (ex: um processo em andamento) rapidamente, sem a
    necessidade de navegar por toda a UI (`/e2e/fixtures/*`).
-3. **Limpeza Específica:** Endpoint para remover dados de um teste específico (`/e2e/processo/{id}/limpar`).
+3. **Limpeza específica:** Endpoint para remover dados de um teste específico (`/e2e/processo/{id}/limpar`).
 
 ## Componentes
 
@@ -23,7 +23,7 @@ O objetivo deste pacote é facilitar a automação de testes, permitindo:
 * **`E2eSecurityConfig`**: Configuração de segurança relaxada para permitir que os testes acessem os endpoints de
   controle sem autenticação complexa, ao mesmo tempo que mantém a simulação de segurança para a aplicação principal.
 
-## Como Usar
+## Como usar
 
 Este pacote é utilizado exclusivamente pela suite de testes Playwright localizada no diretório `/e2e` na raiz do
 projeto.

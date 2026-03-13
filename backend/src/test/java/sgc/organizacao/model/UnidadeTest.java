@@ -4,7 +4,7 @@ import org.junit.jupiter.api.*;
 
 import static org.assertj.core.api.Assertions.*;
 
-@DisplayName("Testes da Entidade Unidade")
+@DisplayName("Testes da Entidade unidade")
 class UnidadeTest {
     @Test
     @DisplayName("Deve atualizar matrícula e título do titular quando usuário não for nulo")

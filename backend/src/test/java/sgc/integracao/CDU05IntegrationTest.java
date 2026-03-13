@@ -50,26 +50,26 @@ class CDU05IntegrationTest extends BaseIntegrationTest {
         unidade = UnidadeFixture.unidadePadrao();
         unidade.setCodigo(null);
         unidade.setSigla("U_REV");
-        unidade.setNome("Unidade Revisão");
+        unidade.setNome("Unidade revisão");
         unidade = unidadeRepo.save(unidade);
 
         mapaOriginal = new Mapa();
         mapaRepo.save(mapaOriginal);
 
         competenciaOriginal = Competencia.builder()
-                .descricao("Competencia Original")
+                .descricao("Competencia original")
                 .mapa(mapaOriginal)
                 .build();
         competenciaRepo.save(competenciaOriginal);
 
         Atividade atividadeOriginal = Atividade.builder()
                 .mapa(mapaOriginal)
-                .descricao("Atividade Original")
+                .descricao("Atividade original")
                 .build();
         atividadeRepo.save(atividadeOriginal);
 
         Conhecimento conhecimentoOriginal = Conhecimento.builder()
-                .descricao("Conhecimento Original")
+                .descricao("Conhecimento original")
                 .atividade(atividadeOriginal)
                 .build();
         atividadeOriginal.getConhecimentos().add(conhecimentoOriginal); // Mantém consistência bidirecional
@@ -92,15 +92,15 @@ class CDU05IntegrationTest extends BaseIntegrationTest {
         Unidade unidadeSuperior = UnidadeFixture.unidadePadrao();
         unidadeSuperior.setCodigo(null);
         unidadeSuperior.setSigla("U_SUP");
-        unidadeSuperior.setNome("Unidade Superior");
+        unidadeSuperior.setNome("Unidade superior");
         unidadeSuperior = unidadeRepo.save(unidadeSuperior);
 
         unidade.setUnidadeSuperior(unidadeSuperior);
         unidade = unidadeRepo.save(unidade);
 
         // Preencher dados originais no mapa para verificar se são limpos
-        mapaOriginal.setSugestoes("Sugestões Legadas");
-        mapaOriginal.setObservacoesDisponibilizacao("Observações Legadas");
+        mapaOriginal.setSugestoes("Sugestões legadas");
+        mapaOriginal.setObservacoesDisponibilizacao("Observações legadas");
         mapaRepo.save(mapaOriginal);
 
         List<Long> unidades = new ArrayList<>();
@@ -128,7 +128,7 @@ class CDU05IntegrationTest extends BaseIntegrationTest {
                 .andExpect(status().isOk());
 
         Processo processo = processoRepo.findByIdComParticipantes(processoId).orElseThrow();
-        assertThat(processo.getParticipantes()).hasSize(2); // Unidade alvo + Unidade Superior
+        assertThat(processo.getParticipantes()).hasSize(2); // Unidade alvo + Unidade superior
         assertThat(processo.getParticipantes().stream().map(UnidadeProcesso::getSigla).toList())
                 .containsExactlyInAnyOrder("U_REV", "U_SUP");
 
@@ -161,13 +161,13 @@ class CDU05IntegrationTest extends BaseIntegrationTest {
         Unidade unidadeSemMapa = UnidadeFixture.unidadePadrao();
         unidadeSemMapa.setCodigo(null);
         unidadeSemMapa.setSigla("U_SEM_MAPA");
-        unidadeSemMapa.setNome("Unidade Sem Mapa");
+        unidadeSemMapa.setNome("Unidade sem mapa");
         unidadeSemMapa = unidadeRepo.save(unidadeSemMapa);
 
         List<Long> unidades = new ArrayList<>();
         unidades.add(unidadeSemMapa.getCodigo());
         CriarProcessoRequest criarRequestDTO = criarCriarProcessoReq(
-                "Processo de Revisão para Unidade Sem Mapa", unidades,
+                "Processo de Revisão para Unidade sem mapa", unidades,
                 LocalDateTime.now().plusDays(30));
 
         // A validação agora ocorre na criação do processo
@@ -175,7 +175,7 @@ class CDU05IntegrationTest extends BaseIntegrationTest {
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(criarRequestDTO)))
-                .andExpect(status().isUnprocessableContent()); // ErroValidacao mapeado para 422 Unprocessable Content
+                .andExpect(status().isUnprocessableContent()); // ErroValidacao mapeado para 422 Unprocessable content
     }
 
     @Test
@@ -194,7 +194,7 @@ class CDU05IntegrationTest extends BaseIntegrationTest {
         List<Long> unidades = new ArrayList<>();
         unidades.add(unidade.getCodigo());
         CriarProcessoRequest criarRequestDTO = criarCriarProcessoReq(
-                "Processo de Revisão para Iniciar Duas Vezes", unidades,
+                "Processo de Revisão para Iniciar duas vezes", unidades,
                 LocalDateTime.now().plusDays(30));
 
         MvcResult result = mockMvc.perform(post("/api/processos")

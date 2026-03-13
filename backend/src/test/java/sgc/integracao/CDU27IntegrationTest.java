@@ -36,10 +36,10 @@ class CDU27IntegrationTest extends BaseIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        // Obter Unidade
+        // Obter unidade
         Unidade unidade = unidadeRepo.findById(1L).orElseThrow();
 
-        // Criar Processo
+        // Criar processo
         Processo processo = ProcessoFixture.processoPadrao();
         processo.setCodigo(null);
         processo.setTipo(TipoProcesso.MAPEAMENTO);
@@ -47,7 +47,7 @@ class CDU27IntegrationTest extends BaseIntegrationTest {
         processo.setDescricao("Processo CDU-27");
         processo = processoRepo.save(processo);
 
-        // Criar Subprocesso
+        // Criar subprocesso
         subprocesso = SubprocessoFixture.subprocessoPadrao(processo, unidade);
         subprocesso.setCodigo(null);
         subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
@@ -82,7 +82,7 @@ class CDU27IntegrationTest extends BaseIntegrationTest {
         Subprocesso atualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
         assertThat(atualizado.getDataLimiteEtapa1().toLocalDate()).isEqualTo(novaData);
 
-        // Verify Alerta
+        // Verify alerta
         boolean alertaExiste = alertaRepo.findAll().stream()
                 .anyMatch(a -> a.getUnidadeDestino() != null &&
                         a.getUnidadeDestino().getCodigo().equals(atualizado.getUnidade().getCodigo()) &&

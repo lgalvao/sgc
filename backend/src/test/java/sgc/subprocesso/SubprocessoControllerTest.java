@@ -64,7 +64,7 @@ class SubprocessoControllerTest {
     }
 
     @Nested
-    @DisplayName("Cadastro Workflow")
+    @DisplayName("Cadastro workflow")
     class CadastroWorkflowTests {
         @Test
         @DisplayName("deve disponibilizar cadastro")
@@ -95,7 +95,7 @@ class SubprocessoControllerTest {
     }
 
     @Nested
-    @DisplayName("Mapa Workflow")
+    @DisplayName("Mapa workflow")
     class MapaWorkflowTests {
         @Test
         @DisplayName("deve obter mapa para visualização")
@@ -122,7 +122,7 @@ class SubprocessoControllerTest {
     }
 
     @Nested
-    @DisplayName("Validação Workflow")
+    @DisplayName("Validação workflow")
     class ValidacaoWorkflowTests {
         @Test
         @DisplayName("deve apresentar sugestões")

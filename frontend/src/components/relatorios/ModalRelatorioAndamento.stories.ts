@@ -15,7 +15,7 @@ type Story = StoryObj<typeof ModalRelatorioAndamento>;
 const mockProcessos = [
     {
         codigo: 1,
-        descricao: 'Mapeamento Anual 2025',
+        descricao: 'Mapeamento anual 2025',
         tipo: TipoProcesso.MAPEAMENTO,
         situacao: SituacaoProcesso.EM_ANDAMENTO,
         dataLimite: '2025-12-31',
@@ -25,7 +25,7 @@ const mockProcessos = [
     },
     {
         codigo: 2,
-        descricao: 'Revisão Semestral TI',
+        descricao: 'Revisão semestral TI',
         tipo: TipoProcesso.REVISAO,
         situacao: SituacaoProcesso.FINALIZADO,
         dataLimite: '2025-06-30',
@@ -35,7 +35,7 @@ const mockProcessos = [
     },
     {
         codigo: 3,
-        descricao: 'Diagnóstico de Gaps Administrativos',
+        descricao: 'Diagnóstico de Gaps administrativos',
         tipo: TipoProcesso.DIAGNOSTICO,
         situacao: SituacaoProcesso.CRIADO,
         dataLimite: '2025-08-15',
@@ -58,7 +58,7 @@ export const Default: Story = {
         },
         template: `
       <div>
-        <button class="btn btn-primary" @click="show = true">Ver Andamento Geral</button>
+        <button class="btn btn-primary" @click="show = true">Ver andamento geral</button>
         <ModalRelatorioAndamento v-bind="args" v-model="show" />
       </div>
     `,

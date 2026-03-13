@@ -1,7 +1,7 @@
 import type {Unidade, UnidadeSnapshot} from "@/types/tipos";
 import {apiGet} from "@/utils/apiUtils";
 
-// Mappers Internos (formerly in /mappers/unidades.ts)
+// Mappers internos (formerly in /mappers/unidades.ts)
 
 export function mapUnidadeSnapshot(obj: any): UnidadeSnapshot {
     return {

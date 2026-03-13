@@ -1,4 +1,4 @@
-# Alinhamento CDU-30 - Manter Administradores
+# Alinhamento CDU-30 - Manter administradores
 
 ## Cobertura atual do teste
 O teste cobre:
@@ -18,7 +18,7 @@ O teste cobre:
 
 2. **Falta teste de fluxo de remoção completo**: O requisito descreve fluxo de remoção (passos 9-15), mas o teste não executa nenhuma remoção. Não valida:
    - Clique no ícone de exclusão
-   - Abertura do modal com título "Confirmar Remoção"
+   - Abertura do modal com título "Confirmar remoção"
    - Mensagem de confirmação com nome do administrador
    - Validações de remoção (não remove a si mesmo, não é único)
    - Mensagens de erro correspondentes
@@ -32,7 +32,7 @@ O teste cobre:
    - Botões "Cancelar" e "Adicionar"
 
 5. **Falta validação de modal de remoção**: Não há validação do modal com:
-   - Título "Confirmar Remoção"
+   - Título "Confirmar remoção"
    - Mensagem dinâmica com nome do administrador
    - Botões "Cancelar" e "Remover"
 
@@ -80,7 +80,7 @@ O teste cobre:
 
 6. **Adicionar teste de remoção de administrador**: 
    - Clicar ícone de remoção em um administrador
-   - Validar que modal com título "Confirmar Remoção" abre
+   - Validar que modal com título "Confirmar remoção" abre
    - Validar mensagem dinâmica com nome do administrador
    - Clicar "Remover"
    - Validar mensagem "Administrador removido com sucesso!"

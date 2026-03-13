@@ -14,7 +14,7 @@ type Story = StoryObj<typeof ModalMapasVigentes>;
 const mockMapas = [
     {codigo: 1, unidade: 'Presidência', competencias: [1, 2, 3]},
     {codigo: 2, unidade: 'Diretoria de Tecnologia', competencias: [1, 2, 3, 4, 5, 6, 7]},
-    {codigo: 3, unidade: 'Diretoria Administrativa', competencias: [1, 2]},
+    {codigo: 3, unidade: 'Diretoria administrativa', competencias: [1, 2]},
     {codigo: 4, unidade: 'Coordenação de Sistemas', competencias: [1, 2, 3, 4]},
 ];
 
@@ -31,7 +31,7 @@ export const Default: Story = {
         },
         template: `
       <div>
-        <button class="btn btn-primary" @click="show = true">Ver Mapas Vigentes</button>
+        <button class="btn btn-primary" @click="show = true">Ver mapas vigentes</button>
         <ModalMapasVigentes v-bind="args" v-model="show" />
       </div>
     `,

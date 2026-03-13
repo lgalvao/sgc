@@ -48,7 +48,7 @@ export const Gestor: Story = {
                     perfil: {
                         perfilSelecionado: 'GESTOR',
                         unidadeSelecionada: 'DITEC',
-                        usuarioNome: 'João Gestor',
+                        usuarioNome: 'João gestor',
                     },
                 },
             });
@@ -73,7 +73,7 @@ export const Mobile: Story = {
                     perfil: {
                         perfilSelecionado: 'ADMIN',
                         unidadeSelecionada: 'PRES',
-                        usuarioNome: 'Admin Mobile',
+                        usuarioNome: 'Admin mobile',
                     },
                 },
             });

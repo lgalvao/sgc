@@ -31,7 +31,7 @@ class CDU29IntegrationTest extends BaseIntegrationTest {
 
         // Processo 1: Finalizado, participa unidade 101 (Gestor)
         processoFinalizado1 = Processo.builder()
-                .descricao("Processo Finalizado 1")
+                .descricao("Processo finalizado 1")
                 .situacao(SituacaoProcesso.FINALIZADO)
                 .tipo(TipoProcesso.MAPEAMENTO)
                 .dataCriacao(agora.minusDays(10))
@@ -44,7 +44,7 @@ class CDU29IntegrationTest extends BaseIntegrationTest {
 
         // Processo 2: Finalizado, participa unidade 102 (Chefe)
         Processo processoFinalizado2 = Processo.builder()
-                .descricao("Processo Finalizado 2")
+                .descricao("Processo finalizado 2")
                 .situacao(SituacaoProcesso.FINALIZADO)
                 .tipo(TipoProcesso.REVISAO)
                 .dataCriacao(agora.minusDays(10))
@@ -57,7 +57,7 @@ class CDU29IntegrationTest extends BaseIntegrationTest {
 
         // Processo 3: Finalizado, participa unidade 10 (Fora da hierarquia)
         Processo processoFinalizado3 = Processo.builder()
-                .descricao("Processo Finalizado 3")
+                .descricao("Processo finalizado 3")
                 .situacao(SituacaoProcesso.FINALIZADO)
                 .tipo(TipoProcesso.MAPEAMENTO)
                 .dataCriacao(agora.minusDays(10))
@@ -70,7 +70,7 @@ class CDU29IntegrationTest extends BaseIntegrationTest {
 
         // Criar processo em andamento (não deve aparecer no histórico)
         Processo processoEmAndamento = Processo.builder()
-                .descricao("Processo Em Andamento")
+                .descricao("Processo em andamento")
                 .situacao(SituacaoProcesso.EM_ANDAMENTO)
                 .tipo(TipoProcesso.MAPEAMENTO)
                 .dataCriacao(agora.minusDays(10))
@@ -89,10 +89,10 @@ class CDU29IntegrationTest extends BaseIntegrationTest {
                 .andExpect(status().isOk())
                 .andDo(result -> {
                     String content = result.getResponse().getContentAsString();
-                    assertThat(content).contains("Processo Finalizado 1");
-                    assertThat(content).contains("Processo Finalizado 2");
-                    assertThat(content).contains("Processo Finalizado 3");
-                    assertThat(content).doesNotContain("Processo Em Andamento");
+                    assertThat(content).contains("Processo finalizado 1");
+                    assertThat(content).contains("Processo finalizado 2");
+                    assertThat(content).contains("Processo finalizado 3");
+                    assertThat(content).doesNotContain("Processo em andamento");
                 });
     }
 
@@ -104,10 +104,10 @@ class CDU29IntegrationTest extends BaseIntegrationTest {
                 .andExpect(status().isOk())
                 .andDo(result -> {
                     String content = result.getResponse().getContentAsString();
-                    assertThat(content).contains("Processo Finalizado 1"); // Unidade 101
-                    assertThat(content).contains("Processo Finalizado 2"); // Unidade 102 (descendente)
-                    assertThat(content).doesNotContain("Processo Finalizado 3"); // Unidade 10 (fora)
-                    assertThat(content).doesNotContain("Processo Em Andamento");
+                    assertThat(content).contains("Processo finalizado 1"); // Unidade 101
+                    assertThat(content).contains("Processo finalizado 2"); // Unidade 102 (descendente)
+                    assertThat(content).doesNotContain("Processo finalizado 3"); // Unidade 10 (fora)
+                    assertThat(content).doesNotContain("Processo em andamento");
                 });
     }
 
@@ -119,9 +119,9 @@ class CDU29IntegrationTest extends BaseIntegrationTest {
                 .andExpect(status().isOk())
                 .andDo(result -> {
                     String content = result.getResponse().getContentAsString();
-                    assertThat(content).doesNotContain("Processo Finalizado 1"); // Unidade 101 (superior)
-                    assertThat(content).contains("Processo Finalizado 2"); // Unidade 102
-                    assertThat(content).doesNotContain("Processo Finalizado 3"); // Unidade 10 (fora)
+                    assertThat(content).doesNotContain("Processo finalizado 1"); // Unidade 101 (superior)
+                    assertThat(content).contains("Processo finalizado 2"); // Unidade 102
+                    assertThat(content).doesNotContain("Processo finalizado 3"); // Unidade 10 (fora)
                 });
     }
 

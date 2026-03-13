@@ -26,7 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @Tag("integration")
 @Transactional
-@DisplayName("CDU-17: Disponibilizar Mapa de Competências")
+@DisplayName("CDU-17: Disponibilizar mapa de Competências")
 class CDU17IntegrationTest extends BaseIntegrationTest {
     private static final String API_URL = "/api/subprocessos/{codigo}/disponibilizar-mapa";
     private static final String OBS_LITERAL = "Obs";
@@ -52,7 +52,7 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
         jdbcTemplate.update("MERGE INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, unidade_codigo, perfil) KEY(usuario_titulo, unidade_codigo, perfil) VALUES (?, ?, ?)",
                 "111111111111", 1, "ADMIN");
 
-        // Criar Unidade via Fixture
+        // Criar unidade via Fixture
         unidade = UnidadeFixture.unidadePadrao();
         unidade.setCodigo(null);
         unidade.setNome("Unidade CDU-17");
@@ -63,18 +63,18 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
         jdbcTemplate.update("INSERT INTO SGC.VW_RESPONSABILIDADE (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio) VALUES (?, ?, ?, ?, ?)",
                 unidade.getCodigo(), "111111111111", "00000", "TITULAR", LocalDateTime.now());
 
-        // Criar Processo via Fixture
+        // Criar processo via Fixture
         Processo processo = ProcessoFixture.processoPadrao();
         processo.setCodigo(null);
         processo.setTipo(TipoProcesso.REVISAO);
         processo = processoRepo.save(processo);
 
-        // Criar Mapa
+        // Criar mapa
         mapa = MapaFixture.mapaPadrao(null);
         mapa.setCodigo(null);
         mapa = mapaRepo.save(mapa);
 
-        // Criar Subprocesso via Fixture
+        // Criar subprocesso via Fixture
         subprocesso = SubprocessoFixture.subprocessoPadrao(processo, unidade);
         subprocesso.setCodigo(null);
         subprocesso.setMapa(mapa);
@@ -93,10 +93,10 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
                 .build();
         movimentacaoRepo.save(movAdmin);
 
-        Atividade atividade = Atividade.builder().mapa(mapa).descricao("Atividade Valida").build();
+        Atividade atividade = Atividade.builder().mapa(mapa).descricao("Atividade valida").build();
         atividade = atividadeRepo.save(atividade);
 
-        Competencia competencia = Competencia.builder().descricao("Competencia Valida").mapa(mapa).build();
+        Competencia competencia = Competencia.builder().descricao("Competencia valida").mapa(mapa).build();
         competencia = competenciaRepo.save(competencia);
 
         atividade.getCompetencias().add(competencia);
@@ -201,7 +201,7 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
         @DisplayName("Não deve disponibilizar mapa se houver atividade sem competência associada")
         @WithMockAdmin
         void disponibilizarMapa_comAtividadeNaoAssociada_retornaBadRequest() throws Exception {
-            Atividade atividadeSolta = Atividade.builder().mapa(mapa).descricao("Atividade Solta").build();
+            Atividade atividadeSolta = Atividade.builder().mapa(mapa).descricao("Atividade solta").build();
             atividadeRepo.save(atividadeSolta);
 
             DisponibilizarMapaRequest request =
@@ -220,7 +220,7 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
         @DisplayName("Não deve disponibilizar mapa se houver competência sem atividade associada")
         @WithMockAdmin
         void disponibilizarMapa_comCompetenciaNaoAssociada_retornaBadRequest() throws Exception {
-            competenciaRepo.save(Competencia.builder().descricao("Competência Solta").mapa(mapa).build());
+            competenciaRepo.save(Competencia.builder().descricao("Competência solta").mapa(mapa).build());
 
             DisponibilizarMapaRequest request = new DisponibilizarMapaRequest(
                     LocalDate.now().plusDays(10), OBS_LITERAL

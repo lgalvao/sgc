@@ -63,7 +63,7 @@ class ModelExtraTest {
     }
 
     @Test
-    @DisplayName("Usuario Security Methods - Teste de cobertura")
+    @DisplayName("Usuario security methods - Teste de cobertura")
     void usuarioSecurityMethods() {
         Usuario u = new Usuario();
         u.setTituloEleitoral("123");

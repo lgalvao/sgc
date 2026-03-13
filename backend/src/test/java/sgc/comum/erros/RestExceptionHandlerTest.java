@@ -172,20 +172,20 @@ class RestExceptionHandlerTest {
     @Test
     @DisplayName("Deve tratar ErroNegocioBase genérico (400)")
     void deveTratarErroNegocioBase() {
-        ErroNegocioBase ex = new ErroNegocioBase("Erro Base", "CODE", HttpStatus.BAD_REQUEST) {
+        ErroNegocioBase ex = new ErroNegocioBase("Erro base", "CODE", HttpStatus.BAD_REQUEST) {
         };
         ResponseEntity<?> response = restExceptionHandler.handleErroNegocio(ex);
         assertNotNull(response);
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertEquals("Erro Base", ((ErroApi) response.getBody()).getMessage());
+        assertEquals("Erro base", ((ErroApi) response.getBody()).getMessage());
     }
 
     @Test
     @DisplayName("Deve tratar ErroNegocioBase com detalhes")
     void deveTratarErroNegocioBaseComDetalhes() {
         Map<String, String> details = Map.of("campo", "erro");
-        ErroNegocioBase ex = new ErroNegocioBase("Erro Com Detalhe", "CODE", HttpStatus.BAD_REQUEST, details) {
+        ErroNegocioBase ex = new ErroNegocioBase("Erro com detalhe", "CODE", HttpStatus.BAD_REQUEST, details) {
         };
         ResponseEntity<?> response = restExceptionHandler.handleErroNegocio(ex);
         assertNotNull(response);
@@ -197,7 +197,7 @@ class RestExceptionHandlerTest {
     @Test
     @DisplayName("Deve tratar ErroNegocioBase com lista de detalhes vazia")
     void deveTratarErroNegocioBaseComDetalhesVazio() {
-        ErroNegocioBase ex = new ErroNegocioBase("Erro Detalhe Vazio", "CODE", HttpStatus.BAD_REQUEST, Collections.emptyMap()) {
+        ErroNegocioBase ex = new ErroNegocioBase("Erro detalhe vazio", "CODE", HttpStatus.BAD_REQUEST, Collections.emptyMap()) {
         };
         ResponseEntity<?> response = restExceptionHandler.handleErroNegocio(ex);
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
@@ -207,7 +207,7 @@ class RestExceptionHandlerTest {
     @Test
     @DisplayName("Deve tratar ErroNegocioBase genérico (500)")
     void deveTratarErroNegocioBase500() {
-        ErroNegocioBase ex = new ErroNegocioBase("Erro Server", "CODE", HttpStatus.INTERNAL_SERVER_ERROR) {
+        ErroNegocioBase ex = new ErroNegocioBase("Erro server", "CODE", HttpStatus.INTERNAL_SERVER_ERROR) {
         };
         ResponseEntity<?> response = restExceptionHandler.handleErroNegocio(ex);
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());

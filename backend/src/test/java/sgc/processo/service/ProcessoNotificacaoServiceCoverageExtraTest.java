@@ -17,7 +17,7 @@ import java.util.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("ProcessoNotificacaoService - Cobertura Extra")
+@DisplayName("ProcessoNotificacaoService - Cobertura extra")
 class ProcessoNotificacaoServiceCoverageExtraTest {
 
     @Mock private AlertaFacade servicoAlertas;
@@ -83,9 +83,9 @@ class ProcessoNotificacaoServiceCoverageExtraTest {
         Usuario userSub = new Usuario();
         userSub.setEmail("sub@test.com");
 
-        doThrow(new RuntimeException("Test Exception")).when(emailService).enviarEmailHtml(anyString(), anyString(), anyString());
+        doThrow(new RuntimeException("Test exception")).when(emailService).enviarEmailHtml(anyString(), anyString(), anyString());
 
-        notificacaoService.enviarEmailParaSubstituto("sub1", Map.of("sub1", userSub), "assunto", "html", "Unidade Teste");
+        notificacaoService.enviarEmailParaSubstituto("sub1", Map.of("sub1", userSub), "assunto", "html", "Unidade teste");
 
         verify(emailService).enviarEmailHtml(anyString(), anyString(), anyString());
     }

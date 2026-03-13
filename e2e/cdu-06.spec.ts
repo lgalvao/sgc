@@ -68,7 +68,7 @@ test.describe('CDU-06 - Detalhar processo', () => {
     test('Fase 1b: Deve exibir detalhes do processo para GESTOR e ocultar ações ADMIN', async ({page}) => {
         const timestamp = Date.now();
         const descricao = `Processo CDU-06 Gestor ${timestamp}`;
-        const UNIDADE_PROCESSO = 'ASSESSORIA_21'; // Subordinada à SECRETARIA_2 (George Harrison)
+        const UNIDADE_PROCESSO = 'ASSESSORIA_21'; // Subordinada à SECRETARIA_2 (George harrison)
 
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
@@ -88,7 +88,7 @@ test.describe('CDU-06 - Detalhar processo', () => {
 
         await page.getByTestId('btn-logout').click();
 
-        // George Harrison (212121) é Gestor da SECRETARIA_2
+        // George harrison (212121) é Gestor da SECRETARIA_2
         await loginComPerfil(page, '212121', 'senha', 'GESTOR - SECRETARIA_2');
 
         // Aguardar que o processo apareça no painel
@@ -103,7 +103,7 @@ test.describe('CDU-06 - Detalhar processo', () => {
             situacao: 'Em andamento'
         });
 
-        // GESTOR não vê Finalizar Processo
+        // GESTOR não vê Finalizar processo
         await expect(page.getByTestId('btn-processo-finalizar')).toBeHidden();
 
         // GESTOR não vê ações de alteração administrativa no subprocesso
@@ -137,8 +137,8 @@ test.describe('CDU-06 - Detalhar processo', () => {
         await login(page, USUARIOS.CHEFE_ASSESSORIA_12.titulo, USUARIOS.CHEFE_ASSESSORIA_12.senha);
         await acessarSubprocessoChefeDireto(page, descricao, UNIDADE_SUB);
         await navegarParaAtividades(page);
-        await adicionarAtividade(page, `Atividade Bloco ${timestamp}`);
-        await adicionarConhecimento(page, `Atividade Bloco ${timestamp}`, 'Conhecimento Bloco');
+        await adicionarAtividade(page, `Atividade bloco ${timestamp}`);
+        await adicionarConhecimento(page, `Atividade bloco ${timestamp}`, 'Conhecimento bloco');
         await disponibilizarCadastro(page);
         await verificarPaginaPainel(page);
 
@@ -149,7 +149,7 @@ test.describe('CDU-06 - Detalhar processo', () => {
         await expect(page.getByRole('button', {name: 'Homologar em bloco'})).toBeVisible();
 
         // 4. GESTOR verifica botão "Aceitar cadastro em bloco"
-        // John Lennon (202020) é Gestor da SECRETARIA_1 (que engloba ASSESSORIA_12)
+        // John lennon (202020) é Gestor da SECRETARIA_1 (que engloba ASSESSORIA_12)
         await loginComPerfil(page, '202020', 'senha', 'GESTOR - SECRETARIA_1');
         await page.getByTestId('tbl-processos').getByText(descricao).first().click();
         await esperarPaginaDetalhesProcesso(page, processoId);

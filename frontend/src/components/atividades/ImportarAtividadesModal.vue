@@ -103,31 +103,34 @@
       </div>
     </fieldset>
     <template #footer>
-      <BButton
-          :disabled="importando"
-          data-testid="importar-atividades-modal__btn-modal-cancelar"
-          type="button"
-          variant="secondary"
-          @click="fechar"
-      >
-        <i aria-hidden="true" class="bi bi-x-circle me-1"/>
-        Cancelar
-      </BButton>
-      <BButton
-          :disabled="!atividadesSelecionadas.length || importando"
-          data-testid="btn-importar"
-          type="button"
-          variant="primary"
-          @click="importar"
-      >
-        <BSpinner
-            v-if="importando"
-            class="me-1"
-            small
-        />
-        <i v-else aria-hidden="true" class="bi bi-box-arrow-in-down me-1"/>
-        {{ importando ? 'Importando...' : 'Importar' }}
-      </BButton>
+      <div class="d-flex justify-content-end w-100 gap-3 align-items-center">
+        <BButton
+            :disabled="importando"
+            class="text-decoration-none text-secondary fw-medium btn-cancelar-link"
+            data-testid="importar-atividades-modal__btn-modal-cancelar"
+            type="button"
+            variant="link"
+            @click="fechar"
+        >
+          <i aria-hidden="true" class="bi bi-x-circle me-1"/>
+          Cancelar
+        </BButton>
+        <BButton
+            :disabled="!atividadesSelecionadas.length || importando"
+            data-testid="btn-importar"
+            type="button"
+            variant="primary"
+            @click="importar"
+        >
+          <BSpinner
+              v-if="importando"
+              class="me-1"
+              small
+          />
+          <i v-else aria-hidden="true" class="bi bi-box-arrow-in-down me-1"/>
+          {{ importando ? 'Importando...' : 'Importar' }}
+        </BButton>
+      </div>
     </template>
   </BModal>
 </template>
@@ -277,5 +280,16 @@ async function importar() {
 .atividades-container {
   max-height: 250px;
   overflow-y: auto;
+}
+
+.btn-cancelar-link {
+  padding: 0.375rem 0.75rem;
+  transition: all 0.2s;
+  border-radius: 0.375rem;
+}
+
+.btn-cancelar-link:hover {
+  color: var(--bs-emphasis-color) !important;
+  background-color: var(--bs-secondary-bg);
 }
 </style>

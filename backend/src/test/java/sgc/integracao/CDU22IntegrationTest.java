@@ -57,7 +57,7 @@ class CDU22IntegrationTest extends BaseIntegrationTest {
         processo.setCodigo(null);
         processo.setTipo(TipoProcesso.MAPEAMENTO);
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
-        processo.setDescricao("Processo Bloco CDU-22");
+        processo.setDescricao("Processo bloco CDU-22");
         processo = processoRepo.save(processo);
 
         // Create subprocesses for both units
@@ -124,7 +124,7 @@ class CDU22IntegrationTest extends BaseIntegrationTest {
         entityManager.flush();
         entityManager.clear();
 
-        // Verify Subprocesso 1
+        // Verify subprocesso 1
         Subprocesso s1 = subprocessoRepo.findById(subprocesso1.getCodigo()).orElseThrow();
         List<Analise> analises1 = analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(s1.getCodigo());
         assertThat(analises1).isNotEmpty();
@@ -137,7 +137,7 @@ class CDU22IntegrationTest extends BaseIntegrationTest {
         // O aceite envia para a unidade superior da unidade atual (6 -> 2)
         assertThat(movs1.getFirst().getUnidadeDestino().getCodigo()).isEqualTo(2L);
 
-        // Verify Subprocesso 2
+        // Verify subprocesso 2
         Subprocesso s2 = subprocessoRepo.findById(subprocesso2.getCodigo()).orElseThrow();
         List<Analise> analises2 = analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(s2.getCodigo());
         assertThat(analises2).isNotEmpty();

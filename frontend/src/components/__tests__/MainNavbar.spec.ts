@@ -36,9 +36,9 @@ describe("MainNavbar.vue", () => {
 
         // Default mock for usePerfil
         vi.mocked(usePerfil).mockReturnValue({
-            servidorLogado: ref({nome: "Usuario Teste"}),
+            servidorLogado: ref({nome: "Usuario teste"}),
             perfilSelecionado: ref("GESTOR"),
-            unidadeSelecionada: ref("Unidade Teste"),
+            unidadeSelecionada: ref("Unidade teste"),
             podeAcessarTodasUnidades: ref(false),
             isAdmin: ref(false),
             isGestor: ref(true),

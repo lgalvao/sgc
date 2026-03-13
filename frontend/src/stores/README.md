@@ -1,10 +1,10 @@
 # Diretório de Stores (Pinia)
 
-Este diretório contém as **Stores Pinia**, responsáveis pelo gerenciamento de estado global da aplicação.
+Este diretório contém as **Stores pinia**, responsáveis pelo gerenciamento de estado global da aplicação.
 
-## Padrão Arquitetural
+## Padrão arquitetural
 
-Utilizamos o padrão **Setup Stores** (Composition API).
+Utilizamos o padrão **Setup stores** (Composition API).
 
 ```typescript
 export const useExemploStore = defineStore('exemplo', () => {
@@ -14,7 +14,7 @@ export const useExemploStore = defineStore('exemplo', () => {
 });
 ```
 
-## Stores Disponíveis
+## Stores disponíveis
 
 ### Autenticação e Perfil
 
@@ -29,7 +29,7 @@ export const useExemploStore = defineStore('exemplo', () => {
     - **`workflow.ts`**: Gerenciamento do fluxo de estados e transições.
 * **`subprocessos.ts` (`useSubprocessosStore`)**: Gestão de subprocessos de unidades.
 
-### Funcionalidades Específicas
+### Funcionalidades específicas
 
 * **`atividades.ts`**: CRUD de atividades.
 * **`mapas.ts`**: Estado do mapa de competências e revisões.
@@ -44,7 +44,7 @@ export const useExemploStore = defineStore('exemplo', () => {
 * **`feedback.ts` (`useFeedbackStore`)**: Centralização de Toasts, alertas e estados de carregamento globais.
 * **`alertas.ts`**: Notificações e alertas contextuais para o usuário.
 
-## Boas Práticas
+## Boas práticas
 
 1. **Separação de Preocupações**: Stores delegam chamadas HTTP para os `services/`.
 2. **Reatividade**: Use `storeToRefs()` ao desestruturar estado em componentes.

@@ -62,7 +62,7 @@ class AlertaControllerTest {
     }
 
     @Nested
-    @DisplayName("Listar Alertas")
+    @DisplayName("Listar alertas")
     class ListarAlertas {
         @Test
         @DisplayName("Deve retornar lista de alertas com sucesso")
@@ -98,7 +98,7 @@ class AlertaControllerTest {
     }
 
     @Nested
-    @DisplayName("Extração de Título de Usuário - Switch Expression")
+    @DisplayName("Extração de Título de Usuário - Switch expression")
     class ExtracaoTituloUsuario {
 
         @Test

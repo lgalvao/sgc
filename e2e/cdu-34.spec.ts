@@ -7,7 +7,7 @@ import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-n
  *
  * Ator: Sistema/ADMIN
  *
- * Fluxo principal (Envio Manual):
+ * Fluxo principal (Envio manual):
  * 1. ADMIN acessa tela de Acompanhamento de Processos
  * 2. Sistema exibe processos com indicadores de prazo
  * 3. ADMIN seleciona unidades com pendências

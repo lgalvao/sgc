@@ -7,7 +7,7 @@
       <strong>Situação:</strong> {{ formatSituacaoProcesso(situacao) }}
     </div>
     <div v-if="showDataLimite && dataLimite" class="mb-2">
-      <strong>Data Limite:</strong> {{ formatDate(dataLimite, false) }}
+      <strong>Data limite:</strong> {{ formatDate(dataLimite, false) }}
     </div>
     <div v-if="showUnidades && numUnidades !== undefined" class="mb-2">
       <strong>Unidades participantes:</strong> {{ numUnidades }}

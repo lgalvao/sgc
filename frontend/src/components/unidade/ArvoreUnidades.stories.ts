@@ -48,7 +48,7 @@ const mockUnidades: Unidade[] = [
             },
             {
                 codigo: 5,
-                nome: 'Diretoria Administrativa',
+                nome: 'Diretoria administrativa',
                 sigla: 'DIRAD',
                 isElegivel: true,
                 filhas: [],

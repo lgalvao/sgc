@@ -2,7 +2,7 @@
 
 ## Acesso TRE-PE
 
-O sistema de Acesso do TRE-PE, que oferece uma API REST de autenticação de usuários, usando título de eleitor e senha. O Acesso também inclui sistemas e perfis de usuários, mas esta funcionalidade não será usada no sistema, sendo os perfis
+O sistema de Acesso do TRE-PE, que oferece uma API REST de autenticação de usuários, usando título de eleitor e senha. O acesso também inclui sistemas e perfis de usuários, mas esta funcionalidade não será usada no sistema, sendo os perfis
 determinados a partir do SGRH juntamente com atribuições temporárias cadastradas.
 
 ## Atribuição temporária
@@ -76,7 +76,7 @@ Seção de desenvolvimento organizacional e capacitação. Principal unidade usu
 
 ## SGRH
 
-O Sistema de Gestão de Recursos Humanos (SGRH) é o sistema cujo banco de dados fornece as informações das unidades de lotação e titularidade dos servidores do Tribunal. As views do sistema são majoritamemente baseadas nos dados fornecidos pelo SGRH.
+O sistema de Gestão de Recursos humanos (SGRH) é o sistema cujo banco de dados fornece as informações das unidades de lotação e titularidade dos servidores do Tribunal. As views do sistema são majoritamemente baseadas nos dados fornecidos pelo SGRH.
 
 ## Subprocesso
 

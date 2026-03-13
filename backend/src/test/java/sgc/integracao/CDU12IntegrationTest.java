@@ -316,7 +316,7 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
 
         @Test
         @WithMockAdmin
-        @DisplayName("ADMIN pode acessar se subprocesso está em 'Mapa Ajustado'")
+        @DisplayName("ADMIN pode acessar se subprocesso está em 'Mapa ajustado'")
         void adminPodeAcessar_EmMapaAjustado() throws Exception {
             configurarUnidadeAdministrador(unidade.getCodigo());
             sp.setSituacaoForcada(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);

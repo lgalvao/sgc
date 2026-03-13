@@ -63,7 +63,7 @@ O teste `cdu-03.spec.ts` cobre os seguintes cenários:
 
 10. **Validação de formulário vazio não trata Data limite**: O teste começa preenchendo descrição, tipo e data limite, e então valida desabilitação de botão se remover descrição. Não há um teste começando com formulário completamente vazio e preenchendo passo a passo.
 
-11. **Campo Observações e Sugestões não validados para criação**: O requisito (passo 2) menciona que o formulário de criação contém também campos para "Observações" e "Sugestões" (no passo 9 mencionado como campos dos subprocessos, não do processo). Pode haver confusão: o processo em "Criado" tem apenas Descrição, Tipo, Data limite e Unidades?
+11. **Campo observações e Sugestões não validados para criação**: O requisito (passo 2) menciona que o formulário de criação contém também campos para "Observações" e "Sugestões" (no passo 9 mencionado como campos dos subprocessos, não do processo). Pode haver confusão: o processo em "Criado" tem apenas Descrição, Tipo, Data limite e Unidades?
 
 12. **Botões do formulário não completamente testados**: O teste não valida explicitamente os botões "Cancelar", "Salvar" e "Iniciar processo" quando aparecem (exceto parcialmente).
 

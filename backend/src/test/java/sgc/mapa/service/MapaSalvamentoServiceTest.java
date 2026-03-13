@@ -68,7 +68,7 @@ class MapaSalvamentoServiceTest {
 
         SalvarMapaRequest.CompetenciaRequest compDto = SalvarMapaRequest.CompetenciaRequest.builder()
                 .codigo(0L)
-                .descricao("Nova Comp")
+                .descricao("Nova comp")
                 .atividadesCodigos(List.of(10L))
                 .build();
 
@@ -182,7 +182,7 @@ class MapaSalvamentoServiceTest {
 
         SalvarMapaRequest.CompetenciaRequest compDto = SalvarMapaRequest.CompetenciaRequest.builder()
                 .codigo(0L)
-                .descricao("Nova Comp")
+                .descricao("Nova comp")
                 .atividadesCodigos(List.of(99L))
                 .build();
 

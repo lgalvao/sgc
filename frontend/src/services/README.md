@@ -15,7 +15,7 @@ export const exemploService = {
 };
 ```
 
-## Serviços Disponíveis
+## Serviços disponíveis
 
 * **`usuarioService`**: Login, perfis e dados de usuários.
 * **`processoService`**: Gestão de processos e cronogramas.

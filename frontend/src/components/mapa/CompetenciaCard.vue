@@ -68,7 +68,7 @@
                 class="botao-acao-inline"
                 data-testid="btn-remover-atividade-associada"
                 size="sm"
-                title="Remover Atividade"
+                title="Remover atividade"
                 variant="outline-secondary"
                 @click="emit('removerAtividade', competencia.codigo, atividade.codigo)"
             >

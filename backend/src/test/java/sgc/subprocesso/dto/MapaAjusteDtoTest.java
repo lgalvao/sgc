@@ -16,7 +16,7 @@ class MapaAjusteDtoTest {
     @BeforeEach
     void setUp() {
         Unidade unidade = new Unidade();
-        unidade.setNome("Unidade Teste");
+        unidade.setNome("Unidade teste");
 
         Mapa mapa = new Mapa();
         mapa.setCodigo(100L);
@@ -49,14 +49,14 @@ class MapaAjusteDtoTest {
         @DisplayName("Deve mapear corretamente os dados básicos")
         void deveMapearDadosBasicos() {
             Analise analise = new Analise();
-            analise.setObservacoes("Justificativa Teste");
+            analise.setObservacoes("Justificativa teste");
 
             MapaAjusteDto dto = MapaAjusteDto.of(
                     subprocesso, analise, List.of(), List.of(), List.of());
 
             assertThat(dto.getCodMapa()).isEqualTo(100L);
-            assertThat(dto.getUnidadeNome()).isEqualTo("Unidade Teste");
-            assertThat(dto.getJustificativaDevolucao()).isEqualTo("Justificativa Teste");
+            assertThat(dto.getUnidadeNome()).isEqualTo("Unidade teste");
+            assertThat(dto.getJustificativaDevolucao()).isEqualTo("Justificativa teste");
         }
 
         @Test

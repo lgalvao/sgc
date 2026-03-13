@@ -45,7 +45,7 @@ const mockParticipantes = [
             {
                 codUnidade: 4,
                 codSubprocesso: 104,
-                nome: 'Diretoria Administrativa',
+                nome: 'Diretoria administrativa',
                 sigla: 'DIRAD',
                 situacaoSubprocesso: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
                 dataLimite: '2025-12-31',
@@ -67,7 +67,7 @@ export const UnidadeUnica: Story = {
             {
                 codUnidade: 5,
                 codSubprocesso: 105,
-                nome: 'Auditoria Interna',
+                nome: 'Auditoria interna',
                 sigla: 'AUDIT',
                 situacaoSubprocesso: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
                 dataLimite: '2025-06-30',

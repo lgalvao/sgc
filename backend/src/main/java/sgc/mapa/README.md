@@ -1,6 +1,6 @@
-# Pacote Mapa
+# Pacote mapa
 
-## Visão Geral
+## Visão geral
 
 O pacote `mapa` é o coração do domínio do SGC. Ele encapsula toda a lógica relacionada à estruturação e gerenciamento
 das competências organizacionais. Este pacote centraliza não apenas o conceito de "Mapa", mas também seus componentes
@@ -18,7 +18,7 @@ O modelo de dados é hierárquico:
 > **Nota:** Anteriormente, `conhecimento` e `atividade` eram módulos separados. Agora, eles foram consolidados neste
 > pacote para garantir alta coesão, visto que são partes inseparáveis do domínio do Mapa.
 
-## Serviços Principais
+## Serviços principais
 
 ### Serviços de CRUD
 
@@ -29,7 +29,7 @@ O modelo de dados é hierárquico:
 | `ConhecimentoService` | Gerencia o cadastro e manutenção de conhecimentos. |
 | `CompetenciaService`  | Centraliza a lógica de CRUD para competências.     |
 
-### Serviços Especializados
+### Serviços especializados
 
 | Serviço                   | Responsabilidade                                                                                         |
 |---------------------------|----------------------------------------------------------------------------------------------------------|
@@ -52,7 +52,7 @@ O modelo de dados é hierárquico:
 sgc/mapa/
 ├── AtividadeController.java     # REST endpoints para Atividades
 ├── MapaController.java          # REST endpoints para Mapas
-├── dto/                         # Data Transfer Objects
+├── dto/                         # Data transfer objects
 │   ├── visualizacao/            # DTOs específicos para visualização
 │   └── ...
 ├── evento/                      # Eventos de domínio
@@ -72,12 +72,12 @@ sgc/mapa/
     └── MapaVisualizacaoService.java
 ```
 
-## Padrões Utilizados
+## Padrões utilizados
 
-* **Facade Pattern:** `AtividadeFacade` simplifica a interface de uso e centraliza a coordenação entre múltiplos
+* **Facade pattern:** `AtividadeFacade` simplifica a interface de uso e centraliza a coordenação entre múltiplos
   serviços.
-* **Single Responsibility Principle:** Cada serviço tem uma responsabilidade bem definida.
+* **Single responsibility principle:** Cada serviço tem uma responsabilidade bem definida.
 * **DTOs de Visualização:** Separação clara entre entidades JPA e objetos retornados para a UI (pacote
   `dto.visualizacao`), evitando problemas de serialização cíclica.
 * **Mapper:** Uso de MapStruct para conversão eficiente entre Entidades e DTOs.
-* **Domain Events:** `EventoMapaAlterado` para comunicação desacoplada entre módulos.
+* **Domain events:** `EventoMapaAlterado` para comunicação desacoplada entre módulos.

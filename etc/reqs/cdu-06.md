@@ -18,7 +18,7 @@ Atores: ADMIN e GESTOR
 
    2.1.2. Se for perfil ADMIN, exibe o botão Finalizar processo.
 
-   2.2. Seção Unidades participantes:
+   2.2. Seção unidades participantes:
 
    2.2.1. Subárvore das unidades hierarquicamente inferiores.
 

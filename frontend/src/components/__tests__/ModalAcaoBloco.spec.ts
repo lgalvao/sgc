@@ -11,8 +11,8 @@ describe("ModalAcaoBloco.vue", () => {
 
     const defaultProps = {
         id: "modal-test",
-        titulo: "Titulo Teste",
-        texto: "Texto Teste",
+        titulo: "Titulo teste",
+        texto: "Texto teste",
         rotuloBotao: "Confirmar",
         unidades: mockUnidades,
         unidadesPreSelecionadas: [],

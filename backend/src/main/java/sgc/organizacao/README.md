@@ -1,12 +1,12 @@
-# Pacote Organizacao
+# Pacote organizacao
 
-## Visão Geral
+## Visão geral
 
 O pacote `organizacao` é responsável pelo gerenciamento de **usuários** e **unidades organizacionais** dentro do SGC.
 Ele consolida o que antes eram dois pacotes separados (`usuario` e `unidade`), mantendo uma interface coesa para
 informações de identidade e estrutura organizacional.
 
-## Responsabilidades Principais
+## Responsabilidades principais
 
 1. **Gestão de Usuários:**
     - Autenticação e autorização via `UsuarioFacade`
@@ -18,7 +18,7 @@ informações de identidade e estrutura organizacional.
     - Mapa vigente por unidade
     - Atribuições temporárias de servidores
 
-## Componentes Principais
+## Componentes principais
 
 ### Controladores
 
@@ -48,7 +48,7 @@ O módulo trabalha em conjunto com o pacote `seguranca` para:
 - Validar requisições via filtros de segurança
 - Recuperar dados de usuário autenticado
 
-## Como Testar
+## Como testar
 
 Para executar apenas os testes deste módulo (a partir do diretório `backend`):
 

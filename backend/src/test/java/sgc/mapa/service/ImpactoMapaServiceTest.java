@@ -264,13 +264,13 @@ class ImpactoMapaServiceTest {
 
         Atividade ativVigente = Atividade.builder()
                 .codigo(1L)
-                .descricao("Ativ Teste")
+                .descricao("Ativ teste")
                 .conhecimentos(Set.of(c1))
                 .build();
 
         Atividade ativAtual = Atividade.builder()
                 .codigo(2L)
-                .descricao("Ativ Teste")
+                .descricao("Ativ teste")
                 .conhecimentos(Set.of(c2, c3))
                 .build();
 
@@ -285,14 +285,14 @@ class ImpactoMapaServiceTest {
         ImpactoMapaResponse result = impactoMapaService.verificarImpactos(subprocesso, usuario);
 
         assertEquals(1, result.alteradas().size());
-        assertEquals("Ativ Teste", result.alteradas().getFirst().descricao());
+        assertEquals("Ativ teste", result.alteradas().getFirst().descricao());
     }
 
     private Subprocesso criarSubprocesso(Long unidadeCodigo, Mapa mapa) {
         Unidade unidade = Unidade.builder()
                 .codigo(unidadeCodigo)
                 .sigla("UNID")
-                .nome("Unidade Teste")
+                .nome("Unidade teste")
                 .build();
         return Subprocesso.builder()
                 .codigo(1L)
@@ -302,7 +302,7 @@ class ImpactoMapaServiceTest {
     }
 
     @Nested
-    @DisplayName("Cobertura Extra")
+    @DisplayName("Cobertura extra")
     class Coverage {
 
         @Test
@@ -364,7 +364,7 @@ class ImpactoMapaServiceTest {
         }
 
         @Test
-        @DisplayName("verificarImpactos: Atividade Alterada vinculada a Competencia gera impacto")
+        @DisplayName("verificarImpactos: Atividade alterada vinculada a Competencia gera impacto")
         void verificarImpactos_AtividadeAlteradaComCompetencia() {
             mockAcessoLivre();
             Subprocesso sp = new Subprocesso();

@@ -19,25 +19,25 @@ public class UsuarioTestBuilder {
     public static UsuarioTestBuilder admin() {
         return new UsuarioTestBuilder()
                 .comTitulo("191919")
-                .comNome("Admin Teste");
+                .comNome("Admin teste");
     }
 
     public static UsuarioTestBuilder gestor() {
         return new UsuarioTestBuilder()
                 .comTitulo("222222")
-                .comNome("Gestor Teste");
+                .comNome("Gestor teste");
     }
 
     public static UsuarioTestBuilder chefe() {
         return new UsuarioTestBuilder()
                 .comTitulo("555555")
-                .comNome("Chefe Teste");
+                .comNome("Chefe teste");
     }
 
     public static UsuarioTestBuilder servidor() {
         return new UsuarioTestBuilder()
                 .comTitulo("666666")
-                .comNome("Servidor Teste");
+                .comNome("Servidor teste");
     }
 
     public UsuarioTestBuilder comTitulo(String tituloEleitoral) {

@@ -5,7 +5,7 @@ O teste E2E (cdu-31.spec.ts) cobre:
 - Navegação para página de parâmetros via botão `btn-configuracoes`
 - Verificação da URL `/parametros` e heading "Parâmetros"
 - Visualização dos dois campos editáveis: "Dias para inativação de processos" e "Dias para indicação de alerta como novo"
-- Verificação do botão "Salvar Configurações"
+- Verificação do botão "Salvar configurações"
 - Preenchimento dos campos com valores (30 e 3)
 - Clique em salvar e validação da mensagem "Configurações salvas."
 

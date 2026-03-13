@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("PainelFacade - Testes Unitários")
+@DisplayName("PainelFacade - Testes unitários")
 class PainelServiceTest {
 
     private final Pageable pageable = PageRequest.of(0, 10);
@@ -53,7 +53,7 @@ class PainelServiceTest {
     }
 
     @Nested
-    @DisplayName("Listar Processos - Regras de Perfil")
+    @DisplayName("Listar processos - Regras de Perfil")
     class ListarProcessosPerfil {
 
         @Test
@@ -106,7 +106,7 @@ class PainelServiceTest {
     }
 
     @Nested
-    @DisplayName("Listar Processos - Formatação de Unidades")
+    @DisplayName("Listar processos - Formatação de Unidades")
     class ListarProcessosFormatacao {
 
         @Test
@@ -198,7 +198,7 @@ class PainelServiceTest {
     }
 
     @Nested
-    @DisplayName("Listar Processos - Outros")
+    @DisplayName("Listar processos - Outros")
     class ListarProcessosOutros {
         @Test
         @DisplayName("garantirOrdenacaoPadrao deve retornar pageable original se já estiver ordenado")
@@ -231,7 +231,7 @@ class PainelServiceTest {
     }
 
     @Nested
-    @DisplayName("Listar Alertas")
+    @DisplayName("Listar alertas")
     class ListarAlertas {
         @Test
         @DisplayName("listarAlertas por unidade deve buscar alertas da unidade")

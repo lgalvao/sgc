@@ -11,7 +11,7 @@ import type {
 import type {ProcessoDetalheDto, UnidadeParticipanteDto} from "@/types/dtos";
 import apiClient from "../axios-setup";
 
-// Mappers Internos (formerly in /mappers/processos.ts)
+// Mappers internos (formerly in /mappers/processos.ts)
 
 export function mapUnidadeParticipanteDtoToFrontend(
     dto: UnidadeParticipanteDto,

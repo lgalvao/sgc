@@ -110,14 +110,14 @@ describe("axios-setup", () => {
     it("interceptor de erro de resposta deve propagar erro 500", async () => {
         const error = {
             isAxiosError: true,
-            response: {status: 500, data: {message: "Server Error"}},
+            response: {status: 500, data: {message: "Server error"}},
             stack: 'stack'
         };
         await expect(responseErrorInterceptor(error)).rejects.toEqual(error);
     });
 
     it("interceptor de erro de resposta deve propagar erro de rede", async () => {
-        const error = {isAxiosError: true, request: {}, message: "Network Error"};
+        const error = {isAxiosError: true, request: {}, message: "Network error"};
         await expect(responseErrorInterceptor(error)).rejects.toEqual(error);
     });
 

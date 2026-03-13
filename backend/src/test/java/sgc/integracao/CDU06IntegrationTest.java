@@ -47,7 +47,7 @@ class CDU06IntegrationTest extends BaseIntegrationTest {
         // Cria unidade programaticamente
         unidade = UnidadeFixture.unidadePadrao();
         unidade.setSigla("U_TESTE");
-        unidade.setNome("Unidade Teste");
+        unidade.setNome("Unidade teste");
         unidade = unidadeRepo.save(unidade);
 
         // Cria processo

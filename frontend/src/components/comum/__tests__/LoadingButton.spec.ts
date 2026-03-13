@@ -20,13 +20,13 @@ describe('LoadingButton.vue', () => {
         const wrapper = mount(LoadingButton, {
             global: globalOptions,
             slots: {
-                default: 'Click Me'
+                default: 'Click me'
             }
         })
 
         const button = wrapper.find('.b-button-stub')
         expect(button.exists()).toBe(true)
-        expect(button.text()).toBe('Click Me')
+        expect(button.text()).toBe('Click me')
         expect(wrapper.find('.b-spinner-stub').exists()).toBe(false)
     })
 
@@ -37,7 +37,7 @@ describe('LoadingButton.vue', () => {
             },
             global: globalOptions,
             slots: {
-                default: 'Click Me'
+                default: 'Click me'
             }
         })
 

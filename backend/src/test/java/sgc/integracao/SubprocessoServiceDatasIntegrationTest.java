@@ -51,7 +51,7 @@ class SubprocessoServiceDatasIntegrationTest extends BaseIntegrationTest {
         unidadeRepo.save(unidade);
 
         processo = Processo.builder()
-                .descricao("Processo Teste Dat")
+                .descricao("Processo teste dat")
                 .tipo(TipoProcesso.MAPEAMENTO)
                 .situacao(SituacaoProcesso.EM_ANDAMENTO)
                 .dataLimite(LocalDateTime.now().plusDays(30))

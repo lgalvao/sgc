@@ -102,7 +102,7 @@
           :columns="colunasTabela"
           :data="dadosFormatadosSubordinadas"
           :hide-headers="true"
-          title="Unidades Subordinadas"
+          title="Unidades subordinadas"
           @row-click="navegarParaUnidadeSubordinada"
       />
     </div>

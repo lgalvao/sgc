@@ -1,14 +1,14 @@
 # Guia do Storybook - SGC
 
 Este guia documenta como visualizar, testar e utilizar as histórias criadas para os componentes do Sistema de Gestão de
-Competências (SGC). O Storybook serve como nossa biblioteca viva de componentes e ferramenta de desenvolvimento isolado.
+Competências (SGC). O storybook serve como nossa biblioteca viva de componentes e ferramenta de desenvolvimento isolado.
 
 ## O que é o Storybook?
 
-O Storybook permite navegar por uma coleção de componentes, visualizar seus diferentes estados e interagir com eles sem
+O storybook permite navegar por uma coleção de componentes, visualizar seus diferentes estados e interagir com eles sem
 a necessidade de navegar por fluxos complexos da aplicação.
 
-## Como Visualizar
+## Como visualizar
 
 1. Abra o terminal na pasta `frontend`.
 2. Execute: `npm run storybook`
@@ -16,7 +16,7 @@ a necessidade de navegar por fluxos complexos da aplicação.
 
 ---
 
-## Cobertura de Histórias (Catálogo Completo)
+## Cobertura de Histórias (Catálogo completo)
 
 Atualmente, o projeto possui **48 histórias** cobrindo 98% dos componentes funcionais.
 
@@ -24,8 +24,8 @@ Atualmente, o projeto possui **48 histórias** cobrindo 98% dos componentes func
 
 Componentes reutilizáveis e utilitários de interface.
 
-* **BadgeSituacao:** Estados de processos (Criado, Em Andamento, Finalizado).
-* **CampoTexto:** Variações: Default, Obrigatório, Desabilitado, Com Erro.
+* **BadgeSituacao:** Estados de processos (Criado, Em andamento, Finalizado).
+* **CampoTexto:** Variações: Default, Obrigatório, Desabilitado, Com erro.
 * **EmptyState:** Estados vazios com ícones e CTAs personalizados.
 * **ErrorAlert / FormErrorAlert:** Alertas de erro globais e específicos de formulário.
 * **InlineEditor:** Edição de texto "no lugar" com estados de salvamento.

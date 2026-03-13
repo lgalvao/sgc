@@ -59,10 +59,10 @@ class ProcessoRepoTest {
 
         Unidade u1 = criarUnidade("Unidade 1", "U1");
 
-        criarProcesso("Processo Criado", SituacaoProcesso.CRIADO, u1);
-        criarProcesso("Processo Em Andamento", SituacaoProcesso.EM_ANDAMENTO, u1);
+        criarProcesso("Processo criado", SituacaoProcesso.CRIADO, u1);
+        criarProcesso("Processo em andamento", SituacaoProcesso.EM_ANDAMENTO, u1);
 
-        entityManager.flush(); // Ensure Persistence
+        entityManager.flush(); // Ensure persistence
 
         Page<Processo> resultado = processoRepo.findDistinctByParticipantes_IdUnidadeCodigoInAndSituacaoNot(
                 List.of(u1.getCodigo()),
@@ -73,7 +73,7 @@ class ProcessoRepoTest {
         assertThat(resultado.getContent())
                 .hasSize(1)
                 .extracting(Processo::getDescricao)
-                .containsExactly("Processo Em Andamento");
+                .containsExactly("Processo em andamento");
 
         assertThat(resultado.getContent())
                 .extracting(Processo::getSituacao)
@@ -89,7 +89,7 @@ class ProcessoRepoTest {
 
         criarProcesso("Processo U1", SituacaoProcesso.EM_ANDAMENTO, u1);
         criarProcesso("Processo U2", SituacaoProcesso.EM_ANDAMENTO, u2); // Não deve aparecer
-        criarProcesso("Processo Ambos", SituacaoProcesso.EM_ANDAMENTO, u1, u2);
+        criarProcesso("Processo ambos", SituacaoProcesso.EM_ANDAMENTO, u1, u2);
 
         entityManager.flush();
 
@@ -102,7 +102,7 @@ class ProcessoRepoTest {
         assertThat(resultado.getContent())
                 .hasSize(2)
                 .extracting(Processo::getDescricao)
-                .containsExactlyInAnyOrder("Processo U1", "Processo Ambos");
+                .containsExactlyInAnyOrder("Processo U1", "Processo ambos");
     }
 
     @Test
@@ -113,7 +113,7 @@ class ProcessoRepoTest {
         Unidade u2 = criarUnidade("Unidade 2", "U2");
 
         // Processo participa de DUAS unidades que eu estou buscando
-        criarProcesso("Processo Ambos", SituacaoProcesso.EM_ANDAMENTO, u1, u2);
+        criarProcesso("Processo ambos", SituacaoProcesso.EM_ANDAMENTO, u1, u2);
 
         entityManager.flush();
 
@@ -126,7 +126,7 @@ class ProcessoRepoTest {
         assertThat(resultado.getContent())
                 .hasSize(1) // DISTINCT deve garantir apenas 1 resultado
                 .extracting(Processo::getDescricao)
-                .containsExactly("Processo Ambos");
+                .containsExactly("Processo ambos");
     }
 
     @Test
@@ -159,9 +159,9 @@ class ProcessoRepoTest {
 
         Unidade u1 = criarUnidade("Unidade 1", "U1");
 
-        criarProcesso("P Finalizado", SituacaoProcesso.FINALIZADO, u1);
-        criarProcesso("P Andamento", SituacaoProcesso.EM_ANDAMENTO, u1);
-        criarProcesso("P Criado", SituacaoProcesso.CRIADO, u1); // Deve ser ignorado
+        criarProcesso("P finalizado", SituacaoProcesso.FINALIZADO, u1);
+        criarProcesso("P andamento", SituacaoProcesso.EM_ANDAMENTO, u1);
+        criarProcesso("P criado", SituacaoProcesso.CRIADO, u1); // Deve ser ignorado
 
         entityManager.flush();
 

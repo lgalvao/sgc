@@ -17,7 +17,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @Tag("integration")
 @Transactional
-@DisplayName("CDU-18: Visualizar Mapa de Competências")
+@DisplayName("CDU-18: Visualizar mapa de Competências")
 class CDU18IntegrationTest extends BaseIntegrationTest {
     @Autowired
     private CompetenciaRepo competenciaRepo;
@@ -30,14 +30,14 @@ class CDU18IntegrationTest extends BaseIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        // Criar Unidade via Fixture
+        // Criar unidade via Fixture
         unidade = UnidadeFixture.unidadePadrao();
         unidade.setCodigo(null);
         unidade.setNome("Unidade CDU-18");
         unidade.setSigla("U18");
         unidade = unidadeRepo.save(unidade);
 
-        // Criar Processo via Fixture
+        // Criar processo via Fixture
         Processo processo = ProcessoFixture.processoPadrao();
         processo.setCodigo(null);
         processo.setTipo(TipoProcesso.MAPEAMENTO);
@@ -45,12 +45,12 @@ class CDU18IntegrationTest extends BaseIntegrationTest {
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
         processo = processoRepo.save(processo);
 
-        // Criar Mapa via Fixture
+        // Criar mapa via Fixture
         Mapa mapa = MapaFixture.mapaPadrao(null);
         mapa.setCodigo(null);
         mapa = mapaRepo.save(mapa);
 
-        // Criar Subprocesso via Fixture
+        // Criar subprocesso via Fixture
         subprocesso = SubprocessoFixture.subprocessoPadrao(processo, unidade);
         subprocesso.setCodigo(null);
         subprocesso.setMapa(mapa);

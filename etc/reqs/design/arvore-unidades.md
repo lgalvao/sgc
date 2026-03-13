@@ -1,6 +1,6 @@
 # Especificação: Árvore de Seleção de Unidades
 
-## Visão Geral
+## Visão geral
 
 A árvore de unidades permite selecionar unidades participantes de um processo usando checkboxes com **três estados** (
 marcado, desmarcado, indeterminado). O comportamento deve ser intuitivo e consistente em todos os níveis da hierarquia.
@@ -26,7 +26,7 @@ Unidade que não tem uma equipe (além do responsável), e portanto não pode te
 
 **Exemplos**: COORD_11
 
-## Comportamento de Seleção (Três Estados)
+## Comportamento de Seleção (Três estados)
 
 ### Estados do Checkbox
 
@@ -36,7 +36,7 @@ Unidade que não tem uma equipe (além do responsável), e portanto não pode te
 
 ### Regras de Propagação
 
-#### 1. Seleção Descendente (Pai → Filhas)
+#### 1. Seleção descendente (Pai → Filhas)
 
 Quando o usuário **marca** uma unidade:
 
@@ -49,7 +49,7 @@ Quando o usuário **desmarca** uma unidade:
 - Todas as filhas são desmarcadas recursivamente
 - Não importa se são elegíveis ou não
 
-#### 2. Propagação Ascendente (Filhas → Pai)
+#### 2. Propagação ascendente (Filhas → Pai)
 
 Após qualquer mudança nas filhas, o estado do pai é recalculado:
 
@@ -87,7 +87,7 @@ Embora INTERMEDIARIA não seja elegível (não pode participar do processo), seu
 - **Unidade não elegível COM filhas elegíveis**: Checkbox habilitado (para facilitar seleção)
 - **Unidade não elegível SEM filhas elegíveis**: Checkbox desabilitado
 
-### Comportamento Visual
+### Comportamento visual
 
 - **Habilitado**: Checkbox clicável (pode ser elegível ou não)
 - **Desabilitado**: Checkbox cinza, não clicável (não elegível E sem filhas elegíveis)
@@ -112,7 +112,7 @@ Embora INTERMEDIARIA não seja elegível (não pode participar do processo), seu
 - SECAO_111: `isElegivel = false` (sem mapa vigente)
 - SECAO_111: Checkbox **desabilitado**
 
-## Filtro Transparente de INTERMEDIARIA
+## Filtro transparente de INTERMEDIARIA
 
 ### Comportamento do Usuário
 
@@ -124,7 +124,7 @@ três estados.
 Quando o formulário é submetido, apenas unidades **não-INTERMEDIARIA** são enviadas ao backend. Este filtro é *
 *transparente** para o usuário - ele não vê que INTERMEDIARIA não vai para o processo.
 
-### Exemplo Prático
+### Exemplo prático
 
 **Usuário seleciona**:
 
@@ -141,33 +141,33 @@ Quando o formulário é submetido, apenas unidades **não-INTERMEDIARIA** são e
 
 **COORD_11 NÃO é enviada** (filtrada automaticamente)
 
-## Validação Backend
+## Validação backend
 
 O backend possui validação defensiva que rejeita unidades INTERMEDIARIA. Esta validação nunca deve ser acionada em uso normal, pois o frontend já filtra.
 
 ## Cenários
 
-### Cenário 1: Selecionar Coordenadoria Inteira
+### Cenário 1: Selecionar coordenadoria inteira
 
 1. Usuário clica em COORD_11 (INTERMEDIARIA)
 2. Todas as filhas elegíveis são marcadas (SECAO_111, SECAO_112, SECAO_113)
 3. COORD_11 fica **marcada** (todas filhas marcadas)
 4. Ao salvar, apenas as SECAOs são enviadas ao backend
 
-### Cenário 2: Selecionar Parcialmente
+### Cenário 2: Selecionar parcialmente
 
 1. Usuário marca SECAO_111 e SECAO_112
 2. COORD_11 fica **indeterminada** (nem todas filhas marcadas)
 3. Ao salvar, apenas SECAO_111 e SECAO_112 são enviadas
 
-### Cenário 3: Desmarcar Coordenadoria
+### Cenário 3: Desmarcar coordenadoria
 
 1. COORD_11 está marcada (todas filhas marcadas)
 2. Usuário clica em COORD_11 para desmarcar
 3. Todas as filhas são desmarcadas
 4. COORD_11 fica **desmarcada**
 
-### Cenário 4: Unidade com Filhas Não Elegíveis
+### Cenário 4: Unidade com Filhas não elegíveis
 
 1. COORD_11 tem 3 filhas, mas apenas 1 é elegível (tem mapa vigente)
 2. COORD_11 está **habilitada** (tem pelo menos uma filha elegível)

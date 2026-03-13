@@ -27,7 +27,7 @@ class ResponsavelUnidadeServiceTest {
     private ResponsavelUnidadeService service;
 
     @Nested
-    @DisplayName("Buscar Atribuições")
+    @DisplayName("Buscar atribuições")
     class BuscarAtribuicoesTests {
 
         @Test
@@ -61,7 +61,7 @@ class ResponsavelUnidadeServiceTest {
     }
 
     @Nested
-    @DisplayName("Criar Atribuição Temporária")
+    @DisplayName("Criar atribuição temporária")
     class CriarAtribuicaoTemporariaTests {
 
         @Test
@@ -105,7 +105,7 @@ class ResponsavelUnidadeServiceTest {
     }
 
     @Nested
-    @DisplayName("Buscar Responsável Atual")
+    @DisplayName("Buscar responsável atual")
     class BuscarResponsavelAtualTests {
 
         @Test
@@ -124,7 +124,7 @@ class ResponsavelUnidadeServiceTest {
 
             Usuario usuarioCompleto = new Usuario();
             usuarioCompleto.setTituloEleitoral("123456789012");
-            usuarioCompleto.setNome("João Silva");
+            usuarioCompleto.setNome("João silva");
 
             when(repo.buscarPorSigla(Unidade.class, siglaUnidade)).thenReturn(unidade);
             when(repo.buscar(Responsabilidade.class, 1L)).thenReturn(resp);
@@ -138,7 +138,7 @@ class ResponsavelUnidadeServiceTest {
     }
 
     @Nested
-    @DisplayName("Buscar Responsável de Unidade")
+    @DisplayName("Buscar responsável de Unidade")
     class BuscarResponsavelUnidadeTests {
 
         @Test
@@ -149,11 +149,11 @@ class ResponsavelUnidadeServiceTest {
 
             Usuario titularOficial = new Usuario();
             titularOficial.setTituloEleitoral("111111111111");
-            titularOficial.setNome("João Silva");
+            titularOficial.setNome("João silva");
 
             Usuario substituto = new Usuario();
             substituto.setTituloEleitoral("222222222222");
-            substituto.setNome("Maria Santos");
+            substituto.setNome("Maria santos");
 
             Unidade unidade = new Unidade();
             unidade.setCodigo(unidadeCodigo);

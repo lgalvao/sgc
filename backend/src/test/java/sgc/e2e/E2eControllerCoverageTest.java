@@ -11,7 +11,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("E2eController - Cobertura Adicional")
+@DisplayName("E2eController - Cobertura adicional")
 class E2eControllerCoverageTest {
     @Mock
     private JdbcTemplate jdbcTemplate;

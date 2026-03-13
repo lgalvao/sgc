@@ -8,7 +8,7 @@ const mockAnalises: any[] = [
     {
         dataHora: "2024-01-01T12:00:00Z",
         unidadeSigla: "TEST",
-        unidadeNome: "Unidade Teste",
+        unidadeNome: "Unidade teste",
         acao: "ACEITE_MAPEAMENTO",
         analistaUsuarioTitulo: "123456",
         observacoes: "Tudo certo.",
@@ -18,7 +18,7 @@ const mockAnalises: any[] = [
     {
         dataHora: "2024-01-02T14:30:00Z",
         unidadeSigla: "TEST2",
-        unidadeNome: "Unidade Teste 2",
+        unidadeNome: "Unidade teste 2",
         acao: "DEVOLUCAO_MAPEAMENTO",
         analistaUsuarioTitulo: "654321",
         observacoes: "Faltou informação.",

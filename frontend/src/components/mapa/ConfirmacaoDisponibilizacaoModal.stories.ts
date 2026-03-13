@@ -28,7 +28,7 @@ export const Cadastro: Story = {
         },
         template: `
       <div>
-        <button class="btn btn-primary" @click="show = true">Disponibilizar Cadastro</button>
+        <button class="btn btn-primary" @click="show = true">Disponibilizar cadastro</button>
         <ConfirmacaoDisponibilizacaoModal v-bind="args" :mostrar="show" @fechar="show = false" />
       </div>
     `,
@@ -48,7 +48,7 @@ export const Revisao: Story = {
         },
         template: `
       <div>
-        <button class="btn btn-primary" @click="show = true">Disponibilizar Revisão</button>
+        <button class="btn btn-primary" @click="show = true">Disponibilizar revisão</button>
         <ConfirmacaoDisponibilizacaoModal v-bind="args" :mostrar="show" @fechar="show = false" />
       </div>
     `,

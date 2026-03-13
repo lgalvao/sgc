@@ -92,7 +92,7 @@ class ProcessoNotificacaoServiceCoverageTest {
 
         when(processoRepo.findByIdComParticipantes(codProcesso)).thenReturn(Optional.of(p));
         when(subprocessoService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp));
-        when(responsavelService.buscarResponsaveisUnidades(any())).thenReturn(Map.of(10L, new UnidadeResponsavelDto(10L, "Titular", "Nome Titular", "Substituto", "Nome Substituto")));
+        when(responsavelService.buscarResponsaveisUnidades(any())).thenReturn(Map.of(10L, new UnidadeResponsavelDto(10L, "Titular", "Nome titular", "Substituto", "Nome substituto")));
         when(unidadeService.buscarPorId(10L)).thenReturn(u);
         when(usuarioService.buscarUsuariosPorTitulos(any())).thenReturn(Map.of("Titular", new Usuario()));
 

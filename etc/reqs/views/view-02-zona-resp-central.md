@@ -1,8 +1,8 @@
-# VIEW-02 - VW_ZONA_RESP_CENTRAL - Responsabilidade de Centrais por Zonas Eleitorais
+# VIEW-02 - VW_ZONA_RESP_CENTRAL - Responsabilidade de Centrais por Zonas eleitorais
 
 ## Finalidade
 
-Esta view estabelece o mapeamento entre as Centrais de Atendimento ao Eleitor (CAEs) do TRE-PE e as Zonas Eleitorais sob
+Esta view estabelece o mapeamento entre as Centrais de Atendimento ao Eleitor (CAEs) do TRE-PE e as Zonas eleitorais sob
 sua responsabilidade, incluindo a vigência temporal dessa responsabilidade. É fundamental para identificar quais zonas
 estão sob jurisdição de cada central em um determinado momento, permitindo a correta atribuição de processos e
 responsabilidades no sistema.
@@ -11,7 +11,7 @@ responsabilidades no sistema.
 
 A view integra dados de duas fontes principais:
 
-**Sistema de Gestão de Recursos Humanos (SRH2):**
+**Sistema de Gestão de Recursos humanos (SRH2):**
 
 - `SRH2.UNIDADE_TSE`: Unidades organizacionais (CAEs e Zonas)
 
@@ -28,7 +28,7 @@ A view integra dados de duas fontes principais:
 |--------------------|----------|-------------------------------------------------------------|-------------------------------------|
 | `codigo_central`   | NUMBER   | Código da Central de Atendimento ao Eleitor (CAE)           | `UNIDADE_TSE.CD`                    |
 | `sigla_central`    | VARCHAR2 | Sigla da central (formato: CAE + identificador, ex: CAE01)  | `UNIDADE_TSE.SIGLA_UNID_TSE`        |
-| `codigo_zona_resp` | NUMBER   | Código da Zona Eleitoral sob responsabilidade da central    | `UNIDADE_TSE.CD` (zona)             |
+| `codigo_zona_resp` | NUMBER   | Código da Zona eleitoral sob responsabilidade da central    | `UNIDADE_TSE.CD` (zona)             |
 | `sigla_zona_resp`  | VARCHAR2 | Sigla da zona eleitoral                                     | `UNIDADE_TSE.SIGLA_UNID_TSE` (zona) |
 | `data_inicio_resp` | DATE     | Data de início da responsabilidade da central sobre a zona  | `EVENTO.DATAINICIO`                 |
 | `data_fim_resp`    | DATE     | Data de término da responsabilidade da central sobre a zona | `EVENTO.DATATERMINO`                |
@@ -81,9 +81,9 @@ SYSDATE BETWEEN TRUNC(e.datainicio) AND TRUNC(e.datatermino + 1)
 - Consulta em 15/06/2024: retorna o evento
 - Consulta em 01/01/2025: não retorna o evento
 
-### RN-VIEW02-04: Identificação de Zonas Eleitorais
+### RN-VIEW02-04: Identificação de Zonas eleitorais
 
-Uma unidade é considerada Zona Eleitoral quando:
+Uma unidade é considerada Zona eleitoral quando:
 
 - Possui `NUM_ZE` não nulo (número da zona eleitoral)
 - Situação (`SIT_UNID`) diferente de 'E%' (não está extinta)
@@ -96,7 +96,7 @@ z.numero = uni_z.num_ze
 
 Onde `z.numero` é o número da zona no CORAU e `uni_z.num_ze` é o número da zona no SGRH.
 
-### RN-VIEW02-05: Centrais sem Zona Atribuída
+### RN-VIEW02-05: Centrais sem Zona atribuída
 
 Centrais que não possuem zona atribuída no momento da consulta terão:
 
@@ -113,7 +113,7 @@ Isso pode ocorrer quando:
 
 ## Casos de Uso da View
 
-### CU-VIEW02-01: Determinação da Unidade Superior para CAEs
+### CU-VIEW02-01: Determinação da Unidade superior para CAEs
 
 **Contexto:** Na view `VW_UNIDADE`, as Centrais de Atendimento ao Eleitor (CAEs) têm sua unidade superior definida
 dinamicamente como a zona eleitoral sob sua responsabilidade.
@@ -143,7 +143,7 @@ a zona sob responsabilidade da central está incluída no processo.
 - Se uma CAE é incluída em um processo, a zona sob sua responsabilidade deve estar incluída
 - Se uma zona é removida de um processo, todas as CAEs sob sua responsabilidade devem ser removidas ou reatribuídas
 
-### CU-VIEW02-03: Relatórios de Distribuição Territorial
+### CU-VIEW02-03: Relatórios de Distribuição territorial
 
 **Contexto:** Geração de relatórios que mostram a distribuição das responsabilidades territoriais das centrais de
 atendimento.
@@ -168,7 +168,7 @@ ORDER BY qtd_zonas DESC;
 **Nota:** Como a view mostra apenas a situação vigente atual, para auditoria histórica completa seria necessário
 consultar diretamente as tabelas do CORAU sem o filtro de vigência.
 
-## Relação com Outras Views e Tabelas
+## Relação com Outras views e Tabelas
 
 ### Integração com VW_UNIDADE
 
@@ -189,13 +189,13 @@ Indiretamente, esta view afeta:
 
 ## Dependências
 
-### Permissões Necessárias no SGRH
+### Permissões necessárias no SGRH
 
 ```sql
 GRANT SELECT ON SRH2.UNIDADE_TSE TO SGC;
 ```
 
-### Permissões Necessárias no CORAU (SIGMA)
+### Permissões necessárias no CORAU (SIGMA)
 
 ```sql
 GRANT SELECT ON CORAU.RESP_CENTRAL TO SGC;
@@ -254,7 +254,7 @@ consulta é executada uma vez por CAE durante a montagem de `VW_UNIDADE`.
 
 **Interpretação:**
 
-- CAE01: Responsável pela 1ª Zona Eleitoral durante todo o ano de 2024
+- CAE01: Responsável pela 1ª Zona eleitoral durante todo o ano de 2024
 - CAE02: Responsável pela 5ª Zona, com vigência de junho/2024 a junho/2025
 - CAE03: Sem zona atribuída no momento (pode estar inativa ou em reestruturação)
 - CAE04: Responsável pela 10ª Zona do meio de março até final de 2024

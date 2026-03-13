@@ -24,8 +24,8 @@ const mockUnidades = [
 ];
 
 const mockAtividades = [
-    {codigo: 50, descricao: 'Atividade Importada 1'},
-    {codigo: 51, descricao: 'Atividade Importada 2'},
+    {codigo: 50, descricao: 'Atividade importada 1'},
+    {codigo: 51, descricao: 'Atividade importada 2'},
 ];
 
 export const Default: Story = {
@@ -55,7 +55,7 @@ export const Default: Story = {
         },
         template: `
       <div>
-        <button class="btn btn-primary" @click="show = true">Importar Atividades</button>
+        <button class="btn btn-primary" @click="show = true">Importar atividades</button>
         <ImportarAtividadesModal v-bind="args" :mostrar="show" @fechar="show = false" />
       </div>
     `,

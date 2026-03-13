@@ -10,7 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @Tag("integration")
 @Transactional
-@DisplayName("CDU-07: Detalhar Subprocesso")
+@DisplayName("CDU-07: Detalhar subprocesso")
 class CDU07IntegrationTest extends BaseIntegrationTest {
 
     @Test
@@ -31,7 +31,7 @@ class CDU07IntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @WithMockChefe("3") // Fernanda Oliveira - Chefe da Unidade 8 no data.sql
+    @WithMockChefe("3") // Fernanda oliveira - Chefe da Unidade 8 no data.sql
     @DisplayName("CHEFE pode visualizar o subprocesso da sua unidade")
     void chefePodeVisualizarSuaUnidade() throws Exception {
         mockMvc.perform(
@@ -46,7 +46,7 @@ class CDU07IntegrationTest extends BaseIntegrationTest {
 
     @Test
     @WithMockCustomUser(tituloEleitoral = "333333333333", perfis = {"CHEFE"}, unidadeId = 9L)
-    // Chefe Teste - Chefe da Unidade 9 no data.sql tentando ver subprocesso da 8
+    // Chefe teste - Chefe da Unidade 9 no data.sql tentando ver subprocesso da 8
     @DisplayName("CHEFE NÃO pode visualizar o subprocesso de outra unidade")
     void chefeNaoPodeVisualizarOutraUnidade() throws Exception {
         mockMvc.perform(

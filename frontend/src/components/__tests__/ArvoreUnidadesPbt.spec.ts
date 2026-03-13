@@ -36,7 +36,7 @@ const flatten = (nodes: Unidade[]): Unidade[] => {
     return list;
 };
 
-describe('ArvoreUnidades Property-Based Tests', () => {
+describe('ArvoreUnidades Property-Based tests', () => {
 
     it('should satisfy Monotonicity: Selecting a parent selects all eligible children', () => {
         const tree = generateTree(3, 2, 0);
@@ -77,7 +77,7 @@ describe('ArvoreUnidades Property-Based Tests', () => {
         );
     });
 
-    it('should satisfy Selection State Invariant: Parent is checked iff all eligible children are checked', () => {
+    it('should satisfy Selection state invariant: Parent is checked iff all eligible children are checked', () => {
         const tree = generateTree(3, 2, 0);
         const allNodes = flatten(tree);
 
@@ -100,7 +100,7 @@ describe('ArvoreUnidades Property-Based Tests', () => {
                     vm.toggle(node, true);
                 });
 
-                // Verify Invariant for all parents
+                // Verify invariant for all parents
                 allNodes.forEach(node => {
                     if (node.filhas && node.filhas.length > 0) {
                         const allEligibleChildren = flatten(node.filhas).filter(n => n.isElegivel);
@@ -125,7 +125,7 @@ describe('ArvoreUnidades Property-Based Tests', () => {
         );
     });
 
-    it('should satisfy Eligibility Invariant: Only eligible units can be selected', () => {
+    it('should satisfy Eligibility invariant: Only eligible units can be selected', () => {
         // Generate base structure
         const treeStructure = generateTree(3, 2, 0); // ~14 nodes
         const allNodesStructure = flatten(treeStructure);
@@ -173,7 +173,7 @@ describe('ArvoreUnidades Property-Based Tests', () => {
                         vm.toggle(node, !isSelected);
                     });
 
-                    // Assert Invariant: All selected units must be eligible
+                    // Assert invariant: All selected units must be eligible
                     const selectedNodes = allNodes.filter(n => vm.isChecked(n.codigo));
 
                     selectedNodes.forEach(node => {

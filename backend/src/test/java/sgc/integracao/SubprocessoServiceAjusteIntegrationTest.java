@@ -43,7 +43,7 @@ class SubprocessoServiceAjusteIntegrationTest extends BaseIntegrationTest {
         unidade = unidadeRepo.save(unidade);
 
         Processo processo = Processo.builder()
-                .descricao("Processo Teste Ajuste")
+                .descricao("Processo teste ajuste")
                 .tipo(TipoProcesso.REVISAO)
                 .situacao(SituacaoProcesso.EM_ANDAMENTO)
                 .dataLimite(LocalDateTime.now().plusDays(30))
@@ -63,20 +63,20 @@ class SubprocessoServiceAjusteIntegrationTest extends BaseIntegrationTest {
         mapaRepo.save(mapa);
         subprocesso.setMapa(mapa);
 
-        atividade = Atividade.builder().mapa(mapa).descricao("Atividade Antiga").build();
+        atividade = Atividade.builder().mapa(mapa).descricao("Atividade antiga").build();
         atividadeRepo.save(atividade);
 
-        competencia = Competencia.builder().mapa(mapa).descricao("Competencia Antiga").atividades(Set.of(atividade)).build();
+        competencia = Competencia.builder().mapa(mapa).descricao("Competencia antiga").atividades(Set.of(atividade)).build();
         competenciaRepo.save(competencia);
     }
 
     @Test
     @DisplayName("salvarAjustesMapa: deve salvar ajustes e alterar descrição de atividade e competência")
     void salvarAjustesMapa_Sucesso() {
-        AtividadeAjusteDto ativAjuste = new AtividadeAjusteDto(atividade.getCodigo(), "Atividade Nova", List.of());
+        AtividadeAjusteDto ativAjuste = new AtividadeAjusteDto(atividade.getCodigo(), "Atividade nova", List.of());
         CompetenciaAjusteDto compAjuste = CompetenciaAjusteDto.builder()
                 .codCompetencia(competencia.getCodigo())
-                .nome("Competencia Nova")
+                .nome("Competencia nova")
                 .atividades(List.of(ativAjuste))
                 .build();
 
@@ -88,10 +88,10 @@ class SubprocessoServiceAjusteIntegrationTest extends BaseIntegrationTest {
         assertThat(spAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
 
         Competencia compAtualizada = competenciaRepo.findById(competencia.getCodigo()).orElseThrow();
-        assertThat(compAtualizada.getDescricao()).isEqualTo("Competencia Nova");
+        assertThat(compAtualizada.getDescricao()).isEqualTo("Competencia nova");
 
         Atividade ativAtualizada = atividadeRepo.findById(atividade.getCodigo()).orElseThrow();
-        assertThat(ativAtualizada.getDescricao()).isEqualTo("Atividade Nova");
+        assertThat(ativAtualizada.getDescricao()).isEqualTo("Atividade nova");
     }
 
 }

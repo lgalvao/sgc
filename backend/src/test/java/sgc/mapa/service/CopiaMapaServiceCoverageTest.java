@@ -13,7 +13,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("CopiaMapaService - Cobertura Adicional")
+@DisplayName("CopiaMapaService - Cobertura adicional")
 class CopiaMapaServiceCoverageTest {
 
     @Mock
@@ -44,12 +44,12 @@ class CopiaMapaServiceCoverageTest {
 
         Atividade ativFonte = new Atividade();
         ativFonte.setCodigo(100L);
-        ativFonte.setDescricao("Atividade Teste");
+        ativFonte.setDescricao("Atividade teste");
         when(atividadeRepo.findWithConhecimentosByMapa_Codigo(codMapaOrigem)).thenReturn(List.of(ativFonte));
 
         Competencia compFonte = new Competencia();
         compFonte.setCodigo(200L);
-        compFonte.setDescricao("Competencia Teste");
+        compFonte.setDescricao("Competencia teste");
 
         // Associada a uma atividade que NÃO existe no mapa de origem (ou ID errado no mock)
         Atividade ativFantasma = new Atividade();
@@ -73,7 +73,7 @@ class CopiaMapaServiceCoverageTest {
         Long mapaDestinoId = 2L;
 
         Atividade ativOrigem = Atividade.builder()
-                .descricao("Nova Atividade")
+                .descricao("Nova atividade")
                 .conhecimentos(new HashSet<>())
                 .build();
 
@@ -97,7 +97,7 @@ class CopiaMapaServiceCoverageTest {
 
         Atividade ativ1 = Atividade.builder().descricao("Selecionada").conhecimentos(new HashSet<>()).build();
         ativ1.setCodigo(10L);
-        Atividade ativ2 = Atividade.builder().descricao("Nao Selecionada").conhecimentos(new HashSet<>()).build();
+        Atividade ativ2 = Atividade.builder().descricao("Nao selecionada").conhecimentos(new HashSet<>()).build();
         ativ2.setCodigo(20L);
 
         when(atividadeRepo.findWithConhecimentosByMapa_Codigo(mapaOrigemId)).thenReturn(List.of(ativ1, ativ2));

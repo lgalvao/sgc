@@ -3,17 +3,6 @@
     <PageHeader title="Atividades e conhecimentos">
       <template #default>
         <div class="d-flex align-items-center gap-2">
-          <BButton
-              aria-label="Voltar"
-              class="p-0 me-2 text-decoration-none text-muted"
-              data-testid="btn-cad-atividades-voltar"
-              title="Voltar"
-              variant="link"
-              @click="() => { router.push(`/processo/${props.codProcesso}/${props.sigla}`); }"
-          >
-            <i aria-hidden="true" class="bi bi-arrow-left"/>
-          </BButton>
-          <span>{{ sigla }} - {{ nomeUnidade }}</span>
           <BBadge
               v-if="subprocesso"
               :variant="badgeVariant(subprocesso.situacao)"
@@ -23,40 +12,38 @@
         </div>
       </template>
       <template #actions>
-        <BDropdown
-            v-if="codSubprocesso && (podeVerImpacto || isChefe)"
+        <BButton
+            v-if="codSubprocesso && podeVerImpacto"
             class="me-2"
-            data-testid="btn-mais-acoes"
-            text="Mais ações"
+            data-testid="cad-atividades__btn-impactos-mapa-edicao"
             variant="outline-secondary"
+            @click="abrirModalImpacto"
         >
-          <BDropdownItem
-              v-if="podeVerImpacto"
-              data-testid="cad-atividades__btn-impactos-mapa-edicao"
-              @click="abrirModalImpacto"
-          >
-            <i aria-hidden="true" class="bi bi-arrow-right-circle me-2"/> Impacto no mapa
-          </BDropdownItem>
-          <BDropdownItem
-              v-if="isChefe"
-              :disabled="!podeEditarCadastro"
-              data-testid="btn-cad-atividades-historico"
-              @click="abrirModalHistorico"
-          >
-            <i aria-hidden="true" class="bi bi-clock-history me-2"/> Histórico de análise
-          </BDropdownItem>
-          <BDropdownItem
-              v-if="isChefe"
-              :disabled="!podeEditarCadastro"
-              data-testid="btn-cad-atividades-importar"
-              @click="mostrarModalImportar = true"
-          >
-            <i aria-hidden="true" class="bi bi-upload me-2"/> Importar atividades
-          </BDropdownItem>
-        </BDropdown>
+          <i aria-hidden="true" class="bi bi-arrow-right-circle me-1"/> Impacto no mapa
+        </BButton>
+        <BButton
+            v-if="codSubprocesso && isChefe"
+            :disabled="!podeEditarCadastro"
+            class="me-2"
+            data-testid="btn-cad-atividades-historico"
+            variant="outline-secondary"
+            @click="abrirModalHistorico"
+        >
+          <i aria-hidden="true" class="bi bi-clock-history me-1"/> Histórico
+        </BButton>
+        <BButton
+            v-if="codSubprocesso && isChefe"
+            :disabled="!podeEditarCadastro"
+            class="me-2"
+            data-testid="btn-cad-atividades-importar"
+            variant="outline-secondary"
+            @click="mostrarModalImportar = true"
+        >
+          <i aria-hidden="true" class="bi bi-upload me-1"/> Importar
+        </BButton>
 
         <LoadingButton
-              v-if="isChefe"
+            v-if="isChefe"
             :disabled="botaoDisponibilizarDesabilitado"
             :loading="loadingValidacao"
             data-testid="btn-cad-atividades-disponibilizar"
@@ -88,24 +75,13 @@
         @submit="handleAdicionarAtividade"
     />
 
-    <!-- Empty State -->
     <EmptyState
         v-if="atividades?.length === 0"
-        :description="`Não há atividades cadastradas. Utilize o campo acima para adicionar uma nova atividade${isChefe ? ' ou importe de outro processo' : ''}.`"
+        :description="`Não há atividades cadastradas. Utilize o campo acima para adicionar uma nova atividade ou importe de outro processo.`"
         data-testid="cad-atividades-empty-state"
         icon="bi-list-check"
         title="Lista de atividades"
     >
-      <BButton
-          v-if="isChefe"
-          :disabled="!podeEditarCadastro"
-          data-testid="btn-empty-state-importar"
-          size="sm"
-          variant="outline-primary"
-          @click="mostrarModalImportar = true"
-      >
-        <i aria-hidden="true" class="bi bi-upload me-2"/> Importar atividades
-      </BButton>
     </EmptyState>
 
     <div
@@ -156,7 +132,7 @@
     <ModalConfirmacao
         v-model="mostrarModalConfirmacaoRemocao"
         :mensagem="dadosRemocao?.tipo === 'atividade' ? 'Confirma a remoção desta atividade e todos os conhecimentos associados?' : 'Confirma a remoção deste conhecimento?'"
-        :titulo="dadosRemocao?.tipo === 'atividade' ? 'Remover Atividade' : 'Remover Conhecimento'"
+        :titulo="dadosRemocao?.tipo === 'atividade' ? 'Remover atividade' : 'Remover conhecimento'"
         variant="danger"
         @confirmar="confirmarRemocao"
     />
@@ -165,7 +141,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BButton, BDropdown, BDropdownItem, BBadge} from "bootstrap-vue-next";
+import {BAlert, BButton, BBadge} from "bootstrap-vue-next";
 import {computed, nextTick, onMounted, ref, watch} from "vue";
 import {useRouter} from "vue-router";
 import {storeToRefs} from "pinia";
@@ -231,7 +207,6 @@ const codSubprocesso = ref<number | null>(null);
 const codMapa = computed(() => mapasStore.mapaCompleto?.codigo || null);
 const subprocesso = computed(() => subprocessosStore.subprocessoDetalhe);
 const unidade = ref<Unidade | null>(null);
-const nomeUnidade = computed(() => unidade.value?.nome || "");
 const {podeEditarCadastro, podeDisponibilizarCadastro, podeVisualizarImpacto} = useAcesso(subprocesso);
 const isRevisao = computed(() => subprocesso.value?.tipoProcesso === TipoProcesso.REVISAO);
 const podeVerImpacto = computed(() => podeVisualizarImpacto.value);
@@ -528,7 +503,7 @@ async function confirmarDisponibilizacao() {
 
   mostrarModalConfirmacao.value = false;
   if (sucesso) {
-    toastStore.setPending("Disponibilizado com sucesso.");
+    toastStore.setPending("Cadastro disponibilizado.");
     await router.push("/painel");
   }
 }

@@ -8,7 +8,7 @@ describe('TabelaProcessos Coverage', () => {
     const mockProcessos = [
         createMockProcessoResumo({
             codigo: 1,
-            descricao: "Processo Teste",
+            descricao: "Processo teste",
             tipo: TipoProcesso.MAPEAMENTO,
             unidadeCodigo: 1,
             unidadeNome: "U1",

@@ -7,7 +7,7 @@ import sgc.processo.model.*;
 
 import static org.assertj.core.api.Assertions.*;
 
-@DisplayName("ProcessoDetalheDto Test Suite")
+@DisplayName("ProcessoDetalheDto Test suite")
 class ProcessoDetalheDtoTest {
 
     @Test
@@ -49,7 +49,7 @@ class ProcessoDetalheDtoTest {
     void fromSnapshotDeveMapearCampos() {
         UnidadeProcesso snapshot = new UnidadeProcesso();
         snapshot.setUnidadeCodigo(10L);
-        snapshot.setNome("Snapshot Unidade");
+        snapshot.setNome("Snapshot unidade");
         snapshot.setSigla("SU");
         snapshot.setUnidadeSuperiorCodigo(20L);
 
@@ -57,7 +57,7 @@ class ProcessoDetalheDtoTest {
 
         assertThat(dto).isNotNull();
         assertThat(dto.getCodUnidade()).isEqualTo(10L);
-        assertThat(dto.getNome()).isEqualTo("Snapshot Unidade");
+        assertThat(dto.getNome()).isEqualTo("Snapshot unidade");
         assertThat(dto.getSigla()).isEqualTo("SU");
         assertThat(dto.getCodUnidadeSuperior()).isEqualTo(20L);
         assertThat(dto.getFilhos()).isEmpty();

@@ -22,7 +22,7 @@ const mockColumns = [
 const mockData = [
     {
         codigo: 1,
-        nome: 'Projeto Principal',
+        nome: 'Projeto principal',
         tipo: 'Categoria',
         status: 'Ativo',
         expanded: true,
@@ -31,7 +31,7 @@ const mockData = [
                 codigo: 2,
                 nome: 'Subprojeto A',
                 tipo: 'Tarefa',
-                status: 'Em Andamento',
+                status: 'Em andamento',
                 children: [
                     {
                         codigo: 3,
@@ -51,7 +51,7 @@ const mockData = [
     },
     {
         codigo: 5,
-        nome: 'Projeto Secundário',
+        nome: 'Projeto secundário',
         tipo: 'Categoria',
         status: 'Inativo',
     },

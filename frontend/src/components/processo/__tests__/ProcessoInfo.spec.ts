@@ -15,7 +15,7 @@ describe("ProcessoInfo.vue", () => {
 
         expect(wrapper.text()).toContain("Tipo: Mapeamento");
         expect(wrapper.text()).toContain("Situação: Em andamento");
-        expect(wrapper.text()).toContain("Data Limite:");
+        expect(wrapper.text()).toContain("Data limite:");
         expect(wrapper.text()).toContain("31/12/2023");
     });
 

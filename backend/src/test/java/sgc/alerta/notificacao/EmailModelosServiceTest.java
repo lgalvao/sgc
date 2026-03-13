@@ -43,7 +43,7 @@ class EmailModelosServiceTest {
         void criarEmailProcessoFinalizadoPorUnidade() {
 
             String siglaUnidade = "UT";
-            String nomeProcesso = "Processo Teste";
+            String nomeProcesso = "Processo teste";
 
             emailModelosService.criarEmailProcessoFinalizadoPorUnidade(
                     siglaUnidade, nomeProcesso);
@@ -60,7 +60,7 @@ class EmailModelosServiceTest {
         void criarEmailProcessoFinalizadoUnidadesSubordinadas() {
 
             String siglaUnidade = "UT";
-            String nomeProcesso = "Processo Teste";
+            String nomeProcesso = "Processo teste";
             List<String> siglas = List.of("SUB1", "SUB2");
 
             emailModelosService.criarEmailProcessoFinalizadoUnidadesSubordinadas(
