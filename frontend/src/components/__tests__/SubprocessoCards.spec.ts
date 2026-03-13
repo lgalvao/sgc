@@ -67,7 +67,7 @@ describe('SubprocessoCards.vue', () => {
             params: {codProcesso: 1, siglaUnidade: 'TESTE'}
         });
 
-        // Keydown Enter action
+        // Keydown enter action
         pushMock.mockClear();
         await wrapper.find('[data-testid="card-subprocesso-atividades"]').trigger('keydown', {key: 'Enter'});
         expect(pushMock).toHaveBeenCalledWith({
@@ -75,7 +75,7 @@ describe('SubprocessoCards.vue', () => {
             params: {codProcesso: 1, siglaUnidade: 'TESTE'}
         });
 
-        // Keydown Space action
+        // Keydown space action
         pushMock.mockClear();
         await wrapper.find('[data-testid="card-subprocesso-atividades"]').trigger('keydown', {key: ' '});
         expect(pushMock).toHaveBeenCalledWith({
@@ -83,7 +83,7 @@ describe('SubprocessoCards.vue', () => {
             params: {codProcesso: 1, siglaUnidade: 'TESTE'}
         });
 
-        // Mapa Card Actions
+        // Mapa card actions
         // Click
         pushMock.mockClear();
         await wrapper.find('[data-testid="card-subprocesso-mapa-edicao"]').trigger('click');
@@ -114,7 +114,7 @@ describe('SubprocessoCards.vue', () => {
 
         expect(wrapper.find('[data-testid="card-subprocesso-atividades-vis"]').exists()).toBe(true);
 
-        // Atividades Vis Actions
+        // Atividades vis actions
         await wrapper.find('[data-testid="card-subprocesso-atividades-vis"]').trigger('click');
         expect(pushMock).toHaveBeenCalledWith({
             name: 'SubprocessoVisCadastro',
@@ -177,7 +177,7 @@ describe('SubprocessoCards.vue', () => {
             codSubprocesso: 100
         }, {podeVisualizarDiagnostico: true});
 
-        // Diagnostico Card Actions
+        // Diagnostico card actions
         await wrapper.find('[data-testid="card-subprocesso-diagnostico"]').trigger('click');
         expect(pushMock).toHaveBeenCalledWith({
             name: 'AutoavaliacaoDiagnostico',
@@ -198,7 +198,7 @@ describe('SubprocessoCards.vue', () => {
             params: {codSubprocesso: 100, siglaUnidade: 'TESTE'}
         });
 
-        // Ocupacoes Card Actions
+        // Ocupacoes card actions
         pushMock.mockClear();
         await wrapper.find('[data-testid="card-subprocesso-ocupacoes"]').trigger('click');
         expect(pushMock).toHaveBeenCalledWith({
@@ -220,7 +220,7 @@ describe('SubprocessoCards.vue', () => {
             params: {codSubprocesso: 100, siglaUnidade: 'TESTE'}
         });
 
-        // Monitoramento Card Actions
+        // Monitoramento card actions
         pushMock.mockClear();
         await wrapper.find('[data-testid="card-subprocesso-monitoramento"]').trigger('click');
         expect(pushMock).toHaveBeenCalledWith({

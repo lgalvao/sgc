@@ -70,14 +70,14 @@ describe("router/index.ts", () => {
             path: "/titulo",
             name: "TituloTeste",
             component: {template: "<div>Titulo</div>"},
-            meta: {title: "Meu Título"}
+            meta: {title: "Meu título"}
         });
 
         await router.push("/titulo");
         // Esperar a navegação completar
         await router.isReady();
 
-        expect(document.title).toBe("Meu Título - SGC");
+        expect(document.title).toBe("Meu título - SGC");
     });
 
     it("deve usar o nome da rota como título se meta.title não existir", async () => {

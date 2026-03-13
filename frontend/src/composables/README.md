@@ -1,8 +1,8 @@
-# Composables (Vue Composition API)
+# Composables (Vue composition API)
 
 Este diretório contém funções que encapsulam lógica de estado e UI reutilizável.
 
-## Composables Disponíveis
+## Composables disponíveis
 
 ### Lógica de UI e Estado
 
@@ -19,7 +19,7 @@ Este diretório contém funções que encapsulam lógica de estado e UI reutiliz
 * **`useBreadcrumbs.ts`**: Geração dinâmica da trilha de navegação (breadcrumbs).
 * **`useRelatorios.ts`**: Lógica de busca e filtros para a central de relatórios.
 
-### Fluxos Específicos (Views)
+### Fluxos específicos (Views)
 
 * **`useProcessoView.ts` / `useProcessoForm.ts`**: Lógica para telas de detalhes e cadastro de processos.
 * **`useUnidadeView.ts`**: Lógica para a tela de detalhes da unidade.
@@ -27,7 +27,7 @@ Este diretório contém funções que encapsulam lógica de estado e UI reutiliz
 * **`useVisAtividades.ts`**: Lógica para visualização de atividades.
 * **`useVisMapa.ts`**: Lógica para exibição do mapa de competências.
 
-## Boas Práticas
+## Boas práticas
 
 1. **Nomenclatura**: Sempre começar com o prefixo `use` (ex: `useAuth`).
 2. **Ciclo de Vida**: Podem utilizar `onMounted`, `watch`, etc., para gerenciar efeitos colaterais.

@@ -40,7 +40,7 @@ class CDU16IntegrationTest extends BaseIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        // Criar Unidade via Fixture
+        // Criar unidade via Fixture
         Unidade unidade = UnidadeFixture.unidadePadrao();
         unidade.setCodigo(null);
         unidade.setNome("Unidade CDU-16");
@@ -51,7 +51,7 @@ class CDU16IntegrationTest extends BaseIntegrationTest {
         jdbcTemplate.update("INSERT INTO SGC.VW_RESPONSABILIDADE (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio) VALUES (?, ?, ?, ?, ?)",
                 unidade.getCodigo(), "111111111111", "00000", "TITULAR", LocalDateTime.now());
 
-        // Criar Processo via Fixture
+        // Criar processo via Fixture
         Processo processo = ProcessoFixture.processoPadrao();
         processo.setCodigo(null);
         processo.setDescricao("Processo de Revisão");
@@ -59,14 +59,14 @@ class CDU16IntegrationTest extends BaseIntegrationTest {
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
         processo = processoRepo.save(processo);
 
-        // Criar Subprocesso via Fixture (Primeiro o subprocesso, pois Mapa depende dele)
+        // Criar subprocesso via Fixture (Primeiro o subprocesso, pois Mapa depende dele)
         subprocesso = SubprocessoFixture.subprocessoPadrao(processo, unidade);
         subprocesso.setCodigo(null);
         subprocesso.setMapa(null); // Importante: limpar mapa da fixture para evitar dependência circular errada
         subprocesso.setSituacaoForcada(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
         subprocesso = subprocessoRepo.save(subprocesso);
 
-        // Criar Mapa via Fixture (Ligado ao Subprocesso)
+        // Criar mapa via Fixture (Ligado ao Subprocesso)
         Mapa mapa = MapaFixture.mapaPadrao(subprocesso);
         mapa.setCodigo(null);
         mapa = mapaRepo.save(mapa);
@@ -85,7 +85,7 @@ class CDU16IntegrationTest extends BaseIntegrationTest {
                 .build();
         movimentacaoRepo.save(movAdmin);
 
-        // Criar Competências e Atividades
+        // Criar competências e Atividades
         var c1 = competenciaRepo.save(Competencia.builder().descricao("Competência 1").mapa(mapa).build());
 
         // As atividades devem ser salvas antes de serem associadas à competência
@@ -145,7 +145,7 @@ class CDU16IntegrationTest extends BaseIntegrationTest {
                             List.of(
                                     CompetenciaAjusteDto.builder()
                                             .codCompetencia(c1.getCodigo())
-                                            .nome("Competência Ajustada")
+                                            .nome("Competência ajustada")
                                             .atividades(
                                                     List.of(
                                                             AtividadeAjusteDto.builder()
@@ -183,7 +183,7 @@ class CDU16IntegrationTest extends BaseIntegrationTest {
                     List.of(
                             CompetenciaAjusteDto.builder()
                                     .codCompetencia(1L)
-                                    .nome("Competência Dummy")
+                                    .nome("Competência dummy")
                                     .atividades(List.of())
                                     .build()));
 

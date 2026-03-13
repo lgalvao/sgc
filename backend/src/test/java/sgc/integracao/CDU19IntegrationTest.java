@@ -20,7 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @Tag("integration")
 @Transactional
-@DisplayName("CDU-19: Validar Mapa de Competências")
+@DisplayName("CDU-19: Validar mapa de Competências")
 class CDU19IntegrationTest extends BaseIntegrationTest {
     @Autowired
     private MovimentacaoRepo movimentacaoRepo;
@@ -63,7 +63,7 @@ class CDU19IntegrationTest extends BaseIntegrationTest {
     }
 
     @Nested
-    @DisplayName("Testes para o fluxo de 'Apresentar Sugestões'")
+    @DisplayName("Testes para o fluxo de 'Apresentar sugestões'")
     class ApresentarSugestoesTest {
         @Test
         @DisplayName(
@@ -108,7 +108,7 @@ class CDU19IntegrationTest extends BaseIntegrationTest {
     }
 
     @Nested
-    @DisplayName("Testes para o fluxo de 'Validar Mapa'")
+    @DisplayName("Testes para o fluxo de 'Validar mapa'")
     class ValidarMapaTest {
         @Test
         @DisplayName("Deve validar o mapa, alterar status, registrar movimentação e criar alerta")

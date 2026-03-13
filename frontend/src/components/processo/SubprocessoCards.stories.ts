@@ -19,8 +19,8 @@ type Story = StoryObj<typeof SubprocessoCards>;
 
 const mockMapa = {
     codigo: 1,
-    descricao: 'Mapa Teste',
-    unidade: {codigo: 1, nome: 'Unidade Teste', sigla: 'TEST'},
+    descricao: 'Mapa teste',
+    unidade: {codigo: 1, nome: 'Unidade teste', sigla: 'TEST'},
     codProcesso: 456,
     competencias: [],
     situacao: 'CRIADO',

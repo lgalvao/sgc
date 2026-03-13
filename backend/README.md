@@ -1,13 +1,13 @@
 # Backend do Sistema de Gestão de Competências (SGC)
 
-## Visão Geral
+## Visão geral
 
 Este diretório contém o código do backend do SGC. Ele fornece uma API REST para consumo pelo frontend. A arquitetura é
 organizada em pacotes representando domínios específicos.
 
 ## 🏗️ Arquitetura e Stack
 
-A aplicação segue uma arquitetura **Modular Monolith** construída com:
+A aplicação segue uma arquitetura **Modular monolith** construída com:
 
 * **Java 21**: Linguagem base.
 * **Spring Boot 4.0.3**: Framework de aplicação (GA).
@@ -16,7 +16,7 @@ A aplicação segue uma arquitetura **Modular Monolith** construída com:
 * **H2 Database**: Banco de dados em memória para testes e desenvolvimento local rápido.
 * **Gradle**: Ferramenta de build e gerenciamento de dependências.
 
-## 📦 Módulos Principais
+## 📦 Módulos principais
 
 O código está organizado em `src/main/java/sgc/` com os seguintes módulos principais:
 
@@ -28,7 +28,7 @@ O código está organizado em `src/main/java/sgc/` com os seguintes módulos pri
 * **`alerta` / `notificacao`**: Módulos reativos para comunicação com o usuário.
 * **`analise`**: Auditoria e histórico de revisões.
 
-## 🚀 Como Executar
+## 🚀 Como executar
 
 A partir da raiz do projeto, execute:
 
@@ -60,12 +60,12 @@ O projeto suporta a execução granular de testes através de tarefas Gradle esp
   ```
   Executa tanto testes unitários quanto de integração.
 
-* **Apenas Unitários** (Rápido, exclui tag `integration`):
+* **Apenas unitários** (Rápido, exclui tag `integration`):
   ```bash
   ./gradlew unitTest
   ```
 
-* **Apenas Integração** (Filtra tag `integration`):
+* **Apenas integração** (Filtra tag `integration`):
   ```bash
   ./gradlew integrationTest
   ```
@@ -78,13 +78,13 @@ Os testes estão localizados em `src/test/java/sgc/`:
 * **`[pacote]/`**: Testes unitários específicos de cada módulo.
 * **`architecture/`**: Testes ArchUnit garantindo a integridade arquitetural.
 
-## 🏛️ Arquitetura Detalhada
+## 🏛️ Arquitetura detalhada
 
-### Padrões Arquiteturais
+### Padrões arquiteturais
 
 O sistema segue uma arquitetura em camadas com padrões bem definidos:
 
-#### 1. Facade Pattern
+#### 1. Facade pattern
 
 Todos os módulos principais expõem uma **Facade** como ponto de entrada único:
 
@@ -101,7 +101,7 @@ public class SubprocessoController {
 }
 ```
 
-**Services Especializados** são package-private e usados apenas pelas Facades:
+**Services especializados** são package-private e usados apenas pelas Facades:
 
 * `SubprocessoCadastroWorkflowService`
 * `SubprocessoMapaWorkflowService`
@@ -146,9 +146,9 @@ CAMADA 3: LÓGICA DE NEGÓCIO (Services)
 * `HierarchyService` - Hierarquia de unidades
 * `AccessAuditService` - Auditoria automática
 
-#### 3. Domain Events
+#### 3. Domain events
 
-Comunicação assíncrona entre módulos via Spring Events:
+Comunicação assíncrona entre módulos via Spring events:
 
 ```java
 // Publicação
@@ -161,7 +161,7 @@ public void onProcessoIniciado(EventoProcessoIniciado evento) {
 }
 ```
 
-#### 4. Data Transfer Objects (DTOs)
+#### 4. Data transfer objects (DTOs)
 
 **Regra:** NUNCA expor entidades JPA diretamente.
 
@@ -184,20 +184,20 @@ public Subprocesso obter(@PathVariable Long id) {
 #### Leitura (Query)
 
 ```
-User Request → Controller → Facade → Service → Repository 
+User request → Controller → Facade → Service → Repository 
 → JPA Entity → Mapper → DTO → HTTP Response
 ```
 
 #### Escrita (Command)
 
 ```
-User Request + DTO → Controller (@Valid) → Facade
+User request + DTO → Controller (@Valid) → Facade
 → AccessControlService (autoriza)
 → Service (valida + executa) → Repository → JPA Entity
 → EventPublisher (opcional) → DTO → HTTP Response
 ```
 
-### Módulos Detalhados
+### Módulos detalhados
 
 #### `sgc.processo`
 
@@ -260,7 +260,7 @@ User Request + DTO → Controller (@Valid) → Facade
 * **Constantes:** `UPPER_SNAKE_CASE`
 * **Packages:** `lowercase`
 
-#### Sufixos Obrigatórios
+#### Sufixos obrigatórios
 
 * Controllers: `{Entidade}Controller`
 * Facades: `{Entidade}Facade`
@@ -272,7 +272,7 @@ User Request + DTO → Controller (@Valid) → Facade
 
 #### Idioma
 
-**TUDO em Português Brasileiro:**
+**TUDO em Português brasileiro:**
 
 * Código (variáveis, métodos, classes)
 * Comentários
@@ -304,6 +304,6 @@ POST /api/processos/{id}/excluir     - Excluir
 POST /api/processos/{id}/iniciar     - Workflow action
 ```
 
-## 📚 Documentação Adicional
+## 📚 Documentação adicional
 
-* [Backend Patterns](/etc/docs/backend-padroes.md) - Padrões e convenções
+* [Backend patterns](/etc/docs/backend-padroes.md) - Padrões e convenções

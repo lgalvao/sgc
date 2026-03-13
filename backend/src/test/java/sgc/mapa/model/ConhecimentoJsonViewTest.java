@@ -20,7 +20,7 @@ class ConhecimentoJsonViewTest {
         Atividade atividade = Atividade.builder().codigo(1L).build();
         Conhecimento conhecimento = Conhecimento.builder()
                 .codigo(100L)
-                .descricao("Conhecimento Teste")
+                .descricao("Conhecimento teste")
                 .atividade(atividade)
                 .build();
 
@@ -29,7 +29,7 @@ class ConhecimentoJsonViewTest {
                 .writeValueAsString(conhecimento);
 
         assertThat(json).contains("\"codigo\":100");
-        assertThat(json).contains("\"descricao\":\"Conhecimento Teste\"");
+        assertThat(json).contains("\"descricao\":\"Conhecimento teste\"");
         assertThat(json).contains("\"atividadeCodigo\":1");
 
         assertThat(json).doesNotContain("\"atividade\"");

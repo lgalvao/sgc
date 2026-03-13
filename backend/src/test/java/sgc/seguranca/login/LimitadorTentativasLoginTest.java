@@ -10,7 +10,7 @@ import java.util.stream.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@DisplayName("LimitadorTentativasLogin - Testes Unitários")
+@DisplayName("LimitadorTentativasLogin - Testes unitários")
 class LimitadorTentativasLoginTest {
     private LimitadorTentativasLogin limitador;
     private Environment environment;

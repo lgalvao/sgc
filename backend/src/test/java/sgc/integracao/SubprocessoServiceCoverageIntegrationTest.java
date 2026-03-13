@@ -33,11 +33,11 @@ class SubprocessoServiceCoverageIntegrationTest extends BaseIntegrationTest {
         Unidade unidade = UnidadeFixture.unidadePadrao();
         unidade.setCodigo(null);
         unidade.setSigla("TEST_COV");
-        unidade.setNome("Unidade Cov");
+        unidade.setNome("Unidade cov");
         unidade = unidadeRepo.save(unidade);
 
         Processo processo = Processo.builder()
-                .descricao("Processo Teste Cov")
+                .descricao("Processo teste cov")
                 .tipo(TipoProcesso.MAPEAMENTO)
                 .situacao(SituacaoProcesso.EM_ANDAMENTO)
                 .dataLimite(LocalDateTime.now().plusDays(30))

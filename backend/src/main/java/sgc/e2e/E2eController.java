@@ -149,7 +149,7 @@ public class E2eController {
             jdbcTemplate.update("DELETE FROM sgc.atividade WHERE mapa_codigo IN " + subqueryMapas);
             jdbcTemplate.update("DELETE FROM sgc.competencia WHERE mapa_codigo IN " + subqueryMapas);
 
-            // Limpar referências de Mapa Vigente antes de excluir o Mapa
+            // Limpar referências de Mapa vigente antes de excluir o Mapa
             jdbcTemplate.update("DELETE FROM sgc.unidade_mapa WHERE mapa_vigente_codigo IN " + subqueryMapas);
             jdbcTemplate.update("DELETE FROM sgc.mapa WHERE subprocesso_codigo IN " + subquerySubprocessos);
 
@@ -256,13 +256,13 @@ public class E2eController {
         Long mapaId = jdbcTemplate.queryForObject("SELECT codigo FROM sgc.mapa WHERE subprocesso_codigo = ?", Long.class, subId);
         
         // Atividades com conhecimentos associados
-        jdbcTemplate.update("INSERT INTO sgc.atividade (mapa_codigo, descricao) VALUES (?, ?)", mapaId, "Atividade Origem A - " + procId);
-        jdbcTemplate.update("INSERT INTO sgc.atividade (mapa_codigo, descricao) VALUES (?, ?)", mapaId, "Atividade Origem B - " + procId);
+        jdbcTemplate.update("INSERT INTO sgc.atividade (mapa_codigo, descricao) VALUES (?, ?)", mapaId, "Atividade origem A - " + procId);
+        jdbcTemplate.update("INSERT INTO sgc.atividade (mapa_codigo, descricao) VALUES (?, ?)", mapaId, "Atividade origem B - " + procId);
 
         jdbcTemplate.update("INSERT INTO sgc.conhecimento (atividade_codigo, descricao) SELECT codigo, ? FROM sgc.atividade WHERE mapa_codigo = ? AND descricao = ?",
-                "Conhecimento A - " + procId, mapaId, "Atividade Origem A - " + procId);
+                "Conhecimento A - " + procId, mapaId, "Atividade origem A - " + procId);
         jdbcTemplate.update("INSERT INTO sgc.conhecimento (atividade_codigo, descricao) SELECT codigo, ? FROM sgc.atividade WHERE mapa_codigo = ? AND descricao = ?",
-                "Conhecimento B - " + procId, mapaId, "Atividade Origem B - " + procId);
+                "Conhecimento B - " + procId, mapaId, "Atividade origem B - " + procId);
 
         // Atualizar status para simular finalização
         jdbcTemplate.update("UPDATE sgc.subprocesso SET situacao = 'MAPEAMENTO_MAPA_HOMOLOGADO' WHERE codigo = ?", subId);
@@ -374,27 +374,27 @@ public class E2eController {
 
         String sufixo = " - " + procId;
         jdbcTemplate.update("INSERT INTO sgc.atividade (mapa_codigo, descricao) VALUES (?, ?)",
-                mapaId, "Atividade Fixture" + sufixo);
+                mapaId, "Atividade fixture" + sufixo);
         Long atividadeId = jdbcTemplate.queryForObject(
                 "SELECT codigo FROM sgc.atividade WHERE mapa_codigo = ? AND descricao = ?",
-                Long.class, mapaId, "Atividade Fixture" + sufixo);
+                Long.class, mapaId, "Atividade fixture" + sufixo);
 
         jdbcTemplate.update("INSERT INTO sgc.conhecimento (atividade_codigo, descricao) VALUES (?, ?)",
-                atividadeId, "Conhecimento Fixture" + sufixo);
+                atividadeId, "Conhecimento fixture" + sufixo);
         jdbcTemplate.update("INSERT INTO sgc.competencia (mapa_codigo, descricao) VALUES (?, ?)",
-                mapaId, "Competência Fixture" + sufixo);
+                mapaId, "Competência fixture" + sufixo);
         Long competenciaId = jdbcTemplate.queryForObject(
                 "SELECT codigo FROM sgc.competencia WHERE mapa_codigo = ? AND descricao = ?",
-                Long.class, mapaId, "Competência Fixture" + sufixo);
+                Long.class, mapaId, "Competência fixture" + sufixo);
         jdbcTemplate.update("INSERT INTO sgc.competencia_atividade (atividade_codigo, competencia_codigo) VALUES (?, ?)",
                 atividadeId, competenciaId);
         
         jdbcTemplate.update("UPDATE sgc.subprocesso SET situacao = ? WHERE codigo = ?", situacaoSubprocesso, subId);
 
         // Definir localização baseada na situação para que os botões de ação apareçam para o ator correto:
-        // 1. Cadastro Disponibilizado -> Gestor (superiorId)
-        // 2. Mapa Disponibilizado -> Chefe (unidId) para validação
-        // 3. Mapa Validado -> Gestor (superiorId) para análise
+        // 1. Cadastro disponibilizado -> Gestor (superiorId)
+        // 2. Mapa disponibilizado -> Chefe (unidId) para validação
+        // 3. Mapa validado -> Gestor (superiorId) para análise
         // 4. Homologados -> Unidade (unidId)
         Long destinoId = superiorId;
         if (situacaoSubprocesso.equals("MAPEAMENTO_MAPA_DISPONIBILIZADO") || situacaoSubprocesso.endsWith("_HOMOLOGADO")) {
@@ -477,7 +477,7 @@ public class E2eController {
         Unidade admin = unidadeService.buscarPorSigla("ADMIN");
 
         ProcessoFixtureRequest requestMapeamento = new ProcessoFixtureRequest(
-                "Mapa Base Fixture " + System.currentTimeMillis(), request.unidadeSigla(), true, diasLimite);
+                "Mapa base fixture " + System.currentTimeMillis(), request.unidadeSigla(), true, diasLimite);
         Processo processoMapeamento = criarProcessoFixture(requestMapeamento, TipoProcesso.MAPEAMENTO);
         Long procMapeamentoId = processoMapeamento.getCodigo();
         Long subMapeamentoId = jdbcTemplate.queryForObject(
@@ -487,13 +487,13 @@ public class E2eController {
                 "SELECT codigo FROM sgc.mapa WHERE subprocesso_codigo = ?",
                 Long.class, subMapeamentoId);
 
-        Long atividadeBase1Id = inserirAtividadeComConhecimento(mapaVigenteId, "Atividade Fixture 1", "Conhecimento Fixture 1A");
-        Long atividadeBase2Id = inserirAtividadeComConhecimento(mapaVigenteId, "Atividade Fixture 2", "Conhecimento Fixture 2A");
-        Long atividadeBase3Id = inserirAtividadeComConhecimento(mapaVigenteId, "Atividade Fixture 3", "Conhecimento Fixture 3A");
+        Long atividadeBase1Id = inserirAtividadeComConhecimento(mapaVigenteId, "Atividade fixture 1", "Conhecimento fixture 1A");
+        Long atividadeBase2Id = inserirAtividadeComConhecimento(mapaVigenteId, "Atividade fixture 2", "Conhecimento fixture 2A");
+        Long atividadeBase3Id = inserirAtividadeComConhecimento(mapaVigenteId, "Atividade fixture 3", "Conhecimento fixture 3A");
 
-        inserirCompetenciaComAtividade(mapaVigenteId, "Competência Fixture 1", atividadeBase1Id);
-        inserirCompetenciaComAtividade(mapaVigenteId, "Competência Fixture 2", atividadeBase2Id);
-        inserirCompetenciaComAtividade(mapaVigenteId, "Competência Fixture 3", atividadeBase3Id);
+        inserirCompetenciaComAtividade(mapaVigenteId, "Competência fixture 1", atividadeBase1Id);
+        inserirCompetenciaComAtividade(mapaVigenteId, "Competência fixture 2", atividadeBase2Id);
+        inserirCompetenciaComAtividade(mapaVigenteId, "Competência fixture 3", atividadeBase3Id);
 
         jdbcTemplate.update("UPDATE sgc.subprocesso SET situacao = 'MAPEAMENTO_MAPA_HOMOLOGADO' WHERE codigo = ?", subMapeamentoId);
         jdbcTemplate.update("UPDATE sgc.processo SET situacao = 'FINALIZADO' WHERE codigo = ?", procMapeamentoId);
@@ -514,21 +514,21 @@ public class E2eController {
 
         Long atividadeRevisao2Id = jdbcTemplate.queryForObject(
                 "SELECT codigo FROM sgc.atividade WHERE mapa_codigo = ? AND descricao = ?",
-                Long.class, mapaRevisaoId, "Atividade Fixture 2");
+                Long.class, mapaRevisaoId, "Atividade fixture 2");
         jdbcTemplate.update("DELETE FROM sgc.conhecimento WHERE atividade_codigo = ?", atividadeRevisao2Id);
         jdbcTemplate.update("INSERT INTO sgc.conhecimento (atividade_codigo, descricao) VALUES (?, ?)",
-                atividadeRevisao2Id, "Conhecimento Fixture 2B");
+                atividadeRevisao2Id, "Conhecimento fixture 2B");
 
         Long atividadeRemovidaId = jdbcTemplate.queryForObject(
                 "SELECT codigo FROM sgc.atividade WHERE mapa_codigo = ? AND descricao = ?",
-                Long.class, mapaRevisaoId, "Atividade Fixture 3");
+                Long.class, mapaRevisaoId, "Atividade fixture 3");
         jdbcTemplate.update("DELETE FROM sgc.conhecimento WHERE atividade_codigo = ?", atividadeRemovidaId);
         jdbcTemplate.update("DELETE FROM sgc.competencia_atividade WHERE atividade_codigo = ?", atividadeRemovidaId);
         jdbcTemplate.update("DELETE FROM sgc.atividade WHERE codigo = ?", atividadeRemovidaId);
         jdbcTemplate.update("DELETE FROM sgc.competencia WHERE mapa_codigo = ? AND descricao = ?",
-                mapaRevisaoId, "Competência Fixture 3");
+                mapaRevisaoId, "Competência fixture 3");
 
-        inserirAtividadeComConhecimento(mapaRevisaoId, "Atividade Nova Revisão Fixture", "Conhecimento Novo");
+        inserirAtividadeComConhecimento(mapaRevisaoId, "Atividade nova revisão fixture", "Conhecimento novo");
         jdbcTemplate.update("UPDATE sgc.subprocesso SET situacao = 'REVISAO_CADASTRO_HOMOLOGADA' WHERE codigo = ?", subRevisaoId);
         registrarMovimentacaoFixture(subRevisaoId, admin.getCodigo(), admin.getCodigo(), "Revisão homologada via fixture");
 
@@ -536,9 +536,9 @@ public class E2eController {
     }
 
     private void inserirAtividadesFixtureMapaSemCompetencias(Long mapaId) {
-        inserirAtividadeComConhecimento(mapaId, "Atividade Fixture 1", "Conhecimento Fixture 1A");
-        inserirAtividadeComConhecimento(mapaId, "Atividade Fixture 2", "Conhecimento Fixture 2A");
-        inserirAtividadeComConhecimento(mapaId, "Atividade Fixture 3", "Conhecimento Fixture 3A");
+        inserirAtividadeComConhecimento(mapaId, "Atividade fixture 1", "Conhecimento fixture 1A");
+        inserirAtividadeComConhecimento(mapaId, "Atividade fixture 2", "Conhecimento fixture 2A");
+        inserirAtividadeComConhecimento(mapaId, "Atividade fixture 3", "Conhecimento fixture 3A");
     }
 
     private Long inserirAtividadeComConhecimento(Long mapaId, String atividade, String conhecimento) {
@@ -572,7 +572,7 @@ public class E2eController {
         if (descReq != null && !descReq.isBlank()) {
             return descReq;
         }
-        return "Processo Fixture E2E " + tipo.name() + " " + System.currentTimeMillis();
+        return "Processo fixture E2E " + tipo.name() + " " + System.currentTimeMillis();
     }
 
     /**
@@ -611,7 +611,7 @@ public class E2eController {
         if (descReq != null && !descReq.isBlank()) {
             descricao = descReq;
         } else {
-            descricao = "Processo Fixture E2E " + tipo.name() + " " + System.currentTimeMillis();
+            descricao = "Processo fixture E2E " + tipo.name() + " " + System.currentTimeMillis();
         }
 
         CriarProcessoRequest criarReq = CriarProcessoRequest.builder()

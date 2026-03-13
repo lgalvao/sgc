@@ -21,7 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @Tag("integration")
 @Transactional
-@DisplayName("CDU-09: Fluxo Completo de Disponibilização")
+@DisplayName("CDU-09: Fluxo completo de Disponibilização")
 class CDU09IntegrationTest extends BaseIntegrationTest {
 
     @Autowired
@@ -38,8 +38,8 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
     private EntityManager entityManager;
 
     @Test
-    @WithMockChefe("3") // Fernanda Oliveira - Chefe da Unidade 8 no data.sql
-    @DisplayName("Fluxo Principal - Visualizar, Preparar e Disponibilizar Cadastro")
+    @WithMockChefe("3") // Fernanda oliveira - Chefe da Unidade 8 no data.sql
+    @DisplayName("Fluxo principal - Visualizar, Preparar e Disponibilizar cadastro")
     void fluxoCompletoDisponibilizacao() throws Exception {
         // SEDESENV (Unidade 8) no data.sql
         Long SP_CODIGO = 60000L;
@@ -114,7 +114,7 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
         // 12. Notificação por E-mail (Superior da 8 é COSIS)
         aguardarEmail(1);
 
-        // 13. Criação de Alerta para Unidade Superior (Async)
+        // 13. Criação de Alerta para Unidade superior (Async)
         final Long processoCodigo = spEtapa3.getProcesso().getCodigo();
         Awaitility.await()
                 .atMost(Duration.ofSeconds(5))

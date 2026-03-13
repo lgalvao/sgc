@@ -53,7 +53,7 @@ describe('CadAtribuicao Coverage', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         vi.mocked(unidadeService.buscarUnidadePorCodigo).mockResolvedValue({
-            codigo: 1, sigla: 'TEST', nome: 'Unidade Teste'
+            codigo: 1, sigla: 'TEST', nome: 'Unidade teste'
         } as any);
     });
 

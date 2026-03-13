@@ -3,7 +3,7 @@ import Papa from "papaparse";
 export type CSVData = Record<string, string | number | undefined | null>;
 
 /**
- * Preprocesses value to mitigate CSV Injection (Formula Injection).
+ * Preprocesses value to mitigate CSV Injection (Formula injection).
  * Prepends a single quote (') if the value starts with =, +, -, or @.
  */
 function sanitizeCSVValue(value: unknown): string | number | undefined {

@@ -15,7 +15,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @Tag("integration")
 @Transactional
-@DisplayName("Busca de Subprocesso Integration")
+@DisplayName("Busca de Subprocesso integration")
 class SubprocessoBuscaIntegrationTest extends BaseIntegrationTest {
 
     private Unidade unidade;
@@ -36,7 +36,7 @@ class SubprocessoBuscaIntegrationTest extends BaseIntegrationTest {
         unidade = unidadeRepo.save(unidade);
 
         processo = Processo.builder()
-                .descricao("Processo Busca")
+                .descricao("Processo busca")
                 .tipo(TipoProcesso.MAPEAMENTO)
                 .situacao(SituacaoProcesso.EM_ANDAMENTO)
                 .dataLimite(LocalDateTime.now().plusDays(30))

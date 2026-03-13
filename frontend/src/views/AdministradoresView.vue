@@ -82,13 +82,13 @@
       </BFormGroup>
     </ModalConfirmacao>
 
-    <!-- Modal: Remover Administrador -->
+    <!-- Modal: Remover administrador -->
     <ModalConfirmacao
         v-model="mostrarModalRemoverAdmin"
         :auto-close="false"
         :loading="removendoAdmin !== null"
         ok-title="Remover"
-        titulo="Confirmar Remoção"
+        titulo="Confirmar remoção"
         variant="danger"
         @confirmar="removerAdmin"
     >
@@ -131,7 +131,7 @@ const inputTituloRef = ref<InstanceType<typeof BFormInput> | null>(null);
 
 const camposAdmins = [
   {key: 'nome', label: 'Nome'},
-  {key: 'tituloEleitoral', label: 'Título Eleitoral'},
+  {key: 'tituloEleitoral', label: 'Título eleitoral'},
   {key: 'matricula', label: 'Matrícula'},
   {key: 'unidadeSigla', label: 'Unidade'},
   {key: 'acoes', label: 'Ações', thClass: 'text-end'},

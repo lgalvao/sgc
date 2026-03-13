@@ -95,7 +95,7 @@ describe('BarraNavegacao.vue', () => {
         expect(mockRouter.back).toHaveBeenCalled();
     });
 
-    describe('Breadcrumbs Logic', () => {
+    describe('Breadcrumbs logic', () => {
         it('deve sempre mostrar Home/Painel como primeiro item', () => {
             const wrapper = mountComponent();
             const items = wrapper.findAllComponents(BBreadcrumbItemStub);
@@ -183,22 +183,22 @@ describe('BarraNavegacao.vue', () => {
         it('deve usar meta.breadcrumb para rotas genéricas', () => {
             mockRoute.name = 'OutraRota';
             mockRoute.matched = [
-                {name: 'OutraRota', meta: {breadcrumb: 'Minha Rota'}}
+                {name: 'OutraRota', meta: {breadcrumb: 'Minha rota'}}
             ];
             const wrapper = mountComponent();
             const items = wrapper.findAllComponents(BBreadcrumbItemStub);
             expect(items.length).toBe(2);
-            expect(items[1].text()).toBe('Minha Rota');
+            expect(items[1].text()).toBe('Minha rota');
         });
 
         it('deve resolver meta.breadcrumb function', () => {
             mockRoute.name = 'RotaFunc';
             mockRoute.matched = [
-                {name: 'RotaFunc', meta: {breadcrumb: () => 'Rota Dinâmica'}}
+                {name: 'RotaFunc', meta: {breadcrumb: () => 'Rota dinâmica'}}
             ];
             const wrapper = mountComponent();
             const items = wrapper.findAllComponents(BBreadcrumbItemStub);
-            expect(items[1].text()).toBe('Rota Dinâmica');
+            expect(items[1].text()).toBe('Rota dinâmica');
         });
 
         it('deve adicionar breadcrumb final para SubprocessoVisMapa', () => {

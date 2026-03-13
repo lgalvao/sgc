@@ -56,7 +56,7 @@ class SubprocessoServiceAtividadeIntegrationTest extends BaseIntegrationTest {
         );
 
         Processo processo = Processo.builder()
-                .descricao("Processo Teste Ativ")
+                .descricao("Processo teste ativ")
                 .tipo(TipoProcesso.MAPEAMENTO)
                 .situacao(SituacaoProcesso.EM_ANDAMENTO)
                 .dataLimite(LocalDateTime.now().plusDays(30))
@@ -87,7 +87,7 @@ class SubprocessoServiceAtividadeIntegrationTest extends BaseIntegrationTest {
         mapaRepo.save(mapaOrigem);
         subprocessoOrigem.setMapa(mapaOrigem);
 
-        atividadeOrigem = Atividade.builder().mapa(mapaOrigem).descricao("Atividade Importada").build();
+        atividadeOrigem = Atividade.builder().mapa(mapaOrigem).descricao("Atividade importada").build();
         atividadeRepo.save(atividadeOrigem);
     }
 
@@ -108,7 +108,7 @@ class SubprocessoServiceAtividadeIntegrationTest extends BaseIntegrationTest {
     void importarAtividades_SeletivaSucesso() {
         Atividade atividadeExtra = Atividade.builder()
                 .mapa(subprocessoOrigem.getMapa())
-                .descricao("Atividade Nao Selecionada")
+                .descricao("Atividade nao selecionada")
                 .build();
         atividadeRepo.save(atividadeExtra);
 
@@ -122,7 +122,7 @@ class SubprocessoServiceAtividadeIntegrationTest extends BaseIntegrationTest {
         long countAtividadesDestino = atividadeRepo.findByMapa_Codigo(destAtualizado.getMapa().getCodigo()).size();
         assertThat(countAtividadesDestino).isEqualTo(1);
         assertThat(atividadeRepo.findByMapa_Codigo(destAtualizado.getMapa().getCodigo()).getFirst().getDescricao())
-                .isEqualTo("Atividade Importada");
+                .isEqualTo("Atividade importada");
     }
 
     @Test
@@ -187,6 +187,6 @@ class SubprocessoServiceAtividadeIntegrationTest extends BaseIntegrationTest {
         List<sgc.mapa.dto.AtividadeDto> atividades = subprocessoService.listarAtividadesSubprocesso(subprocessoDestino.getCodigo());
         
         assertThat(atividades).hasSize(1);
-        assertThat(atividades.getFirst().descricao()).isEqualTo("Atividade Importada");
+        assertThat(atividades.getFirst().descricao()).isEqualTo("Atividade importada");
     }
 }

@@ -85,7 +85,7 @@ const observacao = ref("");
 const tituloModal = computed(() => {
   return props.perfil === "ADMIN"
       ? "Homologação"
-      : "Aceitar Mapa de Competências";
+      : "Aceitar mapa de Competências";
 });
 
 const corpoModal = computed(() => {

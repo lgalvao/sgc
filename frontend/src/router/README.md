@@ -1,15 +1,15 @@
 # Diretório de Roteamento
 
-Configuração centralizada do Vue Router.
+Configuração centralizada do Vue router.
 
 ## Estrutura de Arquivos
 
-* **`index.ts`**: Ponto de entrada. Cria a instância do router e configura os Navigation Guards (proteção de rotas).
+* **`index.ts`**: Ponto de entrada. Cria a instância do router e configura os Navigation guards (proteção de rotas).
 * **`main.routes.ts`**: Rotas principais de nível superior (Login, Dashboard, Erro).
 * **`processo.routes.ts`**: Rotas relacionadas ao fluxo de processos e subprocessos.
 * **`unidade.routes.ts`**: Rotas para gestão e visualização de unidades.
 
-## Navigation Guards
+## Navigation guards
 
 O sistema utiliza o guard `beforeEach` para validar:
 

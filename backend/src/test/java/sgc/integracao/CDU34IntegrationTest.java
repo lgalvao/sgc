@@ -40,10 +40,10 @@ class CDU34IntegrationTest extends BaseIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        // Obter Unidade
+        // Obter unidade
         unidade = unidadeRepo.findById(2L).orElseThrow();
 
-        // Criar Processo
+        // Criar processo
         processo = ProcessoFixture.processoPadrao();
         processo.setCodigo(null);
         processo.setTipo(TipoProcesso.MAPEAMENTO);
@@ -52,7 +52,7 @@ class CDU34IntegrationTest extends BaseIntegrationTest {
         processo.adicionarParticipantes(Set.of(unidade)); // Adicionar unidade como participante
         processo = processoRepo.save(processo);
 
-        // Criar Subprocesso com prazo próximo
+        // Criar subprocesso com prazo próximo
         Subprocesso subprocesso = SubprocessoFixture.subprocessoPadrao(processo, unidade);
         subprocesso.setCodigo(null);
         subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);

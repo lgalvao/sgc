@@ -124,7 +124,7 @@
         >
           <div class="card-click-area">
             <BCardTitle>
-              Ocupações Críticas
+              Ocupações críticas
             </BCardTitle>
             <BCardText class="text-muted">
               Identificação das ocupações críticas da unidade

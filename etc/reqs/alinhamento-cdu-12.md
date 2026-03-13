@@ -3,8 +3,8 @@
 ## Cobertura atual do teste
 O teste `cdu-12.spec.ts` em 3 testes:
 
-**Teste Setup**:
-- Cria processo mapeamento finalizado (gera Mapa Vigente)
+**Teste setup**:
+- Cria processo mapeamento finalizado (gera Mapa vigente)
 - Cria processo de revisão
 - Ambos na mesma unidade
 

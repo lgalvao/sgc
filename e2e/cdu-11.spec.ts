@@ -8,12 +8,12 @@ import {navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
 
 test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos', () => {
     
-    test.describe('Em Processo em Andamento', () => {
+    test.describe('Em processo em Andamento', () => {
         const UNIDADE_ALVO = 'SECAO_111';
         const timestamp = Date.now();
-        const descProcesso = `Processo Em Andamento CDU-11 ${timestamp}`;
+        const descProcesso = `Processo em andamento CDU-11 ${timestamp}`;
 
-        test('Setup Data', async ({request}) => {
+        test('Setup data', async ({request}) => {
             await criarProcessoCadastroDisponibilizadoFixture(request, {
                 unidade: UNIDADE_ALVO,
                 descricao: descProcesso
@@ -22,7 +22,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         });
 
         test('Fluxo ADMIN/GESTOR: Navega via Detalhes do Processo (Passo 2)', async ({page, autenticadoComoAdmin}) => {
-            // 1. No Painel, o usuário clica no processo em andamento
+            // 1. No painel, o usuário clica no processo em andamento
             await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
 
             // 2.1. O sistema mostra a tela Detalhes do processo
@@ -41,12 +41,12 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
             // 6. Verificação dos dados
             await expect(page.locator('.unidade-sigla').getByText(UNIDADE_ALVO)).toBeVisible();
             await expect(page.locator('.unidade-nome')).toContainText(/\S+/);
-            await expect(page.getByText(/Atividade Fixture/)).toBeVisible();
-            await expect(page.getByText(/Conhecimento Fixture/)).toBeVisible();
+            await expect(page.getByText(/Atividade fixture/)).toBeVisible();
+            await expect(page.getByText(/Conhecimento fixture/)).toBeVisible();
         });
 
         test('Fluxo CHEFE/SERVIDOR: Navega direto para Detalhes do Subprocesso (Passo 3)', async ({page, autenticadoComoChefeSecao111}) => {
-            // 1. No Painel, o usuário clica no processo em andamento
+            // 1. No painel, o usuário clica no processo em andamento
             await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
 
             // 3.1. O sistema exibe a tela Detalhes do subprocesso com os dados da unidade do usuário
@@ -58,17 +58,17 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
             // 6. Verificação dos dados
             await expect(page.locator('.unidade-sigla').getByText(UNIDADE_ALVO)).toBeVisible();
             await expect(page.locator('.unidade-nome')).toContainText(/\S+/);
-            await expect(page.getByText(/Atividade Fixture/)).toBeVisible();
-            await expect(page.getByText(/Conhecimento Fixture/)).toBeVisible();
+            await expect(page.getByText(/Atividade fixture/)).toBeVisible();
+            await expect(page.getByText(/Conhecimento fixture/)).toBeVisible();
         });
     });
 
-    test.describe('Em Processo Finalizado', () => {
+    test.describe('Em processo finalizado', () => {
         const UNIDADE_ALVO = 'SECAO_112';
         const timestamp = Date.now();
-        const descProcesso = `Processo Mapeamento CDU-11 ${timestamp}`;
+        const descProcesso = `Processo mapeamento CDU-11 ${timestamp}`;
 
-        test('Setup Data', async ({request}) => {
+        test('Setup data', async ({request}) => {
             await criarProcessoFinalizadoFixture(request, {
                 unidade: UNIDADE_ALVO,
                 descricao: descProcesso
@@ -78,7 +78,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
 
         test('Fluxo ADMIN: Visualizar em processo finalizado', async ({page, autenticadoComoAdmin}) => {
 
-            // 1. No Painel, o usuário clica no processo finalizado
+            // 1. No painel, o usuário clica no processo finalizado
             await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
 
             // 2. Navegação até a visualização
@@ -87,7 +87,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
 
             await expect(page.locator('.unidade-sigla').getByText(UNIDADE_ALVO)).toBeVisible();
             await expect(page.locator('.unidade-nome')).toContainText(/\S+/);
-            await expect(page.getByText(/Atividade Origem/).first()).toBeVisible();
+            await expect(page.getByText(/Atividade origem/).first()).toBeVisible();
             await expect(page.getByText(/Conhecimento [AB]/).first()).toBeVisible();
         });
     });

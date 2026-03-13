@@ -10,7 +10,7 @@ Ator: CHEFE
 
 ## Fluxo principal
 
-1. No Painel, o usuário clica em um processo de mapeamento ou revisão da lista de processos.
+1. No painel, o usuário clica em um processo de mapeamento ou revisão da lista de processos.
 
 2. O sistema mostra a tela `Detalhes de subprocesso` com os dados do subprocesso da unidade.
 

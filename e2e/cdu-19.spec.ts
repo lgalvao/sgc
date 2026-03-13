@@ -9,7 +9,7 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
     const timestamp = Date.now();
     const descProcesso = `Mapeamento CDU-19 ${timestamp}`;
 
-    test('Setup Data', async ({request}) => {
+    test('Setup data', async ({request}) => {
         await criarProcessoMapaDisponibilizadoFixture(request, {
             descricao: descProcesso,
             unidade: UNIDADE_ALVO

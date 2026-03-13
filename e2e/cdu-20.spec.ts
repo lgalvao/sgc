@@ -11,7 +11,7 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
     const timestamp = Date.now();
     const descProcesso = `Processo CDU-20 ${timestamp}`;
 
-    test('Setup Data', async ({request}) => {
+    test('Setup data', async ({request}) => {
         await criarProcessoMapaValidadoFixture(request, {
             unidade: UNIDADE_ALVO,
             descricao: descProcesso
@@ -20,7 +20,7 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
     });
 
     test('Cenario 1: GESTOR SECRETARIA_1 analisa e aceita', async ({page}) => {
-        // Superior da ASSESSORIA_11 é John Lennon (SECRETARIA_1)
+        // Superior da ASSESSORIA_11 é John lennon (SECRETARIA_1)
         await loginComPerfil(page, USUARIOS.GESTOR_SECRETARIA_1.titulo, USUARIOS.GESTOR_SECRETARIA_1.senha, 'GESTOR - SECRETARIA_1');
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
         await navegarParaMapa(page);

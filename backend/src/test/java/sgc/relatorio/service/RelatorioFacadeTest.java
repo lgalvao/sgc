@@ -51,7 +51,7 @@ class RelatorioFacadeTest {
     @DisplayName("Deve obter relatório de andamento com dados corretos")
     void deveObterRelatorioAndamento() {
         Processo p = new Processo();
-        p.setDescricao("Proc Teste");
+        p.setDescricao("Proc teste");
 
         Unidade u = new Unidade();
         u.setSigla("U1");
@@ -83,7 +83,7 @@ class RelatorioFacadeTest {
     void deveGerarRelatorioAndamento() throws DocumentException {
         when(pdfFactory.createDocument()).thenReturn(document);
         Processo p = new Processo();
-        p.setDescricao("Proc Teste");
+        p.setDescricao("Proc teste");
 
         Unidade u = new Unidade();
         u.setSigla("U1");
@@ -108,7 +108,7 @@ class RelatorioFacadeTest {
     void deveGerarRelatorioMapasCompleto() throws DocumentException {
         when(pdfFactory.createDocument()).thenReturn(document);
         Processo p = new Processo();
-        p.setDescricao("Proc Teste");
+        p.setDescricao("Proc teste");
 
         Unidade u = new Unidade();
         u.setSigla("U1");
@@ -145,7 +145,7 @@ class RelatorioFacadeTest {
     void deveFiltrarPorUnidadeNoRelatorioMapas() throws DocumentException {
         when(pdfFactory.createDocument()).thenReturn(document);
         Processo p = new Processo();
-        p.setDescricao("Proc Teste");
+        p.setDescricao("Proc teste");
 
         Unidade u1 = new Unidade();
         u1.setCodigo(1L);

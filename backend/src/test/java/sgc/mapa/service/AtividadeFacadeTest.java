@@ -134,7 +134,7 @@ class AtividadeFacadeTest {
             Long mapaCodigo = 100L;
             Long subCodigo = 200L;
 
-            AtualizarAtividadeRequest request = new AtualizarAtividadeRequest("Nova Desc");
+            AtualizarAtividadeRequest request = new AtualizarAtividadeRequest("Nova desc");
 
             Usuario usuario = new Usuario();
             Mapa mapa = new Mapa();
@@ -146,7 +146,7 @@ class AtividadeFacadeTest {
             Atividade atividade = new Atividade();
             atividade.setCodigo(atividadeCodigo);
             atividade.setMapa(mapa);
-            atividade.setDescricao("Antiga Desc");
+            atividade.setDescricao("Antiga desc");
 
             when(mapaManutencaoService.atividadeCodigo(atividadeCodigo)).thenReturn(atividade);
             when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
@@ -265,7 +265,7 @@ class AtividadeFacadeTest {
             Long conhecimentoCodigo = 500L;
             Long mapaCodigo = 100L;
             Long subCodigo = 200L;
-            AtualizarConhecimentoRequest request = new AtualizarConhecimentoRequest("Conhecimento Atualizado");
+            AtualizarConhecimentoRequest request = new AtualizarConhecimentoRequest("Conhecimento atualizado");
 
             Usuario usuario = new Usuario();
             Mapa mapa = new Mapa();

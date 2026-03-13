@@ -19,7 +19,7 @@ import static org.assertj.core.api.Assertions.*;
 
 @Tag("integration")
 @Transactional
-@DisplayName("Integração: SubprocessoService - Cobertura de Metodos Auxiliares")
+@DisplayName("Integração: SubprocessoService - Cobertura de Metodos auxiliares")
 class SubprocessoServiceMethodsIntegrationTest extends BaseIntegrationTest {
 
     @Autowired
@@ -36,11 +36,11 @@ class SubprocessoServiceMethodsIntegrationTest extends BaseIntegrationTest {
         Unidade unidade = UnidadeFixture.unidadePadrao();
         unidade.setCodigo(null);
         unidade.setSigla("TEST_MET");
-        unidade.setNome("Unidade Met");
+        unidade.setNome("Unidade met");
         unidade = unidadeRepo.save(unidade);
 
         processo = Processo.builder()
-                .descricao("Processo Teste Met")
+                .descricao("Processo teste met")
                 .tipo(TipoProcesso.MAPEAMENTO)
                 .situacao(SituacaoProcesso.EM_ANDAMENTO)
                 .dataLimite(LocalDateTime.now().plusDays(30))

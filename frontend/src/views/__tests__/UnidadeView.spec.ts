@@ -13,12 +13,12 @@ import {logger} from "@/utils";
 const {mockPush, mockUnidadeData, mockUsuario, mockUsuarioResponsavel} = vi.hoisted(() => {
     const u = {
         codigo: 10,
-        nome: 'Titular Teste',
+        nome: 'Titular teste',
         unidade: {codigo: 1, sigla: 'TEST'}
     };
     const ur = {
         codigo: 20,
-        nome: 'Responsavel Teste',
+        nome: 'Responsavel teste',
         unidade: {codigo: 1, sigla: 'TEST'}
     };
     return {
@@ -141,7 +141,7 @@ describe('UnidadeView.vue', () => {
         await flushPromises();
 
         expect(wrapper.text()).toContain('TEST - UnidadeView Teste');
-        expect(wrapper.text()).toContain('Titular: Titular Teste');
+        expect(wrapper.text()).toContain('Titular: Titular teste');
     });
 
     it('renders "Criar atribuição" button only for ADMIN', async () => {
@@ -178,7 +178,7 @@ describe('UnidadeView.vue', () => {
         await wrapper.vm.$nextTick();
         await flushPromises();
 
-        expect(wrapper.text()).toContain('Responsável: Responsavel Teste');
+        expect(wrapper.text()).toContain('Responsável: Responsavel teste');
     });
 
     it('renders subordinate units tree table', async () => {

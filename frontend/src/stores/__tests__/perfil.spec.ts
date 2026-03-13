@@ -72,8 +72,8 @@ describe("usePerfilStore", () => {
             expect(context.store.unidadeSelecionada).toBe(unidadeCodigo);
             expect(context.store.unidadeSelecionadaSigla).toBe(unidadeSigla);
 
-            context.store.definirPerfilUnidade(Perfil.ADMIN, unidadeCodigo, unidadeSigla, "Nome Teste");
-            expect(context.store.usuarioNome).toBe("Nome Teste");
+            context.store.definirPerfilUnidade(Perfil.ADMIN, unidadeCodigo, unidadeSigla, "Nome teste");
+            expect(context.store.usuarioNome).toBe("Nome teste");
         });
 
         it("loginCompleto deve autenticar, buscar perfis e selecionar automaticamente se houver apenas um perfil", async () => {
@@ -144,7 +144,7 @@ describe("usePerfilStore", () => {
                 unidadeCodigo: 2,
                 tituloEleitoral: "456",
                 token: "fake-token",
-                nome: "Maria Oliveira",
+                nome: "Maria oliveira",
             };
             mockUsuarioService.entrar.mockResolvedValue(mockLoginResponse);
 

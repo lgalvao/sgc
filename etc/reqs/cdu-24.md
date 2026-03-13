@@ -9,7 +9,7 @@
 
 ## Fluxo principal
 
-1. No Painel, ADMIN acessa um processo de mapeamento ou revisão em andamento.
+1. No painel, ADMIN acessa um processo de mapeamento ou revisão em andamento.
 
 2. O sistema mostra tela `Detalhes do processo`.
 

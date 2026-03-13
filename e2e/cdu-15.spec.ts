@@ -19,11 +19,11 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
     const timestamp = Date.now();
     const descProcesso = `Processo CDU-15 ${timestamp}`;
 
-    const ATIVIDADE_1 = 'Atividade Fixture 1';
-    const ATIVIDADE_2 = 'Atividade Fixture 2';
-    const ATIVIDADE_3 = 'Atividade Fixture 3';
+    const ATIVIDADE_1 = 'Atividade fixture 1';
+    const ATIVIDADE_2 = 'Atividade fixture 2';
+    const ATIVIDADE_3 = 'Atividade fixture 3';
 
-    test('Setup Data', async ({request}) => {
+    test('Setup data', async ({request}) => {
         await criarProcessoCadastroHomologadoFixture(request, {
             descricao: descProcesso,
             unidade: UNIDADE_ALVO
@@ -32,7 +32,7 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
     });
 
     test('Cenários CDU-15: Fluxo completo de manutenção do mapa pelo ADMIN', async ({page, autenticadoComoAdmin}) => {
-        // CT-00 e CT-01: Acessar Edição e verificar elementos
+        // CT-00 e CT-01: Acessar edição e verificar elementos
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
         await navegarParaMapa(page);
 
@@ -40,27 +40,27 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
         await expect(page.getByTestId('btn-abrir-criar-competencia').or(page.getByTestId('btn-abrir-criar-competencia-empty'))).toBeVisible();
         await expect(page.getByTestId('btn-cad-mapa-disponibilizar')).toBeDisabled();
 
-        // CT-02: Criar Competência
+        // CT-02: Criar competência
         const compDesc = `Competência 1 ${timestamp}`;
         await criarCompetencia(page, compDesc, [ATIVIDADE_1]);
         await verificarSituacaoSubprocesso(page, 'Mapa criado');
         await expect(page.getByTestId('btn-cad-mapa-disponibilizar')).toBeEnabled();
 
-        // CT-03: Editar Competência
+        // CT-03: Editar competência
         const newDesc = `Competência 1 Editada ${timestamp}`;
         await editarCompetencia(page, compDesc, newDesc, [ATIVIDADE_2]);
         await verificarCompetenciaNoMapa(page, newDesc, [ATIVIDADE_1, ATIVIDADE_2]);
 
-        // CT-05: Validar Cancelamento da Exclusão
+        // CT-05: Validar cancelamento da Exclusão
         await excluirCompetenciaCancelando(page, newDesc);
         await expect(page.getByText(newDesc).first()).toBeVisible();
 
-        // CT-04: Excluir Competência com Confirmação
+        // CT-04: Excluir competência com Confirmação
         await excluirCompetenciaConfirmando(page, newDesc);
         await expect(page.getByTestId('btn-cad-mapa-disponibilizar')).toBeDisabled();
 
         // CT-06: Navegar para Disponibilização
-        const compFinal = `Competência Final ${timestamp}`;
+        const compFinal = `Competência final ${timestamp}`;
         await criarCompetencia(page, compFinal, [ATIVIDADE_1, ATIVIDADE_2, ATIVIDADE_3]);
         await disponibilizarMapa(page);
 

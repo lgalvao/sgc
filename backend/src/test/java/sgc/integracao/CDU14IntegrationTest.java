@@ -120,7 +120,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
     private Processo criarEIniciarProcessoDeRevisao() throws Exception {
         Map<String, Object> criarReqMap = Map.of(
                 "descricao",
-                "Processo Revisão CDU-14",
+                "Processo revisão CDU-14",
                 "tipo",
                 "REVISAO",
                 "dataLimiteEtapa1",
@@ -303,7 +303,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
                                     .with(user(gestor))
                                     .contentType(APPLICATION_JSON)
                                     .content(
-                                            "{\"motivo\": \"Teste Histórico\", \"justificativa\":"
+                                            "{\"motivo\": \"Teste histórico\", \"justificativa\":"
                                                     + " \"Registrando análise\"}"))
                     .andExpect(status().isOk());
 
@@ -374,7 +374,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
             Long subprocessoId = criarEComecarProcessoDeRevisao();
 
             // AccessControlService
-            // Retorna 403 (Forbidden) em vez de 422 (Unprocessable Entity)
+            // Retorna 403 (Forbidden) em vez de 422 (Unprocessable entity)
             // Isso é mais correto do ponto de vista de segurança: verificar permissões
             // antes de validações de negócio
             mockMvc.perform(

@@ -9,13 +9,13 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
     const timestamp = Date.now();
     const descProcesso = `Mapeamento CDU-17 ${timestamp}`;
 
-    const atividade1 = 'Atividade Fixture 1';
-    const atividade2 = 'Atividade Fixture 2';
-    const atividade3 = 'Atividade Fixture 3';
+    const atividade1 = 'Atividade fixture 1';
+    const atividade2 = 'Atividade fixture 2';
+    const atividade3 = 'Atividade fixture 3';
     const competencia1 = `Competência 1 ${timestamp}`;
     const competencia2 = `Competência 2 ${timestamp}`;
 
-    test('Setup Data', async ({request}) => {
+    test('Setup data', async ({request}) => {
         await criarProcessoCadastroHomologadoFixture(request, {
             descricao: descProcesso,
             unidade: UNIDADE_ALVO

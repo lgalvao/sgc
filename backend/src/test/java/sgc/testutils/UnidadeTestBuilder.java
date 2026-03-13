@@ -18,7 +18,7 @@ public class UnidadeTestBuilder {
     }
 
     /**
-     * Cria uma Unidade Operacional padrão (ASSESSORIA_11)
+     * Cria uma Unidade operacional padrão (ASSESSORIA_11)
      */
     public static UnidadeTestBuilder operacional() {
         return new UnidadeTestBuilder()
@@ -30,7 +30,7 @@ public class UnidadeTestBuilder {
     }
 
     /**
-     * Cria uma Unidade Intermediária padrão (COORD_11)
+     * Cria uma Unidade intermediária padrão (COORD_11)
      */
     public static UnidadeTestBuilder intermediaria() {
         return new UnidadeTestBuilder()
@@ -42,7 +42,7 @@ public class UnidadeTestBuilder {
     }
 
     /**
-     * Cria uma Unidade Raiz padrão (ADMIN)
+     * Cria uma Unidade raiz padrão (ADMIN)
      */
     public static UnidadeTestBuilder raiz() {
         return new UnidadeTestBuilder()

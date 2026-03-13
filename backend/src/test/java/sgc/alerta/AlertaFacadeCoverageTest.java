@@ -12,7 +12,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("AlertaFacade - Cobertura Adicional")
+@DisplayName("AlertaFacade - Cobertura adicional")
 class AlertaFacadeCoverageTest {
     @Mock
     private AlertaService alertaService;
@@ -24,7 +24,7 @@ class AlertaFacadeCoverageTest {
     @DisplayName("criarAlertaCadastroDisponibilizado deve usar sigla da unidade de origem na descrição")
     void deveUsarSiglaDaUnidadeOrigemNaDescricao() {
 
-        Processo processo = Processo.builder().codigo(10L).descricao("Processo Teste").build();
+        Processo processo = Processo.builder().codigo(10L).descricao("Processo teste").build();
 
         Unidade unidadeOrigem = new Unidade();
         unidadeOrigem.setCodigo(1L);

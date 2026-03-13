@@ -51,7 +51,7 @@ export const FullContent: Story = {
         },
         template: `
       <EmptyState v-bind="args">
-        <BButton variant="primary">Adicionar Novo</BButton>
+        <BButton variant="primary">Adicionar novo</BButton>
       </EmptyState>
     `,
     }),

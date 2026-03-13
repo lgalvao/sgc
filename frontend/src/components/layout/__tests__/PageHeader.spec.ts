@@ -4,7 +4,7 @@ import PageHeader from '../PageHeader.vue'
 
 describe('PageHeader.vue', () => {
     it('renders title correctly', () => {
-        const title = 'Test Title'
+        const title = 'Test title'
         const wrapper = mount(PageHeader, {
             props: {title}
         })
@@ -12,7 +12,7 @@ describe('PageHeader.vue', () => {
     })
 
     it('renders subtitle from prop', () => {
-        const subtitle = 'Test Subtitle'
+        const subtitle = 'Test subtitle'
         const wrapper = mount(PageHeader, {
             props: {
                 title: 'Title',
@@ -24,7 +24,7 @@ describe('PageHeader.vue', () => {
     })
 
     it('renders subtitle from slot', () => {
-        const slotContent = 'Slot Subtitle'
+        const slotContent = 'Slot subtitle'
         const wrapper = mount(PageHeader, {
             props: {title: 'Title'},
             slots: {
@@ -38,10 +38,10 @@ describe('PageHeader.vue', () => {
         const wrapper = mount(PageHeader, {
             props: {title: 'Title'},
             slots: {
-                actions: '<button>Action Button</button>'
+                actions: '<button>Action button</button>'
             }
         })
-        expect(wrapper.find('button').text()).toBe('Action Button')
+        expect(wrapper.find('button').text()).toBe('Action button')
         expect(wrapper.find('.d-flex.gap-2').exists()).toBe(true)
     })
 

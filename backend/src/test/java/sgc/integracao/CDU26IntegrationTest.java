@@ -50,9 +50,9 @@ class CDU26IntegrationTest extends BaseIntegrationTest {
         Long idUnidade2 = 8002L;
 
         String sqlInsertUnidade = "INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        jdbcTemplate.update(sqlInsertUnidade, idSuperior, "Coordenação Homolog Valid", "COORD-HOM-VAL", "INTERMEDIARIA", "ATIVA", null, null);
-        jdbcTemplate.update(sqlInsertUnidade, idUnidade1, "Unidade Hom Val 1", "UNID-HOM-VAL-1", "OPERACIONAL", "ATIVA", idSuperior, null);
-        jdbcTemplate.update(sqlInsertUnidade, idUnidade2, "Unidade Hom Val 2", "UNID-HOM-VAL-2", "OPERACIONAL", "ATIVA", idSuperior, null);
+        jdbcTemplate.update(sqlInsertUnidade, idSuperior, "Coordenação homolog valid", "COORD-HOM-VAL", "INTERMEDIARIA", "ATIVA", null, null);
+        jdbcTemplate.update(sqlInsertUnidade, idUnidade1, "Unidade hom val 1", "UNID-HOM-VAL-1", "OPERACIONAL", "ATIVA", idSuperior, null);
+        jdbcTemplate.update(sqlInsertUnidade, idUnidade2, "Unidade hom val 2", "UNID-HOM-VAL-2", "OPERACIONAL", "ATIVA", idSuperior, null);
 
         unidade1 = unidadeRepo.findById(idUnidade1).orElseThrow();
         unidade2 = unidadeRepo.findById(idUnidade2).orElseThrow();
@@ -65,7 +65,7 @@ class CDU26IntegrationTest extends BaseIntegrationTest {
         processo.setCodigo(null);
         processo.setTipo(TipoProcesso.MAPEAMENTO);
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
-        processo.setDescricao("Processo Homologação Validação CDU-26");
+        processo.setDescricao("Processo homologação validação CDU-26");
         processo = processoRepo.save(processo);
 
         // Subprocessos (Status deve ser Validado ou similar, pronto para homologação)
@@ -135,7 +135,7 @@ class CDU26IntegrationTest extends BaseIntegrationTest {
         entityManager.flush();
         entityManager.clear();
 
-        // Check Subprocesso 1
+        // Check subprocesso 1
         Subprocesso s1 = subprocessoRepo.findById(subprocesso1.getCodigo()).orElseThrow();
         assertThat(s1.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
 
@@ -144,7 +144,7 @@ class CDU26IntegrationTest extends BaseIntegrationTest {
         // A mensagem de homologação pode variar. "Mapa de competências homologado"
         assertThat(movs1.getFirst().getDescricao()).contains("homologado");
 
-        // Check Subprocesso 2
+        // Check subprocesso 2
         Subprocesso s2 = subprocessoRepo.findById(subprocesso2.getCodigo()).orElseThrow();
         assertThat(s2.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
     }

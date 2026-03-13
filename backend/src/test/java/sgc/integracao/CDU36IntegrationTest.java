@@ -32,10 +32,10 @@ class CDU36IntegrationTest extends BaseIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        // Obter Unidade
+        // Obter unidade
         unidade = unidadeRepo.findById(1L).orElseThrow();
 
-        // Criar Processo
+        // Criar processo
         processo = ProcessoFixture.processoPadrao();
         processo.setCodigo(null);
         processo.setTipo(TipoProcesso.MAPEAMENTO);
@@ -43,14 +43,14 @@ class CDU36IntegrationTest extends BaseIntegrationTest {
         processo.setDescricao("Processo CDU-36");
         processo = processoRepo.save(processo);
 
-        // Criar Subprocesso
+        // Criar subprocesso
         Subprocesso subprocesso = SubprocessoFixture.subprocessoPadrao(processo, unidade);
         subprocesso.setCodigo(null);
         subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         subprocesso.setDataLimiteEtapa1(LocalDateTime.now().plusDays(10));
         subprocesso = subprocessoRepo.save(subprocesso);
 
-        // Criar Mapa (opcional, mas ajuda a tornar o teste mais realista)
+        // Criar mapa (opcional, mas ajuda a tornar o teste mais realista)
         Mapa mapa = new Mapa();
         mapa.setSubprocesso(subprocesso);
         mapaRepo.save(mapa);

@@ -11,7 +11,7 @@ test.describe('CDU-01 - Realizar login e exibir estrutura das telas', () => {
         await expect(page.getByText('Título ou senha inválidos.')).toBeVisible();
     });
 
-    test('Deve realizar login com sucesso (Perfil Único)', async ({page}) => {
+    test('Deve realizar login com sucesso (Perfil único)', async ({page}) => {
         await autenticar(page, USUARIOS.GESTOR_COORD.titulo, USUARIOS.GESTOR_COORD.senha);
 
         await expect(page.getByText('GESTOR - COORD_11')).toBeVisible();

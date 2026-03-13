@@ -169,7 +169,7 @@ describe("BarraNavegacao.vue", () => {
             }, {BButton}));
 
             const items = wrapper.findAllComponents(BBreadcrumbItem);
-            expect(items).toHaveLength(1); // Apenas Home
+            expect(items).toHaveLength(1); // Apenas home
             expect(items[0].find('[data-testid="btn-nav-home"]').exists()).toBe(true);
         });
 
@@ -183,7 +183,7 @@ describe("BarraNavegacao.vue", () => {
             }, {BButton}));
 
             const items = wrapper.findAllComponents(BBreadcrumbItem);
-            expect(items).toHaveLength(1); // Apenas Home
+            expect(items).toHaveLength(1); // Apenas home
             expect(items[0].find('[data-testid="btn-nav-home"]').exists()).toBe(true);
         });
 

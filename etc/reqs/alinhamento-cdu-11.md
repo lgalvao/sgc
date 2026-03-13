@@ -1,9 +1,9 @@
 # Alinhamento CDU-11 - Visualizar cadastro de atividades e conhecimentos
 
 ## Cobertura atual do teste
-O teste `cdu-11.spec.ts` em dois grupos (Em Andamento, Finalizado):
+O teste `cdu-11.spec.ts` em dois grupos (Em andamento, Finalizado):
 
-**Grupo 1: Em Processo em Andamento**
+**Grupo 1: Em processo em Andamento**
 - Setup: Cria processo com cadastro disponibilizado via fixture
 
 **Fluxo ADMIN/GESTOR (Passo 2)**:
@@ -21,7 +21,7 @@ O teste `cdu-11.spec.ts` em dois grupos (Em Andamento, Finalizado):
 - Navega para Atividades e conhecimentos
 - Valida mesma cobertura (sigla/nome/atividades/conhecimentos)
 
-**Grupo 2: Em Processo Finalizado**
+**Grupo 2: Em processo finalizado**
 - Setup: Cria processo mapeamento finalizado via fixture
 
 **Fluxo ADMIN**:
@@ -34,7 +34,7 @@ O teste `cdu-11.spec.ts` em dois grupos (Em Andamento, Finalizado):
 **Não coberto**:
 - **Passo 6**: Estrutura de apresentação - "cada atividade é apresentada como uma tabela, com cabeçalho a descrição da atividade, e as linhas preenchidas com os conhecimentos cadastrados" - teste apenas valida presença de atividades/conhecimentos, não estrutura de tabela com cabeçalho
 - **Passo 6 (Detalhe visual)**: Validação de que "sigla e nome da unidade" aparecem na tela (teste valida via `.unidade-sigla` e `.unidade-nome`, mas não valida apresentação conjunta)
-- **Pré-condição**: "Subprocesso da unidade com cadastro de atividades e conhecimentos já disponibilizados" - teste presume que fixture criar cadastro disponibilizado, mas não valida situação exata do subprocesso (deve estar em "Cadastro disponibilizado" ou "Cadastro homologado" ou "Mapa Ajustado" conforme fluxo)
+- **Pré-condição**: "Subprocesso da unidade com cadastro de atividades e conhecimentos já disponibilizados" - teste presume que fixture criar cadastro disponibilizado, mas não valida situação exata do subprocesso (deve estar em "Cadastro disponibilizado" ou "Cadastro homologado" ou "Mapa ajustado" conforme fluxo)
 - **Atores**: Teste não cobre **SERVIDOR** (apenas ADMIN, GESTOR, CHEFE)
 - **Pré-condição "processo iniciado ou finalizado"**: Teste cobre ambos em fixtures diferentes, mas não em mesmo teste
 - **Cobertura por perfil**: Requisito cita "Todos os perfis" como atores, mas teste cobre apenas 3 perfis explícitos

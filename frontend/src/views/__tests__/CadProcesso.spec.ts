@@ -180,7 +180,7 @@ describe('ProcessoCadastroView.vue', () => {
         const {wrapper, processosStore} = createWrapper();
 
         const descricaoInput = wrapper.find('[data-testid="inp-processo-descricao"]');
-        await descricaoInput.setValue('Novo Processo');
+        await descricaoInput.setValue('Novo processo');
 
         wrapper.vm.tipo = 'MAPEAMENTO';
         await nextTick();
@@ -195,7 +195,7 @@ describe('ProcessoCadastroView.vue', () => {
         await salvarBtn.trigger('click');
 
         expect(processosStore.criarProcesso).toHaveBeenCalledWith({
-            descricao: 'Novo Processo',
+            descricao: 'Novo processo',
             tipo: 'MAPEAMENTO',
             dataLimiteEtapa1: '2023-12-31T00:00:00',
             unidades: [1, 2]
@@ -250,7 +250,7 @@ describe('ProcessoCadastroView.vue', () => {
     it('initiates a process (confirmation flow)', async () => {
         const {wrapper, processosStore} = createWrapper();
 
-        wrapper.vm.descricao = 'Iniciar Teste';
+        wrapper.vm.descricao = 'Iniciar teste';
         wrapper.vm.tipo = 'MAPEAMENTO';
         wrapper.vm.dataLimite = '2023-12-31';
         wrapper.vm.unidadesSelecionadas = [1];
@@ -314,14 +314,14 @@ describe('ProcessoCadastroView.vue', () => {
         const {wrapper, processosStore} = createWrapper();
 
         wrapper.vm.processoEditando = null;
-        wrapper.vm.descricao = 'Novo Processo Fail';
+        wrapper.vm.descricao = 'Novo processo fail';
         wrapper.vm.tipo = 'MAPEAMENTO';
         wrapper.vm.unidadesSelecionadas = [1];
 
         wrapper.vm.mostrarModalConfirmacao = true;
         await nextTick();
 
-        processosStore.criarProcesso.mockRejectedValue(new Error('Erro Criacao'));
+        processosStore.criarProcesso.mockRejectedValue(new Error('Erro criacao'));
         processosStore.lastError = {message: 'Erro ao criar', subErrors: []};
 
         await wrapper.find('[data-testid="btn-iniciar-processo-confirmar"]').trigger('click');
@@ -338,7 +338,7 @@ describe('ProcessoCadastroView.vue', () => {
         wrapper.vm.mostrarModalConfirmacao = true;
         await nextTick();
 
-        processosStore.iniciarProcesso.mockRejectedValue(new Error('Erro Inicio'));
+        processosStore.iniciarProcesso.mockRejectedValue(new Error('Erro inicio'));
         processosStore.lastError = {message: 'Erro ao iniciar', subErrors: []};
 
         await wrapper.find('[data-testid="btn-iniciar-processo-confirmar"]').trigger('click');
@@ -350,7 +350,7 @@ describe('ProcessoCadastroView.vue', () => {
 
     it('handles error when removing a process', async () => {
         const {wrapper, processosStore} = createWrapper();
-        processosStore.removerProcesso.mockRejectedValue(new Error('Erro Remocao'));
+        processosStore.removerProcesso.mockRejectedValue(new Error('Erro remocao'));
 
         wrapper.vm.processoEditando = {codigo: 123};
         wrapper.vm.mostrarModalRemocao = true;
@@ -393,7 +393,7 @@ describe('ProcessoCadastroView.vue', () => {
                     {field: null, message: 'Erro genérico'}
                 ]
             };
-            throw new Error('Validation Error');
+            throw new Error('Validation error');
         });
 
         wrapper.vm.descricao = 'Teste';
@@ -416,7 +416,7 @@ describe('ProcessoCadastroView.vue', () => {
     it('handles error without lastError (network/runtime error)', async () => {
         const {wrapper, processosStore} = createWrapper();
 
-        processosStore.criarProcesso.mockRejectedValue(new Error('Network Error'));
+        processosStore.criarProcesso.mockRejectedValue(new Error('Network error'));
         processosStore.lastError = null;
 
         wrapper.vm.descricao = 'Teste';
@@ -514,7 +514,7 @@ describe('ProcessoCadastroView.vue', () => {
         const {createTestingPinia} = await import('@pinia/testing');
         const pinia = createTestingPinia({stubActions: true, createSpy: vi.fn});
         const store = useProcessosStore(pinia);
-        (store.buscarProcessoDetalhe as any).mockRejectedValue(new Error('Load Error'));
+        (store.buscarProcessoDetalhe as any).mockRejectedValue(new Error('Load error'));
 
         const wrapper = mount(ProcessoCadastroView, {
             ...getCommonMountOptions({}, {
@@ -553,7 +553,7 @@ describe('ProcessoCadastroView.vue', () => {
                     {field: 'descricao', message: 'Descrição é obrigatória'}
                 ]
             };
-            throw new Error('Validation Error');
+            throw new Error('Validation error');
         });
 
         wrapper.vm.descricao = 'Teste';

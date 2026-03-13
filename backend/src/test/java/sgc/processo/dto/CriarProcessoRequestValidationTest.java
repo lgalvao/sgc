@@ -108,7 +108,7 @@ class CriarProcessoRequestValidationTest {
         @DisplayName("Deve rejeitar data limite nula")
         void deveRejeitarDataLimiteNula() {
             CriarProcessoRequest req = CriarProcessoRequest.builder()
-                    .descricao("Processo Teste")
+                    .descricao("Processo teste")
                     .tipo(TipoProcesso.MAPEAMENTO)
                     .dataLimiteEtapa1(null)
                     .unidades(List.of(1L))
@@ -126,7 +126,7 @@ class CriarProcessoRequestValidationTest {
         @DisplayName("Deve rejeitar data limite no passado")
         void deveRejeitarDataLimiteNoPassado() {
             CriarProcessoRequest req = CriarProcessoRequest.builder()
-                    .descricao("Processo Teste")
+                    .descricao("Processo teste")
                     .tipo(TipoProcesso.MAPEAMENTO)
                     .dataLimiteEtapa1(LocalDateTime.now().minusDays(1))
                     .unidades(List.of(1L))
@@ -144,7 +144,7 @@ class CriarProcessoRequestValidationTest {
         @DisplayName("Deve rejeitar data limite igual a agora")
         void deveRejeitarDataLimiteIgualAgora() {
             CriarProcessoRequest req = CriarProcessoRequest.builder()
-                    .descricao("Processo Teste")
+                    .descricao("Processo teste")
                     .tipo(TipoProcesso.MAPEAMENTO)
                     .dataLimiteEtapa1(LocalDateTime.now())
                     .unidades(List.of(1L))
@@ -165,7 +165,7 @@ class CriarProcessoRequestValidationTest {
         @DisplayName("Deve rejeitar lista de unidades nula")
         void deveRejeitarUnidadesNulas() {
             CriarProcessoRequest req = CriarProcessoRequest.builder()
-                    .descricao("Processo Teste")
+                    .descricao("Processo teste")
                     .tipo(TipoProcesso.MAPEAMENTO)
                     .dataLimiteEtapa1(LocalDateTime.now().plusDays(30))
                     .unidades(null)
@@ -183,7 +183,7 @@ class CriarProcessoRequestValidationTest {
         @DisplayName("Deve rejeitar lista de unidades vazia")
         void deveRejeitarUnidadesVazias() {
             CriarProcessoRequest req = CriarProcessoRequest.builder()
-                    .descricao("Processo Teste")
+                    .descricao("Processo teste")
                     .tipo(TipoProcesso.MAPEAMENTO)
                     .dataLimiteEtapa1(LocalDateTime.now().plusDays(30))
                     .unidades(List.of())

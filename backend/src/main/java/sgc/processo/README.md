@@ -1,17 +1,17 @@
 # Módulo de Processo
 
-## Visão Geral
+## Visão geral
 
 O pacote `processo` é o **orquestrador central** dos fluxos de trabalho do SGC. Ele gerencia a entidade `Processo`, que
-representa uma iniciativa de alto nível, como um "Mapeamento Anual de Competências" ou "Revisão de Mapas".
+representa uma iniciativa de alto nível, como um "Mapeamento anual de Competências" ou "Revisão de Mapas".
 
 Este módulo inicia e finaliza os fluxos de trabalho, coordena a criação de `Subprocessos` para cada unidade participante
 e **publica eventos de domínio** para comunicar-se de forma desacoplada com outros módulos, como `alerta` e
 `notificacao`.
 
-## Arquitetura de Serviços (Padrão Fachada)
+## Arquitetura de Serviços (Padrão fachada)
 
-O módulo adota o padrão **Service Facade**, onde o `ProcessoService` serve como o ponto de entrada único para todas as
+O módulo adota o padrão **Service facade**, onde o `ProcessoService` serve como o ponto de entrada único para todas as
 operações principais.
 
 ```mermaid
@@ -20,13 +20,13 @@ graph TD
         Controle(ProcessoControle)
     end
 
-    subgraph "Módulo Processo"
-        Facade(ProcessoService - Fachada Única)
+    subgraph "Módulo processo"
+        Facade(ProcessoService - Fachada única)
 
         Eventos(ApplicationEventPublisher)
     end
 
-    subgraph "Outros Módulos"
+    subgraph "Outros módulos"
         SubprocessoService
         CopiaMapaService
     end
@@ -37,7 +37,7 @@ graph TD
     Facade -- Publica eventos via --> Eventos
 ```
 
-## Componentes Principais
+## Componentes principais
 
 ### Controladores e Serviços
 
@@ -73,7 +73,7 @@ graph TD
 5. Ao final, um `EventoProcessoIniciado` é publicado, disparando alertas e e-mails através dos listeners no pacote
    `notificacao`.
 
-## Como Testar
+## Como testar
 
 Para executar apenas os testes deste módulo (a partir do diretório `backend`):
 

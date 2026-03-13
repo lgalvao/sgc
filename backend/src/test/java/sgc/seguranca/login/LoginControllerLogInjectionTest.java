@@ -21,7 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(LoginController.class)
 @Import(RestExceptionHandler.class)
-@DisplayName("LoginController - Teste de Log Injection")
+@DisplayName("LoginController - Teste de Log injection")
 class LoginControllerLogInjectionTest {
 
     @Autowired
@@ -49,10 +49,10 @@ class LoginControllerLogInjectionTest {
     }
 
     @Test
-    @DisplayName("POST /api/usuarios/autenticar - Deve sanitizar IP no header X-Forwarded-For (Log Injection)")
+    @DisplayName("POST /api/usuarios/autenticar - Deve sanitizar IP no header X-Forwarded-For (Log injection)")
     @WithMockUser
     void autenticar_DeveSanitizarIpLogInjection() throws Exception {
-        // Payload de Log Injection: Tenta injetar uma nova linha e um log falso
+        // Payload de Log injection: Tenta injetar uma nova linha e um log falso
         // O valor original poderia ser algo como: "10.0.0.1\nINFO User logged in as admin"
         String ipMalicioso = "10.0.0.1\nINFO User logged in as admin";
 

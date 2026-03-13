@@ -1,4 +1,4 @@
-# VIEW-03 - VW_UNIDADE - Unidades Organizacionais do Sistema
+# VIEW-03 - VW_UNIDADE - Unidades organizacionais do Sistema
 
 ## Finalidade
 
@@ -9,7 +9,7 @@ virtual raiz (ADMIN) que não existe no SGRH.
 
 ## Origem dos Dados
 
-**Sistema de Gestão de Recursos Humanos (SRH2):**
+**Sistema de Gestão de Recursos humanos (SRH2):**
 
 - `SRH2.UNIDADE_TSE`: Unidades organizacionais
 - `SRH2.LOTACAO`: Lotações de servidores
@@ -37,7 +37,7 @@ virtual raiz (ADMIN) que não existe no SGRH.
 
 ## Regras de Negócio
 
-### RN-VIEW03-01: Unidade Virtual Raiz (ADMIN)
+### RN-VIEW03-01: Unidade virtual raiz (ADMIN)
 
 O sistema cria uma unidade virtual que não existe no SGRH:
 
@@ -86,7 +86,7 @@ WHERE cd NOT IN (1, 6, 19, 37, 634, 635, 637)
 
 O tipo da unidade é calculado através de uma lógica complexa que considera múltiplos fatores:
 
-#### Unidades Extintas
+#### Unidades extintas
 
 ```sql
 WHEN sit_unid LIKE 'E%' THEN ''
@@ -94,7 +94,7 @@ WHEN sit_unid LIKE 'E%' THEN ''
 
 Unidades extintas não recebem classificação de tipo.
 
-#### Unidades sem Unidades Filhas
+#### Unidades sem Unidades filhas
 
 Para unidades que não possuem subordinadas (`qtd_unidades_filhas = 0`):
 
@@ -109,7 +109,7 @@ ELSE 'OPERACIONAL'
 **Observação importante:** A contagem de servidores inclui não apenas os servidores diretamente lotados, mas também
 servidores de unidades filhas que sejam únicas em suas respectivas unidades (ver RN-VIEW03-06).
 
-#### Unidades com Unidades Filhas
+#### Unidades com Unidades filhas
 
 Para unidades com subordinadas, a classificação depende se as filhas têm servidores ou subfilhas:
 
@@ -139,7 +139,7 @@ Se alguma filha tem >1 servidor ou tem subunidades:
 
 #### Resumo dos Tipos
 
-| Tipo               | Definição                                                                      | Perfis Aplicáveis                   |
+| Tipo               | Definição                                                                      | Perfis aplicáveis                   |
 |--------------------|--------------------------------------------------------------------------------|-------------------------------------|
 | `RAIZ`             | Unidade virtual ADMIN                                                          | ADMIN                               |
 | `SEM_EQUIPE`       | Unidade sem subordinadas e menos de 2 servidores                               | Nenhum (não participa de processos) |
@@ -147,7 +147,7 @@ Se alguma filha tem >1 servidor ou tem subunidades:
 | `INTEROPERACIONAL` | Unidade com filhas operacionais E 2+ servidores próprios                       | GESTOR, CHEFE, SERVIDOR             |
 | `INTERMEDIARIA`    | Unidade com filhas operacionais mas apenas titular                             | GESTOR                              |
 
-### RN-VIEW03-04: Determinação da Unidade Superior
+### RN-VIEW03-04: Determinação da Unidade superior
 
 A hierarquia das unidades é ajustada através de regras especiais:
 
@@ -167,12 +167,12 @@ END AS cod_unid_super
 - Busca em `VW_ZONA_RESP_CENTRAL` pelo `codigo_zona_resp`
 - Se não houver zona atribuída, retorna NULL
 
-**Regra 2 - Unidades Especiais:**
+**Regra 2 - Unidades especiais:**
 
 - Unidades com superior nos códigos 6, 19, 37, 634, 635, 637 são remapeadas para a unidade ADMIN (código 1)
 - Torna essas unidades filhas diretas da raiz administrativa
 
-**Regra 3 - Demais Unidades:**
+**Regra 3 - Demais unidades:**
 
 - Mantêm a hierarquia original do SGRH (`cod_unid_super`)
 
@@ -213,7 +213,7 @@ WHERE c.dt_dispensa IS NULL
 
 A contagem de servidores de uma unidade é complexa e inclui dois grupos:
 
-**Grupo 1 - Servidores Diretamente Lotados:**
+**Grupo 1 - Servidores diretamente lotados:**
 
 ```sql
 SELECT l1.cod_unid_tse, COUNT(1) + nvl(...ajuste..., 0) as qtd_servidores
@@ -222,7 +222,7 @@ WHERE l1.dt_fim_lotacao IS NULL
 GROUP BY l1.cod_unid_tse
 ```
 
-**Grupo 2 - Servidores Únicos de Filhas sem Subfilhas:**
+**Grupo 2 - Servidores únicos de Filhas sem Subfilhas:**
 
 ```sql
 SELECT DECODE(qtd_servidores, 1, 1, 0)
@@ -347,9 +347,9 @@ CONNECT BY codigo = PRIOR unidade_superior_codigo;
 - Movimentação para superior: `unidade_destino_codigo = unidade_superior_codigo`
 - Movimentação para subordinada: Verificar se `unidade_destino` tem `unidade_superior_codigo = unidade_origem`
 
-## Relação com Outras Views e Tabelas
+## Relação com Outras views e Tabelas
 
-### Dependências de Outras Views
+### Dependências de Outras views
 
 **VW_ZONA_RESP_CENTRAL:**
 
@@ -389,7 +389,7 @@ CONNECT BY codigo = PRIOR unidade_superior_codigo;
 
 ## Dependências
 
-### Permissões Necessárias
+### Permissões necessárias
 
 ```sql
 GRANT SELECT ON SRH2.UNIDADE_TSE TO SGC;
@@ -407,7 +407,7 @@ GRANT SELECT ON SRH2.SERVIDOR TO SGC;
 - `SRH2.QFC_VAGAS_COM`: Vagas de cargos
 - `SRH2.SERVIDOR`: Dados dos servidores
 
-### Views Necessárias
+### Views necessárias
 
 - `VW_ZONA_RESP_CENTRAL`: Para hierarquia de CAEs
 
@@ -458,9 +458,9 @@ Cada CAE executa uma subconsulta em `VW_ZONA_RESP_CENTRAL`. Para otimizar:
 +--------+-------------------------+--------+--------------------+----------------+---------------------------+-----------------+----------+-----------+
 | 1      | UNIDADE RAIZ ADM        | ADMIN  | NULL               | NULL           | NULL                      | RAIZ            | ATIVA    | NULL      |
 | 10     | Presidência             | PRES   | 00012345           | 001234567890   | 01/01/2023                | INTERMEDIARIA   | ATIVA    | 1         |
-| 100    | Secret Adm e Orc        | SAO    | 00023456           | 002345678901   | 15/06/2022                | INTEROPERACIONAL| ATIVA    | 10        |
+| 100    | Secret adm e Orc        | SAO    | 00023456           | 002345678901   | 15/06/2022                | INTEROPERACIONAL| ATIVA    | 10        |
 | 150    | Coord de Orçamento      | COOR   | 00034567           | 003456789012   | 20/03/2023                | INTERMEDIARIA   | ATIVA    | 100       |
-| 200    | Seção de Controle Orc   | SECO   | 00045678           | 004567890123   | 10/08/2023                | OPERACIONAL     | ATIVA    | 150       |
+| 200    | Seção de Controle orc   | SECO   | 00045678           | 004567890123   | 10/08/2023                | OPERACIONAL     | ATIVA    | 150       |
 | 201    | Seção de Planejamento   | SEPL   | NULL               | NULL           | NULL                      | SEM_EQUIPE      | ATIVA    | 150       |
 | 1001   | CAE Recife              | CAE01  | 00056789           | 005678901234   | 05/02/2024                | OPERACIONAL     | ATIVA    | 2001      |
 +--------+-------------------------+--------+--------------------+----------------+---------------------------+-----------------+----------+-----------+

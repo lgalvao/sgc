@@ -132,7 +132,7 @@
     <ModalConfirmacao
         v-model="mostrarModalConfirmacaoRemocao"
         :mensagem="dadosRemocao?.tipo === 'atividade' ? 'Confirma a remoção desta atividade e todos os conhecimentos associados?' : 'Confirma a remoção deste conhecimento?'"
-        :titulo="dadosRemocao?.tipo === 'atividade' ? 'Remover Atividade' : 'Remover Conhecimento'"
+        :titulo="dadosRemocao?.tipo === 'atividade' ? 'Remover atividade' : 'Remover conhecimento'"
         variant="danger"
         @confirmar="confirmarRemocao"
     />

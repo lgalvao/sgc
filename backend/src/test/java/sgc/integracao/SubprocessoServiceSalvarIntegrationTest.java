@@ -45,7 +45,7 @@ class SubprocessoServiceSalvarIntegrationTest extends BaseIntegrationTest {
         unidade = unidadeRepo.save(unidade);
 
         Processo processo = Processo.builder()
-                .descricao("Processo Teste Salvar")
+                .descricao("Processo teste salvar")
                 .tipo(TipoProcesso.MAPEAMENTO)
                 .situacao(SituacaoProcesso.EM_ANDAMENTO)
                 .dataLimite(LocalDateTime.now().plusDays(30))
@@ -80,7 +80,7 @@ class SubprocessoServiceSalvarIntegrationTest extends BaseIntegrationTest {
     @DisplayName("criarParaDiagnostico: deve criar subprocesso com copia de mapa")
     void criarParaDiagnostico() {
         Processo procDiag = Processo.builder()
-                .descricao("Processo Diag")
+                .descricao("Processo diag")
                 .tipo(TipoProcesso.DIAGNOSTICO)
                 .situacao(SituacaoProcesso.EM_ANDAMENTO)
                 .dataLimite(LocalDateTime.now().plusDays(30))
@@ -92,7 +92,7 @@ class SubprocessoServiceSalvarIntegrationTest extends BaseIntegrationTest {
         uniDiag.setSigla("DIAG");
         uniDiag = unidadeRepo.save(uniDiag);
 
-        Usuario user = Usuario.builder().tituloEleitoral("12345").matricula("123").nome("User Diag").email("a@a.com").build();
+        Usuario user = Usuario.builder().tituloEleitoral("12345").matricula("123").nome("User diag").email("a@a.com").build();
         usuarioRepo.save(user);
 
         Mapa mapaVigente = new Mapa();
@@ -117,7 +117,7 @@ class SubprocessoServiceSalvarIntegrationTest extends BaseIntegrationTest {
         Atividade a1 = Atividade.builder().mapa(subprocesso.getMapa()).descricao("Ativ 1").build();
         atividadeRepo.save(a1);
 
-        SalvarMapaRequest.CompetenciaRequest compReq = new SalvarMapaRequest.CompetenciaRequest(0L, "Nova Comp", List.of(a1.getCodigo()));
+        SalvarMapaRequest.CompetenciaRequest compReq = new SalvarMapaRequest.CompetenciaRequest(0L, "Nova comp", List.of(a1.getCodigo()));
         SalvarMapaRequest req = new SalvarMapaRequest("Justificativa", List.of(compReq));
 
         Mapa atualizado = subprocessoService.salvarMapa(subprocesso.getCodigo(), req);
@@ -134,7 +134,7 @@ class SubprocessoServiceSalvarIntegrationTest extends BaseIntegrationTest {
         Atividade a1 = Atividade.builder().mapa(subprocesso.getMapa()).descricao("Ativ 1").build();
         atividadeRepo.save(a1);
 
-        SalvarMapaRequest.CompetenciaRequest compReq = new SalvarMapaRequest.CompetenciaRequest(0L, "Nova Comp", List.of(a1.getCodigo()));
+        SalvarMapaRequest.CompetenciaRequest compReq = new SalvarMapaRequest.CompetenciaRequest(0L, "Nova comp", List.of(a1.getCodigo()));
         SalvarMapaRequest req = new SalvarMapaRequest("Justificativa", List.of(compReq));
 
         subprocessoService.salvarMapaSubprocesso(subprocesso.getCodigo(), req);
@@ -152,7 +152,7 @@ class SubprocessoServiceSalvarIntegrationTest extends BaseIntegrationTest {
         Atividade a1 = Atividade.builder().mapa(subprocesso.getMapa()).descricao("Ativ 1").build();
         atividadeRepo.save(a1);
 
-        SalvarMapaRequest.CompetenciaRequest compReq = new SalvarMapaRequest.CompetenciaRequest(0L, "Nova Comp", List.of(a1.getCodigo()));
+        SalvarMapaRequest.CompetenciaRequest compReq = new SalvarMapaRequest.CompetenciaRequest(0L, "Nova comp", List.of(a1.getCodigo()));
         SalvarMapaRequest req = new SalvarMapaRequest("Justificativa", List.of(compReq));
 
         subprocessoService.salvarMapaSubprocesso(subprocesso.getCodigo(), req);
@@ -170,7 +170,7 @@ class SubprocessoServiceSalvarIntegrationTest extends BaseIntegrationTest {
         Atividade a1 = Atividade.builder().mapa(subprocesso.getMapa()).descricao("Ativ 1").build();
         atividadeRepo.save(a1);
 
-        CompetenciaRequest req = new CompetenciaRequest("Nova Comp", List.of(a1.getCodigo()));
+        CompetenciaRequest req = new CompetenciaRequest("Nova comp", List.of(a1.getCodigo()));
         subprocessoService.adicionarCompetencia(subprocesso.getCodigo(), req);
 
         Subprocesso atualizado = subprocessoRepo.findById(subprocesso.getCodigo()).get();
@@ -186,7 +186,7 @@ class SubprocessoServiceSalvarIntegrationTest extends BaseIntegrationTest {
         Atividade a1 = Atividade.builder().mapa(subprocesso.getMapa()).descricao("Ativ 1").build();
         atividadeRepo.save(a1);
 
-        CompetenciaRequest req = new CompetenciaRequest("Nova Comp", List.of(a1.getCodigo()));
+        CompetenciaRequest req = new CompetenciaRequest("Nova comp", List.of(a1.getCodigo()));
         subprocessoService.adicionarCompetencia(subprocesso.getCodigo(), req);
 
         Subprocesso atualizado = subprocessoRepo.findById(subprocesso.getCodigo()).get();
@@ -202,14 +202,14 @@ class SubprocessoServiceSalvarIntegrationTest extends BaseIntegrationTest {
         Atividade a1 = Atividade.builder().mapa(subprocesso.getMapa()).descricao("Ativ 1").build();
         atividadeRepo.save(a1);
 
-        Competencia comp = Competencia.builder().mapa(subprocesso.getMapa()).descricao("Comp Velha").build();
+        Competencia comp = Competencia.builder().mapa(subprocesso.getMapa()).descricao("Comp velha").build();
         comp = competenciaRepo.save(comp);
 
-        CompetenciaRequest req = new CompetenciaRequest("Comp Atualizada", List.of(a1.getCodigo()));
+        CompetenciaRequest req = new CompetenciaRequest("Comp atualizada", List.of(a1.getCodigo()));
         subprocessoService.atualizarCompetencia(subprocesso.getCodigo(), comp.getCodigo(), req);
 
         Competencia atualizada = competenciaRepo.findById(comp.getCodigo()).get();
-        assertThat(atualizada.getDescricao()).isEqualTo("Comp Atualizada");
+        assertThat(atualizada.getDescricao()).isEqualTo("Comp atualizada");
     }
 
     @Test
@@ -218,7 +218,7 @@ class SubprocessoServiceSalvarIntegrationTest extends BaseIntegrationTest {
         ReflectionTestUtils.setField(subprocesso, "situacao", SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
         subprocessoRepo.save(subprocesso);
 
-        Competencia comp = Competencia.builder().mapa(subprocesso.getMapa()).descricao("Unica Comp").build();
+        Competencia comp = Competencia.builder().mapa(subprocesso.getMapa()).descricao("Unica comp").build();
         comp = competenciaRepo.save(comp);
 
         subprocessoService.removerCompetencia(subprocesso.getCodigo(), comp.getCodigo());
@@ -234,7 +234,7 @@ class SubprocessoServiceSalvarIntegrationTest extends BaseIntegrationTest {
         ReflectionTestUtils.setField(subprocesso, "situacao", SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
         subprocessoRepo.save(subprocesso);
 
-        Competencia comp = Competencia.builder().mapa(subprocesso.getMapa()).descricao("Unica Comp").build();
+        Competencia comp = Competencia.builder().mapa(subprocesso.getMapa()).descricao("Unica comp").build();
         comp = competenciaRepo.save(comp);
 
         subprocessoService.removerCompetencia(subprocesso.getCodigo(), comp.getCodigo());

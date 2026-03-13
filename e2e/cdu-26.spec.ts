@@ -13,7 +13,7 @@ import {criarProcessoMapaValidadoFixture} from './fixtures/fixtures-processos.js
  * 1. ADMIN acessa processo em andamento
  * 2. Sistema mostra Detalhes do processo
  * 3. Sistema identifica unidades elegíveis para homologação
- * 4. ADMIN clica no botão 'Homologar Mapa em Bloco'
+ * 4. ADMIN clica no botão 'Homologar mapa em Bloco'
  * 5. Sistema abre modal com lista de unidades
  * 6. ADMIN confirma
  * 7. Sistema executa homologação para cada unidade
@@ -24,7 +24,7 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
     const timestamp = Date.now();
     const descProcesso = `Mapeamento CDU-26 ${timestamp}`;
 
-    test('Setup Data', async ({request}) => {
+    test('Setup data', async ({request}) => {
         await criarProcessoMapaValidadoFixture(request, {
             descricao: descProcesso,
             unidade: UNIDADE_1
@@ -32,7 +32,7 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
         expect(true).toBeTruthy();
     });
 
-    test('Cenario 1: ADMIN visualiza botão Homologar Mapa em Bloco', async ({page, autenticadoComoAdmin}) => {
+    test('Cenario 1: ADMIN visualiza botão Homologar mapa em Bloco', async ({page, autenticadoComoAdmin}) => {
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
 

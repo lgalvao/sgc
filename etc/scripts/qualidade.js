@@ -6,7 +6,7 @@ import os from 'node:os';
 // Configuração dos testes
 const steps = [
     {
-        name: 'Backend - Testes Unitários',
+        name: 'Backend - Testes unitários',
         command: process.platform === 'win32' ? 'gradlew.bat' : './gradlew',
         args: ['unitTest'],
         cwd: 'backend',
@@ -22,7 +22,7 @@ const steps = [
         reportDir: 'backend/build/test-results/integrationTest'
     },
     {
-        name: 'Frontend - Testes Unitários',
+        name: 'Frontend - Testes unitários',
         command: 'npm',
         args: ['run', 'test:unit'],
         cwd: 'frontend',
@@ -50,9 +50,9 @@ function cleanLog(output) {
         /^> Task :.* UP-TO-DATE/,
         /^> Task :.* NO-SOURCE/,
         /^> Task :.* SUCCESS/,
-        /Downloading Chromium/,
-        /Downloading Firefox/,
-        /Downloading Webkit/,
+        /Downloading chromium/,
+        /Downloading firefox/,
+        /Downloading webkit/,
         /^\|.*\| \d+% of .* MiB/, // Barras de progresso
         /^\s*$/, // Linhas vazias
         /^Calculating task graph/,
@@ -248,11 +248,11 @@ async function runCommand(step) {
 function generateReport(results) {
     const date = new Date().toLocaleString('pt-BR');
 
-    let md = `# Relatório de Testes Automatizados\n\n`;
+    let md = `# Relatório de Testes automatizados\n\n`;
     md += `**Data:** ${date}\n`;
     md += `**Sistema:** ${os.type()} ${os.release()}\n\n`;
 
-    md += `## Resumo Executivo\n\n`;
+    md += `## Resumo executivo\n\n`;
 
     md += `| Teste | Status | Duração (s) |\n`;
     md += `| :--- | :---: | :---: |\n`;
@@ -264,7 +264,7 @@ function generateReport(results) {
     });
     md += `\n`;
 
-    md += `### Estatísticas Detalhadas\n\n`;
+    md += `### Estatísticas detalhadas\n\n`;
     md += `| Teste | Total | Passou | Falhou | Ignorado |\n`;
     md += `| :--- | :---: | :---: | :---: | :---: |\n`;
 
@@ -273,7 +273,7 @@ function generateReport(results) {
         md += `| ${r.name} | ${s.total} | ${s.passed} | ${s.failed} | ${s.skipped} |\n`;
     });
 
-    md += `\n**Status Geral:** ${allPassed ? '🟢 APROVADO' : '🔴 REPROVADO'}\n\n`;
+    md += `\n**Status geral:** ${allPassed ? '🟢 APROVADO' : '🔴 REPROVADO'}\n\n`;
 
     md += `## Detalhes da Execução\n\n`;
 
@@ -286,7 +286,7 @@ function generateReport(results) {
         const s = r.stats;
         md += `- **Resultados:** ${s.total} testes, ${s.passed} aprovados, ${s.failed} falhas\n\n`;
 
-        md += '<details>\n<summary>Ver Logs de Saída</summary>\n\n';
+        md += '<details>\n<summary>Ver logs de Saída</summary>\n\n';
         md += '```text\n';
 
         let cleanOutput = cleanLog(r.output);

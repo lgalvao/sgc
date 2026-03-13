@@ -185,7 +185,7 @@ WHERE usu.titulo <> uni.titulo_titular
 - Condição `usu.titulo <> uni.titulo_titular` evita duplicação
 - Substitutos e atribuídos temporariamente também são excluídos (pois aparecem como titulares em `VW_RESPONSABILIDADE`)
 
-### RN-VIEW06-06: Múltiplos Perfis e Unidades
+### RN-VIEW06-06: Múltiplos perfis e Unidades
 
 Um usuário pode aparecer múltiplas vezes na view:
 
@@ -217,7 +217,7 @@ Registros:
   (003456789012, SERVIDOR, 200)
 ```
 
-### RN-VIEW06-07: Validação de Usuários Ativos
+### RN-VIEW06-07: Validação de Usuários ativos
 
 Todas as queries fazem JOIN com `VW_USUARIO`:
 
@@ -305,9 +305,9 @@ WHERE usuario_titulo = :titulo_usuario
 - Homologar mapa: Requer perfil ADMIN
 - Participar de diagnóstico: Requer perfil SERVIDOR ou superior
 
-### CU-VIEW06-03: Filtragem de Processos Visíveis (CDU-02)
+### CU-VIEW06-03: Filtragem de Processos visíveis (CDU-02)
 
-**Contexto:** Tela Painel mostra apenas processos relevantes ao usuário.
+**Contexto:** Tela painel mostra apenas processos relevantes ao usuário.
 
 **Implementação:**
 
@@ -347,7 +347,7 @@ const temPerfilAdmin = perfisUsuario.some(p => p.perfil === 'ADMIN');
 
 // Mostrar botão "Criar processo" apenas para ADMIN
 <button v-if="temPerfilAdmin" @click="criarProcesso">
-  Criar Processo
+  Criar processo
 </button>
 
 // Mostrar link de Configurações apenas para ADMIN
@@ -417,7 +417,7 @@ GROUP BY usuario_titulo
 HAVING COUNT(DISTINCT perfil) > 1;
 ```
 
-## Relação com Outras Views e Tabelas
+## Relação com Outras views e Tabelas
 
 ### Dependências
 
@@ -461,7 +461,7 @@ HAVING COUNT(DISTINCT perfil) > 1;
 
 ## Dependências
 
-### Permissões Necessárias
+### Permissões necessárias
 
 Todas as permissões são herdadas das views dependentes:
 
@@ -596,7 +596,7 @@ WHERE usu.titulo NOT IN (
 );
 ```
 
-### Mudanças Dinâmicas
+### Mudanças dinâmicas
 
 **Eventos que afetam perfis:**
 

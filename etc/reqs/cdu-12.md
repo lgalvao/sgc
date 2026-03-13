@@ -10,11 +10,11 @@ Pré-condições:
     - Perfil GESTOR e subprocesso na situação 'Revisão do cadastro disponibilizada' e com localização atual na unidade
       do usuário
     - Perfil ADMIN e subprocesso nas situações 'Revisão do cadastro disponibilizada', 'Revisão do cadastro homologada'
-      ou 'Mapa Ajustado'
+      ou 'Mapa ajustado'
 
 Fluxo principal:
 
-1. No Painel, o usuário clica no processo de revisão na situação 'Em andamento'.
+1. No painel, o usuário clica no processo de revisão na situação 'Em andamento'.
 
 2. O sistema mostra a tela Detalhes do subprocesso da unidade.
 

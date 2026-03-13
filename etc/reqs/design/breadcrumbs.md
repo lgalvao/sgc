@@ -1,13 +1,13 @@
 # Especificação: Barra de Navegação (Breadcrumbs)
 
-## Visão Geral
+## Visão geral
 
 A barra de navegação exibe breadcrumbs contextuais que indicam a localização atual do usuário na hierarquia de
 navegação do sistema. Inclui também um botão de voltar para facilitar a navegação.
 
 ## Componentes da Barra
 
-### Botão Voltar
+### Botão voltar
 
 - Exibido em todas as páginas **exceto** Login e Painel
 - Ao clicar, navega para a página anterior do histórico (`router.back()`)
@@ -64,7 +64,7 @@ Rotas que exibem informações de uma unidade específica.
 | `/unidade/:codUnidade/mapa`       | Mapa                     | 🏠 > [SIGLA] > Mapa de competências  |
 | `/unidade/:codUnidade/atribuicao` | AtribuicaoTemporariaForm | 🏠 > [SIGLA] > Atribuição temporária |
 
-### Outras Rotas
+### Outras rotas
 
 Rotas que não se encaixam nas categorias acima usam a propriedade `meta.breadcrumb` definida no roteador. O breadcrumb
 pode ser:
@@ -94,7 +94,7 @@ Para rotas de unidade, a hierarquia é:
 🏠 (Painel) → [SIGLA] (UnidadeView) → [Página]
 ```
 
-## Comportamento Visual
+## Comportamento visual
 
 ### Estilos
 
@@ -104,7 +104,7 @@ Para rotas de unidade, a hierarquia é:
 - Cor do item ativo: `#212529` (preto)
 - Separador: `›` em cor `#adb5bd`
 
-### Botão Voltar
+### Botão voltar
 
 - Altura: compatível com os breadcrumbs
 - Cor: cinza discreto
@@ -112,27 +112,27 @@ Para rotas de unidade, a hierarquia é:
 
 ## Cenários
 
-### Cenário 1: ADMIN Visualizando Atividades
+### Cenário 1: ADMIN Visualizando atividades
 
 1. ADMIN navega para `/processo/99/ASSESSORIA_12/vis-cadastro`
 2. Breadcrumbs exibidos: 🏠 > Detalhes do processo > ASSESSORIA_12 > Atividades e conhecimentos
 3. Clicar em "ASSESSORIA_12" leva para `/processo/99/ASSESSORIA_12`
 4. Clicar em "Detalhes do processo" leva para `/processo/99`
 
-### Cenário 2: CHEFE Visualizando Atividades
+### Cenário 2: CHEFE Visualizando atividades
 
 1. CHEFE navega para `/processo/99/ASSESSORIA_12/vis-cadastro`
 2. Breadcrumbs exibidos: 🏠 > ASSESSORIA_12 > Atividades e conhecimentos
 3. "Detalhes do processo" não aparece (CHEFE só vê sua unidade)
 
-### Cenário 3: Visualizando Unidade
+### Cenário 3: Visualizando unidade
 
 1. Usuário navega para `/unidade/1`
 2. Store de unidades carrega a unidade com sigla "SEDOC"
 3. Breadcrumbs exibidos: 🏠 > SEDOC > Minha unidade
 4. Se a unidade não estivesse carregada, mostraria: 🏠 > Unidade 1 > Minha unidade
 
-### Cenário 4: Navegando para Atribuição Temporária
+### Cenário 4: Navegando para Atribuição temporária
 
 1. ADMIN navega para `/unidade/1/atribuicao`
 2. Breadcrumbs exibidos: 🏠 > SEDOC > Atribuição temporária
@@ -140,7 +140,7 @@ Para rotas de unidade, a hierarquia é:
 
 ## Implementação
 
-### Arquivos Envolvidos
+### Arquivos envolvidos
 
 - `frontend/src/components/BarraNavegacao.vue` - Componente principal
 - `frontend/src/router/*.routes.ts` - Definições das rotas com `meta.breadcrumb`

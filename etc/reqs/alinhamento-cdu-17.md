@@ -6,7 +6,7 @@ O teste E2E cobre:
 - **Navegação para Edição de Mapa** (passos 1-6): ADMIN acessa processo, navega para subprocesso, navega para mapa (linhas 114-121).
 - **Validação de disponibilidade do botão "Disponibilizar"** (passo 7): Botão está visível (linha 121).
 - **Abertura de modal** (passo 10): Clica no botão, valida presença do modal com teste ID `mdl-disponibilizar-mapa` (linhas 123-126).
-- **Cancelamento** (passo 11): Clica Cancelar, valida que modal fecha e permanece na tela de edição (linhas 128-131).
+- **Cancelamento** (passo 11): Clica cancelar, valida que modal fecha e permanece na tela de edição (linhas 128-131).
 - **Disponibilização com sucesso** (passos 12-20): Chama helper `disponibilizarMapa(page, '2030-12-31')`, valida redirecionamento para Painel e mudança de situação para "Mapa disponibilizado" (linhas 134-138).
 
 ## Lacunas em relação ao requisito
@@ -27,8 +27,8 @@ O teste E2E cobre:
 
 **Validação de modal (passo 10) incompleta:**
 - **Título**: Não valida que título é 'Disponibilização do mapa de competências'.
-- **Campo Data**: Não valida presença de campo de data, label, validação (obrigatório), formato esperado.
-- **Campo Observações**: Não valida presença de campo de observações, label, validação (opcional).
+- **Campo data**: Não valida presença de campo de data, label, validação (obrigatório), formato esperado.
+- **Campo observações**: Não valida presença de campo de observações, label, validação (opcional).
 - **Botões**: Valida que modal está visível e tem botão Cancelar, mas não valida explicitamente botão "Disponibilizar" no modal.
 
 **Campos do modal não validados:**

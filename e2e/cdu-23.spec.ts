@@ -15,7 +15,7 @@ import {loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
  * - Subprocessos na situação 'Cadastro disponibilizado' ou 'Cadastro aceito'
  *
  * Fluxo principal:
- * 1. No Painel, ADMIN acessa processo em andamento
+ * 1. No painel, ADMIN acessa processo em andamento
  * 2. Sistema mostra tela Detalhes do processo
  * 3. Sistema identifica unidades elegíveis para homologação
  * 4. ADMIN clica no botão 'Homologar em Bloco'
@@ -29,7 +29,7 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {
     const timestamp = Date.now();
     const descProcesso = `Mapeamento CDU-23 ${timestamp}`;
 
-    test('Setup Data', async ({request}) => {
+    test('Setup data', async ({request}) => {
         await criarProcessoCadastroDisponibilizadoFixture(request, {
             descricao: descProcesso,
             unidade: UNIDADE_1
@@ -37,7 +37,7 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {
         expect(true).toBeTruthy();
     });
 
-    test('Setup Aceites', async ({page, autenticadoComoGestorCoord22}) => {
+    test('Setup aceites', async ({page, autenticadoComoGestorCoord22}) => {
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_1);
         await navegarParaAtividadesVisualizacao(page);
         await aceitarCadastroMapeamento(page);

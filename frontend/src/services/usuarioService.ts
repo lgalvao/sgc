@@ -2,7 +2,7 @@ import type {LoginResponseDto, PerfilUnidadeDto, UsuarioDto} from "@/types/dtos"
 import type {Usuario} from "@/types/tipos";
 import apiClient from "../axios-setup";
 
-// Mappers Internos (formerly in /mappers/sgrh.ts & /mappers/usuarios.ts)
+// Mappers internos (formerly in /mappers/sgrh.ts & /mappers/usuarios.ts)
 
 export interface AutenticacaoRequest {
     tituloEleitoral: string;

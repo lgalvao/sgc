@@ -25,7 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @Tag("integration")
 @Transactional
-@DisplayName("Fluxo Completo de Subprocesso")
+@DisplayName("Fluxo completo de Subprocesso")
 class SubprocessoFluxoIntegrationTest extends BaseIntegrationTest {
 
     @Autowired
@@ -52,7 +52,7 @@ class SubprocessoFluxoIntegrationTest extends BaseIntegrationTest {
         unidadeFilha = UnidadeFixture.unidadePadrao();
         unidadeFilha.setCodigo(null);
         unidadeFilha.setSigla("FILHA");
-        unidadeFilha.setNome("Unidade Filha");
+        unidadeFilha.setNome("Unidade filha");
         unidadeFilha.setUnidadeSuperior(unidadeRaiz);
         unidadeFilha = unidadeRepo.save(unidadeFilha);
 
@@ -61,11 +61,11 @@ class SubprocessoFluxoIntegrationTest extends BaseIntegrationTest {
                 unidadeFilha.getCodigo(), "111111111111", "00000", "TITULAR", LocalDateTime.now());
 
         // 2. Usuários
-        admin = usuarioRepo.findById("111111111111").orElseThrow(); // Admin padrão do seed (Admin Teste V2)
+        admin = usuarioRepo.findById("111111111111").orElseThrow(); // Admin padrão do seed (Admin teste V2)
 
         Usuario chefe = UsuarioFixture.usuarioPadrao();
         chefe.setTituloEleitoral("555555555555");
-        chefe.setNome("Chefe Filha");
+        chefe.setNome("Chefe filha");
         chefe.setUnidadeLotacao(unidadeFilha);
         chefe = usuarioRepo.save(chefe);
 
@@ -80,14 +80,14 @@ class SubprocessoFluxoIntegrationTest extends BaseIntegrationTest {
 
         // 3. Processo
         Processo processo = Processo.builder()
-                .descricao("Processo Mapeamento Teste")
+                .descricao("Processo mapeamento teste")
                 .tipo(TipoProcesso.MAPEAMENTO)
                 .situacao(SituacaoProcesso.EM_ANDAMENTO)
                 .dataLimite(LocalDateTime.now().plusDays(30))
                 .build();
         processoRepo.save(processo);
 
-        // 4. Subprocesso Inicial
+        // 4. Subprocesso inicial
         subprocesso = Subprocesso.builder()
                 .unidade(unidadeFilha)
                 .situacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO) // Começando já homologado para focar no mapa
@@ -122,14 +122,14 @@ class SubprocessoFluxoIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("Fluxo Completo: Criação Mapa -> Disponibilização -> Validação -> Homologação")
+    @DisplayName("Fluxo completo: Criação mapa -> Disponibilização -> Validação -> Homologação")
     void fluxoCompletoMapeamento() throws Exception {
         Long spId = subprocesso.getCodigo();
         Long mapaId = subprocesso.getMapa().getCodigo();
 
-        // 1. Adicionar Competência (ADMIN)
-        // O ADMIN está na Unidade RAIZ. O Subprocesso está na Unidade FILHA.
-        // A Regra de Ouro (SgcPermissionEvaluator) exige que a localização do subprocesso (FILHA)
+        // 1. Adicionar competência (ADMIN)
+        // O ADMIN está na Unidade RAIZ. O subprocesso está na Unidade FILHA.
+        // A regra de Ouro (SgcPermissionEvaluator) exige que a localização do subprocesso (FILHA)
         // seja igual à unidade ativa do usuário para ações de escrita (EDITAR_MAPA, DISPONIBILIZAR_MAPA).
         // Mesmo ADMIN não escapa dessa regra para ações de escrita.
         // Portanto, o ADMIN deve "simular" estar na unidade FILHA para realizar estas ações.
@@ -154,7 +154,7 @@ class SubprocessoFluxoIntegrationTest extends BaseIntegrationTest {
         Subprocesso sp = subprocessoRepo.findById(spId).orElseThrow();
         assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
 
-        // 2. Disponibilizar Mapa (ADMIN)
+        // 2. Disponibilizar mapa (ADMIN)
         // Situação deve mudar para MAPA_DISPONIBILIZADO
         // Admin continua na unidade filha para essa ação de escrita.
 
@@ -173,7 +173,7 @@ class SubprocessoFluxoIntegrationTest extends BaseIntegrationTest {
         assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO);
 
         // Situação deve mudar para MAPA_VALIDADO
-        // A Disponibilização enviou o processo para a Unidade Superior (RAIZ).
+        // A disponibilização enviou o processo para a Unidade superior (RAIZ).
         // Quem valida a disponibilização é o Chefe da Unidade SUPERIOR (que recebeu o processo).
         // O ADMIN é titular da RAIZ e possui o perfil CHEFE lá (segundo seed).
 
@@ -192,9 +192,9 @@ class SubprocessoFluxoIntegrationTest extends BaseIntegrationTest {
         assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
 
         // O teste já cobre:
-        // - Adicionar competência (Escrita na Unidade Filha)
-        // - Disponibilizar Mapa (Transição de estado e localização para cima)
-        // - Validar Mapa (Escrita na Unidade Raiz pelo Chefe)
+        // - Adicionar competência (Escrita na Unidade filha)
+        // - Disponibilizar mapa (Transição de estado e localização para cima)
+        // - Validar mapa (Escrita na Unidade raiz pelo Chefe)
 
     }
 }

@@ -1,4 +1,4 @@
-# Alinhamento CDU-02 - Visualizar Painel
+# Alinhamento CDU-02 - Visualizar painel
 
 ## Cobertura atual do teste
 O teste `cdu-02.spec.ts` cobre os seguintes cenários:

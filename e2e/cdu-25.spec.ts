@@ -17,7 +17,7 @@ import {verificarPaginaPainel} from './helpers/helpers-navegacao.js';
  * 1. GESTOR acessa processo em andamento
  * 2. Sistema mostra Detalhes do processo
  * 3. Sistema identifica unidades elegíveis para aceite
- * 4. GESTOR clica no botão 'Aceitar Mapa em Bloco'
+ * 4. GESTOR clica no botão 'Aceitar mapa em Bloco'
  * 5. Sistema abre modal com lista de unidades
  * 6. GESTOR confirma
  * 7. Sistema executa aceite para cada unidade
@@ -28,7 +28,7 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
     const timestamp = Date.now();
     const descProcesso = `Mapeamento CDU-25 ${timestamp}`;
 
-    test('Setup Data', async ({request}) => {
+    test('Setup data', async ({request}) => {
         await criarProcessoMapaValidadoFixture(request, {
             descricao: descProcesso,
             unidade: UNIDADE_1

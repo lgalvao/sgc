@@ -264,7 +264,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
         });
     });
 
-    test.describe('02 - Painel Principal', () => {
+    test.describe('02 - Painel principal', () => {
         test('Captura painel ADMIN', async ({page}) => {
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
@@ -272,7 +272,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await capturarTela(page, '02-painel', '01-painel-admin-vazio', {fullPage: true});
 
             // Criar um processo para popular o painel
-            const descricaoProcesso = `Processo Captura ${Date.now()}`;
+            const descricaoProcesso = `Processo captura ${Date.now()}`;
             await page.getByTestId('btn-painel-criar-processo').click();
             await expect(page).toHaveURL(/\/processo\/cadastro/);
             await capturarTela(page, '02-painel', '02-criar-processo-form-vazio');
@@ -324,7 +324,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
         test('Captura painel GESTOR', async ({page}) => {
             // Criar processo para o Gestor primeiro como ADMIN
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
-            const desc = `Processo Gestor ${Date.now()}`;
+            const desc = `Processo gestor ${Date.now()}`;
             await criarProcesso(page, {
                 descricao: desc,
                 tipo: 'MAPEAMENTO',
@@ -341,7 +341,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
         });
 
         test('Captura painel CHEFE', async ({page, request}) => {
-            const desc = `Processo Chefe ${Date.now()}`;
+            const desc = `Processo chefe ${Date.now()}`;
             await criarProcessoMapeamentoIniciadoPorFixture(request, cleanup, desc, 'SECAO_211');
 
             await login(page, USUARIOS.CHEFE_SECAO_211.titulo, USUARIOS.CHEFE_SECAO_211.senha);
@@ -357,7 +357,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             const timestamp = Date.now();
             const UNIDADE_ALVO = 'ASSESSORIA_12';
-            const descricao = `Processo Detalhado ${timestamp}`;
+            const descricao = `Processo detalhado ${timestamp}`;
 
             await criarProcesso(page, {
                 descricao,
@@ -393,7 +393,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
         test('Captura fluxo de cadastro ate mapa disponibilizado', async ({page, request}) => {
             const timestamp = Date.now();
             const unidadeAlvo = 'ASSESSORIA_12';
-            const descricao = `Processo Cadastro ${timestamp}`;
+            const descricao = `Processo cadastro ${timestamp}`;
             const atividade = `Atividade ${timestamp}`;
             const conhecimento = `Conhecimento ${timestamp}`;
             const competencia = `Competência ${timestamp}`;
@@ -442,7 +442,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
         test('Captura validacao do mapa', async ({page, request}) => {
             const timestamp = Date.now();
             const unidadeAlvo = 'ASSESSORIA_12';
-            const descricao = `Processo Validacao Mapa ${timestamp}`;
+            const descricao = `Processo validacao mapa ${timestamp}`;
 
             const processoCodigo = await criarProcessoMapeamentoComMapaDisponibilizadoPorFixture(
                 request,
@@ -465,7 +465,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
         test('Captura processo homologado e finalizacao', async ({page, request}) => {
             const timestamp = Date.now();
             const unidadeAlvo = 'SECAO_121';
-            const descricao = `Processo Finalizacao ${timestamp}`;
+            const descricao = `Processo finalizacao ${timestamp}`;
 
             const processoCodigo = await criarProcessoMapeamentoComMapaHomologadoPorFixture(
                 request,
@@ -490,7 +490,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
     test.describe('04 - Subprocesso e Atividades', () => {
         test('Captura fluxo completo de atividades (incluindo validações de form)', async ({page}) => {
-            const descricao = `Proc Atividades ${Date.now()}`;
+            const descricao = `Proc atividades ${Date.now()}`;
             const UNIDADE_ALVO = 'SECAO_211';
 
             // 1. Início: Validações de Formulário (Admin)
@@ -527,7 +527,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await expect(page.getByTestId('btn-processo-salvar')).toBeEnabled();
             await capturarTela(page, '03-processo', '13-botoes-ativados-form-completo');
 
-            // 2. Iniciar Processo
+            // 2. Iniciar processo
             await page.getByTestId('btn-processo-iniciar').click();
             await confirmarInicioProcessoPeloDialogo(page, {
                 descricao,
@@ -551,7 +551,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await navegarParaAtividades(page);
             await capturarTela(page, '04-subprocesso', '02-cadastro-atividades-vazio', {fullPage: true});
 
-            const atividadeDesc = `Atividade Teste ${Date.now()}`;
+            const atividadeDesc = `Atividade teste ${Date.now()}`;
             await page.getByTestId('inp-nova-atividade').fill(atividadeDesc);
             await capturarTela(page, '04-subprocesso', '03-cadastro-atividades-preenchendo');
             await page.getByTestId('btn-adicionar-atividade').click();
@@ -581,7 +581,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
         });
 
         test('Captura estados de validação inline de atividades', async ({page}) => {
-            const descricao = `Proc Validação ${Date.now()}`;
+            const descricao = `Proc validação ${Date.now()}`;
             const UNIDADE_ALVO = 'SECAO_212';
 
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
@@ -614,18 +614,18 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await capturarTela(page, '04-subprocesso', '20-cadastro-vazio-com-label-obrigatorio', {fullPage: true});
 
             // Adicionar primeira atividade SEM conhecimento
-            const atividade1 = `Atividade Sem Conhecimento 1 ${Date.now()}`;
+            const atividade1 = `Atividade sem conhecimento 1 ${Date.now()}`;
             await adicionarAtividade(page, atividade1);
             await page.waitForTimeout(300);
             await capturarTela(page, '04-subprocesso', '21-atividade-sem-conhecimento', {fullPage: true});
 
             // Adicionar segunda atividade SEM conhecimento
-            const atividade2 = `Atividade Sem Conhecimento 2 ${Date.now()}`;
+            const atividade2 = `Atividade sem conhecimento 2 ${Date.now()}`;
             await adicionarAtividade(page, atividade2);
             await page.waitForTimeout(300);
 
             // Adicionar terceira atividade COM conhecimento (para contraste)
-            const atividade3 = `Atividade Com Conhecimento ${Date.now()}`;
+            const atividade3 = `Atividade com conhecimento ${Date.now()}`;
             await adicionarAtividade(page, atividade3);
             await adicionarConhecimento(page, atividade3, 'Java');
             await page.waitForTimeout(300);
@@ -679,7 +679,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
     test.describe('05 - Mapa de Competências', () => {
         test('Captura fluxo de mapa de competências', async ({page}) => {
-            const descricao = `Proc Mapa ${Date.now()}`;
+            const descricao = `Proc mapa ${Date.now()}`;
             const UNIDADE_ALVO = 'SECAO_121';
 
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
@@ -708,20 +708,20 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await acessarSubprocessoChefeDireto(page, descricao, 'SECAO_121');
             await navegarParaAtividades(page);
 
-            await adicionarAtividade(page, 'Desenvolvimento Web');
-            await adicionarConhecimento(page, 'Desenvolvimento Web', 'Vue.js');
-            await adicionarConhecimento(page, 'Desenvolvimento Web', 'TypeScript');
+            await adicionarAtividade(page, 'Desenvolvimento web');
+            await adicionarConhecimento(page, 'Desenvolvimento web', 'Vue.js');
+            await adicionarConhecimento(page, 'Desenvolvimento web', 'TypeScript');
 
-            await adicionarAtividade(page, 'Desenvolvimento Backend');
-            await adicionarConhecimento(page, 'Desenvolvimento Backend', 'Java');
-            await adicionarConhecimento(page, 'Desenvolvimento Backend', 'Spring Boot');
+            await adicionarAtividade(page, 'Desenvolvimento backend');
+            await adicionarConhecimento(page, 'Desenvolvimento backend', 'Java');
+            await adicionarConhecimento(page, 'Desenvolvimento backend', 'Spring Boot');
 
             // Disponibilizar (como chefe)
             await page.getByTestId('btn-cad-atividades-disponibilizar').click();
             await page.getByTestId('btn-confirmar-disponibilizacao').click();
             await page.waitForTimeout(500);
 
-            // 1. GESTOR COORD_12 - Primeiro Aceite
+            // 1. GESTOR COORD_12 - Primeiro aceite
             await login(page, USUARIOS.GESTOR_COORD_12.titulo, USUARIOS.GESTOR_COORD_12.senha);
 
             await acessarSubprocessoGestor(page, descricao, UNIDADE_ALVO);
@@ -732,7 +732,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await page.getByTestId('btn-aceite-cadastro-confirmar').click();
             await verificarPaginaPainel(page);
 
-            // 2. GESTOR SECRETARIA_1 - Segundo Aceite
+            // 2. GESTOR SECRETARIA_1 - Segundo aceite
             await loginComPerfil(page, USUARIOS.GESTOR_SECRETARIA_1.titulo, USUARIOS.GESTOR_SECRETARIA_1.senha, USUARIOS.GESTOR_SECRETARIA_1.perfil);
             await acessarSubprocessoGestor(page, descricao, UNIDADE_ALVO);
             await navegarParaAtividadesVisualizacao(page);
@@ -742,7 +742,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await page.getByTestId('btn-aceite-cadastro-confirmar').click();
             await verificarPaginaPainel(page);
 
-            // 3. ADMIN - Homologação Final
+            // 3. ADMIN - Homologação final
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
             // Navegar para o subprocesso (admin vê tabela de unidades)
@@ -768,8 +768,8 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await capturarTela(page, '05-mapa', '03-modal-criar-competencia-preenchida');
 
             const modal = page.getByTestId('mdl-criar-competencia');
-            await modal.locator('label').filter({hasText: 'Desenvolvimento Web'}).click();
-            await modal.locator('label').filter({hasText: 'Desenvolvimento Backend'}).click();
+            await modal.locator('label').filter({hasText: 'Desenvolvimento web'}).click();
+            await modal.locator('label').filter({hasText: 'Desenvolvimento backend'}).click();
             await capturarTela(page, '05-mapa', '04-modal-criar-competencia-atividades-selecionadas');
 
             await page.getByTestId('btn-criar-competencia-salvar').click();
@@ -808,7 +808,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await capturarTela(page, '06-navegacao', '02-menu-parametros');
             await page.goto('/painel');
 
-            // Seção Unidades (para ADMIN)
+            // Seção unidades (para ADMIN)
             await page.getByText('Unidades').first().click();
             await expect(page).toHaveURL(/\/unidades/);
             await capturarTela(page, '06-navegacao', '03-unidades', {fullPage: true});
@@ -891,7 +891,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             // Prepara cenário: criar processo com unidades subordinadas e disponibilizar cadastros
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
-            const descricao = `Processo Bloco ${Date.now()}`;
+            const descricao = `Processo bloco ${Date.now()}`;
             // Criar com múltiplas unidades para que GESTOR veja tela de "Unidades participantes"
             // COORD_22 tem SECAO_221 e é gerido por GESTOR_COORD_22
             await criarProcesso(page, {
@@ -915,8 +915,8 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             const processoId = await extrairProcessoId(page);
             if (processoId > 0) cleanup.registrar(processoId);
             await navegarParaAtividades(page);
-            await adicionarAtividade(page, 'Atividade Bloco 1');
-            await adicionarConhecimento(page, 'Atividade Bloco 1', 'Conhecimento 1');
+            await adicionarAtividade(page, 'Atividade bloco 1');
+            await adicionarConhecimento(page, 'Atividade bloco 1', 'Conhecimento 1');
             await page.getByTestId('btn-cad-atividades-disponibilizar').click();
             await expect(page.getByTestId('btn-confirmar-disponibilizacao')).toBeVisible();
             await page.getByTestId('btn-confirmar-disponibilizacao').click();
@@ -972,7 +972,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
         test('Captura modais de gestão de subprocesso', async ({page}) => {
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
-            const descricao = `Processo Gestão ${Date.now()}`;
+            const descricao = `Processo gestão ${Date.now()}`;
             await criarProcesso(page, {
                 descricao,
                 tipo: 'MAPEAMENTO',
@@ -1018,7 +1018,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
         test('Captura telas administrativas (Unidades, Histórico, Configurações e Relatórios)', async ({page}) => {
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
-            // 1. Unidades e Atribuição Temporária
+            // 1. Unidades e Atribuição temporária
             const linkUnidades = page.getByRole('link', {name: /Unidades/i});
             await expect(linkUnidades).toBeVisible();
             await linkUnidades.click();
@@ -1093,7 +1093,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await expect(painelAndamento.getByLabel(/Selecione o Processo/i)).toBeVisible();
             await capturarTela(page, '14-relatorios', '02-relatorio-andamento');
 
-            await expect(painelAndamento.getByRole('button', {name: /Gerar Relatório/i})).toBeVisible();
+            await expect(painelAndamento.getByRole('button', {name: /Gerar relatório/i})).toBeVisible();
             await capturarTela(page, '14-relatorios', '03-botao-gerar-relatorio');
 
             await page.getByRole('tab', {name: /^Mapas$/i}).click();

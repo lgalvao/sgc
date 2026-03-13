@@ -28,7 +28,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         // Criar processo mapeamento finalizado (gera mapa vigente)
         await criarProcessoFinalizadoFixture(request, {
             unidade: UNIDADE_ALVO,
-            descricao: `Base Map 10 ${timestamp}`
+            descricao: `Base map 10 ${timestamp}`
         });
 
         // Criar processo de revisão
@@ -44,8 +44,8 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
         await page.goto(`/processo/${processoCodigo}/${UNIDADE_ALVO}`);
         await navegarParaAtividades(page);
-        await adicionarAtividade(page, `Atividade Revisão Nova ${timestamp}`);
-        await adicionarConhecimento(page, `Atividade Revisão Nova ${timestamp}`, 'Conhecimento Revisão');
+        await adicionarAtividade(page, `Atividade revisão nova ${timestamp}`);
+        await adicionarConhecimento(page, `Atividade revisão nova ${timestamp}`, 'Conhecimento revisão');
         await page.getByTestId('btn-nav-voltar').click();
         await verificarPaginaSubprocesso(page, UNIDADE_ALVO);
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Revisão em andamento/i);
@@ -55,11 +55,11 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
         await page.goto(`/processo/${processoCodigo}/${UNIDADE_ALVO}/cadastro`);
 
-        const atividadeIncompleta = `Atividade Incompleta ${timestamp}`;
+        const atividadeIncompleta = `Atividade incompleta ${timestamp}`;
         await adicionarAtividade(page, atividadeIncompleta);
         await expect(page.getByTestId('btn-cad-atividades-disponibilizar')).toBeDisabled();
 
-        await adicionarConhecimento(page, atividadeIncompleta, 'Conhecimento Corretivo');
+        await adicionarConhecimento(page, atividadeIncompleta, 'Conhecimento corretivo');
         await limparNotificacoes(page);
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
         await expect(page.getByTestId('btn-confirmar-disponibilizacao')).toBeVisible();

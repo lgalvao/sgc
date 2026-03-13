@@ -6,7 +6,7 @@ import org.junit.jupiter.api.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@DisplayName("ConfigOpenApi - Cobertura Adicional")
+@DisplayName("ConfigOpenApi - Cobertura adicional")
 class ConfigOpenApiCoverageTest {
 
     @Test
@@ -33,8 +33,8 @@ class ConfigOpenApiCoverageTest {
 
         ConfigAplicacao config = mock(ConfigAplicacao.class);
         ConfigAplicacao.OpenApi openapi = new ConfigAplicacao.OpenApi();
-        openapi.setTitle("Meu Titulo");
-        openapi.setDescription("Minha Descricao");
+        openapi.setTitle("Meu titulo");
+        openapi.setDescription("Minha descricao");
         openapi.setVersion("v2");
 
         when(config.getOpenapi()).thenReturn(openapi);
@@ -43,8 +43,8 @@ class ConfigOpenApiCoverageTest {
 
         OpenAPI result = configOpenApi.customOpenAPI();
 
-        assertThat(result.getInfo().getTitle()).isEqualTo("Meu Titulo");
-        assertThat(result.getInfo().getDescription()).isEqualTo("Minha Descricao");
+        assertThat(result.getInfo().getTitle()).isEqualTo("Meu titulo");
+        assertThat(result.getInfo().getDescription()).isEqualTo("Minha descricao");
         assertThat(result.getInfo().getVersion()).isEqualTo("v2");
     }
 }

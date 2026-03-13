@@ -127,13 +127,13 @@ class MapaManutencaoServiceIntegrationTest extends BaseIntegrationTest {
             Atividade atividade = atividadeRepo.saveAndFlush(Atividade.builder().mapa(mapa).descricao("Antiga").build());
 
             AtualizarAtividadeRequest request = AtualizarAtividadeRequest.builder()
-                    .descricao("Nova Descrição")
+                    .descricao("Nova descrição")
                     .build();
 
             service.atualizarAtividade(atividade.getCodigo(), request);
 
             Atividade atualizada = service.atividadeCodigo(atividade.getCodigo());
-            assertThat(atualizada.getDescricao()).isEqualTo("Nova Descrição");
+            assertThat(atualizada.getDescricao()).isEqualTo("Nova descrição");
         }
 
         @Test
@@ -141,7 +141,7 @@ class MapaManutencaoServiceIntegrationTest extends BaseIntegrationTest {
         void deveExcluirAtividade() {
             Subprocesso sub = subprocessoRepo.findById(60000L).orElseThrow();
             Mapa mapa = mapaRepo.saveAndFlush(Mapa.builder().subprocesso(sub).build());
-            Atividade atividade = atividadeRepo.saveAndFlush(Atividade.builder().mapa(mapa).descricao("Para Excluir").build());
+            Atividade atividade = atividadeRepo.saveAndFlush(Atividade.builder().mapa(mapa).descricao("Para excluir").build());
 
             service.excluirAtividade(atividade.getCodigo());
 
@@ -194,19 +194,19 @@ class MapaManutencaoServiceIntegrationTest extends BaseIntegrationTest {
         void cicloVida() {
             Subprocesso sub = subprocessoRepo.findById(60000L).orElseThrow();
             Mapa mapa = mapaRepo.saveAndFlush(Mapa.builder().subprocesso(sub).build());
-            Atividade a1 = atividadeRepo.saveAndFlush(Atividade.builder().mapa(mapa).descricao("Atividade Teste").build());
+            Atividade a1 = atividadeRepo.saveAndFlush(Atividade.builder().mapa(mapa).descricao("Atividade teste").build());
 
-            service.criarCompetenciaComAtividades(mapa, "Comp Nova", List.of(a1.getCodigo()));
+            service.criarCompetenciaComAtividades(mapa, "Comp nova", List.of(a1.getCodigo()));
 
             List<Competencia> criadas = service.competenciasCodMapa(mapa.getCodigo());
             assertThat(criadas).hasSize(1);
             Competencia novaComp = criadas.getFirst();
-            assertThat(novaComp.getDescricao()).isEqualTo("Comp Nova");
+            assertThat(novaComp.getDescricao()).isEqualTo("Comp nova");
 
-            service.atualizarCompetencia(novaComp.getCodigo(), "Comp Atualizada", List.of(a1.getCodigo()));
+            service.atualizarCompetencia(novaComp.getCodigo(), "Comp atualizada", List.of(a1.getCodigo()));
 
             Competencia atualizada = service.competenciaCodigo(novaComp.getCodigo());
-            assertThat(atualizada.getDescricao()).isEqualTo("Comp Atualizada");
+            assertThat(atualizada.getDescricao()).isEqualTo("Comp atualizada");
 
             service.removerCompetencia(novaComp.getCodigo());
             Long codigo = novaComp.getCodigo();
@@ -235,7 +235,7 @@ class MapaManutencaoServiceIntegrationTest extends BaseIntegrationTest {
             assertThat(c1).isNotNull();
             assertThat(c1.getDescricao()).isEqualTo("Conhecimento 1");
 
-            AtualizarConhecimentoRequest req2 = AtualizarConhecimentoRequest.builder().descricao("Conhec Atualizado").build();
+            AtualizarConhecimentoRequest req2 = AtualizarConhecimentoRequest.builder().descricao("Conhec atualizado").build();
             service.atualizarConhecimento(atividade.getCodigo(), c1.getCodigo(), req2);
 
             entityManager.flush();
@@ -243,7 +243,7 @@ class MapaManutencaoServiceIntegrationTest extends BaseIntegrationTest {
 
             List<Conhecimento> conhecs = service.conhecimentosCodigoAtividade(atividade.getCodigo());
             assertThat(conhecs).hasSize(1);
-            assertThat(conhecs.getFirst().getDescricao()).isEqualTo("Conhec Atualizado");
+            assertThat(conhecs.getFirst().getDescricao()).isEqualTo("Conhec atualizado");
 
             service.excluirConhecimento(atividade.getCodigo(), c1.getCodigo());
 

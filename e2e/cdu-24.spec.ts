@@ -12,12 +12,12 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
     const UNIDADE_1 = 'SECAO_221';
     const timestamp = Date.now();
     const descProcesso = `Mapeamento CDU-24 ${timestamp}`;
-    const atividade1 = 'Atividade Fixture 1';
-    const atividade2 = 'Atividade Fixture 2';
-    const atividade3 = 'Atividade Fixture 3';
-    const competencia1 = `Competência Mapa ${timestamp}`;
+    const atividade1 = 'Atividade fixture 1';
+    const atividade2 = 'Atividade fixture 2';
+    const atividade3 = 'Atividade fixture 3';
+    const competencia1 = `Competência mapa ${timestamp}`;
 
-    test('Setup Data', async ({request}) => {
+    test('Setup data', async ({request}) => {
         await criarProcessoCadastroHomologadoFixture(request, {
             descricao: descProcesso,
             unidade: UNIDADE_1
@@ -43,14 +43,14 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
         const modal = page.locator('#modal-acao-bloco');
         await expect(modal.getByText(/Disponibilização de mapa em bloco/i)).toBeVisible();
         await expect(modal.getByText(/Selecione abaixo as unidades cujos mapas deverão ser disponibilizados/i)).toBeVisible();
-        await expect(modal.getByLabel(/Data Limite/i)).toBeVisible();
+        await expect(modal.getByLabel(/Data limite/i)).toBeVisible();
 
         const data = new Date();
         data.setDate(data.getDate() + 10);
         const yyyy = data.getFullYear();
         const mm = String(data.getMonth() + 1).padStart(2, '0');
         const dd = String(data.getDate()).padStart(2, '0');
-        await modal.getByLabel(/Data Limite/i).fill(`${yyyy}-${mm}-${dd}`);
+        await modal.getByLabel(/Data limite/i).fill(`${yyyy}-${mm}-${dd}`);
 
         await modal.getByRole('button', {name: /^Disponibilizar$/i}).click();
         await expect(page.getByText(/Mapas de competências disponibilizados em bloco/i).first()).toBeVisible();

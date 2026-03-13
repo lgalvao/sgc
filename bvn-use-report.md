@@ -2,11 +2,11 @@
 
 **Data:** Março de 2026  
 **Versão BVN no projeto:** `^0.43.9`  
-**Arquivos Vue analisados:** 48 componentes e views  
+**Arquivos vue analisados:** 48 componentes e views  
 
 ---
 
-## Sumário Executivo
+## Sumário executivo
 
 O frontend do SGC utiliza o BootstrapVueNext (BVN) como framework de UI, mas de forma inconsistente: enquanto alguns arquivos
 fazem uso exemplar dos componentes BVN, outros contornam completamente o framework — em especial `ModalAcaoBloco.vue`, que usa a API
@@ -129,7 +129,7 @@ function fechar() { modalInstance.value?.hide(); }
   </BAlert>
 
   <div v-if="mostrarDataLimite" class="mb-3">
-    <BFormGroup label="Data Limite" label-for="dataLimiteBloco" label-class="required">
+    <BFormGroup label="Data limite" label-for="dataLimiteBloco" label-class="required">
       <InputData id="dataLimiteBloco" v-model="dataLimite" ... />
     </BFormGroup>
   </div>
@@ -389,7 +389,7 @@ O `BBadge` existe no BVN mas não é usado em nenhum lugar do projeto. Há pelo 
 Este arquivo usa extensivamente `<ul class="list-group">` e `<li class="list-group-item">` em quatro seções distintas.
 O BVN oferece `BListGroup` e `BListGroupItem` como componentes dedicados.
 
-**Prova — seção "Atividades Inseridas" (linhas 30–53):**
+**Prova — seção "Atividades inseridas" (linhas 30–53):**
 
 ```html
 <!-- ATUAL -->
@@ -461,7 +461,7 @@ O BVN oferece `BListGroup` e `BListGroupItem` como componentes dedicados.
     <thead>
       <tr>
         <th>Nome</th>
-        <th>Título Eleitoral</th>
+        <th>Título eleitoral</th>
         <th>Matrícula</th>
         <th>Unidade</th>
         <th class="text-end">Ações</th>
@@ -513,7 +513,7 @@ O BVN oferece `BListGroup` e `BListGroupItem` como componentes dedicados.
 // Script - adicionar definição dos campos
 const campos = [
   { key: 'nome', label: 'Nome' },
-  { key: 'tituloEleitoral', label: 'Título Eleitoral' },
+  { key: 'tituloEleitoral', label: 'Título eleitoral' },
   { key: 'matricula', label: 'Matrícula' },
   { key: 'unidadeSigla', label: 'Unidade' },
   { key: 'acoes', label: 'Ações', thClass: 'text-end' },
@@ -870,7 +870,7 @@ mais elegante quando o campo já usa `BFormGroup`.
 
 ---
 
-## Passos de Implementação Recomendados
+## Passos de Implementação recomendados
 
 ### Fase 1 — Remover dependência do Bootstrap JS (Sprint curto, 1–2 dias)
 

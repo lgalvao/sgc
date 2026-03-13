@@ -117,7 +117,7 @@ describe('ProcessoCadastroView.vue Coverage', () => {
                     {field: null, message: 'Erro genérico de regra de negócio'}
                 ]
             };
-            throw new Error('Mixed Error');
+            throw new Error('Mixed error');
         });
 
         await wrapper.find('[data-testid="inp-processo-descricao"]').setValue('Teste');
@@ -137,7 +137,7 @@ describe('ProcessoCadastroView.vue Coverage', () => {
     it('handles error creating process during initiation flow (without existing process)', async () => {
         const {wrapper, processosStore} = createWrapper();
 
-        await wrapper.find('[data-testid="inp-processo-descricao"]').setValue('Teste Inicio');
+        await wrapper.find('[data-testid="inp-processo-descricao"]').setValue('Teste inicio');
         wrapper.vm.tipo = 'MAPEAMENTO';
         wrapper.vm.unidadesSelecionadas = [1];
         await nextTick();
@@ -146,7 +146,7 @@ describe('ProcessoCadastroView.vue Coverage', () => {
         expect(wrapper.vm.mostrarModalConfirmacao).toBe(true);
 
         // Configure error on create
-        processosStore.criarProcesso.mockRejectedValue(new Error('Create Error'));
+        processosStore.criarProcesso.mockRejectedValue(new Error('Create error'));
         processosStore.lastError = {message: 'Failed to create'};
 
         // Confirm initiation
@@ -164,7 +164,7 @@ describe('ProcessoCadastroView.vue Coverage', () => {
     it('handles error starting process during initiation flow', async () => {
         const {wrapper, processosStore} = createWrapper();
 
-        await wrapper.find('[data-testid="inp-processo-descricao"]').setValue('Teste Inicio');
+        await wrapper.find('[data-testid="inp-processo-descricao"]').setValue('Teste inicio');
         wrapper.vm.tipo = 'MAPEAMENTO';
         wrapper.vm.unidadesSelecionadas = [1];
         await nextTick();
@@ -173,7 +173,7 @@ describe('ProcessoCadastroView.vue Coverage', () => {
 
         // Configure success on create, failure on start
         processosStore.criarProcesso.mockResolvedValue({codigo: 777});
-        processosStore.iniciarProcesso.mockRejectedValue(new Error('Start Error'));
+        processosStore.iniciarProcesso.mockRejectedValue(new Error('Start error'));
         processosStore.lastError = {message: 'Failed to start'};
 
         const modal = wrapper.findComponent({name: 'ModalConfirmacao'});
@@ -191,7 +191,7 @@ describe('ProcessoCadastroView.vue Coverage', () => {
         const {wrapper, processosStore} = createWrapper();
 
         // Setup process being edited
-        (wrapper.vm).processoEditando = {codigo: 123, descricao: 'Processo Teste'};
+        (wrapper.vm).processoEditando = {codigo: 123, descricao: 'Processo teste'};
         await nextTick();
 
         // Open modal
@@ -212,10 +212,10 @@ describe('ProcessoCadastroView.vue Coverage', () => {
     it('handles error during removal', async () => {
         const {wrapper, processosStore} = createWrapper();
 
-        (wrapper.vm).processoEditando = {codigo: 123, descricao: 'Processo Teste'};
+        (wrapper.vm).processoEditando = {codigo: 123, descricao: 'Processo teste'};
         await nextTick();
 
-        processosStore.removerProcesso.mockRejectedValue(new Error('Delete Error'));
+        processosStore.removerProcesso.mockRejectedValue(new Error('Delete error'));
         processosStore.lastError = {message: 'Failed to delete'};
 
         await (wrapper.vm).confirmarRemocao();
@@ -257,7 +257,7 @@ describe('ProcessoCadastroView.vue Coverage', () => {
         mockRoute.query = {codProcesso: '123'};
         const mockProcesso = {
             codigo: 123,
-            descricao: 'Processo Existente',
+            descricao: 'Processo existente',
             tipo: 'MAPEAMENTO',
             dataLimite: '2023-12-31T00:00:00',
             situacao: 'CRIADO',
@@ -272,7 +272,7 @@ describe('ProcessoCadastroView.vue Coverage', () => {
 
         await flushPromises();
 
-        expect((wrapper.vm).descricao).toBe('Processo Existente');
+        expect((wrapper.vm).descricao).toBe('Processo existente');
         expect((wrapper.vm).tipo).toBe('MAPEAMENTO');
         expect((wrapper.vm).dataLimite).toBe('2023-12-31');
         expect((wrapper.vm).unidadesSelecionadas).toEqual([1, 2]);

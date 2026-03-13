@@ -1,6 +1,6 @@
 # Módulo de Subprocesso
 
-## Visão Geral
+## Visão geral
 
 Este pacote é o **motor do workflow** do SGC. Ele gerencia a entidade `Subprocesso`, que representa a tarefa de uma
 única unidade organizacional dentro de um `Processo` maior. Ele funciona como uma **máquina de estados**, controlando o
@@ -26,10 +26,10 @@ graph TD
         ControleValidacao(SubprocessoValidacaoController)
     end
 
-    subgraph "Módulo Subprocesso"
+    subgraph "Módulo subprocesso"
         Facade(SubprocessoService - Fachada CRUD)
 
-        subgraph "Serviços Especializados"
+        subgraph "Serviços especializados"
             CadastroWorkflow(SubprocessoCadastroWorkflowService)
             MapaWorkflow(SubprocessoMapaWorkflowService)
             Consulta(SubprocessoConsultaService)
@@ -49,7 +49,7 @@ graph TD
     CadastroWorkflow & MapaWorkflow & Consulta & DtoBuilder & Mapa & Notificacao -- Acessam --> Repos
 ```
 
-## Componentes Principais
+## Componentes principais
 
 ### Controladores REST
 
@@ -76,7 +76,7 @@ graph TD
         - `PUT .../competencias/{id}`: Atualiza competência.
         - `DELETE .../competencias/{id}`: Remove competência.
 
-### Serviços Especializados
+### Serviços especializados
 
 - **`SubprocessoCadastroWorkflowService`**: Gerencia a fase de cadastro de atividades e conhecimentos, incluindo
   disponibilização, devolução, aceite e homologação do cadastro.
@@ -115,7 +115,7 @@ stateDiagram-v2
 Para cada transição de estado, uma nova entidade `Movimentacao` é persistida, garantindo um histórico completo de quem
 fez o quê e quando.
 
-## Como Testar
+## Como testar
 
 Para executar apenas os testes deste módulo (a partir do diretório `backend`):
 

@@ -5,7 +5,7 @@ const processoRoutes: RouteRecordRaw[] = [
         path: "/processo/cadastro",
         name: "CadProcesso",
         component: () => import("@/views/ProcessoCadastroView.vue"),
-        meta: {title: "Novo Processo"},
+        meta: {title: "Novo processo"},
     },
     {
         path: "/processo/:codProcesso",

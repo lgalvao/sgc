@@ -34,7 +34,7 @@ export const Default: Story = {
         },
         template: `
       <div>
-        <button class="btn btn-primary" @click="show = true">Alterar Data Limite</button>
+        <button class="btn btn-primary" @click="show = true">Alterar data limite</button>
         <SubprocessoModal v-bind="args" :mostrarModal="show" @fecharModal="show = false" />
       </div>
     `,

@@ -7,7 +7,7 @@ import java.time.*;
 
 import static org.assertj.core.api.Assertions.*;
 
-@DisplayName("Testes da Entidade Movimentacao")
+@DisplayName("Testes da Entidade movimentacao")
 class MovimentacaoTest {
 
     @Test

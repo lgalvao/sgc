@@ -23,7 +23,7 @@ const mockColumns = [{key: 'nome'}, {key: 'valor'}];
 
 export const Raiz: Story = {
     args: {
-        item: {codigo: 1, nome: 'Item Raiz', valor: '100', children: [{codigo: 1.1}], expanded: false},
+        item: {codigo: 1, nome: 'Item raiz', valor: '100', children: [{codigo: 1.1}], expanded: false},
         level: 0,
         columns: mockColumns,
     },
@@ -31,7 +31,7 @@ export const Raiz: Story = {
 
 export const Nivel1: Story = {
     args: {
-        item: {codigo: 2, nome: 'Item Nível 1', valor: '50'},
+        item: {codigo: 2, nome: 'Item nível 1', valor: '50'},
         level: 1,
         columns: mockColumns,
     },
@@ -39,7 +39,7 @@ export const Nivel1: Story = {
 
 export const Nivel2: Story = {
     args: {
-        item: {codigo: 3, nome: 'Item Nível 2', valor: '25'},
+        item: {codigo: 3, nome: 'Item nível 2', valor: '25'},
         level: 2,
         columns: mockColumns,
     },
@@ -47,7 +47,7 @@ export const Nivel2: Story = {
 
 export const Expandido: Story = {
     args: {
-        item: {codigo: 4, nome: 'Item Expandido', valor: '200', children: [{codigo: 4.1}], expanded: true},
+        item: {codigo: 4, nome: 'Item expandido', valor: '200', children: [{codigo: 4.1}], expanded: true},
         level: 0,
         columns: mockColumns,
     },

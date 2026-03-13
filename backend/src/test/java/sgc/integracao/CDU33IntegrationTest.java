@@ -55,18 +55,18 @@ class CDU33IntegrationTest extends BaseIntegrationTest {
             unidadeRepo.save(admin);
         }
 
-        // Obter Unidade
+        // Obter unidade
         Unidade unidade = unidadeRepo.findById(1L).orElseGet(() -> {
             Unidade u = new Unidade();
             u.setCodigo(1L);
             u.setSigla("TESTE");
-            u.setNome("Unidade Teste");
+            u.setNome("Unidade teste");
             u.setSituacao(ATIVA);
             u.setTipo(OPERACIONAL);
             return unidadeRepo.save(u);
         });
 
-        // Criar Processo de REVISAO
+        // Criar processo de REVISAO
         Processo processo = ProcessoFixture.processoPadrao();
         processo.setCodigo(null);
         processo.setTipo(TipoProcesso.REVISAO);
@@ -154,7 +154,7 @@ class CDU33IntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("Não deve permitir reabrir revisão quando em situação insuficiente (ex: Revisão Homologada precoce)")
+    @DisplayName("Não deve permitir reabrir revisão quando em situação insuficiente (ex: Revisão homologada precoce)")
     @WithMockAdmin
     void reabrirRevisaoCadastro_SituacaoInsuficiente_Erro() throws Exception {
         // Forçar situação que ainda não atingiu REVISAO_MAPA_HOMOLOGADO

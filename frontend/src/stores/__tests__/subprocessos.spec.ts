@@ -70,7 +70,7 @@ vi.mock('@/axios-setup', () => ({
     apiClient: mockApiClient
 }));
 
-describe('Subprocessos Store', () => {
+describe('Subprocessos store', () => {
     let store: ReturnType<typeof useSubprocessosStore>;
 
     const mockProcessosStore = {

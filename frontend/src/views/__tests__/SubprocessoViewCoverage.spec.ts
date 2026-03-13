@@ -123,7 +123,7 @@ describe('SubprocessoView Coverage', () => {
             initialState: {
                 subprocessos: {
                     subprocessoDetalhe: {
-                        unidade: {codigo: 1, sigla: 'TEST', nome: 'Unidade Teste'}
+                        unidade: {codigo: 1, sigla: 'TEST', nome: 'Unidade teste'}
                     }
                 }
             }
@@ -166,7 +166,7 @@ describe('SubprocessoView Coverage', () => {
             initialState: {
                 subprocessos: {
                     subprocessoDetalhe: {
-                        unidade: {codigo: 1, sigla: 'TEST', nome: 'Unidade Teste'},
+                        unidade: {codigo: 1, sigla: 'TEST', nome: 'Unidade teste'},
                         movimentacoes: [],
                     }
                 }

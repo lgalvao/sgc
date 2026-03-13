@@ -22,7 +22,7 @@ class UsuarioAcessoAdTest {
         UsuarioAcessoAd.LotacaoAd lot = new UsuarioAcessoAd.LotacaoAd();
         lot.setCodigo(100);
         lot.setSigla("SIGLA");
-        lot.setNome("Nome Lotacao");
+        lot.setNome("Nome lotacao");
 
         ad.setLotacao(lot);
 
@@ -36,6 +36,6 @@ class UsuarioAcessoAdTest {
 
         assertThat(lot.getCodigo()).isEqualTo(100);
         assertThat(lot.getSigla()).isEqualTo("SIGLA");
-        assertThat(lot.getNome()).isEqualTo("Nome Lotacao");
+        assertThat(lot.getNome()).isEqualTo("Nome lotacao");
     }
 }

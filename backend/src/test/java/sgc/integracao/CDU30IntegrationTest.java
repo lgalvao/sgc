@@ -17,7 +17,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @Tag("integration")
 @Transactional
-@DisplayName("CDU-30: Manter Administradores")
+@DisplayName("CDU-30: Manter administradores")
 class CDU30IntegrationTest extends BaseIntegrationTest {
     @Autowired
     private AdministradorRepo administradorRepo;
@@ -39,7 +39,7 @@ class CDU30IntegrationTest extends BaseIntegrationTest {
         // Criar usuário 1 (que será administrador inicial)
         usuario1 = Usuario.builder()
                 .tituloEleitoral("123456789012")
-                .nome("Admin Inicial")
+                .nome("Admin inicial")
                 .email("admin@test.com")
                 .ramal("1234")
                 .unidadeLotacao(unidade)
@@ -49,7 +49,7 @@ class CDU30IntegrationTest extends BaseIntegrationTest {
         // Criar usuário 2 (que será adicionado como administrador)
         usuario2 = Usuario.builder()
                 .tituloEleitoral("234567890123")
-                .nome("Novo Admin")
+                .nome("Novo admin")
                 .email("novo@test.com")
                 .ramal("5678")
                 .unidadeLotacao(unidade)

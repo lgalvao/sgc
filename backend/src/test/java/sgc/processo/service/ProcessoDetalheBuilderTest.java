@@ -65,7 +65,7 @@ class ProcessoDetalheBuilderTest {
         Usuario usuario = criarUsuarioMock();
         Processo processo = new Processo();
         processo.setCodigo(1L);
-        processo.setDescricao("Processo Teste");
+        processo.setDescricao("Processo teste");
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
         processo.setTipo(TipoProcesso.MAPEAMENTO);
         processo.setDataCriacao(LocalDateTime.now());
@@ -89,7 +89,7 @@ class ProcessoDetalheBuilderTest {
 
         assertThat(dto).isNotNull();
         assertThat(dto.getCodigo()).isEqualTo(1L);
-        assertThat(dto.getDescricao()).isEqualTo("Processo Teste");
+        assertThat(dto.getDescricao()).isEqualTo("Processo teste");
         assertThat(dto.getUnidades()).hasSize(1);
 
         ProcessoDetalheDto.UnidadeParticipanteDto uDto = dto.getUnidades().getFirst();

@@ -9,7 +9,7 @@ import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentT
 const mockProcessos: ProcessoResumo[] = [
     {
         codigo: 1,
-        descricao: "Processo Alpha",
+        descricao: "Processo alpha",
         tipo: TipoProcesso.MAPEAMENTO,
         unidadeCodigo: 1,
         unidadeNome: "UNID1, UNID2",
@@ -21,7 +21,7 @@ const mockProcessos: ProcessoResumo[] = [
     },
     {
         codigo: 2,
-        descricao: "Processo Beta",
+        descricao: "Processo beta",
         tipo: TipoProcesso.REVISAO,
         unidadeCodigo: 3,
         unidadeNome: "UNID3",
@@ -75,13 +75,13 @@ describe("TabelaProcessos.vue", () => {
         expect(rows.length).toBe(mockProcessos.length);
 
         const cells = rows[0].findAll("td");
-        expect(cells[0].text()).toBe("Processo Alpha");
+        expect(cells[0].text()).toBe("Processo alpha");
         expect(cells[1].text()).toBe("Mapeamento");
         expect(cells[2].text()).toBe("UNID1, UNID2");
         expect(cells[3].text()).toBe("Em andamento");
 
         const cells2 = rows[1].findAll("td");
-        expect(cells2[0].text()).toBe("Processo Beta");
+        expect(cells2[0].text()).toBe("Processo beta");
         expect(cells2[1].text()).toBe("Revisão");
         expect(cells2[2].text()).toBe("UNID3");
         expect(cells2[3].text()).toBe("Finalizado");
@@ -272,7 +272,7 @@ describe("TabelaProcessos.vue", () => {
         expect(context.wrapper.emitted("ctaVazio")).toBeTruthy();
     });
 
-    describe("Modo Compacto", () => {
+    describe("Modo compacto", () => {
         it("deve exibir o rótulo reduzido 'Unidades' quando compacto é true", async () => {
             context.wrapper = mount(TabelaProcessos, {
                 ...getCommonMountOptions(),

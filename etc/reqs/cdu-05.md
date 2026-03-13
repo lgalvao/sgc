@@ -9,7 +9,7 @@ Pré-condições:
 
 Fluxo principal:
 
-1. No Painel, o usuário clica em um processo de revisão que esteja na situação 'Criado'.
+1. No painel, o usuário clica em um processo de revisão que esteja na situação 'Criado'.
 
 2. O sistema muda para a tela `Cadastro de processo`. Os campos aparecem preenchidos com as informações do processo
    selecionado.

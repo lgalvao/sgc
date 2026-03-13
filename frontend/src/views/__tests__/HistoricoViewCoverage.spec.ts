@@ -30,7 +30,7 @@ describe("HistoricoView Coverage", () => {
                                 processosFinalizados: [
                                     {
                                         codigo: 1,
-                                        descricao: "Processo Teste",
+                                        descricao: "Processo teste",
                                         tipo: TipoProcesso.MAPEAMENTO,
                                         tipoLabel: "Mapeamento",
                                         dataFinalizacaoFormatada: "01/01/2023",
@@ -51,7 +51,7 @@ describe("HistoricoView Coverage", () => {
 
         const row = wrapper.find("tbody tr.row-processo-1");
         expect(row.exists()).toBe(true);
-        expect(row.text()).toContain("Processo Teste");
+        expect(row.text()).toContain("Processo teste");
 
         // Check accessibility attributes (expecting failure)
         expect(row.attributes("tabindex")).toBe("0");

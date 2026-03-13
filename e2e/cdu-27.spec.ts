@@ -23,7 +23,7 @@ test.describe.serial('CDU-27 - Alterar data limite de subprocesso', () => {
     const timestamp = Date.now();
     const descProcesso = `Mapeamento CDU-27 ${timestamp}`;
 
-    test('Setup Data', async ({request}) => {
+    test('Setup data', async ({request}) => {
         await criarProcessoFixture(request, {
             descricao: descProcesso,
             unidade: UNIDADE_1,

@@ -1,8 +1,8 @@
-# 🧪 Test Utilities - SGC Backend
+# 🧪 Test utilities - SGC Backend
 
 Este pacote contém utilitários para facilitar a criação de testes, reduzindo código duplicado e mocks desnecessários.
 
-## 📋 Builders Disponíveis
+## 📋 Builders disponíveis
 
 ### UnidadeTestBuilder
 
@@ -30,7 +30,7 @@ Unidade sec = UnidadeTestBuilder.secretaria().build();
 Unidade unidadeCustom = UnidadeTestBuilder.umaDe()
     .comCodigo("CUSTOM_01")
     .comSigla("CUSTOM_01")
-    .comNome("Unidade Customizada")
+    .comNome("Unidade customizada")
     .comTipo(TipoUnidade.ASSESSORIA)
     .comSuperior("SECRETARIA_2")
     .build();
@@ -63,7 +63,7 @@ Usuario servidor = UsuarioTestBuilder.servidor().build();
 ```java
 Usuario usuarioCustom = UsuarioTestBuilder.umDe()
     .comTitulo("123456")
-    .comNome("João Silva")
+    .comNome("João silva")
     .comUnidade("ASSESSORIA_22")
     .comPerfil(Perfil.GESTOR)
     .comPerfil(Perfil.CHEFE_UNIDADE) // Múltiplos perfis
@@ -79,7 +79,7 @@ Usuario multiPerfil = UsuarioTestBuilder.umDe()
 
 ## 🎯 Benefícios
 
-### ❌ ANTES (Com Mocks)
+### ❌ ANTES (Com mocks)
 
 ```java
 @Test
@@ -93,7 +93,7 @@ void deveValidarHierarquia() {
     
     Usuario usuario = mock(Usuario.class);
     when(usuario.getTitulo()).thenReturn("191919");
-    when(usuario.getNome()).thenReturn("Admin Teste");
+    when(usuario.getNome()).thenReturn("Admin teste");
     when(usuario.getCodigoUnidade()).thenReturn("SEDOC");
     Set<Perfil> perfis = new HashSet<>();
     perfis.add(Perfil.ADMIN);
@@ -112,7 +112,7 @@ void deveValidarHierarquia() {
 - Frágil (se adicionar campo em Usuario/Unidade, quebra)
 - Difícil de ler e manter
 
-### ✅ DEPOIS (Com Builders)
+### ✅ DEPOIS (Com builders)
 
 ```java
 @Test
@@ -136,26 +136,26 @@ void deveValidarHierarquia() {
 
 ---
 
-## 📊 Quando Usar
+## 📊 Quando usar
 
-### ✅ USE Builders Quando:
+### ✅ USE Builders quando:
 
 1. **Teste de Lógica de Negócio**: Validações, cálculos, regras
-2. **Objetos Simples**: DTOs, Entities, Value Objects
-3. **Dados Imutáveis**: Records, configurações
-4. **Setup Repetitivo**: Mesmo objeto usado em múltiplos testes
+2. **Objetos simples**: DTOs, Entities, Value objects
+3. **Dados imutáveis**: Records, configurações
+4. **Setup repetitivo**: Mesmo objeto usado em múltiplos testes
 
-### ⚠️ USE Mocks Quando:
+### ⚠️ USE Mocks quando:
 
-1. **Dependências Externas**: Repositórios, APIs REST, bancos de dados
-2. **Comportamento Complexo**: Workflows, services com múltiplas dependências
+1. **Dependências externas**: Repositórios, APIs REST, bancos de dados
+2. **Comportamento complexo**: Workflows, services com múltiplas dependências
 3. **Verificação de Interações**: Precisa verificar se método foi chamado
 
 ---
 
 ## 🔄 Guia de Migração
 
-### Padrão 1: Mock de Value Objects → Builder
+### Padrão 1: Mock de Value objects → Builder
 
 **❌ ANTES:**
 
@@ -177,7 +177,7 @@ Usuario usuario = UsuarioTestBuilder.admin().build();
 
 ---
 
-### Padrão 2: Setup Complexo → Builders Encadeados
+### Padrão 2: Setup complexo → Builders encadeados
 
 **❌ ANTES:**
 
@@ -209,15 +209,15 @@ Usuario usuario = UsuarioTestBuilder.admin().build();
 
 ## 📝 Checklist de Migração
 
-### Por Teste
+### Por teste
 
-- [ ] Identificar mocks de Value Objects (Usuario, Unidade)
+- [ ] Identificar mocks de Value objects (Usuario, Unidade)
 - [ ] Substituir por builder apropriado
 - [ ] Remover imports de Mockito não utilizados
 - [ ] Verificar se teste ainda passa
 - [ ] Remover setup methods se ficaram vazios
 
-### Por Arquivo de Teste
+### Por arquivo de Teste
 
 1. Buscar padrões `mock(Usuario.class)` e `mock(Unidade.class)`
 2. Substituir por `UsuarioTestBuilder` e `UnidadeTestBuilder`
@@ -245,7 +245,7 @@ Migrar nesta ordem:
 
 ## 📚 Referências
 
-- **Padrão Builder**: [Effective Java - Item 2](https://www.oreilly.com/library/view/effective-java/9780134686097/)
-- **Test Data Builders**: [Growing Object-Oriented Software](http://www.growing-object-oriented-software.com/)
+- **Padrão builder**: [Effective java - Item 2](https://www.oreilly.com/library/view/effective-java/9780134686097/)
+- **Test data builders**: [Growing object-Oriented software](http://www.growing-object-oriented-software.com/)
 - **Por que evitar over-mocking
-  **: [Don't Mock What You Don't Own](https://github.com/testdouble/contributing-tests/wiki/Don't-mock-what-you-don't-own)
+  **: [Don't Mock what you don't Own](https://github.com/testdouble/contributing-tests/wiki/Don't-mock-what-you-don't-own)

@@ -11,7 +11,7 @@ Atores: GESTOR e ADMIN
 
 ## Fluxo principal
 
-1. No Painel, o usuário clica no processo de revisão.
+1. No painel, o usuário clica no processo de revisão.
 
 2. O sistema exibe a tela `Detalhes do processo`.
 

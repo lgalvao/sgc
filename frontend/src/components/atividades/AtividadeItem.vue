@@ -115,7 +115,7 @@
                 aria-label="Adicionar conhecimento"
                 data-testid="btn-adicionar-conhecimento"
                 size="sm"
-                title="Adicionar Conhecimento"
+                title="Adicionar conhecimento"
                 type="submit"
                 variant="outline-secondary"
             >

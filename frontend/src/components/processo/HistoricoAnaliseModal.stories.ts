@@ -17,7 +17,7 @@ const mockHistorico = [
         unidadeSigla: 'PRES',
         unidadeNome: 'Presidência',
         acao: 'Aceite',
-        analistaUsuarioTitulo: 'Maria Administradora',
+        analistaUsuarioTitulo: 'Maria administradora',
         observacoes: 'Cadastro revisado e aceito.',
         motivo: '',
         tipo: 'CADASTRO'
@@ -27,7 +27,7 @@ const mockHistorico = [
         unidadeSigla: 'DITEC',
         unidadeNome: 'Diretoria de Tecnologia',
         acao: 'Envio',
-        analistaUsuarioTitulo: 'João Gestor',
+        analistaUsuarioTitulo: 'João gestor',
         observacoes: 'Enviado para análise inicial.',
         motivo: '',
         tipo: 'CADASTRO'
@@ -48,7 +48,7 @@ export const Default: Story = {
         },
         template: `
       <div>
-        <button class="btn btn-primary" @click="show = true">Ver Histórico de Análise</button>
+        <button class="btn btn-primary" @click="show = true">Ver histórico de Análise</button>
         <HistoricoAnaliseModal v-bind="args" :mostrar="show" @fechar="show = false" />
       </div>
     `,

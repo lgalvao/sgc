@@ -9,7 +9,7 @@ Ator: CHEFE
 
 ## Fluxo principal
 
-1. No Painel, o usuário escolhe um processo de mapeamento na situação 'Em andamento'.
+1. No painel, o usuário escolhe um processo de mapeamento na situação 'Em andamento'.
 
 2. O sistema mostra tela `Detalhes do subprocesso` da unidade.
 

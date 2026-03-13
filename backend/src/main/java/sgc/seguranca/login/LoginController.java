@@ -133,7 +133,7 @@ public class LoginController {
             ip = ip.split(",")[0].trim();
         }
 
-        // Sanitização contra Log Injection (CWE-117)
+        // Sanitização contra Log injection (CWE-117)
         if (ip != null) {
             return ip.replaceAll("[\\n\\r]", "_");
         }

@@ -11,7 +11,7 @@ Ator: Usuário (todos os perfis)
 
 ## Fluxo principal
 
-1. No Painel, o usuário clica no processo de mapeamento ou revisão na situação `Em andamento` ou `Finalizado`.
+1. No painel, o usuário clica no processo de mapeamento ou revisão na situação `Em andamento` ou `Finalizado`.
 
 2. Se usuário estiver logado com perfil ADMIN ou GESTOR:
 

@@ -18,7 +18,7 @@
       </BButton>
       <span v-else class="expansor-placeholder"></span>
 
-      <!-- Checkbox com label (Modo Seleção) -->
+      <!-- Checkbox com label (Modo seleção) -->
       <BFormCheckbox
           v-if="modoSelecao"
           :id="`chk-${unidade.sigla}`"
@@ -39,7 +39,7 @@
         </span>
       </BFormCheckbox>
 
-      <!-- Link para Unidade (Modo Navegação) -->
+      <!-- Link para Unidade (Modo navegação) -->
       <router-link
           v-else
           :data-testid="`link-arvore-unidade-${unidade.sigla}`"

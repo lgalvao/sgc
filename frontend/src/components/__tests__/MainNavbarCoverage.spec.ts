@@ -30,7 +30,7 @@ describe("MainNavbar.vue Coverage", () => {
     // Setup default mock for usePerfil
     vi.mocked(usePerfil).mockReturnValue({
         perfilSelecionado: ref("GESTOR"),
-        unidadeSelecionada: ref("Unidade Teste"),
+        unidadeSelecionada: ref("Unidade teste"),
         usuarioNome: ref("User"),
         podeAcessarTodasUnidades: ref(false)
     } as any);

@@ -37,7 +37,7 @@ export const Default: Story = {
 
 export const Carregando: Story = {
     args: {
-        modelValue: 'Nova Atividade',
+        modelValue: 'Nova atividade',
         loading: true,
     },
 };

@@ -47,7 +47,7 @@ class CDU04IntegrationTest extends BaseIntegrationTest {
         unidadeLivre = UnidadeFixture.unidadePadrao();
         unidadeLivre.setCodigo(null);
         unidadeLivre.setSigla("U_LIVRE_MAPP");
-        unidadeLivre.setNome("Unidade Livre Mapeamento");
+        unidadeLivre.setNome("Unidade livre mapeamento");
         unidadeLivre = unidadeRepo.save(unidadeLivre);
 
         // Cria titular para a unidade (para garantir envio de notificação)
@@ -78,7 +78,7 @@ class CDU04IntegrationTest extends BaseIntegrationTest {
     void deveIniciarProcessoMapeamento() throws Exception {
 
         CriarProcessoRequest criarReq = new CriarProcessoRequest(
-                "Processo Mapeamento Teste CDU-04",
+                "Processo mapeamento teste CDU-04",
                 TipoProcesso.MAPEAMENTO,
                 LocalDateTime.now().plusDays(10),
                 List.of(unidadeLivre.getCodigo()));

@@ -1,4 +1,4 @@
-# Como Logar no SGC (Perfil E2E)
+# Como logar no SGC (Perfil E2E)
 
 Este documento descreve as credenciais e o processo de login para o ambiente de desenvolvimento/teste utilizando o
 perfil `e2e`.
@@ -7,7 +7,7 @@ perfil `e2e`.
 
 A senha padrão para todos os usuários populados pelo script de seed é: `senha`
 
-### Principais Usuários
+### Principais usuários
 
 | Perfil/Papel         | Título (Usuário) | Descrição                                     |
 |:---------------------|:-----------------|:----------------------------------------------|
@@ -15,7 +15,7 @@ A senha padrão para todos os usuários populados pelo script de seed é: `senha
 | **Gestor**           | `222222`         | Perfil de Gestor da Unidade COORD_11          |
 | **Chefe de Unidade** | `333333`         | Perfil de Chefe da Unidade SECAO_111          |
 | **Servidor**         | `121212`         | Perfil de Servidor da Unidade SECAO_113       |
-| **Múltiplos Perfis** | `111111`         | Permite escolher entre ADMIN e CHEFE da SEDOC |
+| **Múltiplos perfis** | `111111`         | Permite escolher entre ADMIN e CHEFE da SEDOC |
 
 ## Processo de Login
 

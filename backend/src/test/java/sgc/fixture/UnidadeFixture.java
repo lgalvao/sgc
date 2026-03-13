@@ -12,7 +12,7 @@ public class UnidadeFixture {
     public static Unidade unidadePadrao() {
         Unidade unidade = new Unidade();
         unidade.setCodigo(1L);
-        unidade.setNome("Unidade Padrão");
+        unidade.setNome("Unidade padrão");
         unidade.setSigla("UPD");
         unidade.setSituacao(SituacaoUnidade.ATIVA);
         unidade.setTipo(TipoUnidade.OPERACIONAL);

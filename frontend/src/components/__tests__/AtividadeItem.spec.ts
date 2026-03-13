@@ -9,7 +9,7 @@ describe("AtividadeItem.vue", () => {
 
     const atividadeMock: Atividade = {
         codigo: 1,
-        descricao: "Atividade Teste",
+        descricao: "Atividade teste",
         conhecimentos: [
             {codigo: 10, descricao: "Conhecimento 1"}
         ],
@@ -41,14 +41,14 @@ describe("AtividadeItem.vue", () => {
         const input = context.wrapper.find('[data-testid="inp-editar-atividade"]');
         expect(input.exists()).toBe(true);
 
-        await input.setValue('Atividade Editada');
+        await input.setValue('Atividade editada');
 
         const saveButton = context.wrapper.find('[data-testid="btn-salvar-edicao-atividade"]');
         expect(saveButton.exists()).toBe(true);
         await saveButton.trigger('click');
 
         expect(context.wrapper!.emitted('atualizar-atividade')).toBeTruthy();
-        expect(context.wrapper!.emitted('atualizar-atividade')![0]).toEqual(['Atividade Editada']);
+        expect(context.wrapper!.emitted('atualizar-atividade')![0]).toEqual(['Atividade editada']);
     });
 
     it("deve adicionar novo conhecimento", async () => {
@@ -60,13 +60,13 @@ describe("AtividadeItem.vue", () => {
 
         const input = context.wrapper.find('[data-testid="inp-novo-conhecimento"]');
         expect(input.exists()).toBe(true);
-        await input.setValue('Novo Conhecimento');
+        await input.setValue('Novo conhecimento');
 
         // Trigger submit on the form directly
         await context.wrapper.find('[data-testid="form-novo-conhecimento"]').trigger('submit');
 
         expect(context.wrapper!.emitted('adicionar-conhecimento')).toBeTruthy();
-        expect(context.wrapper!.emitted('adicionar-conhecimento')![0]).toEqual(['Novo Conhecimento']);
+        expect(context.wrapper!.emitted('adicionar-conhecimento')![0]).toEqual(['Novo conhecimento']);
     });
 
     it("não deve salvar edição de atividade se descrição vazia", async () => {
@@ -94,7 +94,7 @@ describe("AtividadeItem.vue", () => {
         await context.wrapper.find('[data-testid="btn-editar-atividade"]').trigger('click');
         const input = context.wrapper.find('[data-testid="inp-editar-atividade"]');
 
-        await input.setValue('Atividade Teste'); // Same as initial
+        await input.setValue('Atividade teste'); // Same as initial
         await context.wrapper.find('[data-testid="btn-salvar-edicao-atividade"]').trigger('click');
         expect(context.wrapper.emitted('atualizar-atividade')).toBeFalsy();
     });
@@ -145,11 +145,11 @@ describe("AtividadeItem.vue", () => {
 
         await context.wrapper.find('[data-testid="btn-editar-conhecimento"]').trigger('click');
         const input = context.wrapper.find('[data-testid="inp-editar-conhecimento"]');
-        await input.setValue('Conhecimento Editado');
+        await input.setValue('Conhecimento editado');
         await context.wrapper.find('[data-testid="btn-salvar-edicao-conhecimento"]').trigger('click');
 
         expect(context.wrapper!.emitted('atualizar-conhecimento')).toBeTruthy();
-        expect(context.wrapper!.emitted('atualizar-conhecimento')![0]).toEqual([10, 'Conhecimento Editado']);
+        expect(context.wrapper!.emitted('atualizar-conhecimento')![0]).toEqual([10, 'Conhecimento editado']);
     });
 
     it("não deve salvar edição de conhecimento vazio", async () => {

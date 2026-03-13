@@ -15,7 +15,7 @@ import java.net.*;
 import java.util.*;
 
 /**
- * Gerencia Atividades e seus Conhecimentos associados.
+ * Gerencia atividades e seus Conhecimentos associados.
  */
 @RestController
 @RequestMapping("/api/atividades")

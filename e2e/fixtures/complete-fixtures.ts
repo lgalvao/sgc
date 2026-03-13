@@ -14,7 +14,7 @@ import {resetDatabase} from '../hooks/hooks-limpeza.js';
  *
  * test('Deve criar e editar processo', async ({page, autenticadoComoAdmin}) => {
  *   // Database resetada ao iniciar o arquivo, usuário logado!
- *   const descricao = 'Processo Teste';
+ *   const descricao = 'Processo teste';
  *   await criarProcesso(page, {descricao, ...});
  * });
  * ```

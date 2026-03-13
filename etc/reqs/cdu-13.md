@@ -11,7 +11,7 @@ Atores: GESTOR e ADMIN
 
 ## Fluxo principal:
 
-1. No Painel, o usuário clica no processo de mapeamento.
+1. No painel, o usuário clica no processo de mapeamento.
 
 2. O sistema mostra a tela `Detalhes do processo`.
 

@@ -12,7 +12,7 @@ import {loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
  * - Subprocessos na situação 'Cadastro disponibilizado'
  *
  * Fluxo principal:
- * 1. No Painel, GESTOR acessa processo em andamento
+ * 1. No painel, GESTOR acessa processo em andamento
  * 2. Sistema mostra tela Detalhes do processo
  * 3. Sistema identifica unidades elegíveis e exibe botão de aceite em bloco
  * 4. GESTOR clica no botão 'Aceitar em Bloco'
@@ -26,7 +26,7 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
     const descProcesso = `Mapeamento CDU-22 ${timestamp}`;
     let processoCodigo: number;
 
-    test('Setup Data', async ({request}) => {
+    test('Setup data', async ({request}) => {
         const processo = await criarProcessoCadastroDisponibilizadoFixture(request, {
             descricao: descProcesso,
             unidade: UNIDADE_1

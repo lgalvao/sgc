@@ -45,7 +45,7 @@ describe("Unidades.vue", () => {
                 {},
                 {
                     PageHeader: {
-                        template: "<div><h1>Page Header</h1><slot name='description' /></div>"
+                        template: "<div><h1>Page header</h1><slot name='description' /></div>"
                     },
                     TreeTable: {
                         name: "TreeTable",

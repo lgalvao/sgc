@@ -79,7 +79,7 @@ export async function criarMultiplosProcessos(
     const timestamp = Date.now();
 
     for (let i = 0; i < count; i++) {
-        const descricao = `Processo Múltiplo ${i + 1} - ${timestamp}`;
+        const descricao = `Processo múltiplo ${i + 1} - ${timestamp}`;
 
         await page.getByTestId('btn-painel-criar-processo').click();
         await criarProcesso(page, {

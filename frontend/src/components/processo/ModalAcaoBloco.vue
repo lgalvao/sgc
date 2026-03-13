@@ -13,7 +13,7 @@
     </BAlert>
 
     <div v-if="mostrarDataLimite" class="mb-3">
-      <BFormGroup label="Data Limite" label-for="dataLimiteBloco" label-class="required">
+      <BFormGroup label="Data limite" label-for="dataLimiteBloco" label-class="required">
         <InputData
             id="dataLimiteBloco"
             v-model="dataLimite"

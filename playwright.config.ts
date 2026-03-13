@@ -29,5 +29,5 @@ export default defineConfig({
         stderr: 'pipe',
     },
 
-    projects: [{name: 'chromium', use: {...devices['Desktop Chrome'], channel: 'chromium-headless-shell'}}],
+    projects: [{name: 'chromium', use: {...devices['Desktop chrome'], channel: 'chromium-headless-shell'}}],
 });

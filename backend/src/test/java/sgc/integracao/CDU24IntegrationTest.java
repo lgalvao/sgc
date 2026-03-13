@@ -56,7 +56,7 @@ class CDU24IntegrationTest extends BaseIntegrationTest {
         processo.setCodigo(null);
         processo.setTipo(TipoProcesso.MAPEAMENTO);
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
-        processo.setDescricao("Processo Mapa CDU-24");
+        processo.setDescricao("Processo mapa CDU-24");
         processo = processoRepo.save(processo);
 
         // Create subprocesses with complete maps (Status: MAPEAMENTO_MAPA_CRIADO)
@@ -72,13 +72,13 @@ class CDU24IntegrationTest extends BaseIntegrationTest {
     }
 
     private Subprocesso createSubprocessoComMapaCompleto(Unidade unidade) {
-        // Criar Subprocesso in correct state for disponibilizar mapa
+        // Criar subprocesso in correct state for disponibilizar mapa
         Subprocesso sub = SubprocessoFixture.subprocessoPadrao(processo, unidade);
         sub.setCodigo(null);
         sub.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO); // Changed from MAPEAMENTO_MAPA_CRIADO
         sub = subprocessoRepo.save(sub);
 
-        // Criar Mapa
+        // Criar mapa
         Mapa mapa = new Mapa();
         mapa.setSubprocesso(sub);
         mapa = mapaRepo.save(mapa);
@@ -87,12 +87,12 @@ class CDU24IntegrationTest extends BaseIntegrationTest {
         sub.setMapa(mapa);
         sub = subprocessoRepo.save(sub);
 
-        // Criar Atividade
-        Atividade ativ = Atividade.builder().mapa(mapa).descricao("Atividade Teste " + unidade.getSigla()).build();
+        // Criar atividade
+        Atividade ativ = Atividade.builder().mapa(mapa).descricao("Atividade teste " + unidade.getSigla()).build();
         atividadeRepo.save(ativ);
 
-        // Criar Competência
-        Competencia comp = Competencia.builder().descricao("Competência Teste " + unidade.getSigla()).mapa(mapa).build();
+        // Criar competência
+        Competencia comp = Competencia.builder().descricao("Competência teste " + unidade.getSigla()).mapa(mapa).build();
         competenciaRepo.save(comp);
 
         // Associar (ManyToMany)

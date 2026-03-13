@@ -22,7 +22,7 @@
         <!-- Inseridas -->
         <div v-if="impacto.atividadesInseridas && impacto.atividadesInseridas.length > 0" class="mb-4">
           <h5 class="text-success mb-3">
-            <i aria-hidden="true" class="bi bi-plus-circle me-2"/>Atividades Inseridas
+            <i aria-hidden="true" class="bi bi-plus-circle me-2"/>Atividades inseridas
           </h5>
           <BListGroup data-testid="lista-atividades-inseridas">
             <BListGroupItem
@@ -53,7 +53,7 @@
         <!-- Removidas -->
         <div v-if="impacto.atividadesRemovidas && impacto.atividadesRemovidas.length > 0" class="mb-4">
           <h5 class="text-danger mb-3">
-            <i aria-hidden="true" class="bi bi-dash-circle me-2"/>Atividades Removidas
+            <i aria-hidden="true" class="bi bi-dash-circle me-2"/>Atividades removidas
           </h5>
           <BListGroup data-testid="lista-atividades-removidas">
             <BListGroupItem v-for="ativ in impacto.atividadesRemovidas" :key="ativ.codigo">
@@ -68,7 +68,7 @@
             class="mb-4"
         >
           <h5 class="text-primary mb-3">
-            <i aria-hidden="true" class="bi bi-pencil me-2"/>Atividades Alteradas
+            <i aria-hidden="true" class="bi bi-pencil me-2"/>Atividades alteradas
           </h5>
           <BListGroup data-testid="lista-atividades-alteradas">
             <BListGroupItem
@@ -92,7 +92,7 @@
             data-testid="lista-competencias-impactadas"
         >
           <h5 class="text-warning mb-3">
-            <i aria-hidden="true" class="bi bi-exclamation-triangle me-2"/>Competências Impactadas
+            <i aria-hidden="true" class="bi bi-exclamation-triangle me-2"/>Competências impactadas
           </h5>
           <BCard
               v-for="comp in impacto.competenciasImpactadas"
@@ -168,9 +168,9 @@ const emit = defineEmits<(e: "fechar") => void>();
 function formatTipoImpacto(tipo: TipoImpactoCompetencia): string {
   switch (tipo) {
     case TipoImpactoCompetencia.ATIVIDADE_REMOVIDA:
-      return "Atividade Removida";
+      return "Atividade removida";
     case TipoImpactoCompetencia.ATIVIDADE_ALTERADA:
-      return "Atividade Alterada";
+      return "Atividade alterada";
     default:
       return tipo;
   }

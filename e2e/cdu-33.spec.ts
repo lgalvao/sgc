@@ -18,7 +18,7 @@ import {login, USUARIOS} from './helpers/helpers-auth.js';
 test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
     const UNIDADE_ALVO = 'SECAO_212';
     const timestamp = Date.now();
-    const descMapeamento = `Mapeamento Pre-CDU-33 ${timestamp}`;
+    const descMapeamento = `Mapeamento pre-CDU-33 ${timestamp}`;
     const descRevisao = `Revisão CDU-33 ${timestamp}`;
     let revisaoPid = 0;
 
@@ -66,7 +66,7 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
 
         const modal = page.getByRole('dialog');
         await expect(modal).toBeVisible();
-        await expect(modal.getByRole('heading', {name: /Reabrir Revisão/i})).toBeVisible();
+        await expect(modal.getByRole('heading', {name: /Reabrir revisão/i})).toBeVisible();
 
         // Cenario 4: Confirmar reabertura
         await page.getByTestId('inp-justificativa-reabrir').fill('Ajuste necessário');

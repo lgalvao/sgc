@@ -14,7 +14,7 @@ O teste `cdu-10.spec.ts` em 6 testes:
 - Adição de conhecimento permite prosseguir
 - Cancelamento do diálogo de confirmação
 
-**Teste 3: Caminho Feliz - Disponibilizar Revisão**
+**Teste 3: Caminho feliz - Disponibilizar revisão**
 - CHEFE clica em "Disponibilizar"
 - Valida diálogo com título exato "Disponibilização da revisão do cadastro" e mensagem sobre "finalização da revisão e disponibilização"
 - Confirmação (botão específico `btn-confirmar-disponibilizacao`)
@@ -28,11 +28,11 @@ O teste `cdu-10.spec.ts` em 6 testes:
 - CHEFE abre "Histórico de análise" e verifica resultado "Devolução" e observações
 - CHEFE redisponibiliza
 
-**Teste 5: Histórico Retém Análises Após Nova Disponibilização**
+**Teste 5: Histórico retém análises após nova disponibilização**
 - GESTOR devolve 2 vezes (2ª e 3ª devoluções)
 - CHEFE valida que histórico contém TODAS as devoluções em ordem decrescente (mais recente primeiro)
 
-**Teste 6: Cancelar Disponibilização**
+**Teste 6: Cancelar disponibilização**
 - CHEFE clica em "Disponibilizar"
 - Cancelamento retorna para tela de atividades
 

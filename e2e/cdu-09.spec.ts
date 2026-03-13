@@ -34,25 +34,25 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
         await page.goto(`/processo/${processoCodigo}/${UNIDADE_ALVO}`);
         await navegarParaAtividades(page);
 
-        const atividadeDesc = `Atividade Incompleta ${timestamp}`;
+        const atividadeDesc = `Atividade incompleta ${timestamp}`;
         await adicionarAtividade(page, atividadeDesc);
 
         await expect(page.getByTestId('btn-cad-atividades-disponibilizar')).toBeDisabled();
 
-        await adicionarConhecimento(page, atividadeDesc, 'Conhecimento Corretivo');
+        await adicionarConhecimento(page, atividadeDesc, 'Conhecimento corretivo');
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
         await expect(page.getByTestId('btn-confirmar-disponibilizacao')).toBeVisible();
         await page.getByRole('button', {name: 'Cancelar'}).click();
     });
 
-    test('Cenario 2: Caminho feliz - Disponibilizar Cadastro', async ({page}) => {
+    test('Cenario 2: Caminho feliz - Disponibilizar cadastro', async ({page}) => {
         const timestamp = Date.now();
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
         await page.goto(`/processo/${processoCodigo}/${UNIDADE_ALVO}/cadastro`);
 
-        const atividadeDesc = `Atividade Validada ${timestamp}`;
+        const atividadeDesc = `Atividade validada ${timestamp}`;
         await adicionarAtividade(page, atividadeDesc);
-        await adicionarConhecimento(page, atividadeDesc, 'Conhecimento Valido');
+        await adicionarConhecimento(page, atividadeDesc, 'Conhecimento valido');
 
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
         await page.getByTestId('btn-confirmar-disponibilizacao').click();

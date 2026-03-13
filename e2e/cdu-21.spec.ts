@@ -9,7 +9,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
     const descProcesso = `Mapeamento CDU-21 ${timestamp}`;
     let processoId: number;
 
-    test('Setup Data', async ({request}) => {
+    test('Setup data', async ({request}) => {
         const processo = await criarProcessoMapaHomologadoFixture(request, {
             descricao: descProcesso,
             unidade: UNIDADE_ALVO
@@ -29,7 +29,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
 
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
 
-        // Botão Finalizar visível
+        // Botão finalizar visível
         await expect(page.getByTestId('btn-processo-finalizar')).toBeVisible();
     });
 

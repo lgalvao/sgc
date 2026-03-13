@@ -82,7 +82,7 @@
             v-b-tooltip.hover
             :disabled="atividadesSelecionadas.length === 0 || !novaCompetencia.descricao"
             data-testid="btn-criar-competencia-salvar"
-            title="Criar Competência"
+            title="Criar competência"
             variant="primary"
             @click="salvar"
         >

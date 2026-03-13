@@ -37,7 +37,7 @@ class CDU28IntegrationTest extends BaseIntegrationTest {
 
         usuario = UsuarioFixture.usuarioPadrao();
         usuario.setTituloEleitoral("999988887777");
-        usuario.setNome("Usuario Temporario");
+        usuario.setNome("Usuario temporario");
         usuarioRepo.save(usuario);
 
         entityManager.flush();

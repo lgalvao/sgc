@@ -95,7 +95,7 @@ describe("VisMapa.vue", () => {
                             mapas: {
                                 mapaVisualizacao: {
                                     codigo: 1,
-                                    descricao: "Mapa Test",
+                                    descricao: "Mapa test",
                                     competencias: [
                                         {
                                             codigo: 1,
@@ -176,7 +176,7 @@ describe("VisMapa.vue", () => {
     it("renders correctly with data from store", async () => {
         vi.mocked(mapaServiceModule.obterMapaVisualizacao).mockResolvedValue({
             codigo: 1,
-            descricao: "Mapa Test",
+            descricao: "Mapa test",
             competencias: [
                 {
                     codigo: 1,
@@ -211,7 +211,7 @@ describe("VisMapa.vue", () => {
     it("resolves nested unit from store", async () => {
         await router.push("/processo/1/CHILD/vis-mapa");
         const unidadeService = await import("@/services/unidadeService");
-        vi.mocked(unidadeService.buscarUnidadePorSigla).mockResolvedValueOnce({sigla: "CHILD", nome: "Child Unit", filhas: []} as any);
+        vi.mocked(unidadeService.buscarUnidadePorSigla).mockResolvedValueOnce({sigla: "CHILD", nome: "Child unit", filhas: []} as any);
         const {wrapper} = mountComponent(
             {
                 processos: {
@@ -231,7 +231,7 @@ describe("VisMapa.vue", () => {
         await flushPromises();
 
         expect(wrapper.find('[data-testid="txt-header-unidade"]').text()).toContain(
-            "CHILD - Child Unit",
+            "CHILD - Child unit",
         );
     });
 
@@ -649,7 +649,7 @@ describe("VisMapa.vue", () => {
         await wrapper.vm.$nextTick();
         await wrapper.find('[data-testid="btn-mapa-sugestoes"]').trigger("click");
 
-        const modal = wrapper.findAllComponents({name: 'ModalConfirmacao'}).find(c => c.props('titulo') === 'Apresentar Sugestões');
+        const modal = wrapper.findAllComponents({name: 'ModalConfirmacao'}).find(c => c.props('titulo') === 'Apresentar sugestões');
         await modal?.vm.$emit('shown');
     });
 

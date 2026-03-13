@@ -1,6 +1,6 @@
 # Relatório de Análise dos Testes E2E — SGC
 
-## Sumário Executivo
+## Sumário executivo
 
 Este relatório analisa todos os 36 arquivos de testes E2E (`cdu-01.spec.ts` a `cdu-36.spec.ts`) mais o `captura.spec.ts` com foco em identificar oportunidades de torná-los mais rápidos e focados, aproveitando os endpoints de fixture disponíveis no `E2eController`.
 
@@ -12,7 +12,7 @@ Este relatório analisa todos os 36 arquivos de testes E2E (`cdu-01.spec.ts` a `
 
 ---
 
-## 1. Infraestrutura de Fixtures Disponível
+## 1. Infraestrutura de Fixtures disponível
 
 ### 1.1 Endpoints do `E2eController` (`/e2e/...`)
 
@@ -41,13 +41,13 @@ Para cada endpoint acima existe um helper TypeScript correspondente:
 - `criarProcessoMapaHomologadoFixture(request, options)`
 - `criarProcessoRevisaoMapaHomologadoFixture(request, options)`
 
-### 1.3 Lacuna Identificada: `MAPEAMENTO_CADASTRO_HOMOLOGADO`
+### 1.3 Lacuna identificada: `MAPEAMENTO_CADASTRO_HOMOLOGADO`
 
 Há uma **lacuna crítica** na cobertura de fixtures: o estado `MAPEAMENTO_CADASTRO_HOMOLOGADO` (cadastro de atividades aprovado pelo admin, mapa ainda não criado). Este é exatamente o pré-requisito para iniciar a criação do mapa de competências, e **três testes** (cdu-15, cdu-17, cdu-24) precisam percorrer todo o workflow de mapeamento via UI por causa dessa lacuna.
 
 ---
 
-## 2. Testes Já Otimizados ✅
+## 2. Testes já otimizados ✅
 
 Os seguintes testes usam fixtures de backend corretamente e servem de **modelo de referência**:
 
@@ -68,9 +68,9 @@ Os seguintes testes usam fixtures de backend corretamente e servem de **modelo d
 
 ---
 
-## 3. Oportunidades com Fixtures Existentes
+## 3. Oportunidades com Fixtures existentes
 
-### 3.1 `cdu-21.spec.ts` — **Impacto Alto** (269 linhas, 7 testes de preparação)
+### 3.1 `cdu-21.spec.ts` — **Impacto alto** (269 linhas, 7 testes de preparação)
 
 **Problema:** O arquivo tem 7 testes `Preparacao` (linhas 43–205) que percorrem todo o fluxo de mapeamento (criar → iniciar → adicionar atividades → disponibilizar → aceitar ×2 → homologar cadastro → criar competências → disponibilizar mapa → validar → aceitar ×2 → homologar mapa) apenas para que o último teste (`Cenários CDU-21`) possa testar a **finalização do processo**.
 
@@ -89,7 +89,7 @@ test('Preparacao 1: Admin cria e inicia processo de mapeamento', async ({page, a
 
 **Solução com fixture existente:**
 ```typescript
-test('Setup Data', async ({request}) => {
+test('Setup data', async ({request}) => {
     const processo = await criarProcessoMapaHomologadoFixture(request, {
         descricao: descProcesso,
         unidade: UNIDADE_ALVO
@@ -105,7 +105,7 @@ test('Setup Data', async ({request}) => {
 
 ---
 
-### 3.2 `cdu-19.spec.ts` — **Impacto Alto** (140 linhas, 4 testes de preparação)
+### 3.2 `cdu-19.spec.ts` — **Impacto alto** (140 linhas, 4 testes de preparação)
 
 **Problema:** Quatro testes `Preparacao` (criar → iniciar → adicionar atividades → disponibilizar → aceitar ×2 → homologar cadastro → criar competências → disponibilizar mapa) para testar a **validação do mapa pelo chefe** (CDU-19). O estado alvo é `MAPEAMENTO_MAPA_DISPONIBILIZADO`.
 
@@ -113,7 +113,7 @@ test('Setup Data', async ({request}) => {
 
 **Solução com fixture existente:**
 ```typescript
-test('Setup Data', async ({request}) => {
+test('Setup data', async ({request}) => {
     const processo = await criarProcessoMapaDisponibilizadoFixture(request, {
         descricao: descProcesso,
         unidade: UNIDADE_ALVO
@@ -127,7 +127,7 @@ test('Setup Data', async ({request}) => {
 
 ---
 
-### 3.3 `cdu-25.spec.ts` — **Impacto Médio** (170 linhas, 1 grande teste de setup)
+### 3.3 `cdu-25.spec.ts` — **Impacto médio** (170 linhas, 1 grande teste de setup)
 
 **Problema:** O teste `Setup UI` (linhas 56–140) executa todo o fluxo: criar processo → adicionar atividades → disponibilizar → aceitar → homologar cadastro → criar competências → disponibilizar mapa → validar (chefe). O estado alvo é `MAPEAMENTO_MAPA_VALIDADO`.
 
@@ -135,7 +135,7 @@ test('Setup Data', async ({request}) => {
 
 **Solução com fixture existente:**
 ```typescript
-test('Setup Data', async ({request}) => {
+test('Setup data', async ({request}) => {
     await criarProcessoMapaValidadoFixture(request, {
         descricao: descProcesso,
         unidade: UNIDADE_1
@@ -148,13 +148,13 @@ test('Setup Data', async ({request}) => {
 
 ---
 
-### 3.4 `cdu-26.spec.ts` — **Impacto Médio** (185 linhas, 1 grande teste de setup)
+### 3.4 `cdu-26.spec.ts` — **Impacto médio** (185 linhas, 1 grande teste de setup)
 
 **Problema:** Idêntico ao `cdu-25`. O `Setup UI` percorre o mesmo fluxo até `MAPEAMENTO_MAPA_VALIDADO` para testar "Homologar validação de mapas em bloco" (CDU-26).
 
 **Solução com fixture existente:**
 ```typescript
-test('Setup Data', async ({request}) => {
+test('Setup data', async ({request}) => {
     await criarProcessoMapaValidadoFixture(request, {
         descricao: descProcesso,
         unidade: UNIDADE_1
@@ -167,13 +167,13 @@ test('Setup Data', async ({request}) => {
 
 ---
 
-### 3.5 `cdu-22.spec.ts` — **Impacto Médio** (165 linhas, 1 teste de setup)
+### 3.5 `cdu-22.spec.ts` — **Impacto médio** (165 linhas, 1 teste de setup)
 
 **Problema:** O primeiro teste `Cria processo, cadastra atividades e disponibiliza cadastro` (linhas 36–79) cria processo via UI, chefe adiciona atividades e disponibiliza. Estado alvo: `MAPEAMENTO_CADASTRO_DISPONIBILIZADO`.
 
 **Solução com fixture existente:**
 ```typescript
-test('Setup Data', async ({request}) => {
+test('Setup data', async ({request}) => {
     await criarProcessoCadastroDisponibilizadoFixture(request, {
         descricao: descProcesso,
         unidade: UNIDADE_1
@@ -186,13 +186,13 @@ test('Setup Data', async ({request}) => {
 
 ---
 
-### 3.6 `cdu-23.spec.ts` — **Impacto Médio** (122 linhas, 1 teste de setup)
+### 3.6 `cdu-23.spec.ts` — **Impacto médio** (122 linhas, 1 teste de setup)
 
 **Problema:** O `Setup UI` (linhas 44–78) repete o mesmo padrão de cdu-22: criar processo + adicionar atividades + disponibilizar. Estado alvo: `MAPEAMENTO_CADASTRO_DISPONIBILIZADO`.
 
 **Solução com fixture existente:**
 ```typescript
-test('Setup Data', async ({request}) => {
+test('Setup data', async ({request}) => {
     await criarProcessoCadastroDisponibilizadoFixture(request, {
         descricao: descProcesso,
         unidade: UNIDADE_1
@@ -205,13 +205,13 @@ test('Setup Data', async ({request}) => {
 
 ---
 
-### 3.7 `cdu-27.spec.ts` — **Impacto Baixo** (83 linhas, 1 teste de setup)
+### 3.7 `cdu-27.spec.ts` — **Impacto baixo** (83 linhas, 1 teste de setup)
 
 **Problema:** O `Setup UI` (linhas 28–53) cria processo via UI e inicia. Estado alvo: processo `EM_ANDAMENTO`. O `criarProcessoFixture` com `iniciar: true` já faz isso.
 
 **Solução com fixture existente:**
 ```typescript
-test('Setup Data', async ({request}) => {
+test('Setup data', async ({request}) => {
     await criarProcessoFixture(request, {
         descricao: descProcesso,
         unidade: UNIDADE_1,
@@ -225,7 +225,7 @@ test('Setup Data', async ({request}) => {
 
 ---
 
-## 4. Oportunidades que Requerem Novas Fixtures de Backend
+## 4. Oportunidades que Requerem novas fixtures de Backend
 
 ### 4.1 NOVA FIXTURE NECESSÁRIA: `MAPEAMENTO_CADASTRO_HOMOLOGADO`
 
@@ -252,7 +252,7 @@ test('Preparacao: Criar processo no estado correto', async ({request}) => {
 });
 ```
 
-**Observação importante:** O teste `Cenários CDU-15` usa os nomes `ATIVIDADE_1` e `ATIVIDADE_2` para criar competências. A nova fixture deve retornar os nomes das atividades inseridas para que o teste possa referenciar as atividades corretas. Alternativamente, o fixture pode seguir o padrão já estabelecido: `Atividade Fixture - {procId}`.
+**Observação importante:** O teste `Cenários CDU-15` usa os nomes `ATIVIDADE_1` e `ATIVIDADE_2` para criar competências. A nova fixture deve retornar os nomes das atividades inseridas para que o teste possa referenciar as atividades corretas. Alternativamente, o fixture pode seguir o padrão já estabelecido: `Atividade fixture - {procId}`.
 
 **Ganho estimado:** ~50 linhas de setup, 1 teste de preparação eliminado.
 
@@ -264,7 +264,7 @@ test('Preparacao: Criar processo no estado correto', async ({request}) => {
 
 **Solução:**
 ```typescript
-test('Setup Data', async ({request}) => {
+test('Setup data', async ({request}) => {
     const processo = await criarProcessoCadastroHomologadoFixture(request, {
         descricao: descProcesso,
         unidade: UNIDADE_ALVO
@@ -285,7 +285,7 @@ test('Setup Data', async ({request}) => {
 
 **Solução:** Separar em dois testes — um de setup via API e um de verificação via UI:
 ```typescript
-test('Setup Data', async ({request}) => {
+test('Setup data', async ({request}) => {
     await criarProcessoCadastroHomologadoFixture(request, {
         descricao: descProcesso,
         unidade: UNIDADE_1
@@ -335,7 +335,7 @@ Cenários CDU-16: ADMIN ajusta mapa e visualiza impactos          [TESTE REAL]
 **Abordagem recomendada para a nova fixture:**
 A fixture `/e2e/fixtures/processo-revisao-com-cadastro-homologado` deve:
 1. Criar processo de mapeamento finalizado com atividades `A`, `B`, `C` e competências associadas (via SQL direto, como faz `processo-finalizado-com-atividades`)
-2. Criar processo de revisão iniciado, com atividade nova `D` adicionada, `B` editada para `B Editada`, `C` removida — simulando as alterações que o CDU-16 precisa verificar
+2. Criar processo de revisão iniciado, com atividade nova `D` adicionada, `B` editada para `B editada`, `C` removida — simulando as alterações que o CDU-16 precisa verificar
 3. Colocar subprocesso em situação `REVISAO_CADASTRO_HOMOLOGADO`
 4. Retornar os nomes das atividades e competências criadas para que o teste possa verificá-las
 
@@ -345,18 +345,18 @@ A fixture `/e2e/fixtures/processo-revisao-com-cadastro-homologado` deve:
 
 ---
 
-## 5. Casos Complexos com Análise Especial
+## 5. Casos complexos com Análise especial
 
 ### 5.1 `cdu-05.spec.ts` — Mapeamento completo como prerequisito para testar revisão (256 linhas)
 
-**Problema:** Fases 1.1 a 1.7 (7 testes) e Fase 2.1 executam o workflow completo de mapeamento (criar → iniciar → adicionar atividades → disponibilizar → aceitar → homologar → criar competências → disponibilizar → validar → aceitar → homologar → finalizar) para que a Fase 2 possa testar a **criação de revisão**. A Fase 3 verifica que as atividades do mapeamento foram copiadas para a revisão.
+**Problema:** Fases 1.1 a 1.7 (7 testes) e Fase 2.1 executam o workflow completo de mapeamento (criar → iniciar → adicionar atividades → disponibilizar → aceitar → homologar → criar competências → disponibilizar → validar → aceitar → homologar → finalizar) para que a Fase 2 possa testar a **criação de revisão**. A fase 3 verifica que as atividades do mapeamento foram copiadas para a revisão.
 
-**Por que é complexo:** A Fase 3 verifica especificamente que `Atividade Teste ${timestamp}` foi copiada para a revisão. Se usarmos `criarProcessoFinalizadoFixture`, as atividades geradas teriam nomes como `Atividade Origem A - {procId}`, exigindo ajuste nas asserções.
+**Por que é complexo:** A fase 3 verifica especificamente que `Atividade teste ${timestamp}` foi copiada para a revisão. Se usarmos `criarProcessoFinalizadoFixture`, as atividades geradas teriam nomes como `Atividade Origem A - {procId}`, exigindo ajuste nas asserções.
 
 **Solução proposta:**
-1. Substituir Fases 1.1–1.7 por:
+1. Substituir fases 1.1–1.7 por:
    ```typescript
-   test('Setup Data', async ({request}) => {
+   test('Setup data', async ({request}) => {
        const processo = await criarProcessoFinalizadoFixture(request, {
            unidade: UNIDADE_ALVO,
            descricao: descProcMapeamento
@@ -365,7 +365,7 @@ A fixture `/e2e/fixtures/processo-revisao-com-cadastro-homologado` deve:
        // OU: adicionar endpoint /e2e/fixtures/processo-finalizado-encerrado
    });
    ```
-2. Adaptar as asserções da Fase 3 para verificar `Atividade Origem A - ${proceso.codigo}` em vez de `Atividade Teste ${timestamp}`
+2. Adaptar as asserções da Fase 3 para verificar `Atividade Origem A - ${proceso.codigo}` em vez de `Atividade teste ${timestamp}`
 
 **Observação:** A finalização do processo é um passo separado da homologação do mapa. O endpoint `processo-mapeamento-com-mapa-homologado` cria um processo em estado `MAPEAMENTO_MAPA_HOMOLOGADO` mas o processo ainda não está `FINALIZADO`. Seria necessário finalizar via UI (1 passo) ou adicionar um endpoint `processo-finalizado` que inclui a finalização.
 
@@ -381,7 +381,7 @@ A fixture `/e2e/fixtures/processo-revisao-com-cadastro-homologado` deve:
 
 ---
 
-## 6. Antipadrões Recorrentes
+## 6. Antipadrões recorrentes
 
 ### 6.1 Testes de setup disfarçados de testes reais
 
@@ -456,9 +456,9 @@ async function acessarSubprocessoChefe(page: Page, descProcesso: string) {
 
 ---
 
-## 7. Análise por Arquivo — Tabela Resumo
+## 7. Análise por Arquivo — Tabela resumo
 
-| Arquivo | Linhas | Status | Problema Principal | Solução |
+| Arquivo | Linhas | Status | Problema principal | Solução |
 |---|---|---|---|---|
 | `cdu-01` | 109 | ✅ OK | — | — |
 | `cdu-02` | 170 | ⚠️ Parcial | Cria processos via UI em 2 testes | `criarProcessoFixture` para setup |
@@ -499,7 +499,7 @@ async function acessarSubprocessoChefe(page: Page, descProcesso: string) {
 
 ---
 
-## 8. Plano de Ação Priorizado
+## 8. Plano de Ação priorizado
 
 ### Prioridade 1 — Usar fixtures existentes (sem código novo no backend)
 
@@ -586,7 +586,7 @@ O arquivo já usa `criarProcessoMapaHomologadoFixture` e outros helpers em algun
 
 ---
 
-## 10. Métricas de Impacto Estimado
+## 10. Métricas de Impacto estimado
 
 | Prioridade | Testes afetados | Linhas eliminadas | Novas fixtures backend |
 |---|---|---|---|

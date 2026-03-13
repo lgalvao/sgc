@@ -5,7 +5,7 @@ específicas** do projeto que diferem dos padrões genéricos.
 
 ### Regras gerais
 
-* **Idioma:** Todo o código (variáveis, métodos), comentários, mensagens de erro e documentação deve ser em **Português Brasileiro**.
+* **Idioma:** Todo o código (variáveis, métodos), comentários, mensagens de erro e documentação deve ser em **Português brasileiro**.
 * **Identificadores:** Use sempre `codigo` em vez de `id` para chaves primárias e referências.
 * **Convenções de Nomenclatura:**
     * **Backend:** Classes `PascalCase`, métodos `camelCase`. Sufixos: `Controller`, `Service`, `Repo`, `Dto`, `Mapper`.
@@ -14,7 +14,7 @@ específicas** do projeto que diferem dos padrões genéricos.
 
 * **Qualidade de Código:**
     * **Limite de Parâmetros:** Métodos devem ter no máximo **3 parâmetros**. Se ultrapassar, use um objeto de transporte (DTO de 'command').
-    * **Código Depreciado:** Código marcado como `@Deprecated` deve ser removido sumariamente assim que não houver mais dependências internas (especialmente após consolidações arquiteturais).
+    * **Código depreciado:** Código marcado como `@Deprecated` deve ser removido sumariamente assim que não houver mais dependências internas (especialmente após consolidações arquiteturais).
 
 ### Backend (Java 21 / Spring Boot 4)
 
@@ -26,8 +26,8 @@ específicas** do projeto que diferem dos padrões genéricos.
 * **Persistence:** Tabelas em `UPPER_CASE`, colunas em `snake_case`. Enums como `STRING`.
 * **Controle de Acesso (Security):**
     * Baseado nas regras documentadas em [`regras-acesso.md`](/etc/docs/regras-acesso.md):
-    * **Leitura**: Hierarquia da Unidade Responsável
-    * **Escrita**: Localização Atual do Subprocesso (com algumas exceções para admin)
+    * **Leitura**: Hierarquia da Unidade responsável
+    * **Escrita**: Localização atual do Subprocesso (com algumas exceções para admin)
     * **Implementação:** `SgcPermissionEvaluator` (implementa `PermissionEvaluator` do Spring Security)
     * **Controllers:** Use `@PreAuthorize("hasPermission(#codigo, 'Subprocesso', 'ACAO')")` para verificações
     * **Hierarquia:** `HierarquiaService` para verificações de hierarquia de unidades
@@ -36,7 +36,7 @@ específicas** do projeto que diferem dos padrões genéricos.
 ### Frontend (Vue 3.5 / TypeScript)
 
 * **Padrão de componentes:** Use `<script setup lang="ts">` e **BootstrapVueNext**.
-* **Estado:** **Pinia** utilizando "Setup Stores" (com `ref` e `computed`).
+* **Estado:** **Pinia** utilizando "Setup stores" (com `ref` e `computed`).
 * **Erros:** Use `normalizeError` em services/stores. Componentes decidem como exibir (preferencialmente `BAlert` inline para erros de negócio).
 * **Roteamento:** Modularizado (cada módulo tem seu arquivo `.routes.ts`).
 * **Logging:**

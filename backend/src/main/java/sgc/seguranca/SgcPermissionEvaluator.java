@@ -22,8 +22,8 @@ import static sgc.processo.model.SituacaoProcesso.*;
  * Implementa a interface padrão do Spring Security para uso em expressões @PreAuthorize.
  * Consolida as regras de acesso baseadas na "Regra de Ouro":
  * <ol>
- *     <li>Visualização (Leitura): Hierarquia da Unidade Responsável.</li>
- *     <li>Execução (Escrita): Localização Atual do Subprocesso (Unidade do Usuário == Localização).</li>
+ *     <li>Visualização (Leitura): Hierarquia da Unidade responsável.</li>
+ *     <li>Execução (Escrita): Localização atual do Subprocesso (Unidade do Usuário == Localização).</li>
  * </ol>
  *
  * @see AcaoPermissao
@@ -153,7 +153,7 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
             return hierarquiaService.ehMesmaOuSubordinada(unidadeAlvo, unidadeUsuario);
         }
 
-        log.info("Acesso negado por hierarquia para {} (Perfil: {}, Unidade Ativa: {}). Unidade alvo: {}.",
+        log.info("Acesso negado por hierarquia para {} (Perfil: {}, Unidade ativa: {}). Unidade alvo: {}.",
                 usuario.getTituloEleitoral(), perfil, usuario.getUnidadeAtivaCodigo(), unidadeAlvo.getCodigo());
         return false;
     }
@@ -165,7 +165,7 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
         boolean permitido = Objects.equals(usuario.getUnidadeAtivaCodigo(), localizacao.getCodigo());
 
         if (!permitido) {
-            log.info("Acesso negado por localização. Usuário: {} (Unidade Ativa: {}). Subprocesso {} localizado em {}.",
+            log.info("Acesso negado por localização. Usuário: {} (Unidade ativa: {}). Subprocesso {} localizado em {}.",
                     usuario.getTituloEleitoral(),
                     usuario.getUnidadeAtivaCodigo(),
                     sp.getCodigo(),

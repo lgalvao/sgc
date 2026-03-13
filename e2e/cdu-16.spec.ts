@@ -9,12 +9,12 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
     const timestamp = Date.now();
     const descProcessoRevisao = `Revisão CDU-16 ${timestamp}`;
 
-    const competencia1 = 'Competência Fixture 1';
-    const competencia2 = 'Competência Fixture 2';
-    const competencia3 = 'Competência Fixture 3';
-    const atividadeNovaRevisao = 'Atividade Nova Revisão Fixture';
+    const competencia1 = 'Competência fixture 1';
+    const competencia2 = 'Competência fixture 2';
+    const competencia3 = 'Competência fixture 3';
+    const atividadeNovaRevisao = 'Atividade nova revisão fixture';
 
-    test('Setup Data', async ({request}) => {
+    test('Setup data', async ({request}) => {
         await criarProcessoRevisaoCadastroHomologadoFixture(request, {
             descricao: descProcessoRevisao,
             unidade: UNIDADE_ALVO
@@ -39,9 +39,9 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
             await expect(page.getByTestId('modal-impacto-body')).toBeVisible();
 
             const modal = page.getByRole('dialog');
-            await expect(modal.getByText('Atividades Inseridas')).toBeVisible();
+            await expect(modal.getByText('Atividades inseridas')).toBeVisible();
             await expect(modal.getByText(atividadeNovaRevisao)).toBeVisible();
-            await expect(modal.getByText('Competências Impactadas')).toBeVisible();
+            await expect(modal.getByText('Competências impactadas')).toBeVisible();
             await expect(modal.getByText(competencia2)).toBeVisible();
             await expect(modal.getByText(competencia3)).toBeVisible();
 
@@ -62,8 +62,8 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
             await expect(modalCria).toBeHidden();
         });
 
-        await test.step('Cenário 4: Associação de Nova Competência', async () => {
-            const novaCompetencia = `Competência Nova Ajuste ${timestamp}`;
+        await test.step('Cenário 4: Associação de Nova competência', async () => {
+            const novaCompetencia = `Competência nova ajuste ${timestamp}`;
             await criarCompetencia(page, novaCompetencia, [atividadeNovaRevisao]);
 
             await expect(page.getByText(novaCompetencia)).toBeVisible();

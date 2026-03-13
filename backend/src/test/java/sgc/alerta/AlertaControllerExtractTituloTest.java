@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.*;
  * via MockMvc: Usuario entity e default case.
  */
 @ExtendWith(MockitoExtension.class)
-@DisplayName("AlertaController - Extração Título Usuário (Método Privado)")
+@DisplayName("AlertaController - Extração título usuário (Método privado)")
 class AlertaControllerExtractTituloTest {
     @InjectMocks
     private AlertaController controller;
@@ -37,11 +37,11 @@ class AlertaControllerExtractTituloTest {
     }
 
     @Nested
-    @DisplayName("Switch Expression - Todos os Casos")
+    @DisplayName("Switch expression - Todos os Casos")
     class SwitchExpressionCases {
 
         @Test
-        @DisplayName("Caso String: deve retornar a string diretamente")
+        @DisplayName("Caso string: deve retornar a string diretamente")
         void casoString_DeveRetornarStringDiretamente() throws Exception {
             String tituloEsperado = "12345678901";
             String resultado = invokeExtractTituloUsuario(tituloEsperado);
@@ -49,12 +49,12 @@ class AlertaControllerExtractTituloTest {
         }
 
         @Test
-        @DisplayName("Caso Usuario: deve extrair getTituloEleitoral()")
+        @DisplayName("Caso usuario: deve extrair getTituloEleitoral()")
         void casoUsuario_DeveExtrairTituloEleitoral() throws Exception {
             Usuario usuario = new Usuario();
             usuario.setTituloEleitoral("98765432100");
             usuario.setMatricula("12345");
-            usuario.setNome("João Silva");
+            usuario.setNome("João silva");
 
             String resultado = invokeExtractTituloUsuario(usuario);
             assertThat(resultado).isEqualTo("98765432100");
@@ -74,7 +74,7 @@ class AlertaControllerExtractTituloTest {
         }
 
         @Test
-        @DisplayName("Caso Default: deve usar toString()")
+        @DisplayName("Caso default: deve usar toString()")
         void casoDefault_DeveUsarToString() throws Exception {
             Object objetoGenerico = new Object() {
                 @Override
@@ -88,7 +88,7 @@ class AlertaControllerExtractTituloTest {
         }
 
         @Test
-        @DisplayName("Caso Default com Integer: deve usar toString() do Integer")
+        @DisplayName("Caso default com Integer: deve usar toString() do Integer")
         void casoDefaultInteger_DeveUsarToString() throws Exception {
             Integer numero = 123456789;
 
