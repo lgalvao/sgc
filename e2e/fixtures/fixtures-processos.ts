@@ -108,6 +108,31 @@ export async function criarProcessoFinalizadoFixture(
 }
 
 /**
+ * Cria um processo de mapeamento já com cadastro homologado via API E2E.
+ */
+export async function criarProcessoCadastroHomologadoFixture(
+    request: APIRequestContext,
+    options: ProcessoFixtureOptions
+): Promise<ProcessoFixture> {
+    const response = await request.post('/e2e/fixtures/processo-mapeamento-com-cadastro-homologado', {
+        data: {
+            unidadeSigla: options.unidade,
+            iniciar: options.iniciar ?? true,
+            descricao: options.descricao ?? `Fixture E2E CADASTRO_HOMOLOGADO ${Date.now()}`,
+            diasLimite: options.diasLimite ?? 30
+        }
+    });
+
+    if (!response.ok()) {
+        throw new Error(
+            `Falha ao criar processo fixture com cadastro homologado: ${response.status()} ${response.statusText()}`
+        );
+    }
+
+    return await response.json();
+}
+
+/**
  * Cria um processo de mapeamento já com cadastro disponibilizado via API E2E.
  */
 export async function criarProcessoCadastroDisponibilizadoFixture(
@@ -201,6 +226,31 @@ export async function criarProcessoMapaHomologadoFixture(
     if (!response.ok()) {
         throw new Error(
             `Falha ao criar processo fixture com mapa homologado: ${response.status()} ${response.statusText()}`
+        );
+    }
+
+    return await response.json();
+}
+
+/**
+ * Cria um processo de revisão já com cadastro homologado via API E2E.
+ */
+export async function criarProcessoRevisaoCadastroHomologadoFixture(
+    request: APIRequestContext,
+    options: ProcessoFixtureOptions
+): Promise<ProcessoFixture> {
+    const response = await request.post('/e2e/fixtures/processo-revisao-com-cadastro-homologado', {
+        data: {
+            unidadeSigla: options.unidade,
+            iniciar: options.iniciar ?? true,
+            descricao: options.descricao ?? `Fixture E2E REVISAO_CADASTRO_HOMOLOGADO ${Date.now()}`,
+            diasLimite: options.diasLimite ?? 30
+        }
+    });
+
+    if (!response.ok()) {
+        throw new Error(
+            `Falha ao criar processo fixture de revisão com cadastro homologado: ${response.status()} ${response.statusText()}`
         );
     }
 

@@ -19,7 +19,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @Tag("integration")
 @Transactional
-@DisplayName("CDU-01: Realizar Login")
+@DisplayName("CDU-01: Realizar login")
 class CDU01IntegrationTest extends BaseIntegrationTest {
     private static final String BASE_URL = "/api/usuarios";
 
@@ -43,38 +43,38 @@ class CDU01IntegrationTest extends BaseIntegrationTest {
     @BeforeEach
     void setUp() {
 
-        // Setup Unidade Admin
+        // Setup unidade admin
         unidadeAdmin = UnidadeFixture.unidadePadrao();
         unidadeAdmin.setCodigo(null);
         unidadeAdmin.setSigla("ADM-UNIT-TEST");
-        unidadeAdmin.setNome("Unidade Admin Teste");
+        unidadeAdmin.setNome("Unidade admin teste");
         unidadeAdmin = unidadeRepo.saveAndFlush(unidadeAdmin);
 
-        // Setup Usuario Admin
+        // Setup usuario admin
         usuarioAdmin = UsuarioFixture.usuarioComPerfil(unidadeAdmin, Perfil.ADMIN);
         usuarioAdmin.setTituloEleitoral("999999990001");
-        usuarioAdmin.setNome("Admin User Teste");
+        usuarioAdmin.setNome("Admin user teste");
         usuarioAdmin = usuarioRepo.saveAndFlush(usuarioAdmin);
 
-        // Persist Perfil via JDBC explicitly
+        // Persist perfil via JDBC explicitly
         jdbcTemplate.update(
                 "INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo) VALUES (?, ?, ?)",
                 usuarioAdmin.getTituloEleitoral(), "ADMIN", unidadeAdmin.getCodigo());
 
-        // Setup Unidade Gestor
+        // Setup unidade gestor
         unidadeGestor = UnidadeFixture.unidadePadrao();
         unidadeGestor.setCodigo(null);
         unidadeGestor.setSigla("GES-UNIT-TEST");
-        unidadeGestor.setNome("Unidade Gestor Teste");
+        unidadeGestor.setNome("Unidade gestor teste");
         unidadeGestor = unidadeRepo.saveAndFlush(unidadeGestor);
 
-        // Setup Usuario Gestor
+        // Setup usuario gestor
         usuarioGestor = UsuarioFixture.usuarioPadrao();
         usuarioGestor.setTituloEleitoral("999999990002");
-        usuarioGestor.setNome("Gestor User Teste");
+        usuarioGestor.setNome("Gestor user teste");
         usuarioGestor = usuarioRepo.saveAndFlush(usuarioGestor);
 
-        // Persist Perfis via JDBC explicitly (ADMIN na unidadeAdmin, GESTOR na
+        // Persist perfis via JDBC explicitly (ADMIN na unidadeAdmin, GESTOR na
         // unidadeGestor)
         jdbcTemplate.update(
                 "INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo) VALUES (?, ?, ?)",

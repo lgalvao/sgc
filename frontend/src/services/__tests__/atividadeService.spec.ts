@@ -98,7 +98,7 @@ describe("atividadeService", () => {
     });
 
     it("criarConhecimento deve enviar POST e retornar AtividadeOperacaoResponse", async () => {
-        const request = {descricao: "Novo Conhecimento"};
+        const request = {descricao: "Novo conhecimento"};
         const responseDto = {
             atividade: {codigo: 1, descricao: "Atividade", conhecimentos: [{codigo: 2, ...request}]},
             subprocesso: {codigo: 123, situacao: "CADASTRO_EM_ANDAMENTO", situacaoLabel: "CADASTRO_EM_ANDAMENTO"},
@@ -118,7 +118,7 @@ describe("atividadeService", () => {
     it("atualizarConhecimento deve enviar POST e retornar AtividadeOperacaoResponse", async () => {
         const request: Conhecimento = {
             codigo: 1,
-            descricao: "Conhecimento Atualizado",
+            descricao: "Conhecimento atualizado",
         };
         const responseDto = {
             atividade: {codigo: 1, descricao: "Atividade", conhecimentos: [{...request}]},

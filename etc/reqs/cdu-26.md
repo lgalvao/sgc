@@ -10,7 +10,7 @@
 
 ## Fluxo principal
 
-1. No Painel, o usuário acessa um processo de mapeamento ou de revisão, que esteja em andamento.
+1. No painel, o usuário acessa um processo de mapeamento ou de revisão, que esteja em andamento.
 
 2. O sistema mostra tela `Detalhes do processo`.
 

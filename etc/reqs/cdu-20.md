@@ -10,7 +10,7 @@ Ator: GESTOR e ADMIN
 
 ## Fluxo principal
 
-1. No Painel, usuário escolhe um processo e na tela Detalhes do processo clica em uma unidade com situação 'Mapa
+1. No painel, usuário escolhe um processo e na tela Detalhes do processo clica em uma unidade com situação 'Mapa
    validado' ou 'Mapa com sugestões'.
 
 2. O sistema mostra a tela `Detalhes do subprocesso`.

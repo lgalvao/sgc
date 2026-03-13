@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("ProcessoManutencaoService - Cobertura Extra")
+@DisplayName("ProcessoManutencaoService - Cobertura extra")
 class ProcessoManutencaoServiceCoverageExtraTest {
 
     @Mock private ProcessoRepo processoRepo;

@@ -51,7 +51,7 @@ export const Default: Story = {
 
 export const Grande: Story = {
     args: {
-        modelValue: 'Título Grande',
+        modelValue: 'Título grande',
         size: 'lg',
     },
     render: (args) => ({

@@ -29,7 +29,7 @@ export const Default: Story = {
         },
         template: `
       <div>
-        <button class="btn btn-primary" @click="show = true">Disponibilizar Mapa</button>
+        <button class="btn btn-primary" @click="show = true">Disponibilizar mapa</button>
         <ModalMapaDisponibilizar v-bind="args" :mostrar="show" @fechar="show = false" />
       </div>
     `,

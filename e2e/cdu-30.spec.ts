@@ -1,14 +1,14 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 
 /**
- * CDU-30 - Manter Administradores
+ * CDU-30 - Manter administradores
  *
  * Ator: ADMIN
  *
  * Pré-condições:
  * - Usuário logado como ADMIN
  */
-test.describe.serial('CDU-30 - Manter Administradores', () => {
+test.describe.serial('CDU-30 - Manter administradores', () => {
 
     test('Cenários CDU-30: ADMIN acessa e visualiza lista de administradores', async ({page, autenticadoComoAdmin}) => {
         // Cenario 1: Navegação para página de administradores

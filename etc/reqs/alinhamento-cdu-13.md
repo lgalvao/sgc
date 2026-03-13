@@ -25,7 +25,7 @@ O teste E2E cobre:
 - **10.3**: Não testa cancelamento (permanece na tela).
 - **10.5-10.8**: Não valida registros de análise, movimentação, e-mail ou alerta criado com dados específicos.
 - **10.9**: Não valida mensagem "Aceite registrado".
-- **11.2-11.7**: Não testa homologação com modal "Homologação do cadastro de atividades e conhecimentos", registros específicos ou mensagem "Homologação efetivada".
+- **11.2-11.7**: Não testa homologação com modal "Homologação do cadastro", registros específicos ou mensagem "Homologação efetivada".
 
 **Modal de histórico:**
 - Teste abre histórico mas não valida que exibe tabela com **data/hora**, **sigla da unidade**, **resultado** ('Devolução' ou 'Aceite'), **observações**.
@@ -38,7 +38,7 @@ O teste E2E cobre:
 3. **Validar diálogos modais**: 
    - Para devolução: Verificar título "Devolução", pergunta exata, campo de observação, botões `Confirmar` e `Cancelar`.
    - Para aceite: Verificar título "Aceite", pergunta exata "Confirma o aceite do cadastro de atividades?".
-   - Para homologação: Verificar título "Homologação do cadastro de atividades e conhecimentos".
+   - Para homologação: Verificar título "Homologação do cadastro".
 
 4. **Validar registros de análise e movimentação**: Após devolução ou aceite, consultar estado da análise registrada (Data/hora, Unidade, Resultado, Observação).
 

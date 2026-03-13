@@ -41,7 +41,7 @@ class ActuatorSecurityTest {
     @BeforeEach
     void setup() {
         Unidade unidade = unidadeRepo.findAll().stream().findFirst()
-                .orElseGet(() -> unidadeRepo.save(Unidade.builder().nome("Unidade Teste").sigla("TESTE").build()));
+                .orElseGet(() -> unidadeRepo.save(Unidade.builder().nome("Unidade teste").sigla("TESTE").build()));
 
         criarUsuario("123456789", Perfil.ADMIN, unidade);
         criarUsuario("987654321", Perfil.SERVIDOR, unidade);

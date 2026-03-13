@@ -13,7 +13,7 @@
     </BAlert>
 
     <div v-if="mostrarDataLimite" class="mb-3">
-      <BFormGroup label="Data Limite" label-for="dataLimiteBloco" label-class="required">
+      <BFormGroup label="Data limite" label-for="dataLimiteBloco" label-class="required">
         <InputData
             id="dataLimiteBloco"
             v-model="dataLimite"
@@ -49,15 +49,24 @@
     </BTable>
 
     <template #footer>
-      <BButton :disabled="processando" variant="secondary" @click="fechar">Cancelar</BButton>
-      <BButton
-          :disabled="processando || selecionadosLocal.length === 0"
-          variant="primary"
-          @click="confirmar"
-      >
-        <BSpinner v-if="processando" aria-hidden="true" class="me-2" small />
-        {{ rotuloBotao }}
-      </BButton>
+      <div class="d-flex justify-content-end w-100 gap-3 align-items-center">
+        <BButton
+            :disabled="processando"
+            class="text-decoration-none text-secondary fw-medium btn-cancelar-link"
+            variant="link"
+            @click="fechar"
+        >
+          Cancelar
+        </BButton>
+        <BButton
+            :disabled="processando || selecionadosLocal.length === 0"
+            variant="primary"
+            @click="confirmar"
+        >
+          <BSpinner v-if="processando" aria-hidden="true" class="me-2" small />
+          {{ rotuloBotao }}
+        </BButton>
+      </div>
     </template>
   </BModal>
 </template>
@@ -167,5 +176,16 @@ watch(() => props.unidadesPreSelecionadas, (newVal) => {
 :deep(.required:after) {
   content: " *";
   color: red;
+}
+
+.btn-cancelar-link {
+  padding: 0.375rem 0.75rem;
+  transition: all 0.2s;
+  border-radius: 0.375rem;
+}
+
+.btn-cancelar-link:hover {
+  color: var(--bs-emphasis-color) !important;
+  background-color: var(--bs-secondary-bg);
 }
 </style>

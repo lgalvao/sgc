@@ -90,14 +90,14 @@
         v-model="mostrarModalValidar"
         :auto-close="false"
         :loading="loadingValidacao"
-        :titulo="isHomologacao ? 'Homologação do cadastro de atividades e conhecimentos' : (isRevisao ? 'Aceite da revisão do cadastro' : 'Validação do cadastro')"
+        :titulo="isHomologacao ? 'Homologação do cadastro' : (isRevisao ? 'Aceite da revisão do cadastro' : 'Validação do cadastro')"
         ok-title="Confirmar"
         test-id-confirmar="btn-aceite-cadastro-confirmar"
         variant="success"
         @confirmar="confirmarValidacao"
     >
       <p>{{
-          isHomologacao ? 'Confirma a homologação do cadastro de atividades e conhecimentos?' : (isRevisao ? 'Confirma o aceite da revisão do cadastro de atividades?' : 'Confirma o aceite do cadastro de atividades?')
+          isHomologacao ? 'Confirma a homologação?' : (isRevisao ? 'Confirma o aceite da revisão do cadastro de atividades?' : 'Confirma o aceite do cadastro de atividades?')
         }}</p>
       <BFormGroup class="mb-3" label="Observação" label-for="observacaoValidacao">
         <BFormTextarea

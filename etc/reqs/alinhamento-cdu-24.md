@@ -9,7 +9,7 @@ O teste E2E cobre:
 - **Passo 5 - Validação de modal**:
   - Título "Disponibilização de mapa em bloco"
   - Texto "Selecione abaixo as unidades cujos mapas deverão ser disponibilizados"
-  - Campo de data "Data Limite" visível (Fluxo completo)
+  - Campo de data "Data limite" visível (Fluxo completo)
   - Checkboxes para unidades (assumido)
   - Botões "Cancelar" e "Disponibilizar"
 - **Passo 7**: Preenchimento de data limite (Fluxo completo).
@@ -76,7 +76,7 @@ O teste **NÃO cobre**:
   - Teste não valida processamento de múltiplas unidades com passo 10 executado para cada uma
   - Teste não valida cenários onde há unidades em hierarquias diferentes (para testar passo 10.7)
 
-- **Validação de campo Data Limite**:
+- **Validação de campo Data limite**:
   - Requisito diz campo é "de preenchimento obrigatório"
   - Teste não valida se campo é obrigatório (tenta submeter sem data? Esperado falhar)
   - Teste preenche data sem validar formato ou constraints
@@ -101,7 +101,7 @@ O teste **NÃO cobre**:
    - Deselecionar uma unidade
    - Testar que apenas unidades selecionadas são disponibilizadas
 
-4. **Adicionar validação de campo Data Limite**:
+4. **Adicionar validação de campo Data limite**:
    - Testar que campo é obrigatório (tentar submeter sem data)
    - Testar que campo rejeita datas inválidas se houver validação
    - Testar que data é salva e aparece em notificações

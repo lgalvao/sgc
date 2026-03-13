@@ -44,7 +44,7 @@ describe('CadAtribuicao.vue', () => {
     const mockUnidade = {
         codigo: 1,
         sigla: 'TEST',
-        nome: 'Unidade Teste'
+        nome: 'Unidade teste'
     };
 
     const mockUsuarios = [
@@ -184,7 +184,7 @@ describe('CadAtribuicao.vue', () => {
     });
 
     it('lida com erro no mount', async () => {
-        mockBuscarUnidade.mockRejectedValueOnce(new Error('Fetch Error'));
+        mockBuscarUnidade.mockRejectedValueOnce(new Error('Fetch error'));
         context.wrapper = criarWrapper();
         await flushPromises();
 

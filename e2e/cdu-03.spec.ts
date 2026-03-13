@@ -7,7 +7,7 @@ import {
     verificarToast
 } from './helpers/helpers-navegacao.js';
 
-test.describe('CDU-03 - Manter Processo', () => {
+test.describe('CDU-03 - Manter processo', () => {
 
     test('Deve validar campos obrigatórios e estados dos botões', async ({page, autenticadoComoAdmin}) => {
         await page.getByTestId('btn-painel-criar-processo').click();
@@ -24,7 +24,7 @@ test.describe('CDU-03 - Manter Processo', () => {
         await expect(descricaoInput).toHaveAttribute('required', '');
 
         // Preenche descrição - ainda desativado
-        await descricaoInput.fill('Descrição Teste');
+        await descricaoInput.fill('Descrição teste');
         await expect(btnSalvar).toBeDisabled();
 
         // Preenche data limite - ainda desativado
@@ -246,7 +246,7 @@ test.describe('CDU-03 - Manter Processo', () => {
         await expect(page.getByText(`Remover o processo '${descricao}'?`)).toBeHidden();
     });
 
-    test('Deve validar fluxo alternativo (Botão Iniciar invés de Salvar)', async ({
+    test('Deve validar fluxo alternativo (Botão iniciar invés de Salvar)', async ({
                                                                                       page,
                                                                                       autenticadoComoAdmin
                                                                                   }) => {

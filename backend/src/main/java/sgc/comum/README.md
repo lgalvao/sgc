@@ -1,6 +1,6 @@
-# Pacote Comum
+# Pacote comum
 
-## Visão Geral
+## Visão geral
 
 O pacote `comum` é uma das fundações da aplicação SGC. Ele contém código transversal, essencial para o funcionamento de
 outros módulos. Seu objetivo é centralizar componentes compartilhados para evitar a duplicação de código e garantir
@@ -22,7 +22,7 @@ graph TD
         Models
     end
 
-    subgraph "Pacote Comum"
+    subgraph "Pacote comum"
         direction LR
         Erros(erros)
         ModeloBase(model)
@@ -40,7 +40,7 @@ graph TD
 ### 1. `exceções`
 
 - **Responsabilidade:** Define a hierarquia de exceções customizadas e o tratador global de erros.
-- **Componentes Notáveis:**
+- **Componentes notáveis:**
     - **`RestExceptionHandler`**: Um `@ControllerAdvice` que intercepta exceções lançadas pela aplicação e as converte
       em respostas JSON padronizadas (`ErroApi`).
     - **`ErroApi`**: Classe que modela a resposta de erro JSON padrão (status, mensagem, timestamp).
@@ -53,14 +53,14 @@ graph TD
 ### 2. `model`
 
 - **Responsabilidade:** Contém modelos de dados compartilhados.
-- **Componentes Notáveis:**
+- **Componentes notáveis:**
     - **`EntidadeBase`**: Superclasse (`@MappedSuperclass`) que fornece o campo `codigo` (ID) para as entidades JPA.
     - **`Parametro`**: Entidade para configuração dinâmica de parâmetros do sistema.
 
 ### 3. `config`
 
 - **Responsabilidade:** Centraliza as classes de configuração do Spring.
-- **Componentes Notáveis:**
+- **Componentes notáveis:**
     - `ConfigSeguranca`: Configurações do Spring Security.
     - `ConfigWeb`: Configurações de CORS e MVC.
     - `ConfigThymeleaf`: Configuração do template engine para e-mails.
@@ -68,9 +68,9 @@ graph TD
 ### 4. `json`
 
 - **Responsabilidade:** Utilitários para serialização e sanitização JSON.
-- **Componentes Notáveis:**
+- **Componentes notáveis:**
     - `SanitizeHtml`: Anotação customizada para sanitização de HTML.
-    - `HtmlSanitizingDeserializer`: Deserializador Jackson que remove tags HTML perigosas de strings de entrada.
+    - `HtmlSanitizingDeserializer`: Deserializador jackson que remove tags HTML perigosas de strings de entrada.
 
 ## Propósito e Uso
 
@@ -79,7 +79,7 @@ graph TD
 - **Reutilização**: Classes como `EntidadeBase` e anotações como `@SanitizeHtml` reduzem código boilerplate nos módulos
   de negócio.
 
-## Como Testar
+## Como testar
 
 Para executar apenas os testes deste módulo (a partir do diretório `backend`):
 

@@ -5,7 +5,7 @@
  *
  * ## Guia de Uso
  *
- * ### 1. Testes Simples (apenas autenticação)
+ * ### 1. Testes simples (apenas autenticação)
  * ```typescript
  * import {test, expect} from './fixtures/auth-fixtures.js';
  *
@@ -24,7 +24,7 @@
  * });
  * ```
  *
- * ### 3. Testes Completos (database + auth)
+ * ### 3. Testes completos (database + auth)
  * ```typescript
  * import {test, expect} from './fixtures/complete-fixtures.js';
  *
@@ -34,7 +34,7 @@
  * });
  * ```
  *
- * ### 4. Database Reset Manual
+ * ### 4. Database reset manual
  * ```typescript
  * import {test, expect} from './fixtures/database-fixtures.js';
  *

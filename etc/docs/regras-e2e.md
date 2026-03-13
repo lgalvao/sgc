@@ -42,7 +42,7 @@ Os testes que falharem geram arquivos `error-context.md`, com a situacao da tela
 - **Quando o estado alvo é terminal, prefira endpoint dedicado**: Se o objetivo do teste é validar uma ação final, como reabertura ou permissão liberada apenas após homologação final, crie uma fixture específica para esse estado em vez de encadear vários passos de UI num `serial`.
 - **Toda nova fixture E2E deve nascer com teste de backend**: Ao adicionar endpoint de fixture, cubra-o em teste integrado do backend antes de confiar nele na suíte Playwright. Isso reduz depuração cruzada entre backend e E2E.
 
-## Helpers Disponíveis
+## Helpers disponíveis
 
 Os helpers estão organizados em arquivos especializados no diretório `e2e/helpers/`:
 
@@ -88,10 +88,10 @@ Ao testar elementos que contêm texto, especialmente em tabelas ou listas de men
 - **Conheça o Componente antes de interagir**: Não assuma padrões de interação genéricos. 
     - Unidades e processos na árvore usam `TreeTable.vue` e exigem clique no botão de expansão (`btn-toggle-expand-...`).
     - Atividades e Conhecimentos usam cards (`AtividadeItem.vue`) que já exibem os dados aninhados. **Nao tente clicar em botões de expansão que não existem**.
-- **Seletores Escopados (Scoped & Semantic)**: Evite `page.getByText('SIGLA')` global se o texto aparecer em múltiplos lugares (breadcrumbs, menus, títulos).
+- **Seletores escopados (Scoped & Semantic)**: Evite `page.getByText('SIGLA')` global se o texto aparecer em múltiplos lugares (breadcrumbs, menus, títulos).
   - ✅ USE: `page.locator('.unidade-sigla').getByText(UNIDADE_ALVO)`
   - ✅ USE: `page.locator('.header-context').getByText('Texto')`
-- **Evite Ambiguidade com Modais**: O Playwright falhará em modo estrito se `getByText('Rótulo')` encontrar tanto um botão quanto o título de um modal aberto. 
+- **Evite ambiguidade com Modais**: O Playwright falhará em modo estrito se `getByText('Rótulo')` encontrar tanto um botão quanto o título de um modal aberto. 
     - ✅ USE `getByRole('button', { name: 'Rótulo' })` para garantir que está interagindo com o botão e não com o título do modal (`heading`).
 - **Cuidado com Substrings**: Se uma mensagem ("Início do processo") é parte de outra ("Início do processo em unidade subordinada"), use filtros combinados para diferenciar:
   ```typescript
@@ -100,10 +100,10 @@ Ao testar elementos que contêm texto, especialmente em tabelas ou listas de men
       .filter({hasNotText: 'subordinada'})
   ).toBeVisible();
   ```
-- **Atenção a Textos Ocultos (Accessibility)**: Alguns componentes injetam texto para leitores de tela. Prefira regex ou filtros de conteúdo em vez de matchers exatos (`exact: true`) em células complexas.
+- **Atenção a Textos ocultos (Accessibility)**: Alguns componentes injetam texto para leitores de tela. Prefira regex ou filtros de conteúdo em vez de matchers exatos (`exact: true`) em células complexas.
 - **Use `data-testid` oficial**: Consulte o componente Vue para usar o ID correto (ex: `inp-editar-atividade`, não `inp-editar-atividade-descricao`).
 
-## Resiliência em Componentes Dinâmicos (Hover/Inline)
+## Resiliência em Componentes dinâmicos (Hover/Inline)
 
 Componentes como `InlineEditor` (usados em Atividades) dependem de estados transientes que podem ser instáveis em CI:
 
@@ -115,10 +115,10 @@ Componentes como `InlineEditor` (usados em Atividades) dependem de estados trans
 
 O comportamento do login varia conforme o tipo de unidade do usuário:
 
-- **Siga o Fluxo do Requisito Rigorosamente**: Se o CDU diz "O usuário clica no Painel", faça o teste clicar no Painel, mesmo que `page.goto()` seja mais rápido. Isso valida permissões e SPAs.
-- **Unidades Operacionais/Intermediárias**: Geralmente possuem apenas um perfil e o sistema loga diretamente (Use `login`).
-- **Unidades Interoperacionais**: Podem acumular perfis (ex: Chefe e Gestor), exigindo a escolha em um dropdown após a senha (Use `loginComPerfil`).
-- **Troca de Usuário em Testes Seriais**: Ao usar `test.describe.serial()`, o estado do navegador é mantido entre os cenários. Se o teste N+1 precisa de um usuário diferente do teste N, chame o helper `login` ou `loginComPerfil` explicitamente no início do cenário, mesmo que já use uma fixture.
+- **Siga o Fluxo do Requisito rigorosamente**: Se o CDU diz "O usuário clica no Painel", faça o teste clicar no Painel, mesmo que `page.goto()` seja mais rápido. Isso valida permissões e SPAs.
+- **Unidades operacionais/Intermediárias**: Geralmente possuem apenas um perfil e o sistema loga diretamente (Use `login`).
+- **Unidades interoperacionais**: Podem acumular perfis (ex: Chefe e Gestor), exigindo a escolha em um dropdown após a senha (Use `loginComPerfil`).
+- **Troca de Usuário em Testes seriais**: Ao usar `test.describe.serial()`, o estado do navegador é mantido entre os cenários. Se o teste N+1 precisa de um usuário diferente do teste N, chame o helper `login` ou `loginComPerfil` explicitamente no início do cenário, mesmo que já use uma fixture.
 - **Dica**: Se o teste falhar esperando pelo seletor de perfil, verifique se o usuário em questão realmente possui múltiplos perfis no `seed.sql`.
 
 ### Hierarquia de Unidades

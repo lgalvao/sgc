@@ -30,7 +30,7 @@ class EmailServiceTest {
     private void setupMockEmail() {
         ConfigAplicacao.Email emailConfig = new ConfigAplicacao.Email();
         emailConfig.setRemetente("noreply@test.com");
-        emailConfig.setRemetenteNome("Remetente Teste");
+        emailConfig.setRemetenteNome("Remetente teste");
         emailConfig.setAssuntoPrefixo("[Teste]");
         when(config.getEmail()).thenReturn(emailConfig);
 
@@ -44,8 +44,8 @@ class EmailServiceTest {
         setupMockEmail();
         when(notificacaoRepo.save(any(Notificacao.class))).thenAnswer(i -> i.getArgument(0));
 
-        String assunto = "Test Subject";
-        String corpoHtml = "<h1>Test Body</h1>";
+        String assunto = "Test subject";
+        String corpoHtml = "<h1>Test body</h1>";
 
         notificacaoServico.enviarEmailHtml(DESTINATARIO, assunto, corpoHtml);
 
@@ -57,8 +57,8 @@ class EmailServiceTest {
     @DisplayName("Não deve enviar e-mail para endereço inválido")
     void enviarEmailHtmlNaoDeveEnviarParaEnderecoInvalido() {
         String para = "invalid-email";
-        String assunto = "Test Subject";
-        String corpoHtml = "<h1>Test Body</h1>";
+        String assunto = "Test subject";
+        String corpoHtml = "<h1>Test body</h1>";
 
         notificacaoServico.enviarEmailHtml(para, assunto, corpoHtml);
 
@@ -72,7 +72,7 @@ class EmailServiceTest {
         setupMockEmail();
         when(notificacaoRepo.save(any(Notificacao.class))).thenAnswer(i -> i.getArgument(0));
 
-        String assunto = "Test Subject Plain";
+        String assunto = "Test subject plain";
         String corpo = "This is plain text";
 
         notificacaoServico.enviarEmail(DESTINATARIO, assunto, corpo);

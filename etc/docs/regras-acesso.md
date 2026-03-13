@@ -1,13 +1,13 @@
 # Controle de Acesso e Regras de Negócio — SGC
 
-## 1. Visão Geral
+## 1. Visão geral
 
 O sistema de acesso do SGC baseia-se em dois eixos:
 
 | Eixo            | O que controla         | Critério                           |
 |-----------------|------------------------|------------------------------------|
-| **Hierarquia**  | Visualização (Leitura) | Unidade Responsável do subprocesso |
-| **Localização** | Execução (Escrita)     | Localização Atual do subprocesso   |
+| **Hierarquia**  | Visualização (Leitura) | Unidade responsável do subprocesso |
+| **Localização** | Execução (Escrita)     | Localização atual do subprocesso   |
 
 **Regra de ouro:** O usuário só pode executar ações de escrita em um subprocesso se este estiver **localizado na sua unidade ativa** — incluindo o perfil ADMIN.
 
@@ -206,7 +206,7 @@ As ações devem seguir essas diretrizes na UI:
 
 ---
 
-## 10. Implementação Técnica
+## 10. Implementação técnica
 
 ### Anotações `@PreAuthorize`
 

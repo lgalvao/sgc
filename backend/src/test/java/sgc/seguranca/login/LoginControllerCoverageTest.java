@@ -14,7 +14,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("LoginController - Cobertura Adicional")
+@DisplayName("LoginController - Cobertura adicional")
 class LoginControllerCoverageTest {
 
     @Mock

@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("UsuarioFacade - Testes Unitários")
+@DisplayName("UsuarioFacade - Testes unitários")
 class UsuarioFacadeTest {
 
     @Mock
@@ -34,7 +34,7 @@ class UsuarioFacadeTest {
     private Usuario criarUsuario(String titulo) {
         Usuario usuario = new Usuario();
         usuario.setTituloEleitoral(titulo);
-        usuario.setNome("Usuário Teste");
+        usuario.setNome("Usuário teste");
         usuario.setEmail("usuario@test.com");
         usuario.setMatricula("12345");
         usuario.setUnidadeLotacao(criarUnidade(1L, "UNID1"));
@@ -45,7 +45,7 @@ class UsuarioFacadeTest {
         Unidade unidade = new Unidade();
         unidade.setCodigo(codigo);
         unidade.setSigla(sigla);
-        unidade.setNome("Unidade Teste");
+        unidade.setNome("Unidade teste");
         unidade.setSituacao(SituacaoUnidade.ATIVA);
         unidade.setTipo(TipoUnidade.OPERACIONAL);
         return unidade;

@@ -7,7 +7,7 @@ describe("UnidadeTreeNodeCoverage.spec.ts", () => {
     const mockUnidade: Unidade = {
         codigo: 1,
         sigla: "TESTE",
-        nome: "Unidade Teste",
+        nome: "Unidade teste",
         filhas: []
     };
 

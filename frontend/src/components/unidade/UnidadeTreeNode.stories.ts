@@ -22,7 +22,7 @@ const mockUnidadeRaiz = {
     isElegivel: true,
     filhas: [
         {codigo: 2, nome: 'Diretoria de Tecnologia', sigla: 'DITEC', isElegivel: true, filhas: []},
-        {codigo: 3, nome: 'Diretoria Administrativa', sigla: 'DIRAD', isElegivel: true, filhas: []},
+        {codigo: 3, nome: 'Diretoria administrativa', sigla: 'DIRAD', isElegivel: true, filhas: []},
     ],
 };
 

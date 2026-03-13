@@ -55,7 +55,7 @@ O teste `cdu-06.spec.ts` cobre os seguintes cenários:
    - Botão para "Mapa em bloco"
    - Diferentes situações de subprocesso (REVISAO vs MAPEAMENTO)
 
-8. **GESTOR de unidade intermediária**: O teste testa GESTOR da SECRETARIA_1 (George Harrison para SECRETARIA_2), mas pode haver confusão sobre qual GESTOR testa qual unidade. Isto é implementado corretamente no teste, mas pode ser mais claro.
+8. **GESTOR de unidade intermediária**: O teste testa GESTOR da SECRETARIA_1 (George harrison para SECRETARIA_2), mas pode haver confusão sobre qual GESTOR testa qual unidade. Isto é implementado corretamente no teste, mas pode ser mais claro.
 
 9. **Botão "Enviar lembrete" (passo não especificado)**: O teste valida presença deste botão, mas não está descrito no requisito (passo 2.2.1). Isto pode ser um recurso adicional não documentado no requisito.
 

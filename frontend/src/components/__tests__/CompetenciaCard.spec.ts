@@ -28,7 +28,7 @@ describe("CompetenciaCard.vue", () => {
 
     const mockCompetencia: Competencia = {
         codigo: 10,
-        descricao: "Competencia Teste",
+        descricao: "Competencia teste",
         atividades: [
             {codigo: 101, descricao: "Atividade 1", conhecimentos: []},
             {codigo: 102, descricao: "Atividade 2", conhecimentos: [{descricao: "Java", codigo: 1}]}
@@ -45,7 +45,7 @@ describe("CompetenciaCard.vue", () => {
             global: {stubs, directives: {"b-tooltip": {}}},
         });
 
-        expect(wrapper.text()).toContain("Competencia Teste");
+        expect(wrapper.text()).toContain("Competencia teste");
     });
 
     it("deve renderizar atividades associadas", () => {
@@ -121,7 +121,7 @@ describe("CompetenciaCard.vue", () => {
 
         // Atividade 2 (index 1) tem conhecimentos
         const badges = wrapper.findAll('[data-testid="cad-mapa__txt-badge-conhecimentos-1"]');
-        expect(badges.length).toBe(1); // Só Atividade 2 tem
+        expect(badges.length).toBe(1); // Só atividade 2 tem
         expect(badges[0].text()).toBe("1");
     });
 });

@@ -168,9 +168,9 @@ class SubprocessoValidacaoServiceTest {
         void usaMensagemFornecida() {
             Subprocesso sp = new Subprocesso();
             sp.setSituacaoForcada(SituacaoSubprocesso.NAO_INICIADO);
-            assertThatThrownBy(() -> validacaoService.validarSituacaoPermitida(sp, "Msg Custom", SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO))
+            assertThatThrownBy(() -> validacaoService.validarSituacaoPermitida(sp, "Msg custom", SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO))
                 .isInstanceOf(ErroValidacao.class)
-                .hasMessage("Msg Custom");
+                .hasMessage("Msg custom");
         }
     }
 

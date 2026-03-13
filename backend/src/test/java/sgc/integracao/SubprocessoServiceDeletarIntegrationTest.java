@@ -33,11 +33,11 @@ class SubprocessoServiceDeletarIntegrationTest extends BaseIntegrationTest {
         Unidade unidade = UnidadeFixture.unidadePadrao();
         unidade.setCodigo(null);
         unidade.setSigla("TEST_DEL");
-        unidade.setNome("Unidade Del");
+        unidade.setNome("Unidade del");
         unidade = unidadeRepo.save(unidade);
 
         Processo processo = Processo.builder()
-                .descricao("Processo Teste Del")
+                .descricao("Processo teste del")
                 .tipo(TipoProcesso.MAPEAMENTO)
                 .situacao(SituacaoProcesso.EM_ANDAMENTO)
                 .dataLimite(LocalDateTime.now().plusDays(30))

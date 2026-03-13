@@ -1,4 +1,4 @@
-# Testes End-to-End (E2E)
+# Testes end-to-End (E2E)
 
 Este diretório contém a suite de testes automatizados de ponta a ponta, implementada com **Playwright 1.58.2**.
 
@@ -36,7 +36,7 @@ Define dados de teste e extensões do objeto `test` do Playwright.
 * **`auth-fixtures.ts`**: ⭐ Fixtures de autenticação prontas para uso. Elimina duplicação de código de login.
 * **`fixtures-processos.ts`**: Helpers para criação de processos via API (em desenvolvimento).
 
-**💡 Uso de Auth Fixtures:**
+**💡 Uso de Auth fixtures:**
 
 ```typescript
 import {test, expect} from './fixtures/auth-fixtures';
@@ -57,15 +57,15 @@ test('Deve criar processo', async ({page, autenticadoComoAdmin}) => {
 });
 ```
 
-**Fixtures Disponíveis:**
+**Fixtures disponíveis:**
 
 * `autenticadoComoAdmin` - Admin único perfil (191919)
 * `autenticadoComoGestor` - Gestor COORD_11 (222222)
-* `autenticadoComoChefeSecao111` - Chefe Seção 111 (333333)
-* `autenticadoComoChefeSecao211` - Chefe Seção 211 (101010)
-* `autenticadoComoChefeSecao212` - Chefe Seção 212 (181818)
-* `autenticadoComoChefeSecao221` - Chefe Seção 221 (141414)
-* `autenticadoComoChefeAssessoria11` - Chefe Assessoria 11 (555555)
+* `autenticadoComoChefeSecao111` - Chefe seção 111 (333333)
+* `autenticadoComoChefeSecao211` - Chefe seção 211 (101010)
+* `autenticadoComoChefeSecao212` - Chefe seção 212 (181818)
+* `autenticadoComoChefeSecao221` - Chefe seção 221 (141414)
+* `autenticadoComoChefeAssessoria11` - Chefe assessoria 11 (555555)
 * E outras (veja `auth-fixtures.ts` para lista completa)
 
 ### 4. Setup e Hooks (`/setup`, `/hooks`)
@@ -73,7 +73,7 @@ test('Deve criar processo', async ({page, autenticadoComoAdmin}) => {
 * **`/setup`**: Scripts de inicialização global, como `seed.sql` e configuração inicial do ambiente.
 * **`/hooks`**: Lógica executada antes ou depois dos testes, como `hooks-limpeza.ts` para garantir um estado limpo.
 
-## 🚀 Como Executar
+## 🚀 Como executar
 
 ### Pré-requisitos
 
@@ -112,7 +112,7 @@ O backend possui um perfil específico (`e2e`) que habilita endpoints auxiliares
 
 Consulte `backend/src/main/java/sgc/e2e/README.md` para mais detalhes.
 
-## ♻️ Isolamento Por Worker
+## ♻️ Isolamento por worker
 
 Para paralelismo com isolamento de estado, a infraestrutura E2E suporta:
 
@@ -126,8 +126,8 @@ Para paralelismo com isolamento de estado, a infraestrutura E2E suporta:
 
 ## 🤝 Padrões de Contribuição
 
-* **Seletores Resilientes:** Use sempre `data-testid="..."` em vez de classes CSS ou XPaths frágeis.
+* **Seletores resilientes:** Use sempre `data-testid="..."` em vez de classes CSS ou XPaths frágeis.
 * **Idempotência:** Cada teste deve ser independente. Use os hooks `beforeEach` para limpar/resetar o estado.
 * **Determinismo:** Evite `page.waitForTimeout()`. Use esperas explícitas por elementos ou respostas de rede.
-* **Auth Fixtures:** Use sempre as fixtures de autenticação (`autenticadoComoAdmin`, etc.) em vez de chamar `login()`
+* **Auth fixtures:** Use sempre as fixtures de autenticação (`autenticadoComoAdmin`, etc.) em vez de chamar `login()`
   manualmente. Isso reduz duplicação e torna os testes mais legíveis.

@@ -40,7 +40,7 @@
                 @click="abrirModalReabrirRevisao"
             >
               <i aria-hidden="true" class="bi bi-arrow-counterclockwise me-1"/>
-              Reabrir Revisão
+              Reabrir revisão
             </BButton>
             <BButton
                 v-if="podeEnviarLembrete && !isProcessoFinalizado"
@@ -180,8 +180,8 @@
       :auto-close="false"
       :loading="loading.isLoading('reabertura')"
       :ok-disabled="!justificativaReabertura.trim()"
-      :titulo="tipoReabertura === 'cadastro' ? 'Reabrir cadastro' : 'Reabrir Revisão'"
-      ok-title="Confirmar Reabertura"
+      :titulo="tipoReabertura === 'cadastro' ? 'Reabrir cadastro' : 'Reabrir revisão'"
+      ok-title="Confirmar reabertura"
       test-id-confirmar="btn-confirmar-reabrir"
       variant="warning"
       @confirmar="confirmarReabertura"

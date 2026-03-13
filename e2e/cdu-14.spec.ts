@@ -24,14 +24,14 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
     const UNIDADE_ALVO = 'SECAO_212';
     const timestamp = Date.now();
     const descProcesso = `Processo CDU-14 ${timestamp}`;
-    const atividadeRevisao = `Atividade Rev ${timestamp}`;
+    const atividadeRevisao = `Atividade rev ${timestamp}`;
 
     test('Setup UI', async ({page, request}) => {
 
-        // Preparacao 1: Base de dados com Mapa Vigente e Revisão Iniciada
+        // Preparacao 1: Base de dados com Mapa vigente e Revisão iniciada
         await criarProcessoFinalizadoFixture(request, {
             unidade: UNIDADE_ALVO,
-            descricao: `Base Map CDU-14 ${timestamp}`
+            descricao: `Base map CDU-14 ${timestamp}`
         });
 
         await criarProcessoFixture(request, {
@@ -47,7 +47,7 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
         await navegarParaAtividades(page);
 
         await adicionarAtividade(page, atividadeRevisao);
-        await adicionarConhecimento(page, atividadeRevisao, 'Conhecimento Rev');
+        await adicionarConhecimento(page, atividadeRevisao, 'Conhecimento rev');
 
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
         await page.getByTestId('btn-confirmar-disponibilizacao').click();

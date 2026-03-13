@@ -12,21 +12,21 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
     const CHEFE_UNIDADE = USUARIOS.CHEFE_ASSESSORIA_11.titulo;
     const SENHA_CHEFE = USUARIOS.CHEFE_ASSESSORIA_11.senha;
 
-    test('Cenário 1: Processo de Mapeamento (Fluxo Completo + Importação + Auto-save)', async ({
+    test('Cenário 1: Processo de Mapeamento (Fluxo completo + Importação + Auto-save)', async ({
                                                                                         page,
                                                                                         autenticadoComoAdmin,
                                                                                         request
                                                                                     }) => {
         const timestamp = Date.now();
         const descricaoProcesso = `Processo CDU-08 Map ${timestamp}`;
-        const processoOrigemDescricao = `Processo Base FINALIZADO ${timestamp}`;
-        const processoOrigem2Descricao = `Processo Base FINALIZADO 2 ${timestamp}`;
+        const processoOrigemDescricao = `Processo base FINALIZADO ${timestamp}`;
+        const processoOrigem2Descricao = `Processo base FINALIZADO 2 ${timestamp}`;
         let processoOrigemId: number;
         let processoAlvoId: number;
 
-        await test.step('1. Setup: Criar Processos Origem e Mapeamento Alvo', async () => {
+        await test.step('1. Setup: Criar processos origem e Mapeamento alvo', async () => {
             
-            // Criar Processos Finalizados via Fixture (para importação)
+            // Criar processos finalizados via Fixture (para importação)
             const procOrigem = await criarProcessoFinalizadoFixture(request, {
                 unidade: UNIDADE_ORIGEM,
                 descricao: processoOrigemDescricao
@@ -62,9 +62,9 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
             await AtividadeHelpers.verificarBotaoDisponibilizar(page, false);
         });
 
-        await test.step('3. Importar Atividades (Fluxo Múltiplo e Negativo)', async () => {
-            const atividadeA = `Atividade Origem A - ${processoOrigemId}`;
-            const atividadeB = `Atividade Origem B - ${processoOrigemId}`;
+        await test.step('3. Importar atividades (Fluxo múltiplo e Negativo)', async () => {
+            const atividadeA = `Atividade origem A - ${processoOrigemId}`;
+            const atividadeB = `Atividade origem B - ${processoOrigemId}`;
             
             await AtividadeHelpers.verificarOpcoesImportacao(page, [
                 { processo: processoOrigemDescricao, unidades: [UNIDADE_ORIGEM] },
@@ -77,23 +77,23 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
             await AtividadeHelpers.verificarSituacaoSubprocesso(page, 'Cadastro em andamento');
             await AtividadeHelpers.verificarBotaoDisponibilizar(page, true);
 
-            // Tentar importar de novo e esperar o erro (Fluxo Negativo / Regra de Duplicidade)
+            // Tentar importar de novo e esperar o erro (Fluxo negativo / Regra de Duplicidade)
             await AtividadeHelpers.importarAtividadesComErroDuplicidade(page, processoOrigemDescricao, UNIDADE_ORIGEM, [atividadeA]);
         });
 
-        const atividadeManual = `Atividade Manual ${timestamp}`;
+        const atividadeManual = `Atividade manual ${timestamp}`;
 
-        await test.step('4. Flexibilidade de Fluxo, Cadastro Manual e Validar Auto-save', async () => {
+        await test.step('4. Flexibilidade de Fluxo, Cadastro manual e Validar auto-save', async () => {
             await AtividadeHelpers.adicionarAtividade(page, atividadeManual);
             
             await AtividadeHelpers.verificarSituacaoSubprocesso(page, 'Cadastro em andamento');
 
-            const atividadeManual2 = `Atividade Manual 2 ${timestamp}`;
+            const atividadeManual2 = `Atividade manual 2 ${timestamp}`;
             await AtividadeHelpers.adicionarAtividade(page, atividadeManual2);
 
-            const conhecimento1 = `Conhecimento Manual ${timestamp}`;
+            const conhecimento1 = `Conhecimento manual ${timestamp}`;
             await AtividadeHelpers.adicionarConhecimento(page, atividadeManual, conhecimento1);
-            const conhecimento2 = `Conhecimento Manual 2 ${timestamp}`;
+            const conhecimento2 = `Conhecimento manual 2 ${timestamp}`;
             await AtividadeHelpers.adicionarConhecimento(page, atividadeManual2, conhecimento2);
 
             // Recarregar a página para atestar que os dados estão sendo persistidos
@@ -114,7 +114,7 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
             await AtividadeHelpers.cancelarEdicaoAtividade(page, atividadeManual, atividadeCancelada);
             await AtividadeHelpers.editarAtividade(page, atividadeManual, atividadeEditada);
 
-            const conhecimento1 = `Conhecimento Manual ${timestamp}`;
+            const conhecimento1 = `Conhecimento manual ${timestamp}`;
             const conhecimentoCancelado = `${conhecimento1} CANCELADO`;
             const conhecimento1Editado = `${conhecimento1} EDITADO`;
 
@@ -127,7 +127,7 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
             await AtividadeHelpers.removerAtividade(page, atividadeEditada);
         });
 
-        await test.step('6. Verificar Ausência de Botão de Impacto', async () => {
+        await test.step('6. Verificar ausência de Botão de Impacto', async () => {
             await AtividadeHelpers.verificarBotaoImpactoAusenteEdicao(page);
         });
 
@@ -137,7 +137,7 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
         });
     });
 
-    test('Cenário 2: Processo de Revisão (Botão Impacto)', async ({page, request}) => {
+    test('Cenário 2: Processo de Revisão (Botão impacto)', async ({page, request}) => {
         const timestamp = Date.now();
         const descricao = `Processo CDU-08 Rev ${timestamp}`;
         const UNIDADE_REVISAO = 'ASSESSORIA_12';
@@ -145,7 +145,7 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
         const SENHA_REVISAO = USUARIOS.CHEFE_ASSESSORIA_12.senha;
         let processoRevisaoId: number;
 
-        await test.step('Setup: Criar Processo de Revisão', async () => {
+        await test.step('Setup: Criar processo de Revisão', async () => {
             const processoRevisao = await criarProcessoFixture(request, {
                 unidade: UNIDADE_REVISAO,
                 descricao,
@@ -156,13 +156,13 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
             processoRevisaoId = processoRevisao.codigo;
         });
 
-        await test.step('Verificar Botão Impacto', async () => {
+        await test.step('Verificar botão impacto', async () => {
             await login(page, CHEFE_REVISAO, SENHA_REVISAO);
             await page.goto(`/processo/${processoRevisaoId}/${UNIDADE_REVISAO}`);
             await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processoRevisaoId}/${UNIDADE_REVISAO}$`));
             await AtividadeHelpers.navegarParaAtividades(page);
 
-            await AtividadeHelpers.adicionarAtividade(page, 'Atividade Trigger');
+            await AtividadeHelpers.adicionarAtividade(page, 'Atividade trigger');
             await AtividadeHelpers.verificarBotaoImpactoDropdown(page);
             await AtividadeHelpers.abrirModalImpactoEdicao(page);
             await AtividadeHelpers.fecharModalImpacto(page);

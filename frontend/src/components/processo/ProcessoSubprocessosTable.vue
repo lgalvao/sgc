@@ -24,7 +24,7 @@ defineEmits<{
 const colunas = [
   {key: "unidadeAtual", label: "Unidade", width: "40%"},
   {key: "situacao", label: "Situação", width: "30%"},
-  {key: "dataLimite", label: "Data Limite", width: "30%"},
+  {key: "dataLimite", label: "Data limite", width: "30%"},
 ];
 
 const mapeamentoHierarquia = computed(() => {
@@ -38,6 +38,7 @@ function mapUnidades(unidades: UnidadeParticipante[]): any[] {
     unidadeAtual: `${u.sigla} - ${u.nome}`,
     sigla: u.sigla,
     situacao: formatSituacaoSubprocesso(u.situacaoSubprocesso),
+    situacaoTooltip: formatSituacaoSubprocesso(u.situacaoSubprocesso),
     dataLimite: formatDate(u.dataLimite, false),
     children: u.filhos ? mapUnidades(u.filhos) : [],
     expanded: true,

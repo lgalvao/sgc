@@ -185,7 +185,7 @@ class LoginControllerTest {
     @DisplayName("POST /api/usuarios/autenticar - Deve rejeitar título não numérico")
     @WithMockUser
     void autenticar_DeveRejeitarTituloNaoNumerico() throws Exception {
-        // Log Injection Payload: Digits followed by newline and fake log
+        // Log injection payload: Digits followed by newline and fake log
         // Must be <= 12 chars to bypass @Size check, but contains newline/letters to fail @Pattern
         String maliciousTitle = "12\nFake";
 
@@ -251,7 +251,7 @@ class LoginControllerTest {
                 .build();
 
         Usuario usuario = new Usuario();
-        usuario.setNome("Admin User");
+        usuario.setNome("Admin user");
         usuario.setTituloEleitoral("123");
 
         when(loginFacade.entrar(any(EntrarRequest.class))).thenReturn("token-jwt");
@@ -265,7 +265,7 @@ class LoginControllerTest {
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.token").value("token-jwt"))
-                .andExpect(jsonPath("$.nome").value("Admin User"));
+                .andExpect(jsonPath("$.nome").value("Admin user"));
     }
 
     @Test
@@ -312,7 +312,7 @@ class LoginControllerTest {
     }
 
     @Nested
-    @DisplayName("Unit Tests (Isolated)")
+    @DisplayName("Unit tests (Isolated)")
     class UnitTests {
 
         private LoginController controller;

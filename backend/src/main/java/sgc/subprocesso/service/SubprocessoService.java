@@ -630,16 +630,21 @@ public class SubprocessoService {
     public PermissoesSubprocessoDto obterPermissoesUI(Subprocesso sp, Usuario usuario) {
         Processo processo = sp.getProcesso();
 
+        Perfil perfil = usuario.getPerfilAtivo();
+        SituacaoSubprocesso situacao = sp.getSituacao();
+
         if (processo != null && processo.getSituacao() == SituacaoProcesso.FINALIZADO) {
-            return PermissoesSubprocessoDto.builder().build();
+            // Para processos finalizados, bloqueia toda edição mas mantém acesso de visualização (CDU-18, CDU-17)
+            return PermissoesSubprocessoDto.builder()
+                    .habilitarAcessoCadastro(verificarAcessoCadastroHabilitado(perfil, situacao))
+                    .habilitarAcessoMapa(verificarAcessoMapaHabilitado(perfil, situacao))
+                    .build();
         }
 
         Long codUnidadeUsuario = usuario.getUnidadeAtivaCodigo();
         Long codUnidadeLocalizacao = obterUnidadeLocalizacao(sp).getCodigo();
         boolean mesmaUnidade = Objects.equals(codUnidadeUsuario, codUnidadeLocalizacao);
 
-        Perfil perfil = usuario.getPerfilAtivo();
-        SituacaoSubprocesso situacao = sp.getSituacao();
         boolean temMapaVigente = unidadeService.verificarMapaVigente(sp.getUnidade().getCodigo());
 
         return construirPermissoes(mesmaUnidade, perfil, situacao, temMapaVigente);

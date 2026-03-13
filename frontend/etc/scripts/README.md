@@ -3,7 +3,7 @@
 Este diretório contém scripts utilitários para análise de cobertura, validações de consistência e auditoria de qualidade
 do frontend.
 
-## 🚀 Como Executar
+## 🚀 Como executar
 
 A maioria dos scripts requer que o relatório de cobertura (`coverage-final.json`) tenha sido gerado previamente.
 
@@ -25,7 +25,7 @@ A maioria dos scripts requer que o relatório de cobertura (`coverage-final.json
 
 * **`verificar-cobertura.cjs`**: Lista todos os arquivos com cobertura de statements abaixo de 80%. É útil para
   identificar componentes que precisam de atenção imediata.
-* **`analisar-impacto-cobertura.cjs`**: O script mais estratégico. Ele calcula o "Impacto Potencial", mostrando quanto a
+* **`analisar-impacto-cobertura.cjs`**: O script mais estratégico. Ele calcula o "Impacto potencial", mostrando quanto a
   cobertura total do projeto aumentaria (em pontos percentuais) se um arquivo específico atingisse 100%. Use-o para
   priorizar onde escrever testes.
 
@@ -45,7 +45,7 @@ A maioria dos scripts requer que o relatório de cobertura (`coverage-final.json
 
 ---
 
-## 💡 Dica Profissional
+## 💡 Dica profissional
 
 Antes de começar a aumentar a cobertura, execute:
 
@@ -53,5 +53,5 @@ Antes de começar a aumentar a cobertura, execute:
 node etc/scripts/analisar-impacto-cobertura.cjs
 ```
 
-Foque nos 3 primeiros arquivos da lista de "Impacto Potencial" para obter o maior ganho de cobertura com o menor
+Foque nos 3 primeiros arquivos da lista de "Impacto potencial" para obter o maior ganho de cobertura com o menor
 esforço.

@@ -63,7 +63,7 @@ class CDU03IntegrationTest extends BaseIntegrationTest {
         List<Long> unidades = List.of(unidade1.getCodigo());
 
         CriarProcessoRequest requestDTO = criarCriarProcessoReq(
-                "Processo de Mapeamento Teste", unidades, LocalDateTime.now().plusDays(30));
+                "Processo de Mapeamento teste", unidades, LocalDateTime.now().plusDays(30));
 
         mockMvc.perform(
                         post(API_PROCESSOS)
@@ -72,7 +72,7 @@ class CDU03IntegrationTest extends BaseIntegrationTest {
                                 .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.codigo").isNumber())
-                .andExpect(jsonPath("$.descricao").value("Processo de Mapeamento Teste"))
+                .andExpect(jsonPath("$.descricao").value("Processo de Mapeamento teste"))
                 .andExpect(jsonPath("$.tipo").value("MAPEAMENTO"))
                 .andExpect(
                         jsonPath("$.situacao")
@@ -161,7 +161,7 @@ class CDU03IntegrationTest extends BaseIntegrationTest {
 
         AtualizarProcessoRequest editarRequestDTO = criarAtualizarProcessoReq(
                 processoId,
-                "Processo Editado",
+                "Processo editado",
                 unidadesEditadas,
                 LocalDateTime.now().plusDays(40) // Nova data limite
         );
@@ -173,7 +173,7 @@ class CDU03IntegrationTest extends BaseIntegrationTest {
                                 .content(objectMapper.writeValueAsString(editarRequestDTO)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.codigo").value(processoId))
-                .andExpect(jsonPath("$.descricao").value("Processo Editado"));
+                .andExpect(jsonPath("$.descricao").value("Processo editado"));
     }
 
     @Test
@@ -182,7 +182,7 @@ class CDU03IntegrationTest extends BaseIntegrationTest {
 
         AtualizarProcessoRequest editarRequestDTO = criarAtualizarProcessoReq(
                 99999L, // Código que não existe
-                "Processo Inexistente",
+                "Processo inexistente",
                 unidades,
                 LocalDateTime.now().plusDays(30));
 
@@ -220,7 +220,7 @@ class CDU03IntegrationTest extends BaseIntegrationTest {
 
         // 2. Remover o processo
         mockMvc.perform(post(API_PROCESSOS + "/{codProcesso}/excluir", processoId).with(csrf()))
-                .andExpect(status().isNoContent()); // 204 No Content para remoção bem-sucedida
+                .andExpect(status().isNoContent()); // 204 No content para remoção bem-sucedida
 
         mockMvc.perform(get(API_PROCESSOS_ID, processoId)).andExpect(status().isNotFound());
     }

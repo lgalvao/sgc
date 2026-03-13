@@ -2,7 +2,7 @@
 
 Este diretório contém o código-fonte do frontend da aplicação SGC (Sistema de Gestão de Competências).
 
-## 🚀 Como Executar
+## 🚀 Como executar
 
 Para iniciar o servidor de desenvolvimento:
 
@@ -20,8 +20,8 @@ O frontend utiliza uma arquitetura baseada em componentes com **Vue.js 3** e **T
 
 * **Framework:** Vue.js 3.5.28 (Composition API, `<script setup>`)
 * **Linguagem:** TypeScript 5.9.3
-* **Estado:** Pinia (Setup Stores)
-* **Roteamento:** Vue Router (Modularizado)
+* **Estado:** Pinia (Setup stores)
+* **Roteamento:** Vue router (Modularizado)
 * **UI:** BootstrapVueNext + Bootstrap 5
 * **Build:** Vite 7.3.1
 * **HTTP:** Axios (com interceptors para JWT)
@@ -35,7 +35,7 @@ O frontend utiliza uma arquitetura baseada em componentes com **Vue.js 3** e **T
 3. **Services (`src/services`)**: Camada de abstração da API. Fazem requisições HTTP.
 4. **Backend**: API REST Spring Boot.
 
-## Estrutura de Pastas Principais
+## Estrutura de Pastas principais
 
 * **`src/components/`**: Componentes reutilizáveis, organizados por funcionalidade.
 * **`src/composables/`**: Lógica de estado reutilizável (Composition API).
@@ -55,7 +55,7 @@ O frontend utiliza uma arquitetura baseada em componentes com **Vue.js 3** e **T
 npm run test:unit
 ```
 
-### Type Check
+### Type check
 
 ```bash
 npm run typecheck
@@ -67,7 +67,7 @@ npm run typecheck
 npm run lint
 ```
 
-### Qualidade Completa
+### Qualidade completa
 
 Para executar testes, linting e typecheck de uma vez:
 
@@ -86,7 +86,7 @@ npm run test:e2e
 A autenticação é feita via **JWT**. O token é armazenado no `localStorage` e injetado automaticamente pelo
 `axios-setup.ts`.
 
-## Documentação Adicional
+## Documentação adicional
 
 Consulte a pasta `etc/docs/` para guias detalhados sobre:
 

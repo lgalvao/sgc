@@ -3,8 +3,8 @@
 ## Cobertura atual do teste
 O teste `cdu-07.spec.ts` cobre:
 - **Navegação**: Acesso a detalhes de subprocesso via tabela de processos para 3 perfis (ADMIN, GESTOR, CHEFE)
-- **Seção Dados da Unidade**: Verifica exibição de "Titular" (linha 44)
-- **Seção Movimentações**: Valida presença de tabela com movimentações (linha 56)
+- **Seção dados da Unidade**: Verifica exibição de "Titular" (linha 44)
+- **Seção movimentações**: Valida presença de tabela com movimentações (linha 56)
 - **Regras de Habilitação de Cards**: Testa habilitação/desabilitação de cards "Atividades" e "Mapa de Competências" para cada perfil:
   - ADMIN (antes de homologação): ambos desabilitados
   - GESTOR (antes de disponibilização): card de atividades desabilitado

@@ -16,7 +16,7 @@ O teste `cdu-01.spec.ts` cobre os seguintes cenários:
 
 ## Lacunas em relação ao requisito
 
-1. **Autenticação via API AD não verificada**: O requisito especifica (passo 4) que o sistema deve verificar credenciais através da API do "Sistema Acesso AD" do TRE-PE. O teste apenas valida que a mensagem de erro é exibida, sem validar o mecanismo de integração com AD.
+1. **Autenticação via API AD não verificada**: O requisito especifica (passo 4) que o sistema deve verificar credenciais através da API do "Sistema acesso AD" do TRE-PE. O teste apenas valida que a mensagem de erro é exibida, sem validar o mecanismo de integração com AD.
 
 2. **Consultoria de perfis e unidades não explícita**: O requisito menciona (passo 6) consulta às views do banco de dados para recuperar perfis e unidades. O teste não valida este comportamento internamente.
 
@@ -31,7 +31,7 @@ O teste `cdu-01.spec.ts` cobre os seguintes cenários:
 
 6. **Links SGC não validam navegação**: O teste verifica a visibilidade do link com nome "SGC", mas não valida que clicar nele abre a tela "Painel" (requisito passo 9.1.1).
 
-7. **Link Relatórios não validado**: O requisito menciona (passo 9.1.1) um link "Relatórios", mas o teste apenas valida sua presença, não seu comportamento.
+7. **Link relatórios não validado**: O requisito menciona (passo 9.1.1) um link "Relatórios", mas o teste apenas valida sua presença, não seu comportamento.
 
 8. **Ícone de logout não completamente testado**: O teste valida que `btn-logout` está visível, mas não valida que clicar nele faz logout e mostra a tela Login novamente.
 
@@ -53,4 +53,4 @@ O teste `cdu-01.spec.ts` cobre os seguintes cenários:
 - Há possível inconsistência de nomenclatura entre "Configurações" (requisito) e "Parâmetros" (teste)
 - O requisito é claro quanto às regras de determinação de perfis (passo 7), mas não descreve como o sistema diferencia um SERVIDOR de outros perfis em múltiplas situações de hierarquia
 - O requisito menciona "Reabertura do cadastro de atividades" (referência futura a CDU-06), sugerindo interdependência com outros CDUs
-- A integração com "Sistema Acesso do TRE-PE" não é testada no E2E (esperado, pois é externo), mas não há clareza se há testes de contrato ou mocks
+- A integração com "Sistema acesso do TRE-PE" não é testada no E2E (esperado, pois é externo), mas não há clareza se há testes de contrato ou mocks

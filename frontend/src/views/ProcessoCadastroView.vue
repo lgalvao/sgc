@@ -279,7 +279,7 @@ async function salvarProcesso() {
   clearErrors();
   isLoading.value = true;
 
-  // Validações agora são feitas no backend via Bean Validation
+  // Validações agora são feitas no backend via Bean validation
   try {
     if (processoEditando.value) {
       const request = construirAtualizarRequest(processoEditando.value.codigo);

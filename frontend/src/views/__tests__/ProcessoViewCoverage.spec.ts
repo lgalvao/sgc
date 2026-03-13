@@ -74,7 +74,7 @@ describe("ProcessoViewCoverage.spec.ts", () => {
                 processos: {
                     processoDetalhe: {
                         codigo: 1,
-                        descricao: "Processo Teste",
+                        descricao: "Processo teste",
                         tipo: TipoProcesso.MAPEAMENTO,
                         situacao: "EM_ANDAMENTO",
                         unidades: []

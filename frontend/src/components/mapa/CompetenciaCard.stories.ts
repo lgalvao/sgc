@@ -40,7 +40,7 @@ const mockAtividades: Atividade[] = [
 
 const mockCompetencia: Competencia = {
     codigo: 10,
-    descricao: 'Desenvolvimento Fullstack',
+    descricao: 'Desenvolvimento fullstack',
     atividades: [mockAtividades[0], mockAtividades[1]],
 };
 

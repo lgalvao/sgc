@@ -6,7 +6,7 @@ import org.springframework.web.cors.*;
 /**
  * Configuração do bean CORS.
  *
- * <p>Separado de {@link ConfigCorsProperties} para manter Single Responsibility:
+ * <p>Separado de {@link ConfigCorsProperties} para manter Single responsibility:
  * propriedades em record imutável, bean em classe de configuração.
  */
 @Configuration

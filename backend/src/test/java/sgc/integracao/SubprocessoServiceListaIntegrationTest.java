@@ -36,11 +36,11 @@ class SubprocessoServiceListaIntegrationTest extends BaseIntegrationTest {
         unidade = UnidadeFixture.unidadePadrao();
         unidade.setCodigo(null);
         unidade.setSigla("TEST_LISTA");
-        unidade.setNome("Unidade Lista");
+        unidade.setNome("Unidade lista");
         unidade = unidadeRepo.save(unidade);
 
         processo = Processo.builder()
-                .descricao("Processo Teste Lista")
+                .descricao("Processo teste lista")
                 .tipo(TipoProcesso.MAPEAMENTO)
                 .situacao(SituacaoProcesso.EM_ANDAMENTO)
                 .dataLimite(LocalDateTime.now().plusDays(30))

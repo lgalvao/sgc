@@ -21,7 +21,7 @@ const mockImpacto = {
     atividadesInseridas: [
         {
             codigo: 1,
-            descricao: 'Nova Atividade de Teste',
+            descricao: 'Nova atividade de Teste',
             tipoImpacto: TipoImpactoAtividade.INSERIDA,
             competenciasVinculadas: ['Competência A']
         },
@@ -37,9 +37,9 @@ const mockImpacto = {
     atividadesAlteradas: [
         {
             codigo: 3,
-            descricao: 'Atividade Alterada',
+            descricao: 'Atividade alterada',
             tipoImpacto: TipoImpactoAtividade.ALTERADA,
-            descricaoAnterior: 'Atividade Anterior',
+            descricaoAnterior: 'Atividade anterior',
             competenciasVinculadas: []
         },
     ],
@@ -47,7 +47,7 @@ const mockImpacto = {
         {
             codigo: 10,
             descricao: 'Competência A',
-            atividadesAfetadas: ['Nova Atividade de Teste'],
+            atividadesAfetadas: ['Nova atividade de Teste'],
             tiposImpacto: [TipoImpactoCompetencia.ATIVIDADE_ALTERADA],
         },
         {
@@ -73,7 +73,7 @@ export const ComImpactos: Story = {
         },
         template: `
       <div>
-        <button class="btn btn-primary" @click="show = true">Ver Impactos</button>
+        <button class="btn btn-primary" @click="show = true">Ver impactos</button>
         <ImpactoMapaModal v-bind="args" :mostrar="show" @fechar="show = false" />
       </div>
     `,

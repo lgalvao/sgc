@@ -34,14 +34,14 @@ const routes = [
     {path: '/painel', component: {template: '<div>Painel</div>'}} // Mock painel component if needed
 ];
 
-describe('Router Guards', () => {
+describe('Router guards', () => {
     let router: any;
     let perfilStoreMock: any;
 
     beforeEach(() => {
         vi.clearAllMocks();
 
-        // Setup Store Mock
+        // Setup store mock
         perfilStoreMock = {
             usuarioCodigo: null,
             perfisUnidades: [],
@@ -104,7 +104,7 @@ describe('Router Guards', () => {
     });
 });
 
-describe('Route Props Logic', () => {
+describe('Route props logic', () => {
     it('Processo routes props transformation', () => {
         const subprocessoRoute = processoRoutes.find(r => r.name === 'Subprocesso');
         const propsFn = subprocessoRoute?.props as (...args: any[]) => any;

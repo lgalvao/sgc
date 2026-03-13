@@ -22,7 +22,7 @@ class AtividadeJsonViewTest {
         Mapa mapa = Mapa.builder().codigo(10L).build();
         Atividade atividade = Atividade.builder()
                 .codigo(1L)
-                .descricao("Atividade Teste")
+                .descricao("Atividade teste")
                 .mapa(mapa)
                 .build();
 
@@ -40,7 +40,7 @@ class AtividadeJsonViewTest {
 
         assertThat(json)
                 .contains("\"codigo\":1")
-                .contains("\"descricao\":\"Atividade Teste\"")
+                .contains("\"descricao\":\"Atividade teste\"")
                 .contains("\"mapaCodigo\":10")
                 .contains("\"conhecimentos\"")
                 .contains("\"descricao\":\"K1\"")
@@ -53,7 +53,7 @@ class AtividadeJsonViewTest {
     void deveOcultarConhecimentosEmVisaoMinimal() {
         Atividade atividade = Atividade.builder()
                 .codigo(1L)
-                .descricao("Atividade Teste")
+                .descricao("Atividade teste")
                 .conhecimentos(Set.of(Conhecimento.builder().codigo(100L).descricao("K1").build()))
                 .build();
 

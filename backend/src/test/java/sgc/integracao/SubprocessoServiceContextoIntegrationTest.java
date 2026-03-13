@@ -53,7 +53,7 @@ class SubprocessoServiceContextoIntegrationTest extends BaseIntegrationTest {
         );
 
         processo = Processo.builder()
-                .descricao("Processo Teste Contexto")
+                .descricao("Processo teste contexto")
                 .tipo(TipoProcesso.MAPEAMENTO)
                 .situacao(SituacaoProcesso.EM_ANDAMENTO)
                 .dataLimite(LocalDateTime.now().plusDays(30))

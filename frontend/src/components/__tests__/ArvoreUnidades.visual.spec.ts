@@ -5,7 +5,7 @@ import ArvoreUnidades from '@/components/unidade/ArvoreUnidades.vue';
 import type {Unidade} from '@/types/tipos';
 import {setupComponentTest} from '@/test-utils/componentTestHelpers';
 
-describe('ArvoreUnidades - Estado Visual (getEstadoSelecao)', () => {
+describe('ArvoreUnidades - Estado visual (getEstadoSelecao)', () => {
     setupComponentTest();
 
     const mountOptions = {
@@ -232,7 +232,7 @@ describe('ArvoreUnidades - Estado Visual (getEstadoSelecao)', () => {
         });
     });
 
-    describe('isHabilitado - Habilitação Recursiva', () => {
+    describe('isHabilitado - Habilitação recursiva', () => {
         it('INTERMEDIARIA com filhas elegíveis deve estar habilitada', () => {
             const wrapper = mount(ArvoreUnidades, {
                 ...mountOptions,

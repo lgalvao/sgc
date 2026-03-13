@@ -24,7 +24,7 @@ import static org.mockito.Mockito.*;
  * - AlertaServiceUpdateTest.java (4 testes)
  */
 @ExtendWith(MockitoExtension.class)
-@DisplayName("AlertaFacade - Testes Unitários")
+@DisplayName("AlertaFacade - Testes unitários")
 class AlertaFacadeTest {
     @Mock
     private AlertaService alertaService;
@@ -111,9 +111,8 @@ class AlertaFacadeTest {
     @DisplayName("Métodos: criação de alertas específicos")
     class AlertasEspecificos {
         @Test
-        @DisplayName("Deve criar alerta de cadastro disponibilizado com sucesso")
+        @DisplayName("Deve criar alerta de cadastro disponibilizado")
         void deveCriarAlertaCadastroDisponibilizado() {
-
             Processo p = new Processo();
             p.setDescricao("P");
             Unidade uOrigem = new Unidade();
@@ -180,9 +179,9 @@ class AlertaFacadeTest {
 
             when(alertaService.salvar(any())).thenAnswer(i -> i.getArgument(0));
 
-            service.criarAlertaReaberturaCadastro(p, u, "Justificativa Teste");
+            service.criarAlertaReaberturaCadastro(p, u, "Justificativa teste");
             service.criarAlertaReaberturaCadastroSuperior(p, sup, u);
-            service.criarAlertaReaberturaRevisao(p, u, "Justificativa Teste");
+            service.criarAlertaReaberturaRevisao(p, u, "Justificativa teste");
             service.criarAlertaReaberturaRevisaoSuperior(p, sup, u);
 
             verify(alertaService, times(4)).salvar(any());
@@ -277,7 +276,7 @@ class AlertaFacadeTest {
     }
 
     @Nested
-    @DisplayName("Listagens Paginadas e Outros")
+    @DisplayName("Listagens paginadas e Outros")
     class OutrosMetodos {
         @Test
         @DisplayName("Listar por unidade paginado")
@@ -413,7 +412,7 @@ class AlertaFacadeTest {
     }
 
     @Nested
-    @DisplayName("Método: getUnidadeRaiz (Lazy Load)")
+    @DisplayName("Método: getUnidadeRaiz (Lazy load)")
     class GetUnidadeRaiz {
         @Test
         @DisplayName("Deve buscar unidadeRaiz para cada operação (sem cache lazy para sistema pequeno)")

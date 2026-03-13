@@ -3,7 +3,7 @@ import {login, USUARIOS} from './helpers/helpers-auth.js';
 import {fazerLogout} from './helpers/helpers-navegacao.js';
 import {criarProcesso, verificarProcessoNaTabela} from './helpers/helpers-processos.js';
 
-test.describe('CDU-02 - Visualizar Painel', () => {
+test.describe('CDU-02 - Visualizar painel', () => {
     test.describe('Como ADMIN', () => {
         test('Deve exibir estrutura básica do painel e testar ordenação', async ({page, autenticadoComoAdmin}) => {
             await test.step('Verificar seções principais', async () => {
@@ -58,7 +58,7 @@ test.describe('CDU-02 - Visualizar Painel', () => {
                                                                                page,
                                                                                autenticadoComoAdmin
                                                                            }) => {
-            const descricaoProcesso = `Processo Criado - ${Date.now()}`;
+            const descricaoProcesso = `Processo criado - ${Date.now()}`;
 
             await criarProcesso(page, {
                 descricao: descricaoProcesso,
@@ -93,7 +93,7 @@ test.describe('CDU-02 - Visualizar Painel', () => {
             await page.getByTestId('btn-painel-criar-processo').click();
             await expect(page).toHaveURL(/\/processo\/cadastro/);
 
-            const descricaoProcesso = `Teste Filtragem - ${Date.now()}`;
+            const descricaoProcesso = `Teste filtragem - ${Date.now()}`;
             await page.getByTestId('inp-processo-descricao').fill(descricaoProcesso);
             await page.getByTestId('sel-processo-tipo').selectOption('MAPEAMENTO');
 

@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.*;
 
 @Tag("integration")
 @Transactional
-@DisplayName("Integração: SubprocessoService - Cobertura de Metodos Extras")
+@DisplayName("Integração: SubprocessoService - Cobertura de Metodos extras")
 class SubprocessoServiceExtraMethodsIntegrationTest extends BaseIntegrationTest {
 
     @Autowired
@@ -34,11 +34,11 @@ class SubprocessoServiceExtraMethodsIntegrationTest extends BaseIntegrationTest 
         Unidade unidade = UnidadeFixture.unidadePadrao();
         unidade.setCodigo(null);
         unidade.setSigla("TEST_EXTRA");
-        unidade.setNome("Unidade Extra");
+        unidade.setNome("Unidade extra");
         unidade = unidadeRepo.save(unidade);
 
         Processo processo = Processo.builder()
-                .descricao("Processo Teste Extra")
+                .descricao("Processo teste extra")
                 .tipo(TipoProcesso.MAPEAMENTO)
                 .situacao(SituacaoProcesso.EM_ANDAMENTO)
                 .dataLimite(LocalDateTime.now().plusDays(30))

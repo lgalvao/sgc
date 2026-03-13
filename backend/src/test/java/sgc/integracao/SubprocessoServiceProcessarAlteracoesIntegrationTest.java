@@ -37,7 +37,7 @@ class SubprocessoServiceProcessarAlteracoesIntegrationTest extends BaseIntegrati
         unidade = unidadeRepo.save(unidade);
 
         Processo processo = Processo.builder()
-                .descricao("Processo Teste")
+                .descricao("Processo teste")
                 .tipo(TipoProcesso.MAPEAMENTO)
                 .situacao(SituacaoProcesso.EM_ANDAMENTO)
                 .dataLimite(LocalDateTime.now().plusDays(30))

@@ -46,7 +46,7 @@ class SubprocessoServiceValidacaoIntegrationTest extends BaseIntegrationTest {
         unidade = unidadeRepo.save(unidade);
 
         Processo processo = Processo.builder()
-                .descricao("Processo Teste Val")
+                .descricao("Processo teste val")
                 .tipo(TipoProcesso.MAPEAMENTO)
                 .situacao(SituacaoProcesso.EM_ANDAMENTO)
                 .dataLimite(LocalDateTime.now().plusDays(30))

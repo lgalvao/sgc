@@ -119,7 +119,7 @@ describe("PainelView.vue", () => {
         }));
         expect(wrapperAdmin.find('[data-testid="btn-painel-criar-processo"]').exists()).toBe(true);
 
-        // Not Admin
+        // Not admin
         const wrapperUser = mount(PainelView, mountOptions({
             perfil: {perfilSelecionado: "USER"}
         }));

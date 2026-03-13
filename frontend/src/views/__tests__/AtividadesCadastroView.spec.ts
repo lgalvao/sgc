@@ -49,7 +49,10 @@ vi.mock("@/services/processoService", () => ({
 
 const stubs = {
     LayoutPadrao: {template: '<div><slot /></div>'},
-    PageHeader: {template: '<div><slot /><slot name="actions" /></div>'},
+    PageHeader: {
+        props: ['title'],
+        template: '<div><h1>{{ title }}</h1><slot /><slot name="actions" /></div>'
+    },
     LoadingButton: {
         props: {
             disabled: {
@@ -146,7 +149,7 @@ describe("CadastroView.vue", () => {
     it("renderiza corretamente", async () => {
         const wrapper = createWrapper();
         await flushPromises();
-        expect(wrapper.text()).toContain("TESTE - Teste");
+        expect(wrapper.text()).toContain("Atividades e conhecimentos");
     });
 
     it("chama validação antes de disponibilizar", async () => {

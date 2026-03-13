@@ -7,7 +7,7 @@ import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
 
-@DisplayName("Testes de Exceções Customizadas")
+@DisplayName("Testes de Exceções customizadas")
 class CustomExceptionsTest {
 
     @Test

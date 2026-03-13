@@ -37,7 +37,7 @@ class PainelServiceIntegrationTest {
         void deveVerProcessoRevisaoNaListagem() {
 
             CriarProcessoRequest reqMapeamento = new CriarProcessoRequest(
-                    "Processo Mapeamento Teste",
+                    "Processo mapeamento teste",
                     TipoProcesso.MAPEAMENTO,
                     LocalDateTime.now().plusDays(30),
                     List.of(10L) // SESEL
@@ -45,7 +45,7 @@ class PainelServiceIntegrationTest {
             processoFacade.criar(reqMapeamento);
 
             CriarProcessoRequest reqRevisao = new CriarProcessoRequest(
-                    "Processo Revisão Teste",
+                    "Processo revisão teste",
                     TipoProcesso.REVISAO,
                     LocalDateTime.now().plusDays(30),
                     List.of(10L) // SESEL
@@ -63,7 +63,7 @@ class PainelServiceIntegrationTest {
 
             // Verificar que existe pelo menos um processo com a descrição esperada
             boolean processoRevisaoEncontrado = listaProcessos.stream()
-                    .anyMatch(p -> p.descricao().equals("Processo Revisão Teste"));
+                    .anyMatch(p -> p.descricao().equals("Processo revisão teste"));
 
             assertThat(processoRevisaoEncontrado)
                     .withFailMessage("Processo de revisão não encontrado na listagem. " +
@@ -72,7 +72,7 @@ class PainelServiceIntegrationTest {
 
             // Verificar que o linkDestino está correto
             ProcessoResumoDto pResumo = listaProcessos.stream()
-                    .filter(p -> p.descricao().equals("Processo Revisão Teste"))
+                    .filter(p -> p.descricao().equals("Processo revisão teste"))
                     .findFirst()
                     .orElse(null);
 
@@ -91,7 +91,7 @@ class PainelServiceIntegrationTest {
 
             for (int i = 1; i <= 5; i++) {
                 CriarProcessoRequest req = new CriarProcessoRequest(
-                        "Processo Teste " + i,
+                        "Processo teste " + i,
                         TipoProcesso.MAPEAMENTO,
                         LocalDateTime.now().plusDays(30),
                         List.of(10L)
@@ -117,7 +117,7 @@ class PainelServiceIntegrationTest {
         void deveRetornarLinksCorretosComMixDeProcessos() {
 
             CriarProcessoRequest reqSeedLike = new CriarProcessoRequest(
-                    "Processo Like",
+                    "Processo like",
                     TipoProcesso.MAPEAMENTO,
                     LocalDateTime.now().plusDays(30),
                     List.of(10L)
@@ -126,7 +126,7 @@ class PainelServiceIntegrationTest {
 
             // Criar processo de Revisão (Alvo do teste)
             CriarProcessoRequest reqRevisao = new CriarProcessoRequest(
-                    "Processo Revisão Alvo",
+                    "Processo revisão alvo",
                     TipoProcesso.REVISAO,
                     LocalDateTime.now().plusDays(30),
                     List.of(10L)

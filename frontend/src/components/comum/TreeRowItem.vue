@@ -11,6 +11,7 @@
         v-for="(column, index) in columns"
         :key="column.key"
         :style="index === 0 ? { paddingLeft: (level * 1.25) + 'rem' } : {}"
+        :title="item[column.key + 'Tooltip'] || ''"
     >
       <BButton
           v-if="index === 0 && item.children && item.children.length > 0"

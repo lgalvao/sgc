@@ -157,7 +157,7 @@ describe("useMapasStore", () => {
     describe("adicionarCompetencia", () => {
         it("deve chamar o serviço e atualizar o estado em caso de sucesso", async () => {
             const competencia = {
-                descricao: "Nova Competencia",
+                descricao: "Nova competencia",
                 atividadesIds: [],
             };
             const mockResponse: MapaCompleto = {
@@ -191,7 +191,7 @@ describe("useMapasStore", () => {
         it("deve chamar o serviço e atualizar o estado em caso de sucesso", async () => {
             const codCompetencia = 1;
             const competencia = {
-                descricao: "Competencia Atualizada",
+                descricao: "Competencia atualizada",
                 atividadesIds: [],
             };
             const mockResponse: MapaCompleto = {

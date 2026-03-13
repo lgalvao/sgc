@@ -6,7 +6,7 @@ O teste E2E cobre:
 - **Preparação 8**: CHEFE revisa atividades - adiciona nova atividade, edita existente, remove outra, disponibiliza (linhas 181-202).
 - **Preparação 9**: Gestores e ADMIN aceitam revisão (linhas 204-222).
 - **Navegação para Mapa em contexto de Revisão** (passo 1-6): Acessa processo de revisão, navega para mapa (linhas 228-237).
-- **Botão "Impactos no mapa"**: Clica, valida presença do modal com seções "Atividades Inseridas" e "Competências Impactadas", fecha modal (linhas 239-253).
+- **Botão "Impactos no mapa"**: Clica, valida presença do modal com seções "Atividades inseridas" e "Competências impactadas", fecha modal (linhas 239-253).
 - **Edição de competência**: Abre modal de edição, valida preenchimento, cancela (linhas 255-267).
 - **Associação de atividade não vinculada**: Cria nova competência associada a atividade nova, valida presença (linhas 269-275).
 
@@ -19,9 +19,9 @@ O teste E2E cobre:
 
 **Fluxo de análise de impactos (passos 7-8):**
 - **Passo 8**: Teste abre modal de impactos mas não valida se a lógica de "impactos detectados" é a mesma de CDU-14 (requisito remete a CDU-19 "Verificar impactos no mapa de competências").
-- Teste valida seções "Atividades Inseridas" e "Competências Impactadas" mas não valida:
-  - Que "Atividades Inseridas" mostra TODAS as novas atividades adicionadas no cadastro.
-  - Que "Competências Impactadas" mostra TODAS as competências que teriam conhecimentos alterados.
+- Teste valida seções "Atividades inseridas" e "Competências impactadas" mas não valida:
+  - Que "Atividades inseridas" mostra TODAS as novas atividades adicionadas no cadastro.
+  - Que "Competências impactadas" mostra TODAS as competências que teriam conhecimentos alterados.
 
 **Fluxo de ajuste do mapa (passos 9-9.1):**
 - **Passo 9**: Requisito diz ADMIN pode "alterar descrições de competências, de atividades e de conhecimentos; remover ou criar novas competências; ajustar a associação das atividades às competências".
@@ -57,8 +57,8 @@ O teste E2E cobre:
    - Confirma que tela "Detalhes do subprocesso" é exibida.
 
 3. **Expandir cobertura de "Impactos no mapa"**:
-   - Validar que modal exibe "Atividades Inseridas" com atividades específicas adicionadas na revisão.
-   - Validar que modal exibe "Competências Impactadas" com competências que têm atividades removidas/alteradas.
+   - Validar que modal exibe "Atividades inseridas" com atividades específicas adicionadas na revisão.
+   - Validar que modal exibe "Competências impactadas" com competências que têm atividades removidas/alteradas.
    - Validar que pode fechar modal e retorna à edição de mapa.
 
 4. **Testar múltiplos cenários de ajuste (passo 9)**:

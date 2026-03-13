@@ -8,7 +8,7 @@ a unidade operacional ou interoperacional à qual o servidor está efetivamente 
 
 ## Origem dos Dados
 
-**Sistema de Gestão de Recursos Humanos (SRH2):**
+**Sistema de Gestão de Recursos humanos (SRH2):**
 
 - `SRH2.SERVIDOR`: Dados cadastrais dos servidores
 - `SRH2.LOTACAO`: Lotações ativas dos servidores
@@ -32,7 +32,7 @@ a unidade operacional ou interoperacional à qual o servidor está efetivamente 
 
 ## Regras de Negócio
 
-### RN-VIEW04-01: Identificador Único - Título de Eleitor
+### RN-VIEW04-01: Identificador único - Título de Eleitor
 
 O título de eleitor (`titulo`) é o identificador único dos usuários no SGC:
 
@@ -48,7 +48,7 @@ O título de eleitor (`titulo`) é o identificador único dos usuários no SGC:
 - Login no sistema é feito com título de eleitor e senha
 - Perfis e permissões são associados ao título
 
-### RN-VIEW04-02: Lotação Ativa
+### RN-VIEW04-02: Lotação ativa
 
 A view considera apenas servidores com lotação ativa:
 
@@ -144,7 +144,7 @@ ELSE codigo  -- unidade_comp_codigo = unidade_lot_codigo
 Embora unidades intermediárias não cadastrem atividades, seus titulares têm perfil GESTOR e atuam no contexto da própria
 unidade intermediária.
 
-### RN-VIEW04-04: Ramal Telefônico Principal
+### RN-VIEW04-04: Ramal telefônico principal
 
 ```sql
 LEFT JOIN srh2.lot_ramais_servidores r
@@ -268,7 +268,7 @@ WHERE unidade_comp_codigo = :codigo_unidade
   AND email IS NOT NULL;
 ```
 
-## Relação com Outras Views e Tabelas
+## Relação com Outras views e Tabelas
 
 ### Views que Dependem de VW_USUARIO
 
@@ -320,7 +320,7 @@ WHERE u.titulo = :titulo_usuario;
 
 ## Dependências
 
-### Permissões Necessárias
+### Permissões necessárias
 
 ```sql
 GRANT SELECT ON SRH2.SERVIDOR TO SGC;
@@ -334,13 +334,13 @@ GRANT SELECT ON SRH2.LOT_RAMAIS_SERVIDORES TO SGC;
 - `SRH2.LOTACAO`: Lotações ativas
 - `SRH2.LOT_RAMAIS_SERVIDORES`: Ramais telefônicos
 
-### Views Necessárias
+### Views necessárias
 
 - `VW_UNIDADE`: Para cálculo de `unidade_comp_codigo`
 
 ## Considerações de Performance
 
-### Índices Recomendados
+### Índices recomendados
 
 Para otimizar consultas frequentes:
 
@@ -355,7 +355,7 @@ CREATE INDEX idx_ramais_principal ON LOT_RAMAIS_SERVIDORES(mat_servidor, unid_lo
 WHERE ramal_principal = 1;
 ```
 
-### Consultas Frequentes
+### Consultas frequentes
 
 A view é consultada em praticamente todas as operações do sistema:
 
@@ -385,38 +385,38 @@ A subconsulta para calcular `unidade_comp_codigo` é executada para cada servido
 +----------------+------------+-------------------------+---------------------------+-------+-----------------+------------------+
 | titulo         | matricula  | nome                    | email                     | ramal | unidade_lot_cod | unidade_comp_cod |
 +----------------+------------+-------------------------+---------------------------+-------+-----------------+------------------+
-| 001234567890   | 00012345   | João da Silva Santos    | joao.silva@tre-pe.jus.br  | 1234  | 200             | 200              |
-| 002345678901   | 00023456   | Maria Oliveira Costa    | maria.costa@tre-pe.jus.br | 2345  | 100             | 100              |
-| 003456789012   | 00034567   | Pedro Souza Lima        | pedro.lima@tre-pe.jus.br  | NULL  | 201             | 150              |
-| 004567890123   | 00045678   | Ana Paula Rodrigues     | ana.rodrigues@tre-pe.jus  | 3456  | 550             | 551              |
-| 005678901234   | 00056789   | Carlos Alberto Ferreira | NULL                      | 4567  | 1001            | 1001             |
+| 001234567890   | 00012345   | João da Silva santos    | joao.silva@tre-pe.jus.br  | 1234  | 200             | 200              |
+| 002345678901   | 00023456   | Maria oliveira costa    | maria.costa@tre-pe.jus.br | 2345  | 100             | 100              |
+| 003456789012   | 00034567   | Pedro souza lima        | pedro.lima@tre-pe.jus.br  | NULL  | 201             | 150              |
+| 004567890123   | 00045678   | Ana paula rodrigues     | ana.rodrigues@tre-pe.jus  | 3456  | 550             | 551              |
+| 005678901234   | 00056789   | Carlos alberto ferreira | NULL                      | 4567  | 1001            | 1001             |
 +----------------+------------+-------------------------+---------------------------+-------+-----------------+------------------+
 ```
 
 **Interpretação:**
 
-1. **João da Silva Santos:**
+1. **João da Silva santos:**
     - Lotado e atua na unidade 200 (OPERACIONAL)
     - Tem ramal e e-mail cadastrados
     - `unidade_comp_codigo` = `unidade_lot_codigo` (caso padrão)
 
-2. **Maria Oliveira Costa:**
+2. **Maria oliveira costa:**
     - Lotada e atua na unidade 100 (INTEROPERACIONAL)
     - Tem ramal e e-mail cadastrados
     - Caso padrão de lotação operacional
 
-3. **Pedro Souza Lima:**
+3. **Pedro souza lima:**
     - Lotado na unidade 201 (SEM_EQUIPE)
     - Atua na unidade 150 (superior da 201, OPERACIONAL)
     - Sem ramal cadastrado
     - `unidade_comp_codigo` ≠ `unidade_lot_codigo` (caso especial)
 
-4. **Ana Paula Rodrigues:**
+4. **Ana paula rodrigues:**
     - Lotada na unidade 550, mas atua na 551
     - Possível caso de unidade SEM_EQUIPE com superior operacional
     - E-mail incompleto/inválido
 
-5. **Carlos Alberto Ferreira:**
+5. **Carlos alberto ferreira:**
     - Lotado em CAE (1001)
     - Atua na própria CAE (OPERACIONAL)
     - Sem e-mail cadastrado
@@ -460,7 +460,7 @@ A view reflete sempre o estado atual do SGRH:
 - Ao exibir contatos, considerar que ramal pode estar ausente
 - Garantir que toda referência a usuário use `titulo`, não `matricula`
 
-### Casos Especiais
+### Casos especiais
 
 **Usuário com múltiplas funções:**
 

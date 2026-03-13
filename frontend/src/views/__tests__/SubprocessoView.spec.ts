@@ -29,19 +29,19 @@ describe('SubprocessoView.vue', () => {
     const mockSubprocesso = {
         codigo: 10,
         situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
-        situacaoLabel: 'Em Andamento',
-        processoDescricao: 'Processo Teste',
+        situacaoLabel: 'Em andamento',
+        processoDescricao: 'Processo teste',
         tipoProcesso: TipoProcesso.MAPEAMENTO,
         unidade: {
             codigo: 1,
             sigla: 'TEST',
-            nome: 'Unidade Teste'
+            nome: 'Unidade teste'
         },
         responsavel: {
             codigo: 1,
             nome: 'Resp',
             tituloEleitoral: '123456789012',
-            unidade: {codigo: 1, sigla: 'TEST', nome: 'Unidade Teste'},
+            unidade: {codigo: 1, sigla: 'TEST', nome: 'Unidade teste'},
             email: 'resp@test.com',
             ramal: '123'
         },
@@ -49,13 +49,13 @@ describe('SubprocessoView.vue', () => {
             codigo: 2,
             nome: 'Titular',
             tituloEleitoral: '987654321012',
-            unidade: {codigo: 1, sigla: 'TEST', nome: 'Unidade Teste'},
+            unidade: {codigo: 1, sigla: 'TEST', nome: 'Unidade teste'},
             email: 'titular@test.com',
             ramal: '456'
         },
         etapaAtual: 1,
         prazoEtapaAtual: '2023-12-31T00:00:00',
-        localizacaoAtual: 'Unidade Teste',
+        localizacaoAtual: 'Unidade teste',
         isEmAndamento: true,
         elementosProcesso: [],
 
@@ -243,7 +243,7 @@ describe('SubprocessoView.vue', () => {
         const {wrapper, store} = mountComponent();
         await flushPromises();
 
-        // Trigger Reabertura
+        // Trigger reabertura
         await wrapper.find('[data-testid="btn-reabrir-cadastro"]').trigger('click');
         await (wrapper.vm as any).$nextTick();
 

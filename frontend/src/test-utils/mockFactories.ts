@@ -6,13 +6,13 @@ import {ProcessoResumo, SituacaoProcesso, TipoProcesso} from '@/types/tipos';
 export function createMockProcessoResumo(overrides: Partial<ProcessoResumo> = {}): ProcessoResumo {
     return {
         codigo: 1,
-        descricao: 'Processo Teste',
+        descricao: 'Processo teste',
         tipo: TipoProcesso.MAPEAMENTO,
         situacao: SituacaoProcesso.EM_ANDAMENTO,
         dataLimite: new Date().toISOString(),
         dataCriacao: new Date().toISOString(),
         unidadeCodigo: 1,
-        unidadeNome: 'Unidade Teste',
+        unidadeNome: 'Unidade teste',
         unidadesParticipantes: 'UT1, UT2',
         ...overrides
     };

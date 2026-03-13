@@ -9,19 +9,19 @@ Atores: GESTOR e ADMIN
 - Subprocesso com cadastro de atividades e conhecimentos já disponibilizado, e com localização atual na unidade do
   usuário.
 
-Fluxo principal:
+## Fluxo principal:
 
-1. No Painel, o usuário clica no processo de mapeamento.
+1. No painel, o usuário clica no processo de mapeamento.
 
-2. O sistema exibe a tela `Detalhes do processo`.
+2. O sistema mostra a tela `Detalhes do processo`.
 
-3. Usuário clica na unidade subordinada cujo cadastro de atividades deseja validar.
+3. O usuário clica na unidade subordinada cujo cadastro de atividades deseja validar.
 
-4. O sistema exibe a tela `Detalhes do subprocesso` com os dados da unidade selecionada.
+4. O sistema mostra a tela `Detalhes do subprocesso` com os dados da unidade selecionada.
 
-5. Usuário clica no card `Atividades e conhecimentos`.
+5. O usuário clica no card `Atividades e conhecimentos`.
 
-6. O sistema apresenta as atividades e conhecimentos da unidade na tela `Atividades e conhecimentos`, com os botões:
+6. O sistema mostra as atividades e conhecimentos da unidade na tela `Atividades e conhecimentos`, com os botões:
 
     - `Histórico de análise`
     - `Devolver para ajustes`
@@ -34,7 +34,7 @@ Fluxo principal:
 
 8. O usuário analisa as informações e opta por aceitar/homologar ou devolver o cadastro para ajustes.
 
-9. Se optar por devolver para ajustes:
+9. Se optar por **devolver para ajustes**:
 
    9.1. Usuário clica em `Devolver para ajustes`.
 
@@ -89,7 +89,7 @@ Fluxo principal:
 
    9.11. O sistema redireciona para o Painel, e mostra a mensagem "Devolução realizada".
 
-10. Se optar por aceitar (perfil GESTOR):
+10. Se optar por **aceitar** (perfil GESTOR):
 
 10.1. Usuário clica em `Registrar aceite`.
 
@@ -136,15 +136,14 @@ um campo para preenchimento de uma observação opcional e os botões Confirmar 
 
 10.9. O sistema mostra a mensagem "Aceite registrado" e redireciona para o Painel.
 
-1. Se optar por **homologar** (perfil ADMIN):
+11. Se optar por **homologar** (apenas para perfil ADMIN):
 
    11.1. Usuário escolhe `Homologar`.
 
-   11.2. O sistema abre um modal de confirmação (título "Homologação do cadastro de atividades e conhecimentos") com a
-   pergunta "Confirma a homologação do cadastro de atividades e conhecimentos?" e os botões `Confirmar` ou `Cancelar`.
+   11.2. O sistema abre um modal de confirmação (título "Homologação do cadastro") com a
+   pergunta "Confirma a homologação?" e os botões `Confirmar` ou `Cancelar`.
 
-   11.3. Caso o usuário escolha o botão `Cancelar`, o sistema interrompe a operação de homologação do cadastro,
-   permanecendona mesma tela.
+   11.3. Caso o usuário escolha o botão `Cancelar`, o sistema interrompe a operação de homologação do cadastro, permanecendona mesma tela.
 
    11.4. Usuário escolhe `Confirmar`.
 

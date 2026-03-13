@@ -34,7 +34,7 @@ class CDU35IntegrationTest extends BaseIntegrationTest {
         Unidade unidadeRaiz = unidadeRepo.findById(1L).orElseThrow();
 
         when(responsavelService.buscarResponsavelUnidade(anyLong())).thenReturn(UnidadeResponsavelDto.builder()
-                .titularNome("Responsável Teste")
+                .titularNome("Responsável teste")
                 .build());
 
         processo = ProcessoFixture.novoProcesso()

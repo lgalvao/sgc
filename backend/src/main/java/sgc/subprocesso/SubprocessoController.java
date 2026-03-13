@@ -170,7 +170,7 @@ public class SubprocessoController {
             @PathVariable Long id, @AuthenticationPrincipal Usuario usuario) {
         transicaoService.disponibilizarRevisao(id, usuario);
 
-        return ResponseEntity.ok(new MensagemResponse("Revisão do cadastro de atividades disponibilizada"));
+        return ResponseEntity.ok(new MensagemResponse("Revisão do cadastro disponibilizada"));
     }
 
     @PostMapping("/{id}/devolver-cadastro")

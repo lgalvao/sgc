@@ -69,23 +69,26 @@
     </div>
 
     <template #footer>
-      <BButton
-          data-testid="btn-criar-competencia-cancelar"
-          variant="secondary"
-          @click="fechar"
-      >
-        Cancelar
-      </BButton>
-      <BButton
-          v-b-tooltip.hover
-          :disabled="atividadesSelecionadas.length === 0 || !novaCompetencia.descricao"
-          data-testid="btn-criar-competencia-salvar"
-          title="Criar Competência"
-          variant="primary"
-          @click="salvar"
-      >
-        <i aria-hidden="true" class="bi bi-save"/> Salvar
-      </BButton>
+      <div class="d-flex justify-content-end w-100 gap-3 align-items-center">
+        <BButton
+            class="text-decoration-none text-secondary fw-medium btn-cancelar-link"
+            data-testid="btn-criar-competencia-cancelar"
+            variant="link"
+            @click="fechar"
+        >
+          Cancelar
+        </BButton>
+        <BButton
+            v-b-tooltip.hover
+            :disabled="atividadesSelecionadas.length === 0 || !novaCompetencia.descricao"
+            data-testid="btn-criar-competencia-salvar"
+            title="Criar competência"
+            variant="primary"
+            @click="salvar"
+        >
+          <i aria-hidden="true" class="bi bi-save"/> Salvar
+        </BButton>
+      </div>
     </template>
   </BModal>
 </template>
@@ -206,5 +209,16 @@ function salvar() {
 
 .atividade-card-item .card-body {
   padding: 0.5rem 0.75rem;
+}
+
+.btn-cancelar-link {
+  padding: 0.375rem 0.75rem;
+  transition: all 0.2s;
+  border-radius: 0.375rem;
+}
+
+.btn-cancelar-link:hover {
+  color: var(--bs-emphasis-color) !important;
+  background-color: var(--bs-secondary-bg);
 }
 </style>

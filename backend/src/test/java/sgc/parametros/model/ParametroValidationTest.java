@@ -7,7 +7,7 @@ import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
 
-@DisplayName("Parametro Validation")
+@DisplayName("Parametro validation")
 class ParametroValidationTest {
 
     private static ValidatorFactory factory;

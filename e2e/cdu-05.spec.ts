@@ -22,14 +22,14 @@ import {criarCompetencia, disponibilizarMapa, navegarParaMapa,} from './helpers/
 
 
 test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
-    // Unidade ASSESSORIA_21 (12) - Titular 777777 (Janis Joplin)
+    // Unidade ASSESSORIA_21 (12) - Titular 777777 (Janis joplin)
     const UNIDADE_ALVO = 'ASSESSORIA_21';
     const USUARIO_CHEFE = '777777';
     const SENHA_CHEFE = 'senha';
 
     const timestamp = Date.now();
-    const descProcMapeamento = `Mapeamento Setup ${timestamp}`;
-    const descProcRevisao = `Revisão Teste ${timestamp}`;
+    const descProcMapeamento = `Mapeamento setup ${timestamp}`;
+    const descProcRevisao = `Revisão teste ${timestamp}`;
 
     // PASSOS DE PREPARAÇÃO - PROCESSO DE MAPEAMENTO
 
@@ -86,10 +86,10 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await acessarSubprocessoChefeDireto(page, descProcMapeamento, UNIDADE_ALVO);
         await navegarParaAtividades(page);
 
-        // Adicionar Atividade e Conhecimento usando helpers
-        const descAtividade = `Atividade Teste ${timestamp}`;
+        // Adicionar atividade e Conhecimento usando helpers
+        const descAtividade = `Atividade teste ${timestamp}`;
         await adicionarAtividade(page, descAtividade);
-        await adicionarConhecimento(page, descAtividade, 'Conhecimento Teste');
+        await adicionarConhecimento(page, descAtividade, 'Conhecimento teste');
     });
 
     test('Fase 1.3: CHEFE disponibiliza cadastro', async ({page}) => {
@@ -102,7 +102,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
     });
 
     test('Fase 1.3b: GESTOR da SECRETARIA_2 registra aceite', async ({page}) => {
-        // George Harrison (212121) é Gestor da SECRETARIA_2
+        // George harrison (212121) é Gestor da SECRETARIA_2
         await loginComPerfil(page, '212121', 'senha', 'GESTOR - SECRETARIA_2');
         await acessarSubprocessoGestor(page, descProcMapeamento, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
@@ -120,7 +120,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
 
         await acessarSubprocessoAdmin(page, descProcMapeamento, UNIDADE_ALVO);
         await navegarParaMapa(page);
-        await criarCompetencia(page, `Competência Teste ${timestamp}`, [`Atividade Teste ${timestamp}`]);
+        await criarCompetencia(page, `Competência teste ${timestamp}`, [`Atividade teste ${timestamp}`]);
         await disponibilizarMapa(page, '2030-12-31');
         await verificarPaginaPainel(page);
     });
@@ -229,8 +229,8 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
             .filter({hasNotText: 'subordinada'})
         ).toBeVisible();
 
-        // 2. Verificar Alerta para o GESTOR da SECRETARIA_2 (Unidade Intermediária - Step 13.2)
-        // George Harrison (212121) é Gestor da SECRETARIA_2
+        // 2. Verificar alerta para o GESTOR da SECRETARIA_2 (Unidade intermediária - Step 13.2)
+        // George harrison (212121) é Gestor da SECRETARIA_2
         await loginComPerfil(page, '212121', 'senha', 'GESTOR - SECRETARIA_2');
         await verificarPaginaPainel(page);
 
@@ -246,11 +246,11 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await navegarParaAtividades(page);
 
         // Verifica que a atividade criada na fase de Mapeamento foi copiada corretamente (Step 10)
-        const descAtividade = `Atividade Teste ${timestamp}`;
+        const descAtividade = `Atividade teste ${timestamp}`;
         await expect(page.getByText(descAtividade).first()).toBeVisible();
 
         // Conhecimentos são exibidos dentro do card da atividade no componente AtividadeItem
         // Não há necessidade de clicar em um botão de expandir
-        await expect(page.getByText('Conhecimento Teste').first()).toBeVisible();
+        await expect(page.getByText('Conhecimento teste').first()).toBeVisible();
     });
 });

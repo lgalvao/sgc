@@ -31,7 +31,7 @@ import static sgc.seguranca.AcaoPermissao.*;
 import static sgc.processo.model.AcaoProcesso.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("ProcessoFacade Test Suite")
+@DisplayName("ProcessoFacade Test suite")
 class ProcessoFacadeTest {
 
     @InjectMocks
@@ -427,7 +427,7 @@ class ProcessoFacadeTest {
     @DisplayName("Operações em Bloco")
     class OperacoesEmBloco {
         @Nested
-        @DisplayName("Executar Ação em Bloco - DISPONIBILIZAR")
+        @DisplayName("Executar ação em Bloco - DISPONIBILIZAR")
         class AcaoDisponibilizar {
             @Test
             @DisplayName("Deve disponibilizar mapas em bloco quando ação é DISPONIBILIZAR")
@@ -467,7 +467,7 @@ class ProcessoFacadeTest {
         }
 
         @Nested
-        @DisplayName("Executar Ação em Bloco - ACEITAR")
+        @DisplayName("Executar ação em Bloco - ACEITAR")
         class AcaoAceitar {
             @Test
             @DisplayName("Deve aceitar cadastro quando subprocessos estão em MAPEAMENTO_CADASTRO_DISPONIBILIZADO")
@@ -530,7 +530,7 @@ class ProcessoFacadeTest {
         }
 
         @Nested
-        @DisplayName("Executar Ação em Bloco - HOMOLOGAR")
+        @DisplayName("Executar ação em Bloco - HOMOLOGAR")
         class AcaoHomologar {
             @Test
             @DisplayName("Deve homologar cadastro quando subprocessos estão em situação de cadastro")

@@ -26,7 +26,7 @@ class ProcessoTest {
         void deveCriarProcessoComBuilderCompleto() {
 
             Long codigo = 1L;
-            String descricao = "Processo Teste";
+            String descricao = "Processo teste";
             TipoProcesso tipo = TipoProcesso.MAPEAMENTO;
             SituacaoProcesso situacao = SituacaoProcesso.CRIADO;
             LocalDateTime dataCriacao = LocalDateTime.now();
@@ -50,7 +50,7 @@ class ProcessoTest {
         @DisplayName("Deve criar processo com Builder (sem código)")
         void deveCriarProcessoComBuilderParcial() {
 
-            String descricao = "Processo Novo";
+            String descricao = "Processo novo";
             TipoProcesso tipo = TipoProcesso.REVISAO;
             SituacaoProcesso situacao = SituacaoProcesso.CRIADO;
             LocalDateTime dataLimite = LocalDateTime.now().plusDays(30);
@@ -76,7 +76,7 @@ class ProcessoTest {
             LocalDateTime dataCriacao = LocalDateTime.now();
             LocalDateTime dataFinalizacao = LocalDateTime.now().plusDays(10);
             LocalDateTime dataLimite = LocalDateTime.now().plusDays(5);
-            String descricao = "Processo Completo";
+            String descricao = "Processo completo";
             SituacaoProcesso situacao = SituacaoProcesso.EM_ANDAMENTO;
             TipoProcesso tipo = TipoProcesso.MAPEAMENTO;
             List<UnidadeProcesso> participantes = new ArrayList<>();

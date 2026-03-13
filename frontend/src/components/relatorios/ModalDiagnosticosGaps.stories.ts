@@ -14,7 +14,7 @@ type Story = StoryObj<typeof ModalDiagnosticosGaps>;
 const mockDiagnosticos = [
     {
         codigo: 1,
-        processo: 'Diagnóstico Anual 2024',
+        processo: 'Diagnóstico anual 2024',
         unidade: 'Diretoria de Tecnologia',
         gaps: 5,
         importanciaMedia: 4.5,
@@ -25,8 +25,8 @@ const mockDiagnosticos = [
     },
     {
         codigo: 2,
-        processo: 'Diagnóstico Anual 2024',
-        unidade: 'Diretoria Administrativa',
+        processo: 'Diagnóstico anual 2024',
+        unidade: 'Diretoria administrativa',
         gaps: 2,
         importanciaMedia: 3.8,
         dominioMedio: 3.5,
@@ -36,12 +36,12 @@ const mockDiagnosticos = [
     },
     {
         codigo: 3,
-        processo: 'Diagnóstico Especial TI',
+        processo: 'Diagnóstico especial TI',
         unidade: 'Coordenação de Infra',
         gaps: 8,
         importanciaMedia: 4.9,
         dominioMedio: 1.5,
-        competenciasCriticas: ['Cloud Computing', 'Kubernetes', 'DevOps'],
+        competenciasCriticas: ['Cloud computing', 'Kubernetes', 'DevOps'],
         data: new Date('2024-12-05T09:00:00Z'),
         status: 'Pendente',
     },
@@ -60,7 +60,7 @@ export const Default: Story = {
         },
         template: `
       <div>
-        <button class="btn btn-primary" @click="show = true">Ver Diagnósticos de Gaps</button>
+        <button class="btn btn-primary" @click="show = true">Ver diagnósticos de Gaps</button>
         <ModalDiagnosticosGaps v-bind="args" v-model="show" />
       </div>
     `,

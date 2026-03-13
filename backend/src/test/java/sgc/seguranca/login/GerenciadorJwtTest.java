@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("GerenciadorJwt - Testes Unitários")
+@DisplayName("GerenciadorJwt - Testes unitários")
 class GerenciadorJwtTest {
 
     private static final String DEFAULT_SECRET = "sgc-secret-key-change-this-in-production-minimum-32-chars";
@@ -192,7 +192,7 @@ class GerenciadorJwtTest {
     }
 
     @Nested
-    @DisplayName("Cobertura Extra")
+    @DisplayName("Cobertura extra")
     class CoberturaExtra {
         private static final String SECRET = "secure-secret-key-minimum-32-chars-length-xyz-123";
 

@@ -21,7 +21,7 @@ class UsuarioJsonViewTest {
 
         Usuario usuario = new Usuario();
         usuario.setTituloEleitoral("123456789012");
-        usuario.setNome("Usuario Teste");
+        usuario.setNome("Usuario teste");
         usuario.setEmail("teste@teste.com");
         usuario.setMatricula("88888888");
         usuario.setUnidadeLotacao(unidade);
@@ -32,7 +32,7 @@ class UsuarioJsonViewTest {
                 .writeValueAsString(usuario);
 
         assertThat(json).contains("\"tituloEleitoral\":\"123456789012\"");
-        assertThat(json).contains("\"nome\":\"Usuario Teste\"");
+        assertThat(json).contains("\"nome\":\"Usuario teste\"");
         assertThat(json).contains("\"email\":\"teste@teste.com\"");
         assertThat(json).contains("\"matricula\":\"88888888\"");
         assertThat(json).contains("\"unidadeCodigo\":10");

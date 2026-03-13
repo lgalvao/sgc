@@ -14,11 +14,11 @@ O teste `cdu-10.spec.ts` em 6 testes:
 - Adição de conhecimento permite prosseguir
 - Cancelamento do diálogo de confirmação
 
-**Teste 3: Caminho Feliz - Disponibilizar Revisão**
+**Teste 3: Caminho feliz - Disponibilizar revisão**
 - CHEFE clica em "Disponibilizar"
 - Valida diálogo com título exato "Disponibilização da revisão do cadastro" e mensagem sobre "finalização da revisão e disponibilização"
 - Confirmação (botão específico `btn-confirmar-disponibilizacao`)
-- Validação de mensagem "Disponibilizado com sucesso" no Painel
+- Validação de mensagem "Cadastro disponibilizado" no Painel
 - GESTOR verifica alerta com texto específico "Revisão do cadastro da unidade [UNIDADE] disponibilizada para análise"
 - GESTOR verifica situação "Revisão do cadastro disponibilizada" e movimentação "Disponibilização da revisão do cadastro de atividades"
 
@@ -28,11 +28,11 @@ O teste `cdu-10.spec.ts` em 6 testes:
 - CHEFE abre "Histórico de análise" e verifica resultado "Devolução" e observações
 - CHEFE redisponibiliza
 
-**Teste 5: Histórico Retém Análises Após Nova Disponibilização**
+**Teste 5: Histórico retém análises após nova disponibilização**
 - GESTOR devolve 2 vezes (2ª e 3ª devoluções)
 - CHEFE valida que histórico contém TODAS as devoluções em ordem decrescente (mais recente primeiro)
 
-**Teste 6: Cancelar Disponibilização**
+**Teste 6: Cancelar disponibilização**
 - CHEFE clica em "Disponibilizar"
 - Cancelamento retorna para tela de atividades
 
@@ -45,7 +45,6 @@ O teste `cdu-10.spec.ts` em 6 testes:
 - **Passo 12**: E-mail de notificação com modelo exato (Assunto "SGC: Revisão do cadastro de atividades e conhecimentos disponibilizada: [SIGLA]", corpo com "concluiu a revisão e disponibilizou seu cadastro") não é verificado
 - **Passo 13**: Alerta interno com campos específicos (Descrição, Processo, Data/hora, Unidades origem/destino) não é completamente validado - teste valida apenas texto parcial do alerta
 - **Passo 14**: Definição de data/hora de conclusão da Etapa 1
-- **Passo 15**: Mensagem exata "Revisão do cadastro de atividades disponibilizada" não é validada (teste verifica "Disponibilizado com sucesso")
 
 **Teste parcialmente coberto**:
 - Teste usa o mesmo processo/unidade em vários testes em série, o que não reenacted cenários de múltiplos processos paralelos
@@ -58,7 +57,7 @@ O teste `cdu-10.spec.ts` em 6 testes:
 - Validar e-mail com assunto e corpo exatos (ou via API/log)
 - Validar alerta com todos os 5 campos especificados
 - Adicionar teste que valida conclusão de Etapa 1 (data/hora atual)
-- Validar mensagem exata "Revisão do cadastro de atividades disponibilizada" no Painel após redirecionamento
+- Validar mensagem exata "Revisão do cadastro disponibilizada" no Painel após redirecionamento
 - Adicionar teste para validar movimentação com todos os campos (não apenas descrição)
 - Adicionar teste que valida botão "Histórico de análise" ausente quando não há análises prévias vs presente quando há
 - Testar cenário onde múltiplas devoluções ocorrem e histórico mantém todas em ordem (já feito no teste 5, bom)

@@ -50,7 +50,7 @@ export const Criacao: Story = {
         },
         template: `
       <div>
-        <button class="btn btn-primary" @click="show = true">Criar Competência</button>
+        <button class="btn btn-primary" @click="show = true">Criar competência</button>
         <CriarCompetenciaModal v-bind="args" :mostrar="show" @fechar="show = false" />
       </div>
     `,
@@ -63,7 +63,7 @@ export const Edicao: Story = {
         atividades: mockAtividades,
         competenciaParaEditar: {
             codigo: 1,
-            descricao: 'Competência Existente',
+            descricao: 'Competência existente',
             atividades: [],
         },
     },

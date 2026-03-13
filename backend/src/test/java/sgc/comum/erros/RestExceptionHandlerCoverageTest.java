@@ -5,7 +5,7 @@ import org.springframework.http.*;
 
 import static org.assertj.core.api.Assertions.*;
 
-@DisplayName("RestExceptionHandler - Cobertura Adicional")
+@DisplayName("RestExceptionHandler - Cobertura adicional")
 class RestExceptionHandlerCoverageTest {
 
     private final RestExceptionHandler handler = new RestExceptionHandler();

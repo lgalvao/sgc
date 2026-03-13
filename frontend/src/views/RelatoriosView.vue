@@ -22,7 +22,7 @@
                 @click="gerarRelatorioAndamento"
               >
                 <BSpinner v-if="gerandoAndamento" small />
-                {{ gerandoAndamento ? 'Gerando...' : 'Gerar Relatório' }}
+                {{ gerandoAndamento ? 'Gerando...' : 'Gerar relatório' }}
               </BButton>
             </BCol>
              <BCol v-if="relatorioAndamento.length > 0" class="d-flex align-items-end" md="2">

@@ -55,7 +55,7 @@ class CDU25IntegrationTest extends BaseIntegrationTest {
         processo.setCodigo(null);
         processo.setTipo(TipoProcesso.MAPEAMENTO);
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
-        processo.setDescricao("Processo Validação CDU-25");
+        processo.setDescricao("Processo validação CDU-25");
         processo = processoRepo.save(processo);
 
         // Create subprocesses in MAPEAMENTO_MAPA_VALIDADO state
@@ -121,7 +121,7 @@ class CDU25IntegrationTest extends BaseIntegrationTest {
         entityManager.flush();
         entityManager.clear();
 
-        // Check Subprocesso 1
+        // Check subprocesso 1
         Subprocesso s1 = subprocessoRepo.findById(subprocesso1.getCodigo()).orElseThrow();
         List<Analise> analises1 = analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(s1.getCodigo());
         assertThat(analises1).isNotEmpty();
@@ -131,7 +131,7 @@ class CDU25IntegrationTest extends BaseIntegrationTest {
         assertThat(movs1).isNotEmpty();
         assertThat(movs1.getFirst().getDescricao()).contains("Validação do mapa aceita");
 
-        // Check Subprocesso 2
+        // Check subprocesso 2
         Subprocesso s2 = subprocessoRepo.findById(subprocesso2.getCodigo()).orElseThrow();
         assertThat(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(s2.getCodigo())).isNotEmpty();
     }

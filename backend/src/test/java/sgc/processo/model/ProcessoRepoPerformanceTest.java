@@ -30,14 +30,14 @@ class ProcessoRepoPerformanceTest {
     void listarPorSituacaoComParticipantes_deveCarregarParticipantesComFetch() {
 
         Unidade unidade = UnidadeTestBuilder.umaDe()
-                .comNome("Unidade Teste")
+                .comNome("Unidade teste")
                 .comSigla("UT")
                 .comTituloTitular("Titular")
                 .build();
         unidadeRepo.save(unidade);
 
         Processo processo = new Processo();
-        processo.setDescricao("Processo Finalizado");
+        processo.setDescricao("Processo finalizado");
         processo.setSituacao(SituacaoProcesso.FINALIZADO);
         processo.setTipo(TipoProcesso.MAPEAMENTO);
         processo.adicionarParticipantes(Set.of(unidade));

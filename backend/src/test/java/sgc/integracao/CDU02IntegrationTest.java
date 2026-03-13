@@ -22,7 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @Tag("integration")
 @Transactional
-@DisplayName("CDU-02: Visualizar Painel")
+@DisplayName("CDU-02: Visualizar painel")
 @Slf4j
 class CDU02IntegrationTest extends BaseIntegrationTest {
     private static final String API_PAINEL_PROCESSOS = "/api/painel/processos";
@@ -31,8 +31,8 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
     private static final String UNIDADE = "unidade";
     private static final String GESTOR = "GESTOR";
     private static final String CHEFE = "CHEFE";
-    private static final String PROCESSO_RAIZ_JSON_PATH = "$.content[?(@.descricao == 'Processo Raiz')]";
-    private static final String PROCESSO_FILHA_1_JSON_PATH = "$.content[?(@.descricao == 'Processo Filha 1')]";
+    private static final String PROCESSO_RAIZ_JSON_PATH = "$.content[?(@.descricao == 'Processo raiz')]";
+    private static final String PROCESSO_FILHA_1_JSON_PATH = "$.content[?(@.descricao == 'Processo filha 1')]";
 
     @Autowired
     private UsuarioRepo usuarioRepo;
@@ -50,43 +50,43 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
 
     @BeforeEach
     void setup() {
-        // Setup Programático - Não depende do data.sql
+        // Setup programático - Não depende do data.sql
 
         // Raiz
         unidadeRaiz = UnidadeFixture.unidadePadrao();
         unidadeRaiz.setCodigo(null); // Auto-increment
-        unidadeRaiz.setNome("Unidade Raiz Teste");
+        unidadeRaiz.setNome("Unidade raiz teste");
         unidadeRaiz = unidadeRepo.save(unidadeRaiz);
 
         // Filha 1 -> Raiz
         unidadeFilha1 = UnidadeFixture.unidadePadrao();
         unidadeFilha1.setCodigo(null);
-        unidadeFilha1.setNome("Unidade Filha 1 Teste");
+        unidadeFilha1.setNome("Unidade filha 1 Teste");
         unidadeFilha1.setUnidadeSuperior(unidadeRaiz);
         unidadeFilha1 = unidadeRepo.save(unidadeFilha1);
 
         // Filha 2 -> Raiz
         unidadeFilha2 = UnidadeFixture.unidadePadrao();
         unidadeFilha2.setCodigo(null);
-        unidadeFilha2.setNome("Unidade Filha 2 Teste");
+        unidadeFilha2.setNome("Unidade filha 2 Teste");
         unidadeFilha2.setUnidadeSuperior(unidadeRaiz);
         unidadeFilha2 = unidadeRepo.save(unidadeFilha2);
 
         processoRaiz = ProcessoFixture.processoEmAndamento();
         processoRaiz.setCodigo(null);
-        processoRaiz.setDescricao("Processo Raiz");
+        processoRaiz.setDescricao("Processo raiz");
         processoRaiz.adicionarParticipantes(Set.of(unidadeRaiz));
         processoRaiz = processoRepo.save(processoRaiz);
 
         processoFilha1 = ProcessoFixture.processoEmAndamento();
         processoFilha1.setCodigo(null);
-        processoFilha1.setDescricao("Processo Filha 1");
+        processoFilha1.setDescricao("Processo filha 1");
         processoFilha1.adicionarParticipantes(Set.of(unidadeFilha1));
         processoFilha1 = processoRepo.save(processoFilha1);
 
         Processo processoCriado = ProcessoFixture.processoPadrao(); // Status CRIADO
         processoCriado.setCodigo(null);
-        processoCriado.setDescricao("Processo Criado Teste");
+        processoCriado.setDescricao("Processo criado teste");
         processoCriado.adicionarParticipantes(Set.of(unidadeRaiz));
         processoRepo.save(processoCriado);
 
@@ -139,7 +139,7 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
                     .andExpect(status().isOk())
                     .andExpect(jsonPath(PROCESSO_RAIZ_JSON_PATH).exists())
                     .andExpect(jsonPath(PROCESSO_FILHA_1_JSON_PATH).exists())
-                    .andExpect(jsonPath("$.content[?(@.descricao == 'Processo Criado Teste')]").exists());
+                    .andExpect(jsonPath("$.content[?(@.descricao == 'Processo criado teste')]").exists());
         }
 
         @Test
@@ -157,7 +157,7 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
                     .andExpect(jsonPath(PROCESSO_RAIZ_JSON_PATH).exists())
                     .andExpect(jsonPath(PROCESSO_FILHA_1_JSON_PATH).exists())
                     // GESTOR não vê processos com status CRIADO (regra confirmada)
-                    .andExpect(jsonPath("$.content[?(@.descricao == 'Processo Criado Teste')]").doesNotExist());
+                    .andExpect(jsonPath("$.content[?(@.descricao == 'Processo criado teste')]").doesNotExist());
         }
 
         @Test
@@ -166,7 +166,7 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
         void testListarProcessosChefeUnidadeFilha2NaoVeProcessosDeOutros() throws Exception {
             setupSecurityContext("99002", unidadeFilha2, CHEFE);
 
-            // Unidade Filha 2 não tem processos no setup
+            // Unidade filha 2 não tem processos no setup
             mockMvc.perform(
                             get(API_PAINEL_PROCESSOS)
                                     .param(PERFIL, CHEFE)
@@ -184,7 +184,7 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
 
             Processo processoCriadoFilha = ProcessoFixture.processoPadrao();
             processoCriadoFilha.setCodigo(null);
-            processoCriadoFilha.setDescricao("Processo Criado Filha");
+            processoCriadoFilha.setDescricao("Processo criado filha");
             processoCriadoFilha.adicionarParticipantes(Set.of(unidadeFilha1));
             processoRepo.saveAndFlush(processoCriadoFilha);
 
@@ -193,10 +193,10 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
                                     .param(PERFIL, GESTOR)
                                     .param(UNIDADE, unidadeRaiz.getCodigo().toString()))
                     .andExpect(status().isOk())
-                    // Deve ver Raiz e Filha (Em Andamento)
+                    // Deve ver Raiz e Filha (Em andamento)
                     .andExpect(jsonPath(PROCESSO_FILHA_1_JSON_PATH).exists())
-                    // NÃO deve ver Criado Filha
-                    .andExpect(jsonPath("$.content[?(@.descricao == 'Processo Criado Filha')]").doesNotExist());
+                    // NÃO deve ver Criado filha
+                    .andExpect(jsonPath("$.content[?(@.descricao == 'Processo criado filha')]").doesNotExist());
         }
     }
 
@@ -211,14 +211,14 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
 
             Alerta alerta = AlertaFixture.alertaParaUsuario(processoRaiz, usuario);
             alerta.setCodigo(null);
-            alerta.setDescricao("Alerta Pessoal Teste");
+            alerta.setDescricao("Alerta pessoal teste");
             alertaRepo.save(alerta);
 
             mockMvc.perform(get(API_PAINEL_ALERTAS)
                             .param("usuarioTitulo", usuario.getTituloEleitoral())
                             .param(UNIDADE, unidadeRaiz.getCodigo().toString()))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.content[?(@.descricao == 'Alerta Pessoal Teste')]").exists());
+                    .andExpect(jsonPath("$.content[?(@.descricao == 'Alerta pessoal teste')]").exists());
         }
 
         @Test
@@ -226,17 +226,17 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
         @WithMockUser(username = "99005")
         void testListarAlertasUsuarioVeAlertasDaSuaUnidade() throws Exception {
             setupSecurityContext("99005", unidadeRaiz, GESTOR);
-            // Alerta para Unidade Filha 1 (Subordinada à Raiz)
+            // Alerta para Unidade filha 1 (Subordinada à Raiz)
             Alerta alerta = AlertaFixture.alertaParaUnidade(processoFilha1, unidadeFilha1);
             alerta.setCodigo(null);
-            alerta.setDescricao("Alerta Subordinada Teste");
+            alerta.setDescricao("Alerta subordinada teste");
             alertaRepo.save(alerta);
 
             mockMvc.perform(get(API_PAINEL_ALERTAS)
                             .param(UNIDADE, unidadeRaiz.getCodigo().toString()))
                     .andExpect(status().isOk())
                     // Painel não mostra alertas de subordinadas (regra atual do código)
-                    .andExpect(jsonPath("$.content[?(@.descricao == 'Alerta Subordinada Teste')]").doesNotExist());
+                    .andExpect(jsonPath("$.content[?(@.descricao == 'Alerta subordinada teste')]").doesNotExist());
         }
 
         @Test
@@ -245,10 +245,10 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
         void testListarAlertasUsuarioNaoVeAlertasDeOutros() throws Exception {
             Usuario usuario = setupSecurityContext("99006", unidadeFilha2, CHEFE);
 
-            // Alerta para Unidade Filha 1 (Irmã, não subordinada)
+            // Alerta para Unidade filha 1 (Irmã, não subordinada)
             Alerta alerta = AlertaFixture.alertaParaUnidade(processoFilha1, unidadeFilha1);
             alerta.setCodigo(null);
-            alerta.setDescricao("Alerta Outra Unidade");
+            alerta.setDescricao("Alerta outra unidade");
             alertaRepo.save(alerta);
 
             mockMvc.perform(
@@ -256,7 +256,7 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
                                     .param("usuarioTitulo", usuario.getTituloEleitoral())
                                     .param(UNIDADE, unidadeFilha2.getCodigo().toString()))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.content[?(@.descricao == 'Alerta Outra Unidade')]").doesNotExist());
+                    .andExpect(jsonPath("$.content[?(@.descricao == 'Alerta outra unidade')]").doesNotExist());
         }
     }
 }

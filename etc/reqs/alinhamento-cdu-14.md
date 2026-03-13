@@ -27,7 +27,7 @@ O teste E2E cobre:
 
 **Fluxo de homologação (passo 12) não coberto:**
 - **12.1-12.4**: Cenário de "sem impactos no mapa" - modal com título "Homologação do mapa de competências", mensagem específica, mudança de situação para "Mapa homologado".
-- **12.3.1-12.4**: Cenário de "com impactos detectados" - modal com título "Homologação do cadastro de atividades e conhecimentos", movimentação registrada, situação alterada para "Revisão do cadastro homologada".
+- **12.3.1-12.4**: Cenário de "com impactos detectados" - modal com título "Homologação do cadastro", movimentação registrada, situação alterada para "Revisão do cadastro homologada".
 - Teste não verifica se o ADMIN realmente escolhe entre os dois caminhos baseado em impactos.
 
 **Modal de histórico:**
@@ -47,7 +47,7 @@ O teste E2E cobre:
    - Homologação: dois diálogos diferentes conforme presença de impactos.
 
 4. **Cenário de homologação**: Adicionar teste que como ADMIN clica "Homologar" e valida:
-   - Se há impactos: abre modal "Homologação do cadastro de atividades e conhecimentos".
+   - Se há impactos: abre modal "Homologação do cadastro".
    - Se sem impactos: abre modal "Homologação do mapa de competências" com mensagem sobre manutenção.
    - Registra movimentação correta.
    - Altera situação conforme esperado.

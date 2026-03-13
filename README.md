@@ -1,6 +1,6 @@
 # SGC - Sistema de Gestão de Competências
 
-## Visão Geral
+## Visão geral
 
 O **SGC (Sistema de Gestão de Competências)** é uma aplicação corporativa para mapeamento, revisão e diagnóstico de
 competências organizacionais. O sistema permite que unidades mapeiem suas atividades e conhecimentos necessários,
@@ -8,19 +8,19 @@ identifiquem gaps de competência e gerenciem o desenvolvimento de suas equipes.
 
 ---
 
-## Arquitetura e Stack Tecnológico
+## Arquitetura e Stack tecnológico
 
-O projeto segue uma arquitetura **Modular Monolith** no backend e **Component-Based** no frontend.
+O projeto segue uma arquitetura **Modular monolith** no backend e **Component-Based** no frontend.
 
-### Stack Principal
+### Stack principal
 
-| Camada       | Tecnologias Principais                                              |
+| Camada       | Tecnologias principais                                              |
 |--------------|---------------------------------------------------------------------|
 | **Backend**  | Java 21, Spring Boot 4, Hibernate 7, H2 (testes)/Oracle (produção)  |
 | **Frontend** | Vue.js 3.5, TypeScript 5.9, Vite 7.3, Pinia 3, BootstrapVueNext 0.4 |
 | **Testes**   | JUnit, Mockito, Vitest, Playwright 1.5, Storybook 10                |
 
-**Documentação Essencial:**
+**Documentação essencial:**
 
 * **[AGENTS.md](AGENTS.md)**: **Leitura obrigatória** para desenvolvedores e agentes de IA. Contém convenções de código, padrões de projeto e regras fundamentais.
 * **[backend/README.md](backend/README.md)**: Arquitetura detalhada do backend, módulos e comunicação.
@@ -34,7 +34,7 @@ O projeto segue uma arquitetura **Modular Monolith** no backend e **Component-Ba
 sgc/
 ├── backend/            # Código da API REST (Spring Boot 4)
 ├── frontend/           # Código do frontend Web (Vue.js 3.5)
-├── e2e/                # Testes End-to-End (Playwright)
+├── e2e/                # Testes end-to-End (Playwright)
 ├── etc/                # Configurações, requisitos e scripts globais
     ├── reqs/           # Especificações de requisitos (Casos de Uso)
     └── scripts/        # Scripts utilitários
@@ -86,12 +86,12 @@ O projeto possui uma suite abrangente de testes e verificações de qualidade.
 
 | Tipo                   | Comando                              | Descrição                                         |
 |------------------------|--------------------------------------|---------------------------------------------------|
-| **Todos Backend**      | `./gradlew :backend:test`            | Executa suite completa (Unitários + Integração).  |
-| **Unitários Backend**  | `./gradlew :backend:unitTest`        | Executa apenas testes isolados (Rápido).          |
-| **Integração Backend** | `./gradlew :backend:integrationTest` | Executa apenas fluxos completos (Mais lento).     |
-| **Unitários Frontend** | `cd frontend && npm run test:unit`   | Vitest para componentes e lógica.                 |
+| **Todos backend**      | `./gradlew :backend:test`            | Executa suite completa (Unitários + Integração).  |
+| **Unitários backend**  | `./gradlew :backend:unitTest`        | Executa apenas testes isolados (Rápido).          |
+| **Integração backend** | `./gradlew :backend:integrationTest` | Executa apenas fluxos completos (Mais lento).     |
+| **Unitários frontend** | `cd frontend && npm run test:unit`   | Vitest para componentes e lógica.                 |
 | **End-to-End (E2E)**   | `npm run test:e2e`                   | Playwright simulando fluxos reais.                |
-| **Type Check**         | `npm run typecheck`                  | Verificação de erros de tipos para frontend e E2E |
+| **Type check**         | `npm run typecheck`                  | Verificação de erros de tipos para frontend e E2E |
 
 ### Verificação de qualidade
 

@@ -32,7 +32,7 @@ class ProcessoManutencaoServiceValidationTest {
     void deveImpedirCriacaoComUnidadeIntermediaria() {
 
         CriarProcessoRequest request = CriarProcessoRequest.builder()
-                .descricao("Processo Teste")
+                .descricao("Processo teste")
                 .tipo(TipoProcesso.MAPEAMENTO)
                 .dataLimiteEtapa1(LocalDateTime.now().plusDays(10))
                 .unidades(List.of(1L))

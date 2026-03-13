@@ -31,7 +31,7 @@ import static org.mockito.Mockito.*;
 @SpringBootTest
 @Transactional
 @ActiveProfiles("test")
-@DisplayName("Testes do E2eController (Backend Support)")
+@DisplayName("Testes do E2eController (Backend support)")
 class E2eControllerTest {
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -100,10 +100,10 @@ class E2eControllerTest {
                 "INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao) VALUES (999, 'Teste"
                         + " Unit', 'TESTE', 'OPERACIONAL', 'ATIVA')");
         jdbcTemplate.execute(
-                "INSERT INTO sgc.vw_usuario (titulo, nome) VALUES ('123', 'User Teste')");
+                "INSERT INTO sgc.vw_usuario (titulo, nome) VALUES ('123', 'User teste')");
         jdbcTemplate.execute(
                 "INSERT INTO sgc.processo (codigo, descricao, situacao, tipo) VALUES (100,"
-                        + " 'Processo Teste', 'CRIADO', 'MAPEAMENTO')");
+                        + " 'Processo teste', 'CRIADO', 'MAPEAMENTO')");
 
         jdbcTemplate.execute(
                 "INSERT INTO sgc.subprocesso (codigo, processo_codigo, unidade_codigo, situacao) VALUES (300, 100, 999, 'NAO_INICIADO')");
@@ -112,10 +112,10 @@ class E2eControllerTest {
 
         jdbcTemplate.execute(
                 "INSERT INTO sgc.atividade (codigo, mapa_codigo, descricao) VALUES (400, 200,"
-                        + " 'Atividade Teste')");
+                        + " 'Atividade teste')");
         jdbcTemplate.execute(
                 "INSERT INTO sgc.competencia (codigo, mapa_codigo, descricao) VALUES (450, 200,"
-                        + " 'Competencia Teste')");
+                        + " 'Competencia teste')");
         jdbcTemplate.execute(
                 "INSERT INTO sgc.alerta (codigo, processo_codigo, unidade_origem_codigo, unidade_destino_codigo,"
                         + " descricao, data_hora) VALUES (500, 100, 999, 999, 'Alerta teste', CURRENT_TIMESTAMP)");
@@ -164,7 +164,7 @@ class E2eControllerTest {
                 "INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao) VALUES (888, 'Reset"
                         + " Unit', 'RST', 'OPERACIONAL', 'ATIVA')");
         jdbcTemplate.execute(
-                "INSERT INTO sgc.processo (codigo, descricao) VALUES (888, 'Reset Proc')");
+                "INSERT INTO sgc.processo (codigo, descricao) VALUES (888, 'Reset proc')");
 
         assertCount("sgc.vw_unidade WHERE codigo=888", 1);
         assertCount("sgc.processo WHERE codigo=888", 1);
@@ -301,7 +301,7 @@ class E2eControllerTest {
     @DisplayName("Deve limpar processo sem dependentes")
     void deveLimparProcessoSemDependentes() {
         // Create only process, no subprocess/mapa
-        jdbcTemplate.execute("INSERT INTO sgc.processo (codigo, descricao, situacao, tipo) VALUES (101, 'Proc Empty', 'CRIADO', 'MAPEAMENTO')");
+        jdbcTemplate.execute("INSERT INTO sgc.processo (codigo, descricao, situacao, tipo) VALUES (101, 'Proc empty', 'CRIADO', 'MAPEAMENTO')");
 
         controller.limparProcessoComDependentes(101L);
 
@@ -397,7 +397,7 @@ class E2eControllerTest {
     }
 
     @Nested
-    @DisplayName("Cobertura Extra Isolada")
+    @DisplayName("Cobertura extra isolada")
     class CoberturaExtra {
         private JdbcTemplate jdbcTemplateMock;
         private ProcessoFacade processoFacadeMock;

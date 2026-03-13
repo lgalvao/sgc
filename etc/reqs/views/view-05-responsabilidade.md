@@ -9,7 +9,7 @@ estabelecendo uma hierarquia de precedência entre elas.
 
 ## Origem dos Dados
 
-**Sistema de Gestão de Recursos Humanos (SRH2):**
+**Sistema de Gestão de Recursos humanos (SRH2):**
 
 - `SRH2.QFC_OCUP_COM`: Ocupações de cargos comissionados (titulares)
 - `SRH2.QFC_SUBST_COM`: Substituições de cargos comissionados
@@ -36,7 +36,7 @@ estabelecendo uma hierarquia de precedência entre elas.
 
 ## Regras de Negócio
 
-### RN-VIEW05-01: Unidades Elegíveis
+### RN-VIEW05-01: Unidades elegíveis
 
 A view considera apenas unidades que podem ter responsáveis:
 
@@ -66,13 +66,13 @@ O responsável efetivo de uma unidade é determinado por ordem de precedência u
 
 ```sql
 usuario_matricula = COALESCE(
-    a.usuario_matricula,      -- 1ª prioridade: Atribuição Temporária
+    a.usuario_matricula,      -- 1ª prioridade: Atribuição temporária
     s.mat_serv_com_subs,      -- 2ª prioridade: Substituto
     u.matricula_titular        -- 3ª prioridade: Titular
 )
 
 usuario_titulo = COALESCE(
-    a.usuario_titulo,          -- 1ª prioridade: Atribuição Temporária
+    a.usuario_titulo,          -- 1ª prioridade: Atribuição temporária
     s.num_tit_ele,             -- 2ª prioridade: Substituto
     u.titulo_titular           -- 3ª prioridade: Titular
 )
@@ -123,7 +123,7 @@ END
 
 ### RN-VIEW05-04: Vigência das Responsabilidades
 
-#### Atribuição Temporária
+#### Atribuição temporária
 
 ```sql
 LEFT JOIN (
@@ -346,7 +346,7 @@ ORDER BY u.sigla;
 3. Atribuído aparece em `VW_RESPONSABILIDADE` (prioridade maior que substituto)
 4. Ao final do período, retorna à situação anterior (substituto ou titular)
 
-## Relação com Outras Views e Tabelas
+## Relação com Outras views e Tabelas
 
 ### Views que Dependem de VW_RESPONSABILIDADE
 
@@ -356,7 +356,7 @@ ORDER BY u.sigla;
 - Determina perfis GESTOR e CHEFE com base nas responsabilidades
 - Filtrada por tipo de unidade
 
-### Tabelas e Views Consultadas
+### Tabelas e Views consultadas
 
 **VW_UNIDADE:**
 
@@ -383,7 +383,7 @@ ORDER BY u.sigla;
 
 ## Dependências
 
-### Permissões Necessárias
+### Permissões necessárias
 
 ```sql
 GRANT SELECT ON SRH2.QFC_OCUP_COM TO SGC;
@@ -423,7 +423,7 @@ LEFT JOIN (... substituição ...) s
 
 **Benefício:** Menos registros para processar nos JOINs principais
 
-### Índices Recomendados
+### Índices recomendados
 
 ```sql
 -- Na tabela ATRIBUICAO_TEMPORARIA
@@ -436,7 +436,7 @@ ON QFC_SUBST_COM(mat_servidor, dt_ini_subst, dt_fim_subst)
 WHERE dt_fim_subst IS NOT NULL;
 ```
 
-### Consultas Frequentes
+### Consultas frequentes
 
 A view é consultada principalmente através de `VW_USUARIO_PERFIL_UNIDADE`:
 
@@ -522,7 +522,7 @@ A view integra dados de dois sistemas:
 - Sistema deve validar que datas de início < datas de término
 - Sistema deve validar que atribuições temporárias não se sobreponham
 
-### Mudanças Dinâmicas
+### Mudanças dinâmicas
 
 **Transições automáticas:**
 
@@ -538,7 +538,7 @@ A view integra dados de dois sistemas:
 - Notificações devem ir para novo responsável
 - Histórico em `ANALISE`, `MOVIMENTACAO` preserva usuário que realizou ação
 
-### Casos Especiais
+### Casos especiais
 
 **Múltiplas responsabilidades:**
 

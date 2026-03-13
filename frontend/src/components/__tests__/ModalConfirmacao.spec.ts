@@ -121,7 +121,7 @@ describe('ModalConfirmacao.vue', () => {
     })
 
     it('renderiza conteúdo customizado via slot', () => {
-        const customContent = '<div class="custom-content">Conteúdo Customizado</div>'
+        const customContent = '<div class="custom-content">Conteúdo customizado</div>'
         const wrapper = mount(ModalConfirmacao, {
             props: {
                 ...defaultProps,
@@ -134,7 +134,7 @@ describe('ModalConfirmacao.vue', () => {
         })
 
         expect(wrapper.find('.custom-content').exists()).toBe(true)
-        expect(wrapper.find('.custom-content').text()).toBe('Conteúdo Customizado')
+        expect(wrapper.find('.custom-content').text()).toBe('Conteúdo customizado')
     })
 
     it('usa titulos customizados para os botoes', () => {

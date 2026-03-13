@@ -328,7 +328,7 @@ describe("Processo.vue", () => {
         expect(modal.props("titulo")).toBe("Aceite em bloco");
     });
 
-    it("deve executar ação em bloco com sucesso (Aceitar Cadastro)", async () => {
+    it("deve executar ação em bloco com sucesso (Aceitar cadastro)", async () => {
         wrapper = createWrapper();
         perfilStore = usePerfilStore();
         processosStore = useProcessosStore();
@@ -343,7 +343,7 @@ describe("Processo.vue", () => {
         const modal = wrapper.findComponent(ModalAcaoBlocoStub);
         await wrapper.find("button.btn-success").trigger("click"); // Abrir modal 'aceitar'
 
-        // Simular confirmação do modal com ID 101 (Mapeamento Cadastro Disponibilizado)
+        // Simular confirmação do modal com ID 101 (Mapeamento cadastro disponibilizado)
         const dadosConfirmacao = {ids: [101]};
         await modal.vm.$emit("confirmar", dadosConfirmacao);
 
@@ -353,7 +353,7 @@ describe("Processo.vue", () => {
         expect(mocks.push).toHaveBeenCalledWith("/painel");
     });
 
-    it("deve executar ação em bloco com sucesso (Aceitar Validação)", async () => {
+    it("deve executar ação em bloco com sucesso (Aceitar validação)", async () => {
         wrapper = createWrapper();
         perfilStore = usePerfilStore();
         processosStore = useProcessosStore();
@@ -367,7 +367,7 @@ describe("Processo.vue", () => {
         const modal = wrapper.findComponent(ModalAcaoBlocoStub);
         await wrapper.find("button.btn-success").trigger("click"); // Abrir modal 'aceitar'
 
-        // Simular confirmação com ID 103 (Mapa Validado)
+        // Simular confirmação com ID 103 (Mapa validado)
         const dadosConfirmacao = {ids: [103]};
         await modal.vm.$emit("confirmar", dadosConfirmacao);
 
@@ -427,7 +427,7 @@ describe("Processo.vue", () => {
         expect((wrapper.vm).mensagemSucessoAcaoBloco).toBe("Mapas aceitos em bloco");
     });
 
-    it("deve executar ação em bloco com sucesso (Homologar Cadastro)", async () => {
+    it("deve executar ação em bloco com sucesso (Homologar cadastro)", async () => {
         wrapper = createWrapper();
         perfilStore = usePerfilStore();
         processosStore = useProcessosStore();
@@ -440,14 +440,14 @@ describe("Processo.vue", () => {
         const modal = wrapper.findComponent(ModalAcaoBlocoStub);
         await wrapper.find("button.btn-warning").trigger("click"); // Abrir modal 'homologar'
 
-        // ID 101 -> Cadastro Disponibilizado
+        // ID 101 -> Cadastro disponibilizado
         await modal.vm.$emit("confirmar", {ids: [101]});
 
         expect(processosStore.executarAcaoBloco).toHaveBeenCalledWith('homologar', [101], undefined);
         expect(modal.props("titulo")).toBe("Homologação em bloco");
     });
 
-    it("deve executar ação em bloco com sucesso (Homologar Validação)", async () => {
+    it("deve executar ação em bloco com sucesso (Homologar validação)", async () => {
         wrapper = createWrapper();
         perfilStore = usePerfilStore();
         processosStore = useProcessosStore();
@@ -460,7 +460,7 @@ describe("Processo.vue", () => {
         const modal = wrapper.findComponent(ModalAcaoBlocoStub);
         await wrapper.find("button.btn-warning").trigger("click"); // Abrir modal 'homologar'
 
-        // ID 103 -> Mapa Validado
+        // ID 103 -> Mapa validado
         await modal.vm.$emit("confirmar", {ids: [103]});
 
         expect(processosStore.executarAcaoBloco).toHaveBeenCalledWith('homologar', [103], undefined);
@@ -546,7 +546,7 @@ describe("Processo.vue", () => {
         const modal = wrapper.findComponent(ModalAcaoBlocoStub);
         await wrapper.find("button.btn-info").trigger("click"); // Abrir modal 'disponibilizar'
 
-        // ID 104 -> Mapa Criado
+        // ID 104 -> Mapa criado
         await modal.vm.$emit("confirmar", {ids: [104], dataLimite: '2024-12-31'});
 
         expect(processosStore.executarAcaoBloco).toHaveBeenCalledWith('disponibilizar', [104], '2024-12-31');
@@ -816,14 +816,14 @@ describe("Processo.vue", () => {
             unidades: [{
                 codUnidade: 201,
                 sigla: "PAI",
-                nome: "Unidade Pai",
+                nome: "Unidade pai",
                 situacaoSubprocesso: SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO,
                 localizacaoAtualCodigo: 999,
                 codSubprocesso: 2001,
                 filhos: [{
                     codUnidade: 202,
                     sigla: "FILHO",
-                    nome: "Unidade Filho",
+                    nome: "Unidade filho",
                     situacaoSubprocesso: SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO,
                     localizacaoAtualCodigo: 999,
                     codSubprocesso: 2002,
@@ -836,14 +836,14 @@ describe("Processo.vue", () => {
                 codigo: 2001,
                 unidadeCodigo: 201,
                 unidadeSigla: "PAI",
-                unidadeNome: "Unidade Pai",
+                unidadeNome: "Unidade pai",
                 situacao: SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO,
             },
             {
                 codigo: 2002,
                 unidadeCodigo: 202,
                 unidadeSigla: "FILHO",
-                unidadeNome: "Unidade Filho",
+                unidadeNome: "Unidade filho",
                 situacao: SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO,
             }
         ]);

@@ -117,7 +117,7 @@ public class ProcessoConsultaService {
         return subprocessos.stream()
                 .filter(sp -> {
                     SituacaoSubprocesso s = sp.getSituacao();
-                    // Elegível para ACEITE (Cadastro Disponibilizado ou Fluxo de Mapa Validado/Sugestões)
+                    // Elegível para ACEITE (Cadastro disponibilizado ou Fluxo de Mapa validado/Sugestões)
                     boolean situacaoAceite = (s == SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO ||
                             s == SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA ||
                             (s.ordinal() >= SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES.ordinal() &&
@@ -125,7 +125,7 @@ public class ProcessoConsultaService {
                             (s.ordinal() >= SituacaoSubprocesso.REVISAO_MAPA_COM_SUGESTOES.ordinal() &&
                                     s.ordinal() <= SituacaoSubprocesso.REVISAO_MAPA_VALIDADO.ordinal()));
 
-                    // Elegível para DISPONIBILIZAÇÃO (Cadastro Homologado ou Mapa Criado/Ajustado)
+                    // Elegível para DISPONIBILIZAÇÃO (Cadastro homologado ou Mapa criado/Ajustado)
                     boolean situacaoDisp = (s == SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO ||
                             s == SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO ||
                             s == SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA ||

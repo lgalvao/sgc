@@ -15,7 +15,7 @@ describe('CompetenciaCard Coverage', () => {
             props: {
                 competencia: {
                     codigo: 1,
-                    descricao: 'Competencia Teste',
+                    descricao: 'Competencia teste',
                     atividades: [{codigo: 999, descricao: 'Atividade 999', conhecimentos: []}],
                 },
                 atividades: [], // Empty list
@@ -34,7 +34,7 @@ describe('CompetenciaCard Coverage', () => {
             props: {
                 competencia: {
                     codigo: 1,
-                    descricao: 'Competencia Teste',
+                    descricao: 'Competencia teste',
                     atividades: [{codigo: 999, descricao: 'Atividade 999', conhecimentos: []}],
                 },
                 atividades: [],

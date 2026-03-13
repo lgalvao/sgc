@@ -226,7 +226,7 @@ describe("ArvoreUnidades.vue", () => {
             {
                 codigo: 300,
                 sigla: "PAI_INELEGIVEL",
-                nome: "Pai Inelegivel",
+                nome: "Pai inelegivel",
                 isElegivel: false,
                 filhas: [
                     {codigo: 301, sigla: "F1", nome: "F1", isElegivel: true, filhas: [], tipo: "OPERACIONAL"}

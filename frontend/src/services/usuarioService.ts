@@ -2,7 +2,7 @@ import type {LoginResponseDto, PerfilUnidadeDto, UsuarioDto} from "@/types/dtos"
 import type {Usuario} from "@/types/tipos";
 import apiClient from "../axios-setup";
 
-// Mappers Internos (formerly in /mappers/sgrh.ts & /mappers/usuarios.ts)
+// Mappers internos (formerly in /mappers/sgrh.ts & /mappers/usuarios.ts)
 
 export interface AutenticacaoRequest {
     tituloEleitoral: string;
@@ -159,5 +159,12 @@ export async function buscarUsuarioPorTitulo(
     titulo: string,
 ): Promise<Usuario> {
     const response = await apiClient.get(`/usuarios/${titulo}`);
+    return response.data;
+}
+
+export async function pesquisarUsuarios(termo: string): Promise<Usuario[]> {
+    const response = await apiClient.get(`/usuarios/pesquisar`, {
+        params: {termo}
+    });
     return response.data;
 }

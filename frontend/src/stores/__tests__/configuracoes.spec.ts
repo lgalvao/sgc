@@ -8,7 +8,7 @@ vi.mock('@/services/configuracaoService', () => ({
     salvarConfiguracoes: vi.fn()
 }));
 
-describe('Configuracoes Store', () => {
+describe('Configuracoes store', () => {
     let store: ReturnType<typeof useConfiguracoesStore>;
 
     beforeEach(() => {

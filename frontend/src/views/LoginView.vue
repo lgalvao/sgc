@@ -204,7 +204,7 @@ const perfisUnidadesDisponiveis = computed(() => perfilStore.perfisUnidades);
 const perfisUnidadesOptions = computed(() => {
   return perfilStore.perfisUnidades.map((par) => ({
     value: par,
-    text: `${par.perfil} - ${par.unidade.sigla}`,
+    text: par.perfil === par.unidade.sigla ? par.perfil : `${par.perfil} - ${par.unidade.sigla}`,
   }));
 });
 

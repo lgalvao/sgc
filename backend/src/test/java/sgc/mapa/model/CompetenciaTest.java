@@ -4,7 +4,7 @@ import org.junit.jupiter.api.*;
 
 import static org.assertj.core.api.Assertions.*;
 
-@DisplayName("Testes da Entidade Competencia")
+@DisplayName("Testes da Entidade competencia")
 class CompetenciaTest {
 
     @Test

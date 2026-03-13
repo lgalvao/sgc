@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("ProcessoDetalheBuilder - Cobertura Adicional")
+@DisplayName("ProcessoDetalheBuilder - Cobertura adicional")
 class ProcessoDetalheBuilderCoverageTest {
 
     @Mock

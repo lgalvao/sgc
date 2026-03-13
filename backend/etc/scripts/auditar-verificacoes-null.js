@@ -85,8 +85,8 @@ function generateReport(results) {
 
     fs.writeFileSync(AUDIT_FILE, auditContent, 'utf-8');
 
-    let mdContent = `# Null Checks Analysis\n\n`;
-    mdContent += `| Class | Total Checks | Potentially Redundant |\n`;
+    let mdContent = `# Null checks analysis\n\n`;
+    mdContent += `| Class | Total checks | Potentially redundant |\n`;
     mdContent += `|-------|--------------|-----------------------|\n`;
 
     const sortedFiles = Object.entries(results).sort((a, b) => b[1].length - a[1].length);

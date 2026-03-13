@@ -232,7 +232,7 @@ class ProcessoNotificacaoServiceTest {
     }
 
     @Nested
-    @DisplayName("Cobertura Extra")
+    @DisplayName("Cobertura extra")
     class CoberturaExtra {
 
         @Test

@@ -11,7 +11,7 @@ de transformações.
 
 **Tabela principal:** `SRH2.UNIDADE_TSE`
 
-A view utiliza apenas a tabela de unidades do Sistema de Gestão de Recursos Humanos (SGRH), processando os dados de
+A view utiliza apenas a tabela de unidades do Sistema de Gestão de Recursos humanos (SGRH), processando os dados de
 maneira hierárquica através de consultas recursivas (CONNECT BY).
 
 ## Estrutura da View
@@ -24,7 +24,7 @@ maneira hierárquica através de consultas recursivas (CONNECT BY).
 
 ## Regras de Negócio
 
-### RN-VIEW01-01: Filtragem de Unidades Ativas
+### RN-VIEW01-01: Filtragem de Unidades ativas
 
 A view inclui apenas unidades que estejam em situação ativa ou operacional, conforme os seguintes critérios:
 
@@ -35,9 +35,9 @@ A view inclui apenas unidades que estejam em situação ativa ou operacional, co
 **Justificativa:** Apenas unidades em funcionamento têm relevância para os processos de mapeamento, revisão e
 diagnóstico de competências.
 
-### RN-VIEW01-02: Construção do Caminho Histórico
+### RN-VIEW01-02: Construção do Caminho histórico
 
-O histórico de vinculações é construído através de três etapas implementadas via CTEs (Common Table Expressions):
+O histórico de vinculações é construído através de três etapas implementadas via CTEs (Common table expressions):
 
 **Etapa 1 - CTE HistoricoCompleto:**
 
@@ -53,13 +53,13 @@ O histórico de vinculações é construído através de três etapas implementa
 - Extrai a porção do caminho que exclui a unidade atual e a unidade anterior
 - Utiliza expressão regular `^(.*?)->[^>]+->[^>]+$` para isolar o histórico
 
-**Etapa 3 - Consulta Principal:**
+**Etapa 3 - Consulta principal:**
 
 - Tokeniza a string histórica separando por '->'
 - Inverte a ordem para apresentar da mais recente para a mais antiga
 - Concatena os códigos com vírgula usando `LISTAGG`
 
-### RN-VIEW01-03: Casos Especiais de Histórico
+### RN-VIEW01-03: Casos especiais de Histórico
 
 **Unidades com nível 1 (raiz):**
 
@@ -83,7 +83,7 @@ específicas.
 
 ## Casos de Uso da View
 
-### CU-VIEW01-01: Rastreamento de Mudanças Organizacionais
+### CU-VIEW01-01: Rastreamento de Mudanças organizacionais
 
 **Contexto:** Quando uma unidade é reestruturada ou extinta, é necessário identificar qual unidade atual assumiu suas
 atribuições.
@@ -102,7 +102,7 @@ WHERE unidade_anterior_codigo = 123
    );
 ```
 
-### CU-VIEW01-02: Auditoria de Processos Históricos
+### CU-VIEW01-02: Auditoria de Processos históricos
 
 **Contexto:** Em processos antigos de mapeamento ou revisão, as unidades participantes podem ter sido extintas ou
 reestruturadas. Esta view permite identificar as unidades atuais correspondentes.
@@ -118,7 +118,7 @@ transferidos para a unidade sucessora.
 **Aplicação:** Durante processos de migração de dados, o sistema pode utilizar esta view para garantir que todos os
 documentos e registros sejam associados à unidade correta na estrutura atual.
 
-## Relação com Outras Views e Tabelas
+## Relação com Outras views e Tabelas
 
 ### Uso em Conjunto com VW_UNIDADE
 
@@ -137,7 +137,7 @@ esta view é importante para:
 
 ## Dependências
 
-### Permissões Necessárias
+### Permissões necessárias
 
 ```sql
 GRANT SELECT ON SRH2.UNIDADE_TSE TO SGC;
@@ -149,12 +149,12 @@ GRANT SELECT ON SRH2.UNIDADE_TSE TO SGC;
 
 ## Considerações de Performance
 
-### Otimização de Consultas Recursivas
+### Otimização de Consultas recursivas
 
 A view utiliza `CONNECT BY NOCYCLE` para prevenir loops infinitos em casos de dados inconsistentes onde possa haver
 referências circulares na hierarquia de unidades.
 
-### Complexidade Computacional
+### Complexidade computacional
 
 O processamento hierárquico e a construção de strings podem ter impacto em performance para grandes volumes de dados.
 Para consultas frequentes que não necessitem do histórico completo, considere:

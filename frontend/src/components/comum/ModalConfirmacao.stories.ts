@@ -31,7 +31,7 @@ const Template = (args: any) => ({
     },
     template: `
     <div>
-      <BButton @click="show = true">Abrir Modal</BButton>
+      <BButton @click="show = true">Abrir modal</BButton>
       <ModalConfirmacao
         v-bind="args"
         v-model="show"
@@ -53,7 +53,7 @@ export const Default: Story = {
 export const Danger: Story = {
     render: Template,
     args: {
-        titulo: 'Excluir Item',
+        titulo: 'Excluir item',
         mensagem: 'Esta ação não poderá ser desfeita.',
         variant: 'danger',
         okTitle: 'Sim, excluir',
@@ -75,9 +75,9 @@ export const Loading: Story = {
 export const CustomTitles: Story = {
     render: Template,
     args: {
-        titulo: 'Enviar Proposta?',
+        titulo: 'Enviar proposta?',
         mensagem: 'Sua proposta será enviada para análise.',
-        okTitle: 'Enviar Agora',
+        okTitle: 'Enviar agora',
         cancelTitle: 'Revisar',
         variant: 'success',
         modelValue: false,

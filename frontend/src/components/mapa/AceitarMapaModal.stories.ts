@@ -29,7 +29,7 @@ export const Gestor: Story = {
         },
         template: `
       <div>
-        <button class="btn btn-primary" @click="show = true">Aceitar Mapa (Gestor)</button>
+        <button class="btn btn-primary" @click="show = true">Aceitar mapa (Gestor)</button>
         <AceitarMapaModal v-bind="args" :mostrarModal="show" @fecharModal="show = false" />
       </div>
     `,
@@ -50,7 +50,7 @@ export const Admin: Story = {
         },
         template: `
       <div>
-        <button class="btn btn-success" @click="show = true">Homologar Mapa (Admin)</button>
+        <button class="btn btn-success" @click="show = true">Homologar mapa (Admin)</button>
         <AceitarMapaModal v-bind="args" :mostrarModal="show" @fecharModal="show = false" />
       </div>
     `,

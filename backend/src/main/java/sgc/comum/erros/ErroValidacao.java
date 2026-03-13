@@ -7,7 +7,7 @@ import java.util.*;
 /**
  * Exceção para erros de validação de dados de entrada ou regras de negócio.
  *
- * <p>Retorna HTTP 422 (Unprocessable Content) indicando que a requisição está sintaticamente
+ * <p>Retorna HTTP 422 (Unprocessable content) indicando que a requisição está sintaticamente
  * correta mas semanticamente inválida.
  *
  * <p>Pode incluir detalhes adicionais sobre campos específicos que falharam na validação.

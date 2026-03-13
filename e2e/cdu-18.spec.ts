@@ -11,7 +11,7 @@ import {navegarParaMapa} from './helpers/helpers-mapas.js';
  *
  * O seed contém:
  * - Processo 99 (FINALIZADO) com mapa homologado para unidade de assessoria
- * - Mapa 99 com competência "Competência Técnica Seed 99" vinculada às atividades
+ * - Mapa 99 com competência "Competência técnica seed 99" vinculada às atividades
  */
 test.describe('CDU-18: Visualizar mapa de competências', () => {
 
@@ -49,15 +49,15 @@ test.describe('CDU-18: Visualizar mapa de competências', () => {
             await expect(page.getByText(/ASSESSORIA_\d+\s*-\s*Assessoria/i)).toBeVisible();
 
             // 5.3 Competência do seed
-            await expect(page.getByText('Competência Técnica Seed 99')).toBeVisible();
+            await expect(page.getByText('Competência técnica seed 99')).toBeVisible();
 
             // 5.4 Atividades da competência
-            await expect(page.getByText('Atividade Seed 1')).toBeVisible();
-            await expect(page.getByText('Atividade Seed 2')).toBeVisible();
+            await expect(page.getByText('Atividade seed 1')).toBeVisible();
+            await expect(page.getByText('Atividade seed 2')).toBeVisible();
 
             // 5.5 Conhecimentos das atividades
-            await expect(page.getByText('Conhecimento Seed 1.1')).toBeVisible();
-            await expect(page.getByText('Conhecimento Seed 2.1')).toBeVisible();
+            await expect(page.getByText('Conhecimento seed 1.1')).toBeVisible();
+            await expect(page.getByText('Conhecimento seed 2.1')).toBeVisible();
         });
     });
 
@@ -81,7 +81,7 @@ test.describe('CDU-18: Visualizar mapa de competências', () => {
         await test.step('4. Verificar visualização do mapa', async () => {
             await expect(page.getByText('Mapa de competências técnicas')).toBeVisible();
             await expect(page.getByText(/ASSESSORIA_12\s*-\s*Assessoria 12/i)).toBeVisible();
-            await expect(page.getByText('Competência Técnica Seed 99')).toBeVisible();
+            await expect(page.getByText('Competência técnica seed 99')).toBeVisible();
         });
     });
 });

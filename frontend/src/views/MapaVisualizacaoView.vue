@@ -192,7 +192,7 @@
         ok-title="Validar"
         test-id-cancelar="btn-validar-mapa-cancelar"
         test-id-confirmar="btn-validar-mapa-confirmar"
-        titulo="Validar Mapa de Competências"
+        titulo="Validar mapa de Competências"
         variant="success"
         @confirmar="confirmarValidacao"
     >

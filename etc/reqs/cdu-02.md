@@ -1,4 +1,4 @@
-# CDU-02 - Visualizar Painel
+# CDU-02 - Visualizar painel
 
 Ator: Usuário (todos os perfis)
 

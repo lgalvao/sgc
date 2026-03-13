@@ -10,9 +10,9 @@ O teste E2E cobre:
   - Valida presença de:
     - Título "Mapa de competências técnicas" ✓
     - Identificação da unidade (sigla + nome) ✓
-    - Competência "Competência Técnica Seed 99" ✓
-    - Atividades "Atividade Seed 1" e "Atividade Seed 2" ✓
-    - Conhecimentos "Conhecimento Seed 1.1" e "Conhecimento Seed 2.1" ✓
+    - Competência "Competência técnica seed 99" ✓
+    - Atividades "Atividade seed 1" e "Atividade seed 2" ✓
+    - Conhecimentos "Conhecimento seed 1.1" e "Conhecimento seed 2.1" ✓
 
 - **Cenário 2 (CHEFE da unidade)** (linhas 64-86):
   - Login como CHEFE_ASSESSORIA_12.
@@ -22,7 +22,7 @@ O teste E2E cobre:
   - Valida presença de:
     - Título "Mapa de competências técnicas" ✓
     - Identificação da unidade (sigla + nome) ✓
-    - Competência "Competência Técnica Seed 99" ✓
+    - Competência "Competência técnica seed 99" ✓
 
 ## Lacunas em relação ao requisito
 **Pré-condições não completamente validadas:**
@@ -54,28 +54,28 @@ O teste E2E cobre:
 - **Passo 4**: "Na tela de `Detalhes do subprocesso`, usuário clica no card `Mapa de Competências`."
   - Teste chama helper `navegarParaMapa(page)` que provavelmente clica no card, mas não há assertion explícita de clique no card ou presença do card.
 
-**Tela Visualização de Mapa (passo 5) parcialmente validada:**
+**Tela visualização de Mapa (passo 5) parcialmente validada:**
 - **5.1** - Título "Mapa de competências técnicas": ✓ Validado.
 - **5.2** - Identificação da unidade (sigla e nome): ✓ Validado com regex `/ASSESSORIA_\d+\s*-\s*Assessoria/i`.
 - **5.3** - Conjunto de competências com cada competência em bloco individual:
-  - Teste valida que competência "Competência Técnica Seed 99" é visível ✓.
+  - Teste valida que competência "Competência técnica seed 99" é visível ✓.
   - Não valida:
     - Se há múltiplas competências (teste tem apenas 1).
     - Se cada competência está em "bloco individual" (visual/layout não validado).
     - Se há elementos visuais como ícones ou cores distintas para cada bloco.
 
 - **5.3.1** - Descrição da competência como título:
-  - Teste valida que texto "Competência Técnica Seed 99" é visível ✓.
+  - Teste valida que texto "Competência técnica seed 99" é visível ✓.
   - Não valida que é estruturalmente um "título" (tag h3/h4 ou estilo de título).
 
 - **5.3.2** - Conjunto das atividades associadas àquela competência:
-  - Teste valida que "Atividade Seed 1" e "Atividade Seed 2" são visíveis ✓.
+  - Teste valida que "Atividade seed 1" e "Atividade seed 2" são visíveis ✓.
   - Não valida:
     - Se apenas as atividades ASSOCIADAS à competência aparecem (pode haver outras atividades não mostradas).
     - Se atividades são estruturalmente agrupadas sob a competência (layout/hierarquia não validado).
 
 - **5.3.3** - Para cada atividade, conjunto de conhecimentos da atividade:
-  - Teste valida que "Conhecimento Seed 1.1" e "Conhecimento Seed 2.1" são visíveis ✓.
+  - Teste valida que "Conhecimento seed 1.1" e "Conhecimento seed 2.1" são visíveis ✓.
   - Não valida:
     - Se conhecimentos estão hierarquicamente subordinados à atividade (layout não validado).
     - Se apenas conhecimentos ASSOCIADOS à atividade aparecem.

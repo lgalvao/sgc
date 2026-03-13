@@ -6,7 +6,7 @@ O teste E2E (cdu-33.spec.ts) cobre:
 - Navegação para subprocesso de revisão da unidade (SECAO_212)
 - Verificação da situação "Mapa homologado"
 - Visualização e habilitação do botão "Reabrir revisão" (via `btn-reabrir-revisao`)
-- Abertura do modal com heading "Reabrir Revisão"
+- Abertura do modal com heading "Reabrir revisão"
 - Preenchimento de justificativa "Ajuste necessário"
 - Confirmação de reabertura
 - Validação de mudança de situação para "Revisão em andamento"

@@ -34,6 +34,13 @@ public class UsuarioController {
     }
 
     @JsonView(OrganizacaoViews.Publica.class)
+    @GetMapping("/pesquisar")
+    @Operation(summary = "Pesquisa usuários por nome ou matrícula")
+    public ResponseEntity<List<Usuario>> pesquisarUsuarios(@RequestParam String termo) {
+        return ResponseEntity.ok(usuarioService.buscarPorNomeOuMatricula(termo));
+    }
+
+    @JsonView(OrganizacaoViews.Publica.class)
     @GetMapping("/administradores")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Lista todos os administradores")

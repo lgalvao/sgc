@@ -11,13 +11,13 @@ describe('Relatorios.vue', () => {
     const mockProcessos = [
         {
             codigo: 1,
-            descricao: 'Processo Mapeamento 2024',
+            descricao: 'Processo mapeamento 2024',
             tipo: TipoProcesso.MAPEAMENTO,
             situacao: 'EM_ANDAMENTO',
         },
         {
             codigo: 2,
-            descricao: 'Processo Revisao 2025',
+            descricao: 'Processo revisao 2025',
             tipo: TipoProcesso.REVISAO,
             situacao: 'CRIADO',
         }
@@ -69,11 +69,11 @@ describe('Relatorios.vue', () => {
             { siglaUnidade: 'U1', responsavel: 'Joao' }
         ]);
 
-        // Simula selecao de processo (o select em Vue Test Utils com stub pode ser setado no vm)
+        // Simula selecao de processo (o select em Vue test utils com stub pode ser setado no vm)
         ctx.wrapper!.vm.processoIdSelecionado = 1;
         await ctx.wrapper!.vm.$nextTick();
         
-        // Pega todos os botoes. O primeiro é o de Gerar Andamento.
+        // Pega todos os botoes. O primeiro é o de Gerar andamento.
         const btns = ctx.wrapper!.findAll('button');
         await btns[0].trigger('click');
 
@@ -104,7 +104,7 @@ describe('Relatorios.vue', () => {
         await ctx.wrapper!.vm.$nextTick();
         
         // O botao de mapas é o ultimo (index 1 antes de ter dados no andamento, ou index 2 se tiver)
-        // Como o andamento ta vazio, temos 2 botoes disponiveis no DOM: [0] = Gerar Andamento, [1] = Gerar PDF Mapas
+        // Como o andamento ta vazio, temos 2 botoes disponiveis no DOM: [0] = Gerar andamento, [1] = Gerar PDF Mapas
         const btns = ctx.wrapper!.findAll('button');
         await btns[1].trigger('click');
 

@@ -1,4 +1,4 @@
-# CDU-30 - Manter Administradores
+# CDU-30 - Manter administradores
 
 Ator: ADMIN
 
@@ -32,7 +32,7 @@ Permite o gerenciamento dos usuários que possuem perfil de administrador no sis
 
 9. **<<Início de fluxo de remoção de administrador>>** O usuário aciona o ícone de exclusão em um registro da lista.
 
-10. O sistema exibe um modal com título "Confirmar Remoção" e a mensagem "Deseja realmente
+10. O sistema exibe um modal com título "Confirmar remoção" e a mensagem "Deseja realmente
     remover [NOME_DO_ADMINISTRADOR] como administrador do sistema?", com botões "Cancelar" e "Remover".
 
 11. O usuário confirma clicando em "Remover".

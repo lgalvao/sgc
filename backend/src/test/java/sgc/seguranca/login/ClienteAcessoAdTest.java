@@ -49,7 +49,7 @@ class ClienteAcessoAdTest {
     }
 
     @Test
-    @DisplayName("autenticar - Exception Inesperada")
+    @DisplayName("autenticar - Exception inesperada")
     void autenticar_ExceptionInesperada() {
         when(restClient.post()).thenReturn(requestBodyUriSpec);
         when(requestBodyUriSpec.uri(anyString())).thenReturn(requestBodySpec);
@@ -94,7 +94,7 @@ class ClienteAcessoAdTest {
 
         clienteAcessoAd.autenticar("123", "senha");
 
-        // Valida Predicate
+        // Valida predicate
         assertTrue(predicateCaptor.getValue().test(HttpStatusCode.valueOf(400)));
         assertTrue(predicateCaptor.getValue().test(HttpStatusCode.valueOf(500)));
         // Valida que 2xx retorna false

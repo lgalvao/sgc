@@ -18,12 +18,13 @@
       </div>
     </slot>
     <template #footer>
-      <div class="d-flex justify-content-between w-100 footer-confirmacao">
+      <div class="d-flex justify-content-end w-100 footer-confirmacao gap-3 align-items-center">
         <BButton
             ref="btnCancelar"
             :data-testid="testIdCancelar || 'btn-modal-confirmacao-cancelar'"
             :disabled="loading"
-            variant="secondary"
+            class="text-decoration-none text-secondary fw-medium btn-cancelar-link"
+            variant="link"
             @click="fechar"
         >
           {{ cancelTitle }}
@@ -115,7 +116,7 @@ function onShown() {
 <style scoped>
 @media (max-width: 576px) {
   .footer-confirmacao {
-    flex-direction: column-reverse;
+    flex-direction: column;
     gap: 0.5rem;
   }
 
@@ -126,5 +127,16 @@ function onShown() {
   :deep(.modal-responsivo .modal-dialog) {
     margin: 0.5rem;
   }
+}
+
+.btn-cancelar-link {
+  padding: 0.375rem 0.75rem;
+  transition: all 0.2s;
+  border-radius: 0.375rem;
+}
+
+.btn-cancelar-link:hover {
+  color: var(--bs-emphasis-color) !important;
+  background-color: var(--bs-secondary-bg);
 }
 </style>

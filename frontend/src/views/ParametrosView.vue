@@ -62,7 +62,7 @@
           <LoadingButton
               :loading="salvando"
               icon="check-lg"
-              text="Salvar Configurações"
+              text="Salvar configurações"
               type="submit"
               variant="success"
           />
