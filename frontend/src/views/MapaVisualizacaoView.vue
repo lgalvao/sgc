@@ -342,7 +342,7 @@ async function confirmarSugestoes() {
     toastStore.setPending("Mapa submetido com sugestões para análise da unidade superior");
     await router.push({name: "Painel"});
   } catch {
-    notify("Ocorreu um erro ao apresentar sugestões. Tente novamente.", 'danger');
+    notify("Erro ao apresentar sugestões", 'danger');
   } finally {
     isLoading.value = false;
   }
@@ -357,7 +357,7 @@ async function confirmarValidacao() {
     toastStore.setPending("Mapa validado e submetido para análise à unidade superior");
     await router.push({name: "Painel"});
   } catch {
-    notify("Ocorreu um erro ao validar o mapa. Tente novamente.", 'danger');
+    notify("Erro ao validar o mapa", 'danger');
   } finally {
     isLoading.value = false;
   }
@@ -375,7 +375,7 @@ async function confirmarAceitacao() {
       await processosStore.aceitarValidacao(codSubprocesso.value);
     }
     fecharModalAceitar();
-    toastStore.setPending(isHomologacao ? "Homologação efetivada" : "Aceite registrado.");
+    toastStore.setPending(isHomologacao ? "Homologação efetivada" : "Aceite registrado");
     await router.push({name: "Painel"});
   } catch (error) {
     logger.error(error);
@@ -397,7 +397,7 @@ async function confirmarDevolucao() {
     await router.push({name: "Painel"});
   } catch (error) {
     logger.error(error);
-    notify("Erro ao devolver.", 'danger');
+    notify("Erro ao devolver", 'danger');
   } finally {
     isLoading.value = false;
   }
