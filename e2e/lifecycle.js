@@ -226,7 +226,6 @@ function startSmtpServer() {
         authOptional: true,
         onData(stream, _session, callback) {
             stream.on('data', () => {
-                // Consumir dados
             });
             stream.on('end', () => {
                 callback();

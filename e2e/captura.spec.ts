@@ -502,15 +502,12 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await expect(page.getByTestId('btn-processo-salvar')).toBeDisabled();
             await capturarTela(page, '03-processo', '10-botoes-desativados-form-vazio');
 
-            // Preencher descrição
             await page.getByTestId('inp-processo-descricao').fill(descricao);
             await expect(page.getByTestId('btn-processo-salvar')).toBeDisabled();
             await capturarTela(page, '03-processo', '11-botoes-desativados-falta-data-unidade');
 
-            // Selecionar tipo
             await page.getByTestId('sel-processo-tipo').selectOption('MAPEAMENTO');
 
-            // Preencher data
             const dataLimite = new Date();
             dataLimite.setDate(dataLimite.getDate() + 30);
             await page.getByTestId('inp-processo-data-limite').fill(dataLimite.toISOString().split('T')[0]);
@@ -1049,7 +1046,6 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await capturarTela(page, '11-unidades', '04-modal-criar-atribuicao');
             await page.getByRole('button', {name: /Cancelar/i}).click();
 
-            // 2. Histórico
             const linkHistorico = page.getByRole('link', {name: /Histórico/i});
             await expect(linkHistorico).toBeVisible();
             await linkHistorico.click();
@@ -1081,7 +1077,6 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await capturarTela(page, '13-configuracoes', '04-modal-adicionar-administrador');
             await page.getByRole('button', {name: /Cancelar/i}).click();
 
-            // 4. Relatórios
             const linkRelatorios = page.getByRole('link', {name: /Relatórios/i});
             await expect(linkRelatorios).toBeVisible();
             await linkRelatorios.click();
