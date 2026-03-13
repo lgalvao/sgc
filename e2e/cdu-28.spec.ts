@@ -51,6 +51,6 @@ test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
         await page.getByTestId('textarea-justificativa').fill('Cobertura de férias');
         await page.getByTestId('cad-atribuicao__btn-criar-atribuicao').click();
 
-        await expect(page.getByText(/Atribuição criada com sucesso/i).first()).toBeVisible();
+        await expect(page.getByText(/Atribuição criada/i).first()).toBeVisible();
     });
 });

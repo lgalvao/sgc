@@ -151,7 +151,7 @@ export async function disponibilizarCadastro(page: Page) {
     const btnConfirmar = page.getByTestId('btn-confirmar-disponibilizacao');
     await expect(btnConfirmar).toBeVisible();
     await btnConfirmar.click();
-    await verificarToast(page, /Cadastro disponibilizado\./i);
+    await verificarToast(page, /disponibilizada?|Disponibilizado/i);
     await verificarPaginaPainel(page);
 }
 

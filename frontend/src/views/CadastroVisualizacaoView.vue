@@ -156,6 +156,7 @@ import PageHeader from "@/components/layout/PageHeader.vue";
 import {useProcessosStore} from "@/stores/processos";
 import {useMapasStore} from "@/stores/mapas";
 import {useSubprocessosStore} from "@/stores/subprocessos";
+import {useToastStore} from "@/stores/toast";
 import type {
   AceitarCadastroRequest,
   AnaliseCadastro,
@@ -178,6 +179,7 @@ const router = useRouter();
 const processosStore = useProcessosStore();
 const mapasStore = useMapasStore();
 const subprocessosStore = useSubprocessosStore();
+const toastStore = useToastStore();
 const {impactoMapa: impactos} = storeToRefs(mapasStore);
 
 const unidadeId = computed(() => props.sigla);
@@ -310,6 +312,7 @@ async function confirmarValidacao() {
 
       if (sucesso) {
         fecharModalValidar();
+        toastStore.setPending("Homologação efetivada");
         await router.push({
           name: "Subprocesso",
           params: {
@@ -330,6 +333,7 @@ async function confirmarValidacao() {
 
       if (sucesso) {
         fecharModalValidar();
+        toastStore.setPending("Aceite registrado");
         await router.push({name: "Painel"});
       }
     }
@@ -358,6 +362,7 @@ async function confirmarDevolucao() {
 
     if (sucesso) {
       fecharModalDevolver();
+      toastStore.setPending("Devolução realizada");
       await router.push("/painel");
     }
   } finally {

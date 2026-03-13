@@ -138,6 +138,7 @@ import {useAcesso} from "@/composables/useAcesso";
 import {useFormErrors} from '@/composables/useFormErrors';
 import {useMapasStore} from "@/stores/mapas";
 import {useSubprocessosStore} from "@/stores/subprocessos";
+import {useToastStore} from "@/stores/toast";
 import type {Atividade, Competencia, SalvarCompetenciaRequest, Unidade} from "@/types/tipos";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import {formatSituacaoSubprocesso} from "@/utils/formatters";
@@ -152,6 +153,7 @@ const router = useRouter();
 const mapasStore = useMapasStore();
 const {mapaCompleto, impactoMapa: impactos} = storeToRefs(mapasStore);
 const subprocessosStore = useSubprocessosStore();
+const toastStore = useToastStore();
 const subprocesso = computed(() => subprocessosStore.subprocessoDetalhe);
 usePerfil();
 
@@ -262,6 +264,7 @@ function iniciarEdicaoCompetencia(competencia: Competencia) {
 }
 
 async function adicionarCompetenciaEFecharModal(dados: { descricao: string; atividadesSelecionadas: number[] }) {
+  if (!codSubprocesso.value) return;
   const request: SalvarCompetenciaRequest = {
     descricao: dados.descricao,
     atividadesIds: dados.atividadesSelecionadas,
@@ -269,12 +272,12 @@ async function adicionarCompetenciaEFecharModal(dados: { descricao: string; ativ
 
   try {
     if (competenciaSendoEditada.value) {
-      await mapasStore.atualizarCompetencia(codSubprocesso.value as number, competenciaSendoEditada.value.codigo, request);
+      await mapasStore.atualizarCompetencia(codSubprocesso.value, competenciaSendoEditada.value.codigo, request);
     } else {
-      await mapasStore.adicionarCompetencia(codSubprocesso.value as number, request);
+      await mapasStore.adicionarCompetencia(codSubprocesso.value, request);
     }
 
-    const data = await subprocessosStore.buscarContextoEdicao(codSubprocesso.value as number);
+    const data = await subprocessosStore.buscarContextoEdicao(codSubprocesso.value);
     if (data && data.atividadesDisponiveis) {
       atividades.value = data.atividadesDisponiveis;
     }
@@ -294,14 +297,14 @@ function excluirCompetencia(codigo: number) {
 }
 
 async function confirmarExclusaoCompetencia() {
-  if (competenciaParaExcluir.value) {
+  if (competenciaParaExcluir.value && codSubprocesso.value) {
     loadingExclusao.value = true;
     try {
       await mapasStore.removerCompetencia(
-          codSubprocesso.value as number,
+          codSubprocesso.value,
           competenciaParaExcluir.value.codigo,
       );
-      const data = await subprocessosStore.buscarContextoEdicao(codSubprocesso.value as number);
+      const data = await subprocessosStore.buscarContextoEdicao(codSubprocesso.value);
       if (data && data.atividadesDisponiveis) {
         atividades.value = data.atividadesDisponiveis;
       }
@@ -320,6 +323,7 @@ function fecharModalExcluirCompetencia() {
 }
 
 function removerAtividadeAssociada(competenciaId: number, atividadeId: number) {
+  if (!codSubprocesso.value) return;
   const competencia = competencias.value.find(
       (comp) => comp.codigo === competenciaId,
   );
@@ -332,7 +336,7 @@ function removerAtividadeAssociada(competenciaId: number, atividadeId: number) {
     };
 
     mapasStore.atualizarCompetencia(
-        codSubprocesso.value as number,
+        codSubprocesso.value,
         competencia.codigo,
         request,
     );
@@ -345,8 +349,9 @@ async function disponibilizarMapa(payload: { dataLimite: string; observacoes: st
   loadingDisponibilizacao.value = true;
 
   try {
-    await mapasStore.disponibilizarMapa(codSubprocesso.value, payload);
+    await mapasStore.disponibilizarMapa(codSubprocesso.value as number, payload);
     fecharModalDisponibilizar();
+    toastStore.setPending("Disponibilização do mapa de competências efetuada");
     await router.push({name: "Painel"});
   } catch {
     handleErrors(mapasStore);

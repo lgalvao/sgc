@@ -503,7 +503,10 @@ async function confirmarDisponibilizacao() {
 
   mostrarModalConfirmacao.value = false;
   if (sucesso) {
-    toastStore.setPending("Cadastro disponibilizado.");
+    const msg = isRevisao.value
+        ? "Revisão do cadastro de atividades disponibilizada"
+        : "Cadastro de atividades disponibilizado";
+    toastStore.setPending(msg);
     await router.push("/painel");
   }
 }

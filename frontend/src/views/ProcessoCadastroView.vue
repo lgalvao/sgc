@@ -287,12 +287,12 @@ async function salvarProcesso() {
           processoEditando.value.codigo,
           request,
       );
-      toastStore.setPending("O processo foi alterado com sucesso.");
+      toastStore.setPending("Processo alterado.");
       await router.push("/painel");
     } else {
       const request = construirCriarRequest();
       await processosStore.criarProcesso(request);
-      toastStore.setPending("O processo foi criado com sucesso.");
+      toastStore.setPending("Processo criado.");
       await router.push("/painel");
     }
     limparCampos();
@@ -358,7 +358,7 @@ async function confirmarRemocao() {
     const descRemovida = processoEditando.value.descricao;
     try {
       await processosStore.removerProcesso(processoEditando.value.codigo);
-      toastStore.setPending(`Processo ${descRemovida} removido com sucesso.`);
+      toastStore.setPending(`Processo ${descRemovida} removido`);
       await router.push("/painel");
       if (!processoEditando.value) {
         limparCampos();

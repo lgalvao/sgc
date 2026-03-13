@@ -99,7 +99,7 @@ test.describe('CDU-03 - Manter processo', () => {
         await page.getByTestId('btn-processo-salvar').click();
 
         await esperarPaginaPainel(page);
-        await verificarToast(page, /alterado com sucesso/i);
+        await verificarToast(page, /alterado/i);
         await expect(page.getByText(novaDescricao)).toBeVisible();
     });
 
@@ -119,7 +119,7 @@ test.describe('CDU-03 - Manter processo', () => {
 
         await page.getByRole('dialog').getByRole('button', {name: 'Remover'}).click();
         await esperarPaginaPainel(page);
-        await verificarToast(page, /removido com sucesso/i);
+        await verificarToast(page, /removido/i);
         await expect(page.getByTestId('tbl-processos').getByText(descricao)).toBeHidden();
     });
 

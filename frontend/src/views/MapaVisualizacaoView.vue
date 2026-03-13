@@ -339,10 +339,10 @@ async function confirmarSugestoes() {
       sugestoes: sugestoes.value,
     });
     fecharModalSugestoes();
-    toastStore.setPending("Sugestões submetidas para análise da unidade superior.");
+    toastStore.setPending("Mapa submetido com sugestões para análise da unidade superior");
     await router.push({name: "Painel"});
   } catch {
-    notify("Ocorreu um erro ao apresentar sugestões. Tente novamente.", 'danger');
+    notify("Erro ao apresentar sugestões", 'danger');
   } finally {
     isLoading.value = false;
   }
@@ -354,10 +354,10 @@ async function confirmarValidacao() {
   try {
     await processosStore.validarMapa(codSubprocesso.value);
     fecharModalValidar();
-    toastStore.setPending("Mapa validado e submetido para análise da unidade superior.");
+    toastStore.setPending("Mapa validado e submetido para análise à unidade superior");
     await router.push({name: "Painel"});
   } catch {
-    notify("Ocorreu um erro ao validar o mapa. Tente novamente.", 'danger');
+    notify("Erro ao validar o mapa", 'danger');
   } finally {
     isLoading.value = false;
   }
@@ -375,11 +375,11 @@ async function confirmarAceitacao() {
       await processosStore.aceitarValidacao(codSubprocesso.value);
     }
     fecharModalAceitar();
-    toastStore.setPending(isHomologacao ? "Homologação efetivada." : "Aceite registrado.");
+    toastStore.setPending(isHomologacao ? "Homologação efetivada" : "Aceite registrado");
     await router.push({name: "Painel"});
   } catch (error) {
     logger.error(error);
-    notify("Erro ao realizar a operação.", 'danger');
+    notify("Erro ao realizar a operação", 'danger');
   } finally {
     isLoading.value = false;
   }
@@ -393,11 +393,11 @@ async function confirmarDevolucao() {
       justificativa: observacaoDevolucao.value,
     });
     fecharModalDevolucao();
-    toastStore.setPending("Devolução realizada.");
+    toastStore.setPending("Devolução realizada");
     await router.push({name: "Painel"});
   } catch (error) {
     logger.error(error);
-    notify("Erro ao devolver.", 'danger');
+    notify("Erro ao devolver", 'danger');
   } finally {
     isLoading.value = false;
   }
