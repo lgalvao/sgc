@@ -1,62 +1,49 @@
 import {describe, expect, it, vi} from "vitest";
-import {useApi} from "../useApi";
+import {useApi} from "@/composables/useApi";
 
 describe("useApi", () => {
-    it("deve definir isLoading como verdadeiro enquanto a chamada da API estiver em andamento", async () => {
-        const apiCall = vi.fn(
-            () => new Promise((resolve) => setTimeout(() => resolve("data"), 10)),
-        );
-        const {execute, isLoading} = useApi(apiCall);
+    it("deve executar chamada com sucesso", async () => {
+        const mockCall = vi.fn().mockResolvedValue("resultado");
+        const {data, isLoading, error, execute} = useApi(mockCall);
 
-        const promise = execute();
-
+        expect(isLoading.value).toBe(false);
+        const promise = execute("arg1");
         expect(isLoading.value).toBe(true);
 
         await promise;
 
         expect(isLoading.value).toBe(false);
+        expect(data.value).toBe("resultado");
+        expect(error.value).toBe(null);
+        expect(mockCall).toHaveBeenCalledWith("arg1");
     });
 
-    it("deve definir dados na chamada da API bem-sucedida", async () => {
-        const apiCall = vi.fn(() => Promise.resolve("data"));
-        const {execute, data} = useApi(apiCall);
-
-        await execute();
-
-        expect(data.value).toBe("data");
-    });
-
-    it("deve definir erro na chamada da API com falha", async () => {
-        const apiCall = vi.fn(() =>
-            Promise.reject({isAxiosError: true, response: {data: {message: "error"}}}),
-        );
-        const {execute, error} = useApi(apiCall);
+    it("deve lidar com erro na chamada", async () => {
+        const mockCall = vi.fn().mockRejectedValue(new Error("falha"));
+        const {data, isLoading, error, normalizedError, execute} = useApi(mockCall);
 
         try {
             await execute();
-        } catch {
-            // Ignora erro esperado
+        } catch (e) {
+            // expected
         }
 
-        expect(error.value).toBe("error");
+        expect(isLoading.value).toBe(false);
+        expect(data.value).toBe(null);
+        expect(error.value).toBe("falha");
+        expect(normalizedError.value?.message).toBe("falha");
     });
 
-    it("deve limpar o erro quando clearError for chamado", async () => {
-        const apiCall = vi.fn(() =>
-            Promise.reject({isAxiosError: true, response: {data: {message: "error"}}}),
-        );
-        const {execute, error, clearError} = useApi(apiCall);
+    it("deve limpar erro", async () => {
+        const mockCall = vi.fn().mockRejectedValue(new Error("erro"));
+        const {error, execute, clearError} = useApi(mockCall);
 
         try {
             await execute();
-        } catch {
-            // Ignora erro esperado
-        }
+        } catch (e) {}
 
-        expect(error.value).toBe("error");
-
+        expect(error.value).toBe("erro");
         clearError();
-
         expect(error.value).toBe(null);
     });
 });

@@ -44,7 +44,7 @@ try {
         // No Windows, rmSync pode falhar se a pasta estiver aberta no Explorer ou sendo indexada
         fs.rmSync(SCREENSHOTS_DIR, {recursive: true, force: true});
     }
-} catch (error) {
+} catch {
     console.warn(`Aviso: Não foi possível remover o diretório de screenshots (EPERM). Tentando continuar...`);
 }
 
@@ -52,7 +52,8 @@ if (!fs.existsSync(SCREENSHOTS_DIR)) {
     try {
         fs.mkdirSync(SCREENSHOTS_DIR, {recursive: true});
     } catch (error) {
-        console.error(`Erro crítico: Não foi possível criar o diretório de screenshots: ${error.message}`);
+        const message = error instanceof Error ? error.message : String(error);
+        console.error(`Erro crítico: Não foi possível criar o diretório de screenshots: ${message}`);
     }
 }
 
