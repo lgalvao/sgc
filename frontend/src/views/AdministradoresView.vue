@@ -169,6 +169,7 @@ async function adicionarAdmin() {
   try {
     await adicionarAdministrador(novoAdminTitulo.value.trim());
     fecharModalAdicionarAdmin();
+    notify('Administrador adicionado com sucesso!', 'success');
     await carregarAdministradores();
   } catch (error) {
     const erro = normalizeError(error);
@@ -189,6 +190,7 @@ async function removerAdmin() {
   removendoAdmin.value = adminParaRemover.value.tituloEleitoral;
   try {
     await removerAdministrador(adminParaRemover.value.tituloEleitoral);
+    notify('Administrador removido com sucesso!', 'success');
     await carregarAdministradores();
     mostrarModalRemoverAdmin.value = false;
     adminParaRemover.value = null;

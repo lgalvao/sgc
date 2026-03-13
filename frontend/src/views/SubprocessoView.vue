@@ -352,7 +352,7 @@ async function confirmarAlteracaoDataLimite(novaData: string) {
           {novaData},
       );
       fecharModalAlterarDataLimite();
-      notify("A data limite foi alterada com sucesso!", 'success');
+      notify("Data limite alterada com sucesso", 'success');
     } catch {
       notify("Não foi possível alterar a data limite.", 'danger');
     }
@@ -397,7 +397,7 @@ async function confirmarReabertura() {
       notify(
           tipoReabertura.value === 'cadastro'
               ? 'Cadastro reaberto com sucesso'
-              : 'Revisão de cadastro reaberta com sucesso',
+              : 'Revisão reaberta com sucesso',
           'success',
       );
     }
@@ -415,8 +415,13 @@ async function enviarLembreteConfirmado() {
   if (!subprocesso.value || !codSubprocesso.value) {
     return;
   }
-  await processosStore.enviarLembrete(props.codProcesso, subprocesso.value.unidade.codigo);
-  await subprocessosStore.buscarSubprocessoDetalhe(codSubprocesso.value);
-  modalLembreteAberto.value = false;
+  try {
+    await processosStore.enviarLembrete(props.codProcesso, subprocesso.value.unidade.codigo);
+    await subprocessosStore.buscarSubprocessoDetalhe(codSubprocesso.value);
+    modalLembreteAberto.value = false;
+    notify('Lembrete enviado com sucesso', 'success');
+  } catch (error) {
+    notify('Não foi possível enviar o lembrete', 'danger');
+  }
 }
 </script>

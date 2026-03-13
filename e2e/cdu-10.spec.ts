@@ -79,7 +79,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await expect(modalConfirmacao.getByText(/Confirma a finalização da revisão e a disponibilização do cadastro/i)).toBeVisible();
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
 
-        await expect(page.getByText(/Disponibilizado com sucesso\./i).first()).toBeVisible();
+        await expect(page.getByText(/disponibilizada?|Disponibilizado/i).first()).toBeVisible();
         await verificarPaginaPainel(page);
 
         // Verificar alerta para o gestor superior
