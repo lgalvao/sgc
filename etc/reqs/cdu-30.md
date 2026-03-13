@@ -45,5 +45,5 @@ Permite o gerenciamento dos usuários que possuem perfil de administrador no sis
 
 14. Se a validação for bem sucedida, o sistema remove o registro da tabela ADMINISTRADOR.
 
-15. O sistema exibe mensagem de sucesso "Administrador removido com sucesso!" e atualiza a lista. *
+15. O sistema exibe mensagem "Administrador removido" e atualiza a lista. *
     *<<Término de fluxo de remoção de administrador>>**

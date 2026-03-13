@@ -420,7 +420,7 @@ async function enviarLembreteConfirmado() {
     await subprocessosStore.buscarSubprocessoDetalhe(codSubprocesso.value);
     modalLembreteAberto.value = false;
     notify('Lembrete enviado', 'success');
-  } catch (error) {
+  } catch {
     notify('Não foi possível enviar o lembrete', 'danger');
   }
 }

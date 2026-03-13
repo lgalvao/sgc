@@ -48,9 +48,9 @@ graph TD
     - Publicar eventos de domínio (`EventoProcessoIniciado`, `EventoProcessoFinalizado`).
 - **`ProcessoControle`**: Expõe a API REST.
     - `GET /api/processos/ativos`: Lista processos em andamento.
-    - `GET /api/processos/{id}/detalhes`: Visão completa do processo e seus subprocessos.
-    - `POST /api/processos/{id}/iniciar`: Dispara o início do processo (CDU-03).
-    - `POST /api/processos/{id}/finalizar`: Encerra o processo (CDU-21).
+    - `GET /api/processos/{codigo}/detalhes`: Visão completa do processo e seus subprocessos.
+    - `POST /api/processos/{codigo}/iniciar`: Dispara o início do processo (CDU-03).
+    - `POST /api/processos/{codigo}/finalizar`: Encerra o processo (CDU-21).
 
 ### Modelo de Dados (`model`)
 

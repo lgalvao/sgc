@@ -93,11 +93,18 @@ import {BButton, BCard, BCol, BFormGroup, BFormSelect, BRow, BSpinner, BTab, BTa
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
-import {useProcessosStore} from "@/stores/processos";
+import {useProcessos} from "@/composables/useProcessos";
+import {usePerfil} from "@/composables/usePerfil";
+import {usePerfilStore} from "@/stores/perfil";
 import {useNotification} from "@/composables/useNotification";
 import {useRelatorios} from "@/composables/api/useRelatorios";
 
-const processosStore = useProcessosStore();
+const {
+  processosPainel,
+  buscarProcessosPainel
+} = useProcessos();
+const perfil = usePerfil();
+const perfilStore = usePerfilStore();
 const { notify } = useNotification();
 const { obterRelatorioAndamento, downloadRelatorioAndamentoPdf, downloadRelatorioMapasPdf } = useRelatorios();
 
@@ -111,7 +118,7 @@ const gerandoMapas = ref(false);
 const relatorioAndamento = ref<any[]>([]);
 
 const opcoesProcessos = computed(() => {
-  const processos = processosStore.processosPainel || [];
+  const processos = processosPainel.value || [];
   return [
     { value: null, text: "Selecione..." },
     ...processos.map(p => ({ value: p.codigo, text: p.descricao }))
@@ -160,8 +167,13 @@ const gerarRelatorioMapas = async () => {
 }
 
 onMounted(async () => {
-   // Basic loading of available processes for the select box
-   // The store might need a new method to fetch just the list of active processes globally for reports
-   // For now reusing the painel method as fallback
+   if (perfil.perfilSelecionado.value && perfilStore.unidadeSelecionada) {
+      await buscarProcessosPainel(
+          perfil.perfilSelecionado.value,
+          Number(perfilStore.unidadeSelecionada),
+          0,
+          100
+      );
+   }
 });
 </script>

@@ -15,10 +15,10 @@ export async function acessarSubprocessoGestor(page: Page, descricaoProcesso: st
 
     const match = /\/processo\/(\d+)/.exec(page.url());
     expect(match).not.toBeNull();
-    const processoId = match![1];
+    const codProcesso = match![1];
 
     if (!page.url().endsWith(`/${siglaUnidade}`)) {
-        await page.goto(`/processo/${processoId}/${siglaUnidade}`);
+        await page.goto(`/processo/${codProcesso}/${siglaUnidade}`);
     }
 
     await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${siglaUnidade}$`));
@@ -38,10 +38,10 @@ export async function acessarSubprocessoChefeDireto(page: Page, descricaoProcess
 
     const match = /\/processo\/(\d+)/.exec(page.url());
     expect(match).not.toBeNull();
-    const processoId = match![1];
+    const codProcesso = match![1];
 
     if (!page.url().endsWith(`/${siglaUnidade}`)) {
-        await page.goto(`/processo/${processoId}/${siglaUnidade}`);
+        await page.goto(`/processo/${codProcesso}/${siglaUnidade}`);
     }
 
     await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${siglaUnidade}$`));
@@ -60,9 +60,9 @@ export async function acessarSubprocessoAdmin(page: Page, descricaoProcesso: str
 
     const match = /\/processo\/(\d+)/.exec(page.url());
     expect(match).not.toBeNull();
-    const processoId = match![1];
+    const codProcesso = match![1];
 
-    await page.goto(`/processo/${processoId}/${siglaUnidade}`);
+    await page.goto(`/processo/${codProcesso}/${siglaUnidade}`);
     await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${siglaUnidade}$`));
 }
 

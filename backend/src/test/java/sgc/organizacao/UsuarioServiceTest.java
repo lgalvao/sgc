@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class UsuarioServiceTest {
 
     private static final String TITULO_ADMIN = "111111111111";
-    private static final String NOME_ADMIN = "Admin teste";
+    private static final String NOME_ADMIN = "Admin Teste";
 
     private static final Long COD_UNIT_SEC1 = 2L;
     private static final String NOME_UNIT_SEC1 = "Secretaria de Informática e Comunicações";
@@ -99,7 +99,7 @@ class UsuarioServiceTest {
         @DisplayName("Deve buscar unidade por código")
         void deveBuscarUnidadePorCodigo() {
 
-            Unidade result = unidadeService2.buscarPorId(COD_UNIT_SEC1);
+            Unidade result = unidadeService2.buscarPorCodigo(COD_UNIT_SEC1);
 
             assertNotNull(result);
             assertEquals(COD_UNIT_SEC1, result.getCodigo());
@@ -157,7 +157,7 @@ class UsuarioServiceTest {
         @Test
         @DisplayName("Deve lançar erro ao buscar unidade inexistente por código ou sigla")
         void deveRetornarErroAoBuscarUnidadeInexistente() {
-            assertThrows(ErroEntidadeNaoEncontrada.class, () -> unidadeService2.buscarPorId(9999L));
+            assertThrows(ErroEntidadeNaoEncontrada.class, () -> unidadeService2.buscarPorCodigo(9999L));
             assertThrows(ErroEntidadeNaoEncontrada.class, () -> unidadeService2.buscarPorSigla("SIGLA_NAO_EXISTE"));
         }
     }

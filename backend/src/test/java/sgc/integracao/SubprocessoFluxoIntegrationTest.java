@@ -138,14 +138,14 @@ class SubprocessoFluxoIntegrationTest extends BaseIntegrationTest {
         autenticar(admin, Perfil.ADMIN);
 
         List<Atividade> atividades = atividadeRepo.findByMapa_Codigo(mapaId);
-        Long atividadeId = atividades.getFirst().getCodigo();
+        Long codAtividade = atividades.getFirst().getCodigo();
 
         CompetenciaRequest compReq = CompetenciaRequest.builder()
                 .descricao("Competência 1")
-                .atividadesIds(List.of(atividadeId))
+                .atividadesIds(List.of(codAtividade))
                 .build();
 
-        mockMvc.perform(post("/api/subprocessos/{id}/competencia", spId)
+        mockMvc.perform(post("/api/subprocessos/{codigo}/competencia", spId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(compReq))
                         .with(csrf()))
@@ -163,7 +163,7 @@ class SubprocessoFluxoIntegrationTest extends BaseIntegrationTest {
                 .observacoes("Segue para validação")
                 .build();
 
-        mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-mapa", spId)
+        mockMvc.perform(post("/api/subprocessos/{codigo}/disponibilizar-mapa", spId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dispReq))
                         .with(csrf()))
@@ -184,7 +184,7 @@ class SubprocessoFluxoIntegrationTest extends BaseIntegrationTest {
         admin.setUnidadeAtivaCodigo(unidadeRaiz.getCodigo()); // Admin atuando na RAIZ
         autenticar(admin, Perfil.CHEFE); // Admin como CHEFE da Raiz
 
-        mockMvc.perform(post("/api/subprocessos/{id}/validar-mapa", spId)
+        mockMvc.perform(post("/api/subprocessos/{codigo}/validar-mapa", spId)
                         .with(csrf()))
                 .andExpect(status().isOk());
 

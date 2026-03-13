@@ -5,11 +5,11 @@ import {expect} from "vitest";
  */
 export async function selecionarProcessoEUnidade(
     wrapper: any,
-    processoId = 1,
+    codProcesso = 1,
     unidadeId = 1,
 ) {
     const processoSelect = wrapper.find("select#processo-select");
-    await processoSelect.setValue(processoId);
+    await processoSelect.setValue(codProcesso);
     await wrapper.vm.$nextTick();
 
     const unidadeSelect = wrapper.find("select#unidade-select");

@@ -10,21 +10,6 @@ import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("Modelos - Cobertura de Casos de Borda")
 class ModelCoverageTest {
-
-    @Test
-    @DisplayName("UnidadeProcesso deve lidar com ID nulo via getters e setters de conveniência")
-    void deveLidarComIdNuloEmUnidadeProcesso() throws Exception {
-        UnidadeProcesso up = new UnidadeProcesso();
-        Field idField = UnidadeProcesso.class.getDeclaredField("id");
-        idField.setAccessible(true);
-        idField.set(up, null);
-        assertThat(up.getUnidadeCodigo()).isNull();
-
-        up.setUnidadeCodigo(999L);
-        assertThat(up.getUnidadeCodigo()).isEqualTo(999L);
-        assertThat(idField.get(up)).isNotNull();
-    }
-
     @Test
     @DisplayName("Processo deve remover participantes que não estão mais na lista ao sincronizar")
     void deveRemoverParticipantesAoSincronizar() {

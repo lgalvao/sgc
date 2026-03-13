@@ -42,7 +42,7 @@ public class AtividadeFacade {
     }
 
     @Transactional(readOnly = true)
-    public Atividade obterAtividadePorId(Long codAtividade) {
+    public Atividade obterAtividadePorCodigo(Long codAtividade) {
         return mapaManutencaoService.atividadeCodigo(codAtividade);
     }
 

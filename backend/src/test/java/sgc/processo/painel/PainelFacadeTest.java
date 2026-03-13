@@ -9,9 +9,9 @@ import sgc.alerta.*;
 import sgc.alerta.model.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
-import sgc.processo.*;
 import sgc.processo.dto.*;
 import sgc.processo.model.*;
+import sgc.processo.service.ProcessoService;
 import sgc.testutils.*;
 
 import java.time.*;
@@ -25,7 +25,7 @@ import static org.mockito.Mockito.*;
 class PainelFacadeTest {
 
     @Mock
-    private ProcessoFacade processoFacade;
+    private ProcessoService processoService;
     @Mock
     private AlertaFacade alertaFacade;
     @Mock
@@ -41,7 +41,7 @@ class PainelFacadeTest {
     void deveListarProcessosAdmin() {
         Processo p = criarProcesso(1L, SituacaoProcesso.CRIADO);
         Page<Processo> page = new PageImpl<>(List.of(p));
-        when(processoFacade.listarTodos(any(Pageable.class))).thenReturn(page);
+        when(processoService.listarTodos(any(Pageable.class))).thenReturn(page);
         when(hierarquiaService.buscarMapaHierarquia()).thenReturn(new HashMap<>());
 
         Page<ProcessoResumoDto> result = painelFacade.listarProcessos(Perfil.ADMIN, 100L, PageRequest.of(0, 10));
@@ -57,7 +57,7 @@ class PainelFacadeTest {
         Page<Processo> page = new PageImpl<>(List.of(p));
         when(hierarquiaService.buscarMapaHierarquia()).thenReturn(new HashMap<>());
         when(hierarquiaService.buscarDescendentes(eq(100L), anyMap())).thenReturn(List.of(101L));
-        when(processoFacade.listarPorParticipantesIgnorandoCriado(anyList(), any(Pageable.class))).thenReturn(page);
+        when(processoService.listarIniciadosPorParticipantes(anyList(), any(Pageable.class))).thenReturn(page);
 
         Page<ProcessoResumoDto> result = painelFacade.listarProcessos(Perfil.GESTOR, 100L, PageRequest.of(0, 10));
 
@@ -76,8 +76,8 @@ class PainelFacadeTest {
         // Para CHEFE chama apenas para propria unidade.
 
         when(hierarquiaService.buscarMapaHierarquia()).thenReturn(new HashMap<>());
-        when(processoFacade.listarPorParticipantesIgnorandoCriado(anyList(), any(Pageable.class))).thenReturn(page);
-        when(unidadeService.buscarPorId(100L)).thenThrow(new RuntimeException("Erro"));
+        when(processoService.listarIniciadosPorParticipantes(anyList(), any(Pageable.class))).thenReturn(page);
+        when(unidadeService.buscarPorCodigo(100L)).thenThrow(new RuntimeException("Erro"));
 
         PageRequest pageRequest = PageRequest.of(0, 10);
         assertThatThrownBy(() -> painelFacade.listarProcessos(Perfil.CHEFE, 100L, pageRequest))
@@ -173,13 +173,13 @@ class PainelFacadeTest {
     @Test
     @DisplayName("Deve lidar com solicitação não paginada")
     void deveLidarComSolicitacaoNaoPaginada() {
-        when(processoFacade.listarTodos(any(Pageable.class)))
+        when(processoService.listarTodos(any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of()));
 
         Page<ProcessoResumoDto> result = painelFacade.listarProcessos(Perfil.ADMIN, 100L, Pageable.unpaged());
 
         assertThat(result).isEmpty();
-        verify(processoFacade).listarTodos(Pageable.unpaged());
+        verify(processoService).listarTodos(Pageable.unpaged());
     }
 
     @Test
@@ -202,7 +202,7 @@ class PainelFacadeTest {
         when(p.getParticipantes()).thenReturn(List.of(up1, up2));
 
         when(hierarquiaService.buscarMapaHierarquia()).thenReturn(new HashMap<>());
-        when(processoFacade.listarTodos(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(p)));
+        when(processoService.listarTodos(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(p)));
 
         Page<ProcessoResumoDto> result = painelFacade.listarProcessos(Perfil.ADMIN, 100L, PageRequest.of(0, 10));
 
@@ -234,7 +234,7 @@ class PainelFacadeTest {
         hierarquia.put(2L, new ArrayList<>());
 
         when(hierarquiaService.buscarMapaHierarquia()).thenReturn(hierarquia);
-        when(processoFacade.listarTodos(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(p)));
+        when(processoService.listarTodos(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(p)));
 
         Page<ProcessoResumoDto> result = painelFacade.listarProcessos(Perfil.ADMIN, 100L, PageRequest.of(0, 10));
 

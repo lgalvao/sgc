@@ -34,6 +34,7 @@ describe("PainelView.vue", () => {
             push: routerPushMock,
         });
         (painelService.listarAlertas as any).mockResolvedValue(mockPageVazia);
+        (painelService.listarProcessos as any).mockResolvedValue(mockPageVazia);
     });
 
     const initialState = {

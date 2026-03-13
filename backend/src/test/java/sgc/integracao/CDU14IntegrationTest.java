@@ -26,9 +26,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 class CDU14IntegrationTest extends BaseIntegrationTest {
     private static final String APPLICATION_JSON = "application/json";
-    private static final String API_SUBPROCESSOS_ID_DISPONIBILIZAR = "/api/subprocessos/{id}/disponibilizar-revisao";
-    private static final String API_SUBPROCESSOS_ID_ACEITAR = "/api/subprocessos/{id}/aceitar-revisao-cadastro";
-    private static final String API_SUBPROCESSOS_ID_HOMOLOGAR = "/api/subprocessos/{id}/homologar-revisao-cadastro";
+    private static final String API_SUBPROCESSOS_ID_DISPONIBILIZAR = "/api/subprocessos/{codigo}/disponibilizar-revisao";
+    private static final String API_SUBPROCESSOS_ID_ACEITAR = "/api/subprocessos/{codigo}/aceitar-revisao-cadastro";
+    private static final String API_SUBPROCESSOS_ID_HOMOLOGAR = "/api/subprocessos/{codigo}/homologar-revisao-cadastro";
     private static final String JSON_TEXTO_OK = "{\"texto\": \"OK\"}";
 
     @Autowired
@@ -109,7 +109,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
     private Long criarEComecarProcessoDeRevisao() throws Exception {
         Processo processo = criarEIniciarProcessoDeRevisao();
 
-        Subprocesso sp = subprocessoRepo.findByProcessoCodigo(processo.getCodigo()).stream()
+        Subprocesso sp = subprocessoRepo.findByProcessoCodigoComUnidade(processo.getCodigo()).stream()
                 .findFirst()
                 .orElseThrow();
         sp.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
@@ -174,7 +174,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
                     .andExpect(status().isOk());
 
             mockMvc.perform(
-                            post("/api/subprocessos/{id}/devolver-revisao-cadastro", subprocessoId)
+                            post("/api/subprocessos/{codigo}/devolver-revisao-cadastro", subprocessoId)
                                     .with(csrf())
                                     .with(user(gestor))
                                     .contentType(APPLICATION_JSON)
@@ -298,7 +298,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
                     .andExpect(status().isOk());
 
             mockMvc.perform(
-                            post("/api/subprocessos/{id}/devolver-revisao-cadastro", subprocessoId)
+                            post("/api/subprocessos/{codigo}/devolver-revisao-cadastro", subprocessoId)
                                     .with(csrf())
                                     .with(user(gestor))
                                     .contentType(APPLICATION_JSON)
@@ -308,7 +308,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
                     .andExpect(status().isOk());
 
             mockMvc.perform(
-                            get("/api/subprocessos/{id}/historico-cadastro", subprocessoId)
+                            get("/api/subprocessos/{codigo}/historico-cadastro", subprocessoId)
                                     .with(user(gestor)))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$", hasSize(1)))

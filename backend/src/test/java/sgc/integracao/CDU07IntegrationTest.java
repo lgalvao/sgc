@@ -19,7 +19,7 @@ class CDU07IntegrationTest extends BaseIntegrationTest {
     void adminPodeVisualizar() throws Exception {
         // Subprocesso 60000 (Unidade 8 - SEDESENV) do data.sql
         mockMvc.perform(
-                        get("/api/subprocessos/{id}", 60000L)
+                        get("/api/subprocessos/{codigo}", 60000L)
                                 .param("perfil", "ADMIN"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.subprocesso.codUnidade").value(8))
@@ -35,7 +35,7 @@ class CDU07IntegrationTest extends BaseIntegrationTest {
     @DisplayName("CHEFE pode visualizar o subprocesso da sua unidade")
     void chefePodeVisualizarSuaUnidade() throws Exception {
         mockMvc.perform(
-                        get("/api/subprocessos/{id}", 60000L)
+                        get("/api/subprocessos/{codigo}", 60000L)
                                 .param("perfil", "CHEFE")
                                 .param("unidadeUsuario", "8"))
                 .andExpect(status().isOk())
@@ -50,7 +50,7 @@ class CDU07IntegrationTest extends BaseIntegrationTest {
     @DisplayName("CHEFE NÃO pode visualizar o subprocesso de outra unidade")
     void chefeNaoPodeVisualizarOutraUnidade() throws Exception {
         mockMvc.perform(
-                        get("/api/subprocessos/{id}", 60000L)
+                        get("/api/subprocessos/{codigo}", 60000L)
                                 .param("perfil", "CHEFE")
                                 .param("unidadeUsuario", "9"))
                 .andExpect(status().isForbidden());

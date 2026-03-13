@@ -151,7 +151,7 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
         setupUsuarioPerfil(outroChefe, outraUnidade, Perfil.CHEFE);
         autenticarUsuario(outroChefe, Perfil.CHEFE);
 
-        mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-revisao", subprocessoRevisao.getCodigo()))
+        mockMvc.perform(post("/api/subprocessos/{codigo}/disponibilizar-revisao", subprocessoRevisao.getCodigo()))
                 .andExpect(status().isForbidden());
     }
 
@@ -176,7 +176,7 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
         Long subprocessoId = subprocessoRevisao.getCodigo();
 
         // 1. Primeira disponibilização
-        mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-revisao", subprocessoId))
+        mockMvc.perform(post("/api/subprocessos/{codigo}/disponibilizar-revisao", subprocessoId))
                 .andExpect(status().isOk());
 
         Analise analiseAceite = new Analise();
@@ -214,7 +214,7 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
         entityManager.clear();
 
         // 5. Nova disponibilização
-        mockMvc.perform(post("/api/subprocessos/{id}/disponibilizar-revisao", subprocessoId))
+        mockMvc.perform(post("/api/subprocessos/{codigo}/disponibilizar-revisao", subprocessoId))
                 .andExpect(status().isOk());
 
         List<Analise> analisesDepois = analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocessoId);

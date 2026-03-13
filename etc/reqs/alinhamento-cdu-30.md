@@ -14,7 +14,7 @@ O teste cobre:
    - Preenchimento do campo de "título eleitoral"
    - Validação de existência do usuário
    - Validação de duplicação (se já é administrador)
-   - Mensagem de sucesso "Administrador adicionado com sucesso!"
+   - Mensagem de sucesso "Administrador adicionado"
 
 2. **Falta teste de fluxo de remoção completo**: O requisito descreve fluxo de remoção (passos 9-15), mas o teste não executa nenhuma remoção. Não valida:
    - Clique no ícone de exclusão
@@ -57,7 +57,7 @@ O teste cobre:
    - Validar campo de texto para título eleitoral
    - Preenchimento de título eleitoral válido
    - Clique em "Adicionar"
-   - Validar mensagem "Administrador adicionado com sucesso!"
+   - Validar mensagem "Administrador adicionado"
    - Validar que novo administrador aparece na tabela
 
 2. **Adicionar validação de colunas da tabela**: 
@@ -83,7 +83,7 @@ O teste cobre:
    - Validar que modal com título "Confirmar remoção" abre
    - Validar mensagem dinâmica com nome do administrador
    - Clicar "Remover"
-   - Validar mensagem "Administrador removido com sucesso!"
+   - Validar mensagem "Administrador removido"
    - Validar que administrador foi removido da tabela
 
 7. **Adicionar teste de cancelamento de remoção**: 

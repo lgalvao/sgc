@@ -17,7 +17,7 @@ O teste `cdu-11.spec.ts` em dois grupos (Em andamento, Finalizado):
 **Fluxo CHEFE/SERVIDOR (Passo 3)**:
 - Clica em processo em andamento
 - Sistema direto em Detalhes do subprocesso (sem passagem por Detalhes do processo)
-- URL valida `/processo/{id}/{unidade}` (direto, não passando por `/processo/{id}`)
+- URL valida `/processo/{codigo}/{unidade}` (direto, não passando por `/processo/{codigo}`)
 - Navega para Atividades e conhecimentos
 - Valida mesma cobertura (sigla/nome/atividades/conhecimentos)
 

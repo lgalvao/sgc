@@ -84,7 +84,7 @@ const child = spawn(npx, cmdArgs, {
 child.on('close', (code) => {
     if (code === 0) {
         console.log(`
-✓ Captura concluída com sucesso!`);
+✓ Captura concluída`);
         console.log(`Screenshots salvas em: ${screenshotsDir}`);
     } else {
         console.error(`

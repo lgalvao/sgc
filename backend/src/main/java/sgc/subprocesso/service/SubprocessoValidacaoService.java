@@ -39,8 +39,8 @@ public class SubprocessoValidacaoService {
         }
     }
 
-    public void validarAssociacoesMapa(Long mapaId) {
-        List<Competencia> competencias = mapaManutencaoService.competenciasCodMapa(mapaId);
+    public void validarAssociacoesMapa(Long codMapa) {
+        List<Competencia> competencias = mapaManutencaoService.competenciasCodMapa(codMapa);
         List<String> competenciasSemAssociacao = competencias.stream()
                 .filter(c -> c.getAtividades().isEmpty())
                 .map(Competencia::getDescricao)
@@ -50,7 +50,7 @@ public class SubprocessoValidacaoService {
                 "Existem competências que não foram associadas a nenhuma atividade.",
                 Map.of("competenciasNaoAssociadas", competenciasSemAssociacao));
 
-        List<Atividade> atividades = mapaManutencaoService.atividadesMapaCodigo(mapaId);
+        List<Atividade> atividades = mapaManutencaoService.atividadesMapaCodigo(codMapa);
         List<String> atividadesSemAssociacao = atividades.stream()
                 .filter(a -> a.getCompetencias().isEmpty())
                 .map(Atividade::getDescricao)
@@ -186,19 +186,19 @@ public class SubprocessoValidacaoService {
         }
     }
 
-    public boolean verificarAcessoUnidadeAoProcesso(Long processoId, List<Long> unidadeCodigos) {
+    public boolean verificarAcessoUnidadeAoProcesso(Long codProcesso, List<Long> unidadeCodigos) {
         if (unidadeCodigos.isEmpty()) {
             return false;
         }
-        return subprocessoRepo.existsByProcessoCodigoAndUnidadeCodigoIn(processoId, unidadeCodigos);
+        return subprocessoRepo.existsByProcessoCodigoAndUnidadeCodigoIn(codProcesso, unidadeCodigos);
     }
 
-    public ValidationResult validarSubprocessosParaFinalizacao(Long processoId) {
-        long total = subprocessoRepo.countByProcessoCodigo(processoId);
+    public ValidationResult validarSubprocessosParaFinalizacao(Long codProcesso) {
+        long total = subprocessoRepo.countByProcessoCodigo(codProcesso);
 
         if (total == 0) return ValidationResult.ofInvalido("O processo não possui subprocessos para finalizar");
 
-        long homologados = subprocessoRepo.countByProcessoCodigoAndSituacaoIn(processoId,
+        long homologados = subprocessoRepo.countByProcessoCodigoAndSituacaoIn(codProcesso,
                 List.of(
                         SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO,
                         SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO,

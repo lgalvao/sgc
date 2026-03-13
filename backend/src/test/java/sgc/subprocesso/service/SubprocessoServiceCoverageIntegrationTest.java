@@ -99,7 +99,7 @@ class SubprocessoServiceCoverageIntegrationTest {
 
             subprocessoService.criarParaMapeamento(proc, java.util.List.of(u), u, user);
 
-            assertThat(subprocessoRepo.findByProcessoCodigo(proc.getCodigo())).isEmpty();
+            assertThat(subprocessoRepo.findByProcessoCodigoComUnidade(proc.getCodigo())).isEmpty();
         }
     }
 

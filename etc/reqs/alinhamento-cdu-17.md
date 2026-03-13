@@ -7,7 +7,7 @@ O teste E2E cobre:
 - **Validação de disponibilidade do botão "Disponibilizar"** (passo 7): Botão está visível (linha 121).
 - **Abertura de modal** (passo 10): Clica no botão, valida presença do modal com teste ID `mdl-disponibilizar-mapa` (linhas 123-126).
 - **Cancelamento** (passo 11): Clica cancelar, valida que modal fecha e permanece na tela de edição (linhas 128-131).
-- **Disponibilização com sucesso** (passos 12-20): Chama helper `disponibilizarMapa(page, '2030-12-31')`, valida redirecionamento para Painel e mudança de situação para "Mapa disponibilizado" (linhas 134-138).
+- **Disponibilização** (passos 12-20): Chama helper `disponibilizarMapa(page, '2030-12-31')`, valida redirecionamento para Painel e mudança de situação para "Mapa disponibilizado" (linhas 134-138).
 
 ## Lacunas em relação ao requisito
 **Validação de pré-condições (pré-requisitos) não coberta:**

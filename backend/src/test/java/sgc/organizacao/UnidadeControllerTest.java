@@ -12,7 +12,7 @@ import sgc.comum.erros.*;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
-import sgc.processo.*;
+import sgc.processo.service.ProcessoService;
 import sgc.seguranca.*;
 
 import java.util.*;
@@ -41,7 +41,7 @@ class UnidadeControllerTest {
     private UsuarioService usuarioServiceBean;
 
     @MockitoBean
-    private ProcessoFacade processoFacade;
+    private ProcessoService processoService;
 
     @Autowired
     private MockMvc mockMvc;
@@ -88,7 +88,7 @@ class UnidadeControllerTest {
     @WithMockUser
     void deveRetornarArvoreDeElegibilidade() throws Exception {
 
-        when(processoFacade.buscarIdsUnidadesEmProcessosAtivos(any()))
+        when(processoService.buscarIdsUnidadesComProcessosAtivos(any()))
                 .thenReturn(Collections.emptySet());
         when(hierarquiaService.buscarArvoreComElegibilidade(anyBoolean(), any()))
                 .thenReturn(Collections.emptyList());
@@ -150,7 +150,7 @@ class UnidadeControllerTest {
         Unidade un = new Unidade();
         un.setCodigo(1L);
         un.setTipo(TipoUnidade.OPERACIONAL);
-        when(unidadeService.buscarPorId(1L)).thenReturn(un);
+        when(unidadeService.buscarPorCodigo(1L)).thenReturn(un);
 
         // Act & Assert
         mockMvc.perform(get("/api/unidades/1")).andExpect(status().isOk());

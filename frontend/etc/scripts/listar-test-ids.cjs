@@ -4,7 +4,7 @@ const path = require('path');
 
 const searchDir = path.join(__dirname, '../../src');
 const extensions = ['.vue'];
-const regex = /\b(data-test-id|test-id|data-testid)=["']([^"']+)["']/g;
+const regex = /\b(data-test-codigo|test-codigo|data-testid)=["']([^"']+)["']/g;
 
 function scanDirectory(directory) {
     let results = [];
@@ -41,7 +41,7 @@ try {
     const findings = scanDirectory(searchDir);
 
     if (findings.length === 0) {
-        console.log("Nenhum test-id encontrado.");
+        console.log("Nenhum test-codigo encontrado.");
     } else {
         // Agrupar por arquivo para facilitar a leitura
         const grouped = {};
@@ -52,7 +52,7 @@ try {
 
         for (const [file, ids] of Object.entries(grouped)) {
             console.log(`📄 ${file}`);
-            ids.forEach(id => console.log(`   └─ ${id}`));
+            ids.forEach(codigo => console.log(`   └─ ${codigo}`));
             console.log(''); // Linha em branco
         }
 

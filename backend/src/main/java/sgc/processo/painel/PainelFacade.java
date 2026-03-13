@@ -9,9 +9,9 @@ import sgc.alerta.*;
 import sgc.alerta.model.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
-import sgc.processo.*;
 import sgc.processo.dto.*;
 import sgc.processo.model.*;
+import sgc.processo.service.ProcessoService;
 
 import java.time.*;
 import java.util.*;
@@ -27,7 +27,7 @@ public class PainelFacade {
     private final AlertaFacade alertaService;
     private final UnidadeHierarquiaService hierarquiaService;
     private final UnidadeService unidadeService;
-    private final ProcessoFacade processoFacade;
+    private final ProcessoService processoService;
 
     /**
      * Lista processos com base no perfil e na unidade do usuário.
@@ -44,14 +44,14 @@ public class PainelFacade {
 
         Map<Long, List<Long>> mapaPaiFilhos = hierarquiaService.buscarMapaHierarquia();
         if (perfil == Perfil.ADMIN) {
-            processos = processoFacade.listarTodos(sortedPageable);
+            processos = processoService.listarTodos(sortedPageable);
         } else {
             List<Long> codigosUnidades = new ArrayList<>();
             if (perfil == Perfil.GESTOR) {
                 codigosUnidades.addAll(hierarquiaService.buscarDescendentes(codigoUnidade, mapaPaiFilhos));
             }
             codigosUnidades.add(codigoUnidade);
-            processos = processoFacade.listarPorParticipantesIgnorandoCriado(codigosUnidades, sortedPageable);
+            processos = processoService.listarIniciadosPorParticipantes(codigosUnidades, sortedPageable);
         }
         return processos.map(processo -> paraProcessoResumoDto(processo, perfil, codigoUnidade, mapaPaiFilhos));
     }
@@ -158,8 +158,8 @@ public class PainelFacade {
 
         Set<Long> displayIds = new HashSet<>();
         Map<Long, Boolean> coveredCache = new HashMap<>();
-        for (Long pId : participantesIds) {
-            Long candidate = pId;
+        for (Long codUnidade : participantesIds) {
+            Long candidate = codUnidade;
             Long parent = mapaFilhoPai.get(candidate);
 
             while (parent != null && mapaFilhoPai.get(parent) != null) {
@@ -183,9 +183,9 @@ public class PainelFacade {
 
         List<String> siglas = new ArrayList<>();
         List<Long> missingIds = new ArrayList<>();
-        displayIds.forEach(id -> {
-            if (existingSiglas.containsKey(id)) siglas.add(existingSiglas.get(id));
-            else missingIds.add(id);
+        displayIds.forEach(codUnidade -> {
+            if (existingSiglas.containsKey(codUnidade)) siglas.add(existingSiglas.get(codUnidade));
+            else missingIds.add(codUnidade);
         });
 
         if (!missingIds.isEmpty()) {
@@ -196,30 +196,30 @@ public class PainelFacade {
         return siglas.stream().sorted().collect(Collectors.joining(", "));
     }
 
-    private boolean isCovered(Long unidadeId,
+    private boolean isCovered(Long codUnidade,
                               Set<Long> participantesIds,
                               Map<Long, List<Long>> mapaPaiFilhos,
                               Map<Long, Boolean> cache) {
 
-        if (participantesIds.contains(unidadeId)) return true;
+        if (participantesIds.contains(codUnidade)) return true;
 
-        if (cache.containsKey(unidadeId)) return cache.get(unidadeId);
+        if (cache.containsKey(codUnidade)) return cache.get(codUnidade);
 
-        List<Long> children = mapaPaiFilhos.get(unidadeId);
+        List<Long> children = mapaPaiFilhos.get(codUnidade);
         if (children == null || children.isEmpty()) {
-            cache.put(unidadeId, false);
+            cache.put(codUnidade, false);
             return false;
         }
 
         boolean allCovered = true;
-        for (Long child : children) {
-            if (!isCovered(child, participantesIds, mapaPaiFilhos, cache)) {
+        for (Long codFilho : children) {
+            if (!isCovered(codFilho, participantesIds, mapaPaiFilhos, cache)) {
                 allCovered = false;
                 break;
             }
         }
 
-        cache.put(unidadeId, allCovered);
+        cache.put(codUnidade, allCovered);
         return allCovered;
     }
 
@@ -232,7 +232,7 @@ public class PainelFacade {
             return "/processo/" + processo.getCodigo();
         }
 
-        var unidade = unidadeService.buscarPorId(codigoUnidade);
+        var unidade = unidadeService.buscarPorCodigo(codigoUnidade);
         return String.format("/processo/%s/%s", processo.getCodigo(), unidade.getSigla());
     }
 }

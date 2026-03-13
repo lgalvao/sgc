@@ -68,7 +68,7 @@ public class SubprocessoTransicaoService {
     );
 
     private Subprocesso buscarSubprocesso(Long codigo) {
-        return subprocessoRepo.findByIdWithMapaAndAtividades(codigo).orElseThrow();
+        return subprocessoRepo.buscarPorCodigoComMapaEAtividades(codigo).orElseThrow();
     }
 
     private Unidade obterUnidadeLocalizacao(Subprocesso sp) {

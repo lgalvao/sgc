@@ -739,7 +739,7 @@ describe("Processo.vue", () => {
         await modalConfirmacao.vm.$emit("confirmar");
 
         expect(processosStore.finalizarProcesso).toHaveBeenCalledWith(1);
-        expect(toastStore.setPending).toHaveBeenCalledWith("Processo finalizado com sucesso.");
+        expect(toastStore.setPending).toHaveBeenCalledWith("Processo finalizado");
         expect(mocks.push).toHaveBeenCalledWith("/painel");
     });
 
@@ -805,7 +805,7 @@ describe("Processo.vue", () => {
         expect((wrapper.vm).tituloModalBloco).toBe("");
         expect((wrapper.vm).textoModalBloco).toBe("");
         expect((wrapper.vm).rotuloBotaoBloco).toBe("");
-        expect((wrapper.vm).mensagemSucessoAcaoBloco).toBe("Ação em bloco realizada com sucesso");
+        expect((wrapper.vm).mensagemSucessoAcaoBloco).toBe("Ação em bloco realizada");
     });
 
     it("deve achatar unidades recursivamente", async () => {

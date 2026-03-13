@@ -14,28 +14,27 @@ import sgc.comum.erros.*;
 import sgc.organizacao.model.*;
 import sgc.processo.dto.*;
 import sgc.processo.model.*;
+import sgc.processo.service.ProcessoService;
 import sgc.subprocesso.model.*;
+import sgc.subprocesso.service.SubprocessoService;
 
 import java.net.*;
 import java.util.*;
 
-/**
- * Controller REST para Processos. Implementa endpoints CRUD e ações de
- * iniciar/finalizar processo
- */
 @RestController
 @RequestMapping("/api/processos")
 @RequiredArgsConstructor
 @Tag(name = "Processos", description = "Endpoints para gerenciamento de processos de mapeamento, revisão e diagnóstico")
 @PreAuthorize("isAuthenticated()")
 public class ProcessoController {
-    private final ProcessoFacade processoFacade;
+    private final ProcessoService processoService;
+    private final SubprocessoService subprocessoService;
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     @JsonView(ProcessoViews.Publica.class)
     public ResponseEntity<Processo> criar(@Valid @RequestBody CriarProcessoRequest requisicao) {
-        Processo criado = processoFacade.criar(requisicao);
+        Processo criado = processoService.criar(requisicao);
         Long codigo = Objects.requireNonNull(criado.getCodigo(), "Código do processo não pode ser nulo");
 
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
@@ -50,16 +49,16 @@ public class ProcessoController {
     @Operation(summary = "Retorna unidades desabilitadas por tipo e processo")
     public ResponseEntity<Map<String, List<Long>>> obterStatusUnidades(
             @RequestParam String tipo, @RequestParam(required = false) Long codProcesso) {
-        List<Long> unidadesDesabilitadas = processoFacade.listarUnidadesBloqueadasPorTipo(tipo);
+        List<Long> unidadesDesabilitadas = processoService.listarUnidadesBloqueadasPorTipo(TipoProcesso.valueOf(tipo));
         return ResponseEntity.ok(Map.of("unidadesDesabilitadas", unidadesDesabilitadas));
     }
 
     @GetMapping("/{codigo}")
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")
     @JsonView(ProcessoViews.Publica.class)
-    public ResponseEntity<Processo> obterPorId(@PathVariable Long codigo) {
-        return processoFacade
-                .obterPorId(codigo)
+    public ResponseEntity<Processo> obterPorCodigo(@PathVariable Long codigo) {
+        return processoService
+                .buscarOpt(codigo)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
@@ -69,14 +68,14 @@ public class ProcessoController {
     @JsonView(ProcessoViews.Publica.class)
     public ResponseEntity<Processo> atualizar(
             @PathVariable Long codigo, @Valid @RequestBody AtualizarProcessoRequest requisicao) {
-        Processo atualizado = processoFacade.atualizar(codigo, requisicao);
+        Processo atualizado = processoService.atualizar(codigo, requisicao);
         return ResponseEntity.ok(atualizado);
     }
 
     @PostMapping("/{codigo}/excluir")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> excluir(@PathVariable Long codigo) {
-        processoFacade.apagar(codigo);
+        processoService.apagar(codigo);
         return ResponseEntity.noContent().build();
     }
 
@@ -84,14 +83,14 @@ public class ProcessoController {
     @Operation(summary = "Lista todos os processos com situação FINALIZADO")
     @JsonView(ProcessoViews.Publica.class)
     public ResponseEntity<List<Processo>> listarFinalizados() {
-        return ResponseEntity.ok(processoFacade.listarFinalizados());
+        return ResponseEntity.ok(processoService.listarFinalizados());
     }
 
     @GetMapping("/para-importacao")
     @Operation(summary = "Lista processos finalizados elegíveis para servirem de base de importação de atividades")
     @JsonView(ProcessoViews.Publica.class)
     public ResponseEntity<List<Processo>> listarParaImportacao() {
-        return ResponseEntity.ok(processoFacade.listarParaImportacao());
+        return ResponseEntity.ok(processoService.listarParaImportacao());
     }
 
     @GetMapping("/{codigo}/unidades-importacao")
@@ -99,45 +98,55 @@ public class ProcessoController {
     @Operation(summary = "Lista todas as unidades participantes de um processo finalizado para importação")
     public ResponseEntity<List<ProcessoDetalheDto.UnidadeParticipanteDto>> listarUnidadesParaImportacao(
             @PathVariable Long codigo) {
-        return ResponseEntity.ok(processoFacade.listarUnidadesParaImportacao(codigo));
+        Processo processo = processoService.buscarPorCodigoComParticipantes(codigo);
+        if (processo.getSituacao() != SituacaoProcesso.FINALIZADO) {
+            throw new ErroValidacao("Processo deve estar finalizado.");
+        }
+        List<ProcessoDetalheDto.UnidadeParticipanteDto> dtos = processo.getParticipantes().stream()
+                .map(ProcessoDetalheDto.UnidadeParticipanteDto::fromSnapshot)
+                .toList();
+        return ResponseEntity.ok(dtos);
     }
 
     @GetMapping("/ativos")
     @Operation(summary = "Lista todos os processos com situação EM_ANDAMENTO")
     @JsonView(ProcessoViews.Publica.class)
     public ResponseEntity<List<Processo>> listarAtivos() {
-        return ResponseEntity.ok(processoFacade.listarAtivos());
+        return ResponseEntity.ok(processoService.listarAtivos());
     }
 
     @GetMapping("/{codigo}/detalhes")
-    @PreAuthorize("hasRole('ADMIN') or @processoFacade.checarAcesso(authentication, #codigo)")
+    @PreAuthorize("hasRole('ADMIN') or @processoService.checarAcesso(authentication, #codigo)")
     public ResponseEntity<ProcessoDetalheDto> obterDetalhes(
             @PathVariable Long codigo,
             @AuthenticationPrincipal Usuario usuario) {
-        ProcessoDetalheDto detalhes = processoFacade.obterDetalhes(codigo, usuario);
+        ProcessoDetalheDto detalhes = processoService.obterDetalhesCompleto(codigo, usuario, false);
         return ResponseEntity.ok(detalhes);
     }
 
     @GetMapping("/{codigo}/contexto-completo")
-    @PreAuthorize("hasRole('ADMIN') or @processoFacade.checarAcesso(authentication, #codigo)")
+    @PreAuthorize("hasRole('ADMIN') or @processoService.checarAcesso(authentication, #codigo)")
     @Operation(summary = "Obtém o contexto completo para visualização de processo (BFF)")
     public ResponseEntity<ProcessoDetalheDto> obterContextoCompleto(
             @PathVariable Long codigo,
             @AuthenticationPrincipal Usuario usuario) {
-        return ResponseEntity.ok(processoFacade.obterContextoCompleto(codigo, usuario));
+        return ResponseEntity.ok(processoService.obterDetalhesCompleto(codigo, usuario, true));
     }
 
     @PostMapping("/{codigo}/iniciar")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Inicia um processo")
     @JsonView(ProcessoViews.Publica.class)
-    public ResponseEntity<Processo> iniciar(@PathVariable Long codigo, @Valid @RequestBody IniciarProcessoRequest req) {
-        List<String> erros = processoFacade.iniciarProcesso(codigo, req.unidades());
+    public ResponseEntity<Processo> iniciar(
+            @PathVariable Long codigo,
+            @Valid @RequestBody IniciarProcessoRequest req,
+            @AuthenticationPrincipal Usuario usuario) {
+        List<String> erros = processoService.iniciar(codigo, req.unidades(), usuario);
         if (!erros.isEmpty()) {
             throw new ErroValidacao(String.join(". ", erros));
         }
 
-        Processo processoAtualizado = processoFacade.obterEntidadePorId(codigo);
+        Processo processoAtualizado = processoService.buscarPorCodigoComParticipantes(codigo);
         return ResponseEntity.ok(processoAtualizado);
     }
 
@@ -145,14 +154,14 @@ public class ProcessoController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Finaliza um processo (CDU-21)")
     public ResponseEntity<Void> finalizar(@PathVariable Long codigo) {
-        processoFacade.finalizar(codigo);
+        processoService.finalizar(codigo);
         return ResponseEntity.ok().build();
     }
 
     @GetMapping("/unidades-bloqueadas")
     @Operation(summary = "Lista unidades que já participam de processos ativos por tipo")
     public ResponseEntity<List<Long>> listarUnidadesBloqueadas(@RequestParam String tipo) {
-        List<Long> unidadesBloqueadas = processoFacade.listarUnidadesBloqueadasPorTipo(tipo);
+        List<Long> unidadesBloqueadas = processoService.listarUnidadesBloqueadasPorTipo(TipoProcesso.valueOf(tipo));
         return ResponseEntity.ok(unidadesBloqueadas);
     }
 
@@ -161,17 +170,16 @@ public class ProcessoController {
     @Operation(summary = "Lista subprocessos elegíveis para ações em bloco")
     public ResponseEntity<List<SubprocessoElegivelDto>> listarSubprocessosElegiveis(
             @PathVariable Long codigo) {
-        List<SubprocessoElegivelDto> elegiveis = processoFacade.listarSubprocessosElegiveis(codigo);
+        List<SubprocessoElegivelDto> elegiveis = processoService.listarSubprocessosElegiveis(codigo);
         return ResponseEntity.ok(elegiveis);
     }
 
     @GetMapping("/{codigo}/subprocessos")
-    @PreAuthorize("hasRole('ADMIN') or @processoFacade.checarAcesso(authentication, #codigo)")
+    @PreAuthorize("hasRole('ADMIN') or @processoService.checarAcesso(authentication, #codigo)")
     @Operation(summary = "Lista todos os subprocessos de um processo")
     @JsonView(SubprocessoViews.Publica.class)
     public ResponseEntity<List<Subprocesso>> listarSubprocessos(@PathVariable Long codigo) {
-        List<Subprocesso> subprocessos = processoFacade.listarEntidadesSubprocessos(codigo);
-        return ResponseEntity.ok(subprocessos);
+        return ResponseEntity.ok(subprocessoService.listarEntidadesPorProcesso(codigo));
     }
 
     @PostMapping("/{codigo}/enviar-lembrete")
@@ -180,7 +188,7 @@ public class ProcessoController {
     public void enviarLembrete(
             @PathVariable Long codigo,
             @RequestBody @Valid EnviarLembreteRequest request) {
-        processoFacade.enviarLembrete(codigo, request.unidadeCodigo());
+        processoService.enviarLembrete(codigo, request.unidadeCodigo());
     }
 
     @PostMapping("/{codigo}/acao-em-bloco")
@@ -189,7 +197,7 @@ public class ProcessoController {
     public ResponseEntity<Void> executarAcaoEmBloco(
             @PathVariable Long codigo,
             @Valid @RequestBody AcaoEmBlocoRequest request) {
-        processoFacade.executarAcaoEmBloco(codigo, request);
+        processoService.executarAcaoEmBloco(codigo, request);
         return ResponseEntity.ok().build();
     }
 }

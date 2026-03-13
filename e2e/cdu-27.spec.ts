@@ -63,7 +63,7 @@ test.describe.serial('CDU-27 - Alterar data limite de subprocesso', () => {
         await inputData.fill(`${yyyy}-${mm}-${dd}`);
 
         await page.getByTestId('btn-modal-confirmar').click();
-        await expect(page.getByText(/Data limite alterada com sucesso/i).first()).toBeVisible();
+        await expect(page.getByText(/Data limite alterada/i).first()).toBeVisible();
         await expect(inputData).toBeHidden();
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toBeVisible();
     });

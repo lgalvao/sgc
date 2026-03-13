@@ -149,7 +149,7 @@ class CDU03IntegrationTest extends BaseIntegrationTest {
                 .andExpect(status().isCreated())
                 .andReturn();
 
-        Long processoId = objectMapper
+        Long codProcesso = objectMapper
                 .readTree(result.getResponse().getContentAsString())
                 .get("codigo")
                 .asLong();
@@ -160,19 +160,19 @@ class CDU03IntegrationTest extends BaseIntegrationTest {
         unidadesEditadas.add(unidade2.getCodigo()); // Adiciona outra unidade
 
         AtualizarProcessoRequest editarRequestDTO = criarAtualizarProcessoReq(
-                processoId,
+                codProcesso,
                 "Processo editado",
                 unidadesEditadas,
                 LocalDateTime.now().plusDays(40) // Nova data limite
         );
 
         mockMvc.perform(
-                        post(API_PROCESSOS + "/{codProcesso}/atualizar", processoId)
+                        post(API_PROCESSOS + "/{codProcesso}/atualizar", codProcesso)
                                 .with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(editarRequestDTO)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.codigo").value(processoId))
+                .andExpect(jsonPath("$.codigo").value(codProcesso))
                 .andExpect(jsonPath("$.descricao").value("Processo editado"));
     }
 
@@ -213,15 +213,15 @@ class CDU03IntegrationTest extends BaseIntegrationTest {
                 .andExpect(status().isCreated())
                 .andReturn();
 
-        Long processoId = objectMapper
+        Long codProcesso = objectMapper
                 .readTree(result.getResponse().getContentAsString())
                 .get("codigo")
                 .asLong();
 
         // 2. Remover o processo
-        mockMvc.perform(post(API_PROCESSOS + "/{codProcesso}/excluir", processoId).with(csrf()))
+        mockMvc.perform(post(API_PROCESSOS + "/{codProcesso}/excluir", codProcesso).with(csrf()))
                 .andExpect(status().isNoContent()); // 204 No content para remoção bem-sucedida
 
-        mockMvc.perform(get(API_PROCESSOS_ID, processoId)).andExpect(status().isNotFound());
+        mockMvc.perform(get(API_PROCESSOS_ID, codProcesso)).andExpect(status().isNotFound());
     }
 }

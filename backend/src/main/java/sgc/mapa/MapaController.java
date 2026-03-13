@@ -44,7 +44,7 @@ public class MapaController {
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")
     @Operation(summary = "Obtém um mapa pelo código")
     @JsonView(MapaViews.Publica.class)
-    public ResponseEntity<Mapa> obterPorId(@PathVariable Long codigo) {
+    public ResponseEntity<Mapa> obterPorCodigo(@PathVariable Long codigo) {
         var mapa = mapaManutencaoService.mapaCodigo(codigo);
         return ResponseEntity.ok(mapa);
     }

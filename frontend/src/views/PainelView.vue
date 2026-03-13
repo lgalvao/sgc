@@ -65,7 +65,6 @@
 
 <script lang="ts" setup>
 import {BButton, BTable, useToast} from "bootstrap-vue-next";
-import {storeToRefs} from "pinia";
 import {computed, onActivated, onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
@@ -75,7 +74,7 @@ import {formatDateBR} from "@/utils";
 import TabelaProcessos from "@/components/processo/TabelaProcessos.vue";
 import {usePerfilStore} from "@/stores/perfil";
 import {usePerfil} from "@/composables/usePerfil";
-import {useProcessosStore} from "@/stores/processos";
+import {useProcessos} from "@/composables/useProcessos";
 import {useToastStore} from "@/stores/toast";
 import type {Alerta, ProcessoResumo} from "@/types/tipos";
 import type {Page} from "@/services/painelService";
@@ -83,11 +82,9 @@ import * as painelService from "@/services/painelService";
 
 const perfilStore = usePerfilStore();
 const perfil = usePerfil();
-const processosStore = useProcessosStore();
+const {processosPainel, buscarProcessosPainel} = useProcessos();
 const toastStore = useToastStore();
 const toast = useToast();
-
-const {processosPainel} = storeToRefs(processosStore);
 const alertas = ref<Alerta[]>([]);
 const alertasPage = ref<Page<Alerta>>({} as Page<Alerta>);
 
@@ -113,7 +110,7 @@ async function buscarAlertas(
 async function carregarDados() {
   if (perfil.perfilSelecionado.value && perfilStore.unidadeSelecionada) {
     const promises: Promise<any>[] = [
-      processosStore.buscarProcessosPainel(
+      buscarProcessosPainel(
           perfil.perfilSelecionado.value,
           Number(perfilStore.unidadeSelecionada),
           0,
@@ -165,7 +162,7 @@ function ordenarPor(campo: keyof ProcessoResumo) {
     criterio.value = campo;
     asc.value = true;
   }
-  processosStore.buscarProcessosPainel(
+  buscarProcessosPainel(
       perfil.perfilSelecionado.value!,
       Number(perfilStore.unidadeSelecionada),
       0,

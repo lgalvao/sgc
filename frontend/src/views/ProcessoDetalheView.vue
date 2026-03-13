@@ -1,10 +1,10 @@
 <template>
   <LayoutPadrao>
     <AppAlert
-        v-if="processosStore.lastError"
-        :message="processosStore.lastError.message"
+        v-if="lastError"
+        :message="lastError.message"
         variant="danger"
-        @dismissed="processosStore.clearError()"/>
+        @dismissed="clearError()"/>
 
     <AppAlert
         v-if="notificacao"
@@ -129,7 +129,7 @@ import PageHeader from "@/components/layout/PageHeader.vue";
 import AppAlert from "@/components/comum/AppAlert.vue";
 import ProcessoInfo from "@/components/processo/ProcessoInfo.vue";
 import ProcessoSubprocessosTable from "@/components/processo/ProcessoSubprocessosTable.vue";
-import {useProcessosStore} from "@/stores/processos";
+import {useProcessos} from "@/composables/useProcessos";
 import {usePerfilStore} from "@/stores/perfil";
 import {useNotification} from "@/composables/useNotification";
 import {useToastStore} from "@/stores/toast";
@@ -142,7 +142,15 @@ type AcaoBloco = "aceitar" | "homologar" | "disponibilizar";
 
 const route = useRoute();
 const router = useRouter();
-const processosStore = useProcessosStore();
+const {
+  processoDetalhe: processo,
+  subprocessosElegiveis,
+  lastError,
+  clearError,
+  buscarContextoCompleto,
+  finalizarProcesso: apiFinalizarProcesso,
+  executarAcaoBloco: apiExecutarAcaoBloco
+} = useProcessos();
 const perfilStore = usePerfilStore();
 const {notificacao, notify, clear} = useNotification();
 const toastStore = useToastStore();
@@ -152,9 +160,7 @@ const mostrarModalFinalizacao = ref(false);
 const acaoBlocoAtual = ref<AcaoBloco>("aceitar");
 const processandoAcaoBloco = ref(false);
 
-const processo = computed(() => processosStore.processoDetalhe);
 const participantesHierarquia = computed(() => processo.value?.unidades || []);
-const subprocessosElegiveis = computed(() => processosStore.subprocessosElegiveis || []);
 
 const podeAceitarBloco = computed(() => {
   return processo.value?.podeAceitarCadastroBloco ?? false;
@@ -266,7 +272,7 @@ function obterMensagemSucesso(
     case "disponibilizar":
       return "Mapas de competências disponibilizados em bloco";
     default:
-      return "Ação em bloco realizada com sucesso";
+      return "Ação em bloco realizada";
   }
 }
 
@@ -420,11 +426,11 @@ function finalizarProcesso() {
 
 async function confirmarFinalizacao() {
   try {
-    await processosStore.finalizarProcesso(codProcesso);
-    toastStore.setPending("Processo finalizado com sucesso.");
+    await apiFinalizarProcesso(codProcesso);
+    toastStore.setPending("Processo finalizado");
     await router.push("/painel");
   } catch (error: any) {
-    const mensagem = processosStore.lastError?.message || error.message || "Ocorreu um erro";
+    const mensagem = lastError.value?.message || error.message || "Ocorreu um erro";
     notify(mensagem, 'danger');
   }
 }
@@ -440,7 +446,7 @@ async function executarAcaoBloco(dados: { ids: number[], dataLimite?: string }) 
     modalBlocoRef.value?.setProcessando(true);
     const contextoExecucao = obterContextoAtualAcao(acaoBlocoAtual.value, dados.ids);
     const mensagemSucesso = obterMensagemSucesso(acaoBlocoAtual.value, contextoExecucao);
-    await processosStore.executarAcaoBloco(acaoBlocoAtual.value, dados.ids, dados.dataLimite);
+    await apiExecutarAcaoBloco(acaoBlocoAtual.value, dados.ids, dados.dataLimite);
 
     modalBlocoRef.value?.fechar();
     const deveRedirecionarPainel = acaoBlocoAtual.value === "aceitar" ||
@@ -453,7 +459,7 @@ async function executarAcaoBloco(dados: { ids: number[], dataLimite?: string }) 
       return;
     }
     notify(mensagemSucesso, 'success');
-    await processosStore.buscarContextoCompleto(codProcesso);
+    await buscarContextoCompleto(codProcesso);
   } catch (error: any) {
     modalBlocoRef.value?.setErro(error.message || "Erro ao executar ação em bloco");
     modalBlocoRef.value?.setProcessando(false);
@@ -464,7 +470,7 @@ async function executarAcaoBloco(dados: { ids: number[], dataLimite?: string }) 
 
 onMounted(async () => {
   if (codProcesso) {
-    await processosStore.buscarContextoCompleto(codProcesso);
+    await buscarContextoCompleto(codProcesso);
   }
 });
 

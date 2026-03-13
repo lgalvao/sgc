@@ -1,7 +1,7 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {
     criarProcesso,
-    extrairProcessoId,
+    extrairProcessoCodigo,
     verificarDetalhesProcesso,
     verificarProcessoNaTabela
 } from './helpers/helpers-processos.js';
@@ -33,7 +33,7 @@ test.describe('CDU-04 - Iniciar processo', () => {
 
         await page.getByTestId('tbl-processos').getByText(descricao).first().click();
         await esperarPaginaCadastroProcesso(page);
-        const processoId = await extrairProcessoId(page);
+        const codProcesso = await extrairProcessoCodigo(page);
 
         const dataLimiteStr = await page.getByTestId('inp-processo-data-limite').inputValue();
 
@@ -53,7 +53,7 @@ test.describe('CDU-04 - Iniciar processo', () => {
         });
 
         await page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descricao)}).click();
-        await esperarPaginaDetalhesProcesso(page, processoId);
+        await esperarPaginaDetalhesProcesso(page, codProcesso);
 
         await verificarDetalhesProcesso(page, {
             descricao: descricao,

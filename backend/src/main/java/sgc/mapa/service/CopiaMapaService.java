@@ -33,8 +33,8 @@ public class CopiaMapaService {
     }
 
     @Transactional
-    public int importarAtividadesDeOutroMapa(Long mapaOrigemId, Long mapaDestinoId, List<Long> codigosAtividades) {
-        List<Atividade> atividadesOrigem = atividadeRepo.findWithConhecimentosByMapa_Codigo(mapaOrigemId);
+    public int importarAtividadesDeOutroMapa(Long codMapaOrigem, Long codMapaDestino, List<Long> codigosAtividades) {
+        List<Atividade> atividadesOrigem = atividadeRepo.findWithConhecimentosByMapa_Codigo(codMapaOrigem);
 
         if (codigosAtividades != null && !codigosAtividades.isEmpty()) {
             Set<Long> filtro = new HashSet<>(codigosAtividades);
@@ -42,15 +42,15 @@ public class CopiaMapaService {
             Set<Long> naoEncontrados = new HashSet<>(filtro);
             naoEncontrados.removeAll(encontrados);
             if (!naoEncontrados.isEmpty()) {
-                log.warn("Atividades solicitadas não encontradas no mapa de origem {}: {}", mapaOrigemId, naoEncontrados);
+                log.warn("Atividades solicitadas não encontradas no mapa de origem {}: {}", codMapaOrigem, naoEncontrados);
             }
             atividadesOrigem = atividadesOrigem.stream()
                     .filter(a -> filtro.contains(a.getCodigo()))
                     .toList();
         }
 
-        Set<String> descExistentes = obterDescExistentes(mapaDestinoId);
-        Mapa mapaDestino = repo.buscar(Mapa.class, mapaDestinoId);
+        Set<String> descExistentes = obterDescExistentes(codMapaDestino);
+        Mapa mapaDestino = repo.buscar(Mapa.class, codMapaDestino);
 
         List<Atividade> atividadesParaSalvar = atividadesOrigem.stream()
                 .filter(ativ -> !descExistentes.contains(ativ.getDescricao()))
@@ -74,20 +74,20 @@ public class CopiaMapaService {
         Map<Long, Atividade> mapaAtividades = new HashMap<>();
         List<Atividade> atividadesFonte = atividadeRepo.findWithConhecimentosByMapa_Codigo(codMapaFonte);
         List<Atividade> novasAtividades = new ArrayList<>();
-        Map<Atividade, Long> atividadeParaFonteId = new IdentityHashMap<>();
+        Map<Atividade, Long> atividadeParaCodAtividadeFonte = new IdentityHashMap<>();
 
         for (Atividade atividadeFonte : atividadesFonte) {
             Atividade novaAtividade = prepararCopiaAtividade(atividadeFonte, mapaSalvo);
             novasAtividades.add(novaAtividade);
-            atividadeParaFonteId.put(novaAtividade, atividadeFonte.getCodigo());
+            atividadeParaCodAtividadeFonte.put(novaAtividade, atividadeFonte.getCodigo());
         }
 
         if (!novasAtividades.isEmpty()) {
             atividadeRepo.saveAll(novasAtividades);
 
             for (Atividade nova : novasAtividades) {
-                Long fonteId = atividadeParaFonteId.get(nova);
-                mapaAtividades.put(fonteId, nova);
+                Long codAtividadeFonte = atividadeParaCodAtividadeFonte.get(nova);
+                mapaAtividades.put(codAtividadeFonte, nova);
             }
         }
 

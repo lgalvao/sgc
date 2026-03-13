@@ -116,23 +116,23 @@ class CDU05IntegrationTest extends BaseIntegrationTest {
                 .andExpect(status().isCreated())
                 .andReturn();
 
-        Long processoId = objectMapper.readTree(result.getResponse().getContentAsString()).get("codigo")
+        Long codProcesso = objectMapper.readTree(result.getResponse().getContentAsString()).get("codigo")
                 .asLong();
         var iniciarReq = new IniciarProcessoRequest(TipoProcesso.REVISAO, unidades);
 
         // 3. Iniciar o processo de revisão
-        mockMvc.perform(post(API_PROCESSOS_ID_INICIAR, processoId)
+        mockMvc.perform(post(API_PROCESSOS_ID_INICIAR, codProcesso)
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(iniciarReq)))
                 .andExpect(status().isOk());
 
-        Processo processo = processoRepo.findByIdComParticipantes(processoId).orElseThrow();
+        Processo processo = processoRepo.buscarPorCodigoComParticipantes(codProcesso).orElseThrow();
         assertThat(processo.getParticipantes()).hasSize(2); // Unidade alvo + Unidade superior
         assertThat(processo.getParticipantes().stream().map(UnidadeProcesso::getSigla).toList())
                 .containsExactlyInAnyOrder("U_REV", "U_SUP");
 
-        List<Subprocesso> subprocessos = subprocessoRepo.findByProcessoCodigo(processoId);
+        List<Subprocesso> subprocessos = subprocessoRepo.findByProcessoCodigoComUnidade(codProcesso);
         assertThat(subprocessos).hasSize(1);
         Subprocesso subprocessoCriado = subprocessos.getFirst();
         Mapa mapaCopiado = subprocessoCriado.getMapa();
@@ -204,17 +204,17 @@ class CDU05IntegrationTest extends BaseIntegrationTest {
                 .andExpect(status().isCreated())
                 .andReturn();
 
-        Long processoId = objectMapper.readTree(result.getResponse().getContentAsString()).get("codigo")
+        Long codProcesso = objectMapper.readTree(result.getResponse().getContentAsString()).get("codigo")
                 .asLong();
         var iniciarReq = new IniciarProcessoRequest(TipoProcesso.REVISAO, unidades);
 
-        mockMvc.perform(post(API_PROCESSOS_ID_INICIAR, processoId)
+        mockMvc.perform(post(API_PROCESSOS_ID_INICIAR, codProcesso)
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(iniciarReq)))
                 .andExpect(status().isOk());
 
-        mockMvc.perform(post(API_PROCESSOS_ID_INICIAR, processoId)
+        mockMvc.perform(post(API_PROCESSOS_ID_INICIAR, codProcesso)
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(iniciarReq)))

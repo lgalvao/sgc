@@ -100,7 +100,7 @@ class CDU20IntegrationTest extends BaseIntegrationTest {
     void devolucaoEAceitacaoComVerificacaoHistorico() throws Exception {
         // Devolução do mapa (GESTOR of unit 6 devolves to subordinate unit 9)
         JustificativaRequest devolverReq = new JustificativaRequest("Justificativa da devolução");
-        mockMvc.perform(post("/api/subprocessos/{id}/devolver-validacao", subprocesso.getCodigo())
+        mockMvc.perform(post("/api/subprocessos/{codigo}/devolver-validacao", subprocesso.getCodigo())
                         .with(user(usuarioGestor))
                         .with(csrf())
                         .contentType("application/json")
@@ -109,7 +109,7 @@ class CDU20IntegrationTest extends BaseIntegrationTest {
 
         // Verificação do histórico após devolução
         String responseDevolucao =
-                mockMvc.perform(get("/api/subprocessos/{id}/historico-validacao", subprocesso.getCodigo())
+                mockMvc.perform(get("/api/subprocessos/{codigo}/historico-validacao", subprocesso.getCodigo())
                                 .with(user(usuarioGestor))
                                 .with(csrf()))
                         .andExpect(status().isOk())
@@ -153,20 +153,20 @@ class CDU20IntegrationTest extends BaseIntegrationTest {
                 .isEqualTo(subprocesso.getUnidade().getSigla());
 
         // Unidade inferior valida o mapa novamente (CHEFE of unit 9)
-        mockMvc.perform(post("/api/subprocessos/{id}/validar-mapa", subprocesso.getCodigo())
+        mockMvc.perform(post("/api/subprocessos/{codigo}/validar-mapa", subprocesso.getCodigo())
                         .with(user(usuarioChefe))
                         .with(csrf()))
                 .andExpect(status().isOk());
 
         // GESTOR da unidade superior aceita a validação
-        mockMvc.perform(post("/api/subprocessos/{id}/aceitar-validacao", subprocesso.getCodigo())
+        mockMvc.perform(post("/api/subprocessos/{codigo}/aceitar-validacao", subprocesso.getCodigo())
                         .with(user(usuarioGestor))
                         .with(csrf()))
                 .andExpect(status().isOk());
 
         // Verificação do histórico após aceite
         String responseAceite =
-                mockMvc.perform(get("/api/subprocessos/{id}/historico-validacao", subprocesso.getCodigo())
+                mockMvc.perform(get("/api/subprocessos/{codigo}/historico-validacao", subprocesso.getCodigo())
                                 .with(user(usuarioGestor))
                                 .with(csrf()))
                         .andExpect(status().isOk())
@@ -241,7 +241,7 @@ class CDU20IntegrationTest extends BaseIntegrationTest {
 
         // Ação
         mockMvc.perform(
-                        post("/api/subprocessos/{id}/homologar-validacao", subprocesso.getCodigo())
+                        post("/api/subprocessos/{codigo}/homologar-validacao", subprocesso.getCodigo())
                                 .with(csrf()))
                 .andExpect(status().isOk());
 

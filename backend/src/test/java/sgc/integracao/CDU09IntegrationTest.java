@@ -56,12 +56,12 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
                 .observacoes("Favor ajustar atividades")
                 .build());
 
-        mockMvc.perform(get("/api/subprocessos/{id}", SP_CODIGO))
+        mockMvc.perform(get("/api/subprocessos/{codigo}", SP_CODIGO))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.subprocesso.codUnidade", is(8)))
                 .andExpect(jsonPath("$.subprocesso.situacao", is(SituacaoSubprocesso.NAO_INICIADO.name())));
 
-        mockMvc.perform(get("/api/subprocessos/{id}/historico-cadastro", SP_CODIGO))
+        mockMvc.perform(get("/api/subprocessos/{codigo}/historico-cadastro", SP_CODIGO))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].observacoes", is("Favor ajustar atividades")));
@@ -71,7 +71,7 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
         entityManager.flush();
         entityManager.clear();
 
-        mockMvc.perform(post("/api/subprocessos/{id}/cadastro/disponibilizar", SP_CODIGO).with(csrf()))
+        mockMvc.perform(post("/api/subprocessos/{codigo}/cadastro/disponibilizar", SP_CODIGO).with(csrf()))
                 .andExpect(status().isUnprocessableContent())
                 .andExpect(jsonPath("$.message").value(
                         "Situação do subprocesso não permite esta operação. Situação atual: NAO_INICIADO. Situações permitidas: MAPEAMENTO_CADASTRO_EM_ANDAMENTO"));
@@ -90,12 +90,12 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
         entityManager.flush();
         entityManager.clear();
 
-        mockMvc.perform(get("/api/subprocessos/{id}", SP_CODIGO))
+        mockMvc.perform(get("/api/subprocessos/{codigo}", SP_CODIGO))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.subprocesso.situacao", is(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO.name())));
 
         // Ação de Disponibilizar
-        mockMvc.perform(post("/api/subprocessos/{id}/cadastro/disponibilizar", SP_CODIGO).with(csrf()))
+        mockMvc.perform(post("/api/subprocessos/{codigo}/cadastro/disponibilizar", SP_CODIGO).with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.mensagem", is("Cadastro de atividades disponibilizado")));
 

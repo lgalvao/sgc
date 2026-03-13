@@ -52,7 +52,7 @@ O teste cobre:
 5. **Adicionar teste de clique em processo**: 
    - Clicar em um processo da tabela de histórico
    - Validar que navegou para página de detalhes
-   - Validar que URL está correta (provavelmente `/processo/{id}/...`)
+   - Validar que URL está correta (provavelmente `/processo/{codigo}/...`)
 
 6. **Adicionar validação de read-only**: 
    - Na página de detalhes de processo finalizado, validar que:

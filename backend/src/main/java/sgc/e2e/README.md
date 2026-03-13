@@ -15,7 +15,7 @@ O objetivo deste pacote é facilitar a automação de testes, permitindo:
    `/e2e/reset-database`).
 2. **Criação de Fixtures:** Endpoints para criar cenários complexos (ex: um processo em andamento) rapidamente, sem a
    necessidade de navegar por toda a UI (`/e2e/fixtures/*`).
-3. **Limpeza específica:** Endpoint para remover dados de um teste específico (`/e2e/processo/{id}/limpar`).
+3. **Limpeza específica:** Endpoint para remover dados de um teste específico (`/e2e/processo/{codigo}/limpar`).
 
 ## Componentes
 

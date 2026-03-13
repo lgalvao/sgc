@@ -3,13 +3,13 @@ import apiClient from '@/axios-setup';
 export function useRelatorios() {
   const axios = apiClient;
 
-  const obterRelatorioAndamento = async (processoId: number) => {
-    const { data } = await axios.get(`/relatorios/andamento/${processoId}`);
+  const obterRelatorioAndamento = async (codProcesso: number) => {
+    const { data } = await axios.get(`/relatorios/andamento/${codProcesso}`);
     return data;
   };
 
-  const downloadRelatorioAndamentoPdf = async (processoId: number) => {
-    const response = await axios.get(`/relatorios/andamento/${processoId}/exportar`, {
+  const downloadRelatorioAndamentoPdf = async (codProcesso: number) => {
+    const response = await axios.get(`/relatorios/andamento/${codProcesso}/exportar`, {
       responseType: 'blob'
     });
     
@@ -17,14 +17,14 @@ export function useRelatorios() {
     const url = globalThis.URL.createObjectURL(new Blob([response.data]));
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', `relatorio-andamento-${processoId}.pdf`);
+    link.setAttribute('download', `relatorio-andamento-${codProcesso}.pdf`);
     document.body.appendChild(link);
     link.click();
     link.remove();
   };
   
-  const downloadRelatorioMapasPdf = async (processoId: number, unidadeId?: number) => {
-    let urlStr = `/relatorios/mapas/${processoId}/exportar`;
+  const downloadRelatorioMapasPdf = async (codProcesso: number, unidadeId?: number) => {
+    let urlStr = `/relatorios/mapas/${codProcesso}/exportar`;
     if (unidadeId) {
       urlStr += `?unidadeId=${unidadeId}`;
     }
@@ -36,7 +36,7 @@ export function useRelatorios() {
     const url = globalThis.URL.createObjectURL(new Blob([response.data]));
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', `relatorio-mapas-${processoId}.pdf`);
+    link.setAttribute('download', `relatorio-mapas-${codProcesso}.pdf`);
     document.body.appendChild(link);
     link.click();
     link.remove();

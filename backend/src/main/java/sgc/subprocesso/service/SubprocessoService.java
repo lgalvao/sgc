@@ -92,7 +92,7 @@ public class SubprocessoService {
 
     @Transactional(readOnly = true)
     public Subprocesso buscarSubprocesso(Long codigo) {
-        return subprocessoRepo.findByIdWithMapaAndAtividades(codigo)
+        return subprocessoRepo.buscarPorCodigoComMapaEAtividades(codigo)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada(NOME_ENTIDADE, codigo));
     }
 
@@ -103,7 +103,7 @@ public class SubprocessoService {
 
     @Transactional(readOnly = true)
     public List<Subprocesso> listarEntidadesPorProcesso(Long codProcesso) {
-        return subprocessoRepo.findByProcessoCodigoWithUnidade(codProcesso);
+        return subprocessoRepo.findByProcessoCodigoComUnidade(codProcesso);
     }
 
     @Transactional
@@ -123,12 +123,12 @@ public class SubprocessoService {
     }
 
     @Transactional(readOnly = true)
-    public List<Subprocesso> listarEntidades() {
-        return subprocessoRepo.findAllComFetch();
+    public List<Subprocesso> listarTodos() {
+        return subprocessoRepo.listarTodosComFetch();
     }
 
     public Subprocesso obterEntidadePorProcessoEUnidade(Long codProcesso, Long codUnidade) {
-        return subprocessoRepo.findByProcessoCodigoAndUnidadeCodigoWithFetch(codProcesso, codUnidade)
+        return subprocessoRepo.buscarPorProcessoEUnidadeComFetch(codProcesso, codUnidade)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada(NOME_ENTIDADE, "P:%d U:%d".formatted(codProcesso, codUnidade)));
     }
 
@@ -172,20 +172,20 @@ public class SubprocessoService {
         return subprocessoRepo.findByProcessoCodigoAndUnidadeCodigoInWithUnidade(codProcesso, codUnidades);
     }
 
-    public List<Subprocesso> listarPorProcessoESituacoes(Long processoId, List<SituacaoSubprocesso> situacoes) {
-        return subprocessoRepo.findByProcessoCodigoAndSituacaoInWithUnidade(processoId, situacoes);
+    public List<Subprocesso> listarPorProcessoESituacoes(Long codProcesso, List<SituacaoSubprocesso> situacoes) {
+        return subprocessoRepo.findByProcessoCodigoAndSituacaoInWithUnidade(codProcesso, situacoes);
     }
 
     @Transactional(readOnly = true)
-    public List<Subprocesso> listarPorProcessoEUnidadeCodigosESituacoes(Long processoId, List<Long> unidadeIds, List<SituacaoSubprocesso> situacoes) {
-        return subprocessoRepo.findByProcessoCodigoAndUnidadeCodigoInWithUnidade(processoId, unidadeIds).stream()
+    public List<Subprocesso> listarPorProcessoEUnidadeCodigosESituacoes(Long codProcesso, List<Long> codigosUnidades, List<SituacaoSubprocesso> situacoes) {
+        return subprocessoRepo.findByProcessoCodigoAndUnidadeCodigoInWithUnidade(codProcesso, codigosUnidades).stream()
                 .filter(sp -> situacoes.contains(sp.getSituacao()))
                 .toList();
     }
 
     @Transactional(readOnly = true)
     public List<Subprocesso> listarPorProcessoUnidadeESituacoes(Long codProcesso, Long codUnidade, List<SituacaoSubprocesso> situacoes) {
-        return subprocessoRepo.findByProcessoCodigoAndUnidadeCodigoAndSituacaoInWithUnidade(codProcesso, codUnidade, situacoes);
+        return subprocessoRepo.findByProcessoCodigoAndUnidadeCodigoAndSituacaoInComUnidade(codProcesso, codUnidade, situacoes);
     }
 
     private void processarAlteracoes(Subprocesso sp, AtualizarSubprocessoRequest request) {
@@ -474,7 +474,7 @@ public class SubprocessoService {
     @Transactional(readOnly = true)
     public MapaAjusteDto obterMapaParaAjuste(Long codSubprocesso) {
         log.info("Recuperando mapa para ajustes do subprocesso {}", codSubprocesso);
-        Subprocesso sp = subprocessoRepo.findByIdWithMapaAndAtividades(codSubprocesso).orElseThrow(() -> new ErroEntidadeNaoEncontrada(NOME_ENTIDADE, codSubprocesso));
+        Subprocesso sp = subprocessoRepo.buscarPorCodigoComMapaEAtividades(codSubprocesso).orElseThrow(() -> new ErroEntidadeNaoEncontrada(NOME_ENTIDADE, codSubprocesso));
         Long codMapa = sp.getMapa().getCodigo();
 
         Analise analise = listarAnalisesPorSubprocesso(codSubprocesso, TipoAnalise.VALIDACAO)
@@ -547,7 +547,7 @@ public class SubprocessoService {
     }
 
     public SubprocessoDetalheResponse obterDetalhes(Long codigo, Usuario usuarioAutenticado) {
-        Subprocesso sp = subprocessoRepo.findByIdWithMapaAndAtividades(codigo).orElseThrow();
+        Subprocesso sp = subprocessoRepo.buscarPorCodigoComMapaEAtividades(codigo).orElseThrow();
         reconciliarSituacaoCadastro(sp);
         return obterDetalhes(sp, usuarioAutenticado);
     }
@@ -586,7 +586,7 @@ public class SubprocessoService {
     @Transactional
     public ContextoEdicaoResponse obterContextoEdicao(Long codSubprocesso) {
         Usuario usuario = usuarioFacade.usuarioAutenticado();
-        Subprocesso sp = subprocessoRepo.findByIdWithMapaAndAtividades(codSubprocesso).orElseThrow();
+        Subprocesso sp = subprocessoRepo.buscarPorCodigoComMapaEAtividades(codSubprocesso).orElseThrow();
         reconciliarSituacaoCadastro(sp);
         SubprocessoDetalheResponse detalhes = obterDetalhes(sp, usuario);
 
@@ -783,7 +783,7 @@ public class SubprocessoService {
 
     @Transactional(readOnly = true)
     public List<AtividadeDto> listarAtividadesSubprocesso(Long codSubprocesso) {
-        Subprocesso subprocesso = subprocessoRepo.findByIdWithMapaAndAtividades(codSubprocesso).orElseThrow();
+        Subprocesso subprocesso = subprocessoRepo.buscarPorCodigoComMapaEAtividades(codSubprocesso).orElseThrow();
 
         Long codMapa = subprocesso.getMapa().getCodigo();
         List<Atividade> todasAtividades = mapaManutencaoService.atividadesMapaCodigoComConhecimentos(codMapa);
@@ -793,7 +793,7 @@ public class SubprocessoService {
 
     @Transactional(readOnly = true)
     public List<AtividadeDto> listarAtividadesParaImportacao(Long codSubprocesso) {
-        Subprocesso subprocesso = subprocessoRepo.findByIdWithMapaAndAtividades(codSubprocesso).orElseThrow();
+        Subprocesso subprocesso = subprocessoRepo.buscarPorCodigoComMapaEAtividades(codSubprocesso).orElseThrow();
         if (subprocesso.getProcesso() == null || subprocesso.getProcesso().getSituacao() != SituacaoProcesso.FINALIZADO) {
             throw new ErroValidacao("A importação de atividades só permite subprocessos de processos finalizados.");
         }
@@ -847,7 +847,7 @@ public class SubprocessoService {
     }
 
     public AnaliseHistoricoDto paraHistoricoDto(Analise analise) {
-        UnidadeDto unidade = UnidadeDto.fromEntity(unidadeService.buscarPorId(analise.getUnidadeCodigo()));
+        UnidadeDto unidade = UnidadeDto.fromEntity(unidadeService.buscarPorCodigo(analise.getUnidadeCodigo()));
 
         return AnaliseHistoricoDto.builder()
                 .dataHora(analise.getDataHora())
@@ -861,5 +861,19 @@ public class SubprocessoService {
                 .build();
     }
 
+    @Transactional(readOnly = true)
+    public List<Subprocesso> listarEntidadesPorProcessoComUnidade(Long codProcesso) {
+        return subprocessoRepo.findByProcessoCodigoComUnidade(codProcesso);
+    }
 
+    @Transactional(readOnly = true)
+    public Unidade obterLocalizacaoAtual(Subprocesso sp) {
+        if (sp.getLocalizacaoAtual() != null) return sp.getLocalizacaoAtual();
+        Unidade loc = movimentacaoRepo.findFirstBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo())
+                .filter(m -> m.getUnidadeDestino() != null)
+                .map(Movimentacao::getUnidadeDestino)
+                .orElse(sp.getUnidade());
+        sp.setLocalizacaoAtual(loc);
+        return loc;
+    }
 }

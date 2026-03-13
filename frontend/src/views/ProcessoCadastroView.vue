@@ -333,7 +333,7 @@ async function confirmarIniciarProcesso() {
         unidadesSelecionadas.value,
     );
 
-    toastStore.setPending("O processo foi iniciado com sucesso.");
+    toastStore.setPending("Processo iniciado");
     await router.push("/painel");
     mostrarModalConfirmacao.value = false;
   } catch (error) {

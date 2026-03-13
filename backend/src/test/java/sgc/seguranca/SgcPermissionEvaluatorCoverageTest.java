@@ -223,7 +223,7 @@ class SgcPermissionEvaluatorCoverageTest {
 
         Usuario user = usuario(Perfil.CHEFE, 10L);
 
-        when(subprocessoRepo.findById(spId)).thenReturn(Optional.of(sp));
+        when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(spId)).thenReturn(Optional.of(sp));
 
         org.springframework.security.core.Authentication auth = mock(org.springframework.security.core.Authentication.class);
         when(auth.getPrincipal()).thenReturn(user);
@@ -241,7 +241,7 @@ class SgcPermissionEvaluatorCoverageTest {
 
         Usuario user = usuario(Perfil.GESTOR, 10L);
 
-        when(processoRepo.findById(procId)).thenReturn(Optional.of(p));
+        when(processoRepo.buscarPorCodigoComParticipantes(procId)).thenReturn(Optional.of(p));
 
         org.springframework.security.core.Authentication auth = mock(org.springframework.security.core.Authentication.class);
         when(auth.getPrincipal()).thenReturn(user);

@@ -54,7 +54,7 @@ graph TD
 ### Controladores REST
 
 - **`SubprocessoCrudControle`**:
-    - `GET /api/subprocessos/{id}`: Detalhes do subprocesso.
+    - `GET /api/subprocessos/{codigo}`: Detalhes do subprocesso.
     - `GET /api/subprocessos`: Listagem geral.
 
 - **`SubprocessoCadastroControle`**: Lida com o workflow da etapa de cadastro.
@@ -73,8 +73,8 @@ graph TD
     - `GET /impactos-mapa`: Analisa diferenças entre versões.
     - **CRUD de Competências (Exceção ao padrão POST):**
         - `POST .../competencias`: Cria competência.
-        - `PUT .../competencias/{id}`: Atualiza competência.
-        - `DELETE .../competencias/{id}`: Remove competência.
+        - `PUT .../competencias/{codigo}`: Atualiza competência.
+        - `DELETE .../competencias/{codigo}`: Remove competência.
 
 ### Serviços especializados
 

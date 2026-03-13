@@ -64,7 +64,7 @@ class ProcessoRepoTest {
 
         entityManager.flush(); // Ensure persistence
 
-        Page<Processo> resultado = processoRepo.findDistinctByParticipantes_IdUnidadeCodigoInAndSituacaoNot(
+        Page<Processo> resultado = processoRepo.listarPorParticipantesESituacaoDiferente(
                 List.of(u1.getCodigo()),
                 SituacaoProcesso.CRIADO,
                 PageRequest.of(0, 10)
@@ -93,7 +93,7 @@ class ProcessoRepoTest {
 
         entityManager.flush();
 
-        Page<Processo> resultado = processoRepo.findDistinctByParticipantes_IdUnidadeCodigoInAndSituacaoNot(
+        Page<Processo> resultado = processoRepo.listarPorParticipantesESituacaoDiferente(
                 List.of(u1.getCodigo()),
                 SituacaoProcesso.CRIADO,
                 PageRequest.of(0, 10)
@@ -117,7 +117,7 @@ class ProcessoRepoTest {
 
         entityManager.flush();
 
-        Page<Processo> resultado = processoRepo.findDistinctByParticipantes_IdUnidadeCodigoInAndSituacaoNot(
+        Page<Processo> resultado = processoRepo.listarPorParticipantesESituacaoDiferente(
                 List.of(u1.getCodigo(), u2.getCodigo()), // Busco por AMBAS
                 SituacaoProcesso.CRIADO,
                 PageRequest.of(0, 10)
@@ -142,7 +142,7 @@ class ProcessoRepoTest {
         entityManager.flush();
 
         // Act - Paginação com tamanho 2 (espera-se 3 páginas: 2, 2, 1)
-        Page<Processo> resultado = processoRepo.findDistinctByParticipantes_IdUnidadeCodigoInAndSituacaoNot(
+        Page<Processo> resultado = processoRepo.listarPorParticipantesESituacaoDiferente(
                 List.of(u1.getCodigo()),
                 SituacaoProcesso.CRIADO,
                 PageRequest.of(0, 2)
@@ -165,7 +165,7 @@ class ProcessoRepoTest {
 
         entityManager.flush();
 
-        Page<Processo> resultado = processoRepo.findDistinctByParticipantes_IdUnidadeCodigoInAndSituacaoNot(
+        Page<Processo> resultado = processoRepo.listarPorParticipantesESituacaoDiferente(
                 List.of(u1.getCodigo()),
                 SituacaoProcesso.CRIADO,
                 PageRequest.of(0, 10)

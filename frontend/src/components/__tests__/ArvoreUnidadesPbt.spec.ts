@@ -10,13 +10,13 @@ const generateTree = (depth: number, breadth: number, startId = 1): Unidade[] =>
 
     const units: Unidade[] = [];
     for (let i = 0; i < breadth; i++) {
-        const id = startId * 10 + i + 1;
-        const children = generateTree(depth - 1, breadth, id);
+        const codigo = startId * 10 + i + 1;
+        const children = generateTree(depth - 1, breadth, codigo);
 
         units.push({
-            codigo: id,
-            sigla: `U${id}`,
-            nome: `Unidade ${id}`,
+            codigo: codigo,
+            sigla: `U${codigo}`,
+            nome: `Unidade ${codigo}`,
             isElegivel: true,
             filhas: children.length > 0 ? children : undefined,
             tipo: 'OPERACIONAL',

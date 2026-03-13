@@ -84,26 +84,26 @@ Protegidas com `@PreAuthorize("hasRole('ADMIN')")` diretamente no controller:
 | `POST /api/processos/{codigo}/iniciar`                 | Iniciar processo                | 04/05 |
 | `POST /api/processos/{codigo}/finalizar`               | Finalizar processo              | 21    |
 | `POST /api/processos/{codigo}/enviar-lembrete`         | Enviar lembrete de prazo        | 34    |
-| `POST /api/subprocessos/{id}/data-limite`              | Alterar data limite             | 27    |
-| `POST /api/subprocessos/{id}/reabrir-cadastro`         | Reabrir cadastro                | 32    |
-| `POST /api/subprocessos/{id}/reabrir-revisao-cadastro` | Reabrir revisão                 | 33    |
+| `POST /api/subprocessos/{codigo}/data-limite`              | Alterar data limite             | 27    |
+| `POST /api/subprocessos/{codigo}/reabrir-cadastro`         | Reabrir cadastro                | 32    |
+| `POST /api/subprocessos/{codigo}/reabrir-revisao-cadastro` | Reabrir revisão                 | 33    |
 | `POST /api/subprocessos`                               | Criar subprocesso               | —     |
-| `POST /api/subprocessos/{id}/atualizar`                | Atualizar subprocesso           | —     |
-| `POST /api/subprocessos/{id}/excluir`                  | Excluir subprocesso             | —     |
+| `POST /api/subprocessos/{codigo}/atualizar`                | Atualizar subprocesso           | —     |
+| `POST /api/subprocessos/{codigo}/excluir`                  | Excluir subprocesso             | —     |
 | `GET /api/subprocessos`                                | Listar subprocessos             | —     |
 | `GET /api/configuracoes`                               | Listar configurações            | 31    |
 | `POST /api/configuracoes`                              | Atualizar configurações         | 31    |
 | `GET /api/usuarios/administradores`                    | Listar administradores          | 30    |
 | `POST /api/usuarios/administradores`                   | Adicionar administrador         | 30    |
 | `POST /api/usuarios/administradores/{titulo}/remover`  | Remover administrador           | 30    |
-| `POST /api/unidades/{cod}/atribuicoes-temporarias`     | Criar atribuição temporária     | 28    |
+| `POST /api/unidades/{codigo}/atribuicoes-temporarias`     | Criar atribuição temporária     | 28    |
 | `GET /api/unidades/atribuicoes`                        | Listar atribuições              | 28    |
-| `GET /api/relatorios/andamento/{cod}`                  | Ver relatório de andamento      | 35    |
-| `GET /api/relatorios/andamento/{cod}/exportar`         | Exportar relatório de andamento | 35    |
-| `GET /api/relatorios/mapas/{cod}/exportar`             | Exportar relatório de mapas     | 36    |
+| `GET /api/relatorios/andamento/{codigo}`                  | Ver relatório de andamento      | 35    |
+| `GET /api/relatorios/andamento/{codigo}/exportar`         | Exportar relatório de andamento | 35    |
+| `GET /api/relatorios/mapas/{codigo}/exportar`             | Exportar relatório de mapas     | 36    |
 | `POST /api/mapas`                                      | Criar mapa                      | 15    |
-| `POST /api/mapas/{cod}/atualizar`                      | Atualizar mapa                  | 15    |
-| `POST /api/mapas/{cod}/excluir`                        | Excluir mapa                    | 15    |
+| `POST /api/mapas/{codigo}/atualizar`                      | Atualizar mapa                  | 15    |
+| `POST /api/mapas/{codigo}/excluir`                        | Excluir mapa                    | 15    |
 
 ---
 
@@ -160,9 +160,9 @@ O `AtividadeController` usa `hasRole('CHEFE')` para CRUD de atividades e conheci
 
 ## 7. Importação de Atividades
 
-- `POST /subprocessos/{id}/importar-atividades` — protegido com `hasPermission(#id, 'Subprocesso', 'IMPORTAR_ATIVIDADES')`.
+- `POST /subprocessos/{codigo}/importar-atividades` — protegido com `hasPermission(#id, 'Subprocesso', 'IMPORTAR_ATIVIDADES')`.
 - `IMPORTAR_ATIVIDADES` exige perfil **CHEFE** + localização.
-- `GET /subprocessos/{id}/atividades-importacao` — protegido com `isAuthenticated()`.
+- `GET /subprocessos/{codigo}/atividades-importacao` — protegido com `isAuthenticated()`.
 - A ação `CONSULTAR_PARA_IMPORTACAO` no Evaluator permite que CHEFE consulte subprocessos finalizados ou da sua hierarquia.
 
 ---

@@ -69,4 +69,4 @@
     - `Unidade de origem`: ADMIN
     - `Unidade de destino`: [SIGLA_UNIDADE_SUPERIOR]
 
-10. O sistema exibe mensagem de sucesso "Revisão reaberta com sucesso".
+10. O sistema exibe mensagem de sucesso "Revisão reaberta".

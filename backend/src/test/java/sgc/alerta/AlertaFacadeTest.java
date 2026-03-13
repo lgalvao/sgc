@@ -42,7 +42,7 @@ class AlertaFacadeTest {
         Unidade unidadeRaiz = new Unidade();
         unidadeRaiz.setCodigo(1L);
         unidadeRaiz.setSigla("ADMIN");
-        when(unidadeService.buscarPorId(1L)).thenReturn(unidadeRaiz);
+        when(unidadeService.buscarPorCodigo(1L)).thenReturn(unidadeRaiz);
     }
 
     @Nested
@@ -238,7 +238,7 @@ class AlertaFacadeTest {
             alerta.setCodigo(100L);
 
             AlertaUsuario alertaUsuarioExistente = new AlertaUsuario();
-            alertaUsuarioExistente.setId(AlertaUsuario.Chave.builder().alertaCodigo(100L).usuarioTitulo(usuarioTitulo).build());
+            alertaUsuarioExistente.setCodigo(AlertaUsuario.Chave.builder().alertaCodigo(100L).usuarioTitulo(usuarioTitulo).build());
             alertaUsuarioExistente.setAlerta(alerta);
             alertaUsuarioExistente.setDataHoraLeitura(LocalDateTime.now());
 
@@ -400,7 +400,7 @@ class AlertaFacadeTest {
 
             // a1 lido, a2 nao lido
             AlertaUsuario au1 = new AlertaUsuario();
-            au1.setId(AlertaUsuario.Chave.builder().alertaCodigo(1L).usuarioTitulo(titulo).build());
+            au1.setCodigo(AlertaUsuario.Chave.builder().alertaCodigo(1L).usuarioTitulo(titulo).build());
             au1.setDataHoraLeitura(LocalDateTime.now());
             when(alertaService.alertasUsuarios(eq(titulo), anyList())).thenReturn(List.of(au1));
 
@@ -421,16 +421,16 @@ class AlertaFacadeTest {
             unidadeRaizMock.setSigla("ADMIN");
             unidadeRaizMock.setCodigo(1L);
 
-            when(unidadeService.buscarPorId(1L)).thenReturn(unidadeRaizMock);
+            when(unidadeService.buscarPorCodigo(1L)).thenReturn(unidadeRaizMock);
             when(alertaService.salvar(any())).thenAnswer(i -> i.getArgument(0));
 
             // Primeira chamada: deve buscar unidadeRaiz
             service.criarAlertaAdmin(new Processo(), new Unidade(), "Teste");
-            verify(unidadeService).buscarPorId(1L);
+            verify(unidadeService).buscarPorCodigo(1L);
 
             // Segunda chamada: busca novamente (sem cache lazy - simplificação para sistema pequeno)
             service.criarAlertaAdmin(new Processo(), new Unidade(), "Teste 2");
-            verify(unidadeService, times(2)).buscarPorId(1L);
+            verify(unidadeService, times(2)).buscarPorCodigo(1L);
         }
     }
 }

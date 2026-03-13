@@ -63,7 +63,7 @@ class SubprocessoServiceListaIntegrationTest extends BaseIntegrationTest {
     @Test
     @DisplayName("listarEntidades: deve listar todos os subprocessos")
     void listarEntidades() {
-        List<Subprocesso> list = subprocessoService.listarEntidades();
+        List<Subprocesso> list = subprocessoService.listarTodos();
         assertThat(list).isNotEmpty();
         assertThat(list).anyMatch(sp -> sp.getCodigo().equals(subprocesso.getCodigo()));
     }

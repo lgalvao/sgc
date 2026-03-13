@@ -7,14 +7,14 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
 
     const timestamp = Date.now();
     const descProcesso = `Mapeamento CDU-21 ${timestamp}`;
-    let processoId: number;
+    let codProcesso: number;
 
     test('Setup data', async ({request}) => {
         const processo = await criarProcessoMapaHomologadoFixture(request, {
             descricao: descProcesso,
             unidade: UNIDADE_ALVO
         });
-        processoId = processo.codigo;
+        codProcesso = processo.codigo;
         expect(true).toBeTruthy();
     });
 
@@ -74,7 +74,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
     test('Cenario 4: Verificar ausência de botões em processo finalizado', async ({page, autenticadoComoAdmin}) => {
         // Issue #1220: Garantir que botões de ação não aparecem para processos finalizados
 
-        await page.goto(`/processo/${processoId}`);
+        await page.goto(`/processo/${codProcesso}`);
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
 
         await expect(page.getByText(/Processo concluído/i)).toBeVisible();

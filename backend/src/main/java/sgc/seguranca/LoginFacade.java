@@ -80,7 +80,7 @@ public class LoginFacade {
     @Transactional(readOnly = true)
     public String entrar(EntrarRequest request) {
         Long codUnidade = request.unidadeCodigo();
-        unidadeService.buscarPorId(codUnidade);
+        unidadeService.buscarPorCodigo(codUnidade);
 
         String tituloEleitoral = request.tituloEleitoral();
         List<PerfilUnidadeDto> autorizacoes = buscarAutorizacoes(tituloEleitoral);
@@ -103,7 +103,7 @@ public class LoginFacade {
             }
         }
 
-        String siglaUnidade = unidadeService.buscarPorId(codUnidade).getSigla();
+        String siglaUnidade = unidadeService.buscarPorCodigo(codUnidade).getSigla();
         log.info("Usuário {} autorizado: {}-{}", tituloEleitoral, perfilSolicitado, siglaUnidade);
 
         return gerenciadorJwt.gerarToken(

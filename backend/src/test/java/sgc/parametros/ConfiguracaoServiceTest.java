@@ -86,20 +86,20 @@ class ConfiguracaoServiceTest {
 
     @Test
     @DisplayName("Deve buscar parâmetro por ID existente")
-    void deveBuscarPorIdExistente() {
+    void devebuscarPorCodigoExistente() {
         Long id = 1L;
         Parametro p = new Parametro();
         when(parametroRepo.findById(id)).thenReturn(Optional.of(p));
 
-        assertEquals(p, configuracaoService.buscarPorId(id));
+        assertEquals(p, configuracaoService.buscarPorCodigo(id));
     }
 
     @Test
     @DisplayName("Deve lançar erro ao buscar por ID inexistente")
-    void deveLancarErroAoBuscarPorIdInexistente() {
+    void deveLancarErroAobuscarPorCodigoInexistente() {
         Long id = 1L;
         when(parametroRepo.findById(id)).thenReturn(Optional.empty());
 
-        assertThrows(ErroConfiguracao.class, () -> configuracaoService.buscarPorId(id));
+        assertThrows(ErroConfiguracao.class, () -> configuracaoService.buscarPorCodigo(id));
     }
 }

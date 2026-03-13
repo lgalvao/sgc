@@ -59,7 +59,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await page.getByTestId('btn-processo-iniciar').click();
         await page.getByTestId('btn-iniciar-processo-confirmar').click();
 
-        // Validação: Processo iniciado com sucesso
+        // Validação: Processo iniciado
         await verificarPaginaPainel(page);
         await verificarProcessoNaTabela(page, {
             descricao,

@@ -1,5 +1,5 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
-import {criarProcesso, extrairProcessoId, verificarProcessoNaTabela} from './helpers/helpers-processos.js';
+import {criarProcesso, extrairProcessoCodigo, verificarProcessoNaTabela} from './helpers/helpers-processos.js';
 import {
     esperarPaginaCadastroProcesso,
     esperarPaginaDetalhesProcesso,
@@ -90,7 +90,7 @@ test.describe('CDU-03 - Manter processo', () => {
 
         await page.getByTestId('tbl-processos').getByText(descricaoOriginal).first().click();
         await esperarPaginaCadastroProcesso(page);
-        await extrairProcessoId(page);
+        await extrairProcessoCodigo(page);
         await expect(page.getByTestId('inp-processo-descricao')).toHaveValue(descricaoOriginal);
         await expect(page.getByTestId('sel-processo-tipo')).toBeDisabled();
 
@@ -174,7 +174,7 @@ test.describe('CDU-03 - Manter processo', () => {
 
         await page.getByTestId('tbl-processos').getByText(descricaoBase).first().click();
         await esperarPaginaDetalhesProcesso(page);
-        await extrairProcessoId(page);
+        await extrairProcessoCodigo(page);
 
         await page.goto('/painel');
 
@@ -236,7 +236,7 @@ test.describe('CDU-03 - Manter processo', () => {
 
         await page.getByTestId('tbl-processos').getByText(descricao).first().click();
         await esperarPaginaCadastroProcesso(page);
-        await extrairProcessoId(page);
+        await extrairProcessoCodigo(page);
 
         await page.goto('/painel');
 
@@ -274,7 +274,7 @@ test.describe('CDU-03 - Manter processo', () => {
 
         await page.getByTestId('tbl-processos').getByText(descricaoAlt).first().click();
         await esperarPaginaDetalhesProcesso(page);
-        await extrairProcessoId(page);
+        await extrairProcessoCodigo(page);
 
         await expect(page).toHaveURL(/\/processo\/\d+$/);
     });

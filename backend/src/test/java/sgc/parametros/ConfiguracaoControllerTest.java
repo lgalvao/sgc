@@ -74,7 +74,7 @@ class ConfiguracaoControllerTest {
                 .valor("NEW_VALUE")
                 .build();
 
-        when(configuracaoService.buscarPorId(1L)).thenReturn(new Parametro());
+        when(configuracaoService.buscarPorCodigo(1L)).thenReturn(new Parametro());
         when(configuracaoService.salvar(any())).thenReturn(List.of(response));
 
         mockMvc.perform(post("/api/configuracoes")

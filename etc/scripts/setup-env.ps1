@@ -118,7 +118,7 @@ if ($env:JAVA_HOME)
 
                 if ($proc.ExitCode -eq 0)
                 {
-                    Write-Host "[✔] $alias importado com sucesso."
+                    Write-Host "[✔] $alias importado."
                 }
                 else
                 {

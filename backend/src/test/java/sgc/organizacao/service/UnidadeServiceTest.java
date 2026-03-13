@@ -30,12 +30,12 @@ class UnidadeServiceTest {
     private UnidadeService service;
 
     @Test
-    @DisplayName("buscarPorId - Sucesso")
-    void buscarPorId() {
+    @DisplayName("buscarPorCodigo - Sucesso")
+    void buscarPorCodigo() {
         Unidade u = new Unidade();
         when(repo.buscar(eq(Unidade.class), any())).thenReturn(u);
 
-        Unidade result = service.buscarPorId(1L);
+        Unidade result = service.buscarPorCodigo(1L);
 
         assertThat(result).isSameAs(u);
     }
@@ -74,12 +74,12 @@ class UnidadeServiceTest {
     }
 
     @Test
-    @DisplayName("buscarSiglasPorIds - Sucesso")
-    void buscarSiglasPorIds() {
+    @DisplayName("buscarSiglasPorCodigos - Sucesso")
+    void buscarSiglasPorCodigos() {
         List<String> lista = List.of("U1");
         when(unidadeRepo.findSiglasByCodigos(any())).thenReturn(lista);
 
-        List<String> result = service.buscarSiglasPorIds(List.of(1L));
+        List<String> result = service.buscarSiglasPorCodigos(List.of(1L));
 
         assertThat(result).containsExactly("U1");
     }
@@ -87,7 +87,7 @@ class UnidadeServiceTest {
     @Test
     @DisplayName("verificarMapaVigente - Sucesso")
     void verificarMapaVigente() {
-        when(unidadeMapaRepo.existsById(1L)).thenReturn(true);
+        when(unidadeMapaRepo.existsByUnidadeCodigo(1L)).thenReturn(true);
         assertThat(service.verificarMapaVigente(1L)).isTrue();
     }
 
@@ -101,7 +101,7 @@ class UnidadeServiceTest {
     @Test
     @DisplayName("definirMapaVigente - Criar novo")
     void definirMapaVigente_Novo() {
-        when(unidadeMapaRepo.findById(1L)).thenReturn(Optional.empty());
+        when(unidadeMapaRepo.findByUnidadeCodigo(1L)).thenReturn(Optional.empty());
         Mapa mapa = new Mapa();
 
         service.definirMapaVigente(1L, mapa);
@@ -113,7 +113,7 @@ class UnidadeServiceTest {
     @DisplayName("definirMapaVigente - Atualizar existente")
     void definirMapaVigente_Existente() {
         UnidadeMapa existente = new UnidadeMapa();
-        when(unidadeMapaRepo.findById(1L)).thenReturn(Optional.of(existente));
+        when(unidadeMapaRepo.findByUnidadeCodigo(1L)).thenReturn(Optional.of(existente));
         Mapa mapa = new Mapa();
 
         service.definirMapaVigente(1L, mapa);

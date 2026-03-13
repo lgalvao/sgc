@@ -76,7 +76,7 @@
             :pode-editar="podeEditarMapa"
             @editar="iniciarEdicaoCompetencia"
             @excluir="excluirCompetencia"
-            @remover-atividade="(competenciaId, atividadeId) => removerAtividadeAssociada(competenciaId, atividadeId)"
+            @remover-atividade="(competenciaId, codAtividade) => removerAtividadeAssociada(competenciaId, codAtividade)"
         />
       </div>
     </div>
@@ -322,13 +322,13 @@ function fecharModalExcluirCompetencia() {
   competenciaParaExcluir.value = null;
 }
 
-function removerAtividadeAssociada(competenciaId: number, atividadeId: number) {
+function removerAtividadeAssociada(competenciaId: number, codAtividade: number) {
   if (!codSubprocesso.value) return;
   const competencia = competencias.value.find(
       (comp) => comp.codigo === competenciaId,
   );
   if (competencia) {
-    const atividadesIds = (competencia.atividades || []).map((a) => a.codigo).filter((id) => id !== atividadeId);
+    const atividadesIds = (competencia.atividades || []).map((a) => a.codigo).filter((id) => id !== codAtividade);
 
     const request: SalvarCompetenciaRequest = {
       descricao: competencia.descricao,

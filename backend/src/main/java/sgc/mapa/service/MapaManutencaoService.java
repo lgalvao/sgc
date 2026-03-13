@@ -80,9 +80,9 @@ public class MapaManutencaoService {
         Map<Long, Set<Long>> result = new HashMap<>();
 
         for (Object[] row : rows) {
-            Long compId = (Long) row[0];
-            Long ativId = (Long) row[2];
-            result.computeIfAbsent(compId, k -> new HashSet<>()).add(ativId);
+            Long codCompetencia = (Long) row[0];
+            Long codAtividade = (Long) row[2];
+            result.computeIfAbsent(codCompetencia, k -> new HashSet<>()).add(codAtividade);
         }
 
         return result;
@@ -154,12 +154,12 @@ public class MapaManutencaoService {
     }
 
     @Transactional
-    public void atualizarDescricoesAtividadeEmBloco(Map<Long, String> descricoesPorId) {
-        List<Atividade> atividades = atividadeRepo.findAllById(descricoesPorId.keySet());
+    public void atualizarDescricoesAtividadeEmBloco(Map<Long, String> descricoesPorCodigo) {
+        List<Atividade> atividades = atividadeRepo.findAllById(descricoesPorCodigo.keySet());
         Set<Long> mapasAfetados = new HashSet<>();
 
         atividades.forEach(atividade -> {
-            String novaDescricao = descricoesPorId.get(atividade.getCodigo());
+            String novaDescricao = descricoesPorCodigo.get(atividade.getCodigo());
             if (novaDescricao != null) {
                 atividade.setDescricao(novaDescricao);
             }
@@ -169,7 +169,7 @@ public class MapaManutencaoService {
 
         atividadeRepo.saveAll(atividades);
         mapasAfetados.forEach(this::notificarAlteracaoMapa);
-        log.info("Atualizando descrições de {} atividades em lote", descricoesPorId.size());
+        log.info("Atualizando descrições de {} atividades em lote", descricoesPorCodigo.size());
     }
 
     @Transactional

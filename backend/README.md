@@ -94,7 +94,7 @@ Todos os módulos principais expõem uma **Facade** como ponto de entrada único
 public class SubprocessoController {
     private final SubprocessoFacade facade;  // ✅ Correto
     
-    @PostMapping("/{id}/disponibilizar")
+    @PostMapping("/{codigo}/disponibilizar")
     public void disponibilizar(@PathVariable Long id) {
         facade.disponibilizarCadastro(id, getCurrentUser());
     }
@@ -167,13 +167,13 @@ public void onProcessoIniciado(EventoProcessoIniciado evento) {
 
 ```java
 // ✅ BOM: Retorna DTO
-@GetMapping("/{id}")
+@GetMapping("/{codigo}")
 public SubprocessoDto obter(@PathVariable Long id) {
     return facade.obterDto(id);
 }
 
 // ❌ RUIM: Expõe entidade JPA
-@GetMapping("/{id}")
+@GetMapping("/{codigo}")
 public Subprocesso obter(@PathVariable Long id) {
     return repository.findById(id).get();
 }
@@ -297,11 +297,11 @@ private final Long id;
 
 ```
 GET  /api/processos           - Listar
-GET  /api/processos/{id}      - Obter
+GET  /api/processos/{codigo}      - Obter
 POST /api/processos           - Criar
-POST /api/processos/{id}/atualizar   - Atualizar
-POST /api/processos/{id}/excluir     - Excluir
-POST /api/processos/{id}/iniciar     - Workflow action
+POST /api/processos/{codigo}/atualizar   - Atualizar
+POST /api/processos/{codigo}/excluir     - Excluir
+POST /api/processos/{codigo}/iniciar     - Workflow action
 ```
 
 ## 📚 Documentação adicional

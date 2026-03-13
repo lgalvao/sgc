@@ -51,12 +51,6 @@ O teste `cdu-03.spec.ts` cobre os seguintes cenários:
    - Se ao tentar selecionar tais unidades via API (contorno de desabilitar), a mensagem aparece
    - Teste apenas valida a desabilitação do checkbox
 
-5. **Mensagem de sucesso específica (passo 5)**: O teste valida feedback de sucesso, mas o requisito especifica "Processo criado." (sem vírgula). Há um teste que valida `/criado com sucesso/i`, que pode não ser exato.
-
-6. **Mensagem de edição específica (passo 6)**: O requisito especifica "Processo alterado." O teste valida `/alterado com sucesso/i`.
-
-7. **Mensagem de remoção específica (passo 4.2 do fluxo de remoção)**: O requisito especifica "Processo [Descrição do Processo] removido". O teste valida `/removido com sucesso/i`.
-
 8. **Tipo de processo imutável (passo 3, edição)**: O teste valida que o campo é desabilitado, mas não valida que o requisito menciona "O tipo do processo não pode ser alterado" - isto é implementado como "desabilitado", o que é apropriado.
 
 9. **Teste de cancelamento não completo**: O teste valida cancelamento de remoção, mas não valida cancelamento de criação com dados preenchidos (requisito não especifica, mas bom ter).

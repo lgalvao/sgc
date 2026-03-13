@@ -50,7 +50,7 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
         // Cenario 5: Confirmar reabertura
         await page.getByTestId('btn-confirmar-reabrir').click();
 
-        await verificarAppAlert(page, /Cadastro reaberto com sucesso/i);
+        await verificarAppAlert(page, /Cadastro reaberto/i);
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro em andamento/i);
         await expect(page.getByTestId('tbl-movimentacoes')).toContainText(/Reabertura de cadastro/i);
     });
