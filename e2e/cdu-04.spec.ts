@@ -45,7 +45,7 @@ test.describe('CDU-04 - Iniciar processo', () => {
 
         // Aguarda toast e redirect
         await esperarPaginaPainel(page);
-        await verificarToast(page, /iniciado com sucesso/i);
+        await verificarToast(page, /Processo iniciado/i);
         await verificarProcessoNaTabela(page, {
             descricao,
             situacao: 'Em andamento',
