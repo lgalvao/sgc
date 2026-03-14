@@ -29,7 +29,21 @@ A maioria dos scripts requer que o relatório de cobertura (`coverage-final.json
   cobertura total do projeto aumentaria (em pontos percentuais) se um arquivo específico atingisse 100%. Use-o para
   priorizar onde escrever testes.
 
-### 2. Auditoria e Validação
+### 2. Análise de Mensagens e Strings
+
+* **`extrair-mensagens.cjs`**: Extrai todas as mensagens e strings do projeto (backend, frontend e testes) e gera o
+  arquivo `mensagens-extraidas.json` na raiz. Cobre: anotações de validação (DTOs), exceções de negócio (services),
+  toast de sucesso, notificações, constantes e asserções de testes.
+* **`analisar-mensagens.cjs`**: Analisa o JSON gerado por `extrair-mensagens.cjs` e produz o relatório
+  `mensagens-analise.md` com: duplicatas exatas, duplicatas com variações, strings de teste sem correspondência na
+  produção e mensagens de produção sem cobertura de teste. Requer execução prévia de `extrair-mensagens.cjs`.
+
+  ```bash
+  node etc/scripts/extrair-mensagens.cjs   # 1º - gera mensagens-extraidas.json
+  node etc/scripts/analisar-mensagens.cjs  # 2º - gera mensagens-analise.md
+  ```
+
+### 3. Auditoria e Validação
 
 * **`audit-frontend-validations.cjs`**: Compara as validações do Frontend (Vue/Zod) com as do Backend (Java/Bean
   Validation). Gera um relatório `frontend-backend-validation-comparison.md` na raiz do projeto para identificar
