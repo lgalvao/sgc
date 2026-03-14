@@ -55,7 +55,6 @@ public class ProcessoService {
     private final SgcPermissionEvaluator permissionEvaluator;
     private final SubprocessoTransicaoService transicaoService;
 
-    // --- CONSULTAS (Baseadas em ProcessoConsultaService e ProcessoDetalheBuilder) ---
 
     @Transactional(readOnly = true)
     public Processo buscarPorCodigo(Long codigo) {
@@ -139,7 +138,6 @@ public class ProcessoService {
                 .toList();
     }
 
-    // --- MANUTENÇÃO (Baseada em ProcessoManutencaoService) ---
 
     public Processo criar(CriarProcessoRequest req) {
         List<Long> codigosUnidades = new ArrayList<>(req.unidades());
@@ -191,7 +189,6 @@ public class ProcessoService {
         log.info("Processo {} removido.", codigo);
     }
 
-    // --- WORKFLOW (Baseado em ProcessoWorkflowService) ---
 
     public List<String> iniciar(Long codigo, List<Long> codsUnidadesParam, Usuario usuario) {
         Processo processo = buscarPorCodigo(codigo);
@@ -253,7 +250,6 @@ public class ProcessoService {
         log.info("Processo {} finalizado", codigo);
     }
 
-    // --- AÇÕES EM BLOCO (Baseado em ProcessoFacade) ---
 
     public void executarAcaoEmBloco(Long codProcesso, AcaoEmBlocoRequest req) {
         Usuario usuario = usuarioService.usuarioAutenticado();
@@ -274,7 +270,6 @@ public class ProcessoService {
         processarAcoesBlocoAceiteHomologacao(req, usuario, subprocessos);
     }
 
-    // --- BUILDING DTO (Baseado em ProcessoDetalheBuilder) ---
 
     @Transactional(readOnly = true)
     public ProcessoDetalheDto obterDetalhesCompleto(Long codProcesso, Usuario usuario, boolean incluirElegiveis) {
@@ -307,7 +302,6 @@ public class ProcessoService {
         return dto;
     }
 
-    // --- NOTIFICAÇÕES (Baseado em ProcessoNotificacaoService) ---
 
     public void enviarLembrete(Long codProcesso, Long unidadeCodigo) {
         Processo processo = buscarPorCodigoComParticipantes(codProcesso);
@@ -329,7 +323,6 @@ public class ProcessoService {
         servicoAlertas.criarAlertaAdmin(processo, unidade, "Lembrete: Prazo encerra em " + dataLimiteText);
     }
 
-    // --- MÉTODOS PRIVADOS / AUXILIARES ---
 
     private List<Long> buscarCodigosAcesso(Usuario usuario) {
         Long root = usuario.getUnidadeAtivaCodigo();
