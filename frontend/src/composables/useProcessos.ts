@@ -49,7 +49,6 @@ export function useProcessos() {
     } = store;
 
     return {
-        // Estado
         carregando,
         processosPainel,
         processosPainelPage,
@@ -59,7 +58,6 @@ export function useProcessos() {
         subprocessosElegiveis,
         lastError,
         
-        // Ações
         clearError,
         buscarProcessosPainel,
         buscarProcessosFinalizados,
