@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+/* eslint-disable @typescript-eslint/no-require-imports */
 /**
  * analisar-mensagens.cjs
  *
@@ -170,7 +171,7 @@ function gerarRelatorio(dados) {
 
     const agrupadas = agruparPorTexto(todasMensagens);
     const duplicatasExatas = [...agrupadas.entries()]
-        .filter(([_, grupo]) => grupo.length > 1)
+        .filter(([, grupo]) => grupo.length > 1)
         .sort((a, b) => b[1].length - a[1].length);
 
     if (duplicatasExatas.length === 0) {
