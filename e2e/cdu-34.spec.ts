@@ -57,7 +57,7 @@ test.describe.serial('CDU-34 - Enviar lembrete de prazo', () => {
         await expect(page.getByTestId('txt-modelo-lembrete')).toContainText(TEXTOS.subprocesso.LEMBRETE_MODELO_PREFIXO(UNIDADE_1));
         await page.getByTestId('btn-confirmar-enviar-lembrete').click();
 
-        await expect(page.getByTestId('tbl-movimentacoes')).toContainText(TEXTOS.subprocesso.SUCESSO_LEMBRETE_ENVIADO);
+        await expect(page.getByTestId('tbl-movimentacoes')).toContainText(TEXTOS.movimentacao.LEMBRETE_ENVIADO);
     });
 
     test('Cenario complementar: unidade de destino visualiza alerta de lembrete no painel', async ({
