@@ -476,43 +476,41 @@ test('mensagem de erro de processo em situação inválida', async ({ request })
 
 ---
 
-## 5. Plano de Implementação
+## 5. Plano de Implementação Pendente
 
-### Fase 1 — Centralização Backend (estimativa: 1–2 dias)
+### Fase 1 — Backend (pendências remanescentes)
 
-1. **Criar `MsgValidacao.java`** no pacote `sgc.comum` com todas as constantes
-2. **Substituir strings hardcoded** nos DTOs (`@NotBlank(message = MsgValidacao.CHAVE_OBRIGATORIA)`)
-3. **Substituir strings nos services** (`throw new ErroValidacao(MsgValidacao.PROCESSO_SO_EDITAVEL_EM_CRIADO)`)
-4. **Atualizar testes backend** para usar as constantes importadas
-5. **Resolver inconsistências** (ex: `"O código da unidade é obrigatório"` vs com ponto final)
+1. **Migrar hardcodes residuais** ainda fora de `MsgValidacao.java`, sobretudo pontos isolados de apoio a E2E e mensagens compostas diretamente em controllers/services.
+2. **Consolidar testes backend** que ainda validam texto literal para importar as constantes compartilhadas quando fizer sentido.
+3. **Eliminar inconsistências finais de pontuação/redação** entre mensagens equivalentes antes de considerar o backend totalmente consolidado.
 
-### Fase 2 — Centralização Frontend (estimativa: 1–2 dias)
+### Fase 2 — Frontend (pendências remanescentes)
 
-1. **Preencher `textos.ts`** com todas as strings de sucesso, erro e UI
-2. **Substituir strings hardcoded** nas Views e Components
-3. **Atualizar testes unitários** para usar as constantes importadas
+1. **Continuar expandindo `textos.ts`** para telas ainda com strings relevantes hardcoded (login, parâmetros, relatórios, administração, atribuição temporária, mapa e subprocesso).
+2. **Substituir strings remanescentes** nas views/components por constantes tipadas, priorizando mensagens de negócio, toasts, títulos de modal e textos de carregamento.
+3. **Atualizar testes unitários restantes** para usar as constantes compartilhadas em vez de literais repetidos.
 
-### Fase 3 — Sincronização com Testes E2E (estimativa: 1 dia)
+### Fase 3 — Sincronização com Testes E2E (pendências remanescentes)
 
-1. **Criar arquivo de helpers** com as constantes importadas acessíveis nos testes E2E
-2. **Substituir asserções de texto hardcoded** nos testes E2E pelas constantes
-3. **Adicionar lint rule** para evitar strings hardcoded em chamadas `getByText`, `toContain`
+1. **Substituir asserções de texto hardcoded** ainda espalhadas em specs e helpers E2E por importações de `TEXTOS` onde houver fonte de verdade no frontend.
+2. **Cobrir mensagens e labels ainda sem contrato compartilhado** entre produção e testes, principalmente em fluxos antigos de login, navegação, mapa e administração.
+3. **Adicionar proteção automatizada** (regra de lint/check específico) para desencorajar novas strings hardcoded em `getByText`, `toContainText` e equivalentes.
 
-### Fase 4 — Melhoria de Códigos de Erro (estimativa: 2–3 dias)
+### Fase 4 — Melhoria de Códigos de Erro
 
-1. **Definir códigos semânticos** para cada tipo de erro de negócio (ex: `"PROCESSO_SOMENTE_CRIADO"`)
-2. **Atualizar `ErroValidacao`** para aceitar código semântico além da mensagem
-3. **Criar `codigosErro.ts`** no frontend com os mesmos códigos
-4. **Migrar verificações** do frontend de `message` para `code`
+1. **Definir códigos semânticos** para cada tipo de erro de negócio (ex: `"PROCESSO_SOMENTE_CRIADO"`).
+2. **Atualizar `ErroValidacao`** para aceitar código semântico além da mensagem.
+3. **Criar `codigosErro.ts`** no frontend com os mesmos códigos.
+4. **Migrar verificações** do frontend de `message` para `code`.
 
-### Resumo de Esforço
+### Resumo de Esforço Remanescente
 
 | Fase | Esforço | Impacto |
 |---|---|---|
-| Fase 1 — Backend | Médio (mecânico, ~60 substituições) | Alto (consistência das mensagens) |
-| Fase 2 — Frontend | Baixo (mecânico, ~30 substituições) | Médio (rastreabilidade) |
-| Fase 3 — E2E | Médio (~100 substituições) | Alto (testes frágeis → robustos) |
-| Fase 4 — Códigos | Alto (design + refatoração) | Muito alto (desacoplamento) |
+| Fase 1 — Backend residual | Baixo a médio | Alto |
+| Fase 2 — Frontend residual | Médio | Alto |
+| Fase 3 — E2E residual | Médio | Alto |
+| Fase 4 — Códigos | Alto | Muito alto |
 
 ---
 

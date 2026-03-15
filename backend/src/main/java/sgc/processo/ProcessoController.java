@@ -21,6 +21,8 @@ import sgc.subprocesso.service.SubprocessoService;
 
 import java.net.*;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/processos")
@@ -103,8 +105,23 @@ public class ProcessoController {
         if (processo.getSituacao() != SituacaoProcesso.FINALIZADO) {
             throw new ErroValidacao(MsgValidacao.PROCESSO_DEVE_ESTAR_FINALIZADO);
         }
+        Map<Long, Subprocesso> subprocessosPorUnidade = subprocessoService.listarEntidadesPorProcesso(codigo).stream()
+                .collect(Collectors.toMap(sp -> sp.getUnidade().getCodigo(), Function.identity(), (primeiro, duplicado) -> primeiro));
         List<ProcessoDetalheDto.UnidadeParticipanteDto> dtos = processo.getParticipantes().stream()
-                .map(ProcessoDetalheDto.UnidadeParticipanteDto::fromSnapshot)
+                .map(snapshot -> {
+                    ProcessoDetalheDto.UnidadeParticipanteDto dto = ProcessoDetalheDto.UnidadeParticipanteDto.fromSnapshot(snapshot);
+                    Subprocesso subprocesso = subprocessosPorUnidade.get(snapshot.getUnidadeCodigo());
+                    if (subprocesso != null) {
+                        dto.setSituacaoSubprocesso(subprocesso.getSituacao());
+                        dto.setDataLimite(subprocesso.getDataLimiteEtapa1());
+                        dto.setCodSubprocesso(subprocesso.getCodigo());
+                        if (subprocesso.getMapa() != null) dto.setMapaCodigo(subprocesso.getMapa().getCodigo());
+                        if (subprocesso.getLocalizacaoAtual() != null) {
+                            dto.setLocalizacaoAtualCodigo(subprocesso.getLocalizacaoAtual().getCodigo());
+                        }
+                    }
+                    return dto;
+                })
                 .toList();
         return ResponseEntity.ok(dtos);
     }
