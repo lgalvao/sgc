@@ -1,4 +1,5 @@
 import {expect, type Page} from '@playwright/test';
+import {TEXTOS} from '../../frontend/src/constants/textos.js';
 
 const ROTULOS_TIPO_PROCESSO = {
     MAPEAMENTO: 'Mapeamento',
@@ -39,7 +40,7 @@ export async function criarProcesso(page: Page, options: {
     await page.getByTestId('sel-processo-tipo').selectOption(options.tipo);
     await page.getByTestId('inp-processo-data-limite').fill(calcularDataLimite(dias));
 
-    await expect(page.getByText('Carregando unidades...')).toBeHidden();
+    await expect(page.getByText(TEXTOS.unidade.CARREGANDO)).toBeHidden();
     if (options.expandir) {
         for (const sigla of options.expandir) {
             await page.getByTestId(`btn-arvore-expand-${sigla}`).click();
@@ -145,14 +146,14 @@ export async function verificarDetalhesProcesso(page: Page, dados: {
     situacao: 'Criado' | 'Em andamento' | 'Finalizado'
 }) {
     // Aguardar carregamento dos detalhes
-    await expect(page.getByText('Carregando detalhes do processo...').first()).toBeHidden();
+    await expect(page.getByText(TEXTOS.processo.CARREGANDO_DETALHES).first()).toBeHidden();
 
     // Verificar descrição usando o test-id existente
     await expect(page.getByTestId('processo-info')).toHaveText(dados.descricao);
 
     // Verificar tipo e situação usando getByText
-    await expect(page.getByText(`Tipo: ${dados.tipo}`)).toBeVisible();
-    await expect(page.getByText(`Situação: ${dados.situacao}`)).toBeVisible();
+    await expect(page.getByText(`${TEXTOS.processo.INFO_TIPO}: ${dados.tipo}`)).toBeVisible();
+    await expect(page.getByText(`${TEXTOS.processo.INFO_SITUACAO}: ${dados.situacao}`)).toBeVisible();
 }
 
 export async function verificarUnidadeParticipante(page: Page, unidade: UnidadeParticipante) {

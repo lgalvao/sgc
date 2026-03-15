@@ -35,15 +35,12 @@ public final class MsgValidacao {
     public static final String OBSERVACOES_MAX_1000             = "As observações devem ter no máximo 1000 caracteres";
 
     // ── Sigla de unidade ─────────────────────────────────────────────────────
-    public static final String SIGLA_OBRIGATORIA                = "Sigla é obrigatória";
+    public static final String SIGLA_OBRIGATORIA                = "A sigla é obrigatória";
     public static final String SIGLA_MAX                        = "A sigla deve ter no máximo 20 caracteres";
-    public static final String SIGLA_UNIDADE_OBRIGATORIA        = "A sigla da unidade é obrigatória";
-    public static final String SIGLA_UNIDADE_MAX                = "Sigla da unidade deve ter no máximo 20 caracteres";
 
     // ── Processo ─────────────────────────────────────────────────────────────
     public static final String CODIGO_PROCESSO_OBRIGATORIO      = "O código do processo é obrigatório";
-    public static final String TIPO_PROCESSO_OBRIGATORIO        = "Tipo do processo é obrigatório";
-    public static final String TIPO_PROCESSO_OBRIGATORIO_INICIAR = "O tipo do processo é obrigatório";
+    public static final String TIPO_PROCESSO_OBRIGATORIO        = "O tipo do processo é obrigatório";
     public static final String DATA_LIMITE_OBRIGATORIA          = "Preencha a data limite";
     public static final String DATA_LIMITE_FUTURA               = "A data limite deve ser futura";
     public static final String UNIDADES_PARTICIPANTES_OBRIGATORIO = "Pelo menos uma unidade participante deve ser incluída.";
@@ -147,4 +144,11 @@ public final class MsgValidacao {
     public static final String SEM_PERMISSAO_DISPONIBILIZAR     = "Sem permissão para disponibilizar mapas.";
     public static final String SEM_PERMISSAO_EDITAR_ATIVIDADES  = "Usuário não tem permissão para editar atividades neste subprocesso.";
     public static final String SEM_PERMISSAO_VERIFICAR_IMPACTOS = "Usuário não tem permissão para verificar impactos.";
+
+    // ── Mensagens de Movimentação e Templates ────────────────────────────────
+    public static final String LEMBRETE_PRAZO_ENVIADO           = "Lembrete de prazo enviado";
+    public static final String ASSUNTO_DATA_LIMITE_ALTERADA      = "SGC: Data limite alterada";
+    public static final String CORPO_DATA_LIMITE_ALTERADA        = "Prezado(a) responsável pela %s,%n%n" +
+            "A data limite da etapa atual no processo %s foi alterada para %s.%n";
+    public static final String ERRO_SUBPROCESSO_EM_FASE          = "Subprocesso ainda está em fase de %s.";
 }

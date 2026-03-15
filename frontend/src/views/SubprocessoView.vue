@@ -200,7 +200,7 @@
   <ModalConfirmacao
       v-model="modalLembreteAberto"
       :auto-close="false"
-      :ok-title="TEXTOS.subprocesso.BOTAO_CONFIRMAR_LEMRETE"
+      :ok-title="TEXTOS.subprocesso.BOTAO_CONFIRMAR_LEMBRETE"
       test-id-confirmar="btn-confirmar-enviar-lembrete"
       :titulo="TEXTOS.subprocesso.LEMBRETE_TITULO"
       variant="info"
@@ -333,7 +333,7 @@ function abrirModalAlterarDataLimite() {
   if (podeAlterarDataLimite.value) {
     modals.open('alterarDataLimite');
   } else {
-    notify("Você não tem permissão para alterar a data limite.", 'danger');
+    notify(TEXTOS.subprocesso.ERRO_SEM_PERMISSAO_DATA, 'danger');
   }
 }
 
@@ -353,9 +353,9 @@ async function confirmarAlteracaoDataLimite(novaData: string) {
           {novaData},
       );
       fecharModalAlterarDataLimite();
-      notify("Data limite alterada", 'success');
+      notify(TEXTOS.subprocesso.SUCESSO_DATA_ALTERADA, 'success');
     } catch {
-      notify("Não foi possível alterar a data limite", 'danger');
+      notify(TEXTOS.subprocesso.ERRO_DATA_ALTERADA, 'danger');
     }
   });
 }
@@ -380,7 +380,7 @@ function fecharModalReabrir() {
 
 async function confirmarReabertura() {
   if (!codSubprocesso.value || !justificativaReabertura.value.trim()) {
-    notify("Justificativa é obrigatória", 'danger');
+    notify(TEXTOS.subprocesso.ERRO_JUSTIFICATIVA_OBRIGATORIA, 'danger');
     return;
   }
 
@@ -397,8 +397,8 @@ async function confirmarReabertura() {
       await subprocessosStore.buscarSubprocessoDetalhe(codSubprocesso.value!);
       notify(
           tipoReabertura.value === 'cadastro'
-              ? 'Cadastro reaberto'
-              : 'Revisão reaberta',
+              ? TEXTOS.subprocesso.SUCESSO_CADASTRO_REABERTO
+              : TEXTOS.subprocesso.SUCESSO_REVISAO_REABERTA,
           'success',
       );
     }
@@ -420,9 +420,9 @@ async function enviarLembreteConfirmado() {
     await processosStore.enviarLembrete(props.codProcesso, subprocesso.value.unidade.codigo);
     await subprocessosStore.buscarSubprocessoDetalhe(codSubprocesso.value);
     modalLembreteAberto.value = false;
-    notify('Lembrete enviado', 'success');
+    notify(TEXTOS.subprocesso.SUCESSO_LEMBRETE_ENVIADO, 'success');
   } catch {
-    notify('Não foi possível enviar o lembrete', 'danger');
+    notify(TEXTOS.subprocesso.ERRO_LEMBRETE_ENVIADO, 'danger');
   }
 }
 </script>

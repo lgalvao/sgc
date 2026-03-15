@@ -1,7 +1,7 @@
 <template>
   <BNavbar bg-variant="dark" class="navbar-dark bg-dark border-bottom sticky-top" toggleable="lg" variant="dark">
     <BNavbarBrand class="fw-bold fs-5 me-4 text-white" to="/painel">
-      SGC
+      {{ TEXTOS.comum.NOME_SISTEMA }}
     </BNavbarBrand>
 
     <BNavbarToggle target="nav-collapse"/>
@@ -9,16 +9,16 @@
     <BCollapse id="nav-collapse" is-nav>
       <BNavbarNav class="me-auto">
         <BNavItem to="/painel">
-          <i aria-hidden="true" class="bi bi-house-door me-1"/> Painel
+          <i aria-hidden="true" class="bi bi-house-door me-1"/> {{ TEXTOS.comum.MENU_PAINEL }}
         </BNavItem>
         <BNavItem :to="linkUnidade">
           <i :class="iconUnidade" aria-hidden="true"/> {{ labelUnidade }}
         </BNavItem>
         <BNavItem to="/relatorios">
-          <i aria-hidden="true" class="bi bi-bar-chart-line me-1"/> Relatórios
+          <i aria-hidden="true" class="bi bi-bar-chart-line me-1"/> {{ TEXTOS.comum.MENU_RELATORIOS }}
         </BNavItem>
         <BNavItem to="/historico">
-          <i aria-hidden="true" class="bi bi-clock-history me-1"/> Histórico
+          <i aria-hidden="true" class="bi bi-clock-history me-1"/> {{ TEXTOS.comum.MENU_HISTORICO }}
         </BNavItem>
       </BNavbarNav>
 
@@ -88,6 +88,7 @@ import {computed, onMounted, onUnmounted, ref} from "vue";
 import {useRouter} from "vue-router";
 import {usePerfil} from "@/composables/usePerfil";
 import {usePerfilStore} from "@/stores/perfil";
+import {TEXTOS} from "@/constants/textos";
 
 const router = useRouter();
 const perfilStore = usePerfilStore();
@@ -105,7 +106,7 @@ const isMobile = computed(() => windowWidth.value < 992);
 
 // Para ADMIN: mostra "Unidades" e direciona para a árvore completa
 // Para outros perfis: mostra "Minha unidade" e direciona para unidade do usuário
-const labelUnidade = computed(() => podeAcessarTodasUnidades.value ? 'Unidades' : 'Minha unidade');
+const labelUnidade = computed(() => podeAcessarTodasUnidades.value ? TEXTOS.comum.MENU_UNIDADES : TEXTOS.comum.MENU_MINHA_UNIDADE);
 const iconUnidade = computed(() => podeAcessarTodasUnidades.value ? 'bi bi-diagram-3 me-1' : 'bi bi-person me-1');
 const linkUnidade = computed(() => podeAcessarTodasUnidades.value ? '/unidades' : `/unidade/${perfilStore.unidadeSelecionada}`);
 

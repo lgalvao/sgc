@@ -16,10 +16,10 @@
         >
           <div class="card-click-area">
             <BCardTitle>
-              Atividades e conhecimentos
+              {{ TEXTOS.subprocesso.cards.ATUALIZACAO_CADASTRO_TITULO }}
             </BCardTitle>
             <BCardText class="text-muted">
-              Cadastro de atividades e conhecimentos da unidade
+              {{ TEXTOS.subprocesso.cards.ATUALIZACAO_CADASTRO_TEXTO }}
             </BCardText>
           </div>
         </BCard>
@@ -34,10 +34,10 @@
         >
           <div class="card-click-area">
             <BCardTitle>
-              Atividades e conhecimentos
+              {{ TEXTOS.subprocesso.cards.ATUALIZACAO_CADASTRO_TITULO }}
             </BCardTitle>
             <BCardText class="text-muted">
-              Visualização das atividades e conhecimentos da unidade
+              {{ TEXTOS.subprocesso.cards.VISUALIZACAO_CADASTRO_TEXTO }}
             </BCardText>
           </div>
         </BCard>
@@ -58,10 +58,10 @@
         >
           <div class="card-click-area">
             <BCardTitle>
-              Mapa de Competências
+              {{ TEXTOS.subprocesso.cards.MAPA_TITULO }}
             </BCardTitle>
             <BCardText class="text-muted">
-              Mapa de competências técnicas da unidade
+              {{ TEXTOS.subprocesso.cards.MAPA_TEXTO }}
             </BCardText>
           </div>
         </BCard>
@@ -76,10 +76,10 @@
         >
           <div class="card-click-area">
             <BCardTitle :class="mapaHabilitado ? undefined : 'text-muted'">
-              Mapa de Competências
+              {{ TEXTOS.subprocesso.cards.MAPA_TITULO }}
             </BCardTitle>
             <BCardText class="text-muted">
-              {{ mapaHabilitado ? 'Visualização do mapa de competências técnicas' : 'Mapa de competências técnicas da unidade' }}
+              {{ mapaHabilitado ? TEXTOS.subprocesso.cards.MAPA_VISUALIZACAO_TEXTO : TEXTOS.subprocesso.cards.MAPA_TEXTO }}
             </BCardText>
           </div>
         </BCard>
@@ -101,10 +101,10 @@
         >
           <div class="card-click-area">
             <BCardTitle>
-              Autoavaliação
+              {{ TEXTOS.subprocesso.cards.AUTOAVALIACAO_TITULO }}
             </BCardTitle>
             <BCardText class="text-muted">
-              Realize sua autoavaliação de competências
+              {{ TEXTOS.subprocesso.cards.AUTOAVALIACAO_TEXTO }}
             </BCardText>
           </div>
         </BCard>
@@ -124,10 +124,10 @@
         >
           <div class="card-click-area">
             <BCardTitle>
-              Ocupações críticas
+              {{ TEXTOS.subprocesso.cards.OCUPACOES_TITULO }}
             </BCardTitle>
             <BCardText class="text-muted">
-              Identificação das ocupações críticas da unidade
+              {{ TEXTOS.subprocesso.cards.OCUPACOES_TEXTO }}
             </BCardText>
           </div>
         </BCard>
@@ -146,10 +146,10 @@
         >
           <div class="card-click-area">
             <BCardTitle>
-              Monitoramento
+              {{ TEXTOS.subprocesso.cards.MONITORAMENTO_TITULO }}
             </BCardTitle>
             <BCardText class="text-muted">
-              Acompanhamento e conclusão do diagnóstico da unidade
+              {{ TEXTOS.subprocesso.cards.MONITORAMENTO_TEXTO }}
             </BCardText>
           </div>
         </BCard>
@@ -166,6 +166,7 @@ import {useAcesso} from "@/composables/useAcesso";
 import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useProcessosStore} from "@/stores/processos";
 import {SituacaoProcesso, TipoProcesso, type Mapa, type MapaCompleto} from "@/types/tipos";
+import {TEXTOS} from "@/constants/textos";
 
 const TipoProcessoEnum = TipoProcesso;
 

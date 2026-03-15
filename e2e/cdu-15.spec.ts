@@ -12,6 +12,7 @@ import {
     verificarCompetenciaNoMapa,
     verificarSituacaoSubprocesso
 } from './helpers/helpers-mapas.js';
+import {TEXTOS} from '../frontend/src/constants/textos.js';
 
 test.describe.serial('CDU-15 - Manter mapa de competências', () => {
     const UNIDADE_ALVO = 'SECAO_211';
@@ -36,7 +37,7 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
         await navegarParaMapa(page);
 
-        await expect(page.getByRole('heading', {name: /Mapa de competências/i})).toBeVisible();
+        await expect(page.getByRole('heading', {name: TEXTOS.mapa.TITULO})).toBeVisible();
         await expect(page.getByTestId('btn-abrir-criar-competencia').or(page.getByTestId('btn-abrir-criar-competencia-empty'))).toBeVisible();
         await expect(page.getByTestId('btn-cad-mapa-disponibilizar')).toBeDisabled();
 

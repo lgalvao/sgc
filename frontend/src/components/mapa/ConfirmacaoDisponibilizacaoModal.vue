@@ -2,15 +2,15 @@
   <BModal
       :fade="false"
       :model-value="mostrar"
-      :title="isRevisao ? 'Disponibilização da revisão do cadastro' : 'Disponibilização do cadastro'"
+      :title="isRevisao ? TEXTOS.atividades.MODAL_DISPONIBILIZAR_REVISAO_TITULO : TEXTOS.atividades.MODAL_DISPONIBILIZAR_TITULO"
       centered
       @hide="emit('fechar')"
   >
     <template #default>
       <p>
         {{
-          isRevisao ? 'Confirma a finalização da revisão e a disponibilização do cadastro?' : 'Confirma a finalização e a disponibilização do cadastro?'
-        }} Essa ação bloqueia a edição e habilita a análise do cadastro por unidades superiores.
+          isRevisao ? TEXTOS.atividades.MODAL_DISPONIBILIZAR_REVISAO_TEXTO : TEXTOS.atividades.MODAL_DISPONIBILIZAR_TEXTO
+        }}
       </p>
     </template>
     <template #footer>
@@ -37,6 +37,7 @@
 
 <script lang="ts" setup>
 import {BButton, BModal} from "bootstrap-vue-next";
+import {TEXTOS} from "@/constants/textos";
 
 defineProps<{
   mostrar: boolean;

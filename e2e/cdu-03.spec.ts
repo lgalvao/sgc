@@ -39,7 +39,7 @@ test.describe('CDU-03 - Manter processo', () => {
         await expect(btnSalvar).toBeDisabled();
 
         // Seleciona unidade - agora deve habilitar
-        await expect(page.getByText('Carregando unidades...')).toBeHidden();
+        await expect(page.getByText(TEXTOS.unidade.CARREGANDO)).toBeHidden();
         await page.getByTestId('btn-arvore-expand-SECRETARIA_1').click();
         await page.getByTestId('chk-arvore-unidade-ASSESSORIA_12').click();
         
@@ -56,7 +56,7 @@ test.describe('CDU-03 - Manter processo', () => {
         await page.getByTestId('btn-painel-criar-processo').click();
         await esperarPaginaCadastroProcesso(page);
         await page.getByTestId('sel-processo-tipo').selectOption('MAPEAMENTO');
-        await expect(page.getByText('Carregando unidades...')).toBeHidden();
+        await expect(page.getByText(TEXTOS.unidade.CARREGANDO)).toBeHidden();
 
         // SECRETARIA_1 é interoperacional
         const chkRaiz = page.getByTestId('chk-arvore-unidade-SECRETARIA_1');
@@ -116,7 +116,7 @@ test.describe('CDU-03 - Manter processo', () => {
 
         await page.getByTestId('tbl-processos').getByText(descricao).first().click();
         await page.getByTestId('btn-processo-remover').click();
-        await expect(page.getByText(`Remover o processo '${descricao}'?`)).toBeVisible();
+        await expect(page.getByText(TEXTOS.processo.cadastro.REMOVER_CONFIRMACAO(descricao))).toBeVisible();
 
         await page.getByRole('dialog').getByRole('button', {name: 'Remover'}).click();
         await esperarPaginaPainel(page);
@@ -128,7 +128,7 @@ test.describe('CDU-03 - Manter processo', () => {
         await page.getByTestId('btn-painel-criar-processo').click();
         await esperarPaginaCadastroProcesso(page);
         await page.getByTestId('sel-processo-tipo').selectOption('MAPEAMENTO');
-        await expect(page.getByText('Carregando unidades...')).toBeHidden();
+        await expect(page.getByText(TEXTOS.unidade.CARREGANDO)).toBeHidden();
 
         await page.getByTestId('btn-arvore-expand-SECRETARIA_1').click();
         await page.getByTestId('btn-arvore-expand-COORD_11').click();
@@ -182,7 +182,7 @@ test.describe('CDU-03 - Manter processo', () => {
         await page.getByTestId('btn-painel-criar-processo').click();
         await esperarPaginaCadastroProcesso(page);
         await page.getByTestId('sel-processo-tipo').selectOption('MAPEAMENTO');
-        await expect(page.getByText('Carregando unidades...')).toBeHidden();
+        await expect(page.getByText(TEXTOS.unidade.CARREGANDO)).toBeHidden();
         await page.getByTestId('btn-arvore-expand-SECRETARIA_1').click();
 
         const chkOcupada = page.getByTestId('chk-arvore-unidade-ASSESSORIA_12');
@@ -196,7 +196,7 @@ test.describe('CDU-03 - Manter processo', () => {
         await page.getByTestId('btn-painel-criar-processo').click();
         await esperarPaginaCadastroProcesso(page);
         await page.getByTestId('sel-processo-tipo').selectOption('REVISAO');
-        await expect(page.getByText('Carregando unidades...')).toBeHidden();
+        await expect(page.getByText(TEXTOS.unidade.CARREGANDO)).toBeHidden();
 
         await page.getByTestId('btn-arvore-expand-SECRETARIA_1').click();
 
@@ -244,7 +244,7 @@ test.describe('CDU-03 - Manter processo', () => {
         await page.getByTestId('tbl-processos').getByText(descricao).first().click();
         await page.getByTestId('btn-processo-remover').click();
         await page.getByTestId('btn-modal-confirmacao-cancelar').click();
-        await expect(page.getByText(`Remover o processo '${descricao}'?`)).toBeHidden();
+        await expect(page.getByText(TEXTOS.processo.cadastro.REMOVER_CONFIRMACAO(descricao))).toBeHidden();
     });
 
     test('Deve validar fluxo alternativo (Botão iniciar invés de Salvar)', async ({
@@ -260,7 +260,7 @@ test.describe('CDU-03 - Manter processo', () => {
         await page.getByTestId('inp-processo-data-limite').fill(dataLimite.toISOString().split('T')[0]);
         await page.getByTestId('sel-processo-tipo').selectOption('MAPEAMENTO');
 
-        await expect(page.getByText('Carregando unidades...')).toBeHidden();
+        await expect(page.getByText(TEXTOS.unidade.CARREGANDO)).toBeHidden();
         await page.getByTestId('btn-arvore-expand-SECRETARIA_1').click();
         await page.getByTestId('chk-arvore-unidade-ASSESSORIA_12').click();
         await page.getByTestId('btn-processo-iniciar').click();

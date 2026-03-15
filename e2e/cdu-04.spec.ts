@@ -41,7 +41,7 @@ test.describe('CDU-04 - Iniciar processo', () => {
         // 2. Iniciar processo
         await page.getByTestId('btn-processo-iniciar').click();
         const modal = page.getByRole('dialog');
-        await expect(modal.getByText(/Ao iniciar o processo, não será mais possível editá-lo ou removê-lo/i)).toBeVisible();
+        await expect(modal.getByText(TEXTOS.processo.cadastro.INICIAR_CONFIRMACAO)).toBeVisible();
         await page.getByTestId('btn-iniciar-processo-confirmar').click();
 
         // Aguarda toast e redirect
@@ -71,7 +71,7 @@ test.describe('CDU-04 - Iniciar processo', () => {
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText('Não iniciado');
         
         const timeline = page.getByTestId('tbl-movimentacoes');
-        await expect(timeline.getByText(/Processo iniciado/i)).toBeVisible();
+        await expect(timeline.getByText(TEXTOS.movimentacao.PROCESSO_INICIADO)).toBeVisible();
 
         const contextoChefeAss11 = await browser.newContext();
         const paginaChefeAss11 = await contextoChefeAss11.newPage();

@@ -19,6 +19,7 @@ import {
     navegarParaAtividadesVisualizacao,
 } from './helpers/helpers-atividades.js';
 import {criarCompetencia, disponibilizarMapa, navegarParaMapa,} from './helpers/helpers-mapas.js';
+import {TEXTOS} from '../frontend/src/constants/textos.js';
 
 
 test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
@@ -188,7 +189,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
 
         const modal = page.getByRole('dialog');
         await expect(modal).toBeVisible();
-        await expect(modal.getByText('Ao iniciar o processo, não será mais possível editá-lo')).toBeVisible();
+        await expect(modal.getByText(TEXTOS.processo.cadastro.INICIAR_CONFIRMACAO)).toBeVisible();
         await page.getByTestId('btn-iniciar-processo-confirmar').click();
 
         // Validação: Redirecionamento e situação do processo iniciado

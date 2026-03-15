@@ -44,7 +44,7 @@
             v-if="!processosStore.processosParaImportacao.length"
             class="text-center text-muted mt-3"
         >
-          Nenhum processo disponível para importação.
+          {{ TEXTOS.atividades.importacao.NENHUM_PROCESSO }}
         </div>
       </div>
 
@@ -98,7 +98,7 @@
             v-else
             class="text-center text-muted mt-3"
         >
-          Nenhuma atividade encontrada para esta unidade/processo.
+          {{ TEXTOS.atividades.importacao.NENHUMA_ATIVIDADE }}
         </div>
       </div>
     </fieldset>
@@ -142,6 +142,7 @@ import {useApi} from "@/composables/useApi";
 import {useProcessosStore} from "@/stores/processos";
 import * as subprocessoService from "@/services/subprocessoService";
 import {type Atividade, type ProcessoResumo, type UnidadeImportacao,} from "@/types/tipos";
+import {TEXTOS} from "@/constants/textos";
 
 const props = defineProps<{
   mostrar: boolean;
@@ -255,7 +256,7 @@ async function importar() {
     return;
   }
   if (atividadesSelecionadas.value.length === 0) {
-    erroImportacao.value = "Selecione ao menos uma atividade para importar.";
+    erroImportacao.value = TEXTOS.atividades.importacao.SELECIONE_ATIVIDADE;
     return;
   }
 

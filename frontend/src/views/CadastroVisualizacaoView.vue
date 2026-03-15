@@ -23,25 +23,25 @@
             variant="outline-info"
             @click="abrirModalHistoricoAnalise"
         >
-          Histórico de análise
+          {{ TEXTOS.atividades.BOTAO_HISTORICO_ANALISE }}
         </BButton>
         <BButton
             v-if="podeDevolverCadastro"
             data-testid="btn-acao-devolver"
-            title="Devolver para ajustes"
+            :title="TEXTOS.atividades.BOTAO_DEVOLVER"
             variant="secondary"
             @click="devolverCadastro"
         >
-          Devolver para ajustes
+          {{ TEXTOS.atividades.BOTAO_DEVOLVER }}
         </BButton>
         <BButton
             v-if="podeAceitarCadastro || podeHomologarCadastro"
             data-testid="btn-acao-analisar-principal"
-            title="Validar"
+            :title="podeHomologarCadastro ? TEXTOS.atividades.BOTAO_HOMOLOGAR : TEXTOS.atividades.BOTAO_ACEITAR"
             variant="success"
             @click="validarCadastro"
         >
-          {{ podeHomologarCadastro ? 'Homologar' : 'Registrar aceite' }}
+          {{ podeHomologarCadastro ? TEXTOS.atividades.BOTAO_HOMOLOGAR : TEXTOS.atividades.BOTAO_ACEITAR }}
         </BButton>
       </template>
     </PageHeader>
@@ -90,16 +90,16 @@
         v-model="mostrarModalValidar"
         :auto-close="false"
         :loading="loadingValidacao"
-        :titulo="isHomologacao ? 'Homologação do cadastro' : (isRevisao ? 'Aceite da revisão do cadastro' : 'Validação do cadastro')"
-        ok-title="Confirmar"
+        :titulo="isHomologacao ? TEXTOS.atividades.MODAL_HOMOLOGAR_TITULO : (isRevisao ? TEXTOS.atividades.MODAL_ACEITE_REVISAO_TITULO : TEXTOS.atividades.MODAL_VALIDAR_TITULO)"
+        :ok-title="TEXTOS.comum.BOTAO_CONFIRMAR"
         test-id-confirmar="btn-aceite-cadastro-confirmar"
         variant="success"
         @confirmar="confirmarValidacao"
     >
       <p>{{
-          isHomologacao ? 'Confirma a homologação?' : (isRevisao ? 'Confirma o aceite da revisão do cadastro de atividades?' : 'Confirma o aceite do cadastro de atividades?')
+          isHomologacao ? TEXTOS.atividades.MODAL_HOMOLOGAR_TEXTO : (isRevisao ? TEXTOS.atividades.MODAL_ACEITE_REVISAO_TEXTO : TEXTOS.atividades.MODAL_VALIDAR_TEXTO)
         }}</p>
-      <BFormGroup class="mb-3" label="Observação" label-for="observacaoValidacao">
+      <BFormGroup class="mb-3" :label="TEXTOS.comum.OBSERVACAO" label-for="observacaoValidacao">
         <BFormTextarea
             id="observacaoValidacao"
             v-model="observacaoValidacao"
@@ -115,14 +115,14 @@
         :auto-close="false"
         :loading="loadingDevolucao"
         :ok-disabled="!observacaoDevolucao.trim()"
-        :titulo="isRevisao ? 'Devolução da revisão do cadastro' : 'Devolução do cadastro'"
-        ok-title="Confirmar"
+        :titulo="isRevisao ? TEXTOS.atividades.MODAL_DEVOLVER_REVISAO_TITULO : TEXTOS.atividades.MODAL_DEVOLVER_TITULO"
+        :ok-title="TEXTOS.comum.BOTAO_CONFIRMAR"
         test-id-confirmar="btn-devolucao-cadastro-confirmar"
         variant="danger"
         @confirmar="confirmarDevolucao"
     >
       <p>{{
-          isRevisao ? 'Confirma a devolução da revisão do cadastro para ajustes?' : 'Confirma a devolução do cadastro para ajustes?'
+          isRevisao ? TEXTOS.atividades.MODAL_DEVOLVER_REVISAO_TEXTO : TEXTOS.atividades.MODAL_DEVOLVER_TEXTO
         }}</p>
       <BFormGroup class="mb-3" label-for="observacaoDevolucao">
         <template #label>
@@ -136,7 +136,7 @@
             rows="3"
         />
         <BFormInvalidFeedback :state="estadoObservacaoDevolucao">
-          A justificativa é obrigatória para a devolução.
+          {{ TEXTOS.atividades.ERRO_DEVOLUCAO_JUSTIFICATIVA }}
         </BFormInvalidFeedback>
       </BFormGroup>
     </ModalConfirmacao>

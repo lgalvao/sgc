@@ -1,5 +1,6 @@
 import {expect, type Page} from '@playwright/test';
 import {limparNotificacoes, verificarPaginaPainel} from './helpers-navegacao.js';
+import {TEXTOS} from '../../frontend/src/constants/textos.js';
 
 /**
  * Acessa subprocesso como GESTOR (via lista de unidades)
@@ -56,7 +57,7 @@ export async function acessarSubprocessoAdmin(page: Page, descricaoProcesso: str
     await expect(page.getByTestId('tbl-processos').getByText(descricaoProcesso).first()).toBeVisible();
     await page.getByTestId('tbl-processos').getByText(descricaoProcesso).first().click();
 
-    await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
+    await expect(page.getByRole('heading', {name: TEXTOS.subprocesso.DETALHE_UNIDADES_TITULO})).toBeVisible();
 
     const match = /\/processo\/(\d+)/.exec(page.url());
     expect(match).not.toBeNull();
@@ -76,7 +77,7 @@ export async function abrirHistoricoAnalise(page: Page) {
     await expect(itemHistorico).toBeVisible();
     await itemHistorico.click();
 
-    const modal = page.locator('.modal-content').filter({hasText: 'Histórico de Análise'});
+    const modal = page.locator('.modal-content').filter({hasText: TEXTOS.atividades.MODAL_HISTORICO_TITULO});
     await expect(modal).toBeVisible();
     return modal;
 }
@@ -86,7 +87,7 @@ export async function abrirHistoricoAnalise(page: Page) {
  */
 export async function abrirHistoricoAnaliseVisualizacao(page: Page) {
     await page.getByTestId('btn-vis-atividades-historico').click();
-    const modal = page.locator('.modal-content').filter({hasText: 'Histórico de Análise'});
+    const modal = page.locator('.modal-content').filter({hasText: TEXTOS.atividades.MODAL_HISTORICO_TITULO});
     await expect(modal).toBeVisible();
     return modal;
 }
@@ -95,7 +96,7 @@ export async function abrirHistoricoAnaliseVisualizacao(page: Page) {
  * Fecha modal de histórico de análise
  */
 export async function fecharHistoricoAnalise(page: Page) {
-    const modal = page.locator('.modal-content').filter({hasText: 'Histórico de Análise'});
+    const modal = page.locator('.modal-content').filter({hasText: TEXTOS.atividades.MODAL_HISTORICO_TITULO});
     const btnFechar = modal.getByRole('button', {name: 'Fechar'});
     await expect(btnFechar).toBeVisible();
     await btnFechar.click();
@@ -111,6 +112,7 @@ async function realizarDevolucao(page: Page, observacao: string = '') {
     await limparNotificacoes(page);
     await page.getByTestId('btn-acao-devolver').click();
     await expect(page.getByRole('dialog')).toBeVisible();
+    // Verifica regex para cobrir variações de devolução
     await expect(page.getByText(/Confirma a devolução.*para ajustes/i)).toBeVisible();
 
     if (observacao) {
@@ -190,7 +192,7 @@ export async function homologarCadastroMapeamento(page: Page) {
 
     // Modal: "Homologação do cadastro"
     await expect(page.getByRole('dialog')).toBeVisible();
-    await expect(page.getByText(/Confirma a homologação\?/i)).toBeVisible();
+    await expect(page.getByText(TEXTOS.atividades.MODAL_HOMOLOGAR_TEXTO)).toBeVisible();
 
     await page.getByTestId('inp-aceite-cadastro-obs').fill('Homologado sem ressalvas');
 

@@ -1,5 +1,6 @@
 import {expect, type Page} from '@playwright/test';
 import {limparNotificacoes, verificarPaginaPainel, verificarToast} from './helpers-navegacao.js';
+import {TEXTOS} from '../../frontend/src/constants/textos.js';
 
 function extrairRotaSubprocesso(page: Page): { codigoProcesso: string; siglaUnidade: string } {
     const match = /\/processo\/(\d+)\/([A-Z0-9_]+)/.exec(page.url());
@@ -16,7 +17,7 @@ export async function navegarParaAtividades(page: Page) {
     await card.click();
     await page.waitForURL(/\/cadastro$/);
 
-    await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos', level: 2})).toBeVisible();
+    await expect(page.getByRole('heading', {name: TEXTOS.atividades.TITULO, level: 2})).toBeVisible();
     await expect(page.getByTestId('inp-nova-atividade')).toBeVisible();
 }
 
@@ -24,7 +25,7 @@ export async function navegarParaAtividadesVisualizacao(page: Page) {
     const {codigoProcesso, siglaUnidade} = extrairRotaSubprocesso(page);
     await page.goto(`/processo/${codigoProcesso}/${siglaUnidade}/vis-cadastro`);
     await expect(page).toHaveURL(new RegExp(String.raw`/processo/${codigoProcesso}/${siglaUnidade}/vis-cadastro$`));
-    await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos'})).toBeVisible();
+    await expect(page.getByRole('heading', {name: TEXTOS.atividades.TITULO})).toBeVisible();
 }
 
 
@@ -87,7 +88,7 @@ export async function removerAtividade(page: Page, descricao: string | RegExp) {
     await btnRemover.click();
 
     const dialog = page.getByRole('dialog');
-    await expect(dialog.getByText('Confirma a remoção desta atividade e todos os conhecimentos associados?')).toBeVisible();
+    await expect(dialog.getByText(TEXTOS.atividades.MODAL_REMOVER_ATIVIDADE_TEXTO)).toBeVisible();
     await page.getByTestId('btn-modal-confirmacao-confirmar').click();
     await expect(page.getByText(descricao)).toBeHidden();
 }
@@ -136,7 +137,7 @@ export async function removerConhecimento(page: Page, atividadeDescricao: string
     await btnRemover.click();
 
     const dialog = page.getByRole('dialog');
-    await expect(dialog.getByText('Confirma a remoção deste conhecimento?')).toBeVisible();
+    await expect(dialog.getByText(TEXTOS.atividades.MODAL_REMOVER_CONHECIMENTO_TEXTO)).toBeVisible();
     await page.getByTestId('btn-modal-confirmacao-confirmar').click();
     await expect(card.getByText(conhecimento)).toBeHidden();
 }
@@ -214,7 +215,7 @@ export async function selecionarAtividadesParaImportacao(page: Page, processoOri
     }
 
     const modal = page.getByRole('dialog');
-    await expect(modal.getByText('Importação de atividades')).toBeVisible();
+    await expect(modal.getByText(TEXTOS.atividades.MODAL_IMPORTAR_TITULO)).toBeVisible();
 
     await modal.getByTestId('select-processo').selectOption({ label: processoOrigemDescricao });
     const selectUnidade = modal.getByTestId('select-unidade');
@@ -223,7 +224,7 @@ export async function selecionarAtividadesParaImportacao(page: Page, processoOri
     let valorOpcaoUnidade: string | null = null;
     await expect.poll(async () => {
         valorOpcaoUnidade = await selectUnidade.locator('option').evaluateAll((options, sigla) => {
-            const opcao = options.find(option => option.textContent?.includes(sigla as string));
+            const opcao = options.find(option => option.textContent?.includes(sigla));
             return opcao?.getAttribute('value') ?? null;
         }, unidadeOrigemSigla);
         return valorOpcaoUnidade;
@@ -244,7 +245,7 @@ export async function selecionarAtividadesParaImportacao(page: Page, processoOri
 
     await expect.poll(async () => {
         const quantidadeCheckboxes = await modal.locator('input[type="checkbox"]').count();
-        const estadoVazio = await modal.getByText('Nenhuma atividade encontrada para esta unidade/processo.').isVisible()
+        const estadoVazio = await modal.getByText(TEXTOS.atividades.importacao.NENHUMA_ATIVIDADE).isVisible()
             .catch(() => false);
         return quantidadeCheckboxes > 0 || estadoVazio;
     }, { timeout: 10000 }).toBeTruthy();
@@ -309,7 +310,7 @@ export async function verificarOpcoesImportacao(
     }
 
     const modal = page.getByRole('dialog');
-    await expect(modal.getByText('Importação de atividades')).toBeVisible();
+    await expect(modal.getByText(TEXTOS.atividades.MODAL_IMPORTAR_TITULO)).toBeVisible();
 
     const selectProcesso = modal.getByTestId('select-processo');
     const processosEsperados = opcoesEsperadas.map(opcao => opcao.processo);

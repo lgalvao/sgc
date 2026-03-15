@@ -2,6 +2,7 @@ import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcessoRevisaoCadastroHomologadoFixture} from './fixtures/fixtures-processos.js';
 import {criarCompetencia, navegarParaMapa} from './helpers/helpers-mapas.js';
 import {acessarSubprocessoAdmin} from './helpers/helpers-analise.js';
+import {TEXTOS} from '../frontend/src/constants/textos.js';
 
 test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
     const UNIDADE_ALVO = 'SECAO_211';
@@ -27,7 +28,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
             await acessarSubprocessoAdmin(page, descProcessoRevisao, UNIDADE_ALVO);
             await navegarParaMapa(page);
 
-            await expect(page.getByRole('heading', {name: /Mapa de competências/i})).toBeVisible();
+            await expect(page.getByRole('heading', {name: TEXTOS.mapa.TITULO})).toBeVisible();
             await expect(page.getByTestId('cad-mapa__btn-impactos-mapa')).toBeVisible();
             await expect(page.getByTestId('btn-cad-mapa-disponibilizar')).toBeVisible();
             await expect(page.getByText(competencia1)).toBeVisible();
@@ -39,9 +40,9 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
             await expect(page.getByTestId('modal-impacto-body')).toBeVisible();
 
             const modal = page.getByRole('dialog');
-            await expect(modal.getByText('Atividades inseridas')).toBeVisible();
+            await expect(modal.getByText(TEXTOS.mapa.impacto.ATIVIDADES_INSERIDAS)).toBeVisible();
             await expect(modal.getByText(atividadeNovaRevisao)).toBeVisible();
-            await expect(modal.getByText('Competências impactadas')).toBeVisible();
+            await expect(modal.getByText(TEXTOS.mapa.impacto.COMPETENCIAS_IMPACTADAS)).toBeVisible();
             await expect(modal.getByText(competencia2)).toBeVisible();
             await expect(modal.getByText(competencia3)).toBeVisible();
 

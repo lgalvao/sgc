@@ -16,8 +16,8 @@ public record CriarAnaliseRequest(
         @Nullable
         String observacoes,
 
-        @NotNull(message = MsgValidacao.SIGLA_UNIDADE_OBRIGATORIA)
-        @Size(max = 20, message = MsgValidacao.SIGLA_UNIDADE_MAX)
+        @NotBlank(message = MsgValidacao.SIGLA_OBRIGATORIA)
+        @Size(max = 20, message = MsgValidacao.SIGLA_MAX)
         String siglaUnidade,
 
         @Size(max = 200, message = MsgValidacao.MOTIVO_MAX)

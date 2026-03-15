@@ -1,61 +1,49 @@
 <template>
   <LayoutPadrao>
-    <PageHeader title="Mapa de competências técnicas">
+    <PageHeader :title="TEXTOS.mapa.TITULO_TECNICO">
       <template #actions>
         <BButton
             v-if="podeValidar"
             data-testid="btn-mapa-sugestoes"
-            title="Apresentar sugestões"
-            variant="outline-warning"
             @click="abrirModalSugestoes"
         >
-          Apresentar sugestões
+          {{ TEXTOS.mapa.BOTAO_SUGESTOES }}
         </BButton>
         <BButton
             v-if="podeValidar"
             data-testid="btn-mapa-validar"
-            title="Validar mapa"
-            variant="outline-success"
             @click="abrirModalValidar"
         >
-          Validar
+          {{ TEXTOS.mapa.BOTAO_VALIDAR }}
         </BButton>
 
         <BButton
             v-if="podeVerSugestoes"
             data-testid="btn-mapa-ver-sugestoes"
-            title="Ver sugestões"
-            variant="outline-info"
             @click="verSugestoes"
         >
-          Ver sugestões
+          {{ TEXTOS.mapa.BOTAO_VER_SUGESTOES }}
         </BButton>
         <BButton
             v-if="(podeValidar && temHistoricoAnalise) || podeAnalisar"
             :data-testid="podeAnalisar ? 'btn-mapa-historico-gestor' : 'btn-mapa-historico'"
-            title="Histórico de análise"
-            variant="outline-secondary"
             @click="verHistorico"
         >
-          Histórico de análise
+          {{ TEXTOS.mapa.BOTAO_HISTORICO }}
         </BButton>
         <BButton
             v-if="podeAnalisar"
             data-testid="btn-mapa-devolver"
-            title="Devolver para ajustes"
-            variant="outline-danger"
             @click="abrirModalDevolucao"
         >
-          Devolver para ajustes
+          {{ TEXTOS.mapa.BOTAO_DEVOLVER }}
         </BButton>
         <BButton
             v-if="podeAnalisar"
             data-testid="btn-mapa-homologar-aceite"
-            title="Aceitar"
-            variant="outline-success"
             @click="abrirModalAceitar"
         >
-          {{ podeHomologarMapa ? 'Homologar' : 'Registrar aceite' }}
+          {{ podeHomologarMapa ? TEXTOS.mapa.LABEL_HOMOLOGAR : TEXTOS.mapa.LABEL_REGISTRAR_ACEITE }}
         </BButton>
       </template>
     </PageHeader>
@@ -343,7 +331,7 @@ async function confirmarSugestoes() {
     toastStore.setPending(TEXTOS.sucesso.MAPA_SUBMETIDO_COM_SUGESTOES);
     await router.push({name: "Painel"});
   } catch {
-    notify("Erro ao apresentar sugestões", 'danger');
+    notify(TEXTOS.mapa.ERRO_SUGESTOES, 'danger');
   } finally {
     isLoading.value = false;
   }
@@ -358,7 +346,7 @@ async function confirmarValidacao() {
     toastStore.setPending(TEXTOS.sucesso.MAPA_VALIDADO_SUBMETIDO);
     await router.push({name: "Painel"});
   } catch {
-    notify("Erro ao validar o mapa", 'danger');
+    notify(TEXTOS.mapa.ERRO_VALIDAR, 'danger');
   } finally {
     isLoading.value = false;
   }
@@ -384,7 +372,7 @@ async function confirmarAceitacao() {
     await router.push({name: "Painel"});
   } catch (error) {
     logger.error(error);
-    notify("Erro ao realizar a operação", 'danger');
+    notify(TEXTOS.comum.ERRO_OPERACAO, 'danger');
   } finally {
     isLoading.value = false;
   }
@@ -402,7 +390,7 @@ async function confirmarDevolucao() {
     await router.push({name: "Painel"});
   } catch (error) {
     logger.error(error);
-    notify("Erro ao devolver", 'danger');
+    notify(TEXTOS.mapa.ERRO_DEVOLVER, 'danger');
   } finally {
     isLoading.value = false;
   }

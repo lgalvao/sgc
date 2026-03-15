@@ -93,7 +93,7 @@
         @confirmar="removerAdmin"
     >
       <p v-if="adminParaRemover">
-        Deseja realmente remover <strong>{{ adminParaRemover.nome }}</strong> como administrador do sistema?
+        {{ TEXTOS.administracao.MODAL_REMOVER_PERGUNTA(adminParaRemover.nome) }}
       </p>
     </ModalConfirmacao>
   </LayoutPadrao>
