@@ -2,6 +2,7 @@ package sgc.seguranca.dto;
 
 import jakarta.validation.constraints.*;
 import lombok.*;
+import sgc.comum.MsgValidacao;
 import sgc.comum.model.*;
 
 /**
@@ -12,7 +13,7 @@ public record AutenticarRequest(
         @TituloEleitoral
         String tituloEleitoral,
 
-        @NotNull(message = "A senha é obrigatória.")
-        @Size(max = 64, message = "A senha deve ter no máximo 64 caracteres.")
+        @NotNull(message = MsgValidacao.SENHA_OBRIGATORIA)
+        @Size(max = 64, message = MsgValidacao.SENHA_MAX)
         String senha) {
 }

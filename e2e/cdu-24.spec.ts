@@ -2,6 +2,7 @@ import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcessoCadastroHomologadoFixture} from './fixtures/fixtures-processos.js';
 import {criarCompetencia, navegarParaMapa} from './helpers/helpers-mapas.js';
 import {navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
+import {TEXTOS} from '../frontend/src/constants/textos.js';
 
 /**
  * CDU-24 - Disponibilizar mapas de competências em bloco
@@ -53,7 +54,7 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
         await modal.getByLabel(/Data limite/i).fill(`${yyyy}-${mm}-${dd}`);
 
         await modal.getByRole('button', {name: /^Disponibilizar$/i}).click();
-        await expect(page.getByText(/Mapas de competências disponibilizados em bloco/i).first()).toBeVisible();
+        await expect(page.getByText(TEXTOS.sucesso.MAPAS_DISPONIBILIZADOS_EM_BLOCO).first()).toBeVisible();
         await expect(page).toHaveURL(/\/painel/);
     });
 });

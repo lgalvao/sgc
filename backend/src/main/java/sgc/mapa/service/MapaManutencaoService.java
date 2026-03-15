@@ -4,6 +4,7 @@ import lombok.extern.slf4j.*;
 import org.springframework.context.annotation.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
+import sgc.comum.MsgValidacao;
 import sgc.comum.erros.*;
 import sgc.comum.model.*;
 import sgc.mapa.dto.*;
@@ -325,13 +326,13 @@ public class MapaManutencaoService {
         boolean existe = atividadeRepo.findByMapaCodigoSemFetch(codMapa).stream()
                 .anyMatch(a -> a.getDescricao().equalsIgnoreCase(desc));
 
-        if (existe) throw new ErroValidacao("Já existe uma atividade com esta descrição neste mapa.");
+        if (existe) throw new ErroValidacao(MsgValidacao.DESCRICAO_ATIVIDADE_DUPLICADA);
     }
 
     private void validarDescricaoConhecimentoUnica(Long codAtividade, String descricao) {
         boolean existe = conhecimentoRepo.findByAtividade_Codigo(codAtividade).stream()
                 .anyMatch(c -> c.getDescricao().equalsIgnoreCase(descricao));
 
-        if (existe) throw new ErroValidacao("Já existe um conhecimento com esta descrição nesta atividade.");
+        if (existe) throw new ErroValidacao(MsgValidacao.DESCRICAO_CONHECIMENTO_DUPLICADA);
     }
 }

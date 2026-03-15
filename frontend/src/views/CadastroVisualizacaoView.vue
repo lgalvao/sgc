@@ -169,6 +169,7 @@ import type {
 import {TipoProcesso} from "@/types/tipos";
 import {useAcesso} from "@/composables/useAcesso";
 import {listarAnalisesCadastro} from "@/services/analiseService";
+import {TEXTOS} from "@/constants/textos";
 
 const props = defineProps<{
   codProcesso: number | string;
@@ -312,7 +313,7 @@ async function confirmarValidacao() {
 
       if (sucesso) {
         fecharModalValidar();
-        toastStore.setPending("Homologação efetivada");
+        toastStore.setPending(TEXTOS.sucesso.HOMOLOGACAO_EFETIVADA);
         await router.push({
           name: "Subprocesso",
           params: {
@@ -333,7 +334,7 @@ async function confirmarValidacao() {
 
       if (sucesso) {
         fecharModalValidar();
-        toastStore.setPending("Aceite registrado");
+        toastStore.setPending(TEXTOS.sucesso.ACEITE_REGISTRADO);
         await router.push({name: "Painel"});
       }
     }
@@ -362,7 +363,7 @@ async function confirmarDevolucao() {
 
     if (sucesso) {
       fecharModalDevolver();
-      toastStore.setPending("Devolução realizada");
+      toastStore.setPending(TEXTOS.sucesso.DEVOLUCAO_REALIZADA);
       await router.push("/painel");
     }
   } finally {

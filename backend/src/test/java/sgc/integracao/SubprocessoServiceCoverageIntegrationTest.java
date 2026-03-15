@@ -3,6 +3,7 @@ package sgc.integracao;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.transaction.annotation.*;
+import sgc.comum.MsgValidacao;
 import sgc.comum.erros.*;
 import sgc.fixture.*;
 import sgc.mapa.model.*;
@@ -62,7 +63,7 @@ class SubprocessoServiceCoverageIntegrationTest extends BaseIntegrationTest {
     void validarExistenciaAtividades_SemAtividades() {
         assertThatThrownBy(() -> validacaoService.validarExistenciaAtividades(subprocesso))
                 .isInstanceOf(ErroValidacao.class)
-                .hasMessage("O mapa de competências deve ter ao menos uma atividade cadastrada.");
+                .hasMessage(MsgValidacao.MAPA_SEM_ATIVIDADES);
     }
 
     @Test
@@ -73,6 +74,6 @@ class SubprocessoServiceCoverageIntegrationTest extends BaseIntegrationTest {
 
         assertThatThrownBy(() -> validacaoService.validarExistenciaAtividades(subprocesso))
                 .isInstanceOf(ErroValidacao.class)
-                .hasMessage("Todas as atividades devem possuir conhecimentos vinculados. Verifique as atividades pendentes.");
+                .hasMessage(MsgValidacao.ATIVIDADES_SEM_CONHECIMENTOS);
     }
 }

@@ -1,6 +1,7 @@
 import {expect, type Page} from '@playwright/test';
 import {calcularDataLimite} from './helpers-processos.js';
 import {limparNotificacoes, verificarPaginaPainel, verificarToast} from './helpers-navegacao.js';
+import {TEXTOS} from '../../frontend/src/constants/textos.js';
 
 function extrairRotaSubprocesso(page: Page): { codigoProcesso: string; siglaUnidade: string } {
     const match = /\/processo\/(\d+)\/([A-Z0-9_]+)/.exec(page.url());
@@ -159,5 +160,5 @@ export async function disponibilizarMapa(page: Page, dataLimite?: string) {
 
     await expect(modal).toBeHidden();
     await verificarPaginaPainel(page);
-    await verificarToast(page, /Disponibilização do mapa de competências efetuada/i);
+    await verificarToast(page, TEXTOS.sucesso.MAPA_DISPONIBILIZADO);
 }

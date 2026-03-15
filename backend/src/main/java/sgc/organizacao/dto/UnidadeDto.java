@@ -3,6 +3,7 @@ package sgc.organizacao.dto;
 import com.fasterxml.jackson.annotation.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
+import sgc.comum.MsgValidacao;
 import sgc.organizacao.model.*;
 
 import java.util.*;
@@ -24,8 +25,8 @@ public class UnidadeDto {
     @JsonView(OrganizacaoViews.Publica.class)
     private String nome;
     @JsonView(OrganizacaoViews.Publica.class)
-    @NotBlank(message = "Sigla é obrigatória")
-    @Size(max = 20, message = "A sigla deve ter no máximo 20 caracteres")
+    @NotBlank(message = MsgValidacao.SIGLA_OBRIGATORIA)
+    @Size(max = 20, message = MsgValidacao.SIGLA_MAX)
     private String sigla;
     @JsonView(OrganizacaoViews.Publica.class)
     private Long codigoPai;

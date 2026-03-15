@@ -10,6 +10,7 @@ import org.springframework.security.access.prepost.*;
 import org.springframework.security.core.annotation.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.*;
+import sgc.comum.MsgValidacao;
 import sgc.comum.erros.*;
 import sgc.organizacao.model.*;
 import sgc.processo.dto.*;
@@ -100,7 +101,7 @@ public class ProcessoController {
             @PathVariable Long codigo) {
         Processo processo = processoService.buscarPorCodigoComParticipantes(codigo);
         if (processo.getSituacao() != SituacaoProcesso.FINALIZADO) {
-            throw new ErroValidacao("Processo deve estar finalizado.");
+            throw new ErroValidacao(MsgValidacao.PROCESSO_DEVE_ESTAR_FINALIZADO);
         }
         List<ProcessoDetalheDto.UnidadeParticipanteDto> dtos = processo.getParticipantes().stream()
                 .map(ProcessoDetalheDto.UnidadeParticipanteDto::fromSnapshot)

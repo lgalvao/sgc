@@ -179,6 +179,7 @@ import {formatSituacaoSubprocesso} from "@/utils/formatters";
 import * as atividadeService from "@/services/atividadeService";
 import {listarAnalisesCadastro} from "@/services/analiseService";
 import {useErrorHandler} from "@/composables/useErrorHandler";
+import {TEXTOS} from "@/constants/textos";
 
 type DadosRemocao = { tipo: "atividade" | "conhecimento"; index: number; conhecimentoCodigo?: number } | null;
 
@@ -504,8 +505,8 @@ async function confirmarDisponibilizacao() {
   mostrarModalConfirmacao.value = false;
   if (sucesso) {
     const msg = isRevisao.value
-        ? "Revisão do cadastro de atividades disponibilizada"
-        : "Cadastro de atividades disponibilizado";
+        ? TEXTOS.sucesso.REVISAO_CADASTRO_ATIVIDADES_DISPONIBILIZADA
+        : TEXTOS.sucesso.CADASTRO_ATIVIDADES_DISPONIBILIZADO;
     toastStore.setPending(msg);
     await router.push("/painel");
   }

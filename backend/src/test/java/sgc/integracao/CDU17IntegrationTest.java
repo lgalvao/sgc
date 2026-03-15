@@ -8,6 +8,7 @@ import org.springframework.jdbc.core.*;
 import org.springframework.test.web.servlet.result.*;
 import org.springframework.transaction.annotation.*;
 import sgc.alerta.model.*;
+import sgc.comum.MsgValidacao;
 import sgc.fixture.*;
 import sgc.integracao.mocks.*;
 import sgc.mapa.model.*;
@@ -213,7 +214,7 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isUnprocessableContent())
-                    .andExpect(jsonPath("$.message").value(Matchers.containsString("Todas as atividades devem estar associadas a pelo menos uma competência.")));
+                    .andExpect(jsonPath("$.message").value(Matchers.containsString(MsgValidacao.ATIVIDADES_DEVEM_TER_COMPETENCIA)));
         }
 
         @Test

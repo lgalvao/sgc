@@ -6,6 +6,7 @@ import {
     esperarPaginaPainel,
     verificarToast
 } from './helpers/helpers-navegacao.js';
+import {TEXTOS} from '../frontend/src/constants/textos.js';
 
 test.describe('CDU-03 - Manter processo', () => {
 
@@ -99,7 +100,7 @@ test.describe('CDU-03 - Manter processo', () => {
         await page.getByTestId('btn-processo-salvar').click();
 
         await esperarPaginaPainel(page);
-        await verificarToast(page, /alterado/i);
+        await verificarToast(page, TEXTOS.sucesso.PROCESSO_ALTERADO);
         await expect(page.getByText(novaDescricao)).toBeVisible();
     });
 

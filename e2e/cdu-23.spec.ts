@@ -4,6 +4,7 @@ import {criarProcessoCadastroDisponibilizadoFixture} from './fixtures/fixtures-p
 import {navegarParaAtividadesVisualizacao} from './helpers/helpers-atividades.js';
 import {aceitarCadastroMapeamento, acessarSubprocessoGestor} from './helpers/helpers-analise.js';
 import {loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
+import {TEXTOS} from '../frontend/src/constants/textos.js';
 
 /**
  * CDU-23 - Homologar cadastros em bloco
@@ -80,11 +81,11 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {
         await expect(modal).toHaveClass(/show/);
         await modal.getByRole('button', {name: /^Homologar$/i}).click();
 
-        await expect(page.getByText(/Cadastros homologados em bloco/i).first()).toBeVisible();
+        await expect(page.getByText(TEXTOS.sucesso.CADASTROS_HOMOLOGADOS_EM_BLOCO).first()).toBeVisible();
 
         await expect(page).toHaveURL(/\/processo\/\d+$/);
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
-        await expect(page.getByTestId('app-alert')).toContainText('Cadastros homologados em bloco');
+        await expect(page.getByTestId('app-alert')).toContainText(TEXTOS.sucesso.CADASTROS_HOMOLOGADOS_EM_BLOCO);
         await expect(btnHomologar).toBeDisabled();
         await expect(page.getByRole('row', {name: /SECAO_221 - Seção 221 Cadastro homologado/i})).toBeVisible();
     });

@@ -142,6 +142,7 @@ import {useToastStore} from "@/stores/toast";
 import type {Atividade, Competencia, SalvarCompetenciaRequest, Unidade} from "@/types/tipos";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import {formatSituacaoSubprocesso} from "@/utils/formatters";
+import {TEXTOS} from "@/constants/textos";
 
 // Lazy loading de componentes pesados ou modais
 const ImpactoMapaModal = defineAsyncComponent(() => import("@/components/mapa/ImpactoMapaModal.vue"));
@@ -351,7 +352,7 @@ async function disponibilizarMapa(payload: { dataLimite: string; observacoes: st
   try {
     await mapasStore.disponibilizarMapa(codSubprocesso.value as number, payload);
     fecharModalDisponibilizar();
-    toastStore.setPending("Disponibilização do mapa de competências efetuada");
+    toastStore.setPending(TEXTOS.sucesso.MAPA_DISPONIBILIZADO);
     await router.push({name: "Painel"});
   } catch {
     handleErrors(mapasStore);

@@ -4,6 +4,7 @@ import lombok.extern.slf4j.*;
 import org.springframework.context.annotation.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
+import sgc.comum.MsgValidacao;
 import sgc.comum.erros.*;
 import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
@@ -122,7 +123,7 @@ public class AtividadeFacade {
                 MAPEAMENTO_MAPA_CRIADO, MAPEAMENTO_MAPA_COM_SUGESTOES,
                 REVISAO_MAPA_AJUSTADO, REVISAO_MAPA_COM_SUGESTOES).contains(sp.getSituacao())) {
             throw new ErroValidacao(
-                    "Situação do subprocesso não permite esta operação. Situação atual: %s"
+                    MsgValidacao.SITUACAO_ATUAL
                             .formatted(sp.getSituacao()));
         }
     }
