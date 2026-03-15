@@ -44,7 +44,7 @@ try {
         // No Windows, rmSync pode falhar se a pasta estiver aberta no Explorer ou sendo indexada
         fs.rmSync(SCREENSHOTS_DIR, {recursive: true, force: true});
     }
-} catch (error) {
+} catch {
     console.warn(`Aviso: Não foi possível remover o diretório de screenshots (EPERM). Tentando continuar...`);
 }
 

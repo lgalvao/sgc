@@ -272,6 +272,7 @@ export const TEXTOS = {
     }
   },
   unidade: {
+    CARREGANDO: "Carregando unidade...",
     BOTAO_MAPA_VIGENTE: "Mapa vigente",
     BOTAO_CRIAR_ATRIBUICAO: "Criar atribuição",
     LABEL_TITULAR: "Titular:",

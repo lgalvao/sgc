@@ -1,13 +1,14 @@
 #!/bin/bash
 set -e
 
-echo "    🖌️  Executando testes: Frontend  "
+echo " 🖌️  Executando testes: Frontend"
+echo "------------------------------------" 
 cd frontend
 
-echo ">> Verificação de tipos (Typecheck)"
+echo ">> Typecheck  "
 npm run typecheck
 
-echo ">> Validação de lint (Eslint)"
+echo ">> Lint  "
 npm run lint
 
 echo ">> Testes unitários (Vitest)"

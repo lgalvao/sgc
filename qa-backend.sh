@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 
-echo "    🧪 Executando testes: Backend   "
-
+echo " 🧪 Executando testes: Backend"
+echo "------------------------------------"
 echo ">> Testes de unidade"
 ./gradlew :backend:unitTest
 

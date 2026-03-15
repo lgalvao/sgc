@@ -1,13 +1,10 @@
 #!/bin/bash
 set -e
 
-echo "======================================"
-echo "    📦 Atualizando dependências     "
-echo "======================================"
-
-echo ">> Atualizando dependências do root"
-npm update -g
-npm update --save
+echo " 📦 Atualizando dependências"
+echo "------------------------------------"
+echo ">> Atualizando dependências do globais"
+npm update -g --save
 
 echo ">> Atualizando dependências do frontend"
 cd frontend
