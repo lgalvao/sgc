@@ -126,6 +126,7 @@ public final class MsgValidacao {
     public static final String SITUACAO_IMPEDE_IMPORTACAO       = "Situação do subprocesso não permite importação. Situação atual: %s";
     public static final String SITUACAO_IMPEDE_IMPACTO          = "Situação do subprocesso (%s) não permite verificação de impactos para o perfil %s.";
     public static final String ATIVIDADES_PENDENTES_PREFIXO     = "Todas as atividades devem estar associadas a pelo menos uma competência.%nAtividades pendentes: %s";
+    public static final String ATIVIDADES_DEVEM_TER_COMPETENCIA = "Todas as atividades devem estar associadas a pelo menos uma competência.";
     public static final String UNIDADES_INTERMEDIARIA_INVALIDAS = "Unidades INTERMEDIARIA inválidas: %s";
     public static final String UNIDADES_SEM_MAPA_VIGENTE        = "Unidades sem mapa vigente: %s";
     public static final String UNIDADES_SEM_SUBPROCESSOS        = "Algumas unidades selecionadas não possuem subprocessos vinculados neste processo: %s";
