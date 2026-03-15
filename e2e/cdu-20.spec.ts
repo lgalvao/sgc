@@ -4,6 +4,7 @@ import {navegarParaMapa} from './helpers/helpers-mapas.js';
 import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
 import {acessarSubprocessoGestor} from './helpers/helpers-analise.js';
 import {navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
+import {TEXTOS} from '../frontend/src/constants/textos.js';
 
 test.describe.serial('CDU-20 - Analisar validação de mapa de competências', () => {
     const UNIDADE_ALVO = 'ASSESSORIA_11';
@@ -52,6 +53,6 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
 
         await page.getByTestId('btn-mapa-homologar-aceite').click();
         await page.getByTestId('btn-aceite-mapa-confirmar').click();
-        await expect(page.getByText(/Homologação efetivada/i).first()).toBeVisible();
+        await expect(page.getByText(TEXTOS.sucesso.HOMOLOGACAO_EFETIVADA).first()).toBeVisible();
     });
 });

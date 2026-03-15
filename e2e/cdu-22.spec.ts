@@ -1,6 +1,7 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcessoCadastroDisponibilizadoFixture} from './fixtures/fixtures-processos.js';
 import {loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
+import {TEXTOS} from '../frontend/src/constants/textos.js';
 
 /**
  * CDU-22 - Aceitar cadastros em bloco
@@ -71,7 +72,7 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
         await page.getByTestId('btn-processo-aceitar-bloco').click();
         await page.locator('#modal-acao-bloco').getByRole('button', {name: /Registrar aceite/i}).click();
-        await expect(page.getByText(/Cadastros aceitos em bloco/i).first()).toBeVisible();
+        await expect(page.getByText(TEXTOS.sucesso.CADASTROS_ACEITOS_EM_BLOCO).first()).toBeVisible();
 
         // GESTOR SECRETARIA_2 deve agora ver o botão habilitado
         await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');

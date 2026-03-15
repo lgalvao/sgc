@@ -3,6 +3,7 @@ import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcessoMapaValidadoFixture} from './fixtures/fixtures-processos.js';
 import {login, USUARIOS} from './helpers/helpers-auth.js';
 import {verificarPaginaPainel} from './helpers/helpers-navegacao.js';
+import {TEXTOS} from '../frontend/src/constants/textos.js';
 
 /**
  * CDU-25 - Aceitar validação de mapas de competências em bloco
@@ -82,7 +83,7 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
 
         await modal.getByRole('button', {name: /Registrar aceite/i}).click();
 
-        await expect(page.getByText('Mapas aceitos em bloco')).toBeVisible();
+        await expect(page.getByText(TEXTOS.sucesso.MAPAS_ACEITOS_EM_BLOCO)).toBeVisible();
         await verificarPaginaPainel(page);
     });
 });
