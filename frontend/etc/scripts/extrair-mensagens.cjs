@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+/* eslint-disable @typescript-eslint/no-require-imports */
 /**
  * extrair-mensagens.cjs
  *
@@ -22,7 +23,6 @@ const RAIZ = path.join(__dirname, '../../..');
 const BACKEND_SRC = path.join(RAIZ, 'backend/src/main/java/sgc');
 const BACKEND_TEST = path.join(RAIZ, 'backend/src/test/java/sgc');
 const FRONTEND_SRC = path.join(RAIZ, 'frontend/src');
-const FRONTEND_TEST = path.join(RAIZ, 'frontend/src');
 const E2E_DIR = path.join(RAIZ, 'e2e');
 const OUTPUT_FILE = path.join(RAIZ, 'mensagens-extraidas.json');
 
@@ -104,7 +104,6 @@ function extrairMensagensValidacaoDto(arquivos) {
  */
 function extrairMensagensExcecoes(arquivos) {
     const mensagens = [];
-    const PATTERN = /throw\s+new\s+Erro\w+\(\s*"([^"]+)"/g;
 
     for (const arquivo of arquivos) {
         const conteudo = fs.readFileSync(arquivo, 'utf-8');
@@ -173,7 +172,6 @@ function extrairMensagensTeste(arquivos) {
  */
 function extrairMensagensToast(arquivos) {
     const mensagens = [];
-    const PATTERN = /setPending\(\s*["'`]([^"'`]+)["'`]\s*\)/g;
 
     for (const arquivo of arquivos) {
         const conteudo = fs.readFileSync(arquivo, 'utf-8');
