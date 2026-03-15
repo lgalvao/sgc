@@ -236,6 +236,77 @@ class ProcessoServiceTest {
     @DisplayName("Consultas e Detalhes")
     class Consultas {
         @Test
+        @DisplayName("Deve listar para importacao")
+        void deveListarParaImportacao() {
+            Processo p = new Processo();
+            when(processoRepo.listarPorSituacaoComParticipantes(SituacaoProcesso.FINALIZADO)).thenReturn(List.of(p));
+
+            List<Processo> res = processoService.listarParaImportacao();
+            assertThat(res).containsExactly(p);
+            verify(processoRepo).listarPorSituacaoComParticipantes(SituacaoProcesso.FINALIZADO);
+        }
+
+        @Test
+        @DisplayName("Deve listar ativos para ADMIN")
+        void deveListarAtivosParaAdmin() {
+            Usuario admin = new Usuario();
+            admin.setPerfilAtivo(Perfil.ADMIN);
+            when(usuarioService.usuarioAutenticado()).thenReturn(admin);
+
+            Processo p = new Processo();
+            when(processoRepo.listarPorSituacao(SituacaoProcesso.EM_ANDAMENTO)).thenReturn(List.of(p));
+
+            List<Processo> res = processoService.listarAtivos();
+            assertThat(res).containsExactly(p);
+            verify(processoRepo).listarPorSituacao(SituacaoProcesso.EM_ANDAMENTO);
+            verify(processoRepo, never()).listarPorSituacaoEUnidadeCodigos(any(), any());
+        }
+
+        @Test
+        @DisplayName("Deve listar ativos para usuario normal")
+        void deveListarAtivosParaUsuarioNormal() {
+            Usuario gestor = new Usuario();
+            gestor.setPerfilAtivo(Perfil.GESTOR);
+            Unidade u = new Unidade();
+            u.setCodigo(1L);
+            gestor.setUnidadeAtivaCodigo(1L);
+            when(usuarioService.usuarioAutenticado()).thenReturn(gestor);
+            when(unidadeService.todasComHierarquia()).thenReturn(List.of(u));
+
+            Processo p = new Processo();
+            when(processoRepo.listarPorSituacaoEUnidadeCodigos(eq(SituacaoProcesso.EM_ANDAMENTO), anyList())).thenReturn(List.of(p));
+
+            List<Processo> res = processoService.listarAtivos();
+            assertThat(res).containsExactly(p);
+            verify(processoRepo).listarPorSituacaoEUnidadeCodigos(eq(SituacaoProcesso.EM_ANDAMENTO), anyList());
+            verify(processoRepo, never()).listarPorSituacao(any());
+        }
+
+        @Test
+        @DisplayName("Deve listar iniciados por participantes")
+        void deveListarIniciadosPorParticipantes() {
+            Pageable pageable = Pageable.unpaged();
+            Processo p = new Processo();
+            when(processoRepo.listarPorParticipantesESituacaoDiferente(anyList(), eq(SituacaoProcesso.CRIADO), eq(pageable)))
+                    .thenReturn(new PageImpl<>(List.of(p)));
+
+            Page<Processo> res = processoService.listarIniciadosPorParticipantes(List.of(1L), pageable);
+            assertThat(res.getContent()).containsExactly(p);
+            verify(processoRepo).listarPorParticipantesESituacaoDiferente(List.of(1L), SituacaoProcesso.CRIADO, pageable);
+        }
+
+        @Test
+        @DisplayName("Deve listar unidades bloqueadas por tipo")
+        void deveListarUnidadesBloqueadasPorTipo() {
+            when(processoRepo.listarUnidadesBloqueadasPorSituacaoETipo(SituacaoProcesso.EM_ANDAMENTO, TipoProcesso.MAPEAMENTO))
+                    .thenReturn(List.of(1L, 2L));
+
+            List<Long> res = processoService.listarUnidadesBloqueadasPorTipo(TipoProcesso.MAPEAMENTO);
+            assertThat(res).containsExactly(1L, 2L);
+            verify(processoRepo).listarUnidadesBloqueadasPorSituacaoETipo(SituacaoProcesso.EM_ANDAMENTO, TipoProcesso.MAPEAMENTO);
+        }
+
+        @Test
         @DisplayName("Deve buscar entidade por ID")
         void deveBuscarEntidadePorId() {
             Long id = 100L;
