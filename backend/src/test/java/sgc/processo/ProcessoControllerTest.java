@@ -307,6 +307,48 @@ class ProcessoControllerTest {
     class NovasListagens {
         @Test
         @WithMockUser(roles = "ADMIN")
+        @DisplayName("listarParaImportacao deve retornar lista de processos para importacao")
+        void deveListarParaImportacao() throws Exception {
+            when(processoService.listarParaImportacao())
+                    .thenReturn(List.of(Processo.builder().codigo(1L).build()));
+
+            mockMvc.perform(get("/api/processos/para-importacao"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$").isArray())
+                    .andExpect(jsonPath("$[0].codigo").value(1L));
+        }
+
+        @Test
+        @WithMockUser(roles = "ADMIN")
+        @DisplayName("listarUnidadesParaImportacao deve retornar lista de participantes quando finalizado")
+        void deveListarUnidadesParaImportacaoQuandoFinalizado() throws Exception {
+            Processo processo = Processo.builder()
+                .codigo(1L)
+                .situacao(SituacaoProcesso.FINALIZADO)
+                .build();
+
+            Unidade unidade = Unidade.builder().codigo(10L).sigla("U1").nome("Unidade 1").situacao(SituacaoUnidade.ATIVA).build();
+            processo.adicionarParticipantes(Set.of(unidade));
+
+            when(processoService.buscarPorCodigoComParticipantes(1L)).thenReturn(processo);
+
+            Subprocesso sub = Subprocesso.builder()
+                .codigo(100L)
+                .situacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO)
+                .unidade(unidade)
+                .dataLimiteEtapa1(LocalDateTime.now())
+                .build();
+            when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sub));
+
+            mockMvc.perform(get("/api/processos/1/unidades-importacao"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$").isArray())
+                    .andExpect(jsonPath("$[0].codUnidade").value(10L))
+                    .andExpect(jsonPath("$[0].codSubprocesso").value(100L));
+        }
+
+        @Test
+        @WithMockUser(roles = "ADMIN")
         @DisplayName("obterStatusUnidades deve retornar unidades desabilitadas")
         void deveObterStatusUnidades() throws Exception {
             when(processoService.listarUnidadesBloqueadasPorTipo(TipoProcesso.MAPEAMENTO)).thenReturn(List.of(1L, 2L));
@@ -383,6 +425,28 @@ class ProcessoControllerTest {
     @Nested
     @DisplayName("Cobertura extra")
     class CoberturaExtra {
+        @Test
+        @DisplayName("listarUnidadesParaImportacao deve lancar ErroValidacao quando nao finalizado")
+        void deveLancarErroValidacaoQuandoListarUnidadesParaImportacaoNaoFinalizado() {
+            Processo processo = Processo.builder()
+                .codigo(1L)
+                .situacao(SituacaoProcesso.EM_ANDAMENTO)
+                .build();
+            when(processoServiceMock.buscarPorCodigoComParticipantes(1L)).thenReturn(processo);
+
+            ErroValidacao ex = assertThrows(ErroValidacao.class, () -> controller.listarUnidadesParaImportacao(1L));
+            assertEquals(sgc.comum.MsgValidacao.PROCESSO_DEVE_ESTAR_FINALIZADO, ex.getMessage());
+        }
+
+        @Test
+        @DisplayName("excluir chama servico e retorna 204")
+        void excluir_RetornaNoContent() {
+            Long codigo = 1L;
+            ResponseEntity<Void> response = controller.excluir(codigo);
+            verify(processoServiceMock).apagar(codigo);
+            assertEquals(204, response.getStatusCode().value());
+        }
+
         // Usar mocks manuais para testes isolados
         private ProcessoController controller;
         private ProcessoService processoServiceMock;
