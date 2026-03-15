@@ -14,5 +14,5 @@ public record EntrarRequest(
 
         @NotNull(message = MsgValidacao.PERFIL_OBRIGATORIO) @Size(max = 50, message = MsgValidacao.PERFIL_MAX) String perfil,
 
-        @NotNull(message = MsgValidacao.CODIGO_UNIDADE_OBRIGATORIO_COM_PONTO) Long unidadeCodigo) {
+        @NotNull(message = MsgValidacao.CODIGO_UNIDADE_OBRIGATORIO) Long unidadeCodigo) {
 }

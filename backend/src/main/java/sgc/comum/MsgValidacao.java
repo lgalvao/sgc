@@ -43,14 +43,13 @@ public final class MsgValidacao {
     // ── Processo ─────────────────────────────────────────────────────────────
     public static final String CODIGO_PROCESSO_OBRIGATORIO      = "O código do processo é obrigatório";
     public static final String TIPO_PROCESSO_OBRIGATORIO        = "Tipo do processo é obrigatório";
-    public static final String TIPO_PROCESSO_OBRIGATORIO_ALT    = "O tipo do processo é obrigatório";
+    public static final String TIPO_PROCESSO_OBRIGATORIO_INICIAR = "O tipo do processo é obrigatório";
     public static final String DATA_LIMITE_OBRIGATORIA          = "Preencha a data limite";
     public static final String DATA_LIMITE_FUTURA               = "A data limite deve ser futura";
     public static final String UNIDADES_PARTICIPANTES_OBRIGATORIO = "Pelo menos uma unidade participante deve ser incluída.";
 
     // ── Unidade ──────────────────────────────────────────────────────────────
     public static final String CODIGO_UNIDADE_OBRIGATORIO       = "O código da unidade é obrigatório";
-    public static final String CODIGO_UNIDADE_OBRIGATORIO_COM_PONTO = "O código da unidade é obrigatório.";
 
     // ── Subprocesso ──────────────────────────────────────────────────────────
     public static final String CODIGO_SUBPROCESSO_ORIGEM_OBRIGATORIO = "O código do subprocesso de origem é obrigatório";
