@@ -4,6 +4,7 @@ import lombok.*;
 import org.jspecify.annotations.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
+import sgc.comum.MsgValidacao;
 import sgc.comum.erros.*;
 import sgc.mapa.model.*;
 import sgc.mapa.service.*;
@@ -22,12 +23,12 @@ public class SubprocessoValidacaoService {
 
     public void validarExistenciaAtividades(Subprocesso subprocesso) {
         if (subprocesso.getMapa() == null || subprocesso.getMapa().getCodigo() == null) {
-            throw new ErroValidacao("Subprocesso não possui mapa associado.");
+            throw new ErroValidacao(MsgValidacao.SUBPROCESSO_SEM_MAPA);
         }
 
         List<Atividade> atividades = mapaManutencaoService.atividadesMapaCodigoComConhecimentos(subprocesso.getMapa().getCodigo());
         if (atividades.isEmpty()) {
-            throw new ErroValidacao("O mapa de competências deve ter ao menos uma atividade cadastrada.");
+            throw new ErroValidacao(MsgValidacao.MAPA_SEM_ATIVIDADES);
         }
 
         List<Atividade> atividadesSemConhecimento = atividades.stream()
@@ -35,7 +36,7 @@ public class SubprocessoValidacaoService {
                 .toList();
 
         if (!atividadesSemConhecimento.isEmpty()) {
-            throw new ErroValidacao("Todas as atividades devem possuir conhecimentos vinculados. Verifique as atividades pendentes.");
+            throw new ErroValidacao(MsgValidacao.ATIVIDADES_SEM_CONHECIMENTOS);
         }
     }
 
@@ -47,7 +48,7 @@ public class SubprocessoValidacaoService {
                 .toList();
 
         if (!competenciasSemAssociacao.isEmpty()) throw new ErroValidacao(
-                "Existem competências que não foram associadas a nenhuma atividade.",
+                MsgValidacao.COMPETENCIAS_SEM_ATIVIDADE,
                 Map.of("competenciasNaoAssociadas", competenciasSemAssociacao));
 
         List<Atividade> atividades = mapaManutencaoService.atividadesMapaCodigo(codMapa);
@@ -57,7 +58,7 @@ public class SubprocessoValidacaoService {
                 .toList();
 
         if (!atividadesSemAssociacao.isEmpty()) throw new ErroValidacao(
-                "Existem atividades que não foram associadas a nenhuma competência.",
+                MsgValidacao.ATIVIDADES_SEM_COMPETENCIA,
                 Map.of("atividadesNaoAssociadas", atividadesSemAssociacao));
     }
 
@@ -66,7 +67,7 @@ public class SubprocessoValidacaoService {
         var competencias = mapaManutencaoService.competenciasCodMapa(codMapa);
 
         if (competencias.stream().anyMatch(c -> c.getAtividades().isEmpty())) {
-            throw new ErroValidacao("Todas as competências devem estar associadas a pelo menos uma atividade.");
+            throw new ErroValidacao(MsgValidacao.TODAS_COMPETENCIAS_DEVEM_TER_ATIVIDADE);
         }
 
         var atividadesDoSubprocesso = mapaManutencaoService.atividadesMapaCodigo(codMapa);
@@ -85,7 +86,7 @@ public class SubprocessoValidacaoService {
                     .collect(java.util.stream.Collectors.joining(", "));
 
             throw new ErroValidacao(
-                    "Todas as atividades devem estar associadas a pelo menos uma competência.%nAtividades pendentes: %s"
+                    MsgValidacao.ATIVIDADES_PENDENTES_PREFIXO
                             .formatted(nomesAtividades));
         }
     }
@@ -140,7 +141,7 @@ public class SubprocessoValidacaoService {
             String permitidasStr = String.join(", ",
                     permitidas.stream().map(SituacaoSubprocesso::name).toList());
             throw new ErroValidacao(
-                    "Situação do subprocesso não permite esta operação. Situação atual: %s. Situações permitidas: %s"
+                    MsgValidacao.SITUACAO_NAO_PERMITE
                             .formatted(subprocesso.getSituacao(), permitidasStr));
         }
     }
@@ -181,7 +182,7 @@ public class SubprocessoValidacaoService {
                     .map(atividade -> Map.of("codigo", atividade.getCodigo(), "descricao", atividade.getDescricao()))
                     .toList();
             throw new ErroValidacao(
-                    "Existem atividades sem conhecimentos associados.",
+                    MsgValidacao.ATIVIDADES_SEM_CONHECIMENTO_ASSOCIADO,
                     Map.of("atividadesSemConhecimento", atividadesInfo));
         }
     }

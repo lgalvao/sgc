@@ -4,6 +4,7 @@ import jakarta.validation.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
 import org.jspecify.annotations.*;
+import sgc.comum.MsgValidacao;
 import sgc.seguranca.sanitizacao.*;
 
 import java.time.*;
@@ -14,8 +15,8 @@ import java.util.*;
  */
 @Builder
 public record SubmeterMapaAjustadoRequest(
-        @NotBlank(message = "A justificativa é obrigatória")
-        @Size(max = 500, message = "A justificativa deve ter no máximo 500 caracteres")
+        @NotBlank(message = MsgValidacao.JUSTIFICATIVA_OBRIGATORIA)
+        @Size(max = 500, message = MsgValidacao.JUSTIFICATIVA_MAX)
         @SanitizarHtml
         String justificativa,
 

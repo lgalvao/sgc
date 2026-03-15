@@ -4,6 +4,7 @@ import lombok.*;
 import lombok.extern.slf4j.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
+import sgc.comum.MsgValidacao;
 import sgc.comum.erros.*;
 import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
@@ -85,7 +86,7 @@ public class ImpactoMapaService {
 
         if (!situacaoValida) {
             throw new ErroValidacao(
-                    "Situação do subprocesso (%s) não permite verificação de impactos para o perfil %s."
+                    MsgValidacao.SITUACAO_IMPEDE_IMPACTO
                             .formatted(situacao, perfil));
         }
     }

@@ -4,6 +4,7 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
+import sgc.comum.MsgValidacao;
 import sgc.comum.erros.*;
 import sgc.mapa.model.*;
 import sgc.mapa.service.*;
@@ -38,7 +39,7 @@ class SubprocessoValidacaoServiceTest {
             Subprocesso sp = new Subprocesso();
             assertThatThrownBy(() -> validacaoService.validarExistenciaAtividades(sp))
                 .isInstanceOf(ErroValidacao.class)
-                .hasMessageContaining("não possui mapa associado");
+                .hasMessageContaining(MsgValidacao.SUBPROCESSO_SEM_MAPA);
         }
     }
 

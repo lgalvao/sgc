@@ -2,6 +2,7 @@ package sgc.mapa.dto;
 
 import jakarta.validation.constraints.*;
 import lombok.*;
+import sgc.comum.MsgValidacao;
 import sgc.seguranca.sanitizacao.*;
 
 /**
@@ -9,7 +10,7 @@ import sgc.seguranca.sanitizacao.*;
  */
 @Builder
 public record AtualizarConhecimentoRequest(
-        @NotBlank(message = "Descrição não pode ser vazia")
+        @NotBlank(message = MsgValidacao.DESCRICAO_NAO_PODE_SER_VAZIA)
         @SanitizarHtml
         String descricao
 ) {

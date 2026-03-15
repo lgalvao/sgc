@@ -2,6 +2,7 @@ package sgc.subprocesso.dto;
 
 import jakarta.validation.constraints.*;
 import lombok.*;
+import sgc.comum.MsgValidacao;
 
 import java.util.*;
 
@@ -10,6 +11,6 @@ import java.util.*;
  */
 @Builder
 public record SalvarAjustesRequest(
-        @NotEmpty(message = "A lista de competências não pode ser vazia")
+        @NotEmpty(message = MsgValidacao.LISTA_COMPETENCIAS_NAO_PODE_SER_VAZIA)
         List<CompetenciaAjusteDto> competencias) {
 }
