@@ -1,6 +1,5 @@
 #!/bin/bash
-
-# Quality Check Script for SGC Project
+set -e
 
 function show_help {
     echo "Usage: ./quality-check.sh [OPTION]"
@@ -12,33 +11,42 @@ function show_help {
     echo "  help      Show this help message"
 }
 
-if [ -z "$1" ]; then
+ACTION=$1
+
+if [ -z "$ACTION" ]; then
     show_help
     exit 1
 fi
 
-case "$1" in
+GRADLEW="./gradlew"
+
+if [ ! -f "$GRADLEW" ]; then
+    echo "Error: $GRADLEW not found in the current directory."
+    exit 1
+fi
+
+case $ACTION in
     all)
         echo "Running all quality checks..."
-        ./gradlew qualityCheckAll
+        $GRADLEW qualityCheckAll
         ;;
     backend)
         echo "Running backend quality checks..."
-        ./gradlew backendQualityCheck
+        $GRADLEW backendQualityCheck
         ;;
     frontend)
         echo "Running frontend quality checks..."
-        ./gradlew frontendQualityCheck
+        $GRADLEW frontendQualityCheck
         ;;
     fast)
         echo "Running fast quality checks..."
-        ./gradlew qualityCheckFast
+        $GRADLEW qualityCheckFast
         ;;
     help)
         show_help
         ;;
     *)
-        echo "Invalid option: $1"
+        echo "Invalid option: $ACTION"
         show_help
         exit 1
         ;;

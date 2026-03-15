@@ -15,8 +15,8 @@
 
 'use strict';
 
-const fs = require('fs');
-const path = require('path');
+const fs = require('node:fs');
+const path = require('node:path');
 
 // ── Configuração de caminhos ────────────────────────────────────────────────
 const RAIZ = path.join(__dirname, '../../..');
@@ -284,8 +284,8 @@ function extrairMensagensE2e(arquivos) {
                 const match = linha.match(pattern);
                 if (match) {
                     const texto = match[1].trim();
-                    // Filtrar seletores CSS, IDs e strings técnicas
-                    if (texto.startsWith('[') || texto.startsWith('.') || texto.startsWith('#')) continue;
+                    // Filtrar seletores CSS, IDs, strings técnicas e template literals com código
+                    if (texto.startsWith('[') || texto.startsWith('.') || texto.startsWith('#') || texto.includes('${')) continue;
                     if (texto.length < 4) continue;
                     mensagens.push({
                         texto,

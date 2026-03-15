@@ -19,8 +19,8 @@
 
 'use strict';
 
-const fs = require('fs');
-const path = require('path');
+const fs = require('node:fs');
+const path = require('node:path');
 
 const RAIZ = path.join(__dirname, '../../..');
 const INPUT_FILE = path.join(RAIZ, 'mensagens-extraidas.json');
@@ -38,7 +38,7 @@ function normalizar(texto) {
         .trim()
         .replace(/[.!?;,]+$/, '')
         .replace(/^(o |a |os |as |um |uma )/, '')
-        .replace(/\s+/g, ' ');
+        .replaceAll(/\s+/g, ' ');
 }
 
 /**
@@ -71,7 +71,7 @@ function agruparPorTexto(mensagens) {
  * Escapa caracteres especiais de Markdown.
  */
 function escaparMd(texto) {
-    return texto.replace(/\|/g, '\\|').replace(/`/g, "'");
+    return texto.replaceAll('|', String.raw`\|`).replaceAll('`', "'");
 }
 
 // ── Funções de Análise ────────────────────────────────────────────────────────
@@ -127,10 +127,7 @@ function gerarRelatorio(dados) {
     const linhas = [];
     const ts = new Date(dados.meta.geradoEm).toLocaleString('pt-BR', { timeZone: 'UTC' });
 
-    linhas.push('# Relatório de Análise de Mensagens — SGC');
-    linhas.push('');
-    linhas.push(`> Gerado em: ${ts} UTC | Fonte: \`mensagens-extraidas.json\``);
-    linhas.push('');
+    linhas.push('# Relatório de Análise de Mensagens — SGC', '', `> Gerado em: ${ts} UTC | Fonte: \`mensagens-extraidas.json\``, '');
 
     // ── Sumário ──
     const totalProd = dados.backend.validacao_dto.length
@@ -141,24 +138,7 @@ function gerarRelatorio(dados) {
         + dados.testes.assertiva_e2e.length
         + dados.testes.toast_e2e.length;
 
-    linhas.push('## 1. Sumário por Categoria');
-    linhas.push('');
-    linhas.push('| Categoria | Tipo | Quantidade |');
-    linhas.push('|---|---|---:|');
-    linhas.push(`| Backend | Validação DTO | ${dados.backend.validacao_dto.length} |`);
-    linhas.push(`| Backend | Exceção de Negócio | ${dados.backend.excecao_negocio.length} |`);
-    linhas.push(`| Frontend | Toast de Sucesso | ${dados.frontend.toast_sucesso.length} |`);
-    linhas.push(`| Frontend | Notificação/Alerta | ${dados.frontend.notificacao_frontend.length} |`);
-    linhas.push(`| Frontend | Constantes | ${dados.frontend.constante_frontend.length} |`);
-    linhas.push(`| Testes | Asserções Backend | ${dados.testes.teste_backend.length} |`);
-    linhas.push(`| Testes | Asserções E2E | ${dados.testes.assertiva_e2e.length} |`);
-    linhas.push(`| Testes | Toast em Testes Unitários | ${dados.testes.toast_e2e.length} |`);
-    linhas.push(`| **Total** | | **${totalProd + totalTestes + dados.frontend.constante_frontend.length}** |`);
-    linhas.push('');
-
-    // ── Duplicatas Exatas ──
-    linhas.push('## 2. Duplicatas Exatas (mesmo texto em fontes diferentes)');
-    linhas.push('');
+    linhas.push('## 1. Sumário por Categoria', '', '| Categoria | Tipo | Quantidade |', '|---|---|---:|', `| Backend | Validação DTO | ${dados.backend.validacao_dto.length} |`, `| Backend | Exceção de Negócio | ${dados.backend.excecao_negocio.length} |`, `| Frontend | Toast de Sucesso | ${dados.frontend.toast_sucesso.length} |`, `| Frontend | Notificação/Alerta | ${dados.frontend.notificacao_frontend.length} |`, `| Frontend | Constantes | ${dados.frontend.constante_frontend.length} |`, `| Testes | Asserções Backend | ${dados.testes.teste_backend.length} |`, `| Testes | Asserções E2E | ${dados.testes.assertiva_e2e.length} |`, `| Testes | Toast em Testes Unitários | ${dados.testes.toast_e2e.length} |`, `| **Total** | | **${totalProd + totalTestes + dados.frontend.constante_frontend.length}** |`, '', '## 2. Duplicatas Exatas (mesmo texto em fontes diferentes)', '');
 
     const todasMensagens = [
         ...dados.backend.validacao_dto,
@@ -177,10 +157,7 @@ function gerarRelatorio(dados) {
     if (duplicatasExatas.length === 0) {
         linhas.push('✅ Nenhuma duplicata exata encontrada entre fontes diferentes.');
     } else {
-        linhas.push(`Encontradas **${duplicatasExatas.length}** mensagens com texto idêntico em múltiplas fontes:`);
-        linhas.push('');
-        linhas.push('| Texto | Ocorrências | Fontes |');
-        linhas.push('|---|---:|---|');
+        linhas.push(`Encontradas **${duplicatasExatas.length}** mensagens com texto idêntico em múltiplas fontes:`, '', '| Texto | Ocorrências | Fontes |', '|---|---:|---|');
         for (const [texto, grupo] of duplicatasExatas.slice(0, 30)) {
             const fontes = [...new Set(grupo.map(m => m.tipo))].join(', ');
             const textoTruncado = texto.length > 60 ? texto.substring(0, 60) + '…' : texto;
@@ -190,11 +167,7 @@ function gerarRelatorio(dados) {
             linhas.push(`| *(+${duplicatasExatas.length - 30} entradas adicionais)* | | |`);
         }
     }
-    linhas.push('');
-
-    // ── Duplicatas com Variações ──
-    linhas.push('## 3. Duplicatas com Variações (pontuação, artigos, capitalização)');
-    linhas.push('');
+    linhas.push('', '## 3. Duplicatas com Variações (pontuação, artigos, capitalização)', '');
 
     const todasProd = [
         ...dados.backend.validacao_dto,
@@ -208,15 +181,9 @@ function gerarRelatorio(dados) {
     if (duplicatasVariadas.length === 0) {
         linhas.push('✅ Nenhuma duplicata com variação encontrada no código de produção.');
     } else {
-        linhas.push(`Encontradas **${duplicatasVariadas.length}** mensagens com texto similar mas não idêntico:`);
-        linhas.push('');
-        linhas.push('> ⚠️ Estas mensagens provavelmente deveriam ser a mesma constante.');
-        linhas.push('');
+        linhas.push(`Encontradas **${duplicatasVariadas.length}** mensagens com texto similar mas não idêntico:`, '', '> ⚠️ Estas mensagens provavelmente deveriam ser a mesma constante.', '');
         for (const grupo of duplicatasVariadas) {
-            linhas.push(`**Variações de:** \`${normalizar(grupo[0].texto)}\``);
-            linhas.push('');
-            linhas.push('| Texto Exato | Arquivo | Linha | Tipo |');
-            linhas.push('|---|---|---:|---|');
+            linhas.push(`**Variações de:** \`${normalizar(grupo[0].texto)}\``, '| Texto Exato | Arquivo | Linha | Tipo |', '|---|---|---:|---|');
             for (const msg of grupo) {
                 linhas.push(`| \`${escaparMd(msg.texto)}\` | \`${msg.arquivo}\` | ${msg.linha} | ${msg.tipo} |`);
             }
@@ -225,19 +192,12 @@ function gerarRelatorio(dados) {
     }
 
     // ── Órfãos em Testes ──
-    linhas.push('## 4. Mensagens nos Testes sem Correspondência na Produção');
-    linhas.push('');
-    linhas.push('> Estas strings aparecem em testes mas não foram encontradas no código de produção.');
-    linhas.push('> Podem ser mensagens obsoletas, de fixtures de teste, ou textos de UI não capturados.');
-    linhas.push('');
+    linhas.push('## 4. Mensagens nos Testes sem Correspondência na Produção', '', '> Estas strings aparecem em testes mas não foram encontradas no código de produção.', '> Podem ser mensagens obsoletas, de fixtures de teste, ou textos de UI não capturados.', '');
 
     const { orfaosBackend, orfaosE2e } = detectarOrfaosEmTestes(dados);
 
     if (orfaosBackend.length > 0) {
-        linhas.push(`### 4.1 Testes Backend (${orfaosBackend.length} ocorrências)`);
-        linhas.push('');
-        linhas.push('| Texto | Arquivo | Linha |');
-        linhas.push('|---|---|---:|');
+        linhas.push(`### 4.1 Testes Backend (${orfaosBackend.length} ocorrências)`, '', '| Texto | Arquivo | Linha |', '|---|---|---:|');
         for (const msg of orfaosBackend.slice(0, 20)) {
             const textoTruncado = msg.texto.length > 70 ? msg.texto.substring(0, 70) + '…' : msg.texto;
             linhas.push(`| \`${escaparMd(textoTruncado)}\` | \`${msg.arquivo}\` | ${msg.linha} |`);
@@ -247,10 +207,7 @@ function gerarRelatorio(dados) {
     }
 
     if (orfaosE2e.length > 0) {
-        linhas.push(`### 4.2 Testes E2E (${orfaosE2e.length} ocorrências)`);
-        linhas.push('');
-        linhas.push('| Texto | Arquivo | Linha |');
-        linhas.push('|---|---|---:|');
+        linhas.push(`### 4.2 Testes E2E (${orfaosE2e.length} ocorrências)`, '', '| Texto | Arquivo | Linha |', '|---|---|---:|');
         for (const msg of orfaosE2e.slice(0, 30)) {
             const textoTruncado = msg.texto.length > 70 ? msg.texto.substring(0, 70) + '…' : msg.texto;
             linhas.push(`| \`${escaparMd(textoTruncado)}\` | \`${msg.arquivo}\` | ${msg.linha} |`);
@@ -260,23 +217,16 @@ function gerarRelatorio(dados) {
     }
 
     if (orfaosBackend.length === 0 && orfaosE2e.length === 0) {
-        linhas.push('✅ Nenhuma mensagem de teste sem correspondência encontrada.');
-        linhas.push('');
+        linhas.push('✅ Nenhuma mensagem de teste sem correspondência encontrada.', '');
     }
 
     // ── Mensagens de Produção sem Testes ──
-    linhas.push('## 5. Mensagens de Produção sem Cobertura de Teste');
-    linhas.push('');
-    linhas.push('> Estas strings existem no código de produção mas não aparecem em nenhum teste.');
-    linhas.push('');
+    linhas.push('## 5. Mensagens de Produção sem Cobertura de Teste', '', '> Estas strings existem no código de produção mas não aparecem em nenhum teste.', '');
 
     const { backendSemTeste, frontendSemTeste } = detectarSemTeste(dados);
 
     if (backendSemTeste.length > 0) {
-        linhas.push(`### 5.1 Backend sem teste (${backendSemTeste.length} ocorrências)`);
-        linhas.push('');
-        linhas.push('| Texto | Arquivo | Linha | Tipo |');
-        linhas.push('|---|---|---:|---|');
+        linhas.push(`### 5.1 Backend sem teste (${backendSemTeste.length} ocorrências)`, '', '| Texto | Arquivo | Linha | Tipo |', '|---|---|---:|---|');
         for (const msg of backendSemTeste.slice(0, 30)) {
             const textoTruncado = msg.texto.length > 60 ? msg.texto.substring(0, 60) + '…' : msg.texto;
             linhas.push(`| \`${escaparMd(textoTruncado)}\` | \`${msg.arquivo}\` | ${msg.linha} | ${msg.tipo} |`);
@@ -286,10 +236,7 @@ function gerarRelatorio(dados) {
     }
 
     if (frontendSemTeste.length > 0) {
-        linhas.push(`### 5.2 Toast (frontend) sem teste (${frontendSemTeste.length} ocorrências)`);
-        linhas.push('');
-        linhas.push('| Texto | Arquivo | Linha |');
-        linhas.push('|---|---|---:|');
+        linhas.push(`### 5.2 Toast (frontend) sem teste (${frontendSemTeste.length} ocorrências)`, '', '| Texto | Arquivo | Linha |', '|---|---|---:|');
         for (const msg of frontendSemTeste) {
             linhas.push(`| \`${escaparMd(msg.texto)}\` | \`${msg.arquivo}\` | ${msg.linha} |`);
         }
@@ -297,13 +244,11 @@ function gerarRelatorio(dados) {
     }
 
     if (backendSemTeste.length === 0 && frontendSemTeste.length === 0) {
-        linhas.push('✅ Todas as mensagens de produção possuem cobertura de teste.');
-        linhas.push('');
+        linhas.push('✅ Todas as mensagens de produção possuem cobertura de teste.', '');
     }
 
     // ── Inventário Completo ──
-    linhas.push('## 6. Inventário Completo de Mensagens de Produção');
-    linhas.push('');
+    linhas.push('## 6. Inventário Completo de Mensagens de Produção', '');
 
     const secoes = [
         {
@@ -329,18 +274,15 @@ function gerarRelatorio(dados) {
     ];
 
     for (const secao of secoes) {
-        linhas.push(`### ${secao.titulo} (${secao.itens.length})`);
-        linhas.push('');
+        linhas.push(`### ${secao.titulo} (${secao.itens.length})`, '');
 
         if (secao.itens.length === 0) {
-            linhas.push('*Nenhuma mensagem encontrada.*');
-            linhas.push('');
+            linhas.push('*Nenhuma mensagem encontrada.*', '');
             continue;
         }
 
         const { colunas } = secao;
-        linhas.push('| ' + colunas.join(' | ') + ' |');
-        linhas.push('| ' + colunas.map((c, i) => i === colunas.length - 1 ? '---:' : '---').join(' | ') + ' |');
+        linhas.push('| ' + colunas.join(' | ') + ' |', '| ' + colunas.map((c, i) => i === colunas.length - 1 ? '---:' : '---').join(' | ') + ' |');
 
         for (const msg of secao.itens) {
             const valores = colunas.map(c => {
