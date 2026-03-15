@@ -62,11 +62,12 @@ def process_file(filepath):
 
             # Skip jacoco ignores and eslint/ts/ide directives
             ct_lower = comment_text.lower()
-            if ct_lower.startswith("jacoco") or ct_lower.startswith("eslint") or ct_lower.startswith("@ts") or ct_lower.startswith("noinspection"):
+            if ct_lower.startswith("jacoco") or ct_lower.startswith("eslint") or ct_lower.startswith("@ts") or ct_lower.startswith("noinspection") or ct_lower == "ignore":
                 new_lines.append(line)
                 continue
 
             if len(comment_text.split()) <= 2:
+                new_lines.append(line)
                 continue
 
             is_bad = False
