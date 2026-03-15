@@ -5,6 +5,7 @@ import {createTestingPinia} from "@pinia/testing";
 import {useProcessosStore} from "@/stores/processos";
 import {useToastStore} from "@/stores/toast";
 import {usePerfilStore} from "@/stores/perfil";
+import {TEXTOS} from "@/constants/textos";
 import {Perfil, SituacaoSubprocesso, type SubprocessoElegivel} from "@/types/tipos";
 import {nextTick} from "vue";
 
@@ -348,7 +349,7 @@ describe("Processo.vue", () => {
         await modal.vm.$emit("confirmar", dadosConfirmacao);
 
         expect(processosStore.executarAcaoBloco).toHaveBeenCalledWith('aceitar', [101], undefined);
-        expect(toastStore.setPending).toHaveBeenCalledWith("Cadastros aceitos em bloco");
+        expect(toastStore.setPending).toHaveBeenCalledWith(TEXTOS.sucesso.CADASTROS_ACEITOS_EM_BLOCO);
         expect(modalSpies.fechar).toHaveBeenCalled();
         expect(mocks.push).toHaveBeenCalledWith("/painel");
     });
@@ -397,7 +398,7 @@ describe("Processo.vue", () => {
         expect((wrapper.vm).tituloModalBloco).toBe("Aceite de cadastro em bloco");
         expect((wrapper.vm).textoModalBloco).toBe("Selecione as unidades cujos cadastros deverão ser aceitos:");
         expect((wrapper.vm).rotuloBotaoBloco).toBe("Registrar aceite");
-        expect((wrapper.vm).mensagemSucessoAcaoBloco).toBe("Cadastros aceitos em bloco");
+        expect((wrapper.vm).mensagemSucessoAcaoBloco).toBe(TEXTOS.sucesso.CADASTROS_ACEITOS_EM_BLOCO);
     });
 
     it("deve usar textos de CDU-25 quando houver apenas validacao elegível para aceite", async () => {
@@ -424,7 +425,7 @@ describe("Processo.vue", () => {
         expect((wrapper.vm).tituloModalBloco).toBe("Aceite de mapas em bloco");
         expect((wrapper.vm).textoModalBloco).toBe("Selecione as unidades para aceite dos mapas correspondentes");
         expect((wrapper.vm).rotuloBotaoBloco).toBe("Registrar aceite");
-        expect((wrapper.vm).mensagemSucessoAcaoBloco).toBe("Mapas aceitos em bloco");
+        expect((wrapper.vm).mensagemSucessoAcaoBloco).toBe(TEXTOS.sucesso.MAPAS_ACEITOS_EM_BLOCO);
     });
 
     it("deve executar ação em bloco com sucesso (Homologar cadastro)", async () => {
@@ -489,7 +490,7 @@ describe("Processo.vue", () => {
         expect((wrapper.vm).tituloModalBloco).toBe("Homologação de cadastro em bloco");
         expect((wrapper.vm).textoModalBloco).toBe("Selecione abaixo as unidades cujos cadastros deverão ser homologados:");
         expect((wrapper.vm).rotuloBotaoBloco).toBe("Homologar");
-        expect((wrapper.vm).mensagemSucessoAcaoBloco).toBe("Cadastros homologados em bloco");
+        expect((wrapper.vm).mensagemSucessoAcaoBloco).toBe(TEXTOS.sucesso.CADASTROS_HOMOLOGADOS_EM_BLOCO);
 
         const modal = wrapper.findComponent(ModalAcaoBlocoStub);
         await modal.vm.$emit("confirmar", {ids: [101]});
@@ -497,7 +498,7 @@ describe("Processo.vue", () => {
 
         expect(toastStore.setPending).not.toHaveBeenCalled();
         expect(mocks.push).not.toHaveBeenCalledWith("/painel");
-        expect(wrapper.find('[data-testid="app-alert"]').text()).toContain("Cadastros homologados em bloco");
+        expect(wrapper.find('[data-testid="app-alert"]').text()).toContain(TEXTOS.sucesso.CADASTROS_HOMOLOGADOS_EM_BLOCO);
     });
 
     it("deve usar textos de CDU-26 quando houver apenas validacao elegível para homologacao", async () => {
@@ -525,11 +526,11 @@ describe("Processo.vue", () => {
         expect((wrapper.vm).tituloModalBloco).toBe("Homologação de mapa em bloco");
         expect((wrapper.vm).textoModalBloco).toBe("Selecione abaixo as unidades cujos mapas deverão ser homologados:");
         expect((wrapper.vm).rotuloBotaoBloco).toBe("Homologar");
-        expect((wrapper.vm).mensagemSucessoAcaoBloco).toBe("Mapas de competências homologados em bloco");
+        expect((wrapper.vm).mensagemSucessoAcaoBloco).toBe(TEXTOS.sucesso.MAPAS_HOMOLOGADOS_EM_BLOCO);
 
         const modal = wrapper.findComponent(ModalAcaoBlocoStub);
         await modal.vm.$emit("confirmar", {ids: [103]});
-        expect(toastStore.setPending).toHaveBeenCalledWith("Mapas de competências homologados em bloco");
+        expect(toastStore.setPending).toHaveBeenCalledWith(TEXTOS.sucesso.MAPAS_HOMOLOGADOS_EM_BLOCO);
         expect(mocks.push).toHaveBeenCalledWith("/painel");
     });
 
@@ -739,7 +740,7 @@ describe("Processo.vue", () => {
         await modalConfirmacao.vm.$emit("confirmar");
 
         expect(processosStore.finalizarProcesso).toHaveBeenCalledWith(1);
-        expect(toastStore.setPending).toHaveBeenCalledWith("Processo finalizado");
+        expect(toastStore.setPending).toHaveBeenCalledWith(TEXTOS.sucesso.PROCESSO_FINALIZADO);
         expect(mocks.push).toHaveBeenCalledWith("/painel");
     });
 
@@ -805,7 +806,7 @@ describe("Processo.vue", () => {
         expect((wrapper.vm).tituloModalBloco).toBe("");
         expect((wrapper.vm).textoModalBloco).toBe("");
         expect((wrapper.vm).rotuloBotaoBloco).toBe("");
-        expect((wrapper.vm).mensagemSucessoAcaoBloco).toBe("Ação em bloco realizada");
+        expect((wrapper.vm).mensagemSucessoAcaoBloco).toBe(TEXTOS.sucesso.ACAO_EM_BLOCO_REALIZADA);
     });
 
     it("deve achatar unidades recursivamente", async () => {

@@ -117,6 +117,7 @@ import {logger} from "@/utils";
 import {normalizeError, shouldNotifyGlobally} from "@/utils/apiError";
 import {useProcessoForm} from "@/composables/useProcessoForm";
 import {useNotification} from "@/composables/useNotification";
+import {TEXTOS} from "@/constants/textos";
 
 import {useProcessosStore} from "@/stores/processos";
 import {useToastStore} from "@/stores/toast";
@@ -287,12 +288,12 @@ async function salvarProcesso() {
           processoEditando.value.codigo,
           request,
       );
-      toastStore.setPending("Processo alterado.");
+      toastStore.setPending(TEXTOS.sucesso.PROCESSO_ALTERADO);
       await router.push("/painel");
     } else {
       const request = construirCriarRequest();
       await processosStore.criarProcesso(request);
-      toastStore.setPending("Processo criado.");
+      toastStore.setPending(TEXTOS.sucesso.PROCESSO_CRIADO);
       await router.push("/painel");
     }
     limparCampos();
@@ -333,7 +334,7 @@ async function confirmarIniciarProcesso() {
         unidadesSelecionadas.value,
     );
 
-    toastStore.setPending("Processo iniciado");
+    toastStore.setPending(TEXTOS.sucesso.PROCESSO_INICIADO);
     await router.push("/painel");
     mostrarModalConfirmacao.value = false;
   } catch (error) {
@@ -358,7 +359,7 @@ async function confirmarRemocao() {
     const descRemovida = processoEditando.value.descricao;
     try {
       await processosStore.removerProcesso(processoEditando.value.codigo);
-      toastStore.setPending(`Processo ${descRemovida} removido`);
+      toastStore.setPending(TEXTOS.sucesso.PROCESSO_REMOVIDO(descRemovida));
       await router.push("/painel");
       if (!processoEditando.value) {
         limparCampos();

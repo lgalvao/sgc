@@ -136,6 +136,7 @@ import {useToastStore} from "@/stores/toast";
 import {SituacaoProcesso, SituacaoSubprocesso} from "@/types/tipos";
 import {formatSituacaoSubprocesso} from "@/utils/formatters";
 import {logger} from "@/utils";
+import {TEXTOS} from "@/constants/textos";
 
 type ContextoBloco = "cadastro" | "validacao" | "misto";
 type AcaoBloco = "aceitar" | "homologar" | "disponibilizar";
@@ -254,25 +255,25 @@ function obterMensagemSucesso(
     case "aceitar":
       switch (contexto) {
         case "cadastro":
-          return "Cadastros aceitos em bloco";
+          return TEXTOS.sucesso.CADASTROS_ACEITOS_EM_BLOCO;
         case "validacao":
-          return "Mapas aceitos em bloco";
+          return TEXTOS.sucesso.MAPAS_ACEITOS_EM_BLOCO;
         default:
-          return "Aceites registrados em bloco";
+          return TEXTOS.sucesso.ACEITES_REGISTRADOS_EM_BLOCO;
       }
     case "homologar":
       switch (contexto) {
         case "cadastro":
-          return "Cadastros homologados em bloco";
+          return TEXTOS.sucesso.CADASTROS_HOMOLOGADOS_EM_BLOCO;
         case "validacao":
-          return "Mapas de competências homologados em bloco";
+          return TEXTOS.sucesso.MAPAS_HOMOLOGADOS_EM_BLOCO;
         default:
-          return "Homologações registradas em bloco";
+          return TEXTOS.sucesso.HOMOLOGACOES_REGISTRADAS_EM_BLOCO;
       }
     case "disponibilizar":
-      return "Mapas de competências disponibilizados em bloco";
+      return TEXTOS.sucesso.MAPAS_DISPONIBILIZADOS_EM_BLOCO;
     default:
-      return "Ação em bloco realizada";
+      return TEXTOS.sucesso.ACAO_EM_BLOCO_REALIZADA;
   }
 }
 
@@ -427,7 +428,7 @@ function finalizarProcesso() {
 async function confirmarFinalizacao() {
   try {
     await apiFinalizarProcesso(codProcesso);
-    toastStore.setPending("Processo finalizado");
+    toastStore.setPending(TEXTOS.sucesso.PROCESSO_FINALIZADO);
     await router.push("/painel");
   } catch (error: any) {
     const mensagem = lastError.value?.message || error.message || "Ocorreu um erro";
