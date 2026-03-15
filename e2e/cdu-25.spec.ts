@@ -29,7 +29,7 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
     const timestamp = Date.now();
     const descProcesso = `Mapeamento CDU-25 ${timestamp}`;
 
-    test('Setup data', async ({request}) => {
+    test('Setup data', async ({_resetAutomatico, request}) => {
         await criarProcessoMapaValidadoFixture(request, {
             descricao: descProcesso,
             unidade: UNIDADE_1
@@ -37,7 +37,7 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
         expect(true).toBeTruthy();
     });
 
-    test('Cenario 1: GESTOR acessa processo com mapa validado', async ({page}) => {
+    test('Cenario 1: GESTOR acessa processo com mapa validado', async ({_resetAutomatico, page}) => {
         await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);
 
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
@@ -48,7 +48,7 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
         await expect(btnAceitar).toBeEnabled();
     });
 
-    test('Cenario 2: GESTOR abre modal de aceite de mapa em bloco e cancela', async ({page}) => {
+    test('Cenario 2: GESTOR abre modal de aceite de mapa em bloco e cancela', async ({_resetAutomatico, page}) => {
         await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);
 
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
@@ -62,7 +62,7 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
     });
 
-    test('Cenario 3: GESTOR realiza aceite em bloco com sucesso', async ({page}) => {
+    test('Cenario 3: GESTOR realiza aceite em bloco com sucesso', async ({_resetAutomatico, page}) => {
         await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);
 
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();

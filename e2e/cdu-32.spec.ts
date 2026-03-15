@@ -12,7 +12,7 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
     const timestamp = Date.now();
     const descProcesso = `Mapeamento CDU-32 ${timestamp}`;
 
-    test('Setup UI', async ({request}) => {
+    test('Setup UI', async ({_resetAutomatico, request}) => {
         await criarProcessoMapaHomologadoFixture(request, {
             descricao: descProcesso,
             unidade: UNIDADE_1,
@@ -21,7 +21,7 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
         expect(true).toBeTruthy();
     });
 
-    test('Cenários CDU-32: ADMIN reabre cadastro', async ({page}) => {
+    test('Cenários CDU-32: ADMIN reabre cadastro', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
 
         // Cenario 1 & 2: Navegação e visualização do botão
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();

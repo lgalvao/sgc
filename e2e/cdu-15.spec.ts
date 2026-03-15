@@ -24,7 +24,7 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
     const ATIVIDADE_2 = 'Atividade fixture 2';
     const ATIVIDADE_3 = 'Atividade fixture 3';
 
-    test('Setup data', async ({request}) => {
+    test('Setup data', async ({_resetAutomatico, request}) => {
         await criarProcessoCadastroHomologadoFixture(request, {
             descricao: descProcesso,
             unidade: UNIDADE_ALVO
@@ -32,7 +32,7 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
         expect(true).toBeTruthy();
     });
 
-    test('Cenários CDU-15: Fluxo completo de manutenção do mapa pelo ADMIN', async ({page}) => {
+    test('Cenários CDU-15: Fluxo completo de manutenção do mapa pelo ADMIN', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
         // CT-00 e CT-01: Acessar edição e verificar elementos
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
         await navegarParaMapa(page);

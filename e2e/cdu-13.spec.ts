@@ -18,7 +18,7 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
     
     let descProcesso: string;
 
-    test('1. Setup: Preparar processo e devoluções iniciais', async ({request, page}) => {
+    test('1. Setup: Preparar processo e devoluções iniciais', async ({_resetAutomatico, request, page}) => {
         const processo = await criarProcessoCadastroDisponibilizadoFixture(request, {
             unidade: UNIDADE_ALVO
         });
@@ -56,7 +56,7 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
         await expect(page).toHaveURL(/\/painel/);
     });
 
-    test('Cenarios CDU-13: Hierarquia aceita e ADMIN homologa', async ({page}) => {
+    test('Cenarios CDU-13: Hierarquia aceita e ADMIN homologa', async ({_resetAutomatico, page}) => {
         await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);

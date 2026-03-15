@@ -13,9 +13,11 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
     const SENHA_CHEFE = USUARIOS.CHEFE_ASSESSORIA_11.senha;
 
     test('Cenário 1: Processo de Mapeamento (Fluxo completo + Importação + Auto-save)', async ({
+                                                                                        _resetAutomatico,
                                                                                         page,
-                                                                                        request
-                                                                                    }) => {
+                                                                                        request,
+                                                                                        _autenticadoComoAdmin
+}) => {
         const timestamp = Date.now();
         const descricaoProcesso = `Processo CDU-08 Map ${timestamp}`;
         const processoOrigemDescricao = `Processo base FINALIZADO ${timestamp}`;
@@ -138,7 +140,7 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
         });
     });
 
-    test('Cenário 2: Processo de Revisão (Botão impacto)', async ({page, request}) => {
+    test('Cenário 2: Processo de Revisão (Botão impacto)', async ({_resetAutomatico, page, request}) => {
         const timestamp = Date.now();
         const descricao = `Processo CDU-08 Rev ${timestamp}`;
         const UNIDADE_REVISAO = 'ASSESSORIA_12';

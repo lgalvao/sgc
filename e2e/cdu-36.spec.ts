@@ -11,7 +11,7 @@ import {criarProcessoMapaHomologadoFixture} from './fixtures/fixtures-processos.
  */
 test.describe.serial('CDU-36 - Gerar relatório de mapas', () => {
 
-    test('Cenários CDU-36: ADMIN navega e gera relatórios de mapas', async ({page, request}) => {
+    test('Cenários CDU-36: ADMIN navega e gera relatórios de mapas', async ({_resetAutomatico, page, request, _autenticadoComoAdmin}) => {
         const descricaoProcesso = `Relatório CDU-36 ${Date.now()}`;
         const processo = await criarProcessoMapaHomologadoFixture(request, {
             descricao: descricaoProcesso,

@@ -10,7 +10,7 @@ import {expect, test} from './fixtures/complete-fixtures.js';
  */
 test.describe.serial('CDU-30 - Manter administradores', () => {
 
-    test('Cenários CDU-30: ADMIN acessa e visualiza lista de administradores', async ({page}) => {
+    test('Cenários CDU-30: ADMIN acessa e visualiza lista de administradores', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
         // Cenario 1: Navegação para página de administradores
         await page.getByTestId('btn-administradores').click();
         await expect(page).toHaveURL(/\/administradores/);

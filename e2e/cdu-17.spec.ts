@@ -15,7 +15,7 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
     const competencia1 = `Competência 1 ${timestamp}`;
     const competencia2 = `Competência 2 ${timestamp}`;
 
-    test('Setup data', async ({request}) => {
+    test('Setup data', async ({_resetAutomatico, request}) => {
         await criarProcessoCadastroHomologadoFixture(request, {
             descricao: descProcesso,
             unidade: UNIDADE_ALVO
@@ -26,8 +26,10 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
     // TESTES PRINCIPAIS - CDU-17
 
     test('Cenários CDU-17: Fluxo completo de disponibilização do mapa pelo ADMIN', async ({
-                                                                                              page
-                                                                                          }) => {
+                                                                                              _resetAutomatico,
+                                                                                              page,
+                                                                                              _autenticadoComoAdmin
+}) => {
 
         // Cenario 1: Navegação
         await expect(page.getByTestId('tbl-processos').getByText(descProcesso).first()).toBeVisible();

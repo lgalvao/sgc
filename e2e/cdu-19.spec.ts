@@ -9,7 +9,7 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
     const timestamp = Date.now();
     const descProcesso = `Mapeamento CDU-19 ${timestamp}`;
 
-    test('Setup data', async ({request}) => {
+    test('Setup data', async ({_resetAutomatico, request}) => {
         await criarProcessoMapaDisponibilizadoFixture(request, {
             descricao: descProcesso,
             unidade: UNIDADE_ALVO
@@ -20,8 +20,10 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
     // TESTES PRINCIPAIS - CDU-19
 
     test('Cenários CDU-19: Fluxo completo de validação do mapa pelo CHEFE', async ({
-                                                                                       page
-                                                                                   }) => {
+                                                                                       _resetAutomatico,
+                                                                                       page,
+                                                                                       _autenticadoComoChefeSecao221
+}) => {
         // Cenario 1: Navegação para visualização do mapa
         await expect(page.getByTestId('tbl-processos').getByText(descProcesso).first()).toBeVisible();
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();

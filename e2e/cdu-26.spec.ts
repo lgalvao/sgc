@@ -24,7 +24,7 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
     const timestamp = Date.now();
     const descProcesso = `Mapeamento CDU-26 ${timestamp}`;
 
-    test('Setup data', async ({request}) => {
+    test('Setup data', async ({_resetAutomatico, request}) => {
         await criarProcessoMapaValidadoFixture(request, {
             descricao: descProcesso,
             unidade: UNIDADE_1
@@ -32,7 +32,7 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
         expect(true).toBeTruthy();
     });
 
-    test('Cenario 1: ADMIN visualiza botão Homologar mapa em Bloco', async ({page}) => {
+    test('Cenario 1: ADMIN visualiza botão Homologar mapa em Bloco', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
 
@@ -41,7 +41,7 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
         await expect(btnHomologar).toBeEnabled();
     });
 
-    test('Cenario 2: ADMIN abre modal de homologação de mapa em bloco', async ({page}) => {
+    test('Cenario 2: ADMIN abre modal de homologação de mapa em bloco', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
 
         const btnHomologar = page.getByRole('button', {name: /^Homologar mapa de competências em bloco$/i}).first();
@@ -59,7 +59,7 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
         await modal.getByRole('button', {name: /Cancelar/i}).click();
     });
 
-    test('Cenario 3: Cancelar homologação de mapa em bloco', async ({page}) => {
+    test('Cenario 3: Cancelar homologação de mapa em bloco', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
 
         const btnHomologar = page.getByRole('button', {name: /^Homologar mapa de competências em bloco$/i}).first();

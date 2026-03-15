@@ -8,14 +8,15 @@ Migrate the project's linting process to use [OXC (specifically `oxlint`)](https
 - **Frontend**: `oxlint` installed and integrated into `npm run lint`.
 - **Verification**: `npx oxlint .` reports 0 warnings and 0 errors.
 - **Improvements**: 
-  - Removed 80+ unused Playwright fixtures from `e2e/*.spec.ts`.
+  - Removed/Prefixed 100+ unused variables and fixtures.
+  - Optimized E2E setup: `resetAutomatico` is now `_resetAutomatico` (not `auto: true`) and is explicitly included as the **first fixture** in all tests. This ensures the database is reset **BEFORE** any login fixture runs, eliminating redundant logins and speeding up the tests.
   - Fixed unsafe optional chaining in `frontend/src/router/__tests__/router.spec.ts`.
   - Fixed useless fallback in spread operators in frontend component tests.
-  - Cleaned up unused variables and catch parameters in backend scripts and E2E fixtures.
 
 ## Key Files & Context
 - `package.json` (Root): Added `lint:ox`, updated `lint`.
 - `frontend/package.json`: Added `lint:ox`, updated `lint` and `quality:lint`.
+- `e2e/fixtures/complete-fixtures.ts`: Optimized `_resetAutomatico`.
 - `README.md`: Updated with OXC commands.
 
 ## Maintenance

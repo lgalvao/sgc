@@ -13,7 +13,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         const timestamp = Date.now();
         const descProcesso = `Processo em andamento CDU-11 ${timestamp}`;
 
-        test('Setup data', async ({request}) => {
+        test('Setup data', async ({_resetAutomatico, request}) => {
             await criarProcessoCadastroDisponibilizadoFixture(request, {
                 unidade: UNIDADE_ALVO,
                 descricao: descProcesso
@@ -21,7 +21,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
             expect(true).toBeTruthy();
         });
 
-        test('Fluxo ADMIN/GESTOR: Navega via Detalhes do Processo (Passo 2)', async ({page}) => {
+        test('Fluxo ADMIN/GESTOR: Navega via Detalhes do Processo (Passo 2)', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
             // 1. No painel, o usuário clica no processo em andamento
             await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
 
@@ -45,7 +45,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
             await expect(page.getByText(/Conhecimento fixture/)).toBeVisible();
         });
 
-        test('Fluxo CHEFE/SERVIDOR: Navega direto para Detalhes do Subprocesso (Passo 3)', async ({page}) => {
+        test('Fluxo CHEFE/SERVIDOR: Navega direto para Detalhes do Subprocesso (Passo 3)', async ({_resetAutomatico, page, _autenticadoComoChefeSecao111}) => {
             // 1. No painel, o usuário clica no processo em andamento
             await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
 
@@ -68,7 +68,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         const timestamp = Date.now();
         const descProcesso = `Processo mapeamento CDU-11 ${timestamp}`;
 
-        test('Setup data', async ({request}) => {
+        test('Setup data', async ({_resetAutomatico, request}) => {
             await criarProcessoFinalizadoFixture(request, {
                 unidade: UNIDADE_ALVO,
                 descricao: descProcesso
@@ -76,7 +76,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
             expect(true).toBeTruthy();
         });
 
-        test('Fluxo ADMIN: Visualizar em processo finalizado', async ({page}) => {
+        test('Fluxo ADMIN: Visualizar em processo finalizado', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
 
             // 1. No painel, o usuário clica no processo finalizado
             await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();

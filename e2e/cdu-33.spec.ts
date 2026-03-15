@@ -22,7 +22,7 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
     const descRevisao = `Revisão CDU-33 ${timestamp}`;
     let revisaoPid = 0;
 
-    test('Setup UI', async ({page, request}) => {
+    test('Setup UI', async ({_resetAutomatico, page, request}) => {
 
         // PREPARAÇÃO 0 - CRIAR MAPA VIGENTE
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
@@ -51,7 +51,7 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa homologado/i);
     });
 
-    test('Cenários CDU-33: ADMIN reabre revisão de cadastro', async ({page}) => {
+    test('Cenários CDU-33: ADMIN reabre revisão de cadastro', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
 
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
         await page.goto(`/processo/${revisaoPid}/${UNIDADE_ALVO}`);

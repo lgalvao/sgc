@@ -24,7 +24,7 @@ test.describe.serial('CDU-34 - Enviar lembrete de prazo', () => {
     const descProcesso = `Mapeamento CDU-34 ${timestamp}`;
 
 
-    test('Preparacao: Admin cria e inicia processo', async ({page, request}) => {
+    test('Preparacao: Admin cria e inicia processo', async ({_resetAutomatico, page, request, _autenticadoComoAdmin}) => {
         await criarProcessoFixture(request, {
             descricao: descProcesso,
             tipo: 'MAPEAMENTO',
@@ -40,8 +40,10 @@ test.describe.serial('CDU-34 - Enviar lembrete de prazo', () => {
 
 
     test('Cenario principal: ADMIN envia lembrete e sistema registra histórico/alerta', async ({
-                                                                                                   page
-                                                                                               }) => {
+                                                                                                   _resetAutomatico,
+                                                                                                   page,
+                                                                                                   _autenticadoComoAdmin
+}) => {
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
 
@@ -60,8 +62,10 @@ test.describe.serial('CDU-34 - Enviar lembrete de prazo', () => {
     });
 
     test('Cenario complementar: unidade de destino visualiza alerta de lembrete no painel', async ({
-                                                                                                        page
-                                                                                                    }) => {
+                                                                                                        _resetAutomatico,
+                                                                                                        page,
+                                                                                                        _autenticadoComoChefeAssessoria22
+}) => {
         const tabelaAlertas = page.getByTestId('tbl-alertas');
         await expect(tabelaAlertas).toBeVisible();
         await expect(tabelaAlertas).toContainText(descProcesso);

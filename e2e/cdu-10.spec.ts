@@ -25,7 +25,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
     const descProcessoRevisao = `Rev 10 ${timestamp}`;
     let processoCodigo: number;
 
-    test('1. Setup: Preparar processo de revisão e atividades iniciais', async ({request, page}) => {
+    test('1. Setup: Preparar processo de revisão e atividades iniciais', async ({_resetAutomatico, request, page}) => {
         // Criar processo mapeamento finalizado (gera mapa vigente)
         await criarProcessoFinalizadoFixture(request, {
             unidade: UNIDADE_ALVO,
@@ -52,7 +52,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Revisão em andamento/i);
     });
 
-    test('2. Cenário 1: Validação - Atividade sem conhecimento', async ({page}) => {
+    test('2. Cenário 1: Validação - Atividade sem conhecimento', async ({_resetAutomatico, page}) => {
         await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
         await page.goto(`/processo/${processoCodigo}/${UNIDADE_ALVO}/cadastro`);
 
@@ -67,7 +67,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await page.getByTestId('btn-disponibilizar-revisao-cancelar').click();
     });
 
-    test('3. Cenário 2: Caminho feliz - Disponibilizar revisão', async ({page}) => {
+    test('3. Cenário 2: Caminho feliz - Disponibilizar revisão', async ({_resetAutomatico, page}) => {
         await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
         await page.goto(`/processo/${processoCodigo}/${UNIDADE_ALVO}/cadastro`);
         await limparNotificacoes(page);
@@ -89,7 +89,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await expect(page.getByTestId('tbl-movimentacoes')).toContainText(TEXTOS.movimentacao.REVISAO_CADASTRO_DISPONIBILIZADA);
     });
 
-    test('4. Cenário 3: Devolução e Histórico', async ({page}) => {
+    test('4. Cenário 3: Devolução e Histórico', async ({_resetAutomatico, page}) => {
         await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
         await page.goto(`/processo/${processoCodigo}/${UNIDADE_ALVO}/vis-cadastro`);
         await page.getByTestId('btn-acao-devolver').click();
@@ -117,7 +117,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await verificarPaginaPainel(page);
     });
 
-    test('5. Cenário 4: Histórico retém as análises após nova disponibilização', async ({page}) => {
+    test('5. Cenário 4: Histórico retém as análises após nova disponibilização', async ({_resetAutomatico, page}) => {
         await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
         await page.goto(`/processo/${processoCodigo}/${UNIDADE_ALVO}/vis-cadastro`);
         await page.getByTestId('btn-acao-devolver').click();
@@ -157,7 +157,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await fecharHistoricoAnalise(page);
     });
 
-    test('6. Cenário 5: Cancelar disponibilização', async ({page}) => {
+    test('6. Cenário 5: Cancelar disponibilização', async ({_resetAutomatico, page}) => {
         await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
         await page.goto(`/processo/${processoCodigo}/${UNIDADE_ALVO}/cadastro`);
         await limparNotificacoes(page);

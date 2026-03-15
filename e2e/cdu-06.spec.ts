@@ -22,7 +22,7 @@ import {
 test.describe('CDU-06 - Detalhar processo', () => {
     const UNIDADE_ALVO = 'ASSESSORIA_12';
 
-    test('Fase 1: Deve exibir detalhes do processo para ADMIN e ações de unidade', async ({page}) => {
+    test('Fase 1: Deve exibir detalhes do processo para ADMIN e ações de unidade', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
         const timestamp = Date.now();
         const descricao = `Processo CDU-06 ${timestamp}`;
 
@@ -65,7 +65,7 @@ test.describe('CDU-06 - Detalhar processo', () => {
         await expect(page.getByTestId('btn-enviar-lembrete')).toBeVisible();
     });
 
-    test('Fase 1b: Deve exibir detalhes do processo para GESTOR e ocultar ações ADMIN', async ({page}) => {
+    test('Fase 1b: Deve exibir detalhes do processo para GESTOR e ocultar ações ADMIN', async ({_resetAutomatico, page}) => {
         const timestamp = Date.now();
         const descricao = `Processo CDU-06 Gestor ${timestamp}`;
         const UNIDADE_PROCESSO = 'ASSESSORIA_21'; // Subordinada à SECRETARIA_2 (George harrison)
@@ -112,7 +112,7 @@ test.describe('CDU-06 - Detalhar processo', () => {
         await expect(page.getByTestId('btn-reabrir-cadastro')).toBeHidden();
     });
 
-    test('Fase 2: Verificar botões de ação em bloco [Step 2.2.2]', async ({page}) => {
+    test('Fase 2: Verificar botões de ação em bloco [Step 2.2.2]', async ({_resetAutomatico, page}) => {
         const timestamp = Date.now();
         const descricao = `Bloco CDU-06 ${timestamp}`;
         const UNIDADE_SUB = 'ASSESSORIA_12';

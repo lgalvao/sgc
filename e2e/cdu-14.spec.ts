@@ -26,7 +26,7 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
     const descProcesso = `Processo CDU-14 ${timestamp}`;
     const atividadeRevisao = `Atividade rev ${timestamp}`;
 
-    test('Setup UI', async ({page, request}) => {
+    test('Setup UI', async ({_resetAutomatico, page, request}) => {
 
         // Preparacao 1: Base de dados com Mapa vigente e Revisão iniciada
         await criarProcessoFinalizadoFixture(request, {
@@ -78,7 +78,7 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
     });
 
-    test('Cenarios CDU-14: GESTOR cancela devolução, aceita e ADMIN vê histórico final', async ({page}) => {
+    test('Cenarios CDU-14: GESTOR cancela devolução, aceita e ADMIN vê histórico final', async ({_resetAutomatico, page}) => {
         await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);

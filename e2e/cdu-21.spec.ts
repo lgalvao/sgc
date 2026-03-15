@@ -10,7 +10,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
     const descProcesso = `Mapeamento CDU-21 ${timestamp}`;
     let codProcesso: number;
 
-    test('Setup data', async ({request}) => {
+    test('Setup data', async ({_resetAutomatico, request}) => {
         const processo = await criarProcessoMapaHomologadoFixture(request, {
             descricao: descProcesso,
             unidade: UNIDADE_ALVO
@@ -21,7 +21,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
 
     // TESTES PRINCIPAIS - CDU-21
 
-    test('Cenario 1: ADMIN navega para detalhes do processo', async ({page}) => {
+    test('Cenario 1: ADMIN navega para detalhes do processo', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
         // CDU-21: Passos 1-2
 
 
@@ -34,7 +34,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
         await expect(page.getByTestId('btn-processo-finalizar')).toBeVisible();
     });
 
-    test('Cenario 2: ADMIN cancela finalização - permanece na tela', async ({page}) => {
+    test('Cenario 2: ADMIN cancela finalização - permanece na tela', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
 
 
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
@@ -52,7 +52,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
         await expect(page.getByTestId('btn-processo-finalizar')).toBeVisible();
     });
 
-    test('Cenario 3: ADMIN finaliza processo com sucesso', async ({page}) => {
+    test('Cenario 3: ADMIN finaliza processo com sucesso', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
         // CDU-21: Passos 7-10
 
 
@@ -72,7 +72,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
         // (Processo finalizado não aparece na lista de processos ativos)
     });
 
-    test('Cenario 4: Verificar ausência de botões em processo finalizado', async ({page}) => {
+    test('Cenario 4: Verificar ausência de botões em processo finalizado', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
         // Issue #1220: Garantir que botões de ação não aparecem para processos finalizados
 
         await page.goto(`/processo/${codProcesso}`);

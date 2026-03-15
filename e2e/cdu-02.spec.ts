@@ -5,7 +5,7 @@ import {criarProcesso, verificarProcessoNaTabela} from './helpers/helpers-proces
 
 test.describe('CDU-02 - Visualizar painel', () => {
     test.describe('Como ADMIN', () => {
-        test('Deve exibir estrutura básica do painel e testar ordenação', async ({page}) => {
+        test('Deve exibir estrutura básica do painel e testar ordenação', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
             await test.step('Verificar seções principais', async () => {
                 await expect(page.getByTestId('txt-painel-titulo-processos')).toBeVisible();
                 await expect(page.getByTestId('txt-painel-titulo-processos')).toHaveText('Processos');
@@ -31,7 +31,7 @@ test.describe('CDU-02 - Visualizar painel', () => {
             });
         });
 
-        test('Deve criar processo e visualizá-lo na tabela', async ({page}) => {
+        test('Deve criar processo e visualizá-lo na tabela', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
             const descricaoProcesso = `Processo E2E - ${Date.now()}`;
 
             await criarProcesso(page, {
@@ -55,8 +55,10 @@ test.describe('CDU-02 - Visualizar painel', () => {
         });
 
         test('Processos "Criado" devem aparecer apenas para ADMIN', async ({
-                                                                               page
-                                                                           }) => {
+                                                                               _resetAutomatico,
+                                                                               page,
+                                                                               _autenticadoComoAdmin
+}) => {
             const descricaoProcesso = `Processo criado - ${Date.now()}`;
 
             await criarProcesso(page, {
@@ -86,8 +88,10 @@ test.describe('CDU-02 - Visualizar painel', () => {
 
 
         test('Não deve incluir unidades INTERMEDIARIAS na seleção', async ({
-                                                                               page
-                                                                           }) => {
+                                                                               _resetAutomatico,
+                                                                               page,
+                                                                               _autenticadoComoAdmin
+}) => {
             await page.getByTestId('btn-painel-criar-processo').click();
             await expect(page).toHaveURL(/\/processo\/cadastro/);
 
@@ -140,7 +144,7 @@ test.describe('CDU-02 - Visualizar painel', () => {
     });
 
     test.describe('Como GESTOR', () => {
-        test('Deve validar visualização, alertas e ordenação', async ({page}) => {
+        test('Deve validar visualização, alertas e ordenação', async ({_resetAutomatico, page, _autenticadoComoGestor}) => {
             await test.step('Verificar restrições de botões e mensagens de tabela vazia', async () => {
                 await expect(page.getByTestId('btn-painel-criar-processo')).toBeHidden();
                 await expect(page.locator('[data-testid="tbl-processos"]')).toBeVisible();

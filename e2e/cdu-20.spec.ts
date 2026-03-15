@@ -12,7 +12,7 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
     const timestamp = Date.now();
     const descProcesso = `Processo CDU-20 ${timestamp}`;
 
-    test('Setup data', async ({request}) => {
+    test('Setup data', async ({_resetAutomatico, request}) => {
         await criarProcessoMapaValidadoFixture(request, {
             unidade: UNIDADE_ALVO,
             descricao: descProcesso
@@ -20,7 +20,7 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
         expect(true).toBeTruthy();
     });
 
-    test('Cenario 1: GESTOR SECRETARIA_1 analisa e aceita', async ({page}) => {
+    test('Cenario 1: GESTOR SECRETARIA_1 analisa e aceita', async ({_resetAutomatico, page}) => {
         // Superior da ASSESSORIA_11 é John lennon (SECRETARIA_1)
         await loginComPerfil(page, USUARIOS.GESTOR_SECRETARIA_1.titulo, USUARIOS.GESTOR_SECRETARIA_1.senha, 'GESTOR - SECRETARIA_1');
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
@@ -45,7 +45,7 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
         await expect(page).toHaveURL(/\/painel/);
     });
 
-    test('Cenario 2: ADMIN homologa final', async ({page}) => {
+    test('Cenario 2: ADMIN homologa final', async ({_resetAutomatico, page}) => {
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, UNIDADE_ALVO);

@@ -15,7 +15,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
     const competencia3 = 'Competência fixture 3';
     const atividadeNovaRevisao = 'Atividade nova revisão fixture';
 
-    test('Setup data', async ({request}) => {
+    test('Setup data', async ({_resetAutomatico, request}) => {
         await criarProcessoRevisaoCadastroHomologadoFixture(request, {
             descricao: descProcessoRevisao,
             unidade: UNIDADE_ALVO
@@ -23,7 +23,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
         expect(true).toBeTruthy();
     });
 
-    test('Cenários CDU-16: ADMIN ajusta mapa e visualiza impactos', async ({page}) => {
+    test('Cenários CDU-16: ADMIN ajusta mapa e visualiza impactos', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
         await test.step('Cenário 1: Navegação para o Mapa', async () => {
             await acessarSubprocessoAdmin(page, descProcessoRevisao, UNIDADE_ALVO);
             await navegarParaMapa(page);

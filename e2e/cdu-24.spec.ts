@@ -18,7 +18,7 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
     const atividade3 = 'Atividade fixture 3';
     const competencia1 = `Competência mapa ${timestamp}`;
 
-    test('Setup data', async ({request}) => {
+    test('Setup data', async ({_resetAutomatico, request}) => {
         await criarProcessoCadastroHomologadoFixture(request, {
             descricao: descProcesso,
             unidade: UNIDADE_1
@@ -26,7 +26,7 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
         expect(true).toBeTruthy();
     });
 
-    test('ADMIN disponibiliza mapas em bloco', async ({page}) => {
+    test('ADMIN disponibiliza mapas em bloco', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, UNIDADE_1);
         await navegarParaMapa(page);

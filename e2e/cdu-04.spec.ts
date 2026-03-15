@@ -18,9 +18,11 @@ import {TEXTOS} from '../frontend/src/constants/textos.js';
 test.describe('CDU-04 - Iniciar processo', () => {
 
     test('Deve iniciar um processo e validar criação de subprocessos e alertas', async ({
+                                                                                            _resetAutomatico,
                                                                                             page,
-                                                                                            browser
-                                                                                        }) => {
+                                                                                            browser,
+                                                                                            _autenticadoComoAdmin
+}) => {
         const descricao = `CDU-04 Iniciar - ${Date.now()}`;
         await criarProcesso(page, {
             descricao: descricao,
