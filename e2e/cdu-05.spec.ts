@@ -71,8 +71,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
 
 
     test('Fase 1.1: ADMIN cria e inicia processo de Mapeamento', async ({
-                                                                            page,
-                                                                            autenticadoComoAdmin
+                                                                            page
                                                                         }) => {
         await passo1_AdminCriaEIniciaProcessoMapeamento(page, descProcMapeamento);
         // Capturar ID do processo para cleanup
@@ -117,7 +116,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await homologarCadastroMapeamento(page);
     });
 
-    test('Fase 1.5: ADMIN adiciona competências e disponibiliza mapa', async ({page, autenticadoComoAdmin}) => {
+    test('Fase 1.5: ADMIN adiciona competências e disponibiliza mapa', async ({page}) => {
 
         await acessarSubprocessoAdmin(page, descProcMapeamento, UNIDADE_ALVO);
         await navegarParaMapa(page);
@@ -126,7 +125,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Fase 1.6: CHEFE valida mapa', async ({page, autenticadoComoAdmin}) => {
+    test('Fase 1.6: CHEFE valida mapa', async ({page}) => {
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
         await acessarSubprocessoChefeDireto(page, descProcMapeamento, UNIDADE_ALVO);
         await navegarParaMapa(page);
@@ -159,7 +158,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Fase 2: Iniciar processo de Revisão', async ({page, autenticadoComoAdmin}) => {
+    test('Fase 2: Iniciar processo de Revisão', async ({page}) => {
         // O login como Admin já foi disparado pela fixture 'autenticadoComoAdmin'
         // Se houver dúvida se a fixture trocou de usuário em um describe.serial,
         // podemos chamar o helper explicitamente para garantir a navegação para /login.

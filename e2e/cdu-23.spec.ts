@@ -38,7 +38,7 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {
         expect(true).toBeTruthy();
     });
 
-    test('Setup aceites', async ({page, autenticadoComoGestorCoord22}) => {
+    test('Setup aceites', async ({page}) => {
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_1);
         await navegarParaAtividadesVisualizacao(page);
         await aceitarCadastroMapeamento(page);
@@ -51,7 +51,7 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {
         expect(true).toBeTruthy();
     });
 
-    test('Cenario 1: ADMIN abre modal e cancela homologação em bloco', async ({page, autenticadoComoAdmin}) => {
+    test('Cenario 1: ADMIN abre modal e cancela homologação em bloco', async ({page}) => {
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
 
@@ -71,7 +71,7 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
     });
 
-    test('Cenario 2: ADMIN confirma homologação em bloco e permanece na tela', async ({page, autenticadoComoAdmin}) => {
+    test('Cenario 2: ADMIN confirma homologação em bloco e permanece na tela', async ({page}) => {
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         const btnHomologar = page.getByRole('button', {name: TEXTOS.acaoBloco.homologar.ROTULO_CADASTRO}).first();
         await expect(btnHomologar).toBeVisible();

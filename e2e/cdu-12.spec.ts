@@ -37,7 +37,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         expect(true).toBeTruthy();
     });
 
-    test('Passo 3.1: Verificação pelo CHEFE na tela de Cadastro', async ({page, autenticadoComoChefeSecao121}) => {
+    test('Passo 3.1: Verificação pelo CHEFE na tela de Cadastro', async ({page}) => {
         await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
         await navegarParaAtividades(page);
 

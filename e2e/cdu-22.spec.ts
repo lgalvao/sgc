@@ -36,7 +36,7 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
         expect(processoCodigo).toBeGreaterThan(0);
     });
 
-    test('Cenario 1: GESTOR abre modal e cancela aceite em bloco', async ({page, autenticadoComoGestorCoord22}) => {
+    test('Cenario 1: GESTOR abre modal e cancela aceite em bloco', async ({page}) => {
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
 
@@ -56,7 +56,7 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
     });
 
-    test('Cenario 3a: Botão desabilitado quando item está com gestor subordinado', async ({page, autenticadoComoGestorSecretaria2}) => {
+    test('Cenario 3a: Botão desabilitado quando item está com gestor subordinado', async ({page}) => {
         // autenticadoComoGestorSecretaria2 já logou como GESTOR SECRETARIA_2
         await page.goto(`/processo/${processoCodigo}`);
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
@@ -66,7 +66,7 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
         await expect(btnAceitar).toBeDisabled();
     });
 
-    test('Cenario 3b: Botão habilitado após gestor subordinado aceitar', async ({page, autenticadoComoGestorCoord22}) => {
+    test('Cenario 3b: Botão habilitado após gestor subordinado aceitar', async ({page}) => {
         // autenticadoComoGestorCoord22 já logou como GESTOR COORD_22
         await page.goto(`/processo/${processoCodigo}`);
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();

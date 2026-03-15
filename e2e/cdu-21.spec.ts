@@ -21,7 +21,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
 
     // TESTES PRINCIPAIS - CDU-21
 
-    test('Cenario 1: ADMIN navega para detalhes do processo', async ({page, autenticadoComoAdmin}) => {
+    test('Cenario 1: ADMIN navega para detalhes do processo', async ({page}) => {
         // CDU-21: Passos 1-2
 
 
@@ -34,7 +34,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
         await expect(page.getByTestId('btn-processo-finalizar')).toBeVisible();
     });
 
-    test('Cenario 2: ADMIN cancela finalização - permanece na tela', async ({page, autenticadoComoAdmin}) => {
+    test('Cenario 2: ADMIN cancela finalização - permanece na tela', async ({page}) => {
 
 
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
@@ -52,7 +52,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
         await expect(page.getByTestId('btn-processo-finalizar')).toBeVisible();
     });
 
-    test('Cenario 3: ADMIN finaliza processo com sucesso', async ({page, autenticadoComoAdmin}) => {
+    test('Cenario 3: ADMIN finaliza processo com sucesso', async ({page}) => {
         // CDU-21: Passos 7-10
 
 
@@ -72,7 +72,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
         // (Processo finalizado não aparece na lista de processos ativos)
     });
 
-    test('Cenario 4: Verificar ausência de botões em processo finalizado', async ({page, autenticadoComoAdmin}) => {
+    test('Cenario 4: Verificar ausência de botões em processo finalizado', async ({page}) => {
         // Issue #1220: Garantir que botões de ação não aparecem para processos finalizados
 
         await page.goto(`/processo/${codProcesso}`);

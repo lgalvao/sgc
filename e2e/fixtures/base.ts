@@ -11,7 +11,7 @@ function obterBaseUrlWorker(_workerIndex: number): string {
 }
 
 function ehErroEsperadoAutenticacao(url: string, status?: number): boolean {
-    return status === 401 && /\/api\/usuarios\/autorizar$/.test(url);
+    return status === 401 && url.endsWith('/api/usuarios/autorizar');
 }
 
 function ehErroEsperadoImportacaoDuplicada(url: string, status?: number, method?: string, body?: string): boolean {
@@ -70,7 +70,7 @@ export const test = base.extend<{
             }
 
             if (text.includes('Failed to load resource: the server responded with a status of 401')
-                && /\/api\/usuarios\/autorizar$/.test(locationUrl)) {
+                && locationUrl.endsWith('/api/usuarios/autorizar')) {
                 return;
             }
 
@@ -106,7 +106,7 @@ export const test = base.extend<{
                     }
                     return String(a);
                 }).join(' ');
-            } catch (e) {
+            } catch {
                 expandedArgs = text; // Fallback
             }
 
@@ -147,7 +147,7 @@ export const test = base.extend<{
                 let body: string;
                 try {
                     body = await response.text();
-                } catch (e) {
+                } catch {
                     body = '[Erro ao ler corpo]';
                 }
 

@@ -33,7 +33,7 @@ describe("AceitarMapaModal.vue", () => {
                     BFormTextarea,
                     BButton,
                     BModal: BModalStub,
-                    ...(options.global.components || {})
+                    ...options.global.components
                 }
             },
         });

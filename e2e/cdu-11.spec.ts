@@ -21,7 +21,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
             expect(true).toBeTruthy();
         });
 
-        test('Fluxo ADMIN/GESTOR: Navega via Detalhes do Processo (Passo 2)', async ({page, autenticadoComoAdmin}) => {
+        test('Fluxo ADMIN/GESTOR: Navega via Detalhes do Processo (Passo 2)', async ({page}) => {
             // 1. No painel, o usuário clica no processo em andamento
             await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
 
@@ -45,7 +45,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
             await expect(page.getByText(/Conhecimento fixture/)).toBeVisible();
         });
 
-        test('Fluxo CHEFE/SERVIDOR: Navega direto para Detalhes do Subprocesso (Passo 3)', async ({page, autenticadoComoChefeSecao111}) => {
+        test('Fluxo CHEFE/SERVIDOR: Navega direto para Detalhes do Subprocesso (Passo 3)', async ({page}) => {
             // 1. No painel, o usuário clica no processo em andamento
             await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
 
@@ -76,7 +76,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
             expect(true).toBeTruthy();
         });
 
-        test('Fluxo ADMIN: Visualizar em processo finalizado', async ({page, autenticadoComoAdmin}) => {
+        test('Fluxo ADMIN: Visualizar em processo finalizado', async ({page}) => {
 
             // 1. No painel, o usuário clica no processo finalizado
             await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();

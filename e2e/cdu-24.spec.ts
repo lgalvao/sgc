@@ -26,7 +26,7 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
         expect(true).toBeTruthy();
     });
 
-    test('ADMIN disponibiliza mapas em bloco', async ({page, autenticadoComoAdmin}) => {
+    test('ADMIN disponibiliza mapas em bloco', async ({page}) => {
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, UNIDADE_1);
         await navegarParaMapa(page);

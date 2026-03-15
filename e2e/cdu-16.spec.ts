@@ -23,7 +23,7 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
         expect(true).toBeTruthy();
     });
 
-    test('Cenários CDU-16: ADMIN ajusta mapa e visualiza impactos', async ({page, autenticadoComoAdmin}) => {
+    test('Cenários CDU-16: ADMIN ajusta mapa e visualiza impactos', async ({page}) => {
         await test.step('Cenário 1: Navegação para o Mapa', async () => {
             await acessarSubprocessoAdmin(page, descProcessoRevisao, UNIDADE_ALVO);
             await navegarParaMapa(page);

@@ -19,8 +19,7 @@ test.describe('CDU-04 - Iniciar processo', () => {
 
     test('Deve iniciar um processo e validar criação de subprocessos e alertas', async ({
                                                                                             page,
-                                                                                            browser,
-                                                                                            autenticadoComoAdmin
+                                                                                            browser
                                                                                         }) => {
         const descricao = `CDU-04 Iniciar - ${Date.now()}`;
         await criarProcesso(page, {

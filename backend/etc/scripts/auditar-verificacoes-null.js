@@ -25,7 +25,7 @@ function getAllFiles(dirPath, arrayOfFiles) {
     return arrayOfFiles;
 }
 
-function classify(lines, index, content) {
+function classify(lines, index) {
     const contextRange = 20;
     const start = Math.max(0, index - contextRange);
     const contextLines = lines.slice(start, index + 1).join('\n');
@@ -52,7 +52,7 @@ function scanFiles() {
                     const stripped = line.trim();
                     if (stripped.startsWith('//') || stripped.startsWith('*')) return;
 
-                    const category = classify(lines, i, stripped);
+                    const category = classify(lines, i);
                     fileResults.push({
                         line: i + 1,
                         content: stripped,

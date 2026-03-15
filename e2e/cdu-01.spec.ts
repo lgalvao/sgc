@@ -30,7 +30,7 @@ test.describe('CDU-01 - Realizar login e exibir estrutura das telas', () => {
         await expect(page.locator('.user-info-text').getByText('ADMIN')).toBeVisible();
     });
 
-    test('Deve exibir barra de navegação após login como ADMIN', async ({page, autenticadoComoAdmin}) => {
+    test('Deve exibir barra de navegação após login como ADMIN', async ({page: _autenticadoComoAdmin}) => {
         // Login como ADMIN (191919) via fixture
 
         await expect(page.getByRole('link', {name: TEXTOS.comum.NOME_SISTEMA})).toBeVisible();
@@ -45,8 +45,7 @@ test.describe('CDU-01 - Realizar login e exibir estrutura das telas', () => {
     });
 
     test('Deve exibir barra de navegação com restrições para GESTOR', async ({
-                                                                                page,
-                                                                                autenticadoComoGestor
+                                                                                page
                                                                             }) => {
         await expect(page.getByRole('link', {name: TEXTOS.comum.NOME_SISTEMA})).toBeVisible();
         await expect(page.getByRole('link', {name: TEXTOS.comum.MENU_PAINEL})).toBeVisible();
@@ -61,8 +60,7 @@ test.describe('CDU-01 - Realizar login e exibir estrutura das telas', () => {
     });
 
     test('Deve exibir barra de navegação com restrições para CHEFE', async ({
-                                                                                page,
-                                                                                autenticadoComoChefeSecao111
+                                                                                page
                                                                             }) => {
         await expect(page.getByRole('link', {name: TEXTOS.comum.NOME_SISTEMA})).toBeVisible();
         await expect(page.getByRole('link', {name: TEXTOS.comum.MENU_PAINEL})).toBeVisible();
@@ -77,8 +75,7 @@ test.describe('CDU-01 - Realizar login e exibir estrutura das telas', () => {
     });
 
     test('Deve exibir barra de navegação com restrições para SERVIDOR', async ({
-                                                                                  page,
-                                                                                  autenticadoComoServidor
+                                                                                  page
                                                                               }) => {
         await expect(page.getByRole('link', {name: TEXTOS.comum.NOME_SISTEMA})).toBeVisible();
         await expect(page.getByRole('link', {name: TEXTOS.comum.MENU_PAINEL})).toBeVisible();
@@ -92,7 +89,7 @@ test.describe('CDU-01 - Realizar login e exibir estrutura das telas', () => {
         await expect(page.getByTestId('btn-administradores')).toBeHidden();
     });
 
-    test('Deve exibir informações do usuário e controles', async ({page, autenticadoComoAdmin}) => {
+    test('Deve exibir informações do usuário e controles', async ({page}) => {
         // Login como ADMIN (191919)
 
         // Para perfil ADMIN, a navbar exibe apenas 'ADMIN' (sem unidade)
@@ -104,7 +101,7 @@ test.describe('CDU-01 - Realizar login e exibir estrutura das telas', () => {
         await expect(page.getByTestId('btn-logout')).toBeVisible();
     });
 
-    test('Deve exibir rodapé', async ({page, autenticadoComoAdmin}) => {
+    test('Deve exibir rodapé', async ({page}) => {
         // Login como ADMIN (191919)
 
         await expect(page.getByText(TEXTOS.comum.RODAPE)).toBeVisible();

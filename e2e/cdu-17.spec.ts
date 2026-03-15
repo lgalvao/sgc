@@ -26,8 +26,7 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
     // TESTES PRINCIPAIS - CDU-17
 
     test('Cenários CDU-17: Fluxo completo de disponibilização do mapa pelo ADMIN', async ({
-                                                                                              page,
-                                                                                              autenticadoComoAdmin
+                                                                                              page
                                                                                           }) => {
 
         // Cenario 1: Navegação

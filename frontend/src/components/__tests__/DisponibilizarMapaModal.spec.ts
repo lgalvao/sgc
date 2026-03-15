@@ -38,7 +38,7 @@ describe("DisponibilizarMapaModal.vue", () => {
                 ...options.global,
                 components: {
                     BFormInput,
-                    ...(options.global.components || {})
+                    ...options.global.components
                 }
             },
         });

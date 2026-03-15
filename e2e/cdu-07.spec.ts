@@ -12,7 +12,7 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
 
     test('Deve exibir detalhes do subprocesso para ADMIN, GESTOR e CHEFE e respeitar regras de cards', async (
         {
-            page, autenticadoComoAdmin
+            page
         }) => {
         const timestamp = Date.now();
         const descricao = `Processo CDU-07 ${timestamp}`;

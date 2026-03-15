@@ -32,7 +32,7 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
         expect(true).toBeTruthy();
     });
 
-    test('Cenários CDU-15: Fluxo completo de manutenção do mapa pelo ADMIN', async ({page, autenticadoComoAdmin}) => {
+    test('Cenários CDU-15: Fluxo completo de manutenção do mapa pelo ADMIN', async ({page}) => {
         // CT-00 e CT-01: Acessar edição e verificar elementos
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
         await navegarParaMapa(page);

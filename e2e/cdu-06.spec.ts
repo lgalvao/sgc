@@ -22,7 +22,7 @@ import {
 test.describe('CDU-06 - Detalhar processo', () => {
     const UNIDADE_ALVO = 'ASSESSORIA_12';
 
-    test('Fase 1: Deve exibir detalhes do processo para ADMIN e ações de unidade', async ({page, autenticadoComoAdmin}) => {
+    test('Fase 1: Deve exibir detalhes do processo para ADMIN e ações de unidade', async ({page}) => {
         const timestamp = Date.now();
         const descricao = `Processo CDU-06 ${timestamp}`;
 

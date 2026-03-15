@@ -14,7 +14,6 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
 
     test('Cenário 1: Processo de Mapeamento (Fluxo completo + Importação + Auto-save)', async ({
                                                                                         page,
-                                                                                        autenticadoComoAdmin,
                                                                                         request
                                                                                     }) => {
         const timestamp = Date.now();

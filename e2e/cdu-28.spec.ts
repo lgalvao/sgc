@@ -8,7 +8,7 @@ test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
         await page.getByTestId(`link-arvore-unidade-${SIGLA_UNIDADE}`).click();
     }
 
-    test.beforeEach(async ({page, autenticadoComoAdmin}) => {
+    test.beforeEach(async ({page}) => {
         await page.getByRole('link', {name: /Unidades/i}).click();
         await expect(page).toHaveURL(/\/unidades/);
     });
