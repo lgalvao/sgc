@@ -10,7 +10,7 @@ Here are the key suggestions to reduce complexity and fragmentation, aligning th
 
 **Suggestion:** Remove the Facade layer entirely. Controllers should interact directly with Services or, for simple reads/CRUD, directly with Spring Data Repositories.
 
-*   **Action:** Deprecate and remove Facade classes (e.g., `ProcessoFacade`, `SubprocessoFacade`, `UsuarioFacade`).
+*   **Action:** Deprecate and remove Facade classes (e.g., `ProcessoFacade`, `SubprocessoFacade`, `UsuarioFacade`, `PainelFacade`, `AlertaFacade`, `RelatorioFacade`, `LoginFacade`, `AtividadeFacade`).
 *   **Action:** Refactor Controllers to inject necessary Services directly.
 *   **Action:** For simple operations (e.g., fetching a list of active units, getting a user by ID), Controllers should inject the Repository directly and call its methods, bypassing empty Service pass-throughs.
 
@@ -20,8 +20,8 @@ Here are the key suggestions to reduce complexity and fragmentation, aligning th
 
 **Suggestion:** Consolidate these micro-services back into single, cohesive domain services.
 
-*   **Action:** Merge the fragmented `Subprocesso*Service` classes into a single `SubprocessoService`.
-*   **Action:** Apply the same consolidation to the `Processo` domain (merging `ProcessoConsultaService`, workflow, etc., into `ProcessoService`).
+*   **Action:** Merge the fragmented `Subprocesso*Service` classes (e.g., `SubprocessoTransicaoService`, `SubprocessoValidacaoService`, `SubprocessoNotificacaoService`) into a single `SubprocessoService`.
+*   **Action:** Apply the same consolidation to the `Processo` domain (merging `ProcessoConsultaService`, workflow, etc., into `ProcessoService`). *Note: This appears to have been partially started with `ProcessoService`.*
 *   **Action:** Keep logic procedural within these consolidated services rather than splitting it across multiple strategy or workflow classes.
 
 ## 3. Backend: Drastically Reduce DTO Mapping
@@ -31,10 +31,10 @@ Here are the key suggestions to reduce complexity and fragmentation, aligning th
 **Suggestion:** Return JPA Entities directly from Controllers for most read operations.
 
 *   **Action:** Remove DTOs that are mere 1:1 copies of JPA entities.
-*   **Action:** Refactor Controllers to return entities (e.g., `List<Processo>`, `Subprocesso`) directly.
+*   **Action:** Refactor Controllers to return entities (e.g., `List<Processo>`, `Subprocesso`, `Mapa`) directly, utilizing `@JsonView` for projection if necessary.
 *   **Action:** Reserve DTOs *only* for specific cases:
     *   Creating/Updating data where the input structure significantly differs from the entity.
-    *   Aggregating data from multiple entities into a single view.
+    *   Aggregating data from multiple entities into a single view (e.g., `ProcessoDetalheDto`).
     *   Hiding sensitive fields (though `@JsonIgnore` or `@JsonView` on the entity is often simpler and preferable).
 
 ## 4. Backend: Simplify the Security Architecture
@@ -45,17 +45,18 @@ Here are the key suggestions to reduce complexity and fragmentation, aligning th
 
 *   **Action:** Ensure all business rules for access control are encapsulated within `SgcPermissionEvaluator` (which implements Spring's `PermissionEvaluator`).
 *   **Action:** Use `@PreAuthorize("hasPermission(#codigo, 'Entidade', 'ACAO')")` directly on Controller methods or Service methods.
-*   **Action:** Deprecate and remove the complex `AccessControlService` and individual `AccessPolicy<T>` implementations, absorbing their logic into the `SgcPermissionEvaluator` if necessary, or simply relying on standard Spring Security roles where sufficient.
+*   **Action:** Deprecate and remove the complex `AccessControlService` and individual `AccessPolicy<T>` implementations, absorbing their logic into the `SgcPermissionEvaluator` if necessary, or simply relying on standard Spring Security roles where sufficient. *Note: The codebase seems to have already transitioned away from `AccessControlService`.*
 
 ## 5. Frontend: Remove Pass-through Pinia Stores
 
-**Issue:** The frontend uses Pinia stores (`processos.ts`, `mapas.ts`, `subprocessos.ts`) largely as pass-throughs to cache API data fetched by Services. This adds boilerplate and complexity without significant benefit, especially since the user base is small and data fetching is fast.
+**Issue:** The frontend uses Pinia stores (`processos.ts`, `mapas.ts`, `subprocessos.ts`, `perfil.ts`) largely as pass-throughs to cache API data fetched by Services. This adds boilerplate and complexity without significant benefit, especially since the user base is small and data fetching is fast. The data synchronization logic they introduce is often unnecessary.
 
 **Suggestion:** Eliminate Pinia stores that only proxy Service calls. Use Vue composables or simple `ref` variables in components to hold data fetched directly from Services.
 
-*   **Action:** Deprecate and remove stores like `useProcessosStore`, `useMapasStore`, etc.
-*   **Action:** Refactor components that rely on these stores to import the corresponding Service functions (e.g., `processoService.obterDetalhesProcesso`) and manage state locally using `ref` or a custom Composable like `useFetch`.
-*   **Action:** Restrict Pinia usage strictly to global application state, such as Authentication (User session) and UI Notifications (`toast.ts`).
+*   **Action:** Deprecate and remove stores like `useProcessosStore`, `useMapasStore`, `useSubprocessosStore`, etc.
+*   **Action:** Create composables (e.g., `useProcessos()`, `useSubprocessos()`) that encapsulate local state (`ref`) and functions that call API services.
+*   **Action:** Refactor components that rely on these stores to import the corresponding Service functions or Composables and manage state locally.
+*   **Action:** Restrict Pinia usage strictly to global application state, such as Authentication (User session), Configuration (`configuracoes.ts`), and UI Notifications (`toast.ts`).
 
 ## 6. Frontend: Simplify Wrapper Components
 
