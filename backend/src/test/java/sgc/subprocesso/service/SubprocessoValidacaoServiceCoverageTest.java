@@ -197,7 +197,7 @@ class SubprocessoValidacaoServiceCoverageTest {
 
             assertThatThrownBy(() -> validacaoService.validarMapaParaDisponibilizacao(sp))
                     .isInstanceOf(ErroValidacao.class)
-                    .hasMessageContaining("Todas as atividades devem estar associadas a pelo menos uma competência");
+                    .hasMessageContaining(MsgValidacao.ATIVIDADES_DEVEM_TER_COMPETENCIA);
         }
 
         @Test
