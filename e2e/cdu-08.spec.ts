@@ -23,8 +23,8 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
         const processoOrigem2Descricao = `Processo base FINALIZADO 2 ${timestamp}`;
         let processoOrigemId: number;
         let processoAlvoId: number;
-        let atividadeA: string;
-        let atividadeB: string;
+        let atividadeA = '';
+        let atividadeB = '';
 
         await test.step('1. Setup: Criar processos origem e Mapeamento alvo', async () => {
             

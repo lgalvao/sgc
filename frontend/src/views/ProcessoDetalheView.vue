@@ -304,14 +304,14 @@ const contextoAceiteBloco = computed<ContextoBloco>(() => obterContextoBloco(uni
 const contextoHomologacaoBloco = computed<ContextoBloco>(() => obterContextoBloco(unidadesElegiveisPorAcao.value.homologar));
 
 const rotuloAcaoAceitarBloco = computed(() => {
-      switch (contextoAceiteBloco.value) {
-        case "cadastro":
+  switch (contextoAceiteBloco.value) {
+    case "cadastro":
       return TEXTOS.acaoBloco.aceitar.ROTULO_CADASTRO;
-        case "validacao":
+    case "validacao":
       return TEXTOS.acaoBloco.aceitar.ROTULO_VALIDACAO;
-        default:
+    default:
       return TEXTOS.acaoBloco.aceitar.ROTULO_MISTO;
-      }
+  }
 });
 
 const rotuloAcaoHomologarBloco = computed(() => {

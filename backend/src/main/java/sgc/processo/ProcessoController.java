@@ -21,6 +21,8 @@ import sgc.subprocesso.service.SubprocessoService;
 
 import java.net.*;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/processos")
@@ -104,7 +106,7 @@ public class ProcessoController {
             throw new ErroValidacao(MsgValidacao.PROCESSO_DEVE_ESTAR_FINALIZADO);
         }
         Map<Long, Subprocesso> subprocessosPorUnidade = subprocessoService.listarEntidadesPorProcesso(codigo).stream()
-                .collect(HashMap::new, (mapa, sp) -> mapa.put(sp.getUnidade().getCodigo(), sp), HashMap::putAll);
+                .collect(Collectors.toMap(sp -> sp.getUnidade().getCodigo(), Function.identity(), (primeiro, duplicado) -> primeiro));
         List<ProcessoDetalheDto.UnidadeParticipanteDto> dtos = processo.getParticipantes().stream()
                 .map(snapshot -> {
                     ProcessoDetalheDto.UnidadeParticipanteDto dto = ProcessoDetalheDto.UnidadeParticipanteDto.fromSnapshot(snapshot);
