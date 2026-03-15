@@ -109,11 +109,6 @@ export interface SalvarCompetenciaRequest {
     atividadesIds: number[];
 }
 
-// Mantendo para retrocompatibilidade se necessário, mas marcando como depreciado se possível
-export type CompetenciaCompleta = Competencia;
-export type CompetenciaVisualizacao = Competencia;
-export type AtividadeVisualizacao = Atividade;
-export type ConhecimentoVisualizacao = Conhecimento;
 
 export interface Mapa {
     codigo: number;
@@ -216,8 +211,6 @@ export interface Analise {
     tipo: string;
 }
 
-export type AnaliseValidacao = Analise;
-export type AnaliseCadastro = Analise;
 
 export interface AtribuicaoTemporaria {
     codigo: number;
@@ -334,8 +327,8 @@ export interface SubprocessoDetalhe {
 export interface MapaVisualizacao {
     codigo: number;
     descricao: string;
-    competencias: CompetenciaVisualizacao[];
-    atividadesSemCompetencia?: AtividadeVisualizacao[];
+    competencias: Competencia[];
+    atividadesSemCompetencia?: Atividade[];
     sugestoes?: string;
 }
 
@@ -382,7 +375,7 @@ export interface MapaCompleto {
     codigo: number;
     subprocessoCodigo: number;
     observacoes: string;
-    competencias: CompetenciaCompleta[];
+    competencias: Competencia[];
     situacao: string;
 }
 

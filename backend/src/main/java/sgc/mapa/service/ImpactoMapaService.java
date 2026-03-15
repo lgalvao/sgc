@@ -29,7 +29,7 @@ public class ImpactoMapaService {
     @Transactional(readOnly = true)
     public ImpactoMapaResponse verificarImpactos(Subprocesso subprocesso, Usuario usuario) {
         if (!permissionEvaluator.verificarPermissao(usuario, subprocesso, VERIFICAR_IMPACTOS)) {
-            throw new ErroAcessoNegado("Usuário não tem permissão para verificar impactos.");
+            throw new ErroAcessoNegado(MsgValidacao.SEM_PERMISSAO_VERIFICAR_IMPACTOS);
         }
 
         checkSituacao(usuario, subprocesso);

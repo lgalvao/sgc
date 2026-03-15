@@ -1,6 +1,6 @@
 <template>
   <LayoutPadrao>
-    <PageHeader title="Mapa de competências técnicas">
+    <PageHeader :title="TEXTOS.mapa.TITULO_TECNICO">
       <template #default>
         <div class="fs-5">
           {{ unidade?.sigla }} - {{ unidade?.nome }}
@@ -15,7 +15,7 @@
             :loading="loadingImpacto"
             data-testid="cad-mapa__btn-impactos-mapa"
             icon="arrow-right-circle"
-            text="Impacto no mapa"
+            :text="TEXTOS.mapa.BOTAO_IMPACTO"
             variant="outline-secondary"
             @click="abrirModalImpacto"
         />
@@ -26,7 +26,7 @@
             variant="outline-success"
             @click="abrirModalDisponibilizar"
         >
-          Disponibilizar
+          {{ TEXTOS.mapa.BOTAO_DISPONIBILIZAR }}
         </BButton>
       </template>
     </PageHeader>
@@ -44,9 +44,9 @@
     <div v-if="unidade">
       <div v-if="competencias.length === 0" class="mb-4 mt-3">
         <EmptyState
-            description="Nenhuma competência cadastrada para esta unidade."
+            :description="TEXTOS.mapa.EMPTY_DESCRIPTION"
             icon="bi-journal-plus"
-            title="Mapa de competências"
+            :title="TEXTOS.mapa.EMPTY_TITLE"
         >
           <BButton
               v-if="podeEditarMapa"
@@ -54,7 +54,7 @@
               variant="primary"
               @click="abrirModalCriarLimpo"
           >
-            <i aria-hidden="true" class="bi bi-plus-lg me-2"/> Criar primeira competência
+            <i aria-hidden="true" class="bi bi-plus-lg me-2"/> {{ TEXTOS.mapa.BOTAO_CRIAR_PRIMEIRA }}
           </BButton>
         </EmptyState>
       </div>
@@ -66,7 +66,7 @@
             variant="outline-primary"
             @click="abrirModalCriarLimpo"
         >
-          <i aria-hidden="true" class="bi bi-plus-lg"/> Criar competência
+          <i aria-hidden="true" class="bi bi-plus-lg"/> {{ TEXTOS.mapa.BOTAO_CRIAR }}
         </BButton>
         <CompetenciaCard
             v-for="comp in competencias"
@@ -81,7 +81,7 @@
       </div>
     </div>
     <div v-else>
-      <p>Unidade não encontrada.</p>
+      <p>{{ TEXTOS.mapa.UNIDADE_NAO_ENCONTRADA }}</p>
     </div>
 
     <CriarCompetenciaModal
@@ -105,10 +105,10 @@
     <ModalConfirmacao
         v-model="mostrarModalExcluirCompetencia"
         :loading="loadingExclusao"
-        :mensagem="`Confirma a exclusão da competência '${competenciaParaExcluir?.descricao}'?`"
+        :mensagem="TEXTOS.mapa.EXCLUSAO_CONFIRMACAO(competenciaParaExcluir?.descricao || '')"
         data-testid="mdl-excluir-competencia"
         test-id-confirmar="btn-confirmar-exclusao-competencia"
-        titulo="Exclusão de competência"
+        :titulo="TEXTOS.mapa.EXCLUSAO_TITULO"
         variant="danger"
         @confirmar="confirmarExclusaoCompetencia"
     />

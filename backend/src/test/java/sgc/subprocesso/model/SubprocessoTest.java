@@ -3,7 +3,6 @@ package sgc.subprocesso.model;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.*;
 import org.junit.jupiter.params.provider.*;
-import sgc.comum.MsgValidacao;
 import sgc.comum.erros.*;
 import sgc.mapa.model.*;
 import sgc.organizacao.model.*;

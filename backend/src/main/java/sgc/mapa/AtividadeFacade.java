@@ -116,7 +116,7 @@ public class AtividadeFacade {
         Subprocesso sp = subprocessoService.obterEntidadePorCodigoMapa(mapaCodigo);
 
         if (!permissionEvaluator.verificarPermissao(usuario, sp, EDITAR_CADASTRO)) {
-            throw new ErroAcessoNegado("Usuário não tem permissão para editar atividades neste subprocesso.");
+            throw new ErroAcessoNegado(MsgValidacao.SEM_PERMISSAO_EDITAR_ATIVIDADES);
         }
 
         if (!Set.of(NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, REVISAO_CADASTRO_EM_ANDAMENTO,

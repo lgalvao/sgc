@@ -69,10 +69,9 @@
 
 <script lang="ts" setup>
 import {BAlert, BButton, BModal, BTable, BSpinner} from "bootstrap-vue-next";
-import type {AnaliseCadastro, AnaliseValidacao} from "@/types/tipos";
+import type {Analise} from "@/types/tipos";
 import {formatDateTimeBR} from "@/utils/dateUtils";
 
-type Analise = AnaliseCadastro | AnaliseValidacao;
 
 const __ = defineProps<{
   mostrar: boolean;

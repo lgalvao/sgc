@@ -1,8 +1,8 @@
 <template>
   <LayoutPadrao>
-    <PageHeader title="Unidades">
+    <PageHeader :title="TEXTOS.unidades.TITULO">
       <template #description>
-        Clique em unidade para ver detalhes.
+        {{ TEXTOS.unidades.SUBTITULO }}
       </template>
     </PageHeader>
 
@@ -17,8 +17,8 @@
     </BAlert>
 
     <div v-if="isLoading" class="text-center py-5">
-      <BSpinner label="Carregando unidades..." variant="primary"/>
-      <p class="mt-2 text-muted">Carregando árvore de unidades...</p>
+      <BSpinner :label="TEXTOS.unidades.CARREGANDO" variant="primary"/>
+      <p class="mt-2 text-muted">{{ TEXTOS.unidades.CARREGANDO_ARVORE }}</p>
     </div>
 
     <div v-else-if="unidades.length > 0">
@@ -31,9 +31,9 @@
 
     <EmptyState
         v-else
-        description="Nenhuma unidade retornada. Tente atualizar a listagem."
+        :description="TEXTOS.unidades.EMPTY_DESCRIPTION"
         icon="bi-diagram-3"
-        title="Nenhuma unidade encontrada."
+        :title="TEXTOS.unidades.EMPTY_TITLE"
     >
       <BButton
           data-testid="btn-unidades-recarregar"
@@ -41,7 +41,7 @@
           variant="outline-primary"
           @click="carregarUnidades"
       >
-        Atualizar unidades
+        {{ TEXTOS.unidades.BOTAO_ATUALIZAR }}
       </BButton>
     </EmptyState>
   </LayoutPadrao>
@@ -56,6 +56,7 @@ import ArvoreUnidades from "@/components/unidade/ArvoreUnidades.vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
 import {buscarTodasUnidades, mapUnidadesArray} from "@/services/unidadeService";
 import type {Unidade} from "@/types/tipos";
+import {TEXTOS} from "@/constants/textos";
 
 const unidades = ref<Unidade[]>([]);
 const isLoading = ref(false);
@@ -78,7 +79,7 @@ async function carregarUnidades() {
     const response = await buscarTodasUnidades();
     unidades.value = mapUnidadesArray(response as any);
   } catch (err: any) {
-    erro.value = err.message || "Erro ao buscar unidades";
+    erro.value = err.message || TEXTOS.comum.ERRO_OPERACAO;
   } finally {
     isLoading.value = false;
   }

@@ -2,8 +2,6 @@ package sgc.processo.service;
 
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
-import org.junit.jupiter.params.*;
-import org.junit.jupiter.params.provider.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
 import org.springframework.data.domain.*;
@@ -123,13 +121,6 @@ class ProcessoServiceTest {
             Authentication auth = mock(Authentication.class);
             // Assume permissionEvaluator handles this
             assertThat(processoService.checarAcesso(auth, 1L)).isFalse();
-        }
-
-        @ParameterizedTest
-        @ValueSource(longs = {1L, 2L})
-        @DisplayName("Deve delegar verificação de acesso para permissionEvaluator")
-        void deveDelegarVerificacaoDeAcesso(Long processoCodigo) {
-            Authentication auth = mock(Authentication.class);
         }
     }
 

@@ -3,7 +3,6 @@ package sgc.processo.model;
 import org.junit.jupiter.api.*;
 import sgc.organizacao.model.*;
 
-import java.lang.reflect.*;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;

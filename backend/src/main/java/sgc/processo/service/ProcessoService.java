@@ -261,7 +261,7 @@ public class ProcessoService {
 
         if (req.acao() == DISPONIBILIZAR) {
             if (!permissionEvaluator.verificarPermissao(usuario, subprocessos, DISPONIBILIZAR_MAPA)) {
-                throw new ErroAcessoNegado("Sem permissão para disponibilizar mapas.");
+                throw new ErroAcessoNegado(MsgValidacao.SEM_PERMISSAO_DISPONIBILIZAR);
             }
             DisponibilizarMapaRequest dispReq = new DisponibilizarMapaRequest(req.dataLimite(), "Disponibilização em bloco");
             transicaoService.disponibilizarMapaEmBloco(subprocessos.stream().map(Subprocesso::getCodigo).toList(), dispReq, usuario);
@@ -374,10 +374,10 @@ public class ProcessoService {
         List<String> erros = new ArrayList<>();
         if (tipo == REVISAO || tipo == DIAGNOSTICO) {
             unidadeService.buscarSiglasPorCodigos(cods.stream().filter(codigo -> !unidadeService.verificarMapaVigente(codigo)).toList())
-                    .stream().findFirst().ifPresent(s -> erros.add("Unidades sem mapa."));
+                    .stream().findFirst().ifPresent(s -> erros.add(MsgValidacao.UNIDADES_SEM_MAPA));
         }
         List<Long> bloqueadas = processoRepo.listarUnidadesEmProcessoAtivo(EM_ANDAMENTO, cods);
-        if (!bloqueadas.isEmpty()) erros.add("Unidades já em processo ativo.");
+        if (!bloqueadas.isEmpty()) erros.add(MsgValidacao.UNIDADES_EM_PROCESSO_ATIVO);
         return erros;
     }
 
@@ -441,9 +441,12 @@ public class ProcessoService {
     }
 
     private Set<Long> obterIdsUnidadesAcesso(Processo pr, Usuario us) {
-        if (us.getPerfilAtivo() == Perfil.ADMIN) return null;
+        if (us.getPerfilAtivo() == Perfil.ADMIN) {
+            return pr.getParticipantes().stream()
+                    .map(UnidadeProcesso::getUnidadeCodigo)
+                    .collect(Collectors.toSet());
+        }
         Long root = us.getUnidadeAtivaCodigo();
-        if (root == null) return Set.of();
         if (us.getPerfilAtivo() != Perfil.GESTOR) return Set.of(root);
         Set<Long> subarvore = new HashSet<>(buscarDescendentes(root));
         return pr.getParticipantes().stream().map(UnidadeProcesso::getUnidadeCodigo).filter(subarvore::contains).collect(Collectors.toSet());
@@ -479,24 +482,40 @@ public class ProcessoService {
     }
 
     private void processarAcoesBlocoAceiteHomologacao(AcaoEmBlocoRequest req, Usuario user, List<Subprocesso> list) {
-        // Lógica de processamento em lote (original da Facade)
-        List<Long> accCad = new ArrayList<>(), accVal = new ArrayList<>(), homCad = new ArrayList<>(), homVal = new ArrayList<>();
-        for (Subprocesso sp : list) {
-            boolean isCad = sp.getSituacao() == MAPEAMENTO_CADASTRO_DISPONIBILIZADO || sp.getSituacao() == REVISAO_CADASTRO_DISPONIBILIZADA || sp.getSituacao() == REVISAO_CADASTRO_HOMOLOGADA;
-            if (req.acao() == ACEITAR) { if (isCad) accCad.add(sp.getCodigo()); else accVal.add(sp.getCodigo()); }
-            else if (req.acao() == HOMOLOGAR) { if (isCad) homCad.add(sp.getCodigo()); else homVal.add(sp.getCodigo()); }
+        Map<Boolean, List<Long>> separacao = list.stream()
+                .collect(Collectors.partitioningBy(
+                        sp -> isSituacaoCadastro(sp.getSituacao()),
+                        Collectors.mapping(Subprocesso::getCodigo, Collectors.toList())
+                ));
+
+        List<Long> cadastro = separacao.getOrDefault(true, List.of());
+        List<Long> validacao = separacao.getOrDefault(false, List.of());
+
+        if (req.acao() == ACEITAR) {
+            if (!cadastro.isEmpty()) transicaoService.aceitarCadastroEmBloco(cadastro, user);
+            if (!validacao.isEmpty()) transicaoService.aceitarValidacaoEmBloco(validacao, user);
+        } else if (req.acao() == HOMOLOGAR) {
+            if (!cadastro.isEmpty()) transicaoService.homologarCadastroEmBloco(cadastro, user);
+            if (!validacao.isEmpty()) transicaoService.homologarValidacaoEmBloco(validacao, user);
         }
-        if (!accCad.isEmpty()) transicaoService.aceitarCadastroEmBloco(accCad, user);
-        if (!accVal.isEmpty()) transicaoService.aceitarValidacaoEmBloco(accVal, user);
-        if (!homCad.isEmpty()) transicaoService.homologarCadastroEmBloco(homCad, user);
-        if (!homVal.isEmpty()) transicaoService.homologarValidacaoEmBloco(homVal, user);
+    }
+
+    private boolean isSituacaoCadastro(SituacaoSubprocesso s) {
+        return s == MAPEAMENTO_CADASTRO_DISPONIBILIZADO ||
+               s == REVISAO_CADASTRO_DISPONIBILIZADA ||
+               s == REVISAO_CADASTRO_HOMOLOGADA;
     }
     
     // Check permission helper
     public boolean checarAcesso(Authentication auth, Long cod) {
-        if (auth == null || !auth.isAuthenticated()) return false;
-        if (auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) return true;
-        return true;
+        if (auth == null || !auth.isAuthenticated() || !(auth.getPrincipal() instanceof Usuario usuario)) return false;
+        if (usuario.getPerfilAtivo() == Perfil.ADMIN) return true;
+
+        List<Long> unidadesAcesso = buscarCodigosAcesso(usuario);
+        return processoRepo.buscarPorCodigoComParticipantes(cod)
+                .map(p -> p.getParticipantes().stream()
+                        .anyMatch(part -> unidadesAcesso.contains(part.getUnidadeCodigo())))
+                .orElse(false);
     }
 
     private void validarSelecaoBloco(List<Long> codigos, List<Subprocesso> list) {

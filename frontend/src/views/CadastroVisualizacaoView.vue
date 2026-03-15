@@ -159,7 +159,7 @@ import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useToastStore} from "@/stores/toast";
 import type {
   AceitarCadastroRequest,
-  AnaliseCadastro,
+  Analise,
   Atividade,
   DevolverCadastroRequest,
   HomologarCadastroRequest,
@@ -225,7 +225,7 @@ const atividades = ref<Atividade[]>([]);
 const processoAtual = computed(() => processosStore.processoDetalhe);
 const isRevisao = computed(() => processoAtual.value?.tipo === TipoProcesso.REVISAO);
 
-const analisesCadastro = ref<AnaliseCadastro[]>([]);
+const analisesCadastro = ref<Analise[]>([]);
 
 const historicoAnalises = computed(() => {
   return analisesCadastro.value || [];

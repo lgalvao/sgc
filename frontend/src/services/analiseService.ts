@@ -1,10 +1,10 @@
 import apiClient from "@/axios-setup";
-import type {AnaliseCadastro, AnaliseValidacao} from "@/types/tipos";
+import type {Analise} from "@/types/tipos";
 
 export const listarAnalisesCadastro = async (
     codSubprocesso: number,
-): Promise<AnaliseCadastro[]> => {
-    const response = await apiClient.get<AnaliseCadastro[]>(
+): Promise<Analise[]> => {
+    const response = await apiClient.get<Analise[]>(
         `/subprocessos/${codSubprocesso}/historico-cadastro`,
     );
     return response.data;
@@ -12,8 +12,8 @@ export const listarAnalisesCadastro = async (
 
 export const listarAnalisesValidacao = async (
     codSubprocesso: number,
-): Promise<AnaliseValidacao[]> => {
-    const response = await apiClient.get<AnaliseValidacao[]>(
+): Promise<Analise[]> => {
+    const response = await apiClient.get<Analise[]>(
         `/subprocessos/${codSubprocesso}/historico-validacao`,
     );
     return response.data;

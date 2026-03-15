@@ -14,13 +14,13 @@
               class="h2 mb-2 text-center"
               data-testid="txt-login-titulo"
           >
-            SGC
+            {{ TEXTOS.login.TITULO }}
           </h1>
           <p
               class="h5 mb-4 text-center text-muted"
               data-testid="txt-login-subtitulo"
           >
-            Sistema de Gestão de Competências
+            {{ TEXTOS.login.SUBTITULO }}
           </p>
           <BForm
               class="p-0"
@@ -36,7 +36,7 @@
                     aria-hidden="true"
                     class="bi bi-person-circle me-2"
                 />
-                Título eleitoral <span aria-hidden="true" class="text-danger">*</span>
+                {{ TEXTOS.login.LABEL_USUARIO }} <span aria-hidden="true" class="text-danger">*</span>
               </template>
               <!-- eslint-disable vuejs-accessibility/no-autofocus -->
               <BFormInput
@@ -48,7 +48,7 @@
                   data-testid="inp-login-usuario"
                   inputmode="numeric"
                   name="titulo"
-                  placeholder="Digite seu título"
+                  :placeholder="TEXTOS.login.PLACEHOLDER_USUARIO"
                   required
                   type="text"
               />
@@ -63,7 +63,7 @@
                     aria-hidden="true"
                     class="bi bi-key me-2"
                 />
-                Senha <span aria-hidden="true" class="text-danger">*</span>
+                {{ TEXTOS.login.LABEL_SENHA }} <span aria-hidden="true" class="text-danger">*</span>
               </template>
               <BInputGroup>
                 <BFormInput
@@ -74,14 +74,14 @@
                     :type="showPassword ? 'text' : 'password'"
                     data-testid="inp-login-senha"
                     name="senha"
-                    placeholder="Digite sua senha"
+                    :placeholder="TEXTOS.login.PLACEHOLDER_SENHA"
                     required
                     @keydown="verificarCapsLock"
                     @keyup="verificarCapsLock"
                 />
                 <template #append>
                   <BButton
-                      :aria-label="showPassword ? 'Ocultar senha' : 'Mostrar senha'"
+                      :aria-label="showPassword ? TEXTOS.login.OCULTAR_SENHA : TEXTOS.login.MOSTRAR_SENHA"
                       :disabled="loginStep > 1"
                       class="text-secondary border-0"
                       variant="link"
@@ -105,13 +105,13 @@
                     aria-hidden="true"
                     class="bi bi-exclamation-triangle-fill me-1"
                 />
-                Caps Lock ativado
+                {{ TEXTOS.login.CAPS_LOCK }}
               </BAlert>
             </BFormGroup>
 
             <BFormGroup
                 v-if="loginStep === 2 && perfisUnidadesDisponiveis.length > 1"
-                label="Selecione o perfil e a unidade"
+                :label="TEXTOS.login.SELECAO_PERFIL"
                 label-for="par"
                 class="mb-3"
                 data-testid="sec-login-perfil"
@@ -129,7 +129,7 @@
                       :value="null"
                       disabled
                   >
-                    -- Selecione uma opção --
+                    {{ TEXTOS.login.SELECIONE_OPCAO }}
                   </BFormSelectOption>
                 </template>
               </BFormSelect>
@@ -137,12 +137,12 @@
 
           <LoadingButton
               :loading="isLoading"
-              aria-label="Entrar"
+              :aria-label="TEXTOS.comum.BOTAO_ENTRAR"
               class="w-100"
               data-testid="btn-login-entrar"
               icon="box-arrow-in-right"
-              loading-text="Entrando..."
-              text="Entrar"
+              :loading-text="TEXTOS.login.ENTRANDO"
+              :text="TEXTOS.comum.BOTAO_ENTRAR"
               type="submit"
               variant="primary"
           />
@@ -183,6 +183,7 @@ import AppAlert from "@/components/comum/AppAlert.vue";
 import {logger} from "@/utils";
 import {normalizeError} from "@/utils/apiError";
 import type {PerfilUnidade} from "@/services/usuarioService";
+import {TEXTOS} from "@/constants/textos";
 
 import {usePerfilStore} from "@/stores/perfil";
 import {useNotification} from "@/composables/useNotification";
@@ -230,7 +231,7 @@ const handleLogin = async () => {
 
 const performInitialLogin = async () => {
   if (!titulo.value || !senha.value) {
-    notify("Por favor, preencha título e senha.", 'danger');
+    notify(TEXTOS.login.ERRO_PREENCHIMENTO, 'danger');
     return;
   }
 
@@ -241,7 +242,7 @@ const performInitialLogin = async () => {
     if (sucessoAutenticacao) {
       await handlePostAuth();
       } else {
-        notify("Título ou senha inválidos.", 'danger');
+        notify(TEXTOS.login.ERRO_CREDENCIAIS, 'danger');
       }
   } catch (error: any) {
     const erroNormalizado = normalizeError(error);
@@ -250,9 +251,9 @@ const performInitialLogin = async () => {
     }
 
     if (error.response?.status === 404 || error.response?.status === 401) {
-      notify("Título ou senha inválidos.", 'danger');
+      notify(TEXTOS.login.ERRO_CREDENCIAIS, 'danger');
     } else {
-      notify("Ocorreu um erro ao tentar realizar o login.", 'danger');
+      notify(TEXTOS.login.ERRO_GENERICO, 'danger');
     }
   } finally {
     isLoading.value = false;
@@ -265,7 +266,7 @@ const handlePostAuth = async () => {
   } else if (perfilStore.perfisUnidades.length === 1) {
     await router.push("/painel");
   } else {
-    notify("Nenhum perfil/unidade disponível para este usuário.", 'danger');
+    notify(TEXTOS.login.ERRO_SEM_AUTORIZACAO, 'danger');
   }
 };
 
@@ -280,12 +281,12 @@ const performProfileSelection = async () => {
       await router.push("/painel");
     } catch (error) {
       logger.error("Erro ao selecionar perfil:", error);
-      notify("Falha ao selecionar o perfil.", 'danger');
+      notify(TEXTOS.login.ERRO_SELECAO_PERFIL, 'danger');
     } finally {
       isLoading.value = false;
     }
   } else {
-    notify("Por favor, selecione um perfil.", 'danger');
+    notify(TEXTOS.login.ERRO_POR_FAVOR_SELECIONE, 'danger');
   }
 };
 </script>

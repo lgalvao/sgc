@@ -24,7 +24,7 @@
           >
             <i
                 class="bi bi-file-earmark-spreadsheet me-2"
-            />Mapa vigente
+            />{{ TEXTOS.unidade.BOTAO_MAPA_VIGENTE }}
           </BButton>
           <BButton
               v-if="isAdmin"
@@ -33,7 +33,7 @@
               variant="outline-primary"
               @click="irParaCriarAtribuicao"
           >
-            Criar atribuição
+            {{ TEXTOS.unidade.BOTAO_CRIAR_ATRIBUICAO }}
           </BButton>
         </template>
       </PageHeader>
@@ -44,17 +44,17 @@
             <BCol md="6">
               <div data-testid="unidade-titular-info">
                 <h5 class="mb-1">
-                  Titular: {{ titularDetalhes ? titularDetalhes.nome : 'Não informado' }}
+                  {{ TEXTOS.unidade.LABEL_TITULAR }} {{ titularDetalhes ? titularDetalhes.nome : TEXTOS.unidade.NAO_INFORMADO }}
                 </h5>
                 <div v-if="titularDetalhes" class="d-flex flex-column">
                   <span v-if="titularDetalhes.ramal">
-                    Ramal: <a
+                    {{ TEXTOS.unidade.LABEL_RAMAL }} <a
                       :aria-label="`Ligar para ${titularDetalhes.ramal}`"
                       :href="`tel:${titularDetalhes.ramal}`"
                     >{{ titularDetalhes.ramal }}</a>
                   </span>
                   <span v-if="titularDetalhes.email">
-                    E-mail: <a
+                    {{ TEXTOS.unidade.LABEL_EMAIL }} <a
                       :aria-label="`Enviar e-mail para ${titularDetalhes.email}`"
                       :href="`mailto:${titularDetalhes.email}`"
                     >{{ titularDetalhes.email }}</a>
@@ -65,17 +65,17 @@
             <BCol class="border-start" md="6">
               <div data-testid="unidade-responsavel-info">
                 <h5 class="mb-1">
-                  Responsável: {{ unidade.responsavel ? unidade.responsavel.nome : 'Não informado' }}
+                  {{ TEXTOS.unidade.LABEL_RESPONSAVEL }} {{ unidade.responsavel ? unidade.responsavel.nome : TEXTOS.unidade.NAO_INFORMADO }}
                 </h5>
                 <div v-if="unidade.responsavel" class="d-flex flex-column">
                   <span v-if="unidade.responsavel.ramal">
-                    Ramal: <a
+                    {{ TEXTOS.unidade.LABEL_RAMAL }} <a
                       :aria-label="`Ligar para ${unidade.responsavel.ramal}`"
                       :href="`tel:${unidade.responsavel.ramal}`"
                     >{{ unidade.responsavel.ramal }}</a>
                   </span>
                   <span v-if="unidade.responsavel.email">
-                    E-mail: <a
+                    {{ TEXTOS.unidade.LABEL_EMAIL }} <a
                       :aria-label="`Enviar e-mail para ${unidade.responsavel.email}`"
                       :href="`mailto:${unidade.responsavel.email}`"
                     >{{ unidade.responsavel.email }}</a>
@@ -89,9 +89,9 @@
     </div>
     <EmptyState
         v-else
-        description="Não foi possível localizar os dados da unidade solicitada."
+        :description="TEXTOS.unidade.EMPTY_DESCRIPTION"
         icon="bi-building"
-        title="Unidade não encontrada"
+        :title="TEXTOS.unidade.EMPTY_TITLE"
     />
 
     <div
@@ -102,7 +102,7 @@
           :columns="colunasTabela"
           :data="dadosFormatadosSubordinadas"
           :hide-headers="true"
-          title="Unidades subordinadas"
+          :title="TEXTOS.unidade.SUBORDINADAS_TITULO"
           @row-click="navegarParaUnidadeSubordinada"
       />
     </div>
@@ -124,6 +124,7 @@ import {useUnidadeAtual} from "@/composables/useUnidadeAtual";
 import {useMapasStore} from "@/stores/mapas";
 import {buscarUsuarioPorTitulo} from "@/services/usuarioService";
 import {logger} from "@/utils";
+import {TEXTOS} from "@/constants/textos";
 
 const props = defineProps<{ codUnidade: number }>();
 
@@ -152,7 +153,7 @@ async function carregarDados() {
       titularDetalhes.value = await buscarUsuarioPorTitulo(unidade.value.tituloTitular);
     }
   } catch (error: any) {
-    lastError.value = {message: error.message || "Erro ao carregar unidade"};
+    lastError.value = {message: error.message || TEXTOS.unidade.ERRO_CARREGAR};
     logger.error("Erro ao carregar dados da unidade:", error);
   }
 }
@@ -180,7 +181,7 @@ function visualizarMapa() {
 onMounted(carregarDados);
 watch(() => props.codUnidade, carregarDados);
 
-const colunasTabela = [{key: "nome", label: "Unidade"}];
+const colunasTabela = [{key: "nome", label: TEXTOS.unidade.CAMPO_UNIDADE}];
 
 const dadosFormatadosSubordinadas = computed(() => {
   if (!unidade.value || !unidade.value.filhas || unidade.value.filhas.length === 0)

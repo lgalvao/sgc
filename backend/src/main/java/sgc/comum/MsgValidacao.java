@@ -97,6 +97,8 @@ public final class MsgValidacao {
     public static final String SUBPROCESSOS_NAO_HOMOLOGADOS     = "Subprocessos não homologados.";
     public static final String PROCESSO_DEVE_ESTAR_FINALIZADO   = "Processo deve estar finalizado.";
     public static final String DATA_FIM_DEVE_SER_POSTERIOR      = "A data de término deve ser posterior à data de início.";
+    public static final String UNIDADES_SEM_MAPA                = "Unidades sem mapa.";
+    public static final String UNIDADES_EM_PROCESSO_ATIVO       = "Unidades já em processo ativo.";
 
     // ── Regras de negócio — Mapa ─────────────────────────────────────────────
     public static final String SUBPROCESSO_SEM_MAPA             = "Subprocesso não possui mapa associado.";
@@ -130,4 +132,19 @@ public final class MsgValidacao {
     public static final String UNIDADES_INTERMEDIARIA_INVALIDAS = "Unidades INTERMEDIARIA inválidas: %s";
     public static final String UNIDADES_SEM_MAPA_VIGENTE        = "Unidades sem mapa vigente: %s";
     public static final String UNIDADES_SEM_SUBPROCESSOS        = "Algumas unidades selecionadas não possuem subprocessos vinculados neste processo: %s";
+
+    // ── Permissões e Segurança ──────────────────────────────────────────────
+    public static final String SEM_PERMISSAO_IMPORTAR           = "Usuário não tem permissão para importar atividades.";
+    public static final String SEM_PERMISSAO_CONSULTAR_ORIGEM   = "Usuário não tem permissão para consultar o subprocesso de origem.";
+    public static final String SEM_PERMISSAO_ACESSO_PERFIL      = "Usuário não tem permissão para acessar com perfil e unidade informados.";
+    public static final String CREDENCIAIS_INVALIDAS            = "Credenciais inválidas";
+    public static final String MUITAS_TENTATIVAS_LOGIN          = "Muitas tentativas de login no sistema. Tente novamente mais tarde.";
+    public static final String MUITAS_TENTATIVAS_DORMINDO       = "Muitas tentativas de login. Tente novamente em alguns minutos.";
+    public static final String AUTENTICACAO_EXTERNA_FALHA       = "Falha na autenticação externa.";
+    public static final String AUTENTICACAO_ERRO_INESPERADO     = "Ocorreu um erro inesperado durante a autenticação.";
+    public static final String SES_EXPIRADA                     = "Sessão expirada ou inválida. Faça login novamente.";
+    public static final String SES_INVALIDA_USUARIO             = "Sessão inválida para o usuário informado.";
+    public static final String SEM_PERMISSAO_DISPONIBILIZAR     = "Sem permissão para disponibilizar mapas.";
+    public static final String SEM_PERMISSAO_EDITAR_ATIVIDADES  = "Usuário não tem permissão para editar atividades neste subprocesso.";
+    public static final String SEM_PERMISSAO_VERIFICAR_IMPACTOS = "Usuário não tem permissão para verificar impactos.";
 }

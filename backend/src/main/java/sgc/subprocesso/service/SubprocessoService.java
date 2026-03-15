@@ -737,13 +737,13 @@ public class SubprocessoService {
         Usuario usuario = usuarioFacade.usuarioAutenticado();
 
         if (!permissionEvaluator.verificarPermissao(usuario, spDestino, EDITAR_CADASTRO)) {
-            throw new ErroAcessoNegado("Usuário não tem permissão para importar atividades.");
+            throw new ErroAcessoNegado(MsgValidacao.SEM_PERMISSAO_IMPORTAR);
         }
         validarSituacaoParaImportacao(spDestino);
 
         Subprocesso spOrigem = repo.buscar(Subprocesso.class, codSubprocessoOrigem);
         if (!permissionEvaluator.verificarPermissao(usuario, spOrigem, CONSULTAR_PARA_IMPORTACAO)) {
-            throw new ErroAcessoNegado("Usuário não tem permissão para consultar o subprocesso de origem.");
+            throw new ErroAcessoNegado(MsgValidacao.SEM_PERMISSAO_CONSULTAR_ORIGEM);
         }
 
         Long codMapaOrigem = spOrigem.getMapa().getCodigo();

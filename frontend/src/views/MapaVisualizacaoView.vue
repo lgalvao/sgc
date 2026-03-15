@@ -256,7 +256,7 @@ import logger from "@/utils/logger";
 import {listarAnalisesCadastro} from "@/services/analiseService";
 import {obterMapaVisualizacao} from "@/services/mapaService";
 import {buscarUnidadePorSigla as buscarUnidadeServico} from "@/services/unidadeService";
-import type {AnaliseCadastro, MapaVisualizacao, Unidade} from "@/types/tipos";
+import type {Analise, MapaVisualizacao, Unidade} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
 
 const route = useRoute();
@@ -267,7 +267,7 @@ const {notify} = useNotification();
 const toastStore = useToastStore();
 const {perfilSelecionado, isAdmin} = usePerfil();
 const mapa = ref<MapaVisualizacao | null>(null);
-const analisesCadastro = ref<AnaliseCadastro[]>([]);
+const analisesCadastro = ref<Analise[]>([]);
 
 const sigla = computed(() => route.params.siglaUnidade as string);
 const codProcesso = computed(() => Number(route.params.codProcesso));

@@ -1,6 +1,6 @@
 <template>
   <LayoutPadrao>
-    <PageHeader title="Administradores">
+    <PageHeader :title="TEXTOS.administracao.TITULO">
       <template #actions>
         <BButton
             data-testid="btn-abrir-modal-add-admin"
@@ -8,13 +8,13 @@
             variant="outline-primary"
             @click="abrirModalAdicionarAdmin"
         >
-          <i aria-hidden="true" class="bi bi-person-plus"></i> Adicionar administrador
+          <i aria-hidden="true" class="bi bi-person-plus"></i> {{ TEXTOS.administracao.BOTAO_ADICIONAR }}
         </BButton>
       </template>
     </PageHeader>
 
     <div v-if="carregandoAdmins" class="text-center py-4">
-      <BSpinner label="Carregando..." variant="primary" />
+      <BSpinner :label="TEXTOS.comum.CARREGANDO" variant="primary" />
     </div>
 
     <BAlert v-else-if="erroAdmins" :model-value="true" variant="danger">
@@ -23,9 +23,9 @@
 
     <div v-else-if="administradores.length === 0">
       <EmptyState
-          description="Utilize o botão 'Adicionar administrador' para cadastrar novos administradores."
+          :description="TEXTOS.administracao.EMPTY_DESCRIPTION"
           icon="bi-people"
-          title="Nenhum administrador cadastrado"
+          :title="TEXTOS.administracao.EMPTY_TITLE"
       />
     </div>
 
@@ -43,7 +43,7 @@
               :loading="removendoAdmin === item.tituloEleitoral"
               icon="trash"
               size="sm"
-              text="Remover"
+              :text="TEXTOS.comum.BOTAO_REMOVER"
               variant="outline-danger"
               @click="confirmarRemocao(item)"
           />
@@ -57,8 +57,8 @@
         :auto-close="false"
         :loading="adicionandoAdmin"
         :ok-disabled="!novoAdminTitulo"
-        ok-title="Adicionar"
-        titulo="Adicionar administrador"
+        :ok-title="TEXTOS.comum.BOTAO_CRIAR"
+        :titulo="TEXTOS.administracao.MODAL_ADICIONAR_TITULO"
         @confirmar="adicionarAdmin"
         @shown="() => inputTituloRef?.focus()"
     >
@@ -67,14 +67,14 @@
           class="mb-3"
       >
         <template #label>
-          Título <span aria-hidden="true" class="text-danger">*</span>
+          {{ TEXTOS.administracao.LABEL_TITULO }} <span aria-hidden="true" class="text-danger">*</span>
         </template>
         <BFormInput
             id="usuarioTitulo"
             ref="inputTituloRef"
             v-model="novoAdminTitulo"
             maxlength="12"
-            placeholder="Digite o título eleitoral"
+            :placeholder="TEXTOS.administracao.PLACEHOLDER_TITULO"
             required
             type="text"
             @keydown.enter.prevent="adicionarAdmin"
@@ -87,8 +87,8 @@
         v-model="mostrarModalRemoverAdmin"
         :auto-close="false"
         :loading="removendoAdmin !== null"
-        ok-title="Remover"
-        titulo="Confirmar remoção"
+        :ok-title="TEXTOS.comum.BOTAO_REMOVER"
+        :titulo="TEXTOS.administracao.MODAL_REMOVER_TITULO"
         variant="danger"
         @confirmar="removerAdmin"
     >
@@ -115,6 +115,7 @@ import {
 } from '@/services/administradorService';
 import {normalizeError} from '@/utils/apiError';
 import {useNotification} from '@/composables/useNotification';
+import {TEXTOS} from '@/constants/textos';
 
 const {notify} = useNotification();
 
@@ -130,11 +131,11 @@ const adicionandoAdmin = ref(false);
 const inputTituloRef = ref<InstanceType<typeof BFormInput> | null>(null);
 
 const camposAdmins = [
-  {key: 'nome', label: 'Nome'},
-  {key: 'tituloEleitoral', label: 'Título eleitoral'},
-  {key: 'matricula', label: 'Matrícula'},
-  {key: 'unidadeSigla', label: 'Unidade'},
-  {key: 'acoes', label: 'Ações', thClass: 'text-end'},
+  {key: 'nome', label: TEXTOS.administracao.CAMPO_NOME},
+  {key: 'tituloEleitoral', label: TEXTOS.administracao.CAMPO_TITULO},
+  {key: 'matricula', label: TEXTOS.administracao.CAMPO_MATRICULA},
+  {key: 'unidadeSigla', label: TEXTOS.administracao.CAMPO_UNIDADE},
+  {key: 'acoes', label: TEXTOS.administracao.CAMPO_ACOES, thClass: 'text-end'},
 ];
 
 async function carregarAdministradores() {
@@ -161,7 +162,7 @@ function fecharModalAdicionarAdmin() {
 
 async function adicionarAdmin() {
   if (!novoAdminTitulo.value.trim()) {
-    notify('Digite um título eleitoral válido', 'warning');
+    notify(TEXTOS.administracao.ERRO_TITULO_INVALIDO, 'warning');
     return;
   }
 
@@ -169,7 +170,7 @@ async function adicionarAdmin() {
   try {
     await adicionarAdministrador(novoAdminTitulo.value.trim());
     fecharModalAdicionarAdmin();
-    notify('Administrador adicionado', 'success');
+    notify(TEXTOS.administracao.SUCESSO_ADICIONADO, 'success');
     await carregarAdministradores();
   } catch (error) {
     const erro = normalizeError(error);
@@ -190,7 +191,7 @@ async function removerAdmin() {
   removendoAdmin.value = adminParaRemover.value.tituloEleitoral;
   try {
     await removerAdministrador(adminParaRemover.value.tituloEleitoral);
-    notify('Administrador removido', 'success');
+    notify(TEXTOS.administracao.SUCESSO_REMOVIDO, 'success');
     await carregarAdministradores();
     mostrarModalRemoverAdmin.value = false;
     adminParaRemover.value = null;
