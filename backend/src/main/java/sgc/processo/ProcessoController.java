@@ -103,8 +103,23 @@ public class ProcessoController {
         if (processo.getSituacao() != SituacaoProcesso.FINALIZADO) {
             throw new ErroValidacao(MsgValidacao.PROCESSO_DEVE_ESTAR_FINALIZADO);
         }
+        Map<Long, Subprocesso> subprocessosPorUnidade = subprocessoService.listarEntidadesPorProcesso(codigo).stream()
+                .collect(HashMap::new, (mapa, sp) -> mapa.put(sp.getUnidade().getCodigo(), sp), HashMap::putAll);
         List<ProcessoDetalheDto.UnidadeParticipanteDto> dtos = processo.getParticipantes().stream()
-                .map(ProcessoDetalheDto.UnidadeParticipanteDto::fromSnapshot)
+                .map(snapshot -> {
+                    ProcessoDetalheDto.UnidadeParticipanteDto dto = ProcessoDetalheDto.UnidadeParticipanteDto.fromSnapshot(snapshot);
+                    Subprocesso subprocesso = subprocessosPorUnidade.get(snapshot.getUnidadeCodigo());
+                    if (subprocesso != null) {
+                        dto.setSituacaoSubprocesso(subprocesso.getSituacao());
+                        dto.setDataLimite(subprocesso.getDataLimiteEtapa1());
+                        dto.setCodSubprocesso(subprocesso.getCodigo());
+                        if (subprocesso.getMapa() != null) dto.setMapaCodigo(subprocesso.getMapa().getCodigo());
+                        if (subprocesso.getLocalizacaoAtual() != null) {
+                            dto.setLocalizacaoAtualCodigo(subprocesso.getLocalizacaoAtual().getCodigo());
+                        }
+                    }
+                    return dto;
+                })
                 .toList();
         return ResponseEntity.ok(dtos);
     }

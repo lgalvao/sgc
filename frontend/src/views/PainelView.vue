@@ -133,7 +133,7 @@ async function carregarDados() {
   }
 }
 
-onMounted(async () => {
+function exibirToastPendente() {
   const pendente = toastStore.consumePending();
   if (pendente) {
     toast.create({
@@ -146,10 +146,15 @@ onMounted(async () => {
       }
     });
   }
+}
+
+onMounted(async () => {
+  exibirToastPendente();
   await carregarDados();
 });
 
 onActivated(async () => {
+  exibirToastPendente();
   await carregarDados();
 });
 

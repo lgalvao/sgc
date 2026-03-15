@@ -37,13 +37,13 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         
         // Validação da UI da ação em bloco
-        const btnDisponibilizar = page.getByRole('button', {name: /Disponibilizar mapas em bloco/i}).first();
+        const btnDisponibilizar = page.getByRole('button', {name: TEXTOS.acaoBloco.disponibilizar.ROTULO}).first();
         await expect(btnDisponibilizar).toBeEnabled();
         await btnDisponibilizar.click();
 
         const modal = page.locator('#modal-acao-bloco');
-        await expect(modal.getByText(/Disponibilização de mapa em bloco/i)).toBeVisible();
-        await expect(modal.getByText(/Selecione abaixo as unidades cujos mapas deverão ser disponibilizados/i)).toBeVisible();
+        await expect(modal.getByText(TEXTOS.acaoBloco.disponibilizar.TITULO)).toBeVisible();
+        await expect(modal.getByText(TEXTOS.acaoBloco.disponibilizar.TEXTO)).toBeVisible();
         await expect(modal.getByLabel(/Data limite/i)).toBeVisible();
 
         const data = new Date();
@@ -53,7 +53,7 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
         const dd = String(data.getDate()).padStart(2, '0');
         await modal.getByLabel(/Data limite/i).fill(`${yyyy}-${mm}-${dd}`);
 
-        await modal.getByRole('button', {name: /^Disponibilizar$/i}).click();
+        await modal.getByRole('button', {name: TEXTOS.acaoBloco.disponibilizar.BOTAO}).click();
         await expect(page.getByText(TEXTOS.sucesso.MAPAS_DISPONIBILIZADOS_EM_BLOCO).first()).toBeVisible();
         await expect(page).toHaveURL(/\/painel/);
     });

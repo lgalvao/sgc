@@ -47,8 +47,8 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
 
         const modal = page.locator('#modal-acao-bloco');
         await expect(modal).toHaveClass(/show/);
-        await expect(modal.getByText(/Aceite de cadastro em bloco/i)).toBeVisible();
-        await expect(modal.getByText(/Selecione as unidades cujos cadastros deverão ser aceitos/i)).toBeVisible();
+        await expect(modal.getByText(TEXTOS.acaoBloco.aceitar.TITULO_CADASTRO)).toBeVisible();
+        await expect(modal.getByText(TEXTOS.acaoBloco.aceitar.TEXTO_CADASTRO)).toBeVisible();
         await expect(modal.locator('table')).toBeVisible();
         await modal.getByRole('button', {name: /Cancelar/i}).click();
 
@@ -71,7 +71,7 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
         await page.goto(`/processo/${processoCodigo}`);
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
         await page.getByTestId('btn-processo-aceitar-bloco').click();
-        await page.locator('#modal-acao-bloco').getByRole('button', {name: /Registrar aceite/i}).click();
+        await page.locator('#modal-acao-bloco').getByRole('button', {name: TEXTOS.acaoBloco.aceitar.BOTAO}).click();
         await expect(page.getByText(TEXTOS.sucesso.CADASTROS_ACEITOS_EM_BLOCO).first()).toBeVisible();
 
         // GESTOR SECRETARIA_2 deve agora ver o botão habilitado
