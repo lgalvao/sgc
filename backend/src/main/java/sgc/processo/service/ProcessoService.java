@@ -7,6 +7,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.AlertaFacade;
+import sgc.comum.MsgValidacao;
 import sgc.comum.erros.*;
 import sgc.comum.model.ComumRepo;
 import sgc.organizacao.model.*;
@@ -162,7 +163,7 @@ public class ProcessoService {
     public Processo atualizar(Long codigo, AtualizarProcessoRequest req) {
         Processo processo = buscarPorCodigo(codigo);
         if (processo.getSituacao() != CRIADO) {
-            throw new ErroValidacao("Apenas processos na situação 'CRIADO' podem ser editados.");
+            throw new ErroValidacao(MsgValidacao.PROCESSO_SO_EDITAVEL_EM_CRIADO);
         }
 
         validarUnidadesParaProcesso(req.tipo(), new ArrayList<>(req.unidades()));
@@ -183,7 +184,7 @@ public class ProcessoService {
     public void apagar(Long codigo) {
         Processo processo = buscarPorCodigo(codigo);
         if (processo.getSituacao() != CRIADO) {
-            throw new ErroValidacao("Apenas processos na situação 'CRIADO' podem ser removidos.");
+            throw new ErroValidacao(MsgValidacao.PROCESSO_SO_REMOVIVEL_EM_CRIADO);
         }
         processoRepo.deleteById(codigo);
         log.info("Processo {} removido.", codigo);
@@ -193,7 +194,7 @@ public class ProcessoService {
     public List<String> iniciar(Long codigo, List<Long> codsUnidadesParam, Usuario usuario) {
         Processo processo = buscarPorCodigo(codigo);
         if (processo.getSituacao() != CRIADO) {
-            throw new ErroValidacao("Apenas processos na situação 'CRIADO' podem ser iniciados.");
+            throw new ErroValidacao(MsgValidacao.PROCESSO_SO_INICIAVEL_EM_CRIADO);
         }
 
         TipoProcesso tipo = processo.getTipo();
@@ -202,7 +203,7 @@ public class ProcessoService {
 
         if (tipo == REVISAO) {
             if (codsUnidadesParam.isEmpty()) {
-                throw new ErroValidacao("A lista de unidades é obrigatória para iniciar o processo de revisão.");
+                throw new ErroValidacao(MsgValidacao.LISTA_UNIDADES_OBRIGATORIA_REVISAO);
             }
             codigosUnidades = codsUnidadesParam;
             unidadesParaProcessar = new HashSet<>(unidadeService.porCodigos(codigosUnidades));
@@ -210,7 +211,7 @@ public class ProcessoService {
         } else {
             codigosUnidades = processo.getCodigosParticipantes();
             if (codigosUnidades.isEmpty()) {
-                throw new ErroValidacao("Não há unidades participantes definidas.");
+                throw new ErroValidacao(MsgValidacao.SEM_UNIDADES_PARTICIPANTES);
             }
             unidadesParaProcessar = new HashSet<>(unidadeService.porCodigos(codigosUnidades));
         }
@@ -255,7 +256,7 @@ public class ProcessoService {
         Usuario usuario = usuarioService.usuarioAutenticado();
         List<Subprocesso> subprocessos = subprocessoService.listarEntidadesPorProcessoEUnidades(codProcesso, req.unidadeCodigos());
         
-        if (req.unidadeCodigos().isEmpty()) throw new ErroValidacao("Selecione ao menos uma unidade.");
+        if (req.unidadeCodigos().isEmpty()) throw new ErroValidacao(MsgValidacao.SELECIONE_AO_MENOS_UMA_UNIDADE);
         validarSelecaoBloco(req.unidadeCodigos(), subprocessos);
 
         if (req.acao() == DISPONIBILIZAR) {
@@ -308,7 +309,7 @@ public class ProcessoService {
         Unidade unidade = unidadeService.buscarPorCodigo(unidadeCodigo);
 
         if (processo.getParticipantes().stream().noneMatch(u -> u.getUnidadeCodigo().equals(unidadeCodigo))) {
-            throw new ErroValidacao("Unidade não participa deste processo.");
+            throw new ErroValidacao(MsgValidacao.UNIDADE_NAO_PARTICIPA);
         }
 
         String dataLimiteText = processo.getDataLimite() != null 
@@ -359,13 +360,13 @@ public class ProcessoService {
         List<String> invalidas = entidades.stream()
                 .filter(u -> u.getTipo() == TipoUnidade.INTERMEDIARIA)
                 .map(Unidade::getSigla).toList();
-        if (!invalidas.isEmpty()) throw new ErroValidacao("Unidades INTERMEDIARIA inválidas: " + String.join(", ", invalidas));
+        if (!invalidas.isEmpty()) throw new ErroValidacao(MsgValidacao.UNIDADES_INTERMEDIARIA_INVALIDAS.formatted(String.join(", ", invalidas)));
 
         if (tipo == REVISAO || tipo == DIAGNOSTICO) {
             List<String> semMapa = codigosUnidades.stream()
                     .filter(codigo -> !unidadeService.verificarMapaVigente(codigo))
                     .map(codigo -> unidadeService.buscarPorCodigo(codigo).getSigla()).toList();
-            if (!semMapa.isEmpty()) throw new ErroValidacao("Unidades sem mapa vigente: " + String.join(", ", semMapa));
+            if (!semMapa.isEmpty()) throw new ErroValidacao(MsgValidacao.UNIDADES_SEM_MAPA_VIGENTE.formatted(String.join(", ", semMapa)));
         }
     }
 
@@ -381,9 +382,9 @@ public class ProcessoService {
     }
 
     private void validarFinalizacao(Processo processo) {
-        if (processo.getSituacao() != EM_ANDAMENTO) throw new ErroValidacao("Situação inválida.");
+        if (processo.getSituacao() != EM_ANDAMENTO) throw new ErroValidacao(MsgValidacao.SITUACAO_INVALIDA);
         if (!validacaoService.validarSubprocessosParaFinalizacao(processo.getCodigo()).valido()) 
-            throw new ErroValidacao("Subprocessos não homologados.");
+            throw new ErroValidacao(MsgValidacao.SUBPROCESSOS_NAO_HOMOLOGADOS);
     }
 
     private void tornarMapasVigentes(Processo processo) {
@@ -502,7 +503,7 @@ public class ProcessoService {
         if (codigos.size() != list.size()) {
             Set<Long> encontrados = list.stream().map(Subprocesso::getUnidade).map(Unidade::getCodigo).collect(Collectors.toSet());
             List<Long> faltando = codigos.stream().filter(codigo -> !encontrados.contains(codigo)).toList();
-            throw new ErroValidacao("Algumas unidades selecionadas não possuem subprocessos vinculados neste processo: " + faltando);
+            throw new ErroValidacao(MsgValidacao.UNIDADES_SEM_SUBPROCESSOS.formatted(faltando));
         }
     }
 }

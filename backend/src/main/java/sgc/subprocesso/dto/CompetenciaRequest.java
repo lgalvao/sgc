@@ -2,6 +2,7 @@ package sgc.subprocesso.dto;
 
 import jakarta.validation.constraints.*;
 import lombok.*;
+import sgc.comum.MsgValidacao;
 
 import java.util.*;
 
@@ -10,9 +11,9 @@ import java.util.*;
  */
 @Builder
 public record CompetenciaRequest(
-        @NotBlank(message = "A descrição da competência é obrigatória")
+        @NotBlank(message = MsgValidacao.DESCRICAO_COMPETENCIA_OBRIGATORIA)
         String descricao,
 
-        @NotEmpty(message = "A competência deve ter pelo menos uma atividade associada")
+        @NotEmpty(message = MsgValidacao.COMPETENCIA_DEVE_TER_ATIVIDADE)
         List<Long> atividadesIds) {
 }

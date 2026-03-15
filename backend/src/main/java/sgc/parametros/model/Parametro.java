@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
 import lombok.experimental.*;
+import sgc.comum.MsgValidacao;
 import sgc.comum.model.*;
 
 @Entity
@@ -16,8 +17,8 @@ import sgc.comum.model.*;
 public class Parametro extends EntidadeBase {
     @JsonView(ConfiguracaoViews.Publica.class)
     @Column(name = "chave", length = 50, nullable = false)
-    @NotBlank(message = "A chave não pode estar vazia")
-    @Size(max = 50, message = "A chave deve ter no máximo 50 caracteres")
+    @NotBlank(message = MsgValidacao.CHAVE_OBRIGATORIA)
+    @Size(max = 50, message = MsgValidacao.CHAVE_MAX)
     private String chave;
 
     @JsonView(ConfiguracaoViews.Publica.class)
@@ -26,7 +27,7 @@ public class Parametro extends EntidadeBase {
 
     @JsonView(ConfiguracaoViews.Publica.class)
     @Column(name = "valor", nullable = false)
-    @NotBlank(message = "O valor não pode estar vazio")
+    @NotBlank(message = MsgValidacao.VALOR_OBRIGATORIO)
     private String valor;
 
     public void atualizarDe(sgc.parametros.ParametroRequest request) {

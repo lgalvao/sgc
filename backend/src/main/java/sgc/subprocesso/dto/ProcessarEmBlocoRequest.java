@@ -2,16 +2,17 @@ package sgc.subprocesso.dto;
 
 import jakarta.validation.constraints.*;
 import lombok.*;
+import sgc.comum.MsgValidacao;
 
 import java.time.*;
 import java.util.*;
 
 @Builder
 public record ProcessarEmBlocoRequest(
-        @NotBlank(message = "A ação é obrigatória")
+        @NotBlank(message = MsgValidacao.ACAO_OBRIGATORIA)
         String acao,
 
-        @NotEmpty(message = "Pelo menos um subprocesso deve ser selecionado")
+        @NotEmpty(message = MsgValidacao.PELO_MENOS_UM_SUBPROCESSO)
         List<Long> subprocessos,
 
         LocalDate dataLimite) {

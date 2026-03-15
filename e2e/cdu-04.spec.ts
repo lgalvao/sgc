@@ -13,6 +13,7 @@ import {
     verificarToast
 } from './helpers/helpers-navegacao.js';
 import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
+import {TEXTOS} from '../frontend/src/constants/textos.js';
 
 test.describe('CDU-04 - Iniciar processo', () => {
 
@@ -45,7 +46,7 @@ test.describe('CDU-04 - Iniciar processo', () => {
 
         // Aguarda toast e redirect
         await esperarPaginaPainel(page);
-        await verificarToast(page, /iniciado com sucesso/i);
+        await verificarToast(page, TEXTOS.sucesso.PROCESSO_INICIADO);
         await verificarProcessoNaTabela(page, {
             descricao,
             situacao: 'Em andamento',

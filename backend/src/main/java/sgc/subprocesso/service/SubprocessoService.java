@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.*;
 import org.springframework.context.annotation.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
+import sgc.comum.MsgValidacao;
 import sgc.comum.erros.*;
 import sgc.comum.model.*;
 import sgc.mapa.dto.*;
@@ -493,8 +494,8 @@ public class SubprocessoService {
         if (sp.getSituacao() != SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA
                 && sp.getSituacao() != SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO) {
             throw new ErroValidacao(
-                    "Ajustes no mapa só podem ser feitos em estados específicos. "
-                            + "Situação atual: %s".formatted(sp.getSituacao()));
+                    MsgValidacao.AJUSTES_ESTADOS_ESPECIFICOS
+                            .formatted(sp.getSituacao()));
         }
     }
 
@@ -751,7 +752,7 @@ public class SubprocessoService {
         int importadas = copiaMapaService.importarAtividadesDeOutroMapa(codMapaOrigem, codMapaDestino, codigosAtividades);
 
         if (codigosAtividades != null && importadas == 0 && !codigosAtividades.isEmpty()) {
-            throw new ErroValidacao("Uma ou mais atividades selecionadas já existentes no cadastro não puderam ser importadas.");
+            throw new ErroValidacao(MsgValidacao.IMPORTACAO_ATIVIDADES_DUPLICADAS);
         }
 
         if (spDestino.getSituacao() == NAO_INICIADO) {
@@ -795,7 +796,7 @@ public class SubprocessoService {
     public List<AtividadeDto> listarAtividadesParaImportacao(Long codSubprocesso) {
         Subprocesso subprocesso = subprocessoRepo.buscarPorCodigoComMapaEAtividades(codSubprocesso).orElseThrow();
         if (subprocesso.getProcesso() == null || subprocesso.getProcesso().getSituacao() != SituacaoProcesso.FINALIZADO) {
-            throw new ErroValidacao("A importação de atividades só permite subprocessos de processos finalizados.");
+            throw new ErroValidacao(MsgValidacao.IMPORTACAO_SO_PROCESSOS_FINALIZADOS);
         }
         return listarAtividadesSubprocesso(codSubprocesso);
     }
@@ -804,7 +805,7 @@ public class SubprocessoService {
         SituacaoSubprocesso situacaoSp = sp.getSituacao();
 
         if (!SITUACOES_PERMITIDAS_IMPORTACAO.contains(situacaoSp)) {
-            String msg = "Situação do subprocesso não permite importação. Situação atual: %s".formatted(situacaoSp);
+            String msg = MsgValidacao.SITUACAO_IMPEDE_IMPORTACAO.formatted(situacaoSp);
             throw new ErroValidacao(msg);
         }
     }

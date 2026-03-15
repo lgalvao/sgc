@@ -3,6 +3,7 @@ package sgc.subprocesso.dto;
 import jakarta.validation.constraints.*;
 import lombok.*;
 import org.jspecify.annotations.*;
+import sgc.comum.MsgValidacao;
 import sgc.comum.model.*;
 import sgc.subprocesso.model.*;
 
@@ -11,19 +12,19 @@ public record CriarAnaliseRequest(
         @TituloEleitoral
         String tituloUsuario,
 
-        @Size(max = 500, message = "Observações devem ter no máximo 500 caracteres")
+        @Size(max = 500, message = MsgValidacao.OBSERVACOES_MAX_500)
         @Nullable
         String observacoes,
 
-        @NotNull(message = "A sigla da unidade é obrigatória")
-        @Size(max = 20, message = "Sigla da unidade deve ter no máximo 20 caracteres")
+        @NotNull(message = MsgValidacao.SIGLA_UNIDADE_OBRIGATORIA)
+        @Size(max = 20, message = MsgValidacao.SIGLA_UNIDADE_MAX)
         String siglaUnidade,
 
-        @Size(max = 200, message = "Motivo deve ter no máximo 200 caracteres")
+        @Size(max = 200, message = MsgValidacao.MOTIVO_MAX)
         @Nullable
         String motivo,
 
-        @NotNull(message = "A ação é obrigatória")
+        @NotNull(message = MsgValidacao.ACAO_OBRIGATORIA)
         TipoAcaoAnalise acao
 ) {
 }

@@ -10,7 +10,7 @@ public final class ComumDtos {
     }
 
     public record TextoRequest(
-            @NotBlank(message = "O campo texto é obrigatório")
+            @NotBlank(message = MsgValidacao.CAMPO_TEXTO_OBRIGATORIO)
             String texto
     ) {
     }
@@ -21,13 +21,13 @@ public final class ComumDtos {
     }
 
     public record JustificativaRequest(
-            @NotBlank(message = "A justificativa é obrigatória")
+            @NotBlank(message = MsgValidacao.JUSTIFICATIVA_OBRIGATORIA)
             String justificativa
     ) {
     }
 
     public record DataRequest(
-            @NotNull(message = "A data é obrigatória")
+            @NotNull(message = MsgValidacao.DATA_OBRIGATORIA)
             LocalDate data
     ) {
     }

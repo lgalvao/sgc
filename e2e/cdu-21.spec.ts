@@ -1,6 +1,7 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcessoMapaHomologadoFixture} from './fixtures/fixtures-processos.js';
 import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
+import {TEXTOS} from '../frontend/src/constants/textos.js';
 
 test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão', () => {
     const UNIDADE_ALVO = 'SECAO_221';
@@ -65,7 +66,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
         await page.getByTestId('btn-finalizar-processo-confirmar').click();
 
         await verificarPaginaPainel(page);
-        await expect(page.getByText(/Processo finalizado/i)).toBeVisible();
+        await expect(page.getByText(TEXTOS.sucesso.PROCESSO_FINALIZADO)).toBeVisible();
 
         // Verificar que processo não aparece mais no painel ativo (foi finalizado)
         // (Processo finalizado não aparece na lista de processos ativos)
