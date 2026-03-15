@@ -257,6 +257,7 @@ import {listarAnalisesCadastro} from "@/services/analiseService";
 import {obterMapaVisualizacao} from "@/services/mapaService";
 import {buscarUnidadePorSigla as buscarUnidadeServico} from "@/services/unidadeService";
 import type {AnaliseCadastro, MapaVisualizacao, Unidade} from "@/types/tipos";
+import {TEXTOS} from "@/constants/textos";
 
 const route = useRoute();
 const router = useRouter();
@@ -339,7 +340,7 @@ async function confirmarSugestoes() {
       sugestoes: sugestoes.value,
     });
     fecharModalSugestoes();
-    toastStore.setPending("Mapa submetido com sugestões para análise da unidade superior");
+    toastStore.setPending(TEXTOS.sucesso.MAPA_SUBMETIDO_COM_SUGESTOES);
     await router.push({name: "Painel"});
   } catch {
     notify("Erro ao apresentar sugestões", 'danger');
@@ -354,7 +355,7 @@ async function confirmarValidacao() {
   try {
     await processosStore.validarMapa(codSubprocesso.value);
     fecharModalValidar();
-    toastStore.setPending("Mapa validado e submetido para análise à unidade superior");
+    toastStore.setPending(TEXTOS.sucesso.MAPA_VALIDADO_SUBMETIDO);
     await router.push({name: "Painel"});
   } catch {
     notify("Erro ao validar o mapa", 'danger');
@@ -375,7 +376,11 @@ async function confirmarAceitacao() {
       await processosStore.aceitarValidacao(codSubprocesso.value);
     }
     fecharModalAceitar();
-    toastStore.setPending(isHomologacao ? "Homologação efetivada" : "Aceite registrado");
+    toastStore.setPending(
+        isHomologacao
+            ? TEXTOS.sucesso.HOMOLOGACAO_EFETIVADA
+            : TEXTOS.sucesso.ACEITE_REGISTRADO,
+    );
     await router.push({name: "Painel"});
   } catch (error) {
     logger.error(error);
@@ -393,7 +398,7 @@ async function confirmarDevolucao() {
       justificativa: observacaoDevolucao.value,
     });
     fecharModalDevolucao();
-    toastStore.setPending("Devolução realizada");
+    toastStore.setPending(TEXTOS.sucesso.DEVOLUCAO_REALIZADA);
     await router.push({name: "Painel"});
   } catch (error) {
     logger.error(error);
