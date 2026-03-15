@@ -271,7 +271,7 @@ describe("Processo.vue", () => {
         await flushPromises();
 
         expect(wrapper.find("button.btn-success").exists()).toBe(true);
-        expect(wrapper.find("button.btn-success").text()).toContain("Registrar aceite em bloco");
+        expect(wrapper.find("button.btn-success").text()).toContain(TEXTOS.acaoBloco.aceitar.ROTULO_MISTO);
 
         // Test ADMIN buttons
         perfilStore.$patch({perfilSelecionado: Perfil.ADMIN});
@@ -295,7 +295,7 @@ describe("Processo.vue", () => {
         await flushPromises();
 
         const botoesAceitar = wrapper.findAll("button.btn-success").filter(
-            (b: DOMWrapper<Element>) => b.text().includes("Registrar aceite em bloco")
+            (b: DOMWrapper<Element>) => b.text().includes(TEXTOS.acaoBloco.aceitar.ROTULO_MISTO)
         );
         expect(botoesAceitar.length).toBe(1);
 
@@ -305,7 +305,7 @@ describe("Processo.vue", () => {
         await flushPromises();
 
         const botoesHomologar = wrapper.findAll("button.btn-warning").filter(
-            (b: DOMWrapper<Element>) => b.text().includes("Homologar em bloco")
+            (b: DOMWrapper<Element>) => b.text().includes(TEXTOS.acaoBloco.homologar.ROTULO_MISTO)
         );
         expect(botoesHomologar.length).toBe(1);
     });
@@ -326,7 +326,7 @@ describe("Processo.vue", () => {
 
         const modal = wrapper.findComponent(ModalAcaoBlocoStub);
         expect(modal.exists()).toBe(true);
-        expect(modal.props("titulo")).toBe("Aceite em bloco");
+        expect(modal.props("titulo")).toBe(TEXTOS.acaoBloco.aceitar.TITULO_MISTO);
     });
 
     it("deve executar ação em bloco com sucesso (Aceitar cadastro)", async () => {
@@ -373,7 +373,7 @@ describe("Processo.vue", () => {
         await modal.vm.$emit("confirmar", dadosConfirmacao);
 
         expect(processosStore.executarAcaoBloco).toHaveBeenCalledWith('aceitar', [103], undefined);
-        expect(modal.props("titulo")).toBe("Aceite em bloco");
+        expect(modal.props("titulo")).toBe(TEXTOS.acaoBloco.aceitar.TITULO_MISTO);
     });
 
     it("deve usar textos de CDU-22 quando houver apenas cadastro elegível para aceite", async () => {
@@ -393,11 +393,11 @@ describe("Processo.vue", () => {
         await nextTick();
         await flushPromises();
 
-        expect(wrapper.find("button.btn-success").text()).toContain("Aceitar cadastro em bloco");
+        expect(wrapper.find("button.btn-success").text()).toContain(TEXTOS.acaoBloco.aceitar.ROTULO_CADASTRO);
         await wrapper.find("button.btn-success").trigger("click");
-        expect((wrapper.vm).tituloModalBloco).toBe("Aceite de cadastro em bloco");
-        expect((wrapper.vm).textoModalBloco).toBe("Selecione as unidades cujos cadastros deverão ser aceitos:");
-        expect((wrapper.vm).rotuloBotaoBloco).toBe("Registrar aceite");
+        expect((wrapper.vm).tituloModalBloco).toBe(TEXTOS.acaoBloco.aceitar.TITULO_CADASTRO);
+        expect((wrapper.vm).textoModalBloco).toBe(TEXTOS.acaoBloco.aceitar.TEXTO_CADASTRO);
+        expect((wrapper.vm).rotuloBotaoBloco).toBe(TEXTOS.acaoBloco.aceitar.BOTAO);
         expect((wrapper.vm).mensagemSucessoAcaoBloco).toBe(TEXTOS.sucesso.CADASTROS_ACEITOS_EM_BLOCO);
     });
 
@@ -420,11 +420,11 @@ describe("Processo.vue", () => {
         await nextTick();
         await flushPromises();
 
-        expect(wrapper.find("button.btn-success").text()).toContain("Aceitar mapas em bloco");
+        expect(wrapper.find("button.btn-success").text()).toContain(TEXTOS.acaoBloco.aceitar.ROTULO_VALIDACAO);
         await wrapper.find("button.btn-success").trigger("click");
-        expect((wrapper.vm).tituloModalBloco).toBe("Aceite de mapas em bloco");
-        expect((wrapper.vm).textoModalBloco).toBe("Selecione as unidades para aceite dos mapas correspondentes");
-        expect((wrapper.vm).rotuloBotaoBloco).toBe("Registrar aceite");
+        expect((wrapper.vm).tituloModalBloco).toBe(TEXTOS.acaoBloco.aceitar.TITULO_VALIDACAO);
+        expect((wrapper.vm).textoModalBloco).toBe(TEXTOS.acaoBloco.aceitar.TEXTO_VALIDACAO);
+        expect((wrapper.vm).rotuloBotaoBloco).toBe(TEXTOS.acaoBloco.aceitar.BOTAO);
         expect((wrapper.vm).mensagemSucessoAcaoBloco).toBe(TEXTOS.sucesso.MAPAS_ACEITOS_EM_BLOCO);
     });
 
@@ -445,7 +445,7 @@ describe("Processo.vue", () => {
         await modal.vm.$emit("confirmar", {ids: [101]});
 
         expect(processosStore.executarAcaoBloco).toHaveBeenCalledWith('homologar', [101], undefined);
-        expect(modal.props("titulo")).toBe("Homologação em bloco");
+        expect(modal.props("titulo")).toBe(TEXTOS.acaoBloco.homologar.TITULO_MISTO);
     });
 
     it("deve executar ação em bloco com sucesso (Homologar validação)", async () => {
@@ -486,10 +486,10 @@ describe("Processo.vue", () => {
         await flushPromises();
 
         await wrapper.find("button.btn-warning").trigger("click");
-        expect(wrapper.find("button.btn-warning").text()).toContain("Homologar em bloco");
-        expect((wrapper.vm).tituloModalBloco).toBe("Homologação de cadastro em bloco");
-        expect((wrapper.vm).textoModalBloco).toBe("Selecione abaixo as unidades cujos cadastros deverão ser homologados:");
-        expect((wrapper.vm).rotuloBotaoBloco).toBe("Homologar");
+        expect(wrapper.find("button.btn-warning").text()).toContain(TEXTOS.acaoBloco.homologar.ROTULO_CADASTRO);
+        expect((wrapper.vm).tituloModalBloco).toBe(TEXTOS.acaoBloco.homologar.TITULO_CADASTRO);
+        expect((wrapper.vm).textoModalBloco).toBe(TEXTOS.acaoBloco.homologar.TEXTO_CADASTRO);
+        expect((wrapper.vm).rotuloBotaoBloco).toBe(TEXTOS.acaoBloco.homologar.BOTAO);
         expect((wrapper.vm).mensagemSucessoAcaoBloco).toBe(TEXTOS.sucesso.CADASTROS_HOMOLOGADOS_EM_BLOCO);
 
         const modal = wrapper.findComponent(ModalAcaoBlocoStub);
@@ -521,11 +521,11 @@ describe("Processo.vue", () => {
         await nextTick();
         await flushPromises();
 
-        expect(wrapper.find("button.btn-warning").text()).toContain("Homologar mapa de competências em bloco");
+        expect(wrapper.find("button.btn-warning").text()).toContain(TEXTOS.acaoBloco.homologar.ROTULO_VALIDACAO);
         await wrapper.find("button.btn-warning").trigger("click");
-        expect((wrapper.vm).tituloModalBloco).toBe("Homologação de mapa em bloco");
-        expect((wrapper.vm).textoModalBloco).toBe("Selecione abaixo as unidades cujos mapas deverão ser homologados:");
-        expect((wrapper.vm).rotuloBotaoBloco).toBe("Homologar");
+        expect((wrapper.vm).tituloModalBloco).toBe(TEXTOS.acaoBloco.homologar.TITULO_VALIDACAO);
+        expect((wrapper.vm).textoModalBloco).toBe(TEXTOS.acaoBloco.homologar.TEXTO_VALIDACAO);
+        expect((wrapper.vm).rotuloBotaoBloco).toBe(TEXTOS.acaoBloco.homologar.BOTAO);
         expect((wrapper.vm).mensagemSucessoAcaoBloco).toBe(TEXTOS.sucesso.MAPAS_HOMOLOGADOS_EM_BLOCO);
 
         const modal = wrapper.findComponent(ModalAcaoBlocoStub);
@@ -551,8 +551,8 @@ describe("Processo.vue", () => {
         await modal.vm.$emit("confirmar", {ids: [104], dataLimite: '2024-12-31'});
 
         expect(processosStore.executarAcaoBloco).toHaveBeenCalledWith('disponibilizar', [104], '2024-12-31');
-        expect(wrapper.find("button.btn-info").text()).toContain("Disponibilizar mapas em bloco");
-        expect(modal.props("titulo")).toBe("Disponibilização de mapa em bloco");
+        expect(wrapper.find("button.btn-info").text()).toContain(TEXTOS.acaoBloco.disponibilizar.ROTULO);
+        expect(modal.props("titulo")).toBe(TEXTOS.acaoBloco.disponibilizar.TITULO);
     });
 
     it("deve lidar com erro na execução da ação em bloco", async () => {

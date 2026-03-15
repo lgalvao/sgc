@@ -65,7 +65,7 @@
 
       <div>
         <p v-if="isProcessoFinalizado" class="mt-3 text-muted">
-          Processo concluído.
+          {{ TEXTOS.processo.CONCLUIDO }}
         </p>
         <BButton
             v-if="podeFinalizar"
@@ -74,14 +74,14 @@
             variant="danger"
             @click="finalizarProcesso"
         >
-          Finalizar processo
+          {{ TEXTOS.processo.FINALIZAR }}
         </BButton>
       </div>
     </div>
 
     <div v-else class="text-center py-5">
-      <BSpinner label="Carregando detalhes do processo..." variant="primary"/>
-      <p class="mt-2 text-muted">Carregando detalhes do processo...</p>
+      <BSpinner :label="TEXTOS.processo.CARREGANDO_DETALHES" variant="primary"/>
+      <p class="mt-2 text-muted">{{ TEXTOS.processo.CARREGANDO_DETALHES }}</p>
     </div>
 
     <!-- Modal de Ação em Bloco -->
@@ -100,7 +100,7 @@
         v-model="mostrarModalFinalizacao"
         test-id-cancelar="btn-finalizar-processo-cancelar"
         test-id-confirmar="btn-finalizar-processo-confirmar"
-        titulo="Finalização de processo"
+        :titulo="TEXTOS.processo.FINALIZACAO_TITULO"
         variant="success"
         @confirmar="confirmarFinalizacao">
 
@@ -110,9 +110,9 @@
           variant="info">
 
         <i aria-hidden="true" class="bi bi-info-circle"/>
-        Confirma a finalização do processo <strong>{{ processo?.descricao || '' }}</strong>?<br>
-        Essa ação tornará vigentes os mapas de competências homologados e notificará todas as unidades
-        participantes do processo.
+        {{ TEXTOS.processo.FINALIZACAO_CONFIRMACAO_PREFIXO }}
+        <strong>{{ processo?.descricao || '' }}</strong>?<br>
+        {{ TEXTOS.processo.FINALIZACAO_CONFIRMACAO_COMPLEMENTO }}
       </BAlert>
     </ModalConfirmacao>
   </LayoutPadrao>
@@ -306,27 +306,27 @@ const contextoHomologacaoBloco = computed<ContextoBloco>(() => obterContextoBloc
 const rotuloAcaoAceitarBloco = computed(() => {
   switch (contextoAceiteBloco.value) {
     case "cadastro":
-      return "Aceitar cadastro em bloco";
+      return TEXTOS.acaoBloco.aceitar.ROTULO_CADASTRO;
     case "validacao":
-      return "Aceitar mapas em bloco";
+      return TEXTOS.acaoBloco.aceitar.ROTULO_VALIDACAO;
     default:
-      return "Registrar aceite em bloco";
+      return TEXTOS.acaoBloco.aceitar.ROTULO_MISTO;
   }
 });
 
 const rotuloAcaoHomologarBloco = computed(() => {
   switch (contextoHomologacaoBloco.value) {
     case "cadastro":
-      return "Homologar em bloco";
+      return TEXTOS.acaoBloco.homologar.ROTULO_CADASTRO;
     case "validacao":
-      return "Homologar mapa de competências em bloco";
+      return TEXTOS.acaoBloco.homologar.ROTULO_VALIDACAO;
     default:
-      return "Homologar em bloco";
+      return TEXTOS.acaoBloco.homologar.ROTULO_MISTO;
   }
 });
 
 const rotuloAcaoDisponibilizarBloco = computed(() => {
-  return "Disponibilizar mapas em bloco";
+  return TEXTOS.acaoBloco.disponibilizar.ROTULO;
 });
 
 const tituloModalBloco = computed(() => {
@@ -334,23 +334,23 @@ const tituloModalBloco = computed(() => {
     case "aceitar":
       switch (contextoAceiteBloco.value) {
         case "cadastro":
-          return "Aceite de cadastro em bloco";
+          return TEXTOS.acaoBloco.aceitar.TITULO_CADASTRO;
         case "validacao":
-          return "Aceite de mapas em bloco";
+          return TEXTOS.acaoBloco.aceitar.TITULO_VALIDACAO;
         default:
-          return "Aceite em bloco";
+          return TEXTOS.acaoBloco.aceitar.TITULO_MISTO;
       }
     case "homologar":
       switch (contextoHomologacaoBloco.value) {
         case "cadastro":
-          return "Homologação de cadastro em bloco";
+          return TEXTOS.acaoBloco.homologar.TITULO_CADASTRO;
         case "validacao":
-          return "Homologação de mapa em bloco";
+          return TEXTOS.acaoBloco.homologar.TITULO_VALIDACAO;
         default:
-          return "Homologação em bloco";
+          return TEXTOS.acaoBloco.homologar.TITULO_MISTO;
       }
     case "disponibilizar":
-      return "Disponibilização de mapa em bloco";
+      return TEXTOS.acaoBloco.disponibilizar.TITULO;
     default:
       return "";
   }
@@ -361,23 +361,23 @@ const textoModalBloco = computed(() => {
     case "aceitar":
       switch (contextoAceiteBloco.value) {
         case "cadastro":
-          return "Selecione as unidades cujos cadastros deverão ser aceitos:";
+          return TEXTOS.acaoBloco.aceitar.TEXTO_CADASTRO;
         case "validacao":
-          return "Selecione as unidades para aceite dos mapas correspondentes";
+          return TEXTOS.acaoBloco.aceitar.TEXTO_VALIDACAO;
         default:
-          return "Selecione as unidades para registrar o aceite correspondente.";
+          return TEXTOS.acaoBloco.aceitar.TEXTO_MISTO;
       }
     case "homologar":
       switch (contextoHomologacaoBloco.value) {
         case "cadastro":
-          return "Selecione abaixo as unidades cujos cadastros deverão ser homologados:";
+          return TEXTOS.acaoBloco.homologar.TEXTO_CADASTRO;
         case "validacao":
-          return "Selecione abaixo as unidades cujos mapas deverão ser homologados:";
+          return TEXTOS.acaoBloco.homologar.TEXTO_VALIDACAO;
         default:
-          return "Selecione as unidades para homologação em bloco.";
+          return TEXTOS.acaoBloco.homologar.TEXTO_MISTO;
       }
     case "disponibilizar":
-      return "Selecione abaixo as unidades cujos mapas deverão ser disponibilizados:";
+      return TEXTOS.acaoBloco.disponibilizar.TEXTO;
     default:
       return "";
   }
@@ -386,11 +386,11 @@ const textoModalBloco = computed(() => {
 const rotuloBotaoBloco = computed(() => {
   switch (acaoBlocoAtual.value) {
     case "aceitar":
-      return "Registrar aceite";
+      return TEXTOS.acaoBloco.aceitar.BOTAO;
     case "homologar":
-      return "Homologar";
+      return TEXTOS.acaoBloco.homologar.BOTAO;
     case "disponibilizar":
-      return "Disponibilizar";
+      return TEXTOS.acaoBloco.disponibilizar.BOTAO;
     default:
       return "";
   }
@@ -431,7 +431,7 @@ async function confirmarFinalizacao() {
     toastStore.setPending(TEXTOS.sucesso.PROCESSO_FINALIZADO);
     await router.push("/painel");
   } catch (error: any) {
-    const mensagem = lastError.value?.message || error.message || "Ocorreu um erro";
+    const mensagem = lastError.value?.message || error.message || TEXTOS.processo.ERRO_PADRAO;
     notify(mensagem, 'danger');
   }
 }
@@ -462,7 +462,7 @@ async function executarAcaoBloco(dados: { ids: number[], dataLimite?: string }) 
     notify(mensagemSucesso, 'success');
     await buscarContextoCompleto(codProcesso);
   } catch (error: any) {
-    modalBlocoRef.value?.setErro(error.message || "Erro ao executar ação em bloco");
+    modalBlocoRef.value?.setErro(error.message || TEXTOS.processo.ERRO_ACAO_BLOCO);
     modalBlocoRef.value?.setProcessando(false);
   } finally {
     processandoAcaoBloco.value = false;

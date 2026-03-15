@@ -23,6 +23,8 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
         const processoOrigem2Descricao = `Processo base FINALIZADO 2 ${timestamp}`;
         let processoOrigemId: number;
         let processoAlvoId: number;
+        let atividadeA = '';
+        let atividadeB = '';
 
         await test.step('1. Setup: Criar processos origem e Mapeamento alvo', async () => {
             
@@ -63,8 +65,8 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
         });
 
         await test.step('3. Importar atividades (Fluxo múltiplo e Negativo)', async () => {
-            const atividadeA = `Atividade origem A - ${processoOrigemId}`;
-            const atividadeB = `Atividade origem B - ${processoOrigemId}`;
+            atividadeA = `Atividade origem A - ${processoOrigemId}`;
+            atividadeB = `Atividade origem B - ${processoOrigemId}`;
             
             await AtividadeHelpers.verificarOpcoesImportacao(page, [
                 { processo: processoOrigemDescricao, unidades: [UNIDADE_ORIGEM] },
@@ -104,7 +106,7 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
             await expect(page.getByText(atividadeManual2, { exact: true }).first()).toBeVisible();
             await expect(page.locator('.group-conhecimento', { hasText: conhecimento1 }).first()).toBeVisible();
             await expect(page.locator('.group-conhecimento', { hasText: conhecimento2 }).first()).toBeVisible();
-            await expect(page.getByText(`Atividade Origem A - ${processoOrigemId}`, { exact: true }).first()).toBeVisible();
+            await expect(page.getByText(atividadeA, { exact: true }).first()).toBeVisible();
         });
 
         await test.step('5. Editar e Remover (Com cancelamentos visuais)', async () => {
