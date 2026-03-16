@@ -29,7 +29,17 @@
 
         <template #actions>
           <BButton
+              v-if="podeFinalizar"
+              data-testid="btn-processo-finalizar"
+              variant="danger"
+              @click="finalizarProcesso"
+          >
+            {{ TEXTOS.processo.FINALIZAR }}
+          </BButton>
+
+          <BButton
               v-if="podeAceitarBloco"
+              id="btn-aceitar-bloco"
               :disabled="!habilitarAceiteBloco"
               data-testid="btn-processo-aceitar-bloco"
               variant="success"
@@ -39,20 +49,20 @@
 
           <BButton
               v-if="podeHomologarBloco"
+              id="btn-homologar-bloco"
               :disabled="!habilitarHomologacaoBloco"
-              class="text-white"
               data-testid="btn-processo-homologar-bloco"
-              variant="warning"
+              variant="success"
               @click="abrirModalBloco('homologar')">
             {{ rotuloAcaoHomologarBloco }}
           </BButton>
 
           <BButton
               v-if="podeDisponibilizarBloco"
+              id="btn-disponibilizar-bloco"
               :disabled="!habilitarDisponibilizacaoBloco"
-              class="text-white"
               data-testid="btn-processo-disponibilizar-bloco"
-              variant="info"
+              variant="success"
               @click="abrirModalBloco('disponibilizar')">
             {{ rotuloAcaoDisponibilizarBloco }}
           </BButton>
@@ -63,19 +73,10 @@
           :participantes-hierarquia="participantesHierarquia"
           @row-click="abrirDetalhesUnidade"/>
 
-      <div>
-        <p v-if="isProcessoFinalizado" class="mt-3 text-muted">
+      <div v-if="isProcessoFinalizado">
+        <p class="mt-3 text-muted">
           {{ TEXTOS.processo.CONCLUIDO }}
         </p>
-        <BButton
-            v-if="podeFinalizar"
-            class="mt-3"
-            data-testid="btn-processo-finalizar"
-            variant="danger"
-            @click="finalizarProcesso"
-        >
-          {{ TEXTOS.processo.FINALIZAR }}
-        </BButton>
       </div>
     </div>
 

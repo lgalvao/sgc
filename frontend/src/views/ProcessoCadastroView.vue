@@ -1,6 +1,48 @@
 <template>
   <LayoutPadrao>
-    <PageHeader :title="TEXTOS.processo.cadastro.TITULO"/>
+    <PageHeader :title="TEXTOS.processo.cadastro.TITULO">
+      <template #actions>
+        <BButton
+            :disabled="isLoading"
+            data-testid="btn-processo-cancelar"
+            to="/painel"
+            variant="outline-secondary"
+        >
+          {{ TEXTOS.processo.cadastro.BOTAO_CANCELAR }}
+        </BButton>
+
+        <LoadingButton
+            v-if="processoEditando"
+            :disabled="isLoading"
+            data-testid="btn-processo-remover"
+            icon="trash"
+            :text="TEXTOS.processo.cadastro.BOTAO_REMOVER"
+            variant="outline-danger"
+            @click="abrirModalRemocao"
+        />
+
+        <LoadingButton
+            :disabled="isFormInvalid || isLoadingData"
+            :loading="isLoading"
+            data-testid="btn-processo-salvar"
+            icon="save"
+            loading-text="Salvando..."
+            :text="TEXTOS.processo.cadastro.BOTAO_SALVAR"
+            type="button"
+            variant="outline-primary"
+            @click="salvarProcesso"
+        />
+
+        <LoadingButton
+            :disabled="isFormInvalid || isLoading || isLoadingData"
+            data-testid="btn-processo-iniciar"
+            icon="play-fill"
+            :text="TEXTOS.processo.cadastro.BOTAO_INICIAR"
+            variant="success"
+            @click="abrirModalConfirmacao"
+        />
+      </template>
+    </PageHeader>
 
     <BForm class="mt-4 col-md-6 col-sm-8 col-12">
       <AppAlert
@@ -21,49 +63,6 @@
           :is-loading-unidades="isLoadingUnidades"
           :unidades="unidades"
       />
-
-      <div class="d-flex justify-content-between">
-        <div>
-          <LoadingButton
-              :disabled="isFormInvalid || isLoading || isLoadingData"
-              data-testid="btn-processo-iniciar"
-              icon="play-fill"
-              :text="TEXTOS.processo.cadastro.BOTAO_INICIAR"
-              variant="success"
-              @click="abrirModalConfirmacao"
-          />
-          <LoadingButton
-              :disabled="isFormInvalid || isLoadingData"
-              :loading="isLoading"
-              class="ms-2"
-              data-testid="btn-processo-salvar"
-              icon="save"
-              loading-text="Salvando..."
-              :text="TEXTOS.processo.cadastro.BOTAO_SALVAR"
-              type="button"
-              variant="outline-primary"
-              @click="salvarProcesso"
-          />
-          <LoadingButton
-              v-if="processoEditando"
-              :disabled="isLoading"
-              class="ms-2"
-              data-testid="btn-processo-remover"
-              icon="trash"
-              :text="TEXTOS.processo.cadastro.BOTAO_REMOVER"
-              variant="outline-danger"
-              @click="abrirModalRemocao"
-          />
-        </div>
-        <BButton
-            :disabled="isLoading"
-            class="text-secondary"
-            to="/painel"
-            variant="link"
-        >
-          {{ TEXTOS.processo.cadastro.BOTAO_CANCELAR }}
-        </BButton>
-      </div>
     </BForm>
 
     <!-- Modal de confirmação CDU-05 -->

@@ -107,11 +107,21 @@ describe("CadastroView coverage", () => {
         expect((wrapper.vm as any).badgeVariant("INVALIDO")).toBe("secondary");
 
         // Cobre disponibilizar com erro de situacao
-        (wrapper.vm as any).subprocesso.situacao = "MAPEAMENTO_FINALIZADO";
+        store.$patch({
+            subprocessoDetalhe: {
+                ...store.subprocessoDetalhe,
+                situacao: "MAPEAMENTO_FINALIZADO"
+            }
+        });
         await (wrapper.vm as any).disponibilizarCadastro();
 
         // Cobre disponibilizar com erros de validação
-        (wrapper.vm as any).subprocesso.situacao = "MAPEAMENTO_CADASTRO_EM_ANDAMENTO";
+        store.$patch({
+            subprocessoDetalhe: {
+                ...store.subprocessoDetalhe,
+                situacao: "MAPEAMENTO_CADASTRO_EM_ANDAMENTO"
+            }
+        });
         (store.validarCadastro as any).mockResolvedValue({
             valido: false,
             erros: [{mensagem: "Erro genérico"}, {atividadeCodigo: 1, mensagem: "Erro na atividade"}]

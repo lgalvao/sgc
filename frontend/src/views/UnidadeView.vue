@@ -19,7 +19,7 @@
           <BButton
               v-if="mapaVigente"
               data-testid="btn-mapa-vigente"
-              variant="outline-success"
+              variant="outline-secondary"
               @click="visualizarMapa"
           >
             <i
@@ -28,9 +28,8 @@
           </BButton>
           <BButton
               v-if="isAdmin"
-              class="ms-2"
               data-testid="unidade-view__btn-criar-atribuicao"
-              variant="outline-primary"
+              variant="outline-secondary"
               @click="irParaCriarAtribuicao"
           >
             {{ TEXTOS.unidade.BOTAO_CRIAR_ATRIBUICAO }}

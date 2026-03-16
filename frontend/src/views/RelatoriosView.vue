@@ -18,7 +18,7 @@
             <BCol class="d-flex align-items-end" md="2">
               <BButton
                 :disabled="!processoIdSelecionado || gerandoAndamento"
-                variant="primary"
+                variant="success"
                 @click="gerarRelatorioAndamento"
               >
                 <BSpinner v-if="gerandoAndamento" small />
@@ -26,7 +26,7 @@
               </BButton>
             </BCol>
              <BCol v-if="relatorioAndamento.length > 0" class="d-flex align-items-end" md="2">
-               <BButton variant="outline-danger" @click="exportarPdfAndamento">
+               <BButton variant="outline-secondary" @click="exportarPdfAndamento">
                  <i class="bi bi-file-earmark-pdf me-2" />
                  {{ TEXTOS.relatorios.BOTAO_PDF }}
                </BButton>
@@ -72,7 +72,7 @@
             <BCol class="d-flex align-items-end" md="4">
               <BButton
                 :disabled="!processoIdSelecionadoMapas || gerandoMapas"
-                 variant="primary"
+                 variant="success"
                  @click="gerarRelatorioMapas"
               >
                  <BSpinner v-if="gerandoMapas" small />

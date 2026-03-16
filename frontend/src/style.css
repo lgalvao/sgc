@@ -48,3 +48,24 @@
         background-color: #f9f9f9;
     }
 }
+
+/* Estilos Globais para Botões Desabilitados */
+button:disabled,
+.btn:disabled,
+.btn.disabled {
+    cursor: not-allowed !important;
+    opacity: 0.5 !important;
+    pointer-events: auto !important; /* Permite o hover para mostrar o cursor not-allowed */
+}
+
+/* Ajuste específico para variantes outline desabilitadas */
+.btn-outline-secondary:disabled,
+.btn-outline-primary:disabled,
+.btn-outline-success:disabled,
+.btn-outline-danger:disabled,
+.btn-outline-warning:disabled,
+.btn-outline-info:disabled {
+    border-color: rgba(0, 0, 0, 0.1) !important;
+    color: rgba(0, 0, 0, 0.3) !important;
+    background-color: transparent !important;
+}

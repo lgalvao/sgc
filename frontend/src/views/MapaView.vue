@@ -20,10 +20,18 @@
             @click="abrirModalImpacto"
         />
         <BButton
+            v-if="podeEditarMapa"
+            data-testid="btn-abrir-criar-competencia"
+            variant="outline-primary"
+            @click="abrirModalCriarLimpo"
+        >
+          <i aria-hidden="true" class="bi bi-plus-lg me-1"/> {{ TEXTOS.mapa.BOTAO_CRIAR }}
+        </BButton>
+        <BButton
             v-if="podeDisponibilizarMapa"
             :disabled="competencias.length === 0"
             data-testid="btn-cad-mapa-disponibilizar"
-            variant="outline-success"
+            variant="success"
             @click="abrirModalDisponibilizar"
         >
           {{ TEXTOS.mapa.BOTAO_DISPONIBILIZAR }}
@@ -47,27 +55,9 @@
             :description="TEXTOS.mapa.EMPTY_DESCRIPTION"
             icon="bi-journal-plus"
             :title="TEXTOS.mapa.EMPTY_TITLE"
-        >
-          <BButton
-              v-if="podeEditarMapa"
-              data-testid="btn-abrir-criar-competencia-empty"
-              variant="primary"
-              @click="abrirModalCriarLimpo"
-          >
-            <i aria-hidden="true" class="bi bi-plus-lg me-2"/> {{ TEXTOS.mapa.BOTAO_CRIAR_PRIMEIRA }}
-          </BButton>
-        </EmptyState>
+        />
       </div>
       <div v-else class="mb-4 mt-3">
-        <BButton
-            v-if="podeEditarMapa"
-            class="mb-3"
-            data-testid="btn-abrir-criar-competencia"
-            variant="outline-primary"
-            @click="abrirModalCriarLimpo"
-        >
-          <i aria-hidden="true" class="bi bi-plus-lg"/> {{ TEXTOS.mapa.BOTAO_CRIAR }}
-        </BButton>
         <CompetenciaCard
             v-for="comp in competencias"
             :key="comp.codigo"

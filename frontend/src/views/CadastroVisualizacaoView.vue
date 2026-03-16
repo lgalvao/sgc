@@ -20,7 +20,7 @@
         </BButton>
         <BButton
             data-testid="btn-vis-atividades-historico"
-            variant="outline-info"
+            variant="outline-secondary"
             @click="abrirModalHistoricoAnalise"
         >
           {{ TEXTOS.atividades.BOTAO_HISTORICO_ANALISE }}
