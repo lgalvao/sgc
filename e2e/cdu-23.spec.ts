@@ -5,6 +5,7 @@ import {navegarParaAtividadesVisualizacao} from './helpers/helpers-atividades.js
 import {aceitarCadastroMapeamento, acessarSubprocessoGestor, devolverCadastroMapeamento} from './helpers/helpers-analise.js';
 import {navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
 import {loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
+import {resetDatabase} from './hooks/hooks-limpeza.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
 
 /**
@@ -32,6 +33,7 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {
     const descProcesso = `Mapeamento CDU-23 ${timestamp}`;
 
     test('Setup data', async ({_resetAutomatico, request}) => {
+        await resetDatabase(request);
         await criarProcessoCadastroDisponibilizadoFixture(request, {
             descricao: descProcesso,
             unidade: UNIDADE_1
