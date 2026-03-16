@@ -186,7 +186,6 @@ class LoginControllerTest {
     @WithMockUser
     void autenticar_DeveRejeitarTituloNaoNumerico() throws Exception {
         // Log injection payload: Digits followed by newline and fake log
-        // Must be <= 12 chars to bypass @Size check, but contains newline/letters to fail @Pattern
         String maliciousTitle = "12\nFake";
 
         AutenticarRequest req = AutenticarRequest.builder()

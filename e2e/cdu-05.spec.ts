@@ -231,7 +231,6 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
             .filter({hasNotText: 'subordinada'})
         ).toBeVisible();
 
-        // 2. Verificar alerta para o GESTOR da SECRETARIA_2 (Unidade intermediária - Step 13.2)
         // George harrison (212121) é Gestor da SECRETARIA_2
         await loginComPerfil(page, '212121', 'senha', 'GESTOR - SECRETARIA_2');
         await verificarPaginaPainel(page);

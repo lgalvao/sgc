@@ -399,10 +399,6 @@ public class E2eController {
         setSituacaoSubprocesso(codSubprocesso, SituacaoSubprocesso.valueOf(situacaoSubprocesso));
 
         // Definir localização baseada na situação para que os botões de ação apareçam para o ator correto:
-        // 1. Cadastro disponibilizado -> Gestor (codSuperior)
-        // 2. Mapa disponibilizado -> Chefe (codUnidade) para validação
-        // 3. Mapa validado -> Gestor (codSuperior) para análise
-        // 4. Homologados -> Unidade (codUnidade)
         Long codDestino = codSuperior;
         if (situacaoSubprocesso.equals("MAPEAMENTO_MAPA_DISPONIBILIZADO") || situacaoSubprocesso.endsWith("_HOMOLOGADO")) {
             codDestino = codUnidade;

@@ -40,7 +40,6 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
     private AlertaRepo alertaRepo;
 
     // Removido: JdbcTemplate não é necessário pois @Transactional garante isolamento
-    // e os testes usam IDs dinâmicos.
 
     private Unidade unidadeRaiz;
     private Unidade unidadeFilha1;
@@ -50,7 +49,6 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
 
     @BeforeEach
     void setup() {
-        // Setup programático - Não depende do data.sql
 
         // Raiz
         unidadeRaiz = UnidadeFixture.unidadePadrao();

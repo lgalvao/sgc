@@ -69,7 +69,6 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
         usuarioSuperior.setUnidadeLotacao(unidadeSuperior);
         usuarioSuperior = usuarioRepo.saveAndFlush(usuarioSuperior);
 
-        // 3. Configurar perfil e Titularidade
         setupUsuarioPerfil(usuarioChefe, unidadeChefe, Perfil.CHEFE);
         definirTitular(unidadeChefe, usuarioChefe);
         definirTitular(unidadeSuperior, usuarioSuperior);
@@ -103,7 +102,6 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
                 .build();
         movimentacaoRepo.save(mov);
 
-        // 5. Autenticar
         autenticarUsuario(usuarioChefe, Perfil.CHEFE);
     }
 
@@ -175,7 +173,6 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
 
         Long subprocessoId = subprocessoRevisao.getCodigo();
 
-        // 1. Primeira disponibilização
         mockMvc.perform(post("/api/subprocessos/{codigo}/disponibilizar-revisao", subprocessoId))
                 .andExpect(status().isOk());
 
@@ -213,7 +210,6 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
         entityManager.flush();
         entityManager.clear();
 
-        // 5. Nova disponibilização
         mockMvc.perform(post("/api/subprocessos/{codigo}/disponibilizar-revisao", subprocessoId))
                 .andExpect(status().isOk());
 

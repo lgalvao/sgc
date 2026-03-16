@@ -98,7 +98,6 @@ class CDU05IntegrationTest extends BaseIntegrationTest {
         unidade.setUnidadeSuperior(unidadeSuperior);
         unidade = unidadeRepo.save(unidade);
 
-        // Preencher dados originais no mapa para verificar se são limpos
         mapaOriginal.setSugestoes("Sugestões legadas");
         mapaOriginal.setObservacoesDisponibilizacao("Observações legadas");
         mapaRepo.save(mapaOriginal);
@@ -120,7 +119,6 @@ class CDU05IntegrationTest extends BaseIntegrationTest {
                 .asLong();
         var iniciarReq = new IniciarProcessoRequest(TipoProcesso.REVISAO, unidades);
 
-        // 3. Iniciar o processo de revisão
         mockMvc.perform(post(API_PROCESSOS_ID_INICIAR, codProcesso)
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)

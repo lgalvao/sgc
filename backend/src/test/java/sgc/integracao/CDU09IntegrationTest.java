@@ -101,20 +101,16 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
 
         Subprocesso atualizado = subprocessoRepo.findById(SP_CODIGO).orElseThrow();
 
-        // 10. Alteração de Situação
         assertThat(atualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
 
-        // 11. Registro de Movimentação
         List<Movimentacao> movs = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(SP_CODIGO);
         assertThat(movs).isNotEmpty();
         assertThat(movs.getFirst().getDescricao()).isEqualTo("Disponibilização do cadastro de atividades");
         assertThat(movs.getFirst().getUnidadeOrigem().getSigla()).isEqualTo("SEDESENV");
         assertThat(movs.getFirst().getUnidadeDestino().getSigla()).isEqualTo("COSIS");
 
-        // 12. Notificação por E-mail (Superior da 8 é COSIS)
         aguardarEmail(1);
 
-        // 13. Criação de Alerta para Unidade superior (Async)
         final Long processoCodigo = spEtapa3.getProcesso().getCodigo();
         Awaitility.await()
                 .atMost(Duration.ofSeconds(5))
@@ -125,7 +121,6 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
 
         assertThat(atualizado.getDataFimEtapa1()).isNotNull();
 
-        // 15. Manutenção do Histórico de Análise
         assertThat(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(SP_CODIGO)).isNotEmpty();
     }
 }

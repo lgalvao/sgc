@@ -56,7 +56,6 @@ class SubprocessoServiceEmailIntegrationTest extends BaseIntegrationTest {
 
         admin = usuarioRepo.findById("111111111111").orElseThrow();
 
-        // Setup responsabilidade for units using JDBC to bypass Hibernate @Immutable / null identifier issues
         jdbcTemplate.update(
                 "INSERT INTO sgc.vw_responsabilidade (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio) VALUES (?, ?, ?, ?, ?)",
                 unidade.getCodigo(), admin.getTituloEleitoral(), admin.getMatricula(), "TITULAR", LocalDateTime.now()

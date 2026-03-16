@@ -108,7 +108,6 @@ describe('ProcessoCadastroView.vue Coverage', () => {
     it('handles mixed errors (field + generic) correctly in handleApiErrors', async () => {
         const {wrapper, processosStore} = createWrapper();
 
-        // Setup state for error
         processosStore.criarProcesso.mockImplementation(async () => {
             processosStore.lastError = {
                 message: 'Erro misto',
@@ -125,7 +124,6 @@ describe('ProcessoCadastroView.vue Coverage', () => {
         wrapper.vm.unidadesSelecionadas = [1];
         await nextTick();
 
-        // Call method directly
         await (wrapper.vm).salvarProcesso();
         await flushPromises();
 
@@ -149,7 +147,6 @@ describe('ProcessoCadastroView.vue Coverage', () => {
         processosStore.criarProcesso.mockRejectedValue(new Error('Create error'));
         processosStore.lastError = {message: 'Failed to create'};
 
-        // Confirm initiation
         const modal = wrapper.findComponent({name: 'ModalConfirmacao'});
         await modal.vm.$emit('confirmar');
         await flushPromises();
@@ -190,15 +187,12 @@ describe('ProcessoCadastroView.vue Coverage', () => {
     it('opens and confirms removal modal', async () => {
         const {wrapper, processosStore} = createWrapper();
 
-        // Setup process being edited
         (wrapper.vm).processoEditando = {codigo: 123, descricao: 'Processo teste'};
         await nextTick();
 
-        // Open modal
         await (wrapper.vm).abrirModalRemocao();
         expect((wrapper.vm).mostrarModalRemocao).toBe(true);
 
-        // Confirm removal
         processosStore.removerProcesso.mockResolvedValue(undefined);
 
         await (wrapper.vm).confirmarRemocao();

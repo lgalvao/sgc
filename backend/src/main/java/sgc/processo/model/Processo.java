@@ -77,14 +77,12 @@ public class Processo extends EntidadeBase {
      * e adicionando novos apenas para unidades que ainda não participam.
      */
     public void sincronizarParticipantes(Set<Unidade> novasUnidades) {
-        // 1. Remover quem não está mais na nova lista
         Set<Long> novosCodigos = novasUnidades.stream()
                 .map(Unidade::getCodigo)
                 .collect(Collectors.toSet());
 
         participantes.removeIf(up -> !novosCodigos.contains(up.getUnidadeCodigo()));
 
-        // 2. Adicionar apenas quem é novo
         adicionarParticipantes(novasUnidades);
     }
 

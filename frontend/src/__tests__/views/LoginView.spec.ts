@@ -145,7 +145,6 @@ describe("LoginView.vue", () => {
 
         expect(wrapper.find('[data-testid="sec-login-perfil"]').exists()).toBe(true);
 
-        // Trigger submit novamente para confirmar seleção
         await wrapper.find('form').trigger('submit');
 
         expect(perfilStore.selecionarPerfilUnidade).toHaveBeenCalledWith("123", MOCK_PERFIS[0]);

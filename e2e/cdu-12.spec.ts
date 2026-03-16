@@ -50,7 +50,6 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         const descEditada = `Nova ativ editada ${timestamp}`;
         await editarAtividade(page, novaAtividade, descEditada);
 
-        // 4. Usuário clica no botão Impactos no mapa
         await verificarBotaoImpactoDropdown(page);
         await abrirModalImpactoEdicao(page);
 
@@ -75,7 +74,6 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await acessarSubprocessoGestor(page, descProcessoRevisao, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
 
-        // 4. Clicar em impactos (somente leitura)
         await verificarBotaoImpactoDireto(page);
         await abrirModalImpactoVisualizacao(page);
         

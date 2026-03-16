@@ -13,7 +13,6 @@ class ImpactoMapaResponseTest {
     @DisplayName("Deve cobrir branches de criação de ImpactoMapaResponse")
     void deveCobrirBranches() {
         AtividadeImpactadaDto dto = AtividadeImpactadaDto.builder().build();
-        // 1. Com impactos
         ImpactoMapaResponse d1 = ImpactoMapaResponse.builder()
                 .temImpactos(true)
                 .inseridas(List.of(dto))
@@ -24,7 +23,6 @@ class ImpactoMapaResponseTest {
         assertThat(d1.temImpactos()).isTrue();
         assertThat(d1.inseridas()).containsExactly(dto);
 
-        // 2. Sem impactos via builder
         ImpactoMapaResponse d2 = ImpactoMapaResponse.builder()
                 .temImpactos(false)
                 .inseridas(List.of())
@@ -34,7 +32,6 @@ class ImpactoMapaResponseTest {
                 .build();
         assertThat(d2.temImpactos()).isFalse();
 
-        // 3. Sem impacto via helper
         ImpactoMapaResponse d3 = ImpactoMapaResponse.semImpacto();
         assertThat(d3.temImpactos()).isFalse();
         assertThat(d3.inseridas()).isEmpty();
