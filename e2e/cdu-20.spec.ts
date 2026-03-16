@@ -5,6 +5,7 @@ import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
 import {acessarSubprocessoGestor} from './helpers/helpers-analise.js';
 import {navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
+import {resetDatabase} from './hooks/hooks-limpeza.js';
 
 test.describe.serial('CDU-20 - Analisar validação de mapa de competências', () => {
     const UNIDADE_ALVO = 'ASSESSORIA_11';
@@ -67,6 +68,7 @@ test.describe.serial('CDU-20 - Ver sugestões quando situação é "Mapa com sug
     const descProcesso = `Processo CDU-20 Sugestoes ${timestamp}`;
 
     test('Setup data', async ({_resetAutomatico, request}) => {
+        await resetDatabase(request);
         await criarProcessoMapaComSugestoesFixture(request, {
             unidade: UNIDADE_ALVO,
             descricao: descProcesso
