@@ -1,10 +1,10 @@
 <template>
   <LayoutPadrao>
     <AppAlert
-        v-if="processosStore.lastError"
-        :message="processosStore.lastError.message"
+        v-if="lastError"
+        :message="lastError.message"
         variant="danger"
-        @dismissed="processosStore.clearError()"/>
+        @dismissed="clearError()"/>
 
     <AppAlert
         v-if="notificacao"
@@ -65,7 +65,7 @@
 
       <div>
         <p v-if="isProcessoFinalizado" class="mt-3 text-muted">
-          Processo concluído.
+          {{ TEXTOS.processo.CONCLUIDO }}
         </p>
         <BButton
             v-if="podeFinalizar"
@@ -74,14 +74,14 @@
             variant="danger"
             @click="finalizarProcesso"
         >
-          Finalizar processo
+          {{ TEXTOS.processo.FINALIZAR }}
         </BButton>
       </div>
     </div>
 
     <div v-else class="text-center py-5">
-      <BSpinner label="Carregando detalhes do processo..." variant="primary"/>
-      <p class="mt-2 text-muted">Carregando detalhes do processo...</p>
+      <BSpinner :label="TEXTOS.processo.CARREGANDO_DETALHES" variant="primary"/>
+      <p class="mt-2 text-muted">{{ TEXTOS.processo.CARREGANDO_DETALHES }}</p>
     </div>
 
     <!-- Modal de Ação em Bloco -->
@@ -100,7 +100,7 @@
         v-model="mostrarModalFinalizacao"
         test-id-cancelar="btn-finalizar-processo-cancelar"
         test-id-confirmar="btn-finalizar-processo-confirmar"
-        titulo="Finalização de processo"
+        :titulo="TEXTOS.processo.FINALIZACAO_TITULO"
         variant="success"
         @confirmar="confirmarFinalizacao">
 
@@ -110,9 +110,9 @@
           variant="info">
 
         <i aria-hidden="true" class="bi bi-info-circle"/>
-        Confirma a finalização do processo <strong>{{ processo?.descricao || '' }}</strong>?<br>
-        Essa ação tornará vigentes os mapas de competências homologados e notificará todas as unidades
-        participantes do processo.
+        {{ TEXTOS.processo.FINALIZACAO_CONFIRMACAO_PREFIXO }}
+        <strong>{{ processo?.descricao || '' }}</strong>?<br>
+        {{ TEXTOS.processo.FINALIZACAO_CONFIRMACAO_COMPLEMENTO }}
       </BAlert>
     </ModalConfirmacao>
   </LayoutPadrao>
@@ -129,20 +129,29 @@ import PageHeader from "@/components/layout/PageHeader.vue";
 import AppAlert from "@/components/comum/AppAlert.vue";
 import ProcessoInfo from "@/components/processo/ProcessoInfo.vue";
 import ProcessoSubprocessosTable from "@/components/processo/ProcessoSubprocessosTable.vue";
-import {useProcessosStore} from "@/stores/processos";
+import {useProcessos} from "@/composables/useProcessos";
 import {usePerfilStore} from "@/stores/perfil";
 import {useNotification} from "@/composables/useNotification";
 import {useToastStore} from "@/stores/toast";
 import {SituacaoProcesso, SituacaoSubprocesso} from "@/types/tipos";
 import {formatSituacaoSubprocesso} from "@/utils/formatters";
 import {logger} from "@/utils";
+import {TEXTOS} from "@/constants/textos";
 
 type ContextoBloco = "cadastro" | "validacao" | "misto";
 type AcaoBloco = "aceitar" | "homologar" | "disponibilizar";
 
 const route = useRoute();
 const router = useRouter();
-const processosStore = useProcessosStore();
+const {
+  processoDetalhe: processo,
+  subprocessosElegiveis,
+  lastError,
+  clearError,
+  buscarContextoCompleto,
+  finalizarProcesso: apiFinalizarProcesso,
+  executarAcaoBloco: apiExecutarAcaoBloco
+} = useProcessos();
 const perfilStore = usePerfilStore();
 const {notificacao, notify, clear} = useNotification();
 const toastStore = useToastStore();
@@ -152,9 +161,7 @@ const mostrarModalFinalizacao = ref(false);
 const acaoBlocoAtual = ref<AcaoBloco>("aceitar");
 const processandoAcaoBloco = ref(false);
 
-const processo = computed(() => processosStore.processoDetalhe);
 const participantesHierarquia = computed(() => processo.value?.unidades || []);
-const subprocessosElegiveis = computed(() => processosStore.subprocessosElegiveis || []);
 
 const podeAceitarBloco = computed(() => {
   return processo.value?.podeAceitarCadastroBloco ?? false;
@@ -248,25 +255,25 @@ function obterMensagemSucesso(
     case "aceitar":
       switch (contexto) {
         case "cadastro":
-          return "Cadastros aceitos em bloco";
+          return TEXTOS.sucesso.CADASTROS_ACEITOS_EM_BLOCO;
         case "validacao":
-          return "Mapas aceitos em bloco";
+          return TEXTOS.sucesso.MAPAS_ACEITOS_EM_BLOCO;
         default:
-          return "Aceites registrados em bloco";
+          return TEXTOS.sucesso.ACEITES_REGISTRADOS_EM_BLOCO;
       }
     case "homologar":
       switch (contexto) {
         case "cadastro":
-          return "Cadastros homologados em bloco";
+          return TEXTOS.sucesso.CADASTROS_HOMOLOGADOS_EM_BLOCO;
         case "validacao":
-          return "Mapas de competências homologados em bloco";
+          return TEXTOS.sucesso.MAPAS_HOMOLOGADOS_EM_BLOCO;
         default:
-          return "Homologações registradas em bloco";
+          return TEXTOS.sucesso.HOMOLOGACOES_REGISTRADAS_EM_BLOCO;
       }
     case "disponibilizar":
-      return "Mapas de competências disponibilizados em bloco";
+      return TEXTOS.sucesso.MAPAS_DISPONIBILIZADOS_EM_BLOCO;
     default:
-      return "Ação em bloco realizada com sucesso";
+      return TEXTOS.sucesso.ACAO_EM_BLOCO_REALIZADA;
   }
 }
 
@@ -299,27 +306,27 @@ const contextoHomologacaoBloco = computed<ContextoBloco>(() => obterContextoBloc
 const rotuloAcaoAceitarBloco = computed(() => {
   switch (contextoAceiteBloco.value) {
     case "cadastro":
-      return "Aceitar cadastro em bloco";
+      return TEXTOS.acaoBloco.aceitar.ROTULO_CADASTRO;
     case "validacao":
-      return "Aceitar mapas em bloco";
+      return TEXTOS.acaoBloco.aceitar.ROTULO_VALIDACAO;
     default:
-      return "Registrar aceite em bloco";
+      return TEXTOS.acaoBloco.aceitar.ROTULO_MISTO;
   }
 });
 
 const rotuloAcaoHomologarBloco = computed(() => {
   switch (contextoHomologacaoBloco.value) {
     case "cadastro":
-      return "Homologar em bloco";
+      return TEXTOS.acaoBloco.homologar.ROTULO_CADASTRO;
     case "validacao":
-      return "Homologar mapa de competências em bloco";
+      return TEXTOS.acaoBloco.homologar.ROTULO_VALIDACAO;
     default:
-      return "Homologar em bloco";
+      return TEXTOS.acaoBloco.homologar.ROTULO_MISTO;
   }
 });
 
 const rotuloAcaoDisponibilizarBloco = computed(() => {
-  return "Disponibilizar mapas em bloco";
+  return TEXTOS.acaoBloco.disponibilizar.ROTULO;
 });
 
 const tituloModalBloco = computed(() => {
@@ -327,23 +334,23 @@ const tituloModalBloco = computed(() => {
     case "aceitar":
       switch (contextoAceiteBloco.value) {
         case "cadastro":
-          return "Aceite de cadastro em bloco";
+          return TEXTOS.acaoBloco.aceitar.TITULO_CADASTRO;
         case "validacao":
-          return "Aceite de mapas em bloco";
+          return TEXTOS.acaoBloco.aceitar.TITULO_VALIDACAO;
         default:
-          return "Aceite em bloco";
+          return TEXTOS.acaoBloco.aceitar.TITULO_MISTO;
       }
     case "homologar":
       switch (contextoHomologacaoBloco.value) {
         case "cadastro":
-          return "Homologação de cadastro em bloco";
+          return TEXTOS.acaoBloco.homologar.TITULO_CADASTRO;
         case "validacao":
-          return "Homologação de mapa em bloco";
+          return TEXTOS.acaoBloco.homologar.TITULO_VALIDACAO;
         default:
-          return "Homologação em bloco";
+          return TEXTOS.acaoBloco.homologar.TITULO_MISTO;
       }
     case "disponibilizar":
-      return "Disponibilização de mapa em bloco";
+      return TEXTOS.acaoBloco.disponibilizar.TITULO;
     default:
       return "";
   }
@@ -354,23 +361,23 @@ const textoModalBloco = computed(() => {
     case "aceitar":
       switch (contextoAceiteBloco.value) {
         case "cadastro":
-          return "Selecione as unidades cujos cadastros deverão ser aceitos:";
+          return TEXTOS.acaoBloco.aceitar.TEXTO_CADASTRO;
         case "validacao":
-          return "Selecione as unidades para aceite dos mapas correspondentes";
+          return TEXTOS.acaoBloco.aceitar.TEXTO_VALIDACAO;
         default:
-          return "Selecione as unidades para registrar o aceite correspondente.";
+          return TEXTOS.acaoBloco.aceitar.TEXTO_MISTO;
       }
     case "homologar":
       switch (contextoHomologacaoBloco.value) {
         case "cadastro":
-          return "Selecione abaixo as unidades cujos cadastros deverão ser homologados:";
+          return TEXTOS.acaoBloco.homologar.TEXTO_CADASTRO;
         case "validacao":
-          return "Selecione abaixo as unidades cujos mapas deverão ser homologados:";
+          return TEXTOS.acaoBloco.homologar.TEXTO_VALIDACAO;
         default:
-          return "Selecione as unidades para homologação em bloco.";
+          return TEXTOS.acaoBloco.homologar.TEXTO_MISTO;
       }
     case "disponibilizar":
-      return "Selecione abaixo as unidades cujos mapas deverão ser disponibilizados:";
+      return TEXTOS.acaoBloco.disponibilizar.TEXTO;
     default:
       return "";
   }
@@ -379,11 +386,11 @@ const textoModalBloco = computed(() => {
 const rotuloBotaoBloco = computed(() => {
   switch (acaoBlocoAtual.value) {
     case "aceitar":
-      return "Registrar aceite";
+      return TEXTOS.acaoBloco.aceitar.BOTAO;
     case "homologar":
-      return "Homologar";
+      return TEXTOS.acaoBloco.homologar.BOTAO;
     case "disponibilizar":
-      return "Disponibilizar";
+      return TEXTOS.acaoBloco.disponibilizar.BOTAO;
     default:
       return "";
   }
@@ -420,11 +427,11 @@ function finalizarProcesso() {
 
 async function confirmarFinalizacao() {
   try {
-    await processosStore.finalizarProcesso(codProcesso);
-    toastStore.setPending("Processo finalizado com sucesso.");
+    await apiFinalizarProcesso(codProcesso);
+    toastStore.setPending(TEXTOS.sucesso.PROCESSO_FINALIZADO);
     await router.push("/painel");
   } catch (error: any) {
-    const mensagem = processosStore.lastError?.message || error.message || "Ocorreu um erro";
+    const mensagem = lastError.value?.message || error.message || TEXTOS.processo.ERRO_PADRAO;
     notify(mensagem, 'danger');
   }
 }
@@ -440,7 +447,7 @@ async function executarAcaoBloco(dados: { ids: number[], dataLimite?: string }) 
     modalBlocoRef.value?.setProcessando(true);
     const contextoExecucao = obterContextoAtualAcao(acaoBlocoAtual.value, dados.ids);
     const mensagemSucesso = obterMensagemSucesso(acaoBlocoAtual.value, contextoExecucao);
-    await processosStore.executarAcaoBloco(acaoBlocoAtual.value, dados.ids, dados.dataLimite);
+    await apiExecutarAcaoBloco(acaoBlocoAtual.value, dados.ids, dados.dataLimite);
 
     modalBlocoRef.value?.fechar();
     const deveRedirecionarPainel = acaoBlocoAtual.value === "aceitar" ||
@@ -453,9 +460,9 @@ async function executarAcaoBloco(dados: { ids: number[], dataLimite?: string }) 
       return;
     }
     notify(mensagemSucesso, 'success');
-    await processosStore.buscarContextoCompleto(codProcesso);
+    await buscarContextoCompleto(codProcesso);
   } catch (error: any) {
-    modalBlocoRef.value?.setErro(error.message || "Erro ao executar ação em bloco");
+    modalBlocoRef.value?.setErro(error.message || TEXTOS.processo.ERRO_ACAO_BLOCO);
     modalBlocoRef.value?.setProcessando(false);
   } finally {
     processandoAcaoBloco.value = false;
@@ -464,7 +471,7 @@ async function executarAcaoBloco(dados: { ids: number[], dataLimite?: string }) 
 
 onMounted(async () => {
   if (codProcesso) {
-    await processosStore.buscarContextoCompleto(codProcesso);
+    await buscarContextoCompleto(codProcesso);
   }
 });
 

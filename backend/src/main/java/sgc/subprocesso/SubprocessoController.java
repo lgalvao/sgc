@@ -40,20 +40,20 @@ public class SubprocessoController {
     @PreAuthorize("hasRole('ADMIN')")
     @JsonView(SubprocessoViews.Publica.class)
     public List<Subprocesso> listar() {
-        return subprocessoService.listarEntidades();
+        return subprocessoService.listarTodos();
     }
 
-    @GetMapping("/{id}")
-    @PreAuthorize("hasPermission(#id, 'Subprocesso', 'VISUALIZAR_SUBPROCESSO')")
-    public SubprocessoDetalheResponse obterPorId(@PathVariable Long id, @AuthenticationPrincipal Usuario usuario) {
-        return subprocessoService.obterDetalhes(id, usuario);
+    @GetMapping("/{codSubprocesso}")
+    @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'VISUALIZAR_SUBPROCESSO')")
+    public SubprocessoDetalheResponse obterPorCodigo(@PathVariable Long codSubprocesso, @AuthenticationPrincipal Usuario usuario) {
+        return subprocessoService.obterDetalhes(codSubprocesso, usuario);
     }
 
-    @GetMapping("/{id}/status")
-    @PreAuthorize("hasPermission(#id, 'Subprocesso', 'VISUALIZAR_SUBPROCESSO')")
+    @GetMapping("/{codSubprocesso}/status")
+    @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'VISUALIZAR_SUBPROCESSO')")
     @Operation(summary = "Obtém apenas o status atual do subprocesso")
-    public ResponseEntity<SubprocessoSituacaoDto> obterStatus(@PathVariable Long id) {
-        return ResponseEntity.ok(subprocessoService.obterStatus(id));
+    public ResponseEntity<SubprocessoSituacaoDto> obterStatus(@PathVariable Long codSubprocesso) {
+        return ResponseEntity.ok(subprocessoService.obterStatus(codSubprocesso));
     }
 
     @GetMapping("/buscar")
@@ -75,109 +75,109 @@ public class SubprocessoController {
         return ResponseEntity.created(uri).body(salvo);
     }
 
-    @PostMapping("/{id}/atualizar")
+    @PostMapping("/{codSubprocesso}/atualizar")
     @PreAuthorize("hasRole('ADMIN')")
     @JsonView(SubprocessoViews.Publica.class)
     public ResponseEntity<Subprocesso> atualizar(
-            @PathVariable Long id, @Valid @RequestBody AtualizarSubprocessoRequest request) {
-        var atualizado = subprocessoService.atualizarEntidade(id, request);
+            @PathVariable Long codSubprocesso, @Valid @RequestBody AtualizarSubprocessoRequest request) {
+        var atualizado = subprocessoService.atualizarEntidade(codSubprocesso, request);
         return ResponseEntity.ok(atualizado);
     }
 
-    @PostMapping("/{id}/excluir")
+    @PostMapping("/{codSubprocesso}/excluir")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> excluir(@PathVariable Long id) {
-        subprocessoService.excluir(id);
+    public ResponseEntity<Void> excluir(@PathVariable Long codSubprocesso) {
+        subprocessoService.excluir(codSubprocesso);
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/{id}/data-limite")
+    @PostMapping("/{codSubprocesso}/data-limite")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> alterarDataLimite(
-            @PathVariable Long id,
+            @PathVariable Long codSubprocesso,
             @RequestBody @Valid DataRequest request) {
-        transicaoService.alterarDataLimite(id, request.data());
+        transicaoService.alterarDataLimite(codSubprocesso, request.data());
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/{id}/reabrir-cadastro")
+    @PostMapping("/{codSubprocesso}/reabrir-cadastro")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Reabre o cadastro de um subprocesso")
     public ResponseEntity<Void> reabrirCadastro(
-            @PathVariable Long id,
+            @PathVariable Long codSubprocesso,
             @RequestBody @Valid JustificativaRequest request) {
-        transicaoService.reabrirCadastro(id, request.justificativa());
+        transicaoService.reabrirCadastro(codSubprocesso, request.justificativa());
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/{id}/reabrir-revisao-cadastro")
+    @PostMapping("/{codSubprocesso}/reabrir-revisao-cadastro")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Reabre a revisão de cadastro de um subprocesso")
     public ResponseEntity<Void> reabrirRevisaoCadastro(
-            @PathVariable Long id,
+            @PathVariable Long codSubprocesso,
             @RequestBody @Valid JustificativaRequest request) {
-        transicaoService.reabrirRevisaoCadastro(id, request.justificativa());
+        transicaoService.reabrirRevisaoCadastro(codSubprocesso, request.justificativa());
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/{id}/historico-cadastro")
-    @PreAuthorize("hasPermission(#id, 'Subprocesso', 'VISUALIZAR_SUBPROCESSO')")
-    public List<AnaliseHistoricoDto> obterHistoricoCadastro(@PathVariable Long id) {
-        return subprocessoService.listarHistoricoCadastro(id);
+    @GetMapping("/{codSubprocesso}/historico-cadastro")
+    @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'VISUALIZAR_SUBPROCESSO')")
+    public List<AnaliseHistoricoDto> obterHistoricoCadastro(@PathVariable Long codSubprocesso) {
+        return subprocessoService.listarHistoricoCadastro(codSubprocesso);
     }
 
-    @GetMapping("/{id}/contexto-edicao")
-    @PreAuthorize("hasPermission(#id, 'Subprocesso', 'VISUALIZAR_SUBPROCESSO')")
-    public ResponseEntity<ContextoEdicaoResponse> obterContextoEdicao(@PathVariable Long id) {
-        return ResponseEntity.ok(subprocessoService.obterContextoEdicao(id));
+    @GetMapping("/{codSubprocesso}/contexto-edicao")
+    @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'VISUALIZAR_SUBPROCESSO')")
+    public ResponseEntity<ContextoEdicaoResponse> obterContextoEdicao(@PathVariable Long codSubprocesso) {
+        return ResponseEntity.ok(subprocessoService.obterContextoEdicao(codSubprocesso));
     }
 
-    @GetMapping("/{id}/atividades-importacao")
+    @GetMapping("/{codSubprocesso}/atividades-importacao")
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Lista atividades de um subprocesso fonte para importação")
-    public ResponseEntity<List<AtividadeDto>> listarAtividadesParaImportacao(@PathVariable Long id) {
-        return ResponseEntity.ok(subprocessoService.listarAtividadesParaImportacao(id));
+    public ResponseEntity<List<AtividadeDto>> listarAtividadesParaImportacao(@PathVariable Long codSubprocesso) {
+        return ResponseEntity.ok(subprocessoService.listarAtividadesParaImportacao(codSubprocesso));
     }
 
-    @GetMapping("/{id}/validar-cadastro")
-    @PreAuthorize("hasPermission(#id, 'Subprocesso', 'VISUALIZAR_SUBPROCESSO')")
+    @GetMapping("/{codSubprocesso}/validar-cadastro")
+    @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'VISUALIZAR_SUBPROCESSO')")
     @Operation(summary = "Valida se o cadastro está pronto para disponibilização")
-    public ResponseEntity<ValidacaoCadastroDto> validarCadastro(@PathVariable Long id) {
-        return ResponseEntity.ok(subprocessoService.validarCadastro(id));
+    public ResponseEntity<ValidacaoCadastroDto> validarCadastro(@PathVariable Long codSubprocesso) {
+        return ResponseEntity.ok(subprocessoService.validarCadastro(codSubprocesso));
     }
 
     @JsonView(MapaViews.Publica.class)
-    @GetMapping("/{id}/cadastro")
-    @PreAuthorize("hasPermission(#id, 'Subprocesso', 'VISUALIZAR_SUBPROCESSO')")
-    public Subprocesso obterCadastro(@PathVariable Long id) {
-        return subprocessoService.buscarSubprocesso(id);
+    @GetMapping("/{codSubprocesso}/cadastro")
+    @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'VISUALIZAR_SUBPROCESSO')")
+    public Subprocesso obterCadastro(@PathVariable Long codSubprocesso) {
+        return subprocessoService.buscarSubprocesso(codSubprocesso);
     }
 
-    @PostMapping("/{id}/cadastro/disponibilizar")
-    @PreAuthorize("hasPermission(#id, 'Subprocesso', 'DISPONIBILIZAR_CADASTRO')")
+    @PostMapping("/{codSubprocesso}/cadastro/disponibilizar")
+    @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'DISPONIBILIZAR_CADASTRO')")
     @Operation(summary = "Disponibiliza o cadastro de atividades para análise")
     public ResponseEntity<MensagemResponse> disponibilizarCadastro(
-            @PathVariable Long id,
+            @PathVariable Long codSubprocesso,
             @AuthenticationPrincipal Usuario usuario) {
-        transicaoService.disponibilizarCadastro(id, usuario);
+        transicaoService.disponibilizarCadastro(codSubprocesso, usuario);
         return ResponseEntity.ok(new MensagemResponse("Cadastro de atividades disponibilizado"));
     }
 
-    @PostMapping("/{id}/disponibilizar-revisao")
-    @PreAuthorize("hasPermission(#id, 'Subprocesso', 'DISPONIBILIZAR_REVISAO_CADASTRO')")
+    @PostMapping("/{codSubprocesso}/disponibilizar-revisao")
+    @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'DISPONIBILIZAR_REVISAO_CADASTRO')")
     @Operation(summary = "Disponibiliza a revisão do cadastro de atividades para análise")
     public ResponseEntity<MensagemResponse> disponibilizarRevisao(
-            @PathVariable Long id, @AuthenticationPrincipal Usuario usuario) {
-        transicaoService.disponibilizarRevisao(id, usuario);
+            @PathVariable Long codSubprocesso, @AuthenticationPrincipal Usuario usuario) {
+        transicaoService.disponibilizarRevisao(codSubprocesso, usuario);
 
         return ResponseEntity.ok(new MensagemResponse("Revisão do cadastro disponibilizada"));
     }
 
-    @PostMapping("/{id}/devolver-cadastro")
-    @PreAuthorize("hasPermission(#id, 'Subprocesso', 'DEVOLVER_CADASTRO')")
-    @Operation(summary = "Devolve o cadastro de atividades para o responsável")
+    @PostMapping("/{codSubprocesso}/devolver-cadastro")
+    @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'DEVOLVER_CADASTRO')")
+    @Operation(summary = "Devolve o cadastro de atividades para the responsável")
     public void devolverCadastro(
-            @PathVariable Long id,
+            @PathVariable Long codSubprocesso,
             @Valid @RequestBody JustificativaRequest request,
             @AuthenticationPrincipal Usuario usuario) {
 
@@ -185,28 +185,28 @@ public class SubprocessoController {
                 .map(UtilSanitizacao::sanitizar)
                 .orElse("");
 
-        transicaoService.devolverCadastro(id, usuario, sanitizedObservacoes);
+        transicaoService.devolverCadastro(codSubprocesso, usuario, sanitizedObservacoes);
     }
 
-    @PostMapping("/{id}/aceitar-cadastro")
-    @PreAuthorize("hasPermission(#id, 'Subprocesso', 'ACEITAR_CADASTRO')")
+    @PostMapping("/{codSubprocesso}/aceitar-cadastro")
+    @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'ACEITAR_CADASTRO')")
     @Operation(summary = "Aceita o cadastro de atividades")
     public void aceitarCadastro(
-            @PathVariable Long id,
+            @PathVariable Long codSubprocesso,
             @Valid @RequestBody TextoOpcionalRequest request,
             @AuthenticationPrincipal Usuario usuario) {
         String sanitizedObservacoes = Optional.ofNullable(request.texto())
                 .map(UtilSanitizacao::sanitizar)
                 .orElse("");
 
-        transicaoService.aceitarCadastro(id, usuario, sanitizedObservacoes);
+        transicaoService.aceitarCadastro(codSubprocesso, usuario, sanitizedObservacoes);
     }
 
-    @PostMapping("/{id}/homologar-cadastro")
-    @PreAuthorize("hasPermission(#id, 'Subprocesso', 'HOMOLOGAR_CADASTRO')")
+    @PostMapping("/{codSubprocesso}/homologar-cadastro")
+    @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'HOMOLOGAR_CADASTRO')")
     @Operation(summary = "Homologa o cadastro de atividades")
     public void homologarCadastro(
-            @PathVariable Long id,
+            @PathVariable Long codSubprocesso,
             @Valid @RequestBody TextoOpcionalRequest request,
             @AuthenticationPrincipal Usuario usuario) {
 
@@ -214,154 +214,154 @@ public class SubprocessoController {
                 .map(UtilSanitizacao::sanitizar)
                 .orElse("");
 
-        transicaoService.homologarCadastro(id, usuario, sanitizedObservacoes);
+        transicaoService.homologarCadastro(codSubprocesso, usuario, sanitizedObservacoes);
     }
 
-    @PostMapping("/{id}/devolver-revisao-cadastro")
+    @PostMapping("/{codSubprocesso}/devolver-revisao-cadastro")
     @Operation(summary = "Devolve a revisão do cadastro de atividades para o responsável")
-    @PreAuthorize("hasPermission(#id, 'Subprocesso', 'DEVOLVER_REVISAO_CADASTRO')")
+    @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'DEVOLVER_REVISAO_CADASTRO')")
     public void devolverRevisaoCadastro(
-            @PathVariable Long id,
+            @PathVariable Long codSubprocesso,
             @Valid @RequestBody JustificativaRequest request,
             @AuthenticationPrincipal Usuario usuario) {
         String sanitizedObservacoes = Optional.ofNullable(request.justificativa())
                 .map(UtilSanitizacao::sanitizar)
                 .orElse("");
 
-        transicaoService.devolverRevisaoCadastro(id, usuario, sanitizedObservacoes);
+        transicaoService.devolverRevisaoCadastro(codSubprocesso, usuario, sanitizedObservacoes);
     }
 
-    @PostMapping("/{id}/aceitar-revisao-cadastro")
+    @PostMapping("/{codSubprocesso}/aceitar-revisao-cadastro")
     @Operation(summary = "Aceita a revisão do cadastro de atividades")
-    @PreAuthorize("hasPermission(#id, 'Subprocesso', 'ACEITAR_REVISAO_CADASTRO')")
+    @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'ACEITAR_REVISAO_CADASTRO')")
     public void aceitarRevisaoCadastro(
-            @PathVariable Long id,
+            @PathVariable Long codSubprocesso,
             @Valid @RequestBody TextoOpcionalRequest request,
             @AuthenticationPrincipal Usuario usuario) {
         String sanitizedObservacoes = Optional.ofNullable(request.texto())
                 .map(UtilSanitizacao::sanitizar)
                 .orElse("");
 
-        transicaoService.aceitarRevisaoCadastro(id, usuario, sanitizedObservacoes);
+        transicaoService.aceitarRevisaoCadastro(codSubprocesso, usuario, sanitizedObservacoes);
     }
 
-    @PostMapping("/{id}/homologar-revisao-cadastro")
+    @PostMapping("/{codSubprocesso}/homologar-revisao-cadastro")
     @Operation(summary = "Homologa a revisão do cadastro de atividades")
-    @PreAuthorize("hasPermission(#id, 'Subprocesso', 'HOMOLOGAR_REVISAO_CADASTRO')")
+    @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'HOMOLOGAR_REVISAO_CADASTRO')")
     public void homologarRevisaoCadastro(
-            @PathVariable Long id,
+            @PathVariable Long codSubprocesso,
             @Valid @RequestBody TextoOpcionalRequest request,
             @AuthenticationPrincipal Usuario usuario) {
         String sanitizedObservacoes = Optional.ofNullable(request.texto())
                 .map(UtilSanitizacao::sanitizar)
                 .orElse("");
 
-        transicaoService.homologarRevisaoCadastro(id, usuario, sanitizedObservacoes);
+        transicaoService.homologarRevisaoCadastro(codSubprocesso, usuario, sanitizedObservacoes);
     }
 
-    @PostMapping("/{id}/importar-atividades")
-    @PreAuthorize("hasPermission(#id, 'Subprocesso', 'IMPORTAR_ATIVIDADES')")
+    @PostMapping("/{codSubprocesso}/importar-atividades")
+    @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'IMPORTAR_ATIVIDADES')")
     @Transactional
     @Operation(summary = "Importa atividades de outro subprocesso")
     public Map<String, String> importarAtividades(
-            @PathVariable Long id, @RequestBody @Valid ImportarAtividadesRequest request) {
-        subprocessoService.importarAtividades(id, request.codSubprocessoOrigem(), request.codigosAtividades());
+            @PathVariable Long codSubprocesso, @RequestBody @Valid ImportarAtividadesRequest request) {
+        subprocessoService.importarAtividades(codSubprocesso, request.codSubprocessoOrigem(), request.codigosAtividades());
         return Map.of("message", "Atividades importadas.");
     }
 
-    @PostMapping("/{id}/aceitar-cadastro-bloco")
+    @PostMapping("/{codSubprocesso}/aceitar-cadastro-bloco")
     @PreAuthorize("hasPermission(#request.subprocessos, 'Subprocesso', 'ACEITAR_CADASTRO')")
     @Operation(summary = "Aceita cadastros em bloco")
-    public void aceitarCadastroEmBloco(@PathVariable Long id,
+    public void aceitarCadastroEmBloco(@PathVariable Long codSubprocesso,
                                        @RequestBody @Valid ProcessarEmBlocoRequest request,
                                        @AuthenticationPrincipal Usuario usuario) {
         transicaoService.aceitarCadastroEmBloco(request.subprocessos(), usuario);
     }
 
-    @PostMapping("/{id}/homologar-cadastro-bloco")
+    @PostMapping("/{codSubprocesso}/homologar-cadastro-bloco")
     @PreAuthorize("hasPermission(#request.subprocessos, 'Subprocesso', 'HOMOLOGAR_CADASTRO')")
     @Operation(summary = "Homologa cadastros em bloco")
-    public void homologarCadastroEmBloco(@PathVariable Long id,
+    public void homologarCadastroEmBloco(@PathVariable Long codSubprocesso,
                                          @RequestBody @Valid ProcessarEmBlocoRequest request,
                                          @AuthenticationPrincipal Usuario usuario) {
         transicaoService.homologarCadastroEmBloco(request.subprocessos(), usuario);
     }
 
-    @GetMapping("/{id}/impactos-mapa")
-    @PreAuthorize("hasPermission(#id, 'Subprocesso', 'VERIFICAR_IMPACTOS')")
+    @GetMapping("/{codSubprocesso}/impactos-mapa")
+    @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'VERIFICAR_IMPACTOS')")
     @JsonView(MapaViews.Publica.class)
-    public ImpactoMapaResponse verificarImpactos(@PathVariable Long id, @AuthenticationPrincipal Usuario usuario) {
-        return subprocessoService.verificarImpactos(id, usuario);
+    public ImpactoMapaResponse verificarImpactos(@PathVariable Long codSubprocesso, @AuthenticationPrincipal Usuario usuario) {
+        return subprocessoService.verificarImpactos(codSubprocesso, usuario);
     }
 
-    @GetMapping("/{id}/mapa")
-    @PreAuthorize("hasPermission(#id, 'Subprocesso', 'VISUALIZAR_SUBPROCESSO')")
+    @GetMapping("/{codSubprocesso}/mapa")
+    @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'VISUALIZAR_SUBPROCESSO')")
     @JsonView(MapaViews.Publica.class)
-    public Mapa obterMapa(@PathVariable Long id) {
-        Subprocesso sp = subprocessoService.buscarSubprocessoComMapa(id);
+    public Mapa obterMapa(@PathVariable Long codSubprocesso) {
+        Subprocesso sp = subprocessoService.buscarSubprocessoComMapa(codSubprocesso);
         return sp.getMapa();
     }
 
-    @PostMapping("/{id}/disponibilizar-mapa")
-    @PreAuthorize("hasPermission(#id, 'Subprocesso', 'DISPONIBILIZAR_MAPA')")
+    @PostMapping("/{codSubprocesso}/disponibilizar-mapa")
+    @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'DISPONIBILIZAR_MAPA')")
     @Operation(summary = "Disponibiliza o mapa para validação")
     public ResponseEntity<MensagemResponse> disponibilizarMapa(
-            @PathVariable Long id,
+            @PathVariable Long codSubprocesso,
             @Valid @RequestBody DisponibilizarMapaRequest request,
             @AuthenticationPrincipal Usuario usuario) {
-        transicaoService.disponibilizarMapa(id, request, usuario);
+        transicaoService.disponibilizarMapa(codSubprocesso, request, usuario);
         return ResponseEntity.ok(new MensagemResponse("Mapa de competências disponibilizado."));
     }
 
-    @GetMapping("/{id}/mapa-visualizacao")
-    @PreAuthorize("hasPermission(#id, 'Subprocesso', 'VISUALIZAR_SUBPROCESSO')")
+    @GetMapping("/{codSubprocesso}/mapa-visualizacao")
+    @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'VISUALIZAR_SUBPROCESSO')")
     @Operation(summary = "Obtém o mapa formatado para visualização")
     @JsonView(MapaViews.Publica.class)
-    public MapaVisualizacaoResponse obterMapaParaVisualizacao(@PathVariable Long id) {
-        return subprocessoService.mapaParaVisualizacao(id);
+    public MapaVisualizacaoResponse obterMapaParaVisualizacao(@PathVariable Long codSubprocesso) {
+        return subprocessoService.mapaParaVisualizacao(codSubprocesso);
     }
 
-    @PostMapping("/{id}/mapa")
-    @PreAuthorize("hasPermission(#id, 'Subprocesso', 'EDITAR_MAPA')")
+    @PostMapping("/{codSubprocesso}/mapa")
+    @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'EDITAR_MAPA')")
     @Operation(summary = "Salva as alterações do mapa")
     @JsonView(MapaViews.Publica.class)
     public Mapa salvarMapa(
-            @PathVariable Long id,
+            @PathVariable Long codSubprocesso,
             @Valid @RequestBody SalvarMapaRequest request) {
-        return subprocessoService.salvarMapa(id, request);
+        return subprocessoService.salvarMapa(codSubprocesso, request);
     }
 
-    @GetMapping("/{id}/mapa-completo")
-    @PreAuthorize("hasPermission(#id, 'Subprocesso', 'VISUALIZAR_SUBPROCESSO')")
+    @GetMapping("/{codSubprocesso}/mapa-completo")
+    @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'VISUALIZAR_SUBPROCESSO')")
     @Operation(summary = "Obtém o mapa completo para edição/visualização")
     @JsonView(MapaViews.Publica.class)
     @Transactional(readOnly = true)
-    public ResponseEntity<Mapa> obterMapaCompleto(@PathVariable Long id) {
+    public ResponseEntity<Mapa> obterMapaCompleto(@PathVariable Long codSubprocesso) {
         try {
-            Mapa mapa = subprocessoService.mapaCompletoPorSubprocesso(id);
+            Mapa mapa = subprocessoService.mapaCompletoPorSubprocesso(codSubprocesso);
             return ResponseEntity.ok(mapa);
         } catch (Exception e) {
-            log.error("Erro ao buscar mapa completo para subprocesso {}: {}", id, e.getMessage(), e);
+            log.error("Erro ao buscar mapa completo para subprocesso {}: {}", codSubprocesso, e.getMessage(), e);
             throw e;
         }
     }
 
-    @PostMapping("/{id}/mapa-completo")
-    @PreAuthorize("hasPermission(#id, 'Subprocesso', 'EDITAR_MAPA')")
+    @PostMapping("/{codSubprocesso}/mapa-completo")
+    @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'EDITAR_MAPA')")
     @Operation(summary = "Salva o mapa completo (batch)")
     @JsonView(MapaViews.Publica.class)
     public ResponseEntity<Mapa> salvarMapaCompleto(
-            @PathVariable Long id,
+            @PathVariable Long codSubprocesso,
             @Valid @RequestBody SalvarMapaRequest request) {
 
-        Mapa mapa = subprocessoService.salvarMapa(id, request);
+        Mapa mapa = subprocessoService.salvarMapa(codSubprocesso, request);
         return ResponseEntity.ok(mapa);
     }
 
-    @PostMapping("/{id}/disponibilizar-mapa-bloco")
+    @PostMapping("/{codSubprocesso}/disponibilizar-mapa-bloco")
     @PreAuthorize("hasPermission(#request.subprocessos, 'Subprocesso', 'DISPONIBILIZAR_MAPA')")
     @Operation(summary = "Disponibiliza mapas em bloco")
-    public void disponibilizarMapaEmBloco(@PathVariable Long id,
+    public void disponibilizarMapaEmBloco(@PathVariable Long codSubprocesso,
                                           @RequestBody @Valid ProcessarEmBlocoRequest request,
                                           @AuthenticationPrincipal Usuario usuario) {
         DisponibilizarMapaRequest dispoReq = DisponibilizarMapaRequest.builder()
@@ -370,158 +370,158 @@ public class SubprocessoController {
         transicaoService.disponibilizarMapaEmBloco(request.subprocessos(), dispoReq, usuario);
     }
 
-    @GetMapping("/{id}/mapa-ajuste")
-    @PreAuthorize("hasPermission(#id, 'Subprocesso', 'AJUSTAR_MAPA')")
+    @GetMapping("/{codSubprocesso}/mapa-ajuste")
+    @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'AJUSTAR_MAPA')")
     @Operation(summary = "Obtém dados do mapa preparados para ajuste")
-    public MapaAjusteDto obterMapaParaAjuste(@PathVariable Long id) {
-        return subprocessoService.obterMapaParaAjuste(id);
+    public MapaAjusteDto obterMapaParaAjuste(@PathVariable Long codSubprocesso) {
+        return subprocessoService.obterMapaParaAjuste(codSubprocesso);
     }
 
-    @PostMapping("/{id}/mapa-ajuste/atualizar")
-    @PreAuthorize("hasPermission(#id, 'Subprocesso', 'EDITAR_MAPA')")
+    @PostMapping("/{codSubprocesso}/mapa-ajuste/atualizar")
+    @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'EDITAR_MAPA')")
     @Operation(summary = "Salva os ajustes feitos no mapa")
     public void salvarAjustesMapa(
-            @PathVariable Long id,
+            @PathVariable Long codSubprocesso,
             @RequestBody @Valid SalvarAjustesRequest request) {
-        subprocessoService.salvarAjustesMapa(id, request.competencias());
+        subprocessoService.salvarAjustesMapa(codSubprocesso, request.competencias());
     }
 
-    @PostMapping("/{id}/competencia")
-    @PreAuthorize("hasPermission(#id, 'Subprocesso', 'EDITAR_MAPA')")
+    @PostMapping("/{codSubprocesso}/competencia")
+    @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'EDITAR_MAPA')")
     @Operation(summary = "Adiciona uma competência ao mapa")
     @JsonView(MapaViews.Publica.class)
     public ResponseEntity<Mapa> adicionarCompetencia(
-            @PathVariable Long id,
+            @PathVariable Long codSubprocesso,
             @Valid @RequestBody CompetenciaRequest request) {
-        Mapa mapa = subprocessoService.adicionarCompetencia(id, request);
+        Mapa mapa = subprocessoService.adicionarCompetencia(codSubprocesso, request);
         return ResponseEntity.ok(mapa);
     }
 
-    @PostMapping("/{id}/competencia/{codCompetencia}")
-    @PreAuthorize("hasPermission(#id, 'Subprocesso', 'EDITAR_MAPA')")
+    @PostMapping("/{codSubprocesso}/competencia/{codCompetencia}")
+    @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'EDITAR_MAPA')")
     @Operation(summary = "Atualiza uma competência do mapa")
     @JsonView(MapaViews.Publica.class)
     public ResponseEntity<Mapa> atualizarCompetencia(
-            @PathVariable Long id,
+            @PathVariable Long codSubprocesso,
             @PathVariable Long codCompetencia,
             @Valid @RequestBody CompetenciaRequest request) {
-        Mapa mapa = subprocessoService.atualizarCompetencia(id, codCompetencia, request);
+        Mapa mapa = subprocessoService.atualizarCompetencia(codSubprocesso, codCompetencia, request);
         return ResponseEntity.ok(mapa);
     }
 
-    @PostMapping("/{id}/competencia/{codCompetencia}/remover")
-    @PreAuthorize("hasPermission(#id, 'Subprocesso', 'EDITAR_MAPA')")
+    @PostMapping("/{codSubprocesso}/competencia/{codCompetencia}/remover")
+    @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'EDITAR_MAPA')")
     @Operation(summary = "Remove uma competência do mapa")
     @JsonView(MapaViews.Publica.class)
     public ResponseEntity<Mapa> removerCompetencia(
-            @PathVariable Long id,
+            @PathVariable Long codSubprocesso,
             @PathVariable Long codCompetencia) {
-        Mapa mapa = subprocessoService.removerCompetencia(id, codCompetencia);
+        Mapa mapa = subprocessoService.removerCompetencia(codSubprocesso, codCompetencia);
         return ResponseEntity.ok(mapa);
     }
 
-    @PostMapping("/{id}/apresentar-sugestoes")
-    @PreAuthorize("hasPermission(#id, 'Subprocesso', 'APRESENTAR_SUGESTOES')")
+    @PostMapping("/{codSubprocesso}/apresentar-sugestoes")
+    @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'APRESENTAR_SUGESTOES')")
     @Operation(summary = "Apresenta sugestões de melhoria para o mapa")
     public void apresentarSugestoes(
-            @PathVariable Long id,
+            @PathVariable Long codSubprocesso,
             @RequestBody @Valid TextoOpcionalRequest request,
             @AuthenticationPrincipal Usuario usuario) {
-        transicaoService.apresentarSugestoes(id, request.texto(), usuario);
+        transicaoService.apresentarSugestoes(codSubprocesso, request.texto(), usuario);
     }
 
-    @GetMapping("/{id}/sugestoes")
-    @PreAuthorize("hasPermission(#id, 'Subprocesso', 'VISUALIZAR_SUBPROCESSO')")
-    public Map<String, Object> obterSugestoes(@PathVariable Long id) {
+    @GetMapping("/{codSubprocesso}/sugestoes")
+    @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'VISUALIZAR_SUBPROCESSO')")
+    public Map<String, Object> obterSugestoes(@PathVariable Long codSubprocesso) {
         return subprocessoService.obterSugestoes();
     }
 
-    @GetMapping("/{id}/historico-validacao")
-    @PreAuthorize("hasPermission(#id, 'Subprocesso', 'VISUALIZAR_SUBPROCESSO')")
-    public List<AnaliseHistoricoDto> obterHistoricoValidacao(@PathVariable Long id) {
-        return subprocessoService.listarHistoricoValidacao(id);
+    @GetMapping("/{codSubprocesso}/historico-validacao")
+    @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'VISUALIZAR_SUBPROCESSO')")
+    public List<AnaliseHistoricoDto> obterHistoricoValidacao(@PathVariable Long codSubprocesso) {
+        return subprocessoService.listarHistoricoValidacao(codSubprocesso);
     }
 
-    @PostMapping("/{id}/validar-mapa")
-    @PreAuthorize("hasPermission(#id, 'Subprocesso', 'VALIDAR_MAPA')")
+    @PostMapping("/{codSubprocesso}/validar-mapa")
+    @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'VALIDAR_MAPA')")
     @Operation(summary = "Valida o mapa de competências da unidade")
-    public ResponseEntity<Void> validarMapa(@PathVariable Long id, @AuthenticationPrincipal Usuario usuario) {
-        transicaoService.validarMapa(id, usuario);
+    public ResponseEntity<Void> validarMapa(@PathVariable Long codSubprocesso, @AuthenticationPrincipal Usuario usuario) {
+        transicaoService.validarMapa(codSubprocesso, usuario);
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/{id}/devolver-validacao")
-    @PreAuthorize("hasPermission(#id, 'Subprocesso', 'DEVOLVER_MAPA')")
+    @PostMapping("/{codSubprocesso}/devolver-validacao")
+    @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'DEVOLVER_MAPA')")
     @Operation(summary = "Devolve o mapa para ajuste (pelo chefe/gestor)")
     public ResponseEntity<Void> devolverValidacao(
-            @PathVariable Long id,
+            @PathVariable Long codSubprocesso,
             @RequestBody @Valid JustificativaRequest request,
             @AuthenticationPrincipal Usuario usuario) {
-        transicaoService.devolverValidacao(id, request.justificativa(), usuario);
+        transicaoService.devolverValidacao(codSubprocesso, request.justificativa(), usuario);
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/{id}/aceitar-validacao")
-    @PreAuthorize("hasPermission(#id, 'Subprocesso', 'ACEITAR_MAPA')")
+    @PostMapping("/{codSubprocesso}/aceitar-validacao")
+    @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'ACEITAR_MAPA')")
     @Operation(summary = "Aceita a validação (pelo gestor)")
-    public ResponseEntity<Void> aceitarValidacao(@PathVariable Long id, @AuthenticationPrincipal Usuario usuario) {
-        transicaoService.aceitarValidacao(id, usuario);
+    public ResponseEntity<Void> aceitarValidacao(@PathVariable Long codSubprocesso, @AuthenticationPrincipal Usuario usuario) {
+        transicaoService.aceitarValidacao(codSubprocesso, usuario);
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/{id}/homologar-validacao")
-    @PreAuthorize("hasPermission(#id, 'Subprocesso', 'HOMOLOGAR_MAPA')")
+    @PostMapping("/{codSubprocesso}/homologar-validacao")
+    @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'HOMOLOGAR_MAPA')")
     @Operation(summary = "Homologa a validação")
-    public ResponseEntity<Void> homologarValidacao(@PathVariable Long id, @AuthenticationPrincipal Usuario usuario) {
-        transicaoService.homologarValidacao(id, usuario);
+    public ResponseEntity<Void> homologarValidacao(@PathVariable Long codSubprocesso, @AuthenticationPrincipal Usuario usuario) {
+        transicaoService.homologarValidacao(codSubprocesso, usuario);
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/{id}/submeter-mapa-ajustado")
-    @PreAuthorize("hasPermission(#id, 'Subprocesso', 'AJUSTAR_MAPA')")
+    @PostMapping("/{codSubprocesso}/submeter-mapa-ajustado")
+    @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'AJUSTAR_MAPA')")
     @Operation(summary = "Submete o mapa após ajustes solicitados")
     public ResponseEntity<Void> submeterMapaAjustado(
-            @PathVariable Long id,
+            @PathVariable Long codSubprocesso,
             @Valid @RequestBody SubmeterMapaAjustadoRequest request,
             @AuthenticationPrincipal Usuario usuario) {
-        transicaoService.submeterMapaAjustado(id, request, usuario);
+        transicaoService.submeterMapaAjustado(codSubprocesso, request, usuario);
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/{id}/aceitar-validacao-bloco")
+    @PostMapping("/{codSubprocesso}/aceitar-validacao-bloco")
     @PreAuthorize("hasPermission(#request.subprocessos, 'Subprocesso', 'ACEITAR_MAPA')")
     @Operation(summary = "Aceita validação de mapas em bloco")
-    public void aceitarValidacaoEmBloco(@PathVariable Long id,
+    public void aceitarValidacaoEmBloco(@PathVariable Long codSubprocesso,
                                         @RequestBody @Valid ProcessarEmBlocoRequest request,
                                         @AuthenticationPrincipal Usuario usuario) {
         transicaoService.aceitarValidacaoEmBloco(request.subprocessos(), usuario);
     }
 
-    @PostMapping("/{id}/homologar-validacao-bloco")
+    @PostMapping("/{codSubprocesso}/homologar-validacao-bloco")
     @PreAuthorize("hasPermission(#request.subprocessos, 'Subprocesso', 'HOMOLOGAR_MAPA')")
     @Operation(summary = "Homologa validação de mapas em bloco")
-    public void homologarValidacaoEmBloco(@PathVariable Long id,
+    public void homologarValidacaoEmBloco(@PathVariable Long codSubprocesso,
                                           @RequestBody @Valid ProcessarEmBlocoRequest request,
                                           @AuthenticationPrincipal Usuario usuario) {
         transicaoService.homologarValidacaoEmBloco(request.subprocessos(), usuario);
     }
 
-    @PostMapping("/{id}/analises-cadastro")
+    @PostMapping("/{codSubprocesso}/analises-cadastro")
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR')")
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Cria uma análise de cadastro")
-    public AnaliseHistoricoDto criarAnaliseCadastro(@PathVariable Long id,
+    public AnaliseHistoricoDto criarAnaliseCadastro(@PathVariable Long codSubprocesso,
                                                     @RequestBody @Valid CriarAnaliseRequest request) {
-        return criarAnalise(id, request, TipoAnalise.CADASTRO);
+        return criarAnalise(codSubprocesso, request, TipoAnalise.CADASTRO);
     }
 
-    @PostMapping("/{id}/analises-validacao")
+    @PostMapping("/{codSubprocesso}/analises-validacao")
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR')")
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Cria uma análise de validação")
-    public AnaliseHistoricoDto criarAnaliseValidacao(@PathVariable Long id,
+    public AnaliseHistoricoDto criarAnaliseValidacao(@PathVariable Long codSubprocesso,
                                                      @RequestBody @Valid CriarAnaliseRequest request) {
-        return criarAnalise(id, request, TipoAnalise.VALIDACAO);
+        return criarAnalise(codSubprocesso, request, TipoAnalise.VALIDACAO);
     }
 
     private AnaliseHistoricoDto criarAnalise(Long codSubprocesso, CriarAnaliseRequest request, TipoAnalise tipo) {

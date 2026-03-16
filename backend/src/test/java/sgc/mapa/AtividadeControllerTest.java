@@ -43,7 +43,7 @@ class AtividadeControllerTest {
     class OperacoesAtividade {
         @Test
         @DisplayName("Deve obter por ID")
-        void deveObterPorId() throws Exception {
+        void deveobterPorCodigo() throws Exception {
             Atividade response = Atividade.builder()
                     .codigo(1L)
                     .descricao("Atividade teste")
@@ -51,7 +51,7 @@ class AtividadeControllerTest {
                     .conhecimentos(new LinkedHashSet<>())
                     .competencias(new HashSet<>())
                     .build();
-            Mockito.when(atividadeFacade.obterAtividadePorId(1L)).thenReturn(response);
+            Mockito.when(atividadeFacade.obterAtividadePorCodigo(1L)).thenReturn(response);
 
             mockMvc.perform(get("/api/atividades/1").with(user("123")))
                     .andDo(MockMvcResultHandlers.print())
@@ -207,14 +207,14 @@ class AtividadeControllerTest {
         @DisplayName("Deve retornar NotFound ao obter atividade inexistente")
         void deveRetornarNotFoundAoObterAtividadeInexistente() throws Exception {
 
-            Mockito.when(atividadeFacade.obterAtividadePorId(999L))
+            Mockito.when(atividadeFacade.obterAtividadePorCodigo(999L))
                     .thenThrow(new ErroEntidadeNaoEncontrada("Atividade", 999L));
 
             mockMvc.perform(get("/api/atividades/999")
                             .with(user("123")))
                     .andExpect(status().isNotFound());
 
-            Mockito.verify(atividadeFacade).obterAtividadePorId(999L);
+            Mockito.verify(atividadeFacade).obterAtividadePorCodigo(999L);
         }
 
         @Test

@@ -203,7 +203,7 @@ async function main() {
 
     generateMarkdownReport(metrics, OUTPUT_PATH);
 
-    console.log("✓ Relatório gerado com sucesso!");
+    console.log("✓ Relatório gerado");
     console.log("\nTop 5 classes mais complexas:");
 
     const sortedMetrics = [...metrics].sort((a, b) => b.complexityScore - a.complexityScore);

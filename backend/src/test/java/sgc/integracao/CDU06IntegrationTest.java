@@ -105,7 +105,7 @@ class CDU06IntegrationTest extends BaseIntegrationTest {
                 .dataLimiteEtapa1(processo.getDataLimite())
                 .build());
 
-        mockMvc.perform(get("/api/processos/{id}/detalhes", processo.getCodigo()))
+        mockMvc.perform(get("/api/processos/{codigo}/detalhes", processo.getCodigo()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.descricao").value("Processo de Teste"));
     }
@@ -114,7 +114,7 @@ class CDU06IntegrationTest extends BaseIntegrationTest {
     @WithMockAdmin
     @DisplayName("Deve retornar 404 para processo inexistente")
     void testDetalharProcesso_naoEncontrado() throws Exception {
-        mockMvc.perform(get("/api/processos/{id}/detalhes", 99999L))
+        mockMvc.perform(get("/api/processos/{codigo}/detalhes", 99999L))
                 .andExpect(status().isNotFound());
     }
 
@@ -132,7 +132,7 @@ class CDU06IntegrationTest extends BaseIntegrationTest {
                 .dataLimiteEtapa1(processo.getDataLimite())
                 .build());
 
-        mockMvc.perform(get("/api/processos/{id}/detalhes", processo.getCodigo()))
+        mockMvc.perform(get("/api/processos/{codigo}/detalhes", processo.getCodigo()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.podeFinalizar").value(true));
     }
@@ -151,7 +151,7 @@ class CDU06IntegrationTest extends BaseIntegrationTest {
                 .dataLimiteEtapa1(processo.getDataLimite())
                 .build());
 
-        mockMvc.perform(get("/api/processos/{id}/detalhes", processo.getCodigo()).with(authentication(auth)))
+        mockMvc.perform(get("/api/processos/{codigo}/detalhes", processo.getCodigo()).with(authentication(auth)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.podeFinalizar").value(false));
     }
@@ -170,7 +170,7 @@ class CDU06IntegrationTest extends BaseIntegrationTest {
                 .dataLimiteEtapa1(processo.getDataLimite())
                 .build());
 
-        mockMvc.perform(get("/api/processos/{id}/detalhes", processo.getCodigo()).with(authentication(auth)))
+        mockMvc.perform(get("/api/processos/{codigo}/detalhes", processo.getCodigo()).with(authentication(auth)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.podeHomologarCadastro").value(false));
     }
@@ -189,7 +189,7 @@ class CDU06IntegrationTest extends BaseIntegrationTest {
                 .dataLimiteEtapa1(processo.getDataLimite())
                 .build());
 
-        mockMvc.perform(get("/api/processos/{id}/detalhes", processo.getCodigo()).with(authentication(auth)))
+        mockMvc.perform(get("/api/processos/{codigo}/detalhes", processo.getCodigo()).with(authentication(auth)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.podeHomologarMapa").value(false));
     }
@@ -210,7 +210,7 @@ class CDU06IntegrationTest extends BaseIntegrationTest {
                 .build();
         subprocessoRepo.save(subprocesso);
 
-        mockMvc.perform(get("/api/processos/{id}/detalhes", processo.getCodigo()))
+        mockMvc.perform(get("/api/processos/{codigo}/detalhes", processo.getCodigo()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.unidades[0].situacaoSubprocesso")
                         .value("MAPEAMENTO_MAPA_HOMOLOGADO"))

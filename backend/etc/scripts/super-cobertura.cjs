@@ -24,7 +24,7 @@ async function runCoverage() {
     console.log('🚀 Executando :backend:jacocoTestReport...');
     try {
         execSync(GRADLE_CMD, {cwd: BASE_DIR, stdio: 'inherit'});
-    } catch (error) {
+    } catch {
         console.warn('⚠️ Gradle terminou com avisos/erros (testes falhando?), mas prosseguindo para análise do relatório.');
     }
 }

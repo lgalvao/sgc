@@ -18,7 +18,7 @@ public interface SubprocessoRepo extends JpaRepository<Subprocesso, Long> {
               join fetch s.unidade u
               left join fetch s.mapa m
             where s.processo.codigo = :codProcesso""")
-    List<Subprocesso> findByProcessoCodigoWithUnidade(@Param("codProcesso") Long codProcesso);
+    List<Subprocesso> findByProcessoCodigoComUnidade(@Param("codProcesso") Long codProcesso);
 
     @Query("""
             select s from Subprocesso s
@@ -26,7 +26,7 @@ public interface SubprocessoRepo extends JpaRepository<Subprocesso, Long> {
             where s.processo.codigo = :codProcesso
               and s.unidade.codigo = :codUnidade
               and s.situacao in :situacoes""")
-    List<Subprocesso> findByProcessoCodigoAndUnidadeCodigoAndSituacaoInWithUnidade(
+    List<Subprocesso> findByProcessoCodigoAndUnidadeCodigoAndSituacaoInComUnidade(
             @Param("codProcesso") Long codProcesso,
             @Param("codUnidade") Long codUnidade,
             @Param("situacoes") List<SituacaoSubprocesso> situacoes);
@@ -57,14 +57,12 @@ public interface SubprocessoRepo extends JpaRepository<Subprocesso, Long> {
             LEFT JOIN FETCH m.atividades a
             WHERE s.codigo = :codigo
             """)
-    Optional<Subprocesso> findByIdWithMapaAndAtividades(@Param("codigo") Long codigo);
+    Optional<Subprocesso> buscarPorCodigoComMapaEAtividades(@Param("codigo") Long codigo);
 
     @Query("""
             SELECT s FROM Subprocesso s JOIN FETCH s.processo JOIN FETCH s.unidade LEFT JOIN FETCH s.mapa
             """)
-    List<Subprocesso> findAllComFetch();
-
-    List<Subprocesso> findByProcessoCodigo(Long processoCodigo);
+    List<Subprocesso> listarTodosComFetch();
 
     @Query("""
             SELECT DISTINCT s FROM Subprocesso s
@@ -74,17 +72,17 @@ public interface SubprocessoRepo extends JpaRepository<Subprocesso, Long> {
             LEFT JOIN FETCH m.atividades
             WHERE s.processo.codigo = :codProcesso AND s.unidade.codigo = :codUnidade
             """)
-    Optional<Subprocesso> findByProcessoCodigoAndUnidadeCodigoWithFetch(
+    Optional<Subprocesso> buscarPorProcessoEUnidadeComFetch(
             @Param("codProcesso") Long codProcesso,
             @Param("codUnidade") Long codUnidade);
 
     Optional<Subprocesso> findByMapa_Codigo(Long mapaCodigo);
 
-    Optional<Subprocesso> findByProcessoCodigoAndUnidadeCodigo(Long processoCodigo, Long unidadeCodigo);
+    Optional<Subprocesso> findByProcessoCodigoAndUnidadeCodigo(Long codProcesso, Long codUnidade);
 
-    boolean existsByProcessoCodigoAndUnidadeCodigoIn(Long processoCodigo, List<Long> unidadesCodigos);
+    boolean existsByProcessoCodigoAndUnidadeCodigoIn(Long codProcesso, List<Long> codigosUnidades);
 
-    long countByProcessoCodigo(Long processoCodigo);
+    long countByProcessoCodigo(Long codProcesso);
 
-    long countByProcessoCodigoAndSituacaoIn(Long processoCodigo, List<SituacaoSubprocesso> situacoes);
+    long countByProcessoCodigoAndSituacaoIn(Long codProcesso, List<SituacaoSubprocesso> situacoes);
 }

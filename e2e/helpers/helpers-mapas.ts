@@ -1,6 +1,7 @@
 import {expect, type Page} from '@playwright/test';
 import {calcularDataLimite} from './helpers-processos.js';
-import {limparNotificacoes} from './helpers-navegacao.js';
+import {limparNotificacoes, verificarPaginaPainel, verificarToast} from './helpers-navegacao.js';
+import {TEXTOS} from '../../frontend/src/constants/textos.js';
 
 function extrairRotaSubprocesso(page: Page): { codigoProcesso: string; siglaUnidade: string } {
     const match = /\/processo\/(\d+)\/([A-Z0-9_]+)/.exec(page.url());
@@ -24,7 +25,7 @@ export async function navegarParaMapa(page: Page) {
     const rotaMapa = (await cardEdicao.isVisible()) ? 'mapa' : 'vis-mapa';
     await page.goto(`/processo/${codigoProcesso}/${siglaUnidade}/${rotaMapa}`);
     await expect(page).toHaveURL(new RegExp(String.raw`/processo/${codigoProcesso}/${siglaUnidade}/${rotaMapa}$`));
-    await expect(page.getByRole('heading', {name: /Mapa de competências/i})).toBeVisible();
+    await expect(page.getByRole('heading', {name: TEXTOS.mapa.TITULO})).toBeVisible();
 }
 
 export async function abrirModalCriarCompetencia(page: Page) {
@@ -158,4 +159,6 @@ export async function disponibilizarMapa(page: Page, dataLimite?: string) {
     await page.getByTestId('btn-disponibilizar-mapa-confirmar').click();
 
     await expect(modal).toBeHidden();
+    await verificarPaginaPainel(page);
+    await verificarToast(page, TEXTOS.sucesso.MAPA_DISPONIBILIZADO);
 }

@@ -4,7 +4,7 @@
 O teste cobre:
 - **Cenário 1**: Navegação do ADMIN até página de detalhes da unidade e verificação de visibilidade do botão "Criar atribuição".
 - **Cenário 2**: Validação de campos obrigatórios (usuário, data de início, data de término, justificativa). Testa que ao deixar data de início em branco, validação do HTML5 é acionada.
-- **Cenário 3**: Preenchimento correto de todos os campos (usuário selecionado, datas futuras, justificativa) e validação de mensagem de sucesso "Atribuição criada com sucesso".
+- **Cenário 3**: Preenchimento correto de todos os campos (usuário selecionado, datas futuras, justificativa) e validação de mensagem de sucesso "Atribuição criada".
 
 ## Lacunas em relação ao requisito
 **Lacunas críticas:**

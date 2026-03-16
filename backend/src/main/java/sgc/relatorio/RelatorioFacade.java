@@ -9,7 +9,7 @@ import sgc.mapa.service.*;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
-import sgc.processo.*;
+import sgc.processo.service.ProcessoService;
 import sgc.processo.model.*;
 import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.*;
@@ -20,7 +20,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class RelatorioFacade {
-    private final ProcessoFacade processoFacade;
+    private final ProcessoService processoService;
     private final SubprocessoService subprocessoService;
     private final ResponsavelUnidadeService responsavelService;
     private final MapaManutencaoService mapaManutencaoService;
@@ -50,7 +50,7 @@ public class RelatorioFacade {
 
     @Transactional(readOnly = true)
     public void gerarRelatorioAndamento(Long codProcesso, OutputStream outputStream) {
-        Processo processo = processoFacade.buscarEntidadePorId(codProcesso);
+        Processo processo = processoService.buscarPorCodigo(codProcesso);
         List<Subprocesso> subprocessos = subprocessoService.listarEntidadesPorProcesso(codProcesso);
 
         try (Document document = pdfFactory.createDocument()) {
@@ -77,7 +77,7 @@ public class RelatorioFacade {
 
     @Transactional(readOnly = true)
     public void gerarRelatorioMapas(Long codProcesso, Long codUnidade, OutputStream outputStream) {
-        Processo processo = processoFacade.buscarEntidadePorId(codProcesso);
+        Processo processo = processoService.buscarPorCodigo(codProcesso);
         List<Subprocesso> subprocessos = subprocessoService.listarEntidadesPorProcesso(codProcesso);
 
         subprocessos = subprocessos.stream()

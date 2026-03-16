@@ -2,6 +2,7 @@ package sgc.seguranca.dto;
 
 import jakarta.validation.constraints.*;
 import lombok.*;
+import sgc.comum.MsgValidacao;
 import sgc.comum.model.*;
 
 /**
@@ -11,7 +12,7 @@ import sgc.comum.model.*;
 public record EntrarRequest(
         @TituloEleitoral String tituloEleitoral,
 
-        @NotNull(message = "O perfil é obrigatório.") @Size(max = 50, message = "O perfil deve ter no máximo 50 caracteres.") String perfil,
+        @NotNull(message = MsgValidacao.PERFIL_OBRIGATORIO) @Size(max = 50, message = MsgValidacao.PERFIL_MAX) String perfil,
 
-        @NotNull(message = "O código da unidade é obrigatório.") Long unidadeCodigo) {
+        @NotNull(message = MsgValidacao.CODIGO_UNIDADE_OBRIGATORIO) Long unidadeCodigo) {
 }

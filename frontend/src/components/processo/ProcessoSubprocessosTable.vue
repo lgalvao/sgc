@@ -2,7 +2,7 @@
   <TreeTable
       :columns="colunas"
       :data="mapeamentoHierarquia"
-      title="Unidades participantes"
+      :title="TEXTOS.subprocesso.DETALHE_UNIDADES_TITULO"
       @row-click="$emit('row-click', $event)"
   />
 </template>
@@ -12,6 +12,7 @@ import {computed} from "vue";
 import TreeTable from "@/components/comum/TreeTable.vue";
 import type {UnidadeParticipante} from "@/types/tipos";
 import {formatDate, formatSituacaoSubprocesso} from "@/utils/formatters";
+import {TEXTOS} from "@/constants/textos";
 
 const props = defineProps<{
   participantesHierarquia: UnidadeParticipante[];
@@ -22,9 +23,9 @@ defineEmits<{
 }>();
 
 const colunas = [
-  {key: "unidadeAtual", label: "Unidade", width: "40%"},
-  {key: "situacao", label: "Situação", width: "30%"},
-  {key: "dataLimite", label: "Data limite", width: "30%"},
+  {key: "unidadeAtual", label: TEXTOS.subprocesso.COLUNA_UNIDADE, width: "40%"},
+  {key: "situacao", label: TEXTOS.subprocesso.COLUNA_SITUACAO, width: "30%"},
+  {key: "dataLimite", label: TEXTOS.subprocesso.COLUNA_DATA_LIMITE, width: "30%"},
 ];
 
 const mapeamentoHierarquia = computed(() => {

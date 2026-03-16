@@ -18,7 +18,7 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
 
     let processoCodigo: number;
 
-    test('Setup: Criar processo via fixture', async ({request}) => {
+    test('Setup: Criar processo via fixture', async ({_resetAutomatico, request}) => {
         const processo = await criarProcessoFixture(request, {
             unidade: UNIDADE_ALVO,
             iniciar: true,
@@ -28,7 +28,7 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
         expect(processoCodigo).toBeGreaterThan(0);
     });
 
-    test('Cenario 1: Validacao - Atividade sem conhecimento', async ({page}) => {
+    test('Cenario 1: Validacao - Atividade sem conhecimento', async ({_resetAutomatico, page}) => {
         const timestamp = Date.now();
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
         await page.goto(`/processo/${processoCodigo}/${UNIDADE_ALVO}`);
@@ -45,7 +45,7 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
         await page.getByRole('button', {name: 'Cancelar'}).click();
     });
 
-    test('Cenario 2: Caminho feliz - Disponibilizar cadastro', async ({page}) => {
+    test('Cenario 2: Caminho feliz - Disponibilizar cadastro', async ({_resetAutomatico, page}) => {
         const timestamp = Date.now();
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
         await page.goto(`/processo/${processoCodigo}/${UNIDADE_ALVO}/cadastro`);
@@ -60,7 +60,7 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
         await expect(page).toHaveURL(/\/painel/);
     });
 
-    test('Cenario 3: Devolucao e Historico de Analise', async ({page}) => {
+    test('Cenario 3: Devolucao e Historico de Analise', async ({_resetAutomatico, page}) => {
         const motivo = 'Faltou detalhar melhor os conhecimentos técnicos.';
 
         await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);

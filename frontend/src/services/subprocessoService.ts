@@ -1,6 +1,5 @@
 import type {
-    AnaliseCadastro,
-    AnaliseValidacao,
+    Analise,
     Atividade,
     DisponibilizarMapaRequest,
     ImpactoMapa,
@@ -263,18 +262,18 @@ export async function disponibilizarMapaEmBloco(
 
 export const listarAnalisesCadastro = async (
     codSubprocesso: number,
-): Promise<AnaliseCadastro[]> => {
+): Promise<Analise[]> => {
     const response = await apiClient.get(
         `/subprocessos/${codSubprocesso}/historico-cadastro`,
     );
-    return response.data as AnaliseCadastro[];
+    return response.data as Analise[];
 };
 
 export const listarAnalisesValidacao = async (
     codSubprocesso: number,
-): Promise<AnaliseValidacao[]> => {
+): Promise<Analise[]> => {
     const response = await apiClient.get(
         `/subprocessos/${codSubprocesso}/historico-validacao`,
     );
-    return response.data as AnaliseValidacao[];
+    return response.data as Analise[];
 };

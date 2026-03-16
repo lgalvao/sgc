@@ -75,7 +75,7 @@ class CDU19IntegrationTest extends BaseIntegrationTest {
 
             mockMvc.perform(
                             post(
-                                    "/api/subprocessos/{id}/apresentar-sugestoes",
+                                    "/api/subprocessos/{codigo}/apresentar-sugestoes",
                                     subprocesso.getCodigo())
                                     .with(csrf())
                                     .contentType("application/json")
@@ -116,7 +116,7 @@ class CDU19IntegrationTest extends BaseIntegrationTest {
             // CHEFE of unit 9
         void testValidarMapa_Sucesso() throws Exception {
             mockMvc.perform(
-                            post("/api/subprocessos/{id}/validar-mapa", subprocesso.getCodigo())
+                            post("/api/subprocessos/{codigo}/validar-mapa", subprocesso.getCodigo())
                                     .with(csrf()))
                     .andExpect(status().isOk());
 

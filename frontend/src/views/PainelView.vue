@@ -1,9 +1,9 @@
 <template>
   <LayoutPadrao>
-    <h1 class="visually-hidden">Painel</h1>
+    <h1 class="visually-hidden">{{ TEXTOS.painel.TITULO }}</h1>
     <!-- Tabela de Processos -->
     <div class="mb-5">
-      <PageHeader title="Processos" title-test-id="txt-painel-titulo-processos">
+      <PageHeader :title="TEXTOS.painel.PROCESSOS" title-test-id="txt-painel-titulo-processos">
         <template #actions>
           <BButton
               v-if="perfil.podeCriarProcesso.value"
@@ -28,7 +28,7 @@
     </div>
 
     <div>
-      <PageHeader title="Alertas" title-test-id="txt-painel-titulo-alertas"/>
+      <PageHeader :title="TEXTOS.painel.ALERTAS" title-test-id="txt-painel-titulo-alertas"/>
       <div class="table-responsive">
         <BTable
             :fields="camposAlertas"
@@ -45,7 +45,7 @@
             @sort-changed="handleSortChangeAlertas"
         >
           <template #cell(mensagem)="data">
-            <span v-if="!data.item.dataHoraLeitura" class="visually-hidden">Não lido: </span>
+            <span v-if="!data.item.dataHoraLeitura" class="visually-hidden">{{ TEXTOS.comum.NAO_LIDO }}</span>
             {{ data.value }}
           </template>
           <template #empty>
@@ -53,7 +53,7 @@
                 class="border-0 bg-transparent mb-0"
                 data-testid="empty-state-alertas"
                 icon="bi-bell-slash"
-                title="Nenhum alerta"
+                :title="TEXTOS.painel.NENHUM_ALERTA"
             >
             </EmptyState>
           </template>
@@ -65,7 +65,6 @@
 
 <script lang="ts" setup>
 import {BButton, BTable, useToast} from "bootstrap-vue-next";
-import {storeToRefs} from "pinia";
 import {computed, onActivated, onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
@@ -75,19 +74,18 @@ import {formatDateBR} from "@/utils";
 import TabelaProcessos from "@/components/processo/TabelaProcessos.vue";
 import {usePerfilStore} from "@/stores/perfil";
 import {usePerfil} from "@/composables/usePerfil";
-import {useProcessosStore} from "@/stores/processos";
+import {useProcessos} from "@/composables/useProcessos";
 import {useToastStore} from "@/stores/toast";
 import type {Alerta, ProcessoResumo} from "@/types/tipos";
 import type {Page} from "@/services/painelService";
 import * as painelService from "@/services/painelService";
+import {TEXTOS} from "@/constants/textos";
 
 const perfilStore = usePerfilStore();
 const perfil = usePerfil();
-const processosStore = useProcessosStore();
+const {processosPainel, buscarProcessosPainel} = useProcessos();
 const toastStore = useToastStore();
 const toast = useToast();
-
-const {processosPainel} = storeToRefs(processosStore);
 const alertas = ref<Alerta[]>([]);
 const alertasPage = ref<Page<Alerta>>({} as Page<Alerta>);
 
@@ -113,7 +111,7 @@ async function buscarAlertas(
 async function carregarDados() {
   if (perfil.perfilSelecionado.value && perfilStore.unidadeSelecionada) {
     const promises: Promise<any>[] = [
-      processosStore.buscarProcessosPainel(
+      buscarProcessosPainel(
           perfil.perfilSelecionado.value,
           Number(perfilStore.unidadeSelecionada),
           0,
@@ -136,7 +134,7 @@ async function carregarDados() {
   }
 }
 
-onMounted(async () => {
+function exibirToastPendente() {
   const pendente = toastStore.consumePending();
   if (pendente) {
     toast.create({
@@ -149,10 +147,15 @@ onMounted(async () => {
       }
     });
   }
+}
+
+onMounted(async () => {
+  exibirToastPendente();
   await carregarDados();
 });
 
 onActivated(async () => {
+  exibirToastPendente();
   await carregarDados();
 });
 
@@ -165,7 +168,7 @@ function ordenarPor(campo: keyof ProcessoResumo) {
     criterio.value = campo;
     asc.value = true;
   }
-  processosStore.buscarProcessosPainel(
+  buscarProcessosPainel(
       perfil.perfilSelecionado.value!,
       Number(perfilStore.unidadeSelecionada),
       0,
@@ -204,10 +207,10 @@ function ordenarAlertasPor(campo: "data" | "processo") {
 }
 
 const camposAlertas = [
-  {key: "dataHora", label: "Data/Hora", sortable: true, formatter: (v: any) => formatDateBR(v)},
-  {key: "mensagem", label: "Descrição"},
-  {key: "processo", label: "Processo", sortable: true},
-  {key: "origem", label: "Origem"},
+  {key: "dataHora", label: TEXTOS.painel.CAMPOS_ALERTAS.DATA_HORA, sortable: true, formatter: (v: any) => formatDateBR(v)},
+  {key: "mensagem", label: TEXTOS.painel.CAMPOS_ALERTAS.DESCRICAO},
+  {key: "processo", label: TEXTOS.painel.CAMPOS_ALERTAS.PROCESSO, sortable: true},
+  {key: "origem", label: TEXTOS.painel.CAMPOS_ALERTAS.ORIGEM},
 ];
 
 const rowClassAlerta = (item: Alerta | null) => {

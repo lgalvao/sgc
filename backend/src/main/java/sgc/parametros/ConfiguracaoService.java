@@ -17,7 +17,7 @@ public class ConfiguracaoService {
         return parametroRepo.findAll();
     }
 
-    public Parametro buscarPorId(Long codigo) {
+    public Parametro buscarPorCodigo(Long codigo) {
         return parametroRepo.findById(codigo)
                 .orElseThrow(() -> new ErroConfiguracao(
                         "Parâmetro com código '%d' não encontrado.".formatted(codigo)));

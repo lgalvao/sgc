@@ -9,7 +9,8 @@
     "test:e2e": "playwright test",
     "typecheck": "npm run typecheck --prefix frontend && npm run typecheck:e2e",
     "typecheck:e2e": "tsc --noEmit -p e2e/tsconfig.json",
-    "lint": "eslint . --fix"
+    "lint:ox": "oxlint .",
+    "lint": "npm run lint:ox && eslint . --fix"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.11.1",
@@ -22,8 +23,9 @@
     "chrome-launcher": "^1.2.1",
     "eslint": "^9.39.4",
     "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-playwright": "^2.9.0",
+    "eslint-plugin-playwright": "^2.10.0",
     "globals": "^16.5.0",
+    "oxlint": "^1.55.0",
     "smtp-server": "^3.18.1",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.57.0"

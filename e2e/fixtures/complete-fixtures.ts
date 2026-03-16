@@ -24,11 +24,9 @@ import * as fs from 'node:fs';
 const arquivosSerialResetados = new Set<string>();
 
 const test = base.extend<{
-    resetAutomatico: void;
+    _resetAutomatico: void;
 }>({
-    resetAutomatico: [async ({request}, use, testInfo) => {
-        
-        
+    _resetAutomatico: async ({request}, use, testInfo) => {
         const fileContent = fs.readFileSync(testInfo.file, 'utf-8');
         const ehSerial = fileContent.includes('test.describe.serial');
 
@@ -43,7 +41,7 @@ const test = base.extend<{
             await resetDatabase(request);
         }
         await use();
-    }, {auto: true}]
+    }
 });
 
 export {expect} from './auth-fixtures.js';

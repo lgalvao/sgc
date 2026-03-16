@@ -51,7 +51,7 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
     void setUp() {
         // Criar unidades via JDBC para contornar @Immutable
         Long idSuperior = 3000L;
-        Long idUnidade = 3001L;
+        Long codUnidade = 3001L;
 
         String sqlInsertUnidade = "INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
@@ -61,15 +61,15 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
                     "INTERMEDIARIA", "ATIVA", null, "132313231323");
         }
 
-        Integer countUnidade = jdbcTemplate.queryForObject("SELECT count(*) FROM SGC.VW_UNIDADE WHERE codigo = ?", Integer.class, idUnidade);
+        Integer countUnidade = jdbcTemplate.queryForObject("SELECT count(*) FROM SGC.VW_UNIDADE WHERE codigo = ?", Integer.class, codUnidade);
         if (countUnidade != null && countUnidade == 0) {
-            jdbcTemplate.update(sqlInsertUnidade, idUnidade, "Serviço de Desenvolvimento teste", "SEDESENV-TEST",
+            jdbcTemplate.update(sqlInsertUnidade, codUnidade, "Serviço de Desenvolvimento teste", "SEDESENV-TEST",
                     "OPERACIONAL", "ATIVA", idSuperior, "101010101010");
         }
 
         // Carregar via Repo
         unidadeSuperior = unidadeRepo.findById(idSuperior).orElseThrow();
-        unidade = unidadeRepo.findById(idUnidade).orElseThrow();
+        unidade = unidadeRepo.findById(codUnidade).orElseThrow();
 
         // Criar usuários via JDBC (Usuario é @Immutable, não pode ser salvo via Repo)
         String sqlInsertUsuario = "INSERT INTO SGC.VW_USUARIO (TITULO, NOME, EMAIL, RAMAL, unidade_lot_codigo, MATRICULA) VALUES (?, ?, ?, ?, ?, ?)";
@@ -91,7 +91,7 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
         }
 
         // Definir admin como titular da unidade base
-        jdbcTemplate.update(sqlInsertResponsabilidade, idUnidade, tituloAdmin, "12345", "TITULAR", LocalDateTime.now());
+        jdbcTemplate.update(sqlInsertResponsabilidade, codUnidade, tituloAdmin, "12345", "TITULAR", LocalDateTime.now());
 
         // Carregar usuários do banco
         Usuario adminUser = usuarioRepo.findById("101010101010").orElseThrow();
@@ -127,7 +127,7 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
 
         // Reload entities
         subprocesso = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
-        unidade = unidadeRepo.findById(idUnidade).orElseThrow();
+        unidade = unidadeRepo.findById(codUnidade).orElseThrow();
         unidadeSuperior = unidadeRepo.findById(idSuperior).orElseThrow();
     }
 
@@ -145,7 +145,7 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
 
         mockMvc.perform(
                         post(
-                                "/api/subprocessos/{id}/devolver-cadastro",
+                                "/api/subprocessos/{codigo}/devolver-cadastro",
                                 subprocesso.getCodigo())
                                 .with(csrf())
                                 .with(user(gestor))
@@ -191,7 +191,7 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
         TextoRequest requestBody = new TextoRequest(observacoes);
 
         mockMvc.perform(
-                        post("/api/subprocessos/{id}/aceitar-cadastro", subprocesso.getCodigo())
+                        post("/api/subprocessos/{codigo}/aceitar-cadastro", subprocesso.getCodigo())
                                 .with(csrf())
                                 .with(user(gestor))
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -236,7 +236,7 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
 
         mockMvc.perform(
                         post(
-                                "/api/subprocessos/{id}/homologar-cadastro",
+                                "/api/subprocessos/{codigo}/homologar-cadastro",
                                 subprocesso.getCodigo())
                                 .with(csrf())
                                 .with(user(admin))
@@ -271,7 +271,7 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
         String obsDevolucao = "Falta atividade Z";
         JustificativaRequest devolverReq = new JustificativaRequest(obsDevolucao);
 
-        mockMvc.perform(post("/api/subprocessos/{id}/devolver-cadastro", subprocesso.getCodigo())
+        mockMvc.perform(post("/api/subprocessos/{codigo}/devolver-cadastro", subprocesso.getCodigo())
                         .with(csrf())
                         .with(user(gestor))
                         .contentType(MediaType.APPLICATION_JSON)
@@ -302,7 +302,7 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
 
         String obsAceite = "Agora sim, completo.";
         TextoRequest aceitarReq = new TextoRequest(obsAceite);
-        mockMvc.perform(post("/api/subprocessos/{id}/aceitar-cadastro", subprocesso.getCodigo())
+        mockMvc.perform(post("/api/subprocessos/{codigo}/aceitar-cadastro", subprocesso.getCodigo())
                         .with(csrf())
                         .with(user(gestor))
                         .contentType(MediaType.APPLICATION_JSON)
@@ -317,7 +317,7 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
         // Using "132313231323" ensures the user is found in DB, and authorities ensures role check passes
         String jsonResponse = mockMvc
                 .perform(MockMvcRequestBuilders.get(
-                                "/api/subprocessos/{id}/historico-cadastro",
+                                "/api/subprocessos/{codigo}/historico-cadastro",
                                 subprocesso.getCodigo())
                         .with(user(gestor))
                         .accept(MediaType.APPLICATION_JSON))

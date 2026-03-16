@@ -12,7 +12,7 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
     const timestamp = Date.now();
     const descProcesso = `Mapeamento CDU-32 ${timestamp}`;
 
-    test('Setup UI', async ({request}) => {
+    test('Setup UI', async ({_resetAutomatico, request}) => {
         await criarProcessoMapaHomologadoFixture(request, {
             descricao: descProcesso,
             unidade: UNIDADE_1,
@@ -21,7 +21,7 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
         expect(true).toBeTruthy();
     });
 
-    test('Cenários CDU-32: ADMIN reabre cadastro', async ({page, autenticadoComoAdmin}) => {
+    test('Cenários CDU-32: ADMIN reabre cadastro', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
 
         // Cenario 1 & 2: Navegação e visualização do botão
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
@@ -50,7 +50,7 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
         // Cenario 5: Confirmar reabertura
         await page.getByTestId('btn-confirmar-reabrir').click();
 
-        await verificarAppAlert(page, /Cadastro reaberto com sucesso/i);
+        await verificarAppAlert(page, /Cadastro reaberto/i);
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro em andamento/i);
         await expect(page.getByTestId('tbl-movimentacoes')).toContainText(/Reabertura de cadastro/i);
     });

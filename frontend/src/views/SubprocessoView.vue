@@ -22,7 +22,7 @@
                 @click="abrirModalAlterarDataLimite"
             >
               <i aria-hidden="true" class="bi bi-calendar me-1"/>
-              Alterar data limite
+              {{ TEXTOS.subprocesso.BOTAO_ALTERAR_DATA_LIMITE }}
             </BButton>
             <BButton
                 v-if="podeReabrirCadastro && !isProcessoFinalizado"
@@ -31,7 +31,7 @@
                 @click="abrirModalReabrirCadastro"
             >
               <i aria-hidden="true" class="bi bi-arrow-counterclockwise me-1"/>
-              Reabrir cadastro
+              {{ TEXTOS.subprocesso.BOTAO_REABRIR_CADASTRO }}
             </BButton>
             <BButton
                 v-if="podeReabrirRevisao && !isProcessoFinalizado"
@@ -40,7 +40,7 @@
                 @click="abrirModalReabrirRevisao"
             >
               <i aria-hidden="true" class="bi bi-arrow-counterclockwise me-1"/>
-              Reabrir revisão
+              {{ TEXTOS.subprocesso.BOTAO_REABRIR_REVISAO }}
             </BButton>
             <BButton
                 v-if="podeEnviarLembrete && !isProcessoFinalizado"
@@ -49,7 +49,7 @@
                 @click="confirmarEnviarLembrete"
             >
               <i aria-hidden="true" class="bi bi-bell me-1"/>
-              Enviar lembrete
+              {{ TEXTOS.subprocesso.BOTAO_ENVIAR_LEMBRETE }}
             </BButton>
           </template>
         </PageHeader>
@@ -57,21 +57,21 @@
         <BCard class="mb-4" data-testid="header-subprocesso-details" no-body>
           <BCardBody>
             <p data-testid="txt-header-processo">
-              <strong>Processo:</strong> {{ subprocesso.processoDescricao }}
+              <strong>{{ TEXTOS.subprocesso.LABEL_PROCESSO }}:</strong> {{ subprocesso.processoDescricao }}
             </p>
             <p>
-              <span class="fw-bold me-1">Situação:</span>
+              <span class="fw-bold me-1">{{ TEXTOS.subprocesso.LABEL_SITUACAO }}:</span>
               <span data-testid="subprocesso-header__txt-situacao">{{ formatSituacaoSubprocesso(subprocesso.situacao) }}</span>
             </p>
             <p>
-              <span class="fw-bold me-1">Localização atual:</span>
+              <span class="fw-bold me-1">{{ TEXTOS.subprocesso.LABEL_LOCALIZACAO }}:</span>
               <span data-testid="subprocesso-header__txt-localizacao">{{ subprocesso.localizacaoAtual || subprocesso.unidade.sigla }}</span>
             </p>
             <p v-if="subprocesso.prazoEtapaAtual">
-              <span class="fw-bold me-1">Prazo para conclusão da etapa atual:</span>
+              <span class="fw-bold me-1">{{ TEXTOS.subprocesso.LABEL_PRAZO_ETAPA }}:</span>
               <span>{{ formatDataSimples(subprocesso.prazoEtapaAtual) }}</span>
             </p>
-            <p class="mt-2"><strong>Titular:</strong> {{ subprocesso.titular?.nome || '' }}</p>
+            <p class="mt-2"><strong>{{ TEXTOS.subprocesso.LABEL_TITULAR }}:</strong> {{ subprocesso.titular?.nome || '' }}</p>
             <p class="ms-3 mb-2">
               <span v-if="subprocesso.titular?.ramal" class="me-3">
                 <i aria-hidden="true" class="bi bi-telephone-fill me-1 text-muted"/>
@@ -84,7 +84,7 @@
             </p>
             <template v-if="subprocesso.responsavel?.usuario?.nome && subprocesso.responsavel.usuario.nome !== subprocesso.titular?.nome">
               <p class="mt-2">
-                <strong>Responsável:</strong> {{ subprocesso.responsavel.usuario.nome || '' }}
+                <strong>{{ TEXTOS.subprocesso.LABEL_RESPONSAVEL }}:</strong> {{ subprocesso.responsavel.usuario.nome || '' }}
                 <span v-if="subprocesso.responsavel.tipo" class="ms-1">
                   - {{ formatTipoResponsabilidade(subprocesso.responsavel) }}
                 </span>
@@ -115,7 +115,7 @@
       />
 
       <div class="mt-4">
-        <h4>Movimentações</h4>
+        <h4>{{ TEXTOS.subprocesso.MOVIMENTACOES_TITULO }}</h4>
         <BTable
             :fields="camposMovimentacoes"
             :items="movimentacoes"
@@ -130,8 +130,8 @@
           <template #empty>
             <div class="text-center text-muted py-5" data-testid="empty-state-movimentacoes">
               <i aria-hidden="true" class="bi bi-arrow-left-right display-4 d-block mb-3"></i>
-              <p class="h5">Nenhuma movimentação</p>
-              <p class="small">O histórico de movimentações deste processo aparecerá aqui.</p>
+              <p class="h5">{{ TEXTOS.subprocesso.MOVIMENTACOES_VAZIO_TITULO }}</p>
+              <p class="small">{{ TEXTOS.subprocesso.MOVIMENTACOES_VAZIO_TEXTO }}</p>
             </div>
           </template>
           <template #cell(dataHora)="data">
@@ -160,8 +160,8 @@
       </BAlert>
     </div>
     <div v-else class="text-center py-5">
-      <BSpinner label="Carregando informações da unidade..." variant="primary"/>
-      <p class="mt-2 text-muted">Carregando informações da unidade...</p>
+      <BSpinner :label="TEXTOS.subprocesso.CARREGANDO" variant="primary"/>
+      <p class="mt-2 text-muted">{{ TEXTOS.subprocesso.CARREGANDO }}</p>
     </div>
   </LayoutPadrao>
 
@@ -180,19 +180,19 @@
       :auto-close="false"
       :loading="loading.isLoading('reabertura')"
       :ok-disabled="!justificativaReabertura.trim()"
-      :titulo="tipoReabertura === 'cadastro' ? 'Reabrir cadastro' : 'Reabrir revisão'"
-      ok-title="Confirmar reabertura"
+      :titulo="tipoReabertura === 'cadastro' ? TEXTOS.subprocesso.REABRIR_CADASTRO_TITULO : TEXTOS.subprocesso.REABRIR_REVISAO_TITULO"
+      :ok-title="TEXTOS.subprocesso.BOTAO_CONFIRMAR_REABERTURA"
       test-id-confirmar="btn-confirmar-reabrir"
       variant="warning"
       @confirmar="confirmarReabertura"
   >
-    <p>Informe a justificativa para reabrir o {{
-        tipoReabertura === 'cadastro' ? 'cadastro' : 'revisão de cadastro'
+    <p>{{ TEXTOS.subprocesso.REABRIR_JUSTIFICATIVA_PREFIXO }} {{
+        tipoReabertura === 'cadastro' ? TEXTOS.subprocesso.CADASTRO : TEXTOS.subprocesso.REVISAO_CADASTRO
       }}:</p>
     <BFormTextarea
         v-model="justificativaReabertura"
         data-testid="inp-justificativa-reabrir"
-        placeholder="Justificativa obrigatória..."
+        :placeholder="TEXTOS.subprocesso.REABRIR_JUSTIFICATIVA_PLACEHOLDER"
         rows="3"
     />
   </ModalConfirmacao>
@@ -200,15 +200,15 @@
   <ModalConfirmacao
       v-model="modalLembreteAberto"
       :auto-close="false"
-      ok-title="Confirmar envio"
+      :ok-title="TEXTOS.subprocesso.BOTAO_CONFIRMAR_LEMBRETE"
       test-id-confirmar="btn-confirmar-enviar-lembrete"
-      titulo="Enviar lembrete"
+      :titulo="TEXTOS.subprocesso.LEMBRETE_TITULO"
       variant="info"
       @confirmar="enviarLembreteConfirmado"
   >
     <p data-testid="txt-modelo-lembrete">
-      Este lembrete será enviado para os responsáveis da unidade {{ subprocesso?.unidade?.sigla }} sobre o prazo do
-      processo {{ subprocesso?.processoDescricao }}.
+      {{ TEXTOS.subprocesso.LEMBRETE_MODELO_PREFIXO(subprocesso?.unidade?.sigla || '') }}
+      {{ TEXTOS.subprocesso.LEMBRETE_MODELO_PROCESSO(subprocesso?.processoDescricao || '') }}
     </p>
   </ModalConfirmacao>
 </template>
@@ -234,6 +234,7 @@ import {type Movimentacao, SituacaoProcesso, type SubprocessoDetalhe, TipoProces
 import {formatDateTimeBR, logger} from "@/utils";
 import {normalizeError} from "@/utils/apiError";
 import {formatSituacaoSubprocesso} from "@/utils/formatters";
+import {TEXTOS} from "@/constants/textos";
 
 const props = defineProps<{ codProcesso: number; siglaUnidade: string }>();
 
@@ -269,10 +270,10 @@ const codSubprocesso = ref<number | null>(null);
 const modalLembreteAberto = ref(false);
 
 const camposMovimentacoes = [
-  {key: "dataHora", label: "Data/hora"},
-  {key: "unidadeOrigem", label: "Origem"},
-  {key: "unidadeDestino", label: "Destino"},
-  {key: "descricao", label: "Descrição"}
+  {key: "dataHora", label: TEXTOS.subprocesso.MOVIMENTACOES_CAMPO_DATA},
+  {key: "unidadeOrigem", label: TEXTOS.subprocesso.MOVIMENTACOES_CAMPO_ORIGEM},
+  {key: "unidadeDestino", label: TEXTOS.subprocesso.MOVIMENTACOES_CAMPO_DESTINO},
+  {key: "descricao", label: TEXTOS.subprocesso.MOVIMENTACOES_CAMPO_DESCRICAO}
 ];
 
 const rowAttrMovimentacao = (item: Movimentacao | null) => {
@@ -332,7 +333,7 @@ function abrirModalAlterarDataLimite() {
   if (podeAlterarDataLimite.value) {
     modals.open('alterarDataLimite');
   } else {
-    notify("Você não tem permissão para alterar a data limite.", 'danger');
+    notify(TEXTOS.subprocesso.ERRO_SEM_PERMISSAO_DATA, 'danger');
   }
 }
 
@@ -352,9 +353,9 @@ async function confirmarAlteracaoDataLimite(novaData: string) {
           {novaData},
       );
       fecharModalAlterarDataLimite();
-      notify("A data limite foi alterada com sucesso!", 'success');
+      notify(TEXTOS.subprocesso.SUCESSO_DATA_ALTERADA, 'success');
     } catch {
-      notify("Não foi possível alterar a data limite.", 'danger');
+      notify(TEXTOS.subprocesso.ERRO_DATA_ALTERADA, 'danger');
     }
   });
 }
@@ -379,7 +380,7 @@ function fecharModalReabrir() {
 
 async function confirmarReabertura() {
   if (!codSubprocesso.value || !justificativaReabertura.value.trim()) {
-    notify("Justificativa é obrigatória.", 'danger');
+    notify(TEXTOS.subprocesso.ERRO_JUSTIFICATIVA_OBRIGATORIA, 'danger');
     return;
   }
 
@@ -396,8 +397,8 @@ async function confirmarReabertura() {
       await subprocessosStore.buscarSubprocessoDetalhe(codSubprocesso.value!);
       notify(
           tipoReabertura.value === 'cadastro'
-              ? 'Cadastro reaberto com sucesso'
-              : 'Revisão de cadastro reaberta com sucesso',
+              ? TEXTOS.subprocesso.SUCESSO_CADASTRO_REABERTO
+              : TEXTOS.subprocesso.SUCESSO_REVISAO_REABERTA,
           'success',
       );
     }
@@ -415,8 +416,13 @@ async function enviarLembreteConfirmado() {
   if (!subprocesso.value || !codSubprocesso.value) {
     return;
   }
-  await processosStore.enviarLembrete(props.codProcesso, subprocesso.value.unidade.codigo);
-  await subprocessosStore.buscarSubprocessoDetalhe(codSubprocesso.value);
-  modalLembreteAberto.value = false;
+  try {
+    await processosStore.enviarLembrete(props.codProcesso, subprocesso.value.unidade.codigo);
+    await subprocessosStore.buscarSubprocessoDetalhe(codSubprocesso.value);
+    modalLembreteAberto.value = false;
+    notify(TEXTOS.subprocesso.SUCESSO_LEMBRETE_ENVIADO, 'success');
+  } catch {
+    notify(TEXTOS.subprocesso.ERRO_LEMBRETE_ENVIADO, 'danger');
+  }
 }
 </script>

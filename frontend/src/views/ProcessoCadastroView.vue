@@ -1,6 +1,6 @@
 <template>
   <LayoutPadrao>
-    <PageHeader title="Cadastro de processo"/>
+    <PageHeader :title="TEXTOS.processo.cadastro.TITULO"/>
 
     <BForm class="mt-4 col-md-6 col-sm-8 col-12">
       <AppAlert
@@ -28,7 +28,7 @@
               :disabled="isFormInvalid || isLoading || isLoadingData"
               data-testid="btn-processo-iniciar"
               icon="play-fill"
-              text="Iniciar processo"
+              :text="TEXTOS.processo.cadastro.BOTAO_INICIAR"
               variant="success"
               @click="abrirModalConfirmacao"
           />
@@ -39,7 +39,7 @@
               data-testid="btn-processo-salvar"
               icon="save"
               loading-text="Salvando..."
-              text="Salvar"
+              :text="TEXTOS.processo.cadastro.BOTAO_SALVAR"
               type="button"
               variant="outline-primary"
               @click="salvarProcesso"
@@ -50,7 +50,7 @@
               class="ms-2"
               data-testid="btn-processo-remover"
               icon="trash"
-              text="Remover"
+              :text="TEXTOS.processo.cadastro.BOTAO_REMOVER"
               variant="outline-danger"
               @click="abrirModalRemocao"
           />
@@ -61,7 +61,7 @@
             to="/painel"
             variant="link"
         >
-          Cancelar
+          {{ TEXTOS.processo.cadastro.BOTAO_CANCELAR }}
         </BButton>
       </div>
     </BForm>
@@ -75,7 +75,7 @@
         ok-title="Confirmar"
         test-id-cancelar="btn-iniciar-processo-cancelar"
         test-id-confirmar="btn-iniciar-processo-confirmar"
-        titulo="Iniciar processo"
+        :titulo="TEXTOS.processo.cadastro.INICIAR_TITULO"
         @confirmar="confirmarIniciarProcesso"
     >
       <p><strong>Descrição:</strong> {{ descricao }}</p>
@@ -83,8 +83,7 @@
       <p><strong>Unidades selecionadas:</strong> {{ unidadesSelecionadas.length }}</p>
       <hr>
       <p>
-        Ao iniciar o processo, não será mais possível editá-lo ou removê-lo e todas as unidades participantes
-        serão notificadas por e-mail.
+        {{ TEXTOS.processo.cadastro.INICIAR_CONFIRMACAO }}
       </p>
     </ModalConfirmacao>
 
@@ -93,12 +92,12 @@
         v-model="mostrarModalRemocao"
         :auto-close="false"
         :loading="isLoading"
-        ok-title="Remover"
-        titulo="Remover processo"
+        :ok-title="TEXTOS.processo.cadastro.BOTAO_REMOVER"
+        :titulo="TEXTOS.processo.cadastro.REMOVER_TITULO"
         variant="danger"
         @confirmar="confirmarRemocao"
     >
-      <p>Remover o processo '{{ descricao }}'? Esta ação não poderá ser desfeita.</p>
+      <p>{{ TEXTOS.processo.cadastro.REMOVER_CONFIRMACAO(descricao) }}</p>
     </ModalConfirmacao>
   </LayoutPadrao>
 </template>
@@ -117,6 +116,7 @@ import {logger} from "@/utils";
 import {normalizeError, shouldNotifyGlobally} from "@/utils/apiError";
 import {useProcessoForm} from "@/composables/useProcessoForm";
 import {useNotification} from "@/composables/useNotification";
+import {TEXTOS} from "@/constants/textos";
 
 import {useProcessosStore} from "@/stores/processos";
 import {useToastStore} from "@/stores/toast";
@@ -210,7 +210,7 @@ onMounted(async () => {
         await nextTick();
       }
     } catch (error) {
-      notify("Não foi possível carregar os detalhes do processo.", 'danger');
+      notify(TEXTOS.processo.cadastro.ERRO_CARREGAR_DETALHES, 'danger');
       logger.error("Erro ao carregar processo:", error);
     } finally {
       isLoadingData.value = false;
@@ -287,12 +287,12 @@ async function salvarProcesso() {
           processoEditando.value.codigo,
           request,
       );
-      toastStore.setPending("O processo foi alterado com sucesso.");
+      toastStore.setPending(TEXTOS.sucesso.PROCESSO_ALTERADO);
       await router.push("/painel");
     } else {
       const request = construirCriarRequest();
       await processosStore.criarProcesso(request);
-      toastStore.setPending("O processo foi criado com sucesso.");
+      toastStore.setPending(TEXTOS.sucesso.PROCESSO_CRIADO);
       await router.push("/painel");
     }
     limparCampos();
@@ -320,7 +320,7 @@ async function confirmarIniciarProcesso() {
       codigoProcesso = novoProcesso.codigo;
     } catch (error) {
       mostrarModalConfirmacao.value = false;
-      handleApiErrors(error, "Erro ao criar processo", "Não foi possível criar o processo para iniciá-lo.");
+      handleApiErrors(error, "Erro ao criar processo", TEXTOS.processo.cadastro.ERRO_CRIAR_PARA_INICIAR);
       isLoading.value = false;
       return;
     }
@@ -333,12 +333,12 @@ async function confirmarIniciarProcesso() {
         unidadesSelecionadas.value,
     );
 
-    toastStore.setPending("O processo foi iniciado com sucesso.");
+    toastStore.setPending(TEXTOS.sucesso.PROCESSO_INICIADO);
     await router.push("/painel");
     mostrarModalConfirmacao.value = false;
   } catch (error) {
     mostrarModalConfirmacao.value = false;
-    handleApiErrors(error, "Erro ao iniciar processo", "Não foi possível iniciar o processo. Tente novamente.");
+    handleApiErrors(error, "Erro ao iniciar processo", TEXTOS.processo.cadastro.ERRO_INICIAR_PROCESSO);
   } finally {
     isLoading.value = false;
   }
@@ -358,7 +358,7 @@ async function confirmarRemocao() {
     const descRemovida = processoEditando.value.descricao;
     try {
       await processosStore.removerProcesso(processoEditando.value.codigo);
-      toastStore.setPending(`Processo ${descRemovida} removido com sucesso.`);
+      toastStore.setPending(TEXTOS.sucesso.PROCESSO_REMOVIDO(descRemovida));
       await router.push("/painel");
       if (!processoEditando.value) {
         limparCampos();
@@ -366,7 +366,7 @@ async function confirmarRemocao() {
       fecharModalRemocao();
     } catch (error) {
       fecharModalRemocao();
-      handleApiErrors(error, "Erro ao remover processo", "Não foi possível remover o processo. Tente novamente.");
+      handleApiErrors(error, "Erro ao remover processo", TEXTOS.processo.cadastro.ERRO_REMOVER_PROCESSO);
     } finally {
       isLoading.value = false;
     }

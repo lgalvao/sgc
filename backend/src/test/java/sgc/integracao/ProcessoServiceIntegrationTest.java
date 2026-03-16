@@ -12,11 +12,11 @@ import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
 
-@DisplayName("Testes de Integração - ProcessoManutencaoService")
-class ProcessoManutencaoServiceIntegrationTest extends BaseIntegrationTest {
+@DisplayName("Testes de Integração - ProcessoService")
+class ProcessoServiceIntegrationTest extends BaseIntegrationTest {
 
     @Autowired
-    private ProcessoManutencaoService service;
+    private ProcessoService service;
 
     @Nested
     @DisplayName("Criação de Processo")

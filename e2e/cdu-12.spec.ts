@@ -20,7 +20,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
     const timestamp = Date.now();
     const descProcessoRevisao = `Revisão CDU-12 ${timestamp}`;
 
-    test('Setup data', async ({request}) => {
+    test('Setup data', async ({_resetAutomatico, request}) => {
         // Criar processo mapeamento finalizado para gerar o Mapa vigente
         await criarProcessoFinalizadoFixture(request, {
             unidade: UNIDADE_ALVO,
@@ -37,7 +37,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         expect(true).toBeTruthy();
     });
 
-    test('Passo 3.1: Verificação pelo CHEFE na tela de Cadastro', async ({page, autenticadoComoChefeSecao121}) => {
+    test('Passo 3.1: Verificação pelo CHEFE na tela de Cadastro', async ({_resetAutomatico, page, _autenticadoComoChefeSecao121}) => {
         await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
         await navegarParaAtividades(page);
 
@@ -67,7 +67,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
     });
 
-    test('Passo 3.2: Verificação pelo GESTOR na tela de Visualização', async ({page}) => {
+    test('Passo 3.2: Verificação pelo GESTOR na tela de Visualização', async ({_resetAutomatico, page}) => {
 
         // Localização atual deve estar no COORD_12 para o Gestor ver
         // Ringo starr (GESTOR_COORD_12) possui apenas 1 perfil

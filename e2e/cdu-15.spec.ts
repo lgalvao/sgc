@@ -12,6 +12,7 @@ import {
     verificarCompetenciaNoMapa,
     verificarSituacaoSubprocesso
 } from './helpers/helpers-mapas.js';
+import {TEXTOS} from '../frontend/src/constants/textos.js';
 
 test.describe.serial('CDU-15 - Manter mapa de competências', () => {
     const UNIDADE_ALVO = 'SECAO_211';
@@ -23,7 +24,7 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
     const ATIVIDADE_2 = 'Atividade fixture 2';
     const ATIVIDADE_3 = 'Atividade fixture 3';
 
-    test('Setup data', async ({request}) => {
+    test('Setup data', async ({_resetAutomatico, request}) => {
         await criarProcessoCadastroHomologadoFixture(request, {
             descricao: descProcesso,
             unidade: UNIDADE_ALVO
@@ -31,12 +32,12 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
         expect(true).toBeTruthy();
     });
 
-    test('Cenários CDU-15: Fluxo completo de manutenção do mapa pelo ADMIN', async ({page, autenticadoComoAdmin}) => {
+    test('Cenários CDU-15: Fluxo completo de manutenção do mapa pelo ADMIN', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
         // CT-00 e CT-01: Acessar edição e verificar elementos
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
         await navegarParaMapa(page);
 
-        await expect(page.getByRole('heading', {name: /Mapa de competências/i})).toBeVisible();
+        await expect(page.getByRole('heading', {name: TEXTOS.mapa.TITULO})).toBeVisible();
         await expect(page.getByTestId('btn-abrir-criar-competencia').or(page.getByTestId('btn-abrir-criar-competencia-empty'))).toBeVisible();
         await expect(page.getByTestId('btn-cad-mapa-disponibilizar')).toBeDisabled();
 

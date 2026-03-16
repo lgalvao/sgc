@@ -9,4 +9,16 @@ import java.util.*;
 public interface UnidadeMapaRepo extends JpaRepository<UnidadeMapa, Long> {
     @Query("SELECT um.unidadeCodigo FROM UnidadeMapa um")
     List<Long> findAllUnidadeCodigos();
+
+    default Optional<UnidadeMapa> findByUnidadeCodigo(Long unidadeCodigo) {
+        return findById(unidadeCodigo);
+    }
+
+    default boolean existsByUnidadeCodigo(Long unidadeCodigo) {
+        return existsById(unidadeCodigo);
+    }
+
+    default List<UnidadeMapa> findAllByUnidadeCodigoIn(List<Long> unidadeCodigos) {
+        return findAllById(unidadeCodigos);
+    }
 }

@@ -8,19 +8,19 @@ test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
         await page.getByTestId(`link-arvore-unidade-${SIGLA_UNIDADE}`).click();
     }
 
-    test.beforeEach(async ({page, autenticadoComoAdmin}) => {
+    test.beforeEach(async ({_resetAutomatico, _autenticadoComoAdmin, page}) => {
         await page.getByRole('link', {name: /Unidades/i}).click();
         await expect(page).toHaveURL(/\/unidades/);
     });
 
-    test('Cenario 1: ADMIN acessa detalhes da unidade e opção de criar atribuição', async ({page}) => {
+    test('Cenario 1: ADMIN acessa detalhes da unidade e opção de criar atribuição', async ({_resetAutomatico, _autenticadoComoAdmin, page}) => {
         await acessarUnidadeAlvo(page);
         await expect(page).toHaveURL(/\/unidade\/\d+$/);
         await expect(page.getByRole('heading', {name: new RegExp(SIGLA_UNIDADE)})).toBeVisible();
         await expect(page.getByTestId('unidade-view__btn-criar-atribuicao')).toBeVisible();
     });
 
-    test('Cenario 2: Campos obrigatórios devem ser validados', async ({page}) => {
+    test('Cenario 2: Campos obrigatórios devem ser validados', async ({_resetAutomatico, _autenticadoComoAdmin, page}) => {
         await acessarUnidadeAlvo(page);
         await page.getByTestId('unidade-view__btn-criar-atribuicao').click();
         await expect(page).toHaveURL(/\/unidade\/\d+\/atribuicao$/);
@@ -37,7 +37,7 @@ test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
         expect(dataInicioInvalida).toBe(true);
     });
 
-    test('Cenario 3: ADMIN cria atribuição temporária com sucesso', async ({page}) => {
+    test('Cenario 3: ADMIN cria atribuição temporária com sucesso', async ({_resetAutomatico, _autenticadoComoAdmin, page}) => {
         await acessarUnidadeAlvo(page);
         await page.getByTestId('unidade-view__btn-criar-atribuicao').click();
         await expect(page).toHaveURL(/\/unidade\/\d+\/atribuicao$/);
@@ -51,6 +51,6 @@ test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
         await page.getByTestId('textarea-justificativa').fill('Cobertura de férias');
         await page.getByTestId('cad-atribuicao__btn-criar-atribuicao').click();
 
-        await expect(page.getByText(/Atribuição criada com sucesso/i).first()).toBeVisible();
+        await expect(page.getByText(/Atribuição criada/i).first()).toBeVisible();
     });
 });

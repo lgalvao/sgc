@@ -1,6 +1,7 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcessoFixture} from './fixtures/fixtures-processos.js';
 import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
+import {TEXTOS} from '../frontend/src/constants/textos.js';
 
 /**
  * CDU-34 - Enviar lembrete de prazo
@@ -23,7 +24,7 @@ test.describe.serial('CDU-34 - Enviar lembrete de prazo', () => {
     const descProcesso = `Mapeamento CDU-34 ${timestamp}`;
 
 
-    test('Preparacao: Admin cria e inicia processo', async ({page, request, autenticadoComoAdmin}) => {
+    test('Preparacao: Admin cria e inicia processo', async ({_resetAutomatico, page, request, _autenticadoComoAdmin}) => {
         await criarProcessoFixture(request, {
             descricao: descProcesso,
             tipo: 'MAPEAMENTO',
@@ -39,9 +40,10 @@ test.describe.serial('CDU-34 - Enviar lembrete de prazo', () => {
 
 
     test('Cenario principal: ADMIN envia lembrete e sistema registra histórico/alerta', async ({
+                                                                                                   _resetAutomatico,
                                                                                                    page,
-                                                                                                   autenticadoComoAdmin
-                                                                                               }) => {
+                                                                                                   _autenticadoComoAdmin
+}) => {
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
 
@@ -53,16 +55,17 @@ test.describe.serial('CDU-34 - Enviar lembrete de prazo', () => {
         await btnLembrete.click();
 
         await expect(page.getByTestId('txt-modelo-lembrete')).toBeVisible();
-        await expect(page.getByTestId('txt-modelo-lembrete')).toContainText('Este lembrete será enviado');
+        await expect(page.getByTestId('txt-modelo-lembrete')).toContainText(TEXTOS.subprocesso.LEMBRETE_MODELO_PREFIXO(UNIDADE_1));
         await page.getByTestId('btn-confirmar-enviar-lembrete').click();
 
-        await expect(page.getByTestId('tbl-movimentacoes')).toContainText('Lembrete de prazo enviado');
+        await expect(page.getByTestId('tbl-movimentacoes')).toContainText(TEXTOS.movimentacao.LEMBRETE_ENVIADO);
     });
 
     test('Cenario complementar: unidade de destino visualiza alerta de lembrete no painel', async ({
+                                                                                                        _resetAutomatico,
                                                                                                         page,
-                                                                                                        autenticadoComoChefeAssessoria22
-                                                                                                    }) => {
+                                                                                                        _autenticadoComoChefeAssessoria22
+}) => {
         const tabelaAlertas = page.getByTestId('tbl-alertas');
         await expect(tabelaAlertas).toBeVisible();
         await expect(tabelaAlertas).toContainText(descProcesso);

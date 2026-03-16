@@ -1,6 +1,6 @@
 <template>
   <LayoutPadrao>
-    <PageHeader title="Criar atribuição temporária"/>
+    <PageHeader :title="TEXTOS.atribuicaoTemporaria.TITULO"/>
     <AppAlert
         v-if="notificacao"
         :dismissible="notificacao.dismissible ?? true"
@@ -15,7 +15,7 @@
         </BCardTitle>
         <BForm @submit.prevent="criarAtribuicao">
           <BFormGroup
-              label="Usuário"
+              :label="TEXTOS.atribuicaoTemporaria.LABEL_USUARIO"
               label-for="usuario"
               class="mb-3"
           >
@@ -34,7 +34,7 @@
                     :value="null"
                     disabled
                 >
-                   Selecione um usuário
+                   {{ TEXTOS.atribuicaoTemporaria.SELECIONE_USUARIO }}
                 </BFormSelectOption>
               </template>
             </BFormSelect>
@@ -45,7 +45,7 @@
 
           <BRow>
             <BCol md="6" class="mb-3">
-              <BFormGroup label="Data de Início" label-for="dataInicio">
+              <BFormGroup :label="TEXTOS.atribuicaoTemporaria.LABEL_DATA_INICIO" label-for="dataInicio">
                 <InputData
                     id="dataInicio"
                     v-model="dataInicio"
@@ -58,7 +58,7 @@
             </BCol>
 
             <BCol md="6" class="mb-3">
-              <BFormGroup label="Data de Término" label-for="dataTermino">
+              <BFormGroup :label="TEXTOS.atribuicaoTemporaria.LABEL_DATA_TERMINO" label-for="dataTermino">
                 <InputData
                     id="dataTermino"
                     v-model="dataTermino"
@@ -72,7 +72,7 @@
           </BRow>
 
           <BFormGroup
-              label="Justificativa"
+              :label="TEXTOS.atribuicaoTemporaria.LABEL_JUSTIFICATIVA"
               label-for="justificativa"
               class="mb-3"
           >
@@ -86,8 +86,8 @@
           <LoadingButton
               :loading="isLoading"
               data-testid="cad-atribuicao__btn-criar-atribuicao"
-              loading-text="Criando..."
-              text="Criar"
+              :loading-text="TEXTOS.atribuicaoTemporaria.CRIANDO"
+              :text="TEXTOS.comum.BOTAO_CRIAR"
               type="submit"
               variant="primary"
           />
@@ -99,7 +99,7 @@
               variant="secondary"
               @click="router.push(`/unidade/${codUnidade}`)"
           >
-            Cancelar
+            {{ TEXTOS.comum.BOTAO_CANCELAR }}
           </BButton>
         </BForm>
       </BCardBody>
@@ -131,6 +131,7 @@ import LoadingButton from "@/components/comum/LoadingButton.vue";
 import AppAlert from "@/components/comum/AppAlert.vue";
 import InputData from "@/components/comum/InputData.vue";
 import {useNotification} from "@/composables/useNotification";
+import {TEXTOS} from "@/constants/textos";
 import {buscarUnidadePorCodigo as buscarUnidadeServico} from "@/services/unidadeService";
 import {buscarUsuariosPorUnidade} from "@/services/usuarioService";
 import {criarAtribuicaoTemporaria} from "@/services/atribuicaoTemporariaService";
@@ -160,7 +161,7 @@ onMounted(async () => {
       usuarios.value = await buscarUsuariosPorUnidade(unidade.value.codigo);
     }
   } catch (error) {
-    erroUsuario.value = "Falha ao carregar dados da unidade ou usuários.";
+    erroUsuario.value = TEXTOS.atribuicaoTemporaria.ERRO_CARREGAR;
     logger.error(error);
   }
 });
@@ -169,12 +170,12 @@ async function criarAtribuicao() {
   const unidadeAtual = unidade.value;
   if (!unidadeAtual) throw new Error('Invariante violada: unidade não carregada');
   if (!usuarioSelecionado.value) {
-    erroUsuario.value = "Selecione um usuário para criar a atribuição.";
-    notify('Selecione um usuário para criar a atribuição.', 'danger');
+    erroUsuario.value = TEXTOS.atribuicaoTemporaria.ERRO_SELECIONE_USUARIO;
+    notify(TEXTOS.atribuicaoTemporaria.ERRO_SELECIONE_USUARIO, 'danger');
     return;
   }
   if (!dataInicio.value || !dataTermino.value || !justificativa.value.trim()) {
-    notify('Preencha data de início, data de término e justificativa.', 'danger');
+    notify(TEXTOS.atribuicaoTemporaria.ERRO_PREENCHIMENTO, 'danger');
     return;
   }
   erroUsuario.value = "";
@@ -189,7 +190,7 @@ async function criarAtribuicao() {
       justificativa: justificativa.value
     });
 
-    notify('Atribuição criada com sucesso!', 'success');
+    notify(TEXTOS.atribuicaoTemporaria.SUCESSO, 'success');
 
     usuarioSelecionado.value = null;
     dataInicio.value = "";
@@ -197,7 +198,7 @@ async function criarAtribuicao() {
     justificativa.value = "";
   } catch (error) {
     logger.error(error);
-    notify('Falha ao criar atribuição. Tente novamente.', 'danger');
+    notify(TEXTOS.atribuicaoTemporaria.ERRO_CRIAR, 'danger');
   } finally {
     isLoading.value = false;
   }

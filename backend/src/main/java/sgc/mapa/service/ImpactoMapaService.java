@@ -4,6 +4,7 @@ import lombok.*;
 import lombok.extern.slf4j.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
+import sgc.comum.MsgValidacao;
 import sgc.comum.erros.*;
 import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
@@ -28,7 +29,7 @@ public class ImpactoMapaService {
     @Transactional(readOnly = true)
     public ImpactoMapaResponse verificarImpactos(Subprocesso subprocesso, Usuario usuario) {
         if (!permissionEvaluator.verificarPermissao(usuario, subprocesso, VERIFICAR_IMPACTOS)) {
-            throw new ErroAcessoNegado("Usuário não tem permissão para verificar impactos.");
+            throw new ErroAcessoNegado(MsgValidacao.SEM_PERMISSAO_VERIFICAR_IMPACTOS);
         }
 
         checkSituacao(usuario, subprocesso);
@@ -46,13 +47,13 @@ public class ImpactoMapaService {
         List<Atividade> atividadesVigentes = obterAtividadesDoMapa(mapaVigente);
         List<Competencia> competenciasMapa = competenciaRepo.findByMapa_Codigo(mapaVigente.getCodigo());
 
-        Map<Long, List<Competencia>> atividadeIdToCompetencias = construirMapaAtividadeCompetencias(competenciasMapa);
+        Map<Long, List<Competencia>> codAtividadeParaCompetencias = construirMapaAtividadeCompetencias(competenciasMapa);
         Map<String, Atividade> mapaVigentes = atividadesPorDescricao(atividadesVigentes);
         Map<String, Atividade> mapaAtuais = atividadesPorDescricao(atividadesAtuais);
 
         List<AtividadeImpactadaDto> inseridas = detectarInseridas(atividadesAtuais, mapaVigentes.keySet());
-        List<AtividadeImpactadaDto> removidas = detectarRemovidas(mapaAtuais, atividadesVigentes, atividadeIdToCompetencias);
-        List<AtividadeImpactadaDto> alteradas = detectarAlteradas(atividadesAtuais, mapaVigentes, atividadeIdToCompetencias);
+        List<AtividadeImpactadaDto> removidas = detectarRemovidas(mapaAtuais, atividadesVigentes, codAtividadeParaCompetencias);
+        List<AtividadeImpactadaDto> alteradas = detectarAlteradas(atividadesAtuais, mapaVigentes, codAtividadeParaCompetencias);
 
         List<CompetenciaImpactadaDto> competenciasImpactadas = competenciasImpactadas(
                 competenciasMapa, removidas, alteradas, atividadesVigentes);
@@ -85,7 +86,7 @@ public class ImpactoMapaService {
 
         if (!situacaoValida) {
             throw new ErroValidacao(
-                    "Situação do subprocesso (%s) não permite verificação de impactos para o perfil %s."
+                    MsgValidacao.SITUACAO_IMPEDE_IMPACTO
                             .formatted(situacao, perfil));
         }
     }
@@ -141,7 +142,7 @@ public class ImpactoMapaService {
     private List<AtividadeImpactadaDto> detectarAlteradas(
             List<Atividade> atuais,
             Map<String, Atividade> vigentesMap,
-            Map<Long, List<Competencia>> atividadeIdToCompetencias) {
+            Map<Long, List<Competencia>> codAtividadeParaCompetencias) {
 
         List<AtividadeImpactadaDto> alteradas = new ArrayList<>();
 
@@ -161,7 +162,7 @@ public class ImpactoMapaService {
                                     .descricaoAnterior(vigente.getDescricao())
                                     .conhecimentos(vigente.getConhecimentos().stream().map(Conhecimento::getDescricao).toList())
                                     .competenciasVinculadas(
-                                            obterNomesCompetencias(vigente.getCodigo(), atividadeIdToCompetencias))
+                                            obterNomesCompetencias(vigente.getCodigo(), codAtividadeParaCompetencias))
                                     .build());
                 }
             }
@@ -195,8 +196,8 @@ public class ImpactoMapaService {
     }
 
     private List<String> obterNomesCompetencias(Long codigoAtividade,
-                                                Map<Long, List<Competencia>> atividadeIdToCompetencias) {
-        return atividadeIdToCompetencias.getOrDefault(codigoAtividade, List.of())
+                                                Map<Long, List<Competencia>> codAtividadeParaCompetencias) {
+        return codAtividadeParaCompetencias.getOrDefault(codigoAtividade, List.of())
                 .stream()
                 .map(Competencia::getDescricao)
                 .toList();
@@ -210,15 +211,15 @@ public class ImpactoMapaService {
 
         Map<Long, CompetenciaImpactoAcumulador> mapaImpactos = new HashMap<>();
 
-        Map<Long, List<Competencia>> atividadeIdToCompetencias = construirMapaAtividadeCompetencias(competenciasDoMapa);
-        Map<String, Long> descricaoToVigenteId = atividadesVigentes.stream()
+        Map<Long, List<Competencia>> codAtividadeParaCompetencias = construirMapaAtividadeCompetencias(competenciasDoMapa);
+        Map<String, Long> descricaoParaCodVigente = atividadesVigentes.stream()
                 .collect(Collectors.toMap(
                         Atividade::getDescricao,
                         Atividade::getCodigo,
                         (existing, replacement) -> existing));
 
-        processarRemovidas(removidas, atividadeIdToCompetencias, mapaImpactos);
-        processarAlteradas(alteradas, descricaoToVigenteId, atividadeIdToCompetencias, mapaImpactos);
+        processarRemovidas(removidas, codAtividadeParaCompetencias, mapaImpactos);
+        processarAlteradas(alteradas, descricaoParaCodVigente, codAtividadeParaCompetencias, mapaImpactos);
 
         return mapaImpactos.values().stream()
                 .map(this::converterParaDto)
@@ -227,12 +228,12 @@ public class ImpactoMapaService {
 
     private void processarRemovidas(
             List<AtividadeImpactadaDto> removidas,
-            Map<Long, List<Competencia>> atividadeIdToCompetencias,
+            Map<Long, List<Competencia>> codAtividadeParaCompetencias,
             Map<Long, CompetenciaImpactoAcumulador> mapaImpactos) {
 
         removidas
                 .forEach(dto -> {
-                    List<Competencia> competenciasAfetadas = atividadeIdToCompetencias.getOrDefault(
+                    List<Competencia> competenciasAfetadas = codAtividadeParaCompetencias.getOrDefault(
                             dto.codigo(), List.of());
                     competenciasAfetadas.forEach(comp -> adicionarImpacto(mapaImpactos, comp,
                             "Atividade removida: %s".formatted(dto.descricao()),
@@ -242,15 +243,15 @@ public class ImpactoMapaService {
 
     private void processarAlteradas(
             List<AtividadeImpactadaDto> alteradas,
-            Map<String, Long> descricaoToVigenteId,
-            Map<Long, List<Competencia>> atividadeIdToCompetencias,
+            Map<String, Long> descricaoParaCodVigente,
+            Map<Long, List<Competencia>> codAtividadeParaCompetencias,
             Map<Long, CompetenciaImpactoAcumulador> mapaImpactos) {
 
         alteradas.stream()
-                .filter(dto -> descricaoToVigenteId.containsKey(dto.descricao()))
+                .filter(dto -> descricaoParaCodVigente.containsKey(dto.descricao()))
                 .forEach(dto -> {
-                    Long idVigente = descricaoToVigenteId.get(dto.descricao());
-                    List<Competencia> competenciasAfetadas = atividadeIdToCompetencias.getOrDefault(idVigente,
+                    Long codVigente = descricaoParaCodVigente.get(dto.descricao());
+                    List<Competencia> competenciasAfetadas = codAtividadeParaCompetencias.getOrDefault(codVigente,
                             List.of());
 
                     competenciasAfetadas.forEach(comp -> {

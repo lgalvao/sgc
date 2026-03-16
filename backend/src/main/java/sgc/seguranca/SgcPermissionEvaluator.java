@@ -58,22 +58,22 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
     }
 
     @Override
-    public boolean hasPermission(Authentication authentication, Serializable idAlvo, String tipoAlvo, Object permissao) {
+    public boolean hasPermission(Authentication authentication, Serializable codigoAlvo, String tipoAlvo, Object permissao) {
         if (!(authentication.getPrincipal() instanceof Usuario usuario)) {
             return false;
         }
 
-        if (idAlvo instanceof Collection<?> colecao) {
-            return colecao.stream().allMatch(id -> hasPermission(authentication, (Serializable) id, tipoAlvo, permissao));
+        if (codigoAlvo instanceof Collection<?> colecao) {
+            return colecao.stream().allMatch(codigo -> hasPermission(authentication, (Serializable) codigo, tipoAlvo, permissao));
         }
 
         AcaoPermissao acao = resolverAcao((String) permissao);
 
         return switch (tipoAlvo) {
-            case "Subprocesso" -> subprocessoRepo.findById((Long) idAlvo)
+            case "Subprocesso" -> subprocessoRepo.buscarPorCodigoComMapaEAtividades((Long) codigoAlvo)
                     .map(sp -> verificarSubprocesso(usuario, sp, acao))
                     .orElse(false);
-            case "Processo" -> processoRepo.findById((Long) idAlvo)
+            case "Processo" -> processoRepo.buscarPorCodigoComParticipantes((Long) codigoAlvo)
                     .map(p -> verificarProcesso(usuario, p, acao))
                     .orElse(false);
             default -> false;

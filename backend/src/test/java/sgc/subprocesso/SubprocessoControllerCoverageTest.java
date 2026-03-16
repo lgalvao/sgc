@@ -51,7 +51,7 @@ class SubprocessoControllerCoverageTest {
     void listar() throws Exception {
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(1L);
-        when(subprocessoService.listarEntidades()).thenReturn(List.of(sp));
+        when(subprocessoService.listarTodos()).thenReturn(List.of(sp));
 
         mockMvc.perform(get("/api/subprocessos"))
                 .andExpect(status().isOk())

@@ -5,6 +5,7 @@ import {BOrchestrator} from "bootstrap-vue-next";
 import pkg from "../package.json";
 import BarraNavegacao from "./components/layout/BarraNavegacao.vue";
 import MainNavbar from "./components/layout/MainNavbar.vue";
+import {TEXTOS} from "@/constants/textos";
 
 interface PackageJson {
   version: string;
@@ -28,7 +29,7 @@ const shouldShowNavBarExtras = computed(() => {
       href="#main-content"
       style="z-index: 2050;"
   >
-    Pular para o conteúdo principal
+    {{ TEXTOS.comum.PULAR_CONTEUDO }}
   </a>
   <BOrchestrator/>
 
@@ -52,8 +53,8 @@ const shouldShowNavBarExtras = computed(() => {
         class="bg-light text-muted border-top mt-auto"
     >
       <div class="container-fluid py-2 small d-flex justify-content-between align-items-center">
-        <span>Versão {{ version }}</span>
-        <span>© SESEL/COSIS/TRE-PE</span>
+        <span>{{ TEXTOS.comum.VERSAO }} {{ version }}</span>
+        <span>{{ TEXTOS.comum.RODAPE }}</span>
       </div>
     </footer>
   </div>

@@ -4,6 +4,7 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
+import sgc.comum.MsgValidacao;
 import sgc.comum.erros.*;
 import sgc.mapa.model.*;
 import sgc.mapa.service.*;
@@ -38,7 +39,7 @@ class SubprocessoValidacaoServiceTest {
             Subprocesso sp = new Subprocesso();
             assertThatThrownBy(() -> validacaoService.validarExistenciaAtividades(sp))
                 .isInstanceOf(ErroValidacao.class)
-                .hasMessageContaining("não possui mapa associado");
+                .hasMessageContaining(MsgValidacao.SUBPROCESSO_SEM_MAPA);
         }
     }
 
@@ -182,27 +183,27 @@ class SubprocessoValidacaoServiceTest {
         @DisplayName("deve retornar true quando unidade participa do processo")
         void deveRetornarTrueQuandoUnidadeParticipaDoProcesso() {
 
-            Long processoId = 1L;
+            Long codProcesso = 1L;
             List<Long> unidadeCodigos = List.of(10L, 20L);
-            when(subprocessoRepo.existsByProcessoCodigoAndUnidadeCodigoIn(processoId, unidadeCodigos))
+            when(subprocessoRepo.existsByProcessoCodigoAndUnidadeCodigoIn(codProcesso, unidadeCodigos))
                     .thenReturn(true);
 
-            boolean resultado = validacaoService.verificarAcessoUnidadeAoProcesso(processoId, unidadeCodigos);
+            boolean resultado = validacaoService.verificarAcessoUnidadeAoProcesso(codProcesso, unidadeCodigos);
 
             assertThat(resultado).isTrue();
-            verify(subprocessoRepo).existsByProcessoCodigoAndUnidadeCodigoIn(processoId, unidadeCodigos);
+            verify(subprocessoRepo).existsByProcessoCodigoAndUnidadeCodigoIn(codProcesso, unidadeCodigos);
         }
 
         @Test
         @DisplayName("deve retornar false quando unidade não participa do processo")
         void deveRetornarFalseQuandoUnidadeNaoParticipaDoProcesso() {
 
-            Long processoId = 1L;
+            Long codProcesso = 1L;
             List<Long> unidadeCodigos = List.of(10L, 20L);
-            when(subprocessoRepo.existsByProcessoCodigoAndUnidadeCodigoIn(processoId, unidadeCodigos))
+            when(subprocessoRepo.existsByProcessoCodigoAndUnidadeCodigoIn(codProcesso, unidadeCodigos))
                     .thenReturn(false);
 
-            boolean resultado = validacaoService.verificarAcessoUnidadeAoProcesso(processoId, unidadeCodigos);
+            boolean resultado = validacaoService.verificarAcessoUnidadeAoProcesso(codProcesso, unidadeCodigos);
 
             assertThat(resultado).isFalse();
         }
@@ -226,15 +227,15 @@ class SubprocessoValidacaoServiceTest {
         @DisplayName("deve retornar válido quando todos subprocessos estão homologados")
         void deveRetornarValidoQuandoTodosHomologados() {
 
-            Long processoId = 1L;
-            when(subprocessoRepo.countByProcessoCodigo(processoId)).thenReturn(3L);
+            Long codProcesso = 1L;
+            when(subprocessoRepo.countByProcessoCodigo(codProcesso)).thenReturn(3L);
             when(subprocessoRepo.countByProcessoCodigoAndSituacaoIn(
-                    eq(processoId),
+                    eq(codProcesso),
                     argThat(situacoes -> situacoes.contains(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO)
                             && situacoes.contains(SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO))
             )).thenReturn(3L);
 
-            var resultado = validacaoService.validarSubprocessosParaFinalizacao(processoId);
+            var resultado = validacaoService.validarSubprocessosParaFinalizacao(codProcesso);
 
             assertThat(resultado.valido()).isTrue();
             assertThat(resultado.mensagem()).isNull();
@@ -244,12 +245,12 @@ class SubprocessoValidacaoServiceTest {
         @DisplayName("deve retornar inválido quando nem todos subprocessos estão homologados")
         void deveRetornarInvalidoQuandoNemTodosHomologados() {
 
-            Long processoId = 1L;
-            when(subprocessoRepo.countByProcessoCodigo(processoId)).thenReturn(5L);
+            Long codProcesso = 1L;
+            when(subprocessoRepo.countByProcessoCodigo(codProcesso)).thenReturn(5L);
             when(subprocessoRepo.countByProcessoCodigoAndSituacaoIn(anyLong(), anyList()))
                     .thenReturn(3L);
 
-            var resultado = validacaoService.validarSubprocessosParaFinalizacao(processoId);
+            var resultado = validacaoService.validarSubprocessosParaFinalizacao(codProcesso);
 
             assertThat(resultado.valido()).isFalse();
             assertThat(resultado.mensagem())
@@ -261,10 +262,10 @@ class SubprocessoValidacaoServiceTest {
         @DisplayName("deve retornar inválido quando processo não possui subprocessos")
         void deveRetornarInvalidoQuandoProcessoSemSubprocessos() {
 
-            Long processoId = 1L;
-            when(subprocessoRepo.countByProcessoCodigo(processoId)).thenReturn(0L);
+            Long codProcesso = 1L;
+            when(subprocessoRepo.countByProcessoCodigo(codProcesso)).thenReturn(0L);
 
-            var resultado = validacaoService.validarSubprocessosParaFinalizacao(processoId);
+            var resultado = validacaoService.validarSubprocessosParaFinalizacao(codProcesso);
 
             assertThat(resultado.valido()).isFalse();
             assertThat(resultado.mensagem())
@@ -276,18 +277,17 @@ class SubprocessoValidacaoServiceTest {
         @DisplayName("deve otimizar query usando count ao invés de carregar entidades")
         void deveOtimizarQueryUsandoCount() {
 
-            Long processoId = 1L;
-            when(subprocessoRepo.countByProcessoCodigo(processoId)).thenReturn(100L);
+            Long codProcesso = 1L;
+            when(subprocessoRepo.countByProcessoCodigo(codProcesso)).thenReturn(100L);
             when(subprocessoRepo.countByProcessoCodigoAndSituacaoIn(anyLong(), anyList()))
                     .thenReturn(100L);
 
-            validacaoService.validarSubprocessosParaFinalizacao(processoId);
+            validacaoService.validarSubprocessosParaFinalizacao(codProcesso);
 
             // Verifica que apenas queries de contagem foram chamadas, não findAll
-            verify(subprocessoRepo).countByProcessoCodigo(processoId);
+            verify(subprocessoRepo).countByProcessoCodigo(codProcesso);
             verify(subprocessoRepo).countByProcessoCodigoAndSituacaoIn(anyLong(), anyList());
-            verify(subprocessoRepo, never()).findByProcessoCodigo(anyLong());
-            verify(subprocessoRepo, never()).findByProcessoCodigoWithUnidade(anyLong());
+            verify(subprocessoRepo, never()).findByProcessoCodigoComUnidade(anyLong());
         }
     }
 

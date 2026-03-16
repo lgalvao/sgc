@@ -1,6 +1,7 @@
 package sgc.organizacao.dto;
 
 import jakarta.validation.constraints.*;
+import sgc.comum.MsgValidacao;
 import sgc.comum.model.*;
 import sgc.seguranca.sanitizacao.*;
 
@@ -14,6 +15,6 @@ public record CriarAtribuicaoRequest(
         LocalDate dataTermino,
 
         @SanitizarHtml
-        @Size(max = 500, message = "A justificativa deve ter no máximo 500 caracteres")
+        @Size(max = 500, message = MsgValidacao.JUSTIFICATIVA_MAX)
         String justificativa) {
 }

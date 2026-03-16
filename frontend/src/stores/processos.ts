@@ -27,6 +27,7 @@ export const useProcessosStore = defineStore("processos", () => {
     const processosFinalizados = ref<ProcessoResumo[]>([]);
     const processosParaImportacao = ref<ProcessoResumo[]>([]);
     const subprocessosElegiveis = ref<SubprocessoElegivel[]>([]);
+    const carregando = ref(false);
     const {lastError, clearError, withErrorHandling} = useErrorHandler();
 
     async function buscarProcessosPainel(
@@ -38,6 +39,7 @@ export const useProcessosStore = defineStore("processos", () => {
         order?: "asc" | "desc",
     ) {
         return withErrorHandling(async () => {
+            carregando.value = true;
             const response = await painelService.listarProcessos(
                 perfil,
                 unidade,
@@ -46,21 +48,25 @@ export const useProcessosStore = defineStore("processos", () => {
                 sort,
                 order,
             );
-            processosPainel.value = response.content;
-            processosPainelPage.value = response;
-        });
+            if (response) {
+                processosPainel.value = response.content;
+                processosPainelPage.value = response;
+            }
+        }).finally(() => carregando.value = false);
     }
 
     async function buscarProcessosFinalizados() {
         return withErrorHandling(async () => {
+            carregando.value = true;
             processosFinalizados.value = await processoService.buscarProcessosFinalizados();
-        });
+        }).finally(() => carregando.value = false);
     }
 
     async function buscarProcessosParaImportacao() {
         return withErrorHandling(async () => {
+            carregando.value = true;
             processosParaImportacao.value = await processoService.buscarProcessosParaImportacao();
-        });
+        }).finally(() => carregando.value = false);
     }
 
     async function buscarUnidadesParaImportacao(codigoProcesso: number): Promise<UnidadeImportacao[]> {
@@ -71,11 +77,12 @@ export const useProcessosStore = defineStore("processos", () => {
 
     async function buscarProcessoDetalhe(codigoProcesso: number) {
         return withErrorHandling(async () => {
+            carregando.value = true;
             processoDetalhe.value = null; // Limpa estado anterior
             processoDetalhe.value = await processoService.obterDetalhesProcesso(codigoProcesso);
         }, () => {
             processoDetalhe.value = null;
-        });
+        }).finally(() => carregando.value = false);
     }
 
     async function criarProcesso(payload: CriarProcessoRequest) {
@@ -205,6 +212,7 @@ export const useProcessosStore = defineStore("processos", () => {
 
     async function buscarContextoCompleto(codigoProcesso: number) {
         return withErrorHandling(async () => {
+            carregando.value = true;
             setProcessoDetalhe(null);
             const data = await processoService.buscarContextoCompleto(codigoProcesso);
             setProcessoDetalhe(data);
@@ -213,7 +221,7 @@ export const useProcessosStore = defineStore("processos", () => {
             if (normalizeError(err).kind !== 'unauthorized') {
                 logger.error(`Erro ao buscar contexto completo para processo ${codigoProcesso}:`, err);
             }
-        });
+        }).finally(() => carregando.value = false);
     }
 
     async function buscarSubprocessosElegiveis(codigoProcesso: number) {
@@ -229,6 +237,7 @@ export const useProcessosStore = defineStore("processos", () => {
         processoDetalhe,
         processosFinalizados,
         processosParaImportacao,
+        carregando,
         buscarProcessosPainel,
         buscarProcessosFinalizados,
         buscarProcessosParaImportacao,
@@ -254,5 +263,6 @@ export const useProcessosStore = defineStore("processos", () => {
         buscarSubprocessosElegiveis,
         lastError,
         clearError,
+        withErrorHandling,
     };
 });

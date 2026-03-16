@@ -31,8 +31,8 @@ public class AtividadeController {
     @GetMapping("/{codAtividade}")
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Obtém uma atividade pelo código")
-    public ResponseEntity<Atividade> obterPorId(@PathVariable Long codAtividade) {
-        return ResponseEntity.ok(atividadeFacade.obterAtividadePorId(codAtividade));
+    public ResponseEntity<Atividade> obterPorCodigo(@PathVariable Long codAtividade) {
+        return ResponseEntity.ok(atividadeFacade.obterAtividadePorCodigo(codAtividade));
     }
 
     /**
@@ -91,7 +91,7 @@ public class AtividadeController {
             @Valid @RequestBody CriarConhecimentoRequest request) {
 
         ResultadoOperacaoConhecimento resultado = atividadeFacade.criarConhecimento(codAtividade, request);
-        URI uri = URI.create("/api/atividades/%d/conhecimentos/%d".formatted(codAtividade, resultado.novoConhecimentoId()));
+        URI uri = URI.create("/api/atividades/%d/conhecimentos/%d".formatted(codAtividade, resultado.novoConhecimentoCodigo()));
         return ResponseEntity.created(uri).body(resultado.response());
     }
 

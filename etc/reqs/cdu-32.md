@@ -73,4 +73,4 @@
     - `Unidade de origem`: ADMIN
     - `Unidade de destino`: [SIGLA_UNIDADE_SUPERIOR]
 
-3. O sistema exibe mensagem de sucesso "Cadastro reaberto com sucesso".
+3. O sistema exibe mensagem de sucesso "Cadastro reaberto".

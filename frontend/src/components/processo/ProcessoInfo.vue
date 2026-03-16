@@ -1,22 +1,23 @@
 <template>
   <div class="process-info mb-4">
     <div v-if="showTipo && tipo" class="mb-2">
-      <strong>Tipo:</strong> {{ formatTipoProcesso(tipo) }}
+      <strong>{{ TEXTOS.processo.INFO_TIPO }}:</strong> {{ formatTipoProcesso(tipo) }}
     </div>
     <div v-if="showSituacao && situacao" class="mb-2">
-      <strong>Situação:</strong> {{ formatSituacaoProcesso(situacao) }}
+      <strong>{{ TEXTOS.processo.INFO_SITUACAO }}:</strong> {{ formatSituacaoProcesso(situacao) }}
     </div>
     <div v-if="showDataLimite && dataLimite" class="mb-2">
-      <strong>Data limite:</strong> {{ formatDate(dataLimite, false) }}
+      <strong>{{ TEXTOS.processo.INFO_DATA_LIMITE }}:</strong> {{ formatDate(dataLimite, false) }}
     </div>
     <div v-if="showUnidades && numUnidades !== undefined" class="mb-2">
-      <strong>Unidades participantes:</strong> {{ numUnidades }}
+      <strong>{{ TEXTOS.processo.INFO_UNIDADES }}:</strong> {{ numUnidades }}
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
 import {formatDate, formatSituacaoProcesso, formatTipoProcesso} from '@/utils/formatters';
+import {TEXTOS} from '@/constants/textos';
 
 withDefaults(
     defineProps<{

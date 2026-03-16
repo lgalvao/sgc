@@ -35,4 +35,4 @@
     - `Unidade de origem`: 'ADMIN'
     - `Unidade de destino`: [SIGLA_UNIDADE_SUBPROCESSO]
 
-9. Sistema mostra mensagem de confirmação: "Data limite alterada com sucesso" e fecha o modal.
+9. Sistema fecha o modal e mostra mensagem de confirmação "Data limite alterada".

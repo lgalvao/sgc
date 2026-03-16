@@ -129,7 +129,7 @@ class CDU29IntegrationTest extends BaseIntegrationTest {
     @DisplayName("Deve retornar detalhes de um processo finalizado")
     @WithMockAdmin
     void obterDetalhes_finalizado_sucesso() throws Exception {
-        mockMvc.perform(get("/api/processos/{id}", processoFinalizado1.getCodigo()).with(csrf()))
+        mockMvc.perform(get("/api/processos/{codigo}", processoFinalizado1.getCodigo()).with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.codigo").value(processoFinalizado1.getCodigo()))
                 .andExpect(jsonPath("$.situacao").value("FINALIZADO"));

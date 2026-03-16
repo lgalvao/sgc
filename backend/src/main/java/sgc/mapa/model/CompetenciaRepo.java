@@ -16,7 +16,7 @@ import java.util.*;
  * <ul>
  * <li>{@link #findByMapa_Codigo(Long)} - Carrega competências com atividades (EntityGraph)</li>
  * <li>{@link #findCompetenciaAndAtividadeIdsByMapaCodigo(Long)} - Projeção SQL otimizada</li>
- * <li> - Sem relacionamentos (mais leve)</li>
+ * <li>{@link #findByMapaCodigoSemFetch(Long)} - Sem relacionamentos (mais leve)</li>
  * </ul>
  */
 @Repository
@@ -33,9 +33,9 @@ public interface CompetenciaRepo extends JpaRepository<Competencia, Long> {
     List<Competencia> findByMapa_Codigo(@Param("mapaCodigo") Long mapaCodigo);
 
     /**
-     * Busca dados projetados (id, descricao, id_atividade) das competências de um mapa.
+     * Busca dados projetados (codigo, descricao, codAtividade) das competências de um mapa.
      *
-     * <p><b>Quando usar:</b> Para visualização/montagem de DTOs onde apenas IDs e descrições são necessários.
+     * <p><b>Quando usar:</b> Para visualização/montagem de DTOs onde apenas códigos e descrições são necessários.
      * Esta é a abordagem mais eficiente quando múltiplas competências compartilham atividades.
      *
      * <p><b>Performance:</b> Minimiza transferência de dados e uso de memória ao retornar apenas

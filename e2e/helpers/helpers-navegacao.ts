@@ -93,8 +93,8 @@ export async function esperarPaginaCadastroProcesso(page: Page): Promise<void> {
 /**
  * Aguarda a navegação para a página de detalhes de um processo.
  */
-export async function esperarPaginaDetalhesProcesso(page: Page, id?: number): Promise<void> {
-    const regex = id ? new RegExp(String.raw`\/processo\/${id}$`) : /\/processo\/\d+$/;
+export async function esperarPaginaDetalhesProcesso(page: Page, codigo?: number): Promise<void> {
+    const regex = codigo ? new RegExp(String.raw`\/processo\/${codigo}$`) : /\/processo\/\d+$/;
     await page.waitForURL(regex);
 }
 

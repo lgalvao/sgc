@@ -22,24 +22,16 @@ class E2eControllerCoverageTest {
     @Test
     @DisplayName("resetDatabase deve retornar imediatamente se dataSource for nulo")
     void deveRetornarSeDataSourceForNulo() {
-
         when(jdbcTemplate.getDataSource()).thenReturn(null);
-
-
         controller.resetDatabase();
-
-        // Assert - Não deve lançar exceção nem fazer nada (cobertura da linha 62)
         verify(jdbcTemplate).getDataSource();
     }
 
     @Test
     @DisplayName("criarProcessoMapeamento deve falhar se unidadeSigla for vazia")
     void deveFalharSeUnidadeSiglaVazia() {
-
         E2eController.ProcessoFixtureRequest request = new E2eController.ProcessoFixtureRequest(
                 "desc", "", false, 30);
-
-        // Act & Assert (cobertura das linhas 206 e 207)
         assertThatThrownBy(() -> controller.criarProcessoMapeamento(request))
                 .isInstanceOf(ErroValidacao.class)
                 .hasMessage("Unidade é obrigatória");

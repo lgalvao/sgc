@@ -4,6 +4,7 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
+import sgc.comum.MsgValidacao;
 import sgc.comum.erros.ErroValidacao;
 import sgc.mapa.model.Atividade;
 import sgc.mapa.model.Competencia;
@@ -44,7 +45,7 @@ class SubprocessoValidacaoServiceCoverageTest {
 
             assertThatThrownBy(() -> validacaoService.validarExistenciaAtividades(sp))
                     .isInstanceOf(ErroValidacao.class)
-                    .hasMessageContaining("Subprocesso não possui mapa associado");
+                    .hasMessageContaining(MsgValidacao.SUBPROCESSO_SEM_MAPA);
         }
 
         @Test
@@ -57,7 +58,7 @@ class SubprocessoValidacaoServiceCoverageTest {
 
             assertThatThrownBy(() -> validacaoService.validarExistenciaAtividades(sp))
                     .isInstanceOf(ErroValidacao.class)
-                    .hasMessageContaining("Subprocesso não possui mapa associado");
+                    .hasMessageContaining(MsgValidacao.SUBPROCESSO_SEM_MAPA);
         }
 
         @Test
@@ -72,7 +73,7 @@ class SubprocessoValidacaoServiceCoverageTest {
 
             assertThatThrownBy(() -> validacaoService.validarExistenciaAtividades(sp))
                     .isInstanceOf(ErroValidacao.class)
-                    .hasMessageContaining("O mapa de competências deve ter ao menos uma atividade cadastrada.");
+                    .hasMessageContaining(MsgValidacao.MAPA_SEM_ATIVIDADES);
         }
 
         @Test
@@ -90,7 +91,7 @@ class SubprocessoValidacaoServiceCoverageTest {
 
             assertThatThrownBy(() -> validacaoService.validarExistenciaAtividades(sp))
                     .isInstanceOf(ErroValidacao.class)
-                    .hasMessageContaining("Todas as atividades devem possuir conhecimentos vinculados.");
+                    .hasMessageContaining(MsgValidacao.ATIVIDADES_SEM_CONHECIMENTOS);
         }
     }
 
@@ -109,7 +110,7 @@ class SubprocessoValidacaoServiceCoverageTest {
 
             assertThatThrownBy(() -> validacaoService.validarAssociacoesMapa(1L))
                     .isInstanceOf(ErroValidacao.class)
-                    .hasMessageContaining("Existem competências que não foram associadas a nenhuma atividade");
+                    .hasMessageContaining(MsgValidacao.COMPETENCIAS_SEM_ATIVIDADE);
         }
 
         @Test
@@ -130,7 +131,7 @@ class SubprocessoValidacaoServiceCoverageTest {
 
             assertThatThrownBy(() -> validacaoService.validarAssociacoesMapa(1L))
                     .isInstanceOf(ErroValidacao.class)
-                    .hasMessageContaining("Existem atividades que não foram associadas a nenhuma competência");
+                    .hasMessageContaining(MsgValidacao.ATIVIDADES_SEM_COMPETENCIA);
         }
 
         @Test
@@ -169,7 +170,7 @@ class SubprocessoValidacaoServiceCoverageTest {
 
             assertThatThrownBy(() -> validacaoService.validarMapaParaDisponibilizacao(sp))
                     .isInstanceOf(ErroValidacao.class)
-                    .hasMessageContaining("Todas as competências devem estar associadas a pelo menos uma atividade");
+                    .hasMessageContaining(MsgValidacao.TODAS_COMPETENCIAS_DEVEM_TER_ATIVIDADE);
         }
 
         @Test
@@ -196,7 +197,7 @@ class SubprocessoValidacaoServiceCoverageTest {
 
             assertThatThrownBy(() -> validacaoService.validarMapaParaDisponibilizacao(sp))
                     .isInstanceOf(ErroValidacao.class)
-                    .hasMessageContaining("Todas as atividades devem estar associadas a pelo menos uma competência");
+                    .hasMessageContaining(MsgValidacao.ATIVIDADES_DEVEM_TER_COMPETENCIA);
         }
 
         @Test
@@ -291,7 +292,7 @@ class SubprocessoValidacaoServiceCoverageTest {
 
             assertThatThrownBy(() -> validacaoService.validarRequisitosNegocioParaDisponibilizacao(sp, List.of(a2)))
                     .isInstanceOf(ErroValidacao.class)
-                    .hasMessageContaining("Todas as atividades devem possuir conhecimentos vinculados.");
+                    .hasMessageContaining(MsgValidacao.ATIVIDADES_SEM_CONHECIMENTOS);
         }
     }
 }

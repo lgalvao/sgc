@@ -11,7 +11,7 @@ import {criarProcessoFixture} from './fixtures/fixtures-processos.js';
  */
 test.describe.serial('CDU-35 - Gerar relatório de andamento', () => {
 
-    test('Cenários CDU-35: ADMIN navega e gera relatórios de andamento', async ({page, request, autenticadoComoAdmin}) => {
+    test('Cenários CDU-35: ADMIN navega e gera relatórios de andamento', async ({_resetAutomatico, page, request, _autenticadoComoAdmin}) => {
         const descricaoProcesso = `Relatório CDU-35 ${Date.now()}`;
         await criarProcessoFixture(request, {
             descricao: descricaoProcesso,

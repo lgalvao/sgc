@@ -32,7 +32,7 @@ public class UnidadeService {
     private final UnidadeMapaRepo unidadeMapaRepo;
     private final ComumRepo repo;
 
-    public Unidade buscarPorId(Long codigo) {
+    public Unidade buscarPorCodigo(Long codigo) {
         return repo.buscar(Unidade.class, Map.of("codigo", codigo, "situacao", SituacaoUnidade.ATIVA));
     }
 
@@ -48,12 +48,12 @@ public class UnidadeService {
         return unidadeRepo.findAllWithHierarquia();
     }
 
-    public List<String> buscarSiglasPorIds(List<Long> codigos) {
+    public List<String> buscarSiglasPorCodigos(List<Long> codigos) {
         return unidadeRepo.findSiglasByCodigos(codigos);
     }
 
     public boolean verificarMapaVigente(Long codigoUnidade) {
-        return unidadeMapaRepo.existsById(codigoUnidade);
+        return unidadeMapaRepo.existsByUnidadeCodigo(codigoUnidade);
     }
 
     public List<Long> buscarTodosCodigosUnidadesComMapa() {
@@ -61,12 +61,12 @@ public class UnidadeService {
     }
 
     public List<UnidadeMapa> buscarMapasPorUnidades(List<Long> codigosUnidades) {
-        return unidadeMapaRepo.findAllById(codigosUnidades);
+        return unidadeMapaRepo.findAllByUnidadeCodigoIn(codigosUnidades);
     }
 
     @Transactional
     public void definirMapaVigente(Long codigoUnidade, Mapa mapa) {
-        UnidadeMapa unidadeMapa = unidadeMapaRepo.findById(codigoUnidade).orElse(new UnidadeMapa());
+        UnidadeMapa unidadeMapa = unidadeMapaRepo.findByUnidadeCodigo(codigoUnidade).orElse(new UnidadeMapa());
         unidadeMapa.setUnidadeCodigo(codigoUnidade);
         unidadeMapa.setMapaVigente(mapa);
 

@@ -23,7 +23,7 @@ public class AlertaFacade {
     private final UnidadeService unidadeService;
 
     private Unidade unidadeRaiz() {
-        return unidadeService.buscarPorId(1L);
+        return unidadeService.buscarPorCodigo(1L);
     }
 
     public List<Alerta> alertasPorUsuario(String usuarioTitulo) {
@@ -38,7 +38,7 @@ public class AlertaFacade {
 
         Map<Long, LocalDateTime> mapaLeitura = new HashMap<>();
         for (AlertaUsuario alertaUsuario : leituras) {
-            mapaLeitura.put(alertaUsuario.getId().getAlertaCodigo(), alertaUsuario.getDataHoraLeitura());
+            mapaLeitura.put(alertaUsuario.getCodigo().getAlertaCodigo(), alertaUsuario.getDataHoraLeitura());
         }
 
         alertas.forEach(alerta -> alerta.setDataHoraLeitura(mapaLeitura.get(alerta.getCodigo())));
@@ -166,7 +166,7 @@ public class AlertaFacade {
 
             alertaService.porCodigo(codigo).ifPresent(alerta -> {
                 AlertaUsuario novo = AlertaUsuario.builder()
-                        .id(chave)
+                        .codigo(chave)
                         .alerta(alerta)
                         .usuario(usuario)
                         .dataHoraLeitura(agora)

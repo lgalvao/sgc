@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.*;
+import sgc.comum.MsgValidacao;
 import sgc.comum.erros.*;
 import sgc.comum.model.*;
 import sgc.mapa.model.*;
@@ -87,7 +88,7 @@ public class Subprocesso extends EntidadeBase {
 
     public void setSituacao(SituacaoSubprocesso novaSituacao) {
         if (processo != null && situacao != null && situacao != novaSituacao && !situacao.podeTransicionarPara(novaSituacao, processo.getTipo())) {
-            throw new ErroValidacao("Transição de situação inválida: %s -> %s".formatted(
+            throw new ErroValidacao(MsgValidacao.TRANSICAO_INVALIDA.formatted(
                     situacao.getDescricao(), novaSituacao.getDescricao())
             );
         }

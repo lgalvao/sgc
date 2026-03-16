@@ -10,7 +10,7 @@ O teste `cdu-04.spec.ts` cobre os seguintes cenários:
 - ✅ Cancelamento de inicialização mantém na mesma tela
 - ✅ Confirmação de inicialização
 - ✅ Redirecionamento para Painel após sucesso
-- ✅ Feedback de toast "iniciado com sucesso"
+- ✅ Feedback de toast "iniciado"
 - ✅ Processo muda para situação "Em andamento" na tabela
 
 **Snapshot de unidades (passo 7):**

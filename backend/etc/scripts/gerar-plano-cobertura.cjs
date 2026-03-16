@@ -124,7 +124,7 @@ async function runTests() {
     console.log('🚀 Executando testes e gerando relatório JaCoCo...');
     try {
         execSync(GRADLE_CMD, {cwd: BASE_DIR, stdio: 'inherit'});
-    } catch (error) {
+    } catch {
         console.warn('⚠️ Alguns testes falharam, mas prosseguindo com análise...');
     }
 }

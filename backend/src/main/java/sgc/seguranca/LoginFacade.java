@@ -5,6 +5,7 @@ import org.jspecify.annotations.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
+import sgc.comum.MsgValidacao;
 import sgc.comum.erros.*;
 import sgc.organizacao.*;
 import sgc.organizacao.dto.*;
@@ -80,7 +81,7 @@ public class LoginFacade {
     @Transactional(readOnly = true)
     public String entrar(EntrarRequest request) {
         Long codUnidade = request.unidadeCodigo();
-        unidadeService.buscarPorId(codUnidade);
+        unidadeService.buscarPorCodigo(codUnidade);
 
         String tituloEleitoral = request.tituloEleitoral();
         List<PerfilUnidadeDto> autorizacoes = buscarAutorizacoes(tituloEleitoral);
@@ -89,7 +90,7 @@ public class LoginFacade {
         if (perfilSolicitado == ADMIN) {
             boolean temPerfilAdmin = autorizacoes.stream().anyMatch(pu -> pu.perfil() == ADMIN);
             if (!temPerfilAdmin) {
-                throw new ErroAcessoNegado("Usuário não tem permissão para acessar com perfil e unidade informados.");
+                throw new ErroAcessoNegado(MsgValidacao.SEM_PERMISSAO_ACESSO_PERFIL);
             }
         } else {
             boolean autorizado = autorizacoes.stream()
@@ -99,11 +100,11 @@ public class LoginFacade {
                         return perfil == perfilSolicitado && codigoUnidade.equals(codUnidade);
                     });
             if (!autorizado) {
-                throw new ErroAcessoNegado("Usuário não tem permissão para acessar com perfil e unidade informados.");
+                throw new ErroAcessoNegado(MsgValidacao.SEM_PERMISSAO_ACESSO_PERFIL);
             }
         }
 
-        String siglaUnidade = unidadeService.buscarPorId(codUnidade).getSigla();
+        String siglaUnidade = unidadeService.buscarPorCodigo(codUnidade).getSigla();
         log.info("Usuário {} autorizado: {}-{}", tituloEleitoral, perfilSolicitado, siglaUnidade);
 
         return gerenciadorJwt.gerarToken(
@@ -115,7 +116,7 @@ public class LoginFacade {
     private List<PerfilUnidadeDto> buscarAutorizacoes(String tituloEleitoral) {
         Usuario usuario = usuarioFacade.carregarUsuarioParaAutenticacao(tituloEleitoral);
         if (usuario == null) {
-            throw new ErroAutenticacao("Credenciais inválidas");
+            throw new ErroAutenticacao(MsgValidacao.CREDENCIAIS_INVALIDAS);
         }
 
         List<UsuarioPerfil> atribuicoes = usuarioService.buscarPerfis(usuario.getTituloEleitoral());

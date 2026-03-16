@@ -118,7 +118,7 @@ class CDU16IntegrationTest extends BaseIntegrationTest {
 
         mockMvc.perform(
                         post(
-                                "/api/subprocessos/{id}/submeter-mapa-ajustado",
+                                "/api/subprocessos/{codigo}/submeter-mapa-ajustado",
                                 subprocesso.getCodigo())
                                 .with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)

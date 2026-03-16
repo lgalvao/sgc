@@ -100,7 +100,7 @@ class CDU18IntegrationTest extends BaseIntegrationTest {
     @DisplayName("Deve retornar o mapa de competências formatado para visualização")
     @WithMockAdmin
     void deveRetornarMapaParaVisualizacao() throws Exception {
-        mockMvc.perform(get("/api/subprocessos/{id}/mapa-visualizacao", subprocesso.getCodigo()))
+        mockMvc.perform(get("/api/subprocessos/{codigo}/mapa-visualizacao", subprocesso.getCodigo()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.unidade.sigla").value(unidade.getSigla()))
                 .andExpect(jsonPath("$.unidade.nome").value(unidade.getNome()))

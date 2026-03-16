@@ -1,9 +1,9 @@
 <template>
   <LayoutPadrao>
-    <PageHeader title="Parâmetros" />
+    <PageHeader :title="TEXTOS.parametros.TITULO" />
 
     <div v-if="store.loading" class="text-center py-4">
-      <BSpinner label="Carregando..." variant="primary" />
+      <BSpinner :label="TEXTOS.comum.CARREGANDO" variant="primary" />
     </div>
 
     <BAlert v-else-if="store.error" :model-value="true" variant="danger">
@@ -25,10 +25,10 @@
             class="mb-3"
         >
           <template #label>
-            Dias para inativação de processos (DIAS_INATIVACAO_PROCESSO) <span aria-hidden="true" class="text-danger">*</span>
+            {{ TEXTOS.parametros.LABEL_DIAS_INATIVACAO }} <span aria-hidden="true" class="text-danger">*</span>
           </template>
           <template #description>
-            Dias depois da finalização de um processo para que seja considerado inativo.
+            {{ TEXTOS.parametros.DESC_DIAS_INATIVACAO }}
           </template>
           <BFormInput
               id="diasInativacao"
@@ -44,10 +44,10 @@
             class="mb-3"
         >
           <template #label>
-            Dias para indicação de alerta como novo (DIAS_ALERTA_NOVO) <span aria-hidden="true" class="text-danger">*</span>
+            {{ TEXTOS.parametros.LABEL_DIAS_ALERTA_NOVO }} <span aria-hidden="true" class="text-danger">*</span>
           </template>
           <template #description>
-            Dias depois de um alerta ser enviado para que deixe de ser marcado como novo.
+            {{ TEXTOS.parametros.DESC_DIAS_ALERTA_NOVO }}
           </template>
           <BFormInput
               id="diasAlertaNovo"
@@ -62,7 +62,7 @@
           <LoadingButton
               :loading="salvando"
               icon="check-lg"
-              text="Salvar configurações"
+              :text="TEXTOS.parametros.BOTAO_SALVAR"
               type="submit"
               variant="success"
           />
@@ -81,6 +81,7 @@ import AppAlert from '@/components/comum/AppAlert.vue';
 import LoadingButton from '@/components/comum/LoadingButton.vue';
 import {type Parametro, useConfiguracoesStore} from '@/stores/configuracoes';
 import {useNotification} from '@/composables/useNotification';
+import {TEXTOS} from '@/constants/textos';
 
 const store = useConfiguracoesStore();
 const {notify, notificacao, clear} = useNotification();
@@ -123,9 +124,9 @@ async function salvar() {
   const sucesso = await store.salvarConfiguracoes(paramsToSave);
 
   if (sucesso) {
-    notify('Configurações salvas.', 'success');
+    notify(TEXTOS.parametros.SUCESSO_SALVAR, 'success');
   } else {
-    notify('Erro ao salvar configurações.', 'danger');
+    notify(TEXTOS.parametros.ERRO_SALVAR, 'danger');
   }
 
   salvando.value = false;

@@ -19,6 +19,7 @@ import {
     navegarParaAtividadesVisualizacao,
 } from './helpers/helpers-atividades.js';
 import {criarCompetencia, disponibilizarMapa, navegarParaMapa,} from './helpers/helpers-mapas.js';
+import {TEXTOS} from '../frontend/src/constants/textos.js';
 
 
 test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
@@ -59,7 +60,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await page.getByTestId('btn-processo-iniciar').click();
         await page.getByTestId('btn-iniciar-processo-confirmar').click();
 
-        // Validação: Processo iniciado com sucesso
+        // Validação: Processo iniciado
         await verificarPaginaPainel(page);
         await verificarProcessoNaTabela(page, {
             descricao,
@@ -70,9 +71,10 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
 
 
     test('Fase 1.1: ADMIN cria e inicia processo de Mapeamento', async ({
+                                                                            _resetAutomatico,
                                                                             page,
-                                                                            autenticadoComoAdmin
-                                                                        }) => {
+                                                                            _autenticadoComoAdmin
+}) => {
         await passo1_AdminCriaEIniciaProcessoMapeamento(page, descProcMapeamento);
         // Capturar ID do processo para cleanup
         await page.goto('/painel');
@@ -80,7 +82,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
 
     });
 
-    test('Fase 1.2: CHEFE adiciona atividades e conhecimentos', async ({page}) => {
+    test('Fase 1.2: CHEFE adiciona atividades e conhecimentos', async ({_resetAutomatico, page}) => {
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
 
         await acessarSubprocessoChefeDireto(page, descProcMapeamento, UNIDADE_ALVO);
@@ -92,7 +94,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await adicionarConhecimento(page, descAtividade, 'Conhecimento teste');
     });
 
-    test('Fase 1.3: CHEFE disponibiliza cadastro', async ({page}) => {
+    test('Fase 1.3: CHEFE disponibiliza cadastro', async ({_resetAutomatico, page}) => {
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
         await acessarSubprocessoChefeDireto(page, descProcMapeamento, UNIDADE_ALVO);
         await navegarParaAtividades(page);
@@ -101,7 +103,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         // Validação: helper já confirma toast atual e redirecionamento para o painel
     });
 
-    test('Fase 1.3b: GESTOR da SECRETARIA_2 registra aceite', async ({page}) => {
+    test('Fase 1.3b: GESTOR da SECRETARIA_2 registra aceite', async ({_resetAutomatico, page}) => {
         // George harrison (212121) é Gestor da SECRETARIA_2
         await loginComPerfil(page, '212121', 'senha', 'GESTOR - SECRETARIA_2');
         await acessarSubprocessoGestor(page, descProcMapeamento, UNIDADE_ALVO);
@@ -109,14 +111,14 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await aceitarCadastroMapeamento(page, 'Aceite intermediário');
     });
 
-    test('Fase 1.4: ADMIN homologa cadastro', async ({page}) => {
+    test('Fase 1.4: ADMIN homologa cadastro', async ({_resetAutomatico, page}) => {
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
         await acessarSubprocessoAdmin(page, descProcMapeamento, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
         await homologarCadastroMapeamento(page);
     });
 
-    test('Fase 1.5: ADMIN adiciona competências e disponibiliza mapa', async ({page, autenticadoComoAdmin}) => {
+    test('Fase 1.5: ADMIN adiciona competências e disponibiliza mapa', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
 
         await acessarSubprocessoAdmin(page, descProcMapeamento, UNIDADE_ALVO);
         await navegarParaMapa(page);
@@ -125,7 +127,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Fase 1.6: CHEFE valida mapa', async ({page, autenticadoComoAdmin}) => {
+    test('Fase 1.6: CHEFE valida mapa', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
         await acessarSubprocessoChefeDireto(page, descProcMapeamento, UNIDADE_ALVO);
         await navegarParaMapa(page);
@@ -134,7 +136,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Fase 1.6b: GESTOR da SECRETARIA_2 aceita validação do mapa', async ({page}) => {
+    test('Fase 1.6b: GESTOR da SECRETARIA_2 aceita validação do mapa', async ({_resetAutomatico, page}) => {
         await loginComPerfil(page, '212121', 'senha', 'GESTOR - SECRETARIA_2');
         await acessarSubprocessoGestor(page, descProcMapeamento, UNIDADE_ALVO);
         await navegarParaMapa(page);
@@ -143,7 +145,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Fase 1.7: ADMIN homologa e finaliza processo', async ({page}) => {
+    test('Fase 1.7: ADMIN homologa e finaliza processo', async ({_resetAutomatico, page}) => {
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
         await acessarSubprocessoAdmin(page, descProcMapeamento, UNIDADE_ALVO);
         await navegarParaMapa(page);
@@ -158,7 +160,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Fase 2: Iniciar processo de Revisão', async ({page, autenticadoComoAdmin}) => {
+    test('Fase 2: Iniciar processo de Revisão', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
         // O login como Admin já foi disparado pela fixture 'autenticadoComoAdmin'
         // Se houver dúvida se a fixture trocou de usuário em um describe.serial,
         // podemos chamar o helper explicitamente para garantir a navegação para /login.
@@ -188,7 +190,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
 
         const modal = page.getByRole('dialog');
         await expect(modal).toBeVisible();
-        await expect(modal.getByText('Ao iniciar o processo, não será mais possível editá-lo')).toBeVisible();
+        await expect(modal.getByText(TEXTOS.processo.cadastro.INICIAR_CONFIRMACAO)).toBeVisible();
         await page.getByTestId('btn-iniciar-processo-confirmar').click();
 
         // Validação: Redirecionamento e situação do processo iniciado
@@ -219,7 +221,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await expect(timeline.getByText(/Processo iniciado/i).first()).toBeVisible();
     });
 
-    test('Fase 2.1: Verificar alertas do processo de Revisão', async ({page}) => {
+    test('Fase 2.1: Verificar alertas do processo de Revisão', async ({_resetAutomatico, page}) => {
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
         await verificarPaginaPainel(page);
         
@@ -240,7 +242,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         ).toBeVisible();
     });
 
-    test('Fase 3: CHEFE verifica atividades copiadas na Revisão', async ({page}) => {
+    test('Fase 3: CHEFE verifica atividades copiadas na Revisão', async ({_resetAutomatico, page}) => {
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
         await acessarSubprocessoChefeDireto(page, descProcRevisao, UNIDADE_ALVO);
         await navegarParaAtividades(page);

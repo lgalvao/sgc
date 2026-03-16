@@ -18,12 +18,12 @@ public class ComumRepo {
     private EntityManager em;
 
     /**
-     * Busca uma entidade pelo seu ID.
+     * Busca uma entidade pelo seu código.
      */
-    public <T> T buscar(Class<T> classe, Object id) {
-        T entidade = em.find(classe, id);
+    public <T> T buscar(Class<T> classe, Object codigo) {
+        T entidade = em.find(classe, codigo);
         if (entidade == null) {
-            throw new ErroEntidadeNaoEncontrada(classe.getSimpleName(), id);
+            throw new ErroEntidadeNaoEncontrada(classe.getSimpleName(), codigo);
         }
         return entidade;
     }

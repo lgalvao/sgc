@@ -1,5 +1,6 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {navegarParaMapa} from './helpers/helpers-mapas.js';
+import {TEXTOS} from '../frontend/src/constants/textos.js';
 
 /**
  * CDU-18: Visualizar mapa de competências
@@ -15,7 +16,7 @@ import {navegarParaMapa} from './helpers/helpers-mapas.js';
  */
 test.describe('CDU-18: Visualizar mapa de competências', () => {
 
-    test('Cenário 1: ADMIN visualiza mapa via detalhes do processo', async ({page, autenticadoComoAdmin}) => {
+    test('Cenário 1: ADMIN visualiza mapa via detalhes do processo', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
         await test.step('1. Login como ADMIN', async () => {
             // Já autenticado via fixture
         });
@@ -43,7 +44,7 @@ test.describe('CDU-18: Visualizar mapa de competências', () => {
 
         await test.step('5. Verificar visualização do mapa (CDU-18)', async () => {
             // 5.1 Título "Mapa de competências técnicas"
-            await expect(page.getByText('Mapa de competências técnicas')).toBeVisible();
+            await expect(page.getByText(TEXTOS.mapa.TITULO_TECNICO)).toBeVisible();
 
             // 5.2 Identificação da unidade (sigla e nome)
             await expect(page.getByText(/ASSESSORIA_\d+\s*-\s*Assessoria/i)).toBeVisible();
@@ -61,7 +62,7 @@ test.describe('CDU-18: Visualizar mapa de competências', () => {
         });
     });
 
-    test('Cenário 2: CHEFE visualiza mapa da própria unidade', async ({page, autenticadoComoChefeAssessoria12}) => {
+    test('Cenário 2: CHEFE visualiza mapa da própria unidade', async ({_resetAutomatico, page, _autenticadoComoChefeAssessoria12}) => {
         await test.step('1. Login como CHEFE_ASSESSORIA_12', async () => {
             // Já autenticado via fixture
         });
@@ -79,7 +80,7 @@ test.describe('CDU-18: Visualizar mapa de competências', () => {
         });
 
         await test.step('4. Verificar visualização do mapa', async () => {
-            await expect(page.getByText('Mapa de competências técnicas')).toBeVisible();
+            await expect(page.getByText(TEXTOS.mapa.TITULO_TECNICO)).toBeVisible();
             await expect(page.getByText(/ASSESSORIA_12\s*-\s*Assessoria 12/i)).toBeVisible();
             await expect(page.getByText('Competência técnica seed 99')).toBeVisible();
         });

@@ -13,8 +13,8 @@ import java.util.*;
 public interface AlertaUsuarioRepo extends JpaRepository<AlertaUsuario, AlertaUsuario.Chave> {
     @Query("""
              SELECT au FROM AlertaUsuario au
-             WHERE au.id.usuarioTitulo = :usuarioTitulo AND
-                   au.id.alertaCodigo IN :alertaCodigos
+             WHERE au.codigo.usuarioTitulo = :usuarioTitulo AND
+                   au.codigo.alertaCodigo IN :alertaCodigos
             """)
     List<AlertaUsuario> findByUsuarioAndAlertas(
             @Param("usuarioTitulo") String usuarioTitulo,

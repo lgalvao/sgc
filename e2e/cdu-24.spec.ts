@@ -2,6 +2,7 @@ import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcessoCadastroHomologadoFixture} from './fixtures/fixtures-processos.js';
 import {criarCompetencia, navegarParaMapa} from './helpers/helpers-mapas.js';
 import {navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
+import {TEXTOS} from '../frontend/src/constants/textos.js';
 
 /**
  * CDU-24 - Disponibilizar mapas de competências em bloco
@@ -17,7 +18,7 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
     const atividade3 = 'Atividade fixture 3';
     const competencia1 = `Competência mapa ${timestamp}`;
 
-    test('Setup data', async ({request}) => {
+    test('Setup data', async ({_resetAutomatico, request}) => {
         await criarProcessoCadastroHomologadoFixture(request, {
             descricao: descProcesso,
             unidade: UNIDADE_1
@@ -25,7 +26,7 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
         expect(true).toBeTruthy();
     });
 
-    test('ADMIN disponibiliza mapas em bloco', async ({page, autenticadoComoAdmin}) => {
+    test('ADMIN disponibiliza mapas em bloco', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, UNIDADE_1);
         await navegarParaMapa(page);
@@ -36,13 +37,13 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         
         // Validação da UI da ação em bloco
-        const btnDisponibilizar = page.getByRole('button', {name: /Disponibilizar mapas em bloco/i}).first();
+        const btnDisponibilizar = page.getByRole('button', {name: TEXTOS.acaoBloco.disponibilizar.ROTULO}).first();
         await expect(btnDisponibilizar).toBeEnabled();
         await btnDisponibilizar.click();
 
         const modal = page.locator('#modal-acao-bloco');
-        await expect(modal.getByText(/Disponibilização de mapa em bloco/i)).toBeVisible();
-        await expect(modal.getByText(/Selecione abaixo as unidades cujos mapas deverão ser disponibilizados/i)).toBeVisible();
+        await expect(modal.getByText(TEXTOS.acaoBloco.disponibilizar.TITULO)).toBeVisible();
+        await expect(modal.getByText(TEXTOS.acaoBloco.disponibilizar.TEXTO)).toBeVisible();
         await expect(modal.getByLabel(/Data limite/i)).toBeVisible();
 
         const data = new Date();
@@ -52,8 +53,8 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
         const dd = String(data.getDate()).padStart(2, '0');
         await modal.getByLabel(/Data limite/i).fill(`${yyyy}-${mm}-${dd}`);
 
-        await modal.getByRole('button', {name: /^Disponibilizar$/i}).click();
-        await expect(page.getByText(/Mapas de competências disponibilizados em bloco/i).first()).toBeVisible();
+        await modal.getByRole('button', {name: TEXTOS.acaoBloco.disponibilizar.BOTAO}).click();
+        await expect(page.getByText(TEXTOS.sucesso.MAPAS_DISPONIBILIZADOS_EM_BLOCO).first()).toBeVisible();
         await expect(page).toHaveURL(/\/painel/);
     });
 });

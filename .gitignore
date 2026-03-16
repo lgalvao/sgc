@@ -47,6 +47,11 @@ frontend/coverage/
 # Jqwik
 .jqwik-database
 
+# Artefatos gerados pelos scripts de análise de mensagens
+mensagens-extraidas.json
+mensagens-analise.md
+frontend-backend-validation-comparison.md
+
 # Playwright E2E test results
 !test-results/
 playwright-report/

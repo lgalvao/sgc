@@ -1,6 +1,6 @@
 <template>
   <LayoutPadrao>
-    <PageHeader title="Atividades e conhecimentos">
+    <PageHeader :title="TEXTOS.atividades.TITULO">
       <template #default>
         <div class="d-flex align-items-center gap-2">
           <BBadge
@@ -19,7 +19,7 @@
             variant="outline-secondary"
             @click="abrirModalImpacto"
         >
-          <i aria-hidden="true" class="bi bi-arrow-right-circle me-1"/> Impacto no mapa
+          <i aria-hidden="true" class="bi bi-arrow-right-circle me-1"/> {{ TEXTOS.atividades.BOTAO_IMPACTO }}
         </BButton>
         <BButton
             v-if="codSubprocesso && isChefe"
@@ -29,7 +29,7 @@
             variant="outline-secondary"
             @click="abrirModalHistorico"
         >
-          <i aria-hidden="true" class="bi bi-clock-history me-1"/> Histórico
+          <i aria-hidden="true" class="bi bi-clock-history me-1"/> {{ TEXTOS.atividades.BOTAO_HISTORICO }}
         </BButton>
         <BButton
             v-if="codSubprocesso && isChefe"
@@ -39,7 +39,7 @@
             variant="outline-secondary"
             @click="mostrarModalImportar = true"
         >
-          <i aria-hidden="true" class="bi bi-upload me-1"/> Importar
+          <i aria-hidden="true" class="bi bi-upload me-1"/> {{ TEXTOS.atividades.BOTAO_IMPORTAR }}
         </BButton>
 
         <LoadingButton
@@ -48,8 +48,8 @@
             :loading="loadingValidacao"
             data-testid="btn-cad-atividades-disponibilizar"
             icon="check-lg"
-            loading-text="Validando..."
-            text="Disponibilizar"
+            :loading-text="TEXTOS.atividades.BOTAO_DISPONIBILIZANDO"
+            :text="TEXTOS.atividades.BOTAO_DISPONIBILIZAR"
             variant="success"
             @click="disponibilizarCadastro"
         />
@@ -77,10 +77,10 @@
 
     <EmptyState
         v-if="atividades?.length === 0"
-        :description="`Não há atividades cadastradas. Utilize o campo acima para adicionar uma nova atividade ou importe de outro processo.`"
+        :description="TEXTOS.atividades.EMPTY_DESCRIPTION"
         data-testid="cad-atividades-empty-state"
         icon="bi-list-check"
-        title="Lista de atividades"
+        :title="TEXTOS.atividades.EMPTY_TITLE"
     >
     </EmptyState>
 
@@ -131,8 +131,8 @@
 
     <ModalConfirmacao
         v-model="mostrarModalConfirmacaoRemocao"
-        :mensagem="dadosRemocao?.tipo === 'atividade' ? 'Confirma a remoção desta atividade e todos os conhecimentos associados?' : 'Confirma a remoção deste conhecimento?'"
-        :titulo="dadosRemocao?.tipo === 'atividade' ? 'Remover atividade' : 'Remover conhecimento'"
+        :mensagem="dadosRemocao?.tipo === 'atividade' ? TEXTOS.atividades.MODAL_REMOVER_ATIVIDADE_TEXTO : TEXTOS.atividades.MODAL_REMOVER_CONHECIMENTO_TEXTO"
+        :titulo="dadosRemocao?.tipo === 'atividade' ? TEXTOS.atividades.MODAL_REMOVER_ATIVIDADE_TITULO : TEXTOS.atividades.MODAL_REMOVER_CONHECIMENTO_TITULO"
         variant="danger"
         @confirmar="confirmarRemocao"
     />
@@ -165,7 +165,7 @@ import {useToastStore} from "@/stores/toast";
 import {usePerfil} from "@/composables/usePerfil";
 import {useAcesso} from "@/composables/useAcesso";
 import {
-  type AnaliseCadastro,
+  type Analise,
   type Atividade,
   type Conhecimento,
   type CriarConhecimentoRequest,
@@ -179,6 +179,7 @@ import {formatSituacaoSubprocesso} from "@/utils/formatters";
 import * as atividadeService from "@/services/atividadeService";
 import {listarAnalisesCadastro} from "@/services/analiseService";
 import {useErrorHandler} from "@/composables/useErrorHandler";
+import {TEXTOS} from "@/constants/textos";
 
 type DadosRemocao = { tipo: "atividade" | "conhecimento"; index: number; conhecimentoCodigo?: number } | null;
 
@@ -219,7 +220,7 @@ const habilitarDisponibilizar = computed(() => {
 });
 const botaoDisponibilizarDesabilitado = computed(() => !podeDisponibilizarCadastro.value || !habilitarDisponibilizar.value);
 
-const analisesCadastro = ref<AnaliseCadastro[]>([]);
+const analisesCadastro = ref<Analise[]>([]);
 
 const {withErrorHandling, lastError} = useErrorHandler();
 
@@ -307,7 +308,7 @@ async function adicionarAtividade(): Promise<boolean> {
       }
       return false;
     } catch {
-      erroNovaAtividade.value = lastError.value?.message || "Não foi possível adicionar atividade.";
+      erroNovaAtividade.value = lastError.value?.message || TEXTOS.atividades.ERRO_ADICIONAR;
       return false;
     }
   }
@@ -341,7 +342,7 @@ async function confirmarRemocao() {
     dadosRemocao.value = null;
   } catch (e: any) {
     const err = lastError.value?.message || e.message;
-    notify(err || "Não foi possível remover o item.", 'danger');
+    notify(err || TEXTOS.atividades.ERRO_REMOVER, 'danger');
     mostrarModalConfirmacaoRemocao.value = false;
   }
 }
@@ -360,7 +361,7 @@ async function salvarEdicaoAtividade(codigo: number, descricao: string) {
           processarRespostaLocal(response);
         });
       } catch {
-        notify("Falha ao salvar edição da atividade.", "danger");
+        notify(TEXTOS.atividades.ERRO_SALVAR_ATIVIDADE, "danger");
       }
     }
   }
@@ -379,7 +380,7 @@ async function adicionarConhecimento(idx: number, descricao: string) {
         processarRespostaLocal(response);
       });
     } catch {
-      notify("Falha ao adicionar conhecimento.", "danger");
+      notify(TEXTOS.atividades.ERRO_ADICIONAR_CONHECIMENTO, "danger");
     }
   }
 }
@@ -408,7 +409,7 @@ async function salvarEdicaoConhecimento(atividadeCodigo: number, conhecimentoCod
         processarRespostaLocal(response);
       });
     } catch {
-      notify("Falha ao atualizar conhecimento.", "danger");
+      notify(TEXTOS.atividades.ERRO_ATUALIZAR_CONHECIMENTO, "danger");
     }
   }
 }
@@ -428,7 +429,7 @@ async function handleImportAtividades() {
       }
     });
   }
-  notify("As atividades foram importadas para o seu mapa.", 'success');
+  notify(TEXTOS.atividades.SUCESSO_IMPORTACAO, 'success');
 }
 
 function obterErroParaAtividade(atividadeCodigo: number): string | undefined {
@@ -459,7 +460,7 @@ async function disponibilizarCadastro() {
       : SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO;
 
   if (subprocesso.value?.situacao !== situacaoEsperada) {
-    notify(`Ação permitida apenas na situação: "${situacaoEsperada}".`, 'danger');
+    notify(TEXTOS.comum.ACAO_NAO_PERMITIDA_SITUACAO(formatSituacaoSubprocesso(situacaoEsperada)), 'danger');
     return;
   }
 
@@ -503,7 +504,10 @@ async function confirmarDisponibilizacao() {
 
   mostrarModalConfirmacao.value = false;
   if (sucesso) {
-    toastStore.setPending("Cadastro disponibilizado.");
+    const msg = isRevisao.value
+        ? TEXTOS.sucesso.REVISAO_CADASTRO_ATIVIDADES_DISPONIBILIZADA
+        : TEXTOS.sucesso.CADASTRO_ATIVIDADES_DISPONIBILIZADO;
+    toastStore.setPending(msg);
     await router.push("/painel");
   }
 }

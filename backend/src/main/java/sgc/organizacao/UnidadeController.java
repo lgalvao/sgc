@@ -12,8 +12,8 @@ import org.springframework.web.util.*;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
-import sgc.processo.*;
 import sgc.processo.model.*;
+import sgc.processo.service.ProcessoService;
 
 import java.util.*;
 
@@ -29,7 +29,7 @@ public class UnidadeController {
     private final UnidadeHierarquiaService hierarquiaService;
     private final ResponsavelUnidadeService responsavelService;
     private final UsuarioService usuarioService;
-    private final ProcessoFacade processoFacade;
+    private final ProcessoService processoService;
 
     @PostMapping("/{codUnidade}/atribuicoes-temporarias")
     @PreAuthorize("hasRole('ADMIN')")
@@ -62,7 +62,7 @@ public class UnidadeController {
         TipoProcesso tipo = TipoProcesso.valueOf(tipoProcesso);
         boolean requerMapaVigente = tipo == REVISAO || tipo == DIAGNOSTICO;
 
-        Set<Long> bloqueadas = processoFacade.buscarIdsUnidadesEmProcessosAtivos(codProcesso);
+        Set<Long> bloqueadas = processoService.buscarIdsUnidadesComProcessosAtivos(codProcesso);
         List<UnidadeDto> arvore = hierarquiaService.buscarArvoreComElegibilidade(requerMapaVigente, bloqueadas);
 
         return ResponseEntity.ok(arvore);
@@ -93,7 +93,7 @@ public class UnidadeController {
     @GetMapping("/{codigo}")
     @JsonView(OrganizacaoViews.Publica.class)
     public ResponseEntity<UnidadeDto> buscarUnidadePorCodigo(@PathVariable Long codigo) {
-        Unidade unidade = unidadeService.buscarPorId(codigo);
+        Unidade unidade = unidadeService.buscarPorCodigo(codigo);
         return ResponseEntity.ok(UnidadeDto.fromEntity(unidade));
     }
 

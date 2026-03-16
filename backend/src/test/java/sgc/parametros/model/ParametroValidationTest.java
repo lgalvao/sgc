@@ -2,6 +2,7 @@ package sgc.parametros.model;
 
 import jakarta.validation.*;
 import org.junit.jupiter.api.*;
+import sgc.comum.MsgValidacao;
 
 import java.util.*;
 
@@ -41,7 +42,7 @@ class ParametroValidationTest {
         Set<ConstraintViolation<Parametro>> violations = validator.validate(p);
         assertThat(violations).isNotEmpty();
         assertThat(violations).hasSize(1);
-        assertThat(violations.iterator().next().getMessage()).isEqualTo("A chave não pode estar vazia");
+        assertThat(violations.iterator().next().getMessage()).isEqualTo(MsgValidacao.CHAVE_OBRIGATORIA);
     }
 
     @Test
@@ -51,7 +52,7 @@ class ParametroValidationTest {
         Set<ConstraintViolation<Parametro>> violations = validator.validate(p);
         assertThat(violations).isNotEmpty();
         assertThat(violations).hasSize(1);
-        assertThat(violations.iterator().next().getMessage()).isEqualTo("O valor não pode estar vazio");
+        assertThat(violations.iterator().next().getMessage()).isEqualTo(MsgValidacao.VALOR_OBRIGATORIO);
     }
 
     @Test
@@ -62,6 +63,6 @@ class ParametroValidationTest {
         Set<ConstraintViolation<Parametro>> violations = validator.validate(p);
         assertThat(violations).isNotEmpty();
         assertThat(violations).hasSize(1);
-        assertThat(violations.iterator().next().getMessage()).isEqualTo("A chave deve ter no máximo 50 caracteres");
+        assertThat(violations.iterator().next().getMessage()).isEqualTo(MsgValidacao.CHAVE_MAX);
     }
 }

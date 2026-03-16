@@ -17,11 +17,11 @@ O teste E2E (cdu-33.spec.ts) cobre:
 - **Falta validação de alertas internos**: O requisito especifica criação de alertas (seção 9.1 e 9.2) com descrições específicas. O teste não valida a existência ou conteúdo dos alertas.
 - **Falta validação de campo Observação na movimentação**: O requisito especifica que a movimentação deve incluir campo `Observação: [JUSTIFICATIVA]` (linha 24). O teste valida apenas a descrição.
 - **Falta validação de dados completos da movimentação**: Não há validação de Data/hora, Unidade origem (ADMIN), Unidade destino [SIGLA_UNIDADE].
-- **Falta mensagem de sucesso**: O requisito especifica "O sistema exibe mensagem de sucesso 'Revisão reaberta com sucesso'" (linha 72). O teste não valida essa mensagem.
+- **Falta mensagem de sucesso**: O requisito especifica "O sistema exibe mensagem de sucesso 'Revisão reaberta'" (linha 72). O teste não valida essa mensagem.
 - **Falta teste de cancelamento do modal**: O teste não testa o cenário de usuário abrindo o modal e cancelando, diferente do CDU-32.
 
 ## Alterações necessárias no teste E2E
-- Adicionar validação de mensagem de sucesso "Revisão reaberta com sucesso"
+- Adicionar validação de mensagem de sucesso "Revisão reaberta"
 - Adicionar validação de envio de e-mails (tanto para unidade solicitante quanto para unidades superiores)
 - Adicionar validação de alertas internos criados (descrições conforme requisito)
 - Adicionar validação de campo "Observação" da movimentação com a justificativa fornecida

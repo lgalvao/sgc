@@ -2,6 +2,7 @@ package sgc.subprocesso.dto;
 
 import jakarta.validation.constraints.*;
 import lombok.*;
+import sgc.comum.MsgValidacao;
 
 import java.util.*;
 
@@ -10,7 +11,7 @@ import java.util.*;
  */
 @Builder
 public record ImportarAtividadesRequest(
-        @NotNull(message = "O código do subprocesso de origem é obrigatório")
+        @NotNull(message = MsgValidacao.CODIGO_SUBPROCESSO_ORIGEM_OBRIGATORIO)
         Long codSubprocessoOrigem,
         List<Long> codigosAtividades) {
 }

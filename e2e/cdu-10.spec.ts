@@ -13,6 +13,7 @@ import {
     fecharHistoricoAnalise
 } from './helpers/helpers-analise.js';
 import {limparNotificacoes, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
+import {TEXTOS} from '../frontend/src/constants/textos.js';
 
 async function verificarPaginaSubprocesso(page: Page, unidade: string) {
     await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${unidade}(?:/)?$`));
@@ -24,7 +25,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
     const descProcessoRevisao = `Rev 10 ${timestamp}`;
     let processoCodigo: number;
 
-    test('1. Setup: Preparar processo de revisão e atividades iniciais', async ({request, page}) => {
+    test('1. Setup: Preparar processo de revisão e atividades iniciais', async ({_resetAutomatico, request, page}) => {
         // Criar processo mapeamento finalizado (gera mapa vigente)
         await criarProcessoFinalizadoFixture(request, {
             unidade: UNIDADE_ALVO,
@@ -51,7 +52,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Revisão em andamento/i);
     });
 
-    test('2. Cenário 1: Validação - Atividade sem conhecimento', async ({page}) => {
+    test('2. Cenário 1: Validação - Atividade sem conhecimento', async ({_resetAutomatico, page}) => {
         await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
         await page.goto(`/processo/${processoCodigo}/${UNIDADE_ALVO}/cadastro`);
 
@@ -66,29 +67,29 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await page.getByTestId('btn-disponibilizar-revisao-cancelar').click();
     });
 
-    test('3. Cenário 2: Caminho feliz - Disponibilizar revisão', async ({page}) => {
+    test('3. Cenário 2: Caminho feliz - Disponibilizar revisão', async ({_resetAutomatico, page}) => {
         await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
         await page.goto(`/processo/${processoCodigo}/${UNIDADE_ALVO}/cadastro`);
         await limparNotificacoes(page);
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
         const modalConfirmacao = page.getByRole('dialog');
-        await expect(modalConfirmacao.getByText('Disponibilização da revisão do cadastro')).toBeVisible();
-        await expect(modalConfirmacao.getByText(/Confirma a finalização da revisão e a disponibilização do cadastro/i)).toBeVisible();
+        await expect(modalConfirmacao.getByText(TEXTOS.atividades.MODAL_DISPONIBILIZAR_REVISAO_TITULO)).toBeVisible();
+        await expect(modalConfirmacao.getByText(TEXTOS.atividades.MODAL_DISPONIBILIZAR_REVISAO_TEXTO)).toBeVisible();
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
 
-        await expect(page.getByText(/Cadastro disponibilizado\./i).first()).toBeVisible();
+        await expect(page.getByText(/disponibilizada?|Disponibilizado/i).first()).toBeVisible();
         await verificarPaginaPainel(page);
 
         // Verificar alerta para o gestor superior
         await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
-        await expect(page.getByTestId('tbl-alertas')).toContainText(`Revisão do cadastro da unidade ${UNIDADE_ALVO} disponibilizada para análise`);
+        await expect(page.getByTestId('tbl-alertas')).toContainText(TEXTOS.alerta.SUCESSO_REVISAO_DISPONIBILIZADA(UNIDADE_ALVO));
 
         await page.goto(`/processo/${processoCodigo}/${UNIDADE_ALVO}`);
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Revisão d[oe] cadastro disponibilizada/i);
-        await expect(page.getByTestId('tbl-movimentacoes')).toContainText(/Disponibilização da revisão do cadastro de atividades/i);
+        await expect(page.getByTestId('tbl-movimentacoes')).toContainText(TEXTOS.movimentacao.REVISAO_CADASTRO_DISPONIBILIZADA);
     });
 
-    test('4. Cenário 3: Devolução e Histórico', async ({page}) => {
+    test('4. Cenário 3: Devolução e Histórico', async ({_resetAutomatico, page}) => {
         await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
         await page.goto(`/processo/${processoCodigo}/${UNIDADE_ALVO}/vis-cadastro`);
         await page.getByTestId('btn-acao-devolver').click();
@@ -99,12 +100,12 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
 
         // Verificar movimentação de devolução
         await page.goto(`/processo/${processoCodigo}/${UNIDADE_ALVO}`);
-        await expect(page.getByTestId('tbl-movimentacoes')).toContainText(/Devolução da revisão do cadastro para ajustes/i);
+        await expect(page.getByTestId('tbl-movimentacoes')).toContainText(TEXTOS.movimentacao.REVISAO_CADASTRO_DEVOLVIDA);
 
         // Verificar alerta para o chefe da unidade
         await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
         await limparNotificacoes(page);
-        await expect(page.getByTestId('tbl-alertas').locator('tr', { hasText: `Revisão do cadastro da unidade ${UNIDADE_ALVO} devolvida para ajustes` })).toBeVisible();
+        await expect(page.getByTestId('tbl-alertas').locator('tr', { hasText: TEXTOS.alerta.REVISAO_DEVOLVIDA(UNIDADE_ALVO) })).toBeVisible();
 
         await page.goto(`/processo/${processoCodigo}/${UNIDADE_ALVO}/cadastro`);
         const modal = await abrirHistoricoAnalise(page);
@@ -116,7 +117,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await verificarPaginaPainel(page);
     });
 
-    test('5. Cenário 4: Histórico retém as análises após nova disponibilização', async ({page}) => {
+    test('5. Cenário 4: Histórico retém as análises após nova disponibilização', async ({_resetAutomatico, page}) => {
         await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
         await page.goto(`/processo/${processoCodigo}/${UNIDADE_ALVO}/vis-cadastro`);
         await page.getByTestId('btn-acao-devolver').click();
@@ -126,7 +127,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
 
         // Verificar movimentação de devolução (2ª vez)
         await page.goto(`/processo/${processoCodigo}/${UNIDADE_ALVO}`);
-        await expect(page.getByTestId('tbl-movimentacoes').locator('tr', { hasText: /Devolução da revisão do cadastro para ajustes/i }).first()).toBeVisible();
+        await expect(page.getByTestId('tbl-movimentacoes').locator('tr', { hasText: TEXTOS.movimentacao.REVISAO_CADASTRO_DEVOLVIDA }).first()).toBeVisible();
 
         await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
         await page.goto(`/processo/${processoCodigo}/${UNIDADE_ALVO}/cadastro`);
@@ -144,7 +145,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         // Verificar alerta da 3ª devolução
         await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
         await limparNotificacoes(page);
-        await expect(page.getByTestId('tbl-alertas').locator('tr', { hasText: `Revisão do cadastro da unidade ${UNIDADE_ALVO} devolvida para ajustes` }).first()).toBeVisible();
+        await expect(page.getByTestId('tbl-alertas').locator('tr', { hasText: TEXTOS.alerta.REVISAO_DEVOLVIDA(UNIDADE_ALVO) }).first()).toBeVisible();
 
         // Chefe verifica que histórico tem TODAS as devoluções (a última primeiro)
         await page.goto(`/processo/${processoCodigo}/${UNIDADE_ALVO}/cadastro`);
@@ -156,7 +157,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await fecharHistoricoAnalise(page);
     });
 
-    test('6. Cenário 5: Cancelar disponibilização', async ({page}) => {
+    test('6. Cenário 5: Cancelar disponibilização', async ({_resetAutomatico, page}) => {
         await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
         await page.goto(`/processo/${processoCodigo}/${UNIDADE_ALVO}/cadastro`);
         await limparNotificacoes(page);
@@ -166,5 +167,4 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos'})).toBeVisible();
     });
 });
-
 

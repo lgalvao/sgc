@@ -22,7 +22,7 @@ import java.time.*;
 @SuperBuilder
 public class AlertaUsuario implements Serializable {
     @EmbeddedId
-    private Chave id;
+    private Chave codigo;
 
     @MapsId("alertaCodigo")
     @ManyToOne

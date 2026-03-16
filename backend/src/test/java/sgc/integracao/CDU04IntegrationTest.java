@@ -90,21 +90,21 @@ class CDU04IntegrationTest extends BaseIntegrationTest {
                 .andExpect(status().isCreated())
                 .andReturn();
 
-        Long processoId = objectMapper.readTree(result.getResponse().getContentAsString()).get("codigo").asLong();
+        Long codProcesso = objectMapper.readTree(result.getResponse().getContentAsString()).get("codigo").asLong();
 
         IniciarProcessoRequest iniciarReq = new IniciarProcessoRequest(TipoProcesso.MAPEAMENTO,
                 List.of(unidadeLivre.getCodigo()));
 
-        mockMvc.perform(post("/api/processos/{id}/iniciar", processoId)
+        mockMvc.perform(post("/api/processos/{codigo}/iniciar", codProcesso)
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(iniciarReq)))
                 .andExpect(status().isOk());
 
-        Processo processo = processoRepo.findById(processoId).orElseThrow();
+        Processo processo = processoRepo.findById(codProcesso).orElseThrow();
         assertThat(processo.getSituacao()).isEqualTo(SituacaoProcesso.EM_ANDAMENTO);
 
-        List<Subprocesso> subprocessos = subprocessoRepo.findByProcessoCodigo(processoId);
+        List<Subprocesso> subprocessos = subprocessoRepo.findByProcessoCodigoComUnidade(codProcesso);
         assertThat(subprocessos).hasSize(1);
 
         // Verificar subprocesso da unidade livre

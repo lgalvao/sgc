@@ -1,6 +1,6 @@
 <template>
   <LayoutPadrao>
-    <PageHeader title="Mapa de competências técnicas">
+    <PageHeader :title="TEXTOS.mapa.TITULO_TECNICO">
       <template #default>
         <div class="fs-5">
           {{ unidade?.sigla }} - {{ unidade?.nome }}
@@ -15,7 +15,7 @@
             :loading="loadingImpacto"
             data-testid="cad-mapa__btn-impactos-mapa"
             icon="arrow-right-circle"
-            text="Impacto no mapa"
+            :text="TEXTOS.mapa.BOTAO_IMPACTO"
             variant="outline-secondary"
             @click="abrirModalImpacto"
         />
@@ -26,7 +26,7 @@
             variant="outline-success"
             @click="abrirModalDisponibilizar"
         >
-          Disponibilizar
+          {{ TEXTOS.mapa.BOTAO_DISPONIBILIZAR }}
         </BButton>
       </template>
     </PageHeader>
@@ -44,9 +44,9 @@
     <div v-if="unidade">
       <div v-if="competencias.length === 0" class="mb-4 mt-3">
         <EmptyState
-            description="Nenhuma competência cadastrada para esta unidade."
+            :description="TEXTOS.mapa.EMPTY_DESCRIPTION"
             icon="bi-journal-plus"
-            title="Mapa de competências"
+            :title="TEXTOS.mapa.EMPTY_TITLE"
         >
           <BButton
               v-if="podeEditarMapa"
@@ -54,7 +54,7 @@
               variant="primary"
               @click="abrirModalCriarLimpo"
           >
-            <i aria-hidden="true" class="bi bi-plus-lg me-2"/> Criar primeira competência
+            <i aria-hidden="true" class="bi bi-plus-lg me-2"/> {{ TEXTOS.mapa.BOTAO_CRIAR_PRIMEIRA }}
           </BButton>
         </EmptyState>
       </div>
@@ -66,7 +66,7 @@
             variant="outline-primary"
             @click="abrirModalCriarLimpo"
         >
-          <i aria-hidden="true" class="bi bi-plus-lg"/> Criar competência
+          <i aria-hidden="true" class="bi bi-plus-lg"/> {{ TEXTOS.mapa.BOTAO_CRIAR }}
         </BButton>
         <CompetenciaCard
             v-for="comp in competencias"
@@ -76,12 +76,12 @@
             :pode-editar="podeEditarMapa"
             @editar="iniciarEdicaoCompetencia"
             @excluir="excluirCompetencia"
-            @remover-atividade="(competenciaId, atividadeId) => removerAtividadeAssociada(competenciaId, atividadeId)"
+            @remover-atividade="(competenciaId, codAtividade) => removerAtividadeAssociada(competenciaId, codAtividade)"
         />
       </div>
     </div>
     <div v-else>
-      <p>Unidade não encontrada.</p>
+      <p>{{ TEXTOS.mapa.UNIDADE_NAO_ENCONTRADA }}</p>
     </div>
 
     <CriarCompetenciaModal
@@ -105,10 +105,10 @@
     <ModalConfirmacao
         v-model="mostrarModalExcluirCompetencia"
         :loading="loadingExclusao"
-        :mensagem="`Confirma a exclusão da competência '${competenciaParaExcluir?.descricao}'?`"
+        :mensagem="TEXTOS.mapa.EXCLUSAO_CONFIRMACAO(competenciaParaExcluir?.descricao || '')"
         data-testid="mdl-excluir-competencia"
         test-id-confirmar="btn-confirmar-exclusao-competencia"
-        titulo="Exclusão de competência"
+        :titulo="TEXTOS.mapa.EXCLUSAO_TITULO"
         variant="danger"
         @confirmar="confirmarExclusaoCompetencia"
     />
@@ -138,9 +138,11 @@ import {useAcesso} from "@/composables/useAcesso";
 import {useFormErrors} from '@/composables/useFormErrors';
 import {useMapasStore} from "@/stores/mapas";
 import {useSubprocessosStore} from "@/stores/subprocessos";
+import {useToastStore} from "@/stores/toast";
 import type {Atividade, Competencia, SalvarCompetenciaRequest, Unidade} from "@/types/tipos";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import {formatSituacaoSubprocesso} from "@/utils/formatters";
+import {TEXTOS} from "@/constants/textos";
 
 // Lazy loading de componentes pesados ou modais
 const ImpactoMapaModal = defineAsyncComponent(() => import("@/components/mapa/ImpactoMapaModal.vue"));
@@ -152,6 +154,7 @@ const router = useRouter();
 const mapasStore = useMapasStore();
 const {mapaCompleto, impactoMapa: impactos} = storeToRefs(mapasStore);
 const subprocessosStore = useSubprocessosStore();
+const toastStore = useToastStore();
 const subprocesso = computed(() => subprocessosStore.subprocessoDetalhe);
 usePerfil();
 
@@ -262,6 +265,7 @@ function iniciarEdicaoCompetencia(competencia: Competencia) {
 }
 
 async function adicionarCompetenciaEFecharModal(dados: { descricao: string; atividadesSelecionadas: number[] }) {
+  if (!codSubprocesso.value) return;
   const request: SalvarCompetenciaRequest = {
     descricao: dados.descricao,
     atividadesIds: dados.atividadesSelecionadas,
@@ -269,12 +273,12 @@ async function adicionarCompetenciaEFecharModal(dados: { descricao: string; ativ
 
   try {
     if (competenciaSendoEditada.value) {
-      await mapasStore.atualizarCompetencia(codSubprocesso.value as number, competenciaSendoEditada.value.codigo, request);
+      await mapasStore.atualizarCompetencia(codSubprocesso.value, competenciaSendoEditada.value.codigo, request);
     } else {
-      await mapasStore.adicionarCompetencia(codSubprocesso.value as number, request);
+      await mapasStore.adicionarCompetencia(codSubprocesso.value, request);
     }
 
-    const data = await subprocessosStore.buscarContextoEdicao(codSubprocesso.value as number);
+    const data = await subprocessosStore.buscarContextoEdicao(codSubprocesso.value);
     if (data && data.atividadesDisponiveis) {
       atividades.value = data.atividadesDisponiveis;
     }
@@ -294,14 +298,14 @@ function excluirCompetencia(codigo: number) {
 }
 
 async function confirmarExclusaoCompetencia() {
-  if (competenciaParaExcluir.value) {
+  if (competenciaParaExcluir.value && codSubprocesso.value) {
     loadingExclusao.value = true;
     try {
       await mapasStore.removerCompetencia(
-          codSubprocesso.value as number,
+          codSubprocesso.value,
           competenciaParaExcluir.value.codigo,
       );
-      const data = await subprocessosStore.buscarContextoEdicao(codSubprocesso.value as number);
+      const data = await subprocessosStore.buscarContextoEdicao(codSubprocesso.value);
       if (data && data.atividadesDisponiveis) {
         atividades.value = data.atividadesDisponiveis;
       }
@@ -319,12 +323,13 @@ function fecharModalExcluirCompetencia() {
   competenciaParaExcluir.value = null;
 }
 
-function removerAtividadeAssociada(competenciaId: number, atividadeId: number) {
+function removerAtividadeAssociada(competenciaId: number, codAtividade: number) {
+  if (!codSubprocesso.value) return;
   const competencia = competencias.value.find(
       (comp) => comp.codigo === competenciaId,
   );
   if (competencia) {
-    const atividadesIds = (competencia.atividades || []).map((a) => a.codigo).filter((id) => id !== atividadeId);
+    const atividadesIds = (competencia.atividades || []).map((a) => a.codigo).filter((id) => id !== codAtividade);
 
     const request: SalvarCompetenciaRequest = {
       descricao: competencia.descricao,
@@ -332,7 +337,7 @@ function removerAtividadeAssociada(competenciaId: number, atividadeId: number) {
     };
 
     mapasStore.atualizarCompetencia(
-        codSubprocesso.value as number,
+        codSubprocesso.value,
         competencia.codigo,
         request,
     );
@@ -345,8 +350,9 @@ async function disponibilizarMapa(payload: { dataLimite: string; observacoes: st
   loadingDisponibilizacao.value = true;
 
   try {
-    await mapasStore.disponibilizarMapa(codSubprocesso.value, payload);
+    await mapasStore.disponibilizarMapa(codSubprocesso.value as number, payload);
     fecharModalDisponibilizar();
+    toastStore.setPending(TEXTOS.sucesso.MAPA_DISPONIBILIZADO);
     await router.push({name: "Painel"});
   } catch {
     handleErrors(mapasStore);

@@ -57,11 +57,11 @@ public class MapaSalvamentoService {
         List<Competencia> competenciasAtuais = new ArrayList<>(competenciaRepo.findByMapa_Codigo(codMapa));
         List<Atividade> atividadesAtuais = new ArrayList<>(atividadeRepo.findByMapa_Codigo(codMapa));
 
-        Set<Long> atividadesDoMapaIds = atividadesAtuais.stream()
+        Set<Long> codigosAtividadesDoMapa = atividadesAtuais.stream()
                 .map(Atividade::getCodigo)
                 .collect(Collectors.toSet());
 
-        Set<Long> codigosNovos = request.competencias().stream()
+        Set<Long> codigosNovasCompetencias = request.competencias().stream()
                 .map(SalvarMapaRequest.CompetenciaRequest::codigo)
                 .collect(Collectors.toSet());
 
@@ -69,14 +69,14 @@ public class MapaSalvamentoService {
                 codMapa,
                 competenciasAtuais,
                 atividadesAtuais,
-                atividadesDoMapaIds,
-                codigosNovos,
+                codigosAtividadesDoMapa,
+                codigosNovasCompetencias,
                 request);
     }
 
     private void removerCompetenciasObsoletas(ContextoSalvamento contexto) {
         List<Competencia> paraRemover = contexto.competenciasAtuais.stream()
-                .filter(c -> !contexto.codigosNovos.contains(c.getCodigo()))
+                .filter(c -> !contexto.codigosNovasCompetencias.contains(c.getCodigo()))
                 .toList();
 
         if (!paraRemover.isEmpty()) {
@@ -139,8 +139,8 @@ public class MapaSalvamentoService {
             List<Competencia> competenciasSalvas) {
 
         Map<Long, Set<Competencia>> mapAtividadeCompetencias = new HashMap<>();
-        for (Long ativId : contexto.atividadesDoMapaIds) {
-            mapAtividadeCompetencias.put(ativId, new HashSet<>());
+        for (Long codAtividade : contexto.codigosAtividadesDoMapa) {
+            mapAtividadeCompetencias.put(codAtividade, new HashSet<>());
         }
 
         Iterator<Competencia> itSalvas = competenciasSalvas.iterator();
@@ -148,19 +148,19 @@ public class MapaSalvamentoService {
             if (!itSalvas.hasNext()) break;
             Competencia competencia = itSalvas.next();
 
-            for (Long ativId : dto.atividadesCodigos()) {
-                validarAtividadePertenceAoMapa(ativId, contexto.atividadesDoMapaIds, contexto.codMapa);
-                mapAtividadeCompetencias.get(ativId).add(competencia);
+            for (Long codAtividade : dto.atividadesCodigos()) {
+                validarAtividadePertenceAoMapa(codAtividade, contexto.codigosAtividadesDoMapa, contexto.codMapa);
+                mapAtividadeCompetencias.get(codAtividade).add(competencia);
             }
         }
 
         return mapAtividadeCompetencias;
     }
 
-    private void validarAtividadePertenceAoMapa(Long ativId, Set<Long> atividadesDoMapaIds, @Nullable Long codMapa) {
-        if (!atividadesDoMapaIds.contains(ativId)) {
+    private void validarAtividadePertenceAoMapa(Long codAtividade, Set<Long> codigosAtividadesDoMapa, @Nullable Long codMapa) {
+        if (!codigosAtividadesDoMapa.contains(codAtividade)) {
             throw new ErroValidacao(
-                    "Atividade %d não pertence ao mapa %s".formatted(ativId, Objects.toString(codMapa)));
+                    "Atividade %d não pertence ao mapa %s".formatted(codAtividade, Objects.toString(codMapa)));
         }
     }
 
@@ -192,8 +192,9 @@ public class MapaSalvamentoService {
             Long codMapa,
             List<Competencia> competenciasAtuais,
             List<Atividade> atividadesAtuais,
-            Set<Long> atividadesDoMapaIds,
-            Set<Long> codigosNovos,
+            Set<Long> codigosAtividadesDoMapa,
+            Set<Long> codigosNovasCompetencias,
             SalvarMapaRequest request) {
     }
+
 }

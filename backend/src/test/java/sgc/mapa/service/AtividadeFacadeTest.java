@@ -50,7 +50,7 @@ class AtividadeFacadeTest {
 
             when(mapaManutencaoService.atividadeCodigo(atividadeCodigo)).thenReturn(expected);
 
-            Atividade result = atividadeFacade.obterAtividadePorId(atividadeCodigo);
+            Atividade result = atividadeFacade.obterAtividadePorCodigo(atividadeCodigo);
 
             assertNotNull(result);
             assertEquals(expected, result);
@@ -250,7 +250,7 @@ class AtividadeFacadeTest {
             ResultadoOperacaoConhecimento result = atividadeFacade.criarConhecimento(atividadeCodigo, request);
 
             assertNotNull(result);
-            assertEquals(500L, result.novoConhecimentoId());
+            assertEquals(500L, result.novoConhecimentoCodigo());
         }
     }
 

@@ -4,6 +4,7 @@ import lombok.*;
 import org.jspecify.annotations.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
+import sgc.comum.MsgValidacao;
 import sgc.comum.erros.*;
 import sgc.mapa.model.*;
 import sgc.mapa.service.*;
@@ -22,12 +23,12 @@ public class SubprocessoValidacaoService {
 
     public void validarExistenciaAtividades(Subprocesso subprocesso) {
         if (subprocesso.getMapa() == null || subprocesso.getMapa().getCodigo() == null) {
-            throw new ErroValidacao("Subprocesso não possui mapa associado.");
+            throw new ErroValidacao(MsgValidacao.SUBPROCESSO_SEM_MAPA);
         }
 
         List<Atividade> atividades = mapaManutencaoService.atividadesMapaCodigoComConhecimentos(subprocesso.getMapa().getCodigo());
         if (atividades.isEmpty()) {
-            throw new ErroValidacao("O mapa de competências deve ter ao menos uma atividade cadastrada.");
+            throw new ErroValidacao(MsgValidacao.MAPA_SEM_ATIVIDADES);
         }
 
         List<Atividade> atividadesSemConhecimento = atividades.stream()
@@ -35,29 +36,29 @@ public class SubprocessoValidacaoService {
                 .toList();
 
         if (!atividadesSemConhecimento.isEmpty()) {
-            throw new ErroValidacao("Todas as atividades devem possuir conhecimentos vinculados. Verifique as atividades pendentes.");
+            throw new ErroValidacao(MsgValidacao.ATIVIDADES_SEM_CONHECIMENTOS);
         }
     }
 
-    public void validarAssociacoesMapa(Long mapaId) {
-        List<Competencia> competencias = mapaManutencaoService.competenciasCodMapa(mapaId);
+    public void validarAssociacoesMapa(Long codMapa) {
+        List<Competencia> competencias = mapaManutencaoService.competenciasCodMapa(codMapa);
         List<String> competenciasSemAssociacao = competencias.stream()
                 .filter(c -> c.getAtividades().isEmpty())
                 .map(Competencia::getDescricao)
                 .toList();
 
         if (!competenciasSemAssociacao.isEmpty()) throw new ErroValidacao(
-                "Existem competências que não foram associadas a nenhuma atividade.",
+                MsgValidacao.COMPETENCIAS_SEM_ATIVIDADE,
                 Map.of("competenciasNaoAssociadas", competenciasSemAssociacao));
 
-        List<Atividade> atividades = mapaManutencaoService.atividadesMapaCodigo(mapaId);
+        List<Atividade> atividades = mapaManutencaoService.atividadesMapaCodigo(codMapa);
         List<String> atividadesSemAssociacao = atividades.stream()
                 .filter(a -> a.getCompetencias().isEmpty())
                 .map(Atividade::getDescricao)
                 .toList();
 
         if (!atividadesSemAssociacao.isEmpty()) throw new ErroValidacao(
-                "Existem atividades que não foram associadas a nenhuma competência.",
+                MsgValidacao.ATIVIDADES_SEM_COMPETENCIA,
                 Map.of("atividadesNaoAssociadas", atividadesSemAssociacao));
     }
 
@@ -66,7 +67,7 @@ public class SubprocessoValidacaoService {
         var competencias = mapaManutencaoService.competenciasCodMapa(codMapa);
 
         if (competencias.stream().anyMatch(c -> c.getAtividades().isEmpty())) {
-            throw new ErroValidacao("Todas as competências devem estar associadas a pelo menos uma atividade.");
+            throw new ErroValidacao(MsgValidacao.TODAS_COMPETENCIAS_DEVEM_TER_ATIVIDADE);
         }
 
         var atividadesDoSubprocesso = mapaManutencaoService.atividadesMapaCodigo(codMapa);
@@ -85,7 +86,7 @@ public class SubprocessoValidacaoService {
                     .collect(java.util.stream.Collectors.joining(", "));
 
             throw new ErroValidacao(
-                    "Todas as atividades devem estar associadas a pelo menos uma competência.%nAtividades pendentes: %s"
+                    MsgValidacao.ATIVIDADES_PENDENTES_PREFIXO
                             .formatted(nomesAtividades));
         }
     }
@@ -140,7 +141,7 @@ public class SubprocessoValidacaoService {
             String permitidasStr = String.join(", ",
                     permitidas.stream().map(SituacaoSubprocesso::name).toList());
             throw new ErroValidacao(
-                    "Situação do subprocesso não permite esta operação. Situação atual: %s. Situações permitidas: %s"
+                    MsgValidacao.SITUACAO_NAO_PERMITE
                             .formatted(subprocesso.getSituacao(), permitidasStr));
         }
     }
@@ -181,24 +182,24 @@ public class SubprocessoValidacaoService {
                     .map(atividade -> Map.of("codigo", atividade.getCodigo(), "descricao", atividade.getDescricao()))
                     .toList();
             throw new ErroValidacao(
-                    "Existem atividades sem conhecimentos associados.",
+                    MsgValidacao.ATIVIDADES_SEM_CONHECIMENTO_ASSOCIADO,
                     Map.of("atividadesSemConhecimento", atividadesInfo));
         }
     }
 
-    public boolean verificarAcessoUnidadeAoProcesso(Long processoId, List<Long> unidadeCodigos) {
+    public boolean verificarAcessoUnidadeAoProcesso(Long codProcesso, List<Long> unidadeCodigos) {
         if (unidadeCodigos.isEmpty()) {
             return false;
         }
-        return subprocessoRepo.existsByProcessoCodigoAndUnidadeCodigoIn(processoId, unidadeCodigos);
+        return subprocessoRepo.existsByProcessoCodigoAndUnidadeCodigoIn(codProcesso, unidadeCodigos);
     }
 
-    public ValidationResult validarSubprocessosParaFinalizacao(Long processoId) {
-        long total = subprocessoRepo.countByProcessoCodigo(processoId);
+    public ValidationResult validarSubprocessosParaFinalizacao(Long codProcesso) {
+        long total = subprocessoRepo.countByProcessoCodigo(codProcesso);
 
         if (total == 0) return ValidationResult.ofInvalido("O processo não possui subprocessos para finalizar");
 
-        long homologados = subprocessoRepo.countByProcessoCodigoAndSituacaoIn(processoId,
+        long homologados = subprocessoRepo.countByProcessoCodigoAndSituacaoIn(codProcesso,
                 List.of(
                         SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO,
                         SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO,

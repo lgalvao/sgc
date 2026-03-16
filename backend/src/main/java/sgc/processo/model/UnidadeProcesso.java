@@ -23,7 +23,7 @@ public class UnidadeProcesso implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @EmbeddedId
-    private UnidadeProcessoId id = new UnidadeProcessoId();
+    private UnidadeProcessoId codigo = new UnidadeProcessoId();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("processoCodigo")
@@ -69,13 +69,13 @@ public class UnidadeProcesso implements Serializable {
     }
 
     public Long getUnidadeCodigo() {
-        return id != null ? id.getUnidadeCodigo() : null;
+        return codigo != null ? codigo.getUnidadeCodigo() : null;
     }
 
     public void setUnidadeCodigo(Long unidadeCodigo) {
-        if (id == null) {
-            id = new UnidadeProcessoId();
+        if (codigo == null) {
+            codigo = new UnidadeProcessoId();
         }
-        id.setUnidadeCodigo(unidadeCodigo);
+        codigo.setUnidadeCodigo(unidadeCodigo);
     }
 }

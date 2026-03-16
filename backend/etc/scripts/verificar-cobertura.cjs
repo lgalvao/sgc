@@ -70,11 +70,7 @@ function processPackage(pkg, filter) {
 
             const cMetrics = getCounters(cls);
             if (cMetrics.LINE) {
-                const l = cMetrics.LINE;
-
                 // Extrair linhas perdidas se necessário
-                let missedLines = [];
-                let partialBranches = [];
             }
 
             classes.push({

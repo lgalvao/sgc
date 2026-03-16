@@ -23,7 +23,7 @@ test.describe.serial('CDU-27 - Alterar data limite de subprocesso', () => {
     const timestamp = Date.now();
     const descProcesso = `Mapeamento CDU-27 ${timestamp}`;
 
-    test('Setup data', async ({request}) => {
+    test('Setup data', async ({_resetAutomatico, request}) => {
         await criarProcessoFixture(request, {
             descricao: descProcesso,
             unidade: UNIDADE_1,
@@ -33,7 +33,7 @@ test.describe.serial('CDU-27 - Alterar data limite de subprocesso', () => {
     });
 
 
-    test('Cenario 1: ADMIN navega para detalhes do subprocesso', async ({page, autenticadoComoAdmin}) => {
+    test('Cenario 1: ADMIN navega para detalhes do subprocesso', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
         // CDU-27: Passos 1-2
 
 
@@ -44,7 +44,7 @@ test.describe.serial('CDU-27 - Alterar data limite de subprocesso', () => {
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toBeVisible();
     });
 
-    test('Cenario 2: ADMIN altera data limite e recebe confirmação', async ({page, autenticadoComoAdmin}) => {
+    test('Cenario 2: ADMIN altera data limite e recebe confirmação', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, UNIDADE_1);
 
@@ -63,7 +63,7 @@ test.describe.serial('CDU-27 - Alterar data limite de subprocesso', () => {
         await inputData.fill(`${yyyy}-${mm}-${dd}`);
 
         await page.getByTestId('btn-modal-confirmar').click();
-        await expect(page.getByText(/A data limite foi alterada com sucesso/i).first()).toBeVisible();
+        await expect(page.getByText(/Data limite alterada/i).first()).toBeVisible();
         await expect(inputData).toBeHidden();
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toBeVisible();
     });

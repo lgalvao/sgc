@@ -160,7 +160,7 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
             ImportarAtividadesRequest request =
                     new ImportarAtividadesRequest(subprocessoOrigem.getCodigo(), null);
 
-            mockMvc.perform(post("/api/subprocessos/{id}/importar-atividades", subprocessoDestino.getCodigo())
+            mockMvc.perform(post("/api/subprocessos/{codigo}/importar-atividades", subprocessoDestino.getCodigo())
                             .with(user(chefe))
                             .with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
@@ -217,7 +217,7 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
 
             mockMvc.perform(
                             post(
-                                    "/api/subprocessos/{id}/importar-atividades",
+                                    "/api/subprocessos/{codigo}/importar-atividades",
                                     subprocessoDestino.getCodigo())
                                     .with(user(chefe))
                                     .with(csrf())
@@ -242,7 +242,7 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
 
             mockMvc.perform(
                             post(
-                                    "/api/subprocessos/{id}/importar-atividades",
+                                    "/api/subprocessos/{codigo}/importar-atividades",
                                     subprocessoDestino.getCodigo())
                                     .with(user(chefe))
                                     .with(csrf())
@@ -258,7 +258,7 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
 
             mockMvc.perform(
                             post(
-                                    "/api/subprocessos/{id}/importar-atividades",
+                                    "/api/subprocessos/{codigo}/importar-atividades",
                                     subprocessoDestino.getCodigo())
                                     .with(user(chefe))
                                     .with(csrf())
@@ -279,7 +279,7 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
 
             mockMvc.perform(
                             post(
-                                    "/api/subprocessos/{id}/importar-atividades",
+                                    "/api/subprocessos/{codigo}/importar-atividades",
                                     subprocessoDestino.getCodigo())
                                     .with(user(chefe))
                                     .with(csrf())
@@ -315,7 +315,7 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
 
             mockMvc.perform(
                             post(
-                                    "/api/subprocessos/{id}/importar-atividades",
+                                    "/api/subprocessos/{codigo}/importar-atividades",
                                     subprocessoDestino.getCodigo())
                                     .with(user(chefe))
                                     .with(csrf())

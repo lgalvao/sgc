@@ -5,6 +5,7 @@ import lombok.extern.slf4j.*;
 import org.springframework.security.core.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
+import sgc.comum.MsgValidacao;
 import sgc.comum.erros.*;
 import sgc.comum.model.*;
 import sgc.organizacao.model.*;
@@ -75,7 +76,7 @@ public class UsuarioService {
     @Transactional
     public void adicionarAdministrador(String usuarioTitulo) {
         if (isAdministrador(usuarioTitulo)) {
-            throw new ErroValidacao("Usuário já é um administrador do sistema");
+            throw new ErroValidacao(MsgValidacao.USUARIO_JA_ADMINISTRADOR);
         }
         Administrador administrador = Administrador.builder()
                 .usuarioTitulo(usuarioTitulo)
@@ -88,7 +89,7 @@ public class UsuarioService {
     public void removerAdministrador(String usuarioTitulo) {
         long totalAdministradores = administradorRepo.count();
         if (totalAdministradores <= 1) {
-            throw new ErroValidacao("Não é permitido remover o único administrador do sistema");
+            throw new ErroValidacao(MsgValidacao.NAO_REMOVER_UNICO_ADMINISTRADOR);
         }
         administradorRepo.deleteById(usuarioTitulo);
     }

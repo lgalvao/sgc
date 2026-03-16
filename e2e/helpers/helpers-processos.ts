@@ -1,4 +1,5 @@
 import {expect, type Page} from '@playwright/test';
+import {TEXTOS} from '../../frontend/src/constants/textos.js';
 
 const ROTULOS_TIPO_PROCESSO = {
     MAPEAMENTO: 'Mapeamento',
@@ -39,7 +40,7 @@ export async function criarProcesso(page: Page, options: {
     await page.getByTestId('sel-processo-tipo').selectOption(options.tipo);
     await page.getByTestId('inp-processo-data-limite').fill(calcularDataLimite(dias));
 
-    await expect(page.getByText('Carregando unidades...')).toBeHidden();
+    await expect(page.getByText(TEXTOS.unidade.CARREGANDO)).toBeHidden();
     if (options.expandir) {
         for (const sigla of options.expandir) {
             await page.getByTestId(`btn-arvore-expand-${sigla}`).click();
@@ -145,14 +146,14 @@ export async function verificarDetalhesProcesso(page: Page, dados: {
     situacao: 'Criado' | 'Em andamento' | 'Finalizado'
 }) {
     // Aguardar carregamento dos detalhes
-    await expect(page.getByText('Carregando detalhes do processo...').first()).toBeHidden();
+    await expect(page.getByText(TEXTOS.processo.CARREGANDO_DETALHES).first()).toBeHidden();
 
     // Verificar descrição usando o test-id existente
     await expect(page.getByTestId('processo-info')).toHaveText(dados.descricao);
 
     // Verificar tipo e situação usando getByText
-    await expect(page.getByText(`Tipo: ${dados.tipo}`)).toBeVisible();
-    await expect(page.getByText(`Situação: ${dados.situacao}`)).toBeVisible();
+    await expect(page.getByText(`${TEXTOS.processo.INFO_TIPO}: ${dados.tipo}`)).toBeVisible();
+    await expect(page.getByText(`${TEXTOS.processo.INFO_SITUACAO}: ${dados.situacao}`)).toBeVisible();
 }
 
 export async function verificarUnidadeParticipante(page: Page, unidade: UnidadeParticipante) {
@@ -193,15 +194,15 @@ export async function verificarDetalhesSubprocesso(page: Page, dados: {
 }
 
 /**
- * Extrai o ID do processo da URL atual.
+ * Extrai o código do processo da URL atual.
  * Suporta múltiplos formatos de URL do sistema:
- * - /processo/cadastro/{id}
- * - codProcesso={id}
- * - /processo/{id}
+ * - /processo/cadastro/{codigo}
+ * - codProcesso={codigo}
+ * - /processo/{codigo}
  *
- * @throws {Error} Se não for possível extrair o ID da URL atual
+ * @throws {Error} Se não for possível extrair o código da URL atual
  */
-export async function extrairProcessoId(page: Page): Promise<number> {
+export async function extrairProcessoCodigo(page: Page): Promise<number> {
     const url = page.url();
 
     const patterns = [
@@ -218,6 +219,6 @@ export async function extrairProcessoId(page: Page): Promise<number> {
     }
 
     throw new Error(
-        `Não foi possível extrair ID do processo da URL: ${url}`
+        `Não foi possível extrair código do processo da URL: ${url}`
     );
 }

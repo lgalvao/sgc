@@ -9,7 +9,7 @@ O teste E2E (cdu-32.spec.ts) abrange:
 - Teste de cancelamento do modal de reabertura
 - Teste de validação: botão confirmar desabilitado sem justificativa, habilitado com justificativa
 - Confirmação de reabertura com justificativa "Justificativa de teste"
-- Validação de alert de sucesso "Cadastro reaberto com sucesso"
+- Validação de alert de sucesso "Cadastro reaberto"
 - Verificação de mudança de situação para "Cadastro em andamento"
 - Verificação de registro de movimentação com descrição "Reabertura de cadastro"
 

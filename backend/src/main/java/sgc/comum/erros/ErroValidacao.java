@@ -18,7 +18,15 @@ public class ErroValidacao extends ErroNegocioBase {
         super(message, "VALIDACAO", HttpStatus.UNPROCESSABLE_CONTENT);
     }
 
+    public ErroValidacao(String code, String message) {
+        super(message, code, HttpStatus.UNPROCESSABLE_CONTENT);
+    }
+
     public ErroValidacao(String message, Map<String, ?> details) {
         super(message, "VALIDACAO", HttpStatus.UNPROCESSABLE_CONTENT, details);
+    }
+
+    public ErroValidacao(String code, String message, Map<String, ?> details) {
+        super(message, code, HttpStatus.UNPROCESSABLE_CONTENT, details);
     }
 }

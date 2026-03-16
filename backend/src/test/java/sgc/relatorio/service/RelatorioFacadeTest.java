@@ -10,8 +10,8 @@ import sgc.mapa.service.*;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
-import sgc.processo.*;
 import sgc.processo.model.*;
+import sgc.processo.service.ProcessoService;
 import sgc.relatorio.*;
 import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.*;
@@ -28,7 +28,7 @@ import static org.mockito.Mockito.*;
 class RelatorioFacadeTest {
 
     @Mock
-    private ProcessoFacade processoFacade;
+    private ProcessoService processoService;
     @Mock
     private SubprocessoService subprocessoService;
     @Mock
@@ -94,7 +94,7 @@ class RelatorioFacadeTest {
         sp.setUnidade(u);
         sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
-        when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
+        when(processoService.buscarPorCodigo(1L)).thenReturn(p);
         when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
         when(responsavelService.buscarResponsavelUnidade(1L)).thenReturn(UnidadeResponsavelDto.builder().titularNome("Resp").build());
 
@@ -131,7 +131,7 @@ class RelatorioFacadeTest {
         a.setConhecimentos(Set.of(k));
         c.setAtividades(Set.of(a));
 
-        when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
+        when(processoService.buscarPorCodigo(1L)).thenReturn(p);
         when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
         when(mapaManutencaoService.competenciasCodMapa(10L)).thenReturn(List.of(c));
 
@@ -163,7 +163,7 @@ class RelatorioFacadeTest {
         sp2.setMapa(new Mapa());
         sp2.getMapa().setCodigo(20L);
 
-        when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
+        when(processoService.buscarPorCodigo(1L)).thenReturn(p);
         when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp1, sp2));
         when(mapaManutencaoService.competenciasCodMapa(10L)).thenReturn(List.of());
 
@@ -191,7 +191,7 @@ class RelatorioFacadeTest {
         c.setDescricao("Comp 1");
         c.setAtividades(Set.of()); // Atividades vazias
 
-        when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
+        when(processoService.buscarPorCodigo(1L)).thenReturn(p);
         when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
         when(mapaManutencaoService.competenciasCodMapa(10L)).thenReturn(List.of(c));
 
@@ -221,7 +221,7 @@ class RelatorioFacadeTest {
         a.setConhecimentos(Set.of()); // Conhecimentos vazios
         c.setAtividades(Set.of(a));
 
-        when(processoFacade.buscarEntidadePorId(1L)).thenReturn(p);
+        when(processoService.buscarPorCodigo(1L)).thenReturn(p);
         when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
         when(mapaManutencaoService.competenciasCodMapa(10L)).thenReturn(List.of(c));
 
@@ -233,7 +233,7 @@ class RelatorioFacadeTest {
     @Test
     @DisplayName("Deve cobrir erro ao gerar PDF")
     void deveCobrirErroGerarPdf() throws DocumentException {
-        when(processoFacade.buscarEntidadePorId(1L)).thenReturn(new Processo());
+        when(processoService.buscarPorCodigo(1L)).thenReturn(new Processo());
         when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of());
         when(pdfFactory.createDocument()).thenReturn(document);
         doThrow(new DocumentException("Simulado")).when(pdfFactory).createWriter(any(), any());
@@ -247,7 +247,7 @@ class RelatorioFacadeTest {
     @Test
     @DisplayName("Deve cobrir erro ao gerar PDF de mapas")
     void deveCobrirErroGerarPdfMapas() throws DocumentException {
-        when(processoFacade.buscarEntidadePorId(1L)).thenReturn(new Processo());
+        when(processoService.buscarPorCodigo(1L)).thenReturn(new Processo());
         when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of());
         when(pdfFactory.createDocument()).thenReturn(document);
         doThrow(new DocumentException("Simulado")).when(pdfFactory).createWriter(any(), any());

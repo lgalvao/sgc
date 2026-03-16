@@ -1,7 +1,7 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {
     criarProcesso,
-    extrairProcessoId,
+    extrairProcessoCodigo,
     verificarDetalhesProcesso,
     verificarProcessoNaTabela
 } from './helpers/helpers-processos.js';
@@ -13,14 +13,16 @@ import {
     verificarToast
 } from './helpers/helpers-navegacao.js';
 import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
+import {TEXTOS} from '../frontend/src/constants/textos.js';
 
 test.describe('CDU-04 - Iniciar processo', () => {
 
     test('Deve iniciar um processo e validar criação de subprocessos e alertas', async ({
+                                                                                            _resetAutomatico,
                                                                                             page,
                                                                                             browser,
-                                                                                            autenticadoComoAdmin
-                                                                                        }) => {
+                                                                                            _autenticadoComoAdmin
+}) => {
         const descricao = `CDU-04 Iniciar - ${Date.now()}`;
         await criarProcesso(page, {
             descricao: descricao,
@@ -33,19 +35,19 @@ test.describe('CDU-04 - Iniciar processo', () => {
 
         await page.getByTestId('tbl-processos').getByText(descricao).first().click();
         await esperarPaginaCadastroProcesso(page);
-        const processoId = await extrairProcessoId(page);
+        const codProcesso = await extrairProcessoCodigo(page);
 
         const dataLimiteStr = await page.getByTestId('inp-processo-data-limite').inputValue();
 
         // 2. Iniciar processo
         await page.getByTestId('btn-processo-iniciar').click();
         const modal = page.getByRole('dialog');
-        await expect(modal.getByText(/Ao iniciar o processo, não será mais possível editá-lo ou removê-lo/i)).toBeVisible();
+        await expect(modal.getByText(TEXTOS.processo.cadastro.INICIAR_CONFIRMACAO)).toBeVisible();
         await page.getByTestId('btn-iniciar-processo-confirmar').click();
 
         // Aguarda toast e redirect
         await esperarPaginaPainel(page);
-        await verificarToast(page, /iniciado com sucesso/i);
+        await verificarToast(page, TEXTOS.sucesso.PROCESSO_INICIADO);
         await verificarProcessoNaTabela(page, {
             descricao,
             situacao: 'Em andamento',
@@ -53,7 +55,7 @@ test.describe('CDU-04 - Iniciar processo', () => {
         });
 
         await page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descricao)}).click();
-        await esperarPaginaDetalhesProcesso(page, processoId);
+        await esperarPaginaDetalhesProcesso(page, codProcesso);
 
         await verificarDetalhesProcesso(page, {
             descricao: descricao,
@@ -70,7 +72,7 @@ test.describe('CDU-04 - Iniciar processo', () => {
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText('Não iniciado');
         
         const timeline = page.getByTestId('tbl-movimentacoes');
-        await expect(timeline.getByText(/Processo iniciado/i)).toBeVisible();
+        await expect(timeline.getByText(TEXTOS.movimentacao.PROCESSO_INICIADO)).toBeVisible();
 
         const contextoChefeAss11 = await browser.newContext();
         const paginaChefeAss11 = await contextoChefeAss11.newPage();

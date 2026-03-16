@@ -36,7 +36,7 @@ public class ConfiguracaoController {
         // Buscar parâmetros existentes e atualizar com dados das requests
         List<Parametro> parametrosAtualizados = parametros.stream()
                 .map(request -> {
-                    Parametro parametro = configuracaoService.buscarPorId(request.codigo());
+                    Parametro parametro = configuracaoService.buscarPorCodigo(request.codigo());
                     parametro.atualizarDe(request);
                     return parametro;
                 })
