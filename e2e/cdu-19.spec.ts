@@ -1,9 +1,10 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcessoMapaDisponibilizadoFixture} from './fixtures/fixtures-processos.js';
 import {navegarParaMapa} from './helpers/helpers-mapas.js';
-import {loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
+import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
 import {acessarSubprocessoGestor} from './helpers/helpers-analise.js';
 import {verificarPaginaPainel} from './helpers/helpers-navegacao.js';
+import {resetDatabase} from './hooks/hooks-limpeza.js';
 
 test.describe.serial('CDU-19 - Validar mapa de competências', () => {
     const UNIDADE_ALVO = 'SECAO_221';
@@ -67,6 +68,7 @@ test.describe.serial('CDU-19 - Apresentar sugestões e pré-preenchimento', () =
     const TEXTO_SUGESTAO = 'Sugestão de ajuste na competência técnica';
 
     test('Setup data', async ({_resetAutomatico, request}) => {
+        await resetDatabase(request);
         await criarProcessoMapaDisponibilizadoFixture(request, {
             descricao: descProcesso,
             unidade: UNIDADE_ALVO
@@ -99,7 +101,7 @@ test.describe.serial('CDU-19 - Apresentar sugestões e pré-preenchimento', () =
     });
 
     test('Cenario 2: GESTOR devolve mapa para ajustes', async ({_resetAutomatico, page}) => {
-        await loginComPerfil(page, GESTOR_SUPERIOR.titulo, GESTOR_SUPERIOR.senha, 'GESTOR - COORD_22');
+        await login(page, GESTOR_SUPERIOR.titulo, GESTOR_SUPERIOR.senha);
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
         await navegarParaMapa(page);
 
