@@ -100,6 +100,7 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco após devolução', 
     const descProcesso = `Mapeamento CDU-23 Devolucao ${timestamp}`;
 
     test('Setup data', async ({_resetAutomatico, request}) => {
+        await resetDatabase(request);
         await criarProcessoCadastroDisponibilizadoFixture(request, {
             descricao: descProcesso,
             unidade: UNIDADE_1
