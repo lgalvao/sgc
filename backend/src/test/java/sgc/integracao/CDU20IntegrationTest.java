@@ -7,12 +7,14 @@ import sgc.alerta.model.*;
 import sgc.comum.ComumDtos.*;
 import sgc.fixture.*;
 import sgc.integracao.mocks.*;
+import sgc.mapa.model.*;
 import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 import sgc.processo.model.*;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
 import tools.jackson.core.type.*;
+import tools.jackson.databind.*;
 
 import java.time.*;
 import java.util.*;
@@ -264,5 +266,57 @@ class CDU20IntegrationTest extends BaseIntegrationTest {
         List<Alerta> alertas =
                 alertaRepo.findByProcessoCodigo(subprocesso.getProcesso().getCodigo());
         assertThat(alertas).isEmpty(); // MAPA_HOMOLOGADO não gera alerta
+    }
+
+    @Test
+    @DisplayName("GESTOR deve ter podeVerSugestoes=true quando situação é MAPA_COM_SUGESTOES e está na unidade correta")
+    void testPermissaoVerSugestoes_GestorComMapaComSugestoes() throws Exception {
+        // Configura subprocesso com sugestões apresentadas (localizado na unidade superior - 6)
+        Mapa mapa = MapaFixture.mapaPadrao(subprocesso);
+        mapa.setCodigo(null);
+        mapa.setSugestoes("Sugestão de ajuste no mapa");
+        mapa = mapaRepo.save(mapa);
+        subprocesso.setMapa(mapa);
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES);
+        subprocessoRepo.saveAndFlush(subprocesso);
+
+        // Verifica permissões: GESTOR da unidade superior deve ter podeVerSugestoes=true
+        String response = mockMvc.perform(
+                        get("/api/subprocessos/{codigo}", subprocesso.getCodigo())
+                                .with(user(usuarioGestor)))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        JsonNode json = objectMapper.readTree(response);
+        assertThat(json.at("/permissoes/podeVerSugestoes").asBoolean()).isTrue();
+        assertThat(json.at("/permissoes/podeDevolverMapa").asBoolean()).isTrue();
+        assertThat(json.at("/permissoes/podeAceitarMapa").asBoolean()).isTrue();
+    }
+
+    @Test
+    @DisplayName("CHEFE não deve ter podeVerSugestoes quando situação é MAPA_COM_SUGESTOES")
+    void testPermissaoVerSugestoes_ChefeNaoTemAcesso() throws Exception {
+        // Configura subprocesso com sugestões apresentadas
+        Mapa mapa = MapaFixture.mapaPadrao(subprocesso);
+        mapa.setCodigo(null);
+        mapa.setSugestoes("Sugestão de ajuste no mapa");
+        mapa = mapaRepo.save(mapa);
+        subprocesso.setMapa(mapa);
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES);
+        subprocessoRepo.saveAndFlush(subprocesso);
+
+        // Verifica permissões: CHEFE não deve ter podeVerSugestoes
+        String response = mockMvc.perform(
+                        get("/api/subprocessos/{codigo}", subprocesso.getCodigo())
+                                .with(user(usuarioChefe)))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        JsonNode json = objectMapper.readTree(response);
+        assertThat(json.at("/permissoes/podeVerSugestoes").asBoolean()).isFalse();
     }
 }

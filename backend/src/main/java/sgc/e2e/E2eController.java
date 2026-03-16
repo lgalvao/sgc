@@ -285,6 +285,26 @@ public class E2eController {
     }
 
     /**
+     * Cria um processo de mapeamento já iniciado, com mapa preenchido e com sugestões registradas,
+     * para acelerar cenários E2E que começam na visualização de sugestões pelo GESTOR/ADMIN (CDU-20).
+     */
+    @PostMapping("/fixtures/processo-mapeamento-com-mapa-com-sugestoes")
+    @Transactional
+    @JsonView(ProcessoViews.Publica.class)
+    public Processo criarProcessoMapeamentoComMapaComSugestoes(@RequestBody ProcessoFixtureRequest request) {
+        Processo processo = criarProcessoMapeamentoComMapaNaSituacao(request, "MAPEAMENTO_MAPA_COM_SUGESTOES");
+        Unidade unidade = unidadeService.buscarPorSigla(request.unidadeSigla());
+        Long codSubprocesso = subprocessoRepo
+                .findByProcessoCodigoAndUnidadeCodigo(processo.getCodigo(), unidade.getCodigo())
+                .map(Subprocesso::getCodigo)
+                .orElseThrow();
+        Mapa mapa = mapaRepo.buscarPorSubprocesso(codSubprocesso).orElseThrow();
+        mapa.setSugestoes("Sugestão de ajuste na competência via fixture E2E");
+        mapaRepo.save(mapa);
+        return processoService.buscarPorCodigo(processo.getCodigo());
+    }
+
+    /**
      * Cria um processo de mapeamento já iniciado, com mapa preenchido e validado,
      * para acelerar cenários E2E que começam no aceite final do mapa.
      */
