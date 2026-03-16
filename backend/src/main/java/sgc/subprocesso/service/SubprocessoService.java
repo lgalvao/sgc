@@ -87,8 +87,12 @@ public class SubprocessoService {
     }
 
     @Transactional(readOnly = true)
-    public Map<String, Object> obterSugestoes() {
-        return Map.of("sugestoes", "");
+    public Map<String, Object> obterSugestoes(Long codSubprocesso) {
+        Subprocesso subprocesso = buscarSubprocesso(codSubprocesso);
+        String sugestoes = Optional.ofNullable(subprocesso.getMapa())
+                .map(Mapa::getSugestoes)
+                .orElse("");
+        return Map.of("sugestoes", sugestoes);
     }
 
     @Transactional(readOnly = true)

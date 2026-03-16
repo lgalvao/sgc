@@ -31,7 +31,7 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
         await expect(page.getByTestId('btn-mapa-devolver')).toBeVisible();
 
         // Verifica que o botão "Ver sugestões" NÃO aparece (situação é "Mapa validado", não "Mapa com sugestões")
-        await expect(page.getByTestId('btn-mapa-ver-sugestoes')).not.toBeVisible();
+        await expect(page.getByTestId('btn-mapa-ver-sugestoes')).toBeHidden();
 
         // Verifica que o botão de confirmar devolução está desabilitado sem observação
         await page.getByTestId('btn-mapa-devolver').click();
@@ -96,7 +96,7 @@ test.describe.serial('CDU-20 - Ver sugestões quando situação é "Mapa com sug
         // Conteúdo do modal exibe as sugestões
         const txtSugestoes = page.getByTestId('txt-ver-sugestoes-mapa');
         await expect(txtSugestoes).toBeVisible();
-        await expect(txtSugestoes).not.toHaveValue('');
+        await expect(txtSugestoes).toHaveValue('Sugestão de ajuste na competência via fixture E2E');
 
         // Fecha o modal
         await page.getByTestId('btn-ver-sugestoes-mapa-fechar').click();

@@ -25,7 +25,7 @@ const stubs = {
         props: ['title'],
         template: '<div><h1>{{ title }}</h1><slot /><slot name="actions" /></div>'
     },
-    BButton: {template: '<button :data-testid="$attrs[\'data-testid\']" @click="$emit(\'click\')"><slot /></button>'},
+    BButton: {template: '<button :data-testid="$attrs[\'data-testid\']" :disabled="$attrs.disabled" @click="$emit(\'click\')"><slot /></button>'},
     BAlert: {template: '<div><slot /></div>', props: ['modelValue']},
     EmptyState: {template: '<div><slot /></div>'},
     LoadingButton: {
@@ -49,7 +49,7 @@ describe("MapaView coverage", () => {
         } as any);
     });
 
-    function createWrapper() {
+    function createWrapper(initialMapaCompleto: any = {competencias: []}) {
         vi.spyOn(useAcessoModule, 'useAcesso').mockReturnValue({
             podeVisualizarImpacto: ref(true),
             podeEditarMapa: ref(true),
@@ -62,7 +62,7 @@ describe("MapaView coverage", () => {
                     stubActions: true,
                     initialState: {
                         mapas: {
-                            mapaCompleto: {competencias: []},
+                            mapaCompleto: initialMapaCompleto,
                             impactoMapa: null,
                             erro: null
                         }
@@ -130,5 +130,38 @@ describe("MapaView coverage", () => {
         // Cobre remover atividade associada
         (wrapper.vm as any).removerAtividadeAssociada(1, 10);
         expect(store.atualizarCompetencia).toHaveBeenCalled();
+    });
+
+    it("mantém o botão disponibilizar desabilitado enquanto houver atividade sem competência", async () => {
+        const wrapper = createWrapper({
+            competencias: [
+                {
+                    codigo: 10,
+                    descricao: "Competência 1",
+                    atividades: [{codigo: 1, descricao: "Atividade 1"}]
+                }
+            ]
+        });
+        const store = useMapasStore();
+        (wrapper.vm as any).atividades = [
+            {codigo: 1, descricao: "Atividade 1"},
+            {codigo: 2, descricao: "Atividade 2"}
+        ];
+        store.$patch({
+            mapaCompleto: {
+                competencias: [
+                    {
+                        codigo: 10,
+                        descricao: "Competência 1",
+                        atividades: [{codigo: 1, descricao: "Atividade 1"}]
+                    }
+                ]
+            }
+        });
+
+        await flushPromises();
+
+        expect((wrapper.vm as any).atividadesSemCompetencia).toHaveLength(1);
+        expect(wrapper.find('[data-testid="btn-cad-mapa-disponibilizar"]').attributes("disabled")).toBeDefined();
     });
 });

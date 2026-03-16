@@ -17,6 +17,7 @@ import java.time.*;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -160,5 +161,39 @@ class CDU24IntegrationTest extends BaseIntegrationTest {
         // Verificações para Subprocesso 2
         Subprocesso s2 = subprocessoRepo.findById(subprocesso2.getCodigo()).orElseThrow();
         assertThat(s2.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO);
+    }
+
+    @Test
+    @DisplayName("Deve rejeitar disponibilização em bloco quando existir atividade sem competência")
+    @WithMockAdmin
+    void disponibilizarMapaEmBloco_deveFalharComAtividadeSemCompetencia() throws Exception {
+        Atividade atividadeSemCompetencia = Atividade.builder()
+                .mapa(subprocesso1.getMapa())
+                .descricao("Atividade sem competência")
+                .build();
+        atividadeRepo.saveAndFlush(atividadeSemCompetencia);
+
+        Unidade adminUnit = unidadeRepo.findById(1L).orElseThrow();
+        movimentacaoRepo.save(Movimentacao.builder()
+                .subprocesso(subprocesso1)
+                .unidadeOrigem(unidade1)
+                .unidadeDestino(adminUnit)
+                .descricao("Enviado para Admin")
+                .dataHora(LocalDateTime.now())
+                .build());
+
+        ProcessarEmBlocoRequest request = ProcessarEmBlocoRequest.builder()
+                .subprocessos(List.of(subprocesso1.getCodigo()))
+                .acao("DISPONIBILIZAR")
+                .dataLimite(LocalDate.now().plusDays(10))
+                .build();
+
+                mockMvc.perform(
+                        post("/api/subprocessos/{codigo}/disponibilizar-mapa-bloco", processo.getCodigo())
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().is(422))
+                .andExpect(content().string(containsString("Todas as atividades devem estar associadas a pelo menos uma competência")));
     }
 }

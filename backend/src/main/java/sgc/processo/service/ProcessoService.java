@@ -123,8 +123,6 @@ public class ProcessoService {
     @Transactional(readOnly = true)
     public List<SubprocessoElegivelDto> listarSubprocessosElegiveis(Long codProcesso) {
         Usuario usuario = usuarioService.usuarioAutenticado();
-        Long codUnidadeUsuario = usuario.getUnidadeAtivaCodigo();
-
         List<Subprocesso> subprocessos;
         if (usuario.getPerfilAtivo() == Perfil.ADMIN) {
             subprocessos = subprocessoService.listarEntidadesPorProcesso(codProcesso);
@@ -134,7 +132,7 @@ public class ProcessoService {
         }
 
         return subprocessos.stream()
-                .filter(sp -> isElegivelParaAcaoEmBloco(sp, usuario, codUnidadeUsuario))
+                .filter(sp -> isElegivelParaAcaoEmBloco(sp, usuario))
                 .map(this::toElegivelDto)
                 .toList();
     }
@@ -452,14 +450,30 @@ public class ProcessoService {
         return pr.getParticipantes().stream().map(UnidadeProcesso::getUnidadeCodigo).filter(subarvore::contains).collect(Collectors.toSet());
     }
 
-    private boolean isElegivelParaAcaoEmBloco(Subprocesso sp, Usuario us, Long codUnidadeUs) {
+    private boolean isElegivelParaAcaoEmBloco(Subprocesso sp, Usuario us) {
         SituacaoSubprocesso s = sp.getSituacao();
-        boolean aceite = s == MAPEAMENTO_CADASTRO_DISPONIBILIZADO || s == REVISAO_CADASTRO_DISPONIBILIZADA ||
-                (s.ordinal() >= MAPEAMENTO_MAPA_COM_SUGESTOES.ordinal() && s.ordinal() <= MAPEAMENTO_MAPA_VALIDADO.ordinal()) ||
+        boolean elegivelCadastro = s == MAPEAMENTO_CADASTRO_DISPONIBILIZADO || s == REVISAO_CADASTRO_DISPONIBILIZADA;
+        if (elegivelCadastro) {
+            return permissionEvaluator.verificarPermissao(us, sp, ACEITAR_CADASTRO)
+                    || permissionEvaluator.verificarPermissao(us, sp, HOMOLOGAR_CADASTRO);
+        }
+
+        boolean elegivelMapa = (s.ordinal() >= MAPEAMENTO_MAPA_COM_SUGESTOES.ordinal() && s.ordinal() <= MAPEAMENTO_MAPA_VALIDADO.ordinal()) ||
                 (s.ordinal() >= REVISAO_MAPA_COM_SUGESTOES.ordinal() && s.ordinal() <= REVISAO_MAPA_VALIDADO.ordinal());
-        boolean disp = s == MAPEAMENTO_CADASTRO_HOMOLOGADO || s == MAPEAMENTO_MAPA_CRIADO || s == REVISAO_CADASTRO_HOMOLOGADA || s == REVISAO_MAPA_AJUSTADO;
-        if (!aceite && !disp) return false;
-        return us.getPerfilAtivo() == Perfil.ADMIN || Objects.equals(obterLocalizacao(sp).getCodigo(), codUnidadeUs);
+        if (elegivelMapa) {
+            return permissionEvaluator.verificarPermissao(us, sp, ACEITAR_MAPA)
+                    || permissionEvaluator.verificarPermissao(us, sp, HOMOLOGAR_MAPA);
+        }
+
+        boolean elegivelDisponibilizacao = s == MAPEAMENTO_CADASTRO_HOMOLOGADO
+                || s == MAPEAMENTO_MAPA_CRIADO
+                || s == REVISAO_CADASTRO_HOMOLOGADA
+                || s == REVISAO_MAPA_AJUSTADO;
+        if (!elegivelDisponibilizacao) {
+            return false;
+        }
+
+        return permissionEvaluator.verificarPermissao(us, sp, DISPONIBILIZAR_MAPA);
     }
 
     private SubprocessoElegivelDto toElegivelDto(Subprocesso sp) {

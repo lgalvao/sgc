@@ -129,7 +129,7 @@ class SubprocessoControllerCoverageExtraTest {
     @WithMockUser
     void obterSugestoesOk() throws Exception {
         when(permissionEvaluator.hasPermission(any(), eq(1L), eq("Subprocesso"), eq("VISUALIZAR_SUBPROCESSO"))).thenReturn(true);
-        when(subprocessoService.obterSugestoes()).thenReturn(Map.of());
+        when(subprocessoService.obterSugestoes(1L)).thenReturn(Map.of());
 
         mockMvc.perform(get("/api/subprocessos/1/sugestoes"))
                 .andExpect(status().isOk());

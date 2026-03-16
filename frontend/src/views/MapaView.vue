@@ -29,7 +29,7 @@
         </BButton>
         <BButton
             v-if="podeDisponibilizarMapa"
-            :disabled="competencias.length === 0"
+            :disabled="!podeConfirmarDisponibilizacao"
             data-testid="btn-cad-mapa-disponibilizar"
             variant="success"
             @click="abrirModalDisponibilizar"
@@ -196,6 +196,22 @@ onMounted(async () => {
 const atividades = ref<Atividade[]>([]);
 
 const competencias = computed(() => mapaCompleto.value?.competencias || []);
+const atividadesSemCompetencia = computed(() => {
+  if (atividades.value.length === 0) {
+    return [];
+  }
+
+  const atividadesAssociadas = new Set(
+      competencias.value.flatMap((competencia) =>
+          (competencia.atividades || []).map((atividade) => atividade.codigo)
+      )
+  );
+
+  return atividades.value.filter((atividade) => !atividadesAssociadas.has(atividade.codigo));
+});
+const podeConfirmarDisponibilizacao = computed(() => {
+  return competencias.value.length > 0 && atividadesSemCompetencia.value.length === 0;
+});
 const competenciaSendoEditada = ref<Competencia | null>(null);
 
 const mostrarModalCriarNovaCompetencia = ref(false);
@@ -364,9 +380,11 @@ defineExpose({
   podeVerImpacto,
   podeEditarMapa,
   podeDisponibilizarMapa,
+  podeConfirmarDisponibilizacao,
   unidade,
   competencias,
   atividades,
+  atividadesSemCompetencia,
   impactoMapa: impactos,
   mostrarModalImpacto,
   loadingImpacto,

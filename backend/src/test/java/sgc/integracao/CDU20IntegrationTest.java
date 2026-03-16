@@ -319,4 +319,22 @@ class CDU20IntegrationTest extends BaseIntegrationTest {
         JsonNode json = objectMapper.readTree(response);
         assertThat(json.at("/permissoes/podeVerSugestoes").asBoolean()).isFalse();
     }
+
+    @Test
+    @DisplayName("GESTOR deve obter sugestões registradas no endpoint dedicado")
+    void obterSugestoes_deveRetornarTextoRegistrado() throws Exception {
+        Mapa mapa = MapaFixture.mapaPadrao(subprocesso);
+        mapa.setCodigo(null);
+        mapa.setSugestoes("Sugestão de ajuste no mapa");
+        mapa = mapaRepo.save(mapa);
+        subprocesso.setMapa(mapa);
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES);
+        subprocessoRepo.saveAndFlush(subprocesso);
+
+        mockMvc.perform(
+                        get("/api/subprocessos/{codigo}/sugestoes", subprocesso.getCodigo())
+                                .with(user(usuarioGestor)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.sugestoes").value("Sugestão de ajuste no mapa"));
+    }
 }
