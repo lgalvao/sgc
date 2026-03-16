@@ -405,6 +405,7 @@ function fecharModalAceitar() {
 }
 
 function abrirModalSugestoes() {
+  sugestoes.value = mapa.value?.sugestoes ?? "";
   mostrarModalSugestoes.value = true;
 }
 

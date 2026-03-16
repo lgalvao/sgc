@@ -208,6 +208,32 @@ export async function criarProcessoMapaValidadoFixture(
 }
 
 /**
+ * Cria um processo de mapeamento já com mapa com sugestões via API E2E.
+ * Usado para testar o botão "Ver sugestões" no CDU-20.
+ */
+export async function criarProcessoMapaComSugestoesFixture(
+    request: APIRequestContext,
+    options: ProcessoFixtureOptions
+): Promise<ProcessoFixture> {
+    const response = await request.post('/e2e/fixtures/processo-mapeamento-com-mapa-com-sugestoes', {
+        data: {
+            unidadeSigla: options.unidade,
+            iniciar: options.iniciar ?? true,
+            descricao: options.descricao ?? `Fixture E2E MAPA_COM_SUGESTOES ${Date.now()}`,
+            diasLimite: options.diasLimite ?? 30
+        }
+    });
+
+    if (!response.ok()) {
+        throw new Error(
+            `Falha ao criar processo fixture com mapa com sugestões: ${response.status()} ${response.statusText()}`
+        );
+    }
+
+    return await response.json();
+}
+
+/**
  * Cria um processo de mapeamento já com mapa homologado via API E2E.
  */
 export async function criarProcessoMapaHomologadoFixture(
