@@ -76,7 +76,6 @@ class UnidadeControllerTest {
 
         when(hierarquiaService.buscarArvoreHierarquica()).thenReturn(Collections.emptyList());
 
-        // Act & Assert
         mockMvc.perform(get("/api/unidades"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
@@ -93,7 +92,6 @@ class UnidadeControllerTest {
         when(hierarquiaService.buscarArvoreComElegibilidade(anyBoolean(), any()))
                 .thenReturn(Collections.emptyList());
 
-        // Act & Assert
         mockMvc.perform(get("/api/unidades/arvore-com-elegibilidade")
                         .param("tipoProcesso", "MAPEAMENTO"))
                 .andExpect(status().isOk());
@@ -106,7 +104,6 @@ class UnidadeControllerTest {
 
         when(unidadeService.verificarMapaVigente(1L)).thenReturn(true);
 
-        // Act & Assert
         mockMvc.perform(get("/api/unidades/1/mapa-vigente"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.temMapaVigente").value(true));
@@ -124,7 +121,6 @@ class UnidadeControllerTest {
                 .build();
         when(usuarioServiceBean.buscarPorUnidadeLotacao(1L)).thenReturn(List.of(usuario));
 
-        // Act & Assert
         mockMvc.perform(get("/api/unidades/1/usuarios")).andExpect(status().isOk());
     }
 
@@ -138,7 +134,6 @@ class UnidadeControllerTest {
         u.setTipo(TipoUnidade.OPERACIONAL);
         when(unidadeService.buscarPorSigla("SIGLA")).thenReturn(u);
 
-        // Act & Assert
         mockMvc.perform(get("/api/unidades/sigla/SIGLA")).andExpect(status().isOk());
     }
 
@@ -152,7 +147,6 @@ class UnidadeControllerTest {
         un.setTipo(TipoUnidade.OPERACIONAL);
         when(unidadeService.buscarPorCodigo(1L)).thenReturn(un);
 
-        // Act & Assert
         mockMvc.perform(get("/api/unidades/1")).andExpect(status().isOk());
     }
 
@@ -163,7 +157,6 @@ class UnidadeControllerTest {
 
         when(hierarquiaService.buscarArvore(1L)).thenReturn(UnidadeDto.builder().build());
 
-        // Act & Assert
         mockMvc.perform(get("/api/unidades/1/arvore"))
                 .andExpect(status().isOk());
     }
@@ -175,7 +168,6 @@ class UnidadeControllerTest {
 
         when(hierarquiaService.buscarSiglasSubordinadas("SIGLA")).thenReturn(List.of("SIGLA", "FILHA"));
 
-        // Act & Assert
         mockMvc.perform(get("/api/unidades/sigla/SIGLA/subordinadas"))
                 .andExpect(status().isOk());
     }
@@ -187,7 +179,6 @@ class UnidadeControllerTest {
 
         when(hierarquiaService.buscarSiglaSuperior("FILHA")).thenReturn(Optional.of("SIGLA"));
 
-        // Act & Assert
         mockMvc.perform(get("/api/unidades/sigla/FILHA/superior"))
                 .andExpect(status().isOk());
     }
@@ -199,7 +190,6 @@ class UnidadeControllerTest {
 
         when(hierarquiaService.buscarSiglaSuperior("RAIZ")).thenReturn(Optional.empty());
 
-        // Act & Assert
         mockMvc.perform(get("/api/unidades/sigla/RAIZ/superior"))
                 .andExpect(status().isNoContent());
     }

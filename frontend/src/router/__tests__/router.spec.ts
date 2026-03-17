@@ -41,7 +41,6 @@ describe('Router guards', () => {
     beforeEach(() => {
         vi.clearAllMocks();
 
-        // Setup store mock
         perfilStoreMock = {
             usuarioCodigo: null,
             perfisUnidades: [],

@@ -51,7 +51,6 @@ test.describe('CDU-06 - Detalhar processo', () => {
             dataLimite: '/'
         });
 
-        // 5. [Step 2.2.1] ADMIN deve ver elementos de alteração ao entrar no subprocesso
         await navegarParaSubprocesso(page, UNIDADE_ALVO);
         
         // Botão "Alterar data limite" deve estar visível para Admin
@@ -117,7 +116,6 @@ test.describe('CDU-06 - Detalhar processo', () => {
         const descricao = `Bloco CDU-06 ${timestamp}`;
         const UNIDADE_SUB = 'ASSESSORIA_12';
 
-        // 1. ADMIN cria processo
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
         await criarProcesso(page, {
             descricao,
@@ -133,7 +131,6 @@ test.describe('CDU-06 - Detalhar processo', () => {
         await esperarPaginaDetalhesProcesso(page);
         const codProcesso = await extrairProcessoCodigo(page);
 
-        // 2. CHEFE disponibiliza cadastro para habilitar ações em bloco
         await login(page, USUARIOS.CHEFE_ASSESSORIA_12.titulo, USUARIOS.CHEFE_ASSESSORIA_12.senha);
         await acessarSubprocessoChefeDireto(page, descricao, UNIDADE_SUB);
         await navegarParaAtividades(page);
@@ -142,13 +139,11 @@ test.describe('CDU-06 - Detalhar processo', () => {
         await disponibilizarCadastro(page);
         await verificarPaginaPainel(page);
 
-        // 3. ADMIN verifica botão "Homologar em bloco"
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
         await page.getByTestId('tbl-processos').getByText(descricao).first().click();
         await esperarPaginaDetalhesProcesso(page, codProcesso);
         await expect(page.getByRole('button', {name: 'Homologar em bloco'})).toBeVisible();
 
-        // 4. GESTOR verifica botão "Aceitar cadastro em bloco"
         // John lennon (202020) é Gestor da SECRETARIA_1 (que engloba ASSESSORIA_12)
         await loginComPerfil(page, '202020', 'senha', 'GESTOR - SECRETARIA_1');
         await page.getByTestId('tbl-processos').getByText(descricao).first().click();

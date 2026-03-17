@@ -121,7 +121,6 @@ class CDU04IntegrationTest extends BaseIntegrationTest {
         long alertasCount = alertaRepo.count();
         assertThat(alertasCount).isGreaterThan(0);
 
-        // e não podem ser verificadas diretamente via Mockito
         // O teste de envio de emails está em NotificacaoEmailServiceTest
     }
 }

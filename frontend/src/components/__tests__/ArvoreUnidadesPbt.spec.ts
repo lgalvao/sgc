@@ -173,7 +173,6 @@ describe('ArvoreUnidades Property-Based tests', () => {
                         vm.toggle(node, !isSelected);
                     });
 
-                    // Assert invariant: All selected units must be eligible
                     const selectedNodes = allNodes.filter(n => vm.isChecked(n.codigo));
 
                     selectedNodes.forEach(node => {

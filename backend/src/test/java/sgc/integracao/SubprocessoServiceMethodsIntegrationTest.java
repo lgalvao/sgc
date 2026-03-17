@@ -93,10 +93,13 @@ class SubprocessoServiceMethodsIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("obterSugestoes: deve retornar map vazio")
+    @DisplayName("obterSugestoes: deve retornar sugestões do mapa")
     void obterSugestoes() {
-        Map<String, Object> result = subprocessoService.obterSugestoes();
-        assertThat(result).containsEntry("sugestoes", "");
+        subprocesso.getMapa().setSugestoes("Sugestão de integração");
+        mapaRepo.saveAndFlush(subprocesso.getMapa());
+
+        Map<String, Object> result = subprocessoService.obterSugestoes(subprocesso.getCodigo());
+        assertThat(result).containsEntry("sugestoes", "Sugestão de integração");
     }
 
     @Test

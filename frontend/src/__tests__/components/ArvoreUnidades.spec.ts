@@ -120,7 +120,6 @@ describe('ArvoreUnidades.vue', () => {
             }
         });
 
-        // Acesso indireto via props passadas para o stub
         const rootNode = wrapper.findComponent(UnidadeTreeNodeStub);
         expect(rootNode.props('isExpanded')(mockUnidades[0])).toBe(true);
     });

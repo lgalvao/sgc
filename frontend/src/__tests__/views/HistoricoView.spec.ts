@@ -24,7 +24,6 @@ vi.mock("vue-router", () => ({
     createMemoryHistory: vi.fn(),
 }));
 
-// Setup components mocks to avoid rendering issues
 // BContainer, BRow, BCol, BCard, BButton are from bootstrap-vue-next
 // Given the errors were "Cannot call vm on an empty VueWrapper", it usually means
 
@@ -76,7 +75,6 @@ describe("HistoricoView.vue", () => {
         context.wrapper = mount(HistoricoView, mountOptions());
         await flushPromises();
 
-        // The component uses the store, so the data should be rendered from initial state
         expect(context.wrapper.findAll('tbody tr').length).toBe(2);
     });
 

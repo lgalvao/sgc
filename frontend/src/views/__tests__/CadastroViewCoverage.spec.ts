@@ -5,6 +5,8 @@ import {ref} from "vue";
 import * as useAcessoModule from "@/composables/useAcesso";
 import * as subprocessoService from "@/services/subprocessoService";
 import {useSubprocessosStore} from "@/stores/subprocessos";
+import {useMapasStore} from "@/stores/mapas";
+import {SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 import CadastroView from "../CadastroView.vue";
 
 const {pushMock} = vi.hoisted(() => ({pushMock: vi.fn()}));
@@ -62,16 +64,31 @@ describe("CadastroView coverage", () => {
             podeVisualizarImpacto: ref(true),
         } as any);
 
+        const pinia = createTestingPinia({
+            stubActions: true,
+            initialState: {
+                subprocessos: {
+                    subprocessoDetalhe: {
+                        codigo: 123,
+                        situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
+                        tipoProcesso: TipoProcesso.MAPEAMENTO
+                    }
+                }
+            }
+        });
+
+        const store = useSubprocessosStore(pinia);
+        (store.buscarSubprocessoPorProcessoEUnidade as any).mockResolvedValue(123);
+        (store.buscarContextoEdicao as any).mockResolvedValue({
+            subprocesso: {codigo: 123, situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, tipoProcesso: TipoProcesso.MAPEAMENTO},
+            permissoes: {podeEditarCadastro: true, podeDisponibilizarCadastro: true, podeVisualizarImpacto: true},
+            atividadesDisponiveis: [],
+            unidade: {sigla: "TESTE", nome: "Teste"}
+        });
+
         return mount(CadastroView, {
             global: {
-                plugins: [createTestingPinia({
-                    stubActions: true,
-                    initialState: {
-                        subprocessos: {
-                            subprocessoDetalhe: {codigo: 123, situacao: "MAPEAMENTO_CADASTRO_EM_ANDAMENTO"}
-                        }
-                    }
-                })],
+                plugins: [pinia],
                 stubs
             },
             props: {
@@ -87,8 +104,9 @@ describe("CadastroView coverage", () => {
 
         // Cobre handleAdicionarAtividade com erro
         const store = useSubprocessosStore();
-        (wrapper.vm as any).codMapa = 100;
-        (wrapper.vm as any).codSubprocesso = 123;
+        const mapasStore = useMapasStore();
+
+        mapasStore.mapaCompleto = { codigo: 100 } as any;
 
         // Simula falha ao adicionar
         await (wrapper.vm as any).handleAdicionarAtividade();
@@ -107,11 +125,21 @@ describe("CadastroView coverage", () => {
         expect((wrapper.vm as any).badgeVariant("INVALIDO")).toBe("secondary");
 
         // Cobre disponibilizar com erro de situacao
-        (wrapper.vm as any).subprocesso.situacao = "MAPEAMENTO_FINALIZADO";
+        store.$patch({
+            subprocessoDetalhe: {
+                ...store.subprocessoDetalhe,
+                situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO
+            } as any
+        });
         await (wrapper.vm as any).disponibilizarCadastro();
 
         // Cobre disponibilizar com erros de validação
-        (wrapper.vm as any).subprocesso.situacao = "MAPEAMENTO_CADASTRO_EM_ANDAMENTO";
+        store.$patch({
+            subprocessoDetalhe: {
+                ...store.subprocessoDetalhe,
+                situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO
+            } as any
+        });
         (store.validarCadastro as any).mockResolvedValue({
             valido: false,
             erros: [{mensagem: "Erro genérico"}, {atividadeCodigo: 1, mensagem: "Erro na atividade"}]

@@ -86,13 +86,10 @@ class LimitadorTentativasLoginTest {
     @Test
     void deveLimparTentativasAntigasAoVerificarNovamente() {
         String ip = "192.168.1.10";
-        // 1. Adiciona uma tentativa
         limitador.verificar(ip);
 
-        // 2. Avança o tempo para expirar a tentativa (11 minutos, janela é 10)
         when(clock.instant()).thenReturn(Instant.now().plusSeconds(660));
 
-        // 3. Verifica novamente o mesmo IP.
         // Isso deve chamar limparTentativasAntigas(ip), remover a antiga,
         // esvaziar a lista desse IP, remover do mapa, e adicionar a nova.
         assertDoesNotThrow(() -> limitador.verificar(ip));

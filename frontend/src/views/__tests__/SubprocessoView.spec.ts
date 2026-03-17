@@ -212,11 +212,9 @@ describe('SubprocessoView.vue', () => {
         await flushPromises();
         await (wrapper.vm as any).$nextTick();
 
-        // Open modal
         (wrapper.vm as any).modals.open('alterarDataLimite');
         await (wrapper.vm as any).$nextTick();
 
-        // Confirm
         const modal = wrapper.findComponent(SubprocessoModalStub);
         await modal.vm.$emit('confirmar-alteracao', '2024-01-01');
 
@@ -243,18 +241,15 @@ describe('SubprocessoView.vue', () => {
         const {wrapper, store} = mountComponent();
         await flushPromises();
 
-        // Trigger reabertura
         await wrapper.find('[data-testid="btn-reabrir-cadastro"]').trigger('click');
         await (wrapper.vm as any).$nextTick();
 
         expect((wrapper.vm as any).tipoReabertura).toBe('cadastro');
         expect((wrapper.vm as any).modals.modals.reabrir.value.isOpen).toBe(true);
 
-        // Preencher justificativa
         const textarea = wrapper.find('textarea');
         await textarea.setValue('Erro no preenchimento');
 
-        // Confirmar
         const btn = wrapper.find('[data-testid="btn-confirmar-reabrir"]');
         await btn.trigger('click');
         await flushPromises();

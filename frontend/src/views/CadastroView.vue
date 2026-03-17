@@ -14,7 +14,6 @@
       <template #actions>
         <BButton
             v-if="codSubprocesso && podeVerImpacto"
-            class="me-2"
             data-testid="cad-atividades__btn-impactos-mapa-edicao"
             variant="outline-secondary"
             @click="abrirModalImpacto"
@@ -24,7 +23,6 @@
         <BButton
             v-if="codSubprocesso && isChefe"
             :disabled="!podeEditarCadastro"
-            class="me-2"
             data-testid="btn-cad-atividades-historico"
             variant="outline-secondary"
             @click="abrirModalHistorico"
@@ -34,7 +32,6 @@
         <BButton
             v-if="codSubprocesso && isChefe"
             :disabled="!podeEditarCadastro"
-            class="me-2"
             data-testid="btn-cad-atividades-importar"
             variant="outline-secondary"
             @click="mostrarModalImportar = true"

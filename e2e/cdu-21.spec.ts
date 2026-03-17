@@ -87,7 +87,6 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
         await expect(page.getByTestId('btn-acao-bloco-aceitar')).toBeHidden();
         await expect(page.getByTestId('btn-acao-bloco-homologar')).toBeHidden();
 
-        // 4. Entrar em um subprocesso e verificar botões do cabeçalho
         await navegarParaSubprocesso(page, 'SECAO_221');
         await expect(page.getByTestId('btn-enviar-lembrete')).toBeHidden();
         await expect(page.getByTestId('btn-reabrir-cadastro')).toBeHidden();

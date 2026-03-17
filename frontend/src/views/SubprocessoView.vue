@@ -18,7 +18,7 @@
             <BButton
                 v-if="podeAlterarDataLimite && !isProcessoFinalizado"
                 data-testid="btn-alterar-data-limite"
-                variant="outline-primary"
+                variant="outline-secondary"
                 @click="abrirModalAlterarDataLimite"
             >
               <i aria-hidden="true" class="bi bi-calendar me-1"/>
@@ -27,7 +27,7 @@
             <BButton
                 v-if="podeReabrirCadastro && !isProcessoFinalizado"
                 data-testid="btn-reabrir-cadastro"
-                variant="outline-warning"
+                variant="outline-secondary"
                 @click="abrirModalReabrirCadastro"
             >
               <i aria-hidden="true" class="bi bi-arrow-counterclockwise me-1"/>
@@ -36,7 +36,7 @@
             <BButton
                 v-if="podeReabrirRevisao && !isProcessoFinalizado"
                 data-testid="btn-reabrir-revisao"
-                variant="outline-warning"
+                variant="outline-secondary"
                 @click="abrirModalReabrirRevisao"
             >
               <i aria-hidden="true" class="bi bi-arrow-counterclockwise me-1"/>
@@ -45,7 +45,7 @@
             <BButton
                 v-if="podeEnviarLembrete && !isProcessoFinalizado"
                 data-testid="btn-enviar-lembrete"
-                variant="outline-info"
+                variant="outline-secondary"
                 @click="confirmarEnviarLembrete"
             >
               <i aria-hidden="true" class="bi bi-bell me-1"/>

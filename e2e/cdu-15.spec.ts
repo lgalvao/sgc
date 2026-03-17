@@ -38,7 +38,7 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
         await navegarParaMapa(page);
 
         await expect(page.getByRole('heading', {name: TEXTOS.mapa.TITULO})).toBeVisible();
-        await expect(page.getByTestId('btn-abrir-criar-competencia').or(page.getByTestId('btn-abrir-criar-competencia-empty'))).toBeVisible();
+        await expect(page.getByTestId('btn-abrir-criar-competencia')).toBeVisible();
         await expect(page.getByTestId('btn-cad-mapa-disponibilizar')).toBeDisabled();
 
         // CT-02: Criar competência

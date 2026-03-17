@@ -11,12 +11,7 @@ import java.lang.reflect.*;
 
 import static org.assertj.core.api.Assertions.*;
 
-/**
- * Testes unitários diretos do método privado extractTituloUsuario.
- *
- * <p>Este arquivo testa os casos do switch expression que não podem ser facilmente testados
- * via MockMvc: Usuario entity e default case.
- */
+
 @ExtendWith(MockitoExtension.class)
 @DisplayName("AlertaController - Extração título usuário (Método privado)")
 class AlertaControllerExtractTituloTest {

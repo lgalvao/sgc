@@ -25,7 +25,6 @@ public class TestLoginHelper {
      * Realiza login completo e retorna o token JWT.
      */
     public String login(MockMvc mockMvc, String titulo, Perfil perfil, Long unidadeCodigo) throws Exception {
-        // 1. Autenticar
         AutenticarRequest autenticarRequest = new AutenticarRequest(titulo, "senha123");
         MvcResult autenticarResult = mockMvc.perform(post("/api/usuarios/autenticar")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -46,7 +45,6 @@ public class TestLoginHelper {
                         .content(objectMapper.writeValueAsString(autorizarRequest)))
                 .andExpect(status().isOk());
 
-        // 3. Entrar com perfil e unidade
         EntrarRequest entrarRequest = new EntrarRequest(titulo, perfil.name(), unidadeCodigo);
         MvcResult entrarResult = mockMvc.perform(post("/api/usuarios/entrar")
                         .cookie(preAuthCookie)

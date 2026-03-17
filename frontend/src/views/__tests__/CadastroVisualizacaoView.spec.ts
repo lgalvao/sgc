@@ -103,38 +103,32 @@ describe("CadastroVisualizacaoView coverage", () => {
         const procStore = useProcessosStore();
         (procStore.buscarProcessoDetalhe as any).mockResolvedValue(null);
 
-        // Historico
         vi.mocked(analiseService.listarAnalisesCadastro).mockResolvedValue([]);
         await wrapper.find('[data-testid="btn-vis-atividades-historico"]').trigger("click");
         await flushPromises();
         expect(analiseService.listarAnalisesCadastro).toHaveBeenCalledWith(123);
 
-        // Devolver
         await wrapper.find('[data-testid="btn-acao-devolver"]').trigger("click");
         (wrapper.vm as any).observacaoDevolucao = "Obs devolução";
         await wrapper.find('[data-testid="btn-devolucao-cadastro-confirmar"]').trigger("click");
         await flushPromises();
         expect(store.devolverCadastro).toHaveBeenCalled();
 
-        // Aceitar/Validar
         (wrapper.vm as any).podeHomologarCadastro = false;
         await wrapper.find('[data-testid="btn-acao-analisar-principal"]').trigger("click");
         await wrapper.find('[data-testid="btn-aceite-cadastro-confirmar"]').trigger("click");
         await flushPromises();
         expect(store.aceitarCadastro).toHaveBeenCalled();
 
-        // Homologar
         (wrapper.vm as any).podeHomologarCadastro = true;
         await wrapper.find('[data-testid="btn-acao-analisar-principal"]').trigger("click");
         await wrapper.find('[data-testid="btn-aceite-cadastro-confirmar"]').trigger("click");
         await flushPromises();
         expect(store.homologarCadastro).toHaveBeenCalled();
 
-        // Fluxo de Revisão
         (procStore.processoDetalhe as any).tipo = "REVISAO";
         await wrapper.vm.$nextTick();
 
-        // Homologar Revisão
         (wrapper.vm as any).podeHomologarCadastro = true;
         await (wrapper.vm as any).confirmarValidacao();
         expect(store.homologarRevisaoCadastro).toHaveBeenCalled();
@@ -144,12 +138,10 @@ describe("CadastroVisualizacaoView coverage", () => {
         await (wrapper.vm as any).confirmarValidacao();
         expect(store.aceitarRevisaoCadastro).toHaveBeenCalled();
 
-        // Devolver Revisão
         (wrapper.vm as any).observacaoDevolucao = "Rev";
         await (wrapper.vm as any).confirmarDevolucao();
         expect(store.devolverRevisaoCadastro).toHaveBeenCalled();
 
-        // Impacto
         const mapsStore = (wrapper.vm as any).mapasStore;
         mapsStore.buscarImpactoMapa = vi.fn().mockResolvedValue(null);
         await (wrapper.vm as any).abrirModalImpacto();

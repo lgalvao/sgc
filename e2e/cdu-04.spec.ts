@@ -39,7 +39,6 @@ test.describe('CDU-04 - Iniciar processo', () => {
 
         const dataLimiteStr = await page.getByTestId('inp-processo-data-limite').inputValue();
 
-        // 2. Iniciar processo
         await page.getByTestId('btn-processo-iniciar').click();
         const modal = page.getByRole('dialog');
         await expect(modal.getByText(TEXTOS.processo.cadastro.INICIAR_CONFIRMACAO)).toBeVisible();
@@ -85,7 +84,6 @@ test.describe('CDU-04 - Iniciar processo', () => {
         ).toBeVisible();
         await contextoChefeAss11.close();
 
-        // 7. Validar alertas (Step 14) para Unidade interoperacional (SECRETARIA_1)
         // John lennon (SECRETARIA_1) deve receber alertas tanto como Chefe quanto como Gestor
 
         // 7.1. Como CHEFE (Unidade operacional)

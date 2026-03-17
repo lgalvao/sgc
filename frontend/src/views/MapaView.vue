@@ -20,10 +20,18 @@
             @click="abrirModalImpacto"
         />
         <BButton
+            v-if="podeEditarMapa"
+            data-testid="btn-abrir-criar-competencia"
+            variant="outline-primary"
+            @click="abrirModalCriarLimpo"
+        >
+          <i aria-hidden="true" class="bi bi-plus-lg me-1"/> {{ TEXTOS.mapa.BOTAO_CRIAR }}
+        </BButton>
+        <BButton
             v-if="podeDisponibilizarMapa"
-            :disabled="competencias.length === 0"
+            :disabled="!podeConfirmarDisponibilizacao"
             data-testid="btn-cad-mapa-disponibilizar"
-            variant="outline-success"
+            variant="success"
             @click="abrirModalDisponibilizar"
         >
           {{ TEXTOS.mapa.BOTAO_DISPONIBILIZAR }}
@@ -47,27 +55,9 @@
             :description="TEXTOS.mapa.EMPTY_DESCRIPTION"
             icon="bi-journal-plus"
             :title="TEXTOS.mapa.EMPTY_TITLE"
-        >
-          <BButton
-              v-if="podeEditarMapa"
-              data-testid="btn-abrir-criar-competencia-empty"
-              variant="primary"
-              @click="abrirModalCriarLimpo"
-          >
-            <i aria-hidden="true" class="bi bi-plus-lg me-2"/> {{ TEXTOS.mapa.BOTAO_CRIAR_PRIMEIRA }}
-          </BButton>
-        </EmptyState>
+        />
       </div>
       <div v-else class="mb-4 mt-3">
-        <BButton
-            v-if="podeEditarMapa"
-            class="mb-3"
-            data-testid="btn-abrir-criar-competencia"
-            variant="outline-primary"
-            @click="abrirModalCriarLimpo"
-        >
-          <i aria-hidden="true" class="bi bi-plus-lg"/> {{ TEXTOS.mapa.BOTAO_CRIAR }}
-        </BButton>
         <CompetenciaCard
             v-for="comp in competencias"
             :key="comp.codigo"
@@ -206,6 +196,22 @@ onMounted(async () => {
 const atividades = ref<Atividade[]>([]);
 
 const competencias = computed(() => mapaCompleto.value?.competencias || []);
+const atividadesSemCompetencia = computed(() => {
+  if (atividades.value.length === 0) {
+    return [];
+  }
+
+  const atividadesAssociadas = new Set(
+      competencias.value.flatMap((competencia) =>
+          (competencia.atividades || []).map((atividade) => atividade.codigo)
+      )
+  );
+
+  return atividades.value.filter((atividade) => !atividadesAssociadas.has(atividade.codigo));
+});
+const podeConfirmarDisponibilizacao = computed(() => {
+  return competencias.value.length > 0 && atividadesSemCompetencia.value.length === 0;
+});
 const competenciaSendoEditada = ref<Competencia | null>(null);
 
 const mostrarModalCriarNovaCompetencia = ref(false);
@@ -374,9 +380,11 @@ defineExpose({
   podeVerImpacto,
   podeEditarMapa,
   podeDisponibilizarMapa,
+  podeConfirmarDisponibilizacao,
   unidade,
   competencias,
   atividades,
+  atividadesSemCompetencia,
   impactoMapa: impactos,
   mostrarModalImpacto,
   loadingImpacto,

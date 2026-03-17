@@ -81,7 +81,6 @@ test.describe.serial('CDU-20 - Ver sugestões quando situação é "Mapa com sug
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
         await navegarParaMapa(page);
 
-        // O botão "Ver sugestões" deve aparecer quando situação é "Mapa com sugestões" (CDU-20, passo 5)
         await expect(page.getByTestId('btn-mapa-ver-sugestoes')).toBeVisible();
 
         // Os demais botões de análise também devem estar presentes
@@ -96,7 +95,7 @@ test.describe.serial('CDU-20 - Ver sugestões quando situação é "Mapa com sug
         // Conteúdo do modal exibe as sugestões
         const txtSugestoes = page.getByTestId('txt-ver-sugestoes-mapa');
         await expect(txtSugestoes).toBeVisible();
-        await expect(txtSugestoes).not.toHaveValue('');
+        await expect(txtSugestoes).toHaveValue('Sugestão de ajuste na competência via fixture E2E');
 
         // Fecha o modal
         await page.getByTestId('btn-ver-sugestoes-mapa-fechar').click();

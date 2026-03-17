@@ -433,7 +433,7 @@ public class SubprocessoController {
     @GetMapping("/{codSubprocesso}/sugestoes")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'VISUALIZAR_SUBPROCESSO')")
     public Map<String, Object> obterSugestoes(@PathVariable Long codSubprocesso) {
-        return subprocessoService.obterSugestoes();
+        return subprocessoService.obterSugestoes(codSubprocesso);
     }
 
     @GetMapping("/{codSubprocesso}/historico-validacao")

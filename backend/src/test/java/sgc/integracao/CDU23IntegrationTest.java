@@ -154,4 +154,13 @@ class CDU23IntegrationTest extends BaseIntegrationTest {
         assertThat(movs2).isNotEmpty();
         assertThat(movs2.getFirst().getDescricao()).contains("homologado");
     }
+
+    @Test
+    @DisplayName("ADMIN não deve ver subprocessos devolvidos como elegíveis para homologação em bloco")
+    @WithMockAdmin
+    void contextoCompleto_naoDeveListarSubprocessosDevolvidosComoElegiveis() throws Exception {
+        mockMvc.perform(get("/api/processos/{codigo}/contexto-completo", processo.getCodigo()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.elegiveis").isEmpty());
+    }
 }

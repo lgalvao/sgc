@@ -2,45 +2,58 @@
   <LayoutPadrao>
     <PageHeader :title="TEXTOS.mapa.TITULO_TECNICO">
       <template #actions>
+        <!-- Ações de Informação/Secundárias -->
         <BButton
             v-if="podeValidar"
             data-testid="btn-mapa-sugestoes"
+            variant="outline-secondary"
             @click="abrirModalSugestoes"
         >
           {{ TEXTOS.mapa.BOTAO_SUGESTOES }}
         </BButton>
+
+        <BButton
+            v-if="podeVerSugestoes"
+            data-testid="btn-mapa-ver-sugestoes"
+            variant="outline-secondary"
+            @click="verSugestoes"
+        >
+          {{ TEXTOS.mapa.BOTAO_VER_SUGESTOES }}
+        </BButton>
+
+        <BButton
+            v-if="(podeValidar && temHistoricoAnalise) || podeAnalisar"
+            :data-testid="podeAnalisar ? 'btn-mapa-historico-gestor' : 'btn-mapa-historico'"
+            variant="outline-secondary"
+            @click="verHistorico"
+        >
+          {{ TEXTOS.mapa.BOTAO_HISTORICO }}
+        </BButton>
+
+        <!-- Ações Negativas/Retorno -->
+        <BButton
+            v-if="podeAnalisar"
+            data-testid="btn-mapa-devolver"
+            variant="secondary"
+            @click="abrirModalDevolucao"
+        >
+          {{ TEXTOS.mapa.BOTAO_DEVOLVER }}
+        </BButton>
+
+        <!-- Ações Positivas/Avanço -->
         <BButton
             v-if="podeValidar"
             data-testid="btn-mapa-validar"
+            variant="success"
             @click="abrirModalValidar"
         >
           {{ TEXTOS.mapa.BOTAO_VALIDAR }}
         </BButton>
 
         <BButton
-            v-if="podeVerSugestoes"
-            data-testid="btn-mapa-ver-sugestoes"
-            @click="verSugestoes"
-        >
-          {{ TEXTOS.mapa.BOTAO_VER_SUGESTOES }}
-        </BButton>
-        <BButton
-            v-if="(podeValidar && temHistoricoAnalise) || podeAnalisar"
-            :data-testid="podeAnalisar ? 'btn-mapa-historico-gestor' : 'btn-mapa-historico'"
-            @click="verHistorico"
-        >
-          {{ TEXTOS.mapa.BOTAO_HISTORICO }}
-        </BButton>
-        <BButton
-            v-if="podeAnalisar"
-            data-testid="btn-mapa-devolver"
-            @click="abrirModalDevolucao"
-        >
-          {{ TEXTOS.mapa.BOTAO_DEVOLVER }}
-        </BButton>
-        <BButton
             v-if="podeAnalisar"
             data-testid="btn-mapa-homologar-aceite"
+            variant="success"
             @click="abrirModalAceitar"
         >
           {{ podeHomologarMapa ? TEXTOS.mapa.LABEL_HOMOLOGAR : TEXTOS.mapa.LABEL_REGISTRAR_ACEITE }}

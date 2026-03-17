@@ -90,7 +90,6 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
         Authentication auth = new UsernamePasswordAuthenticationToken(chefe, null, chefe.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(auth);
 
-        // 3. Processo origem (FINALIZADO) - Permite importação de qualquer unidade
         Processo processoOrigem = Processo.builder()
                 .descricao("Processo origem finalizado")
                 .tipo(TipoProcesso.MAPEAMENTO)
@@ -121,7 +120,6 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
         conhecimentoRepo.save(Conhecimento.builder().descricao("Conhecimento 2.1").atividade(atividade2).build());
         conhecimentoRepo.save(Conhecimento.builder().descricao("Conhecimento 2.2").atividade(atividade2).build());
 
-        // 4. Processo destino (EM ANDAMENTO)
         Processo processoDestino = Processo.builder()
                 .descricao("Processo destino ativo")
                 .tipo(TipoProcesso.MAPEAMENTO)

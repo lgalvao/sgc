@@ -148,7 +148,6 @@ describe('ProcessoCadastroView.vue', () => {
         wrapper.vm.tipo = 'MAPEAMENTO';
         await nextTick();
 
-        // Now it should be enabled
         expect((salvarBtn.element as HTMLButtonElement).disabled).toBe(false);
         expect((iniciarBtn.element as HTMLButtonElement).disabled).toBe(false);
 
