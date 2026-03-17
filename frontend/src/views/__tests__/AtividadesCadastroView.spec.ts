@@ -62,7 +62,7 @@ const stubs = {
         },
         template: '<button :data-testid="$attrs[\'data-testid\']" v-bind="disabled ? { disabled: true } : {}" @click="$emit(\'click\')"><slot /></button>'
     },
-    BButton: {template: '<button :data-testid="$attrs[\'data-testid\']" @click="$emit(\'click\')"><slot /></button>'},
+    BButton: {template: '<button :data-testid="$attrs[\'data-testid\']" v-bind="$attrs" @click="$emit(\'click\')"><slot /></button>'},
     BDropdown: {template: '<div><slot /></div>'},
     BDropdownItem: {template: '<div :data-testid="$attrs[\'data-testid\']" @click="$emit(\'click\')"><slot /></div>'},
     ErrorAlert: {template: '<div></div>'},
@@ -85,6 +85,10 @@ function createWrapper(customState = {}, accessOverrides = {}) {
         podeEditarCadastro: ref(true),
         podeDisponibilizarCadastro: ref(true),
         podeVisualizarImpacto: ref(true),
+        habilitarEditarCadastro: ref(true),
+        habilitarDisponibilizarCadastro: ref(true),
+        mesmaUnidade: ref(true),
+        habilitarAcessoCadastro: ref(true),
         ...accessOverrides
     } as any);
 

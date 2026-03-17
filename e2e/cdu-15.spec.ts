@@ -45,7 +45,7 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
         const compDesc = `Competência 1 ${timestamp}`;
         await criarCompetencia(page, compDesc, [ATIVIDADE_1]);
         await verificarSituacaoSubprocesso(page, 'Mapa criado');
-        await expect(page.getByTestId('btn-cad-mapa-disponibilizar')).toBeEnabled();
+        await expect(page.getByTestId('btn-cad-mapa-disponibilizar')).toBeDisabled();
 
         // CT-03: Editar competência
         const newDesc = `Competência 1 Editada ${timestamp}`;

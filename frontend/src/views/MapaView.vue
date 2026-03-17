@@ -21,6 +21,7 @@
         />
         <BButton
             v-if="podeEditarMapa"
+            :disabled="!habilitarEditarMapa"
             data-testid="btn-abrir-criar-competencia"
             variant="outline-primary"
             @click="abrirModalCriarLimpo"
@@ -29,7 +30,7 @@
         </BButton>
         <BButton
             v-if="podeDisponibilizarMapa"
-            :disabled="!podeConfirmarDisponibilizacao"
+            :disabled="!habilitarDisponibilizarMapa || !podeConfirmarDisponibilizacao"
             data-testid="btn-cad-mapa-disponibilizar"
             variant="success"
             @click="abrirModalDisponibilizar"
@@ -151,7 +152,7 @@ usePerfil();
 const codProcesso = computed(() => Number(route.params.codProcesso));
 const siglaUnidade = computed(() => String(route.params.siglaUnidade));
 
-const {podeVisualizarImpacto, podeEditarMapa, podeDisponibilizarMapa} = useAcesso(subprocesso);
+const {podeVisualizarImpacto, podeEditarMapa, podeDisponibilizarMapa, habilitarEditarMapa, habilitarDisponibilizarMapa} = useAcesso(subprocesso);
 const podeVerImpacto = computed(() => podeVisualizarImpacto.value);
 
 const mostrarModalImpacto = ref(false);

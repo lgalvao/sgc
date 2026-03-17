@@ -17,7 +17,9 @@ import sgc.alerta.EmailModelosService;
 import sgc.organizacao.UsuarioFacade;
 import sgc.processo.dto.*;
 import sgc.processo.dto.ProcessoDetalheDto.UnidadeParticipanteDto;
+import sgc.organizacao.model.Perfil;
 import sgc.processo.model.*;
+import sgc.seguranca.AcaoPermissao;
 import sgc.seguranca.SgcPermissionEvaluator;
 import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.*;
@@ -275,6 +277,7 @@ public class ProcessoService {
         Processo processo = buscarPorCodigo(codProcesso);
         List<Subprocesso> subprocessos = subprocessoService.listarEntidadesPorProcessoComUnidade(codProcesso);
         Set<Long> unidadesAcesso = obterIdsUnidadesAcesso(processo, usuario);
+        Perfil perfil = usuario.getPerfilAtivo();
 
         ProcessoDetalheDto dto = ProcessoDetalheDto.builder()
                 .codigo(processo.getCodigo())
@@ -286,10 +289,10 @@ public class ProcessoService {
                 .dataLimite(processo.getDataLimite())
                 .podeFinalizar(permissionEvaluator.verificarPermissao(usuario, processo, FINALIZAR_PROCESSO)
                         && validacaoService.validarSubprocessosParaFinalizacao(codProcesso).valido())
-                .podeHomologarCadastro(permissionEvaluator.verificarPermissao(usuario, processo, HOMOLOGAR_CADASTRO_EM_BLOCO))
-                .podeHomologarMapa(permissionEvaluator.verificarPermissao(usuario, processo, HOMOLOGAR_MAPA_EM_BLOCO))
-                .podeAceitarCadastroBloco(permissionEvaluator.verificarPermissao(usuario, processo, ACEITAR_CADASTRO_EM_BLOCO))
-                .podeDisponibilizarMapaBloco(permissionEvaluator.verificarPermissao(usuario, processo, DISPONIBILIZAR_MAPA_EM_BLOCO))
+                .podeHomologarCadastro(AcaoPermissao.HOMOLOGAR_CADASTRO_EM_BLOCO.permitePerfil(perfil))
+                .podeHomologarMapa(AcaoPermissao.HOMOLOGAR_MAPA_EM_BLOCO.permitePerfil(perfil))
+                .podeAceitarCadastroBloco(AcaoPermissao.ACEITAR_CADASTRO_EM_BLOCO.permitePerfil(perfil))
+                .podeDisponibilizarMapaBloco(AcaoPermissao.DISPONIBILIZAR_MAPA_EM_BLOCO.permitePerfil(perfil))
                 .unidades(new ArrayList<>())
                 .build();
 

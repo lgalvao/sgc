@@ -25,6 +25,7 @@ import {
     acessarSubprocessoChefeDireto,
     acessarSubprocessoGestor
 } from './helpers/helpers-analise.js';
+import {TEXTOS} from '../frontend/src/constants/textos.js';
 import {abrirModalCriarCompetencia, disponibilizarMapa, navegarParaMapa} from './helpers/helpers-mapas.js';
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza.js';
 import * as path from 'node:path';
@@ -1166,7 +1167,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             // Executar aceite real para mover subprocesso para Secretaria 2
             await btnAceitarBloco.click();
-            await page.getByRole('button', {name: /^Aceitar$/i}).click();
+            await page.getByRole('button', {name: TEXTOS.acaoBloco.aceitar.BOTAO}).click();
             await page.waitForTimeout(500);
 
             // Login como Gestor da SECRETARIA_2 para aceitar e mover para o ADMIN
@@ -1178,7 +1179,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             const btnAceitarBlocoSec2 = page.getByRole('button', {name: /Aceitar.*Bloco/i});
             await expect(btnAceitarBlocoSec2).toBeVisible();
             await btnAceitarBlocoSec2.click();
-            await page.getByRole('button', {name: /^Aceitar$/i}).click();
+            await page.getByRole('button', {name: TEXTOS.acaoBloco.aceitar.BOTAO}).click();
             await page.waitForTimeout(500);
 
             // Login como Admin para homologar em bloco
