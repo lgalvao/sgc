@@ -1,6 +1,7 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcessoCadastroDisponibilizadoFixture, criarProcessoRevisaoCadastroDisponibilizadoFixture} from './fixtures/fixtures-processos.js';
 import {loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
+import {resetDatabase} from './hooks/hooks-limpeza.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
 
 /**
@@ -106,6 +107,7 @@ test.describe.serial('CDU-22 - Aceitar cadastros de revisão em bloco', () => {
     let processoCodigo: number;
 
     test('Setup: processo de revisão com cadastro disponibilizado', async ({_resetAutomatico, request}) => {
+        await resetDatabase(request);
         const processo = await criarProcessoRevisaoCadastroDisponibilizadoFixture(request, {
             descricao: descProcessoRevisao,
             unidade: UNIDADE_REVISAO
@@ -127,7 +129,7 @@ test.describe.serial('CDU-22 - Aceitar cadastros de revisão em bloco', () => {
         await expect(modal).toHaveClass(/show/);
         await modal.getByRole('button', {name: TEXTOS.acaoBloco.aceitar.BOTAO}).click();
 
+        await expect(page).toHaveURL(/\/painel/);
         await expect(page.getByText(TEXTOS.sucesso.CADASTROS_ACEITOS_EM_BLOCO).first()).toBeVisible();
-        await expect(page).toHaveURL(new RegExp(`/processo/${processoCodigo}$`));
     });
 });
