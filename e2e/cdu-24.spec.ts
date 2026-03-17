@@ -26,11 +26,22 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
         expect(true).toBeTruthy();
     });
 
-    test('ADMIN disponibiliza mapas em bloco', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
+    test('ADMIN mantém botão disponibilizar desabilitado enquanto existir atividade sem competência', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, UNIDADE_1);
         await navegarParaMapa(page);
-        await criarCompetencia(page, competencia1, [atividade1, atividade2, atividade3]);
+
+        const btnDisponibilizarMapa = page.getByTestId('btn-cad-mapa-disponibilizar');
+        await expect(btnDisponibilizarMapa).toBeDisabled();
+        await criarCompetencia(page, competencia1, [atividade1, atividade2]);
+        await expect(btnDisponibilizarMapa).toBeDisabled();
+    });
+
+    test('ADMIN disponibiliza mapas em bloco após associar todas as atividades', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
+        await navegarParaSubprocesso(page, UNIDADE_1);
+        await navegarParaMapa(page);
+        await criarCompetencia(page, `${competencia1} complementar`, [atividade3]);
 
         // Retornar para tela do processo para ação em bloco
         await page.goto('/painel');

@@ -96,7 +96,7 @@ test.describe.serial('CDU-20 - Ver sugestões quando situação é "Mapa com sug
         // Conteúdo do modal exibe as sugestões
         const txtSugestoes = page.getByTestId('txt-ver-sugestoes-mapa');
         await expect(txtSugestoes).toBeVisible();
-        await expect(txtSugestoes).not.toHaveValue('');
+        await expect(txtSugestoes).toHaveValue('Sugestão de ajuste na competência via fixture E2E');
 
         // Fecha o modal
         await page.getByTestId('btn-ver-sugestoes-mapa-fechar').click();
