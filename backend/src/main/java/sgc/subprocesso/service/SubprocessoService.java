@@ -63,6 +63,7 @@ public class SubprocessoService {
     @Autowired
     @Setter
     private MapaManutencaoService mapaManutencaoService;
+    private final HierarquiaService hierarquiaService;
 
     @Transactional(readOnly = true)
     public MapaVisualizacaoResponse mapaParaVisualizacao(Long codSubprocesso) {
@@ -640,9 +641,10 @@ public class SubprocessoService {
 
         if (processo != null && processo.getSituacao() == SituacaoProcesso.FINALIZADO) {
             // Para processos finalizados, bloqueia toda edição mas mantém acesso de visualização (CDU-18, CDU-17)
+            Unidade unidadeUsuario = unidadeService.buscarPorCodigo(usuario.getUnidadeAtivaCodigo());
             return PermissoesSubprocessoDto.builder()
-                    .habilitarAcessoCadastro(verificarAcessoCadastroHabilitado(perfil, situacao))
-                    .habilitarAcessoMapa(verificarAcessoMapaHabilitado(perfil, situacao))
+                    .habilitarAcessoCadastro(verificarAcessoCadastroHabilitado(perfil, situacao, sp.getUnidade(), unidadeUsuario))
+                    .habilitarAcessoMapa(verificarAcessoMapaHabilitado(perfil, situacao, sp.getUnidade(), unidadeUsuario))
                     .build();
         }
 
@@ -652,16 +654,20 @@ public class SubprocessoService {
 
         boolean temMapaVigente = unidadeService.verificarMapaVigente(sp.getUnidade().getCodigo());
 
-        return construirPermissoes(mesmaUnidade, perfil, situacao, temMapaVigente);
+        return construirPermissoes(mesmaUnidade, usuario, sp, temMapaVigente);
     }
 
-    private PermissoesSubprocessoDto construirPermissoes(boolean mesmaUnidade, Perfil perfil, SituacaoSubprocesso situacao, boolean temMapaVigente) {
+    private PermissoesSubprocessoDto construirPermissoes(boolean mesmaUnidade, Usuario usuario, Subprocesso sp, boolean temMapaVigente) {
+        Perfil perfil = usuario.getPerfilAtivo();
+        SituacaoSubprocesso situacao = sp.getSituacao();
+        Unidade unidadeUsuario = unidadeService.buscarPorCodigo(usuario.getUnidadeAtivaCodigo());
+
         boolean isChefe = perfil == Perfil.CHEFE;
         boolean isGestor = perfil == Perfil.GESTOR;
         boolean isAdmin = perfil == Perfil.ADMIN;
 
-        boolean habilitarAcessoCadastro = verificarAcessoCadastroHabilitado(perfil, situacao);
-        boolean habilitarAcessoMapa = verificarAcessoMapaHabilitado(perfil, situacao);
+        boolean habilitarAcessoCadastro = verificarAcessoCadastroHabilitado(perfil, situacao, sp.getUnidade(), unidadeUsuario);
+        boolean habilitarAcessoMapa = verificarAcessoMapaHabilitado(perfil, situacao, sp.getUnidade(), unidadeUsuario);
 
         return PermissoesSubprocessoDto.builder()
                 .podeEditarCadastro(isChefe && Set.of(NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, REVISAO_CADASTRO_EM_ANDAMENTO).contains(situacao))
@@ -688,8 +694,10 @@ public class SubprocessoService {
                 .build();
     }
 
-    private boolean verificarAcessoCadastroHabilitado(Perfil perfil, SituacaoSubprocesso situacao) {
-        if (perfil == Perfil.CHEFE || perfil == Perfil.ADMIN || perfil == Perfil.GESTOR) return true;
+    private boolean verificarAcessoCadastroHabilitado(Perfil perfil, SituacaoSubprocesso situacao, Unidade unidadeAlvo, Unidade unidadeUsuario) {
+        if (perfil == Perfil.ADMIN) return true;
+        if (perfil == Perfil.GESTOR) return hierarquiaService.ehMesmaOuSubordinada(unidadeAlvo, unidadeUsuario);
+        if (perfil == Perfil.CHEFE) return Objects.equals(unidadeAlvo.getCodigo(), unidadeUsuario.getCodigo());
 
         if (situacao.name().startsWith("MAPEAMENTO")) {
             return situacao.ordinal() >= SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO.ordinal();
@@ -699,8 +707,19 @@ public class SubprocessoService {
         return false;
     }
 
-    private boolean verificarAcessoMapaHabilitado(Perfil perfil, SituacaoSubprocesso situacao) {
-        if (perfil == Perfil.ADMIN || perfil == Perfil.GESTOR) return true;
+    private boolean verificarAcessoMapaHabilitado(Perfil perfil, SituacaoSubprocesso situacao, Unidade unidadeAlvo, Unidade unidadeUsuario) {
+        if (perfil == Perfil.ADMIN) {
+            if (situacao.name().startsWith("MAPEAMENTO")) {
+                return situacao.ordinal() >= SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO.ordinal();
+            } else if (situacao.name().startsWith("REVISAO")) {
+                return situacao.ordinal() >= SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA.ordinal();
+            }
+        }
+
+        if (perfil == Perfil.GESTOR) {
+            // Gestor vê o mapa assim que ele é disponibilizado ou está em andamento de homologação/aceite
+            return hierarquiaService.ehMesmaOuSubordinada(unidadeAlvo, unidadeUsuario);
+        }
 
         if (situacao.name().startsWith("MAPEAMENTO")) {
             return situacao.ordinal() >= SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO.ordinal();
