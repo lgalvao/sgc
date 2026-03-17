@@ -9,7 +9,7 @@ Based on the constraint that this is an intranet application for at most 5-10 si
 - Controllers can call Services directly, or for simple CRUD operations, Controllers should be allowed to inject and call Spring Data Repositories directly. This eliminates boilerplate and pass-through code.
 
 ## 2. Frontend: Remove Pass-Through Pinia Stores
-**Issue:** Several Pinia stores (`mapas.ts`, `processos.ts`, `subprocessos.ts`, `atividades.ts`, `usuarios.ts`) act as unnecessary pass-throughs that merely fetch and cache API data for single views.
+**Issue:** Several Pinia stores (`mapas.ts`, `processos.ts`, `subprocessos.ts`, `atividades.ts`, `usuarios.ts`, `configuracoes.ts`) act as unnecessary pass-throughs that merely fetch and cache API data for single views.
 **Suggestion:**
 - Remove these stores. Use standard Vue `ref`s, `reactive`, or composables (like `useAsyncAction`) directly within components to hold page-level state and call `services/` directly.
 - Reserve Pinia strictly for true global state that is shared across the entire application, such as Authentication/Profile (`perfil.ts`) and UI Feedback/Notifications (`feedback.ts`, `toast.ts`).
@@ -32,5 +32,11 @@ Based on the constraint that this is an intranet application for at most 5-10 si
 - Avoid creating Vue components that only wrap base UI components (like BootstrapVueNext components) without adding substantial domain logic or distinct visual structure. Use the base components directly to avoid prop-drilling and event-bubbling overhead.
 
 ## 6. General Architectural Philosophy
-- **Interfaces:** Avoid single-implementation interfaces. If an interface only has an `Impl` class, remove the interface and use the concrete class directly. (Note: A quick scan showed no `Impl` suffix files, which is good, but keep this in mind).
+- **Interfaces:** Avoid single-implementation interfaces. If an interface only has an `Impl` class, remove the interface and use the concrete class directly.
 - **Patterns:** Avoid complex design patterns (Builders for simple objects, Factories, Hexagonal/Onion architectures). Use Spring Boot and Hibernate features directly and simply.
+
+## 7. Active Simplification Efforts
+**Current Status:** There are active efforts to implement these simplifications, as documented in `plano-simplificacao.md`.
+**Ongoing Work:**
+- **DTOs:** Continuing to remove manual DTO mapping in the `Processo` module, favoring Jackson serialization via `@JsonView(ProcessoViews.Publica.class)` directly on entities.
+- **Pinia Stores:** Actively refactoring `frontend/src/stores/processos.ts` to replace the global store with a context-based composable (`useProcessos.ts`) that manages local reactive state (`processos`, `processoAtivo`, `loading`). Views are being updated to use this composable, enabling the eventual removal of the `processos.ts` store.
