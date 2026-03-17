@@ -22,26 +22,19 @@ import sgc.organizacao.model.Usuario;
 import sgc.organizacao.service.UnidadeService;
 import sgc.processo.dto.AcaoEmBlocoRequest;
 import sgc.processo.dto.AtualizarProcessoRequest;
-import sgc.processo.dto.ProcessoDetalheDto;
 import sgc.processo.model.AcaoProcesso;
 import sgc.processo.model.Processo;
 import sgc.processo.model.ProcessoRepo;
 import sgc.processo.model.SituacaoProcesso;
 import sgc.processo.model.TipoProcesso;
-import sgc.processo.model.UnidadeProcesso;
 import sgc.seguranca.SgcPermissionEvaluator;
-import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoService;
 import sgc.subprocesso.service.SubprocessoTransicaoService;
 import sgc.subprocesso.service.SubprocessoValidacaoService;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;

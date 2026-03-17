@@ -1164,6 +1164,23 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await capturarTela(page, '09-operacoes-bloco', '02-modal-aceitar-cadastro-bloco', { tags: ['modal', 'bloco'] });
             await page.getByRole('button', {name: /Cancelar/i}).click();
 
+            // Executar aceite real para mover subprocesso para Secretaria 2
+            await btnAceitarBloco.click();
+            await page.getByRole('button', {name: /^Aceitar$/i}).click();
+            await page.waitForTimeout(500);
+
+            // Login como Gestor da SECRETARIA_2 para aceitar e mover para o ADMIN
+            await fazerLogout(page);
+            await login(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha);
+            await page.getByTestId('tbl-processos').getByText(descricao).first().click();
+            await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
+            
+            const btnAceitarBlocoSec2 = page.getByRole('button', {name: /Aceitar.*Bloco/i});
+            await expect(btnAceitarBlocoSec2).toBeVisible();
+            await btnAceitarBlocoSec2.click();
+            await page.getByRole('button', {name: /^Aceitar$/i}).click();
+            await page.waitForTimeout(500);
+
             // Login como Admin para homologar em bloco
             await fazerLogout(page);
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
