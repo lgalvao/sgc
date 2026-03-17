@@ -152,7 +152,7 @@ async function capturarTela(page: Page, categoria: string, nome: string, opcoes?
         titulo,
         isFullPage,
         isComponente: false,
-        ...(opcoes?.extra ?? {}) // Espalha campos extras na raiz do objeto
+        ...opcoes?.extra // Espalha campos extras na raiz do objeto
     });
 
     // Remover banner após a captura
@@ -214,7 +214,7 @@ async function capturarComponente(elemento: Locator, categoria: string, nome: st
         titulo,
         isFullPage: false,
         isComponente: true,
-        ...(extra ?? {}) // Espalha campos extras na raiz do objeto
+        ...extra // Espalha campos extras na raiz do objeto
     });
 
     await elemento.evaluate((el) => {
