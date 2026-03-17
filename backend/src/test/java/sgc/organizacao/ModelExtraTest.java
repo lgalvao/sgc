@@ -31,7 +31,6 @@ class ModelExtraTest {
         when(unidadeRepo.findBySiglaAndSituacao(sigla, SituacaoUnidade.ATIVA))
                 .thenReturn(Optional.of(u));
 
-        // Call the default method
         doCallRealMethod().when(unidadeRepo).findBySigla(anyString());
 
         Optional<Unidade> result = unidadeRepo.findBySigla(sigla);

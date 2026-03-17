@@ -46,7 +46,6 @@ class SubprocessoFluxoIntegrationTest extends BaseIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        // 1. Unidades
         unidadeRaiz = unidadeRepo.findById(1L).orElseThrow();
 
         unidadeFilha = UnidadeFixture.unidadePadrao();
@@ -60,7 +59,6 @@ class SubprocessoFluxoIntegrationTest extends BaseIntegrationTest {
         jdbcTemplate.update("INSERT INTO SGC.VW_RESPONSABILIDADE (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio) VALUES (?, ?, ?, ?, ?)",
                 unidadeFilha.getCodigo(), "111111111111", "00000", "TITULAR", LocalDateTime.now());
 
-        // 2. Usuários
         admin = usuarioRepo.findById("111111111111").orElseThrow(); // Admin padrão do seed (Admin teste V2)
 
         Usuario chefe = UsuarioFixture.usuarioPadrao();
@@ -78,7 +76,6 @@ class SubprocessoFluxoIntegrationTest extends BaseIntegrationTest {
                 .build();
         usuarioPerfilRepo.save(perfilChefe);
 
-        // 3. Processo
         Processo processo = Processo.builder()
                 .descricao("Processo mapeamento teste")
                 .tipo(TipoProcesso.MAPEAMENTO)
@@ -87,7 +84,6 @@ class SubprocessoFluxoIntegrationTest extends BaseIntegrationTest {
                 .build();
         processoRepo.save(processo);
 
-        // 4. Subprocesso inicial
         subprocesso = Subprocesso.builder()
                 .unidade(unidadeFilha)
                 .situacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO) // Começando já homologado para focar no mapa
@@ -127,7 +123,6 @@ class SubprocessoFluxoIntegrationTest extends BaseIntegrationTest {
         Long spId = subprocesso.getCodigo();
         Long mapaId = subprocesso.getMapa().getCodigo();
 
-        // 1. Adicionar competência (ADMIN)
         // O ADMIN está na Unidade RAIZ. O subprocesso está na Unidade FILHA.
         // A regra de Ouro (SgcPermissionEvaluator) exige que a localização do subprocesso (FILHA)
         // seja igual à unidade ativa do usuário para ações de escrita (EDITAR_MAPA, DISPONIBILIZAR_MAPA).
@@ -154,7 +149,6 @@ class SubprocessoFluxoIntegrationTest extends BaseIntegrationTest {
         Subprocesso sp = subprocessoRepo.findById(spId).orElseThrow();
         assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
 
-        // 2. Disponibilizar mapa (ADMIN)
         // Situação deve mudar para MAPA_DISPONIBILIZADO
         // Admin continua na unidade filha para essa ação de escrita.
 
@@ -178,8 +172,6 @@ class SubprocessoFluxoIntegrationTest extends BaseIntegrationTest {
         // O ADMIN é titular da RAIZ e possui o perfil CHEFE lá (segundo seed).
 
         // Para validar mapa, a regra é:
-        // 1. Ser perfil CHEFE.
-        // 2. Estar na mesma unidade onde está o subprocesso (RAIZ).
 
         admin.setUnidadeAtivaCodigo(unidadeRaiz.getCodigo()); // Admin atuando na RAIZ
         autenticar(admin, Perfil.CHEFE); // Admin como CHEFE da Raiz

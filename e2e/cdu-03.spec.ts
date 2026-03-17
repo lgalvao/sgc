@@ -64,13 +64,11 @@ test.describe('CDU-03 - Manter processo', () => {
         
         await page.getByTestId('btn-arvore-expand-SECRETARIA_1').click();
         
-        // 1. Selecionar a raiz marca a si mesma e as filhas
         await chkRaiz.click();
         await expect(inputRaiz).toBeChecked();
         const inputFilha = page.getByTestId('chk-arvore-unidade-ASSESSORIA_12').locator('input').or(page.getByTestId('chk-arvore-unidade-ASSESSORIA_12'));
         await expect(inputFilha).toBeChecked();
 
-        // 2. Desmarcar uma filha NÃO deve desmarcar a raiz (pois ela é Interoperacional e tem "vida própria")
         await page.getByTestId('chk-arvore-unidade-ASSESSORIA_12').click();
         await expect(inputFilha).not.toBeChecked();
         await expect(inputRaiz).toBeChecked();
@@ -133,7 +131,6 @@ test.describe('CDU-03 - Manter processo', () => {
         await page.getByTestId('btn-arvore-expand-SECRETARIA_1').click();
         await page.getByTestId('btn-arvore-expand-COORD_11').click();
 
-        // 1. Selecionar pai seleciona filhos
         const chkCoord = page.getByTestId('chk-arvore-unidade-COORD_11');
         await chkCoord.click();
 
@@ -142,17 +139,14 @@ test.describe('CDU-03 - Manter processo', () => {
         await expect(input111).toBeChecked();
         await expect(input112).toBeChecked();
 
-        // 2. Desmarcar um filho deixa pai indeterminado
         await page.getByTestId('chk-arvore-unidade-SECAO_111').click();
         const inputCoord = chkCoord.locator('input').or(chkCoord);
         await expect(inputCoord).toHaveJSProperty('indeterminate', true);
 
-        // 3. Desmarcar todos os filhos desmarca o pai
         await page.getByTestId('chk-arvore-unidade-SECAO_112').click();
         await page.getByTestId('chk-arvore-unidade-SECAO_113').click();
         await expect(inputCoord).not.toBeChecked();
 
-        // 4. Selecionar todos os filhos marca o pai automaticamente
         await page.getByTestId('chk-arvore-unidade-SECAO_111').click();
         await page.getByTestId('chk-arvore-unidade-SECAO_112').click();
         await page.getByTestId('chk-arvore-unidade-SECAO_113').click();

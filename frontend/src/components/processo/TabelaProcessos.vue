@@ -57,7 +57,6 @@ const internalSortBy = computed(() => [{
 function handleSortChange(val: any) {
   const sortBy = Array.isArray(val) ? val[0] : val;
   if (sortBy?.key) {
-    // Só emite se for realmente diferente do estado atual vindo das props
     if (sortBy.key !== props.criterioOrdenacao || (sortBy.order === 'asc') !== props.direcaoOrdenacaoAsc) {
       emit("ordenar", sortBy.key);
     }

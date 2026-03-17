@@ -631,7 +631,6 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             const descricao = `Proc atividades ${Date.now()}`;
             const UNIDADE_ALVO = 'SECAO_211';
 
-            // 1. Início: Validações de Formulário (Admin)
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
             await page.getByTestId('btn-painel-criar-processo').click();
             await expect(page).toHaveURL(/\/processo\/cadastro/);
@@ -671,7 +670,6 @@ test.describe('Captura de Telas - Sistema SGC', () => {
                 tags: ['validacao', 'sucesso']
             });
 
-            // 2. Iniciar processo
             await page.getByTestId('btn-processo-iniciar').click();
             await confirmarInicioProcessoPeloDialogo(page, {
                 descricao,
@@ -685,7 +683,6 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             const codProcesso = await extrairProcessoCodigo(page);
             if (codProcesso > 0) cleanup.registrar(codProcesso);
 
-            // 3. Login como Chefe para Fluxo de Atividades
             await login(page, USUARIOS.CHEFE_SECAO_211.titulo, USUARIOS.CHEFE_SECAO_211.senha);
             await page.getByTestId('tbl-processos').getByText(descricao).first().click();
             await navegarParaSubprocesso(page, UNIDADE_ALVO);
@@ -924,7 +921,6 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await page.getByTestId('btn-confirmar-disponibilizacao').click();
             await page.waitForTimeout(500);
 
-            // 1. GESTOR COORD_12 - Primeiro aceite
             await login(page, USUARIOS.GESTOR_COORD_12.titulo, USUARIOS.GESTOR_COORD_12.senha);
 
             await acessarSubprocessoGestor(page, descricao, UNIDADE_ALVO);
@@ -938,7 +934,6 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await page.getByTestId('btn-aceite-cadastro-confirmar').click();
             await verificarPaginaPainel(page);
 
-            // 2. GESTOR SECRETARIA_1 - Segundo aceite
             await loginComPerfil(page, USUARIOS.GESTOR_SECRETARIA_1.titulo, USUARIOS.GESTOR_SECRETARIA_1.senha, USUARIOS.GESTOR_SECRETARIA_1.perfil);
             await acessarSubprocessoGestor(page, descricao, UNIDADE_ALVO);
             await navegarParaAtividadesVisualizacao(page);
@@ -951,7 +946,6 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await page.getByTestId('btn-aceite-cadastro-confirmar').click();
             await verificarPaginaPainel(page);
 
-            // 3. ADMIN - Homologação final
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
             // Navegar para o subprocesso (admin vê tabela de unidades)
@@ -1250,7 +1244,6 @@ test.describe('Captura de Telas - Sistema SGC', () => {
         test('Captura telas administrativas (Unidades, Histórico, Configurações e Relatórios)', async ({page}) => {
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
-            // 1. Unidades e Atribuição temporária
             const linkUnidades = page.getByRole('link', {name: /Unidades/i});
             await expect(linkUnidades).toBeVisible();
             await linkUnidades.click();
@@ -1292,7 +1285,6 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await capturarTela(page, '12-historico', '02-tabela-processos-finalizados', { fullPage: true });
             await capturarComponente(tabela.first(), '12-historico', '03-tabela-processos-finalizados-detalhe', { contexto: 'historico' });
 
-            // 3. Configurações e Administradores
             await page.getByTestId('btn-configuracoes').click();
             await page.waitForTimeout(500);
             await capturarTela(page, '13-configuracoes', '01-pagina-parametros', { fullPage: true });

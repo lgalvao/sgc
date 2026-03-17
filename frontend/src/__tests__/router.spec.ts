@@ -101,7 +101,6 @@ describe("Router", () => {
         expect(route.params.codProcesso).toBe("123");
         expect(route.params.siglaUnidade).toBe("DTI");
 
-        // Test props function
         const matched = route.matched.find((m) => m.name === "Subprocesso");
         expect(matched).toBeDefined();
         if (matched && typeof matched.props.default === "function") {

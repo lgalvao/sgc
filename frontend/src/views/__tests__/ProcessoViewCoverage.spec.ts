@@ -221,7 +221,6 @@ describe("ProcessoViewCoverage.spec.ts", () => {
 
         const modal = wrapper.findComponent({name: 'ModalAcaoBloco'});
 
-        // Trigger action
         (wrapper.vm as any).acaoBlocoAtual = 'aceitar';
         (processosStore.executarAcaoBloco as any).mockRejectedValue(new Error("Erro bloco"));
 

@@ -141,7 +141,6 @@ class ProcessoRepoTest {
 
         entityManager.flush();
 
-        // Act - Paginação com tamanho 2 (espera-se 3 páginas: 2, 2, 1)
         Page<Processo> resultado = processoRepo.listarPorParticipantesESituacaoDiferente(
                 List.of(u1.getCodigo()),
                 SituacaoProcesso.CRIADO,

@@ -27,7 +27,6 @@ vi.mock("vue-router", () => ({
 }));
 
 describe("MainNavbar.vue", () => {
-    // Setup cleanup
     const ctx = setupComponentTest();
 
     beforeEach(() => {

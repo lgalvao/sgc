@@ -154,7 +154,6 @@ class CDU03IntegrationTest extends BaseIntegrationTest {
                 .get("codigo")
                 .asLong();
 
-        // 2. Editar o processo
         List<Long> unidadesEditadas = new ArrayList<>();
         unidadesEditadas.add(unidade1.getCodigo());
         unidadesEditadas.add(unidade2.getCodigo()); // Adiciona outra unidade
@@ -218,7 +217,6 @@ class CDU03IntegrationTest extends BaseIntegrationTest {
                 .get("codigo")
                 .asLong();
 
-        // 2. Remover o processo
         mockMvc.perform(post(API_PROCESSOS + "/{codProcesso}/excluir", codProcesso).with(csrf()))
                 .andExpect(status().isNoContent()); // 204 No content para remoção bem-sucedida
 

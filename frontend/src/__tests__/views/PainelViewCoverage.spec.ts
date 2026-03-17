@@ -131,14 +131,12 @@ describe('PainelView Coverage', () => {
 
         // Initial default: descricao ASC (implied by refs initialization in component)
 
-        // 1. Sort by same field (descricao) -> should toggle to DESC
         await (wrapper.vm as any).ordenarPor('descricao');
 
         expect(processosStore.buscarProcessosPainel).toHaveBeenLastCalledWith(
             'GESTOR', 1, 0, 10, 'descricao', 'desc'
         );
 
-        // 2. Sort by different field (tipo) -> should reset to ASC
         await (wrapper.vm as any).ordenarPor('tipo');
         expect(processosStore.buscarProcessosPainel).toHaveBeenLastCalledWith(
             'GESTOR', 1, 0, 10, 'tipo', 'asc'

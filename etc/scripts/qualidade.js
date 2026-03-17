@@ -113,7 +113,6 @@ function parseGradleStats(step) {
 function parseVitestStats(output) {
     let stats = {passed: 0, failed: 0, skipped: 0, total: 0};
 
-    // Pattern: Tests  1101 passed (1101)
     const passedMatch = output.match(/Tests\s+(\d+)\s+passed\s+\((\d+)\)/);
     if (passedMatch) {
         stats.passed = parseInt(passedMatch[1], 10);
@@ -121,7 +120,6 @@ function parseVitestStats(output) {
         return stats;
     }
 
-    // Pattern: Tests  X passed | Y failed | Z skipped | W total
     // Note: Vitest output might vary, capturing generic numbers
     const testsLine = output.match(/Tests\s+(.*)/);
     if (testsLine) {

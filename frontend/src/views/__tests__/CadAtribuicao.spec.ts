@@ -117,7 +117,6 @@ describe('CadAtribuicao.vue', () => {
         context.wrapper = criarWrapper();
         await flushPromises();
 
-        // Preencher formulário
         const select = context.wrapper.find('[data-testid="select-usuario"]');
         await select.setValue('111');
 
@@ -150,7 +149,6 @@ describe('CadAtribuicao.vue', () => {
         context.wrapper = criarWrapper();
         await flushPromises();
 
-        // Preencher formulário
         context.wrapper.vm.usuarioSelecionado = '111';
         context.wrapper.vm.dataInicio = '2023-01-01';
         context.wrapper.vm.dataTermino = '2023-12-31';

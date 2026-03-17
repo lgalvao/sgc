@@ -126,7 +126,6 @@ test.describe.serial('CDU-19 - Apresentar sugestões e pré-preenchimento', () =
 
         await expect(page.getByTestId('btn-mapa-sugestoes')).toBeVisible();
 
-        // Modal deve abrir pré-preenchido com a sugestão anterior (CDU-19, passo 4.2)
         await page.getByTestId('btn-mapa-sugestoes').click();
         await expect(page.getByTestId('inp-sugestoes-mapa-texto')).toHaveValue(TEXTO_SUGESTAO);
 
