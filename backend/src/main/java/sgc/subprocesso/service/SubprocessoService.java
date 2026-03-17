@@ -695,36 +695,63 @@ public class SubprocessoService {
     }
 
     private boolean verificarAcessoCadastroHabilitado(Perfil perfil, SituacaoSubprocesso situacao, Unidade unidadeAlvo, Unidade unidadeUsuario) {
-        if (perfil == Perfil.ADMIN) return true;
-        if (perfil == Perfil.GESTOR) return hierarquiaService.ehMesmaOuSubordinada(unidadeAlvo, unidadeUsuario);
-        if (perfil == Perfil.CHEFE) return Objects.equals(unidadeAlvo.getCodigo(), unidadeUsuario.getCodigo());
+        if (perfil == Perfil.CHEFE) {
+            return Objects.equals(unidadeAlvo.getCodigo(), unidadeUsuario.getCodigo());
+        }
 
+        boolean cadastroDisponibilizado = verificarCadastroDisponibilizadoParaVisualizacao(situacao);
+        if (perfil == Perfil.ADMIN) {
+            return cadastroDisponibilizado;
+        }
+        if (perfil == Perfil.GESTOR) {
+            return cadastroDisponibilizado && hierarquiaService.ehMesmaOuSubordinada(unidadeAlvo, unidadeUsuario);
+        }
+        return cadastroDisponibilizado && Objects.equals(unidadeAlvo.getCodigo(), unidadeUsuario.getCodigo());
+    }
+
+    private boolean verificarAcessoMapaHabilitado(Perfil perfil, SituacaoSubprocesso situacao, Unidade unidadeAlvo, Unidade unidadeUsuario) {
+        if (perfil == Perfil.ADMIN) {
+            return verificarMapaHabilitadoParaAdmin(situacao);
+        }
+
+        if (perfil == Perfil.GESTOR) {
+            return verificarMapaDisponibilizadoParaVisualizacao(situacao)
+                    && hierarquiaService.ehMesmaOuSubordinada(unidadeAlvo, unidadeUsuario);
+        }
+
+        if (perfil == Perfil.CHEFE || perfil == Perfil.SERVIDOR) {
+            return verificarMapaDisponibilizadoParaVisualizacao(situacao)
+                    && Objects.equals(unidadeAlvo.getCodigo(), unidadeUsuario.getCodigo());
+        }
+        return false;
+    }
+
+    private boolean verificarCadastroDisponibilizadoParaVisualizacao(SituacaoSubprocesso situacao) {
         if (situacao.name().startsWith("MAPEAMENTO")) {
             return situacao.ordinal() >= SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO.ordinal();
-        } else if (situacao.name().startsWith("REVISAO")) {
+        }
+        if (situacao.name().startsWith("REVISAO")) {
             return situacao.ordinal() >= SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA.ordinal();
         }
         return false;
     }
 
-    private boolean verificarAcessoMapaHabilitado(Perfil perfil, SituacaoSubprocesso situacao, Unidade unidadeAlvo, Unidade unidadeUsuario) {
-        if (perfil == Perfil.ADMIN) {
-            if (situacao.name().startsWith("MAPEAMENTO")) {
-                return situacao.ordinal() >= SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO.ordinal();
-            } else if (situacao.name().startsWith("REVISAO")) {
-                return situacao.ordinal() >= SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA.ordinal();
-            }
-        }
-
-        if (perfil == Perfil.GESTOR) {
-            // Gestor vê o mapa assim que ele é disponibilizado ou está em andamento de homologação/aceite
-            return hierarquiaService.ehMesmaOuSubordinada(unidadeAlvo, unidadeUsuario);
-        }
-
+    private boolean verificarMapaDisponibilizadoParaVisualizacao(SituacaoSubprocesso situacao) {
         if (situacao.name().startsWith("MAPEAMENTO")) {
             return situacao.ordinal() >= SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO.ordinal();
-        } else if (situacao.name().startsWith("REVISAO")) {
+        }
+        if (situacao.name().startsWith("REVISAO")) {
             return situacao.ordinal() >= SituacaoSubprocesso.REVISAO_MAPA_DISPONIBILIZADO.ordinal();
+        }
+        return false;
+    }
+
+    private boolean verificarMapaHabilitadoParaAdmin(SituacaoSubprocesso situacao) {
+        if (situacao.name().startsWith("MAPEAMENTO")) {
+            return situacao.ordinal() >= SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO.ordinal();
+        }
+        if (situacao.name().startsWith("REVISAO")) {
+            return situacao.ordinal() >= SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA.ordinal();
         }
         return false;
     }
