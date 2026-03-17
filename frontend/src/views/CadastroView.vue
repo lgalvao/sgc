@@ -63,6 +63,14 @@
       {{ erroGlobalFormatado.message }}
     </BAlert>
 
+    <AppAlert
+        v-if="notificacao"
+        :message="notificacao.message"
+        :variant="notificacao.variant"
+        :dismissible="notificacao.dismissible ?? true"
+        @dismissed="clear()"
+    />
+
     <CadAtividadeForm
         ref="atividadeFormRef"
         v-model="novaAtividade"
@@ -139,6 +147,7 @@
 
 <script lang="ts" setup>
 import {BAlert, BButton, BBadge} from "bootstrap-vue-next";
+import AppAlert from "@/components/comum/AppAlert.vue";
 import {computed, nextTick, onMounted, ref, watch} from "vue";
 import {useRouter} from "vue-router";
 import {storeToRefs} from "pinia";
@@ -194,7 +203,7 @@ const props = defineProps<{
 const router = useRouter();
 const subprocessosStore = useSubprocessosStore();
 const mapasStore = useMapasStore();
-const {notify} = useNotification();
+const {notify, notificacao, clear} = useNotification();
 const toastStore = useToastStore();
 const {impactoMapa: impactos} = storeToRefs(mapasStore);
 
@@ -415,8 +424,13 @@ async function salvarEdicaoConhecimento(atividadeCodigo: number, conhecimentoCod
   }
 }
 
-async function handleImportAtividades() {
+async function handleImportAtividades(aviso?: string) {
   mostrarModalImportar.value = false;
+  if (aviso) {
+    notify(TEXTOS.atividades.AVISO_IMPORTACAO_DUPLICATAS, 'warning');
+  } else {
+    notify(TEXTOS.atividades.SUCESSO_IMPORTACAO, 'success');
+  }
   const codigoSubprocesso = codSubprocesso.value;
   if (codigoSubprocesso !== null) {
     await withErrorHandling(async () => {
@@ -430,7 +444,6 @@ async function handleImportAtividades() {
       }
     });
   }
-  notify(TEXTOS.atividades.SUCESSO_IMPORTACAO, 'success');
 }
 
 function obterErroParaAtividade(atividadeCodigo: number): string | undefined {

@@ -259,6 +259,32 @@ export async function criarProcessoMapaHomologadoFixture(
 }
 
 /**
+ * Cria um processo de revisão já com cadastro disponibilizado via API E2E.
+ * Usado para testar aceite em bloco (CDU-22) e homologação em bloco (CDU-23) para revisão.
+ */
+export async function criarProcessoRevisaoCadastroDisponibilizadoFixture(
+    request: APIRequestContext,
+    options: ProcessoFixtureOptions
+): Promise<ProcessoFixture> {
+    const response = await request.post('/e2e/fixtures/processo-revisao-com-cadastro-disponibilizado', {
+        data: {
+            unidadeSigla: options.unidade,
+            iniciar: options.iniciar ?? true,
+            descricao: options.descricao ?? `Fixture E2E REVISAO_CADASTRO_DISPONIBILIZADO ${Date.now()}`,
+            diasLimite: options.diasLimite ?? 30
+        }
+    });
+
+    if (!response.ok()) {
+        throw new Error(
+            `Falha ao criar processo fixture de revisão com cadastro disponibilizado: ${response.status()} ${response.statusText()}`
+        );
+    }
+
+    return await response.json();
+}
+
+/**
  * Cria um processo de revisão já com cadastro homologado via API E2E.
  */
 export async function criarProcessoRevisaoCadastroHomologadoFixture(

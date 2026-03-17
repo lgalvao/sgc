@@ -492,7 +492,10 @@ public class SubprocessoTransicaoService {
 
     @Transactional
     public void aceitarCadastroEmBloco(List<Long> subprocessoCodigos, Usuario usuario) {
-        subprocessoCodigos.forEach(codSubprocesso -> executarAceite(codSubprocesso, usuario, "Avaliação em bloco", false));
+        subprocessoCodigos.forEach(codSubprocesso -> {
+            boolean isRevisao = REVISAO == buscarSubprocesso(codSubprocesso).getProcesso().getTipo();
+            executarAceite(codSubprocesso, usuario, "Avaliação em bloco", isRevisao);
+        });
     }
 
     private void executarAceite(Long codSubprocesso, Usuario usuario, @Nullable String observacoes, boolean isRevisao) {
@@ -533,12 +536,10 @@ public class SubprocessoTransicaoService {
     }
 
     public void homologarCadastroEmBloco(List<Long> subprocessoCodigos, Usuario usuario) {
-        subprocessoCodigos.forEach(codSubprocesso -> executarHomologacao(
-                codSubprocesso,
-                usuario,
-                "Homologação em bloco",
-                false)
-        );
+        subprocessoCodigos.forEach(codSubprocesso -> {
+            boolean isRevisao = REVISAO == buscarSubprocesso(codSubprocesso).getProcesso().getTipo();
+            executarHomologacao(codSubprocesso, usuario, "Homologação em bloco", isRevisao);
+        });
     }
 
     private void executarHomologacao(Long codSubprocesso, Usuario usuario, @Nullable String observacoes, boolean isRevisao) {

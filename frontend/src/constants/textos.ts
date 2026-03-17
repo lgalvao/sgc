@@ -247,6 +247,7 @@ export const TEXTOS = {
     ERRO_ADICIONAR_CONHECIMENTO: "Falha ao adicionar conhecimento.",
     ERRO_ATUALIZAR_CONHECIMENTO: "Falha ao atualizar conhecimento.",
     SUCESSO_IMPORTACAO: "As atividades foram importadas para o seu mapa.",
+    AVISO_IMPORTACAO_DUPLICATAS: "Uma ou mais atividades selecionadas já existem no cadastro e não foram importadas.",
     MODAL_DISPONIBILIZAR_TITULO: "Disponibilização do cadastro",
     MODAL_DISPONIBILIZAR_REVISAO_TITULO: "Disponibilização da revisão do cadastro",
     MODAL_DISPONIBILIZAR_TEXTO: "Confirma a finalização e a disponibilização do cadastro? Essa ação bloqueia a edição e habilita a análise do cadastro por unidades superiores.",

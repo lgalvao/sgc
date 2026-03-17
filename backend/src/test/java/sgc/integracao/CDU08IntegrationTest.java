@@ -319,8 +319,8 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
                                     .with(csrf())
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .content(objectMapper.writeValueAsString(request)))
-                    .andExpect(status().isUnprocessableContent())
-                    .andExpect(jsonPath("$.message", containsString("já existentes no cadastro")));
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.aviso", containsString("não puderam ser importadas")));
         }
     }
 }
