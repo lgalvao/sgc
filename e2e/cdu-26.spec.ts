@@ -13,7 +13,7 @@ import {criarProcessoMapaValidadoFixture} from './fixtures/fixtures-processos.js
  * 1. ADMIN acessa processo em andamento
  * 2. Sistema mostra Detalhes do processo
  * 3. Sistema identifica unidades elegíveis para homologação
- * 4. ADMIN clica no botão 'Homologar mapa em Bloco'
+ * 4. ADMIN clica no botão 'Homologar mapas em bloco'
  * 5. Sistema abre modal com lista de unidades
  * 6. ADMIN confirma
  * 7. Sistema executa homologação para cada unidade
@@ -32,11 +32,11 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
         expect(true).toBeTruthy();
     });
 
-    test('Cenario 1: ADMIN visualiza botão Homologar mapa em Bloco', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
+    test('Cenario 1: ADMIN visualiza botão Homologar mapas em bloco', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
 
-        const btnHomologar = page.getByRole('button', {name: /^Homologar mapa de competências em bloco$/i}).first();
+        const btnHomologar = page.getByRole('button', {name: /^Homologar mapas em bloco$/i}).first();
         await expect(btnHomologar).toBeVisible();
         await expect(btnHomologar).toBeEnabled();
     });
@@ -44,7 +44,7 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
     test('Cenario 2: ADMIN abre modal de homologação de mapa em bloco', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
 
-        const btnHomologar = page.getByRole('button', {name: /^Homologar mapa de competências em bloco$/i}).first();
+        const btnHomologar = page.getByRole('button', {name: /^Homologar mapas em bloco$/i}).first();
         await expect(btnHomologar).toBeVisible();
         await btnHomologar.click();
 
@@ -62,7 +62,7 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
     test('Cenario 3: Cancelar homologação de mapa em bloco', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
 
-        const btnHomologar = page.getByRole('button', {name: /^Homologar mapa de competências em bloco$/i}).first();
+        const btnHomologar = page.getByRole('button', {name: /^Homologar mapas em bloco$/i}).first();
         await expect(btnHomologar).toBeVisible();
         await btnHomologar.click();
 

@@ -190,7 +190,7 @@ class CDU20IntegrationTest extends BaseIntegrationTest {
                         subprocesso.getCodigo());
         assertThat(movimentacoesAceite).hasSize(4); // Setup + devolução + validação + aceite
         assertThat(movimentacoesAceite.getFirst().getDescricao())
-                .isEqualTo("Validação do mapa aceita");
+                .isEqualTo("Mapa de competências validado");
         assertThat(movimentacoesAceite.getFirst().getUnidadeOrigem().getSigla())
                 .isEqualTo(unidadeSuperior.getSigla());
         assertThat(movimentacoesAceite.getFirst().getUnidadeDestino().getSigla())
@@ -216,6 +216,36 @@ class CDU20IntegrationTest extends BaseIntegrationTest {
                                                         + " encontrado"));
 
         assertThat(alertaDeAceite.getDescricao())
+                .contains("Validação do mapa da unidade " + unidade.getSigla() + " submetida para análise");
+    }
+
+    @Test
+    @DisplayName("Aceite de mapa com sugestões deve manter a situação e subir a localização")
+    void aceiteComSugestoesMantemSituacaoEEncaminha() throws Exception {
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES);
+        subprocessoRepo.saveAndFlush(subprocesso);
+
+        mockMvc.perform(post("/api/subprocessos/{codigo}/aceitar-validacao", subprocesso.getCodigo())
+                        .with(user(usuarioGestor))
+                        .with(csrf()))
+                .andExpect(status().isOk());
+
+        Subprocesso atualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
+        assertThat(atualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES);
+        assertThat(atualizado.getLocalizacaoAtual().getSigla()).isEqualTo(unidadeSuperiorSuperior.getSigla());
+
+        List<Movimentacao> movimentacoes =
+                movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
+        assertThat(movimentacoes.getFirst().getDescricao()).isEqualTo("Mapa de competências validado");
+        assertThat(movimentacoes.getFirst().getUnidadeOrigem().getSigla()).isEqualTo(unidadeSuperior.getSigla());
+        assertThat(movimentacoes.getFirst().getUnidadeDestino().getSigla()).isEqualTo(unidadeSuperiorSuperior.getSigla());
+
+        Alerta alerta =
+                alertaRepo.findByProcessoCodigo(subprocesso.getProcesso().getCodigo()).stream()
+                        .filter(a -> a.getUnidadeDestino().getSigla().equals(unidadeSuperiorSuperior.getSigla()))
+                        .findFirst()
+                        .orElseThrow();
+        assertThat(alerta.getDescricao())
                 .contains("Validação do mapa da unidade " + unidade.getSigla() + " submetida para análise");
     }
 

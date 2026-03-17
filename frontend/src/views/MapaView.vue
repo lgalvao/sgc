@@ -3,10 +3,7 @@
     <PageHeader :title="TEXTOS.mapa.TITULO_TECNICO">
       <template #default>
         <div class="fs-5">
-          {{ unidade?.sigla }} - {{ unidade?.nome }}
-          <span class="ms-3" data-testid="txt-badge-situacao">{{
-              formatSituacaoSubprocesso(subprocessosStore.subprocessoDetalhe?.situacao)
-            }}</span>
+          {{ unidade?.sigla }}
         </div>
       </template>
       <template #actions>
@@ -84,7 +81,7 @@
         @salvar="adicionarCompetenciaEFecharModal"
     />
 
-    <ModalMapaDisponibilizar
+    <DisponibilizarMapaModal
         :field-errors="fieldErrors"
         :loading="loadingDisponibilizacao"
         :mostrar="mostrarModalDisponibilizar"
@@ -132,13 +129,12 @@ import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useToastStore} from "@/stores/toast";
 import type {Atividade, Competencia, SalvarCompetenciaRequest, Unidade} from "@/types/tipos";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
-import {formatSituacaoSubprocesso} from "@/utils/formatters";
 import {TEXTOS} from "@/constants/textos";
 
 // Lazy loading de componentes pesados ou modais
 const ImpactoMapaModal = defineAsyncComponent(() => import("@/components/mapa/ImpactoMapaModal.vue"));
 const CriarCompetenciaModal = defineAsyncComponent(() => import("@/components/mapa/CriarCompetenciaModal.vue"));
-const ModalMapaDisponibilizar = defineAsyncComponent(() => import("@/components/mapa/ModalMapaDisponibilizar.vue"));
+const DisponibilizarMapaModal = defineAsyncComponent(() => import("@/components/mapa/DisponibilizarMapaModal.vue"));
 
 const route = useRoute();
 const router = useRouter();
@@ -152,7 +148,13 @@ usePerfil();
 const codProcesso = computed(() => Number(route.params.codProcesso));
 const siglaUnidade = computed(() => String(route.params.siglaUnidade));
 
-const {podeVisualizarImpacto, podeEditarMapa, podeDisponibilizarMapa, habilitarEditarMapa, habilitarDisponibilizarMapa} = useAcesso(subprocesso);
+const {
+  podeVisualizarImpacto,
+  podeEditarMapa,
+  podeDisponibilizarMapa,
+  habilitarEditarMapa,
+  habilitarDisponibilizarMapa
+} = useAcesso(subprocesso);
 const podeVerImpacto = computed(() => podeVisualizarImpacto.value);
 
 const mostrarModalImpacto = ref(false);
@@ -377,7 +379,7 @@ function fecharModalDisponibilizar() {
 defineExpose({
   ImpactoMapaModal,
   CriarCompetenciaModal,
-  ModalMapaDisponibilizar,
+  DisponibilizarMapaModal,
   podeVerImpacto,
   podeEditarMapa,
   podeDisponibilizarMapa,

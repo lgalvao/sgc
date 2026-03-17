@@ -1,12 +1,16 @@
 <template>
-  <BModal
-      :fade="false"
-      :model-value="mostrar"
-      :title="competenciaSendoEditada ? 'Edição de competência' : 'Criação de competência'"
-      centered
+  <ModalPadrao
+      v-model="mostrarComputado"
+      :acao-desabilitada="salvamentoDesabilitado"
       data-testid="mdl-criar-competencia"
-      size="lg"
-      @hide="fechar"
+      tamanho="lg"
+      test-id-cancelar="btn-criar-competencia-cancelar"
+      test-id-confirmar="btn-criar-competencia-salvar"
+      texto-acao="Salvar"
+      :titulo="competenciaSendoEditada ? 'Edição de competência' : 'Criação de competência'"
+      @confirmar="salvar"
+      @fechar="fechar"
+      @shown="focarDescricao"
   >
     <BAlert v-if="fieldErrors?.generic" :model-value="true" variant="danger" class="mb-4">
       {{ fieldErrors.generic }}
@@ -68,44 +72,21 @@
       </div>
     </div>
 
-    <template #footer>
-      <div class="d-flex justify-content-end w-100 gap-3 align-items-center">
-        <BButton
-            class="text-decoration-none text-secondary fw-medium btn-cancelar-link"
-            data-testid="btn-criar-competencia-cancelar"
-            variant="link"
-            @click="fechar"
-        >
-          Cancelar
-        </BButton>
-        <BButton
-            v-b-tooltip.hover
-            :disabled="atividadesSelecionadas.length === 0 || !novaCompetencia.descricao"
-            data-testid="btn-criar-competencia-salvar"
-            title="Criar competência"
-            variant="primary"
-            @click="salvar"
-        >
-          <i aria-hidden="true" class="bi bi-save"/> Salvar
-        </BButton>
-      </div>
-    </template>
-  </BModal>
+  </ModalPadrao>
 </template>
 
 <script lang="ts" setup>
 import {
-  BButton,
   BCard,
   BCardBody,
   BFormCheckbox,
   BFormInvalidFeedback,
   BFormTextarea,
-  BModal,
   BAlert,
   BBadge,
 } from "bootstrap-vue-next";
-import {nextTick, ref, watch} from "vue";
+import {computed, nextTick, ref, watch} from "vue";
+import ModalPadrao from "@/components/comum/ModalPadrao.vue";
 import type {Atividade, Competencia} from "@/types/tipos";
 
 const props = defineProps<{
@@ -131,6 +112,17 @@ const atividadesSelecionadas = ref<number[]>([]);
 const competenciaSendoEditada = ref<Competencia | null>(null);
 const inputDescricaoRef = ref<InstanceType<typeof BFormTextarea> | null>(null);
 
+const mostrarComputado = computed({
+  get: () => props.mostrar,
+  set: (mostrar: boolean) => {
+    if (!mostrar) emit("fechar");
+  }
+});
+
+const salvamentoDesabilitado = computed(() => {
+  return atividadesSelecionadas.value.length === 0 || !novaCompetencia.value.descricao;
+});
+
 watch(
     () => props.mostrar,
     (mostrar) => {
@@ -146,13 +138,16 @@ watch(
           atividadesSelecionadas.value = [];
           competenciaSendoEditada.value = null;
         }
-        nextTick(() => {
-          inputDescricaoRef.value?.$el?.focus();
-        });
       }
     },
     {immediate: true},
 );
+
+function focarDescricao() {
+  nextTick(() => {
+    inputDescricaoRef.value?.$el?.focus();
+  });
+}
 
 function getConhecimentosModal(atividade: Atividade): string {
   if (!atividade.conhecimentos.length) {
@@ -211,14 +206,4 @@ function salvar() {
   padding: 0.5rem 0.75rem;
 }
 
-.btn-cancelar-link {
-  padding: 0.375rem 0.75rem;
-  transition: all 0.2s;
-  border-radius: 0.375rem;
-}
-
-.btn-cancelar-link:hover {
-  color: var(--bs-emphasis-color) !important;
-  background-color: var(--bs-secondary-bg);
-}
 </style>

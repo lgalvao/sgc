@@ -170,16 +170,31 @@ export async function verificarUnidadeParticipante(page: Page, unidade: UnidadeP
 
 export async function verificarDetalhesSubprocesso(page: Page, dados: {
     sigla: string,
+    nomeUnidade?: string,
     situacao: string,
     prazo?: string | RegExp,
     localizacao?: string,
     titular?: string,
+    ramalTitular?: string,
+    emailTitular?: string,
     responsavel?: string,
-    tipoResponsabilidade?: string
+    tipoResponsabilidade?: string,
+    ramalResponsavel?: string,
+    emailResponsavel?: string
 }) {
+    const header = page.getByTestId('header-subprocesso');
     await expect(page.getByTestId('subprocesso-header__txt-header-unidade')).toContainText(dados.sigla);
+    if (dados.nomeUnidade) {
+        await expect(header).toContainText(dados.nomeUnidade);
+    }
     if (dados.titular) {
         await expect(page.getByText(`Titular: ${dados.titular}`).first()).toBeVisible();
+    }
+    if (dados.ramalTitular) {
+        await expect(header.getByRole('link', {name: dados.ramalTitular})).toBeVisible();
+    }
+    if (dados.emailTitular) {
+        await expect(header.getByRole('link', {name: dados.emailTitular})).toBeVisible();
     }
     if (dados.responsavel) {
         await expect(page.getByText(`Responsável: ${dados.responsavel}`).first()).toBeVisible();
@@ -187,8 +202,23 @@ export async function verificarDetalhesSubprocesso(page: Page, dados: {
     if (dados.tipoResponsabilidade) {
         await expect(page.getByText(`- ${dados.tipoResponsabilidade}`).first()).toBeVisible();
     }
+    if (dados.ramalResponsavel) {
+        await expect(header.getByRole('link', {name: dados.ramalResponsavel})).toBeVisible();
+    }
+    if (dados.emailResponsavel) {
+        await expect(header.getByRole('link', {name: dados.emailResponsavel})).toBeVisible();
+    }
     if (dados.localizacao) {
         await expect(page.getByTestId('subprocesso-header__txt-localizacao')).toContainText(dados.localizacao);
+    }
+    if (dados.prazo) {
+        const campoPrazo = header.getByText(/Prazo para conclusão da etapa atual:/).first();
+        await expect(campoPrazo).toBeVisible();
+        if (dados.prazo instanceof RegExp) {
+            await expect(campoPrazo).toContainText(dados.prazo);
+        } else {
+            await expect(campoPrazo).toContainText(dados.prazo);
+        }
     }
     await expect(page.getByText(dados.situacao).first()).toBeVisible();
 }

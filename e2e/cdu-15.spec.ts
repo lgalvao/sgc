@@ -9,8 +9,7 @@ import {
     excluirCompetenciaCancelando,
     excluirCompetenciaConfirmando,
     navegarParaMapa,
-    verificarCompetenciaNoMapa,
-    verificarSituacaoSubprocesso
+    verificarCompetenciaNoMapa
 } from './helpers/helpers-mapas.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
 
@@ -44,7 +43,7 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
         // CT-02: Criar competência
         const compDesc = `Competência 1 ${timestamp}`;
         await criarCompetencia(page, compDesc, [ATIVIDADE_1]);
-        await verificarSituacaoSubprocesso(page, 'Mapa criado');
+        await verificarCompetenciaNoMapa(page, compDesc, [ATIVIDADE_1]);
         await expect(page.getByTestId('btn-cad-mapa-disponibilizar')).toBeDisabled();
 
         // CT-03: Editar competência

@@ -555,41 +555,4 @@ class SubprocessoTransicaoServiceCoverageIntegrationTest {
         }
     }
 
-    @Nested
-    @DisplayName("registrarMovimentacaoLembrete")
-    class RegistrarMovimentacaoLembrete {
-
-        @Test
-        @DisplayName("deve registrar movimentacao de lembrete")
-        void lembrete() {
-            Processo proc = new Processo();
-            proc.setDescricao("Proc");
-            proc.setTipo(TipoProcesso.MAPEAMENTO);
-            proc = processoRepo.save(proc);
-
-            Unidade uAdmin = new Unidade();
-            uAdmin.setSigla("ADMIN");
-            uAdmin = unidadeRepo.save(uAdmin);
-            when(unidadeService.buscarPorSigla("ADMIN")).thenReturn(uAdmin);
-
-            Unidade uSp = new Unidade();
-            uSp.setSigla("USP");
-            uSp = unidadeRepo.save(uSp);
-
-            Subprocesso sp = new Subprocesso();
-            sp.setProcesso(proc);
-            sp.setUnidade(uSp);
-            sp.setSituacaoForcada(SituacaoSubprocesso.NAO_INICIADO);
-            sp = subprocessoRepo.save(sp);
-
-            Usuario user = new Usuario();
-            user.setTituloEleitoral("123");
-            user = usuarioRepo.save(user);
-            when(usuarioFacade.usuarioAutenticado()).thenReturn(user);
-
-            transicaoService.registrarMovimentacaoLembrete(sp.getCodigo());
-            Subprocesso atualizado = subprocessoRepo.findById(sp.getCodigo()).orElseThrow();
-            assertThat(atualizado.getLocalizacaoAtual()).isEqualTo(uSp);
-        }
-    }
 }

@@ -1172,7 +1172,12 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             // Login como Gestor da SECRETARIA_2 para aceitar e mover para o ADMIN
             await fazerLogout(page);
-            await login(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha);
+            await loginComPerfil(
+                page,
+                USUARIOS.CHEFE_SECRETARIA_2.titulo,
+                USUARIOS.CHEFE_SECRETARIA_2.senha,
+                'GESTOR - SECRETARIA_2'
+            );
             await page.getByTestId('tbl-processos').getByText(descricao).first().click();
             await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
             

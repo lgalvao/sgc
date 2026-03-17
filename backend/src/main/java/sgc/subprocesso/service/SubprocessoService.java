@@ -264,22 +264,6 @@ public class SubprocessoService {
         }
     }
 
-    @Transactional
-    public void registrarMovimentacaoLembrete(Long codSubprocesso) {
-        Subprocesso subprocesso = buscarSubprocesso(codSubprocesso);
-        Usuario usuario = usuarioFacade.usuarioAutenticado();
-        var unidadeAdmin = unidadeService.buscarPorSigla(SIGLA_ADMIN);
-
-        movimentacaoRepo.save(Movimentacao.builder()
-                .subprocesso(subprocesso)
-                .unidadeOrigem(unidadeAdmin)
-                .unidadeDestino(subprocesso.getUnidade())
-                .descricao("Lembrete de prazo enviado")
-                .usuario(usuario)
-                .build());
-        subprocesso.setLocalizacaoAtual(subprocesso.getUnidade());
-    }
-
     public void criarParaMapeamento(Processo processo, Collection<Unidade> unidades, Unidade unidadeOrigem, Usuario usuario) {
         log.info("Iniciando criação de subprocessos para mapeamento no processo {}", processo.getCodigo());
         List<Unidade> unidadesElegiveis = unidades.stream()

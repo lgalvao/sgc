@@ -35,17 +35,26 @@ const stubs = {
         props: ['title'],
         template: '<div><h1>{{ title }}</h1><slot /><slot name="actions" /></div>'
     },
-    BButton: {template: '<button :data-testid="$attrs[\'data-testid\']" @click="$emit(\'click\')"><slot /></button>'},
+    BButton: {
+        props: ['disabled'],
+        template: '<button :data-testid="$attrs[\'data-testid\']" :disabled="disabled" @click="$emit(\'click\')"><slot /></button>'
+    },
     BCard: {template: '<div><slot /></div>'},
     BBadge: {template: '<span><slot /></span>'},
-    BModal: {template: '<div v-if="modelValue"><slot /><slot name="footer" /></div>', props: ['modelValue']},
     BFormGroup: {template: '<div><label><slot name="label" /></label><slot /></div>'},
     BFormTextarea: {
         props: ['modelValue'],
         template: '<textarea :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)"></textarea>'
     },
     EmptyState: {template: '<div></div>'},
-    ModalConfirmacao: {template: '<div v-if="modelValue"><slot /> <button data-testid="btn-confirmar" @click="$emit(\'confirmar\')">Confirmar</button></div>', props: ['modelValue']},
+    ModalConfirmacao: {
+        props: ['modelValue', 'okDisabled'],
+        template: '<div v-if="modelValue"><slot /> <button data-testid="btn-confirmar" :disabled="okDisabled" @click="$emit(\'confirmar\')">Confirmar</button></div>'
+    },
+    ModalPadrao: {
+        props: ['modelValue', 'testIdCancelar'],
+        template: '<div v-if="modelValue"><slot /> <button :data-testid="testIdCancelar" @click="$emit(\'fechar\')">Fechar</button></div>'
+    },
     AceitarMapaModal: {
         template: '<div v-if="mostrarModal"><button data-testid="btn-confirmar-aceite" @click="$emit(\'confirmar-aceitacao\')">Confirmar</button></div>',
         props: ['mostrarModal']
@@ -76,6 +85,10 @@ describe("MapaVisualizacaoView.vue", () => {
             podeDevolverMapa: ref(true),
             podeHomologarMapa: ref(true),
             podeVerSugestoes: ref(true),
+            habilitarValidarMapa: ref(true),
+            habilitarAceitarMapa: ref(true),
+            habilitarDevolverMapa: ref(true),
+            habilitarHomologarMapa: ref(true),
             ...accessOverrides
         } as any);
 
@@ -118,12 +131,27 @@ describe("MapaVisualizacaoView.vue", () => {
         (store.apresentarSugestoes as any).mockResolvedValue(true);
 
         await wrapper.find('[data-testid="btn-mapa-sugestoes"]').trigger("click");
-        (wrapper.vm as any).sugestoes = "Minhas sugestões";
+        await wrapper.find('[data-testid="inp-sugestoes-mapa-texto"]').setValue("Minhas sugestões");
         await wrapper.find('[data-testid="btn-confirmar"]').trigger("click");
         await flushPromises();
 
         expect(store.apresentarSugestoes).toHaveBeenCalledWith(123, {sugestoes: "Minhas sugestões"});
         expect(pushMock).toHaveBeenCalledWith({name: "Painel"});
+    });
+
+    it("deve manter confirmar desabilitado enquanto as sugestões estiverem vazias", async () => {
+        const wrapper = createWrapper();
+        await flushPromises();
+        const store = useProcessosStore();
+        (store.apresentarSugestoes as any).mockResolvedValue(true);
+
+        await wrapper.find('[data-testid="btn-mapa-sugestoes"]').trigger("click");
+        expect(wrapper.find('[data-testid="btn-confirmar"]').attributes('disabled')).toBeDefined();
+
+        await wrapper.find('[data-testid="btn-confirmar"]').trigger("click");
+        await flushPromises();
+
+        expect(store.apresentarSugestoes).not.toHaveBeenCalled();
     });
 
     it("abre modal e confirma validação", async () => {
@@ -162,7 +190,7 @@ describe("MapaVisualizacaoView.vue", () => {
         (store.devolverValidacao as any).mockResolvedValue(true);
 
         await wrapper.find('[data-testid="btn-mapa-devolver"]').trigger("click");
-        (wrapper.vm as any).observacaoDevolucao = "Justificativa";
+        await wrapper.find('[data-testid="inp-devolucao-mapa-obs"]').setValue("Justificativa");
         await wrapper.find('[data-testid="btn-confirmar"]').trigger("click");
         await flushPromises();
 
@@ -178,5 +206,19 @@ describe("MapaVisualizacaoView.vue", () => {
         await flushPromises();
 
         expect(analiseService.listarAnalisesCadastro).toHaveBeenCalledWith(123);
+    });
+
+    it("deve manter devolucao, aceite e validacao visiveis, porem desabilitadas, fora da localizacao permitida", async () => {
+        const wrapper = createWrapper({
+            habilitarValidarMapa: ref(false),
+            habilitarAceitarMapa: ref(false),
+            habilitarDevolverMapa: ref(false),
+            habilitarHomologarMapa: ref(false),
+        });
+        await flushPromises();
+
+        expect(wrapper.find('[data-testid="btn-mapa-devolver"]').attributes('disabled')).toBeDefined();
+        expect(wrapper.find('[data-testid="btn-mapa-homologar-aceite"]').attributes('disabled')).toBeDefined();
+        expect(wrapper.find('[data-testid="btn-mapa-validar"]').attributes('disabled')).toBeDefined();
     });
 });

@@ -18,9 +18,9 @@
    de competências (de acordo com as pré-condições do caso de uso).
 
 4. Na seção de unidades participantes, abaixo da árvore de unidades, sistema mostra o botão
-   `Homologar mapa de competências em bloco`.
+   `Homologar mapas em bloco`.
 
-5. O usuário clica no botão `Homologar mapa de competências em bloco`.
+5. O usuário clica no botão `Homologar mapas em bloco`.
 
 6. O sistema abre modal de confirmação, com os elementos a seguir:
 

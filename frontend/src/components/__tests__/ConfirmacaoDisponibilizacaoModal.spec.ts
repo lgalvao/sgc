@@ -8,16 +8,22 @@ describe('ConfirmacaoDisponibilizacaoModal.vue', () => {
         isRevisao: false,
     }
 
-    const BModalStub = {
-        name: 'BModal',
-        template: '<div data-testid="modal-stub"><slot /><slot name="footer" /></div>',
-        props: ['title', 'modelValue']
+    const ModalConfirmacaoStub = {
+        name: 'ModalConfirmacao',
+        template: `
+            <div v-if="modelValue" :data-titulo="titulo" data-testid="modal-stub">
+                <slot />
+                <button :data-testid="testIdCancelar" @click="$emit('update:modelValue', false)">Cancelar</button>
+                <button :data-testid="testIdConfirmar" @click="$emit('confirmar')">{{ okTitle }}</button>
+            </div>
+        `,
+        props: ['titulo', 'modelValue', 'testIdCancelar', 'testIdConfirmar', 'okTitle'],
+        emits: ['update:modelValue', 'confirmar']
     }
 
     const globalOptions = {
         stubs: {
-            BModal: BModalStub,
-            BButton: {template: '<button><slot /></button>'}
+            ModalConfirmacao: ModalConfirmacaoStub,
         }
     }
 
@@ -27,7 +33,7 @@ describe('ConfirmacaoDisponibilizacaoModal.vue', () => {
             global: globalOptions
         })
 
-        expect(wrapper.attributes('title')).toBe('Disponibilização do cadastro')
+        expect(wrapper.find('[data-testid="modal-stub"]').attributes('data-titulo')).toBe('Disponibilização do cadastro')
         expect(wrapper.text()).toContain('Confirma a finalização e a disponibilização do cadastro?')
     })
 
@@ -37,7 +43,7 @@ describe('ConfirmacaoDisponibilizacaoModal.vue', () => {
             global: globalOptions
         })
 
-        expect(wrapper.attributes('title')).toBe('Disponibilização da revisão do cadastro')
+        expect(wrapper.find('[data-testid="modal-stub"]').attributes('data-titulo')).toBe('Disponibilização da revisão do cadastro')
         expect(wrapper.text()).toContain('Confirma a finalização da revisão e a disponibilização do cadastro?')
     })
 
@@ -59,8 +65,8 @@ describe('ConfirmacaoDisponibilizacaoModal.vue', () => {
             global: globalOptions
         })
 
-        const cancelBtn = wrapper.findAll('button').find(b => b.text() === 'Cancelar')
-        await cancelBtn?.trigger('click')
+        const cancelBtn = wrapper.find('[data-testid="btn-disponibilizar-revisao-cancelar"]')
+        await cancelBtn.trigger('click')
 
         expect(wrapper.emitted('fechar')).toHaveLength(1)
     })

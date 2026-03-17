@@ -146,7 +146,6 @@ public final class MsgValidacao {
     public static final String SEM_PERMISSAO_VERIFICAR_IMPACTOS = "Usuário não tem permissão para verificar impactos.";
 
     // ── Mensagens de Movimentação e Templates ────────────────────────────────
-    public static final String LEMBRETE_PRAZO_ENVIADO           = "Lembrete de prazo enviado";
     public static final String ASSUNTO_DATA_LIMITE_ALTERADA      = "SGC: Data limite alterada";
     public static final String CORPO_DATA_LIMITE_ALTERADA        = "Prezado(a) responsável pela %s,%n%n" +
             "A data limite da etapa atual no processo %s foi alterada para %s.%n";

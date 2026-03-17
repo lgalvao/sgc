@@ -27,7 +27,7 @@
             variant="outline-secondary"
             @click="abrirModalHistorico"
         >
-          <i aria-hidden="true" class="bi bi-clock-history me-1"/> {{ TEXTOS.atividades.BOTAO_HISTORICO }}
+          <i aria-hidden="true" class="bi bi-clock-history me-1"/> {{ TEXTOS.atividades.BOTAO_HISTORICO_ANALISE }}
         </BButton>
         <BButton
             v-if="codSubprocesso && isChefe"

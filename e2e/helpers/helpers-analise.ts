@@ -92,6 +92,33 @@ export async function abrirHistoricoAnaliseVisualizacao(page: Page) {
     return modal;
 }
 
+export async function verificarAcoesAnaliseCadastroVisualizacao(page: Page, options: {
+    rotuloPrincipal: string | RegExp;
+    principalHabilitado: boolean;
+    devolverHabilitado: boolean;
+}) {
+    const botaoHistorico = page.getByTestId('btn-vis-atividades-historico');
+    const botaoDevolver = page.getByTestId('btn-acao-devolver');
+    const botaoPrincipal = page.getByTestId('btn-acao-analisar-principal');
+
+    await expect(botaoHistorico).toBeVisible();
+    await expect(botaoDevolver).toBeVisible();
+    await expect(botaoPrincipal).toBeVisible();
+    await expect(botaoPrincipal).toHaveText(options.rotuloPrincipal);
+
+    if (options.devolverHabilitado) {
+        await expect(botaoDevolver).toBeEnabled();
+    } else {
+        await expect(botaoDevolver).toBeDisabled();
+    }
+
+    if (options.principalHabilitado) {
+        await expect(botaoPrincipal).toBeEnabled();
+    } else {
+        await expect(botaoPrincipal).toBeDisabled();
+    }
+}
+
 /**
  * Fecha modal de histórico de análise
  */

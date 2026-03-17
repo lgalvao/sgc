@@ -392,7 +392,7 @@ public class SubprocessoTransicaoService {
             sp.setSituacao(SITUACAO_MAPA_HOMOLOGADO.get(sp.getProcesso().getTipo()));
             subprocessoRepo.save(sp);
         } else {
-            SituacaoSubprocesso novaSituacao = SITUACAO_MAPA_VALIDADO.get(sp.getProcesso().getTipo());
+            SituacaoSubprocesso novaSituacao = sp.getSituacao();
             registrarAnalise(RegistrarWorkflowCommand.builder()
                     .sp(sp)
                     .novaSituacao(novaSituacao)
@@ -688,18 +688,4 @@ public class SubprocessoTransicaoService {
         }
     }
 
-    public void registrarMovimentacaoLembrete(Long codSubprocesso) {
-        Subprocesso subprocesso = buscarSubprocesso(codSubprocesso);
-        Usuario usuario = usuarioFacade.usuarioAutenticado();
-        Unidade unidadeAdmin = unidadeService.buscarPorSigla(SIGLA_ADMIN);
-
-        movimentacaoRepo.save(Movimentacao.builder()
-                .subprocesso(subprocesso)
-                .unidadeOrigem(unidadeAdmin)
-                .unidadeDestino(subprocesso.getUnidade())
-                .descricao(MsgValidacao.LEMBRETE_PRAZO_ENVIADO)
-                .usuario(usuario)
-                .build());
-        subprocesso.setLocalizacaoAtual(subprocesso.getUnidade());
-    }
 }

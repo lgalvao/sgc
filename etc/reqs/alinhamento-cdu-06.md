@@ -49,7 +49,7 @@ O teste `cdu-06.spec.ts` cobre os seguintes cenários:
 
 7. **Botões de ação em bloco (passo 2.2.2)**: O requisito descreve condições para exibição de botões:
    - "Aceitar/Homologar em bloco" se existirem unidades subordinadas com subprocesso em "Cadastro disponibilizado" (MAPEAMENTO) ou "Revisão do cadastro disponibilizada" (REVISAO)
-   - "Aceitar/Homologar mapa em bloco" se existirem subprocessos em "Mapa validado" ou "Mapa com sugestões"
+   - "Aceitar/Homologar mapas em bloco" se existirem subprocessos em "Mapa validado" ou "Mapa com sugestões"
 
    O teste valida apenas o primeiro tipo (cadastro em bloco). Não testa:
    - Botão para "Mapa em bloco"
@@ -66,7 +66,7 @@ O teste `cdu-06.spec.ts` cobre os seguintes cenários:
 - Adicionar teste que valida que apenas unidades operacionais/interoperacionais são clicáveis
 - Adicionar teste que valida comportamento de clique em "Alterar data limite" (modal, edição, feedback)
 - Adicionar teste que valida comportamento de clique em "Reabrir cadastro" (modal, edição, feedback)
-- Adicionar teste que valida botão "Aceitar/Homologar mapa em bloco" quando há subprocessos em situações apropriadas
+- Adicionar teste que valida botão "Aceitar/Homologar mapas em bloco" quando há subprocessos em situações apropriadas
 - Adicionar teste com unidade intermediária para validar que não é clicável
 - Adicionar teste que valida botão "Enviar lembrete" (se é recurso oficial) ou remover do teste (se não documentado)
 - Expandir testes de ações em bloco para cobrir REVISAO vs MAPEAMENTO
@@ -77,4 +77,4 @@ O teste `cdu-06.spec.ts` cobre os seguintes cenários:
 - Passo 2.2.1 menciona "elementos para possibilitar a alteração" e dá exemplo "Reabertura do cadastro de atividades". Isto sugere que há múltiplas ações possíveis dependendo da situação do subprocesso, não apenas data limite. O requisito não é claro sobre quais ações estão disponíveis em quais situações.
 - Botão "Enviar lembrete" é testado mas não aparece no requisito. Pode ser recurso adicional ou omissão no documento de requisitos.
 - O requisito menciona "Se o perfil do usuário seja ADMIN, serão exibidos..." na seção 2.2.1, mas não há menção de diferenciar comportamento para GESTOR (além de ocultar "Finalizar processo"). O teste testa isto, mas o requisito pode ser mais claro.
-- Referência a "caso de uso Aceitar/Homologar mapa em bloco" no requisito, mas este caso de uso não está entre os 6 analisados.
+- Referência a "caso de uso Aceitar/Homologar mapas em bloco" no requisito, mas este caso de uso não está entre os 6 analisados.

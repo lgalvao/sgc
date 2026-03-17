@@ -35,5 +35,5 @@ Atores: ADMIN e GESTOR
       disponibilizado' (processo de mapeamento) ou 'Revisão do cadastro disponibilizada' (processo de revisão)  (ver
       caso de uso Aceitar/homologar cadastro em bloco).
    
-    - Aceitar/Homologar mapa em bloco, se existirem unidades subordinadas com subprocesso nas situações 'Mapa validado'
-      ou 'Mapa com sugestões' (ver caso de uso Aceitar/Homologar mapa de competências em bloco).
+    - Aceitar/Homologar mapas em bloco, se existirem unidades subordinadas com subprocesso nas situações 'Mapa validado'
+      ou 'Mapa com sugestões' (ver caso de uso Aceitar/Homologar mapas em bloco).

@@ -208,7 +208,6 @@
   >
     <p data-testid="txt-modelo-lembrete">
       {{ TEXTOS.subprocesso.LEMBRETE_MODELO_PREFIXO(subprocesso?.unidade?.sigla || '') }}
-      {{ TEXTOS.subprocesso.LEMBRETE_MODELO_PROCESSO(subprocesso?.processoDescricao || '') }}
     </p>
   </ModalConfirmacao>
 </template>

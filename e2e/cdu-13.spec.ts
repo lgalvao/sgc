@@ -4,12 +4,14 @@ import {criarProcessoCadastroDisponibilizadoFixture} from './fixtures/fixtures-p
 import {navegarParaAtividades, navegarParaAtividadesVisualizacao} from './helpers/helpers-atividades.js';
 import {
     abrirHistoricoAnalise,
+    abrirHistoricoAnaliseVisualizacao,
     aceitarCadastroMapeamento,
     acessarSubprocessoAdmin,
     acessarSubprocessoChefeDireto,
     acessarSubprocessoGestor,
     devolverCadastroMapeamento,
     fecharHistoricoAnalise,
+    verificarAcoesAnaliseCadastroVisualizacao,
 } from './helpers/helpers-analise.js';
 import {navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
 
@@ -27,11 +29,26 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
         await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
+        await verificarAcoesAnaliseCadastroVisualizacao(page, {
+            rotuloPrincipal: 'Registrar aceite',
+            principalHabilitado: true,
+            devolverHabilitado: true
+        });
         await aceitarCadastroMapeamento(page, 'Ok pela Coordenação');
 
         await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
+        await verificarAcoesAnaliseCadastroVisualizacao(page, {
+            rotuloPrincipal: 'Registrar aceite',
+            principalHabilitado: true,
+            devolverHabilitado: true
+        });
+        const historicoSecretaria = await abrirHistoricoAnaliseVisualizacao(page);
+        await expect(historicoSecretaria.getByTestId('cell-unidade-0')).toHaveText('COORD_21');
+        await expect(historicoSecretaria.getByTestId('cell-resultado-0')).toHaveText(/ACEITE/i);
+        await expect(historicoSecretaria.getByTestId('cell-observacao-0')).toHaveText('Ok pela Coordenação');
+        await fecharHistoricoAnalise(page);
         await devolverCadastroMapeamento(page, 'Dados incompletos para a Secretaria');
 
         await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);
@@ -60,17 +77,49 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
         await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
+        await verificarAcoesAnaliseCadastroVisualizacao(page, {
+            rotuloPrincipal: 'Registrar aceite',
+            principalHabilitado: true,
+            devolverHabilitado: true
+        });
         await aceitarCadastroMapeamento(page, 'Ok final 1');
+
+        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
+        await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
+        await navegarParaSubprocesso(page, UNIDADE_ALVO);
+        await navegarParaAtividadesVisualizacao(page);
+        await verificarAcoesAnaliseCadastroVisualizacao(page, {
+            rotuloPrincipal: 'Homologar',
+            principalHabilitado: false,
+            devolverHabilitado: false
+        });
 
         await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
+        await verificarAcoesAnaliseCadastroVisualizacao(page, {
+            rotuloPrincipal: 'Registrar aceite',
+            principalHabilitado: true,
+            devolverHabilitado: true
+        });
         await aceitarCadastroMapeamento(page, 'Ok final 2');
 
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
         await navegarParaSubprocesso(page, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
+        await verificarAcoesAnaliseCadastroVisualizacao(page, {
+            rotuloPrincipal: 'Homologar',
+            principalHabilitado: true,
+            devolverHabilitado: true
+        });
+        const historicoAdmin = await abrirHistoricoAnaliseVisualizacao(page);
+        await expect(historicoAdmin.getByTestId('cell-unidade-0')).toHaveText('SECRETARIA_2');
+        await expect(historicoAdmin.getByTestId('cell-resultado-0')).toHaveText(/ACEITE/i);
+        await expect(historicoAdmin.getByTestId('cell-observacao-0')).toHaveText('Ok final 2');
+        await expect(historicoAdmin.getByTestId('cell-unidade-1')).toHaveText('COORD_21');
+        await expect(historicoAdmin.getByTestId('cell-observacao-1')).toHaveText('Ok final 1');
+        await fecharHistoricoAnalise(page);
         await page.getByTestId('btn-acao-analisar-principal').click();
         await page.getByRole('dialog').getByRole('button', {name: 'Confirmar'}).click();
 

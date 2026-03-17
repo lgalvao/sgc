@@ -75,11 +75,11 @@ Atores: GESTOR e ADMIN
     10.9. O sistema envia notificação por e-mail para a unidade de devolução:
 
       ```text
-      Assunto: SGC: Cadastro de atividades e conhecimentos da [SIGLA_UNIDADE_SUBPROCESSO] devolvido para ajustes
+      Assunto: SGC: Revisão do cadastro de atividades e conhecimentos da [SIGLA_UNIDADE_SUBPROCESSO] devolvida para ajustes
       
       Prezado(a) responsável pela [SIGLA_UNIDADE_DEVOLUCAO],
       
-      O cadastro de atividades e conhecimentos da [SIGLA_UNIDADE_SUBPROCESSO] no processo [DESCRIÇÃO DO PROCESSO] foi devolvido para ajustes.
+      A revisão do cadastro de atividades e conhecimentos da [SIGLA_UNIDADE_SUBPROCESSO] no processo [DESCRIÇÃO DO PROCESSO] foi devolvida para ajustes.
 
       Acompanhe o processo no sistema de Gestão de Competências: [URL_SISTEMA].
       ```

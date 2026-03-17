@@ -32,8 +32,8 @@ Fluxo principal:
 
     - `Data limite etapa 1`: Data copiada da data limite da etapa inicial do processo.
     - `Situação`: 'Não iniciado'
-    - `Observações`: Campo de texto formatado para registro de informações futuras pelo perfil ADMIN.
-    - `Sugestões`: Campo de texto formatado para registro de sugestões futuras pelas unidades.
+    - `Observações`: Campo de texto **formatado** para registro de informações futuras pelo perfil ADMIN.
+    - `Sugestões`: Campo de texto **formatado** para registro de sugestões futuras pelas unidades.
 
 10. O sistema cria internamente um mapa de competências vazio (sem competências) e o vincula ao subprocesso da unidade.
 
