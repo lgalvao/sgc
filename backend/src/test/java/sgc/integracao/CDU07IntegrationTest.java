@@ -45,6 +45,19 @@ class CDU07IntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
+    @WithMockGestor("202020202020")
+    @DisplayName("GESTOR não visualiza cards antes da fase minima mesmo na hierarquia")
+    void gestorNaoVisualizaCardsAntesDaFaseMinima() throws Exception {
+        mockMvc.perform(
+                        get("/api/subprocessos/{codigo}", 60000L)
+                                .param("perfil", "GESTOR"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.subprocesso.codUnidade").value(8))
+                .andExpect(jsonPath("$.permissoes.habilitarAcessoCadastro").value(false))
+                .andExpect(jsonPath("$.permissoes.habilitarAcessoMapa").value(false));
+    }
+
+    @Test
     @WithMockCustomUser(tituloEleitoral = "333333333333", perfis = {"CHEFE"}, unidadeId = 9L)
     // Chefe teste - Chefe da Unidade 9 no data.sql tentando ver subprocesso da 8
     @DisplayName("CHEFE NÃO pode visualizar o subprocesso de outra unidade")
