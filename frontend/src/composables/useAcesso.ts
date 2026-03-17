@@ -38,9 +38,27 @@ export function useAcesso(subprocessoRef: Ref<SubprocessoDetalhe | null> | Subpr
     const podeReabrirRevisao = computed(() => getSubprocesso()?.permissoes?.podeReabrirRevisao ?? false);
     const podeEnviarLembrete = computed(() => getSubprocesso()?.permissoes?.podeEnviarLembrete ?? false);
 
+    const mesmaUnidade = computed(() => getSubprocesso()?.permissoes?.mesmaUnidade ?? false);
+    const habilitarAcessoCadastro = computed(() => getSubprocesso()?.permissoes?.habilitarAcessoCadastro ?? false);
     const habilitarAcessoMapa = computed(() => getSubprocesso()?.permissoes?.habilitarAcessoMapa ?? false);
 
+    // Helpers to combine permission with location (Visible but Disabled rule)
+    const habilitarEditarCadastro = computed(() => podeEditarCadastro.value && mesmaUnidade.value);
+    const habilitarDisponibilizarCadastro = computed(() => podeDisponibilizarCadastro.value && mesmaUnidade.value);
+    const habilitarDevolverCadastro = computed(() => podeDevolverCadastro.value && mesmaUnidade.value);
+    const habilitarAceitarCadastro = computed(() => podeAceitarCadastro.value && mesmaUnidade.value);
+    const habilitarHomologarCadastro = computed(() => podeHomologarCadastro.value && mesmaUnidade.value);
+
+    const habilitarEditarMapa = computed(() => podeEditarMapa.value && mesmaUnidade.value);
+    const habilitarDisponibilizarMapa = computed(() => podeDisponibilizarMapa.value && mesmaUnidade.value);
+    const habilitarValidarMapa = computed(() => podeValidarMapa.value && mesmaUnidade.value);
+    const habilitarApresentarSugestoes = computed(() => podeApresentarSugestoes.value && mesmaUnidade.value);
+    const habilitarDevolverMapa = computed(() => podeDevolverMapa.value && mesmaUnidade.value);
+    const habilitarAceitarMapa = computed(() => podeAceitarMapa.value && mesmaUnidade.value);
+    const habilitarHomologarMapa = computed(() => podeHomologarMapa.value && mesmaUnidade.value);
+
     return {
+        mesmaUnidade,
         podeEditarCadastro,
         podeDisponibilizarCadastro,
         podeDevolverCadastro,
@@ -61,6 +79,20 @@ export function useAcesso(subprocessoRef: Ref<SubprocessoDetalhe | null> | Subpr
         podeReabrirCadastro,
         podeReabrirRevisao,
         podeEnviarLembrete,
-        habilitarAcessoMapa
+        habilitarAcessoCadastro,
+        habilitarAcessoMapa,
+        // Flags de habilitação (Location check)
+        habilitarEditarCadastro,
+        habilitarDisponibilizarCadastro,
+        habilitarDevolverCadastro,
+        habilitarAceitarCadastro,
+        habilitarHomologarCadastro,
+        habilitarEditarMapa,
+        habilitarDisponibilizarMapa,
+        habilitarValidarMapa,
+        habilitarApresentarSugestoes,
+        habilitarDevolverMapa,
+        habilitarAceitarMapa,
+        habilitarHomologarMapa
     };
 }

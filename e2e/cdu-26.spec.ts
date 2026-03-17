@@ -19,7 +19,7 @@ import {criarProcessoMapaValidadoFixture} from './fixtures/fixtures-processos.js
  * 7. Sistema executa homologação para cada unidade
  */
 test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
-    const UNIDADE_1 = 'SECAO_221';
+    const UNIDADE_1 = 'SECRETARIA_2';
 
     const timestamp = Date.now();
     const descProcesso = `Mapeamento CDU-26 ${timestamp}`;

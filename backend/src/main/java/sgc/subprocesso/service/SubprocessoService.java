@@ -664,31 +664,32 @@ public class SubprocessoService {
         boolean habilitarAcessoMapa = verificarAcessoMapaHabilitado(perfil, situacao);
 
         return PermissoesSubprocessoDto.builder()
-                .podeEditarCadastro(mesmaUnidade && isChefe && Set.of(NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, REVISAO_CADASTRO_EM_ANDAMENTO).contains(situacao))
-                .podeDisponibilizarCadastro(mesmaUnidade && isChefe && Set.of(MAPEAMENTO_CADASTRO_EM_ANDAMENTO, REVISAO_CADASTRO_EM_ANDAMENTO).contains(situacao))
-                .podeDevolverCadastro(mesmaUnidade && (isGestor || isAdmin) && Set.of(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO, SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA).contains(situacao))
-                .podeAceitarCadastro(mesmaUnidade && isGestor && Set.of(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO, SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA).contains(situacao))
-                .podeHomologarCadastro(mesmaUnidade && isAdmin && Set.of(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO, SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA).contains(situacao))
-                .podeEditarMapa(verificarEditarMapa(mesmaUnidade, isAdmin, situacao))
-                .podeDisponibilizarMapa(mesmaUnidade && isAdmin && Set.of(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO, SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO, SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES, SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA, SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO, SituacaoSubprocesso.REVISAO_MAPA_COM_SUGESTOES).contains(situacao))
-                .podeValidarMapa(mesmaUnidade && isChefe && Set.of(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO, SituacaoSubprocesso.REVISAO_MAPA_DISPONIBILIZADO).contains(situacao))
-                .podeApresentarSugestoes(mesmaUnidade && isChefe && Set.of(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO, SituacaoSubprocesso.REVISAO_MAPA_DISPONIBILIZADO).contains(situacao))
-                .podeVerSugestoes(mesmaUnidade && (isGestor || isAdmin) && Set.of(SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES, SituacaoSubprocesso.REVISAO_MAPA_COM_SUGESTOES).contains(situacao))
-                .podeDevolverMapa(verificarGerirMapa(mesmaUnidade, isGestor || isAdmin, situacao))
-                .podeAceitarMapa(verificarGerirMapa(mesmaUnidade, isGestor, situacao))
-                .podeHomologarMapa(verificarGerirMapa(mesmaUnidade, isAdmin, situacao))
+                .podeEditarCadastro(isChefe && Set.of(NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, REVISAO_CADASTRO_EM_ANDAMENTO).contains(situacao))
+                .podeDisponibilizarCadastro(isChefe && Set.of(MAPEAMENTO_CADASTRO_EM_ANDAMENTO, REVISAO_CADASTRO_EM_ANDAMENTO).contains(situacao))
+                .podeDevolverCadastro((isGestor || isAdmin) && Set.of(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO, SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA).contains(situacao))
+                .podeAceitarCadastro(isGestor && Set.of(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO, SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA).contains(situacao))
+                .podeHomologarCadastro(isAdmin && Set.of(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO, SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA).contains(situacao))
+                .podeEditarMapa(verificarEditarMapa(isAdmin, situacao))
+                .podeDisponibilizarMapa(isAdmin && Set.of(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO, SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO, SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES, SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA, SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO, SituacaoSubprocesso.REVISAO_MAPA_COM_SUGESTOES).contains(situacao))
+                .podeValidarMapa(isChefe && Set.of(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO, SituacaoSubprocesso.REVISAO_MAPA_DISPONIBILIZADO).contains(situacao))
+                .podeApresentarSugestoes(isChefe && Set.of(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO, SituacaoSubprocesso.REVISAO_MAPA_DISPONIBILIZADO).contains(situacao))
+                .podeVerSugestoes((isGestor || isAdmin) && Set.of(SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES, SituacaoSubprocesso.REVISAO_MAPA_COM_SUGESTOES).contains(situacao))
+                .podeDevolverMapa(verificarGerirMapa(isGestor || isAdmin, situacao))
+                .podeAceitarMapa(verificarGerirMapa(isGestor, situacao))
+                .podeHomologarMapa(verificarGerirMapa(isAdmin, situacao))
                 .podeVisualizarImpacto(verificarVisualizarImpacto(temMapaVigente, mesmaUnidade, isChefe, isGestor, isAdmin, situacao))
                 .podeAlterarDataLimite(isAdmin)
                 .podeReabrirCadastro(isAdmin && situacao.ordinal() >= SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO.ordinal() && situacao.name().startsWith("MAPEAMENTO"))
                 .podeReabrirRevisao(isAdmin && situacao.ordinal() >= SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO.ordinal() && situacao.name().startsWith("REVISAO"))
                 .podeEnviarLembrete(isAdmin)
+                .mesmaUnidade(mesmaUnidade)
                 .habilitarAcessoCadastro(habilitarAcessoCadastro)
                 .habilitarAcessoMapa(habilitarAcessoMapa)
                 .build();
     }
 
     private boolean verificarAcessoCadastroHabilitado(Perfil perfil, SituacaoSubprocesso situacao) {
-        if (perfil == Perfil.CHEFE) return true;
+        if (perfil == Perfil.CHEFE || perfil == Perfil.ADMIN || perfil == Perfil.GESTOR) return true;
 
         if (situacao.name().startsWith("MAPEAMENTO")) {
             return situacao.ordinal() >= SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO.ordinal();
@@ -699,18 +700,12 @@ public class SubprocessoService {
     }
 
     private boolean verificarAcessoMapaHabilitado(Perfil perfil, SituacaoSubprocesso situacao) {
-        if (perfil == Perfil.ADMIN) {
-            if (situacao.name().startsWith("MAPEAMENTO")) {
-                return situacao.ordinal() >= SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO.ordinal();
-            } else if (situacao.name().startsWith("REVISAO")) {
-                return situacao.ordinal() >= SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA.ordinal();
-            }
-        } else {
-            if (situacao.name().startsWith("MAPEAMENTO")) {
-                return situacao.ordinal() >= SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO.ordinal();
-            } else if (situacao.name().startsWith("REVISAO")) {
-                return situacao.ordinal() >= SituacaoSubprocesso.REVISAO_MAPA_DISPONIBILIZADO.ordinal();
-            }
+        if (perfil == Perfil.ADMIN || perfil == Perfil.GESTOR) return true;
+
+        if (situacao.name().startsWith("MAPEAMENTO")) {
+            return situacao.ordinal() >= SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO.ordinal();
+        } else if (situacao.name().startsWith("REVISAO")) {
+            return situacao.ordinal() >= SituacaoSubprocesso.REVISAO_MAPA_DISPONIBILIZADO.ordinal();
         }
         return false;
     }
@@ -723,16 +718,16 @@ public class SubprocessoService {
         );
     }
 
-    private boolean verificarEditarMapa(boolean mesmaUnidade, boolean isAdmin, SituacaoSubprocesso situacao) {
-        return mesmaUnidade && isAdmin && Set.of(
-                NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO,
-                SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO, SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES, REVISAO_CADASTRO_EM_ANDAMENTO,
+    private boolean verificarEditarMapa(boolean isAdmin, SituacaoSubprocesso situacao) {
+        return isAdmin && Set.of(
+                SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO,
+                SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO, SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES,
                 SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA, SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO, SituacaoSubprocesso.REVISAO_MAPA_COM_SUGESTOES,
                 SituacaoSubprocesso.DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO).contains(situacao);
     }
 
-    private boolean verificarGerirMapa(boolean mesmaUnidade, boolean isPermitido, SituacaoSubprocesso situacao) {
-        return mesmaUnidade && isPermitido && Set.of(SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES, SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO, SituacaoSubprocesso.REVISAO_MAPA_COM_SUGESTOES, SituacaoSubprocesso.REVISAO_MAPA_VALIDADO).contains(situacao);
+    private boolean verificarGerirMapa(boolean isPermitido, SituacaoSubprocesso situacao) {
+        return isPermitido && Set.of(SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES, SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO, SituacaoSubprocesso.REVISAO_MAPA_COM_SUGESTOES, SituacaoSubprocesso.REVISAO_MAPA_VALIDADO).contains(situacao);
     }
 
     @Transactional

@@ -7,15 +7,15 @@
       >
         <BCard
             v-if="podeEditarCadastroFinal"
-            class="h-100 card-actionable"
+            :class="['h-100', habilitarAcessoCadastro ? 'card-actionable' : 'card-disabled']"
             data-testid="card-subprocesso-atividades"
-            role="button"
-            tabindex="0"
-            @click="navegarPara('SubprocessoCadastro')"
-            @keydown="handleKeyDown($event, 'SubprocessoCadastro')"
+            :role="habilitarAcessoCadastro ? 'button' : undefined"
+            :tabindex="habilitarAcessoCadastro ? 0 : undefined"
+            @click="habilitarAcessoCadastro && navegarPara('SubprocessoCadastro')"
+            @keydown="habilitarAcessoCadastro && handleKeyDown($event, 'SubprocessoCadastro')"
         >
           <div class="card-click-area">
-            <BCardTitle>
+            <BCardTitle :class="habilitarAcessoCadastro ? undefined : 'text-muted'">
               {{ TEXTOS.subprocesso.cards.ATUALIZACAO_CADASTRO_TITULO }}
             </BCardTitle>
             <BCardText class="text-muted">
@@ -25,19 +25,19 @@
         </BCard>
         <BCard
             v-else
-            class="h-100 card-actionable"
+            :class="['h-100', habilitarAcessoCadastro ? 'card-actionable' : 'card-disabled']"
             data-testid="card-subprocesso-atividades-vis"
-            role="button"
-            tabindex="0"
-            @click="navegarPara('SubprocessoVisCadastro')"
-            @keydown="handleKeyDown($event, 'SubprocessoVisCadastro')"
+            :role="habilitarAcessoCadastro ? 'button' : undefined"
+            :tabindex="habilitarAcessoCadastro ? 0 : undefined"
+            @click="habilitarAcessoCadastro && navegarPara('SubprocessoVisCadastro')"
+            @keydown="habilitarAcessoCadastro && handleKeyDown($event, 'SubprocessoVisCadastro')"
         >
           <div class="card-click-area">
-            <BCardTitle>
+            <BCardTitle :class="habilitarAcessoCadastro ? undefined : 'text-muted'">
               {{ TEXTOS.subprocesso.cards.ATUALIZACAO_CADASTRO_TITULO }}
             </BCardTitle>
             <BCardText class="text-muted">
-              {{ TEXTOS.subprocesso.cards.VISUALIZACAO_CADASTRO_TEXTO }}
+              {{ habilitarAcessoCadastro ? TEXTOS.subprocesso.cards.VISUALIZACAO_CADASTRO_TEXTO : TEXTOS.subprocesso.cards.ATUALIZACAO_CADASTRO_TEXTO }}
             </BCardText>
           </div>
         </BCard>
@@ -187,7 +187,7 @@ const subprocesso = computed(() => subprocessosStore.subprocessoDetalhe);
 
 const isProcessoFinalizado = computed(() => processosStore.processoDetalhe?.situacao === SituacaoProcesso.FINALIZADO);
 
-const {podeEditarCadastro, podeEditarMapa, habilitarAcessoMapa} = useAcesso(subprocesso);
+const {podeEditarCadastro, podeEditarMapa, habilitarAcessoCadastro, habilitarAcessoMapa} = useAcesso(subprocesso);
 
 const podeEditarCadastroFinal = computed(() => podeEditarCadastro.value && !isProcessoFinalizado.value);
 const podeEditarMapaFinal = computed(() => podeEditarMapa.value && !isProcessoFinalizado.value);

@@ -25,6 +25,8 @@ describe('SubprocessoCards.vue', () => {
             podeEditarMapa: ref(accessOverrides.podeEditarMapa ?? true),
             podeEditarCadastro: ref(accessOverrides.podeEditarCadastro ?? true),
             habilitarAcessoMapa: ref(accessOverrides.habilitarAcessoMapa ?? true),
+            habilitarAcessoCadastro: ref(accessOverrides.habilitarAcessoCadastro ?? true),
+            mesmaUnidade: ref(accessOverrides.mesmaUnidade ?? true),
             podeVisualizarMapa: ref(accessOverrides.podeVisualizarMapa ?? true),
             podeVisualizarDiagnostico: ref(accessOverrides.podeVisualizarDiagnostico ?? false),
             podeVerPagina: ref(accessOverrides.podeVerPagina ?? true),

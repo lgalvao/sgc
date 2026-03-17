@@ -22,7 +22,7 @@
         </BButton>
         <BButton
             v-if="codSubprocesso && isChefe"
-            :disabled="!podeEditarCadastro"
+            :disabled="!habilitarEditarCadastro"
             data-testid="btn-cad-atividades-historico"
             variant="outline-secondary"
             @click="abrirModalHistorico"
@@ -31,7 +31,7 @@
         </BButton>
         <BButton
             v-if="codSubprocesso && isChefe"
-            :disabled="!podeEditarCadastro"
+            :disabled="!habilitarEditarCadastro"
             data-testid="btn-cad-atividades-importar"
             variant="outline-secondary"
             @click="mostrarModalImportar = true"
@@ -41,7 +41,7 @@
 
         <LoadingButton
             v-if="isChefe"
-            :disabled="botaoDisponibilizarDesabilitado"
+            :disabled="!habilitarDisponibilizarCadastro || !habilitarDisponibilizar"
             :loading="loadingValidacao"
             data-testid="btn-cad-atividades-disponibilizar"
             icon="check-lg"
@@ -66,7 +66,7 @@
     <CadAtividadeForm
         ref="atividadeFormRef"
         v-model="novaAtividade"
-        :disabled="!codSubprocesso || !podeEditarCadastro"
+        :disabled="!codSubprocesso || !habilitarEditarCadastro"
         :erro="erroNovaAtividade"
         :loading="loadingAdicionar"
         @submit="handleAdicionarAtividade"
@@ -205,7 +205,12 @@ const codSubprocesso = ref<number | null>(null);
 const codMapa = computed(() => mapasStore.mapaCompleto?.codigo || null);
 const subprocesso = computed(() => subprocessosStore.subprocessoDetalhe);
 const unidade = ref<Unidade | null>(null);
-const {podeEditarCadastro, podeDisponibilizarCadastro, podeVisualizarImpacto} = useAcesso(subprocesso);
+const {
+  podeEditarCadastro,
+  podeVisualizarImpacto,
+  habilitarEditarCadastro,
+  habilitarDisponibilizarCadastro
+} = useAcesso(subprocesso);
 const isRevisao = computed(() => subprocesso.value?.tipoProcesso === TipoProcesso.REVISAO);
 const podeVerImpacto = computed(() => podeVisualizarImpacto.value);
 
@@ -215,7 +220,6 @@ const habilitarDisponibilizar = computed(() => {
   if (atividades.value.length === 0) return false;
   return atividades.value.every(a => a.conhecimentos && a.conhecimentos.length > 0);
 });
-const botaoDisponibilizarDesabilitado = computed(() => !podeDisponibilizarCadastro.value || !habilitarDisponibilizar.value);
 
 const analisesCadastro = ref<Analise[]>([]);
 

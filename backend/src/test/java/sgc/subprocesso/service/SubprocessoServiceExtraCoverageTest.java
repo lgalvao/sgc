@@ -10,7 +10,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-import sgc.mapa.model.Mapa;
 import sgc.mapa.service.CopiaMapaService;
 import sgc.mapa.service.MapaManutencaoService;
 import sgc.organizacao.model.Unidade;
