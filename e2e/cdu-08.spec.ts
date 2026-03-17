@@ -80,8 +80,10 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
             await AtividadeHelpers.verificarSituacaoSubprocesso(page, 'Cadastro em andamento');
             await AtividadeHelpers.verificarBotaoDisponibilizar(page, true);
 
-            // Tentar importar de novo e esperar o erro (Fluxo negativo / Regra de Duplicidade)
-            await AtividadeHelpers.importarAtividadesComErroDuplicidade(page, processoOrigemDescricao, UNIDADE_ORIGEM, [atividadeA]);
+            // Tentar importar de novo com atividade já existente:
+            // o modal deve fechar (sem erro) e um aviso deve ser exibido
+            await AtividadeHelpers.importarAtividadesComAvisoDuplicidade(page, processoOrigemDescricao, UNIDADE_ORIGEM, [atividadeA]);
+            await expect(page.getByText(/não foram importadas/i).first()).toBeVisible();
         });
 
         const atividadeManual = `Atividade manual ${timestamp}`;

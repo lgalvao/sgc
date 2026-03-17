@@ -22,15 +22,16 @@ export async function importarAtividades(
     codSubprocessoDestino: number,
     codSubprocessoOrigem: number,
     codigosAtividades?: number[],
-): Promise<void> {
+): Promise<{aviso?: string}> {
     const request: ImportarAtividadesRequest = {
         codSubprocessoOrigem: codSubprocessoOrigem,
         ...(codigosAtividades && codigosAtividades.length > 0 ? {codigosAtividades} : {}),
     };
-    await apiClient.post(
+    const response = await apiClient.post<{message: string; aviso?: string}>(
         `/subprocessos/${codSubprocessoDestino}/importar-atividades`,
         request,
     );
+    return {aviso: response.data.aviso};
 }
 
 export async function listarAtividades(codSubprocesso: number): Promise<Atividade[]> {

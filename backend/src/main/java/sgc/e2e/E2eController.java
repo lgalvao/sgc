@@ -359,8 +359,60 @@ public class E2eController {
         return executeAsAdmin(() -> criarProcessoRevisaoCadastroHomologadoFixture(request));
     }
 
+    /**
+     * Cria um processo de revisão já iniciado, com cadastro disponibilizado pelo CHEFE,
+     * para acelerar cenários E2E que começam na análise em bloco do cadastro (CDU-22 para revisão).
+     */
+    @PostMapping("/fixtures/processo-revisao-com-cadastro-disponibilizado")
+    @Transactional
+    @JsonView(ProcessoViews.Publica.class)
+    public Processo criarProcessoRevisaoComCadastroDisponibilizado(@RequestBody ProcessoFixtureRequest request) {
+        return executeAsAdmin(() -> criarProcessoRevisaoCadastroDisponibilizadoFixture(request));
+    }
+
     private Processo criarProcessoMapeamentoComMapaNaSituacao(ProcessoFixtureRequest request, String situacaoSubprocesso) {
         return criarProcessoNaSituacao(request, TipoProcesso.MAPEAMENTO, situacaoSubprocesso);
+    }
+
+    private Processo criarProcessoRevisaoCadastroDisponibilizadoFixture(ProcessoFixtureRequest request) {
+        int diasLimite = request.diasLimite() != null ? request.diasLimite() : 30;
+        Unidade unidade = unidadeService.buscarPorSigla(request.unidadeSigla());
+
+        // 1. Criar processo de mapeamento base e tornar seu mapa vigente na unidade
+        ProcessoFixtureRequest requestMapeamento = new ProcessoFixtureRequest(
+                "Mapa base fixture " + System.currentTimeMillis(), request.unidadeSigla(), true, diasLimite);
+        Processo processoMapeamento = criarProcessoFixture(requestMapeamento, TipoProcesso.MAPEAMENTO);
+        Long codSubprocessoMapeamento = subprocessoRepo
+                .findByProcessoCodigoAndUnidadeCodigo(processoMapeamento.getCodigo(), unidade.getCodigo())
+                .map(Subprocesso::getCodigo)
+                .orElseThrow();
+        Long codMapaVigente = mapaRepo.buscarPorSubprocesso(codSubprocessoMapeamento)
+                .map(Mapa::getCodigo)
+                .orElseThrow();
+
+        inserirAtividadeComConhecimento(codMapaVigente, "Atividade fixture 1", "Conhecimento fixture 1A");
+        inserirAtividadeComConhecimento(codMapaVigente, "Atividade fixture 2", "Conhecimento fixture 2A");
+
+        setSituacaoSubprocesso(codSubprocessoMapeamento, SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
+        setSituacaoProcesso(processoMapeamento.getCodigo(), SituacaoProcesso.FINALIZADO);
+        jdbcTemplate.update("DELETE FROM sgc.unidade_mapa WHERE unidade_codigo = ?", unidade.getCodigo());
+        jdbcTemplate.update("INSERT INTO sgc.unidade_mapa (unidade_codigo, mapa_vigente_codigo) VALUES (?, ?)",
+                unidade.getCodigo(), codMapaVigente);
+
+        // 2. Criar processo de revisão e definir situação como REVISAO_CADASTRO_DISPONIBILIZADA
+        ProcessoFixtureRequest requestRevisao = new ProcessoFixtureRequest(
+                request.descricao(), request.unidadeSigla(), true, diasLimite);
+        Processo processoRevisao = criarProcessoFixture(requestRevisao, TipoProcesso.REVISAO);
+        Long codSubprocessoRevisao = subprocessoRepo
+                .findByProcessoCodigoAndUnidadeCodigo(processoRevisao.getCodigo(), unidade.getCodigo())
+                .map(Subprocesso::getCodigo)
+                .orElseThrow();
+
+        setSituacaoSubprocesso(codSubprocessoRevisao, SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
+        registrarMovimentacaoFixture(codSubprocessoRevisao, unidade.getCodigo(),
+                unidade.getUnidadeSuperior().getCodigo(), "Disponibilização da revisão do cadastro via fixture");
+
+        return processoService.buscarPorCodigo(processoRevisao.getCodigo());
     }
 
     private Processo criarProcessoNaSituacao(ProcessoFixtureRequest request, TipoProcesso tipo, String situacaoSubprocesso) {

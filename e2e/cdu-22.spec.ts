@@ -1,5 +1,5 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
-import {criarProcessoCadastroDisponibilizadoFixture} from './fixtures/fixtures-processos.js';
+import {criarProcessoCadastroDisponibilizadoFixture, criarProcessoRevisaoCadastroDisponibilizadoFixture} from './fixtures/fixtures-processos.js';
 import {loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
 
@@ -96,5 +96,38 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
         const btnAceitar = page.getByTestId('btn-processo-aceitar-bloco');
         await expect(btnAceitar).toBeVisible();
         await expect(btnAceitar).toBeDisabled();
+    });
+});
+
+test.describe.serial('CDU-22 - Aceitar cadastros de revisão em bloco', () => {
+    const UNIDADE_REVISAO = 'SECAO_221';
+    const timestamp = Date.now();
+    const descProcessoRevisao = `Revisao CDU-22 ${timestamp}`;
+    let processoCodigo: number;
+
+    test('Setup: processo de revisão com cadastro disponibilizado', async ({_resetAutomatico, request}) => {
+        const processo = await criarProcessoRevisaoCadastroDisponibilizadoFixture(request, {
+            descricao: descProcessoRevisao,
+            unidade: UNIDADE_REVISAO
+        });
+        processoCodigo = processo.codigo;
+        expect(processoCodigo).toBeGreaterThan(0);
+    });
+
+    test('Cenario REVISAO: GESTOR aceita revisão de cadastro em bloco', async ({_resetAutomatico, page, _autenticadoComoGestorCoord22}) => {
+        await page.goto(`/processo/${processoCodigo}`);
+        await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
+
+        const btnAceitar = page.getByTestId('btn-processo-aceitar-bloco');
+        await expect(btnAceitar).toBeVisible();
+        await expect(btnAceitar).toBeEnabled();
+        await btnAceitar.click();
+
+        const modal = page.locator('#modal-acao-bloco');
+        await expect(modal).toHaveClass(/show/);
+        await modal.getByRole('button', {name: TEXTOS.acaoBloco.aceitar.BOTAO}).click();
+
+        await expect(page.getByText(TEXTOS.sucesso.CADASTROS_ACEITOS_EM_BLOCO).first()).toBeVisible();
+        await expect(page).toHaveURL(new RegExp(`/processo/${processoCodigo}$`));
     });
 });

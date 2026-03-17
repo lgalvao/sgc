@@ -20,6 +20,7 @@ describe('subprocessoService', () => {
 
   describe('importarAtividades', () => {
     it('deve chamar a API corretamente com codigos', async () => {
+      (apiClient.post as any).mockResolvedValueOnce({ data: { message: 'Atividades importadas.' } });
       await subprocessoService.importarAtividades(1, 2, [3, 4]);
       expect(apiClient.post).toHaveBeenCalledWith('/subprocessos/1/importar-atividades', {
         codSubprocessoOrigem: 2,
@@ -28,10 +29,18 @@ describe('subprocessoService', () => {
     });
 
     it('deve chamar a API corretamente sem codigos', async () => {
+      (apiClient.post as any).mockResolvedValueOnce({ data: { message: 'Atividades importadas.' } });
       await subprocessoService.importarAtividades(1, 2);
       expect(apiClient.post).toHaveBeenCalledWith('/subprocessos/1/importar-atividades', {
         codSubprocessoOrigem: 2
       });
+    });
+
+    it('deve retornar aviso quando há duplicatas', async () => {
+      const aviso = 'Uma ou mais atividades selecionadas já existem no cadastro e não foram importadas.';
+      (apiClient.post as any).mockResolvedValueOnce({ data: { message: 'Atividades importadas.', aviso } });
+      const resultado = await subprocessoService.importarAtividades(1, 2, [3]);
+      expect(resultado.aviso).toBe(aviso);
     });
   });
 

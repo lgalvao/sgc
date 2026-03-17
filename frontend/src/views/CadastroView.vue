@@ -415,7 +415,7 @@ async function salvarEdicaoConhecimento(atividadeCodigo: number, conhecimentoCod
   }
 }
 
-async function handleImportAtividades() {
+async function handleImportAtividades(aviso?: string) {
   mostrarModalImportar.value = false;
   const codigoSubprocesso = codSubprocesso.value;
   if (codigoSubprocesso !== null) {
@@ -430,7 +430,11 @@ async function handleImportAtividades() {
       }
     });
   }
-  notify(TEXTOS.atividades.SUCESSO_IMPORTACAO, 'success');
+  if (aviso) {
+    notify(aviso, 'warning');
+  } else {
+    notify(TEXTOS.atividades.SUCESSO_IMPORTACAO, 'success');
+  }
 }
 
 function obterErroParaAtividade(atividadeCodigo: number): string | undefined {
