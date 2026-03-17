@@ -1,76 +1,36 @@
-# Simplification Suggestions for SGC
+# Simplification & De-overengineering Suggestions
 
-Given the context of an intranet application for 5-10 simultaneous users, the current architecture presents significant areas of overengineering. The project guidelines strictly mandate simple, direct code, avoidance of unnecessary layers/patterns, minimization of DTO mapping, and maintenance of a cohesive monolith. Many of the conventions documented in the backend `README.md` (like strict Facades, heavy DTO usage, and complex security layers) directly contradict these simplification goals for a small-scale app.
+Based on the constraint that this is an intranet application for at most 5-10 simultaneous users, many patterns suited for highly-scalable, multi-layered, and super-modularized enterprise applications are unnecessary and represent overengineering. Below are suggestions to simplify the codebase, reduce fragmentation, and improve maintainability.
 
-Here are the key suggestions to reduce complexity and fragmentation, aligning the codebase with its actual usage scale:
+## 1. Backend: Eliminate Facade Layers
+**Issue:** The project currently uses Facades (`PainelFacade`, `UsuarioFacade`, `AlertaFacade`, `RelatorioFacade`, `LoginFacade`, `AtividadeFacade`) as an intermediary layer between Controllers and Services.
+**Suggestion:**
+- Remove the Facade layer entirely. Domain logic should be consolidated directly into Services (e.g., `ProcessoService`, `PainelService`, `UsuarioService`).
+- Controllers can call Services directly, or for simple CRUD operations, Controllers should be allowed to inject and call Spring Data Repositories directly. This eliminates boilerplate and pass-through code.
 
-## 1. Backend: Eliminate the "Facade" Pattern and Simplify Controllers
+## 2. Frontend: Remove Pass-Through Pinia Stores
+**Issue:** Several Pinia stores (`mapas.ts`, `processos.ts`, `subprocessos.ts`, `atividades.ts`, `usuarios.ts`) act as unnecessary pass-throughs that merely fetch and cache API data for single views.
+**Suggestion:**
+- Remove these stores. Use standard Vue `ref`s, `reactive`, or composables (like `useAsyncAction`) directly within components to hold page-level state and call `services/` directly.
+- Reserve Pinia strictly for true global state that is shared across the entire application, such as Authentication/Profile (`perfil.ts`) and UI Feedback/Notifications (`feedback.ts`, `toast.ts`).
 
-**Issue:** The backend `README.md` dictates a strict Facade pattern where Controllers only interact with Facades, which then orchestrate multiple specialized, package-private Services. This is classic overengineering for a CRUD-heavy intranet app. It creates unnecessary boilerplate and indirection.
+## 3. Backend: Reduce Service Fragmentation
+**Issue:** Domain logic is heavily fragmented into micro-services within the monolith. For example:
+- `Subprocesso` has `SubprocessoService`, `SubprocessoTransicaoService`, `SubprocessoValidacaoService`, `SubprocessoNotificacaoService`.
+- `Mapa` has `MapaVisualizacaoService`, `MapaSalvamentoService`, `ImpactoMapaService`, `MapaManutencaoService`, `CopiaMapaService`.
+**Suggestion:**
+- Consolidate these fragmented classes into cohesive, domain-centric services (e.g., a single `SubprocessoService` and a single `MapaService`). Given the application's scale, procedural code in a single service is easier to trace and maintain than navigating through multiple dispersed classes and injected dependencies.
 
-**Suggestion:** Remove the Facade layer entirely. Controllers should interact directly with Services or, for simple reads/CRUD, directly with Spring Data Repositories.
+## 4. Backend: Minimize DTO Mapping for Simple Reads
+**Issue:** There is a proliferation of DTOs for simple read operations where the data closely matches the underlying entity.
+**Suggestion:**
+- Return JPA entities directly from Controllers for simple read operations. Eliminate DTOs (and their mapping boilerplate) unless there is a strict need to hide sensitive fields, prevent recursive serialization (e.g., bidirectional relationships), or aggregate data from multiple entities that cannot be simply solved by Jackson annotations (like `@JsonIgnore` or `@JsonView`).
 
-*   **Action:** Deprecate and remove Facade classes (e.g., `ProcessoFacade`, `SubprocessoFacade`, `UsuarioFacade`, `PainelFacade`, `AlertaFacade`, `RelatorioFacade`, `LoginFacade`, `AtividadeFacade`).
-*   **Action:** Refactor Controllers to inject necessary Services directly.
-*   **Action:** For simple operations (e.g., fetching a list of active units, getting a user by ID), Controllers should inject the Repository directly and call its methods, bypassing empty Service pass-throughs.
+## 5. Frontend: Eliminate Unnecessary Wrapper Components
+**Issue:** Applying strict modularization often leads to creating wrapper components that do nothing but proxy props and events down to a library component.
+**Suggestion:**
+- Avoid creating Vue components that only wrap base UI components (like BootstrapVueNext components) without adding substantial domain logic or distinct visual structure. Use the base components directly to avoid prop-drilling and event-bubbling overhead.
 
-## 2. Backend: Consolidate Fragmented Domain Services
-
-**Issue:** The domain logic is excessively fragmented. The `README.md` lists `SubprocessoCadastroWorkflowService`, `SubprocessoMapaWorkflowService`, `SubprocessoService`, and `SubprocessoContextoService` just for the `Subprocesso` domain. This extreme adherence to Single Responsibility Principle (SRP) makes navigating the codebase difficult and is unnecessary for a small team and simple domain.
-
-**Suggestion:** Consolidate these micro-services back into single, cohesive domain services.
-
-*   **Action:** Merge the fragmented `Subprocesso*Service` classes (e.g., `SubprocessoTransicaoService`, `SubprocessoValidacaoService`, `SubprocessoNotificacaoService`) into a single `SubprocessoService`.
-*   **Action:** Apply the same consolidation to the `Processo` domain (merging `ProcessoConsultaService`, workflow, etc., into `ProcessoService`). *Note: This appears to have been partially started with `ProcessoService`.*
-*   **Action:** Keep logic procedural within these consolidated services rather than splitting it across multiple strategy or workflow classes.
-
-## 3. Backend: Drastically Reduce DTO Mapping
-
-**Issue:** The documentation explicitly forbids returning JPA entities from Controllers ("NUNCA expor entidades JPA diretamente"). This leads to massive amounts of boilerplate mapping code (DTOs and Mappers) that provide zero value when the API consumer (our own frontend) needs the exact same data structure as the database entity.
-
-**Suggestion:** Return JPA Entities directly from Controllers for most read operations.
-
-*   **Action:** Remove DTOs that are mere 1:1 copies of JPA entities.
-*   **Action:** Refactor Controllers to return entities (e.g., `List<Processo>`, `Subprocesso`, `Mapa`) directly, utilizing `@JsonView` for projection if necessary.
-*   **Action:** Reserve DTOs *only* for specific cases:
-    *   Creating/Updating data where the input structure significantly differs from the entity.
-    *   Aggregating data from multiple entities into a single view (e.g., `ProcessoDetalheDto`).
-    *   Hiding sensitive fields (though `@JsonIgnore` or `@JsonView` on the entity is often simpler and preferable).
-
-## 4. Backend: Simplify the Security Architecture
-
-**Issue:** The documented "Security in Layers (3 Camadas)" with `AccessControlService`, `AccessPolicy<T>`, `HierarchyService`, and `AccessAuditService` is an enterprise-grade security framework applied to a 10-user intranet tool. This is highly complex to maintain and test.
-
-**Suggestion:** Move security checks back to the standard, simpler Spring Security mechanisms, specifically method-level security (`@PreAuthorize`) relying on a unified `PermissionEvaluator`.
-
-*   **Action:** Ensure all business rules for access control are encapsulated within `SgcPermissionEvaluator` (which implements Spring's `PermissionEvaluator`).
-*   **Action:** Use `@PreAuthorize("hasPermission(#codigo, 'Entidade', 'ACAO')")` directly on Controller methods or Service methods.
-*   **Action:** Deprecate and remove the complex `AccessControlService` and individual `AccessPolicy<T>` implementations, absorbing their logic into the `SgcPermissionEvaluator` if necessary, or simply relying on standard Spring Security roles where sufficient. *Note: The codebase seems to have already transitioned away from `AccessControlService`.*
-
-## 5. Frontend: Remove Pass-through Pinia Stores
-
-**Issue:** The frontend uses Pinia stores (`processos.ts`, `mapas.ts`, `subprocessos.ts`, `perfil.ts`) largely as pass-throughs to cache API data fetched by Services. This adds boilerplate and complexity without significant benefit, especially since the user base is small and data fetching is fast. The data synchronization logic they introduce is often unnecessary.
-
-**Suggestion:** Eliminate Pinia stores that only proxy Service calls. Use Vue composables or simple `ref` variables in components to hold data fetched directly from Services.
-
-*   **Action:** Deprecate and remove stores like `useProcessosStore`, `useMapasStore`, `useSubprocessosStore`, etc.
-*   **Action:** Create composables (e.g., `useProcessos()`, `useSubprocessos()`) that encapsulate local state (`ref`) and functions that call API services.
-*   **Action:** Refactor components that rely on these stores to import the corresponding Service functions or Composables and manage state locally.
-*   **Action:** Restrict Pinia usage strictly to global application state, such as Authentication (User session), Configuration (`configuracoes.ts`), and UI Notifications (`toast.ts`).
-
-## 6. Frontend: Simplify Wrapper Components
-
-**Issue:** There may be Vue components that exist solely to wrap other components (e.g., wrapping BootstrapVueNext components without adding significant business logic or styling), just passing props and emitting events.
-
-**Suggestion:** Avoid wrapper components that only proxy props and events.
-
-*   **Action:** Use BootstrapVueNext components directly in the views or feature components unless a custom behavior or complex composite structure is genuinely required.
-
-## 7. General: Procedural Logic over Design Patterns
-
-**Issue:** The use of Factories, Builders, and complex Facades suggests an enterprise-level architecture that is overkill.
-
-**Suggestion:** Favor direct, procedural code in Services over complex object-oriented design patterns.
-
-*   **Action:** Replace complex Builders with simple factory methods or procedural construction within Services.
-*   **Action:** Avoid generic interfaces with single implementations; use concrete classes directly.
+## 6. General Architectural Philosophy
+- **Interfaces:** Avoid single-implementation interfaces. If an interface only has an `Impl` class, remove the interface and use the concrete class directly. (Note: A quick scan showed no `Impl` suffix files, which is good, but keep this in mind).
+- **Patterns:** Avoid complex design patterns (Builders for simple objects, Factories, Hexagonal/Onion architectures). Use Spring Boot and Hibernate features directly and simply.
