@@ -64,7 +64,7 @@
     <div v-if="unidade">
       <div class="mb-5 d-flex align-items-center">
         <div class="fs-5" data-testid="txt-header-unidade">
-          {{ unidade.sigla }}
+          {{ unidade.sigla }}<template v-if="unidade.nome"> - {{ unidade.nome }}</template>
         </div>
       </div>
 

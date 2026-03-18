@@ -3,7 +3,7 @@
     <PageHeader title="Atividades e conhecimentos">
       <template #default>
         <div class="unidade-cabecalho mb-0">
-          <span class="unidade-sigla">{{ siglaUnidade }}</span>
+          <span class="unidade-sigla">{{ siglaUnidade }}<template v-if="nomeUnidade"> - {{ nomeUnidade }}</template></span>
         </div>
       </template>
       <template #actions>
