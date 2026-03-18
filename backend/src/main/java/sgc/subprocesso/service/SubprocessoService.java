@@ -751,8 +751,8 @@ public class SubprocessoService {
     private boolean verificarEditarMapa(boolean isAdmin, SituacaoSubprocesso situacao) {
         return isAdmin && Set.of(
                 SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO,
-                SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO, SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES,
-                SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA, SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO, SituacaoSubprocesso.REVISAO_MAPA_COM_SUGESTOES,
+                SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO,
+                SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA, SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO,
                 SituacaoSubprocesso.DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO).contains(situacao);
     }
 
