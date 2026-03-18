@@ -10,21 +10,21 @@ import lombok.*;
 public enum TipoTransicao {
     CADASTRO_DISPONIBILIZADO(
             "Disponibilização do cadastro de atividades",
-            "Cadastro de atividades/conhecimentos da unidade %s disponibilizado para análise",
+            "Cadastro da unidade %s disponibilizado para análise",
             "cadastro-disponibilizado",
             "cadastro-disponibilizado-superior"
     ),
 
     CADASTRO_DEVOLVIDO(
             "Devolução do cadastro de atividades para ajustes",
-            "Cadastro de atividades da unidade %s devolvido para ajustes",
+            "Cadastro da unidade %s devolvido para ajustes",
             "cadastro-devolvido",
             "cadastro-devolvido-superior"
     ),
 
     CADASTRO_ACEITO(
             "Cadastro aceito",
-            "Cadastro de atividades da unidade %s submetido para análise",
+            "Cadastro da unidade %s submetido para análise",
             "aceite-cadastro",
             "aceite-cadastro-superior"
     ),
@@ -38,7 +38,7 @@ public enum TipoTransicao {
 
     CADASTRO_REABERTO(
             "Reabertura de cadastro de atividades",
-            "Cadastro de atividades da unidade %s reaberto para ajustes",
+            "Cadastro da unidade %s reaberto para ajustes",
             "cadastro-reaberto",
             "cadastro-reaberto-superior"
     ),
@@ -107,7 +107,7 @@ public enum TipoTransicao {
     ),
 
     MAPA_VALIDACAO_ACEITA(
-            "Validação do mapa aceita",
+            "Mapa de competências validado",
             "Validação do mapa da unidade %s submetida para análise",
             "aceite-validacao",
             "aceite-validacao-superior"

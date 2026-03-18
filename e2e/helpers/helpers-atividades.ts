@@ -275,25 +275,13 @@ export async function importarAtividades(page: Page,
     }
 }
 
-export async function importarAtividadesComErroDuplicidade(page: Page, processoOrigemDescricao: string, unidadeOrigemSigla: string, atividadesDescricoes: string[]) {
+export async function importarAtividadesComAvisoDuplicidade(page: Page, processoOrigemDescricao: string, unidadeOrigemSigla: string, atividadesDescricoes: string[]) {
     await selecionarAtividadesParaImportacao(page, processoOrigemDescricao, unidadeOrigemSigla, atividadesDescricoes);
-    
-    const modal = page.getByRole('dialog');
-    const respostaImportacao = page.waitForResponse(response =>
-        response.request().method() === 'POST' &&
-        response.url().includes('/importar-atividades') &&
-        response.status() === 422
-    );
-    await modal.getByTestId('btn-importar').click();
-    const response = await respostaImportacao;
-    const corpo = await response.text();
 
-    await expect(modal).toBeVisible();
-    expect(corpo).toContain('"code":"VALIDACAO"');
-    expect(corpo).toContain('já existentes no cadastro');
-    await expect(modal.getByText(/já existente|não puderam ser importadas/i)).toBeVisible();
-    
-    await modal.getByTestId('importar-atividades-modal__btn-modal-cancelar').click();
+    const modal = page.getByRole('dialog');
+    await modal.getByTestId('btn-importar').click();
+
+    // O modal deve fechar (sem erro) mesmo quando todas as atividades são duplicatas
     await expect(modal).toBeHidden();
 }
 

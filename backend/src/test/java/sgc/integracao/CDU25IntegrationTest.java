@@ -129,7 +129,7 @@ class CDU25IntegrationTest extends BaseIntegrationTest {
 
         List<Movimentacao> movs1 = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(s1.getCodigo());
         assertThat(movs1).isNotEmpty();
-        assertThat(movs1.getFirst().getDescricao()).contains("Validação do mapa aceita");
+        assertThat(movs1.getFirst().getDescricao()).contains("Mapa de competências validado");
 
         // Check subprocesso 2
         Subprocesso s2 = subprocessoRepo.findById(subprocesso2.getCodigo()).orElseThrow();

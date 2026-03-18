@@ -20,7 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @Tag("integration")
 @Transactional
-@DisplayName("CDU-19: Validar mapa de Competências")
+@DisplayName("CDU-19: Validar mapa de competências")
 class CDU19IntegrationTest extends BaseIntegrationTest {
     @Autowired
     private MovimentacaoRepo movimentacaoRepo;

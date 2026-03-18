@@ -31,7 +31,10 @@ const stubs = {
         props: ['title'],
         template: '<div><h1>{{ title }}</h1><slot /><slot name="actions" /></div>'
     },
-    BButton: {template: '<button :data-testid="$attrs[\'data-testid\']" @click="$emit(\'click\')"><slot /></button>'},
+    BButton: {
+        props: ['disabled'],
+        template: '<button :data-testid="$attrs[\'data-testid\']" :disabled="disabled" @click="$emit(\'click\')"><slot /></button>'
+    },
     BCard: {template: '<div><slot /></div>'},
     BCardBody: {template: '<div><slot /></div>'},
     BCardTitle: {template: '<div><slot /></div>'},
@@ -62,6 +65,9 @@ describe("CadastroVisualizacaoView coverage", () => {
             podeAceitarCadastro: ref(true),
             podeDevolverCadastro: ref(true),
             podeVisualizarImpacto: ref(true),
+            habilitarHomologarCadastro: ref(true),
+            habilitarAceitarCadastro: ref(true),
+            habilitarDevolverCadastro: ref(true),
             ...accessOverrides
         } as any);
 
@@ -146,5 +152,20 @@ describe("CadastroVisualizacaoView coverage", () => {
         mapsStore.buscarImpactoMapa = vi.fn().mockResolvedValue(null);
         await (wrapper.vm as any).abrirModalImpacto();
         expect(mapsStore.buscarImpactoMapa).toHaveBeenCalledWith(123);
+    });
+
+    it("deve manter devolucao e homologacao visiveis, porem desabilitadas, fora da localizacao permitida", async () => {
+        const wrapper = createWrapper({
+            podeHomologarCadastro: ref(true),
+            podeAceitarCadastro: ref(false),
+            podeDevolverCadastro: ref(true),
+            habilitarHomologarCadastro: ref(false),
+            habilitarAceitarCadastro: ref(false),
+            habilitarDevolverCadastro: ref(false),
+        });
+        await flushPromises();
+
+        expect(wrapper.find('[data-testid="btn-acao-devolver"]').attributes('disabled')).toBeDefined();
+        expect(wrapper.find('[data-testid="btn-acao-analisar-principal"]').attributes('disabled')).toBeDefined();
     });
 });

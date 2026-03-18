@@ -1,10 +1,10 @@
 import type {Meta, StoryObj} from '@storybook/vue3-vite';
-import ModalMapaDisponibilizar from './ModalMapaDisponibilizar.vue';
+import DisponibilizarMapaModal from './DisponibilizarMapaModal.vue';
 import {ref} from 'vue';
 
-const meta: Meta<typeof ModalMapaDisponibilizar> = {
-    title: 'Mapa/ModalMapaDisponibilizar',
-    component: ModalMapaDisponibilizar,
+const meta: Meta<typeof DisponibilizarMapaModal> = {
+    title: 'Mapa/DisponibilizarMapaModal',
+    component: DisponibilizarMapaModal,
     tags: ['autodocs'],
     argTypes: {
         onFechar: {action: 'fechar'},
@@ -13,7 +13,7 @@ const meta: Meta<typeof ModalMapaDisponibilizar> = {
 };
 
 export default meta;
-type Story = StoryObj<typeof ModalMapaDisponibilizar>;
+type Story = StoryObj<typeof DisponibilizarMapaModal>;
 
 export const Default: Story = {
     args: {
@@ -22,7 +22,7 @@ export const Default: Story = {
         loading: false,
     },
     render: (args) => ({
-        components: {ModalMapaDisponibilizar},
+        components: {DisponibilizarMapaModal},
         setup() {
             const show = ref(args.mostrar);
             return {args, show};
@@ -30,7 +30,7 @@ export const Default: Story = {
         template: `
       <div>
         <button class="btn btn-primary" @click="show = true">Disponibilizar mapa</button>
-        <ModalMapaDisponibilizar v-bind="args" :mostrar="show" @fechar="show = false" />
+        <DisponibilizarMapaModal v-bind="args" :mostrar="show" @fechar="show = false" />
       </div>
     `,
     }),
@@ -46,12 +46,12 @@ export const ComErros: Story = {
         },
     },
     render: (args) => ({
-        components: {ModalMapaDisponibilizar},
+        components: {DisponibilizarMapaModal},
         setup() {
             const show = ref(args.mostrar);
             return {args, show};
         },
-        template: '<ModalMapaDisponibilizar v-bind="args" :mostrar="show" @fechar="show = false" />',
+        template: '<DisponibilizarMapaModal v-bind="args" :mostrar="show" @fechar="show = false" />',
     }),
 };
 

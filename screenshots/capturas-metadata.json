@@ -1,0 +1,1854 @@
+[
+  {
+    "file": "01-seguranca--01-login-inicial.png",
+    "url": "http://localhost:5173/login",
+    "route": "/login",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:31:23.142Z",
+    "tags": [
+      "login",
+      "inicial",
+      "01-seguranca"
+    ],
+    "categoria": "01-seguranca",
+    "nome": "01-login-inicial",
+    "titulo": "SGC",
+    "isFullPage": true,
+    "isComponente": false
+  },
+  {
+    "file": "01-seguranca--01b-login-campo-usuario-foco.png",
+    "url": "http://localhost:5173/login",
+    "route": "/login",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:31:23.373Z",
+    "tags": [
+      "login",
+      "interacao",
+      "01-seguranca"
+    ],
+    "categoria": "01-seguranca",
+    "nome": "01b-login-campo-usuario-foco",
+    "titulo": "Login - SGC",
+    "isFullPage": true,
+    "isComponente": false
+  },
+  {
+    "file": "01-seguranca--01c-login-usuario-preenchido.png",
+    "url": "http://localhost:5173/login",
+    "route": "/login",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:31:23.573Z",
+    "tags": [
+      "login",
+      "preenchimento",
+      "01-seguranca"
+    ],
+    "categoria": "01-seguranca",
+    "nome": "01c-login-usuario-preenchido",
+    "titulo": "Login - SGC",
+    "isFullPage": true,
+    "isComponente": false
+  },
+  {
+    "file": "01-seguranca--02-login-erro-credenciais.png",
+    "url": "http://localhost:5173/login",
+    "route": "/login",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:31:24.188Z",
+    "tags": [
+      "login",
+      "erro",
+      "validacao",
+      "01-seguranca"
+    ],
+    "categoria": "01-seguranca",
+    "nome": "02-login-erro-credenciais",
+    "titulo": "Login - SGC",
+    "isFullPage": true,
+    "isComponente": false,
+    "erro": "Credenciais inválidas"
+  },
+  {
+    "file": "01-seguranca--03-login-selecao-perfil.png",
+    "url": "http://localhost:5173/login",
+    "route": "/login",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:31:24.538Z",
+    "tags": [
+      "login",
+      "multi-perfil",
+      "01-seguranca"
+    ],
+    "categoria": "01-seguranca",
+    "nome": "03-login-selecao-perfil",
+    "titulo": "Login - SGC",
+    "isFullPage": true,
+    "isComponente": false,
+    "usuario": "111111"
+  },
+  {
+    "file": "01-seguranca--04-painel-apos-login.png",
+    "url": "http://localhost:5173/painel",
+    "route": "/painel",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:31:25.244Z",
+    "tags": [
+      "login",
+      "sucesso",
+      "dashboard",
+      "01-seguranca"
+    ],
+    "categoria": "01-seguranca",
+    "nome": "04-painel-apos-login",
+    "titulo": "Painel - SGC",
+    "isFullPage": true,
+    "isComponente": false,
+    "perfil": "ADMIN"
+  },
+  {
+    "file": "02-painel--02-criar-processo-form-vazio.png",
+    "url": "http://localhost:5173/processo/cadastro",
+    "route": "/processo/cadastro",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:31:26.292Z",
+    "tags": [
+      "form",
+      "vazio",
+      "02-painel"
+    ],
+    "categoria": "02-painel",
+    "nome": "02-criar-processo-form-vazio",
+    "titulo": "Novo processo - SGC",
+    "isFullPage": true,
+    "isComponente": false,
+    "perfil": "ADMIN"
+  },
+  {
+    "file": "02-painel--04-arvore-unidades-expandida.png",
+    "url": "http://localhost:5173/processo/cadastro",
+    "route": "/processo/cadastro",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:31:26.733Z",
+    "tags": [
+      "02-painel"
+    ],
+    "categoria": "02-painel",
+    "nome": "04-arvore-unidades-expandida",
+    "titulo": "Novo processo - SGC",
+    "isFullPage": true,
+    "isComponente": false,
+    "perfil": "ADMIN",
+    "acao": "expandir-arvore"
+  },
+  {
+    "file": "02-painel--05-arvore-unidades-selecionada.png",
+    "url": "http://localhost:5173/processo/cadastro",
+    "route": "/processo/cadastro",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:31:27.134Z",
+    "tags": [
+      "selecao",
+      "unidades",
+      "02-painel"
+    ],
+    "categoria": "02-painel",
+    "nome": "05-arvore-unidades-selecionada",
+    "titulo": "Novo processo - SGC",
+    "isFullPage": true,
+    "isComponente": false
+  },
+  {
+    "file": "02-painel--06a-tabela-processos.png",
+    "url": "http://localhost:5173/painel",
+    "route": "/painel",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:31:27.668Z",
+    "tags": [
+      "02-painel",
+      "componente"
+    ],
+    "categoria": "02-painel",
+    "nome": "06a-tabela-processos",
+    "titulo": "Painel - SGC",
+    "isFullPage": false,
+    "isComponente": true,
+    "perfil": "ADMIN"
+  },
+  {
+    "file": "02-painel--06-painel-admin-com-processo.png",
+    "url": "http://localhost:5173/painel",
+    "route": "/painel",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:31:28.145Z",
+    "tags": [
+      "02-painel"
+    ],
+    "categoria": "02-painel",
+    "nome": "06-painel-admin-com-processo",
+    "titulo": "SGC",
+    "isFullPage": true,
+    "isComponente": false,
+    "perfil": "ADMIN"
+  },
+  {
+    "file": "02-painel--07-painel-hover-processo.png",
+    "url": "http://localhost:5173/painel",
+    "route": "/painel",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:31:28.425Z",
+    "tags": [
+      "interacao",
+      "hover",
+      "02-painel"
+    ],
+    "categoria": "02-painel",
+    "nome": "07-painel-hover-processo",
+    "titulo": "Painel - SGC",
+    "isFullPage": true,
+    "isComponente": false
+  },
+  {
+    "file": "02-painel--10-painel-gestor.png",
+    "url": "http://localhost:5173/painel",
+    "route": "/painel",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:31:30.871Z",
+    "tags": [
+      "02-painel"
+    ],
+    "categoria": "02-painel",
+    "nome": "10-painel-gestor",
+    "titulo": "Painel - SGC",
+    "isFullPage": true,
+    "isComponente": false,
+    "perfil": "GESTOR",
+    "unidade": "COORD_11"
+  },
+  {
+    "file": "02-painel--11-painel-chefe.png",
+    "url": "http://localhost:5173/painel",
+    "route": "/painel",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:31:31.772Z",
+    "tags": [
+      "02-painel"
+    ],
+    "categoria": "02-painel",
+    "nome": "11-painel-chefe",
+    "titulo": "Painel - SGC",
+    "isFullPage": true,
+    "isComponente": false,
+    "perfil": "CHEFE",
+    "unidade": "SECAO_211"
+  },
+  {
+    "file": "03-processo--01-processo-edicao.png",
+    "url": "http://localhost:5173/processo/cadastro?codProcesso=204",
+    "route": "/processo/cadastro?codProcesso=204",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:31:33.090Z",
+    "tags": [
+      "03-processo"
+    ],
+    "categoria": "03-processo",
+    "nome": "01-processo-edicao",
+    "titulo": "Novo processo - SGC",
+    "isFullPage": true,
+    "isComponente": false,
+    "perfil": "ADMIN",
+    "estado": "CRIADO"
+  },
+  {
+    "file": "03-processo--02-modal-iniciar-processo.png",
+    "url": "http://localhost:5173/processo/cadastro?codProcesso=204",
+    "route": "/processo/cadastro?codProcesso=204",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:31:33.428Z",
+    "tags": [
+      "modal",
+      "confirmacao",
+      "03-processo"
+    ],
+    "categoria": "03-processo",
+    "nome": "02-modal-iniciar-processo",
+    "titulo": "Novo processo - SGC",
+    "isFullPage": true,
+    "isComponente": false,
+    "acao": "iniciar-processo"
+  },
+  {
+    "file": "03-processo--03-detalhes-processo-iniciado.png",
+    "url": "http://localhost:5173/processo/204",
+    "route": "/processo/204",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:31:34.009Z",
+    "tags": [
+      "03-processo"
+    ],
+    "categoria": "03-processo",
+    "nome": "03-detalhes-processo-iniciado",
+    "titulo": "Unidades do Processo - SGC",
+    "isFullPage": true,
+    "isComponente": false,
+    "perfil": "ADMIN",
+    "estado": "EM_ANDAMENTO"
+  },
+  {
+    "file": "03-processo--03a-cadastro-chefe.png",
+    "url": "http://localhost:5173/processo/205/ASSESSORIA_12/cadastro",
+    "route": "/processo/205/ASSESSORIA_12/cadastro",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:31:35.843Z",
+    "tags": [
+      "03-processo"
+    ],
+    "categoria": "03-processo",
+    "nome": "03a-cadastro-chefe",
+    "titulo": "Cadastro - SGC",
+    "isFullPage": true,
+    "isComponente": false,
+    "perfil": "CHEFE",
+    "unidade": "ASSESSORIA_12",
+    "acao": "cadastro-atividades"
+  },
+  {
+    "file": "03-processo--03b-analise-gestor.png",
+    "url": "http://localhost:5173/processo/205/ASSESSORIA_12/vis-cadastro",
+    "route": "/processo/205/ASSESSORIA_12/vis-cadastro",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:31:37.427Z",
+    "tags": [
+      "03-processo"
+    ],
+    "categoria": "03-processo",
+    "nome": "03b-analise-gestor",
+    "titulo": "Visualização de Atividades - SGC",
+    "isFullPage": true,
+    "isComponente": false,
+    "perfil": "GESTOR",
+    "unidade": "ASSESSORIA_12",
+    "acao": "analise-cadastro"
+  },
+  {
+    "file": "03-processo--03c-modal-aceite-gestor.png",
+    "url": "http://localhost:5173/processo/205/ASSESSORIA_12/vis-cadastro",
+    "route": "/processo/205/ASSESSORIA_12/vis-cadastro",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:31:37.760Z",
+    "tags": [
+      "modal",
+      "aceite",
+      "03-processo"
+    ],
+    "categoria": "03-processo",
+    "nome": "03c-modal-aceite-gestor",
+    "titulo": "Visualização de Atividades - SGC",
+    "isFullPage": true,
+    "isComponente": false
+  },
+  {
+    "file": "03-processo--03d-modal-homologacao-admin.png",
+    "url": "http://localhost:5173/processo/205/ASSESSORIA_12/vis-cadastro",
+    "route": "/processo/205/ASSESSORIA_12/vis-cadastro",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:31:38.825Z",
+    "tags": [
+      "modal",
+      "homologacao",
+      "03-processo"
+    ],
+    "categoria": "03-processo",
+    "nome": "03d-modal-homologacao-admin",
+    "titulo": "Visualização de Atividades - SGC",
+    "isFullPage": true,
+    "isComponente": false,
+    "perfil": "ADMIN"
+  },
+  {
+    "file": "03-processo--03e-mapa-criado.png",
+    "url": "http://localhost:5173/processo/205/ASSESSORIA_12/mapa",
+    "route": "/processo/205/ASSESSORIA_12/mapa",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:31:39.938Z",
+    "tags": [
+      "03-processo"
+    ],
+    "categoria": "03-processo",
+    "nome": "03e-mapa-criado",
+    "titulo": "Mapa - SGC",
+    "isFullPage": true,
+    "isComponente": false,
+    "perfil": "ADMIN",
+    "acao": "edicao-mapa"
+  },
+  {
+    "file": "03-processo--03f-modal-validar-mapa.png",
+    "url": "http://localhost:5173/processo/206/ASSESSORIA_12/vis-mapa",
+    "route": "/processo/206/ASSESSORIA_12/vis-mapa",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:31:41.951Z",
+    "tags": [
+      "modal",
+      "validacao-mapa",
+      "03-processo"
+    ],
+    "categoria": "03-processo",
+    "nome": "03f-modal-validar-mapa",
+    "titulo": "Visualização de Mapa - SGC",
+    "isFullPage": true,
+    "isComponente": false,
+    "perfil": "CHEFE"
+  },
+  {
+    "file": "03-processo--03i-detalhes-processo-finalizavel.png",
+    "url": "http://localhost:5173/processo/207",
+    "route": "/processo/207",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:31:43.213Z",
+    "tags": [
+      "03-processo"
+    ],
+    "categoria": "03-processo",
+    "nome": "03i-detalhes-processo-finalizavel",
+    "titulo": "SGC",
+    "isFullPage": true,
+    "isComponente": false,
+    "perfil": "ADMIN",
+    "acao": "finalizacao-processo"
+  },
+  {
+    "file": "03-processo--04-modal-finalizar-processo.png",
+    "url": "http://localhost:5173/processo/207",
+    "route": "/processo/207",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:31:43.566Z",
+    "tags": [
+      "modal",
+      "finalizar",
+      "03-processo"
+    ],
+    "categoria": "03-processo",
+    "nome": "04-modal-finalizar-processo",
+    "titulo": "Unidades do Processo - SGC",
+    "isFullPage": true,
+    "isComponente": false
+  },
+  {
+    "file": "03-processo--05-detalhes-processo-apos-cancelar-finalizacao.png",
+    "url": "http://localhost:5173/processo/207",
+    "route": "/processo/207",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:31:43.830Z",
+    "tags": [
+      "03-processo"
+    ],
+    "categoria": "03-processo",
+    "nome": "05-detalhes-processo-apos-cancelar-finalizacao",
+    "titulo": "Unidades do Processo - SGC",
+    "isFullPage": true,
+    "isComponente": false
+  },
+  {
+    "file": "03-processo--10-botoes-desativados-form-vazio.png",
+    "url": "http://localhost:5173/processo/cadastro",
+    "route": "/processo/cadastro",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:31:44.690Z",
+    "tags": [
+      "validacao",
+      "form",
+      "03-processo"
+    ],
+    "categoria": "03-processo",
+    "nome": "10-botoes-desativados-form-vazio",
+    "titulo": "Novo processo - SGC",
+    "isFullPage": true,
+    "isComponente": false,
+    "motivo": "falta-campos-obrigatorios"
+  },
+  {
+    "file": "03-processo--11-botoes-desativados-falta-data-unidade.png",
+    "url": "http://localhost:5173/processo/cadastro",
+    "route": "/processo/cadastro",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:31:44.889Z",
+    "tags": [
+      "03-processo"
+    ],
+    "categoria": "03-processo",
+    "nome": "11-botoes-desativados-falta-data-unidade",
+    "titulo": "Novo processo - SGC",
+    "isFullPage": true,
+    "isComponente": false,
+    "preenchido": "descricao"
+  },
+  {
+    "file": "03-processo--12-botoes-desativados-falta-unidade.png",
+    "url": "http://localhost:5173/processo/cadastro",
+    "route": "/processo/cadastro",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:31:45.111Z",
+    "tags": [
+      "03-processo"
+    ],
+    "categoria": "03-processo",
+    "nome": "12-botoes-desativados-falta-unidade",
+    "titulo": "Novo processo - SGC",
+    "isFullPage": true,
+    "isComponente": false,
+    "preenchido": [
+      "descricao",
+      "tipo",
+      "data"
+    ]
+  },
+  {
+    "file": "03-processo--13-botoes-ativados-form-completo.png",
+    "url": "http://localhost:5173/processo/cadastro",
+    "route": "/processo/cadastro",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:31:45.412Z",
+    "tags": [
+      "validacao",
+      "sucesso",
+      "03-processo"
+    ],
+    "categoria": "03-processo",
+    "nome": "13-botoes-ativados-form-completo",
+    "titulo": "Novo processo - SGC",
+    "isFullPage": true,
+    "isComponente": false
+  },
+  {
+    "file": "04-subprocesso--01-dashboard-subprocesso.png",
+    "url": "http://localhost:5173/processo/208/SECAO_211",
+    "route": "/processo/208/SECAO_211",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:31:46.579Z",
+    "tags": [
+      "04-subprocesso"
+    ],
+    "categoria": "04-subprocesso",
+    "nome": "01-dashboard-subprocesso",
+    "titulo": "Processos da Unidade - SGC",
+    "isFullPage": true,
+    "isComponente": false,
+    "perfil": "CHEFE",
+    "unidade": "SECAO_211"
+  },
+  {
+    "file": "04-subprocesso--02-cadastro-atividades-vazio.png",
+    "url": "http://localhost:5173/processo/208/SECAO_211/cadastro",
+    "route": "/processo/208/SECAO_211/cadastro",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:31:46.856Z",
+    "tags": [
+      "atividades",
+      "vazio",
+      "04-subprocesso"
+    ],
+    "categoria": "04-subprocesso",
+    "nome": "02-cadastro-atividades-vazio",
+    "titulo": "Cadastro - SGC",
+    "isFullPage": true,
+    "isComponente": false
+  },
+  {
+    "file": "04-subprocesso--03-cadastro-atividades-preenchendo.png",
+    "url": "http://localhost:5173/processo/208/SECAO_211/cadastro",
+    "route": "/processo/208/SECAO_211/cadastro",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:31:47.056Z",
+    "tags": [
+      "interacao",
+      "04-subprocesso"
+    ],
+    "categoria": "04-subprocesso",
+    "nome": "03-cadastro-atividades-preenchendo",
+    "titulo": "Cadastro - SGC",
+    "isFullPage": true,
+    "isComponente": false
+  },
+  {
+    "file": "04-subprocesso--04-cadastro-atividades-com-uma.png",
+    "url": "http://localhost:5173/processo/208/SECAO_211/cadastro",
+    "route": "/processo/208/SECAO_211/cadastro",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:31:47.370Z",
+    "tags": [
+      "04-subprocesso"
+    ],
+    "categoria": "04-subprocesso",
+    "nome": "04-cadastro-atividades-com-uma",
+    "titulo": "Cadastro - SGC",
+    "isFullPage": true,
+    "isComponente": false,
+    "atividade": "Atividade teste 1773765106858"
+  },
+  {
+    "file": "04-subprocesso--05-cadastro-conhecimento-preenchendo.png",
+    "url": "http://localhost:5173/processo/208/SECAO_211/cadastro",
+    "route": "/processo/208/SECAO_211/cadastro",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:31:47.556Z",
+    "tags": [
+      "conhecimento",
+      "edicao",
+      "04-subprocesso"
+    ],
+    "categoria": "04-subprocesso",
+    "nome": "05-cadastro-conhecimento-preenchendo",
+    "titulo": "Cadastro - SGC",
+    "isFullPage": true,
+    "isComponente": false
+  },
+  {
+    "file": "04-subprocesso--06-cadastro-atividade-completa.png",
+    "url": "http://localhost:5173/processo/208/SECAO_211/cadastro",
+    "route": "/processo/208/SECAO_211/cadastro",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:31:47.954Z",
+    "tags": [
+      "04-subprocesso"
+    ],
+    "categoria": "04-subprocesso",
+    "nome": "06-cadastro-atividade-completa",
+    "titulo": "Cadastro - SGC",
+    "isFullPage": true,
+    "isComponente": false,
+    "conhecimentos": [
+      "Java",
+      "Spring Boot",
+      "Oracle"
+    ]
+  },
+  {
+    "file": "04-subprocesso--07-cadastro-atividade-hover.png",
+    "url": "http://localhost:5173/processo/208/SECAO_211/cadastro",
+    "route": "/processo/208/SECAO_211/cadastro",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:31:48.471Z",
+    "tags": [
+      "interacao",
+      "hover",
+      "04-subprocesso"
+    ],
+    "categoria": "04-subprocesso",
+    "nome": "07-cadastro-atividade-hover",
+    "titulo": "Cadastro - SGC",
+    "isFullPage": true,
+    "isComponente": false
+  },
+  {
+    "file": "04-subprocesso--08-modal-disponibilizar-atividades.png",
+    "url": "http://localhost:5173/processo/208/SECAO_211/cadastro",
+    "route": "/processo/208/SECAO_211/cadastro",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:31:48.812Z",
+    "tags": [
+      "modal",
+      "disponibilizar",
+      "04-subprocesso"
+    ],
+    "categoria": "04-subprocesso",
+    "nome": "08-modal-disponibilizar-atividades",
+    "titulo": "Cadastro - SGC",
+    "isFullPage": true,
+    "isComponente": false
+  },
+  {
+    "file": "04-subprocesso--09-cadastro-atividades-disponibilizado.png",
+    "url": "http://localhost:5173/painel",
+    "route": "/painel",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:31:49.173Z",
+    "tags": [
+      "04-subprocesso"
+    ],
+    "categoria": "04-subprocesso",
+    "nome": "09-cadastro-atividades-disponibilizado",
+    "titulo": "Painel - SGC",
+    "isFullPage": true,
+    "isComponente": false,
+    "estado": "DISPONIBILIZADO"
+  },
+  {
+    "file": "04-subprocesso--20-cadastro-vazio-com-label-obrigatorio.png",
+    "url": "http://localhost:5173/processo/209/SECAO_212/cadastro",
+    "route": "/processo/209/SECAO_212/cadastro",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:31:51.674Z",
+    "tags": [
+      "ui-clue",
+      "obrigatorio",
+      "04-subprocesso"
+    ],
+    "categoria": "04-subprocesso",
+    "nome": "20-cadastro-vazio-com-label-obrigatorio",
+    "titulo": "Cadastro - SGC",
+    "isFullPage": true,
+    "isComponente": false
+  },
+  {
+    "file": "04-subprocesso--21-atividade-sem-conhecimento.png",
+    "url": "http://localhost:5173/processo/209/SECAO_212/cadastro",
+    "route": "/processo/209/SECAO_212/cadastro",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:31:52.321Z",
+    "tags": [
+      "04-subprocesso"
+    ],
+    "categoria": "04-subprocesso",
+    "nome": "21-atividade-sem-conhecimento",
+    "titulo": "Cadastro - SGC",
+    "isFullPage": true,
+    "isComponente": false,
+    "erro": "falta-conhecimento"
+  },
+  {
+    "file": "04-subprocesso--22-mix-atividades-com-sem-conhecimento.png",
+    "url": "http://localhost:5173/processo/209/SECAO_212/cadastro",
+    "route": "/processo/209/SECAO_212/cadastro",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:31:53.494Z",
+    "tags": [
+      "validacao",
+      "visual",
+      "04-subprocesso"
+    ],
+    "categoria": "04-subprocesso",
+    "nome": "22-mix-atividades-com-sem-conhecimento",
+    "titulo": "Cadastro - SGC",
+    "isFullPage": true,
+    "isComponente": false
+  },
+  {
+    "file": "04-subprocesso--23-botao-disponibilizar-desabilitado-sem-conhecimento.png",
+    "url": "http://localhost:5173/processo/209/SECAO_212/cadastro",
+    "route": "/processo/209/SECAO_212/cadastro",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:31:53.681Z",
+    "tags": [
+      "validacao",
+      "bloqueio",
+      "04-subprocesso"
+    ],
+    "categoria": "04-subprocesso",
+    "nome": "23-botao-disponibilizar-desabilitado-sem-conhecimento",
+    "titulo": "Cadastro - SGC",
+    "isFullPage": true,
+    "isComponente": false
+  },
+  {
+    "file": "04-subprocesso--24-segunda-atividade-sem-conhecimento.png",
+    "url": "http://localhost:5173/processo/209/SECAO_212/cadastro",
+    "route": "/processo/209/SECAO_212/cadastro",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:31:54.226Z",
+    "tags": [
+      "scroll",
+      "validacao",
+      "04-subprocesso"
+    ],
+    "categoria": "04-subprocesso",
+    "nome": "24-segunda-atividade-sem-conhecimento",
+    "titulo": "Cadastro - SGC",
+    "isFullPage": true,
+    "isComponente": false
+  },
+  {
+    "file": "04-subprocesso--25-detalhe-card-sem-conhecimento.png",
+    "url": "http://localhost:5173/processo/209/SECAO_212/cadastro",
+    "route": "/processo/209/SECAO_212/cadastro",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:31:54.661Z",
+    "tags": [
+      "04-subprocesso",
+      "detalhe",
+      "erro"
+    ],
+    "categoria": "04-subprocesso",
+    "nome": "25-detalhe-card-sem-conhecimento",
+    "titulo": "Cadastro - SGC",
+    "isFullPage": false,
+    "isComponente": true,
+    "motivo": "visualizar erro no card"
+  },
+  {
+    "file": "04-subprocesso--26-erro-desaparece-apos-correcao.png",
+    "url": "http://localhost:5173/processo/209/SECAO_212/cadastro",
+    "route": "/processo/209/SECAO_212/cadastro",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:31:55.426Z",
+    "tags": [
+      "04-subprocesso"
+    ],
+    "categoria": "04-subprocesso",
+    "nome": "26-erro-desaparece-apos-correcao",
+    "titulo": "Cadastro - SGC",
+    "isFullPage": true,
+    "isComponente": false,
+    "atividadeCorrigida": "Atividade sem conhecimento 1 1773765111676"
+  },
+  {
+    "file": "04-subprocesso--27-botao-ainda-desabilitado-com-atividade-restante.png",
+    "url": "http://localhost:5173/processo/209/SECAO_212/cadastro",
+    "route": "/processo/209/SECAO_212/cadastro",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:31:55.626Z",
+    "tags": [
+      "04-subprocesso"
+    ],
+    "categoria": "04-subprocesso",
+    "nome": "27-botao-ainda-desabilitado-com-atividade-restante",
+    "titulo": "Cadastro - SGC",
+    "isFullPage": true,
+    "isComponente": false,
+    "pendente": "Atividade sem conhecimento 2 1773765112323"
+  },
+  {
+    "file": "04-subprocesso--28-modal-confirmacao-disponibilizacao.png",
+    "url": "http://localhost:5173/processo/209/SECAO_212/cadastro",
+    "route": "/processo/209/SECAO_212/cadastro",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:31:56.958Z",
+    "tags": [
+      "modal",
+      "sucesso",
+      "04-subprocesso"
+    ],
+    "categoria": "04-subprocesso",
+    "nome": "28-modal-confirmacao-disponibilizacao",
+    "titulo": "Cadastro - SGC",
+    "isFullPage": true,
+    "isComponente": false
+  },
+  {
+    "file": "05-mapa--00a-analise-gestor-coordenadoria.png",
+    "url": "http://localhost:5173/processo/210/SECAO_121/vis-cadastro",
+    "route": "/processo/210/SECAO_121/vis-cadastro",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:32:00.956Z",
+    "tags": [
+      "05-mapa"
+    ],
+    "categoria": "05-mapa",
+    "nome": "00a-analise-gestor-coordenadoria",
+    "titulo": "Visualização de Atividades - SGC",
+    "isFullPage": true,
+    "isComponente": false,
+    "perfil": "GESTOR_COORD",
+    "acao": "aceite-1"
+  },
+  {
+    "file": "05-mapa--00b-analise-chefe-secretaria.png",
+    "url": "http://localhost:5173/processo/210/SECAO_121/vis-cadastro",
+    "route": "/processo/210/SECAO_121/vis-cadastro",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:32:02.510Z",
+    "tags": [
+      "05-mapa"
+    ],
+    "categoria": "05-mapa",
+    "nome": "00b-analise-chefe-secretaria",
+    "titulo": "Visualização de Atividades - SGC",
+    "isFullPage": true,
+    "isComponente": false,
+    "perfil": "GESTOR_SEC",
+    "acao": "aceite-2"
+  },
+  {
+    "file": "05-mapa--01-mapa-vazio.png",
+    "url": "http://localhost:5173/processo/210/SECAO_121/mapa",
+    "route": "/processo/210/SECAO_121/mapa",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:32:04.489Z",
+    "tags": [
+      "mapa",
+      "vazio",
+      "05-mapa"
+    ],
+    "categoria": "05-mapa",
+    "nome": "01-mapa-vazio",
+    "titulo": "Mapa - SGC",
+    "isFullPage": true,
+    "isComponente": false,
+    "perfil": "ADMIN"
+  },
+  {
+    "file": "05-mapa--02-modal-criar-competencia.png",
+    "url": "http://localhost:5173/processo/210/SECAO_121/mapa",
+    "route": "/processo/210/SECAO_121/mapa",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:32:04.827Z",
+    "tags": [
+      "modal",
+      "criacao-competencia",
+      "05-mapa"
+    ],
+    "categoria": "05-mapa",
+    "nome": "02-modal-criar-competencia",
+    "titulo": "Mapa - SGC",
+    "isFullPage": true,
+    "isComponente": false
+  },
+  {
+    "file": "05-mapa--03-modal-criar-competencia-preenchida.png",
+    "url": "http://localhost:5173/processo/210/SECAO_121/mapa",
+    "route": "/processo/210/SECAO_121/mapa",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:32:05.025Z",
+    "tags": [
+      "05-mapa"
+    ],
+    "categoria": "05-mapa",
+    "nome": "03-modal-criar-competencia-preenchida",
+    "titulo": "Mapa - SGC",
+    "isFullPage": true,
+    "isComponente": false,
+    "competencia": "Desenvolvimento de Software"
+  },
+  {
+    "file": "05-mapa--04-modal-criar-competencia-atividades-selecionadas.png",
+    "url": "http://localhost:5173/processo/210/SECAO_121/mapa",
+    "route": "/processo/210/SECAO_121/mapa",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:32:05.274Z",
+    "tags": [
+      "selecao",
+      "atividades",
+      "05-mapa"
+    ],
+    "categoria": "05-mapa",
+    "nome": "04-modal-criar-competencia-atividades-selecionadas",
+    "titulo": "Mapa - SGC",
+    "isFullPage": true,
+    "isComponente": false
+  },
+  {
+    "file": "05-mapa--05-mapa-com-competencia.png",
+    "url": "http://localhost:5173/processo/210/SECAO_121/mapa",
+    "route": "/processo/210/SECAO_121/mapa",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:32:05.855Z",
+    "tags": [
+      "05-mapa"
+    ],
+    "categoria": "05-mapa",
+    "nome": "05-mapa-com-competencia",
+    "titulo": "Mapa - SGC",
+    "isFullPage": true,
+    "isComponente": false,
+    "competenciaCriada": "Desenvolvimento de Software"
+  },
+  {
+    "file": "05-mapa--06-mapa-competencia-hover.png",
+    "url": "http://localhost:5173/processo/210/SECAO_121/mapa",
+    "route": "/processo/210/SECAO_121/mapa",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:32:06.187Z",
+    "tags": [
+      "interacao",
+      "hover",
+      "05-mapa"
+    ],
+    "categoria": "05-mapa",
+    "nome": "06-mapa-competencia-hover",
+    "titulo": "Mapa - SGC",
+    "isFullPage": true,
+    "isComponente": false
+  },
+  {
+    "file": "05-mapa--07-modal-disponibilizar-mapa.png",
+    "url": "http://localhost:5173/processo/210/SECAO_121/mapa",
+    "route": "/processo/210/SECAO_121/mapa",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:32:06.510Z",
+    "tags": [
+      "modal",
+      "disponibilizar-mapa",
+      "05-mapa"
+    ],
+    "categoria": "05-mapa",
+    "nome": "07-modal-disponibilizar-mapa",
+    "titulo": "Mapa - SGC",
+    "isFullPage": true,
+    "isComponente": false
+  },
+  {
+    "file": "05-mapa--08-mapa-disponibilizado.png",
+    "url": "http://localhost:5173/painel",
+    "route": "/painel",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:32:06.891Z",
+    "tags": [
+      "05-mapa"
+    ],
+    "categoria": "05-mapa",
+    "nome": "08-mapa-disponibilizado",
+    "titulo": "Painel - SGC",
+    "isFullPage": true,
+    "isComponente": false,
+    "estado": "MAPA_DISPONIBILIZADO"
+  },
+  {
+    "file": "06-navegacao--01-menu-principal.png",
+    "url": "http://localhost:5173/painel",
+    "route": "/painel",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:32:07.657Z",
+    "tags": [
+      "layout",
+      "menu",
+      "06-navegacao"
+    ],
+    "categoria": "06-navegacao",
+    "nome": "01-menu-principal",
+    "titulo": "Painel - SGC",
+    "isFullPage": true,
+    "isComponente": false
+  },
+  {
+    "file": "06-navegacao--02-menu-parametros.png",
+    "url": "http://localhost:5173/parametros",
+    "route": "/parametros",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:32:07.971Z",
+    "tags": [
+      "06-navegacao"
+    ],
+    "categoria": "06-navegacao",
+    "nome": "02-menu-parametros",
+    "titulo": "Parâmetros - SGC",
+    "isFullPage": true,
+    "isComponente": false,
+    "secao": "configuracoes"
+  },
+  {
+    "file": "06-navegacao--03-unidades.png",
+    "url": "http://localhost:5173/unidades",
+    "route": "/unidades",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:32:08.401Z",
+    "tags": [
+      "06-navegacao"
+    ],
+    "categoria": "06-navegacao",
+    "nome": "03-unidades",
+    "titulo": "Unidades - SGC",
+    "isFullPage": true,
+    "isComponente": false
+  },
+  {
+    "file": "06-navegacao--04-relatorios.png",
+    "url": "http://localhost:5173/relatorios",
+    "route": "/relatorios",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:32:08.736Z",
+    "tags": [
+      "06-navegacao"
+    ],
+    "categoria": "06-navegacao",
+    "nome": "04-relatorios",
+    "titulo": "Relatórios - SGC",
+    "isFullPage": true,
+    "isComponente": false
+  },
+  {
+    "file": "06-navegacao--05-historico.png",
+    "url": "http://localhost:5173/historico",
+    "route": "/historico",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:32:09.053Z",
+    "tags": [
+      "06-navegacao"
+    ],
+    "categoria": "06-navegacao",
+    "nome": "05-historico",
+    "titulo": "Histórico - SGC",
+    "isFullPage": true,
+    "isComponente": false
+  },
+  {
+    "file": "06-navegacao--05a-barra-lateral.png",
+    "url": "http://localhost:5173/historico",
+    "route": "/historico",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:32:09.143Z",
+    "tags": [
+      "06-navegacao",
+      "componente"
+    ],
+    "categoria": "06-navegacao",
+    "nome": "05a-barra-lateral",
+    "titulo": "Histórico - SGC",
+    "isFullPage": false,
+    "isComponente": true,
+    "parte": "sidebar"
+  },
+  {
+    "file": "06-navegacao--06-rodape.png",
+    "url": "http://localhost:5173/historico",
+    "route": "/historico",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:32:09.452Z",
+    "tags": [
+      "layout",
+      "footer",
+      "06-navegacao"
+    ],
+    "categoria": "06-navegacao",
+    "nome": "06-rodape",
+    "titulo": "Histórico - SGC",
+    "isFullPage": true,
+    "isComponente": false
+  },
+  {
+    "file": "07-estados--01-processo-criado.png",
+    "url": "http://localhost:5173/painel",
+    "route": "/painel",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:32:10.791Z",
+    "tags": [
+      "07-estados"
+    ],
+    "categoria": "07-estados",
+    "nome": "01-processo-criado",
+    "titulo": "SGC",
+    "isFullPage": true,
+    "isComponente": false,
+    "estado": "CRIADO"
+  },
+  {
+    "file": "07-estados--02-processo-em-andamento.png",
+    "url": "http://localhost:5173/painel",
+    "route": "/painel",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:32:12.003Z",
+    "tags": [
+      "07-estados"
+    ],
+    "categoria": "07-estados",
+    "nome": "02-processo-em-andamento",
+    "titulo": "Painel - SGC",
+    "isFullPage": true,
+    "isComponente": false,
+    "estado": "EM_ANDAMENTO"
+  },
+  {
+    "file": "07-estados--03-tabela-com-multiplos-estados.png",
+    "url": "http://localhost:5173/painel",
+    "route": "/painel",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:32:12.120Z",
+    "tags": [
+      "07-estados",
+      "componente"
+    ],
+    "categoria": "07-estados",
+    "nome": "03-tabela-com-multiplos-estados",
+    "titulo": "Painel - SGC",
+    "isFullPage": false,
+    "isComponente": true,
+    "contexto": "painel-admin"
+  },
+  {
+    "file": "08-responsividade--01-desktop-1920x1080.png",
+    "url": "http://localhost:5173/painel",
+    "route": "/painel",
+    "viewport": {
+      "width": 1920,
+      "height": 1080
+    },
+    "timestamp": "2026-03-17T16:32:13.052Z",
+    "tags": [
+      "res-high",
+      "08-responsividade"
+    ],
+    "categoria": "08-responsividade",
+    "nome": "01-desktop-1920x1080",
+    "titulo": "Painel - SGC",
+    "isFullPage": true,
+    "isComponente": false
+  },
+  {
+    "file": "08-responsividade--02-desktop-1366x768.png",
+    "url": "http://localhost:5173/painel",
+    "route": "/painel",
+    "viewport": {
+      "width": 1366,
+      "height": 768
+    },
+    "timestamp": "2026-03-17T16:32:13.265Z",
+    "tags": [
+      "res-medium",
+      "08-responsividade"
+    ],
+    "categoria": "08-responsividade",
+    "nome": "02-desktop-1366x768",
+    "titulo": "Painel - SGC",
+    "isFullPage": true,
+    "isComponente": false
+  },
+  {
+    "file": "08-responsividade--03-tablet-768x1024.png",
+    "url": "http://localhost:5173/painel",
+    "route": "/painel",
+    "viewport": {
+      "width": 768,
+      "height": 1024
+    },
+    "timestamp": "2026-03-17T16:32:13.435Z",
+    "tags": [
+      "res-tablet",
+      "08-responsividade"
+    ],
+    "categoria": "08-responsividade",
+    "nome": "03-tablet-768x1024",
+    "titulo": "Painel - SGC",
+    "isFullPage": true,
+    "isComponente": false
+  },
+  {
+    "file": "08-responsividade--04-mobile-375x667.png",
+    "url": "http://localhost:5173/painel",
+    "route": "/painel",
+    "viewport": {
+      "width": 375,
+      "height": 667
+    },
+    "timestamp": "2026-03-17T16:32:13.612Z",
+    "tags": [
+      "res-mobile",
+      "08-responsividade"
+    ],
+    "categoria": "08-responsividade",
+    "nome": "04-mobile-375x667",
+    "titulo": "Painel - SGC",
+    "isFullPage": true,
+    "isComponente": false
+  },
+  {
+    "file": "09-operacoes-bloco--01-detalhes-processo-gestor.png",
+    "url": "http://localhost:5173/processo/213",
+    "route": "/processo/213",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:32:17.720Z",
+    "tags": [
+      "09-operacoes-bloco"
+    ],
+    "categoria": "09-operacoes-bloco",
+    "nome": "01-detalhes-processo-gestor",
+    "titulo": "Unidades do Processo - SGC",
+    "isFullPage": true,
+    "isComponente": false,
+    "perfil": "GESTOR",
+    "acao": "ver-bloco"
+  },
+  {
+    "file": "09-operacoes-bloco--02-modal-aceitar-cadastro-bloco.png",
+    "url": "http://localhost:5173/processo/213",
+    "route": "/processo/213",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:32:18.255Z",
+    "tags": [
+      "modal",
+      "bloco",
+      "09-operacoes-bloco"
+    ],
+    "categoria": "09-operacoes-bloco",
+    "nome": "02-modal-aceitar-cadastro-bloco",
+    "titulo": "Unidades do Processo - SGC",
+    "isFullPage": true,
+    "isComponente": false
+  },
+  {
+    "file": "09-operacoes-bloco--03-modal-homologar-cadastro-bloco.png",
+    "url": "http://localhost:5173/processo/213",
+    "route": "/processo/213",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:32:21.839Z",
+    "tags": [
+      "09-operacoes-bloco"
+    ],
+    "categoria": "09-operacoes-bloco",
+    "nome": "03-modal-homologar-cadastro-bloco",
+    "titulo": "Unidades do Processo - SGC",
+    "isFullPage": true,
+    "isComponente": false,
+    "perfil": "ADMIN"
+  },
+  {
+    "file": "10-gestao-subprocessos--01-detalhes-subprocesso-admin.png",
+    "url": "http://localhost:5173/processo/214/SECAO_121",
+    "route": "/processo/214/SECAO_121",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:32:23.924Z",
+    "tags": [
+      "10-gestao-subprocessos"
+    ],
+    "categoria": "10-gestao-subprocessos",
+    "nome": "01-detalhes-subprocesso-admin",
+    "titulo": "Processos da Unidade - SGC",
+    "isFullPage": true,
+    "isComponente": false,
+    "perfil": "ADMIN"
+  },
+  {
+    "file": "10-gestao-subprocessos--02-modal-alterar-data-limite.png",
+    "url": "http://localhost:5173/processo/214/SECAO_121",
+    "route": "/processo/214/SECAO_121",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:32:24.461Z",
+    "tags": [
+      "modal",
+      "gestao",
+      "10-gestao-subprocessos"
+    ],
+    "categoria": "10-gestao-subprocessos",
+    "nome": "02-modal-alterar-data-limite",
+    "titulo": "Processos da Unidade - SGC",
+    "isFullPage": true,
+    "isComponente": false
+  },
+  {
+    "file": "10-gestao-subprocessos--04-botao-enviar-lembrete.png",
+    "url": "http://localhost:5173/processo/214/SECAO_121",
+    "route": "/processo/214/SECAO_121",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:32:24.698Z",
+    "tags": [
+      "acao-direta",
+      "10-gestao-subprocessos"
+    ],
+    "categoria": "10-gestao-subprocessos",
+    "nome": "04-botao-enviar-lembrete",
+    "titulo": "Processos da Unidade - SGC",
+    "isFullPage": true,
+    "isComponente": false
+  },
+  {
+    "file": "11-unidades--01-arvore-unidades.png",
+    "url": "http://localhost:5173/unidades",
+    "route": "/unidades",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:32:25.985Z",
+    "tags": [
+      "11-unidades"
+    ],
+    "categoria": "11-unidades",
+    "nome": "01-arvore-unidades",
+    "titulo": "Unidades - SGC",
+    "isFullPage": true,
+    "isComponente": false
+  },
+  {
+    "file": "11-unidades--02-arvore-unidades-expandida.png",
+    "url": "http://localhost:5173/unidades",
+    "route": "/unidades",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:32:26.892Z",
+    "tags": [
+      "11-unidades"
+    ],
+    "categoria": "11-unidades",
+    "nome": "02-arvore-unidades-expandida",
+    "titulo": "Unidades - SGC",
+    "isFullPage": true,
+    "isComponente": false
+  },
+  {
+    "file": "11-unidades--03-detalhes-unidade.png",
+    "url": "http://localhost:5173/unidade/10",
+    "route": "/unidade/10",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:32:27.661Z",
+    "tags": [
+      "11-unidades"
+    ],
+    "categoria": "11-unidades",
+    "nome": "03-detalhes-unidade",
+    "titulo": "Unidade - SGC",
+    "isFullPage": true,
+    "isComponente": false,
+    "unidade": "SECAO_121"
+  },
+  {
+    "file": "11-unidades--04-modal-criar-atribuicao.png",
+    "url": "http://localhost:5173/unidade/10/atribuicao",
+    "route": "/unidade/10/atribuicao",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:32:28.195Z",
+    "tags": [
+      "modal",
+      "atribuicao",
+      "11-unidades"
+    ],
+    "categoria": "11-unidades",
+    "nome": "04-modal-criar-atribuicao",
+    "titulo": "Atribuição temporária - SGC",
+    "isFullPage": true,
+    "isComponente": false
+  },
+  {
+    "file": "12-historico--01-pagina-historico.png",
+    "url": "http://localhost:5173/historico",
+    "route": "/historico",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:32:28.986Z",
+    "tags": [
+      "12-historico"
+    ],
+    "categoria": "12-historico",
+    "nome": "01-pagina-historico",
+    "titulo": "Histórico - SGC",
+    "isFullPage": true,
+    "isComponente": false
+  },
+  {
+    "file": "12-historico--02-tabela-processos-finalizados.png",
+    "url": "http://localhost:5173/historico",
+    "route": "/historico",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:32:29.186Z",
+    "tags": [
+      "12-historico"
+    ],
+    "categoria": "12-historico",
+    "nome": "02-tabela-processos-finalizados",
+    "titulo": "Histórico - SGC",
+    "isFullPage": true,
+    "isComponente": false
+  },
+  {
+    "file": "12-historico--03-tabela-processos-finalizados-detalhe.png",
+    "url": "http://localhost:5173/historico",
+    "route": "/historico",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:32:29.278Z",
+    "tags": [
+      "12-historico",
+      "componente"
+    ],
+    "categoria": "12-historico",
+    "nome": "03-tabela-processos-finalizados-detalhe",
+    "titulo": "Histórico - SGC",
+    "isFullPage": false,
+    "isComponente": true,
+    "contexto": "historico"
+  },
+  {
+    "file": "13-configuracoes--01-pagina-parametros.png",
+    "url": "http://localhost:5173/parametros",
+    "route": "/parametros",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:32:30.006Z",
+    "tags": [
+      "13-configuracoes"
+    ],
+    "categoria": "13-configuracoes",
+    "nome": "01-pagina-parametros",
+    "titulo": "Parâmetros - SGC",
+    "isFullPage": true,
+    "isComponente": false
+  },
+  {
+    "file": "13-configuracoes--02-config-sistema.png",
+    "url": "http://localhost:5173/parametros",
+    "route": "/parametros",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:32:30.187Z",
+    "tags": [
+      "config",
+      "13-configuracoes"
+    ],
+    "categoria": "13-configuracoes",
+    "nome": "02-config-sistema",
+    "titulo": "Parâmetros - SGC",
+    "isFullPage": true,
+    "isComponente": false
+  },
+  {
+    "file": "13-configuracoes--03-lista-administradores.png",
+    "url": "http://localhost:5173/administradores",
+    "route": "/administradores",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:32:30.917Z",
+    "tags": [
+      "13-configuracoes"
+    ],
+    "categoria": "13-configuracoes",
+    "nome": "03-lista-administradores",
+    "titulo": "Administradores - SGC",
+    "isFullPage": true,
+    "isComponente": false
+  },
+  {
+    "file": "13-configuracoes--04-modal-adicionar-administrador.png",
+    "url": "http://localhost:5173/administradores",
+    "route": "/administradores",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:32:31.440Z",
+    "tags": [
+      "modal",
+      "admin",
+      "13-configuracoes"
+    ],
+    "categoria": "13-configuracoes",
+    "nome": "04-modal-adicionar-administrador",
+    "titulo": "Administradores - SGC",
+    "isFullPage": true,
+    "isComponente": false
+  },
+  {
+    "file": "14-relatorios--01-pagina-relatorios.png",
+    "url": "http://localhost:5173/relatorios",
+    "route": "/relatorios",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:32:32.402Z",
+    "tags": [
+      "14-relatorios"
+    ],
+    "categoria": "14-relatorios",
+    "nome": "01-pagina-relatorios",
+    "titulo": "Relatórios - SGC",
+    "isFullPage": true,
+    "isComponente": false
+  },
+  {
+    "file": "14-relatorios--02-relatorio-andamento.png",
+    "url": "http://localhost:5173/relatorios",
+    "route": "/relatorios",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:32:32.584Z",
+    "tags": [
+      "14-relatorios"
+    ],
+    "categoria": "14-relatorios",
+    "nome": "02-relatorio-andamento",
+    "titulo": "Relatórios - SGC",
+    "isFullPage": true,
+    "isComponente": false,
+    "relatorio": "andamento"
+  },
+  {
+    "file": "14-relatorios--03-botao-gerar-relatorio.png",
+    "url": "http://localhost:5173/relatorios",
+    "route": "/relatorios",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:32:32.786Z",
+    "tags": [
+      "ui-element",
+      "14-relatorios"
+    ],
+    "categoria": "14-relatorios",
+    "nome": "03-botao-gerar-relatorio",
+    "titulo": "Relatórios - SGC",
+    "isFullPage": true,
+    "isComponente": false
+  },
+  {
+    "file": "14-relatorios--04-relatorio-mapas.png",
+    "url": "http://localhost:5173/relatorios",
+    "route": "/relatorios",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:32:33.319Z",
+    "tags": [
+      "14-relatorios"
+    ],
+    "categoria": "14-relatorios",
+    "nome": "04-relatorio-mapas",
+    "titulo": "Relatórios - SGC",
+    "isFullPage": true,
+    "isComponente": false,
+    "relatorio": "mapas"
+  },
+  {
+    "file": "14-relatorios--05-botao-gerar-pdf.png",
+    "url": "http://localhost:5173/relatorios",
+    "route": "/relatorios",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-17T16:32:33.518Z",
+    "tags": [
+      "ui-element",
+      "pdf",
+      "14-relatorios"
+    ],
+    "categoria": "14-relatorios",
+    "nome": "05-botao-gerar-pdf",
+    "titulo": "Relatórios - SGC",
+    "isFullPage": true,
+    "isComponente": false
+  }
+]

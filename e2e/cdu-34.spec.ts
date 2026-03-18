@@ -13,9 +13,9 @@ import {TEXTOS} from '../frontend/src/constants/textos.js';
  * 2. Sistema exibe processos com indicadores de prazo
  * 3. ADMIN seleciona unidades com pendências
  * 4. ADMIN aciona "Enviar lembrete"
- * 5. Sistema exibe modelo da mensagem
+ * 5. Sistema exibe modal de confirmação
  * 6. ADMIN confirma envio
- * 7. Sistema envia e-mail e registra no histórico
+ * 7. Sistema envia e-mail e cria alerta para a unidade
  */
 test.describe.serial('CDU-34 - Enviar lembrete de prazo', () => {
     const UNIDADE_1 = 'ASSESSORIA_22';
@@ -39,7 +39,7 @@ test.describe.serial('CDU-34 - Enviar lembrete de prazo', () => {
     });
 
 
-    test('Cenario principal: ADMIN envia lembrete e sistema registra histórico/alerta', async ({
+    test('Cenario principal: ADMIN envia lembrete e sistema cria alerta sem alterar o workflow', async ({
                                                                                                    _resetAutomatico,
                                                                                                    page,
                                                                                                    _autenticadoComoAdmin
@@ -54,11 +54,14 @@ test.describe.serial('CDU-34 - Enviar lembrete de prazo', () => {
         await expect(btnLembrete).toBeVisible();
         await btnLembrete.click();
 
+        await expect(page.getByRole('dialog').getByRole('heading', {name: TEXTOS.subprocesso.LEMBRETE_TITULO})).toBeVisible();
         await expect(page.getByTestId('txt-modelo-lembrete')).toBeVisible();
         await expect(page.getByTestId('txt-modelo-lembrete')).toContainText(TEXTOS.subprocesso.LEMBRETE_MODELO_PREFIXO(UNIDADE_1));
         await page.getByTestId('btn-confirmar-enviar-lembrete').click();
 
-        await expect(page.getByTestId('tbl-movimentacoes')).toContainText(TEXTOS.movimentacao.LEMBRETE_ENVIADO);
+        await expect(page.getByText(TEXTOS.subprocesso.SUCESSO_LEMBRETE_ENVIADO).first()).toBeVisible();
+        await expect(page.getByTestId('tbl-movimentacoes')).not.toContainText(/Lembrete de prazo enviado/i);
+        await expect(page.getByTestId('btn-enviar-lembrete')).toBeVisible();
     });
 
     test('Cenario complementar: unidade de destino visualiza alerta de lembrete no painel', async ({

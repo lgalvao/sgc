@@ -16,10 +16,12 @@ const BACKEND_BASE_PORT = Number.parseInt(process.env.E2E_BACKEND_BASE_PORT || '
 const FRONTEND_PORT = Number.parseInt(process.env.E2E_FRONTEND_PORT || '5173', 10);
 const SMTP_PORT = Number.parseInt(process.env.E2E_SMTP_PORT || '1025', 10);
 const DB_NAME_PREFIX = process.env.E2E_DB_NAME_PREFIX || 'sgc-e2e-w';
+const MAX_BACKEND_PORT_SCAN = Number.parseInt(process.env.E2E_BACKEND_PORT_SCAN_LIMIT || '20', 10);
 
 const backendProcessos = [];
 const frontendProcessos = [];
 let smtpServer;
+let backendPortSelecionado = BACKEND_BASE_PORT;
 
 // Criar/limpar arquivo de log ao iniciar
 const LOG_FILE = path.resolve(__dirname, 'server.log');
@@ -145,7 +147,45 @@ function normalizarEnv(baseEnv = process.env) {
 }
 
 function portaBackend() {
-    return BACKEND_BASE_PORT;
+    return backendPortSelecionado;
+}
+
+function requestStatus(url, method = 'GET') {
+    return new Promise((resolve) => {
+        const req = http.request(url, {method}, (res) => {
+            const status = res.statusCode ?? null;
+            res.resume();
+            resolve(status);
+        });
+        req.on('error', () => resolve(null));
+        req.end();
+    });
+}
+
+async function resolverBackendExistenteOuPortaLivre() {
+    for (let offset = 0; offset < MAX_BACKEND_PORT_SCAN; offset++) {
+        const porta = BACKEND_BASE_PORT + offset;
+        const status = await requestStatus(`http://localhost:${porta}/e2e/reset-database`);
+
+        if (status === null) {
+            return {porta, reutilizar: false};
+        }
+
+        if (status === 405) {
+            lifecycleLogger.warn(`Backend E2E já ativo na porta ${porta}; reutilizando instância existente.`);
+            return {porta, reutilizar: true};
+        }
+
+        lifecycleLogger.warn(
+            `Porta ${porta} ocupada por serviço incompatível com E2E ` +
+            `(status ${status} em /e2e/reset-database). Tentando próxima porta.`
+        );
+    }
+
+    throw new Error(
+        `Nenhuma porta disponível para backend E2E a partir de ${BACKEND_BASE_PORT} ` +
+        `(limite de varredura: ${MAX_BACKEND_PORT_SCAN}).`
+    );
 }
 
 function dbUrl() {
@@ -295,7 +335,13 @@ function checkHttpHealth(url, expectedMin, expectedMax) {
 }
 
 async function subirBackends() {
-    startBackend();
+    const backendResolvido = await resolverBackendExistenteOuPortaLivre();
+    backendPortSelecionado = backendResolvido.porta;
+
+    if (!backendResolvido.reutilizar) {
+        startBackend();
+    }
+
     await checkHttpHealth(`http://localhost:${portaBackend()}/`, 200, 500);
 }
 

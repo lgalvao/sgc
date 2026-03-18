@@ -85,7 +85,7 @@ stateDiagram-v2
     NaoIniciado --> CadastroEmAndamento: udp iniciou cadastro
 
     note right of Cadastro
-        udp = unidade do processo
+        udp = unidade do subprocesso
         int = unidade intermediária
     end note
 

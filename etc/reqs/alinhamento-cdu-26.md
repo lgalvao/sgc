@@ -3,7 +3,7 @@
 ## Cobertura atual do teste
 O teste cobre:
 - **Setup preparatório**: Criação de processo, disponibilização de atividades, homologação de cadastro por múltiplas gestores, criação/disponibilização de mapa, validação e aceite de mapa pelos gestores.
-- **Cenário 1**: Verificação de visibilidade e habilitação do botão "Homologar mapa de competências em bloco" após ADMIN acessar processo em andamento.
+- **Cenário 1**: Verificação de visibilidade e habilitação do botão "Homologar mapas em bloco" após ADMIN acessar processo em andamento.
 - **Cenário 2**: Verificação de abertura do modal, validação de título, texto, lista de unidades, tabela e botões.
 - **Cenário 3**: Verificação de cancelamento do modal e permanência na tela "Detalhes do processo".
 

@@ -317,12 +317,10 @@ public class ProcessoService {
             ? processo.getDataLimite().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) : "N/A";
         String corpoHtml = emailModelosService.criarEmailLembretePrazo(unidade.getSigla(), processo.getDescricao(), processo.getDataLimite());
 
-        Subprocesso sp = subprocessoService.obterEntidadePorProcessoEUnidade(codProcesso, unidadeCodigo);
-        subprocessoService.registrarMovimentacaoLembrete(sp.getCodigo());
-
         Usuario titular = usuarioService.buscarPorLogin(unidade.getTituloTitular());
         emailService.enviarEmailHtml(titular.getEmail(), "SGC: Lembrete - " + processo.getDescricao(), corpoHtml);
-        servicoAlertas.criarAlertaAdmin(processo, unidade, "Lembrete: Prazo encerra em " + dataLimiteText);
+        servicoAlertas.criarAlertaAdmin(processo, unidade,
+                "Lembrete: Prazo do processo " + processo.getDescricao() + " encerra em " + dataLimiteText);
     }
 
 

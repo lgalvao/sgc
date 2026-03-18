@@ -36,7 +36,7 @@ const stubs = {
     ModalConfirmacao: {template: '<div v-if="modelValue"></div>', props: ['modelValue']},
     ImpactoMapaModal: {template: '<div></div>', props: ['mostrar']},
     CriarCompetenciaModal: {template: '<div></div>', props: ['mostrar']},
-    ModalMapaDisponibilizar: {template: '<div></div>', props: ['mostrar']},
+    DisponibilizarMapaModal: {template: '<div></div>', props: ['mostrar']},
 };
 
 describe("MapaView coverage", () => {

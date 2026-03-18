@@ -1,25 +1,25 @@
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 import {mount} from "@vue/test-utils";
-import {BButton, BFormTextarea} from "bootstrap-vue-next";
 import {describe, expect, it} from "vitest";
 import AceitarMapaModal from "@/components/mapa/AceitarMapaModal.vue";
 
-const BModalStub = {
+const ModalConfirmacaoStub = {
     template: `
-        <div v-if="modelValue" data-testid="modal-stub">
+        <div v-if="modelValue" :data-ok-title="okTitle" :data-titulo="titulo" data-testid="modal-stub">
             <slot />
-            <slot name="footer" />
+            <button :data-testid="testIdCancelar" :disabled="loading" @click="$emit('update:modelValue', false)">Cancelar</button>
+            <button :data-testid="testIdConfirmar" :disabled="loading" @click="$emit('confirmar')">{{ okTitle }}</button>
         </div>
     `,
-    props: ["modelValue"],
-    emits: ["update:modelValue", "hide"],
+    props: ["modelValue", "titulo", "okTitle", "testIdCancelar", "testIdConfirmar", "loading"],
+    emits: ["update:modelValue", "confirmar"],
 };
 
 describe("AceitarMapaModal.vue", () => {
     const context = setupComponentTest();
 
     const createWrapper = (propsOverride = {}) => {
-        const options = getCommonMountOptions({}, {BModal: BModalStub});
+        const options = getCommonMountOptions({}, {ModalConfirmacao: ModalConfirmacaoStub});
 
         context.wrapper = mount(AceitarMapaModal, {
             ...options,
@@ -30,9 +30,7 @@ describe("AceitarMapaModal.vue", () => {
             global: {
                 ...options.global,
                 components: {
-                    BFormTextarea,
-                    BButton,
-                    BModal: BModalStub,
+                    ModalConfirmacao: ModalConfirmacaoStub,
                     ...options.global.components
                 }
             },
@@ -50,10 +48,9 @@ describe("AceitarMapaModal.vue", () => {
 
         const corpoModal = wrapper.find('[data-testid="body-aceite-mapa"]');
         expect(corpoModal.exists()).toBe(true);
-        expect(corpoModal.text()).toContain("Observações");
-        expect(
-            wrapper.find('[data-testid="inp-aceite-mapa-obs"]').exists(),
-        ).toBe(true);
+        expect(wrapper.find('[data-testid="modal-stub"]').attributes("data-titulo")).toBe("Aceitar mapa");
+        expect(wrapper.find('[data-testid="modal-stub"]').attributes("data-ok-title")).toBe("Aceitar");
+        expect(corpoModal.text()).toContain("Confirma o aceite da validação do mapa de competências?");
     });
 
     it("deve renderizar o modal com o perfil ADMIN", () => {
@@ -61,13 +58,9 @@ describe("AceitarMapaModal.vue", () => {
 
         const corpoModal = wrapper.find('[data-testid="body-aceite-mapa"]');
         expect(corpoModal.exists()).toBe(true);
-        expect(corpoModal.text()).toContain(
-            "Confirma a homologação do mapa de competências?",
-        );
-        // Textarea não deve existir para admin
-        expect(
-            wrapper.find('[data-testid="observacao-aceite-textarea"]').exists(),
-        ).toBe(false);
+        expect(wrapper.find('[data-testid="modal-stub"]').attributes("data-titulo")).toBe("Homologar mapa");
+        expect(wrapper.find('[data-testid="modal-stub"]').attributes("data-ok-title")).toBe("Homologar");
+        expect(corpoModal.text()).toContain("Confirma a homologação do mapa de competências?");
     });
 
     it("deve emitir o evento fecharModal ao clicar no botão de cancelar", async () => {
@@ -81,18 +74,13 @@ describe("AceitarMapaModal.vue", () => {
 
     it("deve emitir o evento confirmarAceitacao com a observação", async () => {
         const wrapper = createWrapper();
-        const observacao = "Mapa de competências está de acordo com o esperado.";
-
-        const textareaWrapper = wrapper.findComponent(BFormTextarea);
-        const nativeTextarea = textareaWrapper.find("textarea");
-        await nativeTextarea.setValue(observacao);
 
         await wrapper
             .find('[data-testid="btn-aceite-mapa-confirmar"]')
             .trigger("click");
 
         expect(wrapper.emitted("confirmarAceitacao")).toBeTruthy();
-        expect(wrapper.emitted("confirmarAceitacao")?.[0]).toEqual([observacao]);
+        expect(wrapper.emitted("confirmarAceitacao")?.[0]).toEqual([""]);
     });
 
     it("deve emitir o evento confirmarAceitacao com uma observação vazia", async () => {
@@ -106,7 +94,7 @@ describe("AceitarMapaModal.vue", () => {
         expect(wrapper.emitted("confirmarAceitacao")?.[0]).toEqual([""]);
     });
 
-    it("deve desabilitar botões e mostrar spinner quando loading for true", () => {
+    it("deve desabilitar botões quando loading for true", () => {
         const wrapper = createWrapper({loading: true});
 
         const btnCancelar = wrapper.find('[data-testid="btn-aceite-mapa-cancelar"]');
@@ -114,6 +102,5 @@ describe("AceitarMapaModal.vue", () => {
 
         expect(btnCancelar.attributes("disabled")).toBeDefined();
         expect(btnConfirmar.attributes("disabled")).toBeDefined();
-        expect(btnConfirmar.text()).toContain("Processando...");
     });
 });

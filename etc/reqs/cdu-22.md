@@ -46,7 +46,7 @@
    8.3. Registra internamente um alerta:
 
     - `Data/hora`: [Data/hora atual]
-    - `Descrição`: "Cadastro de atividades da unidade [SIGLA_UNIDADE_SUBPROCESSO] submetido para análise"
+    - `Descrição`: "Cadastro da unidade [SIGLA_UNIDADE_SUBPROCESSO] submetido para análise"
     - `Processo`: [DESCRIÇÃO_PROCESSO]
     - `Unidade de origem`: [SIGLA_UNIDADE_ATUAL]
     - `Unidade de destino`: [SIGLA_UNIDADE_SUPERIOR]

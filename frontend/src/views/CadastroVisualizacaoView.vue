@@ -28,6 +28,7 @@
         <BButton
             v-if="podeDevolverCadastro"
             data-testid="btn-acao-devolver"
+            :disabled="!habilitarDevolverCadastro"
             :title="TEXTOS.atividades.BOTAO_DEVOLVER"
             variant="secondary"
             @click="devolverCadastro"
@@ -37,6 +38,7 @@
         <BButton
             v-if="podeAceitarCadastro || podeHomologarCadastro"
             data-testid="btn-acao-analisar-principal"
+            :disabled="!habilitarAnalisarCadastro"
             :title="podeHomologarCadastro ? TEXTOS.atividades.BOTAO_HOMOLOGAR : TEXTOS.atividades.BOTAO_ACEITAR"
             variant="success"
             @click="validarCadastro"
@@ -118,7 +120,7 @@
         :titulo="isRevisao ? TEXTOS.atividades.MODAL_DEVOLVER_REVISAO_TITULO : TEXTOS.atividades.MODAL_DEVOLVER_TITULO"
         :ok-title="TEXTOS.comum.BOTAO_CONFIRMAR"
         test-id-confirmar="btn-devolucao-cadastro-confirmar"
-        variant="danger"
+        variant="secondary"
         @confirmar="confirmarDevolucao"
     >
       <p>{{
@@ -212,11 +214,15 @@ const {
   podeHomologarCadastro,
   podeAceitarCadastro,
   podeDevolverCadastro,
-  podeVisualizarImpacto
+  podeVisualizarImpacto,
+  habilitarAceitarCadastro,
+  habilitarDevolverCadastro,
+  habilitarHomologarCadastro
 } = useAcesso(computed(() => subprocessosStore.subprocessoDetalhe));
 
 const podeVerImpacto = computed(() => podeVisualizarImpacto.value);
 const isHomologacao = computed(() => podeHomologarCadastro.value);
+const habilitarAnalisarCadastro = computed(() => habilitarAceitarCadastro.value || habilitarHomologarCadastro.value);
 
 const codSubprocesso = computed(() => subprocesso.value?.codSubprocesso);
 

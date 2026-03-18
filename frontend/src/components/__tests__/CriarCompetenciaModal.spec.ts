@@ -1,18 +1,19 @@
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 import {flushPromises, mount} from "@vue/test-utils";
-import {BButton, BCard, BFormCheckbox, BFormTextarea, BModal} from "bootstrap-vue-next";
+import {BCard, BFormCheckbox, BFormTextarea} from "bootstrap-vue-next";
 import {describe, expect, it} from "vitest";
 import CriarCompetenciaModal from "@/components/mapa/CriarCompetenciaModal.vue";
 
-const BModalStub = {
+const ModalPadraoStub = {
     template: `
         <div v-if="modelValue" data-testid="modal-stub">
             <slot />
-            <slot name="footer" />
+            <button :data-testid="testIdCancelar" @click="$emit('fechar')">Cancelar</button>
+            <button :data-testid="testIdConfirmar" :disabled="acaoDesabilitada" @click="$emit('confirmar')">{{ textoAcao }}</button>
         </div>
     `,
-    props: ["modelValue"],
-    emits: ["update:modelValue", "hide"],
+    props: ["modelValue", "testIdCancelar", "testIdConfirmar", "acaoDesabilitada", "textoAcao"],
+    emits: ["update:modelValue", "fechar", "confirmar", "shown"],
 };
 
 describe("CriarCompetenciaModal.vue", () => {
@@ -28,7 +29,7 @@ describe("CriarCompetenciaModal.vue", () => {
     ];
 
     const createWrapper = (propsOverride = {}) => {
-        const options = getCommonMountOptions({}, {BModal: BModalStub});
+        const options = getCommonMountOptions({}, {ModalPadrao: ModalPadraoStub});
 
         context.wrapper = mount(CriarCompetenciaModal, {
             ...options,
@@ -40,11 +41,10 @@ describe("CriarCompetenciaModal.vue", () => {
             global: {
                 ...options.global,
                 components: {
+                    ModalPadrao: ModalPadraoStub,
                     BFormTextarea,
-                    BButton,
                     BCard,
                     BFormCheckbox,
-                    BModal,
                     ...options.global.components
                 }
             },

@@ -151,13 +151,14 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   fechar: [];
-  importar: [];
+  importar: [aviso?: string];
 }>();
 
 const processosStore = useProcessosStore();
 
 const {
   execute: executarImportacao,
+  data: resultadoImportacao,
   error: erroImportacao,
   isLoading: importando,
   clearError: limparErroImportacao,
@@ -268,7 +269,7 @@ async function importar() {
         unidadeSelecionada.value.codSubprocesso,
         idsAtividades,
     );
-    emit("importar");
+    emit("importar", resultadoImportacao.value?.aviso);
     fechar();
   } catch {
     // O erro já está sendo tratado pelo useApi, não é necessário fazer nada aqui

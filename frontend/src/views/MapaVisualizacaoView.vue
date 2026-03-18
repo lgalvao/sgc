@@ -27,13 +27,14 @@
             variant="outline-secondary"
             @click="verHistorico"
         >
-          {{ TEXTOS.mapa.BOTAO_HISTORICO }}
+          {{ TEXTOS.mapa.BOTAO_HISTORICO_ANALISE }}
         </BButton>
 
         <!-- Ações Negativas/Retorno -->
         <BButton
             v-if="podeAnalisar"
             data-testid="btn-mapa-devolver"
+            :disabled="!habilitarAnalisarMapa"
             variant="secondary"
             @click="abrirModalDevolucao"
         >
@@ -44,6 +45,7 @@
         <BButton
             v-if="podeValidar"
             data-testid="btn-mapa-validar"
+            :disabled="!habilitarValidar"
             variant="success"
             @click="abrirModalValidar"
         >
@@ -53,6 +55,7 @@
         <BButton
             v-if="podeAnalisar"
             data-testid="btn-mapa-homologar-aceite"
+            :disabled="!habilitarAnalisarMapa"
             variant="success"
             @click="abrirModalAceitar"
         >
@@ -132,6 +135,7 @@
     <ModalConfirmacao
         v-model="mostrarModalSugestoes"
         :loading="isLoading"
+        :ok-disabled="!sugestoes.trim()"
         ok-title="Confirmar"
         test-id-cancelar="btn-sugestoes-mapa-cancelar"
         test-id-confirmar="btn-sugestoes-mapa-confirmar"
@@ -149,19 +153,19 @@
             ref="sugestoesTextareaRef"
             v-model="sugestoes"
             data-testid="inp-sugestoes-mapa-texto"
-            placeholder="Digite as sugestões para o mapa de competências"
             rows="5"
             required
         />
       </BFormGroup>
     </ModalConfirmacao>
 
-    <BModal
+    <ModalPadrao
         v-model="mostrarModalVerSugestoes"
-        :fade="false"
-        centered
-        hide-footer
-        title="Sugestões"
+        :mostrar-botao-acao="false"
+        test-id-cancelar="btn-ver-sugestoes-mapa-fechar"
+        texto-cancelar="Fechar"
+        titulo="Sugestões"
+        @fechar="fecharModalVerSugestoes"
     >
       <BFormGroup
           label="Sugestões registradas para o mapa de competências:"
@@ -176,16 +180,7 @@
             rows="5"
         />
       </BFormGroup>
-      <template #footer>
-        <BButton
-            data-testid="btn-ver-sugestoes-mapa-fechar"
-            variant="secondary"
-            @click="fecharModalVerSugestoes"
-        >
-          Fechar
-        </BButton>
-      </template>
-    </BModal>
+    </ModalPadrao>
 
     <ModalConfirmacao
         v-model="mostrarModalValidar"
@@ -193,7 +188,7 @@
         ok-title="Validar"
         test-id-cancelar="btn-validar-mapa-cancelar"
         test-id-confirmar="btn-validar-mapa-confirmar"
-        titulo="Validar mapa de Competências"
+        titulo="Validar mapa de competências"
         variant="success"
         @confirmar="confirmarValidacao"
     >
@@ -204,10 +199,10 @@
         v-model="mostrarModalDevolucao"
         :loading="isLoading"
         :ok-disabled="!observacaoDevolucao.trim()"
-        ok-title="Confirmar"
+        :ok-title="TEXTOS.mapa.BOTAO_DEVOLVER"
         test-id-cancelar="btn-devolucao-mapa-cancelar"
         test-id-confirmar="btn-devolucao-mapa-confirmar"
-        titulo="Devolução"
+        titulo="Devolver mapa"
         variant="danger"
         @confirmar="confirmarDevolucao"
         @shown="() => observacaoDevolucaoRef?.$el?.focus()"
@@ -238,12 +233,13 @@
 </template>
 
 <script lang="ts" setup>
-import {BButton, BCard, BFormGroup, BFormTextarea, BModal, BBadge} from "bootstrap-vue-next";
+import {BButton, BCard, BFormGroup, BFormTextarea, BBadge} from "bootstrap-vue-next";
 import {computed, onMounted, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import EmptyState from "@/components/comum/EmptyState.vue";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
+import ModalPadrao from "@/components/comum/ModalPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import AceitarMapaModal from "@/components/mapa/AceitarMapaModal.vue";
 import HistoricoAnaliseModal from "@/components/processo/HistoricoAnaliseModal.vue";
@@ -298,15 +294,27 @@ const {
   podeAceitarMapa,
   podeDevolverMapa,
   podeHomologarMapa,
-  podeVerSugestoes: podeMostrarVerSugestoes
+  podeVerSugestoes: podeMostrarVerSugestoes,
+  habilitarAceitarMapa,
+  habilitarDevolverMapa,
+  habilitarHomologarMapa,
+  habilitarValidarMapa
 } = useAcesso(computed(() => subprocessosStore.subprocessoDetalhe));
 
 const podeValidar = computed(() => podeValidarMapa.value);
+const habilitarValidar = computed(() => habilitarValidarMapa.value);
 const podeAnalisar = computed(() => {
   return (
       podeAceitarMapa.value ||
       podeDevolverMapa.value ||
       podeHomologarMapa.value
+  );
+});
+const habilitarAnalisarMapa = computed(() => {
+  return (
+      habilitarAceitarMapa.value ||
+      habilitarDevolverMapa.value ||
+      habilitarHomologarMapa.value
   );
 });
 const podeVerSugestoes = computed(() => podeMostrarVerSugestoes.value);
@@ -334,7 +342,7 @@ const sugestoesTextareaRef = ref<InstanceType<typeof BFormTextarea> | null>(null
 const observacaoDevolucaoRef = ref<InstanceType<typeof BFormTextarea> | null>(null);
 
 async function confirmarSugestoes() {
-  if (!codSubprocesso.value) return;
+  if (!codSubprocesso.value || !sugestoes.value.trim()) return;
   isLoading.value = true;
   try {
     await processosStore.apresentarSugestoes(codSubprocesso.value, {
@@ -379,7 +387,7 @@ async function confirmarAceitacao() {
     fecharModalAceitar();
     toastStore.setPending(
         isHomologacao
-            ? TEXTOS.sucesso.HOMOLOGACAO_EFETIVADA
+            ? TEXTOS.mapa.SUCESSO_HOMOLOGACAO
             : TEXTOS.sucesso.ACEITE_REGISTRADO,
     );
     await router.push({name: "Painel"});

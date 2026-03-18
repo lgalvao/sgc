@@ -264,22 +264,6 @@ public class SubprocessoService {
         }
     }
 
-    @Transactional
-    public void registrarMovimentacaoLembrete(Long codSubprocesso) {
-        Subprocesso subprocesso = buscarSubprocesso(codSubprocesso);
-        Usuario usuario = usuarioFacade.usuarioAutenticado();
-        var unidadeAdmin = unidadeService.buscarPorSigla(SIGLA_ADMIN);
-
-        movimentacaoRepo.save(Movimentacao.builder()
-                .subprocesso(subprocesso)
-                .unidadeOrigem(unidadeAdmin)
-                .unidadeDestino(subprocesso.getUnidade())
-                .descricao("Lembrete de prazo enviado")
-                .usuario(usuario)
-                .build());
-        subprocesso.setLocalizacaoAtual(subprocesso.getUnidade());
-    }
-
     public void criarParaMapeamento(Processo processo, Collection<Unidade> unidades, Unidade unidadeOrigem, Usuario usuario) {
         log.info("Iniciando criação de subprocessos para mapeamento no processo {}", processo.getCodigo());
         List<Unidade> unidadesElegiveis = unidades.stream()
@@ -777,7 +761,7 @@ public class SubprocessoService {
     }
 
     @Transactional
-    public void importarAtividades(Long codSubprocessoDestino, Long codSubprocessoOrigem, List<Long> codigosAtividades) {
+    public boolean importarAtividades(Long codSubprocessoDestino, Long codSubprocessoOrigem, List<Long> codigosAtividades) {
         final Subprocesso spDestino = repo.buscar(Subprocesso.class, codSubprocessoDestino);
         Usuario usuario = usuarioFacade.usuarioAutenticado();
 
@@ -796,9 +780,7 @@ public class SubprocessoService {
         log.info("Importando {} atividades do mapa #{} para o mapa #{}", codigosAtividades != null ? codigosAtividades.size() : "todas as", codMapaOrigem, codMapaDestino);
         int importadas = copiaMapaService.importarAtividadesDeOutroMapa(codMapaOrigem, codMapaDestino, codigosAtividades);
 
-        if (codigosAtividades != null && importadas == 0 && !codigosAtividades.isEmpty()) {
-            throw new ErroValidacao(MsgValidacao.IMPORTACAO_ATIVIDADES_DUPLICADAS);
-        }
+        boolean temDuplicatas = codigosAtividades != null && !codigosAtividades.isEmpty() && importadas < codigosAtividades.size();
 
         if (spDestino.getSituacao() == NAO_INICIADO) {
             var tipoProcesso = spDestino.getProcesso().getTipo();
@@ -825,6 +807,7 @@ public class SubprocessoService {
 
         movimentacaoRepo.save(movimentacao);
         spDestino.setLocalizacaoAtual(spDestino.getUnidade());
+        return temDuplicatas;
     }
 
     @Transactional(readOnly = true)

@@ -4,7 +4,7 @@
       :model-value="mostrar"
       centered
       size="lg"
-      title="Histórico de Análises"
+      title="Histórico de análise"
       @hide="fechar"
   >
     <div data-testid="modal-historico-body">

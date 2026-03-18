@@ -195,10 +195,6 @@ class ProcessoServiceTest {
             when(unidadeService.buscarPorCodigo(codUnidade)).thenReturn(u);
             when(emailModelosService.criarEmailLembretePrazo(anyString(), anyString(), any())).thenReturn("<html>body</html>");
             
-            Subprocesso sp = new Subprocesso();
-            sp.setCodigo(100L);
-            when(subprocessoService.obterEntidadePorProcessoEUnidade(codProcesso, codUnidade)).thenReturn(sp);
-            
             Usuario titular = new Usuario();
             titular.setEmail("titular@teste.com");
             when(usuarioService.buscarPorLogin("titular1")).thenReturn(titular);
@@ -206,7 +202,7 @@ class ProcessoServiceTest {
             processoService.enviarLembrete(codProcesso, codUnidade);
             
             verify(emailService).enviarEmailHtml(eq("titular@teste.com"), anyString(), anyString());
-            verify(servicoAlertas).criarAlertaAdmin(eq(p), eq(u), anyString());
+            verify(servicoAlertas).criarAlertaAdmin(eq(p), eq(u), eq("Lembrete: Prazo do processo Processo Teste encerra em N/A"));
         }
     }
 

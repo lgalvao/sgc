@@ -208,13 +208,12 @@
   >
     <p data-testid="txt-modelo-lembrete">
       {{ TEXTOS.subprocesso.LEMBRETE_MODELO_PREFIXO(subprocesso?.unidade?.sigla || '') }}
-      {{ TEXTOS.subprocesso.LEMBRETE_MODELO_PROCESSO(subprocesso?.processoDescricao || '') }}
     </p>
   </ModalConfirmacao>
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BButton, BCard, BCardBody, BFormTextarea, BSpinner, BTable} from "bootstrap-vue-next";
+import {BAlert, BButton, BCard, BCardBody, BFormTextarea, BSpinner, BTable, useToast} from "bootstrap-vue-next";
 import {computed, onMounted, ref} from "vue";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
@@ -235,6 +234,7 @@ import {formatDateTimeBR, logger} from "@/utils";
 import {normalizeError} from "@/utils/apiError";
 import {formatSituacaoSubprocesso} from "@/utils/formatters";
 import {TEXTOS} from "@/constants/textos";
+import {useToastStore} from "@/stores/toast";
 
 const props = defineProps<{ codProcesso: number; siglaUnidade: string }>();
 
@@ -259,6 +259,8 @@ const processosStore = useProcessosStore();
 
 const mapaStore = useMapasStore();
 const {notificacao, notify, clear} = useNotification();
+const toastStore = useToastStore();
+const toast = useToast();
 
 // Gerenciamento simplificado de modals e loading com composables
 const modals = useModalManager(['alterarDataLimite', 'reabrir']);
@@ -307,7 +309,23 @@ const dataLimite = computed(() =>
         : new Date(),
 );
 
+function exibirToastPendente() {
+  const pendente = toastStore.consumePending();
+  if (pendente) {
+    toast.create({
+      props: {
+        body: pendente.body,
+        variant: 'success',
+        modelValue: 4000,
+        pos: 'bottom-end',
+        noProgress: true,
+      }
+    });
+  }
+}
+
 onMounted(async () => {
+  exibirToastPendente();
   try {
     const id = await subprocessosStore.buscarSubprocessoPorProcessoEUnidade(
         props.codProcesso,

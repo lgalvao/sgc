@@ -32,9 +32,6 @@ class CDU34IntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private EntityManager entityManager;
-    @Autowired
-    private MovimentacaoRepo movimentacaoRepo;
-
     private Unidade unidade;
     private Processo processo;
 
@@ -93,11 +90,13 @@ class CDU34IntegrationTest extends BaseIntegrationTest {
                         a.getDescricao().toLowerCase().contains("lembrete"));
         assertThat(alertaExiste).isTrue();
 
-        boolean movimentacaoExiste = movimentacaoRepo.findAll().stream()
-                .anyMatch(m -> "Lembrete de prazo enviado".equals(m.getDescricao())
-                        && m.getUnidadeDestino() != null
-                        && m.getUnidadeDestino().getCodigo().equals(unidade.getCodigo()));
-        assertThat(movimentacaoExiste).isTrue();
+        boolean alertaDescricaoCorreta = alertaRepo.findAll().stream()
+                .anyMatch(a -> a.getUnidadeDestino() != null
+                        && a.getUnidadeDestino().getCodigo().equals(unidade.getCodigo())
+                        && ("Lembrete: Prazo do processo " + processo.getDescricao() + " encerra em "
+                        + processo.getDataLimite().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")))
+                        .equals(a.getDescricao()));
+        assertThat(alertaDescricaoCorreta).isTrue();
     }
 
     @Test

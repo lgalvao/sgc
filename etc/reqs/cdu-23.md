@@ -48,7 +48,7 @@
 
    8.3. O sistema cria internamente um alerta:
 
-    - `Descrição`: "Cadastro de atividades da unidade [SIGLA_UNIDADE_SUBPROCESSO] homologado"
+    - `Descrição`: "Cadastro da unidade [SIGLA_UNIDADE_SUBPROCESSO] homologado"
     - `Processo`: [DESCRIÇÃO_PROCESSO]
     - `Data/hora`: [Data/hora atual]
     - `Unidade de origem`: ADMIN

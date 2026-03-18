@@ -1,68 +1,26 @@
 <template>
-  <BModal
-      :fade="false"
-      :header-bg-variant="perfil === 'ADMIN' ? 'success' : 'primary'"
-      :model-value="mostrarModal"
-      :title="tituloModal"
-      centered
-      header-text-variant="white"
-      @hide="$emit('fecharModal')"
+  <ModalConfirmacao
+      v-model="mostrarModalComputado"
+      :auto-close="false"
+      :loading="loading"
+      :ok-title="rotuloConfirmar"
+      :titulo="tituloModal"
+      ok-variant="success"
+      test-id-cancelar="btn-aceite-mapa-cancelar"
+      test-id-confirmar="btn-aceite-mapa-confirmar"
+      variant="success"
+      @confirmar="confirmarAceitacao"
   >
     <div data-testid="body-aceite-mapa">
-      <p v-if="perfil === 'ADMIN'">
-        {{ corpoModal }}
-      </p>
-      <BFormGroup
-          v-else
-          label-for="observacao-textarea"
-          class="mb-3"
-      >
-        <template #label>
-          Observações <span class="text-muted small">(opcional)</span>
-        </template>
-        <BFormTextarea
-            id="observacao-textarea"
-            v-model="observacao"
-            data-testid="inp-aceite-mapa-obs"
-            placeholder="Digite suas observações sobre o mapa..."
-            rows="4"
-        />
-        <BFormText>
-          As observações serão registradas junto com a validação do mapa.
-        </BFormText>
-      </BFormGroup>
+      <p class="mb-0">{{ corpoModal }}</p>
     </div>
-
-    <template #footer>
-      <div class="d-flex justify-content-end w-100 gap-3 align-items-center">
-        <BButton
-            :disabled="loading"
-            class="text-decoration-none text-secondary fw-medium btn-cancelar-link"
-            data-testid="btn-aceite-mapa-cancelar"
-            variant="link"
-            @click="$emit('fecharModal')"
-        >
-          <i aria-hidden="true" class="bi bi-x-circle me-1"/>
-          Cancelar
-        </BButton>
-        <BButton
-            :disabled="loading"
-            data-testid="btn-aceite-mapa-confirmar"
-            variant="success"
-            @click="$emit('confirmarAceitacao', observacao)"
-        >
-          <BSpinner v-if="loading" aria-hidden="true" class="me-1" small/>
-          <i v-else aria-hidden="true" class="bi bi-check-circle me-1"/>
-          {{ loading ? 'Processando...' : 'Aceitar' }}
-        </BButton>
-      </div>
-    </template>
-  </BModal>
+  </ModalConfirmacao>
 </template>
 
 <script lang="ts" setup>
-import {BButton, BFormGroup, BFormText, BFormTextarea, BModal, BSpinner} from "bootstrap-vue-next";
-import {computed, ref} from "vue";
+import {computed} from "vue";
+import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
+import {TEXTOS} from "@/constants/textos";
 
 interface Props {
   mostrarModal: boolean;
@@ -75,40 +33,37 @@ const props = withDefaults(defineProps<Props>(), {
   perfil: ""
 });
 
-defineEmits<{
+const emit = defineEmits<{
   fecharModal: [];
   confirmarAceitacao: [observacao: string];
 }>();
 
-const observacao = ref("");
+const mostrarModalComputado = computed({
+  get: () => props.mostrarModal,
+  set: (mostrar: boolean) => {
+    if (!mostrar) emit("fecharModal");
+  }
+});
 
 const tituloModal = computed(() => {
   return props.perfil === "ADMIN"
-      ? "Homologação"
-      : "Aceitar mapa de Competências";
+      ? TEXTOS.mapa.MODAL_HOMOLOGAR_TITULO
+      : TEXTOS.mapa.MODAL_ACEITE_TITULO;
 });
 
 const corpoModal = computed(() => {
   return props.perfil === "ADMIN"
-      ? "Confirma a homologação do mapa de competências?"
-      : "Observações";
+      ? TEXTOS.mapa.MODAL_HOMOLOGAR_TEXTO
+      : TEXTOS.mapa.MODAL_ACEITE_TEXTO;
 });
+
+const rotuloConfirmar = computed(() => {
+  return props.perfil === "ADMIN"
+      ? TEXTOS.mapa.LABEL_HOMOLOGAR
+      : TEXTOS.mapa.BOTAO_ACEITAR;
+});
+
+function confirmarAceitacao() {
+  emit("confirmarAceitacao", "");
+}
 </script>
-
-<style scoped>
-.form-control:focus {
-  border-color: var(--bs-success);
-  box-shadow: 0 0 0 0.2rem rgba(var(--bs-success-rgb), 0.25);
-}
-
-.btn-cancelar-link {
-  padding: 0.375rem 0.75rem;
-  transition: all 0.2s;
-  border-radius: 0.375rem;
-}
-
-.btn-cancelar-link:hover {
-  color: var(--bs-emphasis-color) !important;
-  background-color: var(--bs-secondary-bg);
-}
-</style>

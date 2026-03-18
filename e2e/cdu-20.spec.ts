@@ -1,9 +1,13 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
-import {criarProcessoMapaValidadoFixture, criarProcessoMapaComSugestoesFixture} from './fixtures/fixtures-processos.js';
+import {
+    criarProcessoMapaDisponibilizadoFixture,
+    criarProcessoMapaValidadoFixture,
+    criarProcessoMapaComSugestoesFixture
+} from './fixtures/fixtures-processos.js';
 import {navegarParaMapa} from './helpers/helpers-mapas.js';
 import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
-import {acessarSubprocessoGestor} from './helpers/helpers-analise.js';
-import {navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
+import {acessarSubprocessoChefeDireto, acessarSubprocessoGestor} from './helpers/helpers-analise.js';
+import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
 import {resetDatabase} from './hooks/hooks-limpeza.js';
 
@@ -57,7 +61,7 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
 
         await page.getByTestId('btn-mapa-homologar-aceite').click();
         await page.getByTestId('btn-aceite-mapa-confirmar').click();
-        await expect(page.getByText(TEXTOS.sucesso.HOMOLOGACAO_EFETIVADA).first()).toBeVisible();
+        await expect(page.getByText(TEXTOS.mapa.SUCESSO_HOMOLOGACAO).first()).toBeVisible();
     });
 });
 
@@ -100,5 +104,56 @@ test.describe.serial('CDU-20 - Ver sugestões quando situação é "Mapa com sug
         // Fecha o modal
         await page.getByTestId('btn-ver-sugestoes-mapa-fechar').click();
         await expect(modal).toBeHidden();
+    });
+});
+
+test.describe.serial('CDU-20 - Aceite de mapa com sugestões', () => {
+    const UNIDADE_ALVO = 'ASSESSORIA_11';
+    const TEXTO_SUGESTAO = 'Sugestão do chefe para ajuste no mapa';
+
+    const timestamp = Date.now();
+    const descProcesso = `Processo CDU-20 Aceite Sugestoes ${timestamp}`;
+
+    test('Setup data', async ({_resetAutomatico, request}) => {
+        await resetDatabase(request);
+        await criarProcessoMapaDisponibilizadoFixture(request, {
+            unidade: UNIDADE_ALVO,
+            descricao: descProcesso
+        });
+        expect(true).toBeTruthy();
+    });
+
+    test('CHEFE apresenta sugestões e GESTOR registra aceite', async ({_resetAutomatico, page}) => {
+        await login(page, USUARIOS.CHEFE_ASSESSORIA_11.titulo, USUARIOS.CHEFE_ASSESSORIA_11.senha);
+        await acessarSubprocessoChefeDireto(page, descProcesso, UNIDADE_ALVO);
+        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa disponibilizado/i);
+        await navegarParaMapa(page);
+
+        await expect(page.getByTestId('btn-mapa-sugestoes')).toBeVisible();
+        await page.getByTestId('btn-mapa-sugestoes').click();
+        await expect(page.getByRole('dialog')).toBeVisible();
+        await page.getByTestId('inp-sugestoes-mapa-texto').fill(TEXTO_SUGESTAO);
+        await page.getByTestId('btn-sugestoes-mapa-confirmar').click();
+
+        await verificarPaginaPainel(page);
+
+        await loginComPerfil(page, USUARIOS.GESTOR_SECRETARIA_1.titulo, USUARIOS.GESTOR_SECRETARIA_1.senha, 'GESTOR - SECRETARIA_1');
+        await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
+        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa com sugestões/i);
+        await navegarParaMapa(page);
+
+        await expect(page.getByTestId('btn-mapa-ver-sugestoes')).toBeVisible();
+        await expect(page.getByTestId('btn-mapa-homologar-aceite')).toBeVisible();
+        await expect(page.getByTestId('btn-mapa-homologar-aceite')).toBeEnabled();
+
+        await page.getByTestId('btn-mapa-ver-sugestoes').click();
+        await expect(page.getByTestId('txt-ver-sugestoes-mapa')).toHaveValue(TEXTO_SUGESTAO);
+        await page.getByTestId('btn-ver-sugestoes-mapa-fechar').click();
+
+        await page.getByTestId('btn-mapa-homologar-aceite').click();
+        await page.getByTestId('btn-aceite-mapa-confirmar').click();
+
+        await verificarPaginaPainel(page);
+        await expect(page.getByText(TEXTOS.sucesso.ACEITE_REGISTRADO).first()).toBeVisible();
     });
 });

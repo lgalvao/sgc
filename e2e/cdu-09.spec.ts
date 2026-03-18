@@ -8,8 +8,15 @@ import {
 } from './helpers/helpers-atividades.js';
 import {
     abrirHistoricoAnalise,
+    fecharHistoricoAnalise,
 } from './helpers/helpers-analise.js';
-import {fazerLogout} from './helpers/helpers-navegacao.js';
+import {
+    fazerLogout,
+    verificarAlertaPainel,
+    verificarPaginaPainel,
+    verificarToast,
+} from './helpers/helpers-navegacao.js';
+import {TEXTOS} from '../frontend/src/constants/textos.js';
 
 test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecimentos', () => {
     const UNIDADE_ALVO = 'SECAO_221';
@@ -41,8 +48,12 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
 
         await adicionarConhecimento(page, atividadeDesc, 'Conhecimento corretivo');
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
+        const modalConfirmacao = page.getByRole('dialog');
+        await expect(modalConfirmacao.getByRole('heading', {name: TEXTOS.atividades.MODAL_DISPONIBILIZAR_TITULO})).toBeVisible();
+        await expect(modalConfirmacao.getByText(TEXTOS.atividades.MODAL_DISPONIBILIZAR_TEXTO)).toBeVisible();
         await expect(page.getByTestId('btn-confirmar-disponibilizacao')).toBeVisible();
-        await page.getByRole('button', {name: 'Cancelar'}).click();
+        await page.getByTestId('btn-disponibilizar-revisao-cancelar').click();
+        await expect(page.getByRole('heading', {name: TEXTOS.atividades.TITULO, level: 2})).toBeVisible();
     });
 
     test('Cenario 2: Caminho feliz - Disponibilizar cadastro', async ({_resetAutomatico, page}) => {
@@ -55,9 +66,20 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
         await adicionarConhecimento(page, atividadeDesc, 'Conhecimento valido');
 
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
+        const modalConfirmacao = page.getByRole('dialog');
+        await expect(modalConfirmacao.getByRole('heading', {name: TEXTOS.atividades.MODAL_DISPONIBILIZAR_TITULO})).toBeVisible();
+        await expect(modalConfirmacao.getByText(TEXTOS.atividades.MODAL_DISPONIBILIZAR_TEXTO)).toBeVisible();
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
 
-        await expect(page).toHaveURL(/\/painel/);
+        await verificarToast(page, TEXTOS.sucesso.CADASTRO_ATIVIDADES_DISPONIBILIZADO);
+        await verificarPaginaPainel(page);
+
+        await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
+        await verificarAlertaPainel(page, /Cadastro da unidade SECAO_221 disponibilizado para análise/i);
+
+        await page.goto(`/processo/${processoCodigo}/${UNIDADE_ALVO}`);
+        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro disponibilizado/i);
+        await expect(page.getByTestId('tbl-movimentacoes')).toContainText(TEXTOS.movimentacao.CADASTRO_DISPONIBILIZADO);
     });
 
     test('Cenario 3: Devolucao e Historico de Analise', async ({_resetAutomatico, page}) => {
@@ -79,12 +101,15 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
 
         await navegarParaAtividades(page);
         const modal = await abrirHistoricoAnalise(page);
+        await expect(modal.getByTestId('cell-dataHora-0')).not.toHaveText('');
+        await expect(modal.getByTestId('cell-unidade-0')).toHaveText('COORD_22');
         await expect(modal.getByTestId('cell-resultado-0')).toHaveText(/Devolu[cç][aã]o/i);
         await expect(modal.getByTestId('cell-observacao-0')).toHaveText(motivo);
-        await page.getByRole('button', {name: 'Fechar'}).click();
+        await fecharHistoricoAnalise(page);
 
         await page.getByTestId('btn-cad-atividades-disponibilizar').click();
         await page.getByTestId('btn-confirmar-disponibilizacao').click();
-        await expect(page).toHaveURL(/\/painel/);
+        await verificarToast(page, TEXTOS.sucesso.CADASTRO_ATIVIDADES_DISPONIBILIZADO);
+        await verificarPaginaPainel(page);
     });
 });

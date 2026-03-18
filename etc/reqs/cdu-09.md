@@ -61,7 +61,7 @@ Ator: CHEFE
 
 14. O sistema cria internamente um alerta:
 
-    - `Descrição`: "Cadastro de atividades/conhecimentos da unidade [SIGLA_UNIDADE_SUBPROCESSO] disponibilizado para
+    - `Descrição`: "Cadastro da unidade [SIGLA_UNIDADE_SUBPROCESSO] disponibilizado para
       análise"
     - `Processo`: [DESCRICAO_PROCESSO]
     - `Data/hora`: Data/hora atual

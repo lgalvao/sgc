@@ -392,7 +392,7 @@ public class SubprocessoTransicaoService {
             sp.setSituacao(SITUACAO_MAPA_HOMOLOGADO.get(sp.getProcesso().getTipo()));
             subprocessoRepo.save(sp);
         } else {
-            SituacaoSubprocesso novaSituacao = SITUACAO_MAPA_VALIDADO.get(sp.getProcesso().getTipo());
+            SituacaoSubprocesso novaSituacao = sp.getSituacao();
             registrarAnalise(RegistrarWorkflowCommand.builder()
                     .sp(sp)
                     .novaSituacao(novaSituacao)
@@ -492,7 +492,10 @@ public class SubprocessoTransicaoService {
 
     @Transactional
     public void aceitarCadastroEmBloco(List<Long> subprocessoCodigos, Usuario usuario) {
-        subprocessoCodigos.forEach(codSubprocesso -> executarAceite(codSubprocesso, usuario, "Avaliação em bloco", false));
+        subprocessoCodigos.forEach(codSubprocesso -> {
+            boolean isRevisao = REVISAO == buscarSubprocesso(codSubprocesso).getProcesso().getTipo();
+            executarAceite(codSubprocesso, usuario, "Avaliação em bloco", isRevisao);
+        });
     }
 
     private void executarAceite(Long codSubprocesso, Usuario usuario, @Nullable String observacoes, boolean isRevisao) {
@@ -533,12 +536,10 @@ public class SubprocessoTransicaoService {
     }
 
     public void homologarCadastroEmBloco(List<Long> subprocessoCodigos, Usuario usuario) {
-        subprocessoCodigos.forEach(codSubprocesso -> executarHomologacao(
-                codSubprocesso,
-                usuario,
-                "Homologação em bloco",
-                false)
-        );
+        subprocessoCodigos.forEach(codSubprocesso -> {
+            boolean isRevisao = REVISAO == buscarSubprocesso(codSubprocesso).getProcesso().getTipo();
+            executarHomologacao(codSubprocesso, usuario, "Homologação em bloco", isRevisao);
+        });
     }
 
     private void executarHomologacao(Long codSubprocesso, Usuario usuario, @Nullable String observacoes, boolean isRevisao) {
@@ -688,18 +689,4 @@ public class SubprocessoTransicaoService {
         }
     }
 
-    public void registrarMovimentacaoLembrete(Long codSubprocesso) {
-        Subprocesso subprocesso = buscarSubprocesso(codSubprocesso);
-        Usuario usuario = usuarioFacade.usuarioAutenticado();
-        Unidade unidadeAdmin = unidadeService.buscarPorSigla(SIGLA_ADMIN);
-
-        movimentacaoRepo.save(Movimentacao.builder()
-                .subprocesso(subprocesso)
-                .unidadeOrigem(unidadeAdmin)
-                .unidadeDestino(subprocesso.getUnidade())
-                .descricao(MsgValidacao.LEMBRETE_PRAZO_ENVIADO)
-                .usuario(usuario)
-                .build());
-        subprocesso.setLocalizacaoAtual(subprocesso.getUnidade());
-    }
 }

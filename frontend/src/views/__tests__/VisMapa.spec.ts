@@ -80,6 +80,10 @@ describe("VisMapa.vue", () => {
             podeAceitarMapa: {value: true},
             podeDevolverMapa: {value: true},
             podeHomologarMapa: {value: false},
+            habilitarValidarMapa: {value: true},
+            habilitarAceitarMapa: {value: true},
+            habilitarDevolverMapa: {value: true},
+            habilitarHomologarMapa: {value: false},
             podeVerPagina: {value: true},
             podeVisualizarMapa: {value: true},
             ...accessOverrides
@@ -606,6 +610,7 @@ describe("VisMapa.vue", () => {
         (store.apresentarSugestoes as any).mockRejectedValue(new Error("Fail"));
         await wrapper.find('[data-testid="btn-mapa-sugestoes"]').trigger("click");
         await wrapper.vm.$nextTick();
+        await wrapper.find('[data-testid="inp-sugestoes-mapa-texto"]').setValue("Sugestão com erro");
         await wrapper.find('[data-testid="btn-sugestoes-mapa-confirmar"]').trigger("click");
         await flushPromises();
 
@@ -662,7 +667,7 @@ describe("VisMapa.vue", () => {
 
         await wrapper.find('[data-testid="btn-mapa-devolver"]').trigger("click");
 
-        const modal = wrapper.findAllComponents({name: 'ModalConfirmacao'}).find(c => c.props('titulo') === 'Devolução');
+        const modal = wrapper.findAllComponents({name: 'ModalConfirmacao'}).find(c => c.props('titulo') === 'Devolver mapa');
         await modal?.vm.$emit('shown');
     });
 
