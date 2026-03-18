@@ -72,12 +72,6 @@
       <ProcessoSubprocessosTable
           :participantes-hierarquia="participantesHierarquia"
           @row-click="abrirDetalhesUnidade"/>
-
-      <div v-if="isProcessoFinalizado">
-        <p class="mt-3 text-muted">
-          {{ TEXTOS.processo.CONCLUIDO }}
-        </p>
-      </div>
     </div>
 
     <div v-else class="text-center py-5">
@@ -108,7 +102,7 @@
       <BAlert
           :fade="false"
           :model-value="true"
-          variant="info">
+          variant="secondary">
 
         <i aria-hidden="true" class="bi bi-info-circle"/>
         {{ TEXTOS.processo.FINALIZACAO_CONFIRMACAO_PREFIXO }}

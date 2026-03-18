@@ -16,7 +16,7 @@ describe('ParametrosView', () => {
 
         configuracoesStore = useConfiguracoesStore(pinia);
 
-        configuracoesStore.parametros = storeParams !== null ? storeParams : [
+        configuracoesStore.configuracoes = storeParams !== null ? storeParams : [
             {codigo: 1, chave: 'DIAS_INATIVACAO_PROCESSO', valor: '30', descricao: 'Desc 1'},
             {codigo: 2, chave: 'DIAS_ALERTA_NOVO', valor: '5', descricao: 'Desc 2'}
         ];
@@ -53,7 +53,7 @@ describe('ParametrosView', () => {
     it('deve renderizar o formulário corretamente', async () => {
         setupWrapper();
         await wrapper.vm.$nextTick();
-        expect(wrapper.find('h1').text()).toBe('Parâmetros');
+        expect(wrapper.find('h1').text()).toBe('Configurações');
         expect(wrapper.find('form').exists()).toBe(true);
         expect(wrapper.find('#diasInativacao').exists()).toBe(true);
         expect(wrapper.find('#diasAlertaNovo').exists()).toBe(true);

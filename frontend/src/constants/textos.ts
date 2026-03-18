@@ -73,7 +73,7 @@ export const TEXTOS = {
     BOTAO_DISPONIBILIZAR: "Disponibilizar",
     BOTAO_CRIAR_PRIMEIRA: "Criar primeira competência",
     BOTAO_CRIAR: "Criar competência",
-    EMPTY_DESCRIPTION: "Nenhuma competência cadastrada para esta unidade.",
+    EMPTY_DESCRIPTION: "Nenhuma competência cadastrada para a unidade.",
     EMPTY_TITLE: "Mapa de competências",
     UNIDADE_NAO_ENCONTRADA: "Unidade não encontrada.",
     EXCLUSAO_TITULO: "Exclusão de competência",
@@ -342,7 +342,7 @@ export const TEXTOS = {
     INFO_UNIDADES: "Unidades participantes",
     cadastro: {
       TITULO: "Cadastro de processo",
-      BOTAO_INICIAR: "Iniciar processo",
+      BOTAO_INICIAR: "Iniciar",
       BOTAO_SALVAR: "Salvar",
       BOTAO_REMOVER: "Remover",
       BOTAO_CANCELAR: "Cancelar",
@@ -388,8 +388,8 @@ export const TEXTOS = {
       BOTAO: "Disponibilizar",
     },
   },
-  parametros: {
-    TITULO: "Parâmetros",
+  configuracoes: {
+    TITULO: "Configurações",
     LABEL_DIAS_INATIVACAO: "Dias para inativação de processos (DIAS_INATIVACAO_PROCESSO)",
     DESC_DIAS_INATIVACAO: "Dias depois da finalização de um processo para que seja considerado inativo.",
     LABEL_DIAS_ALERTA_NOVO: "Dias para indicação de alerta como novo (DIAS_ALERTA_NOVO)",

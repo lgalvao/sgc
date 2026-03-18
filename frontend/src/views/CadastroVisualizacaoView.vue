@@ -4,7 +4,6 @@
       <template #default>
         <div class="unidade-cabecalho mb-0">
           <span class="unidade-sigla">{{ siglaUnidade }}</span>
-          <span class="unidade-nome">{{ nomeUnidade }}</span>
         </div>
       </template>
       <template #actions>

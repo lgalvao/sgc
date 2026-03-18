@@ -94,7 +94,7 @@ defineExpose({fields});
 </script>
 
 <template>
-  <div class="table-responsive">
+  <div v-if="processos.length > 0" class="table-responsive">
     <BTable
         :fields="fields"
         :items="processos"
@@ -105,31 +105,10 @@ defineExpose({fields});
         data-testid="tbl-processos"
         hover
         responsive
-        show-empty
         stacked="md"
         @row-clicked="handleSelecionarProcesso"
         @update:sort-by="handleSortChange"
     >
-
-      <template #empty>
-        <EmptyState
-            class="border-0 bg-transparent mb-0"
-            data-testid="empty-state-processos"
-            description="Os processos em que sua unidade participa aparecerão aqui."
-            icon="bi-folder2-open"
-            title="Nenhum processo encontrado">
-          <BButton
-              v-if="mostrarCtaVazio"
-              data-testid="btn-empty-state-criar-processo"
-              size="sm"
-              variant="outline-primary"
-              @click="emit('ctaVazio')"
-          >
-            {{ textoCtaVazio || 'Criar processo' }}
-          </BButton>
-        </EmptyState>
-      </template>
-
       <template #cell(dataFinalizacao)="{ item }">
         {{ formatDate(item.dataFinalizacao) }}
       </template>
@@ -145,4 +124,21 @@ defineExpose({fields});
       </template>
     </BTable>
   </div>
+  <EmptyState
+      v-else
+      class="border-0 bg-transparent mb-0"
+      data-testid="empty-state-processos"
+      icon="bi-folder2-open"
+      title="Nenhum processo"
+  >
+    <BButton
+        v-if="mostrarCtaVazio"
+        data-testid="btn-empty-state-criar-processo"
+        size="sm"
+        variant="outline-primary"
+        @click="emit('ctaVazio')"
+    >
+      {{ textoCtaVazio || 'Criar processo' }}
+    </BButton>
+  </EmptyState>
 </template>

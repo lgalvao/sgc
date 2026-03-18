@@ -41,13 +41,13 @@
             v-if="isAdmin"
             class="me-lg-1"
             data-testid="btn-configuracoes"
-            title="Parâmetros do sistema"
-            to="/parametros"
+            title="Configurações"
+            to="/configuracoes"
         >
           <template #default>
-            <span class="visually-hidden">Parâmetros do sistema</span>
+            <span class="visually-hidden">Configurações</span>
             <i aria-hidden="true" class="bi bi-sliders me-lg-0 me-1"/>
-            <span aria-hidden="true" class="d-lg-none">Parâmetros</span>
+            <span aria-hidden="true" class="d-lg-none">Configurações</span>
           </template>
         </BNavItem>
 
@@ -59,7 +59,7 @@
             to="/administradores"
         >
           <template #default>
-            <span class="visually-hidden">Administradores do sistema</span>
+            <span class="visually-hidden">Administradores</span>
             <i aria-hidden="true" class="bi bi-people me-lg-0 me-1"/>
             <span aria-hidden="true" class="d-lg-none">Administradores</span>
           </template>
@@ -141,6 +141,11 @@ function handleLogout() {
 .user-profile-item :deep(.nav-link) {
   cursor: default;
   color: rgba(255, 255, 255, 0.9) !important; /* Mais claro que os outros links para destaque */
+}
+
+/* Remover destaque do botão de sair para que fique igual aos outros ícones */
+[data-testid="btn-logout"] :deep(.nav-link) {
+  color: rgba(255, 255, 255, 0.75) !important;
 }
 
 @media (max-width: 992px) {

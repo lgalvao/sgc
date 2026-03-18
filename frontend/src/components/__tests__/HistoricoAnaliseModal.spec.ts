@@ -52,7 +52,7 @@ describe("HistoricoAnaliseModal", () => {
             },
         });
 
-        expect(context.wrapper.find(".alert-info").text()).toContain(
+        expect(context.wrapper.find('[data-testid="alert-historico-vazio"]').text()).toContain(
             "Nenhuma análise registrada",
         );
     });

@@ -19,7 +19,7 @@ describe('Configuracoes store', () => {
         });
     });
 
-    it('carregarConfiguracoes deve preencher parametros em caso de sucesso', async () => {
+    it('carregarConfiguracoes deve preencher configuracoes em caso de sucesso', async () => {
         const mockData = [
             {codigo: 1, chave: 'DIAS_INATIVACAO_PROCESSO', descricao: 'Desc', valor: '60'}
         ];
@@ -28,7 +28,7 @@ describe('Configuracoes store', () => {
         await store.carregarConfiguracoes();
 
         expect(configuracaoService.buscarConfiguracoes).toHaveBeenCalled();
-        expect(store.parametros).toEqual(mockData);
+        expect(store.configuracoes).toEqual(mockData);
         expect(store.error).toBeNull();
         expect(store.loading).toBe(false);
     });
@@ -38,12 +38,12 @@ describe('Configuracoes store', () => {
 
         await store.carregarConfiguracoes();
 
-        expect(store.parametros).toEqual([]);
+        expect(store.configuracoes).toEqual([]);
         expect(store.error).toBe('Erro API');
         expect(store.loading).toBe(false);
     });
 
-    it('salvarConfiguracoes deve atualizar parametros em caso de sucesso', async () => {
+    it('salvarConfiguracoes deve atualizar configuracoes em caso de sucesso', async () => {
         const novosParametros = [
             {codigo: 1, chave: 'DIAS_INATIVACAO_PROCESSO', descricao: 'Desc', valor: '90'}
         ];
@@ -52,7 +52,7 @@ describe('Configuracoes store', () => {
         const result = await store.salvarConfiguracoes(novosParametros);
 
         expect(configuracaoService.salvarConfiguracoes).toHaveBeenCalledWith(novosParametros);
-        expect(store.parametros).toEqual(novosParametros);
+        expect(store.configuracoes).toEqual(novosParametros);
         expect(result).toBe(true);
         expect(store.error).toBeNull();
     });
@@ -70,7 +70,7 @@ describe('Configuracoes store', () => {
     });
 
     it('getValor deve retornar valor correto ou padrao', () => {
-        store.parametros = [
+        store.configuracoes = [
             {codigo: 1, chave: 'TESTE_KEY', descricao: 'Desc', valor: 'valor_teste'}
         ];
 
@@ -83,13 +83,13 @@ describe('Configuracoes store', () => {
         expect(store.getDiasInativacaoProcesso()).toBe(30);
 
         // Caso configurado
-        store.parametros = [
+        store.configuracoes = [
             {codigo: 1, chave: 'DIAS_INATIVACAO_PROCESSO', descricao: 'Desc', valor: '45'}
         ];
         expect(store.getDiasInativacaoProcesso()).toBe(45);
 
         // Caso inválido
-        store.parametros = [
+        store.configuracoes = [
             {codigo: 1, chave: 'DIAS_INATIVACAO_PROCESSO', descricao: 'Desc', valor: 'abc'}
         ];
         expect(store.getDiasInativacaoProcesso()).toBe(30);
@@ -100,13 +100,13 @@ describe('Configuracoes store', () => {
         expect(store.getDiasAlertaNovo()).toBe(3);
 
         // Caso configurado
-        store.parametros = [
+        store.configuracoes = [
             {codigo: 1, chave: 'DIAS_ALERTA_NOVO', descricao: 'Desc', valor: '7'}
         ];
         expect(store.getDiasAlertaNovo()).toBe(7);
 
         // Caso inválido
-        store.parametros = [
+        store.configuracoes = [
             {codigo: 1, chave: 'DIAS_ALERTA_NOVO', descricao: 'Desc', valor: 'xyz'}
         ];
         expect(store.getDiasAlertaNovo()).toBe(3);

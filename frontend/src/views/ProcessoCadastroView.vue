@@ -1,69 +1,71 @@
-<template>
+  <template>
   <LayoutPadrao>
-    <PageHeader :title="TEXTOS.processo.cadastro.TITULO">
-      <template #actions>
-        <BButton
-            :disabled="isLoading"
-            data-testid="btn-processo-cancelar"
-            to="/painel"
-            variant="outline-secondary"
-        >
-          {{ TEXTOS.processo.cadastro.BOTAO_CANCELAR }}
-        </BButton>
+    <div class="col-lg-8 col-md-9 col-12">
+      <PageHeader :title="TEXTOS.processo.cadastro.TITULO">
+        <template #actions>
+          <BButton
+              :disabled="isLoading"
+              data-testid="btn-processo-cancelar"
+              to="/painel"
+              variant="outline-secondary"
+          >
+            {{ TEXTOS.processo.cadastro.BOTAO_CANCELAR }}
+          </BButton>
 
-        <LoadingButton
-            v-if="processoEditando"
-            :disabled="isLoading"
-            data-testid="btn-processo-remover"
-            icon="trash"
-            :text="TEXTOS.processo.cadastro.BOTAO_REMOVER"
-            variant="outline-danger"
-            @click="abrirModalRemocao"
+          <LoadingButton
+              v-if="processoEditando"
+              :disabled="isLoading"
+              data-testid="btn-processo-remover"
+              icon="trash"
+              :text="TEXTOS.processo.cadastro.BOTAO_REMOVER"
+              variant="outline-danger"
+              @click="abrirModalRemocao"
+          />
+
+          <LoadingButton
+              :disabled="isFormInvalid || isLoadingData"
+              :loading="isLoading"
+              data-testid="btn-processo-salvar"
+              icon="save"
+              loading-text="Salvando..."
+              :text="TEXTOS.processo.cadastro.BOTAO_SALVAR"
+              type="button"
+              variant="outline-primary"
+              @click="salvarProcesso"
+          />
+
+          <LoadingButton
+              :disabled="isFormInvalid || isLoading || isLoadingData"
+              data-testid="btn-processo-iniciar"
+              icon="play-fill"
+              :text="TEXTOS.processo.cadastro.BOTAO_INICIAR"
+              variant="success"
+              @click="abrirModalConfirmacao"
+          />
+        </template>
+      </PageHeader>
+
+      <BForm class="mt-4">
+        <AppAlert
+            v-if="notificacao"
+            :dismissible="notificacao.dismissible ?? true"
+            :message="notificacao.message"
+            :notification="notificacao.notification"
+            :stack-trace="notificacao.stackTrace"
+            :variant="notificacao.variant"
+            @dismissed="clear()"
         />
 
-        <LoadingButton
-            :disabled="isFormInvalid || isLoadingData"
-            :loading="isLoading"
-            data-testid="btn-processo-salvar"
-            icon="save"
-            loading-text="Salvando..."
-            :text="TEXTOS.processo.cadastro.BOTAO_SALVAR"
-            type="button"
-            variant="outline-primary"
-            @click="salvarProcesso"
+        <ProcessoFormFields
+            ref="formFieldsRef"
+            v-model="formData"
+            :field-errors="fieldErrors"
+            :is-edit="!!processoEditando"
+            :is-loading-unidades="isLoadingUnidades"
+            :unidades="unidades"
         />
-
-        <LoadingButton
-            :disabled="isFormInvalid || isLoading || isLoadingData"
-            data-testid="btn-processo-iniciar"
-            icon="play-fill"
-            :text="TEXTOS.processo.cadastro.BOTAO_INICIAR"
-            variant="success"
-            @click="abrirModalConfirmacao"
-        />
-      </template>
-    </PageHeader>
-
-    <BForm class="mt-4 col-md-6 col-sm-8 col-12">
-      <AppAlert
-          v-if="notificacao"
-          :dismissible="notificacao.dismissible ?? true"
-          :message="notificacao.message"
-          :notification="notificacao.notification"
-          :stack-trace="notificacao.stackTrace"
-          :variant="notificacao.variant"
-          @dismissed="clear()"
-      />
-
-      <ProcessoFormFields
-          ref="formFieldsRef"
-          v-model="formData"
-          :field-errors="fieldErrors"
-          :is-edit="!!processoEditando"
-          :is-loading-unidades="isLoadingUnidades"
-          :unidades="unidades"
-      />
-    </BForm>
+      </BForm>
+    </div>
 
     <!-- Modal de confirmação CDU-05 -->
     <ModalConfirmacao

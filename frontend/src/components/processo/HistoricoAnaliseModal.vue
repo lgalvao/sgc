@@ -16,7 +16,8 @@
             v-if="historico.length === 0"
             :fade="false"
             :model-value="true"
-            variant="info"
+            data-testid="alert-historico-vazio"
+            variant="secondary"
         >
           Nenhuma análise registrada para este subprocesso.
         </BAlert>

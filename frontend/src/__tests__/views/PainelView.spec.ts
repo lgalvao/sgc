@@ -79,8 +79,9 @@ describe("PainelView.vue", () => {
         },
     });
 
-    it("deve renderizar tabelas e títulos", () => {
+    it("deve mostrar estado vazio de alertas sem renderizar a tabela", async () => {
         const wrapper = mount(PainelView, mountOptions());
+        await flushPromises();
 
         const headers = wrapper.findAllComponents({name: 'PageHeader'});
         expect(headers).toHaveLength(2);
@@ -88,7 +89,34 @@ describe("PainelView.vue", () => {
         expect(headers[1].props('title')).toBe('Alertas');
 
         expect(wrapper.findComponent({name: 'TabelaProcessos'}).exists()).toBe(true);
+        expect(wrapper.find('[data-testid="empty-state-alertas"]').exists()).toBe(true);
+        expect(wrapper.find('[data-testid="tbl-alertas"]').exists()).toBe(false);
+    });
+
+    it("deve renderizar a tabela de alertas quando houver itens", async () => {
+        (painelService.listarAlertas as any).mockResolvedValue({
+            ...mockPageVazia,
+            content: [{
+                codigo: 1,
+                codProcesso: 10,
+                unidadeOrigem: 'SEC',
+                unidadeDestino: 'CGP',
+                descricao: 'Alerta',
+                dataHora: '2026-03-18T10:00:00',
+                dataHoraLeitura: null,
+                mensagem: 'Processo pendente',
+                origem: 'Secretaria',
+                processo: 'Processo 10',
+            }],
+            empty: false,
+            totalElements: 1,
+        });
+
+        const wrapper = mount(PainelView, mountOptions());
+        await flushPromises();
+
         expect(wrapper.find('[data-testid="tbl-alertas"]').exists()).toBe(true);
+        expect(wrapper.find('[data-testid="empty-state-alertas"]').exists()).toBe(false);
     });
 
     it("deve carregar dados ao montar se perfil estiver selecionado", async () => {

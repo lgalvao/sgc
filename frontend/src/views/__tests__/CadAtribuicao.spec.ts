@@ -173,7 +173,7 @@ describe('CadAtribuicao.vue', () => {
 
         // Sem usuario
         await context.wrapper.find('form').trigger('submit');
-        expect(context.wrapper.vm.erroUsuario).toBeTruthy();
+        expect(context.wrapper.text()).toContain('Selecione um usuário para criar a atribuição.');
 
         // Com usuario, sem justificativa
         context.wrapper.vm.usuarioSelecionado = '111';

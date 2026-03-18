@@ -29,18 +29,17 @@
 
     <div>
       <PageHeader :title="TEXTOS.painel.ALERTAS" title-test-id="txt-painel-titulo-alertas"/>
-      <div class="table-responsive">
+      <div v-if="alertas.length > 0" class="table-responsive">
         <BTable
             :fields="camposAlertas"
             :items="alertas"
-            :striped="alertas.length > 0"
+            :striped="true"
             :tbody-tr-props="rowAttrAlerta"
             :tbody-tr-class="rowClassAlerta"
             aria-label="Alertas"
             data-testid="tbl-alertas"
             hover
             responsive
-            show-empty
             stacked="md"
             @sort-changed="handleSortChangeAlertas"
         >
@@ -48,17 +47,15 @@
             <span v-if="!data.item.dataHoraLeitura" class="visually-hidden">{{ TEXTOS.comum.NAO_LIDO }}</span>
             {{ data.value }}
           </template>
-          <template #empty>
-            <EmptyState
-                class="border-0 bg-transparent mb-0"
-                data-testid="empty-state-alertas"
-                icon="bi-bell-slash"
-                :title="TEXTOS.painel.NENHUM_ALERTA"
-            >
-            </EmptyState>
-          </template>
         </BTable>
       </div>
+      <EmptyState
+          v-else
+          class="border-0 bg-transparent mb-0"
+          data-testid="empty-state-alertas"
+          icon="bi-bell-slash"
+          :title="TEXTOS.painel.NENHUM_ALERTA"
+      />
     </div>
   </LayoutPadrao>
 </template>

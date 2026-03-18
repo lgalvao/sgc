@@ -69,3 +69,10 @@ button:disabled,
     color: rgba(0, 0, 0, 0.3) !important;
     background-color: transparent !important;
 }
+
+/* Aproximar as setas de ordenação do texto nos cabeçalhos de tabela (BootstrapVueNext) */
+.table thead th.b-table-sortable > div {
+    display: inline-flex !important;
+    align-items: center;
+    gap: 0.5rem;
+}

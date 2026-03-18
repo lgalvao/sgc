@@ -2,7 +2,6 @@
   <LayoutPadrao>
     <PageHeader :title="TEXTOS.mapa.TITULO_TECNICO">
       <template #actions>
-        <!-- Ações de Informação/Secundárias -->
         <BButton
             v-if="podeValidar"
             data-testid="btn-mapa-sugestoes"
@@ -30,7 +29,6 @@
           {{ TEXTOS.mapa.BOTAO_HISTORICO_ANALISE }}
         </BButton>
 
-        <!-- Ações Negativas/Retorno -->
         <BButton
             v-if="podeAnalisar"
             data-testid="btn-mapa-devolver"
@@ -41,7 +39,6 @@
           {{ TEXTOS.mapa.BOTAO_DEVOLVER }}
         </BButton>
 
-        <!-- Ações Positivas/Avanço -->
         <BButton
             v-if="podeValidar"
             data-testid="btn-mapa-validar"
@@ -66,11 +63,8 @@
 
     <div v-if="unidade">
       <div class="mb-5 d-flex align-items-center">
-        <div
-            class="fs-5"
-            data-testid="txt-header-unidade"
-        >
-          {{ unidade.sigla }} - {{ unidade.nome }}
+        <div class="fs-5" data-testid="txt-header-unidade">
+          {{ unidade.sigla }}
         </div>
       </div>
 
@@ -152,9 +146,9 @@
             id="sugestoesTextarea"
             ref="sugestoesTextareaRef"
             v-model="sugestoes"
+            aria-required="true"
             data-testid="inp-sugestoes-mapa-texto"
             rows="5"
-            required
         />
       </BFormGroup>
     </ModalConfirmacao>
@@ -233,7 +227,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BButton, BCard, BFormGroup, BFormTextarea, BBadge} from "bootstrap-vue-next";
+import {BBadge, BButton, BCard, BFormGroup, BFormTextarea} from "bootstrap-vue-next";
 import {computed, onMounted, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';

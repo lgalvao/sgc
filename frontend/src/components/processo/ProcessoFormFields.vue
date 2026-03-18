@@ -7,11 +7,11 @@
       <BFormInput
           id="descricao"
           ref="inputDescricaoRef"
+          aria-required="true"
           :model-value="modelValue.descricao"
           :state="fieldErrors.descricao ? false : null"
           data-testid="inp-processo-descricao"
           placeholder="Descreva o processo"
-          required
           type="text"
           @update:model-value="(val) => updateField('descricao', String(val))"
       />
@@ -27,12 +27,12 @@
       <BFormSelect
           id="tipo"
           ref="selectTipoRef"
+          aria-required="true"
           :disabled="isEdit"
           :model-value="modelValue.tipo"
           :options="tipoOptions"
           :state="isEdit ? null : (fieldErrors.tipo ? false : null)"
           data-testid="sel-processo-tipo"
-          required
           @update:model-value="updateField('tipo', $event as any)"
       >
         <template #first>
@@ -92,7 +92,7 @@
           data-testid="inp-processo-data-limite"
           max="2099-12-31"
           min="2000-01-01"
-          required
+          :required="true"
           @update:model-value="(val) => updateField('dataLimite', String(val))"
       />
 

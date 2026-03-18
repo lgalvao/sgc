@@ -53,7 +53,7 @@
         :model-value="true"
         class="mt-3"
         data-testid="alert-disponibilizar-mapa"
-        variant="info"
+        variant="secondary"
     >
       {{ notificacao }}
     </BAlert>
