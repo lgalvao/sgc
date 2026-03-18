@@ -41,60 +41,51 @@
             label-for="usuario"
             class="mb-3"
         >
-          <BFormInput
-              id="usuario"
-              v-model="termoUsuario"
-              aria-required="true"
-              autocomplete="off"
-              :state="mensagemErroUsuario ? false : null"
-              data-testid="input-busca-usuario"
-              :placeholder="TEXTOS.atribuicaoTemporaria.SELECIONE_USUARIO"
-              type="text"
-              @focus="mostrarResultadosUsuarios = termoPesquisaMinimaAtingida"
-              @update:model-value="aoAlterarTermoUsuario"
-          />
-          <div
-              v-if="mostrarResultadosUsuarios && termoPesquisaMinimaAtingida"
-              class="border rounded mt-2 overflow-auto usuario-resultados"
-              data-testid="lista-usuarios-pesquisa"
-          >
-            <div v-if="pesquisandoUsuarios" class="p-3 text-muted small">
-              <BSpinner aria-hidden="true" class="me-2" small />
-              Buscando usuários...
-            </div>
-            <template v-else-if="usuariosEncontrados.length > 0">
-              <BListGroup flush>
+          <template #description>
+            {{ TEXTOS.atribuicaoTemporaria.AJUDA_PESQUISA_USUARIO }}
+          </template>
+          <div class="campo-usuario">
+            <BFormInput
+                id="usuario"
+                v-model="termoUsuario"
+                aria-required="true"
+                autocomplete="off"
+                :state="mensagemErroUsuario ? false : null"
+                data-testid="input-busca-usuario"
+                :placeholder="TEXTOS.atribuicaoTemporaria.SELECIONE_USUARIO"
+                type="text"
+                @blur="agendarOcultacaoResultadosUsuarios"
+                @focus="mostrarResultadosUsuarios = termoPesquisaMinimaAtingida"
+                @keydown="aoPressionarTeclaUsuario"
+                @update:model-value="aoAlterarTermoUsuario"
+            />
+            <div
+                v-if="mostrarResultadosUsuarios && termoPesquisaMinimaAtingida"
+                class="usuario-dropdown overflow-auto"
+                data-testid="lista-usuarios-pesquisa"
+            >
+              <div v-if="pesquisandoUsuarios" class="p-2 text-muted small">
+                <BSpinner aria-hidden="true" class="me-2" small />
+                {{ TEXTOS.atribuicaoTemporaria.BUSCANDO_USUARIOS }}
+              </div>
+              <BListGroup v-else-if="usuariosEncontrados.length > 0" flush>
                 <BListGroupItem
-                    v-for="usuario in usuariosEncontrados"
+                    v-for="(usuario, indice) in usuariosEncontrados"
                     :key="usuario.codigo"
                     action
                     button
-                    class="py-2"
+                    :active="indiceUsuarioDestacado === indice"
                     :data-testid="`opcao-usuario-${usuario.codigo}`"
-                    @click="selecionarUsuario(usuario)"
+                    :id="`opcao-usuario-${usuario.codigo}`"
+                    @mousedown.prevent="selecionarUsuario(usuario)"
                 >
-                  <div class="fw-medium">{{ usuario.nome }}</div>
-                  <small class="text-muted">{{ usuario.tituloEleitoral }}</small>
+                  {{ usuario.nome }}
                 </BListGroupItem>
               </BListGroup>
-            </template>
-            <div v-else class="p-3 text-muted small">
-              Nenhum usuário encontrado.
+              <div v-else class="p-2 text-muted small">
+                {{ TEXTOS.atribuicaoTemporaria.NENHUM_USUARIO_ENCONTRADO }}
+              </div>
             </div>
-          </div>
-          <div
-              v-else-if="!termoPesquisaMinimaAtingida"
-              class="small text-muted mt-2"
-              data-testid="txt-ajuda-busca-usuario"
-          >
-            Digite pelo menos 2 caracteres para pesquisar por nome.
-          </div>
-          <div
-              v-if="usuarioSelecionadoNome"
-              class="small text-muted mt-2"
-              data-testid="txt-usuario-selecionado"
-          >
-            Selecionado: {{ usuarioSelecionadoNome }}
           </div>
           <BFormInvalidFeedback :state="mensagemErroUsuario ? false : null">
             {{ mensagemErroUsuario }}
@@ -169,7 +160,7 @@ import {
   BFormTextarea,
   BRow
 } from "bootstrap-vue-next";
-import {computed, onBeforeUnmount, onMounted, ref} from "vue";
+import {computed, nextTick, onBeforeUnmount, onMounted, ref, watch} from "vue";
 import {useRouter} from "vue-router";
 import {logger} from "@/utils";
 import type {Unidade, Usuario} from "@/types/tipos";
@@ -189,23 +180,27 @@ const props = defineProps<{ codUnidade: number }>();
 const router = useRouter();
 const {notificacao, notify, clear} = useNotification();
 const codUnidade = computed(() => props.codUnidade);
-
 const unidade = ref<Unidade | null>(null);
 const usuarioSelecionado = ref<string | null>(null);
-const usuarioSelecionadoNome = ref("");
 const termoUsuario = ref("");
 const usuariosEncontrados = ref<Usuario[]>([]);
 const pesquisandoUsuarios = ref(false);
 const mostrarResultadosUsuarios = ref(false);
+const indiceUsuarioDestacado = ref(-1);
 const dataInicio = ref("");
 const dataTermino = ref("");
 const justificativa = ref("");
 const isLoading = ref(false);
 let timeoutPesquisaUsuarios: ReturnType<typeof setTimeout> | null = null;
+let timeoutOcultarResultadosUsuarios: ReturnType<typeof setTimeout> | null = null;
 
 const erroUsuario = ref("");
 const validacaoSubmetida = ref(false);
 const termoPesquisaMinimaAtingida = computed(() => termoUsuario.value.trim().length >= 2);
+
+watch(usuariosEncontrados, (usuarios) => {
+  indiceUsuarioDestacado.value = usuarios.length > 0 ? 0 : -1;
+});
 
 const mensagemErroUsuario = computed(() => {
   if (erroUsuario.value) return erroUsuario.value;
@@ -241,16 +236,16 @@ onBeforeUnmount(() => {
   if (timeoutPesquisaUsuarios) {
     clearTimeout(timeoutPesquisaUsuarios);
   }
+  if (timeoutOcultarResultadosUsuarios) {
+    clearTimeout(timeoutOcultarResultadosUsuarios);
+  }
 });
 
-function aoAlterarTermoUsuario(valor: string | number) {
-  termoUsuario.value = String(valor);
+function aoAlterarTermoUsuario(valor: string | number | null) {
+  termoUsuario.value = valor == null ? "" : String(valor);
   mostrarResultadosUsuarios.value = termoPesquisaMinimaAtingida.value;
-
-  if (usuarioSelecionadoNome.value && termoUsuario.value !== usuarioSelecionadoNome.value) {
-    usuarioSelecionado.value = null;
-    usuarioSelecionadoNome.value = "";
-  }
+  indiceUsuarioDestacado.value = -1;
+  atualizarUsuarioSelecionadoPorNome(termoUsuario.value);
 
   if (timeoutPesquisaUsuarios) {
     clearTimeout(timeoutPesquisaUsuarios);
@@ -259,6 +254,7 @@ function aoAlterarTermoUsuario(valor: string | number) {
   if (!termoPesquisaMinimaAtingida.value) {
     usuariosEncontrados.value = [];
     pesquisandoUsuarios.value = false;
+    indiceUsuarioDestacado.value = -1;
     return;
   }
 
@@ -266,6 +262,7 @@ function aoAlterarTermoUsuario(valor: string | number) {
     pesquisandoUsuarios.value = true;
     try {
       usuariosEncontrados.value = await pesquisarUsuarios(termoUsuario.value.trim());
+      atualizarUsuarioSelecionadoPorNome(termoUsuario.value);
     } catch (error) {
       usuariosEncontrados.value = [];
       logger.error("Erro ao pesquisar usuários:", error);
@@ -276,12 +273,75 @@ function aoAlterarTermoUsuario(valor: string | number) {
   }, 300);
 }
 
+function atualizarUsuarioSelecionadoPorNome(nome: string) {
+  const usuario = usuariosEncontrados.value.find((item) => item.nome === nome.trim());
+  usuarioSelecionado.value = usuario?.tituloEleitoral ?? null;
+}
+
 function selecionarUsuario(usuario: Usuario) {
   usuarioSelecionado.value = usuario.tituloEleitoral;
-  usuarioSelecionadoNome.value = usuario.nome;
   termoUsuario.value = usuario.nome;
-  usuariosEncontrados.value = [];
   mostrarResultadosUsuarios.value = false;
+  indiceUsuarioDestacado.value = -1;
+}
+
+function agendarOcultacaoResultadosUsuarios() {
+  if (timeoutOcultarResultadosUsuarios) {
+    clearTimeout(timeoutOcultarResultadosUsuarios);
+  }
+  timeoutOcultarResultadosUsuarios = setTimeout(() => {
+    mostrarResultadosUsuarios.value = false;
+    indiceUsuarioDestacado.value = -1;
+  }, 150);
+}
+
+async function destacarUsuario(indice: number) {
+  indiceUsuarioDestacado.value = indice;
+  await nextTick();
+
+  const usuario = usuariosEncontrados.value[indice];
+  if (!usuario) return;
+
+  const elemento = document.getElementById(`opcao-usuario-${usuario.codigo}`);
+  elemento?.scrollIntoView({block: "nearest"});
+}
+
+async function aoPressionarTeclaUsuario(evento: KeyboardEvent) {
+  if (!mostrarResultadosUsuarios.value || usuariosEncontrados.value.length === 0) {
+    if (evento.key === "ArrowDown" && termoPesquisaMinimaAtingida.value) {
+      mostrarResultadosUsuarios.value = true;
+    }
+    return;
+  }
+
+  if (evento.key === "ArrowDown") {
+    evento.preventDefault();
+    const proximoIndice = indiceUsuarioDestacado.value < usuariosEncontrados.value.length - 1
+        ? indiceUsuarioDestacado.value + 1
+        : 0;
+    await destacarUsuario(proximoIndice);
+    return;
+  }
+
+  if (evento.key === "ArrowUp") {
+    evento.preventDefault();
+    const proximoIndice = indiceUsuarioDestacado.value > 0
+        ? indiceUsuarioDestacado.value - 1
+        : usuariosEncontrados.value.length - 1;
+    await destacarUsuario(proximoIndice);
+    return;
+  }
+
+  if (evento.key === "Enter" && indiceUsuarioDestacado.value >= 0) {
+    evento.preventDefault();
+    selecionarUsuario(usuariosEncontrados.value[indiceUsuarioDestacado.value]!);
+    return;
+  }
+
+  if (evento.key === "Escape") {
+    mostrarResultadosUsuarios.value = false;
+    indiceUsuarioDestacado.value = -1;
+  }
 }
 
 async function criarAtribuicao() {
@@ -308,10 +368,10 @@ async function criarAtribuicao() {
     notify(TEXTOS.atribuicaoTemporaria.SUCESSO, 'success');
 
     usuarioSelecionado.value = null;
-    usuarioSelecionadoNome.value = "";
     termoUsuario.value = "";
     usuariosEncontrados.value = [];
     mostrarResultadosUsuarios.value = false;
+    indiceUsuarioDestacado.value = -1;
     dataInicio.value = "";
     dataTermino.value = "";
     justificativa.value = "";
@@ -328,7 +388,6 @@ defineExpose({
   router,
   codUnidade,
   unidade,
-  usuarioSelecionadoNome,
   termoUsuario,
   usuariosEncontrados,
   usuarioSelecionado,
@@ -337,7 +396,10 @@ defineExpose({
   justificativa,
   isLoading,
   erroUsuario,
+  atualizarUsuarioSelecionadoPorNome,
   selecionarUsuario,
+  agendarOcultacaoResultadosUsuarios,
+  aoPressionarTeclaUsuario,
   aoAlterarTermoUsuario,
   criarAtribuicao
 });
@@ -345,11 +407,33 @@ defineExpose({
 
 <style scoped>
 .btn-acao-cabecalho {
-  min-width: 8.5rem;
+  min-width: 7rem;
   justify-content: center;
 }
 
 .usuario-resultados {
   max-height: 16rem;
+}
+
+.campo-usuario {
+  position: relative;
+}
+
+.usuario-dropdown {
+  position: absolute;
+  top: calc(100% + 0.25rem);
+  left: 0;
+  right: 0;
+  z-index: 20;
+  background: var(--bs-body-bg);
+  border: 1px solid var(--bs-border-color);
+  border-radius: var(--bs-border-radius);
+  box-shadow: var(--bs-box-shadow-sm);
+}
+
+.usuario-dropdown :deep(.list-group-item.active) {
+  color: var(--bs-secondary-text-emphasis);
+  background-color: var(--bs-secondary-bg-subtle);
+  border-color: var(--bs-secondary-border-subtle);
 }
 </style>
