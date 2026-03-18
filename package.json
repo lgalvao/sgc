@@ -28,7 +28,7 @@
     "oxlint": "^1.56.0",
     "smtp-server": "^3.18.1",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.57.0"
+    "typescript-eslint": "^8.57.1"
   },
   "dependencies": {
     "xml2js": "^0.6.2"
