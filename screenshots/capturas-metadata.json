@@ -7,7 +7,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:31:23.142Z",
+    "timestamp": "2026-03-18T12:36:35.161Z",
     "tags": [
       "login",
       "inicial",
@@ -15,7 +15,7 @@
     ],
     "categoria": "01-seguranca",
     "nome": "01-login-inicial",
-    "titulo": "SGC",
+    "titulo": "Login - SGC",
     "isFullPage": true,
     "isComponente": false
   },
@@ -27,7 +27,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:31:23.373Z",
+    "timestamp": "2026-03-18T12:36:35.387Z",
     "tags": [
       "login",
       "interacao",
@@ -47,7 +47,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:31:23.573Z",
+    "timestamp": "2026-03-18T12:36:35.585Z",
     "tags": [
       "login",
       "preenchimento",
@@ -67,7 +67,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:31:24.188Z",
+    "timestamp": "2026-03-18T12:36:35.935Z",
     "tags": [
       "login",
       "erro",
@@ -89,7 +89,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:31:24.538Z",
+    "timestamp": "2026-03-18T12:36:36.306Z",
     "tags": [
       "login",
       "multi-perfil",
@@ -110,7 +110,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:31:25.244Z",
+    "timestamp": "2026-03-18T12:36:36.906Z",
     "tags": [
       "login",
       "sucesso",
@@ -132,7 +132,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:31:26.292Z",
+    "timestamp": "2026-03-18T12:36:38.298Z",
     "tags": [
       "form",
       "vazio",
@@ -153,7 +153,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:31:26.733Z",
+    "timestamp": "2026-03-18T12:36:39.087Z",
     "tags": [
       "02-painel"
     ],
@@ -173,7 +173,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:31:27.134Z",
+    "timestamp": "2026-03-18T12:36:39.893Z",
     "tags": [
       "selecao",
       "unidades",
@@ -193,7 +193,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:31:27.668Z",
+    "timestamp": "2026-03-18T12:36:40.501Z",
     "tags": [
       "02-painel",
       "componente"
@@ -213,7 +213,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:31:28.145Z",
+    "timestamp": "2026-03-18T12:36:41.168Z",
     "tags": [
       "02-painel"
     ],
@@ -232,7 +232,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:31:28.425Z",
+    "timestamp": "2026-03-18T12:36:41.449Z",
     "tags": [
       "interacao",
       "hover",
@@ -252,7 +252,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:31:30.871Z",
+    "timestamp": "2026-03-18T12:36:44.880Z",
     "tags": [
       "02-painel"
     ],
@@ -272,7 +272,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:31:31.772Z",
+    "timestamp": "2026-03-18T12:36:46.237Z",
     "tags": [
       "02-painel"
     ],
@@ -292,7 +292,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:31:33.090Z",
+    "timestamp": "2026-03-18T12:36:47.833Z",
     "tags": [
       "03-processo"
     ],
@@ -312,7 +312,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:31:33.428Z",
+    "timestamp": "2026-03-18T12:36:48.205Z",
     "tags": [
       "modal",
       "confirmacao",
@@ -333,7 +333,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:31:34.009Z",
+    "timestamp": "2026-03-18T12:36:49.003Z",
     "tags": [
       "03-processo"
     ],
@@ -353,7 +353,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:31:35.843Z",
+    "timestamp": "2026-03-18T12:36:51.226Z",
     "tags": [
       "03-processo"
     ],
@@ -374,7 +374,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:31:37.427Z",
+    "timestamp": "2026-03-18T12:36:53.097Z",
     "tags": [
       "03-processo"
     ],
@@ -395,7 +395,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:31:37.760Z",
+    "timestamp": "2026-03-18T12:36:53.405Z",
     "tags": [
       "modal",
       "aceite",
@@ -415,7 +415,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:31:38.825Z",
+    "timestamp": "2026-03-18T12:36:56.251Z",
     "tags": [
       "modal",
       "homologacao",
@@ -436,7 +436,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:31:39.938Z",
+    "timestamp": "2026-03-18T12:36:58.098Z",
     "tags": [
       "03-processo"
     ],
@@ -456,7 +456,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:31:41.951Z",
+    "timestamp": "2026-03-18T12:37:00.428Z",
     "tags": [
       "modal",
       "validacao-mapa",
@@ -477,7 +477,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:31:43.213Z",
+    "timestamp": "2026-03-18T12:37:02.020Z",
     "tags": [
       "03-processo"
     ],
@@ -497,7 +497,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:31:43.566Z",
+    "timestamp": "2026-03-18T12:37:02.285Z",
     "tags": [
       "modal",
       "finalizar",
@@ -517,7 +517,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:31:43.830Z",
+    "timestamp": "2026-03-18T12:37:02.736Z",
     "tags": [
       "03-processo"
     ],
@@ -535,7 +535,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:31:44.690Z",
+    "timestamp": "2026-03-18T12:37:03.805Z",
     "tags": [
       "validacao",
       "form",
@@ -556,7 +556,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:31:44.889Z",
+    "timestamp": "2026-03-18T12:37:04.001Z",
     "tags": [
       "03-processo"
     ],
@@ -575,7 +575,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:31:45.111Z",
+    "timestamp": "2026-03-18T12:37:04.237Z",
     "tags": [
       "03-processo"
     ],
@@ -598,7 +598,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:31:45.412Z",
+    "timestamp": "2026-03-18T12:37:04.596Z",
     "tags": [
       "validacao",
       "sucesso",
@@ -618,7 +618,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:31:46.579Z",
+    "timestamp": "2026-03-18T12:37:05.541Z",
     "tags": [
       "04-subprocesso"
     ],
@@ -638,7 +638,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:31:46.856Z",
+    "timestamp": "2026-03-18T12:37:05.842Z",
     "tags": [
       "atividades",
       "vazio",
@@ -658,7 +658,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:31:47.056Z",
+    "timestamp": "2026-03-18T12:37:06.058Z",
     "tags": [
       "interacao",
       "04-subprocesso"
@@ -677,7 +677,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:31:47.370Z",
+    "timestamp": "2026-03-18T12:37:06.402Z",
     "tags": [
       "04-subprocesso"
     ],
@@ -686,7 +686,7 @@
     "titulo": "Cadastro - SGC",
     "isFullPage": true,
     "isComponente": false,
-    "atividade": "Atividade teste 1773765106858"
+    "atividade": "Atividade teste 1773837425847"
   },
   {
     "file": "04-subprocesso--05-cadastro-conhecimento-preenchendo.png",
@@ -696,7 +696,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:31:47.556Z",
+    "timestamp": "2026-03-18T12:37:06.605Z",
     "tags": [
       "conhecimento",
       "edicao",
@@ -716,7 +716,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:31:47.954Z",
+    "timestamp": "2026-03-18T12:37:07.034Z",
     "tags": [
       "04-subprocesso"
     ],
@@ -739,7 +739,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:31:48.471Z",
+    "timestamp": "2026-03-18T12:37:07.592Z",
     "tags": [
       "interacao",
       "hover",
@@ -759,7 +759,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:31:48.812Z",
+    "timestamp": "2026-03-18T12:37:07.926Z",
     "tags": [
       "modal",
       "disponibilizar",
@@ -779,7 +779,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:31:49.173Z",
+    "timestamp": "2026-03-18T12:37:08.421Z",
     "tags": [
       "04-subprocesso"
     ],
@@ -798,7 +798,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:31:51.674Z",
+    "timestamp": "2026-03-18T12:37:12.477Z",
     "tags": [
       "ui-clue",
       "obrigatorio",
@@ -818,7 +818,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:31:52.321Z",
+    "timestamp": "2026-03-18T12:37:13.172Z",
     "tags": [
       "04-subprocesso"
     ],
@@ -837,7 +837,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:31:53.494Z",
+    "timestamp": "2026-03-18T12:37:14.428Z",
     "tags": [
       "validacao",
       "visual",
@@ -857,7 +857,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:31:53.681Z",
+    "timestamp": "2026-03-18T12:37:14.652Z",
     "tags": [
       "validacao",
       "bloqueio",
@@ -877,7 +877,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:31:54.226Z",
+    "timestamp": "2026-03-18T12:37:15.192Z",
     "tags": [
       "scroll",
       "validacao",
@@ -897,7 +897,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:31:54.661Z",
+    "timestamp": "2026-03-18T12:37:15.609Z",
     "tags": [
       "04-subprocesso",
       "detalhe",
@@ -918,7 +918,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:31:55.426Z",
+    "timestamp": "2026-03-18T12:37:16.394Z",
     "tags": [
       "04-subprocesso"
     ],
@@ -927,7 +927,7 @@
     "titulo": "Cadastro - SGC",
     "isFullPage": true,
     "isComponente": false,
-    "atividadeCorrigida": "Atividade sem conhecimento 1 1773765111676"
+    "atividadeCorrigida": "Atividade sem conhecimento 1 1773837432479"
   },
   {
     "file": "04-subprocesso--27-botao-ainda-desabilitado-com-atividade-restante.png",
@@ -937,7 +937,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:31:55.626Z",
+    "timestamp": "2026-03-18T12:37:16.590Z",
     "tags": [
       "04-subprocesso"
     ],
@@ -946,7 +946,7 @@
     "titulo": "Cadastro - SGC",
     "isFullPage": true,
     "isComponente": false,
-    "pendente": "Atividade sem conhecimento 2 1773765112323"
+    "pendente": "Atividade sem conhecimento 2 1773837433176"
   },
   {
     "file": "04-subprocesso--28-modal-confirmacao-disponibilizacao.png",
@@ -956,7 +956,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:31:56.958Z",
+    "timestamp": "2026-03-18T12:37:17.913Z",
     "tags": [
       "modal",
       "sucesso",
@@ -976,7 +976,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:32:00.956Z",
+    "timestamp": "2026-03-18T12:37:22.425Z",
     "tags": [
       "05-mapa"
     ],
@@ -996,7 +996,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:32:02.510Z",
+    "timestamp": "2026-03-18T12:37:24.882Z",
     "tags": [
       "05-mapa"
     ],
@@ -1016,7 +1016,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:32:04.489Z",
+    "timestamp": "2026-03-18T12:37:27.687Z",
     "tags": [
       "mapa",
       "vazio",
@@ -1037,7 +1037,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:32:04.827Z",
+    "timestamp": "2026-03-18T12:37:27.998Z",
     "tags": [
       "modal",
       "criacao-competencia",
@@ -1057,7 +1057,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:32:05.025Z",
+    "timestamp": "2026-03-18T12:37:28.242Z",
     "tags": [
       "05-mapa"
     ],
@@ -1076,7 +1076,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:32:05.274Z",
+    "timestamp": "2026-03-18T12:37:28.529Z",
     "tags": [
       "selecao",
       "atividades",
@@ -1096,7 +1096,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:32:05.855Z",
+    "timestamp": "2026-03-18T12:37:29.138Z",
     "tags": [
       "05-mapa"
     ],
@@ -1115,7 +1115,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:32:06.187Z",
+    "timestamp": "2026-03-18T12:37:29.488Z",
     "tags": [
       "interacao",
       "hover",
@@ -1135,7 +1135,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:32:06.510Z",
+    "timestamp": "2026-03-18T12:37:29.748Z",
     "tags": [
       "modal",
       "disponibilizar-mapa",
@@ -1155,7 +1155,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:32:06.891Z",
+    "timestamp": "2026-03-18T12:37:30.209Z",
     "tags": [
       "05-mapa"
     ],
@@ -1174,7 +1174,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:32:07.657Z",
+    "timestamp": "2026-03-18T12:37:31.136Z",
     "tags": [
       "layout",
       "menu",
@@ -1194,7 +1194,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:32:07.971Z",
+    "timestamp": "2026-03-18T12:37:31.467Z",
     "tags": [
       "06-navegacao"
     ],
@@ -1213,7 +1213,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:32:08.401Z",
+    "timestamp": "2026-03-18T12:37:31.947Z",
     "tags": [
       "06-navegacao"
     ],
@@ -1231,7 +1231,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:32:08.736Z",
+    "timestamp": "2026-03-18T12:37:32.282Z",
     "tags": [
       "06-navegacao"
     ],
@@ -1249,7 +1249,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:32:09.053Z",
+    "timestamp": "2026-03-18T12:37:32.618Z",
     "tags": [
       "06-navegacao"
     ],
@@ -1267,7 +1267,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:32:09.143Z",
+    "timestamp": "2026-03-18T12:37:32.715Z",
     "tags": [
       "06-navegacao",
       "componente"
@@ -1287,7 +1287,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:32:09.452Z",
+    "timestamp": "2026-03-18T12:37:33.021Z",
     "tags": [
       "layout",
       "footer",
@@ -1307,7 +1307,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:32:10.791Z",
+    "timestamp": "2026-03-18T12:37:34.650Z",
     "tags": [
       "07-estados"
     ],
@@ -1326,7 +1326,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:32:12.003Z",
+    "timestamp": "2026-03-18T12:37:35.819Z",
     "tags": [
       "07-estados"
     ],
@@ -1345,7 +1345,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:32:12.120Z",
+    "timestamp": "2026-03-18T12:37:35.926Z",
     "tags": [
       "07-estados",
       "componente"
@@ -1365,7 +1365,7 @@
       "width": 1920,
       "height": 1080
     },
-    "timestamp": "2026-03-17T16:32:13.052Z",
+    "timestamp": "2026-03-18T12:37:36.883Z",
     "tags": [
       "res-high",
       "08-responsividade"
@@ -1384,7 +1384,7 @@
       "width": 1366,
       "height": 768
     },
-    "timestamp": "2026-03-17T16:32:13.265Z",
+    "timestamp": "2026-03-18T12:37:37.087Z",
     "tags": [
       "res-medium",
       "08-responsividade"
@@ -1403,7 +1403,7 @@
       "width": 768,
       "height": 1024
     },
-    "timestamp": "2026-03-17T16:32:13.435Z",
+    "timestamp": "2026-03-18T12:37:37.277Z",
     "tags": [
       "res-tablet",
       "08-responsividade"
@@ -1422,7 +1422,7 @@
       "width": 375,
       "height": 667
     },
-    "timestamp": "2026-03-17T16:32:13.612Z",
+    "timestamp": "2026-03-18T12:37:37.452Z",
     "tags": [
       "res-mobile",
       "08-responsividade"
@@ -1441,7 +1441,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:32:17.720Z",
+    "timestamp": "2026-03-18T12:37:43.471Z",
     "tags": [
       "09-operacoes-bloco"
     ],
@@ -1461,7 +1461,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:32:18.255Z",
+    "timestamp": "2026-03-18T12:37:44.024Z",
     "tags": [
       "modal",
       "bloco",
@@ -1481,7 +1481,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:32:21.839Z",
+    "timestamp": "2026-03-18T12:37:47.038Z",
     "tags": [
       "09-operacoes-bloco"
     ],
@@ -1500,7 +1500,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:32:23.924Z",
+    "timestamp": "2026-03-18T12:37:48.937Z",
     "tags": [
       "10-gestao-subprocessos"
     ],
@@ -1519,7 +1519,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:32:24.461Z",
+    "timestamp": "2026-03-18T12:37:49.479Z",
     "tags": [
       "modal",
       "gestao",
@@ -1539,7 +1539,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:32:24.698Z",
+    "timestamp": "2026-03-18T12:37:49.747Z",
     "tags": [
       "acao-direta",
       "10-gestao-subprocessos"
@@ -1558,7 +1558,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:32:25.985Z",
+    "timestamp": "2026-03-18T12:37:51.228Z",
     "tags": [
       "11-unidades"
     ],
@@ -1576,7 +1576,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:32:26.892Z",
+    "timestamp": "2026-03-18T12:37:52.083Z",
     "tags": [
       "11-unidades"
     ],
@@ -1594,7 +1594,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:32:27.661Z",
+    "timestamp": "2026-03-18T12:37:52.832Z",
     "tags": [
       "11-unidades"
     ],
@@ -1613,7 +1613,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:32:28.195Z",
+    "timestamp": "2026-03-18T12:37:53.380Z",
     "tags": [
       "modal",
       "atribuicao",
@@ -1633,7 +1633,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:32:28.986Z",
+    "timestamp": "2026-03-18T12:37:54.273Z",
     "tags": [
       "12-historico"
     ],
@@ -1651,7 +1651,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:32:29.186Z",
+    "timestamp": "2026-03-18T12:37:54.540Z",
     "tags": [
       "12-historico"
     ],
@@ -1669,7 +1669,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:32:29.278Z",
+    "timestamp": "2026-03-18T12:37:55.176Z",
     "tags": [
       "12-historico",
       "componente"
@@ -1689,7 +1689,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:32:30.006Z",
+    "timestamp": "2026-03-18T12:37:55.963Z",
     "tags": [
       "13-configuracoes"
     ],
@@ -1707,7 +1707,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:32:30.187Z",
+    "timestamp": "2026-03-18T12:37:56.202Z",
     "tags": [
       "config",
       "13-configuracoes"
@@ -1726,7 +1726,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:32:30.917Z",
+    "timestamp": "2026-03-18T12:37:56.976Z",
     "tags": [
       "13-configuracoes"
     ],
@@ -1744,7 +1744,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:32:31.440Z",
+    "timestamp": "2026-03-18T12:37:57.546Z",
     "tags": [
       "modal",
       "admin",
@@ -1764,7 +1764,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:32:32.402Z",
+    "timestamp": "2026-03-18T12:37:58.584Z",
     "tags": [
       "14-relatorios"
     ],
@@ -1782,7 +1782,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:32:32.584Z",
+    "timestamp": "2026-03-18T12:37:58.761Z",
     "tags": [
       "14-relatorios"
     ],
@@ -1801,7 +1801,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:32:32.786Z",
+    "timestamp": "2026-03-18T12:37:58.953Z",
     "tags": [
       "ui-element",
       "14-relatorios"
@@ -1820,7 +1820,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:32:33.319Z",
+    "timestamp": "2026-03-18T12:37:59.499Z",
     "tags": [
       "14-relatorios"
     ],
@@ -1839,7 +1839,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-17T16:32:33.518Z",
+    "timestamp": "2026-03-18T12:37:59.682Z",
     "tags": [
       "ui-element",
       "pdf",

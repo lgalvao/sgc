@@ -426,6 +426,8 @@ async function salvarEdicaoConhecimento(atividadeCodigo: number, conhecimentoCod
 
 async function handleImportAtividades(aviso?: string) {
   mostrarModalImportar.value = false;
+  clear();
+  await nextTick();
   if (aviso) {
     notify(TEXTOS.atividades.AVISO_IMPORTACAO_DUPLICATAS, 'warning');
   } else {
