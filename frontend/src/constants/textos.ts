@@ -246,7 +246,7 @@ export const TEXTOS = {
     ERRO_SALVAR_ATIVIDADE: "Falha ao salvar edição da atividade.",
     ERRO_ADICIONAR_CONHECIMENTO: "Falha ao adicionar conhecimento.",
     ERRO_ATUALIZAR_CONHECIMENTO: "Falha ao atualizar conhecimento.",
-    SUCESSO_IMPORTACAO: "As atividades foram importadas para o seu mapa.",
+    SUCESSO_IMPORTACAO: "Atividades importadas",
     AVISO_IMPORTACAO_DUPLICATAS: "Uma ou mais atividades selecionadas já existem no cadastro e não foram importadas.",
     MODAL_DISPONIBILIZAR_TITULO: "Disponibilização do cadastro",
     MODAL_DISPONIBILIZAR_REVISAO_TITULO: "Disponibilização da revisão do cadastro",
