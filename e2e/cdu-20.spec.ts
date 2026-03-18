@@ -6,7 +6,7 @@ import {
 } from './fixtures/fixtures-processos.js';
 import {navegarParaMapa} from './helpers/helpers-mapas.js';
 import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
-import {acessarSubprocessoChefeDireto, acessarSubprocessoGestor} from './helpers/helpers-analise.js';
+import {acessarSubprocessoAdmin, acessarSubprocessoChefeDireto, acessarSubprocessoGestor} from './helpers/helpers-analise.js';
 import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
 import {resetDatabase} from './hooks/hooks-limpeza.js';
@@ -155,5 +155,79 @@ test.describe.serial('CDU-20 - Aceite de mapa com sugestões', () => {
 
         await verificarPaginaPainel(page);
         await expect(page.getByText(TEXTOS.sucesso.ACEITE_REGISTRADO).first()).toBeVisible();
+    });
+});
+
+test.describe.serial('CDU-20 - ADMIN não deve ver botões de edição com mapa com sugestões (Bug #1376)', () => {
+    const UNIDADE_ALVO = 'ASSESSORIA_11';
+
+    const timestamp = Date.now();
+    const descProcesso = `Processo CDU-20 Bug1376 EditarMapa ${timestamp}`;
+
+    test('Setup data', async ({_resetAutomatico, request}) => {
+        await resetDatabase(request);
+        await criarProcessoMapaComSugestoesFixture(request, {
+            unidade: UNIDADE_ALVO,
+            descricao: descProcesso
+        });
+        expect(true).toBeTruthy();
+    });
+
+    test('ADMIN não vê card de edição de mapa quando situação é Mapa com sugestões', async ({_resetAutomatico, page}) => {
+        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
+        await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
+
+        await expect(page.getByTestId('card-subprocesso-mapa-edicao')).toBeHidden();
+        await expect(page.getByTestId('card-subprocesso-mapa-visualizacao')).toBeVisible();
+    });
+});
+
+test.describe.serial('CDU-20 - ADMIN homologa mapa após GESTOR aceitar com sugestões (Bug #1376)', () => {
+    const UNIDADE_ALVO = 'ASSESSORIA_11';
+    const TEXTO_SUGESTAO = 'Sugestão para ajuste no mapa - Bug 1376';
+
+    const timestamp = Date.now();
+    const descProcesso = `Processo CDU-20 Bug1376 Homologar ${timestamp}`;
+
+    test('Setup data', async ({_resetAutomatico, request}) => {
+        await resetDatabase(request);
+        await criarProcessoMapaDisponibilizadoFixture(request, {
+            unidade: UNIDADE_ALVO,
+            descricao: descProcesso
+        });
+        expect(true).toBeTruthy();
+    });
+
+    test('CHEFE apresenta sugestões e GESTOR registra aceite', async ({_resetAutomatico, page}) => {
+        await login(page, USUARIOS.CHEFE_ASSESSORIA_11.titulo, USUARIOS.CHEFE_ASSESSORIA_11.senha);
+        await acessarSubprocessoChefeDireto(page, descProcesso, UNIDADE_ALVO);
+        await navegarParaMapa(page);
+
+        await page.getByTestId('btn-mapa-sugestoes').click();
+        await expect(page.getByRole('dialog')).toBeVisible();
+        await page.getByTestId('inp-sugestoes-mapa-texto').fill(TEXTO_SUGESTAO);
+        await page.getByTestId('btn-sugestoes-mapa-confirmar').click();
+        await verificarPaginaPainel(page);
+
+        await loginComPerfil(page, USUARIOS.GESTOR_SECRETARIA_1.titulo, USUARIOS.GESTOR_SECRETARIA_1.senha, 'GESTOR - SECRETARIA_1');
+        await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
+        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa com sugestões/i);
+        await navegarParaMapa(page);
+
+        await page.getByTestId('btn-mapa-homologar-aceite').click();
+        await page.getByTestId('btn-aceite-mapa-confirmar').click();
+        await verificarPaginaPainel(page);
+        await expect(page.getByText(TEXTOS.sucesso.ACEITE_REGISTRADO).first()).toBeVisible();
+    });
+
+    test('ADMIN homologa o mapa após aceite do GESTOR com sugestões', async ({_resetAutomatico, page}) => {
+        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
+        await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
+        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa com sugestões/i);
+        await navegarParaMapa(page);
+
+        await page.getByTestId('btn-mapa-homologar-aceite').click();
+        await page.getByTestId('btn-aceite-mapa-confirmar').click();
+        await expect(page.getByText(TEXTOS.mapa.SUCESSO_HOMOLOGACAO).first()).toBeVisible();
     });
 });

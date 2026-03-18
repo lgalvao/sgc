@@ -43,6 +43,32 @@ class SubprocessoTest {
     }
 
     @Test
+    @DisplayName("Deve permitir transição de MAPEAMENTO_MAPA_COM_SUGESTOES para MAPEAMENTO_MAPA_HOMOLOGADO")
+    void devePermitirHomologarMapaComSugestoes() {
+        Processo p = Processo.builder().tipo(TipoProcesso.MAPEAMENTO).build();
+        Subprocesso sp = Subprocesso.builder()
+                .processo(p)
+                .situacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES)
+                .build();
+
+        sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
+        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
+    }
+
+    @Test
+    @DisplayName("Deve permitir transição de REVISAO_MAPA_COM_SUGESTOES para REVISAO_MAPA_HOMOLOGADO")
+    void devePermitirHomologarRevisaoMapaComSugestoes() {
+        Processo p = Processo.builder().tipo(TipoProcesso.REVISAO).build();
+        Subprocesso sp = Subprocesso.builder()
+                .processo(p)
+                .situacao(SituacaoSubprocesso.REVISAO_MAPA_COM_SUGESTOES)
+                .build();
+
+        sp.setSituacao(SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO);
+        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO);
+    }
+
+    @Test
     @DisplayName("Deve permitir mudar situação se processo for nulo")
     void devePermitirMudarSituacaoSeProcessoNulo() {
         Subprocesso sp = new Subprocesso();
