@@ -378,7 +378,6 @@ public class E2eController {
         int diasLimite = request.diasLimite() != null ? request.diasLimite() : 30;
         Unidade unidade = unidadeService.buscarPorSigla(request.unidadeSigla());
 
-        // 1. Criar processo de mapeamento base e tornar seu mapa vigente na unidade
         ProcessoFixtureRequest requestMapeamento = new ProcessoFixtureRequest(
                 "Mapa base fixture " + System.currentTimeMillis(), request.unidadeSigla(), true, diasLimite);
         Processo processoMapeamento = criarProcessoFixture(requestMapeamento, TipoProcesso.MAPEAMENTO);
@@ -399,7 +398,6 @@ public class E2eController {
         jdbcTemplate.update("INSERT INTO sgc.unidade_mapa (unidade_codigo, mapa_vigente_codigo) VALUES (?, ?)",
                 unidade.getCodigo(), codMapaVigente);
 
-        // 2. Criar processo de revisão e definir situação como REVISAO_CADASTRO_DISPONIBILIZADA
         ProcessoFixtureRequest requestRevisao = new ProcessoFixtureRequest(
                 request.descricao(), request.unidadeSigla(), true, diasLimite);
         Processo processoRevisao = criarProcessoFixture(requestRevisao, TipoProcesso.REVISAO);

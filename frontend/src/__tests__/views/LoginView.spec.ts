@@ -34,7 +34,7 @@ describe("LoginView.vue", () => {
                 createTestingPinia({
                     createSpy: vi.fn,
                     initialState: initialState,
-                    stubActions: false, // We want to call actions to test logic inside them or mock them explicitly
+                    stubActions: false,
                 }),
             ],
             // Stubs for bootstrap components to simplify testing

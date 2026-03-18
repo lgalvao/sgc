@@ -36,7 +36,6 @@ import * as fs from 'node:fs';
  * para refinamento de UI. Funciona tambem como um bom teste 'smoke'
  */
 
-// Interface para metadados das capturas (Padrão Captus)
 interface CaptureMetadata {
     file: string;
     url: string;
