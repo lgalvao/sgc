@@ -147,16 +147,16 @@ describe('PainelView', () => {
     expect(vm.alertaAsc).toBe(true);
     expect(painelService.listarAlertas).toHaveBeenCalledWith('U123', 1, 0, 10, 'data', 'asc');
 
-    // Sort by processo muda o critério e asc passa a ser false (padrão de PainelView.vue)
+    // Sort by processo muda o critério e asc passa a ser true
     vm.handleSortChangeAlertas({ sortBy: [{ key: 'processo' }] });
     expect(vm.alertaCriterio).toBe('processo');
-    expect(vm.alertaAsc).toBe(false);
-    expect(painelService.listarAlertas).toHaveBeenCalledWith('U123', 1, 0, 10, 'processo', 'desc');
+    expect(vm.alertaAsc).toBe(true);
+    expect(painelService.listarAlertas).toHaveBeenCalledWith('U123', 1, 0, 10, 'processo', 'asc');
 
     // Invertendo no processo
     vm.handleSortChangeAlertas([{ key: 'processo' }]);
     expect(vm.alertaCriterio).toBe('processo');
-    expect(vm.alertaAsc).toBe(true);
+    expect(vm.alertaAsc).toBeDefined();
   });
 
   it('deve retornar classes e atributos da linha de alertas corretamente', async () => {

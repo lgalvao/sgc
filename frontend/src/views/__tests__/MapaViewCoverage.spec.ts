@@ -6,6 +6,7 @@ import * as useAcessoModule from "@/composables/useAcesso";
 import * as subprocessoService from "@/services/subprocessoService";
 import {useMapasStore} from "@/stores/mapas";
 import {useSubprocessosStore} from "@/stores/subprocessos";
+import {useProcessosStore} from "@/stores/processos";
 import MapaView from "../MapaView.vue";
 
 const {pushMock} = vi.hoisted(() => ({pushMock: vi.fn()}));
@@ -69,7 +70,7 @@ describe("MapaView coverage", () => {
                         },
                         processos: {
                             processoDetalhe: {
-                                unidades: [{sigla: "TESTE"}] // Sem codSubprocesso para forçar fallback
+                                unidades: [{sigla: "TESTE", codSubprocesso: 123}]
                             }
                         }
                     }
@@ -248,12 +249,18 @@ describe("MapaView coverage", () => {
         subprocessosStore.buscarSubprocessoPorProcessoEUnidade = vi.fn().mockResolvedValue(123);
         
         // Chamamos o onMounted simulando o comportamento de montagem para cobrir as linhas
+        // Setamos a propriedade computed dinamicamente
+        const processosStore = useProcessosStore();
+        (processosStore as any).processoDetalhe = {
+            unidades: [{sigla: "TESTE"}]
+        };
+        
         const hook = wrapper.vm.$options.mounted?.[0];
         if (hook) {
             await hook.call(vm);
         }
 
-        // Cobre onMounted definindo variáveis (O id 123 é retornado pelo store.buscarContextoEdicao será chamado)
+        // Cobre onMounted definindo variáveis
         expect(subprocessosStore.buscarContextoEdicao).toHaveBeenCalledWith(123);
         expect(vm.atividades).toHaveLength(1);
         expect(vm.unidade.sigla).toBe("TESTE");

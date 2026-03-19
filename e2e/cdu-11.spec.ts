@@ -36,7 +36,6 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
             await navegarParaAtividadesVisualizacao(page);
 
             await expect(page.getByTestId('subprocesso-header__txt-header-unidade')).toHaveText(UNIDADE_ALVO);
-            await expect(page.getByText(/\S+/).first()).toBeVisible();
             await expect(page.getByText(/Atividade fixture/)).toBeVisible();
             await expect(page.getByText(/Conhecimento fixture/)).toBeVisible();
         });
@@ -50,7 +49,6 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
             await navegarParaAtividadesVisualizacao(page);
 
             await expect(page.getByTestId('subprocesso-header__txt-header-unidade')).toHaveText(UNIDADE_ALVO);
-            await expect(page.getByText(/\S+/).first()).toBeVisible();
             await expect(page.getByText(/Atividade fixture/)).toBeVisible();
             await expect(page.getByText(/Conhecimento fixture/)).toBeVisible();
         });
@@ -77,7 +75,6 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
             await navegarParaAtividadesVisualizacao(page);
 
             await expect(page.getByTestId('subprocesso-header__txt-header-unidade')).toHaveText(UNIDADE_ALVO);
-            await expect(page.getByText(/\S+/).first()).toBeVisible();
             await expect(page.getByText(/Atividade origem/).first()).toBeVisible();
             await expect(page.getByText(/Conhecimento [AB]/).first()).toBeVisible();
         });
