@@ -521,6 +521,7 @@ async function confirmarDisponibilizacao() {
 
   mostrarModalConfirmacao.value = false;
   if (sucesso) {
+    await subprocessosStore.buscarSubprocessoDetalhe(codSubprocesso.value);
     const msg = isRevisao.value
         ? TEXTOS.sucesso.REVISAO_CADASTRO_ATIVIDADES_DISPONIBILIZADA
         : TEXTOS.sucesso.CADASTRO_ATIVIDADES_DISPONIBILIZADO;
