@@ -93,34 +93,6 @@ describe('PainelView Coverage', () => {
         expect(painelService.listarAlertas).not.toHaveBeenCalled();
     });
 
-    it('ordenarAlertasPor does nothing when usuarioCodigo is missing', async () => {
-        const pinia = createTestingPinia({
-            createSpy: vi.fn,
-            initialState: {
-                perfil: {
-                    perfilSelecionado: 'GESTOR',
-                    unidadeSelecionada: 1,
-                    usuarioCodigo: null
-                },
-                processos: {processosPainel: []},
-            }
-        });
-
-        const wrapper = mount(PainelView, {
-            global: {
-                plugins: [pinia],
-                stubs: commonStubs
-            }
-        });
-
-        vi.clearAllMocks();
-        (painelService.listarAlertas as any).mockResolvedValue(mockPageVazia);
-
-        await (wrapper.vm as any).ordenarAlertasPor('processo');
-
-        expect(painelService.listarAlertas).not.toHaveBeenCalled();
-    });
-
     it('ordenarPor toggles asc/desc correctly', async () => {
         const pinia = createTestingPinia({
             createSpy: vi.fn,

@@ -69,29 +69,22 @@ public class PainelFacade {
         return pageable;
     }
 
-    /**
-     * Lista alertas com base no usuário ou na unidade.
-     *
-     * <p>Os alertas são filtrados pela unidade fornecida.
-     * O título do usuário é utilizado para verificar o status de leitura.
-     */
     @Transactional
     public Page<Alerta> listarAlertas(String usuarioTitulo, Long codigoUnidade, Pageable pageable) {
-        // Alertas multi-sort: Req 59 (Processo then Data/hora desc)
         Pageable sortedPageable = pageable;
         if (pageable.isPaged()) {
             Sort currentSort = pageable.getSort();
             if (currentSort.isUnsorted()) {
-                // Initial/Default: Req 57
+                // Ordenação padrão se não informado: Req 57
                 sortedPageable = PageRequest.of(
                         pageable.getPageNumber(),
                         pageable.getPageSize(),
                         Sort.by(Sort.Direction.DESC, "dataHora"));
             } else {
-                // Se ordenado por processo, adiciona dataHora DESC como critério secundário
+                // Regra de negócio: se ordenar por processo, dataHora DESC é critério secundário (Req 59)
                 boolean hasProcessoSort = currentSort.stream()
                         .anyMatch(order -> order.getProperty().equals("processo"));
-                if (hasProcessoSort) {
+                if (hasProcessoSort && currentSort.stream().noneMatch(o -> o.getProperty().equals("dataHora"))) {
                     sortedPageable = PageRequest.of(
                             pageable.getPageNumber(),
                             pageable.getPageSize(),

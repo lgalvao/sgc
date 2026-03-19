@@ -42,7 +42,7 @@ export async function listarAlertas(
     codUnidade?: number,
     page: number = 0,
     size: number = 20,
-    sort?: "data" | "processo",
+    sort?: "dataHora" | "processo",
     order?: "asc" | "desc",
 ): Promise<Page<Alerta>> {
     const params: any = {
