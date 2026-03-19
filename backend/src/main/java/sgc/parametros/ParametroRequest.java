@@ -1,23 +1,23 @@
 package sgc.parametros;
 
 import jakarta.validation.constraints.*;
-import sgc.comum.MsgValidacao;
+import sgc.comum.SgcMensagens;
 
 /**
  * DTO de requisição para atualização de parâmetro de configuração.
  * Utilizado na atualização em bloco de parâmetros.
  */
 public record ParametroRequest(
-        @NotNull(message = MsgValidacao.CODIGO_PARAMETRO_OBRIGATORIO)
+        @NotNull(message = SgcMensagens.CODIGO_PARAMETRO_OBRIGATORIO)
         Long codigo,
 
-        @NotBlank(message = MsgValidacao.CHAVE_OBRIGATORIA)
-        @Size(max = 50, message = MsgValidacao.CHAVE_MAX)
+        @NotBlank(message = SgcMensagens.CHAVE_OBRIGATORIA)
+        @Size(max = 50, message = SgcMensagens.CHAVE_MAX)
         String chave,
 
         String descricao,
 
-        @NotBlank(message = MsgValidacao.VALOR_OBRIGATORIO)
+        @NotBlank(message = SgcMensagens.VALOR_OBRIGATORIO)
         String valor
 ) {
 }

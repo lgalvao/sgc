@@ -2,7 +2,7 @@ package sgc.subprocesso.dto;
 
 import jakarta.validation.constraints.*;
 import lombok.*;
-import sgc.comum.MsgValidacao;
+import sgc.comum.SgcMensagens;
 
 import java.time.*;
 
@@ -15,15 +15,15 @@ import java.time.*;
  */
 @Builder
 public record CriarSubprocessoRequest(
-        @NotNull(message = MsgValidacao.CODIGO_PROCESSO_OBRIGATORIO)
+        @NotNull(message = SgcMensagens.CODIGO_PROCESSO_OBRIGATORIO)
         Long codProcesso,
 
-        @NotNull(message = MsgValidacao.CODIGO_UNIDADE_OBRIGATORIO)
+        @NotNull(message = SgcMensagens.CODIGO_UNIDADE_OBRIGATORIO)
         Long codUnidade,
 
         Long codMapa,
 
-        @NotNull(message = MsgValidacao.DATA_LIMITE_ETAPA1_OBRIGATORIA)
+        @NotNull(message = SgcMensagens.DATA_LIMITE_ETAPA1_OBRIGATORIA)
         LocalDateTime dataLimiteEtapa1,
 
         LocalDateTime dataLimiteEtapa2) {

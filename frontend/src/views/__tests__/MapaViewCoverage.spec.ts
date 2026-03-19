@@ -164,4 +164,61 @@ describe("MapaView coverage", () => {
         expect((wrapper.vm as any).atividadesSemCompetencia).toHaveLength(1);
         expect(wrapper.find('[data-testid="btn-cad-mapa-disponibilizar"]').attributes("disabled")).toBeDefined();
     });
+
+    it("cobre early returns e funções de fechar modal", async () => {
+        const wrapper = createWrapper();
+        await flushPromises();
+
+        const vm = wrapper.vm as any;
+        vm.codSubprocesso = null;
+        
+        // Cobre early return em abrirModalImpacto se codSubprocesso for nulo
+        vm.abrirModalImpacto();
+        expect(vm.loadingImpacto).toBe(false);
+
+        // Cobre early return em adicionarCompetenciaEFecharModal
+        await vm.adicionarCompetenciaEFecharModal({ descricao: "C1", atividadesSelecionadas: [] });
+
+        // Cobre early return em confirmarExclusaoCompetencia
+        await vm.confirmarExclusaoCompetencia();
+        expect(vm.loadingExclusao).toBe(false);
+
+        // Cobre early return em removerAtividadeAssociada
+        vm.removerAtividadeAssociada(1, 10);
+
+        // Cobre early return em disponibilizarMapa
+        await vm.disponibilizarMapa({ dataLimite: "2025-01-01", observacoes: "" });
+        expect(vm.loadingDisponibilizacao).toBe(false);
+
+        // Cobre fecharModalExcluirCompetencia
+        vm.mostrarModalExcluirCompetencia = true;
+        vm.competenciaParaExcluir = { codigo: 1 };
+        vm.fecharModalExcluirCompetencia();
+        expect(vm.mostrarModalExcluirCompetencia).toBe(false);
+        expect(vm.competenciaParaExcluir).toBeNull();
+
+        // Cobre fecharModalDisponibilizar
+        vm.mostrarModalDisponibilizar = true;
+        vm.notificacaoDisponibilizacao = "erro";
+        vm.fecharModalDisponibilizar();
+        expect(vm.mostrarModalDisponibilizar).toBe(false);
+        expect(vm.notificacaoDisponibilizacao).toBe("");
+        
+        // Cobre não encontrar competência em excluirCompetencia
+        const store = useMapasStore();
+        (store.mapaCompleto as any) = { competencias: [{ codigo: 1, descricao: "C1" }] };
+        vm.excluirCompetencia(999);
+        expect(vm.competenciaParaExcluir).toBeNull();
+
+        // Cobre removerAtividadeAssociada sem encontrar a competência (codSubprocesso !== null)
+        vm.codSubprocesso = 123;
+        vm.removerAtividadeAssociada(999, 10);
+        
+        // Cobre handleError com fieldErrors.atividadesIds
+        (store as any).lastError = { message: "Erro", details: { atividadesIds: "Erro ID" } };
+        vm.competenciaSendoEditada = null; // Simula erro no adicionarCompetencia
+        store.adicionarCompetencia = vi.fn().mockRejectedValue(new Error("Erro"));
+        await vm.adicionarCompetenciaEFecharModal({ descricao: "C1", atividadesSelecionadas: [] });
+        expect(vm.fieldErrors.atividades).toBeDefined();
+    });
 });

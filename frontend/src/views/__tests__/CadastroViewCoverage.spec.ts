@@ -4,6 +4,7 @@ import {beforeEach, describe, expect, it, vi} from "vitest";
 import {ref} from "vue";
 import * as useAcessoModule from "@/composables/useAcesso";
 import * as subprocessoService from "@/services/subprocessoService";
+import * as analiseService from "@/services/analiseService";
 import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useMapasStore} from "@/stores/mapas";
 import {SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
@@ -20,6 +21,10 @@ vi.mock("@/services/subprocessoService", () => ({
     buscarSubprocessoPorProcessoEUnidade: vi.fn(),
     buscarSubprocessoDetalhe: vi.fn(),
     buscarContextoEdicao: vi.fn(),
+}));
+
+vi.mock("@/services/analiseService", () => ({
+    listarAnalisesCadastro: vi.fn(),
 }));
 
 const stubs = {
@@ -147,5 +152,82 @@ describe("CadastroView coverage", () => {
         await (wrapper.vm as any).disponibilizarCadastro();
         await flushPromises();
         expect((wrapper.vm as any).erroGlobal).toBe("Erro genérico");
+    });
+
+    it("cobre funções complementares e modais", async () => {
+        const wrapper = createWrapper();
+        await flushPromises();
+        const vm = wrapper.vm as any;
+        vm.codSubprocesso = 123;
+        
+        // setAtividadeRef
+        const el = document.createElement("div");
+        vm.setAtividadeRef(1, el);
+        expect(vm.atividadeRefs.get(1)).toBe(el);
+        
+        // scrollParaPrimeiroErro
+        vm.errosValidacao = [{ atividadeCodigo: 1, mensagem: "Erro" }];
+        el.scrollIntoView = vi.fn();
+        vm.scrollParaPrimeiroErro();
+        expect(el.scrollIntoView).toHaveBeenCalled();
+
+        // confirmarRemocao (conhecimento)
+        vi.mocked(subprocessoService.buscarContextoEdicao).mockResolvedValue({} as any);
+        vm.atividades = [{codigo: 1, descricao: "A1"}];
+        vm.dadosRemocao = {tipo: "conhecimento", index: 0, conhecimentoCodigo: 2};
+        await vm.confirmarRemocao();
+        expect(vm.mostrarModalConfirmacaoRemocao).toBe(false);
+
+        // salvarEdicaoAtividade
+        await vm.salvarEdicaoAtividade(1, "Nova Desc");
+
+        // adicionarConhecimento
+        await vm.adicionarConhecimento(0, "Novo Conhecimento");
+
+        // removerConhecimento
+        vm.removerConhecimento(0, 2);
+        expect(vm.mostrarModalConfirmacaoRemocao).toBe(true);
+        
+        // salvarEdicaoConhecimento
+        await vm.salvarEdicaoConhecimento(1, 2, "Desc Atualizada");
+        
+        // handleImportAtividades
+        await vm.handleImportAtividades("Aviso");
+        expect(vm.mostrarModalImportar).toBe(false);
+        
+        // confirmarDisponibilizacao (Revisao)
+        const store = useSubprocessosStore();
+        store.$patch({
+            subprocessoDetalhe: {
+                tipoProcesso: TipoProcesso.REVISAO
+            } as any
+        });
+        store.disponibilizarRevisaoCadastro = vi.fn().mockResolvedValue(true);
+        await vm.confirmarDisponibilizacao();
+        expect(vm.mostrarModalConfirmacao).toBe(false);
+
+        // confirmarDisponibilizacao (Mapeamento)
+        store.$patch({
+            subprocessoDetalhe: {
+                tipoProcesso: TipoProcesso.MAPEAMENTO
+            } as any
+        });
+        store.disponibilizarCadastro = vi.fn().mockResolvedValue(true);
+        await vm.confirmarDisponibilizacao();
+
+        // abrirModalHistorico
+        await vm.abrirModalHistorico();
+        expect(vm.mostrarModalHistorico).toBe(true);
+
+        // abrir/fechar ModalImpacto
+        const mapasStore = useMapasStore();
+        mapasStore.buscarImpactoMapa = vi.fn().mockResolvedValue(null);
+        vm.abrirModalImpacto();
+        expect(vm.mostrarModalImpacto).toBe(true);
+        vm.fecharModalImpacto();
+        expect(vm.mostrarModalImpacto).toBe(false);
+
+        // Sincronizar contexto null
+        vm.sincronizarEstadoInicialContexto(null);
     });
 });

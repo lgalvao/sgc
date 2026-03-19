@@ -198,5 +198,38 @@ describe("PainelView.vue", () => {
         expect(painelService.listarAlertas).toHaveBeenLastCalledWith(
             100, 1, 0, 10, "processo", "asc"
         );
+
+        // Test with string fallback
+        await (wrapper.vm as any).handleSortChangeAlertas({sortBy: 'dataHora'});
+        expect(painelService.listarAlertas).toHaveBeenLastCalledWith(
+            100, 1, 0, 10, "data", "desc"
+        );
+
+        // Test with array
+        await (wrapper.vm as any).handleSortChangeAlertas({sortBy: [{key: 'dataHora'}]});
+        expect(painelService.listarAlertas).toHaveBeenLastCalledWith(
+            100, 1, 0, 10, "data", "asc"
+        );
+    });
+
+    it("deve cobrir branches de abrirDetalhesProcesso, rowClassAlerta, rowAttrAlerta", async () => {
+        const wrapper = mount(PainelView, mountOptions());
+        await wrapper.vm.$nextTick();
+
+        // abrirDetalhesProcesso
+        await (wrapper.vm as any).abrirDetalhesProcesso(null);
+        expect(routerPushMock).not.toHaveBeenCalled();
+        
+        await (wrapper.vm as any).abrirDetalhesProcesso({ codigo: 1 }); // without linkDestino
+        expect(routerPushMock).not.toHaveBeenCalled();
+
+        // rowClassAlerta
+        expect((wrapper.vm as any).rowClassAlerta(null)).toBe("");
+        expect((wrapper.vm as any).rowClassAlerta({ dataHoraLeitura: "2023-01-01" })).toBe("");
+        expect((wrapper.vm as any).rowClassAlerta({ dataHoraLeitura: null })).toBe("fw-bold");
+
+        // rowAttrAlerta
+        expect((wrapper.vm as any).rowAttrAlerta(null)).toEqual({});
+        expect((wrapper.vm as any).rowAttrAlerta({ codigo: 123 })).toEqual({ 'data-testid': 'row-alerta-123' });
     });
 });

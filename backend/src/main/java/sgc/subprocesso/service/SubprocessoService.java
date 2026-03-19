@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.*;
 import org.springframework.context.annotation.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
-import sgc.comum.MsgValidacao;
+import sgc.comum.SgcMensagens;
 import sgc.comum.erros.*;
 import sgc.comum.model.*;
 import sgc.mapa.dto.*;
@@ -483,7 +483,7 @@ public class SubprocessoService {
         if (sp.getSituacao() != SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA
                 && sp.getSituacao() != SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO) {
             throw new ErroValidacao(
-                    MsgValidacao.AJUSTES_ESTADOS_ESPECIFICOS
+                    SgcMensagens.AJUSTES_ESTADOS_ESPECIFICOS
                             .formatted(sp.getSituacao()));
         }
     }
@@ -766,13 +766,13 @@ public class SubprocessoService {
         Usuario usuario = usuarioFacade.usuarioAutenticado();
 
         if (!permissionEvaluator.verificarPermissao(usuario, spDestino, EDITAR_CADASTRO)) {
-            throw new ErroAcessoNegado(MsgValidacao.SEM_PERMISSAO_IMPORTAR);
+            throw new ErroAcessoNegado(SgcMensagens.SEM_PERMISSAO_IMPORTAR);
         }
         validarSituacaoParaImportacao(spDestino);
 
         Subprocesso spOrigem = repo.buscar(Subprocesso.class, codSubprocessoOrigem);
         if (!permissionEvaluator.verificarPermissao(usuario, spOrigem, CONSULTAR_PARA_IMPORTACAO)) {
-            throw new ErroAcessoNegado(MsgValidacao.SEM_PERMISSAO_CONSULTAR_ORIGEM);
+            throw new ErroAcessoNegado(SgcMensagens.SEM_PERMISSAO_CONSULTAR_ORIGEM);
         }
 
         Long codMapaOrigem = spOrigem.getMapa().getCodigo();
@@ -793,7 +793,7 @@ public class SubprocessoService {
         }
 
         final Unidade unidadeOrigem = spOrigem.getUnidade();
-        String descMovimentacao = String.format("Importação de atividades do subprocesso #%d (Unidade: %s)",
+        String descMovimentacao = SgcMensagens.HIST_IMPORTACAO_ATIVIDADES.formatted(
                 spOrigem.getCodigo(),
                 unidadeOrigem.getSigla());
 
@@ -824,7 +824,7 @@ public class SubprocessoService {
     public List<AtividadeDto> listarAtividadesParaImportacao(Long codSubprocesso) {
         Subprocesso subprocesso = subprocessoRepo.buscarPorCodigoComMapaEAtividades(codSubprocesso).orElseThrow();
         if (subprocesso.getProcesso() == null || subprocesso.getProcesso().getSituacao() != SituacaoProcesso.FINALIZADO) {
-            throw new ErroValidacao(MsgValidacao.IMPORTACAO_SO_PROCESSOS_FINALIZADOS);
+            throw new ErroValidacao(SgcMensagens.IMPORTACAO_SO_PROCESSOS_FINALIZADOS);
         }
         return listarAtividadesSubprocesso(codSubprocesso);
     }
@@ -833,7 +833,7 @@ public class SubprocessoService {
         SituacaoSubprocesso situacaoSp = sp.getSituacao();
 
         if (!SITUACOES_PERMITIDAS_IMPORTACAO.contains(situacaoSp)) {
-            String msg = MsgValidacao.SITUACAO_IMPEDE_IMPORTACAO.formatted(situacaoSp);
+            String msg = SgcMensagens.SITUACAO_IMPEDE_IMPORTACAO.formatted(situacaoSp);
             throw new ErroValidacao(msg);
         }
     }

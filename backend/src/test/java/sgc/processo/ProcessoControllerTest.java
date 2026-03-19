@@ -435,7 +435,7 @@ class ProcessoControllerTest {
             when(processoServiceMock.buscarPorCodigoComParticipantes(1L)).thenReturn(processo);
 
             ErroValidacao ex = assertThrows(ErroValidacao.class, () -> controller.listarUnidadesParaImportacao(1L));
-            assertEquals(sgc.comum.MsgValidacao.PROCESSO_DEVE_ESTAR_FINALIZADO, ex.getMessage());
+            assertEquals(sgc.comum.SgcMensagens.PROCESSO_DEVE_ESTAR_FINALIZADO, ex.getMessage());
         }
 
         @Test

@@ -11,7 +11,7 @@ import org.springframework.security.access.prepost.*;
 import org.springframework.security.core.annotation.*;
 import org.springframework.transaction.annotation.*;
 import org.springframework.web.bind.annotation.*;
-import sgc.comum.MsgValidacao;
+import sgc.comum.SgcMensagens;
 import sgc.comum.ComumDtos.*;
 import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
@@ -268,7 +268,7 @@ public class SubprocessoController {
             @PathVariable Long codSubprocesso, @RequestBody @Valid ImportarAtividadesRequest request) {
         boolean temDuplicatas = subprocessoService.importarAtividades(codSubprocesso, request.codSubprocessoOrigem(), request.codigosAtividades());
         if (temDuplicatas) {
-            return Map.of("message", "Atividades importadas.", "aviso", MsgValidacao.IMPORTACAO_ATIVIDADES_DUPLICADAS);
+            return Map.of("message", "Atividades importadas.", "aviso", SgcMensagens.IMPORTACAO_ATIVIDADES_DUPLICADAS);
         }
         return Map.of("message", "Atividades importadas.");
     }

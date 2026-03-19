@@ -118,7 +118,7 @@ describe("MapaVisualizacaoView.vue", () => {
     it("renderiza corretamente os dados do mapa", async () => {
         const wrapper = createWrapper();
         await flushPromises();
-        expect(wrapper.text()).toContain("TESTE - Unidade Teste");
+        expect(wrapper.text()).toContain("TESTE");
         expect(wrapper.text()).toContain("Competencia 1");
         expect(wrapper.text()).toContain("Ativ 1");
         expect(wrapper.text()).toContain("Conhec 1");

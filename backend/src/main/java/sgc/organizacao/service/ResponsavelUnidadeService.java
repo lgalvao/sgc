@@ -3,7 +3,7 @@ package sgc.organizacao.service;
 import lombok.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
-import sgc.comum.MsgValidacao;
+import sgc.comum.SgcMensagens;
 import sgc.comum.erros.*;
 import sgc.comum.model.*;
 import sgc.organizacao.dto.*;
@@ -69,7 +69,7 @@ public class ResponsavelUnidadeService {
         LocalDate inicio = request.dataInicio() != null ? request.dataInicio() : LocalDate.now();
 
         if (request.dataTermino().isBefore(inicio)) {
-            throw new ErroValidacao(MsgValidacao.DATA_FIM_DEVE_SER_POSTERIOR);
+            throw new ErroValidacao(SgcMensagens.DATA_FIM_DEVE_SER_POSTERIOR);
         }
 
         AtribuicaoTemporaria atribuicao = new AtribuicaoTemporaria()

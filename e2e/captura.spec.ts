@@ -561,6 +561,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await page.getByTestId('inp-criar-competencia-descricao').fill(competencia);
             await page.locator('label').filter({hasText: atividade}).click();
             await page.getByTestId('btn-criar-competencia-salvar').click();
+            await page.waitForTimeout(300);
             await capturarTela(page, '03-processo', '03e-mapa-criado', {
                 extra: { perfil: 'ADMIN', acao: 'edicao-mapa' }
             });

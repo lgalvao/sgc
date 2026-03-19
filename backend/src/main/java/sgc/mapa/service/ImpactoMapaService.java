@@ -4,7 +4,7 @@ import lombok.*;
 import lombok.extern.slf4j.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
-import sgc.comum.MsgValidacao;
+import sgc.comum.SgcMensagens;
 import sgc.comum.erros.*;
 import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
@@ -29,7 +29,7 @@ public class ImpactoMapaService {
     @Transactional(readOnly = true)
     public ImpactoMapaResponse verificarImpactos(Subprocesso subprocesso, Usuario usuario) {
         if (!permissionEvaluator.verificarPermissao(usuario, subprocesso, VERIFICAR_IMPACTOS)) {
-            throw new ErroAcessoNegado(MsgValidacao.SEM_PERMISSAO_VERIFICAR_IMPACTOS);
+            throw new ErroAcessoNegado(SgcMensagens.SEM_PERMISSAO_VERIFICAR_IMPACTOS);
         }
 
         checkSituacao(usuario, subprocesso);
@@ -86,7 +86,7 @@ public class ImpactoMapaService {
 
         if (!situacaoValida) {
             throw new ErroValidacao(
-                    MsgValidacao.SITUACAO_IMPEDE_IMPACTO
+                    SgcMensagens.SITUACAO_IMPEDE_IMPACTO
                             .formatted(situacao, perfil));
         }
     }

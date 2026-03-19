@@ -4,7 +4,7 @@ import jakarta.validation.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
 import org.jspecify.annotations.*;
-import sgc.comum.MsgValidacao;
+import sgc.comum.SgcMensagens;
 import sgc.seguranca.sanitizacao.*;
 
 import java.time.*;
@@ -15,8 +15,8 @@ import java.util.*;
  */
 @Builder
 public record SubmeterMapaAjustadoRequest(
-        @NotBlank(message = MsgValidacao.JUSTIFICATIVA_OBRIGATORIA)
-        @Size(max = 500, message = MsgValidacao.JUSTIFICATIVA_MAX)
+        @NotBlank(message = SgcMensagens.JUSTIFICATIVA_OBRIGATORIA)
+        @Size(max = 500, message = SgcMensagens.JUSTIFICATIVA_MAX)
         @SanitizarHtml
         String justificativa,
 

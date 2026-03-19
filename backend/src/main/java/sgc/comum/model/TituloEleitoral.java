@@ -2,7 +2,7 @@ package sgc.comum.model;
 
 import jakarta.validation.*;
 import jakarta.validation.constraints.*;
-import sgc.comum.MsgValidacao;
+import sgc.comum.SgcMensagens;
 
 import java.lang.annotation.*;
 
@@ -27,9 +27,9 @@ import java.lang.annotation.*;
 @Target({ElementType.FIELD, ElementType.PARAMETER, ElementType.RECORD_COMPONENT})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@NotNull(message = MsgValidacao.TITULO_ELEITORAL_OBRIGATORIO)
-@Size(max = 12, message = MsgValidacao.TITULO_ELEITORAL_MAX)
-@Pattern(regexp = "^\\d+$", message = MsgValidacao.TITULO_ELEITORAL_APENAS_NUMEROS)
+@NotNull(message = SgcMensagens.TITULO_ELEITORAL_OBRIGATORIO)
+@Size(max = 12, message = SgcMensagens.TITULO_ELEITORAL_MAX)
+@Pattern(regexp = "^\\d+$", message = SgcMensagens.TITULO_ELEITORAL_APENAS_NUMEROS)
 @Constraint(validatedBy = {})
 public @interface TituloEleitoral {
 

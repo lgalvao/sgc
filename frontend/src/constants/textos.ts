@@ -264,7 +264,7 @@ export const TEXTOS = {
     MODAL_HOMOLOGAR_TITULO: "Homologação do cadastro",
     MODAL_VALIDAR_TEXTO: "Confirma o aceite do cadastro de atividades?",
     MODAL_ACEITE_REVISAO_TEXTO: "Confirma o aceite da revisão do cadastro de atividades?",
-    MODAL_HOMOLOGAR_TEXTO: "Confirma a homologação?",
+    MODAL_HOMOLOGAR_TEXTO: "Confirma a homologação do cadastro?",
     MODAL_DEVOLVER_TITULO: "Devolução do cadastro",
     MODAL_DEVOLVER_REVISAO_TITULO: "Devolução da revisão do cadastro",
     MODAL_DEVOLVER_TEXTO: "Confirma a devolução do cadastro para ajustes?",
@@ -333,7 +333,7 @@ export const TEXTOS = {
   },
   processo: {
     CONCLUIDO: "Processo concluído.",
-    FINALIZAR: "Finalizar processo",
+    FINALIZAR: "Finalizar",
     CARREGANDO_DETALHES: "Carregando detalhes do processo...",
     ERRO_PADRAO: "Ocorreu um erro",
     FINALIZACAO_TITULO: "Finalização de processo",
@@ -387,22 +387,20 @@ export const TEXTOS = {
       BOTAO: "Homologar",
     },
     disponibilizar: {
-      ROTULO: "Disponibilizar mapas em bloco",
+      ROTULO: "Disponibilizar em bloco",
       TITULO: "Disponibilização de mapa em bloco",
-      TEXTO: "Selecione abaixo as unidades cujos mapas deverão ser disponibilizados:",
+      TEXTO: "Selecione as unidades cujos mapas deverão ser disponibilizados:",
       BOTAO: "Disponibilizar",
     },
   },
   configuracoes: {
     TITULO: "Configurações",
-    LABEL_DIAS_INATIVACAO: "Dias para inativação de processos (DIAS_INATIVACAO_PROCESSO)",
+    LABEL_DIAS_INATIVACAO: "Dias para inativação de processos",
     DESC_DIAS_INATIVACAO: "Dias depois da finalização de um processo para que seja considerado inativo.",
-    LABEL_DIAS_ALERTA_NOVO: "Dias para indicação de alerta como novo (DIAS_ALERTA_NOVO)",
+    LABEL_DIAS_ALERTA_NOVO: "Dias para indicação de alerta como novo",
     DESC_DIAS_ALERTA_NOVO: "Dias depois de um alerta ser enviado para que deixe de ser marcado como novo.",
     SUCESSO_SALVAR: "Configurações salvas.",
     ERRO_SALVAR: "Erro ao salvar configurações.",
     BOTAO_SALVAR: "Salvar configurações",
   },
 } as const;
-
-export type Textos = typeof TEXTOS;
