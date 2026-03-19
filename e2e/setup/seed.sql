@@ -53,6 +53,38 @@ INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao, unidade_superio
                             matricula_titular, data_inicio_titularidade)
 VALUES (18, 'Seção 221', 'SECAO_221', 'OPERACIONAL', 'ATIVA', 17, '141414', '00141414', CURRENT_TIMESTAMP);
 
+-- Nova Subárvore (Secretaria 3)
+INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo, titulo_titular,
+                            matricula_titular, data_inicio_titularidade)
+VALUES (30, 'Secretaria 3', 'SECRETARIA_3', 'INTEROPERACIONAL', 'ATIVA', 1, '300001', '00300001', CURRENT_TIMESTAMP);
+INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo, titulo_titular,
+                            matricula_titular, data_inicio_titularidade)
+VALUES (31, 'Assessoria 31', 'ASSESSORIA_31', 'OPERACIONAL', 'ATIVA', 30, '310001', '00310001', CURRENT_TIMESTAMP);
+INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo, titulo_titular,
+                            matricula_titular, data_inicio_titularidade)
+VALUES (32, 'Coordenadoria 31', 'COORD_31', 'INTERMEDIARIA', 'ATIVA', 30, '320001', '00320001', CURRENT_TIMESTAMP);
+INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo, titulo_titular,
+                            matricula_titular, data_inicio_titularidade)
+VALUES (33, 'Seção 311', 'SECAO_311', 'OPERACIONAL', 'ATIVA', 32, '330001', '00330001', CURRENT_TIMESTAMP);
+INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo, titulo_titular,
+                            matricula_titular, data_inicio_titularidade)
+VALUES (34, 'Assessoria 32', 'ASSESSORIA_32', 'OPERACIONAL', 'ATIVA', 30, '340001', '00340001', CURRENT_TIMESTAMP);
+INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo, titulo_titular,
+                            matricula_titular, data_inicio_titularidade)
+VALUES (35, 'Coordenadoria 32', 'COORD_32', 'INTERMEDIARIA', 'ATIVA', 30, '350001', '00350001', CURRENT_TIMESTAMP);
+INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo, titulo_titular,
+                            matricula_titular, data_inicio_titularidade)
+VALUES (36, 'Seção 321', 'SECAO_321', 'OPERACIONAL', 'ATIVA', 35, '360001', '00360001', CURRENT_TIMESTAMP);
+INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo, titulo_titular,
+                            matricula_titular, data_inicio_titularidade)
+VALUES (37, 'Seção 322', 'SECAO_322', 'OPERACIONAL', 'ATIVA', 35, '370001', '00370001', CURRENT_TIMESTAMP);
+INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo, titulo_titular,
+                            matricula_titular, data_inicio_titularidade)
+VALUES (38, 'Seção 323', 'SECAO_323', 'OPERACIONAL', 'ATIVA', 35, '380001', '00380001', CURRENT_TIMESTAMP);
+INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo, titulo_titular,
+                            matricula_titular, data_inicio_titularidade)
+VALUES (39, 'Seção 324', 'SECAO_324', 'OPERACIONAL', 'ATIVA', 35, '390001', '00390001', CURRENT_TIMESTAMP);
+
 -- Users with full details (titulo, matricula, nome, email, ramal, unidade_lot, unidade_comp)
 INSERT INTO sgc.vw_usuario (titulo, matricula, nome, email, ramal, unidade_lot_codigo, unidade_comp_codigo)
 VALUES ('111111', '00111111', 'ADMIN_E_CHEFE_SEDOC', 'admin_e_chefe_sedoc@tre-pe.jus.br', '2001', 1, 1);
@@ -203,6 +235,59 @@ VALUES ('303030', '00303030', 'Alice Cooper', 'alice.cooper@tre-pe.jus.br', '203
 INSERT INTO sgc.vw_usuario_perfil_unidade (usuario_titulo, perfil, unidade_codigo)
 VALUES ('303030', 'CHEFE', 8);
 
+-- Usuários da Secretaria 3
+INSERT INTO sgc.vw_usuario (titulo, matricula, nome, email, ramal, unidade_lot_codigo, unidade_comp_codigo)
+VALUES ('300001', '00300001', 'CHEFE_SECRETARIA_3', 'chefe_sec3@tre-pe.jus.br', '3001', 30, 30);
+INSERT INTO sgc.vw_usuario_perfil_unidade (usuario_titulo, perfil, unidade_codigo)
+VALUES ('300001', 'CHEFE', 30);
+INSERT INTO sgc.vw_usuario_perfil_unidade (usuario_titulo, perfil, unidade_codigo)
+VALUES ('300001', 'GESTOR', 30);
+
+INSERT INTO sgc.vw_usuario (titulo, matricula, nome, email, ramal, unidade_lot_codigo, unidade_comp_codigo)
+VALUES ('310001', '00310001', 'CHEFE_ASSESSORIA_31', 'chefe_ass31@tre-pe.jus.br', '3101', 31, 31);
+INSERT INTO sgc.vw_usuario_perfil_unidade (usuario_titulo, perfil, unidade_codigo)
+VALUES ('310001', 'CHEFE', 31);
+
+INSERT INTO sgc.vw_usuario (titulo, matricula, nome, email, ramal, unidade_lot_codigo, unidade_comp_codigo)
+VALUES ('320001', '00320001', 'GESTOR_COORD_31', 'gestor_coord31@tre-pe.jus.br', '3201', 32, 32);
+INSERT INTO sgc.vw_usuario_perfil_unidade (usuario_titulo, perfil, unidade_codigo)
+VALUES ('320001', 'GESTOR', 32);
+
+INSERT INTO sgc.vw_usuario (titulo, matricula, nome, email, ramal, unidade_lot_codigo, unidade_comp_codigo)
+VALUES ('330001', '00330001', 'CHEFE_SECAO_311', 'chefe_sec311@tre-pe.jus.br', '3301', 33, 33);
+INSERT INTO sgc.vw_usuario_perfil_unidade (usuario_titulo, perfil, unidade_codigo)
+VALUES ('330001', 'CHEFE', 33);
+
+INSERT INTO sgc.vw_usuario (titulo, matricula, nome, email, ramal, unidade_lot_codigo, unidade_comp_codigo)
+VALUES ('340001', '00340001', 'CHEFE_ASSESSORIA_32', 'chefe_ass32@tre-pe.jus.br', '3401', 34, 34);
+INSERT INTO sgc.vw_usuario_perfil_unidade (usuario_titulo, perfil, unidade_codigo)
+VALUES ('340001', 'CHEFE', 34);
+
+INSERT INTO sgc.vw_usuario (titulo, matricula, nome, email, ramal, unidade_lot_codigo, unidade_comp_codigo)
+VALUES ('350001', '00350001', 'GESTOR_COORD_32', 'gestor_coord32@tre-pe.jus.br', '3501', 35, 35);
+INSERT INTO sgc.vw_usuario_perfil_unidade (usuario_titulo, perfil, unidade_codigo)
+VALUES ('350001', 'GESTOR', 35);
+
+INSERT INTO sgc.vw_usuario (titulo, matricula, nome, email, ramal, unidade_lot_codigo, unidade_comp_codigo)
+VALUES ('360001', '00360001', 'CHEFE_SECAO_321', 'chefe_sec321@tre-pe.jus.br', '3601', 36, 36);
+INSERT INTO sgc.vw_usuario_perfil_unidade (usuario_titulo, perfil, unidade_codigo)
+VALUES ('360001', 'CHEFE', 36);
+
+INSERT INTO sgc.vw_usuario (titulo, matricula, nome, email, ramal, unidade_lot_codigo, unidade_comp_codigo)
+VALUES ('370001', '00370001', 'CHEFE_SECAO_322', 'chefe_sec322@tre-pe.jus.br', '3701', 37, 37);
+INSERT INTO sgc.vw_usuario_perfil_unidade (usuario_titulo, perfil, unidade_codigo)
+VALUES ('370001', 'CHEFE', 37);
+
+INSERT INTO sgc.vw_usuario (titulo, matricula, nome, email, ramal, unidade_lot_codigo, unidade_comp_codigo)
+VALUES ('380001', '00380001', 'CHEFE_SECAO_323', 'chefe_sec323@tre-pe.jus.br', '3801', 38, 38);
+INSERT INTO sgc.vw_usuario_perfil_unidade (usuario_titulo, perfil, unidade_codigo)
+VALUES ('380001', 'CHEFE', 38);
+
+INSERT INTO sgc.vw_usuario (titulo, matricula, nome, email, ramal, unidade_lot_codigo, unidade_comp_codigo)
+VALUES ('390001', '00390001', 'CHEFE_SECAO_324', 'chefe_sec324@tre-pe.jus.br', '3901', 39, 39);
+INSERT INTO sgc.vw_usuario_perfil_unidade (usuario_titulo, perfil, unidade_codigo)
+VALUES ('390001', 'CHEFE', 39);
+
 -- Administradores do Sistema (necessário para listar em configurações)
 INSERT INTO sgc.administrador (usuario_titulo)
 VALUES ('191919');
@@ -306,6 +391,50 @@ VALUES (200001, 'Competência Técnica 1', 200);
 INSERT INTO sgc.competencia_atividade (atividade_codigo, competencia_codigo)
 VALUES (2001, 200001);
 
+-- -------------------------------------------------------------------------------------------------
+-- NOVOS PROCESSOS PARA SECRETARIA 3
+-- -------------------------------------------------------------------------------------------------
+
+-- Processo 301: SECAO_311 (Cadastro de Atividades Homologado)
+INSERT INTO sgc.processo (codigo, data_criacao, data_limite, descricao, situacao, tipo)
+VALUES (301, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP + INTERVAL '30' DAY, 'Mapeamento Secão 311', 'EM_ANDAMENTO', 'MAPEAMENTO');
+
+INSERT INTO sgc.unidade_processo (processo_codigo, unidade_codigo, situacao, nome, sigla, tipo, matricula_titular, titulo_titular, data_inicio_titularidade, unidade_superior_codigo)
+VALUES (301, 33, 'EM_ANDAMENTO', 'Seção 311', 'SECAO_311', 'OPERACIONAL', '00330001', '330001', CURRENT_TIMESTAMP, 32);
+
+INSERT INTO sgc.subprocesso (codigo, processo_codigo, unidade_codigo, situacao, data_limite_etapa1)
+VALUES (301, 301, 33, 'MAPEAMENTO_CADASTRO_HOMOLOGADO', CURRENT_TIMESTAMP + INTERVAL '10' DAY);
+
+INSERT INTO sgc.mapa (codigo, subprocesso_codigo, data_hora_disponibilizado, data_hora_homologado)
+VALUES (301, 301, CURRENT_TIMESTAMP - INTERVAL '2' DAY, NULL);
+
+INSERT INTO sgc.atividade (codigo, descricao, mapa_codigo) VALUES (3011, 'Gestão de Frequência', 301);
+INSERT INTO sgc.conhecimento (codigo, descricao, atividade_codigo) VALUES (301101, 'Normas de Pessoal', 3011);
+INSERT INTO sgc.conhecimento (codigo, descricao, atividade_codigo) VALUES (301102, 'Sistema de Ponto Eletrônico', 3011);
+
+INSERT INTO sgc.atividade (codigo, descricao, mapa_codigo) VALUES (3012, 'Elaboração de Relatórios', 301);
+INSERT INTO sgc.conhecimento (codigo, descricao, atividade_codigo) VALUES (301201, 'Ferramentas de BI', 3012);
+INSERT INTO sgc.conhecimento (codigo, descricao, atividade_codigo) VALUES (301202, 'Técnicas de Redação Oficial', 3012);
+
+-- Processo 302: SECAO_321 (Mapa Disponibilizado)
+INSERT INTO sgc.processo (codigo, data_criacao, data_limite, descricao, situacao, tipo)
+VALUES (302, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP + INTERVAL '30' DAY, 'Mapeamento Secão 321', 'EM_ANDAMENTO', 'MAPEAMENTO');
+
+INSERT INTO sgc.unidade_processo (processo_codigo, unidade_codigo, situacao, nome, sigla, tipo, matricula_titular, titulo_titular, data_inicio_titularidade, unidade_superior_codigo)
+VALUES (302, 36, 'EM_ANDAMENTO', 'Seção 321', 'SECAO_321', 'OPERACIONAL', '00360001', '360001', CURRENT_TIMESTAMP, 35);
+
+INSERT INTO sgc.subprocesso (codigo, processo_codigo, unidade_codigo, situacao, data_limite_etapa1)
+VALUES (302, 302, 36, 'MAPEAMENTO_MAPA_DISPONIBILIZADO', CURRENT_TIMESTAMP + INTERVAL '15' DAY);
+
+INSERT INTO sgc.mapa (codigo, subprocesso_codigo, data_hora_disponibilizado, data_hora_homologado)
+VALUES (302, 302, CURRENT_TIMESTAMP - INTERVAL '1' DAY, NULL);
+
+INSERT INTO sgc.atividade (codigo, descricao, mapa_codigo) VALUES (3021, 'Análise de Processos Licitatórios', 302);
+INSERT INTO sgc.conhecimento (codigo, descricao, atividade_codigo) VALUES (302101, 'Lei de Licitações', 3021);
+
+INSERT INTO sgc.competencia (codigo, descricao, mapa_codigo) VALUES (30201, 'Competência Técnica Secão 321', 302);
+INSERT INTO sgc.competencia_atividade (atividade_codigo, competencia_codigo) VALUES (3021, 30201);
+
 -- Unidade Isolada para Teste de Diagnóstico (Garante 100% de conclusão com Mock User)
 
 INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo, titulo_titular,
@@ -359,6 +488,29 @@ INSERT INTO sgc.vw_responsabilidade (unidade_codigo, usuario_titulo, usuario_mat
 VALUES (17, '131313', '00131313', 'TITULAR', CURRENT_TIMESTAMP);
 INSERT INTO sgc.vw_responsabilidade (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio)
 VALUES (18, '141414', '00141414', 'TITULAR', CURRENT_TIMESTAMP);
+
+-- Responsabilidades da Secretaria 3
+INSERT INTO sgc.vw_responsabilidade (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio)
+VALUES (30, '300001', '00300001', 'TITULAR', CURRENT_TIMESTAMP);
+INSERT INTO sgc.vw_responsabilidade (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio)
+VALUES (31, '310001', '00310001', 'TITULAR', CURRENT_TIMESTAMP);
+INSERT INTO sgc.vw_responsabilidade (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio)
+VALUES (32, '320001', '00320001', 'TITULAR', CURRENT_TIMESTAMP);
+INSERT INTO sgc.vw_responsabilidade (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio)
+VALUES (33, '330001', '00330001', 'TITULAR', CURRENT_TIMESTAMP);
+INSERT INTO sgc.vw_responsabilidade (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio)
+VALUES (34, '340001', '00340001', 'TITULAR', CURRENT_TIMESTAMP);
+INSERT INTO sgc.vw_responsabilidade (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio)
+VALUES (35, '350001', '00350001', 'TITULAR', CURRENT_TIMESTAMP);
+INSERT INTO sgc.vw_responsabilidade (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio)
+VALUES (36, '360001', '00360001', 'TITULAR', CURRENT_TIMESTAMP);
+INSERT INTO sgc.vw_responsabilidade (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio)
+VALUES (37, '370001', '00370001', 'TITULAR', CURRENT_TIMESTAMP);
+INSERT INTO sgc.vw_responsabilidade (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio)
+VALUES (38, '380001', '00380001', 'TITULAR', CURRENT_TIMESTAMP);
+INSERT INTO sgc.vw_responsabilidade (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio)
+VALUES (39, '390001', '00390001', 'TITULAR', CURRENT_TIMESTAMP);
+
 INSERT INTO sgc.vw_responsabilidade (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio)
 VALUES (99, '123456789012', '56789012', 'TITULAR', CURRENT_TIMESTAMP);
 
@@ -371,16 +523,16 @@ VALUES ('212121', 'GESTOR', 11);
 -- Subprocesso 99 (Unidade 4 - ASSESSORIA_12)
 INSERT INTO sgc.movimentacao (codigo, subprocesso_codigo, unidade_origem_codigo, unidade_destino_codigo, usuario_titulo,
                               data_hora, descricao)
-VALUES (1, 99, 4, 4, '151515', CURRENT_TIMESTAMP - INTERVAL '5' DAY, 'Cadastro de atividades iniciado');
+VALUES (1, 99, 4, 4, '151515', CURRENT_TIMESTAMP - INTERVAL '5' DAY, 'Processo iniciado');
 INSERT INTO sgc.movimentacao (codigo, subprocesso_codigo, unidade_origem_codigo, unidade_destino_codigo, usuario_titulo,
                               data_hora, descricao)
-VALUES (2, 99, 4, 2, '151515', CURRENT_TIMESTAMP - INTERVAL '4' DAY, 'Cadastro de atividades disponibilizado para revisão');
+VALUES (2, 99, 4, 2, '151515', CURRENT_TIMESTAMP - INTERVAL '4' DAY, 'Disponibilização do cadastro de atividades');
 INSERT INTO sgc.movimentacao (codigo, subprocesso_codigo, unidade_origem_codigo, unidade_destino_codigo, usuario_titulo,
                               data_hora, descricao)
-VALUES (3, 99, 2, 4, '202020', CURRENT_TIMESTAMP - INTERVAL '3' DAY, 'Mapa de competências criado');
+VALUES (3, 99, 2, 4, '202020', CURRENT_TIMESTAMP - INTERVAL '3' DAY, 'Disponibilização do mapa de competências para validação');
 INSERT INTO sgc.movimentacao (codigo, subprocesso_codigo, unidade_origem_codigo, unidade_destino_codigo, usuario_titulo,
                               data_hora, descricao)
-VALUES (4, 99, 4, 2, '151515', CURRENT_TIMESTAMP - INTERVAL '2' DAY, 'Mapa de competências validado pela unidade');
+VALUES (4, 99, 4, 2, '151515', CURRENT_TIMESTAMP - INTERVAL '2' DAY, 'Validação do mapa de competências');
 INSERT INTO sgc.movimentacao (codigo, subprocesso_codigo, unidade_origem_codigo, unidade_destino_codigo, usuario_titulo,
                               data_hora, descricao)
 VALUES (5, 99, 2, 1, '202020', CURRENT_TIMESTAMP - INTERVAL '1' DAY, 'Mapa de competências homologado');
@@ -388,31 +540,54 @@ VALUES (5, 99, 2, 1, '202020', CURRENT_TIMESTAMP - INTERVAL '1' DAY, 'Mapa de co
 -- Subprocesso 200 (Unidade 2 - SECRETARIA_1)
 INSERT INTO sgc.movimentacao (codigo, subprocesso_codigo, unidade_origem_codigo, unidade_destino_codigo, usuario_titulo,
                               data_hora, descricao)
-VALUES (6, 200, 2, 2, '202020', CURRENT_TIMESTAMP - INTERVAL '10' DAY, 'Cadastro de atividades iniciado');
+VALUES (6, 200, 2, 2, '202020', CURRENT_TIMESTAMP - INTERVAL '10' DAY, 'Processo iniciado');
 INSERT INTO sgc.movimentacao (codigo, subprocesso_codigo, unidade_origem_codigo, unidade_destino_codigo, usuario_titulo,
                               data_hora, descricao)
-VALUES (7, 200, 2, 1, '202020', CURRENT_TIMESTAMP - INTERVAL '8' DAY, 'Cadastro de atividades disponibilizado');
+VALUES (7, 200, 2, 1, '202020', CURRENT_TIMESTAMP - INTERVAL '8' DAY, 'Disponibilização do cadastro de atividades');
 INSERT INTO sgc.movimentacao (codigo, subprocesso_codigo, unidade_origem_codigo, unidade_destino_codigo, usuario_titulo,
                               data_hora, descricao)
 VALUES (8, 200, 1, 2, '111111', CURRENT_TIMESTAMP - INTERVAL '5' DAY,
-        'Mapa de competências disponibilizado para validação');
+        'Disponibilização do mapa de competências para validação');
 INSERT INTO sgc.movimentacao (codigo, subprocesso_codigo, unidade_origem_codigo, unidade_destino_codigo, usuario_titulo,
                               data_hora, descricao)
 VALUES (9, 200, 2, 1, '202020', CURRENT_TIMESTAMP - INTERVAL '2' DAY, 'Mapa de competências homologado');
 
+-- Movimentações Secretaria 3
+-- Processo 301 (33 < 32)
+INSERT INTO sgc.movimentacao (codigo, subprocesso_codigo, unidade_origem_codigo, unidade_destino_codigo, usuario_titulo, data_hora, descricao)
+VALUES (30, 301, 33, 33, '330001', CURRENT_TIMESTAMP - INTERVAL '4' DAY, 'Processo iniciado');
+INSERT INTO sgc.movimentacao (codigo, subprocesso_codigo, unidade_origem_codigo, unidade_destino_codigo, usuario_titulo, data_hora, descricao)
+VALUES (31, 301, 33, 32, '330001', CURRENT_TIMESTAMP - INTERVAL '3' DAY, 'Disponibilização do cadastro de atividades');
+INSERT INTO sgc.movimentacao (codigo, subprocesso_codigo, unidade_origem_codigo, unidade_destino_codigo, usuario_titulo, data_hora, descricao)
+VALUES (32, 301, 32, 1, '320001', CURRENT_TIMESTAMP - INTERVAL '2' DAY, 'Cadastro aceito');
+INSERT INTO sgc.movimentacao (codigo, subprocesso_codigo, unidade_origem_codigo, unidade_destino_codigo, usuario_titulo, data_hora, descricao)
+VALUES (33, 301, 1, 1, '111111', CURRENT_TIMESTAMP - INTERVAL '1' DAY, 'Cadastro homologado');
+
+-- Processo 302 (36 < 35 < 30)
+INSERT INTO sgc.movimentacao (codigo, subprocesso_codigo, unidade_origem_codigo, unidade_destino_codigo, usuario_titulo, data_hora, descricao)
+VALUES (34, 302, 36, 36, '360001', CURRENT_TIMESTAMP - INTERVAL '6' DAY, 'Processo iniciado');
+INSERT INTO sgc.movimentacao (codigo, subprocesso_codigo, unidade_origem_codigo, unidade_destino_codigo, usuario_titulo, data_hora, descricao)
+VALUES (35, 302, 36, 35, '360001', CURRENT_TIMESTAMP - INTERVAL '5' DAY, 'Disponibilização do cadastro de atividades');
+INSERT INTO sgc.movimentacao (codigo, subprocesso_codigo, unidade_origem_codigo, unidade_destino_codigo, usuario_titulo, data_hora, descricao)
+VALUES (36, 302, 35, 30, '350001', CURRENT_TIMESTAMP - INTERVAL '4' DAY, 'Cadastro aceito');
+INSERT INTO sgc.movimentacao (codigo, subprocesso_codigo, unidade_origem_codigo, unidade_destino_codigo, usuario_titulo, data_hora, descricao)
+VALUES (37, 302, 30, 30, '300001', CURRENT_TIMESTAMP - INTERVAL '3' DAY, 'Cadastro homologado');
+INSERT INTO sgc.movimentacao (codigo, subprocesso_codigo, unidade_origem_codigo, unidade_destino_codigo, usuario_titulo, data_hora, descricao)
+VALUES (38, 302, 1, 36, '111111', CURRENT_TIMESTAMP - INTERVAL '1' DAY, 'Disponibilização do mapa de competências para validação');
+
 -- Reset identity sequences to prevent ID conflicts with test data
 -- This ensures auto-generated IDs start above the manually inserted ones
 ALTER TABLE sgc.processo
-    ALTER COLUMN codigo RESTART WITH 201;
+    ALTER COLUMN codigo RESTART WITH 400;
 ALTER TABLE sgc.subprocesso
-    ALTER COLUMN codigo RESTART WITH 201;
+    ALTER COLUMN codigo RESTART WITH 400;
 ALTER TABLE sgc.mapa
-    ALTER COLUMN codigo RESTART WITH 201;
+    ALTER COLUMN codigo RESTART WITH 400;
 ALTER TABLE sgc.atividade
-    ALTER COLUMN codigo RESTART WITH 3000;
+    ALTER COLUMN codigo RESTART WITH 4000;
 ALTER TABLE sgc.conhecimento
-    ALTER COLUMN codigo RESTART WITH 300000;
+    ALTER COLUMN codigo RESTART WITH 400000;
 ALTER TABLE sgc.competencia
-    ALTER COLUMN codigo RESTART WITH 3000;
+    ALTER COLUMN codigo RESTART WITH 4000;
 ALTER TABLE sgc.movimentacao
-    ALTER COLUMN codigo RESTART WITH 20;
+    ALTER COLUMN codigo RESTART WITH 50;

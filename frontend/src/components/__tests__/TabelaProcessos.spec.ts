@@ -40,7 +40,7 @@ describe("TabelaProcessos.vue", () => {
         context.wrapper = mount(TabelaProcessos, {
             ...getCommonMountOptions(),
             props: {
-                processos: [],
+                processos: mockProcessos,
                 criterioOrdenacao: "descricao",
                 direcaoOrdenacaoAsc: true,
             },
@@ -96,7 +96,7 @@ describe("TabelaProcessos.vue", () => {
                 }
             }),
             props: {
-                processos: [],
+                processos: mockProcessos,
                 criterioOrdenacao: "descricao",
                 direcaoOrdenacaoAsc: true,
             },
@@ -251,7 +251,9 @@ describe("TabelaProcessos.vue", () => {
             },
         });
 
-        expect(context.wrapper.text()).toContain("Nenhum processo encontrado");
+        expect(context.wrapper.find('[data-testid="empty-state-processos"]').exists()).toBe(true);
+        expect(context.wrapper.find('[data-testid="tbl-processos"]').exists()).toBe(false);
+        expect(context.wrapper.text()).toContain("Nenhum processo");
     });
 
     it("deve exibir CTA no estado vazio e emitir evento ao clicar", async () => {
@@ -277,7 +279,7 @@ describe("TabelaProcessos.vue", () => {
             context.wrapper = mount(TabelaProcessos, {
                 ...getCommonMountOptions(),
                 props: {
-                    processos: [],
+                    processos: mockProcessos,
                     criterioOrdenacao: "descricao",
                     direcaoOrdenacaoAsc: true,
                     compacto: true,
@@ -294,7 +296,7 @@ describe("TabelaProcessos.vue", () => {
             context.wrapper = mount(TabelaProcessos, {
                 ...getCommonMountOptions(),
                 props: {
-                    processos: [],
+                    processos: mockProcessos,
                     criterioOrdenacao: "descricao",
                     direcaoOrdenacaoAsc: true,
                     compacto: true,
@@ -316,7 +318,7 @@ describe("TabelaProcessos.vue", () => {
                     }
                 }),
                 props: {
-                    processos: [],
+                    processos: mockProcessos,
                     criterioOrdenacao: "descricao",
                     direcaoOrdenacaoAsc: true,
                     compacto: true,

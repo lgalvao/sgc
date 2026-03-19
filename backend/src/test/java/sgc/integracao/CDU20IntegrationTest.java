@@ -367,4 +367,48 @@ class CDU20IntegrationTest extends BaseIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.sugestoes").value("Sugestão de ajuste no mapa"));
     }
+
+    @Test
+    @DisplayName("ADMIN deve poder homologar mapa em situação MAPEAMENTO_MAPA_COM_SUGESTOES")
+    @WithMockAdmin
+    void testHomologarValidacaoComSugestoes_Sucesso() throws Exception {
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES);
+        subprocessoRepo.save(subprocesso);
+
+        Unidade adminUnit = unidadeRepo.findById(1L).orElseThrow();
+        Movimentacao movAdmin = Movimentacao.builder()
+                .subprocesso(subprocesso)
+                .unidadeOrigem(unidadeSuperior)
+                .unidadeDestino(adminUnit)
+                .descricao("Aceite com sugestões encaminhado ao admin")
+                .dataHora(LocalDateTime.now())
+                .build();
+        movimentacaoRepo.save(movAdmin);
+        subprocessoRepo.flush();
+
+        mockMvc.perform(
+                        post("/api/subprocessos/{codigo}/homologar-validacao", subprocesso.getCodigo())
+                                .with(csrf()))
+                .andExpect(status().isOk());
+
+        Subprocesso spAtualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
+        assertThat(spAtualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
+    }
+
+    @Test
+    @DisplayName("ADMIN não deve poder editar mapa em situação MAPEAMENTO_MAPA_COM_SUGESTOES")
+    @WithMockAdmin
+    void testPodeEditarMapa_FalsoQuandoMapaComSugestoes() throws Exception {
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES);
+        subprocessoRepo.saveAndFlush(subprocesso);
+
+        String response = mockMvc.perform(
+                        get("/api/subprocessos/{codigo}", subprocesso.getCodigo()))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        JsonNode json = objectMapper.readTree(response);
+        assertThat(json.at("/permissoes/podeEditarMapa").asBoolean()).isFalse();
+        assertThat(json.at("/permissoes/podeDisponibilizarMapa").asBoolean()).isTrue();
+    }
 }

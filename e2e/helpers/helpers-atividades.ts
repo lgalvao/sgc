@@ -281,7 +281,6 @@ export async function importarAtividadesComAvisoDuplicidade(page: Page, processo
     const modal = page.getByRole('dialog');
     await modal.getByTestId('btn-importar').click();
 
-    // O modal deve fechar (sem erro) mesmo quando todas as atividades são duplicatas
     await expect(modal).toBeHidden();
 }
 

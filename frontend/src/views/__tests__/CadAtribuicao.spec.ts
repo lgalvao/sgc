@@ -4,11 +4,11 @@ import CadAtribuicao from '@/views/AtribuicaoTemporariaView.vue';
 import {criarAtribuicaoTemporaria} from '@/services/atribuicaoTemporariaService';
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 
-const {mockPush, mockBuscarUnidade, mockBuscarUsuarios} = vi.hoisted(() => {
+const {mockPush, mockBuscarUnidade, mockPesquisarUsuarios} = vi.hoisted(() => {
     return {
         mockPush: vi.fn(),
         mockBuscarUnidade: vi.fn(),
-        mockBuscarUsuarios: vi.fn(),
+        mockPesquisarUsuarios: vi.fn(),
     };
 });
 
@@ -35,7 +35,7 @@ vi.mock('@/services/unidadeService', () => ({
 }));
 
 vi.mock('@/services/usuarioService', () => ({
-    buscarUsuariosPorUnidade: mockBuscarUsuarios,
+    pesquisarUsuarios: mockPesquisarUsuarios,
 }));
 
 describe('CadAtribuicao.vue', () => {
@@ -47,9 +47,9 @@ describe('CadAtribuicao.vue', () => {
         nome: 'Unidade teste'
     };
 
-    const mockUsuarios = [
-        {codigo: '111', nome: 'Servidor 1', tituloEleitoral: '111'},
-        {codigo: '222', nome: 'Servidor 2', tituloEleitoral: '222'}
+        const mockUsuarios = [
+        {codigo: 111, nome: 'Servidor 1', tituloEleitoral: '111'},
+        {codigo: 222, nome: 'Servidor 2', tituloEleitoral: '222'}
     ];
 
     function criarWrapper() {
@@ -63,18 +63,13 @@ describe('CadAtribuicao.vue', () => {
                 {
                     LayoutPadrao: {template: '<div><slot /></div>'},
                     BContainer: {template: '<div><slot /></div>'},
-                    BCard: {template: '<div><slot /></div>'},
-                    BCardBody: {template: '<div><slot /></div>'},
                     BForm: {template: '<form @submit.prevent="$emit(\'submit\', { preventDefault: () => {} })"><slot /></form>'},
-                    BFormSelect: {
-                        template: '<select :value="modelValue" @change="$emit(\'update:modelValue\', $event.target.value)"><slot name="first" /><option v-for="opt in options" :key="opt.codigo" :value="opt.codigo">{{ opt.nome }}</option></select>',
-                        props: ['modelValue', 'options']
-                    },
-                    BFormSelectOption: {template: '<option><slot /></option>'},
                     BFormInput: {
                         template: '<input :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />',
                         props: ['modelValue']
                     },
+                    BListGroup: {template: '<div><slot /></div>'},
+                    BListGroupItem: {template: '<button @click="$emit(\'click\')"><slot /></button>'},
                     BFormTextarea: {
                         template: '<textarea :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)"></textarea>',
                         props: ['modelValue']
@@ -96,7 +91,7 @@ describe('CadAtribuicao.vue', () => {
         });
 
         mockBuscarUnidade.mockResolvedValue(mockUnidade);
-        mockBuscarUsuarios.mockResolvedValue(mockUsuarios);
+        mockPesquisarUsuarios.mockResolvedValue(mockUsuarios);
 
         context.wrapper = criarWrapper();
     });
@@ -105,7 +100,7 @@ describe('CadAtribuicao.vue', () => {
         await flushPromises();
 
         expect(mockBuscarUnidade).toHaveBeenCalledWith(1);
-        expect(mockBuscarUsuarios).toHaveBeenCalledWith(1);
+        expect(mockPesquisarUsuarios).not.toHaveBeenCalled();
     });
 
     it('submete o formulário com sucesso', async () => {
@@ -117,8 +112,7 @@ describe('CadAtribuicao.vue', () => {
         context.wrapper = criarWrapper();
         await flushPromises();
 
-        const select = context.wrapper.find('[data-testid="select-usuario"]');
-        await select.setValue('111');
+        context.wrapper.vm.usuarioSelecionado = '111';
 
         const dateInput = context.wrapper.find('[data-testid="input-data-termino"]');
         await dateInput.setValue('2023-12-31');
@@ -173,7 +167,7 @@ describe('CadAtribuicao.vue', () => {
 
         // Sem usuario
         await context.wrapper.find('form').trigger('submit');
-        expect(context.wrapper.vm.erroUsuario).toBeTruthy();
+        expect(context.wrapper.text()).toContain('Selecione um usuário para criar a atribuição.');
 
         // Com usuario, sem justificativa
         context.wrapper.vm.usuarioSelecionado = '111';

@@ -6,6 +6,7 @@
           {{ unidade?.sigla }}
         </div>
       </template>
+
       <template #actions>
         <LoadingButton
             v-if="podeVerImpacto"
@@ -55,6 +56,7 @@
             :title="TEXTOS.mapa.EMPTY_TITLE"
         />
       </div>
+
       <div v-else class="mb-4 mt-3">
         <CompetenciaCard
             v-for="comp in competencias"
@@ -68,6 +70,7 @@
         />
       </div>
     </div>
+
     <div v-else>
       <p>{{ TEXTOS.mapa.UNIDADE_NAO_ENCONTRADA }}</p>
     </div>
@@ -177,11 +180,7 @@ const unidade = ref<Unidade | null>(null);
 const codSubprocesso = ref<number | null>(null);
 
 onMounted(async () => {
-  const id = await subprocessosStore.buscarSubprocessoPorProcessoEUnidade(
-      codProcesso.value,
-      siglaUnidade.value,
-  );
-
+  const id = await subprocessosStore.buscarSubprocessoPorProcessoEUnidade(codProcesso.value, siglaUnidade.value);
   if (id) {
     codSubprocesso.value = id;
     const data = await subprocessosStore.buscarContextoEdicao(id);

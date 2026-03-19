@@ -12,7 +12,7 @@ export async function buscarConfiguracoes(): Promise<Parametro[]> {
     return response.data;
 }
 
-export async function salvarConfiguracoes(parametros: Parametro[]): Promise<Parametro[]> {
-    const response = await apiClient.post<Parametro[]>("/configuracoes", parametros);
+export async function salvarConfiguracoes(configuracoes: Parametro[]): Promise<Parametro[]> {
+    const response = await apiClient.post<Parametro[]>("/configuracoes", configuracoes);
     return response.data;
 }

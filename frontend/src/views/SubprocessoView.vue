@@ -122,10 +122,10 @@
             :tbody-tr-props="rowAttrMovimentacao"
             data-testid="tbl-movimentacoes"
             primary-key="codigo"
+            small
             responsive
             show-empty
             stacked="md"
-            striped
         >
           <template #empty>
             <div class="text-center text-muted py-5" data-testid="empty-state-movimentacoes">
@@ -203,7 +203,7 @@
       :ok-title="TEXTOS.subprocesso.BOTAO_CONFIRMAR_LEMBRETE"
       test-id-confirmar="btn-confirmar-enviar-lembrete"
       :titulo="TEXTOS.subprocesso.LEMBRETE_TITULO"
-      variant="info"
+      variant="primary"
       @confirmar="enviarLembreteConfirmado"
   >
     <p data-testid="txt-modelo-lembrete">

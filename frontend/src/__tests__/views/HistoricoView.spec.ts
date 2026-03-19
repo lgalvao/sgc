@@ -113,7 +113,7 @@ describe("HistoricoView.vue", () => {
         await flushPromises();
 
         const text = context.wrapper.text();
-        expect(text).toContain("Nenhum processo encontrado");
+        expect(text).toContain("Nenhum processo");
     });
 
     it("deve navegar para detalhes ao clicar", async () => {

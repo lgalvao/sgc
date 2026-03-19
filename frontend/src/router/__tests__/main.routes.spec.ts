@@ -70,8 +70,8 @@ describe("main.routes", () => {
     it("deve conter a rota Parametros", async () => {
         const route = mainRoutes.find((r) => r.name === "Parametros");
         expect(route).toBeDefined();
-        expect(route?.path).toBe("/parametros");
-        expect(route?.meta?.title).toBe("Parâmetros");
+        expect(route?.path).toBe("/configuracoes");
+        expect(route?.meta?.title).toBe("Configurações");
 
         if (typeof route?.component === "function") {
             const component = await (route.component as () => Promise<any>)();

@@ -100,7 +100,7 @@ def process_file(filepath):
 modified_files = []
 
 for root, dirs, files in os.walk('.'):
-    if 'node_modules' in root or '.git' in root or 'build' in root or 'dist' in root or 'test' in root or '__tests__' in root or 'stories' in root:
+    if 'node_modules' in root or '.git' in root or 'build' in root or 'dist' in root:
         continue
     for file in files:
         if file.endswith(('.ts', '.js', '.vue', '.java')):

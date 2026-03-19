@@ -39,19 +39,19 @@
                 {{ TEXTOS.login.LABEL_USUARIO }} <span aria-hidden="true" class="text-danger">*</span>
               </template>
               <!-- eslint-disable vuejs-accessibility/no-autofocus -->
-              <BFormInput
-                  id="titulo"
-                  v-model="titulo"
-                  :disabled="loginStep > 1"
-                  autocomplete="username"
-                  autofocus
-                  data-testid="inp-login-usuario"
-                  inputmode="numeric"
-                  name="titulo"
-                  :placeholder="TEXTOS.login.PLACEHOLDER_USUARIO"
-                  required
-                  type="text"
-              />
+               <BFormInput
+                   id="titulo"
+                   v-model="titulo"
+                   aria-required="true"
+                   :disabled="loginStep > 1"
+                   autocomplete="username"
+                   autofocus
+                   data-testid="inp-login-usuario"
+                   inputmode="numeric"
+                   name="titulo"
+                   :placeholder="TEXTOS.login.PLACEHOLDER_USUARIO"
+                   type="text"
+               />
               <!-- eslint-enable vuejs-accessibility/no-autofocus -->
             </BFormGroup>
             <BFormGroup
@@ -69,13 +69,13 @@
                 <BFormInput
                     id="senha"
                     v-model="senha"
+                    aria-required="true"
                     :autocomplete="showPassword ? 'off' : 'current-password'"
                     :disabled="loginStep > 1"
                     :type="showPassword ? 'text' : 'password'"
                     data-testid="inp-login-senha"
                     name="senha"
                     :placeholder="TEXTOS.login.PLACEHOLDER_SENHA"
-                    required
                     @keydown="verificarCapsLock"
                     @keyup="verificarCapsLock"
                 />

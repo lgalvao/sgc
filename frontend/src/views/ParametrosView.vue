@@ -1,6 +1,6 @@
 <template>
   <LayoutPadrao>
-    <PageHeader :title="TEXTOS.parametros.TITULO" />
+    <PageHeader :title="TEXTOS.configuracoes.TITULO" />
 
     <div v-if="store.loading" class="text-center py-4">
       <BSpinner :label="TEXTOS.comum.CARREGANDO" variant="primary" />
@@ -25,18 +25,22 @@
             class="mb-3"
         >
           <template #label>
-            {{ TEXTOS.parametros.LABEL_DIAS_INATIVACAO }} <span aria-hidden="true" class="text-danger">*</span>
+            {{ TEXTOS.configuracoes.LABEL_DIAS_INATIVACAO }} <span aria-hidden="true" class="text-danger">*</span>
           </template>
           <template #description>
-            {{ TEXTOS.parametros.DESC_DIAS_INATIVACAO }}
+            {{ TEXTOS.configuracoes.DESC_DIAS_INATIVACAO }}
           </template>
           <BFormInput
               id="diasInativacao"
               v-model="form.diasInativacao"
+              aria-required="true"
               min="1"
-              required
+              :state="mensagemErroDiasInativacao ? false : null"
               type="number"
           />
+          <BFormInvalidFeedback :state="mensagemErroDiasInativacao ? false : null">
+            {{ mensagemErroDiasInativacao }}
+          </BFormInvalidFeedback>
         </BFormGroup>
 
         <BFormGroup
@@ -44,25 +48,29 @@
             class="mb-3"
         >
           <template #label>
-            {{ TEXTOS.parametros.LABEL_DIAS_ALERTA_NOVO }} <span aria-hidden="true" class="text-danger">*</span>
+            {{ TEXTOS.configuracoes.LABEL_DIAS_ALERTA_NOVO }} <span aria-hidden="true" class="text-danger">*</span>
           </template>
           <template #description>
-            {{ TEXTOS.parametros.DESC_DIAS_ALERTA_NOVO }}
+            {{ TEXTOS.configuracoes.DESC_DIAS_ALERTA_NOVO }}
           </template>
           <BFormInput
               id="diasAlertaNovo"
               v-model="form.diasAlertaNovo"
+              aria-required="true"
               min="1"
-              required
+              :state="mensagemErroDiasAlertaNovo ? false : null"
               type="number"
           />
+          <BFormInvalidFeedback :state="mensagemErroDiasAlertaNovo ? false : null">
+            {{ mensagemErroDiasAlertaNovo }}
+          </BFormInvalidFeedback>
         </BFormGroup>
 
         <div class="d-flex justify-content-end">
           <LoadingButton
               :loading="salvando"
               icon="check-lg"
-              :text="TEXTOS.parametros.BOTAO_SALVAR"
+              :text="TEXTOS.configuracoes.BOTAO_SALVAR"
               type="submit"
               variant="success"
           />
@@ -73,8 +81,8 @@
 </template>
 
 <script lang="ts" setup>
-import {onMounted, reactive, ref} from 'vue';
-import {BAlert, BForm, BFormGroup, BFormInput, BSpinner} from 'bootstrap-vue-next';
+import {computed, onMounted, reactive, ref} from 'vue';
+import {BAlert, BForm, BFormGroup, BFormInput, BFormInvalidFeedback, BSpinner} from 'bootstrap-vue-next';
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import PageHeader from '@/components/layout/PageHeader.vue';
 import AppAlert from '@/components/comum/AppAlert.vue';
@@ -86,10 +94,21 @@ import {TEXTOS} from '@/constants/textos';
 const store = useConfiguracoesStore();
 const {notify, notificacao, clear} = useNotification();
 const salvando = ref(false);
+const validacaoSubmetida = ref(false);
 
 const form = reactive({
   diasInativacao: 30,
   diasAlertaNovo: 3
+});
+
+const mensagemErroDiasInativacao = computed(() => {
+  if (!validacaoSubmetida.value) return "";
+  return Number(form.diasInativacao) >= 1 ? "" : "Informe um valor maior ou igual a 1.";
+});
+
+const mensagemErroDiasAlertaNovo = computed(() => {
+  if (!validacaoSubmetida.value) return "";
+  return Number(form.diasAlertaNovo) >= 1 ? "" : "Informe um valor maior ou igual a 1.";
 });
 
 function atualizarFormulario() {
@@ -103,11 +122,16 @@ async function carregar() {
 }
 
 async function salvar() {
+  validacaoSubmetida.value = true;
+  if (mensagemErroDiasInativacao.value || mensagemErroDiasAlertaNovo.value) {
+    return;
+  }
+
   salvando.value = true;
 
   const paramsToSave: Parametro[] = [];
 
-  const findCodigo = (chave: string) => store.parametros.find(p => p.chave === chave)?.codigo;
+  const findCodigo = (chave: string) => store.configuracoes.find(p => p.chave === chave)?.codigo;
 
   paramsToSave.push({
     codigo: findCodigo('DIAS_INATIVACAO_PROCESSO'),
@@ -124,16 +148,17 @@ async function salvar() {
   const sucesso = await store.salvarConfiguracoes(paramsToSave);
 
   if (sucesso) {
-    notify(TEXTOS.parametros.SUCESSO_SALVAR, 'success');
+    validacaoSubmetida.value = false;
+    notify(TEXTOS.configuracoes.SUCESSO_SALVAR, 'success');
   } else {
-    notify(TEXTOS.parametros.ERRO_SALVAR, 'danger');
+    notify(TEXTOS.configuracoes.ERRO_SALVAR, 'danger');
   }
 
   salvando.value = false;
 }
 
 onMounted(async () => {
-  if (store.parametros.length === 0) {
+  if (store.configuracoes.length === 0) {
     await carregar();
   } else {
     atualizarFormulario();

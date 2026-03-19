@@ -207,4 +207,30 @@ class SubprocessoServiceContextoIntegrationTest extends BaseIntegrationTest {
 
         assertThat(permissoes.podeVisualizarImpacto()).isTrue();
     }
+
+    @Test
+    @DisplayName("obterPermissoesUI: ADMIN não deve poder editar mapa em situação MAPEAMENTO_MAPA_COM_SUGESTOES")
+    void obterPermissoesUI_AdminNaoPodeEditarMapaComSugestoes() {
+        admin.setPerfilAtivo(Perfil.ADMIN);
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES);
+
+        PermissoesSubprocessoDto permissoes = subprocessoService.obterPermissoesUI(subprocesso, admin);
+
+        assertThat(permissoes.podeEditarMapa()).isFalse();
+        assertThat(permissoes.podeDisponibilizarMapa()).isTrue();
+        assertThat(permissoes.podeHomologarMapa()).isTrue();
+    }
+
+    @Test
+    @DisplayName("obterPermissoesUI: ADMIN não deve poder editar mapa em situação REVISAO_MAPA_COM_SUGESTOES")
+    void obterPermissoesUI_AdminNaoPodeEditarRevisaoMapaComSugestoes() {
+        admin.setPerfilAtivo(Perfil.ADMIN);
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.REVISAO_MAPA_COM_SUGESTOES);
+
+        PermissoesSubprocessoDto permissoes = subprocessoService.obterPermissoesUI(subprocesso, admin);
+
+        assertThat(permissoes.podeEditarMapa()).isFalse();
+        assertThat(permissoes.podeDisponibilizarMapa()).isTrue();
+        assertThat(permissoes.podeHomologarMapa()).isTrue();
+    }
 }

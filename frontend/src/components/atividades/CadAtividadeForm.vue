@@ -8,12 +8,12 @@
       <BFormInput
           ref="inputRef"
           v-model="modelValue"
+          aria-required="true"
           :disabled="loading"
           :state="estadoInput"
           aria-label="Nova atividade"
           data-testid="inp-nova-atividade"
           placeholder="Nova atividade"
-          required
           type="text"
       />
       <BFormInvalidFeedback :state="estadoInput">

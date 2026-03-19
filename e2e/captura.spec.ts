@@ -36,7 +36,6 @@ import * as fs from 'node:fs';
  * para refinamento de UI. Funciona tambem como um bom teste 'smoke'
  */
 
-// Interface para metadados das capturas (Padrão Captus)
 interface CaptureMetadata {
     file: string;
     url: string;
@@ -1026,10 +1025,10 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             await capturarTela(page, '06-navegacao', '01-menu-principal', { tags: ['layout', 'menu'] });
 
-            // Parâmetros (se admin)
+            // Configs (se admin)
             await page.getByTestId('btn-configuracoes').click();
-            await expect(page).toHaveURL(/\/parametros/);
-            await capturarTela(page, '06-navegacao', '02-menu-parametros', { extra: { secao: 'configuracoes' } });
+            await expect(page).toHaveURL(/\/config/);
+            await capturarTela(page, '06-navegacao', '02-menu-configs', { extra: { secao: 'configuracoes' } });
             await page.goto('/painel');
 
             // Seção unidades (para ADMIN)
@@ -1310,7 +1309,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             await page.getByTestId('btn-configuracoes').click();
             await page.waitForTimeout(500);
-            await capturarTela(page, '13-configuracoes', '01-pagina-parametros', { fullPage: true });
+            await capturarTela(page, '13-configuracoes', '01-pagina-configuracoes', { fullPage: true });
 
             const inputDiasInativacao = page.getByLabel(/Dias para inativação de processos/i);
             await expect(inputDiasInativacao).toBeVisible();

@@ -73,9 +73,9 @@
             id="usuarioTitulo"
             ref="inputTituloRef"
             v-model="novoAdminTitulo"
+            aria-required="true"
             maxlength="12"
             :placeholder="TEXTOS.administracao.PLACEHOLDER_TITULO"
-            required
             type="text"
             @keydown.enter.prevent="adicionarAdmin"
         />

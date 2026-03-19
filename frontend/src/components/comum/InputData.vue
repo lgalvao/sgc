@@ -3,10 +3,10 @@
     <BFormInput
         :id="id"
         ref="inputRef"
+        :aria-required="required ? 'true' : undefined"
         :model-value="modelValue"
         :state="state"
         :data-testid="dataTestid"
-        :required="required"
         :max="max"
         :min="min"
         type="date"

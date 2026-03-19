@@ -8,7 +8,8 @@
               :variant="badgeVariant(subprocesso.situacao)"
               class="fs-6"
               data-testid="cad-atividades__txt-badge-situacao"
-          >{{ formatSituacaoSubprocesso(subprocesso.situacao) }}</BBadge>
+          >{{ formatSituacaoSubprocesso(subprocesso.situacao) }}
+          </BBadge>
         </div>
       </template>
       <template #actions>
@@ -97,7 +98,7 @@
       <AtividadeItem
           :atividade="atividade"
           :erro-validacao="obterErroParaAtividade(atividade.codigo)"
-          :pode-editar="!!podeEditarCadastro"
+          :pode-editar="podeEditarCadastro"
           @atualizar-atividade="(desc: string) => salvarEdicaoAtividade(atividade.codigo, desc)"
           @remover-atividade="() => removerAtividade(idx)"
           @adicionar-conhecimento="(desc: string) => adicionarConhecimento(idx, desc)"
@@ -122,7 +123,7 @@
     />
 
     <ConfirmacaoDisponibilizacaoModal
-        :is-revisao="!!isRevisao"
+        :is-revisao="isRevisao"
         :mostrar="mostrarModalConfirmacao"
         @confirmar="confirmarDisponibilizacao"
         @fechar="mostrarModalConfirmacao = false"
@@ -146,7 +147,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BButton, BBadge} from "bootstrap-vue-next";
+import {BAlert, BBadge, BButton} from "bootstrap-vue-next";
 import AppAlert from "@/components/comum/AppAlert.vue";
 import {computed, nextTick, onMounted, ref, watch} from "vue";
 import {useRouter} from "vue-router";
@@ -570,11 +571,10 @@ onMounted(async () => {
       }
     }
   } else {
-    logger.error("[CadAtividades] ERRO: Subprocesso não encontrado!");
+    logger.error("ERRO: Subprocesso não encontrado!");
   }
 });
 
-// Auto-focus if empty on load
 watch(() => atividades.value?.length, (newLen, oldLen) => {
   if (newLen === 0 && oldLen === undefined) {
     nextTick(() => atividadeFormRef.value?.inputRef?.$el?.focus());

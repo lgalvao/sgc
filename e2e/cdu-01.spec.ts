@@ -39,7 +39,7 @@ test.describe('CDU-01 - Realizar login e exibir estrutura das telas', () => {
         await expect(page.getByRole('link', {name: TEXTOS.comum.MENU_RELATORIOS})).toBeVisible();
         await expect(page.getByRole('link', {name: TEXTOS.comum.MENU_HISTORICO})).toBeVisible();
 
-        // Admin deve ver Parâmetros e Administradores
+        // Admin deve ver Configs e Administradores
         await expect(page.getByTestId('btn-configuracoes')).toBeVisible();
         await expect(page.getByTestId('btn-administradores')).toBeVisible();
     });

@@ -10,30 +10,30 @@ import {
 export type {Parametro};
 
 export const useConfiguracoesStore = defineStore("configuracoes", () => {
-    const parametros = ref<Parametro[]>([]);
+    const configuracoes = ref<Parametro[]>([]);
     const {carregando, erro, executarSilencioso} = useAsyncAction();
 
     // Map para lookup O(1) de chave -> parametro
-    const parametrosMap = computed(() =>
-        new Map(parametros.value.map(p => [p.chave, p]))
+    const configuracoesMap = computed(() =>
+        new Map(configuracoes.value.map(p => [p.chave, p]))
     );
 
     async function carregarConfiguracoes() {
         await executarSilencioso(async () => {
-            parametros.value = await serviceBuscarConfiguracoes();
+            configuracoes.value = await serviceBuscarConfiguracoes();
         }, "Não foi possível carregar as configurações.");
     }
 
     async function salvarConfiguracoes(novosParametros: Parametro[]) {
         const result = await executarSilencioso(async () => {
-            parametros.value = await serviceSalvarConfiguracoes(novosParametros);
+            configuracoes.value = await serviceSalvarConfiguracoes(novosParametros);
             return true;
         }, "Não foi possível salvar as configurações.");
         return result ?? false;
     }
 
     function getValor(chave: string, valorPadrao: string = ""): string {
-        const param = parametrosMap.value.get(chave);
+        const param = configuracoesMap.value.get(chave);
         return param ? param.valor : valorPadrao;
     }
 
@@ -49,7 +49,7 @@ export const useConfiguracoesStore = defineStore("configuracoes", () => {
     }
 
     return {
-        parametros,
+        configuracoes,
         loading: carregando,
         error: erro,
         carregarConfiguracoes,
