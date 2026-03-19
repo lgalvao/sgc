@@ -152,7 +152,6 @@ test.describe('CDU-02 - Visualizar painel', () => {
             });
 
             await test.step('Verificar tabela de alertas vazia', async () => {
-                // A tabela de alertas também usa EmptyState quando vazia
                 await expect(page.getByTestId('empty-state-alertas')).toBeVisible();
                 await expect(page.getByTestId('empty-state-alertas')).toContainText(/Nenhum alerta/i);
             });
