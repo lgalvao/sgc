@@ -65,7 +65,7 @@ import {useRouter} from "vue-router";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
-import {formatDateBR, formatDateTimeBR} from "@/utils";
+import {formatDateTimeBR} from "@/utils";
 import TabelaProcessos from "@/components/processo/TabelaProcessos.vue";
 import {usePerfilStore} from "@/stores/perfil";
 import {usePerfil} from "@/composables/usePerfil";
@@ -94,7 +94,7 @@ async function buscarAlertas(
     unidade: number,
     page: number,
     size: number,
-    sort?: "data" | "processo",
+    sort?: "dataHora" | "processo",
     order?: "asc" | "desc",
 ) {
   const response = await painelService.listarAlertas(usuarioCodigo, unidade, page, size, sort, order);

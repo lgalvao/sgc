@@ -575,6 +575,30 @@ VALUES (37, 302, 30, 30, '300001', CURRENT_TIMESTAMP - INTERVAL '3' DAY, 'Cadast
 INSERT INTO sgc.movimentacao (codigo, subprocesso_codigo, unidade_origem_codigo, unidade_destino_codigo, usuario_titulo, data_hora, descricao)
 VALUES (38, 302, 1, 36, '111111', CURRENT_TIMESTAMP - INTERVAL '1' DAY, 'Disponibilização do mapa de competências para validação');
 
+-- -------------------------------------------------------------------------------------------------
+-- ALERTAS (Notificações correspondentes às movimentações)
+-- -------------------------------------------------------------------------------------------------
+-- Alertas para Unidade 1 (ADMIN) - Processos Homologados
+INSERT INTO sgc.alerta (codigo, data_hora, processo_codigo, unidade_origem_codigo, unidade_destino_codigo, descricao)
+VALUES (1, CURRENT_TIMESTAMP - INTERVAL '1' DAY, 99, 2, 1, 'Mapa de competências homologado');
+INSERT INTO sgc.alerta (codigo, data_hora, processo_codigo, unidade_origem_codigo, unidade_destino_codigo, descricao)
+VALUES (2, CURRENT_TIMESTAMP - INTERVAL '2' DAY, 200, 2, 1, 'Mapa de competências homologado');
+INSERT INTO sgc.alerta (codigo, data_hora, processo_codigo, unidade_origem_codigo, unidade_destino_codigo, descricao)
+VALUES (3, CURRENT_TIMESTAMP - INTERVAL '1' DAY, 301, 1, 1, 'Cadastro homologado');
+
+-- Alerta para Unidade 36 (SECAO_321) - Mapa Disponibilizado para Validação
+INSERT INTO sgc.alerta (codigo, data_hora, processo_codigo, unidade_origem_codigo, unidade_destino_codigo, descricao)
+VALUES (4, CURRENT_TIMESTAMP - INTERVAL '1' DAY, 302, 1, 36, 'Disponibilização do mapa de competências para validação');
+
+-- Associações de Alertas aos Usuários (Chefe/Gestor)
+-- Para os alertas da Unidade 1 (Usuário 111111)
+INSERT INTO sgc.alerta_usuario (alerta_codigo, usuario_titulo, data_hora_leitura) VALUES (1, '111111', NULL);
+INSERT INTO sgc.alerta_usuario (alerta_codigo, usuario_titulo, data_hora_leitura) VALUES (2, '111111', NULL);
+INSERT INTO sgc.alerta_usuario (alerta_codigo, usuario_titulo, data_hora_leitura) VALUES (3, '111111', NULL);
+
+-- Para o alerta da Unidade 36 (Usuário 360001)
+INSERT INTO sgc.alerta_usuario (alerta_codigo, usuario_titulo, data_hora_leitura) VALUES (4, '360001', NULL);
+
 -- Reset identity sequences to prevent ID conflicts with test data
 -- This ensures auto-generated IDs start above the manually inserted ones
 ALTER TABLE sgc.processo
@@ -591,3 +615,6 @@ ALTER TABLE sgc.competencia
     ALTER COLUMN codigo RESTART WITH 4000;
 ALTER TABLE sgc.movimentacao
     ALTER COLUMN codigo RESTART WITH 50;
+ALTER TABLE sgc.alerta
+    ALTER COLUMN codigo RESTART WITH 10;
+

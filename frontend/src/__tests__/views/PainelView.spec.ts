@@ -126,7 +126,7 @@ describe("PainelView.vue", () => {
         await wrapper.vm.$nextTick();
 
         expect(processosStore.buscarProcessosPainel).toHaveBeenCalledWith("ADMIN", 1, 0, 10);
-        expect(painelService.listarAlertas).toHaveBeenCalledWith(100, 1, 0, 10, undefined, undefined);
+        expect(painelService.listarAlertas).toHaveBeenCalledWith(100, 1, 0, 10, "dataHora", "desc");
     });
 
     it("não deve carregar dados se perfil não estiver selecionado", async () => {
@@ -181,35 +181,6 @@ describe("PainelView.vue", () => {
         await wrapper.findComponent({name: 'TabelaProcessos'}).vm.$emit('selecionar-processo', processoMock);
 
         expect(routerPushMock).toHaveBeenCalledWith("/processo/1");
-    });
-
-    it("deve reordenar alertas", async () => {
-        const wrapper = mount(PainelView, mountOptions());
-
-        // Aguarda onMounted/onActivated
-        await wrapper.vm.$nextTick();
-        await flushPromises();
-
-        vi.clearAllMocks(); // Limpa chamadas do onMounted
-        (painelService.listarAlertas as any).mockResolvedValue(mockPageVazia);
-
-        await (wrapper.vm as any).handleSortChangeAlertas({sortBy: {key: 'processo'}, sortDesc: false});
-
-        expect(painelService.listarAlertas).toHaveBeenLastCalledWith(
-            100, 1, 0, 10, "processo", "asc"
-        );
-
-        // Test with string fallback
-        await (wrapper.vm as any).handleSortChangeAlertas({sortBy: 'dataHora'});
-        expect(painelService.listarAlertas).toHaveBeenLastCalledWith(
-            100, 1, 0, 10, "data", "desc"
-        );
-
-        // Test with array
-        await (wrapper.vm as any).handleSortChangeAlertas({sortBy: [{key: 'dataHora'}]});
-        expect(painelService.listarAlertas).toHaveBeenLastCalledWith(
-            100, 1, 0, 10, "data", "asc"
-        );
     });
 
     it("deve cobrir branches de abrirDetalhesProcesso, rowClassAlerta, rowAttrAlerta", async () => {

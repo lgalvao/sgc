@@ -88,9 +88,9 @@ describe("painelService", () => {
 
         it("deve lidar com ordenação", async () => {
             mockApi.get.mockResolvedValueOnce({data: {content: []}});
-            await service.listarAlertas("123", 1, 0, 10, "data", "asc");
+            await service.listarAlertas("123", 1, 0, 10, "dataHora", "asc");
             expect(mockApi.get).toHaveBeenCalledWith("/painel/alertas", {
-                params: {usuarioTitulo: "123", unidade: 1, page: 0, size: 10, sort: "data,asc"},
+                params: {usuarioTitulo: "123", unidade: 1, page: 0, size: 10, sort: "dataHora,asc"},
             });
         });
 
