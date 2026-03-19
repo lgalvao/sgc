@@ -74,4 +74,27 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
         await expect(modal).toBeHidden();
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
     });
+
+    test('Cenario 4: ADMIN confirma homologação em bloco e é redirecionado ao painel', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
+
+        const btnHomologar = page.getByRole('button', {name: /^Homologar mapas em bloco$/i}).first();
+        await expect(btnHomologar).toBeVisible();
+        await btnHomologar.click();
+
+        const modal = page.getByRole('dialog');
+        await expect(modal).toBeVisible();
+        await expect(modal.locator('table')).toBeVisible();
+
+        // Unidade deve aparecer marcada (checkbox selecionado por padrão)
+        const checkboxUnidade = modal.locator('input[type="checkbox"]').first();
+        await expect(checkboxUnidade).toBeChecked();
+
+        const responsePromise = page.waitForResponse(resp => resp.url().includes('/api/') && resp.request().method() === 'POST');
+        await modal.getByRole('button', {name: /^Homologar$/i}).click();
+        await responsePromise;
+
+        await page.waitForURL(/\/painel/);
+        await expect(page.getByTestId('tbl-processos')).toBeVisible();
+    });
 });
