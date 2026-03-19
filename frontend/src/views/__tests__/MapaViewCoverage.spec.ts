@@ -5,6 +5,7 @@ import {ref} from "vue";
 import * as useAcessoModule from "@/composables/useAcesso";
 import * as subprocessoService from "@/services/subprocessoService";
 import {useMapasStore} from "@/stores/mapas";
+import {useSubprocessosStore} from "@/stores/subprocessos";
 import MapaView from "../MapaView.vue";
 
 const {pushMock} = vi.hoisted(() => ({pushMock: vi.fn()}));
@@ -65,10 +66,19 @@ describe("MapaView coverage", () => {
                             mapaCompleto: initialMapaCompleto,
                             impactoMapa: null,
                             erro: null
+                        },
+                        processos: {
+                            processoDetalhe: {
+                                unidades: [{sigla: "TESTE"}] // Sem codSubprocesso para forçar fallback
+                            }
                         }
                     }
                 })],
                 stubs
+            },
+            props: {
+                codProcesso: "1",
+                sigla: "TESTE"
             }
         });
     }
@@ -243,8 +253,8 @@ describe("MapaView coverage", () => {
             await hook.call(vm);
         }
 
-        // Cobre onMounted definindo variáveis
-        expect(vm.codSubprocesso).toBe(123);
+        // Cobre onMounted definindo variáveis (O id 123 é retornado pelo store.buscarContextoEdicao será chamado)
+        expect(subprocessosStore.buscarContextoEdicao).toHaveBeenCalledWith(123);
         expect(vm.atividades).toHaveLength(1);
         expect(vm.unidade.sigla).toBe("TESTE");
 

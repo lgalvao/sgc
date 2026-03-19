@@ -47,7 +47,9 @@ test.describe('CDU-18: Visualizar mapa de competências', () => {
             await expect(page.getByRole('heading', {name: TEXTOS.mapa.TITULO_TECNICO})).toBeVisible();
 
             // 5.2 Identificação da unidade (sigla e nome)
-            await expect(page.getByTestId('subprocesso-header__txt-header-unidade')).toContainText(/ASSESSORIA_\d+/);
+            const headerUnidade = page.getByTestId('subprocesso-header__txt-header-unidade');
+            await expect(headerUnidade).toBeVisible();
+            await expect(headerUnidade).toContainText(/ASSESSORIA_\d+/);
             await expect(page.getByText(/Assessoria/i).first()).toBeVisible();
 
             // 5.3 Competência do seed
@@ -82,7 +84,9 @@ test.describe('CDU-18: Visualizar mapa de competências', () => {
 
         await test.step('4. Verificar visualização do mapa', async () => {
             await expect(page.getByRole('heading', {name: TEXTOS.mapa.TITULO_TECNICO})).toBeVisible();
-            await expect(page.getByTestId('subprocesso-header__txt-header-unidade')).toHaveText('ASSESSORIA_12');
+            const headerUnidade = page.getByTestId('subprocesso-header__txt-header-unidade');
+            await expect(headerUnidade).toBeVisible();
+            await expect(headerUnidade).toHaveText('ASSESSORIA_12');
             await expect(page.getByText('Assessoria 12')).toBeVisible();
             await expect(page.getByText('Competência técnica seed 99')).toBeVisible();
         });

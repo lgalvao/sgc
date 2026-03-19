@@ -36,8 +36,8 @@ test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
         await page.getByTestId('input-data-termino').fill('2030-12-31');
         await page.getByTestId('cad-atribuicao__btn-criar-atribuicao').click();
 
-        const dataInicioInvalida = await page.getByTestId('input-data-inicio').evaluate((el) => !(el as HTMLInputElement).checkValidity());
-        expect(dataInicioInvalida).toBe(true);
+        // Verifica se a mensagem de erro customizada aparece (disparada pelo validacaoSubmetida)
+        await expect(page.getByText('Informe a data de início.')).toBeVisible();
     });
 
     test('Cenario 3: ADMIN cria atribuição temporária com sucesso', async ({_resetAutomatico, _autenticadoComoAdmin, page}) => {

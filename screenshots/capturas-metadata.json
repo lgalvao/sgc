@@ -1,13 +1,339 @@
 [
   {
-    "file": "10-gestao-subprocessos--01-detalhes-subprocesso-admin.png",
-    "url": "http://localhost:5173/processo/400/SECAO_121",
-    "route": "/processo/400/SECAO_121",
+    "file": "06-navegacao--01-menu-principal.png",
+    "url": "http://localhost:5173/painel",
+    "route": "/painel",
     "viewport": {
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-19T13:46:36.156Z",
+    "timestamp": "2026-03-19T13:56:33.825Z",
+    "tags": [
+      "layout",
+      "menu",
+      "06-navegacao"
+    ],
+    "categoria": "06-navegacao",
+    "nome": "01-menu-principal",
+    "titulo": "Painel - SGC",
+    "isFullPage": true,
+    "isComponente": false
+  },
+  {
+    "file": "06-navegacao--02-menu-configs.png",
+    "url": "http://localhost:5173/configuracoes",
+    "route": "/configuracoes",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-19T13:56:34.317Z",
+    "tags": [
+      "06-navegacao"
+    ],
+    "categoria": "06-navegacao",
+    "nome": "02-menu-configs",
+    "titulo": "Configurações - SGC",
+    "isFullPage": true,
+    "isComponente": false,
+    "secao": "configuracoes"
+  },
+  {
+    "file": "06-navegacao--03-unidades.png",
+    "url": "http://localhost:5173/unidades",
+    "route": "/unidades",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-19T13:56:35.182Z",
+    "tags": [
+      "06-navegacao"
+    ],
+    "categoria": "06-navegacao",
+    "nome": "03-unidades",
+    "titulo": "Unidades - SGC",
+    "isFullPage": true,
+    "isComponente": false
+  },
+  {
+    "file": "06-navegacao--04-relatorios.png",
+    "url": "http://localhost:5173/relatorios",
+    "route": "/relatorios",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-19T13:56:35.693Z",
+    "tags": [
+      "06-navegacao"
+    ],
+    "categoria": "06-navegacao",
+    "nome": "04-relatorios",
+    "titulo": "Relatórios - SGC",
+    "isFullPage": true,
+    "isComponente": false
+  },
+  {
+    "file": "06-navegacao--05-historico.png",
+    "url": "http://localhost:5173/historico",
+    "route": "/historico",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-19T13:56:36.102Z",
+    "tags": [
+      "06-navegacao"
+    ],
+    "categoria": "06-navegacao",
+    "nome": "05-historico",
+    "titulo": "Histórico - SGC",
+    "isFullPage": true,
+    "isComponente": false
+  },
+  {
+    "file": "06-navegacao--05a-barra-lateral.png",
+    "url": "http://localhost:5173/historico",
+    "route": "/historico",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-19T13:56:36.265Z",
+    "tags": [
+      "06-navegacao",
+      "componente"
+    ],
+    "categoria": "06-navegacao",
+    "nome": "05a-barra-lateral",
+    "titulo": "Histórico - SGC",
+    "isFullPage": false,
+    "isComponente": true,
+    "parte": "sidebar"
+  },
+  {
+    "file": "06-navegacao--06-rodape.png",
+    "url": "http://localhost:5173/historico",
+    "route": "/historico",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-19T13:56:36.724Z",
+    "tags": [
+      "layout",
+      "footer",
+      "06-navegacao"
+    ],
+    "categoria": "06-navegacao",
+    "nome": "06-rodape",
+    "titulo": "Histórico - SGC",
+    "isFullPage": true,
+    "isComponente": false
+  },
+  {
+    "file": "07-estados--01-processo-criado.png",
+    "url": "http://localhost:5173/painel",
+    "route": "/painel",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-19T13:56:39.722Z",
+    "tags": [
+      "07-estados"
+    ],
+    "categoria": "07-estados",
+    "nome": "01-processo-criado",
+    "titulo": "SGC",
+    "isFullPage": true,
+    "isComponente": false,
+    "estado": "CRIADO"
+  },
+  {
+    "file": "07-estados--02-processo-em-andamento.png",
+    "url": "http://localhost:5173/painel",
+    "route": "/painel",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-19T13:56:41.592Z",
+    "tags": [
+      "07-estados"
+    ],
+    "categoria": "07-estados",
+    "nome": "02-processo-em-andamento",
+    "titulo": "Painel - SGC",
+    "isFullPage": true,
+    "isComponente": false,
+    "estado": "EM_ANDAMENTO"
+  },
+  {
+    "file": "07-estados--03-tabela-com-multiplos-estados.png",
+    "url": "http://localhost:5173/painel",
+    "route": "/painel",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-19T13:56:41.777Z",
+    "tags": [
+      "07-estados",
+      "componente"
+    ],
+    "categoria": "07-estados",
+    "nome": "03-tabela-com-multiplos-estados",
+    "titulo": "Painel - SGC",
+    "isFullPage": false,
+    "isComponente": true,
+    "contexto": "painel-admin"
+  },
+  {
+    "file": "08-responsividade--01-desktop-1920x1080.png",
+    "url": "http://localhost:5173/painel",
+    "route": "/painel",
+    "viewport": {
+      "width": 1920,
+      "height": 1080
+    },
+    "timestamp": "2026-03-19T13:56:43.688Z",
+    "tags": [
+      "res-high",
+      "08-responsividade"
+    ],
+    "categoria": "08-responsividade",
+    "nome": "01-desktop-1920x1080",
+    "titulo": "Painel - SGC",
+    "isFullPage": true,
+    "isComponente": false
+  },
+  {
+    "file": "08-responsividade--02-desktop-1366x768.png",
+    "url": "http://localhost:5173/painel",
+    "route": "/painel",
+    "viewport": {
+      "width": 1366,
+      "height": 768
+    },
+    "timestamp": "2026-03-19T13:56:44.000Z",
+    "tags": [
+      "res-medium",
+      "08-responsividade"
+    ],
+    "categoria": "08-responsividade",
+    "nome": "02-desktop-1366x768",
+    "titulo": "Painel - SGC",
+    "isFullPage": true,
+    "isComponente": false
+  },
+  {
+    "file": "08-responsividade--03-tablet-768x1024.png",
+    "url": "http://localhost:5173/painel",
+    "route": "/painel",
+    "viewport": {
+      "width": 768,
+      "height": 1024
+    },
+    "timestamp": "2026-03-19T13:56:44.292Z",
+    "tags": [
+      "res-tablet",
+      "08-responsividade"
+    ],
+    "categoria": "08-responsividade",
+    "nome": "03-tablet-768x1024",
+    "titulo": "Painel - SGC",
+    "isFullPage": true,
+    "isComponente": false
+  },
+  {
+    "file": "08-responsividade--04-mobile-375x667.png",
+    "url": "http://localhost:5173/painel",
+    "route": "/painel",
+    "viewport": {
+      "width": 375,
+      "height": 667
+    },
+    "timestamp": "2026-03-19T13:56:44.555Z",
+    "tags": [
+      "res-mobile",
+      "08-responsividade"
+    ],
+    "categoria": "08-responsividade",
+    "nome": "04-mobile-375x667",
+    "titulo": "Painel - SGC",
+    "isFullPage": true,
+    "isComponente": false
+  },
+  {
+    "file": "09-operacoes-bloco--01-detalhes-processo-gestor.png",
+    "url": "http://localhost:5173/processo/402",
+    "route": "/processo/402",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-19T13:56:52.117Z",
+    "tags": [
+      "09-operacoes-bloco"
+    ],
+    "categoria": "09-operacoes-bloco",
+    "nome": "01-detalhes-processo-gestor",
+    "titulo": "Unidades do Processo - SGC",
+    "isFullPage": true,
+    "isComponente": false,
+    "perfil": "GESTOR",
+    "acao": "ver-bloco"
+  },
+  {
+    "file": "09-operacoes-bloco--02-modal-aceitar-cadastro-bloco.png",
+    "url": "http://localhost:5173/processo/402",
+    "route": "/processo/402",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-19T13:56:52.889Z",
+    "tags": [
+      "modal",
+      "bloco",
+      "09-operacoes-bloco"
+    ],
+    "categoria": "09-operacoes-bloco",
+    "nome": "02-modal-aceitar-cadastro-bloco",
+    "titulo": "Unidades do Processo - SGC",
+    "isFullPage": true,
+    "isComponente": false
+  },
+  {
+    "file": "09-operacoes-bloco--03-modal-homologar-cadastro-bloco.png",
+    "url": "http://localhost:5173/processo/402",
+    "route": "/processo/402",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-19T13:56:57.972Z",
+    "tags": [
+      "09-operacoes-bloco"
+    ],
+    "categoria": "09-operacoes-bloco",
+    "nome": "03-modal-homologar-cadastro-bloco",
+    "titulo": "Unidades do Processo - SGC",
+    "isFullPage": true,
+    "isComponente": false,
+    "perfil": "ADMIN"
+  },
+  {
+    "file": "10-gestao-subprocessos--01-detalhes-subprocesso-admin.png",
+    "url": "http://localhost:5173/processo/403/SECAO_121",
+    "route": "/processo/403/SECAO_121",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "timestamp": "2026-03-19T13:57:01.825Z",
     "tags": [
       "10-gestao-subprocessos"
     ],
@@ -20,13 +346,13 @@
   },
   {
     "file": "10-gestao-subprocessos--02-modal-alterar-data-limite.png",
-    "url": "http://localhost:5173/processo/400/SECAO_121",
-    "route": "/processo/400/SECAO_121",
+    "url": "http://localhost:5173/processo/403/SECAO_121",
+    "route": "/processo/403/SECAO_121",
     "viewport": {
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-19T13:46:36.697Z",
+    "timestamp": "2026-03-19T13:57:02.565Z",
     "tags": [
       "modal",
       "gestao",
@@ -40,13 +366,13 @@
   },
   {
     "file": "10-gestao-subprocessos--04-botao-enviar-lembrete.png",
-    "url": "http://localhost:5173/processo/400/SECAO_121",
-    "route": "/processo/400/SECAO_121",
+    "url": "http://localhost:5173/processo/403/SECAO_121",
+    "route": "/processo/403/SECAO_121",
     "viewport": {
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-19T13:46:36.943Z",
+    "timestamp": "2026-03-19T13:57:02.986Z",
     "tags": [
       "acao-direta",
       "10-gestao-subprocessos"
@@ -65,7 +391,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-19T13:46:38.366Z",
+    "timestamp": "2026-03-19T13:57:05.313Z",
     "tags": [
       "11-unidades"
     ],
@@ -83,7 +409,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-19T13:46:39.311Z",
+    "timestamp": "2026-03-19T13:57:06.407Z",
     "tags": [
       "11-unidades"
     ],
@@ -101,7 +427,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-19T13:46:40.096Z",
+    "timestamp": "2026-03-19T13:57:07.301Z",
     "tags": [
       "11-unidades"
     ],
@@ -120,7 +446,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-19T13:46:40.628Z",
+    "timestamp": "2026-03-19T13:57:07.959Z",
     "tags": [
       "modal",
       "atribuicao",
@@ -140,7 +466,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-19T13:46:41.452Z",
+    "timestamp": "2026-03-19T13:57:08.929Z",
     "tags": [
       "12-historico"
     ],
@@ -158,7 +484,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-19T13:46:41.673Z",
+    "timestamp": "2026-03-19T13:57:09.253Z",
     "tags": [
       "12-historico"
     ],
@@ -176,7 +502,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-19T13:46:41.776Z",
+    "timestamp": "2026-03-19T13:57:09.416Z",
     "tags": [
       "12-historico",
       "componente"
@@ -196,7 +522,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-19T13:46:42.522Z",
+    "timestamp": "2026-03-19T13:57:10.283Z",
     "tags": [
       "13-configuracoes"
     ],
@@ -214,7 +540,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-19T13:46:42.725Z",
+    "timestamp": "2026-03-19T13:57:10.583Z",
     "tags": [
       "config",
       "13-configuracoes"
@@ -233,7 +559,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-19T13:46:43.472Z",
+    "timestamp": "2026-03-19T13:57:11.468Z",
     "tags": [
       "13-configuracoes"
     ],
@@ -251,7 +577,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-19T13:46:44.054Z",
+    "timestamp": "2026-03-19T13:57:12.163Z",
     "tags": [
       "modal",
       "admin",
@@ -271,7 +597,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-19T13:46:45.137Z",
+    "timestamp": "2026-03-19T13:57:13.310Z",
     "tags": [
       "14-relatorios"
     ],
@@ -289,7 +615,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-19T13:46:45.489Z",
+    "timestamp": "2026-03-19T13:57:13.655Z",
     "tags": [
       "14-relatorios"
     ],
@@ -308,7 +634,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-19T13:46:45.814Z",
+    "timestamp": "2026-03-19T13:57:13.954Z",
     "tags": [
       "ui-element",
       "14-relatorios"
@@ -327,7 +653,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-19T13:46:46.551Z",
+    "timestamp": "2026-03-19T13:57:14.695Z",
     "tags": [
       "14-relatorios"
     ],
@@ -346,7 +672,7 @@
       "width": 1280,
       "height": 720
     },
-    "timestamp": "2026-03-19T13:46:46.848Z",
+    "timestamp": "2026-03-19T13:57:15.024Z",
     "tags": [
       "ui-element",
       "pdf",

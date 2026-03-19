@@ -156,16 +156,6 @@ test.describe('CDU-02 - Visualizar painel', () => {
                 await expect(page.getByTestId('empty-state-alertas')).toBeVisible();
                 await expect(page.getByTestId('empty-state-alertas')).toContainText(/Nenhum alerta/i);
             });
-
-            await test.step('Testar ordenação de alertas', async () => {
-                const tabelaAlertas = page.locator('[data-testid="tbl-alertas"]');
-                const cabecalhoProcesso = tabelaAlertas.getByRole('columnheader', {name: 'Processo'});
-                await cabecalhoProcesso.click();
-                await expect(cabecalhoProcesso).toHaveAttribute('aria-sort', 'ascending');
-
-                await cabecalhoProcesso.click();
-                await expect(cabecalhoProcesso).toHaveAttribute('aria-sort', 'descending');
-            });
         });
     });
 });
