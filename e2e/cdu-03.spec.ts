@@ -20,9 +20,9 @@ test.describe('CDU-03 - Manter processo', () => {
         await expect(btnSalvar).toBeDisabled();
         await expect(btnIniciar).toBeDisabled();
 
-        // Validação HTML5 / Atributos
+        // Validação - deve ter indicação de campo obrigatório
         const descricaoInput = page.getByTestId('inp-processo-descricao');
-        await expect(descricaoInput).toHaveAttribute('required', '');
+        await expect(descricaoInput).toHaveAttribute('aria-required', 'true');
 
         // Preenche descrição - ainda desativado
         await descricaoInput.fill('Descrição teste');

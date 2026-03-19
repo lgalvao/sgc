@@ -3,6 +3,7 @@
     <PageHeader :title="TEXTOS.atividades.TITULO">
       <template #default>
         <div class="d-flex align-items-center gap-2">
+          <span v-if="unidade" class="fw-bold" data-testid="subprocesso-header__txt-header-unidade">{{ unidade.sigla }}</span>
           <BBadge
               v-if="subprocesso"
               :variant="badgeVariant(subprocesso.situacao)"

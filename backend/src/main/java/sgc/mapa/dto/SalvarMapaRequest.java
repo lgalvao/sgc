@@ -4,7 +4,7 @@ import jakarta.validation.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
 import org.jspecify.annotations.*;
-import sgc.comum.MsgValidacao;
+import sgc.comum.SgcMensagens;
 import sgc.seguranca.sanitizacao.*;
 
 import java.util.*;
@@ -14,14 +14,14 @@ import java.util.*;
  */
 @Builder
 public record SalvarMapaRequest(
-        @Nullable @Size(max = 1000, message = MsgValidacao.OBSERVACOES_MAX_1000) @SanitizarHtml String observacoes,
+        @Nullable @Size(max = 1000, message = SgcMensagens.OBSERVACOES_MAX_1000) @SanitizarHtml String observacoes,
         @Valid List<CompetenciaRequest> competencias) {
 
     @Builder
     public record CompetenciaRequest(
             Long codigo,
 
-            @NotBlank(message = MsgValidacao.DESCRICAO_COMPETENCIA_OBRIGATORIA) String descricao,
+            @NotBlank(message = SgcMensagens.DESCRICAO_COMPETENCIA_OBRIGATORIA) String descricao,
             List<Long> atividadesCodigos
     ) {
     }

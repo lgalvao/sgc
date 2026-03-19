@@ -13,7 +13,7 @@ import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
 import sgc.processo.model.*;
-import sgc.comum.MsgValidacao;
+import sgc.comum.SgcMensagens;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
 
@@ -594,7 +594,7 @@ public class SubprocessoTransicaoService {
         Subprocesso sp = buscarSubprocesso(codigo);
         validacaoService.validarSituacaoMinima(sp,
                 situacaoMinima,
-                MsgValidacao.ERRO_SUBPROCESSO_EM_FASE.formatted(isRevisao ? ETAPA_REVISAO : ETAPA_CADASTRO)
+                SgcMensagens.ERRO_SUBPROCESSO_EM_FASE.formatted(isRevisao ? ETAPA_REVISAO : ETAPA_CADASTRO)
         );
 
         Unidade admin = unidadeService.buscarPorSigla(SIGLA_ADMIN);
@@ -654,8 +654,8 @@ public class SubprocessoTransicaoService {
         subprocessoRepo.save(sp);
 
         String novaDataStr = novaDataLimite.format(DATE_FORMATTER);
-        String assunto = MsgValidacao.ASSUNTO_DATA_LIMITE_ALTERADA;
-        String corpo = MsgValidacao.CORPO_DATA_LIMITE_ALTERADA
+        String assunto = SgcMensagens.ASSUNTO_DATA_LIMITE_ALTERADA;
+        String corpo = SgcMensagens.CORPO_DATA_LIMITE_ALTERADA
                 .formatted(sp.getUnidade().getSigla(), sp.getProcesso().getDescricao(), novaDataStr);
 
         emailService.enviarEmail(sp.getUnidade().getSigla(), assunto, corpo);

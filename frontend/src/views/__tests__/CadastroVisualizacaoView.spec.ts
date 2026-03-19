@@ -154,6 +154,130 @@ describe("CadastroVisualizacaoView coverage", () => {
         expect(mapsStore.buscarImpactoMapa).toHaveBeenCalledWith(123);
     });
 
+    it("cobre ramos condicionais adicionais", async () => {
+        const wrapper = createWrapper();
+        await flushPromises();
+        const vm = wrapper.vm as any;
+
+        // Testar computed nomeUnidade
+        vm.unidade = { sigla: "TESTE", nome: "Unidade de Teste" };
+        expect(vm.nomeUnidade).toBe("Unidade de Teste");
+        vm.unidade = { sigla: "TESTE", nome: null };
+        expect(vm.nomeUnidade).toBe("");
+
+        // Testar subprocesso computed com processoDetalhe nulo
+        const procStore = useProcessosStore();
+        (procStore as any).processoDetalhe = null;
+        expect(vm.subprocesso).toBeNull();
+
+        // Testar subprocesso computed com arvore de unidades aninhadas
+        (procStore as any).processoDetalhe = {
+            unidades: [
+                { sigla: "OUTRA" },
+                { sigla: "PAI", filhos: [{ sigla: "TESTE", codSubprocesso: 123 }] }
+            ]
+        };
+        expect(vm.subprocesso.codSubprocesso).toBe(123);
+        (procStore as any).processoDetalhe = { unidades: [{ sigla: "OUTRA" }] };
+        expect(vm.subprocesso).toBeUndefined();
+
+        // Testar computed estadoObservacaoDevolucao
+        vm.validacaoDevolucaoSubmetida = true;
+        vm.observacaoDevolucao = "   ";
+        expect(vm.estadoObservacaoDevolucao).toBe(false);
+        vm.observacaoDevolucao = "texto";
+        expect(vm.estadoObservacaoDevolucao).toBeNull();
+        
+        // Testar early returns
+        vm.mostrarModalImpacto = true;
+        vm.fecharModalImpacto();
+        expect(vm.mostrarModalImpacto).toBe(false);
+
+        vm.mostrarModalHistoricoAnalise = true;
+        vm.fecharModalHistoricoAnalise();
+        expect(vm.mostrarModalHistoricoAnalise).toBe(false);
+
+        // Retornos antecipados (early return) nas funcoes assincronas
+        const codSubprocessoOriginal = vm.codSubprocesso;
+        Object.defineProperty(vm, 'codSubprocesso', { get: () => null });
+        await vm.confirmarValidacao();
+        
+        vm.validacaoDevolucaoSubmetida = true;
+        vm.observacaoDevolucao = "";
+        await vm.confirmarDevolucao();
+        
+        // Renderização do v-for de atividades e modais via v-model não precisam de interações específicas
+        // desde que as variáveis sejam preenchidas e lidas pelo wrapper.
+        vm.atividades = [
+            { codigo: 1, descricao: "A1", conhecimentos: [{ codigo: 1, descricao: "C1" }] }
+        ];
+        vm.mostrarModalValidar = true;
+        vm.mostrarModalDevolver = true;
+        await wrapper.vm.$nextTick();
+    });
+
+    it("deve lidar com onMounted quando codSubprocesso está ausente mas subprocesso existe", async () => {
+        const store = useSubprocessosStore();
+        (store.buscarContextoEdicao as any).mockResolvedValue({
+            atividadesDisponiveis: null,
+            unidade: null
+        });
+
+        const wrapper = createWrapper();
+        const procStore = useProcessosStore();
+        
+        // Simular que o processoDetalhe retornou a unidade, mas SEM o codSubprocesso
+        (procStore as any).processoDetalhe = {
+            unidades: [{ sigla: "TESTE" }] // codSubprocesso omitido
+        };
+        
+        // Chama onMounted novamente montando um novo wrapper ou apenas chamando
+        const vm = wrapper.vm as any;
+        vm.unidade = null;
+        vm.atividades = [];
+        await vm.$options.setup({ codProcesso: "1", sigla: "TESTE" }, { expose: () => {} });
+        
+        // Ao rodar setup/onMounted, ele tentará buscar fallback
+        expect(store.buscarSubprocessoPorProcessoEUnidade).toHaveBeenCalledWith(1, "TESTE");
+    });
+
+    it("deve tratar falhas de sucesso nas validações e não fechar modais", async () => {
+        const wrapper = createWrapper();
+        await flushPromises();
+        const vm = wrapper.vm as any;
+        const store = useSubprocessosStore();
+
+        // Falha no aceite
+        (store.aceitarCadastro as any).mockResolvedValue(false);
+        vm.podeHomologarCadastro = false;
+        vm.mostrarModalValidar = true;
+        vm.observacaoValidacao = "Teste falha";
+        await vm.confirmarValidacao();
+        expect(vm.mostrarModalValidar).toBe(true); // Permanece aberto
+
+        // Falha na homologação
+        (store.homologarCadastro as any).mockResolvedValue(false);
+        vm.podeHomologarCadastro = true;
+        await vm.confirmarValidacao();
+        expect(vm.mostrarModalValidar).toBe(true);
+
+        // Falha na devolução
+        (store.devolverCadastro as any).mockResolvedValue(false);
+        vm.mostrarModalDevolver = true;
+        vm.observacaoDevolucao = "Obs";
+        await vm.confirmarDevolucao();
+        expect(vm.mostrarModalDevolver).toBe(true);
+        
+        // Fechamento manual dos modais
+        vm.fecharModalValidar();
+        expect(vm.mostrarModalValidar).toBe(false);
+        expect(vm.observacaoValidacao).toBe("");
+
+        vm.fecharModalDevolver();
+        expect(vm.mostrarModalDevolver).toBe(false);
+        expect(vm.observacaoDevolucao).toBe("");
+    });
+
     it("deve manter devolucao e homologacao visiveis, porem desabilitadas, fora da localizacao permitida", async () => {
         const wrapper = createWrapper({
             podeHomologarCadastro: ref(true),

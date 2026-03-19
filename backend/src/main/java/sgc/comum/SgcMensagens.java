@@ -1,16 +1,17 @@
 package sgc.comum;
 
 /**
- * Constantes de mensagens de validação e regras de negócio do sistema SGC.
+ * Constantes de mensagens do sistema SGC.
  *
- * Centraliza todos os textos do sistema para facilitar manutenção e consistência.
- * Use {@link String#formatted} para os templates que contêm {@code %s}.
+ * Centraliza mensagens de validação, histórico de movimentações, alertas e notificações
+ * para facilitar manutenção e consistência.
+ * Use {@link String#formatted} para os templates que contêm {@code %s} ou {@code %d}.
  */
-public final class MsgValidacao {
+public final class SgcMensagens {
 
-    private MsgValidacao() {}
+    private SgcMensagens() {}
 
-    // ── Campos genéricos ─────────────────────────────────────────────────────
+    // ── Validações Genéricas ────────────────────────────────────────────────
     public static final String CAMPO_TEXTO_OBRIGATORIO          = "O campo texto é obrigatório";
     public static final String DATA_OBRIGATORIA                 = "A data é obrigatória";
 
@@ -26,9 +27,10 @@ public final class MsgValidacao {
     public static final String DESCRICAO_COMPETENCIA_OBRIGATORIA = "A descrição da competência é obrigatória";
     public static final String DESCRICAO_NAO_PODE_SER_VAZIA     = "Descrição não pode ser vazia";
 
-    // ── Justificativa ────────────────────────────────────────────────────────
+    // ── Justificativa e Motivos ──────────────────────────────────────────────
     public static final String JUSTIFICATIVA_OBRIGATORIA        = "A justificativa é obrigatória";
     public static final String JUSTIFICATIVA_MAX                = "A justificativa deve ter no máximo 500 caracteres";
+    public static final String MOTIVO_MAX                       = "Motivo deve ter no máximo 200 caracteres";
 
     // ── Observações ──────────────────────────────────────────────────────────
     public static final String OBSERVACOES_MAX_500              = "Observações devem ter no máximo 500 caracteres";
@@ -71,18 +73,26 @@ public final class MsgValidacao {
     public static final String DATA_LIMITE_VALIDACAO_OBRIGATORIA = "A data limite para validação é obrigatória.";
     public static final String DATA_LIMITE_VALIDACAO_FUTURA     = "A data limite para validação deve ser uma data futura.";
 
-    // ── Ação em bloco ────────────────────────────────────────────────────────
+    // ── Ações em bloco ───────────────────────────────────────────────────────
     public static final String ACAO_OBRIGATORIA                 = "A ação é obrigatória";
     public static final String ACAO_DEVE_SER_INFORMADA          = "A ação deve ser informada";
     public static final String PELO_MENOS_UM_SUBPROCESSO        = "Pelo menos um subprocesso deve ser selecionado";
     public static final String PELO_MENOS_UMA_UNIDADE           = "Pelo menos uma unidade deve ser selecionada";
-    public static final String MOTIVO_MAX                       = "Motivo deve ter no máximo 200 caracteres";
 
-    // ── Competências e atividades ────────────────────────────────────────────
+    // ── Regras de Negócio — Validação de Estrutura ───────────────────────────
     public static final String COMPETENCIA_DEVE_TER_ATIVIDADE   = "A competência deve ter pelo menos uma atividade associada";
     public static final String LISTA_COMPETENCIAS_NAO_PODE_SER_VAZIA = "A lista de competências não pode ser vazia";
+    public static final String SUBPROCESSO_SEM_MAPA             = "Subprocesso não possui mapa associado.";
+    public static final String MAPA_SEM_ATIVIDADES              = "O mapa de competências deve ter ao menos uma atividade cadastrada.";
+    public static final String ATIVIDADES_SEM_CONHECIMENTOS     = "Todas as atividades devem possuir conhecimentos vinculados. Verifique as atividades pendentes.";
+    public static final String COMPETENCIAS_SEM_ATIVIDADE       = "Existem competências que não foram associadas a nenhuma atividade.";
+    public static final String ATIVIDADES_SEM_COMPETENCIA       = "Existem atividades que não foram associadas a nenhuma competência.";
+    public static final String TODAS_COMPETENCIAS_DEVEM_TER_ATIVIDADE = "Todas as competências devem estar associadas a pelo menos uma atividade.";
+    public static final String ATIVIDADES_SEM_CONHECIMENTO_ASSOCIADO = "Existem atividades sem conhecimentos associados.";
+    public static final String DESCRICAO_ATIVIDADE_DUPLICADA    = "Já existe uma atividade com esta descrição neste mapa.";
+    public static final String DESCRICAO_CONHECIMENTO_DUPLICADA = "Já existe um conhecimento com esta descrição nesta atividade.";
 
-    // ── Regras de negócio — Processo ─────────────────────────────────────────
+    // ── Regras de Negócio — Estados e Transições ─────────────────────────────
     public static final String PROCESSO_SO_EDITAVEL_EM_CRIADO   = "Apenas processos na situação 'CRIADO' podem ser editados.";
     public static final String PROCESSO_SO_REMOVIVEL_EM_CRIADO  = "Apenas processos na situação 'CRIADO' podem ser removidos.";
     public static final String PROCESSO_SO_INICIAVEL_EM_CRIADO  = "Apenas processos na situação 'CRIADO' podem ser iniciados.";
@@ -96,41 +106,18 @@ public final class MsgValidacao {
     public static final String DATA_FIM_DEVE_SER_POSTERIOR      = "A data de término deve ser posterior à data de início.";
     public static final String UNIDADES_SEM_MAPA                = "Unidades sem mapa.";
     public static final String UNIDADES_EM_PROCESSO_ATIVO       = "Unidades já em processo ativo.";
-
-    // ── Regras de negócio — Mapa ─────────────────────────────────────────────
-    public static final String SUBPROCESSO_SEM_MAPA             = "Subprocesso não possui mapa associado.";
-    public static final String MAPA_SEM_ATIVIDADES              = "O mapa de competências deve ter ao menos uma atividade cadastrada.";
-    public static final String ATIVIDADES_SEM_CONHECIMENTOS     = "Todas as atividades devem possuir conhecimentos vinculados. Verifique as atividades pendentes.";
-    public static final String COMPETENCIAS_SEM_ATIVIDADE       = "Existem competências que não foram associadas a nenhuma atividade.";
-    public static final String ATIVIDADES_SEM_COMPETENCIA       = "Existem atividades que não foram associadas a nenhuma competência.";
-    public static final String TODAS_COMPETENCIAS_DEVEM_TER_ATIVIDADE = "Todas as competências devem estar associadas a pelo menos uma atividade.";
-    public static final String ATIVIDADES_SEM_CONHECIMENTO_ASSOCIADO = "Existem atividades sem conhecimentos associados.";
-    public static final String DESCRICAO_ATIVIDADE_DUPLICADA    = "Já existe uma atividade com esta descrição neste mapa.";
-    public static final String DESCRICAO_CONHECIMENTO_DUPLICADA = "Já existe um conhecimento com esta descrição nesta atividade.";
-
-    // ── Regras de negócio — Usuário ──────────────────────────────────────────
-    public static final String USUARIO_JA_ADMINISTRADOR         = "Usuário já é um administrador do sistema";
-    public static final String NAO_REMOVER_UNICO_ADMINISTRADOR  = "Não é permitido remover o único administrador do sistema";
-    public static final String NAO_REMOVER_A_SI_MESMO           = "Não é permitido remover a si mesmo como administrador";
-
-    // ── Regras de negócio — Importação ──────────────────────────────────────
-    public static final String IMPORTACAO_ATIVIDADES_DUPLICADAS = "Uma ou mais atividades selecionadas já existentes no cadastro não puderam ser importadas.";
-    public static final String IMPORTACAO_SO_PROCESSOS_FINALIZADOS = "A importação de atividades só permite subprocessos de processos finalizados.";
-
-    // ── Templates (usar com .formatted()) ───────────────────────────────────
     public static final String TRANSICAO_INVALIDA               = "Transição de situação inválida: %s -> %s";
     public static final String SITUACAO_NAO_PERMITE             = "Situação do subprocesso não permite esta operação. Situação atual: %s. Situações permitidas: %s";
     public static final String SITUACAO_ATUAL                   = "Situação do subprocesso não permite esta operação. Situação atual: %s";
     public static final String AJUSTES_ESTADOS_ESPECIFICOS      = "Ajustes no mapa só podem ser feitos em estados específicos. Situação atual: %s";
     public static final String SITUACAO_IMPEDE_IMPORTACAO       = "Situação do subprocesso não permite importação. Situação atual: %s";
     public static final String SITUACAO_IMPEDE_IMPACTO          = "Situação do subprocesso (%s) não permite verificação de impactos para o perfil %s.";
-    public static final String ATIVIDADES_PENDENTES_PREFIXO     = "Todas as atividades devem estar associadas a pelo menos uma competência.%nAtividades pendentes: %s";
-    public static final String ATIVIDADES_DEVEM_TER_COMPETENCIA = "Todas as atividades devem estar associadas a pelo menos uma competência.";
-    public static final String UNIDADES_INTERMEDIARIA_INVALIDAS = "Unidades INTERMEDIARIA inválidas: %s";
-    public static final String UNIDADES_SEM_MAPA_VIGENTE        = "Unidades sem mapa vigente: %s";
-    public static final String UNIDADES_SEM_SUBPROCESSOS        = "Algumas unidades selecionadas não possuem subprocessos vinculados neste processo: %s";
+    public static final String ERRO_SUBPROCESSO_EM_FASE          = "Subprocesso ainda está em fase de %s.";
 
-    // ── Permissões e Segurança ──────────────────────────────────────────────
+    // ── Regras de Negócio — Usuário e Segurança ──────────────────────────────
+    public static final String USUARIO_JA_ADMINISTRADOR         = "Usuário já é um administrador do sistema";
+    public static final String NAO_REMOVER_UNICO_ADMINISTRADOR  = "Não é permitido remover o único administrador do sistema";
+    public static final String NAO_REMOVER_A_SI_MESMO           = "Não é permitido remover a si mesmo como administrador";
     public static final String SEM_PERMISSAO_IMPORTAR           = "Usuário não tem permissão para importar atividades.";
     public static final String SEM_PERMISSAO_CONSULTAR_ORIGEM   = "Usuário não tem permissão para consultar o subprocesso de origem.";
     public static final String SEM_PERMISSAO_ACESSO_PERFIL      = "Usuário não tem permissão para acessar com perfil e unidade informados.";
@@ -145,9 +132,54 @@ public final class MsgValidacao {
     public static final String SEM_PERMISSAO_EDITAR_ATIVIDADES  = "Usuário não tem permissão para editar atividades neste subprocesso.";
     public static final String SEM_PERMISSAO_VERIFICAR_IMPACTOS = "Usuário não tem permissão para verificar impactos.";
 
-    // ── Mensagens de Movimentação e Templates ────────────────────────────────
+    // ── Regras de Negócio — Importação e Estrutura ───────────────────────────
+    public static final String IMPORTACAO_ATIVIDADES_DUPLICADAS = "Uma ou mais atividades selecionadas já existentes no cadastro não puderam ser importadas.";
+    public static final String IMPORTACAO_SO_PROCESSOS_FINALIZADOS = "A importação de atividades só permite subprocessos de processos finalizados.";
+    public static final String ATIVIDADES_PENDENTES_PREFIXO     = "Todas as atividades devem estar associadas a pelo menos uma competência.%nAtividades pendentes: %s";
+    public static final String ATIVIDADES_DEVEM_TER_COMPETENCIA = "Todas as atividades devem estar associadas a pelo menos uma competência.";
+    public static final String UNIDADES_INTERMEDIARIA_INVALIDAS = "Unidades INTERMEDIARIA inválidas: %s";
+    public static final String UNIDADES_SEM_MAPA_VIGENTE        = "Unidades sem mapa vigente: %s";
+    public static final String UNIDADES_SEM_SUBPROCESSOS        = "Algumas unidades selecionadas não possuem subprocessos vinculados neste processo: %s";
+
+    // ── Histórico de Movimentações ──────────────────────────────────────────
+    public static final String HIST_CADASTRO_DISPONIBILIZADO     = "Disponibilização do cadastro de atividades";
+    public static final String HIST_CADASTRO_DEVOLVIDO           = "Devolução do cadastro de atividades para ajustes";
+    public static final String HIST_CADASTRO_ACEITO              = "Cadastro aceito";
+    public static final String HIST_CADASTRO_HOMOLOGADO          = "Cadastro homologado";
+    public static final String HIST_CADASTRO_REABERTO            = "Reabertura de cadastro de atividades";
+    public static final String HIST_REVISAO_DISPONIBILIZADA      = "Disponibilização da revisão do cadastro de atividades";
+    public static final String HIST_REVISAO_DEVOLVIDA            = "Devolução da revisão do cadastro para ajustes";
+    public static final String HIST_REVISAO_ACEITA               = "Revisão do cadastro de atividades e conhecimentos aceita";
+    public static final String HIST_REVISAO_HOMOLOGADA           = "Revisão do cadastro homologada";
+    public static final String HIST_REVISAO_REABERTA             = "Reabertura de revisão de cadastro de atividades";
+    public static final String HIST_MAPA_DISPONIBILIZADO         = "Disponibilização do mapa de competências para validação";
+    public static final String HIST_MAPA_SUGESTOES_APRESENTADAS  = "Sugestões apresentadas para o mapa de competências";
+    public static final String HIST_MAPA_VALIDADO                = "Validação do mapa de competências";
+    public static final String HIST_MAPA_VALIDACAO_DEVOLVIDA     = "Devolução da validação do mapa de competências para ajustes";
+    public static final String HIST_MAPA_VALIDACAO_ACEITA        = "Mapa de competências validado";
+    public static final String HIST_MAPA_HOMOLOGADO              = "Mapa de competências homologado";
+    public static final String HIST_PROCESSO_INICIADO            = "Processo iniciado";
+    public static final String HIST_LEMBRETE_ENVIADO             = "Lembrete de prazo enviado";
+    public static final String HIST_IMPORTACAO_ATIVIDADES        = "Importação de atividades do subprocesso #%d (Unidade: %s)";
+
+    // ── Templates de Alertas ─────────────────────────────────────────────────
+    public static final String ALERTA_CADASTRO_DISPONIBILIZADO   = "Cadastro da unidade %s disponibilizado para análise";
+    public static final String ALERTA_CADASTRO_DEVOLVIDO         = "Cadastro da unidade %s devolvido para ajustes";
+    public static final String ALERTA_CADASTRO_ACEITO            = "Cadastro da unidade %s submetido para análise";
+    public static final String ALERTA_CADASTRO_REABERTO          = "Cadastro da unidade %s reaberto para ajustes";
+    public static final String ALERTA_REVISAO_DISPONIBILIZADA    = "Revisão do cadastro da unidade %s disponibilizada para análise";
+    public static final String ALERTA_REVISAO_DEVOLVIDA          = "Revisão do cadastro da unidade %s devolvida para ajustes";
+    public static final String ALERTA_REVISAO_ACEITA             = "Revisão do cadastro da unidade %s submetida para análise";
+    public static final String ALERTA_REVISAO_REABERTA           = "Revisão do cadastro da unidade %s reaberta para ajustes";
+    public static final String ALERTA_MAPA_DISPONIBILIZADO       = "Mapa de competências da unidade %s disponibilizado para validação";
+    public static final String ALERTA_MAPA_SUGESTOES             = "Sugestões para o mapa de competências da unidade %s aguardando análise";
+    public static final String ALERTA_MAPA_VALIDACAO_PENDENTE    = "Validação do mapa de competências da unidade %s aguardando análise";
+    public static final String ALERTA_MAPA_VALIDACAO_DEVOLVIDA   = "Validação do mapa da unidade %s devolvida para ajustes";
+    public static final String ALERTA_MAPA_VALIDACAO_ACEITA      = "Validação do mapa da unidade %s submetida para análise";
+    public static final String ALERTA_PROCESSO_INICIADO          = "Início do processo";
+
+    // ── Notificações e E-mails ───────────────────────────────────────────────
     public static final String ASSUNTO_DATA_LIMITE_ALTERADA      = "SGC: Data limite alterada";
     public static final String CORPO_DATA_LIMITE_ALTERADA        = "Prezado(a) responsável pela %s,%n%n" +
             "A data limite da etapa atual no processo %s foi alterada para %s.%n";
-    public static final String ERRO_SUBPROCESSO_EM_FASE          = "Subprocesso ainda está em fase de %s.";
 }

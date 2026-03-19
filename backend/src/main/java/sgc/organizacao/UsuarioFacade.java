@@ -8,7 +8,7 @@ import org.springframework.security.core.*;
 import org.springframework.security.core.context.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
-import sgc.comum.MsgValidacao;
+import sgc.comum.SgcMensagens;
 import sgc.comum.erros.*;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
@@ -127,7 +127,7 @@ public class UsuarioFacade {
     @Transactional
     public void removerAdministrador(String usuarioTitulo, String usuarioAtualTitulo) {
         if (usuarioTitulo.equals(usuarioAtualTitulo)) {
-            throw new ErroValidacao(MsgValidacao.NAO_REMOVER_A_SI_MESMO);
+            throw new ErroValidacao(SgcMensagens.NAO_REMOVER_A_SI_MESMO);
         }
 
         usuarioService.removerAdministrador(usuarioTitulo);

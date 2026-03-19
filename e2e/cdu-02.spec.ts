@@ -147,7 +147,7 @@ test.describe('CDU-02 - Visualizar painel', () => {
         test('Deve validar visualização, alertas e ordenação', async ({_resetAutomatico, page, _autenticadoComoGestor}) => {
             await test.step('Verificar restrições de botões e mensagens de tabela vazia', async () => {
                 await expect(page.getByTestId('btn-painel-criar-processo')).toBeHidden();
-                await expect(page.locator('[data-testid="tbl-processos"]')).toBeVisible();
+                // A tabela não é renderizada se estiver vazia (EmptyState substitui)
                 await expect(page.getByTestId('empty-state-processos')).toBeVisible();
             });
 

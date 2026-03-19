@@ -71,12 +71,12 @@
               <BListGroup v-else-if="usuariosEncontrados.length > 0" flush>
                 <BListGroupItem
                     v-for="(usuario, indice) in usuariosEncontrados"
+                    :id="`opcao-usuario-${usuario.codigo}`"
                     :key="usuario.codigo"
                     action
                     button
                     :active="indiceUsuarioDestacado === indice"
                     :data-testid="`opcao-usuario-${usuario.codigo}`"
-                    :id="`opcao-usuario-${usuario.codigo}`"
                     @mousedown.prevent="selecionarUsuario(usuario)"
                 >
                   {{ usuario.nome }}

@@ -3,7 +3,7 @@ package sgc.integracao;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.transaction.annotation.*;
-import sgc.comum.MsgValidacao;
+import sgc.comum.SgcMensagens;
 import sgc.comum.erros.*;
 import sgc.fixture.*;
 import sgc.mapa.model.*;
@@ -78,7 +78,7 @@ class SubprocessoServiceValidacaoIntegrationTest extends BaseIntegrationTest {
         Long mapaCodigo = subprocesso.getMapa().getCodigo();
         assertThatThrownBy(() -> validacaoService.validarAssociacoesMapa(mapaCodigo))
                 .isInstanceOf(ErroValidacao.class)
-                .hasMessageContaining(MsgValidacao.COMPETENCIAS_SEM_ATIVIDADE);
+                .hasMessageContaining(SgcMensagens.COMPETENCIAS_SEM_ATIVIDADE);
     }
 
     @Test
@@ -90,7 +90,7 @@ class SubprocessoServiceValidacaoIntegrationTest extends BaseIntegrationTest {
         Long mapaCodigo = subprocesso.getMapa().getCodigo();
         assertThatThrownBy(() -> validacaoService.validarAssociacoesMapa(mapaCodigo))
                 .isInstanceOf(ErroValidacao.class)
-                .hasMessageContaining(MsgValidacao.ATIVIDADES_SEM_COMPETENCIA);
+                .hasMessageContaining(SgcMensagens.ATIVIDADES_SEM_COMPETENCIA);
     }
 
     @Test

@@ -4,7 +4,7 @@ import lombok.extern.slf4j.*;
 import org.springframework.context.annotation.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
-import sgc.comum.MsgValidacao;
+import sgc.comum.SgcMensagens;
 import sgc.comum.erros.*;
 import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
@@ -116,14 +116,14 @@ public class AtividadeFacade {
         Subprocesso sp = subprocessoService.obterEntidadePorCodigoMapa(mapaCodigo);
 
         if (!permissionEvaluator.verificarPermissao(usuario, sp, EDITAR_CADASTRO)) {
-            throw new ErroAcessoNegado(MsgValidacao.SEM_PERMISSAO_EDITAR_ATIVIDADES);
+            throw new ErroAcessoNegado(SgcMensagens.SEM_PERMISSAO_EDITAR_ATIVIDADES);
         }
 
         if (!Set.of(NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, REVISAO_CADASTRO_EM_ANDAMENTO,
                 MAPEAMENTO_MAPA_CRIADO, MAPEAMENTO_MAPA_COM_SUGESTOES,
                 REVISAO_MAPA_AJUSTADO, REVISAO_MAPA_COM_SUGESTOES).contains(sp.getSituacao())) {
             throw new ErroValidacao(
-                    MsgValidacao.SITUACAO_ATUAL
+                    SgcMensagens.SITUACAO_ATUAL
                             .formatted(sp.getSituacao()));
         }
     }

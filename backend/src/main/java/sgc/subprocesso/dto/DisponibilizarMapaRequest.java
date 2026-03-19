@@ -2,7 +2,7 @@ package sgc.subprocesso.dto;
 
 import jakarta.validation.constraints.*;
 import lombok.*;
-import sgc.comum.MsgValidacao;
+import sgc.comum.SgcMensagens;
 
 import java.time.*;
 
@@ -11,6 +11,6 @@ import java.time.*;
  */
 @Builder
 public record DisponibilizarMapaRequest(
-        @NotNull(message = MsgValidacao.DATA_LIMITE_VALIDACAO_OBRIGATORIA) @Future(message = MsgValidacao.DATA_LIMITE_VALIDACAO_FUTURA) LocalDate dataLimite,
+        @NotNull(message = SgcMensagens.DATA_LIMITE_VALIDACAO_OBRIGATORIA) @Future(message = SgcMensagens.DATA_LIMITE_VALIDACAO_FUTURA) LocalDate dataLimite,
         String observacoes) {
 }

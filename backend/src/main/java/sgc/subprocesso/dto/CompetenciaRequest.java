@@ -2,7 +2,7 @@ package sgc.subprocesso.dto;
 
 import jakarta.validation.constraints.*;
 import lombok.*;
-import sgc.comum.MsgValidacao;
+import sgc.comum.SgcMensagens;
 
 import java.util.*;
 
@@ -11,9 +11,9 @@ import java.util.*;
  */
 @Builder
 public record CompetenciaRequest(
-        @NotBlank(message = MsgValidacao.DESCRICAO_COMPETENCIA_OBRIGATORIA)
+        @NotBlank(message = SgcMensagens.DESCRICAO_COMPETENCIA_OBRIGATORIA)
         String descricao,
 
-        @NotEmpty(message = MsgValidacao.COMPETENCIA_DEVE_TER_ATIVIDADE)
+        @NotEmpty(message = SgcMensagens.COMPETENCIA_DEVE_TER_ATIVIDADE)
         List<Long> atividadesIds) {
 }

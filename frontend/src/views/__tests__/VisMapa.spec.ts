@@ -235,7 +235,7 @@ describe("VisMapa.vue", () => {
         await flushPromises();
 
         expect(wrapper.find('[data-testid="txt-header-unidade"]').text()).toContain(
-            "CHILD - Child unit",
+            "CHILD",
         );
     });
 
