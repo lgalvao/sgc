@@ -82,6 +82,6 @@ test.describe.serial('CDU-34 - Enviar lembrete de prazo', () => {
         const tabelaAlertas = page.getByTestId('tbl-alertas');
         await expect(tabelaAlertas).toBeVisible();
         await expect(tabelaAlertas).toContainText(descProcesso);
-        await expect(tabelaAlertas).toContainText(new RegExp(`Lembrete: Prazo do processo ${descProcesso} encerra em \\d{2}/\\d{2}/\\d{4}`));
+        await expect(tabelaAlertas).toContainText(new RegExp(`Lembrete: Prazo do processo ${descProcesso} encerra em [0-9]{2}/[0-9]{2}/[0-9]{4}`));
     });
 });

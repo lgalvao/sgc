@@ -24,6 +24,15 @@ test.describe.serial('CDU-27 - Alterar data limite de subprocesso', () => {
     const timestamp = Date.now();
     const descProcesso = `Mapeamento CDU-27 ${timestamp}`;
 
+    function calcularNovaDataIso(dias: number): string {
+        const novaData = new Date();
+        novaData.setDate(novaData.getDate() + dias);
+        const yyyy = novaData.getFullYear();
+        const mm = String(novaData.getMonth() + 1).padStart(2, '0');
+        const dd = String(novaData.getDate()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd}`;
+    }
+
     test('Setup data', async ({_resetAutomatico, request}) => {
         await criarProcessoFixture(request, {
             descricao: descProcesso,
@@ -62,12 +71,7 @@ test.describe.serial('CDU-27 - Alterar data limite de subprocesso', () => {
         const dataInicialModal = await inputData.inputValue();
         await expect(inputData).toHaveValue(/\d{4}-\d{2}-\d{2}/);
 
-        const novaData = new Date();
-        novaData.setDate(novaData.getDate() + 7);
-        const yyyy = novaData.getFullYear();
-        const mm = String(novaData.getMonth() + 1).padStart(2, '0');
-        const dd = String(novaData.getDate()).padStart(2, '0');
-        await inputData.fill(`${yyyy}-${mm}-${dd}`);
+        await inputData.fill(calcularNovaDataIso(7));
 
         await modal.getByRole('button', {name: /Cancelar/i}).click();
         await expect(modal).toBeHidden();
@@ -87,13 +91,7 @@ test.describe.serial('CDU-27 - Alterar data limite de subprocesso', () => {
         const inputData = page.getByTestId('input-nova-data-limite');
         await expect(inputData).toHaveValue(/\d{4}-\d{2}-\d{2}/);
 
-        const novaData = new Date();
-        novaData.setDate(novaData.getDate() + 7);
-        const yyyy = novaData.getFullYear();
-        const mm = String(novaData.getMonth() + 1).padStart(2, '0');
-        const dd = String(novaData.getDate()).padStart(2, '0');
-        const novaDataIso = `${yyyy}-${mm}-${dd}`;
-        await inputData.fill(novaDataIso);
+        await inputData.fill(calcularNovaDataIso(7));
 
         await page.getByTestId('btn-modal-confirmar').click();
         await verificarAppAlert(page, /Data limite alterada/i);

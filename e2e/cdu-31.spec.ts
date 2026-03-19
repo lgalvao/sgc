@@ -23,6 +23,7 @@ test.describe.serial('CDU-31 - Configurar sistema', () => {
         await expect(campoDiasInativacao).toBeVisible();
         await expect(campoDiasAlertaNovo).toBeVisible();
         await expect(botaoSalvar).toBeVisible();
+        await expect(campoDiasInativacao).toHaveAttribute('min', '1');
         await expect(campoDiasInativacao).toHaveValue(/\d+/);
         await expect(campoDiasAlertaNovo).toHaveValue(/\d+/);
 
@@ -33,6 +34,9 @@ test.describe.serial('CDU-31 - Configurar sistema', () => {
         await botaoSalvar.click();
         await expect(page).toHaveURL(/\/configuracoes/);
         await expect(page.getByText(TEXTOS.configuracoes.SUCESSO_SALVAR)).toBeHidden();
+        await page.reload();
+        await expect(campoDiasInativacao).toHaveValue(String(valorInicialInativacao));
+        await expect(campoDiasAlertaNovo).toHaveValue(String(valorInicialAlerta));
 
         const novoValorInativacao = String(valorInicialInativacao + 1);
         const novoValorAlerta = String(valorInicialAlerta + 1);
