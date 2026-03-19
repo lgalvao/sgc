@@ -4,6 +4,7 @@ import {beforeEach, describe, expect, it, vi} from "vitest";
 import {ref} from "vue";
 import * as usePerfilModule from "@/composables/usePerfil";
 import * as subprocessoService from "@/services/subprocessoService";
+import * as processoService from "@/services/processoService";
 import CadastroView from "@/views/CadastroView.vue";
 import {Perfil, SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 
@@ -20,6 +21,10 @@ vi.mock("@/services/subprocessoService", () => ({
     buscarContextoEdicao: vi.fn(),
     validarCadastro: vi.fn(),
     listarAtividades: vi.fn(),
+}));
+
+vi.mock("@/services/processoService", () => ({
+    obterDetalhesProcesso: vi.fn(),
 }));
 
 const stubs = {
@@ -49,6 +54,10 @@ describe("CadastroView - permissões no carregamento", () => {
             isChefe: ref(true),
         } as any);
 
+        vi.mocked(processoService.obterDetalhesProcesso).mockResolvedValue({
+            codigo: 1,
+            unidades: []
+        } as any);
         vi.mocked(subprocessoService.buscarSubprocessoPorProcessoEUnidade).mockResolvedValue({codigo: 123} as any);
         vi.mocked(subprocessoService.buscarContextoEdicao).mockResolvedValue({
             detalhes: {
