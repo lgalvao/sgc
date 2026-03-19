@@ -36,7 +36,6 @@ test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
         await page.getByTestId('input-data-termino').fill('2030-12-31');
         await page.getByTestId('cad-atribuicao__btn-criar-atribuicao').click();
 
-        // Verifica se a mensagem de erro customizada aparece (disparada pelo validacaoSubmetida)
         await expect(page.getByText('Informe a data de início.')).toBeVisible();
     });
 
