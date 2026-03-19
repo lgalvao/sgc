@@ -9,6 +9,13 @@ describe('useAcesso', () => {
     const acesso = useAcesso(subprocesso);
 
     expect(acesso.podeEditarCadastro.value).toBe(false);
+  });
+
+  it('deve retornar false por padrao quando subprocesso existe mas permissoes é undefined', () => {
+    const subprocesso = ref<SubprocessoDetalhe>({} as any);
+    const acesso = useAcesso(subprocesso);
+
+    expect(acesso.podeEditarCadastro.value).toBe(false);
     expect(acesso.podeDisponibilizarCadastro.value).toBe(false);
     expect(acesso.podeDevolverCadastro.value).toBe(false);
     expect(acesso.podeAceitarCadastro.value).toBe(false);

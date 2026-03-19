@@ -1,10 +1,11 @@
 <template>
   <LayoutPadrao>
-    <PageHeader title="Atividades e conhecimentos">
+    <PageHeader
+        :title="TEXTOS.atividades.TITULO"
+        :subtitle="nomeUnidade"
+    >
       <template #default>
-        <div class="unidade-cabecalho mb-0">
-          <span class="unidade-sigla">{{ siglaUnidade }}</span>
-        </div>
+        <span class="fw-bold" data-testid="subprocesso-header__txt-header-unidade">{{ siglaUnidade }}</span>
       </template>
       <template #actions>
         <BButton

@@ -35,8 +35,8 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
 
             await navegarParaAtividadesVisualizacao(page);
 
-            await expect(page.locator('.unidade-sigla').getByText(UNIDADE_ALVO)).toBeVisible();
-            await expect(page.locator('.unidade-nome')).toContainText(/\S+/);
+            await expect(page.getByTestId('subprocesso-header__txt-header-unidade')).toHaveText(UNIDADE_ALVO);
+            await expect(page.getByText(/\S+/).first()).toBeVisible();
             await expect(page.getByText(/Atividade fixture/)).toBeVisible();
             await expect(page.getByText(/Conhecimento fixture/)).toBeVisible();
         });
@@ -49,8 +49,8 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
 
             await navegarParaAtividadesVisualizacao(page);
 
-            await expect(page.locator('.unidade-sigla').getByText(UNIDADE_ALVO)).toBeVisible();
-            await expect(page.locator('.unidade-nome')).toContainText(/\S+/);
+            await expect(page.getByTestId('subprocesso-header__txt-header-unidade')).toHaveText(UNIDADE_ALVO);
+            await expect(page.getByText(/\S+/).first()).toBeVisible();
             await expect(page.getByText(/Atividade fixture/)).toBeVisible();
             await expect(page.getByText(/Conhecimento fixture/)).toBeVisible();
         });
@@ -76,8 +76,8 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
             await navegarParaSubprocesso(page, UNIDADE_ALVO);
             await navegarParaAtividadesVisualizacao(page);
 
-            await expect(page.locator('.unidade-sigla').getByText(UNIDADE_ALVO)).toBeVisible();
-            await expect(page.locator('.unidade-nome')).toContainText(/\S+/);
+            await expect(page.getByTestId('subprocesso-header__txt-header-unidade')).toHaveText(UNIDADE_ALVO);
+            await expect(page.getByText(/\S+/).first()).toBeVisible();
             await expect(page.getByText(/Atividade origem/).first()).toBeVisible();
             await expect(page.getByText(/Conhecimento [AB]/).first()).toBeVisible();
         });

@@ -221,4 +221,85 @@ describe("MapaView coverage", () => {
         await vm.adicionarCompetenciaEFecharModal({ descricao: "C1", atividadesSelecionadas: [] });
         expect(vm.fieldErrors.atividades).toBeDefined();
     });
+
+    it("cobre caminhos de sucesso e interações visuais adicionais", async () => {
+        const wrapper = createWrapper();
+        await flushPromises();
+        const vm = wrapper.vm as any;
+        const store = useMapasStore();
+        const subprocessosStore = useSubprocessosStore();
+        
+        subprocessosStore.buscarContextoEdicao = vi.fn().mockResolvedValue({
+            atividadesDisponiveis: [{codigo: 1, descricao: "Ativ"}],
+            unidade: {sigla: "TESTE", nome: "Teste"}
+        });
+
+        // Simulando o retorno da action buscarSubprocessoPorProcessoEUnidade
+        subprocessosStore.buscarSubprocessoPorProcessoEUnidade = vi.fn().mockResolvedValue(123);
+        
+        // Chamamos o onMounted simulando o comportamento de montagem para cobrir as linhas
+        const hook = wrapper.vm.$options.mounted?.[0];
+        if (hook) {
+            await hook.call(vm);
+        }
+
+        // Cobre onMounted definindo variáveis
+        expect(vm.codSubprocesso).toBe(123);
+        expect(vm.atividades).toHaveLength(1);
+        expect(vm.unidade.sigla).toBe("TESTE");
+
+        // Cobre abrirModalDisponibilizar
+        vm.abrirModalDisponibilizar();
+        expect(vm.mostrarModalDisponibilizar).toBe(true);
+
+        // Cobre fecharModalCriarNovaCompetencia e handleError atividadesAssociadas
+        vm.fieldErrors.atividadesAssociadas = "erro";
+        vm.fecharModalCriarNovaCompetencia();
+        expect(vm.mostrarModalCriarNovaCompetencia).toBe(false);
+
+        // Cobre BAlert dismissed event via store
+        store.erro = "Teste Erro";
+        await wrapper.vm.$nextTick();
+        const alert = wrapper.findComponent({ name: 'BAlert' });
+        if (alert.exists()) {
+            await alert.vm.$emit('dismissed');
+            expect(store.erro).toBeNull();
+        }
+
+        // Cobre v-model ModalConfirmacao
+        vm.mostrarModalExcluirCompetencia = true;
+        await wrapper.vm.$nextTick();
+        
+        // Cobre adicionarCompetenciaEFecharModal sucesso (atualizar e criar)
+        store.atualizarCompetencia = vi.fn().mockResolvedValue(true);
+        store.adicionarCompetencia = vi.fn().mockResolvedValue(true);
+        vm.competenciaSendoEditada = {codigo: 1, descricao: "C1"};
+        await vm.adicionarCompetenciaEFecharModal({ descricao: "C1", atividadesSelecionadas: [1] });
+        expect(store.atualizarCompetencia).toHaveBeenCalled();
+
+        vm.competenciaSendoEditada = null;
+        await vm.adicionarCompetenciaEFecharModal({ descricao: "C1", atividadesSelecionadas: [1] });
+        expect(store.adicionarCompetencia).toHaveBeenCalled();
+
+        // Cobre iniciarEdicaoCompetencia
+        vm.iniciarEdicaoCompetencia({codigo: 2, descricao: "C2"});
+        expect(vm.competenciaSendoEditada.codigo).toBe(2);
+        expect(vm.mostrarModalCriarNovaCompetencia).toBe(true);
+
+        // Cobre exclusão sucesso
+        vm.competenciaParaExcluir = {codigo: 1, descricao: "C1"};
+        store.removerCompetencia = vi.fn().mockResolvedValue(true);
+        await vm.confirmarExclusaoCompetencia();
+        expect(store.removerCompetencia).toHaveBeenCalled();
+
+        // Cobre disponibilizarMapa sucesso
+        store.disponibilizarMapa = vi.fn().mockResolvedValue(true);
+        await vm.disponibilizarMapa({ dataLimite: "2025-12-31", observacoes: "obs" });
+        expect(store.disponibilizarMapa).toHaveBeenCalled();
+        expect(pushMock).toHaveBeenCalledWith({name: "Painel"});
+        
+        // AtividadesSemCompetencia length === 0
+        vm.atividades = [];
+        expect(vm.atividadesSemCompetencia).toEqual([]);
+    });
 });

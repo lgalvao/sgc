@@ -25,7 +25,7 @@ export async function navegarParaMapa(page: Page) {
     const rotaMapa = (await cardEdicao.isVisible()) ? 'mapa' : 'vis-mapa';
     await page.goto(`/processo/${codigoProcesso}/${siglaUnidade}/${rotaMapa}`);
     await expect(page).toHaveURL(new RegExp(String.raw`/processo/${codigoProcesso}/${siglaUnidade}/${rotaMapa}$`));
-    await expect(page.getByRole('heading', {name: TEXTOS.mapa.TITULO})).toBeVisible();
+    await expect(page.getByRole('heading', {name: TEXTOS.mapa.TITULO_TECNICO})).toBeVisible();
 }
 
 export async function abrirModalCriarCompetencia(page: Page) {
