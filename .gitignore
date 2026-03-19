@@ -41,8 +41,8 @@ frontend/coverage/
 /dados/
 
 # Reports de testes
-!backend/build/reports/tests/test/
-!frontend/coverage/coverage-final.json
+backend/build/reports/tests/test/
+frontend/coverage/coverage-final.json
 
 # Jqwik
 .jqwik-database
@@ -58,5 +58,4 @@ playwright-report/
 .playwright/
 e2e/server.log
 screenshots/
-/.idea/
 test-results/.last-run.json
