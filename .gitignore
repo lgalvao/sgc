@@ -57,6 +57,6 @@ frontend-backend-validation-comparison.md
 playwright-report/
 .playwright/
 e2e/server.log
-!screenshots/
+screenshots/
 /.idea/
 test-results/.last-run.json

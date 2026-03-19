@@ -7,6 +7,12 @@ import {useToastStore} from '@/stores/toast';
 import * as painelService from '@/services/painelService';
 import {useRouter} from 'vue-router';
 
+// Adicionando um stub que contém explicitamente as opções de "emits" para a tabela
+const TabelaProcessos = {
+    template: '<div></div>',
+    emits: ['cta-vazio']
+};
+
 vi.mock("vue-router", () => ({
     useRouter: vi.fn(),
     createRouter: vi.fn(() => ({

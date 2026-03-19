@@ -152,20 +152,9 @@ test.describe('CDU-02 - Visualizar painel', () => {
             });
 
             await test.step('Verificar tabela de alertas vazia', async () => {
-                const tabelaAlertas = page.locator('[data-testid="tbl-alertas"]');
-                await expect(tabelaAlertas).toBeVisible();
-                // BTable empty state renders a row with the message
-                await expect(tabelaAlertas).toContainText(/Nenhum alerta/i);
-            });
-
-            await test.step('Testar ordenação de alertas', async () => {
-                const tabelaAlertas = page.locator('[data-testid="tbl-alertas"]');
-                const cabecalhoProcesso = tabelaAlertas.getByRole('columnheader', {name: 'Processo'});
-                await cabecalhoProcesso.click();
-                await expect(cabecalhoProcesso).toHaveAttribute('aria-sort', 'ascending');
-
-                await cabecalhoProcesso.click();
-                await expect(cabecalhoProcesso).toHaveAttribute('aria-sort', 'descending');
+                // A tabela de alertas também usa EmptyState quando vazia
+                await expect(page.getByTestId('empty-state-alertas')).toBeVisible();
+                await expect(page.getByTestId('empty-state-alertas')).toContainText(/Nenhum alerta/i);
             });
         });
     });

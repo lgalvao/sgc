@@ -1,6 +1,11 @@
 <template>
   <LayoutPadrao>
     <PageHeader :title="TEXTOS.mapa.TITULO_TECNICO">
+      <template #default>
+        <div class="fs-5" data-testid="subprocesso-header__txt-header-unidade">
+          {{ unidade?.sigla }}
+        </div>
+      </template>
       <template #actions>
         <BButton
             v-if="podeValidar"

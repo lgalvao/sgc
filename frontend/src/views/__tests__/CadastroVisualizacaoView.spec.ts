@@ -59,7 +59,7 @@ describe("CadastroVisualizacaoView coverage", () => {
         } as any);
     });
 
-    function createWrapper(accessOverrides = {}) {
+    function createWrapper(accessOverrides = {}, processoDetalheOverride?: any) {
         vi.spyOn(useAcessoModule, 'useAcesso').mockReturnValue({
             podeHomologarCadastro: ref(true),
             podeAceitarCadastro: ref(true),
@@ -77,7 +77,7 @@ describe("CadastroVisualizacaoView coverage", () => {
                     stubActions: true,
                     initialState: {
                         processos: {
-                            processoDetalhe: {
+                            processoDetalhe: processoDetalheOverride !== undefined ? processoDetalheOverride : {
                                 codigo: 1,
                                 tipo: "MAPEAMENTO",
                                 unidades: [{sigla: "TESTE", codSubprocesso: 123}]
@@ -217,27 +217,14 @@ describe("CadastroVisualizacaoView coverage", () => {
     });
 
     it("deve lidar com onMounted quando codSubprocesso está ausente mas subprocesso existe", async () => {
-        const store = useSubprocessosStore();
-        (store.buscarContextoEdicao as any).mockResolvedValue({
-            atividadesDisponiveis: null,
-            unidade: null
+        const wrapper = createWrapper({}, {
+            codigo: 1,
+            tipo: "MAPEAMENTO",
+            unidades: [{ sigla: "TESTE" }] // codSubprocesso undefined
         });
-
-        const wrapper = createWrapper();
-        const procStore = useProcessosStore();
         
-        // Simular que o processoDetalhe retornou a unidade, mas SEM o codSubprocesso
-        (procStore as any).processoDetalhe = {
-            unidades: [{ sigla: "TESTE" }] // codSubprocesso omitido
-        };
-        
-        // Chama onMounted novamente montando um novo wrapper ou apenas chamando
-        const vm = wrapper.vm as any;
-        vm.unidade = null;
-        vm.atividades = [];
-        await vm.$options.setup({ codProcesso: "1", sigla: "TESTE" }, { expose: () => {} });
-        
-        // Ao rodar setup/onMounted, ele tentará buscar fallback
+        await flushPromises();
+        const store = useSubprocessosStore();
         expect(store.buscarSubprocessoPorProcessoEUnidade).toHaveBeenCalledWith(1, "TESTE");
     });
 
