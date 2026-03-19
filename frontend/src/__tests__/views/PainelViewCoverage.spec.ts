@@ -2,11 +2,16 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {mount} from '@vue/test-utils';
 import {createTestingPinia} from '@pinia/testing';
 import PainelView from '@/views/PainelView.vue';
-import TabelaProcessos from '@/components/processo/TabelaProcessos.vue';
 import {useProcessosStore} from '@/stores/processos';
 import {useToastStore} from '@/stores/toast';
 import * as painelService from '@/services/painelService';
 import {useRouter} from 'vue-router';
+
+// Adicionando um stub que contém explicitamente as opções de "emits" para a tabela
+const TabelaProcessos = {
+    template: '<div></div>',
+    emits: ['cta-vazio']
+};
 
 vi.mock("vue-router", () => ({
     useRouter: vi.fn(),
