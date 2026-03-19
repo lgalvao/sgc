@@ -1,6 +1,7 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcessoFixture} from './fixtures/fixtures-processos.js';
-import {navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
+import {navegarParaSubprocesso, verificarAppAlert} from './helpers/helpers-navegacao.js';
+import {TEXTOS} from '../frontend/src/constants/textos.js';
 
 /**
  * CDU-27 - Alterar data limite de subprocesso
@@ -23,6 +24,15 @@ test.describe.serial('CDU-27 - Alterar data limite de subprocesso', () => {
     const timestamp = Date.now();
     const descProcesso = `Mapeamento CDU-27 ${timestamp}`;
 
+    function calcularNovaDataIso(dias: number): string {
+        const novaData = new Date();
+        novaData.setDate(novaData.getDate() + dias);
+        const yyyy = novaData.getFullYear();
+        const mm = String(novaData.getMonth() + 1).padStart(2, '0');
+        const dd = String(novaData.getDate()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd}`;
+    }
+
     test('Setup data', async ({_resetAutomatico, request}) => {
         await criarProcessoFixture(request, {
             descricao: descProcesso,
@@ -44,7 +54,7 @@ test.describe.serial('CDU-27 - Alterar data limite de subprocesso', () => {
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toBeVisible();
     });
 
-    test('Cenario 2: ADMIN altera data limite e recebe confirmação', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
+    test('Cenario 2: ADMIN pode cancelar a alteração da data limite sem persistir mudanças', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await navegarParaSubprocesso(page, UNIDADE_1);
 
@@ -53,17 +63,38 @@ test.describe.serial('CDU-27 - Alterar data limite de subprocesso', () => {
         await expect(btnAlterarData).toBeEnabled();
         await btnAlterarData.click();
 
+        const modal = page.getByRole('dialog');
+        await expect(modal.getByRole('heading', {name: TEXTOS.subprocesso.BOTAO_ALTERAR_DATA_LIMITE})).toBeVisible();
+
         const inputData = page.getByTestId('input-nova-data-limite');
         await expect(inputData).toBeVisible();
-        const novaData = new Date();
-        novaData.setDate(novaData.getDate() + 7);
-        const yyyy = novaData.getFullYear();
-        const mm = String(novaData.getMonth() + 1).padStart(2, '0');
-        const dd = String(novaData.getDate()).padStart(2, '0');
-        await inputData.fill(`${yyyy}-${mm}-${dd}`);
+        const dataInicialModal = await inputData.inputValue();
+        await expect(inputData).toHaveValue(/\d{4}-\d{2}-\d{2}/);
+
+        await inputData.fill(calcularNovaDataIso(7));
+
+        await modal.getByRole('button', {name: /Cancelar/i}).click();
+        await expect(modal).toBeHidden();
+
+        await btnAlterarData.click();
+        await expect(page.getByTestId('input-nova-data-limite')).toHaveValue(dataInicialModal);
+        await modal.getByRole('button', {name: /Cancelar/i}).click();
+    });
+
+    test('Cenario 3: ADMIN altera data limite e recebe confirmação', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
+        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
+        await navegarParaSubprocesso(page, UNIDADE_1);
+
+        const btnAlterarData = page.getByTestId('btn-alterar-data-limite');
+        await btnAlterarData.click();
+
+        const inputData = page.getByTestId('input-nova-data-limite');
+        await expect(inputData).toHaveValue(/\d{4}-\d{2}-\d{2}/);
+
+        await inputData.fill(calcularNovaDataIso(7));
 
         await page.getByTestId('btn-modal-confirmar').click();
-        await expect(page.getByText(/Data limite alterada/i).first()).toBeVisible();
+        await verificarAppAlert(page, /Data limite alterada/i);
         await expect(inputData).toBeHidden();
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toBeVisible();
     });

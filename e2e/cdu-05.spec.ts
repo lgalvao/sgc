@@ -191,6 +191,13 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         const modal = page.getByRole('dialog');
         await expect(modal).toBeVisible();
         await expect(modal.getByText(TEXTOS.processo.cadastro.INICIAR_CONFIRMACAO)).toBeVisible();
+        await modal.getByRole('button', {name: /Cancelar/i}).click();
+        await expect(modal).toBeHidden();
+        await expect(page).toHaveURL(/\/processo\/cadastro/);
+        await expect(page.getByTestId('inp-processo-descricao')).toHaveValue(descProcRevisao);
+
+        await page.getByTestId('btn-processo-iniciar').click();
+        await expect(modal).toBeVisible();
         await page.getByTestId('btn-iniciar-processo-confirmar').click();
 
         // Validação: Redirecionamento e situação do processo iniciado
@@ -253,5 +260,8 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         // Conhecimentos são exibidos dentro do card da atividade no componente AtividadeItem
         // Não há necessidade de clicar em um botão de expandir
         await expect(page.getByText('Conhecimento teste').first()).toBeVisible();
+
+        await page.getByTestId('btn-nav-voltar').click();
+        await expect(page.getByTestId('header-subprocesso')).toBeVisible();
     });
 });
