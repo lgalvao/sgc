@@ -27,7 +27,7 @@ export async function limparNotificacoes(page: Page): Promise<void> {
  * Verifica toast exibido pelo BOrchestrator (notificação transitória).
  * Use em fluxos com navegação após ação mutante.
  */
-export async function verificarToast(page: Page, mensagem?: string) {
+export async function verificarToast(page: Page, mensagem?: string | RegExp) {
     const toast = page.locator('.orchestrator-container .toast').first();
     await expect(toast).toBeVisible();
     if (mensagem) {

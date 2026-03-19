@@ -6,7 +6,6 @@ import * as useAcessoModule from "@/composables/useAcesso";
 import * as subprocessoService from "@/services/subprocessoService";
 import {useMapasStore} from "@/stores/mapas";
 import {useSubprocessosStore} from "@/stores/subprocessos";
-import {useProcessosStore} from "@/stores/processos";
 import MapaView from "../MapaView.vue";
 
 const {pushMock} = vi.hoisted(() => ({pushMock: vi.fn()}));

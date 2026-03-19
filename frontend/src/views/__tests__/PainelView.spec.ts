@@ -2,9 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mount } from '@vue/test-utils';
 import PainelView from '../PainelView.vue';
 import { createTestingPinia } from '@pinia/testing';
-import { usePerfilStore } from '@/stores/perfil';
 import { useToastStore } from '@/stores/toast';
-import { useProcessos } from '@/composables/useProcessos';
 import * as painelService from '@/services/painelService';
 import { createRouter, createMemoryHistory } from 'vue-router';
 

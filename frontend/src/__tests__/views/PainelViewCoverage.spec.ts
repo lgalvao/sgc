@@ -52,6 +52,7 @@ describe('PainelView Coverage', () => {
     const commonStubs = {
         PageHeader: {template: '<div><slot name="actions" /></div>'},
         TabelaProcessos: {
+            name: 'TabelaProcessos',
             template: '<div></div>',
             props: ['processos', 'criterioOrdenacao', 'direcaoOrdenacaoAsc'],
             emits: ['ordenar', 'selecionar-processo', 'cta-vazio']
