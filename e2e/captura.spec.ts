@@ -1203,7 +1203,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await page.getByRole('button', {name: /Cancelar/i}).click();
 
             // Capturar botão de disponibilizar mapas em bloco (CDU-24)
-            const btnDisponibilizarMapaBloco = page.getByRole('button', {name: /Disponibilizar.*mapa.*Bloco/i});
+            const btnDisponibilizarMapaBloco = page.getByRole('button', {name: TEXTOS.acaoBloco.disponibilizar.ROTULO});
             await expect(btnDisponibilizarMapaBloco).toBeVisible();
             await expect(btnDisponibilizarMapaBloco).toBeDisabled();
 

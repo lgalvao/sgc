@@ -25,9 +25,12 @@ test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
         await page.getByTestId('unidade-view__btn-criar-atribuicao').click();
         await expect(page).toHaveURL(/\/unidade\/\d+\/atribuicao$/);
 
-        const selectUsuario = page.getByTestId('select-usuario');
-        const valorPrimeiroUsuario = await selectUsuario.locator('option:not([disabled])').first().getAttribute('value');
-        await selectUsuario.selectOption(valorPrimeiroUsuario ?? '');
+        // Preenche campos
+        await page.getByTestId('input-busca-usuario').fill('Admin');
+        // Aguarda e seleciona o primeiro resultado da lista de pesquisa
+        const opcaoUsuario = page.getByTestId(/opcao-usuario-/).first();
+        await opcaoUsuario.waitFor({state: 'visible'});
+        await opcaoUsuario.click();
 
         await page.getByTestId('textarea-justificativa').fill('Cobertura de férias');
         await page.getByTestId('input-data-termino').fill('2030-12-31');
@@ -42,9 +45,11 @@ test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
         await page.getByTestId('unidade-view__btn-criar-atribuicao').click();
         await expect(page).toHaveURL(/\/unidade\/\d+\/atribuicao$/);
 
-        const selectUsuario = page.getByTestId('select-usuario');
-        const valorPrimeiroUsuario = await selectUsuario.locator('option:not([disabled])').first().getAttribute('value');
-        await selectUsuario.selectOption(valorPrimeiroUsuario ?? '');
+        // Preenche campos
+        await page.getByTestId('input-busca-usuario').fill('Admin');
+        const opcaoUsuario = page.getByTestId(/opcao-usuario-/).first();
+        await opcaoUsuario.waitFor({state: 'visible'});
+        await opcaoUsuario.click();
 
         await page.getByTestId('input-data-inicio').fill('2030-01-01');
         await page.getByTestId('input-data-termino').fill('2030-12-31');

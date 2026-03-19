@@ -78,7 +78,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
         await page.goto(`/processo/${codProcesso}`);
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
 
-        await expect(page.getByText(/Processo concluído/i)).toBeVisible();
+        await expect(page.getByText(/Situação:\s*Finalizado/i)).toBeVisible();
 
 
         await expect(page.getByTestId('btn-processo-finalizar')).toBeHidden();
