@@ -165,8 +165,8 @@ describe('PainelView Coverage', () => {
         });
         const wrapper = mount(PainelView, { global: { plugins: [pinia], stubs: commonStubs } });
         
-        // Chamando a função diretamente para garantir que cobre o fallback e event sem falha de stub
-        await (wrapper.vm as any).criarProcesso();
+        // Chamando a função via emit no stub pelo nome
+        await wrapper.findComponent({ name: 'TabelaProcessos' }).vm.$emit('cta-vazio');
         expect(routerPushMock).toHaveBeenCalledWith({ name: 'CadProcesso' });
     });
 
