@@ -297,21 +297,21 @@ VALUES ('111111');
 -- Inserir Mapa vigente para Assessoria 12 (Unit 4) para testes de Revisão
 -- Processo 99
 INSERT INTO sgc.processo (codigo, data_criacao, data_finalizacao, data_limite, descricao, situacao, tipo)
-VALUES (99, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'Processo 99', 'FINALIZADO', 'MAPEAMENTO');
+VALUES (99, CURRENT_TIMESTAMP - INTERVAL '6' DAY, CURRENT_TIMESTAMP - INTERVAL '1' DAY, CURRENT_TIMESTAMP - INTERVAL '1' DAY, 'Processo 99', 'FINALIZADO', 'MAPEAMENTO');
 
 -- UnidadeProcesso (Unit 4)
 INSERT INTO sgc.unidade_processo (processo_codigo, unidade_codigo, situacao, nome, sigla, tipo, matricula_titular,
                                   titulo_titular, data_inicio_titularidade, unidade_superior_codigo)
-VALUES (99, 4, 'CONCLUIDA', 'Assessoria 12', 'ASSESSORIA_12', 'OPERACIONAL', '00151515', '151515', CURRENT_TIMESTAMP,
+VALUES (99, 4, 'CONCLUIDA', 'Assessoria 12', 'ASSESSORIA_12', 'OPERACIONAL', '00151515', '151515', CURRENT_TIMESTAMP - INTERVAL '6' DAY,
         2);
 
 -- Subprocesso 99
 INSERT INTO sgc.subprocesso (codigo, processo_codigo, unidade_codigo, situacao, data_limite_etapa1)
-VALUES (99, 99, 4, 'MAPEAMENTO_MAPA_HOMOLOGADO', CURRENT_TIMESTAMP);
+VALUES (99, 99, 4, 'MAPEAMENTO_MAPA_HOMOLOGADO', CURRENT_TIMESTAMP - INTERVAL '1' DAY);
 
 -- Mapa (agora vinculado ao Subprocesso e sem sugestoes_apresentadas)
 INSERT INTO sgc.mapa (codigo, subprocesso_codigo, data_hora_disponibilizado, data_hora_homologado, sugestoes)
-VALUES (99, 99, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, NULL);
+VALUES (99, 99, CURRENT_TIMESTAMP - INTERVAL '3' DAY, CURRENT_TIMESTAMP - INTERVAL '1' DAY, NULL);
 
 -- Vincular o mapa à unidade via tabela de associação
 
@@ -353,21 +353,21 @@ VALUES (2, 'DIAS_ALERTA_NOVO', 'Dias para indicação de alerta como novo', '3')
 -- Dados para teste de Importação (CDU-08)
 -- Processo 200
 INSERT INTO sgc.processo (codigo, data_criacao, data_finalizacao, data_limite, descricao, situacao, tipo)
-VALUES (200, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'Processo Seed 200', 'FINALIZADO', 'MAPEAMENTO');
+VALUES (200, CURRENT_TIMESTAMP - INTERVAL '12' DAY, CURRENT_TIMESTAMP - INTERVAL '2' DAY, CURRENT_TIMESTAMP - INTERVAL '2' DAY, 'Processo Seed 200', 'FINALIZADO', 'MAPEAMENTO');
 
 -- UnidadeProcesso (Unit 2)
 INSERT INTO sgc.unidade_processo (processo_codigo, unidade_codigo, situacao, nome, sigla, tipo, matricula_titular,
                                   titulo_titular, data_inicio_titularidade, unidade_superior_codigo)
 VALUES (200, 2, 'CONCLUIDA', 'Secretaria 1', 'SECRETARIA_1', 'INTEROPERACIONAL', '00202020', '202020',
-        CURRENT_TIMESTAMP, 1);
+        CURRENT_TIMESTAMP - INTERVAL '12' DAY, 1);
 
 -- Subprocesso 200
 INSERT INTO sgc.subprocesso (codigo, processo_codigo, unidade_codigo, situacao, data_limite_etapa1)
-VALUES (200, 200, 2, 'MAPEAMENTO_MAPA_HOMOLOGADO', CURRENT_TIMESTAMP);
+VALUES (200, 200, 2, 'MAPEAMENTO_MAPA_HOMOLOGADO', CURRENT_TIMESTAMP - INTERVAL '2' DAY);
 
 -- Mapa para SECRETARIA_1 (Unidade 2)
 INSERT INTO sgc.mapa (codigo, subprocesso_codigo, data_hora_disponibilizado, data_hora_homologado, sugestoes)
-VALUES (200, 200, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, NULL);
+VALUES (200, 200, CURRENT_TIMESTAMP - INTERVAL '5' DAY, CURRENT_TIMESTAMP - INTERVAL '2' DAY, NULL);
 
 -- Vincular o mapa à unidade
 
@@ -397,13 +397,13 @@ VALUES (2001, 200001);
 
 -- Processo 301: SECAO_311 (Cadastro de Atividades Homologado)
 INSERT INTO sgc.processo (codigo, data_criacao, data_limite, descricao, situacao, tipo)
-VALUES (301, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP + INTERVAL '30' DAY, 'Mapeamento Secão 311', 'EM_ANDAMENTO', 'MAPEAMENTO');
+VALUES (301, CURRENT_TIMESTAMP - INTERVAL '5' DAY, CURRENT_TIMESTAMP + INTERVAL '25' DAY, 'Mapeamento Secão 311', 'EM_ANDAMENTO', 'MAPEAMENTO');
 
 INSERT INTO sgc.unidade_processo (processo_codigo, unidade_codigo, situacao, nome, sigla, tipo, matricula_titular, titulo_titular, data_inicio_titularidade, unidade_superior_codigo)
-VALUES (301, 33, 'EM_ANDAMENTO', 'Seção 311', 'SECAO_311', 'OPERACIONAL', '00330001', '330001', CURRENT_TIMESTAMP, 32);
+VALUES (301, 33, 'EM_ANDAMENTO', 'Seção 311', 'SECAO_311', 'OPERACIONAL', '00330001', '330001', CURRENT_TIMESTAMP - INTERVAL '5' DAY, 32);
 
 INSERT INTO sgc.subprocesso (codigo, processo_codigo, unidade_codigo, situacao, data_limite_etapa1)
-VALUES (301, 301, 33, 'MAPEAMENTO_CADASTRO_HOMOLOGADO', CURRENT_TIMESTAMP + INTERVAL '10' DAY);
+VALUES (301, 301, 33, 'MAPEAMENTO_CADASTRO_HOMOLOGADO', CURRENT_TIMESTAMP + INTERVAL '5' DAY);
 
 INSERT INTO sgc.mapa (codigo, subprocesso_codigo, data_hora_disponibilizado, data_hora_homologado)
 VALUES (301, 301, CURRENT_TIMESTAMP - INTERVAL '2' DAY, NULL);
@@ -418,13 +418,13 @@ INSERT INTO sgc.conhecimento (codigo, descricao, atividade_codigo) VALUES (30120
 
 -- Processo 302: SECAO_321 (Mapa Disponibilizado)
 INSERT INTO sgc.processo (codigo, data_criacao, data_limite, descricao, situacao, tipo)
-VALUES (302, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP + INTERVAL '30' DAY, 'Mapeamento Secão 321', 'EM_ANDAMENTO', 'MAPEAMENTO');
+VALUES (302, CURRENT_TIMESTAMP - INTERVAL '7' DAY, CURRENT_TIMESTAMP + INTERVAL '23' DAY, 'Mapeamento Secão 321', 'EM_ANDAMENTO', 'MAPEAMENTO');
 
 INSERT INTO sgc.unidade_processo (processo_codigo, unidade_codigo, situacao, nome, sigla, tipo, matricula_titular, titulo_titular, data_inicio_titularidade, unidade_superior_codigo)
-VALUES (302, 36, 'EM_ANDAMENTO', 'Seção 321', 'SECAO_321', 'OPERACIONAL', '00360001', '360001', CURRENT_TIMESTAMP, 35);
+VALUES (302, 36, 'EM_ANDAMENTO', 'Seção 321', 'SECAO_321', 'OPERACIONAL', '00360001', '360001', CURRENT_TIMESTAMP - INTERVAL '7' DAY, 35);
 
 INSERT INTO sgc.subprocesso (codigo, processo_codigo, unidade_codigo, situacao, data_limite_etapa1)
-VALUES (302, 302, 36, 'MAPEAMENTO_MAPA_DISPONIBILIZADO', CURRENT_TIMESTAMP + INTERVAL '15' DAY);
+VALUES (302, 302, 36, 'MAPEAMENTO_MAPA_DISPONIBILIZADO', CURRENT_TIMESTAMP + INTERVAL '8' DAY);
 
 INSERT INTO sgc.mapa (codigo, subprocesso_codigo, data_hora_disponibilizado, data_hora_homologado)
 VALUES (302, 302, CURRENT_TIMESTAMP - INTERVAL '1' DAY, NULL);
@@ -523,72 +523,73 @@ VALUES ('212121', 'GESTOR', 11);
 -- Subprocesso 99 (Unidade 4 - ASSESSORIA_12)
 INSERT INTO sgc.movimentacao (codigo, subprocesso_codigo, unidade_origem_codigo, unidade_destino_codigo, usuario_titulo,
                               data_hora, descricao)
-VALUES (1, 99, 4, 4, '151515', CURRENT_TIMESTAMP - INTERVAL '5' DAY, 'Processo iniciado');
+VALUES (1, 99, 4, 4, '151515', CURRENT_TIMESTAMP - INTERVAL '5' DAY - INTERVAL '10' HOUR, 'Processo iniciado');
 INSERT INTO sgc.movimentacao (codigo, subprocesso_codigo, unidade_origem_codigo, unidade_destino_codigo, usuario_titulo,
                               data_hora, descricao)
-VALUES (2, 99, 4, 2, '151515', CURRENT_TIMESTAMP - INTERVAL '4' DAY, 'Disponibilização do cadastro de atividades');
+VALUES (2, 99, 4, 2, '151515', CURRENT_TIMESTAMP - INTERVAL '4' DAY - INTERVAL '14' HOUR, 'Disponibilização do cadastro de atividades');
 INSERT INTO sgc.movimentacao (codigo, subprocesso_codigo, unidade_origem_codigo, unidade_destino_codigo, usuario_titulo,
                               data_hora, descricao)
-VALUES (3, 99, 2, 4, '202020', CURRENT_TIMESTAMP - INTERVAL '3' DAY, 'Disponibilização do mapa de competências para validação');
+VALUES (3, 99, 2, 4, '202020', CURRENT_TIMESTAMP - INTERVAL '3' DAY - INTERVAL '9' HOUR, 'Disponibilização do mapa de competências para validação');
 INSERT INTO sgc.movimentacao (codigo, subprocesso_codigo, unidade_origem_codigo, unidade_destino_codigo, usuario_titulo,
                               data_hora, descricao)
-VALUES (4, 99, 4, 2, '151515', CURRENT_TIMESTAMP - INTERVAL '2' DAY, 'Validação do mapa de competências');
+VALUES (4, 99, 4, 2, '151515', CURRENT_TIMESTAMP - INTERVAL '2' DAY - INTERVAL '16' HOUR, 'Validação do mapa de competências');
 INSERT INTO sgc.movimentacao (codigo, subprocesso_codigo, unidade_origem_codigo, unidade_destino_codigo, usuario_titulo,
                               data_hora, descricao)
-VALUES (5, 99, 2, 1, '202020', CURRENT_TIMESTAMP - INTERVAL '1' DAY, 'Mapa de competências homologado');
+VALUES (5, 99, 2, 1, '202020', CURRENT_TIMESTAMP - INTERVAL '1' DAY - INTERVAL '11' HOUR, 'Mapa de competências homologado');
 
 -- Subprocesso 200 (Unidade 2 - SECRETARIA_1)
 INSERT INTO sgc.movimentacao (codigo, subprocesso_codigo, unidade_origem_codigo, unidade_destino_codigo, usuario_titulo,
                               data_hora, descricao)
-VALUES (6, 200, 2, 2, '202020', CURRENT_TIMESTAMP - INTERVAL '10' DAY, 'Processo iniciado');
+VALUES (6, 200, 2, 2, '202020', CURRENT_TIMESTAMP - INTERVAL '10' DAY - INTERVAL '8' HOUR, 'Processo iniciado');
 INSERT INTO sgc.movimentacao (codigo, subprocesso_codigo, unidade_origem_codigo, unidade_destino_codigo, usuario_titulo,
                               data_hora, descricao)
-VALUES (7, 200, 2, 1, '202020', CURRENT_TIMESTAMP - INTERVAL '8' DAY, 'Disponibilização do cadastro de atividades');
+VALUES (7, 200, 2, 1, '202020', CURRENT_TIMESTAMP - INTERVAL '8' DAY - INTERVAL '13' HOUR, 'Disponibilização do cadastro de atividades');
 INSERT INTO sgc.movimentacao (codigo, subprocesso_codigo, unidade_origem_codigo, unidade_destino_codigo, usuario_titulo,
                               data_hora, descricao)
-VALUES (8, 200, 1, 2, '111111', CURRENT_TIMESTAMP - INTERVAL '5' DAY,
+VALUES (8, 200, 1, 2, '111111', CURRENT_TIMESTAMP - INTERVAL '5' DAY - INTERVAL '15' HOUR,
         'Disponibilização do mapa de competências para validação');
 INSERT INTO sgc.movimentacao (codigo, subprocesso_codigo, unidade_origem_codigo, unidade_destino_codigo, usuario_titulo,
                               data_hora, descricao)
-VALUES (9, 200, 2, 1, '202020', CURRENT_TIMESTAMP - INTERVAL '2' DAY, 'Mapa de competências homologado');
+VALUES (9, 200, 2, 1, '202020', CURRENT_TIMESTAMP - INTERVAL '2' DAY - INTERVAL '10' HOUR, 'Mapa de competências homologado');
 
 -- Movimentações Secretaria 3
 -- Processo 301 (33 < 32)
 INSERT INTO sgc.movimentacao (codigo, subprocesso_codigo, unidade_origem_codigo, unidade_destino_codigo, usuario_titulo, data_hora, descricao)
-VALUES (30, 301, 33, 33, '330001', CURRENT_TIMESTAMP - INTERVAL '4' DAY, 'Processo iniciado');
+VALUES (30, 301, 33, 33, '330001', CURRENT_TIMESTAMP - INTERVAL '4' DAY - INTERVAL '9' HOUR, 'Processo iniciado');
 INSERT INTO sgc.movimentacao (codigo, subprocesso_codigo, unidade_origem_codigo, unidade_destino_codigo, usuario_titulo, data_hora, descricao)
-VALUES (31, 301, 33, 32, '330001', CURRENT_TIMESTAMP - INTERVAL '3' DAY, 'Disponibilização do cadastro de atividades');
+VALUES (31, 301, 33, 32, '330001', CURRENT_TIMESTAMP - INTERVAL '3' DAY - INTERVAL '11' HOUR, 'Disponibilização do cadastro de atividades');
 INSERT INTO sgc.movimentacao (codigo, subprocesso_codigo, unidade_origem_codigo, unidade_destino_codigo, usuario_titulo, data_hora, descricao)
-VALUES (32, 301, 32, 1, '320001', CURRENT_TIMESTAMP - INTERVAL '2' DAY, 'Cadastro aceito');
+VALUES (32, 301, 32, 1, '320001', CURRENT_TIMESTAMP - INTERVAL '2' DAY - INTERVAL '14' HOUR, 'Cadastro aceito');
 INSERT INTO sgc.movimentacao (codigo, subprocesso_codigo, unidade_origem_codigo, unidade_destino_codigo, usuario_titulo, data_hora, descricao)
-VALUES (33, 301, 1, 1, '111111', CURRENT_TIMESTAMP - INTERVAL '1' DAY, 'Cadastro homologado');
+VALUES (33, 301, 1, 1, '111111', CURRENT_TIMESTAMP - INTERVAL '1' DAY - INTERVAL '16' HOUR, 'Cadastro homologado');
 
 -- Processo 302 (36 < 35 < 30)
 INSERT INTO sgc.movimentacao (codigo, subprocesso_codigo, unidade_origem_codigo, unidade_destino_codigo, usuario_titulo, data_hora, descricao)
-VALUES (34, 302, 36, 36, '360001', CURRENT_TIMESTAMP - INTERVAL '6' DAY, 'Processo iniciado');
+VALUES (34, 302, 36, 36, '360001', CURRENT_TIMESTAMP - INTERVAL '6' DAY - INTERVAL '8' HOUR, 'Processo iniciado');
 INSERT INTO sgc.movimentacao (codigo, subprocesso_codigo, unidade_origem_codigo, unidade_destino_codigo, usuario_titulo, data_hora, descricao)
-VALUES (35, 302, 36, 35, '360001', CURRENT_TIMESTAMP - INTERVAL '5' DAY, 'Disponibilização do cadastro de atividades');
+VALUES (35, 302, 36, 35, '360001', CURRENT_TIMESTAMP - INTERVAL '5' DAY - INTERVAL '13' HOUR, 'Disponibilização do cadastro de atividades');
 INSERT INTO sgc.movimentacao (codigo, subprocesso_codigo, unidade_origem_codigo, unidade_destino_codigo, usuario_titulo, data_hora, descricao)
-VALUES (36, 302, 35, 30, '350001', CURRENT_TIMESTAMP - INTERVAL '4' DAY, 'Cadastro aceito');
+VALUES (36, 302, 35, 30, '350001', CURRENT_TIMESTAMP - INTERVAL '4' DAY - INTERVAL '10' HOUR, 'Cadastro aceito');
 INSERT INTO sgc.movimentacao (codigo, subprocesso_codigo, unidade_origem_codigo, unidade_destino_codigo, usuario_titulo, data_hora, descricao)
-VALUES (37, 302, 30, 30, '300001', CURRENT_TIMESTAMP - INTERVAL '3' DAY, 'Cadastro homologado');
+VALUES (37, 302, 30, 30, '300001', CURRENT_TIMESTAMP - INTERVAL '3' DAY - INTERVAL '15' HOUR, 'Cadastro homologado');
 INSERT INTO sgc.movimentacao (codigo, subprocesso_codigo, unidade_origem_codigo, unidade_destino_codigo, usuario_titulo, data_hora, descricao)
-VALUES (38, 302, 1, 36, '111111', CURRENT_TIMESTAMP - INTERVAL '1' DAY, 'Disponibilização do mapa de competências para validação');
+VALUES (38, 302, 1, 36, '111111', CURRENT_TIMESTAMP - INTERVAL '1' DAY - INTERVAL '9' HOUR, 'Disponibilização do mapa de competências para validação');
 
 -- -------------------------------------------------------------------------------------------------
 -- ALERTAS (Notificações correspondentes às movimentações)
 -- -------------------------------------------------------------------------------------------------
 -- Alertas para Unidade 1 (ADMIN) - Processos Homologados
 INSERT INTO sgc.alerta (codigo, data_hora, processo_codigo, unidade_origem_codigo, unidade_destino_codigo, descricao)
-VALUES (1, CURRENT_TIMESTAMP - INTERVAL '1' DAY, 99, 2, 1, 'Mapa de competências homologado');
+VALUES (1, CURRENT_TIMESTAMP - INTERVAL '1' DAY - INTERVAL '11' HOUR, 99, 2, 1, 'Mapa de competências homologado');
 INSERT INTO sgc.alerta (codigo, data_hora, processo_codigo, unidade_origem_codigo, unidade_destino_codigo, descricao)
-VALUES (2, CURRENT_TIMESTAMP - INTERVAL '2' DAY, 200, 2, 1, 'Mapa de competências homologado');
+VALUES (2, CURRENT_TIMESTAMP - INTERVAL '2' DAY - INTERVAL '10' HOUR, 200, 2, 1, 'Mapa de competências homologado');
 INSERT INTO sgc.alerta (codigo, data_hora, processo_codigo, unidade_origem_codigo, unidade_destino_codigo, descricao)
-VALUES (3, CURRENT_TIMESTAMP - INTERVAL '1' DAY, 301, 1, 1, 'Cadastro homologado');
+VALUES (3, CURRENT_TIMESTAMP - INTERVAL '1' DAY - INTERVAL '16' HOUR, 301, 1, 1, 'Cadastro homologado');
 
 -- Alerta para Unidade 36 (SECAO_321) - Mapa Disponibilizado para Validação
 INSERT INTO sgc.alerta (codigo, data_hora, processo_codigo, unidade_origem_codigo, unidade_destino_codigo, descricao)
-VALUES (4, CURRENT_TIMESTAMP - INTERVAL '1' DAY, 302, 1, 36, 'Disponibilização do mapa de competências para validação');
+VALUES (4, CURRENT_TIMESTAMP - INTERVAL '1' DAY - INTERVAL '9' HOUR, 302, 1, 36, 'Disponibilização do mapa de competências para validação');
+
 
 -- Associações de Alertas aos Usuários (Chefe/Gestor)
 -- Para os alertas da Unidade 1 (Usuário 111111)
@@ -598,6 +599,7 @@ INSERT INTO sgc.alerta_usuario (alerta_codigo, usuario_titulo, data_hora_leitura
 
 -- Para o alerta da Unidade 36 (Usuário 360001)
 INSERT INTO sgc.alerta_usuario (alerta_codigo, usuario_titulo, data_hora_leitura) VALUES (4, '360001', NULL);
+
 
 -- Reset identity sequences to prevent ID conflicts with test data
 -- This ensures auto-generated IDs start above the manually inserted ones
