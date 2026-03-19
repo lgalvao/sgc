@@ -25,6 +25,18 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
         expect(true).toBeTruthy();
     });
 
+    test('Cenario 0: modal de aceite exibe campo opcional de observação', async ({_resetAutomatico, page}) => {
+        await loginComPerfil(page, USUARIOS.GESTOR_SECRETARIA_1.titulo, USUARIOS.GESTOR_SECRETARIA_1.senha, 'GESTOR - SECRETARIA_1');
+        await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
+        await navegarParaMapa(page);
+
+        await page.getByTestId('btn-mapa-homologar-aceite').click();
+        await expect(page.getByTestId('inp-aceite-mapa-observacao')).toBeVisible();
+        await page.getByTestId('inp-aceite-mapa-observacao').fill('Observação opcional do aceite');
+        await page.getByTestId('btn-aceite-mapa-cancelar').click();
+        await expect(page.getByRole('dialog')).toBeHidden();
+    });
+
     test('Cenario 1: GESTOR SECRETARIA_1 analisa e aceita', async ({_resetAutomatico, page}) => {
         // Superior da ASSESSORIA_11 é John lennon (SECRETARIA_1)
         await loginComPerfil(page, USUARIOS.GESTOR_SECRETARIA_1.titulo, USUARIOS.GESTOR_SECRETARIA_1.senha, 'GESTOR - SECRETARIA_1');

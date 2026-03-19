@@ -191,8 +191,10 @@ describe('PainelView Coverage', () => {
         }));
         
         // Simular onActivated
-        if (wrapper.vm.$options.activated) {
-            for (const hook of wrapper.vm.$options.activated) {
+        const activated = wrapper.vm.$options.activated;
+        if (activated) {
+            const hooks = Array.isArray(activated) ? activated : [activated];
+            for (const hook of hooks) {
                 await hook.call(wrapper.vm);
             }
             expect(toastStore.consumePending).toHaveBeenCalledTimes(2);

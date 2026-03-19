@@ -358,15 +358,15 @@ public class SubprocessoTransicaoService {
         log.info("Devolvida validação do mapa do SP {}", codSubprocesso);
     }
 
-    public void aceitarValidacao(Long codSubprocesso, Usuario usuario) {
-        executarAceiteValidacao(codSubprocesso, usuario);
+    public void aceitarValidacao(Long codSubprocesso, @Nullable String observacoes, Usuario usuario) {
+        executarAceiteValidacao(codSubprocesso, observacoes, usuario);
     }
 
     public void aceitarValidacaoEmBloco(List<Long> subprocessoCodigos, Usuario usuario) {
-        subprocessoCodigos.forEach(codSubprocesso -> executarAceiteValidacao(codSubprocesso, usuario));
+        subprocessoCodigos.forEach(codSubprocesso -> executarAceiteValidacao(codSubprocesso, null, usuario));
     }
 
-    private void executarAceiteValidacao(Long codSubprocesso, Usuario usuario) {
+    private void executarAceiteValidacao(Long codSubprocesso, @Nullable String observacoes, Usuario usuario) {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
         validacaoService.validarSituacaoPermitida(sp,
                 MAPEAMENTO_MAPA_COM_SUGESTOES,
@@ -380,11 +380,11 @@ public class SubprocessoTransicaoService {
         if (proximaUnidade == null) {
             String siglaUnidade = unidadeAtual.getSigla();
             CriarAnaliseRequest request = CriarAnaliseRequest.builder()
-                    .observacoes("Aceite da validação")
+                    .observacoes(observacoes)
                     .acao(TipoAcaoAnalise.ACEITE_MAPEAMENTO)
                     .siglaUnidade(siglaUnidade)
                     .tituloUsuario(usuario.getTituloEleitoral())
-                    .motivo("")
+                    .motivo("Aceite da validação")
                     .build();
 
             criarAnalise(sp, request, TipoAnalise.VALIDACAO);
@@ -404,21 +404,22 @@ public class SubprocessoTransicaoService {
                     .unidadeDestinoTransicao(proximaUnidade)
                     .usuario(usuario)
                     .motivoAnalise("Aceite da validação")
+                    .observacoes(observacoes)
                     .build());
         }
 
         log.info("Validação aceita para mapa do SP {}", codSubprocesso);
     }
 
-    public void homologarValidacao(Long codSubprocesso, Usuario usuario) {
-        executarHomologacaoValidacao(codSubprocesso, usuario);
+    public void homologarValidacao(Long codSubprocesso, @Nullable String observacoes, Usuario usuario) {
+        executarHomologacaoValidacao(codSubprocesso, observacoes, usuario);
     }
 
     public void homologarValidacaoEmBloco(List<Long> subprocessoCodigos, Usuario usuario) {
-        subprocessoCodigos.forEach(codSubprocesso -> executarHomologacaoValidacao(codSubprocesso, usuario));
+        subprocessoCodigos.forEach(codSubprocesso -> executarHomologacaoValidacao(codSubprocesso, null, usuario));
     }
 
-    private void executarHomologacaoValidacao(Long codSubprocesso, Usuario usuario) {
+    private void executarHomologacaoValidacao(Long codSubprocesso, @Nullable String observacoes, Usuario usuario) {
         log.info("Homologando validação do mapa do subprocesso {}", codSubprocesso);
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
         validacaoService.validarSituacaoPermitida(sp,
@@ -434,6 +435,7 @@ public class SubprocessoTransicaoService {
                 .origem(admin)
                 .destino(admin)
                 .usuario(usuario)
+                .observacoes(observacoes)
                 .build());
     }
 

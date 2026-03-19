@@ -251,9 +251,12 @@ describe("MapaView coverage", () => {
         // Chamamos o onMounted simulando o comportamento de montagem para cobrir as linhas
         // Em vez de checar toHaveBeenCalledWith, garantimos que os dados forçados na store funcionam e cobrem a ramificação:
         vm.codSubprocesso = 123;
-        const hook = wrapper.vm.$options.mounted?.[0];
-        if (hook) {
-            await hook.call(vm);
+        const mounted = wrapper.vm.$options.mounted;
+        if (mounted) {
+            const hooks = Array.isArray(mounted) ? mounted : [mounted];
+            for (const hook of hooks) {
+                await hook.call(vm);
+            }
         }
 
         // E injetamos os mocks na instância diretamente

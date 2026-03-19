@@ -72,15 +72,25 @@ describe("AceitarMapaModal.vue", () => {
         expect(wrapper.emitted("fecharModal")).toBeTruthy();
     });
 
+    it("deve renderizar o campo opcional de observação", () => {
+        const wrapper = createWrapper();
+
+        expect(wrapper.find('[data-testid="inp-aceite-mapa-observacao"]').exists()).toBe(true);
+    });
+
     it("deve emitir o evento confirmarAceitacao com a observação", async () => {
         const wrapper = createWrapper();
+
+        await wrapper
+            .find('[data-testid="inp-aceite-mapa-observacao"]')
+            .setValue("Observação teste");
 
         await wrapper
             .find('[data-testid="btn-aceite-mapa-confirmar"]')
             .trigger("click");
 
         expect(wrapper.emitted("confirmarAceitacao")).toBeTruthy();
-        expect(wrapper.emitted("confirmarAceitacao")?.[0]).toEqual([""]);
+        expect(wrapper.emitted("confirmarAceitacao")?.[0]).toEqual(["Observação teste"]);
     });
 
     it("deve emitir o evento confirmarAceitacao com uma observação vazia", async () => {

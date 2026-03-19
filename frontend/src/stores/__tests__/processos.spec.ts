@@ -441,8 +441,8 @@ describe("useProcessosStore", () => {
                 processoService.obterDetalhesProcesso.mockResolvedValue(
                     MOCK_PROCESSO_DETALHE,
                 );
-                await context.store.homologarValidacao(1);
-                expect(processoService.homologarValidacao).toHaveBeenCalledWith(1);
+                await context.store.homologarValidacao(1, {texto: "Obs"});
+                expect(processoService.homologarValidacao).toHaveBeenCalledWith(1, {texto: "Obs"});
                 expect(processoService.obterDetalhesProcesso).toHaveBeenCalledWith(1);
             });
 
@@ -450,15 +450,15 @@ describe("useProcessosStore", () => {
                 context.store.processoDetalhe = null;
                 processoService.homologarValidacao.mockResolvedValue(undefined);
 
-                await context.store.homologarValidacao(1);
+                await context.store.homologarValidacao(1, {texto: ""});
 
-                expect(processoService.homologarValidacao).toHaveBeenCalledWith(1);
+                expect(processoService.homologarValidacao).toHaveBeenCalledWith(1, {texto: ""});
                 expect(processoService.obterDetalhesProcesso).not.toHaveBeenCalled();
             });
 
             it("deve lançar erro em caso de falha", async () => {
                 processoService.homologarValidacao.mockRejectedValue(MOCK_ERROR);
-                await expect(context.store.homologarValidacao(1)).rejects.toThrow(MOCK_ERROR);
+                await expect(context.store.homologarValidacao(1, {texto: ""})).rejects.toThrow(MOCK_ERROR);
                 expect(context.store.lastError).toEqual(normalizeError(MOCK_ERROR));
             });
         });
@@ -468,8 +468,8 @@ describe("useProcessosStore", () => {
                 context.store.processoDetalhe = {codigo: 1} as any;
                 processoService.aceitarValidacao.mockResolvedValue(undefined);
                 processoService.obterDetalhesProcesso.mockResolvedValue(MOCK_PROCESSO_DETALHE);
-                await context.store.aceitarValidacao(10);
-                expect(processoService.aceitarValidacao).toHaveBeenCalledWith(10);
+                await context.store.aceitarValidacao(10, {texto: "Obs"});
+                expect(processoService.aceitarValidacao).toHaveBeenCalledWith(10, {texto: "Obs"});
                 expect(processoService.obterDetalhesProcesso).toHaveBeenCalledWith(1);
             });
 
@@ -477,15 +477,15 @@ describe("useProcessosStore", () => {
                 context.store.processoDetalhe = null;
                 processoService.aceitarValidacao.mockResolvedValue(undefined);
 
-                await context.store.aceitarValidacao(10);
+                await context.store.aceitarValidacao(10, {texto: ""});
 
-                expect(processoService.aceitarValidacao).toHaveBeenCalledWith(10);
+                expect(processoService.aceitarValidacao).toHaveBeenCalledWith(10, {texto: ""});
                 expect(processoService.obterDetalhesProcesso).not.toHaveBeenCalled();
             });
 
             it("deve lançar erro em caso de falha", async () => {
                 processoService.aceitarValidacao.mockRejectedValue(MOCK_ERROR);
-                await expect(context.store.aceitarValidacao(10)).rejects.toThrow(MOCK_ERROR);
+                await expect(context.store.aceitarValidacao(10, {texto: ""})).rejects.toThrow(MOCK_ERROR);
                 expect(context.store.lastError).toEqual(normalizeError(MOCK_ERROR));
             });
         });
