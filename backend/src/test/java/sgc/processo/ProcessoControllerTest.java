@@ -29,10 +29,11 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import sgc.integracao.mocks.TestSecurityConfig;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 
 @WebMvcTest(ProcessoController.class)
-@Import({TestSecurityConfig.class, RestExceptionHandler.class})
+@Import({RestExceptionHandler.class, SgcPermissionEvaluator.class})
+@EnableMethodSecurity
 @Tag("integration")
 @DisplayName("ProcessoController")
 class ProcessoControllerTest {
@@ -217,9 +218,10 @@ class ProcessoControllerTest {
         void deveRetornarForbiddenQuandoChefeNaoTemAcesso() throws Exception {
             var processo = Processo.builder().codigo(1L).descricao("Teste").build();
             when(processoService.buscarOpt(1L)).thenReturn(Optional.of(processo));
-            when(processoService.checarAcesso(any(org.springframework.security.core.Authentication.class), eq(1L))).thenReturn(false);
+            when(processoService.checarAcesso(any(), anyLong())).thenReturn(false);
 
             mockMvc.perform(get(API_PROCESSOS_1))
+                    .andDo(org.springframework.test.web.servlet.result.MockMvcResultHandlers.print())
                     .andExpect(status().isForbidden());
         }
 
@@ -229,7 +231,7 @@ class ProcessoControllerTest {
         void deveRetornarOkQuandoGestorTemAcesso() throws Exception {
             var processo = Processo.builder().codigo(1L).descricao("Teste").build();
             when(processoService.buscarOpt(1L)).thenReturn(Optional.of(processo));
-            when(processoService.checarAcesso(any(org.springframework.security.core.Authentication.class), eq(1L))).thenReturn(true);
+            when(processoService.checarAcesso(any(), anyLong())).thenReturn(true);
 
             mockMvc.perform(get(API_PROCESSOS_1))
                     .andExpect(status().isOk());
@@ -241,7 +243,7 @@ class ProcessoControllerTest {
         void deveRetornarForbiddenQuandoGestorNaoTemAcesso() throws Exception {
             var processo = Processo.builder().codigo(1L).descricao("Teste").build();
             when(processoService.buscarOpt(1L)).thenReturn(Optional.of(processo));
-            when(processoService.checarAcesso(any(org.springframework.security.core.Authentication.class), eq(1L))).thenReturn(false);
+            when(processoService.checarAcesso(any(), anyLong())).thenReturn(false);
 
             mockMvc.perform(get(API_PROCESSOS_1))
                     .andExpect(status().isForbidden());
