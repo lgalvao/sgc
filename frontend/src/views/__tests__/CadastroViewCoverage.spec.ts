@@ -3,6 +3,7 @@ import {flushPromises, mount} from "@vue/test-utils";
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import {ref} from "vue";
 import * as useAcessoModule from "@/composables/useAcesso";
+import * as useProcessosModule from "@/composables/useProcessos";
 import * as subprocessoService from "@/services/subprocessoService";
 import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useMapasStore} from "@/stores/mapas";
@@ -25,6 +26,8 @@ vi.mock("@/services/subprocessoService", () => ({
 vi.mock("@/services/analiseService", () => ({
     listarAnalisesCadastro: vi.fn(),
 }));
+
+vi.mock("@/composables/useProcessos", () => ({useProcessos: vi.fn()}));
 
 const stubs = {
     LayoutPadrao: {template: '<div><slot /></div>'},
@@ -52,6 +55,15 @@ const stubs = {
 describe("CadastroView coverage", () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        vi.mocked(useProcessosModule.useProcessos).mockReturnValue({
+            processoDetalhe: ref({
+                codigo: 1,
+                unidades: [
+                    {sigla: "TESTE", codSubprocesso: 123, filhas: []}
+                ]
+            }),
+            buscarProcessoDetalhe: vi.fn().mockResolvedValue(undefined),
+        } as any);
         vi.mocked(subprocessoService.buscarSubprocessoPorProcessoEUnidade).mockResolvedValue(123 as any);
         vi.mocked(subprocessoService.buscarContextoEdicao).mockResolvedValue({
             subprocesso: {codigo: 123, situacao: "MAPEAMENTO_CADASTRO_EM_ANDAMENTO", tipoProcesso: "MAPEAMENTO"},

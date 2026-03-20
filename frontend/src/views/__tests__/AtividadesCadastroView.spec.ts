@@ -3,6 +3,7 @@ import {flushPromises, mount} from "@vue/test-utils";
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import {ref} from "vue";
 import * as usePerfilModule from "@/composables/usePerfil";
+import * as useProcessosModule from "@/composables/useProcessos";
 import * as subprocessoService from "@/services/subprocessoService";
 import * as analiseService from "@/services/analiseService";
 import {useSubprocessosStore} from "@/stores/subprocessos";
@@ -37,15 +38,7 @@ vi.mock("@/services/analiseService", () => ({
     listarAnalisesCadastro: vi.fn(),
 }));
 
-vi.mock("@/services/processoService", () => ({
-    buscarProcessoDetalhe: vi.fn(),
-    obterDetalhesProcesso: vi.fn().mockResolvedValue({
-        codigo: 1,
-        unidades: [
-            {sigla: "TESTE", codSubprocesso: 123, filhos: []}
-        ]
-    })
-}));
+vi.mock("@/composables/useProcessos", () => ({useProcessos: vi.fn()}));
 
 const stubs = {
     LayoutPadrao: {template: '<div><slot /></div>'},
@@ -137,6 +130,15 @@ function createWrapper(customState = {}, accessOverrides = {}) {
 describe("CadastroView.vue", () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        vi.mocked(useProcessosModule.useProcessos).mockReturnValue({
+            processoDetalhe: ref({
+                codigo: 1,
+                unidades: [
+                    {sigla: "TESTE", codSubprocesso: 123, filhas: []}
+                ]
+            }),
+            buscarProcessoDetalhe: vi.fn().mockResolvedValue(undefined),
+        } as any);
         vi.mocked(subprocessoService.buscarSubprocessoPorProcessoEUnidade).mockResolvedValue({codigo: 123} as any);
         vi.mocked(subprocessoService.buscarContextoEdicao).mockResolvedValue({
             detalhes: {
