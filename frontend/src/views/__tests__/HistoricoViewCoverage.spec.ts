@@ -2,12 +2,32 @@ import {flushPromises, mount} from "@vue/test-utils";
 import {describe, expect, it, vi} from "vitest";
 import {createTestingPinia} from "@pinia/testing";
 import HistoricoView from "@/views/HistoricoView.vue";
-import {useProcessosStore} from "@/stores/processos";
 import {createMemoryHistory, createRouter} from "vue-router";
+import {ref} from "vue";
 import {SituacaoProcesso, TipoProcesso} from "@/types/tipos";
+
+const processosMock = {
+    processosFinalizados: ref<any[]>([]),
+    buscarProcessosFinalizados: vi.fn(),
+};
+
+vi.mock("@/composables/useProcessos", () => ({
+    useProcessos: () => processosMock
+}));
 
 describe("HistoricoView Coverage", () => {
     it("renders correctly and rows are accessible", async () => {
+        processosMock.processosFinalizados.value = [
+            {
+                codigo: 1,
+                descricao: "Processo teste",
+                tipo: TipoProcesso.MAPEAMENTO,
+                tipoLabel: "Mapeamento",
+                dataFinalizacaoFormatada: "01/01/2023",
+                situacao: SituacaoProcesso.FINALIZADO,
+            },
+        ];
+
         const router = createRouter({
             history: createMemoryHistory(),
             routes: [
@@ -25,20 +45,6 @@ describe("HistoricoView Coverage", () => {
                     createTestingPinia({
                         createSpy: vi.fn,
                         stubActions: true,
-                        initialState: {
-                            "processos": {
-                                processosFinalizados: [
-                                    {
-                                        codigo: 1,
-                                        descricao: "Processo teste",
-                                        tipo: TipoProcesso.MAPEAMENTO,
-                                        tipoLabel: "Mapeamento",
-                                        dataFinalizacaoFormatada: "01/01/2023",
-                                        situacao: SituacaoProcesso.FINALIZADO,
-                                    },
-                                ],
-                            },
-                        },
                     }),
                 ],
             },
@@ -46,8 +52,7 @@ describe("HistoricoView Coverage", () => {
 
         await flushPromises();
 
-        const store = useProcessosStore();
-        expect(store.processosFinalizados).toHaveLength(1);
+        expect(processosMock.processosFinalizados.value).toHaveLength(1);
 
         const row = wrapper.find("tbody tr.row-processo-1");
         expect(row.exists()).toBe(true);

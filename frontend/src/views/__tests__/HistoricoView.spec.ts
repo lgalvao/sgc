@@ -3,12 +3,21 @@ import {flushPromises, mount} from '@vue/test-utils';
 import {createTestingPinia} from '@pinia/testing';
 import HistoricoView from '../HistoricoView.vue';
 import {useRouter} from 'vue-router';
-import {useProcessosStore} from '@/stores/processos';
+import {ref} from 'vue';
 
 vi.mock('vue-router', () => ({
   useRouter: vi.fn(() => ({
     push: vi.fn()
   }))
+}));
+
+const processosMock = {
+  processosFinalizados: ref<any[]>([]),
+  buscarProcessosFinalizados: vi.fn(),
+};
+
+vi.mock('@/composables/useProcessos', () => ({
+  useProcessos: () => processosMock,
 }));
 
 const LayoutPadraoStub = {
@@ -34,9 +43,10 @@ const mockProcessosFinalizados = [
 describe('HistoricoView.vue', () => {
   let wrapper: any;
   let mockRouter: any;
-  let processosStore: any;
 
   beforeEach(() => {
+    vi.clearAllMocks();
+    processosMock.processosFinalizados.value = [...mockProcessosFinalizados];
     mockRouter = { push: vi.fn() };
     (useRouter as any).mockReturnValue(mockRouter);
   });
@@ -66,19 +76,17 @@ describe('HistoricoView.vue', () => {
 
   it('deve carregar historico onMounted', async () => {
     wrapper = createWrapper();
-    processosStore = useProcessosStore();
     
     // initially loading
     // then loaded
     await flushPromises();
 
-    expect(processosStore.buscarProcessosFinalizados).toHaveBeenCalled();
+    expect(processosMock.buscarProcessosFinalizados).toHaveBeenCalled();
   });
 
   it('deve lidar com erro ao carregar historico', async () => {
+    processosMock.buscarProcessosFinalizados.mockRejectedValueOnce(new Error('error'));
     wrapper = createWrapper();
-    processosStore = useProcessosStore();
-    processosStore.buscarProcessosFinalizados.mockRejectedValueOnce(new Error('error'));
     
     await flushPromises();
     // shouldn't crash, error caught in try/catch block
