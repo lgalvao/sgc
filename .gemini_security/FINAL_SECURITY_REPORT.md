@@ -6,7 +6,7 @@ Este relatório consolida as vulnerabilidades identificadas durante a auditoria 
 
 | ID | Vulnerabilidade | Tipo | Severidade | Localização Principal |
 | :--- | :--- | :--- | :--- | :--- |
-| 1 | Insecure Direct Object Reference (IDOR) - Acesso de Leitura | Security | High | `ProcessoController`, `AtividadeController`, `MapaController` |
+| 1 | Insecure Direct Object Reference (IDOR) - Acesso de Leitura **[CORRIGIDO]** | Security | High | `ProcessoController`, `AtividadeController`, `MapaController` |
 | 2 | Broken Access Control e Risco de Privacidade no Painel | Security / Privacy | High | `PainelController` |
 | 3 | Exposição de Dados Pessoais (PII) | Privacy | Medium | `UsuarioController` |
 | 4 | Bypass de Limitador de Taxa (Rate Limit) via Header de Proxy | Security | Medium | `LoginController` |
@@ -18,15 +18,16 @@ Este relatório consolida as vulnerabilidades identificadas durante a auditoria 
 ## Detalhamento das Descobertas
 
 ### 1. Insecure Direct Object Reference (IDOR) - Acesso de Leitura não Autorizado
+*   **Status:** ✅ **Corrigido**
 *   **Vulnerabilidade:** Insecure Direct Object Reference (IDOR)
 *   **Tipo:** Security
 *   **Severidade:** High
 *   **Localização:** 
-    *   `backend/src/main/java/sgc/processo/ProcessoController.java` (Linhas 59-62)
-    *   `backend/src/main/java/sgc/mapa/AtividadeController.java` (Linhas 31-34)
-    *   `backend/src/main/java/sgc/mapa/MapaController.java` (Linhas 32-36)
-*   **Descrição:** Os endpoints de consulta (GET) para Processos, Atividades e Mapas permitem que qualquer usuário autenticado com os perfis `GESTOR` ou `CHEFE` visualize detalhes de qualquer registro no sistema, apenas fornecendo o ID (código). Não há verificação se o registro pertence à unidade do usuário ou à sua árvore hierárquica, ao contrário dos endpoints de escrita que possuem proteção adequada.
-*   **Recomendação:** Implementar a anotação `@PreAuthorize("hasPermission(#codigo, 'TipoAlvo', 'VISUALIZAR_...')")` ou utilizar o `SgcPermissionEvaluator` para validar se o usuário tem permissão de leitura sobre o objeto específico.
+    *   `backend/src/main/java/sgc/processo/ProcessoController.java`
+    *   `backend/src/main/java/sgc/mapa/AtividadeController.java`
+    *   `backend/src/main/java/sgc/mapa/MapaController.java`
+*   **Descrição:** Os endpoints de consulta (GET) para Processos, Atividades e Mapas permitiam que qualquer usuário autenticado com os perfis `GESTOR` ou `CHEFE` visualizasse detalhes de qualquer registro no sistema, apenas fornecendo o ID (código). Não havia verificação se o registro pertencia à unidade do usuário ou à sua árvore hierárquica.
+*   **Ação de Correção:** As anotações `@PreAuthorize` foram atualizadas para utilizar o `SgcPermissionEvaluator` e o método `processoService.checarAcesso`, que agora resolvem a hierarquia da unidade conforme definido em `regras-acesso.md`. Testes de integração foram corrigidos (ativação de segurança no `@WebMvcTest`) e novos testes para `CHEFE` e `GESTOR` foram adicionados para validar matematicamente os bloqueios (`403 Forbidden`) e os sucessos (`200 OK`).
 
 ### 2. Broken Access Control e Risco de Privacidade no Painel
 *   **Vulnerabilidade:** IDOR / Privacy Violation
