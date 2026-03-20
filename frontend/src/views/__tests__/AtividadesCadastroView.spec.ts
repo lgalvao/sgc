@@ -5,9 +5,9 @@ import {ref} from "vue";
 import * as usePerfilModule from "@/composables/usePerfil";
 import * as useFluxoSubprocessoModule from "@/composables/useFluxoSubprocesso";
 import * as useProcessosModule from "@/composables/useProcessos";
+import * as useSubprocessosModule from "@/composables/useSubprocessos";
 import * as subprocessoService from "@/services/subprocessoService";
 import * as analiseService from "@/services/analiseService";
-import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useMapasStore} from "@/stores/mapas";
 import CadastroView from "@/views/CadastroView.vue";
 import ConfirmacaoDisponibilizacaoModal from "@/components/mapa/ConfirmacaoDisponibilizacaoModal.vue";
@@ -39,6 +39,7 @@ vi.mock("@/services/analiseService", () => ({
     listarAnalisesCadastro: vi.fn(),
 }));
 
+vi.mock("@/composables/useSubprocessos", () => ({useSubprocessos: vi.fn()}));
 vi.mock("@/composables/useFluxoSubprocesso", () => ({useFluxoSubprocesso: vi.fn()}));
 vi.mock("@/composables/useProcessos", () => ({useProcessos: vi.fn()}));
 
@@ -132,6 +133,15 @@ function createWrapper(customState = {}, accessOverrides = {}) {
 describe("CadastroView.vue", () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        vi.mocked(useSubprocessosModule.useSubprocessos).mockReturnValue({
+            subprocessoDetalhe: null,
+            buscarContextoEdicao: vi.fn(),
+            buscarSubprocessoPorProcessoEUnidade: vi.fn(),
+            buscarSubprocessoDetalhe: vi.fn(),
+            atualizarStatusLocal: vi.fn(),
+            lastError: null,
+            clearError: vi.fn(),
+        } as any);
         vi.mocked(useFluxoSubprocessoModule.useFluxoSubprocesso).mockReturnValue({
             validarCadastro: vi.fn().mockResolvedValue({valido: true}),
             disponibilizarCadastro: vi.fn().mockResolvedValue(true),
@@ -170,7 +180,7 @@ describe("CadastroView.vue", () => {
         await flushPromises();
         (wrapper.vm as any).atividades = [{codigo: 1, conhecimentos: [{codigo: 1}]}];
         await wrapper.vm.$nextTick();
-        const subprocessosStore = useSubprocessosStore();
+        const subprocessosStore = useSubprocessosModule.useSubprocessos() as any;
         const fluxoSubprocesso = useFluxoSubprocessoModule.useFluxoSubprocesso() as any;
         subprocessosStore.subprocessoDetalhe = {
             codigo: 123,
@@ -191,7 +201,7 @@ describe("CadastroView.vue", () => {
         await flushPromises();
         (wrapper.vm as any).atividades = [{codigo: 1, conhecimentos: [{codigo: 1}]}];
         await wrapper.vm.$nextTick();
-        const subprocessosStore = useSubprocessosStore();
+        const subprocessosStore = useSubprocessosModule.useSubprocessos() as any;
         const fluxoSubprocesso = useFluxoSubprocessoModule.useFluxoSubprocesso() as any;
         subprocessosStore.subprocessoDetalhe = {
             codigo: 123,
@@ -287,7 +297,7 @@ describe("CadastroView.vue", () => {
     it("recarrega contexto completo apos importar atividades", async () => {
         const wrapper = createWrapper();
         await flushPromises();
-        const subprocessosStore = useSubprocessosStore();
+        const subprocessosStore = useSubprocessosModule.useSubprocessos() as any;
         subprocessosStore.buscarContextoEdicao = vi.fn().mockResolvedValue({
             detalhes: {
                 subprocesso: {

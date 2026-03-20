@@ -2,7 +2,7 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {flushPromises, mount, RouterLinkStub} from '@vue/test-utils';
 import {createTestingPinia} from '@pinia/testing';
 import SubprocessoView from '@/views/SubprocessoView.vue';
-import {useSubprocessosStore} from '@/stores/subprocessos';
+import * as useSubprocessosModule from '@/composables/useSubprocessos';
 import {useMapasStore} from '@/stores/mapas';
 import {ref} from 'vue';
 import {SituacaoSubprocesso, TipoProcesso} from '@/types/tipos';
@@ -43,6 +43,7 @@ vi.mock('@/composables/useProcessos', () => ({
 vi.mock('@/composables/useFluxoSubprocesso', () => ({
     useFluxoSubprocesso: () => fluxoSubprocessoMock
 }));
+vi.mock('@/composables/useSubprocessos', () => ({useSubprocessos: vi.fn()}));
 
 describe('SubprocessoView.vue', () => {
     const mockSubprocesso = {
@@ -104,6 +105,15 @@ describe('SubprocessoView.vue', () => {
         fluxoSubprocessoMock.alterarDataLimiteSubprocesso.mockResolvedValue({});
         fluxoSubprocessoMock.reabrirCadastro.mockResolvedValue(true);
         fluxoSubprocessoMock.reabrirRevisaoCadastro.mockResolvedValue(true);
+        vi.mocked(useSubprocessosModule.useSubprocessos).mockReturnValue({
+            subprocessoDetalhe: null,
+            buscarSubprocessoPorProcessoEUnidade: vi.fn().mockResolvedValue(10),
+            buscarSubprocessoDetalhe: vi.fn(),
+            buscarContextoEdicao: vi.fn(),
+            atualizarStatusLocal: vi.fn(),
+            lastError: null,
+            clearError: vi.fn(),
+        } as any);
     });
 
     // Helper to mount component with specific setup
@@ -133,7 +143,7 @@ describe('SubprocessoView.vue', () => {
             stubActions: true,
         });
 
-        const store = useSubprocessosStore(pinia);
+        const store = useSubprocessosModule.useSubprocessos() as any;
         const mapaStore = useMapasStore(pinia);
         processosMock.processoDetalhe.value = {situacao: 'EM_ANDAMENTO'};
 

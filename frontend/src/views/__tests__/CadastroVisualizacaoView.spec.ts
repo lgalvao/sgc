@@ -4,9 +4,9 @@ import {beforeEach, describe, expect, it, vi} from "vitest";
 import {ref} from "vue";
 import * as useAcessoModule from "@/composables/useAcesso";
 import * as useFluxoSubprocessoModule from "@/composables/useFluxoSubprocesso";
+import * as useSubprocessosModule from "@/composables/useSubprocessos";
 import * as subprocessoService from "@/services/subprocessoService";
 import * as analiseService from "@/services/analiseService";
-import {useSubprocessosStore} from "@/stores/subprocessos";
 import CadastroVisualizacaoView from "../CadastroVisualizacaoView.vue";
 
 const {pushMock} = vi.hoisted(() => ({pushMock: vi.fn()}));
@@ -25,6 +25,7 @@ vi.mock("@/services/subprocessoService", () => ({
     buscarContextoEdicao: vi.fn(),
 }));
 
+vi.mock("@/composables/useSubprocessos", () => ({useSubprocessos: vi.fn()}));
 vi.mock("@/composables/useFluxoSubprocesso", () => ({useFluxoSubprocesso: vi.fn()}));
 const processosMock = {
     processoDetalhe: ref<any>(null),
@@ -62,6 +63,18 @@ const stubs = {
 describe("CadastroVisualizacaoView coverage", () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        vi.mocked(useSubprocessosModule.useSubprocessos).mockReturnValue({
+            subprocessoDetalhe: null,
+            buscarSubprocessoPorProcessoEUnidade: vi.fn().mockResolvedValue(123),
+            buscarContextoEdicao: vi.fn().mockResolvedValue({
+                atividadesDisponiveis: [{codigo: 1, descricao: "Ativ 1", conhecimentos: []}],
+                unidade: {sigla: "TESTE", nome: "Teste"}
+            }),
+            buscarSubprocessoDetalhe: vi.fn(),
+            atualizarStatusLocal: vi.fn(),
+            lastError: null,
+            clearError: vi.fn(),
+        } as any);
         vi.mocked(useFluxoSubprocessoModule.useFluxoSubprocesso).mockReturnValue({
             aceitarCadastro: vi.fn().mockResolvedValue(true),
             devolverCadastro: vi.fn().mockResolvedValue(true),
@@ -230,7 +243,7 @@ describe("CadastroVisualizacaoView coverage", () => {
         });
         
         await flushPromises();
-        const store = useSubprocessosStore();
+        const store = useSubprocessosModule.useSubprocessos() as any;
         expect(store.buscarSubprocessoPorProcessoEUnidade).toHaveBeenCalledWith(1, "TESTE");
     });
 

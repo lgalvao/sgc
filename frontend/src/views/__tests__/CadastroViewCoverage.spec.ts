@@ -5,8 +5,8 @@ import {ref} from "vue";
 import * as useAcessoModule from "@/composables/useAcesso";
 import * as useFluxoSubprocessoModule from "@/composables/useFluxoSubprocesso";
 import * as useProcessosModule from "@/composables/useProcessos";
+import * as useSubprocessosModule from "@/composables/useSubprocessos";
 import * as subprocessoService from "@/services/subprocessoService";
-import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useMapasStore} from "@/stores/mapas";
 import {SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 import CadastroView from "../CadastroView.vue";
@@ -28,6 +28,7 @@ vi.mock("@/services/analiseService", () => ({
     listarAnalisesCadastro: vi.fn(),
 }));
 
+vi.mock("@/composables/useSubprocessos", () => ({useSubprocessos: vi.fn()}));
 vi.mock("@/composables/useFluxoSubprocesso", () => ({useFluxoSubprocesso: vi.fn()}));
 vi.mock("@/composables/useProcessos", () => ({useProcessos: vi.fn()}));
 
@@ -57,6 +58,24 @@ const stubs = {
 describe("CadastroView coverage", () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        vi.mocked(useSubprocessosModule.useSubprocessos).mockReturnValue({
+            subprocessoDetalhe: {
+                codigo: 123,
+                situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
+                tipoProcesso: TipoProcesso.MAPEAMENTO
+            },
+            buscarSubprocessoPorProcessoEUnidade: vi.fn().mockResolvedValue(123),
+            buscarContextoEdicao: vi.fn().mockResolvedValue({
+                subprocesso: {codigo: 123, situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, tipoProcesso: TipoProcesso.MAPEAMENTO},
+                permissoes: {podeEditarCadastro: true, podeDisponibilizarCadastro: true, podeVisualizarImpacto: true},
+                atividadesDisponiveis: [],
+                unidade: {sigla: "TESTE", nome: "Teste"}
+            }),
+            buscarSubprocessoDetalhe: vi.fn(),
+            atualizarStatusLocal: vi.fn(),
+            lastError: null,
+            clearError: vi.fn(),
+        } as any);
         vi.mocked(useFluxoSubprocessoModule.useFluxoSubprocesso).mockReturnValue({
             validarCadastro: vi.fn(),
             disponibilizarCadastro: vi.fn().mockResolvedValue(true),
@@ -87,27 +106,7 @@ describe("CadastroView coverage", () => {
             podeVisualizarImpacto: ref(true),
         } as any);
 
-        const pinia = createTestingPinia({
-            stubActions: true,
-            initialState: {
-                subprocessos: {
-                    subprocessoDetalhe: {
-                        codigo: 123,
-                        situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
-                        tipoProcesso: TipoProcesso.MAPEAMENTO
-                    }
-                }
-            }
-        });
-
-        const store = useSubprocessosStore(pinia);
-        (store.buscarSubprocessoPorProcessoEUnidade as any).mockResolvedValue(123);
-        (store.buscarContextoEdicao as any).mockResolvedValue({
-            subprocesso: {codigo: 123, situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, tipoProcesso: TipoProcesso.MAPEAMENTO},
-            permissoes: {podeEditarCadastro: true, podeDisponibilizarCadastro: true, podeVisualizarImpacto: true},
-            atividadesDisponiveis: [],
-            unidade: {sigla: "TESTE", nome: "Teste"}
-        });
+        const pinia = createTestingPinia({stubActions: true});
 
         return mount(CadastroView, {
             global: {
@@ -126,7 +125,7 @@ describe("CadastroView coverage", () => {
         await flushPromises();
 
         // Cobre handleAdicionarAtividade com erro
-        const store = useSubprocessosStore();
+        const store = useSubprocessosModule.useSubprocessos() as any;
         const mapasStore = useMapasStore();
 
         mapasStore.mapaCompleto = { codigo: 100 } as any;
@@ -215,7 +214,7 @@ describe("CadastroView coverage", () => {
         expect(vm.mostrarModalImportar).toBe(false);
         
         // confirmarDisponibilizacao (Revisao)
-        const store = useSubprocessosStore();
+        const store = useSubprocessosModule.useSubprocessos() as any;
         store.$patch({
             subprocessoDetalhe: {
                 tipoProcesso: TipoProcesso.REVISAO
