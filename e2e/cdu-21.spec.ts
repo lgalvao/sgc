@@ -73,7 +73,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
     });
 
     test('Cenario 4: Verificar ausência de botões em processo finalizado', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
-        // Issue #1220: Garantir que botões de ação não aparecem para processos finalizados
+        // Garantir que botões de ação não aparecem para processos finalizados
 
         await page.goto(`/processo/${codProcesso}`);
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
