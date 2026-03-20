@@ -182,6 +182,21 @@ class SubprocessoServiceContextoIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
+    @DisplayName("obterPermissoesUI: CHEFE deve editar revisão em andamento")
+    void obterPermissoesUI_ChefePodeEditarRevisaoEmAndamento() {
+        processo.setTipo(TipoProcesso.REVISAO);
+        processoRepo.saveAndFlush(processo);
+        admin.setPerfilAtivo(Perfil.CHEFE);
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+
+        PermissoesSubprocessoDto permissoes = subprocessoService.obterPermissoesUI(subprocesso, admin);
+
+        assertThat(permissoes.podeEditarCadastro()).isTrue();
+        assertThat(permissoes.podeDisponibilizarCadastro()).isTrue();
+        assertThat(permissoes.habilitarAcessoCadastro()).isTrue();
+    }
+
+    @Test
     @DisplayName("obterPermissoesUI: Deve testar permissões de GESTOR na mesma unidade")
     void obterPermissoesUI_GestorMesmaUnidade() {
         admin.setPerfilAtivo(Perfil.GESTOR);
@@ -192,6 +207,53 @@ class SubprocessoServiceContextoIntegrationTest extends BaseIntegrationTest {
         assertThat(permissoes.podeAceitarCadastro()).isTrue();
         assertThat(permissoes.podeDevolverCadastro()).isTrue();
         assertThat(permissoes.podeEnviarLembrete()).isFalse(); // Agora apenas ADMIN
+    }
+
+    @Test
+    @DisplayName("obterPermissoesUI: GESTOR deve visualizar revisão disponibilizada sem edição")
+    void obterPermissoesUI_GestorVisualizaRevisaoDisponibilizada() {
+        processo.setTipo(TipoProcesso.REVISAO);
+        processoRepo.saveAndFlush(processo);
+        admin.setPerfilAtivo(Perfil.GESTOR);
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
+
+        PermissoesSubprocessoDto permissoes = subprocessoService.obterPermissoesUI(subprocesso, admin);
+
+        assertThat(permissoes.podeEditarCadastro()).isFalse();
+        assertThat(permissoes.podeAceitarCadastro()).isTrue();
+        assertThat(permissoes.podeDevolverCadastro()).isTrue();
+        assertThat(permissoes.habilitarAcessoCadastro()).isTrue();
+    }
+
+    @Test
+    @DisplayName("obterPermissoesUI: CHEFE deve visualizar revisão disponibilizada sem edição")
+    void obterPermissoesUI_ChefeVisualizaRevisaoDisponibilizada() {
+        processo.setTipo(TipoProcesso.REVISAO);
+        processoRepo.saveAndFlush(processo);
+        admin.setPerfilAtivo(Perfil.CHEFE);
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
+
+        PermissoesSubprocessoDto permissoes = subprocessoService.obterPermissoesUI(subprocesso, admin);
+
+        assertThat(permissoes.podeEditarCadastro()).isFalse();
+        assertThat(permissoes.podeDisponibilizarCadastro()).isFalse();
+        assertThat(permissoes.habilitarAcessoCadastro()).isTrue();
+    }
+
+    @Test
+    @DisplayName("obterPermissoesUI: Revisão em processo finalizado mantém apenas visualização")
+    void obterPermissoesUI_RevisaoProcessoFinalizadoMantemVisualizacao() {
+        processo.setTipo(TipoProcesso.REVISAO);
+        processo.setSituacao(SituacaoProcesso.FINALIZADO);
+        processoRepo.saveAndFlush(processo);
+        admin.setPerfilAtivo(Perfil.ADMIN);
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
+
+        PermissoesSubprocessoDto permissoes = subprocessoService.obterPermissoesUI(subprocesso, admin);
+
+        assertThat(permissoes.podeEditarCadastro()).isFalse();
+        assertThat(permissoes.podeHomologarCadastro()).isFalse();
+        assertThat(permissoes.habilitarAcessoCadastro()).isTrue();
     }
 
     @Test

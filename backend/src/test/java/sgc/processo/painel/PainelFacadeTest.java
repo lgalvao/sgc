@@ -66,6 +66,28 @@ class PainelFacadeTest {
     }
 
     @Test
+    @DisplayName("Deve listar processo de revisão para CHEFE com link direto ao subprocesso")
+    void deveListarProcessoRevisaoParaChefe() {
+        Processo p = criarProcesso(1L, SituacaoProcesso.EM_ANDAMENTO);
+        p.setTipo(TipoProcesso.REVISAO);
+        Page<Processo> page = new PageImpl<>(List.of(p));
+        Unidade unidade = UnidadeTestBuilder.umaDe()
+                .comCodigo("100")
+                .comSigla("ASSESSORIA_22")
+                .comNome("Assessoria 22")
+                .build();
+
+        when(hierarquiaService.buscarMapaHierarquia()).thenReturn(new HashMap<>());
+        when(processoService.listarIniciadosPorParticipantes(anyList(), any(Pageable.class))).thenReturn(page);
+        when(unidadeService.buscarPorCodigo(100L)).thenReturn(unidade);
+
+        Page<ProcessoResumoDto> result = painelFacade.listarProcessos(Perfil.CHEFE, 100L, PageRequest.of(0, 10));
+
+        assertThat(result).hasSize(1);
+        assertThat(result.getContent().getFirst().linkDestino()).isEqualTo("/processo/1/ASSESSORIA_22");
+    }
+
+    @Test
     @DisplayName("Deve propagar erro ao calcular link sem fallback")
     void devePropagarErroAoCalcularLink() {
         Processo p = criarProcesso(1L, SituacaoProcesso.EM_ANDAMENTO);

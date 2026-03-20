@@ -3,7 +3,7 @@ set -e
 
 echo " 🖌️  Executando testes: Frontend"
 echo "------------------------------------" 
-cd frontend
+cd ..frontend
 
 echo ">> Typecheck  "
 npm run typecheck

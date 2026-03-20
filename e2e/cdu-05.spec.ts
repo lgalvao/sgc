@@ -248,6 +248,18 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         ).toBeVisible();
     });
 
+    test('Fase 2.2: CHEFE acessa o cadastro editavel da Revisão pelo card do subprocesso', async ({_resetAutomatico, page}) => {
+        await login(page, USUARIO_CHEFE, SENHA_CHEFE);
+        await acessarSubprocessoChefeDireto(page, descProcRevisao, UNIDADE_ALVO);
+
+        await expect(page.getByTestId('card-subprocesso-atividades')).toBeVisible();
+        await expect(page.getByTestId('card-subprocesso-atividades-vis')).toBeHidden();
+
+        await page.getByTestId('card-subprocesso-atividades').click();
+        await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${UNIDADE_ALVO}/cadastro$`));
+        await expect(page.getByTestId('inp-nova-atividade')).toBeVisible();
+    });
+
     test('Fase 3: CHEFE verifica atividades copiadas na Revisão', async ({_resetAutomatico, page}) => {
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
         await acessarSubprocessoChefeDireto(page, descProcRevisao, UNIDADE_ALVO);

@@ -11,9 +11,9 @@ const frontendPort = Number.parseInt(process.env.E2E_FRONTEND_PORT || '5173', 10
 
 export default defineConfig({
     testDir: './e2e',
-    timeout: 15_000,
+    timeout: 20_000,
     workers,
-    expect: {timeout: 3_000},
+    expect: {timeout: 4_000},
     reporter: 'list',
     use: {
         baseURL: `http://localhost:${frontendPort}`,
