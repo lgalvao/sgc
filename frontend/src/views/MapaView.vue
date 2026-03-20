@@ -126,6 +126,7 @@ import {computed, defineAsyncComponent, onMounted, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import {usePerfil} from "@/composables/usePerfil";
 import {useAcesso} from "@/composables/useAcesso";
+import {useFluxoMapa} from "@/composables/useFluxoMapa";
 import {useFormErrors} from '@/composables/useFormErrors';
 import {useMapasStore} from "@/stores/mapas";
 import {useSubprocessos} from "@/composables/useSubprocessos";
@@ -142,6 +143,7 @@ const DisponibilizarMapaModal = defineAsyncComponent(() => import("@/components/
 const route = useRoute();
 const router = useRouter();
 const mapasStore = useMapasStore();
+const fluxoMapa = useFluxoMapa();
 const {mapaCompleto, impactoMapa: impactos} = storeToRefs(mapasStore);
 const subprocessosStore = useSubprocessos();
 const toastStore = useToastStore();
@@ -248,7 +250,7 @@ function abrirModalDisponibilizar() {
 function abrirModalCriarNovaCompetencia(competenciaParaEditar?: Competencia) {
   mostrarModalCriarNovaCompetencia.value = true;
   clearErrors();
-  mapasStore.erro = null;
+  fluxoMapa.clearError();
 
   if (competenciaParaEditar) {
     competenciaSendoEditada.value = competenciaParaEditar;
@@ -281,9 +283,9 @@ async function adicionarCompetenciaEFecharModal(dados: { descricao: string; ativ
 
   try {
     if (competenciaSendoEditada.value) {
-      await mapasStore.atualizarCompetencia(codSubprocesso.value, competenciaSendoEditada.value.codigo, request);
+      await fluxoMapa.atualizarCompetencia(codSubprocesso.value, competenciaSendoEditada.value.codigo, request);
     } else {
-      await mapasStore.adicionarCompetencia(codSubprocesso.value, request);
+      await fluxoMapa.adicionarCompetencia(codSubprocesso.value, request);
     }
 
     const data = await subprocessosStore.buscarContextoEdicao(codSubprocesso.value);
@@ -293,7 +295,7 @@ async function adicionarCompetenciaEFecharModal(dados: { descricao: string; ativ
 
     fecharModalCriarNovaCompetencia();
   } catch {
-    handleErrors(mapasStore);
+    handleErrors(fluxoMapa);
   }
 }
 
@@ -309,7 +311,7 @@ async function confirmarExclusaoCompetencia() {
   if (competenciaParaExcluir.value && codSubprocesso.value) {
     loadingExclusao.value = true;
     try {
-      await mapasStore.removerCompetencia(
+      await fluxoMapa.removerCompetencia(
           codSubprocesso.value,
           competenciaParaExcluir.value.codigo,
       );
@@ -319,7 +321,7 @@ async function confirmarExclusaoCompetencia() {
       }
       fecharModalExcluirCompetencia();
     } catch {
-      handleErrors(mapasStore);
+      handleErrors(fluxoMapa);
     } finally {
       loadingExclusao.value = false;
     }
@@ -344,7 +346,7 @@ function removerAtividadeAssociada(competenciaId: number, codAtividade: number) 
       atividadesIds: atividadesIds,
     };
 
-    mapasStore.atualizarCompetencia(
+    fluxoMapa.atualizarCompetencia(
         codSubprocesso.value,
         competencia.codigo,
         request,
@@ -354,16 +356,16 @@ function removerAtividadeAssociada(competenciaId: number, codAtividade: number) 
 
 async function disponibilizarMapa(payload: { dataLimite: string; observacoes: string }) {
   if (!codSubprocesso.value) return;
-  mapasStore.erro = null;
+  fluxoMapa.clearError();
   loadingDisponibilizacao.value = true;
 
   try {
-    await mapasStore.disponibilizarMapa(codSubprocesso.value as number, payload);
+    await fluxoMapa.disponibilizarMapa(codSubprocesso.value as number, payload);
     fecharModalDisponibilizar();
     toastStore.setPending(TEXTOS.sucesso.MAPA_DISPONIBILIZADO);
     await router.push({name: "Painel"});
   } catch {
-    handleErrors(mapasStore);
+    handleErrors(fluxoMapa);
   } finally {
     loadingDisponibilizacao.value = false;
   }

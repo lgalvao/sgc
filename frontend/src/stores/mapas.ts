@@ -1,23 +1,15 @@
 import {
-    adicionarCompetencia as adicionarCompetenciaService,
-    atualizarCompetencia as atualizarCompetenciaService,
-    disponibilizarMapa as disponibilizarMapaService,
     obterMapaAjuste,
     obterMapaCompleto,
     obterMapaVisualizacao,
-    removerCompetencia as removerCompetenciaService,
-    salvarMapaAjuste,
-    salvarMapaCompleto,
     verificarImpactosMapa,
     verificarMapaVigente
 } from "@/services/subprocessoService";
 import type {
-    DisponibilizarMapaRequest,
     ImpactoMapa,
     MapaAjuste,
     MapaCompleto,
-    MapaVisualizacao,
-    SalvarCompetenciaRequest
+    MapaVisualizacao
 } from "@/types/tipos";
 import {defineStore} from "pinia";
 import {ref} from "vue";
@@ -30,7 +22,7 @@ export const useMapasStore = defineStore("mapas", () => {
     const mapaAjuste = ref<MapaAjuste | null>(null);
     const impactoMapa = ref<ImpactoMapa | null>(null);
     const {lastError, clearError} = useErrorHandler();
-    const {carregando, erro, executar, executarSilencioso} = useAsyncAction();
+    const {carregando, erro, executarSilencioso} = useAsyncAction();
 
     async function buscarMapaVisualizacao(codSubprocesso: number) {
         await executarSilencioso(async () => {
@@ -46,22 +38,10 @@ export const useMapasStore = defineStore("mapas", () => {
         }, "Erro ao carregar mapa completo.");
     }
 
-    async function salvarMapa(codSubprocesso: number, dados: any) {
-        await executar(async () => {
-            mapaCompleto.value = await salvarMapaCompleto(codSubprocesso, dados);
-        }, "Erro ao salvar mapa completo.");
-    }
-
     async function buscarMapaAjuste(codSubprocesso: number) {
         await executarSilencioso(async () => {
             mapaAjuste.value = await obterMapaAjuste(codSubprocesso);
         }, "Erro ao carregar mapa para ajuste.");
-    }
-
-    async function salvarAjustes(codSubprocesso: number, request: any) {
-        await executar(async () => {
-            await salvarMapaAjuste(codSubprocesso, request);
-        }, "Erro ao salvar ajustes do mapa.");
     }
 
     async function buscarImpactoMapa(codSubprocesso: number) {
@@ -70,30 +50,6 @@ export const useMapasStore = defineStore("mapas", () => {
                 impactoMapa.value = await verificarImpactosMapa(codSubprocesso);
             }
         }, "Erro ao verificar impactos.");
-    }
-
-    async function disponibilizarMapa(codSubprocesso: number, request: DisponibilizarMapaRequest) {
-        await executar(async () => {
-            await disponibilizarMapaService(codSubprocesso, request);
-        }, "Erro ao disponibilizar mapa.");
-    }
-
-    async function adicionarCompetencia(codSubprocesso: number, competencia: SalvarCompetenciaRequest) {
-        await executar(async () => {
-            mapaCompleto.value = await adicionarCompetenciaService(codSubprocesso, competencia);
-        }, "Erro ao adicionar competência.");
-    }
-
-    async function atualizarCompetencia(codSubprocesso: number, codCompetencia: number, competencia: SalvarCompetenciaRequest) {
-        await executar(async () => {
-            mapaCompleto.value = await atualizarCompetenciaService(codSubprocesso, codCompetencia, competencia);
-        }, "Erro ao atualizar competência.");
-    }
-
-    async function removerCompetencia(codSubprocesso: number, codCompetencia: number) {
-        await executar(async () => {
-            mapaCompleto.value = await removerCompetenciaService(codSubprocesso, codCompetencia);
-        }, "Erro ao remover competência.");
     }
 
     async function temMapaVigente(codigoUnidade: number): Promise<boolean> {
@@ -115,14 +71,8 @@ export const useMapasStore = defineStore("mapas", () => {
         clearError,
         buscarMapaVisualizacao,
         buscarMapaCompleto,
-        salvarMapa,
         buscarMapaAjuste,
-        salvarAjustes,
         buscarImpactoMapa,
-        disponibilizarMapa,
-        adicionarCompetencia,
-        atualizarCompetencia,
-        removerCompetencia,
         temMapaVigente,
     };
 });
