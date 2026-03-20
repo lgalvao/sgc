@@ -7,7 +7,6 @@ import * as usePerfilModule from "@/composables/usePerfil";
 import * as analiseService from "@/services/analiseService";
 import * as mapaService from "@/services/mapaService";
 import * as unidadeService from "@/services/unidadeService";
-import {useProcessosStore} from "@/stores/processos";
 import MapaVisualizacaoView from "../MapaVisualizacaoView.vue";
 
 const {pushMock} = vi.hoisted(() => ({pushMock: vi.fn()}));
@@ -27,6 +26,20 @@ vi.mock("@/services/mapaService", () => ({
 
 vi.mock("@/services/unidadeService", () => ({
     buscarUnidadePorSigla: vi.fn(),
+}));
+
+const processosMock = {
+    processoDetalhe: ref<any>(null),
+    buscarProcessoDetalhe: vi.fn(),
+    apresentarSugestoes: vi.fn(),
+    validarMapa: vi.fn(),
+    aceitarValidacao: vi.fn(),
+    homologarValidacao: vi.fn(),
+    devolverValidacao: vi.fn(),
+};
+
+vi.mock("@/composables/useProcessos", () => ({
+    useProcessos: () => processosMock
 }));
 
 const stubs = {
@@ -65,6 +78,10 @@ const stubs = {
 describe("MapaVisualizacaoView.vue", () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        processosMock.processoDetalhe.value = {
+            codigo: 1,
+            unidades: [{sigla: "TESTE", codSubprocesso: 123}]
+        };
         vi.mocked(unidadeService.buscarUnidadePorSigla).mockResolvedValue({sigla: "TESTE", nome: "Unidade Teste"} as any);
         vi.mocked(mapaService.obterMapaVisualizacao).mockResolvedValue({
             codigo: 100,
@@ -101,14 +118,7 @@ describe("MapaVisualizacaoView.vue", () => {
             global: {
                 plugins: [createTestingPinia({
                     stubActions: true,
-                    initialState: {
-                        processos: {
-                            processoDetalhe: {
-                                codigo: 1,
-                                unidades: [{sigla: "TESTE", codSubprocesso: 123}]
-                            }
-                        }
-                    }
+                    initialState: {}
                 })],
                 stubs
             }
@@ -127,23 +137,21 @@ describe("MapaVisualizacaoView.vue", () => {
     it("abre modal e confirma sugestões", async () => {
         const wrapper = createWrapper();
         await flushPromises();
-        const store = useProcessosStore();
-        (store.apresentarSugestoes as any).mockResolvedValue(true);
+        (processosMock.apresentarSugestoes as any).mockResolvedValue(true);
 
         await wrapper.find('[data-testid="btn-mapa-sugestoes"]').trigger("click");
         await wrapper.find('[data-testid="inp-sugestoes-mapa-texto"]').setValue("Minhas sugestões");
         await wrapper.find('[data-testid="btn-confirmar"]').trigger("click");
         await flushPromises();
 
-        expect(store.apresentarSugestoes).toHaveBeenCalledWith(123, {sugestoes: "Minhas sugestões"});
+        expect(processosMock.apresentarSugestoes).toHaveBeenCalledWith(123, {sugestoes: "Minhas sugestões"});
         expect(pushMock).toHaveBeenCalledWith({name: "Painel"});
     });
 
     it("deve manter confirmar desabilitado enquanto as sugestões estiverem vazias", async () => {
         const wrapper = createWrapper();
         await flushPromises();
-        const store = useProcessosStore();
-        (store.apresentarSugestoes as any).mockResolvedValue(true);
+        (processosMock.apresentarSugestoes as any).mockResolvedValue(true);
 
         await wrapper.find('[data-testid="btn-mapa-sugestoes"]').trigger("click");
         expect(wrapper.find('[data-testid="btn-confirmar"]').attributes('disabled')).toBeDefined();
@@ -151,28 +159,26 @@ describe("MapaVisualizacaoView.vue", () => {
         await wrapper.find('[data-testid="btn-confirmar"]').trigger("click");
         await flushPromises();
 
-        expect(store.apresentarSugestoes).not.toHaveBeenCalled();
+        expect(processosMock.apresentarSugestoes).not.toHaveBeenCalled();
     });
 
     it("abre modal e confirma validação", async () => {
         const wrapper = createWrapper();
         await flushPromises();
-        const store = useProcessosStore();
-        (store.validarMapa as any).mockResolvedValue(true);
+        (processosMock.validarMapa as any).mockResolvedValue(true);
 
         await wrapper.find('[data-testid="btn-mapa-validar"]').trigger("click");
         await wrapper.find('[data-testid="btn-confirmar"]').trigger("click");
         await flushPromises();
 
-        expect(store.validarMapa).toHaveBeenCalledWith(123);
+        expect(processosMock.validarMapa).toHaveBeenCalledWith(123);
         expect(pushMock).toHaveBeenCalledWith({name: "Painel"});
     });
 
     it("abre modal e confirma aceite", async () => {
         const wrapper = createWrapper();
         await flushPromises();
-        const store = useProcessosStore();
-        (store.aceitarValidacao as any).mockResolvedValue(true);
+        (processosMock.aceitarValidacao as any).mockResolvedValue(true);
         // Garante que não é homologação para testar aceitarValidacao
         (wrapper.vm as any).podeHomologarMapa = false;
 
@@ -180,21 +186,20 @@ describe("MapaVisualizacaoView.vue", () => {
         await wrapper.find('[data-testid="btn-confirmar-aceite"]').trigger("click");
         await flushPromises();
 
-        expect(store.aceitarValidacao).toHaveBeenCalledWith(123, {texto: 'Obs aceite'});
+        expect(processosMock.aceitarValidacao).toHaveBeenCalledWith(123, {texto: 'Obs aceite'});
     });
 
     it("abre modal e confirma devolução", async () => {
         const wrapper = createWrapper();
         await flushPromises();
-        const store = useProcessosStore();
-        (store.devolverValidacao as any).mockResolvedValue(true);
+        (processosMock.devolverValidacao as any).mockResolvedValue(true);
 
         await wrapper.find('[data-testid="btn-mapa-devolver"]').trigger("click");
         await wrapper.find('[data-testid="inp-devolucao-mapa-obs"]').setValue("Justificativa");
         await wrapper.find('[data-testid="btn-confirmar"]').trigger("click");
         await flushPromises();
 
-        expect(store.devolverValidacao).toHaveBeenCalledWith(123, {justificativa: "Justificativa"});
+        expect(processosMock.devolverValidacao).toHaveBeenCalledWith(123, {justificativa: "Justificativa"});
     });
 
     it("carrega histórico ao clicar no botão", async () => {

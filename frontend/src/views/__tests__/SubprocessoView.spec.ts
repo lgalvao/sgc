@@ -4,7 +4,7 @@ import {createTestingPinia} from '@pinia/testing';
 import SubprocessoView from '@/views/SubprocessoView.vue';
 import {useSubprocessosStore} from '@/stores/subprocessos';
 import {useMapasStore} from '@/stores/mapas';
-import {useProcessosStore} from '@/stores/processos';
+import {ref} from 'vue';
 import {SituacaoSubprocesso, TipoProcesso} from '@/types/tipos';
 import * as processoService from '@/services/processoService';
 import * as useAcessoModule from '@/composables/useAcesso';
@@ -23,6 +23,15 @@ vi.mock('@/services/processoService', () => ({
     reabrirCadastro: vi.fn(),
     reabrirRevisaoCadastro: vi.fn(),
     enviarLembrete: vi.fn(),
+}));
+
+const processosMock = {
+    processoDetalhe: ref<any>(null),
+    enviarLembrete: vi.fn(),
+};
+
+vi.mock('@/composables/useProcessos', () => ({
+    useProcessos: () => processosMock
 }));
 
 describe('SubprocessoView.vue', () => {
@@ -81,6 +90,7 @@ describe('SubprocessoView.vue', () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
+        processosMock.processoDetalhe.value = null;
     });
 
     // Helper to mount component with specific setup
@@ -112,7 +122,7 @@ describe('SubprocessoView.vue', () => {
 
         const store = useSubprocessosStore(pinia);
         const mapaStore = useMapasStore(pinia);
-        const processosStore = useProcessosStore(pinia);
+        processosMock.processoDetalhe.value = {situacao: 'EM_ANDAMENTO'};
 
         (store.buscarSubprocessoPorProcessoEUnidade as any).mockImplementation(async () => 10);
         (store.buscarSubprocessoDetalhe as any).mockImplementation(async () => {
@@ -139,7 +149,7 @@ describe('SubprocessoView.vue', () => {
             }
         });
 
-        (processosStore.enviarLembrete as any).mockImplementation(async (codProcesso: number, codUnidade: number) => {
+        (processosMock.enviarLembrete as any).mockImplementation(async (codProcesso: number, codUnidade: number) => {
             try {
                 await (processoService.enviarLembrete as any)(codProcesso, codUnidade);
                 return true;
@@ -163,7 +173,7 @@ describe('SubprocessoView.vue', () => {
             }
         });
 
-        return {wrapper, store, mapaStore, processosStore};
+        return {wrapper, store, mapaStore, processos: processosMock};
     };
 
     it('fetches data on mount', async () => {

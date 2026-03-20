@@ -225,10 +225,10 @@ import {useMapasStore} from "@/stores/mapas";
 import {useNotification} from "@/composables/useNotification";
 import {useModalManager} from "@/composables/useModalManager";
 import {useLoadingManager} from "@/composables/useLoadingManager";
+import {useProcessos} from "@/composables/useProcessos";
 
 import {useAcesso} from "@/composables/useAcesso";
 import {useSubprocessosStore} from "@/stores/subprocessos";
-import {useProcessosStore} from "@/stores/processos";
 import {type Movimentacao, SituacaoProcesso, type SubprocessoDetalhe, TipoProcesso} from "@/types/tipos";
 import {formatDateTimeBR, logger} from "@/utils";
 import {normalizeError} from "@/utils/apiError";
@@ -255,7 +255,7 @@ function formatTipoResponsabilidade(resp: any): string {
 }
 
 const subprocessosStore = useSubprocessosStore();
-const processosStore = useProcessosStore();
+const processos = useProcessos();
 
 const mapaStore = useMapasStore();
 const {notificacao, notify, clear} = useNotification();
@@ -296,7 +296,7 @@ const {
 } = useAcesso(subprocesso);
 
 const isProcessoFinalizado = computed(() => {
-  return processosStore.processoDetalhe?.situacao === SituacaoProcesso.FINALIZADO;
+  return processos.processoDetalhe.value?.situacao === SituacaoProcesso.FINALIZADO;
 });
 
 const mapa = computed(() => mapaStore.mapaCompleto);
@@ -435,7 +435,7 @@ async function enviarLembreteConfirmado() {
     return;
   }
   try {
-    await processosStore.enviarLembrete(props.codProcesso, subprocesso.value.unidade.codigo);
+    await processos.enviarLembrete(props.codProcesso, subprocesso.value.unidade.codigo);
     await subprocessosStore.buscarSubprocessoDetalhe(codSubprocesso.value);
     modalLembreteAberto.value = false;
     notify(TEXTOS.subprocesso.SUCESSO_LEMBRETE_ENVIADO, 'success');

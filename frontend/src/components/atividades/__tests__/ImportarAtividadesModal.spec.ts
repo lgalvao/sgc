@@ -1,7 +1,7 @@
 import {createTestingPinia} from "@pinia/testing";
 import {flushPromises, mount} from "@vue/test-utils";
 import {beforeEach, describe, expect, it, vi} from "vitest";
-import {useProcessosStore} from "@/stores/processos";
+import {ref} from "vue";
 import * as subprocessoService from "@/services/subprocessoService";
 import {type Atividade} from "@/types/tipos";
 import ImportarAtividadesModal from "../ImportarAtividadesModal.vue";
@@ -9,6 +9,16 @@ import ImportarAtividadesModal from "../ImportarAtividadesModal.vue";
 vi.mock("@/services/subprocessoService", () => ({
     importarAtividades: vi.fn(),
     listarAtividadesParaImportacao: vi.fn(),
+}));
+
+const processosMock = {
+    processosParaImportacao: ref<any[]>([]),
+    buscarProcessosParaImportacao: vi.fn(),
+    buscarUnidadesParaImportacao: vi.fn(),
+};
+
+vi.mock("@/composables/useProcessos", () => ({
+    useProcessos: () => processosMock
 }));
 
 const stubs = {
@@ -33,6 +43,9 @@ const stubs = {
 describe("ImportarAtividadesModal.vue", () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        processosMock.processosParaImportacao.value = [
+            {codigo: 1, descricao: "Processo 1"}
+        ];
     });
 
     function createWrapper(props = {}) {
@@ -40,13 +53,7 @@ describe("ImportarAtividadesModal.vue", () => {
             global: {
                 plugins: [createTestingPinia({
                     stubActions: false,
-                    initialState: {
-                        processos: {
-                            processosParaImportacao: [
-                                {codigo: 1, descricao: "Processo 1"}
-                            ]
-                        }
-                    }
+                    initialState: {}
                 })],
                 stubs
             },
@@ -60,33 +67,30 @@ describe("ImportarAtividadesModal.vue", () => {
 
     it("carrega processos ao abrir", async () => {
         const wrapper = createWrapper();
-        const store = useProcessosStore();
-        store.buscarProcessosParaImportacao = vi.fn();
+        processosMock.buscarProcessosParaImportacao = vi.fn();
 
         await wrapper.setProps({mostrar: false});
         await wrapper.setProps({mostrar: true});
 
-        expect(store.buscarProcessosParaImportacao).toHaveBeenCalled();
+        expect(processosMock.buscarProcessosParaImportacao).toHaveBeenCalled();
     });
 
     it("carrega unidades ao selecionar processo", async () => {
         const wrapper = createWrapper();
-        const store = useProcessosStore();
         const mockUnidades = [{codUnidade: 10, sigla: "U1", codSubprocesso: 100}];
-        (store.buscarUnidadesParaImportacao as any).mockResolvedValue(mockUnidades);
+        (processosMock.buscarUnidadesParaImportacao as any).mockResolvedValue(mockUnidades);
 
         const select = wrapper.find('select#processo-select');
         await select.setValue("1");
         await flushPromises();
 
-        expect(store.buscarUnidadesParaImportacao).toHaveBeenCalledWith(1);
+        expect(processosMock.buscarUnidadesParaImportacao).toHaveBeenCalledWith(1);
         expect((wrapper.vm as any).unidadesParticipantes).toEqual(mockUnidades);
     });
 
     it("carrega atividades ao selecionar unidade", async () => {
         const wrapper = createWrapper();
-        const store = useProcessosStore();
-        (store.buscarUnidadesParaImportacao as any).mockResolvedValue([{codUnidade: 10, sigla: "U1", codSubprocesso: 100}]);
+        (processosMock.buscarUnidadesParaImportacao as any).mockResolvedValue([{codUnidade: 10, sigla: "U1", codSubprocesso: 100}]);
 
         await wrapper.find('select#processo-select').setValue("1");
         await flushPromises();
@@ -103,8 +107,7 @@ describe("ImportarAtividadesModal.vue", () => {
 
     it("executa importação com sucesso", async () => {
         const wrapper = createWrapper();
-        const store = useProcessosStore();
-        (store.buscarUnidadesParaImportacao as any).mockResolvedValue([{codUnidade: 10, sigla: "U1", codSubprocesso: 100}]);
+        (processosMock.buscarUnidadesParaImportacao as any).mockResolvedValue([{codUnidade: 10, sigla: "U1", codSubprocesso: 100}]);
 
         await wrapper.find('select#processo-select').setValue("1");
         await flushPromises();

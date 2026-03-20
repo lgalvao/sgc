@@ -163,8 +163,8 @@ import {BCard, BCardText, BCardTitle, BCol, BRow} from "bootstrap-vue-next";
 import {useRouter} from "vue-router";
 import {computed} from "vue";
 import {useAcesso} from "@/composables/useAcesso";
+import {useProcessos} from "@/composables/useProcessos";
 import {useSubprocessosStore} from "@/stores/subprocessos";
-import {useProcessosStore} from "@/stores/processos";
 import {SituacaoProcesso, TipoProcesso, type Mapa, type MapaCompleto} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
 
@@ -181,11 +181,11 @@ const props = defineProps<{
 
 const router = useRouter();
 const subprocessosStore = useSubprocessosStore();
-const processosStore = useProcessosStore();
+const processos = useProcessos();
 
 const subprocesso = computed(() => subprocessosStore.subprocessoDetalhe);
 
-const isProcessoFinalizado = computed(() => processosStore.processoDetalhe?.situacao === SituacaoProcesso.FINALIZADO);
+const isProcessoFinalizado = computed(() => processos.processoDetalhe.value?.situacao === SituacaoProcesso.FINALIZADO);
 
 const {podeEditarCadastro, podeEditarMapa, habilitarAcessoCadastro, habilitarAcessoMapa} = useAcesso(subprocesso);
 
