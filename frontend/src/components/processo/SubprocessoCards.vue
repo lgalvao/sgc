@@ -164,7 +164,7 @@ import {useRouter} from "vue-router";
 import {computed} from "vue";
 import {useAcesso} from "@/composables/useAcesso";
 import {useProcessos} from "@/composables/useProcessos";
-import {useSubprocessosStore} from "@/stores/subprocessos";
+import {useSubprocessos} from "@/composables/useSubprocessos";
 import {SituacaoProcesso, TipoProcesso, type Mapa, type MapaCompleto} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
 
@@ -180,7 +180,7 @@ const props = defineProps<{
 }>();
 
 const router = useRouter();
-const subprocessosStore = useSubprocessosStore();
+const subprocessosStore = useSubprocessos();
 const processos = useProcessos();
 
 const subprocesso = computed(() => subprocessosStore.subprocessoDetalhe);

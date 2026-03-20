@@ -227,9 +227,9 @@ import {useModalManager} from "@/composables/useModalManager";
 import {useLoadingManager} from "@/composables/useLoadingManager";
 import {useProcessos} from "@/composables/useProcessos";
 import {useFluxoSubprocesso} from "@/composables/useFluxoSubprocesso";
+import {useSubprocessos} from "@/composables/useSubprocessos";
 
 import {useAcesso} from "@/composables/useAcesso";
-import {useSubprocessosStore} from "@/stores/subprocessos";
 import {type Movimentacao, SituacaoProcesso, type SubprocessoDetalhe, TipoProcesso} from "@/types/tipos";
 import {formatDateTimeBR, logger} from "@/utils";
 import {normalizeError} from "@/utils/apiError";
@@ -255,7 +255,7 @@ function formatTipoResponsabilidade(resp: any): string {
   return resp.tipo;
 }
 
-const subprocessosStore = useSubprocessosStore();
+const subprocessosStore = useSubprocessos();
 const fluxoSubprocesso = useFluxoSubprocesso();
 const processos = useProcessos();
 

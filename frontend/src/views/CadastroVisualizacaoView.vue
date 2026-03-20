@@ -158,7 +158,7 @@ import PageHeader from "@/components/layout/PageHeader.vue";
 import {useProcessos} from "@/composables/useProcessos";
 import {useFluxoSubprocesso} from "@/composables/useFluxoSubprocesso";
 import {useMapasStore} from "@/stores/mapas";
-import {useSubprocessosStore} from "@/stores/subprocessos";
+import {useSubprocessos} from "@/composables/useSubprocessos";
 import {useToastStore} from "@/stores/toast";
 import type {
   AceitarCadastroRequest,
@@ -183,7 +183,7 @@ const router = useRouter();
 const processos = useProcessos();
 const fluxoSubprocesso = useFluxoSubprocesso();
 const mapasStore = useMapasStore();
-const subprocessosStore = useSubprocessosStore();
+const subprocessosStore = useSubprocessos();
 const toastStore = useToastStore();
 const {impactoMapa: impactos} = storeToRefs(mapasStore);
 

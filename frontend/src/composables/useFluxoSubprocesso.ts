@@ -16,7 +16,7 @@ import {
 } from "@/services/processoService";
 import {useErrorHandler} from "@/composables/useErrorHandler";
 import {useProcessos} from "@/composables/useProcessos";
-import {useSubprocessosStore} from "@/stores/subprocessos";
+import {useSubprocessos} from "@/composables/useSubprocessos";
 import type {
     AceitarCadastroRequest,
     DevolverCadastroRequest,
@@ -32,7 +32,7 @@ async function recarregarProcessoAtual() {
 
 export function useFluxoSubprocesso() {
     const {lastError, clearError, withErrorHandling} = useErrorHandler();
-    const subprocessosStore = useSubprocessosStore();
+    const subprocessos = useSubprocessos();
 
     async function executarAcao(
         acao: () => Promise<void>,
@@ -45,7 +45,7 @@ export function useFluxoSubprocesso() {
                 await recarregarProcessoAtual();
 
                 if (recarregarSubprocesso && codigoSubprocesso) {
-                    await subprocessosStore.buscarSubprocessoDetalhe(codigoSubprocesso);
+                    await subprocessos.buscarSubprocessoDetalhe(codigoSubprocesso);
                 }
             });
 
@@ -95,7 +95,7 @@ export function useFluxoSubprocesso() {
         return withErrorHandling(async () => {
             await serviceAlterarDataLimite(codigoSubprocesso, dados);
             await recarregarProcessoAtual();
-            await subprocessosStore.buscarSubprocessoDetalhe(codigoSubprocesso);
+            await subprocessos.buscarSubprocessoDetalhe(codigoSubprocesso);
         });
     }
 

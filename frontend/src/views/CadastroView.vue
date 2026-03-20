@@ -168,7 +168,7 @@ import AtividadeItem from "@/components/atividades/AtividadeItem.vue";
 import {useAtividadeForm} from "@/composables/useAtividadeForm";
 import {useFluxoSubprocesso} from "@/composables/useFluxoSubprocesso";
 import {useProcessos} from "@/composables/useProcessos";
-import {useSubprocessosStore} from "@/stores/subprocessos";
+import {useSubprocessos} from "@/composables/useSubprocessos";
 import {useMapasStore} from "@/stores/mapas";
 import {useNotification} from "@/composables/useNotification";
 import {useToastStore} from "@/stores/toast";
@@ -205,7 +205,7 @@ const props = defineProps<{
 }>();
 
 const router = useRouter();
-const subprocessosStore = useSubprocessosStore();
+const subprocessosStore = useSubprocessos();
 const mapasStore = useMapasStore();
 const processos = useProcessos();
 const fluxoSubprocesso = useFluxoSubprocesso();
