@@ -4,7 +4,7 @@ import {createTestingPinia} from '@pinia/testing';
 import SubprocessoView from '@/views/SubprocessoView.vue';
 import * as useSubprocessosModule from '@/composables/useSubprocessos';
 import {useMapasStore} from '@/stores/mapas';
-import {ref} from 'vue';
+import {reactive, ref} from 'vue';
 import {SituacaoSubprocesso, TipoProcesso} from '@/types/tipos';
 import * as processoService from '@/services/processoService';
 import * as useAcessoModule from '@/composables/useAcesso';
@@ -35,6 +35,15 @@ const fluxoSubprocessoMock = {
     reabrirCadastro: vi.fn(),
     reabrirRevisaoCadastro: vi.fn(),
 };
+const subprocessosMock = reactive({
+    subprocessoDetalhe: null as any,
+    buscarSubprocessoPorProcessoEUnidade: vi.fn(),
+    buscarSubprocessoDetalhe: vi.fn(),
+    buscarContextoEdicao: vi.fn(),
+    atualizarStatusLocal: vi.fn(),
+    lastError: null as any,
+    clearError: vi.fn(),
+});
 
 vi.mock('@/composables/useProcessos', () => ({
     useProcessos: () => processosMock
@@ -43,7 +52,7 @@ vi.mock('@/composables/useProcessos', () => ({
 vi.mock('@/composables/useFluxoSubprocesso', () => ({
     useFluxoSubprocesso: () => fluxoSubprocessoMock
 }));
-vi.mock('@/composables/useSubprocessos', () => ({useSubprocessos: vi.fn()}));
+vi.mock('@/composables/useSubprocessos', () => ({useSubprocessos: () => subprocessosMock}));
 
 describe('SubprocessoView.vue', () => {
     const mockSubprocesso = {
@@ -105,15 +114,12 @@ describe('SubprocessoView.vue', () => {
         fluxoSubprocessoMock.alterarDataLimiteSubprocesso.mockResolvedValue({});
         fluxoSubprocessoMock.reabrirCadastro.mockResolvedValue(true);
         fluxoSubprocessoMock.reabrirRevisaoCadastro.mockResolvedValue(true);
-        vi.mocked(useSubprocessosModule.useSubprocessos).mockReturnValue({
-            subprocessoDetalhe: null,
-            buscarSubprocessoPorProcessoEUnidade: vi.fn().mockResolvedValue(10),
-            buscarSubprocessoDetalhe: vi.fn(),
-            buscarContextoEdicao: vi.fn(),
-            atualizarStatusLocal: vi.fn(),
-            lastError: null,
-            clearError: vi.fn(),
-        } as any);
+        subprocessosMock.subprocessoDetalhe = null;
+        subprocessosMock.buscarSubprocessoPorProcessoEUnidade = vi.fn().mockResolvedValue(10);
+        subprocessosMock.buscarSubprocessoDetalhe = vi.fn();
+        subprocessosMock.buscarContextoEdicao = vi.fn();
+        subprocessosMock.atualizarStatusLocal = vi.fn();
+        subprocessosMock.lastError = null;
     });
 
     // Helper to mount component with specific setup
@@ -143,7 +149,7 @@ describe('SubprocessoView.vue', () => {
             stubActions: true,
         });
 
-        const store = useSubprocessosModule.useSubprocessos() as any;
+        const store = subprocessosMock as any;
         const mapaStore = useMapasStore(pinia);
         processosMock.processoDetalhe.value = {situacao: 'EM_ANDAMENTO'};
 

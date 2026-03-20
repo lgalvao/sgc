@@ -5,17 +5,27 @@ import SubprocessoView from '@/views/SubprocessoView.vue';
 import * as useSubprocessosModule from '@/composables/useSubprocessos';
 import {BSpinner} from 'bootstrap-vue-next';
 import * as useAcessoModule from '@/composables/useAcesso';
+import {reactive} from 'vue';
 
 const fluxoSubprocessoMock = {
     alterarDataLimiteSubprocesso: vi.fn(),
     reabrirCadastro: vi.fn(),
     reabrirRevisaoCadastro: vi.fn(),
 };
+const subprocessosMock = reactive({
+    subprocessoDetalhe: null as any,
+    buscarSubprocessoPorProcessoEUnidade: vi.fn(),
+    buscarSubprocessoDetalhe: vi.fn(),
+    buscarContextoEdicao: vi.fn(),
+    atualizarStatusLocal: vi.fn(),
+    lastError: null as any,
+    clearError: vi.fn(),
+});
 
 vi.mock('@/composables/useFluxoSubprocesso', () => ({
     useFluxoSubprocesso: () => fluxoSubprocessoMock
 }));
-vi.mock('@/composables/useSubprocessos', () => ({useSubprocessos: vi.fn()}));
+vi.mock('@/composables/useSubprocessos', () => ({useSubprocessos: () => subprocessosMock}));
 
 const SubprocessoHeaderStub = {template: '<div />'};
 const SubprocessoCardsStub = {template: '<div />'};
@@ -38,15 +48,12 @@ describe('SubprocessoView Coverage', () => {
         fluxoSubprocessoMock.alterarDataLimiteSubprocesso.mockResolvedValue({});
         fluxoSubprocessoMock.reabrirCadastro.mockResolvedValue(true);
         fluxoSubprocessoMock.reabrirRevisaoCadastro.mockResolvedValue(true);
-        vi.mocked(useSubprocessosModule.useSubprocessos).mockReturnValue({
-            subprocessoDetalhe: null,
-            buscarSubprocessoPorProcessoEUnidade: vi.fn().mockResolvedValue(123),
-            buscarSubprocessoDetalhe: vi.fn(),
-            buscarContextoEdicao: vi.fn(),
-            atualizarStatusLocal: vi.fn(),
-            lastError: null,
-            clearError: vi.fn(),
-        } as any);
+        subprocessosMock.subprocessoDetalhe = null;
+        subprocessosMock.buscarSubprocessoPorProcessoEUnidade = vi.fn().mockResolvedValue(123);
+        subprocessosMock.buscarSubprocessoDetalhe = vi.fn();
+        subprocessosMock.buscarContextoEdicao = vi.fn();
+        subprocessosMock.atualizarStatusLocal = vi.fn();
+        subprocessosMock.lastError = null;
     });
 
     it('renders loading state when no data and no error', () => {
@@ -101,7 +108,7 @@ describe('SubprocessoView Coverage', () => {
         } as any);
 
         const pinia = createTestingPinia({createSpy: vi.fn});
-        (useSubprocessosModule.useSubprocessos() as any).lastError = {message: 'Erro teste'};
+        subprocessosMock.lastError = {message: 'Erro teste'};
 
         vi.spyOn(useAcessoModule, 'useAcesso').mockReturnValue({
             podeVisualizarMapa: {value: true},
@@ -131,7 +138,7 @@ describe('SubprocessoView Coverage', () => {
 
     it('confirmarAlteracaoDataLimite returns early if novaData is empty', async () => {
         const pinia = createTestingPinia({createSpy: vi.fn});
-        (useSubprocessosModule.useSubprocessos() as any).subprocessoDetalhe = {
+        subprocessosMock.subprocessoDetalhe = {
             unidade: {codigo: 1, sigla: 'TEST', nome: 'Unidade teste'}
         };
         vi.spyOn(useAcessoModule, 'useAcesso').mockReturnValue({
@@ -166,7 +173,7 @@ describe('SubprocessoView Coverage', () => {
 
     it('confirmarReabertura returns early if justification is empty', async () => {
         const pinia = createTestingPinia({createSpy: vi.fn});
-        const store = useSubprocessosModule.useSubprocessos() as any;
+        const store = subprocessosMock as any;
         store.subprocessoDetalhe = {
             unidade: {codigo: 1, sigla: 'TEST', nome: 'Unidade teste'},
             movimentacoes: [],

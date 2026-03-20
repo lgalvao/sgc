@@ -1,7 +1,7 @@
 import {createTestingPinia} from "@pinia/testing";
 import {flushPromises, mount} from "@vue/test-utils";
 import {beforeEach, describe, expect, it, vi} from "vitest";
-import {ref} from "vue";
+import {reactive, ref} from "vue";
 import * as usePerfilModule from "@/composables/usePerfil";
 import * as useFluxoSubprocessoModule from "@/composables/useFluxoSubprocesso";
 import * as useProcessosModule from "@/composables/useProcessos";
@@ -17,6 +17,15 @@ import * as useAcessoModule from '@/composables/useAcesso';
 import {Perfil} from "@/types/tipos";
 
 const {pushMock} = vi.hoisted(() => ({pushMock: vi.fn()}));
+const subprocessosMock = reactive({
+    subprocessoDetalhe: null as any,
+    buscarContextoEdicao: vi.fn(),
+    buscarSubprocessoPorProcessoEUnidade: vi.fn(),
+    buscarSubprocessoDetalhe: vi.fn(),
+    atualizarStatusLocal: vi.fn(),
+    lastError: null as any,
+    clearError: vi.fn(),
+});
 
 vi.mock("vue-router", () => ({
     useRoute: () => ({params: {codProcesso: "1", siglaUnidade: "TESTE"}}),
@@ -39,7 +48,7 @@ vi.mock("@/services/analiseService", () => ({
     listarAnalisesCadastro: vi.fn(),
 }));
 
-vi.mock("@/composables/useSubprocessos", () => ({useSubprocessos: vi.fn()}));
+vi.mock("@/composables/useSubprocessos", () => ({useSubprocessos: () => subprocessosMock}));
 vi.mock("@/composables/useFluxoSubprocesso", () => ({useFluxoSubprocesso: vi.fn()}));
 vi.mock("@/composables/useProcessos", () => ({useProcessos: vi.fn()}));
 
@@ -133,15 +142,18 @@ function createWrapper(customState = {}, accessOverrides = {}) {
 describe("CadastroView.vue", () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        vi.mocked(useSubprocessosModule.useSubprocessos).mockReturnValue({
-            subprocessoDetalhe: null,
-            buscarContextoEdicao: vi.fn(),
-            buscarSubprocessoPorProcessoEUnidade: vi.fn(),
-            buscarSubprocessoDetalhe: vi.fn(),
-            atualizarStatusLocal: vi.fn(),
-            lastError: null,
-            clearError: vi.fn(),
-        } as any);
+        subprocessosMock.subprocessoDetalhe = {
+            codigo: 123,
+            situacao: "MAPEAMENTO_CADASTRO_EM_ANDAMENTO",
+            tipoProcesso: "MAPEAMENTO",
+            unidade: {sigla: "TESTE"},
+            permissoes: {}
+        };
+        subprocessosMock.lastError = null;
+        subprocessosMock.buscarContextoEdicao = vi.fn();
+        subprocessosMock.buscarSubprocessoPorProcessoEUnidade = vi.fn();
+        subprocessosMock.buscarSubprocessoDetalhe = vi.fn();
+        subprocessosMock.atualizarStatusLocal = vi.fn();
         vi.mocked(useFluxoSubprocessoModule.useFluxoSubprocesso).mockReturnValue({
             validarCadastro: vi.fn().mockResolvedValue({valido: true}),
             disponibilizarCadastro: vi.fn().mockResolvedValue(true),
@@ -180,7 +192,7 @@ describe("CadastroView.vue", () => {
         await flushPromises();
         (wrapper.vm as any).atividades = [{codigo: 1, conhecimentos: [{codigo: 1}]}];
         await wrapper.vm.$nextTick();
-        const subprocessosStore = useSubprocessosModule.useSubprocessos() as any;
+        const subprocessosStore = subprocessosMock as any;
         const fluxoSubprocesso = useFluxoSubprocessoModule.useFluxoSubprocesso() as any;
         subprocessosStore.subprocessoDetalhe = {
             codigo: 123,
@@ -201,7 +213,7 @@ describe("CadastroView.vue", () => {
         await flushPromises();
         (wrapper.vm as any).atividades = [{codigo: 1, conhecimentos: [{codigo: 1}]}];
         await wrapper.vm.$nextTick();
-        const subprocessosStore = useSubprocessosModule.useSubprocessos() as any;
+        const subprocessosStore = subprocessosMock as any;
         const fluxoSubprocesso = useFluxoSubprocessoModule.useFluxoSubprocesso() as any;
         subprocessosStore.subprocessoDetalhe = {
             codigo: 123,
@@ -297,7 +309,7 @@ describe("CadastroView.vue", () => {
     it("recarrega contexto completo apos importar atividades", async () => {
         const wrapper = createWrapper();
         await flushPromises();
-        const subprocessosStore = useSubprocessosModule.useSubprocessos() as any;
+        const subprocessosStore = subprocessosMock as any;
         subprocessosStore.buscarContextoEdicao = vi.fn().mockResolvedValue({
             detalhes: {
                 subprocesso: {

@@ -1,7 +1,7 @@
 import {createTestingPinia} from "@pinia/testing";
 import {flushPromises, mount} from "@vue/test-utils";
 import {beforeEach, describe, expect, it, vi} from "vitest";
-import {ref} from "vue";
+import {reactive, ref} from "vue";
 import * as useAcessoModule from "@/composables/useAcesso";
 import * as useSubprocessosModule from "@/composables/useSubprocessos";
 import * as subprocessoService from "@/services/subprocessoService";
@@ -19,7 +19,16 @@ vi.mock("@/services/subprocessoService", () => ({
     buscarSubprocessoPorProcessoEUnidade: vi.fn(),
     buscarContextoEdicao: vi.fn(),
 }));
-vi.mock("@/composables/useSubprocessos", () => ({useSubprocessos: vi.fn()}));
+const subprocessosMock = reactive({
+    subprocessoDetalhe: null as any,
+    buscarSubprocessoPorProcessoEUnidade: vi.fn(),
+    buscarContextoEdicao: vi.fn(),
+    buscarSubprocessoDetalhe: vi.fn(),
+    atualizarStatusLocal: vi.fn(),
+    lastError: null as any,
+    clearError: vi.fn(),
+});
+vi.mock("@/composables/useSubprocessos", () => ({useSubprocessos: () => subprocessosMock}));
 
 const stubs = {
     LayoutPadrao: {template: '<div><slot /></div>'},
@@ -44,18 +53,15 @@ const stubs = {
 describe("MapaView coverage", () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        vi.mocked(useSubprocessosModule.useSubprocessos).mockReturnValue({
-            subprocessoDetalhe: null,
-            buscarSubprocessoPorProcessoEUnidade: vi.fn().mockResolvedValue(123),
-            buscarContextoEdicao: vi.fn().mockResolvedValue({
-                atividadesDisponiveis: [],
-                unidade: {sigla: "TESTE", nome: "Teste"}
-            }),
-            buscarSubprocessoDetalhe: vi.fn(),
-            atualizarStatusLocal: vi.fn(),
-            lastError: null,
-            clearError: vi.fn(),
-        } as any);
+        subprocessosMock.subprocessoDetalhe = null;
+        subprocessosMock.buscarSubprocessoPorProcessoEUnidade = vi.fn().mockResolvedValue(123);
+        subprocessosMock.buscarContextoEdicao = vi.fn().mockResolvedValue({
+            atividadesDisponiveis: [],
+            unidade: {sigla: "TESTE", nome: "Teste"}
+        });
+        subprocessosMock.buscarSubprocessoDetalhe = vi.fn();
+        subprocessosMock.atualizarStatusLocal = vi.fn();
+        subprocessosMock.lastError = null;
         vi.mocked(subprocessoService.buscarSubprocessoPorProcessoEUnidade).mockResolvedValue(123 as any);
         vi.mocked(subprocessoService.buscarContextoEdicao).mockResolvedValue({
             atividadesDisponiveis: [],
@@ -250,7 +256,7 @@ describe("MapaView coverage", () => {
         await flushPromises();
         const vm = wrapper.vm as any;
         const store = useMapasStore();
-        const subprocessosStore = useSubprocessosModule.useSubprocessos() as any;
+        const subprocessosStore = subprocessosMock as any;
         
         subprocessosStore.buscarContextoEdicao = vi.fn().mockResolvedValue({
             atividadesDisponiveis: [{codigo: 1, descricao: "Ativ"}],
