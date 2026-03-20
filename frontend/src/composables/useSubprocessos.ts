@@ -117,7 +117,7 @@ function atualizarStatusLocal(status: {
     };
 }
 
-export function useSubprocessos(_pinia?: unknown) {
+export function useSubprocessos() {
     return {
         get subprocessoDetalhe() {
             return subprocessoDetalhe.value;
