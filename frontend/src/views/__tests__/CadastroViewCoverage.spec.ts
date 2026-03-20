@@ -5,7 +5,6 @@ import {reactive, ref} from "vue";
 import * as useAcessoModule from "@/composables/useAcesso";
 import * as useFluxoSubprocessoModule from "@/composables/useFluxoSubprocesso";
 import * as useProcessosModule from "@/composables/useProcessos";
-import * as useSubprocessosModule from "@/composables/useSubprocessos";
 import * as subprocessoService from "@/services/subprocessoService";
 import {useMapasStore} from "@/stores/mapas";
 import {SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";

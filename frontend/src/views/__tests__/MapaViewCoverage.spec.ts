@@ -3,7 +3,6 @@ import {flushPromises, mount} from "@vue/test-utils";
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import {reactive, ref} from "vue";
 import * as useAcessoModule from "@/composables/useAcesso";
-import * as useSubprocessosModule from "@/composables/useSubprocessos";
 import * as subprocessoService from "@/services/subprocessoService";
 import {useMapasStore} from "@/stores/mapas";
 import MapaView from "../MapaView.vue";
@@ -172,6 +171,8 @@ describe("MapaView coverage", () => {
             ]
         });
         const store = useMapasStore();
+        await flushPromises();
+
         (wrapper.vm as any).atividades = [
             {codigo: 1, descricao: "Atividade 1"},
             {codigo: 2, descricao: "Atividade 2"}
@@ -187,8 +188,6 @@ describe("MapaView coverage", () => {
                 ]
             }
         });
-
-        await flushPromises();
 
         expect((wrapper.vm as any).atividadesSemCompetencia).toHaveLength(1);
         expect(wrapper.find('[data-testid="btn-cad-mapa-disponibilizar"]').attributes("disabled")).toBeDefined();

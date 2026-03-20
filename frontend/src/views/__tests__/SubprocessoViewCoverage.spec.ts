@@ -2,7 +2,6 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {mount} from '@vue/test-utils';
 import {createTestingPinia} from '@pinia/testing';
 import SubprocessoView from '@/views/SubprocessoView.vue';
-import * as useSubprocessosModule from '@/composables/useSubprocessos';
 import {BSpinner} from 'bootstrap-vue-next';
 import * as useAcessoModule from '@/composables/useAcesso';
 import {reactive} from 'vue';

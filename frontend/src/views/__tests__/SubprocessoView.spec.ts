@@ -2,7 +2,6 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {flushPromises, mount, RouterLinkStub} from '@vue/test-utils';
 import {createTestingPinia} from '@pinia/testing';
 import SubprocessoView from '@/views/SubprocessoView.vue';
-import * as useSubprocessosModule from '@/composables/useSubprocessos';
 import {useMapasStore} from '@/stores/mapas';
 import {reactive, ref} from 'vue';
 import {SituacaoSubprocesso, TipoProcesso} from '@/types/tipos';

@@ -23,11 +23,7 @@ export const useExemploStore = defineStore('exemplo', () => {
 
 ### Processos e Fluxo
 
-* **`processos/`**: Pasta com lógica dividida para o domínio de processos.
-    - **`core.ts`**: Listagem, filtros e operações CRUD de processos.
-    - **`context.ts`**: Estado do processo atualmente selecionado/aberto.
-    - **`workflow.ts`**: Gerenciamento do fluxo de estados e transições.
-* **`subprocessos.ts` (`useSubprocessosStore`)**: Gestão de subprocessos de unidades.
+* O estado de `Processo` e `Subprocesso` foi simplificado e hoje fica prioritariamente em composables de domínio, não em stores Pinia dedicadas.
 
 ### Funcionalidades específicas
 
