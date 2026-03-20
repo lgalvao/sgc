@@ -117,9 +117,9 @@ import {logger} from "@/utils";
 import {normalizeError, shouldNotifyGlobally} from "@/utils/apiError";
 import {useProcessoForm} from "@/composables/useProcessoForm";
 import {useNotification} from "@/composables/useNotification";
+import {useProcessos} from "@/composables/useProcessos";
 import {TEXTOS} from "@/constants/textos";
 
-import {useProcessosStore} from "@/stores/processos";
 import {useToastStore} from "@/stores/toast";
 import {buscarArvoreComElegibilidade, mapUnidadesArray} from "@/services/unidadeService";
 import {Processo as ProcessoModel, TipoProcesso, type Unidade} from "@/types/tipos";
@@ -160,7 +160,7 @@ const formFieldsRef = ref<InstanceType<typeof ProcessoFormFields> | null>(null);
 const isLoading = ref(false);
 const router = useRouter();
 const route = useRoute();
-const processosStore = useProcessosStore();
+const processos = useProcessos();
 const toastStore = useToastStore();
 const {notificacao, notify, notifyStructured, clear} = useNotification();
 
@@ -190,8 +190,8 @@ onMounted(async () => {
   if (codProcesso) {
     isLoadingData.value = true;
     try {
-      await processosStore.buscarProcessoDetalhe(Number(codProcesso));
-      const processo = processosStore.processoDetalhe;
+      await processos.buscarProcessoDetalhe(Number(codProcesso));
+      const processo = processos.processoDetalhe.value;
       if (processo) {
         // Redireciona se o processo não está em situação CRIADO (não pode ser editado)
         if (processo.situacao !== 'CRIADO') {
@@ -241,7 +241,7 @@ function handleApiErrors(error: any, title: string, defaultMsg: string) {
   clearErrors();
   clear();
 
-  const lastError = processosStore.lastError;
+  const lastError = processos.lastError.value;
 
   if (lastError) {
     setFromNormalizedError(lastError);
@@ -284,7 +284,7 @@ async function salvarProcesso() {
   try {
     if (processoEditando.value) {
       const request = construirAtualizarRequest(processoEditando.value.codigo);
-      await processosStore.atualizarProcesso(
+      await processos.atualizarProcesso(
           processoEditando.value.codigo,
           request,
       );
@@ -292,7 +292,7 @@ async function salvarProcesso() {
       await router.push("/painel");
     } else {
       const request = construirCriarRequest();
-      await processosStore.criarProcesso(request);
+      await processos.criarProcesso(request);
       toastStore.setPending(TEXTOS.sucesso.PROCESSO_CRIADO);
       await router.push("/painel");
     }
@@ -317,7 +317,7 @@ async function confirmarIniciarProcesso() {
   if (!codigoProcesso) {
     try {
       const request = construirCriarRequest();
-      const novoProcesso = await processosStore.criarProcesso(request);
+      const novoProcesso = await processos.criarProcesso(request);
       codigoProcesso = novoProcesso.codigo;
     } catch (error) {
       mostrarModalConfirmacao.value = false;
@@ -328,7 +328,7 @@ async function confirmarIniciarProcesso() {
   }
 
   try {
-    await processosStore.iniciarProcesso(
+    await processos.iniciarProcesso(
         codigoProcesso,
         tipo.value as TipoProcesso,
         unidadesSelecionadas.value,
@@ -358,7 +358,7 @@ async function confirmarRemocao() {
     isLoading.value = true;
     const descRemovida = processoEditando.value.descricao;
     try {
-      await processosStore.removerProcesso(processoEditando.value.codigo);
+      await processos.removerProcesso(processoEditando.value.codigo);
       toastStore.setPending(TEXTOS.sucesso.PROCESSO_REMOVIDO(descRemovida));
       await router.push("/painel");
       if (!processoEditando.value) {

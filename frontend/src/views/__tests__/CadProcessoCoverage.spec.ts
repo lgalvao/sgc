@@ -1,14 +1,27 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {flushPromises, mount} from '@vue/test-utils';
-import {nextTick} from 'vue';
+import {nextTick, ref} from 'vue';
 import ProcessoCadastroView from '@/views/ProcessoCadastroView.vue';
-import {useProcessosStore} from '@/stores/processos';
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 import * as unidadeService from '@/services/unidadeService';
 
 vi.mock('@/services/unidadeService', () => ({
     buscarArvoreComElegibilidade: vi.fn().mockResolvedValue([]),
     mapUnidadesArray: vi.fn((arr) => arr || []),
+}));
+
+const processosMock = {
+    processoDetalhe: ref<any>(null),
+    lastError: ref<any>(null),
+    buscarProcessoDetalhe: vi.fn(),
+    criarProcesso: vi.fn(),
+    atualizarProcesso: vi.fn(),
+    iniciarProcesso: vi.fn(),
+    removerProcesso: vi.fn(),
+};
+
+vi.mock('@/composables/useProcessos', () => ({
+    useProcessos: () => processosMock
 }));
 
 const {mockPush, mockRoute} = vi.hoisted(() => {
@@ -51,16 +64,14 @@ const ModalConfirmacaoStub = {
 
 describe('ProcessoCadastroView.vue Coverage', () => {
     const context = setupComponentTest();
-    let processosStore: any;
 
     const createWrapper = (initialState = {}) => {
+        processosMock.processoDetalhe.value = (initialState as any).processos?.processoDetalhe ?? null;
+        processosMock.lastError.value = (initialState as any).processos?.lastError ?? null;
+
         context.wrapper = mount(ProcessoCadastroView, {
             ...getCommonMountOptions(
                 {
-                    processos: {
-                        processoDetalhe: null,
-                        lastError: null
-                    },
                     ...initialState
                 },
                 {
@@ -86,13 +97,13 @@ describe('ProcessoCadastroView.vue Coverage', () => {
                 }
             )
         });
-
-        processosStore = useProcessosStore();
-        return {wrapper: context.wrapper, processosStore};
+        return {wrapper: context.wrapper, processosStore: processosMock};
     };
 
     beforeEach(() => {
         vi.clearAllMocks();
+        processosMock.processoDetalhe.value = null;
+        processosMock.lastError.value = null;
         mockRoute.query = {};
         vi.mocked(unidadeService.buscarArvoreComElegibilidade).mockResolvedValue([]);
         vi.mocked(unidadeService.mapUnidadesArray).mockImplementation((arr) => arr || []);
@@ -109,7 +120,7 @@ describe('ProcessoCadastroView.vue Coverage', () => {
         const {wrapper, processosStore} = createWrapper();
 
         processosStore.criarProcesso.mockImplementation(async () => {
-            processosStore.lastError = {
+            processosStore.lastError.value = {
                 message: 'Erro misto',
                 subErrors: [
                     {field: 'descricao', message: 'Descrição inválida'},
@@ -145,7 +156,7 @@ describe('ProcessoCadastroView.vue Coverage', () => {
 
         // Configure error on create
         processosStore.criarProcesso.mockRejectedValue(new Error('Create error'));
-        processosStore.lastError = {message: 'Failed to create'};
+        processosStore.lastError.value = {message: 'Failed to create'};
 
         const modal = wrapper.findComponent({name: 'ModalConfirmacao'});
         await modal.vm.$emit('confirmar');
@@ -171,7 +182,7 @@ describe('ProcessoCadastroView.vue Coverage', () => {
         // Configure success on create, failure on start
         processosStore.criarProcesso.mockResolvedValue({codigo: 777});
         processosStore.iniciarProcesso.mockRejectedValue(new Error('Start error'));
-        processosStore.lastError = {message: 'Failed to start'};
+        processosStore.lastError.value = {message: 'Failed to start'};
 
         const modal = wrapper.findComponent({name: 'ModalConfirmacao'});
         await modal.vm.$emit('confirmar');
@@ -210,7 +221,7 @@ describe('ProcessoCadastroView.vue Coverage', () => {
         await nextTick();
 
         processosStore.removerProcesso.mockRejectedValue(new Error('Delete error'));
-        processosStore.lastError = {message: 'Failed to delete'};
+        processosStore.lastError.value = {message: 'Failed to delete'};
 
         await (wrapper.vm).confirmarRemocao();
         await flushPromises();
