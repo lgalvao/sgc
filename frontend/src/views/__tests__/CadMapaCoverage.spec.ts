@@ -1,9 +1,11 @@
-import {describe, expect, it, vi} from 'vitest';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {mount} from '@vue/test-utils';
 import {createTestingPinia} from '@pinia/testing';
 import MapaView from '@/views/MapaView.vue';
 import {useMapasStore} from '@/stores/mapas';
-import {useSubprocessosStore} from '@/stores/subprocessos';
+import * as useSubprocessosModule from '@/composables/useSubprocessos';
+
+vi.mock('@/composables/useSubprocessos', () => ({useSubprocessos: vi.fn()}));
 
 vi.mock("vue-router", () => ({
     useRouter: vi.fn(),
@@ -19,6 +21,16 @@ vi.mock("vue-router", () => ({
 }));
 
 describe('MapaView Coverage', () => {
+    const subprocessosMock = {
+        subprocessoDetalhe: null as any,
+        buscarSubprocessoPorProcessoEUnidade: vi.fn(),
+        buscarContextoEdicao: vi.fn(),
+        buscarSubprocessoDetalhe: vi.fn(),
+        atualizarStatusLocal: vi.fn(),
+        lastError: null as any,
+        clearError: vi.fn(),
+    };
+
     const commonStubs = {
         PageHeader: {template: '<div><slot /><slot name="actions" /></div>'},
         BButton: {template: '<button />'},
@@ -32,6 +44,15 @@ describe('MapaView Coverage', () => {
         ImpactoMapaModal: {template: '<div />'},
         BAlert: {template: '<div />'}
     };
+
+    beforeEach(() => {
+        vi.clearAllMocks();
+        subprocessosMock.subprocessoDetalhe = null;
+        subprocessosMock.lastError = null;
+        subprocessosMock.buscarSubprocessoPorProcessoEUnidade.mockResolvedValue(123);
+        subprocessosMock.buscarContextoEdicao.mockResolvedValue(null);
+        vi.mocked(useSubprocessosModule.useSubprocessos).mockReturnValue(subprocessosMock as any);
+    });
 
     it('removerAtividadeAssociada does nothing if competency not found', async () => {
         const pinia = createTestingPinia({
@@ -68,8 +89,7 @@ describe('MapaView Coverage', () => {
             }
         });
 
-        const store = useSubprocessosStore(pinia);
-        (store.buscarSubprocessoPorProcessoEUnidade as any).mockResolvedValue(null);
+        subprocessosMock.buscarSubprocessoPorProcessoEUnidade.mockResolvedValue(null);
 
         const wrapper = mount(MapaView, {
             global: {

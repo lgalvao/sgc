@@ -2,7 +2,7 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {mount} from '@vue/test-utils';
 import {createTestingPinia} from '@pinia/testing';
 import SubprocessoView from '@/views/SubprocessoView.vue';
-import {useSubprocessosStore} from '@/stores/subprocessos';
+import * as useSubprocessosModule from '@/composables/useSubprocessos';
 import {BSpinner} from 'bootstrap-vue-next';
 import * as useAcessoModule from '@/composables/useAcesso';
 
@@ -15,6 +15,7 @@ const fluxoSubprocessoMock = {
 vi.mock('@/composables/useFluxoSubprocesso', () => ({
     useFluxoSubprocesso: () => fluxoSubprocessoMock
 }));
+vi.mock('@/composables/useSubprocessos', () => ({useSubprocessos: vi.fn()}));
 
 const SubprocessoHeaderStub = {template: '<div />'};
 const SubprocessoCardsStub = {template: '<div />'};
@@ -37,6 +38,15 @@ describe('SubprocessoView Coverage', () => {
         fluxoSubprocessoMock.alterarDataLimiteSubprocesso.mockResolvedValue({});
         fluxoSubprocessoMock.reabrirCadastro.mockResolvedValue(true);
         fluxoSubprocessoMock.reabrirRevisaoCadastro.mockResolvedValue(true);
+        vi.mocked(useSubprocessosModule.useSubprocessos).mockReturnValue({
+            subprocessoDetalhe: null,
+            buscarSubprocessoPorProcessoEUnidade: vi.fn().mockResolvedValue(123),
+            buscarSubprocessoDetalhe: vi.fn(),
+            buscarContextoEdicao: vi.fn(),
+            atualizarStatusLocal: vi.fn(),
+            lastError: null,
+            clearError: vi.fn(),
+        } as any);
     });
 
     it('renders loading state when no data and no error', () => {
@@ -50,15 +60,7 @@ describe('SubprocessoView Coverage', () => {
             podeVisualizarMapa: {value: true},
         } as any);
 
-        const pinia = createTestingPinia({
-            createSpy: vi.fn,
-            initialState: {
-                subprocessos: {
-                    subprocessoDetalhe: null,
-                    lastError: null
-                }
-            }
-        });
+        const pinia = createTestingPinia({createSpy: vi.fn});
 
         vi.spyOn(useAcessoModule, 'useAcesso').mockReturnValue({
             podeVisualizarMapa: {value: true},
@@ -98,15 +100,8 @@ describe('SubprocessoView Coverage', () => {
             podeVisualizarMapa: {value: true},
         } as any);
 
-        const pinia = createTestingPinia({
-            createSpy: vi.fn,
-            initialState: {
-                subprocessos: {
-                    subprocessoDetalhe: null,
-                    lastError: {message: 'Erro teste'}
-                }
-            }
-        });
+        const pinia = createTestingPinia({createSpy: vi.fn});
+        (useSubprocessosModule.useSubprocessos() as any).lastError = {message: 'Erro teste'};
 
         vi.spyOn(useAcessoModule, 'useAcesso').mockReturnValue({
             podeVisualizarMapa: {value: true},
@@ -135,16 +130,10 @@ describe('SubprocessoView Coverage', () => {
     });
 
     it('confirmarAlteracaoDataLimite returns early if novaData is empty', async () => {
-        const pinia = createTestingPinia({
-            createSpy: vi.fn,
-            initialState: {
-                subprocessos: {
-                    subprocessoDetalhe: {
-                        unidade: {codigo: 1, sigla: 'TEST', nome: 'Unidade teste'}
-                    }
-                }
-            }
-        });
+        const pinia = createTestingPinia({createSpy: vi.fn});
+        (useSubprocessosModule.useSubprocessos() as any).subprocessoDetalhe = {
+            unidade: {codigo: 1, sigla: 'TEST', nome: 'Unidade teste'}
+        };
         vi.spyOn(useAcessoModule, 'useAcesso').mockReturnValue({
             podeAlterarDataLimite: {value: true},
             podeReabrirCadastro: {value: false},
@@ -176,17 +165,12 @@ describe('SubprocessoView Coverage', () => {
     });
 
     it('confirmarReabertura returns early if justification is empty', async () => {
-        const pinia = createTestingPinia({
-            createSpy: vi.fn,
-            initialState: {
-                subprocessos: {
-                    subprocessoDetalhe: {
-                        unidade: {codigo: 1, sigla: 'TEST', nome: 'Unidade teste'},
-                        movimentacoes: [],
-                    }
-                }
-            }
-        });
+        const pinia = createTestingPinia({createSpy: vi.fn});
+        const store = useSubprocessosModule.useSubprocessos() as any;
+        store.subprocessoDetalhe = {
+            unidade: {codigo: 1, sigla: 'TEST', nome: 'Unidade teste'},
+            movimentacoes: [],
+        };
 
         vi.spyOn(useAcessoModule, 'useAcesso').mockReturnValue({
             podeAlterarDataLimite: {value: false},
@@ -198,7 +182,6 @@ describe('SubprocessoView Coverage', () => {
             podeVisualizarMapa: {value: true},
         } as any);
 
-        const store = useSubprocessosStore(pinia);
         (store.buscarSubprocessoPorProcessoEUnidade as any).mockResolvedValue(123);
 
         const wrapper = mount(SubprocessoView, {

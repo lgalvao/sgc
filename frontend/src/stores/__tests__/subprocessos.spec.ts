@@ -1,6 +1,6 @@
 import {createPinia, setActivePinia} from 'pinia';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
-import {useSubprocessosStore} from '../subprocessos';
+import {useSubprocessos} from '@/composables/useSubprocessos';
 import {SituacaoSubprocesso} from '@/types/tipos';
 import {usePerfilStore} from '../perfil';
 import {useMapasStore} from '../mapas';
@@ -36,7 +36,7 @@ vi.mock('@/axios-setup', () => ({
 }));
 
 describe('Subprocessos store', () => {
-    let store: ReturnType<typeof useSubprocessosStore>;
+    let store: ReturnType<typeof useSubprocessos>;
 
     const mockPerfilStore = {
         perfilSelecionado: null as string | null,
@@ -56,7 +56,7 @@ describe('Subprocessos store', () => {
         (usePerfilStore as any).mockReturnValue(mockPerfilStore);
         (useMapasStore as any).mockReturnValue(mockMapasStore);
 
-        store = useSubprocessosStore();
+        store = useSubprocessos();
     });
 
     describe('buscarSubprocessoDetalhe', () => {

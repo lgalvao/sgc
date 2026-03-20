@@ -1,18 +1,27 @@
 - [x] Define the audit scope.
 - [x] SAST Recon on `backend/src/main/java/sgc/processo/ProcessoController.java`
-  - [ ] Investigate data flow from `requisicao` on line 46.
-  - [ ] Investigate data flow from `tipo` on line 61.
-  - [ ] Investigate data flow from `codigo` on line 68.
-  - [ ] Investigate data flow from `usuario` on line 145.
-- [ ] SAST Recon on `backend/src/main/java/sgc/e2e/E2eController.java`
-- [ ] SAST Recon on `backend/src/main/java/sgc/subprocesso/SubprocessoController.java`
-- [ ] SAST Recon on `backend/src/main/java/sgc/organizacao/UnidadeController.java`
-- [ ] SAST Recon on `backend/src/main/java/sgc/alerta/AlertaController.java`
-- [ ] SAST Recon on `backend/src/main/java/sgc/mapa/AtividadeController.java`
-- [ ] SAST Recon on `backend/src/main/java/sgc/mapa/MapaController.java`
-- [ ] SAST Recon on `backend/src/main/java/sgc/organizacao/UsuarioController.java`
-- [ ] SAST Recon on `backend/src/main/java/sgc/parametros/ConfiguracaoController.java`
-- [ ] SAST Recon on `backend/src/main/java/sgc/processo/painel/PainelController.java`
-- [ ] SAST Recon on `backend/src/main/java/sgc/relatorio/RelatorioController.java`
-- [ ] SAST Recon on `backend/src/main/java/sgc/seguranca/login/LoginController.java`
+  - [x] Investigate data flow from `requisicao` on line 46.
+  - [x] Investigate data flow from `tipo` on line 61.
+  - [x] Investigate data flow from `codigo` on line 68.
+  - [x] Investigate data flow from `usuario` on line 145.
+- [x] SAST Recon on `backend/src/main/java/sgc/e2e/E2eController.java`
+  - [ ] Investigate `E2eController` activation and raw SQL usage.
+- [x] SAST Recon on `backend/src/main/java/sgc/subprocesso/SubprocessoController.java`
+  - [ ] Investigate `hasPermission` implementation for batch processing.
+- [x] SAST Recon on `backend/src/main/java/sgc/organizacao/UnidadeController.java`
+  - [ ] Investigate `buscarUsuariosPorUnidade` (line 86) for IDOR and PII leakage.
+- [x] SAST Recon on `backend/src/main/java/sgc/alerta/AlertaController.java`
+  - [ ] Investigate `alertaFacade.marcarComoLidos` (line 53) for IDOR.
+- [x] SAST Recon on `backend/src/main/java/sgc/mapa/AtividadeController.java`
+  - [ ] Investigate `AtividadeFacade` (line 33, 43, 53, etc.) for IDOR.
+- [x] SAST Recon on `backend/src/main/java/sgc/mapa/MapaController.java`
+  - [ ] Investigate `mapaManutencaoService.mapas()` (line 39) for IDOR.
+- [x] SAST Recon on `backend/src/main/java/sgc/organizacao/UsuarioController.java`
+  - [ ] Investigate `Usuario` PII exposure in `OrganizacaoViews.Publica`.
+- [x] SAST Recon on `backend/src/main/java/sgc/parametros/ConfiguracaoController.java`
+- [x] SAST Recon on `backend/src/main/java/sgc/processo/painel/PainelController.java`
+  - [ ] Investigate `painelFacade` (line 34, 49) for IDOR and Privacy risk.
+- [x] SAST Recon on `backend/src/main/java/sgc/relatorio/RelatorioController.java`
+- [x] SAST Recon on `backend/src/main/java/sgc/seguranca/login/LoginController.java`
+  - [ ] Investigate `extrairIp` (line 120) for Rate Limit Bypass via `X-Forwarded-For`.
 - [ ] Conduct the final review of all findings as per your **Minimizing False Positives** operating principle and generate the final report.

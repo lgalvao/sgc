@@ -36,8 +36,8 @@ vi.mock("@/composables/useProcessos", () => ({
     useProcessos: () => processosMock,
 }));
 
-vi.mock("@/stores/subprocessos", () => ({
-    useSubprocessosStore: () => subprocessosStoreMock,
+vi.mock("@/composables/useSubprocessos", () => ({
+    useSubprocessos: () => subprocessosStoreMock,
 }));
 
 describe("useFluxoSubprocesso", () => {
