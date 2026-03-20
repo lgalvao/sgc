@@ -1,7 +1,5 @@
 import {createPinia, setActivePinia} from 'pinia';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
-import {ref} from 'vue';
-import {useProcessos} from '@/composables/useProcessos';
 import {useSubprocessosStore} from '../subprocessos';
 import {SituacaoSubprocesso} from '@/types/tipos';
 import {usePerfilStore} from '../perfil';
@@ -10,47 +8,13 @@ import {
     buscarContextoEdicao,
     buscarSubprocessoDetalhe,
     buscarSubprocessoPorProcessoEUnidade,
-    validarCadastro,
 } from '@/services/subprocessoService';
-import {
-    aceitarCadastro,
-    aceitarRevisaoCadastro,
-    devolverCadastro,
-    devolverRevisaoCadastro,
-    disponibilizarCadastro,
-    disponibilizarRevisaoCadastro,
-    homologarCadastro,
-    homologarRevisaoCadastro,
-} from '@/services/cadastroService';
-import {alterarDataLimiteSubprocesso, reabrirCadastro, reabrirRevisaoCadastro,} from '@/services/processoService';
 import logger from '@/utils/logger';
 
 vi.mock('@/services/subprocessoService', () => ({
     buscarContextoEdicao: vi.fn(),
     buscarSubprocessoDetalhe: vi.fn(),
     buscarSubprocessoPorProcessoEUnidade: vi.fn(),
-    validarCadastro: vi.fn(),
-}));
-
-vi.mock('@/services/processoService', () => ({
-    alterarDataLimiteSubprocesso: vi.fn(),
-    reabrirCadastro: vi.fn(),
-    reabrirRevisaoCadastro: vi.fn(),
-}));
-
-vi.mock('@/services/cadastroService', () => ({
-    disponibilizarCadastro: vi.fn(),
-    disponibilizarRevisaoCadastro: vi.fn(),
-    devolverCadastro: vi.fn(),
-    aceitarCadastro: vi.fn(),
-    homologarCadastro: vi.fn(),
-    devolverRevisaoCadastro: vi.fn(),
-    aceitarRevisaoCadastro: vi.fn(),
-    homologarRevisaoCadastro: vi.fn(),
-}));
-
-vi.mock('@/composables/useProcessos', () => ({
-    useProcessos: vi.fn(),
 }));
 vi.mock('../perfil', () => ({
     usePerfilStore: vi.fn(),
@@ -74,10 +38,6 @@ vi.mock('@/axios-setup', () => ({
 describe('Subprocessos store', () => {
     let store: ReturnType<typeof useSubprocessosStore>;
 
-    const mockProcessos = {
-        buscarProcessoDetalhe: vi.fn(),
-        processoDetalhe: ref({codigo: 999}),
-    };
     const mockPerfilStore = {
         perfilSelecionado: null as string | null,
         unidadeSelecionada: null as number | null,
@@ -93,8 +53,6 @@ describe('Subprocessos store', () => {
 
         vi.clearAllMocks();
 
-        mockProcessos.processoDetalhe.value = {codigo: 999} as any;
-        (useProcessos as any).mockReturnValue(mockProcessos);
         (usePerfilStore as any).mockReturnValue(mockPerfilStore);
         (useMapasStore as any).mockReturnValue(mockMapasStore);
 
@@ -228,150 +186,6 @@ describe('Subprocessos store', () => {
         });
     });
 
-    describe('Ações de Workflow', () => {
-        it('disponibilizarCadastro deve executar com sucesso e feedback', async () => {
-            (disponibilizarCadastro as any).mockResolvedValue({});
-            const result = await store.disponibilizarCadastro(1);
-            expect(result).toBe(true);
-            expect(disponibilizarCadastro).toHaveBeenCalledWith(1);
-        });
-
-        it('disponibilizarCadastro deve lidar com erro', async () => {
-            (disponibilizarCadastro as any).mockRejectedValue(new Error('Falha'));
-            const result = await store.disponibilizarCadastro(1);
-            expect(result).toBe(false);
-            expect(store.lastError).toBeTruthy();
-        });
-
-        it('disponibilizarRevisaoCadastro deve executar com sucesso', async () => {
-            (disponibilizarRevisaoCadastro as any).mockResolvedValue({});
-            const result = await store.disponibilizarRevisaoCadastro(1);
-            expect(result).toBe(true);
-            expect(disponibilizarRevisaoCadastro).toHaveBeenCalledWith(1);
-        });
-
-        it('disponibilizarRevisaoCadastro deve lidar com erro', async () => {
-            (disponibilizarRevisaoCadastro as any).mockRejectedValue(new Error('Falha'));
-            const result = await store.disponibilizarRevisaoCadastro(1);
-            expect(result).toBe(false);
-            expect(store.lastError).toBeTruthy();
-        });
-
-        it('devolverCadastro deve executar com sucesso', async () => {
-            (devolverCadastro as any).mockResolvedValue({});
-            const result = await store.devolverCadastro(1, {observacoes: 'Erro'});
-            expect(result).toBe(true);
-            expect(devolverCadastro).toHaveBeenCalledWith(1, {observacoes: 'Erro'});
-        });
-
-        it('devolverCadastro deve lidar com erro', async () => {
-            (devolverCadastro as any).mockRejectedValue(new Error('Falha'));
-            const result = await store.devolverCadastro(1, {observacoes: 'Erro'});
-            expect(result).toBe(false);
-            expect(store.lastError).toBeTruthy();
-        });
-
-        it('aceitarCadastro deve executar com sucesso', async () => {
-            (aceitarCadastro as any).mockResolvedValue({});
-            const result = await store.aceitarCadastro(1, {aprovado: true} as any);
-            expect(result).toBe(true);
-            expect(aceitarCadastro).toHaveBeenCalledWith(1, {aprovado: true});
-        });
-
-        it('aceitarCadastro deve lidar com erro', async () => {
-            (aceitarCadastro as any).mockRejectedValue(new Error('Falha'));
-            const result = await store.aceitarCadastro(1, {aprovado: true} as any);
-            expect(result).toBe(false);
-        });
-
-        it('homologarCadastro deve recarregar detalhes após sucesso', async () => {
-            mockPerfilStore.perfilSelecionado = 'ADMIN' as any;
-            mockPerfilStore.unidadeAtual = null;
-            (homologarCadastro as any).mockResolvedValue({});
-            (buscarSubprocessoDetalhe as any).mockResolvedValue({codigo: 1, situacao: 'HOMOLOGADO'});
-
-            const result = await store.homologarCadastro(1, {aprovado: true} as any);
-            expect(result).toBe(true);
-            expect(homologarCadastro).toHaveBeenCalledWith(1, {aprovado: true});
-            expect(buscarSubprocessoDetalhe).toHaveBeenCalled();
-        });
-
-        it('homologarCadastro deve lidar com erro', async () => {
-            (homologarCadastro as any).mockRejectedValue(new Error('Falha'));
-            const result = await store.homologarCadastro(1, {aprovado: true} as any);
-            expect(result).toBe(false);
-            expect(store.lastError).toBeTruthy();
-        });
-
-        it('devolverRevisaoCadastro deve executar com sucesso', async () => {
-            (devolverRevisaoCadastro as any).mockResolvedValue({});
-            const result = await store.devolverRevisaoCadastro(1, {observacoes: 'Erro'});
-            expect(result).toBe(true);
-            expect(devolverRevisaoCadastro).toHaveBeenCalledWith(1, {observacoes: 'Erro'});
-        });
-
-        it('devolverRevisaoCadastro deve lidar com erro', async () => {
-            (devolverRevisaoCadastro as any).mockRejectedValue(new Error('Falha'));
-            const result = await store.devolverRevisaoCadastro(1, {observacoes: 'Erro'});
-            expect(result).toBe(false);
-        });
-
-        it('aceitarRevisaoCadastro deve executar com sucesso', async () => {
-            (aceitarRevisaoCadastro as any).mockResolvedValue({});
-            const result = await store.aceitarRevisaoCadastro(1, {aprovado: true} as any);
-            expect(result).toBe(true);
-            expect(aceitarRevisaoCadastro).toHaveBeenCalledWith(1, {aprovado: true});
-        });
-
-        it('aceitarRevisaoCadastro deve lidar com erro', async () => {
-            (aceitarRevisaoCadastro as any).mockRejectedValue(new Error('Falha'));
-            const result = await store.aceitarRevisaoCadastro(1, {aprovado: true} as any);
-            expect(result).toBe(false);
-        });
-
-        it('homologarRevisaoCadastro deve executar com sucesso e recarregar', async () => {
-            mockPerfilStore.perfilSelecionado = 'ADMIN' as any;
-            mockPerfilStore.unidadeAtual = null;
-            (homologarRevisaoCadastro as any).mockResolvedValue({});
-            (buscarSubprocessoDetalhe as any).mockResolvedValue({codigo: 1});
-
-            const result = await store.homologarRevisaoCadastro(1, {aprovado: true} as any);
-            expect(result).toBe(true);
-            expect(homologarRevisaoCadastro).toHaveBeenCalledWith(1, {aprovado: true});
-            expect(buscarSubprocessoDetalhe).toHaveBeenCalled();
-        });
-
-        it('homologarRevisaoCadastro deve lidar com erro', async () => {
-            (homologarRevisaoCadastro as any).mockRejectedValue(new Error('Falha'));
-            const result = await store.homologarRevisaoCadastro(1, {aprovado: true} as any);
-            expect(result).toBe(false);
-        });
-    });
-
-    describe('alterarDataLimiteSubprocesso', () => {
-        it('deve delegar para apiClient e recarregar detalhes', async () => {
-            mockPerfilStore.perfilSelecionado = 'ADMIN' as any;
-            mockPerfilStore.unidadeAtual = null;
-            (buscarSubprocessoDetalhe as any).mockResolvedValue({});
-            (alterarDataLimiteSubprocesso as any).mockResolvedValue(undefined);
-
-            const dados = {novaData: '2024-12-31'};
-
-            await store.alterarDataLimiteSubprocesso(123, dados);
-
-            expect(alterarDataLimiteSubprocesso).toHaveBeenCalledWith(123, dados);
-            expect(buscarSubprocessoDetalhe).toHaveBeenCalledWith(123, 'ADMIN', null);
-        });
-
-        it('deve lidar com erro na API', async () => {
-            (alterarDataLimiteSubprocesso as any).mockRejectedValue(new Error("API Fail"));
-
-            await expect(store.alterarDataLimiteSubprocesso(123, {novaData: '2022'}))
-                .rejects.toThrow("API Fail");
-            expect(store.lastError).toBeTruthy();
-        });
-    });
-
     describe('atualizarStatusLocal', () => {
         it('deve atualizar o status se houver detalhe carregado', () => {
             store.subprocessoDetalhe = {situacao: 'CRIADO'} as any;
@@ -383,33 +197,6 @@ describe('Subprocessos store', () => {
             store.subprocessoDetalhe = null;
             store.atualizarStatusLocal({codigo: 1, situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO});
             expect(store.subprocessoDetalhe).toBeNull();
-        });
-    });
-
-    describe('validarCadastro', () => {
-        it('deve chamar serviceValidarCadastro', async () => {
-            (validarCadastro as any).mockResolvedValue({valido: true});
-            const res = await store.validarCadastro(1);
-            expect(validarCadastro).toHaveBeenCalledWith(1);
-            expect(res).toEqual({valido: true});
-        });
-    });
-
-    describe('reabrirCadastro', () => {
-        it('deve chamar reabrirCadastro service', async () => {
-            (reabrirCadastro as any).mockResolvedValue({});
-            const res = await store.reabrirCadastro(1, 'Justificativa');
-            expect(reabrirCadastro).toHaveBeenCalledWith(1, 'Justificativa');
-            expect(res).toBe(true);
-        });
-    });
-
-    describe('reabrirRevisaoCadastro', () => {
-        it('deve chamar reabrirRevisaoCadastro service', async () => {
-            (reabrirRevisaoCadastro as any).mockResolvedValue({});
-            const res = await store.reabrirRevisaoCadastro(1, 'Justificativa');
-            expect(reabrirRevisaoCadastro).toHaveBeenCalledWith(1, 'Justificativa');
-            expect(res).toBe(true);
         });
     });
 });

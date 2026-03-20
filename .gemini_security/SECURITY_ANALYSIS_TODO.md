@@ -1,5 +1,5 @@
 - [x] Define the audit scope.
-- [ ] SAST Recon on `backend/src/main/java/sgc/processo/ProcessoController.java`
+- [x] SAST Recon on `backend/src/main/java/sgc/processo/ProcessoController.java`
   - [ ] Investigate data flow from `requisicao` on line 46.
   - [ ] Investigate data flow from `tipo` on line 61.
   - [ ] Investigate data flow from `codigo` on line 68.

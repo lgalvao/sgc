@@ -1,4 +1,4 @@
-import {describe, expect, it, vi} from 'vitest';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {mount} from '@vue/test-utils';
 import {createTestingPinia} from '@pinia/testing';
 import SubprocessoView from '@/views/SubprocessoView.vue';
@@ -32,11 +32,11 @@ const BAlertStub = {
 };
 
 describe('SubprocessoView Coverage', () => {
-    it('prepara mocks de fluxo', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
         fluxoSubprocessoMock.alterarDataLimiteSubprocesso.mockResolvedValue({});
         fluxoSubprocessoMock.reabrirCadastro.mockResolvedValue(true);
         fluxoSubprocessoMock.reabrirRevisaoCadastro.mockResolvedValue(true);
-        expect(true).toBe(true);
     });
 
     it('renders loading state when no data and no error', () => {
