@@ -23,12 +23,11 @@ export const useExemploStore = defineStore('exemplo', () => {
 
 ### Processos e Fluxo
 
-* O estado de `Processo` e `Subprocesso` foi simplificado e hoje fica prioritariamente em composables de domínio, não em stores Pinia dedicadas.
+* O estado de `Processo`, `Subprocesso` e `Mapa` foi simplificado e hoje fica prioritariamente em composables de domínio, não em stores Pinia dedicadas.
 
 ### Funcionalidades específicas
 
 * **`atividades.ts`**: CRUD de atividades.
-* **`mapas.ts`**: Estado do mapa de competências e revisões.
 * **`diagnosticos.ts`**: Dados de autoavaliação e monitoramento.
 * **`atribuicoes.ts`**: Gestão de atribuições temporárias/substituições.
 * **`analises.ts`**: Histórico de análises e auditoria.
@@ -43,5 +42,5 @@ export const useExemploStore = defineStore('exemplo', () => {
 ## Boas práticas
 
 1. **Separação de Preocupações**: Stores delegam chamadas HTTP para os `services/`.
-2. **Reatividade**: Use `storeToRefs()` ao desestruturar estado em componentes.
+2. **Reatividade**: Use `storeToRefs()` apenas em stores Pinia; composables de domínio já expõem `ref`s diretamente.
 3. **Persistência**: Dados de sessão são persistidos automaticamente no `localStorage`.

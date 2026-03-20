@@ -58,20 +58,22 @@ async function temMapaVigente(codigoUnidade: number): Promise<boolean> {
     }
 }
 
+const mapas = {
+    mapaVisualizacao,
+    mapaCompleto,
+    mapaAjuste,
+    impactoMapa,
+    carregando,
+    erro,
+    lastError,
+    clearError,
+    buscarMapaVisualizacao,
+    buscarMapaCompleto,
+    buscarMapaAjuste,
+    buscarImpactoMapa,
+    temMapaVigente,
+};
+
 export function useMapas() {
-    return {
-        mapaVisualizacao,
-        mapaCompleto,
-        mapaAjuste,
-        impactoMapa,
-        carregando,
-        erro,
-        lastError,
-        clearError,
-        buscarMapaVisualizacao,
-        buscarMapaCompleto,
-        buscarMapaAjuste,
-        buscarImpactoMapa,
-        temMapaVigente,
-    };
+    return mapas;
 }

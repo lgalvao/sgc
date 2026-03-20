@@ -45,7 +45,7 @@ describe('Subprocessos store', () => {
         unidadeAtual: null as number | null,
     };
     const mockMapasStore = {
-        mapaCompleto: null,
+        mapaCompleto: {value: null as any},
     };
 
     beforeEach(() => {
@@ -168,7 +168,7 @@ describe('Subprocessos store', () => {
             await store.buscarContextoEdicao(1);
 
             expect(store.subprocessoDetalhe).toMatchObject(mockData.detalhes);
-            expect(mockMapasStore.mapaCompleto).toEqual(mockData.mapa);
+            expect(mockMapasStore.mapaCompleto.value).toEqual(mockData.mapa);
         });
 
         it('deve falhar se não houver perfil', async () => {
