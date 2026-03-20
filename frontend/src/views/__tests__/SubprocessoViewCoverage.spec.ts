@@ -145,8 +145,6 @@ describe('SubprocessoView Coverage', () => {
                 }
             }
         });
-        const store = useSubprocessosStore(pinia);
-
         vi.spyOn(useAcessoModule, 'useAcesso').mockReturnValue({
             podeAlterarDataLimite: {value: true},
             podeReabrirCadastro: {value: false},

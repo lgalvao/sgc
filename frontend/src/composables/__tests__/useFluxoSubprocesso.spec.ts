@@ -104,4 +104,4 @@ describe("useFluxoSubprocesso", () => {
         expect(resultado).toBe(false);
         expect(lastError.value).toEqual(normalizeError(erro));
     });
-}
+});

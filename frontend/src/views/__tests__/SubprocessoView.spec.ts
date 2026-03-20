@@ -213,7 +213,7 @@ describe('SubprocessoView.vue', () => {
     });
 
     it('handles date limit update confirmation', async () => {
-        const {wrapper, store} = mountComponent();
+        const {wrapper} = mountComponent();
         await flushPromises();
         await (wrapper.vm as any).$nextTick();
 
@@ -243,7 +243,7 @@ describe('SubprocessoView.vue', () => {
     });
 
     it('reabre cadastro com sucesso', async () => {
-        const {wrapper, store} = mountComponent();
+        const {wrapper} = mountComponent();
         await flushPromises();
 
         await wrapper.find('[data-testid="btn-reabrir-cadastro"]').trigger('click');
