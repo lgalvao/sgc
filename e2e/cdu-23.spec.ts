@@ -1,8 +1,11 @@
- 
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcessoCadastroDisponibilizadoFixture} from './fixtures/fixtures-processos.js';
 import {navegarParaAtividadesVisualizacao} from './helpers/helpers-atividades.js';
-import {aceitarCadastroMapeamento, acessarSubprocessoGestor, devolverCadastroMapeamento} from './helpers/helpers-analise.js';
+import {
+    aceitarCadastroMapeamento,
+    acessarSubprocessoGestor,
+    devolverCadastroMapeamento
+} from './helpers/helpers-analise.js';
 import {navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
 import {loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
 import {resetDatabase} from './hooks/hooks-limpeza.js';

@@ -11,7 +11,7 @@ import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
 import sgc.processo.model.*;
-import sgc.processo.service.ProcessoService;
+import sgc.processo.service.*;
 import sgc.relatorio.*;
 import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.*;

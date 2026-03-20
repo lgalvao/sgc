@@ -15,10 +15,10 @@ import sgc.comum.erros.*;
 import sgc.organizacao.model.*;
 import sgc.processo.dto.*;
 import sgc.processo.model.*;
-import sgc.processo.service.ProcessoService;
-import sgc.subprocesso.service.SubprocessoService;
+import sgc.processo.service.*;
 import sgc.seguranca.*;
 import sgc.subprocesso.model.*;
+import sgc.subprocesso.service.*;
 
 import java.time.*;
 import java.util.*;

@@ -1,7 +1,7 @@
 package sgc.e2e;
 
 import com.fasterxml.jackson.annotation.*;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 import lombok.extern.slf4j.*;
 import org.jspecify.annotations.*;
 import org.springframework.context.annotation.*;
@@ -16,12 +16,12 @@ import org.springframework.transaction.annotation.*;
 import org.springframework.web.bind.annotation.*;
 import sgc.comum.erros.*;
 import sgc.mapa.model.*;
-import sgc.organizacao.UsuarioFacade;
+import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
 import sgc.processo.dto.*;
 import sgc.processo.model.*;
-import sgc.processo.service.ProcessoService;
+import sgc.processo.service.*;
 import sgc.subprocesso.model.*;
 
 import javax.sql.*;

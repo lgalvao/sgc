@@ -9,8 +9,8 @@ import sgc.mapa.service.*;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
-import sgc.processo.service.ProcessoService;
 import sgc.processo.model.*;
+import sgc.processo.service.*;
 import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.*;
 

@@ -7,7 +7,12 @@ import {
     criarProcessoMapaDisponibilizadoFixture
 } from './fixtures/fixtures-processos.js';
 import {login, USUARIOS} from './helpers/helpers-auth.js';
-import {esperarPaginaDetalhesProcesso, esperarPaginaSubprocesso, fazerLogout, navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
+import {
+    esperarPaginaDetalhesProcesso,
+    esperarPaginaSubprocesso,
+    fazerLogout,
+    navegarParaSubprocesso
+} from './helpers/helpers-navegacao.js';
 import {criarProcesso, verificarDetalhesSubprocesso} from './helpers/helpers-processos.js';
 
 test.describe('CDU-07 - Detalhar subprocesso', () => {

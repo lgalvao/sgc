@@ -4,18 +4,18 @@ import lombok.*;
 import lombok.extern.slf4j.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
-import sgc.comum.SgcMensagens;
+import sgc.comum.*;
 import sgc.comum.erros.*;
 import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
 import sgc.organizacao.model.*;
 import sgc.seguranca.*;
-import static sgc.seguranca.AcaoPermissao.*;
 import sgc.subprocesso.model.*;
 
 import java.util.*;
 import java.util.stream.*;
 
+import static sgc.seguranca.AcaoPermissao.*;
 import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 
 @Service

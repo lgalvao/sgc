@@ -1,11 +1,11 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { mount } from '@vue/test-utils';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {mount} from '@vue/test-utils';
 import AtribuicaoTemporariaView from '../AtribuicaoTemporariaView.vue';
-import { buscarUnidadePorCodigo } from '@/services/unidadeService';
-import { pesquisarUsuarios } from '@/services/usuarioService';
-import { criarAtribuicaoTemporaria } from '@/services/atribuicaoTemporariaService';
-import { createRouter, createMemoryHistory } from 'vue-router';
-import { createPinia, setActivePinia } from 'pinia';
+import {buscarUnidadePorCodigo} from '@/services/unidadeService';
+import {pesquisarUsuarios} from '@/services/usuarioService';
+import {criarAtribuicaoTemporaria} from '@/services/atribuicaoTemporariaService';
+import {createMemoryHistory, createRouter} from 'vue-router';
+import {createPinia, setActivePinia} from 'pinia';
 
 vi.mock('@/services/unidadeService', () => ({
   buscarUnidadePorCodigo: vi.fn(),

@@ -529,7 +529,7 @@ describe('ProcessoCadastroView.vue', () => {
                 BForm: {template: '<form @submit.prevent><slot /></form>'},
                 BFormGroup: {template: '<div><slot name="label">{{ label }}</slot><slot /></div>', props: ['label']},
                 BFormInput: {template: '<input />', props: ['modelValue']},
-                BFormSelect: {template: '<select></select>', props: ['modelValue']},
+                BFormSelect: {template: '<select></select>', props: ['modelValue', 'options'], inheritAttrs: false},
                 BButton: {template: '<button></button>'},
                 BModal: {template: '<div><slot /></div>'},
                 BSpinner: {template: '<span></span>'},

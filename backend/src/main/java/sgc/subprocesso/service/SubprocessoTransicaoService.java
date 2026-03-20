@@ -7,13 +7,13 @@ import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
 import org.springframework.util.*;
 import sgc.alerta.*;
+import sgc.comum.*;
 import sgc.mapa.model.*;
 import sgc.mapa.service.*;
 import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
 import sgc.processo.model.*;
-import sgc.comum.SgcMensagens;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
 

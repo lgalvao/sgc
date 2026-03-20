@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
 import lombok.experimental.*;
-import sgc.comum.SgcMensagens;
+import sgc.comum.*;
 import sgc.comum.model.*;
 
 @Entity

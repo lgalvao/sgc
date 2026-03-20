@@ -1,7 +1,7 @@
 package sgc.subprocesso.model;
 
 import lombok.*;
-import sgc.comum.SgcMensagens;
+import sgc.comum.*;
 
 /**
  * Define os tipos de transição de subprocesso e seus metadados para comunicação.

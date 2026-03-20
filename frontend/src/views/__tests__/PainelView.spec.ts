@@ -1,10 +1,10 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { mount } from '@vue/test-utils';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {mount} from '@vue/test-utils';
 import PainelView from '../PainelView.vue';
-import { createTestingPinia } from '@pinia/testing';
-import { useToastStore } from '@/stores/toast';
+import {createTestingPinia} from '@pinia/testing';
+import {useToastStore} from '@/stores/toast';
 import * as painelService from '@/services/painelService';
-import { createRouter, createMemoryHistory } from 'vue-router';
+import {createMemoryHistory, createRouter} from 'vue-router';
 
 vi.mock('@/services/painelService', () => ({
   listarAlertas: vi.fn(),

@@ -3,7 +3,7 @@ package sgc.processo.dto;
 import com.fasterxml.jackson.annotation.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
-import sgc.comum.SgcMensagens;
+import sgc.comum.*;
 import sgc.processo.model.*;
 import sgc.seguranca.sanitizacao.*;
 

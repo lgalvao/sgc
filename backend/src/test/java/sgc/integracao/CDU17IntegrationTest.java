@@ -8,7 +8,7 @@ import org.springframework.jdbc.core.*;
 import org.springframework.test.web.servlet.result.*;
 import org.springframework.transaction.annotation.*;
 import sgc.alerta.model.*;
-import sgc.comum.SgcMensagens;
+import sgc.comum.*;
 import sgc.fixture.*;
 import sgc.integracao.mocks.*;
 import sgc.mapa.model.*;

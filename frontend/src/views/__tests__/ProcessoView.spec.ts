@@ -1,5 +1,5 @@
-import {describe, it, expect, vi, beforeEach, afterEach} from "vitest";
-import {mount, flushPromises, DOMWrapper} from "@vue/test-utils";
+import {afterEach, beforeEach, describe, expect, it, vi} from "vitest";
+import {DOMWrapper, flushPromises, mount} from "@vue/test-utils";
 import ProcessoView from "../ProcessoDetalheView.vue";
 import {createTestingPinia} from "@pinia/testing";
 import {usePerfilStore} from "@/stores/perfil";

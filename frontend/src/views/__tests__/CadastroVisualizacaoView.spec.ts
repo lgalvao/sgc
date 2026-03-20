@@ -5,7 +5,6 @@ import {ref} from "vue";
 import * as useAcessoModule from "@/composables/useAcesso";
 import * as subprocessoService from "@/services/subprocessoService";
 import * as analiseService from "@/services/analiseService";
-import {useProcessosStore} from "@/stores/processos";
 import {useSubprocessosStore} from "@/stores/subprocessos";
 import CadastroVisualizacaoView from "../CadastroVisualizacaoView.vue";
 
@@ -23,6 +22,15 @@ vi.mock("@/services/analiseService", () => ({
 vi.mock("@/services/subprocessoService", () => ({
     buscarSubprocessoPorProcessoEUnidade: vi.fn(),
     buscarContextoEdicao: vi.fn(),
+}));
+
+const processosMock = {
+    processoDetalhe: ref<any>(null),
+    buscarProcessoDetalhe: vi.fn(),
+};
+
+vi.mock("@/composables/useProcessos", () => ({
+    useProcessos: () => processosMock
 }));
 
 const stubs = {
@@ -52,6 +60,7 @@ const stubs = {
 describe("CadastroVisualizacaoView coverage", () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        processosMock.processoDetalhe.value = null;
         vi.mocked(subprocessoService.buscarSubprocessoPorProcessoEUnidade).mockResolvedValue(123 as any);
         vi.mocked(subprocessoService.buscarContextoEdicao).mockResolvedValue({
             atividadesDisponiveis: [{codigo: 1, descricao: "Ativ 1", conhecimentos: []}],
@@ -60,6 +69,12 @@ describe("CadastroVisualizacaoView coverage", () => {
     });
 
     function createWrapper(accessOverrides = {}, processoDetalheOverride?: any) {
+        processosMock.processoDetalhe.value = processoDetalheOverride !== undefined ? processoDetalheOverride : {
+            codigo: 1,
+            tipo: "MAPEAMENTO",
+            unidades: [{sigla: "TESTE", codSubprocesso: 123}]
+        };
+
         vi.spyOn(useAcessoModule, 'useAcesso').mockReturnValue({
             podeHomologarCadastro: ref(true),
             podeAceitarCadastro: ref(true),
@@ -75,15 +90,7 @@ describe("CadastroVisualizacaoView coverage", () => {
             global: {
                 plugins: [createTestingPinia({
                     stubActions: true,
-                    initialState: {
-                        processos: {
-                            processoDetalhe: processoDetalheOverride !== undefined ? processoDetalheOverride : {
-                                codigo: 1,
-                                tipo: "MAPEAMENTO",
-                                unidades: [{sigla: "TESTE", codSubprocesso: 123}]
-                            }
-                        }
-                    }
+                    initialState: {}
                 })],
                 stubs
             },
@@ -105,9 +112,6 @@ describe("CadastroVisualizacaoView coverage", () => {
         (store.homologarRevisaoCadastro as any).mockResolvedValue(true);
         (store.aceitarRevisaoCadastro as any).mockResolvedValue(true);
         (store.devolverRevisaoCadastro as any).mockResolvedValue(true);
-
-        const procStore = useProcessosStore();
-        (procStore.buscarProcessoDetalhe as any).mockResolvedValue(null);
 
         vi.mocked(analiseService.listarAnalisesCadastro).mockResolvedValue([]);
         await wrapper.find('[data-testid="btn-vis-atividades-historico"]').trigger("click");
@@ -132,7 +136,7 @@ describe("CadastroVisualizacaoView coverage", () => {
         await flushPromises();
         expect(store.homologarCadastro).toHaveBeenCalled();
 
-        (procStore.processoDetalhe as any).tipo = "REVISAO";
+        (processosMock.processoDetalhe.value as any).tipo = "REVISAO";
         await wrapper.vm.$nextTick();
 
         (wrapper.vm as any).podeHomologarCadastro = true;
@@ -166,19 +170,18 @@ describe("CadastroVisualizacaoView coverage", () => {
         expect(vm.nomeUnidade).toBe("");
 
         // Testar subprocesso computed com processoDetalhe nulo
-        const procStore = useProcessosStore();
-        (procStore as any).processoDetalhe = null;
+        processosMock.processoDetalhe.value = null;
         expect(vm.subprocesso).toBeNull();
 
         // Testar subprocesso computed com arvore de unidades aninhadas
-        (procStore as any).processoDetalhe = {
+        processosMock.processoDetalhe.value = {
             unidades: [
                 { sigla: "OUTRA" },
                 { sigla: "PAI", filhos: [{ sigla: "TESTE", codSubprocesso: 123 }] }
             ]
         };
         expect(vm.subprocesso.codSubprocesso).toBe(123);
-        (procStore as any).processoDetalhe = { unidades: [{ sigla: "OUTRA" }] };
+        processosMock.processoDetalhe.value = { unidades: [{ sigla: "OUTRA" }] };
         expect(vm.subprocesso).toBeUndefined();
 
         // Testar computed estadoObservacaoDevolucao

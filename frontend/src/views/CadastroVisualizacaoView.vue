@@ -155,7 +155,7 @@ import HistoricoAnaliseModal from "@/components/processo/HistoricoAnaliseModal.v
 import ImpactoMapaModal from "@/components/mapa/ImpactoMapaModal.vue";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
-import {useProcessosStore} from "@/stores/processos";
+import {useProcessos} from "@/composables/useProcessos";
 import {useMapasStore} from "@/stores/mapas";
 import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useToastStore} from "@/stores/toast";
@@ -179,7 +179,7 @@ const props = defineProps<{
 }>();
 
 const router = useRouter();
-const processosStore = useProcessosStore();
+const processos = useProcessos();
 const mapasStore = useMapasStore();
 const subprocessosStore = useSubprocessosStore();
 const toastStore = useToastStore();
@@ -194,7 +194,7 @@ const siglaUnidade = computed(() => unidade.value?.sigla || unidadeId.value);
 const nomeUnidade = computed(() => (unidade.value?.nome ? `${unidade.value.nome}` : ""));
 
 const subprocesso = computed(() => {
-  if (!processosStore.processoDetalhe) return null;
+  if (!processos.processoDetalhe.value) return null;
 
   function encontrarUnidade(unidades: UnidadeParticipante[]): UnidadeParticipante | undefined {
     for (const u of unidades) {
@@ -207,7 +207,7 @@ const subprocesso = computed(() => {
     return undefined;
   }
 
-  return encontrarUnidade(processosStore.processoDetalhe.unidades);
+  return encontrarUnidade(processos.processoDetalhe.value.unidades);
 });
 
 const {
@@ -228,7 +228,7 @@ const codSubprocesso = computed(() => subprocesso.value?.codSubprocesso);
 
 const atividades = ref<Atividade[]>([]);
 
-const processoAtual = computed(() => processosStore.processoDetalhe);
+const processoAtual = computed(() => processos.processoDetalhe.value);
 const isRevisao = computed(() => processoAtual.value?.tipo === TipoProcesso.REVISAO);
 
 const analisesCadastro = ref<Analise[]>([]);
@@ -378,7 +378,7 @@ async function confirmarDevolucao() {
 }
 
 onMounted(async () => {
-  await processosStore.buscarProcessoDetalhe(codProcesso.value);
+  await processos.buscarProcessoDetalhe(codProcesso.value);
   
   // Tenta obter o ID do subprocesso de forma robusta
   let id: number | null | undefined = codSubprocesso.value;

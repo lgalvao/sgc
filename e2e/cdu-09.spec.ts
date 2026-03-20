@@ -1,15 +1,8 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {login, USUARIOS} from './helpers/helpers-auth.js';
 import {criarProcessoFixture} from './fixtures/fixtures-processos.js';
-import {
-    adicionarAtividade,
-    adicionarConhecimento,
-    navegarParaAtividades,
-} from './helpers/helpers-atividades.js';
-import {
-    abrirHistoricoAnalise,
-    fecharHistoricoAnalise,
-} from './helpers/helpers-analise.js';
+import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades,} from './helpers/helpers-atividades.js';
+import {abrirHistoricoAnalise, fecharHistoricoAnalise,} from './helpers/helpers-analise.js';
 import {
     fazerLogout,
     verificarAlertaPainel,

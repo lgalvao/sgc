@@ -6,8 +6,8 @@ import org.mockito.*;
 import org.mockito.junit.jupiter.*;
 import org.springframework.data.domain.*;
 import org.springframework.security.core.*;
-import sgc.comum.model.*;
 import sgc.alerta.*;
+import sgc.comum.model.*;
 import sgc.fixture.*;
 import sgc.organizacao.*;
 import sgc.organizacao.model.*;
@@ -18,16 +18,16 @@ import sgc.seguranca.*;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.*;
+import sgc.subprocesso.service.SubprocessoValidacaoService.*;
 
-import sgc.subprocesso.service.SubprocessoValidacaoService.ValidationResult;
 import java.time.*;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
-import static sgc.seguranca.AcaoPermissao.*;
 import static sgc.processo.model.AcaoProcesso.*;
+import static sgc.seguranca.AcaoPermissao.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("ProcessoService Test suite")
