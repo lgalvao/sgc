@@ -16,11 +16,13 @@ Esta análise combinou revisão manual de código com ferramentas automatizadas 
 - **SpotBugs** via `./gradlew :backend:spotbugsMain :backend:spotbugsTest`.
 - **npm audit** na raiz e no `frontend`.
 - **Validação de baseline do projeto**:
-  - `JAVA_HOME=/usr/lib/jvm/temurin-21-jdk-amd64 ./gradlew :backend:test`
+  - `./gradlew :backend:test`
   - `npm run lint`
   - `npm run typecheck`
   - `npm run test:unit`
 - **Leitura manual de código** em pontos sensíveis do backend e frontend.
+
+> As referências de arquivo e linha deste relatório correspondem ao estado do código no momento desta análise e podem variar com a evolução do repositório.
 
 ### Limitações do ambiente
 
@@ -267,7 +269,7 @@ O risco em produção está parcialmente mitigado, mas ainda há exposição em:
 
 - homologação;
 - ambientes locais compartilhados;
-- qualquer execução sem profile produtivo adequado.
+- qualquer execução sem profile de produção adequado.
 
 **Sugestões**
 
