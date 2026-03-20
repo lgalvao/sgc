@@ -3,6 +3,7 @@ import {flushPromises, mount} from "@vue/test-utils";
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import {reactive, ref} from "vue";
 import * as useAcessoModule from "@/composables/useAcesso";
+import * as useFluxoMapaModule from "@/composables/useFluxoMapa";
 import * as subprocessoService from "@/services/subprocessoService";
 import {useMapasStore} from "@/stores/mapas";
 import MapaView from "../MapaView.vue";
@@ -18,6 +19,7 @@ vi.mock("@/services/subprocessoService", () => ({
     buscarSubprocessoPorProcessoEUnidade: vi.fn(),
     buscarContextoEdicao: vi.fn(),
 }));
+vi.mock("@/composables/useFluxoMapa", () => ({useFluxoMapa: vi.fn()}));
 const subprocessosMock = reactive({
     subprocessoDetalhe: null as any,
     buscarSubprocessoPorProcessoEUnidade: vi.fn(),
@@ -28,6 +30,15 @@ const subprocessosMock = reactive({
     clearError: vi.fn(),
 });
 vi.mock("@/composables/useSubprocessos", () => ({useSubprocessos: () => subprocessosMock}));
+const fluxoMapaMock = reactive({
+    erro: null as any,
+    lastError: null as any,
+    clearError: vi.fn(),
+    adicionarCompetencia: vi.fn(),
+    atualizarCompetencia: vi.fn(),
+    removerCompetencia: vi.fn(),
+    disponibilizarMapa: vi.fn(),
+});
 
 const stubs = {
     LayoutPadrao: {template: '<div><slot /></div>'},
@@ -61,6 +72,14 @@ describe("MapaView coverage", () => {
         subprocessosMock.buscarSubprocessoDetalhe = vi.fn();
         subprocessosMock.atualizarStatusLocal = vi.fn();
         subprocessosMock.lastError = null;
+        fluxoMapaMock.erro = null;
+        fluxoMapaMock.lastError = null;
+        fluxoMapaMock.clearError = vi.fn();
+        fluxoMapaMock.adicionarCompetencia = vi.fn();
+        fluxoMapaMock.atualizarCompetencia = vi.fn();
+        fluxoMapaMock.removerCompetencia = vi.fn();
+        fluxoMapaMock.disponibilizarMapa = vi.fn();
+        vi.mocked(useFluxoMapaModule.useFluxoMapa).mockReturnValue(fluxoMapaMock as any);
         vi.mocked(subprocessoService.buscarSubprocessoPorProcessoEUnidade).mockResolvedValue(123 as any);
         vi.mocked(subprocessoService.buscarContextoEdicao).mockResolvedValue({
             atividadesDisponiveis: [],
@@ -107,10 +126,10 @@ describe("MapaView coverage", () => {
 
         const store = useMapasStore();
         store.buscarImpactoMapa = vi.fn().mockResolvedValue(null);
-        store.adicionarCompetencia = vi.fn().mockRejectedValue(new Error("Erro"));
-        store.atualizarCompetencia = vi.fn().mockResolvedValue(null);
-        store.removerCompetencia = vi.fn().mockRejectedValue(new Error("Erro"));
-        store.disponibilizarMapa = vi.fn().mockRejectedValue(new Error("Erro"));
+        fluxoMapaMock.adicionarCompetencia = vi.fn().mockRejectedValue(new Error("Erro"));
+        fluxoMapaMock.atualizarCompetencia = vi.fn().mockResolvedValue(null);
+        fluxoMapaMock.removerCompetencia = vi.fn().mockRejectedValue(new Error("Erro"));
+        fluxoMapaMock.disponibilizarMapa = vi.fn().mockRejectedValue(new Error("Erro"));
 
         (wrapper.vm as any).codSubprocesso = 123;
         await wrapper.vm.$nextTick();
@@ -135,7 +154,7 @@ describe("MapaView coverage", () => {
         expect((wrapper.vm as any).competenciaSendoEditada).toBeNull();
 
         // Cobre salvar competencia com erro
-        (store as any).lastError = {message: "Erro ao salvar", details: {}};
+        fluxoMapaMock.lastError = {message: "Erro ao salvar", details: {}};
         await (wrapper.vm as any).adicionarCompetenciaEFecharModal({descricao: "C1", atividadesSelecionadas: [1]});
         expect((wrapper.vm as any).fieldErrors.generic).toBeDefined();
 
@@ -146,18 +165,18 @@ describe("MapaView coverage", () => {
         expect((wrapper.vm as any).competenciaParaExcluir.codigo).toBe(1);
 
         // Cobre confirmar exclusão com erro
-        (store as any).lastError = {message: "Erro ao excluir"};
+        fluxoMapaMock.lastError = {message: "Erro ao excluir"};
         await (wrapper.vm as any).confirmarExclusaoCompetencia();
         expect((wrapper.vm as any).fieldErrors.generic).toBeDefined();
 
         // Cobre disponibilizar com erro
-        (store as any).lastError = {message: "Erro ao disponibilizar"};
+        fluxoMapaMock.lastError = {message: "Erro ao disponibilizar"};
         await (wrapper.vm as any).disponibilizarMapa({dataLimite: "2025-12-31", observacoes: "obs"});
         expect((wrapper.vm as any).fieldErrors.generic).toBeDefined();
 
         // Cobre remover atividade associada
         (wrapper.vm as any).removerAtividadeAssociada(1, 10);
-        expect(store.atualizarCompetencia).toHaveBeenCalled();
+        expect(fluxoMapaMock.atualizarCompetencia).toHaveBeenCalled();
     });
 
     it("mantém o botão disponibilizar desabilitado enquanto houver atividade sem competência", async () => {
@@ -243,9 +262,9 @@ describe("MapaView coverage", () => {
         vm.removerAtividadeAssociada(999, 10);
         
         // Cobre handleError com fieldErrors.atividadesIds
-        (store as any).lastError = { message: "Erro", details: { atividadesIds: "Erro ID" } };
+        fluxoMapaMock.lastError = { message: "Erro", details: { atividadesIds: "Erro ID" } };
         vm.competenciaSendoEditada = null; // Simula erro no adicionarCompetencia
-        store.adicionarCompetencia = vi.fn().mockRejectedValue(new Error("Erro"));
+        fluxoMapaMock.adicionarCompetencia = vi.fn().mockRejectedValue(new Error("Erro"));
         await vm.adicionarCompetenciaEFecharModal({ descricao: "C1", atividadesSelecionadas: [] });
         expect(vm.fieldErrors.atividades).toBeDefined();
     });
@@ -306,15 +325,15 @@ describe("MapaView coverage", () => {
         await wrapper.vm.$nextTick();
         
         // Cobre adicionarCompetenciaEFecharModal sucesso (atualizar e criar)
-        store.atualizarCompetencia = vi.fn().mockResolvedValue(true);
-        store.adicionarCompetencia = vi.fn().mockResolvedValue(true);
+        fluxoMapaMock.atualizarCompetencia = vi.fn().mockResolvedValue(true);
+        fluxoMapaMock.adicionarCompetencia = vi.fn().mockResolvedValue(true);
         vm.competenciaSendoEditada = {codigo: 1, descricao: "C1"};
         await vm.adicionarCompetenciaEFecharModal({ descricao: "C1", atividadesSelecionadas: [1] });
-        expect(store.atualizarCompetencia).toHaveBeenCalled();
+        expect(fluxoMapaMock.atualizarCompetencia).toHaveBeenCalled();
 
         vm.competenciaSendoEditada = null;
         await vm.adicionarCompetenciaEFecharModal({ descricao: "C1", atividadesSelecionadas: [1] });
-        expect(store.adicionarCompetencia).toHaveBeenCalled();
+        expect(fluxoMapaMock.adicionarCompetencia).toHaveBeenCalled();
 
         // Cobre iniciarEdicaoCompetencia
         vm.iniciarEdicaoCompetencia({codigo: 2, descricao: "C2"});
@@ -323,14 +342,14 @@ describe("MapaView coverage", () => {
 
         // Cobre exclusão sucesso
         vm.competenciaParaExcluir = {codigo: 1, descricao: "C1"};
-        store.removerCompetencia = vi.fn().mockResolvedValue(true);
+        fluxoMapaMock.removerCompetencia = vi.fn().mockResolvedValue(true);
         await vm.confirmarExclusaoCompetencia();
-        expect(store.removerCompetencia).toHaveBeenCalled();
+        expect(fluxoMapaMock.removerCompetencia).toHaveBeenCalled();
 
         // Cobre disponibilizarMapa sucesso
-        store.disponibilizarMapa = vi.fn().mockResolvedValue(true);
+        fluxoMapaMock.disponibilizarMapa = vi.fn().mockResolvedValue(true);
         await vm.disponibilizarMapa({ dataLimite: "2025-12-31", observacoes: "obs" });
-        expect(store.disponibilizarMapa).toHaveBeenCalled();
+        expect(fluxoMapaMock.disponibilizarMapa).toHaveBeenCalled();
         expect(pushMock).toHaveBeenCalledWith({name: "Painel"});
         
         // AtividadesSemCompetencia length === 0

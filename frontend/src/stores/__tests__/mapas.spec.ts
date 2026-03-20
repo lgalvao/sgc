@@ -6,15 +6,9 @@ import {useMapasStore} from "../mapas";
 
 vi.mock("@/services/subprocessoService", () => ({
     obterMapaCompleto: vi.fn(),
-    salvarMapaCompleto: vi.fn(),
     obterMapaAjuste: vi.fn(),
-    salvarMapaAjuste: vi.fn(),
     verificarImpactosMapa: vi.fn(),
     obterMapaVisualizacao: vi.fn(),
-    disponibilizarMapa: vi.fn(),
-    adicionarCompetencia: vi.fn(),
-    atualizarCompetencia: vi.fn(),
-    removerCompetencia: vi.fn(),
 }));
 
 describe("useMapasStore", () => {
@@ -63,41 +57,6 @@ describe("useMapasStore", () => {
         });
     });
 
-    describe("salvarMapa", () => {
-        it("deve chamar o serviço e atualizar o estado em caso de sucesso", async () => {
-            const request = {competencias: []};
-            const mockResponse: MapaCompleto = {
-                codigo: 1,
-                subprocessoCodigo: 1,
-                observacoes: "teste",
-                competencias: [
-                    {
-                        codigo: 1,
-                        descricao: "Nova",
-                        atividades: [],
-                    },
-                ],
-                situacao: "EM_ANDAMENTO",
-            };
-            vi.mocked(subprocessoService.salvarMapaCompleto).mockResolvedValue(mockResponse);
-
-            await context.store.salvarMapa(codSubprocesso, request);
-
-            expect(subprocessoService.salvarMapaCompleto).toHaveBeenCalledWith(
-                codSubprocesso,
-                request,
-            );
-            expect(context.store.mapaCompleto).toEqual(mockResponse);
-        });
-
-        it("deve lançar erro em caso de falha", async () => {
-            const request = {competencias: []};
-            vi.mocked(subprocessoService.salvarMapaCompleto).mockRejectedValue(new Error("Fail"));
-
-            await expect(context.store.salvarMapa(codSubprocesso, request)).rejects.toThrow("Fail");
-        });
-    });
-
     describe("buscarMapaAjuste", () => {
         it("deve chamar o serviço e atualizar o estado em caso de sucesso", async () => {
             const mockMapa: MapaAjuste = {
@@ -111,20 +70,6 @@ describe("useMapasStore", () => {
 
             expect(subprocessoService.obterMapaAjuste).toHaveBeenCalledWith(codSubprocesso);
             expect(context.store.mapaAjuste).toEqual(mockMapa);
-        });
-    });
-
-    describe("salvarAjustes", () => {
-        it("deve chamar o serviço com sucesso", async () => {
-            const request = {competencias: [], atividades: [], sugestoes: ""};
-            vi.mocked(subprocessoService.salvarMapaAjuste).mockResolvedValue(undefined);
-
-            await context.store.salvarAjustes(codSubprocesso, request);
-
-            expect(subprocessoService.salvarMapaAjuste).toHaveBeenCalledWith(
-                codSubprocesso,
-                request,
-            );
         });
     });
 
@@ -154,103 +99,6 @@ describe("useMapasStore", () => {
         });
     });
 
-    describe("adicionarCompetencia", () => {
-        it("deve chamar o serviço e atualizar o estado em caso de sucesso", async () => {
-            const competencia = {
-                descricao: "Nova competencia",
-                atividadesIds: [],
-            };
-            const mockResponse: MapaCompleto = {
-                codigo: 1,
-                subprocessoCodigo: 1,
-                observacoes: "teste",
-                competencias: [
-                    {
-                        codigo: 1,
-                        descricao: "Nova",
-                        atividades: [],
-                    },
-                ],
-                situacao: "EM_ANDAMENTO",
-            };
-            vi.mocked(subprocessoService.adicionarCompetencia).mockResolvedValue(
-                mockResponse,
-            );
-
-            await context.store.adicionarCompetencia(codSubprocesso, competencia);
-
-            expect(subprocessoService.adicionarCompetencia).toHaveBeenCalledWith(
-                codSubprocesso,
-                competencia,
-            );
-            expect(context.store.mapaCompleto).toEqual(mockResponse);
-        });
-    });
-
-    describe("atualizarCompetencia", () => {
-        it("deve chamar o serviço e atualizar o estado em caso de sucesso", async () => {
-            const codCompetencia = 1;
-            const competencia = {
-                descricao: "Competencia atualizada",
-                atividadesIds: [],
-            };
-            const mockResponse: MapaCompleto = {
-                codigo: 1,
-                subprocessoCodigo: 1,
-                observacoes: "teste",
-                competencias: [
-                    {
-                        codigo: 1,
-                        descricao: "Nova",
-                        atividades: [],
-                    },
-                ],
-                situacao: "EM_ANDAMENTO",
-            };
-            vi.mocked(subprocessoService.atualizarCompetencia).mockResolvedValue(
-                mockResponse,
-            );
-
-            await context.store.atualizarCompetencia(codSubprocesso, codCompetencia, competencia);
-
-            expect(subprocessoService.atualizarCompetencia).toHaveBeenCalledWith(
-                codSubprocesso,
-                codCompetencia,
-                competencia,
-            );
-            expect(context.store.mapaCompleto).toEqual(mockResponse);
-        });
-    });
-
-    describe("removerCompetencia", () => {
-        it("deve chamar o serviço e atualizar o estado em caso de sucesso", async () => {
-            const idCompetencia = 1;
-            const mockResponse: MapaCompleto = {
-                codigo: 1,
-                subprocessoCodigo: 1,
-                observacoes: "teste",
-                competencias: [
-                    {
-                        codigo: 1,
-                        descricao: "Nova",
-                        atividades: [],
-                    },
-                ],
-                situacao: "EM_ANDAMENTO",
-            };
-            vi.mocked(subprocessoService.removerCompetencia).mockResolvedValue(
-                mockResponse,
-            );
-
-            await context.store.removerCompetencia(codSubprocesso, idCompetencia);
-
-            expect(subprocessoService.removerCompetencia).toHaveBeenCalledWith(
-                codSubprocesso,
-                idCompetencia,
-            );
-            expect(context.store.mapaCompleto).toEqual(mockResponse);
-        });
-    });
 
     describe("buscarMapaVisualizacao", () => {
         it("deve chamar o serviço e atualizar o estado em caso de sucesso", async () => {
@@ -270,17 +118,4 @@ describe("useMapasStore", () => {
         });
     });
 
-    describe("disponibilizarMapa", () => {
-        it("deve chamar o serviço com sucesso", async () => {
-            const request = {observacoes: "teste", dataLimite: "2025-12-31"};
-            vi.mocked(subprocessoService.disponibilizarMapa).mockResolvedValue(undefined);
-
-            await context.store.disponibilizarMapa(codSubprocesso, request);
-
-            expect(subprocessoService.disponibilizarMapa).toHaveBeenCalledWith(
-                codSubprocesso,
-                request,
-            );
-        });
-    });
 });

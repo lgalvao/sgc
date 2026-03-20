@@ -57,7 +57,7 @@ public class ProcessoController {
     }
 
     @GetMapping("/{codigo}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")
+    @PreAuthorize("hasRole('ADMIN') or @processoService.checarAcesso(authentication, #codigo)")
     @JsonView(ProcessoViews.Publica.class)
     public ResponseEntity<Processo> obterPorCodigo(@PathVariable Long codigo) {
         return processoService

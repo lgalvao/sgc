@@ -3,9 +3,11 @@ import {mount} from '@vue/test-utils';
 import {createTestingPinia} from '@pinia/testing';
 import MapaView from '@/views/MapaView.vue';
 import {useMapasStore} from '@/stores/mapas';
+import * as useFluxoMapaModule from '@/composables/useFluxoMapa';
 import * as useSubprocessosModule from '@/composables/useSubprocessos';
 
 vi.mock('@/composables/useSubprocessos', () => ({useSubprocessos: vi.fn()}));
+vi.mock('@/composables/useFluxoMapa', () => ({useFluxoMapa: vi.fn()}));
 
 vi.mock("vue-router", () => ({
     useRouter: vi.fn(),
@@ -44,6 +46,15 @@ describe('MapaView Coverage', () => {
         ImpactoMapaModal: {template: '<div />'},
         BAlert: {template: '<div />'}
     };
+    const fluxoMapaMock = {
+        erro: null as any,
+        lastError: null as any,
+        clearError: vi.fn(),
+        adicionarCompetencia: vi.fn(),
+        atualizarCompetencia: vi.fn(),
+        removerCompetencia: vi.fn(),
+        disponibilizarMapa: vi.fn(),
+    };
 
     beforeEach(() => {
         vi.clearAllMocks();
@@ -52,6 +63,14 @@ describe('MapaView Coverage', () => {
         subprocessosMock.buscarSubprocessoPorProcessoEUnidade.mockResolvedValue(123);
         subprocessosMock.buscarContextoEdicao.mockResolvedValue(null);
         vi.mocked(useSubprocessosModule.useSubprocessos).mockReturnValue(subprocessosMock as any);
+        fluxoMapaMock.erro = null;
+        fluxoMapaMock.lastError = null;
+        fluxoMapaMock.clearError = vi.fn();
+        fluxoMapaMock.adicionarCompetencia = vi.fn();
+        fluxoMapaMock.atualizarCompetencia = vi.fn();
+        fluxoMapaMock.removerCompetencia = vi.fn();
+        fluxoMapaMock.disponibilizarMapa = vi.fn();
+        vi.mocked(useFluxoMapaModule.useFluxoMapa).mockReturnValue(fluxoMapaMock as any);
     });
 
     it('removerAtividadeAssociada does nothing if competency not found', async () => {
@@ -73,11 +92,11 @@ describe('MapaView Coverage', () => {
             }
         });
 
-        const mapasStore = useMapasStore(pinia);
+        const fluxoMapa = useFluxoMapaModule.useFluxoMapa() as any;
 
         await (wrapper.vm as any).removerAtividadeAssociada(999, 10);
 
-        expect(mapasStore.atualizarCompetencia).not.toHaveBeenCalled();
+        expect(fluxoMapa.atualizarCompetencia).not.toHaveBeenCalled();
     });
 
     it('abrirModalImpacto does nothing if codSubprocesso is missing', async () => {
@@ -151,12 +170,12 @@ describe('MapaView Coverage', () => {
             }
         });
 
-        const mapasStore = useMapasStore(pinia);
+        const fluxoMapa = useFluxoMapaModule.useFluxoMapa() as any;
         (wrapper.vm as any).codSubprocesso = 456;
 
         await (wrapper.vm as any).removerAtividadeAssociada(1, 10);
 
-        expect(mapasStore.atualizarCompetencia).toHaveBeenCalledWith(456, 1, {
+        expect(fluxoMapa.atualizarCompetencia).toHaveBeenCalledWith(456, 1, {
             descricao: 'Comp 1',
             atividadesIds: [20]
         });
@@ -208,8 +227,8 @@ describe('MapaView Coverage', () => {
         (wrapper.vm as any).codSubprocesso = null;
         await (wrapper.vm as any).disponibilizarMapa({});
 
-        const mapasStore = useMapasStore(pinia);
-        expect(mapasStore.disponibilizarMapa).not.toHaveBeenCalled();
+        const fluxoMapa = useFluxoMapaModule.useFluxoMapa() as any;
+        expect(fluxoMapa.disponibilizarMapa).not.toHaveBeenCalled();
     });
 
     it('fecharModalDisponibilizar clears state', async () => {
