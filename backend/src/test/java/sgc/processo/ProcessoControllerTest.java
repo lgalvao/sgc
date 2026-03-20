@@ -29,8 +29,10 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import sgc.integracao.mocks.TestSecurityConfig;
+
 @WebMvcTest(ProcessoController.class)
-@Import(RestExceptionHandler.class)
+@Import({TestSecurityConfig.class, RestExceptionHandler.class})
 @Tag("integration")
 @DisplayName("ProcessoController")
 class ProcessoControllerTest {
