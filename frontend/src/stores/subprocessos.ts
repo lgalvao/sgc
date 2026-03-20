@@ -21,8 +21,8 @@ import {
     reabrirCadastro as serviceReabrirCadastro,
     reabrirRevisaoCadastro as serviceReabrirRevisaoCadastro,
 } from "@/services/processoService";
+import {useProcessos} from "@/composables/useProcessos";
 import {usePerfilStore} from "@/stores/perfil";
-import {useProcessosStore} from "@/stores/processos";
 import {useMapasStore} from "@/stores/mapas";
 import type {
     AceitarCadastroRequest,
@@ -45,9 +45,9 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
             await withErrorHandling(async () => {
                 await acao();
 
-                const processosStore = useProcessosStore();
-                if (processosStore.processoDetalhe) {
-                    await processosStore.buscarProcessoDetalhe(processosStore.processoDetalhe.codigo);
+                const processos = useProcessos();
+                if (processos.processoDetalhe.value) {
+                    await processos.buscarProcessoDetalhe(processos.processoDetalhe.value.codigo);
                 }
             });
             return true;

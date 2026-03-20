@@ -1,8 +1,9 @@
 import {createPinia, setActivePinia} from 'pinia';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {ref} from 'vue';
+import {useProcessos} from '@/composables/useProcessos';
 import {useSubprocessosStore} from '../subprocessos';
 import {SituacaoSubprocesso} from '@/types/tipos';
-import {useProcessosStore} from '../processos';
 import {usePerfilStore} from '../perfil';
 import {useMapasStore} from '../mapas';
 import {
@@ -48,8 +49,8 @@ vi.mock('@/services/cadastroService', () => ({
     homologarRevisaoCadastro: vi.fn(),
 }));
 
-vi.mock('../processos', () => ({
-    useProcessosStore: vi.fn(),
+vi.mock('@/composables/useProcessos', () => ({
+    useProcessos: vi.fn(),
 }));
 vi.mock('../perfil', () => ({
     usePerfilStore: vi.fn(),
@@ -73,9 +74,9 @@ vi.mock('@/axios-setup', () => ({
 describe('Subprocessos store', () => {
     let store: ReturnType<typeof useSubprocessosStore>;
 
-    const mockProcessosStore = {
+    const mockProcessos = {
         buscarProcessoDetalhe: vi.fn(),
-        processoDetalhe: {codigo: 999},
+        processoDetalhe: ref({codigo: 999}),
     };
     const mockPerfilStore = {
         perfilSelecionado: null as string | null,
@@ -92,7 +93,8 @@ describe('Subprocessos store', () => {
 
         vi.clearAllMocks();
 
-        (useProcessosStore as any).mockReturnValue(mockProcessosStore);
+        mockProcessos.processoDetalhe.value = {codigo: 999} as any;
+        (useProcessos as any).mockReturnValue(mockProcessos);
         (usePerfilStore as any).mockReturnValue(mockPerfilStore);
         (useMapasStore as any).mockReturnValue(mockMapasStore);
 
@@ -411,4 +413,3 @@ describe('Subprocessos store', () => {
         });
     });
 });
-
