@@ -84,16 +84,16 @@ O projeto possui uma suite abrangente de testes e verificações de qualidade.
 
 ### Execução de Testes
 
-| Tipo                   | Comando                              | Descrição                                         |
-|------------------------|--------------------------------------|---------------------------------------------------|
-| **Todos backend**      | `./gradlew :backend:test`            | Executa suite completa (Unitários + Integração).  |
-| **Unitários backend**  | `./gradlew :backend:unitTest`        | Executa apenas testes isolados (Rápido).          |
-| **Integração backend** | `./gradlew :backend:integrationTest` | Executa apenas fluxos completos (Mais lento).     |
-| **Unitários frontend** | `cd frontend && npm run test:unit`   | Vitest para componentes e lógica.                 |
-| **End-to-End (E2E)**   | `npm run test:e2e`                   | Playwright simulando fluxos reais.                |
-| **Type check**         | `npm run typecheck`                  | Verificação de erros de tipos para frontend e E2E |
+| Tipo                   | Comando                              | Descrição                                                              |
+|------------------------|--------------------------------------|------------------------------------------------------------------------|
+| **Todos backend**      | `./gradlew :backend:test`            | Executa suite completa (Unitários + Integração).                       |
+| **Unitários backend**  | `./gradlew :backend:unitTest`        | Executa apenas testes isolados (Rápido).                               |
+| **Integração backend** | `./gradlew :backend:integrationTest` | Executa apenas fluxos completos (Mais lento).                          |
+| **Unitários frontend** | `cd frontend && npm run test:unit`   | Vitest para componentes e lógica.                                      |
+| **End-to-End (E2E)**   | `npm run test:e2e`                   | Playwright simulando fluxos reais.                                     |
+| **Type check**         | `npm run typecheck`                  | Verificação de erros de tipos para frontend e E2E                      |
 | **Lint (OXC)**         | `npm run lint:ox`                    | Verificação ultra-rápida com [OXC](https://github.com/oxc-project/oxc) |
-| **Lint (Completo)**    | `npm run lint`                       | Executa OXC seguido de ESLint (para regras complexas) |
+| **Lint (Completo)**    | `npm run lint`                       | Executa OXC seguido de ESLint (para regras complexas)                  |
 
 ### Verificação de qualidade
 
