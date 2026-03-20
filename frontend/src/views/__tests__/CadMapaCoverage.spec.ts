@@ -1,8 +1,8 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {mount} from '@vue/test-utils';
 import {createTestingPinia} from '@pinia/testing';
+import {useMapas} from '@/composables/useMapas';
 import MapaView from '@/views/MapaView.vue';
-import {useMapasStore} from '@/stores/mapas';
 import * as useFluxoMapaModule from '@/composables/useFluxoMapa';
 import * as useSubprocessosModule from '@/composables/useSubprocessos';
 
@@ -91,6 +91,10 @@ describe('MapaView Coverage', () => {
                 stubs: commonStubs
             }
         });
+        const mapas = useMapas();
+        mapas.mapaCompleto.value = {
+            competencias: [{codigo: 1, descricao: 'Comp 1', atividades: [{codigo: 10}]}]
+        } as any;
 
         const fluxoMapa = useFluxoMapaModule.useFluxoMapa() as any;
 
@@ -117,13 +121,14 @@ describe('MapaView Coverage', () => {
             }
         });
 
-        const mapasStore = useMapasStore(pinia);
+        const mapas = useMapas();
+        mapas.buscarImpactoMapa = vi.fn().mockResolvedValue(undefined);
 
         await wrapper.vm.$nextTick(); // Wait for mount
 
         await (wrapper.vm as any).abrirModalImpacto();
 
-        expect(mapasStore.buscarImpactoMapa).not.toHaveBeenCalled();
+        expect(mapas.buscarImpactoMapa).not.toHaveBeenCalled();
     });
 
     it('abrirModalImpacto calls store when codSubprocesso is present', async () => {
@@ -141,13 +146,13 @@ describe('MapaView Coverage', () => {
             }
         });
 
-        const mapasStore = useMapasStore(pinia);
-        (mapasStore.buscarImpactoMapa as any).mockResolvedValue(undefined);
+        const mapas = useMapas();
+        mapas.buscarImpactoMapa = vi.fn().mockResolvedValue(undefined);
         (wrapper.vm as any).codSubprocesso = 456;
 
         await (wrapper.vm as any).abrirModalImpacto();
 
-        expect(mapasStore.buscarImpactoMapa).toHaveBeenCalledWith(456);
+        expect(mapas.buscarImpactoMapa).toHaveBeenCalledWith(456);
         expect((wrapper.vm as any).mostrarModalImpacto).toBe(true);
     });
 
@@ -169,6 +174,10 @@ describe('MapaView Coverage', () => {
                 stubs: commonStubs
             }
         });
+        const mapas = useMapas();
+        mapas.mapaCompleto.value = {
+            competencias: [{codigo: 1, descricao: 'Comp 1', atividades: [{codigo: 10}, {codigo: 20}]}]
+        } as any;
 
         const fluxoMapa = useFluxoMapaModule.useFluxoMapa() as any;
         (wrapper.vm as any).codSubprocesso = 456;

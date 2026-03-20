@@ -10,6 +10,9 @@ import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
 import sgc.processo.model.*;
 import sgc.subprocesso.model.*;
+import sgc.mapa.model.*;
+import sgc.mapa.service.*;
+import sgc.mapa.repository.*; // Assuming this is the package, need to verify. Will just use wildcard for now or specific if known. Let's use standard.
 
 import java.io.*;
 import java.util.*;
@@ -36,6 +39,8 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
     private final MovimentacaoRepo movimentacaoRepo;
     private final HierarquiaService hierarquiaService;
     private final ProcessoRepo processoRepo;
+    private final MapaRepo mapaRepo;
+    private final AtividadeRepo atividadeRepo;
 
     // ── Interface Spring Security ───────────────────────────────────
 
@@ -53,6 +58,8 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
         return switch (alvo) {
             case Subprocesso sp -> verificarSubprocesso(usuario, sp, acao);
             case Processo p -> verificarProcesso(usuario, p, acao);
+            case Mapa m -> verificarSubprocesso(usuario, m.getSubprocesso(), acao);
+            case Atividade a -> verificarSubprocesso(usuario, a.getMapa().getSubprocesso(), acao);
             default -> false;
         };
     }
@@ -75,6 +82,12 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
                     .orElse(false);
             case "Processo" -> processoRepo.buscarPorCodigoComParticipantes((Long) codigoAlvo)
                     .map(p -> verificarProcesso(usuario, p, acao))
+                    .orElse(false);
+            case "Mapa" -> mapaRepo.findById((Long) codigoAlvo)
+                    .map(m -> verificarSubprocesso(usuario, m.getSubprocesso(), acao))
+                    .orElse(false);
+            case "Atividade" -> atividadeRepo.findById((Long) codigoAlvo)
+                    .map(a -> verificarSubprocesso(usuario, a.getMapa().getSubprocesso(), acao))
                     .orElse(false);
             default -> false;
         };

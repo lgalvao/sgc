@@ -4,8 +4,8 @@ import {beforeEach, describe, expect, it, vi} from "vitest";
 import {reactive, ref} from "vue";
 import * as useAcessoModule from "@/composables/useAcesso";
 import * as useFluxoMapaModule from "@/composables/useFluxoMapa";
+import {useMapas} from "@/composables/useMapas";
 import * as subprocessoService from "@/services/subprocessoService";
-import {useMapasStore} from "@/stores/mapas";
 import MapaView from "../MapaView.vue";
 
 const {pushMock} = vi.hoisted(() => ({pushMock: vi.fn()}));
@@ -94,6 +94,12 @@ describe("MapaView coverage", () => {
             podeDisponibilizarMapa: ref(true),
         } as any);
 
+        const mapas = useMapas();
+        mapas.mapaCompleto.value = initialMapaCompleto;
+        mapas.impactoMapa.value = null;
+        mapas.erro.value = null;
+        mapas.buscarImpactoMapa = vi.fn().mockResolvedValue(null);
+
         return mount(MapaView, {
             global: {
                 plugins: [createTestingPinia({
@@ -124,7 +130,7 @@ describe("MapaView coverage", () => {
         const wrapper = createWrapper();
         await flushPromises();
 
-        const store = useMapasStore();
+        const store = useMapas();
         store.buscarImpactoMapa = vi.fn().mockResolvedValue(null);
         fluxoMapaMock.adicionarCompetencia = vi.fn().mockRejectedValue(new Error("Erro"));
         fluxoMapaMock.atualizarCompetencia = vi.fn().mockResolvedValue(null);
@@ -135,7 +141,7 @@ describe("MapaView coverage", () => {
         await wrapper.vm.$nextTick();
 
         // Cobre erro no store
-        (store.erro as any) = "Erro no Mapa";
+        store.erro.value = "Erro no Mapa";
         await wrapper.vm.$nextTick();
         expect(wrapper.text()).toContain("Erro no Mapa");
 
@@ -159,7 +165,7 @@ describe("MapaView coverage", () => {
         expect((wrapper.vm as any).fieldErrors.generic).toBeDefined();
 
         // Cobre excluir competencia
-        (store.mapaCompleto as any) = {competencias: [{codigo: 1, descricao: "C1"}]};
+        store.mapaCompleto.value = {competencias: [{codigo: 1, descricao: "C1"}]} as any;
         (wrapper.vm as any).excluirCompetencia(1);
         expect((wrapper.vm as any).mostrarModalExcluirCompetencia).toBe(true);
         expect((wrapper.vm as any).competenciaParaExcluir.codigo).toBe(1);
@@ -189,24 +195,22 @@ describe("MapaView coverage", () => {
                 }
             ]
         });
-        const store = useMapasStore();
+        const store = useMapas();
         await flushPromises();
 
         (wrapper.vm as any).atividades = [
             {codigo: 1, descricao: "Atividade 1"},
             {codigo: 2, descricao: "Atividade 2"}
         ];
-        store.$patch({
-            mapaCompleto: {
-                competencias: [
-                    {
-                        codigo: 10,
-                        descricao: "Competência 1",
-                        atividades: [{codigo: 1, descricao: "Atividade 1"}]
-                    }
-                ]
-            }
-        });
+        store.mapaCompleto.value = {
+            competencias: [
+                {
+                    codigo: 10,
+                    descricao: "Competência 1",
+                    atividades: [{codigo: 1, descricao: "Atividade 1"}]
+                }
+            ]
+        } as any;
 
         expect((wrapper.vm as any).atividadesSemCompetencia).toHaveLength(1);
         expect(wrapper.find('[data-testid="btn-cad-mapa-disponibilizar"]').attributes("disabled")).toBeDefined();
@@ -252,8 +256,8 @@ describe("MapaView coverage", () => {
         expect(vm.notificacaoDisponibilizacao).toBe("");
         
         // Cobre não encontrar competência em excluirCompetencia
-        const store = useMapasStore();
-        (store.mapaCompleto as any) = { competencias: [{ codigo: 1, descricao: "C1" }] };
+        const store = useMapas();
+        store.mapaCompleto.value = { competencias: [{ codigo: 1, descricao: "C1" }] } as any;
         vm.excluirCompetencia(999);
         expect(vm.competenciaParaExcluir).toBeNull();
 
@@ -273,7 +277,7 @@ describe("MapaView coverage", () => {
         const wrapper = createWrapper();
         await flushPromises();
         const vm = wrapper.vm as any;
-        const store = useMapasStore();
+        const store = useMapas();
         const subprocessosStore = subprocessosMock as any;
         
         subprocessosStore.buscarContextoEdicao = vi.fn().mockResolvedValue({
@@ -312,12 +316,12 @@ describe("MapaView coverage", () => {
         expect(vm.mostrarModalCriarNovaCompetencia).toBe(false);
 
         // Cobre BAlert dismissed event via store
-        store.erro = "Teste Erro";
+        store.erro.value = "Teste Erro";
         await wrapper.vm.$nextTick();
         const alert = wrapper.findComponent({ name: 'BAlert' });
         if (alert.exists()) {
             await alert.vm.$emit('dismissed');
-            expect(store.erro).toBeNull();
+            expect(store.erro.value).toBeNull();
         }
 
         // Cobre v-model ModalConfirmacao
