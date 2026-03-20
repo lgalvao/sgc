@@ -1,9 +1,9 @@
 import {createPinia, setActivePinia} from 'pinia';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {useMapas} from '@/composables/useMapas';
 import {useSubprocessos} from '@/composables/useSubprocessos';
 import {SituacaoSubprocesso} from '@/types/tipos';
 import {usePerfilStore} from '../perfil';
-import {useMapasStore} from '../mapas';
 import {
     buscarContextoEdicao,
     buscarSubprocessoDetalhe,
@@ -19,8 +19,8 @@ vi.mock('@/services/subprocessoService', () => ({
 vi.mock('../perfil', () => ({
     usePerfilStore: vi.fn(),
 }));
-vi.mock('../mapas', () => ({
-    useMapasStore: vi.fn(),
+vi.mock('@/composables/useMapas', () => ({
+    useMapas: vi.fn(),
 }));
 
 const {mockApiClient} = vi.hoisted(() => ({
@@ -54,7 +54,7 @@ describe('Subprocessos store', () => {
         vi.clearAllMocks();
 
         (usePerfilStore as any).mockReturnValue(mockPerfilStore);
-        (useMapasStore as any).mockReturnValue(mockMapasStore);
+        (useMapas as any).mockReturnValue(mockMapasStore);
 
         store = useSubprocessos();
     });

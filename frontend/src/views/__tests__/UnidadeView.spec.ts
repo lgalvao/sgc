@@ -3,8 +3,8 @@ import {flushPromises, mount} from '@vue/test-utils';
 import UnidadeView from '@/views/UnidadeView.vue';
 import EmptyState from '@/components/comum/EmptyState.vue';
 import {BAlert} from 'bootstrap-vue-next';
+import {useMapas} from '@/composables/useMapas';
 import {usePerfilStore} from '@/stores/perfil';
-import {useMapasStore} from '@/stores/mapas';
 import {buscarUsuarioPorTitulo} from '@/services/usuarioService';
 import {buscarArvoreUnidade} from '@/services/unidadeService';
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
@@ -124,7 +124,8 @@ describe('UnidadeView.vue', () => {
         });
 
         perfilStore = usePerfilStore();
-        mapasStore = useMapasStore();
+        mapasStore = useMapas();
+        mapasStore.mapaCompleto.value = null;
 
         return {wrapper: context.wrapper, perfilStore, mapasStore};
     };
@@ -204,7 +205,7 @@ describe('UnidadeView.vue', () => {
     it('renders and clicks "Mapa vigente" button when map exists', async () => {
         const {wrapper, mapasStore} = createWrapper();
         await flushPromises();
-        mapasStore.mapaCompleto = {subprocessoCodigo: 99};
+        mapasStore.mapaCompleto.value = {subprocessoCodigo: 99} as any;
         await wrapper.vm.$nextTick();
 
         const btn = wrapper.find('[data-testid="btn-mapa-vigente"]');

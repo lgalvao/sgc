@@ -2,7 +2,7 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {flushPromises, mount, RouterLinkStub} from '@vue/test-utils';
 import {createTestingPinia} from '@pinia/testing';
 import SubprocessoView from '@/views/SubprocessoView.vue';
-import {useMapasStore} from '@/stores/mapas';
+import {useMapas} from '@/composables/useMapas';
 import {reactive, ref} from 'vue';
 import {SituacaoSubprocesso, TipoProcesso} from '@/types/tipos';
 import * as processoService from '@/services/processoService';
@@ -149,7 +149,7 @@ describe('SubprocessoView.vue', () => {
         });
 
         const store = subprocessosMock as any;
-        const mapaStore = useMapasStore(pinia);
+        const mapaStore = useMapas();
         processosMock.processoDetalhe.value = {situacao: 'EM_ANDAMENTO'};
 
         (store.buscarSubprocessoPorProcessoEUnidade as any).mockImplementation(async () => 10);
@@ -157,7 +157,8 @@ describe('SubprocessoView.vue', () => {
             store.subprocessoDetalhe = subprocessoToUse as any;
             return subprocessoToUse;
         });
-        (mapaStore.buscarMapaCompleto as any).mockResolvedValue({});
+        mapaStore.buscarMapaCompleto = vi.fn().mockResolvedValue({});
+        mapaStore.mapaCompleto.value = null;
 
         (processosMock.enviarLembrete as any).mockImplementation(async (codProcesso: number, codUnidade: number) => {
             try {

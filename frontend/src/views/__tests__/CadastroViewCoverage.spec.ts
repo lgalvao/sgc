@@ -4,9 +4,9 @@ import {beforeEach, describe, expect, it, vi} from "vitest";
 import {reactive, ref} from "vue";
 import * as useAcessoModule from "@/composables/useAcesso";
 import * as useFluxoSubprocessoModule from "@/composables/useFluxoSubprocesso";
+import {useMapas} from "@/composables/useMapas";
 import * as useProcessosModule from "@/composables/useProcessos";
 import * as subprocessoService from "@/services/subprocessoService";
-import {useMapasStore} from "@/stores/mapas";
 import {SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 import CadastroView from "../CadastroView.vue";
 
@@ -112,6 +112,10 @@ describe("CadastroView coverage", () => {
         } as any);
 
         const pinia = createTestingPinia({stubActions: true});
+        const mapas = useMapas();
+        mapas.mapaCompleto.value = {codigo: 100} as any;
+        mapas.impactoMapa.value = null;
+        mapas.erro.value = null;
 
         return mount(CadastroView, {
             global: {
@@ -131,9 +135,6 @@ describe("CadastroView coverage", () => {
 
         // Cobre handleAdicionarAtividade com erro
         const store = subprocessosMock as any;
-        const mapasStore = useMapasStore();
-
-        mapasStore.mapaCompleto = { codigo: 100 } as any;
 
         // Simula falha ao adicionar
         await (wrapper.vm as any).handleAdicionarAtividade();
@@ -232,8 +233,8 @@ describe("CadastroView coverage", () => {
         expect(vm.mostrarModalHistorico).toBe(true);
 
         // abrir/fechar ModalImpacto
-        const mapasStore = useMapasStore();
-        mapasStore.buscarImpactoMapa = vi.fn().mockResolvedValue(null);
+        const mapas = useMapas();
+        mapas.buscarImpactoMapa = vi.fn().mockResolvedValue(null);
         vm.abrirModalImpacto();
         expect(vm.mostrarModalImpacto).toBe(true);
         vm.fecharModalImpacto();

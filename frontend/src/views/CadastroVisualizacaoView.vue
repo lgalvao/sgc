@@ -149,7 +149,6 @@
 import {BButton, BCard, BCardBody, BCardTitle, BFormGroup, BFormInvalidFeedback, BFormTextarea} from "bootstrap-vue-next";
 import {computed, onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
-import {storeToRefs} from "pinia";
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import HistoricoAnaliseModal from "@/components/processo/HistoricoAnaliseModal.vue";
 import ImpactoMapaModal from "@/components/mapa/ImpactoMapaModal.vue";
@@ -157,7 +156,7 @@ import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import {useProcessos} from "@/composables/useProcessos";
 import {useFluxoSubprocesso} from "@/composables/useFluxoSubprocesso";
-import {useMapasStore} from "@/stores/mapas";
+import {useMapas} from "@/composables/useMapas";
 import {useSubprocessos} from "@/composables/useSubprocessos";
 import {useToastStore} from "@/stores/toast";
 import type {
@@ -182,10 +181,10 @@ const props = defineProps<{
 const router = useRouter();
 const processos = useProcessos();
 const fluxoSubprocesso = useFluxoSubprocesso();
-const mapasStore = useMapasStore();
+const mapasStore = useMapas();
 const subprocessosStore = useSubprocessos();
 const toastStore = useToastStore();
-const {impactoMapa: impactos} = storeToRefs(mapasStore);
+const {impactoMapa: impactos} = mapasStore;
 
 const unidadeId = computed(() => props.sigla);
 const codProcesso = computed(() => Number(props.codProcesso));

@@ -152,7 +152,6 @@ import {BAlert, BBadge, BButton} from "bootstrap-vue-next";
 import AppAlert from "@/components/comum/AppAlert.vue";
 import {computed, nextTick, onMounted, ref, watch} from "vue";
 import {useRouter} from "vue-router";
-import {storeToRefs} from "pinia";
 import {badgeClass} from "@/utils";
 import ImpactoMapaModal from "@/components/mapa/ImpactoMapaModal.vue";
 import ImportarAtividadesModal from "@/components/atividades/ImportarAtividadesModal.vue";
@@ -169,7 +168,7 @@ import {useAtividadeForm} from "@/composables/useAtividadeForm";
 import {useFluxoSubprocesso} from "@/composables/useFluxoSubprocesso";
 import {useProcessos} from "@/composables/useProcessos";
 import {useSubprocessos} from "@/composables/useSubprocessos";
-import {useMapasStore} from "@/stores/mapas";
+import {useMapas} from "@/composables/useMapas";
 import {useNotification} from "@/composables/useNotification";
 import {useToastStore} from "@/stores/toast";
 import {usePerfil} from "@/composables/usePerfil";
@@ -206,18 +205,18 @@ const props = defineProps<{
 
 const router = useRouter();
 const subprocessosStore = useSubprocessos();
-const mapasStore = useMapasStore();
+const mapasStore = useMapas();
 const processos = useProcessos();
 const fluxoSubprocesso = useFluxoSubprocesso();
 const {notify, notificacao, clear} = useNotification();
 const toastStore = useToastStore();
-const {impactoMapa: impactos} = storeToRefs(mapasStore);
+const {impactoMapa: impactos} = mapasStore;
 
 const perfil = usePerfil();
 const isChefe = computed(() => perfil.isChefe.value);
 const codSubprocesso = ref<number | null>(null);
 
-const codMapa = computed(() => mapasStore.mapaCompleto?.codigo || null);
+const codMapa = computed(() => mapasStore.mapaCompleto.value?.codigo || null);
 const subprocesso = computed(() => subprocessosStore.subprocessoDetalhe);
 const unidade = ref<Unidade | null>(null);
 const {

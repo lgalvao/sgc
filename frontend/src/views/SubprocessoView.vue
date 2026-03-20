@@ -221,7 +221,7 @@ import SubprocessoCards from "@/components/processo/SubprocessoCards.vue";
 import SubprocessoModal from "@/components/processo/SubprocessoModal.vue";
 import AppAlert from "@/components/comum/AppAlert.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
-import {useMapasStore} from "@/stores/mapas";
+import {useMapas} from "@/composables/useMapas";
 import {useNotification} from "@/composables/useNotification";
 import {useModalManager} from "@/composables/useModalManager";
 import {useLoadingManager} from "@/composables/useLoadingManager";
@@ -259,7 +259,7 @@ const subprocessosStore = useSubprocessos();
 const fluxoSubprocesso = useFluxoSubprocesso();
 const processos = useProcessos();
 
-const mapaStore = useMapasStore();
+const mapaStore = useMapas();
 const {notificacao, notify, clear} = useNotification();
 const toastStore = useToastStore();
 const toast = useToast();
@@ -301,7 +301,7 @@ const isProcessoFinalizado = computed(() => {
   return processos.processoDetalhe.value?.situacao === SituacaoProcesso.FINALIZADO;
 });
 
-const mapa = computed(() => mapaStore.mapaCompleto);
+const mapa = computed(() => mapaStore.mapaCompleto.value);
 const movimentacoes = computed<Movimentacao[]>(
     () => subprocesso.value?.movimentacoes || [],
 );

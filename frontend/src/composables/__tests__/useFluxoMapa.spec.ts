@@ -1,4 +1,5 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
+import {ref} from "vue";
 
 vi.mock("@/services/subprocessoService", () => ({
     salvarMapaCompleto: vi.fn(),
@@ -10,17 +11,17 @@ vi.mock("@/services/subprocessoService", () => ({
 }));
 
 const mapasStoreMock = {
-    mapaCompleto: null as any,
+    mapaCompleto: ref(null as any),
 };
 
-vi.mock("@/stores/mapas", () => ({
-    useMapasStore: () => mapasStoreMock,
+vi.mock("@/composables/useMapas", () => ({
+    useMapas: () => mapasStoreMock,
 }));
 
 describe("useFluxoMapa", () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        mapasStoreMock.mapaCompleto = null;
+        mapasStoreMock.mapaCompleto.value = null;
     });
 
     it("deve adicionar competencia e atualizar mapaCompleto", async () => {
@@ -33,7 +34,7 @@ describe("useFluxoMapa", () => {
         await fluxoMapa.adicionarCompetencia(10, {descricao: "Comp", atividadesIds: []});
 
         expect(service.adicionarCompetencia).toHaveBeenCalledWith(10, {descricao: "Comp", atividadesIds: []});
-        expect(mapasStoreMock.mapaCompleto).toEqual(resposta);
+        expect(mapasStoreMock.mapaCompleto.value).toEqual(resposta);
     });
 
     it("deve atualizar competencia e atualizar mapaCompleto", async () => {
@@ -46,7 +47,7 @@ describe("useFluxoMapa", () => {
         await fluxoMapa.atualizarCompetencia(10, 20, {descricao: "Comp", atividadesIds: [1]});
 
         expect(service.atualizarCompetencia).toHaveBeenCalledWith(10, 20, {descricao: "Comp", atividadesIds: [1]});
-        expect(mapasStoreMock.mapaCompleto).toEqual(resposta);
+        expect(mapasStoreMock.mapaCompleto.value).toEqual(resposta);
     });
 
     it("deve remover competencia e atualizar mapaCompleto", async () => {
@@ -59,7 +60,7 @@ describe("useFluxoMapa", () => {
         await fluxoMapa.removerCompetencia(10, 20);
 
         expect(service.removerCompetencia).toHaveBeenCalledWith(10, 20);
-        expect(mapasStoreMock.mapaCompleto).toEqual(resposta);
+        expect(mapasStoreMock.mapaCompleto.value).toEqual(resposta);
     });
 
     it("deve disponibilizar mapa", async () => {

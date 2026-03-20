@@ -9,16 +9,16 @@ import {
 import type {DisponibilizarMapaRequest, SalvarCompetenciaRequest} from "@/types/tipos";
 import {useAsyncAction} from "@/composables/useAsyncAction";
 import {useErrorHandler} from "@/composables/useErrorHandler";
-import {useMapasStore} from "@/stores/mapas";
+import {useMapas} from "@/composables/useMapas";
 
 export function useFluxoMapa() {
-    const mapasStore = useMapasStore();
+    const mapas = useMapas();
     const {lastError, clearError} = useErrorHandler();
     const {carregando, erro, executar} = useAsyncAction();
 
     async function salvarMapa(codSubprocesso: number, dados: any) {
         await executar(async () => {
-            mapasStore.mapaCompleto = await salvarMapaCompleto(codSubprocesso, dados);
+            mapas.mapaCompleto.value = await salvarMapaCompleto(codSubprocesso, dados);
         }, "Erro ao salvar mapa completo.");
     }
 
@@ -36,19 +36,19 @@ export function useFluxoMapa() {
 
     async function adicionarCompetencia(codSubprocesso: number, competencia: SalvarCompetenciaRequest) {
         await executar(async () => {
-            mapasStore.mapaCompleto = await adicionarCompetenciaService(codSubprocesso, competencia);
+            mapas.mapaCompleto.value = await adicionarCompetenciaService(codSubprocesso, competencia);
         }, "Erro ao adicionar competência.");
     }
 
     async function atualizarCompetencia(codSubprocesso: number, codCompetencia: number, competencia: SalvarCompetenciaRequest) {
         await executar(async () => {
-            mapasStore.mapaCompleto = await atualizarCompetenciaService(codSubprocesso, codCompetencia, competencia);
+            mapas.mapaCompleto.value = await atualizarCompetenciaService(codSubprocesso, codCompetencia, competencia);
         }, "Erro ao atualizar competência.");
     }
 
     async function removerCompetencia(codSubprocesso: number, codCompetencia: number) {
         await executar(async () => {
-            mapasStore.mapaCompleto = await removerCompetenciaService(codSubprocesso, codCompetencia);
+            mapas.mapaCompleto.value = await removerCompetenciaService(codSubprocesso, codCompetencia);
         }, "Erro ao remover competência.");
     }
 

@@ -39,13 +39,13 @@
     </PageHeader>
 
     <BAlert
-        v-if="mapasStore.erro"
+        v-if="erroMapa"
         :model-value="true"
         variant="danger"
         dismissible
-        @dismissed="mapasStore.erro = null"
+        @dismissed="erroMapa = null"
     >
-      {{ mapasStore.erro }}
+      {{ erroMapa }}
     </BAlert>
 
     <div v-if="unidade">
@@ -121,14 +121,13 @@ import PageHeader from "@/components/layout/PageHeader.vue";
 import LoadingButton from "@/components/comum/LoadingButton.vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
 import CompetenciaCard from "@/components/mapa/CompetenciaCard.vue";
-import {storeToRefs} from "pinia";
 import {computed, defineAsyncComponent, onMounted, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import {usePerfil} from "@/composables/usePerfil";
 import {useAcesso} from "@/composables/useAcesso";
 import {useFluxoMapa} from "@/composables/useFluxoMapa";
 import {useFormErrors} from '@/composables/useFormErrors';
-import {useMapasStore} from "@/stores/mapas";
+import {useMapas} from "@/composables/useMapas";
 import {useSubprocessos} from "@/composables/useSubprocessos";
 import {useToastStore} from "@/stores/toast";
 import type {Atividade, Competencia, SalvarCompetenciaRequest, Unidade} from "@/types/tipos";
@@ -142,9 +141,9 @@ const DisponibilizarMapaModal = defineAsyncComponent(() => import("@/components/
 
 const route = useRoute();
 const router = useRouter();
-const mapasStore = useMapasStore();
+const mapasStore = useMapas();
 const fluxoMapa = useFluxoMapa();
-const {mapaCompleto, impactoMapa: impactos} = storeToRefs(mapasStore);
+const {mapaCompleto, impactoMapa: impactos, erro: erroMapa} = mapasStore;
 const subprocessosStore = useSubprocessos();
 const toastStore = useToastStore();
 const subprocesso = computed(() => subprocessosStore.subprocessoDetalhe);

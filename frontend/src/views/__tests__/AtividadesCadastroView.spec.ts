@@ -4,10 +4,10 @@ import {beforeEach, describe, expect, it, vi} from "vitest";
 import {reactive, ref} from "vue";
 import * as usePerfilModule from "@/composables/usePerfil";
 import * as useFluxoSubprocessoModule from "@/composables/useFluxoSubprocesso";
+import {useMapas} from "@/composables/useMapas";
 import * as useProcessosModule from "@/composables/useProcessos";
 import * as subprocessoService from "@/services/subprocessoService";
 import * as analiseService from "@/services/analiseService";
-import {useMapasStore} from "@/stores/mapas";
 import CadastroView from "@/views/CadastroView.vue";
 import ConfirmacaoDisponibilizacaoModal from "@/components/mapa/ConfirmacaoDisponibilizacaoModal.vue";
 import HistoricoAnaliseModal from "@/components/processo/HistoricoAnaliseModal.vue";
@@ -132,6 +132,11 @@ function createWrapper(customState = {}, accessOverrides = {}) {
         }
     });
 
+    const mapas = useMapas();
+    mapas.mapaCompleto.value = {codigo: 100} as any;
+    mapas.impactoMapa.value = null;
+    mapas.erro.value = null;
+
     (wrapper.vm as any).codSubprocesso = 123;
     (wrapper.vm as any).unidade = {sigla: "TESTE", nome: "Teste"};
 
@@ -248,13 +253,13 @@ describe("CadastroView.vue", () => {
     it("carrega impacto ao abrir modal", async () => {
         const wrapper = createWrapper();
         await flushPromises();
-        const mapasStore = useMapasStore();
-        mapasStore.buscarImpactoMapa = vi.fn().mockResolvedValue(null);
+        const mapas = useMapas();
+        mapas.buscarImpactoMapa = vi.fn().mockResolvedValue(null);
 
         await wrapper.find('[data-testid="cad-atividades__btn-impactos-mapa-edicao"]').trigger("click");
         await flushPromises();
 
-        expect(mapasStore.buscarImpactoMapa).toHaveBeenCalledWith(123);
+        expect(mapas.buscarImpactoMapa).toHaveBeenCalledWith(123);
         expect(wrapper.findComponent(ImpactoMapaModal).exists()).toBe(true);
     });
 
