@@ -45,7 +45,7 @@ class ProcessoControllerTest {
     protected static final String PROCESSO_ATUALIZADO = "Processo atualizado";
     private static final String NOVO_PROCESSO = "Novo processo";
 
-    @MockitoBean
+    @MockitoBean(name = "processoService")
     private ProcessoService processoService;
 
     @Autowired
