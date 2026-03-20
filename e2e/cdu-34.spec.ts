@@ -23,7 +23,6 @@ test.describe.serial('CDU-34 - Enviar lembrete de prazo', () => {
     const timestamp = Date.now();
     const descProcesso = `Mapeamento CDU-34 ${timestamp}`;
 
-
     test('Preparacao: Admin cria e inicia processo', async ({_resetAutomatico, page, request, _autenticadoComoAdmin}) => {
         await criarProcessoFixture(request, {
             descricao: descProcesso,
@@ -40,9 +39,9 @@ test.describe.serial('CDU-34 - Enviar lembrete de prazo', () => {
 
 
     test('Cenario principal: ADMIN envia lembrete e sistema cria alerta sem alterar o workflow', async ({
-                                                                                                   _resetAutomatico,
-                                                                                                   page,
-                                                                                                   _autenticadoComoAdmin
+                                                                                                    _resetAutomatico,
+                                                                                                    page,
+                                                                                                    _autenticadoComoAdmin
 }) => {
         await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
@@ -50,18 +49,29 @@ test.describe.serial('CDU-34 - Enviar lembrete de prazo', () => {
         await expect(page.getByTestId('tbl-tree')).toBeVisible();
         await navegarParaSubprocesso(page, UNIDADE_1);
 
+        const situacaoAntes = await page.getByTestId('subprocesso-header__txt-situacao').innerText();
+        const localizacaoAntes = await page.getByTestId('subprocesso-header__txt-localizacao').innerText();
         const btnLembrete = page.getByTestId('btn-enviar-lembrete');
         await expect(btnLembrete).toBeVisible();
         await btnLembrete.click();
 
-        await expect(page.getByRole('dialog').getByRole('heading', {name: TEXTOS.subprocesso.LEMBRETE_TITULO})).toBeVisible();
+        const modal = page.getByRole('dialog');
+        await expect(modal.getByRole('heading', {name: TEXTOS.subprocesso.LEMBRETE_TITULO})).toBeVisible();
         await expect(page.getByTestId('txt-modelo-lembrete')).toBeVisible();
+        await expect(page.getByTestId('txt-modelo-lembrete')).toContainText(TEXTOS.subprocesso.LEMBRETE_MODELO_PREFIXO(UNIDADE_1));
+        await modal.getByRole('button', {name: /Cancelar/i}).click();
+        await expect(modal).toBeHidden();
+
+        await btnLembrete.click();
+        await expect(modal.getByRole('heading', {name: TEXTOS.subprocesso.LEMBRETE_TITULO})).toBeVisible();
         await expect(page.getByTestId('txt-modelo-lembrete')).toContainText(TEXTOS.subprocesso.LEMBRETE_MODELO_PREFIXO(UNIDADE_1));
         await page.getByTestId('btn-confirmar-enviar-lembrete').click();
 
         await expect(page.getByText(TEXTOS.subprocesso.SUCESSO_LEMBRETE_ENVIADO).first()).toBeVisible();
         await expect(page.getByTestId('tbl-movimentacoes')).not.toContainText(/Lembrete de prazo enviado/i);
         await expect(page.getByTestId('btn-enviar-lembrete')).toBeVisible();
+        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(situacaoAntes);
+        await expect(page.getByTestId('subprocesso-header__txt-localizacao')).toHaveText(localizacaoAntes);
     });
 
     test('Cenario complementar: unidade de destino visualiza alerta de lembrete no painel', async ({
@@ -72,6 +82,6 @@ test.describe.serial('CDU-34 - Enviar lembrete de prazo', () => {
         const tabelaAlertas = page.getByTestId('tbl-alertas');
         await expect(tabelaAlertas).toBeVisible();
         await expect(tabelaAlertas).toContainText(descProcesso);
-        await expect(tabelaAlertas).toContainText(/Lembrete/i);
+        await expect(tabelaAlertas).toContainText(new RegExp(`Lembrete: Prazo do processo ${descProcesso} encerra em [0-9]{2}/[0-9]{2}/[0-9]{4}`));
     });
 });

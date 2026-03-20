@@ -260,14 +260,16 @@ describe('processoService', () => {
 
     it('homologarValidacao deve fazer requisição POST', async () => {
         const codSubprocesso = 1;
-        await processoService.homologarValidacao(codSubprocesso);
-        expect(apiClient.post).toHaveBeenCalledWith(`/subprocessos/${codSubprocesso}/homologar-validacao`);
+        const dados = {texto: 'Obs'};
+        await processoService.homologarValidacao(codSubprocesso, dados);
+        expect(apiClient.post).toHaveBeenCalledWith(`/subprocessos/${codSubprocesso}/homologar-validacao`, dados);
     });
 
     it('aceitarValidacao deve fazer requisição POST', async () => {
         const codSubprocesso = 1;
-        await processoService.aceitarValidacao(codSubprocesso);
-        expect(apiClient.post).toHaveBeenCalledWith(`/subprocessos/${codSubprocesso}/aceitar-validacao`);
+        const dados = {texto: 'Obs'};
+        await processoService.aceitarValidacao(codSubprocesso, dados);
+        expect(apiClient.post).toHaveBeenCalledWith(`/subprocessos/${codSubprocesso}/aceitar-validacao`, dados);
     });
 
     it('devolverValidacao deve fazer requisição POST', async () => {

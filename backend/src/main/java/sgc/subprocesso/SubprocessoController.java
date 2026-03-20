@@ -468,16 +468,30 @@ public class SubprocessoController {
     @PostMapping("/{codSubprocesso}/aceitar-validacao")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'ACEITAR_MAPA')")
     @Operation(summary = "Aceita a validação (pelo gestor)")
-    public ResponseEntity<Void> aceitarValidacao(@PathVariable Long codSubprocesso, @AuthenticationPrincipal Usuario usuario) {
-        transicaoService.aceitarValidacao(codSubprocesso, usuario);
+    public ResponseEntity<Void> aceitarValidacao(
+            @PathVariable Long codSubprocesso,
+            @RequestBody(required = false) TextoOpcionalRequest request,
+            @AuthenticationPrincipal Usuario usuario) {
+        String observacoes = Optional.ofNullable(request)
+                .map(TextoOpcionalRequest::texto)
+                .map(UtilSanitizacao::sanitizar)
+                .orElse(null);
+        transicaoService.aceitarValidacao(codSubprocesso, observacoes, usuario);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/{codSubprocesso}/homologar-validacao")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'HOMOLOGAR_MAPA')")
     @Operation(summary = "Homologa a validação")
-    public ResponseEntity<Void> homologarValidacao(@PathVariable Long codSubprocesso, @AuthenticationPrincipal Usuario usuario) {
-        transicaoService.homologarValidacao(codSubprocesso, usuario);
+    public ResponseEntity<Void> homologarValidacao(
+            @PathVariable Long codSubprocesso,
+            @RequestBody(required = false) TextoOpcionalRequest request,
+            @AuthenticationPrincipal Usuario usuario) {
+        String observacoes = Optional.ofNullable(request)
+                .map(TextoOpcionalRequest::texto)
+                .map(UtilSanitizacao::sanitizar)
+                .orElse(null);
+        transicaoService.homologarValidacao(codSubprocesso, observacoes, usuario);
         return ResponseEntity.ok().build();
     }
 

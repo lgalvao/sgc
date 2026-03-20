@@ -27,7 +27,7 @@ Below are concrete suggestions to simplify the codebase, reduce fragmentation, a
 - Consolidate these fragmented classes into cohesive, domain-centric services (e.g., a single `SubprocessoService` and a single `MapaService`). Given the application's scale, procedural code in a single service is easier to trace, understand, and maintain than navigating through multiple dispersed classes and injected dependencies.
 
 ## 4. Backend: Minimize DTO Mapping for Simple Reads
-**Issue:** There is a proliferation of DTOs for simple read operations where the data closely matches the underlying entity.
+**Issue:** There is a proliferation of DTOs for simple read operations where the data closely matches the underlying entity. For example, `ProcessoDetalheDto` involves manual, error-prone mapping that often simply replicates entity state.
 **Suggestion:**
 - Return JPA entities directly from Controllers for simple read operations.
 - Eliminate DTOs (and their mapping boilerplate) unless there is a strict need to hide sensitive fields, prevent recursive serialization (e.g., bidirectional relationships), or aggregate data from multiple entities that cannot be simply solved by Jackson annotations (like `@JsonIgnore` or `@JsonView`).
@@ -41,6 +41,7 @@ Below are concrete suggestions to simplify the codebase, reduce fragmentation, a
 - **No Complex Architectures:** Avoid Hexagonal Architecture, Onion Architecture, CQRS, or strict Clean Architecture boundaries. Use JPA annotations directly on domain models.
 - **Interfaces:** Avoid single-implementation interfaces (e.g., `IService` and `ServiceImpl`). If an interface only has an `Impl` class, remove the interface and use the concrete class directly.
 - **Patterns:** Avoid complex design patterns (Builders for simple objects, Factories). Use Spring Boot and Hibernate features directly and simply. Keep the monolithic structure cohesive (no microservices or fragmented Gradle subprojects).
+- **Direct Repositories:** Keep things simple and do not feel obligated to layer simple CRUD logic; if a Controller only saves or reads a record, it can inject the Spring Data Repository interface directly.
 
 ## 7. Active Simplification Efforts
 **Current Status:** There are active efforts to implement these simplifications, as documented in `plano-simplificacao.md`.

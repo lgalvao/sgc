@@ -157,16 +157,16 @@ export const useProcessosStore = defineStore("processos", () => {
         });
     }
 
-    async function homologarValidacao(codigo: number) {
+    async function homologarValidacao(codigo: number, dados: { texto: string }) {
         return withErrorHandling(async () => {
-            await processoService.homologarValidacao(codigo);
+            await processoService.homologarValidacao(codigo, dados);
             if (processoDetalhe.value) await buscarProcessoDetalhe(processoDetalhe.value.codigo);
         });
     }
 
-    async function aceitarValidacao(codigo: number) {
+    async function aceitarValidacao(codigo: number, dados: { texto: string }) {
         return withErrorHandling(async () => {
-            await processoService.aceitarValidacao(codigo);
+            await processoService.aceitarValidacao(codigo, dados);
             if (processoDetalhe.value) await buscarProcessoDetalhe(processoDetalhe.value.codigo);
         });
     }

@@ -198,7 +198,6 @@ describe("CadastroVisualizacaoView coverage", () => {
         expect(vm.mostrarModalHistoricoAnalise).toBe(false);
 
         // Retornos antecipados (early return) nas funcoes assincronas
-        const codSubprocessoOriginal = vm.codSubprocesso;
         Object.defineProperty(vm, 'codSubprocesso', { get: () => null });
         await vm.confirmarValidacao();
         
@@ -217,7 +216,7 @@ describe("CadastroVisualizacaoView coverage", () => {
     });
 
     it("deve lidar com onMounted quando codSubprocesso está ausente mas subprocesso existe", async () => {
-        const wrapper = createWrapper({}, {
+        createWrapper({}, {
             codigo: 1,
             tipo: "MAPEAMENTO",
             unidades: [{ sigla: "TESTE" }] // codSubprocesso undefined

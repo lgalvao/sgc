@@ -548,7 +548,7 @@ class SubprocessoTransicaoServiceCoverageIntegrationTest {
 
             when(unidadeService.buscarPorSigla("U7")).thenReturn(uSp);
 
-            transicaoService.aceitarValidacao(sp.getCodigo(), user);
+            transicaoService.aceitarValidacao(sp.getCodigo(), "Observacao aceite", user);
 
             Subprocesso atualizado = subprocessoRepo.findById(sp.getCodigo()).orElseThrow();
             assertThat(atualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);

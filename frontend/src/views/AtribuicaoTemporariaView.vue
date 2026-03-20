@@ -391,6 +391,8 @@ defineExpose({
   termoUsuario,
   usuariosEncontrados,
   usuarioSelecionado,
+  mostrarResultadosUsuarios,
+  indiceUsuarioDestacado,
   dataInicio,
   dataTermino,
   justificativa,

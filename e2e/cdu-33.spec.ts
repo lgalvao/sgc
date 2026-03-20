@@ -3,7 +3,7 @@ import {
     criarProcessoMapaHomologadoFixture,
     criarProcessoRevisaoMapaHomologadoFixture
 } from './fixtures/fixtures-processos.js';
-import {verificarPaginaPainel} from './helpers/helpers-navegacao.js';
+import {verificarAppAlert, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 import {login, USUARIOS} from './helpers/helpers-auth.js';
 
 /**
@@ -52,6 +52,7 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
     });
 
     test('Cenários CDU-33: ADMIN reabre revisão de cadastro', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
+        const textoJustificativa = 'Ajuste necessário';
 
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
         await page.goto(`/processo/${revisaoPid}/${UNIDADE_ALVO}`);
@@ -68,10 +69,20 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
         await expect(modal).toBeVisible();
         await expect(modal.getByRole('heading', {name: /Reabrir revisão/i})).toBeVisible();
 
+        await expect(page.getByTestId('btn-confirmar-reabrir')).toBeDisabled();
+        await modal.getByRole('button', {name: /Cancelar/i}).click();
+        await expect(modal).toBeHidden();
+        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa homologado/i);
+
+        await btnReabrir.click();
+        await expect(page.getByTestId('btn-confirmar-reabrir')).toBeDisabled();
+
         // Cenario 4: Confirmar reabertura
-        await page.getByTestId('inp-justificativa-reabrir').fill('Ajuste necessário');
+        await page.getByTestId('inp-justificativa-reabrir').fill(textoJustificativa);
+        await expect(page.getByTestId('btn-confirmar-reabrir')).toBeEnabled();
         await page.getByTestId('btn-confirmar-reabrir').click();
 
+        await verificarAppAlert(page, /Revisão reaberta/i);
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Revisão em andamento/i);
         await expect(page.getByTestId('tbl-movimentacoes')).toContainText(/Reabertura de revisão de cadastro/i);
     });

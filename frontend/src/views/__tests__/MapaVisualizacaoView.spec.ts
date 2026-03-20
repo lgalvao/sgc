@@ -56,7 +56,7 @@ const stubs = {
         template: '<div v-if="modelValue"><slot /> <button :data-testid="testIdCancelar" @click="$emit(\'fechar\')">Fechar</button></div>'
     },
     AceitarMapaModal: {
-        template: '<div v-if="mostrarModal"><button data-testid="btn-confirmar-aceite" @click="$emit(\'confirmar-aceitacao\')">Confirmar</button></div>',
+        template: '<div v-if="mostrarModal"><button data-testid="btn-confirmar-aceite" @click="$emit(\'confirmar-aceitacao\', \'Obs aceite\')">Confirmar</button></div>',
         props: ['mostrarModal']
     },
     HistoricoAnaliseModal: {template: '<div v-if="mostrar"></div>', props: ['mostrar']},
@@ -180,7 +180,7 @@ describe("MapaVisualizacaoView.vue", () => {
         await wrapper.find('[data-testid="btn-confirmar-aceite"]').trigger("click");
         await flushPromises();
 
-        expect(store.aceitarValidacao).toHaveBeenCalledWith(123);
+        expect(store.aceitarValidacao).toHaveBeenCalledWith(123, {texto: 'Obs aceite'});
     });
 
     it("abre modal e confirma devolução", async () => {

@@ -393,7 +393,7 @@ describe("VisMapa.vue", () => {
 
         modal.vm.$emit("confirmar-aceitacao", "Obs aceite");
 
-        expect(store.aceitarValidacao).toHaveBeenCalledWith(10);
+        expect(store.aceitarValidacao).toHaveBeenCalledWith(10, {texto: "Obs aceite"});
     });
 
     it("confirms homologacao (ADMIN)", async () => {
@@ -423,7 +423,7 @@ describe("VisMapa.vue", () => {
         const modal = wrapper.findComponent(AceitarMapaModal);
         modal.vm.$emit("confirmar-aceitacao", "Obs homolog");
 
-        expect(store.homologarValidacao).toHaveBeenCalledWith(10);
+        expect(store.homologarValidacao).toHaveBeenCalledWith(10, {texto: "Obs homolog"});
     });
 
     it("shows historico de analise", async () => {
@@ -524,7 +524,7 @@ describe("VisMapa.vue", () => {
         const modal = wrapper.findComponent(AceitarMapaModal);
         modal.vm.$emit("confirmar-aceitacao", "Obs homolog");
 
-        expect(store.homologarValidacao).toHaveBeenCalledWith(10);
+        expect(store.homologarValidacao).toHaveBeenCalledWith(10, {texto: "Obs homolog"});
     });
 
     it("handles error in confirmarAceitacao", async () => {

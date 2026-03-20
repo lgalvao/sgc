@@ -372,16 +372,16 @@ async function confirmarValidacao() {
   }
 }
 
-async function confirmarAceitacao() {
+async function confirmarAceitacao(observacao = "") {
   if (!codSubprocesso.value) return;
   isLoading.value = true;
   const isHomologacao = podeHomologarMapa.value || isAdmin.value;
 
   try {
     if (isHomologacao) {
-      await processosStore.homologarValidacao(codSubprocesso.value);
+      await processosStore.homologarValidacao(codSubprocesso.value, {texto: observacao});
     } else {
-      await processosStore.aceitarValidacao(codSubprocesso.value);
+      await processosStore.aceitarValidacao(codSubprocesso.value, {texto: observacao});
     }
     fecharModalAceitar();
     toastStore.setPending(

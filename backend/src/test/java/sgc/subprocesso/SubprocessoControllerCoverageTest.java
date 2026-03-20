@@ -355,22 +355,30 @@ class SubprocessoControllerCoverageTest {
     @DisplayName("aceitarValidacao - deve chamar servico e retornar 200")
     @WithMockUser
     void aceitarValidacao() throws Exception {
+        TextoOpcionalRequest req = new TextoOpcionalRequest("Obs");
+
         mockMvc.perform(post("/api/subprocessos/1/aceitar-validacao")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req))
                         .with(csrf()))
                 .andExpect(status().isOk());
 
-        verify(transicaoService).aceitarValidacao(eq(1L), any());
+        verify(transicaoService).aceitarValidacao(eq(1L), eq("Obs"), any());
     }
 
     @Test
     @DisplayName("homologarValidacao - deve chamar servico e retornar 200")
     @WithMockUser
     void homologarValidacao() throws Exception {
+        TextoOpcionalRequest req = new TextoOpcionalRequest("Obs");
+
         mockMvc.perform(post("/api/subprocessos/1/homologar-validacao")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req))
                         .with(csrf()))
                 .andExpect(status().isOk());
 
-        verify(transicaoService).homologarValidacao(eq(1L), any());
+        verify(transicaoService).homologarValidacao(eq(1L), eq("Obs"), any());
     }
 
     @Test

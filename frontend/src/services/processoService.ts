@@ -169,14 +169,18 @@ export async function validarMapa(codSubprocesso: number): Promise<void> {
     await apiClient.post(`/subprocessos/${codSubprocesso}/validar-mapa`);
 }
 
-export async function homologarValidacao(codSubprocesso: number): Promise<void> {
-    await apiClient.post(`/subprocessos/${codSubprocesso}/homologar-validacao`);
+export async function homologarValidacao(
+    codSubprocesso: number,
+    dados: { texto: string },
+): Promise<void> {
+    await apiClient.post(`/subprocessos/${codSubprocesso}/homologar-validacao`, dados);
 }
 
 export async function aceitarValidacao(
     codSubprocesso: number,
+    dados: { texto: string },
 ): Promise<void> {
-    await apiClient.post(`/subprocessos/${codSubprocesso}/aceitar-validacao`);
+    await apiClient.post(`/subprocessos/${codSubprocesso}/aceitar-validacao`, dados);
 }
 
 export async function devolverValidacao(

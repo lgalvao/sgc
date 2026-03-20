@@ -52,6 +52,15 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Revisão em andamento/i);
     });
 
+    test('1.1 Cenário adicional: primeiro acesso direto ao cadastro carrega o subprocesso', async ({_resetAutomatico, page}) => {
+        await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
+        await page.goto(`/processo/${processoCodigo}/${UNIDADE_ALVO}/cadastro`);
+
+        await expect(page.getByRole('heading', {name: TEXTOS.atividades.TITULO, level: 2})).toBeVisible();
+        await expect(page.getByTestId('inp-nova-atividade')).toBeVisible();
+        await expect(page.getByTestId('btn-cad-atividades-disponibilizar')).toBeVisible();
+    });
+
     test('2. Cenário 1: Validação - Atividade sem conhecimento', async ({_resetAutomatico, page}) => {
         await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
         await page.goto(`/processo/${processoCodigo}/${UNIDADE_ALVO}/cadastro`);

@@ -12,13 +12,28 @@
       @confirmar="confirmarAceitacao"
   >
     <div data-testid="body-aceite-mapa">
-      <p class="mb-0">{{ corpoModal }}</p>
+      <p>{{ corpoModal }}</p>
+
+      <BFormGroup
+          class="mb-0"
+          :label="TEXTOS.comum.OBSERVACAO"
+          label-for="observacaoAceiteMapa"
+      >
+        <BFormTextarea
+            id="observacaoAceiteMapa"
+            v-model="observacao"
+            data-testid="inp-aceite-mapa-observacao"
+            placeholder="Digite observacoes sobre o aceite..."
+            rows="3"
+        />
+      </BFormGroup>
     </div>
   </ModalConfirmacao>
 </template>
 
 <script lang="ts" setup>
-import {computed} from "vue";
+import {BFormGroup, BFormTextarea} from "bootstrap-vue-next";
+import {computed, ref, watch} from "vue";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import {TEXTOS} from "@/constants/textos";
 
@@ -37,6 +52,8 @@ const emit = defineEmits<{
   fecharModal: [];
   confirmarAceitacao: [observacao: string];
 }>();
+
+const observacao = ref("");
 
 const mostrarModalComputado = computed({
   get: () => props.mostrarModal,
@@ -63,7 +80,13 @@ const rotuloConfirmar = computed(() => {
       : TEXTOS.mapa.BOTAO_ACEITAR;
 });
 
+watch(() => props.mostrarModal, (mostrar) => {
+  if (mostrar) {
+    observacao.value = "";
+  }
+});
+
 function confirmarAceitacao() {
-  emit("confirmarAceitacao", "");
+  emit("confirmarAceitacao", observacao.value);
 }
 </script>

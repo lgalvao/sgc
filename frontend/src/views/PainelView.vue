@@ -33,15 +33,13 @@
         <BTable
             :fields="camposAlertas"
             :items="alertas"
-            :striped="true"
             :tbody-tr-props="rowAttrAlerta"
             :tbody-tr-class="rowClassAlerta"
             aria-label="Alertas"
             data-testid="tbl-alertas"
-            hover
             responsive
             stacked="md"
-            @sort-changed="handleSortChangeAlertas"
+            small
         >
           <template #cell(mensagem)="data">
             <span v-if="!data.item.dataHoraLeitura" class="visually-hidden">{{ TEXTOS.comum.NAO_LIDO }}</span>
@@ -67,7 +65,7 @@ import {useRouter} from "vue-router";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
-import {formatDateBR} from "@/utils";
+import {formatDateTimeBR} from "@/utils";
 import TabelaProcessos from "@/components/processo/TabelaProcessos.vue";
 import {usePerfilStore} from "@/stores/perfil";
 import {usePerfil} from "@/composables/usePerfil";
@@ -96,7 +94,7 @@ async function buscarAlertas(
     unidade: number,
     page: number,
     size: number,
-    sort?: "data" | "processo",
+    sort?: "dataHora" | "processo",
     order?: "asc" | "desc",
 ) {
   const response = await painelService.listarAlertas(usuarioCodigo, unidade, page, size, sort, order);
@@ -123,7 +121,9 @@ async function carregarDados() {
               Number(perfilStore.unidadeSelecionada),
               0,
               10,
-          ), // Paginação inicial
+              "dataHora",
+              "desc"
+          ), // Paginação inicial ordenada por dataHora DESC
       );
     }
 
@@ -181,48 +181,16 @@ function abrirDetalhesProcesso(processo: ProcessoResumo | undefined) {
   }
 }
 
-const alertaCriterio = ref<"data" | "processo">("data");
-const alertaAsc = ref(false); // false = desc (padrão por data/hora)
-
-function ordenarAlertasPor(campo: "data" | "processo") {
-  if (alertaCriterio.value === campo) {
-    alertaAsc.value = !alertaAsc.value;
-  } else {
-    alertaCriterio.value = campo;
-    alertaAsc.value = campo !== "data";
-  }
-  if (perfilStore.usuarioCodigo) {
-    buscarAlertas(
-        perfilStore.usuarioCodigo,
-        Number(perfilStore.unidadeSelecionada),
-        0,
-        10,
-        alertaCriterio.value,
-        alertaAsc.value ? "asc" : "desc",
-    );
-  }
-}
-
 const camposAlertas = [
-  {key: "dataHora", label: TEXTOS.painel.CAMPOS_ALERTAS.DATA_HORA, sortable: true, formatter: (v: any) => formatDateBR(v)},
+  {key: "dataHora", label: TEXTOS.painel.CAMPOS_ALERTAS.DATA_HORA, sortable: false, formatter: (v: any) => formatDateTimeBR(v)},
   {key: "mensagem", label: TEXTOS.painel.CAMPOS_ALERTAS.DESCRICAO},
-  {key: "processo", label: TEXTOS.painel.CAMPOS_ALERTAS.PROCESSO, sortable: true},
+  {key: "processo", label: TEXTOS.painel.CAMPOS_ALERTAS.PROCESSO, sortable: false},
   {key: "origem", label: TEXTOS.painel.CAMPOS_ALERTAS.ORIGEM},
 ];
 
 const rowClassAlerta = (item: Alerta | null) => {
   if (!item) return "";
   return item.dataHoraLeitura ? "" : "fw-bold";
-};
-
-const handleSortChangeAlertas = (ctx: any) => {
-  const sortBy = Array.isArray(ctx.sortBy) ? ctx.sortBy[0] : ctx.sortBy;
-  const key = sortBy?.key || (typeof sortBy === 'string' ? sortBy : null);
-  if (key === "dataHora") {
-    ordenarAlertasPor("data");
-  } else if (key === "processo") {
-    ordenarAlertasPor("processo");
-  }
 };
 
 const rowAttrAlerta = (item: Alerta | null) => {

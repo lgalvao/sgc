@@ -168,6 +168,7 @@ import AtividadeItem from "@/components/atividades/AtividadeItem.vue";
 import {useAtividadeForm} from "@/composables/useAtividadeForm";
 import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useMapasStore} from "@/stores/mapas";
+import {useProcessosStore} from "@/stores/processos";
 import {useNotification} from "@/composables/useNotification";
 import {useToastStore} from "@/stores/toast";
 import {usePerfil} from "@/composables/usePerfil";
@@ -205,6 +206,7 @@ const props = defineProps<{
 const router = useRouter();
 const subprocessosStore = useSubprocessosStore();
 const mapasStore = useMapasStore();
+const processosStore = useProcessosStore();
 const {notify, notificacao, clear} = useNotification();
 const toastStore = useToastStore();
 const {impactoMapa: impactos} = storeToRefs(mapasStore);
@@ -307,6 +309,61 @@ function sincronizarEstadoInicialContexto(data: any) {
     subprocesso: subprocessoContexto,
     permissoes: permissoesContexto
   });
+}
+
+type UnidadeProcesso = Unidade & {
+  codSubprocesso?: number;
+  filhas?: UnidadeProcesso[];
+};
+
+function buscarSubprocessoNoProcesso(unidades: UnidadeProcesso[] | undefined, siglaAlvo: string): number | null {
+  if (!unidades?.length) {
+    return null;
+  }
+
+  for (const unidadeAtual of unidades) {
+    if (unidadeAtual.sigla === siglaAlvo) {
+      return unidadeAtual.codSubprocesso ?? null;
+    }
+
+    const codigoFilho = buscarSubprocessoNoProcesso(unidadeAtual.filhas, siglaAlvo);
+    if (codigoFilho) {
+      return codigoFilho;
+    }
+  }
+
+  return null;
+}
+
+async function carregarContextoInicial() {
+  const codProcessoRef = Number(props.codProcesso);
+
+  await processosStore.buscarProcessoDetalhe(codProcessoRef);
+
+  let id = buscarSubprocessoNoProcesso(processosStore.processoDetalhe?.unidades as UnidadeProcesso[] | undefined, props.sigla);
+
+  if (!id) {
+    id = await subprocessosStore.buscarSubprocessoPorProcessoEUnidade(codProcessoRef, props.sigla);
+  }
+
+  if (!id) {
+    logger.error("ERRO: Subprocesso não encontrado!");
+    return;
+  }
+
+  codSubprocesso.value = id;
+  const data = await subprocessosStore.buscarContextoEdicao(id);
+  if (!data) {
+    return;
+  }
+
+  sincronizarEstadoInicialContexto(data);
+  if (data.atividadesDisponiveis) {
+    atividades.value = data.atividadesDisponiveis;
+  }
+  if (data.unidade) {
+    unidade.value = data.unidade as Unidade;
+  }
 }
 
 async function adicionarAtividade(): Promise<boolean> {
@@ -556,26 +613,7 @@ async function handleAdicionarAtividade() {
   if (sucesso || erroNovaAtividade.value) atividadeFormRef.value?.inputRef?.$el?.focus();
 }
 
-onMounted(async () => {
-  const codProcessoRef = Number(props.codProcesso);
-  const id = await subprocessosStore.buscarSubprocessoPorProcessoEUnidade(codProcessoRef, props.sigla);
-
-  if (id) {
-    codSubprocesso.value = id;
-    const data = await subprocessosStore.buscarContextoEdicao(id);
-    if (data) {
-      sincronizarEstadoInicialContexto(data);
-      if (data.atividadesDisponiveis) {
-        atividades.value = data.atividadesDisponiveis;
-      }
-      if (data.unidade) {
-        unidade.value = data.unidade as Unidade;
-      }
-    }
-  } else {
-    logger.error("ERRO: Subprocesso não encontrado!");
-  }
-});
+onMounted(carregarContextoInicial);
 
 watch(() => atividades.value?.length, (newLen, oldLen) => {
   if (newLen === 0 && oldLen === undefined) {

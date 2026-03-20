@@ -2,7 +2,6 @@ import {describe, expect, it} from "vitest";
 import {setupServiceTest, testErrorHandling} from "@/test-utils/serviceTestHelpers";
 import * as service from "../painelService";
 
-// Mas como setupServiceTest mocka o modulo, e aqui mockamos também, pode haver conflito?
 // Se test-utils/serviceTestHelpers.ts faz vi.mock("@/axios-setup"), e este arquivo também faz...
 // O último a ser executado vence? Ou conflitam?
 // A recomendação é centralizar. Se eu uso setupServiceTest, deveria confiar nele.
@@ -88,9 +87,9 @@ describe("painelService", () => {
 
         it("deve lidar com ordenação", async () => {
             mockApi.get.mockResolvedValueOnce({data: {content: []}});
-            await service.listarAlertas("123", 1, 0, 10, "data", "asc");
+            await service.listarAlertas("123", 1, 0, 10, "dataHora", "asc");
             expect(mockApi.get).toHaveBeenCalledWith("/painel/alertas", {
-                params: {usuarioTitulo: "123", unidade: 1, page: 0, size: 10, sort: "data,asc"},
+                params: {usuarioTitulo: "123", unidade: 1, page: 0, size: 10, sort: "dataHora,asc"},
             });
         });
 

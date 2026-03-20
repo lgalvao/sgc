@@ -2,9 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mount } from '@vue/test-utils';
 import PainelView from '../PainelView.vue';
 import { createTestingPinia } from '@pinia/testing';
-import { usePerfilStore } from '@/stores/perfil';
 import { useToastStore } from '@/stores/toast';
-import { useProcessos } from '@/composables/useProcessos';
 import * as painelService from '@/services/painelService';
 import { createRouter, createMemoryHistory } from 'vue-router';
 
@@ -93,7 +91,7 @@ describe('PainelView', () => {
     await wrapper.vm.$nextTick();
 
     expect(mockBuscarProcessosPainel).toHaveBeenCalledWith('ADMIN', 1, 0, 10);
-    expect(painelService.listarAlertas).toHaveBeenCalledWith('U123', 1, 0, 10, undefined, undefined);
+    expect(painelService.listarAlertas).toHaveBeenCalledWith('U123', 1, 0, 10, 'dataHora', 'desc');
     expect(mockToastCreate).toHaveBeenCalledWith(expect.objectContaining({ props: expect.objectContaining({ body: 'Sucesso' }) }));
   });
 
@@ -133,30 +131,6 @@ describe('PainelView', () => {
 
     vm.abrirDetalhesProcesso({codigo: 1, linkDestino: '/detalhes'});
     expect(mockRouterPush).toHaveBeenCalledWith('/detalhes');
-  });
-
-  it('deve ordenar alertas corretamente', async () => {
-    const wrapper = mount(PainelView, createMountOptions());
-    await wrapper.vm.$nextTick();
-    const vm = wrapper.vm as any;
-
-    // Default alertaCriterio é 'data' e alertaAsc é false
-    // Sort by data novamente inverte a ordem
-    vm.handleSortChangeAlertas({ sortBy: [{ key: 'dataHora' }] });
-    expect(vm.alertaCriterio).toBe('data');
-    expect(vm.alertaAsc).toBe(true);
-    expect(painelService.listarAlertas).toHaveBeenCalledWith('U123', 1, 0, 10, 'data', 'asc');
-
-    // Sort by processo muda o critério e asc passa a ser true
-    vm.handleSortChangeAlertas({ sortBy: [{ key: 'processo' }] });
-    expect(vm.alertaCriterio).toBe('processo');
-    expect(vm.alertaAsc).toBe(true);
-    expect(painelService.listarAlertas).toHaveBeenCalledWith('U123', 1, 0, 10, 'processo', 'asc');
-
-    // Invertendo no processo
-    vm.handleSortChangeAlertas([{ key: 'processo' }]);
-    expect(vm.alertaCriterio).toBe('processo');
-    expect(vm.alertaAsc).toBeDefined();
   });
 
   it('deve retornar classes e atributos da linha de alertas corretamente', async () => {

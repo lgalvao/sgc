@@ -56,6 +56,7 @@ const capturasMetadata: CaptureMetadata[] = [];
 // Diretório onde as screenshots serão salvas
 const SCREENSHOTS_DIR = path.join(process.cwd(), 'screenshots');
 const METADATA_PATH = path.join(SCREENSHOTS_DIR, 'capturas-metadata.json');
+type ProcessoCleanup = ReturnType<typeof useProcessoCleanup>;
 
 // Criar diretório se não existir, tratando erro de permissão no Windows
 try {
@@ -130,8 +131,7 @@ async function capturarTela(page: Page, categoria: string, nome: string, opcoes?
     const nomeArquivo = `${categoria}--${nome}.png`;
     const caminhoCompleto = path.join(SCREENSHOTS_DIR, nomeArquivo);
     
-    // Pequena espera para garantir que o banner e renderização estabilizem
-    await page.waitForTimeout(100);
+    await aguardarPinturaEstavel(page);
     
     await page.screenshot({
         path: caminhoCompleto,
@@ -220,6 +220,19 @@ async function capturarComponente(elemento: Locator, categoria: string, nome: st
         const banner = el.querySelector('#sgc-url-banner-comp');
         if (banner) banner.remove();
     });
+}
+
+async function aguardarPinturaEstavel(page: Page, quadros = 2): Promise<void> {
+    for (let indice = 0; indice < quadros; indice += 1) {
+        await page.evaluate(() => new Promise<void>((resolve) => {
+            window.requestAnimationFrame(() => resolve());
+        }));
+    }
+}
+
+function registrarProcessoParaCleanup(cleanup: ProcessoCleanup, codigo: number): void {
+    expect(codigo, 'Código de processo inválido para cleanup').toBeGreaterThan(0);
+    cleanup.registrar(codigo);
 }
 
 async function criarProcessoMapeamentoIniciadoPorFixture(
@@ -408,7 +421,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await page.getByTestId('tbl-processos').getByText(descricaoProcesso).first().click();
             await expect(page).toHaveURL(/codProcesso=\d+/);
             const codProcesso = await extrairProcessoCodigo(page);
-            if (codProcesso > 0) cleanup.registrar(codProcesso);
+            registrarProcessoParaCleanup(cleanup, codProcesso);
             await page.goto('/painel');
 
             // Painel com processo criado
@@ -479,7 +492,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             // Capturar ID para cleanup
             await page.getByTestId('tbl-processos').getByText(descricao).first().click();
             const codProcesso = await extrairProcessoCodigo(page);
-            if (codProcesso > 0) cleanup.registrar(codProcesso);
+            registrarProcessoParaCleanup(cleanup, codProcesso);
 
             // Tela de edição de processo
             await capturarTela(page, '03-processo', '01-processo-edicao', {
@@ -561,7 +574,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await page.getByTestId('inp-criar-competencia-descricao').fill(competencia);
             await page.locator('label').filter({hasText: atividade}).click();
             await page.getByTestId('btn-criar-competencia-salvar').click();
-            await page.waitForTimeout(300);
+            await expect(page.locator('.competencia-card', {has: page.getByText(competencia)})).toBeVisible();
             await capturarTela(page, '03-processo', '03e-mapa-criado', {
                 extra: { perfil: 'ADMIN', acao: 'edicao-mapa' }
             });
@@ -682,7 +695,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await linhaProcesso.click();
             await page.waitForURL(/\/processo\/\d+/);
             const codProcesso = await extrairProcessoCodigo(page);
-            if (codProcesso > 0) cleanup.registrar(codProcesso);
+            registrarProcessoParaCleanup(cleanup, codProcesso);
 
             await login(page, USUARIOS.CHEFE_SECAO_211.titulo, USUARIOS.CHEFE_SECAO_211.senha);
             await page.getByTestId('tbl-processos').getByText(descricao).first().click();
@@ -726,7 +739,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             // Hover na atividade para ver ações
             await card.locator('.atividade-hover-row').hover();
-            await page.waitForTimeout(300);
+            await aguardarPinturaEstavel(page);
             await capturarTela(page, '04-subprocesso', '07-cadastro-atividade-hover', {
                 tags: ['interacao', 'hover']
             });
@@ -762,7 +775,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             const linhaProcesso = page.getByTestId('tbl-processos').locator('tr').filter({has: page.getByText(descricao)});
             await linhaProcesso.click();
             const codProcesso = await extrairProcessoCodigo(page);
-            if (codProcesso > 0) cleanup.registrar(codProcesso);
+            registrarProcessoParaCleanup(cleanup, codProcesso);
 
             await iniciarProcessoPeloCadastro(page, {
                 descricao,
@@ -784,7 +797,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             // Adicionar primeira atividade SEM conhecimento
             const atividade1 = `Atividade sem conhecimento 1 ${Date.now()}`;
             await adicionarAtividade(page, atividade1);
-            await page.waitForTimeout(300);
+            await expect(page.locator('.atividade-card', {has: page.getByText(atividade1)})).toBeVisible();
             await capturarTela(page, '04-subprocesso', '21-atividade-sem-conhecimento', {
                 fullPage: true,
                 extra: { erro: 'falta-conhecimento' }
@@ -793,13 +806,13 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             // Adicionar segunda atividade SEM conhecimento
             const atividade2 = `Atividade sem conhecimento 2 ${Date.now()}`;
             await adicionarAtividade(page, atividade2);
-            await page.waitForTimeout(300);
+            await expect(page.locator('.atividade-card', {has: page.getByText(atividade2)})).toBeVisible();
 
             // Adicionar terceira atividade COM conhecimento (para contraste)
             const atividade3 = `Atividade com conhecimento ${Date.now()}`;
             await adicionarAtividade(page, atividade3);
             await adicionarConhecimento(page, atividade3, 'Java');
-            await page.waitForTimeout(300);
+            await expect(page.locator('.atividade-card', {has: page.getByText(atividade3)})).toContainText('Java');
             await capturarTela(page, '04-subprocesso', '22-mix-atividades-com-sem-conhecimento', {
                 fullPage: true,
                 tags: ['validacao', 'visual']
@@ -815,7 +828,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             // Scroll para segunda atividade sem conhecimento
             const card2 = page.locator('.atividade-card', {has: page.getByText(atividade2)});
             await card2.scrollIntoViewIfNeeded();
-            await page.waitForTimeout(300);
+            await aguardarPinturaEstavel(page);
             await capturarTela(page, '04-subprocesso', '24-segunda-atividade-sem-conhecimento', {
                 tags: ['scroll', 'validacao']
             });
@@ -823,7 +836,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             // Capturar detalhe do card sem conhecimento
             const primeiroCard = page.locator('.atividade-card', {has: page.getByText(atividade1)});
             await primeiroCard.scrollIntoViewIfNeeded();
-            await page.waitForTimeout(300);
+            await aguardarPinturaEstavel(page);
 
             // Capturar apenas o card para detalhe
             await primeiroCard.screenshot({
@@ -847,7 +860,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             // Corrigir primeira atividade adicionando conhecimento
             await adicionarConhecimento(page, atividade1, 'Python');
-            await page.waitForTimeout(500);
+            await expect(page.locator('.atividade-card', {has: page.getByText(atividade1)})).toContainText('Python');
             await capturarTela(page, '04-subprocesso', '26-erro-desaparece-apos-correcao', {
                 fullPage: true,
                 extra: { atividadeCorrigida: atividade1 }
@@ -861,11 +874,10 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             // Corrigir segunda atividade
             await adicionarConhecimento(page, atividade2, 'JavaScript');
-            await page.waitForTimeout(500);
+            await expect(page.locator('.atividade-card', {has: page.getByText(atividade2)})).toContainText('JavaScript');
 
             // Tentar disponibilizar - agora deve funcionar
             await page.getByTestId('btn-cad-atividades-disponibilizar').click();
-            await page.waitForTimeout(500);
 
             // Modal de confirmação deve aparecer
             const modalConfirmacao = page.locator('.modal-content').filter({hasText: 'Disponibilização do cadastro'});
@@ -896,7 +908,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             const linhaProcesso = page.getByTestId('tbl-processos').locator('tr').filter({has: page.getByText(descricao)});
             await linhaProcesso.click();
             const codProcesso = await extrairProcessoCodigo(page);
-            if (codProcesso > 0) cleanup.registrar(codProcesso);
+            registrarProcessoParaCleanup(cleanup, codProcesso);
 
             await iniciarProcessoPeloCadastro(page, {
                 descricao,
@@ -920,7 +932,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             // Disponibilizar (como chefe)
             await page.getByTestId('btn-cad-atividades-disponibilizar').click();
             await page.getByTestId('btn-confirmar-disponibilizacao').click();
-            await page.waitForTimeout(500);
+            await verificarPaginaPainel(page);
 
             await login(page, USUARIOS.GESTOR_COORD_12.titulo, USUARIOS.GESTOR_COORD_12.senha);
 
@@ -996,7 +1008,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             // Hover na competência
             const card = page.locator('.competencia-card', {has: page.getByText(competenciaDesc)});
             await card.hover();
-            await page.waitForTimeout(100);
+            await aguardarPinturaEstavel(page);
             await capturarTela(page, '05-mapa', '06-mapa-competencia-hover', {
                 tags: ['interacao', 'hover']
             });
@@ -1047,7 +1059,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await capturarComponente(page.getByRole('navigation').first(), '06-navegacao', '05a-barra-lateral', { parte: 'sidebar' });
 
             await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-            await page.waitForTimeout(100);
+            await aguardarPinturaEstavel(page);
             await capturarTela(page, '06-navegacao', '06-rodape', { tags: ['layout', 'footer'] });
         });
     });
@@ -1068,7 +1080,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await page.getByText(processosCriado).click();
             await expect(page).toHaveURL(/codProcesso=|processo\/\d+/);
             const codProcesso1 = await extrairProcessoCodigo(page);
-            if (codProcesso1 > 0) cleanup.registrar(codProcesso1);
+            registrarProcessoParaCleanup(cleanup, codProcesso1);
             await page.goto('/painel');
 
             await capturarTela(page, '07-estados', '01-processo-criado', { extra: { estado: 'CRIADO' } });
@@ -1137,14 +1149,14 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             // Capturar ID para cleanup (após navegar para o subprocesso)
             const codProcesso = await extrairProcessoCodigo(page);
-            if (codProcesso > 0) cleanup.registrar(codProcesso);
+            registrarProcessoParaCleanup(cleanup, codProcesso);
             await navegarParaAtividades(page);
             await adicionarAtividade(page, 'Atividade bloco 1');
             await adicionarConhecimento(page, 'Atividade bloco 1', 'Conhecimento 1');
             await page.getByTestId('btn-cad-atividades-disponibilizar').click();
             await expect(page.getByTestId('btn-confirmar-disponibilizacao')).toBeVisible();
             await page.getByTestId('btn-confirmar-disponibilizacao').click();
-            await page.waitForTimeout(500);
+            await verificarPaginaPainel(page);
 
             // Login como Gestor da COORD_22 para ver botão de aceitar em bloco
             await fazerLogout(page);
@@ -1161,14 +1173,14 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             const btnAceitarBloco = page.getByRole('button', {name: /Aceitar.*Bloco/i});
             await expect(btnAceitarBloco).toBeVisible();
             await btnAceitarBloco.click();
-            await page.waitForTimeout(300);
+            await expect(page.getByRole('dialog')).toBeVisible();
             await capturarTela(page, '09-operacoes-bloco', '02-modal-aceitar-cadastro-bloco', { tags: ['modal', 'bloco'] });
             await page.getByRole('button', {name: /Cancelar/i}).click();
 
             // Executar aceite real para mover subprocesso para Secretaria 2
             await btnAceitarBloco.click();
             await page.getByRole('button', {name: TEXTOS.acaoBloco.aceitar.BOTAO}).click();
-            await page.waitForTimeout(500);
+            await expect(btnAceitarBloco).toBeHidden();
 
             // Login como Gestor da SECRETARIA_2 para aceitar e mover para o ADMIN
             await fazerLogout(page);
@@ -1185,7 +1197,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await expect(btnAceitarBlocoSec2).toBeVisible();
             await btnAceitarBlocoSec2.click();
             await page.getByRole('button', {name: TEXTOS.acaoBloco.aceitar.BOTAO}).click();
-            await page.waitForTimeout(500);
+            await expect(btnAceitarBlocoSec2).toBeHidden();
 
             // Login como Admin para homologar em bloco
             await fazerLogout(page);
@@ -1198,7 +1210,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             const btnHomologarBloco = page.getByRole('button', {name: /Homologar.*Bloco/i});
             await expect(btnHomologarBloco).toBeVisible();
             await btnHomologarBloco.click();
-            await page.waitForTimeout(300);
+            await expect(page.getByRole('dialog')).toBeVisible();
             await capturarTela(page, '09-operacoes-bloco', '03-modal-homologar-cadastro-bloco', { extra: { perfil: 'ADMIN' } });
             await page.getByRole('button', {name: /Cancelar/i}).click();
 
@@ -1237,7 +1249,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             // Registrar para cleanup
             const codProcesso = await extrairProcessoCodigo(page);
-            if (codProcesso > 0) cleanup.registrar(codProcesso);
+            registrarProcessoParaCleanup(cleanup, codProcesso);
 
             await page.getByRole('row', {name: /SECAO_121/i}).click();
             await expect(page).toHaveURL(/\/processo\/\d+\/SECAO_121/);
@@ -1247,7 +1259,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             const btnAlterarData = page.getByRole('button', {name: /Alterar.*data.*limite/i});
             await expect(btnAlterarData).toBeVisible();
             await btnAlterarData.click();
-            await page.waitForTimeout(300);
+            await expect(page.getByRole('dialog')).toBeVisible();
             await capturarTela(page, '10-gestao-subprocessos', '02-modal-alterar-data-limite', { tags: ['modal', 'gestao'] });
             await page.getByRole('button', {name: /Cancelar/i}).click();
 
@@ -1270,37 +1282,40 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             const linkUnidades = page.getByRole('link', {name: /Unidades/i});
             await expect(linkUnidades).toBeVisible();
             await linkUnidades.click();
-            await page.waitForTimeout(500);
+            await expect(page).toHaveURL(/\/unidades/);
             await capturarTela(page, '11-unidades', '01-arvore-unidades', { fullPage: true });
 
             const btnExpand = page.getByTestId('btn-arvore-expand-SECRETARIA_1');
             await expect(btnExpand).toBeVisible();
             await btnExpand.click();
-            await page.waitForTimeout(300);
+            await expect(page.getByTestId('btn-arvore-expand-COORD_12')).toBeVisible();
 
             const btnExpandCoord12 = page.getByTestId('btn-arvore-expand-COORD_12');
             await expect(btnExpandCoord12).toBeVisible();
             await btnExpandCoord12.click();
-            await page.waitForTimeout(300);
+            await expect(page.getByText('SECAO_121').first()).toBeVisible();
             await capturarTela(page, '11-unidades', '02-arvore-unidades-expandida', { fullPage: true });
 
             const unidade = page.getByText('SECAO_121').first();
             await expect(unidade).toBeVisible();
             await unidade.click();
-            await page.waitForTimeout(500);
+            await expect(page.getByRole('button', {name: /Criar atribuição|Nova atribuição/i})).toBeVisible();
             await capturarTela(page, '11-unidades', '03-detalhes-unidade', { fullPage: true, extra: { unidade: 'SECAO_121' } });
 
             const btnCriarAtribuicao = page.getByRole('button', {name: /Criar atribuição|Nova atribuição/i});
             await expect(btnCriarAtribuicao).toBeVisible();
             await btnCriarAtribuicao.click();
-            await page.waitForTimeout(300);
-            await capturarTela(page, '11-unidades', '04-modal-criar-atribuicao', { tags: ['modal', 'atribuicao'] });
-            await page.getByRole('button', {name: /Cancelar/i}).click();
+            await expect(page).toHaveURL(/\/unidade\/\d+\/atribuicao$/);
+            await expect(page.getByRole('heading', {name: TEXTOS.atribuicaoTemporaria.TITULO})).toBeVisible();
+            await expect(page.getByTestId('input-busca-usuario')).toBeVisible();
+            await capturarTela(page, '11-unidades', '04-tela-criar-atribuicao', { tags: ['tela', 'atribuicao'] });
+            await page.getByTestId('btn-cancelar-atribuicao').click();
+            await expect(page).toHaveURL(/\/unidade\/\d+$/);
 
             const linkHistorico = page.getByRole('link', {name: /Histórico/i});
             await expect(linkHistorico).toBeVisible();
             await linkHistorico.click();
-            await page.waitForTimeout(500);
+            await expect(page.locator('table').first()).toBeVisible();
             await capturarTela(page, '12-historico', '01-pagina-historico', { fullPage: true });
 
             const tabela = page.locator('table');
@@ -1309,7 +1324,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await capturarComponente(tabela.first(), '12-historico', '03-tabela-processos-finalizados-detalhe', { contexto: 'historico' });
 
             await page.getByTestId('btn-configuracoes').click();
-            await page.waitForTimeout(500);
+            await expect(page.getByLabel(/Dias para inativação de processos/i)).toBeVisible();
             await capturarTela(page, '13-configuracoes', '01-pagina-configuracoes', { fullPage: true });
 
             const inputDiasInativacao = page.getByLabel(/Dias para inativação de processos/i);
@@ -1317,20 +1332,20 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await capturarTela(page, '13-configuracoes', '02-config-sistema', { tags: ['config'] });
 
             await page.getByTestId('btn-administradores').click();
-            await page.waitForTimeout(500);
+            await expect(page.getByRole('button', {name: /Adicionar|Novo/i})).toBeVisible();
             await capturarTela(page, '13-configuracoes', '03-lista-administradores', { fullPage: true });
 
             const btnAdicionar = page.getByRole('button', {name: /Adicionar|Novo/i});
             await expect(btnAdicionar).toBeVisible();
             await btnAdicionar.click();
-            await page.waitForTimeout(300);
+            await expect(page.getByRole('dialog')).toBeVisible();
             await capturarTela(page, '13-configuracoes', '04-modal-adicionar-administrador', { tags: ['modal', 'admin'] });
             await page.getByRole('button', {name: /Cancelar/i}).click();
 
             const linkRelatorios = page.getByRole('link', {name: /Relatórios/i});
             await expect(linkRelatorios).toBeVisible();
             await linkRelatorios.click();
-            await page.waitForTimeout(500);
+            await expect(page.getByRole('tab', {name: /Andamento de processo/i})).toBeVisible();
             await capturarTela(page, '14-relatorios', '01-pagina-relatorios', { fullPage: true });
 
             const painelAndamento = page.getByRole('tabpanel', {name: /Andamento de processo/i});
@@ -1342,7 +1357,6 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await capturarTela(page, '14-relatorios', '03-botao-gerar-relatorio', { tags: ['ui-element'] });
 
             await page.getByRole('tab', {name: /^Mapas$/i}).click();
-            await page.waitForTimeout(300);
             const painelMapas = page.getByRole('tabpanel', {name: /^Mapas$/i});
             await expect(painelMapas.getByLabel(/Selecione o Processo/i)).toBeVisible();
             await expect(painelMapas.getByLabel(/Selecione a unidade/i)).toBeVisible();

@@ -52,6 +52,7 @@ describe('PainelView Coverage', () => {
     const commonStubs = {
         PageHeader: {template: '<div><slot name="actions" /></div>'},
         TabelaProcessos: {
+            name: 'TabelaProcessos',
             template: '<div></div>',
             props: ['processos', 'criterioOrdenacao', 'direcaoOrdenacaoAsc'],
             emits: ['ordenar', 'selecionar-processo', 'cta-vazio']
@@ -89,34 +90,6 @@ describe('PainelView Coverage', () => {
         await wrapper.vm.$nextTick();
 
         expect(processosStore.buscarProcessosPainel).toHaveBeenCalled();
-        expect(painelService.listarAlertas).not.toHaveBeenCalled();
-    });
-
-    it('ordenarAlertasPor does nothing when usuarioCodigo is missing', async () => {
-        const pinia = createTestingPinia({
-            createSpy: vi.fn,
-            initialState: {
-                perfil: {
-                    perfilSelecionado: 'GESTOR',
-                    unidadeSelecionada: 1,
-                    usuarioCodigo: null
-                },
-                processos: {processosPainel: []},
-            }
-        });
-
-        const wrapper = mount(PainelView, {
-            global: {
-                plugins: [pinia],
-                stubs: commonStubs
-            }
-        });
-
-        vi.clearAllMocks();
-        (painelService.listarAlertas as any).mockResolvedValue(mockPageVazia);
-
-        await (wrapper.vm as any).ordenarAlertasPor('processo');
-
         expect(painelService.listarAlertas).not.toHaveBeenCalled();
     });
 
@@ -191,8 +164,10 @@ describe('PainelView Coverage', () => {
         }));
         
         // Simular onActivated
-        if (wrapper.vm.$options.activated) {
-            for (const hook of wrapper.vm.$options.activated) {
+        const activated = wrapper.vm.$options.activated;
+        if (activated) {
+            const hooks = Array.isArray(activated) ? activated : [activated];
+            for (const hook of hooks) {
                 await hook.call(wrapper.vm);
             }
             expect(toastStore.consumePending).toHaveBeenCalledTimes(2);

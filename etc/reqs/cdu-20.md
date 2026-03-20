@@ -31,12 +31,11 @@ Ator: GESTOR e ADMIN
 
    8.1. Usuário clica em `Devolver para ajustes`.
 
-   8.2. O sistema abre um modal (título "Devolver mapa") com a pergunta "Confirma a devolução da validação do mapa para
-   ajustes?", um campo de observação (opcional) e os botões `Devolver` e `Cancelar`.
+   8.2. O sistema abre um modal (título "Devolver mapa") com a pergunta "Confirma a devolução da validação do mapa para ajustes?", um campo de observação (opcional) e os botões `Devolver` e `Cancelar`.
 
    8.3. Caso o usuário escolha `Cancelar`, o sistema interrompe a operação de devolução, permanecendo na tela `Visualização de mapa`.
 
-   8.4. O usuário opcionalmente informa a observação e escolhe `Confirmar`.
+   8.4. O usuário opcionalmente informa a observação e escolhe `Devolver`.
 
    8.5. O sistema registra uma análise de validação para o subprocesso com:
 
@@ -124,16 +123,15 @@ Ator: GESTOR e ADMIN
 
    9.9. O sistema redireciona para o Painel e mostra a mensagem "Aceite registrado".
 
-10. Se optar por homologar (perfil ADMIN):
+10. Se optar por **homologar** (perfil ADMIN):
 
     10.1. Usuário escolhe `Homologar`.
 
     10.2. O sistema abre um diálogo de confirmação (título 'Homologar mapa') com a pergunta 'Confirma a homologação do mapa de competências?' e os botões `Confirmar` ou `Homologar`.
 
-    10.3. Caso o usuário escolha o botão `Cancelar`, o sistema interrompe a operação de homologação, permanecendo na
-    mesma tela.
+    10.3. Caso o usuário escolha o botão `Cancelar`, o sistema interrompe a operação de homologação, permanecendo na mesma tela.
 
-    10.4. Usuário escolhe `Homologar`.
+    10.4. O usuário clica em `Homologar`.
 
     10.5. O sistema altera a situação do subprocesso da unidade para 'Mapa homologado'.
 

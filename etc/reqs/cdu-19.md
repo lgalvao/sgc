@@ -48,13 +48,13 @@ Ator: CHEFE
 
    4.6. O sistema mostra a mensagem "Mapa submetido com sugestões para análise da unidade superior".
 
-5. Se usuário clicar em Validar:
+5. Se usuário clicar em **Validar**:
 
-   5.1. O sistema mostra diálogo de confirmação: título ''Validação do mapa de competências", mensagem "Confirma a validação do mapa de competências? Essa ação habilita a análise por unidades superiores''/ Botões `Confirmar` e `Cancelar`.
+   5.1. O sistema mostra diálogo de confirmação, com título ''Validação do mapa" e mensagem "Confirma a validação do mapa de competências? Essa ação habilita a análise por unidades superiores''/ Botões `Cancelar` e `Validar`.
 
    5.1.1. Caso o usuário escolha `Cancelar`, o sistema interrompe a operação de validação, permanecendo na mesma tela.
 
-   5.2. O usuário escolhe `Confirmar`.
+   5.2. O usuário escolhe `Validar`.
 
    5.3. O sistema altera a situação do subprocesso da unidade para 'Mapa validado'.
 
@@ -80,13 +80,13 @@ Ator: CHEFE
 
    5.6. O sistema mostra a mensagem "Mapa validado e submetido para análise à unidade superior".
 
-6. O sistema registra movimentação para o subprocesso com:
+6. O sistema registra uma movimentação para o subprocesso com:
 
     - `Data/hora`: Data/hora atual
     - `Unidade origem`: [SIGLA_UNIDADE_SUBPROCESSO]
     - `Unidade destino`: [SIGLA_UNIDADE_SUPERIOR]
-    - `Descrição`: "Apresentação de sugestões para o mapa de competências", ou "Validação do mapa de competências", conforme o caso.
+    - `Descrição`: "Apresentação de sugestões para o mapa", ou "Validação do mapa", conforme o caso.
 
-7. O sistema define a data/hora de conclusão da etapa 2 do subprocesso da unidade como sendo a atual.
+7. O sistema define a data/hora de conclusão da Etapa 2 do subprocesso da unidade como sendo a atual.
 
 8. O sistema redireciona para o `Painel`.
