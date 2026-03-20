@@ -322,5 +322,44 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.aviso", containsString("não puderam ser importadas")));
         }
+
+        @Test
+        @DisplayName("IDs de atividades de outro subprocesso devem ser ignorados sem travar a importação")
+        void deveIgnorarIdsDeSelecoesDesatualizadasAoImportar() throws Exception {
+            // Cenário: o frontend enviou IDs de atividades pertencentes a outro mapa
+            // (seleções não limpas ao trocar de processo/unidade — Bug #1390).
+            // O backend deve ignorar os IDs inválidos e importar apenas o que encontrou.
+            List<Atividade> atividadesOrigem =
+                    atividadeRepo.findByMapa_Codigo(subprocessoOrigem.getMapa().getCodigo());
+            Atividade atividadeValida = atividadesOrigem.getFirst();
+
+            // IDs inválidos que não pertencem ao mapa de origem
+            long idSeleçãoDesatualizadaDeOutroMapa = 99999L;
+
+            ImportarAtividadesRequest request =
+                    new ImportarAtividadesRequest(
+                            subprocessoOrigem.getCodigo(),
+                            List.of(atividadeValida.getCodigo(), idSeleçãoDesatualizadaDeOutroMapa));
+
+            mockMvc.perform(
+                            post("/api/subprocessos/{codigo}/importar-atividades",
+                                    subprocessoDestino.getCodigo())
+                                    .with(user(chefe))
+                                    .with(csrf())
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isOk())
+                    // O aviso deve indicar que nem todas as atividades foram importadas
+                    .andExpect(jsonPath("$.aviso", containsString("não puderam ser importadas")));
+
+            entityManager.flush();
+            entityManager.clear();
+
+            // Apenas a atividade válida deve ter sido importada
+            List<Atividade> atividadesDestino =
+                    atividadeRepo.findByMapa_Codigo(subprocessoDestino.getMapa().getCodigo());
+            assertThat(atividadesDestino).hasSize(1);
+            assertThat(atividadesDestino.getFirst().getDescricao()).isEqualTo(atividadeValida.getDescricao());
+        }
     }
 }

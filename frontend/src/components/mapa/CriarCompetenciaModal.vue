@@ -54,15 +54,24 @@
                 data-testid="chk-criar-competencia-atividade"
             >
               {{ atividade.descricao }}
-              <BBadge
+              <BTooltip
                   v-if="atividade.conhecimentos.length > 0"
-                  v-b-tooltip.html.right="getConhecimentosModal(atividade)"
-                  variant="secondary"
-                  class="ms-2"
-                  data-testid="cad-mapa__txt-badge-conhecimentos-2"
+                  placement="right"
               >
-                {{ atividade.conhecimentos.length }}
-              </BBadge>
+                <template #title>
+                  <strong>Conhecimentos:</strong>
+                  <ul class="mb-0 ps-3 mt-1">
+                    <li v-for="c in atividade.conhecimentos" :key="c.codigo">{{ c.descricao }}</li>
+                  </ul>
+                </template>
+                <BBadge
+                    variant="secondary"
+                    class="ms-2"
+                    data-testid="cad-mapa__txt-badge-conhecimentos-2"
+                >
+                  {{ atividade.conhecimentos.length }}
+                </BBadge>
+              </BTooltip>
             </BFormCheckbox>
           </BCardBody>
         </BCard>
@@ -84,6 +93,7 @@ import {
   BFormCheckbox,
   BFormInvalidFeedback,
   BFormTextarea,
+  BTooltip,
 } from "bootstrap-vue-next";
 import {computed, nextTick, ref, watch} from "vue";
 import ModalPadrao from "@/components/comum/ModalPadrao.vue";
@@ -147,18 +157,6 @@ function focarDescricao() {
   nextTick(() => {
     inputDescricaoRef.value?.$el?.focus();
   });
-}
-
-function getConhecimentosModal(atividade: Atividade): string {
-  if (!atividade.conhecimentos.length) {
-    return "Nenhum conhecimento";
-  }
-
-  const conhecimentosHtml = atividade.conhecimentos
-      .map((c) => `<div class="mb-1">• ${c.descricao}</div>`)
-      .join("");
-
-  return `<div class="text-start"><strong>Conhecimentos:</strong><br>${conhecimentosHtml}</div>`;
 }
 
 function fechar() {

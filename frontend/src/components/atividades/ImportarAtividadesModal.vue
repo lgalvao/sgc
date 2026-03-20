@@ -224,6 +224,7 @@ function resetModal() {
 
 async function selecionarProcesso(processo: ProcessoResumo | null) {
   processoSelecionado.value = processo;
+  atividadesSelecionadas.value = [];
   if (processo) {
     unidadesParticipantes.value = await processos.buscarUnidadesParaImportacao(processo.codigo);
   } else {
@@ -234,6 +235,7 @@ async function selecionarProcesso(processo: ProcessoResumo | null) {
 }
 
 async function selecionarUnidade(unidadePu: UnidadeImportacao | null) {
+  atividadesSelecionadas.value = [];
   unidadeSelecionada.value = unidadePu;
   if (unidadePu) {
     try {
