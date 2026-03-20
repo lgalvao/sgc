@@ -166,9 +166,9 @@ import EmptyState from "@/components/comum/EmptyState.vue";
 import CadAtividadeForm from "@/components/atividades/CadAtividadeForm.vue";
 import AtividadeItem from "@/components/atividades/AtividadeItem.vue";
 import {useAtividadeForm} from "@/composables/useAtividadeForm";
+import {useProcessos} from "@/composables/useProcessos";
 import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useMapasStore} from "@/stores/mapas";
-import {useProcessosStore} from "@/stores/processos";
 import {useNotification} from "@/composables/useNotification";
 import {useToastStore} from "@/stores/toast";
 import {usePerfil} from "@/composables/usePerfil";
@@ -206,7 +206,7 @@ const props = defineProps<{
 const router = useRouter();
 const subprocessosStore = useSubprocessosStore();
 const mapasStore = useMapasStore();
-const processosStore = useProcessosStore();
+const processos = useProcessos();
 const {notify, notificacao, clear} = useNotification();
 const toastStore = useToastStore();
 const {impactoMapa: impactos} = storeToRefs(mapasStore);
@@ -338,9 +338,9 @@ function buscarSubprocessoNoProcesso(unidades: UnidadeProcesso[] | undefined, si
 async function carregarContextoInicial() {
   const codProcessoRef = Number(props.codProcesso);
 
-  await processosStore.buscarProcessoDetalhe(codProcessoRef);
+  await processos.buscarProcessoDetalhe(codProcessoRef);
 
-  let id = buscarSubprocessoNoProcesso(processosStore.processoDetalhe?.unidades as UnidadeProcesso[] | undefined, props.sigla);
+  let id = buscarSubprocessoNoProcesso(processos.processoDetalhe.value?.unidades as UnidadeProcesso[] | undefined, props.sigla);
 
   if (!id) {
     id = await subprocessosStore.buscarSubprocessoPorProcessoEUnidade(codProcessoRef, props.sigla);
