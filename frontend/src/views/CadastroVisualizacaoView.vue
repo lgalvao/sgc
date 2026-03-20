@@ -156,6 +156,7 @@ import ImpactoMapaModal from "@/components/mapa/ImpactoMapaModal.vue";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import {useProcessos} from "@/composables/useProcessos";
+import {useFluxoSubprocesso} from "@/composables/useFluxoSubprocesso";
 import {useMapasStore} from "@/stores/mapas";
 import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useToastStore} from "@/stores/toast";
@@ -180,6 +181,7 @@ const props = defineProps<{
 
 const router = useRouter();
 const processos = useProcessos();
+const fluxoSubprocesso = useFluxoSubprocesso();
 const mapasStore = useMapasStore();
 const subprocessosStore = useSubprocessosStore();
 const toastStore = useToastStore();
@@ -312,9 +314,9 @@ async function confirmarValidacao() {
         observacoes: observacaoValidacao.value,
       };
       if (isRevisao.value) {
-        sucesso = await subprocessosStore.homologarRevisaoCadastro(codSubprocesso.value, req);
+        sucesso = await fluxoSubprocesso.homologarRevisaoCadastro(codSubprocesso.value, req);
       } else {
-        sucesso = await subprocessosStore.homologarCadastro(codSubprocesso.value, req);
+        sucesso = await fluxoSubprocesso.homologarCadastro(codSubprocesso.value, req);
       }
 
       if (sucesso) {
@@ -333,9 +335,9 @@ async function confirmarValidacao() {
         observacoes: observacaoValidacao.value,
       };
       if (isRevisao.value) {
-        sucesso = await subprocessosStore.aceitarRevisaoCadastro(codSubprocesso.value, req);
+        sucesso = await fluxoSubprocesso.aceitarRevisaoCadastro(codSubprocesso.value, req);
       } else {
-        sucesso = await subprocessosStore.aceitarCadastro(codSubprocesso.value, req);
+        sucesso = await fluxoSubprocesso.aceitarCadastro(codSubprocesso.value, req);
       }
 
       if (sucesso) {
@@ -362,9 +364,9 @@ async function confirmarDevolucao() {
 
     let sucesso: boolean;
     if (isRevisao.value) {
-      sucesso = await subprocessosStore.devolverRevisaoCadastro(codSubprocesso.value, req);
+      sucesso = await fluxoSubprocesso.devolverRevisaoCadastro(codSubprocesso.value, req);
     } else {
-      sucesso = await subprocessosStore.devolverCadastro(codSubprocesso.value, req);
+      sucesso = await fluxoSubprocesso.devolverCadastro(codSubprocesso.value, req);
     }
 
     if (sucesso) {

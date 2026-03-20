@@ -1,33 +1,13 @@
 import {defineStore} from "pinia";
 import {ref} from "vue";
 import {
-    aceitarCadastro,
-    aceitarRevisaoCadastro,
-    devolverCadastro,
-    devolverRevisaoCadastro,
-    disponibilizarCadastro,
-    disponibilizarRevisaoCadastro,
-    homologarCadastro,
-    homologarRevisaoCadastro,
-} from "@/services/cadastroService";
-import {
     buscarContextoEdicao as serviceBuscarContextoEdicao,
     buscarSubprocessoDetalhe as serviceFetchSubprocessoDetalhe,
     buscarSubprocessoPorProcessoEUnidade as serviceBuscarSubprocessoPorProcessoEUnidade,
-    validarCadastro as serviceValidarCadastro,
 } from "@/services/subprocessoService";
-import {
-    alterarDataLimiteSubprocesso as serviceAlterarDataLimite,
-    reabrirCadastro as serviceReabrirCadastro,
-    reabrirRevisaoCadastro as serviceReabrirRevisaoCadastro,
-} from "@/services/processoService";
-import {useProcessos} from "@/composables/useProcessos";
 import {usePerfilStore} from "@/stores/perfil";
 import {useMapasStore} from "@/stores/mapas";
 import type {
-    AceitarCadastroRequest,
-    DevolverCadastroRequest,
-    HomologarCadastroRequest,
     MapaCompleto,
     SituacaoSubprocesso,
     SubprocessoDetalhe,
@@ -39,32 +19,6 @@ import {logger} from "@/utils";
 export const useSubprocessosStore = defineStore("subprocessos", () => {
     const subprocessoDetalhe = ref<SubprocessoDetalhe | null>(null);
     const {lastError, clearError, withErrorHandling} = useErrorHandler();
-
-    async function _executarAcao(acao: () => Promise<any>): Promise<boolean> {
-        try {
-            await withErrorHandling(async () => {
-                await acao();
-
-                const processos = useProcessos();
-                if (processos.processoDetalhe.value) {
-                    await processos.buscarProcessoDetalhe(processos.processoDetalhe.value.codigo);
-                }
-            });
-            return true;
-        } catch {
-            return false;
-        }
-    }
-
-    async function alterarDataLimiteSubprocesso(
-        codigo: number,
-        dados: { novaData: string },
-    ) {
-        return withErrorHandling(async () => {
-            await serviceAlterarDataLimite(codigo, dados);
-            await buscarSubprocessoDetalhe(codigo);
-        });
-    }
 
     function mapSubprocessoDetalheDtoToModel(dto: any): SubprocessoDetalhe {
         if (!dto) return null as any;
@@ -170,73 +124,13 @@ export const useSubprocessosStore = defineStore("subprocessos", () => {
         }
     }
 
-    async function validarCadastro(codSubprocesso: number) {
-        return withErrorHandling(async () => {
-            return await serviceValidarCadastro(codSubprocesso);
-        });
-    }
-
-    async function reabrirCadastro(codSubprocesso: number, justificativa: string) {
-        return _executarAcao(
-            () => serviceReabrirCadastro(codSubprocesso, justificativa)
-        );
-    }
-
-    async function reabrirRevisaoCadastro(codSubprocesso: number, justificativa: string) {
-        return _executarAcao(
-            () => serviceReabrirRevisaoCadastro(codSubprocesso, justificativa)
-        );
-    }
-
     return {
         subprocessoDetalhe,
         lastError,
         clearError,
-        alterarDataLimiteSubprocesso,
         buscarSubprocessoDetalhe,
         buscarContextoEdicao,
         buscarSubprocessoPorProcessoEUnidade,
         atualizarStatusLocal,
-        validarCadastro,
-        reabrirCadastro,
-        reabrirRevisaoCadastro,
-        disponibilizarCadastro: (codSubprocesso: number) =>
-            _executarAcao(
-                () => disponibilizarCadastro(codSubprocesso)
-            ),
-        disponibilizarRevisaoCadastro: (codSubprocesso: number) =>
-            _executarAcao(
-                () => disponibilizarRevisaoCadastro(codSubprocesso)
-            ),
-        devolverCadastro: (codSubprocesso: number, req: DevolverCadastroRequest) =>
-            _executarAcao(
-                () => devolverCadastro(codSubprocesso, req)
-            ),
-        aceitarCadastro: (codSubprocesso: number, req: AceitarCadastroRequest) =>
-            _executarAcao(
-                () => aceitarCadastro(codSubprocesso, req)
-            ),
-        homologarCadastro: async (codSubprocesso: number, req: HomologarCadastroRequest) => {
-            const ok = await _executarAcao(
-                () => homologarCadastro(codSubprocesso, req)
-            );
-            if (ok) await buscarSubprocessoDetalhe(codSubprocesso);
-            return ok;
-        },
-        devolverRevisaoCadastro: (codSubprocesso: number, req: DevolverCadastroRequest) =>
-            _executarAcao(
-                () => devolverRevisaoCadastro(codSubprocesso, req)
-            ),
-        aceitarRevisaoCadastro: (codSubprocesso: number, req: AceitarCadastroRequest) =>
-            _executarAcao(
-                () => aceitarRevisaoCadastro(codSubprocesso, req)
-            ),
-        homologarRevisaoCadastro: async (codSubprocesso: number, req: HomologarCadastroRequest) => {
-            const ok = await _executarAcao(
-                () => homologarRevisaoCadastro(codSubprocesso, req)
-            );
-            if (ok) await buscarSubprocessoDetalhe(codSubprocesso);
-            return ok;
-        },
     };
 });

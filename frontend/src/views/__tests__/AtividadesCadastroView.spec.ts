@@ -3,6 +3,7 @@ import {flushPromises, mount} from "@vue/test-utils";
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import {ref} from "vue";
 import * as usePerfilModule from "@/composables/usePerfil";
+import * as useFluxoSubprocessoModule from "@/composables/useFluxoSubprocesso";
 import * as useProcessosModule from "@/composables/useProcessos";
 import * as subprocessoService from "@/services/subprocessoService";
 import * as analiseService from "@/services/analiseService";
@@ -38,6 +39,7 @@ vi.mock("@/services/analiseService", () => ({
     listarAnalisesCadastro: vi.fn(),
 }));
 
+vi.mock("@/composables/useFluxoSubprocesso", () => ({useFluxoSubprocesso: vi.fn()}));
 vi.mock("@/composables/useProcessos", () => ({useProcessos: vi.fn()}));
 
 const stubs = {
@@ -130,6 +132,11 @@ function createWrapper(customState = {}, accessOverrides = {}) {
 describe("CadastroView.vue", () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        vi.mocked(useFluxoSubprocessoModule.useFluxoSubprocesso).mockReturnValue({
+            validarCadastro: vi.fn().mockResolvedValue({valido: true}),
+            disponibilizarCadastro: vi.fn().mockResolvedValue(true),
+            disponibilizarRevisaoCadastro: vi.fn().mockResolvedValue(true),
+        } as any);
         vi.mocked(useProcessosModule.useProcessos).mockReturnValue({
             processoDetalhe: ref({
                 codigo: 1,
@@ -164,6 +171,7 @@ describe("CadastroView.vue", () => {
         (wrapper.vm as any).atividades = [{codigo: 1, conhecimentos: [{codigo: 1}]}];
         await wrapper.vm.$nextTick();
         const subprocessosStore = useSubprocessosStore();
+        const fluxoSubprocesso = useFluxoSubprocessoModule.useFluxoSubprocesso() as any;
         subprocessosStore.subprocessoDetalhe = {
             codigo: 123,
             situacao: "MAPEAMENTO_CADASTRO_EM_ANDAMENTO",
@@ -171,11 +179,10 @@ describe("CadastroView.vue", () => {
             unidade: {sigla: "TESTE"},
             permissoes: {}
         } as any;
-        subprocessosStore.validarCadastro = vi.fn().mockResolvedValue({valido: true});
 
         await (wrapper.vm as any).disponibilizarCadastro();
 
-        expect(subprocessosStore.validarCadastro).toHaveBeenCalledWith(123);
+        expect(fluxoSubprocesso.validarCadastro).toHaveBeenCalledWith(123);
         expect((wrapper.vm as any).mostrarModalConfirmacao).toBe(true);
     });
 
@@ -185,6 +192,7 @@ describe("CadastroView.vue", () => {
         (wrapper.vm as any).atividades = [{codigo: 1, conhecimentos: [{codigo: 1}]}];
         await wrapper.vm.$nextTick();
         const subprocessosStore = useSubprocessosStore();
+        const fluxoSubprocesso = useFluxoSubprocessoModule.useFluxoSubprocesso() as any;
         subprocessosStore.subprocessoDetalhe = {
             codigo: 123,
             situacao: "MAPEAMENTO_CADASTRO_EM_ANDAMENTO",
@@ -192,8 +200,6 @@ describe("CadastroView.vue", () => {
             unidade: {sigla: "TESTE"},
             permissoes: {}
         } as any;
-        subprocessosStore.validarCadastro = vi.fn().mockResolvedValue({valido: true});
-        subprocessosStore.disponibilizarCadastro = vi.fn().mockResolvedValue(true);
 
         await (wrapper.vm as any).disponibilizarCadastro();
         await flushPromises();
@@ -202,7 +208,7 @@ describe("CadastroView.vue", () => {
         modal.vm.$emit('confirmar');
         await flushPromises();
 
-        expect(subprocessosStore.disponibilizarCadastro).toHaveBeenCalledWith(123);
+        expect(fluxoSubprocesso.disponibilizarCadastro).toHaveBeenCalledWith(123);
         expect(pushMock).toHaveBeenCalledWith("/painel");
     });
 

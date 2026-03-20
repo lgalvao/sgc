@@ -166,6 +166,7 @@ import EmptyState from "@/components/comum/EmptyState.vue";
 import CadAtividadeForm from "@/components/atividades/CadAtividadeForm.vue";
 import AtividadeItem from "@/components/atividades/AtividadeItem.vue";
 import {useAtividadeForm} from "@/composables/useAtividadeForm";
+import {useFluxoSubprocesso} from "@/composables/useFluxoSubprocesso";
 import {useProcessos} from "@/composables/useProcessos";
 import {useSubprocessosStore} from "@/stores/subprocessos";
 import {useMapasStore} from "@/stores/mapas";
@@ -207,6 +208,7 @@ const router = useRouter();
 const subprocessosStore = useSubprocessosStore();
 const mapasStore = useMapasStore();
 const processos = useProcessos();
+const fluxoSubprocesso = useFluxoSubprocesso();
 const {notify, notificacao, clear} = useNotification();
 const toastStore = useToastStore();
 const {impactoMapa: impactos} = storeToRefs(mapasStore);
@@ -544,7 +546,7 @@ async function disponibilizarCadastro() {
     errosValidacao.value = [];
     erroGlobal.value = null;
     try {
-      const resultado = await subprocessosStore.validarCadastro(codSubprocesso.value);
+      const resultado = await fluxoSubprocesso.validarCadastro(codSubprocesso.value);
       if (resultado?.valido) {
         mostrarModalConfirmacao.value = true;
       } else if (resultado) {
@@ -572,9 +574,9 @@ async function confirmarDisponibilizacao() {
 
   let sucesso: boolean;
   if (isRevisao.value) {
-    sucesso = await subprocessosStore.disponibilizarRevisaoCadastro(codSubprocesso.value);
+    sucesso = await fluxoSubprocesso.disponibilizarRevisaoCadastro(codSubprocesso.value);
   } else {
-    sucesso = await subprocessosStore.disponibilizarCadastro(codSubprocesso.value);
+    sucesso = await fluxoSubprocesso.disponibilizarCadastro(codSubprocesso.value);
   }
 
   mostrarModalConfirmacao.value = false;

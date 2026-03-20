@@ -106,19 +106,26 @@ Os seguintes pontos foram confirmados no código:
 - As facades `PainelFacade`, `UsuarioFacade`, `AlertaFacade`, `RelatorioFacade`, `LoginFacade` e `AtividadeFacade` existem.
 - Há fragmentação real em `SubprocessoService`, `SubprocessoTransicaoService`, `SubprocessoValidacaoService`, `SubprocessoNotificacaoService`.
 - Há fragmentação real em `MapaVisualizacaoService`, `MapaSalvamentoService`, `ImpactoMapaService`, `MapaManutencaoService` e `CopiaMapaService`.
-- `frontend/src/composables/useProcessos.ts` hoje ainda é um wrapper da store `frontend/src/stores/processos.ts`.
-- A migração do fluxo de `Processo` no frontend ainda está incompleta.
+- `frontend/src/composables/useProcessos.ts` já foi convertido em composable real, com estado próprio e chamadas diretas a `services/`.
+- `frontend/src/stores/processos.ts` já foi removido.
+- O fluxo principal de `Processo` no frontend já foi migrado para `useProcessos()`.
 - O backend já usa `@JsonView` em múltiplos controllers e entidades, então a simplificação por serialização controlada já é compatível com o padrão atual.
 
 ## Pendências consolidadas
 
 ## 1. Processo: frontend
 
-- Refatorar `frontend/src/composables/useProcessos.ts` para manter estado local e chamar `services/` diretamente, deixando de ser apenas um wrapper da store.
-- Migrar os consumidores diretos de `useProcessosStore()` para o composable ou para estado local.
-- Atualizar os testes afetados pela remoção da store compartilhada.
-- Remover `frontend/src/stores/processos.ts` apenas depois que não houver mais dependências diretas ou indiretas.
-- Revisar stores relacionadas que hoje dependem de `processos.ts`, especialmente `frontend/src/stores/subprocessos.ts`.
+Concluído:
+
+- `frontend/src/composables/useProcessos.ts` foi refatorado para manter estado próprio e chamar `services/` diretamente.
+- Os consumidores diretos mais relevantes de `Processo` foram migrados para o composable.
+- Os testes afetados pela remoção da store compartilhada foram ajustados.
+- `frontend/src/stores/processos.ts` foi removido.
+
+Pendente:
+
+- Revisar `frontend/src/stores/subprocessos.ts` para verificar o que ainda precisa permanecer como estado global.
+- Auditar se o restante do módulo `Processo` ainda pode perder estado compartilhado residual e migrar isso para composables locais quando fizer sentido.
 
 ## 2. Processo: backend
 
@@ -150,7 +157,7 @@ Os seguintes pontos foram confirmados no código:
 
 ## Ordem recomendada
 
-1. Concluir a migração do fluxo de `Processo` no frontend, incluindo composable, views, componentes e testes.
+1. Revisar `frontend/src/stores/subprocessos.ts` e decidir o que permanece global e o que migra para composables locais.
 2. Ajustar a serialização e os retornos simples do backend de `Processo`.
 3. Consolidar facades e reduzir fragmentação artificial nos services do backend.
 4. Auditar e remover stores pass-through e wrappers restantes no frontend.
@@ -160,7 +167,7 @@ Os seguintes pontos foram confirmados no código:
 O plano será considerado concluído quando:
 
 - não houver mais dependência relevante de facades elimináveis;
-- o fluxo de `Processo` no frontend não depender mais de `frontend/src/stores/processos.ts`;
+- o fluxo de `Processo` no frontend não depender mais de store global artificial;
 - os retornos simples do backend tiverem sido simplificados sem exposição indevida de campos;
 - `Subprocesso` e `Mapa` não estiverem mais divididos em services artificiais sem ganho claro;
 - testes de backend e frontend cobrirem os fluxos afetados pela simplificação.

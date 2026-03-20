@@ -226,6 +226,7 @@ import {useNotification} from "@/composables/useNotification";
 import {useModalManager} from "@/composables/useModalManager";
 import {useLoadingManager} from "@/composables/useLoadingManager";
 import {useProcessos} from "@/composables/useProcessos";
+import {useFluxoSubprocesso} from "@/composables/useFluxoSubprocesso";
 
 import {useAcesso} from "@/composables/useAcesso";
 import {useSubprocessosStore} from "@/stores/subprocessos";
@@ -255,6 +256,7 @@ function formatTipoResponsabilidade(resp: any): string {
 }
 
 const subprocessosStore = useSubprocessosStore();
+const fluxoSubprocesso = useFluxoSubprocesso();
 const processos = useProcessos();
 
 const mapaStore = useMapasStore();
@@ -366,7 +368,7 @@ async function confirmarAlteracaoDataLimite(novaData: string) {
 
   await loading.withLoading('dataLimite', async () => {
     try {
-      await subprocessosStore.alterarDataLimiteSubprocesso(
+      await fluxoSubprocesso.alterarDataLimiteSubprocesso(
           subprocesso.value!.codigo,
           {novaData},
       );
@@ -405,14 +407,13 @@ async function confirmarReabertura() {
   await loading.withLoading('reabertura', async () => {
     let sucesso: boolean;
     if (tipoReabertura.value === 'cadastro') {
-      sucesso = await subprocessosStore.reabrirCadastro(codSubprocesso.value!, justificativaReabertura.value);
+      sucesso = await fluxoSubprocesso.reabrirCadastro(codSubprocesso.value!, justificativaReabertura.value);
     } else {
-      sucesso = await subprocessosStore.reabrirRevisaoCadastro(codSubprocesso.value!, justificativaReabertura.value);
+      sucesso = await fluxoSubprocesso.reabrirRevisaoCadastro(codSubprocesso.value!, justificativaReabertura.value);
     }
 
     if (sucesso) {
       fecharModalReabrir();
-      await subprocessosStore.buscarSubprocessoDetalhe(codSubprocesso.value!);
       notify(
           tipoReabertura.value === 'cadastro'
               ? TEXTOS.subprocesso.SUCESSO_CADASTRO_REABERTO

@@ -3,6 +3,7 @@ import {flushPromises, mount} from "@vue/test-utils";
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import {ref} from "vue";
 import * as useAcessoModule from "@/composables/useAcesso";
+import * as useFluxoSubprocessoModule from "@/composables/useFluxoSubprocesso";
 import * as subprocessoService from "@/services/subprocessoService";
 import * as analiseService from "@/services/analiseService";
 import {useSubprocessosStore} from "@/stores/subprocessos";
@@ -24,6 +25,7 @@ vi.mock("@/services/subprocessoService", () => ({
     buscarContextoEdicao: vi.fn(),
 }));
 
+vi.mock("@/composables/useFluxoSubprocesso", () => ({useFluxoSubprocesso: vi.fn()}));
 const processosMock = {
     processoDetalhe: ref<any>(null),
     buscarProcessoDetalhe: vi.fn(),
@@ -60,6 +62,14 @@ const stubs = {
 describe("CadastroVisualizacaoView coverage", () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        vi.mocked(useFluxoSubprocessoModule.useFluxoSubprocesso).mockReturnValue({
+            aceitarCadastro: vi.fn().mockResolvedValue(true),
+            devolverCadastro: vi.fn().mockResolvedValue(true),
+            homologarCadastro: vi.fn().mockResolvedValue(true),
+            homologarRevisaoCadastro: vi.fn().mockResolvedValue(true),
+            aceitarRevisaoCadastro: vi.fn().mockResolvedValue(true),
+            devolverRevisaoCadastro: vi.fn().mockResolvedValue(true),
+        } as any);
         processosMock.processoDetalhe.value = null;
         vi.mocked(subprocessoService.buscarSubprocessoPorProcessoEUnidade).mockResolvedValue(123 as any);
         vi.mocked(subprocessoService.buscarContextoEdicao).mockResolvedValue({
@@ -105,13 +115,7 @@ describe("CadastroVisualizacaoView coverage", () => {
         const wrapper = createWrapper();
         await flushPromises();
 
-        const store = useSubprocessosStore();
-        (store.aceitarCadastro as any).mockResolvedValue(true);
-        (store.devolverCadastro as any).mockResolvedValue(true);
-        (store.homologarCadastro as any).mockResolvedValue(true);
-        (store.homologarRevisaoCadastro as any).mockResolvedValue(true);
-        (store.aceitarRevisaoCadastro as any).mockResolvedValue(true);
-        (store.devolverRevisaoCadastro as any).mockResolvedValue(true);
+        const fluxoSubprocesso = useFluxoSubprocessoModule.useFluxoSubprocesso() as any;
 
         vi.mocked(analiseService.listarAnalisesCadastro).mockResolvedValue([]);
         await wrapper.find('[data-testid="btn-vis-atividades-historico"]').trigger("click");
@@ -122,35 +126,35 @@ describe("CadastroVisualizacaoView coverage", () => {
         (wrapper.vm as any).observacaoDevolucao = "Obs devolução";
         await wrapper.find('[data-testid="btn-devolucao-cadastro-confirmar"]').trigger("click");
         await flushPromises();
-        expect(store.devolverCadastro).toHaveBeenCalled();
+        expect(fluxoSubprocesso.devolverCadastro).toHaveBeenCalled();
 
         (wrapper.vm as any).podeHomologarCadastro = false;
         await wrapper.find('[data-testid="btn-acao-analisar-principal"]').trigger("click");
         await wrapper.find('[data-testid="btn-aceite-cadastro-confirmar"]').trigger("click");
         await flushPromises();
-        expect(store.aceitarCadastro).toHaveBeenCalled();
+        expect(fluxoSubprocesso.aceitarCadastro).toHaveBeenCalled();
 
         (wrapper.vm as any).podeHomologarCadastro = true;
         await wrapper.find('[data-testid="btn-acao-analisar-principal"]').trigger("click");
         await wrapper.find('[data-testid="btn-aceite-cadastro-confirmar"]').trigger("click");
         await flushPromises();
-        expect(store.homologarCadastro).toHaveBeenCalled();
+        expect(fluxoSubprocesso.homologarCadastro).toHaveBeenCalled();
 
         (processosMock.processoDetalhe.value as any).tipo = "REVISAO";
         await wrapper.vm.$nextTick();
 
         (wrapper.vm as any).podeHomologarCadastro = true;
         await (wrapper.vm as any).confirmarValidacao();
-        expect(store.homologarRevisaoCadastro).toHaveBeenCalled();
+        expect(fluxoSubprocesso.homologarRevisaoCadastro).toHaveBeenCalled();
 
         // Aceitar Revisão
         (wrapper.vm as any).podeHomologarCadastro = false;
         await (wrapper.vm as any).confirmarValidacao();
-        expect(store.aceitarRevisaoCadastro).toHaveBeenCalled();
+        expect(fluxoSubprocesso.aceitarRevisaoCadastro).toHaveBeenCalled();
 
         (wrapper.vm as any).observacaoDevolucao = "Rev";
         await (wrapper.vm as any).confirmarDevolucao();
-        expect(store.devolverRevisaoCadastro).toHaveBeenCalled();
+        expect(fluxoSubprocesso.devolverRevisaoCadastro).toHaveBeenCalled();
 
         const mapsStore = (wrapper.vm as any).mapasStore;
         mapsStore.buscarImpactoMapa = vi.fn().mockResolvedValue(null);
@@ -234,10 +238,10 @@ describe("CadastroVisualizacaoView coverage", () => {
         const wrapper = createWrapper();
         await flushPromises();
         const vm = wrapper.vm as any;
-        const store = useSubprocessosStore();
+        const fluxoSubprocesso = useFluxoSubprocessoModule.useFluxoSubprocesso() as any;
 
         // Falha no aceite
-        (store.aceitarCadastro as any).mockResolvedValue(false);
+        fluxoSubprocesso.aceitarCadastro.mockResolvedValue(false);
         vm.podeHomologarCadastro = false;
         vm.mostrarModalValidar = true;
         vm.observacaoValidacao = "Teste falha";
@@ -245,13 +249,13 @@ describe("CadastroVisualizacaoView coverage", () => {
         expect(vm.mostrarModalValidar).toBe(true); // Permanece aberto
 
         // Falha na homologação
-        (store.homologarCadastro as any).mockResolvedValue(false);
+        fluxoSubprocesso.homologarCadastro.mockResolvedValue(false);
         vm.podeHomologarCadastro = true;
         await vm.confirmarValidacao();
         expect(vm.mostrarModalValidar).toBe(true);
 
         // Falha na devolução
-        (store.devolverCadastro as any).mockResolvedValue(false);
+        fluxoSubprocesso.devolverCadastro.mockResolvedValue(false);
         vm.mostrarModalDevolver = true;
         vm.observacaoDevolucao = "Obs";
         await vm.confirmarDevolucao();

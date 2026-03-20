@@ -6,6 +6,16 @@ import {useSubprocessosStore} from '@/stores/subprocessos';
 import {BSpinner} from 'bootstrap-vue-next';
 import * as useAcessoModule from '@/composables/useAcesso';
 
+const fluxoSubprocessoMock = {
+    alterarDataLimiteSubprocesso: vi.fn(),
+    reabrirCadastro: vi.fn(),
+    reabrirRevisaoCadastro: vi.fn(),
+};
+
+vi.mock('@/composables/useFluxoSubprocesso', () => ({
+    useFluxoSubprocesso: () => fluxoSubprocessoMock
+}));
+
 const SubprocessoHeaderStub = {template: '<div />'};
 const SubprocessoCardsStub = {template: '<div />'};
 const SubprocessoModalStub = {template: '<div />'};
@@ -22,6 +32,13 @@ const BAlertStub = {
 };
 
 describe('SubprocessoView Coverage', () => {
+    it('prepara mocks de fluxo', () => {
+        fluxoSubprocessoMock.alterarDataLimiteSubprocesso.mockResolvedValue({});
+        fluxoSubprocessoMock.reabrirCadastro.mockResolvedValue(true);
+        fluxoSubprocessoMock.reabrirRevisaoCadastro.mockResolvedValue(true);
+        expect(true).toBe(true);
+    });
+
     it('renders loading state when no data and no error', () => {
         vi.spyOn(useAcessoModule, 'useAcesso').mockReturnValue({
             podeAlterarDataLimite: {value: false},
@@ -157,7 +174,7 @@ describe('SubprocessoView Coverage', () => {
 
         await (wrapper.vm as any).confirmarAlteracaoDataLimite('');
 
-        expect(store.alterarDataLimiteSubprocesso).not.toHaveBeenCalled();
+        expect(fluxoSubprocessoMock.alterarDataLimiteSubprocesso).not.toHaveBeenCalled();
     });
 
     it('confirmarReabertura returns early if justification is empty', async () => {
@@ -207,6 +224,6 @@ describe('SubprocessoView Coverage', () => {
         (wrapper.vm as any).justificativaReabertura = '';
         await (wrapper.vm as any).confirmarReabertura();
 
-        expect(store.reabrirCadastro).not.toHaveBeenCalled();
+        expect(fluxoSubprocessoMock.reabrirCadastro).not.toHaveBeenCalled();
     });
 });

@@ -1,3 +1,18 @@
-- [ ] Define the audit scope.
-- [ ] Conduct a two-pass SAST analysis on all files within scope.
+- [x] Define the audit scope.
+- [ ] SAST Recon on `backend/src/main/java/sgc/processo/ProcessoController.java`
+  - [ ] Investigate data flow from `requisicao` on line 46.
+  - [ ] Investigate data flow from `tipo` on line 61.
+  - [ ] Investigate data flow from `codigo` on line 68.
+  - [ ] Investigate data flow from `usuario` on line 145.
+- [ ] SAST Recon on `backend/src/main/java/sgc/e2e/E2eController.java`
+- [ ] SAST Recon on `backend/src/main/java/sgc/subprocesso/SubprocessoController.java`
+- [ ] SAST Recon on `backend/src/main/java/sgc/organizacao/UnidadeController.java`
+- [ ] SAST Recon on `backend/src/main/java/sgc/alerta/AlertaController.java`
+- [ ] SAST Recon on `backend/src/main/java/sgc/mapa/AtividadeController.java`
+- [ ] SAST Recon on `backend/src/main/java/sgc/mapa/MapaController.java`
+- [ ] SAST Recon on `backend/src/main/java/sgc/organizacao/UsuarioController.java`
+- [ ] SAST Recon on `backend/src/main/java/sgc/parametros/ConfiguracaoController.java`
+- [ ] SAST Recon on `backend/src/main/java/sgc/processo/painel/PainelController.java`
+- [ ] SAST Recon on `backend/src/main/java/sgc/relatorio/RelatorioController.java`
+- [ ] SAST Recon on `backend/src/main/java/sgc/seguranca/login/LoginController.java`
 - [ ] Conduct the final review of all findings as per your **Minimizing False Positives** operating principle and generate the final report.

@@ -3,6 +3,7 @@ import {flushPromises, mount} from "@vue/test-utils";
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import {ref} from "vue";
 import * as useAcessoModule from "@/composables/useAcesso";
+import * as useFluxoSubprocessoModule from "@/composables/useFluxoSubprocesso";
 import * as useProcessosModule from "@/composables/useProcessos";
 import * as subprocessoService from "@/services/subprocessoService";
 import {useSubprocessosStore} from "@/stores/subprocessos";
@@ -27,6 +28,7 @@ vi.mock("@/services/analiseService", () => ({
     listarAnalisesCadastro: vi.fn(),
 }));
 
+vi.mock("@/composables/useFluxoSubprocesso", () => ({useFluxoSubprocesso: vi.fn()}));
 vi.mock("@/composables/useProcessos", () => ({useProcessos: vi.fn()}));
 
 const stubs = {
@@ -55,6 +57,11 @@ const stubs = {
 describe("CadastroView coverage", () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        vi.mocked(useFluxoSubprocessoModule.useFluxoSubprocesso).mockReturnValue({
+            validarCadastro: vi.fn(),
+            disponibilizarCadastro: vi.fn().mockResolvedValue(true),
+            disponibilizarRevisaoCadastro: vi.fn().mockResolvedValue(true),
+        } as any);
         vi.mocked(useProcessosModule.useProcessos).mockReturnValue({
             processoDetalhe: ref({
                 codigo: 1,
@@ -156,7 +163,8 @@ describe("CadastroView coverage", () => {
                 situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO
             } as any
         });
-        (store.validarCadastro as any).mockResolvedValue({
+        const fluxoSubprocesso = useFluxoSubprocessoModule.useFluxoSubprocesso() as any;
+        fluxoSubprocesso.validarCadastro.mockResolvedValue({
             valido: false,
             erros: [{mensagem: "Erro genérico"}, {atividadeCodigo: 1, mensagem: "Erro na atividade"}]
         });
@@ -213,7 +221,8 @@ describe("CadastroView coverage", () => {
                 tipoProcesso: TipoProcesso.REVISAO
             } as any
         });
-        store.disponibilizarRevisaoCadastro = vi.fn().mockResolvedValue(true);
+        const fluxoSubprocesso = useFluxoSubprocessoModule.useFluxoSubprocesso() as any;
+        fluxoSubprocesso.disponibilizarRevisaoCadastro.mockResolvedValue(true);
         await vm.confirmarDisponibilizacao();
         expect(vm.mostrarModalConfirmacao).toBe(false);
 
@@ -223,7 +232,7 @@ describe("CadastroView coverage", () => {
                 tipoProcesso: TipoProcesso.MAPEAMENTO
             } as any
         });
-        store.disponibilizarCadastro = vi.fn().mockResolvedValue(true);
+        fluxoSubprocesso.disponibilizarCadastro.mockResolvedValue(true);
         await vm.confirmarDisponibilizacao();
 
         // abrirModalHistorico

@@ -30,8 +30,18 @@ const processosMock = {
     enviarLembrete: vi.fn(),
 };
 
+const fluxoSubprocessoMock = {
+    alterarDataLimiteSubprocesso: vi.fn(),
+    reabrirCadastro: vi.fn(),
+    reabrirRevisaoCadastro: vi.fn(),
+};
+
 vi.mock('@/composables/useProcessos', () => ({
     useProcessos: () => processosMock
+}));
+
+vi.mock('@/composables/useFluxoSubprocesso', () => ({
+    useFluxoSubprocesso: () => fluxoSubprocessoMock
 }));
 
 describe('SubprocessoView.vue', () => {
@@ -91,6 +101,9 @@ describe('SubprocessoView.vue', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         processosMock.processoDetalhe.value = null;
+        fluxoSubprocessoMock.alterarDataLimiteSubprocesso.mockResolvedValue({});
+        fluxoSubprocessoMock.reabrirCadastro.mockResolvedValue(true);
+        fluxoSubprocessoMock.reabrirRevisaoCadastro.mockResolvedValue(true);
     });
 
     // Helper to mount component with specific setup
@@ -130,24 +143,6 @@ describe('SubprocessoView.vue', () => {
             return subprocessoToUse;
         });
         (mapaStore.buscarMapaCompleto as any).mockResolvedValue({});
-        (store.alterarDataLimiteSubprocesso as any).mockResolvedValue({});
-
-        (store.reabrirCadastro as any).mockImplementation(async (cod: number, just: string) => {
-            try {
-                await (processoService.reabrirCadastro as any)(cod, just);
-                return true;
-            } catch {
-                return false;
-            }
-        });
-        (store.reabrirRevisaoCadastro as any).mockImplementation(async (cod: number, just: string) => {
-            try {
-                await (processoService.reabrirRevisaoCadastro as any)(cod, just);
-                return true;
-            } catch {
-                return false;
-            }
-        });
 
         (processosMock.enviarLembrete as any).mockImplementation(async (codProcesso: number, codUnidade: number) => {
             try {
@@ -230,21 +225,21 @@ describe('SubprocessoView.vue', () => {
 
         await flushPromises();
 
-        expect(store.alterarDataLimiteSubprocesso).toHaveBeenCalledWith(10, {novaData: '2024-01-01'});
+        expect(fluxoSubprocessoMock.alterarDataLimiteSubprocesso).toHaveBeenCalledWith(10, {novaData: '2024-01-01'});
         expect((wrapper.vm as any).modals.modals.alterarDataLimite.value.isOpen).toBe(false);
     });
 
     it('trata erro ao alterar data limite', async () => {
-        const {wrapper, store} = mountComponent();
+        const {wrapper} = mountComponent();
         await flushPromises();
-        (store.alterarDataLimiteSubprocesso as any).mockRejectedValue(new Error('Falha'));
+        fluxoSubprocessoMock.alterarDataLimiteSubprocesso.mockRejectedValue(new Error('Falha'));
 
         (wrapper.vm as any).mostrarModalAlterarDataLimite = true;
         const modal = wrapper.findComponent(SubprocessoModalStub);
         await modal.vm.$emit('confirmar-alteracao', '2024-01-01');
         await flushPromises();
 
-        expect(store.alterarDataLimiteSubprocesso).toHaveBeenCalled();
+        expect(fluxoSubprocessoMock.alterarDataLimiteSubprocesso).toHaveBeenCalled();
     });
 
     it('reabre cadastro com sucesso', async () => {
@@ -264,8 +259,7 @@ describe('SubprocessoView.vue', () => {
         await btn.trigger('click');
         await flushPromises();
 
-        expect(processoService.reabrirCadastro).toHaveBeenCalledWith(10, 'Erro no preenchimento');
-        expect(store.buscarSubprocessoDetalhe).toHaveBeenCalledTimes(2); // Initial + Reload
+        expect(fluxoSubprocessoMock.reabrirCadastro).toHaveBeenCalledWith(10, 'Erro no preenchimento');
     });
 
     it('reabre revisão com sucesso', async () => {
@@ -282,7 +276,7 @@ describe('SubprocessoView.vue', () => {
         await btn.trigger('click');
         await flushPromises();
 
-        expect(processoService.reabrirRevisaoCadastro).toHaveBeenCalledWith(10, 'Revisão incompleta');
+        expect(fluxoSubprocessoMock.reabrirRevisaoCadastro).toHaveBeenCalledWith(10, 'Revisão incompleta');
     });
 
     it('impede reabertura se justificativa vazia (botão desabilitado)', async () => {
@@ -294,13 +288,13 @@ describe('SubprocessoView.vue', () => {
         // O botão deve estar desabilitado se a justificativa for vazia
         const btn = wrapper.find('[data-testid="btn-confirmar-reabrir"]');
         expect(btn.attributes('disabled')).toBeDefined();
-        expect(processoService.reabrirCadastro).not.toHaveBeenCalled();
+        expect(fluxoSubprocessoMock.reabrirCadastro).not.toHaveBeenCalled();
     });
 
     it('trata erro na API ao reabrir', async () => {
         const {wrapper} = mountComponent();
         await flushPromises();
-        vi.mocked(processoService.reabrirCadastro).mockRejectedValue(new Error('API Error'));
+        fluxoSubprocessoMock.reabrirCadastro.mockResolvedValue(false);
 
         await wrapper.find('[data-testid="btn-reabrir-cadastro"]').trigger('click');
 
@@ -311,7 +305,7 @@ describe('SubprocessoView.vue', () => {
         await btn.trigger('click');
         await flushPromises();
 
-        expect(processoService.reabrirCadastro).toHaveBeenCalled();
+        expect(fluxoSubprocessoMock.reabrirCadastro).toHaveBeenCalled();
     });
 
     it('envia lembrete com sucesso', async () => {
