@@ -106,7 +106,7 @@ Os seguintes pontos foram confirmados no código:
 - As facades `PainelFacade`, `UsuarioFacade`, `AlertaFacade`, `RelatorioFacade`, `LoginFacade` e `AtividadeFacade` existem.
 - Há fragmentação real em `SubprocessoService`, `SubprocessoTransicaoService`, `SubprocessoValidacaoService`, `SubprocessoNotificacaoService`.
 - Há fragmentação real em `MapaVisualizacaoService`, `MapaSalvamentoService`, `ImpactoMapaService`, `MapaManutencaoService` e `CopiaMapaService`.
-- O fluxo principal de `Processo` e `Subprocesso` no frontend já foi migrado de stores pass-through para composables de domínio.
+- O fluxo principal de `Processo`, `Subprocesso` e `Mapa` no frontend já foi migrado de stores pass-through para composables de domínio.
 - O backend já usa `@JsonView` em múltiplos controllers e entidades, então a simplificação por serialização controlada já é compatível com o padrão atual.
 
 ## Pendências consolidadas
@@ -134,7 +134,6 @@ Os seguintes pontos foram confirmados no código:
 ## 3. Frontend: consolidação estrutural
 
 - Auditar e remover stores pass-through que ainda funcionam como estado de tela ou cache local:
-  - `frontend/src/stores/mapas.ts`
   - `frontend/src/stores/configuracoes.ts`
 - Auditar componentes wrapper sem lógica própria e substituí-los por uso direto de componentes base quando apropriado.
 
@@ -142,7 +141,7 @@ Os seguintes pontos foram confirmados no código:
 
 1. Ajustar a serialização e os retornos simples do backend de `Processo`.
 2. Consolidar facades e reduzir fragmentação artificial nos services do backend.
-3. Auditar `frontend/src/stores/mapas.ts` e `frontend/src/stores/configuracoes.ts` para remover estado de tela e actions pass-through.
+3. Auditar `frontend/src/stores/configuracoes.ts` para remover estado de tela e actions pass-through.
 4. Auditar wrappers de frontend sem responsabilidade própria.
 
 ## Critérios de conclusão

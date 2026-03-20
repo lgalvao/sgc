@@ -44,6 +44,7 @@ class AtividadeControllerTest {
         @Test
         @DisplayName("Deve obter por ID")
         void deveobterPorCodigo() throws Exception {
+            Mockito.when(permissionEvaluator.hasPermission(any(org.springframework.security.core.Authentication.class), eq(1L), eq("Atividade"), eq("VISUALIZAR_SUBPROCESSO"))).thenReturn(true);
             Atividade response = Atividade.builder()
                     .codigo(1L)
                     .descricao("Atividade teste")
@@ -144,6 +145,7 @@ class AtividadeControllerTest {
         @Test
         @DisplayName("Deve listar conhecimentos")
         void deveListarConhecimentos() throws Exception {
+            Mockito.when(permissionEvaluator.hasPermission(any(org.springframework.security.core.Authentication.class), eq(1L), eq("Atividade"), eq("VISUALIZAR_SUBPROCESSO"))).thenReturn(true);
             Mockito.when(atividadeFacade.listarConhecimentosPorAtividade(1L)).thenReturn(List.of());
             mockMvc.perform(get("/api/atividades/1/conhecimentos").with(user("123")))
                     .andExpect(status().isOk())
@@ -206,6 +208,7 @@ class AtividadeControllerTest {
         @Test
         @DisplayName("Deve retornar NotFound ao obter atividade inexistente")
         void deveRetornarNotFoundAoObterAtividadeInexistente() throws Exception {
+            Mockito.when(permissionEvaluator.hasPermission(any(org.springframework.security.core.Authentication.class), eq(999L), eq("Atividade"), eq("VISUALIZAR_SUBPROCESSO"))).thenReturn(true);
 
             Mockito.when(atividadeFacade.obterAtividadePorCodigo(999L))
                     .thenThrow(new ErroEntidadeNaoEncontrada("Atividade", 999L));

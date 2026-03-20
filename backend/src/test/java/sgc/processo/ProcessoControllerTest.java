@@ -213,7 +213,9 @@ class ProcessoControllerTest {
         @WithMockUser(roles = "CHEFE")
         @DisplayName("Deve retornar 403 Forbidden quando CHEFE tenta acessar processo de outra unidade (correção IDOR)")
         void deveRetornarForbiddenQuandoChefeNaoTemAcesso() throws Exception {
-            when(processoService.checarAcesso(any(), eq(1L))).thenReturn(false);
+            var processo = Processo.builder().codigo(1L).descricao("Teste").build();
+            when(processoService.buscarOpt(1L)).thenReturn(Optional.of(processo));
+            when(processoService.checarAcesso(any(org.springframework.security.core.Authentication.class), eq(1L))).thenReturn(false);
 
             mockMvc.perform(get(API_PROCESSOS_1))
                     .andExpect(status().isForbidden());
@@ -225,7 +227,7 @@ class ProcessoControllerTest {
         void deveRetornarOkQuandoGestorTemAcesso() throws Exception {
             var processo = Processo.builder().codigo(1L).descricao("Teste").build();
             when(processoService.buscarOpt(1L)).thenReturn(Optional.of(processo));
-            when(processoService.checarAcesso(any(), eq(1L))).thenReturn(true);
+            when(processoService.checarAcesso(any(org.springframework.security.core.Authentication.class), eq(1L))).thenReturn(true);
 
             mockMvc.perform(get(API_PROCESSOS_1))
                     .andExpect(status().isOk());
@@ -235,7 +237,9 @@ class ProcessoControllerTest {
         @WithMockUser(roles = "GESTOR")
         @DisplayName("Deve retornar 403 Forbidden quando GESTOR tenta acessar processo fora de sua sub-árvore (correção IDOR)")
         void deveRetornarForbiddenQuandoGestorNaoTemAcesso() throws Exception {
-            when(processoService.checarAcesso(any(), eq(1L))).thenReturn(false);
+            var processo = Processo.builder().codigo(1L).descricao("Teste").build();
+            when(processoService.buscarOpt(1L)).thenReturn(Optional.of(processo));
+            when(processoService.checarAcesso(any(org.springframework.security.core.Authentication.class), eq(1L))).thenReturn(false);
 
             mockMvc.perform(get(API_PROCESSOS_1))
                     .andExpect(status().isForbidden());
