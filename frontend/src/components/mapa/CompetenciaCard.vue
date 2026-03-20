@@ -58,7 +58,7 @@
                       <template #title>
                         <strong>Conhecimentos:</strong>
                         <ul class="mb-0 ps-3 mt-1">
-                          <li v-for="c in getAtividadeCompleta(atividade.codigo)?.conhecimentos" :key="c.codigo">{{ c.descricao }}</li>
+                          <li v-for="c in (getAtividadeCompleta(atividade.codigo)?.conhecimentos ?? [])" :key="c.codigo">{{ c.descricao }}</li>
                         </ul>
                       </template>
                       <BBadge
