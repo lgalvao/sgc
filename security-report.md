@@ -47,8 +47,8 @@ Mesmo com essas limitações, os achados abaixo foram confirmados diretamente no
 
 ### Sinais positivos
 
-- O backend já aplica **HSTS**, **CSP**, **X-Frame-Options** e **CSRF** com cookie para SPA em `/home/runner/work/sgc/sgc/backend/src/main/java/sgc/seguranca/config/ConfigSeguranca.java:71-91`.
-- O `GerenciadorJwt` **bloqueia segredo padrão em produção**, embora ainda aceite em `default`, `local` e `hom`: `/home/runner/work/sgc/sgc/backend/src/main/java/sgc/seguranca/login/GerenciadorJwt.java:31-42`.
+- O backend já aplica **HSTS**, **CSP**, **X-Frame-Options** e **CSRF** com cookie para SPA em `backend/src/main/java/sgc/seguranca/config/ConfigSeguranca.java:71-91`.
+- O `GerenciadorJwt` **bloqueia segredo padrão em produção**, embora ainda aceite em `default`, `local` e `hom`: `backend/src/main/java/sgc/seguranca/login/GerenciadorJwt.java:31-42`.
 - Baseline funcional do projeto está saudável neste ambiente:
   - backend tests: **OK**
   - lint: **OK**
@@ -65,10 +65,10 @@ Mesmo com essas limitações, os achados abaixo foram confirmados diretamente no
 
 - **Severidade:** Alta
 - **Arquivos:**
-  - `/home/runner/work/sgc/sgc/backend/src/main/resources/application.yml:46-60`
-  - `/home/runner/work/sgc/sgc/backend/src/main/java/sgc/seguranca/LoginFacade.java:34-67`
-  - `/home/runner/work/sgc/sgc/backend/src/main/java/sgc/seguranca/login/LimitadorTentativasLogin.java:66-74`
-  - `/home/runner/work/sgc/sgc/backend/src/main/java/sgc/seguranca/login/LoginController.java:35-58`
+  - `backend/src/main/resources/application.yml:46-60`
+  - `backend/src/main/java/sgc/seguranca/LoginFacade.java:34-67`
+  - `backend/src/main/java/sgc/seguranca/login/LimitadorTentativasLogin.java:66-74`
+  - `backend/src/main/java/sgc/seguranca/login/LoginController.java:35-58`
 
 **Evidência**
 
@@ -99,9 +99,9 @@ O profile `prod` redefine `ambiente-testes: false`, mas a configuração base at
 
 - **Severidade:** Alta
 - **Arquivos:**
-  - `/home/runner/work/sgc/sgc/backend/src/main/java/sgc/comum/erros/RestExceptionHandler.java:44-49,65-76,150-190`
-  - `/home/runner/work/sgc/sgc/backend/src/main/java/sgc/comum/erros/ErroApi.java:20-27`
-  - `/home/runner/work/sgc/sgc/frontend/src/axios-setup.ts:34-37`
+  - `backend/src/main/java/sgc/comum/erros/RestExceptionHandler.java:44-49,65-76,150-190`
+  - `backend/src/main/java/sgc/comum/erros/ErroApi.java:20-27`
+  - `frontend/src/axios-setup.ts:34-37`
 
 **Evidência**
 
@@ -132,8 +132,8 @@ Além do vazamento direto ao cliente, o frontend amplia a exposição ao registr
 
 - **Severidade:** Alta
 - **Arquivos:**
-  - `/home/runner/work/sgc/sgc/backend/src/main/java/sgc/e2e/E2eSecurityConfig.java:62-88`
-  - `/home/runner/work/sgc/sgc/backend/src/main/java/sgc/e2e/E2eController.java:55-67,112-201`
+  - `backend/src/main/java/sgc/e2e/E2eSecurityConfig.java:62-88`
+  - `backend/src/main/java/sgc/e2e/E2eController.java:55-67,112-201`
 
 **Evidência**
 
@@ -165,8 +165,8 @@ O uso de `@Profile("e2e")` reduz o risco, mas o impacto potencial é muito alto 
 
 - **Severidade:** Alta
 - **Arquivos:**
-  - `/home/runner/work/sgc/sgc/backend/src/main/java/sgc/processo/painel/PainelController.java:29-57`
-  - `/home/runner/work/sgc/sgc/backend/src/main/java/sgc/processo/painel/PainelFacade.java:41-57,73-109`
+  - `backend/src/main/java/sgc/processo/painel/PainelController.java:29-57`
+  - `backend/src/main/java/sgc/processo/painel/PainelFacade.java:41-57,73-109`
 
 **Evidência**
 
@@ -185,7 +185,7 @@ Há risco de:
 
 **Observação**
 
-Ao contrário de suspeitas antigas em `ProcessoController`, aqui o risco permanece **plausível e consistente com o código atual**. Já em `ProcessoController`, a checagem `processoService.checarAcesso(...)` existe e não foi classificada neste relatório como IDOR confirmado.
+Neste ponto, o risco permanece **plausível e consistente com o código atual**. Já em `ProcessoController`, a checagem `processoService.checarAcesso(...)` existe e por isso ele não foi classificado neste relatório como IDOR confirmado.
 
 **Sugestões**
 
@@ -200,8 +200,8 @@ Ao contrário de suspeitas antigas em `ProcessoController`, aqui o risco permane
 
 - **Severidade:** Média
 - **Arquivos:**
-  - `/home/runner/work/sgc/sgc/backend/src/main/resources/application.yml:27-31`
-  - `/home/runner/work/sgc/sgc/backend/src/main/java/sgc/seguranca/config/ConfigSeguranca.java:60-70`
+  - `backend/src/main/resources/application.yml:27-31`
+  - `backend/src/main/java/sgc/seguranca/config/ConfigSeguranca.java:60-70`
 
 **Evidência**
 
@@ -228,7 +228,7 @@ Mesmo sem exploração direta, documentação pública:
 
 - **Severidade:** Média
 - **Arquivos:**
-  - `/home/runner/work/sgc/sgc/backend/src/main/java/sgc/seguranca/login/LoginController.java:127-140`
+  - `backend/src/main/java/sgc/seguranca/login/LoginController.java:127-140`
 
 **Evidência**
 
@@ -253,8 +253,8 @@ Sem validação de proxy confiável, um cliente pode forjar o cabeçalho e:
 
 - **Severidade:** Média
 - **Arquivos:**
-  - `/home/runner/work/sgc/sgc/backend/src/main/resources/application.yml:55-57`
-  - `/home/runner/work/sgc/sgc/backend/src/main/java/sgc/seguranca/login/GerenciadorJwt.java:27-40`
+  - `backend/src/main/resources/application.yml:55-57`
+  - `backend/src/main/java/sgc/seguranca/login/GerenciadorJwt.java:27-40`
 
 **Evidência**
 
@@ -281,8 +281,8 @@ O risco em produção está parcialmente mitigado, mas ainda há exposição em:
 
 - **Severidade:** Média
 - **Arquivos:**
-  - `/home/runner/work/sgc/sgc/backend/src/main/java/sgc/organizacao/UsuarioController.java:28-40`
-  - `/home/runner/work/sgc/sgc/backend/src/main/java/sgc/organizacao/model/Usuario.java:35-50,65-69`
+  - `backend/src/main/java/sgc/organizacao/UsuarioController.java:28-40`
+  - `backend/src/main/java/sgc/organizacao/model/Usuario.java:35-50,65-69`
 
 **Evidência**
 
@@ -314,8 +314,8 @@ Isso aumenta risco de:
 
 - **Severidade:** Média
 - **Arquivos:**
-  - `/home/runner/work/sgc/sgc/frontend/src/stores/perfil.ts:9-10,127-138`
-  - `/home/runner/work/sgc/sgc/frontend/src/axios-setup.ts:43-49`
+  - `frontend/src/stores/perfil.ts:9-10,127-138`
+  - `frontend/src/axios-setup.ts:43-49`
 
 **Evidência**
 
@@ -337,8 +337,8 @@ Esse padrão aumenta muito o impacto de qualquer XSS, pois scripts executados no
 
 - **Severidade:** Baixa/Média
 - **Arquivos:**
-  - `/home/runner/work/sgc/sgc/backend/src/main/java/sgc/seguranca/login/ClienteAcessoAd.java:25-46`
-  - `/home/runner/work/sgc/sgc/backend/src/main/java/sgc/seguranca/LoginFacade.java:53-67,107-108`
+  - `backend/src/main/java/sgc/seguranca/login/ClienteAcessoAd.java:25-46`
+  - `backend/src/main/java/sgc/seguranca/LoginFacade.java:53-67,107-108`
 
 **Evidência**
 
@@ -358,7 +358,7 @@ Em ambientes com retenção longa de logs ou múltiplos consumidores, isso ampli
 ### 11. Vulnerabilidades em dependências de desenvolvimento do frontend
 
 - **Severidade:** Média
-- **Ferramenta:** `npm audit` em `/home/runner/work/sgc/sgc/frontend`
+- **Ferramenta:** `npm audit` em `frontend`
 
 **Resultado**
 
@@ -389,7 +389,6 @@ O risco parece estar concentrado em dependências de desenvolvimento, não em ru
 
 ## Itens revisados sem evidência imediata de exploração
 
-- **`ProcessoController`**: há verificação real de acesso em `processoService.checarAcesso(...)` em `/home/runner/work/sgc/sgc/backend/src/main/java/sgc/processo/service/ProcessoService.java:521-529`. Não foi classificado aqui como IDOR confirmado.
 - **Headers de segurança**: o backend já aplica HSTS, CSP e `X-Frame-Options`, o que é um bom baseline.
 - **CORS**: configurável por propriedades; não foi encontrada origem wildcard no profile principal, mas o tema merece revisão por ambiente.
 - **Segredo hardcoded adicional**: não foram encontrados segredos reais de produção além do fallback conhecido de JWT e credenciais de teste.
