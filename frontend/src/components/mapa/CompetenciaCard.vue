@@ -82,7 +82,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BButton, BCard, BCardBody, BCardHeader, BCardTitle, BBadge} from "bootstrap-vue-next";
+import {BBadge, BButton, BCard, BCardBody, BCardHeader, BCardTitle} from "bootstrap-vue-next";
 import type {Atividade, Competencia} from "@/types/tipos";
 
 const props = defineProps<{

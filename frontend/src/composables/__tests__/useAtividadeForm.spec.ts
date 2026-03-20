@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { useAtividadeForm } from '../useAtividadeForm';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {useAtividadeForm} from '../useAtividadeForm';
 import * as atividadeService from '@/services/atividadeService';
-import type { CriarAtividadeRequest } from '@/types/tipos';
+import type {CriarAtividadeRequest} from '@/types/tipos';
 
 vi.mock('@/services/atividadeService', () => ({
   criarAtividade: vi.fn(),

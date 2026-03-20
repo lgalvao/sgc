@@ -6,12 +6,11 @@ import org.jspecify.annotations.*;
 import org.springframework.security.access.*;
 import org.springframework.security.core.*;
 import org.springframework.stereotype.*;
+import sgc.mapa.model.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
 import sgc.processo.model.*;
 import sgc.subprocesso.model.*;
-import sgc.mapa.model.*;
-import sgc.mapa.service.*;
 
 import java.io.*;
 import java.util.*;

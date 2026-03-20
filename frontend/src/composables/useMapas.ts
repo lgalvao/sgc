@@ -6,12 +6,7 @@ import {
     verificarImpactosMapa,
     verificarMapaVigente
 } from "@/services/subprocessoService";
-import type {
-    ImpactoMapa,
-    MapaAjuste,
-    MapaCompleto,
-    MapaVisualizacao
-} from "@/types/tipos";
+import type {ImpactoMapa, MapaAjuste, MapaCompleto, MapaVisualizacao} from "@/types/tipos";
 import {useErrorHandler} from "@/composables/useErrorHandler";
 import {useAsyncAction} from "@/composables/useAsyncAction";
 

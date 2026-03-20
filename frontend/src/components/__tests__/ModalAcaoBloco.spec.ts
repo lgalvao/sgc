@@ -1,7 +1,7 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { mount } from "@vue/test-utils";
+import {beforeEach, describe, expect, it, vi} from "vitest";
+import {mount} from "@vue/test-utils";
 import ModalAcaoBloco from "../processo/ModalAcaoBloco.vue";
-import { BButton } from "bootstrap-vue-next";
+import {BButton} from "bootstrap-vue-next";
 
 describe("ModalAcaoBloco.vue", () => {
     const mockUnidades = [

@@ -72,8 +72,8 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref, watch } from 'vue';
-import { BModal, BTable, BFormCheckbox, BAlert, BButton, BSpinner, BFormGroup } from 'bootstrap-vue-next';
+import {computed, ref, watch} from 'vue';
+import {BAlert, BButton, BFormCheckbox, BFormGroup, BModal, BSpinner, BTable} from 'bootstrap-vue-next';
 import InputData from '@/components/comum/InputData.vue';
 
 export interface UnidadeSelecao {

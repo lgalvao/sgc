@@ -77,13 +77,13 @@
 
 <script lang="ts" setup>
 import {
+  BAlert,
+  BBadge,
   BCard,
   BCardBody,
   BFormCheckbox,
   BFormInvalidFeedback,
   BFormTextarea,
-  BAlert,
-  BBadge,
 } from "bootstrap-vue-next";
 import {computed, nextTick, ref, watch} from "vue";
 import ModalPadrao from "@/components/comum/ModalPadrao.vue";

@@ -69,7 +69,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BButton, BModal, BTable, BSpinner} from "bootstrap-vue-next";
+import {BAlert, BButton, BModal, BSpinner, BTable} from "bootstrap-vue-next";
 import type {Analise} from "@/types/tipos";
 import {formatDateTimeBR} from "@/utils/dateUtils";
 

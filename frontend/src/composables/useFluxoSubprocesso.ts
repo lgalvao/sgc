@@ -17,11 +17,7 @@ import {
 import {useErrorHandler} from "@/composables/useErrorHandler";
 import {useProcessos} from "@/composables/useProcessos";
 import {useSubprocessos} from "@/composables/useSubprocessos";
-import type {
-    AceitarCadastroRequest,
-    DevolverCadastroRequest,
-    HomologarCadastroRequest,
-} from "@/types/tipos";
+import type {AceitarCadastroRequest, DevolverCadastroRequest, HomologarCadastroRequest,} from "@/types/tipos";
 
 async function recarregarProcessoAtual() {
     const processos = useProcessos();

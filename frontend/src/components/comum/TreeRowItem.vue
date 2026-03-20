@@ -33,6 +33,7 @@
 
 <script lang="ts" setup>
 import {BButton} from "bootstrap-vue-next";
+
 interface Column {
   key: string;
 }

@@ -165,7 +165,7 @@ import {computed} from "vue";
 import {useAcesso} from "@/composables/useAcesso";
 import {useProcessos} from "@/composables/useProcessos";
 import {useSubprocessos} from "@/composables/useSubprocessos";
-import {SituacaoProcesso, TipoProcesso, type Mapa, type MapaCompleto} from "@/types/tipos";
+import {type Mapa, type MapaCompleto, SituacaoProcesso, TipoProcesso} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
 
 const TipoProcessoEnum = TipoProcesso;

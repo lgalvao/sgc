@@ -8,6 +8,7 @@ import org.springframework.boot.webmvc.test.autoconfigure.*;
 import org.springframework.context.annotation.*;
 import org.springframework.http.*;
 import org.springframework.http.MediaType;
+import org.springframework.security.config.annotation.method.configuration.*;
 import org.springframework.security.test.context.support.*;
 import org.springframework.test.context.bean.override.mockito.*;
 import org.springframework.test.web.servlet.*;
@@ -28,8 +29,6 @@ import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 
 @WebMvcTest(ProcessoController.class)
 @Import({RestExceptionHandler.class, SgcPermissionEvaluator.class})
