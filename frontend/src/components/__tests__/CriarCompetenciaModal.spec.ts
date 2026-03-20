@@ -29,7 +29,13 @@ describe("CriarCompetenciaModal.vue", () => {
     ];
 
     const createWrapper = (propsOverride = {}) => {
-        const options = getCommonMountOptions({}, {ModalPadrao: ModalPadraoStub});
+        const options = getCommonMountOptions({}, {
+            ModalPadrao: ModalPadraoStub,
+            BTooltip: {
+                props: ['placement'],
+                template: '<span><slot /></span>',
+            },
+        });
 
         context.wrapper = mount(CriarCompetenciaModal, {
             ...options,
@@ -119,5 +125,19 @@ describe("CriarCompetenciaModal.vue", () => {
                 atividadesSelecionadas: [atividades[0].codigo],
             },
         ]);
+    });
+
+    it("deve exibir badge com quantidade de conhecimentos sem HTML cru (usando BTooltip)", () => {
+        // A atividade 2 tem 1 conhecimento. O badge deve ser exibido via BTooltip
+        // sem renderizar HTML como texto bruto (o que acontecia com v-b-tooltip.html)
+        const wrapper = createWrapper({mostrar: true, atividades});
+
+        const badges = wrapper.findAll('[data-testid="cad-mapa__txt-badge-conhecimentos-2"]');
+        // Somente atividade 2 tem conhecimentos
+        expect(badges.length).toBe(1);
+        expect(badges[0].text()).toBe("1");
+        // O HTML bruto da implementação anterior não deve aparecer como texto
+        expect(wrapper.html()).not.toContain('&lt;div class=');
+        expect(wrapper.html()).not.toContain('&lt;strong&gt;');
     });
 });

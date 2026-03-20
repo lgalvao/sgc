@@ -176,4 +176,70 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
             await AtividadeHelpers.verificarBotaoHistoricoAnalise(page);
         });
     });
+
+    test('Cenário 3: Seleções limpas ao trocar processo/unidade no modal de importação', async ({
+        _resetAutomatico,
+        page,
+        request,
+        _autenticadoComoAdmin
+    }) => {
+        const timestamp = Date.now();
+        const UNIDADE_ALVO = 'ASSESSORIA_11';
+        const CHEFE_ALVO = USUARIOS.CHEFE_ASSESSORIA_11.titulo;
+        const SENHA_CHEFE = USUARIOS.CHEFE_ASSESSORIA_11.senha;
+        const UNIDADE_ORIGEM_A = 'ASSESSORIA_12';
+        const UNIDADE_ORIGEM_B = 'ASSESSORIA_21';
+
+        let processoAlvoId: number;
+        let processoOrigemAId: number;
+        const descAlvo = `Processo alvo ${timestamp}`;
+        const descOrigemA = `Origem A ${timestamp}`;
+        const descOrigemB = `Origem B ${timestamp}`;
+
+        await test.step('Setup: Criar processos finalizados de origem e processo alvo', async () => {
+            const origemA = await criarProcessoFinalizadoFixture(request, {
+                unidade: UNIDADE_ORIGEM_A,
+                descricao: descOrigemA
+            });
+            processoOrigemAId = origemA.codigo;
+            await criarProcessoFinalizadoFixture(request, {
+                unidade: UNIDADE_ORIGEM_B,
+                descricao: descOrigemB
+            });
+            const processoAlvo = await criarProcessoFixture(request, {
+                unidade: UNIDADE_ALVO,
+                descricao: descAlvo,
+                iniciar: true,
+                diasLimite: 30
+            });
+            processoAlvoId = processoAlvo.codigo;
+            await fazerLogout(page);
+        });
+
+        await test.step('Verificar que seleções são limpas ao trocar de processo no modal de importação', async () => {
+            // A atividade criada pela fixture segue o padrão: "Atividade origem A - {codProcesso}"
+            const atividadeDeA = `Atividade origem A - ${processoOrigemAId}`;
+
+            await login(page, CHEFE_ALVO, SENHA_CHEFE);
+            await page.goto(`/processo/${processoAlvoId}/${UNIDADE_ALVO}`);
+            await AtividadeHelpers.navegarParaAtividades(page);
+
+            // Abre o modal de importação e seleciona atividade do processo A
+            await AtividadeHelpers.selecionarAtividadesParaImportacao(
+                page, descOrigemA, UNIDADE_ORIGEM_A, [atividadeDeA]
+            );
+
+            // Troca para o processo B sem confirmar → deve limpar seleções anteriores
+            const modal = page.getByRole('dialog');
+            await modal.getByTestId('select-processo').selectOption({ label: descOrigemB });
+
+            // Confirmar importação (nenhuma atividade selecionada no processo B)
+            // NÃO deve enviar os IDs do processo A como seleção residual
+            await modal.getByTestId('btn-importar').click();
+            await expect(modal).toBeHidden();
+
+            // Verificar que nenhuma atividade foi importada (seleções do processo A foram descartadas)
+            await expect(page.getByTestId('cad-atividades-empty-state')).toBeVisible();
+        });
+    });
 });

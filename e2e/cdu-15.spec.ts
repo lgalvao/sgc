@@ -3,6 +3,7 @@ import {criarProcessoCadastroHomologadoFixture} from './fixtures/fixtures-proces
 import {acessarSubprocessoAdmin} from './helpers/helpers-analise.js';
 import {verificarProcessoNaTabela} from './helpers/helpers-processos.js';
 import {
+    abrirModalCriarCompetencia,
     criarCompetencia,
     disponibilizarMapa,
     editarCompetencia,
@@ -70,5 +71,27 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
             situacao: 'Em andamento',
             tipo: 'Mapeamento'
         });
+    });
+
+    test('Badge de conhecimentos no modal de criar competência exibe contagem sem HTML bruto', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
+        // CT relacionado ao Bug #1391: o badge deve mostrar a contagem de conhecimentos (ex: "1"),
+        // e não o HTML bruto que era gerado pela implementação anterior com v-b-tooltip.html.
+        await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
+        await navegarParaMapa(page);
+        await abrirModalCriarCompetencia(page);
+
+        // Atividade fixture 1 tem "Conhecimento fixture 1A" → badge deve mostrar "1"
+        const modal = page.getByTestId('mdl-criar-competencia');
+        const badgeConhecimentos = modal
+            .locator('.atividade-card-item', {hasText: ATIVIDADE_1})
+            .getByTestId('cad-mapa__txt-badge-conhecimentos-2');
+
+        await expect(badgeConhecimentos).toBeVisible();
+        await expect(badgeConhecimentos).toHaveText('1');
+        // O badge não deve conter marcação HTML bruta
+        await expect(badgeConhecimentos).not.toContainText('<div');
+        await expect(badgeConhecimentos).not.toContainText('<strong>');
+
+        await page.keyboard.press('Escape');
     });
 });

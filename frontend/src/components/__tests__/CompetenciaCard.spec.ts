@@ -18,6 +18,10 @@ const stubs = {
         props: ['title', 'variant'],
         template: '<button :title="title" :class="variant" @click="$emit(\'click\')"><slot /></button>',
     },
+    BTooltip: {
+        props: ['placement'],
+        template: '<span><slot name="title" /><slot /></span>',
+    },
 };
 
 describe("CompetenciaCard.vue", () => {

@@ -49,17 +49,26 @@
             no-body
         >
           <BCardBody class="d-flex align-items-center">
-                  <span class="atividade-associada-descricao me-2 d-flex align-items-center">
+                   <span class="atividade-associada-descricao me-2 d-flex align-items-center">
                     {{ atividade.descricao }}
-                    <BBadge
+                    <BTooltip
                         v-if="(atividade.conhecimentos?.length ?? 0) > 0"
-                        v-b-tooltip.html.top="getConhecimentosTooltip(atividade.codigo)"
-                        variant="secondary"
-                        class="ms-2"
-                        data-testid="cad-mapa__txt-badge-conhecimentos-1"
+                        placement="top"
                     >
-                      {{ atividade.conhecimentos.length }}
-                    </BBadge>
+                      <template #title>
+                        <strong>Conhecimentos:</strong>
+                        <ul class="mb-0 ps-3 mt-1">
+                          <li v-for="c in getAtividadeCompleta(atividade.codigo)?.conhecimentos" :key="c.codigo">{{ c.descricao }}</li>
+                        </ul>
+                      </template>
+                      <BBadge
+                          variant="secondary"
+                          class="ms-2"
+                          data-testid="cad-mapa__txt-badge-conhecimentos-1"
+                      >
+                        {{ atividade.conhecimentos.length }}
+                      </BBadge>
+                    </BTooltip>
                   </span>
             <BButton
                 v-if="podeEditar !== false"
@@ -82,7 +91,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BBadge, BButton, BCard, BCardBody, BCardHeader, BCardTitle} from "bootstrap-vue-next";
+import {BBadge, BButton, BCard, BCardBody, BCardHeader, BCardTitle, BTooltip} from "bootstrap-vue-next";
 import type {Atividade, Competencia} from "@/types/tipos";
 
 const props = defineProps<{
@@ -99,19 +108,6 @@ const emit = defineEmits<{
 
 function getAtividadeCompleta(codigo: number): Atividade | undefined {
   return props.atividades.find((a) => a.codigo === codigo);
-}
-
-function getConhecimentosTooltip(atividadeCodigo: number): string {
-  const atividade = getAtividadeCompleta(atividadeCodigo);
-  if (!atividade || !atividade.conhecimentos.length) {
-    return "Nenhum conhecimento cadastrado";
-  }
-
-  const conhecimentosHtml = atividade.conhecimentos
-      .map((c) => `<div class="mb-1">• ${c.descricao}</div>`)
-      .join("");
-
-  return `<div class="text-start"><strong>Conhecimentos:</strong><br>${conhecimentosHtml}</div>`;
 }
 </script>
 

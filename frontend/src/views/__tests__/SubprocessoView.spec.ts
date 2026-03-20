@@ -196,6 +196,22 @@ describe('SubprocessoView.vue', () => {
         expect(mapaStore.buscarMapaCompleto).toHaveBeenCalledWith(10);
     });
 
+    it('limpa subprocessoDetalhe imediatamente ao montar para evitar dados desatualizados', async () => {
+        // Simula dado desatualizado de uma visita anterior (ex: processo de mapeamento
+        // com podeEditarCadastro=false), que poderia fazer SubprocessoCards mostrar
+        // a rota errada (vis-cadastro em vez de cadastro) na primeira renderização
+        subprocessosMock.subprocessoDetalhe = {
+            ...mockSubprocesso,
+            codigo: 999,
+            situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
+            permissoes: {podeEditarCadastro: false}
+        } as any;
+
+        mountComponent();
+        // Antes de qualquer await, o subprocessoDetalhe já deve ter sido limpo
+        expect(subprocessosMock.subprocessoDetalhe).toBeNull();
+    });
+
     it('renders components when data is available', async () => {
         const {wrapper} = mountComponent();
         await flushPromises();

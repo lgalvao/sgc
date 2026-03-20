@@ -328,6 +328,7 @@ function exibirToastPendente() {
 
 onMounted(async () => {
   exibirToastPendente();
+  subprocessosStore.subprocessoDetalhe = null;
   try {
     const id = await subprocessosStore.buscarSubprocessoPorProcessoEUnidade(
         props.codProcesso,

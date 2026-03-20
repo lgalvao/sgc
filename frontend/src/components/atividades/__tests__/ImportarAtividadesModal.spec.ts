@@ -136,4 +136,61 @@ describe("ImportarAtividadesModal.vue", () => {
         await wrapper.find('[data-testid="importar-atividades-modal__btn-modal-cancelar"]').trigger("click");
         expect(wrapper.emitted("fechar")).toBeTruthy();
     });
+
+    it("limpa seleções de atividades ao trocar de processo", async () => {
+        processosMock.processosParaImportacao.value = [
+            {codigo: 1, descricao: "Processo 1"},
+            {codigo: 2, descricao: "Processo 2"},
+        ];
+        const wrapper = createWrapper();
+        const unidades1 = [{codUnidade: 10, sigla: "U1", codSubprocesso: 100}];
+        (processosMock.buscarUnidadesParaImportacao as any).mockResolvedValue(unidades1);
+
+        // Seleciona processo 1 e unidade
+        await wrapper.find('select#processo-select').setValue("1");
+        await flushPromises();
+        const mockAtividades: Atividade[] = [{codigo: 50, descricao: "Ativ 50", conhecimentos: []}];
+        vi.mocked(subprocessoService.listarAtividadesParaImportacao).mockResolvedValue(mockAtividades);
+        await wrapper.find('select#unidade-select').setValue("10");
+        await flushPromises();
+
+        // Simula seleção de atividade do processo 1
+        (wrapper.vm as any).atividadesSelecionadas = [mockAtividades[0]];
+        expect((wrapper.vm as any).atividadesSelecionadas.length).toBe(1);
+
+        // Troca para processo 2 - seleções devem ser limpas
+        (processosMock.buscarUnidadesParaImportacao as any).mockResolvedValue([{codUnidade: 20, sigla: "U2", codSubprocesso: 200}]);
+        await wrapper.find('select#processo-select').setValue("2");
+        await flushPromises();
+
+        expect((wrapper.vm as any).atividadesSelecionadas.length).toBe(0);
+    });
+
+    it("limpa seleções de atividades ao trocar de unidade", async () => {
+        const wrapper = createWrapper();
+        const unidades = [
+            {codUnidade: 10, sigla: "U1", codSubprocesso: 100},
+            {codUnidade: 20, sigla: "U2", codSubprocesso: 200},
+        ];
+        (processosMock.buscarUnidadesParaImportacao as any).mockResolvedValue(unidades);
+
+        await wrapper.find('select#processo-select').setValue("1");
+        await flushPromises();
+
+        // Seleciona unidade 1 e simula atividades selecionadas
+        const mockAtividadesU1: Atividade[] = [{codigo: 50, descricao: "Ativ 50", conhecimentos: []}];
+        vi.mocked(subprocessoService.listarAtividadesParaImportacao).mockResolvedValue(mockAtividadesU1);
+        await wrapper.find('select#unidade-select').setValue("10");
+        await flushPromises();
+        (wrapper.vm as any).atividadesSelecionadas = [mockAtividadesU1[0]];
+        expect((wrapper.vm as any).atividadesSelecionadas.length).toBe(1);
+
+        // Troca para unidade 2 - seleções devem ser limpas
+        const mockAtividadesU2: Atividade[] = [{codigo: 60, descricao: "Ativ 60", conhecimentos: []}];
+        vi.mocked(subprocessoService.listarAtividadesParaImportacao).mockResolvedValue(mockAtividadesU2);
+        await wrapper.find('select#unidade-select').setValue("20");
+        await flushPromises();
+
+        expect((wrapper.vm as any).atividadesSelecionadas.length).toBe(0);
+    });
 });
