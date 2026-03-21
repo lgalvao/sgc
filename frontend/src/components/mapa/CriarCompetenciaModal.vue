@@ -54,24 +54,6 @@
                 data-testid="chk-criar-competencia-atividade"
             >
               {{ atividade.descricao }}
-              <BTooltip
-                  v-if="atividade.conhecimentos.length > 0"
-                  placement="right"
-              >
-                <template #title>
-                  <strong>Conhecimentos:</strong>
-                  <ul class="mb-0 ps-3 mt-1">
-                    <li v-for="c in atividade.conhecimentos" :key="c.codigo">{{ c.descricao }}</li>
-                  </ul>
-                </template>
-                <BBadge
-                    variant="secondary"
-                    class="ms-2"
-                    data-testid="cad-mapa__txt-badge-conhecimentos-2"
-                >
-                  {{ atividade.conhecimentos.length }}
-                </BBadge>
-              </BTooltip>
             </BFormCheckbox>
           </BCardBody>
         </BCard>
@@ -87,13 +69,11 @@
 <script lang="ts" setup>
 import {
   BAlert,
-  BBadge,
   BCard,
   BCardBody,
   BFormCheckbox,
   BFormInvalidFeedback,
   BFormTextarea,
-  BTooltip,
 } from "bootstrap-vue-next";
 import {computed, nextTick, ref, watch} from "vue";
 import ModalPadrao from "@/components/comum/ModalPadrao.vue";

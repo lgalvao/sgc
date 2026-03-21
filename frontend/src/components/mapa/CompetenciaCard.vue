@@ -51,9 +51,20 @@
           <BCardBody class="d-flex align-items-center">
                    <span class="atividade-associada-descricao me-2 d-flex align-items-center">
                     {{ atividade.descricao }}
+                    <span :id="`badge-tooltip-${competencia.codigo}-${atividade.codigo}`" class="badge-container">
+                      <BBadge
+                          v-if="(atividade.conhecimentos?.length ?? 0) > 0"
+                          variant="secondary"
+                          class="ms-2"
+                          data-testid="cad-mapa__txt-badge-conhecimentos-1"
+                      >
+                        {{ atividade.conhecimentos.length }}
+                      </BBadge>
+                    </span>
                     <BTooltip
                         v-if="(atividade.conhecimentos?.length ?? 0) > 0"
                         placement="top"
+                        :target="`badge-tooltip-${competencia.codigo}-${atividade.codigo}`"
                     >
                       <template #title>
                         <strong>Conhecimentos:</strong>
@@ -61,13 +72,6 @@
                           <li v-for="c in (getAtividadeCompleta(atividade.codigo)?.conhecimentos ?? [])" :key="c.codigo">{{ c.descricao }}</li>
                         </ul>
                       </template>
-                      <BBadge
-                          variant="secondary"
-                          class="ms-2"
-                          data-testid="cad-mapa__txt-badge-conhecimentos-1"
-                      >
-                        {{ atividade.conhecimentos.length }}
-                      </BBadge>
                     </BTooltip>
                   </span>
             <BButton

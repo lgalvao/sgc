@@ -3,7 +3,6 @@ import {criarProcessoCadastroHomologadoFixture} from './fixtures/fixtures-proces
 import {acessarSubprocessoAdmin} from './helpers/helpers-analise.js';
 import {verificarProcessoNaTabela} from './helpers/helpers-processos.js';
 import {
-    abrirModalCriarCompetencia,
     criarCompetencia,
     disponibilizarMapa,
     editarCompetencia,
@@ -46,16 +45,15 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
         await criarCompetencia(page, compDesc, [ATIVIDADE_1]);
         await verificarCompetenciaNoMapa(page, compDesc, [ATIVIDADE_1]);
 
-        await abrirModalCriarCompetencia(page);
-        const modalBadge = page.getByTestId('mdl-criar-competencia');
-        const badgeConhecimentos = modalBadge
-            .locator('.atividade-card-item', {hasText: ATIVIDADE_1})
-            .getByTestId('cad-mapa__txt-badge-conhecimentos-2');
+        // Assert badge in the map main view, not the modal
+        const cardCompetencia = page.locator('.competencia-card', {hasText: compDesc});
+        const badgeConhecimentos = cardCompetencia
+            .locator('.atividade-associada-card-item', {hasText: ATIVIDADE_1})
+            .getByTestId('cad-mapa__txt-badge-conhecimentos-1');
         await expect(badgeConhecimentos).toBeVisible();
         await expect(badgeConhecimentos).toHaveText('1');
         await expect(badgeConhecimentos).not.toContainText('<div');
         await expect(badgeConhecimentos).not.toContainText('<strong>');
-        await page.keyboard.press('Escape');
 
         await expect(page.getByTestId('btn-cad-mapa-disponibilizar')).toBeDisabled();
 
