@@ -134,8 +134,8 @@ describe("PainelView.vue", () => {
 
         await wrapper.vm.$nextTick();
 
-        expect(processosMock.buscarProcessosPainel).toHaveBeenCalledWith("ADMIN", 1, 0, 10);
-        expect(painelService.listarAlertas).toHaveBeenCalledWith(100, 1, 0, 10, "dataHora", "desc");
+        expect(processosMock.buscarProcessosPainel).toHaveBeenCalledWith(1, 0, 10);
+        expect(painelService.listarAlertas).toHaveBeenCalledWith(1, 0, 10, "dataHora", "desc");
     });
 
     it("não deve carregar dados se perfil não estiver selecionado", async () => {
@@ -173,12 +173,12 @@ describe("PainelView.vue", () => {
         await wrapper.findComponent({name: 'TabelaProcessos'}).vm.$emit('ordenar', 'dataCriacao');
 
         expect(processosMock.buscarProcessosPainel).toHaveBeenLastCalledWith(
-            "ADMIN", 1, 0, 10, "dataCriacao", "asc"
+            1, 0, 10, "dataCriacao", "asc"
         );
 
         await wrapper.findComponent({name: 'TabelaProcessos'}).vm.$emit('ordenar', 'dataCriacao');
         expect(processosMock.buscarProcessosPainel).toHaveBeenLastCalledWith(
-            "ADMIN", 1, 0, 10, "dataCriacao", "desc"
+            1, 0, 10, "dataCriacao", "desc"
         );
     });
 

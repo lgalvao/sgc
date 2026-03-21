@@ -233,10 +233,9 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
             const modal = page.getByRole('dialog');
             await modal.getByTestId('select-processo').selectOption({ label: descOrigemB });
 
-            // Confirmar importação (nenhuma atividade selecionada no processo B)
-            // NÃO deve enviar os IDs do processo A como seleção residual
-            await modal.getByTestId('btn-importar').click();
-            await expect(modal).toBeHidden();
+            // Ao trocar de processo, as seleções anteriores devem ser limpas.
+            // Sem atividade selecionada no processo B, o botão fica desabilitado.
+            await expect(modal.getByTestId('btn-importar')).toBeDisabled();
 
             // Verificar que nenhuma atividade foi importada (seleções do processo A foram descartadas)
             await expect(page.getByTestId('cad-atividades-empty-state')).toBeVisible();

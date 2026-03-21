@@ -16,20 +16,48 @@ public class AlertaService {
     private final AlertaRepo alertaRepo;
     private final AlertaUsuarioRepo alertaUsuarioRepo;
 
+    public Alerta salvar(Alerta alerta) {
+        return alertaRepo.save(alerta);
+    }
+
     public Optional<Alerta> porCodigo(Long codigo) {
         return alertaRepo.findById(codigo);
     }
 
-    public List<Alerta> porUnidadeDestino(Long codigoUnidade) {
-        return alertaRepo.findByUnidadeDestino_Codigo(codigoUnidade);
+    /**
+     * Regra CDU-02: Para o perfil SERVIDOR, lista apenas os alertas destinados 
+     * individualmente ao seu título de eleitor.
+     */
+    public List<Alerta> listarParaServidor(String usuarioTitulo) {
+        return alertaRepo.buscarAlertasExclusivosDoUsuario(usuarioTitulo);
     }
 
-    public Page<Alerta> porUnidadeDestinoPaginado(Long codigoUnidade, Pageable pageable) {
-        return alertaRepo.findByUnidadeDestino_Codigo(codigoUnidade, pageable);
+    /**
+     * Regra CDU-02: Para os demais perfis, lista alertas coletivos da unidade 
+     * E alertas individuais do usuário.
+     */
+    public List<Alerta> listarParaGestao(Long codigoUnidade, String usuarioTitulo) {
+        return alertaRepo.buscarAlertasDaUnidadeEIndividuais(codigoUnidade, usuarioTitulo);
+    }
+
+    public Page<Alerta> listarParaServidorPaginado(String usuarioTitulo, Pageable pageable) {
+        return alertaRepo.buscarAlertasExclusivosDoUsuario(usuarioTitulo, pageable);
+    }
+
+    public Page<Alerta> listarParaGestaoPaginado(Long codigoUnidade, String usuarioTitulo, Pageable pageable) {
+        return alertaRepo.buscarAlertasDaUnidadeEIndividuais(codigoUnidade, usuarioTitulo, pageable);
     }
 
     public Optional<AlertaUsuario> alertaUsuario(AlertaUsuario.Chave chave) {
         return alertaUsuarioRepo.findById(chave);
+    }
+
+    public List<AlertaUsuario> alertasUsuarios(String usuarioTitulo, List<Long> alertaCodigos) {
+        return alertaUsuarioRepo.findByUsuarioAndAlertas(usuarioTitulo, alertaCodigos);
+    }
+
+    public AlertaUsuario salvarAlertaUsuario(AlertaUsuario au) {
+        return alertaUsuarioRepo.save(au);
     }
 
     public Optional<LocalDateTime> dataHoraLeituraAlertaUsuario(Long codigoAlerta, String usuarioTitulo) {
@@ -37,21 +65,6 @@ public class AlertaService {
                 .alertaCodigo(codigoAlerta)
                 .usuarioTitulo(usuarioTitulo)
                 .build();
-
         return alertaUsuarioRepo.findById(chave).map(AlertaUsuario::getDataHoraLeitura);
-    }
-
-    public List<AlertaUsuario> alertasUsuarios(String usuarioTitulo, List<Long> alertaCodigos) {
-        return alertaUsuarioRepo.findByUsuarioAndAlertas(usuarioTitulo, alertaCodigos);
-    }
-
-    @Transactional
-    public AlertaUsuario salvarAlertaUsuario(AlertaUsuario alertaUsuario) {
-        return alertaUsuarioRepo.save(alertaUsuario);
-    }
-
-    @Transactional
-    public Alerta salvar(Alerta alerta) {
-        return alertaRepo.save(alerta);
     }
 }

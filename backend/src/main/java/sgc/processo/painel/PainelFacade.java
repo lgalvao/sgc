@@ -24,7 +24,7 @@ import static java.util.stream.Collectors.*;
 @Transactional(readOnly = true)
 @Slf4j
 public class PainelFacade {
-    private final AlertaFacade alertaService;
+    private final AlertaFacade alertaFacade;
     private final UnidadeHierarquiaService hierarquiaService;
     private final UnidadeService unidadeService;
     private final ProcessoService processoService;
@@ -70,34 +70,18 @@ public class PainelFacade {
     }
 
     @Transactional
-    public Page<Alerta> listarAlertas(String usuarioTitulo, Long codigoUnidade, Pageable pageable) {
-        Pageable sortedPageable = pageable;
-        if (pageable.isPaged()) {
-            Sort currentSort = pageable.getSort();
-            if (currentSort.isUnsorted()) {
-                // Ordenação padrão se não informado: Req 57
-                sortedPageable = PageRequest.of(
-                        pageable.getPageNumber(),
-                        pageable.getPageSize(),
-                        Sort.by(Sort.Direction.DESC, "dataHora"));
-            } else {
-                // Regra de negócio: se ordenar por processo, dataHora DESC é critério secundário (Req 59)
-                boolean hasProcessoSort = currentSort.stream()
-                        .anyMatch(order -> order.getProperty().equals("processo"));
-                if (hasProcessoSort && currentSort.stream().noneMatch(o -> o.getProperty().equals("dataHora"))) {
-                    sortedPageable = PageRequest.of(
-                            pageable.getPageNumber(),
-                            pageable.getPageSize(),
-                            currentSort.and(Sort.by(Sort.Direction.DESC, "dataHora")));
-                }
-            }
-        }
+    public Page<Alerta> listarAlertas(String usuarioTitulo, Long codigoUnidade, String perfil, Pageable pageable) {
+        // Regra CDU-02 (3.3): Os alertas devem estar ordenados de forma decrescente por data/hora, 
+        // nao sendo permitida a reordenação.
+        Pageable sortedPageable = pageable.isPaged() 
+                ? PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.DESC, "dataHora"))
+                : pageable;
 
-        // Alertas são filtrados pela unidade do usuário (sem subordinadas)
-        Page<Alerta> alertasPage = alertaService.listarPorUnidade(codigoUnidade, sortedPageable);
+        // Alertas são filtrados pela unidade do usuário ou alertas pessoais (sem subordinadas - Regra CDU-02)
+        Page<Alerta> alertasPage = alertaFacade.listarPorUnidade(usuarioTitulo, codigoUnidade, perfil, sortedPageable);
         List<Long> alertasNaoLidosVisualizados = new ArrayList<>();
         alertasPage.forEach(alerta -> {
-            LocalDateTime dataHoraLeitura = alertaService.obterDataHoraLeitura(alerta.getCodigo(), usuarioTitulo).orElse(null);
+            LocalDateTime dataHoraLeitura = alertaFacade.obterDataHoraLeitura(alerta.getCodigo(), usuarioTitulo).orElse(null);
             if (dataHoraLeitura == null) {
                 alertasNaoLidosVisualizados.add(alerta.getCodigo());
             }
@@ -105,7 +89,7 @@ public class PainelFacade {
         });
 
         if (!alertasNaoLidosVisualizados.isEmpty()) {
-            alertaService.marcarComoLidos(usuarioTitulo, alertasNaoLidosVisualizados);
+            alertaFacade.marcarComoLidos(usuarioTitulo, alertasNaoLidosVisualizados);
         }
 
         return alertasPage;

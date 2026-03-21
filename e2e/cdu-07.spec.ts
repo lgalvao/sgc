@@ -259,9 +259,9 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
         const UNIDADE = 'ASSESSORIA_12';
         const chefe = USUARIOS.CHEFE_ASSESSORIA_12;
 
-        const processoDisponibilizado = await criarProcessoCadastroDisponibilizadoFixture(request, {
+        const processoDisponibilizado = await criarProcessoFinalizadoFixture(request, {
             unidade: UNIDADE,
-            descricao: `CDU-07 Disp ${ts}`
+            descricao: `CDU-07 Finalizado ${ts}`
         });
         const processoEmAndamento = await criarProcessoFixture(request, {
             unidade: UNIDADE,

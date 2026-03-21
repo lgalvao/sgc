@@ -90,14 +90,13 @@ const criterio = ref<keyof ProcessoResumo>("descricao");
 const asc = ref(true);
 
 async function buscarAlertas(
-    usuarioCodigo: string,
     unidade: number,
     page: number,
     size: number,
     sort?: "dataHora" | "processo",
     order?: "asc" | "desc",
 ) {
-  const response = await painelService.listarAlertas(usuarioCodigo, unidade, page, size, sort, order);
+  const response = await painelService.listarAlertas(unidade, page, size, sort, order);
   alertas.value = response.content;
   alertasPage.value = response;
 }
@@ -105,27 +104,24 @@ async function buscarAlertas(
 
 async function carregarDados() {
   if (perfil.perfilSelecionado.value && perfilStore.unidadeSelecionada) {
+    const unidadeCodigo = (perfilStore.unidadeSelecionada as any).codigo || perfilStore.unidadeSelecionada;
     const promises: Promise<any>[] = [
       buscarProcessosPainel(
-          perfil.perfilSelecionado.value,
-          Number(perfilStore.unidadeSelecionada),
+          unidadeCodigo,
           0,
           10,
       ), // Paginação inicial
     ];
 
-    if (perfilStore.usuarioCodigo) {
-      promises.push(
-          buscarAlertas(
-              perfilStore.usuarioCodigo,
-              Number(perfilStore.unidadeSelecionada),
-              0,
-              10,
-              "dataHora",
-              "desc"
-          ), // Paginação inicial ordenada por dataHora DESC
-      );
-    }
+    promises.push(
+        buscarAlertas(
+            unidadeCodigo,
+            0,
+            10,
+            "dataHora",
+            "desc"
+        ), // Paginação inicial ordenada por dataHora DESC
+    );
 
     await Promise.all(promises);
   }
@@ -165,9 +161,9 @@ function ordenarPor(campo: keyof ProcessoResumo) {
     criterio.value = campo;
     asc.value = true;
   }
+  const unidadeCodigo = (perfilStore.unidadeSelecionada as any)?.codigo || perfilStore.unidadeSelecionada;
   buscarProcessosPainel(
-      perfil.perfilSelecionado.value!,
-      Number(perfilStore.unidadeSelecionada),
+      unidadeCodigo,
       0,
       10,
       criterio.value,

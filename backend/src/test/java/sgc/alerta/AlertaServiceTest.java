@@ -1,20 +1,23 @@
 package sgc.alerta;
 
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.*;
-import org.mockito.*;
-import org.mockito.junit.jupiter.*;
-import org.springframework.data.domain.*;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.alerta.model.*;
 
-import java.time.*;
+import java.time.LocalDateTime;
 import java.util.*;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@DisplayName("AlertaService Test")
 class AlertaServiceTest {
+
     @Mock
     private AlertaRepo alertaRepo;
 
@@ -25,112 +28,53 @@ class AlertaServiceTest {
     private AlertaService alertaService;
 
     @Test
-    @DisplayName("Deve salvar alerta com sucesso")
-    void deveSalvarAlerta() {
-        Alerta alerta = new Alerta();
-        when(alertaRepo.save(alerta)).thenReturn(alerta);
-
-        Alerta resultado = alertaService.salvar(alerta);
-
-        assertThat(resultado).isNotNull();
-        verify(alertaRepo).save(alerta);
-    }
-
-    @Test
-    @DisplayName("Deve buscar alertas por unidade de destino")
-    void devePorUnidadeDestinoPaginado() {
-        Long codigoUnidade = 1L;
+    @DisplayName("Deve buscar alertas para Servidor (apenas individuais)")
+    void deveListarParaServidor() {
+        String usuarioTitulo = "123";
         List<Alerta> alertas = Collections.singletonList(new Alerta());
-        when(alertaRepo.findByUnidadeDestino_Codigo(codigoUnidade)).thenReturn(alertas);
+        when(alertaRepo.buscarAlertasExclusivosDoUsuario(usuarioTitulo)).thenReturn(alertas);
 
-        List<Alerta> resultado = alertaService.porUnidadeDestino(codigoUnidade);
+        List<Alerta> resultado = alertaService.listarParaServidor(usuarioTitulo);
 
-        assertThat(resultado).isNotEmpty();
         assertThat(resultado).hasSize(1);
-        verify(alertaRepo).findByUnidadeDestino_Codigo(codigoUnidade);
+        verify(alertaRepo).buscarAlertasExclusivosDoUsuario(usuarioTitulo);
+        verify(alertaRepo, never()).buscarAlertasDaUnidadeEIndividuais(anyLong(), anyString());
     }
 
     @Test
-    @DisplayName("Deve buscar alertas por unidade de destino com paginação")
-    void devePorUnidadeDestinoPaginadoComPaginacao() {
+    @DisplayName("Deve buscar alertas para Gestão (unidade + individuais)")
+    void deveListarParaGestao() {
         Long codigoUnidade = 1L;
-        Pageable pageable = PageRequest.of(0, 10);
-        Page<Alerta> page = new PageImpl<>(Collections.singletonList(new Alerta()));
-        when(alertaRepo.findByUnidadeDestino_Codigo(codigoUnidade, pageable)).thenReturn(page);
+        String usuarioTitulo = "123";
+        List<Alerta> alertas = Collections.singletonList(new Alerta());
+        when(alertaRepo.buscarAlertasDaUnidadeEIndividuais(codigoUnidade, usuarioTitulo)).thenReturn(alertas);
 
-        Page<Alerta> resultado = alertaService.porUnidadeDestinoPaginado(codigoUnidade, pageable);
+        List<Alerta> resultado = alertaService.listarParaGestao(codigoUnidade, usuarioTitulo);
 
-        assertThat(resultado).isNotNull();
-        assertThat(resultado.getContent()).hasSize(1);
-        verify(alertaRepo).findByUnidadeDestino_Codigo(codigoUnidade, pageable);
+        assertThat(resultado).hasSize(1);
+        verify(alertaRepo).buscarAlertasDaUnidadeEIndividuais(codigoUnidade, usuarioTitulo);
+        verify(alertaRepo, never()).buscarAlertasExclusivosDoUsuario(anyString());
     }
 
     @Test
     @DisplayName("Deve buscar alerta por código")
     void devePorCodigo() {
-        Long codigo = 1L;
-        Alerta alerta = new Alerta();
-        when(alertaRepo.findById(codigo)).thenReturn(Optional.of(alerta));
-
-        Optional<Alerta> resultado = alertaService.porCodigo(codigo);
-
-        assertThat(resultado).isPresent();
-        verify(alertaRepo).findById(codigo);
+        when(alertaRepo.findById(1L)).thenReturn(Optional.of(new Alerta()));
+        assertThat(alertaService.porCodigo(1L)).isPresent();
     }
 
     @Test
-    @DisplayName("Deve buscar AlertaUsuario por chave")
-    void deveAlertaUsuario() {
-        AlertaUsuario.Chave chave = AlertaUsuario.Chave.builder().alertaCodigo(1L).usuarioTitulo("user").build();
-        AlertaUsuario alertaUsuario = new AlertaUsuario();
-        when(alertaUsuarioRepo.findById(chave)).thenReturn(Optional.of(alertaUsuario));
+    @DisplayName("Deve obter data/hora leitura")
+    void deveObterDataHoraLeitura() {
+        AlertaUsuario au = new AlertaUsuario();
+        LocalDateTime agora = LocalDateTime.now();
+        au.setDataHoraLeitura(agora);
 
-        Optional<AlertaUsuario> resultado = alertaService.alertaUsuario(chave);
+        when(alertaUsuarioRepo.findById(any())).thenReturn(Optional.of(au));
 
-        assertThat(resultado).isPresent();
-        verify(alertaUsuarioRepo).findById(chave);
-    }
+        Optional<LocalDateTime> data = alertaService.dataHoraLeituraAlertaUsuario(1L, "123");
 
-    @Test
-    @DisplayName("Deve salvar AlertaUsuario")
-    void deveSalvarAlertaUsuario() {
-        AlertaUsuario alertaUsuario = new AlertaUsuario();
-        when(alertaUsuarioRepo.save(alertaUsuario)).thenReturn(alertaUsuario);
-
-        AlertaUsuario resultado = alertaService.salvarAlertaUsuario(alertaUsuario);
-
-        assertThat(resultado).isNotNull();
-        verify(alertaUsuarioRepo).save(alertaUsuario);
-    }
-
-    @Test
-    @DisplayName("Deve buscar AlertaUsuario por usuário e lista de alertas")
-    void deveAlertasUsuarios() {
-        String usuario = "user";
-        List<Long> codigos = List.of(1L, 2L);
-        List<AlertaUsuario> lista = Collections.singletonList(new AlertaUsuario());
-        when(alertaUsuarioRepo.findByUsuarioAndAlertas(usuario, codigos)).thenReturn(lista);
-
-        List<AlertaUsuario> resultado = alertaService.alertasUsuarios(usuario, codigos);
-
-        assertThat(resultado).isNotEmpty();
-        verify(alertaUsuarioRepo).findByUsuarioAndAlertas(usuario, codigos);
-    }
-
-    @Test
-    @DisplayName("Deve obter data hora de leitura")
-    void deveDataHoraLeituraAlertaUsuario() {
-        Long codigoAlerta = 1L;
-        String usuario = "user";
-        LocalDateTime now = LocalDateTime.now();
-        AlertaUsuario alertaUsuario = new AlertaUsuario();
-        alertaUsuario.setDataHoraLeitura(now);
-
-        when(alertaUsuarioRepo.findById(any(AlertaUsuario.Chave.class))).thenReturn(Optional.of(alertaUsuario));
-
-        Optional<LocalDateTime> resultado = alertaService.dataHoraLeituraAlertaUsuario(codigoAlerta, usuario);
-
-        assertThat(resultado).isPresent();
-        assertThat(resultado.get()).isEqualTo(now);
+        assertThat(data).isPresent();
+        assertThat(data).contains(agora);
     }
 }

@@ -76,7 +76,7 @@ describe('PainelView Coverage', () => {
         BButton: {template: '<button />'}
     };
 
-    it('carregarDados calls only buscarProcessosPainel when usuarioCodigo is missing', async () => {
+    it('carregarDados calls buscarProcessosPainel and listarAlertas when unit is present', async () => {
         const pinia = createTestingPinia({
             createSpy: vi.fn,
             initialState: {
@@ -99,7 +99,7 @@ describe('PainelView Coverage', () => {
         await wrapper.vm.$nextTick();
 
         expect(processosMock.buscarProcessosPainel).toHaveBeenCalled();
-        expect(painelService.listarAlertas).not.toHaveBeenCalled();
+        expect(painelService.listarAlertas).toHaveBeenCalled();
     });
 
     it('ordenarPor toggles asc/desc correctly', async () => {
@@ -127,12 +127,12 @@ describe('PainelView Coverage', () => {
         await (wrapper.vm as any).ordenarPor('descricao');
 
         expect(processosMock.buscarProcessosPainel).toHaveBeenLastCalledWith(
-            'GESTOR', 1, 0, 10, 'descricao', 'desc'
+            1, 0, 10, 'descricao', 'desc'
         );
 
         await (wrapper.vm as any).ordenarPor('tipo');
         expect(processosMock.buscarProcessosPainel).toHaveBeenLastCalledWith(
-            'GESTOR', 1, 0, 10, 'tipo', 'asc'
+            1, 0, 10, 'tipo', 'asc'
         );
     });
 

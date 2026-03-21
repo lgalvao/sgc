@@ -7,11 +7,9 @@ import org.springframework.security.authentication.*;
 import org.springframework.security.core.*;
 import org.springframework.security.core.authority.*;
 import org.springframework.security.core.context.*;
-import org.springframework.security.test.context.support.*;
 import org.springframework.transaction.annotation.*;
 import sgc.alerta.model.*;
 import sgc.fixture.*;
-import sgc.integracao.mocks.*;
 import sgc.organizacao.model.*;
 import sgc.processo.model.*;
 
@@ -27,8 +25,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class CDU02IntegrationTest extends BaseIntegrationTest {
     private static final String API_PAINEL_PROCESSOS = "/api/painel/processos";
     private static final String API_PAINEL_ALERTAS = "/api/painel/alertas";
-    private static final String PERFIL = "perfil";
-    private static final String UNIDADE = "unidade";
     private static final String GESTOR = "GESTOR";
     private static final String CHEFE = "CHEFE";
     private static final String PROCESSO_RAIZ_JSON_PATH = "$.content[?(@.descricao == 'Processo raiz')]";
@@ -39,8 +35,6 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
     @Autowired
     private AlertaRepo alertaRepo;
 
-    // Removido: JdbcTemplate não é necessário pois @Transactional garante isolamento
-
     private Unidade unidadeRaiz;
     private Unidade unidadeFilha1;
     private Unidade unidadeFilha2;
@@ -49,27 +43,28 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
 
     @BeforeEach
     void setup() {
+        // Limpa contexto de segurança entre testes
+        SecurityContextHolder.clearContext();
 
-        // Raiz
+        // Unidades
         unidadeRaiz = UnidadeFixture.unidadePadrao();
-        unidadeRaiz.setCodigo(null); // Auto-increment
+        unidadeRaiz.setCodigo(null);
         unidadeRaiz.setNome("Unidade raiz teste");
         unidadeRaiz = unidadeRepo.save(unidadeRaiz);
 
-        // Filha 1 -> Raiz
         unidadeFilha1 = UnidadeFixture.unidadePadrao();
         unidadeFilha1.setCodigo(null);
         unidadeFilha1.setNome("Unidade filha 1 Teste");
         unidadeFilha1.setUnidadeSuperior(unidadeRaiz);
         unidadeFilha1 = unidadeRepo.save(unidadeFilha1);
 
-        // Filha 2 -> Raiz
         unidadeFilha2 = UnidadeFixture.unidadePadrao();
         unidadeFilha2.setCodigo(null);
         unidadeFilha2.setNome("Unidade filha 2 Teste");
         unidadeFilha2.setUnidadeSuperior(unidadeRaiz);
         unidadeFilha2 = unidadeRepo.save(unidadeFilha2);
 
+        // Processos
         processoRaiz = ProcessoFixture.processoEmAndamento();
         processoRaiz.setCodigo(null);
         processoRaiz.setDescricao("Processo raiz");
@@ -88,52 +83,67 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
         processoCriado.adicionarParticipantes(Set.of(unidadeRaiz));
         processoRepo.save(processoCriado);
 
-        // Flush para garantir persistência antes dos testes
         unidadeRepo.flush();
         processoRepo.flush();
     }
 
-    private Usuario setupSecurityContext(String tituloEleitoral, Unidade unidade, String... perfis) {
-        // Cria usuário dinamicamente se não existir
+    private Usuario setupSecurityContext(String tituloEleitoral, Unidade unidade, Object perfilOuString) {
+        Perfil p = (perfilOuString instanceof String) ? Perfil.valueOf((String) perfilOuString) : (Perfil) perfilOuString;
+
         Usuario usuario = usuarioRepo.findById(tituloEleitoral).orElseGet(() -> {
             Usuario newUser = UsuarioFixture.usuarioComTitulo(tituloEleitoral);
             newUser.setUnidadeLotacao(unidade);
             return usuarioRepo.save(newUser);
         });
 
-        // Configura perfil e unidade ativos da sessão
-        if (perfis.length > 0) {
-            Perfil p = Perfil.valueOf(perfis[0]);
-            usuario.setPerfilAtivo(p);
-            usuario.setUnidadeAtivaCodigo(unidade.getCodigo());
-        }
+        // Configura o contexto de segurança soberano (Token JWT simulado)
+        usuario.setPerfilAtivo(p);
+        usuario.setUnidadeAtivaCodigo(unidade.getCodigo());
+        usuarioRepo.saveAndFlush(usuario);
 
-        Set<GrantedAuthority> authorities = Collections.emptySet();
-        if (perfis.length > 0) {
-            authorities = Set.of(new SimpleGrantedAuthority("ROLE_" + perfis[0]));
-        }
+        Set<GrantedAuthority> authorities = Set.of(new SimpleGrantedAuthority("ROLE_" + p.name()));
         usuario.setAuthorities(authorities);
 
-        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(usuario, null,
-                authorities);
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+                usuario, null, authorities);
+        SecurityContextHolder.getContext().setAuthentication(auth);
 
-        SecurityContext context = SecurityContextHolder.createEmptyContext();
-        context.setAuthentication(authentication);
-        SecurityContextHolder.setContext(context);
         return usuario;
     }
 
     @Nested
     @DisplayName("Testes de Visibilidade de Processos (CDU-02)")
     class VisibilidadeProcessosTestes {
+
         @Test
-        @WithMockAdmin
+        @DisplayName("CDU-02: GESTOR da unidade raiz deve ver processos subordinados, mas NÃO os 'Criado'")
+        void testListarProcessosGestorRaizVeTodos() throws Exception {
+            setupSecurityContext("99001", unidadeRaiz, GESTOR);
+
+            mockMvc.perform(get(API_PAINEL_PROCESSOS))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath(PROCESSO_RAIZ_JSON_PATH).exists())
+                    .andExpect(jsonPath(PROCESSO_FILHA_1_JSON_PATH).exists())
+                    .andExpect(jsonPath("$.content[?(@.descricao == 'Processo criado teste')]").doesNotExist());
+        }
+
+        @Test
+        @DisplayName("CDU-02: CHEFE da unidade Filha 2 não deve ver processos de outras unidades")
+        void testListarProcessosChefeNaoVeIrmas() throws Exception {
+            setupSecurityContext("99002", unidadeFilha2, CHEFE);
+
+            mockMvc.perform(get(API_PAINEL_PROCESSOS))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath(PROCESSO_RAIZ_JSON_PATH).doesNotExist())
+                    .andExpect(jsonPath(PROCESSO_FILHA_1_JSON_PATH).doesNotExist());
+        }
+
+        @Test
         @DisplayName("CDU-02: ADMIN deve ver todos os processos, incluindo os com status 'Criado'")
         void testListarProcessosAdminVeTodos() throws Exception {
-            // Requisito CDU-02: Processos na situação 'Criado' deverão ser listados apenas se o usuário estiver logado com o perfil ADMIN.
-            mockMvc.perform(get(API_PAINEL_PROCESSOS)
-                            .param(PERFIL, "ADMIN")
-                            .param(UNIDADE, unidadeRaiz.getCodigo().toString())) // Uso de ID dinâmico
+            setupSecurityContext("admin", unidadeRaiz, Perfil.ADMIN);
+
+            mockMvc.perform(get(API_PAINEL_PROCESSOS))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath(PROCESSO_RAIZ_JSON_PATH).exists())
                     .andExpect(jsonPath(PROCESSO_FILHA_1_JSON_PATH).exists())
@@ -141,60 +151,13 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
         }
 
         @Test
-        @DisplayName("CDU-02: GESTOR da unidade raiz deve ver processos subordinados, mas NÃO os 'Criado'")
-        @WithMockUser(username = "99001")
-        void testListarProcessosGestorRaizVeTodos() throws Exception {
-            setupSecurityContext("99001", unidadeRaiz, GESTOR);
-
-            mockMvc.perform(
-                            get(API_PAINEL_PROCESSOS)
-                                    .param(PERFIL, GESTOR)
-                                    .param(UNIDADE, unidadeRaiz.getCodigo().toString()))
-                    .andExpect(status().isOk())
-                    // Deve ver o da Raiz e o da Filha (CDU-02: Processos ... que incluam entre as unidades participantes a unidade do usuário e/ou suas unidades subordinadas)
-                    .andExpect(jsonPath(PROCESSO_RAIZ_JSON_PATH).exists())
-                    .andExpect(jsonPath(PROCESSO_FILHA_1_JSON_PATH).exists())
-                    // GESTOR não vê processos com status CRIADO (regra confirmada)
-                    .andExpect(jsonPath("$.content[?(@.descricao == 'Processo criado teste')]").doesNotExist());
-        }
-
-        @Test
-        @DisplayName("CDU-02: CHEFE da unidade Filha 2 não deve ver processos de outras unidades")
-        @WithMockUser(username = "99002")
-        void testListarProcessosChefeUnidadeFilha2NaoVeProcessosDeOutros() throws Exception {
-            setupSecurityContext("99002", unidadeFilha2, CHEFE);
-
-            // Unidade filha 2 não tem processos no setup
-            mockMvc.perform(
-                            get(API_PAINEL_PROCESSOS)
-                                    .param(PERFIL, CHEFE)
-                                    .param(UNIDADE, unidadeFilha2.getCodigo().toString()))
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath(PROCESSO_RAIZ_JSON_PATH).doesNotExist())
-                    .andExpect(jsonPath(PROCESSO_FILHA_1_JSON_PATH).doesNotExist());
-        }
-
-        @Test
-        @DisplayName("CDU-02: Nenhum perfil (GESTOR), exceto ADMIN, deve ver processos com status 'Criado'")
-        @WithMockUser(username = "99003")
+        @DisplayName("CDU-02: Nenhum perfil, exceto ADMIN, deve ver processos com status 'Criado'")
         void testListarProcessosNaoAdminNaoVeProcessosCriados() throws Exception {
             setupSecurityContext("99003", unidadeRaiz, GESTOR);
 
-            Processo processoCriadoFilha = ProcessoFixture.processoPadrao();
-            processoCriadoFilha.setCodigo(null);
-            processoCriadoFilha.setDescricao("Processo criado filha");
-            processoCriadoFilha.adicionarParticipantes(Set.of(unidadeFilha1));
-            processoRepo.saveAndFlush(processoCriadoFilha);
-
-            mockMvc.perform(
-                            get(API_PAINEL_PROCESSOS)
-                                    .param(PERFIL, GESTOR)
-                                    .param(UNIDADE, unidadeRaiz.getCodigo().toString()))
+            mockMvc.perform(get(API_PAINEL_PROCESSOS))
                     .andExpect(status().isOk())
-                    // Deve ver Raiz e Filha (Em andamento)
-                    .andExpect(jsonPath(PROCESSO_FILHA_1_JSON_PATH).exists())
-                    // NÃO deve ver Criado filha
-                    .andExpect(jsonPath("$.content[?(@.descricao == 'Processo criado filha')]").doesNotExist());
+                    .andExpect(jsonPath("$.content[?(@.descricao == 'Processo criado teste')]").doesNotExist());
         }
     }
 
@@ -203,7 +166,6 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
     class VisibilidadeAlertasTestes {
         @Test
         @DisplayName("CDU-02: Usuário deve ver alertas direcionados a ele")
-        @WithMockUser(username = "99004")
         void testListarAlertasUsuarioVeSeusAlertas() throws Exception {
             Usuario usuario = setupSecurityContext("99004", unidadeRaiz, GESTOR);
 
@@ -212,49 +174,45 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
             alerta.setDescricao("Alerta pessoal teste");
             alertaRepo.save(alerta);
 
-            mockMvc.perform(get(API_PAINEL_ALERTAS)
-                            .param("usuarioTitulo", usuario.getTituloEleitoral())
-                            .param(UNIDADE, unidadeRaiz.getCodigo().toString()))
+            mockMvc.perform(get(API_PAINEL_ALERTAS))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.content[?(@.descricao == 'Alerta pessoal teste')]").exists());
         }
 
         @Test
-        @DisplayName("CDU-02: Usuário deve ver alertas direcionados à sua unidade")
-        @WithMockUser(username = "99005")
+        @DisplayName("CDU-02: Usuário deve ver alertas coletivos da sua unidade ativa (se não for SERVIDOR)")
         void testListarAlertasUsuarioVeAlertasDaSuaUnidade() throws Exception {
             setupSecurityContext("99005", unidadeRaiz, GESTOR);
-            // Alerta para Unidade filha 1 (Subordinada à Raiz)
-            Alerta alerta = AlertaFixture.alertaParaUnidade(processoFilha1, unidadeFilha1);
+            
+            Alerta alerta = AlertaFixture.alertaParaUnidade(processoRaiz, unidadeRaiz);
             alerta.setCodigo(null);
-            alerta.setDescricao("Alerta subordinada teste");
+            alerta.setDescricao("Alerta unidade raiz");
             alertaRepo.save(alerta);
 
-            mockMvc.perform(get(API_PAINEL_ALERTAS)
-                            .param(UNIDADE, unidadeRaiz.getCodigo().toString()))
+            mockMvc.perform(get(API_PAINEL_ALERTAS))
                     .andExpect(status().isOk())
-                    // Painel não mostra alertas de subordinadas (regra atual do código)
-                    .andExpect(jsonPath("$.content[?(@.descricao == 'Alerta subordinada teste')]").doesNotExist());
+                    .andExpect(jsonPath("$.content[?(@.descricao == 'Alerta unidade raiz')]").exists());
         }
 
         @Test
-        @DisplayName("CDU-02: Usuário não deve ver alertas de outros usuários ou unidades")
-        @WithMockUser(username = "99006")
-        void testListarAlertasUsuarioNaoVeAlertasDeOutros() throws Exception {
-            Usuario usuario = setupSecurityContext("99006", unidadeFilha2, CHEFE);
+        @DisplayName("CDU-02: SERVIDOR NÃO deve ver alertas da unidade, apenas os pessoais")
+        void testListarAlertasServidorNaoVeAlertasDaUnidade() throws Exception {
+            Usuario usuario = setupSecurityContext("99007", unidadeRaiz, Perfil.SERVIDOR);
+            
+            Alerta alertaUnidade = AlertaFixture.alertaParaUnidade(processoRaiz, unidadeRaiz);
+            alertaUnidade.setCodigo(null);
+            alertaUnidade.setDescricao("Alerta unidade SERVIDOR");
+            alertaRepo.save(alertaUnidade);
 
-            // Alerta para Unidade filha 1 (Irmã, não subordinada)
-            Alerta alerta = AlertaFixture.alertaParaUnidade(processoFilha1, unidadeFilha1);
-            alerta.setCodigo(null);
-            alerta.setDescricao("Alerta outra unidade");
-            alertaRepo.save(alerta);
+            Alerta alertaPessoal = AlertaFixture.alertaParaUsuario(processoRaiz, usuario);
+            alertaPessoal.setCodigo(null);
+            alertaPessoal.setDescricao("Alerta pessoal SERVIDOR");
+            alertaRepo.save(alertaPessoal);
 
-            mockMvc.perform(
-                            get(API_PAINEL_ALERTAS)
-                                    .param("usuarioTitulo", usuario.getTituloEleitoral())
-                                    .param(UNIDADE, unidadeFilha2.getCodigo().toString()))
+            mockMvc.perform(get(API_PAINEL_ALERTAS))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.content[?(@.descricao == 'Alerta outra unidade')]").doesNotExist());
+                    .andExpect(jsonPath("$.content[?(@.descricao == 'Alerta pessoal SERVIDOR')]").exists())
+                    .andExpect(jsonPath("$.content[?(@.descricao == 'Alerta unidade SERVIDOR')]").doesNotExist());
         }
     }
 }

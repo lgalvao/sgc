@@ -36,6 +36,19 @@ Validadas no método `checkHierarquia` do `SgcPermissionEvaluator`:
 
 A ação `VERIFICAR_IMPACTOS` **não depende de localização** no Evaluator (apenas retorna `true` se o perfil for CHEFE, GESTOR ou ADMIN). O controle fino de em quais situações cada perfil pode ver os impactos é feito no **serviço** (`ImpactoMapaService`), não no Evaluator.
 
+### Exceção: Alertas (Painel e Barra de Navegação)
+
+As regras de visualização de alertas **não seguem a hierarquia recursiva**. A visibilidade é determinada pelo perfil e pelo destino do alerta (CDU-02):
+
+- **Perfil SERVIDOR:**
+    * Vê **apenas** os alertas exclusivos (**pessoais**) direcionados ao seu título de eleitor.
+    * **Não vê** alertas da unidade, mesmo que seja sua unidade ativa.
+- **Outros Perfis (ADMIN, GESTOR, CHEFE):**
+    * Veem os alertas exclusivos (**pessoais**) direcionados a eles.
+    * Veem **também** alertas coletivos da sua **unidade ativa** (alertas que não possuem um usuário de destino específico).
+
+**Ordenação:** Os alertas são exibidos obrigatoriamente em ordem decrescente por **Data/Hora**, não sendo permitida a reordenação pelo usuário.
+
 ---
 
 ## 4. Regras de Execução (Escrita)

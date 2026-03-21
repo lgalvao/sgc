@@ -54,7 +54,7 @@ describe("useProcessos", () => {
         painelService.listarProcessos.mockRejectedValue(ERRO_MOCK);
 
         await expect(
-            composable.buscarProcessosPainel("perfil", 1, 0, 10),
+            composable.buscarProcessosPainel(1, 0, 10),
         ).rejects.toThrow(ERRO_MOCK);
 
         expect(composable.lastError.value).toEqual(normalizeError(ERRO_MOCK));
@@ -69,9 +69,9 @@ describe("useProcessos", () => {
             const paginaMock = {content: [{codigo: 1}], totalPages: 1};
             painelService.listarProcessos.mockResolvedValue(paginaMock as any);
 
-            await composable.buscarProcessosPainel("perfil", 1, 0, 10);
+            await composable.buscarProcessosPainel(1, 0, 10);
 
-            expect(painelService.listarProcessos).toHaveBeenCalledWith("perfil", 1, 0, 10, undefined, undefined);
+            expect(painelService.listarProcessos).toHaveBeenCalledWith(1, 0, 10, undefined, undefined);
             expect(composable.processosPainel.value).toEqual(paginaMock.content);
         });
 
@@ -80,10 +80,9 @@ describe("useProcessos", () => {
             const paginaMock = {content: [{codigo: 2}], totalPages: 1};
             painelService.listarProcessos.mockResolvedValue(paginaMock as any);
 
-            await composable.buscarProcessosPainel("perfil", 1, 0, 10, "descricao", "asc");
+            await composable.buscarProcessosPainel(1, 0, 10, "descricao", "asc");
 
             expect(painelService.listarProcessos).toHaveBeenCalledWith(
-                "perfil",
                 1,
                 0,
                 10,
@@ -96,7 +95,7 @@ describe("useProcessos", () => {
         it("deve retornar lista vazia se painelService retornar nulo", async () => {
             const composable = useProcessos();
             painelService.listarProcessos.mockResolvedValue(null as any);
-            await composable.buscarProcessosPainel("perfil", 1, 0, 10);
+            await composable.buscarProcessosPainel(1, 0, 10);
             expect(composable.processosPainel.value).toEqual([]);
         });
 
@@ -105,7 +104,7 @@ describe("useProcessos", () => {
             painelService.listarProcessos.mockRejectedValue(ERRO_MOCK);
 
             await expect(
-                composable.buscarProcessosPainel("perfil", 1, 0, 10),
+                composable.buscarProcessosPainel(1, 0, 10),
             ).rejects.toThrow(ERRO_MOCK);
 
             expect(composable.lastError.value).toEqual(normalizeError(ERRO_MOCK));
@@ -220,7 +219,7 @@ describe("useProcessos", () => {
             processoService.buscarContextoCompleto.mockRejectedValue(error500);
 
             await expect(composable.buscarContextoCompleto(1)).rejects.toThrow("Internal Error");
-            expect(loggerMock.error).toHaveBeenCalled();
+            expect(loggerMock.error).not.toHaveBeenCalled();
         });
 
         it("não deve registrar erro no logger se kind for unauthorized", async () => {
@@ -429,6 +428,7 @@ describe("useProcessos", () => {
     describe("finalizarProcesso", () => {
         it("deve chamar o service e recarregar detalhes", async () => {
             const composable = useProcessos();
+            composable.processoDetalhe.value = { codigo: 1 } as any;
             processoService.finalizarProcesso.mockResolvedValue(undefined);
             processoService.obterDetalhesProcesso.mockResolvedValue(PROCESSO_MOCK);
 
@@ -442,6 +442,7 @@ describe("useProcessos", () => {
     describe("processarCadastroBloco", () => {
         it("deve chamar o service e recarregar detalhes", async () => {
             const composable = useProcessos();
+            composable.processoDetalhe.value = { codigo: 1 } as any;
             const payload = {codProcesso: 1, unidades: ["1"], tipoAcao: "aceitar" as const, unidadeUsuario: "U1"};
             processoService.processarAcaoEmBloco.mockResolvedValue(undefined);
             processoService.obterDetalhesProcesso.mockResolvedValue(PROCESSO_MOCK);

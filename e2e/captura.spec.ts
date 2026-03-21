@@ -225,7 +225,7 @@ async function capturarComponente(elemento: Locator, categoria: string, nome: st
 async function aguardarPinturaEstavel(page: Page, quadros = 2): Promise<void> {
     for (let indice = 0; indice < quadros; indice += 1) {
         await page.evaluate(() => new Promise<void>((resolve) => {
-            window.requestAnimationFrame(() => resolve());
+            globalThis.requestAnimationFrame(() => resolve());
         }));
     }
 }

@@ -34,7 +34,6 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 @Slf4j
 @RequiredArgsConstructor
 public class SubprocessoService {
-    private static final String SIGLA_ADMIN = "ADMIN";
     private static final String NOME_ENTIDADE = "Subprocesso";
     private static final Set<SituacaoSubprocesso> SITUACOES_PERMITIDAS_IMPORTACAO = Set.of(
             NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, REVISAO_CADASTRO_EM_ANDAMENTO);

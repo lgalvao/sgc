@@ -36,6 +36,10 @@ public class Alerta extends EntidadeBase {
     @JsonIgnore
     private Unidade unidadeDestino;
 
+    @Column(name = "usuario_destino_titulo", length = 12)
+    @JsonIgnore
+    private String usuarioDestinoTitulo;
+
     @JsonView(ComumViews.Publica.class)
     @Column(name = "descricao", nullable = false)
     private String descricao;
