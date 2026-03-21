@@ -12,7 +12,6 @@ import type {
     TipoProcesso,
     UnidadeImportacao,
 } from "@/types/tipos";
-import {normalizeError} from "@/utils/apiError";
 import {logger} from "@/utils";
 
 type ContextoCompletoProcesso = Processo & {
@@ -227,9 +226,9 @@ async function buscarContextoCompleto(codigoProcesso: number) {
 
         setProcessoDetalhe(data ?? null);
         subprocessosElegiveis.value = data?.elegiveis ?? [];
-    }, (erro) => {
-        if (normalizeError(erro).kind !== "unauthorized") {
-            logger.error(`Erro ao buscar contexto completo para processo ${codigoProcesso}:`, erro);
+    }, (normalized) => {
+        if (normalized.kind !== "unauthorized") {
+            logger.error(`Erro ao buscar contexto completo para processo ${codigoProcesso}:`, normalized);
         }
     }).finally(() => {
         carregando.value = false;

@@ -311,4 +311,20 @@ describe("ProcessoViewCoverage.spec.ts", () => {
         expect((wrapper.vm as any).unidadesElegiveis).toHaveLength(1);
         expect((wrapper.vm as any).unidadesElegiveis[0].sigla).toBe("A");
     });
+
+    it("deve cobrir branches de erro e estados de carregamento", async () => {
+        const wrapper = createWrapper({
+            processos: {
+                processoDetalhe: {codigo: 1, situacao: 'EM_ANDAMENTO'},
+                lastError: {message: 'Erro de teste'}
+            }
+        });
+        await flushPromises();
+        expect(wrapper.text()).toContain('Erro de teste');
+
+        // In this component, notify() is used for local notifications.
+        (wrapper.vm as any).notify('Erro Manual', 'danger');
+        await wrapper.vm.$nextTick();
+        expect(wrapper.text()).toContain('Erro Manual');
+    });
 });

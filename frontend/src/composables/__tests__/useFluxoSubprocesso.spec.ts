@@ -104,4 +104,77 @@ describe("useFluxoSubprocesso", () => {
         expect(resultado).toBe(false);
         expect(lastError.value).toEqual(normalizeError(erro));
     });
+
+    it("deve disponibilizar revisao cadastro", async () => {
+        const {disponibilizarRevisaoCadastro} = await import("../useFluxoSubprocesso").then((m) => m.useFluxoSubprocesso());
+        const {disponibilizarRevisaoCadastro: service} = await import("@/services/cadastroService");
+        (service as any).mockResolvedValue(undefined);
+
+        await disponibilizarRevisaoCadastro(10);
+        expect(service).toHaveBeenCalledWith(10);
+    });
+
+    it("deve devolver cadastro", async () => {
+        const {devolverCadastro} = await import("../useFluxoSubprocesso").then((m) => m.useFluxoSubprocesso());
+        const {devolverCadastro: service} = await import("@/services/cadastroService");
+        (service as any).mockResolvedValue(undefined);
+
+        await devolverCadastro(10, {observacoes: "Erro"});
+        expect(service).toHaveBeenCalledWith(10, {observacoes: "Erro"});
+    });
+
+    it("deve devolver revisao cadastro", async () => {
+        const {devolverRevisaoCadastro} = await import("../useFluxoSubprocesso").then((m) => m.useFluxoSubprocesso());
+        const {devolverRevisaoCadastro: service} = await import("@/services/cadastroService");
+        (service as any).mockResolvedValue(undefined);
+
+        await devolverRevisaoCadastro(10, {observacoes: "Erro"});
+        expect(service).toHaveBeenCalledWith(10, {observacoes: "Erro"});
+    });
+
+    it("deve aceitar cadastro", async () => {
+        const {aceitarCadastro} = await import("../useFluxoSubprocesso").then((m) => m.useFluxoSubprocesso());
+        const {aceitarCadastro: service} = await import("@/services/cadastroService");
+        (service as any).mockResolvedValue(undefined);
+
+        await aceitarCadastro(10, {observacoes: "OK"});
+        expect(service).toHaveBeenCalledWith(10, {observacoes: "OK"});
+    });
+
+    it("deve aceitar revisao cadastro", async () => {
+        const {aceitarRevisaoCadastro} = await import("../useFluxoSubprocesso").then((m) => m.useFluxoSubprocesso());
+        const {aceitarRevisaoCadastro: service} = await import("@/services/cadastroService");
+        (service as any).mockResolvedValue(undefined);
+
+        await aceitarRevisaoCadastro(10, {observacoes: "OK"});
+        expect(service).toHaveBeenCalledWith(10, {observacoes: "OK"});
+    });
+
+    it("deve homologar revisao cadastro", async () => {
+        const {homologarRevisaoCadastro} = await import("../useFluxoSubprocesso").then((m) => m.useFluxoSubprocesso());
+        const {homologarRevisaoCadastro: service} = await import("@/services/cadastroService");
+        (service as any).mockResolvedValue(undefined);
+
+        await homologarRevisaoCadastro(10, {observacoes: "OK"});
+        expect(service).toHaveBeenCalledWith(10, {observacoes: "OK"});
+    });
+
+    it("deve reabrir revisao cadastro", async () => {
+        const {reabrirRevisaoCadastro} = await import("../useFluxoSubprocesso").then((m) => m.useFluxoSubprocesso());
+        const {reabrirRevisaoCadastro: service} = await import("@/services/processoService");
+        (service as any).mockResolvedValue(undefined);
+
+        await reabrirRevisaoCadastro(10, "Justificativa");
+        expect(service).toHaveBeenCalledWith(10, "Justificativa");
+    });
+
+    it("não deve recarregar processo se processoDetalhe for nulo", async () => {
+        processosMock.processoDetalhe.value = null;
+        const {disponibilizarCadastro} = await import("../useFluxoSubprocesso").then((m) => m.useFluxoSubprocesso());
+        const {disponibilizarCadastro: service} = await import("@/services/cadastroService");
+        (service as any).mockResolvedValue(undefined);
+
+        await disponibilizarCadastro(10);
+        expect(processosMock.buscarProcessoDetalhe).not.toHaveBeenCalled();
+    });
 });

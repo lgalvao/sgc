@@ -430,6 +430,7 @@ async function confirmarEnviarLembrete() {
     return;
   }
   modalLembreteAberto.value = true;
+  return true;
 }
 
 async function enviarLembreteConfirmado() {
@@ -445,4 +446,16 @@ async function enviarLembreteConfirmado() {
     notify(TEXTOS.subprocesso.ERRO_LEMBRETE_ENVIADO, 'danger');
   }
 }
+
+defineExpose({
+  confirmarEnviarLembrete,
+  enviarLembreteConfirmado,
+  confirmarReabertura,
+  confirmarAlteracaoDataLimite,
+  abrirModalAlterarDataLimite,
+  abrirModalReabrirCadastro,
+  abrirModalReabrirRevisao,
+  modalLembreteAberto,
+  justificativaReabertura
+});
 </script>

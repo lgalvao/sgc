@@ -73,4 +73,47 @@ describe("useFluxoMapa", () => {
 
         expect(service.disponibilizarMapa).toHaveBeenCalledWith(10, {dataLimite: "2026-05-01", observacoes: "obs"});
     });
+
+    it("deve salvar mapa completo", async () => {
+        const {useFluxoMapa} = await import("../useFluxoMapa");
+        const fluxoMapa = useFluxoMapa();
+        const service = await import("@/services/subprocessoService");
+        const resposta = {codigo: 1, competencias: []} as any;
+        vi.mocked(service.salvarMapaCompleto).mockResolvedValue(resposta);
+
+        await fluxoMapa.salvarMapa(10, {dados: "teste"});
+
+        expect(service.salvarMapaCompleto).toHaveBeenCalledWith(10, {dados: "teste"});
+        expect(mapasStoreMock.mapaCompleto.value).toEqual(resposta);
+    });
+
+    it("deve salvar ajustes do mapa", async () => {
+        const {useFluxoMapa} = await import("../useFluxoMapa");
+        const fluxoMapa = useFluxoMapa();
+        const service = await import("@/services/subprocessoService");
+        vi.mocked(service.salvarMapaAjuste).mockResolvedValue(undefined);
+
+        await fluxoMapa.salvarAjustes(10, {dados: "ajuste"});
+
+        expect(service.salvarMapaAjuste).toHaveBeenCalledWith(10, {dados: "ajuste"});
+    });
+
+    it("deve propagar erro se salvarAjustes falhar", async () => {
+        const {useFluxoMapa} = await import("../useFluxoMapa");
+        const fluxoMapa = useFluxoMapa();
+        const service = await import("@/services/subprocessoService");
+        vi.mocked(service.salvarMapaAjuste).mockRejectedValue(new Error("Erro ajuste"));
+
+        await expect(fluxoMapa.salvarAjustes(10, {})).rejects.toThrow("Erro ajuste");
+    });
+
+    it("deve propagar erro se salvarMapa falhar", async () => {
+        const {useFluxoMapa} = await import("../useFluxoMapa");
+        const fluxoMapa = useFluxoMapa();
+        const service = await import("@/services/subprocessoService");
+        vi.mocked(service.salvarMapaCompleto).mockRejectedValue(new Error("Erro grave"));
+
+        await expect(fluxoMapa.salvarMapa(10, {})).rejects.toThrow("Erro grave");
+        expect(fluxoMapa.erro.value).toBe("Erro grave");
+    });
 });

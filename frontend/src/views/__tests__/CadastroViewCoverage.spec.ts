@@ -32,6 +32,14 @@ vi.mock("@/services/subprocessoService", () => ({
     buscarContextoEdicao: vi.fn(),
 }));
 
+vi.mock("@/services/atividadeService", () => ({
+    excluirAtividade: vi.fn(),
+    atualizarAtividade: vi.fn(),
+    criarConhecimento: vi.fn(),
+    atualizarConhecimento: vi.fn(),
+    excluirConhecimento: vi.fn(),
+}));
+
 vi.mock("@/services/analiseService", () => ({
     listarAnalisesCadastro: vi.fn(),
 }));
@@ -242,5 +250,115 @@ describe("CadastroView coverage", () => {
 
         // Sincronizar contexto null
         vm.sincronizarEstadoInicialContexto(null);
+
+        // bad badge situations
+        expect(vm.badgeVariant("MAPEAMENTO_CADASTRO_EM_ANDAMENTO")).toBe("secondary");
+    });
+
+    it("cobre ramos de erro em confirmarRemocao e salvarEdicao", async () => {
+        const wrapper = createWrapper();
+        await flushPromises();
+        const vm = wrapper.vm as any;
+        vm.codSubprocesso = 123;
+
+        const service = await import("@/services/atividadeService") as any;
+        (service.excluirAtividade as any).mockRejectedValue(new Error("Falha"));
+
+        vm.dadosRemocao = { tipo: "atividade", index: 0 };
+        vm.atividades = [{codigo: 1}];
+        await vm.confirmarRemocao();
+
+        // Cobre branch index ou tipo nulo/inválido
+        vm.dadosRemocao = null;
+        await vm.confirmarRemocao();
+
+        // Simular salvarEdicaoAtividade com erro
+        (service.atualizarAtividade as any).mockRejectedValue(new Error("Falha"));
+        await vm.salvarEdicaoAtividade(1, "Desc");
+
+        // Simular adicionarConhecimento com erro
+        (service.criarConhecimento as any).mockRejectedValue(new Error("Falha"));
+        await vm.adicionarConhecimento(0, "Desc");
+
+        // Simular salvarEdicaoConhecimento com erro
+        (service.atualizarConhecimento as any).mockRejectedValue(new Error("Falha"));
+        await vm.salvarEdicaoConhecimento(1, 2, "Desc");
+    });
+
+    it("cobre disponibilizarCadastro com erro sem atividade", async () => {
+        const wrapper = createWrapper();
+        await flushPromises();
+        const vm = wrapper.vm as any;
+        vm.codSubprocesso = 123;
+
+        subprocessosMock.subprocessoDetalhe = {
+            situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO
+        } as any;
+
+        const fluxoSubprocesso = useFluxoSubprocessoModule.useFluxoSubprocesso() as any;
+        fluxoSubprocesso.validarCadastro.mockResolvedValue({
+            valido: false,
+            erros: [{mensagem: "Erro Global Sem ID"}]
+        });
+
+        await vm.disponibilizarCadastro();
+        expect(vm.erroGlobal).toBe("Erro Global Sem ID");
+    });
+
+    it("cobre ramos de erro ao buscar contexto", async () => {
+        const wrapper = createWrapper();
+        const vm = wrapper.vm as any;
+        subprocessosMock.buscarSubprocessoPorProcessoEUnidade.mockResolvedValue(null);
+        vi.mocked(useProcessosModule.useProcessos().buscarProcessoDetalhe).mockResolvedValue(undefined);
+
+        await vm.carregarContextoInicial();
+
+        // Cobre branch where data is null
+        subprocessosMock.buscarContextoEdicao.mockResolvedValue(null);
+        vm.codSubprocesso = 123;
+        await vm.carregarContextoInicial();
+    });
+
+    it("cobre habilitarDisponibilizar ramos", async () => {
+        const wrapper = createWrapper();
+        const vm = wrapper.vm as any;
+        vm.atividades = [];
+        expect(vm.habilitarDisponibilizar).toBe(false);
+
+        vm.atividades = [{codigo: 1, conhecimentos: []}];
+        expect(vm.habilitarDisponibilizar).toBe(false);
+
+        vm.atividades = [{codigo: 1, conhecimentos: [{codigo: 1}]}];
+        expect(vm.habilitarDisponibilizar).toBe(true);
+    });
+
+    it("cobre timeout de limpeza de erros", async () => {
+        vi.useFakeTimers();
+        const wrapper = createWrapper();
+        const vm = wrapper.vm as any;
+        vm.errosValidacao = [{mensagem: "Erro"}];
+        vm.erroGlobal = "Global";
+
+        vm.timeoutLimpezaErros();
+        vi.advanceTimersByTime(6001);
+
+        expect(vm.errosValidacao).toEqual([]);
+        expect(vm.erroGlobal).toBeNull();
+        vi.useRealTimers();
+    });
+
+    it("cobre buscarSubprocessoNoProcesso", async () => {
+        const wrapper = createWrapper();
+        const vm = wrapper.vm as any;
+
+        const unidades = [
+            {sigla: "OUTRA", codSubprocesso: 1, filhas: [
+                {sigla: "ALVO", codSubprocesso: 2}
+            ]}
+        ];
+
+        expect(vm.buscarSubprocessoNoProcesso(unidades, "ALVO")).toBe(2);
+        expect(vm.buscarSubprocessoNoProcesso(unidades, "NONE")).toBeNull();
+        expect(vm.buscarSubprocessoNoProcesso(undefined, "ALVO")).toBeNull();
     });
 });

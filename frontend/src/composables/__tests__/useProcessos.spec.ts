@@ -6,6 +6,16 @@ import {normalizeError} from "@/utils/apiError";
 vi.mock("@/services/painelService");
 vi.mock("@/services/processoService");
 
+const {loggerMock} = vi.hoisted(() => ({
+    loggerMock: {
+        error: vi.fn(),
+    }
+}));
+
+vi.mock("@/utils", () => ({
+    logger: loggerMock
+}));
+
 describe("useProcessos", () => {
     let painelService: Mocked<typeof import("@/services/painelService")>;
     let processoService: Mocked<typeof import("@/services/processoService")>;
@@ -83,6 +93,13 @@ describe("useProcessos", () => {
             expect(composable.processosPainel.value).toEqual(paginaMock.content);
         });
 
+        it("deve retornar lista vazia se painelService retornar nulo", async () => {
+            const composable = useProcessos();
+            painelService.listarProcessos.mockResolvedValue(null as any);
+            await composable.buscarProcessosPainel("perfil", 1, 0, 10);
+            expect(composable.processosPainel.value).toEqual([]);
+        });
+
         it("deve registrar erro quando a busca falhar", async () => {
             const composable = useProcessos();
             painelService.listarProcessos.mockRejectedValue(ERRO_MOCK);
@@ -121,6 +138,14 @@ describe("useProcessos", () => {
     });
 
     describe("buscarContextoCompleto", () => {
+        it("deve lidar com retorno nulo", async () => {
+            const composable = useProcessos();
+            processoService.buscarContextoCompleto.mockResolvedValue(null as any);
+            await composable.buscarContextoCompleto(1);
+            expect(composable.processoDetalhe.value).toBeNull();
+            expect(composable.subprocessosElegiveis.value).toEqual([]);
+        });
+
         it("deve limpar o estado anterior antes de buscar novo contexto", async () => {
             const composable = useProcessos();
             composable.processoDetalhe.value = {codigo: 1} as any;
@@ -187,6 +212,30 @@ describe("useProcessos", () => {
 
             expect(composable.processoDetalhe.value).toBeNull();
             expect(composable.lastError.value).toEqual(normalizeError(ERRO_MOCK));
+        });
+
+        it("deve registrar erro no logger se kind não for unauthorized", async () => {
+            const composable = useProcessos();
+            const error500 = new Error("Internal Error");
+            processoService.buscarContextoCompleto.mockRejectedValue(error500);
+
+            await expect(composable.buscarContextoCompleto(1)).rejects.toThrow("Internal Error");
+            expect(loggerMock.error).toHaveBeenCalled();
+        });
+
+        it("não deve registrar erro no logger se kind for unauthorized", async () => {
+            const composable = useProcessos();
+            const error401 = {
+                isAxiosError: true,
+                response: {
+                    status: 401,
+                    data: {message: "Unauthorized"}
+                }
+            } as any;
+            processoService.buscarContextoCompleto.mockRejectedValue(error401);
+
+            await expect(composable.buscarContextoCompleto(1)).rejects.toThrow();
+            expect(loggerMock.error).not.toHaveBeenCalled();
         });
     });
 
@@ -293,6 +342,227 @@ describe("useProcessos", () => {
             await composable.buscarProcessosFinalizados();
 
             expect(composable.processosFinalizados.value).toEqual(processosMock);
+        });
+
+        it("deve usar lista vazia se service retornar nulo", async () => {
+            const composable = useProcessos();
+            processoService.buscarProcessosFinalizados.mockResolvedValue(null as any);
+            await composable.buscarProcessosFinalizados();
+            expect(composable.processosFinalizados.value).toEqual([]);
+        });
+
+        it("deve propagar erro de buscarProcessosFinalizados", async () => {
+            const composable = useProcessos();
+            processoService.buscarProcessosFinalizados.mockRejectedValue(ERRO_MOCK);
+            await expect(composable.buscarProcessosFinalizados()).rejects.toThrow(ERRO_MOCK);
+        });
+    });
+
+    describe("buscarProcessosParaImportacao", () => {
+        it("deve atualizar o estado em caso de sucesso", async () => {
+            const composable = useProcessos();
+            const processosMock = [{codigo: 1}];
+            processoService.buscarProcessosParaImportacao.mockResolvedValue(processosMock as any);
+
+            await composable.buscarProcessosParaImportacao();
+
+            expect(composable.processosParaImportacao.value).toEqual(processosMock);
+        });
+
+        it("deve usar lista vazia se service retornar nulo", async () => {
+            const composable = useProcessos();
+            processoService.buscarProcessosParaImportacao.mockResolvedValue(null as any);
+            await composable.buscarProcessosParaImportacao();
+            expect(composable.processosParaImportacao.value).toEqual([]);
+        });
+
+        it("deve propagar erro de buscarProcessosParaImportacao", async () => {
+            const composable = useProcessos();
+            processoService.buscarProcessosParaImportacao.mockRejectedValue(ERRO_MOCK);
+            await expect(composable.buscarProcessosParaImportacao()).rejects.toThrow(ERRO_MOCK);
+        });
+    });
+
+    describe("recarregarProcessoDetalheAtual", () => {
+        it("deve recarregar se houver processo atual", async () => {
+            const composable = useProcessos();
+            composable.processoDetalhe.value = {codigo: 55} as any;
+            processoService.obterDetalhesProcesso.mockResolvedValue(PROCESSO_MOCK);
+
+            // Chamando uma função que use recarregarProcessoDetalheAtual internamente, ou testar o export se existir
+            // recarregarProcessoDetalheAtual não é exportado, mas é usado por validarMapa, etc.
+            await composable.validarMapa(55);
+            expect(processoService.obterDetalhesProcesso).toHaveBeenCalledWith(55);
+        });
+
+        it("não deve recarregar se não houver processo atual", async () => {
+            const composable = useProcessos();
+            composable.processoDetalhe.value = null;
+            await composable.validarMapa(55);
+            expect(processoService.obterDetalhesProcesso).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("executarAcaoBloco", () => {
+        it("deve propagar erro do service", async () => {
+            const composable = useProcessos();
+            composable.processoDetalhe.value = {codigo: 1} as Processo;
+            processoService.executarAcaoEmBloco.mockRejectedValue(ERRO_MOCK);
+
+            await expect(composable.executarAcaoBloco("aceitar", [1])).rejects.toThrow(ERRO_MOCK);
+        });
+    });
+
+    describe("buscarUnidadesParaImportacao", () => {
+        it("deve chamar o service e retornar dados", async () => {
+            const composable = useProcessos();
+            const unidadesMock = [{unidadeCodigo: 1, unidadeSigla: "U1"}];
+            processoService.buscarUnidadesParaImportacao.mockResolvedValue(unidadesMock as any);
+
+            const result = await composable.buscarUnidadesParaImportacao(1);
+
+            expect(processoService.buscarUnidadesParaImportacao).toHaveBeenCalledWith(1);
+            expect(result).toEqual(unidadesMock);
+        });
+    });
+
+    describe("finalizarProcesso", () => {
+        it("deve chamar o service e recarregar detalhes", async () => {
+            const composable = useProcessos();
+            processoService.finalizarProcesso.mockResolvedValue(undefined);
+            processoService.obterDetalhesProcesso.mockResolvedValue(PROCESSO_MOCK);
+
+            await composable.finalizarProcesso(1);
+
+            expect(processoService.finalizarProcesso).toHaveBeenCalledWith(1);
+            expect(processoService.obterDetalhesProcesso).toHaveBeenCalledWith(1);
+        });
+    });
+
+    describe("processarCadastroBloco", () => {
+        it("deve chamar o service e recarregar detalhes", async () => {
+            const composable = useProcessos();
+            const payload = {codProcesso: 1, unidades: ["1"], tipoAcao: "aceitar" as const, unidadeUsuario: "U1"};
+            processoService.processarAcaoEmBloco.mockResolvedValue(undefined);
+            processoService.obterDetalhesProcesso.mockResolvedValue(PROCESSO_MOCK);
+
+            await composable.processarCadastroBloco(payload);
+
+            expect(processoService.processarAcaoEmBloco).toHaveBeenCalledWith(payload);
+            expect(processoService.obterDetalhesProcesso).toHaveBeenCalledWith(1);
+        });
+    });
+
+    describe("alterarDataLimiteSubprocesso", () => {
+        it("deve chamar o service e recarregar se houver processo atual", async () => {
+            const composable = useProcessos();
+            composable.processoDetalhe.value = {codigo: 1} as any;
+            processoService.alterarDataLimiteSubprocesso.mockResolvedValue(undefined);
+            processoService.obterDetalhesProcesso.mockResolvedValue(PROCESSO_MOCK);
+
+            await composable.alterarDataLimiteSubprocesso(10, {novaData: "2025-01-01"});
+
+            expect(processoService.alterarDataLimiteSubprocesso).toHaveBeenCalledWith(10, {novaData: "2025-01-01"});
+            expect(processoService.obterDetalhesProcesso).toHaveBeenCalledWith(1);
+        });
+    });
+
+    describe("apresentarSugestoes", () => {
+        it("deve chamar o service", async () => {
+            const composable = useProcessos();
+            processoService.apresentarSugestoes.mockResolvedValue(undefined);
+
+            await composable.apresentarSugestoes(1, {sugestoes: "Teste"});
+
+            expect(processoService.apresentarSugestoes).toHaveBeenCalledWith(1, {sugestoes: "Teste"});
+        });
+    });
+
+    describe("validarMapa", () => {
+        it("deve chamar o service", async () => {
+            const composable = useProcessos();
+            processoService.validarMapa.mockResolvedValue(undefined);
+
+            await composable.validarMapa(1);
+
+            expect(processoService.validarMapa).toHaveBeenCalledWith(1);
+        });
+    });
+
+    describe("homologarValidacao", () => {
+        it("deve chamar o service", async () => {
+            const composable = useProcessos();
+            processoService.homologarValidacao.mockResolvedValue(undefined);
+
+            await composable.homologarValidacao(1, {texto: "OK"});
+
+            expect(processoService.homologarValidacao).toHaveBeenCalledWith(1, {texto: "OK"});
+        });
+    });
+
+    describe("aceitarValidacao", () => {
+        it("deve chamar o service", async () => {
+            const composable = useProcessos();
+            processoService.aceitarValidacao.mockResolvedValue(undefined);
+
+            await composable.aceitarValidacao(1, {texto: "OK"});
+
+            expect(processoService.aceitarValidacao).toHaveBeenCalledWith(1, {texto: "OK"});
+        });
+    });
+
+    describe("executarAcaoBloco", () => {
+        it("deve chamar o service se houver processo carregado", async () => {
+            const composable = useProcessos();
+            composable.processoDetalhe.value = {codigo: 1} as any;
+            processoService.executarAcaoEmBloco.mockResolvedValue(undefined);
+            processoService.obterDetalhesProcesso.mockResolvedValue(PROCESSO_MOCK);
+
+            await composable.executarAcaoBloco("aceitar", [10], "2025-01-01");
+
+            expect(processoService.executarAcaoEmBloco).toHaveBeenCalledWith(1, {
+                unidadeCodigos: [10],
+                acao: "aceitar",
+                dataLimite: "2025-01-01",
+            });
+            expect(processoService.obterDetalhesProcesso).toHaveBeenCalledWith(1);
+        });
+
+        it("deve falhar se não houver processo carregado", async () => {
+            const composable = useProcessos();
+            composable.processoDetalhe.value = null;
+
+            await expect(composable.executarAcaoBloco("aceitar", [10])).rejects.toThrow("Detalhes do processo não carregados.");
+        });
+    });
+
+    describe("enviarLembrete", () => {
+        it("deve chamar o service", async () => {
+            const composable = useProcessos();
+            processoService.enviarLembrete.mockResolvedValue(undefined);
+
+            await composable.enviarLembrete(1, 10);
+
+            expect(processoService.enviarLembrete).toHaveBeenCalledWith(1, 10);
+        });
+    });
+
+    describe("buscarSubprocessosElegiveis", () => {
+        it("deve atualizar o estado", async () => {
+            const composable = useProcessos();
+            const elegiveisMock = [{unidadeCodigo: 1}];
+            processoService.buscarSubprocessosElegiveis.mockResolvedValue(elegiveisMock as any);
+
+            await composable.buscarSubprocessosElegiveis(1);
+
+            expect(composable.subprocessosElegiveis.value).toEqual(elegiveisMock);
+        });
+
+        it("deve usar lista vazia se service retornar nulo", async () => {
+            const composable = useProcessos();
+            processoService.buscarSubprocessosElegiveis.mockResolvedValue(null as any);
+            await composable.buscarSubprocessosElegiveis(1);
+            expect(composable.subprocessosElegiveis.value).toEqual([]);
         });
     });
 });

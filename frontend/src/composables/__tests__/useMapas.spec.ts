@@ -118,4 +118,35 @@ describe("useMapas", () => {
 
         await expect(mapas.temMapaVigente(10)).resolves.toBe(false);
     });
+
+    it("não deve buscar mapa visualizacao se codSubprocesso for zero", async () => {
+        const {useMapas} = await import("../useMapas");
+        const service = await import("@/services/subprocessoService");
+        const mapas = useMapas();
+
+        await mapas.buscarMapaVisualizacao(0);
+
+        expect(service.obterMapaVisualizacao).not.toHaveBeenCalled();
+    });
+
+    it("não deve buscar impacto se codSubprocesso for zero", async () => {
+        const {useMapas} = await import("../useMapas");
+        const service = await import("@/services/subprocessoService");
+        const mapas = useMapas();
+
+        await mapas.buscarImpactoMapa(0);
+
+        expect(service.verificarImpactosMapa).not.toHaveBeenCalled();
+    });
+
+    it("deve lidar com falha silenciosa no buscarMapaVisualizacao", async () => {
+        const {useMapas} = await import("../useMapas");
+        const service = await import("@/services/subprocessoService");
+        const mapas = useMapas();
+        vi.mocked(service.obterMapaVisualizacao).mockRejectedValue(new Error("Erro silencioso"));
+
+        await mapas.buscarMapaVisualizacao(1);
+
+        expect(mapas.erro.value).toBe("Erro silencioso");
+    });
 });

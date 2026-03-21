@@ -57,13 +57,15 @@ describe('useLoadingManager', () => {
     });
 
     it('deve logar aviso se tentar usar estado não registrado', () => {
-        const {start, stop} = useLoadingManager(['m1']);
+        const {start, stop, isLoading} = useLoadingManager(['m1']);
 
         start('m2');
         expect(logger.warn).toHaveBeenCalledWith(expect.stringContaining('m2'));
 
         stop('m2');
         expect(logger.warn).toHaveBeenCalledTimes(2);
+
+        expect(isLoading('m2')).toBe(false);
     });
 });
 

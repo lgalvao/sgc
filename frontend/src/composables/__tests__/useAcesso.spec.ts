@@ -165,4 +165,29 @@ describe('useAcesso', () => {
     const acessoFalse = useAcesso(subprocessoFalse);
     expect(acessoFalse.habilitarEditarCadastro.value).toBe(false);
   });
+
+  it('deve calcular analisadores de mapa e flags de habilitação de mapa', () => {
+    const subprocesso = {
+      permissoes: {
+        mesmaUnidade: true,
+        podeDevolverMapa: true,
+        podeAceitarMapa: false,
+        podeHomologarMapa: false,
+        podeEditarMapa: true,
+        podeDisponibilizarMapa: true,
+        podeValidarMapa: true,
+        podeApresentarSugestoes: true,
+      }
+    } as any;
+    const acesso = useAcesso(subprocesso);
+
+    expect(acesso.podeAnalisarMapa.value).toBe(true);
+    expect(acesso.habilitarDevolverMapa.value).toBe(true);
+    expect(acesso.habilitarAceitarMapa.value).toBe(false);
+    expect(acesso.habilitarHomologarMapa.value).toBe(false);
+    expect(acesso.habilitarEditarMapa.value).toBe(true);
+    expect(acesso.habilitarDisponibilizarMapa.value).toBe(true);
+    expect(acesso.habilitarValidarMapa.value).toBe(true);
+    expect(acesso.habilitarApresentarSugestoes.value).toBe(true);
+  });
 });
