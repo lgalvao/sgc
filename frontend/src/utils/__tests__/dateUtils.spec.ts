@@ -108,4 +108,16 @@ describe('dateUtils', () => {
         const d = new Date();
         expect(ensureValidDate(d)).toBe(d);
     });
+
+    it('parseDate deve suportar objetos de contexto', () => {
+        expect(parseDate({value: '2024-01-01'})?.getFullYear()).toBe(2024);
+    });
+
+    it('parseDate deve suportar arrays', () => {
+        expect(parseDate([2024, 1, 1])?.getFullYear()).toBe(2024);
+    });
+
+    it('parseDate deve retornar null para tipos não suportados', () => {
+        expect(parseDate(true)).toBeNull();
+    });
 });

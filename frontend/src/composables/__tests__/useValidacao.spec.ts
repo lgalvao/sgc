@@ -16,4 +16,9 @@ describe("useValidacao", () => {
         const {possuiErros} = useValidacao();
         expect(possuiErros({descricao: "", tipo: null})).toBe(false);
     });
+
+    it("retorna null se nenhum campo tem erro", () => {
+        const {obterPrimeiroCampoComErro} = useValidacao();
+        expect(obterPrimeiroCampoComErro({a: null, b: ""})).toBeNull();
+    });
 });

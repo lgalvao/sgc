@@ -120,4 +120,20 @@ describe("Unidades.vue", () => {
         expect(wrapper.findComponent({name: 'ArvoreUnidades'}).exists()).toBe(false);
     });
 
+    it("deve lidar com erro sem mensagem", async () => {
+        vi.mocked(unidadeService.buscarTodasUnidades).mockRejectedValueOnce({});
+        const wrapper = createWrapper();
+        await flushPromises();
+        expect(wrapper.text()).toContain("Falha ao realizar operação. Tente novamente.");
+    });
+
+    it("deve recarregar ao clicar no botão de recarregar", async () => {
+        const wrapper = createWrapper({unidades: []});
+        await flushPromises();
+        const recarregarBtn = wrapper.find('[data-testid="btn-unidades-recarregar"]');
+
+        vi.mocked(unidadeService.buscarTodasUnidades).mockClear();
+        await recarregarBtn.trigger("click");
+        expect(unidadeService.buscarTodasUnidades).toHaveBeenCalled();
+    });
 });
