@@ -97,7 +97,6 @@ public class LoginController {
                 .nome(usuario.getNome())
                 .perfil(Perfil.valueOf(request.perfil()))
                 .unidadeCodigo(request.unidadeCodigo())
-                .token(token)
                 .build();
 
         Cookie cookie = new Cookie("jwtToken", token);

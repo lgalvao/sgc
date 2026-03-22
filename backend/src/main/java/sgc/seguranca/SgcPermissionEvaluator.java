@@ -117,7 +117,7 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
 
         // Processo finalizado: bloqueia escrita, permite leitura
         if (processo.getSituacao() == FINALIZADO) {
-            return !acao.dependeLocalizacao();
+            return !acao.dependeLocalizacao() && acao.permitePerfil(perfil);
         }
 
         // Ações de leitura: verificam hierarquia (exceto admin, que vê tudo)

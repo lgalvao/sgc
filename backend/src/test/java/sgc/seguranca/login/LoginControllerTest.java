@@ -224,7 +224,9 @@ class LoginControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.token").value("token-jwt"))
+                .andExpect(jsonPath("$.token").doesNotExist())
+                .andExpect(cookie().exists("jwtToken"))
+                .andExpect(cookie().value("jwtToken", "token-jwt"))
                 .andExpect(jsonPath("$.nome").value("Admin user"));
     }
 

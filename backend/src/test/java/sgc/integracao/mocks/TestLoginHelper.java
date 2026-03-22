@@ -53,10 +53,12 @@ public class TestLoginHelper {
                 .andExpect(status().isOk())
                 .andReturn();
 
-        // Extrair token da resposta
-        String responseBody = entrarResult.getResponse().getContentAsString();
-        EntrarResponse response = objectMapper.readValue(responseBody, EntrarResponse.class);
-        return response.token();
+        // Extrair token do cookie
+        Cookie jwtCookie = entrarResult.getResponse().getCookie("jwtToken");
+        if (jwtCookie == null) {
+            throw new IllegalStateException("Cookie jwtToken não encontrado");
+        }
+        return jwtCookie.getValue();
     }
 
     /**

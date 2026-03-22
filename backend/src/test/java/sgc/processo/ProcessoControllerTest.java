@@ -370,7 +370,7 @@ class ProcessoControllerTest {
         }
 
         @Test
-        @WithMockUser(roles = "ADMIN")
+        @WithMockUser(roles = "CHEFE")
         @DisplayName("listarUnidadesParaImportacao deve retornar lista de participantes quando finalizado")
         void deveListarUnidadesParaImportacaoQuandoFinalizado() throws Exception {
             Processo processo = Processo.builder()
