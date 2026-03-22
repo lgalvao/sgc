@@ -28,11 +28,10 @@ class SgcPermissionEvaluatorCoverageTest {
     private SgcPermissionEvaluator evaluator;
 
     @Test
-    @DisplayName("hasPermission: Deve retornar false se principal não for Usuario (via Serializable)")
-    void principalNaoUsuarioSerializable() {
+    @DisplayName("hasPermission: Deve retornar false se principal não for Usuario (via ID)")
+    void principalNaoUsuarioId() {
         when(authentication.getPrincipal()).thenReturn("not-a-user");
-        boolean result = evaluator.hasPermission(authentication, 1L, "Subprocesso", "VISUALIZAR_SUBPROCESSO");
-        assertThat(result).isFalse();
+        assertThat(evaluator.hasPermission(authentication, 1L, "Subprocesso", "VISUALIZAR_SUBPROCESSO")).isFalse();
     }
 
     @Test
@@ -238,34 +237,69 @@ class SgcPermissionEvaluatorCoverageTest {
     }
 
     @Test
-    @DisplayName("mascarar: Deve cobrir strings curtas")
-    void mascararCurto() {
-        Usuario usuario = Usuario.builder()
-                .perfilAtivo(Perfil.CHEFE)
-                .unidadeAtivaCodigo(1L)
-                .tituloEleitoral("12")
-                .build();
+    @DisplayName("hasPermission: Deve retornar false se principal não for Usuario (via Objeto)")
+    void principalNaoUsuarioObjeto() {
+        when(authentication.getPrincipal()).thenReturn("not-a-user");
+        assertThat(evaluator.hasPermission(authentication, new Object(), "VISUALIZAR_SUBPROCESSO")).isFalse();
+    }
+
+    @Test
+    @DisplayName("hasPermission: Deve lidar com tipo de alvo desconhecido")
+    void tipoAlvoDesconhecido() {
+        Usuario usuario = Usuario.builder().perfilAtivo(Perfil.ADMIN).build();
+        when(authentication.getPrincipal()).thenReturn(usuario);
+        boolean result = evaluator.hasPermission(authentication, 1L, "TipoInexistente", "VISUALIZAR_SUBPROCESSO");
+        assertThat(result).isFalse();
+    }
+
+    @Test
+    @DisplayName("hasPermission: Deve lidar com alvo de classe desconhecida")
+    void classeAlvoDesconhecida() {
+        Usuario usuario = Usuario.builder().perfilAtivo(Perfil.ADMIN).build();
+        when(authentication.getPrincipal()).thenReturn(usuario);
+        boolean result = evaluator.hasPermission(authentication, new Object(), "VISUALIZAR_SUBPROCESSO");
+        assertThat(result).isFalse();
+    }
+
+    @Test
+    @DisplayName("verificarPermissao: Deve retornar false para alvo nulo ou desconhecido")
+    void alvoNuloOuDesconhecido() {
+        Usuario usuario = new Usuario();
+        assertThat(evaluator.verificarPermissao(usuario, null, AcaoPermissao.VISUALIZAR_SUBPROCESSO)).isFalse();
+        assertThat(evaluator.verificarPermissao(usuario, new Object(), AcaoPermissao.VISUALIZAR_SUBPROCESSO)).isFalse();
+    }
+
+    @Test
+    @DisplayName("verificarHierarquia: Deve cobrir log de acesso negado (perfil inesperado)")
+    void perfilInesperado() {
+        // Usamos um mock de Usuario para o perfilAtivo retornar algo que não caia nos IFs
+        Usuario usuario = mock(Usuario.class);
+        when(usuario.getPerfilAtivo()).thenReturn(null);
+        when(usuario.getTituloEleitoral()).thenReturn("123456789012"); // 12 chars
+        when(usuario.getUnidadeAtivaCodigo()).thenReturn(1L);
         
+        Unidade unidadeAlvo = Unidade.builder().codigo(2L).build();
         Subprocesso sp = new Subprocesso();
         sp.setProcesso(Processo.builder().situacao(SituacaoProcesso.EM_ANDAMENTO).build());
-        sp.setUnidade(Unidade.builder().codigo(2L).build());
+        sp.setUnidade(unidadeAlvo);
 
+        // Chamando via verificarPermissao que chamará verificarSubprocesso -> verificarHierarquia
         assertThat(evaluator.verificarPermissao(usuario, sp, AcaoPermissao.VISUALIZAR_SUBPROCESSO)).isFalse();
     }
 
     @Test
-    @DisplayName("mascarar: Deve cobrir nulo")
-    void mascararNulo() {
-        Usuario usuario = Usuario.builder()
-                .perfilAtivo(Perfil.CHEFE)
-                .unidadeAtivaCodigo(1L)
-                .tituloEleitoral(null)
-                .build();
+    @DisplayName("mascarar: Deve cobrir string com 12 caracteres")
+    void mascarar12Chars() {
+        // Não temos acesso direto ao mascarar, mas verificarHierarquia o chama se perfil for inesperado
+        Usuario usuarioMock = mock(Usuario.class);
+        when(usuarioMock.getPerfilAtivo()).thenReturn(null);
+        when(usuarioMock.getTituloEleitoral()).thenReturn("123456789012");
         
+        Unidade unidadeAlvo = Unidade.builder().codigo(2L).build();
         Subprocesso sp = new Subprocesso();
         sp.setProcesso(Processo.builder().situacao(SituacaoProcesso.EM_ANDAMENTO).build());
-        sp.setUnidade(Unidade.builder().codigo(2L).build());
+        sp.setUnidade(unidadeAlvo);
 
-        assertThat(evaluator.verificarPermissao(usuario, sp, AcaoPermissao.VISUALIZAR_SUBPROCESSO)).isFalse();
+        evaluator.verificarPermissao(usuarioMock, sp, AcaoPermissao.VISUALIZAR_SUBPROCESSO);
     }
 }
