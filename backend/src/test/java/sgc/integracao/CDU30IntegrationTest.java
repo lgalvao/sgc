@@ -72,7 +72,7 @@ class CDU30IntegrationTest extends BaseIntegrationTest {
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[?(@.tituloEleitoral == '" + usuario1.getTituloEleitoral() + "')]").exists());
+                .andExpect(jsonPath("$[?(@.nome == '" + usuario1.getNome() + "')]").exists());
     }
 
     @Test
@@ -86,7 +86,7 @@ class CDU30IntegrationTest extends BaseIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.tituloEleitoral").value(usuario2.getTituloEleitoral()))
+                .andExpect(jsonPath("$.tituloEleitoral").doesNotExist())
                 .andExpect(jsonPath("$.nome").value(usuario2.getNome()));
 
         entityManager.flush();
