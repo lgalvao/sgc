@@ -228,4 +228,79 @@ describe('AtribuicaoTemporariaView', () => {
     await wrapper.vm.aoPressionarTeclaUsuario(enterEvent);
     expect(wrapper.vm.usuarioSelecionado).toBe('1');
   });
+
+  it('cobre lacunas remanescentes de cobertura', async () => {
+    vi.mocked(buscarUnidadePorCodigo).mockResolvedValue({ codigo: 1 } as any);
+    const wrapper = mount(AtribuicaoTemporariaView, mountOptions);
+    await vi.dynamicImportSettled();
+    const vm = wrapper.vm as any;
+
+    // Linha 36 (@dismissed="clear()")
+    // We need AppAlert to be stubbed correctly to emit dismissed
+    const appAlert = wrapper.findComponent({name: 'AppAlert'});
+    // Mocking useNotification to return a notification
+    // Wait, the mock at the top already does this but notificacao is { value: null }
+    // Let's force it on the vm if possible or update the mock
+    vm.notify("Msg", "info");
+    await vm.$nextTick();
+    // Since AppAlert is stubbed, we can trigger the event
+    await wrapper.findComponent({name: 'AppAlert'}).vm.$emit('dismissed');
+    expect(mockClear).toHaveBeenCalled();
+
+    // Linha 58 (@focus)
+    vm.termoUsuario = "Abc"; // length >= 2
+    const input = wrapper.find('[data-testid="input-busca-usuario"]');
+    await input.trigger('focus');
+    expect(vm.mostrarResultadosUsuarios).toBe(true);
+
+    // Linha 80 (@mousedown.prevent)
+    vm.usuariosEncontrados = [{codigo: 1, nome: 'User', tituloEleitoral: '123'}];
+    vm.mostrarResultadosUsuarios = true;
+    await vm.$nextTick();
+    const item = wrapper.find('[data-testid="opcao-usuario-1"]');
+    await item.trigger('mousedown');
+    expect(vm.usuarioSelecionado).toBe('123');
+
+    // Linha 237, 240 (clearTimeout on unmount)
+    // @ts-ignore
+    vm.timeoutPesquisaUsuarios = setTimeout(() => {}, 100);
+    // @ts-ignore
+    vm.timeoutOcultarResultadosUsuarios = setTimeout(() => {}, 100);
+    wrapper.unmount();
+
+    // Re-mount for other tests
+    const wrapper2 = mount(AtribuicaoTemporariaView, mountOptions);
+    const vm2 = wrapper2.vm as any;
+
+    // Linha 251, 255-258 (aoAlterarTermoUsuario with short term)
+    // @ts-ignore
+    vm2.timeoutPesquisaUsuarios = setTimeout(() => {}, 100);
+    vm2.aoAlterarTermoUsuario("A");
+    expect(vm2.usuariosEncontrados).toHaveLength(0);
+
+    // Linha 290 (agendarOcultacaoResultadosUsuarios with existing timeout)
+    // @ts-ignore
+    vm2.timeoutOcultarResultadosUsuarios = setTimeout(() => {}, 100);
+    vm2.agendarOcultacaoResultadosUsuarios();
+
+    // Linha 311-313 (ArrowDown when hidden)
+    vm2.mostrarResultadosUsuarios = false;
+    vm2.usuariosEncontrados = [{codigo: 1, nome: 'U1'}];
+    vm2.termoUsuario = "Abc";
+    const eventDown = { key: 'ArrowDown', preventDefault: vi.fn() } as any;
+    await vm2.aoPressionarTeclaUsuario(eventDown);
+    expect(vm2.mostrarResultadosUsuarios).toBe(true);
+
+    // Linha 327-332 (ArrowUp)
+    vm2.mostrarResultadosUsuarios = true;
+    vm2.indiceUsuarioDestacado = 0;
+    const eventUp = { key: 'ArrowUp', preventDefault: vi.fn() } as any;
+    await vm2.aoPressionarTeclaUsuario(eventUp);
+    expect(vm2.indiceUsuarioDestacado).toBe(0); // length is 1, so 0 -> 0
+
+    // Linha 341-343 (Escape)
+    const eventEsc = { key: 'Escape', preventDefault: vi.fn() } as any;
+    await vm2.aoPressionarTeclaUsuario(eventEsc);
+    expect(vm2.mostrarResultadosUsuarios).toBe(false);
+  });
 });
