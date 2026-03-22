@@ -48,15 +48,11 @@ específicas** do projeto que diferem dos padrões genéricos.
 
 * **Backend:** `./gradlew :backend:test` (JUnit 6 + Mockito + H2).
 * **Frontend:** `npm run typecheck` (inclui e2e), `npm run lint` (inclui e2e), `npm run test:unit` (Vitest).
-* **E2E:** Playwright (consulte `/e2e/README.md`).
+* **E2E:** Playwright `npx playwright test`
 
 ### Referências e Padrões
 
 Para detalhes técnicos, consulte:
-
-* Regras para execução de testes e2e e correção de bugs: /etc/docs/regras-e2e.md
+* Regras de acesso /etc/docs/regras-acesso.md
+* Regras para ajustes em testes e2e e correção de bugs: /etc/docs/regras-e2e.md
 * README.md de cada módulo e diretório para responsabilidades específicas
-
-### Apêndice: Aprendizados do Ambiente (Local)
-
-**Testes E2E Seriais**: Em testes marcados como `test.describe.serial`, não se deve executar cenários individualmente (ex: usando `-g "Cenario X"`), pois cada cenário depende do estado deixado pelo anterior. Execute sempre o arquivo de teste completo.
