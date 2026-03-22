@@ -120,7 +120,6 @@ class SgcPermissionEvaluatorCoverageTest {
         when(atividadeRepo.findById(1L)).thenReturn(java.util.Optional.of(a));
         assertThat(evaluator.hasPermission(authentication, 1L, "Atividade", "VISUALIZAR_SUBPROCESSO")).isTrue();
         
-        // Alvos não encontrados
         when(processoRepo.buscarPorCodigoComParticipantes(999L)).thenReturn(java.util.Optional.empty());
         assertThat(evaluator.hasPermission(authentication, 999L, "Processo", "VISUALIZAR_PROCESSO")).isFalse();
     }
@@ -137,7 +136,6 @@ class SgcPermissionEvaluatorCoverageTest {
         sp.setProcesso(p);
         sp.setUnidade(Unidade.builder().codigo(2L).build());
 
-        // CONSULTAR_PARA_IMPORTACAO + CHEFE + FINALIZADO -> retorna true logo de cara
         assertThat(evaluator.verificarPermissao(usuario, sp, AcaoPermissao.CONSULTAR_PARA_IMPORTACAO)).isTrue();
     }
 
@@ -169,7 +167,6 @@ class SgcPermissionEvaluatorCoverageTest {
         sp.setProcesso(p);
         sp.setUnidade(Unidade.builder().codigo(2L).build());
 
-        // VERIFICAR_IMPACTOS (deve permitir)
         assertThat(evaluator.verificarPermissao(usuario, sp, AcaoPermissao.VERIFICAR_IMPACTOS)).isTrue();
     }
 
@@ -272,7 +269,6 @@ class SgcPermissionEvaluatorCoverageTest {
     @Test
     @DisplayName("verificarHierarquia: Deve cobrir log de acesso negado (perfil inesperado)")
     void perfilInesperado() {
-        // Usamos um mock de Usuario para o perfilAtivo retornar algo que não caia nos IFs
         Usuario usuario = mock(Usuario.class);
         when(usuario.getPerfilAtivo()).thenReturn(null);
         when(usuario.getTituloEleitoral()).thenReturn("123456789012"); // 12 chars
@@ -283,17 +279,68 @@ class SgcPermissionEvaluatorCoverageTest {
         sp.setProcesso(Processo.builder().situacao(SituacaoProcesso.EM_ANDAMENTO).build());
         sp.setUnidade(unidadeAlvo);
 
-        // Chamando via verificarPermissao que chamará verificarSubprocesso -> verificarHierarquia
         assertThat(evaluator.verificarPermissao(usuario, sp, AcaoPermissao.VISUALIZAR_SUBPROCESSO)).isFalse();
     }
 
     @Test
-    @DisplayName("mascarar: Deve cobrir string com 12 caracteres")
-    void mascarar12Chars() {
-        // Não temos acesso direto ao mascarar, mas verificarHierarquia o chama se perfil for inesperado
+    @DisplayName("verificarPermissao: Deve tratar coleções")
+    void verificarPermissaoColecao() {
+        Usuario usuario = Usuario.builder().perfilAtivo(Perfil.ADMIN).build();
+        Processo p1 = Processo.builder().situacao(SituacaoProcesso.EM_ANDAMENTO).build();
+        Processo p2 = Processo.builder().situacao(SituacaoProcesso.EM_ANDAMENTO).build();
+        
+        assertThat(evaluator.verificarPermissao(usuario, java.util.List.of(p1, p2), AcaoPermissao.VISUALIZAR_PROCESSO)).isTrue();
+    }
+
+    @Test
+    @DisplayName("verificarSubprocesso: Casos de borda em importação")
+    void verificarSubprocessoImportacaoBorda() {
+        Usuario usuario = Usuario.builder()
+                .perfilAtivo(Perfil.CHEFE)
+                .unidadeAtivaCodigo(1L)
+                .build();
+        
+        Processo pFinal = Processo.builder().situacao(SituacaoProcesso.FINALIZADO).build();
+        Subprocesso sp1 = new Subprocesso();
+        sp1.setProcesso(pFinal);
+        sp1.setUnidade(Unidade.builder().codigo(2L).build()); // Unidade diferente
+        assertThat(evaluator.verificarPermissao(usuario, sp1, AcaoPermissao.CONSULTAR_PARA_IMPORTACAO)).isTrue();
+
+        Processo pAndam = Processo.builder().situacao(SituacaoProcesso.EM_ANDAMENTO).build();
+        Subprocesso sp2 = new Subprocesso();
+        sp2.setProcesso(pAndam);
+        sp2.setUnidade(Unidade.builder().codigo(1L).build()); // Mesma unidade
+        assertThat(evaluator.verificarPermissao(usuario, sp2, AcaoPermissao.CONSULTAR_PARA_IMPORTACAO)).isTrue();
+    }
+
+    @Test
+    @DisplayName("verificarSubprocesso: Brancas em FINALIZADO")
+    void verificarSubprocessoFinalizadoBranches() {
+        Usuario usuario = Usuario.builder().perfilAtivo(Perfil.GESTOR).build();
+        Processo p = Processo.builder().situacao(SituacaoProcesso.FINALIZADO).build();
+        Subprocesso sp = new Subprocesso();
+        sp.setProcesso(p);
+
+        assertThat(evaluator.verificarPermissao(usuario, sp, AcaoPermissao.VISUALIZAR_SUBPROCESSO)).isTrue();
+        assertThat(evaluator.verificarPermissao(usuario, sp, AcaoPermissao.ACEITAR_CADASTRO)).isFalse();
+    }
+
+    @Test
+    @DisplayName("verificarProcesso: Outras ações")
+    void verificarProcessoOutrasAcoes() {
+        Usuario usuario = Usuario.builder().perfilAtivo(Perfil.GESTOR).build();
+        Processo p = Processo.builder().situacao(SituacaoProcesso.EM_ANDAMENTO).build();
+       
+        assertThat(evaluator.verificarPermissao(usuario, p, AcaoPermissao.DEVOLVER_CADASTRO)).isTrue();
+    }
+
+    @Test
+    @DisplayName("mascarar: Deve cobrir 12 chars com sucesso")
+    void mascararSucesso() {
         Usuario usuarioMock = mock(Usuario.class);
         when(usuarioMock.getPerfilAtivo()).thenReturn(null);
         when(usuarioMock.getTituloEleitoral()).thenReturn("123456789012");
+        when(usuarioMock.getUnidadeAtivaCodigo()).thenReturn(1L);
         
         Unidade unidadeAlvo = Unidade.builder().codigo(2L).build();
         Subprocesso sp = new Subprocesso();
