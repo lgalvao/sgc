@@ -165,7 +165,7 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
         }
 
         log.info("Acesso negado por hierarquia para {} (Perfil: {}, Unidade ativa: {}). Unidade alvo: {}.",
-                usuario.getTituloEleitoral(), perfil, usuario.getUnidadeAtivaCodigo(), unidadeAlvo.getCodigo());
+                mascarar(usuario.getTituloEleitoral()), perfil, usuario.getUnidadeAtivaCodigo(), unidadeAlvo.getCodigo());
         return false;
     }
 
@@ -177,7 +177,7 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
 
         if (!permitido) {
             log.info("Acesso negado por localização. Usuário: {} (Unidade ativa: {}). Subprocesso {} localizado em {}.",
-                    usuario.getTituloEleitoral(),
+                    mascarar(usuario.getTituloEleitoral()),
                     usuario.getUnidadeAtivaCodigo(),
                     sp.getCodigo(),
                     localizacao.getCodigo());
@@ -197,6 +197,11 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
     }
 
     // ── Utilitário ──────────────────────────────────────────────────
+
+    private String mascarar(String valor) {
+        if (valor == null || valor.length() <= 4) return "***";
+        return "***" + valor.substring(valor.length() - 4);
+    }
 
     private AcaoPermissao resolverAcao(String permissao) {
         try {

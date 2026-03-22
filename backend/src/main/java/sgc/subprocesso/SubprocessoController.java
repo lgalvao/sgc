@@ -134,9 +134,10 @@ public class SubprocessoController {
     }
 
     @GetMapping("/{codSubprocesso}/atividades-importacao")
-    @PreAuthorize("isAuthenticated()")
-    @Operation(summary = "Lista atividades de um subprocesso fonte para importação")
+    @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'CONSULTAR_PARA_IMPORTACAO')")
+    @Operation(summary = "Lista todas as atividades de um subprocesso finalizado para importação")
     public ResponseEntity<List<AtividadeDto>> listarAtividadesParaImportacao(@PathVariable Long codSubprocesso) {
+
         return ResponseEntity.ok(subprocessoService.listarAtividadesParaImportacao(codSubprocesso));
     }
 
