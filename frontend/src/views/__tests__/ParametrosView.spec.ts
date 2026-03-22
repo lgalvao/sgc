@@ -37,6 +37,11 @@ describe('ParametrosView', () => {
                     BAlert: {
                         template: '<div class="alert-stub"><slot /></div>'
                     },
+                    BFormInput: {
+                        name: 'BFormInput',
+                        props: ['modelValue'],
+                        template: '<input :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />'
+                    },
                     LoadingButton: {
                         template: '<button :disabled="loading" class="loading-button-stub" @click="$emit(\'click\')">{{ text }}<slot /></button>',
                         props: ['loading', 'variant', 'size', 'icon', 'text']
@@ -89,5 +94,24 @@ describe('ParametrosView', () => {
         });
         await wrapper.vm.$nextTick();
         expect(wrapper.find('.alert-stub').text()).toContain('Erro de teste');
+    });
+
+    it('cobre lacunas remanescentes de cobertura', async () => {
+        // Test carregar() path (length === 0)
+        setupWrapper({}, []);
+        await wrapper.vm.$nextTick();
+        expect(configuracoesStore.carregarConfiguracoes).toHaveBeenCalled();
+
+        // v-model gaps (35, 58)
+        const inputs = wrapper.findAllComponents({name: 'BFormInput'});
+        if (inputs.length > 0) await inputs[0].vm.$emit('update:modelValue', 40);
+        if (inputs.length > 1) await inputs[1].vm.$emit('update:modelValue', 10);
+        expect(wrapper.vm.form.diasInativacao).toBe(40);
+        expect(wrapper.vm.form.diasAlertaNovo).toBe(10);
+
+        // Validation early return (127)
+        wrapper.vm.form.diasInativacao = 0;
+        await wrapper.find('form').trigger('submit.prevent');
+        expect(configuracoesStore.salvarConfiguracoes).not.toHaveBeenCalled();
     });
 });

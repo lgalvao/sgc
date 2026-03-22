@@ -139,7 +139,6 @@ class ${className}CoverageTest {
     void setUp() {
         // Inicialização se necessário
     }
-
 `;
 
     methods.forEach((lines, methodName) => {

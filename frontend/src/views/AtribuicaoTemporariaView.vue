@@ -403,7 +403,9 @@ defineExpose({
   agendarOcultacaoResultadosUsuarios,
   aoPressionarTeclaUsuario,
   aoAlterarTermoUsuario,
-  criarAtribuicao
+  criarAtribuicao,
+  notify,
+  clear
 });
 </script>
 

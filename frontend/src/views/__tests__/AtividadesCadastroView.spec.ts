@@ -8,12 +8,22 @@ import {useMapas} from "@/composables/useMapas";
 import * as useProcessosModule from "@/composables/useProcessos";
 import * as subprocessoService from "@/services/subprocessoService";
 import * as analiseService from "@/services/analiseService";
+import * as atividadeService from "@/services/atividadeService";
 import CadastroView from "@/views/CadastroView.vue";
 import ConfirmacaoDisponibilizacaoModal from "@/components/mapa/ConfirmacaoDisponibilizacaoModal.vue";
 import HistoricoAnaliseModal from "@/components/processo/HistoricoAnaliseModal.vue";
 import ImpactoMapaModal from "@/components/mapa/ImpactoMapaModal.vue";
 import * as useAcessoModule from '@/composables/useAcesso';
 import {Perfil} from "@/types/tipos";
+
+vi.mock("@/utils/logger", () => ({
+    default: {
+        error: vi.fn(),
+        warn: vi.fn(),
+        info: vi.fn(),
+        debug: vi.fn(),
+    }
+}));
 
 const {pushMock} = vi.hoisted(() => ({pushMock: vi.fn()}));
 const subprocessosMock = reactive({
@@ -47,9 +57,26 @@ vi.mock("@/services/analiseService", () => ({
     listarAnalisesCadastro: vi.fn(),
 }));
 
+vi.mock("@/services/atividadeService", () => ({
+    excluirAtividade: vi.fn(),
+    atualizarAtividade: vi.fn(),
+    criarConhecimento: vi.fn(),
+    atualizarConhecimento: vi.fn(),
+    excluirConhecimento: vi.fn(),
+}));
+
 vi.mock("@/composables/useSubprocessos", () => ({useSubprocessos: () => subprocessosMock}));
 vi.mock("@/composables/useFluxoSubprocesso", () => ({useFluxoSubprocesso: vi.fn()}));
 vi.mock("@/composables/useProcessos", () => ({useProcessos: vi.fn()}));
+const mockAtividadeForm = {
+    novaAtividade: ref(""),
+    loadingAdicionar: ref(false),
+    adicionarAtividade: vi.fn(),
+};
+
+vi.mock("@/composables/useAtividadeForm", () => ({
+    useAtividadeForm: vi.fn(() => mockAtividadeForm)
+}));
 
 const stubs = {
     LayoutPadrao: {template: '<div><slot /></div>'},
@@ -405,6 +432,16 @@ describe("CadastroView.vue", () => {
             expect(vm.mostrarModalConfirmacaoRemocao).toBe(true);
         }
 
+        // @fechar events (114, 130, 136)
+        const importModal = wrapper.findComponent({name: 'ImportarAtividadesModal'});
+        if (importModal.exists()) await importModal.vm.$emit('fechar');
+        
+        const confirmModal = wrapper.findComponent({name: 'ConfirmacaoDisponibilizacaoModal'});
+        if (confirmModal.exists()) await confirmModal.vm.$emit('fechar');
+        
+        const histModal = wrapper.findComponent({name: 'HistoricoAnaliseModal'});
+        if (histModal.exists()) await histModal.vm.$emit('fechar');
+
         // Branches de timeout e outros
         // @ts-ignore
         vm.timeoutLimparErros = setTimeout(() => {}, 100);
@@ -414,5 +451,23 @@ describe("CadastroView.vue", () => {
         subprocessosMock.buscarSubprocessoPorProcessoEUnidade.mockResolvedValue(null);
         vi.mocked(useProcessosModule.useProcessos().buscarProcessoDetalhe).mockResolvedValue(undefined);
         await vm.carregarContextoInicial();
+
+        // 375-377 (adicionarAtividade success branch)
+        vm.codSubprocesso = 123;
+        const mockAtiv = {atividadesAtualizadas: []};
+        mockAtividadeForm.adicionarAtividade.mockResolvedValue(mockAtiv);
+        await vm.adicionarAtividade();
+
+        // 381-385 (adicionarAtividade fail branch)
+        mockAtividadeForm.adicionarAtividade.mockRejectedValue(new Error("Erro"));
+        await vm.adicionarAtividade();
+
+        // 404 (confirmarRemocao success branch)
+        vi.mocked(atividadeService.excluirAtividade).mockResolvedValue({atividadesAtualizadas: []} as any);
+        vm.dadosRemocao = {tipo: "atividade", index: 0};
+        await vm.confirmarRemocao();
+        
+        // 291 (processarRespostaLocal branch)
+        vm.processarRespostaLocal({atividadesAtualizadas: [{codigo: 1}]});
     });
 });

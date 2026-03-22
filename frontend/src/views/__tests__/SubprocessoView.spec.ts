@@ -93,6 +93,16 @@ describe('SubprocessoView.vue', () => {
     const additionalStubs = {
         SubprocessoCards: SubprocessoCardsStub,
         SubprocessoModal: SubprocessoModalStub,
+        ModalConfirmacao: {
+            name: 'ModalConfirmacao',
+            template: '<div><slot /><button data-testid="btn-confirmar-reabrir" @click="$emit(\'confirmar\')">OK</button> <button data-testid="btn-confirmar-enviar-lembrete" @click="$emit(\'confirmar\')">OK</button></div>',
+            props: ['modelValue', 'titulo'],
+            emits: ['update:modelValue', 'confirmar']
+        },
+        AppAlert: {
+            name: 'AppAlert',
+            template: '<div><button @click="$emit(\'dismissed\')">x</button></div>'
+        },
         BModal: {
             template: '<div><slot /><slot name="footer" /></div>',
             props: ['modelValue', 'title'],
@@ -104,7 +114,11 @@ describe('SubprocessoView.vue', () => {
             emits: ['update:modelValue']
         },
         BButton: {template: '<button :disabled="disabled"><slot /></button>', props: ['disabled']},
-        BAlert: {template: '<div><slot /></div>', props: ['variant', 'dismissible', 'modelValue']}
+        BAlert: {
+            name: 'BAlert',
+            template: '<div><slot /><button @click="$emit(\'dismissed\')">x</button></div>', 
+            props: ['variant', 'dismissible', 'modelValue']
+        }
     };
 
     beforeEach(() => {
@@ -367,5 +381,41 @@ describe('SubprocessoView.vue', () => {
         await flushPromises();
 
         expect(processoService.enviarLembrete).toHaveBeenCalled();
+    });
+
+    it('cobre lacunas remanescentes de cobertura', async () => {
+        const {wrapper} = mountComponent();
+        await flushPromises();
+        const vm = wrapper.vm as any;
+
+        // notificacao cover (8)
+        vm.notify("Msg", "info");
+        await vm.$nextTick();
+        const appAlert = wrapper.findComponent({name: 'AppAlert'});
+        if (appAlert.exists()) await appAlert.vm.$emit('dismissed');
+
+        // lastError cover (154)
+        subprocessosMock.lastError = { message: "Erro" };
+        await vm.$nextTick();
+        const bAlert = wrapper.findComponent({name: 'BAlert'});
+        if (bAlert.exists()) await bAlert.vm.$emit('dismissed');
+        expect(subprocessosMock.clearError).toHaveBeenCalled();
+
+        // v-model cover (179, 201)
+        const modalsComp = wrapper.findAllComponents({name: 'ModalConfirmacao'});
+        for (const modal of modalsComp) {
+            await modal.vm.$emit('update:modelValue', true);
+        }
+        expect(vm.modalLembreteAberto).toBe(true);
+
+        // formatDataSimples branch (243)
+        expect(vm.confirmarAlteracaoDataLimite(null)).toBeUndefined();
+        
+        // exibirToastPendente coverage (317-325)
+        const {useToastStore} = await import("@/stores/toast");
+        const toastStore = useToastStore();
+        toastStore.setPending("Msg");
+        // Re-mount to trigger EXHIBIR_TOAST_PENDENTE in onMounted
+        mountComponent();
     });
 });

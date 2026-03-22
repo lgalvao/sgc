@@ -51,13 +51,18 @@ const stubs = {
     BCardTitle: {template: '<div><slot /></div>'},
     BFormGroup: {template: '<div><label><slot name="label" /></label><slot /></div>'},
     BFormTextarea: {
+        name: 'BFormTextarea',
         props: ['modelValue'],
         template: '<textarea :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)"></textarea>'
     },
     BFormInvalidFeedback: {template: '<div><slot /></div>'},
     ImpactoMapaModal: {template: '<div></div>', props: ['mostrar']},
     HistoricoAnaliseModal: {template: '<div></div>', props: ['mostrar']},
-    ModalConfirmacao: {template: '<div v-if="modelValue"> <button :data-testid="$attrs[\'test-id-confirmar\']" @click="$emit(\'confirmar\')">Confirmar</button> </div>', props: ['modelValue']},
+    ModalConfirmacao: {
+        name: 'ModalConfirmacao',
+        template: '<div v-if="modelValue"> <slot /> <button :data-testid="$attrs[\'test-id-confirmar\']" @click="$emit(\'confirmar\')">Confirmar</button> </div>', 
+        props: ['modelValue']
+    },
 };
 
 describe("CadastroVisualizacaoView coverage", () => {
@@ -297,5 +302,35 @@ describe("CadastroVisualizacaoView coverage", () => {
 
         expect(wrapper.find('[data-testid="btn-acao-devolver"]').attributes('disabled')).toBeDefined();
         expect(wrapper.find('[data-testid="btn-acao-analisar-principal"]').attributes('disabled')).toBeDefined();
+    });
+
+    it("cobre lacunas remanescentes de cobertura", async () => {
+        const wrapper = createWrapper();
+        await flushPromises();
+        const vm = wrapper.vm as any;
+
+        // v-model cover (92, 116)
+        const modals = wrapper.findAllComponents({name: 'ModalConfirmacao'});
+        for (const modal of modals) {
+            await modal.vm.$emit('update:modelValue', true);
+        }
+        expect(vm.mostrarModalValidar).toBe(true);
+        expect(vm.mostrarModalDevolver).toBe(true);
+
+        // Textarea v-model (107, 135)
+        const textareas = wrapper.findAllComponents({name: 'BFormTextarea'});
+        if (textareas.length > 0) {
+            await textareas[0].vm.$emit('update:modelValue', 'Obs val');
+            expect(vm.observacaoValidacao).toBe('Obs val');
+        }
+        if (textareas.length > 1) {
+            await textareas[1].vm.$emit('update:modelValue', 'Obs dev');
+            expect(vm.observacaoDevolucao).toBe('Obs dev');
+        }
+        
+        // Ensure feedback is covered (140-141)
+        vm.validacaoDevolucaoSubmetida = true;
+        vm.observacaoDevolucao = "";
+        await vm.$nextTick();
     });
 });

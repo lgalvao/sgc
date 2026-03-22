@@ -1,7 +1,9 @@
 package sgc.alerta;
 
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
+import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.alerta.model.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
@@ -13,20 +15,18 @@ import java.util.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 @DisplayName("AlertaFacade - Cobertura adicional")
 class AlertaFacadeCoverageTest {
+    @Mock
     private AlertaService alertaService;
+    @Mock
     private UnidadeService unidadeService;
+    @Mock
     private UsuarioService usuarioService;
-    private AlertaFacade alertaFacade;
 
-    @BeforeEach
-    void setUp() {
-        alertaService = mock(AlertaService.class, withSettings().lenient());
-        unidadeService = mock(UnidadeService.class, withSettings().lenient());
-        usuarioService = mock(UsuarioService.class, withSettings().lenient());
-        alertaFacade = new AlertaFacade(alertaService, usuarioService, unidadeService);
-    }
+    @InjectMocks
+    private AlertaFacade alertaFacade;
 
     @Test
     @DisplayName("criarAlertaCadastroDisponibilizado deve usar sigla da unidade de origem na descrição")
@@ -59,10 +59,10 @@ class AlertaFacadeCoverageTest {
         Unidade raiz = new Unidade();
         raiz.setCodigo(1L);
         when(unidadeService.buscarPorCodigo(1L)).thenReturn(raiz);
+        when(alertaService.salvar(any(Alerta.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         alertaFacade.criarAlertasProcessoIniciado(processo, List.of(unidadeInteroperacional));
 
-        // Deve criar 2 alertas (operacional e intermediária)
         verify(alertaService, times(2)).salvar(any(Alerta.class));
     }
 
@@ -104,14 +104,18 @@ class AlertaFacadeCoverageTest {
     @Test
     @DisplayName("marcarComoLidos deve atualizar data de leitura se AlertaUsuario já existir e não estiver lido")
     void deveAtualizarDataLeituraSeExistirENaoLido() {
-        String usuario = "user1";
+        String usuarioTitulo = "user1";
         List<Long> codigos = List.of(100L);
         
+        Usuario usuario = new Usuario();
+        usuario.setTituloEleitoral(usuarioTitulo);
+        when(usuarioService.buscar(usuarioTitulo)).thenReturn(usuario);
+
         AlertaUsuario au = new AlertaUsuario();
         au.setDataHoraLeitura(null);
         when(alertaService.alertaUsuario(any())).thenReturn(Optional.of(au));
 
-        alertaFacade.marcarComoLidos(usuario, codigos);
+        alertaFacade.marcarComoLidos(usuarioTitulo, codigos);
 
         assertThat(au.getDataHoraLeitura()).isNotNull();
         verify(alertaService).salvarAlertaUsuario(au);
@@ -120,15 +124,19 @@ class AlertaFacadeCoverageTest {
     @Test
     @DisplayName("marcarComoLidos não deve atualizar data de leitura se AlertaUsuario já estiver lido")
     void naoDeveAtualizarDataLeituraSeJaLido() {
-        String usuario = "user1";
+        String usuarioTitulo = "user1";
         List<Long> codigos = List.of(100L);
         
+        Usuario usuario = new Usuario();
+        usuario.setTituloEleitoral(usuarioTitulo);
+        when(usuarioService.buscar(usuarioTitulo)).thenReturn(usuario);
+
         LocalDateTime leituraAnterior = LocalDateTime.now().minusDays(1);
         AlertaUsuario au = new AlertaUsuario();
         au.setDataHoraLeitura(leituraAnterior);
         when(alertaService.alertaUsuario(any())).thenReturn(Optional.of(au));
 
-        alertaFacade.marcarComoLidos(usuario, codigos);
+        alertaFacade.marcarComoLidos(usuarioTitulo, codigos);
 
         assertThat(au.getDataHoraLeitura()).isEqualTo(leituraAnterior);
         verify(alertaService, never()).salvarAlertaUsuario(au);

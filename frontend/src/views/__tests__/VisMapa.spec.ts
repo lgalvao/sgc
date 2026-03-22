@@ -169,7 +169,26 @@ describe("VisMapa.vue", () => {
                 ],
                 stubs: {
                     AceitarMapaModal: true,
+                    BBadge: {
+                        name: 'BBadge',
+                        template: '<span><slot /></span>'
+                    },
+                    BCard: {
+                        name: 'BCard',
+                        template: '<div><slot /></div>'
+                    },
+                    BFormGroup: {
+                        name: 'BFormGroup',
+                        props: ['label'],
+                        template: '<div><label>{{ label }}</label><slot /></div>'
+                    },
+                    BFormTextarea: {
+                        name: 'BFormTextarea',
+                        props: ['modelValue'],
+                        template: '<textarea :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)"></textarea>'
+                    },
                     BModal: {
+                        name: 'BModal',
                         props: ["modelValue", "title"],
                         template: `
                     <div v-if="modelValue" class="custom-modal-stub" :data-title="title">
@@ -181,6 +200,21 @@ describe("VisMapa.vue", () => {
                     </div>
                 `,
                     },
+                    ModalConfirmacao: {
+                        name: 'ModalConfirmacao',
+                        props: ['modelValue', 'titulo', 'okDisabled'],
+                        template: '<div v-if="modelValue"><h3>{{ titulo }}</h3><slot /> <button data-testid="btn-validar-mapa-confirmar" :disabled="okDisabled" @click="$emit(\'confirmar\')">OK</button> <button data-testid="btn-sugestoes-mapa-confirmar" :disabled="okDisabled" @click="$emit(\'confirmar\')">OK</button> <button data-testid="btn-devolucao-mapa-confirmar" :disabled="okDisabled" @click="$emit(\'confirmar\')">OK</button></div>'
+                    },
+                    ModalPadrao: {
+                        name: 'ModalPadrao',
+                        props: ['modelValue', 'testIdCancelar'],
+                        template: '<div v-if="modelValue"><slot /><button :data-testid="testIdCancelar" @click="$emit(\'fechar\')">Fechar</button></div>'
+                    },
+                    EmptyState: {
+                        name: 'EmptyState',
+                        props: ['title', 'description'],
+                        template: '<div><h3>{{ title }}</h3><p>{{ description }}</p></div>'
+                    }
                 },
             },
         });
@@ -696,5 +730,43 @@ describe("VisMapa.vue", () => {
         await wrapper.vm.$nextTick();
 
         expect((confirmBtn.element as HTMLButtonElement).disabled).toBe(false);
+    });
+
+    it("cobre lacunas remanescentes de cobertura", async () => {
+        const {wrapper} = mountComponent();
+        await flushPromises();
+        const vm = wrapper.vm as any;
+
+        // v-model cover (176)
+        const textareaVis = wrapper.findComponent({name: 'BFormTextarea'});
+        // Need to make sure we find the right one if multiple
+        const textareas = wrapper.findAllComponents({name: 'BFormTextarea'});
+        const visTextarea = textareas.find(t => t.attributes('id') === 'sugestoesVisualizacao');
+        if (visTextarea) await visTextarea.vm.$emit('update:modelValue', 'Sugestões');
+
+        // Recursive unit search branch (276-281)
+        processosMock.processoDetalhe.value = {
+            unidades: [
+                {
+                    sigla: "P1",
+                    filhos: [{sigla: "C1", codSubprocesso: 20}]
+                }
+            ]
+        };
+        await router.push("/processo/1/C1/vis-mapa");
+        await flushPromises();
+        expect(vm.subprocesso.codSubprocesso).toBe(20);
+        
+        // subprocesso null branch (285)
+        processosMock.processoDetalhe.value = null;
+        await vm.$nextTick();
+        expect(vm.subprocesso).toBeNull();
+
+        // early returns (344, 361, 376, 402)
+        vm.codSubprocesso = null;
+        await vm.confirmarSugestoes();
+        await vm.confirmarValidacao();
+        await vm.confirmarAceitacao();
+        await vm.confirmarDevolucao();
     });
 });

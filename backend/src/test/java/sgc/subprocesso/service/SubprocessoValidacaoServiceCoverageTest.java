@@ -260,6 +260,33 @@ class SubprocessoValidacaoServiceCoverageTest {
     }
 
     @Nested
+    @DisplayName("validarSituacaoPermitida")
+    class ValidarSituacaoPermitida {
+
+        @Test
+        @DisplayName("deve lançar IllegalArgumentException se situação for nula")
+        void erroSituacaoNula() {
+            Subprocesso sp = new Subprocesso();
+            sp.setSituacao(null);
+
+            assertThatThrownBy(() -> validacaoService.validarSituacaoPermitida(sp, "msg", SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("Situação do subprocesso não pode ser nula");
+        }
+
+        @Test
+        @DisplayName("deve lançar IllegalArgumentException se não houver situações permitidas")
+        void erroSemPermitidas() {
+            Subprocesso sp = new Subprocesso();
+            sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+
+            assertThatThrownBy(() -> validacaoService.validarSituacaoPermitida(sp, "msg"))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("Pelo menos uma situação permitida deve ser fornecida");
+        }
+    }
+
+    @Nested
     @DisplayName("validarRequisitosNegocioParaDisponibilizacao")
     class ValidarRequisitosNegocioParaDisponibilizacao {
 
@@ -277,16 +304,17 @@ class SubprocessoValidacaoServiceCoverageTest {
             Conhecimento c1 = new Conhecimento();
             a1.setConhecimentos(Set.of(c1));
 
+            // Para passar na validarExistenciaAtividades, o mapaManutencaoService deve retornar a1
+            when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(1L)).thenReturn(List.of(a1));
+
+            // Atividade sem conhecimento passada no argumento
             Atividade a2 = new Atividade();
             a2.setCodigo(20L);
             a2.setDescricao("A2");
-            a2.setConhecimentos(Set.of());
-
-            when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(1L)).thenReturn(List.of(a1, a2));
 
             assertThatThrownBy(() -> validacaoService.validarRequisitosNegocioParaDisponibilizacao(sp, List.of(a2)))
                     .isInstanceOf(ErroValidacao.class)
-                    .hasMessageContaining(SgcMensagens.ATIVIDADES_SEM_CONHECIMENTOS);
+                    .hasMessageContaining(SgcMensagens.ATIVIDADES_SEM_CONHECIMENTO_ASSOCIADO);
         }
     }
 }

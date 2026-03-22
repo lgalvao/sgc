@@ -35,9 +35,10 @@ describe("AdministradoresView.vue", () => {
                     BAlert: {template: '<div><slot /></div>'},
                     EmptyState: true,
                     ModalConfirmacao: {
+                        name: 'ModalConfirmacao',
                         props: ['modelValue', 'loading'],
                         template: `<div v-if="modelValue"><slot /><button class="confirm" @click="$emit('confirmar')">OK</button></div>`,
-                        emits: ['confirmar']
+                        emits: ['confirmar', 'shown']
                     },
                     LoadingButton: {
                         props: ['loading', 'text'],
@@ -98,5 +99,41 @@ describe("AdministradoresView.vue", () => {
         await flushPromises();
 
         expect(administradorService.removerAdministrador).toHaveBeenCalledWith("111");
+    });
+
+    it("cobre lacunas remanescentes de cobertura", async () => {
+        const wrapper = createWrapper();
+        await flushPromises();
+        const vm = wrapper.vm as any;
+
+        // Linha 56, 87 (v-model)
+        const modals = wrapper.findAllComponents({name: 'ModalConfirmacao'});
+        for (const modal of modals) {
+            await modal.vm.$emit('update:modelValue', true);
+        }
+        expect(vm.mostrarModalAdicionarAdmin).toBe(true);
+        expect(vm.mostrarModalRemoverAdmin).toBe(true);
+        
+        // Linha 63 (@shown)
+        const modalAdd = wrapper.findComponent({name: 'ModalConfirmacao'});
+        await modalAdd.vm.$emit('shown');
+
+        // Linhas 165-166 (invalid title)
+        vm.novoAdminTitulo = "";
+        await vm.adicionarAdmin();
+        
+        // Linhas 176-177 (error on add)
+        vm.novoAdminTitulo = "123";
+        vi.mocked(administradorService.adicionarAdministrador).mockRejectedValue(new Error("Erro add"));
+        await vm.adicionarAdmin();
+
+        // Linha 189 (removerAdmin without selection)
+        vm.adminParaRemover = null;
+        await vm.removerAdmin();
+
+        // Linhas 199-200 (error on remove)
+        vm.adminParaRemover = {tituloEleitoral: "111", nome: "Admin"};
+        vi.mocked(administradorService.removerAdministrador).mockRejectedValue(new Error("Erro rem"));
+        await vm.removerAdmin();
     });
 });

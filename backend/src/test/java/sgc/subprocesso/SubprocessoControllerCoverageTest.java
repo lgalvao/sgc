@@ -425,4 +425,39 @@ class SubprocessoControllerCoverageTest {
 
         verify(transicaoService).homologarValidacaoEmBloco(anyList(), any());
     }
+
+    @Test
+    @DisplayName("listarAtividadesParaImportacao - deve retornar lista e 200")
+    @WithMockUser
+    void listarAtividadesParaImportacao() throws Exception {
+        when(permissionEvaluator.hasPermission(any(), eq(1L), eq("Subprocesso"), eq("CONSULTAR_PARA_IMPORTACAO"))).thenReturn(true);
+        when(subprocessoService.listarAtividadesParaImportacao(1L)).thenReturn(List.of());
+
+        mockMvc.perform(get("/api/subprocessos/1/atividades-importacao"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("obterMapa - deve retornar mapa e 200")
+    @WithMockUser
+    void obterMapa() throws Exception {
+        when(permissionEvaluator.hasPermission(any(), eq(1L), eq("Subprocesso"), eq("VISUALIZAR_SUBPROCESSO"))).thenReturn(true);
+        Subprocesso sp = new Subprocesso();
+        sp.setMapa(new Mapa());
+        when(subprocessoService.buscarSubprocessoComMapa(1L)).thenReturn(sp);
+
+        mockMvc.perform(get("/api/subprocessos/1/mapa"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("obterMapaCompleto - deve retornar mapa e 200")
+    @WithMockUser
+    void obterMapaCompleto() throws Exception {
+        when(permissionEvaluator.hasPermission(any(), eq(1L), eq("Subprocesso"), eq("VISUALIZAR_SUBPROCESSO"))).thenReturn(true);
+        when(subprocessoService.mapaCompletoPorSubprocesso(1L)).thenReturn(new Mapa());
+
+        mockMvc.perform(get("/api/subprocessos/1/mapa-completo"))
+                .andExpect(status().isOk());
+    }
 }
