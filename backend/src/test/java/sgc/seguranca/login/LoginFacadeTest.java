@@ -4,7 +4,6 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
-import org.springframework.test.util.*;
 import sgc.comum.erros.*;
 import sgc.organizacao.*;
 import sgc.organizacao.model.*;
