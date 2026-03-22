@@ -139,10 +139,10 @@ class SubprocessoControllerCoverageExtraTest {
     @DisplayName("criarAnaliseValidacao - ok")
     @WithMockUser(roles = {"GESTOR"})
     void criarAnaliseValidacaoOk() throws Exception {
-        CriarAnaliseRequest req = new CriarAnaliseRequest("191919", "obs", "SGL", "mot", sgc.subprocesso.model.TipoAcaoAnalise.ACEITE_MAPEAMENTO);
+        CriarAnaliseRequest req = new CriarAnaliseRequest("obs", "mot", sgc.subprocesso.model.TipoAcaoAnalise.ACEITE_MAPEAMENTO);
         when(subprocessoService.buscarSubprocesso(1L)).thenReturn(new Subprocesso());
         Analise a = new Analise();
-        when(transicaoService.criarAnalise(any(), any(), eq(sgc.subprocesso.model.TipoAnalise.VALIDACAO))).thenReturn(a);
+        when(transicaoService.criarAnalise(any(), any(), eq(sgc.subprocesso.model.TipoAnalise.VALIDACAO), any())).thenReturn(a);
         when(subprocessoService.paraHistoricoDto(a)).thenReturn(new AnaliseHistoricoDto(null, null, null, null, null, null, null, null));
 
         mockMvc.perform(post("/api/subprocessos/1/analises-validacao")
@@ -155,10 +155,10 @@ class SubprocessoControllerCoverageExtraTest {
     @DisplayName("criarAnaliseCadastro - ok")
     @WithMockUser(roles = {"GESTOR"})
     void criarAnaliseCadastroOk() throws Exception {
-        CriarAnaliseRequest req = new CriarAnaliseRequest("191919", "obs", "SGL", "mot", sgc.subprocesso.model.TipoAcaoAnalise.ACEITE_MAPEAMENTO);
+        CriarAnaliseRequest req = new CriarAnaliseRequest("obs", "mot", sgc.subprocesso.model.TipoAcaoAnalise.ACEITE_MAPEAMENTO);
         when(subprocessoService.buscarSubprocesso(1L)).thenReturn(new Subprocesso());
         Analise a = new Analise();
-        when(transicaoService.criarAnalise(any(), any(), eq(sgc.subprocesso.model.TipoAnalise.CADASTRO))).thenReturn(a);
+        when(transicaoService.criarAnalise(any(), any(), eq(sgc.subprocesso.model.TipoAnalise.CADASTRO), any())).thenReturn(a);
         when(subprocessoService.paraHistoricoDto(a)).thenReturn(new AnaliseHistoricoDto(null, null, null, null, null, null, null, null));
 
         mockMvc.perform(post("/api/subprocessos/1/analises-cadastro")

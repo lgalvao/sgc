@@ -79,7 +79,6 @@ export const usePerfilStore = defineStore("perfil", () => {
                 if (responsePerfisUnidades.length === 1) {
                     const perfilUnidadeSelecionado = responsePerfisUnidades[0];
                     const loginResponse = await usuarioService.entrar({
-                        tituloEleitoral,
                         perfil: perfilUnidadeSelecionado.perfil,
                         unidadeCodigo: perfilUnidadeSelecionado.unidade.codigo,
                     });
@@ -109,7 +108,6 @@ export const usePerfilStore = defineStore("perfil", () => {
     ) {
         return withErrorHandling(async () => {
             const loginResponse = await usuarioService.entrar({
-                tituloEleitoral,
                 perfil: perfilUnidade.perfil,
                 unidadeCodigo: perfilUnidade.unidade.codigo,
             });

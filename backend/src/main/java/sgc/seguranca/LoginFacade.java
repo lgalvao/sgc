@@ -31,7 +31,7 @@ public class LoginFacade {
     private final GerenciadorJwt gerenciadorJwt;
     private final UsuarioService usuarioService;
 
-    @Value("${aplicacao.ambiente-testes:true}")
+    @Value("${aplicacao.ambiente-testes:false}")
     private boolean ambienteTestes;
 
     public LoginFacade(UsuarioFacade usuarioFacade,
@@ -79,11 +79,10 @@ public class LoginFacade {
      * Finaliza o login gerando um token JWT para o perfil e unidade escolhidos.
      */
     @Transactional(readOnly = true)
-    public String entrar(EntrarRequest request) {
+    public String entrar(EntrarRequest request, String tituloEleitoral) {
         Long codUnidade = request.unidadeCodigo();
         unidadeService.buscarPorCodigo(codUnidade);
 
-        String tituloEleitoral = request.tituloEleitoral();
         List<PerfilUnidadeDto> autorizacoes = buscarAutorizacoes(tituloEleitoral);
         Perfil perfilSolicitado = Perfil.valueOf(request.perfil());
 

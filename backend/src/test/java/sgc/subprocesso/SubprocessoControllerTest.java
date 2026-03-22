@@ -147,15 +147,13 @@ class SubprocessoControllerTest {
         @WithMockUser(roles = "GESTOR")
         void deveCriarAnaliseCadastro() throws Exception {
             CriarAnaliseRequest request = CriarAnaliseRequest.builder()
-                    .tituloUsuario("123456789012")
                     .observacoes("Obs")
-                    .siglaUnidade("SIGLA")
                     .motivo("MOTIVO")
                     .acao(TipoAcaoAnalise.ACEITE_MAPEAMENTO)
                     .build();
 
             when(subprocessoService.buscarSubprocesso(1L)).thenReturn(new Subprocesso());
-            when(transicaoService.criarAnalise(any(), any(), any())).thenReturn(new Analise());
+            when(transicaoService.criarAnalise(any(), any(), any(), any())).thenReturn(new Analise());
 
             mockMvc.perform(post("/api/subprocessos/1/analises-cadastro")
                             .with(csrf())
@@ -163,7 +161,7 @@ class SubprocessoControllerTest {
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isCreated());
 
-            verify(transicaoService).criarAnalise(any(), any(), any());
+            verify(transicaoService).criarAnalise(any(), any(), any(), any());
         }
     }
 }

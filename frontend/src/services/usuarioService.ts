@@ -10,7 +10,6 @@ export interface AutenticacaoRequest {
 }
 
 export interface EntrarRequest {
-    tituloEleitoral: string;
     perfil: string;
     unidadeCodigo: number;
 }
@@ -130,7 +129,7 @@ export async function autorizar(
 ): Promise<PerfilUnidade[]> {
     const response = await apiClient.post<any[]>(
         "/usuarios/autorizar",
-        {tituloEleitoral},
+        {},
     );
     return response.data.map(mapPerfilUnidadeToFrontend);
 }

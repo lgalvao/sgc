@@ -26,7 +26,7 @@ describe('usuarioService', () => {
       const mockResponse = [{ perfil: 'ADMIN', unidade: { codigo: 1, sigla: 'TEST', nome: 'Teste' }, siglaUnidade: 'TEST' }];
       (apiClient.post as any).mockResolvedValueOnce({ data: mockResponse });
       const result = await usuarioService.autorizar('123');
-      expect(apiClient.post).toHaveBeenCalledWith('/usuarios/autorizar', { tituloEleitoral: '123' });
+      expect(apiClient.post).toHaveBeenCalledWith('/usuarios/autorizar', {});
       expect(result).toHaveLength(1);
       expect(result[0].perfil).toBe('ADMIN');
     });
@@ -34,8 +34,8 @@ describe('usuarioService', () => {
     it('entrar', async () => {
       const mockData = { token: 'abc' };
       (apiClient.post as any).mockResolvedValueOnce({ data: mockData });
-      const result = await usuarioService.entrar({ tituloEleitoral: '123', perfil: 'ADMIN', unidadeCodigo: 1 });
-      expect(apiClient.post).toHaveBeenCalledWith('/usuarios/entrar', { tituloEleitoral: '123', perfil: 'ADMIN', unidadeCodigo: 1 });
+      const result = await usuarioService.entrar({ perfil: 'ADMIN', unidadeCodigo: 1 });
+      expect(apiClient.post).toHaveBeenCalledWith('/usuarios/entrar', { perfil: 'ADMIN', unidadeCodigo: 1 });
       expect(result).toEqual(mockData);
     });
 

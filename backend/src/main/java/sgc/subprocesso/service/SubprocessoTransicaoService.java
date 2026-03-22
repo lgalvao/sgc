@@ -115,12 +115,10 @@ public class SubprocessoTransicaoService {
         CriarAnaliseRequest request = CriarAnaliseRequest.builder()
                 .observacoes(cmd.observacoes())
                 .acao(cmd.tipoAcaoAnalise())
-                .siglaUnidade(cmd.unidadeAnalise().getSigla())
-                .tituloUsuario(usuario.getTituloEleitoral())
                 .motivo(cmd.motivoAnalise())
                 .build();
 
-        criarAnalise(sp, request, cmd.tipoAnalise());
+        criarAnalise(sp, request, cmd.tipoAnalise(), usuario);
 
         sp.setSituacao(cmd.novaSituacao());
 
@@ -134,17 +132,15 @@ public class SubprocessoTransicaoService {
                 .build());
     }
 
-    public Analise criarAnalise(Subprocesso sp, CriarAnaliseRequest request, TipoAnalise tipo) {
-        Unidade unidadeEntidade = unidadeService.buscarPorSigla(request.siglaUnidade());
-
+    public Analise criarAnalise(Subprocesso sp, CriarAnaliseRequest request, TipoAnalise tipo, Usuario usuario) {
         Analise analise = Analise.builder()
                 .subprocesso(sp)
                 .dataHora(LocalDateTime.now())
                 .observacoes(request.observacoes())
                 .tipo(tipo)
                 .acao(request.acao())
-                .unidadeCodigo(unidadeEntidade.getCodigo())
-                .usuarioTitulo(request.tituloUsuario())
+                .unidadeCodigo(usuario.getUnidadeAtivaCodigo())
+                .usuarioTitulo(usuario.getTituloEleitoral())
                 .motivo(request.motivo())
                 .build();
 
@@ -378,16 +374,13 @@ public class SubprocessoTransicaoService {
         Unidade proximaUnidade = unidadeAtual.getUnidadeSuperior();
 
         if (proximaUnidade == null) {
-            String siglaUnidade = unidadeAtual.getSigla();
             CriarAnaliseRequest request = CriarAnaliseRequest.builder()
                     .observacoes(observacoes)
                     .acao(TipoAcaoAnalise.ACEITE_MAPEAMENTO)
-                    .siglaUnidade(siglaUnidade)
-                    .tituloUsuario(usuario.getTituloEleitoral())
                     .motivo("Aceite da validação")
                     .build();
 
-            criarAnalise(sp, request, TipoAnalise.VALIDACAO);
+            criarAnalise(sp, request, TipoAnalise.VALIDACAO, usuario);
 
             sp.setSituacao(SITUACAO_MAPA_HOMOLOGADO.get(sp.getProcesso().getTipo()));
             subprocessoRepo.save(sp);

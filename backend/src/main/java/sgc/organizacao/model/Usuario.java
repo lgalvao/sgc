@@ -37,7 +37,6 @@ public class Usuario implements UserDetails {
     @Column(name = "titulo", length = 12, nullable = false)
     private String tituloEleitoral;
 
-    @JsonView(OrganizacaoViews.Publica.class)
     @Column(name = "matricula", length = 8, nullable = false)
     private String matricula;
 

@@ -31,10 +31,13 @@ import java.util.*;
 import java.util.function.*;
 import java.util.stream.*;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+
 @SuppressWarnings("JvmTaintAnalysis")
 @RestController
 @RequestMapping("/e2e")
 @Profile("e2e")
+@ConditionalOnProperty(name = "aplicacao.ambiente-testes", havingValue = "true")
 @Slf4j
 @RequiredArgsConstructor
 public class E2eController {

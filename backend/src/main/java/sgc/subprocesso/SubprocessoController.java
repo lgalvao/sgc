@@ -529,8 +529,9 @@ public class SubprocessoController {
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Cria uma análise de cadastro")
     public AnaliseHistoricoDto criarAnaliseCadastro(@PathVariable Long codSubprocesso,
-                                                    @RequestBody @Valid CriarAnaliseRequest request) {
-        return criarAnalise(codSubprocesso, request, TipoAnalise.CADASTRO);
+                                                    @RequestBody @Valid CriarAnaliseRequest request,
+                                                    @AuthenticationPrincipal Usuario usuario) {
+        return criarAnalise(codSubprocesso, request, TipoAnalise.CADASTRO, usuario);
     }
 
     @PostMapping("/{codSubprocesso}/analises-validacao")
@@ -538,13 +539,14 @@ public class SubprocessoController {
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Cria uma análise de validação")
     public AnaliseHistoricoDto criarAnaliseValidacao(@PathVariable Long codSubprocesso,
-                                                     @RequestBody @Valid CriarAnaliseRequest request) {
-        return criarAnalise(codSubprocesso, request, TipoAnalise.VALIDACAO);
+                                                     @RequestBody @Valid CriarAnaliseRequest request,
+                                                     @AuthenticationPrincipal Usuario usuario) {
+        return criarAnalise(codSubprocesso, request, TipoAnalise.VALIDACAO, usuario);
     }
 
-    private AnaliseHistoricoDto criarAnalise(Long codSubprocesso, CriarAnaliseRequest request, TipoAnalise tipo) {
+    private AnaliseHistoricoDto criarAnalise(Long codSubprocesso, CriarAnaliseRequest request, TipoAnalise tipo, Usuario usuario) {
         Subprocesso sp = subprocessoService.buscarSubprocesso(codSubprocesso);
-        Analise analise = transicaoService.criarAnalise(sp, request, tipo);
+        Analise analise = transicaoService.criarAnalise(sp, request, tipo, usuario);
         return subprocessoService.paraHistoricoDto(analise);
     }
 }

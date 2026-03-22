@@ -94,15 +94,17 @@ class SubprocessoTransicaoServiceCoverageIntegrationTest {
 
             when(unidadeService.buscarPorSigla("U1")).thenReturn(unidade);
 
+            Usuario user = new Usuario();
+            user.setTituloEleitoral("Titulo");
+            user.setUnidadeAtivaCodigo(unidade.getCodigo());
+
             CriarAnaliseRequest request = CriarAnaliseRequest.builder()
                     .observacoes("Obs")
                     .acao(TipoAcaoAnalise.ACEITE_MAPEAMENTO)
-                    .siglaUnidade("U1")
-                    .tituloUsuario("Titulo")
                     .motivo("Motivo")
                     .build();
 
-            Analise analise = transicaoService.criarAnalise(sp, request, TipoAnalise.CADASTRO);
+            Analise analise = transicaoService.criarAnalise(sp, request, TipoAnalise.CADASTRO, user);
 
             assertThat(analise).isNotNull();
             assertThat(analise.getSubprocesso()).isEqualTo(sp);

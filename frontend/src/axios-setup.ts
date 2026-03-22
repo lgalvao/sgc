@@ -33,7 +33,7 @@ const handleResponseError = (error: any) => {
 
     // Loga globalmente erros de rede e inesperados para diagnóstico
     if (shouldNotifyGlobally(normalized)) {
-        logger.error("[axios] Erro global:", normalized.message, normalized.stackTrace || '');
+        logger.error("[axios] Erro global:", normalized.message);
     }
 
     // Sempre rejeitar para permitir tratamento local
