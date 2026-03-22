@@ -57,7 +57,7 @@ const stubs = {
     BFormInvalidFeedback: {template: '<div><slot /></div>'},
     ImpactoMapaModal: {template: '<div></div>', props: ['mostrar']},
     HistoricoAnaliseModal: {template: '<div></div>', props: ['mostrar']},
-    ModalConfirmacao: {template: '<div v-if="modelValue"> <button :data-testid="$attrs[\'test-id-confirmar\']" @click="$emit(\'confirmar\')">Confirmar</button> </div>', props: ['modelValue']},
+    ModalConfirmacao: {template: '<div v-if="modelValue"> <button :data-testid="$attrs[\'test-codigo-confirmar\']" @click="$emit(\'confirmar\')">Confirmar</button> </div>', props: ['modelValue']},
 };
 
 describe("CadastroVisualizacaoView coverage", () => {

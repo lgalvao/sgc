@@ -25,7 +25,7 @@
         >Processo</label>
         <BFormSelect
             id="processo-select"
-            v-model="processoSelecionadoId"
+            v-model="processoSelecionadoCodigo"
             :options="processos.processosParaImportacao.value"
             data-testid="select-processo"
             text-field="descricao"
@@ -55,7 +55,7 @@
         >Unidade</label>
         <BFormSelect
             id="unidade-select"
-            v-model="unidadeSelecionadaId"
+            v-model="unidadeSelecionadaCodigo"
             :disabled="!processoSelecionado"
             :options="unidadesParticipantes"
             data-testid="select-unidade"
@@ -165,10 +165,10 @@ const {
 } = useApi(subprocessoService.importarAtividades);
 
 const processoSelecionado = ref<ProcessoResumo | null>(null);
-const processoSelecionadoId = ref<number | null>(null);
+const processoSelecionadoCodigo = ref<number | null>(null);
 const unidadesParticipantes = ref<UnidadeImportacao[]>([]);
 const unidadeSelecionada = ref<UnidadeImportacao | null>(null);
-const unidadeSelecionadaId = ref<number | null>(null);
+const unidadeSelecionadaCodigo = ref<number | null>(null);
 const atividadesParaImportar = ref<Atividade[]>([]);
 const atividadesSelecionadas = ref<Atividade[]>([]);
 
@@ -186,10 +186,10 @@ watch(
     },
 );
 
-watch(processoSelecionadoId, async (newId) => {
-  if (newId) {
+watch(processoSelecionadoCodigo, async (novoCodigo) => {
+  if (novoCodigo) {
     const processo = processos.processosParaImportacao.value.find(
-        (p) => p.codigo === Number(newId),
+        (p) => p.codigo === Number(novoCodigo),
     );
     if (processo) {
       await selecionarProcesso(processo);
@@ -199,10 +199,10 @@ watch(processoSelecionadoId, async (newId) => {
   }
 });
 
-watch(unidadeSelecionadaId, (newId) => {
-  if (newId) {
+watch(unidadeSelecionadaCodigo, (novoCodigo) => {
+  if (novoCodigo) {
     const unidade = unidadesParticipantes.value.find(
-        (u) => u.codUnidade === Number(newId),
+        (u) => u.codUnidade === Number(novoCodigo),
     );
     if (unidade) {
       selecionarUnidade(unidade);
@@ -214,10 +214,10 @@ watch(unidadeSelecionadaId, (newId) => {
 
 function resetModal() {
   processoSelecionado.value = null;
-  processoSelecionadoId.value = null;
+  processoSelecionadoCodigo.value = null;
   unidadesParticipantes.value = [];
   unidadeSelecionada.value = null;
-  unidadeSelecionadaId.value = null;
+  unidadeSelecionadaCodigo.value = null;
   atividadesParaImportar.value = [];
   atividadesSelecionadas.value = [];
 }
@@ -231,7 +231,7 @@ async function selecionarProcesso(processo: ProcessoResumo | null) {
     unidadesParticipantes.value = [];
   }
   unidadeSelecionada.value = null;
-  unidadeSelecionadaId.value = null;
+  unidadeSelecionadaCodigo.value = null;
 }
 
 async function selecionarUnidade(unidadePu: UnidadeImportacao | null) {

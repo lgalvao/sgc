@@ -46,75 +46,75 @@ export interface OcupacaoCriticaDto {
 }
 
 export const diagnosticoService = {
-    async buscarDiagnostico(subprocessoId: number): Promise<DiagnosticoDto> {
-        const response = await apiClient.get(`/diagnosticos/${subprocessoId}`);
+    async buscarDiagnostico(codSubprocesso: number): Promise<DiagnosticoDto> {
+        const response = await apiClient.get(`/diagnosticos/${codSubprocesso}`);
         return response.data;
     },
 
     async salvarAvaliacao(
-        subprocessoId: number,
+        codSubprocesso: number,
         competenciaCodigo: number,
         importancia: string,
         dominio: string,
         observacoes?: string
     ): Promise<AvaliacaoServidorDto> {
         const response = await apiClient.post(
-            `/diagnosticos/${subprocessoId}/avaliacoes`,
+            `/diagnosticos/${codSubprocesso}/avaliacoes`,
             {competenciaCodigo, importancia, dominio, observacoes}
         );
         return response.data;
     },
 
     async buscarMinhasAvaliacoes(
-        subprocessoId: number,
+        codSubprocesso: number,
         servidorTitulo?: string
     ): Promise<AvaliacaoServidorDto[]> {
         const params = servidorTitulo ? {servidorTitulo} : {};
         const response = await apiClient.get(
-            `/diagnosticos/${subprocessoId}/avaliacoes/minhas`,
+            `/diagnosticos/${codSubprocesso}/avaliacoes/minhas`,
             {params}
         );
         return response.data;
     },
 
     async concluirAutoavaliacao(
-        subprocessoId: number,
+        codSubprocesso: number,
         justificativaAtraso?: string
     ): Promise<void> {
         await apiClient.post(
-            `/diagnosticos/${subprocessoId}/avaliacoes/concluir`,
+            `/diagnosticos/${codSubprocesso}/avaliacoes/concluir`,
             {justificativaAtraso}
         );
     },
 
     async salvarOcupacao(
-        subprocessoId: number,
+        codSubprocesso: number,
         servidorTitulo: string,
         competenciaCodigo: number,
         situacao: string
     ): Promise<OcupacaoCriticaDto> {
         const response = await apiClient.post(
-            `/diagnosticos/${subprocessoId}/ocupacoes`,
+            `/diagnosticos/${codSubprocesso}/ocupacoes`,
             {servidorTitulo, competenciaCodigo, situacao}
         );
         return response.data;
     },
 
     async buscarOcupacoes(
-        subprocessoId: number
+        codSubprocesso: number
     ): Promise<OcupacaoCriticaDto[]> {
         const response = await apiClient.get(
-            `/diagnosticos/${subprocessoId}/ocupacoes`
+            `/diagnosticos/${codSubprocesso}/ocupacoes`
         );
         return response.data;
     },
 
     async concluirDiagnostico(
-        subprocessoId: number,
+        codSubprocesso: number,
         justificativa?: string
     ): Promise<DiagnosticoDto> {
         const response = await apiClient.post(
-            `/diagnosticos/${subprocessoId}/concluir`,
+            `/diagnosticos/${codSubprocesso}/concluir`,
             {justificativa}
         );
         return response.data;

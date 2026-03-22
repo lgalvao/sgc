@@ -36,8 +36,8 @@ export const usePerfilStore = defineStore("perfil", () => {
         return pu ? pu.unidade.codigo : null;
     });
 
-    function definirUsuarioCodigo(novoId: string) {
-        usuarioCodigo.value = novoId;
+    function definirUsuarioCodigo(novoCodigo: string) {
+        usuarioCodigo.value = novoCodigo;
         // localStorage.setItem removido - sincronização automática
     }
 

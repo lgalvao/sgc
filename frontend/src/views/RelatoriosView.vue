@@ -10,14 +10,14 @@
               <BFormGroup :label="TEXTOS.relatorios.LABEL_SELECIONE_PROCESSO" label-for="select-processo-andamento">
                 <BFormSelect
                   id="select-processo-andamento"
-                  v-model="processoIdSelecionado"
+                  v-model="codProcessoSelecionado"
                   :options="opcoesProcessos"
                 />
               </BFormGroup>
             </BCol>
             <BCol class="d-flex align-items-end" md="2">
               <BButton
-                :disabled="!processoIdSelecionado || gerandoAndamento"
+                :disabled="!codProcessoSelecionado || gerandoAndamento"
                 variant="success"
                 @click="gerarRelatorioAndamento"
               >
@@ -42,7 +42,7 @@
             striped
           />
           <EmptyState
-            v-else-if="processoIdSelecionado && !gerandoAndamento"
+            v-else-if="codProcessoSelecionado && !gerandoAndamento"
              :description="TEXTOS.relatorios.EMPTY_DESCRIPTION"
              icon="bi-table"
              :title="TEXTOS.relatorios.EMPTY_TITLE"
@@ -54,7 +54,7 @@
               <BFormGroup :label="TEXTOS.relatorios.LABEL_SELECIONE_PROCESSO" label-for="select-processo-mapas">
                 <BFormSelect
                   id="select-processo-mapas"
-                  v-model="processoIdSelecionadoMapas"
+                  v-model="codProcessoSelecionadoMapas"
                   :options="opcoesProcessos"
                 />
               </BFormGroup>
@@ -64,14 +64,14 @@
                  <!-- Integrate with real units endpoint or store if needed -->
                  <BFormSelect
                    id="select-unidade-mapas"
-                   v-model="unidadeIdSelecionadaMapas"
+                   v-model="codUnidadeSelecionadaMapas"
                    :options="opcoesUnidades"
                  />
               </BFormGroup>
             </BCol>
             <BCol class="d-flex align-items-end" md="4">
               <BButton
-                :disabled="!processoIdSelecionadoMapas || gerandoMapas"
+                :disabled="!codProcessoSelecionadoMapas || gerandoMapas"
                  variant="success"
                  @click="gerarRelatorioMapas"
               >
@@ -109,9 +109,9 @@ const perfilStore = usePerfilStore();
 const { notify } = useNotification();
 const { obterRelatorioAndamento, downloadRelatorioAndamentoPdf, downloadRelatorioMapasPdf } = useRelatorios();
 
-const processoIdSelecionado = ref<number | null>(null);
-const processoIdSelecionadoMapas = ref<number | null>(null);
-const unidadeIdSelecionadaMapas = ref<number | null>(null);
+const codProcessoSelecionado = ref<number | null>(null);
+const codProcessoSelecionadoMapas = ref<number | null>(null);
+const codUnidadeSelecionadaMapas = ref<number | null>(null);
 
 const gerandoAndamento = ref(false);
 const gerandoMapas = ref(false);
@@ -132,10 +132,10 @@ const opcoesUnidades = ref<Array<{ value: number | null, text: string }>>([
 ]);
 
 const gerarRelatorioAndamento = async () => {
-  if (!processoIdSelecionado.value) return;
+  if (!codProcessoSelecionado.value) return;
   gerandoAndamento.value = true;
   try {
-     relatorioAndamento.value = await obterRelatorioAndamento(processoIdSelecionado.value);
+     relatorioAndamento.value = await obterRelatorioAndamento(codProcessoSelecionado.value);
   } catch {
      notify(TEXTOS.relatorios.ERRO_BUSCA, "danger");
   } finally {
@@ -144,21 +144,21 @@ const gerarRelatorioAndamento = async () => {
 };
 
 const exportarPdfAndamento = async () => {
-  if (!processoIdSelecionado.value) return;
+  if (!codProcessoSelecionado.value) return;
   try {
-      await downloadRelatorioAndamentoPdf(processoIdSelecionado.value);
+      await downloadRelatorioAndamentoPdf(codProcessoSelecionado.value);
   } catch {
       notify(TEXTOS.relatorios.ERRO_EXPORTAR, "danger");
   }
 };
 
 const gerarRelatorioMapas = async () => {
-    if (!processoIdSelecionadoMapas.value) return;
+    if (!codProcessoSelecionadoMapas.value) return;
     gerandoMapas.value = true;
     try {
         await downloadRelatorioMapasPdf(
-            processoIdSelecionadoMapas.value, 
-            unidadeIdSelecionadaMapas.value || undefined
+            codProcessoSelecionadoMapas.value,
+            codUnidadeSelecionadaMapas.value || undefined
         );
     } catch {
        notify(TEXTOS.relatorios.ERRO_GERAR, "danger");

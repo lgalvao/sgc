@@ -186,7 +186,7 @@ describe('MapaView Coverage', () => {
 
         expect(fluxoMapa.atualizarCompetencia).toHaveBeenCalledWith(456, 1, {
             descricao: 'Comp 1',
-            atividadesIds: [20]
+            codigosAtividades: [20]
         });
     });
 
@@ -205,7 +205,7 @@ describe('MapaView Coverage', () => {
         expect((wrapper.vm as any).mostrarModalImpacto).toBe(false);
     });
 
-    it('handleErrors covers activitiesIds branch', async () => {
+    it('handleErrors covers codigosAtividades branch', async () => {
         const pinia = createTestingPinia();
         const wrapper = mount(MapaView, {
             global: {
@@ -216,7 +216,7 @@ describe('MapaView Coverage', () => {
 
         const store = {
             lastError: {
-                subErrors: [{field: 'atividadesIds', message: 'Erro ID'}]
+                subErrors: [{field: 'codigosAtividades', message: 'Erro ID'}]
             }
         };
 

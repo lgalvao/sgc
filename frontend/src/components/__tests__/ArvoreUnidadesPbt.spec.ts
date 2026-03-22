@@ -5,12 +5,12 @@ import ArvoreUnidades from '../unidade/ArvoreUnidades.vue';
 import type {Unidade} from '@/types/tipos';
 
 // Helper to generate a tree of units with unique IDs
-const generateTree = (depth: number, breadth: number, startId = 1): Unidade[] => {
+const generateTree = (depth: number, breadth: number, codigoInicial = 1): Unidade[] => {
     if (depth === 0) return [];
 
     const units: Unidade[] = [];
     for (let i = 0; i < breadth; i++) {
-        const codigo = startId * 10 + i + 1;
+        const codigo = codigoInicial * 10 + i + 1;
         const children = generateTree(depth - 1, breadth, codigo);
 
         units.push({
@@ -20,7 +20,7 @@ const generateTree = (depth: number, breadth: number, startId = 1): Unidade[] =>
             isElegivel: true,
             filhas: children.length > 0 ? children : undefined,
             tipo: 'OPERACIONAL',
-            unidadeSuperiorCodigo: Math.floor(startId / 10) // Approx
+            unidadeSuperiorCodigo: Math.floor(codigoInicial / 10) // Approx
         });
     }
     return units;

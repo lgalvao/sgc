@@ -65,8 +65,8 @@ const stubs = {
         template: '<div v-if="modelValue"><slot /> <button data-testid="btn-confirmar" :disabled="okDisabled" @click="$emit(\'confirmar\')">Confirmar</button></div>'
     },
     ModalPadrao: {
-        props: ['modelValue', 'testIdCancelar'],
-        template: '<div v-if="modelValue"><slot /> <button :data-testid="testIdCancelar" @click="$emit(\'fechar\')">Fechar</button></div>'
+        props: ['modelValue', 'testCodigoCancelar'],
+        template: '<div v-if="modelValue"><slot /> <button :data-testid="testCodigoCancelar" @click="$emit(\'fechar\')">Fechar</button></div>'
     },
     AceitarMapaModal: {
         template: '<div v-if="mostrarModal"><button data-testid="btn-confirmar-aceite" @click="$emit(\'confirmar-aceitacao\', \'Obs aceite\')">Confirmar</button></div>',

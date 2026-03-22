@@ -94,7 +94,7 @@
         :loading="loadingValidacao"
         :titulo="isHomologacao ? TEXTOS.atividades.MODAL_HOMOLOGAR_TITULO : (isRevisao ? TEXTOS.atividades.MODAL_ACEITE_REVISAO_TITULO : TEXTOS.atividades.MODAL_VALIDAR_TITULO)"
         :ok-title="TEXTOS.comum.BOTAO_CONFIRMAR"
-        test-id-confirmar="btn-aceite-cadastro-confirmar"
+        test-codigo-confirmar="btn-aceite-cadastro-confirmar"
         variant="success"
         @confirmar="confirmarValidacao"
     >
@@ -119,7 +119,7 @@
         :ok-disabled="!observacaoDevolucao.trim()"
         :titulo="isRevisao ? TEXTOS.atividades.MODAL_DEVOLVER_REVISAO_TITULO : TEXTOS.atividades.MODAL_DEVOLVER_TITULO"
         :ok-title="TEXTOS.comum.BOTAO_CONFIRMAR"
-        test-id-confirmar="btn-devolucao-cadastro-confirmar"
+        test-codigo-confirmar="btn-devolucao-cadastro-confirmar"
         variant="secondary"
         @confirmar="confirmarDevolucao"
     >
@@ -194,12 +194,12 @@ const subprocessosStore = useSubprocessos();
 const toastStore = useToastStore();
 const {impactoMapa: impactos} = mapasStore;
 
-const unidadeId = computed(() => props.sigla);
+const siglaUnidadeAux = computed(() => props.sigla);
 const codProcesso = computed(() => Number(props.codProcesso));
 
 const unidade = ref<Unidade | null>(null);
 
-const siglaUnidade = computed(() => unidade.value?.sigla || unidadeId.value);
+const siglaUnidade = computed(() => unidade.value?.sigla || siglaUnidadeAux.value);
 const nomeUnidade = computed(() => (unidade.value?.nome ? `${unidade.value.nome}` : ""));
 
 const subprocesso = computed(() => {
@@ -207,7 +207,7 @@ const subprocesso = computed(() => {
 
   function encontrarUnidade(unidades: UnidadeParticipante[]): UnidadeParticipante | undefined {
     for (const u of unidades) {
-      if (u.sigla === unidadeId.value) return u;
+      if (u.sigla === siglaUnidadeAux.value) return u;
       if (u.filhos && u.filhos.length > 0) {
         const encontrada = encontrarUnidade(u.filhos);
         if (encontrada) return encontrada;

@@ -12,7 +12,7 @@
         <PageHeader
             :subtitle="subprocesso.unidade.nome"
             :title="subprocesso.unidade.sigla"
-            title-test-id="subprocesso-header__txt-header-unidade"
+            titulo-test-codigo="subprocesso-header__txt-header-unidade"
         >
           <template #actions>
             <BButton
@@ -182,7 +182,7 @@
       :ok-disabled="!justificativaReabertura.trim()"
       :titulo="tipoReabertura === 'cadastro' ? TEXTOS.subprocesso.REABRIR_CADASTRO_TITULO : TEXTOS.subprocesso.REABRIR_REVISAO_TITULO"
       :ok-title="TEXTOS.subprocesso.BOTAO_CONFIRMAR_REABERTURA"
-      test-id-confirmar="btn-confirmar-reabrir"
+      test-codigo-confirmar="btn-confirmar-reabrir"
       variant="warning"
       @confirmar="confirmarReabertura"
   >
@@ -201,7 +201,7 @@
       v-model="modalLembreteAberto"
       :auto-close="false"
       :ok-title="TEXTOS.subprocesso.BOTAO_CONFIRMAR_LEMBRETE"
-      test-id-confirmar="btn-confirmar-enviar-lembrete"
+      test-codigo-confirmar="btn-confirmar-enviar-lembrete"
       :titulo="TEXTOS.subprocesso.LEMBRETE_TITULO"
       variant="primary"
       @confirmar="enviarLembreteConfirmado"

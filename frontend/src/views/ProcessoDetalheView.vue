@@ -18,7 +18,7 @@
     <div v-if="processo">
       <PageHeader
           :title="processo.descricao"
-          title-test-id="processo-info">
+          titulo-test-codigo="processo-info">
 
         <template #default>
           <ProcessoInfo
@@ -93,8 +93,8 @@
 
     <ModalConfirmacao
         v-model="mostrarModalFinalizacao"
-        test-id-cancelar="btn-finalizar-processo-cancelar"
-        test-id-confirmar="btn-finalizar-processo-confirmar"
+        test-codigo-cancelar="btn-finalizar-processo-cancelar"
+        test-codigo-confirmar="btn-finalizar-processo-confirmar"
         :titulo="TEXTOS.processo.FINALIZACAO_TITULO"
         variant="success"
         @confirmar="confirmarFinalizacao">

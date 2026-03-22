@@ -158,14 +158,14 @@ describe('subprocessoService', () => {
 
   it('adicionarCompetencia', async () => {
     (apiClient.post as any).mockResolvedValueOnce({ data: {} });
-    await subprocessoService.adicionarCompetencia(1, { descricao: 'desc', atividadesIds: [1] });
-    expect(apiClient.post).toHaveBeenCalledWith('/subprocessos/1/competencia', { descricao: 'desc', atividadesIds: [1] });
+    await subprocessoService.adicionarCompetencia(1, { descricao: 'desc', codigosAtividades: [1] });
+    expect(apiClient.post).toHaveBeenCalledWith('/subprocessos/1/competencia', { descricao: 'desc', codigosAtividades: [1] });
   });
 
   it('atualizarCompetencia', async () => {
     (apiClient.post as any).mockResolvedValueOnce({ data: {} });
-    await subprocessoService.atualizarCompetencia(1, 2, { descricao: 'desc', atividadesIds: [1] });
-    expect(apiClient.post).toHaveBeenCalledWith('/subprocessos/1/competencia/2', { descricao: 'desc', atividadesIds: [1] });
+    await subprocessoService.atualizarCompetencia(1, 2, { descricao: 'desc', codigosAtividades: [1] });
+    expect(apiClient.post).toHaveBeenCalledWith('/subprocessos/1/competencia/2', { descricao: 'desc', codigosAtividades: [1] });
   });
 
   it('removerCompetencia', async () => {

@@ -13,11 +13,11 @@ describe('ConfirmacaoDisponibilizacaoModal.vue', () => {
         template: `
             <div v-if="modelValue" :data-titulo="titulo" data-testid="modal-stub">
                 <slot />
-                <button :data-testid="testIdCancelar" @click="$emit('update:modelValue', false)">Cancelar</button>
-                <button :data-testid="testIdConfirmar" @click="$emit('confirmar')">{{ okTitle }}</button>
+                <button :data-testid="testCodigoCancelar" @click="$emit('update:modelValue', false)">Cancelar</button>
+                <button :data-testid="testCodigoConfirmar" @click="$emit('confirmar')">{{ okTitle }}</button>
             </div>
         `,
-        props: ['titulo', 'modelValue', 'testIdCancelar', 'testIdConfirmar', 'okTitle'],
+        props: ['titulo', 'modelValue', 'testCodigoCancelar', 'testCodigoConfirmar', 'okTitle'],
         emits: ['update:modelValue', 'confirmar']
     }
 

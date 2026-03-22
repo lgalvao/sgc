@@ -8,11 +8,11 @@ const ModalPadraoStub = {
     template: `
         <div v-if="modelValue" data-testid="modal-stub">
             <slot />
-            <button :data-testid="testIdCancelar" @click="$emit('fechar')">Cancelar</button>
-            <button :data-testid="testIdConfirmar" :disabled="acaoDesabilitada" @click="$emit('confirmar')">{{ textoAcao }}</button>
+            <button :data-testid="testCodigoCancelar" @click="$emit('fechar')">Cancelar</button>
+            <button :data-testid="testCodigoConfirmar" :disabled="acaoDesabilitada" @click="$emit('confirmar')">{{ textoAcao }}</button>
         </div>
     `,
-    props: ["modelValue", "testIdCancelar", "testIdConfirmar", "acaoDesabilitada", "textoAcao"],
+    props: ["modelValue", "testCodigoCancelar", "testCodigoConfirmar", "acaoDesabilitada", "textoAcao"],
     emits: ["update:modelValue", "fechar", "confirmar", "shown"],
 };
 

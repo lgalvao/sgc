@@ -265,8 +265,8 @@ describe("MapaView coverage", () => {
         vm.codSubprocesso = 123;
         vm.removerAtividadeAssociada(999, 10);
         
-        // Cobre handleError com fieldErrors.atividadesIds
-        fluxoMapaMock.lastError = { message: "Erro", details: { atividadesIds: "Erro ID" } };
+        // Cobre handleError com fieldErrors.codigosAtividades
+        fluxoMapaMock.lastError = { message: "Erro", details: { codigosAtividades: "Erro ID" } };
         vm.competenciaSendoEditada = null; // Simula erro no adicionarCompetencia
         fluxoMapaMock.adicionarCompetencia = vi.fn().mockRejectedValue(new Error("Erro"));
         await vm.adicionarCompetenciaEFecharModal({ descricao: "C1", atividadesSelecionadas: [] });

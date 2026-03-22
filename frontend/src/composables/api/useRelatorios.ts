@@ -23,10 +23,10 @@ export function useRelatorios() {
     link.remove();
   };
   
-  const downloadRelatorioMapasPdf = async (codProcesso: number, unidadeId?: number) => {
+  const downloadRelatorioMapasPdf = async (codProcesso: number, codigoUnidade?: number) => {
     let urlStr = `/relatorios/mapas/${codProcesso}/exportar`;
-    if (unidadeId) {
-      urlStr += `?unidadeId=${unidadeId}`;
+    if (codigoUnidade) {
+      urlStr += `?codigoUnidade=${codigoUnidade}`;
     }
     
     const response = await axios.get(urlStr, {

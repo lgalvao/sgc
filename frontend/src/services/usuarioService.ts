@@ -93,13 +93,13 @@ export function perfisUnidadesParaDominio(
 }
 
 export function mapVWUsuarioToUsuario(vw: any): Usuario {
-    const candidateId =
+    const codigoCandidato =
         vw?.codigo ??
         (typeof vw?.titulo === "string" && /^\d+$/.test(vw.titulo)
             ? Number(vw.titulo)
             : undefined) ??
         undefined;
-    const codigo = Number(candidateId ?? 0);
+    const codigo = Number(codigoCandidato ?? 0);
 
     return {
         codigo,

@@ -6,7 +6,7 @@ export interface ApiErrorPayload {
     message?: string;
     code?: string;
     details?: Record<string, any>;
-    traceId?: string;
+    rastreioCodigo?: string;
     stackTrace?: string;
     subErrors?: Array<{
         object?: string;
@@ -32,7 +32,7 @@ export interface NormalizedError {
     status?: number;
     details?: Record<string, any>;
     subErrors?: Array<{ message?: string; field?: string; }>;
-    traceId?: string;
+    rastreioCodigo?: string;
     stackTrace?: string;
     originalError?: unknown;
 }
@@ -61,7 +61,7 @@ export function normalizeError(err: unknown): NormalizedError {
             status: status,
             details: payload?.details,
             subErrors: payload?.subErrors,
-            traceId: payload?.traceId,
+            rastreioCodigo: payload?.rastreioCodigo,
             stackTrace: payload?.stackTrace || (err as any).stack,
             originalError: err
         };

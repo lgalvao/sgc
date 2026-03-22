@@ -4,8 +4,8 @@
       :auto-close="false"
       :ok-title="TEXTOS.comum.BOTAO_CONFIRMAR"
       :titulo="isRevisao ? TEXTOS.atividades.MODAL_DISPONIBILIZAR_REVISAO_TITULO : TEXTOS.atividades.MODAL_DISPONIBILIZAR_TITULO"
-      test-id-cancelar="btn-disponibilizar-revisao-cancelar"
-      test-id-confirmar="btn-confirmar-disponibilizacao"
+      test-codigo-cancelar="btn-disponibilizar-revisao-cancelar"
+      test-codigo-confirmar="btn-confirmar-disponibilizacao"
       variant="success"
       @confirmar="emit('confirmar')"
   >

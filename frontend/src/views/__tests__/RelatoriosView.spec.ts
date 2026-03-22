@@ -70,7 +70,7 @@ describe('Relatorios.vue', () => {
         ]);
 
         // Simula selecao de processo (o select em Vue test utils com stub pode ser setado no vm)
-        ctx.wrapper!.vm.processoIdSelecionado = 1;
+        ctx.wrapper!.vm.codProcessoSelecionado = 1;
         await ctx.wrapper!.vm.$nextTick();
         
         // Pega todos os botoes. O primeiro é o de Gerar andamento.
@@ -86,7 +86,7 @@ describe('Relatorios.vue', () => {
     it('deve chamar a exportacao de pdf de andamento', async () => {
         mockObterRelatorioAndamento.mockResolvedValue([{ siglaUnidade: 'U1' }]);
 
-        ctx.wrapper!.vm.processoIdSelecionado = 1;
+        ctx.wrapper!.vm.codProcessoSelecionado = 1;
         await ctx.wrapper!.vm.$nextTick();
         
         await ctx.wrapper!.findAll('button')[0].trigger('click'); // Gerar andamento
@@ -100,7 +100,7 @@ describe('Relatorios.vue', () => {
     });
 
     it('deve chamar a exportacao de pdf de mapas', async () => {
-        ctx.wrapper!.vm.processoIdSelecionadoMapas = 2;
+        ctx.wrapper!.vm.codProcessoSelecionadoMapas = 2;
         await ctx.wrapper!.vm.$nextTick();
         
         // O botao de mapas é o ultimo (index 1 antes de ter dados no andamento, ou index 2 se tiver)

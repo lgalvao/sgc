@@ -66,7 +66,7 @@
             :pode-editar="podeEditarMapa"
             @editar="iniciarEdicaoCompetencia"
             @excluir="excluirCompetencia"
-            @remover-atividade="(competenciaId, codAtividade) => removerAtividadeAssociada(competenciaId, codAtividade)"
+            @remover-atividade="(codCompetencia, codAtividade) => removerAtividadeAssociada(codCompetencia, codAtividade)"
         />
       </div>
     </div>
@@ -98,7 +98,7 @@
         :loading="loadingExclusao"
         :mensagem="TEXTOS.mapa.EXCLUSAO_CONFIRMACAO(competenciaParaExcluir?.descricao || '')"
         data-testid="mdl-excluir-competencia"
-        test-id-confirmar="btn-confirmar-exclusao-competencia"
+        test-codigo-confirmar="btn-confirmar-exclusao-competencia"
         :titulo="TEXTOS.mapa.EXCLUSAO_TITULO"
         variant="danger"
         @confirmar="confirmarExclusaoCompetencia"
@@ -228,7 +228,7 @@ const loadingExclusao = ref(false);
 const {errors: fieldErrors, setFromNormalizedError, clearErrors} = useFormErrors([
   'descricao',
   'atividades',
-  'atividadesIds',
+  'codigosAtividades',
   'atividadesAssociadas',
   'dataLimite',
   'observacoes',
@@ -238,7 +238,7 @@ const {errors: fieldErrors, setFromNormalizedError, clearErrors} = useFormErrors
 function handleErrors(store: any) {
   setFromNormalizedError(store.lastError);
   if (fieldErrors.value.atividadesAssociadas) fieldErrors.value.atividades = fieldErrors.value.atividadesAssociadas;
-  if (fieldErrors.value.atividadesIds) fieldErrors.value.atividades = fieldErrors.value.atividadesIds;
+  if (fieldErrors.value.codigosAtividades) fieldErrors.value.atividades = fieldErrors.value.codigosAtividades;
 }
 
 function abrirModalDisponibilizar() {
@@ -277,7 +277,7 @@ async function adicionarCompetenciaEFecharModal(dados: { descricao: string; ativ
   if (!codSubprocesso.value) return;
   const request: SalvarCompetenciaRequest = {
     descricao: dados.descricao,
-    atividadesIds: dados.atividadesSelecionadas,
+    codigosAtividades: dados.atividadesSelecionadas,
   };
 
   try {
@@ -332,17 +332,17 @@ function fecharModalExcluirCompetencia() {
   competenciaParaExcluir.value = null;
 }
 
-function removerAtividadeAssociada(competenciaId: number, codAtividade: number) {
+function removerAtividadeAssociada(codCompetencia: number, codAtividade: number) {
   if (!codSubprocesso.value) return;
   const competencia = competencias.value.find(
-      (comp) => comp.codigo === competenciaId,
+      (comp) => comp.codigo === codCompetencia,
   );
   if (competencia) {
-    const atividadesIds = (competencia.atividades || []).map((a) => a.codigo).filter((id) => id !== codAtividade);
+    const codigosAtividades = (competencia.atividades || []).map((a) => a.codigo).filter((id) => id !== codAtividade);
 
     const request: SalvarCompetenciaRequest = {
       descricao: competencia.descricao,
-      atividadesIds: atividadesIds,
+      codigosAtividades: codigosAtividades,
     };
 
     fluxoMapa.atualizarCompetencia(

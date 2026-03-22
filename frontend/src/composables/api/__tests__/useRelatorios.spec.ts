@@ -54,7 +54,7 @@ describe('useRelatorios', () => {
     expect(document.createElement).toHaveBeenCalledWith('a');
   });
 
-  it('deve fazer o download do relatorio de mapas em pdf sem unidadeId', async () => {
+  it('deve fazer o download do relatorio de mapas em pdf sem codigoUnidade', async () => {
     const mockBlobData = new Blob(['pdf content']);
     (apiClient.get as any).mockResolvedValueOnce({ data: mockBlobData });
 
@@ -66,14 +66,14 @@ describe('useRelatorios', () => {
     });
   });
 
-  it('deve fazer o download do relatorio de mapas em pdf com unidadeId', async () => {
+  it('deve fazer o download do relatorio de mapas em pdf com codigoUnidade', async () => {
     const mockBlobData = new Blob(['pdf content']);
     (apiClient.get as any).mockResolvedValueOnce({ data: mockBlobData });
 
     const { downloadRelatorioMapasPdf } = useRelatorios();
     await downloadRelatorioMapasPdf(123, 456);
 
-    expect(apiClient.get).toHaveBeenCalledWith('/relatorios/mapas/123/exportar?unidadeId=456', {
+    expect(apiClient.get).toHaveBeenCalledWith('/relatorios/mapas/123/exportar?codigoUnidade=456', {
       responseType: 'blob'
     });
   });
