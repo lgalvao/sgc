@@ -13,6 +13,8 @@ const minCovArg = args.find(a => a.startsWith('--min='))?.split('=')[1] || '99';
 const showMissed = args.includes('--missed') || args.includes('--details');
 const simpleMode = args.includes('--simple');
 
+const failUnderArg = args.find(a => a.startsWith('--fail-under='))?.split('=')[1] || null;
+
 if (help) {
     console.log(`
 Uso: node scripts/backend/check-coverage.js [filtro] [opções]
@@ -24,6 +26,7 @@ Opções:
   --min=<n>      Filtrar classes com cobertura de linha menor que <n>% (Padrão: 99)
   --missed       Exibir detalhes das linhas e branches não cobertos (Ranking de perdidos)
   --simple       Saída simplificada (apenas classe e linhas/branches perdidas)
+  --fail-under=<n> Falhar (exit 1) se a cobertura global de instruções for inferior a <n>%
   --help, -h     Exibir esta ajuda
 `);
     process.exit(0);
@@ -216,6 +219,19 @@ async function main() {
             console.log("Nenhuma classe abaixo do limite de cobertura encontrado.");
         } else if (lowCovClasses.length > 20) {
             console.log(`\n... e mais ${lowCovClasses.length - 20} classes.`);
+        }
+
+        if (failUnderArg) {
+            const globalCounters = getCounters(root);
+            const inst = globalCounters.INSTRUCTION;
+            const actual = calculatePercentage(inst.covered, inst.missed);
+            const target = parseFloat(failUnderArg);
+            if (actual < target) {
+                console.error(`\n❌ ERRO: Cobertura global (${actual.toFixed(2)}%) abaixo do esperado (${target.toFixed(2)}%).`);
+                process.exit(1);
+            } else {
+                console.log(`\n✅ Cobertura global (${actual.toFixed(2)}%) atingiu a meta (${target.toFixed(2)}%).`);
+            }
         }
     }
 }

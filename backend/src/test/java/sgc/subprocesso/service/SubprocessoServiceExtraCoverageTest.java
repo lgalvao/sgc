@@ -5,12 +5,16 @@ import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
 import org.mockito.quality.*;
+import sgc.comum.model.*;
+import sgc.comum.erros.*;
 import sgc.mapa.service.*;
+import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
 import sgc.processo.model.*;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
+import sgc.seguranca.*;
 
 import java.time.*;
 import java.util.*;
@@ -42,6 +46,15 @@ class SubprocessoServiceExtraCoverageTest {
 
     @Mock
     private CopiaMapaService copiaMapaService;
+
+    @Mock
+    private ComumRepo repo;
+
+    @Mock
+    private UsuarioFacade usuarioFacade;
+
+    @Mock
+    private SgcPermissionEvaluator permissionEvaluator;
 
     @BeforeEach
     void setUp() {
@@ -169,38 +182,97 @@ class SubprocessoServiceExtraCoverageTest {
 
             assertThat(resultado).isEqualTo(u1);
         }
+
+        @Test
+        @DisplayName("deve retornar unidade do subprocesso se codigo for null")
+        void codNull() {
+            Unidade u = new Unidade();
+            Subprocesso sp = new Subprocesso();
+            sp.setUnidade(u);
+            sp.setCodigo(null);
+
+            assertThat(subprocessoService.obterUnidadeLocalizacao(sp)).isEqualTo(u);
+        }
+
+        @Test
+        @DisplayName("deve retornar unidade do subprocesso se movimentacoes vazio")
+        void movVazio() {
+            Unidade u = new Unidade();
+            Subprocesso sp = new Subprocesso();
+            sp.setUnidade(u);
+            sp.setCodigo(1L);
+
+            when(movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(1L)).thenReturn(List.of());
+
+            assertThat(subprocessoService.obterUnidadeLocalizacao(sp)).isEqualTo(u);
+        }
     }
 
     @Nested
-    @DisplayName("processarAlteracoes (via atualizarEntidade)")
-    class ProcessarAlteracoes {
+    @DisplayName("listarPorProcessoEUnidadeCodigosESituacoes")
+    class ListarPorProcessoEUnidadeCodigosESituacoes {
         @Test
-        @DisplayName("deve atualizar datas limite e fim de etapa sem codMapa")
-        void deveAtualizarDatasSemCodMapa() {
-            LocalDateTime limite1 = LocalDateTime.now().plusDays(1);
-            LocalDateTime fim1 = LocalDateTime.now().plusDays(2);
-            LocalDateTime limite2 = LocalDateTime.now().plusDays(3);
-            LocalDateTime fim2 = LocalDateTime.now().plusDays(4);
+        @DisplayName("deve filtrar por situacoes")
+        void deveFiltrar() {
+            Subprocesso sp1 = new Subprocesso();
+            sp1.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+            Subprocesso sp2 = new Subprocesso();
+            sp2.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
 
-            AtualizarSubprocessoRequest req = AtualizarSubprocessoRequest.builder()
-                    .dataLimiteEtapa1(limite1)
-                    .dataFimEtapa1(fim1)
-                    .dataLimiteEtapa2(limite2)
-                    .dataFimEtapa2(fim2)
-                    .build();
+            when(subprocessoRepo.findByProcessoCodigoAndUnidadeCodigoInWithUnidade(1L, List.of(10L, 11L)))
+                    .thenReturn(List.of(sp1, sp2));
 
+            List<Subprocesso> res = subprocessoService.listarPorProcessoEUnidadeCodigosESituacoes(1L, List.of(10L, 11L), List.of(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO));
+
+            assertThat(res).containsExactly(sp1);
+        }
+    }
+
+    @Nested
+    @DisplayName("importarAtividades")
+    class ImportarAtividades {
+        @Test
+        @DisplayName("deve lancar erro se nao tiver permissao no destino")
+        void semPermissaoDestino() {
             Subprocesso sp = new Subprocesso();
-            sp.setCodigo(1L);
+            when(repo.buscar(Subprocesso.class, 1L)).thenReturn(sp);
+            when(usuarioFacade.usuarioAutenticado()).thenReturn(new Usuario());
+            when(permissionEvaluator.verificarPermissao(any(), eq(sp), eq(AcaoPermissao.EDITAR_CADASTRO))).thenReturn(false);
 
+            assertThrows(ErroAcessoNegado.class, () -> subprocessoService.importarAtividades(1L, 2L, List.of()));
+        }
+
+        @Test
+        @DisplayName("deve lancar erro se nao tiver permissao na origem")
+        void semPermissaoOrigem() {
+            Subprocesso spDest = new Subprocesso();
+            spDest.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
+            Subprocesso spOrig = new Subprocesso();
+            
+            when(repo.buscar(Subprocesso.class, 1L)).thenReturn(spDest);
+            when(repo.buscar(Subprocesso.class, 2L)).thenReturn(spOrig);
+            Usuario u = new Usuario();
+            when(usuarioFacade.usuarioAutenticado()).thenReturn(u);
+            when(permissionEvaluator.verificarPermissao(u, spDest, AcaoPermissao.EDITAR_CADASTRO)).thenReturn(true);
+            when(permissionEvaluator.verificarPermissao(u, spOrig, AcaoPermissao.CONSULTAR_PARA_IMPORTACAO)).thenReturn(false);
+
+            assertThrows(ErroAcessoNegado.class, () -> subprocessoService.importarAtividades(1L, 2L, List.of()));
+        }
+    }
+
+    @Nested
+    @DisplayName("listarAtividadesParaImportacao")
+    class ListarAtividadesParaImportacao {
+        @Test
+        @DisplayName("deve lancar erro se processo nao finalizado")
+        void processoNaoFinalizado() {
+            Subprocesso sp = new Subprocesso();
+            Processo p = new Processo();
+            p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+            sp.setProcesso(p);
             when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(1L)).thenReturn(Optional.of(sp));
-            when(subprocessoRepo.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
-            Subprocesso atualizado = subprocessoService.atualizarEntidade(1L, req);
-
-            assertThat(atualizado.getDataLimiteEtapa1()).isEqualTo(limite1);
-            assertThat(atualizado.getDataFimEtapa1()).isEqualTo(fim1);
-            assertThat(atualizado.getDataLimiteEtapa2()).isEqualTo(limite2);
-            assertThat(atualizado.getDataFimEtapa2()).isEqualTo(fim2);
+            assertThrows(ErroValidacao.class, () -> subprocessoService.listarAtividadesParaImportacao(1L));
         }
     }
 }

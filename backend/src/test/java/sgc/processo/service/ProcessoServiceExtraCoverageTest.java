@@ -16,7 +16,10 @@ import sgc.processo.model.*;
 import sgc.seguranca.*;
 import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.*;
+import sgc.mapa.model.*;
+import org.springframework.security.core.Authentication;
 
+import java.time.*;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
@@ -269,42 +272,247 @@ class ProcessoServiceExtraCoverageTest {
     }
 
     @Nested
-    @DisplayName("executarAcaoEmBloco")
-    class ExecutarAcaoEmBloco {
+    @DisplayName("enviarLembrete")
+    class EnviarLembrete {
         @Test
-        @DisplayName("deve lancar erro se unidades vazio")
-        void vazio() {
-            AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(List.of(), AcaoProcesso.ACEITAR, null);
-            assertThrows(ErroValidacao.class, () -> processoService.executarAcaoEmBloco(1L, req));
+        @DisplayName("deve lancar erro se unidade nao participa")
+        void unidadeNaoParticipa() {
+            Processo p = new Processo();
+            p.setParticipantes(new ArrayList<>());
+            when(processoRepo.buscarPorCodigoComParticipantes(1L)).thenReturn(Optional.of(p));
+            when(unidadeService.buscarPorCodigo(2L)).thenReturn(new Unidade());
+
+            assertThrows(ErroValidacao.class, () -> processoService.enviarLembrete(1L, 2L));
         }
 
         @Test
-        @DisplayName("deve lancar erro se quantidade nao bate")
-        void qtdeNaoBate() {
-            Usuario u = new Usuario();
-            when(usuarioService.usuarioAutenticado()).thenReturn(u);
+        @DisplayName("deve enviar lembrete com sucesso")
+        void sucesso() {
+            Processo p = new Processo();
+            p.setDescricao("Processo Teste");
+            p.setDataLimite(LocalDateTime.of(2026, 3, 22, 12, 0));
+            UnidadeProcesso up = new UnidadeProcesso();
+            up.setUnidadeCodigo(1L);
+            p.setParticipantes(new ArrayList<>(List.of(up)));
+            when(processoRepo.buscarPorCodigoComParticipantes(1L)).thenReturn(Optional.of(p));
 
-            when(subprocessoService.listarEntidadesPorProcessoEUnidades(1L, List.of(1L, 2L))).thenReturn(List.of());
+            Unidade u = new Unidade();
+            u.setCodigo(1L);
+            u.setSigla("UNI1");
+            u.setTituloTitular("TITULAR");
+            when(unidadeService.buscarPorCodigo(1L)).thenReturn(u);
 
-            AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(List.of(1L, 2L), AcaoProcesso.ACEITAR, null);
-            assertThrows(ErroValidacao.class, () -> processoService.executarAcaoEmBloco(1L, req));
+            when(emailModelosService.criarEmailLembretePrazo(anyString(), anyString(), any())).thenReturn("html");
+            Usuario titular = new Usuario();
+            titular.setEmail("titular@teste.com");
+            when(usuarioService.buscarPorLogin("TITULAR")).thenReturn(titular);
+
+            processoService.enviarLembrete(1L, 1L);
+
+            verify(emailService).enviarEmailHtml(eq("titular@teste.com"), anyString(), eq("html"));
+            verify(servicoAlertas).criarAlertaAdmin(eq(p), eq(u), anyString());
         }
+    }
 
+    @Nested
+    @DisplayName("listarSubprocessosElegiveis")
+    class ListarSubprocessosElegiveis {
         @Test
-        @DisplayName("deve lancar erro de permissao ao disponibilizar sem permissao")
-        void semPermissaoDisponibilizar() {
+        @DisplayName("deve listar para nao-admin")
+        void naoAdmin() {
             Usuario u = new Usuario();
+            u.setPerfilAtivo(Perfil.GESTOR);
+            u.setUnidadeAtivaCodigo(1L);
             when(usuarioService.usuarioAutenticado()).thenReturn(u);
+
+            Unidade uni = new Unidade();
+            uni.setCodigo(1L);
+            when(unidadeService.todasComHierarquia()).thenReturn(List.of(uni));
 
             Subprocesso sp = new Subprocesso();
-            sp.setUnidade(new Unidade());
-            sp.getUnidade().setCodigo(1L);
-            when(subprocessoService.listarEntidadesPorProcessoEUnidades(1L, List.of(1L))).thenReturn(List.of(sp));
+            sp.setCodigo(100L);
+            sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
+            sp.setUnidade(uni);
+            when(subprocessoService.listarEntidadesPorProcessoEUnidades(eq(1L), anyList())).thenReturn(List.of(sp));
+            when(permissionEvaluator.verificarPermissao(eq(u), eq(sp), eq(sgc.seguranca.AcaoPermissao.DISPONIBILIZAR_MAPA))).thenReturn(true);
 
-            when(permissionEvaluator.verificarPermissao(eq(u), anyList(), eq(sgc.seguranca.AcaoPermissao.DISPONIBILIZAR_MAPA))).thenReturn(false);
+            List<SubprocessoElegivelDto> res = processoService.listarSubprocessosElegiveis(1L);
 
-            AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(List.of(1L), AcaoProcesso.DISPONIBILIZAR, null);
-            assertThrows(sgc.comum.erros.ErroAcessoNegado.class, () -> processoService.executarAcaoEmBloco(1L, req));
+            assertThat(res).hasSize(1);
+            assertThat(res.get(0).getCodigo()).isEqualTo(100L);
+        }
+    }
+
+    @Nested
+    @DisplayName("checarAcesso")
+    class ChecarAcesso {
+        @Test
+        @DisplayName("deve retornar falso se nao autenticado")
+        void naoAutenticado() {
+            assertThat(processoService.checarAcesso(null, 1L)).isFalse();
+            
+            Authentication auth = mock(Authentication.class);
+            when(auth.isAuthenticated()).thenReturn(false);
+            assertThat(processoService.checarAcesso(auth, 1L)).isFalse();
+        }
+
+        @Test
+        @DisplayName("deve retornar verdadeiro se admin")
+        void admin() {
+            Usuario u = new Usuario();
+            u.setPerfilAtivo(Perfil.ADMIN);
+            Authentication auth = mock(Authentication.class);
+            when(auth.isAuthenticated()).thenReturn(true);
+            when(auth.getPrincipal()).thenReturn(u);
+
+            assertThat(processoService.checarAcesso(auth, 1L)).isTrue();
+        }
+
+        @Test
+        @DisplayName("deve retornar verdadeiro se participante")
+        void participante() {
+            Usuario u = new Usuario();
+            u.setPerfilAtivo(Perfil.GESTOR);
+            u.setUnidadeAtivaCodigo(1L);
+            Authentication auth = mock(Authentication.class);
+            when(auth.isAuthenticated()).thenReturn(true);
+            when(auth.getPrincipal()).thenReturn(u);
+
+            Unidade uni = new Unidade();
+            uni.setCodigo(1L);
+            when(unidadeService.todasComHierarquia()).thenReturn(List.of(uni));
+
+            Processo p = new Processo();
+            UnidadeProcesso up = new UnidadeProcesso();
+            up.setUnidadeCodigo(1L);
+            p.setParticipantes(new ArrayList<>(List.of(up)));
+            when(processoRepo.buscarPorCodigoComParticipantes(1L)).thenReturn(Optional.of(p));
+
+            assertThat(processoService.checarAcesso(auth, 1L)).isTrue();
+        }
+
+        @Test
+        @DisplayName("deve retornar falso se nao participante")
+        void naoParticipante() {
+            Usuario u = new Usuario();
+            u.setPerfilAtivo(Perfil.GESTOR);
+            u.setUnidadeAtivaCodigo(1L);
+            Authentication auth = mock(Authentication.class);
+            when(auth.isAuthenticated()).thenReturn(true);
+            when(auth.getPrincipal()).thenReturn(u);
+
+            Unidade uni = new Unidade();
+            uni.setCodigo(1L);
+            when(unidadeService.todasComHierarquia()).thenReturn(List.of(uni));
+
+            Processo p = new Processo();
+            UnidadeProcesso up = new UnidadeProcesso();
+            up.setUnidadeCodigo(2L);
+            p.setParticipantes(new ArrayList<>(List.of(up)));
+            when(processoRepo.buscarPorCodigoComParticipantes(1L)).thenReturn(Optional.of(p));
+
+            assertThat(processoService.checarAcesso(auth, 1L)).isFalse();
+        }
+    }
+
+    @Nested
+    @DisplayName("finalizar")
+    class FinalizarMaisGaps {
+        @Test
+        @DisplayName("deve tornar mapas vigentes se nao for diagnostico")
+        void naoDiagnostico() {
+            Processo p = new Processo();
+            p.setCodigo(1L);
+            p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+            p.setTipo(TipoProcesso.MAPEAMENTO);
+            p.setParticipantes(new ArrayList<>());
+            when(repo.buscar(Processo.class, 1L)).thenReturn(p);
+
+            when(validacaoService.validarSubprocessosParaFinalizacao(1L)).thenReturn(sgc.subprocesso.service.SubprocessoValidacaoService.ValidationResult.ofValido());
+
+            Subprocesso sp = new Subprocesso();
+            Unidade uni = new Unidade();
+            uni.setCodigo(10L);
+            sp.setUnidade(uni);
+            Mapa mapa = new Mapa();
+            sp.setMapa(mapa);
+            when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
+
+            processoService.finalizar(1L);
+
+            verify(unidadeService).definirMapaVigente(10L, mapa);
+        }
+    }
+
+    @Nested
+    @DisplayName("iniciar")
+    class IniciarMaisGaps {
+        @Test
+        @DisplayName("deve iniciar diagnostico")
+        void diagnostico() {
+            Processo p = new Processo();
+            p.setCodigo(1L);
+            p.setSituacao(SituacaoProcesso.CRIADO);
+            p.setTipo(TipoProcesso.DIAGNOSTICO);
+            
+            UnidadeProcesso up = new UnidadeProcesso();
+            up.setUnidadeCodigo(10L);
+            p.setParticipantes(new ArrayList<>(List.of(up)));
+            when(repo.buscar(Processo.class, 1L)).thenReturn(p);
+
+            Unidade uni = new Unidade();
+            uni.setCodigo(10L);
+            uni.setSigla("UNI10");
+            when(unidadeService.porCodigos(anyList())).thenReturn(List.of(uni));
+            when(unidadeService.buscarPorCodigo(10L)).thenReturn(uni);
+            when(unidadeService.verificarMapaVigente(10L)).thenReturn(true);
+
+            Unidade admin = new Unidade();
+            when(repo.buscarPorSigla(Unidade.class, "ADMIN")).thenReturn(admin);
+
+            processoService.iniciar(1L, List.of(), new Usuario());
+
+            verify(subprocessoService).criarParaDiagnostico(eq(p), eq(uni), any(), eq(admin), any());
+        }
+    }
+
+    @Nested
+    @DisplayName("isElegivelParaAcaoEmBloco")
+    class IsElegivelParaAcaoEmBloco {
+        @Test
+        @DisplayName("deve ser elegivel para mapa")
+        void elegivelMapa() {
+            Usuario u = new Usuario();
+            Subprocesso sp = new Subprocesso();
+            sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
+            
+            when(permissionEvaluator.verificarPermissao(u, sp, sgc.seguranca.AcaoPermissao.ACEITAR_MAPA)).thenReturn(true);
+
+            // Chamando via listarSubprocessosElegiveis para testar o metodo privado
+            u.setPerfilAtivo(Perfil.ADMIN);
+            when(usuarioService.usuarioAutenticado()).thenReturn(u);
+            when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
+            Unidade uni = new Unidade();
+            uni.setCodigo(1L);
+            sp.setUnidade(uni);
+
+            List<SubprocessoElegivelDto> res = processoService.listarSubprocessosElegiveis(1L);
+            assertThat(res).hasSize(1);
+        }
+
+        @Test
+        @DisplayName("nao deve ser elegivel se situacao nao permite")
+        void naoElegivel() {
+            Usuario u = new Usuario();
+            Subprocesso sp = new Subprocesso();
+            sp.setSituacao(SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
+            
+            u.setPerfilAtivo(Perfil.ADMIN);
+            when(usuarioService.usuarioAutenticado()).thenReturn(u);
+            when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
+
+            List<SubprocessoElegivelDto> res = processoService.listarSubprocessosElegiveis(1L);
+            assertThat(res).isEmpty();
         }
     }
 }

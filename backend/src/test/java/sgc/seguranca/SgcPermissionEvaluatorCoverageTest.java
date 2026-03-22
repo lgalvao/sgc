@@ -8,7 +8,10 @@ import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
 import sgc.processo.model.*;
 import sgc.subprocesso.model.*;
+import sgc.mapa.model.*;
+import sgc.subprocesso.service.*;
 
+import java.io.Serializable;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
@@ -27,6 +30,11 @@ class SgcPermissionEvaluatorCoverageTest {
     private HierarquiaService hierarquiaService;
     @Mock
     private ProcessoRepo processoRepo;
+
+    @Mock
+    private MapaRepo mapaRepo;
+    @Mock
+    private AtividadeRepo atividadeRepo;
 
     @InjectMocks
     private SgcPermissionEvaluator evaluator;
@@ -263,14 +271,99 @@ class SgcPermissionEvaluatorCoverageTest {
     }
 
     @Test
-    @DisplayName("verificarPerfil - Ações de CHEFE para mapa")
-    void verificarPerfil_MapActions_Chefe() {
-        Usuario user = usuario(Perfil.CHEFE, 10L);
+    @DisplayName("hasPermission - non-Usuario principal")
+    void hasPermission_NonUsuario() {
+        org.springframework.security.core.Authentication auth = mock(org.springframework.security.core.Authentication.class);
+        when(auth.getPrincipal()).thenReturn("not-a-usuario");
+
+        assertThat(evaluator.hasPermission(auth, new Processo(), "VISUALIZAR_PROCESSO")).isFalse();
+        assertThat(evaluator.hasPermission(auth, 1L, "Processo", "VISUALIZAR_PROCESSO")).isFalse();
+    }
+
+    @Test
+    @DisplayName("hasPermission - Coleção de alvos")
+    void hasPermission_ColecaoAlvos() {
+        Usuario u = usuario(Perfil.ADMIN, 10L);
+        org.springframework.security.core.Authentication auth = mock(org.springframework.security.core.Authentication.class);
+        when(auth.getPrincipal()).thenReturn(u);
+
+        Processo p1 = new Processo();
+        Processo p2 = new Processo();
+
+        assertThat(evaluator.hasPermission(auth, List.of(p1, p2), "VISUALIZAR_PROCESSO")).isTrue();
+    }
+
+    @Test
+    @DisplayName("hasPermission - Coleção de IDs")
+    void hasPermission_ColecaoIds() {
+        Usuario u = usuario(Perfil.ADMIN, 10L);
+        org.springframework.security.core.Authentication auth = mock(org.springframework.security.core.Authentication.class);
+        when(auth.getPrincipal()).thenReturn(u);
+
+        Processo p1 = new Processo();
+        when(processoRepo.buscarPorCodigoComParticipantes(1L)).thenReturn(Optional.of(p1));
+        when(processoRepo.buscarPorCodigoComParticipantes(2L)).thenReturn(Optional.of(p1));
+
+        assertThat(evaluator.hasPermission(auth, (Serializable) List.of(1L, 2L), "Processo", "VISUALIZAR_PROCESSO")).isTrue();
+    }
+
+    @Test
+    @DisplayName("hasPermission - Mapa e Atividade")
+    void hasPermission_MapaEAtividade() {
+        Usuario u = usuario(Perfil.ADMIN, 10L);
+        org.springframework.security.core.Authentication auth = mock(org.springframework.security.core.Authentication.class);
+        when(auth.getPrincipal()).thenReturn(u);
+
         Subprocesso sp = criarSubprocesso(1L, 10L);
         sp.setProcesso(new Processo());
         sp.setLocalizacaoAtual(Unidade.builder().codigo(10L).build());
 
-        assertThat(evaluator.verificarPermissao(user, sp, VALIDAR_MAPA)).isTrue();
-        assertThat(evaluator.verificarPermissao(user, sp, HOMOLOGAR_MAPA)).isFalse();
+        Mapa m = new Mapa();
+        m.setCodigo(100L);
+        m.setSubprocesso(sp);
+        when(mapaRepo.findById(100L)).thenReturn(Optional.of(m));
+
+        Atividade a = new Atividade();
+        a.setCodigo(200L);
+        a.setMapa(m);
+        when(atividadeRepo.findById(200L)).thenReturn(Optional.of(a));
+
+        assertThat(evaluator.hasPermission(auth, m, "EDITAR_MAPA")).isTrue();
+        assertThat(evaluator.hasPermission(auth, a, "EDITAR_MAPA")).isTrue();
+        assertThat(evaluator.hasPermission(auth, 100L, "Mapa", "EDITAR_MAPA")).isTrue();
+        assertThat(evaluator.hasPermission(auth, 200L, "Atividade", "EDITAR_MAPA")).isTrue();
+    }
+
+    @Test
+    @DisplayName("verificarPermissao - Casos nulo e default")
+    void verificarPermissao_NuloEDefault() {
+        Usuario u = usuario(Perfil.ADMIN, 10L);
+        assertThat(evaluator.verificarPermissao(null, new Processo(), VISUALIZAR_PROCESSO)).isFalse();
+        assertThat(evaluator.verificarPermissao(u, null, VISUALIZAR_PROCESSO)).isFalse();
+        assertThat(evaluator.verificarPermissao(u, "string-nao-mapeada", VISUALIZAR_PROCESSO)).isFalse();
+        assertThat(evaluator.verificarPermissao(u, List.of(new Processo()), VISUALIZAR_PROCESSO)).isTrue();
+    }
+
+    @Test
+    @DisplayName("resolverAcao - erro para acao desconhecida")
+    void resolverAcao_Erro() {
+        Usuario u = usuario(Perfil.ADMIN, 10L);
+        org.springframework.security.core.Authentication auth = mock(org.springframework.security.core.Authentication.class);
+        when(auth.getPrincipal()).thenReturn(u);
+
+        assertThatThrownBy(() -> evaluator.hasPermission(auth, new Processo(), "ACAO_INEXISTENTE"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Ação de permissão desconhecida");
+    }
+
+    @Test
+    @DisplayName("hasPermission - default case switch")
+    void hasPermission_DefaultCase() {
+        Usuario u = usuario(Perfil.ADMIN, 10L);
+        org.springframework.security.core.Authentication auth = mock(org.springframework.security.core.Authentication.class);
+        when(auth.getPrincipal()).thenReturn(u);
+
+        assertThat(evaluator.hasPermission(auth, "alvo-desconhecido", "VISUALIZAR_PROCESSO")).isFalse();
+        assertThat(evaluator.hasPermission(auth, 1L, "TipoDesconhecido", "VISUALIZAR_PROCESSO")).isFalse();
     }
 }

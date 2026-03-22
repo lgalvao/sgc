@@ -11,15 +11,23 @@ const GRADLE_CMD = isWindows ? 'gradlew.bat :backend:jacocoTestReport' : './grad
 
 // Função principal
 async function main() {
-    console.log('=== Iniciando Análise de Cobertura ===');
-    console.log(`Executando comando: ${GRADLE_CMD}`);
-    console.log('Aguarde, isso pode levar alguns minutos...\n');
+    const args = process.argv.slice(2);
+    const skipRun = args.includes('--skip-run');
 
-    try {
-        execSync(GRADLE_CMD, {cwd: GRADLE_DIR, stdio: 'inherit'});
-    } catch (error) {
-        console.warn('\nA execução do Gradle falhou (possivelmente devido a testes falhando).', error.message);
-        console.warn('Tentando ler o relatório mesmo assim...\n');
+    console.log('=== Iniciando Análise de Cobertura ===');
+    
+    if (!skipRun) {
+        console.log(`Executando comando: ${GRADLE_CMD}`);
+        console.log('Aguarde, isso pode levar alguns minutos...\n');
+
+        try {
+            execSync(GRADLE_CMD, {cwd: GRADLE_DIR, stdio: 'inherit'});
+        } catch (error) {
+            console.warn('\nA execução do Gradle falhou (possivelmente devido a testes falhando).', error.message);
+            console.warn('Tentando ler o relatório mesmo assim...\n');
+        }
+    } else {
+        console.log('Pulando execução do Gradle (--skip-run)...');
     }
 
     if (!fs.existsSync(REPORT_PATH)) {
