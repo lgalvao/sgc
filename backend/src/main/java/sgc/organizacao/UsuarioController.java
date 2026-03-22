@@ -25,7 +25,7 @@ public class UsuarioController {
     private final UsuarioFacade usuarioFacade;
     private final UsuarioService usuarioService;
 
-    @JsonView(OrganizacaoViews.Publica.class)
+    @JsonView(OrganizacaoViews.Interna.class)
     @GetMapping("/{titulo}")
     public ResponseEntity<Usuario> buscarUsuarioPorTitulo(@PathVariable String titulo) {
         return usuarioService.buscarOpt(titulo)
@@ -33,14 +33,14 @@ public class UsuarioController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @JsonView(OrganizacaoViews.Publica.class)
+    @JsonView(OrganizacaoViews.Interna.class)
     @GetMapping("/pesquisar")
     @Operation(summary = "Pesquisa usuários por nome ou matrícula")
     public ResponseEntity<List<Usuario>> pesquisarUsuarios(@RequestParam String termo) {
         return ResponseEntity.ok(usuarioService.buscarPorNomeOuMatricula(termo));
     }
 
-    @JsonView(OrganizacaoViews.Publica.class)
+    @JsonView(OrganizacaoViews.Interna.class)
     @GetMapping("/administradores")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Lista todos os administradores")
@@ -48,7 +48,7 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarioFacade.listarAdministradores());
     }
 
-    @JsonView(OrganizacaoViews.Publica.class)
+    @JsonView(OrganizacaoViews.Interna.class)
     @PostMapping("/administradores")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Adiciona um administrador")

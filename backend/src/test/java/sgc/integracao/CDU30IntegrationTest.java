@@ -86,7 +86,7 @@ class CDU30IntegrationTest extends BaseIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.tituloEleitoral").doesNotExist())
+                .andExpect(jsonPath("$.tituloEleitoral").value(usuario2.getTituloEleitoral()))
                 .andExpect(jsonPath("$.nome").value(usuario2.getNome()));
 
         entityManager.flush();

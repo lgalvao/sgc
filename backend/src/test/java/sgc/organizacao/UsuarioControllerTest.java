@@ -53,7 +53,7 @@ class UsuarioControllerTest {
 
         mockMvc.perform(get("/api/usuarios/123"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.tituloEleitoral").doesNotExist())
+                .andExpect(jsonPath("$.tituloEleitoral").value("123"))
                 .andExpect(jsonPath("$.nome").value("Teste"));
     }
 
@@ -91,7 +91,7 @@ class UsuarioControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"usuarioTitulo\": \"123\"}"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.tituloEleitoral").doesNotExist());
+                .andExpect(jsonPath("$.tituloEleitoral").value("123"));
     }
 
     @Test
