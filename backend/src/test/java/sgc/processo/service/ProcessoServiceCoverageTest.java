@@ -77,7 +77,7 @@ class ProcessoServiceCoverageTest {
         uni.setCodigo(10L);
         when(unidadeService.porCodigos(anyList())).thenReturn(List.of(uni));
         
-        when(repo.buscar(eq(Processo.class), eq(codigo))).thenReturn(p);
+        when(repo.buscar(Processo.class, codigo)).thenReturn(p);
         
         SubprocessoValidacaoService.ValidationResult v = SubprocessoValidacaoService.ValidationResult.ofValido();
         when(validacaoService.validarSubprocessosParaFinalizacao(codigo)).thenReturn(v);
@@ -85,7 +85,7 @@ class ProcessoServiceCoverageTest {
         target.finalizar(codigo);
         
         verify(p).setSituacao(FINALIZADO);
-        verify(servicoAlertas).criarAlertaAdmin(eq(p), eq(uni), anyString());
+        verify(servicoAlertas).criarAlertaAdmin(p, uni, "Processo finalizado: Desc");
         verify(processoRepo).save(p);
     }
 

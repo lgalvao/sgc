@@ -196,7 +196,8 @@ class SubprocessoServiceExtraCoverageTest {
             when(usuarioFacade.usuarioAutenticado()).thenReturn(user);
             when(permissionEvaluator.verificarPermissao(user, sp, AcaoPermissao.EDITAR_CADASTRO)).thenReturn(false);
 
-            assertThrows(ErroAcessoNegado.class, () -> subprocessoService.importarAtividades(1L, 2L, List.of()));
+            List<Long> ativs = List.of();
+            assertThrows(ErroAcessoNegado.class, () -> subprocessoService.importarAtividades(1L, 2L, ativs));
         }
 
         @Test
@@ -212,7 +213,8 @@ class SubprocessoServiceExtraCoverageTest {
             when(permissionEvaluator.verificarPermissao(user, spDest, AcaoPermissao.EDITAR_CADASTRO)).thenReturn(true);
             when(permissionEvaluator.verificarPermissao(user, spOrig, AcaoPermissao.CONSULTAR_PARA_IMPORTACAO)).thenReturn(false);
 
-            assertThrows(ErroAcessoNegado.class, () -> subprocessoService.importarAtividades(1L, 2L, List.of()));
+            List<Long> ativs = List.of();
+            assertThrows(ErroAcessoNegado.class, () -> subprocessoService.importarAtividades(1L, 2L, ativs));
         }
 
         @Test
@@ -268,7 +270,7 @@ class SubprocessoServiceExtraCoverageTest {
 
     @Test
     @DisplayName("deve cobrir verificarAcessoCadastroHabilitado para perfil SERVIDOR na linha 692")
-    void deveCobrirLinha692() throws Exception {
+    void deveCobrirLinha692() {
         Usuario user = new Usuario(); user.setPerfilAtivo(Perfil.SERVIDOR); user.setUnidadeAtivaCodigo(10L);
         when(usuarioFacade.usuarioAutenticado()).thenReturn(user);
         Unidade uUser = new Unidade(); uUser.setCodigo(10L);

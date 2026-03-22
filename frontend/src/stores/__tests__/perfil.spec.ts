@@ -71,7 +71,12 @@ describe("usePerfilStore", () => {
         it("NÃO deve armazenar PII (usuarioCodigo, usuarioNome) no localStorage para evitar vazamento via XSS/Sessão", async () => {
             vi.clearAllMocks();
             context.store.definirUsuarioCodigo("999999");
-            context.store.definirPerfilUnidade(Perfil.ADMIN, 123, "TEST", "Nome Pessoal");
+            context.store.definirPerfilUnidade({
+                perfil: Perfil.ADMIN,
+                unidadeCodigo: 123,
+                unidadeSigla: "TEST",
+                nome: "Nome Pessoal",
+            });
             
             await nextTick();
             
@@ -86,13 +91,22 @@ describe("usePerfilStore", () => {
             const unidadeCodigo = 123;
             const unidadeSigla = "TEST_SIGLA";
 
-            context.store.definirPerfilUnidade(Perfil.ADMIN, unidadeCodigo, unidadeSigla);
+            context.store.definirPerfilUnidade({
+                perfil: Perfil.ADMIN,
+                unidadeCodigo,
+                unidadeSigla,
+            });
 
             expect(context.store.perfilSelecionado).toBe(Perfil.ADMIN);
             expect(context.store.unidadeSelecionada).toBe(unidadeCodigo);
             expect(context.store.unidadeSelecionadaSigla).toBe(unidadeSigla);
 
-            context.store.definirPerfilUnidade(Perfil.ADMIN, unidadeCodigo, unidadeSigla, "Nome teste");
+            context.store.definirPerfilUnidade({
+                perfil: Perfil.ADMIN,
+                unidadeCodigo,
+                unidadeSigla,
+                nome: "Nome teste",
+            });
             expect(context.store.usuarioNome).toBe("Nome teste");
         });
 

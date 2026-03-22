@@ -38,14 +38,19 @@ export const usePerfilStore = defineStore("perfil", () => {
         // localStorage.setItem removido - sincronização automática
     }
 
-    function definirPerfilUnidade(perfil: Perfil, unidadeCodigo: number, unidadeSigla: string, nome?: string) {
-        perfilSelecionado.value = perfil;
-        unidadeSelecionada.value = unidadeCodigo;
-        unidadeSelecionadaSigla.value = unidadeSigla;
-        // localStorage.setItem removido - sincronização automática
-        if (nome) {
-            usuarioNome.value = nome;
-            // localStorage.setItem removido - sincronização automática
+    interface DadosSelecaoPerfil {
+        perfil: Perfil;
+        unidadeCodigo: number;
+        unidadeSigla: string;
+        nome?: string;
+    }
+
+    function definirPerfilUnidade(dados: DadosSelecaoPerfil) {
+        perfilSelecionado.value = dados.perfil;
+        unidadeSelecionada.value = dados.unidadeCodigo;
+        unidadeSelecionadaSigla.value = dados.unidadeSigla;
+        if (dados.nome) {
+            usuarioNome.value = dados.nome;
         }
     }
 
@@ -78,12 +83,12 @@ export const usePerfilStore = defineStore("perfil", () => {
                         perfil: perfilUnidadeSelecionado.perfil,
                         unidadeCodigo: perfilUnidadeSelecionado.unidade.codigo,
                     });
-                    definirPerfilUnidade(
-                        loginResponse.perfil as unknown as Perfil,
-                        loginResponse.unidadeCodigo,
-                        perfilUnidadeSelecionado.unidade.sigla,
-                        loginResponse.nome,
-                    );
+                    definirPerfilUnidade({
+                        perfil: loginResponse.perfil as unknown as Perfil,
+                        unidadeCodigo: loginResponse.unidadeCodigo,
+                        unidadeSigla: perfilUnidadeSelecionado.unidade.sigla,
+                        nome: loginResponse.nome,
+                    });
                     definirUsuarioCodigo(loginResponse.tituloEleitoral);
                 }
                 return true;
@@ -106,12 +111,12 @@ export const usePerfilStore = defineStore("perfil", () => {
                 perfil: perfilUnidade.perfil,
                 unidadeCodigo: perfilUnidade.unidade.codigo,
             });
-            definirPerfilUnidade(
-                loginResponse.perfil as unknown as Perfil,
-                loginResponse.unidadeCodigo,
-                perfilUnidade.unidade.sigla,
-                loginResponse.nome,
-            );
+            definirPerfilUnidade({
+                perfil: loginResponse.perfil as unknown as Perfil,
+                unidadeCodigo: loginResponse.unidadeCodigo,
+                unidadeSigla: perfilUnidade.unidade.sigla,
+                nome: loginResponse.nome,
+            });
             definirUsuarioCodigo(loginResponse.tituloEleitoral);
         });
     }

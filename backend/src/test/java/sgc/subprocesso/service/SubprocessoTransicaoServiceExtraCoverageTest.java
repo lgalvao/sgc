@@ -174,9 +174,9 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         // Usando Reflection para invocar metodo privado
         org.springframework.test.util.ReflectionTestUtils.invokeMethod(service, "enviarAlertasReabertura", sp, "justificativa", false);
 
-        verify(alertaService, times(1)).criarAlertaReaberturaCadastro(eq(p), eq(u), anyString());
-        verify(alertaService, times(1)).criarAlertaReaberturaCadastroSuperior(eq(p), eq(sup1), eq(u));
-        verify(alertaService, times(1)).criarAlertaReaberturaCadastroSuperior(eq(p), eq(sup2), eq(u));
+        verify(alertaService, times(1)).criarAlertaReaberturaCadastro(p, u, "justificativa");
+        verify(alertaService, times(1)).criarAlertaReaberturaCadastroSuperior(p, sup1, u);
+        verify(alertaService, times(1)).criarAlertaReaberturaCadastroSuperior(p, sup2, u);
     }
 
     @Test
@@ -193,7 +193,7 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
 
         org.springframework.test.util.ReflectionTestUtils.invokeMethod(service, "enviarAlertasReabertura", sp, "justificativa", true);
 
-        verify(alertaService).criarAlertaReaberturaRevisao(eq(p), eq(u), anyString());
-        verify(alertaService).criarAlertaReaberturaRevisaoSuperior(eq(p), eq(sup), eq(u));
+        verify(alertaService).criarAlertaReaberturaRevisao(p, u, "justificativa");
+        verify(alertaService).criarAlertaReaberturaRevisaoSuperior(p, sup, u);
     }
 }

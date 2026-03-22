@@ -389,17 +389,16 @@ async function confirmarDevolucao() {
 onMounted(async () => {
   await processos.buscarProcessoDetalhe(codProcesso.value);
   
-  // Tenta obter o ID do subprocesso de forma robusta
-  let id: number | null | undefined = codSubprocesso.value;
-  if (!id && subprocesso.value) {
-    id = await subprocessosStore.buscarSubprocessoPorProcessoEUnidade(
+  let codigoSubprocesso: number | null | undefined = codSubprocesso.value;
+  if (!codigoSubprocesso && subprocesso.value) {
+    codigoSubprocesso = await subprocessosStore.buscarSubprocessoPorProcessoEUnidade(
         codProcesso.value,
         subprocesso.value.sigla,
     );
   }
 
-  if (id) {
-    const data = await subprocessosStore.buscarContextoEdicao(id);
+  if (codigoSubprocesso) {
+    const data = await subprocessosStore.buscarContextoEdicao(codigoSubprocesso);
     if (data) {
       if (data.atividadesDisponiveis) {
         atividades.value = data.atividadesDisponiveis;
