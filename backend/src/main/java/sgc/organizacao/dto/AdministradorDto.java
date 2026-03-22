@@ -10,7 +10,7 @@ import sgc.organizacao.model.*;
  */
 @Builder
 public record AdministradorDto(
-        @JsonView(OrganizacaoViews.Interna.class)
+        @JsonView(OrganizacaoViews.Publica.class)
         @TituloEleitoral
         String tituloEleitoral,
 

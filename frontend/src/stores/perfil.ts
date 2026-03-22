@@ -5,14 +5,15 @@ import type {Perfil} from "@/types/tipos";
 import * as usuarioService from "../services/usuarioService";
 import {useErrorHandler} from "@/composables/useErrorHandler";
 import {useLocalStorage} from "@/composables/useLocalStorage";
+import {useSessionStorage} from "@/composables/useSessionStorage";
 
 export const usePerfilStore = defineStore("perfil", () => {
-    // Estados sincronizados com localStorage usando composable
-    const usuarioCodigo = useLocalStorage<string | null>("usuarioCodigo", null);
+    // Estados sincronizados com localStorage/sessionStorage usando composable
+    const usuarioCodigo = useSessionStorage<string | null>("usuarioCodigo", null);
     const perfilSelecionado = useLocalStorage<Perfil | null>("perfilSelecionado", null);
     const unidadeSelecionada = useLocalStorage<number | null>("unidadeSelecionada", null);
     const unidadeSelecionadaSigla = useLocalStorage<string | null>("unidadeSelecionadaSigla", null);
-    const usuarioNome = useLocalStorage<string | null>("usuarioNome", null);
+    const usuarioNome = useSessionStorage<string | null>("usuarioNome", null);
     const perfis = useLocalStorage<Perfil[]>("perfis", []);
 
     // Estados não persistidos

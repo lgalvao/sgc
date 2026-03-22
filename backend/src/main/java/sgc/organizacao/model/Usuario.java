@@ -33,7 +33,7 @@ public class Usuario implements UserDetails {
     private Long unidadeAtivaCodigo;
 
     @Id
-    @JsonView(OrganizacaoViews.Interna.class)
+    @JsonView(OrganizacaoViews.Publica.class)
     @Column(name = "titulo", length = 12, nullable = false)
     private String tituloEleitoral;
 

@@ -1,5 +1,6 @@
 import {createPinia, setActivePinia} from "pinia";
 import {beforeEach, describe, expect, it, vi} from "vitest";
+import {nextTick} from "vue";
 import * as usuarioService from "@/services/usuarioService";
 import {setupStoreTest} from "@/test-utils/storeTestHelpers";
 import {Perfil} from "@/types/tipos";
@@ -7,7 +8,7 @@ import {usePerfilStore} from "../perfil";
 
 vi.mock("@/services/usuarioService");
 
-const mockLocalStorage = (() => {
+const createMockStorage = () => {
     let store: { [key: string]: string } = {};
     return {
         getItem: vi.fn((key: string) => store[key] || null),
@@ -21,14 +22,19 @@ const mockLocalStorage = (() => {
             store = {};
         }),
     };
-})();
+};
+
+const mockLocalStorage = createMockStorage();
+const mockSessionStorage = createMockStorage();
 
 Object.defineProperty(globalThis, "localStorage", {value: mockLocalStorage});
+Object.defineProperty(globalThis, "sessionStorage", {value: mockSessionStorage});
 
 describe("usePerfilStore", () => {
     beforeEach(() => {
         mockLocalStorage.clear();
-        mockLocalStorage.setItem("usuarioCodigo", JSON.stringify("9")); // Set default for initial state
+        mockSessionStorage.clear();
+        mockSessionStorage.setItem("usuarioCodigo", JSON.stringify("9")); // Set default for initial state
     });
 
     const context = setupStoreTest(usePerfilStore);
@@ -39,8 +45,8 @@ describe("usePerfilStore", () => {
         expect(context.store.unidadeSelecionada).toBeNull();
     });
 
-    it("deve inicializar com valores do localStorage se disponíveis", () => {
-        mockLocalStorage.setItem("usuarioCodigo", JSON.stringify("10"));
+    it("deve inicializar com valores do localStorage/sessionStorage se disponíveis", () => {
+        mockSessionStorage.setItem("usuarioCodigo", JSON.stringify("10"));
         mockLocalStorage.setItem("perfilSelecionado", JSON.stringify("USER"));
         mockLocalStorage.setItem("unidadeSelecionada", JSON.stringify(123));
         mockLocalStorage.setItem("unidadeSelecionadaSigla", JSON.stringify("U10"));
@@ -57,9 +63,23 @@ describe("usePerfilStore", () => {
     describe("actions", () => {
         const mockUsuarioService = vi.mocked(usuarioService);
 
-        it("definirUsuarioCodigo deve atualizar usuarioCodigo e armazená-lo no localStorage", () => {
+        it("definirUsuarioCodigo deve atualizar usuarioCodigo", () => {
             context.store.definirUsuarioCodigo("15");
             expect(context.store.usuarioCodigo).toBe("15");
+        });
+
+        it("NÃO deve armazenar PII (usuarioCodigo, usuarioNome) no localStorage para evitar vazamento via XSS/Sessão", async () => {
+            vi.clearAllMocks();
+            context.store.definirUsuarioCodigo("999999");
+            context.store.definirPerfilUnidade(Perfil.ADMIN, 123, "TEST", "Nome Pessoal");
+            
+            await nextTick();
+            
+            expect(mockLocalStorage.setItem).not.toHaveBeenCalledWith("usuarioNome", expect.anything());
+            
+            // Mas deve estar no sessionStorage
+            expect(mockSessionStorage.setItem).toHaveBeenCalledWith("usuarioCodigo", JSON.stringify("999999"));
+            expect(mockSessionStorage.setItem).toHaveBeenCalledWith("usuarioNome", JSON.stringify("Nome Pessoal"));
         });
 
         it("definirPerfilUnidade deve atualizar perfilSelecionado e unidadeSelecionada e armazená-los no localStorage", () => {
