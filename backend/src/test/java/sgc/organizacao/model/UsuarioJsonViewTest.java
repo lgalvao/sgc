@@ -31,7 +31,7 @@ class UsuarioJsonViewTest {
                 .writerWithView(OrganizacaoViews.Publica.class)
                 .writeValueAsString(usuario);
 
-        assertThat(json).contains("\"tituloEleitoral\":\"123456789012\"");
+        assertThat(json).doesNotContain("\"tituloEleitoral\":\"123456789012\"");
         assertThat(json).contains("\"nome\":\"Usuario teste\"");
         assertThat(json).contains("\"email\":\"teste@teste.com\"");
         assertThat(json).doesNotContain("\"matricula\":\"88888888\"");

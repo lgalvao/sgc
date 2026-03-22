@@ -43,21 +43,12 @@ class LoginFacadeTest {
                 unidadeService,
                 usuarioServiceInterno
         );
-        ReflectionTestUtils.setField(loginFacade, "ambienteTestes", false);
-    }
-
-    @Test
-    @DisplayName("autenticar deve retornar true em ambiente de testes")
-    void autenticar_AmbienteTestes() {
-        ReflectionTestUtils.setField(loginFacade, "ambienteTestes", true);
-        assertThat(loginFacade.autenticar("123", "senha")).isTrue();
     }
 
     @Test
     @DisplayName("autenticar deve retornar false se clienteAcessoAd for null")
     void autenticar_ClienteAdNull() {
         LoginFacade facadeSemAd = new LoginFacade(usuarioFacade, gerenciadorJwt, null, unidadeService, usuarioServiceInterno);
-        ReflectionTestUtils.setField(facadeSemAd, "ambienteTestes", false);
         assertThat(facadeSemAd.autenticar("123", "senha")).isFalse();
     }
 

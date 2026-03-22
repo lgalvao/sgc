@@ -8,4 +8,7 @@ public final class OrganizacaoViews {
 
     public interface Publica extends ComumViews.Publica {
     }
+
+    public interface Interna extends Publica {
+    }
 }

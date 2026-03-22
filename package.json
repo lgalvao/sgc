@@ -10,7 +10,8 @@
     "typecheck": "npm run typecheck --prefix frontend && npm run typecheck:e2e",
     "typecheck:e2e": "tsc --noEmit -p e2e/tsconfig.json",
     "lint:ox": "oxlint .",
-    "lint": "npm run lint:ox && eslint . --fix"
+    "lint": "npm run lint:ox && eslint . --fix",
+    "sast": "semgrep scan --config p/java --config p/typescript --config p/javascript --config p/owasp-top-ten --config p/security-audit --config p/secrets --metrics=off"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.11.1",
