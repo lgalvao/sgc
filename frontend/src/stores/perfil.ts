@@ -60,8 +60,7 @@ export const usePerfilStore = defineStore("perfil", () => {
                 senha,
             });
             if (autenticado) {
-                const responsePerfisUnidades =
-                    await usuarioService.autorizar(tituloEleitoral);
+                const responsePerfisUnidades = await usuarioService.autorizar();
                 perfisUnidades.value = responsePerfisUnidades;
 
                 const listaPerfis = [

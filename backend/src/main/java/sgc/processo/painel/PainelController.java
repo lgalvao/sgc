@@ -23,7 +23,6 @@ public class PainelController {
 
     /**
      * Lista os processos a serem exibidos no painel do usuário.
-     * A unidade e o perfil são obtidos exclusivamente do Token JWT para garantir a segurança (Anti-IDOR).
      */
     @GetMapping("/processos")
     @Operation(summary = "Lista processos para o painel com base no contexto do Token JWT")

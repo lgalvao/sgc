@@ -42,8 +42,6 @@
     "vitest.setup.ts",
     "vite.config.ts",
     "vitest.config.ts",
-    "vitest.browser.config.ts",
-    "vitest.pact.config.ts",
     ".storybook/*.ts"
   ],
   "exclude": [

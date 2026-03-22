@@ -204,7 +204,7 @@ public class E2eController {
     }
 
     /**
-     * Cria um processo de mapeamento via API para testes E2E. Mais rápido que criar via UI.
+     * Cria um processo de mapeamento via API para testes E2E.
      */
     @PostMapping("/fixtures/processo-mapeamento")
     @Transactional
@@ -214,7 +214,7 @@ public class E2eController {
     }
 
     /**
-     * Cria um processo de revisão via API para testes E2E. Mais rápido que criar via UI.
+     * Cria um processo de revisão via API para testes E2E.
      */
     @PostMapping("/fixtures/processo-revisao")
     @Transactional
@@ -225,7 +225,6 @@ public class E2eController {
 
     /**
      * Cria um processo já finalizado e insere atividades/mapa forçadamente via SQL
-     * para pular o workflow e testar a importação de forma ultra-rápida.
      */
     @PostMapping("/fixtures/processo-finalizado-com-atividades")
     @Transactional
@@ -266,8 +265,7 @@ public class E2eController {
     }
 
     /**
-     * Cria um processo de mapeamento já iniciado, com cadastro preenchido e disponibilizado,
-     * para acelerar cenários E2E que começam na análise do cadastro.
+     * Cria um processo de mapeamento já iniciado, com cadastro preenchido e disponibilizado
      */
     @PostMapping("/fixtures/processo-mapeamento-com-cadastro-disponibilizado")
     @Transactional
@@ -278,7 +276,6 @@ public class E2eController {
 
     /**
      * Cria um processo de mapeamento já iniciado, com mapa preenchido e disponibilizado,
-     * para acelerar cenários E2E que começam na validação do mapa.
      */
     @PostMapping("/fixtures/processo-mapeamento-com-mapa-disponibilizado")
     @Transactional
@@ -289,7 +286,6 @@ public class E2eController {
 
     /**
      * Cria um processo de mapeamento já iniciado, com mapa preenchido e com sugestões registradas,
-     * para acelerar cenários E2E que começam na visualização de sugestões pelo GESTOR/ADMIN (CDU-20).
      */
     @PostMapping("/fixtures/processo-mapeamento-com-mapa-com-sugestoes")
     @Transactional
@@ -309,7 +305,6 @@ public class E2eController {
 
     /**
      * Cria um processo de mapeamento já iniciado, com mapa preenchido e validado,
-     * para acelerar cenários E2E que começam no aceite final do mapa.
      */
     @PostMapping("/fixtures/processo-mapeamento-com-mapa-validado")
     @Transactional
@@ -320,7 +315,6 @@ public class E2eController {
 
     /**
      * Cria um processo de mapeamento já iniciado, com mapa preenchido e homologado,
-     * para acelerar cenários E2E que começam na finalização do processo.
      */
     @PostMapping("/fixtures/processo-mapeamento-com-mapa-homologado")
     @Transactional
@@ -341,8 +335,7 @@ public class E2eController {
     }
 
     /**
-     * Cria um processo de revisão já iniciado, com mapa preenchido e homologado,
-     * para acelerar cenários E2E que começam após o encerramento da revisão.
+     * Cria um processo de revisão já iniciado, com mapa preenchido e homologado
      */
     @PostMapping("/fixtures/processo-revisao-com-mapa-homologado")
     @Transactional
@@ -364,7 +357,6 @@ public class E2eController {
 
     /**
      * Cria um processo de revisão já iniciado, com cadastro disponibilizado pelo CHEFE,
-     * para acelerar cenários E2E que começam na análise em bloco do cadastro (CDU-22 para revisão).
      */
     @PostMapping("/fixtures/processo-revisao-com-cadastro-disponibilizado")
     @Transactional
@@ -382,8 +374,7 @@ public class E2eController {
         Unidade unidade = unidadeService.buscarPorSigla(request.unidadeSigla());
 
         ProcessoFixtureRequest requestMapeamento = new ProcessoFixtureRequest(
-                "Mapa base fixture " + System.currentTimeMillis(), request.unidadeSigla(), true, diasLimite);
-        Processo processoMapeamento = criarProcessoFixture(requestMapeamento, TipoProcesso.MAPEAMENTO);
+                "Mapa base fixture " + System.currentTimeMillis(), request.unidadeSigla(), true, diasLimite);        Processo processoMapeamento = criarProcessoFixture(requestMapeamento, TipoProcesso.MAPEAMENTO);
         Long codSubprocessoMapeamento = subprocessoRepo
                 .findByProcessoCodigoAndUnidadeCodigo(processoMapeamento.getCodigo(), unidade.getCodigo())
                 .map(Subprocesso::getCodigo)

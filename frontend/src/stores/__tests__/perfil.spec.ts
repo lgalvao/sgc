@@ -100,7 +100,7 @@ describe("usePerfilStore", () => {
                 tituloEleitoral: "123",
                 senha: "pass",
             });
-            expect(mockUsuarioService.autorizar).toHaveBeenCalledWith("123");
+            expect(mockUsuarioService.autorizar).toHaveBeenCalledWith();
             expect(mockUsuarioService.entrar).toHaveBeenCalled();
             expect(context.store.perfilSelecionado).toBe(Perfil.CHEFE);
             expect(context.store.unidadeSelecionada).toBe(1);

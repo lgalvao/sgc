@@ -30,10 +30,25 @@ public class FiltroJwt extends OncePerRequestFilter {
             FilterChain filterChain)
             throws ServletException, IOException {
 
-        String authHeader = request.getHeader("Authorization");
+        String jwtToken = null;
 
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            String jwtToken = authHeader.substring(7);
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if ("jwtToken".equals(cookie.getName())) {
+                    jwtToken = cookie.getValue();
+                    break;
+                }
+            }
+        }
+
+        if (jwtToken == null) {
+            String authHeader = request.getHeader("Authorization");
+            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                jwtToken = authHeader.substring(7);
+            }
+        }
+
+        if (jwtToken != null) {
 
             gerenciadorJwt.validarToken(jwtToken).ifPresent(claims -> {
                 Usuario usuario = usuarioService.carregarUsuarioParaAutenticacao(claims.tituloEleitoral());

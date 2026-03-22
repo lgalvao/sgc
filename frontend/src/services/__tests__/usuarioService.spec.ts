@@ -25,7 +25,7 @@ describe('usuarioService', () => {
     it('autorizar', async () => {
       const mockResponse = [{ perfil: 'ADMIN', unidade: { codigo: 1, sigla: 'TEST', nome: 'Teste' }, siglaUnidade: 'TEST' }];
       (apiClient.post as any).mockResolvedValueOnce({ data: mockResponse });
-      const result = await usuarioService.autorizar('123');
+      const result = await usuarioService.autorizar();
       expect(apiClient.post).toHaveBeenCalledWith('/usuarios/autorizar', {});
       expect(result).toHaveLength(1);
       expect(result[0].perfil).toBe('ADMIN');

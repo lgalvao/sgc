@@ -64,8 +64,7 @@ public class LoginController {
     }
 
     /**
-     * Autoriza um usuário, retornando a lista de perfis e unidades a que ele tem
-     * acesso.
+     * Autoriza um usuário, retornando a lista de perfis e unidades a que tem acesso.
      */
     @PostMapping("/autorizar")
     @Operation(summary = "Retorna os perfis e unidades disponíveis para o usuário")
@@ -86,7 +85,8 @@ public class LoginController {
     @Operation(summary = "Finaliza o login e retorna o token JWT")
     public ResponseEntity<EntrarResponse> entrar(
             @Valid @RequestBody EntrarRequest request,
-            HttpServletRequest httpRequest) {
+            HttpServletRequest httpRequest,
+            HttpServletResponse httpResponse) {
 
         String tituloEleitoral = extrairTituloPreAuth(httpRequest);
         String token = loginFacade.entrar(request, tituloEleitoral);
@@ -99,6 +99,13 @@ public class LoginController {
                 .unidadeCodigo(request.unidadeCodigo())
                 .token(token)
                 .build();
+
+        Cookie cookie = new Cookie("jwtToken", token);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(!ambienteTestes);
+        cookie.setPath("/");
+        cookie.setMaxAge(86400);
+        httpResponse.addCookie(cookie);
 
         return ResponseEntity.ok(response);
     }

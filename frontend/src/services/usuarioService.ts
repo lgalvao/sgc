@@ -124,9 +124,7 @@ export async function autenticar(
     return response.data;
 }
 
-export async function autorizar(
-    tituloEleitoral: string,
-): Promise<PerfilUnidade[]> {
+export async function autorizar(): Promise<PerfilUnidade[]> {
     const response = await apiClient.post<any[]>(
         "/usuarios/autorizar",
         {},

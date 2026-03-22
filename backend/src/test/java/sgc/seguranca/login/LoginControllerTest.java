@@ -322,8 +322,9 @@ class LoginControllerTest {
             // No cookies
             when(httpReq.getCookies()).thenReturn(null);
 
+            HttpServletResponse httpRes = mock(HttpServletResponse.class);
             Assertions.assertThrows(ErroAutenticacao.class,
-                    () -> controller.entrar(req, httpReq));
+                    () -> controller.entrar(req, httpReq, httpRes));
         }
 
 
@@ -338,8 +339,9 @@ class LoginControllerTest {
             when(httpReq.getCookies()).thenReturn(new Cookie[]{cookie});
             when(gerenciadorJwtMock.validarTokenPreAuth("token")).thenReturn(Optional.empty());
 
+            HttpServletResponse httpRes = mock(HttpServletResponse.class);
             Assertions.assertThrows(ErroAutenticacao.class,
-                    () -> controller.entrar(req, httpReq));
+                    () -> controller.entrar(req, httpReq, httpRes));
         }
     }
 }
