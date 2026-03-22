@@ -95,8 +95,8 @@ describe('SubprocessoView.vue', () => {
         SubprocessoModal: SubprocessoModalStub,
         ModalConfirmacao: {
             name: 'ModalConfirmacao',
-            template: '<div><slot /><button data-testid="btn-confirmar-reabrir" @click="$emit(\'confirmar\')">OK</button> <button data-testid="btn-confirmar-enviar-lembrete" @click="$emit(\'confirmar\')">OK</button></div>',
-            props: ['modelValue', 'titulo'],
+            template: '<div><slot /><button :data-testid="testIdConfirmar" :disabled="okDisabled" @click="$emit(\'confirmar\')">OK</button></div>',
+            props: ['modelValue', 'titulo', 'testIdConfirmar', 'okDisabled'],
             emits: ['update:modelValue', 'confirmar']
         },
         AppAlert: {
@@ -118,7 +118,8 @@ describe('SubprocessoView.vue', () => {
             name: 'BAlert',
             template: '<div><slot /><button @click="$emit(\'dismissed\')">x</button></div>', 
             props: ['variant', 'dismissible', 'modelValue']
-        }
+        },
+        BSpinner: {template: '<div></div>'},
     };
 
     beforeEach(() => {
@@ -383,39 +384,39 @@ describe('SubprocessoView.vue', () => {
         expect(processoService.enviarLembrete).toHaveBeenCalled();
     });
 
-    it('cobre lacunas remanescentes de cobertura', async () => {
+    it('deve gerenciar notificações de erro, alertas de sistema e estados de modais de confirmação', async () => {
         const {wrapper} = mountComponent();
         await flushPromises();
         const vm = wrapper.vm as any;
 
-        // notificacao cover (8)
+        // Gerenciamento de notificações
         vm.notify("Msg", "info");
         await vm.$nextTick();
         const appAlert = wrapper.findComponent({name: 'AppAlert'});
         if (appAlert.exists()) await appAlert.vm.$emit('dismissed');
 
-        // lastError cover (154)
+        // Gerenciamento de erros de subprocesso
+        subprocessosMock.subprocessoDetalhe = null;
         subprocessosMock.lastError = { message: "Erro" };
         await vm.$nextTick();
         const bAlert = wrapper.findComponent({name: 'BAlert'});
         if (bAlert.exists()) await bAlert.vm.$emit('dismissed');
         expect(subprocessosMock.clearError).toHaveBeenCalled();
 
-        // v-model cover (179, 201)
+        // Atualização de estados de v-model nos modais
         const modalsComp = wrapper.findAllComponents({name: 'ModalConfirmacao'});
         for (const modal of modalsComp) {
             await modal.vm.$emit('update:modelValue', true);
         }
         expect(vm.modalLembreteAberto).toBe(true);
 
-        // formatDataSimples branch (243)
-        expect(vm.confirmarAlteracaoDataLimite(null)).toBeUndefined();
+        // Validação de entrada nula para alteração de data limite
+        expect(await vm.confirmarAlteracaoDataLimite(null)).toBeUndefined();
         
-        // exibirToastPendente coverage (317-325)
+        // Exibição de toast pendente ao montar componente
         const {useToastStore} = await import("@/stores/toast");
         const toastStore = useToastStore();
         toastStore.setPending("Msg");
-        // Re-mount to trigger EXHIBIR_TOAST_PENDENTE in onMounted
         mountComponent();
     });
 });

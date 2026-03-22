@@ -612,9 +612,9 @@ describe("Processo.vue", () => {
         expect(mocks.push).toHaveBeenCalledWith("/painel");
     });
 
-    it("cobre lacunas remanescentes de cobertura", async () => {
+    it("deve lidar com atualizações de estado do modal, descarte de notificações, erros de navegação e exibição de carregamento", async () => {
         aplicarContextoProcesso();
-        const vm = wrapper.vm as any;
+        const vm = wrapper.vm;
 
         // v-model cover (95)
         const modalConf = wrapper.findComponent(ModalConfirmacaoStub);
@@ -624,7 +624,7 @@ describe("Processo.vue", () => {
         // notificacao cover (9-16)
         vm.notificacao = { message: "Msg", variant: "info" };
         await nextTick();
-        const appAlert = wrapper.find('[data-testid="app-alert"]');
+        wrapper.find('[data-testid="app-alert"]');
         // If app-alert is covered via BAlert stub or real AppAlert
         const bAlerts = wrapper.findAllComponents(BAlertStub);
         if (bAlerts.length > 0) await bAlerts[0].vm.$emit('dismissed');

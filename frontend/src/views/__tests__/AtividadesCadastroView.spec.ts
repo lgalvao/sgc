@@ -104,7 +104,7 @@ const stubs = {
         template: '<div data-testid="cad-atividade-form"></div>', 
         props: ['modelValue'],
         expose: ['inputRef'],
-        setup(props: any, {emit}: any) {
+        setup(_: any, {emit: __}: any) {
             return {
                 inputRef: {
                     $el: {
@@ -385,38 +385,38 @@ describe("CadastroView.vue", () => {
         ]);
     });
 
-    it("cobre lacunas remanescentes de cobertura", async () => {
+    it("deve gerenciar interações com formulários de atividades, modais de importação e alertas de erro", async () => {
         const wrapper = createWrapper();
         await flushPromises();
         const vm = wrapper.vm as any;
         vm.atividades = [{codigo: 1, descricao: "A1", conhecimentos: [{codigo: 1}]}];
         await vm.$nextTick();
 
-        // Linha 39
+        // Abertura do modal de importação
         const btnImportar = wrapper.find('[data-testid="btn-cad-atividades-importar"]');
         await btnImportar.trigger('click');
         expect(vm.mostrarModalImportar).toBe(true);
 
-        // Linha 63
+        // Descarte de alerta de erro global
         vm.erroGlobal = "Erro";
         await vm.$nextTick();
         const btnDismissAlert = wrapper.find('[data-testid="btn-dismiss-alert"]');
         await btnDismissAlert.trigger('click');
         expect(vm.erroGlobal).toBeNull();
 
-        // Linha 73
-        (vm as any).notify("Msg", "info");
+        // Descarte de notificação do sistema
+        vm.notify("Msg", "info");
         await vm.$nextTick();
         const btnDismissAppAlert = wrapper.find('[data-testid="btn-dismiss-app-alert"]');
         await btnDismissAppAlert.trigger('click');
-        expect((vm as any).notificacao).toBeNull();
+        expect(vm.notificacao).toBeNull();
 
-        // Linha 78 (v-model)
+        // Atualização de v-model no formulário de atividade
         const form = wrapper.findComponent({name: 'CadAtividadeForm'});
         await form.vm.$emit('update:modelValue', 'Nova');
         expect(vm.novaAtividade).toBe('Nova');
 
-        // Linhas 103-107 (Template events)
+        // Eventos disparados pelo item de atividade
         const item = wrapper.findComponent({name: 'AtividadeItem'});
         await item.vm.$emit('atualizar-atividade', 'desc');
         await item.vm.$emit('remover-atividade');
@@ -424,7 +424,7 @@ describe("CadastroView.vue", () => {
         await item.vm.$emit('atualizar-conhecimento', 1, 'con desc');
         await item.vm.$emit('remover-conhecimento', 1);
 
-        // Linha 140 (v-model)
+        // Atualização de v-model no modal de confirmação
         vm.mostrarModalConfirmacaoRemocao = false;
         const modalConfirmacao = wrapper.findAllComponents({name: 'ModalConfirmacao'}).find(c => c.props('modelValue') !== undefined);
         if (modalConfirmacao) {
@@ -443,7 +443,7 @@ describe("CadastroView.vue", () => {
         if (histModal.exists()) await histModal.vm.$emit('fechar');
 
         // Branches de timeout e outros
-        // @ts-ignore
+
         vm.timeoutLimparErros = setTimeout(() => {}, 100);
         vm.timeoutLimpezaErros();
         

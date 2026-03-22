@@ -10,18 +10,14 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.test.util.ReflectionTestUtils;
 import sgc.comum.erros.*;
 import sgc.mapa.model.*;
-import sgc.mapa.service.*;
 import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
 import sgc.processo.model.*;
 import sgc.processo.service.*;
 import sgc.subprocesso.model.*;
-import sgc.subprocesso.service.*;
-
 import java.sql.*;
 import java.util.*;
 
@@ -47,9 +43,8 @@ class E2eControllerCoverageTest {
 
     @BeforeEach
     void setUp() {
-        ReflectionTestUtils.setField(controller, "subprocessoRepo", subprocessoRepo);
-        ReflectionTestUtils.setField(controller, "mapaRepo", mapaRepo);
-        ReflectionTestUtils.setField(controller, "processoRepo", processoRepo);
+        SecurityContextHolder.clearContext();
+        controller = new E2eController(jdbcTemplate, namedJdbcTemplate, processoService, processoRepo, subprocessoRepo, mapaRepo, unidadeService, usuarioFacade, resourceLoader);
     }
 
     @Test
@@ -138,6 +133,7 @@ class E2eControllerCoverageTest {
         Subprocesso sub = new Subprocesso();
         sub.setCodigo(200L);
         when(subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(100L, 10L)).thenReturn(Optional.of(sub));
+        when(subprocessoRepo.findById(200L)).thenReturn(Optional.of(sub));
 
         Mapa mapa = new Mapa();
         mapa.setCodigo(300L);
@@ -217,6 +213,38 @@ class E2eControllerCoverageTest {
         } finally {
             SecurityContextHolder.clearContext();
         }
+    }
+
+    @Test
+    @DisplayName("criarProcessoMapeamentoComCadastroDisponibilizado: Deve chamar criarProcessoNaSituacao")
+    void deveCriarProcessoMapeamentoComCadastroDisponibilizado() {
+        var req = new E2eController.ProcessoFixtureRequest("Desc", "SIGLA", true, 30);
+
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(10L);
+        Unidade superior = new Unidade();
+        superior.setCodigo(5L);
+        unidade.setUnidadeSuperior(superior);
+        when(unidadeService.buscarPorSigla("SIGLA")).thenReturn(unidade);
+
+        Processo dto = Processo.builder().codigo(100L).build();
+        when(processoService.criar(any())).thenReturn(dto);
+        when(processoService.buscarPorCodigo(anyLong())).thenReturn(dto);
+        when(usuarioFacade.buscarPorLogin(anyString())).thenReturn(new Usuario());
+
+        Subprocesso sub = new Subprocesso();
+        sub.setCodigo(200L);
+        when(subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(anyLong(), anyLong())).thenReturn(Optional.of(sub));
+        when(subprocessoRepo.findById(anyLong())).thenReturn(Optional.of(sub));
+
+        Mapa mapa = new Mapa();
+        mapa.setCodigo(300L);
+        when(mapaRepo.buscarPorSubprocesso(anyLong())).thenReturn(Optional.of(mapa));
+
+        Processo result = controller.criarProcessoMapeamentoComCadastroDisponibilizado(req);
+
+        assertNotNull(result);
+        verify(subprocessoRepo).findByProcessoCodigoAndUnidadeCodigo(anyLong(), anyLong());
     }
 
     @Test

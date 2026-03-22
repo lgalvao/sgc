@@ -16,7 +16,6 @@ import sgc.seguranca.*;
 import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.*;
 
-import java.time.*;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;

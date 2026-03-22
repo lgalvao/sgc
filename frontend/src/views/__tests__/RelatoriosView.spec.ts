@@ -5,6 +5,7 @@ import Relatorios from '@/views/RelatoriosView.vue';
 import {TipoProcesso} from '@/types/tipos';
 import {getCommonMountOptions, setupComponentTest} from '@/test-utils/componentTestHelpers';
 import * as useRelatoriosModule from '@/composables/api/useRelatorios';
+import * as useProcessosModule from '@/composables/useProcessos';
 
 vi.mock("@/composables/usePerfil", () => ({
     usePerfil: vi.fn(() => ({
@@ -52,6 +53,7 @@ describe('Relatorios.vue', () => {
         BRow: {template: '<div><slot /></div>'},
         BCol: {template: '<div><slot /></div>'},
         BFormGroup: {template: '<div><slot /></div>'},
+        BSpinner: {template: '<div></div>'},
     };
 
     beforeEach(() => {
@@ -63,11 +65,12 @@ describe('Relatorios.vue', () => {
             error: ref(null)
         } as any);
 
-        const mountOptions = getCommonMountOptions({
-            processos: {
-                processosPainel: mockProcessos,
-            }
-        }, stubs);
+        vi.spyOn(useProcessosModule, 'useProcessos').mockReturnValue({
+            processosPainel: ref(mockProcessos),
+            buscarProcessosPainel: vi.fn().mockResolvedValue([])
+        } as any);
+
+        const mountOptions = getCommonMountOptions({}, stubs);
 
         ctx.wrapper = mount(Relatorios, mountOptions);
     });
@@ -99,7 +102,7 @@ describe('Relatorios.vue', () => {
         await ctx.wrapper!.vm.$nextTick();
         
         // Simula que ja buscou dados (para aparecer o botao de exportar)
-        ctx.wrapper!.vm.dadosRelatorioAndamento = [{}];
+        ctx.wrapper!.vm.relatorioAndamento = [{}];
         await ctx.wrapper!.vm.$nextTick();
 
         // Agora temos 2 botoes no andamento: [0] = Gerar, [1] = Exportar PDF
@@ -122,14 +125,14 @@ describe('Relatorios.vue', () => {
         expect(mockDownloadRelatorioMapasPdf).toHaveBeenCalledWith(2, undefined);
     });
 
-    it('cobre lacunas remanescentes de cobertura', async () => {
-        const vm = ctx.wrapper!.vm as any;
+    it('deve gerenciar estados de seleção e erros de geração de relatórios', async () => {
+        const vm = ctx.wrapper!.vm;
         
-        // Ensure processes are there
+        // Configuração de processos simulados
         vm.processosPainel = mockProcessos;
         await vm.$nextTick();
 
-        // v-model cover (13, 58, 67)
+        // Atualização de v-model nos seletores de processo e unidade
         const selects = ctx.wrapper!.findAllComponents({name: 'BFormSelect'});
         if (selects.length > 0) {
             await selects[0].vm.$emit('update:modelValue', 1);
@@ -144,22 +147,22 @@ describe('Relatorios.vue', () => {
             expect(vm.unidadeIdSelecionadaMapas).toBe(3);
         }
 
-        // Access computed to cover line 125
+        // Verificação de opções de processos disponíveis
         expect(vm.opcoesProcessos.length).toBeGreaterThan(1);
 
-        // Error branches (140, 151, 164)
-        mockObterRelatorioAndamento.mockRejectedValue(new Error());
+        // Tratamento de erros nas chamadas de serviço de relatórios
+        mockObterRelatorioAndamento.mockRejectedValue(new Error('API Error'));
         vm.processoIdSelecionado = 1;
         await vm.gerarRelatorioAndamento();
 
-        mockDownloadRelatorioAndamentoPdf.mockRejectedValue(new Error());
+        mockDownloadRelatorioAndamentoPdf.mockRejectedValue(new Error('PDF Error'));
         await vm.exportarPdfAndamento();
 
-        mockDownloadRelatorioMapasPdf.mockRejectedValue(new Error());
+        mockDownloadRelatorioMapasPdf.mockRejectedValue(new Error('Map API Error'));
         vm.processoIdSelecionadoMapas = 1;
         await vm.gerarRelatorioMapas();
 
-        // Early returns (135, 147, 156)
+        // Retornos antecipados em funções de geração sem seleção de ID
         vm.processoIdSelecionado = null;
         await vm.gerarRelatorioAndamento();
         await vm.exportarPdfAndamento();
@@ -172,7 +175,7 @@ describe('Relatorios.vue', () => {
         const perfilStore = usePerfilStore();
         perfilStore.unidadeSelecionada = {codigo: 5} as any;
         
-        const wrapper = mount(Relatorios, getCommonMountOptions({
+        const _ = mount(Relatorios, getCommonMountOptions({
             processos: {
                 buscarProcessosPainel: vi.fn().mockResolvedValue([])
             }

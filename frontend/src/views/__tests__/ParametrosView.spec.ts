@@ -96,20 +96,20 @@ describe('ParametrosView', () => {
         expect(wrapper.find('.alert-stub').text()).toContain('Erro de teste');
     });
 
-    it('cobre lacunas remanescentes de cobertura', async () => {
-        // Test carregar() path (length === 0)
+    it('deve gerenciar o carregamento de configurações e validações de formulário de parâmetros', async () => {
+        // Carregamento de configurações quando a lista está vazia
         setupWrapper({}, []);
         await wrapper.vm.$nextTick();
         expect(configuracoesStore.carregarConfiguracoes).toHaveBeenCalled();
 
-        // v-model gaps (35, 58)
+        // Atualização de v-model nos campos do formulário
         const inputs = wrapper.findAllComponents({name: 'BFormInput'});
         if (inputs.length > 0) await inputs[0].vm.$emit('update:modelValue', 40);
         if (inputs.length > 1) await inputs[1].vm.$emit('update:modelValue', 10);
         expect(wrapper.vm.form.diasInativacao).toBe(40);
         expect(wrapper.vm.form.diasAlertaNovo).toBe(10);
 
-        // Validation early return (127)
+        // Bloqueio de submissão do formulário com dados inválidos
         wrapper.vm.form.diasInativacao = 0;
         await wrapper.find('form').trigger('submit.prevent');
         expect(configuracoesStore.salvarConfiguracoes).not.toHaveBeenCalled();

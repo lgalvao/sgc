@@ -732,19 +732,18 @@ describe("VisMapa.vue", () => {
         expect((confirmBtn.element as HTMLButtonElement).disabled).toBe(false);
     });
 
-    it("cobre lacunas remanescentes de cobertura", async () => {
+    it("deve gerenciar a busca recursiva de unidades, visualização de sugestões e estados nulos do subprocesso", async () => {
         const {wrapper} = mountComponent();
         await flushPromises();
-        const vm = wrapper.vm as any;
+        const vm = wrapper.vm;
 
-        // v-model cover (176)
-        const textareaVis = wrapper.findComponent({name: 'BFormTextarea'});
-        // Need to make sure we find the right one if multiple
+        // Atualização de v-model na visualização de sugestões
+        wrapper.findComponent({name: 'BFormTextarea'});
         const textareas = wrapper.findAllComponents({name: 'BFormTextarea'});
         const visTextarea = textareas.find(t => t.attributes('id') === 'sugestoesVisualizacao');
         if (visTextarea) await visTextarea.vm.$emit('update:modelValue', 'Sugestões');
 
-        // Recursive unit search branch (276-281)
+        // Busca recursiva de unidade na estrutura hierárquica do processo
         processosMock.processoDetalhe.value = {
             unidades: [
                 {
@@ -757,13 +756,14 @@ describe("VisMapa.vue", () => {
         await flushPromises();
         expect(vm.subprocesso.codSubprocesso).toBe(20);
         
-        // subprocesso null branch (285)
+        // Tratamento de ausência de detalhes do processo
         processosMock.processoDetalhe.value = null;
         await vm.$nextTick();
         expect(vm.subprocesso).toBeNull();
 
-        // early returns (344, 361, 376, 402)
-        vm.codSubprocesso = null;
+        // Verificação de retornos antecipados em funções de confirmação sem subprocesso
+        processosMock.processoDetalhe.value = null;
+        await vm.$nextTick();
         await vm.confirmarSugestoes();
         await vm.confirmarValidacao();
         await vm.confirmarAceitacao();

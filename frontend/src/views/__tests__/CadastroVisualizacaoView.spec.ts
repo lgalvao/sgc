@@ -304,7 +304,7 @@ describe("CadastroVisualizacaoView coverage", () => {
         expect(wrapper.find('[data-testid="btn-acao-analisar-principal"]').attributes('disabled')).toBeDefined();
     });
 
-    it("cobre lacunas remanescentes de cobertura", async () => {
+    it("deve gerenciar atualizações de estado do modal de confirmação e campos de observação", async () => {
         const wrapper = createWrapper();
         await flushPromises();
         const vm = wrapper.vm as any;

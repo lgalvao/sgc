@@ -6,8 +6,6 @@ import org.mockito.*;
 import org.mockito.junit.jupiter.*;
 import org.mockito.quality.*;
 import sgc.alerta.*;
-import sgc.comum.*;
-import sgc.comum.erros.*;
 import sgc.comum.model.*;
 import sgc.mapa.service.*;
 import sgc.organizacao.*;
@@ -16,11 +14,9 @@ import sgc.organizacao.service.*;
 import sgc.processo.model.*;
 import sgc.subprocesso.model.*;
 
-import java.time.*;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 

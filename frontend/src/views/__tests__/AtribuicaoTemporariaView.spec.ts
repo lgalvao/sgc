@@ -244,26 +244,26 @@ describe('AtribuicaoTemporariaView', () => {
     expect(wrapper.vm.usuarioSelecionado).toBe('1');
   });
 
-  it('cobre lacunas remanescentes de cobertura', async () => {
+  it('deve gerenciar pesquisa de usuários, seleção de resultados e limpeza de timers de interface', async () => {
     vi.mocked(buscarUnidadePorCodigo).mockResolvedValue({ codigo: 1 } as any);
     const wrapper = mount(AtribuicaoTemporariaView, mountOptions);
     await vi.dynamicImportSettled();
     const vm = wrapper.vm as any;
 
-    // Linha 36 (@dismissed="clear()")
+    // Descarte de alerta de notificação
     vm.notify("Msg", "info");
     await vm.$nextTick();
     const appAlert = wrapper.findComponent({name: 'AppAlert'});
     if (appAlert.exists()) await appAlert.vm.$emit('dismissed');
     expect(mockClear).toHaveBeenCalled();
 
-    // Linha 58 (@focus)
+    // Exibição de resultados ao focar no campo de busca
     vm.termoUsuario = "Abc"; // length >= 2
     const input = wrapper.find('[data-testid="input-busca-usuario"]');
     await input.trigger('focus');
     expect(vm.mostrarResultadosUsuarios).toBe(true);
 
-    // Linha 80 (@mousedown.prevent)
+    // Seleção de usuário ao clicar no resultado
     vm.usuariosEncontrados = [{codigo: 1, nome: 'User', tituloEleitoral: '123'}];
     vm.mostrarResultadosUsuarios = true;
     await vm.$nextTick();
@@ -271,16 +271,16 @@ describe('AtribuicaoTemporariaView', () => {
     if (item.exists()) await item.trigger('mousedown');
     expect(vm.usuarioSelecionado).toBe('123');
 
-    // Linha 237, 240 (clearTimeout on unmount)
+    // Limpeza de timers ao desmontar componente
     vm.timeoutPesquisaUsuarios = setTimeout(() => {}, 100);
     vm.timeoutOcultarResultadosUsuarios = setTimeout(() => {}, 100);
     wrapper.unmount();
 
-    // Re-mount for other tests
+    // Reinicialização para testes de alteração de termo de busca
     const wrapper2 = mount(AtribuicaoTemporariaView, mountOptions);
     const vm2 = wrapper2.vm as any;
 
-    // Linha 251 (clearTimeout in aoAlterarTermoUsuario)
+    // Reinicialização de timer de pesquisa ao alterar termo
     vm2.timeoutPesquisaUsuarios = setTimeout(() => {}, 100);
     vm2.aoAlterarTermoUsuario("A");
 

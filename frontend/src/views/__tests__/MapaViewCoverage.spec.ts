@@ -288,7 +288,6 @@ describe("MapaView coverage", () => {
         // Simulando o retorno da action buscarSubprocessoPorProcessoEUnidade
         subprocessosStore.buscarSubprocessoPorProcessoEUnidade = vi.fn().mockResolvedValue(123);
         
-        // Chamamos o onMounted simulando o comportamento de montagem para cobrir as linhas
         // Em vez de checar toHaveBeenCalledWith, garantimos que os dados forçados na store funcionam e cobrem a ramificação:
         vm.codSubprocesso = 123;
         const mounted = wrapper.vm.$options.mounted;

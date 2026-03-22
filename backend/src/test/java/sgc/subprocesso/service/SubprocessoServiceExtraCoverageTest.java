@@ -17,12 +17,10 @@ import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
 import sgc.seguranca.*;
 
-import java.time.*;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 
