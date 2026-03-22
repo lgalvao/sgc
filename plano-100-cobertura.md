@@ -4,11 +4,11 @@
 
 ## 📊 Situação Atual
 
-- **Cobertura Global de Linhas:** 96.30%
-- **Cobertura Global de Branches:** 86.62%
+- **Cobertura Global de Linhas:** 97.21%
+- **Cobertura Global de Branches:** 87.66%
 - **Total de Arquivos Analisados:** 175
-- **Arquivos com Cobertura < 100%:** 36
-- **Arquivos com 100% de Cobertura:** 139
+- **Arquivos com Cobertura < 100%:** 35
+- **Arquivos com 100% de Cobertura:** 140
 
 ## 🎯 Objetivo
 
@@ -18,7 +18,7 @@ Alcançar **100% de cobertura** em todas as classes relevantes do projeto.
 
 - **🔴 CRÍTICO - Lógica de negócio central:** 0 arquivo(s) pendente(s)
 - **🟡 IMPORTANTE - API e transformação de dados:** 0 arquivo(s) pendente(s)
-- **🟢 NORMAL - Entidades e utilitários:** 36 arquivo(s) pendente(s)
+- **🟢 NORMAL - Entidades e utilitários:** 35 arquivo(s) pendente(s)
 
 ---
 
@@ -32,7 +32,7 @@ Alcançar **100% de cobertura** em todas as classes relevantes do projeto.
 
 ## 🟢 NORMAL - Entidades e utilitários
 
-**Total:** 36 arquivo(s) com lacunas
+**Total:** 35 arquivo(s) com lacunas
 
 ### 1. `sgc.e2e.E2eController`
 
@@ -45,23 +45,14 @@ Alcançar **100% de cobertura** em todas as classes relevantes do projeto.
 
 ### 2. `sgc.subprocesso.service.SubprocessoService`
 
-- **Cobertura de Linhas:** 97.34% (13 linha(s) não cobertas)
-- **Cobertura de Branches:** 83.39% (46 branch(es) não cobertos)
-- **Linhas não cobertas:** 186, 187, 188, 228, 232, 692, 709, 774, 789, 824, 825, 826, 828
-- **Branches não cobertos:** 227(1/2), 231(1/2), 254(1/4), 260(1/4), 271(1/6), 369(1/4), 385(1/2), 407(1/2), 422(1/2), 523(1/2), 554(1/2), 625(1/4), 663(1/4), 664(1/6), 672(3/4), 689(1/2), 690(1/4), 692(4/4), 702(1/2), 705(3/4)
+- **Cobertura de Linhas:** 99.18% (4 linha(s) não cobertas)
+- **Cobertura de Branches:** 84.48% (43 branch(es) não cobertos)
+- **Linhas não cobertas:** 692, 709, 789, 828
+- **Branches não cobertos:** 210(1/2), 216(1/2), 254(1/4), 260(1/4), 271(1/6), 369(1/4), 385(1/2), 407(1/2), 422(1/2), 523(1/2), 554(1/2), 625(1/4), 663(1/4), 664(1/6), 672(3/4), 689(1/2), 690(1/4), 692(4/4), 702(1/2), 705(3/4)
 
 **Ação necessária:** Criar ou expandir `SubprocessoServiceCoverageTest.java` para cobrir todas as linhas e branches.
 
-### 3. `sgc.subprocesso.service.SubprocessoTransicaoService`
-
-- **Cobertura de Linhas:** 95.90% (17 linha(s) não cobertas)
-- **Cobertura de Branches:** 80.43% (18 branch(es) não cobertos)
-- **Linhas não cobertas:** 82, 83, 279, 304, 377, 378, 379, 380, 381, 383, 385, 386, 387, 626, 627, 629, 631
-- **Branches não cobertos:** 77(1/2), 80(1/2), 83(2/2), 252(1/2), 278(1/2), 303(1/2), 376(1/2), 460(1/2), 491(1/2), 535(1/2), 625(1/2), 626(2/2), 668(1/2), 675(1/4), 681(2/4)
-
-**Ação necessária:** Criar ou expandir `SubprocessoTransicaoServiceCoverageTest.java` para cobrir todas as linhas e branches.
-
-### 4. `sgc.processo.service.ProcessoService`
+### 3. `sgc.processo.service.ProcessoService`
 
 - **Cobertura de Linhas:** 97.92% (6 linha(s) não cobertas)
 - **Cobertura de Branches:** 83.33% (28 branch(es) não cobertos)
@@ -70,7 +61,7 @@ Alcançar **100% de cobertura** em todas as classes relevantes do projeto.
 
 **Ação necessária:** Criar ou expandir `ProcessoServiceCoverageTest.java` para cobrir todas as linhas e branches.
 
-### 5. `sgc.alerta.AlertaFacade`
+### 4. `sgc.alerta.AlertaFacade`
 
 - **Cobertura de Linhas:** 85.71% (15 linha(s) não cobertas)
 - **Cobertura de Branches:** 80.56% (7 branch(es) não cobertos)
@@ -79,16 +70,7 @@ Alcançar **100% de cobertura** em todas as classes relevantes do projeto.
 
 **Ação necessária:** Criar ou expandir `AlertaFacadeCoverageTest.java` para cobrir todas as linhas e branches.
 
-### 6. `sgc.alerta.EmailModelosService`
-
-- **Cobertura de Linhas:** 61.29% (12 linha(s) não cobertas)
-- **Cobertura de Branches:** 0.00% (4 branch(es) não cobertos)
-- **Linhas não cobertas:** 40, 41, 42, 43, 45, 46, 47, 48, 49, 50, 51, 53
-- **Branches não cobertos:** 41(2/2), 51(2/2)
-
-**Ação necessária:** Criar ou expandir `EmailModelosServiceCoverageTest.java` para cobrir todas as linhas e branches.
-
-### 7. `sgc.organizacao.service.UnidadeHierarquiaService`
+### 5. `sgc.organizacao.service.UnidadeHierarquiaService`
 
 - **Cobertura de Linhas:** 91.58% (8 linha(s) não cobertas)
 - **Cobertura de Branches:** 72.73% (12 branch(es) não cobertos)
@@ -97,7 +79,7 @@ Alcançar **100% de cobertura** em todas as classes relevantes do projeto.
 
 **Ação necessária:** Criar ou expandir `UnidadeHierarquiaServiceCoverageTest.java` para cobrir todas as linhas e branches.
 
-### 8. `sgc.subprocesso.service.SubprocessoValidacaoService`
+### 6. `sgc.subprocesso.service.SubprocessoValidacaoService`
 
 - **Cobertura de Linhas:** 94.26% (7 linha(s) não cobertas)
 - **Cobertura de Branches:** 92.59% (4 branch(es) não cobertos)
@@ -106,7 +88,7 @@ Alcançar **100% de cobertura** em todas as classes relevantes do projeto.
 
 **Ação necessária:** Criar ou expandir `SubprocessoValidacaoServiceCoverageTest.java` para cobrir todas as linhas e branches.
 
-### 9. `sgc.processo.model.Processo`
+### 7. `sgc.processo.model.Processo`
 
 - **Cobertura de Linhas:** 89.29% (3 linha(s) não cobertas)
 - **Cobertura de Branches:** 50.00% (9 branch(es) não cobertos)
@@ -115,7 +97,7 @@ Alcançar **100% de cobertura** em todas as classes relevantes do projeto.
 
 **Ação necessária:** Criar ou expandir `ProcessoCoverageTest.java` para cobrir todas as linhas e branches.
 
-### 10. `sgc.subprocesso.model.SituacaoSubprocesso`
+### 8. `sgc.subprocesso.model.SituacaoSubprocesso`
 
 - **Cobertura de Linhas:** 96.61% (2 linha(s) não cobertas)
 - **Cobertura de Branches:** 93.20% (10 branch(es) não cobertos)
@@ -124,7 +106,7 @@ Alcançar **100% de cobertura** em todas as classes relevantes do projeto.
 
 **Ação necessária:** Criar ou expandir `SituacaoSubprocessoCoverageTest.java` para cobrir todas as linhas e branches.
 
-### 11. `sgc.subprocesso.SubprocessoController`
+### 9. `sgc.subprocesso.SubprocessoController`
 
 - **Cobertura de Linhas:** 96.03% (5 linha(s) não cobertas)
 - **Cobertura de Branches:** 100.00% (0 branch(es) não cobertos)
@@ -132,7 +114,15 @@ Alcançar **100% de cobertura** em todas as classes relevantes do projeto.
 
 **Ação necessária:** Criar ou expandir `SubprocessoControllerCoverageTest.java` para cobrir todas as linhas e branches.
 
-### 12. `sgc.seguranca.SgcPermissionEvaluator`
+### 10. `sgc.subprocesso.service.SubprocessoTransicaoService`
+
+- **Cobertura de Linhas:** 100.00% (0 linha(s) não cobertas)
+- **Cobertura de Branches:** 89.13% (10 branch(es) não cobertos)
+- **Branches não cobertos:** 77(1/2), 83(1/2), 252(1/2), 460(1/2), 491(1/2), 535(1/2), 668(1/2), 675(1/4), 681(2/4)
+
+**Ação necessária:** Criar ou expandir `SubprocessoTransicaoServiceCoverageTest.java` para cobrir todas as linhas e branches.
+
+### 11. `sgc.seguranca.SgcPermissionEvaluator`
 
 - **Cobertura de Linhas:** 96.43% (3 linha(s) não cobertas)
 - **Cobertura de Branches:** 94.12% (4 branch(es) não cobertos)
@@ -141,7 +131,7 @@ Alcançar **100% de cobertura** em todas as classes relevantes do projeto.
 
 **Ação necessária:** Criar ou expandir `SgcPermissionEvaluatorCoverageTest.java` para cobrir todas as linhas e branches.
 
-### 13. `sgc.seguranca.login.FiltroJwt`
+### 12. `sgc.seguranca.login.FiltroJwt`
 
 - **Cobertura de Linhas:** 89.29% (3 linha(s) não cobertas)
 - **Cobertura de Branches:** 83.33% (3 branch(es) não cobertos)
@@ -150,7 +140,7 @@ Alcançar **100% de cobertura** em todas as classes relevantes do projeto.
 
 **Ação necessária:** Criar ou expandir `FiltroJwtCoverageTest.java` para cobrir todas as linhas e branches.
 
-### 14. `sgc.organizacao.UsuarioFacade`
+### 13. `sgc.organizacao.UsuarioFacade`
 
 - **Cobertura de Linhas:** 98.41% (1 linha(s) não cobertas)
 - **Cobertura de Branches:** 75.00% (4 branch(es) não cobertos)
@@ -159,7 +149,7 @@ Alcançar **100% de cobertura** em todas as classes relevantes do projeto.
 
 **Ação necessária:** Criar ou expandir `UsuarioFacadeCoverageTest.java` para cobrir todas as linhas e branches.
 
-### 15. `sgc.seguranca.login.LimitadorTentativasLogin`
+### 14. `sgc.seguranca.login.LimitadorTentativasLogin`
 
 - **Cobertura de Linhas:** 96.61% (2 linha(s) não cobertas)
 - **Cobertura de Branches:** 93.75% (2 branch(es) não cobertos)
@@ -168,7 +158,7 @@ Alcançar **100% de cobertura** em todas as classes relevantes do projeto.
 
 **Ação necessária:** Criar ou expandir `LimitadorTentativasLoginCoverageTest.java` para cobrir todas as linhas e branches.
 
-### 16. `sgc.processo.painel.PainelFacade`
+### 15. `sgc.processo.painel.PainelFacade`
 
 - **Cobertura de Linhas:** 98.99% (1 linha(s) não cobertas)
 - **Cobertura de Branches:** 93.48% (3 branch(es) não cobertos)
@@ -177,7 +167,7 @@ Alcançar **100% de cobertura** em todas as classes relevantes do projeto.
 
 **Ação necessária:** Criar ou expandir `PainelFacadeCoverageTest.java` para cobrir todas as linhas e branches.
 
-### 17. `sgc.mapa.service.ImpactoMapaService`
+### 16. `sgc.mapa.service.ImpactoMapaService`
 
 - **Cobertura de Linhas:** 99.40% (1 linha(s) não cobertas)
 - **Cobertura de Branches:** 94.00% (3 branch(es) não cobertos)
@@ -186,7 +176,7 @@ Alcançar **100% de cobertura** em todas as classes relevantes do projeto.
 
 **Ação necessária:** Criar ou expandir `ImpactoMapaServiceCoverageTest.java` para cobrir todas as linhas e branches.
 
-### 18. `sgc.processo.ProcessoController`
+### 17. `sgc.processo.ProcessoController`
 
 - **Cobertura de Linhas:** 98.28% (1 linha(s) não cobertas)
 - **Cobertura de Branches:** 70.00% (3 branch(es) não cobertos)
@@ -195,7 +185,7 @@ Alcançar **100% de cobertura** em todas as classes relevantes do projeto.
 
 **Ação necessária:** Criar ou expandir `ProcessoControllerCoverageTest.java` para cobrir todas as linhas e branches.
 
-### 19. `sgc.alerta.EmailService`
+### 18. `sgc.alerta.EmailService`
 
 - **Cobertura de Linhas:** 94.29% (2 linha(s) não cobertas)
 - **Cobertura de Branches:** 100.00% (0 branch(es) não cobertos)
@@ -203,7 +193,7 @@ Alcançar **100% de cobertura** em todas as classes relevantes do projeto.
 
 **Ação necessária:** Criar ou expandir `EmailServiceCoverageTest.java` para cobrir todas as linhas e branches.
 
-### 20. `sgc.subprocesso.service.SubprocessoNotificacaoService`
+### 19. `sgc.subprocesso.service.SubprocessoNotificacaoService`
 
 - **Cobertura de Linhas:** 100.00% (0 linha(s) não cobertas)
 - **Cobertura de Branches:** 83.33% (4 branch(es) não cobertos)
@@ -211,7 +201,7 @@ Alcançar **100% de cobertura** em todas as classes relevantes do projeto.
 
 **Ação necessária:** Criar ou expandir `SubprocessoNotificacaoServiceCoverageTest.java` para cobrir todas as linhas e branches.
 
-### 21. `sgc.mapa.service.MapaManutencaoService`
+### 20. `sgc.mapa.service.MapaManutencaoService`
 
 - **Cobertura de Linhas:** 100.00% (0 linha(s) não cobertas)
 - **Cobertura de Branches:** 71.43% (4 branch(es) não cobertos)
@@ -219,7 +209,7 @@ Alcançar **100% de cobertura** em todas as classes relevantes do projeto.
 
 **Ação necessária:** Criar ou expandir `MapaManutencaoServiceCoverageTest.java` para cobrir todas as linhas e branches.
 
-### 22. `sgc.processo.model.UnidadeProcesso`
+### 21. `sgc.processo.model.UnidadeProcesso`
 
 - **Cobertura de Linhas:** 94.44% (1 linha(s) não cobertas)
 - **Cobertura de Branches:** 66.67% (2 branch(es) não cobertos)
@@ -228,7 +218,7 @@ Alcançar **100% de cobertura** em todas as classes relevantes do projeto.
 
 **Ação necessária:** Criar ou expandir `UnidadeProcessoCoverageTest.java` para cobrir todas as linhas e branches.
 
-### 23. `sgc.organizacao.service.ResponsavelUnidadeService`
+### 22. `sgc.organizacao.service.ResponsavelUnidadeService`
 
 - **Cobertura de Linhas:** 100.00% (0 linha(s) não cobertas)
 - **Cobertura de Branches:** 75.00% (3 branch(es) não cobertos)
@@ -236,7 +226,7 @@ Alcançar **100% de cobertura** em todas as classes relevantes do projeto.
 
 **Ação necessária:** Criar ou expandir `ResponsavelUnidadeServiceCoverageTest.java` para cobrir todas as linhas e branches.
 
-### 24. `sgc.comum.model.EntidadeBase`
+### 23. `sgc.comum.model.EntidadeBase`
 
 - **Cobertura de Linhas:** 80.00% (1 linha(s) não cobertas)
 - **Cobertura de Branches:** 87.50% (1 branch(es) não cobertos)
@@ -245,7 +235,7 @@ Alcançar **100% de cobertura** em todas as classes relevantes do projeto.
 
 **Ação necessária:** Criar ou expandir `EntidadeBaseCoverageTest.java` para cobrir todas as linhas e branches.
 
-### 25. `sgc.alerta.AlertaService`
+### 24. `sgc.alerta.AlertaService`
 
 - **Cobertura de Linhas:** 92.86% (1 linha(s) não cobertas)
 - **Cobertura de Branches:** 100.00% (0 branch(es) não cobertos)
@@ -253,7 +243,7 @@ Alcançar **100% de cobertura** em todas as classes relevantes do projeto.
 
 **Ação necessária:** Criar ou expandir `AlertaServiceCoverageTest.java` para cobrir todas as linhas e branches.
 
-### 26. `sgc.relatorio.RelatorioController`
+### 25. `sgc.relatorio.RelatorioController`
 
 - **Cobertura de Linhas:** 88.89% (1 linha(s) não cobertas)
 - **Cobertura de Branches:** 100.00% (0 branch(es) não cobertos)
@@ -261,7 +251,7 @@ Alcançar **100% de cobertura** em todas as classes relevantes do projeto.
 
 **Ação necessária:** Criar ou expandir `RelatorioControllerCoverageTest.java` para cobrir todas as linhas e branches.
 
-### 27. `sgc.organizacao.service.UsuarioService`
+### 26. `sgc.organizacao.service.UsuarioService`
 
 - **Cobertura de Linhas:** 96.67% (1 linha(s) não cobertas)
 - **Cobertura de Branches:** 100.00% (0 branch(es) não cobertos)
@@ -269,7 +259,7 @@ Alcançar **100% de cobertura** em todas as classes relevantes do projeto.
 
 **Ação necessária:** Criar ou expandir `UsuarioServiceCoverageTest.java` para cobrir todas as linhas e branches.
 
-### 28. `sgc.organizacao.UnidadeController`
+### 27. `sgc.organizacao.UnidadeController`
 
 - **Cobertura de Linhas:** 100.00% (0 linha(s) não cobertas)
 - **Cobertura de Branches:** 50.00% (2 branch(es) não cobertos)
@@ -277,7 +267,7 @@ Alcançar **100% de cobertura** em todas as classes relevantes do projeto.
 
 **Ação necessária:** Criar ou expandir `UnidadeControllerCoverageTest.java` para cobrir todas as linhas e branches.
 
-### 29. `sgc.organizacao.UsuarioController`
+### 28. `sgc.organizacao.UsuarioController`
 
 - **Cobertura de Linhas:** 90.91% (1 linha(s) não cobertas)
 - **Cobertura de Branches:** 100.00% (0 branch(es) não cobertos)
@@ -285,7 +275,7 @@ Alcançar **100% de cobertura** em todas as classes relevantes do projeto.
 
 **Ação necessária:** Criar ou expandir `UsuarioControllerCoverageTest.java` para cobrir todas as linhas e branches.
 
-### 30. `sgc.seguranca.LoginFacade`
+### 29. `sgc.seguranca.LoginFacade`
 
 - **Cobertura de Linhas:** 100.00% (0 linha(s) não cobertas)
 - **Cobertura de Branches:** 90.00% (2 branch(es) não cobertos)
@@ -293,7 +283,7 @@ Alcançar **100% de cobertura** em todas as classes relevantes do projeto.
 
 **Ação necessária:** Criar ou expandir `LoginFacadeCoverageTest.java` para cobrir todas as linhas e branches.
 
-### 31. `sgc.organizacao.dto.UnidadeDto`
+### 30. `sgc.organizacao.dto.UnidadeDto`
 
 - **Cobertura de Linhas:** 100.00% (0 linha(s) não cobertas)
 - **Cobertura de Branches:** 83.33% (1 branch(es) não cobertos)
@@ -301,7 +291,7 @@ Alcançar **100% de cobertura** em todas as classes relevantes do projeto.
 
 **Ação necessária:** Criar ou expandir `UnidadeDtoCoverageTest.java` para cobrir todas as linhas e branches.
 
-### 32. `sgc.comum.erros.RestExceptionHandler`
+### 31. `sgc.comum.erros.RestExceptionHandler`
 
 - **Cobertura de Linhas:** 100.00% (0 linha(s) não cobertas)
 - **Cobertura de Branches:** 83.33% (1 branch(es) não cobertos)
@@ -309,7 +299,7 @@ Alcançar **100% de cobertura** em todas as classes relevantes do projeto.
 
 **Ação necessária:** Criar ou expandir `RestExceptionHandlerCoverageTest.java` para cobrir todas as linhas e branches.
 
-### 33. `sgc.seguranca.login.LoginController`
+### 32. `sgc.seguranca.login.LoginController`
 
 - **Cobertura de Linhas:** 100.00% (0 linha(s) não cobertas)
 - **Cobertura de Branches:** 95.00% (1 branch(es) não cobertos)
@@ -317,7 +307,7 @@ Alcançar **100% de cobertura** em todas as classes relevantes do projeto.
 
 **Ação necessária:** Criar ou expandir `LoginControllerCoverageTest.java` para cobrir todas as linhas e branches.
 
-### 34. `sgc.seguranca.login.GerenciadorJwt`
+### 33. `sgc.seguranca.login.GerenciadorJwt`
 
 - **Cobertura de Linhas:** 100.00% (0 linha(s) não cobertas)
 - **Cobertura de Branches:** 94.44% (1 branch(es) não cobertos)
@@ -325,7 +315,7 @@ Alcançar **100% de cobertura** em todas as classes relevantes do projeto.
 
 **Ação necessária:** Criar ou expandir `GerenciadorJwtCoverageTest.java` para cobrir todas as linhas e branches.
 
-### 35. `sgc.mapa.service.MapaSalvamentoService`
+### 34. `sgc.mapa.service.MapaSalvamentoService`
 
 - **Cobertura de Linhas:** 100.00% (0 linha(s) não cobertas)
 - **Cobertura de Branches:** 97.06% (1 branch(es) não cobertos)
@@ -333,7 +323,7 @@ Alcançar **100% de cobertura** em todas as classes relevantes do projeto.
 
 **Ação necessária:** Criar ou expandir `MapaSalvamentoServiceCoverageTest.java` para cobrir todas as linhas e branches.
 
-### 36. `sgc.mapa.service.CopiaMapaService`
+### 35. `sgc.mapa.service.CopiaMapaService`
 
 - **Cobertura de Linhas:** 100.00% (0 linha(s) não cobertas)
 - **Cobertura de Branches:** 96.15% (1 branch(es) não cobertos)
