@@ -65,7 +65,10 @@ class LoginControllerLogInjectionTest {
 
         mockMvc.perform(post("/api/usuarios/autenticar")
                         .with(csrf())
-                        .header("X-Forwarded-For", ipMalicioso)
+                        .with(request -> {
+                            request.setRemoteAddr(ipMalicioso);
+                            return request;
+                        })
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk());
