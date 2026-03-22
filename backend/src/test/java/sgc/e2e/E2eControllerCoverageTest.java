@@ -36,4 +36,24 @@ class E2eControllerCoverageTest {
                 .isInstanceOf(ErroValidacao.class)
                 .hasMessage("Unidade é obrigatória");
     }
+
+    @Test
+    @DisplayName("criarProcessoRevisaoComMapaHomologado deve falhar se unidadeSigla for vazia")
+    void criarProcessoRevisaoHomologadoDeveFalharSeUnidadeSiglaVazia() {
+        E2eController.ProcessoFixtureRequest request = new E2eController.ProcessoFixtureRequest(
+                "desc", "", false, 30);
+        assertThatThrownBy(() -> controller.criarProcessoRevisaoComMapaHomologado(request))
+                .isInstanceOf(ErroValidacao.class)
+                .hasMessage("Unidade é obrigatória");
+    }
+
+    @Test
+    @DisplayName("criarProcessoRevisaoComCadastroHomologado deve falhar se unidadeSigla for vazia")
+    void criarProcessoRevisaoCadastroHomologadoDeveFalharSeUnidadeSiglaVazia() {
+        E2eController.ProcessoFixtureRequest request = new E2eController.ProcessoFixtureRequest(
+                "desc", "   ", false, 30);
+        assertThatThrownBy(() -> controller.criarProcessoRevisaoComCadastroHomologado(request))
+                .isInstanceOf(ErroValidacao.class)
+                .hasMessage("Unidade é obrigatória");
+    }
 }

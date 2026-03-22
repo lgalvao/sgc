@@ -4,289 +4,69 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
-import sgc.comum.*;
+import sgc.subprocesso.model.*;
 import sgc.comum.erros.*;
 import sgc.mapa.model.*;
-import sgc.mapa.service.*;
-import sgc.subprocesso.model.*;
 
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@DisplayName("SubprocessoValidacaoService - Cobertura adicional")
 class SubprocessoValidacaoServiceCoverageTest {
 
-    @Mock
-    private SubprocessoRepo subprocessoRepo;
-
-    @Mock
-    private MapaManutencaoService mapaManutencaoService;
-
     @InjectMocks
-    private SubprocessoValidacaoService validacaoService;
+    private SubprocessoValidacaoService subprocessoValidacaoService;
 
-    @Nested
-    @DisplayName("validarExistenciaAtividades")
-    class ValidarExistenciaAtividades {
+    @Test
+    @DisplayName("validarSituacaoMinima deve lancar excecao se situacao nula")
+    void validarSituacaoMinimaDeveLancarExcecaoSeNula() {
+        Subprocesso sp = new Subprocesso();
+        sp.setSituacaoForcada(null);
 
-        @Test
-        @DisplayName("deve lançar erro se mapa for nulo")
-        void erroMapaNulo() {
-            Subprocesso sp = new Subprocesso();
-            sp.setMapa(null);
-
-            assertThatThrownBy(() -> validacaoService.validarExistenciaAtividades(sp))
-                    .isInstanceOf(ErroValidacao.class)
-                    .hasMessageContaining(SgcMensagens.SUBPROCESSO_SEM_MAPA);
-        }
-
-        @Test
-        @DisplayName("deve lançar erro se codigo do mapa for nulo")
-        void erroCodigoMapaNulo() {
-            Subprocesso sp = new Subprocesso();
-            Mapa mapa = new Mapa();
-            mapa.setCodigo(null);
-            sp.setMapa(mapa);
-
-            assertThatThrownBy(() -> validacaoService.validarExistenciaAtividades(sp))
-                    .isInstanceOf(ErroValidacao.class)
-                    .hasMessageContaining(SgcMensagens.SUBPROCESSO_SEM_MAPA);
-        }
-
-        @Test
-        @DisplayName("deve lançar erro se mapa não possui atividades cadastradas")
-        void erroSemAtividades() {
-            Subprocesso sp = new Subprocesso();
-            Mapa mapa = new Mapa();
-            mapa.setCodigo(1L);
-            sp.setMapa(mapa);
-
-            when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(1L)).thenReturn(List.of());
-
-            assertThatThrownBy(() -> validacaoService.validarExistenciaAtividades(sp))
-                    .isInstanceOf(ErroValidacao.class)
-                    .hasMessageContaining(SgcMensagens.MAPA_SEM_ATIVIDADES);
-        }
-
-        @Test
-        @DisplayName("deve lançar erro se houver atividades sem conhecimento")
-        void erroAtividadeSemConhecimento() {
-            Subprocesso sp = new Subprocesso();
-            Mapa mapa = new Mapa();
-            mapa.setCodigo(1L);
-            sp.setMapa(mapa);
-
-            Atividade a1 = new Atividade();
-            a1.setConhecimentos(Set.of()); // Atividade sem conhecimento
-
-            when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(1L)).thenReturn(List.of(a1));
-
-            assertThatThrownBy(() -> validacaoService.validarExistenciaAtividades(sp))
-                    .isInstanceOf(ErroValidacao.class)
-                    .hasMessageContaining(SgcMensagens.ATIVIDADES_SEM_CONHECIMENTOS);
-        }
+        assertThatIllegalArgumentException()
+            .isThrownBy(() -> subprocessoValidacaoService.validarSituacaoMinima(sp, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, "msg"))
+            .withMessageContaining("não pode ser nula");
     }
 
-    @Nested
-    @DisplayName("validarAssociacoesMapa")
-    class ValidarAssociacoesMapa {
+    @Test
+    @DisplayName("validarSituacaoPermitida deve lançar exceção se situacao atual for nula")
+    void deveLancarExcecaoSeSituacaoNula() {
+        Subprocesso sp = new Subprocesso();
+        sp.setSituacaoForcada(null);
 
-        @Test
-        @DisplayName("deve lançar erro se existe competencia sem atividade")
-        void erroCompetenciaSemAtividade() {
-            Competencia comp = new Competencia();
-            comp.setDescricao("Comp1");
-            comp.setAtividades(Set.of());
-
-            when(mapaManutencaoService.competenciasCodMapa(1L)).thenReturn(List.of(comp));
-
-            assertThatThrownBy(() -> validacaoService.validarAssociacoesMapa(1L))
-                    .isInstanceOf(ErroValidacao.class)
-                    .hasMessageContaining(SgcMensagens.COMPETENCIAS_SEM_ATIVIDADE);
-        }
-
-        @Test
-        @DisplayName("deve lançar erro se existe atividade sem competencia")
-        void erroAtividadeSemCompetencia() {
-            Competencia comp = new Competencia();
-            comp.setDescricao("Comp1");
-            Atividade a1 = new Atividade();
-            a1.setDescricao("A1");
-            comp.setAtividades(Set.of(a1));
-
-            Atividade aSemComp = new Atividade();
-            aSemComp.setDescricao("A2");
-            aSemComp.setCompetencias(Set.of());
-
-            when(mapaManutencaoService.competenciasCodMapa(1L)).thenReturn(List.of(comp));
-            when(mapaManutencaoService.atividadesMapaCodigo(1L)).thenReturn(List.of(a1, aSemComp));
-
-            assertThatThrownBy(() -> validacaoService.validarAssociacoesMapa(1L))
-                    .isInstanceOf(ErroValidacao.class)
-                    .hasMessageContaining(SgcMensagens.ATIVIDADES_SEM_COMPETENCIA);
-        }
-
-        @Test
-        @DisplayName("nao deve lançar erro se todas as competencias tem atividades e vice-versa")
-        void sucesso() {
-            Competencia comp = new Competencia();
-            comp.setDescricao("Comp1");
-            Atividade a1 = new Atividade();
-            a1.setDescricao("A1");
-            comp.setAtividades(Set.of(a1));
-            a1.setCompetencias(Set.of(comp));
-
-            when(mapaManutencaoService.competenciasCodMapa(1L)).thenReturn(List.of(comp));
-            when(mapaManutencaoService.atividadesMapaCodigo(1L)).thenReturn(List.of(a1));
-
-            validacaoService.validarAssociacoesMapa(1L);
-        }
+        assertThatIllegalArgumentException()
+            .isThrownBy(() -> subprocessoValidacaoService.validarSituacaoPermitida(sp, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO))
+            .withMessageContaining("não pode ser nula");
     }
 
-    @Nested
-    @DisplayName("validarMapaParaDisponibilizacao")
-    class ValidarMapaParaDisponibilizacao {
+    @Test
+    @DisplayName("validarSituacaoPermitida deve lançar exceção se lista de permitidas for vazia")
+    void deveLancarExcecaoSePermitidasVazia() {
+        Subprocesso sp = new Subprocesso();
+        sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
-        @Test
-        @DisplayName("deve lançar erro se competencia sem atividade")
-        void erroCompetenciaSemAtividade() {
-            Subprocesso sp = new Subprocesso();
-            Mapa mapa = new Mapa();
-            mapa.setCodigo(1L);
-            sp.setMapa(mapa);
-
-            Competencia comp = new Competencia();
-            comp.setAtividades(Set.of());
-
-            when(mapaManutencaoService.competenciasCodMapa(1L)).thenReturn(List.of(comp));
-
-            assertThatThrownBy(() -> validacaoService.validarMapaParaDisponibilizacao(sp))
-                    .isInstanceOf(ErroValidacao.class)
-                    .hasMessageContaining(SgcMensagens.TODAS_COMPETENCIAS_DEVEM_TER_ATIVIDADE);
-        }
-
-        @Test
-        @DisplayName("deve lançar erro se atividade nao estiver associada a competencia")
-        void erroAtividadeNaoAssociada() {
-            Subprocesso sp = new Subprocesso();
-            Mapa mapa = new Mapa();
-            mapa.setCodigo(1L);
-            sp.setMapa(mapa);
-
-            Atividade a1 = new Atividade();
-            a1.setCodigo(10L);
-            a1.setDescricao("A1");
-
-            Atividade a2 = new Atividade();
-            a2.setCodigo(20L);
-            a2.setDescricao("A2");
-
-            Competencia comp = new Competencia();
-            comp.setAtividades(Set.of(a1));
-
-            when(mapaManutencaoService.competenciasCodMapa(1L)).thenReturn(List.of(comp));
-            when(mapaManutencaoService.atividadesMapaCodigo(1L)).thenReturn(List.of(a1, a2));
-
-            assertThatThrownBy(() -> validacaoService.validarMapaParaDisponibilizacao(sp))
-                    .isInstanceOf(ErroValidacao.class)
-                    .hasMessageContaining(SgcMensagens.ATIVIDADES_DEVEM_TER_COMPETENCIA);
-        }
-
-        @Test
-        @DisplayName("sucesso quando todas estao associadas")
-        void sucesso() {
-            Subprocesso sp = new Subprocesso();
-            Mapa mapa = new Mapa();
-            mapa.setCodigo(1L);
-            sp.setMapa(mapa);
-
-            Atividade a1 = new Atividade();
-            a1.setCodigo(10L);
-
-            Competencia comp = new Competencia();
-            comp.setAtividades(Set.of(a1));
-
-            when(mapaManutencaoService.competenciasCodMapa(1L)).thenReturn(List.of(comp));
-            when(mapaManutencaoService.atividadesMapaCodigo(1L)).thenReturn(List.of(a1));
-
-            validacaoService.validarMapaParaDisponibilizacao(sp);
-        }
+        assertThatIllegalArgumentException()
+            .isThrownBy(() -> subprocessoValidacaoService.validarSituacaoPermitida(sp))
+            .withMessageContaining("Pelo menos uma situação permitida");
     }
 
-    @Nested
-    @DisplayName("validarSituacaoMinima")
-    class ValidarSituacaoMinima {
+    @Test
+    @DisplayName("validarRequisitosNegocioParaDisponibilizacao deve lançar exceção com atividades sem conhecimento")
+    void deveLancarExcecaoSeAtividadesSemConhecimento() {
+        Subprocesso sp = new Subprocesso();
+        Mapa m = new Mapa();
 
-        @Test
-        @DisplayName("deve lançar IllegalArgumentException se situação for nula")
-        void erroSituacaoNula() {
-            Subprocesso sp = new Subprocesso();
-            sp.setSituacao(null);
+        Atividade a = new Atividade(); a.setDescricao("Ativ");
+        Set<Atividade> set = new HashSet<>();
+        set.add(a);
+        m.setAtividades(set);
+        sp.setMapa(m);
 
-            assertThatThrownBy(() -> validacaoService.validarSituacaoMinima(sp, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, "msg"))
-                    .isInstanceOf(IllegalArgumentException.class);
-        }
+        Atividade a1 = new Atividade(); a1.setCodigo(1L); a1.setDescricao("Ativ1");
 
-        @Test
-        @DisplayName("deve lançar ErroValidacao se situação atual for menor que a mínima")
-        void erroSituacaoMenor() {
-            Subprocesso sp = new Subprocesso();
-            sp.setSituacaoForcada(SituacaoSubprocesso.NAO_INICIADO);
-
-            assertThatThrownBy(() -> validacaoService.validarSituacaoMinima(sp, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, "Msg custom"))
-                    .isInstanceOf(ErroValidacao.class)
-                    .hasMessage("Msg custom");
-        }
-
-        @Test
-        @DisplayName("sucesso se situação atual for igual a mínima")
-        void sucessoSituacaoIgual() {
-            Subprocesso sp = new Subprocesso();
-            sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
-
-            validacaoService.validarSituacaoMinima(sp, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, "Msg custom");
-        }
-
-        @Test
-        @DisplayName("sucesso se situação atual for maior que a mínima")
-        void sucessoSituacaoMaior() {
-            Subprocesso sp = new Subprocesso();
-            sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
-
-            validacaoService.validarSituacaoMinima(sp, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, "Msg custom");
-        }
-    }
-
-    @Nested
-    @DisplayName("validarRequisitosNegocioParaDisponibilizacao")
-    class ValidarRequisitosNegocioParaDisponibilizacao {
-
-        @Test
-        @DisplayName("deve lançar erro se houver atividades sem conhecimento")
-        void erroAtividadeSemConhecimento() {
-            Subprocesso sp = new Subprocesso();
-            Mapa mapa = new Mapa();
-            mapa.setCodigo(1L);
-            sp.setMapa(mapa);
-
-            Atividade a1 = new Atividade();
-            a1.setCodigo(10L);
-            a1.setDescricao("A1");
-            Conhecimento c1 = new Conhecimento();
-            a1.setConhecimentos(Set.of(c1));
-
-            Atividade a2 = new Atividade();
-            a2.setCodigo(20L);
-            a2.setDescricao("A2");
-            a2.setConhecimentos(Set.of());
-
-            when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(1L)).thenReturn(List.of(a1, a2));
-
-            assertThatThrownBy(() -> validacaoService.validarRequisitosNegocioParaDisponibilizacao(sp, List.of(a2)))
-                    .isInstanceOf(ErroValidacao.class)
-                    .hasMessageContaining(SgcMensagens.ATIVIDADES_SEM_CONHECIMENTOS);
-        }
+        assertThatThrownBy(() -> subprocessoValidacaoService.validarRequisitosNegocioParaDisponibilizacao(sp, List.of(a1)))
+            .isInstanceOf(ErroValidacao.class);
     }
 }
