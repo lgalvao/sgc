@@ -62,14 +62,11 @@ class GerenciadorJwtTest {
     }
 
     @Test
-    @DisplayName("Deve falhar se segredo muito curto")
-    void failShortSecret() {
-        when(jwtProperties.secret()).thenReturn(DEFAULT_SECRET_SHORT);
+    @DisplayName("Deve falhar na inicialização se segredo é muito curto ou não resolvido")
+    void failInitShortSecret() {
+        when(jwtProperties.secret()).thenReturn(DEFAULT_SECRET_SHORT); // A short secret or unresoved literal
 
-        // init check doesn't check length, only equality to default.
-        // length check happens on signing key generation which happens on usage.
-
-        assertThatThrownBy(() -> gerenciador.gerarToken("123", Perfil.ADMIN, 1L))
+        assertThatThrownBy(() -> gerenciador.verificarSegurancaChave())
                 .isInstanceOf(ErroConfiguracao.class)
                 .hasMessageContaining("mínimo 32 caracteres");
     }

@@ -112,6 +112,8 @@ springdoc:
 
 aplicacao:
   ambiente-testes: true
+  jwt:
+    secret: sgc-secret-key-change-this-in-production-minimum-32-chars
 
 ---
 spring:
