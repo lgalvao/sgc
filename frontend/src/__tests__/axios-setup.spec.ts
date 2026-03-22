@@ -47,8 +47,6 @@ vi.mock("axios", () => {
 });
 
 describe("axios-setup", () => {
-    let requestInterceptor: (config: any) => any;
-    let requestErrorInterceptor: (error: any) => any;
     let responseSuccessInterceptor: (response: any) => any;
     let responseErrorInterceptor: (error: any) => any;
 
@@ -56,13 +54,9 @@ describe("axios-setup", () => {
         const {setRouter} = await import("../axios-setup"); // Use dynamic import
         setRouter(router as any);
 
-        const requestUseCalls = mockInstance.interceptors.request.use.mock.calls;
         const responseUseCalls = mockInstance.interceptors.response.use.mock.calls;
 
-        if (requestUseCalls.length > 0) {
-            requestInterceptor = requestUseCalls[0][0];
-            requestErrorInterceptor = requestUseCalls[0][1];
-        }
+
         if (responseUseCalls.length > 0) {
             responseSuccessInterceptor = responseUseCalls[0][0];
             responseErrorInterceptor = responseUseCalls[0][1];
@@ -76,25 +70,6 @@ describe("axios-setup", () => {
 
     afterEach(() => {
         vi.restoreAllMocks();
-    });
-
-    it("interceptor de requisição deve adicionar token se existir", () => {
-        localStorage.setItem("jwtToken", "token123");
-        const config = {headers: {}};
-        const result = requestInterceptor(config);
-        expect(result.headers.Authorization).toBe("Bearer token123");
-    });
-
-    it("interceptor de requisição não deve adicionar token se estiver faltando", () => {
-        localStorage.removeItem("jwtToken");
-        const config = {headers: {}};
-        const result = requestInterceptor(config);
-        expect(result.headers.Authorization).toBeUndefined();
-    });
-
-    it("interceptor de erro de requisição deve rejeitar a promessa", async () => {
-        const error = new Error("Request error");
-        await expect(requestErrorInterceptor(error)).rejects.toThrow("Request error");
     });
 
     it("interceptor de erro de resposta deve redirecionar para login em caso de 401", async () => {

@@ -21,7 +21,7 @@
     "@vitest/browser-preview": "^4.0.18",
     "axe-playwright": "^2.2.2",
     "chrome-launcher": "^1.2.1",
-    "eslint": "^10.0.3",
+    "eslint": "^10.1.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-playwright": "^2.10.1",
     "globals": "^17.4.0",

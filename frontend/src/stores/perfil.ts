@@ -6,10 +6,6 @@ import * as usuarioService from "../services/usuarioService";
 import {useErrorHandler} from "@/composables/useErrorHandler";
 import {useLocalStorage} from "@/composables/useLocalStorage";
 
-function definirToken(token: string) {
-    localStorage.setItem("jwtToken", token);
-}
-
 export const usePerfilStore = defineStore("perfil", () => {
     // Estados sincronizados com localStorage usando composable
     const usuarioCodigo = useLocalStorage<string | null>("usuarioCodigo", null);
@@ -89,7 +85,6 @@ export const usePerfilStore = defineStore("perfil", () => {
                         loginResponse.nome,
                     );
                     definirUsuarioCodigo(loginResponse.tituloEleitoral);
-                    definirToken(loginResponse.token);
                 }
                 return true;
             }
@@ -118,7 +113,6 @@ export const usePerfilStore = defineStore("perfil", () => {
                 loginResponse.nome,
             );
             definirUsuarioCodigo(loginResponse.tituloEleitoral);
-            definirToken(loginResponse.token);
         });
     }
 
@@ -131,9 +125,6 @@ export const usePerfilStore = defineStore("perfil", () => {
         usuarioNome.value = null;
         perfisUnidades.value = [];
         perfis.value = [];
-
-        // Apenas jwtToken precisa de remoção manual (não é gerenciado pelo composable)
-        localStorage.removeItem("jwtToken");
     }
 
     return {

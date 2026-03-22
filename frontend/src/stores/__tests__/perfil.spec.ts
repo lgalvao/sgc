@@ -151,7 +151,6 @@ describe("usePerfilStore", () => {
             await context.store.selecionarPerfilUnidade("456", perfilUnidade);
 
             expect(mockUsuarioService.entrar).toHaveBeenCalledWith({
-                tituloEleitoral: "456",
                 perfil: Perfil.GESTOR,
                 unidadeCodigo: 2,
             });
@@ -193,7 +192,6 @@ describe("usePerfilStore", () => {
             expect(context.store.usuarioCodigo).toBeNull();
             expect(context.store.perfilSelecionado).toBeNull();
             expect(context.store.unidadeSelecionada).toBeNull();
-            expect(mockLocalStorage.removeItem).toHaveBeenCalledWith("jwtToken");
         });
 
         it("deve limpar o erro", () => {
