@@ -11,6 +11,6 @@ import java.util.*;
  */
 @Builder
 public record SalvarAjustesRequest(
-        @NotEmpty(message = SgcMensagens.LISTA_COMPETENCIAS_NAO_PODE_SER_VAZIA)
+        @NotEmpty(message = Mensagens.LISTA_COMPETENCIAS_NAO_PODE_SER_VAZIA)
         List<CompetenciaAjusteDto> competencias) {
 }

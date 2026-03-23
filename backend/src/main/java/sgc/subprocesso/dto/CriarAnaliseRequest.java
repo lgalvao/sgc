@@ -8,15 +8,15 @@ import sgc.subprocesso.model.*;
 
 @Builder
 public record CriarAnaliseRequest(
-        @Size(max = 500, message = SgcMensagens.OBSERVACOES_MAX_500)
+        @Size(max = 500, message = Mensagens.OBSERVACOES_MAX_500)
         @Nullable
         String observacoes,
 
-        @Size(max = 200, message = SgcMensagens.MOTIVO_MAX)
+        @Size(max = 200, message = Mensagens.MOTIVO_MAX)
         @Nullable
         String motivo,
 
-        @NotNull(message = SgcMensagens.ACAO_OBRIGATORIA)
+        @NotNull(message = Mensagens.ACAO_OBRIGATORIA)
         TipoAcaoAnalise acao
 ) {
 }

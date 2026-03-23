@@ -159,7 +159,7 @@ public class ProcessoService {
     public Processo atualizar(Long codigo, AtualizarProcessoRequest req) {
         Processo processo = buscarPorCodigo(codigo);
         if (processo.getSituacao() != CRIADO) {
-            throw new ErroValidacao(SgcMensagens.PROCESSO_SO_EDITAVEL_EM_CRIADO);
+            throw new ErroValidacao(Mensagens.PROCESSO_SO_EDITAVEL_EM_CRIADO);
         }
 
         validarUnidadesParaProcesso(req.tipo(), new ArrayList<>(req.unidades()));
@@ -180,7 +180,7 @@ public class ProcessoService {
     public void apagar(Long codigo) {
         Processo processo = buscarPorCodigo(codigo);
         if (processo.getSituacao() != CRIADO) {
-            throw new ErroValidacao(SgcMensagens.PROCESSO_SO_REMOVIVEL_EM_CRIADO);
+            throw new ErroValidacao(Mensagens.PROCESSO_SO_REMOVIVEL_EM_CRIADO);
         }
         processoRepo.deleteById(codigo);
         log.info("Processo {} removido.", codigo);
@@ -190,7 +190,7 @@ public class ProcessoService {
     public List<String> iniciar(Long codigo, List<Long> codsUnidadesParam, Usuario usuario) {
         Processo processo = buscarPorCodigo(codigo);
         if (processo.getSituacao() != CRIADO) {
-            throw new ErroValidacao(SgcMensagens.PROCESSO_SO_INICIAVEL_EM_CRIADO);
+            throw new ErroValidacao(Mensagens.PROCESSO_SO_INICIAVEL_EM_CRIADO);
         }
 
         TipoProcesso tipo = processo.getTipo();
@@ -199,7 +199,7 @@ public class ProcessoService {
 
         if (tipo == REVISAO) {
             if (codsUnidadesParam.isEmpty()) {
-                throw new ErroValidacao(SgcMensagens.LISTA_UNIDADES_OBRIGATORIA_REVISAO);
+                throw new ErroValidacao(Mensagens.LISTA_UNIDADES_OBRIGATORIA_REVISAO);
             }
             codigosUnidades = codsUnidadesParam;
             unidadesParaProcessar = new HashSet<>(unidadeService.porCodigos(codigosUnidades));
@@ -207,7 +207,7 @@ public class ProcessoService {
         } else {
             codigosUnidades = processo.getCodigosParticipantes();
             if (codigosUnidades.isEmpty()) {
-                throw new ErroValidacao(SgcMensagens.SEM_UNIDADES_PARTICIPANTES);
+                throw new ErroValidacao(Mensagens.SEM_UNIDADES_PARTICIPANTES);
             }
             unidadesParaProcessar = new HashSet<>(unidadeService.porCodigos(codigosUnidades));
         }
@@ -252,12 +252,12 @@ public class ProcessoService {
         Usuario usuario = usuarioService.usuarioAutenticado();
         List<Subprocesso> subprocessos = subprocessoService.listarEntidadesPorProcessoEUnidades(codProcesso, req.unidadeCodigos());
         
-        if (req.unidadeCodigos().isEmpty()) throw new ErroValidacao(SgcMensagens.SELECIONE_AO_MENOS_UMA_UNIDADE);
+        if (req.unidadeCodigos().isEmpty()) throw new ErroValidacao(Mensagens.SELECIONE_AO_MENOS_UMA_UNIDADE);
         validarSelecaoBloco(req.unidadeCodigos(), subprocessos);
 
         if (req.acao() == DISPONIBILIZAR) {
             if (!permissionEvaluator.verificarPermissao(usuario, subprocessos, DISPONIBILIZAR_MAPA)) {
-                throw new ErroAcessoNegado(SgcMensagens.SEM_PERMISSAO_DISPONIBILIZAR);
+                throw new ErroAcessoNegado(Mensagens.SEM_PERMISSAO_DISPONIBILIZAR);
             }
             DisponibilizarMapaRequest dispReq = new DisponibilizarMapaRequest(req.dataLimite(), "Disponibilização em bloco");
             transicaoService.disponibilizarMapaEmBloco(subprocessos.stream().map(Subprocesso::getCodigo).toList(), dispReq, usuario);
@@ -306,7 +306,7 @@ public class ProcessoService {
         Unidade unidade = unidadeService.buscarPorCodigo(unidadeCodigo);
 
         if (processo.getParticipantes().stream().noneMatch(u -> u.getUnidadeCodigo().equals(unidadeCodigo))) {
-            throw new ErroValidacao(SgcMensagens.UNIDADE_NAO_PARTICIPA);
+            throw new ErroValidacao(Mensagens.UNIDADE_NAO_PARTICIPA);
         }
 
         String dataLimiteText = processo.getDataLimite() != null 
@@ -355,13 +355,13 @@ public class ProcessoService {
         List<String> invalidas = entidades.stream()
                 .filter(u -> u.getTipo() == TipoUnidade.INTERMEDIARIA)
                 .map(Unidade::getSigla).toList();
-        if (!invalidas.isEmpty()) throw new ErroValidacao(SgcMensagens.UNIDADES_INTERMEDIARIA_INVALIDAS.formatted(String.join(", ", invalidas)));
+        if (!invalidas.isEmpty()) throw new ErroValidacao(Mensagens.UNIDADES_INTERMEDIARIA_INVALIDAS.formatted(String.join(", ", invalidas)));
 
         if (tipo == REVISAO || tipo == DIAGNOSTICO) {
             List<String> semMapa = codigosUnidades.stream()
                     .filter(codigo -> !unidadeService.verificarMapaVigente(codigo))
                     .map(codigo -> unidadeService.buscarPorCodigo(codigo).getSigla()).toList();
-            if (!semMapa.isEmpty()) throw new ErroValidacao(SgcMensagens.UNIDADES_SEM_MAPA_VIGENTE.formatted(String.join(", ", semMapa)));
+            if (!semMapa.isEmpty()) throw new ErroValidacao(Mensagens.UNIDADES_SEM_MAPA_VIGENTE.formatted(String.join(", ", semMapa)));
         }
     }
 
@@ -369,17 +369,17 @@ public class ProcessoService {
         List<String> erros = new ArrayList<>();
         if (tipo == REVISAO || tipo == DIAGNOSTICO) {
             unidadeService.buscarSiglasPorCodigos(cods.stream().filter(codigo -> !unidadeService.verificarMapaVigente(codigo)).toList())
-                    .stream().findFirst().ifPresent(s -> erros.add(SgcMensagens.UNIDADES_SEM_MAPA));
+                    .stream().findFirst().ifPresent(s -> erros.add(Mensagens.UNIDADES_SEM_MAPA));
         }
         List<Long> bloqueadas = processoRepo.listarUnidadesEmProcessoAtivo(EM_ANDAMENTO, cods);
-        if (!bloqueadas.isEmpty()) erros.add(SgcMensagens.UNIDADES_EM_PROCESSO_ATIVO);
+        if (!bloqueadas.isEmpty()) erros.add(Mensagens.UNIDADES_EM_PROCESSO_ATIVO);
         return erros;
     }
 
     private void validarFinalizacao(Processo processo) {
-        if (processo.getSituacao() != EM_ANDAMENTO) throw new ErroValidacao(SgcMensagens.SITUACAO_INVALIDA);
+        if (processo.getSituacao() != EM_ANDAMENTO) throw new ErroValidacao(Mensagens.SITUACAO_INVALIDA);
         if (!validacaoService.validarSubprocessosParaFinalizacao(processo.getCodigo()).valido()) 
-            throw new ErroValidacao(SgcMensagens.SUBPROCESSOS_NAO_HOMOLOGADOS);
+            throw new ErroValidacao(Mensagens.SUBPROCESSOS_NAO_HOMOLOGADOS);
     }
 
     private void tornarMapasVigentes(Processo processo) {
@@ -533,7 +533,7 @@ public class ProcessoService {
         if (codigos.size() != list.size()) {
             Set<Long> encontrados = list.stream().map(Subprocesso::getUnidade).map(Unidade::getCodigo).collect(Collectors.toSet());
             List<Long> faltando = codigos.stream().filter(codigo -> !encontrados.contains(codigo)).toList();
-            throw new ErroValidacao(SgcMensagens.UNIDADES_SEM_SUBPROCESSOS.formatted(faltando));
+            throw new ErroValidacao(Mensagens.UNIDADES_SEM_SUBPROCESSOS.formatted(faltando));
         }
     }
 }

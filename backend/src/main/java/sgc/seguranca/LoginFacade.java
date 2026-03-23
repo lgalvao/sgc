@@ -81,7 +81,7 @@ public class LoginFacade {
         if (perfilSolicitado == ADMIN) {
             boolean temPerfilAdmin = autorizacoes.stream().anyMatch(pu -> pu.perfil() == ADMIN);
             if (!temPerfilAdmin) {
-                throw new ErroAcessoNegado(SgcMensagens.SEM_PERMISSAO_ACESSO_PERFIL);
+                throw new ErroAcessoNegado(Mensagens.SEM_PERMISSAO_ACESSO_PERFIL);
             }
         } else {
             boolean autorizado = autorizacoes.stream()
@@ -91,7 +91,7 @@ public class LoginFacade {
                         return perfil == perfilSolicitado && codigoUnidade.equals(codUnidade);
                     });
             if (!autorizado) {
-                throw new ErroAcessoNegado(SgcMensagens.SEM_PERMISSAO_ACESSO_PERFIL);
+                throw new ErroAcessoNegado(Mensagens.SEM_PERMISSAO_ACESSO_PERFIL);
             }
         }
 
@@ -107,7 +107,7 @@ public class LoginFacade {
     private List<PerfilUnidadeDto> buscarAutorizacoes(String tituloEleitoral) {
         Usuario usuario = usuarioFacade.carregarUsuarioParaAutenticacao(tituloEleitoral);
         if (usuario == null) {
-            throw new ErroAutenticacao(SgcMensagens.CREDENCIAIS_INVALIDAS);
+            throw new ErroAutenticacao(Mensagens.CREDENCIAIS_INVALIDAS);
         }
 
         List<UsuarioPerfil> atribuicoes = usuarioService.buscarPerfis(usuario.getTituloEleitoral());

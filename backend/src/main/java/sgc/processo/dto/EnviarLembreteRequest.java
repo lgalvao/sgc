@@ -9,5 +9,5 @@ import sgc.comum.*;
  */
 @Builder
 public record EnviarLembreteRequest(
-        @NotNull(message = SgcMensagens.CODIGO_UNIDADE_OBRIGATORIO) Long unidadeCodigo) {
+        @NotNull(message = Mensagens.CODIGO_UNIDADE_OBRIGATORIO) Long unidadeCodigo) {
 }

@@ -127,7 +127,7 @@ public class UsuarioFacade {
     @Transactional
     public void removerAdministrador(String usuarioTitulo, String usuarioAtualTitulo) {
         if (usuarioTitulo.equals(usuarioAtualTitulo)) {
-            throw new ErroValidacao(SgcMensagens.NAO_REMOVER_A_SI_MESMO);
+            throw new ErroValidacao(Mensagens.NAO_REMOVER_A_SI_MESMO);
         }
 
         usuarioService.removerAdministrador(usuarioTitulo);

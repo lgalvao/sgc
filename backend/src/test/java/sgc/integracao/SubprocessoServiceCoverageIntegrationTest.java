@@ -63,7 +63,7 @@ class SubprocessoServiceCoverageIntegrationTest extends BaseIntegrationTest {
     void validarExistenciaAtividades_SemAtividades() {
         assertThatThrownBy(() -> validacaoService.validarExistenciaAtividades(subprocesso))
                 .isInstanceOf(ErroValidacao.class)
-                .hasMessage(SgcMensagens.MAPA_SEM_ATIVIDADES);
+                .hasMessage(Mensagens.MAPA_SEM_ATIVIDADES);
     }
 
     @Test
@@ -74,6 +74,6 @@ class SubprocessoServiceCoverageIntegrationTest extends BaseIntegrationTest {
 
         assertThatThrownBy(() -> validacaoService.validarExistenciaAtividades(subprocesso))
                 .isInstanceOf(ErroValidacao.class)
-                .hasMessage(SgcMensagens.ATIVIDADES_SEM_CONHECIMENTOS);
+                .hasMessage(Mensagens.ATIVIDADES_SEM_CONHECIMENTOS);
     }
 }

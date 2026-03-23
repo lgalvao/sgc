@@ -7,9 +7,9 @@ package sgc.comum;
  * para facilitar manutenção e consistência.
  * Use {@link String#formatted} para os templates que contêm {@code %s} ou {@code %d}.
  */
-public final class SgcMensagens {
+public final class Mensagens {
 
-    private SgcMensagens() {}
+    private Mensagens() {}
 
     // ── Validações Genéricas ────────────────────────────────────────────────
     public static final String CAMPO_TEXTO_OBRIGATORIO          = "O campo texto é obrigatório";

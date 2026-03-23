@@ -78,7 +78,7 @@ class SubprocessoServiceValidacaoIntegrationTest extends BaseIntegrationTest {
         Long mapaCodigo = subprocesso.getMapa().getCodigo();
         assertThatThrownBy(() -> validacaoService.validarAssociacoesMapa(mapaCodigo))
                 .isInstanceOf(ErroValidacao.class)
-                .hasMessageContaining(SgcMensagens.COMPETENCIAS_SEM_ATIVIDADE);
+                .hasMessageContaining(Mensagens.COMPETENCIAS_SEM_ATIVIDADE);
     }
 
     @Test
@@ -90,7 +90,7 @@ class SubprocessoServiceValidacaoIntegrationTest extends BaseIntegrationTest {
         Long mapaCodigo = subprocesso.getMapa().getCodigo();
         assertThatThrownBy(() -> validacaoService.validarAssociacoesMapa(mapaCodigo))
                 .isInstanceOf(ErroValidacao.class)
-                .hasMessageContaining(SgcMensagens.ATIVIDADES_SEM_COMPETENCIA);
+                .hasMessageContaining(Mensagens.ATIVIDADES_SEM_COMPETENCIA);
     }
 
     @Test

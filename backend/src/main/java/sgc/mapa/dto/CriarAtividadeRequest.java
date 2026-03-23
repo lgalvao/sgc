@@ -7,10 +7,10 @@ import sgc.seguranca.sanitizacao.*;
 
 @Builder
 public record CriarAtividadeRequest(
-        @NotNull(message = SgcMensagens.CODIGO_MAPA_OBRIGATORIO)
+        @NotNull(message = Mensagens.CODIGO_MAPA_OBRIGATORIO)
         Long mapaCodigo,
 
-        @NotBlank(message = SgcMensagens.DESCRICAO_NAO_PODE_SER_VAZIA)
+        @NotBlank(message = Mensagens.DESCRICAO_NAO_PODE_SER_VAZIA)
         @SanitizarHtml
         String descricao
 ) {

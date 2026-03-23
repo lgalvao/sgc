@@ -10,7 +10,7 @@ public final class ComumDtos {
     }
 
     public record TextoRequest(
-            @NotBlank(message = SgcMensagens.CAMPO_TEXTO_OBRIGATORIO)
+            @NotBlank(message = Mensagens.CAMPO_TEXTO_OBRIGATORIO)
             String texto
     ) {
     }
@@ -21,13 +21,13 @@ public final class ComumDtos {
     }
 
     public record JustificativaRequest(
-            @NotBlank(message = SgcMensagens.JUSTIFICATIVA_OBRIGATORIA)
+            @NotBlank(message = Mensagens.JUSTIFICATIVA_OBRIGATORIA)
             String justificativa
     ) {
     }
 
     public record DataRequest(
-            @NotNull(message = SgcMensagens.DATA_OBRIGATORIA)
+            @NotNull(message = Mensagens.DATA_OBRIGATORIA)
             LocalDate data
     ) {
     }

@@ -9,7 +9,7 @@ import sgc.comum.*;
  */
 @Builder
 public record EntrarRequest(
-        @NotNull(message = SgcMensagens.PERFIL_OBRIGATORIO) @Size(max = 50, message = SgcMensagens.PERFIL_MAX) String perfil,
+        @NotNull(message = Mensagens.PERFIL_OBRIGATORIO) @Size(max = 50, message = Mensagens.PERFIL_MAX) String perfil,
 
-        @NotNull(message = SgcMensagens.CODIGO_UNIDADE_OBRIGATORIO) Long unidadeCodigo) {
+        @NotNull(message = Mensagens.CODIGO_UNIDADE_OBRIGATORIO) Long unidadeCodigo) {
 }

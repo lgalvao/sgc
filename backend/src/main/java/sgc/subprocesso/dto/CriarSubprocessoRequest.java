@@ -15,15 +15,15 @@ import java.time.*;
  */
 @Builder
 public record CriarSubprocessoRequest(
-        @NotNull(message = SgcMensagens.CODIGO_PROCESSO_OBRIGATORIO)
+        @NotNull(message = Mensagens.CODIGO_PROCESSO_OBRIGATORIO)
         Long codProcesso,
 
-        @NotNull(message = SgcMensagens.CODIGO_UNIDADE_OBRIGATORIO)
+        @NotNull(message = Mensagens.CODIGO_UNIDADE_OBRIGATORIO)
         Long codUnidade,
 
         Long codMapa,
 
-        @NotNull(message = SgcMensagens.DATA_LIMITE_ETAPA1_OBRIGATORIA)
+        @NotNull(message = Mensagens.DATA_LIMITE_ETAPA1_OBRIGATORIA)
         LocalDateTime dataLimiteEtapa1,
 
         LocalDateTime dataLimiteEtapa2) {

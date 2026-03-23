@@ -17,8 +17,8 @@ import sgc.comum.model.*;
 public class Parametro extends EntidadeBase {
     @JsonView(ConfiguracaoViews.Publica.class)
     @Column(name = "chave", length = 50, nullable = false)
-    @NotBlank(message = SgcMensagens.CHAVE_OBRIGATORIA)
-    @Size(max = 50, message = SgcMensagens.CHAVE_MAX)
+    @NotBlank(message = Mensagens.CHAVE_OBRIGATORIA)
+    @Size(max = 50, message = Mensagens.CHAVE_MAX)
     private String chave;
 
     @JsonView(ConfiguracaoViews.Publica.class)
@@ -27,7 +27,7 @@ public class Parametro extends EntidadeBase {
 
     @JsonView(ConfiguracaoViews.Publica.class)
     @Column(name = "valor", nullable = false)
-    @NotBlank(message = SgcMensagens.VALOR_OBRIGATORIO)
+    @NotBlank(message = Mensagens.VALOR_OBRIGATORIO)
     private String valor;
 
     public void atualizarDe(sgc.parametros.ParametroRequest request) {
