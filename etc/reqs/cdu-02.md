@@ -15,7 +15,6 @@ Ator: Usuário (todos os perfis)
    subordinadas.
 
    2.1. Campos da tabela:
-
     - `Descrição`: Descrição dada ao processo no momento do seu cadastro
     - `Tipo`: Tipo do processo ('Mapeamento', 'Revisão' ou 'Diagnóstico')
     - `Unidades participantes`: Lista textual das unidades, contendo apenas as unidades de nível mais alto abaixo da
@@ -34,27 +33,26 @@ Ator: Usuário (todos os perfis)
         - Clicar em processos nas situações 'Em andamento' e 'Finalizado' mostrará as telas Detalhes do processo, caso o
           perfil logado seja ADMIN ou GESTOR (ver caso de uso `Detalhar processo`), ou `Detalhes do subprocesso`, caso o
           perfil logado seja CHEFE ou SERVIDOR (ver caso de uso `Detalhar subprocesso`).
+          
+   2.3. Caso o usuário logado esteja no perfil ADMIN, no topo da seção de Processos ativos deverá ser exibido o botão `Criar processo` a partir do qual será efetuado o cadastro de novos processos (ver caso de uso `Manter processo`).
 
-   2.3. Caso o usuário logado esteja no perfil ADMIN, no topo da seção de Processos ativos deverá ser exibido o botão
-   `Criar processo` a partir do qual será efetuado o cadastro de novos processos (ver caso de uso `Manter processo`).
-
-3. Na seção `Alertas`, O sistema mostra uma tabela com os alertas registrados pelo sistema que tiverem como destino o
-   usuário logado ou, na ausência desta informação específica, a sua unidade de lotação (título 'Alertas').
+3. Na seção `Alertas`, O sistema mostra uma tabela com os alertas registrados pelo sistema que tiverem como destino o usuário logado ou, na ausência desta informação específica, a sua unidade de ativa, ouse seja a unidade que escolheu ao fazer o login no sistema).
 
    3.1. Campos da tabela:
-
     - `Descrição`: Descrição do alerta
     - `Data/Hora`: Informação da data e da hora de geração do alerta
     - `Processo`: Descrição do processo a que se refere o alerta
     - `Unidade`: Unidade de origem do alerta
 
-   3.2. Regras de exibição e funcionamento da tabela de alertas:
+   3.2. Regras de visibilidade de alertas por perfil: 
+      - Perfil SERVIDOR:
+          * Vê apenas os alertas direcionados ao seu título de eleitor
+          * Não vê alertas da unidade (mesmo que ele tenha a unidade como unidade ativa).
+      - Outros Perfis (ADMIN, GESTOR, CHEFE):
+          * Veem os alertas direcionados a eles 
+          * Veem tambem alertas da sua unidade ativa (desde que esses alertas não tenham um usuário de destino específico).
 
-    - Alertas ainda não visualizados pelo usuário logado serão exibidos em negrito.
-    - Na primeira visualização de um ou mais alertas pelo usuário logado, estes alertas deverão ser marcado como
-      visualizado **pelo usuário**, de maneira a serem exibidos sem negrito a partir da próxima visualização pelo mesmo
-      usuário.
-    - Os alertas devem estar inicialmente em ordem decrescente por data/hora, podendo-se alternar a ordenação clicando
-      no cabeçalho correspondente.
-    - A ordenação deve ser feita tendo como primeiro critério a `Processo` (asc/desc) e em seguida `Data/hora` (desc).
-    - O cabeçalho da coluna `Processo` poderá ser clicado para alterar a ordenação dos dados da tabela.
+   3.3. Regras de exibição e funcionamento da tabela de alertas:
+     - Alertas ainda não visualizados pelo usuário logado serão exibidos em negrito.
+     - Na primeira visualização de um ou mais alertas pelo usuário logado, estes alertas deverão ser marcado como visualizado **pelo usuário**, de maneira a serem exibidos sem negrito a partir da próxima visualização pelo mesmo usuário.
+     - Os alertas devem estar ordenados de forma decrescente por data/hora, nao sendo permitida a reordenação.

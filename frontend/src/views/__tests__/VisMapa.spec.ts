@@ -4,7 +4,7 @@ import {createMemoryHistory, createRouter} from 'vue-router';
 import {createTestingPinia} from '@pinia/testing';
 import VisMapa from '@/views/MapaVisualizacaoView.vue';
 import AceitarMapaModal from "@/components/mapa/AceitarMapaModal.vue";
-import {useProcessosStore} from "@/stores/processos";
+import {ref} from 'vue';
 import {useToastStore} from "@/stores/toast";
 import {SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 import {setupComponentTest} from "@/test-utils/componentTestHelpers";
@@ -39,6 +39,20 @@ vi.mock("@/services/mapaService", () => ({
 vi.mock("@/services/analiseService", () => ({
     listarAnalisesCadastro: vi.fn().mockResolvedValue([]),
     listarAnalisesValidacao: vi.fn().mockResolvedValue([]),
+}));
+
+const processosMock = {
+    processoDetalhe: ref<any>(null),
+    buscarProcessoDetalhe: vi.fn(),
+    validarMapa: vi.fn(),
+    apresentarSugestoes: vi.fn(),
+    aceitarValidacao: vi.fn(),
+    homologarValidacao: vi.fn(),
+    devolverValidacao: vi.fn(),
+};
+
+vi.mock("@/composables/useProcessos", () => ({
+    useProcessos: () => processosMock
 }));
 
 const router = createRouter({
@@ -89,6 +103,18 @@ describe("VisMapa.vue", () => {
             ...accessOverrides
         });
 
+        processosMock.processoDetalhe.value = {
+            unidades: [
+                {
+                    sigla: siglaUnidade,
+                    codUnidade: 10,
+                    codSubprocesso: 10,
+                    situacaoSubprocesso: SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO,
+                },
+            ],
+            ...initialState["processos"],
+        };
+
         context.wrapper = mount(VisMapa, {
             global: {
                 plugins: [
@@ -126,20 +152,6 @@ describe("VisMapa.vue", () => {
                                 unidade: {sigla: "TEST", nome: "Unidade de Teste", filhas: []},
                                 ...initialState["unidades"],
                             },
-                            processos: {
-                                processoDetalhe: {
-                                    unidades: [
-                                        {
-                                            sigla: siglaUnidade,
-                                            codUnidade: 10,
-                                            codSubprocesso: 10,
-                                            situacaoSubprocesso:
-                                            SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO,
-                                        },
-                                    ],
-                                },
-                                ...initialState["processos"],
-                            },
                             perfil: {
                                 perfilSelecionado: "CHEFE",
                                 ...initialState["perfil"],
@@ -157,7 +169,26 @@ describe("VisMapa.vue", () => {
                 ],
                 stubs: {
                     AceitarMapaModal: true,
+                    BBadge: {
+                        name: 'BBadge',
+                        template: '<span><slot /></span>'
+                    },
+                    BCard: {
+                        name: 'BCard',
+                        template: '<div><slot /></div>'
+                    },
+                    BFormGroup: {
+                        name: 'BFormGroup',
+                        props: ['label'],
+                        template: '<div><label>{{ label }}</label><slot /></div>'
+                    },
+                    BFormTextarea: {
+                        name: 'BFormTextarea',
+                        props: ['modelValue'],
+                        template: '<textarea :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)"></textarea>'
+                    },
                     BModal: {
+                        name: 'BModal',
                         props: ["modelValue", "title"],
                         template: `
                     <div v-if="modelValue" class="custom-modal-stub" :data-title="title">
@@ -169,6 +200,21 @@ describe("VisMapa.vue", () => {
                     </div>
                 `,
                     },
+                    ModalConfirmacao: {
+                        name: 'ModalConfirmacao',
+                        props: ['modelValue', 'titulo', 'okDisabled'],
+                        template: '<div v-if="modelValue"><h3>{{ titulo }}</h3><slot /> <button data-testid="btn-validar-mapa-confirmar" :disabled="okDisabled" @click="$emit(\'confirmar\')">OK</button> <button data-testid="btn-sugestoes-mapa-confirmar" :disabled="okDisabled" @click="$emit(\'confirmar\')">OK</button> <button data-testid="btn-devolucao-mapa-confirmar" :disabled="okDisabled" @click="$emit(\'confirmar\')">OK</button></div>'
+                    },
+                    ModalPadrao: {
+                        name: 'ModalPadrao',
+                        props: ['modelValue', 'testIdCancelar'],
+                        template: '<div v-if="modelValue"><slot /><button :data-testid="testIdCancelar" @click="$emit(\'fechar\')">Fechar</button></div>'
+                    },
+                    EmptyState: {
+                        name: 'EmptyState',
+                        props: ['title', 'description'],
+                        template: '<div><h3>{{ title }}</h3><p>{{ description }}</p></div>'
+                    }
                 },
             },
         });
@@ -290,7 +336,6 @@ describe("VisMapa.vue", () => {
 
     it("opens validar modal and confirms", async () => {
         const {wrapper, toastStore} = mountComponent({}, "TEST", {podeValidarMapa: {value: true}});
-        const store = useProcessosStore();
 
         await wrapper.find('[data-testid="btn-mapa-validar"]').trigger("click");
         await wrapper.vm.$nextTick();
@@ -301,13 +346,12 @@ describe("VisMapa.vue", () => {
         await confirmBtn.trigger("click");
         await flushPromises();
 
-        expect(store.validarMapa).toHaveBeenCalledWith(10);
+        expect(processosMock.validarMapa).toHaveBeenCalledWith(10);
         expect(toastStore.setPending).toHaveBeenCalled();
     });
 
     it("opens sugestoes modal and confirms", async () => {
         const {wrapper, toastStore} = mountComponent({}, "TEST", {podeValidarMapa: {value: true}});
-        const store = useProcessosStore();
 
         await wrapper
             .find('[data-testid="btn-mapa-sugestoes"]')
@@ -323,7 +367,7 @@ describe("VisMapa.vue", () => {
         await confirmBtn.trigger("click");
         await flushPromises();
 
-        expect(store.apresentarSugestoes).toHaveBeenCalledWith(10, {
+        expect(processosMock.apresentarSugestoes).toHaveBeenCalledWith(10, {
             sugestoes: "Minhas sugestões",
         });
         expect(toastStore.setPending).toHaveBeenCalled();
@@ -345,8 +389,6 @@ describe("VisMapa.vue", () => {
                 },
             },
         });
-        const store = useProcessosStore();
-
         await wrapper.find('[data-testid="btn-mapa-devolver"]').trigger("click");
         await wrapper.vm.$nextTick();
 
@@ -360,7 +402,7 @@ describe("VisMapa.vue", () => {
         );
         await confirmBtn.trigger("click");
 
-        expect(store.devolverValidacao).toHaveBeenCalledWith(10, {
+        expect(processosMock.devolverValidacao).toHaveBeenCalledWith(10, {
             justificativa: "Ajustar X",
         });
     });
@@ -381,8 +423,6 @@ describe("VisMapa.vue", () => {
                 },
             },
         });
-        const store = useProcessosStore();
-
         await wrapper
             .find('[data-testid="btn-mapa-homologar-aceite"]')
             .trigger("click");
@@ -393,7 +433,7 @@ describe("VisMapa.vue", () => {
 
         modal.vm.$emit("confirmar-aceitacao", "Obs aceite");
 
-        expect(store.aceitarValidacao).toHaveBeenCalledWith(10, {texto: "Obs aceite"});
+        expect(processosMock.aceitarValidacao).toHaveBeenCalledWith(10, {texto: "Obs aceite"});
     });
 
     it("confirms homologacao (ADMIN)", async () => {
@@ -413,8 +453,6 @@ describe("VisMapa.vue", () => {
                 },
             },
         }, "TEST", {podeHomologarMapa: {value: true}});
-        const store = useProcessosStore();
-
         await wrapper
             .find('[data-testid="btn-mapa-homologar-aceite"]')
             .trigger("click");
@@ -423,7 +461,7 @@ describe("VisMapa.vue", () => {
         const modal = wrapper.findComponent(AceitarMapaModal);
         modal.vm.$emit("confirmar-aceitacao", "Obs homolog");
 
-        expect(store.homologarValidacao).toHaveBeenCalledWith(10, {texto: "Obs homolog"});
+        expect(processosMock.homologarValidacao).toHaveBeenCalledWith(10, {texto: "Obs homolog"});
     });
 
     it("shows historico de analise", async () => {
@@ -514,8 +552,6 @@ describe("VisMapa.vue", () => {
                 },
             },
         });
-        const store = useProcessosStore();
-
         await wrapper
             .find('[data-testid="btn-mapa-homologar-aceite"]')
             .trigger("click");
@@ -524,7 +560,7 @@ describe("VisMapa.vue", () => {
         const modal = wrapper.findComponent(AceitarMapaModal);
         modal.vm.$emit("confirmar-aceitacao", "Obs homolog");
 
-        expect(store.homologarValidacao).toHaveBeenCalledWith(10, {texto: "Obs homolog"});
+        expect(processosMock.homologarValidacao).toHaveBeenCalledWith(10, {texto: "Obs homolog"});
     });
 
     it("handles error in confirmarAceitacao", async () => {
@@ -543,8 +579,7 @@ describe("VisMapa.vue", () => {
                 },
             },
         });
-        const store = useProcessosStore();
-        (store.aceitarValidacao as any).mockRejectedValue(new Error("Fail"));
+        (processosMock.aceitarValidacao as any).mockRejectedValue(new Error("Fail"));
 
         await wrapper
             .find('[data-testid="btn-mapa-homologar-aceite"]')
@@ -555,7 +590,7 @@ describe("VisMapa.vue", () => {
         modal.vm.$emit("confirmar-aceitacao", "Obs");
         await flushPromises();
 
-        expect(store.aceitarValidacao).toHaveBeenCalled();
+        expect(processosMock.aceitarValidacao).toHaveBeenCalled();
     });
 
     it("handles error in confirmarDevolucao", async () => {
@@ -574,8 +609,7 @@ describe("VisMapa.vue", () => {
                 },
             },
         });
-        const store = useProcessosStore();
-        (store.devolverValidacao as any).mockRejectedValue(new Error("Fail"));
+        (processosMock.devolverValidacao as any).mockRejectedValue(new Error("Fail"));
 
         await wrapper.find('[data-testid="btn-mapa-devolver"]').trigger("click");
         await wrapper.vm.$nextTick();
@@ -586,35 +620,33 @@ describe("VisMapa.vue", () => {
         await wrapper.find('[data-testid="btn-devolucao-mapa-confirmar"]').trigger("click");
         await flushPromises();
 
-        expect(store.devolverValidacao).toHaveBeenCalled();
+        expect(processosMock.devolverValidacao).toHaveBeenCalled();
     });
 
     it("handles error in confirmarValidacao", async () => {
         const {wrapper} = mountComponent({}, "TEST", {podeValidarMapa: {value: true}});
-        const store = useProcessosStore();
-        (store.validarMapa as any).mockRejectedValue(new Error("Fail"));
+        (processosMock.validarMapa as any).mockRejectedValue(new Error("Fail"));
 
         await wrapper.find('[data-testid="btn-mapa-validar"]').trigger("click");
         await wrapper.vm.$nextTick();
         await wrapper.find('[data-testid="btn-validar-mapa-confirmar"]').trigger("click");
         await flushPromises();
 
-        expect(store.validarMapa).toHaveBeenCalled();
+        expect(processosMock.validarMapa).toHaveBeenCalled();
     });
 
     it("handles error in confirmarSugestoes", async () => {
         const {wrapper} = mountComponent({
             perfil: {perfilSelecionado: "CHEFE"}
         }, "TEST", {podeValidarMapa: {value: true}});
-        const store = useProcessosStore();
-        (store.apresentarSugestoes as any).mockRejectedValue(new Error("Fail"));
+        (processosMock.apresentarSugestoes as any).mockRejectedValue(new Error("Fail"));
         await wrapper.find('[data-testid="btn-mapa-sugestoes"]').trigger("click");
         await wrapper.vm.$nextTick();
         await wrapper.find('[data-testid="inp-sugestoes-mapa-texto"]').setValue("Sugestão com erro");
         await wrapper.find('[data-testid="btn-sugestoes-mapa-confirmar"]').trigger("click");
         await flushPromises();
 
-        expect(store.apresentarSugestoes).toHaveBeenCalled();
+        expect(processosMock.apresentarSugestoes).toHaveBeenCalled();
     });
 
     it("closes ver sugestoes modal", async () => {
@@ -698,5 +730,43 @@ describe("VisMapa.vue", () => {
         await wrapper.vm.$nextTick();
 
         expect((confirmBtn.element as HTMLButtonElement).disabled).toBe(false);
+    });
+
+    it("deve gerenciar a busca recursiva de unidades, visualização de sugestões e estados nulos do subprocesso", async () => {
+        const {wrapper} = mountComponent();
+        await flushPromises();
+        const vm = wrapper.vm;
+
+        // Atualização de v-model na visualização de sugestões
+        wrapper.findComponent({name: 'BFormTextarea'});
+        const textareas = wrapper.findAllComponents({name: 'BFormTextarea'});
+        const visTextarea = textareas.find(t => t.attributes('id') === 'sugestoesVisualizacao');
+        if (visTextarea) await visTextarea.vm.$emit('update:modelValue', 'Sugestões');
+
+        // Busca recursiva de unidade na estrutura hierárquica do processo
+        processosMock.processoDetalhe.value = {
+            unidades: [
+                {
+                    sigla: "P1",
+                    filhos: [{sigla: "C1", codSubprocesso: 20}]
+                }
+            ]
+        };
+        await router.push("/processo/1/C1/vis-mapa");
+        await flushPromises();
+        expect(vm.subprocesso.codSubprocesso).toBe(20);
+        
+        // Tratamento de ausência de detalhes do processo
+        processosMock.processoDetalhe.value = null;
+        await vm.$nextTick();
+        expect(vm.subprocesso).toBeNull();
+
+        // Verificação de retornos antecipados em funções de confirmação sem subprocesso
+        processosMock.processoDetalhe.value = null;
+        await vm.$nextTick();
+        await vm.confirmarSugestoes();
+        await vm.confirmarValidacao();
+        await vm.confirmarAceitacao();
+        await vm.confirmarDevolucao();
     });
 });

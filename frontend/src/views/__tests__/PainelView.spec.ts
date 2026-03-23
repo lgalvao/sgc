@@ -1,10 +1,10 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { mount } from '@vue/test-utils';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {mount} from '@vue/test-utils';
 import PainelView from '../PainelView.vue';
-import { createTestingPinia } from '@pinia/testing';
-import { useToastStore } from '@/stores/toast';
+import {createTestingPinia} from '@pinia/testing';
+import {useToastStore} from '@/stores/toast';
 import * as painelService from '@/services/painelService';
-import { createRouter, createMemoryHistory } from 'vue-router';
+import {createMemoryHistory, createRouter} from 'vue-router';
 
 vi.mock('@/services/painelService', () => ({
   listarAlertas: vi.fn(),
@@ -90,13 +90,13 @@ describe('PainelView', () => {
     const wrapper = mount(PainelView, options);
     await wrapper.vm.$nextTick();
 
-    expect(mockBuscarProcessosPainel).toHaveBeenCalledWith('ADMIN', 1, 0, 10);
-    expect(painelService.listarAlertas).toHaveBeenCalledWith('U123', 1, 0, 10, 'dataHora', 'desc');
+    expect(mockBuscarProcessosPainel).toHaveBeenCalledWith(1, 0, 10);
+    expect(painelService.listarAlertas).toHaveBeenCalledWith(1, 0, 10, 'dataHora', 'desc');
     expect(mockToastCreate).toHaveBeenCalledWith(expect.objectContaining({ props: expect.objectContaining({ body: 'Sucesso' }) }));
   });
 
-  it('nao deve carregar alertas se usuarioCodigo for nulo', async () => {
-    const options = createMountOptions({ usuarioCodigo: null });
+  it('nao deve carregar alertas se unidadeSelecionada for nula', async () => {
+    const options = createMountOptions({ unidadeSelecionada: null });
     mount(PainelView, options);
     expect(painelService.listarAlertas).not.toHaveBeenCalled();
   });
@@ -110,13 +110,13 @@ describe('PainelView', () => {
     // Inverter direção no mesmo critério (default é "descricao" e asc=true)
     vm.ordenarPor('descricao');
     expect(vm.asc).toBe(false);
-    expect(mockBuscarProcessosPainel).toHaveBeenCalledWith('ADMIN', 1, 0, 10, 'descricao', 'desc');
+    expect(mockBuscarProcessosPainel).toHaveBeenCalledWith(1, 0, 10, 'descricao', 'desc');
 
     // Mudar critério
     vm.ordenarPor('dataCriacao');
     expect(vm.criterio).toBe('dataCriacao');
     expect(vm.asc).toBe(true);
-    expect(mockBuscarProcessosPainel).toHaveBeenCalledWith('ADMIN', 1, 0, 10, 'dataCriacao', 'asc');
+    expect(mockBuscarProcessosPainel).toHaveBeenCalledWith(1, 0, 10, 'dataCriacao', 'asc');
   });
 
   it('deve abrir detalhes do processo se linkDestino existir', async () => {

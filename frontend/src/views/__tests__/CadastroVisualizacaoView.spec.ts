@@ -3,10 +3,10 @@ import {flushPromises, mount} from "@vue/test-utils";
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import {ref} from "vue";
 import * as useAcessoModule from "@/composables/useAcesso";
+import * as useFluxoSubprocessoModule from "@/composables/useFluxoSubprocesso";
+import * as useSubprocessosModule from "@/composables/useSubprocessos";
 import * as subprocessoService from "@/services/subprocessoService";
 import * as analiseService from "@/services/analiseService";
-import {useProcessosStore} from "@/stores/processos";
-import {useSubprocessosStore} from "@/stores/subprocessos";
 import CadastroVisualizacaoView from "../CadastroVisualizacaoView.vue";
 
 const {pushMock} = vi.hoisted(() => ({pushMock: vi.fn()}));
@@ -25,6 +25,17 @@ vi.mock("@/services/subprocessoService", () => ({
     buscarContextoEdicao: vi.fn(),
 }));
 
+vi.mock("@/composables/useSubprocessos", () => ({useSubprocessos: vi.fn()}));
+vi.mock("@/composables/useFluxoSubprocesso", () => ({useFluxoSubprocesso: vi.fn()}));
+const processosMock = {
+    processoDetalhe: ref<any>(null),
+    buscarProcessoDetalhe: vi.fn(),
+};
+
+vi.mock("@/composables/useProcessos", () => ({
+    useProcessos: () => processosMock
+}));
+
 const stubs = {
     LayoutPadrao: {template: '<div><slot /></div>'},
     PageHeader: {
@@ -40,18 +51,44 @@ const stubs = {
     BCardTitle: {template: '<div><slot /></div>'},
     BFormGroup: {template: '<div><label><slot name="label" /></label><slot /></div>'},
     BFormTextarea: {
+        name: 'BFormTextarea',
         props: ['modelValue'],
         template: '<textarea :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)"></textarea>'
     },
     BFormInvalidFeedback: {template: '<div><slot /></div>'},
     ImpactoMapaModal: {template: '<div></div>', props: ['mostrar']},
     HistoricoAnaliseModal: {template: '<div></div>', props: ['mostrar']},
-    ModalConfirmacao: {template: '<div v-if="modelValue"> <button :data-testid="$attrs[\'test-id-confirmar\']" @click="$emit(\'confirmar\')">Confirmar</button> </div>', props: ['modelValue']},
+    ModalConfirmacao: {
+        name: 'ModalConfirmacao',
+        template: '<div v-if="modelValue"> <slot /> <button :data-testid="$attrs[\'test-id-confirmar\']" @click="$emit(\'confirmar\')">Confirmar</button> </div>', 
+        props: ['modelValue']
+    },
 };
 
 describe("CadastroVisualizacaoView coverage", () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        vi.mocked(useSubprocessosModule.useSubprocessos).mockReturnValue({
+            subprocessoDetalhe: null,
+            buscarSubprocessoPorProcessoEUnidade: vi.fn().mockResolvedValue(123),
+            buscarContextoEdicao: vi.fn().mockResolvedValue({
+                atividadesDisponiveis: [{codigo: 1, descricao: "Ativ 1", conhecimentos: []}],
+                unidade: {sigla: "TESTE", nome: "Teste"}
+            }),
+            buscarSubprocessoDetalhe: vi.fn(),
+            atualizarStatusLocal: vi.fn(),
+            lastError: null,
+            clearError: vi.fn(),
+        } as any);
+        vi.mocked(useFluxoSubprocessoModule.useFluxoSubprocesso).mockReturnValue({
+            aceitarCadastro: vi.fn().mockResolvedValue(true),
+            devolverCadastro: vi.fn().mockResolvedValue(true),
+            homologarCadastro: vi.fn().mockResolvedValue(true),
+            homologarRevisaoCadastro: vi.fn().mockResolvedValue(true),
+            aceitarRevisaoCadastro: vi.fn().mockResolvedValue(true),
+            devolverRevisaoCadastro: vi.fn().mockResolvedValue(true),
+        } as any);
+        processosMock.processoDetalhe.value = null;
         vi.mocked(subprocessoService.buscarSubprocessoPorProcessoEUnidade).mockResolvedValue(123 as any);
         vi.mocked(subprocessoService.buscarContextoEdicao).mockResolvedValue({
             atividadesDisponiveis: [{codigo: 1, descricao: "Ativ 1", conhecimentos: []}],
@@ -60,6 +97,12 @@ describe("CadastroVisualizacaoView coverage", () => {
     });
 
     function createWrapper(accessOverrides = {}, processoDetalheOverride?: any) {
+        processosMock.processoDetalhe.value = processoDetalheOverride !== undefined ? processoDetalheOverride : {
+            codigo: 1,
+            tipo: "MAPEAMENTO",
+            unidades: [{sigla: "TESTE", codSubprocesso: 123}]
+        };
+
         vi.spyOn(useAcessoModule, 'useAcesso').mockReturnValue({
             podeHomologarCadastro: ref(true),
             podeAceitarCadastro: ref(true),
@@ -75,15 +118,7 @@ describe("CadastroVisualizacaoView coverage", () => {
             global: {
                 plugins: [createTestingPinia({
                     stubActions: true,
-                    initialState: {
-                        processos: {
-                            processoDetalhe: processoDetalheOverride !== undefined ? processoDetalheOverride : {
-                                codigo: 1,
-                                tipo: "MAPEAMENTO",
-                                unidades: [{sigla: "TESTE", codSubprocesso: 123}]
-                            }
-                        }
-                    }
+                    initialState: {}
                 })],
                 stubs
             },
@@ -98,16 +133,7 @@ describe("CadastroVisualizacaoView coverage", () => {
         const wrapper = createWrapper();
         await flushPromises();
 
-        const store = useSubprocessosStore();
-        (store.aceitarCadastro as any).mockResolvedValue(true);
-        (store.devolverCadastro as any).mockResolvedValue(true);
-        (store.homologarCadastro as any).mockResolvedValue(true);
-        (store.homologarRevisaoCadastro as any).mockResolvedValue(true);
-        (store.aceitarRevisaoCadastro as any).mockResolvedValue(true);
-        (store.devolverRevisaoCadastro as any).mockResolvedValue(true);
-
-        const procStore = useProcessosStore();
-        (procStore.buscarProcessoDetalhe as any).mockResolvedValue(null);
+        const fluxoSubprocesso = useFluxoSubprocessoModule.useFluxoSubprocesso() as any;
 
         vi.mocked(analiseService.listarAnalisesCadastro).mockResolvedValue([]);
         await wrapper.find('[data-testid="btn-vis-atividades-historico"]').trigger("click");
@@ -118,35 +144,35 @@ describe("CadastroVisualizacaoView coverage", () => {
         (wrapper.vm as any).observacaoDevolucao = "Obs devolução";
         await wrapper.find('[data-testid="btn-devolucao-cadastro-confirmar"]').trigger("click");
         await flushPromises();
-        expect(store.devolverCadastro).toHaveBeenCalled();
+        expect(fluxoSubprocesso.devolverCadastro).toHaveBeenCalled();
 
         (wrapper.vm as any).podeHomologarCadastro = false;
         await wrapper.find('[data-testid="btn-acao-analisar-principal"]').trigger("click");
         await wrapper.find('[data-testid="btn-aceite-cadastro-confirmar"]').trigger("click");
         await flushPromises();
-        expect(store.aceitarCadastro).toHaveBeenCalled();
+        expect(fluxoSubprocesso.aceitarCadastro).toHaveBeenCalled();
 
         (wrapper.vm as any).podeHomologarCadastro = true;
         await wrapper.find('[data-testid="btn-acao-analisar-principal"]').trigger("click");
         await wrapper.find('[data-testid="btn-aceite-cadastro-confirmar"]').trigger("click");
         await flushPromises();
-        expect(store.homologarCadastro).toHaveBeenCalled();
+        expect(fluxoSubprocesso.homologarCadastro).toHaveBeenCalled();
 
-        (procStore.processoDetalhe as any).tipo = "REVISAO";
+        (processosMock.processoDetalhe.value as any).tipo = "REVISAO";
         await wrapper.vm.$nextTick();
 
         (wrapper.vm as any).podeHomologarCadastro = true;
         await (wrapper.vm as any).confirmarValidacao();
-        expect(store.homologarRevisaoCadastro).toHaveBeenCalled();
+        expect(fluxoSubprocesso.homologarRevisaoCadastro).toHaveBeenCalled();
 
         // Aceitar Revisão
         (wrapper.vm as any).podeHomologarCadastro = false;
         await (wrapper.vm as any).confirmarValidacao();
-        expect(store.aceitarRevisaoCadastro).toHaveBeenCalled();
+        expect(fluxoSubprocesso.aceitarRevisaoCadastro).toHaveBeenCalled();
 
         (wrapper.vm as any).observacaoDevolucao = "Rev";
         await (wrapper.vm as any).confirmarDevolucao();
-        expect(store.devolverRevisaoCadastro).toHaveBeenCalled();
+        expect(fluxoSubprocesso.devolverRevisaoCadastro).toHaveBeenCalled();
 
         const mapsStore = (wrapper.vm as any).mapasStore;
         mapsStore.buscarImpactoMapa = vi.fn().mockResolvedValue(null);
@@ -166,19 +192,18 @@ describe("CadastroVisualizacaoView coverage", () => {
         expect(vm.nomeUnidade).toBe("");
 
         // Testar subprocesso computed com processoDetalhe nulo
-        const procStore = useProcessosStore();
-        (procStore as any).processoDetalhe = null;
+        processosMock.processoDetalhe.value = null;
         expect(vm.subprocesso).toBeNull();
 
         // Testar subprocesso computed com arvore de unidades aninhadas
-        (procStore as any).processoDetalhe = {
+        processosMock.processoDetalhe.value = {
             unidades: [
                 { sigla: "OUTRA" },
                 { sigla: "PAI", filhos: [{ sigla: "TESTE", codSubprocesso: 123 }] }
             ]
         };
         expect(vm.subprocesso.codSubprocesso).toBe(123);
-        (procStore as any).processoDetalhe = { unidades: [{ sigla: "OUTRA" }] };
+        processosMock.processoDetalhe.value = { unidades: [{ sigla: "OUTRA" }] };
         expect(vm.subprocesso).toBeUndefined();
 
         // Testar computed estadoObservacaoDevolucao
@@ -223,7 +248,7 @@ describe("CadastroVisualizacaoView coverage", () => {
         });
         
         await flushPromises();
-        const store = useSubprocessosStore();
+        const store = useSubprocessosModule.useSubprocessos() as any;
         expect(store.buscarSubprocessoPorProcessoEUnidade).toHaveBeenCalledWith(1, "TESTE");
     });
 
@@ -231,10 +256,10 @@ describe("CadastroVisualizacaoView coverage", () => {
         const wrapper = createWrapper();
         await flushPromises();
         const vm = wrapper.vm as any;
-        const store = useSubprocessosStore();
+        const fluxoSubprocesso = useFluxoSubprocessoModule.useFluxoSubprocesso() as any;
 
         // Falha no aceite
-        (store.aceitarCadastro as any).mockResolvedValue(false);
+        fluxoSubprocesso.aceitarCadastro.mockResolvedValue(false);
         vm.podeHomologarCadastro = false;
         vm.mostrarModalValidar = true;
         vm.observacaoValidacao = "Teste falha";
@@ -242,13 +267,13 @@ describe("CadastroVisualizacaoView coverage", () => {
         expect(vm.mostrarModalValidar).toBe(true); // Permanece aberto
 
         // Falha na homologação
-        (store.homologarCadastro as any).mockResolvedValue(false);
+        fluxoSubprocesso.homologarCadastro.mockResolvedValue(false);
         vm.podeHomologarCadastro = true;
         await vm.confirmarValidacao();
         expect(vm.mostrarModalValidar).toBe(true);
 
         // Falha na devolução
-        (store.devolverCadastro as any).mockResolvedValue(false);
+        fluxoSubprocesso.devolverCadastro.mockResolvedValue(false);
         vm.mostrarModalDevolver = true;
         vm.observacaoDevolucao = "Obs";
         await vm.confirmarDevolucao();
@@ -277,5 +302,35 @@ describe("CadastroVisualizacaoView coverage", () => {
 
         expect(wrapper.find('[data-testid="btn-acao-devolver"]').attributes('disabled')).toBeDefined();
         expect(wrapper.find('[data-testid="btn-acao-analisar-principal"]').attributes('disabled')).toBeDefined();
+    });
+
+    it("deve gerenciar atualizações de estado do modal de confirmação e campos de observação", async () => {
+        const wrapper = createWrapper();
+        await flushPromises();
+        const vm = wrapper.vm as any;
+
+        // v-model cover (92, 116)
+        const modals = wrapper.findAllComponents({name: 'ModalConfirmacao'});
+        for (const modal of modals) {
+            await modal.vm.$emit('update:modelValue', true);
+        }
+        expect(vm.mostrarModalValidar).toBe(true);
+        expect(vm.mostrarModalDevolver).toBe(true);
+
+        // Textarea v-model (107, 135)
+        const textareas = wrapper.findAllComponents({name: 'BFormTextarea'});
+        if (textareas.length > 0) {
+            await textareas[0].vm.$emit('update:modelValue', 'Obs val');
+            expect(vm.observacaoValidacao).toBe('Obs val');
+        }
+        if (textareas.length > 1) {
+            await textareas[1].vm.$emit('update:modelValue', 'Obs dev');
+            expect(vm.observacaoDevolucao).toBe('Obs dev');
+        }
+        
+        // Ensure feedback is covered (140-141)
+        vm.validacaoDevolucaoSubmetida = true;
+        vm.observacaoDevolucao = "";
+        await vm.$nextTick();
     });
 });

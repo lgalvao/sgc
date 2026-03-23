@@ -10,19 +10,19 @@ import org.springframework.security.access.prepost.*;
 import org.springframework.security.core.annotation.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.*;
-import sgc.comum.SgcMensagens;
+import sgc.comum.*;
 import sgc.comum.erros.*;
 import sgc.organizacao.model.*;
 import sgc.processo.dto.*;
 import sgc.processo.model.*;
-import sgc.processo.service.ProcessoService;
+import sgc.processo.service.*;
 import sgc.subprocesso.model.*;
-import sgc.subprocesso.service.SubprocessoService;
+import sgc.subprocesso.service.*;
 
 import java.net.*;
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import java.util.function.*;
+import java.util.stream.*;
 
 @RestController
 @RequestMapping("/api/processos")
@@ -57,7 +57,7 @@ public class ProcessoController {
     }
 
     @GetMapping("/{codigo}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")
+    @PreAuthorize("hasRole('ADMIN') or @processoService.checarAcesso(authentication, #codigo)")
     @JsonView(ProcessoViews.Publica.class)
     public ResponseEntity<Processo> obterPorCodigo(@PathVariable Long codigo) {
         return processoService
@@ -97,7 +97,7 @@ public class ProcessoController {
     }
 
     @GetMapping("/{codigo}/unidades-importacao")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasRole('CHEFE')")
     @Operation(summary = "Lista todas as unidades participantes de um processo finalizado para importação")
     public ResponseEntity<List<ProcessoDetalheDto.UnidadeParticipanteDto>> listarUnidadesParaImportacao(
             @PathVariable Long codigo) {

@@ -146,18 +146,26 @@
 </template>
 
 <script lang="ts" setup>
-import {BButton, BCard, BCardBody, BCardTitle, BFormGroup, BFormInvalidFeedback, BFormTextarea} from "bootstrap-vue-next";
+import {
+  BButton,
+  BCard,
+  BCardBody,
+  BCardTitle,
+  BFormGroup,
+  BFormInvalidFeedback,
+  BFormTextarea
+} from "bootstrap-vue-next";
 import {computed, onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
-import {storeToRefs} from "pinia";
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import HistoricoAnaliseModal from "@/components/processo/HistoricoAnaliseModal.vue";
 import ImpactoMapaModal from "@/components/mapa/ImpactoMapaModal.vue";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
-import {useProcessosStore} from "@/stores/processos";
-import {useMapasStore} from "@/stores/mapas";
-import {useSubprocessosStore} from "@/stores/subprocessos";
+import {useProcessos} from "@/composables/useProcessos";
+import {useFluxoSubprocesso} from "@/composables/useFluxoSubprocesso";
+import {useMapas} from "@/composables/useMapas";
+import {useSubprocessos} from "@/composables/useSubprocessos";
 import {useToastStore} from "@/stores/toast";
 import type {
   AceitarCadastroRequest,
@@ -179,11 +187,12 @@ const props = defineProps<{
 }>();
 
 const router = useRouter();
-const processosStore = useProcessosStore();
-const mapasStore = useMapasStore();
-const subprocessosStore = useSubprocessosStore();
+const processos = useProcessos();
+const fluxoSubprocesso = useFluxoSubprocesso();
+const mapasStore = useMapas();
+const subprocessosStore = useSubprocessos();
 const toastStore = useToastStore();
-const {impactoMapa: impactos} = storeToRefs(mapasStore);
+const {impactoMapa: impactos} = mapasStore;
 
 const unidadeId = computed(() => props.sigla);
 const codProcesso = computed(() => Number(props.codProcesso));
@@ -194,7 +203,7 @@ const siglaUnidade = computed(() => unidade.value?.sigla || unidadeId.value);
 const nomeUnidade = computed(() => (unidade.value?.nome ? `${unidade.value.nome}` : ""));
 
 const subprocesso = computed(() => {
-  if (!processosStore.processoDetalhe) return null;
+  if (!processos.processoDetalhe.value) return null;
 
   function encontrarUnidade(unidades: UnidadeParticipante[]): UnidadeParticipante | undefined {
     for (const u of unidades) {
@@ -207,7 +216,7 @@ const subprocesso = computed(() => {
     return undefined;
   }
 
-  return encontrarUnidade(processosStore.processoDetalhe.unidades);
+  return encontrarUnidade(processos.processoDetalhe.value.unidades);
 });
 
 const {
@@ -228,7 +237,7 @@ const codSubprocesso = computed(() => subprocesso.value?.codSubprocesso);
 
 const atividades = ref<Atividade[]>([]);
 
-const processoAtual = computed(() => processosStore.processoDetalhe);
+const processoAtual = computed(() => processos.processoDetalhe.value);
 const isRevisao = computed(() => processoAtual.value?.tipo === TipoProcesso.REVISAO);
 
 const analisesCadastro = ref<Analise[]>([]);
@@ -312,9 +321,9 @@ async function confirmarValidacao() {
         observacoes: observacaoValidacao.value,
       };
       if (isRevisao.value) {
-        sucesso = await subprocessosStore.homologarRevisaoCadastro(codSubprocesso.value, req);
+        sucesso = await fluxoSubprocesso.homologarRevisaoCadastro(codSubprocesso.value, req);
       } else {
-        sucesso = await subprocessosStore.homologarCadastro(codSubprocesso.value, req);
+        sucesso = await fluxoSubprocesso.homologarCadastro(codSubprocesso.value, req);
       }
 
       if (sucesso) {
@@ -333,9 +342,9 @@ async function confirmarValidacao() {
         observacoes: observacaoValidacao.value,
       };
       if (isRevisao.value) {
-        sucesso = await subprocessosStore.aceitarRevisaoCadastro(codSubprocesso.value, req);
+        sucesso = await fluxoSubprocesso.aceitarRevisaoCadastro(codSubprocesso.value, req);
       } else {
-        sucesso = await subprocessosStore.aceitarCadastro(codSubprocesso.value, req);
+        sucesso = await fluxoSubprocesso.aceitarCadastro(codSubprocesso.value, req);
       }
 
       if (sucesso) {
@@ -362,9 +371,9 @@ async function confirmarDevolucao() {
 
     let sucesso: boolean;
     if (isRevisao.value) {
-      sucesso = await subprocessosStore.devolverRevisaoCadastro(codSubprocesso.value, req);
+      sucesso = await fluxoSubprocesso.devolverRevisaoCadastro(codSubprocesso.value, req);
     } else {
-      sucesso = await subprocessosStore.devolverCadastro(codSubprocesso.value, req);
+      sucesso = await fluxoSubprocesso.devolverCadastro(codSubprocesso.value, req);
     }
 
     if (sucesso) {
@@ -378,19 +387,18 @@ async function confirmarDevolucao() {
 }
 
 onMounted(async () => {
-  await processosStore.buscarProcessoDetalhe(codProcesso.value);
+  await processos.buscarProcessoDetalhe(codProcesso.value);
   
-  // Tenta obter o ID do subprocesso de forma robusta
-  let id: number | null | undefined = codSubprocesso.value;
-  if (!id && subprocesso.value) {
-    id = await subprocessosStore.buscarSubprocessoPorProcessoEUnidade(
+  let codigoSubprocesso: number | null | undefined = codSubprocesso.value;
+  if (!codigoSubprocesso && subprocesso.value) {
+    codigoSubprocesso = await subprocessosStore.buscarSubprocessoPorProcessoEUnidade(
         codProcesso.value,
         subprocesso.value.sigla,
     );
   }
 
-  if (id) {
-    const data = await subprocessosStore.buscarContextoEdicao(id);
+  if (codigoSubprocesso) {
+    const data = await subprocessosStore.buscarContextoEdicao(codigoSubprocesso);
     if (data) {
       if (data.atividadesDisponiveis) {
         atividades.value = data.atividadesDisponiveis;

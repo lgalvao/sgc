@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.*;
 import org.springframework.context.annotation.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
-import sgc.comum.SgcMensagens;
+import sgc.comum.*;
 import sgc.comum.erros.*;
 import sgc.comum.model.*;
 import sgc.mapa.dto.*;
@@ -18,7 +18,6 @@ import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
 import sgc.processo.model.*;
 import sgc.seguranca.*;
-import static sgc.seguranca.AcaoPermissao.*;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
 
@@ -28,13 +27,13 @@ import java.util.function.*;
 import java.util.stream.*;
 
 import static sgc.organizacao.model.TipoUnidade.*;
+import static sgc.seguranca.AcaoPermissao.*;
 import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class SubprocessoService {
-    private static final String SIGLA_ADMIN = "ADMIN";
     private static final String NOME_ENTIDADE = "Subprocesso";
     private static final Set<SituacaoSubprocesso> SITUACOES_PERMITIDAS_IMPORTACAO = Set.of(
             NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, REVISAO_CADASTRO_EM_ANDAMENTO);

@@ -2,7 +2,7 @@ package sgc.comum.model;
 
 import jakarta.validation.*;
 import jakarta.validation.constraints.*;
-import sgc.comum.SgcMensagens;
+import sgc.comum.*;
 
 import java.lang.annotation.*;
 

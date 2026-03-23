@@ -1,7 +1,7 @@
 package sgc.e2e;
 
 import com.fasterxml.jackson.annotation.*;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 import lombok.extern.slf4j.*;
 import org.jspecify.annotations.*;
 import org.springframework.context.annotation.*;
@@ -16,12 +16,12 @@ import org.springframework.transaction.annotation.*;
 import org.springframework.web.bind.annotation.*;
 import sgc.comum.erros.*;
 import sgc.mapa.model.*;
-import sgc.organizacao.UsuarioFacade;
+import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
 import sgc.processo.dto.*;
 import sgc.processo.model.*;
-import sgc.processo.service.ProcessoService;
+import sgc.processo.service.*;
 import sgc.subprocesso.model.*;
 
 import javax.sql.*;
@@ -31,10 +31,13 @@ import java.util.*;
 import java.util.function.*;
 import java.util.stream.*;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+
 @SuppressWarnings("JvmTaintAnalysis")
 @RestController
 @RequestMapping("/e2e")
 @Profile("e2e")
+@ConditionalOnProperty(name = "aplicacao.ambiente-testes", havingValue = "true")
 @Slf4j
 @RequiredArgsConstructor
 public class E2eController {
@@ -92,6 +95,7 @@ public class E2eController {
     private void limparTabela(Statement stmt, String table) throws SQLException {
         log.debug("Limpando tabela: sgc.{}", table);
         try {
+            // nosemgrep: java.lang.security.audit.formatted-sql-string.formatted-sql-string
             stmt.execute("DELETE FROM sgc." + table);
         } catch (Exception e) {
             log.warn("Erro ao limpar tabela {}: {}", table, e.getMessage());
@@ -120,25 +124,25 @@ public class E2eController {
 
             stmt.execute("SET REFERENTIAL_INTEGRITY FALSE");
 
-            String subquerySubprocessos = "(SELECT codigo FROM sgc.subprocesso WHERE processo_codigo = " + codigo + ")";
+            String subquerySubprocessos = "(SELECT codigo FROM sgc.subprocesso WHERE processo_codigo = ?)";
             String subqueryMapas = "(SELECT codigo FROM sgc.mapa WHERE subprocesso_codigo IN " + subquerySubprocessos + ")";
 
             jdbcTemplate.update("DELETE FROM sgc.alerta_usuario WHERE alerta_codigo IN (SELECT codigo FROM sgc.alerta WHERE processo_codigo = ?)", codigo);
             jdbcTemplate.update("DELETE FROM sgc.alerta WHERE processo_codigo = ?", codigo);
 
-            jdbcTemplate.update("DELETE FROM sgc.conhecimento WHERE atividade_codigo IN (SELECT codigo FROM sgc.atividade WHERE mapa_codigo IN " + subqueryMapas + ")");
-            jdbcTemplate.update("DELETE FROM sgc.competencia_atividade WHERE atividade_codigo IN (SELECT codigo FROM sgc.atividade WHERE mapa_codigo IN " + subqueryMapas + ")");
-            jdbcTemplate.update("DELETE FROM sgc.competencia_atividade WHERE competencia_codigo IN (SELECT codigo FROM sgc.competencia WHERE mapa_codigo IN " + subqueryMapas + ")");
-            jdbcTemplate.update("DELETE FROM sgc.atividade WHERE mapa_codigo IN " + subqueryMapas);
-            jdbcTemplate.update("DELETE FROM sgc.competencia WHERE mapa_codigo IN " + subqueryMapas);
+            jdbcTemplate.update("DELETE FROM sgc.conhecimento WHERE atividade_codigo IN (SELECT codigo FROM sgc.atividade WHERE mapa_codigo IN " + subqueryMapas + ")", codigo);
+            jdbcTemplate.update("DELETE FROM sgc.competencia_atividade WHERE atividade_codigo IN (SELECT codigo FROM sgc.atividade WHERE mapa_codigo IN " + subqueryMapas + ")", codigo);
+            jdbcTemplate.update("DELETE FROM sgc.competencia_atividade WHERE competencia_codigo IN (SELECT codigo FROM sgc.competencia WHERE mapa_codigo IN " + subqueryMapas + ")", codigo);
+            jdbcTemplate.update("DELETE FROM sgc.atividade WHERE mapa_codigo IN " + subqueryMapas, codigo);
+            jdbcTemplate.update("DELETE FROM sgc.competencia WHERE mapa_codigo IN " + subqueryMapas, codigo);
 
             // Limpar referências de Mapa vigente antes de excluir o Mapa
-            jdbcTemplate.update("DELETE FROM sgc.unidade_mapa WHERE mapa_vigente_codigo IN " + subqueryMapas);
-            jdbcTemplate.update("DELETE FROM sgc.mapa WHERE subprocesso_codigo IN " + subquerySubprocessos);
+            jdbcTemplate.update("DELETE FROM sgc.unidade_mapa WHERE mapa_vigente_codigo IN " + subqueryMapas, codigo);
+            jdbcTemplate.update("DELETE FROM sgc.mapa WHERE subprocesso_codigo IN " + subquerySubprocessos, codigo);
 
-            jdbcTemplate.update("DELETE FROM sgc.analise WHERE subprocesso_codigo IN " + subquerySubprocessos);
-            jdbcTemplate.update("DELETE FROM sgc.notificacao WHERE subprocesso_codigo IN " + subquerySubprocessos);
-            jdbcTemplate.update("DELETE FROM sgc.movimentacao WHERE subprocesso_codigo IN " + subquerySubprocessos);
+            jdbcTemplate.update("DELETE FROM sgc.analise WHERE subprocesso_codigo IN " + subquerySubprocessos, codigo);
+            jdbcTemplate.update("DELETE FROM sgc.notificacao WHERE subprocesso_codigo IN " + subquerySubprocessos, codigo);
+            jdbcTemplate.update("DELETE FROM sgc.movimentacao WHERE subprocesso_codigo IN " + subquerySubprocessos, codigo);
             jdbcTemplate.update("DELETE FROM sgc.subprocesso WHERE processo_codigo = ?", codigo);
 
             jdbcTemplate.update("DELETE FROM sgc.unidade_processo WHERE processo_codigo = ?", codigo);
@@ -201,7 +205,7 @@ public class E2eController {
     }
 
     /**
-     * Cria um processo de mapeamento via API para testes E2E. Mais rápido que criar via UI.
+     * Cria um processo de mapeamento via API para testes E2E.
      */
     @PostMapping("/fixtures/processo-mapeamento")
     @Transactional
@@ -211,7 +215,7 @@ public class E2eController {
     }
 
     /**
-     * Cria um processo de revisão via API para testes E2E. Mais rápido que criar via UI.
+     * Cria um processo de revisão via API para testes E2E.
      */
     @PostMapping("/fixtures/processo-revisao")
     @Transactional
@@ -222,7 +226,6 @@ public class E2eController {
 
     /**
      * Cria um processo já finalizado e insere atividades/mapa forçadamente via SQL
-     * para pular o workflow e testar a importação de forma ultra-rápida.
      */
     @PostMapping("/fixtures/processo-finalizado-com-atividades")
     @Transactional
@@ -263,8 +266,7 @@ public class E2eController {
     }
 
     /**
-     * Cria um processo de mapeamento já iniciado, com cadastro preenchido e disponibilizado,
-     * para acelerar cenários E2E que começam na análise do cadastro.
+     * Cria um processo de mapeamento já iniciado, com cadastro preenchido e disponibilizado
      */
     @PostMapping("/fixtures/processo-mapeamento-com-cadastro-disponibilizado")
     @Transactional
@@ -275,7 +277,6 @@ public class E2eController {
 
     /**
      * Cria um processo de mapeamento já iniciado, com mapa preenchido e disponibilizado,
-     * para acelerar cenários E2E que começam na validação do mapa.
      */
     @PostMapping("/fixtures/processo-mapeamento-com-mapa-disponibilizado")
     @Transactional
@@ -286,7 +287,6 @@ public class E2eController {
 
     /**
      * Cria um processo de mapeamento já iniciado, com mapa preenchido e com sugestões registradas,
-     * para acelerar cenários E2E que começam na visualização de sugestões pelo GESTOR/ADMIN (CDU-20).
      */
     @PostMapping("/fixtures/processo-mapeamento-com-mapa-com-sugestoes")
     @Transactional
@@ -306,7 +306,6 @@ public class E2eController {
 
     /**
      * Cria um processo de mapeamento já iniciado, com mapa preenchido e validado,
-     * para acelerar cenários E2E que começam no aceite final do mapa.
      */
     @PostMapping("/fixtures/processo-mapeamento-com-mapa-validado")
     @Transactional
@@ -317,7 +316,6 @@ public class E2eController {
 
     /**
      * Cria um processo de mapeamento já iniciado, com mapa preenchido e homologado,
-     * para acelerar cenários E2E que começam na finalização do processo.
      */
     @PostMapping("/fixtures/processo-mapeamento-com-mapa-homologado")
     @Transactional
@@ -338,8 +336,7 @@ public class E2eController {
     }
 
     /**
-     * Cria um processo de revisão já iniciado, com mapa preenchido e homologado,
-     * para acelerar cenários E2E que começam após o encerramento da revisão.
+     * Cria um processo de revisão já iniciado, com mapa preenchido e homologado
      */
     @PostMapping("/fixtures/processo-revisao-com-mapa-homologado")
     @Transactional
@@ -361,7 +358,6 @@ public class E2eController {
 
     /**
      * Cria um processo de revisão já iniciado, com cadastro disponibilizado pelo CHEFE,
-     * para acelerar cenários E2E que começam na análise em bloco do cadastro (CDU-22 para revisão).
      */
     @PostMapping("/fixtures/processo-revisao-com-cadastro-disponibilizado")
     @Transactional
@@ -379,8 +375,7 @@ public class E2eController {
         Unidade unidade = unidadeService.buscarPorSigla(request.unidadeSigla());
 
         ProcessoFixtureRequest requestMapeamento = new ProcessoFixtureRequest(
-                "Mapa base fixture " + System.currentTimeMillis(), request.unidadeSigla(), true, diasLimite);
-        Processo processoMapeamento = criarProcessoFixture(requestMapeamento, TipoProcesso.MAPEAMENTO);
+                "Mapa base fixture " + System.currentTimeMillis(), request.unidadeSigla(), true, diasLimite);        Processo processoMapeamento = criarProcessoFixture(requestMapeamento, TipoProcesso.MAPEAMENTO);
         Long codSubprocessoMapeamento = subprocessoRepo
                 .findByProcessoCodigoAndUnidadeCodigo(processoMapeamento.getCodigo(), unidade.getCodigo())
                 .map(Subprocesso::getCodigo)

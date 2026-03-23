@@ -121,7 +121,7 @@ class LimitadorTentativasLoginTest {
     }
 
     @Test
-    void deveBloquearNovosIpsSeCacheCheioEEntradasRecentes() {
+    void deveEvictOldestIpSeCacheCheioEEntradasRecentes() {
         // Cache minúsculo
         int limiteTeste = 5;
         LimitadorTentativasLogin limitadorTeste = new LimitadorTentativasLogin(environment, limiteTeste, clock);
@@ -133,12 +133,15 @@ class LimitadorTentativasLoginTest {
         assertEquals(limiteTeste, limitadorTeste.getCacheSize());
 
         // Tenta adicionar mais um, SEM avançar o tempo
-        // Deve lançar erro indicando sobrecarga
-        var exception = assertThrows(ErroMuitasTentativas.class, () -> limitadorTeste.verificar("IpNovo"));
-        assertNotNull(exception);
+        // Agora deve PERMITIR (fazendo eviction da entrada mais antiga)
+        assertDoesNotThrow(() -> limitadorTeste.verificar("IpNovo"));
 
-        // O cache NÃO deve ter sido limpo. Size = limiteTeste.
+        // O cache deve continuar com o tamanho limite
         assertEquals(limiteTeste, limitadorTeste.getCacheSize());
+        
+        // Verifica se o Ip0 (mais antigo) foi removido
+        // (Ao verificar IpNovo, Ip0 foi removido. Se verificarmos Ip0 agora, ele deve ser adicionado novamente sem erro)
+        assertDoesNotThrow(() -> limitadorTeste.verificar("Ip0"));
     }
 
     @Test

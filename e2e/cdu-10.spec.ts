@@ -8,10 +8,7 @@ import {
     disponibilizarCadastro,
     navegarParaAtividades,
 } from './helpers/helpers-atividades.js';
-import {
-    abrirHistoricoAnalise,
-    fecharHistoricoAnalise
-} from './helpers/helpers-analise.js';
+import {abrirHistoricoAnalise, fecharHistoricoAnalise} from './helpers/helpers-analise.js';
 import {limparNotificacoes, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
 

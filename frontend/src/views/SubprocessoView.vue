@@ -221,14 +221,15 @@ import SubprocessoCards from "@/components/processo/SubprocessoCards.vue";
 import SubprocessoModal from "@/components/processo/SubprocessoModal.vue";
 import AppAlert from "@/components/comum/AppAlert.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
-import {useMapasStore} from "@/stores/mapas";
+import {useMapas} from "@/composables/useMapas";
 import {useNotification} from "@/composables/useNotification";
 import {useModalManager} from "@/composables/useModalManager";
 import {useLoadingManager} from "@/composables/useLoadingManager";
+import {useProcessos} from "@/composables/useProcessos";
+import {useFluxoSubprocesso} from "@/composables/useFluxoSubprocesso";
+import {useSubprocessos} from "@/composables/useSubprocessos";
 
 import {useAcesso} from "@/composables/useAcesso";
-import {useSubprocessosStore} from "@/stores/subprocessos";
-import {useProcessosStore} from "@/stores/processos";
 import {type Movimentacao, SituacaoProcesso, type SubprocessoDetalhe, TipoProcesso} from "@/types/tipos";
 import {formatDateTimeBR, logger} from "@/utils";
 import {normalizeError} from "@/utils/apiError";
@@ -254,10 +255,11 @@ function formatTipoResponsabilidade(resp: any): string {
   return resp.tipo;
 }
 
-const subprocessosStore = useSubprocessosStore();
-const processosStore = useProcessosStore();
+const subprocessosStore = useSubprocessos();
+const fluxoSubprocesso = useFluxoSubprocesso();
+const processos = useProcessos();
 
-const mapaStore = useMapasStore();
+const mapaStore = useMapas();
 const {notificacao, notify, clear} = useNotification();
 const toastStore = useToastStore();
 const toast = useToast();
@@ -296,10 +298,10 @@ const {
 } = useAcesso(subprocesso);
 
 const isProcessoFinalizado = computed(() => {
-  return processosStore.processoDetalhe?.situacao === SituacaoProcesso.FINALIZADO;
+  return processos.processoDetalhe.value?.situacao === SituacaoProcesso.FINALIZADO;
 });
 
-const mapa = computed(() => mapaStore.mapaCompleto);
+const mapa = computed(() => mapaStore.mapaCompleto.value);
 const movimentacoes = computed<Movimentacao[]>(
     () => subprocesso.value?.movimentacoes || [],
 );
@@ -326,6 +328,7 @@ function exibirToastPendente() {
 
 onMounted(async () => {
   exibirToastPendente();
+  subprocessosStore.subprocessoDetalhe = null;
   try {
     const id = await subprocessosStore.buscarSubprocessoPorProcessoEUnidade(
         props.codProcesso,
@@ -366,7 +369,7 @@ async function confirmarAlteracaoDataLimite(novaData: string) {
 
   await loading.withLoading('dataLimite', async () => {
     try {
-      await subprocessosStore.alterarDataLimiteSubprocesso(
+      await fluxoSubprocesso.alterarDataLimiteSubprocesso(
           subprocesso.value!.codigo,
           {novaData},
       );
@@ -405,14 +408,13 @@ async function confirmarReabertura() {
   await loading.withLoading('reabertura', async () => {
     let sucesso: boolean;
     if (tipoReabertura.value === 'cadastro') {
-      sucesso = await subprocessosStore.reabrirCadastro(codSubprocesso.value!, justificativaReabertura.value);
+      sucesso = await fluxoSubprocesso.reabrirCadastro(codSubprocesso.value!, justificativaReabertura.value);
     } else {
-      sucesso = await subprocessosStore.reabrirRevisaoCadastro(codSubprocesso.value!, justificativaReabertura.value);
+      sucesso = await fluxoSubprocesso.reabrirRevisaoCadastro(codSubprocesso.value!, justificativaReabertura.value);
     }
 
     if (sucesso) {
       fecharModalReabrir();
-      await subprocessosStore.buscarSubprocessoDetalhe(codSubprocesso.value!);
       notify(
           tipoReabertura.value === 'cadastro'
               ? TEXTOS.subprocesso.SUCESSO_CADASTRO_REABERTO
@@ -428,6 +430,7 @@ async function confirmarEnviarLembrete() {
     return;
   }
   modalLembreteAberto.value = true;
+  return true;
 }
 
 async function enviarLembreteConfirmado() {
@@ -435,7 +438,7 @@ async function enviarLembreteConfirmado() {
     return;
   }
   try {
-    await processosStore.enviarLembrete(props.codProcesso, subprocesso.value.unidade.codigo);
+    await processos.enviarLembrete(props.codProcesso, subprocesso.value.unidade.codigo);
     await subprocessosStore.buscarSubprocessoDetalhe(codSubprocesso.value);
     modalLembreteAberto.value = false;
     notify(TEXTOS.subprocesso.SUCESSO_LEMBRETE_ENVIADO, 'success');
@@ -443,4 +446,16 @@ async function enviarLembreteConfirmado() {
     notify(TEXTOS.subprocesso.ERRO_LEMBRETE_ENVIADO, 'danger');
   }
 }
+
+defineExpose({
+  confirmarEnviarLembrete,
+  enviarLembreteConfirmado,
+  confirmarReabertura,
+  confirmarAlteracaoDataLimite,
+  abrirModalAlterarDataLimite,
+  abrirModalReabrirCadastro,
+  abrirModalReabrirRevisao,
+  modalLembreteAberto,
+  justificativaReabertura
+});
 </script>

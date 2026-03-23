@@ -1,32 +1,155 @@
-# Pendências do Plano de Simplificação
+# Plano Consolidado de Simplificação
 
-Este documento lista apenas o que ainda falta concluir no processo de simplificação do projeto SGC.
+Documento consolidado e confirmado a partir das propostas anteriores e da validação do código atual do projeto.
 
-## 1. Backend (Módulo Processo)
+## Objetivo
 
-### Pendências
-- **Simplificação de DTOs:** revisar os endpoints do módulo `Processo` para eliminar, onde ainda existir, o mapeamento manual desnecessário em retornos de `Processo`.
-- **Serialização com Jackson:** aplicar `@JsonView(ProcessoViews.Publica.class)` no `ProcessoController`, caso ainda não tenha sido adotado em todos os endpoints previstos pelo plano.
+Simplificar o monólito sem romper regras já consolidadas do SGC, reduzindo camadas pass-through, mapeamentos desnecessários e fragmentação artificial, mas preservando:
 
-## 2. Frontend (Módulo Processo)
+- regras de segurança e autorização;
+- contratos de API que ainda dependem de DTOs;
+- clareza de responsabilidade entre classes;
+- testes e restrições arquiteturais já codificadas no repositório.
 
-### Pendências
-- **Remover a Store global de processos:** apagar `src/stores/processos.ts`.
-- **Desacoplar o composable da Store:** refatorar `src/composables/useProcessos.ts` para que ele deixe de ser um wrapper de `useProcessosStore()` e passe a manter estado local baseado em contexto.
-- **Garantir estado local reativo no composable:** manter diretamente no composable os estados:
-  - `processos`
-  - `processoAtivo`
-  - `loading`
-- **Concentrar operações no composable:** manter no composable as funções:
-  - `loadProcessos()`
-  - `loadDetalhes(id)`
-  - `executarAcao(id, payload)`
-- **Refatorar views restantes:** substituir usos remanescentes de `useProcessosStore()` por `useProcessos()`.
-- **Remover sincronização reativa global desnecessária:** eliminar dependências entre telas que ainda assumem compartilhamento global de estado para esse fluxo.
+## Princípios confirmados
 
-## 3. Próxima fase de execução
+### 1. Backend: remover camadas intermediárias sem valor real
 
-1. Concluir a simplificação de DTOs e padronizar a serialização no backend.
-2. Refatorar `useProcessos.ts` para funcionar sem Store global.
-3. Atualizar as views restantes para usar apenas o composable.
-4. Remover definitivamente a Store de processos.
+Confirmado:
+
+- Eliminar facades que apenas orquestram chamadas triviais ou duplicam responsabilidades já existentes em services.
+- Fazer controllers dependerem diretamente de services de domínio.
+- Consolidar lógica onde hoje há excesso de repasse entre classes.
+
+Não aprovado:
+
+- Controllers acessarem `Repo` diretamente.
+
+Justificativa:
+
+- O projeto possui regra arquitetural automatizada que proíbe controllers de acessarem repositories.
+- No SGC, services concentram regras de negócio, autorização implícita, composição entre módulos e transações.
+
+Diretriz prática:
+
+- Quando houver service ou facade puramente pass-through, simplificar a cadeia no nível de service, sem pular para repository no controller.
+
+### 2. Backend: reduzir fragmentação excessiva, sem forçar service único
+
+Confirmado:
+
+- Reduzir a fragmentação artificial nos domínios de `Subprocesso` e `Mapa`.
+- Unificar classes quando a separação atual só aumenta navegação, acoplamento e custo de manutenção.
+
+Não aprovado como regra absoluta:
+
+- Obrigar cada domínio a terminar em um único `Service`.
+
+Diretriz prática:
+
+- Manter apenas classes com responsabilidade clara e justificável.
+- Fundir services quando a divisão atual for burocrática.
+- Preservar separações que ainda isolem fluxos complexos ou regras distintas de forma útil.
+
+### 3. Backend: reduzir DTOs em leituras simples
+
+Confirmado:
+
+- Remover mapeamentos manuais desnecessários em retornos simples.
+- Preferir expor entidades com `@JsonView` e `@JsonIgnore` quando isso for suficiente e seguro.
+- Manter DTOs quando houver:
+  - agregação de dados;
+  - proteção de campos;
+  - prevenção de recursão;
+  - necessidade de contrato próprio de API;
+  - composição que não deva vazar do modelo de domínio.
+
+Diretriz prática:
+
+- A simplificação deve ser guiada por payload real e risco de exposição indevida, não por remoção indiscriminada de DTO.
+
+### 4. Frontend: remover stores pass-through
+
+Confirmado:
+
+- Stores que só mantêm estado de tela, cache local ou repasse de chamadas para `services/` devem migrar para composables ou estado local do componente.
+- Pinia deve ficar concentrado no que é efetivamente compartilhado entre múltiplas áreas da aplicação ou representa estado global durável.
+
+Diretriz prática:
+
+- Para fluxos de página única, preferir `ref`, `reactive` e composables.
+- Para autenticação, perfil, feedback global e estados amplamente compartilhados, manter store.
+
+### 5. Frontend: evitar wrappers sem responsabilidade própria
+
+Confirmado:
+
+- Remover componentes que apenas repassam props e eventos para componentes base do BootstrapVueNext sem agregar comportamento, composição visual ou regra de domínio.
+
+Diretriz prática:
+
+- Só manter wrapper quando ele encapsular comportamento reutilizável real, semântica de domínio ou estrutura visual relevante.
+
+### 6. Filosofia arquitetural para o projeto
+
+Confirmado:
+
+- Evitar arquiteturas e padrões que aumentem complexidade sem benefício proporcional ao contexto do SGC.
+- Evitar interfaces de implementação única sem motivo concreto.
+- Evitar factories, builders e camadas extras quando a solução direta for mais clara.
+- Manter o monólito coeso, com responsabilidades visíveis e navegação simples.
+
+## Estado atual validado
+
+Os seguintes pontos foram confirmados no código:
+
+- As facades `PainelFacade`, `UsuarioFacade`, `AlertaFacade`, `RelatorioFacade`, `LoginFacade` e `AtividadeFacade` existem.
+- Há fragmentação real em `SubprocessoService`, `SubprocessoTransicaoService`, `SubprocessoValidacaoService`, `SubprocessoNotificacaoService`.
+- Há fragmentação real em `MapaVisualizacaoService`, `MapaSalvamentoService`, `ImpactoMapaService`, `MapaManutencaoService` e `CopiaMapaService`.
+- O fluxo principal de `Processo`, `Subprocesso` e `Mapa` no frontend já foi migrado de stores pass-through para composables de domínio.
+- O backend já usa `@JsonView` em múltiplos controllers e entidades, então a simplificação por serialização controlada já é compatível com o padrão atual.
+
+## Pendências consolidadas
+
+## 1. Processo: backend
+
+- Revisar o payload público de `Processo`.
+- Ajustar serialização com `@JsonView` e `@JsonIgnore` onde houver campo exposto sem necessidade.
+- Remover mapeamento manual desnecessário em retornos simples do módulo `Processo`.
+- Manter DTOs como `ProcessoDetalheDto` somente onde ainda houver necessidade real de agregação, composição de contexto ou proteção de contrato.
+
+## 2. Backend: consolidação estrutural
+
+- Eliminar facades desnecessárias do backend:
+  - `PainelFacade`
+  - `UsuarioFacade`
+  - `AlertaFacade`
+  - `RelatorioFacade`
+  - `LoginFacade`
+  - `AtividadeFacade`
+- Reabsorver as responsabilidades dessas facades em services de domínio ou services de aplicação já existentes.
+- Reduzir a fragmentação de serviços nos domínios `Subprocesso` e `Mapa`, mantendo apenas divisões com ganho real de clareza.
+- Não introduzir acesso direto de controller a repository durante essa consolidação.
+
+## 3. Frontend: consolidação estrutural
+
+- Auditar e remover stores pass-through que ainda funcionam como estado de tela ou cache local:
+  - `frontend/src/stores/configuracoes.ts`
+- Auditar componentes wrapper sem lógica própria e substituí-los por uso direto de componentes base quando apropriado.
+
+## Ordem recomendada
+
+1. Ajustar a serialização e os retornos simples do backend de `Processo`.
+2. Consolidar facades e reduzir fragmentação artificial nos services do backend.
+3. Auditar `frontend/src/stores/configuracoes.ts` para remover estado de tela e actions pass-through.
+4. Auditar wrappers de frontend sem responsabilidade própria.
+
+## Critérios de conclusão
+
+O plano será considerado concluído quando:
+
+- não houver mais dependência relevante de facades elimináveis;
+- os retornos simples do backend tiverem sido simplificados sem exposição indevida de campos;
+- `Subprocesso` e `Mapa` não estiverem mais divididos em services artificiais sem ganho claro;
+- as stores restantes do frontend estiverem restritas a estado global realmente compartilhado;
+- testes de backend e frontend cobrirem os fluxos afetados pela simplificação.

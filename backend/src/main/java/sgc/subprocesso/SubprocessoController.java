@@ -11,8 +11,8 @@ import org.springframework.security.access.prepost.*;
 import org.springframework.security.core.annotation.*;
 import org.springframework.transaction.annotation.*;
 import org.springframework.web.bind.annotation.*;
-import sgc.comum.SgcMensagens;
 import sgc.comum.ComumDtos.*;
+import sgc.comum.*;
 import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
 import sgc.organizacao.model.*;
@@ -134,9 +134,10 @@ public class SubprocessoController {
     }
 
     @GetMapping("/{codSubprocesso}/atividades-importacao")
-    @PreAuthorize("isAuthenticated()")
-    @Operation(summary = "Lista atividades de um subprocesso fonte para importação")
+    @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'CONSULTAR_PARA_IMPORTACAO')")
+    @Operation(summary = "Lista todas as atividades de um subprocesso finalizado para importação")
     public ResponseEntity<List<AtividadeDto>> listarAtividadesParaImportacao(@PathVariable Long codSubprocesso) {
+
         return ResponseEntity.ok(subprocessoService.listarAtividadesParaImportacao(codSubprocesso));
     }
 
@@ -529,8 +530,9 @@ public class SubprocessoController {
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Cria uma análise de cadastro")
     public AnaliseHistoricoDto criarAnaliseCadastro(@PathVariable Long codSubprocesso,
-                                                    @RequestBody @Valid CriarAnaliseRequest request) {
-        return criarAnalise(codSubprocesso, request, TipoAnalise.CADASTRO);
+                                                    @RequestBody @Valid CriarAnaliseRequest request,
+                                                    @AuthenticationPrincipal Usuario usuario) {
+        return criarAnalise(codSubprocesso, request, TipoAnalise.CADASTRO, usuario);
     }
 
     @PostMapping("/{codSubprocesso}/analises-validacao")
@@ -538,13 +540,14 @@ public class SubprocessoController {
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Cria uma análise de validação")
     public AnaliseHistoricoDto criarAnaliseValidacao(@PathVariable Long codSubprocesso,
-                                                     @RequestBody @Valid CriarAnaliseRequest request) {
-        return criarAnalise(codSubprocesso, request, TipoAnalise.VALIDACAO);
+                                                     @RequestBody @Valid CriarAnaliseRequest request,
+                                                     @AuthenticationPrincipal Usuario usuario) {
+        return criarAnalise(codSubprocesso, request, TipoAnalise.VALIDACAO, usuario);
     }
 
-    private AnaliseHistoricoDto criarAnalise(Long codSubprocesso, CriarAnaliseRequest request, TipoAnalise tipo) {
+    private AnaliseHistoricoDto criarAnalise(Long codSubprocesso, CriarAnaliseRequest request, TipoAnalise tipo, Usuario usuario) {
         Subprocesso sp = subprocessoService.buscarSubprocesso(codSubprocesso);
-        Analise analise = transicaoService.criarAnalise(sp, request, tipo);
+        Analise analise = transicaoService.criarAnalise(sp, request, tipo, usuario);
         return subprocessoService.paraHistoricoDto(analise);
     }
 }

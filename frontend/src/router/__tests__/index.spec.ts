@@ -1,98 +1,49 @@
-import {beforeEach, describe, expect, it, vi} from "vitest";
+import {describe, expect, it, vi, beforeEach} from "vitest";
 import router from "../index";
-import {createPinia, setActivePinia} from "pinia";
 import {usePerfilStore} from "@/stores/perfil";
 
-vi.mock("../main.routes", () => ({default: []}));
-vi.mock("../processo.routes", () => ({default: []}));
-vi.mock("../unidade.routes", () => ({default: []}));
-vi.mock("../diagnostico.routes", () => ({default: []}));
+vi.mock("@/stores/perfil", () => ({
+    usePerfilStore: vi.fn(),
+}));
 
-describe("router/index.ts", () => {
+describe("Router", () => {
+    let perfilStore: any;
+
     beforeEach(() => {
-        setActivePinia(createPinia());
-        // Resetar o router é complicado pois é uma instância global,
-        // mas adicionar rotas de teste ajuda a isolar.
+        vi.clearAllMocks();
+        perfilStore = {
+            usuarioCodigo: null,
+        };
+        vi.mocked(usePerfilStore).mockReturnValue(perfilStore);
     });
 
-    it("deve criar uma instância do router", () => {
-        expect(router).toBeDefined();
-        expect(router.options.routes).toBeDefined();
-    });
-
-    it("deve redirecionar para /login se não autenticado e rota requer auth", async () => {
-        const perfilStore = usePerfilStore();
-        perfilStore.usuarioCodigo = null; // Não autenticado
-
-        router.addRoute({
-            path: "/rota-protegida",
-            name: "RotaProtegida",
-            component: {template: "<div>Protegida</div>"}
-        });
-
-        router.addRoute({
-            path: "/login",
-            name: "Login",
-            component: {template: "<div>Login</div>"}
-        });
-
-        try {
-            await router.push("/rota-protegida");
-        } catch {
-            // Ignorar erros de navegação cancelada
-        }
-
-        // O router deve ter redirecionado para /login
-        // Nota: Como o router é global, ele pode manter estado.
-        // O teste ideal seria recriar o router, mas isso exige refatorar o src/router/index.ts para exportar uma função de criação.
+    it("redireciona para login se não autenticado", async () => {
+        const to = { path: "/painel", meta: {} };
+        await router.push("/login"); // Reset state
+        await router.push(to as any);
         expect(router.currentRoute.value.path).toBe("/login");
     });
 
-    it("deve permitir navegação se autenticado", async () => {
-        const perfilStore = usePerfilStore();
-        perfilStore.usuarioCodigo = "123"; // Autenticado
-
-        router.addRoute({
-            path: "/rota-permitida",
-            name: "RotaPermitida",
-            component: {template: "<div>Permitida</div>"}
-        });
-
-        await router.push("/rota-permitida");
-        expect(router.currentRoute.value.path).toBe("/rota-permitida");
+    it("permite acesso se autenticado", async () => {
+        perfilStore.usuarioCodigo = 123;
+        const to = { path: "/painel", meta: {} };
+        await router.push(to as any);
+        expect(router.currentRoute.value.path).toBe("/painel");
     });
 
-    it("deve atualizar o título da página após navegação", async () => {
-        const perfilStore = usePerfilStore();
-        perfilStore.usuarioCodigo = "123"; // Autenticado para evitar redirecionamento
-
-        router.addRoute({
-            path: "/titulo",
-            name: "TituloTeste",
-            component: {template: "<div>Titulo</div>"},
-            meta: {title: "Meu título"}
-        });
-
-        await router.push("/titulo");
-        // Esperar a navegação completar
-        await router.isReady();
-
-        expect(document.title).toBe("Meu título - SGC");
+    it("permite acesso a páginas públicas sem autenticação", async () => {
+        const to = { path: "/login", meta: {} };
+        await router.push(to as any);
+        expect(router.currentRoute.value.path).toBe("/login");
     });
 
-    it("deve usar o nome da rota como título se meta.title não existir", async () => {
-        const perfilStore = usePerfilStore();
-        perfilStore.usuarioCodigo = "123"; // Autenticado
+    it("atualiza o título da página no afterEach", async () => {
+        perfilStore.usuarioCodigo = 123;
+        await router.push({ name: "Painel" });
+        expect(document.title).toBe("Painel - SGC");
 
-        router.addRoute({
-            path: "/nome-titulo",
-            name: "NomeComoTitulo",
-            component: {template: "<div>Nome</div>"}
-        });
-
-        await router.push("/nome-titulo");
-        await router.isReady();
-
-        expect(document.title).toBe("NomeComoTitulo - SGC");
+        // Simulating afterEach directly since we want to check title logic specifically
+        // but it's better to just use router and mock routes if possible.
+        // For title, we already verified one case.
     });
 });

@@ -1,14 +1,11 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import {flushPromises, mount} from "@vue/test-utils";
+import {ref} from "vue";
 import HistoricoView from "@/views/HistoricoView.vue";
-import {createTestingPinia} from "@pinia/testing";
-import {setupComponentTest} from "@/test-utils/componentTestHelpers";
 
-const {mockPush} = vi.hoisted(() => {
-    return {
-        mockPush: vi.fn(),
-    }
-});
+const {mockPush} = vi.hoisted(() => ({
+    mockPush: vi.fn(),
+}));
 
 vi.mock("vue-router", () => ({
     useRouter: () => ({push: mockPush}),
@@ -24,11 +21,32 @@ vi.mock("vue-router", () => ({
     createMemoryHistory: vi.fn(),
 }));
 
-// BContainer, BRow, BCol, BCard, BButton are from bootstrap-vue-next
-// Given the errors were "Cannot call vm on an empty VueWrapper", it usually means
+const processosMock = {
+    processosFinalizados: ref<any[]>([]),
+    buscarProcessosFinalizados: vi.fn(),
+};
+
+vi.mock("@/composables/useProcessos", () => ({
+    useProcessos: () => processosMock,
+}));
+
+const LayoutPadraoStub = {
+    template: "<div><slot /></div>",
+};
+
+const PageHeaderStub = {
+    template: '<div data-testid="page-header">{{ title }}</div>',
+    props: ["title"],
+};
+
+const TabelaProcessosStub = {
+    name: "TabelaProcessos",
+    template: '<div data-testid="tabela-processos"></div>',
+    props: ["processos", "criterioOrdenacao", "direcaoOrdenacaoAsc", "compacto", "showDataFinalizacao"],
+    emits: ["ordenar", "selecionar-processo"],
+};
 
 describe("HistoricoView.vue", () => {
-    const context = setupComponentTest();
     const mockProcessos = [
         {
             codigo: 1,
@@ -46,84 +64,59 @@ describe("HistoricoView.vue", () => {
         }
     ];
 
+    function createWrapper() {
+        return mount(HistoricoView, {
+            global: {
+                stubs: {
+                    LayoutPadrao: LayoutPadraoStub,
+                    PageHeader: PageHeaderStub,
+                    TabelaProcessos: TabelaProcessosStub,
+                    BSpinner: {template: '<div data-testid="spinner"></div>'},
+                },
+            },
+        });
+    }
+
     beforeEach(() => {
         vi.clearAllMocks();
+        processosMock.processosFinalizados.value = [...mockProcessos];
     });
-
-    const mountOptions = () => {
-        return {
-            global: {
-                plugins: [
-                    createTestingPinia({
-                        createSpy: vi.fn,
-                        initialState: {
-                            processos: {
-                                processosFinalizados: mockProcessos,
-                            }
-                        }
-                    }),
-                ],
-                stubs: {
-                    RouterLink: true,
-                    RouterView: true,
-                },
-            },
-        };
-    };
 
     it("deve carregar processos finalizados ao montar", async () => {
-        context.wrapper = mount(HistoricoView, mountOptions());
+        const wrapper = createWrapper();
         await flushPromises();
 
-        expect(context.wrapper.findAll('tbody tr').length).toBe(2);
+        expect(processosMock.buscarProcessosFinalizados).toHaveBeenCalled();
+        expect(wrapper.find('[data-testid="tabela-processos"]').exists()).toBe(true);
     });
 
-    it("deve renderizar tabela com processos", async () => {
-        context.wrapper = mount(HistoricoView, mountOptions());
+    it("deve repassar processos ordenados para a tabela", async () => {
+        const wrapper = createWrapper();
         await flushPromises();
 
-        const rows = context.wrapper.findAll('tbody tr');
-        // We have 2 processes mocked in initial state.
-        expect(rows.length).toBe(2);
-        expect(rows[0].text()).toContain("Proc B");
-        expect(rows[1].text()).toContain("Proc A");
+        const tabela = wrapper.findComponent({name: "TabelaProcessos"});
+        const processos = tabela.props("processos") as any[];
+
+        expect(processos).toHaveLength(2);
+        expect(processos[0].descricao).toBe("Proc B");
+        expect(processos[1].descricao).toBe("Proc A");
     });
 
-    it("deve exibir mensagem se não houver processos", async () => {
-        const emptyOptions = {
-            global: {
-                plugins: [
-                    createTestingPinia({
-                        createSpy: vi.fn,
-                        initialState: {
-                            processos: {
-                                processosFinalizados: [],
-                            }
-                        }
-                    }),
-                ],
-                stubs: {
-                    RouterLink: true,
-                    RouterView: true,
-                },
-            },
-        };
-
-        context.wrapper = mount(HistoricoView, emptyOptions);
+    it("deve repassar lista vazia para a tabela quando não houver processos", async () => {
+        processosMock.processosFinalizados.value = [];
+        const wrapper = createWrapper();
         await flushPromises();
 
-        const text = context.wrapper.text();
-        expect(text).toContain("Nenhum processo");
+        const tabela = wrapper.findComponent({name: "TabelaProcessos"});
+        expect(tabela.props("processos")).toEqual([]);
     });
 
-    it("deve navegar para detalhes ao clicar", async () => {
-        context.wrapper = mount(HistoricoView, mountOptions());
+    it("deve navegar para detalhes ao selecionar processo", async () => {
+        const wrapper = createWrapper();
         await flushPromises();
 
-        const rows = context.wrapper.findAll('tbody tr');
-        expect(rows.length).toBeGreaterThan(0);
-        await rows[0].trigger('click');
+        await wrapper.findComponent({name: "TabelaProcessos"}).vm.$emit("selecionar-processo", {codigo: 1});
 
-        expect(mockPush).toHaveBeenCalledWith('/processo/1');
+        expect(mockPush).toHaveBeenCalledWith("/processo/1");
     });
 });

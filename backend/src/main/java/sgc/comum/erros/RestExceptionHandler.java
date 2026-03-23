@@ -12,7 +12,6 @@ import org.springframework.web.context.request.*;
 import org.springframework.web.servlet.mvc.method.annotation.*;
 import sgc.seguranca.sanitizacao.*;
 
-import java.io.*;
 import java.util.*;
 
 /**
@@ -41,12 +40,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return (ResponseEntity<Object>) (Object) buildResponseEntity(erroApi);
     }
 
-    private String getStackTrace(Throwable ex) {
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-        ex.printStackTrace(pw);
-        return sw.toString();
-    }
+
 
     /**
      * Trata todas as exceções de negócio que estendem {@link ErroNegocioBase}.
@@ -67,7 +61,6 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                 sanitizar(ex.getMessage()),
                 ex.getCode(),
                 traceId);
-        erroApi.setStackTrace(getStackTrace(ex));
 
         if (!ex.getDetails().isEmpty()) {
             erroApi.setDetails(ex.getDetails());
@@ -155,7 +148,6 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
         String mensagemUsuario = "ERRO INTERNO: " + ex.getMessage();
         ErroApi erroApi = new ErroApi(HttpStatus.INTERNAL_SERVER_ERROR, mensagemUsuario, "ERRO_INTERNO", traceId);
-        erroApi.setStackTrace(getStackTrace(ex));
         return buildResponseEntity(erroApi);
     }
 
@@ -165,7 +157,6 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         log.warn("[{}] Estado ilegal da aplicação: {}", traceId, ex.getMessage());
         String message = "ESTADO ILEGAL: " + ex.getMessage();
         ErroApi erroApi = new ErroApi(HttpStatus.CONFLICT, message, "ESTADO_ILEGAL", traceId);
-        erroApi.setStackTrace(getStackTrace(ex));
         return buildResponseEntity(erroApi);
     }
 
@@ -175,7 +166,6 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         log.error("[{}] Argumento ilegal fornecido: {}", traceId, ex.getMessage(), ex);
         String message = "ARGUMENTO INVÁLIDO: " + ex.getMessage();
         ErroApi erroApi = new ErroApi(HttpStatus.BAD_REQUEST, message, "ARGUMENTO_INVALIDO", traceId);
-        erroApi.setStackTrace(getStackTrace(ex));
         return buildResponseEntity(erroApi);
     }
 
@@ -186,7 +176,6 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
         String message = "ERRO INESPERADO: " + (ex.getMessage() != null ? ex.getMessage() : ex.getClass().getSimpleName());
         ErroApi erroApi = new ErroApi(HttpStatus.INTERNAL_SERVER_ERROR, message, "ERRO_INTERNO", traceId);
-        erroApi.setStackTrace(getStackTrace(ex));
         return buildResponseEntity(erroApi);
     }
 }

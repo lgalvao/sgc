@@ -2,7 +2,7 @@ package sgc.parametros.model;
 
 import jakarta.validation.*;
 import org.junit.jupiter.api.*;
-import sgc.comum.SgcMensagens;
+import sgc.comum.*;
 
 import java.util.*;
 

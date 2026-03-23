@@ -7,6 +7,7 @@ import org.springframework.data.domain.*;
 import org.springframework.data.web.*;
 import org.springframework.http.*;
 import org.springframework.security.access.prepost.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import sgc.alerta.model.*;
 import sgc.organizacao.model.*;
@@ -22,37 +23,37 @@ public class PainelController {
 
     /**
      * Lista os processos a serem exibidos no painel do usuário.
-     *
-     * <p>A visibilidade dos processos é determinada pelo perfil do usuário e pela
-     * unidade selecionada.
      */
     @GetMapping("/processos")
-    @PreAuthorize("isAuthenticated()")
-    @Operation(summary = "Lista processos para o painel com base no perfil e unidade")
+    @Operation(summary = "Lista processos para o painel com base no contexto do Token JWT")
     public ResponseEntity<Page<ProcessoResumoDto>> listarProcessos(
-            @RequestParam(name = "perfil") Perfil perfil,
-            @RequestParam(name = "unidade") Long unidade,
+            @AuthenticationPrincipal Usuario usuario,
             @PageableDefault(size = 20) Pageable pageable) {
 
-        Page<ProcessoResumoDto> page = painelFacade.listarProcessos(perfil, unidade, pageable);
+        Page<ProcessoResumoDto> page = painelFacade.listarProcessos(
+                usuario.getPerfilAtivo(), 
+                usuario.getUnidadeAtivaCodigo(), 
+                pageable
+        );
         return ResponseEntity.ok(page);
     }
 
     /**
      * Lista os alertas a serem exibidos no painel.
-     *
-     * <p>Os alertas podem ser filtrados pelo título de eleitor do usuário ou pelo código da
-     * unidade.
+     * A visibilidade segue a regra do CDU-02 (pessoal ou unidade ativa, sem recursividade).
      */
     @GetMapping("/alertas")
-    @PreAuthorize("isAuthenticated()")
-    @Operation(summary = "Lista alertas para o painel com base no usuário e unidade")
+    @Operation(summary = "Lista alertas para o painel com base no contexto do Token JWT")
     public ResponseEntity<Page<Alerta>> listarAlertas(
-            @RequestParam(name = "usuarioTitulo", required = false) String usuarioTitulo,
-            @RequestParam(name = "unidade") Long unidade,
+            @AuthenticationPrincipal Usuario usuario,
             @PageableDefault(size = 20) Pageable pageable) {
 
-        Page<Alerta> page = painelFacade.listarAlertas(usuarioTitulo, unidade, pageable);
+        Page<Alerta> page = painelFacade.listarAlertas(
+                usuario.getTituloEleitoral(), 
+                usuario.getUnidadeAtivaCodigo(), 
+                usuario.getPerfilAtivo().name(), 
+                pageable
+        );
         return ResponseEntity.ok(page);
     }
 }

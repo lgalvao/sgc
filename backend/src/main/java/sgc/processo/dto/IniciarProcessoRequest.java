@@ -1,7 +1,7 @@
 package sgc.processo.dto;
 
 import jakarta.validation.constraints.*;
-import sgc.comum.SgcMensagens;
+import sgc.comum.*;
 import sgc.processo.model.*;
 
 import java.util.*;

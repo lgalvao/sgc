@@ -8,6 +8,7 @@ import org.springframework.boot.webmvc.test.autoconfigure.*;
 import org.springframework.context.annotation.*;
 import org.springframework.http.*;
 import org.springframework.http.MediaType;
+import org.springframework.security.config.annotation.method.configuration.*;
 import org.springframework.security.test.context.support.*;
 import org.springframework.test.context.bean.override.mockito.*;
 import org.springframework.test.web.servlet.*;
@@ -15,10 +16,10 @@ import sgc.comum.erros.*;
 import sgc.organizacao.model.*;
 import sgc.processo.dto.*;
 import sgc.processo.model.*;
-import sgc.processo.service.ProcessoService;
-import sgc.subprocesso.service.SubprocessoService;
+import sgc.processo.service.*;
 import sgc.seguranca.*;
 import sgc.subprocesso.model.*;
+import sgc.subprocesso.service.*;
 
 import java.time.*;
 import java.util.*;
@@ -30,7 +31,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(ProcessoController.class)
-@Import(RestExceptionHandler.class)
+@Import({RestExceptionHandler.class, SgcPermissionEvaluator.class})
+@EnableMethodSecurity
 @Tag("integration")
 @DisplayName("ProcessoController")
 class ProcessoControllerTest {
@@ -42,7 +44,7 @@ class ProcessoControllerTest {
     protected static final String PROCESSO_ATUALIZADO = "Processo atualizado";
     private static final String NOVO_PROCESSO = "Novo processo";
 
-    @MockitoBean
+    @MockitoBean(name = "processoService")
     private ProcessoService processoService;
 
     @Autowired
@@ -196,6 +198,55 @@ class ProcessoControllerTest {
 
             verify(processoService).buscarOpt(999L);
         }
+
+        @Test
+        @WithMockUser(roles = "CHEFE")
+        @DisplayName("Deve retornar 200 OK quando CHEFE tem acesso ao processo (correção IDOR)")
+        void deveRetornarOkQuandoChefeTemAcesso() throws Exception {
+            var processo = Processo.builder().codigo(1L).descricao("Teste").build();
+            when(processoService.buscarOpt(1L)).thenReturn(Optional.of(processo));
+            when(processoService.checarAcesso(any(), eq(1L))).thenReturn(true);
+
+            mockMvc.perform(get(API_PROCESSOS_1))
+                    .andExpect(status().isOk());
+        }
+
+        @Test
+        @WithMockUser(roles = "CHEFE")
+        @DisplayName("Deve retornar 403 Forbidden quando CHEFE tenta acessar processo de outra unidade (correção IDOR)")
+        void deveRetornarForbiddenQuandoChefeNaoTemAcesso() throws Exception {
+            var processo = Processo.builder().codigo(1L).descricao("Teste").build();
+            when(processoService.buscarOpt(1L)).thenReturn(Optional.of(processo));
+            when(processoService.checarAcesso(any(), anyLong())).thenReturn(false);
+
+            mockMvc.perform(get(API_PROCESSOS_1))
+                    .andDo(org.springframework.test.web.servlet.result.MockMvcResultHandlers.print())
+                    .andExpect(status().isForbidden());
+        }
+
+        @Test
+        @WithMockUser(roles = "GESTOR")
+        @DisplayName("Deve retornar 200 OK quando GESTOR tem acesso a processo de sua sub-árvore (correção IDOR)")
+        void deveRetornarOkQuandoGestorTemAcesso() throws Exception {
+            var processo = Processo.builder().codigo(1L).descricao("Teste").build();
+            when(processoService.buscarOpt(1L)).thenReturn(Optional.of(processo));
+            when(processoService.checarAcesso(any(), anyLong())).thenReturn(true);
+
+            mockMvc.perform(get(API_PROCESSOS_1))
+                    .andExpect(status().isOk());
+        }
+
+        @Test
+        @WithMockUser(roles = "GESTOR")
+        @DisplayName("Deve retornar 403 Forbidden quando GESTOR tenta acessar processo fora de sua sub-árvore (correção IDOR)")
+        void deveRetornarForbiddenQuandoGestorNaoTemAcesso() throws Exception {
+            var processo = Processo.builder().codigo(1L).descricao("Teste").build();
+            when(processoService.buscarOpt(1L)).thenReturn(Optional.of(processo));
+            when(processoService.checarAcesso(any(), anyLong())).thenReturn(false);
+
+            mockMvc.perform(get(API_PROCESSOS_1))
+                    .andExpect(status().isForbidden());
+        }
     }
 
     @Nested
@@ -319,7 +370,7 @@ class ProcessoControllerTest {
         }
 
         @Test
-        @WithMockUser(roles = "ADMIN")
+        @WithMockUser(roles = "CHEFE")
         @DisplayName("listarUnidadesParaImportacao deve retornar lista de participantes quando finalizado")
         void deveListarUnidadesParaImportacaoQuandoFinalizado() throws Exception {
             Processo processo = Processo.builder()

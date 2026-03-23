@@ -5,7 +5,7 @@ import org.jspecify.annotations.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
-import sgc.comum.SgcMensagens;
+import sgc.comum.*;
 import sgc.comum.erros.*;
 import sgc.organizacao.*;
 import sgc.organizacao.dto.*;
@@ -25,14 +25,10 @@ import static sgc.organizacao.model.Perfil.*;
 @Slf4j
 public class LoginFacade {
     private final @Nullable ClienteAcessoAd clienteAcessoAd;
-
     private final UsuarioFacade usuarioFacade;
     private final UnidadeService unidadeService;
     private final GerenciadorJwt gerenciadorJwt;
     private final UsuarioService usuarioService;
-
-    @Value("${aplicacao.ambiente-testes:true}")
-    private boolean ambienteTestes;
 
     public LoginFacade(UsuarioFacade usuarioFacade,
                        GerenciadorJwt gerenciadorJwt,
@@ -51,10 +47,6 @@ public class LoginFacade {
      * Autentica um usuário com título de eleitor e senha.
      */
     public boolean autenticar(String tituloEleitoral, String senha) {
-        if (ambienteTestes) {
-            log.debug("Usuário autenticado: {}", tituloEleitoral);
-            return true;
-        }
         if (clienteAcessoAd == null) {
             log.error("ClienteAcessoAd não configurado em ambiente de produção");
             return false;
@@ -62,7 +54,7 @@ public class LoginFacade {
         try {
             return clienteAcessoAd.autenticar(tituloEleitoral, senha);
         } catch (ErroAutenticacao e) {
-            log.warn("Falha na autenticação do usuário {}: {}", tituloEleitoral, e.getMessage());
+            log.warn("Falha na autenticação do usuário {}: {}", mascarar(tituloEleitoral), e.getMessage());
             return false;
         }
     }
@@ -79,11 +71,10 @@ public class LoginFacade {
      * Finaliza o login gerando um token JWT para o perfil e unidade escolhidos.
      */
     @Transactional(readOnly = true)
-    public String entrar(EntrarRequest request) {
+    public String entrar(EntrarRequest request, String tituloEleitoral) {
         Long codUnidade = request.unidadeCodigo();
         unidadeService.buscarPorCodigo(codUnidade);
 
-        String tituloEleitoral = request.tituloEleitoral();
         List<PerfilUnidadeDto> autorizacoes = buscarAutorizacoes(tituloEleitoral);
         Perfil perfilSolicitado = Perfil.valueOf(request.perfil());
 
@@ -105,7 +96,7 @@ public class LoginFacade {
         }
 
         String siglaUnidade = unidadeService.buscarPorCodigo(codUnidade).getSigla();
-        log.info("Usuário {} autorizado: {}-{}", tituloEleitoral, perfilSolicitado, siglaUnidade);
+        log.info("Usuário {} autorizado: {}-{}", mascarar(tituloEleitoral), perfilSolicitado, siglaUnidade);
 
         return gerenciadorJwt.gerarToken(
                 tituloEleitoral,
@@ -126,5 +117,10 @@ public class LoginFacade {
                         atribuicao.getPerfil(),
                         UnidadeDto.fromEntity(atribuicao.getUnidade())))
                 .toList();
+    }
+
+    private String mascarar(String valor) {
+        if (valor.length() <= 4) return "***";
+        return "***" + valor.substring(valor.length() - 4);
     }
 }

@@ -4,7 +4,6 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
-import org.springframework.test.util.*;
 import sgc.comum.erros.*;
 import sgc.organizacao.*;
 import sgc.organizacao.model.*;
@@ -43,21 +42,12 @@ class LoginFacadeTest {
                 unidadeService,
                 usuarioServiceInterno
         );
-        ReflectionTestUtils.setField(loginFacade, "ambienteTestes", false);
-    }
-
-    @Test
-    @DisplayName("autenticar deve retornar true em ambiente de testes")
-    void autenticar_AmbienteTestes() {
-        ReflectionTestUtils.setField(loginFacade, "ambienteTestes", true);
-        assertThat(loginFacade.autenticar("123", "senha")).isTrue();
     }
 
     @Test
     @DisplayName("autenticar deve retornar false se clienteAcessoAd for null")
     void autenticar_ClienteAdNull() {
         LoginFacade facadeSemAd = new LoginFacade(usuarioFacade, gerenciadorJwt, null, unidadeService, usuarioServiceInterno);
-        ReflectionTestUtils.setField(facadeSemAd, "ambienteTestes", false);
         assertThat(facadeSemAd.autenticar("123", "senha")).isFalse();
     }
 
@@ -79,8 +69,8 @@ class LoginFacadeTest {
     @DisplayName("entrar deve falhar se usuário não encontrado")
     void entrar_UsuarioNaoEncontrado() {
         when(usuarioFacade.carregarUsuarioParaAutenticacao("123")).thenReturn(null);
-        EntrarRequest req = new EntrarRequest("123", "ADMIN", 1L);
-        assertThatThrownBy(() -> loginFacade.entrar(req))
+        EntrarRequest req = new EntrarRequest("ADMIN", 1L);
+        assertThatThrownBy(() -> loginFacade.entrar(req, "123"))
                 .isInstanceOf(ErroAutenticacao.class);
     }
 
@@ -104,8 +94,8 @@ class LoginFacadeTest {
         when(gerenciadorJwt.gerarToken("123", Perfil.ADMIN, 1L)).thenReturn("token");
         when(unidadeService.buscarPorCodigo(1L)).thenReturn(unidade);
 
-        EntrarRequest req = new EntrarRequest("123", "ADMIN", 1L);
-        assertThat(loginFacade.entrar(req)).isEqualTo("token");
+        EntrarRequest req = new EntrarRequest("ADMIN", 1L);
+        assertThat(loginFacade.entrar(req, "123")).isEqualTo("token");
     }
 
     @Test
@@ -116,8 +106,8 @@ class LoginFacadeTest {
         when(usuarioFacade.carregarUsuarioParaAutenticacao("123")).thenReturn(user);
         when(usuarioServiceInterno.buscarPerfis("123")).thenReturn(List.of());
 
-        EntrarRequest req = new EntrarRequest("123", "ADMIN", 1L);
-        assertThatThrownBy(() -> loginFacade.entrar(req))
+        EntrarRequest req = new EntrarRequest("ADMIN", 1L);
+        assertThatThrownBy(() -> loginFacade.entrar(req, "123"))
                 .isInstanceOf(ErroAcessoNegado.class);
     }
 
@@ -141,8 +131,8 @@ class LoginFacadeTest {
         when(gerenciadorJwt.gerarToken("123", Perfil.GESTOR, 1L)).thenReturn("token");
         when(unidadeService.buscarPorCodigo(1L)).thenReturn(unidade);
 
-        EntrarRequest req = new EntrarRequest("123", "GESTOR", 1L);
-        assertThat(loginFacade.entrar(req)).isEqualTo("token");
+        EntrarRequest req = new EntrarRequest("GESTOR", 1L);
+        assertThat(loginFacade.entrar(req, "123")).isEqualTo("token");
     }
 
     @Test
@@ -163,8 +153,8 @@ class LoginFacadeTest {
 
         when(usuarioServiceInterno.buscarPerfis("123")).thenReturn(List.of(up));
 
-        EntrarRequest req = new EntrarRequest("123", "GESTOR", 1L);
-        assertThatThrownBy(() -> loginFacade.entrar(req))
+        EntrarRequest req = new EntrarRequest("GESTOR", 1L);
+        assertThatThrownBy(() -> loginFacade.entrar(req, "123"))
                 .isInstanceOf(ErroAcessoNegado.class);
     }
 

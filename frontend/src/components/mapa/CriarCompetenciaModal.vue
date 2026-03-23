@@ -54,15 +54,6 @@
                 data-testid="chk-criar-competencia-atividade"
             >
               {{ atividade.descricao }}
-              <BBadge
-                  v-if="atividade.conhecimentos.length > 0"
-                  v-b-tooltip.html.right="getConhecimentosModal(atividade)"
-                  variant="secondary"
-                  class="ms-2"
-                  data-testid="cad-mapa__txt-badge-conhecimentos-2"
-              >
-                {{ atividade.conhecimentos.length }}
-              </BBadge>
             </BFormCheckbox>
           </BCardBody>
         </BCard>
@@ -77,13 +68,12 @@
 
 <script lang="ts" setup>
 import {
+  BAlert,
   BCard,
   BCardBody,
   BFormCheckbox,
   BFormInvalidFeedback,
   BFormTextarea,
-  BAlert,
-  BBadge,
 } from "bootstrap-vue-next";
 import {computed, nextTick, ref, watch} from "vue";
 import ModalPadrao from "@/components/comum/ModalPadrao.vue";
@@ -147,18 +137,6 @@ function focarDescricao() {
   nextTick(() => {
     inputDescricaoRef.value?.$el?.focus();
   });
-}
-
-function getConhecimentosModal(atividade: Atividade): string {
-  if (!atividade.conhecimentos.length) {
-    return "Nenhum conhecimento";
-  }
-
-  const conhecimentosHtml = atividade.conhecimentos
-      .map((c) => `<div class="mb-1">• ${c.descricao}</div>`)
-      .join("");
-
-  return `<div class="text-start"><strong>Conhecimentos:</strong><br>${conhecimentosHtml}</div>`;
 }
 
 function fechar() {

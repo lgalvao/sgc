@@ -48,8 +48,16 @@ public class LimitadorTentativasLogin {
             limparCachePeriodico();
             if (tentativasPorIp.size() >= maxCacheEntries) {
                 if (!tentativasPorIp.containsKey(ip)) {
-                    log.warn("Limitador de login cheio. Rejeitando novo IP: {}", ip);
-                    throw new ErroMuitasTentativas("Muitas tentativas de login no sistema. Tente novamente mais tarde.");
+                    // Cache ainda cheio: enviction policy - remove a entrada mais antiga para liberar espaço
+                    String ipMaisAntigo = encontrarIpMaisAntigo();
+                    if (ipMaisAntigo != null) {
+                        tentativasPorIp.remove(ipMaisAntigo);
+                        log.debug("Limitador de login cheio. Removida entrada mais antiga (IP: {}).", ipMaisAntigo);
+                    } else {
+                        // Fallback se algo der errado na busca
+                        log.warn("Limitador de login cheio e falha ao limpar. Rejeitando novo IP: {}", ip);
+                        throw new ErroMuitasTentativas("Muitas tentativas de login no sistema. Tente novamente mais tarde.");
+                    }
                 }
             }
         }
@@ -61,6 +69,14 @@ public class LimitadorTentativasLogin {
             throw new ErroMuitasTentativas("Muitas tentativas de login. Tente novamente em alguns minutos.");
         }
         tentativas.add(LocalDateTime.now(clock));
+    }
+
+    private String encontrarIpMaisAntigo() {
+        return tentativasPorIp.entrySet().stream()
+                .filter(e -> !e.getValue().isEmpty())
+                .min(Comparator.comparing(e -> e.getValue().peekFirst()))
+                .map(Map.Entry::getKey)
+                .orElseGet(() -> tentativasPorIp.keySet().stream().findFirst().orElse(null));
     }
 
     private boolean isLimiterDesabilitado() {

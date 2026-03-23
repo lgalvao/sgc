@@ -5,6 +5,7 @@ import {createTestingPinia} from "@pinia/testing";
 import {usePerfilStore} from "@/stores/perfil";
 import {useRouter} from "vue-router";
 import {Perfil} from "@/types/tipos";
+import {logger} from "@/utils";
 
 vi.mock("vue-router", () => ({
     useRouter: vi.fn(),
@@ -69,6 +70,15 @@ describe("LoginView.vue", () => {
         expect(wrapper.find('[data-testid="inp-login-senha"]').exists()).toBe(true);
         expect(wrapper.find('[data-testid="btn-login-entrar"]').exists()).toBe(true);
         expect(wrapper.find('[data-testid="sec-login-perfil"]').exists()).toBe(false);
+    });
+
+    it("NÃO deve preencher as credenciais hardcoded em start (mesmo em DEV)", () => {
+        const wrapper = mount(LoginView, mountOptions());
+        const usuarioInput = wrapper.find<HTMLInputElement>('[data-testid="inp-login-usuario"]');
+        const senhaInput = wrapper.find<HTMLInputElement>('[data-testid="inp-login-senha"]');
+        
+        expect(usuarioInput.element.value).toBe("");
+        expect(senhaInput.element.value).toBe("");
     });
 
     it("deve mostrar erro se campos estiverem vazios", async () => {
@@ -168,6 +178,27 @@ describe("LoginView.vue", () => {
 
         expect(wrapper.text()).toContain("Ocorreu um erro ao tentar realizar o login.");
         consoleSpy.mockRestore();
+    });
+
+    it("NÃO deve vazar a senha no logger.error se houver falha genérica de login (objeto Axios exposto)", async () => {
+        const wrapper = mount(LoginView, mountOptions());
+        const perfilStore = usePerfilStore();
+
+        const fakeError = new Error("API Failure");
+        (fakeError as any).config = { data: JSON.stringify({ tituloEleitoral: "123", senha: "senhasupersecreta" }) };
+        perfilStore.loginCompleto = vi.fn().mockRejectedValue(fakeError);
+
+        const loggerSpy = vi.spyOn(logger, 'error').mockImplementation(() => {});
+
+        await wrapper.find('[data-testid="inp-login-usuario"]').setValue("123");
+        await wrapper.find('[data-testid="inp-login-senha"]').setValue("senhasupersecreta");
+        await wrapper.find('form').trigger('submit');
+
+        await new Promise(resolve => setTimeout(resolve, 0));
+
+        expect(loggerSpy).toHaveBeenCalledWith("Erro no login:", expect.not.objectContaining({ config: expect.anything() }));
+        
+        loggerSpy.mockRestore();
     });
 
     it("deve exibir erro se nenhum perfil estiver disponível (array vazio)", async () => {

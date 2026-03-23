@@ -26,7 +26,7 @@
         <BFormSelect
             id="processo-select"
             v-model="processoSelecionadoId"
-            :options="processosStore.processosParaImportacao"
+            :options="processos.processosParaImportacao.value"
             data-testid="select-processo"
             text-field="descricao"
             value-field="codigo"
@@ -41,7 +41,7 @@
           </template>
         </BFormSelect>
         <div
-            v-if="!processosStore.processosParaImportacao.length"
+            v-if="!processos.processosParaImportacao.value.length"
             class="text-center text-muted mt-3"
         >
           {{ TEXTOS.atividades.importacao.NENHUM_PROCESSO }}
@@ -139,7 +139,7 @@
 import {BAlert, BButton, BFormCheckbox, BFormSelect, BFormSelectOption, BModal, BSpinner} from "bootstrap-vue-next";
 import {onMounted, ref, watch} from "vue";
 import {useApi} from "@/composables/useApi";
-import {useProcessosStore} from "@/stores/processos";
+import {useProcessos} from "@/composables/useProcessos";
 import * as subprocessoService from "@/services/subprocessoService";
 import {type Atividade, type ProcessoResumo, type UnidadeImportacao,} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
@@ -154,7 +154,7 @@ const emit = defineEmits<{
   importar: [aviso?: string];
 }>();
 
-const processosStore = useProcessosStore();
+const processos = useProcessos();
 
 const {
   execute: executarImportacao,
@@ -181,14 +181,14 @@ watch(
     (mostrar) => {
       if (mostrar) {
         resetModal();
-        processosStore.buscarProcessosParaImportacao();
+        processos.buscarProcessosParaImportacao();
       }
     },
 );
 
 watch(processoSelecionadoId, async (newId) => {
   if (newId) {
-    const processo = processosStore.processosParaImportacao.find(
+    const processo = processos.processosParaImportacao.value.find(
         (p) => p.codigo === Number(newId),
     );
     if (processo) {
@@ -224,8 +224,9 @@ function resetModal() {
 
 async function selecionarProcesso(processo: ProcessoResumo | null) {
   processoSelecionado.value = processo;
+  atividadesSelecionadas.value = [];
   if (processo) {
-    unidadesParticipantes.value = await processosStore.buscarUnidadesParaImportacao(processo.codigo);
+    unidadesParticipantes.value = await processos.buscarUnidadesParaImportacao(processo.codigo);
   } else {
     unidadesParticipantes.value = [];
   }
@@ -234,6 +235,7 @@ async function selecionarProcesso(processo: ProcessoResumo | null) {
 }
 
 async function selecionarUnidade(unidadePu: UnidadeImportacao | null) {
+  atividadesSelecionadas.value = [];
   unidadeSelecionada.value = unidadePu;
   if (unidadePu) {
     try {

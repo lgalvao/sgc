@@ -15,31 +15,75 @@ public interface AlertaRepo extends JpaRepository<Alerta, Long> {
     List<Alerta> findByProcessoCodigo(Long codProcesso);
 
     /**
-     * Carrega eagerly as entidades relacionadas (JOIN FETCH) para evitar LazyInitializationException.
+     * Busca alertas destinados exclusivamente ao usuário logado (pessoais).
      */
     @Query("""
             SELECT DISTINCT a FROM Alerta a
-            JOIN FETCH a.processo
-            JOIN FETCH a.unidadeOrigem
-            JOIN FETCH a.unidadeDestino
-            WHERE a.unidadeDestino.codigo = :codUnidade
+            LEFT JOIN FETCH a.processo
+            LEFT JOIN FETCH a.unidadeOrigem
+            LEFT JOIN FETCH a.unidadeDestino
+            WHERE a.usuarioDestinoTitulo = :usuarioTitulo
+            ORDER BY a.dataHora DESC
             """)
-    List<Alerta> findByUnidadeDestino_Codigo(@Param("codUnidade") Long codUnidade);
+    List<Alerta> buscarAlertasExclusivosDoUsuario(@Param("usuarioTitulo") String usuarioTitulo);
 
     /**
-     * Versão paginada. JOIN FETCH para evitar LazyInitializationException.
+     * Busca alertas visíveis para perfis de gestão: alertas da unidade (sem destino individual) 
+     * OU alertas exclusivos do próprio usuário.
+     */
+    @Query("""
+            SELECT DISTINCT a FROM Alerta a
+            LEFT JOIN FETCH a.processo
+            LEFT JOIN FETCH a.unidadeOrigem
+            LEFT JOIN FETCH a.unidadeDestino
+            WHERE a.usuarioDestinoTitulo = :usuarioTitulo
+               OR (a.unidadeDestino.codigo = :codUnidade AND a.usuarioDestinoTitulo IS NULL)
+            ORDER BY a.dataHora DESC
+            """)
+    List<Alerta> buscarAlertasDaUnidadeEIndividuais(
+            @Param("codUnidade") Long codUnidade, 
+            @Param("usuarioTitulo") String usuarioTitulo);
+
+    /**
+     * Versão paginada para perfis de gestão (Coletivos da Unidade + Individuais).
      */
     @Query(value = """
             SELECT DISTINCT a FROM Alerta a
-            JOIN FETCH a.processo
-            JOIN FETCH a.unidadeOrigem
-            JOIN FETCH a.unidadeDestino
-            WHERE a.unidadeDestino.codigo = :codUnidade
+            LEFT JOIN FETCH a.processo
+            LEFT JOIN FETCH a.unidadeOrigem
+            LEFT JOIN FETCH a.unidadeDestino
+            WHERE a.usuarioDestinoTitulo = :usuarioTitulo
+               OR (a.unidadeDestino.codigo = :codUnidade AND a.usuarioDestinoTitulo IS NULL)
+            ORDER BY a.dataHora DESC
             """,
             countQuery = """
                     SELECT COUNT(a) FROM Alerta a
-                    WHERE a.unidadeDestino.codigo = :codUnidade
+                    WHERE a.usuarioDestinoTitulo = :usuarioTitulo
+                       OR (a.unidadeDestino.codigo = :codUnidade AND a.usuarioDestinoTitulo IS NULL)
                     AND a.processo IS NOT NULL
                     """)
-    Page<Alerta> findByUnidadeDestino_Codigo(@Param("codUnidade") Long codUnidade, Pageable pageable);
+    Page<Alerta> buscarAlertasDaUnidadeEIndividuais(
+            @Param("codUnidade") Long codUnidade, 
+            @Param("usuarioTitulo") String usuarioTitulo, 
+            Pageable pageable);
+
+    /**
+     * Versão paginada para o perfil SERVIDOR (Apenas exclusivos/pessoais).
+     */
+    @Query(value = """
+            SELECT DISTINCT a FROM Alerta a
+            LEFT JOIN FETCH a.processo
+            LEFT JOIN FETCH a.unidadeOrigem
+            LEFT JOIN FETCH a.unidadeDestino
+            WHERE a.usuarioDestinoTitulo = :usuarioTitulo
+            ORDER BY a.dataHora DESC
+            """,
+            countQuery = """
+                    SELECT COUNT(a) FROM Alerta a
+                    WHERE a.usuarioDestinoTitulo = :usuarioTitulo
+                    AND a.processo IS NOT NULL
+                    """)
+    Page<Alerta> buscarAlertasExclusivosDoUsuario(
+            @Param("usuarioTitulo") String usuarioTitulo, 
+            Pageable pageable);
 }

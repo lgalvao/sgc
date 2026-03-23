@@ -5,18 +5,15 @@ import type {Perfil} from "@/types/tipos";
 import * as usuarioService from "../services/usuarioService";
 import {useErrorHandler} from "@/composables/useErrorHandler";
 import {useLocalStorage} from "@/composables/useLocalStorage";
-
-function definirToken(token: string) {
-    localStorage.setItem("jwtToken", token);
-}
+import {useSessionStorage} from "@/composables/useSessionStorage";
 
 export const usePerfilStore = defineStore("perfil", () => {
-    // Estados sincronizados com localStorage usando composable
-    const usuarioCodigo = useLocalStorage<string | null>("usuarioCodigo", null);
+    // Estados sincronizados com localStorage/sessionStorage usando composable
+    const usuarioCodigo = useSessionStorage<string | null>("usuarioCodigo", null);
     const perfilSelecionado = useLocalStorage<Perfil | null>("perfilSelecionado", null);
     const unidadeSelecionada = useLocalStorage<number | null>("unidadeSelecionada", null);
     const unidadeSelecionadaSigla = useLocalStorage<string | null>("unidadeSelecionadaSigla", null);
-    const usuarioNome = useLocalStorage<string | null>("usuarioNome", null);
+    const usuarioNome = useSessionStorage<string | null>("usuarioNome", null);
     const perfis = useLocalStorage<Perfil[]>("perfis", []);
 
     // Estados não persistidos
@@ -41,14 +38,19 @@ export const usePerfilStore = defineStore("perfil", () => {
         // localStorage.setItem removido - sincronização automática
     }
 
-    function definirPerfilUnidade(perfil: Perfil, unidadeCodigo: number, unidadeSigla: string, nome?: string) {
-        perfilSelecionado.value = perfil;
-        unidadeSelecionada.value = unidadeCodigo;
-        unidadeSelecionadaSigla.value = unidadeSigla;
-        // localStorage.setItem removido - sincronização automática
-        if (nome) {
-            usuarioNome.value = nome;
-            // localStorage.setItem removido - sincronização automática
+    interface DadosSelecaoPerfil {
+        perfil: Perfil;
+        unidadeCodigo: number;
+        unidadeSigla: string;
+        nome?: string;
+    }
+
+    function definirPerfilUnidade(dados: DadosSelecaoPerfil) {
+        perfilSelecionado.value = dados.perfil;
+        unidadeSelecionada.value = dados.unidadeCodigo;
+        unidadeSelecionadaSigla.value = dados.unidadeSigla;
+        if (dados.nome) {
+            usuarioNome.value = dados.nome;
         }
     }
 
@@ -64,8 +66,7 @@ export const usePerfilStore = defineStore("perfil", () => {
                 senha,
             });
             if (autenticado) {
-                const responsePerfisUnidades =
-                    await usuarioService.autorizar(tituloEleitoral);
+                const responsePerfisUnidades = await usuarioService.autorizar();
                 perfisUnidades.value = responsePerfisUnidades;
 
                 const listaPerfis = [
@@ -79,18 +80,16 @@ export const usePerfilStore = defineStore("perfil", () => {
                 if (responsePerfisUnidades.length === 1) {
                     const perfilUnidadeSelecionado = responsePerfisUnidades[0];
                     const loginResponse = await usuarioService.entrar({
-                        tituloEleitoral,
                         perfil: perfilUnidadeSelecionado.perfil,
                         unidadeCodigo: perfilUnidadeSelecionado.unidade.codigo,
                     });
-                    definirPerfilUnidade(
-                        loginResponse.perfil as unknown as Perfil,
-                        loginResponse.unidadeCodigo,
-                        perfilUnidadeSelecionado.unidade.sigla,
-                        loginResponse.nome,
-                    );
+                    definirPerfilUnidade({
+                        perfil: loginResponse.perfil as unknown as Perfil,
+                        unidadeCodigo: loginResponse.unidadeCodigo,
+                        unidadeSigla: perfilUnidadeSelecionado.unidade.sigla,
+                        nome: loginResponse.nome,
+                    });
                     definirUsuarioCodigo(loginResponse.tituloEleitoral);
-                    definirToken(loginResponse.token);
                 }
                 return true;
             }
@@ -109,18 +108,16 @@ export const usePerfilStore = defineStore("perfil", () => {
     ) {
         return withErrorHandling(async () => {
             const loginResponse = await usuarioService.entrar({
-                tituloEleitoral,
                 perfil: perfilUnidade.perfil,
                 unidadeCodigo: perfilUnidade.unidade.codigo,
             });
-            definirPerfilUnidade(
-                loginResponse.perfil as unknown as Perfil,
-                loginResponse.unidadeCodigo,
-                perfilUnidade.unidade.sigla,
-                loginResponse.nome,
-            );
+            definirPerfilUnidade({
+                perfil: loginResponse.perfil as unknown as Perfil,
+                unidadeCodigo: loginResponse.unidadeCodigo,
+                unidadeSigla: perfilUnidade.unidade.sigla,
+                nome: loginResponse.nome,
+            });
             definirUsuarioCodigo(loginResponse.tituloEleitoral);
-            definirToken(loginResponse.token);
         });
     }
 
@@ -133,9 +130,6 @@ export const usePerfilStore = defineStore("perfil", () => {
         usuarioNome.value = null;
         perfisUnidades.value = [];
         perfis.value = [];
-
-        // Apenas jwtToken precisa de remoção manual (não é gerenciado pelo composable)
-        localStorage.removeItem("jwtToken");
     }
 
     return {

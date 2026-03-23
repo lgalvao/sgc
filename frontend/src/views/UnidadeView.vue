@@ -120,7 +120,7 @@ import EmptyState from "@/components/comum/EmptyState.vue";
 import {buscarArvoreUnidade as buscarArvoreUnidadeServico} from "@/services/unidadeService";
 import {usePerfil} from "@/composables/usePerfil";
 import {useUnidadeAtual} from "@/composables/useUnidadeAtual";
-import {useMapasStore} from "@/stores/mapas";
+import {useMapas} from "@/composables/useMapas";
 import {buscarUsuarioPorTitulo} from "@/services/usuarioService";
 import {logger} from "@/utils";
 import {TEXTOS} from "@/constants/textos";
@@ -129,7 +129,7 @@ const props = defineProps<{ codUnidade: number }>();
 
 const router = useRouter();
 const {isAdmin} = usePerfil();
-const mapasStore = useMapasStore();
+const mapasStore = useMapas();
 const {definirUnidadeAtual} = useUnidadeAtual();
 
 const unidade = ref<Unidade | null>(null);
@@ -140,7 +140,7 @@ function clearError() {
   lastError.value = null;
 }
 
-const mapaVigente = computed(() => mapasStore.mapaCompleto);
+const mapaVigente = computed(() => mapasStore.mapaCompleto.value);
 
 async function carregarDados() {
   try {

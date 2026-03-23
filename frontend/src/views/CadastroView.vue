@@ -152,7 +152,6 @@ import {BAlert, BBadge, BButton} from "bootstrap-vue-next";
 import AppAlert from "@/components/comum/AppAlert.vue";
 import {computed, nextTick, onMounted, ref, watch} from "vue";
 import {useRouter} from "vue-router";
-import {storeToRefs} from "pinia";
 import {badgeClass} from "@/utils";
 import ImpactoMapaModal from "@/components/mapa/ImpactoMapaModal.vue";
 import ImportarAtividadesModal from "@/components/atividades/ImportarAtividadesModal.vue";
@@ -166,9 +165,10 @@ import EmptyState from "@/components/comum/EmptyState.vue";
 import CadAtividadeForm from "@/components/atividades/CadAtividadeForm.vue";
 import AtividadeItem from "@/components/atividades/AtividadeItem.vue";
 import {useAtividadeForm} from "@/composables/useAtividadeForm";
-import {useSubprocessosStore} from "@/stores/subprocessos";
-import {useMapasStore} from "@/stores/mapas";
-import {useProcessosStore} from "@/stores/processos";
+import {useFluxoSubprocesso} from "@/composables/useFluxoSubprocesso";
+import {useProcessos} from "@/composables/useProcessos";
+import {useSubprocessos} from "@/composables/useSubprocessos";
+import {useMapas} from "@/composables/useMapas";
 import {useNotification} from "@/composables/useNotification";
 import {useToastStore} from "@/stores/toast";
 import {usePerfil} from "@/composables/usePerfil";
@@ -204,18 +204,19 @@ const props = defineProps<{
 }>();
 
 const router = useRouter();
-const subprocessosStore = useSubprocessosStore();
-const mapasStore = useMapasStore();
-const processosStore = useProcessosStore();
+const subprocessosStore = useSubprocessos();
+const mapasStore = useMapas();
+const processos = useProcessos();
+const fluxoSubprocesso = useFluxoSubprocesso();
 const {notify, notificacao, clear} = useNotification();
 const toastStore = useToastStore();
-const {impactoMapa: impactos} = storeToRefs(mapasStore);
+const {impactoMapa: impactos} = mapasStore;
 
 const perfil = usePerfil();
 const isChefe = computed(() => perfil.isChefe.value);
 const codSubprocesso = ref<number | null>(null);
 
-const codMapa = computed(() => mapasStore.mapaCompleto?.codigo || null);
+const codMapa = computed(() => mapasStore.mapaCompleto.value?.codigo || null);
 const subprocesso = computed(() => subprocessosStore.subprocessoDetalhe);
 const unidade = ref<Unidade | null>(null);
 const {
@@ -338,9 +339,9 @@ function buscarSubprocessoNoProcesso(unidades: UnidadeProcesso[] | undefined, si
 async function carregarContextoInicial() {
   const codProcessoRef = Number(props.codProcesso);
 
-  await processosStore.buscarProcessoDetalhe(codProcessoRef);
+  await processos.buscarProcessoDetalhe(codProcessoRef);
 
-  let id = buscarSubprocessoNoProcesso(processosStore.processoDetalhe?.unidades as UnidadeProcesso[] | undefined, props.sigla);
+  let id = buscarSubprocessoNoProcesso(processos.processoDetalhe.value?.unidades as UnidadeProcesso[] | undefined, props.sigla);
 
   if (!id) {
     id = await subprocessosStore.buscarSubprocessoPorProcessoEUnidade(codProcessoRef, props.sigla);
@@ -544,7 +545,7 @@ async function disponibilizarCadastro() {
     errosValidacao.value = [];
     erroGlobal.value = null;
     try {
-      const resultado = await subprocessosStore.validarCadastro(codSubprocesso.value);
+      const resultado = await fluxoSubprocesso.validarCadastro(codSubprocesso.value);
       if (resultado?.valido) {
         mostrarModalConfirmacao.value = true;
       } else if (resultado) {
@@ -572,9 +573,9 @@ async function confirmarDisponibilizacao() {
 
   let sucesso: boolean;
   if (isRevisao.value) {
-    sucesso = await subprocessosStore.disponibilizarRevisaoCadastro(codSubprocesso.value);
+    sucesso = await fluxoSubprocesso.disponibilizarRevisaoCadastro(codSubprocesso.value);
   } else {
-    sucesso = await subprocessosStore.disponibilizarCadastro(codSubprocesso.value);
+    sucesso = await fluxoSubprocesso.disponibilizarCadastro(codSubprocesso.value);
   }
 
   mostrarModalConfirmacao.value = false;

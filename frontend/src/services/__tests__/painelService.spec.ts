@@ -1,11 +1,6 @@
-import {describe, expect, it} from "vitest";
+import {describe, expect, it, vi} from "vitest";
 import {setupServiceTest, testErrorHandling} from "@/test-utils/serviceTestHelpers";
 import * as service from "../painelService";
-
-// Se test-utils/serviceTestHelpers.ts faz vi.mock("@/axios-setup"), e este arquivo também faz...
-// O último a ser executado vence? Ou conflitam?
-// A recomendação é centralizar. Se eu uso setupServiceTest, deveria confiar nele.
-// Mas ele exporta mockApi.
 
 vi.mock("@/mappers/processos", () => ({
     mapProcessoResumoDtoToFrontend: vi.fn((dto) => ({...dto, mapped: true})),
@@ -15,11 +10,10 @@ vi.mock("@/mappers/alertas", () => ({
 }));
 
 describe("painelService", () => {
-    // Usando helper centralizado
     const {mockApi} = setupServiceTest();
 
     describe("listarProcessos", () => {
-        it("deve buscar e mapear processos", async () => {
+        it("deve buscar e mapear processos sem enviar o perfil", async () => {
             const dtoList = [{codigo: 1, tipo: "MAPEAMENTO"}];
             const responseData = {
                 content: dtoList,
@@ -33,36 +27,35 @@ describe("painelService", () => {
             };
             mockApi.get.mockResolvedValueOnce({data: responseData});
 
-            const result = await service.listarProcessos("CHEFE", 1);
+            const result = await service.listarProcessos(1);
 
             expect(mockApi.get).toHaveBeenCalledWith("/painel/processos", {
-                params: {perfil: "CHEFE", unidade: 1, page: 0, size: 20},
+                params: {unidade: 1, page: 0, size: 20},
             });
             expect(result.content[0]).toEqual(dtoList[0]);
-            expect(result.totalPages).toBe(1);
         });
 
-        it("deve lidar com paginação diferente", async () => {
+        it("deve lidar com paginação", async () => {
             mockApi.get.mockResolvedValueOnce({data: {content: []}});
-            await service.listarProcessos("GESTOR", undefined, 2, 10);
+            await service.listarProcessos(undefined, 2, 10);
             expect(mockApi.get).toHaveBeenCalledWith("/painel/processos", {
-                params: {perfil: "GESTOR", unidade: undefined, page: 2, size: 10},
+                params: {page: 2, size: 10},
             });
         });
 
         it("deve lidar com ordenação", async () => {
             mockApi.get.mockResolvedValueOnce({data: {content: []}});
-            await service.listarProcessos("GESTOR", undefined, 0, 10, "descricao", "desc");
+            await service.listarProcessos(undefined, 0, 10, "descricao", "desc");
             expect(mockApi.get).toHaveBeenCalledWith("/painel/processos", {
-                params: {perfil: "GESTOR", unidade: undefined, page: 0, size: 10, sort: "descricao,desc"},
+                params: {page: 0, size: 10, sort: "descricao,desc"},
             });
         });
 
-        testErrorHandling(() => service.listarProcessos("CHEFE"));
+        testErrorHandling(() => service.listarProcessos(1));
     });
 
     describe("listarAlertas", () => {
-        it("deve buscar e mapear alertas", async () => {
+        it("deve buscar e mapear alertas sem enviar título do usuário", async () => {
             const dtoList = [{codigo: 1, mensagem: "Alerta DTO"}];
             const responseData = {
                 content: dtoList,
@@ -76,23 +69,22 @@ describe("painelService", () => {
             };
             mockApi.get.mockResolvedValueOnce({data: responseData});
 
-            const result = await service.listarAlertas("123", 1);
+            const result = await service.listarAlertas(1);
 
             expect(mockApi.get).toHaveBeenCalledWith("/painel/alertas", {
-                params: {usuarioTitulo: "123", unidade: 1, page: 0, size: 20},
+                params: {unidade: 1, page: 0, size: 20},
             });
             expect(result.content[0]).toEqual(dtoList[0]);
-            expect(result.totalElements).toBe(1);
         });
 
         it("deve lidar com ordenação", async () => {
             mockApi.get.mockResolvedValueOnce({data: {content: []}});
-            await service.listarAlertas("123", 1, 0, 10, "dataHora", "asc");
+            await service.listarAlertas(1, 0, 10, "dataHora", "asc");
             expect(mockApi.get).toHaveBeenCalledWith("/painel/alertas", {
-                params: {usuarioTitulo: "123", unidade: 1, page: 0, size: 10, sort: "dataHora,asc"},
+                params: {unidade: 1, page: 0, size: 10, sort: "dataHora,asc"},
             });
         });
 
-        testErrorHandling(() => service.listarAlertas("123"));
+        testErrorHandling(() => service.listarAlertas(1));
     });
 });

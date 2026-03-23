@@ -1,12 +1,16 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {
+    criarProcessoMapaComSugestoesFixture,
     criarProcessoMapaDisponibilizadoFixture,
-    criarProcessoMapaValidadoFixture,
-    criarProcessoMapaComSugestoesFixture
+    criarProcessoMapaValidadoFixture
 } from './fixtures/fixtures-processos.js';
 import {navegarParaMapa} from './helpers/helpers-mapas.js';
 import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
-import {acessarSubprocessoAdmin, acessarSubprocessoChefeDireto, acessarSubprocessoGestor} from './helpers/helpers-analise.js';
+import {
+    acessarSubprocessoAdmin,
+    acessarSubprocessoChefeDireto,
+    acessarSubprocessoGestor
+} from './helpers/helpers-analise.js';
 import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
 import {resetDatabase} from './hooks/hooks-limpeza.js';

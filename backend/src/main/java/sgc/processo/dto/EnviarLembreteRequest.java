@@ -2,7 +2,7 @@ package sgc.processo.dto;
 
 import jakarta.validation.constraints.*;
 import lombok.*;
-import sgc.comum.SgcMensagens;
+import sgc.comum.*;
 
 /**
  * DTO de requisição para enviar lembrete a uma unidade.

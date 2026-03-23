@@ -7,7 +7,12 @@ import {
     criarProcessoMapaDisponibilizadoFixture
 } from './fixtures/fixtures-processos.js';
 import {login, USUARIOS} from './helpers/helpers-auth.js';
-import {esperarPaginaDetalhesProcesso, esperarPaginaSubprocesso, fazerLogout, navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
+import {
+    esperarPaginaDetalhesProcesso,
+    esperarPaginaSubprocesso,
+    fazerLogout,
+    navegarParaSubprocesso
+} from './helpers/helpers-navegacao.js';
 import {criarProcesso, verificarDetalhesSubprocesso} from './helpers/helpers-processos.js';
 
 test.describe('CDU-07 - Detalhar subprocesso', () => {
@@ -238,6 +243,45 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
         await expect(cardMapa).toBeVisible();
         await expect(cardMapa).toHaveClass(/card-actionable/);
         await expect(cardMapa).toHaveAttribute('role', 'button');
+    });
+
+    test('Deve exibir cards com rotas corretas ao navegar entre subprocessos distintos na mesma sessão', async ({
+        _resetAutomatico,
+        _autenticadoComoAdmin,
+        request,
+        page
+    }) => {
+        // Cenário: o CHEFE visita o subprocesso de um processo com cadastro disponibilizado
+        // (onde o card de atividades é "vis-cadastro"), depois navega para um subprocesso
+        // com cadastro em andamento (onde o card deve ser o editável "cadastro").
+        // Sem a correção, os dados antigos fazem o card errado ser exibido na primeira renderização.
+        const ts = Date.now();
+        const UNIDADE = 'ASSESSORIA_12';
+        const chefe = USUARIOS.CHEFE_ASSESSORIA_12;
+
+        const processoDisponibilizado = await criarProcessoFinalizadoFixture(request, {
+            unidade: UNIDADE,
+            descricao: `CDU-07 Finalizado ${ts}`
+        });
+        const processoEmAndamento = await criarProcessoFixture(request, {
+            unidade: UNIDADE,
+            descricao: `CDU-07 Andamento ${ts}`,
+            iniciar: true,
+            diasLimite: 30
+        });
+
+        await login(page, chefe.titulo, chefe.senha);
+
+        // 1. Primeira visita: subprocesso com cadastro DISPONIBILIZADO → card vis-cadastro
+        await page.goto(`/processo/${processoDisponibilizado.codigo}/${UNIDADE}`);
+        await expect(page.getByTestId('card-subprocesso-atividades-vis')).toBeVisible();
+        await expect(page.getByTestId('card-subprocesso-atividades')).toBeHidden();
+
+        // 2. Segunda visita: subprocesso com cadastro EM ANDAMENTO → card editável
+        await page.goto(`/processo/${processoEmAndamento.codigo}/${UNIDADE}`);
+        // O card editável deve aparecer imediatamente (sem dados desatualizados da visita anterior)
+        await expect(page.getByTestId('card-subprocesso-atividades')).toBeVisible();
+        await expect(page.getByTestId('card-subprocesso-atividades-vis')).toBeHidden();
     });
 
     test('Deve exibir os cards do ramo de diagnóstico na tela de detalhes do subprocesso', async ({

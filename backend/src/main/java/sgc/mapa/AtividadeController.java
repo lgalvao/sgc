@@ -29,7 +29,7 @@ public class AtividadeController {
      * Busca e retorna uma atividade específica pelo seu código.
      */
     @GetMapping("/{codAtividade}")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasPermission(#codAtividade, 'Atividade', 'VISUALIZAR_SUBPROCESSO')")
     @Operation(summary = "Obtém uma atividade pelo código")
     public ResponseEntity<Atividade> obterPorCodigo(@PathVariable Long codAtividade) {
         return ResponseEntity.ok(atividadeFacade.obterAtividadePorCodigo(codAtividade));
@@ -39,7 +39,7 @@ public class AtividadeController {
      * Lista todos os conhecimentos associados a uma atividade específica.
      */
     @GetMapping("/{codAtividade}/conhecimentos")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasPermission(#codAtividade, 'Atividade', 'VISUALIZAR_SUBPROCESSO')")
     @Operation(summary = "Lista todos os conhecimentos de uma atividade")
     public ResponseEntity<List<Conhecimento>> listarConhecimentos(@PathVariable Long codAtividade) {
         return ResponseEntity.ok(atividadeFacade.listarConhecimentosPorAtividade(codAtividade));

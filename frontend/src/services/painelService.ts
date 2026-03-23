@@ -13,7 +13,6 @@ export interface Page<T> {
 }
 
 export async function listarProcessos(
-    perfil: string,
     codUnidade?: number,
     page: number = 0,
     size: number = 20,
@@ -21,7 +20,6 @@ export async function listarProcessos(
     order?: "asc" | "desc",
 ): Promise<Page<ProcessoResumo>> {
     const params: any = {
-        perfil,
         page,
         size,
     };
@@ -38,7 +36,6 @@ export async function listarProcessos(
 }
 
 export async function listarAlertas(
-    usuarioTitulo?: string,
     codUnidade?: number,
     page: number = 0,
     size: number = 20,
@@ -49,9 +46,6 @@ export async function listarAlertas(
         page,
         size,
     };
-    if (usuarioTitulo !== undefined && usuarioTitulo !== null) {
-        params.usuarioTitulo = usuarioTitulo;
-    }
     if (codUnidade !== undefined && codUnidade !== null) {
         params.unidade = codUnidade;
     }

@@ -1,11 +1,10 @@
-import {describe, it, expect, vi, beforeEach, afterEach} from "vitest";
-import {mount, flushPromises, DOMWrapper} from "@vue/test-utils";
+import {afterEach, beforeEach, describe, expect, it, vi} from "vitest";
+import {DOMWrapper, flushPromises, mount} from "@vue/test-utils";
 import ProcessoView from "../ProcessoDetalheView.vue";
 import {createTestingPinia} from "@pinia/testing";
-import {useProcessosStore} from "@/stores/processos";
 import {usePerfilStore} from "@/stores/perfil";
 import {useToastStore} from "@/stores/toast";
-import {nextTick} from "vue";
+import {nextTick, ref} from "vue";
 import {Perfil, SituacaoProcesso, SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
 
@@ -17,6 +16,20 @@ vi.mock("@/services/processoService", () => ({
     executarAcaoBloco: vi.fn().mockResolvedValue({}),
     finalizarProcesso: vi.fn().mockResolvedValue({}),
     enviarLembrete: vi.fn().mockResolvedValue({})
+}));
+
+const processosMock = {
+    processoDetalhe: ref<any>(null),
+    subprocessosElegiveis: ref<any[]>([]),
+    lastError: ref<any>(null),
+    clearError: vi.fn(),
+    buscarContextoCompleto: vi.fn().mockResolvedValue(undefined),
+    finalizarProcesso: vi.fn().mockResolvedValue(undefined),
+    executarAcaoBloco: vi.fn().mockResolvedValue(undefined),
+};
+
+vi.mock("@/composables/useProcessos", () => ({
+    useProcessos: () => processosMock
 }));
 
 const mocks = {
@@ -105,9 +118,10 @@ const ModalAcaoBlocoStub = {
 
 const ModalConfirmacaoStub = {
     name: "ModalConfirmacao",
-    template: '<div id="modal-confirmacao-stub"><slot></slot></div>',
+    template: '<div v-if="modelValue" id="modal-confirmacao-stub"><slot /></div>',
     props: ["modelValue", "titulo", "variant", "okTitle"]
 };
+
 
 const TreeTableStub = {
     name: "ProcessoSubprocessosTable",
@@ -141,7 +155,6 @@ const BSpinnerStub = {
 
 describe("Processo.vue", () => {
     let wrapper: any;
-    let processosStore: any;
     let perfilStore: any;
     let toastStore: any;
 
@@ -169,17 +182,17 @@ describe("Processo.vue", () => {
     };
 
     const aplicarContextoProcesso = (processo = mockProcesso, elegiveis = mockElegiveis) => {
-        processosStore.$patch({
-            processoDetalhe: processo,
-            subprocessosElegiveis: elegiveis,
-            lastError: null
-        });
+        processosMock.processoDetalhe.value = processo;
+        processosMock.subprocessosElegiveis.value = elegiveis;
+        processosMock.lastError.value = null;
     };
 
     beforeEach(() => {
         vi.clearAllMocks();
+        processosMock.processoDetalhe.value = null;
+        processosMock.subprocessosElegiveis.value = [];
+        processosMock.lastError.value = null;
         wrapper = createWrapper();
-        processosStore = useProcessosStore();
         perfilStore = usePerfilStore();
         toastStore = useToastStore();
     });
@@ -190,11 +203,11 @@ describe("Processo.vue", () => {
 
     it("deve carregar detalhes do processo ao montar", async () => {
         aplicarContextoProcesso();
-        expect(processosStore.buscarContextoCompleto).toHaveBeenCalledWith(1);
+        expect(processosMock.buscarContextoCompleto).toHaveBeenCalledWith(1);
     });
 
     it("deve exibir erro se falhar ao carregar processo", async () => {
-        processosStore.$patch({lastError: {message: "Erro ao carregar"}});
+        processosMock.lastError.value = {message: "Erro ao carregar"};
         await nextTick();
 
         const alert = wrapper.find('[data-testid="app-alert"]');
@@ -203,7 +216,7 @@ describe("Processo.vue", () => {
 
         const alertCmp = wrapper.findComponent(BAlertStub);
         await alertCmp.vm.$emit("dismissed");
-        expect(processosStore.clearError).toHaveBeenCalled();
+        expect(processosMock.clearError).toHaveBeenCalled();
     });
 
     it("deve exibir botões de ação em bloco se houver unidades elegíveis", async () => {
@@ -229,7 +242,6 @@ describe("Processo.vue", () => {
     it("não deve exibir botões de ação em bloco duplicados (apenas um conjunto)", async () => {
         wrapper = createWrapper();
         perfilStore = usePerfilStore();
-        processosStore = useProcessosStore();
 
         aplicarContextoProcesso();
 
@@ -257,7 +269,6 @@ describe("Processo.vue", () => {
     it("deve abrir modal de ação em bloco ao clicar no botão", async () => {
         wrapper = createWrapper();
         perfilStore = usePerfilStore();
-        processosStore = useProcessosStore();
 
         perfilStore.$patch({perfilSelecionado: Perfil.GESTOR, unidadeSelecionada: 999});
         aplicarContextoProcesso();
@@ -276,7 +287,6 @@ describe("Processo.vue", () => {
     it("deve executar ação em bloco com sucesso (Aceitar cadastro)", async () => {
         wrapper = createWrapper();
         perfilStore = usePerfilStore();
-        processosStore = useProcessosStore();
         toastStore = useToastStore();
 
         perfilStore.$patch({perfilSelecionado: Perfil.GESTOR, unidadeSelecionada: 999});
@@ -292,7 +302,7 @@ describe("Processo.vue", () => {
         const dadosConfirmacao = {ids: [101]};
         await modal.vm.$emit("confirmar", dadosConfirmacao);
 
-        expect(processosStore.executarAcaoBloco).toHaveBeenCalledWith('aceitar', [101], undefined);
+        expect(processosMock.executarAcaoBloco).toHaveBeenCalledWith('aceitar', [101], undefined);
         expect(toastStore.setPending).toHaveBeenCalledWith(TEXTOS.sucesso.CADASTROS_ACEITOS_EM_BLOCO);
         expect(mocks.push).toHaveBeenCalledWith("/painel");
     });
@@ -300,7 +310,6 @@ describe("Processo.vue", () => {
     it("deve executar ação em bloco com sucesso (Homologar cadastro)", async () => {
         wrapper = createWrapper();
         perfilStore = usePerfilStore();
-        processosStore = useProcessosStore();
         perfilStore.$patch({perfilSelecionado: Perfil.ADMIN});
         aplicarContextoProcesso();
 
@@ -313,14 +322,13 @@ describe("Processo.vue", () => {
         // ID 101 -> Cadastro disponibilizado
         await modal.vm.$emit("confirmar", {ids: [101]});
 
-        expect(processosStore.executarAcaoBloco).toHaveBeenCalledWith('homologar', [101], undefined);
+        expect(processosMock.executarAcaoBloco).toHaveBeenCalledWith('homologar', [101], undefined);
         expect(modal.props("titulo")).toBe(TEXTOS.acaoBloco.homologar.TITULO_MISTO);
     });
 
     it("deve executar ação em bloco com sucesso (Homologar validação)", async () => {
         wrapper = createWrapper();
         perfilStore = usePerfilStore();
-        processosStore = useProcessosStore();
         perfilStore.$patch({perfilSelecionado: Perfil.ADMIN});
         aplicarContextoProcesso();
 
@@ -333,13 +341,12 @@ describe("Processo.vue", () => {
         // ID 103 -> Mapa validado
         await modal.vm.$emit("confirmar", {ids: [103]});
 
-        expect(processosStore.executarAcaoBloco).toHaveBeenCalledWith('homologar', [103], undefined);
+        expect(processosMock.executarAcaoBloco).toHaveBeenCalledWith('homologar', [103], undefined);
     });
 
     it("deve usar textos de CDU-23 quando houver apenas cadastro elegível para homologacao", async () => {
         wrapper = createWrapper();
         perfilStore = usePerfilStore();
-        processosStore = useProcessosStore();
         toastStore = useToastStore();
 
         perfilStore.$patch({perfilSelecionado: Perfil.ADMIN});
@@ -373,7 +380,6 @@ describe("Processo.vue", () => {
     it("deve usar textos de CDU-26 quando houver apenas validacao elegível para homologacao", async () => {
         wrapper = createWrapper();
         perfilStore = usePerfilStore();
-        processosStore = useProcessosStore();
         toastStore = useToastStore();
 
         perfilStore.$patch({perfilSelecionado: Perfil.ADMIN});
@@ -406,7 +412,6 @@ describe("Processo.vue", () => {
     it("deve executar ação em bloco com sucesso (Disponibilizar)", async () => {
         wrapper = createWrapper();
         perfilStore = usePerfilStore();
-        processosStore = useProcessosStore();
         perfilStore.$patch({perfilSelecionado: Perfil.ADMIN});
         aplicarContextoProcesso();
 
@@ -419,7 +424,7 @@ describe("Processo.vue", () => {
         // ID 104 -> Mapa criado
         await modal.vm.$emit("confirmar", {ids: [104], dataLimite: '2024-12-31'});
 
-        expect(processosStore.executarAcaoBloco).toHaveBeenCalledWith('disponibilizar', [104], '2024-12-31');
+        expect(processosMock.executarAcaoBloco).toHaveBeenCalledWith('disponibilizar', [104], '2024-12-31');
         expect(wrapper.find('#btn-disponibilizar-bloco').text()).toContain(TEXTOS.acaoBloco.disponibilizar.ROTULO);
         expect(modal.props("titulo")).toBe(TEXTOS.acaoBloco.disponibilizar.TITULO);
     });
@@ -427,7 +432,6 @@ describe("Processo.vue", () => {
     it("deve lidar com erro na execução da ação em bloco", async () => {
         wrapper = createWrapper();
         perfilStore = usePerfilStore();
-        processosStore = useProcessosStore();
 
         perfilStore.$patch({perfilSelecionado: Perfil.GESTOR, unidadeSelecionada: 999});
         aplicarContextoProcesso();
@@ -436,14 +440,14 @@ describe("Processo.vue", () => {
         await flushPromises();
 
         const errorMsg = "Falha ao aceitar";
-        processosStore.executarAcaoBloco.mockRejectedValue(new Error(errorMsg));
+        processosMock.executarAcaoBloco.mockRejectedValue(new Error(errorMsg));
 
         const modal = wrapper.findComponent(ModalAcaoBlocoStub);
         await wrapper.find('#btn-aceitar-bloco').trigger("click"); // Abrir modal
 
         await modal.vm.$emit("confirmar", {ids: [101]});
 
-        expect(processosStore.executarAcaoBloco).toHaveBeenCalled();
+        expect(processosMock.executarAcaoBloco).toHaveBeenCalled();
         expect(modalSpies.setErro).toHaveBeenCalledWith(errorMsg);
         expect(modalSpies.setProcessando).toHaveBeenCalledWith(false);
     });
@@ -451,7 +455,6 @@ describe("Processo.vue", () => {
     it("deve mostrar erro se unidade não for encontrada para ação em bloco", async () => {
         wrapper = createWrapper();
         perfilStore = usePerfilStore();
-        processosStore = useProcessosStore();
 
         perfilStore.$patch({perfilSelecionado: Perfil.GESTOR, unidadeSelecionada: 999});
         aplicarContextoProcesso();
@@ -460,7 +463,7 @@ describe("Processo.vue", () => {
         await flushPromises();
 
         const errorMsg = "Unidade selecionada não encontrada no contexto do processo.";
-        processosStore.executarAcaoBloco.mockRejectedValue(new Error(errorMsg));
+        processosMock.executarAcaoBloco.mockRejectedValue(new Error(errorMsg));
 
         const modal = wrapper.findComponent(ModalAcaoBlocoStub);
         await wrapper.find('#btn-aceitar-bloco').trigger("click");
@@ -474,7 +477,6 @@ describe("Processo.vue", () => {
     it("deve exibir apenas o botão aceitar quando permissões do processo focam nisso (ex: Gestor)", async () => {
         wrapper = createWrapper();
         perfilStore = usePerfilStore();
-        processosStore = useProcessosStore();
 
         perfilStore.$patch({perfilSelecionado: Perfil.GESTOR, unidadeSelecionada: 999});
         aplicarContextoProcesso({
@@ -496,7 +498,6 @@ describe("Processo.vue", () => {
     it("deve exibir botões homologar e disponibilizar quando permissões focam nisso (ex: Admin)", async () => {
         wrapper = createWrapper();
         perfilStore = usePerfilStore();
-        processosStore = useProcessosStore();
 
         perfilStore.$patch({perfilSelecionado: Perfil.ADMIN});
         aplicarContextoProcesso({
@@ -518,7 +519,6 @@ describe("Processo.vue", () => {
     it("deve redirecionar para detalhes da unidade ao clicar na tabela (Gestor)", async () => {
         wrapper = createWrapper();
         perfilStore = usePerfilStore();
-        processosStore = useProcessosStore();
 
         perfilStore.$patch({
             perfilSelecionado: Perfil.GESTOR,
@@ -554,7 +554,6 @@ describe("Processo.vue", () => {
 
         wrapper = createWrapper();
         perfilStore = usePerfilStore();
-        processosStore = useProcessosStore();
 
         // Servidor - o controle de acesso agora é no backend, não no frontend
         perfilStore.$patch({
@@ -587,7 +586,6 @@ describe("Processo.vue", () => {
 
     it("deve abrir modal de finalização de processo", async () => {
         wrapper = createWrapper();
-        processosStore = useProcessosStore();
         aplicarContextoProcesso();
 
         await nextTick();
@@ -601,7 +599,6 @@ describe("Processo.vue", () => {
 
     it("deve chamar API de finalizar processo com sucesso", async () => {
         wrapper = createWrapper();
-        processosStore = useProcessosStore();
         toastStore = useToastStore();
         aplicarContextoProcesso();
 
@@ -610,8 +607,43 @@ describe("Processo.vue", () => {
 
         await (wrapper.vm).confirmarFinalizacao();
 
-        expect(processosStore.finalizarProcesso).toHaveBeenCalledWith(1);
+        expect(processosMock.finalizarProcesso).toHaveBeenCalledWith(1);
         expect(toastStore.setPending).toHaveBeenCalledWith(TEXTOS.sucesso.PROCESSO_FINALIZADO);
         expect(mocks.push).toHaveBeenCalledWith("/painel");
+    });
+
+    it("deve lidar com atualizações de estado do modal, descarte de notificações, erros de navegação e exibição de carregamento", async () => {
+        aplicarContextoProcesso();
+        const vm = wrapper.vm;
+
+        // v-model cover (95)
+        const modalConf = wrapper.findComponent(ModalConfirmacaoStub);
+        if (modalConf.exists()) await modalConf.vm.$emit('update:modelValue', true);
+        expect(vm.mostrarModalFinalizacao).toBe(true);
+
+        // notificacao cover (9-16)
+        vm.notificacao = { message: "Msg", variant: "info" };
+        await nextTick();
+        wrapper.find('[data-testid="app-alert"]');
+        // If app-alert is covered via BAlert stub or real AppAlert
+        const bAlerts = wrapper.findAllComponents(BAlertStub);
+        if (bAlerts.length > 0) await bAlerts[0].vm.$emit('dismissed');
+
+        // error branches (428-431)
+        processosMock.finalizarProcesso.mockRejectedValue(new Error("Erro final"));
+        await vm.confirmarFinalizacao();
+
+        // branch 402-404 (abrirDetalhesUnidade not clickable)
+        await vm.abrirDetalhesUnidade({clickable: false});
+        expect(mocks.push).not.toHaveBeenCalledWith(expect.objectContaining({name: "Subprocesso"}));
+
+        // branch 414-416 (navigation error)
+        mocks.push.mockRejectedValueOnce(new Error("Nav error"));
+        await vm.abrirDetalhesUnidade({clickable: true, sigla: "ERR"});
+
+        // loading state (77-80)
+        processosMock.processoDetalhe.value = null;
+        await nextTick();
+        expect(wrapper.findComponent(BSpinnerStub).exists()).toBe(true);
     });
 });

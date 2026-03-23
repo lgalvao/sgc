@@ -14,7 +14,7 @@ import {
 import {TEXTOS} from '../frontend/src/constants/textos.js';
 
 test.describe.serial('CDU-15 - Manter mapa de competências', () => {
-    const UNIDADE_ALVO = 'SECAO_211';
+    const UNIDADE_ALVO = 'ADMIN';
 
     const timestamp = Date.now();
     const descProcesso = `Processo CDU-15 ${timestamp}`;
@@ -44,6 +44,17 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
         const compDesc = `Competência 1 ${timestamp}`;
         await criarCompetencia(page, compDesc, [ATIVIDADE_1]);
         await verificarCompetenciaNoMapa(page, compDesc, [ATIVIDADE_1]);
+
+        // Assert badge in the map main view, not the modal
+        const cardCompetencia = page.locator('.competencia-card', {hasText: compDesc});
+        const badgeConhecimentos = cardCompetencia
+            .locator('.atividade-associada-card-item', {hasText: ATIVIDADE_1})
+            .getByTestId('cad-mapa__txt-badge-conhecimentos-1');
+        await expect(badgeConhecimentos).toBeVisible();
+        await expect(badgeConhecimentos).toHaveText('1');
+        await expect(badgeConhecimentos).not.toContainText('<div');
+        await expect(badgeConhecimentos).not.toContainText('<strong>');
+
         await expect(page.getByTestId('btn-cad-mapa-disponibilizar')).toBeDisabled();
 
         // CT-03: Editar competência
@@ -71,4 +82,5 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
             tipo: 'Mapeamento'
         });
     });
+
 });

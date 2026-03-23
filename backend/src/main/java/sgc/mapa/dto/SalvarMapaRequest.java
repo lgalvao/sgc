@@ -4,7 +4,7 @@ import jakarta.validation.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
 import org.jspecify.annotations.*;
-import sgc.comum.SgcMensagens;
+import sgc.comum.*;
 import sgc.seguranca.sanitizacao.*;
 
 import java.util.*;

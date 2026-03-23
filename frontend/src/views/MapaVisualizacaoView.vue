@@ -242,8 +242,8 @@ import ModalPadrao from "@/components/comum/ModalPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import AceitarMapaModal from "@/components/mapa/AceitarMapaModal.vue";
 import HistoricoAnaliseModal from "@/components/processo/HistoricoAnaliseModal.vue";
-import {useProcessosStore} from "@/stores/processos";
-import {useSubprocessosStore} from "@/stores/subprocessos";
+import {useProcessos} from "@/composables/useProcessos";
+import {useSubprocessos} from "@/composables/useSubprocessos";
 import {useNotification} from "@/composables/useNotification";
 import {useToastStore} from "@/stores/toast";
 import {usePerfil} from "@/composables/usePerfil";
@@ -257,8 +257,8 @@ import {TEXTOS} from "@/constants/textos";
 
 const route = useRoute();
 const router = useRouter();
-const processosStore = useProcessosStore();
-const subprocessosStore = useSubprocessosStore();
+const processos = useProcessos();
+const subprocessosStore = useSubprocessos();
 const {notify} = useNotification();
 const toastStore = useToastStore();
 const {perfilSelecionado, isAdmin} = usePerfil();
@@ -282,8 +282,8 @@ function buscarUnidadeRecursivo(unidades: any[], siglaAlvo: string): any | null 
 }
 
 const subprocesso = computed(() => {
-  if (!processosStore.processoDetalhe) return null;
-  return buscarUnidadeRecursivo(processosStore.processoDetalhe.unidades, sigla.value);
+  if (!processos.processoDetalhe.value) return null;
+  return buscarUnidadeRecursivo(processos.processoDetalhe.value.unidades, sigla.value);
 });
 
 const codSubprocesso = computed(() => subprocesso.value?.codSubprocesso);
@@ -344,7 +344,7 @@ async function confirmarSugestoes() {
   if (!codSubprocesso.value || !sugestoes.value.trim()) return;
   isLoading.value = true;
   try {
-    await processosStore.apresentarSugestoes(codSubprocesso.value, {
+    await processos.apresentarSugestoes(codSubprocesso.value, {
       sugestoes: sugestoes.value,
     });
     fecharModalSugestoes();
@@ -361,7 +361,7 @@ async function confirmarValidacao() {
   if (!codSubprocesso.value) return;
   isLoading.value = true;
   try {
-    await processosStore.validarMapa(codSubprocesso.value);
+    await processos.validarMapa(codSubprocesso.value);
     fecharModalValidar();
     toastStore.setPending(TEXTOS.sucesso.MAPA_VALIDADO_SUBMETIDO);
     await router.push({name: "Painel"});
@@ -379,9 +379,9 @@ async function confirmarAceitacao(observacao = "") {
 
   try {
     if (isHomologacao) {
-      await processosStore.homologarValidacao(codSubprocesso.value, {texto: observacao});
+      await processos.homologarValidacao(codSubprocesso.value, {texto: observacao});
     } else {
-      await processosStore.aceitarValidacao(codSubprocesso.value, {texto: observacao});
+      await processos.aceitarValidacao(codSubprocesso.value, {texto: observacao});
     }
     fecharModalAceitar();
     toastStore.setPending(
@@ -402,7 +402,7 @@ async function confirmarDevolucao() {
   if (!codSubprocesso.value) return;
   isLoading.value = true;
   try {
-    await processosStore.devolverValidacao(codSubprocesso.value, {
+    await processos.devolverValidacao(codSubprocesso.value, {
       justificativa: observacaoDevolucao.value,
     });
     fecharModalDevolucao();
@@ -479,7 +479,7 @@ function verHistorico() {
 onMounted(async () => {
   const response = await buscarUnidadeServico(sigla.value);
   unidade.value = response as Unidade;
-  await processosStore.buscarProcessoDetalhe(codProcesso.value);
+  await processos.buscarProcessoDetalhe(codProcesso.value);
   if (codSubprocesso.value) {
     await subprocessosStore.buscarSubprocessoDetalhe(codSubprocesso.value);
     mapa.value = await obterMapaVisualizacao(codSubprocesso.value);

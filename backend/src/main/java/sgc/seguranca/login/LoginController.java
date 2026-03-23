@@ -64,8 +64,7 @@ public class LoginController {
     }
 
     /**
-     * Autoriza um usuário, retornando a lista de perfis e unidades a que ele tem
-     * acesso.
+     * Autoriza um usuário, retornando a lista de perfis e unidades a que tem acesso.
      */
     @PostMapping("/autorizar")
     @Operation(summary = "Retorna os perfis e unidades disponíveis para o usuário")
@@ -73,8 +72,8 @@ public class LoginController {
             @Valid @RequestBody AutorizarRequest request,
             HttpServletRequest httpRequest) {
 
-        verificarTokenPreAuth(httpRequest, request.tituloEleitoral());
-        List<PerfilUnidadeDto> perfis = loginFacade.buscarAutorizacoesUsuario(request.tituloEleitoral());
+        String tituloEleitoral = extrairTituloPreAuth(httpRequest);
+        List<PerfilUnidadeDto> perfis = loginFacade.buscarAutorizacoesUsuario(tituloEleitoral);
         return ResponseEntity.ok(perfis);
     }
 
@@ -86,24 +85,31 @@ public class LoginController {
     @Operation(summary = "Finaliza o login e retorna o token JWT")
     public ResponseEntity<EntrarResponse> entrar(
             @Valid @RequestBody EntrarRequest request,
-            HttpServletRequest httpRequest) {
+            HttpServletRequest httpRequest,
+            HttpServletResponse httpResponse) {
 
-        verificarTokenPreAuth(httpRequest, request.tituloEleitoral());
-        String token = loginFacade.entrar(request);
-        Usuario usuario = usuarioFacade.buscarPorLogin(request.tituloEleitoral());
+        String tituloEleitoral = extrairTituloPreAuth(httpRequest);
+        String token = loginFacade.entrar(request, tituloEleitoral);
+        Usuario usuario = usuarioFacade.buscarPorLogin(tituloEleitoral);
 
         EntrarResponse response = EntrarResponse.builder()
-                .tituloEleitoral(request.tituloEleitoral())
+                .tituloEleitoral(tituloEleitoral)
                 .nome(usuario.getNome())
                 .perfil(Perfil.valueOf(request.perfil()))
                 .unidadeCodigo(request.unidadeCodigo())
-                .token(token)
                 .build();
+
+        Cookie cookie = new Cookie("jwtToken", token);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(!ambienteTestes);
+        cookie.setPath("/");
+        cookie.setMaxAge(86400);
+        httpResponse.addCookie(cookie);
 
         return ResponseEntity.ok(response);
     }
 
-    private void verificarTokenPreAuth(HttpServletRequest request, String tituloEsperado) {
+    private String extrairTituloPreAuth(HttpServletRequest request) {
         String token = null;
         if (request.getCookies() != null) {
             for (Cookie cookie : request.getCookies()) {
@@ -119,19 +125,15 @@ public class LoginController {
         }
 
         Optional<String> sujeito = gerenciadorJwt.validarTokenPreAuth(token);
-        if (sujeito.isEmpty() || !sujeito.get().equals(tituloEsperado)) {
-            throw new ErroAutenticacao("Sessão inválida para o usuário informado.");
+        if (sujeito.isEmpty()) {
+            throw new ErroAutenticacao("Sessão inválida. Faça login novamente.");
         }
+        return sujeito.get();
     }
 
     @SuppressWarnings("ConstantConditions")
     private @Nullable String extrairIp(HttpServletRequest httpRequest) {
-        String ip = httpRequest.getHeader("X-Forwarded-For");
-        if (ip == null || ip.isEmpty()) {
-            ip = httpRequest.getRemoteAddr();
-        } else {
-            ip = ip.split(",")[0].trim();
-        }
+        String ip = httpRequest.getRemoteAddr();
 
         // Sanitização contra Log injection (CWE-117)
         if (ip != null) {

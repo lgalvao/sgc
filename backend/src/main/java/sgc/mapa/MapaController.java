@@ -41,7 +41,7 @@ public class MapaController {
      * Busca e retorna um mapa de competências específico pelo seu código.
      */
     @GetMapping("/{codigo}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")
+    @PreAuthorize("hasPermission(#codigo, 'Mapa', 'VISUALIZAR_SUBPROCESSO')")
     @Operation(summary = "Obtém um mapa pelo código")
     @JsonView(MapaViews.Publica.class)
     public ResponseEntity<Mapa> obterPorCodigo(@PathVariable Long codigo) {

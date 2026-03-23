@@ -31,13 +31,10 @@ class UsuarioJsonViewTest {
                 .writerWithView(OrganizacaoViews.Publica.class)
                 .writeValueAsString(usuario);
 
-        assertThat(json).contains("\"tituloEleitoral\":\"123456789012\"");
+        assertThat(json).doesNotContain("\"tituloEleitoral\":\"123456789012\"");
         assertThat(json).contains("\"nome\":\"Usuario teste\"");
         assertThat(json).contains("\"email\":\"teste@teste.com\"");
-        assertThat(json).contains("\"matricula\":\"88888888\"");
-        assertThat(json).contains("\"unidadeCodigo\":10");
-
-        // Campos sensíveis ou internos não devem aparecer
+        assertThat(json).doesNotContain("\"matricula\":\"88888888\"");
         assertThat(json).doesNotContain("\"unidadeLotacao\"");
         assertThat(json).doesNotContain("\"ramal\"");
         assertThat(json).doesNotContain("\"authorities\"");

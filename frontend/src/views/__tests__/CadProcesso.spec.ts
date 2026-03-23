@@ -1,8 +1,7 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {flushPromises, mount} from '@vue/test-utils';
-import {nextTick} from 'vue';
+import {nextTick, ref} from 'vue';
 import ProcessoCadastroView from '@/views/ProcessoCadastroView.vue';
-import {useProcessosStore} from '@/stores/processos';
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 import * as unidadeService from '@/services/unidadeService';
 
@@ -15,6 +14,20 @@ vi.mock('@/services/processoService', () => ({
 vi.mock('@/services/unidadeService', () => ({
     buscarArvoreComElegibilidade: vi.fn().mockResolvedValue([]),
     mapUnidadesArray: vi.fn((arr) => arr || []),
+}));
+
+const processosMock = {
+    processoDetalhe: ref<any>(null),
+    lastError: ref<any>(null),
+    buscarProcessoDetalhe: vi.fn(),
+    criarProcesso: vi.fn(),
+    atualizarProcesso: vi.fn(),
+    iniciarProcesso: vi.fn(),
+    removerProcesso: vi.fn(),
+};
+
+vi.mock('@/composables/useProcessos', () => ({
+    useProcessos: () => processosMock
 }));
 
 const {mockPush, mockRoute} = vi.hoisted(() => {
@@ -49,16 +62,14 @@ const ArvoreUnidadesStub = {
 
 describe('ProcessoCadastroView.vue', () => {
     const context = setupComponentTest();
-    let processosStore: any;
 
     const createWrapper = (initialState = {}) => {
+        processosMock.processoDetalhe.value = (initialState as any).processos?.processoDetalhe ?? null;
+        processosMock.lastError.value = (initialState as any).processos?.lastError ?? null;
+
         context.wrapper = mount(ProcessoCadastroView, {
             ...getCommonMountOptions(
                 {
-                    processos: {
-                        processoDetalhe: null,
-                        lastError: null
-                    },
                     ...initialState
                 },
                 {
@@ -94,13 +105,13 @@ describe('ProcessoCadastroView.vue', () => {
             )
         });
 
-        processosStore = useProcessosStore();
-
-        return {wrapper: context.wrapper, processosStore};
+        return {wrapper: context.wrapper, processosStore: processosMock};
     };
 
     beforeEach(async () => {
         vi.clearAllMocks();
+        processosMock.processoDetalhe.value = null;
+        processosMock.lastError.value = null;
         mockRoute.query = {};
         vi.mocked(unidadeService.buscarArvoreComElegibilidade).mockResolvedValue([]);
         vi.mocked(unidadeService.mapUnidadesArray).mockImplementation((arr) => arr || []);
@@ -208,7 +219,7 @@ describe('ProcessoCadastroView.vue', () => {
         const {wrapper, processosStore} = createWrapper();
 
         processosStore.criarProcesso.mockRejectedValue(new Error('Erro API'));
-        processosStore.lastError = {message: 'Erro validacao', subErrors: []};
+        processosStore.lastError.value = {message: 'Erro validacao', subErrors: []};
 
         wrapper.vm.descricao = 'Teste';
         wrapper.vm.tipo = 'MAPEAMENTO';
@@ -321,7 +332,7 @@ describe('ProcessoCadastroView.vue', () => {
         await nextTick();
 
         processosStore.criarProcesso.mockRejectedValue(new Error('Erro criacao'));
-        processosStore.lastError = {message: 'Erro ao criar', subErrors: []};
+        processosStore.lastError.value = {message: 'Erro ao criar', subErrors: []};
 
         await wrapper.find('[data-testid="btn-iniciar-processo-confirmar"]').trigger('click');
         await flushPromises();
@@ -338,7 +349,7 @@ describe('ProcessoCadastroView.vue', () => {
         await nextTick();
 
         processosStore.iniciarProcesso.mockRejectedValue(new Error('Erro inicio'));
-        processosStore.lastError = {message: 'Erro ao iniciar', subErrors: []};
+        processosStore.lastError.value = {message: 'Erro ao iniciar', subErrors: []};
 
         await wrapper.find('[data-testid="btn-iniciar-processo-confirmar"]').trigger('click');
         await flushPromises();
@@ -379,10 +390,10 @@ describe('ProcessoCadastroView.vue', () => {
 
     it('maps field-specific validation errors from subErrors', async () => {
         const {wrapper, processosStore} = createWrapper();
-        processosStore.lastError = null;
+        processosStore.lastError.value = null;
 
         processosStore.criarProcesso.mockImplementation(async () => {
-            processosStore.lastError = {
+            processosStore.lastError.value = {
                 message: 'Erro de validação',
                 subErrors: [
                     {field: 'descricao', message: 'Descrição é obrigatória'},
@@ -416,7 +427,7 @@ describe('ProcessoCadastroView.vue', () => {
         const {wrapper, processosStore} = createWrapper();
 
         processosStore.criarProcesso.mockRejectedValue(new Error('Network error'));
-        processosStore.lastError = null;
+        processosStore.lastError.value = null;
 
         wrapper.vm.descricao = 'Teste';
         wrapper.vm.tipo = 'MAPEAMENTO';
@@ -509,11 +520,7 @@ describe('ProcessoCadastroView.vue', () => {
 
     it('handles error when loading process details on mount', async () => {
         mockRoute.query = {codProcesso: '123'};
-        // Need to set mock BEFORE mount since buscarProcessoDetalhe fires in onMounted
-        const {createTestingPinia} = await import('@pinia/testing');
-        const pinia = createTestingPinia({stubActions: true, createSpy: vi.fn});
-        const store = useProcessosStore(pinia);
-        (store.buscarProcessoDetalhe as any).mockRejectedValue(new Error('Load error'));
+        processosMock.buscarProcessoDetalhe.mockRejectedValue(new Error('Load error'));
 
         const wrapper = mount(ProcessoCadastroView, {
             ...getCommonMountOptions({}, {
@@ -522,15 +529,14 @@ describe('ProcessoCadastroView.vue', () => {
                 BForm: {template: '<form @submit.prevent><slot /></form>'},
                 BFormGroup: {template: '<div><slot name="label">{{ label }}</slot><slot /></div>', props: ['label']},
                 BFormInput: {template: '<input />', props: ['modelValue']},
-                BFormSelect: {template: '<select></select>', props: ['modelValue']},
+                BFormSelect: {template: '<select></select>', props: ['modelValue', 'options'], inheritAttrs: false},
                 BButton: {template: '<button></button>'},
                 BModal: {template: '<div><slot /></div>'},
                 BSpinner: {template: '<span></span>'},
                 ArvoreUnidades: {template: '<div></div>', props: ['unidades', 'modelValue']},
                 BFormInvalidFeedback: {template: '<div></div>'},
                 LoadingButton: {template: '<button><slot /></button>'}
-            }),
-            global: {plugins: [pinia]}
+            })
         });
 
         await flushPromises();
@@ -546,7 +552,7 @@ describe('ProcessoCadastroView.vue', () => {
         const querySelectorSpy = vi.spyOn(document, 'querySelector').mockReturnValue(mockElement);
 
         processosStore.criarProcesso.mockImplementation(async () => {
-            processosStore.lastError = {
+            processosStore.lastError.value = {
                 message: 'Erro de validação',
                 subErrors: [
                     {field: 'descricao', message: 'Descrição é obrigatória'}

@@ -1,9 +1,9 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import {flushPromises, mount} from "@vue/test-utils";
 import Processo from "@/views/ProcessoDetalheView.vue";
-import {useProcessosStore} from "@/stores/processos";
 import {usePerfilStore} from "@/stores/perfil";
 import {createTestingPinia} from "@pinia/testing";
+import {ref} from "vue";
 import {SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 
 const mocks = vi.hoisted(() => ({
@@ -28,6 +28,20 @@ vi.mock("vue-router", () => ({
 }));
 
 vi.mock("@/services/processoService");
+
+const processosMock = {
+    processoDetalhe: ref<any>(null),
+    subprocessosElegiveis: ref<any[]>([]),
+    lastError: ref<any>(null),
+    clearError: vi.fn(),
+    buscarContextoCompleto: vi.fn().mockResolvedValue(undefined),
+    finalizarProcesso: vi.fn().mockResolvedValue(undefined),
+    executarAcaoBloco: vi.fn().mockResolvedValue(undefined),
+};
+
+vi.mock("@/composables/useProcessos", () => ({
+    useProcessos: () => processosMock
+}));
 
 const ModalAcaoBlocoStub = {
     name: 'ModalAcaoBloco',
@@ -65,22 +79,10 @@ const commonStubs = {
 };
 
 describe("ProcessoViewCoverage.spec.ts", () => {
-    let processosStore: ReturnType<typeof useProcessosStore>;
-
     const createWrapper = (initialState: any = {}, shallow = false) => {
         const pinia = createTestingPinia({
             createSpy: vi.fn,
             initialState: {
-                processos: {
-                    processoDetalhe: {
-                        codigo: 1,
-                        descricao: "Processo teste",
-                        tipo: TipoProcesso.MAPEAMENTO,
-                        situacao: "EM_ANDAMENTO",
-                        unidades: []
-                    },
-                    lastError: null
-                },
                 perfil: {
                     perfilSelecionado: "GESTOR",
                     unidadeSelecionada: 100,
@@ -91,19 +93,23 @@ describe("ProcessoViewCoverage.spec.ts", () => {
             stubActions: true
         });
 
-        if (initialState.processos) {
-            const store = useProcessosStore(pinia);
-            store.$patch(initialState.processos);
-        }
         if (initialState.perfil) {
             const store = usePerfilStore(pinia);
             store.$patch(initialState.perfil);
         }
 
-        processosStore = useProcessosStore(pinia) as any;
-        (processosStore.buscarContextoCompleto as any).mockResolvedValue({});
-        (processosStore.finalizarProcesso as any).mockResolvedValue({});
-        (processosStore.executarAcaoBloco as any).mockResolvedValue({});
+        processosMock.processoDetalhe.value = initialState.processos?.processoDetalhe ?? {
+            codigo: 1,
+            descricao: "Processo teste",
+            tipo: TipoProcesso.MAPEAMENTO,
+            situacao: "EM_ANDAMENTO",
+            unidades: []
+        };
+        processosMock.subprocessosElegiveis.value = initialState.processos?.subprocessosElegiveis ?? [];
+        processosMock.lastError.value = initialState.processos?.lastError ?? null;
+        processosMock.buscarContextoCompleto.mockResolvedValue(undefined);
+        processosMock.finalizarProcesso.mockResolvedValue(undefined);
+        processosMock.executarAcaoBloco.mockResolvedValue(undefined);
 
         const options: any = {
             global: {
@@ -121,12 +127,15 @@ describe("ProcessoViewCoverage.spec.ts", () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
+        processosMock.processoDetalhe.value = null;
+        processosMock.subprocessosElegiveis.value = [];
+        processosMock.lastError.value = null;
     });
 
     it("deve lidar com erro ao finalizar processo", async () => {
         const wrapper = createWrapper();
 
-        vi.mocked(processosStore.finalizarProcesso).mockRejectedValue(new Error("Erro ao finalizar"));
+        vi.mocked(processosMock.finalizarProcesso).mockRejectedValue(new Error("Erro ao finalizar"));
 
         await flushPromises();
 
@@ -222,7 +231,7 @@ describe("ProcessoViewCoverage.spec.ts", () => {
         const modal = wrapper.findComponent({name: 'ModalAcaoBloco'});
 
         (wrapper.vm as any).acaoBlocoAtual = 'aceitar';
-        (processosStore.executarAcaoBloco as any).mockRejectedValue(new Error("Erro bloco"));
+        (processosMock.executarAcaoBloco as any).mockRejectedValue(new Error("Erro bloco"));
 
         await modal.vm.$emit("confirmar", {ids: [1]});
         await flushPromises();
@@ -301,5 +310,21 @@ describe("ProcessoViewCoverage.spec.ts", () => {
         (wrapper.vm as any).acaoBlocoAtual = 'aceitar';
         expect((wrapper.vm as any).unidadesElegiveis).toHaveLength(1);
         expect((wrapper.vm as any).unidadesElegiveis[0].sigla).toBe("A");
+    });
+
+    it("deve cobrir branches de erro e estados de carregamento", async () => {
+        const wrapper = createWrapper({
+            processos: {
+                processoDetalhe: {codigo: 1, situacao: 'EM_ANDAMENTO'},
+                lastError: {message: 'Erro de teste'}
+            }
+        });
+        await flushPromises();
+        expect(wrapper.text()).toContain('Erro de teste');
+
+        // In this component, notify() is used for local notifications.
+        (wrapper.vm as any).notify('Erro Manual', 'danger');
+        await wrapper.vm.$nextTick();
+        expect(wrapper.text()).toContain('Erro Manual');
     });
 });

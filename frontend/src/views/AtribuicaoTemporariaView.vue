@@ -154,11 +154,11 @@ import {
   BFormGroup,
   BFormInput,
   BFormInvalidFeedback,
+  BFormTextarea,
   BListGroup,
   BListGroupItem,
-  BSpinner,
-  BFormTextarea,
-  BRow
+  BRow,
+  BSpinner
 } from "bootstrap-vue-next";
 import {computed, nextTick, onBeforeUnmount, onMounted, ref, watch} from "vue";
 import {useRouter} from "vue-router";
@@ -403,7 +403,9 @@ defineExpose({
   agendarOcultacaoResultadosUsuarios,
   aoPressionarTeclaUsuario,
   aoAlterarTermoUsuario,
-  criarAtribuicao
+  criarAtribuicao,
+  notify,
+  clear
 });
 </script>
 

@@ -35,9 +35,10 @@ describe("AdministradoresView.vue", () => {
                     BAlert: {template: '<div><slot /></div>'},
                     EmptyState: true,
                     ModalConfirmacao: {
+                        name: 'ModalConfirmacao',
                         props: ['modelValue', 'loading'],
                         template: `<div v-if="modelValue"><slot /><button class="confirm" @click="$emit('confirmar')">OK</button></div>`,
-                        emits: ['confirmar']
+                        emits: ['confirmar', 'shown', 'update:modelValue']
                     },
                     LoadingButton: {
                         props: ['loading', 'text'],
@@ -98,5 +99,41 @@ describe("AdministradoresView.vue", () => {
         await flushPromises();
 
         expect(administradorService.removerAdministrador).toHaveBeenCalledWith("111");
+    });
+
+    it("deve gerenciar estados de modais e fluxos de erro na administração de usuários", async () => {
+        const wrapper = createWrapper();
+        await flushPromises();
+        const vm = wrapper.vm as any;
+
+        // Atualização de v-model nos modais
+        const modals = wrapper.findAllComponents({name: 'ModalConfirmacao'});
+        for (const modal of modals) {
+            await modal.vm.$emit('update:modelValue', true);
+        }
+        expect(vm.mostrarModalAdicionarAdmin).toBe(true);
+        expect(vm.mostrarModalRemoverAdmin).toBe(true);
+        
+        // Disparo de evento shown do modal
+        const modalAdd = wrapper.findComponent({name: 'ModalConfirmacao'});
+        await modalAdd.vm.$emit('shown');
+
+        // Tentativa de adicionar administrador com título inválido
+        vm.novoAdminTitulo = "";
+        await vm.adicionarAdmin();
+        
+        // Tratamento de erro na adição de administrador
+        vm.novoAdminTitulo = "123";
+        vi.mocked(administradorService.adicionarAdministrador).mockRejectedValue(new Error("Erro add"));
+        await vm.adicionarAdmin();
+
+        // Tentativa de remover administrador sem seleção
+        vm.adminParaRemover = null;
+        await vm.removerAdmin();
+
+        // Tratamento de erro na remoção de administrador
+        vm.adminParaRemover = {tituloEleitoral: "111", nome: "Admin"};
+        vi.mocked(administradorService.removerAdministrador).mockRejectedValue(new Error("Erro rem"));
+        await vm.removerAdmin();
     });
 });

@@ -4,13 +4,13 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.transaction.annotation.*;
 import sgc.fixture.*;
+import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
-import sgc.mapa.service.MapaManutencaoService;
+import sgc.mapa.service.*;
 import sgc.organizacao.model.*;
 import sgc.processo.model.*;
 import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.*;
-import sgc.mapa.dto.*;
 
 import java.time.*;
 

@@ -2,10 +2,10 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {mount} from '@vue/test-utils';
 import {createTestingPinia} from '@pinia/testing';
 import PainelView from '@/views/PainelView.vue';
-import {useProcessosStore} from '@/stores/processos';
 import {useToastStore} from '@/stores/toast';
 import * as painelService from '@/services/painelService';
 import {useRouter} from 'vue-router';
+import {ref} from 'vue';
 
 vi.mock("vue-router", () => ({
     useRouter: vi.fn(),
@@ -37,11 +37,21 @@ vi.mock("@/services/painelService", () => ({
     listarAlertas: vi.fn(),
 }));
 
+const processosMock = {
+    processosPainel: ref([]),
+    buscarProcessosPainel: vi.fn(),
+};
+
+vi.mock("@/composables/useProcessos", () => ({
+    useProcessos: () => processosMock
+}));
+
 describe('PainelView Coverage', () => {
     let routerPushMock: any;
 
     beforeEach(() => {
         vi.clearAllMocks();
+        processosMock.processosPainel.value = [];
         routerPushMock = vi.fn();
         (useRouter as any).mockReturnValue({
             push: routerPushMock,
@@ -66,7 +76,7 @@ describe('PainelView Coverage', () => {
         BButton: {template: '<button />'}
     };
 
-    it('carregarDados calls only buscarProcessosPainel when usuarioCodigo is missing', async () => {
+    it('carregarDados calls buscarProcessosPainel and listarAlertas when unit is present', async () => {
         const pinia = createTestingPinia({
             createSpy: vi.fn,
             initialState: {
@@ -86,11 +96,10 @@ describe('PainelView Coverage', () => {
             }
         });
 
-        const processosStore = useProcessosStore(pinia);
         await wrapper.vm.$nextTick();
 
-        expect(processosStore.buscarProcessosPainel).toHaveBeenCalled();
-        expect(painelService.listarAlertas).not.toHaveBeenCalled();
+        expect(processosMock.buscarProcessosPainel).toHaveBeenCalled();
+        expect(painelService.listarAlertas).toHaveBeenCalled();
     });
 
     it('ordenarPor toggles asc/desc correctly', async () => {
@@ -112,19 +121,18 @@ describe('PainelView Coverage', () => {
                 stubs: commonStubs
             }
         });
-        const processosStore = useProcessosStore(pinia);
 
         // Initial default: descricao ASC (implied by refs initialization in component)
 
         await (wrapper.vm as any).ordenarPor('descricao');
 
-        expect(processosStore.buscarProcessosPainel).toHaveBeenLastCalledWith(
-            'GESTOR', 1, 0, 10, 'descricao', 'desc'
+        expect(processosMock.buscarProcessosPainel).toHaveBeenLastCalledWith(
+            1, 0, 10, 'descricao', 'desc'
         );
 
         await (wrapper.vm as any).ordenarPor('tipo');
-        expect(processosStore.buscarProcessosPainel).toHaveBeenLastCalledWith(
-            'GESTOR', 1, 0, 10, 'tipo', 'asc'
+        expect(processosMock.buscarProcessosPainel).toHaveBeenLastCalledWith(
+            1, 0, 10, 'tipo', 'asc'
         );
     });
 

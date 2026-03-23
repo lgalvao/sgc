@@ -3,7 +3,7 @@ package sgc.organizacao.service;
 import lombok.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
-import sgc.comum.SgcMensagens;
+import sgc.comum.*;
 import sgc.comum.erros.*;
 import sgc.comum.model.*;
 import sgc.organizacao.dto.*;

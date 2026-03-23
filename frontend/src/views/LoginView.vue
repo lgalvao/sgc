@@ -192,8 +192,8 @@ const router = useRouter();
 const perfilStore = usePerfilStore();
 const {notificacao, notify, clear} = useNotification();
 
-const titulo = ref(import.meta.env.DEV ? "1" : "");
-const senha = ref(import.meta.env.DEV ? "123" : "");
+const titulo = ref("");
+const senha = ref("");
 const loginStep = ref(1);
 const parSelecionado = ref<PerfilUnidade | null>(null);
 const isLoading = ref(false);
@@ -247,7 +247,7 @@ const performInitialLogin = async () => {
   } catch (error: any) {
     const erroNormalizado = normalizeError(error);
     if (erroNormalizado.kind !== 'notFound' && erroNormalizado.kind !== 'unauthorized') {
-      logger.error("Erro no login:", error);
+      logger.error("Erro no login:", error instanceof Error ? error.message : "Erro desconhecido");
     }
 
     if (error.response?.status === 404 || error.response?.status === 401) {

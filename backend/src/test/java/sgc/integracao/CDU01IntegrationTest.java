@@ -42,7 +42,6 @@ class CDU01IntegrationTest extends BaseIntegrationTest {
 
     @BeforeEach
     void setUp() {
-
         unidadeAdmin = UnidadeFixture.unidadePadrao();
         unidadeAdmin.setCodigo(null);
         unidadeAdmin.setSigla("ADM-UNIT-TEST");
@@ -54,7 +53,6 @@ class CDU01IntegrationTest extends BaseIntegrationTest {
         usuarioAdmin.setNome("Admin user teste");
         usuarioAdmin = usuarioRepo.saveAndFlush(usuarioAdmin);
 
-        // Persist perfil via JDBC explicitly
         jdbcTemplate.update(
                 "INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo) VALUES (?, ?, ?)",
                 usuarioAdmin.getTituloEleitoral(), "ADMIN", unidadeAdmin.getCodigo());
@@ -70,8 +68,6 @@ class CDU01IntegrationTest extends BaseIntegrationTest {
         usuarioGestor.setNome("Gestor user teste");
         usuarioGestor = usuarioRepo.saveAndFlush(usuarioGestor);
 
-        // Persist perfis via JDBC explicitly (ADMIN na unidadeAdmin, GESTOR na
-        // unidadeGestor)
         jdbcTemplate.update(
                 "INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo) VALUES (?, ?, ?)",
                 usuarioGestor.getTituloEleitoral(), "ADMIN", unidadeAdmin.getCodigo());
@@ -79,7 +75,7 @@ class CDU01IntegrationTest extends BaseIntegrationTest {
                 "INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo) VALUES (?, ?, ?)",
                 usuarioGestor.getTituloEleitoral(), "GESTOR", unidadeGestor.getCodigo());
 
-        entityManager.clear(); // Clear cache to ensure subsequent reads fetch fresh data including profiles
+        entityManager.clear();
 
         unidadeAdmin = unidadeRepo.findById(unidadeAdmin.getCodigo()).orElseThrow();
         unidadeGestor = unidadeRepo.findById(unidadeGestor.getCodigo()).orElseThrow();
@@ -106,7 +102,7 @@ class CDU01IntegrationTest extends BaseIntegrationTest {
                     .andExpect(jsonPath("$").value(true))
                     .andReturn().getResponse().getCookies();
 
-            AutorizarRequest autorizarReq = AutorizarRequest.builder().tituloEleitoral(tituloEleitoral)
+            AutorizarRequest autorizarReq = AutorizarRequest.builder()
                     .build();
 
             mockMvc.perform(post(BASE_URL + "/autorizar")
@@ -119,7 +115,6 @@ class CDU01IntegrationTest extends BaseIntegrationTest {
                     .andExpect(jsonPath("$[0].unidade.sigla").value(unidadeAdmin.getSigla()));
 
             EntrarRequest entrarReq = EntrarRequest.builder()
-                    .tituloEleitoral(tituloEleitoral)
                     .perfil("ADMIN")
                     .unidadeCodigo(unidadeAdmin.getCodigo())
                     .build();
@@ -148,7 +143,7 @@ class CDU01IntegrationTest extends BaseIntegrationTest {
                     .andExpect(jsonPath("$").value(true))
                     .andReturn().getResponse().getCookies();
 
-            AutorizarRequest autorizarReq = AutorizarRequest.builder().tituloEleitoral(tituloEleitoral)
+            AutorizarRequest autorizarReq = AutorizarRequest.builder()
                     .build();
 
             mockMvc.perform(post(BASE_URL + "/autorizar")
@@ -163,7 +158,6 @@ class CDU01IntegrationTest extends BaseIntegrationTest {
 
             // Entrar como GESTOR na unidadeGestor
             EntrarRequest entrarReq = EntrarRequest.builder()
-                    .tituloEleitoral(tituloEleitoral)
                     .perfil("GESTOR")
                     .unidadeCodigo(unidadeGestor.getCodigo())
                     .build();
@@ -178,14 +172,7 @@ class CDU01IntegrationTest extends BaseIntegrationTest {
         @Test
         @DisplayName("Deve falhar ao tentar autorizar com usuário não autenticado")
         void testAutorizar_falhaUsuarioNaoAutenticado() throws Exception {
-
-            String tituloEleitoral = "888888888888"; // Usuário inexistente
-
-            // Não realizamos a autenticação prévia para simular um usuário não autenticado.
-
-            // Sem autenticação prévia (sessão válida), a tentativa de autorizar deve ser
-            // rejeitada com 401 (Unauthorized)
-            AutorizarRequest autorizarReq = AutorizarRequest.builder().tituloEleitoral(tituloEleitoral)
+            AutorizarRequest autorizarReq = AutorizarRequest.builder()
                     .build();
 
             mockMvc.perform(post(BASE_URL + "/autorizar")
@@ -202,7 +189,6 @@ class CDU01IntegrationTest extends BaseIntegrationTest {
             String tituloEleitoral = usuarioAdmin.getTituloEleitoral();
             long codigoUnidadeInexistente = 999999L;
 
-            // Pre-authenticate (Required by security fix)
             AutenticarRequest authRequest = AutenticarRequest.builder()
                     .tituloEleitoral(tituloEleitoral)
                     .senha("any")
@@ -214,7 +200,6 @@ class CDU01IntegrationTest extends BaseIntegrationTest {
                     .andReturn().getResponse().getCookies();
 
             EntrarRequest entrarReq = EntrarRequest.builder()
-                    .tituloEleitoral(tituloEleitoral)
                     .perfil("ADMIN")
                     .unidadeCodigo(codigoUnidadeInexistente)
                     .build();

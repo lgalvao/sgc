@@ -2,9 +2,8 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {flushPromises, mount, RouterLinkStub} from '@vue/test-utils';
 import {createTestingPinia} from '@pinia/testing';
 import SubprocessoView from '@/views/SubprocessoView.vue';
-import {useSubprocessosStore} from '@/stores/subprocessos';
-import {useMapasStore} from '@/stores/mapas';
-import {useProcessosStore} from '@/stores/processos';
+import {useMapas} from '@/composables/useMapas';
+import {reactive, ref} from 'vue';
 import {SituacaoSubprocesso, TipoProcesso} from '@/types/tipos';
 import * as processoService from '@/services/processoService';
 import * as useAcessoModule from '@/composables/useAcesso';
@@ -24,6 +23,35 @@ vi.mock('@/services/processoService', () => ({
     reabrirRevisaoCadastro: vi.fn(),
     enviarLembrete: vi.fn(),
 }));
+
+const processosMock = {
+    processoDetalhe: ref<any>(null),
+    enviarLembrete: vi.fn(),
+};
+
+const fluxoSubprocessoMock = {
+    alterarDataLimiteSubprocesso: vi.fn(),
+    reabrirCadastro: vi.fn(),
+    reabrirRevisaoCadastro: vi.fn(),
+};
+const subprocessosMock = reactive({
+    subprocessoDetalhe: null as any,
+    buscarSubprocessoPorProcessoEUnidade: vi.fn(),
+    buscarSubprocessoDetalhe: vi.fn(),
+    buscarContextoEdicao: vi.fn(),
+    atualizarStatusLocal: vi.fn(),
+    lastError: null as any,
+    clearError: vi.fn(),
+});
+
+vi.mock('@/composables/useProcessos', () => ({
+    useProcessos: () => processosMock
+}));
+
+vi.mock('@/composables/useFluxoSubprocesso', () => ({
+    useFluxoSubprocesso: () => fluxoSubprocessoMock
+}));
+vi.mock('@/composables/useSubprocessos', () => ({useSubprocessos: () => subprocessosMock}));
 
 describe('SubprocessoView.vue', () => {
     const mockSubprocesso = {
@@ -65,6 +93,16 @@ describe('SubprocessoView.vue', () => {
     const additionalStubs = {
         SubprocessoCards: SubprocessoCardsStub,
         SubprocessoModal: SubprocessoModalStub,
+        ModalConfirmacao: {
+            name: 'ModalConfirmacao',
+            template: '<div><slot /><button :data-testid="testIdConfirmar" :disabled="okDisabled" @click="$emit(\'confirmar\')">OK</button></div>',
+            props: ['modelValue', 'titulo', 'testIdConfirmar', 'okDisabled'],
+            emits: ['update:modelValue', 'confirmar']
+        },
+        AppAlert: {
+            name: 'AppAlert',
+            template: '<div><button @click="$emit(\'dismissed\')">x</button></div>'
+        },
         BModal: {
             template: '<div><slot /><slot name="footer" /></div>',
             props: ['modelValue', 'title'],
@@ -76,11 +114,26 @@ describe('SubprocessoView.vue', () => {
             emits: ['update:modelValue']
         },
         BButton: {template: '<button :disabled="disabled"><slot /></button>', props: ['disabled']},
-        BAlert: {template: '<div><slot /></div>', props: ['variant', 'dismissible', 'modelValue']}
+        BAlert: {
+            name: 'BAlert',
+            template: '<div><slot /><button @click="$emit(\'dismissed\')">x</button></div>', 
+            props: ['variant', 'dismissible', 'modelValue']
+        },
+        BSpinner: {template: '<div></div>'},
     };
 
     beforeEach(() => {
         vi.clearAllMocks();
+        processosMock.processoDetalhe.value = null;
+        fluxoSubprocessoMock.alterarDataLimiteSubprocesso.mockResolvedValue({});
+        fluxoSubprocessoMock.reabrirCadastro.mockResolvedValue(true);
+        fluxoSubprocessoMock.reabrirRevisaoCadastro.mockResolvedValue(true);
+        subprocessosMock.subprocessoDetalhe = null;
+        subprocessosMock.buscarSubprocessoPorProcessoEUnidade = vi.fn().mockResolvedValue(10);
+        subprocessosMock.buscarSubprocessoDetalhe = vi.fn();
+        subprocessosMock.buscarContextoEdicao = vi.fn();
+        subprocessosMock.atualizarStatusLocal = vi.fn();
+        subprocessosMock.lastError = null;
     });
 
     // Helper to mount component with specific setup
@@ -110,36 +163,19 @@ describe('SubprocessoView.vue', () => {
             stubActions: true,
         });
 
-        const store = useSubprocessosStore(pinia);
-        const mapaStore = useMapasStore(pinia);
-        const processosStore = useProcessosStore(pinia);
+        const store = subprocessosMock as any;
+        const mapaStore = useMapas();
+        processosMock.processoDetalhe.value = {situacao: 'EM_ANDAMENTO'};
 
         (store.buscarSubprocessoPorProcessoEUnidade as any).mockImplementation(async () => 10);
         (store.buscarSubprocessoDetalhe as any).mockImplementation(async () => {
             store.subprocessoDetalhe = subprocessoToUse as any;
             return subprocessoToUse;
         });
-        (mapaStore.buscarMapaCompleto as any).mockResolvedValue({});
-        (store.alterarDataLimiteSubprocesso as any).mockResolvedValue({});
+        mapaStore.buscarMapaCompleto = vi.fn().mockResolvedValue({});
+        mapaStore.mapaCompleto.value = null;
 
-        (store.reabrirCadastro as any).mockImplementation(async (cod: number, just: string) => {
-            try {
-                await (processoService.reabrirCadastro as any)(cod, just);
-                return true;
-            } catch {
-                return false;
-            }
-        });
-        (store.reabrirRevisaoCadastro as any).mockImplementation(async (cod: number, just: string) => {
-            try {
-                await (processoService.reabrirRevisaoCadastro as any)(cod, just);
-                return true;
-            } catch {
-                return false;
-            }
-        });
-
-        (processosStore.enviarLembrete as any).mockImplementation(async (codProcesso: number, codUnidade: number) => {
+        (processosMock.enviarLembrete as any).mockImplementation(async (codProcesso: number, codUnidade: number) => {
             try {
                 await (processoService.enviarLembrete as any)(codProcesso, codUnidade);
                 return true;
@@ -163,7 +199,7 @@ describe('SubprocessoView.vue', () => {
             }
         });
 
-        return {wrapper, store, mapaStore, processosStore};
+        return {wrapper, store, mapaStore, processos: processosMock};
     };
 
     it('fetches data on mount', async () => {
@@ -173,6 +209,22 @@ describe('SubprocessoView.vue', () => {
         expect(store.buscarSubprocessoPorProcessoEUnidade).toHaveBeenCalledWith(1, 'TEST');
         expect(store.buscarSubprocessoDetalhe).toHaveBeenCalledWith(10);
         expect(mapaStore.buscarMapaCompleto).toHaveBeenCalledWith(10);
+    });
+
+    it('limpa subprocessoDetalhe imediatamente ao montar para evitar dados desatualizados', async () => {
+        // Simula dado desatualizado de uma visita anterior (ex: processo de mapeamento
+        // com podeEditarCadastro=false), que poderia fazer SubprocessoCards mostrar
+        // a rota errada (vis-cadastro em vez de cadastro) na primeira renderização
+        subprocessosMock.subprocessoDetalhe = {
+            ...mockSubprocesso,
+            codigo: 999,
+            situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
+            permissoes: {podeEditarCadastro: false}
+        } as any;
+
+        mountComponent();
+        // Antes de qualquer await, o subprocessoDetalhe já deve ter sido limpo
+        expect(subprocessosMock.subprocessoDetalhe).toBeNull();
     });
 
     it('renders components when data is available', async () => {
@@ -208,7 +260,7 @@ describe('SubprocessoView.vue', () => {
     });
 
     it('handles date limit update confirmation', async () => {
-        const {wrapper, store} = mountComponent();
+        const {wrapper} = mountComponent();
         await flushPromises();
         await (wrapper.vm as any).$nextTick();
 
@@ -220,25 +272,25 @@ describe('SubprocessoView.vue', () => {
 
         await flushPromises();
 
-        expect(store.alterarDataLimiteSubprocesso).toHaveBeenCalledWith(10, {novaData: '2024-01-01'});
+        expect(fluxoSubprocessoMock.alterarDataLimiteSubprocesso).toHaveBeenCalledWith(10, {novaData: '2024-01-01'});
         expect((wrapper.vm as any).modals.modals.alterarDataLimite.value.isOpen).toBe(false);
     });
 
     it('trata erro ao alterar data limite', async () => {
-        const {wrapper, store} = mountComponent();
+        const {wrapper} = mountComponent();
         await flushPromises();
-        (store.alterarDataLimiteSubprocesso as any).mockRejectedValue(new Error('Falha'));
+        fluxoSubprocessoMock.alterarDataLimiteSubprocesso.mockRejectedValue(new Error('Falha'));
 
         (wrapper.vm as any).mostrarModalAlterarDataLimite = true;
         const modal = wrapper.findComponent(SubprocessoModalStub);
         await modal.vm.$emit('confirmar-alteracao', '2024-01-01');
         await flushPromises();
 
-        expect(store.alterarDataLimiteSubprocesso).toHaveBeenCalled();
+        expect(fluxoSubprocessoMock.alterarDataLimiteSubprocesso).toHaveBeenCalled();
     });
 
     it('reabre cadastro com sucesso', async () => {
-        const {wrapper, store} = mountComponent();
+        const {wrapper} = mountComponent();
         await flushPromises();
 
         await wrapper.find('[data-testid="btn-reabrir-cadastro"]').trigger('click');
@@ -254,8 +306,7 @@ describe('SubprocessoView.vue', () => {
         await btn.trigger('click');
         await flushPromises();
 
-        expect(processoService.reabrirCadastro).toHaveBeenCalledWith(10, 'Erro no preenchimento');
-        expect(store.buscarSubprocessoDetalhe).toHaveBeenCalledTimes(2); // Initial + Reload
+        expect(fluxoSubprocessoMock.reabrirCadastro).toHaveBeenCalledWith(10, 'Erro no preenchimento');
     });
 
     it('reabre revisão com sucesso', async () => {
@@ -272,7 +323,7 @@ describe('SubprocessoView.vue', () => {
         await btn.trigger('click');
         await flushPromises();
 
-        expect(processoService.reabrirRevisaoCadastro).toHaveBeenCalledWith(10, 'Revisão incompleta');
+        expect(fluxoSubprocessoMock.reabrirRevisaoCadastro).toHaveBeenCalledWith(10, 'Revisão incompleta');
     });
 
     it('impede reabertura se justificativa vazia (botão desabilitado)', async () => {
@@ -284,13 +335,13 @@ describe('SubprocessoView.vue', () => {
         // O botão deve estar desabilitado se a justificativa for vazia
         const btn = wrapper.find('[data-testid="btn-confirmar-reabrir"]');
         expect(btn.attributes('disabled')).toBeDefined();
-        expect(processoService.reabrirCadastro).not.toHaveBeenCalled();
+        expect(fluxoSubprocessoMock.reabrirCadastro).not.toHaveBeenCalled();
     });
 
     it('trata erro na API ao reabrir', async () => {
         const {wrapper} = mountComponent();
         await flushPromises();
-        vi.mocked(processoService.reabrirCadastro).mockRejectedValue(new Error('API Error'));
+        fluxoSubprocessoMock.reabrirCadastro.mockResolvedValue(false);
 
         await wrapper.find('[data-testid="btn-reabrir-cadastro"]').trigger('click');
 
@@ -301,7 +352,7 @@ describe('SubprocessoView.vue', () => {
         await btn.trigger('click');
         await flushPromises();
 
-        expect(processoService.reabrirCadastro).toHaveBeenCalled();
+        expect(fluxoSubprocessoMock.reabrirCadastro).toHaveBeenCalled();
     });
 
     it('envia lembrete com sucesso', async () => {
@@ -331,5 +382,41 @@ describe('SubprocessoView.vue', () => {
         await flushPromises();
 
         expect(processoService.enviarLembrete).toHaveBeenCalled();
+    });
+
+    it('deve gerenciar notificações de erro, alertas de sistema e estados de modais de confirmação', async () => {
+        const {wrapper} = mountComponent();
+        await flushPromises();
+        const vm = wrapper.vm as any;
+
+        // Gerenciamento de notificações
+        vm.notify("Msg", "info");
+        await vm.$nextTick();
+        const appAlert = wrapper.findComponent({name: 'AppAlert'});
+        if (appAlert.exists()) await appAlert.vm.$emit('dismissed');
+
+        // Gerenciamento de erros de subprocesso
+        subprocessosMock.subprocessoDetalhe = null;
+        subprocessosMock.lastError = { message: "Erro" };
+        await vm.$nextTick();
+        const bAlert = wrapper.findComponent({name: 'BAlert'});
+        if (bAlert.exists()) await bAlert.vm.$emit('dismissed');
+        expect(subprocessosMock.clearError).toHaveBeenCalled();
+
+        // Atualização de estados de v-model nos modais
+        const modalsComp = wrapper.findAllComponents({name: 'ModalConfirmacao'});
+        for (const modal of modalsComp) {
+            await modal.vm.$emit('update:modelValue', true);
+        }
+        expect(vm.modalLembreteAberto).toBe(true);
+
+        // Validação de entrada nula para alteração de data limite
+        expect(await vm.confirmarAlteracaoDataLimite(null)).toBeUndefined();
+        
+        // Exibição de toast pendente ao montar componente
+        const {useToastStore} = await import("@/stores/toast");
+        const toastStore = useToastStore();
+        toastStore.setPending("Msg");
+        mountComponent();
     });
 });

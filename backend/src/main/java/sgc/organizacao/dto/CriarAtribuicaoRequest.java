@@ -1,7 +1,7 @@
 package sgc.organizacao.dto;
 
 import jakarta.validation.constraints.*;
-import sgc.comum.SgcMensagens;
+import sgc.comum.*;
 import sgc.comum.model.*;
 import sgc.seguranca.sanitizacao.*;
 

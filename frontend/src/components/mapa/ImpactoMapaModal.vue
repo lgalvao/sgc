@@ -149,7 +149,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BButton, BCard, BModal, BListGroup, BListGroupItem, BSpinner} from "bootstrap-vue-next";
+import {BAlert, BButton, BCard, BListGroup, BListGroupItem, BModal, BSpinner} from "bootstrap-vue-next";
 import {type ImpactoMapa, TipoImpactoCompetencia} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
 

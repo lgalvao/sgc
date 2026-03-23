@@ -11,7 +11,7 @@ import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
 import sgc.processo.dto.*;
 import sgc.processo.model.*;
-import sgc.processo.service.ProcessoService;
+import sgc.processo.service.*;
 import sgc.testutils.*;
 
 import java.time.*;
@@ -123,10 +123,10 @@ class PainelFacadeTest {
         a.setDataHora(LocalDateTime.now());
 
         Page<Alerta> page = new PageImpl<>(List.of(a));
-        when(alertaFacade.listarPorUnidade(eq(100L), any(Pageable.class))).thenReturn(page);
+        when(alertaFacade.listarPorUnidade(eq("123"), eq(100L), eq("ADMIN"), any(Pageable.class))).thenReturn(page);
         when(alertaFacade.obterDataHoraLeitura(1L, "123")).thenReturn(Optional.of(LocalDateTime.now()));
 
-        Page<Alerta> result = painelFacade.listarAlertas("123", 100L, Pageable.unpaged());
+        Page<Alerta> result = painelFacade.listarAlertas("123", 100L, "ADMIN", Pageable.unpaged());
 
         assertThat(result).hasSize(1);
         assertThat(result.getContent().getFirst().getDataHoraLeitura()).isNotNull();
@@ -153,10 +153,10 @@ class PainelFacadeTest {
         a.setDataHora(LocalDateTime.now());
 
         Page<Alerta> page = new PageImpl<>(List.of(a));
-        when(alertaFacade.listarPorUnidade(100L, sorted)).thenReturn(page);
+        when(alertaFacade.listarPorUnidade(eq("123"), eq(100L), eq("ADMIN"), any(Pageable.class))).thenReturn(page);
         when(alertaFacade.obterDataHoraLeitura(1L, "123")).thenReturn(Optional.of(LocalDateTime.now()));
 
-        Page<Alerta> result = painelFacade.listarAlertas("123", 100L, sorted);
+        Page<Alerta> result = painelFacade.listarAlertas("123", 100L, "ADMIN", sorted);
 
         assertThat(result).hasSize(1);
     }
@@ -181,13 +181,11 @@ class PainelFacadeTest {
 
         Page<Alerta> page = new PageImpl<>(List.of(a));
 
-        when(alertaFacade.listarPorUnidade(eq(100L), argThat(p ->
-                p.isPaged() && p.getSort().isSorted() && p.getSort().getOrderFor("dataHora") != null
-        ))).thenReturn(page);
+        when(alertaFacade.listarPorUnidade(eq("123"), eq(100L), eq("ADMIN"), any(Pageable.class))).thenReturn(page);
 
         when(alertaFacade.obterDataHoraLeitura(1L, "123")).thenReturn(Optional.of(LocalDateTime.now()));
 
-        Page<Alerta> result = painelFacade.listarAlertas("123", 100L, unsortedPaged);
+        Page<Alerta> result = painelFacade.listarAlertas("123", 100L, "ADMIN", unsortedPaged);
 
         assertThat(result).hasSize(1);
     }

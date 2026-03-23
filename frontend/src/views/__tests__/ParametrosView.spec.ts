@@ -37,6 +37,11 @@ describe('ParametrosView', () => {
                     BAlert: {
                         template: '<div class="alert-stub"><slot /></div>'
                     },
+                    BFormInput: {
+                        name: 'BFormInput',
+                        props: ['modelValue'],
+                        template: '<input :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />'
+                    },
                     LoadingButton: {
                         template: '<button :disabled="loading" class="loading-button-stub" @click="$emit(\'click\')">{{ text }}<slot /></button>',
                         props: ['loading', 'variant', 'size', 'icon', 'text']
@@ -89,5 +94,24 @@ describe('ParametrosView', () => {
         });
         await wrapper.vm.$nextTick();
         expect(wrapper.find('.alert-stub').text()).toContain('Erro de teste');
+    });
+
+    it('deve gerenciar o carregamento de configurações e validações de formulário de parâmetros', async () => {
+        // Carregamento de configurações quando a lista está vazia
+        setupWrapper({}, []);
+        await wrapper.vm.$nextTick();
+        expect(configuracoesStore.carregarConfiguracoes).toHaveBeenCalled();
+
+        // Atualização de v-model nos campos do formulário
+        const inputs = wrapper.findAllComponents({name: 'BFormInput'});
+        if (inputs.length > 0) await inputs[0].vm.$emit('update:modelValue', 40);
+        if (inputs.length > 1) await inputs[1].vm.$emit('update:modelValue', 10);
+        expect(wrapper.vm.form.diasInativacao).toBe(40);
+        expect(wrapper.vm.form.diasAlertaNovo).toBe(10);
+
+        // Bloqueio de submissão do formulário com dados inválidos
+        wrapper.vm.form.diasInativacao = 0;
+        await wrapper.find('form').trigger('submit.prevent');
+        expect(configuracoesStore.salvarConfiguracoes).not.toHaveBeenCalled();
     });
 });

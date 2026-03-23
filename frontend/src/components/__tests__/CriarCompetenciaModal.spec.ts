@@ -29,7 +29,13 @@ describe("CriarCompetenciaModal.vue", () => {
     ];
 
     const createWrapper = (propsOverride = {}) => {
-        const options = getCommonMountOptions({}, {ModalPadrao: ModalPadraoStub});
+        const options = getCommonMountOptions({}, {
+            ModalPadrao: ModalPadraoStub,
+            BTooltip: {
+                props: ['placement'],
+                template: '<span><slot /></span>',
+            },
+        });
 
         context.wrapper = mount(CriarCompetenciaModal, {
             ...options,
@@ -120,4 +126,5 @@ describe("CriarCompetenciaModal.vue", () => {
             },
         ]);
     });
+
 });

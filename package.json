@@ -10,27 +10,26 @@
     "typecheck": "npm run typecheck --prefix frontend && npm run typecheck:e2e",
     "typecheck:e2e": "tsc --noEmit -p e2e/tsconfig.json",
     "lint:ox": "oxlint .",
-    "lint": "npm run lint:ox && eslint . --fix"
+    "lint": "npm run lint:ox && eslint . --fix",
+    "sast": "semgrep scan --config p/java --config p/typescript --config p/javascript --config p/owasp-top-ten --config p/security-audit --config p/secrets --metrics=off"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.11.1",
-    "@eslint/js": "^9.21.0",
+    "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.58.2",
     "@types/node": "^25.5.0",
     "@types/smtp-server": "^3.5.12",
     "@vitest/browser-preview": "^4.0.18",
     "axe-playwright": "^2.2.2",
     "chrome-launcher": "^1.2.1",
-    "eslint": "^9.39.4",
+    "eslint": "^10.1.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-playwright": "^2.10.1",
-    "globals": "^16.5.0",
+    "globals": "^17.4.0",
     "oxlint": "^1.56.0",
     "smtp-server": "^3.18.1",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.57.1"
-  },
-  "dependencies": {
+    "typescript-eslint": "^8.57.1",
     "xml2js": "^0.6.2"
   }
 }

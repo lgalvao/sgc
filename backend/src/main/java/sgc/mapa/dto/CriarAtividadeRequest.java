@@ -2,7 +2,7 @@ package sgc.mapa.dto;
 
 import jakarta.validation.constraints.*;
 import lombok.*;
-import sgc.comum.SgcMensagens;
+import sgc.comum.*;
 import sgc.seguranca.sanitizacao.*;
 
 @Builder

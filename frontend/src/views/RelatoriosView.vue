@@ -169,9 +169,9 @@ const gerarRelatorioMapas = async () => {
 
 onMounted(async () => {
    if (perfil.perfilSelecionado.value && perfilStore.unidadeSelecionada) {
+      const unidadeCodigo = (perfilStore.unidadeSelecionada as any)?.codigo || perfilStore.unidadeSelecionada;
       await buscarProcessosPainel(
-          perfil.perfilSelecionado.value,
-          Number(perfilStore.unidadeSelecionada),
+          Number(unidadeCodigo),
           0,
           100
       );

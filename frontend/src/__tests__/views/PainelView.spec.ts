@@ -2,9 +2,9 @@ import {beforeEach, describe, expect, it, vi} from "vitest";
 import {flushPromises, mount} from "@vue/test-utils";
 import PainelView from "@/views/PainelView.vue";
 import {createTestingPinia} from "@pinia/testing";
-import {useProcessosStore} from "@/stores/processos";
 import * as painelService from "@/services/painelService";
 import {useRouter} from "vue-router";
+import {ref} from "vue";
 
 vi.mock("vue-router", () => ({
     useRouter: vi.fn(),
@@ -24,11 +24,21 @@ vi.mock("@/services/painelService", () => ({
     listarAlertas: vi.fn(),
 }));
 
+const processosMock = {
+    processosPainel: ref([]),
+    buscarProcessosPainel: vi.fn(),
+};
+
+vi.mock("@/composables/useProcessos", () => ({
+    useProcessos: () => processosMock
+}));
+
 describe("PainelView.vue", () => {
     let routerPushMock: any;
 
     beforeEach(() => {
         vi.clearAllMocks();
+        processosMock.processosPainel.value = [];
         routerPushMock = vi.fn();
         (useRouter as any).mockReturnValue({
             push: routerPushMock,
@@ -121,23 +131,21 @@ describe("PainelView.vue", () => {
 
     it("deve carregar dados ao montar se perfil estiver selecionado", async () => {
         const wrapper = mount(PainelView, mountOptions());
-        const processosStore = useProcessosStore();
 
         await wrapper.vm.$nextTick();
 
-        expect(processosStore.buscarProcessosPainel).toHaveBeenCalledWith("ADMIN", 1, 0, 10);
-        expect(painelService.listarAlertas).toHaveBeenCalledWith(100, 1, 0, 10, "dataHora", "desc");
+        expect(processosMock.buscarProcessosPainel).toHaveBeenCalledWith(1, 0, 10);
+        expect(painelService.listarAlertas).toHaveBeenCalledWith(1, 0, 10, "dataHora", "desc");
     });
 
     it("não deve carregar dados se perfil não estiver selecionado", async () => {
         const wrapper = mount(PainelView, mountOptions({
             perfil: {perfilSelecionado: null, unidadeSelecionada: null}
         }));
-        const processosStore = useProcessosStore();
 
         await wrapper.vm.$nextTick();
 
-        expect(processosStore.buscarProcessosPainel).not.toHaveBeenCalled();
+        expect(processosMock.buscarProcessosPainel).not.toHaveBeenCalled();
         expect(painelService.listarAlertas).not.toHaveBeenCalled();
     });
 
@@ -157,20 +165,20 @@ describe("PainelView.vue", () => {
 
     it("deve reordenar processos ao receber evento da tabela", async () => {
         const wrapper = mount(PainelView, mountOptions());
-        const processosStore = useProcessosStore();
 
         vi.clearAllMocks(); // Limpa chamadas do onMounted
         (painelService.listarAlertas as any).mockResolvedValue(mockPageVazia);
+        processosMock.buscarProcessosPainel.mockClear();
 
         await wrapper.findComponent({name: 'TabelaProcessos'}).vm.$emit('ordenar', 'dataCriacao');
 
-        expect(processosStore.buscarProcessosPainel).toHaveBeenLastCalledWith(
-            "ADMIN", 1, 0, 10, "dataCriacao", "asc"
+        expect(processosMock.buscarProcessosPainel).toHaveBeenLastCalledWith(
+            1, 0, 10, "dataCriacao", "asc"
         );
 
         await wrapper.findComponent({name: 'TabelaProcessos'}).vm.$emit('ordenar', 'dataCriacao');
-        expect(processosStore.buscarProcessosPainel).toHaveBeenLastCalledWith(
-            "ADMIN", 1, 0, 10, "dataCriacao", "desc"
+        expect(processosMock.buscarProcessosPainel).toHaveBeenLastCalledWith(
+            1, 0, 10, "dataCriacao", "desc"
         );
     });
 

@@ -1,5 +1,8 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
-import {criarProcessoCadastroDisponibilizadoFixture, criarProcessoRevisaoCadastroDisponibilizadoFixture} from './fixtures/fixtures-processos.js';
+import {
+    criarProcessoCadastroDisponibilizadoFixture,
+    criarProcessoRevisaoCadastroDisponibilizadoFixture
+} from './fixtures/fixtures-processos.js';
 import {loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
 import {resetDatabase} from './hooks/hooks-limpeza.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';

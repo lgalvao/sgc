@@ -72,7 +72,7 @@ class CDU30IntegrationTest extends BaseIntegrationTest {
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[?(@.tituloEleitoral == '" + usuario1.getTituloEleitoral() + "')]").exists());
+                .andExpect(jsonPath("$[0].nome").exists());
     }
 
     @Test

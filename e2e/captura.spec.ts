@@ -86,12 +86,12 @@ async function capturarTela(page: Page, categoria: string, nome: string, opcoes?
     const viewport = page.viewportSize() || { width: 0, height: 0 };
     
     // Extrair rota da URL (ex: /painel)
-    let route = '/';
+    let routePath;
     try {
         const urlObj = new URL(url);
-        route = urlObj.pathname + urlObj.search;
+        routePath = urlObj.pathname + urlObj.search;
     } catch {
-        route = url;
+        routePath = url;
     }
 
     // Injetar banner com a URL no RODAPÉ
@@ -142,7 +142,7 @@ async function capturarTela(page: Page, categoria: string, nome: string, opcoes?
     capturasMetadata.push({
         file: nomeArquivo,
         url,
-        route,
+        route: routePath,
         viewport,
         timestamp: new Date().toISOString(),
         tags: [...(opcoes?.tags ?? []), categoria],
@@ -168,12 +168,12 @@ async function capturarComponente(elemento: Locator, categoria: string, nome: st
     const viewport = page.viewportSize() || { width: 0, height: 0 };
     
     // Extrair rota
-    let route = '/';
+    let routePath;
     try {
         const urlObj = new URL(url);
-        route = urlObj.pathname + urlObj.search;
+        routePath = urlObj.pathname + urlObj.search;
     } catch {
-        route = url;
+        routePath = url;
     }
 
     // Para componentes, adicionamos um selo discreto no final
@@ -204,7 +204,7 @@ async function capturarComponente(elemento: Locator, categoria: string, nome: st
     capturasMetadata.push({
         file: nomeArquivo,
         url,
-        route,
+        route: routePath,
         viewport,
         timestamp: new Date().toISOString(),
         tags: [...(tags ?? []), categoria, 'componente'],
@@ -225,7 +225,7 @@ async function capturarComponente(elemento: Locator, categoria: string, nome: st
 async function aguardarPinturaEstavel(page: Page, quadros = 2): Promise<void> {
     for (let indice = 0; indice < quadros; indice += 1) {
         await page.evaluate(() => new Promise<void>((resolve) => {
-            window.requestAnimationFrame(() => resolve());
+            globalThis.requestAnimationFrame(() => resolve());
         }));
     }
 }

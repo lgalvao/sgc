@@ -38,14 +38,14 @@ public class TestLoginHelper {
             throw new IllegalStateException("Cookie de pré-autenticação não encontrado");
         }
 
-        AutorizarRequest autorizarRequest = new AutorizarRequest(titulo);
+        AutorizarRequest autorizarRequest = new AutorizarRequest();
         mockMvc.perform(post("/api/usuarios/autorizar")
                         .cookie(preAuthCookie)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(autorizarRequest)))
                 .andExpect(status().isOk());
 
-        EntrarRequest entrarRequest = new EntrarRequest(titulo, perfil.name(), unidadeCodigo);
+        EntrarRequest entrarRequest = new EntrarRequest(perfil.name(), unidadeCodigo);
         MvcResult entrarResult = mockMvc.perform(post("/api/usuarios/entrar")
                         .cookie(preAuthCookie)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -53,10 +53,12 @@ public class TestLoginHelper {
                 .andExpect(status().isOk())
                 .andReturn();
 
-        // Extrair token da resposta
-        String responseBody = entrarResult.getResponse().getContentAsString();
-        EntrarResponse response = objectMapper.readValue(responseBody, EntrarResponse.class);
-        return response.token();
+        // Extrair token do cookie
+        Cookie jwtCookie = entrarResult.getResponse().getCookie("jwtToken");
+        if (jwtCookie == null) {
+            throw new IllegalStateException("Cookie jwtToken não encontrado");
+        }
+        return jwtCookie.getValue();
     }
 
     /**

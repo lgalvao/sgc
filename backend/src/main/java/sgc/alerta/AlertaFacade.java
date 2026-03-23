@@ -26,11 +26,16 @@ public class AlertaFacade {
         return unidadeService.buscarPorCodigo(1L);
     }
 
-    public List<Alerta> alertasPorUsuario(String usuarioTitulo) {
-        Usuario usuario = usuarioService.buscar(usuarioTitulo);
-        Unidade lotacao = usuario.getUnidadeLotacao();
+    public List<Alerta> alertasPorUsuario(String usuarioTitulo, Long codigoUnidadeAtiva, String perfil) {
+        List<Alerta> alertas;
+        
+        // Regra expressiva CDU-02 (3.2)
+        if ("SERVIDOR".equals(perfil)) {
+            alertas = alertaService.listarParaServidor(usuarioTitulo);
+        } else {
+            alertas = alertaService.listarParaGestao(codigoUnidadeAtiva, usuarioTitulo);
+        }
 
-        List<Alerta> alertas = alertaService.porUnidadeDestino(lotacao.getCodigo());
         if (alertas.isEmpty()) return Collections.emptyList();
 
         List<Long> alertaCodigos = alertas.stream().map(Alerta::getCodigo).toList();
@@ -46,14 +51,24 @@ public class AlertaFacade {
         return alertas;
     }
 
-    public List<Alerta> listarNaoLidos(String usuarioTitulo) {
-        return alertasPorUsuario(usuarioTitulo).stream()
+    public List<Alerta> listarNaoLidos(String usuarioTitulo, Long codigoUnidadeAtiva, String perfil) {
+        return alertasPorUsuario(usuarioTitulo, codigoUnidadeAtiva, perfil).stream()
                 .filter(alerta -> alerta.getDataHoraLeitura() == null)
                 .toList();
     }
 
-    public Page<Alerta> listarPorUnidade(Long codigoUnidade, Pageable pageable) {
-        return alertaService.porUnidadeDestinoPaginado(codigoUnidade, pageable);
+    public Page<Alerta> listarPorUnidade(String usuarioTitulo, Long codigoUnidade, String perfil, Pageable pageable) {
+        // Regra CDU-02 (3.3): Ordenação decrescente obrigatória por data/hora
+        Pageable sortedPageable = pageable.isPaged() 
+                ? PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.DESC, "dataHora"))
+                : pageable;
+
+        // Regra expressiva CDU-02 (3.2)
+        if ("SERVIDOR".equals(perfil)) {
+            return alertaService.listarParaServidorPaginado(usuarioTitulo, sortedPageable);
+        } else {
+            return alertaService.listarParaGestaoPaginado(codigoUnidade, usuarioTitulo, sortedPageable);
+        }
     }
 
     public Optional<LocalDateTime> obterDataHoraLeitura(Long codigoAlerta, String usuarioTitulo) {
