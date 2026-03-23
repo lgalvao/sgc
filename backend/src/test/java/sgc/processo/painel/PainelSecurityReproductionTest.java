@@ -6,13 +6,14 @@ import org.springframework.http.MediaType;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.*;
 import org.springframework.security.core.context.*;
-import sgc.integracao.BaseIntegrationTest;
+import sgc.integracao.*;
 import sgc.organizacao.model.*;
+
 import java.util.*;
 
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.hamcrest.Matchers.*;
 
 @DisplayName("PainelController - Reprodução de Vulnerabilidade de Segurança")
 class PainelSecurityReproductionTest extends BaseIntegrationTest {

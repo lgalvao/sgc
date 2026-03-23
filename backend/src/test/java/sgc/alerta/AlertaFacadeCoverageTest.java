@@ -1,9 +1,9 @@
 package sgc.alerta;
 
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.*;
 import sgc.alerta.model.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;

@@ -1,14 +1,14 @@
 package sgc.alerta;
 
+import com.fasterxml.jackson.annotation.*;
 import io.swagger.v3.oas.annotations.*;
 import io.swagger.v3.oas.annotations.tags.*;
 import lombok.*;
 import org.springframework.http.*;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.annotation.*;
 import org.springframework.web.bind.annotation.*;
 import sgc.alerta.model.*;
-import sgc.comum.model.ComumViews;
-import com.fasterxml.jackson.annotation.JsonView;
+import sgc.comum.model.*;
 import sgc.organizacao.model.*;
 
 import java.util.*;

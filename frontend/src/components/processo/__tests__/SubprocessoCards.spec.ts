@@ -1,4 +1,4 @@
-import {describe, expect, it, vi, beforeEach} from "vitest";
+import {beforeEach, describe, expect, it, vi} from "vitest";
 import {mount} from "@vue/test-utils";
 import SubprocessoCards from "../SubprocessoCards.vue";
 import {createTestingPinia} from "@pinia/testing";

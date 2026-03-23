@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.*;
 import sgc.alerta.model.*;
 import sgc.integracao.mocks.*;
 import sgc.mapa.model.*;
+import sgc.mapa.service.*;
 import sgc.subprocesso.model.*;
 
 import java.time.*;
@@ -35,6 +36,8 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
     @Autowired
     private AnaliseRepo analiseRepo;
     @Autowired
+    private MapaManutencaoService mapaManutencaoService;
+    @Autowired
     private EntityManager entityManager;
 
     @Test
@@ -42,8 +45,8 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
     @DisplayName("Fluxo principal - Visualizar, Preparar e Disponibilizar cadastro")
     void fluxoCompletoDisponibilizacao() throws Exception {
         // SEDESENV (Unidade 8) no data.sql
-        Long SP_CODIGO = 60000L;
-        Subprocesso sp = subprocessoRepo.findById(SP_CODIGO).orElseThrow();
+        Long spCodigo = 60000L;
+        Subprocesso sp = subprocessoRepo.findById(spCodigo).orElseThrow();
 
         // Simula uma análise anterior (que deve ser exibida no histórico)
         analiseRepo.saveAndFlush(Analise.builder()
@@ -56,12 +59,12 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
                 .observacoes("Favor ajustar atividades")
                 .build());
 
-        mockMvc.perform(get("/api/subprocessos/{codigo}", SP_CODIGO))
+        mockMvc.perform(get("/api/subprocessos/{codigo}", spCodigo))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.subprocesso.codUnidade", is(8)))
                 .andExpect(jsonPath("$.subprocesso.situacao", is(SituacaoSubprocesso.NAO_INICIADO.name())));
 
-        mockMvc.perform(get("/api/subprocessos/{codigo}/historico-cadastro", SP_CODIGO))
+        mockMvc.perform(get("/api/subprocessos/{codigo}/historico-cadastro", spCodigo))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].observacoes", is("Favor ajustar atividades")));
@@ -71,12 +74,12 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
         entityManager.flush();
         entityManager.clear();
 
-        mockMvc.perform(post("/api/subprocessos/{codigo}/cadastro/disponibilizar", SP_CODIGO).with(csrf()))
+        mockMvc.perform(post("/api/subprocessos/{codigo}/cadastro/disponibilizar", spCodigo).with(csrf()))
                 .andExpect(status().isUnprocessableContent())
                 .andExpect(jsonPath("$.message").value(
                         "Situação do subprocesso não permite esta operação. Situação atual: NAO_INICIADO. Situações permitidas: MAPEAMENTO_CADASTRO_EM_ANDAMENTO"));
 
-        var spEtapa3 = subprocessoRepo.findById(SP_CODIGO).orElseThrow();
+        var spEtapa3 = subprocessoRepo.findById(spCodigo).orElseThrow();
         var competencia = competenciaRepo.save(Competencia.builder().descricao("Java").mapa(spEtapa3.getMapa()).build());
         var atividade = Atividade.builder().mapa(spEtapa3.getMapa()).descricao("Desenvolver APIs").build();
         atividade.getCompetencias().add(competencia);
@@ -88,22 +91,24 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
                 .build());
 
         entityManager.flush();
+        mapaManutencaoService.reconciliarSituacaoSubprocesso(spEtapa3);
+        entityManager.flush();
         entityManager.clear();
 
-        mockMvc.perform(get("/api/subprocessos/{codigo}", SP_CODIGO))
+        mockMvc.perform(get("/api/subprocessos/{codigo}", spCodigo))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.subprocesso.situacao", is(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO.name())));
 
         // Ação de Disponibilizar
-        mockMvc.perform(post("/api/subprocessos/{codigo}/cadastro/disponibilizar", SP_CODIGO).with(csrf()))
+        mockMvc.perform(post("/api/subprocessos/{codigo}/cadastro/disponibilizar", spCodigo).with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.mensagem", is("Cadastro de atividades disponibilizado")));
 
-        Subprocesso atualizado = subprocessoRepo.findById(SP_CODIGO).orElseThrow();
+        Subprocesso atualizado = subprocessoRepo.findById(spCodigo).orElseThrow();
 
         assertThat(atualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
 
-        List<Movimentacao> movs = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(SP_CODIGO);
+        List<Movimentacao> movs = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(spCodigo);
         assertThat(movs).isNotEmpty();
         assertThat(movs.getFirst().getDescricao()).isEqualTo("Disponibilização do cadastro de atividades");
         assertThat(movs.getFirst().getUnidadeOrigem().getSigla()).isEqualTo("SEDESENV");
@@ -121,6 +126,6 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
 
         assertThat(atualizado.getDataFimEtapa1()).isNotNull();
 
-        assertThat(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(SP_CODIGO)).isNotEmpty();
+        assertThat(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(spCodigo)).isNotEmpty();
     }
 }

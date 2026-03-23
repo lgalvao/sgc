@@ -659,29 +659,5 @@ public class SubprocessoTransicaoService {
         alertaService.criarAlertaAlteracaoDataLimite(sp.getProcesso(), sp.getUnidade(), novaDataStr, etapa);
     }
 
-    public void atualizarParaEmAndamento(Long mapaCodigo) {
-        var subprocesso = subprocessoRepo.findByMapa_Codigo(mapaCodigo).orElseThrow();
-        boolean temAtividades = !mapaManutencaoService.atividadesMapaCodigoSemRels(mapaCodigo).isEmpty();
-        TipoProcesso tipo = subprocesso.getProcesso().getTipo();
-
-        if (tipo == REVISAO) {
-            if (subprocesso.getSituacao() == NAO_INICIADO) {
-                subprocesso.setSituacao(REVISAO_CADASTRO_EM_ANDAMENTO);
-                subprocessoRepo.save(subprocesso);
-            }
-            return;
-        }
-
-        if (!temAtividades && subprocesso.getSituacao() == MAPEAMENTO_CADASTRO_EM_ANDAMENTO) {
-            subprocesso.setSituacaoForcada(NAO_INICIADO);
-            subprocessoRepo.save(subprocesso);
-            return;
-        }
-
-        if (temAtividades && subprocesso.getSituacao() == NAO_INICIADO) {
-            subprocesso.setSituacao(MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
-            subprocessoRepo.save(subprocesso);
-        }
-    }
 
 }

@@ -49,7 +49,7 @@ class SubprocessoServiceMethodsIntegrationTest extends BaseIntegrationTest {
 
         subprocesso = Subprocesso.builder()
                 .unidade(unidade)
-                .situacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO)
+                .situacao(SituacaoSubprocesso.NAO_INICIADO)
                 .processo(processo)
                 .build();
         subprocessoRepo.save(subprocesso);

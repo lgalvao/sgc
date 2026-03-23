@@ -2,8 +2,6 @@ package sgc.subprocesso.service;
 
 import lombok.*;
 import lombok.extern.slf4j.*;
-import org.springframework.beans.factory.annotation.*;
-import org.springframework.context.annotation.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
 import sgc.comum.*;
@@ -46,22 +44,10 @@ public class SubprocessoService {
     private final SgcPermissionEvaluator permissionEvaluator;
     private final MapaVisualizacaoService mapaVisualizacaoService;
     private final SubprocessoValidacaoService validacaoService;
-    @Setter
-    @Autowired
-    @Lazy
-    private SubprocessoRepo subprocessoRepo;
-    @Setter
-    @Autowired
-    @Lazy
-    private MovimentacaoRepo movimentacaoRepo;
-    @Setter
-    @Autowired
-    @Lazy
-    private CopiaMapaService copiaMapaService;
-    @Lazy
-    @Autowired
-    @Setter
-    private MapaManutencaoService mapaManutencaoService;
+    private final SubprocessoRepo subprocessoRepo;
+    private final MovimentacaoRepo movimentacaoRepo;
+    private final CopiaMapaService copiaMapaService;
+    private final MapaManutencaoService mapaManutencaoService;
     private final HierarquiaService hierarquiaService;
 
     @Transactional(readOnly = true)
@@ -114,7 +100,6 @@ public class SubprocessoService {
     @Transactional
     public SubprocessoSituacaoDto obterStatus(Long codSubprocesso) {
         Subprocesso subprocesso = buscarSubprocesso(codSubprocesso);
-        reconciliarSituacaoCadastro(subprocesso);
         return SubprocessoSituacaoDto.builder()
                 .codigo(subprocesso.getCodigo())
                 .situacao(subprocesso.getSituacao())
@@ -132,6 +117,7 @@ public class SubprocessoService {
         return subprocessoRepo.listarTodosComFetch();
     }
 
+    @Transactional(readOnly = true)
     public Subprocesso obterEntidadePorProcessoEUnidade(Long codProcesso, Long codUnidade) {
         return subprocessoRepo.buscarPorProcessoEUnidadeComFetch(codProcesso, codUnidade)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada(NOME_ENTIDADE, "P:%d U:%d".formatted(codProcesso, codUnidade)));
@@ -235,36 +221,8 @@ public class SubprocessoService {
         return (destino != null) ? destino : sp.getUnidade();
     }
 
-
     @Transactional
-    public void atualizarParaEmAndamento(Long mapaCodigo) {
-        var subprocesso = subprocessoRepo.findByMapa_Codigo(mapaCodigo).orElseThrow();
-        boolean temAtividades = !mapaManutencaoService.atividadesMapaCodigoSemRels(mapaCodigo).isEmpty();
-        SituacaoSubprocesso situacaoAtual = subprocesso.getSituacao();
-        TipoProcesso tipoProcesso = subprocesso.getProcesso().getTipo();
-
-        if (tipoProcesso == TipoProcesso.REVISAO) {
-            if (situacaoAtual == NAO_INICIADO) {
-                subprocesso.setSituacao(REVISAO_CADASTRO_EM_ANDAMENTO);
-                subprocessoRepo.save(subprocesso);
-            }
-            return;
-        }
-
-        if (!temAtividades && situacaoAtual == MAPEAMENTO_CADASTRO_EM_ANDAMENTO) {
-            subprocesso.setSituacaoForcada(NAO_INICIADO);
-            subprocessoRepo.save(subprocesso);
-            return;
-        }
-
-        if (temAtividades && situacaoAtual == NAO_INICIADO) {
-            subprocesso.setSituacao(MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
-            subprocessoRepo.save(subprocesso);
-        }
-    }
-
     public void criarParaMapeamento(Processo processo, Collection<Unidade> unidades, Unidade unidadeOrigem, Usuario usuario) {
-        log.info("Iniciando criação de subprocessos para mapeamento no processo {}", processo.getCodigo());
         List<Unidade> unidadesElegiveis = unidades.stream()
                 .filter(u -> {
                     TipoUnidade tipo = u.getTipo();
@@ -277,7 +235,6 @@ public class SubprocessoService {
         }
 
         log.info("Criando {} subprocessos para o processo {}", unidadesElegiveis.size(), processo.getCodigo());
-
         List<Subprocesso> subprocessos = unidadesElegiveis.stream()
                 .map(unidade -> Subprocesso.builder()
                         .processo(processo)
@@ -316,15 +273,14 @@ public class SubprocessoService {
     }
 
     public void criarParaRevisao(Processo processo, Unidade unidade, UnidadeMapa unidadeMapa, Unidade unidadeOrigem, Usuario usuario) {
-        log.info("Criando subprocesso para unidade {} no processo {}", unidade.getSigla(), processo.getCodigo());
-        criarSubprocessoComMapa(processo, unidade, unidadeMapa, unidadeOrigem, usuario,
-                NAO_INICIADO, "Processo iniciado");
+        criarSubprocessoComMapa(processo, unidade, unidadeMapa, unidadeOrigem, usuario, NAO_INICIADO, "Processo iniciado");
+        log.info("Criado subprocesso para unidade {}", unidade.getSigla());
     }
 
     public void criarParaDiagnostico(Processo processo, Unidade unidade, UnidadeMapa unidadeMapa, Unidade unidadeOrigem, Usuario usuario) {
         Subprocesso subprocessoSalvo = criarSubprocessoComMapa(processo, unidade, unidadeMapa, unidadeOrigem, usuario,
                 SituacaoSubprocesso.DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO, "Processo de diagnóstico iniciado");
-        log.info("Subprocesso {} para diagnóstico criado para unidade {}", subprocessoSalvo.getCodigo(), unidade.getSigla());
+        log.info("Criado subprocesso {} para unidade {}", subprocessoSalvo.getCodigo(), unidade.getSigla());
     }
 
     private Subprocesso criarSubprocessoComMapa(Processo processo, Unidade unidade, UnidadeMapa unidadeMapa,
@@ -343,6 +299,7 @@ public class SubprocessoService {
 
         Mapa mapaCopiado = copiaMapaService.copiarMapaParaUnidade(codMapaVigente);
         mapaCopiado.setSubprocesso(subprocessoSalvo);
+
         Mapa mapaSalvo = mapaManutencaoService.salvarMapa(mapaCopiado);
         subprocessoSalvo.setMapa(mapaSalvo);
 
@@ -366,6 +323,8 @@ public class SubprocessoService {
         boolean temNovasCompetencias = !request.competencias().isEmpty();
 
         Mapa mapa = mapaSalvamentoService.salvarMapaCompleto(codMapa, request);
+        mapaManutencaoService.reconciliarSituacaoSubprocesso(subprocesso);
+
         if (eraVazio && temNovasCompetencias) {
             atualizarSituacaoMapaVazio(subprocesso, false);
         }
@@ -404,6 +363,7 @@ public class SubprocessoService {
         mapaManutencaoService.removerCompetencia(codCompetencia);
 
         boolean ficouVazio = mapaManutencaoService.competenciasCodMapa(codMapa).isEmpty();
+        mapaManutencaoService.reconciliarSituacaoSubprocesso(subprocesso);
         if (ficouVazio) {
             atualizarSituacaoMapaVazio(subprocesso, true);
         }
@@ -462,7 +422,6 @@ public class SubprocessoService {
 
     @Transactional(readOnly = true)
     public MapaAjusteDto obterMapaParaAjuste(Long codSubprocesso) {
-        log.info("Recuperando mapa para ajustes do subprocesso {}", codSubprocesso);
         Subprocesso sp = subprocessoRepo.buscarPorCodigoComMapaEAtividades(codSubprocesso).orElseThrow(() -> new ErroEntidadeNaoEncontrada(NOME_ENTIDADE, codSubprocesso));
         Long codMapa = sp.getMapa().getCodigo();
 
@@ -537,7 +496,6 @@ public class SubprocessoService {
 
     public SubprocessoDetalheResponse obterDetalhes(Long codigo, Usuario usuarioAutenticado) {
         Subprocesso sp = subprocessoRepo.buscarPorCodigoComMapaEAtividades(codigo).orElseThrow();
-        reconciliarSituacaoCadastro(sp);
         return obterDetalhes(sp, usuarioAutenticado);
     }
 
@@ -576,7 +534,6 @@ public class SubprocessoService {
     public ContextoEdicaoResponse obterContextoEdicao(Long codSubprocesso) {
         Usuario usuario = usuarioFacade.usuarioAutenticado();
         Subprocesso sp = subprocessoRepo.buscarPorCodigoComMapaEAtividades(codSubprocesso).orElseThrow();
-        reconciliarSituacaoCadastro(sp);
         SubprocessoDetalheResponse detalhes = obterDetalhes(sp, usuario);
 
         Unidade unidadeSp = sp.getUnidade();
@@ -589,31 +546,6 @@ public class SubprocessoService {
                 mapaManutencaoService.mapaCompletoSubprocesso(codSubprocesso),
                 atividades
         );
-    }
-
-    private void reconciliarSituacaoCadastro(Subprocesso subprocesso) {
-        if (subprocesso.getMapa() == null) {
-            return;
-        }
-
-        TipoProcesso tipoProcesso = subprocesso.getProcesso().getTipo();
-        if (tipoProcesso != TipoProcesso.MAPEAMENTO) {
-            return;
-        }
-
-        boolean temAtividades = !mapaManutencaoService.atividadesMapaCodigoSemRels(subprocesso.getMapa().getCodigo()).isEmpty();
-        SituacaoSubprocesso situacaoAtual = subprocesso.getSituacao();
-
-        if (temAtividades && situacaoAtual == NAO_INICIADO) {
-            subprocesso.setSituacao(MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
-            subprocessoRepo.save(subprocesso);
-            return;
-        }
-
-        if (!temAtividades && situacaoAtual == MAPEAMENTO_CADASTRO_EM_ANDAMENTO) {
-            subprocesso.setSituacaoForcada(NAO_INICIADO);
-            subprocessoRepo.save(subprocesso);
-        }
     }
 
     public PermissoesSubprocessoDto obterPermissoesUI(Subprocesso sp, Usuario usuario) {

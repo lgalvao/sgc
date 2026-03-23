@@ -178,6 +178,36 @@ public class ArchConsistencyTest {
      * houver necessidade legítima de referências mútuas.
      */
     @ArchTest
+    static final ArchRule no_lazy_annotation_allowed = classes()
+            .should(new ArchCondition<>("não utilizar @Lazy") {
+                @Override
+                public void check(JavaClass item, ConditionEvents events) {
+                    String lazyAnnotation = "org.springframework.context.annotation.Lazy";
+                    if (item.isAnnotatedWith(lazyAnnotation)) {
+                        events.add(SimpleConditionEvent.violated(item, item.getName() + " está anotada com @Lazy"));
+                    }
+                    item.getFields().stream()
+                            .filter(f -> f.isAnnotatedWith(lazyAnnotation))
+                            .forEach(f -> events.add(SimpleConditionEvent.violated(f, f.getFullName() + " está anotada com @Lazy")));
+
+                    item.getMethods().stream()
+                            .filter(m -> m.isAnnotatedWith(lazyAnnotation))
+                            .forEach(m -> events.add(SimpleConditionEvent.violated(m, m.getFullName() + " está anotada com @Lazy")));
+
+                    item.getConstructors().stream()
+                            .forEach(c -> {
+                                if (c.isAnnotatedWith(lazyAnnotation)) {
+                                    events.add(SimpleConditionEvent.violated(c, c.getFullName() + " está anotada com @Lazy"));
+                                }
+                                c.getParameters().stream()
+                                        .filter(p -> p.isAnnotatedWith(lazyAnnotation))
+                                        .forEach(p -> events.add(SimpleConditionEvent.violated(p, "Parâmetro em " + c.getFullName() + " está anotado com @Lazy")));
+                            });
+                }
+            })
+            .because("O uso de @Lazy deve ser evitado em favor de injeção por construtor e quebra de dependências circulares");
+
+    @ArchTest
     static final ArchRule no_cycles_within_service_packages = slices()
             .matching("sgc.(*).service.(**)")
             .should()

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.*;
 import lombok.*;
 import lombok.extern.slf4j.*;
 import org.jspecify.annotations.*;
+import org.springframework.boot.autoconfigure.condition.*;
 import org.springframework.context.annotation.*;
 import org.springframework.core.io.*;
 import org.springframework.jdbc.core.*;
@@ -30,8 +31,6 @@ import java.time.*;
 import java.util.*;
 import java.util.function.*;
 import java.util.stream.*;
-
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 @SuppressWarnings("JvmTaintAnalysis")
 @RestController

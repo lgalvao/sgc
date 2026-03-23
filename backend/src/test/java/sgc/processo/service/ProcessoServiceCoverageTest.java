@@ -1,13 +1,13 @@
 package sgc.processo.service;
 
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.*;
 import sgc.alerta.*;
 import sgc.comum.erros.*;
 import sgc.comum.model.*;
-import sgc.organizacao.UsuarioFacade;
+import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
 import sgc.processo.dto.*;
