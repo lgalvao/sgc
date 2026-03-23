@@ -66,7 +66,7 @@ function extractMethodInfo(sourceContent, lineNumbers) {
         // Procurar o método que contém esta linha (andando para trás)
         for (let i = nr - 1; i >= 0; i--) {
             const line = lines[i].trim();
-            const methodMatch = line.match(/(?:public|protected|private|static|\s) +[\w<>\[\], ]+ +(\w+) *\(/);
+            const methodMatch = line.match(/(?:public|protected|private|static|\s) +[\w<>[], ]+ +(\w+) *\(/);
             if (methodMatch && !line.includes('class ') && !line.includes('return ')) {
                 const methodName = methodMatch[1];
                 if (!methods.has(methodName)) {
