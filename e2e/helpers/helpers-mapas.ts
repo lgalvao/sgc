@@ -3,14 +3,7 @@ import {calcularDataLimite} from './helpers-processos.js';
 import {limparNotificacoes, verificarPaginaPainel, verificarToast} from './helpers-navegacao.js';
 import {TEXTOS} from '../../frontend/src/constants/textos.js';
 
-function extrairRotaSubprocesso(page: Page): { codigoProcesso: string; siglaUnidade: string } {
-    const match = /\/processo\/(\d+)\/([A-Z0-9_]+)/.exec(page.url());
-    expect(match).not.toBeNull();
-    return {
-        codigoProcesso: match![1],
-        siglaUnidade: match![2]
-    };
-}
+
 
 export async function navegarParaMapa(page: Page) {
     // Aguardar o carregamento do subprocesso antes de verificar os cards
@@ -21,10 +14,13 @@ export async function navegarParaMapa(page: Page) {
 
     await expect(cardEdicao.or(cardVisualizacao)).toBeVisible();
 
-    const {codigoProcesso, siglaUnidade} = extrairRotaSubprocesso(page);
-    const rotaMapa = (await cardEdicao.isVisible()) ? 'mapa' : 'vis-mapa';
-    await page.goto(`/processo/${codigoProcesso}/${siglaUnidade}/${rotaMapa}`);
-    await expect(page).toHaveURL(new RegExp(String.raw`/processo/${codigoProcesso}/${siglaUnidade}/${rotaMapa}$`));
+    if (await cardEdicao.isVisible()) {
+        await cardEdicao.click();
+    } else {
+        await cardVisualizacao.click();
+    }
+
+    await page.waitForURL(/\/(mapa|vis-mapa)$/);
     await expect(page.getByRole('heading', {name: TEXTOS.mapa.TITULO_TECNICO})).toBeVisible();
 }
 
@@ -47,8 +43,9 @@ export async function criarCompetencia(page: Page, descricao: string, atividades
     await page.getByTestId('inp-criar-competencia-descricao').fill(descricao);
 
     for (const atividade of atividades) {
-        const cardAtividade = modal.locator('.atividade-card-item', {hasText: atividade});
-        await cardAtividade.getByRole('checkbox').click();
+        const checkbox = modal.getByLabel(atividade, {exact: true});
+        await expect(checkbox).toBeVisible();
+        await checkbox.click();
     }
 
     await page.getByTestId('btn-criar-competencia-salvar').click();
@@ -58,7 +55,7 @@ export async function criarCompetencia(page: Page, descricao: string, atividades
 }
 
 export async function editarCompetencia(page: Page, descricaoAtual: string, novaDescricao: string, novasAtividades?: string[], removerAtividades?: string[]) {
-    const card = page.locator('.competencia-card', {has: page.getByText(descricaoAtual, {exact: true})});
+    const card = page.getByTestId('cad-mapa__card-competencia').filter({has: page.getByText(descricaoAtual, {exact: true})});
     const editButton = card.getByTestId('btn-editar-competencia');
 
     // Hover on the card to trigger CSS hover state (buttons use card-level hover now)
@@ -77,15 +74,13 @@ export async function editarCompetencia(page: Page, descricaoAtual: string, nova
 
     if (removerAtividades) {
         for (const atividade of removerAtividades) {
-            // Click on the label containing the activity text to toggle the checkbox
-            await modal.locator('label').filter({hasText: atividade}).click();
+            await modal.getByLabel(atividade, {exact: true}).click();
         }
     }
 
     if (novasAtividades) {
         for (const atividade of novasAtividades) {
-            // Click on the label containing the activity text to toggle the checkbox
-            await modal.locator('label').filter({hasText: atividade}).click();
+            await modal.getByLabel(atividade, {exact: true}).click();
         }
     }
 
@@ -99,7 +94,7 @@ export async function editarCompetencia(page: Page, descricaoAtual: string, nova
  * Exclui competência confirmando a ação no modal
  */
 export async function excluirCompetenciaConfirmando(page: Page, descricao: string) {
-    const card = page.locator('.competencia-card', {has: page.getByText(descricao, {exact: true})});
+    const card = page.getByTestId('cad-mapa__card-competencia').filter({has: page.getByText(descricao, {exact: true})});
     await card.hover();
     await card.getByTestId('btn-excluir-competencia').click();
 
@@ -107,7 +102,10 @@ export async function excluirCompetenciaConfirmando(page: Page, descricao: strin
     await expect(modal).toBeVisible();
     await expect(modal).toContainText(descricao);
 
-    await page.getByRole('button', {name: 'Confirmar'}).click();
+    const btnConfirmar = modal.getByTestId('btn-confirmar-exclusao-competencia');
+    await btnConfirmar.waitFor({ state: 'visible', timeout: 5000 });
+    await btnConfirmar.scrollIntoViewIfNeeded();
+    await btnConfirmar.click();
     await expect(modal).toBeHidden();
     await expect(page.getByText(descricao, {exact: true})).toBeHidden();
 }
@@ -116,7 +114,7 @@ export async function excluirCompetenciaConfirmando(page: Page, descricao: strin
  * Exclui competência cancelando a ação no modal
  */
 export async function excluirCompetenciaCancelando(page: Page, descricao: string) {
-    const card = page.locator('.competencia-card', {has: page.getByText(descricao, {exact: true})});
+    const card = page.getByTestId('cad-mapa__card-competencia').filter({has: page.getByText(descricao, {exact: true})});
     await card.hover();
     await card.getByTestId('btn-excluir-competencia').click();
 
@@ -124,13 +122,13 @@ export async function excluirCompetenciaCancelando(page: Page, descricao: string
     await expect(modal).toBeVisible();
     await expect(modal).toContainText(descricao);
 
-    await page.getByRole('button', {name: 'Cancelar'}).click();
+    await modal.getByTestId('btn-modal-confirmacao-cancelar').click();
     await expect(modal).toBeHidden();
     await expect(page.getByText(descricao, {exact: true})).toBeVisible();
 }
 
 export async function verificarCompetenciaNoMapa(page: Page, descricao: string, atividades: string[]) {
-    const card = page.locator('.competencia-card', {has: page.getByText(descricao, {exact: true})});
+    const card = page.getByTestId('cad-mapa__card-competencia').filter({has: page.getByText(descricao, {exact: true})});
     await expect(card).toBeVisible();
 
     for (const atividade of atividades) {

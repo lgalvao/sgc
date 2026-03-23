@@ -3,6 +3,7 @@
       :fade="false"
       :model-value="mostrar"
       centered
+      data-testid="mdl-historico-analise"
       size="lg"
       title="Histórico de análise"
       @hide="fechar"

@@ -2,11 +2,13 @@
   <BCard
       :class="{'atividade-com-erro': !!erroValidacao}"
       class="mb-3 atividade-card"
+      data-testid="cad-atividades__card-atividade"
       no-body
   >
     <BCardBody class="py-2 position-relative">
       <BCardTitle
           :class="{'atividade-hover-row': !emEdicao}"
+          :data-testid="!emEdicao ? 'cad-atividades__hover-row' : undefined"
           class="d-flex align-items-center atividade-titulo-card"
       >
         <InlineEditor
@@ -64,6 +66,7 @@
             v-for="conhecimento in atividade.conhecimentos"
             :key="conhecimento.codigo"
             class="d-flex align-items-center mb-2 group-conhecimento position-relative conhecimento-hover-row"
+            data-testid="cad-atividades__item-conhecimento"
         >
           <InlineEditor
               :can-edit="podeEditar"

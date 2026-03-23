@@ -2,14 +2,7 @@ import {expect, type Page} from '@playwright/test';
 import {limparNotificacoes, verificarPaginaPainel, verificarToast} from './helpers-navegacao.js';
 import {TEXTOS} from '../../frontend/src/constants/textos.js';
 
-function extrairRotaSubprocesso(page: Page): { codigoProcesso: string; siglaUnidade: string } {
-    const match = /\/processo\/(\d+)\/([A-Z0-9_]+)/.exec(page.url());
-    expect(match).not.toBeNull();
-    return {
-        codigoProcesso: match![1],
-        siglaUnidade: match![2]
-    };
-}
+
 
 export async function navegarParaAtividades(page: Page) {
     const card = page.getByTestId('card-subprocesso-atividades');
@@ -22,9 +15,10 @@ export async function navegarParaAtividades(page: Page) {
 }
 
 export async function navegarParaAtividadesVisualizacao(page: Page) {
-    const {codigoProcesso, siglaUnidade} = extrairRotaSubprocesso(page);
-    await page.goto(`/processo/${codigoProcesso}/${siglaUnidade}/vis-cadastro`);
-    await expect(page).toHaveURL(new RegExp(String.raw`/processo/${codigoProcesso}/${siglaUnidade}/vis-cadastro$`));
+    const card = page.getByTestId('card-subprocesso-atividades-vis');
+    await expect(card).toBeVisible();
+    await card.click();
+    await page.waitForURL(/\/vis-cadastro$/);
     await expect(page.getByRole('heading', {name: TEXTOS.atividades.TITULO})).toBeVisible();
 }
 
@@ -37,7 +31,7 @@ export async function adicionarAtividade(page: Page, descricao: string) {
 }
 
 export async function adicionarConhecimento(page: Page, atividadeDescricao: string | RegExp, conhecimentoDescricao: string) {
-    const card = page.locator('.atividade-card').filter({has: page.getByText(atividadeDescricao)});
+    const card = page.getByTestId('cad-atividades__card-atividade').filter({has: page.getByText(atividadeDescricao)});
     await card.getByTestId('inp-novo-conhecimento').fill(conhecimentoDescricao);
 
     const responsePromise = page.waitForResponse(resp => resp.url().includes('/conhecimentos') && resp.status() === 201);
@@ -48,11 +42,8 @@ export async function adicionarConhecimento(page: Page, atividadeDescricao: stri
 }
 
 export async function editarAtividade(page: Page, descricaoAtual: string | RegExp, novaDescricao: string) {
-    const card = page.locator('.atividade-card').filter({has: page.getByText(descricaoAtual)});
+    const card = page.getByTestId('cad-atividades__card-atividade').filter({has: page.getByText(descricaoAtual)});
     const editButton = card.getByTestId('btn-editar-atividade');
-
-    // Forçar clique pois o botão só aparece no hover, o que pode ser instável em CI
-    // eslint-disable-next-line playwright/no-force-option
     await editButton.click({force: true});
 
     const input = page.getByTestId('inp-editar-atividade');
@@ -64,10 +55,9 @@ export async function editarAtividade(page: Page, descricaoAtual: string | RegEx
 }
 
 export async function cancelarEdicaoAtividade(page: Page, descricaoAtual: string | RegExp, textoCancelado: string) {
-    const card = page.locator('.atividade-card').filter({has: page.getByText(descricaoAtual)});
+    const card = page.getByTestId('cad-atividades__card-atividade').filter({has: page.getByText(descricaoAtual)});
     const editButton = card.getByTestId('btn-editar-atividade');
 
-    // eslint-disable-next-line playwright/no-force-option
     await editButton.click({force: true});
 
     const input = page.getByTestId('inp-editar-atividade');
@@ -79,8 +69,8 @@ export async function cancelarEdicaoAtividade(page: Page, descricaoAtual: string
 }
 
 export async function removerAtividade(page: Page, descricao: string | RegExp) {
-    const card = page.locator('.atividade-card').filter({has: page.getByText(descricao)});
-    const row = card.locator('.atividade-hover-row');
+    const card = page.getByTestId('cad-atividades__card-atividade').filter({has: page.getByText(descricao)});
+    const row = card.getByTestId('cad-atividades__hover-row');
     const btnRemover = card.getByTestId('btn-remover-atividade');
 
     await row.hover();
@@ -94,8 +84,8 @@ export async function removerAtividade(page: Page, descricao: string | RegExp) {
 }
 
 export async function editarConhecimento(page: Page, atividadeDescricao: string | RegExp, conhecimentoAtual: string, novoConhecimento: string) {
-    const card = page.locator('.atividade-card', {has: page.getByText(atividadeDescricao)});
-    const linhaConhecimento = card.locator('.group-conhecimento', {hasText: conhecimentoAtual});
+    const card = page.getByTestId('cad-atividades__card-atividade').filter({has: page.getByText(atividadeDescricao)});
+    const linhaConhecimento = card.getByTestId('cad-atividades__item-conhecimento').filter({hasText: conhecimentoAtual});
     const btnEditar = linhaConhecimento.getByTestId('btn-editar-conhecimento');
 
     await linhaConhecimento.hover();
@@ -111,8 +101,8 @@ export async function editarConhecimento(page: Page, atividadeDescricao: string 
 }
 
 export async function cancelarEdicaoConhecimento(page: Page, atividadeDescricao: string | RegExp, conhecimentoAtual: string, textoCancelado: string) {
-    const card = page.locator('.atividade-card', {has: page.getByText(atividadeDescricao)});
-    const linhaConhecimento = card.locator('.group-conhecimento', {hasText: conhecimentoAtual});
+    const card = page.getByTestId('cad-atividades__card-atividade').filter({has: page.getByText(atividadeDescricao)});
+    const linhaConhecimento = card.getByTestId('cad-atividades__item-conhecimento').filter({hasText: conhecimentoAtual});
     const btnEditar = linhaConhecimento.getByTestId('btn-editar-conhecimento');
 
     await linhaConhecimento.hover();
@@ -128,8 +118,8 @@ export async function cancelarEdicaoConhecimento(page: Page, atividadeDescricao:
 }
 
 export async function removerConhecimento(page: Page, atividadeDescricao: string | RegExp, conhecimento: string) {
-    const card = page.locator('.atividade-card').filter({has: page.getByText(atividadeDescricao)});
-    const linhaConhecimento = card.locator('.group-conhecimento', {hasText: conhecimento});
+    const card = page.getByTestId('cad-atividades__card-atividade').filter({has: page.getByText(atividadeDescricao)});
+    const linhaConhecimento = card.getByTestId('cad-atividades__item-conhecimento').filter({hasText: conhecimento});
     const btnRemover = linhaConhecimento.getByTestId('btn-remover-conhecimento');
 
     await linhaConhecimento.hover();
@@ -144,13 +134,15 @@ export async function removerConhecimento(page: Page, atividadeDescricao: string
 
 export async function disponibilizarCadastro(page: Page) {
     await limparNotificacoes(page);
-    await page.getByTestId('btn-cad-atividades-disponibilizar').click();
+    const botao = page.getByTestId('btn-cad-atividades-disponibilizar');
+    await expect(botao).toBeEnabled();
+    await botao.click();
 
     const modal = page.getByRole('dialog');
     await expect(modal).toBeVisible();
     
     const btnConfirmar = page.getByTestId('btn-confirmar-disponibilizacao');
-    await expect(btnConfirmar).toBeVisible();
+    await expect(btnConfirmar).toBeEnabled();
     await btnConfirmar.click();
     await verificarToast(page, /disponibilizada?|Disponibilizado/i);
     await verificarPaginaPainel(page);
@@ -205,58 +197,59 @@ export async function fecharModalImpacto(page: Page) {
     await expect(page.getByRole('dialog')).toBeHidden();
 }
 
-export async function selecionarAtividadesParaImportacao(page: Page, processoOrigemDescricao: string, unidadeOrigemSigla: string, atividadesDescricoes: string[]) {
-    const btnEmptyState = page.getByTestId('btn-empty-state-importar');
-    
-    if (await btnEmptyState.isVisible()) {
-        await btnEmptyState.click();
-    } else {
-        await page.getByTestId('btn-cad-atividades-importar').click();
-    }
-
+async function preencherFormularioImportacao(page: Page, processoOrigemDescricao: string, unidadeOrigemSigla: string, atividadesDescricoes: string[]) {
     const modal = page.getByRole('dialog');
     await expect(modal.getByText(TEXTOS.atividades.MODAL_IMPORTAR_TITULO)).toBeVisible();
 
-    await modal.getByTestId('select-processo').selectOption({ label: processoOrigemDescricao });
+    const selectProcesso = modal.getByTestId('select-processo');
     const selectUnidade = modal.getByTestId('select-unidade');
-    await expect(selectUnidade).toBeEnabled();
 
-    let valorOpcaoUnidade: string | null = null;
-    await expect.poll(async () => {
-        valorOpcaoUnidade = await selectUnidade.locator('option').evaluateAll((options, sigla) => {
-            const opcao = options.find(option => option.textContent?.includes(sigla));
-            return opcao?.getAttribute('value') ?? null;
-        }, unidadeOrigemSigla);
-        return valorOpcaoUnidade;
-    }, { timeout: 10000 }).not.toBeNull();
-
-    const respostaAtividades = page.waitForResponse(response =>
-        response.request().method() === 'GET' &&
-        response.url().includes('/atividades-importacao')
+    // 1. Aguardar o processo aparecer no select e selecionar
+    await expect(selectProcesso.locator('option', { hasText: processoOrigemDescricao })).toBeAttached();
+    
+    const respostaUnidades = page.waitForResponse(r => 
+        r.url().includes('/unidades-importacao')
     );
-    await selectUnidade.evaluate((elemento, valor) => {
-        const select = elemento as HTMLSelectElement;
-        select.value = String(valor);
-        select.dispatchEvent(new Event('input', { bubbles: true }));
-        select.dispatchEvent(new Event('change', { bubbles: true }));
-    }, valorOpcaoUnidade);
-    const response = await respostaAtividades;
-    expect(response.ok()).toBeTruthy();
+    await selectProcesso.selectOption({ label: processoOrigemDescricao });
+    await respostaUnidades;
 
-    await expect.poll(async () => {
-        const quantidadeCheckboxes = await modal.locator('input[type="checkbox"]').count();
-        const estadoVazio = await modal.getByText(TEXTOS.atividades.importacao.NENHUMA_ATIVIDADE).isVisible()
-            .catch(() => false);
-        return quantidadeCheckboxes > 0 || estadoVazio;
-    }, { timeout: 10000 }).toBeTruthy();
+    // 2. Aguardar a unidade aparecer no select e selecionar
+    await expect(selectUnidade).toBeEnabled();
+    await expect(selectUnidade.locator('option', { hasText: unidadeOrigemSigla })).toBeAttached();
 
+    const respostaAtividades = page.waitForResponse(r =>
+        r.url().includes('/atividades-importacao')
+    );
+    await selectUnidade.selectOption({ label: unidadeOrigemSigla });
+    await respostaAtividades;
+
+    // 3. Aguardar as atividades aparecerem (checkboxes) ou o estado vazio
+    const primeiroCheckbox = modal.locator('input[type="checkbox"]').first();
+    const textoVazio = modal.getByText(TEXTOS.atividades.importacao.NENHUMA_ATIVIDADE);
+    await expect(primeiroCheckbox.or(textoVazio)).toBeVisible();
+
+    // 4. Selecionar as atividades solicitadas
     for (const desc of atividadesDescricoes) {
-        const checkbox = modal.locator('.form-check')
-            .filter({ hasText: desc })
-            .locator('input[type="checkbox"]');
+        const checkbox = modal.getByLabel(desc, { exact: true }).first();
         await expect(checkbox).toBeVisible();
         await checkbox.check();
     }
+}
+
+export async function selecionarAtividadesParaImportacao(page: Page, processoOrigemDescricao: string, unidadeOrigemSigla: string, atividadesDescricoes: string[]) {
+    await Promise.all([
+        page.waitForResponse(r => r.url().includes('/para-importacao')),
+        page.getByTestId('btn-cad-atividades-importar').click()
+    ]);
+    await preencherFormularioImportacao(page, processoOrigemDescricao, unidadeOrigemSigla, atividadesDescricoes);
+}
+
+export async function selecionarAtividadesParaImportacaoVazia(page: Page, processoOrigemDescricao: string, unidadeOrigemSigla: string, atividadesDescricoes: string[]) {
+    await Promise.all([
+        page.waitForResponse(r => r.url().includes('/para-importacao')),
+        page.getByTestId('btn-empty-state-importar').click()
+    ]);
+    await preencherFormularioImportacao(page, processoOrigemDescricao, unidadeOrigemSigla, atividadesDescricoes);
 }
 
 export async function importarAtividades(page: Page,
@@ -268,6 +261,24 @@ export async function importarAtividades(page: Page,
 
     const modal = page.getByRole('dialog');
     await modal.getByTestId('btn-importar').click();
+
+    await expect(modal).toBeHidden();
+
+    for (const desc of atividadesDescricoes) {
+        await expect(page.getByText(desc, { exact: true }).first()).toBeVisible();
+    }
+}
+
+export async function importarAtividadesVazia(page: Page,
+                                              processoOrigemDescricao: string,
+                                              unidadeOrigemSigla: string,
+                                              atividadesDescricoes: string[]) {
+
+    await selecionarAtividadesParaImportacaoVazia(page, processoOrigemDescricao, unidadeOrigemSigla, atividadesDescricoes);
+
+    const modal = page.getByRole('dialog');
+    await modal.getByTestId('btn-importar').click();
+
     await expect(modal).toBeHidden();
 
     for (const desc of atividadesDescricoes) {
@@ -284,38 +295,54 @@ export async function importarAtividadesComAvisoDuplicidade(page: Page, processo
     await expect(modal).toBeHidden();
 }
 
-export async function verificarOpcoesImportacao(
+async function realizarVerificacaoOpcoesImportacao(
     page: Page,
     opcoesEsperadas: Array<{ processo: string; unidades: string[] }>
 ) {
-    const btnEmptyState = page.getByTestId('btn-empty-state-importar');
-    
-    if (await btnEmptyState.isVisible()) {
-        await btnEmptyState.click();
-    } else {
-        await page.getByTestId('btn-cad-atividades-importar').click();
-    }
-
     const modal = page.getByRole('dialog');
     await expect(modal.getByText(TEXTOS.atividades.MODAL_IMPORTAR_TITULO)).toBeVisible();
 
     const selectProcesso = modal.getByTestId('select-processo');
-    const processosEsperados = opcoesEsperadas.map(opcao => opcao.processo);
-    await expect.poll(async () => {
-        const options = await selectProcesso.locator('option').allTextContents();
-        return processosEsperados.every(proc => options.some(opt => opt.includes(proc)));
-    }, { timeout: 10000 }).toBeTruthy();
-
     const selectUnidade = modal.getByTestId('select-unidade');
+
     for (const opcao of opcoesEsperadas) {
+        // Aguardar cada processo aparecer como opção — auto-wait sem poll
+        await expect(selectProcesso.locator('option', { hasText: opcao.processo })).toBeAttached();
+        
+        const respostaUnidades = page.waitForResponse(r => 
+            r.url().includes('/unidades-importacao')
+        );
         await selectProcesso.selectOption({ label: opcao.processo });
+        await respostaUnidades;
+
         await expect(selectUnidade).toBeEnabled();
 
-        await expect.poll(async () => {
-            const options = await selectUnidade.locator('option').allTextContents();
-            return opcao.unidades.every(unidade => options.some(opt => opt.includes(unidade)));
-        }, { timeout: 10000 }).toBeTruthy();
+        for (const unidade of opcao.unidades) {
+            await expect(selectUnidade.locator('option', { hasText: unidade })).toBeAttached();
+        }
     }
 
     await modal.getByTestId('importar-atividades-modal__btn-modal-cancelar').click();
 }
+
+export async function verificarOpcoesImportacao(
+    page: Page,
+    opcoesEsperadas: Array<{ processo: string; unidades: string[] }>
+) {
+    const respostaProcessos = page.waitForResponse(r => r.url().includes('/para-importacao'));
+    await page.getByTestId('btn-cad-atividades-importar').click();
+    await respostaProcessos;
+    await realizarVerificacaoOpcoesImportacao(page, opcoesEsperadas);
+}
+
+export async function verificarOpcoesImportacaoVazia(
+    page: Page,
+    opcoesEsperadas: Array<{ processo: string; unidades: string[] }>
+) {
+    const respostaProcessos = page.waitForResponse(r => r.url().includes('/para-importacao'));
+    await page.getByTestId('btn-empty-state-importar').click();
+    await respostaProcessos;
+    await realizarVerificacaoOpcoesImportacao(page, opcoesEsperadas);
+}
+
+

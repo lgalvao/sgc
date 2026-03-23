@@ -1,0 +1,167 @@
+import {test, expect} from '@playwright/test';
+import * as AuthHelpers from './helpers/helpers-auth.js';
+import * as ProcessoHelpers from './helpers/helpers-processos.js';
+import * as AtividadeHelpers from './helpers/helpers-atividades.js';
+import * as MapaHelpers from './helpers/helpers-mapas.js';
+import * as AnaliseHelpers from './helpers/helpers-analise.js';
+import {fazerLogout} from './helpers/helpers-navegacao.js';
+
+test.describe('Jornada do Ciclo de Vida Completo do SGC', () => {
+    // Timeout estendido para cobrir mapeamento + revisão (3 minutos)
+    test.setTimeout(180_000);
+
+    const descricaoMapeamento = `Mapeamento Ciclo Completo ${Date.now()}`;
+    const descricaoRevisao = `Revisão Ciclo Completo ${Date.now()}`;
+    const siglaUnidade = 'ASSESSORIA_11'; // Unidade alvo (David Bowie)
+
+    test.beforeEach(async ({request}) => {
+        // Reset do banco de dados para garantir estado limpo
+        const response = await request.post('/e2e/reset-database');
+        expect(response.ok()).toBeTruthy();
+    });
+
+    test('Ciclo Completo: Mapeamento -> Mapa -> Revisão', async ({page}) => {
+        // ---------------------------------------------------------------------
+        // PARTE 1: MAPEAMENTO INICIAL (Ciclo de Cadastro)
+        // ---------------------------------------------------------------------
+
+        // 1. ADMIN cria o processo
+        await AuthHelpers.login(page, AuthHelpers.USUARIOS.ADMIN_1_PERFIL.titulo, AuthHelpers.USUARIOS.ADMIN_1_PERFIL.senha);
+        await ProcessoHelpers.criarProcesso(page, {
+            descricao: descricaoMapeamento,
+            tipo: 'MAPEAMENTO',
+            unidade: [siglaUnidade],
+            expandir: ['SECRETARIA_1'],
+            iniciar: true
+        });
+        await fazerLogout(page);
+
+        // 2. CHEFE (David Bowie) preenche as atividades
+        await AuthHelpers.login(page, AuthHelpers.USUARIOS.CHEFE_ASSESSORIA_11.titulo, AuthHelpers.USUARIOS.CHEFE_ASSESSORIA_11.senha);
+        await AnaliseHelpers.acessarSubprocessoChefeDireto(page, descricaoMapeamento, siglaUnidade);
+        await AtividadeHelpers.navegarParaAtividades(page);
+        
+        // Importa atividades de um processo base (Seed 200)
+        await AtividadeHelpers.importarAtividadesVazia(page, 'Processo Seed 200', 'SECRETARIA_1', ['Atividade 1']);
+        
+        // Disponibiliza o cadastro para o Gestor
+        await AtividadeHelpers.disponibilizarCadastro(page);
+        await fazerLogout(page);
+
+        // 3. GESTOR (John Lennon) realiza o Aceite
+        await AuthHelpers.loginComPerfil(page, AuthHelpers.USUARIOS.GESTOR_SECRETARIA_1.titulo, AuthHelpers.USUARIOS.GESTOR_SECRETARIA_1.senha, AuthHelpers.USUARIOS.GESTOR_SECRETARIA_1.perfil!);
+        await AnaliseHelpers.acessarSubprocessoGestor(page, descricaoMapeamento, siglaUnidade);
+        await AtividadeHelpers.navegarParaAtividadesVisualizacao(page);
+        
+        await page.getByTestId('btn-acao-analisar-principal').click();
+        await page.getByTestId('inp-aceite-cadastro-obs').fill('Cadastro aceito pelo Gestor.');
+        await page.getByTestId('btn-aceite-cadastro-confirmar').click();
+        await fazerLogout(page);
+
+        // 4. ADMIN realiza a Homologação do Cadastro
+        await AuthHelpers.login(page, AuthHelpers.USUARIOS.ADMIN_1_PERFIL.titulo, AuthHelpers.USUARIOS.ADMIN_1_PERFIL.senha);
+        await AnaliseHelpers.acessarSubprocessoAdmin(page, descricaoMapeamento, siglaUnidade);
+        await AtividadeHelpers.navegarParaAtividadesVisualizacao(page);
+        
+        await page.getByTestId('btn-acao-analisar-principal').click();
+        await page.getByTestId('inp-aceite-cadastro-obs').fill('Cadastro homologado pelo Admin.');
+        await page.getByTestId('btn-aceite-cadastro-confirmar').click();
+        await page.waitForURL(/\/painel$/);
+
+        // ---------------------------------------------------------------------
+        // PARTE 2: CICLO DE MAPA (Vínculo de Competências)
+        // ---------------------------------------------------------------------
+
+        // 5. ADMIN cria e disponibiliza o Mapa para a unidade
+        // Após homologar cadastro, a situação vai para MAPEAMENTO_MAPA_CRIADO
+        await AnaliseHelpers.acessarSubprocessoAdmin(page, descricaoMapeamento, siglaUnidade);
+        await MapaHelpers.navegarParaMapa(page);
+        
+        // Cria uma competência no Mapa
+        await MapaHelpers.criarCompetencia(page, 'Competência Técnica Básica', ['Atividade 1']);
+        
+        // Disponibiliza o Mapa para validação do Chefe
+        await MapaHelpers.disponibilizarMapa(page);
+        await fazerLogout(page);
+
+        // 6. CHEFE (David Bowie) valida o Mapa
+        await AuthHelpers.login(page, AuthHelpers.USUARIOS.CHEFE_ASSESSORIA_11.titulo, AuthHelpers.USUARIOS.CHEFE_ASSESSORIA_11.senha);
+        await AnaliseHelpers.acessarSubprocessoChefeDireto(page, descricaoMapeamento, siglaUnidade);
+        await MapaHelpers.navegarParaMapa(page);
+        
+        // Ação: Validar Mapa
+        await page.getByTestId('btn-mapa-validar').click();
+        await page.getByTestId('btn-validar-mapa-confirmar').click();
+        await fazerLogout(page);
+
+        // 7. GESTOR (John Lennon) realiza o Aceite do Mapa
+        await AuthHelpers.loginComPerfil(page, AuthHelpers.USUARIOS.GESTOR_SECRETARIA_1.titulo, AuthHelpers.USUARIOS.GESTOR_SECRETARIA_1.senha, AuthHelpers.USUARIOS.GESTOR_SECRETARIA_1.perfil!);
+        await AnaliseHelpers.acessarSubprocessoGestor(page, descricaoMapeamento, siglaUnidade);
+        
+        // O Aceite do mapa é feito na visualização do mapa
+        await page.getByTestId('card-subprocesso-mapa-visualizacao').click();
+        await page.getByTestId('btn-mapa-homologar-aceite').click();
+        await page.getByTestId('inp-aceite-mapa-observacao').fill('Mapa aceito pelo Gestor.');
+        await page.getByTestId('btn-aceite-mapa-confirmar').click();
+        await fazerLogout(page);
+
+        // 8. ADMIN realiza a Homologação do Mapa
+        await AuthHelpers.login(page, AuthHelpers.USUARIOS.ADMIN_1_PERFIL.titulo, AuthHelpers.USUARIOS.ADMIN_1_PERFIL.senha);
+        await AnaliseHelpers.acessarSubprocessoAdmin(page, descricaoMapeamento, siglaUnidade);
+        
+        await page.getByTestId('card-subprocesso-mapa-visualizacao').click();
+        await page.getByTestId('btn-mapa-homologar-aceite').click();
+        await page.getByTestId('inp-aceite-mapa-observacao').fill('Mapa homologado pelo Admin. Ciclo base concluído.');
+        await page.getByTestId('btn-aceite-mapa-confirmar').click();
+
+        // ---------------------------------------------------------------------
+        // PARTE 3: CICLO DE REVISÃO (O Novo Normal)
+        // ---------------------------------------------------------------------
+
+        // 9. ADMIN cria o processo de REVISÃO referenciando o ciclo concluído
+        await ProcessoHelpers.criarProcesso(page, {
+            descricao: descricaoRevisao,
+            tipo: 'REVISAO',
+            unidade: [siglaUnidade],
+            expandir: ['SECRETARIA_1'],
+            iniciar: true
+        });
+        await fazerLogout(page);
+
+        // 10. CHEFE (David Bowie) realiza a Revisão
+        await AuthHelpers.login(page, AuthHelpers.USUARIOS.CHEFE_ASSESSORIA_11.titulo, AuthHelpers.USUARIOS.CHEFE_ASSESSORIA_11.senha);
+        await AnaliseHelpers.acessarSubprocessoChefeDireto(page, descricaoRevisao, siglaUnidade);
+        await AtividadeHelpers.navegarParaAtividades(page);
+        
+        // Verifica se a atividade do ciclo anterior foi importada automaticamente
+        await expect(page.getByText('Atividade 1')).toBeVisible();
+        
+        // Altera para marcar a revisão (Adiciona conhecimento)
+        await AtividadeHelpers.adicionarConhecimento(page, 'Atividade 1', 'Conhecimento Revisado');
+        
+        // Disponibiliza a revisão
+        await AtividadeHelpers.disponibilizarCadastro(page);
+        await fazerLogout(page);
+
+        // 11. GESTOR realiza o Aceite da Revisão
+        await AuthHelpers.loginComPerfil(page, AuthHelpers.USUARIOS.GESTOR_SECRETARIA_1.titulo, AuthHelpers.USUARIOS.GESTOR_SECRETARIA_1.senha, AuthHelpers.USUARIOS.GESTOR_SECRETARIA_1.perfil!);
+        await AnaliseHelpers.acessarSubprocessoGestor(page, descricaoRevisao, siglaUnidade);
+        await AtividadeHelpers.navegarParaAtividadesVisualizacao(page);
+        
+        await page.getByTestId('btn-acao-analisar-principal').click();
+        await page.getByTestId('inp-aceite-cadastro-obs').fill('Revisão aceita.');
+        await page.getByTestId('btn-aceite-cadastro-confirmar').click();
+        await fazerLogout(page);
+
+        // 12. ADMIN realiza a Homologação da Revisão
+        await AuthHelpers.login(page, AuthHelpers.USUARIOS.ADMIN_1_PERFIL.titulo, AuthHelpers.USUARIOS.ADMIN_1_PERFIL.senha);
+        await AnaliseHelpers.acessarSubprocessoAdmin(page, descricaoRevisao, siglaUnidade);
+        await AtividadeHelpers.navegarParaAtividadesVisualizacao(page);
+        
+        await page.getByTestId('btn-acao-analisar-principal').click();
+        await page.getByTestId('inp-aceite-cadastro-obs').fill('Revisão homologada. Ciclo de manutenção completo.');
+        await page.getByTestId('btn-aceite-cadastro-confirmar').click();
+
+        await fazerLogout(page);
+    });
+});
