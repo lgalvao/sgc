@@ -383,7 +383,7 @@ INSERT INTO SGC.ALERTA (codigo, processo_codigo, unidade_origem_codigo, unidade_
 VALUES ('70003', 50000, 1, 6, 'Alerta para Unidade Filha 1', CURRENT_TIMESTAMP);
 
 INSERT INTO SGC.SUBPROCESSO (codigo, processo_codigo, unidade_codigo, situacao, data_limite_etapa1)
-VALUES ('60000', 50000, 8, 'MAPEAMENTO_CADASTRO_EM_ANDAMENTO', CURRENT_TIMESTAMP);
+VALUES ('60000', 50000, 8, 'NAO_INICIADO', CURRENT_TIMESTAMP);
 
 INSERT INTO SGC.MAPA (codigo, subprocesso_codigo)
 VALUES (1001, 60000);

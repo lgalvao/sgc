@@ -1,7 +1,7 @@
 package sgc.mapa.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.*;
-import org.springframework.context.annotation.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
 import sgc.comum.*;
@@ -9,36 +9,21 @@ import sgc.comum.erros.*;
 import sgc.comum.model.*;
 import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
-import sgc.subprocesso.service.*;
-
+import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.service.SubprocessoSituacaoService;
 import java.util.*;
 
 @Slf4j
 @Service
 @Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class MapaManutencaoService {
     private final AtividadeRepo atividadeRepo;
     private final CompetenciaRepo competenciaRepo;
     private final ConhecimentoRepo conhecimentoRepo;
     private final MapaRepo mapaRepo;
     private final ComumRepo repo;
-    private final SubprocessoService subprocessoService;
-
-    public MapaManutencaoService(
-            AtividadeRepo atividadeRepo,
-            CompetenciaRepo competenciaRepo,
-            ConhecimentoRepo conhecimentoRepo,
-            MapaRepo mapaRepo,
-            ComumRepo repo,
-            @Lazy SubprocessoService subprocessoService) {
-
-        this.atividadeRepo = atividadeRepo;
-        this.competenciaRepo = competenciaRepo;
-        this.conhecimentoRepo = conhecimentoRepo;
-        this.mapaRepo = mapaRepo;
-        this.repo = repo;
-        this.subprocessoService = subprocessoService;
-    }
+    private final SubprocessoSituacaoService subprocessoSituacaoService;
 
     public List<Atividade> listarAtividades() {
         return atividadeRepo.findAll();
@@ -137,7 +122,7 @@ public class MapaManutencaoService {
 
         log.info("Atividade criada no mapa {}", request.mapaCodigo());
         Atividade atividadeSalva = atividadeRepo.save(entidade);
-        notificarAlteracaoMapa(request.mapaCodigo());
+        reconciliarSituacaoSubprocesso(request.mapaCodigo());
         return atividadeSalva;
     }
 
@@ -150,7 +135,7 @@ public class MapaManutencaoService {
 
         existente.atualizarDe(request);
         atividadeRepo.save(existente);
-        notificarAlteracaoMapa(existente.getMapa().getCodigo());
+        reconciliarSituacaoSubprocesso(existente.getMapa().getCodigo());
         log.info("Atividade {} atualizada", codigo);
     }
 
@@ -169,7 +154,7 @@ public class MapaManutencaoService {
         });
 
         atividadeRepo.saveAll(atividades);
-        mapasAfetados.forEach(this::notificarAlteracaoMapa);
+        mapasAfetados.forEach(this::reconciliarSituacaoSubprocesso);
         log.info("Atualizando descrições de {} atividades em lote", descricoesPorCodigo.size());
     }
 
@@ -187,7 +172,7 @@ public class MapaManutencaoService {
         conhecimentoRepo.deleteAll(conhecimentos);
 
         atividadeRepo.delete(atividade);
-        notificarAlteracaoMapa(mapa.getCodigo());
+        reconciliarSituacaoSubprocesso(mapa.getCodigo());
     }
 
     @Transactional
@@ -207,8 +192,8 @@ public class MapaManutencaoService {
 
     @Transactional
     public void salvarCompetencias(List<Competencia> competencias) {
-        log.info("Salvando lote de {} competências", competencias.size());
         competenciaRepo.saveAll(competencias);
+        log.info("Salvas {} competências em lote", competencias.size());
     }
 
     @Transactional
@@ -245,7 +230,6 @@ public class MapaManutencaoService {
 
     @Transactional
     public void removerCompetencia(Long codCompetencia) {
-        log.info("Removendo competência {}", codCompetencia);
         Competencia competencia = repo.buscar(Competencia.class, codCompetencia);
 
         List<Atividade> atividadesAssociadas = atividadeRepo.listarPorCompetencia(competencia);
@@ -253,6 +237,7 @@ public class MapaManutencaoService {
 
         atividadeRepo.saveAll(atividadesAssociadas);
         competenciaRepo.delete(competencia);
+        log.info("Competência excluída");
     }
 
     @Transactional
@@ -264,10 +249,11 @@ public class MapaManutencaoService {
         var conhecimento = Conhecimento.criarDe(request);
         conhecimento.setAtividade(atividade);
         atividade.getConhecimentos().add(conhecimento);
-        log.info("Conhecimento criado na atividade {}", codAtividade);
 
         Conhecimento conhecimentoSalvo = conhecimentoRepo.save(conhecimento);
-        notificarAlteracaoMapa(mapa.getCodigo());
+        reconciliarSituacaoSubprocesso(mapa.getCodigo());
+
+        log.info("Conhecimento criado na atividade {}", codAtividade);
         return conhecimentoSalvo;
     }
 
@@ -284,7 +270,7 @@ public class MapaManutencaoService {
 
         existente.atualizarDe(request);
         conhecimentoRepo.save(existente);
-        notificarAlteracaoMapa(mapa.getCodigo());
+        reconciliarSituacaoSubprocesso(mapa.getCodigo());
 
         log.info("Conhecimento atualizado na atividade {}",codAtividade);
     }
@@ -306,7 +292,7 @@ public class MapaManutencaoService {
         Mapa mapa = conhecimento.getAtividade().getMapa();
         conhecimento.getAtividade().getConhecimentos().remove(conhecimento);
         conhecimentoRepo.delete(conhecimento);
-        notificarAlteracaoMapa(mapa.getCodigo());
+        reconciliarSituacaoSubprocesso(mapa.getCodigo());
     }
 
     private void prepararCompetenciasAtividades(List<Long> codigosAtividades, Competencia competencia) {
@@ -318,8 +304,14 @@ public class MapaManutencaoService {
         atividades.forEach(atividade -> atividade.getCompetencias().add(competencia));
     }
 
-    private void notificarAlteracaoMapa(Long codMapa) {
-        subprocessoService.atualizarParaEmAndamento(codMapa);
+    public void reconciliarSituacaoSubprocesso(Long codMapa) {
+        boolean temAtividades = !atividadesMapaCodigoSemRels(codMapa).isEmpty();
+        subprocessoSituacaoService.atualizarSituacaoPorMapa(codMapa, temAtividades);
+    }
+
+    public void reconciliarSituacaoSubprocesso(Subprocesso subprocesso) {
+        boolean temAtividades = !atividadesMapaCodigoSemRels(subprocesso.getMapa().getCodigo()).isEmpty();
+        subprocessoSituacaoService.reconciliarSituacao(subprocesso, temAtividades);
     }
 
     private void validarDescricaoAtividadeUnica(Long codMapa, String desc) {

@@ -4,13 +4,14 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.*;
 import sgc.mapa.model.*;
 import sgc.organizacao.model.*;
-import sgc.organizacao.service.HierarquiaService;
+import sgc.organizacao.service.*;
 import sgc.processo.model.*;
 import sgc.subprocesso.model.*;
-import static org.assertj.core.api.Assertions.assertThat;
+
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)

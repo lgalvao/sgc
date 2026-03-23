@@ -5,7 +5,7 @@ import sgc.comum.erros.*;
 import sgc.comum.model.*;
 import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
-import sgc.subprocesso.service.*;
+import sgc.subprocesso.service.SubprocessoSituacaoService;
 
 import java.util.*;
 
@@ -23,11 +23,11 @@ class MapaManutencaoServicePbtTest {
         MapaRepo mapaRepo = mock(MapaRepo.class);
         ComumRepo repo = mock(ComumRepo.class);
 
-        SubprocessoService subprocessoService = mock(SubprocessoService.class);
+        SubprocessoSituacaoService subprocessoSituacaoService = mock(SubprocessoSituacaoService.class);
 
         MapaManutencaoService service = new MapaManutencaoService(
                 atividadeRepo, competenciaRepo, conhecimentoRepo, mapaRepo, repo,
-                subprocessoService
+                subprocessoSituacaoService
         );
 
         Long mapaCodigo = 1L;
@@ -55,11 +55,11 @@ class MapaManutencaoServicePbtTest {
         MapaRepo mapaRepo = mock(MapaRepo.class);
         ComumRepo repo = mock(ComumRepo.class);
 
-        SubprocessoService subprocessoService = mock(SubprocessoService.class);
+        SubprocessoSituacaoService subprocessoSituacaoService = mock(SubprocessoSituacaoService.class);
 
         MapaManutencaoService service = new MapaManutencaoService(
                 atividadeRepo, competenciaRepo, conhecimentoRepo, mapaRepo, repo,
-                subprocessoService
+                subprocessoSituacaoService
         );
 
         Long ativCodigo = 10L;

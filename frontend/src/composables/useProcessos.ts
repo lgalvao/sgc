@@ -8,8 +8,8 @@ import type {
     UnidadeImportacao
 } from "@/types/tipos";
 import * as processoService from "@/services/processoService";
-import * as painelService from "@/services/painelService";
 import type {Page} from "@/services/painelService";
+import * as painelService from "@/services/painelService";
 import {useErrorHandler} from "@/composables/useErrorHandler";
 
 const processosPainel = ref<ProcessoResumo[]>([]);

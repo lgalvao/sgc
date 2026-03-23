@@ -67,14 +67,7 @@
 </template>
 
 <script lang="ts" setup>
-import {
-  BAlert,
-  BCard,
-  BCardBody,
-  BFormCheckbox,
-  BFormInvalidFeedback,
-  BFormTextarea,
-} from "bootstrap-vue-next";
+import {BAlert, BCard, BCardBody, BFormCheckbox, BFormInvalidFeedback, BFormTextarea,} from "bootstrap-vue-next";
 import {computed, nextTick, ref, watch} from "vue";
 import ModalPadrao from "@/components/comum/ModalPadrao.vue";
 import type {Atividade, Competencia} from "@/types/tipos";

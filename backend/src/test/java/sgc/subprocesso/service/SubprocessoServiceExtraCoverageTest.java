@@ -4,18 +4,17 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
-import sgc.comum.model.*;
 import sgc.comum.erros.*;
-import sgc.mapa.model.Mapa;
-import sgc.mapa.model.Atividade;
+import sgc.comum.model.*;
+import sgc.mapa.model.*;
 import sgc.mapa.service.*;
 import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
 import sgc.processo.model.*;
+import sgc.seguranca.*;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
-import sgc.seguranca.*;
 
 import java.util.*;
 
@@ -48,77 +47,9 @@ class SubprocessoServiceExtraCoverageTest {
 
     @BeforeEach
     void setUp() {
-        subprocessoService.setSubprocessoRepo(subprocessoRepo);
-        subprocessoService.setMovimentacaoRepo(movimentacaoRepo);
-        subprocessoService.setMapaManutencaoService(mapaManutencaoService);
-        subprocessoService.setCopiaMapaService(copiaMapaService);
+        // As dependências agora são injetadas via construtor, Mockito @InjectMocks cuida disso.
     }
 
-    @Nested
-    @DisplayName("atualizarParaEmAndamento")
-    class AtualizarParaEmAndamento {
-
-        @Test
-        @DisplayName("deve lançar exceção quando não encontrar subprocesso pelo mapa")
-        void deveLancarExcecaoNaoEncontrado() {
-            when(subprocessoRepo.findByMapa_Codigo(1L)).thenReturn(Optional.empty());
-            assertThrows(NoSuchElementException.class, () -> subprocessoService.atualizarParaEmAndamento(1L));
-        }
-
-        @Test
-        @DisplayName("deve atualizar revisão para andamento se nao iniciado")
-        void atualizarRevisao() {
-            Processo p = new Processo();
-            p.setTipo(TipoProcesso.REVISAO);
-            Subprocesso sp = new Subprocesso();
-            sp.setProcesso(p);
-            sp.setSituacaoForcada(NAO_INICIADO);
-
-            when(subprocessoRepo.findByMapa_Codigo(1L)).thenReturn(Optional.of(sp));
-            when(mapaManutencaoService.atividadesMapaCodigoSemRels(1L)).thenReturn(List.of());
-
-            subprocessoService.atualizarParaEmAndamento(1L);
-
-            verify(subprocessoRepo).save(sp);
-            assertThat(sp.getSituacao()).isEqualTo(REVISAO_CADASTRO_EM_ANDAMENTO);
-        }
-
-        @Test
-        @DisplayName("deve atualizar para andamento se tiver atividades e não for revisão")
-        void atualizarMapeamentoComAtividades() {
-            Processo p = new Processo();
-            p.setTipo(TipoProcesso.MAPEAMENTO);
-            Subprocesso sp = new Subprocesso();
-            sp.setProcesso(p);
-            sp.setSituacaoForcada(NAO_INICIADO);
-
-            when(subprocessoRepo.findByMapa_Codigo(1L)).thenReturn(Optional.of(sp));
-            when(mapaManutencaoService.atividadesMapaCodigoSemRels(1L)).thenReturn(List.of(new Atividade()));
-
-            subprocessoService.atualizarParaEmAndamento(1L);
-
-            verify(subprocessoRepo).save(sp);
-            assertThat(sp.getSituacao()).isEqualTo(MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
-        }
-
-        @Test
-        @DisplayName("deve atualizar para nao iniciado se nao tiver atividades e nao for revisao")
-        void atualizarMapeamentoSemAtividades() {
-            Processo p = new Processo();
-            p.setTipo(TipoProcesso.MAPEAMENTO);
-            Subprocesso sp = new Subprocesso();
-            sp.setProcesso(p);
-            sp.setSituacaoForcada(MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
-
-            when(subprocessoRepo.findByMapa_Codigo(1L)).thenReturn(Optional.of(sp));
-            when(mapaManutencaoService.atividadesMapaCodigoSemRels(1L)).thenReturn(List.of());
-
-            subprocessoService.atualizarParaEmAndamento(1L);
-
-            verify(subprocessoRepo).save(sp);
-            assertThat(sp.getSituacao()).isEqualTo(NAO_INICIADO);
-        }
-    }
 
     @Nested
     @DisplayName("obterUnidadeLocalizacao")

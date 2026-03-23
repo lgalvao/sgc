@@ -1,8 +1,8 @@
 package sgc.seguranca.login;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.*;
+import org.springframework.context.annotation.*;
+import org.springframework.stereotype.*;
 
 /**
  * Cliente de simulação de AD para habilitar a execução dos fluxos

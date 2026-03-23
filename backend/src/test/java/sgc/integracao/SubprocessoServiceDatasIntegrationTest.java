@@ -105,8 +105,6 @@ class SubprocessoServiceDatasIntegrationTest extends BaseIntegrationTest {
         subprocessoRepo.flush();
         mapaManutencaoService.criarAtividade(new CriarAtividadeRequest(subprocesso.getMapa().getCodigo(), "Atividade inicial"));
 
-        subprocessoService.atualizarParaEmAndamento(subprocesso.getMapa().getCodigo());
-
         Subprocesso atualizado = subprocessoService.buscarSubprocesso(subprocesso.getCodigo());
         assertThat(atualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
     }
@@ -120,8 +118,6 @@ class SubprocessoServiceDatasIntegrationTest extends BaseIntegrationTest {
         subprocessoRepo.save(subprocesso);
         subprocessoRepo.flush();
         mapaManutencaoService.criarAtividade(new CriarAtividadeRequest(subprocesso.getMapa().getCodigo(), "Atividade inicial revisao"));
-
-        subprocessoService.atualizarParaEmAndamento(subprocesso.getMapa().getCodigo());
 
         Subprocesso atualizado = subprocessoService.buscarSubprocesso(subprocesso.getCodigo());
         assertThat(atualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);

@@ -4,12 +4,12 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
+import org.springframework.core.io.*;
 import org.springframework.jdbc.core.*;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.core.io.ResourceLoader;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.jdbc.core.namedparam.*;
+import org.springframework.security.authentication.*;
+import org.springframework.security.core.authority.*;
+import org.springframework.security.core.context.*;
 import sgc.comum.erros.*;
 import sgc.mapa.model.*;
 import sgc.organizacao.*;
@@ -18,6 +18,7 @@ import sgc.organizacao.service.*;
 import sgc.processo.model.*;
 import sgc.processo.service.*;
 import sgc.subprocesso.model.*;
+
 import java.sql.*;
 import java.util.*;
 

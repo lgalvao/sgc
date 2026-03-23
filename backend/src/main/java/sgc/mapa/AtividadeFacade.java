@@ -1,7 +1,6 @@
 package sgc.mapa;
 
 import lombok.extern.slf4j.*;
-import org.springframework.context.annotation.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
 import sgc.comum.*;
@@ -32,7 +31,7 @@ public class AtividadeFacade {
 
     public AtividadeFacade(
             MapaManutencaoService mapaManutencaoService,
-            @Lazy SubprocessoService subprocessoService,
+            SubprocessoService subprocessoService,
             SgcPermissionEvaluator permissionEvaluator,
             UsuarioFacade usuarioService) {
 

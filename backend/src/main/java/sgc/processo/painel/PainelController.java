@@ -7,7 +7,7 @@ import org.springframework.data.domain.*;
 import org.springframework.data.web.*;
 import org.springframework.http.*;
 import org.springframework.security.access.prepost.*;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.annotation.*;
 import org.springframework.web.bind.annotation.*;
 import sgc.alerta.model.*;
 import sgc.organizacao.model.*;
