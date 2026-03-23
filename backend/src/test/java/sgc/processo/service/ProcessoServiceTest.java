@@ -202,7 +202,7 @@ class ProcessoServiceTest {
             processoService.enviarLembrete(codProcesso, codUnidade);
             
             verify(emailService).enviarEmailHtml(eq("titular@teste.com"), anyString(), anyString());
-            verify(servicoAlertas).criarAlertaAdmin(eq(p), eq(u), eq("Lembrete: Prazo do processo Processo Teste encerra em N/A"));
+            verify(servicoAlertas).criarAlertaAdmin(p, u, "Lembrete: Prazo do processo Processo Teste encerra em N/A");
         }
     }
 

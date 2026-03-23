@@ -274,11 +274,12 @@ function obterMensagemSucesso(
 
 const unidadesElegiveisPorAcao = computed(() => {
   const unidades = subprocessosElegiveis.value;
+  const unidadeAtiva = perfilStore.unidadeSelecionada;
 
   return {
-    aceitar: unidades.filter(u => isSituacaoCadastroPronto(u.situacao) || isSituacaoMapaValidadoOuAjustado(u.situacao)),
-    homologar: unidades.filter(u => isSituacaoCadastroPronto(u.situacao) || isSituacaoMapaValidadoOuAjustado(u.situacao)),
-    disponibilizar: unidades.filter(u => isSituacaoDisponibilizacaoMapa(u.situacao))
+    aceitar: unidades.filter(u => (isSituacaoCadastroPronto(u.situacao) || isSituacaoMapaValidadoOuAjustado(u.situacao)) && u.localizacaoCodigo === unidadeAtiva),
+    homologar: unidades.filter(u => (isSituacaoCadastroPronto(u.situacao) || isSituacaoMapaValidadoOuAjustado(u.situacao)) && u.localizacaoCodigo === unidadeAtiva),
+    disponibilizar: unidades.filter(u => isSituacaoDisponibilizacaoMapa(u.situacao) && u.localizacaoCodigo === unidadeAtiva)
   };
 });
 

@@ -19,6 +19,9 @@ class HierarquiaServiceTest {
     @Mock
     private ResponsabilidadeRepo responsabilidadeRepo;
 
+    @Mock
+    private UnidadeRepo unidadeRepo;
+
     @InjectMocks
     private HierarquiaService hierarquiaService;
 
@@ -88,6 +91,9 @@ class HierarquiaServiceTest {
         Unidade intermediaria = criarUnidade(2L, raiz);
         Unidade alvo = criarUnidade(3L, intermediaria);
 
+        // O novo isSubordinada sobe a árvore via repo se necessário
+        when(unidadeRepo.findById(2L)).thenReturn(Optional.of(intermediaria));
+
         assertThat(hierarquiaService.isSubordinada(alvo, raiz)).isTrue();
     }
 
@@ -97,6 +103,11 @@ class HierarquiaServiceTest {
         Unidade raiz1 = criarUnidade(1L, null);
         Unidade raiz2 = criarUnidade(2L, null);
         Unidade alvo = criarUnidade(3L, raiz1);
+
+        // O novo isSubordinada sobe a árvore via repo se necessário
+        // No loop: atual=alvo(3), proxSuperior=raiz1(1). 1 != 2. 
+        // Em seguida busca 1 no repo.
+        when(unidadeRepo.findById(1L)).thenReturn(Optional.of(raiz1));
 
         assertThat(hierarquiaService.isSubordinada(alvo, raiz2)).isFalse();
     }

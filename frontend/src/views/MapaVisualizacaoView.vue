@@ -480,9 +480,18 @@ onMounted(async () => {
   const response = await buscarUnidadeServico(sigla.value);
   unidade.value = response as Unidade;
   await processos.buscarProcessoDetalhe(codProcesso.value);
-  if (codSubprocesso.value) {
-    await subprocessosStore.buscarSubprocessoDetalhe(codSubprocesso.value);
-    mapa.value = await obterMapaVisualizacao(codSubprocesso.value);
+
+  // Garantia de busca de subprocesso mais robusta após carregar detalhes do processo
+  let idSubprocesso = codSubprocesso.value;
+  if (!idSubprocesso) {
+    const unidades = processos.processoDetalhe.value?.unidades || [];
+    const spEncontrado = buscarUnidadeRecursivo(unidades, sigla.value);
+    idSubprocesso = spEncontrado?.codSubprocesso;
+  }
+
+  if (idSubprocesso) {
+    await subprocessosStore.buscarSubprocessoDetalhe(idSubprocesso);
+    mapa.value = await obterMapaVisualizacao(idSubprocesso);
   }
 });
 

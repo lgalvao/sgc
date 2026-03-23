@@ -2,6 +2,8 @@ package sgc.processo.service;
 
 import lombok.*;
 import lombok.extern.slf4j.*;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.domain.*;
 import org.springframework.security.core.*;
 import org.springframework.stereotype.*;
@@ -474,8 +476,15 @@ public class ProcessoService {
     }
 
     private SubprocessoElegivelDto toElegivelDto(Subprocesso sp) {
-        return SubprocessoElegivelDto.builder().codigo(sp.getCodigo()).unidadeCodigo(sp.getUnidade().getCodigo())
-                .unidadeNome(sp.getUnidade().getNome()).unidadeSigla(sp.getUnidade().getSigla()).situacao(sp.getSituacao()).build();
+        Unidade localizacao = obterLocalizacao(sp);
+        return SubprocessoElegivelDto.builder()
+                .codigo(sp.getCodigo())
+                .unidadeCodigo(sp.getUnidade().getCodigo())
+                .unidadeNome(sp.getUnidade().getNome())
+                .unidadeSigla(sp.getUnidade().getSigla())
+                .localizacaoCodigo(localizacao != null ? localizacao.getCodigo() : null)
+                .situacao(sp.getSituacao())
+                .build();
     }
 
     private void notificarInicioProcesso(Processo p, List<Unidade> participantes) {
@@ -518,7 +527,7 @@ public class ProcessoService {
     }
     
     // Check permission helper
-    public boolean checarAcesso(Authentication auth, Long cod) {
+    public boolean checarAcesso(@Nullable Authentication auth, Long cod) {
         if (auth == null || !auth.isAuthenticated() || !(auth.getPrincipal() instanceof Usuario usuario)) return false;
         if (usuario.getPerfilAtivo() == Perfil.ADMIN) return true;
 
