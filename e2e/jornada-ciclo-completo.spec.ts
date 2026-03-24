@@ -7,8 +7,11 @@ import * as AnaliseHelpers from './helpers/helpers-analise.js';
 import {fazerLogout} from './helpers/helpers-navegacao.js';
 
 test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
-    const descricaoMapeamento = `Mapeamento Ciclo Completo ${Date.now()}`;
-    const descricaoRevisao = `Revisão Ciclo Completo ${Date.now()}`;
+    test.setTimeout(20_000);
+
+    const timestamp = Date.now();
+    const descricaoMapeamento = `Mapeamento Ciclo Completo ${timestamp}`;
+    const descricaoRevisao = `Revisão Ciclo Completo ${timestamp}`;
     const siglaUnidade = 'ASSESSORIA_11'; // Unidade alvo (David Bowie)
 
     test.beforeAll(async ({request}) => {
@@ -45,22 +48,17 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
         await AuthHelpers.loginComPerfil(page, AuthHelpers.USUARIOS.GESTOR_SECRETARIA_1.titulo, AuthHelpers.USUARIOS.GESTOR_SECRETARIA_1.senha, AuthHelpers.USUARIOS.GESTOR_SECRETARIA_1.perfil);
         await AnaliseHelpers.acessarSubprocessoGestor(page, descricaoMapeamento, siglaUnidade);
         await AtividadeHelpers.navegarParaAtividadesVisualizacao(page);
-        
-        await page.getByTestId('btn-acao-analisar-principal').click();
-        await page.getByTestId('inp-aceite-cadastro-obs').fill('Cadastro aceito pelo Gestor.');
-        await page.getByTestId('btn-aceite-cadastro-confirmar').click();
-        await page.waitForURL(/\/painel$/);
+        await AnaliseHelpers.aceitarCadastroMapeamento(page, 'Cadastro aceito pelo Gestor.');
         await fazerLogout(page);
 
         // 4. ADMIN realiza a Homologação do Cadastro
         await AuthHelpers.login(page, AuthHelpers.USUARIOS.ADMIN_1_PERFIL.titulo, AuthHelpers.USUARIOS.ADMIN_1_PERFIL.senha);
         await AnaliseHelpers.acessarSubprocessoAdmin(page, descricaoMapeamento, siglaUnidade);
         await AtividadeHelpers.navegarParaAtividadesVisualizacao(page);
+        await AnaliseHelpers.homologarCadastroMapeamento(page);
         
-        await page.getByTestId('btn-acao-analisar-principal').click();
-        await page.getByTestId('inp-aceite-cadastro-obs').fill('Cadastro homologado pelo Admin.');
-        await page.getByTestId('btn-aceite-cadastro-confirmar').click();
-        await page.waitForURL(/\/painel$/);
+        // Admin permanece no Subprocesso após homologar (segundo redirect de CadastroVisualizacaoView.vue)
+        await expect(page).toHaveURL(/\/processo\/\d+\/ASSESSORIA_11$/);
         await fazerLogout(page);
     });
 
@@ -109,6 +107,16 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
         await page.getByTestId('inp-aceite-mapa-observacao').fill('Mapa homologado pelo Admin. Ciclo base concluído.');
         await page.getByTestId('btn-aceite-mapa-confirmar').click();
         await page.waitForURL(/\/painel$/);
+
+        // 8.1 ADMIN finaliza o processo para liberar a revisão
+        // Clica no processo na tabela do painel para abrir os detalhes
+        await page.getByTestId('tbl-processos').getByText(descricaoMapeamento).first().click();
+        await expect(page).toHaveURL(/\/processo\/\d+$/);
+        
+        await page.getByTestId('btn-processo-finalizar').click();
+        await page.getByTestId('btn-modal-confirmacao-confirmar').click();
+        await page.waitForURL(/\/painel$/);
+
         await fazerLogout(page);
     });
 
@@ -143,11 +151,7 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
         await AuthHelpers.loginComPerfil(page, AuthHelpers.USUARIOS.GESTOR_SECRETARIA_1.titulo, AuthHelpers.USUARIOS.GESTOR_SECRETARIA_1.senha, AuthHelpers.USUARIOS.GESTOR_SECRETARIA_1.perfil);
         await AnaliseHelpers.acessarSubprocessoGestor(page, descricaoRevisao, siglaUnidade);
         await AtividadeHelpers.navegarParaAtividadesVisualizacao(page);
-        
-        await page.getByTestId('btn-acao-analisar-principal').click();
-        await page.getByTestId('inp-aceite-cadastro-obs').fill('Revisão aceita.');
-        await page.getByTestId('btn-aceite-cadastro-confirmar').click();
-        await page.waitForURL(/\/painel$/);
+        await AnaliseHelpers.aceitarRevisao(page, 'Revisão aceita.');
         await fazerLogout(page);
 
         // 12. ADMIN realiza a Homologação da Revisão
@@ -155,10 +159,12 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
         await AnaliseHelpers.acessarSubprocessoAdmin(page, descricaoRevisao, siglaUnidade);
         await AtividadeHelpers.navegarParaAtividadesVisualizacao(page);
         
+        // Aqui Admin homologa (mais uma vez, redirect para subprocesso)
         await page.getByTestId('btn-acao-analisar-principal').click();
         await page.getByTestId('inp-aceite-cadastro-obs').fill('Revisão homologada. Ciclo de manutenção completo.');
         await page.getByTestId('btn-aceite-cadastro-confirmar').click();
-        await page.waitForURL(/\/painel$/);
+        await page.waitForURL(/\/processo\/\d+\/ASSESSORIA_11$/);
+        
         await fazerLogout(page);
     });
 });
