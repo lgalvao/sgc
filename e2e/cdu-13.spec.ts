@@ -122,7 +122,7 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
         await expect(historicoAdmin.getByTestId('cell-observacao-1')).toHaveText('Ok final 1');
         await fecharHistoricoAnalise(page);
         await page.getByTestId('btn-acao-analisar-principal').click();
-        await page.getByRole('dialog').getByRole('button', {name: 'Confirmar'}).click();
+        await page.getByTestId('btn-aceite-cadastro-confirmar').click();
 
         await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${UNIDADE_ALVO}$`));
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro homologado/i);

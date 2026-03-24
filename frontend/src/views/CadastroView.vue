@@ -149,6 +149,7 @@
     <ModalConfirmacao
         v-model="mostrarModalConfirmacaoRemocao"
         :mensagem="dadosRemocao?.tipo === 'atividade' ? TEXTOS.atividades.MODAL_REMOVER_ATIVIDADE_TEXTO : TEXTOS.atividades.MODAL_REMOVER_CONHECIMENTO_TEXTO"
+        :ok-title="TEXTOS.comum.BOTAO_REMOVER"
         :titulo="dadosRemocao?.tipo === 'atividade' ? TEXTOS.atividades.MODAL_REMOVER_ATIVIDADE_TITULO : TEXTOS.atividades.MODAL_REMOVER_CONHECIMENTO_TITULO"
         variant="danger"
         @confirmar="confirmarRemocao"

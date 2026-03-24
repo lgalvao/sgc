@@ -181,7 +181,7 @@
       :loading="loading.isLoading('reabertura')"
       :ok-disabled="!justificativaReabertura.trim()"
       :titulo="tipoReabertura === 'cadastro' ? TEXTOS.subprocesso.REABRIR_CADASTRO_TITULO : TEXTOS.subprocesso.REABRIR_REVISAO_TITULO"
-      ok-title="Reabrir"
+      :ok-title="TEXTOS.comum.BOTAO_REABRIR"
       test-id-confirmar="btn-confirmar-reabrir"
       variant="success"
       @confirmar="confirmarReabertura"

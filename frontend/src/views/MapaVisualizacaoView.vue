@@ -135,7 +135,7 @@
         v-model="mostrarModalSugestoes"
         :loading="isLoading"
         :ok-disabled="!sugestoes.trim()"
-        ok-title="Apresentar"
+        :ok-title="TEXTOS.comum.BOTAO_APRESENTAR"
         test-id-cancelar="btn-sugestoes-mapa-cancelar"
         test-id-confirmar="btn-sugestoes-mapa-confirmar"
         titulo="Apresentar sugestões"
@@ -185,7 +185,7 @@
     <ModalConfirmacao
         v-model="mostrarModalValidar"
         :loading="isLoading"
-        ok-title="Validar"
+        :ok-title="TEXTOS.comum.BOTAO_VALIDAR"
         test-id-cancelar="btn-validar-mapa-cancelar"
         test-id-confirmar="btn-validar-mapa-confirmar"
         titulo="Validação de mapa"

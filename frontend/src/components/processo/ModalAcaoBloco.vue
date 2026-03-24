@@ -60,7 +60,7 @@
         </BButton>
         <BButton
             :disabled="processando || selecionadosLocal.length === 0"
-            variant="primary"
+            variant="success"
             @click="confirmar"
         >
           <BSpinner v-if="processando" aria-hidden="true" class="me-2" small />
