@@ -12,16 +12,25 @@ import {expect, type Page} from '@playwright/test';
  * Fecha cada toast visível clicando no seu botão "X".
  */
 export async function limparNotificacoes(page: Page): Promise<void> {
-    // BOrchestrator renderiza toasts como role="alert" ou .toast
-    // Procuramos botões de fechar (X) em toasts, alertas ou no orchestrator
-    const closeButtons = page.locator('.toast .btn-close, .orchestrator-container .btn-close, [role="alert"] .btn-close, .alert .btn-close, button[aria-label="Close"]');
-    const count = await closeButtons.count();
-    for (let i = 0; i < count; i++) {
-        const btn = closeButtons.nth(i);
-        if (await btn.isVisible()) {
-            // Tenta clicar e ignorar se o toast sumir antes do clique
-            await btn.click().catch(() => {});
+    try {
+        // BOrchestrator renderiza toasts como role="alert" ou .toast
+        // Procuramos botões de fechar (X) em toasts, alertas ou no orchestrator
+        const closeButtons = page.locator('.toast .btn-close, .orchestrator-container .btn-close, [role="alert"] .btn-close, .alert .btn-close, button[aria-label="Close"]');
+        
+        // count() é rápido, mas isVisible() e click() podem falhar se a página fechar
+        const count = await closeButtons.count();
+        for (let i = 0; i < count; i++) {
+            const btn = closeButtons.nth(i);
+            if (await btn.isVisible()) {
+                await btn.click().catch(() => {});
+            }
         }
+    } catch (e: any) {
+        // Ignorar erros se a página ou contexto foram fechados durante a limpeza (comum em timeouts)
+        if (e.message?.includes('closed') || e.message?.includes('Target page, context or browser has been closed')) {
+            return;
+        }
+        throw e;
     }
 }
 

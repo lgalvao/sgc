@@ -1,5 +1,5 @@
 import {expect, type Page} from '@playwright/test';
-import {limparNotificacoes, verificarPaginaPainel, verificarToast} from './helpers-navegacao.js';
+import {verificarPaginaPainel, verificarToast} from './helpers-navegacao.js';
 import {TEXTOS} from '../../frontend/src/constants/textos.js';
 
 
@@ -133,7 +133,6 @@ export async function removerConhecimento(page: Page, atividadeDescricao: string
 }
 
 export async function disponibilizarCadastro(page: Page) {
-    await limparNotificacoes(page);
     const botao = page.getByTestId('btn-cad-atividades-disponibilizar');
     await expect(botao).toBeEnabled();
     await botao.click();
