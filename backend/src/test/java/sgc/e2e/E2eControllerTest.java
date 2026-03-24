@@ -372,7 +372,7 @@ class E2eControllerTest {
         Processo proc = new Processo();
         proc.setCodigo(100L);
         when(processoService.criar(any())).thenReturn(proc);
-        when(processoService.iniciar(eq(100L), anyList(), any())).thenReturn(List.of());
+        doNothing().when(processoService).iniciar(eq(100L), anyList(), any());
         when(processoService.buscarPorCodigo(100L)).thenReturn(proc);
         when(usuarioFacade.buscarPorLogin(anyString())).thenReturn(new Usuario());
 
@@ -403,7 +403,7 @@ class E2eControllerTest {
         when(usuarioFacade.buscarPorLogin(anyString())).thenReturn(new Usuario());
 
         // Simular retorno de erros vazio (sucesso)
-        when(processoService.iniciar(anyLong(), anyList(), any())).thenReturn(List.of());
+        doNothing().when(processoService).iniciar(anyLong(), anyList(), any());
 
         var method = E2eController.class.getDeclaredMethod("criarProcessoFixture",
                 E2eController.ProcessoFixtureRequest.class, TipoProcesso.class);
@@ -487,8 +487,8 @@ class E2eControllerTest {
             when(processoServiceMock.criar(any())).thenReturn(dto);
             when(usuarioFacadeMock.buscarPorLogin(anyString())).thenReturn(new Usuario());
 
-            when(processoServiceMock.iniciar(eq(100L), anyList(), any()))
-                    .thenReturn(List.of("Erro 1", "Erro 2"));
+            doThrow(new ErroValidacao("Erro 1, Erro 2"))
+                    .when(processoServiceMock).iniciar(eq(100L), anyList(), any());
 
             assertThatThrownBy(() -> controllerIsolado.criarProcessoMapeamento(req))
                     .isInstanceOf(ErroValidacao.class)
@@ -508,8 +508,7 @@ class E2eControllerTest {
             when(processoServiceMock.criar(any())).thenReturn(dto);
             when(usuarioFacadeMock.buscarPorLogin(anyString())).thenReturn(new Usuario());
 
-            when(processoServiceMock.iniciar(eq(100L), anyList(), any()))
-                    .thenReturn(List.of()); // Sucesso
+            doNothing().when(processoServiceMock).iniciar(eq(100L), anyList(), any()); // Sucesso
 
             when(processoServiceMock.buscarPorCodigo(100L)).thenThrow(new ErroEntidadeNaoEncontrada("Processo", 100L)); // Falha ao recarregar
 

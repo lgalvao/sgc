@@ -7,6 +7,8 @@ import org.mockito.junit.jupiter.*;
 import org.springframework.data.domain.*;
 import org.springframework.security.core.*;
 import sgc.alerta.*;
+import sgc.comum.Mensagens;
+import sgc.comum.erros.ErroValidacao;
 import sgc.comum.model.*;
 import sgc.fixture.*;
 import sgc.organizacao.*;
@@ -146,10 +148,60 @@ class ProcessoServiceTest {
             uniAdmin.setSituacao(SituacaoUnidade.ATIVA);
             when(repo.buscarPorSigla(Unidade.class, "ADMIN")).thenReturn(uniAdmin);
 
-            List<String> erros = processoService.iniciar(id, List.of(), usuario);
+            processoService.iniciar(id, List.of(), usuario);
 
-            assertThat(erros).isEmpty();
             verify(processoRepo).save(any(Processo.class));
+        }
+
+        @Test
+        @DisplayName("Deve falhar ao iniciar processo se houver unidades em processo ativo")
+        void deveFalharAoIniciarSeHouverUnidadesEmProcessoAtivo() {
+            Long id = 100L;
+            Usuario usuario = new Usuario();
+
+            Processo p = new Processo();
+            p.setCodigo(id);
+            p.setSituacao(SituacaoProcesso.CRIADO);
+            p.setTipo(TipoProcesso.MAPEAMENTO);
+            Unidade uni = new Unidade();
+            uni.setCodigo(1L);
+            uni.setSituacao(SituacaoUnidade.ATIVA);
+            p.adicionarParticipantes(Set.of(uni));
+
+            when(repo.buscar(Processo.class, id)).thenReturn(p);
+            // Simular que a unidade já está em outro processo
+            when(processoRepo.listarUnidadesEmProcessoAtivo(eq(SituacaoProcesso.EM_ANDAMENTO), anyList()))
+                    .thenReturn(List.of(1L));
+
+            assertThatThrownBy(() -> processoService.iniciar(id, List.of(), usuario))
+                    .isInstanceOf(ErroValidacao.class)
+                    .hasMessageContaining(Mensagens.UNIDADES_EM_PROCESSO_ATIVO);
+        }
+
+        @Test
+        @DisplayName("Deve falhar ao iniciar processo se houver unidades sem mapa em REVISAO")
+        void deveFalharAoIniciarSeHouverUnidadesSemMapaEmRevisao() {
+            Long id = 100L;
+            Usuario usuario = new Usuario();
+
+            Processo p = new Processo();
+            p.setCodigo(id);
+            p.setSituacao(SituacaoProcesso.CRIADO);
+            p.setTipo(TipoProcesso.REVISAO);
+            Unidade uni = new Unidade();
+            uni.setCodigo(1L);
+            uni.setSituacao(SituacaoUnidade.ATIVA);
+            p.adicionarParticipantes(Set.of(uni));
+
+            when(repo.buscar(Processo.class, id)).thenReturn(p);
+            when(unidadeService.porCodigos(anyList())).thenReturn(List.of(uni));
+            // Simular que a unidade não tem mapa vigente
+            when(unidadeService.verificarMapaVigente(1L)).thenReturn(false);
+            when(unidadeService.buscarSiglasPorCodigos(anyList())).thenReturn(List.of("U1"));
+
+            assertThatThrownBy(() -> processoService.iniciar(id, List.of(1L), usuario))
+                    .isInstanceOf(ErroValidacao.class)
+                    .hasMessageContaining(Mensagens.UNIDADES_SEM_MAPA);
         }
 
         @Test
@@ -203,6 +255,96 @@ class ProcessoServiceTest {
             
             verify(emailService).enviarEmailHtml(eq("titular@teste.com"), anyString(), anyString());
             verify(servicoAlertas).criarAlertaAdmin(p, u, "Lembrete: Prazo do processo Processo Teste encerra em N/A");
+        }
+    }
+
+    @Nested
+    @DisplayName("Detalhes e Elegibilidade")
+    class DetalhesEElegibilidade {
+        @Test
+        @DisplayName("Deve obter detalhes completos do processo")
+        void deveObterDetalhesCompletos() {
+            Long codProcesso = 1L;
+            Usuario usuario = new Usuario();
+            usuario.setPerfilAtivo(Perfil.ADMIN);
+
+            Processo p = new Processo();
+            p.setCodigo(codProcesso);
+            p.setDescricao("Processo");
+            p.setTipo(TipoProcesso.MAPEAMENTO);
+            p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+
+            Unidade u = new Unidade();
+            u.setCodigo(10L);
+            u.setSigla("U10");
+            u.setSituacao(SituacaoUnidade.ATIVA);
+            p.adicionarParticipantes(Set.of(u));
+
+            when(repo.buscar(Processo.class, codProcesso)).thenReturn(p);
+
+            Subprocesso sp = new Subprocesso();
+            sp.setCodigo(100L);
+            sp.setUnidade(u);
+            sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+            when(subprocessoService.listarEntidadesPorProcessoComUnidade(codProcesso)).thenReturn(List.of(sp));
+            when(subprocessoService.obterLocalizacaoAtual(sp)).thenReturn(u);
+            when(validacaoService.validarSubprocessosParaFinalizacao(codProcesso)).thenReturn(ValidationResult.ofValido());
+
+            ProcessoDetalheDto result = processoService.obterDetalhesCompleto(codProcesso, usuario, false);
+
+            assertThat(result).isNotNull();
+            assertThat(result.getCodigo()).isEqualTo(codProcesso);
+            assertThat(result.getUnidades()).isNotEmpty();
+        }
+
+        @Test
+        @DisplayName("Deve listar subprocessos elegíveis para ação em bloco")
+        void deveListarSubprocessosElegiveis() {
+            Long codProcesso = 1L;
+            Usuario usuario = new Usuario();
+            usuario.setUnidadeAtivaCodigo(10L);
+            usuario.setPerfilAtivo(Perfil.CHEFE);
+            when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+
+            Subprocesso s1 = new Subprocesso();
+            s1.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+            Unidade u1 = new Unidade();
+            u1.setCodigo(10L);
+            s1.setUnidade(u1);
+
+            Subprocesso s2 = new Subprocesso();
+            s2.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
+            Unidade u2 = new Unidade();
+            u2.setCodigo(20L);
+            s2.setUnidade(u2);
+
+            Subprocesso s3 = new Subprocesso();
+            s3.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO); // Não elegível
+            Unidade u3 = new Unidade();
+            u3.setCodigo(30L);
+            s3.setUnidade(u3);
+
+            when(subprocessoService.listarEntidadesPorProcessoComUnidade(codProcesso)).thenReturn(List.of(s1, s2, s3));
+            when(permissionEvaluator.verificarPermissao(eq(usuario), eq(s1), any())).thenReturn(true);
+            when(permissionEvaluator.verificarPermissao(eq(usuario), eq(s2), any())).thenReturn(true);
+            when(subprocessoService.obterLocalizacaoAtual(any())).thenReturn(u1);
+
+            List<SubprocessoElegivelDto> result = processoService.listarSubprocessosElegiveis(codProcesso);
+
+            assertThat(result).hasSize(2);
+        }
+    }
+
+    @Nested
+    @DisplayName("Ações em Bloco")
+    class AcoesEmBloco {
+        @Test
+        @DisplayName("Deve falhar ao executar ação em bloco sem unidades")
+        void deveFalharAoExecutarAcaoEmBlocoSemUnidades() {
+            AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(List.of(), ACEITAR, LocalDate.now());
+            assertThatThrownBy(() -> processoService.executarAcaoEmBloco(1L, req))
+                    .isInstanceOf(ErroValidacao.class)
+                    .hasMessageContaining(Mensagens.SELECIONE_AO_MENOS_UMA_UNIDADE);
         }
     }
 

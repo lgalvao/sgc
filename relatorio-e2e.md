@@ -6,6 +6,15 @@ A suíte E2E do SGC, em geral, **simula operações reais do usuário** de forma
 
 O principal cuidado está no uso de **fixtures/atalhos de preparação** para pular etapas repetitivas do fluxo. Isso é aceitável quando o objetivo é apenas montar o estado inicial do cenário, desde que a **ação validada continue sendo executada pela interface**.
 
+## Situação atual das melhorias
+
+As críticas que motivaram a revisão já foram tratadas:
+
+* `click({force: true})` foi removido dos helpers de atividades;
+* `limparNotificacoes()` deixou de engolir erros silenciosamente;
+* os setups críticos deixaram de usar `expect(true).toBeTruthy()` e passaram a validar fixtures/estado;
+* `npm run typecheck:e2e` passou e uma amostra de Playwright dos fluxos críticos também passou.
+
 ## Atalhos aceitáveis por design
 
 ### 1. Reset do banco antes dos testes
@@ -28,11 +37,15 @@ Em `e2e/helpers/helpers-atividades.ts`, os helpers de edição usam `click({forc
 
 Risco: o teste pode continuar passando mesmo se o botão estiver mal posicionado, obstruído ou com problema de interação real para o usuário.
 
+Situação atual: removido nos helpers de atividades.
+
 ### 2. Limpeza de notificações engolindo erro
 
 Em `e2e/helpers/helpers-navegacao.ts`, `limparNotificacoes()` captura erros amplamente e pode retornar sem sinalizar problemas relevantes.
 
 Risco: falhas reais de fechamento/overlay podem ser silenciadas, especialmente em cenários com modais, toasts ou páginas já fechando.
+
+Situação atual: a limpeza continua tolerante apenas a fechamento de página/contexto; demais falhas voltam a aparecer.
 
 ### 3. Acesso direto a rotas profundas em vários specs
 
@@ -40,11 +53,15 @@ Exemplos em `e2e/cdu-07.spec.ts`, `e2e/cdu-08.spec.ts`, `e2e/cdu-10.spec.ts`, `e
 
 Risco: isso é aceitável para validar a tela interna, mas não valida o percurso real do usuário quando a navegação via painel/listagem também faz parte da regra.
 
+Situação atual: mantido apenas onde a tela interna é o foco do cenário; não foi alterado nesta rodada.
+
 ### 4. Helpers que concentram navegação + assertiva demais
 
 Alguns helpers fazem muito mais do que um clique semântico; por exemplo, `navegarParaSubprocesso()` e helpers de análise combinam navegação, checagem de estado e decisão de rota.
 
 Risco: se usados sem cuidado, podem esconder exatamente o ponto em que o usuário real encontraria erro.
+
+Situação atual: mantidos, mas agora o relatório separa melhor o que é preparo e o que é validação.
 
 ## Segunda passada: classificação por risco
 

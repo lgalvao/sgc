@@ -299,7 +299,7 @@ class ProcessoControllerTest {
             Processo processo = Processo.builder().codigo(1L).descricao("Processo teste").build();
 
             when(processoService.buscarPorCodigoComParticipantes(1L)).thenReturn(processo);
-            when(processoService.iniciar(eq(1L), anyList(), any())).thenReturn(List.of());
+            doNothing().when(processoService).iniciar(eq(1L), anyList(), any());
 
             mockMvc.perform(
                             post("/api/processos/1/iniciar")
@@ -514,8 +514,8 @@ class ProcessoControllerTest {
         @DisplayName("Deve lançar ErroValidacao com status UNPROCESSABLE_CONTENT quando iniciar processo retorna lista de erros")
         void deveLancarErroValidacaoQuandoIniciarProcessoRetornaErros() {
             IniciarProcessoRequest req = new IniciarProcessoRequest(TipoProcesso.MAPEAMENTO, List.of(1L));
-            when(processoServiceMock.iniciar(anyLong(), anyList(), any()))
-                    .thenReturn(List.of("erro"));
+            doThrow(new ErroValidacao("erro"))
+                    .when(processoServiceMock).iniciar(anyLong(), anyList(), any());
 
             ErroValidacao ex = assertThrows(ErroValidacao.class, () -> controller.iniciar(1L, req, null));
             assertEquals(HttpStatus.UNPROCESSABLE_CONTENT, ex.getStatus());
