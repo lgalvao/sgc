@@ -1,0 +1,156 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - heading "SGC" [level=1] [ref=e2]
+  - generic [ref=e3]:
+    - link "Pular para o conteúdo principal" [ref=e4] [cursor=pointer]:
+      - /url: "#main-content"
+    - generic [ref=e5]:
+      - navigation [ref=e6]:
+        - generic [ref=e7]:
+          - link "SGC" [ref=e8] [cursor=pointer]:
+            - /url: /painel
+          - generic [ref=e9]:
+            - list [ref=e10]:
+              - listitem [ref=e11]:
+                - link "Painel" [ref=e12] [cursor=pointer]:
+                  - /url: /painel
+                  - generic [ref=e13]: 
+                  - text: Painel
+              - listitem [ref=e14]:
+                - link "Unidades" [ref=e15] [cursor=pointer]:
+                  - /url: /unidades
+                  - generic [ref=e16]: 
+                  - text: Unidades
+              - listitem [ref=e17]:
+                - link "Relatórios" [ref=e18] [cursor=pointer]:
+                  - /url: /relatorios
+                  - generic [ref=e19]: 
+                  - text: Relatórios
+              - listitem [ref=e20]:
+                - link "Histórico" [ref=e21] [cursor=pointer]:
+                  - /url: /historico
+                  - generic [ref=e22]: 
+                  - text: Histórico
+            - list [ref=e23]:
+              - listitem [ref=e24]:
+                - link "ADMIN" [ref=e25]:
+                  - /url: "#"
+                  - generic [ref=e26]:
+                    - generic [ref=e27]: 
+                    - generic [ref=e28]: ADMIN
+              - listitem "Configurações" [ref=e29]:
+                - link "Configurações" [ref=e30] [cursor=pointer]:
+                  - /url: /configuracoes
+                  - generic [ref=e31]: Configurações
+                  - generic [ref=e32]: 
+              - listitem "Administradores do sistema" [ref=e33]:
+                - link "Administradores" [ref=e34] [cursor=pointer]:
+                  - /url: /administradores
+                  - generic [ref=e35]: Administradores
+                  - generic [ref=e36]: 
+              - listitem "Sair" [ref=e37]:
+                - link "Sair" [ref=e38] [cursor=pointer]:
+                  - /url: "#"
+                  - generic [ref=e39]: Sair
+                  - generic [ref=e40]: 
+      - generic [ref=e43]:
+        - button "Voltar" [ref=e44] [cursor=pointer]:
+          - generic [ref=e45]: 
+        - navigation "breadcrumb" [ref=e46]:
+          - list [ref=e47]:
+            - listitem [ref=e48]:
+              - link "Início" [ref=e49] [cursor=pointer]:
+                - /url: /painel
+                - generic [ref=e50]: 
+                - generic [ref=e51]: Início
+            - listitem [ref=e52]:
+              - text: ›
+              - link "Detalhes do processo" [ref=e53] [cursor=pointer]:
+                - /url: /processo/400
+            - listitem [ref=e54]:
+              - text: ›
+              - generic [ref=e55]: ASSESSORIA_11
+      - main [ref=e56]:
+        - generic [ref=e58]:
+          - generic [ref=e59]:
+            - generic [ref=e60]:
+              - generic [ref=e61]:
+                - heading "ASSESSORIA_11" [level=2] [ref=e62]
+                - paragraph [ref=e63]: Assessoria 11
+              - generic [ref=e64]:
+                - button "Alterar data limite" [ref=e65] [cursor=pointer]:
+                  - generic [ref=e66]: 
+                  - text: Alterar data limite
+                - button "Enviar lembrete" [ref=e67] [cursor=pointer]:
+                  - generic [ref=e68]: 
+                  - text: Enviar lembrete
+            - generic [ref=e70]:
+              - paragraph [ref=e71]:
+                - strong [ref=e72]: "Processo:"
+                - text: Mapeamento Ciclo Completo 1774310437467
+              - paragraph [ref=e73]: Situação:Cadastro homologado
+              - paragraph [ref=e74]: Localização atual:ADMIN
+              - paragraph [ref=e75]:
+                - strong [ref=e76]: "Titular:"
+                - text: David Bowie
+              - paragraph [ref=e77]:
+                - generic [ref=e78]:
+                  - generic [ref=e79]: 
+                  - link "2003" [ref=e80] [cursor=pointer]:
+                    - /url: tel:2003
+                - generic [ref=e81]:
+                  - generic [ref=e82]: 
+                  - link "david.bowie@tre-pe.jus.br" [ref=e83] [cursor=pointer]:
+                    - /url: mailto:david.bowie@tre-pe.jus.br
+          - generic [ref=e84]:
+            - button "Atividades e conhecimentos Visualização das atividades e conhecimentos da unidade" [ref=e86] [cursor=pointer]:
+              - generic [ref=e88]:
+                - heading "Atividades e conhecimentos" [level=4] [ref=e89]
+                - paragraph [ref=e90]: Visualização das atividades e conhecimentos da unidade
+            - button "Mapa de Competências Mapa de competências técnicas da unidade" [ref=e92] [cursor=pointer]:
+              - generic [ref=e94]:
+                - heading "Mapa de Competências" [level=4] [ref=e95]
+                - paragraph [ref=e96]: Mapa de competências técnicas da unidade
+          - generic [ref=e97]:
+            - heading "Movimentações" [level=4] [ref=e98]
+            - table [ref=e100]:
+              - rowgroup [ref=e101]:
+                - row "Data/hora Origem Destino Descrição" [ref=e102]:
+                  - columnheader "Data/hora" [ref=e103]
+                  - columnheader "Origem" [ref=e104]
+                  - columnheader "Destino" [ref=e105]
+                  - columnheader "Descrição" [ref=e106]
+              - rowgroup [ref=e107]:
+                - row "23/03/2026 21:00 ADMIN ADMIN Cadastro homologado" [ref=e108]:
+                  - cell "23/03/2026 21:00" [ref=e109]
+                  - cell "ADMIN" [ref=e110]
+                  - cell "ADMIN" [ref=e111]
+                  - cell "Cadastro homologado" [ref=e112]
+                - row "23/03/2026 21:00 SECRETARIA_1 ADMIN Cadastro aceito" [ref=e113]:
+                  - cell "23/03/2026 21:00" [ref=e114]
+                  - cell "SECRETARIA_1" [ref=e115]
+                  - cell "ADMIN" [ref=e116]
+                  - cell "Cadastro aceito" [ref=e117]
+                - row "23/03/2026 21:00 ASSESSORIA_11 SECRETARIA_1 Disponibilização do cadastro de atividades" [ref=e118]:
+                  - cell "23/03/2026 21:00" [ref=e119]
+                  - cell "ASSESSORIA_11" [ref=e120]
+                  - cell "SECRETARIA_1" [ref=e121]
+                  - cell "Disponibilização do cadastro de atividades" [ref=e122]
+                - 'row "23/03/2026 21:00 SECRETARIA_1 ASSESSORIA_11 Importação de atividades do subprocesso #200 (Unidade: SECRETARIA_1)" [ref=e123]':
+                  - cell "23/03/2026 21:00" [ref=e124]
+                  - cell "SECRETARIA_1" [ref=e125]
+                  - cell "ASSESSORIA_11" [ref=e126]
+                  - 'cell "Importação de atividades do subprocesso #200 (Unidade: SECRETARIA_1)" [ref=e127]'
+                - row "23/03/2026 21:00 ADMIN ASSESSORIA_11 Processo iniciado" [ref=e128]:
+                  - cell "23/03/2026 21:00" [ref=e129]
+                  - cell "ADMIN" [ref=e130]
+                  - cell "ASSESSORIA_11" [ref=e131]
+                  - cell "Processo iniciado" [ref=e132]
+      - contentinfo [ref=e133]:
+        - generic [ref=e134]:
+          - generic [ref=e135]: Versão 1.0.0
+          - generic [ref=e136]: © SESEL/COSIS/TRE-PE
+  - text:   
+```

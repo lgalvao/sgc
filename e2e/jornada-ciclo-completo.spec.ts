@@ -6,25 +6,18 @@ import * as MapaHelpers from './helpers/helpers-mapas.js';
 import * as AnaliseHelpers from './helpers/helpers-analise.js';
 import {fazerLogout} from './helpers/helpers-navegacao.js';
 
-test.describe('Jornada do Ciclo de Vida Completo do SGC', () => {
-    // Timeout estendido para cobrir mapeamento + revisão (3 minutos)
-    test.setTimeout(180_000);
-
+test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
     const descricaoMapeamento = `Mapeamento Ciclo Completo ${Date.now()}`;
     const descricaoRevisao = `Revisão Ciclo Completo ${Date.now()}`;
     const siglaUnidade = 'ASSESSORIA_11'; // Unidade alvo (David Bowie)
 
-    test.beforeEach(async ({request}) => {
-        // Reset do banco de dados para garantir estado limpo
+    test.beforeAll(async ({request}) => {
+        // Reset do banco de dados UMA VEZ para iniciar a jornada
         const response = await request.post('/e2e/reset-database');
         expect(response.ok()).toBeTruthy();
     });
 
-    test('Ciclo Completo: Mapeamento -> Mapa -> Revisão', async ({page}) => {
-        // ---------------------------------------------------------------------
-        // PARTE 1: MAPEAMENTO INICIAL (Ciclo de Cadastro)
-        // ---------------------------------------------------------------------
-
+    test('Fase 1: Mapeamento Inicial - Cadastro de Atividades', async ({page}) => {
         // 1. ADMIN cria o processo
         await AuthHelpers.login(page, AuthHelpers.USUARIOS.ADMIN_1_PERFIL.titulo, AuthHelpers.USUARIOS.ADMIN_1_PERFIL.senha);
         await ProcessoHelpers.criarProcesso(page, {
@@ -49,13 +42,14 @@ test.describe('Jornada do Ciclo de Vida Completo do SGC', () => {
         await fazerLogout(page);
 
         // 3. GESTOR (John Lennon) realiza o Aceite
-        await AuthHelpers.loginComPerfil(page, AuthHelpers.USUARIOS.GESTOR_SECRETARIA_1.titulo, AuthHelpers.USUARIOS.GESTOR_SECRETARIA_1.senha, AuthHelpers.USUARIOS.GESTOR_SECRETARIA_1.perfil!);
+        await AuthHelpers.loginComPerfil(page, AuthHelpers.USUARIOS.GESTOR_SECRETARIA_1.titulo, AuthHelpers.USUARIOS.GESTOR_SECRETARIA_1.senha, AuthHelpers.USUARIOS.GESTOR_SECRETARIA_1.perfil);
         await AnaliseHelpers.acessarSubprocessoGestor(page, descricaoMapeamento, siglaUnidade);
         await AtividadeHelpers.navegarParaAtividadesVisualizacao(page);
         
         await page.getByTestId('btn-acao-analisar-principal').click();
         await page.getByTestId('inp-aceite-cadastro-obs').fill('Cadastro aceito pelo Gestor.');
         await page.getByTestId('btn-aceite-cadastro-confirmar').click();
+        await page.waitForURL(/\/painel$/);
         await fazerLogout(page);
 
         // 4. ADMIN realiza a Homologação do Cadastro
@@ -67,13 +61,12 @@ test.describe('Jornada do Ciclo de Vida Completo do SGC', () => {
         await page.getByTestId('inp-aceite-cadastro-obs').fill('Cadastro homologado pelo Admin.');
         await page.getByTestId('btn-aceite-cadastro-confirmar').click();
         await page.waitForURL(/\/painel$/);
+        await fazerLogout(page);
+    });
 
-        // ---------------------------------------------------------------------
-        // PARTE 2: CICLO DE MAPA (Vínculo de Competências)
-        // ---------------------------------------------------------------------
-
+    test('Fase 2: Elaboração e Homologação do Mapa', async ({page}) => {
         // 5. ADMIN cria e disponibiliza o Mapa para a unidade
-        // Após homologar cadastro, a situação vai para MAPEAMENTO_MAPA_CRIADO
+        await AuthHelpers.login(page, AuthHelpers.USUARIOS.ADMIN_1_PERFIL.titulo, AuthHelpers.USUARIOS.ADMIN_1_PERFIL.senha);
         await AnaliseHelpers.acessarSubprocessoAdmin(page, descricaoMapeamento, siglaUnidade);
         await MapaHelpers.navegarParaMapa(page);
         
@@ -92,10 +85,11 @@ test.describe('Jornada do Ciclo de Vida Completo do SGC', () => {
         // Ação: Validar Mapa
         await page.getByTestId('btn-mapa-validar').click();
         await page.getByTestId('btn-validar-mapa-confirmar').click();
+        await page.waitForURL(/\/painel$/);
         await fazerLogout(page);
 
         // 7. GESTOR (John Lennon) realiza o Aceite do Mapa
-        await AuthHelpers.loginComPerfil(page, AuthHelpers.USUARIOS.GESTOR_SECRETARIA_1.titulo, AuthHelpers.USUARIOS.GESTOR_SECRETARIA_1.senha, AuthHelpers.USUARIOS.GESTOR_SECRETARIA_1.perfil!);
+        await AuthHelpers.loginComPerfil(page, AuthHelpers.USUARIOS.GESTOR_SECRETARIA_1.titulo, AuthHelpers.USUARIOS.GESTOR_SECRETARIA_1.senha, AuthHelpers.USUARIOS.GESTOR_SECRETARIA_1.perfil);
         await AnaliseHelpers.acessarSubprocessoGestor(page, descricaoMapeamento, siglaUnidade);
         
         // O Aceite do mapa é feito na visualização do mapa
@@ -103,6 +97,7 @@ test.describe('Jornada do Ciclo de Vida Completo do SGC', () => {
         await page.getByTestId('btn-mapa-homologar-aceite').click();
         await page.getByTestId('inp-aceite-mapa-observacao').fill('Mapa aceito pelo Gestor.');
         await page.getByTestId('btn-aceite-mapa-confirmar').click();
+        await page.waitForURL(/\/painel$/);
         await fazerLogout(page);
 
         // 8. ADMIN realiza a Homologação do Mapa
@@ -113,12 +108,13 @@ test.describe('Jornada do Ciclo de Vida Completo do SGC', () => {
         await page.getByTestId('btn-mapa-homologar-aceite').click();
         await page.getByTestId('inp-aceite-mapa-observacao').fill('Mapa homologado pelo Admin. Ciclo base concluído.');
         await page.getByTestId('btn-aceite-mapa-confirmar').click();
+        await page.waitForURL(/\/painel$/);
+        await fazerLogout(page);
+    });
 
-        // ---------------------------------------------------------------------
-        // PARTE 3: CICLO DE REVISÃO (O Novo Normal)
-        // ---------------------------------------------------------------------
-
+    test('Fase 3: Ciclo de Revisão e Manutenção', async ({page}) => {
         // 9. ADMIN cria o processo de REVISÃO referenciando o ciclo concluído
+        await AuthHelpers.login(page, AuthHelpers.USUARIOS.ADMIN_1_PERFIL.titulo, AuthHelpers.USUARIOS.ADMIN_1_PERFIL.senha);
         await ProcessoHelpers.criarProcesso(page, {
             descricao: descricaoRevisao,
             tipo: 'REVISAO',
@@ -144,13 +140,14 @@ test.describe('Jornada do Ciclo de Vida Completo do SGC', () => {
         await fazerLogout(page);
 
         // 11. GESTOR realiza o Aceite da Revisão
-        await AuthHelpers.loginComPerfil(page, AuthHelpers.USUARIOS.GESTOR_SECRETARIA_1.titulo, AuthHelpers.USUARIOS.GESTOR_SECRETARIA_1.senha, AuthHelpers.USUARIOS.GESTOR_SECRETARIA_1.perfil!);
+        await AuthHelpers.loginComPerfil(page, AuthHelpers.USUARIOS.GESTOR_SECRETARIA_1.titulo, AuthHelpers.USUARIOS.GESTOR_SECRETARIA_1.senha, AuthHelpers.USUARIOS.GESTOR_SECRETARIA_1.perfil);
         await AnaliseHelpers.acessarSubprocessoGestor(page, descricaoRevisao, siglaUnidade);
         await AtividadeHelpers.navegarParaAtividadesVisualizacao(page);
         
         await page.getByTestId('btn-acao-analisar-principal').click();
         await page.getByTestId('inp-aceite-cadastro-obs').fill('Revisão aceita.');
         await page.getByTestId('btn-aceite-cadastro-confirmar').click();
+        await page.waitForURL(/\/painel$/);
         await fazerLogout(page);
 
         // 12. ADMIN realiza a Homologação da Revisão
