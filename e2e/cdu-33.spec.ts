@@ -3,6 +3,8 @@ import {
     criarProcessoMapaHomologadoFixture,
     criarProcessoRevisaoMapaHomologadoFixture
 } from './fixtures/fixtures-processos.js';
+import {acessarSubprocessoAdmin} from './helpers/helpers-analise.js';
+import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
 import {verificarAppAlert, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 import {login, USUARIOS} from './helpers/helpers-auth.js';
 
@@ -20,7 +22,6 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
     const timestamp = Date.now();
     const descMapeamento = `Mapeamento pre-CDU-33 ${timestamp}`;
     const descRevisao = `Revisão CDU-33 ${timestamp}`;
-    let revisaoPid = 0;
 
     test('Setup UI', async ({_resetAutomatico, page, request}) => {
 
@@ -33,8 +34,7 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
         });
 
         await page.goto('/painel');
-        await expect(page.getByTestId('tbl-processos').getByText(descMapeamento).first()).toBeVisible();
-        await page.getByTestId('tbl-processos').getByText(descMapeamento).first().click();
+        await acessarDetalhesProcesso(page, descMapeamento);
         await page.getByTestId('btn-processo-finalizar').click();
         await page.getByTestId('btn-finalizar-processo-confirmar').click();
         await verificarPaginaPainel(page);
@@ -45,9 +45,10 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
             diasLimite: 30,
             unidade: UNIDADE_ALVO
         });
-        revisaoPid = processo.codigo;
+        expect(processo.codigo).toBeGreaterThan(0);
 
-        await page.goto(`/processo/${revisaoPid}/${UNIDADE_ALVO}`);
+        await page.goto('/painel');
+        await acessarSubprocessoAdmin(page, descRevisao, UNIDADE_ALVO);
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa homologado/i);
     });
 
@@ -55,7 +56,8 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
         const textoJustificativa = 'Ajuste necessário';
 
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
-        await page.goto(`/processo/${revisaoPid}/${UNIDADE_ALVO}`);
+        await page.goto('/painel');
+        await acessarSubprocessoAdmin(page, descRevisao, UNIDADE_ALVO);
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa homologado/i);
 
         const btnReabrir = page.getByTestId('btn-reabrir-revisao');

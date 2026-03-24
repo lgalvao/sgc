@@ -72,7 +72,7 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
 
     test('Cenario 2: ADMIN homologa final', async ({_resetAutomatico, page}) => {
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
-        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
+        await acessarDetalhesProcesso(page, descProcesso);
         await navegarParaSubprocesso(page, UNIDADE_ALVO);
         await navegarParaMapa(page);
 

@@ -55,13 +55,50 @@ class FiltroJwtTest {
         String token = "valid-token";
         when(request.getHeader("Authorization")).thenReturn("Bearer " + token);
 
-        GerenciadorJwt.JwtClaims claims = new GerenciadorJwt.JwtClaims("123", null, null);
+        GerenciadorJwt.JwtClaims claims = new GerenciadorJwt.JwtClaims("12345", null, null);
         when(jwtService.validarToken(token)).thenReturn(Optional.of(claims));
 
-        when(usuarioService.carregarUsuarioParaAutenticacao("123")).thenReturn(null);
+        when(usuarioService.carregarUsuarioParaAutenticacao("12345")).thenReturn(null);
 
         filtro.doFilterInternal(request, response, filterChain);
 
+        verify(filterChain).doFilter(request, response);
+    }
+
+    @Test
+    @DisplayName("Deve processar JWT via Cookie")
+    void deveProcessarJwtViaCookie() throws ServletException, IOException {
+        Cookie cookie = new Cookie("jwtToken", "token-cookie");
+        when(request.getCookies()).thenReturn(new Cookie[]{cookie});
+        
+        filtro.doFilterInternal(request, response, filterChain);
+        
+        verify(jwtService).validarToken("token-cookie");
+        verify(filterChain).doFilter(request, response);
+    }
+
+    @Test
+    @DisplayName("Deve lidar com cookies nulos")
+    void deveLidarComCookiesNulos() throws ServletException, IOException {
+        when(request.getCookies()).thenReturn(null);
+        when(request.getHeader("Authorization")).thenReturn(null);
+        
+        filtro.doFilterInternal(request, response, filterChain);
+        
+        verify(filterChain).doFilter(request, response);
+    }
+
+    @Test
+    @DisplayName("Deve cobrir ramificações do método mascarar")
+    void deveCobrirMascarar() throws ServletException, IOException {
+        // Para testar o mascarar(valor) precisamos que caia no log.warn
+        // Caso valor.length <= 4
+        String token = "short-token";
+        when(request.getHeader("Authorization")).thenReturn("Bearer " + token);
+        when(jwtService.validarToken(token)).thenReturn(Optional.of(new GerenciadorJwt.JwtClaims("123", null, null)));
+        when(usuarioService.carregarUsuarioParaAutenticacao("123")).thenReturn(null);
+
+        filtro.doFilterInternal(request, response, filterChain);
         verify(filterChain).doFilter(request, response);
     }
 }

@@ -154,6 +154,40 @@ class ProcessoServiceTest {
         }
 
         @Test
+        @DisplayName("Deve iniciar revisao com sucesso e salvar")
+        void deveIniciarRevisaoComSucesso() {
+            Long id = 100L;
+            Usuario usuario = new Usuario();
+
+            Processo p = new Processo();
+            p.setCodigo(id);
+            p.setSituacao(SituacaoProcesso.CRIADO);
+            p.setTipo(TipoProcesso.REVISAO);
+            Unidade uni = new Unidade();
+            uni.setCodigo(1L);
+            uni.setSituacao(SituacaoUnidade.ATIVA);
+            p.adicionarParticipantes(Set.of(uni));
+
+            when(repo.buscar(Processo.class, id)).thenReturn(p);
+            when(unidadeService.porCodigos(anyList())).thenReturn(List.of(uni));
+            when(unidadeService.buscarPorCodigo(1L)).thenReturn(uni);
+            when(unidadeService.verificarMapaVigente(1L)).thenReturn(true);
+            
+            UnidadeMapa um = new UnidadeMapa();
+            um.setUnidadeCodigo(1L);
+            when(unidadeService.buscarMapasPorUnidades(anyList())).thenReturn(List.of(um));
+
+            Unidade uniAdmin = new Unidade();
+            uniAdmin.setSituacao(SituacaoUnidade.ATIVA);
+            when(repo.buscarPorSigla(Unidade.class, "ADMIN")).thenReturn(uniAdmin);
+
+            processoService.iniciar(id, List.of(1L), usuario);
+
+            verify(processoRepo).save(any(Processo.class));
+            verify(subprocessoService).criarParaRevisao(eq(p), eq(uni), eq(um), eq(uniAdmin), eq(usuario));
+        }
+
+        @Test
         @DisplayName("Deve falhar ao iniciar processo se houver unidades em processo ativo")
         void deveFalharAoIniciarSeHouverUnidadesEmProcessoAtivo() {
             Long id = 100L;
@@ -281,6 +315,7 @@ class ProcessoServiceTest {
             p.adicionarParticipantes(Set.of(u));
 
             when(repo.buscar(Processo.class, codProcesso)).thenReturn(p);
+            when(permissionEvaluator.verificarPermissao(eq(usuario), eq(p), eq(AcaoPermissao.FINALIZAR_PROCESSO))).thenReturn(true);
 
             Subprocesso sp = new Subprocesso();
             sp.setCodigo(100L);
@@ -324,14 +359,65 @@ class ProcessoServiceTest {
             u3.setCodigo(30L);
             s3.setUnidade(u3);
 
-            when(subprocessoService.listarEntidadesPorProcessoComUnidade(codProcesso)).thenReturn(List.of(s1, s2, s3));
-            when(permissionEvaluator.verificarPermissao(eq(usuario), eq(s1), any())).thenReturn(true);
-            when(permissionEvaluator.verificarPermissao(eq(usuario), eq(s2), any())).thenReturn(true);
+            when(subprocessoService.listarEntidadesPorProcessoEUnidades(eq(codProcesso), anyList())).thenReturn(List.of(s1, s2, s3));
+            when(permissionEvaluator.verificarPermissao(eq(usuario), eq(s1), eq(AcaoPermissao.ACEITAR_CADASTRO))).thenReturn(true);
+            when(permissionEvaluator.verificarPermissao(eq(usuario), eq(s2), eq(AcaoPermissao.ACEITAR_MAPA))).thenReturn(true);
             when(subprocessoService.obterLocalizacaoAtual(any())).thenReturn(u1);
 
             List<SubprocessoElegivelDto> result = processoService.listarSubprocessosElegiveis(codProcesso);
 
             assertThat(result).hasSize(2);
+        }
+
+        @Test
+        @DisplayName("Deve montar hierarquia no DTO corretamente para GESTOR")
+        void deveMontarHierarquiaDtoGestor() {
+            Long codProcesso = 1L;
+            Usuario usuario = new Usuario();
+            usuario.setUnidadeAtivaCodigo(10L); // Pai
+            usuario.setPerfilAtivo(Perfil.GESTOR);
+
+            Processo p = new Processo();
+            p.setCodigo(codProcesso);
+            p.setDescricao("Processo");
+            p.setTipo(TipoProcesso.MAPEAMENTO);
+            p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+
+            Unidade uPai = new Unidade();
+            uPai.setCodigo(10L);
+            uPai.setSigla("PAI");
+            uPai.setSituacao(SituacaoUnidade.ATIVA);
+            p.adicionarParticipantes(Set.of(uPai));
+
+            Unidade uFilho = new Unidade();
+            uFilho.setCodigo(20L);
+            uFilho.setSigla("FILHO");
+            uFilho.setSituacao(SituacaoUnidade.ATIVA);
+            uFilho.setUnidadeSuperior(uPai);
+            p.adicionarParticipantes(Set.of(uFilho));
+
+            Unidade uSemSub = new Unidade();
+            uSemSub.setCodigo(30L);
+            uSemSub.setSigla("SEMSUB");
+            uSemSub.setSituacao(SituacaoUnidade.ATIVA);
+            p.adicionarParticipantes(Set.of(uSemSub));
+
+            when(repo.buscar(Processo.class, codProcesso)).thenReturn(p);
+            when(unidadeService.todasComHierarquia()).thenReturn(List.of(uPai, uFilho, uSemSub));
+
+            Subprocesso sp = new Subprocesso();
+            sp.setCodigo(100L);
+            sp.setUnidade(uPai);
+            sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+            // Filho não tem subprocesso para cobrir branch sp != null
+
+            when(subprocessoService.listarEntidadesPorProcessoComUnidade(codProcesso)).thenReturn(List.of(sp));
+            when(subprocessoService.obterLocalizacaoAtual(sp)).thenReturn(uPai);
+
+            ProcessoDetalheDto result = processoService.obterDetalhesCompleto(codProcesso, usuario, false);
+
+            assertThat(result.getUnidades()).isNotEmpty();
+            assertThat(result.getUnidades().get(0).getFilhos()).isNotEmpty();
         }
     }
 
@@ -345,6 +431,36 @@ class ProcessoServiceTest {
             assertThatThrownBy(() -> processoService.executarAcaoEmBloco(1L, req))
                     .isInstanceOf(ErroValidacao.class)
                     .hasMessageContaining(Mensagens.SELECIONE_AO_MENOS_UMA_UNIDADE);
+        }
+
+        @Test
+        @DisplayName("Deve executar ação de HOMOLOGAR e ACEITAR separando cadastro e validacao")
+        void deveExecutarAcaoBlocoHomologarEAceitar() {
+            Usuario usuario = new Usuario();
+            when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+
+            Subprocesso sCad = new Subprocesso();
+            sCad.setCodigo(10L);
+            sCad.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+
+            Subprocesso sVal = new Subprocesso();
+            sVal.setCodigo(20L);
+            sVal.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
+
+            when(subprocessoService.listarEntidadesPorProcessoEUnidades(eq(1L), anyList()))
+                    .thenReturn(List.of(sCad, sVal));
+
+            // Teste ACEITAR
+            AcaoEmBlocoRequest reqAceitar = new AcaoEmBlocoRequest(List.of(10L, 20L), ACEITAR, LocalDate.now());
+            processoService.executarAcaoEmBloco(1L, reqAceitar);
+            verify(transicaoService).aceitarCadastroEmBloco(List.of(10L), usuario);
+            verify(transicaoService).aceitarValidacaoEmBloco(List.of(20L), usuario);
+
+            // Teste HOMOLOGAR
+            AcaoEmBlocoRequest reqHomologar = new AcaoEmBlocoRequest(List.of(10L, 20L), HOMOLOGAR, LocalDate.now());
+            processoService.executarAcaoEmBloco(1L, reqHomologar);
+            verify(transicaoService).homologarCadastroEmBloco(List.of(10L), usuario);
+            verify(transicaoService).homologarValidacaoEmBloco(List.of(20L), usuario);
         }
     }
 
@@ -367,6 +483,57 @@ class ProcessoServiceTest {
             assertThat(resultado).isNotNull();
             assertThat(resultado.getDescricao()).isEqualTo("Teste");
             verify(processoRepo).saveAndFlush(any());
+        }
+    }
+
+    @Nested
+    @DisplayName("Checagem de Acesso")
+    class ChecagemAcesso {
+        @Test
+        @DisplayName("Deve retornar false se auth for nulo ou invalido")
+        void deveRetornarFalseSeAuthInvalido() {
+            assertThat(processoService.checarAcesso(null, 1L)).isFalse();
+
+            Authentication auth = mock(Authentication.class);
+            when(auth.isAuthenticated()).thenReturn(false);
+            assertThat(processoService.checarAcesso(auth, 1L)).isFalse();
+
+            when(auth.isAuthenticated()).thenReturn(true);
+            when(auth.getPrincipal()).thenReturn(new Object());
+            assertThat(processoService.checarAcesso(auth, 1L)).isFalse();
+        }
+
+        @Test
+        @DisplayName("Deve retornar true se ADMIN")
+        void deveRetornarTrueSeAdmin() {
+            Authentication auth = mock(Authentication.class);
+            Usuario user = new Usuario();
+            user.setPerfilAtivo(Perfil.ADMIN);
+            when(auth.isAuthenticated()).thenReturn(true);
+            when(auth.getPrincipal()).thenReturn(user);
+
+            assertThat(processoService.checarAcesso(auth, 1L)).isTrue();
+        }
+
+        @Test
+        @DisplayName("Deve retornar true se unidade esta no processo para GESTOR/CHEFE")
+        void deveRetornarTrueSeUnidadeNoProcesso() {
+            Authentication auth = mock(Authentication.class);
+            Usuario user = new Usuario();
+            user.setPerfilAtivo(Perfil.CHEFE);
+            user.setUnidadeAtivaCodigo(10L);
+            when(auth.isAuthenticated()).thenReturn(true);
+            when(auth.getPrincipal()).thenReturn(user);
+
+            Processo p = new Processo();
+            Unidade u = new Unidade();
+            u.setCodigo(10L);
+            u.setSituacao(SituacaoUnidade.ATIVA);
+            p.adicionarParticipantes(Set.of(u));
+
+            when(processoRepo.buscarPorCodigoComParticipantes(1L)).thenReturn(Optional.of(p));
+
+            assertThat(processoService.checarAcesso(auth, 1L)).isTrue();
         }
     }
 

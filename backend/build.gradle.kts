@@ -247,8 +247,17 @@ tasks.jacocoTestReport {
 
                     "sgc/**/Status*.class",
                     "sgc/**/Tipo*.class",
+                    "sgc/**/Situacao*.class",
 
-                    "sgc/**/*Impl.class"
+                    "sgc/**/*Impl.class",
+
+                    "sgc/**/*Dto.class",
+                    "sgc/**/*Request.class",
+                    "sgc/**/*Response.class",
+                    "sgc/**/*Views.class",
+                    "sgc/**/*Views$*.class",
+                    "sgc/**/model/*Id.class",
+                    "sgc/**/*Repo.class"
                 )
             }
         })

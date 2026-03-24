@@ -23,7 +23,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         });
 
         test('Fluxo ADMIN/GESTOR: Navega via Detalhes do Processo (Passo 2)', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
-            await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
+            await acessarDetalhesProcesso(page, descProcesso);
 
             // 2.1. O sistema mostra a tela Detalhes do processo
             await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+$`));
@@ -42,7 +42,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         });
 
         test('Fluxo CHEFE/SERVIDOR: Navega direto para Detalhes do Subprocesso (Passo 3)', async ({_resetAutomatico, page, _autenticadoComoChefeSecao111}) => {
-            await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
+            await acessarDetalhesProcesso(page, descProcesso);
 
             // 3.1. O sistema exibe a tela Detalhes do subprocesso com os dados da unidade do usuário
             await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${UNIDADE_ALVO}$`));
@@ -70,7 +70,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
 
         test('Fluxo ADMIN: Visualizar em processo finalizado', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
 
-            await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
+            await acessarDetalhesProcesso(page, descProcesso);
 
             await navegarParaSubprocesso(page, UNIDADE_ALVO);
             await navegarParaAtividadesVisualizacao(page);

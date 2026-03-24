@@ -1,5 +1,6 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {
+    acessarDetalhesProcesso,
     criarProcesso,
     extrairProcessoCodigo,
     verificarDetalhesProcesso,
@@ -33,7 +34,7 @@ test.describe('CDU-04 - Iniciar processo', () => {
             iniciar: false
         });
 
-        await page.getByTestId('tbl-processos').getByText(descricao).first().click();
+        await acessarDetalhesProcesso(page, descricao);
         await esperarPaginaCadastroProcesso(page);
         const codProcesso = await extrairProcessoCodigo(page);
 
@@ -66,7 +67,7 @@ test.describe('CDU-04 - Iniciar processo', () => {
         await expect(linhaAss11).toContainText('Não iniciado');
         await expect(linhaAss11).toContainText(dataLimiteStr.split('-').reverse().join('/'));
 
-        await linhaAss11.click();
+        await acessarDetalhesProcesso(page, descricao);
         await esperarPaginaSubprocesso(page, 'ASSESSORIA_11');
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText('Não iniciado');
         

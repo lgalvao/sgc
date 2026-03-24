@@ -59,7 +59,7 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {
     });
 
     test('Cenario 1: ADMIN abre modal e cancela homologação em bloco', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
-        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
+        await acessarDetalhesProcesso(page, descProcesso);
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
 
         const btnHomologar = page.getByRole('button', {name: TEXTOS.acaoBloco.homologar.ROTULO_CADASTRO}).first();
@@ -79,7 +79,7 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {
     });
 
     test('Cenario 2: ADMIN confirma homologação em bloco e permanece na tela', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
-        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
+        await acessarDetalhesProcesso(page, descProcesso);
         const btnHomologar = page.getByRole('button', {name: TEXTOS.acaoBloco.homologar.ROTULO_CADASTRO}).first();
         await expect(btnHomologar).toBeVisible();
         await btnHomologar.click();
@@ -126,12 +126,12 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco após devolução', 
     });
 
     test('Cenario 1: ADMIN não pode homologar em bloco após devolver para ajustes', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
-        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
+        await acessarDetalhesProcesso(page, descProcesso);
         await navegarParaSubprocesso(page, UNIDADE_1);
         await navegarParaAtividadesVisualizacao(page);
         await devolverCadastroMapeamento(page, 'Ajustar cadastro antes da homologação');
 
-        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
+        await acessarDetalhesProcesso(page, descProcesso);
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
         await expect(page.getByRole('button', {name: TEXTOS.acaoBloco.homologar.ROTULO_CADASTRO}).first()).toBeDisabled();
     });

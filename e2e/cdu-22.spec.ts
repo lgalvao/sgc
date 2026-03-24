@@ -4,6 +4,7 @@ import {
     criarProcessoRevisaoCadastroDisponibilizadoFixture
 } from './fixtures/fixtures-processos.js';
 import {loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
+import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
 import {resetDatabase} from './hooks/hooks-limpeza.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
 
@@ -41,7 +42,7 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
     });
 
     test('Cenario 1: GESTOR abre modal e cancela aceite em bloco', async ({_resetAutomatico, page, _autenticadoComoGestorCoord22}) => {
-        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
+        await acessarDetalhesProcesso(page, descProcesso);
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
 
         const btnAceitar = page.getByTestId('btn-processo-aceitar-bloco');
@@ -62,7 +63,7 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
 
     test('Cenario 3a: Botão desabilitado quando item está com gestor subordinado', async ({_resetAutomatico, page, _autenticadoComoGestorSecretaria2}) => {
         // autenticadoComoGestorSecretaria2 já logou como GESTOR SECRETARIA_2
-        await page.goto(`/processo/${processoCodigo}`);
+        await acessarDetalhesProcesso(page, descProcesso);
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
 
         const btnAceitar = page.getByTestId('btn-processo-aceitar-bloco');
@@ -72,7 +73,7 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
 
     test('Cenario 3b: Botão habilitado após gestor subordinado aceitar', async ({_resetAutomatico, page, _autenticadoComoGestorCoord22}) => {
         // autenticadoComoGestorCoord22 já logou como GESTOR COORD_22
-        await page.goto(`/processo/${processoCodigo}`);
+        await acessarDetalhesProcesso(page, descProcesso);
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
         await page.getByTestId('btn-processo-aceitar-bloco').click();
         await page.locator('#modal-acao-bloco').getByRole('button', {name: TEXTOS.acaoBloco.aceitar.BOTAO}).click();
@@ -80,7 +81,7 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
 
         // GESTOR SECRETARIA_2 deve agora ver o botão habilitado
         await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
-        await page.goto(`/processo/${processoCodigo}`);
+        await acessarDetalhesProcesso(page, descProcesso);
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
         await expect(page.getByTestId('btn-processo-aceitar-bloco')).toBeEnabled();
     });
@@ -94,7 +95,7 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
 
         // GESTOR SECRETARIA_1 acessa: item está com COORD_11 (intermediário)
         await loginComPerfil(page, USUARIOS.GESTOR_SECRETARIA_1.titulo, USUARIOS.GESTOR_SECRETARIA_1.senha, 'GESTOR - SECRETARIA_1');
-        await page.goto(`/processo/${processo4.codigo}`);
+        await acessarDetalhesProcesso(page, `CDU-22-C4 ${timestamp4}`);
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
 
         const btnAceitar = page.getByTestId('btn-processo-aceitar-bloco');
@@ -120,7 +121,7 @@ test.describe.serial('CDU-22 - Aceitar cadastros de revisão em bloco', () => {
     });
 
     test('Cenario REVISAO: GESTOR aceita revisão de cadastro em bloco', async ({_resetAutomatico, page, _autenticadoComoGestorCoord22}) => {
-        await page.goto(`/processo/${processoCodigo}`);
+        await acessarDetalhesProcesso(page, descProcessoRevisao);
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
 
         const btnAceitar = page.getByTestId('btn-processo-aceitar-bloco');

@@ -29,7 +29,7 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
 }) => {
         // Cenario 1: Navegação para visualização do mapa
         await expect(page.getByTestId('tbl-processos').getByText(descProcesso).first()).toBeVisible();
-        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
+        await acessarDetalhesProcesso(page, descProcesso);
 
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa disponibilizado/i);
 
@@ -54,7 +54,7 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
         await page.getByTestId('btn-validar-mapa-confirmar').click();
 
         await verificarPaginaPainel(page);
-        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
+        await acessarDetalhesProcesso(page, descProcesso);
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa validado/i);
     });
 });
@@ -78,7 +78,7 @@ test.describe.serial('CDU-19 - Apresentar sugestões e pré-preenchimento', () =
 
     test('Cenario 1: CHEFE apresenta sugestões com sucesso', async ({_resetAutomatico, page, _autenticadoComoChefeSecao221}) => {
         await expect(page.getByTestId('tbl-processos').getByText(descProcesso).first()).toBeVisible();
-        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
+        await acessarDetalhesProcesso(page, descProcesso);
 
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa disponibilizado/i);
         await navegarParaMapa(page);
@@ -96,7 +96,7 @@ test.describe.serial('CDU-19 - Apresentar sugestões e pré-preenchimento', () =
         await page.getByTestId('btn-sugestoes-mapa-confirmar').click();
 
         await verificarPaginaPainel(page);
-        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
+        await acessarDetalhesProcesso(page, descProcesso);
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa com sugestões/i);
     });
 
@@ -119,7 +119,7 @@ test.describe.serial('CDU-19 - Apresentar sugestões e pré-preenchimento', () =
         _autenticadoComoChefeSecao221
     }) => {
         await expect(page.getByTestId('tbl-processos').getByText(descProcesso).first()).toBeVisible();
-        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
+        await acessarDetalhesProcesso(page, descProcesso);
 
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa disponibilizado/i);
         await navegarParaMapa(page);

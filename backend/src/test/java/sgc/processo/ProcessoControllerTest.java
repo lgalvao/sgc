@@ -413,8 +413,75 @@ class ProcessoControllerTest {
         }
 
         @Test
+        @WithMockUser(roles = "CHEFE")
+        @DisplayName("listarUnidadesParaImportacao deve retornar lista de participantes quando finalizado com mapa e localizacao")
+        void deveListarUnidadesParaImportacaoQuandoFinalizadoCompleto() throws Exception {
+            Processo processo = Processo.builder()
+                .codigo(1L)
+                .situacao(SituacaoProcesso.FINALIZADO)
+                .build();
+
+            Unidade unidade = Unidade.builder().codigo(10L).sigla("U1").nome("Unidade 1").situacao(SituacaoUnidade.ATIVA).build();
+            processo.adicionarParticipantes(Set.of(unidade));
+
+            when(processoService.buscarPorCodigoComParticipantes(1L)).thenReturn(processo);
+
+            Subprocesso sub = Subprocesso.builder()
+                .codigo(100L)
+                .situacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO)
+                .unidade(unidade)
+                .mapa(sgc.mapa.model.Mapa.builder().codigo(500L).build())
+                .localizacaoAtual(unidade)
+                .dataLimiteEtapa1(LocalDateTime.now())
+                .build();
+            when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sub));
+
+            mockMvc.perform(get("/api/processos/1/unidades-importacao"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$[0].mapaCodigo").value(500L))
+                    .andExpect(jsonPath("$[0].localizacaoAtualCodigo").value(10L));
+        }
+
+        @Test
+        @WithMockUser(roles = "CHEFE")
+        @DisplayName("listarUnidadesParaImportacao deve falhar se processo nao finalizado")
+        void deveFalharListarUnidadesParaImportacaoSeNaoFinalizado() throws Exception {
+            Processo processo = Processo.builder()
+                .codigo(1L)
+                .situacao(SituacaoProcesso.EM_ANDAMENTO)
+                .build();
+
+            when(processoService.buscarPorCodigoComParticipantes(1L)).thenReturn(processo);
+
+            mockMvc.perform(get("/api/processos/1/unidades-importacao"))
+                    .andExpect(status().isUnprocessableContent());
+        }
+
+        @Test
+        @WithMockUser(roles = "CHEFE")
+        @DisplayName("listarUnidadesParaImportacao deve retornar lista mesmo com subprocesso nulo")
+        void deveListarUnidadesParaImportacaoComSubprocessoNulo() throws Exception {
+            Processo processo = Processo.builder()
+                .codigo(1L)
+                .situacao(SituacaoProcesso.FINALIZADO)
+                .build();
+
+            Unidade unidade = Unidade.builder().codigo(10L).sigla("U1").nome("Unidade 1").situacao(SituacaoUnidade.ATIVA).build();
+            processo.adicionarParticipantes(Set.of(unidade));
+
+            when(processoService.buscarPorCodigoComParticipantes(1L)).thenReturn(processo);
+            // Retornar lista vazia para forçar subprocesso = null na iteração
+            when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of());
+
+            mockMvc.perform(get("/api/processos/1/unidades-importacao"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$[0].codUnidade").value(10L))
+                    .andExpect(jsonPath("$[0].codSubprocesso").isEmpty());
+        }
+
+        @Test
         @WithMockUser(roles = "ADMIN")
-        @DisplayName("listarAtivos deve retornar processos em andamento")
+        @DisplayName("listarAtivos deve retornar lista de processos em andamento")
         void deveListarAtivos() throws Exception {
             when(processoService.listarAtivos()).thenReturn(List.of(Processo.builder().codigo(1L).build()));
 

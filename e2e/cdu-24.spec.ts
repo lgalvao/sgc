@@ -1,6 +1,7 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcessoCadastroHomologadoFixture, validarProcessoFixture} from './fixtures/fixtures-processos.js';
 import {criarCompetencia, navegarParaMapa} from './helpers/helpers-mapas.js';
+import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
 import {navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
 
@@ -27,7 +28,7 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
     });
 
     test('ADMIN mantém botão disponibilizar desabilitado enquanto existir atividade sem competência', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
-        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
+        await acessarDetalhesProcesso(page, descProcesso);
         await navegarParaSubprocesso(page, UNIDADE_1);
         await navegarParaMapa(page);
 
@@ -38,14 +39,14 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
     });
 
     test('ADMIN disponibiliza mapas em bloco após associar todas as atividades', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
-        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
+        await acessarDetalhesProcesso(page, descProcesso);
         await navegarParaSubprocesso(page, UNIDADE_1);
         await navegarParaMapa(page);
         await criarCompetencia(page, `${competencia1} complementar`, [atividade3]);
 
         // Retornar para tela do processo para ação em bloco
         await page.goto('/painel');
-        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
+        await acessarDetalhesProcesso(page, descProcesso);
         
         // Validação da UI da ação em bloco
         const btnDisponibilizar = page.getByRole('button', {name: TEXTOS.acaoBloco.disponibilizar.ROTULO}).first();

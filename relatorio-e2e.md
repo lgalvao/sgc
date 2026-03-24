@@ -14,6 +14,10 @@ As críticas que motivaram a revisão já foram tratadas:
 * `limparNotificacoes()` deixou de engolir erros silenciosamente;
 * os setups críticos deixaram de usar `expect(true).toBeTruthy()` e passaram a validar fixtures/estado;
 * `npm run typecheck:e2e` passou e uma amostra de Playwright dos fluxos críticos também passou.
+* `CDU-07` e `CDU-08` foram endurecidos para entrar pelo painel antes de abrir processos/subprocessos, reduzindo a navegação direta.
+* `CDU-09` e `CDU-10` agora usam helpers distintos por perfil: `CHEFE` entra direto no subprocesso e `GESTOR` usa a árvore de unidades.
+* `CDU-22`, `CDU-25` e `CDU-33` também foram endurecidos para abrir detalhes via painel antes das ações de bloco/reabertura.
+* `CDU-21` e `CDU-24` também passaram a entrar pelo painel nos fluxos de ADMIN.
 
 ## Atalhos aceitáveis por design
 
@@ -53,7 +57,7 @@ Exemplos em `e2e/cdu-07.spec.ts`, `e2e/cdu-08.spec.ts`, `e2e/cdu-10.spec.ts`, `e
 
 Risco: isso é aceitável para validar a tela interna, mas não valida o percurso real do usuário quando a navegação via painel/listagem também faz parte da regra.
 
-Situação atual: mantido apenas onde a tela interna é o foco do cenário; não foi alterado nesta rodada.
+Situação atual: reduzido nos cenários de maior risco; ainda mantido onde a tela interna é o foco do cenário ou onde a rota direta é parte aceitável do preparo.
 
 ### 4. Helpers que concentram navegação + assertiva demais
 

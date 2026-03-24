@@ -33,7 +33,7 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
     });
 
     test('Cenario 1: ADMIN visualiza botão Homologar mapas em bloco', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
-        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
+        await acessarDetalhesProcesso(page, descProcesso);
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
 
         const btnHomologar = page.getByRole('button', {name: /^Homologar mapas em bloco$/i}).first();
@@ -42,7 +42,7 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
     });
 
     test('Cenario 2: ADMIN abre modal de homologação de mapa em bloco', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
-        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
+        await acessarDetalhesProcesso(page, descProcesso);
 
         const btnHomologar = page.getByRole('button', {name: /^Homologar mapas em bloco$/i}).first();
         await expect(btnHomologar).toBeVisible();
@@ -60,7 +60,7 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
     });
 
     test('Cenario 3: Cancelar homologação de mapa em bloco', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
-        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
+        await acessarDetalhesProcesso(page, descProcesso);
 
         const btnHomologar = page.getByRole('button', {name: /^Homologar mapas em bloco$/i}).first();
         await expect(btnHomologar).toBeVisible();
@@ -76,7 +76,7 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
     });
 
     test('Cenario 4: ADMIN confirma homologação em bloco e é redirecionado ao painel', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
-        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
+        await acessarDetalhesProcesso(page, descProcesso);
 
         const btnHomologar = page.getByRole('button', {name: /^Homologar mapas em bloco$/i}).first();
         await expect(btnHomologar).toBeVisible();

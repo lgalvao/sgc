@@ -1,6 +1,7 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
 import {
+    acessarDetalhesProcesso,
     criarProcesso,
     extrairProcessoCodigo,
     verificarDetalhesProcesso,
@@ -36,7 +37,7 @@ test.describe('CDU-06 - Detalhar processo', () => {
         });
 
         // Capturar ID do processo para cleanup (padrão CDU-04/05)
-        await page.getByTestId('tbl-processos').getByText(descricao).first().click();
+        await acessarDetalhesProcesso(page, descricao);
         await esperarPaginaDetalhesProcesso(page);
 
         await verificarDetalhesProcesso(page, {
@@ -81,7 +82,7 @@ test.describe('CDU-06 - Detalhar processo', () => {
         });
 
         // Capturar ID para cleanup
-        await page.getByTestId('tbl-processos').getByText(descricao).first().click();
+        await acessarDetalhesProcesso(page, descricao);
         await esperarPaginaDetalhesProcesso(page);
         const codProcesso = await extrairProcessoCodigo(page);
 
@@ -92,7 +93,7 @@ test.describe('CDU-06 - Detalhar processo', () => {
 
         // Aguardar que o processo apareça no painel
         await expect(page.getByTestId('tbl-processos').getByRole('row', {name: descricao})).toBeVisible();
-        await page.getByTestId('tbl-processos').getByRole('row', {name: descricao}).click();
+        await acessarDetalhesProcesso(page, descricao);
 
         await esperarPaginaDetalhesProcesso(page, codProcesso);
 
@@ -127,7 +128,7 @@ test.describe('CDU-06 - Detalhar processo', () => {
         });
         
         // Capturar ID para cleanup
-        await page.getByTestId('tbl-processos').getByText(descricao).first().click();
+        await acessarDetalhesProcesso(page, descricao);
         await esperarPaginaDetalhesProcesso(page);
         const codProcesso = await extrairProcessoCodigo(page);
 
@@ -140,13 +141,13 @@ test.describe('CDU-06 - Detalhar processo', () => {
         await verificarPaginaPainel(page);
 
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
-        await page.getByTestId('tbl-processos').getByText(descricao).first().click();
+        await acessarDetalhesProcesso(page, descricao);
         await esperarPaginaDetalhesProcesso(page, codProcesso);
         await expect(page.getByRole('button', {name: 'Homologar em bloco'})).toBeVisible();
 
         // John lennon (202020) é Gestor da SECRETARIA_1 (que engloba ASSESSORIA_12)
         await loginComPerfil(page, '202020', 'senha', 'GESTOR - SECRETARIA_1');
-        await page.getByTestId('tbl-processos').getByText(descricao).first().click();
+        await acessarDetalhesProcesso(page, descricao);
         await esperarPaginaDetalhesProcesso(page, codProcesso);
         await expect(page.getByRole('button', {name: 'Aceitar cadastro em bloco'})).toBeVisible();
     });

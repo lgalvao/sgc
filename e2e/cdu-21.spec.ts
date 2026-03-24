@@ -1,5 +1,6 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcessoMapaHomologadoFixture, validarProcessoFixture} from './fixtures/fixtures-processos.js';
+import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
 import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
 
@@ -24,9 +25,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
     test('Cenario 1: ADMIN navega para detalhes do processo', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
         // CDU-21: Passos 1-2
 
-
-        await expect(page.getByTestId('tbl-processos').getByText(descProcesso).first()).toBeVisible();
-        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
+        await acessarDetalhesProcesso(page, descProcesso);
 
         await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
 
@@ -37,7 +36,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
     test('Cenario 2: ADMIN cancela finalização - permanece na tela', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
 
 
-        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
+        await acessarDetalhesProcesso(page, descProcesso);
 
         await page.getByTestId('btn-processo-finalizar').click();
 
@@ -56,7 +55,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
         // CDU-21: Passos 7-10
 
 
-        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
+        await acessarDetalhesProcesso(page, descProcesso);
 
         await page.getByTestId('btn-processo-finalizar').click();
 

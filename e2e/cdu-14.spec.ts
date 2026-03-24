@@ -88,7 +88,7 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
         await aceitarRevisao(page, 'Revisão aprovada conforme análise');
 
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
-        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
+        await acessarDetalhesProcesso(page, descProcesso);
         await navegarParaSubprocesso(page, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
         const modal = await abrirHistoricoAnaliseVisualizacao(page);

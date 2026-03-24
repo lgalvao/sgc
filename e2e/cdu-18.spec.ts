@@ -1,4 +1,5 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
+import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
 import {navegarParaMapa} from './helpers/helpers-mapas.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
 
@@ -23,7 +24,7 @@ test.describe('CDU-18: Visualizar mapa de competências', () => {
 
         await test.step('2. Navegar para processo finalizado com mapa', async () => {
             // Clicar no processo 99 que tem mapa homologado
-            await page.getByTestId('tbl-processos').getByRole('row', {name: 'Processo 99'}).click();
+            await acessarDetalhesProcesso(page, 'Processo 99');
             await expect(page).toHaveURL(/\/processo\/\d+$/);
         });
 
@@ -71,7 +72,7 @@ test.describe('CDU-18: Visualizar mapa de competências', () => {
 
         await test.step('2. Navegar para processo via painel', async () => {
             // CHEFE vê processo no painel e clica
-            await page.getByTestId('tbl-processos').getByRole('row', {name: 'Processo 99'}).click();
+            await acessarDetalhesProcesso(page, 'Processo 99');
 
             // CHEFE vai direto para detalhes do subprocesso da sua unidade
             await expect(page).toHaveURL(/\/processo\/\d+\/ASSESSORIA_12$/);

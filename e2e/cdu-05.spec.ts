@@ -2,7 +2,7 @@
 import type {Page} from '@playwright/test';
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
-import {criarProcesso, verificarProcessoNaTabela} from './helpers/helpers-processos.js';
+import {acessarDetalhesProcesso, criarProcesso, verificarProcessoNaTabela} from './helpers/helpers-processos.js';
 import {verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 import {
     aceitarCadastroMapeamento,
@@ -52,8 +52,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
             tipo: 'Mapeamento'
         });
 
-        const linhaProcesso = page.getByTestId('tbl-processos').locator('tr', {has: page.getByText(descricao)});
-        await linhaProcesso.click();
+        await acessarDetalhesProcesso(page, descricao);
         await expect(page).toHaveURL(/\/processo\/cadastro/);
         await expect(page.getByTestId('inp-processo-descricao')).toHaveValue(descricao);
 
@@ -78,7 +77,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await passo1_AdminCriaEIniciaProcessoMapeamento(page, descProcMapeamento);
         // Capturar ID do processo para cleanup
         await page.goto('/painel');
-        await page.getByTestId('tbl-processos').getByText(descProcMapeamento).first().click();
+        await acessarDetalhesProcesso(page, descProcMapeamento);
 
     });
 
@@ -154,7 +153,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await verificarPaginaPainel(page);
 
         await page.goto('/painel');
-        await page.getByTestId('tbl-processos').getByText(descProcMapeamento).first().click();
+        await acessarDetalhesProcesso(page, descProcMapeamento);
         await page.getByTestId('btn-processo-finalizar').click();
         await page.getByTestId('btn-finalizar-processo-confirmar').click();
         await verificarPaginaPainel(page);
@@ -180,7 +179,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         });
 
         // Capturar ID do processo para cleanup
-        await page.getByTestId('tbl-processos').getByText(descProcRevisao).first().click();
+        await acessarDetalhesProcesso(page, descProcRevisao);
         await expect(page).toHaveURL(/\/processo\/cadastro/);
 
         const dataLimiteStr = (await page.getByTestId('inp-processo-data-limite').inputValue()).split('-').reverse().join('/');

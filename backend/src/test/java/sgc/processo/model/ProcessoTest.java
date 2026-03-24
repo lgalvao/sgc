@@ -3,6 +3,7 @@ package sgc.processo.model;
 import org.junit.jupiter.api.*;
 import sgc.fixture.*;
 import sgc.organizacao.model.*;
+import nl.jqno.equalsverifier.*;
 
 import java.time.*;
 import java.util.*;
@@ -104,6 +105,45 @@ class ProcessoTest {
     @Nested
     @DisplayName("Participantes")
     class Participantes {
+
+        @Test
+        @DisplayName("Deve retornar vazio se participantes for null")
+        void deveRetornarVazioSeParticipantesNull() {
+            processo.setParticipantes(null);
+            assertThat(processo.getCodigosParticipantes()).isEmpty();
+            assertThat(processo.getSiglasParticipantes()).isNull();
+        }
+
+        @Test
+        @DisplayName("Deve extrair siglas e codigos dos participantes")
+        void deveExtrairSiglasECodigos() {
+            UnidadeProcesso u1 = new UnidadeProcesso(); u1.setUnidadeCodigo(10L); u1.setSigla("SIGLA1");
+            UnidadeProcesso u2 = new UnidadeProcesso(); u2.setUnidadeCodigo(20L); u2.setSigla("SIGLA2");
+            UnidadeProcesso u3 = new UnidadeProcesso(); u3.setUnidadeCodigo(30L); u3.setSigla(null); // testar filtro
+            
+            processo.setParticipantes(List.of(u1, u2, u3));
+            
+            assertThat(processo.getCodigosParticipantes()).containsExactly(10L, 20L, 30L);
+            assertThat(processo.getSiglasParticipantes()).isEqualTo("SIGLA1, SIGLA2");
+        }
+
+        @Test
+        @DisplayName("Deve sincronizar participantes corretamente")
+        void deveSincronizarParticipantes() {
+            Unidade u1 = new Unidade(); u1.setCodigo(1L); u1.setSituacao(SituacaoUnidade.ATIVA);
+            Unidade u2 = new Unidade(); u2.setCodigo(2L); u2.setSituacao(SituacaoUnidade.ATIVA);
+            Unidade u3 = new Unidade(); u3.setCodigo(3L); u3.setSituacao(SituacaoUnidade.ATIVA);
+
+            processo.adicionarParticipantes(Set.of(u1, u2));
+            assertThat(processo.getParticipantes()).hasSize(2);
+
+            processo.sincronizarParticipantes(Set.of(u2, u3));
+            
+            assertThat(processo.getParticipantes()).hasSize(2);
+            assertThat(processo.getParticipantes())
+                    .extracting(UnidadeProcesso::getUnidadeCodigo)
+                    .containsExactlyInAnyOrder(2L, 3L);
+        }
 
         @Test
         @DisplayName("Deve inicializar participantes como lista vazia")

@@ -252,8 +252,10 @@ export async function extrairProcessoCodigo(page: Page): Promise<number> {
  * Acessa a tela de detalhes de um processo a partir do painel.
  */
 export async function acessarDetalhesProcesso(page: Page, descricao: string) {
-    await page.getByTestId('tbl-processos').getByText(descricao).first().click();
-    await expect(page).toHaveURL(/\/processo\/\d+$/);
+    const linhaProcesso = page.getByTestId('tbl-processos').locator('tr', {hasText: descricao});
+    await expect(linhaProcesso).toBeVisible();
+    await linhaProcesso.click();
+    await expect(page).toHaveURL(/\/processo\/\d+(?:\/[A-Z0-9_]+)?$/);
 }
 
 /**
