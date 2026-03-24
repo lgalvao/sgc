@@ -8,16 +8,16 @@ import sgc.comum.*;
  * Utilizado na atualização em bloco de parâmetros.
  */
 public record ParametroRequest(
-        @NotNull(message = SgcMensagens.CODIGO_PARAMETRO_OBRIGATORIO)
+        @NotNull(message = Mensagens.CODIGO_PARAMETRO_OBRIGATORIO)
         Long codigo,
 
-        @NotBlank(message = SgcMensagens.CHAVE_OBRIGATORIA)
-        @Size(max = 50, message = SgcMensagens.CHAVE_MAX)
+        @NotBlank(message = Mensagens.CHAVE_OBRIGATORIA)
+        @Size(max = 50, message = Mensagens.CHAVE_MAX)
         String chave,
 
         String descricao,
 
-        @NotBlank(message = SgcMensagens.VALOR_OBRIGATORIO)
+        @NotBlank(message = Mensagens.VALOR_OBRIGATORIO)
         String valor
 ) {
 }

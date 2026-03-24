@@ -8,16 +8,17 @@ import sgc.alerta.*;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
+import sgc.processo.model.*;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
 
+import java.time.*;
 import java.time.format.*;
 import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 public class SubprocessoNotificacaoService {
-
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     private final AlertaFacade alertaService;
@@ -27,39 +28,42 @@ public class SubprocessoNotificacaoService {
     private final SpringTemplateEngine templateEngine;
 
     public void notificarTransicao(NotificacaoCommand cmd) {
-        if (cmd.tipoTransicao().geraAlerta()) {
-            String sigla = cmd.subprocesso().getUnidade().getSigla();
-            String descricao = cmd.tipoTransicao().formatarAlerta(sigla);
-            alertaService.criarAlertaTransicao(cmd.subprocesso().getProcesso(), descricao, cmd.unidadeOrigem(), cmd.unidadeDestino());
+        TipoTransicao tipoTransicao = cmd.tipoTransicao();
+        if (tipoTransicao.geraAlerta()) {
+            Subprocesso subprocesso = cmd.subprocesso();
+            String sigla = subprocesso.getUnidade().getSigla();
+            String descricao = tipoTransicao.formatarAlerta(sigla);
+            alertaService.criarAlertaTransicao(subprocesso.getProcesso(), descricao, cmd.unidadeOrigem(), cmd.unidadeDestino());
         }
-        if (cmd.tipoTransicao().enviaEmail()) {
+        if (tipoTransicao.enviaEmail()) {
             notificarMovimentacaoEmail(cmd);
         }
     }
 
     private void notificarMovimentacaoEmail(NotificacaoCommand cmd) {
-        if (!cmd.tipoTransicao().enviaEmail()) return;
+        TipoTransicao tipoTransicao = cmd.tipoTransicao();
+        if (!tipoTransicao.enviaEmail()) return;
 
         Map<String, Object> variaveis = criarVariaveisTemplateDireto(cmd);
         enviarNotificacaoDireta(cmd, variaveis);
-        
-        if (cmd.tipoTransicao().notificacaoSuperior()) {
+
+        if (tipoTransicao.notificacaoSuperior()) {
             enviarNotificacaoSuperior(cmd, variaveis);
         }
     }
 
     private String getEmailUnidade(Unidade unidade) {
-        String sigla = unidade.getSigla();
-        return sigla.toLowerCase() + "@tre-pe.jus.br";
+        return "%s@tre-pe.jus.br".formatted(unidade.getSigla().toLowerCase());
     }
 
     private void enviarNotificacaoDireta(NotificacaoCommand cmd, Map<String, Object> variaveis) {
-        String assunto = criarAssunto(cmd.tipoTransicao(), cmd.subprocesso(), false);
-        String corpo = processarTemplate(cmd.tipoTransicao().getTemplateEmail(), variaveis);
+        TipoTransicao tipo = cmd.tipoTransicao();
 
+        String assunto = criarAssunto(tipo, cmd.subprocesso(), false);
+        String corpo = processarTemplate(tipo.getTemplateEmail(), variaveis);
         String emailUnidade = getEmailUnidade(cmd.unidadeDestino());
-        emailService.enviarEmailHtml(emailUnidade, assunto, corpo);
 
+        emailService.enviarEmailHtml(emailUnidade, assunto, corpo);
         notificarResponsavelPessoal(cmd.unidadeDestino(), assunto, corpo);
     }
 
@@ -67,9 +71,7 @@ public class SubprocessoNotificacaoService {
         UnidadeResponsavelDto responsavel = responsavelService.buscarResponsavelUnidade(unidade.getCodigo());
         if (responsavel.substitutoTitulo() != null) {
             usuarioService.buscarOpt(responsavel.substitutoTitulo()).ifPresent(u -> {
-                if (!u.getEmail().isBlank()) {
-                    emailService.enviarEmailHtml(u.getEmail(), assunto, corpo);
-                }
+                if (!u.getEmail().isBlank()) emailService.enviarEmailHtml(u.getEmail(), assunto, corpo);
             });
         }
     }
@@ -98,22 +100,31 @@ public class SubprocessoNotificacaoService {
     private Map<String, Object> criarVariaveisTemplateDireto(NotificacaoCommand cmd) {
         Map<String, Object> variaveis = new HashMap<>();
 
-        variaveis.put("siglaUnidade", cmd.subprocesso().getUnidade().getSigla());
-        variaveis.put("nomeUnidade", cmd.subprocesso().getUnidade().getNome());
-        variaveis.put("siglaUnidadeOrigem", cmd.unidadeOrigem().getSigla());
-        variaveis.put("nomeUnidadeOrigem", cmd.unidadeOrigem().getNome());
-        variaveis.put("siglaUnidadeDestino", cmd.unidadeDestino().getSigla());
-        variaveis.put("nomeUnidadeDestino", cmd.unidadeDestino().getNome());
-        variaveis.put("nomeProcesso", cmd.subprocesso().getProcesso().getDescricao());
-        variaveis.put("tipoProcesso", cmd.subprocesso().getProcesso().getTipo().name());
+        Subprocesso subprocesso = cmd.subprocesso();
+        Unidade unidade = subprocesso.getUnidade();
+        variaveis.put("siglaUnidade", unidade.getSigla());
+        variaveis.put("nomeUnidade", unidade.getNome());
 
-        if (cmd.subprocesso().getDataLimiteEtapa1() != null) {
-            variaveis.put("dataLimiteEtapa1", cmd.subprocesso().getDataLimiteEtapa1().format(DATE_FORMATTER));
+        Unidade unidadeOrigem = cmd.unidadeOrigem();
+        variaveis.put("siglaUnidadeOrigem", unidadeOrigem.getSigla());
+        variaveis.put("nomeUnidadeOrigem", unidadeOrigem.getNome());
+
+        Unidade unidadeDestino = cmd.unidadeDestino();
+        variaveis.put("siglaUnidadeDestino", unidadeDestino.getSigla());
+        variaveis.put("nomeUnidadeDestino", unidadeDestino.getNome());
+
+        Processo processo = subprocesso.getProcesso();
+        variaveis.put("nomeProcesso", processo.getDescricao());
+        variaveis.put("tipoProcesso", processo.getTipo().name());
+
+        if (subprocesso.getDataLimiteEtapa1() != null) {
+            variaveis.put("dataLimiteEtapa1", subprocesso.getDataLimiteEtapa1().format(DATE_FORMATTER));
         }
 
-        if (cmd.subprocesso().getDataLimiteEtapa2() != null) {
-            variaveis.put("dataLimiteEtapa2", cmd.subprocesso().getDataLimiteEtapa2().format(DATE_FORMATTER));
-            variaveis.put("dataLimiteValidacao", cmd.subprocesso().getDataLimiteEtapa2().format(DATE_FORMATTER));
+        LocalDateTime dataLimiteEtapa2 = subprocesso.getDataLimiteEtapa2();
+        if (dataLimiteEtapa2 != null) {
+            variaveis.put("dataLimiteEtapa2", dataLimiteEtapa2.format(DATE_FORMATTER));
+            variaveis.put("dataLimiteValidacao", dataLimiteEtapa2.format(DATE_FORMATTER));
         }
 
         String observacoes = Objects.requireNonNullElse(cmd.observacoes(), "-");

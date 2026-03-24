@@ -15,6 +15,6 @@ public record CriarAtribuicaoRequest(
         LocalDate dataTermino,
 
         @SanitizarHtml
-        @Size(max = 500, message = SgcMensagens.JUSTIFICATIVA_MAX)
+        @Size(max = 500, message = Mensagens.JUSTIFICATIVA_MAX)
         String justificativa) {
 }

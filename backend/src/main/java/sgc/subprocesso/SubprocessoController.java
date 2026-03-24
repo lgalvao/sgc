@@ -269,7 +269,7 @@ public class SubprocessoController {
             @PathVariable Long codSubprocesso, @RequestBody @Valid ImportarAtividadesRequest request) {
         boolean temDuplicatas = subprocessoService.importarAtividades(codSubprocesso, request.codSubprocessoOrigem(), request.codigosAtividades());
         if (temDuplicatas) {
-            return Map.of("message", "Atividades importadas.", "aviso", SgcMensagens.IMPORTACAO_ATIVIDADES_DUPLICADAS);
+            return Map.of("message", "Atividades importadas.", "aviso", Mensagens.IMPORTACAO_ATIVIDADES_DUPLICADAS);
         }
         return Map.of("message", "Atividades importadas.");
     }

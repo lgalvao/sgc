@@ -86,19 +86,22 @@ const mockElegiveis = [
         unidadeCodigo: 101,
         unidadeSigla: "UNI1",
         unidadeNome: "Unidade 1",
-        situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO
+        situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
+        localizacaoCodigo: 999
     },
     {
         unidadeCodigo: 103,
         unidadeSigla: "UNI3",
         unidadeNome: "Unidade 3",
-        situacao: SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO
+        situacao: SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO,
+        localizacaoCodigo: 999
     },
     {
         unidadeCodigo: 104,
         unidadeSigla: "UNI4",
         unidadeNome: "Unidade 4",
-        situacao: SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO
+        situacao: SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO,
+        localizacaoCodigo: 999
     }
 ];
 
@@ -175,7 +178,7 @@ describe("Processo.vue", () => {
                     ProcessoInfo: ProcessoInfoStub,
                     BAlert: BAlertStub,
                     BSpinner: BSpinnerStub,
-                    BButton: {template: "<button><slot></slot></button>"}
+                    BButton: {template: '<button @click="$emit(\'click\', $event)"><slot /></button>'}
                 }
             }
         });

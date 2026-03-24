@@ -1,5 +1,6 @@
 package sgc.mapa;
 
+import lombok.*;
 import lombok.extern.slf4j.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
@@ -23,23 +24,12 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 @Service
 @Transactional
 @Slf4j
+@RequiredArgsConstructor
 public class AtividadeFacade {
     private final MapaManutencaoService mapaManutencaoService;
     private final SubprocessoService subprocessoService;
     private final SgcPermissionEvaluator permissionEvaluator;
     private final UsuarioFacade usuarioService;
-
-    public AtividadeFacade(
-            MapaManutencaoService mapaManutencaoService,
-            SubprocessoService subprocessoService,
-            SgcPermissionEvaluator permissionEvaluator,
-            UsuarioFacade usuarioService) {
-
-        this.mapaManutencaoService = mapaManutencaoService;
-        this.subprocessoService = subprocessoService;
-        this.permissionEvaluator = permissionEvaluator;
-        this.usuarioService = usuarioService;
-    }
 
     @Transactional(readOnly = true)
     public Atividade obterAtividadePorCodigo(Long codAtividade) {
@@ -115,15 +105,18 @@ public class AtividadeFacade {
         Subprocesso sp = subprocessoService.obterEntidadePorCodigoMapa(mapaCodigo);
 
         if (!permissionEvaluator.verificarPermissao(usuario, sp, EDITAR_CADASTRO)) {
-            throw new ErroAcessoNegado(SgcMensagens.SEM_PERMISSAO_EDITAR_ATIVIDADES);
+            throw new ErroAcessoNegado(Mensagens.SEM_PERMISSAO_EDITAR_ATIVIDADES);
         }
 
-        if (!Set.of(NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, REVISAO_CADASTRO_EM_ANDAMENTO,
-                MAPEAMENTO_MAPA_CRIADO, MAPEAMENTO_MAPA_COM_SUGESTOES,
-                REVISAO_MAPA_AJUSTADO, REVISAO_MAPA_COM_SUGESTOES).contains(sp.getSituacao())) {
-            throw new ErroValidacao(
-                    SgcMensagens.SITUACAO_ATUAL
-                            .formatted(sp.getSituacao()));
+        if (!Set.of(NAO_INICIADO,
+                MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
+                REVISAO_CADASTRO_EM_ANDAMENTO,
+                MAPEAMENTO_MAPA_CRIADO,
+                MAPEAMENTO_MAPA_COM_SUGESTOES,
+                REVISAO_MAPA_AJUSTADO,
+                REVISAO_MAPA_COM_SUGESTOES).contains(sp.getSituacao())) {
+
+            throw new ErroValidacao(Mensagens.SITUACAO_ATUAL.formatted(sp.getSituacao()));
         }
     }
 
@@ -152,6 +145,7 @@ public class AtividadeFacade {
     private AtividadeOperacaoResponse criarRespostaOperacao(Long codSubprocesso, Long codigoAtividade, boolean incluirAtividade) {
         SubprocessoSituacaoDto situacaoDto = subprocessoService.obterStatus(codSubprocesso);
         List<AtividadeDto> todasAtividades = subprocessoService.listarAtividadesSubprocesso(codSubprocesso);
+
         Usuario usuario = usuarioService.usuarioAutenticado();
         Subprocesso sp = subprocessoService.buscarSubprocesso(codSubprocesso);
         PermissoesSubprocessoDto permissoes = subprocessoService.obterPermissoesUI(sp, usuario);

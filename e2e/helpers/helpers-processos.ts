@@ -212,15 +212,10 @@ export async function verificarDetalhesSubprocesso(page: Page, dados: {
         await expect(page.getByTestId('subprocesso-header__txt-localizacao')).toContainText(dados.localizacao);
     }
     if (dados.prazo) {
-        const campoPrazo = header.getByText(/Prazo para conclusão da etapa atual:/).first();
-        await expect(campoPrazo).toBeVisible();
-        if (dados.prazo instanceof RegExp) {
-            await expect(campoPrazo).toContainText(dados.prazo);
-        } else {
-            await expect(campoPrazo).toContainText(dados.prazo);
-        }
+        const campoPrazo = page.locator('span:has-text("Prazo para conclusão da etapa atual:")').first();
+        await expect(campoPrazo).toContainText(dados.prazo);
     }
-    await expect(page.getByText(dados.situacao).first()).toBeVisible();
+    await expect(page.getByTestId('subprocesso-header__txt-situacao')).toContainText(dados.situacao);
 }
 
 /**

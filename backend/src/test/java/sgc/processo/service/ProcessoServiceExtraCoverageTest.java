@@ -334,7 +334,8 @@ class ProcessoServiceExtraCoverageTest {
             sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
             sp.setUnidade(uni);
             when(subprocessoService.listarEntidadesPorProcessoEUnidades(eq(1L), anyList())).thenReturn(List.of(sp));
-            when(permissionEvaluator.verificarPermissao(eq(u), eq(sp), eq(sgc.seguranca.AcaoPermissao.DISPONIBILIZAR_MAPA))).thenReturn(true);
+            when(subprocessoService.obterLocalizacaoAtual(sp)).thenReturn(uni);
+            when(permissionEvaluator.verificarPermissao(u, sp, sgc.seguranca.AcaoPermissao.DISPONIBILIZAR_MAPA)).thenReturn(true);
 
             List<SubprocessoElegivelDto> res = processoService.listarSubprocessosElegiveis(1L);
 
@@ -495,6 +496,7 @@ class ProcessoServiceExtraCoverageTest {
             Unidade uni = new Unidade();
             uni.setCodigo(1L);
             sp.setUnidade(uni);
+            when(subprocessoService.obterLocalizacaoAtual(sp)).thenReturn(uni);
 
             List<SubprocessoElegivelDto> res = processoService.listarSubprocessosElegiveis(1L);
             assertThat(res).hasSize(1);

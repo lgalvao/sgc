@@ -10,5 +10,6 @@ public class SubprocessoElegivelDto {
     Long unidadeCodigo;
     String unidadeNome;
     String unidadeSigla;
+    Long localizacaoCodigo;
     SituacaoSubprocesso situacao;
 }

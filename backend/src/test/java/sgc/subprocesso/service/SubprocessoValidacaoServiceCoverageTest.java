@@ -39,7 +39,7 @@ class SubprocessoValidacaoServiceCoverageTest {
 
             assertThatThrownBy(() -> validacaoService.validarExistenciaAtividades(sp))
                     .isInstanceOf(ErroValidacao.class)
-                    .hasMessageContaining(SgcMensagens.SUBPROCESSO_SEM_MAPA);
+                    .hasMessageContaining(Mensagens.SUBPROCESSO_SEM_MAPA);
         }
 
         @Test
@@ -52,7 +52,7 @@ class SubprocessoValidacaoServiceCoverageTest {
 
             assertThatThrownBy(() -> validacaoService.validarExistenciaAtividades(sp))
                     .isInstanceOf(ErroValidacao.class)
-                    .hasMessageContaining(SgcMensagens.SUBPROCESSO_SEM_MAPA);
+                    .hasMessageContaining(Mensagens.SUBPROCESSO_SEM_MAPA);
         }
 
         @Test
@@ -67,7 +67,7 @@ class SubprocessoValidacaoServiceCoverageTest {
 
             assertThatThrownBy(() -> validacaoService.validarExistenciaAtividades(sp))
                     .isInstanceOf(ErroValidacao.class)
-                    .hasMessageContaining(SgcMensagens.MAPA_SEM_ATIVIDADES);
+                    .hasMessageContaining(Mensagens.MAPA_SEM_ATIVIDADES);
         }
 
         @Test
@@ -85,7 +85,7 @@ class SubprocessoValidacaoServiceCoverageTest {
 
             assertThatThrownBy(() -> validacaoService.validarExistenciaAtividades(sp))
                     .isInstanceOf(ErroValidacao.class)
-                    .hasMessageContaining(SgcMensagens.ATIVIDADES_SEM_CONHECIMENTOS);
+                    .hasMessageContaining(Mensagens.ATIVIDADES_SEM_CONHECIMENTOS);
         }
     }
 
@@ -104,7 +104,7 @@ class SubprocessoValidacaoServiceCoverageTest {
 
             assertThatThrownBy(() -> validacaoService.validarAssociacoesMapa(1L))
                     .isInstanceOf(ErroValidacao.class)
-                    .hasMessageContaining(SgcMensagens.COMPETENCIAS_SEM_ATIVIDADE);
+                    .hasMessageContaining(Mensagens.COMPETENCIAS_SEM_ATIVIDADE);
         }
 
         @Test
@@ -125,7 +125,7 @@ class SubprocessoValidacaoServiceCoverageTest {
 
             assertThatThrownBy(() -> validacaoService.validarAssociacoesMapa(1L))
                     .isInstanceOf(ErroValidacao.class)
-                    .hasMessageContaining(SgcMensagens.ATIVIDADES_SEM_COMPETENCIA);
+                    .hasMessageContaining(Mensagens.ATIVIDADES_SEM_COMPETENCIA);
         }
 
         @Test
@@ -164,7 +164,7 @@ class SubprocessoValidacaoServiceCoverageTest {
 
             assertThatThrownBy(() -> validacaoService.validarMapaParaDisponibilizacao(sp))
                     .isInstanceOf(ErroValidacao.class)
-                    .hasMessageContaining(SgcMensagens.TODAS_COMPETENCIAS_DEVEM_TER_ATIVIDADE);
+                    .hasMessageContaining(Mensagens.TODAS_COMPETENCIAS_DEVEM_TER_ATIVIDADE);
         }
 
         @Test
@@ -191,7 +191,7 @@ class SubprocessoValidacaoServiceCoverageTest {
 
             assertThatThrownBy(() -> validacaoService.validarMapaParaDisponibilizacao(sp))
                     .isInstanceOf(ErroValidacao.class)
-                    .hasMessageContaining(SgcMensagens.ATIVIDADES_DEVEM_TER_COMPETENCIA);
+                    .hasMessageContaining(Mensagens.ATIVIDADES_DEVEM_TER_COMPETENCIA);
         }
 
         @Test
@@ -314,7 +314,7 @@ class SubprocessoValidacaoServiceCoverageTest {
 
             assertThatThrownBy(() -> validacaoService.validarRequisitosNegocioParaDisponibilizacao(sp, List.of(a2)))
                     .isInstanceOf(ErroValidacao.class)
-                    .hasMessageContaining(SgcMensagens.ATIVIDADES_SEM_CONHECIMENTO_ASSOCIADO);
+                    .hasMessageContaining(Mensagens.ATIVIDADES_SEM_CONHECIMENTO_ASSOCIADO);
         }
     }
 }

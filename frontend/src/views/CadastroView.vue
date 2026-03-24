@@ -89,6 +89,16 @@
         icon="bi-list-check"
         :title="TEXTOS.atividades.EMPTY_TITLE"
     >
+      <BButton
+          :disabled="!habilitarEditarCadastro"
+          class="mt-2 px-4 shadow-sm"
+          data-testid="btn-empty-state-importar"
+          variant="primary"
+          @click="mostrarModalImportar = true"
+      >
+        <i aria-hidden="true" class="bi bi-upload me-1"/>
+        {{ TEXTOS.atividades.BOTAO_IMPORTAR }}
+      </BButton>
     </EmptyState>
 
     <div

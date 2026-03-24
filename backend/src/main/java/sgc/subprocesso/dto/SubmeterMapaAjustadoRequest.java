@@ -15,8 +15,8 @@ import java.util.*;
  */
 @Builder
 public record SubmeterMapaAjustadoRequest(
-        @NotBlank(message = SgcMensagens.JUSTIFICATIVA_OBRIGATORIA)
-        @Size(max = 500, message = SgcMensagens.JUSTIFICATIVA_MAX)
+        @NotBlank(message = Mensagens.JUSTIFICATIVA_OBRIGATORIA)
+        @Size(max = 500, message = Mensagens.JUSTIFICATIVA_MAX)
         @SanitizarHtml
         String justificativa,
 

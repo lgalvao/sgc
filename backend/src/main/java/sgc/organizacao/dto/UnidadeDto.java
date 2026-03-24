@@ -25,8 +25,8 @@ public class UnidadeDto {
     @JsonView(OrganizacaoViews.Publica.class)
     private String nome;
     @JsonView(OrganizacaoViews.Publica.class)
-    @NotBlank(message = SgcMensagens.SIGLA_OBRIGATORIA)
-    @Size(max = 20, message = SgcMensagens.SIGLA_MAX)
+    @NotBlank(message = Mensagens.SIGLA_OBRIGATORIA)
+    @Size(max = 20, message = Mensagens.SIGLA_MAX)
     private String sigla;
     @JsonView(OrganizacaoViews.Publica.class)
     private Long codigoPai;

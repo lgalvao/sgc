@@ -14,14 +14,14 @@ import java.util.*;
  */
 @Builder
 public record SalvarMapaRequest(
-        @Nullable @Size(max = 1000, message = SgcMensagens.OBSERVACOES_MAX_1000) @SanitizarHtml String observacoes,
+        @Nullable @Size(max = 1000, message = Mensagens.OBSERVACOES_MAX_1000) @SanitizarHtml String observacoes,
         @Valid List<CompetenciaRequest> competencias) {
 
     @Builder
     public record CompetenciaRequest(
             Long codigo,
 
-            @NotBlank(message = SgcMensagens.DESCRICAO_COMPETENCIA_OBRIGATORIA) String descricao,
+            @NotBlank(message = Mensagens.DESCRICAO_COMPETENCIA_OBRIGATORIA) String descricao,
             List<Long> atividadesCodigos
     ) {
     }

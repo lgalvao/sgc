@@ -42,7 +42,7 @@ class ParametroValidationTest {
         Set<ConstraintViolation<Parametro>> violations = validator.validate(p);
         assertThat(violations).isNotEmpty();
         assertThat(violations).hasSize(1);
-        assertThat(violations.iterator().next().getMessage()).isEqualTo(SgcMensagens.CHAVE_OBRIGATORIA);
+        assertThat(violations.iterator().next().getMessage()).isEqualTo(Mensagens.CHAVE_OBRIGATORIA);
     }
 
     @Test
@@ -52,7 +52,7 @@ class ParametroValidationTest {
         Set<ConstraintViolation<Parametro>> violations = validator.validate(p);
         assertThat(violations).isNotEmpty();
         assertThat(violations).hasSize(1);
-        assertThat(violations.iterator().next().getMessage()).isEqualTo(SgcMensagens.VALOR_OBRIGATORIO);
+        assertThat(violations.iterator().next().getMessage()).isEqualTo(Mensagens.VALOR_OBRIGATORIO);
     }
 
     @Test
@@ -63,6 +63,6 @@ class ParametroValidationTest {
         Set<ConstraintViolation<Parametro>> violations = validator.validate(p);
         assertThat(violations).isNotEmpty();
         assertThat(violations).hasSize(1);
-        assertThat(violations.iterator().next().getMessage()).isEqualTo(SgcMensagens.CHAVE_MAX);
+        assertThat(violations.iterator().next().getMessage()).isEqualTo(Mensagens.CHAVE_MAX);
     }
 }

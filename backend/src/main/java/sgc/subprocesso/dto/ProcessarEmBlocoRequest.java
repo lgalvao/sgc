@@ -9,10 +9,10 @@ import java.util.*;
 
 @Builder
 public record ProcessarEmBlocoRequest(
-        @NotBlank(message = SgcMensagens.ACAO_OBRIGATORIA)
+        @NotBlank(message = Mensagens.ACAO_OBRIGATORIA)
         String acao,
 
-        @NotEmpty(message = SgcMensagens.PELO_MENOS_UM_SUBPROCESSO)
+        @NotEmpty(message = Mensagens.PELO_MENOS_UM_SUBPROCESSO)
         List<Long> subprocessos,
 
         LocalDate dataLimite) {

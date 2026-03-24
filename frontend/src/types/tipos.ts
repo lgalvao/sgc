@@ -396,6 +396,7 @@ export interface SubprocessoElegivel {
     unidadeCodigo: number;
     unidadeNome: string;
     unidadeSigla: string;
+    localizacaoCodigo: number;
     situacao: SituacaoSubprocesso;
 }
 

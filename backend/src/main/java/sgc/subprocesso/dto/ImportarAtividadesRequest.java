@@ -11,7 +11,7 @@ import java.util.*;
  */
 @Builder
 public record ImportarAtividadesRequest(
-        @NotNull(message = SgcMensagens.CODIGO_SUBPROCESSO_ORIGEM_OBRIGATORIO)
+        @NotNull(message = Mensagens.CODIGO_SUBPROCESSO_ORIGEM_OBRIGATORIO)
         Long codSubprocessoOrigem,
         List<Long> codigosAtividades) {
 }

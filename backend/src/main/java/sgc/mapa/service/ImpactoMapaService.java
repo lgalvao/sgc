@@ -29,7 +29,7 @@ public class ImpactoMapaService {
     @Transactional(readOnly = true)
     public ImpactoMapaResponse verificarImpactos(Subprocesso subprocesso, Usuario usuario) {
         if (!permissionEvaluator.verificarPermissao(usuario, subprocesso, VERIFICAR_IMPACTOS)) {
-            throw new ErroAcessoNegado(SgcMensagens.SEM_PERMISSAO_VERIFICAR_IMPACTOS);
+            throw new ErroAcessoNegado(Mensagens.SEM_PERMISSAO_VERIFICAR_IMPACTOS);
         }
 
         checkSituacao(usuario, subprocesso);
@@ -86,7 +86,7 @@ public class ImpactoMapaService {
 
         if (!situacaoValida) {
             throw new ErroValidacao(
-                    SgcMensagens.SITUACAO_IMPEDE_IMPACTO
+                    Mensagens.SITUACAO_IMPEDE_IMPACTO
                             .formatted(situacao, perfil));
         }
     }

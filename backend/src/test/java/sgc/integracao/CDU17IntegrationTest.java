@@ -214,7 +214,7 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isUnprocessableContent())
-                    .andExpect(jsonPath("$.message").value(Matchers.containsString(SgcMensagens.ATIVIDADES_DEVEM_TER_COMPETENCIA)));
+                    .andExpect(jsonPath("$.message").value(Matchers.containsString(Mensagens.ATIVIDADES_DEVEM_TER_COMPETENCIA)));
         }
 
         @Test

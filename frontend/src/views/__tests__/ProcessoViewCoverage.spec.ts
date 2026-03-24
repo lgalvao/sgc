@@ -249,13 +249,15 @@ describe("ProcessoViewCoverage.spec.ts", () => {
                         unidadeCodigo: 1,
                         unidadeSigla: "A",
                         unidadeNome: "Unidade A",
-                        situacao: SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO
+                        situacao: SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO,
+                        localizacaoCodigo: 100
                     }, // Eligible
                     {
                         unidadeCodigo: 2,
                         unidadeSigla: "B",
                         unidadeNome: "Unidade B",
-                        situacao: "OUTRO"
+                        situacao: "OUTRO",
+                        localizacaoCodigo: 100
                     }
                 ]
             }
@@ -273,13 +275,15 @@ describe("ProcessoViewCoverage.spec.ts", () => {
                         unidadeCodigo: 1,
                         unidadeSigla: "A",
                         unidadeNome: "Unidade A",
-                        situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO
+                        situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
+                        localizacaoCodigo: 100
                     }, // Eligible
                     {
                         unidadeCodigo: 2,
                         unidadeSigla: "B",
                         unidadeNome: "Unidade B",
-                        situacao: "OUTRO"
+                        situacao: "OUTRO",
+                        localizacaoCodigo: 100
                     }
                 ]
             }
@@ -296,13 +300,15 @@ describe("ProcessoViewCoverage.spec.ts", () => {
                         unidadeCodigo: 1,
                         unidadeSigla: "A",
                         unidadeNome: "Unidade A",
-                        situacao: SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA
+                        situacao: SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA,
+                        localizacaoCodigo: 100
                     }, // Eligible
                     {
                         unidadeCodigo: 2,
                         unidadeSigla: "B",
                         unidadeNome: "Unidade B",
-                        situacao: "OUTRO"
+                        situacao: "OUTRO",
+                        localizacaoCodigo: 100
                     }
                 ]
             }

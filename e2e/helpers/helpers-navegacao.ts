@@ -12,14 +12,25 @@ import {expect, type Page} from '@playwright/test';
  * Fecha cada toast visível clicando no seu botão "X".
  */
 export async function limparNotificacoes(page: Page): Promise<void> {
-    // BOrchestrator renderiza toasts como role="alert" dentro de .orchestrator-container
-    const closeButtons = page.locator('.toast .btn-close, .orchestrator-container .btn-close, [role="alert"] .btn-close');
-    const count = await closeButtons.count();
-    for (let i = 0; i < count; i++) {
-        const btn = closeButtons.nth(i);
-        if (await btn.isVisible()) {
-            await btn.click().catch(() => {}); // Toast pode auto-fechar entre isVisible e click
+    try {
+        // BOrchestrator renderiza toasts como role="alert" ou .toast
+        // Procuramos botões de fechar (X) em toasts, alertas ou no orchestrator
+        const closeButtons = page.locator('.toast .btn-close, .orchestrator-container .btn-close, [role="alert"] .btn-close, .alert .btn-close, button[aria-label="Close"]');
+        
+        // count() é rápido, mas isVisible() e click() podem falhar se a página fechar
+        const count = await closeButtons.count();
+        for (let i = 0; i < count; i++) {
+            const btn = closeButtons.nth(i);
+            if (await btn.isVisible()) {
+                await btn.click().catch(() => {});
+            }
         }
+    } catch (e: any) {
+        // Ignorar erros se a página ou contexto foram fechados durante a limpeza (comum em timeouts)
+        if (e.message?.includes('closed') || e.message?.includes('Target page, context or browser has been closed')) {
+            return;
+        }
+        throw e;
     }
 }
 
@@ -60,12 +71,13 @@ export async function verificarAlertaPainel(page: Page, mensagem: string | RegEx
  * Faz logout do sistema clicando no link "Sair".
  */
 export async function fazerLogout(page: Page): Promise<void> {
-    await page.keyboard.press('Escape');
-    // Disparar click via JS para evitar bloqueio por toast sobreposto
-    await page.getByTestId('btn-logout').locator('a').dispatchEvent('click');
-    await expect(page).toHaveURL(/\/login/);
+    // Limpar notificações que possam estar sobrepondo o menu ou botões
+    await limparNotificacoes(page);
 
-    // Limpar possíveis toasts de "Não autorizado" ou "Sessão expirada" que aparecem no teardown
+    await page.getByTestId('btn-logout').click();
+    await page.waitForURL(/\/login/);
+
+    // Limpar possíveis toasts de "Não autorizado" ou "Sessão expirada" que aparecem no teardown após o logout
     await limparNotificacoes(page);
 }
 
@@ -129,7 +141,7 @@ export async function navegarParaSubprocesso(
     const tabela = page.getByTestId('tbl-tree');
     await expect(tabela).toBeVisible();
 
-    const celula = tabela.getByRole('cell', {name: new RegExp(`^${siglaUnidade}\\b`)}).first();
+    const celula = tabela.getByRole('cell', {name: new RegExp(String.raw`^${siglaUnidade}\b`)}).first();
     await expect(celula).toBeVisible();
     await celula.click();
 

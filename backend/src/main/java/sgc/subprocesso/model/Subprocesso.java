@@ -88,7 +88,7 @@ public class Subprocesso extends EntidadeBase {
 
     public void setSituacao(SituacaoSubprocesso novaSituacao) {
         if (processo != null && situacao != null && situacao != novaSituacao && !situacao.podeTransicionarPara(novaSituacao, processo.getTipo())) {
-            throw new ErroValidacao(SgcMensagens.TRANSICAO_INVALIDA.formatted(
+            throw new ErroValidacao(Mensagens.TRANSICAO_INVALIDA.formatted(
                     situacao.getDescricao(), novaSituacao.getDescricao())
             );
         }

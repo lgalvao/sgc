@@ -1,5 +1,5 @@
 import {expect, type Page} from '@playwright/test';
-import {limparNotificacoes, verificarPaginaPainel} from './helpers-navegacao.js';
+import {limparNotificacoes, navegarParaSubprocesso, verificarPaginaPainel} from './helpers-navegacao.js';
 import {TEXTOS} from '../../frontend/src/constants/textos.js';
 
 /**
@@ -12,17 +12,7 @@ export async function acessarSubprocessoGestor(page: Page, descricaoProcesso: st
     await expect(row).toBeVisible();
     await row.click();
 
-    await expect(page).toHaveURL(/\/processo\/\d+/);
-
-    const match = /\/processo\/(\d+)/.exec(page.url());
-    expect(match).not.toBeNull();
-    const codProcesso = match![1];
-
-    if (!page.url().endsWith(`/${siglaUnidade}`)) {
-        await page.goto(`/processo/${codProcesso}/${siglaUnidade}`);
-    }
-
-    await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${siglaUnidade}$`));
+    await navegarParaSubprocesso(page, siglaUnidade);
 }
 
 /**
@@ -35,17 +25,7 @@ export async function acessarSubprocessoChefeDireto(page: Page, descricaoProcess
     await expect(linhaProcesso).toBeVisible();
     await linhaProcesso.click();
 
-    await expect(page).toHaveURL(/\/processo\/\d+/);
-
-    const match = /\/processo\/(\d+)/.exec(page.url());
-    expect(match).not.toBeNull();
-    const codProcesso = match![1];
-
-    if (!page.url().endsWith(`/${siglaUnidade}`)) {
-        await page.goto(`/processo/${codProcesso}/${siglaUnidade}`);
-    }
-
-    await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${siglaUnidade}$`));
+    await navegarParaSubprocesso(page, siglaUnidade);
 }
 
 /**
@@ -59,15 +39,8 @@ export async function acessarSubprocessoAdmin(page: Page, descricaoProcesso: str
 
     await expect(page.getByRole('heading', {name: TEXTOS.subprocesso.DETALHE_UNIDADES_TITULO})).toBeVisible();
 
-    const match = /\/processo\/(\d+)/.exec(page.url());
-    expect(match).not.toBeNull();
-    const codProcesso = match![1];
-
-    await page.goto(`/processo/${codProcesso}/${siglaUnidade}`);
-    await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${siglaUnidade}$`));
+    await navegarParaSubprocesso(page, siglaUnidade);
 }
-
-// Funções de Histórico de Análise
 
 /**
  * Abre modal de histórico de análise (tela de edição - CadAtividades)
@@ -77,7 +50,7 @@ export async function abrirHistoricoAnalise(page: Page) {
     await expect(itemHistorico).toBeVisible();
     await itemHistorico.click();
 
-    const modal = page.locator('.modal-content').filter({hasText: TEXTOS.atividades.MODAL_HISTORICO_TITULO});
+    const modal = page.getByTestId('mdl-historico-analise');
     await expect(modal).toBeVisible();
     return modal;
 }
@@ -87,7 +60,7 @@ export async function abrirHistoricoAnalise(page: Page) {
  */
 export async function abrirHistoricoAnaliseVisualizacao(page: Page) {
     await page.getByTestId('btn-vis-atividades-historico').click();
-    const modal = page.locator('.modal-content').filter({hasText: TEXTOS.atividades.MODAL_HISTORICO_TITULO});
+    const modal = page.getByTestId('mdl-historico-analise');
     await expect(modal).toBeVisible();
     return modal;
 }
@@ -123,8 +96,8 @@ export async function verificarAcoesAnaliseCadastroVisualizacao(page: Page, opti
  * Fecha modal de histórico de análise
  */
 export async function fecharHistoricoAnalise(page: Page) {
-    const modal = page.locator('.modal-content').filter({hasText: TEXTOS.atividades.MODAL_HISTORICO_TITULO});
-    const btnFechar = modal.getByRole('button', {name: 'Fechar'});
+    const modal = page.getByTestId('mdl-historico-analise');
+    const btnFechar = modal.getByTestId('btn-modal-fechar');
     await expect(btnFechar).toBeVisible();
     await btnFechar.click();
     await expect(modal).toBeHidden();
@@ -137,16 +110,17 @@ export async function fecharHistoricoAnalise(page: Page) {
  */
 async function realizarDevolucao(page: Page, observacao: string = '') {
     await limparNotificacoes(page);
-    await page.getByTestId('btn-acao-devolver').click();
-    await expect(page.getByRole('dialog')).toBeVisible();
-    // Verifica regex para cobrir variações de devolução
-    await expect(page.getByText(/Confirma a devolução.*para ajustes/i)).toBeVisible();
+    const btnDevolver = page.getByTestId('btn-acao-devolver');
+    await expect(btnDevolver).toBeEnabled();
+    await btnDevolver.click();
+    const modal = page.locator('.modal.show');
+    await expect(modal).toBeVisible();
 
     if (observacao) {
-        await page.getByTestId('inp-devolucao-cadastro-obs').fill(observacao);
+        await modal.getByTestId('inp-devolucao-cadastro-obs').fill(observacao);
     }
 
-    await page.getByTestId('btn-devolucao-cadastro-confirmar').click();
+    await modal.getByTestId('btn-devolucao-cadastro-confirmar').click();
     await verificarPaginaPainel(page);
 }
 
@@ -168,12 +142,15 @@ export async function devolverRevisao(page: Page, observacao: string = '') {
  * Cancela devolução de cadastro
  */
 export async function cancelarDevolucao(page: Page) {
-    await page.getByTestId('btn-acao-devolver').click();
+    const btnDevolver = page.getByTestId('btn-acao-devolver');
+    await expect(btnDevolver).toBeEnabled();
+    await btnDevolver.click();
 
     // Verificar modal de devolução
-    await expect(page.getByRole('dialog')).toBeVisible();
+    const modal = page.locator('.modal.show');
+    await expect(modal).toBeVisible();
 
-    await page.getByRole('button', {name: 'Cancelar'}).click();
+    await modal.getByTestId('btn-modal-confirmacao-cancelar').click();
 
     // Verificar que modal fechou
     await expect(page.getByRole('dialog')).toBeHidden();
@@ -186,14 +163,17 @@ export async function cancelarDevolucao(page: Page) {
  */
 async function realizarAceite(page: Page, observacao: string = '') {
     await limparNotificacoes(page);
-    await page.getByTestId('btn-acao-analisar-principal').click();
-    await expect(page.getByRole('dialog')).toBeVisible();
-    await expect(page.getByText(/Confirma o aceite/i)).toBeVisible();
+    const btnAceitar = page.getByTestId('btn-acao-analisar-principal');
+    await expect(btnAceitar).toBeEnabled();
+    await btnAceitar.click();
+    const modal = page.locator('.modal.show');
+    await expect(modal).toBeVisible();
+    await expect(modal.getByText(/Confirma o aceite/i)).toBeVisible();
 
     const obsToSend = observacao || 'Aceite sem ressalvas';
-    await page.getByTestId('inp-aceite-cadastro-obs').fill(obsToSend);
+    await modal.getByTestId('inp-aceite-cadastro-obs').fill(obsToSend);
 
-    await page.getByTestId('btn-aceite-cadastro-confirmar').click();
+    await modal.getByTestId('btn-aceite-cadastro-confirmar').click();
     await verificarPaginaPainel(page);
 }
 
@@ -215,7 +195,9 @@ export async function aceitarRevisao(page: Page, observacao: string = '') {
  * Homologa cadastro (ADMIN) - Mapeamento
  */
 export async function homologarCadastroMapeamento(page: Page) {
-    await page.getByTestId('btn-acao-analisar-principal').click();
+    const btnHomologar = page.getByTestId('btn-acao-analisar-principal');
+    await expect(btnHomologar).toBeEnabled();
+    await btnHomologar.click();
 
     // Modal: "Homologação do cadastro"
     await expect(page.getByRole('dialog')).toBeVisible();

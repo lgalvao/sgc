@@ -12,6 +12,7 @@ import org.springframework.security.config.annotation.method.configuration.*;
 import org.springframework.security.test.context.support.*;
 import org.springframework.test.context.bean.override.mockito.*;
 import org.springframework.test.web.servlet.*;
+import sgc.comum.*;
 import sgc.comum.erros.*;
 import sgc.organizacao.model.*;
 import sgc.processo.dto.*;
@@ -486,7 +487,7 @@ class ProcessoControllerTest {
             when(processoServiceMock.buscarPorCodigoComParticipantes(1L)).thenReturn(processo);
 
             ErroValidacao ex = assertThrows(ErroValidacao.class, () -> controller.listarUnidadesParaImportacao(1L));
-            assertEquals(sgc.comum.SgcMensagens.PROCESSO_DEVE_ESTAR_FINALIZADO, ex.getMessage());
+            assertEquals(Mensagens.PROCESSO_DEVE_ESTAR_FINALIZADO, ex.getMessage());
         }
 
         @Test

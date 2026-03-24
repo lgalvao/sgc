@@ -10,7 +10,7 @@ import sgc.seguranca.sanitizacao.*;
  */
 @Builder
 public record AtualizarConhecimentoRequest(
-        @NotBlank(message = SgcMensagens.DESCRICAO_NAO_PODE_SER_VAZIA)
+        @NotBlank(message = Mensagens.DESCRICAO_NAO_PODE_SER_VAZIA)
         @SanitizarHtml
         String descricao
 ) {

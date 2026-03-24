@@ -39,7 +39,7 @@ class SubprocessoValidacaoServiceTest {
             Subprocesso sp = new Subprocesso();
             assertThatThrownBy(() -> validacaoService.validarExistenciaAtividades(sp))
                 .isInstanceOf(ErroValidacao.class)
-                .hasMessageContaining(SgcMensagens.SUBPROCESSO_SEM_MAPA);
+                .hasMessageContaining(Mensagens.SUBPROCESSO_SEM_MAPA);
         }
     }
 

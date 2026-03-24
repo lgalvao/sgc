@@ -12,6 +12,7 @@ import java.util.*;
 @Slf4j
 public class HierarquiaService {
     private final ResponsabilidadeRepo responsabilidadeRepo;
+    private final UnidadeRepo unidadeRepo;
 
     public boolean isResponsavel(Unidade unidade, Usuario usuario) {
         return responsabilidadeRepo.findById(unidade.getCodigo())
@@ -20,12 +21,21 @@ public class HierarquiaService {
     }
 
     public boolean isSubordinada(Unidade alvo, Unidade superior) {
-        Unidade atual = alvo.getUnidadeSuperior();
+        if (alvo == null || superior == null) return false;
+        Long codigoSuperiorAlvo = superior.getCodigo();
+
+        Unidade atual = alvo;
         while (atual != null) {
-            if (Objects.equals(superior.getCodigo(), atual.getCodigo())) {
+            Unidade proxSuperior = atual.getUnidadeSuperior();
+            if (proxSuperior == null) break;
+
+            if (Objects.equals(codigoSuperiorAlvo, proxSuperior.getCodigo())) {
                 return true;
             }
-            atual = atual.getUnidadeSuperior();
+            
+            // Busca via repo para garantir que o próximo 'getUnidadeSuperior' funcione 
+            // mesmo se estivermos lidando com proxies ou sessões parciais.
+            atual = unidadeRepo.findById(proxSuperior.getCodigo()).orElse(null);
         }
         return false;
     }
@@ -37,6 +47,7 @@ public class HierarquiaService {
     }
 
     public boolean isSuperiorImediata(Unidade alvo, Unidade superior) {
+        if (alvo == null || superior == null) return false;
         Unidade superiorAlvo = alvo.getUnidadeSuperior();
         if (superiorAlvo == null) return false;
 

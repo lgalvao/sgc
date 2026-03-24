@@ -27,9 +27,9 @@ import java.lang.annotation.*;
 @Target({ElementType.FIELD, ElementType.PARAMETER, ElementType.RECORD_COMPONENT})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@NotNull(message = SgcMensagens.TITULO_ELEITORAL_OBRIGATORIO)
-@Size(max = 12, message = SgcMensagens.TITULO_ELEITORAL_MAX)
-@Pattern(regexp = "^\\d+$", message = SgcMensagens.TITULO_ELEITORAL_APENAS_NUMEROS)
+@NotNull(message = Mensagens.TITULO_ELEITORAL_OBRIGATORIO)
+@Size(max = 12, message = Mensagens.TITULO_ELEITORAL_MAX)
+@Pattern(regexp = "^\\d+$", message = Mensagens.TITULO_ELEITORAL_APENAS_NUMEROS)
 @Constraint(validatedBy = {})
 public @interface TituloEleitoral {
 

@@ -103,7 +103,7 @@ public class ProcessoController {
             @PathVariable Long codigo) {
         Processo processo = processoService.buscarPorCodigoComParticipantes(codigo);
         if (processo.getSituacao() != SituacaoProcesso.FINALIZADO) {
-            throw new ErroValidacao(SgcMensagens.PROCESSO_DEVE_ESTAR_FINALIZADO);
+            throw new ErroValidacao(Mensagens.PROCESSO_DEVE_ESTAR_FINALIZADO);
         }
         Map<Long, Subprocesso> subprocessosPorUnidade = subprocessoService.listarEntidadesPorProcesso(codigo).stream()
                 .collect(Collectors.toMap(sp -> sp.getUnidade().getCodigo(), Function.identity(), (primeiro, duplicado) -> primeiro));

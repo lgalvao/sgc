@@ -13,7 +13,7 @@ public record AutenticarRequest(
         @TituloEleitoral
         String tituloEleitoral,
 
-        @NotNull(message = SgcMensagens.SENHA_OBRIGATORIA)
-        @Size(max = 64, message = SgcMensagens.SENHA_MAX)
+        @NotNull(message = Mensagens.SENHA_OBRIGATORIA)
+        @Size(max = 64, message = Mensagens.SENHA_MAX)
         String senha) {
 }

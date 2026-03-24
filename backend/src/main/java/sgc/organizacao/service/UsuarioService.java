@@ -76,7 +76,7 @@ public class UsuarioService {
     @Transactional
     public void adicionarAdministrador(String usuarioTitulo) {
         if (isAdministrador(usuarioTitulo)) {
-            throw new ErroValidacao(SgcMensagens.USUARIO_JA_ADMINISTRADOR);
+            throw new ErroValidacao(Mensagens.USUARIO_JA_ADMINISTRADOR);
         }
         Administrador administrador = Administrador.builder()
                 .usuarioTitulo(usuarioTitulo)
@@ -89,7 +89,7 @@ public class UsuarioService {
     public void removerAdministrador(String usuarioTitulo) {
         long totalAdministradores = administradorRepo.count();
         if (totalAdministradores <= 1) {
-            throw new ErroValidacao(SgcMensagens.NAO_REMOVER_UNICO_ADMINISTRADOR);
+            throw new ErroValidacao(Mensagens.NAO_REMOVER_UNICO_ADMINISTRADOR);
         }
         administradorRepo.deleteById(usuarioTitulo);
     }

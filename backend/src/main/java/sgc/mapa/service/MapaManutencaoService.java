@@ -318,13 +318,13 @@ public class MapaManutencaoService {
         boolean existe = atividadeRepo.findByMapaCodigoSemFetch(codMapa).stream()
                 .anyMatch(a -> a.getDescricao().equalsIgnoreCase(desc));
 
-        if (existe) throw new ErroValidacao(SgcMensagens.DESCRICAO_ATIVIDADE_DUPLICADA);
+        if (existe) throw new ErroValidacao(Mensagens.DESCRICAO_ATIVIDADE_DUPLICADA);
     }
 
     private void validarDescricaoConhecimentoUnica(Long codAtividade, String descricao) {
         boolean existe = conhecimentoRepo.findByAtividade_Codigo(codAtividade).stream()
                 .anyMatch(c -> c.getDescricao().equalsIgnoreCase(descricao));
 
-        if (existe) throw new ErroValidacao(SgcMensagens.DESCRICAO_CONHECIMENTO_DUPLICADA);
+        if (existe) throw new ErroValidacao(Mensagens.DESCRICAO_CONHECIMENTO_DUPLICADA);
     }
 }

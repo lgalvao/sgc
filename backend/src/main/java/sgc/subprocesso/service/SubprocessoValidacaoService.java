@@ -23,12 +23,12 @@ public class SubprocessoValidacaoService {
 
     public void validarExistenciaAtividades(Subprocesso subprocesso) {
         if (subprocesso.getMapa() == null || subprocesso.getMapa().getCodigo() == null) {
-            throw new ErroValidacao(SgcMensagens.SUBPROCESSO_SEM_MAPA);
+            throw new ErroValidacao(Mensagens.SUBPROCESSO_SEM_MAPA);
         }
 
         List<Atividade> atividades = mapaManutencaoService.atividadesMapaCodigoComConhecimentos(subprocesso.getMapa().getCodigo());
         if (atividades.isEmpty()) {
-            throw new ErroValidacao(SgcMensagens.MAPA_SEM_ATIVIDADES);
+            throw new ErroValidacao(Mensagens.MAPA_SEM_ATIVIDADES);
         }
 
         List<Atividade> atividadesSemConhecimento = atividades.stream()
@@ -36,7 +36,7 @@ public class SubprocessoValidacaoService {
                 .toList();
 
         if (!atividadesSemConhecimento.isEmpty()) {
-            throw new ErroValidacao(SgcMensagens.ATIVIDADES_SEM_CONHECIMENTOS);
+            throw new ErroValidacao(Mensagens.ATIVIDADES_SEM_CONHECIMENTOS);
         }
     }
 
@@ -48,7 +48,7 @@ public class SubprocessoValidacaoService {
                 .toList();
 
         if (!competenciasSemAssociacao.isEmpty()) throw new ErroValidacao(
-                SgcMensagens.COMPETENCIAS_SEM_ATIVIDADE,
+                Mensagens.COMPETENCIAS_SEM_ATIVIDADE,
                 Map.of("competenciasNaoAssociadas", competenciasSemAssociacao));
 
         List<Atividade> atividades = mapaManutencaoService.atividadesMapaCodigo(codMapa);
@@ -58,7 +58,7 @@ public class SubprocessoValidacaoService {
                 .toList();
 
         if (!atividadesSemAssociacao.isEmpty()) throw new ErroValidacao(
-                SgcMensagens.ATIVIDADES_SEM_COMPETENCIA,
+                Mensagens.ATIVIDADES_SEM_COMPETENCIA,
                 Map.of("atividadesNaoAssociadas", atividadesSemAssociacao));
     }
 
@@ -67,7 +67,7 @@ public class SubprocessoValidacaoService {
         var competencias = mapaManutencaoService.competenciasCodMapa(codMapa);
 
         if (competencias.stream().anyMatch(c -> c.getAtividades().isEmpty())) {
-            throw new ErroValidacao(SgcMensagens.TODAS_COMPETENCIAS_DEVEM_TER_ATIVIDADE);
+            throw new ErroValidacao(Mensagens.TODAS_COMPETENCIAS_DEVEM_TER_ATIVIDADE);
         }
 
         var atividadesDoSubprocesso = mapaManutencaoService.atividadesMapaCodigo(codMapa);
@@ -86,7 +86,7 @@ public class SubprocessoValidacaoService {
                     .collect(java.util.stream.Collectors.joining(", "));
 
             throw new ErroValidacao(
-                    SgcMensagens.ATIVIDADES_PENDENTES_PREFIXO
+                    Mensagens.ATIVIDADES_PENDENTES_PREFIXO
                             .formatted(nomesAtividades));
         }
     }
@@ -141,7 +141,7 @@ public class SubprocessoValidacaoService {
             String permitidasStr = String.join(", ",
                     permitidas.stream().map(SituacaoSubprocesso::name).toList());
             throw new ErroValidacao(
-                    SgcMensagens.SITUACAO_NAO_PERMITE
+                    Mensagens.SITUACAO_NAO_PERMITE
                             .formatted(subprocesso.getSituacao(), permitidasStr));
         }
     }
@@ -182,7 +182,7 @@ public class SubprocessoValidacaoService {
                     .map(atividade -> Map.of("codigo", atividade.getCodigo(), "descricao", atividade.getDescricao()))
                     .toList();
             throw new ErroValidacao(
-                    SgcMensagens.ATIVIDADES_SEM_CONHECIMENTO_ASSOCIADO,
+                    Mensagens.ATIVIDADES_SEM_CONHECIMENTO_ASSOCIADO,
                     Map.of("atividadesSemConhecimento", atividadesInfo));
         }
     }

@@ -69,7 +69,7 @@ public class ResponsavelUnidadeService {
         LocalDate inicio = request.dataInicio() != null ? request.dataInicio() : LocalDate.now();
 
         if (request.dataTermino().isBefore(inicio)) {
-            throw new ErroValidacao(SgcMensagens.DATA_FIM_DEVE_SER_POSTERIOR);
+            throw new ErroValidacao(Mensagens.DATA_FIM_DEVE_SER_POSTERIOR);
         }
 
         AtribuicaoTemporaria atribuicao = new AtribuicaoTemporaria()
