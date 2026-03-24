@@ -93,7 +93,7 @@
         :auto-close="false"
         :loading="loadingValidacao"
         :titulo="isHomologacao ? TEXTOS.atividades.MODAL_HOMOLOGAR_TITULO : (isRevisao ? TEXTOS.atividades.MODAL_ACEITE_REVISAO_TITULO : TEXTOS.atividades.MODAL_VALIDAR_TITULO)"
-        :ok-title="TEXTOS.comum.BOTAO_CONFIRMAR"
+        :ok-title="isHomologacao ? 'Homologar' : (isRevisao ? 'Aceitar' : 'Validar')"
         test-id-confirmar="btn-aceite-cadastro-confirmar"
         variant="success"
         @confirmar="confirmarValidacao"
@@ -118,9 +118,9 @@
         :loading="loadingDevolucao"
         :ok-disabled="!observacaoDevolucao.trim()"
         :titulo="isRevisao ? TEXTOS.atividades.MODAL_DEVOLVER_REVISAO_TITULO : TEXTOS.atividades.MODAL_DEVOLVER_TITULO"
-        :ok-title="TEXTOS.comum.BOTAO_CONFIRMAR"
+        ok-title="Devolver"
         test-id-confirmar="btn-devolucao-cadastro-confirmar"
-        variant="secondary"
+        variant="danger"
         @confirmar="confirmarDevolucao"
     >
       <p>{{

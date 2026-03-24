@@ -59,6 +59,7 @@
         :ok-disabled="!novoAdminTitulo"
         :ok-title="TEXTOS.comum.BOTAO_CRIAR"
         :titulo="TEXTOS.administracao.MODAL_ADICIONAR_TITULO"
+        variant="success"
         @confirmar="adicionarAdmin"
         @shown="() => inputTituloRef?.focus()"
     >

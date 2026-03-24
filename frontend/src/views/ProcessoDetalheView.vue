@@ -93,10 +93,11 @@
 
     <ModalConfirmacao
         v-model="mostrarModalFinalizacao"
+        ok-title="Finalizar"
         test-id-cancelar="btn-finalizar-processo-cancelar"
         test-id-confirmar="btn-finalizar-processo-confirmar"
         :titulo="TEXTOS.processo.FINALIZACAO_TITULO"
-        variant="success"
+        variant="danger"
         @confirmar="confirmarFinalizacao">
 
       <BAlert

@@ -154,3 +154,14 @@ export async function disponibilizarMapa(page: Page, dataLimite?: string) {
     await verificarPaginaPainel(page);
     await verificarToast(page, TEXTOS.sucesso.MAPA_DISPONIBILIZADO);
 }
+
+/**
+ * Realiza o aceite ou homologação do mapa a partir da visualização do subprocesso.
+ */
+export async function aceitarOuHomologarMapa(page: Page, observacao: string) {
+    await page.getByTestId('card-subprocesso-mapa-visualizacao').click();
+    await page.getByTestId('btn-mapa-homologar-aceite').click();
+    await page.getByTestId('inp-aceite-mapa-observacao').fill(observacao);
+    await page.getByTestId('btn-aceite-mapa-confirmar').click();
+    await page.waitForURL(/\/painel$/);
+}

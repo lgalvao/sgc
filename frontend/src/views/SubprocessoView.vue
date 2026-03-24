@@ -181,9 +181,9 @@
       :loading="loading.isLoading('reabertura')"
       :ok-disabled="!justificativaReabertura.trim()"
       :titulo="tipoReabertura === 'cadastro' ? TEXTOS.subprocesso.REABRIR_CADASTRO_TITULO : TEXTOS.subprocesso.REABRIR_REVISAO_TITULO"
-      :ok-title="TEXTOS.subprocesso.BOTAO_CONFIRMAR_REABERTURA"
+      ok-title="Reabrir"
       test-id-confirmar="btn-confirmar-reabrir"
-      variant="warning"
+      variant="success"
       @confirmar="confirmarReabertura"
   >
     <p>{{ TEXTOS.subprocesso.REABRIR_JUSTIFICATIVA_PREFIXO }} {{
@@ -203,7 +203,7 @@
       :ok-title="TEXTOS.subprocesso.BOTAO_CONFIRMAR_LEMBRETE"
       test-id-confirmar="btn-confirmar-enviar-lembrete"
       :titulo="TEXTOS.subprocesso.LEMBRETE_TITULO"
-      variant="primary"
+      variant="success"
       @confirmar="enviarLembreteConfirmado"
   >
     <p data-testid="txt-modelo-lembrete">

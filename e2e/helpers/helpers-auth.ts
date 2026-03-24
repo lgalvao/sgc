@@ -1,5 +1,11 @@
 import {Page} from '@playwright/test';
-import {limparNotificacoes} from './helpers-navegacao.js';
+import {fazerLogout, limparNotificacoes} from './helpers-navegacao.js';
+
+export interface Usuario {
+    titulo: string;
+    senha: string;
+    perfil?: string;
+}
 
 /**
  * Credenciais de usuários para testes E2E
@@ -63,4 +69,21 @@ export async function loginComPerfil(page: Page, usuario: string, senha: string,
     await page.getByTestId('btn-login-entrar').click();
     await page.waitForURL(/\/painel(?:\?|$)/);
     await limparNotificacoes(page);
+}
+
+/**
+ * Encapsula o ciclo de login, execução de uma ação e logout.
+ */
+export async function executarComo(page: Page, usuario: Usuario, acao: (page: Page) => Promise<void>) {
+    if (usuario.perfil) {
+        await loginComPerfil(page, usuario.titulo, usuario.senha, usuario.perfil);
+    } else {
+        await login(page, usuario.titulo, usuario.senha);
+    }
+
+    try {
+        await acao(page);
+    } finally {
+        await fazerLogout(page);
+    }
 }

@@ -135,10 +135,11 @@
         v-model="mostrarModalSugestoes"
         :loading="isLoading"
         :ok-disabled="!sugestoes.trim()"
-        ok-title="Confirmar"
+        ok-title="Apresentar"
         test-id-cancelar="btn-sugestoes-mapa-cancelar"
         test-id-confirmar="btn-sugestoes-mapa-confirmar"
         titulo="Apresentar sugestões"
+        variant="success"
         @confirmar="confirmarSugestoes"
         @shown="() => sugestoesTextareaRef?.$el?.focus()"
     >
