@@ -114,7 +114,7 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
         await expect(page).toHaveURL(/\/processo\/\d+$/);
         
         await page.getByTestId('btn-processo-finalizar').click();
-        await page.getByTestId('btn-modal-confirmacao-confirmar').click();
+        await page.getByTestId('btn-finalizar-processo-confirmar').click();
         await page.waitForURL(/\/painel$/);
 
         await fazerLogout(page);
