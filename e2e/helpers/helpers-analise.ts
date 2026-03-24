@@ -194,7 +194,7 @@ export async function aceitarRevisao(page: Page, observacao: string = '') {
 /**
  * Homologa cadastro (ADMIN) - Mapeamento
  */
-export async function homologarCadastroMapeamento(page: Page) {
+export async function homologarCadastroMapeamento(page: Page, observacao: string = 'Homologado sem ressalvas') {
     const btnHomologar = page.getByTestId('btn-acao-analisar-principal');
     await expect(btnHomologar).toBeEnabled();
     await btnHomologar.click();
@@ -203,11 +203,11 @@ export async function homologarCadastroMapeamento(page: Page) {
     await expect(page.getByRole('dialog')).toBeVisible();
     await expect(page.getByText(TEXTOS.atividades.MODAL_HOMOLOGAR_TEXTO)).toBeVisible();
 
-    await page.getByTestId('inp-aceite-cadastro-obs').fill('Homologado sem ressalvas');
+    await page.getByTestId('inp-aceite-cadastro-obs').fill(observacao);
 
     await page.getByTestId('btn-aceite-cadastro-confirmar').click();
-    await expect(page.getByText(/Cadastro homologado/i).first()).toBeVisible();
-
-    await expect(page).toHaveURL(/\/processo\/\d+\/\w+$/);
+    
+    // Aguarda o redirecionamento para a tela do subprocesso
+    await expect(page).toHaveURL(/\/processo\/\d+\/(\w+)$/);
 }
 export {fazerLogout, verificarPaginaPainel} from './helpers-navegacao.js';

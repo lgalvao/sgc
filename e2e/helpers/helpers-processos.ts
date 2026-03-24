@@ -247,3 +247,20 @@ export async function extrairProcessoCodigo(page: Page): Promise<number> {
         `Não foi possível extrair código do processo da URL: ${url}`
     );
 }
+
+/**
+ * Acessa a tela de detalhes de um processo a partir do painel.
+ */
+export async function acessarDetalhesProcesso(page: Page, descricao: string) {
+    await page.getByTestId('tbl-processos').getByText(descricao).first().click();
+    await expect(page).toHaveURL(/\/processo\/\d+$/);
+}
+
+/**
+ * Finaliza o processo atual a partir da tela de detalhes do processo.
+ */
+export async function finalizarProcesso(page: Page) {
+    await page.getByTestId('btn-processo-finalizar').click();
+    await page.getByTestId('btn-finalizar-processo-confirmar').click();
+    await page.waitForURL(/\/painel$/);
+}
