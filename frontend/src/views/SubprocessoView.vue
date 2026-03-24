@@ -161,8 +161,8 @@
     </div>
     <div v-else-if="erroNaoEncontrado" class="text-center py-5">
       <i class="bi bi-exclamation-triangle fs-1 text-warning mb-3 d-block"></i>
-      <h3>{{ TEXTOS.subprocesso.NAO_ENCONTRADO_TITULO || 'Subprocesso não iniciado' }}</h3>
-      <p class="text-muted">{{ TEXTOS.subprocesso.NAO_ENCONTRADO_DESC || 'Este subprocesso ainda não foi iniciado ou a unidade não participa deste processo.' }}</p>
+      <h3>{{ TEXTOS.subprocesso.NAO_ENCONTRADO_TITULO }}</h3>
+      <p class="text-muted">{{ TEXTOS.subprocesso.NAO_ENCONTRADO_DESC }}</p>
       <BButton to="/painel" variant="primary" class="mt-3">Voltar para o Painel</BButton>
     </div>
     <div v-else class="text-center py-5">

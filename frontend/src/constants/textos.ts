@@ -178,6 +178,8 @@ export const TEXTOS = {
     SUCESSO_LEMBRETE_ENVIADO: "Lembrete enviado",
     ERRO_LEMBRETE_ENVIADO: "Não foi possível enviar o lembrete",
     CARREGANDO: "Carregando informações da unidade...",
+    NAO_ENCONTRADO_TITULO: "Subprocesso não iniciado",
+    NAO_ENCONTRADO_DESC: "Este subprocesso ainda não foi iniciado ou a unidade não participa deste processo.",
     REABRIR_CADASTRO_TITULO: "Reabrir cadastro",
     REABRIR_REVISAO_TITULO: "Reabrir revisão",
     BOTAO_CONFIRMAR_REABERTURA: "Confirmar reabertura",
