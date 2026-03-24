@@ -1,3 +1,4 @@
+/* eslint-disable playwright/expect-expect */
 import {test, expect, Page} from '@playwright/test';
 import * as AuthHelpers from './helpers/helpers-auth.js';
 import * as ProcessoHelpers from './helpers/helpers-processos.js';
@@ -42,7 +43,6 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
     const CHEFE = AuthHelpers.USUARIOS.CHEFE_ASSESSORIA_11;
     const GESTOR = AuthHelpers.USUARIOS.GESTOR_SECRETARIA_1;
 
-    // --- Funções Locais para Etapas da Jornada ---
 
     const criarProcessoMapeamento = async (page: Page) => {
         await AuthHelpers.executarComo(page, ADMIN, async () => {
