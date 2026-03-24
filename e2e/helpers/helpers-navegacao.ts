@@ -22,7 +22,7 @@ export async function limparNotificacoes(page: Page): Promise<void> {
         for (let i = 0; i < count; i++) {
             const btn = closeButtons.nth(i);
             if (await btn.isVisible()) {
-                await btn.click().catch(() => {});
+                await btn.click();
             }
         }
     } catch (e: any) {

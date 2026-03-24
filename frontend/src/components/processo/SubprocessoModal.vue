@@ -9,10 +9,13 @@
     <BFormGroup
         description="Selecione uma data futura"
         label="Nova data limite"
+        :state="erroLocalDataLimite ? false : null"
+        :invalid-feedback="erroLocalDataLimite"
     >
       <InputData
           v-model="novaDataLimite"
           :min="dataLimiteMinima"
+          :state="erroLocalDataLimite ? false : null"
           data-testid="input-nova-data-limite"
           max="2099-12-31"
       />
@@ -56,7 +59,15 @@
 import {BButton, BFormGroup, BModal} from "bootstrap-vue-next";
 import InputData from "@/components/comum/InputData.vue";
 import {computed, ref, watch} from "vue";
-import {formatDateBR, formatDateForInput, isDateValidAndFuture, parseDate,} from "@/utils";
+import {
+  formatDateBR,
+  formatDateForInput,
+  isDateStrictlyFuture,
+  isDateValidAndFuture,
+  obterAmanhaFormatado,
+  parseDate,
+} from "@/utils";
+
 
 interface Props {
   mostrarModal: boolean;
@@ -75,9 +86,17 @@ defineEmits<{
 }>();
 
 const novaDataLimite = ref("");
+const erroLocalDataLimite = ref("");
+
+watch(novaDataLimite, (novaData) => {
+  erroLocalDataLimite.value = "";
+  if (novaData && !isDateStrictlyFuture(parseDate(novaData))) {
+    erroLocalDataLimite.value = "A data limite para validação deve ser uma data futura.";
+  }
+});
 
 const dataLimiteMinima = computed(() => {
-  return formatDateForInput(new Date());
+  return obterAmanhaFormatado();
 });
 
 const dataLimiteAtualFormatada = computed(() => {

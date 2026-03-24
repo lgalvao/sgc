@@ -674,11 +674,7 @@ public class E2eController {
             List<Long> unidades = List.of(unidade.getCodigo());
             Long processoCodigo = processo.getCodigo();
             Usuario usuario = obterUsuarioParaIniciacao();
-            List<String> erros = processoService.iniciar(processoCodigo, unidades, usuario);
-
-            if (!erros.isEmpty()) {
-                throw new ErroValidacao("Falha ao iniciar processo fixture: " + String.join("; ", erros));
-            }
+            processoService.iniciar(processoCodigo, unidades, usuario);
 
             // Recarregar processo após iniciar
             processo = processoService.buscarPorCodigo(processoCodigo);

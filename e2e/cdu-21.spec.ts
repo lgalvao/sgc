@@ -1,5 +1,5 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
-import {criarProcessoMapaHomologadoFixture} from './fixtures/fixtures-processos.js';
+import {criarProcessoMapaHomologadoFixture, validarProcessoFixture} from './fixtures/fixtures-processos.js';
 import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
 
@@ -16,7 +16,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
             unidade: UNIDADE_ALVO
         });
         codProcesso = processo.codigo;
-        expect(true).toBeTruthy();
+        validarProcessoFixture(processo, descProcesso);
     });
 
     // TESTES PRINCIPAIS - CDU-21

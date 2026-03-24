@@ -1,5 +1,5 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
-import {criarProcessoRevisaoCadastroHomologadoFixture} from './fixtures/fixtures-processos.js';
+import {criarProcessoRevisaoCadastroHomologadoFixture, validarProcessoFixture} from './fixtures/fixtures-processos.js';
 import {criarCompetencia, navegarParaMapa} from './helpers/helpers-mapas.js';
 import {acessarSubprocessoAdmin} from './helpers/helpers-analise.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
@@ -16,11 +16,11 @@ test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {
     const atividadeNovaRevisao = 'Atividade nova revisão fixture';
 
     test('Setup data', async ({_resetAutomatico, request}) => {
-        await criarProcessoRevisaoCadastroHomologadoFixture(request, {
+        const processo = await criarProcessoRevisaoCadastroHomologadoFixture(request, {
             descricao: descProcessoRevisao,
             unidade: UNIDADE_ALVO
         });
-        expect(true).toBeTruthy();
+        validarProcessoFixture(processo, descProcessoRevisao);
     });
 
     test('Cenários CDU-16: ADMIN ajusta mapa e visualiza impactos', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {

@@ -74,9 +74,18 @@ public class ComumRepo {
     }
 
     /**
-     * Busca uma entidade pela sua sigla.
+     * Busca uma entidade pela sua sigla (insensível a maiúsculas/minúsculas).
      */
     public <T> T buscarPorSigla(Class<T> classe, String sigla) {
-        return buscar(classe, "sigla", sigla);
+        var cb = em.getCriteriaBuilder();
+        var cq = cb.createQuery(classe);
+        var root = cq.from(classe);
+        cq.where(cb.equal(cb.upper(root.get("sigla")), sigla.toUpperCase()));
+
+        try {
+            return em.createQuery(cq).getSingleResult();
+        } catch (NoResultException e) {
+            throw new ErroEntidadeNaoEncontrada(classe.getSimpleName(), sigla);
+        }
     }
 }

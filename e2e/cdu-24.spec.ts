@@ -1,5 +1,5 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
-import {criarProcessoCadastroHomologadoFixture} from './fixtures/fixtures-processos.js';
+import {criarProcessoCadastroHomologadoFixture, validarProcessoFixture} from './fixtures/fixtures-processos.js';
 import {criarCompetencia, navegarParaMapa} from './helpers/helpers-mapas.js';
 import {navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
@@ -19,11 +19,11 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
     const competencia1 = `Competência mapa ${timestamp}`;
 
     test('Setup data', async ({_resetAutomatico, request}) => {
-        await criarProcessoCadastroHomologadoFixture(request, {
+        const processo = await criarProcessoCadastroHomologadoFixture(request, {
             descricao: descProcesso,
             unidade: UNIDADE_1
         });
-        expect(true).toBeTruthy();
+        validarProcessoFixture(processo, descProcesso);
     });
 
     test('ADMIN mantém botão disponibilizar desabilitado enquanto existir atividade sem competência', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {

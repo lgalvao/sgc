@@ -1,6 +1,6 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {login, USUARIOS} from './helpers/helpers-auth.js';
-import {criarProcessoFinalizadoFixture, criarProcessoFixture} from './fixtures/fixtures-processos.js';
+import {criarProcessoFinalizadoFixture, criarProcessoFixture, validarProcessoFixture} from './fixtures/fixtures-processos.js';
 import {
     abrirModalImpactoEdicao,
     abrirModalImpactoVisualizacao,
@@ -22,19 +22,20 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
 
     test('Setup data', async ({_resetAutomatico, request}) => {
         // Criar processo mapeamento finalizado para gerar o Mapa vigente
-        await criarProcessoFinalizadoFixture(request, {
+        const processoBase = await criarProcessoFinalizadoFixture(request, {
             unidade: UNIDADE_ALVO,
             descricao: `Base map CDU-12 ${timestamp}`
         });
+        validarProcessoFixture(processoBase, `Base map CDU-12 ${timestamp}`);
 
         // Iniciar processo de Revisão
-        await criarProcessoFixture(request, {
+        const processo = await criarProcessoFixture(request, {
             descricao: descProcessoRevisao,
             tipo: 'REVISAO',
             unidade: UNIDADE_ALVO,
             iniciar: true
         });
-        expect(true).toBeTruthy();
+        validarProcessoFixture(processo, descProcessoRevisao);
     });
 
     test('Passo 3.1: Verificação pelo CHEFE na tela de Cadastro', async ({_resetAutomatico, page, _autenticadoComoChefeSecao121}) => {

@@ -1,5 +1,5 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
-import {criarProcessoMapaHomologadoFixture} from './fixtures/fixtures-processos.js';
+import {criarProcessoMapaHomologadoFixture, validarProcessoFixture} from './fixtures/fixtures-processos.js';
 import {navegarParaSubprocesso, verificarAppAlert} from './helpers/helpers-navegacao.js';
 
 /**
@@ -12,12 +12,12 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
     const descProcesso = `Mapeamento CDU-32 ${timestamp}`;
 
     test('Setup UI', async ({_resetAutomatico, request}) => {
-        await criarProcessoMapaHomologadoFixture(request, {
+        const processo = await criarProcessoMapaHomologadoFixture(request, {
             descricao: descProcesso,
             unidade: UNIDADE_1,
             diasLimite: 30
         });
-        expect(true).toBeTruthy();
+        validarProcessoFixture(processo, descProcesso);
     });
 
     test('Cenários CDU-32: ADMIN reabre cadastro', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {

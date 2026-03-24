@@ -1,6 +1,6 @@
 <template>
   <ModalPadrao
-      :acao-desabilitada="!dataLimiteValidacao"
+      :acao-desabilitada="!dataLimiteValidacao || !!erroLocalDataLimite"
       :loading="loading"
       :model-value="mostrar"
       data-testid="mdl-disponibilizar-mapa"
@@ -18,19 +18,20 @@
     <BFormGroup
         label="Data limite para validação"
         label-for="dataLimite"
-        :state="fieldErrors?.dataLimite ? false : null"
-        :invalid-feedback="fieldErrors?.dataLimite"
+        :state="(fieldErrors?.dataLimite || erroLocalDataLimite) ? false : null"
+        :invalid-feedback="fieldErrors?.dataLimite || erroLocalDataLimite"
         class="mb-3"
     >
       <InputData
           id="dataLimite"
           v-model="dataLimiteValidacao"
-          :state="fieldErrors?.dataLimite ? false : null"
+          :state="(fieldErrors?.dataLimite || erroLocalDataLimite) ? false : null"
           data-testid="inp-disponibilizar-mapa-data"
           max="2099-12-31"
-          min="2000-01-01"
+          :min="obterAmanhaFormatado()"
       />
     </BFormGroup>
+
     <BFormGroup
         label="Observações"
         label-for="observacoes"
@@ -59,7 +60,7 @@
     </BAlert>
     <template #acao>
       <LoadingButton
-          :disabled="!dataLimiteValidacao"
+          :disabled="!dataLimiteValidacao || !!erroLocalDataLimite"
           :loading="loading"
           data-testid="btn-disponibilizar-mapa-confirmar"
           loading-text="Disponibilizando..."
@@ -77,6 +78,7 @@ import LoadingButton from "@/components/comum/LoadingButton.vue";
 import ModalPadrao from "@/components/comum/ModalPadrao.vue";
 import InputData from "@/components/comum/InputData.vue";
 import {ref, watch} from "vue";
+import {isDateStrictlyFuture, obterAmanhaFormatado} from "@/utils/dateUtils";
 
 const props = defineProps<{
   mostrar: boolean;
@@ -96,6 +98,14 @@ const emit = defineEmits<{
 
 const dataLimiteValidacao = ref("");
 const observacoesDisponibilizacao = ref("");
+const erroLocalDataLimite = ref("");
+
+watch(dataLimiteValidacao, (novaData) => {
+  erroLocalDataLimite.value = "";
+  if (novaData && !isDateStrictlyFuture(novaData)) {
+    erroLocalDataLimite.value = "A data limite para validação deve ser uma data futura.";
+  }
+});
 
 watch(
     () => props.mostrar,
@@ -103,6 +113,7 @@ watch(
       if (mostrar) {
         dataLimiteValidacao.value = "";
         observacoesDisponibilizacao.value = "";
+        erroLocalDataLimite.value = "";
       }
     },
 );

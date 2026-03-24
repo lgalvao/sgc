@@ -2,6 +2,7 @@ import {beforeEach, describe, expect, it, vi} from "vitest";
 import {mount} from "@vue/test-utils";
 import ModalAcaoBloco from "../processo/ModalAcaoBloco.vue";
 import {BButton} from "bootstrap-vue-next";
+import {obterAmanhaFormatado} from "@/utils/dateUtils";
 
 describe("ModalAcaoBloco.vue", () => {
     const mockUnidades = [
@@ -28,13 +29,17 @@ describe("ModalAcaoBloco.vue", () => {
                     },
                     BTable: false,
                     BFormCheckbox: false,
-                    BButton: false,
+                    BButton: {
+                        template: '<button @click="$emit(\'click\')"><slot /></button>'
+                    },
                     BSpinner: true,
                     BAlert: {
-                        template: '<div><slot /></div>'
+                        template: '<div v-if="modelValue" class="alert"><slot /></div>',
+                        props: ['modelValue']
                     },
                     BFormGroup: {
-                        template: '<div><slot /></div>'
+                        template: '<div><slot name="label">{{ label }}</slot><slot /><div v-if="state === false" class="invalid-feedback"><slot name="invalid-feedback">{{ invalidFeedback }}</slot></div></div>',
+                        props: ['label', 'state', 'invalidFeedback']
                     },
                     InputData: true
                 }
@@ -108,21 +113,23 @@ describe("ModalAcaoBloco.vue", () => {
         (wrapper.vm as any).abrir();
         await wrapper.vm.$nextTick();
 
-        const btnConfirmar = wrapper.findAllComponents(BButton).find(b => b.text().includes("Confirmar"));
-        await btnConfirmar?.trigger('click');
-        
-        expect(wrapper.emitted('confirmar')).toBeFalsy();
-        expect(wrapper.text()).toContain("A data limite é obrigatória");
-
-        (wrapper.vm as any).dataLimite = '2024-12-31';
+        // Chamar confirmar diretamente pois o botão está desabilitado via :disabled
+        await (wrapper.vm as any).confirmar();
         await wrapper.vm.$nextTick();
         
-        await btnConfirmar?.trigger('click');
+        expect(wrapper.emitted('confirmar')).toBeFalsy();
+        expect((wrapper.vm as any).erro).toBe("A data limite é obrigatória.");
+
+        const amanha = obterAmanhaFormatado();
+        (wrapper.vm as any).dataLimite = amanha;
+        await wrapper.vm.$nextTick();
+        
+        await (wrapper.vm as any).confirmar();
 
         expect(wrapper.emitted('confirmar')).toBeTruthy();
         expect(wrapper.emitted('confirmar')![0][0]).toEqual({
             ids: [1],
-            dataLimite: '2024-12-31'
+            dataLimite: amanha
         });
     });
 

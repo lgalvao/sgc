@@ -1,5 +1,5 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
-import {criarProcessoFixture} from './fixtures/fixtures-processos.js';
+import {criarProcessoFixture, validarProcessoFixture} from './fixtures/fixtures-processos.js';
 import {navegarParaSubprocesso, verificarAppAlert} from './helpers/helpers-navegacao.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
 
@@ -34,12 +34,12 @@ test.describe.serial('CDU-27 - Alterar data limite de subprocesso', () => {
     }
 
     test('Setup data', async ({_resetAutomatico, request}) => {
-        await criarProcessoFixture(request, {
+        const processo = await criarProcessoFixture(request, {
             descricao: descProcesso,
             unidade: UNIDADE_1,
             iniciar: true
         });
-        expect(true).toBeTruthy();
+        validarProcessoFixture(processo, descProcesso);
     });
 
 

@@ -4,6 +4,7 @@ import {nextTick, ref} from 'vue';
 import ProcessoCadastroView from '@/views/ProcessoCadastroView.vue';
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 import * as unidadeService from '@/services/unidadeService';
+import {obterAmanhaFormatado} from "@/utils/dateUtils";
 
 vi.mock('@/services/processoService', () => ({
     criarProcesso: vi.fn(),
@@ -146,7 +147,7 @@ describe('ProcessoCadastroView.vue', () => {
         expect((salvarBtn.element as HTMLButtonElement).disabled).toBe(true);
 
         // Fill date
-        await wrapper.find('[data-testid="inp-processo-data-limite"]').setValue('2023-12-31');
+        await wrapper.find('[data-testid="inp-processo-data-limite"]').setValue(obterAmanhaFormatado());
         expect((salvarBtn.element as HTMLButtonElement).disabled).toBe(true);
 
         // Select units (modelValue for ArvoreUnidades)
@@ -196,7 +197,7 @@ describe('ProcessoCadastroView.vue', () => {
         await nextTick();
 
         const dataInput = wrapper.find('[data-testid="inp-processo-data-limite"]');
-        await dataInput.setValue('2023-12-31');
+        await dataInput.setValue(obterAmanhaFormatado());
 
         wrapper.vm.unidadesSelecionadas = [1, 2];
         await nextTick();
@@ -207,7 +208,7 @@ describe('ProcessoCadastroView.vue', () => {
         expect(processosStore.criarProcesso).toHaveBeenCalledWith({
             descricao: 'Novo processo',
             tipo: 'MAPEAMENTO',
-            dataLimiteEtapa1: '2023-12-31T00:00:00',
+            dataLimiteEtapa1: `${obterAmanhaFormatado()}T00:00:00`,
             unidades: [1, 2]
         });
 
@@ -223,7 +224,7 @@ describe('ProcessoCadastroView.vue', () => {
 
         wrapper.vm.descricao = 'Teste';
         wrapper.vm.tipo = 'MAPEAMENTO';
-        wrapper.vm.dataLimite = '2023-12-31';
+        wrapper.vm.dataLimite = obterAmanhaFormatado();
         wrapper.vm.unidadesSelecionadas = [1];
         await nextTick();
 
@@ -240,7 +241,7 @@ describe('ProcessoCadastroView.vue', () => {
         wrapper.vm.processoEditando = {codigo: 123};
         wrapper.vm.descricao = 'Editado';
         wrapper.vm.tipo = 'MAPEAMENTO';
-        wrapper.vm.dataLimite = '2023-12-31';
+        wrapper.vm.dataLimite = obterAmanhaFormatado();
         wrapper.vm.unidadesSelecionadas = [1];
         await nextTick();
 
@@ -250,7 +251,7 @@ describe('ProcessoCadastroView.vue', () => {
             codigo: 123,
             descricao: 'Editado',
             tipo: 'MAPEAMENTO',
-            dataLimiteEtapa1: '2023-12-31T00:00:00',
+            dataLimiteEtapa1: `${obterAmanhaFormatado()}T00:00:00`,
             unidades: [1]
         });
         await flushPromises();
@@ -262,7 +263,7 @@ describe('ProcessoCadastroView.vue', () => {
 
         wrapper.vm.descricao = 'Iniciar teste';
         wrapper.vm.tipo = 'MAPEAMENTO';
-        wrapper.vm.dataLimite = '2023-12-31';
+        wrapper.vm.dataLimite = obterAmanhaFormatado();
         wrapper.vm.unidadesSelecionadas = [1];
         await nextTick();
 
@@ -285,7 +286,7 @@ describe('ProcessoCadastroView.vue', () => {
         wrapper.vm.processoEditando = {codigo: 123};
         wrapper.vm.descricao = 'Existente';
         wrapper.vm.tipo = 'MAPEAMENTO';
-        wrapper.vm.dataLimite = '2023-12-31';
+        wrapper.vm.dataLimite = obterAmanhaFormatado();
         wrapper.vm.unidadesSelecionadas = [1];
         await nextTick();
 
@@ -377,7 +378,7 @@ describe('ProcessoCadastroView.vue', () => {
 
         wrapper.vm.descricao = 'Teste';
         wrapper.vm.tipo = 'MAPEAMENTO';
-        wrapper.vm.dataLimite = '2023-12-31';
+        wrapper.vm.dataLimite = obterAmanhaFormatado();
         wrapper.vm.unidadesSelecionadas = [1];
         await nextTick();
 
@@ -408,7 +409,7 @@ describe('ProcessoCadastroView.vue', () => {
 
         wrapper.vm.descricao = 'Teste';
         wrapper.vm.tipo = 'MAPEAMENTO';
-        wrapper.vm.dataLimite = '2023-12-31';
+        wrapper.vm.dataLimite = obterAmanhaFormatado();
         wrapper.vm.unidadesSelecionadas = [1];
         await nextTick();
 
@@ -431,7 +432,7 @@ describe('ProcessoCadastroView.vue', () => {
 
         wrapper.vm.descricao = 'Teste';
         wrapper.vm.tipo = 'MAPEAMENTO';
-        wrapper.vm.dataLimite = '2023-12-31';
+        wrapper.vm.dataLimite = obterAmanhaFormatado();
         wrapper.vm.unidadesSelecionadas = [1];
         await nextTick();
 
@@ -475,7 +476,7 @@ describe('ProcessoCadastroView.vue', () => {
         await nextTick();
         expect(wrapper.vm.fieldErrors.tipo).toBe('');
 
-        wrapper.vm.dataLimite = '2024-01-01';
+        wrapper.vm.dataLimite = obterAmanhaFormatado();
         await nextTick();
         expect(wrapper.vm.fieldErrors.dataLimite).toBe('');
 
@@ -508,7 +509,7 @@ describe('ProcessoCadastroView.vue', () => {
 
         wrapper.vm.descricao = 'Teste';
         wrapper.vm.tipo = 'MAPEAMENTO';
-        wrapper.vm.dataLimite = '2023-12-31';
+        wrapper.vm.dataLimite = obterAmanhaFormatado();
         wrapper.vm.unidadesSelecionadas = [1];
         await nextTick();
 
@@ -563,7 +564,7 @@ describe('ProcessoCadastroView.vue', () => {
 
         wrapper.vm.descricao = 'Teste';
         wrapper.vm.tipo = 'MAPEAMENTO';
-        wrapper.vm.dataLimite = '2023-12-31';
+        wrapper.vm.dataLimite = obterAmanhaFormatado();
         wrapper.vm.unidadesSelecionadas = [1];
         await nextTick();
 

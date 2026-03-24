@@ -1,5 +1,5 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
-import {criarProcessoMapaValidadoFixture} from './fixtures/fixtures-processos.js';
+import {criarProcessoMapaValidadoFixture, validarProcessoFixture} from './fixtures/fixtures-processos.js';
 
 /**
  * CDU-26 - Homologar validação de mapas de competências em bloco
@@ -25,11 +25,11 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
     const descProcesso = `Mapeamento CDU-26 ${timestamp}`;
 
     test('Setup data', async ({_resetAutomatico, request}) => {
-        await criarProcessoMapaValidadoFixture(request, {
+        const processo = await criarProcessoMapaValidadoFixture(request, {
             descricao: descProcesso,
             unidade: UNIDADE_1
         });
-        expect(true).toBeTruthy();
+        validarProcessoFixture(processo, descProcesso);
     });
 
     test('Cenario 1: ADMIN visualiza botão Homologar mapas em bloco', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {

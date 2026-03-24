@@ -3,6 +3,7 @@ import {mount} from "@vue/test-utils";
 import {BFormInput} from "bootstrap-vue-next";
 import {describe, expect, it} from "vitest";
 import DisponibilizarMapaModal from "@/components/mapa/DisponibilizarMapaModal.vue";
+import {obterAmanhaFormatado} from "@/utils/dateUtils";
 
 const ModalPadraoStub = {
     template: `
@@ -68,7 +69,7 @@ describe("DisponibilizarMapaModal.vue", () => {
 
         const inputWrapper = wrapper.findComponent(BFormInput);
         const nativeInput = inputWrapper.find("input");
-        await nativeInput.setValue("2024-12-31");
+        await nativeInput.setValue(obterAmanhaFormatado());
 
         const disponibilizarButton = wrapper.find(
             '[data-testid="btn-disponibilizar-mapa-confirmar"]'
@@ -86,7 +87,7 @@ describe("DisponibilizarMapaModal.vue", () => {
     it("deve emitir o evento disponibilizar com a data selecionada", async () => {
         const wrapper = createWrapper({mostrar: true});
 
-        const dataLimite = "2024-12-31";
+        const dataLimite = obterAmanhaFormatado();
         const inputWrapper = wrapper.findComponent(BFormInput);
         const nativeInput = inputWrapper.find("input");
         await nativeInput.setValue(dataLimite);
@@ -129,7 +130,7 @@ describe("DisponibilizarMapaModal.vue", () => {
 
     it("deve incluir observações no evento disponibilizar", async () => {
         const wrapper = createWrapper({mostrar: true});
-        const dataLimite = "2024-12-31";
+        const dataLimite = obterAmanhaFormatado();
         const observacoes = "Teste observação";
 
         const inputWrapper = wrapper.findComponent(BFormInput);
@@ -153,7 +154,7 @@ describe("DisponibilizarMapaModal.vue", () => {
 
         const inputWrapper = wrapper.findComponent(BFormInput);
         const nativeInput = inputWrapper.find("input");
-        await nativeInput.setValue("2024-12-31");
+        await nativeInput.setValue(obterAmanhaFormatado());
 
         const obsTextarea = wrapper.find('[data-testid="inp-disponibilizar-mapa-obs"]');
         await obsTextarea.setValue("Obs");

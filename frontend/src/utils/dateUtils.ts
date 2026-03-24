@@ -1,7 +1,21 @@
-import {differenceInDays, format, isFuture, isValid, parse, parseISO, startOfDay,} from "date-fns";
+import {addDays, differenceInDays, format, isFuture, isValid, parse, parseISO, startOfDay,} from "date-fns";
 import {ptBR} from "date-fns/locale";
 
 export type DateInput = string | number | Date | number[] | null | undefined;
+
+/**
+ * Retorna a data de amanhã formatada para inputs (yyyy-MM-dd)
+ */
+export function obterAmanhaFormatado(): string {
+    return format(addDays(new Date(), 1), "yyyy-MM-dd");
+}
+
+/**
+ * Retorna a data de hoje formatada para inputs (yyyy-MM-dd)
+ */
+export function obterHojeFormatado(): string {
+    return format(new Date(), "yyyy-MM-dd");
+}
 
 function parseStringDate(s: string): Date | null {
     const trimmed = s.trim();
@@ -88,7 +102,20 @@ export function isDateValidAndFuture(date: DateInput): boolean {
     if (!d) return false;
     const today = startOfDay(new Date());
     const dateToCompare = startOfDay(d);
+    // Deve ser hoje ou futuro
     return isFuture(dateToCompare) || dateToCompare.getTime() === today.getTime();
+}
+
+/**
+ * Valida se a data é estritamente futura (pelo menos amanhã)
+ */
+export function isDateStrictlyFuture(date: DateInput): boolean {
+    const d = parseDate(date);
+    if (!d) return false;
+    const today = startOfDay(new Date());
+    const tomorrow = startOfDay(addDays(today, 1));
+    const dateToCompare = startOfDay(d);
+    return dateToCompare.getTime() >= tomorrow.getTime();
 }
 
 export function diffInDays(date1: Date, date2: Date): number {

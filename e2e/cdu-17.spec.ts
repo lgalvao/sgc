@@ -1,5 +1,5 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
-import {criarProcessoCadastroHomologadoFixture} from './fixtures/fixtures-processos.js';
+import {criarProcessoCadastroHomologadoFixture, validarProcessoFixture} from './fixtures/fixtures-processos.js';
 import {criarCompetencia, disponibilizarMapa, navegarParaMapa} from './helpers/helpers-mapas.js';
 import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 
@@ -16,11 +16,11 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
     const competencia2 = `Competência 2 ${timestamp}`;
 
     test('Setup data', async ({_resetAutomatico, request}) => {
-        await criarProcessoCadastroHomologadoFixture(request, {
+        const processo = await criarProcessoCadastroHomologadoFixture(request, {
             descricao: descProcesso,
             unidade: UNIDADE_ALVO
         });
-        expect(true).toBeTruthy();
+        validarProcessoFixture(processo, descProcesso);
     });
 
     // TESTES PRINCIPAIS - CDU-17

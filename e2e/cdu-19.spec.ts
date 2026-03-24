@@ -1,5 +1,5 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
-import {criarProcessoMapaDisponibilizadoFixture} from './fixtures/fixtures-processos.js';
+import {criarProcessoMapaDisponibilizadoFixture, validarProcessoFixture} from './fixtures/fixtures-processos.js';
 import {navegarParaMapa} from './helpers/helpers-mapas.js';
 import {login, USUARIOS} from './helpers/helpers-auth.js';
 import {acessarSubprocessoGestor} from './helpers/helpers-analise.js';
@@ -13,11 +13,11 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
     const descProcesso = `Mapeamento CDU-19 ${timestamp}`;
 
     test('Setup data', async ({_resetAutomatico, request}) => {
-        await criarProcessoMapaDisponibilizadoFixture(request, {
+        const processo = await criarProcessoMapaDisponibilizadoFixture(request, {
             descricao: descProcesso,
             unidade: UNIDADE_ALVO
         });
-        expect(true).toBeTruthy();
+        validarProcessoFixture(processo, descProcesso);
     });
 
     // TESTES PRINCIPAIS - CDU-19
@@ -69,11 +69,11 @@ test.describe.serial('CDU-19 - Apresentar sugestões e pré-preenchimento', () =
 
     test('Setup data', async ({_resetAutomatico, request}) => {
         await resetDatabase(request);
-        await criarProcessoMapaDisponibilizadoFixture(request, {
+        const processo = await criarProcessoMapaDisponibilizadoFixture(request, {
             descricao: descProcesso,
             unidade: UNIDADE_ALVO
         });
-        expect(true).toBeTruthy();
+        validarProcessoFixture(processo, descProcesso);
     });
 
     test('Cenario 1: CHEFE apresenta sugestões com sucesso', async ({_resetAutomatico, page, _autenticadoComoChefeSecao221}) => {

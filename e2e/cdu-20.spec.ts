@@ -2,7 +2,8 @@ import {expect, test} from './fixtures/complete-fixtures.js';
 import {
     criarProcessoMapaComSugestoesFixture,
     criarProcessoMapaDisponibilizadoFixture,
-    criarProcessoMapaValidadoFixture
+    criarProcessoMapaValidadoFixture,
+    validarProcessoFixture
 } from './fixtures/fixtures-processos.js';
 import {navegarParaMapa} from './helpers/helpers-mapas.js';
 import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
@@ -22,11 +23,11 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
     const descProcesso = `Processo CDU-20 ${timestamp}`;
 
     test('Setup data', async ({_resetAutomatico, request}) => {
-        await criarProcessoMapaValidadoFixture(request, {
+        const processo = await criarProcessoMapaValidadoFixture(request, {
             unidade: UNIDADE_ALVO,
             descricao: descProcesso
         });
-        expect(true).toBeTruthy();
+        validarProcessoFixture(processo, descProcesso);
     });
 
     test('Cenario 0: modal de aceite exibe campo opcional de observação', async ({_resetAutomatico, page}) => {
@@ -89,11 +90,11 @@ test.describe.serial('CDU-20 - Ver sugestões quando situação é "Mapa com sug
 
     test('Setup data', async ({_resetAutomatico, request}) => {
         await resetDatabase(request);
-        await criarProcessoMapaComSugestoesFixture(request, {
+        const processo = await criarProcessoMapaComSugestoesFixture(request, {
             unidade: UNIDADE_ALVO,
             descricao: descProcesso
         });
-        expect(true).toBeTruthy();
+        validarProcessoFixture(processo, descProcesso);
     });
 
     test('GESTOR visualiza botão "Ver sugestões" e acessa modal com conteúdo', async ({_resetAutomatico, page}) => {
@@ -132,11 +133,11 @@ test.describe.serial('CDU-20 - Aceite de mapa com sugestões', () => {
 
     test('Setup data', async ({_resetAutomatico, request}) => {
         await resetDatabase(request);
-        await criarProcessoMapaDisponibilizadoFixture(request, {
+        const processo = await criarProcessoMapaDisponibilizadoFixture(request, {
             unidade: UNIDADE_ALVO,
             descricao: descProcesso
         });
-        expect(true).toBeTruthy();
+        validarProcessoFixture(processo, descProcesso);
     });
 
     test('CHEFE apresenta sugestões e GESTOR registra aceite', async ({_resetAutomatico, page}) => {
@@ -182,11 +183,11 @@ test.describe.serial('CDU-20 - ADMIN não deve ver botões de edição com mapa 
 
     test('Setup data', async ({_resetAutomatico, request}) => {
         await resetDatabase(request);
-        await criarProcessoMapaComSugestoesFixture(request, {
+        const processo = await criarProcessoMapaComSugestoesFixture(request, {
             unidade: UNIDADE_ALVO,
             descricao: descProcesso
         });
-        expect(true).toBeTruthy();
+        validarProcessoFixture(processo, descProcesso);
     });
 
     test('ADMIN não vê card de edição de mapa quando situação é Mapa com sugestões', async ({_resetAutomatico, page}) => {
@@ -207,11 +208,11 @@ test.describe.serial('CDU-20 - ADMIN homologa mapa após GESTOR aceitar com suge
 
     test('Setup data', async ({_resetAutomatico, request}) => {
         await resetDatabase(request);
-        await criarProcessoMapaDisponibilizadoFixture(request, {
+        const processo = await criarProcessoMapaDisponibilizadoFixture(request, {
             unidade: UNIDADE_ALVO,
             descricao: descProcesso
         });
-        expect(true).toBeTruthy();
+        validarProcessoFixture(processo, descProcesso);
     });
 
     test('CHEFE apresenta sugestões e GESTOR registra aceite', async ({_resetAutomatico, page}) => {

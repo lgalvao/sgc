@@ -13,13 +13,20 @@
     </BAlert>
 
     <div v-if="mostrarDataLimite" class="mb-3">
-      <BFormGroup label="Data limite" label-for="dataLimiteBloco" label-class="required">
+      <BFormGroup
+          label="Data limite"
+          label-for="dataLimiteBloco"
+          label-class="required"
+          :state="erroLocalDataLimite ? false : null"
+          :invalid-feedback="erroLocalDataLimite"
+      >
         <InputData
             id="dataLimiteBloco"
             v-model="dataLimite"
             data-testid="inp-data-limite-bloco"
             max="2099-12-31"
-            min="2000-01-01"
+            :min="obterAmanhaFormatado()"
+            :state="erroLocalDataLimite ? false : null"
             required
         />
       </BFormGroup>
@@ -59,7 +66,7 @@
           Cancelar
         </BButton>
         <BButton
-            :disabled="processando || selecionadosLocal.length === 0"
+            :disabled="processando || selecionadosLocal.length === 0 || (mostrarDataLimite && (!!erroLocalDataLimite || !dataLimite))"
             variant="success"
             @click="confirmar"
         >
@@ -75,6 +82,7 @@
 import {computed, ref, watch} from 'vue';
 import {BAlert, BButton, BFormCheckbox, BFormGroup, BModal, BSpinner, BTable} from 'bootstrap-vue-next';
 import InputData from '@/components/comum/InputData.vue';
+import {isDateStrictlyFuture, obterAmanhaFormatado} from "@/utils/dateUtils";
 
 export interface UnidadeSelecao {
   codigo: number;
@@ -103,6 +111,14 @@ const selecionadosLocal = ref<number[]>([]);
 const processando = ref(false);
 const erro = ref<string | null>(null);
 const dataLimite = ref<string>('');
+const erroLocalDataLimite = ref('');
+
+watch(dataLimite, (novaData) => {
+  erroLocalDataLimite.value = "";
+  if (novaData && props.mostrarDataLimite && !isDateStrictlyFuture(novaData)) {
+    erroLocalDataLimite.value = "A data limite para validação deve ser uma data futura.";
+  }
+});
 
 const campos = [
   { key: 'selecao', label: '', thStyle: { width: '40px' } },
@@ -125,9 +141,14 @@ const todosSelecionados = computed({
 });
 
 function confirmar() {
-  if (props.mostrarDataLimite && !dataLimite.value) {
-    erro.value = "A data limite é obrigatória.";
-    return;
+  if (props.mostrarDataLimite) {
+    if (!dataLimite.value) {
+      erro.value = "A data limite é obrigatória.";
+      return;
+    }
+    if (erroLocalDataLimite.value) {
+      return;
+    }
   }
 
   processando.value = true;
@@ -148,6 +169,7 @@ function fechar() {
   processando.value = false;
   erro.value = null;
   dataLimite.value = '';
+  erroLocalDataLimite.value = '';
 }
 
 function setProcessando(val: boolean) {

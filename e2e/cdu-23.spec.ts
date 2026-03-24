@@ -9,6 +9,7 @@ import {
 import {navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
 import {loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
 import {resetDatabase} from './hooks/hooks-limpeza.js';
+import {validarProcessoFixture} from './fixtures/fixtures-processos.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
 
 /**
@@ -37,11 +38,11 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {
 
     test('Setup data', async ({_resetAutomatico, request}) => {
         await resetDatabase(request);
-        await criarProcessoCadastroDisponibilizadoFixture(request, {
+        const processo = await criarProcessoCadastroDisponibilizadoFixture(request, {
             descricao: descProcesso,
             unidade: UNIDADE_1
         });
-        expect(true).toBeTruthy();
+        validarProcessoFixture(processo, descProcesso);
     });
 
     test('Setup aceites', async ({_resetAutomatico, page, _autenticadoComoGestorCoord22}) => {
@@ -54,7 +55,7 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {
         await navegarParaAtividadesVisualizacao(page);
         await aceitarCadastroMapeamento(page);
 
-        expect(true).toBeTruthy();
+        await expect(page.getByTestId('tbl-processos').getByText(descProcesso).first()).toBeVisible();
     });
 
     test('Cenario 1: ADMIN abre modal e cancela homologação em bloco', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
@@ -104,11 +105,11 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco após devolução', 
 
     test('Setup data', async ({_resetAutomatico, request}) => {
         await resetDatabase(request);
-        await criarProcessoCadastroDisponibilizadoFixture(request, {
+        const processo = await criarProcessoCadastroDisponibilizadoFixture(request, {
             descricao: descProcesso,
             unidade: UNIDADE_1
         });
-        expect(true).toBeTruthy();
+        validarProcessoFixture(processo, descProcesso);
     });
 
     test('Setup aceites', async ({_resetAutomatico, page, _autenticadoComoGestorCoord22}) => {
@@ -121,7 +122,7 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco após devolução', 
         await navegarParaAtividadesVisualizacao(page);
         await aceitarCadastroMapeamento(page);
 
-        expect(true).toBeTruthy();
+        await expect(page.getByTestId('tbl-processos').getByText(descProcesso).first()).toBeVisible();
     });
 
     test('Cenario 1: ADMIN não pode homologar em bloco após devolver para ajustes', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {

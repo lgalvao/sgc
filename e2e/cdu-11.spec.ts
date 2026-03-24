@@ -1,7 +1,8 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {
     criarProcessoCadastroDisponibilizadoFixture,
-    criarProcessoFinalizadoFixture
+    criarProcessoFinalizadoFixture,
+    validarProcessoFixture
 } from './fixtures/fixtures-processos.js';
 import {navegarParaAtividadesVisualizacao} from './helpers/helpers-atividades.js';
 import {navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
@@ -14,11 +15,11 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         const descProcesso = `Processo em andamento CDU-11 ${timestamp}`;
 
         test('Setup data', async ({_resetAutomatico, request}) => {
-            await criarProcessoCadastroDisponibilizadoFixture(request, {
+            const processo = await criarProcessoCadastroDisponibilizadoFixture(request, {
                 unidade: UNIDADE_ALVO,
                 descricao: descProcesso
             });
-            expect(true).toBeTruthy();
+            validarProcessoFixture(processo, descProcesso);
         });
 
         test('Fluxo ADMIN/GESTOR: Navega via Detalhes do Processo (Passo 2)', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
@@ -60,11 +61,11 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
         const descProcesso = `Processo mapeamento CDU-11 ${timestamp}`;
 
         test('Setup data', async ({_resetAutomatico, request}) => {
-            await criarProcessoFinalizadoFixture(request, {
+            const processo = await criarProcessoFinalizadoFixture(request, {
                 unidade: UNIDADE_ALVO,
                 descricao: descProcesso
             });
-            expect(true).toBeTruthy();
+            validarProcessoFixture(processo, descProcesso);
         });
 
         test('Fluxo ADMIN: Visualizar em processo finalizado', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
