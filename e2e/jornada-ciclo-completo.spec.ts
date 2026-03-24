@@ -161,7 +161,7 @@ test.describe('Jornada do Ciclo de Vida Completo do SGC', () => {
         await page.getByTestId('btn-acao-analisar-principal').click();
         await page.getByTestId('inp-aceite-cadastro-obs').fill('Revisão homologada. Ciclo de manutenção completo.');
         await page.getByTestId('btn-aceite-cadastro-confirmar').click();
-
+        await page.waitForURL(/\/painel$/);
         await fazerLogout(page);
     });
 });
