@@ -19,6 +19,8 @@ As críticas que motivaram a revisão já foram tratadas:
 * `CDU-22`, `CDU-25` e `CDU-33` também foram endurecidos para abrir detalhes via painel antes das ações de bloco/reabertura.
 * `CDU-21` e `CDU-24` também passaram a entrar pelo painel nos fluxos de ADMIN.
 
+A varredura final foi concluída sem deixar passos obrigatórios em aberto. O que ainda existe de navegação direta ou helper semântico ficou restrito a preparação aceitável por design, ou a cliques reais encapsulados em helpers.
+
 ## Atalhos aceitáveis por design
 
 ### 1. Reset do banco antes dos testes
@@ -139,8 +141,10 @@ Resumo da segunda passada:
 * **Arriscado**: navegação direta e abstração excessiva de login/jornada.
 * **Crítico**: force click, limpeza permissiva e testes vazios de setup.
 
-Se eu tivesse que priorizar uma revisão, começaria por:
+Se eu tivesse que priorizar uma revisão adicional, começaria por:
 
 1. `e2e/helpers/helpers-atividades.ts`
 2. `e2e/helpers/helpers-navegacao.ts`
 3. specs que entram direto em rotas profundas sem validar a jornada completa
+
+No estado atual, essa priorização virou apenas uma fila de melhorias opcionais, não uma pendência bloqueadora.
