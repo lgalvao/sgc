@@ -150,7 +150,7 @@ const inputDescricaoRef = ref<InstanceType<typeof BFormInput> | null>(null);
 const selectTipoRef = ref<any>(null);
 const inputDataLimiteRef = ref<InstanceType<typeof InputData> | null>(null);
 const containerUnidadesRef = ref<HTMLElement | null>(null);
-const {obterPrimeiroCampoComErro, possuiErros} = useValidacao();
+const {obterPrimeiroCampoComErro} = useValidacao();
 
 const tipoOptions = [
   {value: TipoProcesso.MAPEAMENTO, text: 'Mapeamento'},

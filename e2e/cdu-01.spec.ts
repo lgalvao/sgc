@@ -9,6 +9,7 @@ test.describe('CDU-01 - Realizar login e exibir estrutura das telas', () => {
 
     test('Deve exibir a tela de login com campos obrigatórios', async ({page}) => {
         await verificarTelaLogin(page);
+        await expect(page).toHaveURL(/\/login/);
     });
 
     test('Deve exibir erro com credenciais inválidas', async ({page}) => {
