@@ -1,11 +1,21 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {login, USUARIOS} from './helpers/helpers-auth.js';
 import {fazerLogout} from './helpers/helpers-navegacao.js';
-import {criarProcesso, verificarProcessoNaTabela} from './helpers/helpers-processos.js';
+import {criarProcesso, verificarCabecalhosTabelaProcessos, verificarProcessoNaTabela} from './helpers/helpers-processos.js';
 
 test.describe('CDU-02 - Visualizar painel', () => {
     test.describe('Como ADMIN', () => {
         test('Deve exibir estrutura básica do painel e testar ordenação', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
+            const descricaoProcesso = `Processo estrutura painel - ${Date.now()}`;
+
+            await criarProcesso(page, {
+                descricao: descricaoProcesso,
+                tipo: 'MAPEAMENTO',
+                diasLimite: 30,
+                unidade: 'ASSESSORIA_11',
+                expandir: ['SECRETARIA_1']
+            });
+
             await test.step('Verificar seções principais', async () => {
                 await expect(page.getByTestId('txt-painel-titulo-processos')).toBeVisible();
                 await expect(page.getByTestId('txt-painel-titulo-processos')).toHaveText('Processos');
@@ -15,6 +25,16 @@ test.describe('CDU-02 - Visualizar painel', () => {
 
             await test.step('Verificar botão de criação', async () => {
                 await expect(page.getByTestId('btn-painel-criar-processo')).toBeVisible();
+            });
+
+            await test.step('Verificar campos da tabela de processos ativos', async () => {
+                await verificarCabecalhosTabelaProcessos(page, true);
+                await verificarProcessoNaTabela(page, {
+                    descricao: descricaoProcesso,
+                    tipo: 'Mapeamento',
+                    situacao: 'Criado',
+                    unidadesParticipantes: ['ASSESSORIA_11']
+                });
             });
 
             await test.step('Testar ordenação da tabela de processos', async () => {

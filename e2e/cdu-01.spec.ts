@@ -1,10 +1,14 @@
 import {expect, test} from './fixtures/auth-fixtures.js';
-import {autenticar, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
+import {autenticar, loginComPerfil, USUARIOS, verificarTelaLogin} from './helpers/helpers-auth.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
 
 test.describe('CDU-01 - Realizar login e exibir estrutura das telas', () => {
     test.beforeEach(async ({page}) => {
         await page.goto('/login');
+    });
+
+    test('Deve exibir a tela de login com campos obrigatórios', async ({page}) => {
+        await verificarTelaLogin(page);
     });
 
     test('Deve exibir erro com credenciais inválidas', async ({page}) => {
