@@ -1,82 +1,126 @@
-# Alinhamento CDU-28 - Manter atribuição temporária
+# Alinhamento CDU-28 - Reanálise (rodada 2)
 
-## Cobertura atual do teste
-O teste cobre:
-- **Cenário 1**: Navegação do ADMIN até página de detalhes da unidade e verificação de visibilidade do botão "Criar atribuição".
-- **Cenário 2**: Validação de campos obrigatórios (usuário, data de início, data de término, justificativa). Testa que ao deixar data de início em branco, validação do HTML5 é acionada.
-- **Cenário 3**: Preenchimento correto de todos os campos (usuário selecionado, datas futuras, justificativa) e validação de mensagem de sucesso "Atribuição criada".
+## Artefatos analisados
+- Requisito: `etc/reqs/cdu-28.md`.
+- Teste E2E: `e2e/cdu-28.spec.ts` (3 cenários `test`, 0 `test.step`).
 
-## Lacunas em relação ao requisito
-**Lacunas críticas:**
+## Resultado da comparação requisito x E2E
+- Itens do fluxo principal avaliados: **21**.
+- Status: **9 cobertos**, **7 parciais**, **5 não cobertos** (baseado em evidências textuais no spec e helpers).
 
-1. **Falta validação de modal vs. página**: O requisito (passo 6) especifica que o sistema "apresenta um **modal**" com campos, mas o teste acessa uma página (`/unidade/\d+\/atribuicao$`), não um modal. Há inconsistência entre requisito e implementação.
+## Matriz de evidências
+- ✅ **[COBERTO]** 1. ADMIN clica em `Unidade` no menu (este é o comando equivalente a `Minha unidade`, visto por outros perfis).
+  - Palavras-chave usadas: `unidade, admin, clica, menu, este, comando`
+  - Evidência (score 2): `e2e/cdu-28.spec.ts:16` -> `test('Cenario 1: ADMIN acessa detalhes da unidade e opção de criar atribuição', async ({_resetAutomatico, _autenticad...`
+  - Evidência (score 1): `e2e/cdu-28.spec.ts:4` -> `const SIGLA_UNIDADE = 'SECRETARIA_2';`
+  - Evidência (score 1): `e2e/cdu-28.spec.ts:6` -> `async function acessarUnidadeAlvo(page: import('@playwright/test').Page) {`
+- 🟡 **[PARCIAL]** 2. Sistema mostra a árvore completa de unidades.
+  - Palavras-chave usadas: `unidades, mostra, árvore, completa`
+  - Evidência (score 1): `e2e/cdu-28.spec.ts:12` -> `await page.getByRole('link', {name: /Unidades/i}).click();`
+  - Evidência (score 1): `e2e/cdu-28.spec.ts:13` -> `await expect(page).toHaveURL(/\/unidades/);`
+- 🟡 **[PARCIAL]** 3. ADMIN clica em umas das unidades.
+  - Palavras-chave usadas: `unidades, admin, clica`
+  - Evidência (score 1): `e2e/cdu-28.spec.ts:11` -> `test.beforeEach(async ({_resetAutomatico, _autenticadoComoAdmin, page}) => {`
+  - Evidência (score 1): `e2e/cdu-28.spec.ts:12` -> `await page.getByRole('link', {name: /Unidades/i}).click();`
+  - Evidência (score 1): `e2e/cdu-28.spec.ts:13` -> `await expect(page).toHaveURL(/\/unidades/);`
+- ✅ **[COBERTO]** 4. Sistema mostra a pagina `Detalhes da unidade`
+  - Palavras-chave usadas: `unidade, mostra, pagina, detalhes`
+  - Evidência (score 2): `e2e/cdu-28.spec.ts:16` -> `test('Cenario 1: ADMIN acessa detalhes da unidade e opção de criar atribuição', async ({_resetAutomatico, _autenticad...`
+  - Evidência (score 1): `e2e/cdu-28.spec.ts:4` -> `const SIGLA_UNIDADE = 'SECRETARIA_2';`
+  - Evidência (score 1): `e2e/cdu-28.spec.ts:6` -> `async function acessarUnidadeAlvo(page: import('@playwright/test').Page) {`
+- ✅ **[COBERTO]** 5. ADMIN clica no botão `Criar atribuição`.
+  - Palavras-chave usadas: `admin, clica, botão, criar, atribuição`
+  - Evidência (score 3): `e2e/cdu-28.spec.ts:16` -> `test('Cenario 1: ADMIN acessa detalhes da unidade e opção de criar atribuição', async ({_resetAutomatico, _autenticad...`
+  - Evidência (score 2): `e2e/cdu-28.spec.ts:42` -> `test('Cenario 3: ADMIN cria atribuição temporária com sucesso', async ({_resetAutomatico, _autenticadoComoAdmin, page...`
+  - Evidência (score 1): `e2e/cdu-28.spec.ts:3` -> `test.describe.serial('CDU-28 - Manter atribuição temporária', () => {`
+- ❌ **[NAO_COBERTO]** 6. Sistema apresenta um modal com estes campos:
+  - Palavras-chave usadas: `apresenta, modal, estes`
+  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
+- 🟡 **[PARCIAL]** 7. Dropdown pesquisável `Servidores` com os nomes dos servidores da unidade
+  - Palavras-chave usadas: `unidade, dropdown, pesquisável, servidores, nomes`
+  - Evidência (score 1): `e2e/cdu-28.spec.ts:4` -> `const SIGLA_UNIDADE = 'SECRETARIA_2';`
+  - Evidência (score 1): `e2e/cdu-28.spec.ts:6` -> `async function acessarUnidadeAlvo(page: import('@playwright/test').Page) {`
+  - Evidência (score 1): `e2e/cdu-28.spec.ts:7` -> `await expect(page.getByTestId(`link-arvore-unidade-${SIGLA_UNIDADE}`)).toBeVisible();`
+- ✅ **[COBERTO]** 8. `Data de início`
+  - Palavras-chave usadas: `data, início`
+  - Evidência (score 2): `e2e/cdu-28.spec.ts:39` -> `await expect(page.getByText('Informe a data de início.')).toBeVisible();`
+  - Evidência (score 1): `e2e/cdu-28.spec.ts:36` -> `await page.getByTestId('input-data-termino').fill('2030-12-31');`
+  - Evidência (score 1): `e2e/cdu-28.spec.ts:53` -> `await page.getByTestId('input-data-inicio').fill('2030-01-01');`
+- 🟡 **[PARCIAL]** 9. `Data de término`
+  - Palavras-chave usadas: `data, término`
+  - Evidência (score 1): `e2e/cdu-28.spec.ts:36` -> `await page.getByTestId('input-data-termino').fill('2030-12-31');`
+  - Evidência (score 1): `e2e/cdu-28.spec.ts:39` -> `await expect(page.getByText('Informe a data de início.')).toBeVisible();`
+  - Evidência (score 1): `e2e/cdu-28.spec.ts:53` -> `await page.getByTestId('input-data-inicio').fill('2030-01-01');`
+- 🟡 **[PARCIAL]** 10. `Justificativa`
+  - Palavras-chave usadas: `justificativa`
+  - Evidência (score 1): `e2e/cdu-28.spec.ts:35` -> `await page.getByTestId('textarea-justificativa').fill('Cobertura de férias');`
+  - Evidência (score 1): `e2e/cdu-28.spec.ts:55` -> `await page.getByTestId('textarea-justificativa').fill('Cobertura de férias');`
+- ❌ **[NAO_COBERTO]** 11. Botões `Confirmar` e `Cancelar`
+  - Palavras-chave usadas: `botões, confirmar, cancelar`
+  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
+- 🟡 **[PARCIAL]** 12. ADMIN seleciona o servidor, define as datas e inclui uma justificativa. Todos os campos *são obrigatórios*.
+  - Palavras-chave usadas: `admin, seleciona, servidor, define, datas, inclui`
+  - Evidência (score 1): `e2e/cdu-28.spec.ts:11` -> `test.beforeEach(async ({_resetAutomatico, _autenticadoComoAdmin, page}) => {`
+  - Evidência (score 1): `e2e/cdu-28.spec.ts:16` -> `test('Cenario 1: ADMIN acessa detalhes da unidade e opção de criar atribuição', async ({_resetAutomatico, _autenticad...`
+  - Evidência (score 1): `e2e/cdu-28.spec.ts:23` -> `test('Cenario 2: Campos obrigatórios devem ser validados', async ({_resetAutomatico, _autenticadoComoAdmin, page}) => {`
+- ✅ **[COBERTO]** 13. Sistema registra internamente a atribuição temporária e mostra uma confirmação "Atribuição criada".
+  - Palavras-chave usadas: `registra, internamente, atribuição, temporária, mostra, confirmação`
+  - Evidência (score 2): `e2e/cdu-28.spec.ts:3` -> `test.describe.serial('CDU-28 - Manter atribuição temporária', () => {`
+  - Evidência (score 2): `e2e/cdu-28.spec.ts:42` -> `test('Cenario 3: ADMIN cria atribuição temporária com sucesso', async ({_resetAutomatico, _autenticadoComoAdmin, page...`
+  - Evidência (score 1): `e2e/cdu-28.spec.ts:16` -> `test('Cenario 1: ADMIN acessa detalhes da unidade e opção de criar atribuição', async ({_resetAutomatico, _autenticad...`
+- ✅ **[COBERTO]** 14. O sistema envia notificação por e-mail para o usuário que recebeu a atribuição temporária:
+  - Palavras-chave usadas: `envia, notificação, e-mail, recebeu, atribuição, temporária`
+  - Evidência (score 2): `e2e/cdu-28.spec.ts:3` -> `test.describe.serial('CDU-28 - Manter atribuição temporária', () => {`
+  - Evidência (score 2): `e2e/cdu-28.spec.ts:42` -> `test('Cenario 3: ADMIN cria atribuição temporária com sucesso', async ({_resetAutomatico, _autenticadoComoAdmin, page...`
+  - Evidência (score 1): `e2e/cdu-28.spec.ts:16` -> `test('Cenario 1: ADMIN acessa detalhes da unidade e opção de criar atribuição', async ({_resetAutomatico, _autenticad...`
+- 🟡 **[PARCIAL]** 15. O sistema cria internamente um alerta para o usuário:
+  - Palavras-chave usadas: `alerta, cria, internamente`
+  - Evidência (score 1): `e2e/cdu-28.spec.ts:16` -> `test('Cenario 1: ADMIN acessa detalhes da unidade e opção de criar atribuição', async ({_resetAutomatico, _autenticad...`
+  - Evidência (score 1): `e2e/cdu-28.spec.ts:20` -> `await expect(page.getByTestId('unidade-view__btn-criar-atribuicao')).toBeVisible();`
+  - Evidência (score 1): `e2e/cdu-28.spec.ts:25` -> `await page.getByTestId('unidade-view__btn-criar-atribuicao').click();`
+- ✅ **[COBERTO]** 16. `Descrição`: "Atribuição temporária de perfil de CHEFE na unidade [SIGLA_UNIDADE]"
+  - Palavras-chave usadas: `perfil, unidade, sigla_unidade, descrição, atribuição, temporária`
+  - Evidência (score 2): `e2e/cdu-28.spec.ts:3` -> `test.describe.serial('CDU-28 - Manter atribuição temporária', () => {`
+  - Evidência (score 2): `e2e/cdu-28.spec.ts:4` -> `const SIGLA_UNIDADE = 'SECRETARIA_2';`
+  - Evidência (score 2): `e2e/cdu-28.spec.ts:7` -> `await expect(page.getByTestId(`link-arvore-unidade-${SIGLA_UNIDADE}`)).toBeVisible();`
+- ❌ **[NAO_COBERTO]** 17. `Processo`: (Vazio)
+  - Palavras-chave usadas: `processo, vazio`
+  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
+- ❌ **[NAO_COBERTO]** 18. `Data/hora`: Data/hora atual
+  - Palavras-chave usadas: `data/hora, atual`
+  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
+- ✅ **[COBERTO]** 19. `Unidade de origem`: ADMIN
+  - Palavras-chave usadas: `unidade, origem, admin`
+  - Evidência (score 2): `e2e/cdu-28.spec.ts:16` -> `test('Cenario 1: ADMIN acessa detalhes da unidade e opção de criar atribuição', async ({_resetAutomatico, _autenticad...`
+  - Evidência (score 1): `e2e/cdu-28.spec.ts:4` -> `const SIGLA_UNIDADE = 'SECRETARIA_2';`
+  - Evidência (score 1): `e2e/cdu-28.spec.ts:6` -> `async function acessarUnidadeAlvo(page: import('@playwright/test').Page) {`
+- ❌ **[NAO_COBERTO]** 20. `Usuário destino`: [USUARIO_SERVIDOR]
+  - Palavras-chave usadas: `destino, usuario_servidor`
+  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
+- ✅ **[COBERTO]** 21. O usuário que recebe a atribuição temporária passa a ter os mesmos direitos do perfil CHEFE. A atribuição temporária
+  - Palavras-chave usadas: `perfil, recebe, atribuição, temporária, passa, mesmos`
+  - Evidência (score 2): `e2e/cdu-28.spec.ts:3` -> `test.describe.serial('CDU-28 - Manter atribuição temporária', () => {`
+  - Evidência (score 2): `e2e/cdu-28.spec.ts:42` -> `test('Cenario 3: ADMIN cria atribuição temporária com sucesso', async ({_resetAutomatico, _autenticadoComoAdmin, page...`
+  - Evidência (score 1): `e2e/cdu-28.spec.ts:16` -> `test('Cenario 1: ADMIN acessa detalhes da unidade e opção de criar atribuição', async ({_resetAutomatico, _autenticad...`
 
-2. **Falta validação de dropdown pesquisável**: O requisito especifica "Dropdown pesquisável `Servidores` com os nomes dos servidores da unidade". O teste usa `selectOption()` que não valida se é pesquisável ou se filtra corretamente.
+## Ajustes recomendados para próximo ciclo
+- Completar cobertura do item: **Sistema mostra a árvore completa de unidades.** (atualmente parcial).
+- Completar cobertura do item: **ADMIN clica em umas das unidades.** (atualmente parcial).
+- Implementar cenário específico para: **Sistema apresenta um modal com estes campos:** (sem evidência no E2E atual).
 
-3. **Falta validação de conteúdo do dropdown**: O teste não valida se o dropdown contém apenas servidores da unidade específica (SECRETARIA_2).
+## Prontidão para o próximo PR de melhoria E2E
+- Status de entrada: **PRONTO_COM_GAPS**.
+- Motivos: há itens sem cobertura E2E.
+- Checklist mínimo antes de codar:
+  - [ ] confirmar massa de dados/fixtures para cenário positivo e negativo;
+  - [ ] definir assert de regra de negócio + assert de efeito colateral;
+  - [ ] validar perfil/unidade necessários no cenário (quando aplicável);
+  - [ ] mapear se precisa teste de integração backend complementar.
+- Escopo sugerido para o próximo PR deste CDU:
+  - Completar cobertura do item: **Sistema mostra a árvore completa de unidades.** (atualmente parcial).
+  - Completar cobertura do item: **ADMIN clica em umas das unidades.** (atualmente parcial).
+  - Implementar cenário específico para: **Sistema apresenta um modal com estes campos:** (sem evidência no E2E atual).
 
-4. **Falta validação de notificação por e-mail**: O requisito (passo 9) especifica envio de e-mail ao servidor com formato específico (assunto, corpo com nome, período, justificativa). O teste não valida.
-
-5. **Falta validação de alerta interno**: O requisito (passo 10) especifica criação de alerta com campos específicos (`Descrição`, `Processo` vazio, `Data/hora`, `Unidade de origem: ADMIN`, `Usuário destino`). O teste não valida.
-
-6. **Falta validação de direitos conferidos**: O requisito (passo 11) especifica que o usuário passa a ter "os mesmos direitos do perfil CHEFE" e que "A atribuição temporária terá prioridade sobre os dados de titularidade lidos do SGRH". O teste não valida se o usuário efetivamente pode exercer direitos de CHEFE.
-
-7. **Falta validação de datas**: O teste preenche datas hardcoded (2030-01-01 e 2030-12-31), mas não valida:
-   - Se data de término posterior a data de início é validada
-   - Se datas no passado são permitidas/rejeitadas
-   - Se o sistema permite atribuições com datas que já passaram
-
-8. **Falta cenário de cancelamento**: Não há teste que valida o botão "Cancelar" do modal/formulário.
-
-9. **Falta validação de justificativa obrigatória**: O teste preenche justificativa, mas não valida explicitamente que é obrigatória tentando enviar sem ela.
-
-10. **Falta validação de atualizações ou edições**: O requisito intitula-se "Manter atribuição temporária" que sugere CRUD (Create, Read, Update, Delete), mas o teste apenas cobre criação. Não há testes para consultar, alterar ou remover atribuições.
-
-## Alterações necessárias no teste E2E
-1. **Clarificar se é modal ou página**: 
-   - Se deve ser modal, o formulário deve estar em um modal, não uma página separada
-   - Se é página, o requisito precisa ser revisado para remover "modal"
-
-2. **Adicionar validação de dropdown pesquisável**: 
-   - Testar digitação no dropdown (se suporta filtro)
-   - Validar que apenas servidores da unidade aparecem
-
-3. **Adicionar validação de notificação por e-mail**: 
-   - Simular ou interceptar envio de e-mail
-   - Validar assunto, corpo com todos os dados (nome, período, justificativa)
-
-4. **Adicionar validação de alerta interno**: 
-   - Consultar API ou base de dados
-   - Validar campos esperados, incluindo `Processo` vazio
-
-5. **Adicionar validação de direitos conferidos**: 
-   - Após criar atribuição, fazer login com o servidor
-   - Validar que pode exercer ações de CHEFE (ex: aceitar mapas)
-
-6. **Adicionar validação de ordem de datas**: 
-   - Tentar preencher data de término anterior a de início
-   - Validar mensagem de erro
-
-7. **Adicionar cenário de cancelamento**: 
-   - Abrir formulário, preencher parcialmente, clicar "Cancelar"
-   - Validar que nenhuma atribuição foi criada
-
-8. **Adicionar cenários de validação de datas**: 
-   - Tentar datas no passado
-   - Tentar datas iguais (período zero)
-   - Validar comportamento esperado
-
-9. **Adicionar testes de leitura, atualização e remoção de atribuições** (se "Manter" significa CRUD):
-   - Consultar atribuição criada
-   - Alterar período ou justificativa
-   - Remover atribuição
-   - Validar que direitos de CHEFE são revertidos após expiração
-
-## Notas e inconsistências do requisito
-- **Inconsistência modal vs. página**: O requisito diz "modal" mas a implementação usa página. Precisa clarificar qual é a intenção.
-
-- **Falta de clareza em "prioridade sobre SGRH"**: O requisito menciona que atribuição temporária tem prioridade sobre dados do SGRH (sistema de recursos humanos externo), mas não especifica como essa prioridade é implementada ou validada.
-
-- **Ambiguidade em "Manter"**: O título sugere operações CRUD, mas o fluxo principal descreve apenas criação. Não fica claro se há funcionalidades de leitura, atualização ou remoção.
-
-- **Falta de clareza em "Usuário destino" do alerta**: O requisito especifica `Usuário destino: [USUARIO_SERVIDOR]`, mas não clarifica o formato (ID, username, e-mail, nome completo).
+## Observações metodológicas
+- Esta rodada incluiu leitura de helpers importados para reduzir falso negativo de cobertura indireta.
+- Classificação automática por evidência textual; recomenda-se validação humana dos itens `🟡` e `❌` antes da implementação final.

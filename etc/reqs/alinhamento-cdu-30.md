@@ -1,109 +1,122 @@
-# Alinhamento CDU-30 - Manter administradores
+# Alinhamento CDU-30 - Reanálise (rodada 2)
 
-## Cobertura atual do teste
-O teste cobre:
-- **Setup inicial**: Validação de acesso a página de administradores via botão de configurações.
-- **Validação de UI**: Verificação de heading "Administradores", presença de tabela com dados (linha não vazia) e botão "Adicionar/Novo" visível e habilitado.
+## Artefatos analisados
+- Requisito: `etc/reqs/cdu-30.md`.
+- Teste E2E: `e2e/cdu-30.spec.ts` (3 cenários `test`, 0 `test.step`).
 
-## Lacunas em relação ao requisito
-**Lacunas críticas:**
+## Resultado da comparação requisito x E2E
+- Itens do fluxo principal avaliados: **19**.
+- Status: **5 cobertos**, **11 parciais**, **3 não cobertos** (baseado em evidências textuais no spec e helpers).
 
-1. **Falta teste de fluxo de adição completo**: O requisito descreve detalhadamente o fluxo de adição (passos 4-8), mas o teste não executa nenhuma adição. Não valida:
-   - Clique no botão "Adicionar"
-   - Abertura do modal com título "Adicionar administrador"
-   - Preenchimento do campo de "título eleitoral"
-   - Validação de existência do usuário
-   - Validação de duplicação (se já é administrador)
-   - Mensagem de sucesso "Administrador adicionado"
+## Matriz de evidências
+- 🟡 **[PARCIAL]** 1. O usuário clica em Configurações (ícone de engrenagem) e escolhe `Administradores`.
+  - Palavras-chave usadas: `clica, configurações, ícone, engrenagem, escolhe, administradores`
+  - Evidência (score 1): `e2e/cdu-30.spec.ts:5` -> `* CDU-30 - Manter administradores`
+  - Evidência (score 1): `e2e/cdu-30.spec.ts:12` -> `test.describe.serial('CDU-30 - Manter administradores', () => {`
+  - Evidência (score 1): `e2e/cdu-30.spec.ts:18` -> `test('Cenário 1: ADMIN navega para página de administradores e visualiza lista', async ({_resetAutomatico, page, _aut...`
+- ✅ **[COBERTO]** 2. O sistema exibe a lista de administradores cadastrados, mostrando nome, título de eleitor, matricula e unidade de
+  - Palavras-chave usadas: `unidade, exibe, lista, administradores, cadastrados, mostrando`
+  - Evidência (score 2): `e2e/cdu-30.spec.ts:18` -> `test('Cenário 1: ADMIN navega para página de administradores e visualiza lista', async ({_resetAutomatico, page, _aut...`
+  - Evidência (score 1): `e2e/cdu-30.spec.ts:5` -> `* CDU-30 - Manter administradores`
+  - Evidência (score 1): `e2e/cdu-30.spec.ts:12` -> `test.describe.serial('CDU-30 - Manter administradores', () => {`
+- ❌ **[NAO_COBERTO]** 3. O sistema apresenta opções para:
+  - Palavras-chave usadas: `apresenta, opções`
+  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
+- ✅ **[COBERTO]** 4. Adicionar novo administrador.
+  - Palavras-chave usadas: `adicionar, novo, administrador`
+  - Evidência (score 2): `e2e/cdu-30.spec.ts:35` -> `test('Cenário 2: ADMIN adiciona novo administrador', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {`
+  - Evidência (score 1): `e2e/cdu-30.spec.ts:5` -> `* CDU-30 - Manter administradores`
+  - Evidência (score 1): `e2e/cdu-30.spec.ts:12` -> `test.describe.serial('CDU-30 - Manter administradores', () => {`
+- 🟡 **[PARCIAL]** 5. Remover administrador existente.
+  - Palavras-chave usadas: `remover, administrador, existente`
+  - Evidência (score 1): `e2e/cdu-30.spec.ts:5` -> `* CDU-30 - Manter administradores`
+  - Evidência (score 1): `e2e/cdu-30.spec.ts:12` -> `test.describe.serial('CDU-30 - Manter administradores', () => {`
+  - Evidência (score 1): `e2e/cdu-30.spec.ts:14` -> `// Usuário não-admin existente no seed (David Bowie - CHEFE da Assessoria 11)`
+- 🟡 **[PARCIAL]** 6. **<<Início de fluxo de adição de administrador>>** O usuário aciona a opção "Adicionar".
+  - Palavras-chave usadas: `início, adição, administrador, aciona, opção, adicionar`
+  - Evidência (score 1): `e2e/cdu-30.spec.ts:5` -> `* CDU-30 - Manter administradores`
+  - Evidência (score 1): `e2e/cdu-30.spec.ts:12` -> `test.describe.serial('CDU-30 - Manter administradores', () => {`
+  - Evidência (score 1): `e2e/cdu-30.spec.ts:18` -> `test('Cenário 1: ADMIN navega para página de administradores e visualiza lista', async ({_resetAutomatico, page, _aut...`
+- ✅ **[COBERTO]** 7. O sistema apresenta um modal com título "Adicionar administrador" contendo um campo de texto para o título eleitoral
+  - Palavras-chave usadas: `apresenta, modal, título, adicionar, administrador, contendo`
+  - Evidência (score 2): `e2e/cdu-30.spec.ts:43` -> `await expect(modal.getByRole('heading', {name: TEXTOS.administracao.MODAL_ADICIONAR_TITULO})).toBeVisible();`
+  - Evidência (score 1): `e2e/cdu-30.spec.ts:5` -> `* CDU-30 - Manter administradores`
+  - Evidência (score 1): `e2e/cdu-30.spec.ts:12` -> `test.describe.serial('CDU-30 - Manter administradores', () => {`
+- 🟡 **[PARCIAL]** 8. O usuário informa o título eleitoral e clica em "Adicionar".
+  - Palavras-chave usadas: `informa, título, eleitoral, clica, adicionar`
+  - Evidência (score 1): `e2e/cdu-30.spec.ts:30` -> `// Botão de adicionar deve estar visível e habilitado`
+  - Evidência (score 1): `e2e/cdu-30.spec.ts:31` -> `await expect(page.getByRole('button', {name: TEXTOS.administracao.BOTAO_ADICIONAR})).toBeVisible();`
+  - Evidência (score 1): `e2e/cdu-30.spec.ts:32` -> `await expect(page.getByRole('button', {name: TEXTOS.administracao.BOTAO_ADICIONAR})).toBeEnabled();`
+- 🟡 **[PARCIAL]** 9. O sistema valida se o usuário existe e se já é administrador. Se houver erro, exibe mensagem de erro.
+  - Palavras-chave usadas: `valida, existe, administrador, houver, erro, exibe`
+  - Evidência (score 1): `e2e/cdu-30.spec.ts:5` -> `* CDU-30 - Manter administradores`
+  - Evidência (score 1): `e2e/cdu-30.spec.ts:12` -> `test.describe.serial('CDU-30 - Manter administradores', () => {`
+  - Evidência (score 1): `e2e/cdu-30.spec.ts:14` -> `// Usuário não-admin existente no seed (David Bowie - CHEFE da Assessoria 11)`
+- 🟡 **[PARCIAL]** 10. Sistema insere o registro na tabela ADMINISTRADOR e mostra uma mensagem de sucesso "Administrador adicionado com
+  - Palavras-chave usadas: `insere, registro, administrador, mostra, mensagem, sucesso`
+  - Evidência (score 1): `e2e/cdu-30.spec.ts:5` -> `* CDU-30 - Manter administradores`
+  - Evidência (score 1): `e2e/cdu-30.spec.ts:12` -> `test.describe.serial('CDU-30 - Manter administradores', () => {`
+  - Evidência (score 1): `e2e/cdu-30.spec.ts:18` -> `test('Cenário 1: ADMIN navega para página de administradores e visualiza lista', async ({_resetAutomatico, page, _aut...`
+- 🟡 **[PARCIAL]** 11. **<<Início de fluxo de remoção de administrador>>** O usuário aciona o ícone de exclusão em um registro da lista.
+  - Palavras-chave usadas: `início, remoção, administrador, aciona, ícone, exclusão`
+  - Evidência (score 1): `e2e/cdu-30.spec.ts:5` -> `* CDU-30 - Manter administradores`
+  - Evidência (score 1): `e2e/cdu-30.spec.ts:12` -> `test.describe.serial('CDU-30 - Manter administradores', () => {`
+  - Evidência (score 1): `e2e/cdu-30.spec.ts:18` -> `test('Cenário 1: ADMIN navega para página de administradores e visualiza lista', async ({_resetAutomatico, page, _aut...`
+- 🟡 **[PARCIAL]** 12. O sistema exibe um modal com título "Confirmar remoção" e a mensagem "Deseja realmente
+  - Palavras-chave usadas: `exibe, modal, título, confirmar, remoção, mensagem`
+  - Evidência (score 1): `e2e/cdu-30.spec.ts:41` -> `const modal = page.getByRole('dialog');`
+  - Evidência (score 1): `e2e/cdu-30.spec.ts:42` -> `await expect(modal).toBeVisible();`
+  - Evidência (score 1): `e2e/cdu-30.spec.ts:43` -> `await expect(modal.getByRole('heading', {name: TEXTOS.administracao.MODAL_ADICIONAR_TITULO})).toBeVisible();`
+- 🟡 **[PARCIAL]** 13. O usuário confirma clicando em "Remover".
+  - Palavras-chave usadas: `confirma, clicando, remover`
+  - Evidência (score 1): `e2e/cdu-30.spec.ts:69` -> `await expect(modal.getByRole('heading', {name: TEXTOS.administracao.MODAL_REMOVER_TITULO})).toBeVisible();`
+  - Evidência (score 1): `e2e/cdu-30.spec.ts:70` -> `await expect(modal.getByText(TEXTOS.administracao.MODAL_REMOVER_PERGUNTA(NOME_NOVO_ADMIN))).toBeVisible();`
+  - Evidência (score 1): `e2e/cdu-30.spec.ts:73` -> `await modal.getByRole('button', {name: /Remover/i}).click();`
+- ❌ **[NAO_COBERTO]** 14. O sistema valida se a exclusão é permitida:
+  - Palavras-chave usadas: `valida, exclusão, permitida`
+  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
+- 🟡 **[PARCIAL]** 15. Verifica se o usuário está tentando remover a si mesmo.
+  - Palavras-chave usadas: `verifica, está, tentando, remover, mesmo`
+  - Evidência (score 1): `e2e/cdu-30.spec.ts:69` -> `await expect(modal.getByRole('heading', {name: TEXTOS.administracao.MODAL_REMOVER_TITULO})).toBeVisible();`
+  - Evidência (score 1): `e2e/cdu-30.spec.ts:70` -> `await expect(modal.getByText(TEXTOS.administracao.MODAL_REMOVER_PERGUNTA(NOME_NOVO_ADMIN))).toBeVisible();`
+  - Evidência (score 1): `e2e/cdu-30.spec.ts:73` -> `await modal.getByRole('button', {name: /Remover/i}).click();`
+- 🟡 **[PARCIAL]** 16. Verifica se é o único administrador do sistema.
+  - Palavras-chave usadas: `verifica, único, administrador`
+  - Evidência (score 1): `e2e/cdu-30.spec.ts:5` -> `* CDU-30 - Manter administradores`
+  - Evidência (score 1): `e2e/cdu-30.spec.ts:12` -> `test.describe.serial('CDU-30 - Manter administradores', () => {`
+  - Evidência (score 1): `e2e/cdu-30.spec.ts:18` -> `test('Cenário 1: ADMIN navega para página de administradores e visualiza lista', async ({_resetAutomatico, page, _aut...`
+- ❌ **[NAO_COBERTO]** 17. Se a validação falhar, o sistema exibe mensagem de erro correspondente.
+  - Palavras-chave usadas: `validação, falhar, exibe, mensagem, erro, correspondente`
+  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
+- ✅ **[COBERTO]** 18. Se a validação for bem sucedida, o sistema remove o registro da tabela ADMINISTRADOR.
+  - Palavras-chave usadas: `validação, sucedida, remove, registro, administrador`
+  - Evidência (score 2): `e2e/cdu-30.spec.ts:57` -> `test('Cenário 3: ADMIN remove administrador adicionado', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {`
+  - Evidência (score 1): `e2e/cdu-30.spec.ts:5` -> `* CDU-30 - Manter administradores`
+  - Evidência (score 1): `e2e/cdu-30.spec.ts:12` -> `test.describe.serial('CDU-30 - Manter administradores', () => {`
+- ✅ **[COBERTO]** 19. O sistema exibe mensagem "Administrador removido" e atualiza a lista. *
+  - Palavras-chave usadas: `exibe, mensagem, administrador, removido, atualiza, lista`
+  - Evidência (score 2): `e2e/cdu-30.spec.ts:18` -> `test('Cenário 1: ADMIN navega para página de administradores e visualiza lista', async ({_resetAutomatico, page, _aut...`
+  - Evidência (score 1): `e2e/cdu-30.spec.ts:5` -> `* CDU-30 - Manter administradores`
+  - Evidência (score 1): `e2e/cdu-30.spec.ts:12` -> `test.describe.serial('CDU-30 - Manter administradores', () => {`
 
-2. **Falta teste de fluxo de remoção completo**: O requisito descreve fluxo de remoção (passos 9-15), mas o teste não executa nenhuma remoção. Não valida:
-   - Clique no ícone de exclusão
-   - Abertura do modal com título "Confirmar remoção"
-   - Mensagem de confirmação com nome do administrador
-   - Validações de remoção (não remove a si mesmo, não é único)
-   - Mensagens de erro correspondentes
-   - Mensagem de sucesso "Administrador removido com sucesso!"
+## Ajustes recomendados para próximo ciclo
+- Completar cobertura do item: **O usuário clica em Configurações (ícone de engrenagem) e escolhe `Administradores`.** (atualmente parcial).
+- Implementar cenário específico para: **O sistema apresenta opções para:** (sem evidência no E2E atual).
+- Completar cobertura do item: **Remover administrador existente.** (atualmente parcial).
 
-3. **Falta validação de campos da tabela**: O requisito (passo 2) especifica que a tabela mostra "nome, título de eleitor, matricula e unidade de lotação". O teste não valida a presença dessas colunas.
+## Prontidão para o próximo PR de melhoria E2E
+- Status de entrada: **PRONTO_COM_GAPS**.
+- Motivos: há itens sem cobertura E2E.
+- Checklist mínimo antes de codar:
+  - [ ] confirmar massa de dados/fixtures para cenário positivo e negativo;
+  - [ ] definir assert de regra de negócio + assert de efeito colateral;
+  - [ ] validar perfil/unidade necessários no cenário (quando aplicável);
+  - [ ] mapear se precisa teste de integração backend complementar.
+- Escopo sugerido para o próximo PR deste CDU:
+  - Completar cobertura do item: **O usuário clica em Configurações (ícone de engrenagem) e escolhe `Administradores`.** (atualmente parcial).
+  - Implementar cenário específico para: **O sistema apresenta opções para:** (sem evidência no E2E atual).
+  - Completar cobertura do item: **Remover administrador existente.** (atualmente parcial).
 
-4. **Falta validação de modal de adição**: Não há validação do modal com:
-   - Título "Adicionar administrador"
-   - Campo de texto para título eleitoral
-   - Botões "Cancelar" e "Adicionar"
-
-5. **Falta validação de modal de remoção**: Não há validação do modal com:
-   - Título "Confirmar remoção"
-   - Mensagem dinâmica com nome do administrador
-   - Botões "Cancelar" e "Remover"
-
-6. **Falta validação de validações no fluxo de adição**: O requisito especifica (passo 7) que o sistema "valida se o usuário existe e se já é administrador. Se houver erro, exibe mensagem de erro". O teste não valida esses cenários de erro.
-
-7. **Falta validação de validações no fluxo de remoção**: O requisito especifica (passo 12) validações de:
-   - Não permitir remover a si mesmo
-   - Não permitir remover se é o único administrador
-   
-   O teste não valida esses cenários de erro.
-
-8. **Falta teste de cancelamento de adição**: Não há validação de clique em "Cancelar" no modal de adição.
-
-9. **Falta teste de cancelamento de remoção**: Não há validação de clique em "Cancelar" no modal de remoção.
-
-10. **Falta atualização dinâmica da lista**: Não há validação de que após adicionar/remover, a tabela é atualizada corretamente.
-
-## Alterações necessárias no teste E2E
-1. **Adicionar teste de adição de administrador**: 
-   - Clicar em botão "Adicionar"
-   - Validar que modal com título "Adicionar administrador" abre
-   - Validar campo de texto para título eleitoral
-   - Preenchimento de título eleitoral válido
-   - Clique em "Adicionar"
-   - Validar mensagem "Administrador adicionado"
-   - Validar que novo administrador aparece na tabela
-
-2. **Adicionar validação de colunas da tabela**: 
-   - Validar presença de colunas: "Nome", "Título de eleitor", "Matrícula", "Unidade de lotação"
-
-3. **Adicionar teste de erro ao adicionar usuário inexistente**: 
-   - Preencher título eleitoral inválido
-   - Clicar "Adicionar"
-   - Validar mensagem de erro (usuário não existe)
-
-4. **Adicionar teste de erro ao adicionar administrador duplicado**: 
-   - Tentar adicionar usuário que já é administrador
-   - Validar mensagem de erro (já é administrador)
-
-5. **Adicionar teste de cancelamento de adição**: 
-   - Abrir modal de adição
-   - Preencher dados
-   - Clicar "Cancelar"
-   - Validar que modal fecha e nenhum administrador foi adicionado
-
-6. **Adicionar teste de remoção de administrador**: 
-   - Clicar ícone de remoção em um administrador
-   - Validar que modal com título "Confirmar remoção" abre
-   - Validar mensagem dinâmica com nome do administrador
-   - Clicar "Remover"
-   - Validar mensagem "Administrador removido"
-   - Validar que administrador foi removido da tabela
-
-7. **Adicionar teste de cancelamento de remoção**: 
-   - Abrir modal de remoção
-   - Clicar "Cancelar"
-   - Validar que modal fecha e administrador continua na tabela
-
-8. **Adicionar teste de validação: não remover a si mesmo**: 
-   - Como ADMIN atualmente logado, tentar remover a si mesmo
-   - Validar mensagem de erro específica (não pode remover a si mesmo)
-
-9. **Adicionar teste de validação: não remover único administrador**: 
-   - Em cenário com apenas um administrador, tentar removê-lo
-   - Validar mensagem de erro (não pode remover único administrador)
-
-## Notas e inconsistências do requisito
-- **Ambiguidade em "título eleitoral" vs "título de eleitor"**: O requisito usa "título eleitoral" no passo de entrada (passo 6) mas "título de eleitor" na exibição (passo 2). Presume-se ser o mesmo campo.
-
-- **Falta de clareza em "icone de exclusão"**: O requisito menciona (passo 9) "ícone de exclusão em um registro" mas não especifica qual ícone (X, lixeira, etc.).
-
-- **Ambiguidade em validação de duplicação**: O requisito diz "valida se o usuário existe e se já é administrador", mas não especifica se essas são validações separadas (dois erros distintos) ou uma validação única.
-
-- **Falta de informação sobre logout do usuário removido**: O requisito não especifica se um administrador removido é imediatamente deslogado ou se sua sessão continua válida até expirar.
+## Observações metodológicas
+- Esta rodada incluiu leitura de helpers importados para reduzir falso negativo de cobertura indireta.
+- Classificação automática por evidência textual; recomenda-se validação humana dos itens `🟡` e `❌` antes da implementação final.

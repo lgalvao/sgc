@@ -1,80 +1,98 @@
-# Alinhamento CDU-21 - Finalizar processo de mapeamento ou de revisão
+# Alinhamento CDU-21 - Reanálise (rodada 2)
 
-## Cobertura atual do teste
-O teste E2E cobre:
+## Artefatos analisados
+- Requisito: `etc/reqs/cdu-21.md`.
+- Teste E2E: `e2e/cdu-21.spec.ts` (5 cenários `test`, 0 `test.step`).
 
-- **Pré-condição e setup**: Criação de processo com múltiplos subprocessos em situação "Mapa homologado" (Preparações 1-7).
-- **Passos 1-2**: Navegação ao painel, seleção do processo, exibição de tela "Detalhes do processo" (Cenário 1).
-- **Passo 3**: Verificação de presença do botão "Finalizar processo" (Cenário 1).
-- **Passo 6.1**: Cancelamento da finalização (Cenário 2) - clique em "Finalizar processo", abertura de diálogo com mensagem de confirmação, clique em "Cancelar", permanência na tela.
-- **Passos 7-10**: Finalização bem-sucedida (Cenário 3) - clique em "Confirmar", redirecionamento ao painel, verificação de mensagem "Processo finalizado".
-- **Estado pós-finalização** (Cenário 4): Validação de que processo finalizado não exibe botões de ação (Finalizar, Aceitar em bloco, Homologar em bloco) e subprocessos exibem card de visualização em vez de edição.
+## Resultado da comparação requisito x E2E
+- Itens do fluxo principal avaliados: **13**.
+- Status: **5 cobertos**, **8 parciais**, **0 não cobertos** (baseado em evidências textuais no spec e helpers).
 
-## Lacunas em relação ao requisito
-O teste **NÃO cobre**:
+## Matriz de evidências
+- ✅ **[COBERTO]** 1. No `Painel`, o usuário clica em um processo de mapeamento ou de revisão com situação 'Em andamento'.
+  - Palavras-chave usadas: `processo, situação, painel, clica, mapeamento, revisão`
+  - Evidência (score 3): `e2e/cdu-21.spec.ts:7` -> `test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão', () => {`
+  - Evidência (score 2): `e2e/cdu-21.spec.ts:4` -> `import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';`
+  - Evidência (score 2): `e2e/cdu-21.spec.ts:11` -> `const descProcesso = `Mapeamento CDU-21 ${timestamp}`;`
+- ✅ **[COBERTO]** 2. O sistema exibe a tela `Detalhes do processo`.
+  - Palavras-chave usadas: `processo, exibe, detalhes`
+  - Evidência (score 2): `e2e/cdu-21.spec.ts:3` -> `import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';`
+  - Evidência (score 2): `e2e/cdu-21.spec.ts:25` -> `test('Cenario 1: ADMIN navega para detalhes do processo', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {`
+  - Evidência (score 2): `e2e/cdu-21.spec.ts:28` -> `await acessarDetalhesProcesso(page, descProcesso);`
+- ✅ **[COBERTO]** 3. O usuário clica no botão `Finalizar`.
+  - Palavras-chave usadas: `clica, botão, finalizar`
+  - Evidência (score 2): `e2e/cdu-21.spec.ts:32` -> `// Botão finalizar visível`
+  - Evidência (score 1): `e2e/cdu-21.spec.ts:7` -> `test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão', () => {`
+  - Evidência (score 1): `e2e/cdu-21.spec.ts:33` -> `await expect(page.getByTestId('btn-processo-finalizar')).toBeVisible();`
+- 🟡 **[PARCIAL]** 4. O sistema verifica se todos os subprocessos das unidades operacionais e interoperacionais participantes estão na situação 'Mapa homologado'.
+  - Palavras-chave usadas: `subprocessos, unidades, situação, verifica, todos, operacionais`
+  - Evidência (score 1): `e2e/cdu-21.spec.ts:4` -> `import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';`
+  - Evidência (score 1): `e2e/cdu-21.spec.ts:30` -> `await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();`
+  - Evidência (score 1): `e2e/cdu-21.spec.ts:50` -> `await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();`
+- 🟡 **[PARCIAL]** 5. Caso negativo, o sistema exibe a mensagem "Não é possível finalizar o processo enquanto houver unidades com mapa ainda não homologado".
+  - Palavras-chave usadas: `processo, unidades, negativo, exibe, mensagem, possível`
+  - Evidência (score 1): `e2e/cdu-21.spec.ts:2` -> `import {criarProcessoMapaHomologadoFixture, validarProcessoFixture} from './fixtures/fixtures-processos.js';`
+  - Evidência (score 1): `e2e/cdu-21.spec.ts:3` -> `import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';`
+  - Evidência (score 1): `e2e/cdu-21.spec.ts:4` -> `import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';`
+- 🟡 **[PARCIAL]** 6. Caso positivo, sistema mostra diálogo de confirmação: título "Finalização de processo", mensagem "Confirma a finalização do processo [DESCRICAO_PROCESSO]? Essa ação tornará vigentes os mapas de competências homologados e notificará todas as unidades participantes do processo." e botões `Confirmar` e `Finalizar`.
+  - Palavras-chave usadas: `processo, descricao_processo, competências, unidades, positivo, mostra`
+  - Evidência (score 1): `e2e/cdu-21.spec.ts:2` -> `import {criarProcessoMapaHomologadoFixture, validarProcessoFixture} from './fixtures/fixtures-processos.js';`
+  - Evidência (score 1): `e2e/cdu-21.spec.ts:3` -> `import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';`
+  - Evidência (score 1): `e2e/cdu-21.spec.ts:4` -> `import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';`
+- 🟡 **[PARCIAL]** 7. Caso o usuário escolha `Cancelar`, o sistema interrompe a operação de finalização, permanecendo na mesma tela.
+  - Palavras-chave usadas: `escolha, cancelar, interrompe, operação, finalização, permanecendo`
+  - Evidência (score 1): `e2e/cdu-21.spec.ts:36` -> `test('Cenario 2: ADMIN cancela finalização - permanece na tela', async ({_resetAutomatico, page, _autenticadoComoAdmi...`
+  - Evidência (score 1): `e2e/cdu-21.spec.ts:45` -> `await expect(modal.getByText(/Confirma a finalização/i)).toBeVisible();`
+  - Evidência (score 1): `e2e/cdu-21.spec.ts:47` -> `await page.getByTestId('btn-finalizar-processo-cancelar').click();`
+- 🟡 **[PARCIAL]** 8. O usuário escolhe `Finalizar`.
+  - Palavras-chave usadas: `escolhe, finalizar`
+  - Evidência (score 1): `e2e/cdu-21.spec.ts:7` -> `test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão', () => {`
+  - Evidência (score 1): `e2e/cdu-21.spec.ts:32` -> `// Botão finalizar visível`
+  - Evidência (score 1): `e2e/cdu-21.spec.ts:33` -> `await expect(page.getByTestId('btn-processo-finalizar')).toBeVisible();`
+- 🟡 **[PARCIAL]** 9. O sistema define os mapas de competências dos subprocessos como os mapas de competências vigentes das respectivas unidades.
+  - Palavras-chave usadas: `competências, subprocessos, unidades, define, mapas, vigentes`
+  - Evidência (score 1): `e2e/cdu-21.spec.ts:30` -> `await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();`
+  - Evidência (score 1): `e2e/cdu-21.spec.ts:50` -> `await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();`
+  - Evidência (score 1): `e2e/cdu-21.spec.ts:78` -> `await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();`
+- ✅ **[COBERTO]** 10. O sistema muda a situação do processo para 'Finalizado' e envia notificações por e-mail para todas as unidades participantes, como a seguir:
+  - Palavras-chave usadas: `situação, processo, unidades, muda, finalizado, envia`
+  - Evidência (score 2): `e2e/cdu-21.spec.ts:68` -> `await expect(page.getByText(TEXTOS.sucesso.PROCESSO_FINALIZADO)).toBeVisible();`
+  - Evidência (score 2): `e2e/cdu-21.spec.ts:70` -> `// Verificar que processo não aparece mais no painel ativo (foi finalizado)`
+  - Evidência (score 2): `e2e/cdu-21.spec.ts:71` -> `// (Processo finalizado não aparece na lista de processos ativos)`
+- 🟡 **[PARCIAL]** 11. Unidades operacionais e interoperacionais deverão receber um e-mail segundo o modelo:
+  - Palavras-chave usadas: `unidades, operacionais, interoperacionais, receber, e-mail, segundo`
+  - Evidência (score 1): `e2e/cdu-21.spec.ts:30` -> `await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();`
+  - Evidência (score 1): `e2e/cdu-21.spec.ts:50` -> `await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();`
+  - Evidência (score 1): `e2e/cdu-21.spec.ts:78` -> `await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();`
+- 🟡 **[PARCIAL]** 12. Unidades intermediárias e interoperacionais deverão receber um e-mail com informações consolidadas das unidades operacionais e interoperacionais subordinadas a elas, segundo o modelo:
+  - Palavras-chave usadas: `unidades, intermediárias, interoperacionais, receber, e-mail, informações`
+  - Evidência (score 1): `e2e/cdu-21.spec.ts:30` -> `await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();`
+  - Evidência (score 1): `e2e/cdu-21.spec.ts:50` -> `await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();`
+  - Evidência (score 1): `e2e/cdu-21.spec.ts:78` -> `await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();`
+- ✅ **[COBERTO]** 13. O sistema redireciona para o `Painel`, mostrando a mensagem "Processo finalizado".
+  - Palavras-chave usadas: `processo, redireciona, painel, mostrando, mensagem, finalizado`
+  - Evidência (score 3): `e2e/cdu-21.spec.ts:70` -> `// Verificar que processo não aparece mais no painel ativo (foi finalizado)`
+  - Evidência (score 2): `e2e/cdu-21.spec.ts:4` -> `import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';`
+  - Evidência (score 2): `e2e/cdu-21.spec.ts:68` -> `await expect(page.getByText(TEXTOS.sucesso.PROCESSO_FINALIZADO)).toBeVisible();`
 
-- **Passo 4**: "O sistema verifica se todos os subprocessos das unidades operacionais e interoperacionais participantes estão na situação 'Mapa homologado'."
-  - Teste não valida a verificação dessa condição
-  - Teste não cobre cenário onde nem todos os subprocessos estão homologados (passo 5 - mensagem de erro)
+## Ajustes recomendados para próximo ciclo
+- Completar cobertura do item: **O sistema verifica se todos os subprocessos das unidades operacionais e interoperacionais participantes estão na situação 'Mapa homologado'.** (atualmente parcial).
+- Completar cobertura do item: **Caso negativo, o sistema exibe a mensagem "Não é possível finalizar o processo enquanto houver unidades com mapa ainda não homologado".** (atualmente parcial).
+- Completar cobertura do item: **Caso positivo, sistema mostra diálogo de confirmação: título "Finalização de processo", mensagem "Confirma a finalização do processo [DESCRICAO_PROCESSO]? Essa ação tornará vigentes os mapas de competências homologados e notificará todas as unidades participantes do processo." e botões `Confirmar` e `Finalizar`.** (atualmente parcial).
 
-- **Passo 5**: Mensagem de erro condicional - "Não é possível finalizar o processo enquanto houver unidades com mapa de competência ainda não homologado"
-  - Teste não tenta finalizar processo com subprocesso em outro estado
-  - Teste não valida mensagem de erro exata
+## Prontidão para o próximo PR de melhoria E2E
+- Status de entrada: **PRONTO**.
+- Motivos: base de análise e pendências objetivas definidas.
+- Checklist mínimo antes de codar:
+  - [ ] confirmar massa de dados/fixtures para cenário positivo e negativo;
+  - [ ] definir assert de regra de negócio + assert de efeito colateral;
+  - [ ] validar perfil/unidade necessários no cenário (quando aplicável);
+  - [ ] mapear se precisa teste de integração backend complementar.
+- Escopo sugerido para o próximo PR deste CDU:
+  - Completar cobertura do item: **O sistema verifica se todos os subprocessos das unidades operacionais e interoperacionais participantes estão na situação 'Mapa homologado'.** (atualmente parcial).
+  - Completar cobertura do item: **Caso negativo, o sistema exibe a mensagem "Não é possível finalizar o processo enquanto houver unidades com mapa ainda não homologado".** (atualmente parcial).
+  - Completar cobertura do item: **Caso positivo, sistema mostra diálogo de confirmação: título "Finalização de processo", mensagem "Confirma a finalização do processo [DESCRICAO_PROCESSO]? Essa ação tornará vigentes os mapas de competências homologados e notificará todas as unidades participantes do processo." e botões `Confirmar` e `Finalizar`.** (atualmente parcial).
 
-- **Passo 6**: Diálogo de confirmação
-  - Teste valida presença de diálogo mas não valida textos exatos:
-    - Título: "Finalização de processo"
-    - Mensagem: "Confirma a finalização do processo [DESCRICAO_PROCESSO]? Essa ação tornará vigentes os mapas de competências homologados e notificará todas as unidades participantes do processo."
-  - Mensagem inclui placeholders que teste não valida
-
-- **Passo 8**: "O sistema define os mapas de competências dos subprocessos como os mapas de competências vigentes das respectivas unidades."
-  - Teste não valida se mapas se tornaram "vigentes"
-  - Validação requer acesso a dados de backend (não apenas UI)
-
-- **Passo 9**: Mudança de situação do processo para "Finalizado"
-  - Teste verifica que processo não aparece mais na lista ativa (Cenário 3, comentário)
-  - Mas não valida explicitamente que situação mudou para "Finalizado"
-
-- **Passo 9.1 e 9.2**: Notificações por e-mail
-  - Teste não valida envio de e-mails
-  - Teste não valida diferenciais de e-mails por tipo de unidade (operacional/interoperacional vs. intermediária)
-  - Teste não valida conteúdo dos e-mails (templates específicos com placeholders)
-
-- **Pré-condição "Perfil ADMIN"**:
-  - Teste é executado com `autenticadoComoAdmin`, mas não há teste de acesso negado para outro perfil
-
-- **Múltiplas unidades**:
-  - Setup cria apenas uma unidade alvo (SECAO_221)
-  - Requisito menciona notificação a "todas as unidades participantes do processo"
-  - Teste não valida comportamento com múltiplas unidades operacionais, intermediárias e interoperacionais
-
-## Alterações necessárias no teste E2E
-1. **Adicionar validação de verificação de pré-requisito (Passo 4-5)**:
-   - Criar novo teste que tenta finalizar processo com subprocesso em situação diferente de "Mapa homologado"
-   - Validar mensagem de erro exata: "Não é possível finalizar o processo enquanto houver unidades com mapa de competência ainda não homologado"
-
-2. **Aprimorar validação do diálogo de confirmação (Passo 6)**:
-   - Validar título exato: "Finalização de processo"
-   - Validar mensagem contendo: "Confirma a finalização do processo"
-   - Validar presença de "[DESCRICAO_PROCESSO]" expandida corretamente na mensagem
-
-3. **Adicionar validação de situação do processo (Passo 9)**:
-   - Após finalização, navegar até processo e validar situação exibida como "Finalizado" ou "Concluído"
-
-4. **Expandir setup com múltiplas unidades**:
-   - Criar processo com unidades operacionais, intermediárias e interoperacionais
-   - Validar que todos os tipos recebem notificação apropriada (mesmo sem poder verificar e-mail, validar logs ou alertas no sistema)
-
-5. **Adicionar teste de acesso negado**:
-   - Tentar finalizar processo com GESTOR e validar que botão não está visível ou não funciona
-
-6. **Adicionar teste de estado definitivo (Passo 8)**:
-   - Se possível acessar dados de backend, validar que mapas se tornaram "vigentes"
-   - Ou validar que após finalização, atividades e mapas não podem ser mais editados
-
-## Notas e inconsistências do requisito
-- **Ambiguidade em "unidades operacionais e interoperacionais"**: Requisito não deixa claro se "interoperacionais" é subset de "operacionais" ou categoria separada. Afeta lógica de verificação no passo 4.
-- **Comportamento em cadeia**: Requisito não especifica o que acontece se uma unidade não conseguir ser notificada (e-mail falha). Teste não pode validar isso.
-- **Falta de especificidade em "mapas vigentes"**: Passo 8 não deixa claro se há histórico de mapas anteriores que são substituídos ou se é primeira vez que se torna "vigente".
-- **Typo no e-mail**: Passo 9.1 e 9.2 contêm "no O sistema de Gestão de Competências" (redundância).
-- **Inconsistência no nome**: Cenário 4 valida página com texto "Processo concluído" mas requisito usa "Finalizado". Possível divergência entre requisito e implementação.
+## Observações metodológicas
+- Esta rodada incluiu leitura de helpers importados para reduzir falso negativo de cobertura indireta.
+- Classificação automática por evidência textual; recomenda-se validação humana dos itens `🟡` e `❌` antes da implementação final.

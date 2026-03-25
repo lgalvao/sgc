@@ -1,102 +1,344 @@
-# Alinhamento CDU-20 - Analisar validação de mapa de competências
+# Alinhamento CDU-20 - Reanálise (rodada 2)
 
-## Cobertura atual do teste
-O teste E2E cobre:
+## Artefatos analisados
+- Requisito: `etc/reqs/cdu-20.md`.
+- Teste E2E: `e2e/cdu-20.spec.ts` (13 cenários `test`, 0 `test.step`).
 
-- **Pré-condição e setup**: Fixture cria um processo com mapa validado em estado apropriado (Cenário 1).
-- **Acesso ao mapa**: Login com GESTOR_SECRETARIA_1, navegação para subprocesso ASSESSORIA_11 e acesso ao mapa (passo 1-3).
-- **Tela de visualização**: Verifica presença dos botões "Histórico de análise" e "Devolver para ajustes" (passo 4).
-- **Fluxo de devolução**:
-  - Clique em "Devolver para ajustes" (passo 8.1)
-  - Verificação de estado do botão de confirmação (desabilitado sem observação, habilitado com observação) - validação de regra de negócio
-  - Preenchimento de observação (passo 8.4)
-  - Cancelamento da devolução (passo 8.3)
-- **Fluxo de aceite**:
-  - Clique em "Registrar aceite" / "Homologar" (passos 9.1 / 10.1)
-  - Confirmação no diálogo (passos 9.4 / 10.4)
-  - Redirecionamento ao painel e validação de mensagem (passos 9.9 / 10.6)
-- **Suporte para múltiplos perfis**: Cenário 1 testa GESTOR, Cenário 2 testa ADMIN (com botão "Homologar" em vez de "Registrar aceite").
+## Resultado da comparação requisito x E2E
+- Itens do fluxo principal avaliados: **65**.
+- Status: **20 cobertos**, **39 parciais**, **6 não cobertos** (baseado em evidências textuais no spec e helpers).
 
-## Lacunas em relação ao requisito
-O teste **NÃO cobre**:
+## Matriz de evidências
+- ✅ **[COBERTO]** 1. No painel, usuário escolhe um processo e na tela Detalhes do processo clica em uma unidade com situação 'Mapa validado' ou 'Mapa com sugestões'.
+  - Palavras-chave usadas: `processo, unidade, situação, painel, escolhe, detalhes`
+  - Evidência (score 2): `e2e/cdu-20.spec.ts:15` -> `import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';`
+  - Evidência (score 2): `e2e/cdu-20.spec.ts:16` -> `import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';`
+  - Evidência (score 2): `e2e/cdu-20.spec.ts:36` -> `await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);`
+- 🟡 **[PARCIAL]** 2. O sistema mostra a tela `Detalhes do subprocesso`.
+  - Palavras-chave usadas: `subprocesso, mostra, detalhes`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:11` -> `acessarSubprocessoAdmin,`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:12` -> `acessarSubprocessoChefeDireto,`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:13` -> `acessarSubprocessoGestor`
+- ✅ **[COBERTO]** 3. Usuário clica no card `Mapa de competências`.
+  - Palavras-chave usadas: `competências, clica, card, mapa`
+  - Evidência (score 2): `e2e/cdu-20.spec.ts:20` -> `test.describe.serial('CDU-20 - Analisar validação de mapa de competências', () => {`
+  - Evidência (score 2): `e2e/cdu-20.spec.ts:194` -> `test('ADMIN não vê card de edição de mapa quando situação é Mapa com sugestões', async ({_resetAutomatico, page}) => {`
+  - Evidência (score 2): `e2e/cdu-20.spec.ts:198` -> `await expect(page.getByTestId('card-subprocesso-mapa-edicao')).toBeHidden();`
+- ✅ **[COBERTO]** 4. O sistema apresenta o mapa de competências da unidade na tela `Visualização de mapa`, com os botões:
+  - Palavras-chave usadas: `competências, unidade, apresenta, mapa, visualização, botões`
+  - Evidência (score 2): `e2e/cdu-20.spec.ts:20` -> `test.describe.serial('CDU-20 - Analisar validação de mapa de competências', () => {`
+  - Evidência (score 2): `e2e/cdu-20.spec.ts:179` -> `test.describe.serial('CDU-20 - ADMIN não deve ver botões de edição com mapa com sugestões (Bug #1376)', () => {`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:3` -> `criarProcessoMapaComSugestoesFixture,`
+- 🟡 **[PARCIAL]** 5. `Histórico de análise`;
+  - Palavras-chave usadas: `histórico, análise`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:108` -> `// Os demais botões de análise também devem estar presentes`
+- 🟡 **[PARCIAL]** 6. `Devolver para ajustes`;
+  - Palavras-chave usadas: `devolver, ajustes`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:53` -> `await expect(page.getByTestId('btn-mapa-devolver')).toBeVisible();`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:59` -> `await page.getByTestId('btn-mapa-devolver').click();`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:110` -> `await expect(page.getByTestId('btn-mapa-devolver')).toBeVisible();`
+- ✅ **[COBERTO]** 7. `Registrar aceite`, caso o perfil seja GESTOR ou `Homologar`, caso o perfil seja ADMIN.
+  - Palavras-chave usadas: `perfil, registrar, aceite, seja, gestor, homologar`
+  - Evidência (score 2): `e2e/cdu-20.spec.ts:35` -> `await loginComPerfil(page, USUARIOS.GESTOR_SECRETARIA_1.titulo, USUARIOS.GESTOR_SECRETARIA_1.senha, 'GESTOR - SECRETA...`
+  - Evidência (score 2): `e2e/cdu-20.spec.ts:39` -> `await page.getByTestId('btn-mapa-homologar-aceite').click();`
+  - Evidência (score 2): `e2e/cdu-20.spec.ts:48` -> `await loginComPerfil(page, USUARIOS.GESTOR_SECRETARIA_1.titulo, USUARIOS.GESTOR_SECRETARIA_1.senha, 'GESTOR - SECRETA...`
+- ✅ **[COBERTO]** 8. Caso a situação do subprocesso seja 'Mapa com sugestões', a tela Visualização de mapa incluirá ainda, antes do botão `Histórico de análise`, o botão `Ver sugestões`, a partir do qual será possível visualizar, em uma tela modal, as sugestões registradas para o mapa no subprocesso da unidade.
+  - Palavras-chave usadas: `situação, subprocesso, unidade, seja, mapa, sugestões`
+  - Evidência (score 3): `e2e/cdu-20.spec.ts:55` -> `// Verifica que o botão "Ver sugestões" NÃO aparece (situação é "Mapa validado", não "Mapa com sugestões")`
+  - Evidência (score 3): `e2e/cdu-20.spec.ts:86` -> `test.describe.serial('CDU-20 - Ver sugestões quando situação é "Mapa com sugestões"', () => {`
+  - Evidência (score 3): `e2e/cdu-20.spec.ts:160` -> `await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa com sugestões/i);`
+- 🟡 **[PARCIAL]** 9. Se o usuário clicar no botão `Histórico de análise`, o sistema mostra, em tela modal, os dados das análises prévias registradas para a validação do mapa. As análises deverão ser apresentadas em uma pequena tabela com data/hora, sigla da unidade, resultado ('Devolução' ou 'Aceite') e observações. Essas informações poderão ser usadas como subsídio para a realização da análise pela unidade atual.
+  - Palavras-chave usadas: `unidade, clicar, botão, histórico, análise, mostra`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:21` -> `const UNIDADE_ALVO = 'ASSESSORIA_11';`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:28` -> `unidade: UNIDADE_ALVO,`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:36` -> `await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);`
+- ✅ **[COBERTO]** 10. O usuário analisa as informações e opta por aceitar/homologar ou devolver a validação para ajustes.
+  - Palavras-chave usadas: `analisa, informações, opta, aceitar/homologar, devolver, validação`
+  - Evidência (score 2): `e2e/cdu-20.spec.ts:20` -> `test.describe.serial('CDU-20 - Analisar validação de mapa de competências', () => {`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:46` -> `test('Cenario 1: GESTOR SECRETARIA_1 analisa e aceita', async ({_resetAutomatico, page}) => {`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:53` -> `await expect(page.getByTestId('btn-mapa-devolver')).toBeVisible();`
+- 🟡 **[PARCIAL]** 11. Se optar por **devolver para ajustes**:
+  - Palavras-chave usadas: `optar, devolver, ajustes`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:53` -> `await expect(page.getByTestId('btn-mapa-devolver')).toBeVisible();`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:59` -> `await page.getByTestId('btn-mapa-devolver').click();`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:110` -> `await expect(page.getByTestId('btn-mapa-devolver')).toBeVisible();`
+- 🟡 **[PARCIAL]** 12. Usuário clica em `Devolver para ajustes`.
+  - Palavras-chave usadas: `clica, devolver, ajustes`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:53` -> `await expect(page.getByTestId('btn-mapa-devolver')).toBeVisible();`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:59` -> `await page.getByTestId('btn-mapa-devolver').click();`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:110` -> `await expect(page.getByTestId('btn-mapa-devolver')).toBeVisible();`
+- ✅ **[COBERTO]** 13. O sistema abre um modal (título "Devolver mapa") com a pergunta "Confirma a devolução da validação do mapa para ajustes?", um campo de observação (opcional) e os botões `Devolver` e `Cancelar`.
+  - Palavras-chave usadas: `abre, modal, título, devolver, mapa, pergunta`
+  - Evidência (score 2): `e2e/cdu-20.spec.ts:53` -> `await expect(page.getByTestId('btn-mapa-devolver')).toBeVisible();`
+  - Evidência (score 2): `e2e/cdu-20.spec.ts:59` -> `await page.getByTestId('btn-mapa-devolver').click();`
+  - Evidência (score 2): `e2e/cdu-20.spec.ts:110` -> `await expect(page.getByTestId('btn-mapa-devolver')).toBeVisible();`
+- 🟡 **[PARCIAL]** 14. Caso o usuário escolha `Cancelar`, o sistema interrompe a operação de devolução, permanecendo na tela `Visualização de mapa`.
+  - Palavras-chave usadas: `escolha, cancelar, interrompe, operação, devolução, permanecendo`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:42` -> `await page.getByTestId('btn-aceite-mapa-cancelar').click();`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:58` -> `// Verifica que o botão de confirmar devolução está desabilitado sem observação`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:63` -> `await page.getByTestId('inp-devolucao-mapa-obs').fill('Observação de devolução');`
+- 🟡 **[PARCIAL]** 15. O usuário opcionalmente informa a observação e escolhe `Devolver`.
+  - Palavras-chave usadas: `opcionalmente, informa, observação, escolhe, devolver`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:34` -> `test('Cenario 0: modal de aceite exibe campo opcional de observação', async ({_resetAutomatico, page}) => {`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:41` -> `await page.getByTestId('inp-aceite-mapa-observacao').fill('Observação opcional do aceite');`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:53` -> `await expect(page.getByTestId('btn-mapa-devolver')).toBeVisible();`
+- 🟡 **[PARCIAL]** 16. O sistema registra uma análise de validação para o subprocesso com:
+  - Palavras-chave usadas: `subprocesso, registra, análise, validação`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:11` -> `acessarSubprocessoAdmin,`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:12` -> `acessarSubprocessoChefeDireto,`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:13` -> `acessarSubprocessoGestor`
+- ❌ **[NAO_COBERTO]** 17. `Data/hora`: Data/hora atual
+  - Palavras-chave usadas: `data/hora, atual`
+  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
+- 🟡 **[PARCIAL]** 18. `Unidade`: [SIGLA_UNIDADE_ANALISE]
+  - Palavras-chave usadas: `unidade, sigla_unidade_analise`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:21` -> `const UNIDADE_ALVO = 'ASSESSORIA_11';`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:28` -> `unidade: UNIDADE_ALVO,`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:36` -> `await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);`
+- 🟡 **[PARCIAL]** 19. `Resultado`: 'Devolução para ajustes'
+  - Palavras-chave usadas: `resultado, devolução, ajustes`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:58` -> `// Verifica que o botão de confirmar devolução está desabilitado sem observação`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:63` -> `await page.getByTestId('inp-devolucao-mapa-obs').fill('Observação de devolução');`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:66` -> `// Cancela a devolução (passo CDU)`
+- 🟡 **[PARCIAL]** 20. `Observação`: A observação caso tenha sido fornecida.
+  - Palavras-chave usadas: `observação, tenha, sido, fornecida`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:34` -> `test('Cenario 0: modal de aceite exibe campo opcional de observação', async ({_resetAutomatico, page}) => {`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:41` -> `await page.getByTestId('inp-aceite-mapa-observacao').fill('Observação opcional do aceite');`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:58` -> `// Verifica que o botão de confirmar devolução está desabilitado sem observação`
+- ✅ **[COBERTO]** 21. O sistema identifica a unidade de devolução como sendo a unidade de origem da última movimentação do subprocesso.
+  - Palavras-chave usadas: `unidade, subprocesso, identifica, devolução, sendo, origem`
+  - Evidência (score 2): `e2e/cdu-20.spec.ts:36` -> `await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);`
+  - Evidência (score 2): `e2e/cdu-20.spec.ts:49` -> `await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);`
+  - Evidência (score 2): `e2e/cdu-20.spec.ts:77` -> `await navegarParaSubprocesso(page, UNIDADE_ALVO);`
+- 🟡 **[PARCIAL]** 22. O sistema registra uma movimentação para o subprocesso com:
+  - Palavras-chave usadas: `subprocesso, registra, movimentação`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:11` -> `acessarSubprocessoAdmin,`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:12` -> `acessarSubprocessoChefeDireto,`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:13` -> `acessarSubprocessoGestor`
+- ✅ **[COBERTO]** 23. `Descrição`: 'Devolução da validação do mapa de competências para ajustes'
+  - Palavras-chave usadas: `competências, descrição, devolução, validação, mapa, ajustes`
+  - Evidência (score 3): `e2e/cdu-20.spec.ts:20` -> `test.describe.serial('CDU-20 - Analisar validação de mapa de competências', () => {`
+  - Evidência (score 2): `e2e/cdu-20.spec.ts:63` -> `await page.getByTestId('inp-devolucao-mapa-obs').fill('Observação de devolução');`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:3` -> `criarProcessoMapaComSugestoesFixture,`
+- ❌ **[NAO_COBERTO]** 24. `Data/hora`: Data/hora atual
+  - Palavras-chave usadas: `data/hora, atual`
+  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
+- 🟡 **[PARCIAL]** 25. `Unidade origem`: [SIGLA_UNIDADE_ANALISE]
+  - Palavras-chave usadas: `unidade, sigla_unidade_analise, origem`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:21` -> `const UNIDADE_ALVO = 'ASSESSORIA_11';`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:28` -> `unidade: UNIDADE_ALVO,`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:36` -> `await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);`
+- 🟡 **[PARCIAL]** 26. `Unidade destino`: [SIGLA_UNIDADE_DEVOLUCAO]
+  - Palavras-chave usadas: `unidade, sigla_unidade_devolucao, destino`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:21` -> `const UNIDADE_ALVO = 'ASSESSORIA_11';`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:28` -> `unidade: UNIDADE_ALVO,`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:36` -> `await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);`
+- ✅ **[COBERTO]** 27. Se a unidade de devolução for a própria unidade do subprocesso, o sistema altera a situação do subprocesso para 'Mapa disponibilizado' e apaga a data/hora de conclusão da etapa 2 do subprocesso da unidade.
+  - Palavras-chave usadas: `unidade, subprocesso, situação, devolução, própria, altera`
+  - Evidência (score 2): `e2e/cdu-20.spec.ts:36` -> `await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);`
+  - Evidência (score 2): `e2e/cdu-20.spec.ts:49` -> `await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);`
+  - Evidência (score 2): `e2e/cdu-20.spec.ts:77` -> `await navegarParaSubprocesso(page, UNIDADE_ALVO);`
+- 🟡 **[PARCIAL]** 28. O sistema envia notificação por e-mail para a unidade de devolução:
+  - Palavras-chave usadas: `unidade, envia, notificação, e-mail, devolução`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:21` -> `const UNIDADE_ALVO = 'ASSESSORIA_11';`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:28` -> `unidade: UNIDADE_ALVO,`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:36` -> `await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);`
+- 🟡 **[PARCIAL]** 29. O sistema cria internamente um alerta com:
+  - Palavras-chave usadas: `alerta, cria, internamente`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:3` -> `criarProcessoMapaComSugestoesFixture,`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:4` -> `criarProcessoMapaDisponibilizadoFixture,`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:5` -> `criarProcessoMapaValidadoFixture,`
+- 🟡 **[PARCIAL]** 30. Descrição: "Cadastro da unidade [SIGLA_UNIDADE_SUBPROCESSO] devolvido para ajustes"
+  - Palavras-chave usadas: `unidade, sigla_unidade_subprocesso, descrição, cadastro, devolvido, ajustes`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:21` -> `const UNIDADE_ALVO = 'ASSESSORIA_11';`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:28` -> `unidade: UNIDADE_ALVO,`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:36` -> `await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);`
+- 🟡 **[PARCIAL]** 31. Processo: [DESCRICAO_PROCESSO]
+  - Palavras-chave usadas: `processo, descricao_processo`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:3` -> `criarProcessoMapaComSugestoesFixture,`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:4` -> `criarProcessoMapaDisponibilizadoFixture,`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:5` -> `criarProcessoMapaValidadoFixture,`
+- ❌ **[NAO_COBERTO]** 32. Data/hora: Data/hora atual
+  - Palavras-chave usadas: `data/hora, atual`
+  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
+- 🟡 **[PARCIAL]** 33. Unidade de origem: [SIGLA_UNIDADE_ANALISE]
+  - Palavras-chave usadas: `unidade, sigla_unidade_analise, origem`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:21` -> `const UNIDADE_ALVO = 'ASSESSORIA_11';`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:28` -> `unidade: UNIDADE_ALVO,`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:36` -> `await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);`
+- 🟡 **[PARCIAL]** 34. Unidade de destino: [SIGLA_UNIDADE_DEVOLUCAO].
+  - Palavras-chave usadas: `unidade, sigla_unidade_devolucao, destino`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:21` -> `const UNIDADE_ALVO = 'ASSESSORIA_11';`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:28` -> `unidade: UNIDADE_ALVO,`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:36` -> `await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);`
+- 🟡 **[PARCIAL]** 35. O sistema redireciona para o `Painel` e mostra a mensagem "Devolução realizada".
+  - Palavras-chave usadas: `redireciona, painel, mostra, mensagem, devolução, realizada`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:15` -> `import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:58` -> `// Verifica que o botão de confirmar devolução está desabilitado sem observação`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:63` -> `await page.getByTestId('inp-devolucao-mapa-obs').fill('Observação de devolução');`
+- ✅ **[COBERTO]** 36. Se optar por *aceitar* (perfil GESTOR):
+  - Palavras-chave usadas: `perfil, optar, aceitar, gestor`
+  - Evidência (score 2): `e2e/cdu-20.spec.ts:35` -> `await loginComPerfil(page, USUARIOS.GESTOR_SECRETARIA_1.titulo, USUARIOS.GESTOR_SECRETARIA_1.senha, 'GESTOR - SECRETA...`
+  - Evidência (score 2): `e2e/cdu-20.spec.ts:48` -> `await loginComPerfil(page, USUARIOS.GESTOR_SECRETARIA_1.titulo, USUARIOS.GESTOR_SECRETARIA_1.senha, 'GESTOR - SECRETA...`
+  - Evidência (score 2): `e2e/cdu-20.spec.ts:102` -> `await loginComPerfil(page, USUARIOS.GESTOR_SECRETARIA_1.titulo, USUARIOS.GESTOR_SECRETARIA_1.senha, 'GESTOR - SECRETA...`
+- 🟡 **[PARCIAL]** 37. Usuário clica em `Registrar aceite`.
+  - Palavras-chave usadas: `clica, registrar, aceite`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:34` -> `test('Cenario 0: modal de aceite exibe campo opcional de observação', async ({_resetAutomatico, page}) => {`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:39` -> `await page.getByTestId('btn-mapa-homologar-aceite').click();`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:40` -> `await expect(page.getByTestId('inp-aceite-mapa-observacao')).toBeVisible();`
+- ✅ **[COBERTO]** 38. O sistema abre um modal (título "Aceitar mapa") com o texto "Confirma o aceite da validação do mapa de competências?", um campo de observação opcional e os botões `Confirmar` ou `Aceitar`.
+  - Palavras-chave usadas: `competências, abre, modal, título, aceitar, mapa`
+  - Evidência (score 2): `e2e/cdu-20.spec.ts:20` -> `test.describe.serial('CDU-20 - Analisar validação de mapa de competências', () => {`
+  - Evidência (score 2): `e2e/cdu-20.spec.ts:112` -> `// Clique no botão abre modal com sugestões registradas`
+  - Evidência (score 2): `e2e/cdu-20.spec.ts:203` -> `test.describe.serial('CDU-20 - ADMIN homologa mapa após GESTOR aceitar com sugestões (Bug #1376)', () => {`
+- ✅ **[COBERTO]** 39. Caso o usuário escolha o `Cancelar`, o sistema interrompe a operação de aceite, permanecendo na tela `Visualização de mapa`.
+  - Palavras-chave usadas: `escolha, cancelar, interrompe, operação, aceite, permanecendo`
+  - Evidência (score 2): `e2e/cdu-20.spec.ts:42` -> `await page.getByTestId('btn-aceite-mapa-cancelar').click();`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:34` -> `test('Cenario 0: modal de aceite exibe campo opcional de observação', async ({_resetAutomatico, page}) => {`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:39` -> `await page.getByTestId('btn-mapa-homologar-aceite').click();`
+- ✅ **[COBERTO]** 40. O usuário opcionalmente informa a observação e escolhe `Confirmar`.
+  - Palavras-chave usadas: `opcionalmente, informa, observação, escolhe, confirmar`
+  - Evidência (score 2): `e2e/cdu-20.spec.ts:58` -> `// Verifica que o botão de confirmar devolução está desabilitado sem observação`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:34` -> `test('Cenario 0: modal de aceite exibe campo opcional de observação', async ({_resetAutomatico, page}) => {`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:41` -> `await page.getByTestId('inp-aceite-mapa-observacao').fill('Observação opcional do aceite');`
+- 🟡 **[PARCIAL]** 41. O sistema registra uma análise de validação para o subprocesso com:
+  - Palavras-chave usadas: `subprocesso, registra, análise, validação`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:11` -> `acessarSubprocessoAdmin,`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:12` -> `acessarSubprocessoChefeDireto,`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:13` -> `acessarSubprocessoGestor`
+- ❌ **[NAO_COBERTO]** 42. `Data/hora`: Data/hora atual
+  - Palavras-chave usadas: `data/hora, atual`
+  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
+- 🟡 **[PARCIAL]** 43. `Unidade`: [SIGLA_UNIDADE_ANALISE]
+  - Palavras-chave usadas: `unidade, sigla_unidade_analise`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:21` -> `const UNIDADE_ALVO = 'ASSESSORIA_11';`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:28` -> `unidade: UNIDADE_ALVO,`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:36` -> `await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);`
+- 🟡 **[PARCIAL]** 44. `Resultado`: 'Aceite'
+  - Palavras-chave usadas: `resultado, aceite`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:34` -> `test('Cenario 0: modal de aceite exibe campo opcional de observação', async ({_resetAutomatico, page}) => {`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:39` -> `await page.getByTestId('btn-mapa-homologar-aceite').click();`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:40` -> `await expect(page.getByTestId('inp-aceite-mapa-observacao')).toBeVisible();`
+- ✅ **[COBERTO]** 45. `Observação`: A observação da janela modal, caso tenha sido fornecida.
+  - Palavras-chave usadas: `observação, janela, modal, tenha, sido, fornecida`
+  - Evidência (score 2): `e2e/cdu-20.spec.ts:34` -> `test('Cenario 0: modal de aceite exibe campo opcional de observação', async ({_resetAutomatico, page}) => {`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:41` -> `await page.getByTestId('inp-aceite-mapa-observacao').fill('Observação opcional do aceite');`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:58` -> `// Verifica que o botão de confirmar devolução está desabilitado sem observação`
+- 🟡 **[PARCIAL]** 46. O sistema registra uma movimentação para o subprocesso com:
+  - Palavras-chave usadas: `subprocesso, registra, movimentação`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:11` -> `acessarSubprocessoAdmin,`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:12` -> `acessarSubprocessoChefeDireto,`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:13` -> `acessarSubprocessoGestor`
+- ❌ **[NAO_COBERTO]** 47. `Data/hora`: Data/hora atual
+  - Palavras-chave usadas: `data/hora, atual`
+  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
+- 🟡 **[PARCIAL]** 48. `Unidade origem`: [SIGLA_UNIDADE_ANALISE]
+  - Palavras-chave usadas: `unidade, sigla_unidade_analise, origem`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:21` -> `const UNIDADE_ALVO = 'ASSESSORIA_11';`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:28` -> `unidade: UNIDADE_ALVO,`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:36` -> `await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);`
+- 🟡 **[PARCIAL]** 49. `Unidade destino`: [SIGLA_UNIDADE_SUPERIOR]
+  - Palavras-chave usadas: `unidade, sigla_unidade_superior, destino`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:21` -> `const UNIDADE_ALVO = 'ASSESSORIA_11';`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:28` -> `unidade: UNIDADE_ALVO,`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:36` -> `await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);`
+- ✅ **[COBERTO]** 50. `Descrição`: 'Mapa de competências validado'
+  - Palavras-chave usadas: `competências, descrição, mapa, validado`
+  - Evidência (score 2): `e2e/cdu-20.spec.ts:5` -> `criarProcessoMapaValidadoFixture,`
+  - Evidência (score 2): `e2e/cdu-20.spec.ts:20` -> `test.describe.serial('CDU-20 - Analisar validação de mapa de competências', () => {`
+  - Evidência (score 2): `e2e/cdu-20.spec.ts:27` -> `const processo = await criarProcessoMapaValidadoFixture(request, {`
+- 🟡 **[PARCIAL]** 51. O sistema envia notificação por e-mail para a unidade superior:
+  - Palavras-chave usadas: `unidade, envia, notificação, e-mail, superior`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:21` -> `const UNIDADE_ALVO = 'ASSESSORIA_11';`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:28` -> `unidade: UNIDADE_ALVO,`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:36` -> `await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);`
+- 🟡 **[PARCIAL]** 52. O sistema cria internamente um alerta com:
+  - Palavras-chave usadas: `alerta, cria, internamente`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:3` -> `criarProcessoMapaComSugestoesFixture,`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:4` -> `criarProcessoMapaDisponibilizadoFixture,`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:5` -> `criarProcessoMapaValidadoFixture,`
+- ✅ **[COBERTO]** 53. Descrição: "Validação do mapa da [SIGLA_UNIDADE_SUBPROCESSO] submetida para análise"
+  - Palavras-chave usadas: `sigla_unidade_subprocesso, descrição, validação, mapa, submetida, análise`
+  - Evidência (score 2): `e2e/cdu-20.spec.ts:20` -> `test.describe.serial('CDU-20 - Analisar validação de mapa de competências', () => {`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:3` -> `criarProcessoMapaComSugestoesFixture,`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:4` -> `criarProcessoMapaDisponibilizadoFixture,`
+- 🟡 **[PARCIAL]** 54. Processo: [DESCRICAO_PROCESSO]
+  - Palavras-chave usadas: `processo, descricao_processo`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:3` -> `criarProcessoMapaComSugestoesFixture,`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:4` -> `criarProcessoMapaDisponibilizadoFixture,`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:5` -> `criarProcessoMapaValidadoFixture,`
+- ❌ **[NAO_COBERTO]** 55. Data/hora: Data/hora atual
+  - Palavras-chave usadas: `data/hora, atual`
+  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
+- 🟡 **[PARCIAL]** 56. Unidade de origem: [SIGLA_UNIDADE_ANALISE]
+  - Palavras-chave usadas: `unidade, sigla_unidade_analise, origem`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:21` -> `const UNIDADE_ALVO = 'ASSESSORIA_11';`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:28` -> `unidade: UNIDADE_ALVO,`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:36` -> `await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);`
+- 🟡 **[PARCIAL]** 57. Unidade de destino: [SIGLA_UNIDADE_SUPERIOR].
+  - Palavras-chave usadas: `unidade, sigla_unidade_superior, destino`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:21` -> `const UNIDADE_ALVO = 'ASSESSORIA_11';`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:28` -> `unidade: UNIDADE_ALVO,`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:36` -> `await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);`
+- ✅ **[COBERTO]** 58. O sistema redireciona para o Painel e mostra a mensagem "Aceite registrado".
+  - Palavras-chave usadas: `redireciona, painel, mostra, mensagem, aceite, registrado`
+  - Evidência (score 2): `e2e/cdu-20.spec.ts:175` -> `await expect(page.getByText(TEXTOS.sucesso.ACEITE_REGISTRADO).first()).toBeVisible();`
+  - Evidência (score 2): `e2e/cdu-20.spec.ts:238` -> `await expect(page.getByText(TEXTOS.sucesso.ACEITE_REGISTRADO).first()).toBeVisible();`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:15` -> `import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';`
+- ✅ **[COBERTO]** 59. Se optar por **homologar** (perfil ADMIN):
+  - Palavras-chave usadas: `perfil, optar, homologar, admin`
+  - Evidência (score 2): `e2e/cdu-20.spec.ts:75` -> `await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);`
+  - Evidência (score 2): `e2e/cdu-20.spec.ts:195` -> `await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);`
+  - Evidência (score 2): `e2e/cdu-20.spec.ts:242` -> `await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);`
+- 🟡 **[PARCIAL]** 60. Usuário escolhe `Homologar`.
+  - Palavras-chave usadas: `escolhe, homologar`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:39` -> `await page.getByTestId('btn-mapa-homologar-aceite').click();`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:69` -> `await page.getByTestId('btn-mapa-homologar-aceite').click();`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:80` -> `await page.getByTestId('btn-mapa-homologar-aceite').click();`
+- 🟡 **[PARCIAL]** 61. O sistema abre um diálogo de confirmação (título 'Homologar mapa') com a pergunta 'Confirma a homologação do mapa de competências?' e os botões `Confirmar` ou `Homologar`.
+  - Palavras-chave usadas: `competências, abre, diálogo, confirmação, título, homologar`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:20` -> `test.describe.serial('CDU-20 - Analisar validação de mapa de competências', () => {`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:39` -> `await page.getByTestId('btn-mapa-homologar-aceite').click();`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:69` -> `await page.getByTestId('btn-mapa-homologar-aceite').click();`
+- 🟡 **[PARCIAL]** 62. Caso o usuário escolha o botão `Cancelar`, o sistema interrompe a operação de homologação, permanecendo na mesma tela.
+  - Palavras-chave usadas: `escolha, botão, cancelar, interrompe, operação, homologação`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:42` -> `await page.getByTestId('btn-aceite-mapa-cancelar').click();`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:55` -> `// Verifica que o botão "Ver sugestões" NÃO aparece (situação é "Mapa validado", não "Mapa com sugestões")`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:58` -> `// Verifica que o botão de confirmar devolução está desabilitado sem observação`
+- 🟡 **[PARCIAL]** 63. O usuário clica em `Homologar`.
+  - Palavras-chave usadas: `clica, homologar`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:39` -> `await page.getByTestId('btn-mapa-homologar-aceite').click();`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:69` -> `await page.getByTestId('btn-mapa-homologar-aceite').click();`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:80` -> `await page.getByTestId('btn-mapa-homologar-aceite').click();`
+- ✅ **[COBERTO]** 64. O sistema altera a situação do subprocesso da unidade para 'Mapa homologado'.
+  - Palavras-chave usadas: `situação, subprocesso, unidade, altera, mapa, homologado`
+  - Evidência (score 2): `e2e/cdu-20.spec.ts:36` -> `await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);`
+  - Evidência (score 2): `e2e/cdu-20.spec.ts:49` -> `await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);`
+  - Evidência (score 2): `e2e/cdu-20.spec.ts:55` -> `// Verifica que o botão "Ver sugestões" NÃO aparece (situação é "Mapa validado", não "Mapa com sugestões")`
+- 🟡 **[PARCIAL]** 65. O sistema redireciona para o painel e mostra a mensagem "Mapa homologado".
+  - Palavras-chave usadas: `redireciona, painel, mostra, mensagem, mapa, homologado`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:3` -> `criarProcessoMapaComSugestoesFixture,`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:4` -> `criarProcessoMapaDisponibilizadoFixture,`
+  - Evidência (score 1): `e2e/cdu-20.spec.ts:5` -> `criarProcessoMapaValidadoFixture,`
 
-- **Passo 5 - Botão "Ver sugestões" (condicional)**:
-  - Requisito: Se a situação do subprocesso for "Mapa com sugestões", deve-se exibir botão "Ver sugestões" antes de "Histórico de análise"
-  - Teste não valida presença/ausência deste botão
-  - Teste não valida abertura do modal com sugestões registradas
+## Ajustes recomendados para próximo ciclo
+- Completar cobertura do item: **O sistema mostra a tela `Detalhes do subprocesso`.** (atualmente parcial).
+- Completar cobertura do item: **`Histórico de análise`;** (atualmente parcial).
+- Completar cobertura do item: **`Devolver para ajustes`;** (atualmente parcial).
 
-- **Passo 6 - Histórico de análise (aberto mas não testado completamente)**:
-  - Requisito: Modal com tabela contendo data/hora, sigla da unidade, resultado ('Devolução' ou 'Aceite'), observações
-  - Teste não clica em "Histórico de análise" para validar conteúdo
-  - Teste não valida estrutura e dados da tabela
+## Prontidão para o próximo PR de melhoria E2E
+- Status de entrada: **PRONTO_COM_GAPS**.
+- Motivos: há itens sem cobertura E2E.
+- Checklist mínimo antes de codar:
+  - [ ] confirmar massa de dados/fixtures para cenário positivo e negativo;
+  - [ ] definir assert de regra de negócio + assert de efeito colateral;
+  - [ ] validar perfil/unidade necessários no cenário (quando aplicável);
+  - [ ] mapear se precisa teste de integração backend complementar.
+- Escopo sugerido para o próximo PR deste CDU:
+  - Completar cobertura do item: **O sistema mostra a tela `Detalhes do subprocesso`.** (atualmente parcial).
+  - Completar cobertura do item: **`Histórico de análise`;** (atualmente parcial).
+  - Completar cobertura do item: **`Devolver para ajustes`;** (atualmente parcial).
 
-- **Passo 8 - Fluxo de devolução (parcialmente coberto)**:
-  - 8.2: Modal com título "Devolução" e mensagem específica - teste não valida texto exato
-  - 8.4: Campo de observação é "opcional" - teste testa habilitação do botão, mas não fluxo com observação omitida
-  - 8.5: Registro de análise com campos específicos (data/hora, unidade, resultado 'Devolução', observação) - não testado se os dados são realmente persistidos
-  - 8.6: "Identifica a unidade de devolução como sendo a unidade de origem da última movimentação" - lógica complexa não testada
-  - 8.7: Registro de movimentação - não testado
-  - 8.8: Alteração condicional de situação para "Mapa disponibilizado" se devolução for para a própria unidade - não testado
-  - 8.8: Apagamento de data/hora de conclusão da etapa 2 - não testado
-  - 8.9: Notificação por e-mail - não testado
-  - 8.10: Criação de alerta interno - não testado
-  - 8.11: Mensagem "Devolução realizada" - não testado
-
-- **Passo 9 - Fluxo de aceite (GESTOR) (parcialmente coberto)**:
-  - 9.2: Título do diálogo "Aceite" e mensagem específica - teste não valida textos exatos
-  - 9.4: Campo de observação é opcional - teste não cobre caso sem observação
-  - 9.5: Registro de análise - não testado se persistido corretamente
-  - 9.6: Registro de movimentação - não testado
-  - 9.7: Notificação por e-mail para unidade superior - não testado
-  - 9.8: Criação de alerta interno - não testado
-
-- **Passo 10 - Fluxo de homologação (ADMIN) (parcialmente coberto)**:
-  - 10.2: Título "Homologação" e mensagem específica - teste não valida textos exatos
-  - 10.5: Alteração de situação para "Mapa homologado" - teste não valida se foi alterada (apenas redireciona)
-  - 10.6: Mensagem exata "Homologação efetivada" - teste valida presença, mas em contexto limitado
-
-- **Cenários de validação condicional**:
-  - Teste não valida presença/ausência do botão "Ver sugestões" quando situação é "Mapa com sugestões"
-  - Teste não cobre devolução com unidade de destino ≠ unidade origem da última movimentação
-
-- **Regra de acesso**:
-  - Requisito especifica "GESTOR e ADMIN" como atores
-  - Teste não valida acesso negado para CHEFE ou outro perfil
-
-## Alterações necessárias no teste E2E
-1. **Adicionar cobertura do botão "Ver sugestões"**:
-   - Criar fixture com subprocesso em situação "Mapa com sugestões" (não apenas "Mapa validado")
-   - Testar presença condicional do botão "Ver sugestões"
-   - Testar clique e abertura de modal com sugestões registradas
-
-2. **Expandir cobertura do "Histórico de análise"**:
-   - Testar clique no botão "Histórico de análise"
-   - Validar abertura do modal com tabela
-   - Validar presença de colunas: data/hora, sigla unidade, resultado, observações
-   - Validar dados exatos retornados
-
-3. **Ampliar testes do fluxo de devolução**:
-   - Testar devolução COM observação (validação de persistência)
-   - Testar devolução SEM observação (campo optativo)
-   - Validar mensagem exata "Devolução realizada"
-   - Validar cenário onde unidade de devolução ≠ unidade atual (para testar passo 8.8)
-
-4. **Ampliar testes do fluxo de aceite (GESTOR)**:
-   - Testar aceite COM observação
-   - Testar aceite SEM observação
-   - Validar mensagem exata "Aceite registrado"
-
-5. **Ampliar testes do fluxo de homologação (ADMIN)**:
-   - Validar mudança real de situação para "Mapa homologado" (não apenas mensagem)
-   - Validar que aceite (GESTOR) diferencia-se de homologação (ADMIN)
-
-6. **Adicionar validação de diálogos**:
-   - Validar textos exatos dos títulos e mensagens dos modais
-   - Validar presença/ordem dos botões
-
-## Notas e inconsistências do requisito
-- **Ambiguidade no passo 8.6**: "O sistema identifica a unidade de devolução como sendo a unidade de origem da última movimentação do subprocesso." Não fica claro se isso é automático ou se há seleção pelo usuário. Teste não consegue validar isso sem acesso aos dados de backend.
-- **Inconsistência de rótulo**: Passo 9.1 menciona "Registrar aceite" mas passo 10 menciona "Homologar". Não fica claro se ambos os perfis veem textos diferentes ou se há um botão único que muda de comportamento.
-- **Falta de validação de campos**: O requisito não especifica se campo de observação tem limite de caracteres, formato ou validações.
-- **Typo no e-mail**: Passo 8.9 e 9.7 contêm "no O sistema" (redundância).
-- **Falta de clareza em passo 4**: O requisito diz "com os botões" mas não especifica a ordem ou disposição. Teste assume ordem específica que pode não ser garantida.
+## Observações metodológicas
+- Esta rodada incluiu leitura de helpers importados para reduzir falso negativo de cobertura indireta.
+- Classificação automática por evidência textual; recomenda-se validação humana dos itens `🟡` e `❌` antes da implementação final.

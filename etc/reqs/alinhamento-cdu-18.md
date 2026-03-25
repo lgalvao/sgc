@@ -1,167 +1,105 @@
-# Alinhamento CDU-18 - Visualizar mapa de competências
+# Alinhamento CDU-18 - Reanálise (rodada 2)
 
-## Cobertura atual do teste
-O teste E2E cobre:
-- **Cenário 1 (ADMIN via processo)** (linhas 18-62):
-  - Login como ADMIN (implícito via fixture).
-  - Clica em processo 99 (finalizado) na tabela.
-  - Seleciona unidade ASSESSORIA_* participante.
-  - Acessa mapa de competências.
-  - Valida presença de:
-    - Título "Mapa de competências técnicas" ✓
-    - Identificação da unidade (sigla + nome) ✓
-    - Competência "Competência técnica seed 99" ✓
-    - Atividades "Atividade seed 1" e "Atividade seed 2" ✓
-    - Conhecimentos "Conhecimento seed 1.1" e "Conhecimento seed 2.1" ✓
+## Artefatos analisados
+- Requisito: `etc/reqs/cdu-18.md`.
+- Teste E2E: `e2e/cdu-18.spec.ts` (2 cenários `test`, 9 `test.step`).
+- Contextos `describe`: CDU-18: Visualizar mapa de competências.
 
-- **Cenário 2 (CHEFE da unidade)** (linhas 64-86):
-  - Login como CHEFE_ASSESSORIA_12.
-  - Clica em processo 99 na tabela.
-  - Sistema redireciona diretamente para detalhes do subprocesso da sua unidade.
-  - Acessa mapa de competências.
-  - Valida presença de:
-    - Título "Mapa de competências técnicas" ✓
-    - Identificação da unidade (sigla + nome) ✓
-    - Competência "Competência técnica seed 99" ✓
+## Resultado da comparação requisito x E2E
+- Itens do fluxo principal avaliados: **15**.
+- Status: **14 cobertos**, **1 parciais**, **0 não cobertos** (baseado em evidências textuais no spec e helpers).
 
-## Lacunas em relação ao requisito
-**Pré-condições não completamente validadas:**
-- **Pré-condição 1**: Requisito diz "Usuário logado com qualquer perfil" mas teste apenas cobre ADMIN e CHEFE. Faltam cenários com GESTOR e SERVIDOR.
-- **Pré-condição 2**: Requisito diz "Processo de mapeamento ou de revisão iniciado ou finalizado" - Teste usa processo finalizado. Falta cenário com processo em andamento (iniciado mas não finalizado).
-- **Pré-condição 3**: Requisito diz "Subprocesso da unidade com mapa de competência já disponibilizado" - Teste valida isso implicitamente (seed contém mapa disponibilizado), mas não há assertion explícita de situação do subprocesso.
+## Matriz de evidências
+- ✅ **[COBERTO]** 1. No `Painel`, o usuário clica no processo de mapeamento ou revisão na situação 'Em andamento' ou 'Finalizado'.
+  - Palavras-chave usadas: `processo, situação, painel, clica, mapeamento, revisão`
+  - Evidência (score 3): `e2e/cdu-18.spec.ts:11` -> `* - Processo de mapeamento ou de revisão iniciado ou finalizado`
+  - Evidência (score 3): `e2e/cdu-18.spec.ts:74` -> `// CHEFE vê processo no painel e clica`
+  - Evidência (score 2): `e2e/cdu-18.spec.ts:26` -> `// Clicar no processo 99 que tem mapa homologado`
+- ✅ **[COBERTO]** 2. Se perfil logado for ADMIN ou GESTOR:
+  - Palavras-chave usadas: `perfil, logado, admin, gestor`
+  - Evidência (score 2): `e2e/cdu-18.spec.ts:10` -> `* - Usuário logado com qualquer perfil`
+  - Evidência (score 1): `e2e/cdu-18.spec.ts:15` -> `* - Processo 99 (FINALIZADO) com mapa homologado para unidade de assessoria`
+  - Evidência (score 1): `e2e/cdu-18.spec.ts:20` -> `test('Cenário 1: ADMIN visualiza mapa via detalhes do processo', async ({_resetAutomatico, page, _autenticadoComoAdmi...`
+- ✅ **[COBERTO]** 3. O sistema exibe a tela `Detalhes do processo`.
+  - Palavras-chave usadas: `processo, exibe, detalhes`
+  - Evidência (score 2): `e2e/cdu-18.spec.ts:2` -> `import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';`
+  - Evidência (score 2): `e2e/cdu-18.spec.ts:20` -> `test('Cenário 1: ADMIN visualiza mapa via detalhes do processo', async ({_resetAutomatico, page, _autenticadoComoAdmi...`
+  - Evidência (score 2): `e2e/cdu-18.spec.ts:27` -> `await acessarDetalhesProcesso(page, 'Processo 99');`
+- 🟡 **[PARCIAL]** 4. Usuário clica em uma unidade subordinada que seja operacional ou interoperacional.
+  - Palavras-chave usadas: `unidade, clica, subordinada, seja, operacional, interoperacional`
+  - Evidência (score 1): `e2e/cdu-18.spec.ts:12` -> `* - Subprocesso da unidade com mapa de competência já disponibilizado`
+  - Evidência (score 1): `e2e/cdu-18.spec.ts:15` -> `* - Processo 99 (FINALIZADO) com mapa homologado para unidade de assessoria`
+  - Evidência (score 1): `e2e/cdu-18.spec.ts:26` -> `// Clicar no processo 99 que tem mapa homologado`
+- ✅ **[COBERTO]** 5. O sistema exibe a tela `Detalhes do subprocesso` com os dados do subprocesso da unidade selecionada.
+  - Palavras-chave usadas: `subprocesso, unidade, exibe, detalhes, selecionada`
+  - Evidência (score 3): `e2e/cdu-18.spec.ts:77` -> `// CHEFE vai direto para detalhes do subprocesso da sua unidade`
+  - Evidência (score 2): `e2e/cdu-18.spec.ts:12` -> `* - Subprocesso da unidade com mapa de competência já disponibilizado`
+  - Evidência (score 2): `e2e/cdu-18.spec.ts:36` -> `// Verificar navegação para detalhes do subprocesso`
+- ✅ **[COBERTO]** 6. Se perfil logado for CHEFE ou SERVIDOR:
+  - Palavras-chave usadas: `perfil, logado, chefe, servidor`
+  - Evidência (score 2): `e2e/cdu-18.spec.ts:10` -> `* - Usuário logado com qualquer perfil`
+  - Evidência (score 1): `e2e/cdu-18.spec.ts:15` -> `* - Processo 99 (FINALIZADO) com mapa homologado para unidade de assessoria`
+  - Evidência (score 1): `e2e/cdu-18.spec.ts:26` -> `// Clicar no processo 99 que tem mapa homologado`
+- ✅ **[COBERTO]** 7. O sistema exibe a tela `Detalhes do subprocesso` com os dados do subprocesso da unidade do usuário.
+  - Palavras-chave usadas: `subprocesso, unidade, exibe, detalhes`
+  - Evidência (score 3): `e2e/cdu-18.spec.ts:77` -> `// CHEFE vai direto para detalhes do subprocesso da sua unidade`
+  - Evidência (score 2): `e2e/cdu-18.spec.ts:12` -> `* - Subprocesso da unidade com mapa de competência já disponibilizado`
+  - Evidência (score 2): `e2e/cdu-18.spec.ts:36` -> `// Verificar navegação para detalhes do subprocesso`
+- ✅ **[COBERTO]** 8. Na tela de `Detalhes do subprocesso`, usuário clica no card `Mapa de Competências`.
+  - Palavras-chave usadas: `subprocesso, competências, detalhes, clica, card, mapa`
+  - Evidência (score 3): `e2e/cdu-18.spec.ts:41` -> `await test.step('4. Acessar mapa de competências via card', async () => {`
+  - Evidência (score 2): `e2e/cdu-18.spec.ts:7` -> `* CDU-18: Visualizar mapa de competências`
+  - Evidência (score 2): `e2e/cdu-18.spec.ts:12` -> `* - Subprocesso da unidade com mapa de competência já disponibilizado`
+- ✅ **[COBERTO]** 9. O sistema mostra a tela `Visualização de mapa`, com as seguintes informações:
+  - Palavras-chave usadas: `mostra, visualização, mapa, seguintes, informações`
+  - Evidência (score 2): `e2e/cdu-18.spec.ts:46` -> `await test.step('5. Verificar visualização do mapa (CDU-18)', async () => {`
+  - Evidência (score 2): `e2e/cdu-18.spec.ts:85` -> `await test.step('4. Verificar visualização do mapa', async () => {`
+  - Evidência (score 1): `e2e/cdu-18.spec.ts:3` -> `import {navegarParaMapa} from './helpers/helpers-mapas.js';`
+- ✅ **[COBERTO]** 10. Título "Mapa de competências técnicas"
+  - Palavras-chave usadas: `competências, título, mapa, técnicas`
+  - Evidência (score 4): `e2e/cdu-18.spec.ts:47` -> `// 5.1 Título "Mapa de competências técnicas"`
+  - Evidência (score 2): `e2e/cdu-18.spec.ts:7` -> `* CDU-18: Visualizar mapa de competências`
+  - Evidência (score 2): `e2e/cdu-18.spec.ts:18` -> `test.describe('CDU-18: Visualizar mapa de competências', () => {`
+- ✅ **[COBERTO]** 11. Identificação da unidade (sigla e nome).
+  - Palavras-chave usadas: `unidade, identificação, sigla, nome`
+  - Evidência (score 3): `e2e/cdu-18.spec.ts:50` -> `// 5.2 Identificação da unidade (sigla)`
+  - Evidência (score 1): `e2e/cdu-18.spec.ts:12` -> `* - Subprocesso da unidade com mapa de competência já disponibilizado`
+  - Evidência (score 1): `e2e/cdu-18.spec.ts:15` -> `* - Processo 99 (FINALIZADO) com mapa homologado para unidade de assessoria`
+- ✅ **[COBERTO]** 12. Conjunto de competências, com cada competência mostrada em um bloco individual, contendo:
+  - Palavras-chave usadas: `competências, competência, conjunto, cada, mostrada, bloco`
+  - Evidência (score 2): `e2e/cdu-18.spec.ts:7` -> `* CDU-18: Visualizar mapa de competências`
+  - Evidência (score 2): `e2e/cdu-18.spec.ts:18` -> `test.describe('CDU-18: Visualizar mapa de competências', () => {`
+  - Evidência (score 2): `e2e/cdu-18.spec.ts:41` -> `await test.step('4. Acessar mapa de competências via card', async () => {`
+- ✅ **[COBERTO]** 13. Descrição da competência como título.
+  - Palavras-chave usadas: `competência, descrição, título`
+  - Evidência (score 2): `e2e/cdu-18.spec.ts:47` -> `// 5.1 Título "Mapa de competências técnicas"`
+  - Evidência (score 1): `e2e/cdu-18.spec.ts:7` -> `* CDU-18: Visualizar mapa de competências`
+  - Evidência (score 1): `e2e/cdu-18.spec.ts:12` -> `* - Subprocesso da unidade com mapa de competência já disponibilizado`
+- ✅ **[COBERTO]** 14. Conjunto das atividades associadas àquela competência.
+  - Palavras-chave usadas: `atividades, competência, conjunto, associadas, àquela`
+  - Evidência (score 2): `e2e/cdu-18.spec.ts:16` -> `* - Mapa 99 com competência "Competência técnica seed 99" vinculada às atividades`
+  - Evidência (score 2): `e2e/cdu-18.spec.ts:58` -> `// 5.4 Atividades da competência`
+  - Evidência (score 1): `e2e/cdu-18.spec.ts:7` -> `* CDU-18: Visualizar mapa de competências`
+- ✅ **[COBERTO]** 15. Para cada atividade, conjunto de conhecimentos da atividade.
+  - Palavras-chave usadas: `atividade, cada, conjunto, conhecimentos`
+  - Evidência (score 2): `e2e/cdu-18.spec.ts:62` -> `// 5.5 Conhecimentos das atividades`
+  - Evidência (score 1): `e2e/cdu-18.spec.ts:16` -> `* - Mapa 99 com competência "Competência técnica seed 99" vinculada às atividades`
+  - Evidência (score 1): `e2e/cdu-18.spec.ts:58` -> `// 5.4 Atividades da competência`
 
-**Fluxo principal (passos 1-4) parcialmente coberto:**
-- **Passo 1**: Requisito diz "No `Painel`, o usuário clica no processo de mapeamento ou revisão na situação 'Em andamento' ou 'Finalizado'."
-  - Teste clica em processo finalizado ✓ (cenário 1).
-  - Faltam cenários: processo em andamento.
+## Ajustes recomendados para próximo ciclo
+- Completar cobertura do item: **Usuário clica em uma unidade subordinada que seja operacional ou interoperacional.** (atualmente parcial).
 
-- **Passo 2** (se perfil ADMIN ou GESTOR): "O sistema exibe a tela `Detalhes do processo`."
-  - Teste valida que URL muda para padrão `/processo/\d+$` ✓.
-  - Não há assertion de título/heading "Detalhes do processo" ou conteúdo visual da tela.
+## Prontidão para o próximo PR de melhoria E2E
+- Status de entrada: **PRONTO**.
+- Motivos: base de análise e pendências objetivas definidas.
+- Checklist mínimo antes de codar:
+  - [ ] confirmar massa de dados/fixtures para cenário positivo e negativo;
+  - [ ] definir assert de regra de negócio + assert de efeito colateral;
+  - [ ] validar perfil/unidade necessários no cenário (quando aplicável);
+  - [ ] mapear se precisa teste de integração backend complementar.
+- Escopo sugerido para o próximo PR deste CDU:
+  - Completar cobertura do item: **Usuário clica em uma unidade subordinada que seja operacional ou interoperacional.** (atualmente parcial).
 
-- **Passo 2.2** (se ADMIN/GESTOR): "Usuário clica em uma unidade subordinada que seja operacional ou interoperacional."
-  - Teste clica em linha com `ASSESSORIA_*` ✓.
-  - Não há validation de que unidade selecionada é "operacional ou interoperacional" (poderia ser unidade raiz).
-
-- **Passo 2.3** (se ADMIN/GESTOR): "O sistema exibe a tela `Detalhes do subprocesso`..."
-  - Teste valida URL `/processo/\d+/ASSESSORIA_\d+$` ✓.
-  - Não há assertion de título/heading "Detalhes do subprocesso" ou conteúdo visual.
-
-- **Passo 3** (se CHEFE/SERVIDOR): "O sistema exibe a tela `Detalhes do subprocesso`..."
-  - Teste valida redirecionamento direto para `/processo/\d+/ASSESSORIA_12$` ✓.
-  - Não há assertion de conteúdo visual da tela.
-
-- **Passo 4**: "Na tela de `Detalhes do subprocesso`, usuário clica no card `Mapa de Competências`."
-  - Teste chama helper `navegarParaMapa(page)` que provavelmente clica no card, mas não há assertion explícita de clique no card ou presença do card.
-
-**Tela visualização de Mapa (passo 5) parcialmente validada:**
-- **5.1** - Título "Mapa de competências técnicas": ✓ Validado.
-- **5.2** - Identificação da unidade (sigla e nome): ✓ Validado com regex `/ASSESSORIA_\d+\s*-\s*Assessoria/i`.
-- **5.3** - Conjunto de competências com cada competência em bloco individual:
-  - Teste valida que competência "Competência técnica seed 99" é visível ✓.
-  - Não valida:
-    - Se há múltiplas competências (teste tem apenas 1).
-    - Se cada competência está em "bloco individual" (visual/layout não validado).
-    - Se há elementos visuais como ícones ou cores distintas para cada bloco.
-
-- **5.3.1** - Descrição da competência como título:
-  - Teste valida que texto "Competência técnica seed 99" é visível ✓.
-  - Não valida que é estruturalmente um "título" (tag h3/h4 ou estilo de título).
-
-- **5.3.2** - Conjunto das atividades associadas àquela competência:
-  - Teste valida que "Atividade seed 1" e "Atividade seed 2" são visíveis ✓.
-  - Não valida:
-    - Se apenas as atividades ASSOCIADAS à competência aparecem (pode haver outras atividades não mostradas).
-    - Se atividades são estruturalmente agrupadas sob a competência (layout/hierarquia não validado).
-
-- **5.3.3** - Para cada atividade, conjunto de conhecimentos da atividade:
-  - Teste valida que "Conhecimento seed 1.1" e "Conhecimento seed 2.1" são visíveis ✓.
-  - Não valida:
-    - Se conhecimentos estão hierarquicamente subordinados à atividade (layout não validado).
-    - Se apenas conhecimentos ASSOCIADOS à atividade aparecem.
-    - Estrutura visual (blocos internos, ícones, etc.).
-
-**Cenários não cobertos:**
-- **Múltiplas competências**: Seed tem apenas 1 competência. Teste não valida visualização de múltiplas competências, ordem de exibição, ou comportamento visual.
-- **Múltiplas atividades por competência**: Competência tem 2 atividades. Falta testar cenário com 3+ atividades.
-- **Múltiplos conhecimentos por atividade**: Teste valida 1.1 conhecimento por atividade. Falta testar atividade com 2+ conhecimentos.
-- **Processo em andamento**: Teste usa processo finalizado. Requisito diz "iniciado ou finalizado" - falta cenário com processo em andamento.
-- **Perfil GESTOR**: Requisito diz qualquer perfil. Teste cobre ADMIN e CHEFE. Falta GESTOR (que deveria seguir passo 2).
-- **Perfil SERVIDOR**: Requisito cobre. Teste não implementa (não há fixture de SERVIDOR).
-
-**Validações de acesso/permissão:**
-- Teste não valida que CHEFE vê apenas mapa da sua unidade (não consegue acessar outras unidades).
-- Teste não valida que SERVIDOR consegue acessar o mapa (assumindo que seed fornece acesso).
-
-**Comportamento interativo não testado:**
-- Requisito implica que visualização é apenas leitura (não há botões de edição mencionados).
-- Teste não valida que não há botões de edição (como em CDU-15 para ADMIN).
-- Teste não valida que elementos são clicáveis ou não (ex: pode clicar em competência para expandir?).
-
-## Alterações necessárias no teste E2E
-1. **Adicionar cenário com GESTOR**:
-   - GESTOR clica em processo em Painel.
-   - Sistema exibe "Detalhes do processo".
-   - GESTOR clica em unidade subordinada.
-   - Sistema exibe "Detalhes do subprocesso".
-   - GESTOR clica no card "Mapa de Competências".
-   - Valida visualização do mapa.
-
-2. **Adicionar cenário com SERVIDOR** (se houver seed preparado):
-   - SERVIDOR clica em processo no Painel.
-   - Sistema redireciona direto para "Detalhes do subprocesso" da unidade do SERVIDOR.
-   - SERVIDOR clica no card "Mapa de Competências".
-   - Valida visualização do mapa (apenas leitura).
-
-3. **Adicionar cenário com processo em andamento**:
-   - Usar seed ou criar processo em situação 'Em andamento'.
-   - ADMIN acessa processo em andamento.
-   - Valida que consegue visualizar mapa mesmo com processo não finalizado.
-
-4. **Validar presença de elementos visuais específicos**:
-   - Assertar que título é estruturalmente um heading (tag h2 ou similar).
-   - Validar que identificação da unidade está visível de forma clara (sigla + nome).
-   - Validar que cada competência está em um "bloco" visualmente distinto (ex: border, background).
-
-5. **Validar hierarquia e estrutura visual**:
-   - Validar que atividades aparecem **dentro** do bloco da competência (não apenas presentes na página).
-   - Validar que conhecimentos aparecem **dentro** do bloco da atividade.
-   - Usar `locator.locator()` para validar relações pai-filho.
-
-6. **Adicionar cenário com múltiplas competências** (se criar novo seed ou usar preparação):
-   - Mapa com 2+ competências.
-   - Validar que todas aparecem.
-   - Validar ordem de exibição.
-   - Validar que cada uma é um bloco distinto.
-
-7. **Adicionar cenário com múltiplos conhecimentos por atividade**:
-   - Atividade com 2+ conhecimentos.
-   - Validar que todos aparecem em ordem.
-
-8. **Validar que visualização é somente leitura**:
-   - Validar que botões de edição (criar, editar, excluir competências) **não aparecem**.
-   - Validar que campos não são editáveis.
-
-9. **Adicionar assertion para pré-condições**:
-   - Ao navegaração, validar que subprocesso está em situação de mapa disponibilizado/validado/homologado.
-   - Validar que mapa não está vazio (tem competências).
-
-10. **Validar redirecionamento automático para CHEFE/SERVIDOR**:
-    - Confirmar que CHEFE/SERVIDOR não veem tela "Detalhes do processo" (vão direto para subprocesso).
-    - Confirmar que só conseguem acessar mapa da sua unidade.
-
-## Notas e inconsistências do requisito
-- **Passo 2 vs 3**: Requisito separa comportamento por perfil mas falta clareza sobre:
-  - Se CHEFE consegue acessar "Detalhes do processo" ou vai direto para subprocesso.
-  - Se CHEFE consegue ver múltiplas unidades em "Detalhes do processo" ou apenas a sua.
-  - Se SERVIDOR consegue ver "Detalhes do processo" ou vai direto.
-
-- **Passo 5**: Estrutura descrita é genérica e não detalha:
-  - Se há paginação, scroll, ou limite de competências por página.
-  - Se há ordenação (alfabética, por data, customizada).
-  - Se há busca/filtro.
-  - Se há collapsed/expanded state para competências.
-
-- **Pré-condição**: Diz "mapa de competência já disponibilizado" mas requisitos anteriores (CDU-15, CDU-17) mencionam situações como 'Mapa homologado' ou 'Mapa validado'. Não fica claro qual é a situação exata esperada para que mapa seja visualizável.
-
-- **Falta de referência**: Requisito não menciona se visualização de mapa para CHEFE/SERVIDOR inclui também "Mapa de Impactos" ou outros dados contextuais (como validação realizada, histórico de alterações).
+## Observações metodológicas
+- Esta rodada incluiu leitura de helpers importados para reduzir falso negativo de cobertura indireta.
+- Classificação automática por evidência textual; recomenda-se validação humana dos itens `🟡` e `❌` antes da implementação final.

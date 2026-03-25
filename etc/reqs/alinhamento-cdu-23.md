@@ -1,96 +1,158 @@
-# Alinhamento CDU-23 - Homologar cadastros em bloco
+# Alinhamento CDU-23 - Reanálise (rodada 2)
 
-## Cobertura atual do teste
-O teste E2E cobre:
+## Artefatos analisados
+- Requisito: `etc/reqs/cdu-23.md`.
+- Teste E2E: `e2e/cdu-23.spec.ts` (7 cenários `test`, 0 `test.step`).
 
-- **Setup de dados**: Criação de processo, adição de atividades por CHEFE, disponibilização de cadastro, aceite de cadastro por GESTORs (Setup UI).
-- **Passos 1-2**: Navegação de ADMIN ao painel, acesso ao processo, exibição de tela "Detalhes do processo" (Cenário 1).
-- **Passo 3**: Verificação de presença do botão "Homologar em bloco" na seção "Unidades participantes" (Cenário 1).
-- **Passo 4**: Clique no botão (Cenário 1).
-- **Passo 5**: Abertura de modal com:
-  - Título "Homologação de cadastro em bloco"
-  - Texto "Selecione abaixo as unidades cujos cadastros deverão ser homologados"
-  - Lista de unidades com checkboxes (pré-selecionados)
-  - Botões "Cancelar" e "Homologar"
-- **Passo 6**: Cancelamento retorna à tela Detalhes do processo (Cenário 1).
-- **Passos 7-9**: Confirmação da homologação (Cenário 2):
-  - Clique em "Homologar"
-  - Permanência na tela Detalhes do processo
-  - Validação de que botão "Homologar em bloco" fica desabilitado
-  - Validação de que subprocesso SECAO_221 exibe situação "Cadastro homologado"
+## Resultado da comparação requisito x E2E
+- Itens do fluxo principal avaliados: **26**.
+- Status: **18 cobertos**, **6 parciais**, **2 não cobertos** (baseado em evidências textuais no spec e helpers).
 
-## Lacunas em relação ao requisito
-O teste **NÃO cobre**:
+## Matriz de evidências
+- ✅ **[COBERTO]** 1. No painel, o usuário acessa um processo de mapeamento ou revisão em andamento.
+  - Palavras-chave usadas: `processo, painel, acessa, mapeamento, revisão, andamento`
+  - Evidência (score 4): `e2e/cdu-23.spec.ts:26` -> `* 1. No painel, ADMIN acessa processo em andamento`
+  - Evidência (score 3): `e2e/cdu-23.spec.ts:22` -> `* - Processo de mapeamento ou revisão com unidades subordinadas`
+  - Evidência (score 2): `e2e/cdu-23.spec.ts:6` -> `acessarSubprocessoGestor,`
+- ✅ **[COBERTO]** 2. O sistema mostra a tela Detalhes do processo.
+  - Palavras-chave usadas: `processo, mostra, detalhes`
+  - Evidência (score 3): `e2e/cdu-23.spec.ts:27` -> `* 2. Sistema mostra tela Detalhes do processo`
+  - Evidência (score 2): `e2e/cdu-23.spec.ts:10` -> `import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';`
+  - Evidência (score 2): `e2e/cdu-23.spec.ts:63` -> `await acessarDetalhesProcesso(page, descProcesso);`
+- ✅ **[COBERTO]** 3. O sistema identifica que existem unidades subordinadas com subprocessos elegíveis para homologação em bloco do
+  - Palavras-chave usadas: `unidades, subprocessos, identifica, existem, subordinadas, elegíveis`
+  - Evidência (score 3): `e2e/cdu-23.spec.ts:28` -> `* 3. Sistema identifica unidades elegíveis para homologação`
+  - Evidência (score 2): `e2e/cdu-23.spec.ts:22` -> `* - Processo de mapeamento ou revisão com unidades subordinadas`
+  - Evidência (score 1): `e2e/cdu-23.spec.ts:23` -> `* - Subprocessos na situação 'Cadastro disponibilizado' ou 'Cadastro aceito'`
+- ✅ **[COBERTO]** 4. O usuário clica no botão `Homologar em bloco`.
+  - Palavras-chave usadas: `clica, botão, homologar, bloco`
+  - Evidência (score 4): `e2e/cdu-23.spec.ts:29` -> `* 4. ADMIN clica no botão 'Homologar em Bloco'`
+  - Evidência (score 2): `e2e/cdu-23.spec.ts:17` -> `* CDU-23 - Homologar cadastros em bloco`
+  - Evidência (score 2): `e2e/cdu-23.spec.ts:34` -> `test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {`
+- ✅ **[COBERTO]** 5. O sistema abre modal de confirmação, com os elementos a seguir:
+  - Palavras-chave usadas: `abre, modal, confirmação, elementos, seguir`
+  - Evidência (score 2): `e2e/cdu-23.spec.ts:30` -> `* 5. Sistema abre modal com lista de unidades selecionáveis`
+  - Evidência (score 2): `e2e/cdu-23.spec.ts:62` -> `test('Cenario 1: ADMIN abre modal e cancela homologação em bloco', async ({_resetAutomatico, page, _autenticadoComoAd...`
+  - Evidência (score 1): `e2e/cdu-23.spec.ts:71` -> `const modal = page.locator('#modal-acao-bloco');`
+- ✅ **[COBERTO]** 6. Título "Homologação de cadastro em bloco";
+  - Palavras-chave usadas: `título, homologação, cadastro, bloco`
+  - Evidência (score 2): `e2e/cdu-23.spec.ts:17` -> `* CDU-23 - Homologar cadastros em bloco`
+  - Evidência (score 2): `e2e/cdu-23.spec.ts:34` -> `test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {`
+  - Evidência (score 2): `e2e/cdu-23.spec.ts:62` -> `test('Cenario 1: ADMIN abre modal e cancela homologação em bloco', async ({_resetAutomatico, page, _autenticadoComoAd...`
+- ✅ **[COBERTO]** 7. Texto "Selecione abaixo as unidades cujos cadastros deverão ser homologados:";
+  - Palavras-chave usadas: `unidades, texto, selecione, abaixo, cujos, cadastros`
+  - Evidência (score 2): `e2e/cdu-23.spec.ts:92` -> `await expect(page.getByText(TEXTOS.sucesso.CADASTROS_HOMOLOGADOS_EM_BLOCO).first()).toBeVisible();`
+  - Evidência (score 2): `e2e/cdu-23.spec.ts:96` -> `await expect(page.getByTestId('app-alert')).toContainText(TEXTOS.sucesso.CADASTROS_HOMOLOGADOS_EM_BLOCO);`
+  - Evidência (score 1): `e2e/cdu-23.spec.ts:14` -> `import {TEXTOS} from '../frontend/src/constants/textos.js';`
+- ✅ **[COBERTO]** 8. Lista das unidades operacionais ou interoperacionais subordinadas cujos cadastros poderão ser homologados, sendo
+  - Palavras-chave usadas: `unidades, lista, operacionais, interoperacionais, subordinadas, cujos`
+  - Evidência (score 2): `e2e/cdu-23.spec.ts:22` -> `* - Processo de mapeamento ou revisão com unidades subordinadas`
+  - Evidência (score 2): `e2e/cdu-23.spec.ts:30` -> `* 5. Sistema abre modal com lista de unidades selecionáveis`
+  - Evidência (score 1): `e2e/cdu-23.spec.ts:28` -> `* 3. Sistema identifica unidades elegíveis para homologação`
+- 🟡 **[PARCIAL]** 9. Botões `Cancelar` e `Homologar`.
+  - Palavras-chave usadas: `botões, cancelar, homologar`
+  - Evidência (score 1): `e2e/cdu-23.spec.ts:17` -> `* CDU-23 - Homologar cadastros em bloco`
+  - Evidência (score 1): `e2e/cdu-23.spec.ts:29` -> `* 4. ADMIN clica no botão 'Homologar em Bloco'`
+  - Evidência (score 1): `e2e/cdu-23.spec.ts:34` -> `test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {`
+- 🟡 **[PARCIAL]** 10. Caso o usuário escolha o botão `Cancelar`, o sistema interrompe a operação, permanecendo na tela Detalhes do
+  - Palavras-chave usadas: `escolha, botão, cancelar, interrompe, operação, permanecendo`
+  - Evidência (score 1): `e2e/cdu-23.spec.ts:29` -> `* 4. ADMIN clica no botão 'Homologar em Bloco'`
+  - Evidência (score 1): `e2e/cdu-23.spec.ts:76` -> `await modal.getByRole('button', {name: /Cancelar/i}).click();`
+- ✅ **[COBERTO]** 11. O usuário clica em `Homologar`.
+  - Palavras-chave usadas: `clica, homologar`
+  - Evidência (score 2): `e2e/cdu-23.spec.ts:29` -> `* 4. ADMIN clica no botão 'Homologar em Bloco'`
+  - Evidência (score 1): `e2e/cdu-23.spec.ts:17` -> `* CDU-23 - Homologar cadastros em bloco`
+  - Evidência (score 1): `e2e/cdu-23.spec.ts:34` -> `test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {`
+- ✅ **[COBERTO]** 12. O sistema atua, para cada unidade selecionada, da seguinte forma:
+  - Palavras-chave usadas: `unidade, atua, cada, selecionada, seguinte, forma`
+  - Evidência (score 3): `e2e/cdu-23.spec.ts:32` -> `* 7. Sistema executa homologação para cada unidade selecionada`
+  - Evidência (score 1): `e2e/cdu-23.spec.ts:2` -> `import {criarProcessoCadastroDisponibilizadoFixture} from './fixtures/fixtures-processos.js';`
+  - Evidência (score 1): `e2e/cdu-23.spec.ts:5` -> `aceitarCadastroMapeamento,`
+- 🟡 **[PARCIAL]** 13. O sistema registra uma movimentação para o subprocesso:
+  - Palavras-chave usadas: `subprocesso, registra, movimentação`
+  - Evidência (score 1): `e2e/cdu-23.spec.ts:6` -> `acessarSubprocessoGestor,`
+  - Evidência (score 1): `e2e/cdu-23.spec.ts:9` -> `import {navegarParaSubprocesso} from './helpers/helpers-navegacao.js';`
+  - Evidência (score 1): `e2e/cdu-23.spec.ts:23` -> `* - Subprocessos na situação 'Cadastro disponibilizado' ou 'Cadastro aceito'`
+- ❌ **[NAO_COBERTO]** 14. `Data/hora`: [Data/hora atual]
+  - Palavras-chave usadas: `data/hora, atual`
+  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
+- ✅ **[COBERTO]** 15. `Unidade origem`: "ADMIN"
+  - Palavras-chave usadas: `unidade, origem, admin`
+  - Evidência (score 2): `e2e/cdu-23.spec.ts:31` -> `* 6. ADMIN seleciona unidades e confirma`
+  - Evidência (score 1): `e2e/cdu-23.spec.ts:19` -> `* Ator: ADMIN`
+  - Evidência (score 1): `e2e/cdu-23.spec.ts:22` -> `* - Processo de mapeamento ou revisão com unidades subordinadas`
+- ✅ **[COBERTO]** 16. `Unidade destino`: "ADMIN"
+  - Palavras-chave usadas: `unidade, destino, admin`
+  - Evidência (score 2): `e2e/cdu-23.spec.ts:31` -> `* 6. ADMIN seleciona unidades e confirma`
+  - Evidência (score 1): `e2e/cdu-23.spec.ts:19` -> `* Ator: ADMIN`
+  - Evidência (score 1): `e2e/cdu-23.spec.ts:22` -> `* - Processo de mapeamento ou revisão com unidades subordinadas`
+- ✅ **[COBERTO]** 17. `Descrição`: "Cadastro homologado"
+  - Palavras-chave usadas: `descrição, cadastro, homologado`
+  - Evidência (score 2): `e2e/cdu-23.spec.ts:92` -> `await expect(page.getByText(TEXTOS.sucesso.CADASTROS_HOMOLOGADOS_EM_BLOCO).first()).toBeVisible();`
+  - Evidência (score 2): `e2e/cdu-23.spec.ts:96` -> `await expect(page.getByTestId('app-alert')).toContainText(TEXTOS.sucesso.CADASTROS_HOMOLOGADOS_EM_BLOCO);`
+  - Evidência (score 2): `e2e/cdu-23.spec.ts:98` -> `await expect(page.getByRole('row', {name: /SECAO_221 - Seção 221 Cadastro homologado/i})).toBeVisible();`
+- ✅ **[COBERTO]** 18. O sistema altera a situação do subprocesso da unidade para 'Cadastro homologado'.
+  - Palavras-chave usadas: `situação, subprocesso, unidade, altera, cadastro, homologado`
+  - Evidência (score 3): `e2e/cdu-23.spec.ts:23` -> `* - Subprocessos na situação 'Cadastro disponibilizado' ou 'Cadastro aceito'`
+  - Evidência (score 2): `e2e/cdu-23.spec.ts:50` -> `await acessarSubprocessoGestor(page, descProcesso, UNIDADE_1);`
+  - Evidência (score 2): `e2e/cdu-23.spec.ts:55` -> `await acessarSubprocessoGestor(page, descProcesso, UNIDADE_1);`
+- 🟡 **[PARCIAL]** 19. O sistema cria internamente um alerta:
+  - Palavras-chave usadas: `alerta, cria, internamente`
+  - Evidência (score 1): `e2e/cdu-23.spec.ts:2` -> `import {criarProcessoCadastroDisponibilizadoFixture} from './fixtures/fixtures-processos.js';`
+  - Evidência (score 1): `e2e/cdu-23.spec.ts:42` -> `const processo = await criarProcessoCadastroDisponibilizadoFixture(request, {`
+  - Evidência (score 1): `e2e/cdu-23.spec.ts:109` -> `const processo = await criarProcessoCadastroDisponibilizadoFixture(request, {`
+- ✅ **[COBERTO]** 20. `Descrição`: "Cadastro da unidade [SIGLA_UNIDADE_SUBPROCESSO] homologado"
+  - Palavras-chave usadas: `unidade, sigla_unidade_subprocesso, descrição, cadastro, homologado`
+  - Evidência (score 2): `e2e/cdu-23.spec.ts:92` -> `await expect(page.getByText(TEXTOS.sucesso.CADASTROS_HOMOLOGADOS_EM_BLOCO).first()).toBeVisible();`
+  - Evidência (score 2): `e2e/cdu-23.spec.ts:96` -> `await expect(page.getByTestId('app-alert')).toContainText(TEXTOS.sucesso.CADASTROS_HOMOLOGADOS_EM_BLOCO);`
+  - Evidência (score 2): `e2e/cdu-23.spec.ts:98` -> `await expect(page.getByRole('row', {name: /SECAO_221 - Seção 221 Cadastro homologado/i})).toBeVisible();`
+- 🟡 **[PARCIAL]** 21. `Processo`: [DESCRIÇÃO_PROCESSO]
+  - Palavras-chave usadas: `processo, descrição_processo`
+  - Evidência (score 1): `e2e/cdu-23.spec.ts:2` -> `import {criarProcessoCadastroDisponibilizadoFixture} from './fixtures/fixtures-processos.js';`
+  - Evidência (score 1): `e2e/cdu-23.spec.ts:6` -> `acessarSubprocessoGestor,`
+  - Evidência (score 1): `e2e/cdu-23.spec.ts:9` -> `import {navegarParaSubprocesso} from './helpers/helpers-navegacao.js';`
+- ❌ **[NAO_COBERTO]** 22. `Data/hora`: [Data/hora atual]
+  - Palavras-chave usadas: `data/hora, atual`
+  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
+- ✅ **[COBERTO]** 23. `Unidade de origem`: ADMIN
+  - Palavras-chave usadas: `unidade, origem, admin`
+  - Evidência (score 2): `e2e/cdu-23.spec.ts:31` -> `* 6. ADMIN seleciona unidades e confirma`
+  - Evidência (score 1): `e2e/cdu-23.spec.ts:19` -> `* Ator: ADMIN`
+  - Evidência (score 1): `e2e/cdu-23.spec.ts:22` -> `* - Processo de mapeamento ou revisão com unidades subordinadas`
+- 🟡 **[PARCIAL]** 24. `Unidade de destino`: [SIGLA_UNIDADE_SUBPROCESSO]
+  - Palavras-chave usadas: `unidade, sigla_unidade_subprocesso, destino`
+  - Evidência (score 1): `e2e/cdu-23.spec.ts:22` -> `* - Processo de mapeamento ou revisão com unidades subordinadas`
+  - Evidência (score 1): `e2e/cdu-23.spec.ts:28` -> `* 3. Sistema identifica unidades elegíveis para homologação`
+  - Evidência (score 1): `e2e/cdu-23.spec.ts:30` -> `* 5. Sistema abre modal com lista de unidades selecionáveis`
+- ✅ **[COBERTO]** 25. O sistema envia notificação por e-mail para a unidade do subprocesso:
+  - Palavras-chave usadas: `unidade, subprocesso, envia, notificação, e-mail`
+  - Evidência (score 2): `e2e/cdu-23.spec.ts:50` -> `await acessarSubprocessoGestor(page, descProcesso, UNIDADE_1);`
+  - Evidência (score 2): `e2e/cdu-23.spec.ts:55` -> `await acessarSubprocessoGestor(page, descProcesso, UNIDADE_1);`
+  - Evidência (score 2): `e2e/cdu-23.spec.ts:117` -> `await acessarSubprocessoGestor(page, descProcesso, UNIDADE_1);`
+- ✅ **[COBERTO]** 26. O sistema mostra mensagem de confirmação: "Cadastros homologados em bloco" e permanece na tela
+  - Palavras-chave usadas: `mostra, mensagem, confirmação, cadastros, homologados, bloco`
+  - Evidência (score 3): `e2e/cdu-23.spec.ts:92` -> `await expect(page.getByText(TEXTOS.sucesso.CADASTROS_HOMOLOGADOS_EM_BLOCO).first()).toBeVisible();`
+  - Evidência (score 3): `e2e/cdu-23.spec.ts:96` -> `await expect(page.getByTestId('app-alert')).toContainText(TEXTOS.sucesso.CADASTROS_HOMOLOGADOS_EM_BLOCO);`
+  - Evidência (score 2): `e2e/cdu-23.spec.ts:17` -> `* CDU-23 - Homologar cadastros em bloco`
 
-- **Passo 5 - Detalhes do modal**:
-  - Requisito diz "Lista das unidades operacionais ou interoperacionais subordinadas cujos cadastros poderão ser homologados"
-  - Teste não valida:
-    - Que apenas unidades elegíveis aparecem
-    - Que checkboxes estão pré-selecionados (assume, mas não valida)
-    - Que sigla e nome aparecem corretamente
+## Ajustes recomendados para próximo ciclo
+- Completar cobertura do item: **Botões `Cancelar` e `Homologar`.** (atualmente parcial).
+- Completar cobertura do item: **Caso o usuário escolha o botão `Cancelar`, o sistema interrompe a operação, permanecendo na tela Detalhes do** (atualmente parcial).
+- Completar cobertura do item: **O sistema registra uma movimentação para o subprocesso:** (atualmente parcial).
 
-- **Passo 8 - Processamento para cada unidade selecionada**:
-  - 8.1: Registro de movimentação com:
-    - Data/hora: Data/hora atual
-    - Unidade origem: "ADMIN"
-    - Unidade destino: "ADMIN"
-    - Descrição: "Cadastro homologado"
-    - Teste não valida se movimentação foi registrada
-  
-  - 8.2: Alteração de situação para "Cadastro homologado"
-    - Teste valida que SECAO_221 exibe "Cadastro homologado" (Cenário 2)
-    - Mas não valida para outras unidades se existirem múltiplas
-  
-  - 8.3: Criação de alerta com campos específicos
-    - Teste não valida se alerta foi criado
-  
-  - 8.4: E-mail para unidade do subprocesso com template específico
-    - Teste não valida envio de e-mail
-    - Teste não valida conteúdo do e-mail
+## Prontidão para o próximo PR de melhoria E2E
+- Status de entrada: **PRONTO_COM_GAPS**.
+- Motivos: há itens sem cobertura E2E.
+- Checklist mínimo antes de codar:
+  - [ ] confirmar massa de dados/fixtures para cenário positivo e negativo;
+  - [ ] definir assert de regra de negócio + assert de efeito colateral;
+  - [ ] validar perfil/unidade necessários no cenário (quando aplicável);
+  - [ ] mapear se precisa teste de integração backend complementar.
+- Escopo sugerido para o próximo PR deste CDU:
+  - Completar cobertura do item: **Botões `Cancelar` e `Homologar`.** (atualmente parcial).
+  - Completar cobertura do item: **Caso o usuário escolha o botão `Cancelar`, o sistema interrompe a operação, permanecendo na tela Detalhes do** (atualmente parcial).
+  - Completar cobertura do item: **O sistema registra uma movimentação para o subprocesso:** (atualmente parcial).
 
-- **Pré-condições**:
-  - Teste valida que ADMIN consegue homologar
-  - Mas não valida acesso negado para outro perfil (GESTOR, CHEFE)
-  - Teste não valida pré-condição "situação 'Cadastro disponibilizado' ou 'Cadastro aceito'" (setup coloca em "Cadastro aceito", mas teste não valida cenário com "Cadastro disponibilizado")
-
-- **Seleção condicional de unidades**:
-  - Requisito permite seleção individual de unidades
-  - Teste não valida deselecção de uma unidade e homologação apenas das selecionadas
-  - Teste assume que todas estão selecionadas
-
-- **Estado após homologação (Passo 9)**:
-  - Teste valida que botão fica desabilitado (Cenário 2)
-  - Mas não valida se isso é porque não há mais unidades elegíveis (correto) ou outro motivo
-
-## Alterações necessárias no teste E2E
-1. **Aprimorar validação da estrutura do modal (Passo 5)**:
-   - Validar que checkboxes estão pré-selecionados (não apenas assumir)
-   - Validar que sigla e nome aparecem para cada unidade
-   - Validar que apenas unidades operacionais/interoperacionais aparecem (não intermediárias)
-
-2. **Adicionar teste de seleção condicional (Passo 8)**:
-   - Criar processo com múltiplas unidades subordinadas
-   - Testar deselecção de uma unidade e confirmação de homologação
-   - Validar que apenas unidades selecionadas são homologadas
-
-3. **Adicionar teste com múltiplas unidades**:
-   - Validar que situação muda para "Cadastro homologado" em TODAS as unidades selecionadas
-   - Validar comportamento quando há múltiplos subprocessos
-
-4. **Adicionar teste de pré-condição com "Cadastro disponibilizado"**:
-   - Criar outro processo onde cadastro está em "Cadastro disponibilizado" (antes de GESTOR aceitar)
-   - Testar que botão de homologação aparece e funciona nesse estado também
-
-5. **Adicionar validação de acesso negado**:
-   - Testar que GESTOR ou CHEFE não veem botão ou não conseguem homologar
-
-6. **Melhorar validação de desabilitação do botão (Passo 9)**:
-   - Após homologação bem-sucedida, validar explicitamente que não há mais unidades elegíveis
-   - Ou criar novo subprocesso com "Cadastro disponibilizado" e validar que seu aceite habilitaria o botão novamente
-
-## Notas e inconsistências do requisito
-- **Ambiguidade em "operacionais ou interoperacionais subordinadas"**: Mesmo problema do CDU-22. Não fica claro a hierarquia exata.
-- **Unidade origem/destino = "ADMIN"**: Passo 8.1 diz que origem e destino são "ADMIN", o que parece estranho para uma movimentação. Possível erro no requisito ou significado especial não documentado.
-- **Falta de clareza em quando botão aparece**: Requisito diz que botão aparece quando há "unidades subordinadas cujos cadastros poderão ser homologados", mas não define explicitamente os estados elegíveis. Pré-condição menciona "Cadastro disponibilizado" ou "Revisão do cadastro disponibilizada", mas não "Cadastro aceito" (embora setup do teste mostre funcionamento com "Cadastro aceito").
-- **Ordem de apresentação**: Requisito não especifica se unidades aparecem em ordem hierárquica, alfabética, etc.
-- **Ausência de mensagem de confirmação**: Passo 9 diz "O sistema mostra mensagem de confirmação: 'Cadastros homologados em bloco'" mas teste não valida presença dessa mensagem. Teste valida que permanece na tela, mas mensagem pode não ser exibida.
+## Observações metodológicas
+- Esta rodada incluiu leitura de helpers importados para reduzir falso negativo de cobertura indireta.
+- Classificação automática por evidência textual; recomenda-se validação humana dos itens `🟡` e `❌` antes da implementação final.

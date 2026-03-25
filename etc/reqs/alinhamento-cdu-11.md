@@ -1,59 +1,77 @@
-# Alinhamento CDU-11 - Visualizar cadastro de atividades e conhecimentos
+# Alinhamento CDU-11 - Reanálise (rodada 2)
 
-## Cobertura atual do teste
-O teste `cdu-11.spec.ts` em dois grupos (Em andamento, Finalizado):
+## Artefatos analisados
+- Requisito: `etc/reqs/cdu-11.md`.
+- Teste E2E: `e2e/cdu-11.spec.ts` (5 cenários `test`, 0 `test.step`).
+- Contextos `describe`: Em processo em Andamento, Em processo finalizado.
 
-**Grupo 1: Em processo em Andamento**
-- Setup: Cria processo com cadastro disponibilizado via fixture
+## Resultado da comparação requisito x E2E
+- Itens do fluxo principal avaliados: **10**.
+- Status: **9 cobertos**, **1 parciais**, **0 não cobertos** (baseado em evidências textuais no spec e helpers).
 
-**Fluxo ADMIN/GESTOR (Passo 2)**:
-- Clica em processo em andamento na tabela
-- Navega para tela Detalhes do processo
-- Clica em unidade subordinada
-- Sistema mostra Detalhes do subprocesso
-- Navega para Atividades e conhecimentos
-- Valida presença de sigla/nome da unidade e atividades/conhecimentos
+## Matriz de evidências
+- ✅ **[COBERTO]** 1. No painel, o usuário clica no processo de mapeamento ou revisão na situação `Em andamento` ou `Finalizado`.
+  - Palavras-chave usadas: `processo, situação, painel, clica, mapeamento, revisão`
+  - Evidência (score 2): `e2e/cdu-11.spec.ts:62` -> `const descProcesso = `Processo mapeamento CDU-11 ${timestamp}`;`
+  - Evidência (score 1): `e2e/cdu-11.spec.ts:3` -> `criarProcessoCadastroDisponibilizadoFixture,`
+  - Evidência (score 1): `e2e/cdu-11.spec.ts:4` -> `criarProcessoFinalizadoFixture,`
+- ✅ **[COBERTO]** 2. Se usuário estiver logado com perfil ADMIN ou GESTOR:
+  - Palavras-chave usadas: `perfil, estiver, logado, admin, gestor`
+  - Evidência (score 2): `e2e/cdu-11.spec.ts:26` -> `test('Fluxo ADMIN/GESTOR: Navega via Detalhes do Processo (Passo 2)', async ({_resetAutomatico, page, _autenticadoCom...`
+  - Evidência (score 1): `e2e/cdu-11.spec.ts:72` -> `test('Fluxo ADMIN: Visualizar em processo finalizado', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {`
+- ✅ **[COBERTO]** 3. O sistema mostra a tela `Detalhes do processo`
+  - Palavras-chave usadas: `processo, mostra, detalhes`
+  - Evidência (score 3): `e2e/cdu-11.spec.ts:29` -> `// 2.1. O sistema mostra a tela Detalhes do processo`
+  - Evidência (score 3): `e2e/cdu-11.spec.ts:35` -> `// 2.3. O sistema mostra a tela Detalhes do subprocesso`
+  - Evidência (score 2): `e2e/cdu-11.spec.ts:9` -> `import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';`
+- ✅ **[COBERTO]** 4. Usuário clica em uma unidade subordinada, que seja operacional ou interoperacional
+  - Palavras-chave usadas: `unidade, clica, subordinada, seja, operacional, interoperacional`
+  - Evidência (score 3): `e2e/cdu-11.spec.ts:32` -> `// 2.2. Usuário clica em uma unidade subordinada`
+  - Evidência (score 1): `e2e/cdu-11.spec.ts:14` -> `const UNIDADE_ALVO = 'SECAO_111';`
+  - Evidência (score 1): `e2e/cdu-11.spec.ts:20` -> `unidade: UNIDADE_ALVO,`
+- ✅ **[COBERTO]** 5. O sistema mostra a tela `Detalhes do subprocesso`, com os dados do subprocesso da unidade selecionada
+  - Palavras-chave usadas: `subprocesso, unidade, mostra, detalhes, selecionada`
+  - Evidência (score 3): `e2e/cdu-11.spec.ts:35` -> `// 2.3. O sistema mostra a tela Detalhes do subprocesso`
+  - Evidência (score 3): `e2e/cdu-11.spec.ts:48` -> `// 3.1. O sistema exibe a tela Detalhes do subprocesso com os dados da unidade do usuário`
+  - Evidência (score 2): `e2e/cdu-11.spec.ts:29` -> `// 2.1. O sistema mostra a tela Detalhes do processo`
+- ✅ **[COBERTO]** 6. Se perfil logado for CHEFE ou SERVIDOR:
+  - Palavras-chave usadas: `perfil, logado, chefe, servidor`
+  - Evidência (score 2): `e2e/cdu-11.spec.ts:45` -> `test('Fluxo CHEFE/SERVIDOR: Navega direto para Detalhes do Subprocesso (Passo 3)', async ({_resetAutomatico, page, _a...`
+- ✅ **[COBERTO]** 7. O sistema exibe a tela `Detalhes do subprocesso` com os dados do subprocesso da unidade do usuário
+  - Palavras-chave usadas: `subprocesso, unidade, exibe, detalhes`
+  - Evidência (score 4): `e2e/cdu-11.spec.ts:48` -> `// 3.1. O sistema exibe a tela Detalhes do subprocesso com os dados da unidade do usuário`
+  - Evidência (score 2): `e2e/cdu-11.spec.ts:33` -> `await navegarParaSubprocesso(page, UNIDADE_ALVO);`
+  - Evidência (score 2): `e2e/cdu-11.spec.ts:35` -> `// 2.3. O sistema mostra a tela Detalhes do subprocesso`
+- ✅ **[COBERTO]** 8. Na tela de Detalhes do subprocesso, usuário clica no card `Atividades e conhecimentos`.
+  - Palavras-chave usadas: `subprocesso, atividades, detalhes, clica, card, conhecimentos`
+  - Evidência (score 2): `e2e/cdu-11.spec.ts:11` -> `test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos', () => {`
+  - Evidência (score 2): `e2e/cdu-11.spec.ts:35` -> `// 2.3. O sistema mostra a tela Detalhes do subprocesso`
+  - Evidência (score 2): `e2e/cdu-11.spec.ts:45` -> `test('Fluxo CHEFE/SERVIDOR: Navega direto para Detalhes do Subprocesso (Passo 3)', async ({_resetAutomatico, page, _a...`
+- ✅ **[COBERTO]** 9. O sistema apresenta a tela `Atividades e conhecimentos`, preenchida com os dados da unidade.
+  - Palavras-chave usadas: `atividades, unidade, apresenta, conhecimentos, preenchida`
+  - Evidência (score 2): `e2e/cdu-11.spec.ts:11` -> `test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos', () => {`
+  - Evidência (score 1): `e2e/cdu-11.spec.ts:7` -> `import {navegarParaAtividadesVisualizacao} from './helpers/helpers-atividades.js';`
+  - Evidência (score 1): `e2e/cdu-11.spec.ts:14` -> `const UNIDADE_ALVO = 'SECAO_111';`
+- 🟡 **[PARCIAL]** 10. Nesta tela, são apresentados a sigla e o nome da unidade, e cada atividade é apresentada como uma tabela, com
+  - Palavras-chave usadas: `unidade, atividade, nesta, apresentados, sigla, nome`
+  - Evidência (score 1): `e2e/cdu-11.spec.ts:7` -> `import {navegarParaAtividadesVisualizacao} from './helpers/helpers-atividades.js';`
+  - Evidência (score 1): `e2e/cdu-11.spec.ts:11` -> `test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos', () => {`
+  - Evidência (score 1): `e2e/cdu-11.spec.ts:14` -> `const UNIDADE_ALVO = 'SECAO_111';`
 
-**Fluxo CHEFE/SERVIDOR (Passo 3)**:
-- Clica em processo em andamento
-- Sistema direto em Detalhes do subprocesso (sem passagem por Detalhes do processo)
-- URL valida `/processo/{codigo}/{unidade}` (direto, não passando por `/processo/{codigo}`)
-- Navega para Atividades e conhecimentos
-- Valida mesma cobertura (sigla/nome/atividades/conhecimentos)
+## Ajustes recomendados para próximo ciclo
+- Completar cobertura do item: **Nesta tela, são apresentados a sigla e o nome da unidade, e cada atividade é apresentada como uma tabela, com** (atualmente parcial).
 
-**Grupo 2: Em processo finalizado**
-- Setup: Cria processo mapeamento finalizado via fixture
+## Prontidão para o próximo PR de melhoria E2E
+- Status de entrada: **PRONTO**.
+- Motivos: base de análise e pendências objetivas definidas.
+- Checklist mínimo antes de codar:
+  - [ ] confirmar massa de dados/fixtures para cenário positivo e negativo;
+  - [ ] definir assert de regra de negócio + assert de efeito colateral;
+  - [ ] validar perfil/unidade necessários no cenário (quando aplicável);
+  - [ ] mapear se precisa teste de integração backend complementar.
+- Escopo sugerido para o próximo PR deste CDU:
+  - Completar cobertura do item: **Nesta tela, são apresentados a sigla e o nome da unidade, e cada atividade é apresentada como uma tabela, com** (atualmente parcial).
 
-**Fluxo ADMIN**:
-- Clica em processo finalizado
-- Navega para detalhes do subprocesso
-- Navega para Atividades e conhecimentos
-- Valida sigla/nome/atividades/conhecimentos
-
-## Lacunas em relação ao requisito
-**Não coberto**:
-- **Passo 6**: Estrutura de apresentação - "cada atividade é apresentada como uma tabela, com cabeçalho a descrição da atividade, e as linhas preenchidas com os conhecimentos cadastrados" - teste apenas valida presença de atividades/conhecimentos, não estrutura de tabela com cabeçalho
-- **Passo 6 (Detalhe visual)**: Validação de que "sigla e nome da unidade" aparecem na tela (teste valida via `.unidade-sigla` e `.unidade-nome`, mas não valida apresentação conjunta)
-- **Pré-condição**: "Subprocesso da unidade com cadastro de atividades e conhecimentos já disponibilizados" - teste presume que fixture criar cadastro disponibilizado, mas não valida situação exata do subprocesso (deve estar em "Cadastro disponibilizado" ou "Cadastro homologado" ou "Mapa ajustado" conforme fluxo)
-- **Atores**: Teste não cobre **SERVIDOR** (apenas ADMIN, GESTOR, CHEFE)
-- **Pré-condição "processo iniciado ou finalizado"**: Teste cobre ambos em fixtures diferentes, mas não em mesmo teste
-- **Cobertura por perfil**: Requisito cita "Todos os perfis" como atores, mas teste cobre apenas 3 perfis explícitos
-
-**Teste parcialmente coberto**:
-- Estrutura de tabela não é validada (apenas texto dentro dela)
-- Fixture não é clara sobre situação exata do subprocesso
-
-## Alterações necessárias no teste E2E
-- Adicionar validação de estrutura de tabela (cabeçalho com descrição de atividade, linhas com conhecimentos)
-- Adicionar teste para perfil SERVIDOR (fluxo 3)
-- Adicionar teste explícito para processo "Finalizado" com fluxo CHEFE/SERVIDOR (atualmente só testa ADMIN)
-- Validar que apresentação de sigla e nome da unidade é clara/conjunta
-- Adicionar teste de múltiplas atividades com múltiplos conhecimentos para validar estrutura de indentação/agrupamento
-- Adicionar teste para verificar que tela é somente leitura (sem edição, botões de remoção, etc.)
-- Validar que situação do subprocesso é uma das estados "Cadastro disponibilizado" (ou posterior) antes de entrar em visulização
-
-## Notas e inconsistências do requisito
-- **Ambiguidade em Passo 6**: "tabela com cabeçalho" - não especifica se é tabela HTML literal, cards, ou outra estrutura visual
-- **Falta de detalhe**: Não especifica se há paginação, ordenação, ou outras interações na visualização
-- **Indefinição de "somente leitura"**: Requisito não explicita que é modo visualização (sem edição), apenas implícito pelo título
-- **Estrutura incompleta**: Não menciona se há botão "Voltar" ou navegação adicional
+## Observações metodológicas
+- Esta rodada incluiu leitura de helpers importados para reduzir falso negativo de cobertura indireta.
+- Classificação automática por evidência textual; recomenda-se validação humana dos itens `🟡` e `❌` antes da implementação final.

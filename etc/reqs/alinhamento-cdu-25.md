@@ -1,63 +1,171 @@
-# Alinhamento CDU-25 - Aceitar validação de mapas de competências em bloco
+# Alinhamento CDU-25 - Reanálise (rodada 2)
 
-## Cobertura atual do teste
-O teste cobre:
-- **Setup preparatório**: Criação de processo, disponibilização de atividades, homologação de cadastro, criação e disponibilização de mapa, validação do mapa pelo chefe.
-- **Cenário 1**: Verificação de visibilidade e habilitação do botão "Aceitar mapas em bloco" após GESTOR acessar processo em andamento.
-- **Cenário 2**: Verificação de abertura, cancelamento e fechamento do modal.
-- **Cenário 3**: Verificação de título/texto do modal, checkbox selecionado por padrão, mensagem de confirmação "Mapas aceitos em bloco" e redirecionamento para Painel.
+## Artefatos analisados
+- Requisito: `etc/reqs/cdu-25.md`.
+- Teste E2E: `e2e/cdu-25.spec.ts` (1 cenários `test`, 4 `test.step`).
 
-## Lacunas em relação ao requisito
-**Lacunas críticas:**
+## Resultado da comparação requisito x E2E
+- Itens do fluxo principal avaliados: **30**.
+- Status: **12 cobertos**, **13 parciais**, **5 não cobertos** (baseado em evidências textuais no spec e helpers).
 
-1. **Falta validação de pré-condições**: O requisito exige que subprocessos estejam em situações 'Mapa validado' **OU** 'Mapa com sugestões'. O teste apenas valida com 'Mapa validado'. Não há cenário com 'Mapa com sugestões'.
+## Matriz de evidências
+- ✅ **[COBERTO]** 1. No `Painel`, o usuário acessa um processo de mapeamento ou de revisão, que esteja na situação em andamento.
+  - Palavras-chave usadas: `processo, situação, painel, acessa, mapeamento, revisão`
+  - Evidência (score 2): `e2e/cdu-25.spec.ts:4` -> `import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';`
+  - Evidência (score 2): `e2e/cdu-25.spec.ts:15` -> `const descProcesso = `Mapeamento CDU-25 ${Date.now()}`;`
+  - Evidência (score 2): `e2e/cdu-25.spec.ts:27` -> `await acessarDetalhesProcesso(page, descProcesso);`
+- ✅ **[COBERTO]** 2. O sistema mostra a tela `Detalhes do processo`, exibindo apenas os subprocessos das unidades que compõem a hierarquia do usuário (sua própria unidade e subordinadas recursivamente).
+  - Palavras-chave usadas: `processo, subprocessos, unidades, unidade, mostra, detalhes`
+  - Evidência (score 2): `e2e/cdu-25.spec.ts:4` -> `import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';`
+  - Evidência (score 2): `e2e/cdu-25.spec.ts:27` -> `await acessarDetalhesProcesso(page, descProcesso);`
+  - Evidência (score 2): `e2e/cdu-25.spec.ts:28` -> `await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();`
+- 🟡 **[PARCIAL]** 3. O sistema identifica que existem unidades subordinadas com subprocessos elegíveis para aceite do mapa em bloco e se houver mostra o botão `Aceitar mapas em bloco`.
+  - Palavras-chave usadas: `unidades, subprocessos, identifica, existem, subordinadas, elegíveis`
+  - Evidência (score 1): `e2e/cdu-25.spec.ts:28` -> `await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();`
+  - Evidência (score 1): `e2e/cdu-25.spec.ts:46` -> `await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();`
+- ✅ **[COBERTO]** 4. O usuário clica no botão `Aceitar mapas em bloco`.
+  - Palavras-chave usadas: `clica, botão, aceitar, mapas, bloco`
+  - Evidência (score 3): `e2e/cdu-25.spec.ts:9` -> `* CDU-25 - Aceitar validação de mapas de competências em bloco`
+  - Evidência (score 3): `e2e/cdu-25.spec.ts:13` -> `test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {`
+  - Evidência (score 2): `e2e/cdu-25.spec.ts:17` -> `test('Cenários CDU-25: Aceite em bloco de mapas validados', async ({_resetAutomatico, request, page}) => {`
+- ✅ **[COBERTO]** 5. O sistema abre um modal de confirmação, com os elementos a seguir:
+  - Palavras-chave usadas: `abre, modal, confirmação, elementos, seguir`
+  - Evidência (score 2): `e2e/cdu-25.spec.ts:37` -> `await test.step('Cenario 2: GESTOR abre modal e cancela o aceite', async () => {`
+  - Evidência (score 1): `e2e/cdu-25.spec.ts:41` -> `const modal = page.getByRole('dialog');`
+  - Evidência (score 1): `e2e/cdu-25.spec.ts:42` -> `await expect(modal).toBeVisible();`
+- ✅ **[COBERTO]** 6. Título "Aceite de mapas em bloco";
+  - Palavras-chave usadas: `título, aceite, mapas, bloco`
+  - Evidência (score 3): `e2e/cdu-25.spec.ts:17` -> `test('Cenários CDU-25: Aceite em bloco de mapas validados', async ({_resetAutomatico, request, page}) => {`
+  - Evidência (score 2): `e2e/cdu-25.spec.ts:9` -> `* CDU-25 - Aceitar validação de mapas de competências em bloco`
+  - Evidência (score 2): `e2e/cdu-25.spec.ts:13` -> `test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {`
+- ✅ **[COBERTO]** 7. Texto "Selecione as unidades para aceite dos mapas correspondentes";
+  - Palavras-chave usadas: `unidades, texto, selecione, aceite, mapas, correspondentes`
+  - Evidência (score 2): `e2e/cdu-25.spec.ts:17` -> `test('Cenários CDU-25: Aceite em bloco de mapas validados', async ({_resetAutomatico, request, page}) => {`
+  - Evidência (score 2): `e2e/cdu-25.spec.ts:63` -> `await expect(page.getByText(TEXTOS.sucesso.MAPAS_ACEITOS_EM_BLOCO)).toBeVisible();`
+  - Evidência (score 1): `e2e/cdu-25.spec.ts:6` -> `import {TEXTOS} from '../frontend/src/constants/textos.js';`
+- ✅ **[COBERTO]** 8. Lista das unidades cujos mapas poderão ser aceitos (conforme pré-condições); devem ser apresentados para cada unidade um checkbox (selecionado por padrão) ao lado da sigla e nome; e
+  - Palavras-chave usadas: `unidades, unidade, lista, cujos, mapas, poderão`
+  - Evidência (score 2): `e2e/cdu-25.spec.ts:28` -> `await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();`
+  - Evidência (score 2): `e2e/cdu-25.spec.ts:46` -> `await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();`
+  - Evidência (score 1): `e2e/cdu-25.spec.ts:9` -> `* CDU-25 - Aceitar validação de mapas de competências em bloco`
+- 🟡 **[PARCIAL]** 9. Botão `Cancelar` e botão `Registrar aceite`.
+  - Palavras-chave usadas: `botão, cancelar, registrar, aceite`
+  - Evidência (score 1): `e2e/cdu-25.spec.ts:17` -> `test('Cenários CDU-25: Aceite em bloco de mapas validados', async ({_resetAutomatico, request, page}) => {`
+  - Evidência (score 1): `e2e/cdu-25.spec.ts:37` -> `await test.step('Cenario 2: GESTOR abre modal e cancela o aceite', async () => {`
+  - Evidência (score 1): `e2e/cdu-25.spec.ts:43` -> `await modal.getByRole('button', {name: /Cancelar/i}).click();`
+- 🟡 **[PARCIAL]** 10. Caso o usuário escolha `Cancelar`, o sistema interrompe a operação, permanecendo na tela `Detalhes do processo`.
+  - Palavras-chave usadas: `processo, escolha, cancelar, interrompe, operação, permanecendo`
+  - Evidência (score 1): `e2e/cdu-25.spec.ts:2` -> `import {criarProcessoMapaValidadoFixture} from './fixtures/fixtures-processos.js';`
+  - Evidência (score 1): `e2e/cdu-25.spec.ts:4` -> `import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';`
+  - Evidência (score 1): `e2e/cdu-25.spec.ts:15` -> `const descProcesso = `Mapeamento CDU-25 ${Date.now()}`;`
+- 🟡 **[PARCIAL]** 11. O usuário clica em `Registrar aceite`.
+  - Palavras-chave usadas: `clica, registrar, aceite`
+  - Evidência (score 1): `e2e/cdu-25.spec.ts:17` -> `test('Cenários CDU-25: Aceite em bloco de mapas validados', async ({_resetAutomatico, request, page}) => {`
+  - Evidência (score 1): `e2e/cdu-25.spec.ts:37` -> `await test.step('Cenario 2: GESTOR abre modal e cancela o aceite', async () => {`
+  - Evidência (score 1): `e2e/cdu-25.spec.ts:49` -> `await test.step('Cenario 3: GESTOR realiza aceite em bloco com sucesso', async () => {`
+- 🟡 **[PARCIAL]** 12. O sistema atua, para cada unidade selecionada, da seguinte forma:
+  - Palavras-chave usadas: `unidade, atua, cada, selecionada, seguinte, forma`
+  - Evidência (score 1): `e2e/cdu-25.spec.ts:14` -> `const UNIDADE_1 = 'SECAO_211';`
+  - Evidência (score 1): `e2e/cdu-25.spec.ts:21` -> `unidade: UNIDADE_1,`
+  - Evidência (score 1): `e2e/cdu-25.spec.ts:28` -> `await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();`
+- 🟡 **[PARCIAL]** 13. Registra internamente uma análise de validação para o subprocesso:
+  - Palavras-chave usadas: `subprocesso, registra, internamente, análise, validação`
+  - Evidência (score 1): `e2e/cdu-25.spec.ts:9` -> `* CDU-25 - Aceitar validação de mapas de competências em bloco`
+  - Evidência (score 1): `e2e/cdu-25.spec.ts:13` -> `test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {`
+- ❌ **[NAO_COBERTO]** 14. `Data/hora`: [Data/hora atual]
+  - Palavras-chave usadas: `data/hora, atual`
+  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
+- 🟡 **[PARCIAL]** 15. `Unidade`: [SIGLA_UNIDADE_ATUAL]
+  - Palavras-chave usadas: `unidade, sigla_unidade_atual`
+  - Evidência (score 1): `e2e/cdu-25.spec.ts:14` -> `const UNIDADE_1 = 'SECAO_211';`
+  - Evidência (score 1): `e2e/cdu-25.spec.ts:21` -> `unidade: UNIDADE_1,`
+  - Evidência (score 1): `e2e/cdu-25.spec.ts:28` -> `await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();`
+- ✅ **[COBERTO]** 16. `Resultado`: "Aceite de mapa"
+  - Palavras-chave usadas: `resultado, aceite, mapa`
+  - Evidência (score 2): `e2e/cdu-25.spec.ts:17` -> `test('Cenários CDU-25: Aceite em bloco de mapas validados', async ({_resetAutomatico, request, page}) => {`
+  - Evidência (score 1): `e2e/cdu-25.spec.ts:2` -> `import {criarProcessoMapaValidadoFixture} from './fixtures/fixtures-processos.js';`
+  - Evidência (score 1): `e2e/cdu-25.spec.ts:9` -> `* CDU-25 - Aceitar validação de mapas de competências em bloco`
+- ✅ **[COBERTO]** 17. `Observação`: "De acordo com a validação do mapa realizada pela unidade"
+  - Palavras-chave usadas: `unidade, observação, acordo, validação, mapa, realizada`
+  - Evidência (score 2): `e2e/cdu-25.spec.ts:9` -> `* CDU-25 - Aceitar validação de mapas de competências em bloco`
+  - Evidência (score 2): `e2e/cdu-25.spec.ts:13` -> `test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {`
+  - Evidência (score 1): `e2e/cdu-25.spec.ts:2` -> `import {criarProcessoMapaValidadoFixture} from './fixtures/fixtures-processos.js';`
+- ❌ **[NAO_COBERTO]** 18. Registra internamente uma movimentação para o subprocesso:
+  - Palavras-chave usadas: `subprocesso, registra, internamente, movimentação`
+  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
+- ❌ **[NAO_COBERTO]** 19. `Data/hora`: [Data/hora atual]
+  - Palavras-chave usadas: `data/hora, atual`
+  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
+- 🟡 **[PARCIAL]** 20. `Unidade origem`: [SIGLA_UNIDADE_ATUAL]
+  - Palavras-chave usadas: `unidade, sigla_unidade_atual, origem`
+  - Evidência (score 1): `e2e/cdu-25.spec.ts:14` -> `const UNIDADE_1 = 'SECAO_211';`
+  - Evidência (score 1): `e2e/cdu-25.spec.ts:21` -> `unidade: UNIDADE_1,`
+  - Evidência (score 1): `e2e/cdu-25.spec.ts:28` -> `await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();`
+- 🟡 **[PARCIAL]** 21. `Unidade destino`: [SIGLA_UNIDADE_SUPERIOR]
+  - Palavras-chave usadas: `unidade, sigla_unidade_superior, destino`
+  - Evidência (score 1): `e2e/cdu-25.spec.ts:14` -> `const UNIDADE_1 = 'SECAO_211';`
+  - Evidência (score 1): `e2e/cdu-25.spec.ts:21` -> `unidade: UNIDADE_1,`
+  - Evidência (score 1): `e2e/cdu-25.spec.ts:28` -> `await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();`
+- ✅ **[COBERTO]** 22. `Descrição`: "Mapa de competências aceito"
+  - Palavras-chave usadas: `competências, descrição, mapa, aceito`
+  - Evidência (score 2): `e2e/cdu-25.spec.ts:9` -> `* CDU-25 - Aceitar validação de mapas de competências em bloco`
+  - Evidência (score 2): `e2e/cdu-25.spec.ts:63` -> `await expect(page.getByText(TEXTOS.sucesso.MAPAS_ACEITOS_EM_BLOCO)).toBeVisible();`
+  - Evidência (score 1): `e2e/cdu-25.spec.ts:2` -> `import {criarProcessoMapaValidadoFixture} from './fixtures/fixtures-processos.js';`
+- ❌ **[NAO_COBERTO]** 23. Registra internamente um alerta:
+  - Palavras-chave usadas: `alerta, registra, internamente`
+  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
+- ✅ **[COBERTO]** 24. `Descrição`: "Validação do mapa de competências da unidade [SIGLA_UNIDADE_SUBPROCESSO] submetida para análise"
+  - Palavras-chave usadas: `competências, unidade, sigla_unidade_subprocesso, descrição, validação, mapa`
+  - Evidência (score 3): `e2e/cdu-25.spec.ts:9` -> `* CDU-25 - Aceitar validação de mapas de competências em bloco`
+  - Evidência (score 2): `e2e/cdu-25.spec.ts:13` -> `test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {`
+  - Evidência (score 1): `e2e/cdu-25.spec.ts:2` -> `import {criarProcessoMapaValidadoFixture} from './fixtures/fixtures-processos.js';`
+- 🟡 **[PARCIAL]** 25. `Processo`: [DESCRIÇÃO_PROCESSO]
+  - Palavras-chave usadas: `processo, descrição_processo`
+  - Evidência (score 1): `e2e/cdu-25.spec.ts:2` -> `import {criarProcessoMapaValidadoFixture} from './fixtures/fixtures-processos.js';`
+  - Evidência (score 1): `e2e/cdu-25.spec.ts:4` -> `import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';`
+  - Evidência (score 1): `e2e/cdu-25.spec.ts:15` -> `const descProcesso = `Mapeamento CDU-25 ${Date.now()}`;`
+- ❌ **[NAO_COBERTO]** 26. `Data/hora`: [Data/hora atual]
+  - Palavras-chave usadas: `data/hora, atual`
+  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
+- 🟡 **[PARCIAL]** 27. `Unidade de origem`: [SIGLA_UNIDADE_ATUAL]
+  - Palavras-chave usadas: `unidade, sigla_unidade_atual, origem`
+  - Evidência (score 1): `e2e/cdu-25.spec.ts:14` -> `const UNIDADE_1 = 'SECAO_211';`
+  - Evidência (score 1): `e2e/cdu-25.spec.ts:21` -> `unidade: UNIDADE_1,`
+  - Evidência (score 1): `e2e/cdu-25.spec.ts:28` -> `await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();`
+- 🟡 **[PARCIAL]** 28. `Unidade de destino`: [SIGLA_UNIDADE_SUPERIOR]
+  - Palavras-chave usadas: `unidade, sigla_unidade_superior, destino`
+  - Evidência (score 1): `e2e/cdu-25.spec.ts:14` -> `const UNIDADE_1 = 'SECAO_211';`
+  - Evidência (score 1): `e2e/cdu-25.spec.ts:21` -> `unidade: UNIDADE_1,`
+  - Evidência (score 1): `e2e/cdu-25.spec.ts:28` -> `await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();`
+- 🟡 **[PARCIAL]** 29. Envia notificação por e-mail para a unidade superior, com o modelo a seguir:
+  - Palavras-chave usadas: `unidade, envia, notificação, e-mail, superior, modelo`
+  - Evidência (score 1): `e2e/cdu-25.spec.ts:14` -> `const UNIDADE_1 = 'SECAO_211';`
+  - Evidência (score 1): `e2e/cdu-25.spec.ts:21` -> `unidade: UNIDADE_1,`
+  - Evidência (score 1): `e2e/cdu-25.spec.ts:28` -> `await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();`
+- ✅ **[COBERTO]** 30. O sistema mostra mensagem de confirmação: "Mapas aceitos em bloco" e redireciona para o Painel.
+  - Palavras-chave usadas: `mostra, mensagem, confirmação, mapas, aceitos, bloco`
+  - Evidência (score 3): `e2e/cdu-25.spec.ts:63` -> `await expect(page.getByText(TEXTOS.sucesso.MAPAS_ACEITOS_EM_BLOCO)).toBeVisible();`
+  - Evidência (score 2): `e2e/cdu-25.spec.ts:9` -> `* CDU-25 - Aceitar validação de mapas de competências em bloco`
+  - Evidência (score 2): `e2e/cdu-25.spec.ts:13` -> `test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {`
 
-2. **Falta validação de localização**: O requisito especifica que subprocessos devem estar com "localização atual na unidade do usuário". O teste não valida explicitamente isso.
+## Ajustes recomendados para próximo ciclo
+- Completar cobertura do item: **O sistema identifica que existem unidades subordinadas com subprocessos elegíveis para aceite do mapa em bloco e se houver mostra o botão `Aceitar mapas em bloco`.** (atualmente parcial).
+- Completar cobertura do item: **Botão `Cancelar` e botão `Registrar aceite`.** (atualmente parcial).
+- Completar cobertura do item: **Caso o usuário escolha `Cancelar`, o sistema interrompe a operação, permanecendo na tela `Detalhes do processo`.** (atualmente parcial).
 
-3. **Falta verificação de conteúdo do modal**: O teste não valida:
-   - Se as unidades corretas são exibidas na lista (especificamente que mostra apenas as elegíveis)
-   - Se o texto "Selecione as unidades para aceite dos mapas correspondentes" está exatamente como especificado
+## Prontidão para o próximo PR de melhoria E2E
+- Status de entrada: **PRONTO_COM_GAPS**.
+- Motivos: há itens sem cobertura E2E.
+- Checklist mínimo antes de codar:
+  - [ ] confirmar massa de dados/fixtures para cenário positivo e negativo;
+  - [ ] definir assert de regra de negócio + assert de efeito colateral;
+  - [ ] validar perfil/unidade necessários no cenário (quando aplicável);
+  - [ ] mapear se precisa teste de integração backend complementar.
+- Escopo sugerido para o próximo PR deste CDU:
+  - Completar cobertura do item: **O sistema identifica que existem unidades subordinadas com subprocessos elegíveis para aceite do mapa em bloco e se houver mostra o botão `Aceitar mapas em bloco`.** (atualmente parcial).
+  - Completar cobertura do item: **Botão `Cancelar` e botão `Registrar aceite`.** (atualmente parcial).
+  - Completar cobertura do item: **Caso o usuário escolha `Cancelar`, o sistema interrompe a operação, permanecendo na tela `Detalhes do processo`.** (atualmente parcial).
 
-4. **Ausência de validação de múltiplas unidades**: O teste apenas trabalha com uma unidade (SECAO_211). Não valida o cenário de múltiplas unidades subordinadas onde o gestor pode selecionar/deselecionar seletivamente.
-
-5. **Falta de validação de movimentação e alerta internos**: O requisito especifica (passo 8) o registro de:
-   - Análise de validação (resultado "Aceite de mapa", observação, etc.)
-   - Movimentação (unidade origem/destino, descrição)
-   - Alerta (descrição, processo, datas, unidades)
-   
-   O teste não valida nenhum desses registros internos.
-
-6. **Falta validação de notificação por e-mail**: O requisito especifica envio de e-mail para unidade superior (passo 8.4). O teste não valida recebimento ou conteúdo do e-mail.
-
-7. **Falta cenário de cancelamento**: Embora haja teste de cancelamento (Cenário 2), não há validação de que nenhuma movimentação/alerta é registrada após cancelamento.
-
-8. **Falta validação de comportamento com unidades deselacionadas**: O teste não cobre o caso de o usuário desselecionar unidades antes de clicar "Registrar aceite".
-
-## Alterações necessárias no teste E2E
-1. **Adicionar cenário com 'Mapa com sugestões'**: Criar um teste paralelo que valida o fluxo com subprocessos em estado 'Mapa com sugestões'.
-
-2. **Adicionar validação de múltiplas unidades**: 
-   - Expandir a hierarquia para incluir múltiplas unidades subordinadas
-   - Validar que todas aparecem no modal com checkboxes
-   - Validar deselecção de unidades e verificar que apenas as selecionadas são processadas
-
-3. **Adicionar validação de registros internos**: 
-   - Após aceite, consultar API ou dados persistidos para validar:
-     - Análise de validação registrada com resultado "Aceite de mapa"
-     - Movimentação registrada com siglas corretas
-     - Alerta criado com descrição esperada
-
-4. **Adicionar validação de e-mail**: 
-   - Simular envio de e-mail ou interceptar chamadas de API de notificação
-   - Validar conteúdo esperado (assunto, corpo com descrição do processo e unidades)
-
-5. **Adicionar teste de deselecção**: Validar que ao desselecionar uma unidade e confirmar, apenas as selecionadas são processadas.
-
-6. **Adicionar validação pós-cancelamento**: Após cancelar no Cenário 2, validar que nenhum registro foi criado no banco de dados.
-
-## Notas e inconsistências do requisito
-- **Ambiguidade em "unidades cujos mapas poderão ser aceitos"**: O requisito não clarifica se deve mostrar apenas unidades subordinadas diretas ou toda a hierarquia recursiva. O passo 2 menciona "subprocessos das unidades que compõem a hierarquia do usuário (sua própria unidade e subordinadas recursivamente)", sugerindo inclusão de toda a hierarquia.
-
-- **Falta clareza em dados de notificação**: O requisito especifica `[LISTA_UNIDADES_SUBORDINADAS_SELECIONADAS]` no e-mail, mas não clarifica se devem vir no formato de sigla, nome ou ambos, nem o separador (vírgula, quebra de linha, etc.).
-
-- **Inconsistência em "unidade de origem" vs "sigla"**: O passo 8.1 e 8.2 usam `[SIGLA_UNIDADE_ATUAL]` e `[SIGLA_UNIDADE_SUPERIOR]`, mas o passo 8.3 (alerta) usa `[SIGLA_UNIDADE_SUBPROCESSO]` que não foi definida anteriormente. Presume-se ser a unidade do subprocesso sendo aceito.
+## Observações metodológicas
+- Esta rodada incluiu leitura de helpers importados para reduzir falso negativo de cobertura indireta.
+- Classificação automática por evidência textual; recomenda-se validação humana dos itens `🟡` e `❌` antes da implementação final.

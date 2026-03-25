@@ -1,28 +1,61 @@
-# Alinhamento CDU-31 - Configurar sistema
+# Alinhamento CDU-31 - Reanálise (rodada 2)
 
-## Cobertura atual do teste
-O teste E2E (cdu-31.spec.ts) cobre:
-- Navegação para página de parâmetros via botão `btn-configuracoes`
-- Verificação da URL `/parametros` e heading "Parâmetros"
-- Visualização dos dois campos editáveis: "Dias para inativação de processos" e "Dias para indicação de alerta como novo"
-- Verificação do botão "Salvar configurações"
-- Preenchimento dos campos com valores (30 e 3)
-- Clique em salvar e validação da mensagem "Configurações salvas."
+## Artefatos analisados
+- Requisito: `etc/reqs/cdu-31.md`.
+- Teste E2E: `e2e/cdu-31.spec.ts` (1 cenários `test`, 0 `test.step`).
 
-## Lacunas em relação ao requisito
-- **Falta validação da efetividade imediata**: O requisito especifica que "O efeito das configurações deve ser imediato", mas o teste não valida que as configurações alteradas (30 e 3 dias) foram realmente aplicadas no sistema ou persistidas para uso.
-- **Falta teste de valores inválidos**: O requisito menciona que DIAS_INATIVACAO_PROCESSO deve ser "Valor inteiro, 1 ou mais". Não há validação de entrada de valores negativos, zero, decimais ou não-inteiros.
-- **Falta verificação de valores iniciais**: O teste não verifica quais eram os valores das configurações ANTES da alteração.
-- **Falta teste de múltiplas alterações**: Apenas um cenário de alteração é testado; não há validação de alterações subsequentes.
+## Resultado da comparação requisito x E2E
+- Itens do fluxo principal avaliados: **6**.
+- Status: **3 cobertos**, **3 parciais**, **0 não cobertos** (baseado em evidências textuais no spec e helpers).
 
-## Alterações necessárias no teste E2E
-- Adicionar verificação do estado inicial dos campos de entrada antes da alteração
-- Adicionar cenário de tentativa de preenchimento com valores inválidos (zero, negativo, letra) para confirmar validação
-- Adicionar verificação de persistência: após salvar, recarregar a página e confirmar que os valores salvos (30 e 3) aparecem nos campos
-- Adicionar verificação de que alterações subsequentes também funcionam
-- Considerar adicionar cenário de teste com valores mínimos e máximos válidos
+## Matriz de evidências
+- ✅ **[COBERTO]** 1. ADMIN clica no botão de configurações ('engrenagem') na barra de navegação
+  - Palavras-chave usadas: `admin, clica, botão, configurações, engrenagem, barra`
+  - Evidência (score 2): `e2e/cdu-31.spec.ts:14` -> `test('Cenários CDU-31: ADMIN navega, valida entradas e persiste alterações de configurações', async ({_resetAutomatic...`
+  - Evidência (score 1): `e2e/cdu-31.spec.ts:7` -> `* Ator: ADMIN`
+  - Evidência (score 1): `e2e/cdu-31.spec.ts:10` -> `* - Usuário logado como ADMIN`
+- 🟡 **[PARCIAL]** 2. O sistema mostra a tela Configurações com o valor atual das seguintes configurações, permitindo edição.
+  - Palavras-chave usadas: `mostra, configurações, valor, atual, seguintes, permitindo`
+  - Evidência (score 1): `e2e/cdu-31.spec.ts:14` -> `test('Cenários CDU-31: ADMIN navega, valida entradas e persiste alterações de configurações', async ({_resetAutomatic...`
+  - Evidência (score 1): `e2e/cdu-31.spec.ts:30` -> `const valorInicialInativacao = Number(await campoDiasInativacao.inputValue());`
+  - Evidência (score 1): `e2e/cdu-31.spec.ts:31` -> `const valorInicialAlerta = Number(await campoDiasAlertaNovo.inputValue());`
+- 🟡 **[PARCIAL]** 3. Dias para inativação de processos (referenciado neste documento como DIAS_INATIVACAO_PROCESSO): Dias depois da
+  - Palavras-chave usadas: `processos, dias_inativacao_processo, dias, inativação, referenciado, neste`
+  - Evidência (score 1): `e2e/cdu-31.spec.ts:19` -> `const campoDiasInativacao = page.getByLabel(TEXTOS.configuracoes.LABEL_DIAS_INATIVACAO);`
+  - Evidência (score 1): `e2e/cdu-31.spec.ts:20` -> `const campoDiasAlertaNovo = page.getByLabel(TEXTOS.configuracoes.LABEL_DIAS_ALERTA_NOVO);`
+  - Evidência (score 1): `e2e/cdu-31.spec.ts:23` -> `await expect(campoDiasInativacao).toBeVisible();`
+- ✅ **[COBERTO]** 4. Dias para indicação de alerta como novo (referenciado neste documento como DIAS_ALERTA_NOVO): Dias depois depois
+  - Palavras-chave usadas: `alerta, dias_alerta_novo, dias, indicação, novo, referenciado`
+  - Evidência (score 4): `e2e/cdu-31.spec.ts:20` -> `const campoDiasAlertaNovo = page.getByLabel(TEXTOS.configuracoes.LABEL_DIAS_ALERTA_NOVO);`
+  - Evidência (score 3): `e2e/cdu-31.spec.ts:24` -> `await expect(campoDiasAlertaNovo).toBeVisible();`
+  - Evidência (score 3): `e2e/cdu-31.spec.ts:28` -> `await expect(campoDiasAlertaNovo).toHaveValue(/\d+/);`
+- ✅ **[COBERTO]** 5. ADMIN altera os valores das configurações e clica em `Salvar`.
+  - Palavras-chave usadas: `admin, altera, valores, configurações, clica, salvar`
+  - Evidência (score 3): `e2e/cdu-31.spec.ts:14` -> `test('Cenários CDU-31: ADMIN navega, valida entradas e persiste alterações de configurações', async ({_resetAutomatic...`
+  - Evidência (score 1): `e2e/cdu-31.spec.ts:7` -> `* Ator: ADMIN`
+  - Evidência (score 1): `e2e/cdu-31.spec.ts:10` -> `* - Usuário logado como ADMIN`
+- 🟡 **[PARCIAL]** 6. O sistema mostra mensagem de confirmação e guarda as configurações internamente. O efeito das configurações deve ser
+  - Palavras-chave usadas: `mostra, mensagem, confirmação, guarda, configurações, internamente`
+  - Evidência (score 1): `e2e/cdu-31.spec.ts:14` -> `test('Cenários CDU-31: ADMIN navega, valida entradas e persiste alterações de configurações', async ({_resetAutomatic...`
 
-## Notas e inconsistências do requisito
-- O requisito menciona "mostra mensagem de confirmação", mas a forma exata não é especificada (tooltip, snackbar, modal, etc.). O teste valida "Configurações salvas.", confirmando que é uma mensagem de texto simples.
-- O requisito não especifica onde está o botão de configurações ("engrenagem na barra de navegação"), apenas que é um botão. O teste usa `btn-configuracoes`, que pode estar no menu de navegação, não especificando sua localização exata na UI.
-- Não está claro se as duas configurações são as ÚNICAS configurações do sistema ou se há outras que não devem ser alteradas pelo usuário.
+## Ajustes recomendados para próximo ciclo
+- Completar cobertura do item: **O sistema mostra a tela Configurações com o valor atual das seguintes configurações, permitindo edição.** (atualmente parcial).
+- Completar cobertura do item: **Dias para inativação de processos (referenciado neste documento como DIAS_INATIVACAO_PROCESSO): Dias depois da** (atualmente parcial).
+- Completar cobertura do item: **O sistema mostra mensagem de confirmação e guarda as configurações internamente. O efeito das configurações deve ser** (atualmente parcial).
+
+## Prontidão para o próximo PR de melhoria E2E
+- Status de entrada: **PRONTO**.
+- Motivos: base de análise e pendências objetivas definidas.
+- Checklist mínimo antes de codar:
+  - [ ] confirmar massa de dados/fixtures para cenário positivo e negativo;
+  - [ ] definir assert de regra de negócio + assert de efeito colateral;
+  - [ ] validar perfil/unidade necessários no cenário (quando aplicável);
+  - [ ] mapear se precisa teste de integração backend complementar.
+- Escopo sugerido para o próximo PR deste CDU:
+  - Completar cobertura do item: **O sistema mostra a tela Configurações com o valor atual das seguintes configurações, permitindo edição.** (atualmente parcial).
+  - Completar cobertura do item: **Dias para inativação de processos (referenciado neste documento como DIAS_INATIVACAO_PROCESSO): Dias depois da** (atualmente parcial).
+  - Completar cobertura do item: **O sistema mostra mensagem de confirmação e guarda as configurações internamente. O efeito das configurações deve ser** (atualmente parcial).
+
+## Observações metodológicas
+- Esta rodada incluiu leitura de helpers importados para reduzir falso negativo de cobertura indireta.
+- Classificação automática por evidência textual; recomenda-se validação humana dos itens `🟡` e `❌` antes da implementação final.

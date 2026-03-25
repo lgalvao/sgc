@@ -1,35 +1,166 @@
-# Alinhamento CDU-33 - Reabrir revisão de cadastro
+# Alinhamento CDU-33 - Reanálise (rodada 2)
 
-## Cobertura atual do teste
-O teste E2E (cdu-33.spec.ts) cobre:
-- Setup: Criação de processo de mapeamento, finalização e criação de processo de revisão com mapa homologado
-- Navegação para subprocesso de revisão da unidade (SECAO_212)
-- Verificação da situação "Mapa homologado"
-- Visualização e habilitação do botão "Reabrir revisão" (via `btn-reabrir-revisao`)
-- Abertura do modal com heading "Reabrir revisão"
-- Preenchimento de justificativa "Ajuste necessário"
-- Confirmação de reabertura
-- Validação de mudança de situação para "Revisão em andamento"
-- Validação de registro de movimentação com descrição "Reabertura de revisão de cadastro"
+## Artefatos analisados
+- Requisito: `etc/reqs/cdu-33.md`.
+- Teste E2E: `e2e/cdu-33.spec.ts` (2 cenários `test`, 0 `test.step`).
 
-## Lacunas em relação ao requisito
-- **Falta validação de e-mails**: O requisito especifica envio de notificações por e-mail para (8.1) unidade solicitante e (8.2) unidades superiores com templates específicos. Nenhuma validação é realizada.
-- **Falta validação de alertas internos**: O requisito especifica criação de alertas (seção 9.1 e 9.2) com descrições específicas. O teste não valida a existência ou conteúdo dos alertas.
-- **Falta validação de campo Observação na movimentação**: O requisito especifica que a movimentação deve incluir campo `Observação: [JUSTIFICATIVA]` (linha 24). O teste valida apenas a descrição.
-- **Falta validação de dados completos da movimentação**: Não há validação de Data/hora, Unidade origem (ADMIN), Unidade destino [SIGLA_UNIDADE].
-- **Falta mensagem de sucesso**: O requisito especifica "O sistema exibe mensagem de sucesso 'Revisão reaberta'" (linha 72). O teste não valida essa mensagem.
-- **Falta teste de cancelamento do modal**: O teste não testa o cenário de usuário abrindo o modal e cancelando, diferente do CDU-32.
+## Resultado da comparação requisito x E2E
+- Itens do fluxo principal avaliados: **29**.
+- Status: **10 cobertos**, **14 parciais**, **5 não cobertos** (baseado em evidências textuais no spec e helpers).
 
-## Alterações necessárias no teste E2E
-- Adicionar validação de mensagem de sucesso "Revisão reaberta"
-- Adicionar validação de envio de e-mails (tanto para unidade solicitante quanto para unidades superiores)
-- Adicionar validação de alertas internos criados (descrições conforme requisito)
-- Adicionar validação de campo "Observação" da movimentação com a justificativa fornecida
-- Adicionar validação de Data/hora, Unidade origem, Unidade destino da movimentação
-- Adicionar teste de cancelamento do modal (abrindo e clicando em Cancelar)
-- Considerar adicionar teste com unidades superiores para validar escalação de notificações
+## Matriz de evidências
+- ✅ **[COBERTO]** 1. O ADMIN acessa o Painel.
+  - Palavras-chave usadas: `admin, acessa, painel`
+  - Evidência (score 2): `e2e/cdu-33.spec.ts:6` -> `import {acessarSubprocessoAdmin} from './helpers/helpers-analise.js';`
+  - Evidência (score 2): `e2e/cdu-33.spec.ts:51` -> `await acessarSubprocessoAdmin(page, descRevisao, UNIDADE_ALVO);`
+  - Evidência (score 2): `e2e/cdu-33.spec.ts:60` -> `await acessarSubprocessoAdmin(page, descRevisao, UNIDADE_ALVO);`
+- ✅ **[COBERTO]** 2. O ADMIN seleciona o subprocesso da unidade solicitante.
+  - Palavras-chave usadas: `subprocesso, unidade, admin, seleciona, solicitante`
+  - Evidência (score 3): `e2e/cdu-33.spec.ts:51` -> `await acessarSubprocessoAdmin(page, descRevisao, UNIDADE_ALVO);`
+  - Evidência (score 3): `e2e/cdu-33.spec.ts:60` -> `await acessarSubprocessoAdmin(page, descRevisao, UNIDADE_ALVO);`
+  - Evidência (score 2): `e2e/cdu-33.spec.ts:6` -> `import {acessarSubprocessoAdmin} from './helpers/helpers-analise.js';`
+- ✅ **[COBERTO]** 3. O ADMIN seleciona a opção "Reabrir revisão de cadastro".
+  - Palavras-chave usadas: `admin, seleciona, opção, reabrir, revisão, cadastro`
+  - Evidência (score 3): `e2e/cdu-33.spec.ts:12` -> `* CDU-33 - Reabrir revisão de cadastro`
+  - Evidência (score 3): `e2e/cdu-33.spec.ts:20` -> `test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {`
+  - Evidência (score 3): `e2e/cdu-33.spec.ts:55` -> `test('Cenários CDU-33: ADMIN reabre revisão de cadastro', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {`
+- 🟡 **[PARCIAL]** 4. O sistema solicita uma justificativa.
+  - Palavras-chave usadas: `solicita, justificativa`
+  - Evidência (score 1): `e2e/cdu-33.spec.ts:56` -> `const textoJustificativa = 'Ajuste necessário';`
+  - Evidência (score 1): `e2e/cdu-33.spec.ts:83` -> `await page.getByTestId('inp-justificativa-reabrir').fill(textoJustificativa);`
+- 🟡 **[PARCIAL]** 5. O usuário informa a justificativa e confirma.
+  - Palavras-chave usadas: `informa, justificativa, confirma`
+  - Evidência (score 1): `e2e/cdu-33.spec.ts:39` -> `await page.getByTestId('btn-finalizar-processo-confirmar').click();`
+  - Evidência (score 1): `e2e/cdu-33.spec.ts:56` -> `const textoJustificativa = 'Ajuste necessário';`
+  - Evidência (score 1): `e2e/cdu-33.spec.ts:74` -> `await expect(page.getByTestId('btn-confirmar-reabrir')).toBeDisabled();`
+- 🟡 **[PARCIAL]** 6. O sistema altera a situação do subprocesso para `REVISAO_CADASTRO_EM_ANDAMENTO`.
+  - Palavras-chave usadas: `situação, subprocesso, altera, revisao_cadastro_em_andamento`
+  - Evidência (score 1): `e2e/cdu-33.spec.ts:6` -> `import {acessarSubprocessoAdmin} from './helpers/helpers-analise.js';`
+  - Evidência (score 1): `e2e/cdu-33.spec.ts:18` -> `* - Subprocesso de revisão com mapa homologado`
+  - Evidência (score 1): `e2e/cdu-33.spec.ts:51` -> `await acessarSubprocessoAdmin(page, descRevisao, UNIDADE_ALVO);`
+- 🟡 **[PARCIAL]** 7. O sistema registra uma movimentação para o subprocesso com os campos:
+  - Palavras-chave usadas: `subprocesso, registra, movimentação`
+  - Evidência (score 1): `e2e/cdu-33.spec.ts:6` -> `import {acessarSubprocessoAdmin} from './helpers/helpers-analise.js';`
+  - Evidência (score 1): `e2e/cdu-33.spec.ts:18` -> `* - Subprocesso de revisão com mapa homologado`
+  - Evidência (score 1): `e2e/cdu-33.spec.ts:51` -> `await acessarSubprocessoAdmin(page, descRevisao, UNIDADE_ALVO);`
+- ❌ **[NAO_COBERTO]** 8. `Data/hora`: Data/hora atual
+  - Palavras-chave usadas: `data/hora, atual`
+  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
+- ✅ **[COBERTO]** 9. `Unidade origem`: ADMIN
+  - Palavras-chave usadas: `unidade, origem, admin`
+  - Evidência (score 2): `e2e/cdu-33.spec.ts:51` -> `await acessarSubprocessoAdmin(page, descRevisao, UNIDADE_ALVO);`
+  - Evidência (score 2): `e2e/cdu-33.spec.ts:60` -> `await acessarSubprocessoAdmin(page, descRevisao, UNIDADE_ALVO);`
+  - Evidência (score 1): `e2e/cdu-33.spec.ts:6` -> `import {acessarSubprocessoAdmin} from './helpers/helpers-analise.js';`
+- 🟡 **[PARCIAL]** 10. `Unidade destino`: [SIGLA_UNIDADE_SUBPROCESSO]
+  - Palavras-chave usadas: `unidade, sigla_unidade_subprocesso, destino`
+  - Evidência (score 1): `e2e/cdu-33.spec.ts:21` -> `const UNIDADE_ALVO = 'SECAO_212';`
+  - Evidência (score 1): `e2e/cdu-33.spec.ts:33` -> `unidade: UNIDADE_ALVO`
+  - Evidência (score 1): `e2e/cdu-33.spec.ts:46` -> `unidade: UNIDADE_ALVO`
+- ✅ **[COBERTO]** 11. `Descrição`: 'Reabertura de revisão de cadastro'
+  - Palavras-chave usadas: `descrição, reabertura, revisão, cadastro`
+  - Evidência (score 3): `e2e/cdu-33.spec.ts:89` -> `await expect(page.getByTestId('tbl-movimentacoes')).toContainText(/Reabertura de revisão de cadastro/i);`
+  - Evidência (score 2): `e2e/cdu-33.spec.ts:12` -> `* CDU-33 - Reabrir revisão de cadastro`
+  - Evidência (score 2): `e2e/cdu-33.spec.ts:20` -> `test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {`
+- 🟡 **[PARCIAL]** 12. `Observação`: [JUSTIFICATIVA]
+  - Palavras-chave usadas: `observação, justificativa`
+  - Evidência (score 1): `e2e/cdu-33.spec.ts:56` -> `const textoJustificativa = 'Ajuste necessário';`
+  - Evidência (score 1): `e2e/cdu-33.spec.ts:83` -> `await page.getByTestId('inp-justificativa-reabrir').fill(textoJustificativa);`
+- 🟡 **[PARCIAL]** 13. O sistema envia notificações por e-mail para a unidade solicitante e unidades superiores.
+  - Palavras-chave usadas: `unidade, unidades, envia, notificações, e-mail, solicitante`
+  - Evidência (score 1): `e2e/cdu-33.spec.ts:21` -> `const UNIDADE_ALVO = 'SECAO_212';`
+  - Evidência (score 1): `e2e/cdu-33.spec.ts:33` -> `unidade: UNIDADE_ALVO`
+  - Evidência (score 1): `e2e/cdu-33.spec.ts:46` -> `unidade: UNIDADE_ALVO`
+- 🟡 **[PARCIAL]** 14. Para a unidade solicitante (operacional/interoperacional):
+  - Palavras-chave usadas: `unidade, solicitante, operacional/interoperacional`
+  - Evidência (score 1): `e2e/cdu-33.spec.ts:21` -> `const UNIDADE_ALVO = 'SECAO_212';`
+  - Evidência (score 1): `e2e/cdu-33.spec.ts:33` -> `unidade: UNIDADE_ALVO`
+  - Evidência (score 1): `e2e/cdu-33.spec.ts:46` -> `unidade: UNIDADE_ALVO`
+- ❌ **[NAO_COBERTO]** 15. Para as unidades superiores:
+  - Palavras-chave usadas: `unidades, superiores`
+  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
+- 🟡 **[PARCIAL]** 16. O sistema cria internamente alertas:
+  - Palavras-chave usadas: `alertas, cria, internamente`
+  - Evidência (score 1): `e2e/cdu-33.spec.ts:3` -> `criarProcessoMapaHomologadoFixture,`
+  - Evidência (score 1): `e2e/cdu-33.spec.ts:4` -> `criarProcessoRevisaoMapaHomologadoFixture`
+  - Evidência (score 1): `e2e/cdu-33.spec.ts:28` -> `// PREPARAÇÃO 0 - CRIAR MAPA VIGENTE`
+- 🟡 **[PARCIAL]** 17. Para a unidade solicitante:
+  - Palavras-chave usadas: `unidade, solicitante`
+  - Evidência (score 1): `e2e/cdu-33.spec.ts:21` -> `const UNIDADE_ALVO = 'SECAO_212';`
+  - Evidência (score 1): `e2e/cdu-33.spec.ts:33` -> `unidade: UNIDADE_ALVO`
+  - Evidência (score 1): `e2e/cdu-33.spec.ts:46` -> `unidade: UNIDADE_ALVO`
+- ✅ **[COBERTO]** 18. `Descrição`: "Revisão de cadastro reaberta"
+  - Palavras-chave usadas: `descrição, revisão, cadastro, reaberta`
+  - Evidência (score 2): `e2e/cdu-33.spec.ts:12` -> `* CDU-33 - Reabrir revisão de cadastro`
+  - Evidência (score 2): `e2e/cdu-33.spec.ts:20` -> `test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {`
+  - Evidência (score 2): `e2e/cdu-33.spec.ts:55` -> `test('Cenários CDU-33: ADMIN reabre revisão de cadastro', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {`
+- 🟡 **[PARCIAL]** 19. `Processo`: [DESCRICAO_PROCESSO]
+  - Palavras-chave usadas: `processo, descricao_processo`
+  - Evidência (score 1): `e2e/cdu-33.spec.ts:3` -> `criarProcessoMapaHomologadoFixture,`
+  - Evidência (score 1): `e2e/cdu-33.spec.ts:4` -> `criarProcessoRevisaoMapaHomologadoFixture`
+  - Evidência (score 1): `e2e/cdu-33.spec.ts:5` -> `} from './fixtures/fixtures-processos.js';`
+- ❌ **[NAO_COBERTO]** 20. `Data/hora`: Data/hora atual
+  - Palavras-chave usadas: `data/hora, atual`
+  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
+- ✅ **[COBERTO]** 21. `Unidade de origem`: ADMIN
+  - Palavras-chave usadas: `unidade, origem, admin`
+  - Evidência (score 2): `e2e/cdu-33.spec.ts:51` -> `await acessarSubprocessoAdmin(page, descRevisao, UNIDADE_ALVO);`
+  - Evidência (score 2): `e2e/cdu-33.spec.ts:60` -> `await acessarSubprocessoAdmin(page, descRevisao, UNIDADE_ALVO);`
+  - Evidência (score 1): `e2e/cdu-33.spec.ts:6` -> `import {acessarSubprocessoAdmin} from './helpers/helpers-analise.js';`
+- 🟡 **[PARCIAL]** 22. `Unidade de destino`: [SIGLA_UNIDADE]
+  - Palavras-chave usadas: `unidade, sigla_unidade, destino`
+  - Evidência (score 1): `e2e/cdu-33.spec.ts:21` -> `const UNIDADE_ALVO = 'SECAO_212';`
+  - Evidência (score 1): `e2e/cdu-33.spec.ts:33` -> `unidade: UNIDADE_ALVO`
+  - Evidência (score 1): `e2e/cdu-33.spec.ts:46` -> `unidade: UNIDADE_ALVO`
+- ❌ **[NAO_COBERTO]** 23. Para as unidades superiores:
+  - Palavras-chave usadas: `unidades, superiores`
+  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
+- ✅ **[COBERTO]** 24. `Descrição`: "Revisão de cadastro da unidade [SIGLA_UNIDADE_SUBORDINADA] reaberta"
+  - Palavras-chave usadas: `unidade, sigla_unidade_subordinada, descrição, revisão, cadastro, reaberta`
+  - Evidência (score 2): `e2e/cdu-33.spec.ts:12` -> `* CDU-33 - Reabrir revisão de cadastro`
+  - Evidência (score 2): `e2e/cdu-33.spec.ts:20` -> `test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {`
+  - Evidência (score 2): `e2e/cdu-33.spec.ts:55` -> `test('Cenários CDU-33: ADMIN reabre revisão de cadastro', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {`
+- 🟡 **[PARCIAL]** 25. `Processo`: [DESCRICAO_PROCESSO]
+  - Palavras-chave usadas: `processo, descricao_processo`
+  - Evidência (score 1): `e2e/cdu-33.spec.ts:3` -> `criarProcessoMapaHomologadoFixture,`
+  - Evidência (score 1): `e2e/cdu-33.spec.ts:4` -> `criarProcessoRevisaoMapaHomologadoFixture`
+  - Evidência (score 1): `e2e/cdu-33.spec.ts:5` -> `} from './fixtures/fixtures-processos.js';`
+- ❌ **[NAO_COBERTO]** 26. `Data/hora`: Data/hora atual
+  - Palavras-chave usadas: `data/hora, atual`
+  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
+- ✅ **[COBERTO]** 27. `Unidade de origem`: ADMIN
+  - Palavras-chave usadas: `unidade, origem, admin`
+  - Evidência (score 2): `e2e/cdu-33.spec.ts:51` -> `await acessarSubprocessoAdmin(page, descRevisao, UNIDADE_ALVO);`
+  - Evidência (score 2): `e2e/cdu-33.spec.ts:60` -> `await acessarSubprocessoAdmin(page, descRevisao, UNIDADE_ALVO);`
+  - Evidência (score 1): `e2e/cdu-33.spec.ts:6` -> `import {acessarSubprocessoAdmin} from './helpers/helpers-analise.js';`
+- 🟡 **[PARCIAL]** 28. `Unidade de destino`: [SIGLA_UNIDADE_SUPERIOR]
+  - Palavras-chave usadas: `unidade, sigla_unidade_superior, destino`
+  - Evidência (score 1): `e2e/cdu-33.spec.ts:21` -> `const UNIDADE_ALVO = 'SECAO_212';`
+  - Evidência (score 1): `e2e/cdu-33.spec.ts:33` -> `unidade: UNIDADE_ALVO`
+  - Evidência (score 1): `e2e/cdu-33.spec.ts:46` -> `unidade: UNIDADE_ALVO`
+- ✅ **[COBERTO]** 29. O sistema exibe mensagem de sucesso "Revisão reaberta".
+  - Palavras-chave usadas: `exibe, mensagem, sucesso, revisão, reaberta`
+  - Evidência (score 2): `e2e/cdu-33.spec.ts:87` -> `await verificarAppAlert(page, /Revisão reaberta/i);`
+  - Evidência (score 1): `e2e/cdu-33.spec.ts:12` -> `* CDU-33 - Reabrir revisão de cadastro`
+  - Evidência (score 1): `e2e/cdu-33.spec.ts:18` -> `* - Subprocesso de revisão com mapa homologado`
 
-## Notas e inconsistências do requisito
-- Situação na linha 6 refere-se a "REVISAO_CADASTRO_EM_ANDAMENTO", mas no teste é validada como "Revisão em andamento" (texto formatado). Há correspondência?
-- Requisito menciona "unidades solicitante" (linha 28), mas não fica claro se é a unidade do subprocesso ou outra entidade. Contexto anterior (CDU-32) esclarece que é a unidade do subprocesso.
-- Diferença entre CDU-32 e CDU-33: CDU-32 gera movimentação com "Descrição: 'Reabertura de cadastro'" enquanto CDU-33 gera "Descrição: 'Reabertura de revisão de cadastro'" e adiciona "Observação: [JUSTIFICATIVA]". Estrutura de movimentação difere.
+## Ajustes recomendados para próximo ciclo
+- Completar cobertura do item: **O sistema solicita uma justificativa.** (atualmente parcial).
+- Completar cobertura do item: **O usuário informa a justificativa e confirma.** (atualmente parcial).
+- Completar cobertura do item: **O sistema altera a situação do subprocesso para `REVISAO_CADASTRO_EM_ANDAMENTO`.** (atualmente parcial).
+
+## Prontidão para o próximo PR de melhoria E2E
+- Status de entrada: **PRONTO_COM_GAPS**.
+- Motivos: há itens sem cobertura E2E.
+- Checklist mínimo antes de codar:
+  - [ ] confirmar massa de dados/fixtures para cenário positivo e negativo;
+  - [ ] definir assert de regra de negócio + assert de efeito colateral;
+  - [ ] validar perfil/unidade necessários no cenário (quando aplicável);
+  - [ ] mapear se precisa teste de integração backend complementar.
+- Escopo sugerido para o próximo PR deste CDU:
+  - Completar cobertura do item: **O sistema solicita uma justificativa.** (atualmente parcial).
+  - Completar cobertura do item: **O usuário informa a justificativa e confirma.** (atualmente parcial).
+  - Completar cobertura do item: **O sistema altera a situação do subprocesso para `REVISAO_CADASTRO_EM_ANDAMENTO`.** (atualmente parcial).
+
+## Observações metodológicas
+- Esta rodada incluiu leitura de helpers importados para reduzir falso negativo de cobertura indireta.
+- Classificação automática por evidência textual; recomenda-se validação humana dos itens `🟡` e `❌` antes da implementação final.

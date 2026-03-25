@@ -1,70 +1,161 @@
-# Alinhamento CDU-26 - Homologar validação de mapas de competências em bloco
+# Alinhamento CDU-26 - Reanálise (rodada 2)
 
-## Cobertura atual do teste
-O teste cobre:
-- **Setup preparatório**: Criação de processo, disponibilização de atividades, homologação de cadastro por múltiplas gestores, criação/disponibilização de mapa, validação e aceite de mapa pelos gestores.
-- **Cenário 1**: Verificação de visibilidade e habilitação do botão "Homologar mapas em bloco" após ADMIN acessar processo em andamento.
-- **Cenário 2**: Verificação de abertura do modal, validação de título, texto, lista de unidades, tabela e botões.
-- **Cenário 3**: Verificação de cancelamento do modal e permanência na tela "Detalhes do processo".
+## Artefatos analisados
+- Requisito: `etc/reqs/cdu-26.md`.
+- Teste E2E: `e2e/cdu-26.spec.ts` (5 cenários `test`, 0 `test.step`).
 
-## Lacunas em relação ao requisito
-**Lacunas críticas:**
+## Resultado da comparação requisito x E2E
+- Itens do fluxo principal avaliados: **27**.
+- Status: **16 cobertos**, **9 parciais**, **2 não cobertos** (baseado em evidências textuais no spec e helpers).
 
-1. **Falta validação de pré-condições**: O requisito exige subprocessos em situações 'Mapa validado' **OU** 'Mapa com sugestões'. O teste apenas valida com 'Mapa validado'. Não há cenário com 'Mapa com sugestões'.
+## Matriz de evidências
+- ✅ **[COBERTO]** 1. No painel, o usuário acessa um processo de mapeamento ou de revisão, que esteja em andamento.
+  - Palavras-chave usadas: `processo, painel, acessa, mapeamento, revisão, esteja`
+  - Evidência (score 2): `e2e/cdu-26.spec.ts:3` -> `import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';`
+  - Evidência (score 2): `e2e/cdu-26.spec.ts:14` -> `* 1. ADMIN acessa processo em andamento`
+  - Evidência (score 2): `e2e/cdu-26.spec.ts:26` -> `const descProcesso = `Mapeamento CDU-26 ${timestamp}`;`
+- ✅ **[COBERTO]** 2. O sistema mostra tela `Detalhes do processo`.
+  - Palavras-chave usadas: `processo, mostra, detalhes`
+  - Evidência (score 3): `e2e/cdu-26.spec.ts:15` -> `* 2. Sistema mostra Detalhes do processo`
+  - Evidência (score 2): `e2e/cdu-26.spec.ts:3` -> `import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';`
+  - Evidência (score 2): `e2e/cdu-26.spec.ts:37` -> `await acessarDetalhesProcesso(page, descProcesso);`
+- ✅ **[COBERTO]** 3. O sistema identifica que existem unidades subordinadas com subprocessos elegíveis para homologação em bloco do mapa
+  - Palavras-chave usadas: `unidades, subprocessos, identifica, existem, subordinadas, elegíveis`
+  - Evidência (score 3): `e2e/cdu-26.spec.ts:16` -> `* 3. Sistema identifica unidades elegíveis para homologação`
+  - Evidência (score 1): `e2e/cdu-26.spec.ts:18` -> `* 5. Sistema abre modal com lista de unidades`
+  - Evidência (score 1): `e2e/cdu-26.spec.ts:38` -> `await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();`
+- ✅ **[COBERTO]** 4. Na seção de unidades participantes, abaixo da árvore de unidades, sistema mostra o botão
+  - Palavras-chave usadas: `unidades, participantes, abaixo, árvore, mostra, botão`
+  - Evidência (score 2): `e2e/cdu-26.spec.ts:38` -> `await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();`
+  - Evidência (score 2): `e2e/cdu-26.spec.ts:55` -> `await expect(modal.getByText(/Selecione abaixo as unidades cujos mapas deverão ser homologados/i)).toBeVisible();`
+  - Evidência (score 2): `e2e/cdu-26.spec.ts:76` -> `await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();`
+- ✅ **[COBERTO]** 5. O usuário clica no botão `Homologar mapas em bloco`.
+  - Palavras-chave usadas: `clica, botão, homologar, mapas, bloco`
+  - Evidência (score 5): `e2e/cdu-26.spec.ts:17` -> `* 4. ADMIN clica no botão 'Homologar mapas em bloco'`
+  - Evidência (score 4): `e2e/cdu-26.spec.ts:36` -> `test('Cenario 1: ADMIN visualiza botão Homologar mapas em bloco', async ({_resetAutomatico, page, _autenticadoComoAdm...`
+  - Evidência (score 3): `e2e/cdu-26.spec.ts:6` -> `* CDU-26 - Homologar validação de mapas de competências em bloco`
+- ✅ **[COBERTO]** 6. O sistema abre modal de confirmação, com os elementos a seguir:
+  - Palavras-chave usadas: `abre, modal, confirmação, elementos, seguir`
+  - Evidência (score 2): `e2e/cdu-26.spec.ts:18` -> `* 5. Sistema abre modal com lista de unidades`
+  - Evidência (score 2): `e2e/cdu-26.spec.ts:45` -> `test('Cenario 2: ADMIN abre modal de homologação de mapa em bloco', async ({_resetAutomatico, page, _autenticadoComoA...`
+  - Evidência (score 1): `e2e/cdu-26.spec.ts:52` -> `const modal = page.getByRole('dialog');`
+- ✅ **[COBERTO]** 7. Título "Homologação de mapa em bloco";
+  - Palavras-chave usadas: `título, homologação, mapa, bloco`
+  - Evidência (score 3): `e2e/cdu-26.spec.ts:45` -> `test('Cenario 2: ADMIN abre modal de homologação de mapa em bloco', async ({_resetAutomatico, page, _autenticadoComoA...`
+  - Evidência (score 3): `e2e/cdu-26.spec.ts:54` -> `await expect(modal.getByText(/Homologação de mapa em bloco/i)).toBeVisible();`
+  - Evidência (score 3): `e2e/cdu-26.spec.ts:63` -> `test('Cenario 3: Cancelar homologação de mapa em bloco', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {`
+- ✅ **[COBERTO]** 8. Texto "Selecione abaixo as unidades cujos mapas deverão ser homologados:";
+  - Palavras-chave usadas: `unidades, texto, selecione, abaixo, cujos, mapas`
+  - Evidência (score 5): `e2e/cdu-26.spec.ts:55` -> `await expect(modal.getByText(/Selecione abaixo as unidades cujos mapas deverão ser homologados/i)).toBeVisible();`
+  - Evidência (score 1): `e2e/cdu-26.spec.ts:6` -> `* CDU-26 - Homologar validação de mapas de competências em bloco`
+  - Evidência (score 1): `e2e/cdu-26.spec.ts:16` -> `* 3. Sistema identifica unidades elegíveis para homologação`
+- ✅ **[COBERTO]** 9. Lista das unidades operacionais ou interoperacionais subordinadas cujos mapas poderão ser homologados, sendo
+  - Palavras-chave usadas: `unidades, lista, operacionais, interoperacionais, subordinadas, cujos`
+  - Evidência (score 2): `e2e/cdu-26.spec.ts:18` -> `* 5. Sistema abre modal com lista de unidades`
+  - Evidência (score 2): `e2e/cdu-26.spec.ts:55` -> `await expect(modal.getByText(/Selecione abaixo as unidades cujos mapas deverão ser homologados/i)).toBeVisible();`
+  - Evidência (score 1): `e2e/cdu-26.spec.ts:16` -> `* 3. Sistema identifica unidades elegíveis para homologação`
+- ✅ **[COBERTO]** 10. Botão `Cancelar` e botão `Homologar`.
+  - Palavras-chave usadas: `botão, cancelar, homologar`
+  - Evidência (score 2): `e2e/cdu-26.spec.ts:17` -> `* 4. ADMIN clica no botão 'Homologar mapas em bloco'`
+  - Evidência (score 2): `e2e/cdu-26.spec.ts:36` -> `test('Cenario 1: ADMIN visualiza botão Homologar mapas em bloco', async ({_resetAutomatico, page, _autenticadoComoAdm...`
+  - Evidência (score 1): `e2e/cdu-26.spec.ts:6` -> `* CDU-26 - Homologar validação de mapas de competências em bloco`
+- 🟡 **[PARCIAL]** 11. Caso o usuário escolha o botão `Cancelar`, o sistema interrompe a operação, permanecendo na tela Detalhes do
+  - Palavras-chave usadas: `escolha, botão, cancelar, interrompe, operação, permanecendo`
+  - Evidência (score 1): `e2e/cdu-26.spec.ts:17` -> `* 4. ADMIN clica no botão 'Homologar mapas em bloco'`
+  - Evidência (score 1): `e2e/cdu-26.spec.ts:36` -> `test('Cenario 1: ADMIN visualiza botão Homologar mapas em bloco', async ({_resetAutomatico, page, _autenticadoComoAdm...`
+  - Evidência (score 1): `e2e/cdu-26.spec.ts:57` -> `await expect(modal.getByRole('button', {name: /Cancelar/i})).toBeVisible();`
+- ✅ **[COBERTO]** 12. O usuário clica em `Homologar`.
+  - Palavras-chave usadas: `clica, homologar`
+  - Evidência (score 2): `e2e/cdu-26.spec.ts:17` -> `* 4. ADMIN clica no botão 'Homologar mapas em bloco'`
+  - Evidência (score 1): `e2e/cdu-26.spec.ts:6` -> `* CDU-26 - Homologar validação de mapas de competências em bloco`
+  - Evidência (score 1): `e2e/cdu-26.spec.ts:22` -> `test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {`
+- ✅ **[COBERTO]** 13. O sistema atua, para cada unidade selecionada, da seguinte forma:
+  - Palavras-chave usadas: `unidade, atua, cada, selecionada, seguinte, forma`
+  - Evidência (score 2): `e2e/cdu-26.spec.ts:20` -> `* 7. Sistema executa homologação para cada unidade`
+  - Evidência (score 2): `e2e/cdu-26.spec.ts:90` -> `// Unidade deve aparecer marcada (checkbox selecionado por padrão)`
+  - Evidência (score 1): `e2e/cdu-26.spec.ts:16` -> `* 3. Sistema identifica unidades elegíveis para homologação`
+- 🟡 **[PARCIAL]** 14. O sistema registra uma movimentação para o subprocesso:
+  - Palavras-chave usadas: `subprocesso, registra, movimentação`
+  - Evidência (score 1): `e2e/cdu-26.spec.ts:11` -> `* - Subprocesso nas situações 'Mapa validado' ou 'Mapa com sugestões'`
+- ❌ **[NAO_COBERTO]** 15. `Data/hora`: [Data/hora atual]
+  - Palavras-chave usadas: `data/hora, atual`
+  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
+- 🟡 **[PARCIAL]** 16. `Unidade origem`: "ADMIN"
+  - Palavras-chave usadas: `unidade, origem, admin`
+  - Evidência (score 1): `e2e/cdu-26.spec.ts:8` -> `* Ator: ADMIN`
+  - Evidência (score 1): `e2e/cdu-26.spec.ts:14` -> `* 1. ADMIN acessa processo em andamento`
+  - Evidência (score 1): `e2e/cdu-26.spec.ts:16` -> `* 3. Sistema identifica unidades elegíveis para homologação`
+- 🟡 **[PARCIAL]** 17. `Unidade destino`: "ADMIN"
+  - Palavras-chave usadas: `unidade, destino, admin`
+  - Evidência (score 1): `e2e/cdu-26.spec.ts:8` -> `* Ator: ADMIN`
+  - Evidência (score 1): `e2e/cdu-26.spec.ts:14` -> `* 1. ADMIN acessa processo em andamento`
+  - Evidência (score 1): `e2e/cdu-26.spec.ts:16` -> `* 3. Sistema identifica unidades elegíveis para homologação`
+- ✅ **[COBERTO]** 18. `Descrição`: "Mapa de competências homologado"
+  - Palavras-chave usadas: `competências, descrição, mapa, homologado`
+  - Evidência (score 2): `e2e/cdu-26.spec.ts:6` -> `* CDU-26 - Homologar validação de mapas de competências em bloco`
+  - Evidência (score 2): `e2e/cdu-26.spec.ts:55` -> `await expect(modal.getByText(/Selecione abaixo as unidades cujos mapas deverão ser homologados/i)).toBeVisible();`
+  - Evidência (score 1): `e2e/cdu-26.spec.ts:2` -> `import {criarProcessoMapaValidadoFixture, validarProcessoFixture} from './fixtures/fixtures-processos.js';`
+- ✅ **[COBERTO]** 19. O sistema altera a situação do subprocesso da unidade para 'Mapa homologado'.
+  - Palavras-chave usadas: `situação, subprocesso, unidade, altera, mapa, homologado`
+  - Evidência (score 3): `e2e/cdu-26.spec.ts:55` -> `await expect(modal.getByText(/Selecione abaixo as unidades cujos mapas deverão ser homologados/i)).toBeVisible();`
+  - Evidência (score 2): `e2e/cdu-26.spec.ts:11` -> `* - Subprocesso nas situações 'Mapa validado' ou 'Mapa com sugestões'`
+  - Evidência (score 1): `e2e/cdu-26.spec.ts:2` -> `import {criarProcessoMapaValidadoFixture, validarProcessoFixture} from './fixtures/fixtures-processos.js';`
+- 🟡 **[PARCIAL]** 20. O sistema cria internamente um alerta:
+  - Palavras-chave usadas: `alerta, cria, internamente`
+  - Evidência (score 1): `e2e/cdu-26.spec.ts:2` -> `import {criarProcessoMapaValidadoFixture, validarProcessoFixture} from './fixtures/fixtures-processos.js';`
+  - Evidência (score 1): `e2e/cdu-26.spec.ts:29` -> `const processo = await criarProcessoMapaValidadoFixture(request, {`
+- ✅ **[COBERTO]** 21. `Descrição`: "Mapa de competências da unidade [SIGLA_UNIDADE_SUBPROCESSO] homologado"
+  - Palavras-chave usadas: `competências, unidade, sigla_unidade_subprocesso, descrição, mapa, homologado`
+  - Evidência (score 3): `e2e/cdu-26.spec.ts:55` -> `await expect(modal.getByText(/Selecione abaixo as unidades cujos mapas deverão ser homologados/i)).toBeVisible();`
+  - Evidência (score 2): `e2e/cdu-26.spec.ts:6` -> `* CDU-26 - Homologar validação de mapas de competências em bloco`
+  - Evidência (score 1): `e2e/cdu-26.spec.ts:2` -> `import {criarProcessoMapaValidadoFixture, validarProcessoFixture} from './fixtures/fixtures-processos.js';`
+- 🟡 **[PARCIAL]** 22. `Processo`: [DESCRIÇÃO_PROCESSO]
+  - Palavras-chave usadas: `processo, descrição_processo`
+  - Evidência (score 1): `e2e/cdu-26.spec.ts:2` -> `import {criarProcessoMapaValidadoFixture, validarProcessoFixture} from './fixtures/fixtures-processos.js';`
+  - Evidência (score 1): `e2e/cdu-26.spec.ts:3` -> `import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';`
+  - Evidência (score 1): `e2e/cdu-26.spec.ts:11` -> `* - Subprocesso nas situações 'Mapa validado' ou 'Mapa com sugestões'`
+- ❌ **[NAO_COBERTO]** 23. `Data/hora`: [Data/hora atual]
+  - Palavras-chave usadas: `data/hora, atual`
+  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
+- 🟡 **[PARCIAL]** 24. `Unidade de origem`: ADMIN
+  - Palavras-chave usadas: `unidade, origem, admin`
+  - Evidência (score 1): `e2e/cdu-26.spec.ts:8` -> `* Ator: ADMIN`
+  - Evidência (score 1): `e2e/cdu-26.spec.ts:14` -> `* 1. ADMIN acessa processo em andamento`
+  - Evidência (score 1): `e2e/cdu-26.spec.ts:16` -> `* 3. Sistema identifica unidades elegíveis para homologação`
+- 🟡 **[PARCIAL]** 25. `Unidade de destino`: [SIGLA_UNIDADE_SUBPROCESSO]
+  - Palavras-chave usadas: `unidade, sigla_unidade_subprocesso, destino`
+  - Evidência (score 1): `e2e/cdu-26.spec.ts:16` -> `* 3. Sistema identifica unidades elegíveis para homologação`
+  - Evidência (score 1): `e2e/cdu-26.spec.ts:18` -> `* 5. Sistema abre modal com lista de unidades`
+  - Evidência (score 1): `e2e/cdu-26.spec.ts:20` -> `* 7. Sistema executa homologação para cada unidade`
+- 🟡 **[PARCIAL]** 26. O sistema envia notificação por e-mail para a unidade do subprocesso:
+  - Palavras-chave usadas: `unidade, subprocesso, envia, notificação, e-mail`
+  - Evidência (score 1): `e2e/cdu-26.spec.ts:11` -> `* - Subprocesso nas situações 'Mapa validado' ou 'Mapa com sugestões'`
+  - Evidência (score 1): `e2e/cdu-26.spec.ts:16` -> `* 3. Sistema identifica unidades elegíveis para homologação`
+  - Evidência (score 1): `e2e/cdu-26.spec.ts:18` -> `* 5. Sistema abre modal com lista de unidades`
+- ✅ **[COBERTO]** 27. O sistema mostra mensagem de confirmação: "Mapas de competências homologados em bloco" e redireciona para o Painel.
+  - Palavras-chave usadas: `competências, mostra, mensagem, confirmação, mapas, homologados`
+  - Evidência (score 2): `e2e/cdu-26.spec.ts:6` -> `* CDU-26 - Homologar validação de mapas de competências em bloco`
+  - Evidência (score 2): `e2e/cdu-26.spec.ts:55` -> `await expect(modal.getByText(/Selecione abaixo as unidades cujos mapas deverão ser homologados/i)).toBeVisible();`
+  - Evidência (score 1): `e2e/cdu-26.spec.ts:15` -> `* 2. Sistema mostra Detalhes do processo`
 
-2. **Falta validação de localização na unidade ADMIN**: O requisito especifica (pré-condição) "com localização atual na unidade do usuário" (ADMIN). O teste não valida explicitamente isso.
+## Ajustes recomendados para próximo ciclo
+- Completar cobertura do item: **Caso o usuário escolha o botão `Cancelar`, o sistema interrompe a operação, permanecendo na tela Detalhes do** (atualmente parcial).
+- Completar cobertura do item: **O sistema registra uma movimentação para o subprocesso:** (atualmente parcial).
+- Implementar cenário específico para: **`Data/hora`: [Data/hora atual]** (sem evidência no E2E atual).
 
-3. **Ausência de cenário de homologação efetiva**: O teste abre o modal e cancela, mas **não executa a homologação** propriamente dita. Não há validação de:
-   - Clique efetivo no botão "Homologar"
-   - Alteração de situação para 'Mapa homologado'
-   - Registros de movimentação, alerta e e-mail
+## Prontidão para o próximo PR de melhoria E2E
+- Status de entrada: **PRONTO_COM_GAPS**.
+- Motivos: há itens sem cobertura E2E.
+- Checklist mínimo antes de codar:
+  - [ ] confirmar massa de dados/fixtures para cenário positivo e negativo;
+  - [ ] definir assert de regra de negócio + assert de efeito colateral;
+  - [ ] validar perfil/unidade necessários no cenário (quando aplicável);
+  - [ ] mapear se precisa teste de integração backend complementar.
+- Escopo sugerido para o próximo PR deste CDU:
+  - Completar cobertura do item: **Caso o usuário escolha o botão `Cancelar`, o sistema interrompe a operação, permanecendo na tela Detalhes do** (atualmente parcial).
+  - Completar cobertura do item: **O sistema registra uma movimentação para o subprocesso:** (atualmente parcial).
+  - Implementar cenário específico para: **`Data/hora`: [Data/hora atual]** (sem evidência no E2E atual).
 
-4. **Falta validação de mudança de situação**: O requisito especifica (passo 9.2) que a situação do subprocesso deve mudar para 'Mapa homologado'. O teste não valida isso.
-
-5. **Falta validação de movimentação registrada**: O requisito especifica (passo 9.1) o registro de movimentação com:
-   - `Unidade origem`: "ADMIN"
-   - `Unidade destino`: "ADMIN"
-   - `Descrição`: "Mapa de competências homologado"
-   
-   O teste não valida nenhum desses registros.
-
-6. **Falta validação de alerta**: O requisito especifica (passo 9.3) criação de alerta com descrição específica. O teste não valida.
-
-7. **Falta validação de e-mail**: O requisito especifica (passo 9.4) envio de e-mail para "a unidade do subprocesso". O teste não valida.
-
-8. **Falta validação de múltiplas unidades**: O teste não cobre seleção/deselecção de unidades no modal ou homologação seletiva.
-
-9. **Falta validação de mensagem de confirmação final**: O requisito especifica (passo 10) mensagem "Mapas de competências homologados em bloco" e redirecionamento para Painel. O teste não valida isso.
-
-10. **Falta validação do tipo de unidades elegíveis**: O requisito especifica "operacionais ou interoperacionais". O teste não valida se apenas essas unidades aparecem.
-
-## Alterações necessárias no teste E2E
-1. **Adicionar cenário de homologação completa**: 
-   - Criar teste que executa a homologação efetivamente (clique em "Homologar", não "Cancelar")
-   - Validar mensagem de confirmação "Mapas de competências homologados em bloco"
-   - Validar redirecionamento para Painel
-
-2. **Adicionar validação de mudança de situação**: 
-   - Após homologação, navegar de volta para o subprocesso
-   - Validar que a situação agora é 'Mapa homologado'
-
-3. **Adicionar validação de registros internos**: 
-   - Validar movimentação registrada (origem/destino "ADMIN", descrição)
-   - Validar alerta criado com campos esperados
-   - Validar e-mail enviado para unidade do subprocesso
-
-4. **Adicionar cenário com 'Mapa com sugestões'**: Criar teste paralelo com essa situação.
-
-5. **Adicionar validação de seleção/deselecção**: 
-   - Validar comportamento ao desselecionar unidades
-   - Validar que apenas as selecionadas são homologadas
-
-6. **Adicionar validação de filtro de unidades**: 
-   - Validar que apenas unidades operacionais/interoperacionais aparecem (se aplicável)
-
-## Notas e inconsistências do requisito
-- **Ambiguidade em "localização atual na unidade do usuário"**: Para ADMIN, qual seria sua "unidade"? O requisito assume que ADMIN tem uma unidade associada, mas isso não é claro. Presume-se que refira-se à possibilidade de o subprocesso estar em qualquer lugar da hierarquia.
-
-- **Inconsistência em campo "Unidade de origem" do alerta**: O passo 9.3 especifica `Unidade de origem: ADMIN`, mas não é claro se "ADMIN" é a sigla literal ou um placeholder. Presume-se ser a sigla literal ou identificador especial.
-
-- **Falta informação sobre estados anteriores**: O requisito não especifica quais estados o subprocesso pode ter antes de chegar a 'Mapa validado' ou 'Mapa com sugestões', tornando difícil construir dados de teste realistas.
+## Observações metodológicas
+- Esta rodada incluiu leitura de helpers importados para reduzir falso negativo de cobertura indireta.
+- Classificação automática por evidência textual; recomenda-se validação humana dos itens `🟡` e `❌` antes da implementação final.

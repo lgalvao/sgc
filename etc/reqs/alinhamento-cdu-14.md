@@ -1,70 +1,386 @@
-# Alinhamento CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos
+# Alinhamento CDU-14 - Reanálise (rodada 2)
 
-## Cobertura atual do teste
-O teste E2E cobre:
-- **Setup (Preparação)**: Cria processo de revisão, CHEFE adiciona/modifica atividades, disponibiliza (linhas 29-78).
-- **Histórico de análise**: GESTOR abre histórico em modo visualização; testa apresentação em tabela (linhas 60-62).
-- **Botão "Impactos no mapa"**: Testa presença e funcionalidade (linha 64).
-- **Devolução**: GESTOR devolve revisão com observação (linha 65).
-- **Cancelamento de devolução**: GESTOR clica para devolver, depois cancela (linha 86).
-- **Aceite de revisão**: GESTOR aceita revisão com observação (linha 88).
-- **Visualização de histórico por ADMIN**: Em modo visualização após aceite (linhas 94-96).
+## Artefatos analisados
+- Requisito: `etc/reqs/cdu-14.md`.
+- Teste E2E: `e2e/cdu-14.spec.ts` (2 cenários `test`, 0 `test.step`).
 
-## Lacunas em relação ao requisito
-**Fluxo principal não coberto:**
-- **Passos 1-4**: Não há assertions explícitas de navegação via Painel, tela "Detalhes do processo", seleção da unidade subordinada.
-- **Passo 5-6**: Não valida explicitamente que o card `Atividades e conhecimentos` é clicado ou que botões aparecem (`Impactos no mapa`, `Histórico de análise`, `Devolver para ajustes`, `Registrar aceite`/`Homologar`).
+## Resultado da comparação requisito x E2E
+- Itens do fluxo principal avaliados: **79**.
+- Status: **16 cobertos**, **55 parciais**, **8 não cobertos** (baseado em evidências textuais no spec e helpers).
 
-**Fluxo de devolução (passo 10) não completamente coberto:**
-- **10.2**: Não valida modal com título "Devolução", pergunta exata "Confirma a devolução do cadastro para ajustes?".
-- **10.5-10.10**: Não valida registros de análise, movimentação com descrição correta, identificação de unidade de devolução, mudança de situação para "Revisão do cadastro em andamento", e-mail e alerta.
-- **10.11**: Não valida mensagem "Devolução realizada" e redirecionamento para Painel.
+## Matriz de evidências
+- ✅ **[COBERTO]** 1. No painel, o usuário clica no processo de revisão.
+  - Palavras-chave usadas: `processo, painel, clica, revisão`
+  - Evidência (score 2): `e2e/cdu-14.spec.ts:71` -> `await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Revisão em andamento/i);`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:3` -> `import {criarProcessoFinalizadoFixture, criarProcessoFixture} from './fixtures/fixtures-processos.js';`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:15` -> `acessarSubprocessoChefeDireto,`
+- ✅ **[COBERTO]** 2. O sistema exibe a tela `Detalhes do processo`.
+  - Palavras-chave usadas: `processo, exibe, detalhes`
+  - Evidência (score 2): `e2e/cdu-14.spec.ts:22` -> `import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';`
+  - Evidência (score 2): `e2e/cdu-14.spec.ts:92` -> `await acessarDetalhesProcesso(page, descProcesso);`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:3` -> `import {criarProcessoFinalizadoFixture, criarProcessoFixture} from './fixtures/fixtures-processos.js';`
+- ✅ **[COBERTO]** 3. Usuário clica na unidade subordinada cujo cadastro de atividades deseja validar.
+  - Palavras-chave usadas: `unidade, atividades, clica, subordinada, cujo, cadastro`
+  - Evidência (score 2): `e2e/cdu-14.spec.ts:24` -> `test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos', () => {`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:7` -> `navegarParaAtividades,`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:8` -> `navegarParaAtividadesVisualizacao,`
+- ✅ **[COBERTO]** 4. O sistema exibe a tela `Detalhes do subprocesso` com os dados da unidade selecionada.
+  - Palavras-chave usadas: `subprocesso, unidade, exibe, detalhes, selecionada`
+  - Evidência (score 2): `e2e/cdu-14.spec.ts:47` -> `await acessarSubprocessoChefeDireto(page, descProcesso, UNIDADE_ALVO);`
+  - Evidência (score 2): `e2e/cdu-14.spec.ts:58` -> `await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);`
+  - Evidência (score 2): `e2e/cdu-14.spec.ts:70` -> `await acessarSubprocessoChefeDireto(page, descProcesso, UNIDADE_ALVO);`
+- ✅ **[COBERTO]** 5. Usuário clica no card `Atividades e conhecimentos`.
+  - Palavras-chave usadas: `atividades, clica, card, conhecimentos`
+  - Evidência (score 2): `e2e/cdu-14.spec.ts:24` -> `test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos', () => {`
+  - Evidência (score 2): `e2e/cdu-14.spec.ts:88` -> `await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos'})).toBeVisible();`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:7` -> `navegarParaAtividades,`
+- ✅ **[COBERTO]** 6. O sistema apresenta as atividades e conhecimentos da unidade na tela `Atividades e conhecimentos`, com os botões:
+  - Palavras-chave usadas: `atividades, unidade, apresenta, conhecimentos, botões`
+  - Evidência (score 2): `e2e/cdu-14.spec.ts:24` -> `test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos', () => {`
+  - Evidência (score 2): `e2e/cdu-14.spec.ts:88` -> `await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos'})).toBeVisible();`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:7` -> `navegarParaAtividades,`
+- 🟡 **[PARCIAL]** 7. `Impactos no mapa`;
+  - Palavras-chave usadas: `impactos, mapa`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:32` -> `// Preparacao 1: Base de dados com Mapa vigente e Revisão iniciada`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:56` -> `// Preparacao 5: GESTOR visualiza histórico, impactos e devolve`
+- 🟡 **[PARCIAL]** 8. `Histórico de análise`;
+  - Palavras-chave usadas: `histórico, análise`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:56` -> `// Preparacao 5: GESTOR visualiza histórico, impactos e devolve`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:82` -> `test('Cenarios CDU-14: GESTOR cancela devolução, aceita e ADMIN vê histórico final', async ({_resetAutomatico, page})...`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:89` -> `await aceitarRevisao(page, 'Revisão aprovada conforme análise');`
+- 🟡 **[PARCIAL]** 9. `Devolver para ajustes`; e
+  - Palavras-chave usadas: `devolver, ajustes`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:18` -> `devolverRevisao,`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:66` -> `await devolverRevisao(page, 'Favor revisar as competências associadas');`
+- 🟡 **[PARCIAL]** 10. `Registrar aceite`, caso o perfil seja GESTOR ou `Homologar`, caso o perfil seja ADMIN.
+  - Palavras-chave usadas: `perfil, registrar, aceite, seja, gestor, homologar`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:16` -> `acessarSubprocessoGestor,`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:56` -> `// Preparacao 5: GESTOR visualiza histórico, impactos e devolve`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:57` -> `await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);`
+- 🟡 **[PARCIAL]** 11. O botão `Impactos no mapa` poderá ser usado pelo usuário para verificar as competências da unidade que serão
+  - Palavras-chave usadas: `competências, unidade, botão, impactos, mapa, poderá`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:25` -> `const UNIDADE_ALVO = 'SECAO_212';`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:32` -> `// Preparacao 1: Base de dados com Mapa vigente e Revisão iniciada`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:34` -> `unidade: UNIDADE_ALVO,`
+- 🟡 **[PARCIAL]** 12. Se o usuário clicar no botão `Histórico de análise`, o sistema mostra, em tela modal, os dados das análises prévias
+  - Palavras-chave usadas: `clicar, botão, histórico, análise, mostra, modal`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:56` -> `// Preparacao 5: GESTOR visualiza histórico, impactos e devolve`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:61` -> `const modalVisualizacao = await abrirHistoricoAnaliseVisualizacao(page);`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:62` -> `await expect(modalVisualizacao).toBeVisible();`
+- 🟡 **[PARCIAL]** 13. Usuário analisa as informações obtidas através dos botões `Impactos no mapa` e `Histórico de análise` e opta por
+  - Palavras-chave usadas: `analisa, informações, obtidas, através, botões, impactos`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:24` -> `test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos', () => {`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:56` -> `// Preparacao 5: GESTOR visualiza histórico, impactos e devolve`
+- 🟡 **[PARCIAL]** 14. Se optar por devolver para ajustes:
+  - Palavras-chave usadas: `optar, devolver, ajustes`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:18` -> `devolverRevisao,`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:66` -> `await devolverRevisao(page, 'Favor revisar as competências associadas');`
+- 🟡 **[PARCIAL]** 15. Usuário clica em `Devolver para ajustes`.
+  - Palavras-chave usadas: `clica, devolver, ajustes`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:18` -> `devolverRevisao,`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:66` -> `await devolverRevisao(page, 'Favor revisar as competências associadas');`
+- 🟡 **[PARCIAL]** 16. O sistema abre uma tela modal (título `Devolução`) com a pergunta "Confirma a devolução do cadastro para
+  - Palavras-chave usadas: `abre, modal, título, devolução, pergunta, confirma`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:54` -> `await page.getByTestId('btn-confirmar-disponibilizacao').click();`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:61` -> `const modalVisualizacao = await abrirHistoricoAnaliseVisualizacao(page);`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:62` -> `await expect(modalVisualizacao).toBeVisible();`
+- 🟡 **[PARCIAL]** 17. Caso o usuário escolha `Cancelar`, o sistema interrompe a operação de devolução do cadastro,
+  - Palavras-chave usadas: `escolha, cancelar, interrompe, operação, devolução, cadastro`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:17` -> `cancelarDevolucao,`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:24` -> `test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos', () => {`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:68` -> `// Preparacao 6: CHEFE vê devolução, ajusta e redisponibiliza`
+- 🟡 **[PARCIAL]** 18. O usuário opcionalmente informa a observação e escolhe `Confirmar`.
+  - Palavras-chave usadas: `opcionalmente, informa, observação, escolhe, confirmar`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:54` -> `await page.getByTestId('btn-confirmar-disponibilizacao').click();`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:79` -> `await page.getByTestId('btn-confirmar-disponibilizacao').click();`
+- 🟡 **[PARCIAL]** 19. O sistema registra uma análise de cadastro para o subprocesso com:
+  - Palavras-chave usadas: `subprocesso, registra, análise, cadastro`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:15` -> `acessarSubprocessoChefeDireto,`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:16` -> `acessarSubprocessoGestor,`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:21` -> `import {navegarParaSubprocesso} from './helpers/helpers-navegacao.js';`
+- ❌ **[NAO_COBERTO]** 20. `Data/hora`: Data/hora atual
+  - Palavras-chave usadas: `data/hora, atual`
+  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
+- 🟡 **[PARCIAL]** 21. `Unidade`: [SIGLA_UNIDADE_ANALISE]
+  - Palavras-chave usadas: `unidade, sigla_unidade_analise`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:25` -> `const UNIDADE_ALVO = 'SECAO_212';`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:34` -> `unidade: UNIDADE_ALVO,`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:41` -> `unidade: UNIDADE_ALVO,`
+- 🟡 **[PARCIAL]** 22. `Resultado`: 'Devolução'
+  - Palavras-chave usadas: `resultado, devolução`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:68` -> `// Preparacao 6: CHEFE vê devolução, ajusta e redisponibiliza`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:75` -> `await expect(modalAnalise.getByTestId('cell-resultado-0')).toHaveText(/Devolu[cç][aã]o/i);`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:82` -> `test('Cenarios CDU-14: GESTOR cancela devolução, aceita e ADMIN vê histórico final', async ({_resetAutomatico, page})...`
+- 🟡 **[PARCIAL]** 23. `Observação`: A observação da janela modal, caso tenha sido fornecida.
+  - Palavras-chave usadas: `observação, janela, modal, tenha, sido, fornecida`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:61` -> `const modalVisualizacao = await abrirHistoricoAnaliseVisualizacao(page);`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:62` -> `await expect(modalVisualizacao).toBeVisible();`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:74` -> `const modalAnalise = await abrirHistoricoAnalise(page);`
+- 🟡 **[PARCIAL]** 24. O sistema identifica a unidade de devolução como sendo a unidade de origem da última movimentação do
+  - Palavras-chave usadas: `unidade, identifica, devolução, sendo, origem, última`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:25` -> `const UNIDADE_ALVO = 'SECAO_212';`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:34` -> `unidade: UNIDADE_ALVO,`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:41` -> `unidade: UNIDADE_ALVO,`
+- 🟡 **[PARCIAL]** 25. O sistema registra uma movimentação para o subprocesso com:
+  - Palavras-chave usadas: `subprocesso, registra, movimentação`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:15` -> `acessarSubprocessoChefeDireto,`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:16` -> `acessarSubprocessoGestor,`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:21` -> `import {navegarParaSubprocesso} from './helpers/helpers-navegacao.js';`
+- ❌ **[NAO_COBERTO]** 26. `Data/hora`: Data/hora atual
+  - Palavras-chave usadas: `data/hora, atual`
+  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
+- 🟡 **[PARCIAL]** 27. `Unidade origem`: [SIGLA_UNIDADE_ANALISE]
+  - Palavras-chave usadas: `unidade, sigla_unidade_analise, origem`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:25` -> `const UNIDADE_ALVO = 'SECAO_212';`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:34` -> `unidade: UNIDADE_ALVO,`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:41` -> `unidade: UNIDADE_ALVO,`
+- 🟡 **[PARCIAL]** 28. `Unidade destino`: [SIGLA_UNIDADE_DEVOLUCAO]
+  - Palavras-chave usadas: `unidade, sigla_unidade_devolucao, destino`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:25` -> `const UNIDADE_ALVO = 'SECAO_212';`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:34` -> `unidade: UNIDADE_ALVO,`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:41` -> `unidade: UNIDADE_ALVO,`
+- ✅ **[COBERTO]** 29. `Descrição`: 'Devolução do cadastro de atividades e conhecimentos para ajustes'
+  - Palavras-chave usadas: `atividades, descrição, devolução, cadastro, conhecimentos, ajustes`
+  - Evidência (score 3): `e2e/cdu-14.spec.ts:24` -> `test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos', () => {`
+  - Evidência (score 2): `e2e/cdu-14.spec.ts:88` -> `await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos'})).toBeVisible();`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:7` -> `navegarParaAtividades,`
+- ✅ **[COBERTO]** 30. Se a unidade de devolução for a própria unidade do subprocesso, o sistema altera a situação do subprocesso
+  - Palavras-chave usadas: `unidade, subprocesso, situação, devolução, própria, altera`
+  - Evidência (score 2): `e2e/cdu-14.spec.ts:47` -> `await acessarSubprocessoChefeDireto(page, descProcesso, UNIDADE_ALVO);`
+  - Evidência (score 2): `e2e/cdu-14.spec.ts:58` -> `await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);`
+  - Evidência (score 2): `e2e/cdu-14.spec.ts:70` -> `await acessarSubprocessoChefeDireto(page, descProcesso, UNIDADE_ALVO);`
+- 🟡 **[PARCIAL]** 31. O sistema envia notificação por e-mail para a unidade de devolução:
+  - Palavras-chave usadas: `unidade, envia, notificação, e-mail, devolução`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:25` -> `const UNIDADE_ALVO = 'SECAO_212';`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:34` -> `unidade: UNIDADE_ALVO,`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:41` -> `unidade: UNIDADE_ALVO,`
+- 🟡 **[PARCIAL]** 32. O sistema cria internamente um alerta:
+  - Palavras-chave usadas: `alerta, cria, internamente`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:3` -> `import {criarProcessoFinalizadoFixture, criarProcessoFixture} from './fixtures/fixtures-processos.js';`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:33` -> `await criarProcessoFinalizadoFixture(request, {`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:38` -> `await criarProcessoFixture(request, {`
+- ✅ **[COBERTO]** 33. `Descrição`: "Cadastro de atividades e conhecimentos da unidade [SIGLA_UNIDADE_SUBPROCESSO] devolvido para
+  - Palavras-chave usadas: `atividades, unidade, sigla_unidade_subprocesso, descrição, cadastro, conhecimentos`
+  - Evidência (score 3): `e2e/cdu-14.spec.ts:24` -> `test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos', () => {`
+  - Evidência (score 2): `e2e/cdu-14.spec.ts:88` -> `await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos'})).toBeVisible();`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:7` -> `navegarParaAtividades,`
+- 🟡 **[PARCIAL]** 34. `Processo`: [DESCRIÇÃO DO PROCESSO]
+  - Palavras-chave usadas: `processo, descrição`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:3` -> `import {criarProcessoFinalizadoFixture, criarProcessoFixture} from './fixtures/fixtures-processos.js';`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:15` -> `acessarSubprocessoChefeDireto,`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:16` -> `acessarSubprocessoGestor,`
+- ❌ **[NAO_COBERTO]** 35. `Data/hora`: Data/hora atual
+  - Palavras-chave usadas: `data/hora, atual`
+  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
+- 🟡 **[PARCIAL]** 36. `Unidade de origem`: [SIGLA_UNIDADE_ANALISE]
+  - Palavras-chave usadas: `unidade, sigla_unidade_analise, origem`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:25` -> `const UNIDADE_ALVO = 'SECAO_212';`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:34` -> `unidade: UNIDADE_ALVO,`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:41` -> `unidade: UNIDADE_ALVO,`
+- 🟡 **[PARCIAL]** 37. `Unidade de destino`: [SIGLA_UNIDADE_DEVOLUCAO].
+  - Palavras-chave usadas: `unidade, sigla_unidade_devolucao, destino`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:25` -> `const UNIDADE_ALVO = 'SECAO_212';`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:34` -> `unidade: UNIDADE_ALVO,`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:41` -> `unidade: UNIDADE_ALVO,`
+- 🟡 **[PARCIAL]** 38. O sistema redireciona para o Painel, mostrando a mensagem "Devolução realizada".
+  - Palavras-chave usadas: `redireciona, painel, mostrando, mensagem, devolução, realizada`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:68` -> `// Preparacao 6: CHEFE vê devolução, ajusta e redisponibiliza`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:82` -> `test('Cenarios CDU-14: GESTOR cancela devolução, aceita e ADMIN vê histórico final', async ({_resetAutomatico, page})...`
+- 🟡 **[PARCIAL]** 39. Se optar por aceitar (perfil GESTOR):
+  - Palavras-chave usadas: `perfil, optar, aceitar, gestor`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:14` -> `aceitarRevisao,`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:16` -> `acessarSubprocessoGestor,`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:56` -> `// Preparacao 5: GESTOR visualiza histórico, impactos e devolve`
+- 🟡 **[PARCIAL]** 40. Usuário clica em `Registrar aceite`.
+  - Palavras-chave usadas: `clica, registrar, aceite`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:96` -> `await expect(modal.getByTestId('cell-resultado-0')).toHaveText(/ACEITE_REVISAO/i);`
+- ✅ **[COBERTO]** 41. O sistema abre um diálogo modal (título "Aceite") com a pergunta "Confirma o aceite da revisão do cadastro de
+  - Palavras-chave usadas: `abre, diálogo, modal, título, aceite, pergunta`
+  - Evidência (score 2): `e2e/cdu-14.spec.ts:96` -> `await expect(modal.getByTestId('cell-resultado-0')).toHaveText(/ACEITE_REVISAO/i);`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:61` -> `const modalVisualizacao = await abrirHistoricoAnaliseVisualizacao(page);`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:62` -> `await expect(modalVisualizacao).toBeVisible();`
+- 🟡 **[PARCIAL]** 42. Caso o usuário escolha `Cancelar`, o sistema interrompe a operação de aceite, permanecendo na tela
+  - Palavras-chave usadas: `escolha, cancelar, interrompe, operação, aceite, permanecendo`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:17` -> `cancelarDevolucao,`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:87` -> `await cancelarDevolucao(page);`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:96` -> `await expect(modal.getByTestId('cell-resultado-0')).toHaveText(/ACEITE_REVISAO/i);`
+- 🟡 **[PARCIAL]** 43. O usuário opcionalmente informa a observação e escolhe Confirmar.
+  - Palavras-chave usadas: `opcionalmente, informa, observação, escolhe, confirmar`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:54` -> `await page.getByTestId('btn-confirmar-disponibilizacao').click();`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:79` -> `await page.getByTestId('btn-confirmar-disponibilizacao').click();`
+- 🟡 **[PARCIAL]** 44. O sistema registra uma análise de cadastro para o subprocesso com:
+  - Palavras-chave usadas: `subprocesso, registra, análise, cadastro`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:15` -> `acessarSubprocessoChefeDireto,`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:16` -> `acessarSubprocessoGestor,`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:21` -> `import {navegarParaSubprocesso} from './helpers/helpers-navegacao.js';`
+- ❌ **[NAO_COBERTO]** 45. `Data/hora`: Data/hora atual
+  - Palavras-chave usadas: `data/hora, atual`
+  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
+- 🟡 **[PARCIAL]** 46. `Unidade`: [SIGLA_UNIDADE_ANALISE]
+  - Palavras-chave usadas: `unidade, sigla_unidade_analise`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:25` -> `const UNIDADE_ALVO = 'SECAO_212';`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:34` -> `unidade: UNIDADE_ALVO,`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:41` -> `unidade: UNIDADE_ALVO,`
+- ✅ **[COBERTO]** 47. `Resultado`: 'Aceite'
+  - Palavras-chave usadas: `resultado, aceite`
+  - Evidência (score 2): `e2e/cdu-14.spec.ts:96` -> `await expect(modal.getByTestId('cell-resultado-0')).toHaveText(/ACEITE_REVISAO/i);`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:75` -> `await expect(modalAnalise.getByTestId('cell-resultado-0')).toHaveText(/Devolu[cç][aã]o/i);`
+- 🟡 **[PARCIAL]** 48. `Observação`: A observação da janela modal, caso tenha sido fornecida.
+  - Palavras-chave usadas: `observação, janela, modal, tenha, sido, fornecida`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:61` -> `const modalVisualizacao = await abrirHistoricoAnaliseVisualizacao(page);`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:62` -> `await expect(modalVisualizacao).toBeVisible();`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:74` -> `const modalAnalise = await abrirHistoricoAnalise(page);`
+- 🟡 **[PARCIAL]** 49. O sistema registra uma movimentação para o subprocesso com:
+  - Palavras-chave usadas: `subprocesso, registra, movimentação`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:15` -> `acessarSubprocessoChefeDireto,`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:16` -> `acessarSubprocessoGestor,`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:21` -> `import {navegarParaSubprocesso} from './helpers/helpers-navegacao.js';`
+- ❌ **[NAO_COBERTO]** 50. `Data/hora`: Data/hora atual
+  - Palavras-chave usadas: `data/hora, atual`
+  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
+- 🟡 **[PARCIAL]** 51. `Unidade origem`: [SIGLA_UNIDADE_ANALISE]
+  - Palavras-chave usadas: `unidade, sigla_unidade_analise, origem`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:25` -> `const UNIDADE_ALVO = 'SECAO_212';`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:34` -> `unidade: UNIDADE_ALVO,`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:41` -> `unidade: UNIDADE_ALVO,`
+- 🟡 **[PARCIAL]** 52. `Unidade destino`: [SIGLA_UNIDADE_SUPERIOR]
+  - Palavras-chave usadas: `unidade, sigla_unidade_superior, destino`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:25` -> `const UNIDADE_ALVO = 'SECAO_212';`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:34` -> `unidade: UNIDADE_ALVO,`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:41` -> `unidade: UNIDADE_ALVO,`
+- ✅ **[COBERTO]** 53. `Descrição`: 'Revisão do cadastro de atividades e conhecimentos aceita'
+  - Palavras-chave usadas: `atividades, descrição, revisão, cadastro, conhecimentos, aceita`
+  - Evidência (score 4): `e2e/cdu-14.spec.ts:24` -> `test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos', () => {`
+  - Evidência (score 2): `e2e/cdu-14.spec.ts:88` -> `await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos'})).toBeVisible();`
+  - Evidência (score 2): `e2e/cdu-14.spec.ts:89` -> `await aceitarRevisao(page, 'Revisão aprovada conforme análise');`
+- 🟡 **[PARCIAL]** 54. O sistema envia notificação por e-mail para a unidade superior:
+  - Palavras-chave usadas: `unidade, envia, notificação, e-mail, superior`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:25` -> `const UNIDADE_ALVO = 'SECAO_212';`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:34` -> `unidade: UNIDADE_ALVO,`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:41` -> `unidade: UNIDADE_ALVO,`
+- 🟡 **[PARCIAL]** 55. O sistema cria internamente um alerta com:
+  - Palavras-chave usadas: `alerta, cria, internamente`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:3` -> `import {criarProcessoFinalizadoFixture, criarProcessoFixture} from './fixtures/fixtures-processos.js';`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:33` -> `await criarProcessoFinalizadoFixture(request, {`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:38` -> `await criarProcessoFixture(request, {`
+- ✅ **[COBERTO]** 56. `Descrição`: "Revisão do cadastro de atividades e conhecimentos da unidade [SIGLA_UNIDADE_SUBPROCESSO] submetida
+  - Palavras-chave usadas: `atividades, unidade, sigla_unidade_subprocesso, descrição, revisão, cadastro`
+  - Evidência (score 3): `e2e/cdu-14.spec.ts:24` -> `test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos', () => {`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:7` -> `navegarParaAtividades,`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:8` -> `navegarParaAtividadesVisualizacao,`
+- 🟡 **[PARCIAL]** 57. `Processo`: [DESCRIÇÃO DO PROCESSO]
+  - Palavras-chave usadas: `processo, descrição`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:3` -> `import {criarProcessoFinalizadoFixture, criarProcessoFixture} from './fixtures/fixtures-processos.js';`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:15` -> `acessarSubprocessoChefeDireto,`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:16` -> `acessarSubprocessoGestor,`
+- ❌ **[NAO_COBERTO]** 58. `Data/hora`: Data/hora atual
+  - Palavras-chave usadas: `data/hora, atual`
+  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
+- 🟡 **[PARCIAL]** 59. `Unidade de origem`: [SIGLA_UNIDADE_ANALISE]
+  - Palavras-chave usadas: `unidade, sigla_unidade_analise, origem`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:25` -> `const UNIDADE_ALVO = 'SECAO_212';`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:34` -> `unidade: UNIDADE_ALVO,`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:41` -> `unidade: UNIDADE_ALVO,`
+- 🟡 **[PARCIAL]** 60. `Unidade de destino`: [SIGLA_UNIDADE_SUPERIOR].
+  - Palavras-chave usadas: `unidade, sigla_unidade_superior, destino`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:25` -> `const UNIDADE_ALVO = 'SECAO_212';`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:34` -> `unidade: UNIDADE_ALVO,`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:41` -> `unidade: UNIDADE_ALVO,`
+- 🟡 **[PARCIAL]** 61. O sistema mostra a mensagem "Aceite registrado" e redireciona para o Painel.
+  - Palavras-chave usadas: `mostra, mensagem, aceite, registrado, redireciona, painel`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:96` -> `await expect(modal.getByTestId('cell-resultado-0')).toHaveText(/ACEITE_REVISAO/i);`
+- ✅ **[COBERTO]** 62. Se optar por homologar (perfil ADMIN):
+  - Palavras-chave usadas: `perfil, optar, homologar, admin`
+  - Evidência (score 2): `e2e/cdu-14.spec.ts:91` -> `await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:82` -> `test('Cenarios CDU-14: GESTOR cancela devolução, aceita e ADMIN vê histórico final', async ({_resetAutomatico, page})...`
+- ❌ **[NAO_COBERTO]** 63. Usuário escolhe `Homologar`.
+  - Palavras-chave usadas: `escolhe, homologar`
+  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
+- 🟡 **[PARCIAL]** 64. Se o sistema não detectar nenhum impacto no mapa de competências da unidade:
+  - Palavras-chave usadas: `competências, unidade, detectar, nenhum, impacto, mapa`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:9` -> `verificarBotaoImpactoDireto`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:25` -> `const UNIDADE_ALVO = 'SECAO_212';`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:32` -> `// Preparacao 1: Base de dados com Mapa vigente e Revisão iniciada`
+- 🟡 **[PARCIAL]** 65. O sistema abre um diálogo de confirmação (título `Homologação do mapa de competências`) com a mensagem "A
+  - Palavras-chave usadas: `competências, abre, diálogo, confirmação, título, homologação`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:66` -> `await devolverRevisao(page, 'Favor revisar as competências associadas');`
+- 🟡 **[PARCIAL]** 66. Caso o usuário escolha o botão `Cancelar`, o sistema interrompe a operação de homologação, permanecendo na
+  - Palavras-chave usadas: `escolha, botão, cancelar, interrompe, operação, homologação`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:17` -> `cancelarDevolucao,`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:87` -> `await cancelarDevolucao(page);`
+- 🟡 **[PARCIAL]** 67. Usuário escolhe `Confirmar`.
+  - Palavras-chave usadas: `escolhe, confirmar`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:54` -> `await page.getByTestId('btn-confirmar-disponibilizacao').click();`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:79` -> `await page.getByTestId('btn-confirmar-disponibilizacao').click();`
+- ✅ **[COBERTO]** 68. O sistema altera a situação do subprocesso da unidade para 'Mapa homologado'.
+  - Palavras-chave usadas: `situação, subprocesso, unidade, altera, mapa, homologado`
+  - Evidência (score 2): `e2e/cdu-14.spec.ts:47` -> `await acessarSubprocessoChefeDireto(page, descProcesso, UNIDADE_ALVO);`
+  - Evidência (score 2): `e2e/cdu-14.spec.ts:58` -> `await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);`
+  - Evidência (score 2): `e2e/cdu-14.spec.ts:70` -> `await acessarSubprocessoChefeDireto(page, descProcesso, UNIDADE_ALVO);`
+- 🟡 **[PARCIAL]** 69. Caso contrário (impactos detectados):
+  - Palavras-chave usadas: `contrário, impactos, detectados`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:56` -> `// Preparacao 5: GESTOR visualiza histórico, impactos e devolve`
+- 🟡 **[PARCIAL]** 70. O sistema abre um diálogo de confirmação (título `Homologação do cadastro`)
+  - Palavras-chave usadas: `abre, diálogo, confirmação, título, homologação, cadastro`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:24` -> `test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos', () => {`
+- 🟡 **[PARCIAL]** 71. Caso o usuário escolha o botão `Cancelar`, o sistema interrompe a operação de homologação do cadastro,
+  - Palavras-chave usadas: `escolha, botão, cancelar, interrompe, operação, homologação`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:17` -> `cancelarDevolucao,`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:87` -> `await cancelarDevolucao(page);`
+- 🟡 **[PARCIAL]** 72. Usuário escolhe `Confirmar`.
+  - Palavras-chave usadas: `escolhe, confirmar`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:54` -> `await page.getByTestId('btn-confirmar-disponibilizacao').click();`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:79` -> `await page.getByTestId('btn-confirmar-disponibilizacao').click();`
+- 🟡 **[PARCIAL]** 73. O sistema registra uma movimentação para o subprocesso com:
+  - Palavras-chave usadas: `subprocesso, registra, movimentação`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:15` -> `acessarSubprocessoChefeDireto,`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:16` -> `acessarSubprocessoGestor,`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:21` -> `import {navegarParaSubprocesso} from './helpers/helpers-navegacao.js';`
+- ❌ **[NAO_COBERTO]** 74. `Data/hora`: Data/hora atual
+  - Palavras-chave usadas: `data/hora, atual`
+  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
+- 🟡 **[PARCIAL]** 75. `Unidade origem`: 'ADMIN'
+  - Palavras-chave usadas: `unidade, origem, admin`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:25` -> `const UNIDADE_ALVO = 'SECAO_212';`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:34` -> `unidade: UNIDADE_ALVO,`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:41` -> `unidade: UNIDADE_ALVO,`
+- 🟡 **[PARCIAL]** 76. `Unidade destino`: 'ADMIN'
+  - Palavras-chave usadas: `unidade, destino, admin`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:25` -> `const UNIDADE_ALVO = 'SECAO_212';`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:34` -> `unidade: UNIDADE_ALVO,`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:41` -> `unidade: UNIDADE_ALVO,`
+- 🟡 **[PARCIAL]** 77. `Descrição`: 'Cadastro homologado'
+  - Palavras-chave usadas: `descrição, cadastro, homologado`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:24` -> `test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos', () => {`
+- ✅ **[COBERTO]** 78. O sistema altera a situação do subprocesso da unidade para 'Revisão do cadastro homologada'.
+  - Palavras-chave usadas: `situação, subprocesso, unidade, altera, revisão, cadastro`
+  - Evidência (score 2): `e2e/cdu-14.spec.ts:24` -> `test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos', () => {`
+  - Evidência (score 2): `e2e/cdu-14.spec.ts:47` -> `await acessarSubprocessoChefeDireto(page, descProcesso, UNIDADE_ALVO);`
+  - Evidência (score 2): `e2e/cdu-14.spec.ts:58` -> `await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);`
+- 🟡 **[PARCIAL]** 79. O sistema redireciona para a tela `Detalhes do subprocesso` e mostra a mensagem "Homologação efetivada".
+  - Palavras-chave usadas: `subprocesso, redireciona, detalhes, mostra, mensagem, homologação`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:15` -> `acessarSubprocessoChefeDireto,`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:16` -> `acessarSubprocessoGestor,`
+  - Evidência (score 1): `e2e/cdu-14.spec.ts:21` -> `import {navegarParaSubprocesso} from './helpers/helpers-navegacao.js';`
 
-**Fluxo de aceite (passo 11) não completamente coberto:**
-- **11.2**: Não valida modal com título "Aceite" e pergunta exata "Confirma o aceite da revisão do cadastro de atividades?".
-- **11.5-11.8**: Não valida registros de análise, movimentação, e-mail com assunto/corpo específicos, alerta criado.
-- **11.9**: Não valida mensagem "Aceite registrado".
+## Ajustes recomendados para próximo ciclo
+- Completar cobertura do item: **`Impactos no mapa`;** (atualmente parcial).
+- Completar cobertura do item: **`Histórico de análise`;** (atualmente parcial).
+- Completar cobertura do item: **`Devolver para ajustes`; e** (atualmente parcial).
 
-**Fluxo de homologação (passo 12) não coberto:**
-- **12.1-12.4**: Cenário de "sem impactos no mapa" - modal com título "Homologação do mapa de competências", mensagem específica, mudança de situação para "Mapa homologado".
-- **12.3.1-12.4**: Cenário de "com impactos detectados" - modal com título "Homologação do cadastro", movimentação registrada, situação alterada para "Revisão do cadastro homologada".
-- Teste não verifica se o ADMIN realmente escolhe entre os dois caminhos baseado em impactos.
+## Prontidão para o próximo PR de melhoria E2E
+- Status de entrada: **PRONTO_COM_GAPS**.
+- Motivos: há itens sem cobertura E2E.
+- Checklist mínimo antes de codar:
+  - [ ] confirmar massa de dados/fixtures para cenário positivo e negativo;
+  - [ ] definir assert de regra de negócio + assert de efeito colateral;
+  - [ ] validar perfil/unidade necessários no cenário (quando aplicável);
+  - [ ] mapear se precisa teste de integração backend complementar.
+- Escopo sugerido para o próximo PR deste CDU:
+  - Completar cobertura do item: **`Impactos no mapa`;** (atualmente parcial).
+  - Completar cobertura do item: **`Histórico de análise`;** (atualmente parcial).
+  - Completar cobertura do item: **`Devolver para ajustes`; e** (atualmente parcial).
 
-**Modal de histórico:**
-- Não valida estrutura completa: data/hora, sigla da unidade, resultado ('Devolução' ou 'Aceite'), observações em tabela.
-
-**Botão "Impactos no mapa":**
-- Passo 7: Teste valida presença do botão mas não executa o fluxo "Verificar impactos no mapa de competências" referenciado.
-
-## Alterações necessárias no teste E2E
-1. **Cobertura de botões obrigatórios (passo 6)**: Validar presença simultânea de `Impactos no mapa`, `Histórico de análise`, `Devolver para ajustes`, `Registrar aceite`/`Homologar`.
-
-2. **Cenário de cancelamento de devolução completo**: Validar que modal abre com título, pergunta, botões, e ao clicar Cancelar, permanece em `Atividades e conhecimentos`.
-
-3. **Validar diálogos modais com textos exatos**:
-   - Devolução: título "Devolução", pergunta "Confirma a devolução do cadastro para ajustes?".
-   - Aceite: título "Aceite", pergunta "Confirma o aceite da revisão do cadastro de atividades?".
-   - Homologação: dois diálogos diferentes conforme presença de impactos.
-
-4. **Cenário de homologação**: Adicionar teste que como ADMIN clica "Homologar" e valida:
-   - Se há impactos: abre modal "Homologação do cadastro".
-   - Se sem impactos: abre modal "Homologação do mapa de competências" com mensagem sobre manutenção.
-   - Registra movimentação correta.
-   - Altera situação conforme esperado.
-
-5. **Validar registros de análise e movimentação**: Consultar backend ou UI que registra Data/hora, Unidade, Resultado, Observação após devolução/aceite.
-
-6. **Validar notificações**: E-mail enviado com assunto/corpo corretos; alerta criado com descrição e unidades.
-
-7. **Validar mudanças de situação**: 
-   - Devolução para própria unidade → "Revisão do cadastro em andamento".
-   - Aceite → "Revisão do cadastro em andamento" → movimentação para unidade superior.
-   - Homologação → "Revisão do cadastro homologada" ou "Mapa homologado".
-
-8. **Validar histórico de análise**: Deve mostrar tabela com data/hora, sigla da unidade, resultado, observações; usar resultado com enum correto (ex: "ACEITE_REVISAO" em vez de "Aceite").
-
-## Notas e inconsistências do requisito
-- **Linha 134 (passo 11.7)**: Há erro de digitação "O sistema de Gestão de Competências ([URL_SISTEMA])" deveria dizer "no O sistema..." (extra "no").
-- **Linha 152 (passo 12.2)**: Lógica de "impactos detectados" não é especificada - como o sistema detecta? Requisito não detalha o algoritmo.
-- **Ambiguidade em passo 12.3.4-12.3.5**: Quando há impactos, registra movimentação com Unidade origem/destino = 'ADMIN'? Isso é diferente do fluxo de aceite (linhas 119-121) onde há unidades reais. Não fica claro se isso é intencional.
-- **Falta de cenário de recusa**: Requisito não especifica se ADMIN pode devolver uma revisão ou apenas aceitar/homologar.
+## Observações metodológicas
+- Esta rodada incluiu leitura de helpers importados para reduzir falso negativo de cobertura indireta.
+- Classificação automática por evidência textual; recomenda-se validação humana dos itens `🟡` e `❌` antes da implementação final.
