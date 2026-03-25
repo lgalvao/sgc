@@ -7,6 +7,7 @@ import {
     devolverCadastroMapeamento
 } from './helpers/helpers-analise.js';
 import {navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
+import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
 import {loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
 import {resetDatabase} from './hooks/hooks-limpeza.js';
 import {validarProcessoFixture} from './fixtures/fixtures-processos.js';

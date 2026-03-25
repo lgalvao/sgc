@@ -1,5 +1,6 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcessoMapaValidadoFixture, validarProcessoFixture} from './fixtures/fixtures-processos.js';
+import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
 
 /**
  * CDU-26 - Homologar validação de mapas de competências em bloco

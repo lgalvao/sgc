@@ -69,7 +69,7 @@ class RelatorioFacadeTest {
         List<RelatorioAndamentoDto> resultado = relatorioService.obterRelatorioAndamento(1L);
 
         assertThat(resultado).hasSize(1);
-        RelatorioAndamentoDto dto = resultado.get(0);
+        RelatorioAndamentoDto dto = resultado.getFirst();
         assertThat(dto.siglaUnidade()).isEqualTo("U1");
         assertThat(dto.nomeUnidade()).isEqualTo("Unidade 1");
         assertThat(dto.situacaoAtual()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO.name());

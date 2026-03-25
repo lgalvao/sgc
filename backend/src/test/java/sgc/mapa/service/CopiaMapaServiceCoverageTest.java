@@ -81,8 +81,7 @@ class CopiaMapaServiceCoverageTest {
         when(atividadeRepo.findByMapa_Codigo(mapaDestinoId)).thenReturn(List.of()); // Destino vazio
         when(repo.buscar(Mapa.class, mapaDestinoId)).thenReturn(new Mapa());
 
-
-        service.importarAtividadesDeOutroMapa(mapaOrigemId, mapaDestinoId, null);
+        service.importarAtividadesDeOutroMapa(mapaOrigemId, mapaDestinoId, List.of());
 
 
         verify(atividadeRepo).saveAll(anyList());
@@ -149,8 +148,7 @@ class CopiaMapaServiceCoverageTest {
         when(atividadeRepo.findByMapa_Codigo(mapaDestinoId)).thenReturn(List.of(ativDestino));
         when(repo.buscar(Mapa.class, mapaDestinoId)).thenReturn(new Mapa());
 
-
-        service.importarAtividadesDeOutroMapa(mapaOrigemId, mapaDestinoId, null);
+        service.importarAtividadesDeOutroMapa(mapaOrigemId, mapaDestinoId, List.of());
 
 
         verify(atividadeRepo, never()).saveAll(anyList());

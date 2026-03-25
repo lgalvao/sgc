@@ -34,7 +34,6 @@ class SubprocessoServiceContextoIntegrationTest extends BaseIntegrationTest {
     @Autowired
     private MapaManutencaoService mapaManutencaoService;
 
-    private Unidade unidade;
     private Usuario admin;
     private Subprocesso subprocesso;
     private Processo processo;
@@ -42,7 +41,7 @@ class SubprocessoServiceContextoIntegrationTest extends BaseIntegrationTest {
     @BeforeEach
     void setUp() {
         // Unidade 8 (SEDESENV) has titular '3' (00000003) in data.sql
-        unidade = unidadeRepo.findById(8L).orElseThrow();
+        Unidade unidade = unidadeRepo.findById(8L).orElseThrow();
 
         admin = usuarioRepo.findById("3").orElseThrow();
         admin.setUnidadeAtivaCodigo(unidade.getCodigo());

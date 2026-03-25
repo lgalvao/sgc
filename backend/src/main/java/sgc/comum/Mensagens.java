@@ -2,7 +2,7 @@ package sgc.comum;
 
 /**
  * Constantes de mensagens do sistema SGC.
- *
+ * <p>
  * Centraliza mensagens de validação, histórico de movimentações, alertas e notificações
  * para facilitar manutenção e consistência.
  * Use {@link String#formatted} para os templates que contêm {@code %s} ou {@code %d}.

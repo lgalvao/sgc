@@ -20,8 +20,8 @@ describe("ModalAcaoBloco.vue", () => {
     };
 
     const createWrapper = (props = {}) => {
-        const wrapper = mount(ModalAcaoBloco, {
-            props: { ...defaultProps, ...props },
+        return mount(ModalAcaoBloco, {
+            props: {...defaultProps, ...props},
             global: {
                 stubs: {
                     BModal: {
@@ -45,7 +45,6 @@ describe("ModalAcaoBloco.vue", () => {
                 }
             }
         });
-        return wrapper;
     };
 
     beforeEach(() => {

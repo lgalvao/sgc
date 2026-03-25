@@ -206,6 +206,8 @@ export const TEXTOS = {
       MONITORAMENTO_TITULO: "Monitoramento",
       MONITORAMENTO_TEXTO: "Acompanhamento e conclusão do diagnóstico da unidade",
     },
+    NAO_ENCONTRADO_TITULO: "Subprocesso não iniciado",
+    NAO_ENCONTRADO_DESC: "Este subprocesso ainda não foi iniciado ou a unidade não participa deste processo.",
   },
   relatorios: {
     TITULO: "Relatórios",

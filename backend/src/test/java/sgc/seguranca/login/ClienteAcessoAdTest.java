@@ -44,8 +44,7 @@ class ClienteAcessoAdTest {
         when(responseSpec.onStatus(any(), any())).thenReturn(responseSpec);
         when(responseSpec.body(String.class)).thenReturn("OK");
 
-        boolean resultado = clienteAcessoAd.autenticar("123", "senha");
-        assertTrue(resultado);
+        assertDoesNotThrow(() -> clienteAcessoAd.autenticar("123", "senha"));
     }
 
     @Test

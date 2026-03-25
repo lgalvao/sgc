@@ -36,10 +36,8 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
     private AlertaRepo alertaRepo;
 
     private Unidade unidadeRaiz;
-    private Unidade unidadeFilha1;
     private Unidade unidadeFilha2;
     private Processo processoRaiz;
-    private Processo processoFilha1;
 
     @BeforeEach
     void setup() {
@@ -52,7 +50,7 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
         unidadeRaiz.setNome("Unidade raiz teste");
         unidadeRaiz = unidadeRepo.save(unidadeRaiz);
 
-        unidadeFilha1 = UnidadeFixture.unidadePadrao();
+        Unidade unidadeFilha1 = UnidadeFixture.unidadePadrao();
         unidadeFilha1.setCodigo(null);
         unidadeFilha1.setNome("Unidade filha 1 Teste");
         unidadeFilha1.setUnidadeSuperior(unidadeRaiz);
@@ -71,11 +69,11 @@ class CDU02IntegrationTest extends BaseIntegrationTest {
         processoRaiz.adicionarParticipantes(Set.of(unidadeRaiz));
         processoRaiz = processoRepo.save(processoRaiz);
 
-        processoFilha1 = ProcessoFixture.processoEmAndamento();
+        Processo processoFilha1 = ProcessoFixture.processoEmAndamento();
         processoFilha1.setCodigo(null);
         processoFilha1.setDescricao("Processo filha 1");
         processoFilha1.adicionarParticipantes(Set.of(unidadeFilha1));
-        processoFilha1 = processoRepo.save(processoFilha1);
+        processoRepo.save(processoFilha1);
 
         Processo processoCriado = ProcessoFixture.processoPadrao(); // Status CRIADO
         processoCriado.setCodigo(null);

@@ -51,15 +51,15 @@ O teste `cdu-03.spec.ts` cobre os seguintes cenários:
    - Se ao tentar selecionar tais unidades via API (contorno de desabilitar), a mensagem aparece
    - Teste apenas valida a desabilitação do checkbox
 
-8. **Tipo de processo imutável (passo 3, edição)**: O teste valida que o campo é desabilitado, mas não valida que o requisito menciona "O tipo do processo não pode ser alterado" - isto é implementado como "desabilitado", o que é apropriado.
+5. **Tipo de processo imutável (passo 3, edição)**: O teste valida que o campo é desabilitado, mas não valida que o requisito menciona "O tipo do processo não pode ser alterado" - isto é implementado como "desabilitado", o que é apropriado.
 
-9. **Teste de cancelamento não completo**: O teste valida cancelamento de remoção, mas não valida cancelamento de criação com dados preenchidos (requisito não especifica, mas bom ter).
+6. **Teste de cancelamento não completo**: O teste valida cancelamento de remoção, mas não valida cancelamento de criação com dados preenchidos (requisito não especifica, mas bom ter).
 
-10. **Validação de formulário vazio não trata Data limite**: O teste começa preenchendo descrição, tipo e data limite, e então valida desabilitação de botão se remover descrição. Não há um teste começando com formulário completamente vazio e preenchendo passo a passo.
+7. **Validação de formulário vazio não trata Data limite**: O teste começa preenchendo descrição, tipo e data limite, e então valida desabilitação de botão se remover descrição. Não há um teste começando com formulário completamente vazio e preenchendo passo a passo.
 
-11. **Campo observações e Sugestões não validados para criação**: O requisito (passo 2) menciona que o formulário de criação contém também campos para "Observações" e "Sugestões" (no passo 9 mencionado como campos dos subprocessos, não do processo). Pode haver confusão: o processo em "Criado" tem apenas Descrição, Tipo, Data limite e Unidades?
+8. **Campo observações e Sugestões não validados para criação**: O requisito (passo 2) menciona que o formulário de criação contém também campos para "Observações" e "Sugestões" (no passo 9 mencionado como campos dos subprocessos, não do processo). Pode haver confusão: o processo em "Criado" tem apenas Descrição, Tipo, Data limite e Unidades?
 
-12. **Botões do formulário não completamente testados**: O teste não valida explicitamente os botões "Cancelar", "Salvar" e "Iniciar processo" quando aparecem (exceto parcialmente).
+9. **Botões do formulário não completamente testados**: O teste não valida explicitamente os botões "Cancelar", "Salvar" e "Iniciar processo" quando aparecem (exceto parcialmente).
 
 ## Alterações necessárias no teste E2E
 - Adicionar teste que valida mensagens de erro exatas (ajustar regex para ser mais específica):

@@ -21,7 +21,6 @@ public class HierarquiaService {
     }
 
     public boolean isSubordinada(Unidade alvo, Unidade superior) {
-        if (alvo == null || superior == null) return false;
         Long codigoSuperiorAlvo = superior.getCodigo();
 
         Unidade atual = alvo;
@@ -47,10 +46,10 @@ public class HierarquiaService {
     }
 
     public boolean isSuperiorImediata(Unidade alvo, Unidade superior) {
-        if (alvo == null || superior == null) return false;
         Unidade superiorAlvo = alvo.getUnidadeSuperior();
-        if (superiorAlvo == null) return false;
-
+        if (superiorAlvo == null) {
+            return false;
+        }
         return Objects.equals(superiorAlvo.getCodigo(), superior.getCodigo());
     }
 }

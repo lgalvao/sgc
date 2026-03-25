@@ -3,7 +3,6 @@ package sgc.processo.model;
 import org.junit.jupiter.api.*;
 import sgc.fixture.*;
 import sgc.organizacao.model.*;
-import nl.jqno.equalsverifier.*;
 
 import java.time.*;
 import java.util.*;

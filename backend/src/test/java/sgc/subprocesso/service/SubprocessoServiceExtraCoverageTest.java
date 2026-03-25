@@ -464,7 +464,7 @@ class SubprocessoServiceExtraCoverageTest {
             when(permissionEvaluator.verificarPermissao(user, spDest, AcaoPermissao.EDITAR_CADASTRO)).thenReturn(true);
             when(permissionEvaluator.verificarPermissao(user, spOrig, AcaoPermissao.CONSULTAR_PARA_IMPORTACAO)).thenReturn(true);
             
-            subprocessoService.importarAtividades(1L, 2L, null);
+            subprocessoService.importarAtividades(1L, 2L, List.of());
             verify(subprocessoRepo).save(spDest);
             verify(copiaMapaService).importarAtividadesDeOutroMapa(eq(200L), eq(100L), any());
             assertThat(spDest.getSituacao()).isEqualTo(MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
@@ -489,7 +489,7 @@ class SubprocessoServiceExtraCoverageTest {
             when(permissionEvaluator.verificarPermissao(eq(user), eq(spDest), any())).thenReturn(true);
             when(permissionEvaluator.verificarPermissao(eq(user), eq(spOrig), any())).thenReturn(true);
             
-            subprocessoService.importarAtividades(1L, 2L, null);
+            subprocessoService.importarAtividades(1L, 2L, List.of());
             assertThat(spDest.getSituacao()).isEqualTo(REVISAO_CADASTRO_EM_ANDAMENTO);
         }
 

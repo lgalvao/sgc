@@ -54,7 +54,7 @@ class SubprocessoValidacaoServiceTest {
             ValidacaoCadastroDto dto = validacaoService.validarCadastro(sp);
             assertThat(dto.valido()).isFalse();
             assertThat(dto.erros()).hasSize(1);
-            assertThat(dto.erros().get(0).tipo()).isEqualTo("SEM_MAPA");
+            assertThat(dto.erros().getFirst().tipo()).isEqualTo("SEM_MAPA");
         }
 
         @Test
@@ -69,7 +69,7 @@ class SubprocessoValidacaoServiceTest {
             ValidacaoCadastroDto dto = validacaoService.validarCadastro(sp);
             assertThat(dto.valido()).isFalse();
             assertThat(dto.erros()).hasSize(1);
-            assertThat(dto.erros().get(0).tipo()).isEqualTo("SEM_ATIVIDADES");
+            assertThat(dto.erros().getFirst().tipo()).isEqualTo("SEM_ATIVIDADES");
         }
 
         @Test
@@ -90,7 +90,7 @@ class SubprocessoValidacaoServiceTest {
             ValidacaoCadastroDto dto = validacaoService.validarCadastro(sp);
             assertThat(dto.valido()).isFalse();
             assertThat(dto.erros()).hasSize(1);
-            assertThat(dto.erros().get(0).tipo()).isEqualTo("ATIVIDADE_SEM_CONHECIMENTO");
+            assertThat(dto.erros().getFirst().tipo()).isEqualTo("ATIVIDADE_SEM_CONHECIMENTO");
         }
 
         @Test

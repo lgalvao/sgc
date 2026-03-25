@@ -27,8 +27,7 @@ export function useAsyncAction() {
         carregando.value = true;
         erro.value = null;
         try {
-            const resultado = await acao();
-            return resultado;
+            return await acao();
         } catch (e: any) {
             erro.value = e.message || mensagemErro;
             throw e;

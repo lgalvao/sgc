@@ -13,7 +13,7 @@ import {
     fazerLogout,
     navegarParaSubprocesso
 } from './helpers/helpers-navegacao.js';
-import {criarProcesso, verificarDetalhesSubprocesso} from './helpers/helpers-processos.js';
+import {acessarDetalhesProcesso, criarProcesso, verificarDetalhesSubprocesso} from './helpers/helpers-processos.js';
 
 test.describe('CDU-07 - Detalhar subprocesso', () => {
     const UNIDADE_ALVO = 'SECAO_211';
@@ -324,7 +324,7 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
             iniciar: true
         });
 
-        await acessarDetalhesProcesso(page, descricao, {exact: true});
+        await acessarDetalhesProcesso(page, descricao);
         await esperarPaginaDetalhesProcesso(page);
         await navegarParaSubprocesso(page, 'ASSESSORIA_12');
 

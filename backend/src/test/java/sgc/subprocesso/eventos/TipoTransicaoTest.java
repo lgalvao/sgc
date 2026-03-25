@@ -25,6 +25,6 @@ class TipoTransicaoTest {
         assertThat(tipo.geraAlerta()).isFalse();
 
         String alerta = tipo.formatarAlerta("SIGLA");
-        assertThat(alerta).isEqualTo("");
+        assertThat(alerta).isEmpty();
     }
 }

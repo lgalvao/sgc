@@ -1,4 +1,4 @@
-// noinspection JSUnusedGlobalSymbols
+// noinspection JSUnusedGlobalSymbols,ES6ConvertVarToLetConst
 
 import {createBootstrap, vBTooltip} from "bootstrap-vue-next"; // Importar createBootstrap e vBTooltip
 import {createPinia} from "pinia";
@@ -15,13 +15,7 @@ import "bootstrap/dist/css/bootstrap.min.css"; // Manter se houver estilos custo
 import "bootstrap-icons/font/bootstrap-icons.css";
 
 declare global {
-    interface Window {
-        pinia: ReturnType<typeof createPinia>;
-        __pinia__: ReturnType<typeof createPinia>;
-    }
-
     var pinia: ReturnType<typeof createPinia>;
-
     var __pinia__: ReturnType<typeof createPinia>;
 }
 
