@@ -19,6 +19,7 @@ import {
     fecharHistoricoAnalise,
 } from './helpers/helpers-analise.js';
 import {navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
+import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
 
 test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos', () => {
     const UNIDADE_ALVO = 'SECAO_212';

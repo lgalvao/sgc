@@ -4,6 +4,7 @@ import {navegarParaMapa} from './helpers/helpers-mapas.js';
 import {login, USUARIOS} from './helpers/helpers-auth.js';
 import {acessarSubprocessoGestor} from './helpers/helpers-analise.js';
 import {verificarPaginaPainel} from './helpers/helpers-navegacao.js';
+import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
 import {resetDatabase} from './hooks/hooks-limpeza.js';
 
 test.describe.serial('CDU-19 - Validar mapa de competências', () => {

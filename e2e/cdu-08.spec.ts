@@ -5,6 +5,7 @@ import {login, USUARIOS} from './helpers/helpers-auth.js';
 import * as AtividadeHelpers from './helpers/helpers-atividades.js';
 import {fazerLogout} from './helpers/helpers-navegacao.js';
 import {criarProcessoFinalizadoFixture, criarProcessoFixture} from './fixtures/fixtures-processos.js';
+import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
 
 test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
     const UNIDADE_ALVO = 'ASSESSORIA_11';
@@ -148,6 +149,7 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
         const UNIDADE_REVISAO = 'ASSESSORIA_12';
         const CHEFE_REVISAO = USUARIOS.CHEFE_ASSESSORIA_12.titulo;
         const SENHA_REVISAO = USUARIOS.CHEFE_ASSESSORIA_12.senha;
+
         await test.step('Setup: Criar processo de Revisão', async () => {
             await criarProcessoFixture(request, {
                 unidade: UNIDADE_REVISAO,

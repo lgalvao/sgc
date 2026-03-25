@@ -6,6 +6,7 @@ import {
 } from './fixtures/fixtures-processos.js';
 import {navegarParaAtividadesVisualizacao} from './helpers/helpers-atividades.js';
 import {navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
+import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
 
 test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos', () => {
     

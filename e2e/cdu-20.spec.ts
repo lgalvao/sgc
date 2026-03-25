@@ -13,6 +13,7 @@ import {
     acessarSubprocessoGestor
 } from './helpers/helpers-analise.js';
 import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
+import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
 import {resetDatabase} from './hooks/hooks-limpeza.js';
 

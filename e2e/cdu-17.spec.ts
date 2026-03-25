@@ -2,6 +2,7 @@ import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcessoCadastroHomologadoFixture, validarProcessoFixture} from './fixtures/fixtures-processos.js';
 import {criarCompetencia, disponibilizarMapa, navegarParaMapa} from './helpers/helpers-mapas.js';
 import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
+import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
 
 test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
     const UNIDADE_ALVO = 'SECAO_211';
