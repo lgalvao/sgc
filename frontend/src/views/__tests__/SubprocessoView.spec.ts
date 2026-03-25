@@ -10,7 +10,7 @@ import * as useAcessoModule from '@/composables/useAcesso';
 
 const SubprocessoCardsStub = {
     template: '<div data-testid="subprocesso-cards"></div>',
-    props: ['situacao', 'tipoProcesso']
+    props: ['situacao', 'tipoProcesso', 'subprocesso']
 };
 const SubprocessoModalStub = {
     template: '<div data-testid="subprocesso-modal"></div>',
@@ -235,6 +235,18 @@ describe('SubprocessoView.vue', () => {
         expect(wrapper.find('[data-testid="header-subprocesso"]').exists()).toBe(true);
         expect(wrapper.findComponent(SubprocessoCardsStub).exists()).toBe(true);
         expect(wrapper.find('[data-testid="tbl-movimentacoes"]').exists()).toBe(true);
+    });
+
+    it('passa o subprocesso carregado ao componente de cards', async () => {
+        const {wrapper} = mountComponent();
+        await flushPromises();
+        await (wrapper.vm as any).$nextTick();
+
+        const cards = wrapper.findComponent(SubprocessoCardsStub);
+        expect(cards.props('subprocesso')).toEqual(expect.objectContaining({
+            codigo: 10,
+            tipoProcesso: TipoProcesso.MAPEAMENTO
+        }));
     });
 
     it('opens date limit modal when allowed', async () => {

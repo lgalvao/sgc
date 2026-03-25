@@ -111,6 +111,7 @@
           :mapa="mapa"
           :sigla-unidade="props.siglaUnidade"
           :situacao="subprocesso.situacao"
+          :subprocesso="subprocesso"
           :tipo-processo="subprocesso.tipoProcesso || TipoProcesso.MAPEAMENTO"
       />
 
