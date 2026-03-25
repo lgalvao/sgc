@@ -135,7 +135,7 @@ class SubprocessoControllerCoverageTest {
     @DisplayName("alterarDataLimite - deve chamar servico e retornar 200")
     @WithMockUser(roles = "ADMIN")
     void alterarDataLimite() throws Exception {
-        DataRequest req = new DataRequest(LocalDate.now());
+        DataRequest req = new DataRequest(LocalDate.now().plusDays(1));
 
         mockMvc.perform(post("/api/subprocessos/1/data-limite")
                         .with(csrf())

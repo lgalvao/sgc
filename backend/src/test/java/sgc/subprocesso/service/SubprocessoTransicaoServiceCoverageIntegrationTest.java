@@ -140,7 +140,7 @@ class SubprocessoTransicaoServiceCoverageIntegrationTest {
             sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
             sp = subprocessoRepo.save(sp);
 
-            java.time.LocalDate novaData = java.time.LocalDate.of(2025, 12, 31);
+            java.time.LocalDate novaData = java.time.LocalDate.now().plusDays(30);
             transicaoService.alterarDataLimite(sp.getCodigo(), novaData);
 
             Subprocesso atualizado = subprocessoRepo.findById(sp.getCodigo()).orElseThrow();
@@ -165,7 +165,7 @@ class SubprocessoTransicaoServiceCoverageIntegrationTest {
             sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO);
             sp = subprocessoRepo.save(sp);
 
-            java.time.LocalDate novaData = java.time.LocalDate.of(2025, 12, 31);
+            java.time.LocalDate novaData = java.time.LocalDate.now().plusDays(30);
             transicaoService.alterarDataLimite(sp.getCodigo(), novaData);
 
             Subprocesso atualizado = subprocessoRepo.findById(sp.getCodigo()).orElseThrow();
@@ -190,7 +190,7 @@ class SubprocessoTransicaoServiceCoverageIntegrationTest {
             sp.setSituacaoForcada(SituacaoSubprocesso.NAO_INICIADO);
             sp = subprocessoRepo.save(sp);
 
-            java.time.LocalDate novaData = java.time.LocalDate.of(2025, 12, 31);
+            java.time.LocalDate novaData = java.time.LocalDate.now().plusDays(30);
             transicaoService.alterarDataLimite(sp.getCodigo(), novaData);
 
             Subprocesso atualizado = subprocessoRepo.findById(sp.getCodigo()).orElseThrow();
@@ -285,9 +285,12 @@ class SubprocessoTransicaoServiceCoverageIntegrationTest {
             user.setTituloEleitoral("123");
             user = usuarioRepo.save(user);
 
+            proc.setDataCriacao(java.time.LocalDateTime.now().plusDays(5));
+            proc = processoRepo.saveAndFlush(proc);
+
             sgc.subprocesso.dto.DisponibilizarMapaRequest request = sgc.subprocesso.dto.DisponibilizarMapaRequest.builder()
                 .observacoes("novas observacoes")
-                .dataLimite(java.time.LocalDate.of(2025, 12, 31))
+                .dataLimite(proc.getDataCriacao().toLocalDate().plusDays(1))
                 .build();
 
             transicaoService.disponibilizarMapa(sp.getCodigo(), request, user);

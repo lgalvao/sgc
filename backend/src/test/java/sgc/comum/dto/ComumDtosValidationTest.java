@@ -74,7 +74,7 @@ class ComumDtosValidationTest {
         @Test
         @DisplayName("Deve aceitar data válida")
         void deveAceitarDataValida() {
-            DataRequest req = new DataRequest(LocalDate.now());
+            DataRequest req = new DataRequest(LocalDate.now().plusDays(1));
             Set<ConstraintViolation<DataRequest>> violations = validator.validate(req);
             assertThat(violations).isEmpty();
         }

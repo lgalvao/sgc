@@ -90,6 +90,23 @@ export async function editarCompetencia(page: Page, descricaoAtual: string, nova
     await expect(page.getByText(novaDescricao)).toBeVisible();
 }
 
+export async function removerAtividadeAssociada(page: Page, descricaoCompetencia: string, descricaoAtividade: string) {
+    const card = page.getByTestId('cad-mapa__card-competencia')
+        .filter({has: page.getByText(descricaoCompetencia, {exact: true})});
+    await expect(card).toBeVisible();
+
+    const atividadeAssociada = card.locator('.atividade-associada-card-item')
+        .filter({hasText: descricaoAtividade})
+        .first();
+    await expect(atividadeAssociada).toBeVisible();
+
+    const botaoRemover = atividadeAssociada.getByTestId('btn-remover-atividade-associada');
+    await expect(botaoRemover).toBeVisible();
+    await botaoRemover.click({force: true});
+
+    await expect(atividadeAssociada).toBeHidden();
+}
+
 /**
  * Exclui competência confirmando a ação no modal
  */

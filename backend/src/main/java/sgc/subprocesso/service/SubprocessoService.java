@@ -344,6 +344,8 @@ public class SubprocessoService {
         Mapa mapa = subprocesso.getMapa();
         Long codMapa = mapa.getCodigo();
 
+        validarCompetenciaParaCriacao(request);
+
         boolean eraVazio = mapaManutencaoService.competenciasCodMapa(codMapa).isEmpty();
 
         mapaManutencaoService.criarCompetenciaComAtividades(mapa, request.descricao(), request.atividadesIds());
@@ -361,6 +363,12 @@ public class SubprocessoService {
 
         Mapa mapa = sp.getMapa();
         return mapaManutencaoService.mapaCodigo(mapa.getCodigo());
+    }
+
+    private void validarCompetenciaParaCriacao(CompetenciaRequest request) {
+        if (request.atividadesIds() == null || request.atividadesIds().isEmpty()) {
+            throw new ErroValidacao(Mensagens.COMPETENCIA_DEVE_TER_ATIVIDADE);
+        }
     }
 
     public Mapa removerCompetencia(Long codSubprocesso, Long codCompetencia) {

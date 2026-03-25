@@ -14,6 +14,5 @@ public record CompetenciaRequest(
         @NotBlank(message = Mensagens.DESCRICAO_COMPETENCIA_OBRIGATORIA)
         String descricao,
 
-        @NotEmpty(message = Mensagens.COMPETENCIA_DEVE_TER_ATIVIDADE)
         List<Long> atividadesIds) {
 }
