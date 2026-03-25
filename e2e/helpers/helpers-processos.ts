@@ -81,7 +81,7 @@ export async function verificarCabecalhosTabelaProcessos(page: Page, compacto = 
     const cabecalhosEsperados = ['Descrição', 'Tipo', rotuloUnidades, 'Situação'];
 
     for (const cabecalho of cabecalhosEsperados) {
-        await expect(tabela.getByRole('columnheader', {name: cabecalho})).toBeVisible();
+        await expect(tabela.locator('th', {hasText: cabecalho}).first()).toBeVisible();
     }
 }
 

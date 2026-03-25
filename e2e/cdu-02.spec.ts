@@ -28,7 +28,7 @@ test.describe('CDU-02 - Visualizar painel', () => {
             });
 
             await test.step('Verificar campos da tabela de processos ativos', async () => {
-                await verificarCabecalhosTabelaProcessos(page);
+                await verificarCabecalhosTabelaProcessos(page, true);
                 await verificarProcessoNaTabela(page, {
                     descricao: descricaoProcesso,
                     tipo: 'Mapeamento',

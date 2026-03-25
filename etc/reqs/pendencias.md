@@ -4,11 +4,13 @@ Esta versão substitui a rodada anterior e consolida pendências após segunda v
 
 ## Andamento da execução (2026-03-25)
 - ✅ **Lote iniciado** com foco no **CDU-02 (Visualizar painel)**, priorizando item P0 de campos da tabela de processos ativos.
-- ✅ Adicionada cobertura E2E explícita para validar cabeçalhos obrigatórios da tabela (`Descrição`, `Tipo`, `Unidades participantes`, `Situação`) e presença dos dados recém-criados na mesma linha.
+- ✅ Adicionada cobertura E2E explícita para validar cabeçalhos obrigatórios da tabela do painel compacto (`Descrição`, `Tipo`, `Unidades`, `Situação`) e presença dos dados recém-criados na mesma linha.
+- ✅ Execução do arquivo `e2e/cdu-02.spec.ts` validada com sucesso após instalação dos navegadores Playwright no ambiente.
 - 🔄 Próximo passo sugerido: fechar regras de exibição restantes do CDU-02 (visibilidade por perfil e regras de funcionamento da listagem) com cenários negativos adicionais.
 
 ## Novos aprendizados (rodada atual)
 - A validação de cabeçalhos da tabela depende de existir ao menos um processo visível, pois a UI troca para `EmptyState` quando a lista está vazia.
+- No painel (`PainelView`), a tabela roda em modo `compacto`; portanto o cabeçalho correto é `Unidades` (e não `Unidades participantes`).
 - Para cobrir requisito de “campos da tabela”, é mais robusto preparar dado mínimo via fluxo de criação e depois validar cabeçalho + linha no painel.
 - O helper semântico para cabeçalhos reduz duplicação e evita espalhar seletores de coluna em múltiplas specs.
 
