@@ -57,7 +57,25 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
         await expect(page.getByTestId('mdl-disponibilizar-mapa')).toBeHidden();
         await expect(page.getByText('Mapa de competências técnicas')).toBeVisible();
 
-        // Cenario 4: Disponibilizar com sucesso
+        // Cenario 4: Validar data posterior à criação do processo
+        await page.getByTestId('btn-cad-mapa-disponibilizar').click();
+        const modal = page.getByTestId('mdl-disponibilizar-mapa');
+        await expect(modal).toBeVisible();
+
+        // Tenta preencher com a data de hoje (que é igual ou anterior à criação do processo na maioria dos casos de teste)
+        const hoje = new Date().toISOString().split('T')[0];
+        await page.getByTestId('inp-disponibilizar-mapa-data').fill(hoje);
+
+        // Verifica se a mensagem de erro aparece
+        // Nota: Se hoje for a data de criação, deve mostrar "A data limite deve ser posterior à data de criação do processo."
+        // Se hoje for passado, o componente InputData ou o watch podem mostrar "A data limite para validação deve ser uma data futura."
+        // De qualquer forma, o botão de confirmar deve estar desabilitado.
+        await expect(modal.getByText(/A data limite (deve ser posterior à data de criação do processo|para validação deve ser uma data futura)/)).toBeVisible();
+        await expect(page.getByTestId('btn-disponibilizar-mapa-confirmar')).toBeDisabled();
+
+        await page.getByTestId('btn-disponibilizar-mapa-cancelar').click();
+
+        // Cenario 5: Disponibilizar com sucesso
         await disponibilizarMapa(page, '2030-12-31');
         await verificarPaginaPainel(page);
         await acessarDetalhesProcesso(page, descProcesso);
