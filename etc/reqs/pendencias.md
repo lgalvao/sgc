@@ -10,7 +10,8 @@ Esta versão substitui a rodada anterior e consolida pendências após segunda v
 - ✅ Fechado bloco de regras de clique da tabela de processos do CDU-02 com cobertura explícita por perfil: `ADMIN` abre cadastro para processo `Criado`; `ADMIN`/`GESTOR` abrem `Detalhes do processo` para `Em andamento`; `CHEFE` abre `Detalhes do subprocesso`.
 - ✅ Incluídos cenários negativos/funcionais complementares no CDU-02 para reforçar regra de exibição por perfil e comportamento de navegação da listagem.
 - ✅ Correção de preparação de ambiente E2E aplicada: instalação do Playwright refeita com o comando obrigatório `npx playwright install --with-deps --only-shell` (inclui dependências de SO para execução headless estável).
-- 🔄 Próximo passo sugerido: avançar em pendências de **alertas do CDU-02** (campos da tabela, visibilidade por perfil e ordenação fixa por data/hora).
+- ✅ Novo cenário E2E no CDU-02 cobrindo tabela de alertas: validação explícita dos campos (`Data/Hora`, `Descrição`, `Processo`, `Origem`), comportamento de ordenação fixa por data/hora (sem reordenação por clique) e transição de alerta não lido (`fw-bold`) para lido após recarga.
+- 🔄 Próximo passo sugerido: ampliar matriz de visibilidade de alertas por perfil no CDU-02 (principalmente regra específica de `SERVIDOR` não herdar alertas de unidade).
 
 ## Novos aprendizados (rodada atual)
 - A validação de cabeçalhos da tabela depende de existir ao menos um processo visível, pois a UI troca para `EmptyState` quando a lista está vazia.
@@ -23,6 +24,7 @@ Esta versão substitui a rodada anterior e consolida pendências após segunda v
 - Para CHEFE, o clique na linha do painel tende a redirecionar diretamente para rota de subprocesso (`/processo/{codigo}/{SIGLA_UNIDADE}`), o que fornece evidência objetiva da regra de navegação por perfil.
 - **Padronização obrigatória para ambiente E2E headless:** usar `npx playwright install --with-deps --only-shell`; usar apenas `npx playwright install` pode deixar dependências nativas ausentes no host e quebrar a inicialização do navegador.
 - Evitar usar, na descrição dinâmica de processos de teste, termos idênticos ao texto da situação (ex.: `Em andamento`), pois pode gerar ambiguidade de seletor textual na mesma linha da tabela.
+- Para validar “não reordenável” na tabela de alertas, a asserção mais estável é verificar que o cabeçalho não ganha estado de sort (`aria-sort`) após clique e que a tabela mantém comportamento passivo no header.
 
 ## Síntese executiva
 - Escopo: 36 pares requisito x teste E2E.

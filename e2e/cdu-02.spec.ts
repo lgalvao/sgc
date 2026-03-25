@@ -240,4 +240,53 @@ test.describe('CDU-02 - Visualizar painel', () => {
             });
         });
     });
+
+    test.describe('Alertas no painel', () => {
+        test('Deve exibir campos, manter ordenação fixa e marcar alerta como lido na segunda visualização', async ({
+                                                                                                                       _resetAutomatico,
+                                                                                                                       page,
+                                                                                                                       _autenticadoComoAdmin
+}) => {
+            const descricaoProcesso = `Processo alerta painel - ${Date.now()}`;
+
+            await criarProcesso(page, {
+                descricao: descricaoProcesso,
+                tipo: 'MAPEAMENTO',
+                diasLimite: 30,
+                unidade: 'ASSESSORIA_11',
+                expandir: ['SECRETARIA_1'],
+                iniciar: true
+            });
+
+            await fazerLogout(page);
+            await login(page, USUARIOS.CHEFE_ASSESSORIA_11.titulo, USUARIOS.CHEFE_ASSESSORIA_11.senha);
+
+            const tabelaAlertas = page.getByTestId('tbl-alertas');
+            await expect(tabelaAlertas).toBeVisible();
+
+            await expect(tabelaAlertas.locator('th', {hasText: 'Data/Hora'}).first()).toBeVisible();
+            await expect(tabelaAlertas.locator('th', {hasText: 'Descrição'}).first()).toBeVisible();
+            await expect(tabelaAlertas.locator('th', {hasText: 'Processo'}).first()).toBeVisible();
+            await expect(tabelaAlertas.locator('th', {hasText: 'Origem'}).first()).toBeVisible();
+
+            const linhaAlerta = tabelaAlertas.locator('tr', {hasText: descricaoProcesso})
+                .filter({hasText: 'Início do processo'})
+                .first();
+            await expect(linhaAlerta).toBeVisible();
+            await expect(linhaAlerta).toContainText(/\d{2}\/\d{2}\/\d{4}\s+\d{2}:\d{2}/);
+            await expect(linhaAlerta).toHaveClass(/fw-bold/);
+
+            const cabecalhoDataHora = tabelaAlertas.locator('th', {hasText: 'Data/Hora'}).first();
+            await expect(cabecalhoDataHora).not.toHaveAttribute('aria-sort', /ascending|descending/);
+            await cabecalhoDataHora.click();
+            await expect(cabecalhoDataHora).not.toHaveAttribute('aria-sort', /ascending|descending/);
+
+            await page.reload();
+            const linhaAlertaLida = page.getByTestId('tbl-alertas').locator('tr', {hasText: descricaoProcesso})
+                .filter({hasText: 'Início do processo'})
+                .first();
+            await expect(linhaAlertaLida).toBeVisible();
+            await expect(linhaAlertaLida).not.toHaveClass(/fw-bold/);
+        });
+    });
 });
