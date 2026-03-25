@@ -105,6 +105,6 @@ class UnidadeHierarquiaServiceCoverageTest {
         
         List<UnidadeDto> result = target.buscarArvoreHierarquica();
         assertThat(result).hasSize(1);
-        assertThat(result.get(0).isElegivel()).isTrue();
+        assertThat(result.getFirst().isElegivel()).isTrue();
     }
 }

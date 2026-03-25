@@ -22,7 +22,7 @@ public class ClienteAcessoAd {
     /**
      * Autentica um usuário no serviço AcessoAD.
      */
-    public boolean autenticar(String titulo, String senha) {
+    public void autenticar(String titulo, String senha) {
         try {
             AutenticarRequest request = new AutenticarRequest(titulo, senha);
             acessoAdRestClient.post()
@@ -38,7 +38,6 @@ public class ClienteAcessoAd {
                     .body(String.class);
 
             log.info("Usuário {} autenticado no AD.", titulo);
-            return true;
         } catch (ErroAutenticacao e) {
             throw e;
         } catch (Exception e) {

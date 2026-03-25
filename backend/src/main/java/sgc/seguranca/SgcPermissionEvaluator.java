@@ -199,7 +199,7 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
     // ── Utilitário ──────────────────────────────────────────────────
 
     private String mascarar(String valor) {
-        if (valor == null || valor.length() <= 4) return "***";
+        if (valor.length() <= 4) return "***";
         return "***" + valor.substring(valor.length() - 4);
     }
 

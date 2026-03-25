@@ -26,7 +26,6 @@ import java.time.*;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static sgc.processo.model.AcaoProcesso.*;
 import static sgc.seguranca.AcaoPermissao.*;
@@ -417,7 +416,7 @@ class ProcessoServiceTest {
             ProcessoDetalheDto result = processoService.obterDetalhesCompleto(codProcesso, usuario, false);
 
             assertThat(result.getUnidades()).isNotEmpty();
-            assertThat(result.getUnidades().get(0).getFilhos()).isNotEmpty();
+            assertThat(result.getUnidades().getFirst().getFilhos()).isNotEmpty();
         }
     }
 

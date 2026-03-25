@@ -52,7 +52,8 @@ public class LoginFacade {
             return false;
         }
         try {
-            return clienteAcessoAd.autenticar(tituloEleitoral, senha);
+            clienteAcessoAd.autenticar(tituloEleitoral, senha);
+            return true;
         } catch (ErroAutenticacao e) {
             log.warn("Falha na autenticação do usuário {}: {}", mascarar(tituloEleitoral), e.getMessage());
             return false;

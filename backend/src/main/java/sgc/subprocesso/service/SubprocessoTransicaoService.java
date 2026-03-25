@@ -618,7 +618,7 @@ public class SubprocessoTransicaoService {
         if (isRevisao) {
             alertaService.criarAlertaReaberturaRevisao(processo, unidade, justificativa);
         } else {
-            alertaService.criarAlertaReaberturaCadastro(processo, unidade, justificativa);
+            alertaService.criarAlertaReaberturaCadastro(processo, unidade);
         }
 
         Unidade superior = unidade.getUnidadeSuperior();

@@ -24,7 +24,6 @@ import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -140,7 +139,7 @@ class ProcessoServiceExtraCoverageTest {
             p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
             when(repo.buscar(Processo.class, 1L)).thenReturn(p);
 
-            AtualizarProcessoRequest req = new AtualizarProcessoRequest(1L, "desc", TipoProcesso.MAPEAMENTO, null, List.<Long>of());
+            AtualizarProcessoRequest req = new AtualizarProcessoRequest(1L, "desc", TipoProcesso.MAPEAMENTO, null, List.of());
 
             assertThrows(ErroValidacao.class, () -> processoService.atualizar(1L, req));
         }
@@ -340,7 +339,7 @@ class ProcessoServiceExtraCoverageTest {
             List<SubprocessoElegivelDto> res = processoService.listarSubprocessosElegiveis(1L);
 
             assertThat(res).hasSize(1);
-            assertThat(res.get(0).getCodigo()).isEqualTo(100L);
+            assertThat(res.getFirst().getCodigo()).isEqualTo(100L);
         }
     }
 

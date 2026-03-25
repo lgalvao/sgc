@@ -194,7 +194,7 @@ public class ArchConsistencyTest {
                             .filter(m -> m.isAnnotatedWith(lazyAnnotation))
                             .forEach(m -> events.add(SimpleConditionEvent.violated(m, m.getFullName() + " está anotada com @Lazy")));
 
-                    item.getConstructors().stream()
+                    item.getConstructors()
                             .forEach(c -> {
                                 if (c.isAnnotatedWith(lazyAnnotation)) {
                                     events.add(SimpleConditionEvent.violated(c, c.getFullName() + " está anotada com @Lazy"));

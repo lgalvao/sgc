@@ -69,7 +69,7 @@ public enum AcaoPermissao {
 
     /** Indica se a ação exige que a unidade do usuário seja igual à localização do subprocesso. */
     public boolean dependeLocalizacao() {
-        return tipo == ESCRITA;
+        return Tipo.ESCRITA == tipo;
     }
 
     /**

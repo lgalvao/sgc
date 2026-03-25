@@ -20,9 +20,8 @@ declare global {
         __pinia__: ReturnType<typeof createPinia>;
     }
 
-    var pinia: ReturnType<typeof createPinia>;
-
-    var __pinia__: ReturnType<typeof createPinia>;
+    const pinia: ReturnType<typeof createPinia>;
+    const __pinia__: ReturnType<typeof createPinia>;
 }
 
 const app = createApp(App);

@@ -254,14 +254,12 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
         void deveFalharAoImportarDeSubprocessoInexistente() throws Exception {
             ImportarAtividadesRequest request = new ImportarAtividadesRequest(99999L, null);
 
-            mockMvc.perform(
-                            post(
-                                    "/api/subprocessos/{codigo}/importar-atividades",
-                                    subprocessoDestino.getCodigo())
-                                    .with(user(chefe))
-                                    .with(csrf())
-                                    .contentType(MediaType.APPLICATION_JSON)
-                                    .content(objectMapper.writeValueAsString(request)))
+            mockMvc.perform(post("/api/subprocessos/{codigo}/importar-atividades",
+                            subprocessoDestino.getCodigo())
+                            .with(user(chefe))
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isNotFound());
         }
 
@@ -295,16 +293,13 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
         @Test
         @DisplayName("Deve retornar erro ao importar atividades já existentes no destino (duplicidade)")
         void deveRetornarErroAoImportarAtividadesJaExistentes() throws Exception {
-            List<Atividade> atividadesOrigem =
-                    atividadeRepo.findByMapa_Codigo(subprocessoOrigem.getMapa().getCodigo());
-
+            List<Atividade> atividadesOrigem = atividadeRepo.findByMapa_Codigo(subprocessoOrigem.getMapa().getCodigo());
             Atividade atividadeDuplicada = atividadesOrigem.getFirst();
 
-            Atividade atividadeExistente =
-                    Atividade.builder()
-                            .mapa(subprocessoDestino.getMapa())
-                            .descricao(atividadeDuplicada.getDescricao())
-                            .build();
+            Atividade atividadeExistente = Atividade.builder()
+                    .mapa(subprocessoDestino.getMapa())
+                    .descricao(atividadeDuplicada.getDescricao())
+                    .build();
             atividadeRepo.save(atividadeExistente);
 
             ImportarAtividadesRequest request =
@@ -329,25 +324,24 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
             // Cenário: o frontend enviou IDs de atividades pertencentes a outro mapa
             // (seleções não limpas ao trocar de processo/unidade — Bug #1390).
             // O backend deve ignorar os IDs inválidos e importar apenas o que encontrou.
-            List<Atividade> atividadesOrigem =
-                    atividadeRepo.findByMapa_Codigo(subprocessoOrigem.getMapa().getCodigo());
+
+            List<Atividade> atividadesOrigem = atividadeRepo.findByMapa_Codigo(subprocessoOrigem.getMapa().getCodigo());
             Atividade atividadeValida = atividadesOrigem.getFirst();
 
             // IDs inválidos que não pertencem ao mapa de origem
-            long idSeleçãoDesatualizadaDeOutroMapa = 99999L;
+            long idSelecaoDesatualizadaDeOutroMapa = 99999L;
 
             ImportarAtividadesRequest request =
                     new ImportarAtividadesRequest(
                             subprocessoOrigem.getCodigo(),
-                            List.of(atividadeValida.getCodigo(), idSeleçãoDesatualizadaDeOutroMapa));
+                            List.of(atividadeValida.getCodigo(), idSelecaoDesatualizadaDeOutroMapa));
 
-            mockMvc.perform(
-                            post("/api/subprocessos/{codigo}/importar-atividades",
-                                    subprocessoDestino.getCodigo())
-                                    .with(user(chefe))
-                                    .with(csrf())
-                                    .contentType(MediaType.APPLICATION_JSON)
-                                    .content(objectMapper.writeValueAsString(request)))
+            mockMvc.perform(post("/api/subprocessos/{codigo}/importar-atividades",
+                            subprocessoDestino.getCodigo())
+                            .with(user(chefe))
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isOk())
                     // O aviso deve indicar que nem todas as atividades foram importadas
                     .andExpect(jsonPath("$.aviso", containsString("não puderam ser importadas")));
@@ -356,8 +350,7 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
             entityManager.clear();
 
             // Apenas a atividade válida deve ter sido importada
-            List<Atividade> atividadesDestino =
-                    atividadeRepo.findByMapa_Codigo(subprocessoDestino.getMapa().getCodigo());
+            List<Atividade> atividadesDestino = atividadeRepo.findByMapa_Codigo(subprocessoDestino.getMapa().getCodigo());
             assertThat(atividadesDestino).hasSize(1);
             assertThat(atividadesDestino.getFirst().getDescricao()).isEqualTo(atividadeValida.getDescricao());
         }

@@ -192,7 +192,7 @@ public class AlertaFacade {
     }
 
     @Transactional
-    public void criarAlertaReaberturaCadastro(Processo processo, Unidade unidade, String justificativa) {
+    public void criarAlertaReaberturaCadastro(Processo processo, Unidade unidade) {
         String descricao = "Cadastro de atividades reaberto";
         criarAlertaAdmin(processo, unidade, descricao);
     }

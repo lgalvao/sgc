@@ -15,7 +15,6 @@ import {
 } from './helpers/helpers-analise.js';
 import {
     fazerLogout,
-    limparNotificacoes,
     verificarAlertaPainel,
     verificarPaginaPainel,
     verificarToast,

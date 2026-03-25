@@ -54,14 +54,14 @@ class LoginFacadeTest {
     @Test
     @DisplayName("autenticar deve chamar clienteAcessoAd")
     void autenticar_Sucesso() {
-        when(clienteAcessoAd.autenticar("123", "senha")).thenReturn(true);
+        doNothing().when(clienteAcessoAd).autenticar("123", "senha");
         assertThat(loginFacade.autenticar("123", "senha")).isTrue();
     }
 
     @Test
     @DisplayName("autenticar deve retornar false em caso de ErroAutenticacao")
     void autenticar_ErroAutenticacao() {
-        when(clienteAcessoAd.autenticar("123", "senha")).thenThrow(new ErroAutenticacao("Falha"));
+        doThrow(new ErroAutenticacao("Falha")).when(clienteAcessoAd).autenticar("123", "senha");
         assertThat(loginFacade.autenticar("123", "senha")).isFalse();
     }
 

@@ -240,7 +240,7 @@ defineExpose({inputDescricaoRef, focarPrimeiroErro});
   overflow-x: hidden;
 }
 
-@media (max-width: 575.98px) {
+@media (max-width: 576px) {
   .container-arvore {
     padding: 0.75rem !important;
   }

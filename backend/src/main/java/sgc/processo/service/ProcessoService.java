@@ -70,7 +70,7 @@ public class ProcessoService {
 
     @Transactional(readOnly = true)
     public Optional<Processo> buscarOpt(Long codigo) {
-        return Optional.ofNullable(repo.buscar(Processo.class, codigo));
+        return Optional.of(repo.buscar(Processo.class, codigo));
     }
 
     @Transactional(readOnly = true)
@@ -312,8 +312,10 @@ public class ProcessoService {
             throw new ErroValidacao(Mensagens.UNIDADE_NAO_PARTICIPA);
         }
 
-        String dataLimiteText = processo.getDataLimite() != null 
-            ? processo.getDataLimite().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) : "N/A";
+        String dataLimiteText = "N/A";
+        if (processo.getDataLimite() != null) {
+            dataLimiteText = processo.getDataLimite().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+        }
         String corpoHtml = emailModelosService.criarEmailLembretePrazo(unidade.getSigla(), processo.getDescricao(), processo.getDataLimite());
 
         Usuario titular = usuarioService.buscarPorLogin(unidade.getTituloTitular());
@@ -411,7 +413,7 @@ public class ProcessoService {
         Map<Long, Subprocesso> mapSp = subps.stream().collect(Collectors.toMap(s -> s.getUnidade().getCodigo(), s -> s));
 
         processo.getParticipantes().stream()
-                .filter(p -> acesso == null || acesso.contains(p.getUnidadeCodigo()))
+                .filter(p -> acesso.contains(p.getUnidadeCodigo()))
                 .forEach(p -> {
                     UnidadeParticipanteDto uDto = UnidadeParticipanteDto.fromSnapshot(p);
                     Subprocesso sp = mapSp.get(p.getUnidadeCodigo());
@@ -483,7 +485,7 @@ public class ProcessoService {
                 .unidadeCodigo(sp.getUnidade().getCodigo())
                 .unidadeNome(sp.getUnidade().getNome())
                 .unidadeSigla(sp.getUnidade().getSigla())
-                .localizacaoCodigo(localizacao != null ? localizacao.getCodigo() : null)
+                .localizacaoCodigo(localizacao.getCodigo())
                 .situacao(sp.getSituacao())
                 .build();
     }

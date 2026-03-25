@@ -32,7 +32,6 @@ import java.util.*;
 import java.util.function.*;
 import java.util.stream.*;
 
-@SuppressWarnings("JvmTaintAnalysis")
 @RestController
 @RequestMapping("/e2e")
 @Profile("e2e")
@@ -91,7 +90,7 @@ public class E2eController {
         }
     }
 
-    private void limparTabela(Statement stmt, String table) throws SQLException {
+    private void limparTabela(Statement stmt, String table) {
         log.debug("Limpando tabela: sgc.{}", table);
         try {
             // nosemgrep: java.lang.security.audit.formatted-sql-string.formatted-sql-string

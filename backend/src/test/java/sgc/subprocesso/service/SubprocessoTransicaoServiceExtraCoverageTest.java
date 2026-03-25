@@ -17,7 +17,6 @@ import sgc.subprocesso.model.*;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -81,8 +80,7 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         when(movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(100L)).thenReturn(List.of(mov));
 
         // Metodo privado, testado via registrarTransicao ou similar
-        // Aqui vou usar Reflection para testar o metodo privado diretamente para garantir cobertura
-        Unidade res = (Unidade) org.springframework.test.util.ReflectionTestUtils.invokeMethod(service, "obterUnidadeLocalizacao", sp);
+        Unidade res = org.springframework.test.util.ReflectionTestUtils.invokeMethod(service, "obterUnidadeLocalizacao", sp);
         assertThat(res).isEqualTo(u);
     }
 
@@ -174,7 +172,7 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         // Usando Reflection para invocar metodo privado
         org.springframework.test.util.ReflectionTestUtils.invokeMethod(service, "enviarAlertasReabertura", sp, "justificativa", false);
 
-        verify(alertaService, times(1)).criarAlertaReaberturaCadastro(p, u, "justificativa");
+        verify(alertaService, times(1)).criarAlertaReaberturaCadastro(p, u);
         verify(alertaService, times(1)).criarAlertaReaberturaCadastroSuperior(p, sup1, u);
         verify(alertaService, times(1)).criarAlertaReaberturaCadastroSuperior(p, sup2, u);
     }

@@ -719,11 +719,13 @@ public class SubprocessoService {
 
         Long codMapaOrigem = spOrigem.getMapa().getCodigo();
         Long codMapaDestino = spDestino.getMapa().getCodigo();
-        int totalParaImportar = codigosAtividades != null ? codigosAtividades.size() : 0;
-        log.info("Importando {} atividades do mapa #{} para o mapa #{}", totalParaImportar, codMapaOrigem, codMapaDestino);
-        int importadas = copiaMapaService.importarAtividadesDeOutroMapa(codMapaOrigem, codMapaDestino, codigosAtividades);
 
-        boolean temDuplicatas = codigosAtividades != null && !codigosAtividades.isEmpty() && importadas < totalParaImportar;
+        List<Long> ids = codigosAtividades != null ? codigosAtividades : Collections.emptyList();
+        int totalParaImportar = ids.size();
+        log.info("Importando {} atividades do mapa #{} para o mapa #{}", totalParaImportar, codMapaOrigem, codMapaDestino);
+        int importadas = copiaMapaService.importarAtividadesDeOutroMapa(codMapaOrigem, codMapaDestino, ids);
+
+        boolean temDuplicatas = !ids.isEmpty() && importadas < totalParaImportar;
 
         if (spDestino.getSituacao() == NAO_INICIADO) {
             var tipoProcesso = spDestino.getProcesso().getTipo();

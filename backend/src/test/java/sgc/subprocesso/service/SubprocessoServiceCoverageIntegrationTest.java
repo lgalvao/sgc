@@ -196,7 +196,7 @@ class SubprocessoServiceCoverageIntegrationTest {
 
             java.util.List<Subprocesso> lista = subprocessoService.listarPorProcessoESituacoes(proc.getCodigo(), java.util.List.of(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO));
             assertThat(lista).hasSize(1);
-            assertThat(lista.get(0).getCodigo()).isEqualTo(sp.getCodigo());
+            assertThat(lista.getFirst().getCodigo()).isEqualTo(sp.getCodigo());
         }
     }
 
@@ -222,7 +222,7 @@ class SubprocessoServiceCoverageIntegrationTest {
 
             java.util.List<Subprocesso> lista = subprocessoService.listarPorProcessoUnidadeESituacoes(proc.getCodigo(), u.getCodigo(), java.util.List.of(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO));
             assertThat(lista).hasSize(1);
-            assertThat(lista.get(0).getCodigo()).isEqualTo(sp.getCodigo());
+            assertThat(lista.getFirst().getCodigo()).isEqualTo(sp.getCodigo());
         }
     }
 
@@ -331,8 +331,8 @@ class SubprocessoServiceCoverageIntegrationTest {
                     new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities())
             );
 
+            // Simulando perfil SERVIDOR
             try {
-                // Simulando perfil SERVIDOR (não ADMIN, CHEFE ou GESTOR)
                 ContextoEdicaoResponse resp = subprocessoService.obterContextoEdicao(sp.getCodigo());
                 assertThat(resp).isNotNull();
             } finally {
@@ -379,14 +379,6 @@ class SubprocessoServiceCoverageIntegrationTest {
             spOrigem.setMapa(mapaOrigem);
             spOrigem = subprocessoRepo.saveAndFlush(spOrigem);
 
-            // Mockando security para permitir
-            // (Isso requer que o usuario autenticado tenha permissao)
-            // Mas como é integração, vamos ver se o Mockito consegue interceptar o Evaluator
-            // Ou se o Evaluator permite por padrão no ambiente de teste.
-            
-            // Para cobrir a linha 789 (default do switch), spDestino deve estar em NAO_INICIADO
-            // e processo ser DIAGNOSTICO.
-            
             try {
                 subprocessoService.importarAtividades(spDestino.getCodigo(), spOrigem.getCodigo(), java.util.List.of());
             } catch (Exception e) {

@@ -41,26 +41,19 @@ public class LimitadorTentativasLogin {
     }
 
     public void verificar(String ip) {
-        if (isLimiterDesabilitado())
+        if (isLimiterDesabilitado() || ip == null || ip.isBlank()) {
             return;
-
-        if (tentativasPorIp.size() >= maxCacheEntries) {
-            limparCachePeriodico();
-            if (tentativasPorIp.size() >= maxCacheEntries) {
-                if (!tentativasPorIp.containsKey(ip)) {
-                    // Cache ainda cheio: enviction policy - remove a entrada mais antiga para liberar espaço
-                    String ipMaisAntigo = encontrarIpMaisAntigo();
-                    if (ipMaisAntigo != null) {
-                        tentativasPorIp.remove(ipMaisAntigo);
-                        log.debug("Limitador de login cheio. Removida entrada mais antiga (IP: {}).", ipMaisAntigo);
-                    } else {
-                        // Fallback se algo der errado na busca
-                        log.warn("Limitador de login cheio e falha ao limpar. Rejeitando novo IP: {}", ip);
-                        throw new ErroMuitasTentativas("Muitas tentativas de login no sistema. Tente novamente mais tarde.");
-                    }
-                }
-            }
         }
+
+        limparCachePeriodico();
+
+        if (tentativasPorIp.size() >= maxCacheEntries && !tentativasPorIp.containsKey(ip)) {
+            // Cache cheio: remove a entrada mais antiga para liberar espaço
+            String ipMaisAntigo = encontrarIpMaisAntigo();
+            tentativasPorIp.remove(ipMaisAntigo);
+            log.debug("Limitador de login cheio. Removida entrada mais antiga (IP: {}).", ipMaisAntigo);
+        }
+        
 
         limparTentativasAntigas(ip);
 
@@ -76,7 +69,13 @@ public class LimitadorTentativasLogin {
                 .filter(e -> !e.getValue().isEmpty())
                 .min(Comparator.comparing(e -> e.getValue().peekFirst()))
                 .map(Map.Entry::getKey)
-                .orElseGet(() -> tentativasPorIp.keySet().stream().findFirst().orElse(null));
+                .orElseGet(() -> {
+                    String firstKey = tentativasPorIp.keySet().stream().findFirst().orElse(null);
+                    if (firstKey == null) {
+                        throw new ErroConfiguracao("Limitador de login inconsistente: cache vazio ao tentar remover.");
+                    }
+                    return firstKey;
+                });
     }
 
     private boolean isLimiterDesabilitado() {

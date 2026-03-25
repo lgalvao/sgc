@@ -136,7 +136,7 @@ um campo para preenchimento de uma observação opcional e os botões Confirmar 
 
 10.9. O sistema mostra a mensagem "Aceite registrado" e redireciona para o Painel.
 
-11. Se optar por **homologar** (apenas para perfil ADMIN):
+1. Se optar por **homologar** (apenas para perfil ADMIN):
 
    11.1. Usuário escolhe `Homologar`.
 
