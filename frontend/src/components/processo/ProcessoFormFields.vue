@@ -193,29 +193,6 @@ function focarPrimeiroErro() {
   }
 }
 
-watch(
-    () => [
-      props.fieldErrors.descricao,
-      props.fieldErrors.tipo,
-      props.fieldErrors.unidades,
-      props.fieldErrors.dataLimite
-    ],
-    async (erros) => {
-      const errosFiltrados = {
-        descricao: erros[0],
-        tipo: props.isEdit ? undefined : erros[1], // Ignora erro de tipo na edição
-        unidades: erros[2],
-        dataLimite: erros[3]
-      };
-
-      if (possuiErros(errosFiltrados)) {
-        await nextTick();
-        focarPrimeiroErro();
-      }
-    },
-    {immediate: true}
-);
-
 defineExpose({inputDescricaoRef, focarPrimeiroErro});
 </script>
 

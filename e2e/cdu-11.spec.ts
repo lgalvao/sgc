@@ -27,7 +27,7 @@ test.describe.serial('CDU-11 - Visualizar cadastro de atividades e conhecimentos
             await acessarDetalhesProcesso(page, descProcesso);
 
             // 2.1. O sistema mostra a tela Detalhes do processo
-            await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+$`));
+            await expect(page).toHaveURL(/\/processo\/\d+$/);
 
             // 2.2. Usuário clica em uma unidade subordinada
             await navegarParaSubprocesso(page, UNIDADE_ALVO);
