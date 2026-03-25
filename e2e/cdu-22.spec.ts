@@ -88,7 +88,7 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
 
     test('Cenario 4: Botão desabilitado para gestor superior quando item está com intermediário', async ({_resetAutomatico, request, page}) => {
         const timestamp4 = Date.now();
-        const processo4 = await criarProcessoCadastroDisponibilizadoFixture(request, {
+        await criarProcessoCadastroDisponibilizadoFixture(request, {
             descricao: `CDU-22-C4 ${timestamp4}`,
             unidade: 'SECAO_111'  // Sob COORD_11, que está sob SECRETARIA_1
         });

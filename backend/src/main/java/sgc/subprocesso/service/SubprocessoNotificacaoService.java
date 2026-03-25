@@ -52,7 +52,7 @@ public class SubprocessoNotificacaoService {
         }
     }
 
-    private String getEmailUnidade(Unidade unidade) {
+    public String getEmailUnidade(Unidade unidade) {
         return "%s@tre-pe.jus.br".formatted(unidade.getSigla().toLowerCase());
     }
 
