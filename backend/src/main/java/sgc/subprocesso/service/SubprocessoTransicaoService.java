@@ -653,7 +653,8 @@ public class SubprocessoTransicaoService {
         String corpo = Mensagens.CORPO_DATA_LIMITE_ALTERADA
                 .formatted(sp.getUnidade().getSigla(), sp.getProcesso().getDescricao(), novaDataStr);
 
-        emailService.enviarEmail(sp.getUnidade().getSigla(), assunto, corpo);
+        String emailDestino = notificacaoService.getEmailUnidade(sp.getUnidade());
+        emailService.enviarEmail(emailDestino, assunto, corpo);
 
         int etapa = situacaoSp.contains("MAPA") ? 2 : 1;
         alertaService.criarAlertaAlteracaoDataLimite(sp.getProcesso(), sp.getUnidade(), novaDataStr, etapa);

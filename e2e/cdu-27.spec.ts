@@ -59,6 +59,11 @@ test.describe.serial('CDU-27 - Alterar data limite de subprocesso', () => {
         await acessarDetalhesProcesso(page, descProcesso);
         await navegarParaSubprocesso(page, UNIDADE_1);
 
+        // Obter a data atual do prazo na página
+        const prazoPaginaElement = page.locator('p:has-text("Prazo da etapa:") span:nth-child(2)');
+        await expect(prazoPaginaElement).not.toBeEmpty();
+        const prazoPagina = await prazoPaginaElement.innerText();
+
         const btnAlterarData = page.getByTestId('btn-alterar-data-limite');
         await expect(btnAlterarData).toBeVisible();
         await expect(btnAlterarData).toBeEnabled();
@@ -69,17 +74,24 @@ test.describe.serial('CDU-27 - Alterar data limite de subprocesso', () => {
 
         const inputData = page.getByTestId('input-nova-data-limite');
         await expect(inputData).toBeVisible();
+        
+        // BUG FIX VERIFICATION: Verificar se o modal inicia com a data do prazo (não criação)
         const dataInicialModal = await inputData.inputValue();
-        await expect(inputData).toHaveValue(/\d{4}-\d{2}-\d{2}/);
+        // Converter data do modal (yyyy-mm-dd) para formato brasileiro (dd/mm/yyyy) para comparar
+        const [y, m, d] = dataInicialModal.split('-');
+        expect(`${d}/${m}/${y}`).toBe(prazoPagina?.trim());
 
-        await inputData.fill(calcularNovaDataIso(7));
+        // Validação de data futura (min attribute)
+        const amanha = calcularNovaDataIso(1);
+        await expect(inputData).toHaveAttribute('min', amanha);
+
+        // Tentar preencher data passada
+        await inputData.fill(calcularNovaDataIso(-1));
+        await expect(page.getByText('A data limite para validação deve ser uma data futura.')).toBeVisible();
+        await expect(page.getByTestId('btn-modal-confirmar')).toBeDisabled();
 
         await modal.getByRole('button', {name: /Cancelar/i}).click();
         await expect(modal).toBeHidden();
-
-        await btnAlterarData.click();
-        await expect(page.getByTestId('input-nova-data-limite')).toHaveValue(dataInicialModal);
-        await modal.getByRole('button', {name: /Cancelar/i}).click();
     });
 
     test('Cenario 3: ADMIN altera data limite e recebe confirmação', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
@@ -90,13 +102,14 @@ test.describe.serial('CDU-27 - Alterar data limite de subprocesso', () => {
         await btnAlterarData.click();
 
         const inputData = page.getByTestId('input-nova-data-limite');
-        await expect(inputData).toHaveValue(/\d{4}-\d{2}-\d{2}/);
-
-        await inputData.fill(calcularNovaDataIso(7));
+        const novaDataIso = calcularNovaDataIso(15);
+        await inputData.fill(novaDataIso);
 
         await page.getByTestId('btn-modal-confirmar').click();
-        await verificarAppAlert(page, /Data limite alterada/i);
-        await expect(inputData).toBeHidden();
-        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toBeVisible();
+        await verificarAppAlert(page, TEXTOS.subprocesso.SUCESSO_DATA_ALTERADA);
+        
+        // Verificar se a página atualizou o prazo
+        const [y, m, d] = novaDataIso.split('-');
+        await expect(page.locator('p:has-text("Prazo da etapa:")')).toContainText(`${d}/${m}/${y}`);
     });
 });

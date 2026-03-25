@@ -237,7 +237,7 @@ import {useSubprocessos} from "@/composables/useSubprocessos";
 
 import {useAcesso} from "@/composables/useAcesso";
 import {type Movimentacao, SituacaoProcesso, type SubprocessoDetalhe, TipoProcesso} from "@/types/tipos";
-import {formatDateTimeBR, logger} from "@/utils";
+import {formatDateTimeBR, logger, parseDate} from "@/utils";
 import {normalizeError} from "@/utils/apiError";
 import {formatSituacaoSubprocesso} from "@/utils/formatters";
 import {TEXTOS} from "@/constants/textos";
@@ -314,12 +314,12 @@ const movimentacoes = computed<Movimentacao[]>(
 );
 const dataLimite = computed(() => {
   if (subprocesso.value?.prazoEtapaAtual) {
-    return new Date(subprocesso.value.prazoEtapaAtual);
+    return parseDate(subprocesso.value.prazoEtapaAtual);
   }
   // Se não tem prazoEtapaAtual, o subprocesso pode estar na etapa 1 (Mapeamento)
   // e o prazo é o do processo pai.
   const dataProcesso = processos.processoDetalhe.value?.dataLimite;
-  return dataProcesso ? new Date(dataProcesso) : null;
+  return dataProcesso ? parseDate(dataProcesso) : null;
 });
 
 function exibirToastPendente() {

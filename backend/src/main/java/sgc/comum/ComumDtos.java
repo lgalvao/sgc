@@ -28,6 +28,7 @@ public final class ComumDtos {
 
     public record DataRequest(
             @NotNull(message = Mensagens.DATA_OBRIGATORIA)
+            @Future(message = Mensagens.DATA_LIMITE_FUTURA)
             LocalDate data
     ) {
     }

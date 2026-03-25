@@ -15,6 +15,7 @@ import sgc.processo.model.*;
 import sgc.subprocesso.model.*;
 
 import java.time.*;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
@@ -62,9 +63,9 @@ class CDU27IntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("Deve alterar a data limite e gerar alerta quando ADMIN")
+    @DisplayName("Deve alterar a data limite, gerar alerta e enviar e-mail quando ADMIN (Etapa 1)")
     @WithMockAdmin
-    void alterarDataLimite_comoAdmin_sucesso() throws Exception {
+    void alterarDataLimite_etapa1_sucesso() throws Exception {
 
         LocalDate novaData = LocalDate.now().plusDays(20);
         DataRequest request = new DataRequest(novaData);
@@ -82,12 +83,48 @@ class CDU27IntegrationTest extends BaseIntegrationTest {
         Subprocesso atualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
         assertThat(atualizado.getDataLimiteEtapa1().toLocalDate()).isEqualTo(novaData);
 
-        // Verify alerta
-        boolean alertaExiste = alertaRepo.findAll().stream()
-                .anyMatch(a -> a.getUnidadeDestino() != null &&
-                        a.getUnidadeDestino().getCodigo().equals(atualizado.getUnidade().getCodigo()) &&
-                        a.getDescricao().contains("Data limite"));
-        assertThat(alertaExiste).isTrue();
+        // 1. Verificar Alerta
+        List<Alerta> alertas = alertaRepo.findAll();
+        Alerta alerta = alertas.get(alertas.size() - 1);
+        assertThat(alerta.getDescricao()).contains("Data limite da etapa 1 alterada");
+        assertThat(alerta.getUnidadeDestino().getCodigo()).isEqualTo(atualizado.getUnidade().getCodigo());
+        assertThat(alerta.getProcesso().getCodigo()).isEqualTo(subprocesso.getProcesso().getCodigo());
+
+        // 2. Verificar E-mail
+        aguardarEmail(1);
+        assertThat(algumEmailContem("A data limite da etapa atual no processo Processo CDU-27 foi alterada")).isTrue();
+    }
+
+    @Test
+    @DisplayName("Deve alterar a data limite e gerar alerta para Etapa 2 (MAPA)")
+    @WithMockAdmin
+    void alterarDataLimite_etapa2_sucesso() throws Exception {
+
+        // Mudar situação para MAPA
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO);
+        subprocessoRepo.save(subprocesso);
+        entityManager.flush();
+
+        LocalDate novaData = LocalDate.now().plusDays(25);
+        DataRequest request = new DataRequest(novaData);
+
+        mockMvc.perform(
+                        post("/api/subprocessos/{codigo}/data-limite", subprocesso.getCodigo())
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk());
+
+        entityManager.flush();
+        entityManager.clear();
+
+        Subprocesso atualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
+        assertThat(atualizado.getDataLimiteEtapa2().toLocalDate()).isEqualTo(novaData);
+
+        // Verificar Alerta para Etapa 2
+        List<Alerta> alertas = alertaRepo.findAll();
+        Alerta alerta = alertas.get(alertas.size() - 1);
+        assertThat(alerta.getDescricao()).contains("Data limite da etapa 2 alterada");
     }
 
     @Test
@@ -98,12 +135,27 @@ class CDU27IntegrationTest extends BaseIntegrationTest {
         LocalDate novaData = LocalDate.now().plusDays(20);
         DataRequest request = new DataRequest(novaData);
 
-        // When/Then
         mockMvc.perform(
                         post("/api/subprocessos/{codigo}/data-limite", subprocesso.getCodigo())
                                 .with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DisplayName("Não deve permitir alterar data limite para data passada ou hoje")
+    @WithMockAdmin
+    void alterarDataLimite_dataPassada_erro() throws Exception {
+
+        LocalDate dataOntem = LocalDate.now().minusDays(1);
+        DataRequest request = new DataRequest(dataOntem);
+
+        mockMvc.perform(
+                        post("/api/subprocessos/{codigo}/data-limite", subprocesso.getCodigo())
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
     }
 }

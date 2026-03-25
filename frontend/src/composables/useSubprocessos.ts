@@ -28,7 +28,7 @@ function mapSubprocessoDetalheDtoToModel(dto: any): SubprocessoDetalhe {
         localizacaoAtual: dto.localizacaoAtual || sp.unidade?.sigla,
         processoDescricao: sp.processoDescricao || sp.processo?.descricao,
         tipoProcesso: sp.tipoProcesso || sp.processo?.tipo,
-        prazoEtapaAtual: sp.prazoEtapaAtual || sp.dataLimite,
+        prazoEtapaAtual: sp.prazoEtapaAtual || sp.dataLimite || sp.dataLimiteEtapa2 || sp.dataLimiteEtapa1,
         isEmAndamento: sp.isEmAndamento ?? true,
         etapaAtual: sp.etapaAtual || 1,
         movimentacoes: dto.movimentacoes || [],
@@ -68,8 +68,8 @@ async function buscarSubprocessoPorProcessoEUnidade(codProcesso: number, siglaUn
             const dto = await serviceBuscarSubprocessoPorProcessoEUnidade(codProcesso, siglaUnidade);
             return dto.codigo;
         });
-    } catch (erro) {
-        logger.error("Erro ao buscar ID do subprocesso:", erro);
+    } catch (error) {
+        logger.error("Erro ao buscar ID do subprocesso:", error);
         return null;
     }
 }
