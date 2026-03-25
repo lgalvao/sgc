@@ -268,6 +268,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await expect(page.getByTestId('card-subprocesso-atividades-vis')).toBeVisible();
         await expect(page.getByTestId('card-subprocesso-atividades')).toBeHidden();
 
+        await page.goto('/painel');
         await acessarSubprocessoChefeDireto(page, descProcRevisao, UNIDADE_ALVO);
         await expect(page.getByTestId('card-subprocesso-atividades')).toBeVisible();
         await expect(page.getByTestId('card-subprocesso-atividades-vis')).toBeHidden();
