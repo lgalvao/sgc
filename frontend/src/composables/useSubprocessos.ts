@@ -27,6 +27,7 @@ function mapSubprocessoDetalheDtoToModel(dto: any): SubprocessoDetalhe {
         situacao: sp.situacao,
         localizacaoAtual: dto.localizacaoAtual || sp.unidade?.sigla,
         processoDescricao: sp.processoDescricao || sp.processo?.descricao,
+        dataCriacaoProcesso: sp.dataCriacaoProcesso || sp.processo?.dataCriacao,
         tipoProcesso: sp.tipoProcesso || sp.processo?.tipo,
         prazoEtapaAtual: sp.prazoEtapaAtual || sp.dataLimite || sp.dataLimiteEtapa2 || sp.dataLimiteEtapa1,
         isEmAndamento: sp.isEmAndamento ?? true,

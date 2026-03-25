@@ -72,6 +72,7 @@ public final class Mensagens {
     // ── Disponibilização de mapa ─────────────────────────────────────────────
     public static final String DATA_LIMITE_VALIDACAO_OBRIGATORIA = "A data limite para validação é obrigatória.";
     public static final String DATA_LIMITE_VALIDACAO_FUTURA     = "A data limite para validação deve ser uma data futura.";
+    public static final String DATA_LIMITE_APOS_CRIACAO_PROCESSO = "A data limite deve ser posterior à data de criação do processo.";
 
     // ── Ações em bloco ───────────────────────────────────────────────────────
     public static final String ACAO_OBRIGATORIA                 = "A ação é obrigatória";

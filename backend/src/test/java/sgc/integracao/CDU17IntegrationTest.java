@@ -234,5 +234,27 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
                     .andExpect(status().isUnprocessableContent())
                     .andExpect(jsonPath("$.message").value("Todas as competências devem estar associadas a pelo menos uma atividade."));
         }
+
+        @Test
+        @DisplayName("Não deve disponibilizar mapa com data limite igual à data de criação do processo")
+        @WithMockAdmin
+        void disponibilizarMapa_comDataLimiteIgualCriacao_retornaUnprocessable() throws Exception {
+            Processo processo = subprocesso.getProcesso();
+            // Definir data de criação futura para testar a regra de negócio sem bater no @Future do DTO (que valida contra Hoje)
+            processo.setDataCriacao(LocalDateTime.now().plusDays(5));
+            processoRepo.save(processo);
+
+            LocalDate dataCriacao = processo.getDataCriacao().toLocalDate();
+            // dataLimite é igual à data de criação (portanto futura em relação a hoje, passando no @Future)
+            DisponibilizarMapaRequest request = new DisponibilizarMapaRequest(dataCriacao, OBS_LITERAL);
+
+            mockMvc.perform(post(API_URL, subprocesso.getCodigo())
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andDo(MockMvcResultHandlers.print())
+                    .andExpect(status().isUnprocessableContent())
+                    .andExpect(jsonPath("$.message").value(Mensagens.DATA_LIMITE_APOS_CRIACAO_PROCESSO));
+        }
     }
 }

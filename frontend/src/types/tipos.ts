@@ -316,6 +316,7 @@ export interface SubprocessoDetalhe {
     situacao: SituacaoSubprocesso;
     localizacaoAtual: string;
     processoDescricao: string;
+    dataCriacaoProcesso: string;
     tipoProcesso: TipoProcesso;
     prazoEtapaAtual: string;
     isEmAndamento: boolean;
