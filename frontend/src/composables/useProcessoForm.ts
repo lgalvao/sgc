@@ -32,7 +32,8 @@ export function useProcessoForm(initialData?: Processo) {
 
     watch(dataLimite, (novaData) => {
         fieldErrors.value.dataLimite = '';
-        if (novaData && !isDateStrictlyFuture(novaData)) {
+        // Só valida se a data parecer completa (10 caracteres no formato yyyy-mm-dd)
+        if (novaData?.length === 10 && !isDateStrictlyFuture(novaData)) {
             fieldErrors.value.dataLimite = 'A data limite deve ser uma data futura.';
         }
     });
@@ -44,7 +45,7 @@ export function useProcessoForm(initialData?: Processo) {
     const isFormInvalid = computed(() => {
         return !descricao.value.trim() ||
             !tipo.value ||
-            !dataLimite.value ||
+            dataLimite.value?.length !== 10 ||
             !!fieldErrors.value.dataLimite ||
             unidadesSelecionadas.value.length === 0;
     });

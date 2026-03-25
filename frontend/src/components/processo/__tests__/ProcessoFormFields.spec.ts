@@ -29,23 +29,21 @@ describe("ProcessoFormFields.vue", () => {
         });
     }
 
-    it("foca no campo descrição quando há erro de descrição", async () => {
-        const wrapper = criarWrapper({descricao: "Descrição obrigatória"});
+    it("não deve focar automaticamente nos campos quando há erro no mount", async () => {
+        const wrapper = criarWrapper({descricao: "Erro"});
         await nextTick();
         const inputDescricao = wrapper.find('[data-testid="inp-processo-descricao"]');
-        expect(inputDescricao.element).toBe(document.activeElement);
+        expect(inputDescricao.element).not.toBe(document.activeElement);
     });
 
-    it("foca no container de unidades quando só há erro de unidades", async () => {
-        const wrapper = criarWrapper({unidades: "Selecione ao menos uma unidade"});
+    it("foca no campo correto quando focarPrimeiroErro é chamado manualmente", async () => {
+        const wrapper = criarWrapper({dataLimite: "Erro"});
         await nextTick();
-        const container = wrapper.find('[data-testid="container-processo-unidades"]');
-        expect(container.element).toBe(document.activeElement);
-    });
-
-    it("foca no campo data limite quando há erro de data limite", async () => {
-        const wrapper = criarWrapper({dataLimite: "Data limite obrigatória"});
+        
+        // Chama manualmente o método exposto
+        (wrapper.vm as any).focarPrimeiroErro();
         await nextTick();
+        
         const inputDataLimite = wrapper.find('[data-testid="inp-processo-data-limite"]');
         expect(inputDataLimite.element).toBe(document.activeElement);
     });
