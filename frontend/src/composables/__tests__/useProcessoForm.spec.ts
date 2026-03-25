@@ -83,6 +83,37 @@ describe("useProcessoForm", () => {
         expect(form.fieldErrors.value.unidades).toBe("");
     });
 
+    it("não deve disparar erro de data futura se a data estiver incompleta", async () => {
+        const form = useProcessoForm();
+        form.dataLimite.value = "202"; // Incompleta
+        await flushPromises();
+        expect(form.fieldErrors.value.dataLimite).toBe("");
+        expect(form.isFormInvalid.value).toBe(true); // Mas o formulário ainda é inválido
+    });
+
+    it("deve disparar erro de data futura se a data estiver completa e for passada", async () => {
+        const form = useProcessoForm();
+        form.dataLimite.value = "2020-01-01"; // Completa mas no passado
+        await flushPromises();
+        expect(form.fieldErrors.value.dataLimite).toBe("A data limite deve ser uma data futura.");
+        expect(form.isFormInvalid.value).toBe(true);
+    });
+
+    it("deve habilitar o formulário apenas com data completa e futura", async () => {
+        const form = useProcessoForm();
+        form.descricao.value = "Teste";
+        form.tipo.value = TipoProcesso.MAPEAMENTO;
+        form.unidadesSelecionadas.value = [1];
+        
+        form.dataLimite.value = "202"; // Incompleta
+        await flushPromises();
+        expect(form.isFormInvalid.value).toBe(true);
+
+        form.dataLimite.value = obterAmanhaFormatado(); // Completa e futura
+        await flushPromises();
+        expect(form.isFormInvalid.value).toBe(false);
+    });
+
     it("deve construir requests com data nula", () => {
         const form = useProcessoForm();
         form.descricao.value = "X";

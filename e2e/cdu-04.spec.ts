@@ -11,6 +11,7 @@ import {
     esperarPaginaDetalhesProcesso,
     esperarPaginaPainel,
     esperarPaginaSubprocesso,
+    navegarParaSubprocesso,
     verificarToast
 } from './helpers/helpers-navegacao.js';
 import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
@@ -67,9 +68,10 @@ test.describe('CDU-04 - Iniciar processo', () => {
         await expect(linhaAss11).toContainText('Não iniciado');
         await expect(linhaAss11).toContainText(dataLimiteStr.split('-').reverse().join('/'));
 
-        await acessarDetalhesProcesso(page, descricao);
+        await navegarParaSubprocesso(page, 'ASSESSORIA_11');
         await esperarPaginaSubprocesso(page, 'ASSESSORIA_11');
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText('Não iniciado');
+
         
         const timeline = page.getByTestId('tbl-movimentacoes');
         await expect(timeline.getByText(TEXTOS.movimentacao.PROCESSO_INICIADO)).toBeVisible();

@@ -255,8 +255,9 @@ export async function acessarDetalhesProcesso(page: Page, descricao: string) {
     const linhaProcesso = page.getByTestId('tbl-processos').locator('tr', {hasText: descricao});
     await expect(linhaProcesso).toBeVisible();
     await linhaProcesso.click();
-    await expect(page).toHaveURL(/\/processo\/\d+(?:\/[A-Z0-9_]+)?$/);
+    await expect(page).toHaveURL(/\/processo\/(?:cadastro\?codProcesso=)?\d+(?:\/[A-Z0-9_]+)?$/);
 }
+
 
 /**
  * Finaliza o processo atual a partir da tela de detalhes do processo.

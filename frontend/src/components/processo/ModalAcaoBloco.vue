@@ -115,7 +115,7 @@ const erroLocalDataLimite = ref('');
 
 watch(dataLimite, (novaData) => {
   erroLocalDataLimite.value = "";
-  if (novaData && props.mostrarDataLimite && !isDateStrictlyFuture(novaData)) {
+  if (novaData?.length === 10 && props.mostrarDataLimite && !isDateStrictlyFuture(novaData)) {
     erroLocalDataLimite.value = "A data limite para validação deve ser uma data futura.";
   }
 });
