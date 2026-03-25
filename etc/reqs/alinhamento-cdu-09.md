@@ -1,59 +1,26 @@
-# Alinhamento CDU-09 - Disponibilizar cadastro de atividades e conhecimentos
+# Alinhamento CDU-09 - Reanálise
 
-## Cobertura atual do teste
-O teste `cdu-09.spec.ts` cobre:
+## Escopo da reanálise
+- Requisito analisado: `etc/reqs/cdu-09.md`.
+- Teste E2E analisado: `e2e/cdu-09.spec.ts` (4 cenários `test`, 0 `test.step`, 119 linhas).
 
-**Cenário 1: Validação (Atividade sem conhecimento)**
-- Adição de atividade sem conhecimento
-- Clique em "Disponibilizar" dispara erro inline com menção a "conhecimento" (passos 1-7.1)
-- Adição de conhecimento corrige validação
-- Cancelamento do diálogo de confirmação
+## Cobertura observada no E2E
+- ✅ Setup: Criar processo via fixture
+- ✅ Cenario 1: Validacao - Atividade sem conhecimento
+- ✅ Cenario 2: Caminho feliz - Disponibilizar cadastro
+- ✅ Cenario 3: Devolucao e Historico de Analise
 
-**Cenário 2: Caminho feliz**
-- Adição de atividade com conhecimento
-- Clique em "Disponibilizar"
-- Apresentação de diálogo de confirmação (título "Disponibilização do cadastro", mensagem sobre finalização e análise) (passo 8)
-- Confirmação (passo 9) leva a Painel
+## Pontos do requisito sem evidência direta no E2E
+- ⚠️ Se houver esses problemas de validação, o sistema indica quais atividades estão precisando de adição de conhecimentos e interrompe a operação de disponibilização, permanecendo na mesma tela. (palavras-chave do requisito: houver, esses, problemas, validação)
+- ⚠️ O sistema mostra um diálogo de confirmação com título "Disponibilização do cadastro", com mensagem "Confirma a finalização e a disponibilização do cadastro? Essa ação bloqueia a edição e habilita a análise do cadastro por unidades superiores", além dos botões `Confirmar` e `Cancelar`. (palavras-chave do requisito: diálogo, confirmação, título, disponibilização)
+- ⚠️ Caso o usuário escolha `Cancelar`, o sistema interrompe a operação de disponibilização, permanecendo na mesma tela. (palavras-chave do requisito: escolha, cancelar, interrompe, operação)
+- ⚠️ O sistema notifica a unidade superior hierárquica quanto à disponibilização, com e-mail no modelo abaixo: (palavras-chave do requisito: notifica, unidade, superior, hierárquica)
 
-**Cenário 3: Devolução e Histórico de Análise**
-- GESTOR acessa subprocesso e clica em "Devolver"
-- Preenchimento de observações (motivo)
-- Confirmação de devolução leva a Painel
-- CHEFE volta ao subprocesso, verifica situação "Cadastro em andamento" e abre "Histórico de análise"
-- Modal mostra resultado "Devolução" e observações inseridas
+## Ações recomendadas (teste e sistema)
+- Priorizar cenários com dados controlados para validar regra de negócio (não apenas presença de elementos na UI).
+- Incluir asserts de navegação/efeito colateral (persistência, alteração de estado, permissões por perfil e unidade ativa).
+- Quando o requisito citar integração externa, manter o E2E focado em contrato visível (mensagem, bloqueio, fallback) e complementar com teste de integração/backend.
 
-## Lacunas em relação ao requisito
-**Não coberto**:
-- **Passo 5**: Validação de botão "Histórico de análise" quando subprocesso retornou de análise pelas unidades superiores
-  - Teste cobre devolução posterior mas não testa botão na primeira disponibilização sem histórico anterior
-  - Teste não valida que botão desaparece quando não há análises prévias
-- **Passo 7.1**: Validação deve indicar "quais atividades estão precisando de adição de conhecimentos" - teste apenas verifica presença de erro genérico, não a identificação específica
-- **Passo 10**: Mudança de situação para "Cadastro disponibilizado" não é explicitamente verificada (teste verifica "Cadastro em andamento" após devolução, não "Cadastro disponibilizado" após sucesso)
-- **Passo 11**: Registro de movimentação com campos específicos (Data/hora, Unidade origem, Unidade destino, Descrição "Disponibilização do cadastro de atividades")
-- **Passo 12**: Notificação por e-mail com modelo exato (Assunto, Prezado, corpo com URL do sistema) não é verificada
-- **Passo 13**: Criação de alerta interno (Descrição, Processo, Data/hora, Unidade origem, Unidade destino) não é validada
-- **Passo 14**: Definição de data/hora de conclusão da etapa 1
-- **Passo 15**: Mensagem de sucesso "Cadastro de atividades disponibilizado" não é validada após confirmação
-
-**Teste parcialmente coberto**:
-- Erro de validação (7.1) é genérico; requisito exige indicação específica de quais atividades faltam conhecimento
-- Fluxo de devolução é testado mas não está no requisito (é fluxo externo, provavelmente de outro CDU)
-- Teste não valida situação exata "Cadastro disponibilizado" (apenas "Cadastro em andamento" em contexto de devolução)
-
-## Alterações necessárias no teste E2E
-- Adicionar teste que valida mensagem de erro especificando QUAIS atividades faltam conhecimento (não apenas presença de erro)
-- Validar situação exata do subprocesso após sucesso: "Cadastro disponibilizado"
-- Adicionar teste que verifica movimentação com todos os campos corretos na tabela
-- Validar presença de alerta na tela de alertas para unidade superior (ou via API)
-- Adicionar verificação de e-mail enviado (ou log de e-mail) com modelo correto
-- Validar mensagem de sucesso "Cadastro de atividades disponibilizado" na tela após confirmação
-- Adicionar teste para botão "Histórico de análise" ausente quando não há análises prévias
-- Dividir teste em: "Primeiro envio" (sem histórico) e "Reenviio após devolução" (com histórico)
-- Validar conclusão de etapa 1 (data/hora atual) se acesso a dados de etapa existir
-
-## Notas e inconsistências do requisito
-- **Ambiguidade em Passo 7.1**: "indica quais atividades" não especifica se é lista numerada, badges, destaque visual ou ícone
-- **Referência incompleta**: Requisito cita "[SIGLA_UNIDADE_SUPERIOR]" mas não define como sistema calcula hierarquia
-- **Falta de detalhe em Passo 12**: "[URL_SISTEMA]" não especifica se é URL completa ou apenas domínio
-- **Indefinição em 14**: "Etapa 1" é conceito não definido neste CDU - refere-se a estrutura de etapas da CDU-01?
-- **Ambiguidade em 15**: "redireciona para o Painel" - se houve erro em 7.1, mensagem de erro fica visível na mesma tela ou há redirecionamento com erro?
+## Método utilizado nesta reanálise
+- Leitura comparativa do texto do requisito (fluxo principal) com os cenários e passos automatizados no arquivo E2E correspondente.
+- Marcação de lacunas por ausência de evidência textual de validação no teste; itens marcados como ⚠️ devem ser revisados manualmente na próxima rodada.

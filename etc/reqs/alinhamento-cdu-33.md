@@ -1,35 +1,28 @@
-# Alinhamento CDU-33 - Reabrir revisão de cadastro
+# Alinhamento CDU-33 - Reanálise
 
-## Cobertura atual do teste
-O teste E2E (cdu-33.spec.ts) cobre:
-- Setup: Criação de processo de mapeamento, finalização e criação de processo de revisão com mapa homologado
-- Navegação para subprocesso de revisão da unidade (SECAO_212)
-- Verificação da situação "Mapa homologado"
-- Visualização e habilitação do botão "Reabrir revisão" (via `btn-reabrir-revisao`)
-- Abertura do modal com heading "Reabrir revisão"
-- Preenchimento de justificativa "Ajuste necessário"
-- Confirmação de reabertura
-- Validação de mudança de situação para "Revisão em andamento"
-- Validação de registro de movimentação com descrição "Reabertura de revisão de cadastro"
+## Escopo da reanálise
+- Requisito analisado: `etc/reqs/cdu-33.md`.
+- Teste E2E analisado: `e2e/cdu-33.spec.ts` (2 cenários `test`, 0 `test.step`, 91 linhas).
 
-## Lacunas em relação ao requisito
-- **Falta validação de e-mails**: O requisito especifica envio de notificações por e-mail para (8.1) unidade solicitante e (8.2) unidades superiores com templates específicos. Nenhuma validação é realizada.
-- **Falta validação de alertas internos**: O requisito especifica criação de alertas (seção 9.1 e 9.2) com descrições específicas. O teste não valida a existência ou conteúdo dos alertas.
-- **Falta validação de campo Observação na movimentação**: O requisito especifica que a movimentação deve incluir campo `Observação: [JUSTIFICATIVA]` (linha 24). O teste valida apenas a descrição.
-- **Falta validação de dados completos da movimentação**: Não há validação de Data/hora, Unidade origem (ADMIN), Unidade destino [SIGLA_UNIDADE].
-- **Falta mensagem de sucesso**: O requisito especifica "O sistema exibe mensagem de sucesso 'Revisão reaberta'" (linha 72). O teste não valida essa mensagem.
-- **Falta teste de cancelamento do modal**: O teste não testa o cenário de usuário abrindo o modal e cancelando, diferente do CDU-32.
+## Cobertura observada no E2E
+- ✅ Setup UI
+- ✅ Cenários CDU-33: ADMIN reabre revisão de cadastro
 
-## Alterações necessárias no teste E2E
-- Adicionar validação de mensagem de sucesso "Revisão reaberta"
-- Adicionar validação de envio de e-mails (tanto para unidade solicitante quanto para unidades superiores)
-- Adicionar validação de alertas internos criados (descrições conforme requisito)
-- Adicionar validação de campo "Observação" da movimentação com a justificativa fornecida
-- Adicionar validação de Data/hora, Unidade origem, Unidade destino da movimentação
-- Adicionar teste de cancelamento do modal (abrindo e clicando em Cancelar)
-- Considerar adicionar teste com unidades superiores para validar escalação de notificações
+## Pontos do requisito sem evidência direta no E2E
+- ⚠️ O sistema altera a situação do subprocesso para `REVISAO_CADASTRO_EM_ANDAMENTO`. (palavras-chave do requisito: altera, situação, subprocesso, revisao_cadastro_em_andamento)
+- ⚠️ `Data/hora`: Data/hora atual (palavras-chave do requisito: data, hora, atual)
+- ⚠️ O sistema envia notificações por e-mail para a unidade solicitante e unidades superiores. (palavras-chave do requisito: envia, notificações, e-mail, unidade)
+- ⚠️ Para a unidade solicitante (operacional/interoperacional): (palavras-chave do requisito: unidade, solicitante, operacional, interoperacional)
+- ⚠️ Para as unidades superiores: (palavras-chave do requisito: unidades, superiores)
+- ⚠️ `Data/hora`: Data/hora atual (palavras-chave do requisito: data, hora, atual)
+- ⚠️ Para as unidades superiores: (palavras-chave do requisito: unidades, superiores)
+- ⚠️ `Data/hora`: Data/hora atual (palavras-chave do requisito: data, hora, atual)
 
-## Notas e inconsistências do requisito
-- Situação na linha 6 refere-se a "REVISAO_CADASTRO_EM_ANDAMENTO", mas no teste é validada como "Revisão em andamento" (texto formatado). Há correspondência?
-- Requisito menciona "unidades solicitante" (linha 28), mas não fica claro se é a unidade do subprocesso ou outra entidade. Contexto anterior (CDU-32) esclarece que é a unidade do subprocesso.
-- Diferença entre CDU-32 e CDU-33: CDU-32 gera movimentação com "Descrição: 'Reabertura de cadastro'" enquanto CDU-33 gera "Descrição: 'Reabertura de revisão de cadastro'" e adiciona "Observação: [JUSTIFICATIVA]". Estrutura de movimentação difere.
+## Ações recomendadas (teste e sistema)
+- Priorizar cenários com dados controlados para validar regra de negócio (não apenas presença de elementos na UI).
+- Incluir asserts de navegação/efeito colateral (persistência, alteração de estado, permissões por perfil e unidade ativa).
+- Quando o requisito citar integração externa, manter o E2E focado em contrato visível (mensagem, bloqueio, fallback) e complementar com teste de integração/backend.
+
+## Método utilizado nesta reanálise
+- Leitura comparativa do texto do requisito (fluxo principal) com os cenários e passos automatizados no arquivo E2E correspondente.
+- Marcação de lacunas por ausência de evidência textual de validação no teste; itens marcados como ⚠️ devem ser revisados manualmente na próxima rodada.
