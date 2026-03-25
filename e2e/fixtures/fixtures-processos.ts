@@ -1,4 +1,5 @@
 import type {APIRequestContext} from '@playwright/test';
+import {expect} from '@playwright/test';
 
 /**
  * Representa um processo criado via fixture
@@ -24,6 +25,17 @@ export interface ProcessoFixtureOptions {
     tipo?: 'MAPEAMENTO' | 'REVISAO' | 'DIAGNOSTICO';
     /** Dias até data limite (padrão: 30) */
     diasLimite?: number;
+}
+
+export function validarProcessoFixture(processo: ProcessoFixture, descricaoEsperada?: string): void {
+    expect(processo.codigo).toBeGreaterThan(0);
+    expect(processo.descricao).not.toBe('');
+
+    if (descricaoEsperada) {
+        expect(processo.descricao).toBe(descricaoEsperada);
+    }
+
+    expect(processo.situacao).not.toBe('');
 }
 
 /**

@@ -1,5 +1,5 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
-import {criarProcesso, extrairProcessoCodigo, verificarProcessoNaTabela} from './helpers/helpers-processos.js';
+import {acessarDetalhesProcesso, criarProcesso, extrairProcessoCodigo, verificarProcessoNaTabela} from './helpers/helpers-processos.js';
 import {
     esperarPaginaCadastroProcesso,
     esperarPaginaDetalhesProcesso,
@@ -87,7 +87,7 @@ test.describe('CDU-03 - Manter processo', () => {
             expandir: ['SECRETARIA_1']
         });
 
-        await page.getByTestId('tbl-processos').getByText(descricaoOriginal).first().click();
+        await acessarDetalhesProcesso(page, descricaoOriginal);
         await esperarPaginaCadastroProcesso(page);
         await extrairProcessoCodigo(page);
         await expect(page.getByTestId('inp-processo-descricao')).toHaveValue(descricaoOriginal);
@@ -112,7 +112,7 @@ test.describe('CDU-03 - Manter processo', () => {
             expandir: ['SECRETARIA_2']
         });
 
-        await page.getByTestId('tbl-processos').getByText(descricao).first().click();
+        await acessarDetalhesProcesso(page, descricao);
         await page.getByTestId('btn-processo-remover').click();
         await expect(page.getByText(TEXTOS.processo.cadastro.REMOVER_CONFIRMACAO(descricao))).toBeVisible();
 
@@ -168,7 +168,7 @@ test.describe('CDU-03 - Manter processo', () => {
             iniciar: true
         });
 
-        await page.getByTestId('tbl-processos').getByText(descricaoBase).first().click();
+        await acessarDetalhesProcesso(page, descricaoBase);
         await esperarPaginaDetalhesProcesso(page);
         await extrairProcessoCodigo(page);
 
@@ -232,13 +232,13 @@ test.describe('CDU-03 - Manter processo', () => {
             tipo: 'Mapeamento'
         });
 
-        await page.getByTestId('tbl-processos').getByText(descricao).first().click();
+        await acessarDetalhesProcesso(page, descricao);
         await esperarPaginaCadastroProcesso(page);
         await extrairProcessoCodigo(page);
 
         await page.goto('/painel');
 
-        await page.getByTestId('tbl-processos').getByText(descricao).first().click();
+        await acessarDetalhesProcesso(page, descricao);
         await page.getByTestId('btn-processo-remover').click();
         await page.getByTestId('btn-modal-confirmacao-cancelar').click();
         await expect(page.getByText(TEXTOS.processo.cadastro.REMOVER_CONFIRMACAO(descricao))).toBeHidden();
@@ -271,7 +271,7 @@ test.describe('CDU-03 - Manter processo', () => {
             tipo: 'Mapeamento'
         });
 
-        await page.getByTestId('tbl-processos').getByText(descricaoAlt).first().click();
+        await acessarDetalhesProcesso(page, descricaoAlt);
         await esperarPaginaDetalhesProcesso(page);
         await extrairProcessoCodigo(page);
 

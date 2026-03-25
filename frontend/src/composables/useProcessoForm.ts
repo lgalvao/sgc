@@ -1,6 +1,7 @@
 import {computed, ref, watch} from 'vue';
 import {useFormErrors} from '@/composables/useFormErrors';
 import {type AtualizarProcessoRequest, type CriarProcessoRequest, type Processo, TipoProcesso} from '@/types/tipos';
+import {isDateStrictlyFuture} from "@/utils/dateUtils";
 
 export function useProcessoForm(initialData?: Processo) {
     const descricao = ref(initialData?.descricao ?? '');
@@ -29,8 +30,11 @@ export function useProcessoForm(initialData?: Processo) {
         fieldErrors.value.tipo = '';
     });
 
-    watch(dataLimite, () => {
+    watch(dataLimite, (novaData) => {
         fieldErrors.value.dataLimite = '';
+        if (novaData && !isDateStrictlyFuture(novaData)) {
+            fieldErrors.value.dataLimite = 'A data limite deve ser uma data futura.';
+        }
     });
 
     watch(unidadesSelecionadas, () => {
@@ -41,6 +45,7 @@ export function useProcessoForm(initialData?: Processo) {
         return !descricao.value.trim() ||
             !tipo.value ||
             !dataLimite.value ||
+            !!fieldErrors.value.dataLimite ||
             unidadesSelecionadas.value.length === 0;
     });
 

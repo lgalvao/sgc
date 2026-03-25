@@ -34,7 +34,9 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
             diasLimite: 30
         });
 
-        await page.goto(`/processo/${processo.codigo}`);
+        await page.goto('/painel');
+        await expect(page.getByTestId('tbl-processos').getByText(processo.descricao).first()).toBeVisible();
+        await acessarDetalhesProcesso(page, processo.descricao);
         await esperarPaginaDetalhesProcesso(page, processo.codigo);
         await navegarParaSubprocesso(page, UNIDADE_ALVO);
 
@@ -66,7 +68,9 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
 
         await fazerLogout(page);
         await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);
-        await page.goto(`/processo/${processo.codigo}`);
+        await page.goto('/painel');
+        await expect(page.getByTestId('tbl-processos').getByText(processo.descricao).first()).toBeVisible();
+        await acessarDetalhesProcesso(page, processo.descricao);
         await esperarPaginaDetalhesProcesso(page, processo.codigo);
         await navegarParaSubprocesso(page, UNIDADE_ALVO);
 
@@ -80,7 +84,9 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
 
         await fazerLogout(page);
         await login(page, USUARIOS.CHEFE_SECAO_211.titulo, USUARIOS.CHEFE_SECAO_211.senha);
-        await page.goto(`/processo/${processo.codigo}/${UNIDADE_ALVO}`);
+        await page.goto('/painel');
+        await expect(page.getByTestId('tbl-processos').getByText(processo.descricao).first()).toBeVisible();
+        await acessarDetalhesProcesso(page, processo.descricao);
         await esperarPaginaSubprocesso(page, UNIDADE_ALVO);
 
         await verificarDetalhesSubprocesso(page, {
@@ -102,7 +108,9 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
 
         await fazerLogout(page);
         await login(page, USUARIOS.SERVIDOR_SECAO_211.titulo, USUARIOS.SERVIDOR_SECAO_211.senha);
-        await page.goto(`/processo/${processo.codigo}/${UNIDADE_ALVO}`);
+        await page.goto('/painel');
+        await expect(page.getByTestId('tbl-processos').getByText(processo.descricao).first()).toBeVisible();
+        await acessarDetalhesProcesso(page, processo.descricao);
         await esperarPaginaSubprocesso(page, UNIDADE_ALVO);
 
         await verificarDetalhesSubprocesso(page, {
@@ -132,9 +140,13 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
             unidade: UNIDADE_ALVO,
             descricao: `Fixture CDU-07 CAD DISP ${Date.now()}`
         });
+        const processoCodigo = processoCadastroDisponibilizado.codigo;
 
-        await page.goto(`/processo/${processoCadastroDisponibilizado.codigo}/${UNIDADE_ALVO}`);
-        await esperarPaginaSubprocesso(page, UNIDADE_ALVO);
+        await page.goto('/painel');
+        await expect(page.getByTestId('tbl-processos').getByText(processoCadastroDisponibilizado.descricao).first()).toBeVisible();
+        await acessarDetalhesProcesso(page, processoCadastroDisponibilizado.descricao);
+        await esperarPaginaDetalhesProcesso(page, processoCodigo);
+        await navegarParaSubprocesso(page, UNIDADE_ALVO);
 
         const cardAtividadesAdmin = page.getByTestId('card-subprocesso-atividades-vis');
         await expect(cardAtividadesAdmin).toBeVisible();
@@ -152,8 +164,10 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
 
         await fazerLogout(page);
         await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);
-        await page.goto(`/processo/${processoCadastroDisponibilizado.codigo}/${UNIDADE_ALVO}`);
-        await esperarPaginaSubprocesso(page, UNIDADE_ALVO);
+        await page.goto('/painel');
+        await expect(page.getByTestId('tbl-processos').getByText(processoCadastroDisponibilizado.descricao).first()).toBeVisible();
+        await acessarDetalhesProcesso(page, processoCadastroDisponibilizado.descricao);
+        await navegarParaSubprocesso(page, UNIDADE_ALVO);
 
         const cardAtividadesGestor = page.getByTestId('card-subprocesso-atividades-vis');
         await expect(cardAtividadesGestor).toBeVisible();
@@ -162,8 +176,10 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
 
         await fazerLogout(page);
         await login(page, USUARIOS.SERVIDOR_SECAO_211.titulo, USUARIOS.SERVIDOR_SECAO_211.senha);
-        await page.goto(`/processo/${processoCadastroDisponibilizado.codigo}/${UNIDADE_ALVO}`);
-        await esperarPaginaSubprocesso(page, UNIDADE_ALVO);
+        await page.goto('/painel');
+        await expect(page.getByTestId('tbl-processos').getByText(processoCadastroDisponibilizado.descricao).first()).toBeVisible();
+        await acessarDetalhesProcesso(page, processoCadastroDisponibilizado.descricao);
+        await navegarParaSubprocesso(page, UNIDADE_ALVO);
 
         const cardAtividadesServidor = page.getByTestId('card-subprocesso-atividades-vis');
         await expect(cardAtividadesServidor).toBeVisible();
@@ -178,8 +194,10 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
             descricao: `Fixture CDU-07 CAD HOM ${Date.now()}`
         });
 
-        await page.goto(`/processo/${processoCadastroHomologado.codigo}/${UNIDADE_ALVO_2}`);
-        await esperarPaginaSubprocesso(page, UNIDADE_ALVO_2);
+        await page.goto('/painel');
+        await expect(page.getByTestId('tbl-processos').getByText(processoCadastroHomologado.descricao).first()).toBeVisible();
+        await acessarDetalhesProcesso(page, processoCadastroHomologado.descricao);
+        await navegarParaSubprocesso(page, UNIDADE_ALVO_2);
 
         const cardMapaAdminEdicao = page.getByTestId('card-subprocesso-mapa-edicao');
         await expect(cardMapaAdminEdicao).toBeVisible();
@@ -192,8 +210,10 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
 
         await fazerLogout(page);
         await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
-        await page.goto(`/processo/${processoMapaDisponibilizado.codigo}/${UNIDADE_ALVO_3}`);
-        await esperarPaginaSubprocesso(page, UNIDADE_ALVO_3);
+        await page.goto('/painel');
+        await expect(page.getByTestId('tbl-processos').getByText(processoMapaDisponibilizado.descricao).first()).toBeVisible();
+        await acessarDetalhesProcesso(page, processoMapaDisponibilizado.descricao);
+        await navegarParaSubprocesso(page, UNIDADE_ALVO_3);
 
         const cardMapaGestor = page.getByTestId('card-subprocesso-mapa-visualizacao');
         await expect(cardMapaGestor).toBeVisible();
@@ -203,8 +223,10 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
 
         await fazerLogout(page);
         await login(page, USUARIOS.SERVIDOR_SECAO_221.titulo, USUARIOS.SERVIDOR_SECAO_221.senha);
-        await page.goto(`/processo/${processoMapaDisponibilizado.codigo}/${UNIDADE_ALVO_3}`);
-        await esperarPaginaSubprocesso(page, UNIDADE_ALVO_3);
+        await page.goto('/painel');
+        await expect(page.getByTestId('tbl-processos').getByText(processoMapaDisponibilizado.descricao).first()).toBeVisible();
+        await acessarDetalhesProcesso(page, processoMapaDisponibilizado.descricao);
+        await navegarParaSubprocesso(page, UNIDADE_ALVO_3);
 
         const cardMapaServidor = page.getByTestId('card-subprocesso-mapa-visualizacao');
         await expect(cardMapaServidor).toBeVisible();
@@ -223,7 +245,9 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
         });
 
         await login(page, USUARIOS.SERVIDOR_SECAO_211.titulo, USUARIOS.SERVIDOR_SECAO_211.senha);
-        await page.goto(`/processo/${processoFinalizado.codigo}/${UNIDADE_ALVO}`);
+        await page.goto('/painel');
+        await expect(page.getByTestId('tbl-processos').getByText(processoFinalizado.descricao).first()).toBeVisible();
+        await acessarDetalhesProcesso(page, processoFinalizado.descricao);
         await esperarPaginaSubprocesso(page, UNIDADE_ALVO);
 
         await verificarDetalhesSubprocesso(page, {
@@ -300,7 +324,7 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
             iniciar: true
         });
 
-        await page.getByTestId('tbl-processos').getByText(descricao, {exact: true}).first().click();
+        await acessarDetalhesProcesso(page, descricao, {exact: true});
         await esperarPaginaDetalhesProcesso(page);
         await navegarParaSubprocesso(page, 'ASSESSORIA_12');
 

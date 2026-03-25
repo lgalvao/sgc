@@ -1,5 +1,5 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
-import {criarProcessoCadastroHomologadoFixture} from './fixtures/fixtures-processos.js';
+import {criarProcessoCadastroHomologadoFixture, validarProcessoFixture} from './fixtures/fixtures-processos.js';
 import {acessarSubprocessoAdmin} from './helpers/helpers-analise.js';
 import {verificarProcessoNaTabela} from './helpers/helpers-processos.js';
 import {
@@ -24,11 +24,11 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
     const ATIVIDADE_3 = 'Atividade fixture 3';
 
     test('Setup data', async ({_resetAutomatico, request}) => {
-        await criarProcessoCadastroHomologadoFixture(request, {
+        const processo = await criarProcessoCadastroHomologadoFixture(request, {
             descricao: descProcesso,
             unidade: UNIDADE_ALVO
         });
-        expect(true).toBeTruthy();
+        validarProcessoFixture(processo, descProcesso);
     });
 
     test('Cenários CDU-15: Fluxo completo de manutenção do mapa pelo ADMIN', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {

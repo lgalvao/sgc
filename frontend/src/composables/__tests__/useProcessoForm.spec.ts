@@ -2,6 +2,7 @@ import {describe, expect, it} from "vitest";
 import {useProcessoForm} from "../useProcessoForm";
 import {TipoProcesso} from "@/types/tipos";
 import {flushPromises} from "@vue/test-utils";
+import {obterAmanhaFormatado} from "@/utils/dateUtils";
 
 describe("useProcessoForm", () => {
     it("deve inicializar com valores vazios", () => {
@@ -11,36 +12,39 @@ describe("useProcessoForm", () => {
     });
 
     it("deve inicializar com dados iniciais", () => {
+        const amanha = obterAmanhaFormatado();
         const initialData: any = {
             descricao: "Teste",
             tipo: TipoProcesso.MAPEAMENTO,
-            dataLimite: "2025-12-31T00:00:00",
+            dataLimite: `${amanha}T00:00:00`,
             unidades: [{codUnidade: 1}]
         };
         const form = useProcessoForm(initialData);
         expect(form.descricao.value).toBe("Teste");
-        expect(form.dataLimite.value).toBe("2025-12-31");
+        expect(form.dataLimite.value).toBe(amanha);
         expect(form.unidadesSelecionadas.value).toEqual([1]);
         expect(form.isFormInvalid.value).toBe(false);
     });
 
     it("deve construir request de criacao", () => {
+        const amanha = obterAmanhaFormatado();
         const form = useProcessoForm();
         form.descricao.value = "Novo";
         form.tipo.value = TipoProcesso.REVISAO;
-        form.dataLimite.value = "2026-01-01";
+        form.dataLimite.value = amanha;
         form.unidadesSelecionadas.value = [10];
 
         const req = form.construirCriarRequest();
         expect(req.descricao).toBe("Novo");
-        expect(req.dataLimiteEtapa1).toBe("2026-01-01T00:00:00");
+        expect(req.dataLimiteEtapa1).toBe(`${amanha}T00:00:00`);
     });
 
     it("deve construir request de atualizacao", () => {
+        const amanha = obterAmanhaFormatado();
         const form = useProcessoForm();
         form.descricao.value = "Update";
         form.tipo.value = TipoProcesso.MAPEAMENTO;
-        form.dataLimite.value = "2026-01-01";
+        form.dataLimite.value = amanha;
         form.unidadesSelecionadas.value = [10];
 
         const req = form.construirAtualizarRequest(5);
@@ -69,7 +73,7 @@ describe("useProcessoForm", () => {
         expect(form.fieldErrors.value.tipo).toBe("");
 
         form.fieldErrors.value.dataLimite = "Erro Data";
-        form.dataLimite.value = "2025-01-01";
+        form.dataLimite.value = obterAmanhaFormatado();
         await flushPromises();
         expect(form.fieldErrors.value.dataLimite).toBe("");
 

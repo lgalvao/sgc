@@ -90,6 +90,18 @@ class UsuarioFacadeTest {
         }
 
         @Test
+        @DisplayName("Deve retornar vazio se auth for anônimo")
+        void deveRetornarVazioSeAuthAnonimo() {
+            Authentication auth = mock(AnonymousAuthenticationToken.class);
+            when(auth.isAuthenticated()).thenReturn(true);
+            SecurityContextHolder.getContext().setAuthentication(auth);
+            
+            assertThatThrownBy(() -> facade.usuarioAutenticado())
+                    .isInstanceOf(ErroAcessoNegado.class);
+            SecurityContextHolder.clearContext();
+        }
+
+        @Test
         @DisplayName("Deve obter usuário diretamente do principal se já for instância de Usuario")
         void deveObterUsuarioDiretamenteDoPrincipal() {
 
@@ -126,6 +138,46 @@ class UsuarioFacadeTest {
             assertThat(resultado).isNotNull();
             assertThat(resultado.getTituloEleitoral()).isEqualTo(titulo);
             verify(usuarioService).carregarAuthorities(usuario);
+        }
+
+        @Test
+        @DisplayName("Deve retornar null se usuário não encontrado")
+        void deveRetornarNullSeNaoEncontrado() {
+            when(usuarioService.buscarComAtribuicoesOpt(any())).thenReturn(Optional.empty());
+            assertThat(facade.carregarUsuarioParaAutenticacao("1")).isNull();
+        }
+    }
+
+    @Nested
+    @DisplayName("Responsabilidades e Perfis")
+    class ResponsabilidadesEPerfis {
+        @Test
+        @DisplayName("Deve buscar responsabilidade detalhada delegando ao service")
+        void deveBuscarResponsabilidadeDetalhada() {
+            facade.buscarResponsabilidadeDetalhadaAtual("SIGLA");
+            verify(responsavelUnidadeService).buscarResponsabilidadeDetalhadaAtual("SIGLA");
+        }
+
+        @Test
+        @DisplayName("Deve buscar perfis filtrando unidades inativas")
+        void deveBuscarPerfisFiltrandoInativos() {
+            String titulo = "123";
+            Usuario user = criarUsuario(titulo);
+            when(usuarioService.buscarComAtribuicoesOpt(titulo)).thenReturn(Optional.of(user));
+            
+            Unidade uAtiva = criarUnidade(1L, "U1");
+            Unidade uInativa = criarUnidade(2L, "U2");
+            uInativa.setSituacao(SituacaoUnidade.INATIVA);
+            
+            UsuarioPerfil p1 = new UsuarioPerfil(); p1.setUnidade(uAtiva); p1.setPerfil(Perfil.CHEFE); p1.setUsuario(user);
+            UsuarioPerfil p2 = new UsuarioPerfil(); p2.setUnidade(uInativa); p2.setPerfil(Perfil.GESTOR); p2.setUsuario(user);
+            
+            when(usuarioService.buscarPerfis(titulo)).thenReturn(List.of(p1, p2));
+            
+            List<PerfilDto> result = facade.buscarPerfisUsuario(titulo);
+            
+            assertThat(result).hasSize(1);
+            assertThat(result.getFirst().unidadeCodigo()).isEqualTo(1L);
         }
     }
 

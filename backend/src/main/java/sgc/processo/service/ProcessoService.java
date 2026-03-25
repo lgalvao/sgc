@@ -189,7 +189,7 @@ public class ProcessoService {
     }
 
 
-    public List<String> iniciar(Long codigo, List<Long> codsUnidadesParam, Usuario usuario) {
+    public void iniciar(Long codigo, List<Long> codsUnidadesParam, Usuario usuario) {
         Processo processo = buscarPorCodigo(codigo);
         if (processo.getSituacao() != CRIADO) {
             throw new ErroValidacao(Mensagens.PROCESSO_SO_INICIAVEL_EM_CRIADO);
@@ -215,7 +215,9 @@ public class ProcessoService {
         }
 
         List<String> erros = validarUnidadesInicio(tipo, codigosUnidades);
-        if (!erros.isEmpty()) return erros;
+        if (!erros.isEmpty()) {
+            throw new ErroValidacao(String.join(", ", erros));
+        }
 
         List<UnidadeMapa> unidadesMapas = (tipo == REVISAO || tipo == DIAGNOSTICO)
                 ? unidadeService.buscarMapasPorUnidades(codigosUnidades)
@@ -229,7 +231,6 @@ public class ProcessoService {
         notificarInicioProcesso(processo, new ArrayList<>(unidadesParaProcessar));
 
         log.info("Processo {} iniciado para {} unidades.", codigo, codigosUnidades.size());
-        return List.of();
     }
 
     public void finalizar(Long codigo) {

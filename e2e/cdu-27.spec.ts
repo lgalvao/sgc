@@ -1,5 +1,5 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
-import {criarProcessoFixture} from './fixtures/fixtures-processos.js';
+import {criarProcessoFixture, validarProcessoFixture} from './fixtures/fixtures-processos.js';
 import {navegarParaSubprocesso, verificarAppAlert} from './helpers/helpers-navegacao.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
 
@@ -34,12 +34,12 @@ test.describe.serial('CDU-27 - Alterar data limite de subprocesso', () => {
     }
 
     test('Setup data', async ({_resetAutomatico, request}) => {
-        await criarProcessoFixture(request, {
+        const processo = await criarProcessoFixture(request, {
             descricao: descProcesso,
             unidade: UNIDADE_1,
             iniciar: true
         });
-        expect(true).toBeTruthy();
+        validarProcessoFixture(processo, descProcesso);
     });
 
 
@@ -47,7 +47,7 @@ test.describe.serial('CDU-27 - Alterar data limite de subprocesso', () => {
         // CDU-27: Passos 1-2
 
 
-        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
+        await acessarDetalhesProcesso(page, descProcesso);
         await navegarParaSubprocesso(page, UNIDADE_1);
 
         // Verificar que está na página do subprocesso
@@ -55,7 +55,7 @@ test.describe.serial('CDU-27 - Alterar data limite de subprocesso', () => {
     });
 
     test('Cenario 2: ADMIN pode cancelar a alteração da data limite sem persistir mudanças', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
-        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
+        await acessarDetalhesProcesso(page, descProcesso);
         await navegarParaSubprocesso(page, UNIDADE_1);
 
         const btnAlterarData = page.getByTestId('btn-alterar-data-limite');
@@ -82,7 +82,7 @@ test.describe.serial('CDU-27 - Alterar data limite de subprocesso', () => {
     });
 
     test('Cenario 3: ADMIN altera data limite e recebe confirmação', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
-        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
+        await acessarDetalhesProcesso(page, descProcesso);
         await navegarParaSubprocesso(page, UNIDADE_1);
 
         const btnAlterarData = page.getByTestId('btn-alterar-data-limite');

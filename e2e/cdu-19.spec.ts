@@ -1,5 +1,5 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
-import {criarProcessoMapaDisponibilizadoFixture} from './fixtures/fixtures-processos.js';
+import {criarProcessoMapaDisponibilizadoFixture, validarProcessoFixture} from './fixtures/fixtures-processos.js';
 import {navegarParaMapa} from './helpers/helpers-mapas.js';
 import {login, USUARIOS} from './helpers/helpers-auth.js';
 import {acessarSubprocessoGestor} from './helpers/helpers-analise.js';
@@ -13,11 +13,11 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
     const descProcesso = `Mapeamento CDU-19 ${timestamp}`;
 
     test('Setup data', async ({_resetAutomatico, request}) => {
-        await criarProcessoMapaDisponibilizadoFixture(request, {
+        const processo = await criarProcessoMapaDisponibilizadoFixture(request, {
             descricao: descProcesso,
             unidade: UNIDADE_ALVO
         });
-        expect(true).toBeTruthy();
+        validarProcessoFixture(processo, descProcesso);
     });
 
     // TESTES PRINCIPAIS - CDU-19
@@ -29,7 +29,7 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
 }) => {
         // Cenario 1: Navegação para visualização do mapa
         await expect(page.getByTestId('tbl-processos').getByText(descProcesso).first()).toBeVisible();
-        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
+        await acessarDetalhesProcesso(page, descProcesso);
 
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa disponibilizado/i);
 
@@ -54,7 +54,7 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
         await page.getByTestId('btn-validar-mapa-confirmar').click();
 
         await verificarPaginaPainel(page);
-        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
+        await acessarDetalhesProcesso(page, descProcesso);
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa validado/i);
     });
 });
@@ -69,16 +69,16 @@ test.describe.serial('CDU-19 - Apresentar sugestões e pré-preenchimento', () =
 
     test('Setup data', async ({_resetAutomatico, request}) => {
         await resetDatabase(request);
-        await criarProcessoMapaDisponibilizadoFixture(request, {
+        const processo = await criarProcessoMapaDisponibilizadoFixture(request, {
             descricao: descProcesso,
             unidade: UNIDADE_ALVO
         });
-        expect(true).toBeTruthy();
+        validarProcessoFixture(processo, descProcesso);
     });
 
     test('Cenario 1: CHEFE apresenta sugestões com sucesso', async ({_resetAutomatico, page, _autenticadoComoChefeSecao221}) => {
         await expect(page.getByTestId('tbl-processos').getByText(descProcesso).first()).toBeVisible();
-        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
+        await acessarDetalhesProcesso(page, descProcesso);
 
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa disponibilizado/i);
         await navegarParaMapa(page);
@@ -96,7 +96,7 @@ test.describe.serial('CDU-19 - Apresentar sugestões e pré-preenchimento', () =
         await page.getByTestId('btn-sugestoes-mapa-confirmar').click();
 
         await verificarPaginaPainel(page);
-        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
+        await acessarDetalhesProcesso(page, descProcesso);
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa com sugestões/i);
     });
 
@@ -119,7 +119,7 @@ test.describe.serial('CDU-19 - Apresentar sugestões e pré-preenchimento', () =
         _autenticadoComoChefeSecao221
     }) => {
         await expect(page.getByTestId('tbl-processos').getByText(descProcesso).first()).toBeVisible();
-        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
+        await acessarDetalhesProcesso(page, descProcesso);
 
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa disponibilizado/i);
         await navegarParaMapa(page);

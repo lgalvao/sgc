@@ -44,7 +44,7 @@ export async function adicionarConhecimento(page: Page, atividadeDescricao: stri
 export async function editarAtividade(page: Page, descricaoAtual: string | RegExp, novaDescricao: string) {
     const card = page.getByTestId('cad-atividades__card-atividade').filter({has: page.getByText(descricaoAtual)});
     const editButton = card.getByTestId('btn-editar-atividade');
-    await editButton.click({force: true});
+    await editButton.click();
 
     const input = page.getByTestId('inp-editar-atividade');
     await input.waitFor({ state: 'visible' });
@@ -58,7 +58,7 @@ export async function cancelarEdicaoAtividade(page: Page, descricaoAtual: string
     const card = page.getByTestId('cad-atividades__card-atividade').filter({has: page.getByText(descricaoAtual)});
     const editButton = card.getByTestId('btn-editar-atividade');
 
-    await editButton.click({force: true});
+    await editButton.click();
 
     const input = page.getByTestId('inp-editar-atividade');
     await input.waitFor({ state: 'visible' });
@@ -343,5 +343,4 @@ export async function verificarOpcoesImportacaoVazia(
     await respostaProcessos;
     await realizarVerificacaoOpcoesImportacao(page, opcoesEsperadas);
 }
-
 

@@ -23,7 +23,6 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
         const processoOrigemDescricao = `Processo base FINALIZADO ${timestamp}`;
         const processoOrigem2Descricao = `Processo base FINALIZADO 2 ${timestamp}`;
         let processoOrigemId: number;
-        let processoAlvoId: number;
         let atividadeA = '';
         let atividadeB = '';
 
@@ -41,21 +40,22 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
                 descricao: processoOrigem2Descricao
             });
 
-            const processoAlvo = await criarProcessoFixture(request, {
+            await criarProcessoFixture(request, {
                 unidade: UNIDADE_ALVO,
                 descricao: descricaoProcesso,
                 iniciar: true,
                 diasLimite: 30
             });
-            processoAlvoId = processoAlvo.codigo;
 
             await fazerLogout(page);
         });
 
         await test.step('2. Acessar tela de Atividades', async () => {
             await login(page, CHEFE_UNIDADE, SENHA_CHEFE);
-            await page.goto(`/processo/${processoAlvoId}/${UNIDADE_ALVO}`);
-            await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processoAlvoId}/${UNIDADE_ALVO}$`));
+            await page.goto('/painel');
+            await expect(page.getByTestId('tbl-processos').getByText(descricaoProcesso).first()).toBeVisible();
+            await acessarDetalhesProcesso(page, descricaoProcesso);
+            await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${UNIDADE_ALVO}$`));
             await AtividadeHelpers.navegarParaAtividades(page);
         });
 
@@ -148,23 +148,22 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
         const UNIDADE_REVISAO = 'ASSESSORIA_12';
         const CHEFE_REVISAO = USUARIOS.CHEFE_ASSESSORIA_12.titulo;
         const SENHA_REVISAO = USUARIOS.CHEFE_ASSESSORIA_12.senha;
-        let processoRevisaoId: number;
-
         await test.step('Setup: Criar processo de Revisão', async () => {
-            const processoRevisao = await criarProcessoFixture(request, {
+            await criarProcessoFixture(request, {
                 unidade: UNIDADE_REVISAO,
                 descricao,
                 tipo: 'REVISAO',
                 iniciar: true,
                 diasLimite: 30
             });
-            processoRevisaoId = processoRevisao.codigo;
         });
 
         await test.step('Verificar botão impacto', async () => {
             await login(page, CHEFE_REVISAO, SENHA_REVISAO);
-            await page.goto(`/processo/${processoRevisaoId}/${UNIDADE_REVISAO}`);
-            await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processoRevisaoId}/${UNIDADE_REVISAO}$`));
+            await page.goto('/painel');
+            await expect(page.getByTestId('tbl-processos').getByText(descricao).first()).toBeVisible();
+            await acessarDetalhesProcesso(page, descricao);
+            await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${UNIDADE_REVISAO}$`));
             await AtividadeHelpers.navegarParaAtividades(page);
 
             await AtividadeHelpers.adicionarAtividade(page, 'Atividade trigger');
@@ -190,7 +189,6 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
         const UNIDADE_ORIGEM_A = 'ASSESSORIA_12';
         const UNIDADE_ORIGEM_B = 'ASSESSORIA_21';
 
-        let processoAlvoId: number;
         let processoOrigemAId: number;
         const descAlvo = `Processo alvo ${timestamp}`;
         const descOrigemA = `Origem A ${timestamp}`;
@@ -206,13 +204,12 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
                 unidade: UNIDADE_ORIGEM_B,
                 descricao: descOrigemB
             });
-            const processoAlvo = await criarProcessoFixture(request, {
+            await criarProcessoFixture(request, {
                 unidade: UNIDADE_ALVO,
                 descricao: descAlvo,
                 iniciar: true,
                 diasLimite: 30
             });
-            processoAlvoId = processoAlvo.codigo;
             await fazerLogout(page);
         });
 
@@ -221,7 +218,10 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
             const atividadeDeA = `Atividade origem A - ${processoOrigemAId}`;
 
             await login(page, CHEFE_ALVO, SENHA_CHEFE);
-            await page.goto(`/processo/${processoAlvoId}/${UNIDADE_ALVO}`);
+            await page.goto('/painel');
+            await expect(page.getByTestId('tbl-processos').getByText(descAlvo).first()).toBeVisible();
+            await acessarDetalhesProcesso(page, descAlvo);
+            await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${UNIDADE_ALVO}$`));
             await AtividadeHelpers.navegarParaAtividades(page);
 
             // Abre o modal de importação e seleciona atividade do processo A

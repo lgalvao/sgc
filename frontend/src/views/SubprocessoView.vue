@@ -159,6 +159,12 @@
         </div>
       </BAlert>
     </div>
+    <div v-else-if="erroNaoEncontrado" class="text-center py-5">
+      <i class="bi bi-exclamation-triangle fs-1 text-warning mb-3 d-block"></i>
+      <h3>{{ TEXTOS.subprocesso.NAO_ENCONTRADO_TITULO || 'Subprocesso não iniciado' }}</h3>
+      <p class="text-muted">{{ TEXTOS.subprocesso.NAO_ENCONTRADO_DESC || 'Este subprocesso ainda não foi iniciado ou a unidade não participa deste processo.' }}</p>
+      <BButton to="/painel" variant="primary" class="mt-3">Voltar para o Painel</BButton>
+    </div>
     <div v-else class="text-center py-5">
       <BSpinner :label="TEXTOS.subprocesso.CARREGANDO" variant="primary"/>
       <p class="mt-2 text-muted">{{ TEXTOS.subprocesso.CARREGANDO }}</p>
@@ -181,7 +187,7 @@
       :loading="loading.isLoading('reabertura')"
       :ok-disabled="!justificativaReabertura.trim()"
       :titulo="tipoReabertura === 'cadastro' ? TEXTOS.subprocesso.REABRIR_CADASTRO_TITULO : TEXTOS.subprocesso.REABRIR_REVISAO_TITULO"
-      ok-title="Reabrir"
+      :ok-title="TEXTOS.comum.BOTAO_REABRIR"
       test-id-confirmar="btn-confirmar-reabrir"
       variant="success"
       @confirmar="confirmarReabertura"
@@ -271,6 +277,7 @@ const loading = useLoadingManager(['dataLimite', 'reabertura']);
 const tipoReabertura = ref<'cadastro' | 'revisao'>('cadastro');
 const justificativaReabertura = ref('');
 const codSubprocesso = ref<number | null>(null);
+const erroNaoEncontrado = ref(false);
 const modalLembreteAberto = ref(false);
 
 const camposMovimentacoes = [
@@ -305,11 +312,15 @@ const mapa = computed(() => mapaStore.mapaCompleto.value);
 const movimentacoes = computed<Movimentacao[]>(
     () => subprocesso.value?.movimentacoes || [],
 );
-const dataLimite = computed(() =>
-    subprocesso.value?.prazoEtapaAtual
-        ? new Date(subprocesso.value.prazoEtapaAtual)
-        : new Date(),
-);
+const dataLimite = computed(() => {
+  if (subprocesso.value?.prazoEtapaAtual) {
+    return new Date(subprocesso.value.prazoEtapaAtual);
+  }
+  // Se não tem prazoEtapaAtual, o subprocesso pode estar na etapa 1 (Mapeamento)
+  // e o prazo é o do processo pai.
+  const dataProcesso = processos.processoDetalhe.value?.dataLimite;
+  return dataProcesso ? new Date(dataProcesso) : null;
+});
 
 function exibirToastPendente() {
   const pendente = toastStore.consumePending();
@@ -336,10 +347,12 @@ onMounted(async () => {
     );
 
     if (id) {
-      codSubprocesso.value = id;
+      erroNaoEncontrado.value = false;
       await subprocessosStore.buscarSubprocessoDetalhe(id);
+      codSubprocesso.value = id;
       await mapaStore.buscarMapaCompleto(id);
     } else {
+      erroNaoEncontrado.value = true;
       logger.warn(`Subprocesso não encontrado para processo ${props.codProcesso} e unidade ${props.siglaUnidade}`);
     }
   } catch (error: any) {

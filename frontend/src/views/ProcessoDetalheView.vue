@@ -93,7 +93,7 @@
 
     <ModalConfirmacao
         v-model="mostrarModalFinalizacao"
-        ok-title="Finalizar"
+        :ok-title="TEXTOS.comum.BOTAO_FINALIZAR"
         test-id-cancelar="btn-finalizar-processo-cancelar"
         test-id-confirmar="btn-finalizar-processo-confirmar"
         :titulo="TEXTOS.processo.FINALIZACAO_TITULO"

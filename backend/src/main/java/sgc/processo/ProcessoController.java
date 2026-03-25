@@ -159,10 +159,7 @@ public class ProcessoController {
             @PathVariable Long codigo,
             @Valid @RequestBody IniciarProcessoRequest req,
             @AuthenticationPrincipal Usuario usuario) {
-        List<String> erros = processoService.iniciar(codigo, req.unidades(), usuario);
-        if (!erros.isEmpty()) {
-            throw new ErroValidacao(String.join(". ", erros));
-        }
+        processoService.iniciar(codigo, req.unidades(), usuario);
 
         Processo processoAtualizado = processoService.buscarPorCodigoComParticipantes(codigo);
         return ResponseEntity.ok(processoAtualizado);

@@ -2,7 +2,7 @@
   <ModalConfirmacao
       v-model="mostrarComputado"
       :auto-close="false"
-      ok-title="Disponibilizar"
+      :ok-title="TEXTOS.comum.BOTAO_DISPONIBILIZAR"
       :titulo="isRevisao ? TEXTOS.atividades.MODAL_DISPONIBILIZAR_REVISAO_TITULO : TEXTOS.atividades.MODAL_DISPONIBILIZAR_TITULO"
       test-id-cancelar="btn-disponibilizar-revisao-cancelar"
       test-id-confirmar="btn-confirmar-disponibilizacao"

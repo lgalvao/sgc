@@ -1,10 +1,21 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {login, USUARIOS} from './helpers/helpers-auth.js';
 import {criarProcessoFixture} from './fixtures/fixtures-processos.js';
-import {adicionarAtividade, adicionarConhecimento, navegarParaAtividades,} from './helpers/helpers-atividades.js';
-import {abrirHistoricoAnalise, fecharHistoricoAnalise,} from './helpers/helpers-analise.js';
+import {
+    adicionarAtividade,
+    adicionarConhecimento,
+    navegarParaAtividades,
+    navegarParaAtividadesVisualizacao,
+} from './helpers/helpers-atividades.js';
+import {
+    acessarSubprocessoChefeDireto,
+    acessarSubprocessoGestor,
+    abrirHistoricoAnalise,
+    fecharHistoricoAnalise,
+} from './helpers/helpers-analise.js';
 import {
     fazerLogout,
+    limparNotificacoes,
     verificarAlertaPainel,
     verificarPaginaPainel,
     verificarToast,
@@ -15,23 +26,22 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
     const UNIDADE_ALVO = 'SECAO_221';
     const USUARIO_CHEFE = USUARIOS.CHEFE_SECAO_221.titulo;
     const SENHA_CHEFE = USUARIOS.CHEFE_SECAO_221.senha;
-
-    let processoCodigo: number;
+    const descricaoProcesso = `Cadastro CDU-09 ${Date.now()}`;
 
     test('Setup: Criar processo via fixture', async ({_resetAutomatico, request}) => {
         const processo = await criarProcessoFixture(request, {
+            descricao: descricaoProcesso,
             unidade: UNIDADE_ALVO,
             iniciar: true,
             tipo: 'MAPEAMENTO'
         });
-        processoCodigo = processo.codigo;
-        expect(processoCodigo).toBeGreaterThan(0);
+        expect(processo.codigo).toBeGreaterThan(0);
     });
 
     test('Cenario 1: Validacao - Atividade sem conhecimento', async ({_resetAutomatico, page}) => {
         const timestamp = Date.now();
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
-        await page.goto(`/processo/${processoCodigo}/${UNIDADE_ALVO}`);
+        await acessarSubprocessoChefeDireto(page, descricaoProcesso, UNIDADE_ALVO);
         await navegarParaAtividades(page);
 
         const atividadeDesc = `Atividade incompleta ${timestamp}`;
@@ -52,7 +62,8 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
     test('Cenario 2: Caminho feliz - Disponibilizar cadastro', async ({_resetAutomatico, page}) => {
         const timestamp = Date.now();
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
-        await page.goto(`/processo/${processoCodigo}/${UNIDADE_ALVO}/cadastro`);
+        await acessarSubprocessoChefeDireto(page, descricaoProcesso, UNIDADE_ALVO);
+        await navegarParaAtividades(page);
 
         const atividadeDesc = `Atividade validada ${timestamp}`;
         await adicionarAtividade(page, atividadeDesc);
@@ -70,7 +81,7 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
         await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
         await verificarAlertaPainel(page, /Cadastro da unidade SECAO_221 disponibilizado para análise/i);
 
-        await page.goto(`/processo/${processoCodigo}/${UNIDADE_ALVO}`);
+        await acessarSubprocessoGestor(page, descricaoProcesso, UNIDADE_ALVO);
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro disponibilizado/i);
         await expect(page.getByTestId('tbl-movimentacoes')).toContainText(TEXTOS.movimentacao.CADASTRO_DISPONIBILIZADO);
     });
@@ -79,7 +90,8 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
         const motivo = 'Faltou detalhar melhor os conhecimentos técnicos.';
 
         await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
-        await page.goto(`/processo/${processoCodigo}/${UNIDADE_ALVO}/vis-cadastro`);
+        await acessarSubprocessoGestor(page, descricaoProcesso, UNIDADE_ALVO);
+        await navegarParaAtividadesVisualizacao(page);
 
         await page.getByTestId('btn-acao-devolver').click();
         await page.getByTestId('inp-devolucao-cadastro-obs').fill(motivo);
@@ -89,7 +101,7 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
         await fazerLogout(page);
 
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
-        await page.goto(`/processo/${processoCodigo}/${UNIDADE_ALVO}`);
+        await acessarSubprocessoChefeDireto(page, descricaoProcesso, UNIDADE_ALVO);
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro em andamento/i);
 
         await navegarParaAtividades(page);

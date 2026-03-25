@@ -101,7 +101,7 @@
                   :state="mensagemErroDataInicio ? false : null"
                   data-testid="input-data-inicio"
                   max="2099-12-31"
-                  min="2000-01-01"
+                  :min="obterHojeFormatado()"
               />
               <BFormInvalidFeedback :state="mensagemErroDataInicio ? false : null">
                 {{ mensagemErroDataInicio }}
@@ -117,7 +117,7 @@
                   :state="mensagemErroDataTermino ? false : null"
                   data-testid="input-data-termino"
                   max="2099-12-31"
-                  min="2000-01-01"
+                  :min="dataInicio || obterHojeFormatado()"
               />
               <BFormInvalidFeedback :state="mensagemErroDataTermino ? false : null">
                 {{ mensagemErroDataTermino }}
@@ -170,6 +170,7 @@ import AppAlert from "@/components/comum/AppAlert.vue";
 import InputData from "@/components/comum/InputData.vue";
 import {useNotification} from "@/composables/useNotification";
 import {TEXTOS} from "@/constants/textos";
+import {obterHojeFormatado} from "@/utils/dateUtils";
 import {buscarUnidadePorCodigo as buscarUnidadeServico} from "@/services/unidadeService";
 import {pesquisarUsuarios} from "@/services/usuarioService";
 import {criarAtribuicaoTemporaria} from "@/services/atribuicaoTemporariaService";

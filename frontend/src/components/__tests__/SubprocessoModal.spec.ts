@@ -31,7 +31,7 @@ describe("SubprocessoModal", () => {
     });
 
     it("deve desabilitar o botão de confirmar se a data for inválida", async () => {
-        vi.spyOn(utils, "isDateValidAndFuture").mockReturnValue(false);
+        vi.spyOn(utils, "isDateStrictlyFuture").mockReturnValue(false);
         context.wrapper = mount(SubprocessoModal, {
             props: {mostrarModal: true, dataLimiteAtual, etapaAtual: 1},
         });
@@ -41,14 +41,14 @@ describe("SubprocessoModal", () => {
     });
 
     it("deve habilitar o botão de confirmar se a data for válida", async () => {
-        vi.spyOn(utils, "isDateValidAndFuture").mockReturnValue(true);
+        vi.spyOn(utils, "isDateStrictlyFuture").mockReturnValue(true);
         context.wrapper = mount(SubprocessoModal, {
             props: {mostrarModal: true, dataLimiteAtual, etapaAtual: 1},
         });
 
         await context.wrapper
             .find('[data-testid="input-nova-data-limite"]')
-            .setValue("2025-01-01");
+            .setValue(utils.obterAmanhaFormatado());
 
         const confirmButton = context.wrapper.find('[data-testid="btn-modal-confirmar"]');
         expect(confirmButton.attributes("disabled")).toBeUndefined();
@@ -63,12 +63,12 @@ describe("SubprocessoModal", () => {
     });
 
     it('deve emitir "confirmarAlteracao" com a nova data', async () => {
-        vi.spyOn(utils, "isDateValidAndFuture").mockReturnValue(true);
+        vi.spyOn(utils, "isDateStrictlyFuture").mockReturnValue(true);
         context.wrapper = mount(SubprocessoModal, {
             props: {mostrarModal: true, dataLimiteAtual, etapaAtual: 1},
         });
 
-        const novaData = "2025-01-01";
+        const novaData = utils.obterAmanhaFormatado();
         await context.wrapper
             .find('[data-testid="input-nova-data-limite"]')
             .setValue(novaData);

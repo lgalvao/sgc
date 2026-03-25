@@ -1,5 +1,5 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
-import {criarProcessoCadastroHomologadoFixture} from './fixtures/fixtures-processos.js';
+import {criarProcessoCadastroHomologadoFixture, validarProcessoFixture} from './fixtures/fixtures-processos.js';
 import {criarCompetencia, disponibilizarMapa, navegarParaMapa} from './helpers/helpers-mapas.js';
 import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 
@@ -16,11 +16,11 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
     const competencia2 = `Competência 2 ${timestamp}`;
 
     test('Setup data', async ({_resetAutomatico, request}) => {
-        await criarProcessoCadastroHomologadoFixture(request, {
+        const processo = await criarProcessoCadastroHomologadoFixture(request, {
             descricao: descProcesso,
             unidade: UNIDADE_ALVO
         });
-        expect(true).toBeTruthy();
+        validarProcessoFixture(processo, descProcesso);
     });
 
     // TESTES PRINCIPAIS - CDU-17
@@ -33,7 +33,7 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
 
         // Cenario 1: Navegação
         await expect(page.getByTestId('tbl-processos').getByText(descProcesso).first()).toBeVisible();
-        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
+        await acessarDetalhesProcesso(page, descProcesso);
         await navegarParaSubprocesso(page, 'SECAO_211');
         await navegarParaMapa(page);
 
@@ -59,7 +59,7 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
         // Cenario 4: Disponibilizar com sucesso
         await disponibilizarMapa(page, '2030-12-31');
         await verificarPaginaPainel(page);
-        await page.getByTestId('tbl-processos').getByText(descProcesso).first().click();
+        await acessarDetalhesProcesso(page, descProcesso);
         await navegarParaSubprocesso(page, 'SECAO_211');
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa disponibilizado/i);
     });

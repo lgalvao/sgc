@@ -1,6 +1,7 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcessoMapaValidadoFixture} from './fixtures/fixtures-processos.js';
 import {login, USUARIOS} from './helpers/helpers-auth.js';
+import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
 import {verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
 
@@ -11,19 +12,19 @@ import {TEXTOS} from '../frontend/src/constants/textos.js';
  */
 test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
     const UNIDADE_1 = 'SECAO_211';
-    let processoId: number;
+    const descProcesso = `Mapeamento CDU-25 ${Date.now()}`;
 
     test('Cenários CDU-25: Aceite em bloco de mapas validados', async ({_resetAutomatico, request, page}) => {
         
         await test.step('Setup: Criar dados e realizar login', async () => {
             const processo = await criarProcessoMapaValidadoFixture(request, {
-                unidade: UNIDADE_1
+                unidade: UNIDADE_1,
+                descricao: descProcesso
             });
-            processoId = processo.codigo;
+            expect(processo.codigo).toBeGreaterThan(0);
 
             await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);
-            // Navegação direta via ID (State-Jumping) conforme etc/docs/regras-e2e.md
-            await page.goto(`/processo/${processoId}`);
+            await acessarDetalhesProcesso(page, descProcesso);
             await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
         });
 

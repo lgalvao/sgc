@@ -91,7 +91,7 @@
           :state="fieldErrors.dataLimite ? false : null"
           data-testid="inp-processo-data-limite"
           max="2099-12-31"
-          min="2000-01-01"
+          :min="obterAmanhaFormatado()"
           :required="true"
           @update:model-value="(val) => updateField('dataLimite', String(val))"
       />
@@ -118,6 +118,7 @@ import InputData from "@/components/comum/InputData.vue";
 import type {Unidade} from "@/types/tipos";
 import {TipoProcesso} from "@/types/tipos";
 import {useValidacao} from "@/composables/useValidacao";
+import {obterAmanhaFormatado} from "@/utils/dateUtils";
 
 interface ProcessoFormData {
   descricao: string;

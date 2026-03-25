@@ -5,9 +5,13 @@ import {
     formatDateBR,
     formatDateForInput,
     formatDateTimeBR,
+    isDateStrictlyFuture,
     isDateValidAndFuture,
+    obterAmanhaFormatado,
+    obterHojeFormatado,
     parseDate
 } from '@/utils/dateUtils';
+import {addDays, format, subDays} from "date-fns";
 
 describe('dateUtils', () => {
     describe('parseDate', () => {
@@ -74,24 +78,55 @@ describe('dateUtils', () => {
         expect(formatDateForInput(null)).toBe('');
     });
 
+    describe('obterAmanhaFormatado', () => {
+        it('deve retornar a data de amanhã no formato yyyy-MM-dd', () => {
+            const amanha = addDays(new Date(), 1);
+            const formatado = format(amanha, "yyyy-MM-dd");
+            expect(obterAmanhaFormatado()).toBe(formatado);
+        });
+    });
+
+    describe('obterHojeFormatado', () => {
+        it('deve retornar a data de hoje no formato yyyy-MM-dd', () => {
+            const hoje = new Date();
+            const formatado = format(hoje, "yyyy-MM-dd");
+            expect(obterHojeFormatado()).toBe(formatado);
+        });
+    });
+
     describe('isDateValidAndFuture', () => {
         it('deve retornar true para hoje ou futuro', () => {
             const today = new Date();
-            const tomorrow = new Date();
-            tomorrow.setDate(tomorrow.getDate() + 1);
+            const tomorrow = addDays(new Date(), 1);
 
             expect(isDateValidAndFuture(today)).toBe(true);
             expect(isDateValidAndFuture(tomorrow)).toBe(true);
         });
 
         it('deve retornar false para passado', () => {
-            const yesterday = new Date();
-            yesterday.setDate(yesterday.getDate() - 1);
+            const yesterday = subDays(new Date(), 1);
             expect(isDateValidAndFuture(yesterday)).toBe(false);
         });
 
         it('deve retornar false para data inválida', () => {
             expect(isDateValidAndFuture('invalid')).toBe(false);
+        });
+    });
+
+    describe('isDateStrictlyFuture', () => {
+        it('deve retornar true para futuro (amanhã em diante)', () => {
+            const tomorrow = addDays(new Date(), 1);
+            expect(isDateStrictlyFuture(tomorrow)).toBe(true);
+        });
+
+        it('deve retornar false para hoje', () => {
+            const today = new Date();
+            expect(isDateStrictlyFuture(today)).toBe(false);
+        });
+
+        it('deve retornar false para passado', () => {
+            const yesterday = subDays(new Date(), 1);
+            expect(isDateStrictlyFuture(yesterday)).toBe(false);
         });
     });
 
