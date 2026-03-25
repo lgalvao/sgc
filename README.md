@@ -54,7 +54,7 @@ sgc/
 1. **Stack completa com perfil e2e**
 
    ```bash
-   node e1e/lifecycle.js
+   node e2e/lifecycle.js
    ```
 
 2. **Backend (definir perfil com -PENV)**
@@ -100,7 +100,7 @@ O projeto possui uma suite abrangente de testes e verificações de qualidade.
 Para rodar todas as verificações (SpotBugs, Testes, Lint, Typecheck) de uma só vez:
 
 ```bash
-./quality-check.sh
+./etc/scripts/quality-check.sh all
 ```
 
 Os relatórios são gerados em:

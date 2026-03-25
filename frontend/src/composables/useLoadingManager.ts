@@ -4,7 +4,7 @@ import {logger} from '@/utils';
 /**
  * Gerenciador de múltiplos estados de loading
  */
-// TODO traduziros simbolos para portugues
+// TODO traduzir os símbolos para português
 interface LoadingManager {
     states: Record<string, Ref<boolean>>;
     start: (name: string) => void;
