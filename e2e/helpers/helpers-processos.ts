@@ -70,6 +70,22 @@ export async function criarProcesso(page: Page, options: {
 }
 
 /**
+ * Verifica os cabeçalhos obrigatórios da tabela de processos
+ */
+
+export async function verificarCabecalhosTabelaProcessos(page: Page, compacto = false): Promise<void> {
+    const tabela = page.getByTestId('tbl-processos');
+    await expect(tabela).toBeVisible();
+
+    const rotuloUnidades = compacto ? 'Unidades' : 'Unidades participantes';
+    const cabecalhosEsperados = ['Descrição', 'Tipo', rotuloUnidades, 'Situação'];
+
+    for (const cabecalho of cabecalhosEsperados) {
+        await expect(tabela.getByRole('columnheader', {name: cabecalho})).toBeVisible();
+    }
+}
+
+/**
  * Verifica que um processo aparece na tabela com situação e tipo corretos
  */
 export async function verificarProcessoNaTabela(page: Page, options: {
