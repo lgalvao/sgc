@@ -15,6 +15,27 @@ import {
 } from './helpers/helpers-navegacao.js';
 import {acessarDetalhesProcesso, criarProcesso, verificarDetalhesSubprocesso} from './helpers/helpers-processos.js';
 
+function converterDataHoraBrParaTimestamp(dataHoraTexto: string): number {
+    const textoNormalizado = dataHoraTexto.trim().replace(/\s+/g, ' ');
+    const correspondencia = textoNormalizado.match(
+        /^(\d{2})\/(\d{2})\/(\d{4})(?: (\d{2}):(\d{2})(?::(\d{2}))?)?$/
+    );
+
+    if (!correspondencia) {
+        throw new Error(`Data/hora inválida na tabela de movimentações: "${dataHoraTexto}"`);
+    }
+
+    const [, dia, mes, ano, hora = '00', minuto = '00', segundo = '00'] = correspondencia;
+    return new Date(
+        Number(ano),
+        Number(mes) - 1,
+        Number(dia),
+        Number(hora),
+        Number(minuto),
+        Number(segundo)
+    ).getTime();
+}
+
 test.describe('CDU-07 - Detalhar subprocesso', () => {
     const UNIDADE_ALVO = 'SECAO_211';
     const NOME_UNIDADE_ALVO = 'Seção 211';
@@ -55,7 +76,20 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
         await expect(page.getByRole('columnheader', {name: 'Origem'})).toBeVisible();
         await expect(page.getByRole('columnheader', {name: 'Destino'})).toBeVisible();
         await expect(page.getByRole('columnheader', {name: 'Descrição'})).toBeVisible();
-        await expect(page.getByTestId('tbl-movimentacoes').locator('tbody tr')).not.toHaveCount(0);
+        const linhasMovimentacao = page.getByTestId('tbl-movimentacoes').locator('tbody tr');
+        await expect(linhasMovimentacao).not.toHaveCount(0);
+
+        const totalLinhasMovimentacao = await linhasMovimentacao.count();
+        const datasMovimentacao: number[] = [];
+
+        for (let i = 0; i < totalLinhasMovimentacao; i++) {
+            const dataHoraLinha = await linhasMovimentacao.nth(i).locator('td').first().innerText();
+            datasMovimentacao.push(converterDataHoraBrParaTimestamp(dataHoraLinha));
+        }
+
+        for (let i = 0; i < datasMovimentacao.length - 1; i++) {
+            expect(datasMovimentacao[i]).toBeGreaterThanOrEqual(datasMovimentacao[i + 1]);
+        }
 
         const cardAtividadesAdmin = page.getByTestId('card-subprocesso-atividades-vis');
         await expect(cardAtividadesAdmin).toBeVisible();
