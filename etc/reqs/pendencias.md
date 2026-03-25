@@ -194,3 +194,56 @@ Esta versão substitui a rodada anterior e consolida pendências após segunda v
 2. Para cada CDU, converter cada pendência em cenário E2E explícito (nome de teste refletindo o item do requisito).
 3. Onde o requisito exigir comportamento interno não visível na UI, complementar com testes de integração de backend.
 4. Após cada lote, atualizar o alinhamento do CDU com evidência do novo teste e remover a pendência correspondente.
+
+## Prontidão para iniciar a revisão dos testes E2E
+- Critério de prontidão usado: requisito minimamente claro + pendências priorizadas + próximo escopo sugerido no alinhamento do CDU.
+
+| CDU | Status | Observação de prontidão |
+|---|---|---|
+| 01 | PRONTO_COM_GAPS | há itens sem cobertura E2E |
+| 02 | PRONTO_COM_GAPS | há itens sem cobertura E2E |
+| 03 | PRONTO | base de análise e pendências objetivas definidas |
+| 04 | PENDENTE_REFINAMENTO_REQUISITO | requisito sem fluxo principal estruturado |
+| 05 | PENDENTE_REFINAMENTO_REQUISITO | requisito sem fluxo principal estruturado |
+| 06 | PRONTO_COM_GAPS | há itens sem cobertura E2E |
+| 07 | PENDENTE_REFINAMENTO_REQUISITO | requisito sem fluxo principal estruturado; há itens sem cobertura E2E |
+| 08 | PRONTO_COM_GAPS | há itens sem cobertura E2E |
+| 09 | PRONTO_COM_GAPS | há itens sem cobertura E2E |
+| 10 | PENDENTE_REFINAMENTO_REQUISITO | requisito sem fluxo principal estruturado; há itens sem cobertura E2E |
+| 11 | PRONTO | base de análise e pendências objetivas definidas |
+| 12 | PENDENTE_REFINAMENTO_REQUISITO | requisito sem fluxo principal estruturado |
+| 13 | PRONTO_COM_GAPS | há itens sem cobertura E2E |
+| 14 | PRONTO_COM_GAPS | há itens sem cobertura E2E |
+| 15 | PRONTO_COM_GAPS | há itens sem cobertura E2E |
+| 16 | PRONTO | base de análise e pendências objetivas definidas |
+| 17 | PRONTO_COM_GAPS | há itens sem cobertura E2E |
+| 18 | PRONTO | base de análise e pendências objetivas definidas |
+| 19 | PRONTO_COM_GAPS | há itens sem cobertura E2E |
+| 20 | PRONTO_COM_GAPS | há itens sem cobertura E2E |
+| 21 | PRONTO | base de análise e pendências objetivas definidas |
+| 22 | PRONTO_COM_GAPS | há itens sem cobertura E2E |
+| 23 | PRONTO_COM_GAPS | há itens sem cobertura E2E |
+| 24 | PRONTO_COM_GAPS | há itens sem cobertura E2E |
+| 25 | PRONTO_COM_GAPS | há itens sem cobertura E2E |
+| 26 | PRONTO_COM_GAPS | há itens sem cobertura E2E |
+| 27 | PRONTO | base de análise e pendências objetivas definidas |
+| 28 | PRONTO_COM_GAPS | há itens sem cobertura E2E |
+| 29 | PRONTO | base de análise e pendências objetivas definidas |
+| 30 | PRONTO_COM_GAPS | há itens sem cobertura E2E |
+| 31 | PRONTO | base de análise e pendências objetivas definidas |
+| 32 | PRONTO_COM_GAPS | há itens sem cobertura E2E |
+| 33 | PRONTO_COM_GAPS | há itens sem cobertura E2E |
+| 34 | PRONTO_COM_GAPS | há itens sem cobertura E2E |
+| 35 | PRONTO_COM_GAPS | há itens sem cobertura E2E |
+| 36 | PRONTO_COM_GAPS | há itens sem cobertura E2E |
+
+**Leitura operacional**
+- `PRONTO_COM_GAPS`: pode iniciar implementação de testes imediatamente, focando itens P0/P1 já listados.
+- `PENDENTE_REFINAMENTO_REQUISITO`: recomendado refino rápido do requisito antes de codar para evitar retrabalho.
+- `PRONTO`: pode seguir com lote completo conforme priorização.
+
+## Estratégia recomendada para o próximo PR
+1. Selecionar um lote de 4 a 6 CDUs `PRONTO_COM_GAPS` com maior risco funcional (permissão, homologação, devolução, alertas).
+2. Para cada CDU do lote, implementar ao menos: 1 cenário positivo + 1 negativo + 1 assert de efeito colateral.
+3. Fechar cada CDU com evidência objetiva no alinhamento (link para teste criado e item do requisito atendido).
+4. Reexecutar apenas os arquivos E2E impactados no PR e registrar saída no corpo do PR.

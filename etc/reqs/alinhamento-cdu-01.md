@@ -186,6 +186,19 @@
 - Completar cobertura do item: **O sistema exibe a tela `Login`** (atualmente parcial).
 - Completar cobertura do item: **O usuário informa suas credenciais: número do título de eleitor e senha** (atualmente parcial).
 
+## Prontidão para o próximo PR de melhoria E2E
+- Status de entrada: **PRONTO_COM_GAPS**.
+- Motivos: há itens sem cobertura E2E.
+- Checklist mínimo antes de codar:
+  - [ ] confirmar massa de dados/fixtures para cenário positivo e negativo;
+  - [ ] definir assert de regra de negócio + assert de efeito colateral;
+  - [ ] validar perfil/unidade necessários no cenário (quando aplicável);
+  - [ ] mapear se precisa teste de integração backend complementar.
+- Escopo sugerido para o próximo PR deste CDU:
+  - Implementar cenário específico para: **O usuário acessa o sistema** (sem evidência no E2E atual).
+  - Completar cobertura do item: **O sistema exibe a tela `Login`** (atualmente parcial).
+  - Completar cobertura do item: **O usuário informa suas credenciais: número do título de eleitor e senha** (atualmente parcial).
+
 ## Observações metodológicas
 - Esta rodada incluiu leitura de helpers importados para reduzir falso negativo de cobertura indireta.
 - Classificação automática por evidência textual; recomenda-se validação humana dos itens `🟡` e `❌` antes da implementação final.

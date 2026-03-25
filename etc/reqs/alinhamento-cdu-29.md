@@ -52,6 +52,17 @@
 ## Ajustes recomendados para próximo ciclo
 - Manter suíte atual e adicionar apenas testes de regressão de estabilidade (flakiness e dados).
 
+## Prontidão para o próximo PR de melhoria E2E
+- Status de entrada: **PRONTO**.
+- Motivos: base de análise e pendências objetivas definidas.
+- Checklist mínimo antes de codar:
+  - [ ] confirmar massa de dados/fixtures para cenário positivo e negativo;
+  - [ ] definir assert de regra de negócio + assert de efeito colateral;
+  - [ ] validar perfil/unidade necessários no cenário (quando aplicável);
+  - [ ] mapear se precisa teste de integração backend complementar.
+- Escopo sugerido para o próximo PR deste CDU:
+  - Manter suíte atual e adicionar apenas testes de regressão de estabilidade (flakiness e dados).
+
 ## Observações metodológicas
 - Esta rodada incluiu leitura de helpers importados para reduzir falso negativo de cobertura indireta.
 - Classificação automática por evidência textual; recomenda-se validação humana dos itens `🟡` e `❌` antes da implementação final.

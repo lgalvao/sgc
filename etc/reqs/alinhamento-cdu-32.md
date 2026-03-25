@@ -139,6 +139,19 @@
 - Implementar cenário específico para: **`Data/hora`: Data/hora atual** (sem evidência no E2E atual).
 - Completar cobertura do item: **`Unidade origem`: ADMIN** (atualmente parcial).
 
+## Prontidão para o próximo PR de melhoria E2E
+- Status de entrada: **PRONTO_COM_GAPS**.
+- Motivos: há itens sem cobertura E2E.
+- Checklist mínimo antes de codar:
+  - [ ] confirmar massa de dados/fixtures para cenário positivo e negativo;
+  - [ ] definir assert de regra de negócio + assert de efeito colateral;
+  - [ ] validar perfil/unidade necessários no cenário (quando aplicável);
+  - [ ] mapear se precisa teste de integração backend complementar.
+- Escopo sugerido para o próximo PR deste CDU:
+  - Completar cobertura do item: **sistema registra uma movimentação para o subprocesso com os campos:** (atualmente parcial).
+  - Implementar cenário específico para: **`Data/hora`: Data/hora atual** (sem evidência no E2E atual).
+  - Completar cobertura do item: **`Unidade origem`: ADMIN** (atualmente parcial).
+
 ## Observações metodológicas
 - Esta rodada incluiu leitura de helpers importados para reduzir falso negativo de cobertura indireta.
 - Classificação automática por evidência textual; recomenda-se validação humana dos itens `🟡` e `❌` antes da implementação final.

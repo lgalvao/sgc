@@ -194,6 +194,19 @@
 - Completar cobertura do item: **Usuário fornece as sugestões e clica em `Confirmar`.** (atualmente parcial).
 - Completar cobertura do item: **O sistema notifica a unidade superior hierárquica da apresentação de sugestões para o mapa, com e-mail no modelo abaixo:** (atualmente parcial).
 
+## Prontidão para o próximo PR de melhoria E2E
+- Status de entrada: **PRONTO_COM_GAPS**.
+- Motivos: há itens sem cobertura E2E.
+- Checklist mínimo antes de codar:
+  - [ ] confirmar massa de dados/fixtures para cenário positivo e negativo;
+  - [ ] definir assert de regra de negócio + assert de efeito colateral;
+  - [ ] validar perfil/unidade necessários no cenário (quando aplicável);
+  - [ ] mapear se precisa teste de integração backend complementar.
+- Escopo sugerido para o próximo PR deste CDU:
+  - Completar cobertura do item: **Se o subprocesso tiver retornado de análise pelas unidades superiores, deverá ser exibido também o botão `Histórico de análise`.** (atualmente parcial).
+  - Completar cobertura do item: **Usuário fornece as sugestões e clica em `Confirmar`.** (atualmente parcial).
+  - Completar cobertura do item: **O sistema notifica a unidade superior hierárquica da apresentação de sugestões para o mapa, com e-mail no modelo abaixo:** (atualmente parcial).
+
 ## Observações metodológicas
 - Esta rodada incluiu leitura de helpers importados para reduzir falso negativo de cobertura indireta.
 - Classificação automática por evidência textual; recomenda-se validação humana dos itens `🟡` e `❌` antes da implementação final.

@@ -69,6 +69,19 @@
 - Completar cobertura do item: **O usuário usa como base as informações de impactos mostradas nesta tela para alterar o mapa, podendo alterar descrições de competências, de atividades e de conhecimentos; remover ou criar novas competências; e ajustar a associação das atividades às competências do mapa, conforme descrito no caso de uso `Manter mapa de competências`.** (atualmente parcial).
 - Completar cobertura do item: **O usuário deve associar a uma competência todas as atividades ainda não associadas.** (atualmente parcial).
 
+## Prontidão para o próximo PR de melhoria E2E
+- Status de entrada: **PRONTO**.
+- Motivos: base de análise e pendências objetivas definidas.
+- Checklist mínimo antes de codar:
+  - [ ] confirmar massa de dados/fixtures para cenário positivo e negativo;
+  - [ ] definir assert de regra de negócio + assert de efeito colateral;
+  - [ ] validar perfil/unidade necessários no cenário (quando aplicável);
+  - [ ] mapear se precisa teste de integração backend complementar.
+- Escopo sugerido para o próximo PR deste CDU:
+  - Completar cobertura do item: **O sistema mostra tela `Detalhes do processo`.** (atualmente parcial).
+  - Completar cobertura do item: **O usuário usa como base as informações de impactos mostradas nesta tela para alterar o mapa, podendo alterar descrições de competências, de atividades e de conhecimentos; remover ou criar novas competências; e ajustar a associação das atividades às competências do mapa, conforme descrito no caso de uso `Manter mapa de competências`.** (atualmente parcial).
+  - Completar cobertura do item: **O usuário deve associar a uma competência todas as atividades ainda não associadas.** (atualmente parcial).
+
 ## Observações metodológicas
 - Esta rodada incluiu leitura de helpers importados para reduzir falso negativo de cobertura indireta.
 - Classificação automática por evidência textual; recomenda-se validação humana dos itens `🟡` e `❌` antes da implementação final.

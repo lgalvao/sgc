@@ -61,6 +61,17 @@
 ## Ajustes recomendados para próximo ciclo
 - Completar cobertura do item: **Nesta tela, são apresentados a sigla e o nome da unidade, e cada atividade é apresentada como uma tabela, com** (atualmente parcial).
 
+## Prontidão para o próximo PR de melhoria E2E
+- Status de entrada: **PRONTO**.
+- Motivos: base de análise e pendências objetivas definidas.
+- Checklist mínimo antes de codar:
+  - [ ] confirmar massa de dados/fixtures para cenário positivo e negativo;
+  - [ ] definir assert de regra de negócio + assert de efeito colateral;
+  - [ ] validar perfil/unidade necessários no cenário (quando aplicável);
+  - [ ] mapear se precisa teste de integração backend complementar.
+- Escopo sugerido para o próximo PR deste CDU:
+  - Completar cobertura do item: **Nesta tela, são apresentados a sigla e o nome da unidade, e cada atividade é apresentada como uma tabela, com** (atualmente parcial).
+
 ## Observações metodológicas
 - Esta rodada incluiu leitura de helpers importados para reduzir falso negativo de cobertura indireta.
 - Classificação automática por evidência textual; recomenda-se validação humana dos itens `🟡` e `❌` antes da implementação final.

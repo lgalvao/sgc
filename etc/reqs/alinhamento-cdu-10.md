@@ -16,6 +16,17 @@
 ## Ajustes recomendados para próximo ciclo
 - Implementar cenário específico para: **Fluxo principal não estruturado numericamente; validar leitura manual do requisito completo.** (sem evidência no E2E atual).
 
+## Prontidão para o próximo PR de melhoria E2E
+- Status de entrada: **PENDENTE_REFINAMENTO_REQUISITO**.
+- Motivos: requisito sem fluxo principal estruturado, há itens sem cobertura E2E.
+- Checklist mínimo antes de codar:
+  - [ ] confirmar massa de dados/fixtures para cenário positivo e negativo;
+  - [ ] definir assert de regra de negócio + assert de efeito colateral;
+  - [ ] validar perfil/unidade necessários no cenário (quando aplicável);
+  - [ ] mapear se precisa teste de integração backend complementar.
+- Escopo sugerido para o próximo PR deste CDU:
+  - Implementar cenário específico para: **Fluxo principal não estruturado numericamente; validar leitura manual do requisito completo.** (sem evidência no E2E atual).
+
 ## Observações metodológicas
 - Esta rodada incluiu leitura de helpers importados para reduzir falso negativo de cobertura indireta.
 - Classificação automática por evidência textual; recomenda-se validação humana dos itens `🟡` e `❌` antes da implementação final.
