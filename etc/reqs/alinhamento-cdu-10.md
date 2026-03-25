@@ -1,26 +1,21 @@
-# Alinhamento CDU-10 - Reanálise
+# Alinhamento CDU-10 - Reanálise (rodada 2)
 
-## Escopo da reanálise
-- Requisito analisado: `etc/reqs/cdu-10.md`.
-- Teste E2E analisado: `e2e/cdu-10.spec.ts` (7 cenários `test`, 0 `test.step`, 193 linhas).
+## Artefatos analisados
+- Requisito: `etc/reqs/cdu-10.md`.
+- Teste E2E: `e2e/cdu-10.spec.ts` (7 cenários `test`, 0 `test.step`).
 
-## Cobertura observada no E2E
-- ✅ 1. Setup: Preparar processo de revisão e atividades iniciais
-- ✅ 1.1 Cenário adicional: primeiro acesso direto ao cadastro carrega o subprocesso
-- ✅ 2. Cenário 1: Validação - Atividade sem conhecimento
-- ✅ 3. Cenário 2: Caminho feliz - Disponibilizar revisão
-- ✅ 4. Cenário 3: Devolução e Histórico
-- ✅ 5. Cenário 4: Histórico retém as análises após nova disponibilização
-- ✅ 6. Cenário 5: Cancelar disponibilização
+## Resultado da comparação requisito x E2E
+- Itens do fluxo principal avaliados: **1**.
+- Status: **0 cobertos**, **0 parciais**, **1 não cobertos** (baseado em evidências textuais no spec e helpers).
 
-## Pontos do requisito sem evidência direta no E2E
-- ✅ Não foram encontradas lacunas textuais relevantes com a heurística aplicada; ainda assim recomenda-se validação manual funcional.
+## Matriz de evidências
+- ❌ **[NAO_COBERTO]** 1. Fluxo principal não estruturado numericamente; validar leitura manual do requisito completo.
+  - Palavras-chave usadas: `estruturado, numericamente, validar, leitura, manual, requisito`
+  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
 
-## Ações recomendadas (teste e sistema)
-- Priorizar cenários com dados controlados para validar regra de negócio (não apenas presença de elementos na UI).
-- Incluir asserts de navegação/efeito colateral (persistência, alteração de estado, permissões por perfil e unidade ativa).
-- Quando o requisito citar integração externa, manter o E2E focado em contrato visível (mensagem, bloqueio, fallback) e complementar com teste de integração/backend.
+## Ajustes recomendados para próximo ciclo
+- Implementar cenário específico para: **Fluxo principal não estruturado numericamente; validar leitura manual do requisito completo.** (sem evidência no E2E atual).
 
-## Método utilizado nesta reanálise
-- Leitura comparativa do texto do requisito (fluxo principal) com os cenários e passos automatizados no arquivo E2E correspondente.
-- Marcação de lacunas por ausência de evidência textual de validação no teste; itens marcados como ⚠️ devem ser revisados manualmente na próxima rodada.
+## Observações metodológicas
+- Esta rodada incluiu leitura de helpers importados para reduzir falso negativo de cobertura indireta.
+- Classificação automática por evidência textual; recomenda-se validação humana dos itens `🟡` e `❌` antes da implementação final.

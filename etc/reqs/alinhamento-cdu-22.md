@@ -1,27 +1,160 @@
-# Alinhamento CDU-22 - Reanálise
+# Alinhamento CDU-22 - Reanálise (rodada 2)
 
-## Escopo da reanálise
-- Requisito analisado: `etc/reqs/cdu-22.md`.
-- Teste E2E analisado: `e2e/cdu-22.spec.ts` (7 cenários `test`, 0 `test.step`, 139 linhas).
+## Artefatos analisados
+- Requisito: `etc/reqs/cdu-22.md`.
+- Teste E2E: `e2e/cdu-22.spec.ts` (7 cenários `test`, 0 `test.step`).
 
-## Cobertura observada no E2E
-- ✅ Setup data
-- ✅ Cenario 1: GESTOR abre modal e cancela aceite em bloco
-- ✅ Cenario 3a: Botão desabilitado quando item está com gestor subordinado
-- ✅ Cenario 3b: Botão habilitado após gestor subordinado aceitar
-- ✅ Cenario 4: Botão desabilitado para gestor superior quando item está com intermediário
-- ✅ Setup: processo de revisão com cadastro disponibilizado
-- ✅ Cenario REVISAO: GESTOR aceita revisão de cadastro em bloco
+## Resultado da comparação requisito x E2E
+- Itens do fluxo principal avaliados: **30**.
+- Status: **12 cobertos**, **14 parciais**, **4 não cobertos** (baseado em evidências textuais no spec e helpers).
 
-## Pontos do requisito sem evidência direta no E2E
-- ⚠️ Registra internamente uma movimentação para o subprocesso: (palavras-chave do requisito: registra, internamente, movimentação, subprocesso)
-- ⚠️ Registra internamente um alerta: (palavras-chave do requisito: registra, internamente, alerta)
+## Matriz de evidências
+- ✅ **[COBERTO]** 1. No `Painel`, o usuário acessa um processo de mapeamento ou revisão em andamento.
+  - Palavras-chave usadas: `processo, painel, acessa, mapeamento, revisão, andamento`
+  - Evidência (score 4): `e2e/cdu-22.spec.ts:21` -> `* 1. No painel, GESTOR acessa processo em andamento`
+  - Evidência (score 3): `e2e/cdu-22.spec.ts:17` -> `* - Processo de mapeamento ou revisão com unidades subordinadas`
+  - Evidência (score 2): `e2e/cdu-22.spec.ts:7` -> `import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';`
+- ✅ **[COBERTO]** 2. O sistema mostra a tela `Detalhes do processo` com uma tabela um resumo de todas unidades participantes do processo, que sejam iguais ou subordinadas à unidade do gestor.
+  - Palavras-chave usadas: `processo, unidades, unidade, mostra, detalhes, resumo`
+  - Evidência (score 3): `e2e/cdu-22.spec.ts:17` -> `* - Processo de mapeamento ou revisão com unidades subordinadas`
+  - Evidência (score 3): `e2e/cdu-22.spec.ts:22` -> `* 2. Sistema mostra tela Detalhes do processo`
+  - Evidência (score 2): `e2e/cdu-22.spec.ts:7` -> `import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';`
+- ✅ **[COBERTO]** 3. Caso existam unidades com subprocessos elegíveis para aceite em bloco do cadastro de atividades (de acordo com as pré-condições), o sistema habilita o botão `Aceitar cadastro em bloco`.
+  - Palavras-chave usadas: `unidades, subprocessos, atividades, existam, elegíveis, aceite`
+  - Evidência (score 3): `e2e/cdu-22.spec.ts:23` -> `* 3. Sistema identifica unidades elegíveis e exibe botão de aceite em bloco`
+  - Evidência (score 1): `e2e/cdu-22.spec.ts:17` -> `* - Processo de mapeamento ou revisão com unidades subordinadas`
+  - Evidência (score 1): `e2e/cdu-22.spec.ts:18` -> `* - Subprocessos na situação 'Cadastro disponibilizado'`
+- ✅ **[COBERTO]** 4. O usuário clica no botão `Aceitar cadastro em bloco`.
+  - Palavras-chave usadas: `clica, botão, aceitar, cadastro, bloco`
+  - Evidência (score 4): `e2e/cdu-22.spec.ts:24` -> `* 4. GESTOR clica no botão 'Aceitar em Bloco'`
+  - Evidência (score 3): `e2e/cdu-22.spec.ts:12` -> `* CDU-22 - Aceitar cadastros em bloco`
+  - Evidência (score 3): `e2e/cdu-22.spec.ts:29` -> `test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {`
+- ✅ **[COBERTO]** 5. O sistema abre modal de confirmação, com os elementos a seguir:
+  - Palavras-chave usadas: `abre, modal, confirmação, elementos, seguir`
+  - Evidência (score 2): `e2e/cdu-22.spec.ts:25` -> `* 5. Sistema abre modal com lista de unidades selecionáveis`
+  - Evidência (score 2): `e2e/cdu-22.spec.ts:44` -> `test('Cenario 1: GESTOR abre modal e cancela aceite em bloco', async ({_resetAutomatico, page, _autenticadoComoGestor...`
+  - Evidência (score 1): `e2e/cdu-22.spec.ts:53` -> `const modal = page.locator('#modal-acao-bloco');`
+- ✅ **[COBERTO]** 6. Título "Aceite de cadastro em bloco";
+  - Palavras-chave usadas: `título, aceite, cadastro, bloco`
+  - Evidência (score 2): `e2e/cdu-22.spec.ts:12` -> `* CDU-22 - Aceitar cadastros em bloco`
+  - Evidência (score 2): `e2e/cdu-22.spec.ts:23` -> `* 3. Sistema identifica unidades elegíveis e exibe botão de aceite em bloco`
+  - Evidência (score 2): `e2e/cdu-22.spec.ts:29` -> `test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {`
+- ✅ **[COBERTO]** 7. Texto "Selecione as unidades cujos cadastros deverão ser aceitos"
+  - Palavras-chave usadas: `unidades, texto, selecione, cujos, cadastros, aceitos`
+  - Evidência (score 3): `e2e/cdu-22.spec.ts:80` -> `await expect(page.getByText(TEXTOS.sucesso.CADASTROS_ACEITOS_EM_BLOCO).first()).toBeVisible();`
+  - Evidência (score 3): `e2e/cdu-22.spec.ts:137` -> `await expect(page.getByText(TEXTOS.sucesso.CADASTROS_ACEITOS_EM_BLOCO).first()).toBeVisible();`
+  - Evidência (score 1): `e2e/cdu-22.spec.ts:9` -> `import {TEXTOS} from '../frontend/src/constants/textos.js';`
+- ✅ **[COBERTO]** 8. Lista das unidades operacionais ou interoperacionais subordinadas **elegíveis**, sendo apresentadas com um checkbox (selecionado por padrão), a sigla e o nome da unidade
+  - Palavras-chave usadas: `unidades, unidade, lista, operacionais, interoperacionais, subordinadas`
+  - Evidência (score 3): `e2e/cdu-22.spec.ts:17` -> `* - Processo de mapeamento ou revisão com unidades subordinadas`
+  - Evidência (score 3): `e2e/cdu-22.spec.ts:25` -> `* 5. Sistema abre modal com lista de unidades selecionáveis`
+  - Evidência (score 2): `e2e/cdu-22.spec.ts:23` -> `* 3. Sistema identifica unidades elegíveis e exibe botão de aceite em bloco`
+- 🟡 **[PARCIAL]** 9. Botões `Cancelar` e `Registrar aceite`.
+  - Palavras-chave usadas: `botões, cancelar, registrar, aceite`
+  - Evidência (score 1): `e2e/cdu-22.spec.ts:23` -> `* 3. Sistema identifica unidades elegíveis e exibe botão de aceite em bloco`
+  - Evidência (score 1): `e2e/cdu-22.spec.ts:27` -> `* 7. Sistema executa aceite para cada unidade selecionada`
+  - Evidência (score 1): `e2e/cdu-22.spec.ts:44` -> `test('Cenario 1: GESTOR abre modal e cancela aceite em bloco', async ({_resetAutomatico, page, _autenticadoComoGestor...`
+- 🟡 **[PARCIAL]** 10. Caso o usuário escolha o botão `Cancelar`, o sistema interrompe a operação, permanecendo na tela `Detalhes do processo`.
+  - Palavras-chave usadas: `processo, escolha, botão, cancelar, interrompe, operação`
+  - Evidência (score 1): `e2e/cdu-22.spec.ts:3` -> `criarProcessoCadastroDisponibilizadoFixture,`
+  - Evidência (score 1): `e2e/cdu-22.spec.ts:4` -> `criarProcessoRevisaoCadastroDisponibilizadoFixture`
+  - Evidência (score 1): `e2e/cdu-22.spec.ts:5` -> `} from './fixtures/fixtures-processos.js';`
+- 🟡 **[PARCIAL]** 11. O usuário clica em `Registrar aceite`.
+  - Palavras-chave usadas: `clica, registrar, aceite`
+  - Evidência (score 1): `e2e/cdu-22.spec.ts:23` -> `* 3. Sistema identifica unidades elegíveis e exibe botão de aceite em bloco`
+  - Evidência (score 1): `e2e/cdu-22.spec.ts:24` -> `* 4. GESTOR clica no botão 'Aceitar em Bloco'`
+  - Evidência (score 1): `e2e/cdu-22.spec.ts:27` -> `* 7. Sistema executa aceite para cada unidade selecionada`
+- ✅ **[COBERTO]** 12. O sistema atua, para cada unidade selecionada, da seguinte forma:
+  - Palavras-chave usadas: `unidade, atua, cada, selecionada, seguinte, forma`
+  - Evidência (score 3): `e2e/cdu-22.spec.ts:27` -> `* 7. Sistema executa aceite para cada unidade selecionada`
+  - Evidência (score 1): `e2e/cdu-22.spec.ts:3` -> `criarProcessoCadastroDisponibilizadoFixture,`
+  - Evidência (score 1): `e2e/cdu-22.spec.ts:4` -> `criarProcessoRevisaoCadastroDisponibilizadoFixture`
+- ✅ **[COBERTO]** 13. Registra internamente uma análise de cadastro para o subprocesso:
+  - Palavras-chave usadas: `subprocesso, registra, internamente, análise, cadastro`
+  - Evidência (score 2): `e2e/cdu-22.spec.ts:18` -> `* - Subprocessos na situação 'Cadastro disponibilizado'`
+  - Evidência (score 1): `e2e/cdu-22.spec.ts:3` -> `criarProcessoCadastroDisponibilizadoFixture,`
+  - Evidência (score 1): `e2e/cdu-22.spec.ts:4` -> `criarProcessoRevisaoCadastroDisponibilizadoFixture`
+- ❌ **[NAO_COBERTO]** 14. `Data/hora`: [Data/hora atual]
+  - Palavras-chave usadas: `data/hora, atual`
+  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
+- 🟡 **[PARCIAL]** 15. `Unidade`: [SIGLA_UNIDADE_ATUAL]
+  - Palavras-chave usadas: `unidade, sigla_unidade_atual`
+  - Evidência (score 1): `e2e/cdu-22.spec.ts:17` -> `* - Processo de mapeamento ou revisão com unidades subordinadas`
+  - Evidência (score 1): `e2e/cdu-22.spec.ts:23` -> `* 3. Sistema identifica unidades elegíveis e exibe botão de aceite em bloco`
+  - Evidência (score 1): `e2e/cdu-22.spec.ts:25` -> `* 5. Sistema abre modal com lista de unidades selecionáveis`
+- 🟡 **[PARCIAL]** 16. `Resultado`: "Aceite"
+  - Palavras-chave usadas: `resultado, aceite`
+  - Evidência (score 1): `e2e/cdu-22.spec.ts:23` -> `* 3. Sistema identifica unidades elegíveis e exibe botão de aceite em bloco`
+  - Evidência (score 1): `e2e/cdu-22.spec.ts:27` -> `* 7. Sistema executa aceite para cada unidade selecionada`
+  - Evidência (score 1): `e2e/cdu-22.spec.ts:44` -> `test('Cenario 1: GESTOR abre modal e cancela aceite em bloco', async ({_resetAutomatico, page, _autenticadoComoGestor...`
+- 🟡 **[PARCIAL]** 17. `Observação`: "De acordo com o cadastro de atividades da unidade"
+  - Palavras-chave usadas: `atividades, unidade, observação, acordo, cadastro`
+  - Evidência (score 1): `e2e/cdu-22.spec.ts:3` -> `criarProcessoCadastroDisponibilizadoFixture,`
+  - Evidência (score 1): `e2e/cdu-22.spec.ts:4` -> `criarProcessoRevisaoCadastroDisponibilizadoFixture`
+  - Evidência (score 1): `e2e/cdu-22.spec.ts:12` -> `* CDU-22 - Aceitar cadastros em bloco`
+- 🟡 **[PARCIAL]** 18. Registra internamente uma movimentação para o subprocesso:
+  - Palavras-chave usadas: `subprocesso, registra, internamente, movimentação`
+  - Evidência (score 1): `e2e/cdu-22.spec.ts:18` -> `* - Subprocessos na situação 'Cadastro disponibilizado'`
+- ❌ **[NAO_COBERTO]** 19. `Data/hora`: [Data/hora atual]
+  - Palavras-chave usadas: `data/hora, atual`
+  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
+- 🟡 **[PARCIAL]** 20. `Unidade origem`: [SIGLA_UNIDADE_ATUAL]
+  - Palavras-chave usadas: `unidade, sigla_unidade_atual, origem`
+  - Evidência (score 1): `e2e/cdu-22.spec.ts:17` -> `* - Processo de mapeamento ou revisão com unidades subordinadas`
+  - Evidência (score 1): `e2e/cdu-22.spec.ts:23` -> `* 3. Sistema identifica unidades elegíveis e exibe botão de aceite em bloco`
+  - Evidência (score 1): `e2e/cdu-22.spec.ts:25` -> `* 5. Sistema abre modal com lista de unidades selecionáveis`
+- 🟡 **[PARCIAL]** 21. `Unidade destino`: [SIGLA_UNIDADE_SUPERIOR]
+  - Palavras-chave usadas: `unidade, sigla_unidade_superior, destino`
+  - Evidência (score 1): `e2e/cdu-22.spec.ts:17` -> `* - Processo de mapeamento ou revisão com unidades subordinadas`
+  - Evidência (score 1): `e2e/cdu-22.spec.ts:23` -> `* 3. Sistema identifica unidades elegíveis e exibe botão de aceite em bloco`
+  - Evidência (score 1): `e2e/cdu-22.spec.ts:25` -> `* 5. Sistema abre modal com lista de unidades selecionáveis`
+- ✅ **[COBERTO]** 22. `Descrição`: "Cadastro aceito"
+  - Palavras-chave usadas: `descrição, cadastro, aceito`
+  - Evidência (score 2): `e2e/cdu-22.spec.ts:80` -> `await expect(page.getByText(TEXTOS.sucesso.CADASTROS_ACEITOS_EM_BLOCO).first()).toBeVisible();`
+  - Evidência (score 2): `e2e/cdu-22.spec.ts:137` -> `await expect(page.getByText(TEXTOS.sucesso.CADASTROS_ACEITOS_EM_BLOCO).first()).toBeVisible();`
+  - Evidência (score 1): `e2e/cdu-22.spec.ts:3` -> `criarProcessoCadastroDisponibilizadoFixture,`
+- ❌ **[NAO_COBERTO]** 23. Registra internamente um alerta:
+  - Palavras-chave usadas: `alerta, registra, internamente`
+  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
+- ❌ **[NAO_COBERTO]** 24. `Data/hora`: [Data/hora atual]
+  - Palavras-chave usadas: `data/hora, atual`
+  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
+- 🟡 **[PARCIAL]** 25. `Descrição`: "Cadastro da unidade [SIGLA_UNIDADE_SUBPROCESSO] submetido para análise"
+  - Palavras-chave usadas: `unidade, sigla_unidade_subprocesso, descrição, cadastro, submetido, análise`
+  - Evidência (score 1): `e2e/cdu-22.spec.ts:3` -> `criarProcessoCadastroDisponibilizadoFixture,`
+  - Evidência (score 1): `e2e/cdu-22.spec.ts:4` -> `criarProcessoRevisaoCadastroDisponibilizadoFixture`
+  - Evidência (score 1): `e2e/cdu-22.spec.ts:12` -> `* CDU-22 - Aceitar cadastros em bloco`
+- 🟡 **[PARCIAL]** 26. `Processo`: [DESCRIÇÃO_PROCESSO]
+  - Palavras-chave usadas: `processo, descrição_processo`
+  - Evidência (score 1): `e2e/cdu-22.spec.ts:3` -> `criarProcessoCadastroDisponibilizadoFixture,`
+  - Evidência (score 1): `e2e/cdu-22.spec.ts:4` -> `criarProcessoRevisaoCadastroDisponibilizadoFixture`
+  - Evidência (score 1): `e2e/cdu-22.spec.ts:5` -> `} from './fixtures/fixtures-processos.js';`
+- 🟡 **[PARCIAL]** 27. `Unidade de origem`: [SIGLA_UNIDADE_ATUAL]
+  - Palavras-chave usadas: `unidade, sigla_unidade_atual, origem`
+  - Evidência (score 1): `e2e/cdu-22.spec.ts:17` -> `* - Processo de mapeamento ou revisão com unidades subordinadas`
+  - Evidência (score 1): `e2e/cdu-22.spec.ts:23` -> `* 3. Sistema identifica unidades elegíveis e exibe botão de aceite em bloco`
+  - Evidência (score 1): `e2e/cdu-22.spec.ts:25` -> `* 5. Sistema abre modal com lista de unidades selecionáveis`
+- 🟡 **[PARCIAL]** 28. `Unidade de destino`: [SIGLA_UNIDADE_SUPERIOR]
+  - Palavras-chave usadas: `unidade, sigla_unidade_superior, destino`
+  - Evidência (score 1): `e2e/cdu-22.spec.ts:17` -> `* - Processo de mapeamento ou revisão com unidades subordinadas`
+  - Evidência (score 1): `e2e/cdu-22.spec.ts:23` -> `* 3. Sistema identifica unidades elegíveis e exibe botão de aceite em bloco`
+  - Evidência (score 1): `e2e/cdu-22.spec.ts:25` -> `* 5. Sistema abre modal com lista de unidades selecionáveis`
+- 🟡 **[PARCIAL]** 29. Envia notificação por e-mail para a unidade superior, seguindo este modelo:
+  - Palavras-chave usadas: `unidade, envia, notificação, e-mail, superior, seguindo`
+  - Evidência (score 1): `e2e/cdu-22.spec.ts:17` -> `* - Processo de mapeamento ou revisão com unidades subordinadas`
+  - Evidência (score 1): `e2e/cdu-22.spec.ts:23` -> `* 3. Sistema identifica unidades elegíveis e exibe botão de aceite em bloco`
+  - Evidência (score 1): `e2e/cdu-22.spec.ts:25` -> `* 5. Sistema abre modal com lista de unidades selecionáveis`
+- ✅ **[COBERTO]** 30. O sistema redireciona para `Painel` e mostra a notificação "Cadastros aceitos em bloco".
+  - Palavras-chave usadas: `redireciona, painel, mostra, notificação, cadastros, aceitos`
+  - Evidência (score 2): `e2e/cdu-22.spec.ts:80` -> `await expect(page.getByText(TEXTOS.sucesso.CADASTROS_ACEITOS_EM_BLOCO).first()).toBeVisible();`
+  - Evidência (score 2): `e2e/cdu-22.spec.ts:137` -> `await expect(page.getByText(TEXTOS.sucesso.CADASTROS_ACEITOS_EM_BLOCO).first()).toBeVisible();`
+  - Evidência (score 1): `e2e/cdu-22.spec.ts:12` -> `* CDU-22 - Aceitar cadastros em bloco`
 
-## Ações recomendadas (teste e sistema)
-- Priorizar cenários com dados controlados para validar regra de negócio (não apenas presença de elementos na UI).
-- Incluir asserts de navegação/efeito colateral (persistência, alteração de estado, permissões por perfil e unidade ativa).
-- Quando o requisito citar integração externa, manter o E2E focado em contrato visível (mensagem, bloqueio, fallback) e complementar com teste de integração/backend.
+## Ajustes recomendados para próximo ciclo
+- Completar cobertura do item: **Botões `Cancelar` e `Registrar aceite`.** (atualmente parcial).
+- Completar cobertura do item: **Caso o usuário escolha o botão `Cancelar`, o sistema interrompe a operação, permanecendo na tela `Detalhes do processo`.** (atualmente parcial).
+- Completar cobertura do item: **O usuário clica em `Registrar aceite`.** (atualmente parcial).
 
-## Método utilizado nesta reanálise
-- Leitura comparativa do texto do requisito (fluxo principal) com os cenários e passos automatizados no arquivo E2E correspondente.
-- Marcação de lacunas por ausência de evidência textual de validação no teste; itens marcados como ⚠️ devem ser revisados manualmente na próxima rodada.
+## Observações metodológicas
+- Esta rodada incluiu leitura de helpers importados para reduzir falso negativo de cobertura indireta.
+- Classificação automática por evidência textual; recomenda-se validação humana dos itens `🟡` e `❌` antes da implementação final.

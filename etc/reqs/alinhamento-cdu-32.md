@@ -1,25 +1,144 @@
-# Alinhamento CDU-32 - Reanálise
+# Alinhamento CDU-32 - Reanálise (rodada 2)
 
-## Escopo da reanálise
-- Requisito analisado: `etc/reqs/cdu-32.md`.
-- Teste E2E analisado: `e2e/cdu-32.spec.ts` (2 cenários `test`, 0 `test.step`, 57 linhas).
+## Artefatos analisados
+- Requisito: `etc/reqs/cdu-32.md`.
+- Teste E2E: `e2e/cdu-32.spec.ts` (2 cenários `test`, 0 `test.step`).
 
-## Cobertura observada no E2E
-- ✅ Setup UI
-- ✅ Cenários CDU-32: ADMIN reabre cadastro
+## Resultado da comparação requisito x E2E
+- Itens do fluxo principal avaliados: **27**.
+- Status: **11 cobertos**, **11 parciais**, **5 não cobertos** (baseado em evidências textuais no spec e helpers).
 
-## Pontos do requisito sem evidência direta no E2E
-- ⚠️ `Data/hora`: Data/hora atual (palavras-chave do requisito: data, hora, atual)
-- ⚠️ Para as unidades superiores: (palavras-chave do requisito: unidades, superiores)
-- ⚠️ `Data/hora`: Data/hora atual (palavras-chave do requisito: data, hora, atual)
-- ⚠️ Para as unidades superiores: (palavras-chave do requisito: unidades, superiores)
-- ⚠️ `Data/hora`: Data/hora atual (palavras-chave do requisito: data, hora, atual)
+## Matriz de evidências
+- ✅ **[COBERTO]** 1. O usuário acessa o `Painel` e acessa o subprocesso de uma unidade que esteja com a situação 'Mapa homologado ou posterior' (ver situações de subprocessos no arquivo **_intro.md**).
+  - Palavras-chave usadas: `subprocesso, unidade, situação, situações, subprocessos, acessa`
+  - Evidência (score 2): `e2e/cdu-32.spec.ts:28` -> `await navegarParaSubprocesso(page, UNIDADE_1);`
+  - Evidência (score 1): `e2e/cdu-32.spec.ts:3` -> `import {navegarParaSubprocesso, verificarAppAlert} from './helpers/helpers-navegacao.js';`
+  - Evidência (score 1): `e2e/cdu-32.spec.ts:4` -> `import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';`
+- ✅ **[COBERTO]** 2. O usuário clica no botão `Reabrir cadastro`.
+  - Palavras-chave usadas: `clica, botão, reabrir, cadastro`
+  - Evidência (score 2): `e2e/cdu-32.spec.ts:7` -> `* CDU-32 - Reabrir cadastro`
+  - Evidência (score 2): `e2e/cdu-32.spec.ts:9` -> `test.describe.serial('CDU-32 - Reabrir cadastro', () => {`
+  - Evidência (score 2): `e2e/cdu-32.spec.ts:32` -> `const btnReabrir = page.getByTestId('btn-reabrir-cadastro');`
+- ✅ **[COBERTO]** 3. O sistema abre um modal "Reabertura de cadastro" solicitando uma justificativa (obrigatória) para a reabertura.
+  - Palavras-chave usadas: `abre, modal, reabertura, cadastro, solicitando, justificativa`
+  - Evidência (score 2): `e2e/cdu-32.spec.ts:24` -> `test('Cenários CDU-32: ADMIN reabre cadastro', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {`
+  - Evidência (score 2): `e2e/cdu-32.spec.ts:40` -> `await expect(modal.getByText(/Reabrir cadastro/i)).toBeVisible();`
+  - Evidência (score 2): `e2e/cdu-32.spec.ts:55` -> `await expect(page.getByTestId('tbl-movimentacoes')).toContainText(/Reabertura de cadastro/i);`
+- ✅ **[COBERTO]** 4. O usuário informa a justificativa e confirma.
+  - Palavras-chave usadas: `informa, justificativa, confirma`
+  - Evidência (score 2): `e2e/cdu-32.spec.ts:44` -> `// Cenario 4: Botão confirmar desabilitado sem justificativa`
+  - Evidência (score 1): `e2e/cdu-32.spec.ts:46` -> `await expect(page.getByTestId('btn-confirmar-reabrir')).toBeDisabled();`
+  - Evidência (score 1): `e2e/cdu-32.spec.ts:47` -> `await page.getByTestId('inp-justificativa-reabrir').fill('Justificativa de teste');`
+- ✅ **[COBERTO]** 5. O sistema altera a situação do subprocesso para `Cadastro em andamento'.
+  - Palavras-chave usadas: `situação, subprocesso, altera, cadastro, andamento`
+  - Evidência (score 3): `e2e/cdu-32.spec.ts:54` -> `await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro em andamento/i);`
+  - Evidência (score 1): `e2e/cdu-32.spec.ts:3` -> `import {navegarParaSubprocesso, verificarAppAlert} from './helpers/helpers-navegacao.js';`
+  - Evidência (score 1): `e2e/cdu-32.spec.ts:7` -> `* CDU-32 - Reabrir cadastro`
+- 🟡 **[PARCIAL]** 6. sistema registra uma movimentação para o subprocesso com os campos:
+  - Palavras-chave usadas: `subprocesso, registra, movimentação`
+  - Evidência (score 1): `e2e/cdu-32.spec.ts:3` -> `import {navegarParaSubprocesso, verificarAppAlert} from './helpers/helpers-navegacao.js';`
+  - Evidência (score 1): `e2e/cdu-32.spec.ts:28` -> `await navegarParaSubprocesso(page, UNIDADE_1);`
+  - Evidência (score 1): `e2e/cdu-32.spec.ts:30` -> `await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa homologado/i);`
+- ❌ **[NAO_COBERTO]** 7. `Data/hora`: Data/hora atual
+  - Palavras-chave usadas: `data/hora, atual`
+  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
+- 🟡 **[PARCIAL]** 8. `Unidade origem`: ADMIN
+  - Palavras-chave usadas: `unidade, origem, admin`
+  - Evidência (score 1): `e2e/cdu-32.spec.ts:10` -> `const UNIDADE_1 = 'SECAO_221';`
+  - Evidência (score 1): `e2e/cdu-32.spec.ts:18` -> `unidade: UNIDADE_1,`
+  - Evidência (score 1): `e2e/cdu-32.spec.ts:24` -> `test('Cenários CDU-32: ADMIN reabre cadastro', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {`
+- 🟡 **[PARCIAL]** 9. `Unidade destino`: [SIGLA_UNIDADE_SUBPROCESSO]
+  - Palavras-chave usadas: `unidade, sigla_unidade_subprocesso, destino`
+  - Evidência (score 1): `e2e/cdu-32.spec.ts:10` -> `const UNIDADE_1 = 'SECAO_221';`
+  - Evidência (score 1): `e2e/cdu-32.spec.ts:18` -> `unidade: UNIDADE_1,`
+  - Evidência (score 1): `e2e/cdu-32.spec.ts:28` -> `await navegarParaSubprocesso(page, UNIDADE_1);`
+- ✅ **[COBERTO]** 10. `Descrição`: 'Reabertura de cadastro'
+  - Palavras-chave usadas: `descrição, reabertura, cadastro`
+  - Evidência (score 2): `e2e/cdu-32.spec.ts:55` -> `await expect(page.getByTestId('tbl-movimentacoes')).toContainText(/Reabertura de cadastro/i);`
+  - Evidência (score 1): `e2e/cdu-32.spec.ts:7` -> `* CDU-32 - Reabrir cadastro`
+  - Evidência (score 1): `e2e/cdu-32.spec.ts:9` -> `test.describe.serial('CDU-32 - Reabrir cadastro', () => {`
+- ✅ **[COBERTO]** 11. O sistema envia notificações por e-mail para a unidade do subprocesso e para as suas unidades superiores na hierarquia.
+  - Palavras-chave usadas: `unidade, subprocesso, unidades, envia, notificações, e-mail`
+  - Evidência (score 2): `e2e/cdu-32.spec.ts:28` -> `await navegarParaSubprocesso(page, UNIDADE_1);`
+  - Evidência (score 1): `e2e/cdu-32.spec.ts:3` -> `import {navegarParaSubprocesso, verificarAppAlert} from './helpers/helpers-navegacao.js';`
+  - Evidência (score 1): `e2e/cdu-32.spec.ts:10` -> `const UNIDADE_1 = 'SECAO_221';`
+- ✅ **[COBERTO]** 12. Para a unidade do subprocesso:
+  - Palavras-chave usadas: `unidade, subprocesso`
+  - Evidência (score 2): `e2e/cdu-32.spec.ts:28` -> `await navegarParaSubprocesso(page, UNIDADE_1);`
+  - Evidência (score 1): `e2e/cdu-32.spec.ts:3` -> `import {navegarParaSubprocesso, verificarAppAlert} from './helpers/helpers-navegacao.js';`
+  - Evidência (score 1): `e2e/cdu-32.spec.ts:10` -> `const UNIDADE_1 = 'SECAO_221';`
+- ❌ **[NAO_COBERTO]** 13. Para as unidades superiores:
+  - Palavras-chave usadas: `unidades, superiores`
+  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
+- 🟡 **[PARCIAL]** 14. O sistema cria internamente alertas:
+  - Palavras-chave usadas: `alertas, cria, internamente`
+  - Evidência (score 1): `e2e/cdu-32.spec.ts:2` -> `import {criarProcessoMapaHomologadoFixture, validarProcessoFixture} from './fixtures/fixtures-processos.js';`
+  - Evidência (score 1): `e2e/cdu-32.spec.ts:16` -> `const processo = await criarProcessoMapaHomologadoFixture(request, {`
+- 🟡 **[PARCIAL]** 15. Para a unidade solicitante:
+  - Palavras-chave usadas: `unidade, solicitante`
+  - Evidência (score 1): `e2e/cdu-32.spec.ts:10` -> `const UNIDADE_1 = 'SECAO_221';`
+  - Evidência (score 1): `e2e/cdu-32.spec.ts:18` -> `unidade: UNIDADE_1,`
+  - Evidência (score 1): `e2e/cdu-32.spec.ts:28` -> `await navegarParaSubprocesso(page, UNIDADE_1);`
+- ✅ **[COBERTO]** 16. `Descrição`: "Cadastro de atividades reaberto"
+  - Palavras-chave usadas: `atividades, descrição, cadastro, reaberto`
+  - Evidência (score 2): `e2e/cdu-32.spec.ts:53` -> `await verificarAppAlert(page, /Cadastro reaberto/i);`
+  - Evidência (score 1): `e2e/cdu-32.spec.ts:7` -> `* CDU-32 - Reabrir cadastro`
+  - Evidência (score 1): `e2e/cdu-32.spec.ts:9` -> `test.describe.serial('CDU-32 - Reabrir cadastro', () => {`
+- 🟡 **[PARCIAL]** 17. `Processo`: [DESCRICAO_PROCESSO]
+  - Palavras-chave usadas: `processo, descricao_processo`
+  - Evidência (score 1): `e2e/cdu-32.spec.ts:2` -> `import {criarProcessoMapaHomologadoFixture, validarProcessoFixture} from './fixtures/fixtures-processos.js';`
+  - Evidência (score 1): `e2e/cdu-32.spec.ts:3` -> `import {navegarParaSubprocesso, verificarAppAlert} from './helpers/helpers-navegacao.js';`
+  - Evidência (score 1): `e2e/cdu-32.spec.ts:4` -> `import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';`
+- ❌ **[NAO_COBERTO]** 18. `Data/hora`: Data/hora atual
+  - Palavras-chave usadas: `data/hora, atual`
+  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
+- 🟡 **[PARCIAL]** 19. `Unidade de origem`: ADMIN
+  - Palavras-chave usadas: `unidade, origem, admin`
+  - Evidência (score 1): `e2e/cdu-32.spec.ts:10` -> `const UNIDADE_1 = 'SECAO_221';`
+  - Evidência (score 1): `e2e/cdu-32.spec.ts:18` -> `unidade: UNIDADE_1,`
+  - Evidência (score 1): `e2e/cdu-32.spec.ts:24` -> `test('Cenários CDU-32: ADMIN reabre cadastro', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {`
+- 🟡 **[PARCIAL]** 20. `Unidade de destino`: [SIGLA_UNIDADE]
+  - Palavras-chave usadas: `unidade, sigla_unidade, destino`
+  - Evidência (score 1): `e2e/cdu-32.spec.ts:10` -> `const UNIDADE_1 = 'SECAO_221';`
+  - Evidência (score 1): `e2e/cdu-32.spec.ts:18` -> `unidade: UNIDADE_1,`
+  - Evidência (score 1): `e2e/cdu-32.spec.ts:28` -> `await navegarParaSubprocesso(page, UNIDADE_1);`
+- ❌ **[NAO_COBERTO]** 21. Para as unidades superiores:
+  - Palavras-chave usadas: `unidades, superiores`
+  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
+- ✅ **[COBERTO]** 22. `Descrição`: "Cadastro da unidade [SIGLA_UNIDADE_SUBORDINADA] reaberto"
+  - Palavras-chave usadas: `unidade, sigla_unidade_subordinada, descrição, cadastro, reaberto`
+  - Evidência (score 2): `e2e/cdu-32.spec.ts:53` -> `await verificarAppAlert(page, /Cadastro reaberto/i);`
+  - Evidência (score 1): `e2e/cdu-32.spec.ts:7` -> `* CDU-32 - Reabrir cadastro`
+  - Evidência (score 1): `e2e/cdu-32.spec.ts:9` -> `test.describe.serial('CDU-32 - Reabrir cadastro', () => {`
+- 🟡 **[PARCIAL]** 23. `Processo`: [DESCRICAO_PROCESSO]
+  - Palavras-chave usadas: `processo, descricao_processo`
+  - Evidência (score 1): `e2e/cdu-32.spec.ts:2` -> `import {criarProcessoMapaHomologadoFixture, validarProcessoFixture} from './fixtures/fixtures-processos.js';`
+  - Evidência (score 1): `e2e/cdu-32.spec.ts:3` -> `import {navegarParaSubprocesso, verificarAppAlert} from './helpers/helpers-navegacao.js';`
+  - Evidência (score 1): `e2e/cdu-32.spec.ts:4` -> `import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';`
+- ❌ **[NAO_COBERTO]** 24. `Data/hora`: Data/hora atual
+  - Palavras-chave usadas: `data/hora, atual`
+  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
+- 🟡 **[PARCIAL]** 25. `Unidade de origem`: ADMIN
+  - Palavras-chave usadas: `unidade, origem, admin`
+  - Evidência (score 1): `e2e/cdu-32.spec.ts:10` -> `const UNIDADE_1 = 'SECAO_221';`
+  - Evidência (score 1): `e2e/cdu-32.spec.ts:18` -> `unidade: UNIDADE_1,`
+  - Evidência (score 1): `e2e/cdu-32.spec.ts:24` -> `test('Cenários CDU-32: ADMIN reabre cadastro', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {`
+- 🟡 **[PARCIAL]** 26. `Unidade de destino`: [SIGLA_UNIDADE_SUPERIOR]
+  - Palavras-chave usadas: `unidade, sigla_unidade_superior, destino`
+  - Evidência (score 1): `e2e/cdu-32.spec.ts:10` -> `const UNIDADE_1 = 'SECAO_221';`
+  - Evidência (score 1): `e2e/cdu-32.spec.ts:18` -> `unidade: UNIDADE_1,`
+  - Evidência (score 1): `e2e/cdu-32.spec.ts:28` -> `await navegarParaSubprocesso(page, UNIDADE_1);`
+- ✅ **[COBERTO]** 27. O sistema exibe mensagem de sucesso "Cadastro reaberto".
+  - Palavras-chave usadas: `exibe, mensagem, sucesso, cadastro, reaberto`
+  - Evidência (score 2): `e2e/cdu-32.spec.ts:53` -> `await verificarAppAlert(page, /Cadastro reaberto/i);`
+  - Evidência (score 1): `e2e/cdu-32.spec.ts:7` -> `* CDU-32 - Reabrir cadastro`
+  - Evidência (score 1): `e2e/cdu-32.spec.ts:9` -> `test.describe.serial('CDU-32 - Reabrir cadastro', () => {`
 
-## Ações recomendadas (teste e sistema)
-- Priorizar cenários com dados controlados para validar regra de negócio (não apenas presença de elementos na UI).
-- Incluir asserts de navegação/efeito colateral (persistência, alteração de estado, permissões por perfil e unidade ativa).
-- Quando o requisito citar integração externa, manter o E2E focado em contrato visível (mensagem, bloqueio, fallback) e complementar com teste de integração/backend.
+## Ajustes recomendados para próximo ciclo
+- Completar cobertura do item: **sistema registra uma movimentação para o subprocesso com os campos:** (atualmente parcial).
+- Implementar cenário específico para: **`Data/hora`: Data/hora atual** (sem evidência no E2E atual).
+- Completar cobertura do item: **`Unidade origem`: ADMIN** (atualmente parcial).
 
-## Método utilizado nesta reanálise
-- Leitura comparativa do texto do requisito (fluxo principal) com os cenários e passos automatizados no arquivo E2E correspondente.
-- Marcação de lacunas por ausência de evidência textual de validação no teste; itens marcados como ⚠️ devem ser revisados manualmente na próxima rodada.
+## Observações metodológicas
+- Esta rodada incluiu leitura de helpers importados para reduzir falso negativo de cobertura indireta.
+- Classificação automática por evidência textual; recomenda-se validação humana dos itens `🟡` e `❌` antes da implementação final.

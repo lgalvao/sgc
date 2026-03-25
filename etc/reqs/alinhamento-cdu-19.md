@@ -1,25 +1,199 @@
-# Alinhamento CDU-19 - Reanálise
+# Alinhamento CDU-19 - Reanálise (rodada 2)
 
-## Escopo da reanálise
-- Requisito analisado: `etc/reqs/cdu-19.md`.
-- Teste E2E analisado: `e2e/cdu-19.spec.ts` (6 cenários `test`, 0 `test.step`, 136 linhas).
+## Artefatos analisados
+- Requisito: `etc/reqs/cdu-19.md`.
+- Teste E2E: `e2e/cdu-19.spec.ts` (6 cenários `test`, 0 `test.step`).
 
-## Cobertura observada no E2E
-- ✅ Setup data
-- ✅ Cenários CDU-19: Fluxo completo de validação do mapa pelo CHEFE
-- ✅ Setup data
-- ✅ Cenario 1: CHEFE apresenta sugestões com sucesso
-- ✅ Cenario 2: GESTOR devolve mapa para ajustes
-- ✅ Cenario 3: CHEFE reabre modal com pré-preenchimento das sugestões anteriores
+## Resultado da comparação requisito x E2E
+- Itens do fluxo principal avaliados: **37**.
+- Status: **16 cobertos**, **18 parciais**, **3 não cobertos** (baseado em evidências textuais no spec e helpers).
 
-## Pontos do requisito sem evidência direta no E2E
-- ⚠️ Se o subprocesso tiver retornado de análise pelas unidades superiores, deverá ser exibido também o botão `Histórico de análise`. (palavras-chave do requisito: subprocesso, tiver, retornado, análise)
+## Matriz de evidências
+- ✅ **[COBERTO]** 1. No `Painel`, o usuário escolhe um processo e, na tela `Detalhes do subprocesso`, clica no card `Mapa de competências`.
+  - Palavras-chave usadas: `processo, subprocesso, competências, painel, escolhe, detalhes`
+  - Evidência (score 2): `e2e/cdu-19.spec.ts:5` -> `import {acessarSubprocessoGestor} from './helpers/helpers-analise.js';`
+  - Evidência (score 2): `e2e/cdu-19.spec.ts:7` -> `import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';`
+  - Evidência (score 2): `e2e/cdu-19.spec.ts:33` -> `await acessarDetalhesProcesso(page, descProcesso);`
+- ✅ **[COBERTO]** 2. O sistema mostra a tela `Visualização de mapa` com os botões `Apresentar sugestões` e `Validar`.
+  - Palavras-chave usadas: `mostra, visualização, mapa, botões, apresentar, sugestões`
+  - Evidência (score 2): `e2e/cdu-19.spec.ts:31` -> `// Cenario 1: Navegação para visualização do mapa`
+  - Evidência (score 2): `e2e/cdu-19.spec.ts:63` -> `test.describe.serial('CDU-19 - Apresentar sugestões e pré-preenchimento', () => {`
+  - Evidência (score 2): `e2e/cdu-19.spec.ts:89` -> `// Modal abre sem pré-preenchimento (mapa novo, sem sugestões anteriores)`
+- 🟡 **[PARCIAL]** 3. Se o subprocesso tiver retornado de análise pelas unidades superiores, deverá ser exibido também o botão `Histórico de análise`.
+  - Palavras-chave usadas: `subprocesso, unidades, tiver, retornado, análise, pelas`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:5` -> `import {acessarSubprocessoGestor} from './helpers/helpers-analise.js';`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:35` -> `await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa disponibilizado/i);`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:59` -> `await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa validado/i);`
+- ✅ **[COBERTO]** 4. Se o usuário clicar no botão `Histórico de análise`, o sistema mostra, em tela modal, os dados das análises do mapa realizadas pelas unidades superiores à unidade do subprocesso desde a última disponibilização. As análises deverão ser apresentadas em uma pequena tabela com data/hora, sigla da unidade, resultado ('Devolução' ou 'Aceite') e observações. Essas informações poderão ser usadas como subsídio para a realização da nova validação do mapa.
+  - Palavras-chave usadas: `unidades, unidade, subprocesso, clicar, botão, histórico`
+  - Evidência (score 2): `e2e/cdu-19.spec.ts:106` -> `await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:5` -> `import {acessarSubprocessoGestor} from './helpers/helpers-analise.js';`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:11` -> `const UNIDADE_ALVO = 'SECAO_221';`
+- ✅ **[COBERTO]** 5. Se o usuário clicar em `Apresentar sugestões`:
+  - Palavras-chave usadas: `clicar, apresentar, sugestões`
+  - Evidência (score 2): `e2e/cdu-19.spec.ts:63` -> `test.describe.serial('CDU-19 - Apresentar sugestões e pré-preenchimento', () => {`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:80` -> `test('Cenario 1: CHEFE apresenta sugestões com sucesso', async ({_resetAutomatico, page, _autenticadoComoChefeSecao22...`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:89` -> `// Modal abre sem pré-preenchimento (mapa novo, sem sugestões anteriores)`
+- ✅ **[COBERTO]** 6. O sistema abre um modal "Apresentar sugestões" com um campo de **texto formatado** (obrigatório), para inclusão das sugestões.
+  - Palavras-chave usadas: `abre, modal, apresentar, sugestões, texto, formatado`
+  - Evidência (score 3): `e2e/cdu-19.spec.ts:89` -> `// Modal abre sem pré-preenchimento (mapa novo, sem sugestões anteriores)`
+  - Evidência (score 3): `e2e/cdu-19.spec.ts:117` -> `test('Cenario 3: CHEFE reabre modal com pré-preenchimento das sugestões anteriores', async ({`
+  - Evidência (score 2): `e2e/cdu-19.spec.ts:63` -> `test.describe.serial('CDU-19 - Apresentar sugestões e pré-preenchimento', () => {`
+- ✅ **[COBERTO]** 7. Se já houver um registro de sugestões para o mapa no subprocesso da unidade, o sistema traz o campo preenchido com essa informação.
+  - Palavras-chave usadas: `subprocesso, unidade, houver, registro, sugestões, mapa`
+  - Evidência (score 3): `e2e/cdu-19.spec.ts:101` -> `await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa com sugestões/i);`
+  - Evidência (score 2): `e2e/cdu-19.spec.ts:35` -> `await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa disponibilizado/i);`
+  - Evidência (score 2): `e2e/cdu-19.spec.ts:59` -> `await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa validado/i);`
+- 🟡 **[PARCIAL]** 8. Usuário fornece as sugestões e clica em `Confirmar`.
+  - Palavras-chave usadas: `fornece, sugestões, clica, confirmar`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:55` -> `await page.getByTestId('btn-validar-mapa-confirmar').click();`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:63` -> `test.describe.serial('CDU-19 - Apresentar sugestões e pré-preenchimento', () => {`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:80` -> `test('Cenario 1: CHEFE apresenta sugestões com sucesso', async ({_resetAutomatico, page, _autenticadoComoChefeSecao22...`
+- ✅ **[COBERTO]** 9. O sistema armazena as sugestões registradas no mapa do subprocesso da unidade e altera a situação do subprocesso para 'Mapa com sugestões'.
+  - Palavras-chave usadas: `subprocesso, unidade, situação, armazena, sugestões, registradas`
+  - Evidência (score 2): `e2e/cdu-19.spec.ts:101` -> `await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa com sugestões/i);`
+  - Evidência (score 2): `e2e/cdu-19.spec.ts:106` -> `await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:5` -> `import {acessarSubprocessoGestor} from './helpers/helpers-analise.js';`
+- 🟡 **[PARCIAL]** 10. O sistema notifica a unidade superior hierárquica da apresentação de sugestões para o mapa, com e-mail no modelo abaixo:
+  - Palavras-chave usadas: `unidade, notifica, superior, hierárquica, apresentação, sugestões`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:11` -> `const UNIDADE_ALVO = 'SECAO_221';`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:19` -> `unidade: UNIDADE_ALVO`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:63` -> `test.describe.serial('CDU-19 - Apresentar sugestões e pré-preenchimento', () => {`
+- 🟡 **[PARCIAL]** 11. O sistema cria internamente um alerta com:
+  - Palavras-chave usadas: `alerta, cria, internamente`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:2` -> `import {criarProcessoMapaDisponibilizadoFixture, validarProcessoFixture} from './fixtures/fixtures-processos.js';`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:17` -> `const processo = await criarProcessoMapaDisponibilizadoFixture(request, {`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:73` -> `const processo = await criarProcessoMapaDisponibilizadoFixture(request, {`
+- ✅ **[COBERTO]** 12. `Descrição`: "Sugestões para o mapa de competências da [SIGLA_UNIDADE_SUBPROCESSO] aguardando análise"
+  - Palavras-chave usadas: `competências, sigla_unidade_subprocesso, descrição, sugestões, mapa, aguardando`
+  - Evidência (score 2): `e2e/cdu-19.spec.ts:10` -> `test.describe.serial('CDU-19 - Validar mapa de competências', () => {`
+  - Evidência (score 2): `e2e/cdu-19.spec.ts:38` -> `await expect(page.getByText('Mapa de competências técnicas')).toBeVisible();`
+  - Evidência (score 2): `e2e/cdu-19.spec.ts:49` -> `await expect(page.getByText('Mapa de competências técnicas')).toBeVisible();`
+- 🟡 **[PARCIAL]** 13. `Processo`: [DESCRICAO_PROCESSO]
+  - Palavras-chave usadas: `processo, descricao_processo`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:2` -> `import {criarProcessoMapaDisponibilizadoFixture, validarProcessoFixture} from './fixtures/fixtures-processos.js';`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:5` -> `import {acessarSubprocessoGestor} from './helpers/helpers-analise.js';`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:7` -> `import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';`
+- ❌ **[NAO_COBERTO]** 14. `Data/hora`: Data/hora atual
+  - Palavras-chave usadas: `data/hora, atual`
+  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
+- 🟡 **[PARCIAL]** 15. `Unidade de origem`: [SIGLA_UNIDADE_SUBPROCESSO]
+  - Palavras-chave usadas: `unidade, sigla_unidade_subprocesso, origem`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:11` -> `const UNIDADE_ALVO = 'SECAO_221';`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:19` -> `unidade: UNIDADE_ALVO`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:64` -> `const UNIDADE_ALVO = 'SECAO_221';`
+- 🟡 **[PARCIAL]** 16. `Unidade de destino`: [SIGLA_UNIDADE_SUPERIOR].
+  - Palavras-chave usadas: `unidade, sigla_unidade_superior, destino`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:11` -> `const UNIDADE_ALVO = 'SECAO_221';`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:19` -> `unidade: UNIDADE_ALVO`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:64` -> `const UNIDADE_ALVO = 'SECAO_221';`
+- ✅ **[COBERTO]** 17. O sistema mostra a mensagem "Mapa submetido com sugestões para análise da unidade superior".
+  - Palavras-chave usadas: `unidade, mostra, mensagem, mapa, submetido, sugestões`
+  - Evidência (score 2): `e2e/cdu-19.spec.ts:89` -> `// Modal abre sem pré-preenchimento (mapa novo, sem sugestões anteriores)`
+  - Evidência (score 2): `e2e/cdu-19.spec.ts:101` -> `await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa com sugestões/i);`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:2` -> `import {criarProcessoMapaDisponibilizadoFixture, validarProcessoFixture} from './fixtures/fixtures-processos.js';`
+- 🟡 **[PARCIAL]** 18. Se usuário clicar em **Validar**:
+  - Palavras-chave usadas: `clicar, validar`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:2` -> `import {criarProcessoMapaDisponibilizadoFixture, validarProcessoFixture} from './fixtures/fixtures-processos.js';`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:10` -> `test.describe.serial('CDU-19 - Validar mapa de competências', () => {`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:21` -> `validarProcessoFixture(processo, descProcesso);`
+- 🟡 **[PARCIAL]** 19. O sistema mostra diálogo de confirmação, com título ''Validação do mapa" e mensagem "Confirma a validação do mapa de competências? Essa ação habilita a análise por unidades superiores''/ Botões `Cancelar` e `Validar`.
+  - Palavras-chave usadas: `competências, unidades, mostra, diálogo, confirmação, título`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:10` -> `test.describe.serial('CDU-19 - Validar mapa de competências', () => {`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:38` -> `await expect(page.getByText('Mapa de competências técnicas')).toBeVisible();`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:49` -> `await expect(page.getByText('Mapa de competências técnicas')).toBeVisible();`
+- ✅ **[COBERTO]** 20. Caso o usuário escolha `Cancelar`, o sistema interrompe a operação de validação, permanecendo na mesma tela.
+  - Palavras-chave usadas: `escolha, cancelar, interrompe, operação, validação, permanecendo`
+  - Evidência (score 2): `e2e/cdu-19.spec.ts:42` -> `// Cenario 2: Cancelar validação`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:26` -> `test('Cenários CDU-19: Fluxo completo de validação do mapa pelo CHEFE', async ({`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:46` -> `await expect(modal.getByText(/Confirma a validação/i)).toBeVisible();`
+- 🟡 **[PARCIAL]** 21. O usuário escolhe `Validar`.
+  - Palavras-chave usadas: `escolhe, validar`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:2` -> `import {criarProcessoMapaDisponibilizadoFixture, validarProcessoFixture} from './fixtures/fixtures-processos.js';`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:10` -> `test.describe.serial('CDU-19 - Validar mapa de competências', () => {`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:21` -> `validarProcessoFixture(processo, descProcesso);`
+- ✅ **[COBERTO]** 22. O sistema altera a situação do subprocesso da unidade para 'Mapa validado'.
+  - Palavras-chave usadas: `situação, subprocesso, unidade, altera, mapa, validado`
+  - Evidência (score 3): `e2e/cdu-19.spec.ts:59` -> `await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa validado/i);`
+  - Evidência (score 2): `e2e/cdu-19.spec.ts:35` -> `await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa disponibilizado/i);`
+  - Evidência (score 2): `e2e/cdu-19.spec.ts:84` -> `await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa disponibilizado/i);`
+- ✅ **[COBERTO]** 23. O sistema notifica a unidade superior hierárquica da validação do mapa, com e-mail no modelo abaixo:
+  - Palavras-chave usadas: `unidade, notifica, superior, hierárquica, validação, mapa`
+  - Evidência (score 2): `e2e/cdu-19.spec.ts:26` -> `test('Cenários CDU-19: Fluxo completo de validação do mapa pelo CHEFE', async ({`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:2` -> `import {criarProcessoMapaDisponibilizadoFixture, validarProcessoFixture} from './fixtures/fixtures-processos.js';`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:3` -> `import {navegarParaMapa} from './helpers/helpers-mapas.js';`
+- 🟡 **[PARCIAL]** 24. O sistema cria internamente um alerta com:
+  - Palavras-chave usadas: `alerta, cria, internamente`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:2` -> `import {criarProcessoMapaDisponibilizadoFixture, validarProcessoFixture} from './fixtures/fixtures-processos.js';`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:17` -> `const processo = await criarProcessoMapaDisponibilizadoFixture(request, {`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:73` -> `const processo = await criarProcessoMapaDisponibilizadoFixture(request, {`
+- ✅ **[COBERTO]** 25. `Descrição`: "Validação do mapa de competências da [SIGLA_UNIDADE_SUBPROCESSO] aguardando análise"
+  - Palavras-chave usadas: `competências, sigla_unidade_subprocesso, descrição, validação, mapa, aguardando`
+  - Evidência (score 2): `e2e/cdu-19.spec.ts:10` -> `test.describe.serial('CDU-19 - Validar mapa de competências', () => {`
+  - Evidência (score 2): `e2e/cdu-19.spec.ts:26` -> `test('Cenários CDU-19: Fluxo completo de validação do mapa pelo CHEFE', async ({`
+  - Evidência (score 2): `e2e/cdu-19.spec.ts:38` -> `await expect(page.getByText('Mapa de competências técnicas')).toBeVisible();`
+- 🟡 **[PARCIAL]** 26. `Processo`: [DESCRICAO_PROCESSO]
+  - Palavras-chave usadas: `processo, descricao_processo`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:2` -> `import {criarProcessoMapaDisponibilizadoFixture, validarProcessoFixture} from './fixtures/fixtures-processos.js';`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:5` -> `import {acessarSubprocessoGestor} from './helpers/helpers-analise.js';`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:7` -> `import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';`
+- ❌ **[NAO_COBERTO]** 27. `Data/hora`: Data/hora atual
+  - Palavras-chave usadas: `data/hora, atual`
+  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
+- 🟡 **[PARCIAL]** 28. `Unidade de origem`: [SIGLA_UNIDADE_SUBPROCESSO]
+  - Palavras-chave usadas: `unidade, sigla_unidade_subprocesso, origem`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:11` -> `const UNIDADE_ALVO = 'SECAO_221';`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:19` -> `unidade: UNIDADE_ALVO`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:64` -> `const UNIDADE_ALVO = 'SECAO_221';`
+- 🟡 **[PARCIAL]** 29. `Unidade de destino`: [SIGLA_UNIDADE_SUPERIOR].
+  - Palavras-chave usadas: `unidade, sigla_unidade_superior, destino`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:11` -> `const UNIDADE_ALVO = 'SECAO_221';`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:19` -> `unidade: UNIDADE_ALVO`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:64` -> `const UNIDADE_ALVO = 'SECAO_221';`
+- ✅ **[COBERTO]** 30. O sistema mostra a mensagem "Mapa validado e submetido para análise à unidade superior".
+  - Palavras-chave usadas: `unidade, mostra, mensagem, mapa, validado, submetido`
+  - Evidência (score 2): `e2e/cdu-19.spec.ts:59` -> `await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa validado/i);`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:2` -> `import {criarProcessoMapaDisponibilizadoFixture, validarProcessoFixture} from './fixtures/fixtures-processos.js';`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:3` -> `import {navegarParaMapa} from './helpers/helpers-mapas.js';`
+- 🟡 **[PARCIAL]** 31. O sistema registra uma movimentação para o subprocesso com:
+  - Palavras-chave usadas: `subprocesso, registra, movimentação`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:5` -> `import {acessarSubprocessoGestor} from './helpers/helpers-analise.js';`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:35` -> `await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa disponibilizado/i);`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:59` -> `await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa validado/i);`
+- ❌ **[NAO_COBERTO]** 32. `Data/hora`: Data/hora atual
+  - Palavras-chave usadas: `data/hora, atual`
+  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
+- 🟡 **[PARCIAL]** 33. `Unidade origem`: [SIGLA_UNIDADE_SUBPROCESSO]
+  - Palavras-chave usadas: `unidade, sigla_unidade_subprocesso, origem`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:11` -> `const UNIDADE_ALVO = 'SECAO_221';`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:19` -> `unidade: UNIDADE_ALVO`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:64` -> `const UNIDADE_ALVO = 'SECAO_221';`
+- 🟡 **[PARCIAL]** 34. `Unidade destino`: [SIGLA_UNIDADE_SUPERIOR]
+  - Palavras-chave usadas: `unidade, sigla_unidade_superior, destino`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:11` -> `const UNIDADE_ALVO = 'SECAO_221';`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:19` -> `unidade: UNIDADE_ALVO`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:64` -> `const UNIDADE_ALVO = 'SECAO_221';`
+- ✅ **[COBERTO]** 35. `Descrição`: "Apresentação de sugestões para o mapa", ou "Validação do mapa", conforme o caso.
+  - Palavras-chave usadas: `descrição, apresentação, sugestões, mapa, validação, conforme`
+  - Evidência (score 2): `e2e/cdu-19.spec.ts:26` -> `test('Cenários CDU-19: Fluxo completo de validação do mapa pelo CHEFE', async ({`
+  - Evidência (score 2): `e2e/cdu-19.spec.ts:89` -> `// Modal abre sem pré-preenchimento (mapa novo, sem sugestões anteriores)`
+  - Evidência (score 2): `e2e/cdu-19.spec.ts:101` -> `await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa com sugestões/i);`
+- ✅ **[COBERTO]** 36. O sistema define a data/hora de conclusão da Etapa 2 do subprocesso da unidade como sendo a atual.
+  - Palavras-chave usadas: `subprocesso, unidade, define, data/hora, conclusão, sendo`
+  - Evidência (score 2): `e2e/cdu-19.spec.ts:106` -> `await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:5` -> `import {acessarSubprocessoGestor} from './helpers/helpers-analise.js';`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:11` -> `const UNIDADE_ALVO = 'SECAO_221';`
+- 🟡 **[PARCIAL]** 37. O sistema redireciona para o `Painel`.
+  - Palavras-chave usadas: `redireciona, painel`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:6` -> `import {verificarPaginaPainel} from './helpers/helpers-navegacao.js';`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:57` -> `await verificarPaginaPainel(page);`
+  - Evidência (score 1): `e2e/cdu-19.spec.ts:99` -> `await verificarPaginaPainel(page);`
 
-## Ações recomendadas (teste e sistema)
-- Priorizar cenários com dados controlados para validar regra de negócio (não apenas presença de elementos na UI).
-- Incluir asserts de navegação/efeito colateral (persistência, alteração de estado, permissões por perfil e unidade ativa).
-- Quando o requisito citar integração externa, manter o E2E focado em contrato visível (mensagem, bloqueio, fallback) e complementar com teste de integração/backend.
+## Ajustes recomendados para próximo ciclo
+- Completar cobertura do item: **Se o subprocesso tiver retornado de análise pelas unidades superiores, deverá ser exibido também o botão `Histórico de análise`.** (atualmente parcial).
+- Completar cobertura do item: **Usuário fornece as sugestões e clica em `Confirmar`.** (atualmente parcial).
+- Completar cobertura do item: **O sistema notifica a unidade superior hierárquica da apresentação de sugestões para o mapa, com e-mail no modelo abaixo:** (atualmente parcial).
 
-## Método utilizado nesta reanálise
-- Leitura comparativa do texto do requisito (fluxo principal) com os cenários e passos automatizados no arquivo E2E correspondente.
-- Marcação de lacunas por ausência de evidência textual de validação no teste; itens marcados como ⚠️ devem ser revisados manualmente na próxima rodada.
+## Observações metodológicas
+- Esta rodada incluiu leitura de helpers importados para reduzir falso negativo de cobertura indireta.
+- Classificação automática por evidência textual; recomenda-se validação humana dos itens `🟡` e `❌` antes da implementação final.

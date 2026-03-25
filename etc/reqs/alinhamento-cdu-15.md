@@ -1,24 +1,167 @@
-# Alinhamento CDU-15 - Reanálise
+# Alinhamento CDU-15 - Reanálise (rodada 2)
 
-## Escopo da reanálise
-- Requisito analisado: `etc/reqs/cdu-15.md`.
-- Teste E2E analisado: `e2e/cdu-15.spec.ts` (2 cenários `test`, 0 `test.step`, 100 linhas).
+## Artefatos analisados
+- Requisito: `etc/reqs/cdu-15.md`.
+- Teste E2E: `e2e/cdu-15.spec.ts` (2 cenários `test`, 0 `test.step`).
 
-## Cobertura observada no E2E
-- ✅ Setup data
-- ✅ Cenários CDU-15: Fluxo completo de manutenção do mapa pelo ADMIN
+## Resultado da comparação requisito x E2E
+- Itens do fluxo principal avaliados: **30**.
+- Status: **14 cobertos**, **15 parciais**, **1 não cobertos** (baseado em evidências textuais no spec e helpers).
 
-## Pontos do requisito sem evidência direta no E2E
-- ⚠️ Um bloco para cada competência criada, cujo título é a descrição da competência (palavras-chave do requisito: bloco, competência, criada, cujo)
-- ⚠️ Botões `Cancelar` e `Salvar`. (palavras-chave do requisito: botões, cancelar, salvar)
-- ⚠️ O usuário informa a descrição da competência que será criada, seleciona uma ou mais atividades para associar a ela e clica em `Salvar` para confirmar as mudanças. (palavras-chave do requisito: informa, descrição, competência, será)
-- ⚠️ O usuário altera a descrição ou a associação com as atividades e clica no botão `Salvar`. (palavras-chave do requisito: altera, descrição, associação, atividades)
+## Matriz de evidências
+- ✅ **[COBERTO]** 1. No painel ADMIN escolhe um processo na tela Detalhes do processo clica em uma unidade operacional ou interoperacional com subprocesso nas situações 'Cadastro homologado' ou 'Mapa criado'.
+  - Palavras-chave usadas: `processo, unidade, subprocesso, situações, painel, admin`
+  - Evidência (score 4): `e2e/cdu-15.spec.ts:37` -> `await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);`
+  - Evidência (score 3): `e2e/cdu-15.spec.ts:3` -> `import {acessarSubprocessoAdmin} from './helpers/helpers-analise.js';`
+  - Evidência (score 2): `e2e/cdu-15.spec.ts:18` -> `const UNIDADE_ALVO = 'ADMIN';`
+- 🟡 **[PARCIAL]** 2. O sistema mostra a tela `Detalhes do subprocesso`.
+  - Palavras-chave usadas: `subprocesso, mostra, detalhes`
+  - Evidência (score 1): `e2e/cdu-15.spec.ts:3` -> `import {acessarSubprocessoAdmin} from './helpers/helpers-analise.js';`
+  - Evidência (score 1): `e2e/cdu-15.spec.ts:37` -> `await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);`
+- ✅ **[COBERTO]** 3. O usuário clica no card `Mapa de Competências`.
+  - Palavras-chave usadas: `competências, clica, card, mapa`
+  - Evidência (score 2): `e2e/cdu-15.spec.ts:17` -> `test.describe.serial('CDU-15 - Manter mapa de competências', () => {`
+  - Evidência (score 2): `e2e/cdu-15.spec.ts:63` -> `const cardSemAtividades = page.getByTestId('cad-mapa__card-competencia').filter({`
+  - Evidência (score 1): `e2e/cdu-15.spec.ts:7` -> `disponibilizarMapa,`
+- 🟡 **[PARCIAL]** 4. O sistema mostra a tela `Edição de mapa` preenchida com os dados do mapa da unidade, com os seguintes elementos visuais:
+  - Palavras-chave usadas: `unidade, mostra, edição, mapa, preenchida, seguintes`
+  - Evidência (score 1): `e2e/cdu-15.spec.ts:7` -> `disponibilizarMapa,`
+  - Evidência (score 1): `e2e/cdu-15.spec.ts:11` -> `navegarParaMapa,`
+  - Evidência (score 1): `e2e/cdu-15.spec.ts:13` -> `verificarCompetenciaNoMapa`
+- 🟡 **[PARCIAL]** 5. Um bloco para cada competência criada, cujo título é a descrição da competência
+  - Palavras-chave usadas: `competência, bloco, cada, criada, cujo, título`
+  - Evidência (score 1): `e2e/cdu-15.spec.ts:2` -> `import {criarProcessoCadastroHomologadoFixture, validarProcessoFixture} from './fixtures/fixtures-processos.js';`
+  - Evidência (score 1): `e2e/cdu-15.spec.ts:17` -> `test.describe.serial('CDU-15 - Manter mapa de competências', () => {`
+  - Evidência (score 1): `e2e/cdu-15.spec.ts:28` -> `const processo = await criarProcessoCadastroHomologadoFixture(request, {`
+- ✅ **[COBERTO]** 6. Ao lado da descrição da competência, botões de ação (ícones), para editar e para excluir a competência.
+  - Palavras-chave usadas: `competência, lado, descrição, botões, ação, ícones`
+  - Evidência (score 2): `e2e/cdu-15.spec.ts:83` -> `// CT-04: Excluir competência com Confirmação`
+  - Evidência (score 1): `e2e/cdu-15.spec.ts:17` -> `test.describe.serial('CDU-15 - Manter mapa de competências', () => {`
+  - Evidência (score 1): `e2e/cdu-15.spec.ts:44` -> `// CT-02: Criar competência`
+- 🟡 **[PARCIAL]** 7. Dentro de cada bloco de uma competência, mostrar as descrições das atividades associadas à competência em pequenos blocos internos.
+  - Palavras-chave usadas: `competência, atividades, dentro, cada, bloco, mostrar`
+  - Evidência (score 1): `e2e/cdu-15.spec.ts:2` -> `import {criarProcessoCadastroHomologadoFixture, validarProcessoFixture} from './fixtures/fixtures-processos.js';`
+  - Evidência (score 1): `e2e/cdu-15.spec.ts:17` -> `test.describe.serial('CDU-15 - Manter mapa de competências', () => {`
+  - Evidência (score 1): `e2e/cdu-15.spec.ts:28` -> `const processo = await criarProcessoCadastroHomologadoFixture(request, {`
+- 🟡 **[PARCIAL]** 8. À direita da descrição de cada atividade mostrar um badge com o número de conhecimentos da atividade. Ao passar o mouse sobre esse badge, o sistema exibirá em um tooltip a lista de conhecimentos da atividade.
+  - Palavras-chave usadas: `atividade, direita, descrição, cada, mostrar, badge`
+  - Evidência (score 1): `e2e/cdu-15.spec.ts:2` -> `import {criarProcessoCadastroHomologadoFixture, validarProcessoFixture} from './fixtures/fixtures-processos.js';`
+  - Evidência (score 1): `e2e/cdu-15.spec.ts:12` -> `removerAtividadeAssociada,`
+  - Evidência (score 1): `e2e/cdu-15.spec.ts:23` -> `const ATIVIDADE_1 = 'Atividade fixture 1';`
+- ✅ **[COBERTO]** 9. Botões `Criar competência` e `Disponibilizar` alinhados no canto superior direito da lista de blocos de competências
+  - Palavras-chave usadas: `competência, competências, botões, criar, disponibilizar, alinhados`
+  - Evidência (score 2): `e2e/cdu-15.spec.ts:17` -> `test.describe.serial('CDU-15 - Manter mapa de competências', () => {`
+  - Evidência (score 2): `e2e/cdu-15.spec.ts:44` -> `// CT-02: Criar competência`
+  - Evidência (score 1): `e2e/cdu-15.spec.ts:2` -> `import {criarProcessoCadastroHomologadoFixture, validarProcessoFixture} from './fixtures/fixtures-processos.js';`
+- ✅ **[COBERTO]** 10. **<<Início de fluxo de criação de competências>>** ADMIN clica no botão Criar competência.
+  - Palavras-chave usadas: `competências, competência, início, criação, admin, clica`
+  - Evidência (score 2): `e2e/cdu-15.spec.ts:17` -> `test.describe.serial('CDU-15 - Manter mapa de competências', () => {`
+  - Evidência (score 1): `e2e/cdu-15.spec.ts:3` -> `import {acessarSubprocessoAdmin} from './helpers/helpers-analise.js';`
+  - Evidência (score 1): `e2e/cdu-15.spec.ts:18` -> `const UNIDADE_ALVO = 'ADMIN';`
+- 🟡 **[PARCIAL]** 11. O sistema abre a tela modal `Edição de competência`, com:
+  - Palavras-chave usadas: `competência, abre, modal, edição`
+  - Evidência (score 1): `e2e/cdu-15.spec.ts:17` -> `test.describe.serial('CDU-15 - Manter mapa de competências', () => {`
+  - Evidência (score 1): `e2e/cdu-15.spec.ts:36` -> `// CT-00 e CT-01: Acessar edição e verificar elementos`
+  - Evidência (score 1): `e2e/cdu-15.spec.ts:44` -> `// CT-02: Criar competência`
+- 🟡 **[PARCIAL]** 12. Campo para descrição da competência.
+  - Palavras-chave usadas: `competência, descrição`
+  - Evidência (score 1): `e2e/cdu-15.spec.ts:17` -> `test.describe.serial('CDU-15 - Manter mapa de competências', () => {`
+  - Evidência (score 1): `e2e/cdu-15.spec.ts:44` -> `// CT-02: Criar competência`
+  - Evidência (score 1): `e2e/cdu-15.spec.ts:45` -> `const compDesc = `Competência 1 ${timestamp}`;`
+- 🟡 **[PARCIAL]** 13. Lista das atividades cadastradas pela unidade, cada uma podendo ser selecionada para inclusão na competência.
+  - Palavras-chave usadas: `atividades, unidade, competência, lista, cadastradas, pela`
+  - Evidência (score 1): `e2e/cdu-15.spec.ts:17` -> `test.describe.serial('CDU-15 - Manter mapa de competências', () => {`
+  - Evidência (score 1): `e2e/cdu-15.spec.ts:18` -> `const UNIDADE_ALVO = 'ADMIN';`
+  - Evidência (score 1): `e2e/cdu-15.spec.ts:30` -> `unidade: UNIDADE_ALVO`
+- ❌ **[NAO_COBERTO]** 14. Botões `Cancelar` e `Salvar`.
+  - Palavras-chave usadas: `botões, cancelar, salvar`
+  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
+- 🟡 **[PARCIAL]** 15. O usuário informa a descrição da competência que será criada, seleciona uma ou mais atividades para associar a ela e clica em `Salvar` para confirmar as mudanças.
+  - Palavras-chave usadas: `competência, atividades, informa, descrição, será, criada`
+  - Evidência (score 1): `e2e/cdu-15.spec.ts:17` -> `test.describe.serial('CDU-15 - Manter mapa de competências', () => {`
+  - Evidência (score 1): `e2e/cdu-15.spec.ts:44` -> `// CT-02: Criar competência`
+  - Evidência (score 1): `e2e/cdu-15.spec.ts:45` -> `const compDesc = `Competência 1 ${timestamp}`;`
+- 🟡 **[PARCIAL]** 16. O sistema armazena internamente a competência e o vínculo desta com as atividades selecionadas
+  - Palavras-chave usadas: `competência, atividades, armazena, internamente, vínculo, desta`
+  - Evidência (score 1): `e2e/cdu-15.spec.ts:17` -> `test.describe.serial('CDU-15 - Manter mapa de competências', () => {`
+  - Evidência (score 1): `e2e/cdu-15.spec.ts:44` -> `// CT-02: Criar competência`
+  - Evidência (score 1): `e2e/cdu-15.spec.ts:45` -> `const compDesc = `Competência 1 ${timestamp}`;`
+- ✅ **[COBERTO]** 17. O sistema insere a competência criada no mapa de competências.
+  - Palavras-chave usadas: `competência, competências, insere, criada, mapa`
+  - Evidência (score 3): `e2e/cdu-15.spec.ts:17` -> `test.describe.serial('CDU-15 - Manter mapa de competências', () => {`
+  - Evidência (score 1): `e2e/cdu-15.spec.ts:7` -> `disponibilizarMapa,`
+  - Evidência (score 1): `e2e/cdu-15.spec.ts:11` -> `navegarParaMapa,`
+- ✅ **[COBERTO]** 18. Se a situação do subprocesso da unidade ainda for 'Cadastro homologado', o sistema altera a situação para 'Mapa criado'. **<< Término de fluxo de criação de competências >>**
+  - Palavras-chave usadas: `situação, subprocesso, unidade, competências, ainda, cadastro`
+  - Evidência (score 2): `e2e/cdu-15.spec.ts:37` -> `await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);`
+  - Evidência (score 1): `e2e/cdu-15.spec.ts:2` -> `import {criarProcessoCadastroHomologadoFixture, validarProcessoFixture} from './fixtures/fixtures-processos.js';`
+  - Evidência (score 1): `e2e/cdu-15.spec.ts:3` -> `import {acessarSubprocessoAdmin} from './helpers/helpers-analise.js';`
+- ✅ **[COBERTO]** 19. O usuário repete o fluxo de criação de competências até que o mapa esteja completo.
+  - Palavras-chave usadas: `competências, repete, criação, mapa, esteja, completo`
+  - Evidência (score 2): `e2e/cdu-15.spec.ts:17` -> `test.describe.serial('CDU-15 - Manter mapa de competências', () => {`
+  - Evidência (score 2): `e2e/cdu-15.spec.ts:35` -> `test('Cenários CDU-15: Fluxo completo de manutenção do mapa pelo ADMIN', async ({_resetAutomatico, page, _autenticado...`
+  - Evidência (score 1): `e2e/cdu-15.spec.ts:7` -> `disponibilizarMapa,`
+- ✅ **[COBERTO]** 20. O usuário clica no botão de ação de editar no cabeçalho do bloco correspondente à competência.
+  - Palavras-chave usadas: `competência, clica, botão, ação, editar, cabeçalho`
+  - Evidência (score 2): `e2e/cdu-15.spec.ts:74` -> `// CT-03: Editar competência`
+  - Evidência (score 2): `e2e/cdu-15.spec.ts:83` -> `// CT-04: Excluir competência com Confirmação`
+  - Evidência (score 1): `e2e/cdu-15.spec.ts:8` -> `editarCompetencia,`
+- 🟡 **[PARCIAL]** 21. O sistema exibe a tela `Edição de competência` preenchida com a descrição da competência e apresenta selecionadas as atividades atualmente associadas à competência.
+  - Palavras-chave usadas: `competência, atividades, exibe, edição, preenchida, descrição`
+  - Evidência (score 1): `e2e/cdu-15.spec.ts:17` -> `test.describe.serial('CDU-15 - Manter mapa de competências', () => {`
+  - Evidência (score 1): `e2e/cdu-15.spec.ts:36` -> `// CT-00 e CT-01: Acessar edição e verificar elementos`
+  - Evidência (score 1): `e2e/cdu-15.spec.ts:44` -> `// CT-02: Criar competência`
+- 🟡 **[PARCIAL]** 22. O usuário altera a descrição ou a associação com as atividades e clica no botão `Salvar`.
+  - Palavras-chave usadas: `atividades, altera, descrição, associação, clica, botão`
+  - Evidência (score 1): `e2e/cdu-15.spec.ts:63` -> `const cardSemAtividades = page.getByTestId('cad-mapa__card-competencia').filter({`
+  - Evidência (score 1): `e2e/cdu-15.spec.ts:66` -> `await expect(cardSemAtividades).toBeVisible();`
+  - Evidência (score 1): `e2e/cdu-15.spec.ts:67` -> `await expect(cardSemAtividades.locator('.atividade-associada-card-item')).toHaveCount(0);`
+- 🟡 **[PARCIAL]** 23. O sistema armazena a nova descrição da competência e os vínculos com as atividades.
+  - Palavras-chave usadas: `competência, atividades, armazena, nova, descrição, vínculos`
+  - Evidência (score 1): `e2e/cdu-15.spec.ts:17` -> `test.describe.serial('CDU-15 - Manter mapa de competências', () => {`
+  - Evidência (score 1): `e2e/cdu-15.spec.ts:44` -> `// CT-02: Criar competência`
+  - Evidência (score 1): `e2e/cdu-15.spec.ts:45` -> `const compDesc = `Competência 1 ${timestamp}`;`
+- ✅ **[COBERTO]** 24. O sistema retorna para a tela `Edição do mapa`, exibindo o bloco da competência correspondente atualizado.
+  - Palavras-chave usadas: `competência, retorna, edição, mapa, exibindo, bloco`
+  - Evidência (score 2): `e2e/cdu-15.spec.ts:17` -> `test.describe.serial('CDU-15 - Manter mapa de competências', () => {`
+  - Evidência (score 1): `e2e/cdu-15.spec.ts:7` -> `disponibilizarMapa,`
+  - Evidência (score 1): `e2e/cdu-15.spec.ts:11` -> `navegarParaMapa,`
+- ✅ **[COBERTO]** 25. O usuário clica no botão de ação de excluir no cabeçalho do bloco correspondente à competência.
+  - Palavras-chave usadas: `competência, clica, botão, ação, excluir, cabeçalho`
+  - Evidência (score 3): `e2e/cdu-15.spec.ts:83` -> `// CT-04: Excluir competência com Confirmação`
+  - Evidência (score 1): `e2e/cdu-15.spec.ts:9` -> `excluirCompetenciaCancelando,`
+  - Evidência (score 1): `e2e/cdu-15.spec.ts:10` -> `excluirCompetenciaConfirmando,`
+- ✅ **[COBERTO]** 26. O sistema mostra diálogo de confirmação: Título "Exclusão de competência", mensagem "Confirma a exclusão da
+  - Palavras-chave usadas: `competência, mostra, diálogo, confirmação, título, exclusão`
+  - Evidência (score 2): `e2e/cdu-15.spec.ts:83` -> `// CT-04: Excluir competência com Confirmação`
+  - Evidência (score 1): `e2e/cdu-15.spec.ts:17` -> `test.describe.serial('CDU-15 - Manter mapa de competências', () => {`
+  - Evidência (score 1): `e2e/cdu-15.spec.ts:44` -> `// CT-02: Criar competência`
+- 🟡 **[PARCIAL]** 27. O usuário confirma a exclusão.
+  - Palavras-chave usadas: `confirma, exclusão`
+  - Evidência (score 1): `e2e/cdu-15.spec.ts:10` -> `excluirCompetenciaConfirmando,`
+  - Evidência (score 1): `e2e/cdu-15.spec.ts:79` -> `// CT-05: Validar cancelamento da Exclusão`
+  - Evidência (score 1): `e2e/cdu-15.spec.ts:83` -> `// CT-04: Excluir competência com Confirmação`
+- 🟡 **[PARCIAL]** 28. O sistema remove a competência e todos os seus vínculos com as atividades da unidade.
+  - Palavras-chave usadas: `competência, atividades, unidade, remove, todos, vínculos`
+  - Evidência (score 1): `e2e/cdu-15.spec.ts:12` -> `removerAtividadeAssociada,`
+  - Evidência (score 1): `e2e/cdu-15.spec.ts:17` -> `test.describe.serial('CDU-15 - Manter mapa de competências', () => {`
+  - Evidência (score 1): `e2e/cdu-15.spec.ts:18` -> `const UNIDADE_ALVO = 'ADMIN';`
+- ✅ **[COBERTO]** 29. O sistema retorna para a tela `Edição do mapa`, mostrando o bloco da competência correspondente atualizado.
+  - Palavras-chave usadas: `competência, retorna, edição, mapa, mostrando, bloco`
+  - Evidência (score 2): `e2e/cdu-15.spec.ts:17` -> `test.describe.serial('CDU-15 - Manter mapa de competências', () => {`
+  - Evidência (score 1): `e2e/cdu-15.spec.ts:7` -> `disponibilizarMapa,`
+  - Evidência (score 1): `e2e/cdu-15.spec.ts:11` -> `navegarParaMapa,`
+- ✅ **[COBERTO]** 30. Se o usuário clicar em `Disponibilizar`, o sistema segue para o caso de uso `Disponibilizar mapa de competências`.
+  - Palavras-chave usadas: `competências, clicar, disponibilizar, segue, mapa`
+  - Evidência (score 2): `e2e/cdu-15.spec.ts:7` -> `disponibilizarMapa,`
+  - Evidência (score 2): `e2e/cdu-15.spec.ts:17` -> `test.describe.serial('CDU-15 - Manter mapa de competências', () => {`
+  - Evidência (score 2): `e2e/cdu-15.spec.ts:42` -> `await expect(page.getByTestId('btn-cad-mapa-disponibilizar')).toBeDisabled();`
 
-## Ações recomendadas (teste e sistema)
-- Priorizar cenários com dados controlados para validar regra de negócio (não apenas presença de elementos na UI).
-- Incluir asserts de navegação/efeito colateral (persistência, alteração de estado, permissões por perfil e unidade ativa).
-- Quando o requisito citar integração externa, manter o E2E focado em contrato visível (mensagem, bloqueio, fallback) e complementar com teste de integração/backend.
+## Ajustes recomendados para próximo ciclo
+- Completar cobertura do item: **O sistema mostra a tela `Detalhes do subprocesso`.** (atualmente parcial).
+- Completar cobertura do item: **O sistema mostra a tela `Edição de mapa` preenchida com os dados do mapa da unidade, com os seguintes elementos visuais:** (atualmente parcial).
+- Completar cobertura do item: **Um bloco para cada competência criada, cujo título é a descrição da competência** (atualmente parcial).
 
-## Método utilizado nesta reanálise
-- Leitura comparativa do texto do requisito (fluxo principal) com os cenários e passos automatizados no arquivo E2E correspondente.
-- Marcação de lacunas por ausência de evidência textual de validação no teste; itens marcados como ⚠️ devem ser revisados manualmente na próxima rodada.
+## Observações metodológicas
+- Esta rodada incluiu leitura de helpers importados para reduzir falso negativo de cobertura indireta.
+- Classificação automática por evidência textual; recomenda-se validação humana dos itens `🟡` e `❌` antes da implementação final.

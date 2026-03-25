@@ -1,22 +1,74 @@
-# Alinhamento CDU-16 - Reanálise
+# Alinhamento CDU-16 - Reanálise (rodada 2)
 
-## Escopo da reanálise
-- Requisito analisado: `etc/reqs/cdu-16.md`.
-- Teste E2E analisado: `e2e/cdu-16.spec.ts` (2 cenários `test`, 4 `test.step`, 73 linhas).
+## Artefatos analisados
+- Requisito: `etc/reqs/cdu-16.md`.
+- Teste E2E: `e2e/cdu-16.spec.ts` (2 cenários `test`, 4 `test.step`).
 
-## Cobertura observada no E2E
-- ✅ Setup data
-- ✅ Cenários CDU-16: ADMIN ajusta mapa e visualiza impactos
+## Resultado da comparação requisito x E2E
+- Itens do fluxo principal avaliados: **11**.
+- Status: **7 cobertos**, **4 parciais**, **0 não cobertos** (baseado em evidências textuais no spec e helpers).
 
-## Pontos do requisito sem evidência direta no E2E
-- ⚠️ O usuário usa como base as informações de impactos mostradas nesta tela para alterar o mapa, podendo alterar descrições de competências, de atividades e de conhecimentos; remover ou criar novas competências; e ajustar a associação das atividades às competências do mapa, conforme descrito no caso de uso `Manter mapa de competências`. (palavras-chave do requisito: base, informações, impactos, mostradas)
-- ⚠️ Quando concluir os ajustes, o usuário clica em `Disponibilizar` e o sistema segue o fluxo descrito no caso de uso `Disponibilizar mapa de competências`. (palavras-chave do requisito: concluir, ajustes, clica, disponibilizar)
+## Matriz de evidências
+- ✅ **[COBERTO]** 1. No `Painel`, o usuário escolhe o processo de revisão desejado.
+  - Palavras-chave usadas: `processo, painel, escolhe, revisão, desejado`
+  - Evidência (score 2): `e2e/cdu-16.spec.ts:11` -> `const descProcessoRevisao = `Revisão CDU-16 ${timestamp}`;`
+  - Evidência (score 1): `e2e/cdu-16.spec.ts:2` -> `import {criarProcessoRevisaoCadastroHomologadoFixture, validarProcessoFixture} from './fixtures/fixtures-processos.js';`
+  - Evidência (score 1): `e2e/cdu-16.spec.ts:4` -> `import {acessarSubprocessoAdmin} from './helpers/helpers-analise.js';`
+- 🟡 **[PARCIAL]** 2. O sistema mostra tela `Detalhes do processo`.
+  - Palavras-chave usadas: `processo, mostra, detalhes`
+  - Evidência (score 1): `e2e/cdu-16.spec.ts:2` -> `import {criarProcessoRevisaoCadastroHomologadoFixture, validarProcessoFixture} from './fixtures/fixtures-processos.js';`
+  - Evidência (score 1): `e2e/cdu-16.spec.ts:4` -> `import {acessarSubprocessoAdmin} from './helpers/helpers-analise.js';`
+  - Evidência (score 1): `e2e/cdu-16.spec.ts:11` -> `const descProcessoRevisao = `Revisão CDU-16 ${timestamp}`;`
+- ✅ **[COBERTO]** 3. O usuário clica em uma unidade operacional ou interoperacional com subprocesso nas situações 'Revisão do cadastro homologada' ou 'Mapa ajustado'.
+  - Palavras-chave usadas: `unidade, subprocesso, situações, clica, operacional, interoperacional`
+  - Evidência (score 2): `e2e/cdu-16.spec.ts:28` -> `await acessarSubprocessoAdmin(page, descProcessoRevisao, UNIDADE_ALVO);`
+  - Evidência (score 1): `e2e/cdu-16.spec.ts:4` -> `import {acessarSubprocessoAdmin} from './helpers/helpers-analise.js';`
+  - Evidência (score 1): `e2e/cdu-16.spec.ts:8` -> `const UNIDADE_ALVO = 'SECAO_211';`
+- ✅ **[COBERTO]** 4. O sistema mostra a tela `Detalhes do subprocesso` para a unidade selecionada.
+  - Palavras-chave usadas: `subprocesso, unidade, mostra, detalhes, selecionada`
+  - Evidência (score 2): `e2e/cdu-16.spec.ts:28` -> `await acessarSubprocessoAdmin(page, descProcessoRevisao, UNIDADE_ALVO);`
+  - Evidência (score 1): `e2e/cdu-16.spec.ts:4` -> `import {acessarSubprocessoAdmin} from './helpers/helpers-analise.js';`
+  - Evidência (score 1): `e2e/cdu-16.spec.ts:8` -> `const UNIDADE_ALVO = 'SECAO_211';`
+- ✅ **[COBERTO]** 5. O usuário clica no card `Mapa de Competências`.
+  - Palavras-chave usadas: `competências, clica, card, mapa`
+  - Evidência (score 2): `e2e/cdu-16.spec.ts:7` -> `test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {`
+  - Evidência (score 1): `e2e/cdu-16.spec.ts:3` -> `import {criarCompetencia, navegarParaMapa} from './helpers/helpers-mapas.js';`
+  - Evidência (score 1): `e2e/cdu-16.spec.ts:26` -> `test('Cenários CDU-16: ADMIN ajusta mapa e visualiza impactos', async ({_resetAutomatico, page, _autenticadoComoAdmin...`
+- ✅ **[COBERTO]** 6. O sistema mostra a tela `Edição de mapa` preenchida com o mapa do subprocesso da unidade (ver detalhes sobre a tela no caso de uso `Manter mapa de competências`), com os botões Impactos no mapa e `Disponibilizar`.
+  - Palavras-chave usadas: `subprocesso, unidade, competências, mostra, edição, mapa`
+  - Evidência (score 2): `e2e/cdu-16.spec.ts:7` -> `test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {`
+  - Evidência (score 2): `e2e/cdu-16.spec.ts:28` -> `await acessarSubprocessoAdmin(page, descProcessoRevisao, UNIDADE_ALVO);`
+  - Evidência (score 1): `e2e/cdu-16.spec.ts:3` -> `import {criarCompetencia, navegarParaMapa} from './helpers/helpers-mapas.js';`
+- ✅ **[COBERTO]** 7. O usuário clica em `Impactos no mapa`.
+  - Palavras-chave usadas: `clica, impactos, mapa`
+  - Evidência (score 2): `e2e/cdu-16.spec.ts:26` -> `test('Cenários CDU-16: ADMIN ajusta mapa e visualiza impactos', async ({_resetAutomatico, page, _autenticadoComoAdmin...`
+  - Evidência (score 2): `e2e/cdu-16.spec.ts:32` -> `await expect(page.getByTestId('cad-mapa__btn-impactos-mapa')).toBeVisible();`
+  - Evidência (score 2): `e2e/cdu-16.spec.ts:39` -> `await page.getByTestId('cad-mapa__btn-impactos-mapa').click();`
+- ✅ **[COBERTO]** 8. O sistema mostra o modal `Impactos no mapa`. Ver caso de uso `Verificar impactos no mapa de competências`.
+  - Palavras-chave usadas: `competências, mostra, modal, impactos, mapa, verificar`
+  - Evidência (score 2): `e2e/cdu-16.spec.ts:7` -> `test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {`
+  - Evidência (score 2): `e2e/cdu-16.spec.ts:26` -> `test('Cenários CDU-16: ADMIN ajusta mapa e visualiza impactos', async ({_resetAutomatico, page, _autenticadoComoAdmin...`
+  - Evidência (score 2): `e2e/cdu-16.spec.ts:32` -> `await expect(page.getByTestId('cad-mapa__btn-impactos-mapa')).toBeVisible();`
+- 🟡 **[PARCIAL]** 9. O usuário usa como base as informações de impactos mostradas nesta tela para alterar o mapa, podendo alterar descrições de competências, de atividades e de conhecimentos; remover ou criar novas competências; e ajustar a associação das atividades às competências do mapa, conforme descrito no caso de uso `Manter mapa de competências`.
+  - Palavras-chave usadas: `competências, atividades, base, informações, impactos, mostradas`
+  - Evidência (score 1): `e2e/cdu-16.spec.ts:7` -> `test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {`
+  - Evidência (score 1): `e2e/cdu-16.spec.ts:26` -> `test('Cenários CDU-16: ADMIN ajusta mapa e visualiza impactos', async ({_resetAutomatico, page, _autenticadoComoAdmin...`
+  - Evidência (score 1): `e2e/cdu-16.spec.ts:32` -> `await expect(page.getByTestId('cad-mapa__btn-impactos-mapa')).toBeVisible();`
+- 🟡 **[PARCIAL]** 10. O usuário deve associar a uma competência todas as atividades ainda não associadas.
+  - Palavras-chave usadas: `competência, atividades, associar, todas, ainda, associadas`
+  - Evidência (score 1): `e2e/cdu-16.spec.ts:7` -> `test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {`
+  - Evidência (score 1): `e2e/cdu-16.spec.ts:13` -> `const competencia1 = 'Competência fixture 1';`
+  - Evidência (score 1): `e2e/cdu-16.spec.ts:14` -> `const competencia2 = 'Competência fixture 2';`
+- 🟡 **[PARCIAL]** 11. Quando concluir os ajustes, o usuário clica em `Disponibilizar` e o sistema segue o fluxo descrito no caso de uso `Disponibilizar mapa de competências`.
+  - Palavras-chave usadas: `competências, concluir, ajustes, clica, disponibilizar, segue`
+  - Evidência (score 1): `e2e/cdu-16.spec.ts:7` -> `test.describe.serial('CDU-16 - Ajustar mapa de competências', () => {`
+  - Evidência (score 1): `e2e/cdu-16.spec.ts:33` -> `await expect(page.getByTestId('btn-cad-mapa-disponibilizar')).toBeVisible();`
 
-## Ações recomendadas (teste e sistema)
-- Priorizar cenários com dados controlados para validar regra de negócio (não apenas presença de elementos na UI).
-- Incluir asserts de navegação/efeito colateral (persistência, alteração de estado, permissões por perfil e unidade ativa).
-- Quando o requisito citar integração externa, manter o E2E focado em contrato visível (mensagem, bloqueio, fallback) e complementar com teste de integração/backend.
+## Ajustes recomendados para próximo ciclo
+- Completar cobertura do item: **O sistema mostra tela `Detalhes do processo`.** (atualmente parcial).
+- Completar cobertura do item: **O usuário usa como base as informações de impactos mostradas nesta tela para alterar o mapa, podendo alterar descrições de competências, de atividades e de conhecimentos; remover ou criar novas competências; e ajustar a associação das atividades às competências do mapa, conforme descrito no caso de uso `Manter mapa de competências`.** (atualmente parcial).
+- Completar cobertura do item: **O usuário deve associar a uma competência todas as atividades ainda não associadas.** (atualmente parcial).
 
-## Método utilizado nesta reanálise
-- Leitura comparativa do texto do requisito (fluxo principal) com os cenários e passos automatizados no arquivo E2E correspondente.
-- Marcação de lacunas por ausência de evidência textual de validação no teste; itens marcados como ⚠️ devem ser revisados manualmente na próxima rodada.
+## Observações metodológicas
+- Esta rodada incluiu leitura de helpers importados para reduzir falso negativo de cobertura indireta.
+- Classificação automática por evidência textual; recomenda-se validação humana dos itens `🟡` e `❌` antes da implementação final.

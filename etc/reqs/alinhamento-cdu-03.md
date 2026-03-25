@@ -1,31 +1,185 @@
-# Alinhamento CDU-03 - Reanálise
+# Alinhamento CDU-03 - Reanálise (rodada 2)
 
-## Escopo da reanálise
-- Requisito analisado: `etc/reqs/cdu-03.md`.
-- Teste E2E analisado: `e2e/cdu-03.spec.ts` (9 cenários `test`, 0 `test.step`, 280 linhas).
-- Contextos `describe` identificados: CDU-03 - Manter processo.
+## Artefatos analisados
+- Requisito: `etc/reqs/cdu-03.md`.
+- Teste E2E: `e2e/cdu-03.spec.ts` (9 cenários `test`, 0 `test.step`).
+- Contextos `describe`: CDU-03 - Manter processo.
 
-## Cobertura observada no E2E
-- ✅ Deve validar campos obrigatórios e estados dos botões
-- ✅ Deve permitir selecionar raiz interoperacional independentemente das subordinadas
-- ✅ Deve editar um processo existente
-- ✅ Deve remover um processo
-- ✅ Deve validar regras de seleção em cascata na árvore de unidades
-- ✅ Deve avaliar unidades ocupadas por processos em andamento e restringi-las
-- ✅ Deve validar restrições de unidades sem mapa para REVISAO e DIAGNOSTICO
-- ✅ Deve validar fluxos de cancelamento e mensagens de feedback
-- ✅ Deve validar fluxo alternativo (Botão iniciar invés de Salvar)
+## Resultado da comparação requisito x E2E
+- Itens do fluxo principal avaliados: **33**.
+- Status: **21 cobertos**, **12 parciais**, **0 não cobertos** (baseado em evidências textuais no spec e helpers).
 
-## Pontos do requisito sem evidência direta no E2E
-- ⚠️ A lista de unidades **deve deixar desativadas** (não selecionáveis) as unidades que já estejam participando de (palavras-chave do requisito: lista, unidades, deixar, desativadas)
-- ⚠️ Em caso de processos dos tipos 'Revisão' ou 'Diagnóstico', só poderão ser selecionadas unidades com mapas de (palavras-chave do requisito: processos, tipos, revisão, diagnóstico)
-- ⚠️ O sistema valida os dados depois de editados, de acordo com as mesmas regras aplicadas no momento do primeiro (palavras-chave do requisito: valida, depois, editados, acordo)
+## Matriz de evidências
+- ✅ **[COBERTO]** 1. Se o usuário quiser criar um processo, escolhe o botão `Criar processo`.
+  - Palavras-chave usadas: `processo, quiser, criar, escolhe, botão`
+  - Evidência (score 2): `e2e/cdu-03.spec.ts:2` -> `import {acessarDetalhesProcesso, criarProcesso, extrairProcessoCodigo, verificarProcessoNaTabela} from './helpers/hel...`
+  - Evidência (score 2): `e2e/cdu-03.spec.ts:14` -> `await page.getByTestId('btn-painel-criar-processo').click();`
+  - Evidência (score 2): `e2e/cdu-03.spec.ts:56` -> `await page.getByTestId('btn-painel-criar-processo').click();`
+- ✅ **[COBERTO]** 2. O sistema muda para a tela `Cadastro de processo` e apresenta um formulário contendo:
+  - Palavras-chave usadas: `processo, muda, cadastro, apresenta, formulário, contendo`
+  - Evidência (score 2): `e2e/cdu-03.spec.ts:4` -> `esperarPaginaCadastroProcesso,`
+  - Evidência (score 2): `e2e/cdu-03.spec.ts:15` -> `await esperarPaginaCadastroProcesso(page);`
+  - Evidência (score 2): `e2e/cdu-03.spec.ts:57` -> `await esperarPaginaCadastroProcesso(page);`
+- 🟡 **[PARCIAL]** 3. Campo `Descrição`
+  - Palavras-chave usadas: `descrição`
+  - Evidência (score 1): `e2e/cdu-03.spec.ts:27` -> `// Preenche descrição - ainda desativado`
+  - Evidência (score 1): `e2e/cdu-03.spec.ts:28` -> `await descricaoInput.fill('Descrição teste');`
+  - Evidência (score 1): `e2e/cdu-03.spec.ts:49` -> `// Se remover a descrição, deve desabilitar novamente`
+- ✅ **[COBERTO]** 4. Campo `Tipo`, com opções: 'Mapeamento', 'Revisão' e 'Diagnóstico'
+  - Palavras-chave usadas: `tipo, opções, mapeamento, revisão, diagnóstico`
+  - Evidência (score 2): `e2e/cdu-03.spec.ts:38` -> `await page.getByTestId('sel-processo-tipo').selectOption('MAPEAMENTO');`
+  - Evidência (score 2): `e2e/cdu-03.spec.ts:58` -> `await page.getByTestId('sel-processo-tipo').selectOption('MAPEAMENTO');`
+  - Evidência (score 2): `e2e/cdu-03.spec.ts:84` -> `tipo: 'MAPEAMENTO',`
+- ✅ **[COBERTO]** 5. Quadro `Unidades participantes`, contendo uma árvore de unidades com checkboxes para cada uma.
+  - Palavras-chave usadas: `unidades, quadro, participantes, contendo, árvore, checkboxes`
+  - Evidência (score 2): `e2e/cdu-03.spec.ts:125` -> `test('Deve validar regras de seleção em cascata na árvore de unidades', async ({_resetAutomatico, page, _autenticadoC...`
+  - Evidência (score 1): `e2e/cdu-03.spec.ts:156` -> `test('Deve avaliar unidades ocupadas por processos em andamento e restringi-las', async ({`
+  - Evidência (score 1): `e2e/cdu-03.spec.ts:187` -> `test('Deve validar restrições de unidades sem mapa para REVISAO e DIAGNOSTICO', async ({`
+- 🟡 **[PARCIAL]** 6. A lista de unidades **deve deixar desativadas** (não selecionáveis) as unidades que já estejam participando de
+  - Palavras-chave usadas: `unidades, lista, deixar, desativadas, selecionáveis, estejam`
+  - Evidência (score 1): `e2e/cdu-03.spec.ts:125` -> `test('Deve validar regras de seleção em cascata na árvore de unidades', async ({_resetAutomatico, page, _autenticadoC...`
+  - Evidência (score 1): `e2e/cdu-03.spec.ts:156` -> `test('Deve avaliar unidades ocupadas por processos em andamento e restringi-las', async ({`
+  - Evidência (score 1): `e2e/cdu-03.spec.ts:187` -> `test('Deve validar restrições de unidades sem mapa para REVISAO e DIAGNOSTICO', async ({`
+- ✅ **[COBERTO]** 7. O comportamento de seleção das unidades participantes deve seguir estas regras:
+  - Palavras-chave usadas: `unidades, comportamento, seleção, participantes, seguir, estas`
+  - Evidência (score 2): `e2e/cdu-03.spec.ts:125` -> `test('Deve validar regras de seleção em cascata na árvore de unidades', async ({_resetAutomatico, page, _autenticadoC...`
+  - Evidência (score 1): `e2e/cdu-03.spec.ts:156` -> `test('Deve avaliar unidades ocupadas por processos em andamento e restringi-las', async ({`
+  - Evidência (score 1): `e2e/cdu-03.spec.ts:187` -> `test('Deve validar restrições de unidades sem mapa para REVISAO e DIAGNOSTICO', async ({`
+- ✅ **[COBERTO]** 8. Ao clicar em uma unidade intermediária na árvore, todas as unidades abaixo dela devem ser automaticamente
+  - Palavras-chave usadas: `unidade, unidades, clicar, intermediária, árvore, todas`
+  - Evidência (score 3): `e2e/cdu-03.spec.ts:125` -> `test('Deve validar regras de seleção em cascata na árvore de unidades', async ({_resetAutomatico, page, _autenticadoC...`
+  - Evidência (score 2): `e2e/cdu-03.spec.ts:156` -> `test('Deve avaliar unidades ocupadas por processos em andamento e restringi-las', async ({`
+  - Evidência (score 2): `e2e/cdu-03.spec.ts:187` -> `test('Deve validar restrições de unidades sem mapa para REVISAO e DIAGNOSTICO', async ({`
+- 🟡 **[PARCIAL]** 9. Se todas as unidades de uma subárvore estiverem selecionadas, o nó raiz desta subárvore deve ser
+  - Palavras-chave usadas: `unidades, todas, subárvore, estiverem, selecionadas, raiz`
+  - Evidência (score 1): `e2e/cdu-03.spec.ts:55` -> `test('Deve permitir selecionar raiz interoperacional independentemente das subordinadas', async ({_resetAutomatico, p...`
+  - Evidência (score 1): `e2e/cdu-03.spec.ts:62` -> `const chkRaiz = page.getByTestId('chk-arvore-unidade-SECRETARIA_1');`
+  - Evidência (score 1): `e2e/cdu-03.spec.ts:63` -> `const inputRaiz = chkRaiz.locator('input').or(chkRaiz);`
+- 🟡 **[PARCIAL]** 10. Se um nó de uma subárvore tiver a seleção removida, o nó raiz da subárvore deve ficar num estado
+  - Palavras-chave usadas: `subárvore, tiver, seleção, removida, raiz, ficar`
+  - Evidência (score 1): `e2e/cdu-03.spec.ts:2` -> `import {acessarDetalhesProcesso, criarProcesso, extrairProcessoCodigo, verificarProcessoNaTabela} from './helpers/hel...`
+  - Evidência (score 1): `e2e/cdu-03.spec.ts:7` -> `verificarToast`
+  - Evidência (score 1): `e2e/cdu-03.spec.ts:55` -> `test('Deve permitir selecionar raiz interoperacional independentemente das subordinadas', async ({_resetAutomatico, p...`
+- ✅ **[COBERTO]** 11. Se todas as unidades de uma subárvore tiverem a seleção removida, o nó raiz desta subárvore deve ter
+  - Palavras-chave usadas: `unidades, todas, subárvore, tiverem, seleção, removida`
+  - Evidência (score 2): `e2e/cdu-03.spec.ts:125` -> `test('Deve validar regras de seleção em cascata na árvore de unidades', async ({_resetAutomatico, page, _autenticadoC...`
+  - Evidência (score 1): `e2e/cdu-03.spec.ts:156` -> `test('Deve avaliar unidades ocupadas por processos em andamento e restringi-las', async ({`
+  - Evidência (score 1): `e2e/cdu-03.spec.ts:187` -> `test('Deve validar restrições de unidades sem mapa para REVISAO e DIAGNOSTICO', async ({`
+- ✅ **[COBERTO]** 12. Se a raiz de uma subárvore for uma unidade interoperacional, ela poderá ser selecionada ainda que as
+  - Palavras-chave usadas: `unidade, raiz, subárvore, interoperacional, poderá, selecionada`
+  - Evidência (score 2): `e2e/cdu-03.spec.ts:55` -> `test('Deve permitir selecionar raiz interoperacional independentemente das subordinadas', async ({_resetAutomatico, p...`
+  - Evidência (score 2): `e2e/cdu-03.spec.ts:62` -> `const chkRaiz = page.getByTestId('chk-arvore-unidade-SECRETARIA_1');`
+  - Evidência (score 1): `e2e/cdu-03.spec.ts:37` -> `// Seleciona tipo - ainda desativado (falta unidade)`
+- ✅ **[COBERTO]** 13. Campo `Data limite etapa 1`, para informação do prazo que as unidades terão para concluir a etapa inicial do
+  - Palavras-chave usadas: `prazo, unidades, data, limite, informação, terão`
+  - Evidência (score 2): `e2e/cdu-03.spec.ts:31` -> `// Preenche data limite - ainda desativado`
+  - Evidência (score 2): `e2e/cdu-03.spec.ts:32` -> `const dataLimite = new Date();`
+  - Evidência (score 2): `e2e/cdu-03.spec.ts:33` -> `dataLimite.setDate(dataLimite.getDate() + 30);`
+- ✅ **[COBERTO]** 14. Botões `Cancelar`, `Salvar` e `Iniciar processo`
+  - Palavras-chave usadas: `processo, botões, cancelar, salvar, iniciar`
+  - Evidência (score 2): `e2e/cdu-03.spec.ts:17` -> `const btnSalvar = page.getByTestId('btn-processo-salvar');`
+  - Evidência (score 2): `e2e/cdu-03.spec.ts:18` -> `const btnIniciar = page.getByTestId('btn-processo-iniciar');`
+  - Evidência (score 2): `e2e/cdu-03.spec.ts:98` -> `await page.getByTestId('btn-processo-salvar').click();`
+- 🟡 **[PARCIAL]** 15. O usuário fornece os dados solicitados e seleciona as unidades participantes, e clica em `Salvar`.
+  - Palavras-chave usadas: `unidades, fornece, solicitados, seleciona, participantes, clica`
+  - Evidência (score 1): `e2e/cdu-03.spec.ts:37` -> `// Seleciona tipo - ainda desativado (falta unidade)`
+  - Evidência (score 1): `e2e/cdu-03.spec.ts:41` -> `// Seleciona unidade - agora deve habilitar`
+  - Evidência (score 1): `e2e/cdu-03.spec.ts:55` -> `test('Deve permitir selecionar raiz interoperacional independentemente das subordinadas', async ({_resetAutomatico, p...`
+- 🟡 **[PARCIAL]** 16. O sistema faz as seguintes validações (com mensagens de falha de validação indicadas entre aspas):
+  - Palavras-chave usadas: `seguintes, validações, mensagens, falha, validação, indicadas`
+  - Evidência (score 1): `e2e/cdu-03.spec.ts:23` -> `// Validação - deve ter indicação de campo obrigatório`
+  - Evidência (score 1): `e2e/cdu-03.spec.ts:208` -> `test('Deve validar fluxos de cancelamento e mensagens de feedback', async ({`
+- 🟡 **[PARCIAL]** 17. Descrição deve estar preenchida. Validação: "Preencha a descrição".
+  - Palavras-chave usadas: `descrição, preenchida, validação, preencha`
+  - Evidência (score 1): `e2e/cdu-03.spec.ts:23` -> `// Validação - deve ter indicação de campo obrigatório`
+  - Evidência (score 1): `e2e/cdu-03.spec.ts:27` -> `// Preenche descrição - ainda desativado`
+  - Evidência (score 1): `e2e/cdu-03.spec.ts:28` -> `await descricaoInput.fill('Descrição teste');`
+- 🟡 **[PARCIAL]** 18. Ao menos uma unidade deve ser selecionada. Validação: "Pelo menos uma unidade participante deve ser incluída."
+  - Palavras-chave usadas: `unidade, selecionada, validação, pelo, participante, incluída`
+  - Evidência (score 1): `e2e/cdu-03.spec.ts:23` -> `// Validação - deve ter indicação de campo obrigatório`
+  - Evidência (score 1): `e2e/cdu-03.spec.ts:37` -> `// Seleciona tipo - ainda desativado (falta unidade)`
+  - Evidência (score 1): `e2e/cdu-03.spec.ts:41` -> `// Seleciona unidade - agora deve habilitar`
+- ✅ **[COBERTO]** 19. Em caso de processos dos tipos 'Revisão' ou 'Diagnóstico', só poderão ser selecionadas unidades com mapas de
+  - Palavras-chave usadas: `processos, unidades, tipos, revisão, diagnóstico, poderão`
+  - Evidência (score 2): `e2e/cdu-03.spec.ts:156` -> `test('Deve avaliar unidades ocupadas por processos em andamento e restringi-las', async ({`
+  - Evidência (score 1): `e2e/cdu-03.spec.ts:2` -> `import {acessarDetalhesProcesso, criarProcesso, extrairProcessoCodigo, verificarProcessoNaTabela} from './helpers/hel...`
+  - Evidência (score 1): `e2e/cdu-03.spec.ts:122` -> `await expect(page.getByTestId('tbl-processos').getByText(descricao)).toBeHidden();`
+- ✅ **[COBERTO]** 20. O sistema cria o processo internamente, colocando-o na situação 'Criado', e mostrando a mensagem "Processo criado.".
+  - Palavras-chave usadas: `processo, situação, cria, internamente, colocando-o, criado`
+  - Evidência (score 2): `e2e/cdu-03.spec.ts:2` -> `import {acessarDetalhesProcesso, criarProcesso, extrairProcessoCodigo, verificarProcessoNaTabela} from './helpers/hel...`
+  - Evidência (score 2): `e2e/cdu-03.spec.ts:14` -> `await page.getByTestId('btn-painel-criar-processo').click();`
+  - Evidência (score 2): `e2e/cdu-03.spec.ts:56` -> `await page.getByTestId('btn-painel-criar-processo').click();`
+- ✅ **[COBERTO]** 21. O sistema redireciona para o Painel, onde já será mostrada uma linha para o processo recém-criado.
+  - Palavras-chave usadas: `processo, redireciona, painel, será, mostrada, linha`
+  - Evidência (score 2): `e2e/cdu-03.spec.ts:14` -> `await page.getByTestId('btn-painel-criar-processo').click();`
+  - Evidência (score 2): `e2e/cdu-03.spec.ts:56` -> `await page.getByTestId('btn-painel-criar-processo').click();`
+  - Evidência (score 2): `e2e/cdu-03.spec.ts:126` -> `await page.getByTestId('btn-painel-criar-processo').click();`
+- ✅ **[COBERTO]** 22. Se usuário quiser editar o processo, clica na linha do processo na listagem de processos do `Painel` (apenas
+  - Palavras-chave usadas: `processo, processos, quiser, editar, clica, linha`
+  - Evidência (score 2): `e2e/cdu-03.spec.ts:2` -> `import {acessarDetalhesProcesso, criarProcesso, extrairProcessoCodigo, verificarProcessoNaTabela} from './helpers/hel...`
+  - Evidência (score 2): `e2e/cdu-03.spec.ts:80` -> `test('Deve editar um processo existente', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {`
+  - Evidência (score 2): `e2e/cdu-03.spec.ts:122` -> `await expect(page.getByTestId('tbl-processos').getByText(descricao)).toBeHidden();`
+- ✅ **[COBERTO]** 23. O sistema abre a tela `Cadastro de processo` preenchida com os dados atuais do processo.
+  - Palavras-chave usadas: `processo, abre, cadastro, preenchida, atuais`
+  - Evidência (score 2): `e2e/cdu-03.spec.ts:4` -> `esperarPaginaCadastroProcesso,`
+  - Evidência (score 2): `e2e/cdu-03.spec.ts:15` -> `await esperarPaginaCadastroProcesso(page);`
+  - Evidência (score 2): `e2e/cdu-03.spec.ts:57` -> `await esperarPaginaCadastroProcesso(page);`
+- 🟡 **[PARCIAL]** 24. O usuário modifica os dados desejados. Apenas a descrição, as unidades participantes e a data limite podem ser
+  - Palavras-chave usadas: `unidades, modifica, desejados, descrição, participantes, data`
+  - Evidência (score 1): `e2e/cdu-03.spec.ts:27` -> `// Preenche descrição - ainda desativado`
+  - Evidência (score 1): `e2e/cdu-03.spec.ts:28` -> `await descricaoInput.fill('Descrição teste');`
+  - Evidência (score 1): `e2e/cdu-03.spec.ts:31` -> `// Preenche data limite - ainda desativado`
+- ✅ **[COBERTO]** 25. O usuário escolhe o botão `Salvar`.
+  - Palavras-chave usadas: `escolhe, botão, salvar`
+  - Evidência (score 2): `e2e/cdu-03.spec.ts:247` -> `test('Deve validar fluxo alternativo (Botão iniciar invés de Salvar)', async ({`
+  - Evidência (score 1): `e2e/cdu-03.spec.ts:17` -> `const btnSalvar = page.getByTestId('btn-processo-salvar');`
+  - Evidência (score 1): `e2e/cdu-03.spec.ts:20` -> `await expect(btnSalvar).toBeDisabled();`
+- 🟡 **[PARCIAL]** 26. O sistema valida os dados depois de editados, de acordo com as mesmas regras aplicadas no momento do primeiro
+  - Palavras-chave usadas: `valida, depois, editados, acordo, mesmas, aplicadas`
+  - Evidência (score 1): `e2e/cdu-03.spec.ts:13` -> `test('Deve validar campos obrigatórios e estados dos botões', async ({_resetAutomatico, page, _autenticadoComoAdmin})...`
+  - Evidência (score 1): `e2e/cdu-03.spec.ts:23` -> `// Validação - deve ter indicação de campo obrigatório`
+  - Evidência (score 1): `e2e/cdu-03.spec.ts:125` -> `test('Deve validar regras de seleção em cascata na árvore de unidades', async ({_resetAutomatico, page, _autenticadoC...`
+- ✅ **[COBERTO]** 27. O sistema atualiza o processo e mostra a mensagem "Processo alterado.".
+  - Palavras-chave usadas: `processo, atualiza, mostra, mensagem, alterado`
+  - Evidência (score 2): `e2e/cdu-03.spec.ts:101` -> `await verificarToast(page, TEXTOS.sucesso.PROCESSO_ALTERADO);`
+  - Evidência (score 1): `e2e/cdu-03.spec.ts:2` -> `import {acessarDetalhesProcesso, criarProcesso, extrairProcessoCodigo, verificarProcessoNaTabela} from './helpers/hel...`
+  - Evidência (score 1): `e2e/cdu-03.spec.ts:4` -> `esperarPaginaCadastroProcesso,`
+- ✅ **[COBERTO]** 28. Se usuário quiser remover o processo, clica na linha do processo na listagem de processos do `Painel` (apenas
+  - Palavras-chave usadas: `processo, processos, quiser, remover, clica, linha`
+  - Evidência (score 2): `e2e/cdu-03.spec.ts:2` -> `import {acessarDetalhesProcesso, criarProcesso, extrairProcessoCodigo, verificarProcessoNaTabela} from './helpers/hel...`
+  - Evidência (score 2): `e2e/cdu-03.spec.ts:105` -> `test('Deve remover um processo', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {`
+  - Evidência (score 2): `e2e/cdu-03.spec.ts:116` -> `await page.getByTestId('btn-processo-remover').click();`
+- ✅ **[COBERTO]** 29. O sistema abre a tela `Cadastro de processo`, preenchida com os dados atuais do processo.
+  - Palavras-chave usadas: `processo, abre, cadastro, preenchida, atuais`
+  - Evidência (score 2): `e2e/cdu-03.spec.ts:4` -> `esperarPaginaCadastroProcesso,`
+  - Evidência (score 2): `e2e/cdu-03.spec.ts:15` -> `await esperarPaginaCadastroProcesso(page);`
+  - Evidência (score 2): `e2e/cdu-03.spec.ts:57` -> `await esperarPaginaCadastroProcesso(page);`
+- 🟡 **[PARCIAL]** 30. O usuário escolhe o botão `Remover`.
+  - Palavras-chave usadas: `escolhe, botão, remover`
+  - Evidência (score 1): `e2e/cdu-03.spec.ts:49` -> `// Se remover a descrição, deve desabilitar novamente`
+  - Evidência (score 1): `e2e/cdu-03.spec.ts:105` -> `test('Deve remover um processo', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {`
+  - Evidência (score 1): `e2e/cdu-03.spec.ts:116` -> `await page.getByTestId('btn-processo-remover').click();`
+- ✅ **[COBERTO]** 31. O sistema mostra o diálogo de confirmação "Remover o processo '[Descrição do processo]'? Esta ação não poderá ser
+  - Palavras-chave usadas: `processo, mostra, diálogo, confirmação, remover, descrição`
+  - Evidência (score 2): `e2e/cdu-03.spec.ts:49` -> `// Se remover a descrição, deve desabilitar novamente`
+  - Evidência (score 2): `e2e/cdu-03.spec.ts:105` -> `test('Deve remover um processo', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {`
+  - Evidência (score 2): `e2e/cdu-03.spec.ts:116` -> `await page.getByTestId('btn-processo-remover').click();`
+- 🟡 **[PARCIAL]** 32. Se escolher `Cancelar` no diálogo: sistema fecha o diálogo e permanece na tela `Cadastro de processo`, sem
+  - Palavras-chave usadas: `processo, escolher, cancelar, diálogo, fecha, permanece`
+  - Evidência (score 1): `e2e/cdu-03.spec.ts:2` -> `import {acessarDetalhesProcesso, criarProcesso, extrairProcessoCodigo, verificarProcessoNaTabela} from './helpers/hel...`
+  - Evidência (score 1): `e2e/cdu-03.spec.ts:4` -> `esperarPaginaCadastroProcesso,`
+  - Evidência (score 1): `e2e/cdu-03.spec.ts:5` -> `esperarPaginaDetalhesProcesso,`
+- ✅ **[COBERTO]** 33. Ao escolher `Remover` no diálogo: sistema remove o processo permanentemente e redireciona para o Painel,
+  - Palavras-chave usadas: `processo, escolher, remover, diálogo, remove, permanentemente`
+  - Evidência (score 3): `e2e/cdu-03.spec.ts:105` -> `test('Deve remover um processo', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {`
+  - Evidência (score 3): `e2e/cdu-03.spec.ts:116` -> `await page.getByTestId('btn-processo-remover').click();`
+  - Evidência (score 3): `e2e/cdu-03.spec.ts:117` -> `await expect(page.getByText(TEXTOS.processo.cadastro.REMOVER_CONFIRMACAO(descricao))).toBeVisible();`
 
-## Ações recomendadas (teste e sistema)
-- Priorizar cenários com dados controlados para validar regra de negócio (não apenas presença de elementos na UI).
-- Incluir asserts de navegação/efeito colateral (persistência, alteração de estado, permissões por perfil e unidade ativa).
-- Quando o requisito citar integração externa, manter o E2E focado em contrato visível (mensagem, bloqueio, fallback) e complementar com teste de integração/backend.
+## Ajustes recomendados para próximo ciclo
+- Completar cobertura do item: **Campo `Descrição`** (atualmente parcial).
+- Completar cobertura do item: **A lista de unidades **deve deixar desativadas** (não selecionáveis) as unidades que já estejam participando de** (atualmente parcial).
+- Completar cobertura do item: **Se todas as unidades de uma subárvore estiverem selecionadas, o nó raiz desta subárvore deve ser** (atualmente parcial).
 
-## Método utilizado nesta reanálise
-- Leitura comparativa do texto do requisito (fluxo principal) com os cenários e passos automatizados no arquivo E2E correspondente.
-- Marcação de lacunas por ausência de evidência textual de validação no teste; itens marcados como ⚠️ devem ser revisados manualmente na próxima rodada.
+## Observações metodológicas
+- Esta rodada incluiu leitura de helpers importados para reduzir falso negativo de cobertura indireta.
+- Classificação automática por evidência textual; recomenda-se validação humana dos itens `🟡` e `❌` antes da implementação final.

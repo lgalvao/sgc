@@ -1,25 +1,70 @@
-# Alinhamento CDU-35 - Reanálise
+# Alinhamento CDU-35 - Reanálise (rodada 2)
 
-## Escopo da reanálise
-- Requisito analisado: `etc/reqs/cdu-35.md`.
-- Teste E2E analisado: `e2e/cdu-35.spec.ts` (1 cenários `test`, 0 `test.step`, 45 linhas).
+## Artefatos analisados
+- Requisito: `etc/reqs/cdu-35.md`.
+- Teste E2E: `e2e/cdu-35.spec.ts` (1 cenários `test`, 0 `test.step`).
 
-## Cobertura observada no E2E
-- ✅ Cenários CDU-35: ADMIN navega e gera relatórios de andamento
+## Resultado da comparação requisito x E2E
+- Itens do fluxo principal avaliados: **12**.
+- Status: **0 cobertos**, **9 parciais**, **3 não cobertos** (baseado em evidências textuais no spec e helpers).
 
-## Pontos do requisito sem evidência direta no E2E
-- ⚠️ O sistema exibe o relatório em tela contendo as seguintes colunas: (palavras-chave do requisito: relatório, contendo, seguintes, colunas)
-- ⚠️ Data da última movimentação (palavras-chave do requisito: data, última, movimentação)
-- ⚠️ Responsável (palavras-chave do requisito: responsável)
-- ⚠️ Titular (Se não for o responsavel) (palavras-chave do requisito: titular, responsavel)
-- ⚠️ O usuário pode optar por exportar os dados para PDF clicando no botao `PDF`. (palavras-chave do requisito: pode, optar, exportar, clicando)
-- ⚠️ O sistema gera o arquivo selecionado e o disponibiliza para download. (palavras-chave do requisito: gera, arquivo, selecionado, disponibiliza)
+## Matriz de evidências
+- 🟡 **[PARCIAL]** 1. O usuário acessa Relatórios.
+  - Palavras-chave usadas: `relatórios, acessa`
+  - Evidência (score 1): `e2e/cdu-35.spec.ts:14` -> `test('Cenários CDU-35: ADMIN navega e gera relatórios de andamento', async ({_resetAutomatico, page, request, _autent...`
+  - Evidência (score 1): `e2e/cdu-35.spec.ts:27` -> `// Cenario 1: Navegação para página de relatórios`
+  - Evidência (score 1): `e2e/cdu-35.spec.ts:28` -> `await page.getByRole('link', {name: /Relatórios/i}).click();`
+- 🟡 **[PARCIAL]** 2. O usuário seleciona a opção "Andamento de processo".
+  - Palavras-chave usadas: `processo, seleciona, opção, andamento`
+  - Evidência (score 1): `e2e/cdu-35.spec.ts:2` -> `import {criarProcessoFixture} from './fixtures/fixtures-processos.js';`
+  - Evidência (score 1): `e2e/cdu-35.spec.ts:5` -> `* CDU-35 - Gerar relatório de andamento`
+  - Evidência (score 1): `e2e/cdu-35.spec.ts:12` -> `test.describe.serial('CDU-35 - Gerar relatório de andamento', () => {`
+- 🟡 **[PARCIAL]** 3. O usuário seleciona o Processo desejado (ex: "Mapeamento 2027").
+  - Palavras-chave usadas: `processo, seleciona, desejado, mapeamento`
+  - Evidência (score 1): `e2e/cdu-35.spec.ts:2` -> `import {criarProcessoFixture} from './fixtures/fixtures-processos.js';`
+  - Evidência (score 1): `e2e/cdu-35.spec.ts:15` -> `const descricaoProcesso = `Relatório CDU-35 ${Date.now()}`;`
+  - Evidência (score 1): `e2e/cdu-35.spec.ts:16` -> `await criarProcessoFixture(request, {`
+- 🟡 **[PARCIAL]** 4. O sistema exibe o relatório em tela contendo as seguintes colunas:
+  - Palavras-chave usadas: `relatório, exibe, contendo, seguintes, colunas`
+  - Evidência (score 1): `e2e/cdu-35.spec.ts:5` -> `* CDU-35 - Gerar relatório de andamento`
+  - Evidência (score 1): `e2e/cdu-35.spec.ts:12` -> `test.describe.serial('CDU-35 - Gerar relatório de andamento', () => {`
+  - Evidência (score 1): `e2e/cdu-35.spec.ts:14` -> `test('Cenários CDU-35: ADMIN navega e gera relatórios de andamento', async ({_resetAutomatico, page, request, _autent...`
+- 🟡 **[PARCIAL]** 5. Sigla da unidade
+  - Palavras-chave usadas: `unidade, sigla`
+  - Evidência (score 1): `e2e/cdu-35.spec.ts:19` -> `unidade: 'ASSESSORIA_12',`
+- 🟡 **[PARCIAL]** 6. Nome da unidade
+  - Palavras-chave usadas: `unidade, nome`
+  - Evidência (score 1): `e2e/cdu-35.spec.ts:19` -> `unidade: 'ASSESSORIA_12',`
+- 🟡 **[PARCIAL]** 7. Situação atual do subprocesso da unidade, para o processo selecionado
+  - Palavras-chave usadas: `situação, subprocesso, unidade, processo, atual, selecionado`
+  - Evidência (score 1): `e2e/cdu-35.spec.ts:2` -> `import {criarProcessoFixture} from './fixtures/fixtures-processos.js';`
+  - Evidência (score 1): `e2e/cdu-35.spec.ts:15` -> `const descricaoProcesso = `Relatório CDU-35 ${Date.now()}`;`
+  - Evidência (score 1): `e2e/cdu-35.spec.ts:16` -> `await criarProcessoFixture(request, {`
+- ❌ **[NAO_COBERTO]** 8. Data da última movimentação
+  - Palavras-chave usadas: `data, última, movimentação`
+  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
+- ❌ **[NAO_COBERTO]** 9. Responsável
+  - Palavras-chave usadas: `responsável`
+  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
+- ❌ **[NAO_COBERTO]** 10. Titular (Se não for o responsavel)
+  - Palavras-chave usadas: `titular, responsavel`
+  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
+- 🟡 **[PARCIAL]** 11. O usuário pode optar por exportar os dados para PDF clicando no botao `PDF`.
+  - Palavras-chave usadas: `pode, optar, exportar, clicando, botao`
+  - Evidência (score 1): `e2e/cdu-35.spec.ts:33` -> `const botaoGerar = page.getByRole('button', {name: 'Gerar relatório'});`
+  - Evidência (score 1): `e2e/cdu-35.spec.ts:35` -> `await expect(botaoGerar).toBeDisabled();`
+  - Evidência (score 1): `e2e/cdu-35.spec.ts:38` -> `await expect(botaoGerar).toBeEnabled();`
+- 🟡 **[PARCIAL]** 12. O sistema gera o arquivo selecionado e o disponibiliza para download.
+  - Palavras-chave usadas: `gera, arquivo, selecionado, disponibiliza, download`
+  - Evidência (score 1): `e2e/cdu-35.spec.ts:5` -> `* CDU-35 - Gerar relatório de andamento`
+  - Evidência (score 1): `e2e/cdu-35.spec.ts:12` -> `test.describe.serial('CDU-35 - Gerar relatório de andamento', () => {`
+  - Evidência (score 1): `e2e/cdu-35.spec.ts:14` -> `test('Cenários CDU-35: ADMIN navega e gera relatórios de andamento', async ({_resetAutomatico, page, request, _autent...`
 
-## Ações recomendadas (teste e sistema)
-- Priorizar cenários com dados controlados para validar regra de negócio (não apenas presença de elementos na UI).
-- Incluir asserts de navegação/efeito colateral (persistência, alteração de estado, permissões por perfil e unidade ativa).
-- Quando o requisito citar integração externa, manter o E2E focado em contrato visível (mensagem, bloqueio, fallback) e complementar com teste de integração/backend.
+## Ajustes recomendados para próximo ciclo
+- Completar cobertura do item: **O usuário acessa Relatórios.** (atualmente parcial).
+- Completar cobertura do item: **O usuário seleciona a opção "Andamento de processo".** (atualmente parcial).
+- Completar cobertura do item: **O usuário seleciona o Processo desejado (ex: "Mapeamento 2027").** (atualmente parcial).
 
-## Método utilizado nesta reanálise
-- Leitura comparativa do texto do requisito (fluxo principal) com os cenários e passos automatizados no arquivo E2E correspondente.
-- Marcação de lacunas por ausência de evidência textual de validação no teste; itens marcados como ⚠️ devem ser revisados manualmente na próxima rodada.
+## Observações metodológicas
+- Esta rodada incluiu leitura de helpers importados para reduzir falso negativo de cobertura indireta.
+- Classificação automática por evidência textual; recomenda-se validação humana dos itens `🟡` e `❌` antes da implementação final.

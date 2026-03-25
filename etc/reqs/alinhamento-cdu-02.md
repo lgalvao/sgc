@@ -1,34 +1,165 @@
-# Alinhamento CDU-02 - Reanálise
+# Alinhamento CDU-02 - Reanálise (rodada 2)
 
-## Escopo da reanálise
-- Requisito analisado: `etc/reqs/cdu-02.md`.
-- Teste E2E analisado: `e2e/cdu-02.spec.ts` (5 cenários `test`, 5 `test.step`, 160 linhas).
-- Contextos `describe` identificados: CDU-02 - Visualizar painel, Como ADMIN, Como GESTOR.
+## Artefatos analisados
+- Requisito: `etc/reqs/cdu-02.md`.
+- Teste E2E: `e2e/cdu-02.spec.ts` (5 cenários `test`, 5 `test.step`).
+- Contextos `describe`: CDU-02 - Visualizar painel, Como ADMIN, Como GESTOR.
 
-## Cobertura observada no E2E
-- ✅ Deve exibir estrutura básica do painel e testar ordenação
-- ✅ Deve criar processo e visualizá-lo na tabela
-- ✅ Processos "Criado" devem aparecer apenas para ADMIN
-- ✅ Não deve incluir unidades INTERMEDIARIAS na seleção
-- ✅ Deve validar visualização, alertas e ordenação
+## Resultado da comparação requisito x E2E
+- Itens do fluxo principal avaliados: **31**.
+- Status: **11 cobertos**, **15 parciais**, **5 não cobertos** (baseado em evidências textuais no spec e helpers).
 
-## Pontos do requisito sem evidência direta no E2E
-- ⚠️ Campos da tabela:
-- ⚠️ Regras de exibição e funcionamento: (palavras-chave do requisito: exibição)
-- ⚠️ Cabeçalhos das colunas deverão ser clicáveis, possibilitando ordenação em ordem crescente e decrescente. (palavras-chave do requisito: cabeçalhos, colunas, clicáveis, possibilitando)
-- ⚠️ Itens da tabela serão clicáveis com estas regras: (palavras-chave do requisito: itens, serão, clicáveis, estas)
-- ⚠️ Clicar em processos nas situações 'Em andamento' e 'Finalizado' mostrará as telas Detalhes do processo, caso o (palavras-chave do requisito: processos, situações, andamento, finalizado)
-- ⚠️ Na seção `Alertas`, O sistema mostra uma tabela com os alertas registrados pelo sistema que tiverem como destino o usuário logado ou, na ausência desta informação específica, a sua unidade de ativa, ouse seja a unidade que escolheu ao fazer o login no sistema). (palavras-chave do requisito: alertas, registrados, pelo, tiverem)
-- ⚠️ Campos da tabela:
-- ⚠️ Perfil SERVIDOR: (palavras-chave do requisito: servidor)
-- ⚠️ Vê apenas os alertas direcionados ao seu título de eleitor (palavras-chave do requisito: alertas, direcionados, título, eleitor)
-- ⚠️ Veem os alertas direcionados a eles (palavras-chave do requisito: veem, alertas, direcionados, eles)
+## Matriz de evidências
+- ✅ **[COBERTO]** 1. O sistema exibe a tela `Painel`, com as seções `Processos ativos` e `Alertas`.
+  - Palavras-chave usadas: `processos, alertas, exibe, painel, seções, ativos`
+  - Evidência (score 2): `e2e/cdu-02.spec.ts:10` -> `await expect(page.getByTestId('txt-painel-titulo-processos')).toBeVisible();`
+  - Evidência (score 2): `e2e/cdu-02.spec.ts:11` -> `await expect(page.getByTestId('txt-painel-titulo-processos')).toHaveText('Processos');`
+  - Evidência (score 2): `e2e/cdu-02.spec.ts:12` -> `await expect(page.getByTestId('txt-painel-titulo-alertas')).toBeVisible();`
+- 🟡 **[PARCIAL]** 2. Na seção `Processos ativos`, o sistema mostra uma tabela de processos ativos (com título 'Processos'). Devem ser
+  - Palavras-chave usadas: `processos, ativos, mostra, título`
+  - Evidência (score 1): `e2e/cdu-02.spec.ts:4` -> `import {criarProcesso, verificarProcessoNaTabela} from './helpers/helpers-processos.js';`
+  - Evidência (score 1): `e2e/cdu-02.spec.ts:10` -> `await expect(page.getByTestId('txt-painel-titulo-processos')).toBeVisible();`
+  - Evidência (score 1): `e2e/cdu-02.spec.ts:11` -> `await expect(page.getByTestId('txt-painel-titulo-processos')).toHaveText('Processos');`
+- ❌ **[NAO_COBERTO]** 3. Campos da tabela:
+  - Palavras-chave usadas: `validação`
+  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
+- ✅ **[COBERTO]** 4. `Descrição`: Descrição dada ao processo no momento do seu cadastro
+  - Palavras-chave usadas: `processo, descrição, dada, momento, cadastro`
+  - Evidência (score 2): `e2e/cdu-02.spec.ts:22` -> `const cabecalhoDescricao = tabelaProcessos.locator('th', {hasText: 'Descrição'}).first();`
+  - Evidência (score 2): `e2e/cdu-02.spec.ts:96` -> `await expect(page).toHaveURL(/\/processo\/cadastro/);`
+  - Evidência (score 1): `e2e/cdu-02.spec.ts:4` -> `import {criarProcesso, verificarProcessoNaTabela} from './helpers/helpers-processos.js';`
+- ✅ **[COBERTO]** 5. `Tipo`: Tipo do processo ('Mapeamento', 'Revisão' ou 'Diagnóstico')
+  - Palavras-chave usadas: `processo, tipo, mapeamento, revisão, diagnóstico`
+  - Evidência (score 3): `e2e/cdu-02.spec.ts:100` -> `await page.getByTestId('sel-processo-tipo').selectOption('MAPEAMENTO');`
+  - Evidência (score 2): `e2e/cdu-02.spec.ts:39` -> `tipo: 'MAPEAMENTO',`
+  - Evidência (score 2): `e2e/cdu-02.spec.ts:52` -> `tipo: 'Mapeamento',`
+- ✅ **[COBERTO]** 6. `Unidades participantes`: Lista textual das unidades, contendo apenas as unidades de nível mais alto abaixo da
+  - Palavras-chave usadas: `unidades, participantes, lista, textual, contendo, nível`
+  - Evidência (score 2): `e2e/cdu-02.spec.ts:141` -> `unidadesParticipantes: ['COORD_11']`
+  - Evidência (score 1): `e2e/cdu-02.spec.ts:90` -> `test('Não deve incluir unidades INTERMEDIARIAS na seleção', async ({`
+- ✅ **[COBERTO]** 7. `Situação`: Situação do processo ('Criado', 'Em andamento' ou 'Finalizado').
+  - Palavras-chave usadas: `situação, processo, criado, andamento, finalizado`
+  - Evidência (score 2): `e2e/cdu-02.spec.ts:49` -> `// Valida que o processo criado aparece na tabela do painel principal`
+  - Evidência (score 2): `e2e/cdu-02.spec.ts:57` -> `test('Processos "Criado" devem aparecer apenas para ADMIN', async ({`
+  - Evidência (score 2): `e2e/cdu-02.spec.ts:62` -> `const descricaoProcesso = `Processo criado - ${Date.now()}`;`
+- ❌ **[NAO_COBERTO]** 8. Regras de exibição e funcionamento:
+  - Palavras-chave usadas: `exibição, funcionamento`
+  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
+- ✅ **[COBERTO]** 9. Processos na situação 'Criado' deverão ser listados apenas se o usuário estiver logado com o perfil ADMIN.
+  - Palavras-chave usadas: `processos, situação, perfil, criado, listados, estiver`
+  - Evidência (score 2): `e2e/cdu-02.spec.ts:57` -> `test('Processos "Criado" devem aparecer apenas para ADMIN', async ({`
+  - Evidência (score 1): `e2e/cdu-02.spec.ts:4` -> `import {criarProcesso, verificarProcessoNaTabela} from './helpers/helpers-processos.js';`
+  - Evidência (score 1): `e2e/cdu-02.spec.ts:10` -> `await expect(page.getByTestId('txt-painel-titulo-processos')).toBeVisible();`
+- 🟡 **[PARCIAL]** 10. Cabeçalhos das colunas deverão ser clicáveis, possibilitando ordenação em ordem crescente e decrescente.
+  - Palavras-chave usadas: `cabeçalhos, colunas, clicáveis, possibilitando, ordenação, ordem`
+  - Evidência (score 1): `e2e/cdu-02.spec.ts:8` -> `test('Deve exibir estrutura básica do painel e testar ordenação', async ({_resetAutomatico, page, _autenticadoComoAdm...`
+  - Evidência (score 1): `e2e/cdu-02.spec.ts:20` -> `await test.step('Testar ordenação da tabela de processos', async () => {`
+  - Evidência (score 1): `e2e/cdu-02.spec.ts:147` -> `test('Deve validar visualização, alertas e ordenação', async ({_resetAutomatico, page, _autenticadoComoGestor}) => {`
+- ❌ **[NAO_COBERTO]** 11. Itens da tabela serão clicáveis com estas regras:
+  - Palavras-chave usadas: `serão, clicáveis, estas`
+  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
+- ✅ **[COBERTO]** 12. Para perfil ADMIN, clicar em um processo na situação 'Criado' mostra tela `Cadastro de processo` com os dados
+  - Palavras-chave usadas: `perfil, processo, situação, admin, clicar, criado`
+  - Evidência (score 3): `e2e/cdu-02.spec.ts:57` -> `test('Processos "Criado" devem aparecer apenas para ADMIN', async ({`
+  - Evidência (score 2): `e2e/cdu-02.spec.ts:34` -> `test('Deve criar processo e visualizá-lo na tabela', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {`
+  - Evidência (score 2): `e2e/cdu-02.spec.ts:49` -> `// Valida que o processo criado aparece na tabela do painel principal`
+- ✅ **[COBERTO]** 13. Clicar em processos nas situações 'Em andamento' e 'Finalizado' mostrará as telas Detalhes do processo, caso o
+  - Palavras-chave usadas: `processos, situações, processo, clicar, andamento, finalizado`
+  - Evidência (score 2): `e2e/cdu-02.spec.ts:4` -> `import {criarProcesso, verificarProcessoNaTabela} from './helpers/helpers-processos.js';`
+  - Evidência (score 2): `e2e/cdu-02.spec.ts:10` -> `await expect(page.getByTestId('txt-painel-titulo-processos')).toBeVisible();`
+  - Evidência (score 2): `e2e/cdu-02.spec.ts:11` -> `await expect(page.getByTestId('txt-painel-titulo-processos')).toHaveText('Processos');`
+- ✅ **[COBERTO]** 14. Caso o usuário logado esteja no perfil ADMIN, no topo da seção de Processos ativos deverá ser exibido o botão `Criar processo` a partir do qual será efetuado o cadastro de novos processos (ver caso de uso `Manter processo`).
+  - Palavras-chave usadas: `perfil, processos, processo, logado, esteja, admin`
+  - Evidência (score 3): `e2e/cdu-02.spec.ts:57` -> `test('Processos "Criado" devem aparecer apenas para ADMIN', async ({`
+  - Evidência (score 3): `e2e/cdu-02.spec.ts:74` -> `const tabelaAdmin = page.locator('[data-testid="tbl-processos"]');`
+  - Evidência (score 2): `e2e/cdu-02.spec.ts:4` -> `import {criarProcesso, verificarProcessoNaTabela} from './helpers/helpers-processos.js';`
+- 🟡 **[PARCIAL]** 15. Na seção `Alertas`, O sistema mostra uma tabela com os alertas registrados pelo sistema que tiverem como destino o usuário logado ou, na ausência desta informação específica, a sua unidade de ativa, ouse seja a unidade que escolheu ao fazer o login no sistema).
+  - Palavras-chave usadas: `alertas, unidade, login, mostra, registrados, pelo`
+  - Evidência (score 1): `e2e/cdu-02.spec.ts:2` -> `import {login, USUARIOS} from './helpers/helpers-auth.js';`
+  - Evidência (score 1): `e2e/cdu-02.spec.ts:12` -> `await expect(page.getByTestId('txt-painel-titulo-alertas')).toBeVisible();`
+  - Evidência (score 1): `e2e/cdu-02.spec.ts:13` -> `await expect(page.getByTestId('txt-painel-titulo-alertas')).toHaveText('Alertas');`
+- ❌ **[NAO_COBERTO]** 16. Campos da tabela:
+  - Palavras-chave usadas: `validação`
+  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
+- 🟡 **[PARCIAL]** 17. `Descrição`: Descrição do alerta
+  - Palavras-chave usadas: `alerta, descrição`
+  - Evidência (score 1): `e2e/cdu-02.spec.ts:12` -> `await expect(page.getByTestId('txt-painel-titulo-alertas')).toBeVisible();`
+  - Evidência (score 1): `e2e/cdu-02.spec.ts:13` -> `await expect(page.getByTestId('txt-painel-titulo-alertas')).toHaveText('Alertas');`
+  - Evidência (score 1): `e2e/cdu-02.spec.ts:22` -> `const cabecalhoDescricao = tabelaProcessos.locator('th', {hasText: 'Descrição'}).first();`
+- 🟡 **[PARCIAL]** 18. `Data/Hora`: Informação da data e da hora de geração do alerta
+  - Palavras-chave usadas: `alerta, data/hora, informação, data, hora, geração`
+  - Evidência (score 1): `e2e/cdu-02.spec.ts:12` -> `await expect(page.getByTestId('txt-painel-titulo-alertas')).toBeVisible();`
+  - Evidência (score 1): `e2e/cdu-02.spec.ts:13` -> `await expect(page.getByTestId('txt-painel-titulo-alertas')).toHaveText('Alertas');`
+  - Evidência (score 1): `e2e/cdu-02.spec.ts:21` -> `const tabelaProcessos = page.locator('[data-testid="tbl-processos"]');`
+- ✅ **[COBERTO]** 19. `Processo`: Descrição do processo a que se refere o alerta
+  - Palavras-chave usadas: `processo, alerta, descrição, refere`
+  - Evidência (score 2): `e2e/cdu-02.spec.ts:22` -> `const cabecalhoDescricao = tabelaProcessos.locator('th', {hasText: 'Descrição'}).first();`
+  - Evidência (score 1): `e2e/cdu-02.spec.ts:4` -> `import {criarProcesso, verificarProcessoNaTabela} from './helpers/helpers-processos.js';`
+  - Evidência (score 1): `e2e/cdu-02.spec.ts:10` -> `await expect(page.getByTestId('txt-painel-titulo-processos')).toBeVisible();`
+- 🟡 **[PARCIAL]** 20. `Unidade`: Unidade de origem do alerta
+  - Palavras-chave usadas: `unidade, alerta, origem`
+  - Evidência (score 1): `e2e/cdu-02.spec.ts:12` -> `await expect(page.getByTestId('txt-painel-titulo-alertas')).toBeVisible();`
+  - Evidência (score 1): `e2e/cdu-02.spec.ts:13` -> `await expect(page.getByTestId('txt-painel-titulo-alertas')).toHaveText('Alertas');`
+  - Evidência (score 1): `e2e/cdu-02.spec.ts:41` -> `unidade: 'ASSESSORIA_21',`
+- 🟡 **[PARCIAL]** 21. Regras de visibilidade de alertas por perfil:
+  - Palavras-chave usadas: `alertas, perfil, visibilidade`
+  - Evidência (score 1): `e2e/cdu-02.spec.ts:12` -> `await expect(page.getByTestId('txt-painel-titulo-alertas')).toBeVisible();`
+  - Evidência (score 1): `e2e/cdu-02.spec.ts:13` -> `await expect(page.getByTestId('txt-painel-titulo-alertas')).toHaveText('Alertas');`
+  - Evidência (score 1): `e2e/cdu-02.spec.ts:147` -> `test('Deve validar visualização, alertas e ordenação', async ({_resetAutomatico, page, _autenticadoComoGestor}) => {`
+- ❌ **[NAO_COBERTO]** 22. Perfil SERVIDOR:
+  - Palavras-chave usadas: `perfil, servidor`
+  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
+- 🟡 **[PARCIAL]** 23. Vê apenas os alertas direcionados ao seu título de eleitor
+  - Palavras-chave usadas: `alertas, direcionados, título, eleitor`
+  - Evidência (score 1): `e2e/cdu-02.spec.ts:12` -> `await expect(page.getByTestId('txt-painel-titulo-alertas')).toBeVisible();`
+  - Evidência (score 1): `e2e/cdu-02.spec.ts:13` -> `await expect(page.getByTestId('txt-painel-titulo-alertas')).toHaveText('Alertas');`
+  - Evidência (score 1): `e2e/cdu-02.spec.ts:147` -> `test('Deve validar visualização, alertas e ordenação', async ({_resetAutomatico, page, _autenticadoComoGestor}) => {`
+- 🟡 **[PARCIAL]** 24. Não vê alertas da unidade (mesmo que ele tenha a unidade como unidade ativa).
+  - Palavras-chave usadas: `alertas, unidade, mesmo, tenha, ativa`
+  - Evidência (score 1): `e2e/cdu-02.spec.ts:12` -> `await expect(page.getByTestId('txt-painel-titulo-alertas')).toBeVisible();`
+  - Evidência (score 1): `e2e/cdu-02.spec.ts:13` -> `await expect(page.getByTestId('txt-painel-titulo-alertas')).toHaveText('Alertas');`
+  - Evidência (score 1): `e2e/cdu-02.spec.ts:41` -> `unidade: 'ASSESSORIA_21',`
+- 🟡 **[PARCIAL]** 25. Outros Perfis (ADMIN, GESTOR, CHEFE):
+  - Palavras-chave usadas: `outros, perfis, admin, gestor, chefe`
+  - Evidência (score 1): `e2e/cdu-02.spec.ts:7` -> `test.describe('Como ADMIN', () => {`
+  - Evidência (score 1): `e2e/cdu-02.spec.ts:8` -> `test('Deve exibir estrutura básica do painel e testar ordenação', async ({_resetAutomatico, page, _autenticadoComoAdm...`
+  - Evidência (score 1): `e2e/cdu-02.spec.ts:34` -> `test('Deve criar processo e visualizá-lo na tabela', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {`
+- 🟡 **[PARCIAL]** 26. Veem os alertas direcionados a eles
+  - Palavras-chave usadas: `alertas, veem, direcionados, eles`
+  - Evidência (score 1): `e2e/cdu-02.spec.ts:12` -> `await expect(page.getByTestId('txt-painel-titulo-alertas')).toBeVisible();`
+  - Evidência (score 1): `e2e/cdu-02.spec.ts:13` -> `await expect(page.getByTestId('txt-painel-titulo-alertas')).toHaveText('Alertas');`
+  - Evidência (score 1): `e2e/cdu-02.spec.ts:147` -> `test('Deve validar visualização, alertas e ordenação', async ({_resetAutomatico, page, _autenticadoComoGestor}) => {`
+- 🟡 **[PARCIAL]** 27. Veem tambem alertas da sua unidade ativa (desde que esses alertas não tenham um usuário de destino específico).
+  - Palavras-chave usadas: `alertas, unidade, veem, tambem, ativa, desde`
+  - Evidência (score 1): `e2e/cdu-02.spec.ts:12` -> `await expect(page.getByTestId('txt-painel-titulo-alertas')).toBeVisible();`
+  - Evidência (score 1): `e2e/cdu-02.spec.ts:13` -> `await expect(page.getByTestId('txt-painel-titulo-alertas')).toHaveText('Alertas');`
+  - Evidência (score 1): `e2e/cdu-02.spec.ts:41` -> `unidade: 'ASSESSORIA_21',`
+- 🟡 **[PARCIAL]** 28. Regras de exibição e funcionamento da tabela de alertas:
+  - Palavras-chave usadas: `alertas, exibição, funcionamento`
+  - Evidência (score 1): `e2e/cdu-02.spec.ts:12` -> `await expect(page.getByTestId('txt-painel-titulo-alertas')).toBeVisible();`
+  - Evidência (score 1): `e2e/cdu-02.spec.ts:13` -> `await expect(page.getByTestId('txt-painel-titulo-alertas')).toHaveText('Alertas');`
+  - Evidência (score 1): `e2e/cdu-02.spec.ts:147` -> `test('Deve validar visualização, alertas e ordenação', async ({_resetAutomatico, page, _autenticadoComoGestor}) => {`
+- 🟡 **[PARCIAL]** 29. Alertas ainda não visualizados pelo usuário logado serão exibidos em negrito.
+  - Palavras-chave usadas: `alertas, ainda, visualizados, pelo, logado, serão`
+  - Evidência (score 1): `e2e/cdu-02.spec.ts:12` -> `await expect(page.getByTestId('txt-painel-titulo-alertas')).toBeVisible();`
+  - Evidência (score 1): `e2e/cdu-02.spec.ts:13` -> `await expect(page.getByTestId('txt-painel-titulo-alertas')).toHaveText('Alertas');`
+  - Evidência (score 1): `e2e/cdu-02.spec.ts:147` -> `test('Deve validar visualização, alertas e ordenação', async ({_resetAutomatico, page, _autenticadoComoGestor}) => {`
+- ✅ **[COBERTO]** 30. Na primeira visualização de um ou mais alertas pelo usuário logado, estes alertas deverão ser marcado como visualizado **pelo usuário**, de maneira a serem exibidos sem negrito a partir da próxima visualização pelo mesmo usuário.
+  - Palavras-chave usadas: `alertas, primeira, visualização, pelo, logado, estes`
+  - Evidência (score 2): `e2e/cdu-02.spec.ts:147` -> `test('Deve validar visualização, alertas e ordenação', async ({_resetAutomatico, page, _autenticadoComoGestor}) => {`
+  - Evidência (score 1): `e2e/cdu-02.spec.ts:12` -> `await expect(page.getByTestId('txt-painel-titulo-alertas')).toBeVisible();`
+  - Evidência (score 1): `e2e/cdu-02.spec.ts:13` -> `await expect(page.getByTestId('txt-painel-titulo-alertas')).toHaveText('Alertas');`
+- 🟡 **[PARCIAL]** 31. Os alertas devem estar ordenados de forma decrescente por data/hora, nao sendo permitida a reordenação.
+  - Palavras-chave usadas: `alertas, ordenados, forma, decrescente, data/hora, sendo`
+  - Evidência (score 1): `e2e/cdu-02.spec.ts:12` -> `await expect(page.getByTestId('txt-painel-titulo-alertas')).toBeVisible();`
+  - Evidência (score 1): `e2e/cdu-02.spec.ts:13` -> `await expect(page.getByTestId('txt-painel-titulo-alertas')).toHaveText('Alertas');`
+  - Evidência (score 1): `e2e/cdu-02.spec.ts:147` -> `test('Deve validar visualização, alertas e ordenação', async ({_resetAutomatico, page, _autenticadoComoGestor}) => {`
 
-## Ações recomendadas (teste e sistema)
-- Priorizar cenários com dados controlados para validar regra de negócio (não apenas presença de elementos na UI).
-- Incluir asserts de navegação/efeito colateral (persistência, alteração de estado, permissões por perfil e unidade ativa).
-- Quando o requisito citar integração externa, manter o E2E focado em contrato visível (mensagem, bloqueio, fallback) e complementar com teste de integração/backend.
+## Ajustes recomendados para próximo ciclo
+- Completar cobertura do item: **Na seção `Processos ativos`, o sistema mostra uma tabela de processos ativos (com título 'Processos'). Devem ser** (atualmente parcial).
+- Implementar cenário específico para: **Campos da tabela:** (sem evidência no E2E atual).
+- Implementar cenário específico para: **Regras de exibição e funcionamento:** (sem evidência no E2E atual).
 
-## Método utilizado nesta reanálise
-- Leitura comparativa do texto do requisito (fluxo principal) com os cenários e passos automatizados no arquivo E2E correspondente.
-- Marcação de lacunas por ausência de evidência textual de validação no teste; itens marcados como ⚠️ devem ser revisados manualmente na próxima rodada.
+## Observações metodológicas
+- Esta rodada incluiu leitura de helpers importados para reduzir falso negativo de cobertura indireta.
+- Classificação automática por evidência textual; recomenda-se validação humana dos itens `🟡` e `❌` antes da implementação final.
