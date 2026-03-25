@@ -161,6 +161,69 @@ test.describe('CDU-02 - Visualizar painel', () => {
                 unidadesParticipantes: ['COORD_11']
             });
         });
+
+        test('Deve abrir Cadastro de processo ao clicar em processo Criado como ADMIN', async ({
+                                                                                                  _resetAutomatico,
+                                                                                                  page,
+                                                                                                  _autenticadoComoAdmin
+}) => {
+            const descricaoProcesso = `Processo criado clicável - ${Date.now()}`;
+
+            await criarProcesso(page, {
+                descricao: descricaoProcesso,
+                tipo: 'MAPEAMENTO',
+                diasLimite: 30,
+                unidade: 'ASSESSORIA_11',
+                expandir: ['SECRETARIA_1']
+            });
+
+            await page.goto('/painel');
+            const linhaProcessoCriado = page.getByTestId('tbl-processos').locator('tr', {hasText: descricaoProcesso}).first();
+            await expect(linhaProcessoCriado).toBeVisible();
+
+            await linhaProcessoCriado.click();
+            await expect(page).toHaveURL(/\/processo\/cadastro(?:\?codProcesso=\d+|\/\d+)$/);
+            await expect(page.getByTestId('inp-processo-descricao')).toHaveValue(descricaoProcesso);
+        });
+
+        test('Deve respeitar regra de clique por perfil em processo Em andamento', async ({
+                                                                                             _resetAutomatico,
+                                                                                             page,
+                                                                                             _autenticadoComoAdmin
+}) => {
+            const descricaoProcesso = `Processo em andamento clicável - ${Date.now()}`;
+
+            await criarProcesso(page, {
+                descricao: descricaoProcesso,
+                tipo: 'MAPEAMENTO',
+                diasLimite: 30,
+                unidade: 'COORD_11',
+                expandir: ['SECRETARIA_1'],
+                iniciar: true
+            });
+
+            await page.goto('/painel');
+            const linhaAdmin = page.getByTestId('tbl-processos').locator('tr', {hasText: descricaoProcesso}).first();
+            await expect(linhaAdmin).toBeVisible();
+            await linhaAdmin.click();
+            await expect(page).toHaveURL(/\/processo\/\d+$/);
+
+            await fazerLogout(page);
+            await login(page, USUARIOS.GESTOR_COORD.titulo, USUARIOS.GESTOR_COORD.senha);
+
+            const linhaGestor = page.getByTestId('tbl-processos').locator('tr', {hasText: descricaoProcesso}).first();
+            await expect(linhaGestor).toBeVisible();
+            await linhaGestor.click();
+            await expect(page).toHaveURL(/\/processo\/\d+$/);
+
+            await fazerLogout(page);
+            await login(page, USUARIOS.CHEFE_SECAO_111.titulo, USUARIOS.CHEFE_SECAO_111.senha);
+
+            const linhaChefe = page.getByTestId('tbl-processos').locator('tr', {hasText: descricaoProcesso}).first();
+            await expect(linhaChefe).toBeVisible();
+            await linhaChefe.click();
+            await expect(page).toHaveURL(/\/processo\/\d+\/SECAO_111$/);
+        });
     });
 
     test.describe('Como GESTOR', () => {

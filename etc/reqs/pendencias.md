@@ -7,7 +7,9 @@ Esta versão substitui a rodada anterior e consolida pendências após segunda v
 - ✅ Adicionada cobertura E2E explícita para validar cabeçalhos obrigatórios da tabela do painel compacto (`Descrição`, `Tipo`, `Unidades`, `Situação`) e presença dos dados recém-criados na mesma linha.
 - ✅ Execução do arquivo `e2e/cdu-02.spec.ts` validada com sucesso após instalação dos navegadores Playwright no ambiente.
 - ✅ Iniciado também o fechamento do CDU-01 com cenário explícito da tela de login (título, subtítulo, campos e botão de entrar).
-- 🔄 Próximo passo sugerido: fechar regras de exibição restantes do CDU-02 (visibilidade por perfil e regras de funcionamento da listagem) com cenários negativos adicionais.
+- ✅ Fechado bloco de regras de clique da tabela de processos do CDU-02 com cobertura explícita por perfil: `ADMIN` abre cadastro para processo `Criado`; `ADMIN`/`GESTOR` abrem `Detalhes do processo` para `Em andamento`; `CHEFE` abre `Detalhes do subprocesso`.
+- ✅ Incluídos cenários negativos/funcionais complementares no CDU-02 para reforçar regra de exibição por perfil e comportamento de navegação da listagem.
+- 🔄 Próximo passo sugerido: avançar em pendências de **alertas do CDU-02** (campos da tabela, visibilidade por perfil e ordenação fixa por data/hora).
 
 ## Novos aprendizados (rodada atual)
 - A validação de cabeçalhos da tabela depende de existir ao menos um processo visível, pois a UI troca para `EmptyState` quando a lista está vazia.
@@ -15,6 +17,9 @@ Esta versão substitui a rodada anterior e consolida pendências após segunda v
 - Para cobrir requisito de “campos da tabela”, é mais robusto preparar dado mínimo via fluxo de criação e depois validar cabeçalho + linha no painel.
 - O helper semântico para cabeçalhos reduz duplicação e evita espalhar seletores de coluna em múltiplas specs.
 - Para CDU-01, consolidar validações da tela de login em helper dedicado melhora legibilidade e reaproveitamento em cenários de autenticação inválida e múltiplos perfis.
+- Para validar regra de clique por perfil no CDU-02 com estabilidade, usar **um único processo em andamento** e alternar login no mesmo teste reduziu custo de setup e evitou divergência entre massas.
+- A rota de edição/cadastro de processo pode variar (`/processo/cadastro/{codigo}` ou `?codProcesso={codigo}`), então os asserts devem aceitar os dois formatos.
+- Para CHEFE, o clique na linha do painel tende a redirecionar diretamente para rota de subprocesso (`/processo/{codigo}/{SIGLA_UNIDADE}`), o que fornece evidência objetiva da regra de navegação por perfil.
 
 ## Síntese executiva
 - Escopo: 36 pares requisito x teste E2E.
