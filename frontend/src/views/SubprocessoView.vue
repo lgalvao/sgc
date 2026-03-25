@@ -69,7 +69,7 @@
             </p>
             <p v-if="subprocesso.prazoEtapaAtual">
               <span class="fw-bold me-1">{{ TEXTOS.subprocesso.LABEL_PRAZO_ETAPA }}:</span>
-              <span>{{ formatDataSimples(subprocesso.prazoEtapaAtual) }}</span>
+              <span data-testid="subprocesso-header__txt-prazo">{{ formatDataSimples(subprocesso.prazoEtapaAtual) }}</span>
             </p>
             <p class="mt-2"><strong>{{ TEXTOS.subprocesso.LABEL_TITULAR }}:</strong> {{ subprocesso.titular?.nome || '' }}</p>
             <p class="ms-3 mb-2">

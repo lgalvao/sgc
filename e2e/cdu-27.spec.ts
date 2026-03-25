@@ -60,7 +60,7 @@ test.describe.serial('CDU-27 - Alterar data limite de subprocesso', () => {
         await navegarParaSubprocesso(page, UNIDADE_1);
 
         // Obter a data atual do prazo na página
-        const prazoPaginaElement = page.locator('p:has-text("Prazo da etapa:") span:nth-child(2)');
+        const prazoPaginaElement = page.getByTestId('subprocesso-header__txt-prazo');
         await expect(prazoPaginaElement).not.toBeEmpty();
         const prazoPagina = await prazoPaginaElement.innerText();
 
@@ -110,6 +110,6 @@ test.describe.serial('CDU-27 - Alterar data limite de subprocesso', () => {
         
         // Verificar se a página atualizou o prazo
         const [y, m, d] = novaDataIso.split('-');
-        await expect(page.locator('p:has-text("Prazo da etapa:")')).toContainText(`${d}/${m}/${y}`);
+        await expect(page.getByTestId('subprocesso-header__txt-prazo')).toContainText(`${d}/${m}/${y}`);
     });
 });
