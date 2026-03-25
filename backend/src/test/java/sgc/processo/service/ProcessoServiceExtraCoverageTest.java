@@ -64,9 +64,6 @@ class ProcessoServiceExtraCoverageTest {
     @Mock
     private SgcPermissionEvaluator permissionEvaluator;
 
-    @Mock
-    private SubprocessoTransicaoService transicaoService;
-
     @Nested
     @DisplayName("buscarPorCodigoComParticipantes")
     class BuscarPorCodigoComParticipantes {

@@ -112,7 +112,7 @@ import {
   BFormSelectOption,
   BSpinner
 } from "bootstrap-vue-next";
-import {nextTick, ref, watch} from "vue";
+import {ref} from "vue";
 import ArvoreUnidades from "@/components/unidade/ArvoreUnidades.vue";
 import InputData from "@/components/comum/InputData.vue";
 import type {Unidade} from "@/types/tipos";

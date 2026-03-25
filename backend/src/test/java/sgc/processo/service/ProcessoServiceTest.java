@@ -33,10 +33,8 @@ import static sgc.seguranca.AcaoPermissao.*;
 @ExtendWith(MockitoExtension.class)
 @DisplayName("ProcessoService Test suite")
 class ProcessoServiceTest {
-
     @InjectMocks
     private ProcessoService processoService;
-
     @Mock
     private ProcessoRepo processoRepo;
     @Mock
@@ -58,13 +56,7 @@ class ProcessoServiceTest {
     @Mock
     private SgcPermissionEvaluator permissionEvaluator;
     @Mock
-    private SubprocessoRepo subprocessoRepo;
-    @Mock
-    private MovimentacaoRepo movimentacaoRepo;
-    @Mock
     private SubprocessoTransicaoService transicaoService;
-    @Mock
-    private UnidadeHierarquiaService hierarquiaService;
 
     @Nested
     @DisplayName("Cobertura e Casos de Borda")

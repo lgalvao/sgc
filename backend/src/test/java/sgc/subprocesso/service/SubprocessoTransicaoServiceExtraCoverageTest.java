@@ -6,11 +6,7 @@ import org.mockito.*;
 import org.mockito.junit.jupiter.*;
 import org.mockito.quality.*;
 import sgc.alerta.*;
-import sgc.comum.model.*;
-import sgc.mapa.service.*;
-import sgc.organizacao.*;
 import sgc.organizacao.model.*;
-import sgc.organizacao.service.*;
 import sgc.processo.model.*;
 import sgc.subprocesso.model.*;
 
@@ -23,7 +19,6 @@ import static org.mockito.Mockito.*;
 @MockitoSettings(strictness = Strictness.LENIENT)
 @DisplayName("SubprocessoTransicaoService Extra Coverage Test")
 class SubprocessoTransicaoServiceExtraCoverageTest {
-
     @InjectMocks
     private SubprocessoTransicaoService service;
 
@@ -37,34 +32,7 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
     private AnaliseRepo analiseRepo;
 
     @Mock
-    private SubprocessoValidacaoService validacaoService;
-
-    @Mock
-    private SubprocessoNotificacaoService notificacaoService;
-
-    @Mock
-    private UnidadeService unidadeService;
-
-    @Mock
-    private HierarquiaService hierarquiaService;
-
-    @Mock
-    private UsuarioFacade usuarioFacade;
-
-    @Mock
-    private ImpactoMapaService impactoMapaService;
-
-    @Mock
-    private MapaManutencaoService mapaManutencaoService;
-
-    @Mock
-    private EmailService emailService;
-
-    @Mock
     private AlertaFacade alertaService;
-
-    @Mock
-    private ComumRepo repo;
 
     @Test
     @DisplayName("obterUnidadeLocalizacao - destino nulo")
@@ -79,7 +47,6 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         mov.setUnidadeDestino(null);
         when(movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(100L)).thenReturn(List.of(mov));
 
-        // Metodo privado, testado via registrarTransicao ou similar
         Unidade res = org.springframework.test.util.ReflectionTestUtils.invokeMethod(service, "obterUnidadeLocalizacao", sp);
         assertThat(res).isEqualTo(u);
     }

@@ -6,7 +6,6 @@ import org.mockito.*;
 import org.mockito.junit.jupiter.*;
 import org.springframework.data.domain.*;
 import sgc.alerta.model.*;
-import sgc.organizacao.service.*;
 
 import java.time.*;
 import java.util.*;
@@ -17,13 +16,8 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 @DisplayName("AlertaFacade Test")
 class AlertaFacadeTest {
-
     @Mock
     private AlertaService alertaService;
-    @Mock
-    private UsuarioService usuarioService;
-    @Mock
-    private UnidadeService unidadeService;
 
     @InjectMocks
     private AlertaFacade alertaFacade;
@@ -61,15 +55,17 @@ class AlertaFacadeTest {
         @DisplayName("Deve listar alertas não lidos filtrando corretamente")
         void deveListarNaoLidos() {
             String titulo = "123";
-            Alerta a1 = new Alerta(); a1.setCodigo(1L);
-            Alerta a2 = new Alerta(); a2.setCodigo(2L);
+            Alerta a1 = new Alerta();
+            a1.setCodigo(1L);
+            Alerta a2 = new Alerta();
+            a2.setCodigo(2L);
 
             when(alertaService.listarParaGestao(1L, titulo)).thenReturn(List.of(a1, a2));
-            
+
             AlertaUsuario au1 = new AlertaUsuario();
             au1.setCodigo(AlertaUsuario.Chave.builder().alertaCodigo(1L).usuarioTitulo(titulo).build());
             au1.setDataHoraLeitura(LocalDateTime.now());
-            
+
             when(alertaService.alertasUsuarios(eq(titulo), anyList())).thenReturn(List.of(au1));
 
             List<Alerta> resultado = alertaFacade.listarNaoLidos(titulo, 1L, "GESTOR");
@@ -87,9 +83,9 @@ class AlertaFacadeTest {
         void listarPorUnidadePaginadoGestao() {
             Pageable p = Pageable.unpaged();
             when(alertaService.listarParaGestaoPaginado(eq(1L), anyString(), any(Pageable.class))).thenReturn(Page.empty());
-            
+
             alertaFacade.listarPorUnidade("123", 1L, "GESTOR", p);
-            
+
             verify(alertaService).listarParaGestaoPaginado(eq(1L), anyString(), any(Pageable.class));
         }
 
@@ -98,9 +94,9 @@ class AlertaFacadeTest {
         void listarPorUnidadePaginadoServidor() {
             Pageable p = Pageable.unpaged();
             when(alertaService.listarParaServidorPaginado(anyString(), any(Pageable.class))).thenReturn(Page.empty());
-            
+
             alertaFacade.listarPorUnidade("123", 1L, "SERVIDOR", p);
-            
+
             verify(alertaService).listarParaServidorPaginado(anyString(), any(Pageable.class));
         }
     }

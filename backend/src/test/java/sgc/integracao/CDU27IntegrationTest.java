@@ -85,7 +85,7 @@ class CDU27IntegrationTest extends BaseIntegrationTest {
 
         // 1. Verificar Alerta
         List<Alerta> alertas = alertaRepo.findAll();
-        Alerta alerta = alertas.get(alertas.size() - 1);
+        Alerta alerta = alertas.getLast();
         assertThat(alerta.getDescricao()).contains("Data limite da etapa 1 alterada");
         assertThat(alerta.getUnidadeDestino().getCodigo()).isEqualTo(atualizado.getUnidade().getCodigo());
         assertThat(alerta.getProcesso().getCodigo()).isEqualTo(subprocesso.getProcesso().getCodigo());
@@ -123,7 +123,7 @@ class CDU27IntegrationTest extends BaseIntegrationTest {
 
         // Verificar Alerta para Etapa 2
         List<Alerta> alertas = alertaRepo.findAll();
-        Alerta alerta = alertas.get(alertas.size() - 1);
+        Alerta alerta = alertas.getLast();
         assertThat(alerta.getDescricao()).contains("Data limite da etapa 2 alterada");
     }
 

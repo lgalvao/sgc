@@ -16,15 +16,8 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 @DisplayName("LoginController - Cobertura adicional")
 class LoginControllerCoverageTest {
-
     @Mock
     private LoginFacade loginFacade;
-    @Mock
-    private UsuarioFacade usuarioFacade;
-    @Mock
-    private LimitadorTentativasLogin limitadorTentativasLogin;
-    @Mock
-    private GerenciadorJwt gerenciadorJwt;
     @Mock
     private HttpServletRequest httpRequest;
     @Mock
@@ -36,7 +29,6 @@ class LoginControllerCoverageTest {
     @Test
     @DisplayName("autenticar deve retornar false e não gerar cookie se falhar")
     void deveRetornarFalseSeFalharAutenticacao() {
-
         AutenticarRequest request = new AutenticarRequest("111111", "senha_errada");
         when(loginFacade.autenticar("111111", "senha_errada")).thenReturn(false);
         when(httpRequest.getRemoteAddr()).thenReturn("127.0.0.1");

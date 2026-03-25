@@ -366,7 +366,7 @@ public class SubprocessoService {
     }
 
     private void validarCompetenciaParaCriacao(CompetenciaRequest request) {
-        if (request.atividadesIds() == null || request.atividadesIds().isEmpty()) {
+        if (request.atividadesIds().isEmpty()) {
             throw new ErroValidacao(Mensagens.COMPETENCIA_DEVE_TER_ATIVIDADE);
         }
     }
@@ -728,7 +728,7 @@ public class SubprocessoService {
         Long codMapaOrigem = spOrigem.getMapa().getCodigo();
         Long codMapaDestino = spDestino.getMapa().getCodigo();
 
-        List<Long> ids = codigosAtividades != null ? codigosAtividades : Collections.emptyList();
+        List<Long> ids = codigosAtividades;
         int totalParaImportar = ids.size();
         log.info("Importando {} atividades do mapa #{} para o mapa #{}", totalParaImportar, codMapaOrigem, codMapaDestino);
         int importadas = copiaMapaService.importarAtividadesDeOutroMapa(codMapaOrigem, codMapaDestino, ids);

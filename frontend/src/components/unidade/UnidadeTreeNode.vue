@@ -166,7 +166,7 @@ const {isChecked, getEstadoSelecao, isExpanded, isHabilitado, onToggle, onToggle
   margin-left: 1.5rem;
 }
 
-@media (max-width: 575.98px) {
+@media (max-width: 576px) {
   .unidade-children {
     margin-left: 0.75rem;
   }

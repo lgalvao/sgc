@@ -23,25 +23,9 @@ public class UsuarioFixture {
         return usuario;
     }
 
-    public static Usuario usuarioLogado(String titulo, Unidade unidade, Perfil perfil) {
-        Usuario usuario = usuarioComTitulo(titulo);
-        usuario.setPerfilAtivo(perfil);
-        usuario.setUnidadeAtivaCodigo(unidade.getCodigo());
-        usuario.setUnidadeLotacao(unidade);
-        return usuario;
-    }
-
-    public static void adicionarPerfil(Usuario usuario, Unidade unidade, Perfil perfil) {
-        usuario.setPerfilAtivo(perfil);
-        usuario.setUnidadeAtivaCodigo(unidade.getCodigo());
-    }
-
     public static Usuario usuarioComTitulo(String titulo) {
         Usuario usuario = usuarioPadrao();
         usuario.setTituloEleitoral(titulo);
-        // Gera matrícula a partir do título de forma segura
-        // Se título tem >= 8 caracteres, pega os últimos 8
-        // Senão, preenche com zeros à esquerda até ter 8 caracteres
         String matricula;
         if (titulo.length() >= 8) {
             matricula = titulo.substring(titulo.length() - 8);

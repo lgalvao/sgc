@@ -50,11 +50,6 @@ public class UsuarioTestBuilder {
         return this;
     }
 
-    public UsuarioTestBuilder comUnidadeLotacao(Unidade unidade) {
-        this.unidadeLotacao = unidade;
-        return this;
-    }
-
     public Usuario build() {
         Usuario usuario = new Usuario();
         usuario.setTituloEleitoral(tituloEleitoral);

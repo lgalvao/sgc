@@ -123,12 +123,6 @@ public final class Mensagens {
     public static final String SEM_PERMISSAO_CONSULTAR_ORIGEM   = "Usuário não tem permissão para consultar o subprocesso de origem.";
     public static final String SEM_PERMISSAO_ACESSO_PERFIL      = "Usuário não tem permissão para acessar com perfil e unidade informados.";
     public static final String CREDENCIAIS_INVALIDAS            = "Credenciais inválidas";
-    public static final String MUITAS_TENTATIVAS_LOGIN          = "Muitas tentativas de login no sistema. Tente novamente mais tarde.";
-    public static final String MUITAS_TENTATIVAS_DORMINDO       = "Muitas tentativas de login. Tente novamente em alguns minutos.";
-    public static final String AUTENTICACAO_EXTERNA_FALHA       = "Falha na autenticação externa.";
-    public static final String AUTENTICACAO_ERRO_INESPERADO     = "Ocorreu um erro inesperado durante a autenticação.";
-    public static final String SES_EXPIRADA                     = "Sessão expirada ou inválida. Faça login novamente.";
-    public static final String SES_INVALIDA_USUARIO             = "Sessão inválida para o usuário informado.";
     public static final String SEM_PERMISSAO_DISPONIBILIZAR     = "Sem permissão para disponibilizar mapas.";
     public static final String SEM_PERMISSAO_EDITAR_ATIVIDADES  = "Usuário não tem permissão para editar atividades neste subprocesso.";
     public static final String SEM_PERMISSAO_VERIFICAR_IMPACTOS = "Usuário não tem permissão para verificar impactos.";
@@ -160,7 +154,6 @@ public final class Mensagens {
     public static final String HIST_MAPA_VALIDACAO_ACEITA        = "Mapa de competências validado";
     public static final String HIST_MAPA_HOMOLOGADO              = "Mapa de competências homologado";
     public static final String HIST_PROCESSO_INICIADO            = "Processo iniciado";
-    public static final String HIST_LEMBRETE_ENVIADO             = "Lembrete de prazo enviado";
     public static final String HIST_IMPORTACAO_ATIVIDADES        = "Importação de atividades do subprocesso #%d (Unidade: %s)";
 
     // ── Templates de Alertas ─────────────────────────────────────────────────

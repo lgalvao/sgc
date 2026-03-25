@@ -40,8 +40,6 @@ class SubprocessoServiceExtraCoverageTest {
     @Mock
     private MapaManutencaoService mapaManutencaoService;
     @Mock
-    private SubprocessoValidacaoService validacaoService;
-    @Mock
     private UsuarioFacade usuarioFacade;
     @Mock
     private MovimentacaoRepo movimentacaoRepo;
