@@ -11,23 +11,24 @@ const modelValueBase = {
     dataLimite: "",
 };
 
-describe("ProcessoFormFields.vue", () => {
-    function criarWrapper(fieldErrors: Record<string, string> = {}) {
-        return mount(ProcessoFormFields, {
-            props: {
-                modelValue: modelValueBase,
-                fieldErrors,
-                unidades: [],
-                isLoadingUnidades: false,
-            },
-            attachTo: document.body,
-            global: {
-                stubs: {
-                    ArvoreUnidades: {template: "<div>Arvore</div>"}
-                }
+function criarWrapper(fieldErrors: Record<string, string> = {}) {
+    return mount(ProcessoFormFields, {
+        props: {
+            modelValue: modelValueBase,
+            fieldErrors,
+            unidades: [],
+            isLoadingUnidades: false,
+        },
+        attachTo: document.body,
+        global: {
+            stubs: {
+                ArvoreUnidades: {template: "<div>Arvore</div>"}
             }
-        });
-    }
+        }
+    });
+}
+
+describe("ProcessoFormFields.vue", () => {
 
     it("não deve focar automaticamente nos campos quando há erro no mount", async () => {
         const wrapper = criarWrapper({descricao: "Erro"});
