@@ -9,6 +9,7 @@ Esta versão substitui a rodada anterior e consolida pendências após segunda v
 - ✅ Iniciado também o fechamento do CDU-01 com cenário explícito da tela de login (título, subtítulo, campos e botão de entrar).
 - ✅ Fechado bloco de regras de clique da tabela de processos do CDU-02 com cobertura explícita por perfil: `ADMIN` abre cadastro para processo `Criado`; `ADMIN`/`GESTOR` abrem `Detalhes do processo` para `Em andamento`; `CHEFE` abre `Detalhes do subprocesso`.
 - ✅ Incluídos cenários negativos/funcionais complementares no CDU-02 para reforçar regra de exibição por perfil e comportamento de navegação da listagem.
+- ✅ Correção de preparação de ambiente E2E aplicada: instalação do Playwright refeita com o comando obrigatório `npx playwright install --with-deps --only-shell` (inclui dependências de SO para execução headless estável).
 - 🔄 Próximo passo sugerido: avançar em pendências de **alertas do CDU-02** (campos da tabela, visibilidade por perfil e ordenação fixa por data/hora).
 
 ## Novos aprendizados (rodada atual)
@@ -20,6 +21,8 @@ Esta versão substitui a rodada anterior e consolida pendências após segunda v
 - Para validar regra de clique por perfil no CDU-02 com estabilidade, usar **um único processo em andamento** e alternar login no mesmo teste reduziu custo de setup e evitou divergência entre massas.
 - A rota de edição/cadastro de processo pode variar (`/processo/cadastro/{codigo}` ou `?codProcesso={codigo}`), então os asserts devem aceitar os dois formatos.
 - Para CHEFE, o clique na linha do painel tende a redirecionar diretamente para rota de subprocesso (`/processo/{codigo}/{SIGLA_UNIDADE}`), o que fornece evidência objetiva da regra de navegação por perfil.
+- **Padronização obrigatória para ambiente E2E headless:** usar `npx playwright install --with-deps --only-shell`; usar apenas `npx playwright install` pode deixar dependências nativas ausentes no host e quebrar a inicialização do navegador.
+- Evitar usar, na descrição dinâmica de processos de teste, termos idênticos ao texto da situação (ex.: `Em andamento`), pois pode gerar ambiguidade de seletor textual na mesma linha da tabela.
 
 ## Síntese executiva
 - Escopo: 36 pares requisito x teste E2E.

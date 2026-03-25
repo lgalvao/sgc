@@ -191,7 +191,7 @@ test.describe('CDU-02 - Visualizar painel', () => {
                                                                                              page,
                                                                                              _autenticadoComoAdmin
 }) => {
-            const descricaoProcesso = `Processo em andamento clicável - ${Date.now()}`;
+            const descricaoProcesso = `Processo clique perfis - ${Date.now()}`;
 
             await criarProcesso(page, {
                 descricao: descricaoProcesso,
