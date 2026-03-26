@@ -69,7 +69,7 @@ public class ProcessoService {
 
     @Transactional(readOnly = true)
     public Optional<Processo> buscarOpt(Long codigo) {
-        return Optional.of(repo.buscar(Processo.class, codigo));
+        return processoRepo.buscarPorCodigoComParticipantes(codigo);
     }
 
     @Transactional(readOnly = true)
