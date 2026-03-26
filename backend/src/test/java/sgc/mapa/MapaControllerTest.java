@@ -9,6 +9,7 @@ import org.springframework.security.test.context.support.*;
 import org.springframework.test.context.bean.override.mockito.*;
 import org.springframework.test.web.servlet.*;
 import sgc.comum.erros.*;
+import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
 import sgc.mapa.service.*;
 import sgc.seguranca.*;
@@ -93,13 +94,14 @@ class MapaControllerTest {
     void deveRetornarCreatedAoCriar() throws Exception {
         Mapa mapa = new Mapa();
         mapa.setCodigo(1L);
+        CriarMapaRequest request = CriarMapaRequest.builder().subprocessoCodigo(10L).build();
 
-        when(mapaManutencaoService.salvarMapa(any(Mapa.class))).thenReturn(mapa);
+        when(mapaManutencaoService.criarMapa(any(CriarMapaRequest.class))).thenReturn(mapa);
 
         mockMvc.perform(post(API_MAPAS)
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(mapa)))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", org.hamcrest.Matchers.endsWith(API_MAPAS_1)));
     }
@@ -110,14 +112,14 @@ class MapaControllerTest {
     void deveRetornarOkAoAtualizarMapaExistente() throws Exception {
         Mapa mapa = new Mapa();
         mapa.setCodigo(1L);
+        AtualizarMapaRequest request = AtualizarMapaRequest.builder().observacoesDisponibilizacao("Obs").build();
 
-        when(mapaManutencaoService.mapaCodigo(1L)).thenReturn(mapa);
-        when(mapaManutencaoService.salvarMapa(any(Mapa.class))).thenReturn(mapa);
+        when(mapaManutencaoService.atualizarMapa(eq(1L), any(AtualizarMapaRequest.class))).thenReturn(mapa);
 
         mockMvc.perform(post(API_MAPAS_1_ATUALIZAR)
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(mapa)))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(CODIGO_JSON_PATH).value(1L));
     }

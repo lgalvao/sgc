@@ -1,6 +1,5 @@
 package sgc.organizacao;
 
-import com.fasterxml.jackson.annotation.*;
 import jakarta.validation.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -47,14 +46,12 @@ public class UnidadeController {
     }
 
     @GetMapping
-    @JsonView(OrganizacaoViews.Publica.class)
     public ResponseEntity<List<UnidadeDto>> buscarTodasUnidades() {
         List<UnidadeDto> hierarquia = hierarquiaService.buscarArvoreHierarquica();
         return ResponseEntity.ok(hierarquia);
     }
 
     @GetMapping("/arvore-com-elegibilidade")
-    @JsonView(OrganizacaoViews.Publica.class)
     public ResponseEntity<List<UnidadeDto>> buscarArvoreComElegibilidade(
             @RequestParam("tipoProcesso") String tipoProcesso,
             @RequestParam(value = "codProcesso", required = false) Long codProcesso) {
@@ -84,7 +81,6 @@ public class UnidadeController {
     }
 
     @GetMapping("/sigla/{siglaUnidade}")
-    @JsonView(OrganizacaoViews.Publica.class)
     public ResponseEntity<UnidadeDto> buscarUnidadePorSigla(
             @PathVariable @Pattern(regexp = "^[a-zA-Z0-9_.-]+$") String siglaUnidade) {
         Unidade unidade = unidadeService.buscarPorSigla(siglaUnidade);
@@ -92,14 +88,12 @@ public class UnidadeController {
     }
 
     @GetMapping("/{codigo}")
-    @JsonView(OrganizacaoViews.Publica.class)
     public ResponseEntity<UnidadeDto> buscarUnidadePorCodigo(@PathVariable Long codigo) {
         Unidade unidade = unidadeService.buscarPorCodigo(codigo);
         return ResponseEntity.ok(UnidadeDto.fromEntity(unidade));
     }
 
     @GetMapping("/{codigo}/arvore")
-    @JsonView(OrganizacaoViews.Publica.class)
     public ResponseEntity<UnidadeDto> buscarArvoreUnidade(@PathVariable Long codigo) {
         return ResponseEntity.ok(hierarquiaService.buscarArvore(codigo));
     }

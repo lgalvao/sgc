@@ -53,6 +53,7 @@ class SerializacaoEndpointsIntegrationTest extends BaseIntegrationTest {
     private Unidade unidadeCriacao;
     private Processo processo;
     private Subprocesso subprocesso;
+    private Subprocesso subprocessoSemMapa;
     private Usuario usuarioConsulta;
     private String tokenAdmin;
     private String tokenChefe;
@@ -113,6 +114,12 @@ class SerializacaoEndpointsIntegrationTest extends BaseIntegrationTest {
 
         mapa.setSubprocesso(subprocesso);
         mapaRepo.saveAndFlush(mapa);
+
+        subprocessoSemMapa = SubprocessoFixture.subprocessoPadrao(processo, unidadeCriacao);
+        subprocessoSemMapa.setCodigo(null);
+        subprocessoSemMapa.setSituacaoForcada(SituacaoSubprocesso.NAO_INICIADO);
+        subprocessoSemMapa.setMapa(null);
+        subprocessoSemMapa = subprocessoRepo.saveAndFlush(subprocessoSemMapa);
 
         Atividade atividade = AtividadeFixture.atividadePadrao(mapa);
         atividade.setDescricao("Atividade de serialização");
@@ -206,10 +213,9 @@ class SerializacaoEndpointsIntegrationTest extends BaseIntegrationTest {
         mockMvc.perform(get("/api/processos/{codigo}/subprocessos", processo.getCodigo())
                         .header("Authorization", "Bearer " + tokenAdmin))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].codigo", is(subprocesso.getCodigo().intValue())))
-                .andExpect(jsonPath("$[0].unidade.sigla", is("SLZY")))
-                .andExpect(jsonPath("$[0].processoDescricao", is("Processo de serialização")));
+                .andExpect(jsonPath("$[*].codigo", hasItem(subprocesso.getCodigo().intValue())))
+                .andExpect(jsonPath("$[*].unidade.sigla", hasItem("SLZY")))
+                .andExpect(jsonPath("$[*].processoDescricao", hasItem("Processo de serialização")));
     }
 
     @Test
@@ -252,6 +258,57 @@ class SerializacaoEndpointsIntegrationTest extends BaseIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.codigo", is(subprocesso.getMapa().getCodigo().intValue())))
                 .andExpect(jsonPath("$.subprocessoCodigo", is(subprocesso.getCodigo().intValue())));
+    }
+
+    @Test
+    @DisplayName("GET /api/mapas deve serializar lista de resumos sem lazy loading")
+    void deveSerializarListaDeMapas() throws Exception {
+        mockMvc.perform(get("/api/mapas")
+                        .header("Authorization", "Bearer " + tokenAdmin))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[*].codigo", hasItem(subprocesso.getMapa().getCodigo().intValue())))
+                .andExpect(jsonPath("$[*].subprocessoCodigo", hasItem(subprocesso.getCodigo().intValue())));
+    }
+
+    @Test
+    @DisplayName("POST /api/mapas deve criar e serializar resumo sem lazy loading")
+    void deveCriarMapaComRespostaEmDto() throws Exception {
+        String corpo = objectMapper.writeValueAsString(Map.of(
+                "subprocessoCodigo", subprocessoSemMapa.getCodigo(),
+                "observacoesDisponibilizacao", "Observação do mapa",
+                "sugestoes", "Sugestões do mapa"
+        ));
+
+        mockMvc.perform(post("/api/mapas")
+                        .header("Authorization", "Bearer " + tokenAdmin)
+                        .with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf())
+                        .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                        .content(corpo))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.codigo").isNumber())
+                .andExpect(jsonPath("$.subprocessoCodigo", is(subprocessoSemMapa.getCodigo().intValue())))
+                .andExpect(jsonPath("$.observacoesDisponibilizacao", is("Observação do mapa")))
+                .andExpect(jsonPath("$.sugestoes", is("Sugestões do mapa")));
+    }
+
+    @Test
+    @DisplayName("POST /api/mapas/{codigo}/atualizar deve serializar resumo sem lazy loading")
+    void deveAtualizarMapaComRespostaEmDto() throws Exception {
+        String corpo = objectMapper.writeValueAsString(Map.of(
+                "observacoesDisponibilizacao", "Observação atualizada",
+                "sugestoes", "Sugestões atualizadas"
+        ));
+
+        mockMvc.perform(post("/api/mapas/{codigo}/atualizar", subprocesso.getMapa().getCodigo())
+                        .header("Authorization", "Bearer " + tokenAdmin)
+                        .with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf())
+                        .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                        .content(corpo))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.codigo", is(subprocesso.getMapa().getCodigo().intValue())))
+                .andExpect(jsonPath("$.subprocessoCodigo", is(subprocesso.getCodigo().intValue())))
+                .andExpect(jsonPath("$.observacoesDisponibilizacao", is("Observação atualizada")))
+                .andExpect(jsonPath("$.sugestoes", is("Sugestões atualizadas")));
     }
 
     @Test

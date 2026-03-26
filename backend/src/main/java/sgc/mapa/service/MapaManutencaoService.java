@@ -10,6 +10,7 @@ import sgc.comum.model.*;
 import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
 import sgc.subprocesso.model.*;
+import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.*;
 
 import java.util.*;
@@ -179,6 +180,29 @@ public class MapaManutencaoService {
     @Transactional
     public Mapa salvarMapa(Mapa mapa) {
         return mapaRepo.save(mapa);
+    }
+
+    @Transactional
+    public Mapa criarMapa(CriarMapaRequest request) {
+        Subprocesso subprocesso = repo.buscar(Subprocesso.class, request.subprocessoCodigo());
+        Mapa mapa = Mapa.builder()
+                .subprocesso(subprocesso)
+                .dataHoraDisponibilizado(request.dataHoraDisponibilizado())
+                .observacoesDisponibilizacao(request.observacoesDisponibilizacao())
+                .sugestoes(request.sugestoes())
+                .dataHoraHomologado(request.dataHoraHomologado())
+                .build();
+        return mapaRepo.save(mapa);
+    }
+
+    @Transactional
+    public Mapa atualizarMapa(Long codMapa, AtualizarMapaRequest request) {
+        Mapa existente = mapaCodigo(codMapa)
+                .setDataHoraDisponibilizado(request.dataHoraDisponibilizado())
+                .setObservacoesDisponibilizacao(request.observacoesDisponibilizacao())
+                .setSugestoes(request.sugestoes())
+                .setDataHoraHomologado(request.dataHoraHomologado());
+        return mapaRepo.save(existente);
     }
 
     @Transactional

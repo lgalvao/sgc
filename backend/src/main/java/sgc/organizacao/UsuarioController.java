@@ -1,6 +1,5 @@
 package sgc.organizacao;
 
-import com.fasterxml.jackson.annotation.*;
 import io.swagger.v3.oas.annotations.*;
 import io.swagger.v3.oas.annotations.tags.*;
 import lombok.*;
@@ -41,7 +40,6 @@ public class UsuarioController {
                 .toList());
     }
 
-    @JsonView(OrganizacaoViews.Interna.class)
     @GetMapping("/administradores")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Lista todos os administradores")
@@ -49,7 +47,6 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarioFacade.listarAdministradores());
     }
 
-    @JsonView(OrganizacaoViews.Interna.class)
     @PostMapping("/administradores")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Adiciona um administrador")

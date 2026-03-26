@@ -52,8 +52,8 @@ public class MapaController {
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Cria um mapa")
-    public ResponseEntity<MapaResumoDto> criar(@Valid @RequestBody Mapa mapa) {
-        var salvo = mapaManutencaoService.salvarMapa(mapa);
+    public ResponseEntity<MapaResumoDto> criar(@Valid @RequestBody CriarMapaRequest request) {
+        var salvo = mapaManutencaoService.criarMapa(request);
         Long codigo = Objects.requireNonNull(salvo.getCodigo(), "Código do mapa não pode ser nulo");
 
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
@@ -67,13 +67,8 @@ public class MapaController {
     @PostMapping("/{codMapa}/atualizar")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Atualiza um mapa existente")
-    public ResponseEntity<MapaResumoDto> atualizar(@PathVariable Long codMapa, @Valid @RequestBody Mapa mapa) {
-        Mapa existente = mapaManutencaoService.mapaCodigo(codMapa)
-                .setDataHoraDisponibilizado(mapa.getDataHoraDisponibilizado())
-                .setObservacoesDisponibilizacao(mapa.getObservacoesDisponibilizacao())
-                .setDataHoraHomologado(mapa.getDataHoraHomologado());
-
-        var atualizado = mapaManutencaoService.salvarMapa(existente);
+    public ResponseEntity<MapaResumoDto> atualizar(@PathVariable Long codMapa, @Valid @RequestBody AtualizarMapaRequest request) {
+        var atualizado = mapaManutencaoService.atualizarMapa(codMapa, request);
         return ResponseEntity.ok(MapaResumoDto.fromEntity(atualizado));
     }
 

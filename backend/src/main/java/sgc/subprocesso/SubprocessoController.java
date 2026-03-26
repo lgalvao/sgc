@@ -293,7 +293,6 @@ public class SubprocessoController {
 
     @GetMapping("/{codSubprocesso}/impactos-mapa")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'VERIFICAR_IMPACTOS')")
-    @JsonView(MapaViews.Publica.class)
     public ImpactoMapaResponse verificarImpactos(@PathVariable Long codSubprocesso, @AuthenticationPrincipal Usuario usuario) {
         return subprocessoService.verificarImpactos(codSubprocesso, usuario);
     }
@@ -318,7 +317,6 @@ public class SubprocessoController {
     @GetMapping("/{codSubprocesso}/mapa-visualizacao")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'VISUALIZAR_SUBPROCESSO')")
     @Operation(summary = "Obtém o mapa formatado para visualização")
-    @JsonView(MapaViews.Publica.class)
     public MapaVisualizacaoResponse obterMapaParaVisualizacao(@PathVariable Long codSubprocesso) {
         return subprocessoService.mapaParaVisualizacao(codSubprocesso);
     }

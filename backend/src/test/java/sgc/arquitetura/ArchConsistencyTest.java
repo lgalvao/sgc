@@ -12,6 +12,8 @@ import org.springframework.data.jpa.repository.*;
 import org.springframework.stereotype.*;
 import org.springframework.web.bind.annotation.*;
 
+import java.lang.reflect.*;
+
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.*;
 import static com.tngtech.archunit.library.dependencies.SlicesRuleDefinition.*;
 
@@ -119,32 +121,84 @@ public class ArchConsistencyTest {
             .beAnnotatedWith(Entity.class)
             .because("DTOs should never be JPA entities - use separate entity classes");
 
-    /**
-     * Garante que entidades JPA só sejam retornadas por controllers quando houver
-     * {@code @JsonView} explícito no metodo.
-     */
     @ArchTest
-    static final ArchRule controllers_should_not_return_jpa_entities_without_json_view = methods()
+    static final ArchRule controllers_should_not_expose_jpa_entities_in_http_responses = methods()
             .that()
             .arePublic()
             .and()
             .areDeclaredInClassesThat()
             .areAnnotatedWith(RestController.class)
-            .should(new ArchCondition<>("not return JPA entities without @JsonView") {
+            .and()
+            .areDeclaredInClassesThat()
+            .doNotHaveSimpleName("E2eController")
+            .should(new ArchCondition<>("not expose JPA entities in HTTP responses") {
                 @Override
                 public void check(JavaMethod method, ConditionEvents events) {
-                    JavaClass retorno = method.getRawReturnType();
-                    boolean retornaEntidade = retorno.isAnnotatedWith(Entity.class);
-                    boolean possuiJsonView = method.isAnnotatedWith(JsonView.class);
-                    if (retornaEntidade && !possuiJsonView) {
+                    try {
+                        if (contémEntidadeJpa(method.reflect().getGenericReturnType())) {
+                            String mensagem = String.format(
+                                    "Método %s.%s expõe entidade JPA no retorno HTTP: %s",
+                                    method.getOwner().getSimpleName(), method.getName(), method.getDescription());
+                            events.add(SimpleConditionEvent.violated(method, mensagem));
+                        }
+                    } catch (Exception e) {
                         String mensagem = String.format(
-                                "Método %s.%s retorna entidade JPA (%s) sem @JsonView",
-                                method.getOwner().getSimpleName(), method.getName(), retorno.getSimpleName());
+                                "Não foi possível inspecionar o retorno de %s.%s: %s",
+                                method.getOwner().getSimpleName(), method.getName(), e.getMessage());
                         events.add(SimpleConditionEvent.violated(method, mensagem));
                     }
                 }
             })
-            .because("Entidades JPA só podem ser expostas em controllers com @JsonView explícito");
+            .because("Controllers devem responder com DTOs e nunca expor entidades JPA, mesmo dentro de ResponseEntity, List ou Page");
+
+    @ArchTest
+    static final ArchRule controllers_should_not_receive_jpa_entities_in_request_body = methods()
+            .that()
+            .arePublic()
+            .and()
+            .areDeclaredInClassesThat()
+            .areAnnotatedWith(RestController.class)
+            .and()
+            .areDeclaredInClassesThat()
+            .doNotHaveSimpleName("E2eController")
+            .should(new ArchCondition<>("not receive JPA entities in @RequestBody parameters") {
+                @Override
+                public void check(JavaMethod method, ConditionEvents events) {
+                    try {
+                        Method metodoRefletido = method.reflect();
+                        java.lang.reflect.Parameter[] parametros = metodoRefletido.getParameters();
+                        for (java.lang.reflect.Parameter parametro : parametros) {
+                            if (parametro.isAnnotationPresent(RequestBody.class)
+                                    && contémEntidadeJpa(parametro.getParameterizedType())) {
+                                String mensagem = String.format(
+                                        "Método %s.%s recebe entidade JPA em @RequestBody: %s",
+                                        method.getOwner().getSimpleName(),
+                                        method.getName(),
+                                        parametro.getParameterizedType().getTypeName());
+                                events.add(SimpleConditionEvent.violated(method, mensagem));
+                            }
+                        }
+                    } catch (Exception e) {
+                        String mensagem = String.format(
+                                "Não foi possível inspecionar os parâmetros de %s.%s: %s",
+                                method.getOwner().getSimpleName(), method.getName(), e.getMessage());
+                        events.add(SimpleConditionEvent.violated(method, mensagem));
+                    }
+                }
+            })
+            .because("Controllers devem receber DTOs/requests explícitos, não entidades JPA no corpo HTTP");
+
+    @ArchTest
+    static final ArchRule controllers_should_not_use_json_view_except_e2e = noMethods()
+            .that()
+            .areDeclaredInClassesThat()
+            .areAnnotatedWith(RestController.class)
+            .and()
+            .areDeclaredInClassesThat()
+            .doNotHaveSimpleName("E2eController")
+            .should()
+            .beAnnotatedWith(JsonView.class)
+            .because("Controllers da aplicação devem usar DTOs explícitos; @JsonView fica restrito ao adapter interno de E2E");
 
     /**
      * Garante nomenclatura consistente de Controllers.
@@ -213,4 +267,42 @@ public class ArchConsistencyTest {
             .should()
             .beFreeOfCycles()
             .allowEmptyShould(true);
+
+    private static boolean contémEntidadeJpa(Type tipo) {
+        if (tipo instanceof Class<?> classe) {
+            return classe.isAnnotationPresent(Entity.class);
+        }
+
+        if (tipo instanceof ParameterizedType parameterizedType) {
+            if (contémEntidadeJpa(parameterizedType.getRawType())) {
+                return true;
+            }
+            for (Type argumento : parameterizedType.getActualTypeArguments()) {
+                if (contémEntidadeJpa(argumento)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        if (tipo instanceof WildcardType wildcardType) {
+            for (Type upperBound : wildcardType.getUpperBounds()) {
+                if (contémEntidadeJpa(upperBound)) {
+                    return true;
+                }
+            }
+            for (Type lowerBound : wildcardType.getLowerBounds()) {
+                if (contémEntidadeJpa(lowerBound)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        if (tipo instanceof GenericArrayType genericArrayType) {
+            return contémEntidadeJpa(genericArrayType.getGenericComponentType());
+        }
+
+        return false;
+    }
 }
