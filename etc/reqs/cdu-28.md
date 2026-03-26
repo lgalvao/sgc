@@ -8,13 +8,13 @@
 
 ## Fluxo principal
 
-1. ADMIN clica em `Unidade` no menu (este é o comando equivalente a `Minha unidade`, visto por outros perfis).
+1. ADMIN clica em `Unidades` no menu (este é o comando equivalente a `Minha unidade`, visto por outros perfis).
 
-2. Sistema mostra a árvore completa de unidades.
+2. Sistema mostra a árvore de unidades.
 
-3. ADMIN clica em umas das unidades.
+3. ADMIN clica em uma das unidades.
 
-4. Sistema mostra a pagina `Detalhes da unidade`
+4. Sistema mostra a página `Detalhes da unidade`
 
 5. ADMIN clica no botão `Criar atribuição`.
 
@@ -26,7 +26,7 @@
     - `Justificativa`
     - Botões `Confirmar` e `Cancelar`
 
-7. ADMIN seleciona o servidor, define as datas e inclui uma justificativa. Todos os campos *são obrigatórios*.
+7. ADMIN seleciona o servidor, define as datas e inclui uma justificativa. Todos os campos são obrigatórios.
 
 8. Sistema registra internamente a atribuição temporária e mostra uma confirmação "Atribuição criada".
 
@@ -38,19 +38,12 @@
    Prezado(a) [NOME_SERVIDOR],
 
    Foi registrada uma atribuição temporária de perfil de CHEFE para você na unidade [SIGLA_UNIDADE].
+
    Período: [DATA_INICIO] a [DATA_TERMINO].
+
    Justificativa: [JUSTIFICATIVA].
 
    Acesse o sistema em: [URL_SISTEMA].
    ```
 
-10. O sistema cria internamente um alerta para o usuário:
-
-    - `Descrição`: "Atribuição temporária de perfil de CHEFE na unidade [SIGLA_UNIDADE]"
-    - `Processo`: (Vazio)
-    - `Data/hora`: Data/hora atual
-    - `Unidade de origem`: ADMIN
-    - `Usuário destino`: [USUARIO_SERVIDOR]
-
-11. O usuário que recebe a atribuição temporária passa a ter os mesmos direitos do perfil CHEFE. A atribuição temporária
-    terá prioridade sobre os dados de titularidade lidos do SGRH (atraves das views).
+10. O usuário que recebe a atribuição temporária passa a ter os mesmos direitos do perfil CHEFE. A atribuição temporária será calculada de forma transparente pelas views e banco de dados e já refletida ao acessar perfis e unidades.

@@ -7,7 +7,6 @@ test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
     const TITULO_USUARIO_ALVO = '232323';
     const NOME_USUARIO_ALVO = 'Bon Jovi';
     const PERFIL_TEMPORARIO = 'CHEFE - ASSESSORIA_11';
-    const DESCRICAO_ALERTA = `Atribuição temporária de perfil de CHEFE na unidade ${SIGLA_UNIDADE}`;
 
     async function acessarUnidadeAlvo(page: import('@playwright/test').Page) {
         await expect(page.getByTestId('link-arvore-unidade-SECRETARIA_1')).toBeVisible();
@@ -84,7 +83,7 @@ test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
         await expect(page.getByRole('heading', {name: new RegExp(SIGLA_UNIDADE)})).toBeVisible();
     });
 
-    test('Cenario 5: ADMIN cria atribuição e usuário destino recebe alerta e perfil temporário', async ({_resetAutomatico, _autenticadoComoAdmin, page}) => {
+    test('Cenario 5: ADMIN cria atribuição e usuário destino recebe perfil temporário', async ({_resetAutomatico, _autenticadoComoAdmin, page}) => {
         await abrirTelaCriacaoAtribuicao(page);
 
         await selecionarUsuarioAlvo(page);
@@ -97,14 +96,5 @@ test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
 
         await loginComPerfil(page, TITULO_USUARIO_ALVO, 'senha', PERFIL_TEMPORARIO);
         await expect(page.locator('.user-info-text')).toContainText(PERFIL_TEMPORARIO);
-
-        const tabelaAlertas = page.getByTestId('tbl-alertas');
-        await expect(tabelaAlertas).toBeVisible();
-
-        const linhaAlerta = tabelaAlertas.locator('tr', {hasText: DESCRICAO_ALERTA}).first();
-        await expect(linhaAlerta).toBeVisible();
-        await expect(linhaAlerta.locator('td').nth(1)).toContainText(DESCRICAO_ALERTA);
-        await expect(linhaAlerta.locator('td').nth(2)).toHaveText('');
-        await expect(linhaAlerta.locator('td').nth(3)).toHaveText('ADMIN');
     });
 });
