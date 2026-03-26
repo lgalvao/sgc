@@ -2,6 +2,21 @@
 
 Esta versão substitui a rodada anterior e consolida pendências após segunda varredura com leitura de specs e helpers.
 
+## Andamento da execução (2026-03-26)
+- ✅ **Lote multi-CDU concluído** com foco em relatórios: **CDU-35 (Andamento de processo)** e **CDU-36 (Mapas)**.
+- ✅ CDU-35 reforçado com validações explícitas de fluxo ponta a ponta: acesso em `Relatórios`, seleção obrigatória de processo, geração da tabela e presença dos campos-chave do relatório (`Sigla`, `Nome`, `Situação`, `Data`, `Responsável`, `Titular`).
+- ✅ CDU-35 ampliado também com evidência de exportação: clique no botão `PDF` e validação do nome de arquivo baixado (`relatorio-andamento-{codigo}.pdf`).
+- ✅ CDU-36 evoluído para cobrir melhor a etapa de filtros: validação dos campos `Selecione o Processo` e `Selecione a unidade`, estado inicial desabilitado de `Gerar PDF` e habilitação após seleção do processo.
+- ✅ CDU-36 ganhou verificação explícita de comportamento do filtro opcional de unidade no request de geração: sem `unidadeId` quando o valor permanece em `Todas as unidades`.
+- ✅ Execução de regressão direcionada validada com sucesso para os dois specs alterados (`e2e/cdu-35.spec.ts` e `e2e/cdu-36.spec.ts`).
+- 🔄 Próximo passo sugerido: avançar na cobertura de conteúdo semântico do PDF de mapas (competências/atividades/conhecimentos) com estratégia híbrida (assert de backend + smoke de download no E2E).
+
+## Novos aprendizados (rodada 2026-03-26)
+- Para CDU-35, validar somente “tabela visível” é frágil; a cobertura fica mais robusta quando inclui cabeçalhos funcionais e pelo menos uma linha com padrões esperados de data/situação.
+- Em telas com dois blocos de relatório, escopar seletores pelo `tabpanel` reduz ambiguidade entre campos iguais (ex.: `Selecione o Processo` em duas abas).
+- No CDU-36, o requisito de unidade opcional pode ser coberto sem fixture extra ao validar o request emitido sem querystring `unidadeId` quando a opção padrão é mantida.
+- Para comprovar exportação E2E sem acoplamento à implementação interna, a dupla `waitForEvent('download')` + asserção de `suggestedFilename` entrega evidência objetiva e estável.
+
 ## Andamento da execução (2026-03-25)
 - ✅ **Lote iniciado** com foco no **CDU-02 (Visualizar painel)**, priorizando item P0 de campos da tabela de processos ativos.
 - ✅ Adicionada cobertura E2E explícita para validar cabeçalhos obrigatórios da tabela do painel compacto (`Descrição`, `Tipo`, `Unidades`, `Situação`) e presença dos dados recém-criados na mesma linha.
