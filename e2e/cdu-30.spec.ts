@@ -24,6 +24,12 @@ test.describe.serial('CDU-30 - Manter administradores', () => {
         const tabela = page.locator('main table');
         await expect(tabela).toBeVisible();
 
+        await expect(tabela.locator('th', {hasText: TEXTOS.administracao.CAMPO_NOME})).toBeVisible();
+        await expect(tabela.locator('th', {hasText: TEXTOS.administracao.CAMPO_TITULO})).toBeVisible();
+        await expect(tabela.locator('th', {hasText: TEXTOS.administracao.CAMPO_MATRICULA})).toBeVisible();
+        await expect(tabela.locator('th', {hasText: TEXTOS.administracao.CAMPO_UNIDADE})).toBeVisible();
+        await expect(tabela.locator('th', {hasText: TEXTOS.administracao.CAMPO_ACOES})).toBeVisible();
+
         // Deve exibir pelo menos o próprio admin logado
         await expect(tabela.locator('tbody tr')).not.toHaveCount(0);
 
@@ -75,5 +81,27 @@ test.describe.serial('CDU-30 - Manter administradores', () => {
 
         await expect(modal).toBeHidden();
         await expect(tabela.getByText(NOME_NOVO_ADMIN)).toBeHidden();
+    });
+
+    test('Cenário 4: ADMIN tenta adicionar sem título e sistema valida campo obrigatório', async ({
+                                                                                                      _resetAutomatico,
+                                                                                                      page,
+                                                                                                      _autenticadoComoAdmin
+}) => {
+        await page.getByTestId('btn-administradores').click();
+        await expect(page).toHaveURL(/\/administradores/);
+
+        await page.getByRole('button', {name: TEXTOS.administracao.BOTAO_ADICIONAR}).click();
+        const modal = page.getByRole('dialog');
+        await expect(modal).toBeVisible();
+
+        await expect(modal.getByRole('button', {name: /Cancelar/i})).toBeVisible();
+        const botaoConfirmar = modal.getByRole('button', {name: /Adicionar|Criar/i});
+        await expect(botaoConfirmar).toBeVisible();
+        await modal.getByPlaceholder(TEXTOS.administracao.PLACEHOLDER_TITULO).fill('   ');
+        await botaoConfirmar.click();
+        await expect(page).toHaveURL(/\/administradores/);
+        await expect(modal).toBeVisible();
+        await expect(page.locator('main table tbody tr')).not.toHaveCount(0);
     });
 });

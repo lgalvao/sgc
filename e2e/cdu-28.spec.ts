@@ -25,6 +25,13 @@ test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
         await page.getByTestId('unidade-view__btn-criar-atribuicao').click();
         await expect(page).toHaveURL(/\/unidade\/\d+\/atribuicao$/);
 
+        await expect(page.getByTestId('input-busca-usuario')).toBeVisible();
+        await expect(page.getByTestId('input-data-inicio')).toBeVisible();
+        await expect(page.getByTestId('input-data-termino')).toBeVisible();
+        await expect(page.getByTestId('textarea-justificativa')).toBeVisible();
+        await expect(page.getByTestId('btn-cancelar-atribuicao')).toBeVisible();
+        await expect(page.getByTestId('cad-atribuicao__btn-criar-atribuicao')).toBeVisible();
+
         // Preenche campos
         await page.getByTestId('input-busca-usuario').fill('Admin');
         // Aguarda e seleciona o primeiro resultado da lista de pesquisa
@@ -56,5 +63,19 @@ test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
         await page.getByTestId('cad-atribuicao__btn-criar-atribuicao').click();
 
         await expect(page.getByText(/Atribuição criada/i).first()).toBeVisible();
+    });
+
+    test('Cenario 4: ADMIN cancela criação e retorna para detalhes da unidade', async ({
+                                                                                           _resetAutomatico,
+                                                                                           _autenticadoComoAdmin,
+                                                                                           page
+}) => {
+        await acessarUnidadeAlvo(page);
+        await page.getByTestId('unidade-view__btn-criar-atribuicao').click();
+        await expect(page).toHaveURL(/\/unidade\/\d+\/atribuicao$/);
+
+        await page.getByTestId('btn-cancelar-atribuicao').click();
+        await expect(page).toHaveURL(/\/unidade\/\d+$/);
+        await expect(page.getByRole('heading', {name: new RegExp(SIGLA_UNIDADE)})).toBeVisible();
     });
 });
