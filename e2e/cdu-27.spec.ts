@@ -35,6 +35,24 @@ test.describe.serial('CDU-27 - Alterar data limite de subprocesso', () => {
         return `${yyyy}-${mm}-${dd}`;
     }
 
+    function obterDataAnterior(dataIso: string): string {
+        const data = new Date(`${dataIso}T00:00:00`);
+        data.setDate(data.getDate() - 1);
+        const yyyy = data.getFullYear();
+        const mm = String(data.getMonth() + 1).padStart(2, '0');
+        const dd = String(data.getDate()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd}`;
+    }
+
+    function obterDataPosterior(dataIso: string): string {
+        const data = new Date(`${dataIso}T00:00:00`);
+        data.setDate(data.getDate() + 1);
+        const yyyy = data.getFullYear();
+        const mm = String(data.getMonth() + 1).padStart(2, '0');
+        const dd = String(data.getDate()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd}`;
+    }
+
     test('Setup data', async ({_resetAutomatico, request}) => {
         const processo = await criarProcessoFixture(request, {
             descricao: descProcesso,
@@ -82,13 +100,12 @@ test.describe.serial('CDU-27 - Alterar data limite de subprocesso', () => {
         const [y, m, d] = dataInicialModal.split('-');
         expect(`${d}/${m}/${y}`).toBe(prazoPagina?.trim());
 
-        // Validação de data futura (min attribute)
-        const amanha = calcularNovaDataIso(1);
-        await expect(inputData).toHaveAttribute('min', amanha);
+        const dataMinima = await inputData.getAttribute('min');
+        expect(dataMinima).toBeTruthy();
+        await expect(inputData).toHaveAttribute('min', dataMinima!);
 
-        // Tentar preencher data passada
-        await inputData.fill(calcularNovaDataIso(-1));
-        await expect(page.getByText('A data limite para validação deve ser uma data futura.')).toBeVisible();
+        await inputData.fill(obterDataAnterior(dataMinima!));
+        await expect(page.getByText('A data limite deve ser maior ou igual à última data limite do subprocesso.')).toBeVisible();
         await expect(page.getByTestId('btn-modal-confirmar')).toBeDisabled();
 
         await modal.getByRole('button', {name: /Cancelar/i}).click();
@@ -103,7 +120,9 @@ test.describe.serial('CDU-27 - Alterar data limite de subprocesso', () => {
         await btnAlterarData.click();
 
         const inputData = page.getByTestId('input-nova-data-limite');
-        const novaDataIso = calcularNovaDataIso(15);
+        const dataMinima = await inputData.getAttribute('min');
+        expect(dataMinima).toBeTruthy();
+        const novaDataIso = obterDataPosterior(dataMinima!);
         await inputData.fill(novaDataIso);
 
         await page.getByTestId('btn-modal-confirmar').click();

@@ -658,6 +658,11 @@ public class SubprocessoTransicaoService {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
         SituacaoSubprocesso s = sp.getSituacao();
         String situacaoSp = s.name();
+        LocalDate ultimaDataLimite = obterUltimaDataLimite(sp);
+
+        if (ultimaDataLimite != null && novaDataLimite.isBefore(ultimaDataLimite)) {
+            throw new sgc.comum.erros.ErroValidacao(Mensagens.DATA_LIMITE_MAIOR_OU_IGUAL_ULTIMA_DATA_SUBPROCESSO);
+        }
 
         LocalDateTime dataLimiteEtapa1 = novaDataLimite.atStartOfDay();
         if (situacaoSp.contains("CADASTRO")) {

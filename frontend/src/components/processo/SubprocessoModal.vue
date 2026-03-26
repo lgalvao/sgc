@@ -72,6 +72,7 @@ import {
 interface Props {
   mostrarModal: boolean;
   dataLimiteAtual: Date | null;
+  ultimaDataLimiteSubprocesso: Date | null;
   etapaAtual: number | null;
   loading?: boolean;
 }
@@ -90,13 +91,28 @@ const erroLocalDataLimite = ref("");
 
 watch(novaDataLimite, (novaData) => {
   erroLocalDataLimite.value = "";
-  if (novaData && novaData.length === 10 && !isDateStrictlyFuture(parseDate(novaData))) {
+  if (!novaData || novaData.length !== 10) {
+    return;
+  }
+  if (!isDateStrictlyFuture(parseDate(novaData))) {
     erroLocalDataLimite.value = "A data limite para validação deve ser uma data futura.";
+    return;
+  }
+  if (dataLimiteMinimaPorUltimaData.value && novaData < dataLimiteMinimaPorUltimaData.value) {
+    erroLocalDataLimite.value = "A data limite deve ser maior ou igual à última data limite do subprocesso.";
   }
 });
 
+const dataLimiteMinimaPorUltimaData = computed(() => {
+  if (!props.ultimaDataLimiteSubprocesso) return "";
+  return formatDateForInput(props.ultimaDataLimiteSubprocesso);
+});
+
 const dataLimiteMinima = computed(() => {
-  return obterAmanhaFormatado();
+  const amanha = obterAmanhaFormatado();
+  const ultimaDataLimite = dataLimiteMinimaPorUltimaData.value;
+  if (!ultimaDataLimite) return amanha;
+  return ultimaDataLimite > amanha ? ultimaDataLimite : amanha;
 });
 
 const dataLimiteAtualFormatada = computed(() => {
@@ -105,7 +121,8 @@ const dataLimiteAtualFormatada = computed(() => {
 
 const isDataValida = computed(() => {
   if (!novaDataLimite.value) return false;
-  return isDateValidAndFuture(parseDate(novaDataLimite.value));
+  if (!isDateValidAndFuture(parseDate(novaDataLimite.value))) return false;
+  return !dataLimiteMinimaPorUltimaData.value || novaDataLimite.value >= dataLimiteMinimaPorUltimaData.value;
 });
 
 watch(

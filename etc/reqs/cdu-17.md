@@ -18,44 +18,40 @@
 
 4. O sistema mostra a tela `Detalhes de subprocesso`.
 
-5. O usuário clica no card `Mapa de Competências`.
+5. O usuário clica no card `Mapa de competências`.
 
 6. O sistema mostra a tela `Edição de mapa` preenchida com os dados do mapa de competências da unidade.
 
-7. O usuário clica no botão `Disponibilizar`.
+7. O sistema verifica:
+   - se todas as competências criadas estão associadas a pelo menos uma atividade do cadastro da unidade; 
+   - se todas as atividades foram associadas a pelo menos uma competência;
 
-8. O sistema verifica se todas as competências criadas estão associadas a pelo menos uma atividade do cadastro da unidade.
+   Caso positivo, o sistema habilita o botão `Disponibilizar`. Se alguma das validações falhar, o botão permanecerá desabilitado. 
 
-   8.1. Caso negativo, o sistema interrompe a disponibilização do mapa e informa em mensagem de erro quais competências ainda permanecem sem associação.
+8. O usuário clica no botão `Disponibilizar`.
 
-9. O sistema verifica se todas as atividades foram associadas a pelo menos uma competência.
+9. O sistema mostra um modal com título "Disponibilização do mapa de competências", e os seguintes elementos:
+   
+   - Campo `Data limite`: de preenchimento obrigatório, para a Data limite para a validação do mapa
+   - Campo `Observações`: de preenchimento opcional
+   - Botões `Disponibilizar` e `Cancelar`.
 
-   9.1. Caso negativo, o sistema interrompe a disponibilização do mapa e informa em mensagem de erro quais atividades
-   ainda estão sem associação a competências.
+10. Caso o usuário escolha `Cancelar`, o sistema interrompe a operação de disponibilização do mapa, permanecendo na tela `Edição de mapa`.
 
-10. O sistema mostra um modal com as seguintes características:
+11. O usuário preenche as informações dos campos do modal e clica no botão `Disponibilizar`.
 
-    - `Título`: 'Disponibilização do mapa de competências'
-    - `Data`: de preenchimento obrigatório, para armazenar a Data limite para a validação do mapa
-    - `Observações`: de preenchimento opcional
-    - Botões `Disponibilizar` e `Cancelar`.
+12. O sistema registra a informação do campo `Observações` no mapa do subprocesso e a informação do campo `Data limite` para a validação do mapa na data limite da etapa 2 do subprocesso.
 
-11. Caso o usuário escolha `Cancelar`, o sistema interrompe a operação de disponibilização do mapa, permanecendo na tela `Edição de mapa`.
+13. O sistema altera a situação do subprocesso da unidade para 'Mapa disponibilizado'.
 
-12. O usuário preenche as informações dos campos do modal e clica no botão `Disponibilizar`.
-
-13. O sistema registra a informação do campo `Observações` no mapa do subprocesso e a informação do campo `Data limite` para a validação do mapa na data limite da etapa 2 do subprocesso.
-
-14. O sistema altera a situação do subprocesso da unidade para 'Mapa disponibilizado'.
-
-15. O sistema registra uma movimentação para o subprocesso com os campos:
+14. O sistema registra uma movimentação para o subprocesso com os campos:
 
     - `Data/hora`: Data/hora atual
     - `Unidade origem`: ADMIN
     - `Unidade destino`: [SIGLA_UNIDADE_SUBPROCESSO]
     - `Descrição`: 'Disponibilização do mapa de competências'
 
-16. O sistema notifica a unidade do subprocesso quanto à disponibilização, com e-mail no modelo abaixo:
+15. O sistema notifica a unidade do subprocesso quanto à disponibilização, com e-mail no modelo abaixo:
 
     ```text
     Assunto: SGC: Mapa de competências disponibilizado
@@ -67,7 +63,7 @@
     A validação deste mapa já pode ser realizada no O sistema de Gestão de Competências ([URL_SISTEMA]). O prazo para conclusão desta etapa do processo é [DATA_LIMITE].
     ```
 
-17. O sistema notifica as unidades superiores da unidade do subprocesso quanto à disponibilização, com e-mail no modelo
+16. O sistema notifica as unidades superiores da unidade do subprocesso quanto à disponibilização, com e-mail no modelo
     abaixo:
 
     ```text
@@ -81,7 +77,7 @@
     A validação deste mapa já pode ser realizada no O sistema de Gestão de Competências ([URL_SISTEMA]). O prazo para conclusão desta etapa do processo é [DATA_LIMITE].
     ```
 
-18. O sistema cria internamente um alerta:
+17. O sistema cria internamente um alerta:
 
     - `Descrição`: "Mapa de competências da unidade  [SIGLA_UNIDADE_SUBPROCESSO] disponibilizado para análise"
     - `Processo`: [DESCRICAO_PROCESSO]
@@ -89,6 +85,6 @@
     - `Unidade de origem`: ADMIN
     - `Unidade de destino`: [SIGLA_UNIDADE_SUBPROCESSO].
 
-19. O sistema exclui as sugestões apresentadas do mapa de competência do subprocesso da unidade.
+18. O sistema exclui as sugestões apresentadas do mapa de competência do subprocesso da unidade.
 
-20. O sistema redireciona para o `Painel` e mostra confirmação: "Disponibilização do mapa de competências efetuada".
+19. O sistema redireciona para o `Painel` e mostra confirmação: "Disponibilização do mapa de competências efetuada".

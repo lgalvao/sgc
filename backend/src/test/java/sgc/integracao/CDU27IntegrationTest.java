@@ -18,6 +18,7 @@ import java.time.*;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.hamcrest.Matchers.containsString;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -157,5 +158,21 @@ class CDU27IntegrationTest extends BaseIntegrationTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("Não deve permitir alterar data limite para data menor que a última data limite do subprocesso")
+    @WithMockAdmin
+    void alterarDataLimite_dataMenorQueUltimaDataLimite_erro() throws Exception {
+        LocalDate novaData = subprocesso.getDataLimiteEtapa1().toLocalDate().minusDays(1);
+        DataRequest request = new DataRequest(novaData);
+
+        mockMvc.perform(
+                        post("/api/subprocessos/{codigo}/data-limite", subprocesso.getCodigo())
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isUnprocessableContent())
+                .andExpect(content().string(containsString("A data limite deve ser maior ou igual à última data limite do subprocesso.")));
     }
 }
