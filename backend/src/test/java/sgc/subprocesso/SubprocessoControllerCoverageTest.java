@@ -13,8 +13,10 @@ import sgc.comum.ComumDtos.*;
 import sgc.comum.erros.*;
 import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
+import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
+import sgc.processo.model.*;
 import sgc.seguranca.*;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
@@ -164,19 +166,22 @@ class SubprocessoControllerCoverageTest {
     @DisplayName("obterContextoEdicao - deve retornar contexto e 200")
     @WithMockUser
     void obterContextoEdicao() throws Exception {
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(10L);
+        unidade.setSigla("UND");
+        unidade.setNome("Unidade teste");
+
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setCodigo(1L);
+        subprocesso.setUnidade(unidade);
+
         when(permissionEvaluator.hasPermission(any(), eq(1L), eq("Subprocesso"), eq("VISUALIZAR_SUBPROCESSO"))).thenReturn(true);
         when(subprocessoService.obterContextoEdicao(1L)).thenReturn(
             new ContextoEdicaoResponse(
-                    new sgc.organizacao.model.Unidade(),
-                    new Subprocesso(),
-                    new SubprocessoDetalheResponse(
-                            new Subprocesso(),
-                            new ResponsavelDto(new Usuario(), "RESPONSAVEL", LocalDateTime.now(), LocalDateTime.now().plusDays(1)),
-                            new Usuario(),
-                            List.of(),
-                            "SIGLA",
-                            PermissoesSubprocessoDto.builder().build()),
-                    new Mapa(),
+                    unidade,
+                    subprocesso,
+                    null,
+                    null,
                     List.of())
         );
 

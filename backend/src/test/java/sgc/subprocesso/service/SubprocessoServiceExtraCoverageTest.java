@@ -49,6 +49,8 @@ class SubprocessoServiceExtraCoverageTest {
     private HierarquiaService hierarquiaService;
     @Mock
     private CopiaMapaService copiaMapaService;
+    @Mock
+    private SubprocessoValidacaoService validacaoService;
 
     @InjectMocks
     private SubprocessoService subprocessoService;
