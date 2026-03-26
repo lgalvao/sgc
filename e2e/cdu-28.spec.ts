@@ -7,11 +7,46 @@ test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
     const TITULO_USUARIO_ALVO = '232323';
     const NOME_USUARIO_ALVO = 'Bon Jovi';
     const PERFIL_TEMPORARIO = 'CHEFE - ASSESSORIA_11';
+    const SIGLAS_SUBARVORE_SECRETARIA_1 = [
+        'ASSESSORIA_11',
+        'ASSESSORIA_12',
+        'COORD_11',
+        'COORD_12'
+    ];
+    const SIGLAS_SUBARVORE_SECRETARIA_2 = [
+        'ASSESSORIA_21',
+        'ASSESSORIA_22',
+        'COORD_21',
+        'COORD_22'
+    ];
+    const SIGLAS_SUBARVORE_SECRETARIA_3 = [
+        'ASSESSORIA_31',
+        'ASSESSORIA_32',
+        'COORD_31',
+        'COORD_32'
+    ];
+
+    async function validarRamoUnidade(
+        page: import('@playwright/test').Page,
+        siglaRamo: string,
+        siglasFilhas: string[]
+    ) {
+        await expect(page.getByTestId(`link-arvore-unidade-${siglaRamo}`)).toBeVisible();
+        const primeiraFilha = page.getByTestId(`link-arvore-unidade-${siglasFilhas[0]}`);
+        if (!(await primeiraFilha.isVisible())) {
+            await page.getByTestId(`btn-arvore-expand-${siglaRamo}`).click();
+        }
+        for (const siglaFilha of siglasFilhas) {
+            await expect(page.getByTestId(`link-arvore-unidade-${siglaFilha}`)).toBeVisible();
+        }
+    }
 
     async function acessarUnidadeAlvo(page: import('@playwright/test').Page) {
         await expect(page.getByTestId('link-arvore-unidade-SECRETARIA_1')).toBeVisible();
         await expect(page.getByTestId('link-arvore-unidade-SECRETARIA_2')).toBeVisible();
-        await page.getByTestId('btn-arvore-expand-SECRETARIA_1').click();
+        if (!(await page.getByTestId(`link-arvore-unidade-${SIGLA_UNIDADE}`).isVisible())) {
+            await page.getByTestId('btn-arvore-expand-SECRETARIA_1').click();
+        }
         await expect(page.getByTestId(`link-arvore-unidade-${SIGLA_UNIDADE}`)).toBeVisible();
         await page.getByTestId(`link-arvore-unidade-${SIGLA_UNIDADE}`).click();
     }
@@ -39,6 +74,15 @@ test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
     });
 
     test('Cenario 1: ADMIN navega pela árvore e acessa detalhes da unidade', async ({_resetAutomatico, _autenticadoComoAdmin, page}) => {
+        await validarRamoUnidade(page, 'SECRETARIA_1', SIGLAS_SUBARVORE_SECRETARIA_1);
+        await validarRamoUnidade(page, 'SECRETARIA_2', SIGLAS_SUBARVORE_SECRETARIA_2);
+        await validarRamoUnidade(page, 'SECRETARIA_3', SIGLAS_SUBARVORE_SECRETARIA_3);
+
+        await page.getByTestId('btn-arvore-expand-COORD_11').click();
+        await expect(page.getByTestId('link-arvore-unidade-SECAO_111')).toBeVisible();
+        await expect(page.getByTestId('link-arvore-unidade-SECAO_112')).toBeVisible();
+        await expect(page.getByTestId('link-arvore-unidade-SECAO_113')).toBeVisible();
+
         await acessarUnidadeAlvo(page);
 
         await expect(page).toHaveURL(/\/unidade\/\d+$/);
