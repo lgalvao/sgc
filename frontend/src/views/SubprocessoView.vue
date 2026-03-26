@@ -177,6 +177,7 @@
       :etapa-atual="subprocesso?.etapaAtual || null"
       :loading="loading.isLoading('dataLimite')"
       :mostrar-modal="modals.isOpen('alterarDataLimite')"
+      :ultima-data-limite-subprocesso="subprocesso?.ultimaDataLimiteSubprocesso ? parseDate(subprocesso.ultimaDataLimiteSubprocesso) : null"
       @fechar-modal="fecharModalAlterarDataLimite"
       @confirmar-alteracao="confirmarAlteracaoDataLimite"
   />

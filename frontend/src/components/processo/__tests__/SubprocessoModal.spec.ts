@@ -21,6 +21,7 @@ describe('SubprocessoModal.vue', () => {
     const propsPadrao = {
         mostrarModal: true,
         dataLimiteAtual: new Date('2026-03-24'),
+        ultimaDataLimiteSubprocesso: new Date('2026-03-24'),
         etapaAtual: 1
     };
 
@@ -44,5 +45,16 @@ describe('SubprocessoModal.vue', () => {
         
         const btn = wrapper.find('[data-testid="btn-modal-confirmar"]');
         expect((btn.element as HTMLButtonElement).disabled).toBe(true);
+    });
+
+    it('deve usar a última data limite do subprocesso como mínimo quando ela for maior que amanhã', () => {
+        const wrapper = mount(SubprocessoModal, {
+            props: {
+                ...propsPadrao,
+                ultimaDataLimiteSubprocesso: new Date('2026-03-30T12:00:00')
+            }
+        });
+        const input = wrapper.find('[data-testid="input-nova-data-limite"]');
+        expect(input.attributes('min')).toBe('2026-03-30');
     });
 });
