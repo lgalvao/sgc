@@ -151,6 +151,7 @@ test.describe.serial('CDU-13 - Cancelamentos de análise', () => {
             unidade: UNIDADE_ALVO
         });
         descProcessoCancelamento = processo.descricao;
+        expect(descProcessoCancelamento).toBeDefined();
     });
 
     test('GESTOR cancela devolução e permanece na tela de atividades e conhecimentos', async ({_resetAutomatico, page}) => {

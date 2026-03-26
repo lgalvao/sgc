@@ -15,7 +15,7 @@ async function main() {
     if (!skipRun) {
         console.log('🚀 [1/3] Atualizando relatório JaCoCo via Gradle...');
         try { execSync(GRADLE_CMD, { cwd: BASE_DIR, stdio: 'inherit' }); } 
-        catch (error) { console.warn('⚠️  [Aviso] Gradle reportou erros, mas prosseguindo...'); }
+        catch { console.warn('⚠️  [Aviso] Gradle reportou erros, mas prosseguindo...'); }
     }
     if (!fs.existsSync(REPORT_PATH)) { console.error('❌ Relatório não encontrado'); process.exit(1); }
     const data = fs.readFileSync(REPORT_PATH);
