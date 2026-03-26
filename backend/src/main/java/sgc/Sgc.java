@@ -12,7 +12,7 @@ import org.springframework.scheduling.annotation.*;
         "org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration"
 })
 public class Sgc {
-    public static void main(String[] args) {
+    static void main(String[] args) {
         SpringApplication.run(Sgc.class, args);
     }
 }

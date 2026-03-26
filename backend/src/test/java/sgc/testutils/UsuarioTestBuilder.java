@@ -10,7 +10,7 @@ import sgc.organizacao.model.*;
 public class UsuarioTestBuilder {
     private String tituloEleitoral = "999999";
     private String nome = "Usuário de Teste";
-    private Unidade unidadeLotacao = null;
+    private final Unidade unidadeLotacao = null;
 
     public static UsuarioTestBuilder umDe() {
         return new UsuarioTestBuilder();

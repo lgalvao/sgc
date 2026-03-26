@@ -6,7 +6,6 @@ import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
 import org.springframework.http.*;
-import sgc.organizacao.*;
 import sgc.seguranca.*;
 import sgc.seguranca.dto.*;
 

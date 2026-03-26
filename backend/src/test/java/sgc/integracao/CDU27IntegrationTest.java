@@ -15,7 +15,7 @@ import sgc.processo.model.*;
 import sgc.subprocesso.model.*;
 
 import java.time.*;
-import java.util.List;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;

@@ -1,7 +1,11 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {login, USUARIOS} from './helpers/helpers-auth.js';
 import {fazerLogout} from './helpers/helpers-navegacao.js';
-import {criarProcesso, verificarCabecalhosTabelaProcessos, verificarProcessoNaTabela} from './helpers/helpers-processos.js';
+import {
+    criarProcesso,
+    verificarCabecalhosTabelaProcessos,
+    verificarProcessoNaTabela
+} from './helpers/helpers-processos.js';
 
 test.describe('CDU-02 - Visualizar painel', () => {
     test.describe('Como ADMIN', () => {

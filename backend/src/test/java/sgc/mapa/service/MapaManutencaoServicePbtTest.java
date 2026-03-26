@@ -5,7 +5,7 @@ import sgc.comum.erros.*;
 import sgc.comum.model.*;
 import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
-import sgc.subprocesso.service.SubprocessoSituacaoService;
+import sgc.subprocesso.service.*;
 
 import java.util.*;
 

@@ -4,7 +4,6 @@ import {limparNotificacoes, verificarPaginaPainel, verificarToast} from './helpe
 import {TEXTOS} from '../../frontend/src/constants/textos.js';
 
 
-
 export async function navegarParaMapa(page: Page) {
     // Aguardar o carregamento do subprocesso antes de verificar os cards
     await expect(page.getByTestId('header-subprocesso')).toBeVisible();
