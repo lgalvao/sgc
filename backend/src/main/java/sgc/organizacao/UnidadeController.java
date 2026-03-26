@@ -76,7 +76,6 @@ public class UnidadeController {
 
     @GetMapping("/{codUnidade}/usuarios")
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")
-    @JsonView(OrganizacaoViews.Publica.class)
     public ResponseEntity<List<UsuarioConsultaDto>> buscarUsuariosPorUnidade(@PathVariable Long codUnidade) {
         List<UsuarioConsultaDto> usuarios = usuarioService.buscarPorUnidadeLotacao(codUnidade).stream()
                 .map(UsuarioConsultaDto::fromEntity)

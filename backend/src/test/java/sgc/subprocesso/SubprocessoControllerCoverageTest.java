@@ -106,15 +106,26 @@ class SubprocessoControllerCoverageTest {
         CriarSubprocessoRequest req = new CriarSubprocessoRequest(1L, 10L, null, LocalDateTime.now(), LocalDateTime.now());
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(100L);
+        Processo processo = new Processo();
+        processo.setDescricao("Processo criado");
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(10L);
+        unidade.setSigla("UND");
+        unidade.setNome("Unidade teste");
+        unidade.setTipo(TipoUnidade.OPERACIONAL);
+        sp.setProcesso(processo);
+        sp.setUnidade(unidade);
 
         when(subprocessoService.criarEntidade(any())).thenReturn(sp);
+        when(subprocessoService.buscarSubprocesso(100L)).thenReturn(sp);
 
         mockMvc.perform(post("/api/subprocessos")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isCreated())
-                .andExpect(header().string("Location", "/api/subprocessos/100"));
+                .andExpect(header().string("Location", "/api/subprocessos/100"))
+                .andExpect(jsonPath("$.codigo").value(100L));
     }
 
     @Test
@@ -122,13 +133,27 @@ class SubprocessoControllerCoverageTest {
     @WithMockUser(roles = "ADMIN")
     void atualizar() throws Exception {
         AtualizarSubprocessoRequest req = new AtualizarSubprocessoRequest(10L, 20L, null, null, null, null);
-        when(subprocessoService.atualizarEntidade(eq(1L), any())).thenReturn(new Subprocesso());
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(10L);
+        unidade.setSigla("UND");
+        unidade.setNome("Unidade teste");
+        unidade.setTipo(TipoUnidade.OPERACIONAL);
+        Processo processo = new Processo();
+        processo.setDescricao("Processo atualizado");
+        Subprocesso atualizado = new Subprocesso();
+        atualizado.setCodigo(1L);
+        atualizado.setUnidade(unidade);
+        atualizado.setProcesso(processo);
+
+        when(subprocessoService.atualizarEntidade(eq(1L), any())).thenReturn(atualizado);
+        when(subprocessoService.buscarSubprocesso(1L)).thenReturn(atualizado);
 
         mockMvc.perform(post("/api/subprocessos/1/atualizar")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.codigo").value(1L));
     }
 
     @Test

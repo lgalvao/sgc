@@ -138,8 +138,8 @@ public class SubprocessoService {
 
     @Transactional
     public Subprocesso criarEntidade(CriarSubprocessoRequest request) {
-        Processo processo = Processo.builder().codigo(request.codProcesso()).build();
-        Unidade unidade = Unidade.builder().codigo(request.codUnidade()).build();
+        Processo processo = repo.buscar(Processo.class, request.codProcesso());
+        Unidade unidade = unidadeService.buscarPorCodigo(request.codUnidade());
 
         Subprocesso entity = Subprocesso.builder()
                 .processo(processo)
@@ -193,7 +193,11 @@ public class SubprocessoService {
     }
 
     private void processarAlteracoes(Subprocesso sp, AtualizarSubprocessoRequest request) {
-        Optional.of(request.codMapa()).ifPresent(cod -> {
+        Optional.ofNullable(request.codUnidade())
+                .map(unidadeService::buscarPorCodigo)
+                .ifPresent(sp::setUnidade);
+
+        Optional.ofNullable(request.codMapa()).ifPresent(cod -> {
             Mapa m = Mapa.builder().codigo(cod).build();
             Mapa mapa = sp.getMapa();
             Long codAtual = mapa != null ? mapa.getCodigo() : null;

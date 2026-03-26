@@ -69,20 +69,20 @@ public class SubprocessoController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    @JsonView(SubprocessoViews.Publica.class)
-    public ResponseEntity<Subprocesso> criar(@Valid @RequestBody CriarSubprocessoRequest request) {
+    public ResponseEntity<SubprocessoResumoDto> criar(@Valid @RequestBody CriarSubprocessoRequest request) {
         var salvo = subprocessoService.criarEntidade(request);
+        var subprocessoCriado = subprocessoService.buscarSubprocesso(salvo.getCodigo());
         URI uri = URI.create("/api/subprocessos/%d".formatted(salvo.getCodigo()));
-        return ResponseEntity.created(uri).body(salvo);
+        return ResponseEntity.created(uri).body(SubprocessoResumoDto.fromEntity(subprocessoCriado));
     }
 
     @PostMapping("/{codSubprocesso}/atualizar")
     @PreAuthorize("hasRole('ADMIN')")
-    @JsonView(SubprocessoViews.Publica.class)
-    public ResponseEntity<Subprocesso> atualizar(
+    public ResponseEntity<SubprocessoResumoDto> atualizar(
             @PathVariable Long codSubprocesso, @Valid @RequestBody AtualizarSubprocessoRequest request) {
-        var atualizado = subprocessoService.atualizarEntidade(codSubprocesso, request);
-        return ResponseEntity.ok(atualizado);
+        subprocessoService.atualizarEntidade(codSubprocesso, request);
+        var subprocessoAtualizado = subprocessoService.buscarSubprocesso(codSubprocesso);
+        return ResponseEntity.ok(SubprocessoResumoDto.fromEntity(subprocessoAtualizado));
     }
 
     @PostMapping("/{codSubprocesso}/excluir")
