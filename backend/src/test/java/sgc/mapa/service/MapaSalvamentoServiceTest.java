@@ -18,6 +18,8 @@ import static org.mockito.Mockito.*;
 @DisplayName("MapaSalvamentoService Tests")
 class MapaSalvamentoServiceTest {
     @Mock
+    private MapaRepo mapaRepo;
+    @Mock
     private CompetenciaRepo competenciaRepo;
     @Mock
     private AtividadeRepo atividadeRepo;
@@ -49,6 +51,7 @@ class MapaSalvamentoServiceTest {
         Atividade ativ = Atividade.builder().codigo(10L).mapa(mapa).competencias(new HashSet<>()).build();
 
         when(repo.buscar(Mapa.class, codMapa)).thenReturn(mapa);
+        when(mapaRepo.save(mapa)).thenReturn(mapa);
         when(competenciaRepo.findByMapa_Codigo(codMapa)).thenReturn(List.of(comp));
         when(atividadeRepo.findByMapa_Codigo(codMapa)).thenReturn(List.of(ativ));
         when(competenciaRepo.saveAll(anyList())).thenReturn(List.of(comp));
@@ -78,6 +81,7 @@ class MapaSalvamentoServiceTest {
         Atividade ativ = Atividade.builder().codigo(10L).mapa(mapa).competencias(new HashSet<>()).build();
 
         when(repo.buscar(Mapa.class, codMapa)).thenReturn(mapa);
+        when(mapaRepo.save(mapa)).thenReturn(mapa);
         when(competenciaRepo.findByMapa_Codigo(codMapa)).thenReturn(Collections.emptyList());
         when(atividadeRepo.findByMapa_Codigo(codMapa)).thenReturn(List.of(ativ));
         when(competenciaRepo.saveAll(anyList())).thenAnswer(i -> i.getArgument(0));
@@ -110,6 +114,7 @@ class MapaSalvamentoServiceTest {
         Atividade ativ = Atividade.builder().codigo(10L).mapa(mapa).competencias(new HashSet<>()).build();
 
         when(repo.buscar(Mapa.class, codMapa)).thenReturn(mapa);
+        when(mapaRepo.save(mapa)).thenReturn(mapa);
         when(competenciaRepo.findByMapa_Codigo(codMapa)).thenReturn(Collections.emptyList());
         when(repo.buscar(Competencia.class, codComp)).thenReturn(comp);
         when(atividadeRepo.findByMapa_Codigo(codMapa)).thenReturn(List.of(ativ));
@@ -135,6 +140,7 @@ class MapaSalvamentoServiceTest {
         Atividade ativ = spy(Atividade.builder().codigo(10L).mapa(mapa).competencias(new HashSet<>(List.of(compObsoleto))).build());
 
         when(repo.buscar(Mapa.class, codMapa)).thenReturn(mapa);
+        when(mapaRepo.save(mapa)).thenReturn(mapa);
         when(competenciaRepo.findByMapa_Codigo(codMapa)).thenReturn(List.of(compObsoleto));
         when(atividadeRepo.findByMapa_Codigo(codMapa)).thenReturn(List.of(ativ));
         when(competenciaRepo.saveAll(anyList())).thenReturn(Collections.emptyList());
@@ -164,6 +170,7 @@ class MapaSalvamentoServiceTest {
         Atividade ativ = Atividade.builder().codigo(10L).mapa(mapa).competencias(new HashSet<>()).build(); // Ativ sem comp
 
         when(repo.buscar(Mapa.class, codMapa)).thenReturn(mapa);
+        when(mapaRepo.save(mapa)).thenReturn(mapa);
         when(competenciaRepo.findByMapa_Codigo(codMapa)).thenReturn(Collections.emptyList());
         when(atividadeRepo.findByMapa_Codigo(codMapa)).thenReturn(List.of(ativ));
         when(competenciaRepo.saveAll(anyList())).thenAnswer(i -> i.getArgument(0));
@@ -191,6 +198,7 @@ class MapaSalvamentoServiceTest {
         Mapa mapa = Mapa.builder().codigo(codMapa).build();
 
         when(repo.buscar(Mapa.class, codMapa)).thenReturn(mapa);
+        when(mapaRepo.save(mapa)).thenReturn(mapa);
         when(competenciaRepo.findByMapa_Codigo(codMapa)).thenReturn(Collections.emptyList());
         when(atividadeRepo.findByMapa_Codigo(codMapa)).thenReturn(Collections.emptyList());
         when(competenciaRepo.saveAll(anyList())).thenAnswer(i -> i.getArgument(0));
