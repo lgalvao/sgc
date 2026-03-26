@@ -12,6 +12,7 @@ const __dirname = path.dirname(__filename);
 const BACKEND_DIR = path.resolve(__dirname, '../backend');
 const FRONTEND_DIR = path.resolve(__dirname, '../frontend');
 
+const PERFIL_LIFECYCLE = process.env.SGC_LIFECYCLE_PROFILE || 'e2e';
 const BACKEND_BASE_PORT = Number.parseInt(process.env.E2E_BACKEND_BASE_PORT || '10000', 10);
 const FRONTEND_PORT = Number.parseInt(process.env.E2E_FRONTEND_PORT || '5173', 10);
 const SMTP_PORT = Number.parseInt(process.env.E2E_SMTP_PORT || '1025', 10);
@@ -150,6 +151,24 @@ function portaBackend() {
     return backendPortSelecionado;
 }
 
+function modoHomologacao() {
+    return PERFIL_LIFECYCLE === 'hom';
+}
+
+function modoE2e() {
+    return PERFIL_LIFECYCLE === 'e2e';
+}
+
+function validarPerfilLifecycle() {
+    const perfisSuportados = new Set(['e2e', 'hom']);
+    if (!perfisSuportados.has(PERFIL_LIFECYCLE)) {
+        throw new Error(
+            `Perfil de lifecycle inválido: ${PERFIL_LIFECYCLE}. ` +
+            'Use SGC_LIFECYCLE_PROFILE=e2e ou SGC_LIFECYCLE_PROFILE=hom.'
+        );
+    }
+}
+
 function requestStatus(url, method = 'GET') {
     return new Promise((resolve) => {
         const req = http.request(url, {method}, (res) => {
@@ -163,6 +182,10 @@ function requestStatus(url, method = 'GET') {
 }
 
 async function resolverBackendExistenteOuPortaLivre() {
+    if (!modoE2e()) {
+        throw new Error('resolverBackendExistenteOuPortaLivre só pode ser usado no modo e2e.');
+    }
+
     for (let offset = 0; offset < MAX_BACKEND_PORT_SCAN; offset++) {
         const porta = BACKEND_BASE_PORT + offset;
         const status = await requestStatus(`http://localhost:${porta}/e2e/reset-database`);
@@ -201,11 +224,16 @@ function startBackend() {
     const gradlewPath = path.resolve(BACKEND_DIR, `../${gradlewExecutable}`);
 
     const backendPort = portaBackend();
-    const argsAplicacao = [
-        `--server.port=${backendPort}`,
-        `--spring.datasource.url=${dbUrl()}`,
-        `--CORS_ALLOWED_ORIGINS=http://localhost:${FRONTEND_PORT},http://localhost:4173`
-    ].join(' ');
+    const argsAplicacao = modoHomologacao()
+        ? [
+            `--server.port=${backendPort}`,
+            `--CORS_ALLOWED_ORIGINS=http://localhost:${FRONTEND_PORT},http://localhost:4173`
+        ].join(' ')
+        : [
+            `--server.port=${backendPort}`,
+            `--spring.datasource.url=${dbUrl()}`,
+            `--CORS_ALLOWED_ORIGINS=http://localhost:${FRONTEND_PORT},http://localhost:4173`
+        ].join(' ');
     const argsGradle = isWindows ? `--args="${argsAplicacao}"` : `--args=${argsAplicacao}`;
 
     const spawnOptions = {
@@ -215,7 +243,7 @@ function startBackend() {
         env: normalizarEnv()
     };
 
-    const backendProcess = spawn(gradlewPath, ['bootRun', '-PENV=e2e', argsGradle], spawnOptions);
+    const backendProcess = spawn(gradlewPath, ['bootRun', `-PENV=${PERFIL_LIFECYCLE}`, argsGradle], spawnOptions);
     backendProcessos.push(backendProcess);
 
     backendProcess.stdout.on('data', data => log(`BACKEND`, data));
@@ -335,14 +363,30 @@ function checkHttpHealth(url, expectedMin, expectedMax) {
 }
 
 async function subirBackends() {
-    const backendResolvido = await resolverBackendExistenteOuPortaLivre();
-    backendPortSelecionado = backendResolvido.porta;
+    if (modoE2e()) {
+        const backendResolvido = await resolverBackendExistenteOuPortaLivre();
+        backendPortSelecionado = backendResolvido.porta;
 
-    if (!backendResolvido.reutilizar) {
+        if (!backendResolvido.reutilizar) {
+            startBackend();
+        }
+    } else {
+        backendPortSelecionado = BACKEND_BASE_PORT;
+        const status = await requestStatus(`http://localhost:${portaBackend()}/swagger-ui.html`);
+        if (status !== null) {
+            throw new Error(
+                `Porta ${portaBackend()} já está ocupada. ` +
+                'No modo hom o lifecycle não reutiliza backend existente para evitar acoplamento a um serviço inesperado.'
+            );
+        }
         startBackend();
     }
 
-    await checkHttpHealth(`http://localhost:${portaBackend()}/`, 200, 500);
+    const urlHealth = modoHomologacao()
+        ? `http://localhost:${portaBackend()}/swagger-ui.html`
+        : `http://localhost:${portaBackend()}/`;
+    const expectedMax = modoHomologacao() ? 400 : 500;
+    await checkHttpHealth(urlHealth, 200, expectedMax);
 }
 
 async function subirFrontend() {
@@ -356,15 +400,21 @@ async function subirInfra() {
 }
 
 function descreverBackends() {
-    return `Backend: ${BACKEND_BASE_PORT}`;
+    return `Backend: ${portaBackend()} (perfil ${PERFIL_LIFECYCLE})`;
 }
 
-startSmtpServer();
-
 try {
+    validarPerfilLifecycle();
+    if (modoE2e()) {
+        startSmtpServer();
+    } else {
+        lifecycleLogger.warn(
+            'Lifecycle iniciado em modo hom. Endpoints /e2e, seed.sql e rotinas de limpeza não devem estar ativos.'
+        );
+    }
     await subirInfra();
     lifecycleLogger.info(
-        `>>> Infra E2E no ar. Frontend: ${FRONTEND_PORT}. ${descreverBackends()}.`
+        `>>> Infra ${PERFIL_LIFECYCLE.toUpperCase()} no ar. Frontend: ${FRONTEND_PORT}. ${descreverBackends()}.`
     );
 } catch (error) {
     lifecycleLogger.error(`Erro ao iniciar infra de testes: ${error && error.message ? error.message : error}`);

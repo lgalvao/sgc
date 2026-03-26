@@ -16,38 +16,41 @@ Fluxo principal:
 3. O usuário clica em `Atividades e conhecimentos`.
 
 4. O sistema mostra a tela `Cadastro de atividades e conhecimentos` preenchida com os dados cadastrados/revisados até o momento.
+   4.1. Além dos dados do cadastro, será mostrada a checkbox `Dipsonibilização sem mudanças`.
 
-5. Se o subprocesso tiver retornado de análise pelas unidades superiores, deverá ser exibido, além dos botões fixos da tela, o botão `Histórico de análise`.
+5. Se o subprocesso tiver retornado de análise pelas unidades superiores, deverá ser habilitado, além dos botões fixos da tela, o botão `Histórico de análise`.
 
    5.1. Se o usuário clicar no botão `Histórico de análise`, o sistema mostra, em tela modal, os dados das análises do cadastro realizadas pelas unidades superiores desde a última disponibilização.
     - As análises deverão ser apresentadas em uma pequena tabela com data/hora, sigla da unidade, resultado ('Devolução' ou 'Aceite') e observações. Essas informações poderão ser usadas como subsídio para ajustes no cadastro, antes da realização de nova disponibilização.
 
-6. O usuário clica no botão `Disponibilizar`.
+6. O usuário faz as mudanças necessárias no cadastro, ou, se decidir disponibilizar sem mudanças, marca o checkbox `Disponibilização sem mudanças`.
 
-7. O sistema verifica se todas as atividades têm ao menos um conhecimento associado.
+7. Durante as edições no cadastro, o sistema verifica continuamente se todas as atividades têm ao menos um conhecimento associado. Caso negativo, indica quais atividades precisam de conhecimentos e bloqueia a disponibilização.
 
-   7.1. Caso negativo, indica quais atividades estão precisando de adição de conhecimentos e interrompe a operação de disponibilização, permanecendo na mesma tela.
+8. O sistema muda a situação do subprocesso para 'Revisão do cadastro em andamento' e habilita o botão `Disponibilizar`.
 
-8. O sistema mostra diálogo de confirmação: título "Disponibilização da revisão do cadastro", mensagem "Confirma a finalização da revisão e a disponibilização do cadastro? Essa ação bloqueia a edição e habilita a análise do cadastro por unidades superiores" / Botões `Confirmar` e `Cancelar`.
+9. O usuário clica no botão `Disponibilizar`.
 
-   8.1. Caso o usuário escolha `Cancelar`, o sistema interrompe a operação de disponibilização, permanecendo na mesma tela.
+10. O sistema mostra um diálogo de confirmação: título "Disponibilização da revisão do cadastro", mensagem "Confirma a finalização da revisão e a disponibilização do cadastro? Essa ação bloqueia a edição e habilita a análise do cadastro por unidades superiores" / Botões `Confirmar` e `Cancelar`.
 
-9. O usuário escolhe `Confirmar`.
+    8.1. Caso o usuário escolha `Cancelar`, o sistema interrompe a operação de disponibilização, permanecendo na mesma tela.
 
-10. O sistema altera a situação do subprocesso da unidade para 'Revisão do cadastro disponibilizada'
+11. O usuário escolhe `Confirmar`.
 
-11. O sistema registra uma movimentação para o subprocesso com os campos:
+12. O sistema altera a situação do subprocesso da unidade para 'Revisão do cadastro disponibilizada'
+
+13. O sistema registra uma movimentação para o subprocesso com os campos:
 
     - Data/hora: Data/hora atual
     - Unidade origem: [SIGLA_UNIDADE_SUBPROCESSO]
     - Unidade destino: [SIGLA_UNIDADE_SUPERIOR]
     - Descrição: 'Disponibilização da revisão do cadastro de atividades'
 
-12. O sistema notifica unidade superior hierárquica quanto à disponibilização, com e-mail no modelo abaixo:
-
-    Assunto: SGC: Revisão do cadastro de atividades e conhecimentos disponibilizada: [SIGLA_UNIDADE_SUBPROCESSO]
+14. O sistema notifica unidade superior hierárquica quanto à disponibilização, com e-mail no modelo abaixo:
 
     ```text
+    Assunto: SGC: Revisão do cadastro de atividades e conhecimentos disponibilizada: [SIGLA_UNIDADE_SUBPROCESSO]
+
     Prezado(a) responsável pela [SIGLA_UNIDADE_SUPERIOR],
     
     A unidade [SIGLA_UNIDADE_SUBPROCESSO] concluiu a revisão e disponibilizou seu cadastro de atividades e conhecimentos do processo [DESCRICAO_PROCESSO].
@@ -55,7 +58,7 @@ Fluxo principal:
     A análise desse cadastro já pode ser realizada no O sistema de Gestão de Competências ([URL_SISTEMA]).
     ```
 
-13. O sistema cria internamente um alerta com:
+15. O sistema cria internamente um alerta com:
 
     - Descrição: "Cadastro de atividades e conhecimentos da unidade [SIGLA_UNIDADE_SUBPROCESSO] disponibilizado para análise"
     - Processo: [DESCRICAO_PROCESSO]
@@ -63,6 +66,6 @@ Fluxo principal:
     - Unidade de origem: [SIGLA_UNIDADE_SUBPROCESSO]
     - Unidade de destino: [SIGLA_UNIDADE_SUPERIOR].
 
-14. O sistema define a data/hora de conclusão da Etapa 1 do subprocesso da unidade como sendo a data/hora atual.
+16. O sistema define a data/hora de conclusão da Etapa 1 do subprocesso da unidade como sendo a data/hora atual.
 
-15. O sistema redireciona para o `Painel`, e mostra a mensagem "Revisão do cadastro disponibilizada".
+17. O sistema redireciona para o `Painel`, e mostra a mensagem "Revisão do cadastro disponibilizada".

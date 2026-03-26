@@ -80,6 +80,8 @@ test('Deve criar processo', async ({page, autenticadoComoAdmin}) => {
 * Não é necessário subir frontend/backend manualmente para a suíte Playwright padrão.
 * Os testes iniciam a infraestrutura E2E automaticamente via `playwright.config.ts` e `e2e/lifecycle.js`.
 * Para paralelismo isolado, usamos frontend único e 1 backend por worker.
+* O `lifecycle.js` inicia em `e2e` por padrão. O modo `hom` é apenas para subir a aplicação apontando para homologação, sem
+  endpoints `/e2e`, sem `seed.sql` e sem rotinas de limpeza.
 
 ### Comandos
 
@@ -101,6 +103,9 @@ npx playwright test --ui
 
 # Rodar um arquivo específico
 npx playwright test e2e/cdu-01.spec.ts
+
+# Subir frontend + backend em modo homologação (sem reset/seed)
+$env:SGC_LIFECYCLE_PROFILE='hom'; node e2e/lifecycle.js
 ```
 
 ## 🛠️ Suporte no Backend
@@ -111,6 +116,18 @@ O backend possui um perfil específico (`e2e`) que habilita endpoints auxiliares
 * **Fixtures:** `/e2e/fixtures/*` (Cria dados complexos via API para pular etapas repetitivas na UI).
 
 Consulte `backend/src/main/java/sgc/e2e/README.md` para mais detalhes.
+
+## Homologação com segurança
+
+Se precisar usar o mesmo script para subir a aplicação contra homologação:
+
+* Use `SGC_LIFECYCLE_PROFILE=hom`.
+* Nesse modo, o backend sobe com `-PENV=hom`.
+* O script não reutiliza backend existente.
+* O script não depende de `/e2e/reset-database`.
+* Qualquer tentativa de ativar o backend `e2e` fora de H2 deve falhar na inicialização.
+
+Nao use a suíte Playwright padrão contra homologação. Os testes dependem de endpoints `/e2e/*` e de dados do `seed.sql`.
 
 ## ♻️ Isolamento por worker
 
