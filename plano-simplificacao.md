@@ -41,10 +41,6 @@ Confirmado:
 - Reduzir a fragmentação artificial nos domínios de `Subprocesso` e `Mapa`.
 - Unificar classes quando a separação atual só aumenta navegação, acoplamento e custo de manutenção.
 
-Não aprovado como regra absoluta:
-
-- Obrigar cada domínio a terminar em um único `Service`.
-
 Diretriz prática:
 
 - Manter apenas classes com responsabilidade clara e justificável.

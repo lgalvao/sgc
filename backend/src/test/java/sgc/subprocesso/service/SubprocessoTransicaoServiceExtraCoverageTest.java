@@ -14,6 +14,7 @@ import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import static org.springframework.test.util.ReflectionTestUtils.*;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -47,7 +48,7 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         mov.setUnidadeDestino(null);
         when(movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(100L)).thenReturn(List.of(mov));
 
-        Unidade res = org.springframework.test.util.ReflectionTestUtils.invokeMethod(service, "obterUnidadeLocalizacao", sp);
+        Unidade res = invokeMethod(service, "obterUnidadeLocalizacao", sp);
         assertThat(res).isEqualTo(u);
     }
 
@@ -136,8 +137,7 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         sp.setProcesso(p);
         sp.setUnidade(u);
 
-        // Usando Reflection para invocar metodo privado
-        org.springframework.test.util.ReflectionTestUtils.invokeMethod(service, "enviarAlertasReabertura", sp, "justificativa", false);
+        invokeMethod(service, "enviarAlertasReabertura", sp, "justificativa", false);
 
         verify(alertaService, times(1)).criarAlertaReaberturaCadastro(p, u);
         verify(alertaService, times(1)).criarAlertaReaberturaCadastroSuperior(p, sup1, u);
@@ -156,7 +156,7 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         sp.setProcesso(p);
         sp.setUnidade(u);
 
-        org.springframework.test.util.ReflectionTestUtils.invokeMethod(service, "enviarAlertasReabertura", sp, "justificativa", true);
+        invokeMethod(service, "enviarAlertasReabertura", sp, "justificativa", true);
 
         verify(alertaService).criarAlertaReaberturaRevisao(p, u, "justificativa");
         verify(alertaService).criarAlertaReaberturaRevisaoSuperior(p, sup, u);
