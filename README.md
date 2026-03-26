@@ -164,6 +164,24 @@ Consulte tambem:
 * `etc/docs/dashboard-qa.md`
 * `etc/qa-dashboard/config/snapshot.schema.json`
 
+#### Exemplo de leitura
+
+Exemplo de interpretacao de um snapshot `completo`:
+
+* `statusGeral: vermelho`: existe pelo menos uma verificacao falhando.
+* `indiceSaude: 42.86`: panorama agregado ruim, apesar de parte da malha estar verde.
+* `verificacoes`:
+  * backend pode falhar por erro de compilacao antes mesmo de executar os testes
+  * frontend pode permanecer verde com cobertura alta
+  * E2E pode apontar regressao parcial, por exemplo `180/186` aprovados
+* `confiabilidade.suitesLentas`: ajuda a localizar rapidamente o custo das suites mais pesadas, como cobertura de
+  frontend e Playwright.
+* `hotspots`: mostra arquivos com menor cobertura e maior risco relativo, por exemplo componentes e utilitarios ainda
+  pouco protegidos por testes.
+
+Esse tipo de leitura evita depender de varios relatorios separados e concentra a analise em um unico artefato do
+dashboard.
+
 ## Documentação de Negócio
 
 Os requisitos do sistema estão documentados em casos de uso (CDUs) no diretório `etc/reqs/`.
