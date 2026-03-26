@@ -71,14 +71,21 @@ export async function verificarAlertaPainel(page: Page, mensagem: string | RegEx
  * Faz logout do sistema clicando no link "Sair".
  */
 export async function fazerLogout(page: Page): Promise<void> {
-    // Limpar notificações que possam estar sobrepondo o menu ou botões
-    await limparNotificacoes(page);
+    try {
+        // Limpar notificações que possam estar sobrepondo o menu ou botões
+        await limparNotificacoes(page);
 
-    await page.getByTestId('btn-logout').click();
-    await page.waitForURL(/\/login/);
+        await page.getByTestId('btn-logout').click();
+        await page.waitForURL(/\/login/);
 
-    // Limpar possíveis toasts de "Não autorizado" ou "Sessão expirada" que aparecem no teardown após o logout
-    await limparNotificacoes(page);
+        // Limpar possíveis toasts de "Não autorizado" ou "Sessão expirada" que aparecem no teardown após o logout
+        await limparNotificacoes(page);
+    } catch (e: any) {
+        if (e.message?.includes('closed') || e.message?.includes('Target page, context or browser has been closed')) {
+            return;
+        }
+        throw e;
+    }
 }
 
 /**
