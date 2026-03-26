@@ -1,0 +1,100 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - heading "SGC" [level=1] [ref=e2]
+  - generic [ref=e3]:
+    - link "Pular para o conteúdo principal" [ref=e4] [cursor=pointer]:
+      - /url: "#main-content"
+    - generic [ref=e5]:
+      - navigation [ref=e6]:
+        - generic [ref=e7]:
+          - link "SGC" [ref=e8] [cursor=pointer]:
+            - /url: /painel
+          - generic [ref=e9]:
+            - list [ref=e10]:
+              - listitem [ref=e11]:
+                - link "Painel" [ref=e12] [cursor=pointer]:
+                  - /url: /painel
+                  - generic [ref=e13]: 
+                  - text: Painel
+              - listitem [ref=e14]:
+                - link "Minha unidade" [ref=e15] [cursor=pointer]:
+                  - /url: /unidade/3
+                  - generic [ref=e16]: 
+                  - text: Minha unidade
+              - listitem [ref=e17]:
+                - link "Relatórios" [ref=e18] [cursor=pointer]:
+                  - /url: /relatorios
+                  - generic [ref=e19]: 
+                  - text: Relatórios
+              - listitem [ref=e20]:
+                - link "Histórico" [ref=e21] [cursor=pointer]:
+                  - /url: /historico
+                  - generic [ref=e22]: 
+                  - text: Histórico
+            - list [ref=e23]:
+              - listitem [ref=e24]:
+                - link "CHEFE - ASSESSORIA_11" [ref=e25]:
+                  - /url: "#"
+                  - generic [ref=e26]:
+                    - generic [ref=e27]: 
+                    - generic [ref=e28]: CHEFE - ASSESSORIA_11
+              - listitem "Sair" [ref=e29]:
+                - link "Sair" [ref=e30] [cursor=pointer]:
+                  - /url: "#"
+                  - generic [ref=e31]: Sair
+                  - generic [ref=e32]: 
+      - generic [ref=e35]:
+        - button "Voltar" [ref=e36] [cursor=pointer]:
+          - generic [ref=e37]: 
+        - navigation "breadcrumb" [ref=e38]:
+          - list [ref=e39]:
+            - listitem [ref=e40]:
+              - link "Início" [ref=e41] [cursor=pointer]:
+                - /url: /painel
+                - generic [ref=e42]: 
+                - generic [ref=e43]: Início
+            - listitem [ref=e44]:
+              - text: ›
+              - link "ASSESSORIA_11" [ref=e45] [cursor=pointer]:
+                - /url: /processo/400/ASSESSORIA_11
+            - listitem [ref=e46]:
+              - text: ›
+              - generic [ref=e47]: Atividades e conhecimentos
+      - main [ref=e48]:
+        - generic [ref=e49]:
+          - generic [ref=e50]:
+            - generic [ref=e51]:
+              - heading "Atividades e conhecimentos" [level=2] [ref=e52]
+              - paragraph [ref=e53]:
+                - generic [ref=e54]:
+                  - generic [ref=e55]: ASSESSORIA_11
+                  - generic [ref=e56]: Não iniciado
+            - generic [ref=e57]:
+              - button "Histórico de análise" [ref=e58] [cursor=pointer]:
+                - generic [ref=e59]: 
+                - text: Histórico de análise
+              - button "Importar" [ref=e60] [cursor=pointer]:
+                - generic [ref=e61]: 
+                - text: Importar
+              - button "Disponibilizar" [disabled] [ref=e62]:
+                - generic [ref=e63]: 
+                - text: Disponibilizar
+          - generic [ref=e64]:
+            - textbox "Nova atividade" [ref=e66]
+            - button "Adicionar atividade" [disabled] [ref=e68]:
+              - generic [ref=e69]: 
+          - region "Estado vazio" [ref=e70]:
+            - generic [ref=e71]: 
+            - paragraph [ref=e72]: Lista de atividades
+            - paragraph [ref=e73]: Não há atividades cadastradas. Utilize o campo acima para adicionar uma nova atividade ou importe de outro processo.
+            - button "Importar" [active] [ref=e74] [cursor=pointer]:
+              - generic [ref=e75]: 
+              - text: Importar
+      - contentinfo [ref=e76]:
+        - generic [ref=e77]:
+          - generic [ref=e78]: Versão 1.0.0
+          - generic [ref=e79]: © SESEL/COSIS/TRE-PE
+  - text:   
+```
