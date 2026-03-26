@@ -1,12 +1,14 @@
 package sgc.e2e;
 
 import com.fasterxml.jackson.annotation.*;
+import jakarta.annotation.*;
 import lombok.*;
 import lombok.extern.slf4j.*;
-import org.jspecify.annotations.*;
+import org.jspecify.annotations.Nullable;
 import org.springframework.boot.autoconfigure.condition.*;
 import org.springframework.context.annotation.*;
 import org.springframework.core.io.*;
+import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.*;
 import org.springframework.jdbc.core.namedparam.*;
 import org.springframework.jdbc.datasource.init.*;
@@ -51,6 +53,29 @@ public class E2eController {
     private final UnidadeService unidadeService;
     private final UsuarioFacade usuarioFacade;
     private final ResourceLoader resourceLoader;
+
+    @PostConstruct
+    public void validarAmbienteE2e() {
+        DataSource dataSource = jdbcTemplate.getDataSource();
+        if (dataSource == null) {
+            throw new ErroConfiguracao("DataSource indisponível para o perfil e2e");
+        }
+
+        try (Connection conn = dataSource.getConnection()) {
+            String jdbcUrl = conn.getMetaData().getURL();
+            String databaseProductName = conn.getMetaData().getDatabaseProductName();
+            boolean h2 = databaseProductName != null && databaseProductName.equalsIgnoreCase("H2");
+            boolean jdbcH2 = jdbcUrl != null && jdbcUrl.startsWith("jdbc:h2:");
+
+            if (!h2 || !jdbcH2) {
+                throw new ErroConfiguracao(
+                        "Perfil e2e requer H2 em memória. Banco detectado: %s (%s)"
+                                .formatted(databaseProductName, jdbcUrl));
+            }
+        } catch (SQLException e) {
+            throw new ErroConfiguracao("Falha ao validar DataSource do perfil e2e: " + e.getMessage());
+        }
+    }
 
 
     @PostMapping("/reset-database")

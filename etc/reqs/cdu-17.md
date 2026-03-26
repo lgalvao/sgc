@@ -32,7 +32,7 @@
 
 9. O sistema mostra um modal com título "Disponibilização do mapa de competências", e os seguintes elementos:
    
-   - Campo `Data limite`: de preenchimento obrigatório, para a Data limite para a validação do mapa
+   - Campo `Data limite`: de preenchimento obrigatório, para a data limite permitida para a validação do mapa
    - Campo `Observações`: de preenchimento opcional
    - Botões `Disponibilizar` e `Cancelar`.
 

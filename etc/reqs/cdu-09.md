@@ -5,7 +5,7 @@ Ator: CHEFE
 ## Pré-condições
 
 - Usuário logado com perfil CHEFE.
-- Subprocesso de mapeamento da unidade na situação 'Cadastro em andamento'.
+- Subprocesso de mapeamento da unidade, na situação 'Cadastro em andamento'.
 
 ## Fluxo principal
 
@@ -22,8 +22,7 @@ Ator: CHEFE
 6. Se o subprocesso tiver retornado de análise pelas unidades superiores, deverá ser exibido, além dos botões fixos da
    tela, o botão `Histórico de análise`.
 
-   6.1. Se o usuário clicar no botão `Histórico de análise`, o sistema mostra, em tela modal, os dados das análises do
-   cadastro realizadas pelas unidades superiores desde a última disponibilização.
+   6.1. Se o usuário clicar no botão `Histórico de análise`, o sistema mostra, em tela modal, os dados das análises do cadastro realizadas pelas unidades superiores desde a última disponibilização.
 
    6.1.1. As análises deverão ser apresentadas em uma pequena tabela com data/hora, sigla da unidade, resultado ('Devolução' ou 'Aceite') e observações. Essas informações poderão ser usadas como subsídio para ajustes no cadastro pelo usuário, antes da realização de nova disponibilização.
 
