@@ -1,6 +1,5 @@
 package sgc.mapa;
 
-import com.fasterxml.jackson.annotation.*;
 import io.swagger.v3.oas.annotations.*;
 import io.swagger.v3.oas.annotations.tags.*;
 import jakarta.validation.*;
@@ -9,6 +8,7 @@ import org.springframework.http.*;
 import org.springframework.security.access.prepost.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.*;
+import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
 import sgc.mapa.service.*;
 
@@ -32,9 +32,10 @@ public class MapaController {
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")
     @Operation(summary = "Lista todos os mapas")
-    @JsonView(MapaViews.Publica.class)
-    public List<Mapa> listar() {
-        return mapaManutencaoService.mapas();
+    public List<MapaResumoDto> listar() {
+        return mapaManutencaoService.mapas().stream()
+                .map(MapaResumoDto::fromEntity)
+                .toList();
     }
 
     /**
@@ -43,17 +44,15 @@ public class MapaController {
     @GetMapping("/{codigo}")
     @PreAuthorize("hasPermission(#codigo, 'Mapa', 'VISUALIZAR_SUBPROCESSO')")
     @Operation(summary = "Obtém um mapa pelo código")
-    @JsonView(MapaViews.Publica.class)
-    public ResponseEntity<Mapa> obterPorCodigo(@PathVariable Long codigo) {
+    public ResponseEntity<MapaResumoDto> obterPorCodigo(@PathVariable Long codigo) {
         var mapa = mapaManutencaoService.mapaCodigo(codigo);
-        return ResponseEntity.ok(mapa);
+        return ResponseEntity.ok(MapaResumoDto.fromEntity(mapa));
     }
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Cria um mapa")
-    @JsonView(MapaViews.Publica.class)
-    public ResponseEntity<Mapa> criar(@Valid @RequestBody Mapa mapa) {
+    public ResponseEntity<MapaResumoDto> criar(@Valid @RequestBody Mapa mapa) {
         var salvo = mapaManutencaoService.salvarMapa(mapa);
         Long codigo = Objects.requireNonNull(salvo.getCodigo(), "Código do mapa não pode ser nulo");
 
@@ -62,21 +61,20 @@ public class MapaController {
                 .buildAndExpand(codigo)
                 .toUri();
 
-        return ResponseEntity.created(uri).body(salvo);
+        return ResponseEntity.created(uri).body(MapaResumoDto.fromEntity(salvo));
     }
 
     @PostMapping("/{codMapa}/atualizar")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Atualiza um mapa existente")
-    @JsonView(MapaViews.Publica.class)
-    public ResponseEntity<Mapa> atualizar(@PathVariable Long codMapa, @Valid @RequestBody Mapa mapa) {
+    public ResponseEntity<MapaResumoDto> atualizar(@PathVariable Long codMapa, @Valid @RequestBody Mapa mapa) {
         Mapa existente = mapaManutencaoService.mapaCodigo(codMapa)
                 .setDataHoraDisponibilizado(mapa.getDataHoraDisponibilizado())
                 .setObservacoesDisponibilizacao(mapa.getObservacoesDisponibilizacao())
                 .setDataHoraHomologado(mapa.getDataHoraHomologado());
 
         var atualizado = mapaManutencaoService.salvarMapa(existente);
-        return ResponseEntity.ok(atualizado);
+        return ResponseEntity.ok(MapaResumoDto.fromEntity(atualizado));
     }
 
     @PostMapping("/{codMapa}/excluir")

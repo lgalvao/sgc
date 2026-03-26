@@ -36,8 +36,7 @@ public class ProcessoController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    @JsonView(ProcessoViews.Publica.class)
-    public ResponseEntity<Processo> criar(@Valid @RequestBody CriarProcessoRequest requisicao) {
+    public ResponseEntity<ProcessoResumoDto> criar(@Valid @RequestBody CriarProcessoRequest requisicao) {
         Processo criado = processoService.criar(requisicao);
         Long codigo = Objects.requireNonNull(criado.getCodigo(), "Código do processo não pode ser nulo");
 
@@ -46,7 +45,7 @@ public class ProcessoController {
                 .buildAndExpand(codigo)
                 .toUri();
 
-        return ResponseEntity.created(uri).body(criado);
+        return ResponseEntity.created(uri).body(ProcessoResumoDto.fromEntity(criado));
     }
 
     @GetMapping("/status-unidades")
@@ -59,21 +58,20 @@ public class ProcessoController {
 
     @GetMapping("/{codigo}")
     @PreAuthorize("hasRole('ADMIN') or @processoService.checarAcesso(authentication, #codigo)")
-    @JsonView(ProcessoViews.Publica.class)
-    public ResponseEntity<Processo> obterPorCodigo(@PathVariable Long codigo) {
+    public ResponseEntity<ProcessoResumoDto> obterPorCodigo(@PathVariable Long codigo) {
         return processoService
                 .buscarOpt(codigo)
+                .map(ProcessoResumoDto::fromEntity)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping("/{codigo}/atualizar")
     @PreAuthorize("hasRole('ADMIN')")
-    @JsonView(ProcessoViews.Publica.class)
-    public ResponseEntity<Processo> atualizar(
+    public ResponseEntity<ProcessoResumoDto> atualizar(
             @PathVariable Long codigo, @Valid @RequestBody AtualizarProcessoRequest requisicao) {
         Processo atualizado = processoService.atualizar(codigo, requisicao);
-        return ResponseEntity.ok(atualizado);
+        return ResponseEntity.ok(ProcessoResumoDto.fromEntity(atualizado));
     }
 
     @PostMapping("/{codigo}/excluir")
@@ -158,15 +156,14 @@ public class ProcessoController {
     @PostMapping("/{codigo}/iniciar")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Inicia um processo")
-    @JsonView(ProcessoViews.Publica.class)
-    public ResponseEntity<Processo> iniciar(
+    public ResponseEntity<ProcessoResumoDto> iniciar(
             @PathVariable Long codigo,
             @Valid @RequestBody IniciarProcessoRequest req,
             @AuthenticationPrincipal Usuario usuario) {
         processoService.iniciar(codigo, req.unidades(), usuario);
 
         Processo processoAtualizado = processoService.buscarPorCodigoComParticipantes(codigo);
-        return ResponseEntity.ok(processoAtualizado);
+        return ResponseEntity.ok(ProcessoResumoDto.fromEntity(processoAtualizado));
     }
 
     @PostMapping("/{codigo}/finalizar")
