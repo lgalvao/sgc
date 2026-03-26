@@ -18,6 +18,12 @@ class LoginControllerCoverageTest {
     @Mock
     private LoginFacade loginFacade;
     @Mock
+    private sgc.organizacao.UsuarioFacade usuarioFacade;
+    @Mock
+    private LimitadorTentativasLogin limitadorTentativasLogin;
+    @Mock
+    private GerenciadorJwt gerenciadorJwt;
+    @Mock
     private HttpServletRequest httpRequest;
     @Mock
     private HttpServletResponse httpResponse;

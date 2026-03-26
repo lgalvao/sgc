@@ -7,6 +7,7 @@ import org.mockito.junit.jupiter.*;
 import sgc.alerta.*;
 import sgc.comum.erros.*;
 import sgc.comum.model.*;
+import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
 import sgc.processo.dto.*;
@@ -29,6 +30,7 @@ class ProcessoServiceCoverageTest {
     @Mock private ProcessoRepo processoRepo;
     @Mock private ComumRepo repo;
     @Mock private UnidadeService unidadeService;
+    @Mock private UsuarioFacade usuarioService;
     @Mock private SubprocessoService subprocessoService;
     @Mock private SubprocessoValidacaoService validacaoService;
     @Mock private AlertaFacade servicoAlertas;
@@ -44,8 +46,11 @@ class ProcessoServiceCoverageTest {
         AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(List.of(1L), DISPONIBILIZAR, null);
 
         Subprocesso sp = mock(Subprocesso.class);
+        Usuario usuario = new Usuario();
         when(subprocessoService.listarEntidadesPorProcessoEUnidades(eq(codProcesso), anyList()))
                 .thenReturn(List.of(sp));
+
+        when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
 
         when(permissionEvaluator.verificarPermissao(any(), anyList(), any())).thenReturn(false);
 
@@ -91,12 +96,15 @@ class ProcessoServiceCoverageTest {
 
         Subprocesso sp = mock(Subprocesso.class);
         Unidade u = new Unidade();
+        Usuario usuario = new Usuario();
         u.setCodigo(1L);
         when(sp.getUnidade()).thenReturn(u);
 
         // Retorna apenas 1 subprocesso para 2 códigos solicitados
         when(subprocessoService.listarEntidadesPorProcessoEUnidades(eq(codProcesso), anyList()))
                 .thenReturn(List.of(sp));
+
+        when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
 
         assertThatThrownBy(() -> target.executarAcaoEmBloco(codProcesso, req))
                 .isInstanceOf(ErroValidacao.class);
