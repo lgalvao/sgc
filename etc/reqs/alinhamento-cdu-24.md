@@ -37,7 +37,7 @@
   - Evidência (score 2): `e2e/cdu-24.spec.ts:9` -> `* CDU-24 - Disponibilizar mapas de competências em bloco`
   - Evidência (score 2): `e2e/cdu-24.spec.ts:13` -> `test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {`
   - Evidência (score 2): `e2e/cdu-24.spec.ts:41` -> `test('ADMIN disponibiliza mapas em bloco após associar todas as atividades', async ({_resetAutomatico, page, _autenti...`
-- ✅ **[COBERTO]** 7. Texto "Selecione abaixo as unidades cujos mapas deverão ser disponibilizados:";
+- ✅ **[COBERTO]** 7. Texto "Selecione as unidades cujos mapas deverão ser disponibilizados:";
   - Palavras-chave usadas: `unidades, texto, selecione, abaixo, cujos, mapas`
   - Evidência (score 2): `e2e/cdu-24.spec.ts:69` -> `await expect(page.getByText(TEXTOS.sucesso.MAPAS_DISPONIBILIZADOS_EM_BLOCO).first()).toBeVisible();`
   - Evidência (score 1): `e2e/cdu-24.spec.ts:3` -> `import {criarCompetencia, navegarParaMapa} from './helpers/helpers-mapas.js';`

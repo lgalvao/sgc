@@ -120,7 +120,7 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
             analiseAntiga.setObservacoes("Análise antiga que deve ser removida.");
             analiseRepo.save(analiseAntiga);
 
-            LocalDate dataLimite = LocalDate.now().plusDays(10);
+            LocalDate dataLimite = subprocesso.getDataLimiteEtapa1().toLocalDate().plusDays(1);
             String observacoes = "Observações de teste para o mapa.";
             DisponibilizarMapaRequest request = new DisponibilizarMapaRequest(dataLimite, observacoes);
 
@@ -236,17 +236,14 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
         }
 
         @Test
-        @DisplayName("Não deve disponibilizar mapa com data limite igual à data de criação do processo")
+        @DisplayName("Não deve disponibilizar mapa com data limite menor que a última data limite do subprocesso")
         @WithMockAdmin
-        void disponibilizarMapa_comDataLimiteIgualCriacao_retornaUnprocessable() throws Exception {
-            Processo processo = subprocesso.getProcesso();
-            // Definir data de criação futura para testar a regra de negócio sem bater no @Future do DTO (que valida contra Hoje)
-            processo.setDataCriacao(LocalDateTime.now().plusDays(5));
-            processoRepo.save(processo);
+        void disponibilizarMapa_comDataLimiteMenorQueUltimaDataLimite_retornaUnprocessable() throws Exception {
+            subprocesso.setDataLimiteEtapa1(LocalDate.now().plusDays(8).atStartOfDay());
+            subprocesso.setDataLimiteEtapa2(LocalDate.now().plusDays(12).atStartOfDay());
+            subprocessoRepo.save(subprocesso);
 
-            LocalDate dataCriacao = processo.getDataCriacao().toLocalDate();
-            // dataLimite é igual à data de criação (portanto futura em relação a hoje, passando no @Future)
-            DisponibilizarMapaRequest request = new DisponibilizarMapaRequest(dataCriacao, OBS_LITERAL);
+            DisponibilizarMapaRequest request = new DisponibilizarMapaRequest(LocalDate.now().plusDays(10), OBS_LITERAL);
 
             mockMvc.perform(post(API_URL, subprocesso.getCodigo())
                             .with(csrf())
@@ -254,7 +251,7 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
                             .content(objectMapper.writeValueAsString(request)))
                     .andDo(MockMvcResultHandlers.print())
                     .andExpect(status().isUnprocessableContent())
-                    .andExpect(jsonPath("$.message").value(Mensagens.DATA_LIMITE_APOS_CRIACAO_PROCESSO));
+                    .andExpect(jsonPath("$.message").value(Mensagens.DATA_LIMITE_MAIOR_OU_IGUAL_ULTIMA_DATA_SUBPROCESSO));
         }
     }
 }

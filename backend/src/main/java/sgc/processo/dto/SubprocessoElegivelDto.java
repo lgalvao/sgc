@@ -3,6 +3,8 @@ package sgc.processo.dto;
 import lombok.*;
 import sgc.subprocesso.model.*;
 
+import java.time.*;
+
 @Value
 @Builder
 public class SubprocessoElegivelDto {
@@ -12,4 +14,5 @@ public class SubprocessoElegivelDto {
     String unidadeSigla;
     Long localizacaoCodigo;
     SituacaoSubprocesso situacao;
+    LocalDateTime ultimaDataLimite;
 }

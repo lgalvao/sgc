@@ -18,6 +18,7 @@ function mapSubprocessoDetalheDtoToModel(dto: any): SubprocessoDetalhe | null {
     if (!dto) return null;
 
     const sp = dto.subprocesso || dto;
+    const ultimaDataLimiteSubprocesso = obterUltimaDataLimiteSubprocesso(sp);
 
     return {
         codigo: sp.codigo,
@@ -28,6 +29,7 @@ function mapSubprocessoDetalheDtoToModel(dto: any): SubprocessoDetalhe | null {
         localizacaoAtual: dto.localizacaoAtual || sp.unidade?.sigla,
         processoDescricao: sp.processoDescricao || sp.processo?.descricao,
         dataCriacaoProcesso: sp.dataCriacaoProcesso || sp.processo?.dataCriacao,
+        ultimaDataLimiteSubprocesso,
         tipoProcesso: sp.tipoProcesso || sp.processo?.tipo,
         prazoEtapaAtual: sp.prazoEtapaAtual || sp.dataLimite || sp.dataLimiteEtapa2 || sp.dataLimiteEtapa1,
         isEmAndamento: sp.isEmAndamento ?? true,
@@ -36,6 +38,15 @@ function mapSubprocessoDetalheDtoToModel(dto: any): SubprocessoDetalhe | null {
         elementosProcesso: [],
         permissoes: dto.permissoes || {},
     };
+}
+
+function obterUltimaDataLimiteSubprocesso(sp: any): string {
+    const dataLimiteEtapa1 = sp.dataLimiteEtapa1 || sp.dataLimite;
+    const dataLimiteEtapa2 = sp.dataLimiteEtapa2;
+
+    if (!dataLimiteEtapa1) return dataLimiteEtapa2 || "";
+    if (!dataLimiteEtapa2) return dataLimiteEtapa1;
+    return dataLimiteEtapa1 > dataLimiteEtapa2 ? dataLimiteEtapa1 : dataLimiteEtapa2;
 }
 
 async function buscarSubprocessoDetalhe(codigo: number) {

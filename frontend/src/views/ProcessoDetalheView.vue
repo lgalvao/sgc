@@ -291,7 +291,8 @@ const unidadesElegiveis = computed(() => {
     codigo: u.unidadeCodigo,
     sigla: u.unidadeSigla,
     nome: u.unidadeNome,
-    situacao: formatSituacaoSubprocesso(u.situacao)
+    situacao: formatSituacaoSubprocesso(u.situacao),
+    ultimaDataLimite: u.ultimaDataLimite
   }));
 });
 

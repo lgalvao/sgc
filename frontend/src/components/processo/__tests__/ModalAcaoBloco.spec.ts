@@ -41,4 +41,19 @@ describe('ModalAcaoBloco.vue', () => {
         
         expect(wrapper.text()).toContain('A data limite para validação deve ser uma data futura.');
     });
+
+    it('deve usar a maior última data limite selecionada como mínimo', () => {
+        const wrapper = mount(ModalAcaoBloco, {
+            props: {
+                ...propsPadrao,
+                unidades: [
+                    { codigo: 1, sigla: 'U1', nome: 'Unidade 1', situacao: 'OK', ultimaDataLimite: '2026-03-28T00:00:00' },
+                    { codigo: 2, sigla: 'U2', nome: 'Unidade 2', situacao: 'OK', ultimaDataLimite: '2026-03-30T00:00:00' }
+                ],
+                unidadesPreSelecionadas: [1, 2]
+            }
+        });
+        const input = wrapper.find('[data-testid="inp-data-limite-bloco"]');
+        expect(input.attributes('min')).toBe('2026-03-30');
+    });
 });

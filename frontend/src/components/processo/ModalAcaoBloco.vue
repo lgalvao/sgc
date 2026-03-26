@@ -25,7 +25,7 @@
             v-model="dataLimite"
             data-testid="inp-data-limite-bloco"
             max="2099-12-31"
-            :min="obterAmanhaFormatado()"
+            :min="dataMinimaPermitida"
             :state="erroLocalDataLimite ? false : null"
             required
         />
@@ -89,6 +89,7 @@ export interface UnidadeSelecao {
   sigla: string;
   nome: string;
   situacao: string;
+  ultimaDataLimite?: string;
   selecionada?: boolean; // For compatibility if passed from parent with this prop
 }
 
@@ -113,10 +114,32 @@ const erro = ref<string | null>(null);
 const dataLimite = ref<string>('');
 const erroLocalDataLimite = ref('');
 
-watch(dataLimite, (novaData) => {
+const ultimaDataLimiteSelecionada = computed(() => {
+  return props.unidades
+      .filter(unidade => selecionadosLocal.value.includes(unidade.codigo))
+      .map(unidade => extrairData(unidade.ultimaDataLimite))
+      .filter(Boolean)
+      .reduce<string>((maior, atual) => !maior || atual > maior ? atual : maior, '');
+});
+
+const dataMinimaPermitida = computed(() => {
+  const amanha = obterAmanhaFormatado();
+  const ultimaDataLimite = ultimaDataLimiteSelecionada.value;
+  if (!ultimaDataLimite) return amanha;
+  return ultimaDataLimite > amanha ? ultimaDataLimite : amanha;
+});
+
+watch([dataLimite, ultimaDataLimiteSelecionada], ([novaData, ultimaDataLimite]) => {
   erroLocalDataLimite.value = "";
-  if (novaData?.length === 10 && props.mostrarDataLimite && !isDateStrictlyFuture(novaData)) {
+  if (novaData?.length !== 10 || !props.mostrarDataLimite) {
+    return;
+  }
+  if (!isDateStrictlyFuture(novaData)) {
     erroLocalDataLimite.value = "A data limite para validação deve ser uma data futura.";
+    return;
+  }
+  if (ultimaDataLimite && novaData < ultimaDataLimite) {
+    erroLocalDataLimite.value = "A data limite deve ser maior ou igual à última data limite do subprocesso.";
   }
 });
 
@@ -178,6 +201,10 @@ function setProcessando(val: boolean) {
 
 function setErro(msg: string | null) {
   erro.value = msg;
+}
+
+function extrairData(data?: string) {
+  return data?.split("T")[0] || "";
 }
 
 defineExpose({

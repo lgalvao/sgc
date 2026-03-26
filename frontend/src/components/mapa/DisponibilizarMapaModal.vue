@@ -28,7 +28,7 @@
           :state="(fieldErrors?.dataLimite || erroLocalDataLimite) ? false : null"
           data-testid="inp-disponibilizar-mapa-data"
           max="2099-12-31"
-          :min="obterAmanhaFormatado()"
+          :min="dataMinimaPermitida"
       />
     </BFormGroup>
 
@@ -77,14 +77,14 @@ import {BAlert, BFormGroup, BFormTextarea} from "bootstrap-vue-next";
 import LoadingButton from "@/components/comum/LoadingButton.vue";
 import ModalPadrao from "@/components/comum/ModalPadrao.vue";
 import InputData from "@/components/comum/InputData.vue";
-import {ref, watch} from "vue";
+import {computed, ref, watch} from "vue";
 import {isDateStrictlyFuture, obterAmanhaFormatado} from "@/utils/dateUtils";
 
 const props = defineProps<{
   mostrar: boolean;
   notificacao?: string;
   loading?: boolean;
-  dataCriacaoProcesso?: string;
+  ultimaDataLimiteSubprocesso?: string;
   fieldErrors?: {
     dataLimite?: string;
     observacoes?: string;
@@ -101,7 +101,15 @@ const dataLimiteValidacao = ref("");
 const observacoesDisponibilizacao = ref("");
 const erroLocalDataLimite = ref("");
 
-watch(dataLimiteValidacao, (novaData) => {
+const ultimaDataLimiteFormatada = computed(() => extrairData(props.ultimaDataLimiteSubprocesso));
+const dataMinimaPermitida = computed(() => {
+  const amanha = obterAmanhaFormatado();
+  const ultimaDataLimite = ultimaDataLimiteFormatada.value;
+  if (!ultimaDataLimite) return amanha;
+  return ultimaDataLimite > amanha ? ultimaDataLimite : amanha;
+});
+
+watch([dataLimiteValidacao, ultimaDataLimiteFormatada], ([novaData, ultimaDataLimite]) => {
   erroLocalDataLimite.value = "";
   if (!novaData || novaData.length !== 10) return;
 
@@ -110,11 +118,8 @@ watch(dataLimiteValidacao, (novaData) => {
     return;
   }
 
-  if (props.dataCriacaoProcesso) {
-    const dataCriacao = props.dataCriacaoProcesso.split("T")[0];
-    if (novaData <= dataCriacao) {
-      erroLocalDataLimite.value = "A data limite deve ser posterior à data de criação do processo.";
-    }
+  if (ultimaDataLimite && novaData < ultimaDataLimite) {
+    erroLocalDataLimite.value = "A data limite deve ser maior ou igual à última data limite do subprocesso.";
   }
 });
 
@@ -138,5 +143,9 @@ function disponibilizar() {
     dataLimite: dataLimiteValidacao.value,
     observacoes: observacoesDisponibilizacao.value
   });
+}
+
+function extrairData(data?: string) {
+  return data?.split("T")[0] || "";
 }
 </script>
