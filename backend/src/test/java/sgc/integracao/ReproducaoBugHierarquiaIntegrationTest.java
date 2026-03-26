@@ -1,15 +1,12 @@
 package sgc.integracao;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import sgc.organizacao.model.Perfil;
-import sgc.organizacao.model.Usuario;
-import sgc.seguranca.AcaoPermissao;
-import sgc.seguranca.SgcPermissionEvaluator;
-import sgc.subprocesso.model.Subprocesso;
+import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.*;
+import sgc.organizacao.model.*;
+import sgc.seguranca.*;
+import sgc.subprocesso.model.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("Reprodução do Bug de Hierarquia - TDD")
 class ReproducaoBugHierarquiaIntegrationTest extends BaseIntegrationTest {

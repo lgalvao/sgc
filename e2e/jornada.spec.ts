@@ -1,5 +1,5 @@
 /* eslint-disable playwright/expect-expect */
-import {test, expect, Page} from '@playwright/test';
+import {expect, Page, test} from '@playwright/test';
 import * as AuthHelpers from './helpers/helpers-auth.js';
 import * as ProcessoHelpers from './helpers/helpers-processos.js';
 import * as AtividadeHelpers from './helpers/helpers-atividades.js';

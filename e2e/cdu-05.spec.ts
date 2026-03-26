@@ -1,4 +1,3 @@
-/* eslint-disable playwright/expect-expect */
 import type {Page} from '@playwright/test';
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
@@ -78,7 +77,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         // Capturar ID do processo para cleanup
         await page.goto('/painel');
         await acessarDetalhesProcesso(page, descProcMapeamento);
-
+        await expect(page).toHaveURL(/\/processo\/\d+/);
     });
 
     test('Fase 1.2: CHEFE adiciona atividades e conhecimentos', async ({_resetAutomatico, page}) => {
@@ -91,6 +90,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         const descAtividade = `Atividade teste ${timestamp}`;
         await adicionarAtividade(page, descAtividade);
         await adicionarConhecimento(page, descAtividade, 'Conhecimento teste');
+        await expect(page.getByText(descAtividade)).toBeVisible();
     });
 
     test('Fase 1.3: CHEFE disponibiliza cadastro', async ({_resetAutomatico, page}) => {
@@ -98,8 +98,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await acessarSubprocessoChefeDireto(page, descProcMapeamento, UNIDADE_ALVO);
         await navegarParaAtividades(page);
         await disponibilizarCadastro(page);
-
-        // Validação: helper já confirma toast atual e redirecionamento para o painel
+        await verificarPaginaPainel(page);
     });
 
     test('Fase 1.3b: GESTOR da SECRETARIA_2 registra aceite', async ({_resetAutomatico, page}) => {
@@ -108,6 +107,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await acessarSubprocessoGestor(page, descProcMapeamento, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
         await aceitarCadastroMapeamento(page, 'Aceite intermediário');
+        await verificarPaginaPainel(page);
     });
 
     test('Fase 1.4: ADMIN homologa cadastro', async ({_resetAutomatico, page}) => {
@@ -115,6 +115,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await acessarSubprocessoAdmin(page, descProcMapeamento, UNIDADE_ALVO);
         await navegarParaAtividadesVisualizacao(page);
         await homologarCadastroMapeamento(page);
+        await expect(page).toHaveURL(/\/processo\/\d+\/\w+$/);
     });
 
     test('Fase 1.5: ADMIN adiciona competências e disponibiliza mapa', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
@@ -256,6 +257,24 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
 
         await page.getByTestId('card-subprocesso-atividades').click();
         await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${UNIDADE_ALVO}/cadastro$`));
+        await expect(page.getByTestId('inp-nova-atividade')).toBeVisible();
+    });
+
+    test('Fase 2.2b: primeiro clique no card da Revisão abre cadastro mesmo após visitar subprocesso em visualização', async ({_resetAutomatico, page}) => {
+        await login(page, USUARIO_CHEFE, SENHA_CHEFE);
+
+        await acessarSubprocessoChefeDireto(page, descProcMapeamento, UNIDADE_ALVO);
+        await expect(page.getByTestId('card-subprocesso-atividades-vis')).toBeVisible();
+        await expect(page.getByTestId('card-subprocesso-atividades')).toBeHidden();
+
+        await page.goto('/painel');
+        await acessarSubprocessoChefeDireto(page, descProcRevisao, UNIDADE_ALVO);
+        await expect(page.getByTestId('card-subprocesso-atividades')).toBeVisible();
+        await expect(page.getByTestId('card-subprocesso-atividades-vis')).toBeHidden();
+
+        await page.getByTestId('card-subprocesso-atividades').click();
+        await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${UNIDADE_ALVO}/cadastro$`));
+        await expect(page).not.toHaveURL(new RegExp(String.raw`/processo/\d+/${UNIDADE_ALVO}/vis-cadastro$`));
         await expect(page.getByTestId('inp-nova-atividade')).toBeVisible();
     });
 

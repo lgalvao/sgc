@@ -112,7 +112,7 @@ import {
   BFormSelectOption,
   BSpinner
 } from "bootstrap-vue-next";
-import {nextTick, ref, watch} from "vue";
+import {ref} from "vue";
 import ArvoreUnidades from "@/components/unidade/ArvoreUnidades.vue";
 import InputData from "@/components/comum/InputData.vue";
 import type {Unidade} from "@/types/tipos";
@@ -150,7 +150,7 @@ const inputDescricaoRef = ref<InstanceType<typeof BFormInput> | null>(null);
 const selectTipoRef = ref<any>(null);
 const inputDataLimiteRef = ref<InstanceType<typeof InputData> | null>(null);
 const containerUnidadesRef = ref<HTMLElement | null>(null);
-const {obterPrimeiroCampoComErro, possuiErros} = useValidacao();
+const {obterPrimeiroCampoComErro} = useValidacao();
 
 const tipoOptions = [
   {value: TipoProcesso.MAPEAMENTO, text: 'Mapeamento'},

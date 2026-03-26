@@ -18,8 +18,6 @@ import static org.mockito.Mockito.*;
 @DisplayName("MapaSalvamentoService Tests")
 class MapaSalvamentoServiceTest {
     @Mock
-    private MapaRepo mapaRepo;
-    @Mock
     private CompetenciaRepo competenciaRepo;
     @Mock
     private AtividadeRepo atividadeRepo;

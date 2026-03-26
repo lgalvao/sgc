@@ -10,15 +10,12 @@ import {
     navegarParaAtividadesVisualizacao,
 } from './helpers/helpers-atividades.js';
 import {
+    abrirHistoricoAnalise,
     acessarSubprocessoChefeDireto,
     acessarSubprocessoGestor,
-    abrirHistoricoAnalise,
     fecharHistoricoAnalise,
 } from './helpers/helpers-analise.js';
-import {
-    limparNotificacoes,
-    verificarPaginaPainel,
-} from './helpers/helpers-navegacao.js';
+import {limparNotificacoes, verificarPaginaPainel,} from './helpers/helpers-navegacao.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
 
 async function verificarPaginaSubprocesso(page: Page, unidade: string) {

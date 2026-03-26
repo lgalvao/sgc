@@ -110,7 +110,7 @@ class SubprocessoControllerCoverageTest {
     @DisplayName("atualizar - deve chamar servico e retornar 200")
     @WithMockUser(roles = "ADMIN")
     void atualizar() throws Exception {
-        AtualizarSubprocessoRequest req = new AtualizarSubprocessoRequest(null, null, null, null, null, null);
+        AtualizarSubprocessoRequest req = new AtualizarSubprocessoRequest(10L, 20L, null, null, null, null);
         when(subprocessoService.atualizarEntidade(eq(1L), any())).thenReturn(new Subprocesso());
 
         mockMvc.perform(post("/api/subprocessos/1/atualizar")
@@ -135,7 +135,7 @@ class SubprocessoControllerCoverageTest {
     @DisplayName("alterarDataLimite - deve chamar servico e retornar 200")
     @WithMockUser(roles = "ADMIN")
     void alterarDataLimite() throws Exception {
-        DataRequest req = new DataRequest(LocalDate.now());
+        DataRequest req = new DataRequest(LocalDate.now().plusDays(1));
 
         mockMvc.perform(post("/api/subprocessos/1/data-limite")
                         .with(csrf())
@@ -164,9 +164,23 @@ class SubprocessoControllerCoverageTest {
     @DisplayName("obterContextoEdicao - deve retornar contexto e 200")
     @WithMockUser
     void obterContextoEdicao() throws Exception {
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(10L);
+        unidade.setSigla("UND");
+        unidade.setNome("Unidade teste");
+
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setCodigo(1L);
+        subprocesso.setUnidade(unidade);
+
         when(permissionEvaluator.hasPermission(any(), eq(1L), eq("Subprocesso"), eq("VISUALIZAR_SUBPROCESSO"))).thenReturn(true);
         when(subprocessoService.obterContextoEdicao(1L)).thenReturn(
-            new ContextoEdicaoResponse(new sgc.organizacao.model.Unidade(), new Subprocesso(), null, null, List.of())
+            new ContextoEdicaoResponse(
+                    unidade,
+                    subprocesso,
+                    null,
+                    null,
+                    List.of())
         );
 
         mockMvc.perform(get("/api/subprocessos/1/contexto-edicao"))
@@ -217,7 +231,7 @@ class SubprocessoControllerCoverageTest {
     @DisplayName("importarAtividades - deve chamar servico e retornar 200")
     @WithMockUser
     void importarAtividades() throws Exception {
-        ImportarAtividadesRequest req = new ImportarAtividadesRequest(2L, null);
+        ImportarAtividadesRequest req = new ImportarAtividadesRequest(2L, List.of(30L, 31L));
 
         mockMvc.perform(post("/api/subprocessos/1/importar-atividades")
                         .with(csrf())
@@ -225,7 +239,7 @@ class SubprocessoControllerCoverageTest {
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk());
 
-        verify(subprocessoService).importarAtividades(1L, 2L, null);
+        verify(subprocessoService).importarAtividades(1L, 2L, List.of(30L, 31L));
     }
 
     @Test
@@ -385,7 +399,7 @@ class SubprocessoControllerCoverageTest {
     @DisplayName("submeterMapaAjustado - deve chamar servico e retornar 200")
     @WithMockUser
     void submeterMapaAjustado() throws Exception {
-        SubmeterMapaAjustadoRequest req = new SubmeterMapaAjustadoRequest("Just", null, null);
+        SubmeterMapaAjustadoRequest req = new SubmeterMapaAjustadoRequest("Just", null, List.of());
 
         mockMvc.perform(post("/api/subprocessos/1/submeter-mapa-ajustado")
                         .with(csrf())

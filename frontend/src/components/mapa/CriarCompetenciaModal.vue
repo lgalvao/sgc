@@ -103,7 +103,9 @@ const mostrarComputado = computed({
 });
 
 const salvamentoDesabilitado = computed(() => {
-  return atividadesSelecionadas.value.length === 0 || !novaCompetencia.value.descricao;
+  const descricaoVazia = !novaCompetencia.value.descricao.trim();
+  const exigeAtividade = !competenciaSendoEditada.value;
+  return descricaoVazia || (exigeAtividade && atividadesSelecionadas.value.length === 0);
 });
 
 watch(

@@ -105,6 +105,76 @@ describe("SubprocessoCards.vue", () => {
         expect(pushMock).toHaveBeenCalledWith(expect.objectContaining({ name: "SubprocessoVisCadastro" }));
     });
 
+    it("prioriza o subprocesso recebido por prop para evitar rota stale na primeira renderização", async () => {
+        vi.restoreAllMocks();
+
+        const wrapper = mount(SubprocessoCards, {
+            global: {
+                plugins: [createTestingPinia({
+                    createSpy: vi.fn,
+                    initialState: {
+                        subprocessos: {
+                            subprocessoDetalhe: {
+                                codigo: 999,
+                                permissoes: {
+                                    podeEditarCadastro: false,
+                                    habilitarAcessoCadastro: true,
+                                    podeEditarMapa: false,
+                                    habilitarAcessoMapa: false,
+                                }
+                            }
+                        }
+                    }
+                })],
+                stubs: {
+                    BCard: { template: '<div @click="$emit(\'click\')" @keydown="$emit(\'keydown\', $event)"><slot /></div>' },
+                    BCardTitle: { template: '<div><slot /></div>' },
+                    BCardText: { template: '<div><slot /></div>' },
+                    BRow: { template: '<div><slot /></div>' },
+                    BCol: { template: '<div><slot /></div>' },
+                }
+            },
+            props: {
+                tipoProcesso: TipoProcesso.REVISAO,
+                mapa: null,
+                codSubprocesso: 1,
+                codProcesso: 401,
+                siglaUnidade: "ASSESSORIA_22",
+                subprocesso: {
+                    codigo: 1,
+                    unidade: {codigo: 1, sigla: "ASSESSORIA_22", nome: "Assessoria 22"},
+                    titular: {codigo: 1, nome: "Titular"} as any,
+                    responsavel: {codigo: 1, usuario: {nome: "Responsavel"}} as any,
+                    situacao: "REVISAO_CADASTRO_EM_ANDAMENTO" as any,
+                    localizacaoAtual: "ASSESSORIA_22",
+                    processoDescricao: "Processo",
+                    dataCriacaoProcesso: "2025-01-01T00:00:00",
+                    tipoProcesso: TipoProcesso.REVISAO,
+                    prazoEtapaAtual: "2025-01-01T00:00:00",
+                    isEmAndamento: true,
+                    etapaAtual: 1,
+                    movimentacoes: [],
+                    elementosProcesso: [],
+                    permissoes: {
+                        podeEditarCadastro: true,
+                        habilitarAcessoCadastro: true,
+                        podeEditarMapa: false,
+                        habilitarAcessoMapa: false,
+                    }
+                } as any
+            }
+        });
+
+        expect(wrapper.find('[data-testid="card-subprocesso-atividades"]').exists()).toBe(true);
+
+        await wrapper.find('[data-testid="card-subprocesso-atividades"]').trigger("click");
+
+        expect(pushMock).toHaveBeenCalledWith(expect.objectContaining({
+            name: "SubprocessoCadastro",
+            params: {codProcesso: 401, siglaUnidade: "ASSESSORIA_22"}
+        }));
+    });
+
     it("navega para mapa ao clicar no card se habilitado", async () => {
         const wrapper = createWrapper({
             tipoProcesso: TipoProcesso.MAPEAMENTO,

@@ -214,7 +214,13 @@ public class SubprocessoTransicaoService {
                 REVISAO_MAPA_COM_SUGESTOES
         );
 
+
         validacaoService.validarMapaParaDisponibilizacao(sp);
+
+        LocalDate dataCriacaoProcesso = sp.getProcesso().getDataCriacao().toLocalDate();
+        if (!request.dataLimite().isAfter(dataCriacaoProcesso)) {
+            throw new sgc.comum.erros.ErroValidacao(Mensagens.DATA_LIMITE_APOS_CRIACAO_PROCESSO);
+        }
 
         Mapa mapa = sp.getMapa();
         validacaoService.validarAssociacoesMapa(mapa.getCodigo());

@@ -1,5 +1,6 @@
 package sgc.subprocesso.dto;
 
+import org.jspecify.annotations.*;
 import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
 import sgc.organizacao.model.*;
@@ -13,8 +14,8 @@ import java.util.*;
 public record ContextoEdicaoResponse(
         Unidade unidade,
         Subprocesso subprocesso,
-        SubprocessoDetalheResponse detalhes,
-        Mapa mapa,
+        @Nullable SubprocessoDetalheResponse detalhes,
+        @Nullable Mapa mapa,
         List<AtividadeDto> atividadesDisponiveis
 ) {
 }

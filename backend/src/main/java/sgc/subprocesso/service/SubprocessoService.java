@@ -344,6 +344,8 @@ public class SubprocessoService {
         Mapa mapa = subprocesso.getMapa();
         Long codMapa = mapa.getCodigo();
 
+        validarCompetenciaParaCriacao(request);
+
         boolean eraVazio = mapaManutencaoService.competenciasCodMapa(codMapa).isEmpty();
 
         mapaManutencaoService.criarCompetenciaComAtividades(mapa, request.descricao(), request.atividadesIds());
@@ -361,6 +363,12 @@ public class SubprocessoService {
 
         Mapa mapa = sp.getMapa();
         return mapaManutencaoService.mapaCodigo(mapa.getCodigo());
+    }
+
+    private void validarCompetenciaParaCriacao(CompetenciaRequest request) {
+        if (request.atividadesIds().isEmpty()) {
+            throw new ErroValidacao(Mensagens.COMPETENCIA_DEVE_TER_ATIVIDADE);
+        }
     }
 
     public Mapa removerCompetencia(Long codSubprocesso, Long codCompetencia) {
@@ -720,7 +728,7 @@ public class SubprocessoService {
         Long codMapaOrigem = spOrigem.getMapa().getCodigo();
         Long codMapaDestino = spDestino.getMapa().getCodigo();
 
-        List<Long> ids = codigosAtividades != null ? codigosAtividades : Collections.emptyList();
+        List<Long> ids = codigosAtividades;
         int totalParaImportar = ids.size();
         log.info("Importando {} atividades do mapa #{} para o mapa #{}", totalParaImportar, codMapaOrigem, codMapaDestino);
         int importadas = copiaMapaService.importarAtividadesDeOutroMapa(codMapaOrigem, codMapaDestino, ids);

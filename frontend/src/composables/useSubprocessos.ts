@@ -14,8 +14,8 @@ import {logger} from "@/utils";
 const subprocessoDetalhe = ref<SubprocessoDetalhe | null>(null);
 const {lastError, clearError, withErrorHandling} = useErrorHandler();
 
-function mapSubprocessoDetalheDtoToModel(dto: any): SubprocessoDetalhe {
-    if (!dto) return null as any;
+function mapSubprocessoDetalheDtoToModel(dto: any): SubprocessoDetalhe | null {
+    if (!dto) return null;
 
     const sp = dto.subprocesso || dto;
 
@@ -27,6 +27,7 @@ function mapSubprocessoDetalheDtoToModel(dto: any): SubprocessoDetalhe {
         situacao: sp.situacao,
         localizacaoAtual: dto.localizacaoAtual || sp.unidade?.sigla,
         processoDescricao: sp.processoDescricao || sp.processo?.descricao,
+        dataCriacaoProcesso: sp.dataCriacaoProcesso || sp.processo?.dataCriacao,
         tipoProcesso: sp.tipoProcesso || sp.processo?.tipo,
         prazoEtapaAtual: sp.prazoEtapaAtual || sp.dataLimite || sp.dataLimiteEtapa2 || sp.dataLimiteEtapa1,
         isEmAndamento: sp.isEmAndamento ?? true,

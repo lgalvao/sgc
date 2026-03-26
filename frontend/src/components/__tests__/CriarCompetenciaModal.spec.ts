@@ -78,7 +78,7 @@ describe("CriarCompetenciaModal.vue", () => {
         const competenciaParaEditar = {
             codigo: 1,
             descricao: "Competência existente",
-            atividadesAssociadas: [1],
+            atividades: [{codigo: 1, descricao: "Atividade 1"}],
         };
 
         const wrapper = createWrapper({mostrar: true, atividades, competenciaParaEditar});
@@ -99,6 +99,38 @@ describe("CriarCompetenciaModal.vue", () => {
                 .find('[data-testid="btn-criar-competencia-salvar"]')
                 .attributes("disabled"),
         ).toBeFalsy();
+    });
+
+    it("deve permitir salvar edicao sem atividades associadas", async () => {
+        const competenciaParaEditar = {
+            codigo: 1,
+            descricao: "Competência existente",
+            atividades: [{codigo: 1, descricao: "Atividade 1"}],
+        };
+
+        const wrapper = createWrapper({mostrar: true, atividades, competenciaParaEditar});
+
+        await wrapper.vm.$nextTick();
+        await wrapper.find('input[type="checkbox"]').setValue(false);
+        await flushPromises();
+
+        expect(
+            wrapper
+                .find('[data-testid="btn-criar-competencia-salvar"]')
+                .attributes("disabled"),
+        ).toBeFalsy();
+    });
+
+    it("deve manter criacao desabilitada sem atividades mesmo com descricao preenchida", async () => {
+        const wrapper = createWrapper({mostrar: true, atividades});
+
+        await wrapper.findComponent(BFormTextarea).setValue("Nova competência");
+
+        expect(
+            wrapper
+                .find('[data-testid="btn-criar-competencia-salvar"]')
+                .attributes("disabled"),
+        ).toBeDefined();
     });
 
     it("deve emitir o evento fechar ao clicar no botão de cancelar", async () => {

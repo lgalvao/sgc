@@ -7,7 +7,6 @@ import org.mockito.junit.jupiter.*;
 import sgc.alerta.*;
 import sgc.comum.erros.*;
 import sgc.comum.model.*;
-import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
 import sgc.processo.dto.*;
@@ -27,18 +26,13 @@ import static sgc.processo.model.TipoProcesso.*;
 @ExtendWith(MockitoExtension.class)
 @DisplayName("ProcessoService - Cobertura de Testes")
 class ProcessoServiceCoverageTest {
-
     @Mock private ProcessoRepo processoRepo;
     @Mock private ComumRepo repo;
     @Mock private UnidadeService unidadeService;
     @Mock private SubprocessoService subprocessoService;
     @Mock private SubprocessoValidacaoService validacaoService;
-    @Mock private UsuarioFacade usuarioService;
     @Mock private AlertaFacade servicoAlertas;
-    @Mock private EmailService emailService;
-    @Mock private EmailModelosService emailModelosService;
     @Mock private SgcPermissionEvaluator permissionEvaluator;
-    @Mock private SubprocessoTransicaoService transicaoService;
 
     @InjectMocks
     private ProcessoService target;
@@ -48,11 +42,11 @@ class ProcessoServiceCoverageTest {
     void deveLancarErroAcessoNegado() {
         Long codProcesso = 100L;
         AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(List.of(1L), DISPONIBILIZAR, null);
-        
+
         Subprocesso sp = mock(Subprocesso.class);
         when(subprocessoService.listarEntidadesPorProcessoEUnidades(eq(codProcesso), anyList()))
                 .thenReturn(List.of(sp));
-        
+
         when(permissionEvaluator.verificarPermissao(any(), anyList(), any())).thenReturn(false);
 
         assertThatThrownBy(() -> target.executarAcaoEmBloco(codProcesso, req))
@@ -68,22 +62,22 @@ class ProcessoServiceCoverageTest {
         when(p.getDescricao()).thenReturn("Desc");
         when(p.getTipo()).thenReturn(DIAGNOSTICO);
         when(p.getSituacao()).thenReturn(EM_ANDAMENTO);
-        
+
         UnidadeProcesso up = mock(UnidadeProcesso.class);
         when(up.getUnidadeCodigo()).thenReturn(10L);
         when(p.getParticipantes()).thenReturn(List.of(up));
-        
+
         Unidade uni = new Unidade();
         uni.setCodigo(10L);
         when(unidadeService.porCodigos(anyList())).thenReturn(List.of(uni));
-        
+
         when(repo.buscar(Processo.class, codigo)).thenReturn(p);
-        
+
         SubprocessoValidacaoService.ValidationResult v = SubprocessoValidacaoService.ValidationResult.ofValido();
         when(validacaoService.validarSubprocessosParaFinalizacao(codigo)).thenReturn(v);
-        
+
         target.finalizar(codigo);
-        
+
         verify(p).setSituacao(FINALIZADO);
         verify(servicoAlertas).criarAlertaAdmin(p, uni, "Processo finalizado: Desc");
         verify(processoRepo).save(p);
@@ -94,12 +88,12 @@ class ProcessoServiceCoverageTest {
     void deveLancarErroValidacaoEmBloco() {
         Long codProcesso = 100L;
         AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(List.of(1L, 2L), DISPONIBILIZAR, null);
-        
+
         Subprocesso sp = mock(Subprocesso.class);
         Unidade u = new Unidade();
         u.setCodigo(1L);
         when(sp.getUnidade()).thenReturn(u);
-        
+
         // Retorna apenas 1 subprocesso para 2 códigos solicitados
         when(subprocessoService.listarEntidadesPorProcessoEUnidades(eq(codProcesso), anyList()))
                 .thenReturn(List.of(sp));

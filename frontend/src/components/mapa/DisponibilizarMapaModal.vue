@@ -84,6 +84,7 @@ const props = defineProps<{
   mostrar: boolean;
   notificacao?: string;
   loading?: boolean;
+  dataCriacaoProcesso?: string;
   fieldErrors?: {
     dataLimite?: string;
     observacoes?: string;
@@ -102,8 +103,18 @@ const erroLocalDataLimite = ref("");
 
 watch(dataLimiteValidacao, (novaData) => {
   erroLocalDataLimite.value = "";
-  if (novaData && novaData.length === 10 && !isDateStrictlyFuture(novaData)) {
+  if (!novaData || novaData.length !== 10) return;
+
+  if (!isDateStrictlyFuture(novaData)) {
     erroLocalDataLimite.value = "A data limite para validação deve ser uma data futura.";
+    return;
+  }
+
+  if (props.dataCriacaoProcesso) {
+    const dataCriacao = props.dataCriacaoProcesso.split("T")[0];
+    if (novaData <= dataCriacao) {
+      erroLocalDataLimite.value = "A data limite deve ser posterior à data de criação do processo.";
+    }
   }
 });
 

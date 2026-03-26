@@ -401,7 +401,7 @@ const mensagemSucessoAcaoBloco = computed(() => {
 });
 
 async function abrirDetalhesUnidade(row: any) {
-  if (!row.clickable) {
+  if (!row.clickable || !row.sigla) {
     return;
   }
 

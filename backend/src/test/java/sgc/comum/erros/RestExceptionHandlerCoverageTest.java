@@ -34,7 +34,7 @@ class RestExceptionHandlerCoverageTest {
 
         class ErroTeste extends ErroNegocioBase {
             public ErroTeste() {
-                super(null, "ERRO_TESTE", HttpStatus.BAD_REQUEST);
+                super("", "ERRO_TESTE", HttpStatus.BAD_REQUEST);
             }
         }
         ErroTeste ex = new ErroTeste();
@@ -45,6 +45,6 @@ class RestExceptionHandlerCoverageTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         ErroApi body = (ErroApi) response.getBody();
         assertThat(body).isNotNull();
-        assertThat(body.getMessage()).isEmpty(); // Deve retornar "" por causa do sanitizar(null)
+        assertThat(body.getMessage()).isEmpty();
     }
 }

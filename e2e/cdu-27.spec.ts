@@ -1,8 +1,9 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcessoFixture, validarProcessoFixture} from './fixtures/fixtures-processos.js';
-import {navegarParaSubprocesso, verificarAppAlert} from './helpers/helpers-navegacao.js';
+import {fazerLogout, navegarParaSubprocesso, verificarAppAlert} from './helpers/helpers-navegacao.js';
 import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
+import {login, USUARIOS} from './helpers/helpers-auth.js';
 
 /**
  * CDU-27 - Alterar data limite de subprocesso
@@ -60,7 +61,7 @@ test.describe.serial('CDU-27 - Alterar data limite de subprocesso', () => {
         await navegarParaSubprocesso(page, UNIDADE_1);
 
         // Obter a data atual do prazo na página
-        const prazoPaginaElement = page.locator('p:has-text("Prazo da etapa:") span:nth-child(2)');
+        const prazoPaginaElement = page.getByTestId('subprocesso-header__txt-prazo');
         await expect(prazoPaginaElement).not.toBeEmpty();
         const prazoPagina = await prazoPaginaElement.innerText();
 
@@ -107,9 +108,24 @@ test.describe.serial('CDU-27 - Alterar data limite de subprocesso', () => {
 
         await page.getByTestId('btn-modal-confirmar').click();
         await verificarAppAlert(page, TEXTOS.subprocesso.SUCESSO_DATA_ALTERADA);
-        
+
         // Verificar se a página atualizou o prazo
         const [y, m, d] = novaDataIso.split('-');
-        await expect(page.locator('p:has-text("Prazo da etapa:")')).toContainText(`${d}/${m}/${y}`);
+        await expect(page.getByTestId('subprocesso-header__txt-prazo')).toContainText(`${d}/${m}/${y}`);
+
+        // Validar alerta criado para a unidade destino
+        await fazerLogout(page);
+        await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
+
+        const tabelaAlertas = page.getByTestId('tbl-alertas');
+        const linhaAlerta = tabelaAlertas.locator('tr', {hasText: descProcesso})
+            .filter({hasText: 'Data limite da etapa'})
+            .first();
+
+        await expect(linhaAlerta).toBeVisible();
+        await expect(linhaAlerta).toContainText(descProcesso);
+        await expect(linhaAlerta).toContainText(/Data limite da etapa\s+1 alterada para/i);
+        await expect(linhaAlerta).toContainText(/\d{2}\/\d{2}\/\d{4}\s+\d{2}:\d{2}/);
+        await expect(linhaAlerta).toContainText(/ADMIN/i);
     });
 });

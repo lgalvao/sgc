@@ -7,8 +7,8 @@ import org.mockito.junit.jupiter.*;
 import org.springframework.data.domain.*;
 import org.springframework.security.core.*;
 import sgc.alerta.*;
-import sgc.comum.Mensagens;
-import sgc.comum.erros.ErroValidacao;
+import sgc.comum.*;
+import sgc.comum.erros.*;
 import sgc.comum.model.*;
 import sgc.fixture.*;
 import sgc.organizacao.*;
@@ -33,10 +33,8 @@ import static sgc.seguranca.AcaoPermissao.*;
 @ExtendWith(MockitoExtension.class)
 @DisplayName("ProcessoService Test suite")
 class ProcessoServiceTest {
-
     @InjectMocks
     private ProcessoService processoService;
-
     @Mock
     private ProcessoRepo processoRepo;
     @Mock
@@ -58,13 +56,7 @@ class ProcessoServiceTest {
     @Mock
     private SgcPermissionEvaluator permissionEvaluator;
     @Mock
-    private SubprocessoRepo subprocessoRepo;
-    @Mock
-    private MovimentacaoRepo movimentacaoRepo;
-    @Mock
     private SubprocessoTransicaoService transicaoService;
-    @Mock
-    private UnidadeHierarquiaService hierarquiaService;
 
     @Nested
     @DisplayName("Cobertura e Casos de Borda")

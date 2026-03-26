@@ -9,6 +9,7 @@ import {
     excluirCompetenciaCancelando,
     excluirCompetenciaConfirmando,
     navegarParaMapa,
+    removerAtividadeAssociada,
     verificarCompetenciaNoMapa
 } from './helpers/helpers-mapas.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
@@ -56,6 +57,19 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
         await expect(badgeConhecimentos).not.toContainText('<strong>');
 
         await expect(page.getByTestId('btn-cad-mapa-disponibilizar')).toBeDisabled();
+
+        // CT-02b: Remover a última atividade diretamente no card e manter disponibilização bloqueada
+        await removerAtividadeAssociada(page, compDesc, ATIVIDADE_1);
+        const cardSemAtividades = page.getByTestId('cad-mapa__card-competencia').filter({
+            has: page.getByText(compDesc, {exact: true})
+        });
+        await expect(cardSemAtividades).toBeVisible();
+        await expect(cardSemAtividades.locator('.atividade-associada-card-item')).toHaveCount(0);
+        await expect(page.getByTestId('btn-cad-mapa-disponibilizar')).toBeDisabled();
+
+        // CT-02c: Reassociar atividade via edição para continuar o fluxo
+        await editarCompetencia(page, compDesc, compDesc, [ATIVIDADE_1]);
+        await verificarCompetenciaNoMapa(page, compDesc, [ATIVIDADE_1]);
 
         // CT-03: Editar competência
         const newDesc = `Competência 1 Editada ${timestamp}`;

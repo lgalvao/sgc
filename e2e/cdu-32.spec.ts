@@ -53,5 +53,13 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
         await verificarAppAlert(page, /Cadastro reaberto/i);
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro em andamento/i);
         await expect(page.getByTestId('tbl-movimentacoes')).toContainText(/Reabertura de cadastro/i);
+
+        const linhaMovimentacao = page.getByTestId('tbl-movimentacoes')
+            .locator('tr', {hasText: /Reabertura de cadastro/i})
+            .first();
+        await expect(linhaMovimentacao).toBeVisible();
+        await expect(linhaMovimentacao).toContainText(/\d{2}\/\d{2}\/\d{4}\s+\d{2}:\d{2}/);
+        await expect(linhaMovimentacao).toContainText('ADMIN');
+        await expect(linhaMovimentacao).toContainText(UNIDADE_1);
     });
 });

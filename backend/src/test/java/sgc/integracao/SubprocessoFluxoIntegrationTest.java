@@ -6,6 +6,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.*;
 import org.springframework.security.core.context.*;
+import org.springframework.test.util.*;
 import org.springframework.transaction.annotation.*;
 import sgc.fixture.*;
 import sgc.mapa.model.*;
@@ -34,6 +35,8 @@ class SubprocessoFluxoIntegrationTest extends BaseIntegrationTest {
     private UsuarioPerfilRepo usuarioPerfilRepo;
     @Autowired
     private AtividadeRepo atividadeRepo;
+    @Autowired
+    private CompetenciaRepo competenciaRepo;
     @Autowired
     private UnidadeService unidadeService;
     @Autowired
@@ -188,5 +191,43 @@ class SubprocessoFluxoIntegrationTest extends BaseIntegrationTest {
         // - Disponibilizar mapa (Transição de estado e localização para cima)
         // - Validar mapa (Escrita na Unidade raiz pelo Chefe)
 
+    }
+
+    @Test
+    @DisplayName("ADMIN deve conseguir remover a ultima atividade de uma competencia durante edicao do mapa")
+    void adminDeveConseguirRemoverUltimaAtividadeDeCompetencia() throws Exception {
+        ReflectionTestUtils.setField(subprocesso, "situacao", SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
+        subprocessoRepo.save(subprocesso);
+
+        admin.setUnidadeAtivaCodigo(unidadeFilha.getCodigo());
+        autenticar(admin, Perfil.ADMIN);
+
+        Mapa mapa = subprocesso.getMapa();
+        Atividade atividade = atividadeRepo.findByMapa_Codigo(mapa.getCodigo()).getFirst();
+
+        Competencia competencia = Competencia.builder()
+                .mapa(mapa)
+                .descricao("Competência existente")
+                .build();
+        competencia.getAtividades().add(atividade);
+        competencia = competenciaRepo.saveAndFlush(competencia);
+
+        atividade.getCompetencias().add(competencia);
+        atividadeRepo.saveAndFlush(atividade);
+
+        CompetenciaRequest request = CompetenciaRequest.builder()
+                .descricao("Competência existente")
+                .atividadesIds(List.of())
+                .build();
+
+        mockMvc.perform(post("/api/subprocessos/{codSubprocesso}/competencia/{codCompetencia}",
+                        subprocesso.getCodigo(), competencia.getCodigo())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request))
+                        .with(csrf()))
+                .andExpect(status().isOk());
+
+        Competencia competenciaAtualizada = competenciaRepo.findById(competencia.getCodigo()).orElseThrow();
+        assertThat(competenciaAtualizada.getAtividades()).isEmpty();
     }
 }

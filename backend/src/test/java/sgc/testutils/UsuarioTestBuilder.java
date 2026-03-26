@@ -10,7 +10,7 @@ import sgc.organizacao.model.*;
 public class UsuarioTestBuilder {
     private String tituloEleitoral = "999999";
     private String nome = "Usuário de Teste";
-    private Unidade unidadeLotacao = null;
+    private final Unidade unidadeLotacao = null;
 
     public static UsuarioTestBuilder umDe() {
         return new UsuarioTestBuilder();
@@ -47,11 +47,6 @@ public class UsuarioTestBuilder {
 
     public UsuarioTestBuilder comNome(String nome) {
         this.nome = nome;
-        return this;
-    }
-
-    public UsuarioTestBuilder comUnidadeLotacao(Unidade unidade) {
-        this.unidadeLotacao = unidade;
         return this;
     }
 

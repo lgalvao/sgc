@@ -43,7 +43,7 @@ function mapUnidades(unidades: UnidadeParticipante[]): any[] {
     dataLimite: formatDate(u.dataLimite, false),
     children: u.filhos ? mapUnidades(u.filhos) : [],
     expanded: true,
-    clickable: true
+    clickable: u.codSubprocesso > 0
   }));
 }
 </script>

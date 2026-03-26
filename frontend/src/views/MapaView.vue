@@ -89,6 +89,7 @@
         :loading="loadingDisponibilizacao"
         :mostrar="mostrarModalDisponibilizar"
         :notificacao="notificacaoDisponibilizacao"
+        :data-criacao-processo="subprocesso?.dataCriacaoProcesso"
         @disponibilizar="disponibilizarMapa"
         @fechar="fecharModalDisponibilizar"
     />

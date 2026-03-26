@@ -71,13 +71,10 @@ public class PainelFacade {
 
     @Transactional
     public Page<Alerta> listarAlertas(String usuarioTitulo, Long codigoUnidade, String perfil, Pageable pageable) {
-        // Regra CDU-02 (3.3): Os alertas devem estar ordenados de forma decrescente por data/hora, 
-        // nao sendo permitida a reordenação.
-        Pageable sortedPageable = pageable.isPaged() 
+        Pageable sortedPageable = pageable.isPaged()
                 ? PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.DESC, "dataHora"))
                 : pageable;
 
-        // Alertas são filtrados pela unidade do usuário ou alertas pessoais (sem subordinadas - Regra CDU-02)
         Page<Alerta> alertasPage = alertaFacade.listarPorUnidade(usuarioTitulo, codigoUnidade, perfil, sortedPageable);
         List<Long> alertasNaoLidosVisualizados = new ArrayList<>();
         alertasPage.forEach(alerta -> {

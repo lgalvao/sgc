@@ -17,10 +17,6 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class SubprocessoValidacaoServiceCoverageTest {
-
-    @Mock
-    private SubprocessoRepo subprocessoRepo;
-
     @Mock
     private MapaManutencaoService mapaManutencaoService;
 

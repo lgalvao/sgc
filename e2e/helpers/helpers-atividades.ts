@@ -3,7 +3,6 @@ import {verificarPaginaPainel, verificarToast} from './helpers-navegacao.js';
 import {TEXTOS} from '../../frontend/src/constants/textos.js';
 
 
-
 export async function navegarParaAtividades(page: Page) {
     const card = page.getByTestId('card-subprocesso-atividades');
     await expect(card).toBeVisible();

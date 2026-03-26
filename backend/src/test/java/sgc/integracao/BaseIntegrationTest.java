@@ -88,7 +88,7 @@ public abstract class BaseIntegrationTest {
     }
 
     private String extrairHtmlDaMensagem(Part part) throws Exception {
-        if (part.isMimeType("text/html") && part.getContent() instanceof String s) {
+        if ((part.isMimeType("text/html") || part.isMimeType("text/plain")) && part.getContent() instanceof String s) {
             return s;
         }
         if (part.isMimeType("multipart/*")) {

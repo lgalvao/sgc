@@ -1,5 +1,6 @@
-import {Page} from '@playwright/test';
+import {expect, Page} from '@playwright/test';
 import {fazerLogout, limparNotificacoes} from './helpers-navegacao.js';
+import {TEXTOS} from '../../frontend/src/constants/textos.js';
 
 export interface Usuario {
     titulo: string;
@@ -36,6 +37,22 @@ export const USUARIOS = {
     SERVIDOR_SECAO_221: {titulo: '292929', senha: 'senha'}, // Flea (Seção 221)
     INVALIDO: {titulo: '999999999', senha: 'senhaerrada'}
 } as const;
+
+
+export async function verificarTelaLogin(page: Page) {
+    await expect(page.getByTestId('txt-login-titulo')).toHaveText(TEXTOS.login.TITULO);
+    await expect(page.getByTestId('txt-login-subtitulo')).toHaveText(TEXTOS.login.SUBTITULO);
+
+    await expect(page.getByTestId('form-login')).toBeVisible();
+    await expect(page.getByTestId('inp-login-usuario')).toBeVisible();
+    await expect(page.getByTestId('inp-login-usuario')).toHaveAttribute('placeholder', TEXTOS.login.PLACEHOLDER_USUARIO);
+
+    await expect(page.getByTestId('inp-login-senha')).toBeVisible();
+    await expect(page.getByTestId('inp-login-senha')).toHaveAttribute('placeholder', TEXTOS.login.PLACEHOLDER_SENHA);
+
+    await expect(page.getByTestId('btn-login-entrar')).toBeVisible();
+    await expect(page.getByTestId('btn-login-entrar')).toContainText(TEXTOS.comum.BOTAO_ENTRAR);
+}
 
 export async function autenticar(page: Page, usuario: string, senha: string) {
     await page.getByTestId('inp-login-usuario').fill(usuario);

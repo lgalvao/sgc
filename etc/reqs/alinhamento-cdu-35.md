@@ -1,37 +1,83 @@
-# Alinhamento CDU-35 - Gerar relatório de andamento
+# Alinhamento CDU-35 - Reanálise (rodada 2)
 
-## Cobertura atual do teste
-O teste E2E (cdu-35.spec.ts) cobre:
-- Setup: Criação de processo de mapeamento com 30 dias de limite para unidade ASSESSORIA_12, iniciado
-- Verificação de visualização do processo na tabela de processos do painel
-- Navegação para página de Relatórios (via link "Relatórios")
-- Validação de URL `/relatorios` e heading "Relatórios"
-- Localização de select "Selecione o Processo"
-- Validação inicial: botão "Gerar relatório" desabilitado
-- Seleção do processo criado no select
-- Validação: botão "Gerar relatório" habilitado após seleção
-- Clique em "Gerar relatório"
-- Validação de visualização de tabela de relatório
-- Validação de visualização de botão "PDF"
+## Artefatos analisados
+- Requisito: `etc/reqs/cdu-35.md`.
+- Teste E2E: `e2e/cdu-35.spec.ts` (1 cenários `test`, 0 `test.step`).
 
-## Lacunas em relação ao requisito
-- **Falta validação de colunas específicas**: O requisito (linha 14-20) especifica que o relatório deve conter colunas: "Sigla da unidade", "Nome da unidade", "Situação atual do subprocesso", "Data da última movimentação", "Responsável", "Titular (Se não for o responsável)". O teste valida apenas que uma tabela existe, não valida conteúdo ou colunas específicas.
-- **Falta validação de dados do relatório**: Não há verificação de que os dados exibidos correspondem ao processo selecionado ou às unidades participantes.
-- **Falta teste de exportação PDF**: O requisito especifica que usuário "pode optar por exportar os dados para PDF clicando no botão `PDF`" (linha 22-23) e "O sistema gera o arquivo selecionado e o disponibiliza para download" (linha 25). O teste não valida o download ou conteúdo do PDF.
-- **Falta teste de múltiplos processos**: Não há validação de que select contém múltiplos processos ou que funciona corretamente com seleções diferentes.
-- **Falta validação de situações de subprocessos**: Não há teste de como relatório exibe subprocessos em diferentes situações (em andamento, homologado, finalizado, etc.).
+## Resultado da comparação requisito x E2E
+- Itens do fluxo principal avaliados: **12**.
+- Status: **0 cobertos**, **9 parciais**, **3 não cobertos** (baseado em evidências textuais no spec e helpers).
 
-## Alterações necessárias no teste E2E
-- Adicionar validação explícita das colunas do relatório (Sigla, Nome, Situação, Data última movimentação, Responsável, Titular)
-- Adicionar validação de que dados exibidos correspondem ao processo selecionado (ex: unidade ASSESSORIA_12 deve estar na tabela)
-- Adicionar teste de clique no botão "PDF" e validação de download do arquivo
-- Adicionar validação de conteúdo do PDF gerado (estrutura, dados esperados)
-- Adicionar cenário com múltiplos processos para validar que select funciona corretamente
-- Considerar adicionar teste com subprocessos em diferentes situações (não apenas iniciados)
-- Considerar adicionar validação de responsáveis e titulares no relatório
+## Matriz de evidências
+- 🟡 **[PARCIAL]** 1. O usuário acessa Relatórios.
+  - Palavras-chave usadas: `relatórios, acessa`
+  - Evidência (score 1): `e2e/cdu-35.spec.ts:14` -> `test('Cenários CDU-35: ADMIN navega e gera relatórios de andamento', async ({_resetAutomatico, page, request, _autent...`
+  - Evidência (score 1): `e2e/cdu-35.spec.ts:27` -> `// Cenario 1: Navegação para página de relatórios`
+  - Evidência (score 1): `e2e/cdu-35.spec.ts:28` -> `await page.getByRole('link', {name: /Relatórios/i}).click();`
+- 🟡 **[PARCIAL]** 2. O usuário seleciona a opção "Andamento de processo".
+  - Palavras-chave usadas: `processo, seleciona, opção, andamento`
+  - Evidência (score 1): `e2e/cdu-35.spec.ts:2` -> `import {criarProcessoFixture} from './fixtures/fixtures-processos.js';`
+  - Evidência (score 1): `e2e/cdu-35.spec.ts:5` -> `* CDU-35 - Gerar relatório de andamento`
+  - Evidência (score 1): `e2e/cdu-35.spec.ts:12` -> `test.describe.serial('CDU-35 - Gerar relatório de andamento', () => {`
+- 🟡 **[PARCIAL]** 3. O usuário seleciona o Processo desejado (ex: "Mapeamento 2027").
+  - Palavras-chave usadas: `processo, seleciona, desejado, mapeamento`
+  - Evidência (score 1): `e2e/cdu-35.spec.ts:2` -> `import {criarProcessoFixture} from './fixtures/fixtures-processos.js';`
+  - Evidência (score 1): `e2e/cdu-35.spec.ts:15` -> `const descricaoProcesso = `Relatório CDU-35 ${Date.now()}`;`
+  - Evidência (score 1): `e2e/cdu-35.spec.ts:16` -> `await criarProcessoFixture(request, {`
+- 🟡 **[PARCIAL]** 4. O sistema exibe o relatório em tela contendo as seguintes colunas:
+  - Palavras-chave usadas: `relatório, exibe, contendo, seguintes, colunas`
+  - Evidência (score 1): `e2e/cdu-35.spec.ts:5` -> `* CDU-35 - Gerar relatório de andamento`
+  - Evidência (score 1): `e2e/cdu-35.spec.ts:12` -> `test.describe.serial('CDU-35 - Gerar relatório de andamento', () => {`
+  - Evidência (score 1): `e2e/cdu-35.spec.ts:14` -> `test('Cenários CDU-35: ADMIN navega e gera relatórios de andamento', async ({_resetAutomatico, page, request, _autent...`
+- 🟡 **[PARCIAL]** 5. Sigla da unidade
+  - Palavras-chave usadas: `unidade, sigla`
+  - Evidência (score 1): `e2e/cdu-35.spec.ts:19` -> `unidade: 'ASSESSORIA_12',`
+- 🟡 **[PARCIAL]** 6. Nome da unidade
+  - Palavras-chave usadas: `unidade, nome`
+  - Evidência (score 1): `e2e/cdu-35.spec.ts:19` -> `unidade: 'ASSESSORIA_12',`
+- 🟡 **[PARCIAL]** 7. Situação atual do subprocesso da unidade, para o processo selecionado
+  - Palavras-chave usadas: `situação, subprocesso, unidade, processo, atual, selecionado`
+  - Evidência (score 1): `e2e/cdu-35.spec.ts:2` -> `import {criarProcessoFixture} from './fixtures/fixtures-processos.js';`
+  - Evidência (score 1): `e2e/cdu-35.spec.ts:15` -> `const descricaoProcesso = `Relatório CDU-35 ${Date.now()}`;`
+  - Evidência (score 1): `e2e/cdu-35.spec.ts:16` -> `await criarProcessoFixture(request, {`
+- ❌ **[NAO_COBERTO]** 8. Data da última movimentação
+  - Palavras-chave usadas: `data, última, movimentação`
+  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
+- ❌ **[NAO_COBERTO]** 9. Responsável
+  - Palavras-chave usadas: `responsável`
+  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
+- ❌ **[NAO_COBERTO]** 10. Titular (Se não for o responsavel)
+  - Palavras-chave usadas: `titular, responsavel`
+  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
+- 🟡 **[PARCIAL]** 11. O usuário pode optar por exportar os dados para PDF clicando no botao `PDF`.
+  - Palavras-chave usadas: `pode, optar, exportar, clicando, botao`
+  - Evidência (score 1): `e2e/cdu-35.spec.ts:33` -> `const botaoGerar = page.getByRole('button', {name: 'Gerar relatório'});`
+  - Evidência (score 1): `e2e/cdu-35.spec.ts:35` -> `await expect(botaoGerar).toBeDisabled();`
+  - Evidência (score 1): `e2e/cdu-35.spec.ts:38` -> `await expect(botaoGerar).toBeEnabled();`
+- 🟡 **[PARCIAL]** 12. O sistema gera o arquivo selecionado e o disponibiliza para download.
+  - Palavras-chave usadas: `gera, arquivo, selecionado, disponibiliza, download`
+  - Evidência (score 1): `e2e/cdu-35.spec.ts:5` -> `* CDU-35 - Gerar relatório de andamento`
+  - Evidência (score 1): `e2e/cdu-35.spec.ts:12` -> `test.describe.serial('CDU-35 - Gerar relatório de andamento', () => {`
+  - Evidência (score 1): `e2e/cdu-35.spec.ts:14` -> `test('Cenários CDU-35: ADMIN navega e gera relatórios de andamento', async ({_resetAutomatico, page, request, _autent...`
 
-## Notas e inconsistências do requisito
-- Requisito é simples e direto, mas teste executa apenas validação mínima de UI (existência de elementos) sem validação de dados reais.
-- Coluna "Titular (Se não for o responsável)" sugere lógica condicional: se responsável = titular, não exibir duplicação. Teste não valida esse comportamento.
-- Não está claro se "Situação atual do subprocesso" refere-se ao status textual (ex: "Em andamento") ou a um código interno. Teste não valida ambos.
-- Requisito não menciona filtros ou pré-requisitos específicos (ex: mostrar apenas subprocessos ativos, passados, etc.), apenas seleção de processo.
+## Ajustes recomendados para próximo ciclo
+- Completar cobertura do item: **O usuário acessa Relatórios.** (atualmente parcial).
+- Completar cobertura do item: **O usuário seleciona a opção "Andamento de processo".** (atualmente parcial).
+- Completar cobertura do item: **O usuário seleciona o Processo desejado (ex: "Mapeamento 2027").** (atualmente parcial).
+
+## Prontidão para o próximo PR de melhoria E2E
+- Status de entrada: **PRONTO_COM_GAPS**.
+- Motivos: há itens sem cobertura E2E.
+- Checklist mínimo antes de codar:
+  - [ ] confirmar massa de dados/fixtures para cenário positivo e negativo;
+  - [ ] definir assert de regra de negócio + assert de efeito colateral;
+  - [ ] validar perfil/unidade necessários no cenário (quando aplicável);
+  - [ ] mapear se precisa teste de integração backend complementar.
+- Escopo sugerido para o próximo PR deste CDU:
+  - Completar cobertura do item: **O usuário acessa Relatórios.** (atualmente parcial).
+  - Completar cobertura do item: **O usuário seleciona a opção "Andamento de processo".** (atualmente parcial).
+  - Completar cobertura do item: **O usuário seleciona o Processo desejado (ex: "Mapeamento 2027").** (atualmente parcial).
+
+## Observações metodológicas
+- Esta rodada incluiu leitura de helpers importados para reduzir falso negativo de cobertura indireta.
+- Classificação automática por evidência textual; recomenda-se validação humana dos itens `🟡` e `❌` antes da implementação final.

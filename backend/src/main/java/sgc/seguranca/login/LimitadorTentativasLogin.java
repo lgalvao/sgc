@@ -41,7 +41,7 @@ public class LimitadorTentativasLogin {
     }
 
     public void verificar(String ip) {
-        if (isLimiterDesabilitado() || ip == null || ip.isBlank()) {
+        if (isLimiterDesabilitado() || ip.isBlank()) {
             return;
         }
 

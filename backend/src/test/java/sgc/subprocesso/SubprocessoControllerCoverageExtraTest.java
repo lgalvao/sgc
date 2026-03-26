@@ -143,7 +143,15 @@ class SubprocessoControllerCoverageExtraTest {
         when(subprocessoService.buscarSubprocesso(1L)).thenReturn(new Subprocesso());
         Analise a = new Analise();
         when(transicaoService.criarAnalise(any(), any(), eq(sgc.subprocesso.model.TipoAnalise.VALIDACAO), any())).thenReturn(a);
-        when(subprocessoService.paraHistoricoDto(a)).thenReturn(new AnaliseHistoricoDto(null, null, null, null, null, null, null, null));
+        when(subprocessoService.paraHistoricoDto(a)).thenReturn(new AnaliseHistoricoDto(
+                TipoAnalise.VALIDACAO,
+                TipoAcaoAnalise.ACEITE_MAPEAMENTO,
+                "123456789012",
+                "SIGLA",
+                "Unidade teste",
+                LocalDateTime.now(),
+                "mot",
+                "obs"));
 
         mockMvc.perform(post("/api/subprocessos/1/analises-validacao")
                 .with(csrf())
@@ -159,7 +167,15 @@ class SubprocessoControllerCoverageExtraTest {
         when(subprocessoService.buscarSubprocesso(1L)).thenReturn(new Subprocesso());
         Analise a = new Analise();
         when(transicaoService.criarAnalise(any(), any(), eq(sgc.subprocesso.model.TipoAnalise.CADASTRO), any())).thenReturn(a);
-        when(subprocessoService.paraHistoricoDto(a)).thenReturn(new AnaliseHistoricoDto(null, null, null, null, null, null, null, null));
+        when(subprocessoService.paraHistoricoDto(a)).thenReturn(new AnaliseHistoricoDto(
+                TipoAnalise.CADASTRO,
+                TipoAcaoAnalise.ACEITE_MAPEAMENTO,
+                "123456789012",
+                "SIGLA",
+                "Unidade teste",
+                LocalDateTime.now(),
+                "mot",
+                "obs"));
 
         mockMvc.perform(post("/api/subprocessos/1/analises-cadastro")
                 .with(csrf())
@@ -184,7 +200,7 @@ class SubprocessoControllerCoverageExtraTest {
     @WithMockUser
     void salvarAjustesMapaOk() throws Exception {
         when(permissionEvaluator.hasPermission(any(), eq(1L), eq("Subprocesso"), eq("EDITAR_MAPA"))).thenReturn(true);
-        SalvarAjustesRequest req = new SalvarAjustesRequest(List.of(new CompetenciaAjusteDto(1L, "desc", null)));
+        SalvarAjustesRequest req = new SalvarAjustesRequest(List.of(new CompetenciaAjusteDto(1L, "desc", List.of())));
 
         mockMvc.perform(post("/api/subprocessos/1/mapa-ajuste/atualizar")
                 .with(csrf())

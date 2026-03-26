@@ -31,7 +31,36 @@ export default [
             playwright: pluginPlaywright,
         },
         rules: {
-            ...pluginPlaywright.configs["flat/recommended"].rules,
+            "playwright/expect-expect": ["warn", {
+                "assertFunctionNames": [
+                    "validarProcessoFixture",
+                    "validarProcesso",
+                    "verificarToast",
+                    "verificarAppAlert",
+                    "verificarAlertaPainel",
+                    "verificarPaginaPainel",
+                    "verificarProcessoNaTabela",
+                    "verificarDetalhesProcesso",
+                    "verificarUnidadeParticipante",
+                    "verificarDetalhesSubprocesso",
+                    "verificarSituacaoSubprocesso",
+                    "verificarBotaoDisponibilizar",
+                    "verificarBotaoImpactoDropdown",
+                    "verificarBotaoHistoricoAnalise",
+                    "verificarBotaoImpactoDireto",
+                    "verificarBotaoImpactoAusenteEdicao",
+                    "verificarBotaoImpactoAusenteDireto",
+                    "verificarOpcoesImportacao",
+                    "verificarOpcoesImportacaoVazia",
+                    "verificarAcoesAnaliseCadastroVisualizacao",
+                    "esperarPaginaPainel",
+                    "esperarPaginaCadastroProcesso",
+                    "esperarPaginaDetalhesProcesso",
+                    "esperarPaginaSubprocesso",
+                    "aguardarProcessoNoPainel",
+                    "confirmarInicioProcessoPeloDialogo"
+                ]
+            }],
             "@typescript-eslint/no-explicit-any": "off",
             "@typescript-eslint/no-unused-vars": [
                 "warn",

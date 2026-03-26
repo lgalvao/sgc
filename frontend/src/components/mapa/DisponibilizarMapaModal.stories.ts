@@ -1,3 +1,5 @@
+// noinspection JSUnusedGlobalSymbols
+
 import type {Meta, StoryObj} from '@storybook/vue3-vite';
 import DisponibilizarMapaModal from './DisponibilizarMapaModal.vue';
 import {ref} from 'vue';

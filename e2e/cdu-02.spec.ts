@@ -1,11 +1,25 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {login, USUARIOS} from './helpers/helpers-auth.js';
 import {fazerLogout} from './helpers/helpers-navegacao.js';
-import {criarProcesso, verificarProcessoNaTabela} from './helpers/helpers-processos.js';
+import {
+    criarProcesso,
+    verificarCabecalhosTabelaProcessos,
+    verificarProcessoNaTabela
+} from './helpers/helpers-processos.js';
 
 test.describe('CDU-02 - Visualizar painel', () => {
     test.describe('Como ADMIN', () => {
         test('Deve exibir estrutura básica do painel e testar ordenação', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
+            const descricaoProcesso = `Processo estrutura painel - ${Date.now()}`;
+
+            await criarProcesso(page, {
+                descricao: descricaoProcesso,
+                tipo: 'MAPEAMENTO',
+                diasLimite: 30,
+                unidade: 'ASSESSORIA_11',
+                expandir: ['SECRETARIA_1']
+            });
+
             await test.step('Verificar seções principais', async () => {
                 await expect(page.getByTestId('txt-painel-titulo-processos')).toBeVisible();
                 await expect(page.getByTestId('txt-painel-titulo-processos')).toHaveText('Processos');
@@ -15,6 +29,16 @@ test.describe('CDU-02 - Visualizar painel', () => {
 
             await test.step('Verificar botão de criação', async () => {
                 await expect(page.getByTestId('btn-painel-criar-processo')).toBeVisible();
+            });
+
+            await test.step('Verificar campos da tabela de processos ativos', async () => {
+                await verificarCabecalhosTabelaProcessos(page, true);
+                await verificarProcessoNaTabela(page, {
+                    descricao: descricaoProcesso,
+                    tipo: 'Mapeamento',
+                    situacao: 'Criado',
+                    unidadesParticipantes: ['ASSESSORIA_11']
+                });
             });
 
             await test.step('Testar ordenação da tabela de processos', async () => {
@@ -141,6 +165,69 @@ test.describe('CDU-02 - Visualizar painel', () => {
                 unidadesParticipantes: ['COORD_11']
             });
         });
+
+        test('Deve abrir Cadastro de processo ao clicar em processo Criado como ADMIN', async ({
+                                                                                                  _resetAutomatico,
+                                                                                                  page,
+                                                                                                  _autenticadoComoAdmin
+}) => {
+            const descricaoProcesso = `Processo criado clicável - ${Date.now()}`;
+
+            await criarProcesso(page, {
+                descricao: descricaoProcesso,
+                tipo: 'MAPEAMENTO',
+                diasLimite: 30,
+                unidade: 'ASSESSORIA_11',
+                expandir: ['SECRETARIA_1']
+            });
+
+            await page.goto('/painel');
+            const linhaProcessoCriado = page.getByTestId('tbl-processos').locator('tr', {hasText: descricaoProcesso}).first();
+            await expect(linhaProcessoCriado).toBeVisible();
+
+            await linhaProcessoCriado.click();
+            await expect(page).toHaveURL(/\/processo\/cadastro(?:\?codProcesso=\d+|\/\d+)$/);
+            await expect(page.getByTestId('inp-processo-descricao')).toHaveValue(descricaoProcesso);
+        });
+
+        test('Deve respeitar regra de clique por perfil em processo Em andamento', async ({
+                                                                                             _resetAutomatico,
+                                                                                             page,
+                                                                                             _autenticadoComoAdmin
+}) => {
+            const descricaoProcesso = `Processo clique perfis - ${Date.now()}`;
+
+            await criarProcesso(page, {
+                descricao: descricaoProcesso,
+                tipo: 'MAPEAMENTO',
+                diasLimite: 30,
+                unidade: 'COORD_11',
+                expandir: ['SECRETARIA_1'],
+                iniciar: true
+            });
+
+            await page.goto('/painel');
+            const linhaAdmin = page.getByTestId('tbl-processos').locator('tr', {hasText: descricaoProcesso}).first();
+            await expect(linhaAdmin).toBeVisible();
+            await linhaAdmin.click();
+            await expect(page).toHaveURL(/\/processo\/\d+$/);
+
+            await fazerLogout(page);
+            await login(page, USUARIOS.GESTOR_COORD.titulo, USUARIOS.GESTOR_COORD.senha);
+
+            const linhaGestor = page.getByTestId('tbl-processos').locator('tr', {hasText: descricaoProcesso}).first();
+            await expect(linhaGestor).toBeVisible();
+            await linhaGestor.click();
+            await expect(page).toHaveURL(/\/processo\/\d+$/);
+
+            await fazerLogout(page);
+            await login(page, USUARIOS.CHEFE_SECAO_111.titulo, USUARIOS.CHEFE_SECAO_111.senha);
+
+            const linhaChefe = page.getByTestId('tbl-processos').locator('tr', {hasText: descricaoProcesso}).first();
+            await expect(linhaChefe).toBeVisible();
+            await linhaChefe.click();
+            await expect(page).toHaveURL(/\/processo\/\d+\/SECAO_111$/);
+        });
     });
 
     test.describe('Como GESTOR', () => {
@@ -155,6 +242,55 @@ test.describe('CDU-02 - Visualizar painel', () => {
                 await expect(page.getByTestId('empty-state-alertas')).toBeVisible();
                 await expect(page.getByTestId('empty-state-alertas')).toContainText(/Nenhum alerta/i);
             });
+        });
+    });
+
+    test.describe('Alertas no painel', () => {
+        test('Deve exibir campos, manter ordenação fixa e marcar alerta como lido na segunda visualização', async ({
+                                                                                                                       _resetAutomatico,
+                                                                                                                       page,
+                                                                                                                       _autenticadoComoAdmin
+}) => {
+            const descricaoProcesso = `Processo alerta painel - ${Date.now()}`;
+
+            await criarProcesso(page, {
+                descricao: descricaoProcesso,
+                tipo: 'MAPEAMENTO',
+                diasLimite: 30,
+                unidade: 'ASSESSORIA_11',
+                expandir: ['SECRETARIA_1'],
+                iniciar: true
+            });
+
+            await fazerLogout(page);
+            await login(page, USUARIOS.CHEFE_ASSESSORIA_11.titulo, USUARIOS.CHEFE_ASSESSORIA_11.senha);
+
+            const tabelaAlertas = page.getByTestId('tbl-alertas');
+            await expect(tabelaAlertas).toBeVisible();
+
+            await expect(tabelaAlertas.locator('th', {hasText: 'Data/Hora'}).first()).toBeVisible();
+            await expect(tabelaAlertas.locator('th', {hasText: 'Descrição'}).first()).toBeVisible();
+            await expect(tabelaAlertas.locator('th', {hasText: 'Processo'}).first()).toBeVisible();
+            await expect(tabelaAlertas.locator('th', {hasText: 'Origem'}).first()).toBeVisible();
+
+            const linhaAlerta = tabelaAlertas.locator('tr', {hasText: descricaoProcesso})
+                .filter({hasText: 'Início do processo'})
+                .first();
+            await expect(linhaAlerta).toBeVisible();
+            await expect(linhaAlerta).toContainText(/\d{2}\/\d{2}\/\d{4}\s+\d{2}:\d{2}/);
+            await expect(linhaAlerta).toHaveClass(/fw-bold/);
+
+            const cabecalhoDataHora = tabelaAlertas.locator('th', {hasText: 'Data/Hora'}).first();
+            await expect(cabecalhoDataHora).not.toHaveAttribute('aria-sort', /ascending|descending/);
+            await cabecalhoDataHora.click();
+            await expect(cabecalhoDataHora).not.toHaveAttribute('aria-sort', /ascending|descending/);
+
+            await page.reload();
+            const linhaAlertaLida = page.getByTestId('tbl-alertas').locator('tr', {hasText: descricaoProcesso})
+                .filter({hasText: 'Início do processo'})
+                .first();
+            await expect(linhaAlertaLida).toBeVisible();
+            await expect(linhaAlertaLida).not.toHaveClass(/fw-bold/);
         });
     });
 });

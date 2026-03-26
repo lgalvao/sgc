@@ -1,5 +1,6 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcessoMapaValidadoFixture, validarProcessoFixture} from './fixtures/fixtures-processos.js';
+import {navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
 import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
 
 /**
@@ -97,5 +98,43 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
 
         await page.waitForURL(/\/painel/);
         await expect(page.getByTestId('tbl-processos')).toBeVisible();
+    });
+
+    test('Cenario 5: Homologação em bloco registra movimentação com data/hora e origem/destino ADMIN', async ({
+                                                                                                                   _resetAutomatico,
+                                                                                                                   request,
+                                                                                                                   page,
+                                                                                                                   _autenticadoComoAdmin
+}) => {
+        const descricaoIsolada = `Mapeamento CDU-26 mov ${Date.now()}`;
+        const unidadeIsolada = 'SECRETARIA_1';
+        const processoIsolado = await criarProcessoMapaValidadoFixture(request, {
+            descricao: descricaoIsolada,
+            unidade: unidadeIsolada
+        });
+        validarProcessoFixture(processoIsolado, descricaoIsolada);
+
+        await page.goto(`/processo/${processoIsolado.codigo}`);
+        await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processoIsolado.codigo}$`));
+
+        const btnHomologar = page.getByRole('button', {name: /^Homologar mapas em bloco$/i}).first();
+        await expect(btnHomologar).toBeVisible();
+        await btnHomologar.click();
+
+        const modal = page.getByRole('dialog');
+        await expect(modal).toBeVisible();
+        await modal.getByRole('button', {name: /^Homologar$/i}).click();
+
+        await page.waitForURL(/\/painel/);
+        await page.goto(`/processo/${processoIsolado.codigo}`);
+        await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processoIsolado.codigo}$`));
+        await navegarParaSubprocesso(page, unidadeIsolada);
+
+        const linhaMovimentacao = page.getByTestId('tbl-movimentacoes')
+            .locator('tr', {hasText: /Mapa de competências homologado/i})
+            .first();
+        await expect(linhaMovimentacao).toBeVisible();
+        await expect(linhaMovimentacao).toContainText(/\d{2}\/\d{2}\/\d{4}\s+\d{2}:\d{2}/);
+        await expect(linhaMovimentacao).toContainText('ADMIN');
     });
 });

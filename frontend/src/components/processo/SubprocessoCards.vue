@@ -165,7 +165,7 @@ import {computed} from "vue";
 import {useAcesso} from "@/composables/useAcesso";
 import {useProcessos} from "@/composables/useProcessos";
 import {useSubprocessos} from "@/composables/useSubprocessos";
-import {type Mapa, type MapaCompleto, SituacaoProcesso, TipoProcesso} from "@/types/tipos";
+import {type Mapa, type MapaCompleto, SituacaoProcesso, type SubprocessoDetalhe, TipoProcesso} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
 
 const TipoProcessoEnum = TipoProcesso;
@@ -177,13 +177,14 @@ const props = defineProps<{
   codSubprocesso: number;
   codProcesso: number;
   siglaUnidade: string;
+  subprocesso?: SubprocessoDetalhe | null;
 }>();
 
 const router = useRouter();
 const subprocessosStore = useSubprocessos();
 const processos = useProcessos();
 
-const subprocesso = computed(() => subprocessosStore.subprocessoDetalhe);
+const subprocesso = computed(() => props.subprocesso ?? subprocessosStore.subprocessoDetalhe);
 
 const isProcessoFinalizado = computed(() => processos.processoDetalhe.value?.situacao === SituacaoProcesso.FINALIZADO);
 

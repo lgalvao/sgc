@@ -111,7 +111,7 @@ class AtividadeFacadeTest {
             when(subprocessoService.obterEntidadePorCodigoMapa(mapaCodigo)).thenReturn(subprocesso);
             when(subprocessoService.obterStatus(subCodigo)).thenReturn(new SubprocessoSituacaoDto(subCodigo, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO));
             when(subprocessoService.listarAtividadesSubprocesso(subCodigo)).thenReturn(Collections.singletonList(
-                    new AtividadeDto(atividadeCodigo, "Desc", null)
+                    new AtividadeDto(atividadeCodigo, "Desc", List.of())
             ));
             when(subprocessoService.buscarSubprocesso(subCodigo)).thenReturn(subprocesso);
 
@@ -153,7 +153,7 @@ class AtividadeFacadeTest {
             when(subprocessoService.obterEntidadePorCodigoMapa(mapaCodigo)).thenReturn(subprocesso);
             when(subprocessoService.obterStatus(subCodigo)).thenReturn(new SubprocessoSituacaoDto(subCodigo, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO));
             when(subprocessoService.listarAtividadesSubprocesso(subCodigo)).thenReturn(Collections.singletonList(
-                    new AtividadeDto(atividadeCodigo, "Antiga desc", null)
+                    new AtividadeDto(atividadeCodigo, "Antiga desc", List.of())
             ));
             when(subprocessoService.buscarSubprocesso(subCodigo)).thenReturn(subprocesso);
 
@@ -240,7 +240,7 @@ class AtividadeFacadeTest {
             when(subprocessoService.obterEntidadePorCodigoMapa(mapaCodigo)).thenReturn(subprocesso);
             when(subprocessoService.obterStatus(subCodigo)).thenReturn(new SubprocessoSituacaoDto(subCodigo, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO));
             when(subprocessoService.listarAtividadesSubprocesso(subCodigo)).thenReturn(Collections.singletonList(
-                    new AtividadeDto(atividadeCodigo, "Desc", null)
+                    new AtividadeDto(atividadeCodigo, "Desc", List.of())
             ));
             when(subprocessoService.buscarSubprocesso(subCodigo)).thenReturn(subprocesso);
 
@@ -282,7 +282,7 @@ class AtividadeFacadeTest {
             when(subprocessoService.obterEntidadePorCodigoMapa(mapaCodigo)).thenReturn(subprocesso);
             when(subprocessoService.obterStatus(subCodigo)).thenReturn(new SubprocessoSituacaoDto(subCodigo, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO));
             when(subprocessoService.listarAtividadesSubprocesso(subCodigo)).thenReturn(Collections.singletonList(
-                    new AtividadeDto(atividadeCodigo, "Desc", null)
+                    new AtividadeDto(atividadeCodigo, "Desc", List.of())
             ));
             when(subprocessoService.buscarSubprocesso(subCodigo)).thenReturn(subprocesso);
 
@@ -323,7 +323,7 @@ class AtividadeFacadeTest {
             when(subprocessoService.obterEntidadePorCodigoMapa(mapaCodigo)).thenReturn(subprocesso);
             when(subprocessoService.obterStatus(subCodigo)).thenReturn(new SubprocessoSituacaoDto(subCodigo, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO));
             when(subprocessoService.listarAtividadesSubprocesso(subCodigo)).thenReturn(Collections.singletonList(
-                    new AtividadeDto(atividadeCodigo, "Desc", null)
+                    new AtividadeDto(atividadeCodigo, "Desc", List.of())
             ));
             when(subprocessoService.buscarSubprocesso(subCodigo)).thenReturn(subprocesso);
 

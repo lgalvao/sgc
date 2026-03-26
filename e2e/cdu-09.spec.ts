@@ -8,9 +8,9 @@ import {
     navegarParaAtividadesVisualizacao,
 } from './helpers/helpers-atividades.js';
 import {
+    abrirHistoricoAnalise,
     acessarSubprocessoChefeDireto,
     acessarSubprocessoGestor,
-    abrirHistoricoAnalise,
     fecharHistoricoAnalise,
 } from './helpers/helpers-analise.js';
 import {

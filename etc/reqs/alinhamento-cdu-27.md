@@ -1,64 +1,103 @@
-# Alinhamento CDU-27 - Alterar data limite de subprocesso
+# Alinhamento CDU-27 - Reanálise (rodada 2)
 
-## Cobertura atual do teste
-O teste cobre:
-- **Setup preparatório**: Criação e iniciação de processo.
-- **Cenário 1**: Navegação do ADMIN até detalhes do subprocesso e verificação de visibilidade da página.
-- **Cenário 2**: Clique no botão "Alterar data limite", preenchimento com nova data (+7 dias), clique em "Confirmar", validação de mensagem de sucesso e fechamento do modal.
+## Artefatos analisados
+- Requisito: `etc/reqs/cdu-27.md`.
+- Teste E2E: `e2e/cdu-27.spec.ts` (4 cenários `test`, 0 `test.step`).
 
-## Lacunas em relação ao requisito
-**Lacunas críticas:**
+## Resultado da comparação requisito x E2E
+- Itens do fluxo principal avaliados: **14**.
+- Status: **10 cobertos**, **4 parciais**, **0 não cobertos** (baseado em evidências textuais no spec e helpers).
 
-1. **Falta validação de pré-condição de estado**: O requisito especifica "Unidade participante com subprocesso iniciado e ainda não finalizado". O teste não valida explicitamente o estado "não finalizado" (poderia ser "Mapa homologado" ou outro estado terminal).
+## Matriz de evidências
+- ✅ **[COBERTO]** 1. No painel, o usuário acessa um processo ativo e na tela `Detalhes do processo`, clica em uma unidade que tenha subprocesso em andamento.
+  - Palavras-chave usadas: `processo, unidade, subprocesso, painel, acessa, ativo`
+  - Evidência (score 4): `e2e/cdu-27.spec.ts:16` -> `* 1. ADMIN acessa processo ativo e clica em uma unidade`
+  - Evidência (score 3): `e2e/cdu-27.spec.ts:13` -> `* - Unidade participante com subprocesso iniciado e ainda não finalizado`
+  - Evidência (score 3): `e2e/cdu-27.spec.ts:52` -> `await navegarParaSubprocesso(page, UNIDADE_1);`
+- ✅ **[COBERTO]** 2. O sistema mostra a tela `Detalhes do subprocesso`.
+  - Palavras-chave usadas: `subprocesso, mostra, detalhes`
+  - Evidência (score 3): `e2e/cdu-27.spec.ts:17` -> `* 2. Sistema mostra tela Detalhes do subprocesso`
+  - Evidência (score 2): `e2e/cdu-27.spec.ts:47` -> `test('Cenario 1: ADMIN navega para detalhes do subprocesso', async ({_resetAutomatico, page, _autenticadoComoAdmin}) ...`
+  - Evidência (score 1): `e2e/cdu-27.spec.ts:3` -> `import {navegarParaSubprocesso, verificarAppAlert} from './helpers/helpers-navegacao.js';`
+- ✅ **[COBERTO]** 3. O usuário clica no botão `Alterar data limite`.
+  - Palavras-chave usadas: `clica, botão, alterar, data, limite`
+  - Evidência (score 5): `e2e/cdu-27.spec.ts:18` -> `* 3. ADMIN clica no botão 'Alterar data limite'`
+  - Evidência (score 3): `e2e/cdu-27.spec.ts:8` -> `* CDU-27 - Alterar data limite de subprocesso`
+  - Evidência (score 3): `e2e/cdu-27.spec.ts:23` -> `test.describe.serial('CDU-27 - Alterar data limite de subprocesso', () => {`
+- ✅ **[COBERTO]** 4. O sistema abre um modal com título "Alterar data limite", campo de data preenchido com a data limite atual da etapa em andamento, e apresenta botões `Cancelar` e `Alterar`.
+  - Palavras-chave usadas: `abre, modal, título, alterar, data, limite`
+  - Evidência (score 4): `e2e/cdu-27.spec.ts:73` -> `await expect(modal.getByRole('heading', {name: TEXTOS.subprocesso.BOTAO_ALTERAR_DATA_LIMITE})).toBeVisible();`
+  - Evidência (score 3): `e2e/cdu-27.spec.ts:8` -> `* CDU-27 - Alterar data limite de subprocesso`
+  - Evidência (score 3): `e2e/cdu-27.spec.ts:18` -> `* 3. ADMIN clica no botão 'Alterar data limite'`
+- ✅ **[COBERTO]** 5. O usuário fornece a nova data limite e clica em `Alterar`.
+  - Palavras-chave usadas: `fornece, nova, data, limite, clica, alterar`
+  - Evidência (score 4): `e2e/cdu-27.spec.ts:18` -> `* 3. ADMIN clica no botão 'Alterar data limite'`
+  - Evidência (score 3): `e2e/cdu-27.spec.ts:8` -> `* CDU-27 - Alterar data limite de subprocesso`
+  - Evidência (score 3): `e2e/cdu-27.spec.ts:23` -> `test.describe.serial('CDU-27 - Alterar data limite de subprocesso', () => {`
+- ✅ **[COBERTO]** 6. A data limite deve ser estritamente no futuro (amanhã em diante)
+  - Palavras-chave usadas: `data, limite, estritamente, futuro, amanhã, diante`
+  - Evidência (score 2): `e2e/cdu-27.spec.ts:8` -> `* CDU-27 - Alterar data limite de subprocesso`
+  - Evidência (score 2): `e2e/cdu-27.spec.ts:18` -> `* 3. ADMIN clica no botão 'Alterar data limite'`
+  - Evidência (score 2): `e2e/cdu-27.spec.ts:23` -> `test.describe.serial('CDU-27 - Alterar data limite de subprocesso', () => {`
+- ✅ **[COBERTO]** 7. O sistema atualiza a data limite do subprocesso e envia notificação por e-mail para a unidade do subprocesso, neste modelo:
+  - Palavras-chave usadas: `subprocesso, unidade, atualiza, data, limite, envia`
+  - Evidência (score 3): `e2e/cdu-27.spec.ts:8` -> `* CDU-27 - Alterar data limite de subprocesso`
+  - Evidência (score 3): `e2e/cdu-27.spec.ts:23` -> `test.describe.serial('CDU-27 - Alterar data limite de subprocesso', () => {`
+  - Evidência (score 3): `e2e/cdu-27.spec.ts:73` -> `await expect(modal.getByRole('heading', {name: TEXTOS.subprocesso.BOTAO_ALTERAR_DATA_LIMITE})).toBeVisible();`
+- 🟡 **[PARCIAL]** 8. O sistema cria internamente um alerta com as seguintes informações:
+  - Palavras-chave usadas: `alerta, cria, internamente, seguintes, informações`
+  - Evidência (score 1): `e2e/cdu-27.spec.ts:2` -> `import {criarProcessoFixture, validarProcessoFixture} from './fixtures/fixtures-processos.js';`
+  - Evidência (score 1): `e2e/cdu-27.spec.ts:38` -> `const processo = await criarProcessoFixture(request, {`
+  - Evidência (score 1): `e2e/cdu-27.spec.ts:78` -> `// BUG FIX VERIFICATION: Verificar se o modal inicia com a data do prazo (não criação)`
+- ✅ **[COBERTO]** 9. `Descrição`: "Data limite da etapa [NÚMERO_ETAPA] alterada para [NOVA_DATA_LIMITE]"
+  - Palavras-chave usadas: `descrição, data, limite, número_etapa, alterada, nova_data_limite`
+  - Evidência (score 2): `e2e/cdu-27.spec.ts:8` -> `* CDU-27 - Alterar data limite de subprocesso`
+  - Evidência (score 2): `e2e/cdu-27.spec.ts:18` -> `* 3. ADMIN clica no botão 'Alterar data limite'`
+  - Evidência (score 2): `e2e/cdu-27.spec.ts:23` -> `test.describe.serial('CDU-27 - Alterar data limite de subprocesso', () => {`
+- 🟡 **[PARCIAL]** 10. `Processo`: [DESCRICAO_PROCESSO]
+  - Palavras-chave usadas: `processo, descricao_processo`
+  - Evidência (score 1): `e2e/cdu-27.spec.ts:2` -> `import {criarProcessoFixture, validarProcessoFixture} from './fixtures/fixtures-processos.js';`
+  - Evidência (score 1): `e2e/cdu-27.spec.ts:3` -> `import {navegarParaSubprocesso, verificarAppAlert} from './helpers/helpers-navegacao.js';`
+  - Evidência (score 1): `e2e/cdu-27.spec.ts:4` -> `import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';`
+- 🟡 **[PARCIAL]** 11. `Data/hora`: Data/hora atual
+  - Palavras-chave usadas: `data/hora, atual`
+  - Evidência (score 1): `e2e/cdu-27.spec.ts:21` -> `* 6. Sistema atualiza e envia notificação`
+  - Evidência (score 1): `e2e/cdu-27.spec.ts:62` -> `// Obter a data atual do prazo na página`
+  - Evidência (score 1): `e2e/cdu-27.spec.ts:111` -> `// Verificar se a página atualizou o prazo`
+- ✅ **[COBERTO]** 12. `Unidade de origem`: 'ADMIN'
+  - Palavras-chave usadas: `unidade, origem, admin`
+  - Evidência (score 2): `e2e/cdu-27.spec.ts:16` -> `* 1. ADMIN acessa processo ativo e clica em uma unidade`
+  - Evidência (score 1): `e2e/cdu-27.spec.ts:10` -> `* Ator: ADMIN`
+  - Evidência (score 1): `e2e/cdu-27.spec.ts:13` -> `* - Unidade participante com subprocesso iniciado e ainda não finalizado`
+- 🟡 **[PARCIAL]** 13. `Unidade de destino`: [SIGLA_UNIDADE_SUBPROCESSO]
+  - Palavras-chave usadas: `unidade, sigla_unidade_subprocesso, destino`
+  - Evidência (score 1): `e2e/cdu-27.spec.ts:13` -> `* - Unidade participante com subprocesso iniciado e ainda não finalizado`
+  - Evidência (score 1): `e2e/cdu-27.spec.ts:16` -> `* 1. ADMIN acessa processo ativo e clica em uma unidade`
+  - Evidência (score 1): `e2e/cdu-27.spec.ts:24` -> `const UNIDADE_1 = 'SECAO_221';`
+- ✅ **[COBERTO]** 14. O sistema fecha o modal e mostra uma mensagem de confirmação "Data limite alterada".
+  - Palavras-chave usadas: `fecha, modal, mostra, mensagem, confirmação, data`
+  - Evidência (score 2): `e2e/cdu-27.spec.ts:19` -> `* 4. Sistema abre modal com campo de data preenchido`
+  - Evidência (score 2): `e2e/cdu-27.spec.ts:73` -> `await expect(modal.getByRole('heading', {name: TEXTOS.subprocesso.BOTAO_ALTERAR_DATA_LIMITE})).toBeVisible();`
+  - Evidência (score 2): `e2e/cdu-27.spec.ts:78` -> `// BUG FIX VERIFICATION: Verificar se o modal inicia com a data do prazo (não criação)`
 
-2. **Falta validação do campo de data preenchido com data limite atual**: O requisito (passo 4) especifica que o modal deve ter o "campo de data preenchido com a data limite atual da etapa em andamento". O teste não valida se o campo vem preenchido com a data antiga/atual.
+## Ajustes recomendados para próximo ciclo
+- Completar cobertura do item: **O sistema cria internamente um alerta com as seguintes informações:** (atualmente parcial).
+- Completar cobertura do item: **`Processo`: [DESCRICAO_PROCESSO]** (atualmente parcial).
+- Completar cobertura do item: **`Data/hora`: Data/hora atual** (atualmente parcial).
 
-3. **Falta validação de atualização efetiva da data**: O teste valida a mensagem de sucesso, mas não valida se a data foi realmente alterada no banco de dados ou se ao navegar novamente para o subprocesso, a data exibida é a nova data.
+## Prontidão para o próximo PR de melhoria E2E
+- Status de entrada: **PRONTO**.
+- Motivos: base de análise e pendências objetivas definidas.
+- Checklist mínimo antes de codar:
+  - [ ] confirmar massa de dados/fixtures para cenário positivo e negativo;
+  - [ ] definir assert de regra de negócio + assert de efeito colateral;
+  - [ ] validar perfil/unidade necessários no cenário (quando aplicável);
+  - [ ] mapear se precisa teste de integração backend complementar.
+- Escopo sugerido para o próximo PR deste CDU:
+  - Completar cobertura do item: **O sistema cria internamente um alerta com as seguintes informações:** (atualmente parcial).
+  - Completar cobertura do item: **`Processo`: [DESCRICAO_PROCESSO]** (atualmente parcial).
+  - Completar cobertura do item: **`Data/hora`: Data/hora atual** (atualmente parcial).
 
-4. **Falta validação de notificação por e-mail**: O requisito (passo 7) especifica envio de e-mail à unidade do subprocesso. O teste não valida.
-
-5. **Falta validação de alerta interno**: O requisito (passo 8) especifica criação de alerta com campos específicos (`Descrição`, `Processo`, `Data/hora`, `Unidade de origem`, `Unidade de destino`). O teste não valida.
-
-6. **Falta validação de número da etapa no alerta**: O requisito especifica que a descrição do alerta deve incluir `[NÚMERO_ETAPA]`, mas o teste não valida isso.
-
-7. **Falta validação de mudança de data para passada**: O teste apenas valida mudança para data futura (+7 dias). Não há validação de comportamento ao tentar alterar para data passada ou data inválida.
-
-8. **Falta validação de modal correto "Alterar data limite"**: O teste não valida o título do modal.
-
-9. **Falta cenário de cancelamento**: Não há teste que valida o botão "Cancelar" do modal.
-
-## Alterações necessárias no teste E2E
-1. **Adicionar validação de data preenchida no modal**: 
-   - Validar que o campo de data vem com a data limite atual preenchida
-   - Comparar com a data limite exibida anteriormente na página do subprocesso
-
-2. **Adicionar validação de persistência da alteração**: 
-   - Após alterar data e confirmar, navegar novamente para o subprocesso
-   - Validar que a nova data é exibida na página
-
-3. **Adicionar validação de alerta interno**: 
-   - Consultar API ou base de dados para validar criação de alerta
-   - Validar campos: descrição (com número da etapa), processo, data/hora, unidade origem/destino
-
-4. **Adicionar validação de e-mail**: 
-   - Simular ou interceptar envio de e-mail
-   - Validar assunto ("SGC: Data limite alterada")
-   - Validar corpo com nova data no formato especificado
-
-5. **Adicionar cenário de cancelamento**: 
-   - Abrir modal, clicar "Cancelar"
-   - Validar que modal fecha e nenhuma alteração é feita
-
-6. **Adicionar validação de título do modal**: 
-   - Validar que modal tem título "Alterar data limite"
-
-7. **Adicionar teste de validação de datas inválidas**: 
-   - Tentar alterar para data passada
-   - Validar mensagem de erro ou validação de formulário
-
-## Notas e inconsistências do requisito
-- **Falta clareza em "data limite atual da etapa em andamento"**: O requisito não especifica claramente qual é a "data limite" - é a data limite do processo, da etapa ou do subprocesso? Presume-se ser a data limite da etapa em andamento do subprocesso.
-
-- **Ambiguidade em "ainda não finalizado"**: O requisito usa "ainda não finalizado" para pré-condição, mas não especifica quais estados do subprocesso qualificam como "finalizado" versus "não finalizado". Presume-se que significa o subprocesso não está em situação terminal (como 'Finalizado' ou 'Mapa homologado').
-
-- **Falta de clareza sobre múltiplos subprocessos**: O requisito é singular ("subprocesso iniciado"), mas não especifica se o ADMIN pode alterar a data de múltiplos subprocessos em um mesmo processo.
+## Observações metodológicas
+- Esta rodada incluiu leitura de helpers importados para reduzir falso negativo de cobertura indireta.
+- Classificação automática por evidência textual; recomenda-se validação humana dos itens `🟡` e `❌` antes da implementação final.

@@ -17,7 +17,7 @@ import sgc.seguranca.*;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
 
-import java.time.LocalDateTime;
+import java.time.*;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
@@ -40,8 +40,6 @@ class SubprocessoServiceExtraCoverageTest {
     @Mock
     private MapaManutencaoService mapaManutencaoService;
     @Mock
-    private SubprocessoValidacaoService validacaoService;
-    @Mock
     private UsuarioFacade usuarioFacade;
     @Mock
     private MovimentacaoRepo movimentacaoRepo;
@@ -51,6 +49,8 @@ class SubprocessoServiceExtraCoverageTest {
     private HierarquiaService hierarquiaService;
     @Mock
     private CopiaMapaService copiaMapaService;
+    @Mock
+    private SubprocessoValidacaoService validacaoService;
 
     @InjectMocks
     private SubprocessoService subprocessoService;
@@ -135,7 +135,7 @@ class SubprocessoServiceExtraCoverageTest {
             when(mapaManutencaoService.competenciasCodMapa(100L)).thenReturn(List.of()); // eraVazio = true
             when(mapaSalvamentoService.salvarMapaCompleto(eq(100L), any())).thenReturn(sp.getMapa());
 
-            SalvarMapaRequest request = new SalvarMapaRequest("Desc", List.of(new SalvarMapaRequest.CompetenciaRequest(null, "Comp", List.of()))); // temNovas = true
+            SalvarMapaRequest request = new SalvarMapaRequest("Desc", List.of(new SalvarMapaRequest.CompetenciaRequest(0L, "Comp", List.of()))); // temNovas = true
             subprocessoService.salvarMapaSubprocesso(1L, request);
 
             verify(mapaManutencaoService).reconciliarSituacaoSubprocesso(sp);
@@ -153,7 +153,7 @@ class SubprocessoServiceExtraCoverageTest {
             when(mapaManutencaoService.competenciasCodMapa(100L)).thenReturn(List.of()); // eraVazio = true
             when(mapaManutencaoService.mapaCodigo(100L)).thenReturn(sp.getMapa());
 
-            subprocessoService.adicionarCompetencia(1L, new CompetenciaRequest("Desc", List.of()));
+            subprocessoService.adicionarCompetencia(1L, new CompetenciaRequest("Desc", List.of(10L)));
 
             assertThat(sp.getSituacao()).isEqualTo(REVISAO_MAPA_AJUSTADO); // Mudou situacao
         }
