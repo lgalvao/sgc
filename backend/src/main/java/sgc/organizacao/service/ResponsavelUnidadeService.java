@@ -91,7 +91,6 @@ public class ResponsavelUnidadeService {
     @Transactional(readOnly = true)
     public Usuario buscarResponsavelAtual(String siglaUnidade) {
         Unidade unidade = repo.buscarPorSigla(Unidade.class, siglaUnidade);
-
         Responsabilidade resp = repo.buscar(Responsabilidade.class, unidade.getCodigo());
 
         return repo.buscar(Usuario.class, resp.getUsuarioTitulo());
@@ -124,7 +123,6 @@ public class ResponsavelUnidadeService {
         Usuario responsavel = repo.buscar(Usuario.class, responsabilidade.getUsuarioTitulo());
 
         Usuario titularOficial = repo.buscar(Usuario.class, responsabilidade.getUnidade().getTituloTitular());
-
         return montarResponsavelDto(unidadeCodigo, responsavel, titularOficial);
     }
 

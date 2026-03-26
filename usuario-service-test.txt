@@ -1,0 +1,4 @@
+Starting a Gradle Daemon, 3 busy and 19 stopped Daemons could not be reused, use --status for details
+Calculating task graph as no cached configuration is available for tasks: :backend:test --tests sgc.organizacao.UsuarioServiceTest
+> Task :backend:processResources UP-TO-DATE
+> Task :backend:processTestResources UP-TO-DATE

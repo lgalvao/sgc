@@ -1,0 +1,87 @@
+[2m[WebServer] [22m[SMTP] Servidor SMTP local executando na porta 1025
+[2m[WebServer] [22m[BACKEND] INFO  [/].log:168: Initializing Spring DispatcherServlet 'dispatcherServlet'
+[2m[WebServer] [22m[FRONTEND] > vite --port 5173
+[2m[WebServer] [22m[FRONTEND]   [32m[1mVITE[22m v7.3.1[39m  [2mready in [0m[1m3545[22m[2m[0m ms[22m
+[2m[WebServer] [22m[FRONTEND]   [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5173[22m/[39m
+[2m[WebServer] [22m[FRONTEND] [2m  [32m➜[39m  [1mNetwork[22m[2m: use [22m[1m--host[22m[2m to expose[22m
+[2m[WebServer] [22m>>> Infra E2E no ar. Frontend: 5173. Backend: 10000 (perfil e2e).
+
+Running 14 tests using 1 worker
+
+[2m[WebServer] [22m[BACKEND] INFO  E2eController.resetDatabase:88: Reset do banco de dados concluído.
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoService.criar:156: Processo criado com 1 unidades participantes
+  ✓   1 [chromium] › e2e\cdu-20.spec.ts:53:5 › CDU-20 - Analisar validação de mapa de competências › Setup data (481ms)
+[2m[WebServer] [22m[BACKEND] INFO  SubprocessoService.criarParaMapeamento:259: Criando 1 subprocessos para o processo 400
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoService.notificarInicioProcesso:507: Notificando início do processo 400
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoService.iniciar:232: Processo 400 iniciado para 1 unidades.
+[2m[WebServer] [22m[BACKEND] INFO  ClienteAcessoAdE2e.autenticar:24: Usuário autenticado via bypass de AD (Profile E2E): ***2020
+[2m[WebServer] [22m[BACKEND] INFO  LoginFacade.entrar:100: Usuário ***2020 autorizado: GESTOR-SECRETARIA_1
+  ✓   2 [chromium] › e2e\cdu-20.spec.ts:61:5 › CDU-20 - Analisar validação de mapa de competências › Cenario 0: modal de aceite exibe campo opcional de observação (4.6s)
+[2m[WebServer] [22m[BACKEND] INFO  ClienteAcessoAdE2e.autenticar:24: Usuário autenticado via bypass de AD (Profile E2E): ***2020
+[2m[WebServer] [22m[BACKEND] INFO  LoginFacade.entrar:100: Usuário ***2020 autorizado: GESTOR-SECRETARIA_1
+[2m[WebServer] [22m[BACKEND] INFO  SubprocessoTransicaoService.executarAceiteValidacao:433: Validação aceita para mapa do SP 400
+  ✓   3 [chromium] › e2e\cdu-20.spec.ts:76:5 › CDU-20 - Analisar validação de mapa de competências › Cenario 1: GESTOR SECRETARIA_1 analisa e aceita (2.8s)
+[2m[WebServer] [22m[BACKEND] INFO  ClienteAcessoAdE2e.autenticar:24: Usuário autenticado via bypass de AD (Profile E2E): ***1919
+[2m[WebServer] [22m[BACKEND] INFO  LoginFacade.entrar:100: Usuário ***1919 autorizado: ADMIN-ADMIN
+[2m[WebServer] [22m[BACKEND] INFO  SubprocessoTransicaoService.executarHomologacaoValidacao:445: Homologando validação do mapa do subprocesso 400
+  ✓   4 [chromium] › e2e\cdu-20.spec.ts:106:5 › CDU-20 - Analisar validação de mapa de competências › Cenario 2: ADMIN homologa final (1.3s)
+[2m[WebServer] [22m[BACKEND] INFO  E2eController.resetDatabase:88: Reset do banco de dados concluído.
+  ✓   5 [chromium] › e2e\cdu-20.spec.ts:125:5 › CDU-20 - Ver sugestões quando situação é "Mapa com sugestões" › Setup data (73ms)
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoService.criar:156: Processo criado com 1 unidades participantes
+[2m[WebServer] [22m[BACKEND] INFO  SubprocessoService.criarParaMapeamento:259: Criando 1 subprocessos para o processo 400
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoService.notificarInicioProcesso:507: Notificando início do processo 400
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoService.iniciar:232: Processo 400 iniciado para 1 unidades.
+[2m[WebServer] [22m[BACKEND] INFO  ClienteAcessoAdE2e.autenticar:24: Usuário autenticado via bypass de AD (Profile E2E): ***2020
+[2m[WebServer] [22m[BACKEND] INFO  LoginFacade.entrar:100: Usuário ***2020 autorizado: GESTOR-SECRETARIA_1
+  ✓   6 [chromium] › e2e\cdu-20.spec.ts:134:5 › CDU-20 - Ver sugestões quando situação é "Mapa com sugestões" › GESTOR visualiza botão "Ver sugestões" e acessa modal com conteúdo (1.9s)
+  ✓   7 [chromium] › e2e\cdu-20.spec.ts:168:5 › CDU-20 - Aceite de mapa com sugestões › Setup data (57ms)
+[2m[WebServer] [22m[BACKEND] INFO  E2eController.resetDatabase:88: Reset do banco de dados concluído.
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoService.criar:156: Processo criado com 1 unidades participantes
+[2m[WebServer] [22m[BACKEND] INFO  SubprocessoService.criarParaMapeamento:259: Criando 1 subprocessos para o processo 400
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoService.notificarInicioProcesso:507: Notificando início do processo 400
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoService.iniciar:232: Processo 400 iniciado para 1 unidades.
+[2m[WebServer] [22m[BACKEND] INFO  ClienteAcessoAdE2e.autenticar:24: Usuário autenticado via bypass de AD (Profile E2E): ***5555
+[2m[WebServer] [22m[BACKEND] INFO  LoginFacade.entrar:100: Usuário ***5555 autorizado: CHEFE-ASSESSORIA_11
+[2m[WebServer] [22m[BACKEND] INFO  SubprocessoTransicaoService.apresentarSugestoes:320: Sugestões aresentadas para mapa do SP 400: Sugestão do chefe para ajuste no mapa
+[2m[WebServer] [22m[BACKEND] INFO  ClienteAcessoAdE2e.autenticar:24: Usuário autenticado via bypass de AD (Profile E2E): ***2020
+[2m[WebServer] [22m[BACKEND] INFO  LoginFacade.entrar:100: Usuário ***2020 autorizado: GESTOR-SECRETARIA_1
+[2m[WebServer] [22m[BACKEND] INFO  SubprocessoTransicaoService.executarAceiteValidacao:433: Validação aceita para mapa do SP 400
+  ✓   8 [chromium] › e2e\cdu-20.spec.ts:177:5 › CDU-20 - Aceite de mapa com sugestões › CHEFE apresenta sugestões e GESTOR registra aceite (2.8s)
+[2m[WebServer] [22m[BACKEND] INFO  E2eController.resetDatabase:88: Reset do banco de dados concluído.
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoService.criar:156: Processo criado com 1 unidades participantes
+[2m[WebServer] [22m[BACKEND] INFO  SubprocessoService.criarParaMapeamento:259: Criando 1 subprocessos para o processo 400
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoService.notificarInicioProcesso:507: Notificando início do processo 400
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoService.iniciar:232: Processo 400 iniciado para 1 unidades.
+[2m[WebServer] [22m[BACKEND] INFO  ClienteAcessoAdE2e.autenticar:24: Usuário autenticado via bypass de AD (Profile E2E): ***2020
+[2m[WebServer] [22m[BACKEND] INFO  LoginFacade.entrar:100: Usuário ***2020 autorizado: GESTOR-SECRETARIA_1
+[2m[WebServer] [22m[BACKEND] INFO  SubprocessoTransicaoService.devolverValidacao:383: Devolvida validação do mapa do SP 400
+  ✓   9 [chromium] › e2e\cdu-20.spec.ts:211:5 › CDU-20 - Aceite de mapa com sugestões › GESTOR devolve validação do mapa e sistema registra efeito visível no subprocesso (2.0s)
+[2m[WebServer] [22m[BACKEND] INFO  E2eController.resetDatabase:88: Reset do banco de dados concluído.
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoService.criar:156: Processo criado com 1 unidades participantes
+[2m[WebServer] [22m[BACKEND] INFO  SubprocessoService.criarParaMapeamento:259: Criando 1 subprocessos para o processo 400
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoService.notificarInicioProcesso:507: Notificando início do processo 400
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoService.iniciar:232: Processo 400 iniciado para 1 unidades.
+  ✓  10 [chromium] › e2e\cdu-20.spec.ts:264:5 › CDU-20 - ADMIN não deve ver botões de edição com mapa com sugestões (Bug #1376) › Setup data (95ms)
+[2m[WebServer] [22m[BACKEND] INFO  ClienteAcessoAdE2e.autenticar:24: Usuário autenticado via bypass de AD (Profile E2E): ***1919
+[2m[WebServer] [22m[BACKEND] INFO  LoginFacade.entrar:100: Usuário ***1919 autorizado: ADMIN-ADMIN
+[2m[WebServer] [22m[BACKEND] INFO  SgcPermissionEvaluator.verificarLocalizacao:179: Acesso negado por localização. Usuário: ***1919 (Unidade ativa: 1). Subprocesso 400 localizado em 2.
+  ✓  11 [chromium] › e2e\cdu-20.spec.ts:273:5 › CDU-20 - ADMIN não deve ver botões de edição com mapa com sugestões (Bug #1376) › ADMIN não vê card de edição de mapa quando situação é Mapa com sugestões (1.2s)
+  ✓  12 [chromium] › e2e\cdu-20.spec.ts:289:5 › CDU-20 - ADMIN homologa mapa após GESTOR aceitar com sugestões (Bug #1376) › Setup data (65ms)
+[2m[WebServer] [22m[BACKEND] INFO  E2eController.resetDatabase:88: Reset do banco de dados concluído.
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoService.criar:156: Processo criado com 1 unidades participantes
+[2m[WebServer] [22m[BACKEND] INFO  SubprocessoService.criarParaMapeamento:259: Criando 1 subprocessos para o processo 400
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoService.notificarInicioProcesso:507: Notificando início do processo 400
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoService.iniciar:232: Processo 400 iniciado para 1 unidades.
+[2m[WebServer] [22m[BACKEND] INFO  ClienteAcessoAdE2e.autenticar:24: Usuário autenticado via bypass de AD (Profile E2E): ***5555
+[2m[WebServer] [22m[BACKEND] INFO  LoginFacade.entrar:100: Usuário ***5555 autorizado: CHEFE-ASSESSORIA_11
+[2m[WebServer] [22m[BACKEND] INFO  SubprocessoTransicaoService.apresentarSugestoes:320: Sugestões aresentadas para mapa do SP 400: Sugestão para ajuste no mapa - Bug 1376
+[2m[WebServer] [22m[BACKEND] INFO  ClienteAcessoAdE2e.autenticar:24: Usuário autenticado via bypass de AD (Profile E2E): ***2020
+[2m[WebServer] [22m[BACKEND] INFO  LoginFacade.entrar:100: Usuário ***2020 autorizado: GESTOR-SECRETARIA_1
+[2m[WebServer] [22m[BACKEND] INFO  SubprocessoTransicaoService.executarAceiteValidacao:433: Validação aceita para mapa do SP 400
+  ✓  13 [chromium] › e2e\cdu-20.spec.ts:298:5 › CDU-20 - ADMIN homologa mapa após GESTOR aceitar com sugestões (Bug #1376) › CHEFE apresenta sugestões e GESTOR registra aceite (2.6s)
+[2m[WebServer] [22m[BACKEND] INFO  ClienteAcessoAdE2e.autenticar:24: Usuário autenticado via bypass de AD (Profile E2E): ***1919
+[2m[WebServer] [22m[BACKEND] INFO  LoginFacade.entrar:100: Usuário ***1919 autorizado: ADMIN-ADMIN
+[2m[WebServer] [22m[BACKEND] INFO  SubprocessoTransicaoService.executarHomologacaoValidacao:445: Homologando validação do mapa do subprocesso 400
+  ✓  14 [chromium] › e2e\cdu-20.spec.ts:320:5 › CDU-20 - ADMIN homologa mapa após GESTOR aceitar com sugestões (Bug #1376) › ADMIN homologa o mapa após aceite do GESTOR com sugestões (1.2s)
+
+  14 passed (58.0s)

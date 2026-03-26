@@ -12,6 +12,7 @@ test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
     async function acessarUnidadeAlvo(page: import('@playwright/test').Page) {
         await expect(page.getByTestId('link-arvore-unidade-SECRETARIA_1')).toBeVisible();
         await expect(page.getByTestId('link-arvore-unidade-SECRETARIA_2')).toBeVisible();
+        await page.getByTestId('btn-arvore-expand-SECRETARIA_1').click();
         await expect(page.getByTestId(`link-arvore-unidade-${SIGLA_UNIDADE}`)).toBeVisible();
         await page.getByTestId(`link-arvore-unidade-${SIGLA_UNIDADE}`).click();
     }
@@ -50,7 +51,7 @@ test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
         await abrirTelaCriacaoAtribuicao(page);
 
         await expect(page.getByRole('heading', {name: TEXTOS.atribuicaoTemporaria.TITULO})).toBeVisible();
-        await expect(page.getByText(SIGLA_UNIDADE)).toBeVisible();
+        await expect(page.locator('p.text-muted', {hasText: SIGLA_UNIDADE}).first()).toBeVisible();
         await expect(page.getByText(TEXTOS.atribuicaoTemporaria.AJUDA_PESQUISA_USUARIO)).toBeVisible();
 
         await expect(page.getByLabel(TEXTOS.atribuicaoTemporaria.LABEL_USUARIO)).toBeVisible();

@@ -1,0 +1,64 @@
+[2m[WebServer] [22m[SMTP] Servidor SMTP local executando na porta 1025
+[2m[WebServer] [22m[BACKEND] Calculating task graph as configuration cache cannot be reused because system property 'idea.io.use.nio2' has changed.
+[2m[WebServer] [22m[BACKEND] Perfil Spring ativado: e2e
+[2m[WebServer] [22m[BACKEND] Carregando configurações de: .env.e2e
+[2m[WebServer] [22m[BACKEND] INFO  [/].log:168: Initializing Spring DispatcherServlet 'dispatcherServlet'
+[2m[WebServer] [22m[FRONTEND] > vite --port 5173
+[2m[WebServer] [22m[FRONTEND]   [32m[1mVITE[22m v7.3.1[39m  [2mready in [0m[1m2115[22m[2m[0m ms[22m
+[2m[WebServer] [22m[FRONTEND]   [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5173[22m/[39m
+[2m[WebServer] [22m[FRONTEND] [2m  [32m➜[39m  [1mNetwork[22m[2m: use [22m[1m--host[22m[2m to expose[22m
+[2m[WebServer] [22m>>> Infra E2E no ar. Frontend: 5173. Backend: 10000 (perfil e2e).
+
+Running 5 tests using 1 worker
+
+[2m[WebServer] [22m[BACKEND] INFO  E2eController.resetDatabase:88: Reset do banco de dados concluído.
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoService.criar:156: Processo criado com 1 unidades participantes
+[2m[WebServer] [22m[BACKEND] INFO  SubprocessoService.criarParaMapeamento:259: Criando 1 subprocessos para o processo 400
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoService.notificarInicioProcesso:507: Notificando início do processo 400
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoService.iniciar:232: Processo 400 iniciado para 1 unidades.
+[2m[WebServer] [22m[BACKEND] INFO  ClienteAcessoAdE2e.autenticar:24: Usuário autenticado via bypass de AD (Profile E2E): ***9999
+[2m[WebServer] [22m[BACKEND] INFO  LoginFacade.entrar:100: Usuário ***9999 autorizado: GESTOR-COORD_21
+[2m[WebServer] [22m[BACKEND] INFO  SubprocessoTransicaoService.executarAceite:526: Aceitando cadastro do subprocesso 400
+[2m[WebServer] [22m[BACKEND] INFO  ClienteAcessoAdE2e.autenticar:24: Usuário autenticado via bypass de AD (Profile E2E): ***2121
+[2m[WebServer] [22m[BACKEND] INFO  LoginFacade.entrar:100: Usuário ***2121 autorizado: GESTOR-SECRETARIA_2
+[2m[WebServer] [22m[BACKEND] INFO  SubprocessoTransicaoService.executarDevolucao:473: Devolvendo cadastro do subprocesso 400
+[2m[WebServer] [22m[BACKEND] INFO  ClienteAcessoAdE2e.autenticar:24: Usuário autenticado via bypass de AD (Profile E2E): ***9999
+[2m[WebServer] [22m[BACKEND] INFO  LoginFacade.entrar:100: Usuário ***9999 autorizado: GESTOR-COORD_21
+[2m[WebServer] [22m[BACKEND] INFO  SubprocessoTransicaoService.executarDevolucao:473: Devolvendo cadastro do subprocesso 400
+[2m[WebServer] [22m[BACKEND] INFO  ClienteAcessoAdE2e.autenticar:24: Usuário autenticado via bypass de AD (Profile E2E): ***1010
+[2m[WebServer] [22m[BACKEND] INFO  LoginFacade.entrar:100: Usuário ***1010 autorizado: CHEFE-SECAO_211
+[2m[WebServer] [22m[BACKEND] INFO  SubprocessoTransicaoService.disponibilizarCadastro:152: Disponibilizando cadastro do subprocesso 400
+  ✓  1 [chromium] › e2e\cdu-13.spec.ts:33:5 › CDU-13 - Analisar cadastro de atividades e conhecimentos › 1. Setup: Preparar processo e devoluções iniciais (10.0s)
+[2m[WebServer] [22m[BACKEND] INFO  ClienteAcessoAdE2e.autenticar:24: Usuário autenticado via bypass de AD (Profile E2E): ***9999
+[2m[WebServer] [22m[BACKEND] INFO  LoginFacade.entrar:100: Usuário ***9999 autorizado: GESTOR-COORD_21
+[2m[WebServer] [22m[BACKEND] INFO  SubprocessoTransicaoService.executarAceite:526: Aceitando cadastro do subprocesso 400
+[2m[WebServer] [22m[BACKEND] INFO  ClienteAcessoAdE2e.autenticar:24: Usuário autenticado via bypass de AD (Profile E2E): ***1919
+[2m[WebServer] [22m[BACKEND] INFO  LoginFacade.entrar:100: Usuário ***1919 autorizado: ADMIN-ADMIN
+[2m[WebServer] [22m[BACKEND] INFO  SgcPermissionEvaluator.verificarLocalizacao:179: Acesso negado por localização. Usuário: ***1919 (Unidade ativa: 1). Subprocesso 400 localizado em 11.
+[2m[WebServer] [22m[BACKEND] INFO  ClienteAcessoAdE2e.autenticar:24: Usuário autenticado via bypass de AD (Profile E2E): ***2121
+[2m[WebServer] [22m[BACKEND] INFO  LoginFacade.entrar:100: Usuário ***2121 autorizado: GESTOR-SECRETARIA_2
+[2m[WebServer] [22m[BACKEND] INFO  SubprocessoTransicaoService.executarAceite:526: Aceitando cadastro do subprocesso 400
+[2m[WebServer] [22m[BACKEND] INFO  ClienteAcessoAdE2e.autenticar:24: Usuário autenticado via bypass de AD (Profile E2E): ***1919
+[2m[WebServer] [22m[BACKEND] INFO  LoginFacade.entrar:100: Usuário ***1919 autorizado: ADMIN-ADMIN
+[2m[WebServer] [22m[BACKEND] INFO  SubprocessoTransicaoService.executarHomologacao:570: Homologando cadastro do subprocesso 400
+  ✓  2 [chromium] › e2e\cdu-13.spec.ts:88:5 › CDU-13 - Analisar cadastro de atividades e conhecimentos › Cenarios CDU-13: Hierarquia aceita e ADMIN homologa (6.0s)
+  ✓  3 [chromium] › e2e\cdu-13.spec.ts:148:5 › CDU-13 - Cancelamentos de análise › Setup: preparar processo para fluxos de cancelamento (57ms)
+[2m[WebServer] [22m[BACKEND] INFO  E2eController.resetDatabase:88: Reset do banco de dados concluído.
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoService.criar:156: Processo criado com 1 unidades participantes
+[2m[WebServer] [22m[BACKEND] INFO  SubprocessoService.criarParaMapeamento:259: Criando 1 subprocessos para o processo 400
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoService.notificarInicioProcesso:507: Notificando início do processo 400
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoService.iniciar:232: Processo 400 iniciado para 1 unidades.
+[2m[WebServer] [22m[BACKEND] INFO  ClienteAcessoAdE2e.autenticar:24: Usuário autenticado via bypass de AD (Profile E2E): ***9999
+[2m[WebServer] [22m[BACKEND] INFO  LoginFacade.entrar:100: Usuário ***9999 autorizado: GESTOR-COORD_21
+  ✓  4 [chromium] › e2e\cdu-13.spec.ts:156:5 › CDU-13 - Cancelamentos de análise › GESTOR cancela devolução e permanece na tela de atividades e conhecimentos (1.8s)
+[2m[WebServer] [22m[BACKEND] INFO  ClienteAcessoAdE2e.autenticar:24: Usuário autenticado via bypass de AD (Profile E2E): ***9999
+[2m[WebServer] [22m[BACKEND] INFO  LoginFacade.entrar:100: Usuário ***9999 autorizado: GESTOR-COORD_21
+[2m[WebServer] [22m[BACKEND] INFO  SubprocessoTransicaoService.executarAceite:526: Aceitando cadastro do subprocesso 400
+[2m[WebServer] [22m[BACKEND] INFO  ClienteAcessoAdE2e.autenticar:24: Usuário autenticado via bypass de AD (Profile E2E): ***2121
+[2m[WebServer] [22m[BACKEND] INFO  LoginFacade.entrar:100: Usuário ***2121 autorizado: GESTOR-SECRETARIA_2
+[2m[WebServer] [22m[BACKEND] INFO  SubprocessoTransicaoService.executarAceite:526: Aceitando cadastro do subprocesso 400
+[2m[WebServer] [22m[BACKEND] INFO  ClienteAcessoAdE2e.autenticar:24: Usuário autenticado via bypass de AD (Profile E2E): ***1919
+[2m[WebServer] [22m[BACKEND] INFO  LoginFacade.entrar:100: Usuário ***1919 autorizado: ADMIN-ADMIN
+  ✓  5 [chromium] › e2e\cdu-13.spec.ts:173:5 › CDU-13 - Cancelamentos de análise › ADMIN cancela homologação e permanece na tela de atividades e conhecimentos (4.7s)
+
+  5 passed (50.1s)

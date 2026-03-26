@@ -94,7 +94,22 @@ function Executar-ComandoCapturando {
         duracaoMs = $duracaoMs
         log = $ArquivoLog
         texto = if (Test-Path $ArquivoLog) { Get-Content $ArquivoLog -Raw } else { '' }
+        inicio = $inicio
     }
+}
+
+function Testar-ArtefatoFresco {
+    param(
+        [string]$Caminho,
+        [datetime]$InicioExecucao
+    )
+
+    if (-not (Test-Path $Caminho)) {
+        return $false
+    }
+
+    $item = Get-Item $Caminho
+    return $item.LastWriteTime -ge $InicioExecucao
 }
 
 function Extrair-LinhasFinaisLog {
@@ -195,7 +210,7 @@ function Extrair-CoberturaJacoco {
         foreach ($class in $package.class) {
             $line = $class.counter | Where-Object { $_.type -eq 'LINE' } | Select-Object -First 1
             $branch = $class.counter | Where-Object { $_.type -eq 'BRANCH' } | Select-Object -First 1
-            $classes += @{
+            $classes += [pscustomobject]@{
                 nome = ($class.name -replace '/', '.')
                 linhasPercentual = Obter-Percentual ([int](Obter-ValorOuPadrao $line.covered 0)) ([int](Obter-ValorOuPadrao $line.missed 0))
                 branchesPercentual = Obter-Percentual ([int](Obter-ValorOuPadrao $branch.covered 0)) ([int](Obter-ValorOuPadrao $branch.missed 0))
@@ -255,7 +270,7 @@ function Extrair-CoberturaFrontend {
         $totais.lines.total += $lineTotal
         $totais.lines.cobertos += $lineCobertos
 
-        $arquivos += @{
+        $arquivos += [pscustomobject]@{
             arquivo = ConverterEm-CaminhoRelativo $entrada.Name
             statementsPercentual = if ($statementTotal -gt 0) { [math]::Round(($statementCobertos / $statementTotal) * 100, 2) } else { 0 }
             branchesPercentual = if ($branchTotal -gt 0) { [math]::Round(($branchCobertos / $branchTotal) * 100, 2) } else { 0 }
@@ -419,6 +434,16 @@ function Gerar-ResumoMarkdown {
     return ($linhas -join "`n") + "`n"
 }
 
+function Obter-MetricasNulasFrontend {
+    return @{
+        functions = $null
+        lines = $null
+        branches = $null
+        statements = $null
+        arquivos = @()
+    }
+}
+
 Novo-DiretorioSeNecessario $diretorioRuns
 Novo-DiretorioSeNecessario $diretorioLatest
 
@@ -455,20 +480,35 @@ $adaptadores = @{
         $execucao = Nova-Execucao 'backend-cobertura' 'Backend cobertura' 'cobertura' '.\gradlew.bat :backend:jacocoTestReport' 'backend'
         $saida = Executar-ComandoCapturando '.\gradlew.bat' @(':backend:jacocoTestReport') $diretorioRaiz (Join-Path $diretorioExecucao 'backend-cobertura.log')
         $arquivoXml = Join-Path $diretorioRaiz 'backend\build\reports\jacoco\test\jacocoTestReport.xml'
-        $metricas = Extrair-CoberturaJacoco $arquivoXml
+        $metricas = $null
+        if (($saida.codigo -eq 0) -and (Testar-ArtefatoFresco $arquivoXml $saida.inicio)) {
+            $metricas = Extrair-CoberturaJacoco $arquivoXml
+        }
+
         $execucao.status = Obter-StatusExecucao $saida.codigo @{}
         $execucao.duracaoMs = $saida.duracaoMs
         $execucao.metricas = $metricas
-        $execucao.sumario = "Cobertura backend: $($metricas.linhas.percentual)% de linhas e $($metricas.branches.percentual)% de branches."
+        $execucao.sumario = if ($null -ne $metricas) {
+            "Cobertura backend: $($metricas.linhas.percentual)% de linhas e $($metricas.branches.percentual)% de branches."
+        } else {
+            'Cobertura backend indisponivel nesta execucao.'
+        }
         $execucao.erros = if ($saida.codigo -eq 0) { @() } else { @(Extrair-LinhasFinaisLog $saida.texto) }
-        $execucao.artefatos = @((ConverterEm-CaminhoRelativo $arquivoXml), (ConverterEm-CaminhoRelativo $saida.log))
+        $execucao.artefatos = @()
+        if ($null -ne $metricas) {
+            $execucao.artefatos += (ConverterEm-CaminhoRelativo $arquivoXml)
+        }
+        $execucao.artefatos += (ConverterEm-CaminhoRelativo $saida.log)
         return $execucao
     }
     frontendCobertura = {
         $execucao = Nova-Execucao 'frontend-cobertura' 'Frontend cobertura' 'cobertura' 'npm run coverage:unit --prefix frontend' 'frontend'
         $saida = Executar-ComandoCapturando 'npm.cmd' @('run', 'coverage:unit', '--prefix', 'frontend') $diretorioRaiz (Join-Path $diretorioExecucao 'frontend-cobertura.log')
         $arquivoJson = Join-Path $diretorioRaiz 'frontend\coverage\coverage-final.json'
-        $cobertura = Extrair-CoberturaFrontend $arquivoJson
+        $cobertura = $null
+        if (($saida.codigo -eq 0) -and (Testar-ArtefatoFresco $arquivoJson $saida.inicio)) {
+            $cobertura = Extrair-CoberturaFrontend $arquivoJson
+        }
         $testes = Extrair-ResumoVitest $saida.texto
         $metricas = @{
             testes = $testes
@@ -477,9 +517,17 @@ $adaptadores = @{
         $execucao.status = Obter-StatusExecucao $saida.codigo $testes
         $execucao.duracaoMs = $saida.duracaoMs
         $execucao.metricas = $metricas
-        $execucao.sumario = "Cobertura frontend: $($cobertura.lines.percentual)% de linhas com $($testes.sucessos) testes aprovados."
+        $execucao.sumario = if ($null -ne $cobertura) {
+            "Cobertura frontend: $($cobertura.lines.percentual)% de linhas com $($testes.sucessos) testes aprovados."
+        } else {
+            "Cobertura frontend indisponivel nesta execucao com $($testes.sucessos) testes aprovados."
+        }
         $execucao.erros = if ($saida.codigo -eq 0) { @() } else { @(Extrair-LinhasFinaisLog $saida.texto) }
-        $execucao.artefatos = @((ConverterEm-CaminhoRelativo $arquivoJson), (ConverterEm-CaminhoRelativo $saida.log))
+        $execucao.artefatos = @()
+        if ($null -ne $cobertura) {
+            $execucao.artefatos += (ConverterEm-CaminhoRelativo $arquivoJson)
+        }
+        $execucao.artefatos += (ConverterEm-CaminhoRelativo $saida.log)
         return $execucao
     }
     frontendLint = {
@@ -555,8 +603,8 @@ $confiabilidade = @{
         ([int](Obter-ValorOuPadrao (($verificacoes | Where-Object { $_.codigo -eq 'e2e-playwright' } | Select-Object -First 1).metricas.ignorados) 0))
     )
     testesFlaky = ([int](Obter-ValorOuPadrao (($verificacoes | Where-Object { $_.codigo -eq 'e2e-playwright' } | Select-Object -First 1).metricas.flaky) 0))
-    suitesLentas = @($verificacoes | Sort-Object duracaoMs -Descending | Select-Object -First 5 | ForEach-Object {
-        @{
+    suitesLentas = @($verificacoes | Sort-Object { [int]$_.duracaoMs } -Descending | Select-Object -First 5 | ForEach-Object {
+        [pscustomobject]@{
             codigo = $_.codigo
             nome = $_.nome
             duracaoMs = $_.duracaoMs
@@ -566,7 +614,10 @@ $confiabilidade = @{
 
 $hotspots = @()
 foreach ($classe in $cobertura.backend.itensCriticos) {
-    $hotspots += @{
+    if (($classe.nome -match 'Builder$') -or ($classe.nome -match '\$.*Builder') -or ($classe.nome -match '\.dto\.') -or ($classe.nome -eq 'sgc.comum.ComumDtos')) {
+        continue
+    }
+    $hotspots += [pscustomobject]@{
         codigo = "backend:$($classe.nome)"
         nome = $classe.nome
         risco = [math]::Round(100 - $classe.linhasPercentual, 2)
@@ -574,7 +625,7 @@ foreach ($classe in $cobertura.backend.itensCriticos) {
     }
 }
 foreach ($arquivo in $cobertura.frontend.itensCriticos) {
-    $hotspots += @{
+    $hotspots += [pscustomobject]@{
         codigo = "frontend:$($arquivo.arquivo)"
         nome = $arquivo.arquivo
         risco = [math]::Round(100 - $arquivo.linesPercentual, 2)

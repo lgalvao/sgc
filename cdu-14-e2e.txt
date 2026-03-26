@@ -1,0 +1,46 @@
+[2m[WebServer] [22m[SMTP] Servidor SMTP local executando na porta 1025
+[2m[WebServer] [22m[BACKEND] Calculating task graph as configuration cache cannot be reused because file 'backend\build.gradle.kts' has changed.
+[2m[WebServer] [22m[BACKEND] Perfil Spring ativado: e2e
+[2m[WebServer] [22m[BACKEND] Carregando configurações de: .env.e2e
+[2m[WebServer] [22m[BACKEND] INFO  [/].log:168: Initializing Spring DispatcherServlet 'dispatcherServlet'
+[2m[WebServer] [22m[FRONTEND] > vite --port 5173
+[2m[WebServer] [22m[FRONTEND]   [32m[1mVITE[22m v7.3.1[39m  [2mready in [0m[1m4486[22m[2m[0m ms[22m
+[2m[WebServer] [22m[FRONTEND]   [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5173[22m/[39m
+[2m[WebServer] [22m[FRONTEND] [2m  [32m➜[39m  [1mNetwork[22m[2m: use [22m[1m--host[22m[2m to expose[22m
+[2m[WebServer] [22m>>> Infra E2E no ar. Frontend: 5173. Backend: 10000 (perfil e2e).
+
+Running 2 tests using 1 worker
+
+[2m[WebServer] [22m[BACKEND] INFO  E2eController.resetDatabase:88: Reset do banco de dados concluído.
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoService.criar:156: Processo criado com 1 unidades participantes
+[2m[WebServer] [22m[BACKEND] INFO  SubprocessoService.criarParaMapeamento:259: Criando 1 subprocessos para o processo 400
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoService.notificarInicioProcesso:507: Notificando início do processo 400
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoService.iniciar:232: Processo 400 iniciado para 1 unidades.
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoService.criar:156: Processo criado com 1 unidades participantes
+[2m[WebServer] [22m[BACKEND] INFO  SubprocessoService.criarParaRevisao:299: Criado subprocesso para unidade SECAO_212
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoService.notificarInicioProcesso:507: Notificando início do processo 401
+[2m[WebServer] [22m[BACKEND] INFO  ProcessoService.iniciar:232: Processo 401 iniciado para 1 unidades.
+[2m[WebServer] [22m[BACKEND] INFO  ClienteAcessoAdE2e.autenticar:24: Usuário autenticado via bypass de AD (Profile E2E): ***1818
+[2m[WebServer] [22m[BACKEND] INFO  LoginFacade.entrar:100: Usuário ***1818 autorizado: CHEFE-SECAO_212
+[2m[WebServer] [22m[BACKEND] INFO  MapaManutencaoService.criarAtividade:125: Atividade criada no mapa 401
+[2m[WebServer] [22m[BACKEND] INFO  SubprocessoSituacaoService.reconciliarSituacao:39: Subprocesso 401 (REVISAO) movido para em andamento
+[2m[WebServer] [22m[BACKEND] INFO  MapaManutencaoService.criarConhecimento:281: Conhecimento criado na atividade 4004
+[2m[WebServer] [22m[BACKEND] INFO  SubprocessoTransicaoService.disponibilizarRevisao:159: Disponibilizando revisão do subprocesso 401
+[2m[WebServer] [22m[BACKEND] INFO  ClienteAcessoAdE2e.autenticar:24: Usuário autenticado via bypass de AD (Profile E2E): ***9999
+[2m[WebServer] [22m[BACKEND] INFO  LoginFacade.entrar:100: Usuário ***9999 autorizado: GESTOR-COORD_21
+[2m[WebServer] [22m[BACKEND] WARN  MonitoramentoAspect.monitorarExecucao:27: EXECUCAO LENTA: sgc.subprocesso.service.SubprocessoTransicaoService.disponibilizarRevisao levou 540 ms
+[2m[WebServer] [22m[BACKEND] INFO  SubprocessoTransicaoService.executarDevolucao:473: Devolvendo revisão do subprocesso 401
+[2m[WebServer] [22m[BACKEND] INFO  ClienteAcessoAdE2e.autenticar:24: Usuário autenticado via bypass de AD (Profile E2E): ***1818
+[2m[WebServer] [22m[BACKEND] INFO  LoginFacade.entrar:100: Usuário ***1818 autorizado: CHEFE-SECAO_212
+[2m[WebServer] [22m[BACKEND] INFO  SubprocessoTransicaoService.disponibilizarRevisao:159: Disponibilizando revisão do subprocesso 401
+  ✓  1 [chromium] › e2e\cdu-14.spec.ts:41:5 › CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos › Setup UI (14.7s)
+[2m[WebServer] [22m[BACKEND] INFO  ClienteAcessoAdE2e.autenticar:24: Usuário autenticado via bypass de AD (Profile E2E): ***9999
+[2m[WebServer] [22m[BACKEND] INFO  LoginFacade.entrar:100: Usuário ***9999 autorizado: GESTOR-COORD_21
+[2m[WebServer] [22m[BACKEND] INFO  SubprocessoTransicaoService.executarAceite:526: Aceitando revisão do subprocesso 401
+[2m[WebServer] [22m[BACKEND] INFO  ClienteAcessoAdE2e.autenticar:24: Usuário autenticado via bypass de AD (Profile E2E): ***1919
+[2m[WebServer] [22m[BACKEND] INFO  LoginFacade.entrar:100: Usuário ***1919 autorizado: ADMIN-ADMIN
+[2m[WebServer] [22m[BACKEND] INFO  SgcPermissionEvaluator.verificarLocalizacao:179: Acesso negado por localização. Usuário: ***1919 (Unidade ativa: 1). Subprocesso 401 localizado em 11.
+  ✓  2 [chromium] › e2e\cdu-14.spec.ts:101:5 › CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos › Cenarios CDU-14: GESTOR cancela devolução, aceita e ADMIN vê histórico final (5.7s)
+[WebServer] Backend saiu com código 1
+
+  2 passed (1.4m)
