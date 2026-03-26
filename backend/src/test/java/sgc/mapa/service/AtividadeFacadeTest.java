@@ -46,14 +46,16 @@ class AtividadeFacadeTest {
             Atividade expected = Atividade.builder()
                     .codigo(atividadeCodigo)
                     .descricao("Atividade")
+                    .conhecimentos(new LinkedHashSet<>())
                     .build();
 
             when(mapaManutencaoService.atividadeCodigo(atividadeCodigo)).thenReturn(expected);
 
-            Atividade result = atividadeFacade.obterAtividadePorCodigo(atividadeCodigo);
+            AtividadeDto result = atividadeFacade.obterAtividadePorCodigo(atividadeCodigo);
 
             assertNotNull(result);
-            assertEquals(expected, result);
+            assertEquals(expected.getCodigo(), result.codigo());
+            assertEquals(expected.getDescricao(), result.descricao());
             verify(mapaManutencaoService).atividadeCodigo(atividadeCodigo);
         }
     }
@@ -73,10 +75,11 @@ class AtividadeFacadeTest {
 
             when(mapaManutencaoService.conhecimentosCodigoAtividade(atividadeCodigo)).thenReturn(expected);
 
-            List<Conhecimento> result = atividadeFacade.listarConhecimentosPorAtividade(atividadeCodigo);
+            List<ConhecimentoResumoDto> result = atividadeFacade.listarConhecimentosPorAtividade(atividadeCodigo);
 
             assertNotNull(result);
             assertEquals(2, result.size());
+            assertEquals("Conhecimento 1", result.getFirst().descricao());
             verify(mapaManutencaoService).conhecimentosCodigoAtividade(atividadeCodigo);
         }
     }

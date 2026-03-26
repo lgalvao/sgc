@@ -22,4 +22,15 @@ public record ProcessoResumoDto(
         String unidadesParticipantes,
         @Nullable String linkDestino
 ) {
+    public static ProcessoResumoDto fromEntity(Processo processo) {
+        return ProcessoResumoDto.builder()
+                .codigo(processo.getCodigo())
+                .descricao(processo.getDescricao())
+                .situacao(processo.getSituacao())
+                .tipo(processo.getTipo() != null ? processo.getTipo().name() : null)
+                .dataLimite(processo.getDataLimite())
+                .dataCriacao(processo.getDataCriacao())
+                .unidadesParticipantes(processo.getSiglasParticipantes())
+                .build();
+    }
 }

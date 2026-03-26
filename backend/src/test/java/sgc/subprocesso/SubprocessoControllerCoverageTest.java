@@ -15,6 +15,7 @@ import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
+import sgc.processo.model.*;
 import sgc.seguranca.*;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
@@ -49,8 +50,18 @@ class SubprocessoControllerCoverageTest {
     @DisplayName("listar - deve retornar lista e 200")
     @WithMockUser(roles = "ADMIN")
     void listar() throws Exception {
+        Processo processo = new Processo();
+        processo.setDescricao("Processo teste");
+
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(2L);
+        unidade.setSigla("UND");
+        unidade.setNome("Unidade teste");
+
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(1L);
+        sp.setProcesso(processo);
+        sp.setUnidade(unidade);
         when(subprocessoService.listarTodos()).thenReturn(List.of(sp));
 
         mockMvc.perform(get("/api/subprocessos"))
@@ -168,16 +179,21 @@ class SubprocessoControllerCoverageTest {
         unidade.setCodigo(10L);
         unidade.setSigla("UND");
         unidade.setNome("Unidade teste");
+        unidade.setTipo(TipoUnidade.OPERACIONAL);
+
+        Processo processo = new Processo();
+        processo.setDescricao("Processo teste");
 
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setCodigo(1L);
         subprocesso.setUnidade(unidade);
+        subprocesso.setProcesso(processo);
 
         when(permissionEvaluator.hasPermission(any(), eq(1L), eq("Subprocesso"), eq("VISUALIZAR_SUBPROCESSO"))).thenReturn(true);
         when(subprocessoService.obterContextoEdicao(1L)).thenReturn(
             new ContextoEdicaoResponse(
                     unidade,
-                    subprocesso,
+                    SubprocessoResumoDto.fromEntity(subprocesso),
                     null,
                     null,
                     List.of())
@@ -262,7 +278,8 @@ class SubprocessoControllerCoverageTest {
     @WithMockUser
     void salvarMapa() throws Exception {
         SalvarMapaRequest req = new SalvarMapaRequest("Obs", List.of());
-        when(subprocessoService.salvarMapa(eq(1L), any())).thenReturn(new Mapa());
+        when(subprocessoService.mapaCompletoDtoPorSubprocesso(1L))
+                .thenReturn(new MapaCompletoDto(1L, 1L, "Obs", List.of(), null));
 
         mockMvc.perform(post("/api/subprocessos/1/mapa")
                         .with(csrf())
@@ -276,7 +293,8 @@ class SubprocessoControllerCoverageTest {
     @WithMockUser
     void adicionarCompetencia() throws Exception {
         CompetenciaRequest req = new CompetenciaRequest("Comp", List.of(1L));
-        when(subprocessoService.adicionarCompetencia(eq(1L), any())).thenReturn(new Mapa());
+        when(subprocessoService.mapaCompletoDtoPorSubprocesso(1L))
+                .thenReturn(new MapaCompletoDto(1L, 1L, null, List.of(), null));
 
         mockMvc.perform(post("/api/subprocessos/1/competencia")
                         .with(csrf())
@@ -290,7 +308,8 @@ class SubprocessoControllerCoverageTest {
     @WithMockUser
     void atualizarCompetencia() throws Exception {
         CompetenciaRequest req = new CompetenciaRequest("Comp", List.of(1L));
-        when(subprocessoService.atualizarCompetencia(eq(1L), eq(10L), any())).thenReturn(new Mapa());
+        when(subprocessoService.mapaCompletoDtoPorSubprocesso(1L))
+                .thenReturn(new MapaCompletoDto(1L, 1L, null, List.of(), null));
 
         mockMvc.perform(post("/api/subprocessos/1/competencia/10")
                         .with(csrf())
@@ -303,7 +322,8 @@ class SubprocessoControllerCoverageTest {
     @DisplayName("removerCompetencia - deve chamar servico e retornar 200")
     @WithMockUser
     void removerCompetencia() throws Exception {
-        when(subprocessoService.removerCompetencia(1L, 10L)).thenReturn(new Mapa());
+        when(subprocessoService.mapaCompletoDtoPorSubprocesso(1L))
+                .thenReturn(new MapaCompletoDto(1L, 1L, null, List.of(), null));
 
         mockMvc.perform(post("/api/subprocessos/1/competencia/10/remover")
                         .with(csrf()))
@@ -330,7 +350,8 @@ class SubprocessoControllerCoverageTest {
     @WithMockUser
     void salvarMapaCompleto() throws Exception {
         SalvarMapaRequest req = new SalvarMapaRequest("Obs", List.of());
-        when(subprocessoService.salvarMapaSubprocesso(eq(1L), any())).thenReturn(new Mapa());
+        when(subprocessoService.mapaCompletoDtoPorSubprocesso(1L))
+                .thenReturn(new MapaCompletoDto(1L, 1L, "Obs", List.of(), null));
 
         mockMvc.perform(post("/api/subprocessos/1/mapa-completo")
                         .with(csrf())
@@ -456,9 +477,8 @@ class SubprocessoControllerCoverageTest {
     @WithMockUser
     void obterMapa() throws Exception {
         when(permissionEvaluator.hasPermission(any(), eq(1L), eq("Subprocesso"), eq("VISUALIZAR_SUBPROCESSO"))).thenReturn(true);
-        Subprocesso sp = new Subprocesso();
-        sp.setMapa(new Mapa());
-        when(subprocessoService.buscarSubprocessoComMapa(1L)).thenReturn(sp);
+        when(subprocessoService.mapaCompletoDtoPorSubprocesso(1L))
+                .thenReturn(new MapaCompletoDto(1L, 1L, null, List.of(), null));
 
         mockMvc.perform(get("/api/subprocessos/1/mapa"))
                 .andExpect(status().isOk());
@@ -469,7 +489,8 @@ class SubprocessoControllerCoverageTest {
     @WithMockUser
     void obterMapaCompleto() throws Exception {
         when(permissionEvaluator.hasPermission(any(), eq(1L), eq("Subprocesso"), eq("VISUALIZAR_SUBPROCESSO"))).thenReturn(true);
-        when(subprocessoService.mapaCompletoPorSubprocesso(1L)).thenReturn(new Mapa());
+        when(subprocessoService.mapaCompletoDtoPorSubprocesso(1L))
+                .thenReturn(new MapaCompletoDto(1L, 1L, null, List.of(), null));
 
         mockMvc.perform(get("/api/subprocessos/1/mapa-completo"))
                 .andExpect(status().isOk());

@@ -28,9 +28,30 @@ public interface UnidadeRepo extends JpaRepository<Unidade, Long> {
             SELECT u FROM Unidade u
             LEFT JOIN FETCH u.unidadeSuperior
             LEFT JOIN FETCH u.responsabilidade
+            LEFT JOIN FETCH u.responsabilidade.usuario
             WHERE u.situacao = SituacaoUnidade.ATIVA
             """)
     List<Unidade> findAllWithHierarquia();
+
+    @Query("""
+            SELECT u FROM Unidade u
+            LEFT JOIN FETCH u.unidadeSuperior
+            LEFT JOIN FETCH u.responsabilidade
+            LEFT JOIN FETCH u.responsabilidade.usuario
+            WHERE u.codigo = :codigo
+            AND u.situacao = SituacaoUnidade.ATIVA
+            """)
+    Optional<Unidade> findByCodigoComResponsavel(@Param("codigo") Long codigo);
+
+    @Query("""
+            SELECT u FROM Unidade u
+            LEFT JOIN FETCH u.unidadeSuperior
+            LEFT JOIN FETCH u.responsabilidade
+            LEFT JOIN FETCH u.responsabilidade.usuario
+            WHERE UPPER(u.sigla) = UPPER(:sigla)
+            AND u.situacao = SituacaoUnidade.ATIVA
+            """)
+    Optional<Unidade> findBySiglaComResponsavel(@Param("sigla") String sigla);
 
     List<Unidade> findByUnidadeSuperiorCodigoAndSituacao(Long unidadeSuperiorCodigo, SituacaoUnidade situacao);
 

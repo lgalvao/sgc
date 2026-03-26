@@ -33,7 +33,7 @@ class UnidadeServiceTest {
     @DisplayName("buscarPorCodigo - Sucesso")
     void buscarPorCodigo() {
         Unidade u = new Unidade();
-        when(repo.buscar(eq(Unidade.class), any())).thenReturn(u);
+        when(unidadeRepo.findByCodigoComResponsavel(1L)).thenReturn(Optional.of(u));
 
         Unidade result = service.buscarPorCodigo(1L);
 
@@ -44,7 +44,7 @@ class UnidadeServiceTest {
     @DisplayName("buscarPorSigla - Sucesso")
     void buscarPorSigla() {
         Unidade u = new Unidade();
-        when(repo.buscarPorSigla(Unidade.class, "U1")).thenReturn(u);
+        when(unidadeRepo.findBySiglaComResponsavel("U1")).thenReturn(Optional.of(u));
 
         Unidade result = service.buscarPorSigla("U1");
 

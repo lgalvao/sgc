@@ -117,7 +117,7 @@ class UnidadeControllerTest {
         Usuario usuario = Usuario.builder()
                 .tituloEleitoral("123")
                 .nome("Teste")
-                .unidadeLotacao(Unidade.builder().codigo(1L).build())
+                .unidadeLotacao(Unidade.builder().codigo(1L).sigla("U1").nome("Unidade 1").build())
                 .build();
         when(usuarioServiceBean.buscarPorUnidadeLotacao(1L)).thenReturn(List.of(usuario));
 

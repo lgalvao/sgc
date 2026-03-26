@@ -7,8 +7,8 @@ import lombok.*;
 import org.springframework.http.*;
 import org.springframework.security.core.annotation.*;
 import org.springframework.web.bind.annotation.*;
+import sgc.alerta.dto.*;
 import sgc.alerta.model.*;
-import sgc.comum.model.*;
 import sgc.organizacao.model.*;
 
 import java.util.*;
@@ -21,29 +21,27 @@ public class AlertaController {
     private final AlertaFacade alertaFacade;
 
     @GetMapping
-    @JsonView(ComumViews.Publica.class)
     @Operation(summary = "Lista todos os alertas do usuário autenticado usando o contexto do JWT")
-    public ResponseEntity<List<Alerta>> listarAlertas(@AuthenticationPrincipal Usuario usuario) {
+    public ResponseEntity<List<AlertaDto>> listarAlertas(@AuthenticationPrincipal Usuario usuario) {
         List<Alerta> alertas = alertaFacade.alertasPorUsuario(
                 usuario.getTituloEleitoral(), 
                 usuario.getUnidadeAtivaCodigo(),
                 usuario.getPerfilAtivo().name()
         );
 
-        return ResponseEntity.ok(alertas);
+        return ResponseEntity.ok(alertas.stream().map(AlertaDto::fromEntity).toList());
     }
 
     @GetMapping("/nao-lidos")
-    @JsonView(ComumViews.Publica.class)
     @Operation(summary = "Lista alertas não lidos do usuário autenticado usando o contexto do JWT")
-    public ResponseEntity<List<Alerta>> listarNaoLidos(@AuthenticationPrincipal Usuario usuario) {
+    public ResponseEntity<List<AlertaDto>> listarNaoLidos(@AuthenticationPrincipal Usuario usuario) {
         List<Alerta> alertas = alertaFacade.listarNaoLidos(
                 usuario.getTituloEleitoral(), 
                 usuario.getUnidadeAtivaCodigo(),
                 usuario.getPerfilAtivo().name()
         );
 
-        return ResponseEntity.ok(alertas);
+        return ResponseEntity.ok(alertas.stream().map(AlertaDto::fromEntity).toList());
     }
 
     @PostMapping("/marcar-como-lidos")

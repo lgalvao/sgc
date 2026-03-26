@@ -7,7 +7,7 @@ import java.time.*;
 
 @Builder
 public record ResponsavelDto(
-        Usuario usuario,
+        UsuarioResumoDto usuario,
         String tipo,
         LocalDateTime dataInicio,
         LocalDateTime dataFim

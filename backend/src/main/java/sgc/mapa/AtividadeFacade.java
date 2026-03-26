@@ -32,13 +32,15 @@ public class AtividadeFacade {
     private final UsuarioFacade usuarioService;
 
     @Transactional(readOnly = true)
-    public Atividade obterAtividadePorCodigo(Long codAtividade) {
-        return mapaManutencaoService.atividadeCodigo(codAtividade);
+    public AtividadeDto obterAtividadePorCodigo(Long codAtividade) {
+        return AtividadeDto.fromEntity(mapaManutencaoService.atividadeCodigo(codAtividade));
     }
 
     @Transactional(readOnly = true)
-    public List<Conhecimento> listarConhecimentosPorAtividade(Long codAtividade) {
-        return mapaManutencaoService.conhecimentosCodigoAtividade(codAtividade);
+    public List<ConhecimentoResumoDto> listarConhecimentosPorAtividade(Long codAtividade) {
+        return mapaManutencaoService.conhecimentosCodigoAtividade(codAtividade).stream()
+                .map(ConhecimentoResumoDto::fromEntity)
+                .toList();
     }
 
     public AtividadeOperacaoResponse criarAtividade(CriarAtividadeRequest request) {

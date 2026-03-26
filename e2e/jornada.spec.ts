@@ -7,6 +7,8 @@ import * as MapaHelpers from './helpers/helpers-mapas.js';
 import * as AnaliseHelpers from './helpers/helpers-analise.js';
 
 test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
+    test.describe.configure({timeout: 30_000});
+
     test.beforeAll(async ({request}) => {
         // Reset do banco de dados UMA VEZ para iniciar a jornada
         const response = await request.post('/e2e/reset-database');

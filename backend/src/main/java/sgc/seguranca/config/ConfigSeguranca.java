@@ -1,5 +1,7 @@
 package sgc.seguranca.config;
 
+import jakarta.servlet.*;
+import jakarta.servlet.http.*;
 import lombok.*;
 import org.springframework.context.annotation.*;
 import org.springframework.http.*;
@@ -11,10 +13,13 @@ import org.springframework.security.config.annotation.web.configurers.*;
 import org.springframework.security.web.*;
 import org.springframework.security.web.authentication.*;
 import org.springframework.security.web.csrf.*;
+import org.springframework.web.filter.*;
 import org.springframework.web.cors.*;
 import sgc.organizacao.*;
 import sgc.seguranca.*;
 import sgc.seguranca.login.*;
+
+import java.io.*;
 
 @Configuration
 @EnableWebSecurity
@@ -88,6 +93,18 @@ public class ConfigSeguranca {
                                         "default-src 'none'; frame-ancestors 'none'; sandbox"))
                         .frameOptions(HeadersConfigurer.FrameOptionsConfig::deny)
                         .xssProtection(HeadersConfigurer.XXssConfig::disable))
+                .addFilterAfter(new OncePerRequestFilter() {
+                    @Override
+                    protected void doFilterInternal(HttpServletRequest request,
+                                                    HttpServletResponse response,
+                                                    FilterChain filterChain) throws ServletException, IOException {
+                        CsrfToken csrfToken = (CsrfToken) request.getAttribute(CsrfToken.class.getName());
+                        if (csrfToken != null) {
+                            csrfToken.getToken();
+                        }
+                        filterChain.doFilter(request, response);
+                    }
+                }, CsrfFilter.class)
                 .addFilterBefore(filtroJwt, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }

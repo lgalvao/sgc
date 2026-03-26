@@ -16,6 +16,7 @@ import sgc.organizacao.model.*;
 import sgc.processo.dto.*;
 import sgc.processo.model.*;
 import sgc.processo.service.*;
+import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.*;
 
@@ -35,8 +36,7 @@ public class ProcessoController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    @JsonView(ProcessoViews.Publica.class)
-    public ResponseEntity<Processo> criar(@Valid @RequestBody CriarProcessoRequest requisicao) {
+    public ResponseEntity<ProcessoResumoDto> criar(@Valid @RequestBody CriarProcessoRequest requisicao) {
         Processo criado = processoService.criar(requisicao);
         Long codigo = Objects.requireNonNull(criado.getCodigo(), "Código do processo não pode ser nulo");
 
@@ -45,7 +45,7 @@ public class ProcessoController {
                 .buildAndExpand(codigo)
                 .toUri();
 
-        return ResponseEntity.created(uri).body(criado);
+        return ResponseEntity.created(uri).body(ProcessoResumoDto.fromEntity(criado));
     }
 
     @GetMapping("/status-unidades")
@@ -58,21 +58,20 @@ public class ProcessoController {
 
     @GetMapping("/{codigo}")
     @PreAuthorize("hasRole('ADMIN') or @processoService.checarAcesso(authentication, #codigo)")
-    @JsonView(ProcessoViews.Publica.class)
-    public ResponseEntity<Processo> obterPorCodigo(@PathVariable Long codigo) {
+    public ResponseEntity<ProcessoResumoDto> obterPorCodigo(@PathVariable Long codigo) {
         return processoService
                 .buscarOpt(codigo)
+                .map(ProcessoResumoDto::fromEntity)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping("/{codigo}/atualizar")
     @PreAuthorize("hasRole('ADMIN')")
-    @JsonView(ProcessoViews.Publica.class)
-    public ResponseEntity<Processo> atualizar(
+    public ResponseEntity<ProcessoResumoDto> atualizar(
             @PathVariable Long codigo, @Valid @RequestBody AtualizarProcessoRequest requisicao) {
         Processo atualizado = processoService.atualizar(codigo, requisicao);
-        return ResponseEntity.ok(atualizado);
+        return ResponseEntity.ok(ProcessoResumoDto.fromEntity(atualizado));
     }
 
     @PostMapping("/{codigo}/excluir")
@@ -84,16 +83,18 @@ public class ProcessoController {
 
     @GetMapping("/finalizados")
     @Operation(summary = "Lista todos os processos com situação FINALIZADO")
-    @JsonView(ProcessoViews.Publica.class)
-    public ResponseEntity<List<Processo>> listarFinalizados() {
-        return ResponseEntity.ok(processoService.listarFinalizados());
+    public ResponseEntity<List<ProcessoResumoDto>> listarFinalizados() {
+        return ResponseEntity.ok(processoService.listarFinalizados().stream()
+                .map(ProcessoResumoDto::fromEntity)
+                .toList());
     }
 
     @GetMapping("/para-importacao")
     @Operation(summary = "Lista processos finalizados elegíveis para servirem de base de importação de atividades")
-    @JsonView(ProcessoViews.Publica.class)
-    public ResponseEntity<List<Processo>> listarParaImportacao() {
-        return ResponseEntity.ok(processoService.listarParaImportacao());
+    public ResponseEntity<List<ProcessoResumoDto>> listarParaImportacao() {
+        return ResponseEntity.ok(processoService.listarParaImportacao().stream()
+                .map(ProcessoResumoDto::fromEntity)
+                .toList());
     }
 
     @GetMapping("/{codigo}/unidades-importacao")
@@ -128,9 +129,10 @@ public class ProcessoController {
 
     @GetMapping("/ativos")
     @Operation(summary = "Lista todos os processos com situação EM_ANDAMENTO")
-    @JsonView(ProcessoViews.Publica.class)
-    public ResponseEntity<List<Processo>> listarAtivos() {
-        return ResponseEntity.ok(processoService.listarAtivos());
+    public ResponseEntity<List<ProcessoResumoDto>> listarAtivos() {
+        return ResponseEntity.ok(processoService.listarAtivos().stream()
+                .map(ProcessoResumoDto::fromEntity)
+                .toList());
     }
 
     @GetMapping("/{codigo}/detalhes")
@@ -154,15 +156,14 @@ public class ProcessoController {
     @PostMapping("/{codigo}/iniciar")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Inicia um processo")
-    @JsonView(ProcessoViews.Publica.class)
-    public ResponseEntity<Processo> iniciar(
+    public ResponseEntity<ProcessoResumoDto> iniciar(
             @PathVariable Long codigo,
             @Valid @RequestBody IniciarProcessoRequest req,
             @AuthenticationPrincipal Usuario usuario) {
         processoService.iniciar(codigo, req.unidades(), usuario);
 
         Processo processoAtualizado = processoService.buscarPorCodigoComParticipantes(codigo);
-        return ResponseEntity.ok(processoAtualizado);
+        return ResponseEntity.ok(ProcessoResumoDto.fromEntity(processoAtualizado));
     }
 
     @PostMapping("/{codigo}/finalizar")
@@ -192,9 +193,10 @@ public class ProcessoController {
     @GetMapping("/{codigo}/subprocessos")
     @PreAuthorize("hasRole('ADMIN') or @processoService.checarAcesso(authentication, #codigo)")
     @Operation(summary = "Lista todos os subprocessos de um processo")
-    @JsonView(SubprocessoViews.Publica.class)
-    public ResponseEntity<List<Subprocesso>> listarSubprocessos(@PathVariable Long codigo) {
-        return ResponseEntity.ok(subprocessoService.listarEntidadesPorProcesso(codigo));
+    public ResponseEntity<List<SubprocessoListagemDto>> listarSubprocessos(@PathVariable Long codigo) {
+        return ResponseEntity.ok(subprocessoService.listarEntidadesPorProcesso(codigo).stream()
+                .map(SubprocessoListagemDto::fromEntity)
+                .toList());
     }
 
     @PostMapping("/{codigo}/enviar-lembrete")

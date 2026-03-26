@@ -8,6 +8,7 @@ import org.springframework.http.converter.*;
 import org.springframework.security.access.*;
 import org.springframework.web.bind.*;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.*;
 import org.springframework.web.servlet.mvc.method.annotation.*;
 import sgc.seguranca.sanitizacao.*;
@@ -38,6 +39,22 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @SuppressWarnings("unchecked")
     private ResponseEntity<Object> buildResponseEntityObject(ErroApi erroApi) {
         return (ResponseEntity<Object>) (Object) buildResponseEntity(erroApi);
+    }
+
+    private String descreverRequisicao(@Nullable WebRequest request) {
+        if (request instanceof ServletWebRequest servletWebRequest) {
+            var httpRequest = servletWebRequest.getRequest();
+            return httpRequest.getMethod() + " " + httpRequest.getRequestURI();
+        }
+        return "requisição desconhecida";
+    }
+
+    private Throwable obterCausaRaiz(Throwable throwable) {
+        Throwable atual = throwable;
+        while (atual.getCause() != null && atual.getCause() != atual) {
+            atual = atual.getCause();
+        }
+        return atual;
     }
 
 
@@ -80,6 +97,34 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
         String error = "Requisição JSON malformada";
         return buildResponseEntityObject(new ErroApi(HttpStatus.BAD_REQUEST, error));
+    }
+
+    @Override
+    protected @Nullable ResponseEntity<Object> handleHttpMessageNotWritable(
+            HttpMessageNotWritableException ex,
+            @Nullable HttpHeaders headers,
+            HttpStatusCode status,
+            WebRequest request) {
+
+        String traceId = UUID.randomUUID().toString();
+        Throwable causaRaiz = obterCausaRaiz(ex);
+        String requisicao = descreverRequisicao(request);
+
+        log.error(
+                "[{}] Erro ao serializar resposta em {}: {} | Causa raiz: {}: {}",
+                traceId,
+                requisicao,
+                ex.getMessage(),
+                causaRaiz.getClass().getSimpleName(),
+                causaRaiz.getMessage(),
+                ex);
+
+        ErroApi erroApi = new ErroApi(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "ERRO INESPERADO: falha ao serializar resposta",
+                "ERRO_SERIALIZACAO",
+                traceId);
+        return buildResponseEntityObject(erroApi);
     }
 
     @Override

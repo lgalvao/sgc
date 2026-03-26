@@ -128,6 +128,7 @@ public class PainelFacade {
 
         Set<Long> participantesIds = participantes.stream()
                 .map(UnidadeProcesso::getUnidadeCodigo)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
         Set<Long> displayIds = new HashSet<>();
@@ -149,17 +150,24 @@ public class PainelFacade {
             displayIds.add(candidate);
         }
 
-        Map<Long, String> existingSiglas = participantes.stream().collect(toMap(
-                UnidadeProcesso::getUnidadeCodigo,
-                UnidadeProcesso::getSigla,
-                (s1, s2) -> s1)
-        );
+        Map<Long, String> existingSiglas = participantes.stream()
+                .filter(participante -> participante.getUnidadeCodigo() != null)
+                .filter(participante -> participante.getSigla() != null && !participante.getSigla().isBlank())
+                .collect(toMap(
+                        UnidadeProcesso::getUnidadeCodigo,
+                        UnidadeProcesso::getSigla,
+                        (s1, s2) -> s1)
+                );
 
         List<String> siglas = new ArrayList<>();
         List<Long> missingIds = new ArrayList<>();
         displayIds.forEach(codUnidade -> {
-            if (existingSiglas.containsKey(codUnidade)) siglas.add(existingSiglas.get(codUnidade));
-            else missingIds.add(codUnidade);
+            String sigla = existingSiglas.get(codUnidade);
+            if (sigla != null && !sigla.isBlank()) {
+                siglas.add(sigla);
+            } else if (codUnidade != null) {
+                missingIds.add(codUnidade);
+            }
         });
 
         if (!missingIds.isEmpty()) {

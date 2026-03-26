@@ -38,6 +38,8 @@ class SubprocessoFluxoIntegrationTest extends BaseIntegrationTest {
     @Autowired
     private CompetenciaRepo competenciaRepo;
     @Autowired
+    private ConhecimentoRepo conhecimentoRepo;
+    @Autowired
     private UnidadeService unidadeService;
     @Autowired
     private org.springframework.jdbc.core.JdbcTemplate jdbcTemplate;
@@ -91,7 +93,7 @@ class SubprocessoFluxoIntegrationTest extends BaseIntegrationTest {
                 .unidade(unidadeFilha)
                 .situacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO) // Começando já homologado para focar no mapa
                 .dataLimiteEtapa1(LocalDateTime.now().minusDays(1))
-                .dataLimiteEtapa2(LocalDateTime.now().plusDays(15))
+                .dataLimiteEtapa2(null)
                 .processo(processo)
                 .build();
         subprocessoRepo.save(subprocesso);
@@ -104,6 +106,12 @@ class SubprocessoFluxoIntegrationTest extends BaseIntegrationTest {
         // Criar atividade para associar
         Atividade ativ = Atividade.builder().mapa(mapa).descricao("Atividade 1").build();
         atividadeRepo.save(ativ);
+
+        Conhecimento conhecimento = Conhecimento.builder()
+                .atividade(ativ)
+                .descricao("Conhecimento 1")
+                .build();
+        conhecimentoRepo.save(conhecimento);
 
         // Definir mapa vigente para a unidade (necessário para permissões de impacto e outras verificações)
         unidadeService.definirMapaVigente(unidadeFilha.getCodigo(), mapa);
