@@ -31,7 +31,7 @@ describe("ArvoreUnidades.vue Coverage", () => {
     it("deve atualizar unidadesSelecionadasLocal quando modelValue muda externamente", async () => {
         const wrapper = mount(ArvoreUnidades, {
             props: {
-                unidades: [{codigo: 1, sigla: "A", nome: "A", filhas: []}],
+                unidades: [{codigo: 1, sigla: "A", nome: "A", isElegivel: true, filhas: []}],
                 modelValue: []
             },
             global: {
