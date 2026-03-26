@@ -12,7 +12,8 @@ Esta versão substitui a rodada anterior e consolida pendências após segunda v
 - ✅ Correção de preparação de ambiente E2E aplicada: instalação do Playwright refeita com o comando obrigatório `npx playwright install --with-deps --only-shell` (inclui dependências de SO para execução headless estável).
 - ✅ Novo cenário E2E no CDU-02 cobrindo tabela de alertas: validação explícita dos campos (`Data/Hora`, `Descrição`, `Processo`, `Origem`), comportamento de ordenação fixa por data/hora (sem reordenação por clique) e transição de alerta não lido (`fw-bold`) para lido após recarga.
 - ✅ Lote expandido para outros casos de uso críticos: CDU-30 (validação de colunas/ações da lista de administradores + bloqueio de adição sem título) e CDU-32 (validação explícita dos campos da movimentação de reabertura, incluindo `Data/hora`, `Unidade origem` e `Unidade destino`).
-- 🔄 Próximo passo sugerido: ampliar matriz de visibilidade de alertas por perfil no CDU-02 (principalmente regra específica de `SERVIDOR` não herdar alertas de unidade) e revisar CDUs com P0 de `Data/hora atual` remanescentes (ex.: CDU-26).
+- ✅ Novo lote multi-CDU executado em sequência pesada: CDU-26 (homologação em bloco com validação de movimentação e `Data/hora atual`) e CDU-28 (campos obrigatórios da tela de atribuição + caminho de cancelamento explícito).
+- 🔄 Próximo passo sugerido: ampliar matriz de visibilidade de alertas por perfil no CDU-02 (principalmente regra específica de `SERVIDOR` não herdar alertas de unidade) e avançar em CDUs de histórico de análise pendentes (ex.: CDU-14).
 
 ## Novos aprendizados (rodada atual)
 - A validação de cabeçalhos da tabela depende de existir ao menos um processo visível, pois a UI troca para `EmptyState` quando a lista está vazia.
@@ -28,6 +29,8 @@ Esta versão substitui a rodada anterior e consolida pendências após segunda v
 - Para validar “não reordenável” na tabela de alertas, a asserção mais estável é verificar que o cabeçalho não ganha estado de sort (`aria-sort`) após clique e que a tabela mantém comportamento passivo no header.
 - Em CDUs administrativos (como CDU-30), cobrir explicitamente os cabeçalhos da listagem e os rótulos dos botões de modal reduz falso positivo de navegação “ok” sem validação real de requisitos visuais/funcionais.
 - Para CDUs com requisito de auditoria temporal (como CDU-32), validar `Data/hora` por regex no registro de movimentação aumenta cobertura de regra P0 sem acoplar o teste a timestamp exato.
+- Em lotes pesados, agrupar specs por domínio (ex.: homologação/reabertura/atribuição) numa única execução Playwright reduz tempo total de setup de infraestrutura E2E.
+- Para CDU-28, apesar do requisito mencionar modal, a implementação atual está em rota dedicada (`/unidade/{codigo}/atribuicao`); o teste deve validar os mesmos campos/ações esperados sem acoplar ao tipo de container visual.
 
 ## Síntese executiva
 - Escopo: 36 pares requisito x teste E2E.
