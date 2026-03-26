@@ -3,8 +3,6 @@ package sgc.subprocesso.dto;
 import org.jspecify.annotations.*;
 import sgc.mapa.dto.*;
 import sgc.organizacao.model.*;
-import sgc.subprocesso.model.*;
-
 import java.util.*;
 
 /**

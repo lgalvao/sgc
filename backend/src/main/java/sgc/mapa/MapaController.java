@@ -9,7 +9,6 @@ import org.springframework.security.access.prepost.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.*;
 import sgc.mapa.dto.*;
-import sgc.mapa.model.*;
 import sgc.mapa.service.*;
 
 import java.net.*;

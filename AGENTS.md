@@ -50,6 +50,23 @@ específicas** do projeto que diferem dos padrões genéricos.
 * **Frontend:** `npm run typecheck` (inclui e2e), `npm run lint` (inclui e2e), `npm run test:unit` (Vitest).
 * **E2E:** Playwright `npx playwright test`
 
+### Dashboard de QA
+
+* **Objetivo:** Consolidar saude de QA em snapshots estaveis para desenvolvimento.
+* **Comando rapido:** `npm run qa:dashboard`
+* **Comando direto:** `powershell -ExecutionPolicy Bypass -File etc/qa-dashboard/scripts/coletar-snapshot.ps1 -Perfil rapido`
+* **Perfis:** `rapido`, `frontend`, `backend`, `completo`
+* **Fonte de verdade:** `etc/qa-dashboard/latest/ultimo-snapshot.json` e `etc/qa-dashboard/latest/ultimo-resumo.md`
+* **Historico:** `etc/qa-dashboard/runs/<timestamp>/`
+* **Regra:** Agentes NAO devem usar `backend/build/`, `frontend/coverage/`, `playwright-report/` ou `test-results/`
+  como fonte primaria do dashboard; esses caminhos sao apenas artefatos transientes consumidos pelo coletor.
+* **Quando atualizar:** Depois de mudancas relevantes em testes, cobertura, lint, typecheck, E2E ou antes de fechar uma
+  investigacao de qualidade mais ampla.
+* **Leitura minima recomendada para agentes:** `resumo.statusGeral`, `resumo.indiceSaude`, `verificacoes`,
+  `confiabilidade.suitesLentas` e `hotspots`.
+* **Se uma suite falhar:** Tratar o snapshot como evidencia da execucao atual. Nao reaproveitar relatorios antigos
+  manualmente para "melhorar" o dashboard.
+
 ### Referências e Padrões
 
 Para detalhes técnicos, consulte:

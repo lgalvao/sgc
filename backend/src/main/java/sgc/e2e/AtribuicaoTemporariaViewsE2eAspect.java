@@ -8,7 +8,6 @@ import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
 import sgc.organizacao.dto.*;
 
-import java.time.*;
 import java.util.*;
 
 @Aspect

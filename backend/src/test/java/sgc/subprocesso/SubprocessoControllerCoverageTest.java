@@ -12,7 +12,6 @@ import org.springframework.test.web.servlet.*;
 import sgc.comum.ComumDtos.*;
 import sgc.comum.erros.*;
 import sgc.mapa.dto.*;
-import sgc.mapa.model.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
 import sgc.processo.model.*;

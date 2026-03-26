@@ -2,9 +2,6 @@ package sgc.subprocesso.dto;
 
 import lombok.*;
 import sgc.organizacao.dto.*;
-import sgc.organizacao.model.*;
-import sgc.subprocesso.model.*;
-
 import java.util.*;
 
 @Builder

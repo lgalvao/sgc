@@ -1,6 +1,5 @@
 package sgc.alerta;
 
-import com.fasterxml.jackson.annotation.*;
 import io.swagger.v3.oas.annotations.*;
 import io.swagger.v3.oas.annotations.tags.*;
 import lombok.*;

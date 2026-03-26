@@ -4,7 +4,6 @@ import lombok.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
 import sgc.comum.erros.*;
-import sgc.comum.model.*;
 import sgc.mapa.model.*;
 import sgc.organizacao.model.*;
 
@@ -31,8 +30,6 @@ import java.util.*;
 public class UnidadeService {
     private final UnidadeRepo unidadeRepo;
     private final UnidadeMapaRepo unidadeMapaRepo;
-    private final ComumRepo repo;
-
     public Unidade buscarPorCodigo(Long codigo) {
         return unidadeRepo.findByCodigoComResponsavel(codigo)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada(Unidade.class.getSimpleName(), codigo));

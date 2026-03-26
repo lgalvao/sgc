@@ -1,5 +1,5 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
-import {autenticar} from './helpers/helpers-auth.js';
+import {loginComPerfil} from './helpers/helpers-auth.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
 
 test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
@@ -95,13 +95,8 @@ test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
 
         await expect(page.getByText(TEXTOS.atribuicaoTemporaria.SUCESSO).first()).toBeVisible();
 
-        await page.goto('/login');
-        await autenticar(page, TITULO_USUARIO_ALVO, 'senha');
-        await expect(page.getByTestId('sel-login-perfil')).toBeVisible();
-        await expect(page.getByTestId('sel-login-perfil').locator('option', {hasText: PERFIL_TEMPORARIO})).toBeVisible();
-        await page.getByTestId('sel-login-perfil').selectOption({label: PERFIL_TEMPORARIO});
-        await page.getByTestId('btn-login-entrar').click();
-        await expect(page).toHaveURL(/\/painel(?:\?|$)/);
+        await loginComPerfil(page, TITULO_USUARIO_ALVO, 'senha', PERFIL_TEMPORARIO);
+        await expect(page.locator('.user-info-text')).toContainText(PERFIL_TEMPORARIO);
 
         const tabelaAlertas = page.getByTestId('tbl-alertas');
         await expect(tabelaAlertas).toBeVisible();

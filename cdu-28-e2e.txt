@@ -1,38 +1,61 @@
+[2m[WebServer] [22m[SMTP] Servidor SMTP local executando na porta 1025
+[2m[WebServer] [22m[BACKEND] Calculating task graph as configuration cache cannot be reused because file 'build.gradle.kts' has changed.
+[2m[WebServer] [22m[BACKEND] Perfil Spring ativado: e2e
+[2m[WebServer] [22m[BACKEND] Carregando configurações de: .env.e2e
+[2m[WebServer] [22m[BACKEND] INFO  [/].log:168: Initializing Spring DispatcherServlet 'dispatcherServlet'
+[2m[WebServer] [22m[FRONTEND] > vite --port 5173
+[2m[WebServer] [22m[FRONTEND]   [32m[1mVITE[22m v7.3.1[39m  [2mready in [0m[1m3036[22m[2m[0m ms[22m
+[2m[WebServer] [22m[FRONTEND]   [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5173[22m/[39m
+[2m[WebServer] [22m[FRONTEND] [2m  [32m➜[39m  [1mNetwork[22m[2m: use [22m[1m--host[22m[2m to expose[22m
+[2m[WebServer] [22m>>> Infra E2E no ar. Frontend: 5173. Backend: 10000 (perfil e2e).
 
 Running 5 tests using 1 worker
 
-  ✓  1 [chromium] › e2e\cdu-28.spec.ts:42:5 › CDU-28 - Manter atribuição temporária › Cenario 1: ADMIN navega pela árvore e acessa detalhes da unidade (2.2s)
-  ✓  2 [chromium] › e2e\cdu-28.spec.ts:50:5 › CDU-28 - Manter atribuição temporária › Cenario 2: tela de atribuição expõe os campos e ações exigidos pelo requisito (1.9s)
-  ✓  3 [chromium] › e2e\cdu-28.spec.ts:67:5 › CDU-28 - Manter atribuição temporária › Cenario 3: todos os campos são obrigatórios para criar a atribuição (2.0s)
-  ✓  4 [chromium] › e2e\cdu-28.spec.ts:79:5 › CDU-28 - Manter atribuição temporária › Cenario 4: ADMIN cancela criação e retorna para detalhes da unidade (1.7s)
-  ✘  5 [chromium] › e2e\cdu-28.spec.ts:87:5 › CDU-28 - Manter atribuição temporária › Cenario 5: ADMIN cria atribuição e usuário destino recebe alerta e perfil temporário (7.5s)
+[2m[WebServer] [22m[BACKEND] INFO  E2eController.resetDatabase:88: Reset do banco de dados concluído.
+[2m[WebServer] [22m[BACKEND] INFO  ClienteAcessoAdE2e.autenticar:24: Usuário autenticado via bypass de AD (Profile E2E): ***1919
+[2m[WebServer] [22m[BACKEND] INFO  LoginFacade.entrar:100: Usuário ***1919 autorizado: ADMIN-ADMIN
+  ✓  1 [chromium] › e2e\cdu-28.spec.ts:42:5 › CDU-28 - Manter atribuição temporária › Cenario 1: ADMIN navega pela árvore e acessa detalhes da unidade (3.8s)
+[2m[WebServer] [22m[BACKEND] INFO  ClienteAcessoAdE2e.autenticar:24: Usuário autenticado via bypass de AD (Profile E2E): ***1919
+[2m[WebServer] [22m[BACKEND] INFO  LoginFacade.entrar:100: Usuário ***1919 autorizado: ADMIN-ADMIN
+  ✓  2 [chromium] › e2e\cdu-28.spec.ts:50:5 › CDU-28 - Manter atribuição temporária › Cenario 2: tela de atribuição expõe os campos e ações exigidos pelo requisito (2.0s)
+[2m[WebServer] [22m[BACKEND] INFO  ClienteAcessoAdE2e.autenticar:24: Usuário autenticado via bypass de AD (Profile E2E): ***1919
+[2m[WebServer] [22m[BACKEND] INFO  LoginFacade.entrar:100: Usuário ***1919 autorizado: ADMIN-ADMIN
+  ✓  3 [chromium] › e2e\cdu-28.spec.ts:67:5 › CDU-28 - Manter atribuição temporária › Cenario 3: todos os campos são obrigatórios para criar a atribuição (2.1s)
+[2m[WebServer] [22m[BACKEND] INFO  ClienteAcessoAdE2e.autenticar:24: Usuário autenticado via bypass de AD (Profile E2E): ***1919
+[2m[WebServer] [22m[BACKEND] INFO  LoginFacade.entrar:100: Usuário ***1919 autorizado: ADMIN-ADMIN
+  ✓  4 [chromium] › e2e\cdu-28.spec.ts:79:5 › CDU-28 - Manter atribuição temporária › Cenario 4: ADMIN cancela criação e retorna para detalhes da unidade (1.6s)
+[2m[WebServer] [22m[BACKEND] INFO  ClienteAcessoAdE2e.autenticar:24: Usuário autenticado via bypass de AD (Profile E2E): ***1919
+[2m[WebServer] [22m[BACKEND] INFO  LoginFacade.entrar:100: Usuário ***1919 autorizado: ADMIN-ADMIN
+[2m[WebServer] [22m[BACKEND] INFO  ClienteAcessoAdE2e.autenticar:24: Usuário autenticado via bypass de AD (Profile E2E): ***2323
+[2m[WebServer] [22m[BACKEND] INFO  LoginFacade.entrar:100: Usuário ***2323 autorizado: CHEFE-ASSESSORIA_11
+  ✘  5 [chromium] › e2e\cdu-28.spec.ts:87:5 › CDU-28 - Manter atribuição temporária › Cenario 5: ADMIN cria atribuição e usuário destino recebe alerta e perfil temporário (7.3s)
 
 
   1) [chromium] › e2e\cdu-28.spec.ts:87:5 › CDU-28 - Manter atribuição temporária › Cenario 5: ADMIN cria atribuição e usuário destino recebe alerta e perfil temporário 
 
     Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
 
-    Locator: getByTestId('sel-login-perfil')
+    Locator: getByTestId('tbl-alertas')
     Expected: visible
     Timeout: 4000ms
     Error: element(s) not found
 
     Call log:
     [2m  - Expect "toBeVisible" with timeout 4000ms[22m
-    [2m  - waiting for getByTestId('sel-login-perfil')[22m
+    [2m  - waiting for getByTestId('tbl-alertas')[22m
 
 
-       98 |         await page.goto('/login');
-       99 |         await autenticar(page, TITULO_USUARIO_ALVO, 'senha');
-    > 100 |         await expect(page.getByTestId('sel-login-perfil')).toBeVisible();
-          |                                                            ^
-      101 |         await expect(page.getByTestId('sel-login-perfil').locator('option', {hasText: PERFIL_TEMPORARIO})).toBeVisible();
-      102 |         await page.getByTestId('sel-login-perfil').selectOption({label: PERFIL_TEMPORARIO});
-      103 |         await page.getByTestId('btn-login-entrar').click();
-        at C:\sgc\e2e\cdu-28.spec.ts:100:60
+      100 |
+      101 |         const tabelaAlertas = page.getByTestId('tbl-alertas');
+    > 102 |         await expect(tabelaAlertas).toBeVisible();
+          |                                     ^
+      103 |
+      104 |         const linhaAlerta = tabelaAlertas.locator('tr', {hasText: DESCRICAO_ALERTA}).first();
+      105 |         await expect(linhaAlerta).toBeVisible();
+        at C:\sgc\e2e\cdu-28.spec.ts:102:37
 
     Error Context: test-results\cdu-28-CDU-28---Manter-atr-8c25f--alerta-e-perfil-temporário-chromium\error-context.md
 
   1 failed
     [chromium] › e2e\cdu-28.spec.ts:87:5 › CDU-28 - Manter atribuição temporária › Cenario 5: ADMIN cria atribuição e usuário destino recebe alerta e perfil temporário 
-  4 passed (23.0s)
+  4 passed (1.9m)

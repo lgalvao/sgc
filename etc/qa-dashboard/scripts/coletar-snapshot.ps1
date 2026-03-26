@@ -444,6 +444,27 @@ function Obter-MetricasNulasFrontend {
     }
 }
 
+function Escrever-ArquivoComRetry {
+    param(
+        [string]$Caminho,
+        [string]$Conteudo,
+        [int]$Tentativas = 5,
+        [int]$EsperaMs = 300
+    )
+
+    for ($tentativa = 1; $tentativa -le $Tentativas; $tentativa++) {
+        try {
+            [System.IO.File]::WriteAllText($Caminho, $Conteudo, [System.Text.Encoding]::UTF8)
+            return
+        } catch {
+            if ($tentativa -eq $Tentativas) {
+                throw
+            }
+            Start-Sleep -Milliseconds $EsperaMs
+        }
+    }
+}
+
 Novo-DiretorioSeNecessario $diretorioRuns
 Novo-DiretorioSeNecessario $diretorioLatest
 
@@ -672,11 +693,12 @@ $arquivoResumo = Join-Path $diretorioExecucao 'resumo.md'
 $arquivoUltimoSnapshot = Join-Path $diretorioLatest 'ultimo-snapshot.json'
 $arquivoUltimoResumo = Join-Path $diretorioLatest 'ultimo-resumo.md'
 
-$snapshot | ConvertTo-Json -Depth 12 | Set-Content -Path $arquivoSnapshot -Encoding UTF8
+$jsonSnapshot = $snapshot | ConvertTo-Json -Depth 12
+$jsonSnapshot | Set-Content -Path $arquivoSnapshot -Encoding UTF8
 $conteudoResumo = Gerar-ResumoMarkdown $snapshot
 $conteudoResumo | Set-Content -Path $arquivoResumo -Encoding UTF8
-$snapshot | ConvertTo-Json -Depth 12 | Set-Content -Path $arquivoUltimoSnapshot -Encoding UTF8
-$conteudoResumo | Set-Content -Path $arquivoUltimoResumo -Encoding UTF8
+Escrever-ArquivoComRetry -Caminho $arquivoUltimoSnapshot -Conteudo $jsonSnapshot
+Escrever-ArquivoComRetry -Caminho $arquivoUltimoResumo -Conteudo $conteudoResumo
 
 Write-Host "Snapshot gerado em $(ConverterEm-CaminhoRelativo $arquivoSnapshot)"
 Write-Host "Resumo gerado em $(ConverterEm-CaminhoRelativo $arquivoResumo)"

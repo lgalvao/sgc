@@ -13,7 +13,6 @@ import org.springframework.test.web.servlet.result.*;
 import sgc.comum.erros.*;
 import sgc.integracao.mocks.*;
 import sgc.mapa.dto.*;
-import sgc.mapa.model.*;
 import sgc.seguranca.*;
 import sgc.subprocesso.dto.*;
 

@@ -1,6 +1,5 @@
 package sgc.subprocesso;
 
-import com.fasterxml.jackson.annotation.*;
 import io.swagger.v3.oas.annotations.*;
 import io.swagger.v3.oas.annotations.tags.*;
 import jakarta.validation.*;
@@ -14,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 import sgc.comum.ComumDtos.*;
 import sgc.comum.*;
 import sgc.mapa.dto.*;
-import sgc.mapa.model.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
 import sgc.seguranca.sanitizacao.*;

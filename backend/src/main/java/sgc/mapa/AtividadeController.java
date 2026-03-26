@@ -8,7 +8,6 @@ import org.springframework.http.*;
 import org.springframework.security.access.prepost.*;
 import org.springframework.web.bind.annotation.*;
 import sgc.mapa.dto.*;
-import sgc.mapa.model.*;
 import sgc.subprocesso.dto.*;
 
 import java.net.*;

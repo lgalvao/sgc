@@ -1,8 +1,6 @@
 package sgc.organizacao.dto;
 
 import lombok.*;
-import sgc.organizacao.model.*;
-
 import java.time.*;
 
 @Builder
