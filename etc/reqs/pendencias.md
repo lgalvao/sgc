@@ -2,6 +2,16 @@
 
 Esta versão substitui a rodada anterior e consolida pendências após segunda varredura com leitura de specs e helpers.
 
+## Andamento da execução (2026-03-26 - continuidade CDU-28)
+- ✅ **CDU-28 reforçado na regra de árvore completa**: cenário inicial passou a validar, de forma explícita, as três secretarias da árvore (`SECRETARIA_1`, `SECRETARIA_2`, `SECRETARIA_3`) e seus principais nós subordinados antes de seguir para o fluxo de criação de atribuição.
+- ✅ A cobertura também ganhou evidência de profundidade no ramo intermediário (`COORD_11`), incluindo validação das seções filhas (`SECAO_111`, `SECAO_112`, `SECAO_113`).
+- ✅ Regressão direcionada de `e2e/cdu-28.spec.ts` executada com sucesso após a ampliação das asserções.
+- 🔄 Próximo passo sugerido: manter no E2E apenas a validação estrutural mínima da árvore e mover efeitos internos de notificação por e-mail para integração backend, evitando acoplamento desnecessário na UI.
+
+## Novos aprendizados (continuidade CDU-28 em 2026-03-26)
+- Para requisito de “árvore completa”, validar somente o ramo usado na ação principal pode deixar lacunas; uma verificação incremental por raiz e subárvore traz evidência mais fiel do comportamento esperado.
+- Reusar um helper de validação de ramo (`sigla do nó + lista de filhas`) reduz duplicação e facilita manutenção quando a estrutura da árvore evoluir no seed.
+
 ## Andamento da execução (2026-03-26 - continuidade CDU-30)
 - ✅ **CDU-30 avançado em regra de validação negativa**: incluído cenário E2E para tentativa de adicionar como administrador um título já administrador (`111111`), com asserção de erro funcional retornado pela API.
 - ✅ O cenário novo também confirma permanência do modal de adição após falha, preservando o contexto de correção do usuário sem navegação inesperada.
