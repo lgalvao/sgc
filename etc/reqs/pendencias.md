@@ -7,7 +7,7 @@ Esta versão substitui a rodada anterior e consolida pendências após segunda v
 - ✅ **Novo avanço multi-CDU** além dos relatórios: **CDU-27 (Alterar data limite)** recebeu cobertura explícita de alerta no painel da unidade destino após alteração por ADMIN.
 - ✅ No CDU-27, a asserção agora valida os campos críticos do alerta gerado (`Descrição`, `Processo`, `Data/Hora` e `Origem` com `ADMIN`) após troca de perfil para CHEFE da unidade afetada.
 - ✅ Regressão direcionada executada em lote único dos specs alterados (`cdu-27`, `cdu-35`, `cdu-36`) para evidenciar passagem conjunta dos casos trabalhados.
-- 🔄 Próximo passo sugerido: ampliar o lote para CDUs de histórico de análise ainda parciais (CDU-13/CDU-14/CDU-20), priorizando campos de tabela e regras de visibilidade por perfil.
+- 🔄 Próximo passo sugerido: avançar para o próximo lote priorizado (`CDU-28`, `CDU-30`, `CDU-36`) e deixar `CDU-13`, `CDU-14` e `CDU-20` apenas com complementos pontuais de backend ou bordas de homologação.
 
 ## Novos aprendizados (rodada complementar 2026-03-26)
 - Em ambiente com build cold de backend Java, timeout curto de `webServer` no Playwright gera falha de infraestrutura sem relação com regra de negócio; calibrar timeout evita retrabalho e ruído no ciclo.
@@ -114,14 +114,14 @@ Esta versão substitui a rodada anterior e consolida pendências após segunda v
 - **P1** `PARCIAL`: Fluxo principal não estruturado numericamente; validar leitura manual do requisito completo.
 
 ### CDU-13
-- **P1** `PARCIAL`: No painel, o usuário clica no processo de mapeamento.
-- **P1** `PARCIAL`: O sistema mostra a tela `Detalhes do processo`.
-- **P0** `NAO_COBERTO`: `Histórico de análise`
+- **P1** `PARCIAL`: Evidência direta da tela `Detalhes do processo` antes da seleção da unidade.
+- **P1** `PARCIAL`: Campos de movimentação, alerta interno e notificações não observáveis de forma estável na UI.
+- **P1** `PARCIAL`: Auditoria de `Data/hora atual` fora do histórico de análise visível.
 
 ### CDU-14
-- **P1** `PARCIAL`: `Impactos no mapa`;
-- **P1** `PARCIAL`: `Histórico de análise`;
-- **P1** `PARCIAL`: `Devolver para ajustes`; e
+- **P1** `PARCIAL`: Homologação por `ADMIN`, incluindo os ramos com e sem impacto no mapa.
+- **P1** `PARCIAL`: Mensagem final de aceite e redirecionamento ao painel com assert direto.
+- **P1** `PARCIAL`: Efeitos colaterais internos (`alerta`, e-mail, auditoria temporal) sem superfície E2E estável.
 
 ### CDU-15
 - **P1** `PARCIAL`: O sistema mostra a tela `Detalhes do subprocesso`.
@@ -147,9 +147,9 @@ Esta versão substitui a rodada anterior e consolida pendências após segunda v
 - **P1** `PARCIAL`: O sistema notifica a unidade superior hierárquica da apresentação de sugestões para o mapa, com e-mail no modelo abaixo:
 
 ### CDU-20
-- **P1** `PARCIAL`: O sistema mostra a tela `Detalhes do subprocesso`.
-- **P1** `PARCIAL`: `Histórico de análise`;
-- **P1** `PARCIAL`: `Devolver para ajustes`;
+- **P1** `PARCIAL`: Cancelamento de homologação em estado válido e estável para E2E.
+- **P1** `PARCIAL`: Notificações por e-mail e alerta interno após aceite/devolução.
+- **P1** `PARCIAL`: Campos internos de auditoria não expostos de forma consistente na UI.
 
 ### CDU-21
 - **P1** `PARCIAL`: O sistema verifica se todos os subprocessos das unidades operacionais e interoperacionais participantes estão na situação 'Mapa homologado'.

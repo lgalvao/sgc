@@ -30,6 +30,21 @@
               responsive
               striped
           >
+            <template #head(dataHora)>
+              <span data-testid="header-historico-dataHora">Data/Hora</span>
+            </template>
+            <template #head(unidadeSigla)>
+              <span data-testid="header-historico-unidade">Unidade</span>
+            </template>
+            <template #head(acao)>
+              <span data-testid="header-historico-resultado">Resultado</span>
+            </template>
+            <template #head(analistaUsuarioTitulo)>
+              <span data-testid="header-historico-analista">Analista</span>
+            </template>
+            <template #head(observacoes)>
+              <span data-testid="header-historico-observacao">Observação</span>
+            </template>
             <template #cell(dataHora)="{ item, index }">
               <span :data-testid="`cell-dataHora-${index}`">
                 {{ formatDateTimeBR((item as Analise).dataHora) }}

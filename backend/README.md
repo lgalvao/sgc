@@ -304,6 +304,29 @@ POST /api/processos/{codigo}/excluir     - Excluir
 POST /api/processos/{codigo}/iniciar     - Workflow action
 ```
 
+## 📊 Qualidade e Cobertura de Código
+
+Temos um ecossistema de ferramentas para garantir 100% de cobertura de lógica de negócio:
+
+### 🎵 Maestro de Cobertura
+O ponto de entrada para análise. Ele atualiza o relatório, calcula o "Score de Ação" (impacto vs complexidade) e gera um plano de ação.
+```bash
+node etc/scripts/maestro-cobertura.cjs
+```
+- **Saída:** Console (Top 10) e arquivo `plano-maestro-cobertura.md` (na raiz do projeto).
+- **Dica:** Use `--skip-run` se já tiver rodado os testes recentemente e quiser apenas reanalisar o XML.
+
+### 🛠️ Gerador de Testes Inteligente
+Gera esqueletos de testes Mockito detectando dependências e mapeando lacunas de branches/linhas.
+```bash
+node etc/scripts/gerar-testes-cobertura.cjs NomeDaClasse
+```
+- **Funcionalidade:** Cria ou sugere código para o arquivo `*CoverageTest.java`, já com `@Mock` e `@InjectMocks` baseados nos campos `private final` da classe original.
+
+### 🔍 Outros Scripts e Ferramentas
+- `verificar-cobertura.cjs --missed`: Detalha exatamente quais linhas e branches faltam em cada arquivo.
+- `mutationTest`: Executa testes de mutação com PIT para validar a eficácia dos testes unitários.
+
 ## 📚 Documentação adicional
 
 * [Backend patterns](/etc/docs/backend-padroes.md) - Padrões e convenções

@@ -1,4 +1,5 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
+import type {Page} from '@playwright/test';
 import {
     criarProcessoMapaComSugestoesFixture,
     criarProcessoMapaDisponibilizadoFixture,
@@ -17,6 +18,32 @@ import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
 import {resetDatabase} from './hooks/hooks-limpeza.js';
 
+function validarDataHoraBrasileira(dataHoraTexto: string) {
+    expect(dataHoraTexto.trim()).toMatch(/^\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}(:\d{2})?$/);
+}
+
+async function validarHistoricoAnaliseMapa(page: Page, unidadeEsperada?: string) {
+    const modal = page.getByTestId('mdl-historico-analise');
+
+    await expect(modal.getByTestId('header-historico-dataHora')).toBeVisible();
+    await expect(modal.getByTestId('header-historico-unidade')).toBeVisible();
+    await expect(modal.getByTestId('header-historico-resultado')).toBeVisible();
+    await expect(modal.getByTestId('header-historico-analista')).toBeVisible();
+    await expect(modal.getByTestId('header-historico-observacao')).toBeVisible();
+
+    const dataHora = await modal.getByTestId('cell-dataHora-0').innerText();
+    validarDataHoraBrasileira(dataHora);
+
+    if (unidadeEsperada) {
+        await expect(modal.getByTestId('cell-unidade-0')).toHaveText(unidadeEsperada);
+    } else {
+        await expect(modal.getByTestId('cell-unidade-0')).not.toHaveText('');
+    }
+
+    await expect(modal.getByTestId('cell-resultado-0')).not.toHaveText('');
+    await expect(modal.getByTestId('cell-observacao-0')).not.toHaveText('');
+}
+
 test.describe.serial('CDU-20 - Analisar validação de mapa de competências', () => {
     const UNIDADE_ALVO = 'ASSESSORIA_11';
 
@@ -34,9 +61,12 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
     test('Cenario 0: modal de aceite exibe campo opcional de observação', async ({_resetAutomatico, page}) => {
         await loginComPerfil(page, USUARIOS.GESTOR_SECRETARIA_1.titulo, USUARIOS.GESTOR_SECRETARIA_1.senha, 'GESTOR - SECRETARIA_1');
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
+        await expect(page.getByTestId('header-subprocesso')).toBeVisible();
+        await expect(page.getByTestId('subprocesso-header__txt-header-unidade')).toHaveText(UNIDADE_ALVO);
         await navegarParaMapa(page);
 
         await page.getByTestId('btn-mapa-homologar-aceite').click();
+        await expect(page.getByRole('dialog')).toContainText(TEXTOS.mapa.MODAL_ACEITE_TITULO);
         await expect(page.getByTestId('inp-aceite-mapa-observacao')).toBeVisible();
         await page.getByTestId('inp-aceite-mapa-observacao').fill('Observação opcional do aceite');
         await page.getByTestId('btn-aceite-mapa-cancelar').click();
@@ -47,6 +77,8 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
         // Superior da ASSESSORIA_11 é John lennon (SECRETARIA_1)
         await loginComPerfil(page, USUARIOS.GESTOR_SECRETARIA_1.titulo, USUARIOS.GESTOR_SECRETARIA_1.senha, 'GESTOR - SECRETARIA_1');
         await acessarSubprocessoGestor(page, descProcesso, UNIDADE_ALVO);
+        await expect(page.getByTestId('header-subprocesso')).toBeVisible();
+        await expect(page.getByTestId('subprocesso-header__txt-header-unidade')).toHaveText(UNIDADE_ALVO);
         await navegarParaMapa(page);
 
         await expect(page.getByTestId('btn-mapa-historico-gestor')).toBeVisible();
@@ -81,6 +113,7 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
         await page.getByTestId('btn-aceite-mapa-confirmar').click();
         await expect(page.getByText(TEXTOS.mapa.SUCESSO_HOMOLOGACAO).first()).toBeVisible();
     });
+
 });
 
 test.describe.serial('CDU-20 - Ver sugestões quando situação é "Mapa com sugestões"', () => {
@@ -173,6 +206,52 @@ test.describe.serial('CDU-20 - Aceite de mapa com sugestões', () => {
 
         await verificarPaginaPainel(page);
         await expect(page.getByText(TEXTOS.sucesso.ACEITE_REGISTRADO).first()).toBeVisible();
+    });
+
+    test('GESTOR devolve validação do mapa e sistema registra efeito visível no subprocesso', async ({_resetAutomatico, request, page}) => {
+        await resetDatabase(request);
+        const processo = await criarProcessoMapaValidadoFixture(request, {
+            unidade: UNIDADE_ALVO,
+            descricao: `Processo CDU-20 Devolucao ${Date.now()}`
+        });
+        validarProcessoFixture(processo, processo.descricao);
+
+        await loginComPerfil(page, USUARIOS.GESTOR_SECRETARIA_1.titulo, USUARIOS.GESTOR_SECRETARIA_1.senha, 'GESTOR - SECRETARIA_1');
+        await acessarSubprocessoGestor(page, processo.descricao, UNIDADE_ALVO);
+        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa validado/i);
+        await navegarParaMapa(page);
+
+        await page.getByTestId('btn-mapa-devolver').click();
+        const modal = page.getByRole('dialog');
+        await expect(modal).toContainText('Devolver mapa');
+        await expect(modal).toContainText('Confirma a devolução da validação do mapa para ajustes?');
+        await expect(page.getByTestId('btn-devolucao-mapa-confirmar')).toBeDisabled();
+
+        await page.getByTestId('inp-devolucao-mapa-obs').fill('Necessário rever competências');
+        await expect(page.getByTestId('btn-devolucao-mapa-confirmar')).toBeEnabled();
+        await page.getByTestId('btn-devolucao-mapa-confirmar').click();
+
+        await verificarPaginaPainel(page);
+        await expect(page.getByText(TEXTOS.sucesso.DEVOLUCAO_REALIZADA).first()).toBeVisible();
+
+        await acessarSubprocessoChefeDireto(page, processo.descricao, UNIDADE_ALVO);
+        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa disponibilizado/i);
+        await expect(page.getByTestId('tbl-movimentacoes')).toBeVisible();
+        await expect(page.getByRole('columnheader', {name: 'Data/hora'})).toBeVisible();
+        await expect(page.getByRole('columnheader', {name: 'Origem'})).toBeVisible();
+        await expect(page.getByRole('columnheader', {name: 'Destino'})).toBeVisible();
+        await expect(page.getByRole('columnheader', {name: 'Descrição'})).toBeVisible();
+
+        const linhaMovimentacao = page.getByTestId('tbl-movimentacoes')
+            .locator('tr', {hasText: 'Devolução da validação do mapa de competências para ajustes'})
+            .first();
+        await expect(linhaMovimentacao).toBeVisible();
+
+        const dataHora = await linhaMovimentacao.locator('td').nth(0).innerText();
+        validarDataHoraBrasileira(dataHora);
+        await expect(linhaMovimentacao.locator('td').nth(1)).toHaveText('SECRETARIA_1');
+        await expect(linhaMovimentacao.locator('td').nth(2)).toHaveText(UNIDADE_ALVO);
+
     });
 });
 

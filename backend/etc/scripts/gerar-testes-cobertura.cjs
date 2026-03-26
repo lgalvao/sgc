@@ -1,9 +1,12 @@
 #!/usr/bin/env node
 
 /**
- * Script para gerar esqueletos de testes de cobertura para uma classe específica
- * Uso: node backend/etc/scripts/gerar-testes-cobertura.cjs <NomeDaClasse>
- * Exemplo: node backend/etc/scripts/gerar-testes-cobertura.cjs AlertaFacade
+ * 🛠️ Gerador de Testes de Cobertura Inteligente
+ * 
+ * Gera esqueletos de testes Mockito com detecção automática de:
+ * 1. Dependências (para gerar @Mock)
+ * 2. Métodos afetados por linhas não cobertas
+ * 3. Branches parciais (decisões não testadas)
  */
 
 const fs = require('node:fs');
@@ -18,7 +21,6 @@ const TEST_DIR = path.join(BASE_DIR, 'src/test/java');
 async function parseXml(filePath) {
     if (!fs.existsSync(filePath)) {
         console.error(`❌ Relatório não encontrado: ${filePath}`);
-        console.error("💡 Execute './gradlew :backend:test :backend:jacocoTestReport' primeiro.");
         process.exit(1);
     }
     const data = fs.readFileSync(filePath);
@@ -26,58 +28,75 @@ async function parseXml(filePath) {
     return parser.parseStringPromise(data);
 }
 
-function findClassInReport(report, className) {
+function findClassInReport(report, target) {
     const packages = report.report.package || [];
     for (const pkg of packages) {
         const sourceFiles = pkg.sourcefile || [];
         for (const sf of sourceFiles) {
-            if (sf.$.name.replace('.java', '') === className || 
-                (pkg.$.name.replaceAll('/', '.') + '.' + sf.$.name.replace('.java', '')) === className) {
-                return { pkg: pkg.$.name.replaceAll('/', '.'), sf };
+            const pkgName = pkg.$.name.replaceAll('/', '.');
+            const simpleName = sf.$.name.replace('.java', '');
+            if (simpleName === target || `${pkgName}.${simpleName}` === target) {
+                return { pkg: pkgName, sf };
             }
         }
     }
     return null;
 }
 
-function findSourceFile(packageName, fileName) {
-    const fullPath = path.join(SRC_DIR, packageName.replaceAll('.', '/'), fileName);
-    if (fs.existsSync(fullPath)) return fullPath;
-    return null;
+function extractDependencies(sourceContent) {
+    const dependencies = [];
+    const lines = sourceContent.split('\n');
+    
+    // Procura por campos private final (padrão @RequiredArgsConstructor)
+    lines.forEach(line => {
+        const match = line.match(/private\s+final\s+([\w<>]+)\s+(\w+);/);
+        if (match) {
+            dependencies.push({ type: match[1], name: match[2] });
+        }
+    });
+    
+    return dependencies;
 }
 
-function getMissingLines(sf) {
-    const missed = [];
+function getGaps(sf) {
+    const missedLines = [];
+    const missedBranches = [];
+    
     if (sf.line) {
         sf.line.forEach(line => {
-            if (parseInt(line.$.ci || 0) === 0) {
-                missed.push(parseInt(line.$.nr));
-            }
+            const nr = parseInt(line.$.nr);
+            const ci = parseInt(line.$.ci || 0);
+            const mb = parseInt(line.$.mb || 0);
+            const cb = parseInt(line.$.cb || 0);
+            
+            if (ci === 0) missedLines.push(nr);
+            if (mb > 0) missedBranches.push({ nr, mb, total: mb + cb });
         });
     }
-    return missed;
+    return { missedLines, missedBranches };
 }
 
-function extractMethodInfo(sourceContent, lineNumbers) {
+function mapToMethods(sourceContent, gaps) {
     const lines = sourceContent.split('\n');
     const methods = new Map();
+    const allGapLines = new Set([...gaps.missedLines, ...gaps.missedBranches.map(b => b.nr)]);
 
-    lineNumbers.forEach(nr => {
-        // Procurar o método que contém esta linha (andando para trás)
+    allGapLines.forEach(nr => {
         for (let i = nr - 1; i >= 0; i--) {
             const line = lines[i].trim();
-            const methodMatch = line.match(/(?:public|protected|private|static|\s) +[\w<>[], ]+ +(\w+) *\(/);
-            if (methodMatch && !line.includes('class ') && !line.includes('return ')) {
+            const methodMatch = line.match(/(?:public|protected|private|static|\s) +[\w<>[\] ]+ +(\w+) *\(/);
+            if (methodMatch && !line.includes('class ') && !line.includes('return ') && !line.includes('new ')) {
                 const methodName = methodMatch[1];
                 if (!methods.has(methodName)) {
-                    methods.set(methodName, []);
+                    methods.set(methodName, { lines: [], branches: [] });
                 }
-                methods.get(methodName).push(nr);
+                if (gaps.missedLines.includes(nr)) methods.get(methodName).lines.push(nr);
+                const br = gaps.missedBranches.find(b => b.nr === nr);
+                if (br) methods.get(methodName).branches.push(br);
                 break;
             }
         }
     });
-
     return methods;
 }
 
@@ -92,31 +111,19 @@ async function main() {
     const classInfo = findClassInReport(report, target);
 
     if (!classInfo) {
-        console.error(`❌ Classe '${target}' não encontrada no relatório de cobertura.`);
+        console.error(`❌ Classe '${target}' não encontrada no relatório.`);
         process.exit(1);
     }
 
     const { pkg, sf } = classInfo;
-    const fileName = sf.$.name;
-    const className = fileName.replace('.java', '');
-    const sourcePath = findSourceFile(pkg, fileName);
-
-    if (!sourcePath) {
-        console.error(`❌ Arquivo fonte não encontrado para ${pkg}.${fileName}`);
-        process.exit(1);
-    }
-
+    const className = sf.$.name.replace('.java', '');
+    const sourcePath = path.join(SRC_DIR, pkg.replaceAll('.', '/'), sf.$.name);
     const sourceContent = fs.readFileSync(sourcePath, 'utf-8');
-    const missingLines = getMissingLines(sf);
-    
-    if (missingLines.length === 0) {
-        console.log(`✅ A classe ${className} já tem 100% de cobertura de linhas!`);
-        process.exit(0);
-    }
 
-    const methods = extractMethodInfo(sourceContent, missingLines);
+    const gaps = getGaps(sf);
+    const deps = extractDependencies(sourceContent);
+    const methodMap = mapToMethods(sourceContent, gaps);
 
-    // Gerar esqueleto do teste
     let testCode = `package ${pkg};
 
 import org.junit.jupiter.api.*;
@@ -133,19 +140,32 @@ class ${className}CoverageTest {
     @InjectMocks
     private ${className} target;
 
-    // TODO: Adicione @Mock para as dependências da classe
-
-    @BeforeEach
-    void setUp() {
-        // Inicialização se necessário
-    }
 `;
 
-    methods.forEach((lines, methodName) => {
+    deps.forEach(d => {
+        testCode += `    @Mock
+    private ${d.type} ${d.name};
+
+`;
+    });
+
+    methodMap.forEach((info, methodName) => {
+        const desc = [];
+        if (info.lines.length > 0) desc.push(`linhas [${info.lines.join(', ')}]`);
+        if (info.branches.length > 0) desc.push(`branches [${info.branches.map(b => b.nr).join(', ')}]`);
+
         testCode += `    @Test
-    @DisplayName("Deve cobrir as linhas [${lines.join(', ')}] do método ${methodName}")
+    @DisplayName("Deve cobrir ${desc.join(' e ')} do método ${methodName}")
     void deveCobrir${methodName.charAt(0).toUpperCase() + methodName.slice(1)}() {
-        // TODO: Implementar teste para cobrir as linhas ${lines.join(', ')}
+        // TODO: Implementar cobertura para:
+`;
+        if (info.lines.length > 0) testCode += `        // Linhas: ${info.lines.join(', ')}
+`;
+        if (info.branches.length > 0) info.branches.forEach(b => {
+            testCode += `        // Branch na linha ${b.nr}: ${b.mb} de ${b.total} decisões faltantes\n`;
+        });
+        
+        testCode += `        
         // 1. Configurar mocks
         // 2. Executar método
         // 3. Verificar resultados
@@ -154,27 +174,25 @@ class ${className}CoverageTest {
 `;
     });
 
-    testCode += `}\n`;
+    testCode += `}
+`;
 
     const testPath = path.join(TEST_DIR, pkg.replaceAll('.', '/'), `${className}CoverageTest.java`);
     
-    console.log(`\n🚀 Plano de Cobertura para ${className}:`);
-    console.log(`📍 Linhas não cobertas: ${missingLines.join(', ')}`);
-    console.log(`📍 Métodos afetados: ${Array.from(methods.keys()).join(', ')}`);
-    
+    console.log(`\n🚀 Gerando plano para ${className}...`);
+    if (deps.length > 0) console.log(`📦 Detectadas ${deps.length} dependências para Mock.`);
+    console.log(`📍 Métodos afetados: ${Array.from(methodMap.keys()).join(', ') || 'Nenhum (verifique exclusões)'}`);
+
     if (fs.existsSync(testPath)) {
-        console.log(`\n⚠️ O arquivo de teste já existe: ${testPath}`);
-        console.log(`Considere adicionar os novos casos de teste a ele.`);
-        console.log(`\n--- Sugestão de Código ---\n`);
-        console.log(testCode);
+        console.log(`\n⚠️ Arquivo existente: ${testPath}`);
+        console.log(`--- Sugestão de Código ---
+
+${testCode}`);
     } else {
         fs.mkdirSync(path.dirname(testPath), { recursive: true });
         fs.writeFileSync(testPath, testCode);
-        console.log(`\n✅ Esqueleto de teste gerado em: ${testPath}`);
+        console.log(`\n✅ Esqueleto gerado com sucesso em: ${testPath}`);
     }
 }
 
-main().catch(err => {
-    console.error('❌ Erro:', err);
-    process.exit(1);
-});
+main().catch(console.error);
