@@ -186,7 +186,13 @@ const processos = useProcessos();
 
 const subprocesso = computed(() => props.subprocesso ?? subprocessosStore.subprocessoDetalhe);
 
-const isProcessoFinalizado = computed(() => processos.processoDetalhe.value?.situacao === SituacaoProcesso.FINALIZADO);
+const isProcessoFinalizado = computed(() => {
+  const processoDetalhe = processos.processoDetalhe.value;
+  if (!processoDetalhe || processoDetalhe.codigo !== props.codProcesso) {
+    return false;
+  }
+  return processoDetalhe.situacao === SituacaoProcesso.FINALIZADO;
+});
 
 const {podeEditarCadastro, podeEditarMapa, habilitarAcessoCadastro, habilitarAcessoMapa} = useAcesso(subprocesso);
 
