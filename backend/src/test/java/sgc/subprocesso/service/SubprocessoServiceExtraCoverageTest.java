@@ -133,7 +133,7 @@ class SubprocessoServiceExtraCoverageTest {
             when(mapaManutencaoService.competenciasCodMapa(100L)).thenReturn(List.of()); // eraVazio = true
             when(mapaSalvamentoService.salvarMapaCompleto(eq(100L), any())).thenReturn(sp.getMapa());
 
-            SalvarMapaRequest request = new SalvarMapaRequest("Desc", List.of(new SalvarMapaRequest.CompetenciaRequest(null, "Comp", List.of()))); // temNovas = true
+            SalvarMapaRequest request = new SalvarMapaRequest("Desc", List.of(new SalvarMapaRequest.CompetenciaRequest(0L, "Comp", List.of()))); // temNovas = true
             subprocessoService.salvarMapaSubprocesso(1L, request);
 
             verify(mapaManutencaoService).reconciliarSituacaoSubprocesso(sp);

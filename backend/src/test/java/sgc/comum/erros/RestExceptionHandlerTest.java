@@ -15,6 +15,7 @@ import org.springframework.test.context.bean.override.mockito.*;
 import org.springframework.test.web.servlet.*;
 import org.springframework.validation.*;
 import org.springframework.web.bind.*;
+import org.springframework.web.context.request.*;
 import sgc.integracao.mocks.*;
 import sgc.seguranca.*;
 
@@ -145,7 +146,11 @@ class RestExceptionHandlerTest {
     @DisplayName("Deve tratar HttpMessageNotReadableException (400)")
     void deveTratarHttpMessageNotReadableException() {
         HttpMessageNotReadableException ex = new HttpMessageNotReadableException("JSON Error", Mockito.mock(HttpInputMessage.class));
-        ResponseEntity<Object> response = restExceptionHandler.handleHttpMessageNotReadable(ex, new HttpHeaders(), HttpStatus.BAD_REQUEST, null);
+        ResponseEntity<Object> response = restExceptionHandler.handleHttpMessageNotReadable(
+                ex,
+                new HttpHeaders(),
+                HttpStatus.BAD_REQUEST,
+                Mockito.mock(WebRequest.class));
         assertNotNull(response);
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertNotNull(response.getBody());
@@ -162,7 +167,11 @@ class RestExceptionHandlerTest {
         Mockito.when(methodParameter.getExecutable()).thenReturn(Object.class.getMethod("toString"));
         MethodArgumentNotValidException ex = new MethodArgumentNotValidException(methodParameter, bindingResult);
 
-        ResponseEntity<Object> response = restExceptionHandler.handleMethodArgumentNotValid(ex, new HttpHeaders(), HttpStatus.BAD_REQUEST, null);
+        ResponseEntity<Object> response = restExceptionHandler.handleMethodArgumentNotValid(
+                ex,
+                new HttpHeaders(),
+                HttpStatus.BAD_REQUEST,
+                Mockito.mock(WebRequest.class));
         assertNotNull(response);
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertNotNull(response.getBody());

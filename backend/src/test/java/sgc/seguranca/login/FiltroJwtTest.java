@@ -7,6 +7,7 @@ import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
 import sgc.organizacao.*;
+import sgc.organizacao.model.*;
 
 import java.io.*;
 import java.util.*;
@@ -95,7 +96,7 @@ class FiltroJwtTest {
         // Caso valor.length <= 4
         String token = "short-token";
         when(request.getHeader("Authorization")).thenReturn("Bearer " + token);
-        when(jwtService.validarToken(token)).thenReturn(Optional.of(new GerenciadorJwt.JwtClaims("123", null, null)));
+        when(jwtService.validarToken(token)).thenReturn(Optional.of(new GerenciadorJwt.JwtClaims("123", Perfil.SERVIDOR, 10L)));
         when(usuarioService.carregarUsuarioParaAutenticacao("123")).thenReturn(null);
 
         filtro.doFilterInternal(request, response, filterChain);

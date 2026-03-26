@@ -47,6 +47,7 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
     private Subprocesso subprocessoOrigem;
     private Subprocesso subprocessoDestino;
     private Usuario chefe;
+    private List<Long> codigosAtividadesOrigem;
 
     @BeforeEach
     void setUp() {
@@ -119,6 +120,7 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
         atividadeRepo.save(atividade2);
         conhecimentoRepo.save(Conhecimento.builder().descricao("Conhecimento 2.1").atividade(atividade2).build());
         conhecimentoRepo.save(Conhecimento.builder().descricao("Conhecimento 2.2").atividade(atividade2).build());
+        codigosAtividadesOrigem = List.of(atividade1.getCodigo(), atividade2.getCodigo());
 
         Processo processoDestino = Processo.builder()
                 .descricao("Processo destino ativo")
@@ -156,7 +158,7 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
         @DisplayName("Deve importar atividades e conhecimentos")
         void deveImportarAtividadesEConhecimentosComSucesso() throws Exception {
             ImportarAtividadesRequest request =
-                    new ImportarAtividadesRequest(subprocessoOrigem.getCodigo(), null);
+                    new ImportarAtividadesRequest(subprocessoOrigem.getCodigo(), codigosAtividadesOrigem);
 
             mockMvc.perform(post("/api/subprocessos/{codigo}/importar-atividades", subprocessoDestino.getCodigo())
                             .with(user(chefe))
@@ -211,7 +213,7 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
             subprocessoRepo.save(subprocessoDestino);
 
             ImportarAtividadesRequest request =
-                    new ImportarAtividadesRequest(subprocessoOrigem.getCodigo(), null);
+                    new ImportarAtividadesRequest(subprocessoOrigem.getCodigo(), codigosAtividadesOrigem);
 
             mockMvc.perform(
                             post(
@@ -236,7 +238,7 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
             subprocessoRepo.save(subprocessoDestino);
 
             ImportarAtividadesRequest request =
-                    new ImportarAtividadesRequest(subprocessoOrigem.getCodigo(), null);
+                    new ImportarAtividadesRequest(subprocessoOrigem.getCodigo(), codigosAtividadesOrigem);
 
             mockMvc.perform(
                             post(
@@ -252,7 +254,7 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
         @Test
         @DisplayName("Deve falhar ao importar de subprocesso inexistente")
         void deveFalharAoImportarDeSubprocessoInexistente() throws Exception {
-            ImportarAtividadesRequest request = new ImportarAtividadesRequest(99999L, null);
+            ImportarAtividadesRequest request = new ImportarAtividadesRequest(99999L, codigosAtividadesOrigem);
 
             mockMvc.perform(post("/api/subprocessos/{codigo}/importar-atividades",
                             subprocessoDestino.getCodigo())
@@ -271,7 +273,7 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
             atividadeRepo.save(atividadeExistente);
 
             ImportarAtividadesRequest request =
-                    new ImportarAtividadesRequest(subprocessoOrigem.getCodigo(), null);
+                    new ImportarAtividadesRequest(subprocessoOrigem.getCodigo(), codigosAtividadesOrigem);
 
             mockMvc.perform(
                             post(
