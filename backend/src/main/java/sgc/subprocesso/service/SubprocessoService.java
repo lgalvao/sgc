@@ -73,6 +73,11 @@ public class SubprocessoService {
     }
 
     @Transactional(readOnly = true)
+    public MapaCompletoDto mapaCompletoDtoPorSubprocesso(Long codSubprocesso) {
+        return MapaCompletoDto.fromEntity(mapaCompletoPorSubprocesso(codSubprocesso));
+    }
+
+    @Transactional(readOnly = true)
     public Map<String, Object> obterSugestoes(Long codSubprocesso) {
         Subprocesso subprocesso = buscarSubprocesso(codSubprocesso);
         String sugestoes = Optional.ofNullable(subprocesso.getMapa())
@@ -116,6 +121,13 @@ public class SubprocessoService {
     @Transactional(readOnly = true)
     public List<Subprocesso> listarTodos() {
         return subprocessoRepo.listarTodosComFetch();
+    }
+
+    @Transactional(readOnly = true)
+    public SubprocessoCadastroDto obterCadastro(Long codSubprocesso) {
+        Subprocesso subprocesso = buscarSubprocesso(codSubprocesso);
+        List<AtividadeDto> atividades = listarAtividadesSubprocesso(codSubprocesso);
+        return SubprocessoCadastroDto.fromEntity(subprocesso, atividades);
     }
 
     @Transactional(readOnly = true)
@@ -536,9 +548,9 @@ public class SubprocessoService {
         PermissoesSubprocessoDto permissoes = obterPermissoesUI(sp, usuarioAutenticado);
 
         return SubprocessoDetalheResponse.builder()
-                .subprocesso(sp)
+                .subprocesso(SubprocessoResumoDto.fromEntity(sp))
                 .responsavel(responsavel)
-                .titular(titular)
+                .titular(UsuarioResumoDto.fromEntity(titular))
                 .movimentacoes(movimentacoes)
                 .localizacaoAtual(localizacaoAtual)
                 .permissoes(permissoes)
@@ -556,9 +568,9 @@ public class SubprocessoService {
 
         return new ContextoEdicaoResponse(
                 unidadeSp,
-                sp,
+                SubprocessoResumoDto.fromEntity(sp),
                 detalhes,
-                mapaManutencaoService.mapaCompletoSubprocesso(codSubprocesso),
+                mapaCompletoDtoPorSubprocesso(codSubprocesso),
                 atividades
         );
     }
@@ -792,11 +804,7 @@ public class SubprocessoService {
     }
 
     private AtividadeDto mapAtividadeToDto(Atividade atividade) {
-        return AtividadeDto.builder()
-                .codigo(atividade.getCodigo())
-                .descricao(atividade.getDescricao())
-                .conhecimentos(new ArrayList<>(atividade.getConhecimentos()))
-                .build();
+        return AtividadeDto.fromEntity(atividade);
     }
 
     @Transactional(readOnly = true)

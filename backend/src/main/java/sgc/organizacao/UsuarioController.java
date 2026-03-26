@@ -25,19 +25,20 @@ public class UsuarioController {
     private final UsuarioFacade usuarioFacade;
     private final UsuarioService usuarioService;
 
-    @JsonView(OrganizacaoViews.Interna.class)
     @GetMapping("/{titulo}")
-    public ResponseEntity<Usuario> buscarUsuarioPorTitulo(@PathVariable String titulo) {
+    public ResponseEntity<UsuarioConsultaDto> buscarUsuarioPorTitulo(@PathVariable String titulo) {
         return usuarioService.buscarOpt(titulo)
+                .map(UsuarioConsultaDto::fromEntity)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @JsonView(OrganizacaoViews.Interna.class)
     @GetMapping("/pesquisar")
     @Operation(summary = "Pesquisa usuários por nome ou matrícula")
-    public ResponseEntity<List<Usuario>> pesquisarUsuarios(@RequestParam String termo) {
-        return ResponseEntity.ok(usuarioService.buscarPorNomeOuMatricula(termo));
+    public ResponseEntity<List<UsuarioConsultaDto>> pesquisarUsuarios(@RequestParam String termo) {
+        return ResponseEntity.ok(usuarioService.buscarPorNomeOuMatricula(termo).stream()
+                .map(UsuarioConsultaDto::fromEntity)
+                .toList());
     }
 
     @JsonView(OrganizacaoViews.Interna.class)

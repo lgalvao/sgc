@@ -22,6 +22,10 @@ export default defineConfig({
     },
     webServer: {
         command: `node e2e/lifecycle.js`,
+        env: {
+            ...process.env,
+            SGC_LIFECYCLE_PROFILE: 'e2e'
+        },
         url: `http://localhost:${frontendPort}`,
         reuseExistingServer: true,
         timeout: 300 * 1000,

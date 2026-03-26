@@ -16,6 +16,7 @@ import sgc.organizacao.model.*;
 import sgc.processo.dto.*;
 import sgc.processo.model.*;
 import sgc.processo.service.*;
+import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.*;
 
@@ -84,16 +85,18 @@ public class ProcessoController {
 
     @GetMapping("/finalizados")
     @Operation(summary = "Lista todos os processos com situação FINALIZADO")
-    @JsonView(ProcessoViews.Publica.class)
-    public ResponseEntity<List<Processo>> listarFinalizados() {
-        return ResponseEntity.ok(processoService.listarFinalizados());
+    public ResponseEntity<List<ProcessoResumoDto>> listarFinalizados() {
+        return ResponseEntity.ok(processoService.listarFinalizados().stream()
+                .map(ProcessoResumoDto::fromEntity)
+                .toList());
     }
 
     @GetMapping("/para-importacao")
     @Operation(summary = "Lista processos finalizados elegíveis para servirem de base de importação de atividades")
-    @JsonView(ProcessoViews.Publica.class)
-    public ResponseEntity<List<Processo>> listarParaImportacao() {
-        return ResponseEntity.ok(processoService.listarParaImportacao());
+    public ResponseEntity<List<ProcessoResumoDto>> listarParaImportacao() {
+        return ResponseEntity.ok(processoService.listarParaImportacao().stream()
+                .map(ProcessoResumoDto::fromEntity)
+                .toList());
     }
 
     @GetMapping("/{codigo}/unidades-importacao")
@@ -128,9 +131,10 @@ public class ProcessoController {
 
     @GetMapping("/ativos")
     @Operation(summary = "Lista todos os processos com situação EM_ANDAMENTO")
-    @JsonView(ProcessoViews.Publica.class)
-    public ResponseEntity<List<Processo>> listarAtivos() {
-        return ResponseEntity.ok(processoService.listarAtivos());
+    public ResponseEntity<List<ProcessoResumoDto>> listarAtivos() {
+        return ResponseEntity.ok(processoService.listarAtivos().stream()
+                .map(ProcessoResumoDto::fromEntity)
+                .toList());
     }
 
     @GetMapping("/{codigo}/detalhes")
@@ -192,9 +196,10 @@ public class ProcessoController {
     @GetMapping("/{codigo}/subprocessos")
     @PreAuthorize("hasRole('ADMIN') or @processoService.checarAcesso(authentication, #codigo)")
     @Operation(summary = "Lista todos os subprocessos de um processo")
-    @JsonView(SubprocessoViews.Publica.class)
-    public ResponseEntity<List<Subprocesso>> listarSubprocessos(@PathVariable Long codigo) {
-        return ResponseEntity.ok(subprocessoService.listarEntidadesPorProcesso(codigo));
+    public ResponseEntity<List<SubprocessoListagemDto>> listarSubprocessos(@PathVariable Long codigo) {
+        return ResponseEntity.ok(subprocessoService.listarEntidadesPorProcesso(codigo).stream()
+                .map(SubprocessoListagemDto::fromEntity)
+                .toList());
     }
 
     @PostMapping("/{codigo}/enviar-lembrete")

@@ -39,9 +39,10 @@ public class SubprocessoController {
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    @JsonView(SubprocessoViews.Publica.class)
-    public List<Subprocesso> listar() {
-        return subprocessoService.listarTodos();
+    public List<SubprocessoListagemDto> listar() {
+        return subprocessoService.listarTodos().stream()
+                .map(SubprocessoListagemDto::fromEntity)
+                .toList();
     }
 
     @GetMapping("/{codSubprocesso}")
@@ -58,13 +59,12 @@ public class SubprocessoController {
     }
 
     @GetMapping("/buscar")
-    @PostAuthorize("hasPermission(returnObject.body, 'VISUALIZAR_SUBPROCESSO')")
-    @JsonView(SubprocessoViews.Publica.class)
-    public ResponseEntity<Subprocesso> buscarPorProcessoEUnidade(
+    @PostAuthorize("hasPermission(returnObject.body.codigo, 'Subprocesso', 'VISUALIZAR_SUBPROCESSO')")
+    public ResponseEntity<SubprocessoCodigoDto> buscarPorProcessoEUnidade(
             @RequestParam Long codProcesso, @RequestParam String siglaUnidade) {
         Unidade unidade = unidadeService.buscarPorSigla(siglaUnidade);
         Subprocesso sp = subprocessoService.obterEntidadePorProcessoEUnidade(codProcesso, unidade.getCodigo());
-        return ResponseEntity.ok(sp);
+        return ResponseEntity.ok(new SubprocessoCodigoDto(sp.getCodigo()));
     }
 
     @PostMapping
@@ -148,11 +148,10 @@ public class SubprocessoController {
         return ResponseEntity.ok(subprocessoService.validarCadastro(codSubprocesso));
     }
 
-    @JsonView(MapaViews.Publica.class)
     @GetMapping("/{codSubprocesso}/cadastro")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'VISUALIZAR_SUBPROCESSO')")
-    public Subprocesso obterCadastro(@PathVariable Long codSubprocesso) {
-        return subprocessoService.buscarSubprocesso(codSubprocesso);
+    public SubprocessoCadastroDto obterCadastro(@PathVariable Long codSubprocesso) {
+        return subprocessoService.obterCadastro(codSubprocesso);
     }
 
     @PostMapping("/{codSubprocesso}/cadastro/disponibilizar")
@@ -301,10 +300,8 @@ public class SubprocessoController {
 
     @GetMapping("/{codSubprocesso}/mapa")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'VISUALIZAR_SUBPROCESSO')")
-    @JsonView(MapaViews.Publica.class)
-    public Mapa obterMapa(@PathVariable Long codSubprocesso) {
-        Subprocesso sp = subprocessoService.buscarSubprocessoComMapa(codSubprocesso);
-        return sp.getMapa();
+    public MapaCompletoDto obterMapa(@PathVariable Long codSubprocesso) {
+        return subprocessoService.mapaCompletoDtoPorSubprocesso(codSubprocesso);
     }
 
     @PostMapping("/{codSubprocesso}/disponibilizar-mapa")
@@ -329,22 +326,20 @@ public class SubprocessoController {
     @PostMapping("/{codSubprocesso}/mapa")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'EDITAR_MAPA')")
     @Operation(summary = "Salva as alterações do mapa")
-    @JsonView(MapaViews.Publica.class)
-    public Mapa salvarMapa(
+    public MapaCompletoDto salvarMapa(
             @PathVariable Long codSubprocesso,
             @Valid @RequestBody SalvarMapaRequest request) {
-        return subprocessoService.salvarMapa(codSubprocesso, request);
+        subprocessoService.salvarMapa(codSubprocesso, request);
+        return subprocessoService.mapaCompletoDtoPorSubprocesso(codSubprocesso);
     }
 
     @GetMapping("/{codSubprocesso}/mapa-completo")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'VISUALIZAR_SUBPROCESSO')")
     @Operation(summary = "Obtém o mapa completo para edição/visualização")
-    @JsonView(MapaViews.Publica.class)
     @Transactional(readOnly = true)
-    public ResponseEntity<Mapa> obterMapaCompleto(@PathVariable Long codSubprocesso) {
+    public ResponseEntity<MapaCompletoDto> obterMapaCompleto(@PathVariable Long codSubprocesso) {
         try {
-            Mapa mapa = subprocessoService.mapaCompletoPorSubprocesso(codSubprocesso);
-            return ResponseEntity.ok(mapa);
+            return ResponseEntity.ok(subprocessoService.mapaCompletoDtoPorSubprocesso(codSubprocesso));
         } catch (Exception e) {
             log.error("Erro ao buscar mapa completo para subprocesso {}: {}", codSubprocesso, e.getMessage(), e);
             throw e;
@@ -354,13 +349,12 @@ public class SubprocessoController {
     @PostMapping("/{codSubprocesso}/mapa-completo")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'EDITAR_MAPA')")
     @Operation(summary = "Salva o mapa completo (batch)")
-    @JsonView(MapaViews.Publica.class)
-    public ResponseEntity<Mapa> salvarMapaCompleto(
+    public ResponseEntity<MapaCompletoDto> salvarMapaCompleto(
             @PathVariable Long codSubprocesso,
             @Valid @RequestBody SalvarMapaRequest request) {
 
-        Mapa mapa = subprocessoService.salvarMapa(codSubprocesso, request);
-        return ResponseEntity.ok(mapa);
+        subprocessoService.salvarMapa(codSubprocesso, request);
+        return ResponseEntity.ok(subprocessoService.mapaCompletoDtoPorSubprocesso(codSubprocesso));
     }
 
     @PostMapping("/{codSubprocesso}/disponibilizar-mapa-bloco")
@@ -394,35 +388,32 @@ public class SubprocessoController {
     @PostMapping("/{codSubprocesso}/competencia")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'EDITAR_MAPA')")
     @Operation(summary = "Adiciona uma competência ao mapa")
-    @JsonView(MapaViews.Publica.class)
-    public ResponseEntity<Mapa> adicionarCompetencia(
+    public ResponseEntity<MapaCompletoDto> adicionarCompetencia(
             @PathVariable Long codSubprocesso,
             @Valid @RequestBody CompetenciaRequest request) {
-        Mapa mapa = subprocessoService.adicionarCompetencia(codSubprocesso, request);
-        return ResponseEntity.ok(mapa);
+        subprocessoService.adicionarCompetencia(codSubprocesso, request);
+        return ResponseEntity.ok(subprocessoService.mapaCompletoDtoPorSubprocesso(codSubprocesso));
     }
 
     @PostMapping("/{codSubprocesso}/competencia/{codCompetencia}")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'EDITAR_MAPA')")
     @Operation(summary = "Atualiza uma competência do mapa")
-    @JsonView(MapaViews.Publica.class)
-    public ResponseEntity<Mapa> atualizarCompetencia(
+    public ResponseEntity<MapaCompletoDto> atualizarCompetencia(
             @PathVariable Long codSubprocesso,
             @PathVariable Long codCompetencia,
             @Valid @RequestBody CompetenciaRequest request) {
-        Mapa mapa = subprocessoService.atualizarCompetencia(codSubprocesso, codCompetencia, request);
-        return ResponseEntity.ok(mapa);
+        subprocessoService.atualizarCompetencia(codSubprocesso, codCompetencia, request);
+        return ResponseEntity.ok(subprocessoService.mapaCompletoDtoPorSubprocesso(codSubprocesso));
     }
 
     @PostMapping("/{codSubprocesso}/competencia/{codCompetencia}/remover")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'EDITAR_MAPA')")
     @Operation(summary = "Remove uma competência do mapa")
-    @JsonView(MapaViews.Publica.class)
-    public ResponseEntity<Mapa> removerCompetencia(
+    public ResponseEntity<MapaCompletoDto> removerCompetencia(
             @PathVariable Long codSubprocesso,
             @PathVariable Long codCompetencia) {
-        Mapa mapa = subprocessoService.removerCompetencia(codSubprocesso, codCompetencia);
-        return ResponseEntity.ok(mapa);
+        subprocessoService.removerCompetencia(codSubprocesso, codCompetencia);
+        return ResponseEntity.ok(subprocessoService.mapaCompletoDtoPorSubprocesso(codSubprocesso));
     }
 
     @PostMapping("/{codSubprocesso}/apresentar-sugestoes")

@@ -15,7 +15,7 @@ public record AtribuicaoDto(
         @JsonView(OrganizacaoViews.Publica.class)
         String unidadeSigla,
         @JsonView(OrganizacaoViews.Publica.class)
-        Usuario usuario,
+        UsuarioResumoDto usuario,
         @JsonView(OrganizacaoViews.Publica.class)
         LocalDateTime dataInicio,
         @JsonView(OrganizacaoViews.Publica.class)

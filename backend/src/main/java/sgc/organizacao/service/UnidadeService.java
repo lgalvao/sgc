@@ -3,6 +3,7 @@ package sgc.organizacao.service;
 import lombok.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
+import sgc.comum.erros.*;
 import sgc.comum.model.*;
 import sgc.mapa.model.*;
 import sgc.organizacao.model.*;
@@ -33,11 +34,13 @@ public class UnidadeService {
     private final ComumRepo repo;
 
     public Unidade buscarPorCodigo(Long codigo) {
-        return repo.buscar(Unidade.class, Map.of("codigo", codigo, "situacao", SituacaoUnidade.ATIVA));
+        return unidadeRepo.findByCodigoComResponsavel(codigo)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(Unidade.class.getSimpleName(), codigo));
     }
 
     public Unidade buscarPorSigla(String sigla) {
-        return repo.buscarPorSigla(Unidade.class, sigla);
+        return unidadeRepo.findBySiglaComResponsavel(sigla)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(Unidade.class.getSimpleName(), sigla));
     }
 
     public List<Unidade> porCodigos(List<Long> codigos) {

@@ -31,7 +31,7 @@ public class AtividadeController {
     @GetMapping("/{codAtividade}")
     @PreAuthorize("hasPermission(#codAtividade, 'Atividade', 'VISUALIZAR_SUBPROCESSO')")
     @Operation(summary = "Obtém uma atividade pelo código")
-    public ResponseEntity<Atividade> obterPorCodigo(@PathVariable Long codAtividade) {
+    public ResponseEntity<AtividadeDto> obterPorCodigo(@PathVariable Long codAtividade) {
         return ResponseEntity.ok(atividadeFacade.obterAtividadePorCodigo(codAtividade));
     }
 
@@ -41,7 +41,7 @@ public class AtividadeController {
     @GetMapping("/{codAtividade}/conhecimentos")
     @PreAuthorize("hasPermission(#codAtividade, 'Atividade', 'VISUALIZAR_SUBPROCESSO')")
     @Operation(summary = "Lista todos os conhecimentos de uma atividade")
-    public ResponseEntity<List<Conhecimento>> listarConhecimentos(@PathVariable Long codAtividade) {
+    public ResponseEntity<List<ConhecimentoResumoDto>> listarConhecimentos(@PathVariable Long codAtividade) {
         return ResponseEntity.ok(atividadeFacade.listarConhecimentosPorAtividade(codAtividade));
     }
 
