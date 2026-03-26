@@ -11,7 +11,8 @@ import {criarProcessoMapaHomologadoFixture} from './fixtures/fixtures-processos.
  */
 test.describe.serial('CDU-36 - Gerar relatório de mapas', () => {
 
-    test('Cenários CDU-36: ADMIN navega e gera relatórios de mapas', async ({_resetAutomatico, page, request, _autenticadoComoAdmin}) => {
+    test('Cenários CDU-36: ADMIN define filtros e gera PDF de mapas', async ({_resetAutomatico, page, request, _autenticadoComoAdmin}) => {
+        test.slow();
         const descricaoProcesso = `Relatório CDU-36 ${Date.now()}`;
         const processo = await criarProcessoMapaHomologadoFixture(request, {
             descricao: descricaoProcesso,
@@ -22,26 +23,34 @@ test.describe.serial('CDU-36 - Gerar relatório de mapas', () => {
         await page.goto('/painel');
         await expect(page.getByTestId('tbl-processos').getByText(descricaoProcesso).first()).toBeVisible();
 
-        // Cenario 1: Navegação para página de relatórios
         await page.getByRole('link', {name: /Relatórios/i}).click();
         await expect(page).toHaveURL(/\/relatorios/);
         await expect(page.getByRole('heading', {name: /Relatórios/i})).toBeVisible();
 
         await page.getByRole('tab', {name: 'Mapas'}).click();
 
-        const selectProcesso = page.getByLabel('Selecione o Processo').last();
-        const selectUnidade = page.getByLabel('Selecione a unidade');
-        const botaoGerar = page.getByRole('button', {name: 'Gerar PDF'});
+        const painelMapas = page.getByRole('tabpanel', {name: /^Mapas$/i});
+        const selectProcesso = painelMapas.getByLabel('Selecione o Processo');
+        const selectUnidade = painelMapas.getByLabel('Selecione a unidade');
+        const botaoGerar = painelMapas.getByRole('button', {name: 'Gerar PDF'});
+
         await expect(selectProcesso).toBeVisible();
         await expect(selectUnidade).toBeVisible();
+        await expect(selectUnidade).toContainText(/Todas as unidades/i);
         await expect(botaoGerar).toBeDisabled();
 
         await selectProcesso.selectOption({label: descricaoProcesso});
         await expect(botaoGerar).toBeEnabled();
 
+        const requisicaoSemFiltroUnidade = page.waitForRequest((req) => {
+            return req.url().includes(`/relatorios/mapas/${processo.codigo}/exportar`) && !req.url().includes('unidadeId=');
+        });
+
         const downloadPromise = page.waitForEvent('download');
         await botaoGerar.click();
+        await requisicaoSemFiltroUnidade;
         const download = await downloadPromise;
+
         expect(download.suggestedFilename()).toContain(`relatorio-mapas-${processo.codigo}.pdf`);
     });
 });

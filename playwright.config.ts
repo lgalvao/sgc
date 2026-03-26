@@ -24,7 +24,7 @@ export default defineConfig({
         command: `node e2e/lifecycle.js`,
         url: `http://localhost:${frontendPort}`,
         reuseExistingServer: true,
-        timeout: 120 * 1000,
+        timeout: 300 * 1000,
         stdout: 'pipe',
         stderr: 'pipe',
     },

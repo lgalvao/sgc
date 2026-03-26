@@ -2,6 +2,33 @@
 
 Esta versão substitui a rodada anterior e consolida pendências após segunda varredura com leitura de specs e helpers.
 
+## Andamento da execução (2026-03-26 - rodada complementar)
+- ✅ **Estabilização de execução E2E** aplicada para reduzir falsos negativos de infra em execução fria: timeout do `webServer` do Playwright ampliado para acomodar subida completa de backend/frontend no ambiente atual.
+- ✅ **Novo avanço multi-CDU** além dos relatórios: **CDU-27 (Alterar data limite)** recebeu cobertura explícita de alerta no painel da unidade destino após alteração por ADMIN.
+- ✅ No CDU-27, a asserção agora valida os campos críticos do alerta gerado (`Descrição`, `Processo`, `Data/Hora` e `Origem` com `ADMIN`) após troca de perfil para CHEFE da unidade afetada.
+- ✅ Regressão direcionada executada em lote único dos specs alterados (`cdu-27`, `cdu-35`, `cdu-36`) para evidenciar passagem conjunta dos casos trabalhados.
+- 🔄 Próximo passo sugerido: ampliar o lote para CDUs de histórico de análise ainda parciais (CDU-13/CDU-14/CDU-20), priorizando campos de tabela e regras de visibilidade por perfil.
+
+## Novos aprendizados (rodada complementar 2026-03-26)
+- Em ambiente com build cold de backend Java, timeout curto de `webServer` no Playwright gera falha de infraestrutura sem relação com regra de negócio; calibrar timeout evita retrabalho e ruído no ciclo.
+- Para CDU-27, validar apenas mensagem de sucesso não garante requisito de notificação; incluir leitura da tabela de alertas da unidade destino aumenta a evidência de comportamento esperado.
+- Alternar perfil no mesmo teste (ADMIN -> CHEFE da unidade) foi suficiente para confirmar o efeito colateral do fluxo sem depender de fixtures adicionais.
+
+## Andamento da execução (2026-03-26)
+- ✅ **Lote multi-CDU concluído** com foco em relatórios: **CDU-35 (Andamento de processo)** e **CDU-36 (Mapas)**.
+- ✅ CDU-35 reforçado com validações explícitas de fluxo ponta a ponta: acesso em `Relatórios`, seleção obrigatória de processo, geração da tabela e presença dos campos-chave do relatório (`Sigla`, `Nome`, `Situação`, `Data`, `Responsável`, `Titular`).
+- ✅ CDU-35 ampliado também com evidência de exportação: clique no botão `PDF` e validação do nome de arquivo baixado (`relatorio-andamento-{codigo}.pdf`).
+- ✅ CDU-36 evoluído para cobrir melhor a etapa de filtros: validação dos campos `Selecione o Processo` e `Selecione a unidade`, estado inicial desabilitado de `Gerar PDF` e habilitação após seleção do processo.
+- ✅ CDU-36 ganhou verificação explícita de comportamento do filtro opcional de unidade no request de geração: sem `unidadeId` quando o valor permanece em `Todas as unidades`.
+- ✅ Execução de regressão direcionada validada com sucesso para os dois specs alterados (`e2e/cdu-35.spec.ts` e `e2e/cdu-36.spec.ts`).
+- 🔄 Próximo passo sugerido: avançar na cobertura de conteúdo semântico do PDF de mapas (competências/atividades/conhecimentos) com estratégia híbrida (assert de backend + smoke de download no E2E).
+
+## Novos aprendizados (rodada 2026-03-26)
+- Para CDU-35, validar somente “tabela visível” é frágil; a cobertura fica mais robusta quando inclui cabeçalhos funcionais e pelo menos uma linha com padrões esperados de data/situação.
+- Em telas com dois blocos de relatório, escopar seletores pelo `tabpanel` reduz ambiguidade entre campos iguais (ex.: `Selecione o Processo` em duas abas).
+- No CDU-36, o requisito de unidade opcional pode ser coberto sem fixture extra ao validar o request emitido sem querystring `unidadeId` quando a opção padrão é mantida.
+- Para comprovar exportação E2E sem acoplamento à implementação interna, a dupla `waitForEvent('download')` + asserção de `suggestedFilename` entrega evidência objetiva e estável.
+
 ## Andamento da execução (2026-03-25)
 - ✅ **Lote iniciado** com foco no **CDU-02 (Visualizar painel)**, priorizando item P0 de campos da tabela de processos ativos.
 - ✅ Adicionada cobertura E2E explícita para validar cabeçalhos obrigatórios da tabela do painel compacto (`Descrição`, `Tipo`, `Unidades`, `Situação`) e presença dos dados recém-criados na mesma linha.
