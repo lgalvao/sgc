@@ -43,7 +43,7 @@
 
         <LoadingButton
             v-if="isChefe"
-            :disabled="!habilitarDisponibilizarCadastro || !habilitarDisponibilizar"
+            :disabled="botaoDisponibilizarDesabilitado"
             :loading="loadingValidacao"
             data-testid="btn-cad-atividades-disponibilizar"
             icon="check-lg"
@@ -54,6 +54,15 @@
         />
       </template>
     </PageHeader>
+
+    <BFormCheckbox
+        v-if="isChefe && isRevisao"
+        v-model="disponibilizacaoSemMudancas"
+        class="mt-3 mb-2"
+        data-testid="chk-disponibilizacao-sem-mudancas"
+    >
+      {{ TEXTOS.atividades.CHECKBOX_DISPONIBILIZACAO_SEM_MUDANCAS }}
+    </BFormCheckbox>
 
     <BAlert
         v-if="erroGlobalFormatado"
@@ -159,7 +168,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BBadge, BButton} from "bootstrap-vue-next";
+import {BAlert, BBadge, BButton, BFormCheckbox} from "bootstrap-vue-next";
 import AppAlert from "@/components/comum/AppAlert.vue";
 import {computed, nextTick, onMounted, ref, watch} from "vue";
 import {useRouter} from "vue-router";
@@ -236,14 +245,53 @@ const {
   habilitarEditarCadastro,
   habilitarDisponibilizarCadastro
 } = useAcesso(subprocesso);
-const isRevisao = computed(() => subprocesso.value?.tipoProcesso === TipoProcesso.REVISAO);
+const isRevisao = computed(() => {
+  if (subprocesso.value?.tipoProcesso === TipoProcesso.REVISAO) {
+    return true;
+  }
+  return processos.processoDetalhe.value?.tipo === TipoProcesso.REVISAO;
+});
 const podeVerImpacto = computed(() => podeVisualizarImpacto.value);
 
 const atividades = ref<Atividade[]>([]);
+const atividadesSnapshotInicial = ref<string>('[]');
+const disponibilizacaoSemMudancas = ref(false);
+
+function serializarAtividades(lista: Atividade[]): string {
+  const normalizadas = lista
+      .map(atividade => ({
+        descricao: (atividade.descricao || '').trim(),
+        conhecimentos: (atividade.conhecimentos || [])
+            .map(conhecimento => (conhecimento.descricao || '').trim())
+            .sort(),
+      }))
+      .sort((a, b) => a.descricao.localeCompare(b.descricao));
+
+  return JSON.stringify(normalizadas);
+}
+
+const houveAlteracaoCadastro = computed(() => serializarAtividades(atividades.value) !== atividadesSnapshotInicial.value);
 
 const habilitarDisponibilizar = computed(() => {
-  if (atividades.value.length === 0) return false;
-  return atividades.value.every(a => a.conhecimentos && a.conhecimentos.length > 0);
+  const cadastroValido = atividades.value.length > 0
+      && atividades.value.every(a => a.conhecimentos && a.conhecimentos.length > 0);
+
+  if (!cadastroValido) {
+    return false;
+  }
+
+  if (!isRevisao.value) {
+    return true;
+  }
+
+  return houveAlteracaoCadastro.value || disponibilizacaoSemMudancas.value;
+});
+
+const botaoDisponibilizarDesabilitado = computed(() => {
+  if (isRevisao.value) {
+    return !habilitarDisponibilizar.value;
+  }
+  return !habilitarDisponibilizarCadastro.value || !habilitarDisponibilizar.value;
 });
 
 const analisesCadastro = ref<Analise[]>([]);
@@ -373,6 +421,8 @@ async function carregarContextoInicial() {
   if (data.atividadesDisponiveis) {
     atividades.value = data.atividadesDisponiveis;
   }
+  atividadesSnapshotInicial.value = serializarAtividades(atividades.value);
+  disponibilizacaoSemMudancas.value = false;
   if (data.unidade) {
     unidade.value = data.unidade as Unidade;
   }
@@ -511,6 +561,8 @@ async function handleImportAtividades(aviso?: string) {
       if (data) {
         sincronizarEstadoInicialContexto(data);
         atividades.value = data.atividadesDisponiveis ?? [];
+        atividadesSnapshotInicial.value = serializarAtividades(atividades.value);
+        disponibilizacaoSemMudancas.value = false;
         if (data.unidade) {
           unidade.value = data.unidade as Unidade;
         }
@@ -542,12 +594,15 @@ function scrollParaPrimeiroErro() {
 }
 
 async function disponibilizarCadastro() {
-  const situacaoEsperada = isRevisao.value
-      ? SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO
-      : SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO;
+  const situacoesPermitidas = isRevisao.value
+      ? [SituacaoSubprocesso.NAO_INICIADO, SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO]
+      : [SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO];
 
-  if (subprocesso.value?.situacao !== situacaoEsperada) {
-    notify(TEXTOS.comum.ACAO_NAO_PERMITIDA_SITUACAO(formatSituacaoSubprocesso(situacaoEsperada)), 'danger');
+  if (!subprocesso.value?.situacao || !situacoesPermitidas.includes(subprocesso.value.situacao)) {
+    const situacaoReferencia = isRevisao.value
+        ? SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO
+        : SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO;
+    notify(TEXTOS.comum.ACAO_NAO_PERMITIDA_SITUACAO(formatSituacaoSubprocesso(situacaoReferencia)), 'danger');
     return;
   }
 

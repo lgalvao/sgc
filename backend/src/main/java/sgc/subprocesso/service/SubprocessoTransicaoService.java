@@ -158,6 +158,13 @@ public class SubprocessoTransicaoService {
     public void disponibilizarRevisao(Long codSubprocesso, Usuario usuario) {
         log.info("Disponibilizando revisão do subprocesso {}", codSubprocesso);
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
+        validacaoService.validarSituacaoPermitida(sp, NAO_INICIADO, REVISAO_CADASTRO_EM_ANDAMENTO);
+
+        if (sp.getSituacao() == NAO_INICIADO) {
+            sp.setSituacao(REVISAO_CADASTRO_EM_ANDAMENTO);
+            subprocessoRepo.save(sp);
+        }
+
         validacaoService.validarSituacaoPermitida(sp, REVISAO_CADASTRO_EM_ANDAMENTO);
         disponibilizar(sp, REVISAO_CADASTRO_DISPONIBILIZADA, TipoTransicao.REVISAO_CADASTRO_DISPONIBILIZADA, usuario);
     }
