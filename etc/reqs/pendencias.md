@@ -2,6 +2,16 @@
 
 Esta versão substitui a rodada anterior e consolida pendências após segunda varredura com leitura de specs e helpers.
 
+## Andamento da execução (2026-03-26 - continuidade CDU-30)
+- ✅ **CDU-30 avançado em regra de validação negativa**: incluído cenário E2E para tentativa de adicionar como administrador um título já administrador (`111111`), com asserção de erro funcional retornado pela API.
+- ✅ O cenário novo também confirma permanência do modal de adição após falha, preservando o contexto de correção do usuário sem navegação inesperada.
+- ✅ Regressão direcionada do arquivo `e2e/cdu-30.spec.ts` executada com sucesso no ambiente atual.
+- 🔄 Próximo passo sugerido: cobrir no CDU-30 o ramo de validação de remoção inválida (auto-remoção e/ou único administrador) por combinação de E2E + integração backend, conforme viabilidade da massa.
+
+## Novos aprendizados (continuidade CDU-30 em 2026-03-26)
+- Em fluxos de modal administrativo, a dupla **`waitForResponse` com `status >= 400` + assert do payload de erro (`message`)** melhora evidência de regra de negócio quando a validação vem da API e não de bloqueio local.
+- Para o CDU-30, manter o modal aberto após erro de domínio é comportamento relevante do requisito funcional (usuário corrige e tenta novamente), então vale validar explicitamente esse estado.
+
 ## Andamento da execução (2026-03-26 - rodada complementar)
 - ✅ **Estabilização de execução E2E** aplicada para reduzir falsos negativos de infra em execução fria: timeout do `webServer` do Playwright ampliado para acomodar subida completa de backend/frontend no ambiente atual.
 - ✅ **Novo avanço multi-CDU** além dos relatórios: **CDU-27 (Alterar data limite)** recebeu cobertura explícita de alerta no painel da unidade destino após alteração por ADMIN.
