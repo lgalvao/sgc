@@ -299,7 +299,7 @@ describe("ArvoreUnidades.vue", () => {
     it("deve atualizar unidadesSelecionadasLocal quando modelValue muda", async () => {
         const wrapper = createWrapper({modelValue: [10]});
         await wrapper.setProps({modelValue: [20]});
-        expect((wrapper.vm as any).unidadesSelecionadasLocal).toContain(20);
+        expect((wrapper.vm as any).unidadesSelecionadasLocal).toEqual([]);
     });
 
     it("deve atualizar expandedUnits quando unidades muda", async () => {
@@ -361,6 +361,54 @@ describe("ArvoreUnidades.vue", () => {
         const wrapper = createWrapper({modelValue: [10]});
         await wrapper.setProps({modelValue: [10]});
         expect((wrapper.vm as any).unidadesSelecionadasLocal).toEqual([10]);
+    });
+
+    it("deve remover seleção inelegível quando unidades muda", async () => {
+        const wrapper = createWrapper({modelValue: [10, 21]});
+        const unidadesAtualizadas: Unidade[] = [
+            {
+                codigo: 1,
+                sigla: "ROOT",
+                nome: "Raiz",
+                isElegivel: false,
+                tipo: "ADMINISTRATIVA",
+                filhas: [
+                    {
+                        codigo: 10,
+                        sigla: "FILHA1",
+                        nome: "Filha 1",
+                        isElegivel: false,
+                        filhas: [],
+                        tipo: "OPERACIONAL"
+                    },
+                    {
+                        codigo: 20,
+                        sigla: "FILHA2",
+                        nome: "Filha 2",
+                        isElegivel: false,
+                        filhas: [
+                            {
+                                codigo: 21,
+                                sigla: "NETA1",
+                                nome: "Neta 1",
+                                isElegivel: true,
+                                filhas: [],
+                                tipo: "OPERACIONAL"
+                            }
+                        ],
+                        tipo: "INTERMEDIARIA"
+                    }
+                ]
+            }
+        ];
+
+        await wrapper.setProps({unidades: unidadesAtualizadas});
+        await wrapper.vm.$nextTick();
+
+        const emissoes = wrapper.emitted("update:modelValue");
+        expect(emissoes).toBeTruthy();
+        const ultimaEmissao = emissoes![emissoes!.length - 1][0] as number[];
+        expect(ultimaEmissao).toEqual([21]);
     });
 
     it("deve lidar com unidades sem propriedade filhas", async () => {
