@@ -145,6 +145,20 @@ public class AlertaFacade {
         criarAlerta(processo, unidadeRaiz(), unidadeDestino, desc);
     }
 
+    @Transactional
+    public Alerta criarAlertaPessoalSemProcesso(Unidade destino, String usuarioDestinoTitulo, String descricao) {
+        Alerta alerta = Alerta.builder()
+                .processo(null)
+                .dataHora(LocalDateTime.now())
+                .unidadeOrigem(unidadeRaiz())
+                .unidadeDestino(destino)
+                .usuarioDestinoTitulo(usuarioDestinoTitulo)
+                .descricao(descricao)
+                .build();
+
+        return alertaService.salvar(alerta);
+    }
+
     private Alerta criarAlerta(Processo processo, Unidade origem, Unidade destino, String descricao) {
         Alerta alerta = Alerta.builder()
                 .processo(processo)

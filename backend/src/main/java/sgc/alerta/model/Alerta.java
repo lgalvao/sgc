@@ -18,7 +18,7 @@ import java.time.*;
 @NoArgsConstructor
 public class Alerta extends EntidadeBase {
     @ManyToOne
-    @JoinColumn(name = "processo_codigo", nullable = false)
+    @JoinColumn(name = "processo_codigo")
     @JsonIgnore
     private Processo processo;
 
@@ -51,13 +51,13 @@ public class Alerta extends EntidadeBase {
     @JsonView(ComumViews.Publica.class)
     @JsonProperty("codProcesso")
     public Long getCodProcessoSintetico() {
-        return processo.getCodigo();
+        return processo != null ? processo.getCodigo() : null;
     }
 
     @JsonView(ComumViews.Publica.class)
     @JsonProperty("processo")
     public String getProcessoDescricaoSintetica() {
-        return processo.getDescricao();
+        return processo != null ? processo.getDescricao() : "";
     }
 
     @JsonView(ComumViews.Publica.class)

@@ -31,6 +31,7 @@ public class ResponsavelUnidadeService {
     private final UsuarioRepo usuarioRepo;
     private final AtribuicaoTemporariaRepo atribuicaoTemporariaRepo;
     private final ResponsabilidadeRepo responsabilidadeRepo;
+    private final AtribuicaoTemporariaNotificacaoService notificacaoService;
     private final ComumRepo repo;
 
     /**
@@ -81,6 +82,7 @@ public class ResponsavelUnidadeService {
                 .setJustificativa(request.justificativa());
 
         atribuicaoTemporariaRepo.save(atribuicao);
+        notificacaoService.notificarCriacao(atribuicao, usuario);
     }
 
     /**

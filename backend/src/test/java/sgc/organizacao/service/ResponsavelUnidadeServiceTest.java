@@ -23,6 +23,9 @@ class ResponsavelUnidadeServiceTest {
     @Mock
     private ComumRepo repo;
 
+    @Mock
+    private AtribuicaoTemporariaNotificacaoService notificacaoService;
+
     @InjectMocks
     private ResponsavelUnidadeService service;
 
@@ -101,6 +104,7 @@ class ResponsavelUnidadeServiceTest {
             assertThat(atribuicao.getDataInicio()).isEqualTo(dataInicio.atStartOfDay());
             assertThat(atribuicao.getDataTermino()).isEqualTo(dataTermino.atTime(23, 59, 59));
             assertThat(atribuicao.getJustificativa()).isEqualTo("Cobertura de férias");
+            verify(notificacaoService).notificarCriacao(atribuicao, usuario);
         }
     }
 

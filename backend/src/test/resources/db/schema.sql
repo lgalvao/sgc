@@ -367,7 +367,7 @@ create table if not exists sgc.alerta
 (
     6
 ) not null,
-    processo_codigo bigint not null,
+    processo_codigo bigint,
     unidade_origem_codigo bigint not null,
     unidade_destino_codigo bigint not null,
     usuario_destino_titulo varchar
