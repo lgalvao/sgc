@@ -16,6 +16,15 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
     const competencia1 = `Competência 1 ${timestamp}`;
     const competencia2 = `Competência 2 ${timestamp}`;
 
+    function obterDataAnterior(dataIso: string): string {
+        const data = new Date(`${dataIso}T00:00:00`);
+        data.setDate(data.getDate() - 1);
+        const ano = data.getFullYear();
+        const mes = String(data.getMonth() + 1).padStart(2, '0');
+        const dia = String(data.getDate()).padStart(2, '0');
+        return `${ano}-${mes}-${dia}`;
+    }
+
     test('Setup data', async ({_resetAutomatico, request}) => {
         const processo = await criarProcessoCadastroHomologadoFixture(request, {
             descricao: descProcesso,
@@ -57,20 +66,17 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
         await expect(page.getByTestId('mdl-disponibilizar-mapa')).toBeHidden();
         await expect(page.getByText('Mapa de competências técnicas')).toBeVisible();
 
-        // Cenario 4: Validar data posterior à criação do processo
+        // Cenario 4: Validar data menor que a última data limite do subprocesso
         await page.getByTestId('btn-cad-mapa-disponibilizar').click();
         const modal = page.getByTestId('mdl-disponibilizar-mapa');
         await expect(modal).toBeVisible();
 
-        // Tenta preencher com a data de hoje (que é igual ou anterior à criação do processo na maioria dos casos de teste)
-        const hoje = new Date().toISOString().split('T')[0];
-        await page.getByTestId('inp-disponibilizar-mapa-data').fill(hoje);
+        const campoData = page.getByTestId('inp-disponibilizar-mapa-data');
+        const dataMinima = await campoData.getAttribute('min');
+        expect(dataMinima).toBeTruthy();
+        await campoData.fill(obterDataAnterior(dataMinima!));
 
-        // Verifica se a mensagem de erro aparece
-        // Nota: Se hoje for a data de criação, deve mostrar "A data limite deve ser posterior à data de criação do processo."
-        // Se hoje for passado, o componente InputData ou o watch podem mostrar "A data limite para validação deve ser uma data futura."
-        // De qualquer forma, o botão de confirmar deve estar desabilitado.
-        await expect(modal.getByText(/A data limite (deve ser posterior à data de criação do processo|para validação deve ser uma data futura)/)).toBeVisible();
+        await expect(modal.getByText('A data limite deve ser maior ou igual à última data limite do subprocesso.')).toBeVisible();
         await expect(page.getByTestId('btn-disponibilizar-mapa-confirmar')).toBeDisabled();
 
         await page.getByTestId('btn-disponibilizar-mapa-cancelar').click();

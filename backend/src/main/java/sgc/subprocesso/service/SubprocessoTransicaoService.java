@@ -217,9 +217,9 @@ public class SubprocessoTransicaoService {
 
         validacaoService.validarMapaParaDisponibilizacao(sp);
 
-        LocalDate dataCriacaoProcesso = sp.getProcesso().getDataCriacao().toLocalDate();
-        if (!request.dataLimite().isAfter(dataCriacaoProcesso)) {
-            throw new sgc.comum.erros.ErroValidacao(Mensagens.DATA_LIMITE_APOS_CRIACAO_PROCESSO);
+        LocalDate ultimaDataLimite = obterUltimaDataLimite(sp);
+        if (ultimaDataLimite != null && request.dataLimite().isBefore(ultimaDataLimite)) {
+            throw new sgc.comum.erros.ErroValidacao(Mensagens.DATA_LIMITE_MAIOR_OU_IGUAL_ULTIMA_DATA_SUBPROCESSO);
         }
 
         Mapa mapa = sp.getMapa();
@@ -245,6 +245,22 @@ public class SubprocessoTransicaoService {
                 .usuario(usuario)
                 .observacoes(observacoes)
                 .build());
+    }
+
+    private LocalDate obterUltimaDataLimite(Subprocesso sp) {
+        LocalDateTime dataLimiteEtapa1 = sp.getDataLimiteEtapa1();
+        LocalDateTime dataLimiteEtapa2 = sp.getDataLimiteEtapa2();
+
+        if (dataLimiteEtapa1 == null && dataLimiteEtapa2 == null) {
+            return null;
+        }
+        if (dataLimiteEtapa1 == null) {
+            return dataLimiteEtapa2.toLocalDate();
+        }
+        if (dataLimiteEtapa2 == null) {
+            return dataLimiteEtapa1.toLocalDate();
+        }
+        return dataLimiteEtapa1.isAfter(dataLimiteEtapa2) ? dataLimiteEtapa1.toLocalDate() : dataLimiteEtapa2.toLocalDate();
     }
 
     public void submeterMapaAjustado(Long codSubprocesso, SubmeterMapaAjustadoRequest request, Usuario usuario) {

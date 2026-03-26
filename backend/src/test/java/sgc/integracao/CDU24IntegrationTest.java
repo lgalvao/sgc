@@ -17,6 +17,7 @@ import java.time.*;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -137,7 +138,7 @@ class CDU24IntegrationTest extends BaseIntegrationTest {
         ProcessarEmBlocoRequest request = ProcessarEmBlocoRequest.builder()
                 .subprocessos(unidadesSelecionadas)
                 .acao("DISPONIBILIZAR")
-                .dataLimite(LocalDate.now().plusDays(10))
+                .dataLimite(subprocesso1.getDataLimiteEtapa1().toLocalDate().plusDays(1))
                 .build();
 
         mockMvc.perform(
@@ -195,5 +196,37 @@ class CDU24IntegrationTest extends BaseIntegrationTest {
                                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().is(422))
                 .andExpect(content().string(containsString("Todas as atividades devem estar associadas a pelo menos uma competência")));
+    }
+
+    @Test
+    @DisplayName("Deve rejeitar disponibilização em bloco com data menor que a última data limite de algum subprocesso")
+    @WithMockAdmin
+    void disponibilizarMapaEmBloco_deveFalharQuandoDataMenorQueUltimaDataLimite() throws Exception {
+        subprocesso1.setDataLimiteEtapa1(LocalDate.now().plusDays(7).atStartOfDay());
+        subprocesso1.setDataLimiteEtapa2(LocalDate.now().plusDays(15).atStartOfDay());
+        subprocessoRepo.saveAndFlush(subprocesso1);
+
+        Unidade adminUnit = unidadeRepo.findById(1L).orElseThrow();
+        movimentacaoRepo.save(Movimentacao.builder()
+                .subprocesso(subprocesso1)
+                .unidadeOrigem(unidade1)
+                .unidadeDestino(adminUnit)
+                .descricao("Enviado para Admin")
+                .dataHora(LocalDateTime.now())
+                .build());
+
+        ProcessarEmBlocoRequest request = ProcessarEmBlocoRequest.builder()
+                .subprocessos(List.of(subprocesso1.getCodigo()))
+                .acao("DISPONIBILIZAR")
+                .dataLimite(LocalDate.now().plusDays(10))
+                .build();
+
+        mockMvc.perform(
+                        post("/api/subprocessos/{codigo}/disponibilizar-mapa-bloco", processo.getCodigo())
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isUnprocessableContent())
+                .andExpect(content().string(containsString("A data limite deve ser maior ou igual à última data limite do subprocesso.")));
     }
 }

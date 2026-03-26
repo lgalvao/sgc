@@ -19,6 +19,15 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
     const atividade3 = 'Atividade fixture 3';
     const competencia1 = `Competência mapa ${timestamp}`;
 
+    function obterDataPosterior(dataIso: string): string {
+        const data = new Date(`${dataIso}T00:00:00`);
+        data.setDate(data.getDate() + 1);
+        const ano = data.getFullYear();
+        const mes = String(data.getMonth() + 1).padStart(2, '0');
+        const dia = String(data.getDate()).padStart(2, '0');
+        return `${ano}-${mes}-${dia}`;
+    }
+
     test('Setup data', async ({_resetAutomatico, request}) => {
         const processo = await criarProcessoCadastroHomologadoFixture(request, {
             descricao: descProcesso,
@@ -58,12 +67,10 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
         await expect(modal.getByText(TEXTOS.acaoBloco.disponibilizar.TEXTO)).toBeVisible();
         await expect(modal.getByLabel(/Data limite/i)).toBeVisible();
 
-        const data = new Date();
-        data.setDate(data.getDate() + 10);
-        const yyyy = data.getFullYear();
-        const mm = String(data.getMonth() + 1).padStart(2, '0');
-        const dd = String(data.getDate()).padStart(2, '0');
-        await modal.getByLabel(/Data limite/i).fill(`${yyyy}-${mm}-${dd}`);
+        const campoData = modal.getByLabel(/Data limite/i);
+        const dataMinima = await campoData.getAttribute('min');
+        expect(dataMinima).toBeTruthy();
+        await campoData.fill(obterDataPosterior(dataMinima!));
 
         await modal.getByRole('button', {name: TEXTOS.acaoBloco.disponibilizar.BOTAO}).click();
         await expect(page.getByText(TEXTOS.sucesso.MAPAS_DISPONIBILIZADOS_EM_BLOCO).first()).toBeVisible();

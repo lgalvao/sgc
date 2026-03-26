@@ -486,7 +486,21 @@ public class ProcessoService {
                 .unidadeSigla(sp.getUnidade().getSigla())
                 .localizacaoCodigo(localizacao.getCodigo())
                 .situacao(sp.getSituacao())
+                .ultimaDataLimite(obterUltimaDataLimite(sp))
                 .build();
+    }
+
+    private LocalDateTime obterUltimaDataLimite(Subprocesso sp) {
+        LocalDateTime dataLimiteEtapa1 = sp.getDataLimiteEtapa1();
+        LocalDateTime dataLimiteEtapa2 = sp.getDataLimiteEtapa2();
+
+        if (dataLimiteEtapa1 == null) {
+            return dataLimiteEtapa2;
+        }
+        if (dataLimiteEtapa2 == null) {
+            return dataLimiteEtapa1;
+        }
+        return dataLimiteEtapa1.isAfter(dataLimiteEtapa2) ? dataLimiteEtapa1 : dataLimiteEtapa2;
     }
 
     private void notificarInicioProcesso(Processo p, List<Unidade> participantes) {

@@ -317,6 +317,7 @@ export interface SubprocessoDetalhe {
     localizacaoAtual: string;
     processoDescricao: string;
     dataCriacaoProcesso: string;
+    ultimaDataLimiteSubprocesso: string;
     tipoProcesso: TipoProcesso;
     prazoEtapaAtual: string;
     isEmAndamento: boolean;
@@ -399,6 +400,7 @@ export interface SubprocessoElegivel {
     unidadeSigla: string;
     localizacaoCodigo: number;
     situacao: SituacaoSubprocesso;
+    ultimaDataLimite?: string;
 }
 
 export interface ErroValidacao {
