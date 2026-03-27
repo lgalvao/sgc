@@ -1,6 +1,7 @@
 package sgc.subprocesso.dto;
 
 import lombok.*;
+import org.jspecify.annotations.*;
 import sgc.mapa.model.*;
 import sgc.subprocesso.model.*;
 
@@ -18,14 +19,14 @@ import java.util.*;
 @Builder
 public class MapaAjusteDto {
 
-    private final Long codMapa;
+    private final @Nullable Long codMapa;
     private final String unidadeNome;
     private final List<CompetenciaAjusteDto> competencias;
     private final @org.jspecify.annotations.Nullable String justificativaDevolucao;
 
     public static MapaAjusteDto of(
             Subprocesso sp,
-            @org.jspecify.annotations.Nullable Analise analise,
+            @Nullable Analise analise,
             List<Competencia> competencias,
             List<Atividade> atividades,
             List<Conhecimento> conhecimentos) {
@@ -39,7 +40,7 @@ public class MapaAjusteDto {
             List<AtividadeAjusteDto> atividadeDtos = new ArrayList<>();
             for (Atividade ativ : atividades) {
                 List<Conhecimento> conhecimentosDaAtividade = conhecimentos.stream()
-                        .filter(c -> c.getAtividade().getCodigo().equals(ativ.getCodigo()))
+                        .filter(c -> Objects.equals(c.getAtividade().getCodigo(), ativ.getCodigo()))
                         .toList();
                 boolean isLinked = comp.getAtividades().contains(ativ);
                 List<ConhecimentoAjusteDto> conhecimentoDtos = conhecimentosDaAtividade.stream()

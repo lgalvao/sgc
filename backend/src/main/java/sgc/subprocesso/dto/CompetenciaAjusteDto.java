@@ -1,6 +1,7 @@
 package sgc.subprocesso.dto;
 
 import lombok.*;
+import org.jspecify.annotations.*;
 
 import java.util.*;
 
@@ -15,7 +16,7 @@ import java.util.*;
 @AllArgsConstructor
 @NoArgsConstructor(force = true)
 public class CompetenciaAjusteDto {
-    private final Long codCompetencia;
+    private final @Nullable Long codCompetencia;
     private final String nome;
 
     @Builder.Default

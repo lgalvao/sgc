@@ -1,6 +1,7 @@
 package sgc.subprocesso.dto;
 
 import lombok.*;
+import org.jspecify.annotations.*;
 
 /**
  * DTO para conhecimento no contexto de ajustes do mapa.
@@ -10,7 +11,7 @@ import lombok.*;
  */
 @Builder
 public record ConhecimentoAjusteDto(
-        Long conhecimentoCodigo,
+        @Nullable Long conhecimentoCodigo,
         String nome,
         boolean incluido) {
 }

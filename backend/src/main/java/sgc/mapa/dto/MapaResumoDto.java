@@ -8,7 +8,7 @@ import java.time.*;
 
 @Builder
 public record MapaResumoDto(
-        Long codigo,
+        @Nullable Long codigo,
         @Nullable Long subprocessoCodigo,
         @Nullable LocalDateTime dataHoraDisponibilizado,
         @Nullable String observacoesDisponibilizacao,

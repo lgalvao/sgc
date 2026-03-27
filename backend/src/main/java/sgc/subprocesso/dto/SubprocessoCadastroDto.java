@@ -11,7 +11,7 @@ import java.util.*;
 
 @Builder
 public record SubprocessoCadastroDto(
-        Long codigo,
+        @Nullable Long codigo,
         @Nullable UnidadeDto unidade,
         List<AtividadeDto> atividades) {
 

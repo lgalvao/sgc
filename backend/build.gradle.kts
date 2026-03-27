@@ -22,15 +22,30 @@ tasks.withType<JavaCompile>().configureEach {
         disableAllChecks = true
         disableWarningsInGeneratedCode = true
         check("NullAway", CheckSeverity.WARN)
-        option("NullAway:AnnotatedPackages", "sgc")
+        option(
+            "NullAway:AnnotatedPackages",
+            listOf(
+                "sgc.comum.erros",
+                "sgc.processo.dto",
+                "sgc.subprocesso.dto",
+                "sgc.mapa.dto"
+            ).joinToString(",")
+        )
         option("NullAway:JSpecifyMode", "true")
-        excludedPaths = ".*/build/generated/.*"
+        excludedPaths = listOf(
+            """.*[\\/](build[\\/]generated)[\\/].*""",
+            """.*[\\/]src[\\/]main[\\/]java[\\/]sgc[\\/](?!comum[\\/]erros[\\/]|processo[\\/]dto[\\/]|subprocesso[\\/]dto[\\/]|mapa[\\/]dto[\\/]).*"""
+        ).joinToString("|")
     }
 }
 
 tasks.named<JavaCompile>("compileTestJava") {
     options.errorprone.check("NullAway", CheckSeverity.WARN)
-    options.errorprone.excludedPaths = ".*/(build/generated|src/test/java/sgc/integracao/).*"
+    options.errorprone.excludedPaths = listOf(
+        """.*[\\/](build[\\/]generated)[\\/].*""",
+        """.*[\\/]src[\\/]main[\\/]java[\\/]sgc[\\/](?!comum[\\/]erros[\\/]|processo[\\/]dto[\\/]|subprocesso[\\/]dto[\\/]|mapa[\\/]dto[\\/]).*""",
+        """.*[\\/]src[\\/]test[\\/]java[\\/]sgc[\\/]integracao[\\/].*"""
+    ).joinToString("|")
 }
 
 extra["mapstruct.version"] = "1.6.3"

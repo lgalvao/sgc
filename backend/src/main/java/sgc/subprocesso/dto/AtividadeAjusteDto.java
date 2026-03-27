@@ -1,6 +1,7 @@
 package sgc.subprocesso.dto;
 
 import lombok.*;
+import org.jspecify.annotations.*;
 
 import java.util.*;
 
@@ -12,7 +13,7 @@ import java.util.*;
  */
 @Builder
 public record AtividadeAjusteDto(
-        Long codAtividade,
+        @Nullable Long codAtividade,
         String nome,
         List<ConhecimentoAjusteDto> conhecimentos) {
 }

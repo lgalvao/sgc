@@ -1,3 +1,4 @@
+/// <reference types="@vitest/browser/matchers" />
 import type {Meta, StoryObj} from '@storybook/vue3-vite';
 import InlineEditor from './InlineEditor.vue';
 import {ref} from 'vue';

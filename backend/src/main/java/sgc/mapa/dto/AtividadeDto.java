@@ -1,6 +1,7 @@
 package sgc.mapa.dto;
 
 import lombok.*;
+import org.jspecify.annotations.*;
 import sgc.mapa.model.*;
 
 import java.util.*;
@@ -10,7 +11,7 @@ import java.util.*;
  */
 @Builder
 public record AtividadeDto(
-        Long codigo,
+        @Nullable Long codigo,
         String descricao,
         List<ConhecimentoResumoDto> conhecimentos) {
 

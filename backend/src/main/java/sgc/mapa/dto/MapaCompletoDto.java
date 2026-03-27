@@ -7,7 +7,7 @@ import sgc.subprocesso.model.*;
 import java.util.*;
 
 public record MapaCompletoDto(
-        Long codigo,
+        @Nullable Long codigo,
         @Nullable Long subprocessoCodigo,
         @Nullable String observacoes,
         List<CompetenciaMapaDto> competencias,

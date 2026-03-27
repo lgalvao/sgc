@@ -15,15 +15,15 @@ public record MovimentacaoDto(
         String unidadeOrigemSigla,
         String unidadeOrigemNome,
         @Nullable Long unidadeDestinoCodigo,
-        String unidadeDestinoSigla,
-        String unidadeDestinoNome,
+        @Nullable String unidadeDestinoSigla,
+        @Nullable String unidadeDestinoNome,
         String usuarioTitulo,
         String usuarioNome,
         String descricao
 ) {
     public static MovimentacaoDto from(Movimentacao m) {
         Unidade unidadeOrigem = m.getUnidadeOrigem();
-        Unidade unidadeDestino = m.getUnidadeDestino();
+        @Nullable Unidade unidadeDestino = m.getUnidadeDestino();
         Usuario usuario = m.getUsuario();
 
         return MovimentacaoDto.builder()
@@ -32,9 +32,9 @@ public record MovimentacaoDto(
                 .unidadeOrigemCodigo(unidadeOrigem.getCodigo())
                 .unidadeOrigemSigla(unidadeOrigem.getSigla())
                 .unidadeOrigemNome(unidadeOrigem.getNome())
-                .unidadeDestinoCodigo(unidadeDestino.getCodigo())
-                .unidadeDestinoSigla(unidadeDestino.getSigla())
-                .unidadeDestinoNome(unidadeDestino.getNome())
+                .unidadeDestinoCodigo(unidadeDestino != null ? unidadeDestino.getCodigo() : null)
+                .unidadeDestinoSigla(unidadeDestino != null ? unidadeDestino.getSigla() : null)
+                .unidadeDestinoNome(unidadeDestino != null ? unidadeDestino.getNome() : null)
                 .usuarioTitulo(usuario.getTituloEleitoral())
                 .usuarioNome(usuario.getNome())
                 .descricao(m.getDescricao())
