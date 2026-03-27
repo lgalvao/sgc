@@ -32,6 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import({TestSecurityConfig.class, RestExceptionHandler.class})
 @DisplayName("Testes do Manipulador de Exceções REST")
 class RestExceptionHandlerTest {
+    private static final String JSON_VALIDO_TESTE = "{\"dadoSensivel\":\"valor-seguro\"}";
 
     @Autowired
     private MockMvc mockMvc;
@@ -52,7 +53,7 @@ class RestExceptionHandlerTest {
 
         mockMvc.perform(post("/test/validacao")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"campo\": \"valor\"}"))
+                        .content(JSON_VALIDO_TESTE))
                 .andDo(print())
                 .andExpect(status().is(422))
                 .andExpect(jsonPath("$.message").value("Erro validação negócio"));
@@ -66,7 +67,7 @@ class RestExceptionHandlerTest {
 
         mockMvc.perform(post("/test/validacao")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"campo\": \"valor\"}"))
+                        .content(JSON_VALIDO_TESTE))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.message").value("ACESSO NEGADO: Acesso negado"));
     }
@@ -79,7 +80,7 @@ class RestExceptionHandlerTest {
 
         mockMvc.perform(post("/test/validacao")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"campo\": \"valor\"}"))
+                        .content(JSON_VALIDO_TESTE))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.message").value("Falha autenticação"));
     }
@@ -92,7 +93,7 @@ class RestExceptionHandlerTest {
 
         mockMvc.perform(post("/test/validacao")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"campo\": \"valor\"}"))
+                        .content(JSON_VALIDO_TESTE))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.message").value("ESTADO ILEGAL: Estado inválido"));
     }
@@ -105,7 +106,7 @@ class RestExceptionHandlerTest {
 
         mockMvc.perform(post("/test/validacao")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"campo\": \"valor\"}"))
+                        .content(JSON_VALIDO_TESTE))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("ARGUMENTO INVÁLIDO: Argumento inválido"));
     }
@@ -118,7 +119,7 @@ class RestExceptionHandlerTest {
 
         mockMvc.perform(post("/test/validacao")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"campo\": \"valor\"}"))
+                        .content(JSON_VALIDO_TESTE))
                 .andExpect(status().isInternalServerError())
                 .andExpect(jsonPath("$.message").value("ERRO INESPERADO: Erro inesperado"));
     }
@@ -137,7 +138,7 @@ class RestExceptionHandlerTest {
 
         mockMvc.perform(post("/test/validacao")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"campo\": \"valor\"}"))
+                        .content(JSON_VALIDO_TESTE))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("A requisição contém dados inválidos."));
     }

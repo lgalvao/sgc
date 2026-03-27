@@ -13,6 +13,7 @@ import org.springframework.web.context.request.WebRequest;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -81,10 +82,9 @@ class RestExceptionHandlerCoverageTest {
         ErroNegocioBase ex = new ErroNegocioBase("Mensagem Erro", "COD_400", HttpStatus.BAD_REQUEST, details) {};
         
         ResponseEntity<ErroApi> response = target.handleErroNegocio(ex);
-        ErroApi corpo = response.getBody();
+        ErroApi corpo = Objects.requireNonNull(response.getBody());
         
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(corpo).isNotNull();
         assertThat(corpo.getMessage()).isEqualTo("Mensagem Erro");
         
         Map<String, Object> responseDetails = (Map<String, Object>) corpo.getDetails();
@@ -107,10 +107,9 @@ class RestExceptionHandlerCoverageTest {
         Exception ex = new NullPointerException(); 
         
         ResponseEntity<ErroApi> response = target.handleGenericException(ex);
-        ErroApi corpo = response.getBody();
+        ErroApi corpo = Objects.requireNonNull(response.getBody());
         
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
-        assertThat(corpo).isNotNull();
         assertThat(corpo.getMessage()).contains("NullPointerException");
     }
 }
