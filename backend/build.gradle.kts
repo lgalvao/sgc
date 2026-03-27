@@ -1,5 +1,7 @@
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 import info.solidsoft.gradle.pitest.PitestTask
+import net.ltgt.gradle.errorprone.CheckSeverity
+import net.ltgt.gradle.errorprone.errorprone
 import org.gradle.api.tasks.testing.logging.*
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
@@ -9,12 +11,26 @@ plugins {
     id("org.springframework.boot") version "4.0.5"
     id("io.spring.dependency-management") version "1.1.7"
     id("com.github.spotbugs") version "6.4.8"
+    id("net.ltgt.errorprone") version "4.3.0"
     id("info.solidsoft.pitest") version "1.19.0-rc.3"
     id("com.github.ben-manes.versions") version "0.53.0"
 }
 
-tasks.withType<JavaCompile> {
+tasks.withType<JavaCompile>().configureEach {
     options.compilerArgs.addAll(listOf("-Xlint:unchecked", "-Xlint:deprecation"))
+    options.errorprone {
+        disableAllChecks = true
+        disableWarningsInGeneratedCode = true
+        check("NullAway", CheckSeverity.WARN)
+        option("NullAway:AnnotatedPackages", "sgc")
+        option("NullAway:JSpecifyMode", "true")
+        excludedPaths = ".*/build/generated/.*"
+    }
+}
+
+tasks.named<JavaCompile>("compileTestJava") {
+    options.errorprone.check("NullAway", CheckSeverity.WARN)
+    options.errorprone.excludedPaths = ".*/(build/generated|src/test/java/sgc/integracao/).*"
 }
 
 extra["mapstruct.version"] = "1.6.3"
@@ -74,6 +90,9 @@ dependencies {
     implementation("org.mozilla:rhino:1.9.0")
     testImplementation("com.atlassian.oai:swagger-request-validator-mockmvc:2.46.0")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+
+    errorprone("com.google.errorprone:error_prone_core:2.41.0")
+    errorprone("com.uber.nullaway:nullaway:0.12.10")
 }
 
 
