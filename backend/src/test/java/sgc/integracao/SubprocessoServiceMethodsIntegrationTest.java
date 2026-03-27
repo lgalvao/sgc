@@ -51,6 +51,7 @@ class SubprocessoServiceMethodsIntegrationTest extends BaseIntegrationTest {
                 .unidade(unidade)
                 .situacao(SituacaoSubprocesso.NAO_INICIADO)
                 .processo(processo)
+                .dataLimiteEtapa1(LocalDateTime.now().plusDays(10))
                 .build();
         subprocessoRepo.save(subprocesso);
 

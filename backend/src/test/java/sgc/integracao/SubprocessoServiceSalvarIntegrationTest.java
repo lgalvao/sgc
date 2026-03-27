@@ -56,6 +56,7 @@ class SubprocessoServiceSalvarIntegrationTest extends BaseIntegrationTest {
                 .unidade(unidade)
                 .situacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO)
                 .processo(processo)
+                .dataLimiteEtapa1(LocalDateTime.now().plusDays(10))
                 .build();
 
         subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);

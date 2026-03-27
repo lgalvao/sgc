@@ -53,6 +53,7 @@ class SubprocessoServiceValidacaoCadastroIntegrationTest extends BaseIntegration
                 .unidade(unidade)
                 .situacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO)
                 .processo(processo)
+                .dataLimiteEtapa1(LocalDateTime.now().plusDays(10))
                 .build();
         subprocessoRepo.save(subprocesso);
 

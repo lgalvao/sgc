@@ -122,7 +122,7 @@ class E2eControllerTest {
                         + " 'Processo teste', 'CRIADO', 'MAPEAMENTO')");
 
         jdbcTemplate.execute(
-                "INSERT INTO sgc.subprocesso (codigo, processo_codigo, unidade_codigo, situacao) VALUES (300, 100, 999, 'NAO_INICIADO')");
+                "INSERT INTO sgc.subprocesso (codigo, processo_codigo, unidade_codigo, situacao, data_limite_etapa1) VALUES (300, 100, 999, 'NAO_INICIADO', CURRENT_TIMESTAMP)");
 
         jdbcTemplate.execute("INSERT INTO sgc.mapa (codigo, subprocesso_codigo) VALUES (200, 300)");
 

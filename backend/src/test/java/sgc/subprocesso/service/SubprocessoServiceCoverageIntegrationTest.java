@@ -18,6 +18,8 @@ import sgc.processo.model.*;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
 
+import java.time.*;
+
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -59,6 +61,7 @@ class SubprocessoServiceCoverageIntegrationTest {
             u = unidadeRepo.save(u);
 
             Subprocesso sp = new Subprocesso();
+            sp.setDataLimiteEtapa1(LocalDateTime.now().plusDays(30));
             sp.setProcesso(proc);
             sp.setUnidade(u);
             sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
@@ -121,6 +124,7 @@ class SubprocessoServiceCoverageIntegrationTest {
             u = unidadeRepo.save(u);
 
             Subprocesso sp = new Subprocesso();
+            sp.setDataLimiteEtapa1(LocalDateTime.now().plusDays(30));
             sp.setProcesso(proc);
             sp.setUnidade(u);
             sp.setSituacaoForcada(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
@@ -155,6 +159,7 @@ class SubprocessoServiceCoverageIntegrationTest {
             u = unidadeRepo.save(u);
 
             Subprocesso sp = new Subprocesso();
+            sp.setDataLimiteEtapa1(LocalDateTime.now().plusDays(30));
             sp.setProcesso(proc);
             sp.setUnidade(u);
             sp.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
@@ -189,6 +194,7 @@ class SubprocessoServiceCoverageIntegrationTest {
             u = unidadeRepo.save(u);
 
             Subprocesso sp = new Subprocesso();
+            sp.setDataLimiteEtapa1(LocalDateTime.now().plusDays(30));
             sp.setProcesso(proc);
             sp.setUnidade(u);
             sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
@@ -215,6 +221,7 @@ class SubprocessoServiceCoverageIntegrationTest {
             u = unidadeRepo.save(u);
 
             Subprocesso sp = new Subprocesso();
+            sp.setDataLimiteEtapa1(LocalDateTime.now().plusDays(30));
             sp.setProcesso(proc);
             sp.setUnidade(u);
             sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
@@ -248,6 +255,7 @@ class SubprocessoServiceCoverageIntegrationTest {
             mapaNovo = mapaRepo.save(mapaNovo);
 
             Subprocesso sp = new Subprocesso();
+            sp.setDataLimiteEtapa1(LocalDateTime.now().plusDays(30));
             sp.setProcesso(proc);
             sp.setUnidade(u);
             sp.setMapa(mapaAntigo);
@@ -278,6 +286,7 @@ class SubprocessoServiceCoverageIntegrationTest {
             mapaAntigo = mapaRepo.save(mapaAntigo);
 
             Subprocesso sp = new Subprocesso();
+            sp.setDataLimiteEtapa1(LocalDateTime.now().plusDays(30));
             sp.setProcesso(proc);
             sp.setUnidade(u);
             sp.setMapa(mapaAntigo);
@@ -310,6 +319,7 @@ class SubprocessoServiceCoverageIntegrationTest {
             u = unidadeRepo.save(u);
 
             Subprocesso sp = new Subprocesso();
+            sp.setDataLimiteEtapa1(LocalDateTime.now().plusDays(30));
             sp.setProcesso(proc);
             sp.setUnidade(u);
             sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
@@ -359,6 +369,7 @@ class SubprocessoServiceCoverageIntegrationTest {
             u = unidadeRepo.save(u);
 
             Subprocesso spDestino = new Subprocesso();
+            spDestino.setDataLimiteEtapa1(LocalDateTime.now().plusDays(30));
             spDestino.setProcesso(proc);
             spDestino.setUnidade(u);
             spDestino.setSituacaoForcada(SituacaoSubprocesso.NAO_INICIADO);
@@ -371,6 +382,7 @@ class SubprocessoServiceCoverageIntegrationTest {
             spDestino = subprocessoRepo.saveAndFlush(spDestino);
 
             Subprocesso spOrigem = new Subprocesso();
+            spOrigem.setDataLimiteEtapa1(LocalDateTime.now().plusDays(30));
             spOrigem.setProcesso(proc);
             spOrigem.setUnidade(u);
             spOrigem.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
@@ -405,6 +417,7 @@ class SubprocessoServiceCoverageIntegrationTest {
             u = unidadeRepo.save(u);
 
             Subprocesso sp = new Subprocesso();
+            sp.setDataLimiteEtapa1(LocalDateTime.now().plusDays(30));
             sp.setProcesso(proc);
             sp.setUnidade(u);
             sp = subprocessoRepo.saveAndFlush(sp);
@@ -420,4 +433,3 @@ class SubprocessoServiceCoverageIntegrationTest {
         }
     }
 }
-

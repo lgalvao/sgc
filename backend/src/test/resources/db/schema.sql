@@ -304,7 +304,7 @@ create table if not exists sgc.subprocesso
     timestamp
 (
     6
-),
+) not null,
     data_limite_etapa2 timestamp
 (
     6
@@ -317,12 +317,12 @@ create table if not exists sgc.subprocesso
 (
     6
 ),
-    processo_codigo bigint,
-    unidade_codigo bigint,
+    processo_codigo bigint not null,
+    unidade_codigo bigint not null,
     situacao varchar
 (
     50
-) check
+) not null check
 (
     situacao
     in
