@@ -72,6 +72,8 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {
         await expect(modal.getByText(TEXTOS.acaoBloco.homologar.TITULO_CADASTRO)).toBeVisible();
         await expect(modal.getByText(TEXTOS.acaoBloco.homologar.TEXTO_CADASTRO)).toBeVisible();
         await expect(modal.locator('table')).toBeVisible();
+        await expect(modal.getByRole('button', {name: /Cancelar/i})).toBeVisible();
+        await expect(modal.getByRole('button', {name: TEXTOS.acaoBloco.homologar.BOTAO})).toBeVisible();
         await modal.getByRole('button', {name: /Cancelar/i}).click();
 
         await expect(modal).not.toHaveClass(/show/);

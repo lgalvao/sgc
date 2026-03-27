@@ -55,6 +55,8 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
         await expect(modal.getByText(TEXTOS.acaoBloco.aceitar.TITULO_CADASTRO)).toBeVisible();
         await expect(modal.getByText(TEXTOS.acaoBloco.aceitar.TEXTO_CADASTRO)).toBeVisible();
         await expect(modal.locator('table')).toBeVisible();
+        await expect(modal.getByRole('button', {name: /Cancelar/i})).toBeVisible();
+        await expect(modal.getByRole('button', {name: TEXTOS.acaoBloco.aceitar.BOTAO})).toBeVisible();
         await modal.getByRole('button', {name: /Cancelar/i}).click();
 
         await expect(modal).not.toHaveClass(/show/);
