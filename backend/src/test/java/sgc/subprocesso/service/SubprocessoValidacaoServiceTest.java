@@ -117,6 +117,22 @@ class SubprocessoValidacaoServiceTest {
     }
 
     @Nested
+    @DisplayName("validarMapaParaDisponibilizacao")
+    class ValidarMapaParaDisponibilizacao {
+
+        @Test
+        @DisplayName("deve lançar erro quando subprocesso não possui mapa")
+        void deveLancarErroQuandoSubprocessoSemMapa() {
+            Subprocesso subprocesso = new Subprocesso();
+            subprocesso.setMapa(null);
+
+            assertThatThrownBy(() -> validacaoService.validarMapaParaDisponibilizacao(subprocesso))
+                    .isInstanceOf(ErroValidacao.class)
+                    .hasMessageContaining(Mensagens.SUBPROCESSO_SEM_MAPA);
+        }
+    }
+
+    @Nested
     @DisplayName("validarSituacaoPermitida")
     class ValidarSituacaoPermitida {
 

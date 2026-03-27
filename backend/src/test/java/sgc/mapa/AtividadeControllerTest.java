@@ -106,6 +106,23 @@ class AtividadeControllerTest {
         }
 
         @Test
+        @DisplayName("Deve retornar erro quando criação não retorna atividade")
+        void deveRetornarErroQuandoCriacaoNaoRetornaAtividade() throws Exception {
+            AtividadeOperacaoResponse response = AtividadeOperacaoResponse.builder()
+                    .atividade(null)
+                    .subprocesso(SubprocessoSituacaoDto.builder().build())
+                    .build();
+            Mockito.when(atividadeFacade.criarAtividade(any())).thenReturn(response);
+
+            mockMvc.perform(post("/api/atividades")
+                            .with(user("123").roles("CHEFE"))
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content("{\"mapaCodigo\": 1, \"descricao\": \"Teste\"}"))
+                    .andExpect(status().isConflict());
+        }
+
+        @Test
         @DisplayName("Deve atualizar atividade")
         void deveAtualizarAtividade() throws Exception {
             AtividadeOperacaoResponse response = AtividadeOperacaoResponse.builder().build();

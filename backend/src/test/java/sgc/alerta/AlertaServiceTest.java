@@ -4,6 +4,7 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
+import org.springframework.data.domain.*;
 import sgc.alerta.model.*;
 
 import java.time.*;
@@ -75,5 +76,44 @@ class AlertaServiceTest {
 
         assertThat(data).isPresent();
         assertThat(data).contains(agora);
+    }
+
+    @Test
+    @DisplayName("Deve buscar vínculos de leitura de alertas do usuário")
+    void deveBuscarAlertasUsuarios() {
+        List<Long> codigosAlertas = List.of(10L, 20L);
+        List<AlertaUsuario> alertasUsuarios = List.of(new AlertaUsuario());
+        when(alertaUsuarioRepo.findByUsuarioAndAlertas("123", codigosAlertas)).thenReturn(alertasUsuarios);
+
+        List<AlertaUsuario> resultado = alertaService.alertasUsuarios("123", codigosAlertas);
+
+        assertThat(resultado).hasSize(1);
+        verify(alertaUsuarioRepo).findByUsuarioAndAlertas("123", codigosAlertas);
+    }
+
+    @Test
+    @DisplayName("Deve listar alertas paginados para servidor")
+    void deveListarParaServidorPaginado() {
+        Pageable paginacao = PageRequest.of(0, 10);
+        Page<Alerta> pagina = new PageImpl<>(List.of(new Alerta()));
+        when(alertaRepo.buscarAlertasExclusivosDoUsuario("123", paginacao)).thenReturn(pagina);
+
+        Page<Alerta> resultado = alertaService.listarParaServidorPaginado("123", paginacao);
+
+        assertThat(resultado.getContent()).hasSize(1);
+        verify(alertaRepo).buscarAlertasExclusivosDoUsuario("123", paginacao);
+    }
+
+    @Test
+    @DisplayName("Deve listar alertas paginados para gestão")
+    void deveListarParaGestaoPaginado() {
+        Pageable paginacao = PageRequest.of(0, 10);
+        Page<Alerta> pagina = new PageImpl<>(List.of(new Alerta()));
+        when(alertaRepo.buscarAlertasDaUnidadeEIndividuais(1L, "123", paginacao)).thenReturn(pagina);
+
+        Page<Alerta> resultado = alertaService.listarParaGestaoPaginado(1L, "123", paginacao);
+
+        assertThat(resultado.getContent()).hasSize(1);
+        verify(alertaRepo).buscarAlertasDaUnidadeEIndividuais(1L, "123", paginacao);
     }
 }

@@ -80,6 +80,22 @@ class UsuarioControllerTest {
     }
 
     @Test
+    @DisplayName("GET /api/usuarios/pesquisar - Deve pesquisar por termo")
+    @WithMockUser
+    void pesquisarUsuarios_Sucesso() throws Exception {
+        Usuario usuario = new Usuario();
+        usuario.setTituloEleitoral("123");
+        usuario.setNome("Fulano");
+        usuario.setUnidadeLotacao(Unidade.builder().codigo(1L).sigla("U1").nome("Unidade 1").tipo(TipoUnidade.OPERACIONAL).build());
+        when(usuarioService.buscarPorNomeOuMatricula("ful")).thenReturn(List.of(usuario));
+
+        mockMvc.perform(get("/api/usuarios/pesquisar").param("termo", "ful"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].tituloEleitoral").value("123"))
+                .andExpect(jsonPath("$[0].nome").value("Fulano"));
+    }
+
+    @Test
     @DisplayName("POST /api/usuarios/administradores - Deve adicionar (ADMIN)")
     @WithMockUser(roles = "ADMIN")
     void adicionarAdministrador_Sucesso() throws Exception {

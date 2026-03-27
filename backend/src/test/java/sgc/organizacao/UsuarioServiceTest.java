@@ -90,6 +90,16 @@ class UsuarioServiceTest {
             assertTrue(result.containsKey(TITULO_CHEFE_UNIT2));
             assertTrue(result.containsKey(TITULO_ADMIN));
         }
+
+        @Test
+        @DisplayName("Deve buscar usuários por nome ou matrícula")
+        void deveBuscarUsuariosPorNomeOuMatricula() {
+            List<Usuario> resultado = usuarioServiceInternal.buscarPorNomeOuMatricula("Admin");
+
+            assertNotNull(resultado);
+            assertFalse(resultado.isEmpty());
+            assertTrue(resultado.stream().anyMatch(usuario -> usuario.getNome().contains("Admin")));
+        }
     }
 
     @Nested
