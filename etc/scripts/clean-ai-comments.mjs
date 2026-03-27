@@ -51,9 +51,9 @@ function isUselessComment(text) {
   if (AI_MARKERS.some(regex => regex.test(text))) return true;
   
   // Check redundant markers
-  if (REDUNDANT_MARKERS.some(regex => regex.test(text))) return true;
+  return REDUNDANT_MARKERS.some(regex => regex.test(text));
 
-  return false;
+
 }
 
 async function run() {

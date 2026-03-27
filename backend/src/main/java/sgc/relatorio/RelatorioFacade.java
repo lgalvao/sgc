@@ -81,10 +81,7 @@ public class RelatorioFacade {
         List<Subprocesso> subprocessos = subprocessoService.listarEntidadesPorProcesso(codProcesso);
 
         subprocessos = subprocessos.stream()
-                .filter(sp -> {
-                    Long codigoUnidade = sp.getUnidade().getCodigo();
-                    return codigoUnidade.equals(codUnidade);
-                })
+                .filter(sp -> sp.getUnidade().getCodigo().equals(codUnidade))
                 .toList();
 
         try (Document document = pdfFactory.createDocument()) {
@@ -115,3 +112,4 @@ public class RelatorioFacade {
         }
     }
 }
+

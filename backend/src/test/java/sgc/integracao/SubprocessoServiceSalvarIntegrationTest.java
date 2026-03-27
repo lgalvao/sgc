@@ -139,7 +139,7 @@ class SubprocessoServiceSalvarIntegrationTest extends BaseIntegrationTest {
 
         subprocessoService.salvarMapaSubprocesso(subprocesso.getCodigo(), req);
 
-        Subprocesso atualizado = subprocessoRepo.findById(subprocesso.getCodigo()).get();
+        Subprocesso atualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
         assertThat(atualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
     }
 
@@ -157,7 +157,7 @@ class SubprocessoServiceSalvarIntegrationTest extends BaseIntegrationTest {
 
         subprocessoService.salvarMapaSubprocesso(subprocesso.getCodigo(), req);
 
-        Subprocesso atualizado = subprocessoRepo.findById(subprocesso.getCodigo()).get();
+        Subprocesso atualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
         assertThat(atualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
     }
 
@@ -173,7 +173,7 @@ class SubprocessoServiceSalvarIntegrationTest extends BaseIntegrationTest {
         CompetenciaRequest req = new CompetenciaRequest("Nova comp", List.of(a1.getCodigo()));
         subprocessoService.adicionarCompetencia(subprocesso.getCodigo(), req);
 
-        Subprocesso atualizado = subprocessoRepo.findById(subprocesso.getCodigo()).get();
+        Subprocesso atualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
         assertThat(atualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
     }
 
@@ -189,7 +189,7 @@ class SubprocessoServiceSalvarIntegrationTest extends BaseIntegrationTest {
         CompetenciaRequest req = new CompetenciaRequest("Nova comp", List.of(a1.getCodigo()));
         subprocessoService.adicionarCompetencia(subprocesso.getCodigo(), req);
 
-        Subprocesso atualizado = subprocessoRepo.findById(subprocesso.getCodigo()).get();
+        Subprocesso atualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
         assertThat(atualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
     }
 
@@ -208,7 +208,7 @@ class SubprocessoServiceSalvarIntegrationTest extends BaseIntegrationTest {
         CompetenciaRequest req = new CompetenciaRequest("Comp atualizada", List.of(a1.getCodigo()));
         subprocessoService.atualizarCompetencia(subprocesso.getCodigo(), comp.getCodigo(), req);
 
-        Competencia atualizada = competenciaRepo.findById(comp.getCodigo()).get();
+        Competencia atualizada = competenciaRepo.findById(comp.getCodigo()).orElseThrow();
         assertThat(atualizada.getDescricao()).isEqualTo("Comp atualizada");
     }
 
@@ -223,7 +223,7 @@ class SubprocessoServiceSalvarIntegrationTest extends BaseIntegrationTest {
 
         subprocessoService.removerCompetencia(subprocesso.getCodigo(), comp.getCodigo());
 
-        Subprocesso atualizado = subprocessoRepo.findById(subprocesso.getCodigo()).get();
+        Subprocesso atualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
         assertThat(atualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
         assertThat(competenciaRepo.findById(comp.getCodigo())).isEmpty();
     }
@@ -239,7 +239,7 @@ class SubprocessoServiceSalvarIntegrationTest extends BaseIntegrationTest {
 
         subprocessoService.removerCompetencia(subprocesso.getCodigo(), comp.getCodigo());
 
-        Subprocesso atualizado = subprocessoRepo.findById(subprocesso.getCodigo()).get();
+        Subprocesso atualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
         assertThat(atualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
         assertThat(competenciaRepo.findById(comp.getCodigo())).isEmpty();
     }

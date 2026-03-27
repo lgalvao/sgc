@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.*;
+import org.jspecify.annotations.*;
 import sgc.comum.model.*;
 import sgc.organizacao.model.*;
 
@@ -33,9 +34,9 @@ public class Movimentacao extends EntidadeBase {
     private Unidade unidadeOrigem;
 
     @ManyToOne
-    @JoinColumn(name = "unidade_destino_codigo", nullable = false)
+    @JoinColumn(name = "unidade_destino_codigo")
     @JsonView(ComumViews.Publica.class)
-    private Unidade unidadeDestino;
+    private @Nullable Unidade unidadeDestino;
 
     @Column(name = "descricao")
     @JsonView(ComumViews.Publica.class)

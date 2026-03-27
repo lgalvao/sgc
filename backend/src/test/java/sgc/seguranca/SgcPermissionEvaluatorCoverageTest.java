@@ -16,6 +16,7 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("SgcPermissionEvaluator - Cobertura adicional")
+@SuppressWarnings("NullAway.Init")
 class SgcPermissionEvaluatorCoverageTest {
 
     @Mock private SubprocessoRepo subprocessoRepo;

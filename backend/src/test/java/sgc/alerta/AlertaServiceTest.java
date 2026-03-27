@@ -14,6 +14,7 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("AlertaService Test")
+@SuppressWarnings("NullAway.Init")
 class AlertaServiceTest {
 
     @Mock

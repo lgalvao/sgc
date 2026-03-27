@@ -99,7 +99,7 @@ public class UsuarioFacade {
     private PerfilDto toPerfilDto(UsuarioPerfil atribuicao) {
         return PerfilDto.builder()
                 .usuarioTitulo(atribuicao.getUsuario().getTituloEleitoral())
-                .unidadeCodigo(atribuicao.getUnidade().getCodigoPersistido())
+                .unidadeCodigo(atribuicao.getUnidade().getCodigo())
                 .unidadeNome(atribuicao.getUnidade().getNome())
                 .perfil(atribuicao.getPerfil().name())
                 .build();
@@ -142,8 +142,9 @@ public class UsuarioFacade {
                 .tituloEleitoral(usuario.getTituloEleitoral())
                 .nome(usuario.getNome())
                 .matricula(usuario.getMatricula())
-                .unidadeCodigo(unidadeLotacao.getCodigoPersistido())
+                .unidadeCodigo(unidadeLotacao.getCodigo())
                 .unidadeSigla(unidadeLotacao.getSigla())
                 .build();
     }
 }
+

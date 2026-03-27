@@ -64,3 +64,4 @@ class ProcessoRepoPerformanceTest {
         assertThat(returnedProcess.getParticipantes()).hasSize(1);
     }
 }
+

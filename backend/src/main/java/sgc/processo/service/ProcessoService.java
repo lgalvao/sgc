@@ -237,7 +237,7 @@ public class ProcessoService {
         validarFinalizacao(codigo, processo);
 
         if (processo.getTipo() != DIAGNOSTICO) {
-            tornarMapasVigentes(codigo, processo);
+            tornarMapasVigentes(codigo);
         }
         notificarFinalizacaoProcesso(processo);
 
@@ -278,7 +278,7 @@ public class ProcessoService {
         Perfil perfil = usuario.getPerfilAtivo();
 
         ProcessoDetalheDto dto = ProcessoDetalheDto.builder()
-                .codigo(processo.getCodigoPersistido())
+                .codigo(processo.getCodigo())
                 .descricao(processo.getDescricao())
                 .situacao(processo.getSituacao())
                 .tipo(processo.getTipo().name())
@@ -311,11 +311,14 @@ public class ProcessoService {
             throw new ErroValidacao(Mensagens.UNIDADE_NAO_PARTICIPA);
         }
 
-        String dataLimiteText = "N/A";
-        if (processo.getDataLimite() != null) {
-            dataLimiteText = processo.getDataLimite().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+        LocalDateTime dataLimite = processo.getDataLimite();
+        String dataLimiteText;
+        if (dataLimite != null) {
+            dataLimiteText = dataLimite.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+        } else {
+            throw new IllegalStateException("Processo %d sem data limite para envio de lembrete".formatted(codProcesso));
         }
-        String corpoHtml = emailModelosService.criarEmailLembretePrazo(unidade.getSigla(), processo.getDescricao(), processo.getDataLimite());
+        String corpoHtml = emailModelosService.criarEmailLembretePrazo(unidade.getSigla(), processo.getDescricao(), dataLimite);
 
         Usuario titular = usuarioService.buscarPorLogin(unidade.getTituloTitular());
         emailService.enviarEmailHtml(titular.getEmail(), "SGC: Lembrete - " + processo.getDescricao(), corpoHtml);
@@ -336,7 +339,7 @@ public class ProcessoService {
         List<Unidade> todas = unidadeService.todasComHierarquia();
         Map<Long, List<Unidade>> porPai = todas.stream()
                 .filter(u -> u.getUnidadeSuperior() != null)
-                .collect(Collectors.groupingBy(u -> u.getUnidadeSuperior().getCodigoPersistido()));
+                .collect(Collectors.groupingBy(u -> u.getUnidadeSuperior().getCodigo()));
         
         Set<Long> result = new HashSet<>();
         Queue<Long> fila = new LinkedList<>();
@@ -347,7 +350,7 @@ public class ProcessoService {
             List<Unidade> filhos = porPai.get(atual);
             if (filhos != null) {
                 for (Unidade f : filhos) {
-                    Long codFilho = f.getCodigoPersistido();
+                    Long codFilho = f.getCodigo();
                     if (result.add(codFilho)) fila.add(codFilho);
                 }
             }
@@ -387,9 +390,9 @@ public class ProcessoService {
             throw new ErroValidacao(Mensagens.SUBPROCESSOS_NAO_HOMOLOGADOS);
     }
 
-    private void tornarMapasVigentes(Long codProcesso, Processo processo) {
+    private void tornarMapasVigentes(Long codProcesso) {
         subprocessoService.listarEntidadesPorProcesso(codProcesso)
-                .forEach(sp -> unidadeService.definirMapaVigente(sp.getUnidade().getCodigoPersistido(), sp.getMapa()));
+                .forEach(sp -> unidadeService.definirMapaVigente(sp.getUnidade().getCodigo(), sp.getMapa()));
     }
 
     private Set<Unidade> carregarArvoreUnidades(Set<Unidade> participantes) {
@@ -402,7 +405,7 @@ public class ProcessoService {
     }
 
     private void efetivarInicioSubprocessos(Processo processo, TipoProcesso tipo, List<Long> cods, Set<Unidade> pars, List<UnidadeMapa> ums, Unidade adm, Usuario user) {
-        Map<Long, UnidadeMapa> mapUm = ums.stream().collect(Collectors.toMap(UnidadeMapa::getUnidadeCodigo, m -> m));
+        Map<Long, UnidadeMapa> mapUm = ums.stream().collect(Collectors.toMap(UnidadeMapa::getUnidadeCodigoPersistido, m -> m));
         if (tipo == MAPEAMENTO) subprocessoService.criarParaMapeamento(processo, pars, adm, user);
         else if (tipo == REVISAO) cods.forEach(c -> subprocessoService.criarParaRevisao(
                 processo,
@@ -413,28 +416,29 @@ public class ProcessoService {
         else if (tipo == DIAGNOSTICO) pars.forEach(u -> subprocessoService.criarParaDiagnostico(
                 processo,
                 u,
-                obterUnidadeMapaObrigatorio(mapUm, u.getCodigoPersistido()),
+                obterUnidadeMapaObrigatorio(mapUm, u.getCodigo()),
                 adm,
                 user));
     }
 
     private void montarHierarquiaNoDto(ProcessoDetalheDto dto, Processo processo, List<Subprocesso> subps, Set<Long> acesso) {
         Map<Long, UnidadeParticipanteDto> mapDto = new HashMap<>();
-        Map<Long, Subprocesso> mapSp = subps.stream().collect(Collectors.toMap(s -> s.getUnidade().getCodigoPersistido(), s -> s));
+        Map<Long, Subprocesso> mapSp = subps.stream().collect(Collectors.toMap(s -> s.getUnidade().getCodigo(), s -> s));
 
         processo.getParticipantes().stream()
-                .filter(p -> acesso.contains(p.getUnidadeCodigo()))
+                .filter(p -> acesso.contains(p.getUnidadeCodigoPersistido()))
                 .forEach(p -> {
+                    Long codigoUnidadeParticipante = p.getUnidadeCodigoPersistido();
                     UnidadeParticipanteDto uDto = UnidadeParticipanteDto.fromSnapshot(p);
-                    Subprocesso sp = mapSp.get(p.getUnidadeCodigo());
+                    Subprocesso sp = mapSp.get(codigoUnidadeParticipante);
                     if (sp != null) {
                         uDto.setSituacaoSubprocesso(sp.getSituacao());
                         uDto.setDataLimite(sp.getDataLimiteEtapa1());
-                        uDto.setCodSubprocesso(sp.getCodigoPersistido());
-                        if (sp.getMapa() != null) uDto.setMapaCodigo(sp.getMapa().getCodigoPersistido());
-                        uDto.setLocalizacaoAtualCodigo(obterLocalizacao(sp).getCodigoPersistido());
+                        uDto.setCodSubprocesso(sp.getCodigo());
+                        if (sp.getMapa() != null) uDto.setMapaCodigo(sp.getMapa().getCodigo());
+                        uDto.setLocalizacaoAtualCodigo(obterLocalizacao(sp).getCodigo());
                     }
-                    mapDto.put(p.getUnidadeCodigo(), uDto);
+                    mapDto.put(codigoUnidadeParticipante, uDto);
                 });
 
         mapDto.values().forEach(u -> {
@@ -453,13 +457,16 @@ public class ProcessoService {
     private Set<Long> obterIdsUnidadesAcesso(Processo pr, Usuario us) {
         if (us.getPerfilAtivo() == Perfil.ADMIN) {
             return pr.getParticipantes().stream()
-                    .map(UnidadeProcesso::getUnidadeCodigo)
+                    .map(UnidadeProcesso::getUnidadeCodigoPersistido)
                     .collect(Collectors.toSet());
         }
         Long root = us.getUnidadeAtivaCodigo();
         if (us.getPerfilAtivo() != Perfil.GESTOR) return Set.of(root);
         Set<Long> subarvore = new HashSet<>(buscarDescendentes(root));
-        return pr.getParticipantes().stream().map(UnidadeProcesso::getUnidadeCodigo).filter(subarvore::contains).collect(Collectors.toSet());
+        return pr.getParticipantes().stream()
+                .map(UnidadeProcesso::getUnidadeCodigoPersistido)
+                .filter(subarvore::contains)
+                .collect(Collectors.toSet());
     }
 
     private boolean isElegivelParaAcaoEmBloco(Subprocesso subprocesso, Usuario usuario) {
@@ -513,13 +520,21 @@ public class ProcessoService {
         LocalDateTime dataLimiteEtapa1 = sp.getDataLimiteEtapa1();
         LocalDateTime dataLimiteEtapa2 = sp.getDataLimiteEtapa2();
 
+        if (dataLimiteEtapa1 == null && dataLimiteEtapa2 == null) {
+            return null;
+        }
         if (dataLimiteEtapa1 == null) {
-            return dataLimiteEtapa2;
+            throw new IllegalStateException("Subprocesso %d com data limite da etapa 2 sem data limite da etapa 1"
+                    .formatted(sp.getCodigo()));
         }
         if (dataLimiteEtapa2 == null) {
             return dataLimiteEtapa1;
         }
-        return dataLimiteEtapa1.isAfter(dataLimiteEtapa2) ? dataLimiteEtapa1 : dataLimiteEtapa2;
+        if (dataLimiteEtapa1.isAfter(dataLimiteEtapa2)) {
+            throw new IllegalStateException("Subprocesso %d com data limite da etapa 1 posterior à etapa 2"
+                    .formatted(sp.getCodigo()));
+        }
+        return dataLimiteEtapa2;
     }
 
     private void notificarInicioProcesso(Processo p, List<Unidade> participantes) {
@@ -529,7 +544,7 @@ public class ProcessoService {
 
     private void notificarFinalizacaoProcesso(Processo p) {
         log.info("Notificando finalização do processo {}", p.getCodigo());
-        List<Long> unidadesCods = p.getParticipantes().stream().map(UnidadeProcesso::getUnidadeCodigo).toList();
+        List<Long> unidadesCods = p.getParticipantes().stream().map(UnidadeProcesso::getUnidadeCodigoPersistido).toList();
         List<Unidade> participantes = unidadeService.porCodigos(unidadesCods);
         for (Unidade u : participantes) {
             servicoAlertas.criarAlertaAdmin(p, u, "Processo finalizado: " + p.getDescricao());
@@ -569,7 +584,7 @@ public class ProcessoService {
         List<Long> unidadesAcesso = buscarCodigosAcesso(usuario);
         return processoRepo.buscarPorCodigoComParticipantes(cod)
                 .map(p -> p.getParticipantes().stream()
-                        .anyMatch(part -> unidadesAcesso.contains(part.getUnidadeCodigo())))
+                        .anyMatch(part -> unidadesAcesso.contains(part.getUnidadeCodigoPersistido())))
                 .orElse(false);
     }
 
@@ -581,3 +596,5 @@ public class ProcessoService {
         }
     }
 }
+
+

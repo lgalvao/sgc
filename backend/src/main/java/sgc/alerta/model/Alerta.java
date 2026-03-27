@@ -10,8 +10,6 @@ import sgc.organizacao.model.*;
 import sgc.processo.model.*;
 
 import java.time.*;
-import java.util.Objects;
-
 @Entity
 @Table(name = "ALERTA", schema = "sgc")
 @Getter
@@ -54,7 +52,7 @@ public class Alerta extends EntidadeBase {
     @JsonView(ComumViews.Publica.class)
     @JsonProperty("codProcesso")
     public Long getCodProcessoSintetico() {
-        return Objects.requireNonNull(processo.getCodigo());
+        return processo.getCodigo();
     }
 
     @JsonView(ComumViews.Publica.class)
@@ -81,3 +79,4 @@ public class Alerta extends EntidadeBase {
         return descricao;
     }
 }
+

@@ -238,7 +238,7 @@ public class SubprocessoTransicaoService {
             mapa.setSugestoes(observacoes);
         }
 
-        sp.setSituacao(SITUACAO_MAPA_DISPONIBILIZADO.get(sp.getProcesso().getTipo()));
+        sp.setSituacao(obterSituacaoObrigatoria(SITUACAO_MAPA_DISPONIBILIZADO, sp, "disponibilização de mapa"));
 
         sp.setDataLimiteEtapa2(request.dataLimite().atStartOfDay());
         sp.setDataFimEtapa1(LocalDateTime.now());
@@ -258,16 +258,19 @@ public class SubprocessoTransicaoService {
         LocalDateTime dataLimiteEtapa1 = sp.getDataLimiteEtapa1();
         LocalDateTime dataLimiteEtapa2 = sp.getDataLimiteEtapa2();
 
-        if (dataLimiteEtapa1 == null && dataLimiteEtapa2 == null) {
-            return null;
-        }
         if (dataLimiteEtapa1 == null) {
-            return dataLimiteEtapa2.toLocalDate();
+            if (dataLimiteEtapa2 == null) {
+                return null;
+            }
+            throw new IllegalStateException("Subprocesso %s com data limite da etapa 2 sem data limite da etapa 1".formatted(sp.getCodigo()));
         }
         if (dataLimiteEtapa2 == null) {
             return dataLimiteEtapa1.toLocalDate();
         }
-        return dataLimiteEtapa1.isAfter(dataLimiteEtapa2) ? dataLimiteEtapa1.toLocalDate() : dataLimiteEtapa2.toLocalDate();
+        if (dataLimiteEtapa1.isAfter(dataLimiteEtapa2)) {
+            throw new IllegalStateException("Subprocesso %s com data limite da etapa 1 posterior à etapa 2".formatted(sp.getCodigo()));
+        }
+        return dataLimiteEtapa2.toLocalDate();
     }
 
     public void submeterMapaAjustado(Long codSubprocesso, SubmeterMapaAjustadoRequest request, Usuario usuario) {
@@ -275,7 +278,7 @@ public class SubprocessoTransicaoService {
         validacaoService.validarSituacaoPermitida(sp, REVISAO_CADASTRO_HOMOLOGADA, REVISAO_MAPA_AJUSTADO);
         validacaoService.validarAssociacoesMapa(sp.getMapa().getCodigo());
 
-        sp.setSituacao(SITUACAO_MAPA_DISPONIBILIZADO.get(sp.getProcesso().getTipo()));
+        sp.setSituacao(obterSituacaoObrigatoria(SITUACAO_MAPA_DISPONIBILIZADO, sp, "submissão de mapa ajustado"));
         sp.setDataFimEtapa1(LocalDateTime.now());
 
         if (request.dataLimiteEtapa2() != null) {
@@ -300,7 +303,7 @@ public class SubprocessoTransicaoService {
                 REVISAO_MAPA_DISPONIBILIZADO);
 
         sp.getMapa().setSugestoes(sugestoes);
-        sp.setSituacao(SITUACAO_MAPA_COM_SUGESTOES.get(sp.getProcesso().getTipo()));
+        sp.setSituacao(obterSituacaoObrigatoria(SITUACAO_MAPA_COM_SUGESTOES, sp, "apresentação de sugestões"));
         sp.setDataFimEtapa2(LocalDateTime.now());
 
         Unidade destino = sp.getUnidade().getUnidadeSuperior();
@@ -325,7 +328,7 @@ public class SubprocessoTransicaoService {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
         validacaoService.validarSituacaoPermitida(sp, MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO);
 
-        sp.setSituacao(SITUACAO_MAPA_VALIDADO.get(sp.getProcesso().getTipo()));
+        sp.setSituacao(obterSituacaoObrigatoria(SITUACAO_MAPA_VALIDADO, sp, "validação de mapa"));
         sp.setDataFimEtapa2(LocalDateTime.now());
 
         Unidade destino = sp.getUnidade().getUnidadeSuperior();
@@ -363,7 +366,7 @@ public class SubprocessoTransicaoService {
                 .findFirst()
                 .orElse(sp.getUnidade());
 
-        SituacaoSubprocesso novaSituacao = SITUACAO_MAPA_DISPONIBILIZADO.get(sp.getProcesso().getTipo());
+        SituacaoSubprocesso novaSituacao = obterSituacaoObrigatoria(SITUACAO_MAPA_DISPONIBILIZADO, sp, "devolução de validação");
         sp.setDataFimEtapa2(null);
 
         RegistrarWorkflowCommand workflowCommand = RegistrarWorkflowCommand.builder()
@@ -412,7 +415,7 @@ public class SubprocessoTransicaoService {
 
             criarAnalise(sp, request, TipoAnalise.VALIDACAO, usuario);
 
-            sp.setSituacao(SITUACAO_MAPA_HOMOLOGADO.get(sp.getProcesso().getTipo()));
+            sp.setSituacao(obterSituacaoObrigatoria(SITUACAO_MAPA_HOMOLOGADO, sp, "aceite final de validação"));
             subprocessoRepo.save(sp);
         } else {
             SituacaoSubprocesso novaSituacao = sp.getSituacao();
@@ -449,7 +452,7 @@ public class SubprocessoTransicaoService {
                 MAPEAMENTO_MAPA_COM_SUGESTOES, MAPEAMENTO_MAPA_VALIDADO,
                 REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO);
 
-        sp.setSituacao(SITUACAO_MAPA_HOMOLOGADO.get(sp.getProcesso().getTipo()));
+        sp.setSituacao(obterSituacaoObrigatoria(SITUACAO_MAPA_HOMOLOGADO, sp, "homologação de validação"));
 
         Unidade admin = unidadeService.buscarPorSigla(SIGLA_ADMIN);
         registrarTransicao(RegistrarTransicaoCommand.builder()
@@ -697,4 +700,14 @@ public class SubprocessoTransicaoService {
     }
 
 
+    private SituacaoSubprocesso obterSituacaoObrigatoria(Map<TipoProcesso, SituacaoSubprocesso> situacoes, Subprocesso subprocesso, String contexto) {
+        TipoProcesso tipoProcesso = subprocesso.getProcesso().getTipo();
+        SituacaoSubprocesso situacao = situacoes.get(tipoProcesso);
+        if (situacao == null) {
+            throw new IllegalStateException("Tipo de processo %s sem situação configurada para %s".formatted(tipoProcesso, contexto));
+        }
+        return situacao;
+    }
+
 }
+

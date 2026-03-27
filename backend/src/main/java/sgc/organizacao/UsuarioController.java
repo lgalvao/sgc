@@ -8,6 +8,7 @@ import org.springframework.http.*;
 import org.springframework.security.access.prepost.*;
 import org.springframework.security.core.annotation.*;
 import org.springframework.web.bind.annotation.*;
+import sgc.comum.erros.*;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
@@ -54,6 +55,9 @@ public class UsuarioController {
             @RequestBody Map<String, String> request) {
 
         String usuarioTitulo = request.get("usuarioTitulo");
+        if (usuarioTitulo == null || usuarioTitulo.isBlank()) {
+            throw new ErroValidacao("Campo usuarioTitulo é obrigatório.");
+        }
         AdministradorDto administrador = usuarioFacade.adicionarAdministrador(usuarioTitulo);
         return ResponseEntity.ok(administrador);
     }

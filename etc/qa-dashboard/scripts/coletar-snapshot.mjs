@@ -46,8 +46,7 @@ function caminhoRelativo(caminhoAbsoluto) {
 }
 
 function formatarTimestampArquivo(data = new Date()) {
-    const texto = data.toISOString().replaceAll(":", "-").replace(/\.\d{3}Z$/, "Z");
-    return texto;
+    return data.toISOString().replaceAll(":", "-").replace(/\.\d{3}Z$/, "Z");
 }
 
 function resumirComando(comando, args) {

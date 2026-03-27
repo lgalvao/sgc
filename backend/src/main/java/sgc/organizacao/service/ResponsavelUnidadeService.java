@@ -45,8 +45,8 @@ public class ResponsavelUnidadeService {
     private AtribuicaoDto toAtribuicaoTemporariaDto(AtribuicaoTemporaria a) {
         Usuario usuario = repo.buscar(Usuario.class, a.getUsuarioTitulo());
         return AtribuicaoDto.builder()
-                .codigo(a.getCodigoPersistido())
-                .unidadeCodigo(a.getUnidade().getCodigoPersistido())
+                .codigo(a.getCodigo())
+                .unidadeCodigo(a.getUnidade().getCodigo())
                 .unidadeSigla(a.getUnidade().getSigla())
                 .usuario(UsuarioResumoDto.fromEntityObrigatorio(usuario))
                 .dataInicio(a.getDataInicio())
@@ -91,7 +91,7 @@ public class ResponsavelUnidadeService {
     @Transactional(readOnly = true)
     public Usuario buscarResponsavelAtual(String siglaUnidade) {
         Unidade unidade = repo.buscarPorSigla(Unidade.class, siglaUnidade);
-        Responsabilidade resp = repo.buscar(Responsabilidade.class, unidade.getCodigoPersistido());
+        Responsabilidade resp = repo.buscar(Responsabilidade.class, unidade.getCodigo());
 
         return repo.buscar(Usuario.class, resp.getUsuarioTitulo());
     }
@@ -102,7 +102,7 @@ public class ResponsavelUnidadeService {
     @Transactional(readOnly = true)
     public ResponsavelDto buscarResponsabilidadeDetalhadaAtual(String siglaUnidade) {
         Unidade unidade = repo.buscarPorSigla(Unidade.class, siglaUnidade);
-        Responsabilidade resp = repo.buscar(Responsabilidade.class, unidade.getCodigoPersistido());
+        Responsabilidade resp = repo.buscar(Responsabilidade.class, unidade.getCodigo());
         Usuario usuario = repo.buscar(Usuario.class, resp.getUsuarioTitulo());
 
         return ResponsavelDto.builder()
@@ -194,3 +194,4 @@ public class ResponsavelUnidadeService {
                 .toList();
     }
 }
+

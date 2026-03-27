@@ -10,6 +10,7 @@ import lombok.*;
  */
 @Getter
 @Setter
+@SuppressWarnings("NullAway.Init")
 public class UsuarioAcessoAd {
     private String login;
     private String nome;
@@ -21,6 +22,7 @@ public class UsuarioAcessoAd {
 
     @Getter
     @Setter
+    @SuppressWarnings("NullAway.Init")
     public static class LotacaoAd {
         private Integer codigo;
         private String sigla;

@@ -4,6 +4,7 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
+import org.jspecify.annotations.*;
 import sgc.comum.erros.*;
 import sgc.comum.model.*;
 import sgc.mapa.dto.*;
@@ -27,6 +28,7 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("SubprocessoService Extra Coverage Test")
+@SuppressWarnings("NullAway.Init")
 class SubprocessoServiceExtraCoverageTest {
 
     @Mock
@@ -55,11 +57,11 @@ class SubprocessoServiceExtraCoverageTest {
     @InjectMocks
     private SubprocessoService subprocessoService;
 
-    private Subprocesso criarSubprocessoComMapa(Long codigo) {
+    private Subprocesso criarSubprocessoComMapa(@Nullable Long codigo) {
         return criarSubprocessoComMapa(codigo, TipoProcesso.MAPEAMENTO);
     }
 
-    private Subprocesso criarSubprocessoComMapa(Long codigo, TipoProcesso tipo) {
+    private Subprocesso criarSubprocessoComMapa(@Nullable Long codigo, TipoProcesso tipo) {
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(codigo);
         sp.setMapa(new Mapa());

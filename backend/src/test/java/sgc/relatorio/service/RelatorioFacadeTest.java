@@ -25,6 +25,7 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("RelatorioFacade Test")
+@SuppressWarnings("NullAway.Init")
 class RelatorioFacadeTest {
 
     @Mock

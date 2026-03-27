@@ -131,12 +131,12 @@ public class MapaManutencaoService {
     public void atualizarAtividade(Long codigo, AtualizarAtividadeRequest request) {
         Atividade existente = repo.buscar(Atividade.class, codigo);
         if (!existente.getDescricao().equalsIgnoreCase(request.descricao())) {
-            validarDescricaoAtividadeUnica(existente.getMapa().getCodigoPersistido(), request.descricao());
+            validarDescricaoAtividadeUnica(existente.getMapa().getCodigo(), request.descricao());
         }
 
         existente.atualizarDe(request);
         atividadeRepo.save(existente);
-        reconciliarSituacaoSubprocesso(existente.getMapa().getCodigoPersistido());
+        reconciliarSituacaoSubprocesso(existente.getMapa().getCodigo());
         log.info("Atividade {} atualizada", codigo);
     }
 
@@ -146,12 +146,12 @@ public class MapaManutencaoService {
         Set<Long> mapasAfetados = new HashSet<>();
 
         atividades.forEach(atividade -> {
-            String novaDescricao = descricoesPorCodigo.get(atividade.getCodigoPersistido());
+            String novaDescricao = descricoesPorCodigo.get(atividade.getCodigo());
             if (novaDescricao != null) {
                 atividade.setDescricao(novaDescricao);
             }
             var mapa = atividade.getMapa();
-            mapasAfetados.add(mapa.getCodigoPersistido());
+            mapasAfetados.add(mapa.getCodigo());
         });
 
         atividadeRepo.saveAll(atividades);
@@ -169,11 +169,11 @@ public class MapaManutencaoService {
     private void excluirAtividadeComConhecimentos(Atividade atividade) {
         var mapa = atividade.getMapa();
 
-        List<Conhecimento> conhecimentos = conhecimentoRepo.findByAtividade_Codigo(atividade.getCodigoPersistido());
+        List<Conhecimento> conhecimentos = conhecimentoRepo.findByAtividade_Codigo(atividade.getCodigo());
         conhecimentoRepo.deleteAll(conhecimentos);
 
         atividadeRepo.delete(atividade);
-        reconciliarSituacaoSubprocesso(mapa.getCodigoPersistido());
+        reconciliarSituacaoSubprocesso(mapa.getCodigo());
     }
 
     @Transactional
@@ -275,7 +275,7 @@ public class MapaManutencaoService {
         atividade.getConhecimentos().add(conhecimento);
 
         Conhecimento conhecimentoSalvo = conhecimentoRepo.save(conhecimento);
-        reconciliarSituacaoSubprocesso(mapa.getCodigoPersistido());
+        reconciliarSituacaoSubprocesso(mapa.getCodigo());
 
         log.info("Conhecimento criado na atividade {}", codAtividade);
         return conhecimentoSalvo;
@@ -294,7 +294,7 @@ public class MapaManutencaoService {
 
         existente.atualizarDe(request);
         conhecimentoRepo.save(existente);
-        reconciliarSituacaoSubprocesso(mapa.getCodigoPersistido());
+        reconciliarSituacaoSubprocesso(mapa.getCodigo());
 
         log.info("Conhecimento atualizado na atividade {}",codAtividade);
     }
@@ -316,7 +316,7 @@ public class MapaManutencaoService {
         Mapa mapa = conhecimento.getAtividade().getMapa();
         conhecimento.getAtividade().getConhecimentos().remove(conhecimento);
         conhecimentoRepo.delete(conhecimento);
-        reconciliarSituacaoSubprocesso(mapa.getCodigoPersistido());
+        reconciliarSituacaoSubprocesso(mapa.getCodigo());
     }
 
     private void prepararCompetenciasAtividades(List<Long> codigosAtividades, Competencia competencia) {
@@ -334,7 +334,7 @@ public class MapaManutencaoService {
     }
 
     public void reconciliarSituacaoSubprocesso(Subprocesso subprocesso) {
-        boolean temAtividades = !atividadesMapaCodigoSemRels(subprocesso.getMapa().getCodigoPersistido()).isEmpty();
+        boolean temAtividades = !atividadesMapaCodigoSemRels(subprocesso.getMapa().getCodigo()).isEmpty();
         subprocessoSituacaoService.reconciliarSituacao(subprocesso, temAtividades);
     }
 
@@ -352,3 +352,4 @@ public class MapaManutencaoService {
         if (existe) throw new ErroValidacao(Mensagens.DESCRICAO_CONHECIMENTO_DUPLICADA);
     }
 }
+

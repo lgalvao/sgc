@@ -52,7 +52,11 @@ public class AtividadeController {
     @Operation(summary = "Cria uma atividade")
     public ResponseEntity<AtividadeOperacaoResponse> criar(@Valid @RequestBody CriarAtividadeRequest request) {
         AtividadeOperacaoResponse resp = atividadeFacade.criarAtividade(request);
-        URI uri = URI.create("/api/atividades/%d".formatted(resp.atividade().codigo()));
+        AtividadeDto atividadeCriada = resp.atividade();
+        if (atividadeCriada == null) {
+            throw new IllegalStateException("Resposta de criação de atividade sem código gerado");
+        }
+        URI uri = URI.create("/api/atividades/%d".formatted(atividadeCriada.codigo()));
         return ResponseEntity.created(uri).body(resp);
     }
 

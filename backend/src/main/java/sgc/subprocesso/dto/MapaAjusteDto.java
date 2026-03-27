@@ -1,7 +1,6 @@
 package sgc.subprocesso.dto;
 
 import lombok.*;
-import sgc.comum.model.*;
 import sgc.mapa.model.*;
 import sgc.subprocesso.model.*;
 
@@ -30,7 +29,7 @@ public class MapaAjusteDto {
             List<Competencia> competencias,
             List<Atividade> atividades,
             List<Conhecimento> conhecimentos) {
-        Long codMapa = sp.getMapa().getCodigoPersistido();
+        Long codMapa = sp.getMapa().getCodigo();
         String nomeUnidade = sp.getUnidade().getNome();
         String justificativa = analise != null ? analise.getObservacoes() : null;
 
@@ -40,13 +39,13 @@ public class MapaAjusteDto {
             List<AtividadeAjusteDto> atividadeDtos = new ArrayList<>();
             for (Atividade ativ : atividades) {
                 List<Conhecimento> conhecimentosDaAtividade = conhecimentos.stream()
-                        .filter(c -> c.getAtividade().getCodigoPersistido().equals(ativ.getCodigoPersistido()))
+                        .filter(c -> c.getAtividade().getCodigo().equals(ativ.getCodigo()))
                         .toList();
                 boolean isLinked = comp.getAtividades().contains(ativ);
                 List<ConhecimentoAjusteDto> conhecimentoDtos = conhecimentosDaAtividade.stream()
                         .map(
                                 con -> ConhecimentoAjusteDto.builder()
-                                        .conhecimentoCodigo(con.getCodigoPersistido())
+                                        .conhecimentoCodigo(con.getCodigo())
                                         .nome(con.getDescricao())
                                         .incluido(isLinked)
                                         .build())
@@ -54,7 +53,7 @@ public class MapaAjusteDto {
 
                 atividadeDtos.add(
                         AtividadeAjusteDto.builder()
-                                .codAtividade(ativ.getCodigoPersistido())
+                                .codAtividade(ativ.getCodigo())
                                 .nome(ativ.getDescricao())
                                 .conhecimentos(conhecimentoDtos)
                                 .build());
@@ -62,7 +61,7 @@ public class MapaAjusteDto {
 
             competenciaDtos.add(
                     CompetenciaAjusteDto.builder()
-                            .codCompetencia(comp.getCodigoPersistido())
+                            .codCompetencia(comp.getCodigo())
                             .nome(comp.getDescricao())
                             .atividades(atividadeDtos)
                             .build());
@@ -76,3 +75,4 @@ public class MapaAjusteDto {
                 .build();
     }
 }
+

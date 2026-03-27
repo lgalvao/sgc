@@ -1,6 +1,7 @@
 package sgc.subprocesso.dto;
 
 import lombok.*;
+import org.jspecify.annotations.*;
 import sgc.organizacao.dto.*;
 import java.util.*;
 
@@ -8,7 +9,7 @@ import java.util.*;
 public record SubprocessoDetalheResponse(
         SubprocessoResumoDto subprocesso,
         ResponsavelDto responsavel,
-        UsuarioResumoDto titular,
+        @Nullable UsuarioResumoDto titular,
         List<MovimentacaoDto> movimentacoes,
         String localizacaoAtual,
         PermissoesSubprocessoDto permissoes

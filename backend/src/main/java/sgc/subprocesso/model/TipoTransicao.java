@@ -1,6 +1,7 @@
 package sgc.subprocesso.model;
 
 import lombok.*;
+import org.jspecify.annotations.*;
 import sgc.comum.*;
 
 /**
@@ -129,9 +130,9 @@ public enum TipoTransicao {
     );
 
     private final String descMovimentacao;
-    private final String templateAlerta;
-    private final String templateEmail;
-    private final String templateEmailSuperior;
+    private final @Nullable String templateAlerta;
+    private final @Nullable String templateEmail;
+    private final @Nullable String templateEmailSuperior;
 
     public String formatarAlerta(String siglaUnidade) {
         return templateAlerta != null ? templateAlerta.formatted(siglaUnidade) : "";

@@ -17,6 +17,7 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("AlertaFacade - Cobertura adicional")
+@SuppressWarnings("NullAway.Init")
 class AlertaFacadeCoverageTest {
     @Mock
     private AlertaService alertaService;

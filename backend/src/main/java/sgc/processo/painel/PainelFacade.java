@@ -78,9 +78,10 @@ public class PainelFacade {
         Page<Alerta> alertasPage = alertaFacade.listarPorUnidade(usuarioTitulo, codigoUnidade, perfil, sortedPageable);
         List<Long> alertasNaoLidosVisualizados = new ArrayList<>();
         alertasPage.forEach(alerta -> {
-            LocalDateTime dataHoraLeitura = alertaFacade.obterDataHoraLeitura(alerta.getCodigo(), usuarioTitulo).orElse(null);
+            Long codigoAlerta = alerta.getCodigo();
+            LocalDateTime dataHoraLeitura = alertaFacade.obterDataHoraLeitura(codigoAlerta, usuarioTitulo).orElse(null);
             if (dataHoraLeitura == null) {
-                alertasNaoLidosVisualizados.add(alerta.getCodigo());
+                alertasNaoLidosVisualizados.add(codigoAlerta);
             }
             alerta.setDataHoraLeitura(dataHoraLeitura);
         });
@@ -100,7 +101,7 @@ public class PainelFacade {
         var participantes = processo.getParticipantes();
         var participante = participantes.getFirst();
 
-        Long codUnidMapeado = participante.getUnidadeCodigo();
+        Long codUnidMapeado = participante.getUnidadeCodigoPersistido();
         String nomeUnidMapeado = participante.getNome();
 
         String linkDestino = calcularLinkDestinoProcesso(processo, perfil, codigoUnidade);
@@ -127,8 +128,7 @@ public class PainelFacade {
         mapaPaiFilhos.forEach((key, value) -> value.forEach(filho -> mapaFilhoPai.put(filho, key)));
 
         Set<Long> participantesIds = participantes.stream()
-                .map(UnidadeProcesso::getUnidadeCodigo)
-                .filter(Objects::nonNull)
+                .map(UnidadeProcesso::getUnidadeCodigoPersistido)
                 .collect(Collectors.toSet());
 
         Set<Long> displayIds = new HashSet<>();
@@ -151,10 +151,9 @@ public class PainelFacade {
         }
 
         Map<Long, String> existingSiglas = participantes.stream()
-                .filter(participante -> participante.getUnidadeCodigo() != null)
                 .filter(participante -> participante.getSigla() != null && !participante.getSigla().isBlank())
                 .collect(toMap(
-                        UnidadeProcesso::getUnidadeCodigo,
+                        UnidadeProcesso::getUnidadeCodigoPersistido,
                         UnidadeProcesso::getSigla,
                         (s1, s2) -> s1)
                 );
@@ -165,7 +164,7 @@ public class PainelFacade {
             String sigla = existingSiglas.get(codUnidade);
             if (sigla != null && !sigla.isBlank()) {
                 siglas.add(sigla);
-            } else if (codUnidade != null) {
+            } else {
                 missingIds.add(codUnidade);
             }
         });
@@ -218,3 +217,4 @@ public class PainelFacade {
         return String.format("/processo/%s/%s", processo.getCodigo(), unidade.getSigla());
     }
 }
+

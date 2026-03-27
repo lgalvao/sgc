@@ -21,4 +21,11 @@ public class UnidadeMapa {
     @ManyToOne
     @JoinColumn(name = "mapa_vigente_codigo", nullable = false)
     private @Nullable Mapa mapaVigente;
+
+    public Long getUnidadeCodigoPersistido() {
+        if (unidadeCodigo == null) {
+            throw new IllegalStateException("UnidadeMapa sem unidadeCodigo persistido");
+        }
+        return unidadeCodigo;
+    }
 }

@@ -19,6 +19,7 @@ import org.jspecify.annotations.*;
 @Setter
 @NoArgsConstructor
 @SuperBuilder
+@SuppressWarnings("NullAway.Init")
 public class VinculacaoUnidade {
     @Id
     @Column(name = "unidade_atual_codigo", nullable = false)

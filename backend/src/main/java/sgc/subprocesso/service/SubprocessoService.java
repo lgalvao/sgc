@@ -31,6 +31,7 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@Transactional
 public class SubprocessoService {
     private static final String NOME_ENTIDADE = "Subprocesso";
     private static final Set<SituacaoSubprocesso> SITUACOES_PERMITIDAS_IMPORTACAO = Set.of(
@@ -192,11 +193,11 @@ public class SubprocessoService {
     }
 
     private void processarAlteracoes(Subprocesso sp, AtualizarSubprocessoRequest request) {
-        Optional.ofNullable(request.codUnidade())
+        Optional.of(request.codUnidade())
                 .map(unidadeService::buscarPorCodigo)
                 .ifPresent(sp::setUnidade);
 
-        Optional.ofNullable(request.codMapa()).ifPresent(cod -> {
+        Optional.of(request.codMapa()).ifPresent(cod -> {
             Mapa m = Mapa.builder().codigo(cod).build();
             Mapa mapa = sp.getMapa();
             Long codAtual = mapa != null ? mapa.getCodigo() : null;
@@ -260,7 +261,6 @@ public class SubprocessoService {
                 .map(unidade -> Subprocesso.builder()
                         .processo(processo)
                         .unidade(unidade)
-                        .mapa(null)
                         .situacao(NAO_INICIADO)
                         .dataLimiteEtapa1(processo.getDataLimite())
                         .build())
@@ -308,7 +308,11 @@ public class SubprocessoService {
                                                 Unidade unidadeOrigem, Usuario usuario,
                                                 SituacaoSubprocesso situacaoInicial, String descMovimentacao) {
 
-        Long codMapaVigente = unidadeMapa.getMapaVigente().getCodigo();
+        Mapa mapaVigente = unidadeMapa.getMapaVigente();
+        if (mapaVigente == null) {
+            throw new IllegalStateException("Unidade %s sem mapa vigente para revisão/diagnóstico".formatted(unidade.getSigla()));
+        }
+        Long codMapaVigente = mapaVigente.getCodigo();
         Subprocesso subprocesso = Subprocesso.builder()
                 .processo(processo)
                 .unidade(unidade)
@@ -336,9 +340,10 @@ public class SubprocessoService {
         return subprocessoSalvo;
     }
 
+    @Transactional
     public Mapa salvarMapaSubprocesso(Long codSubprocesso, SalvarMapaRequest request) {
         Subprocesso subprocesso = getSubprocessoParaEdicao(codSubprocesso);
-        Long codMapa = subprocesso.getMapa().getCodigo();
+        Long codMapa = obterCodigoMapaObrigatorio(subprocesso);
 
         boolean eraVazio = mapaManutencaoService.competenciasCodMapa(codMapa).isEmpty();
         boolean temNovasCompetencias = !request.competencias().isEmpty();
@@ -353,9 +358,10 @@ public class SubprocessoService {
         return mapa;
     }
 
+    @Transactional
     public Mapa adicionarCompetencia(Long codSubprocesso, CompetenciaRequest request) {
         Subprocesso subprocesso = getSubprocessoParaEdicao(codSubprocesso);
-        Mapa mapa = subprocesso.getMapa();
+        Mapa mapa = obterMapaObrigatorio(subprocesso);
         Long codMapa = mapa.getCodigo();
 
         validarCompetenciaParaCriacao(request);
@@ -375,7 +381,7 @@ public class SubprocessoService {
         Subprocesso sp = getSubprocessoParaEdicao(codSubprocesso);
         mapaManutencaoService.atualizarCompetencia(codCompetencia, request.descricao(), request.atividadesIds());
 
-        Mapa mapa = sp.getMapa();
+        Mapa mapa = obterMapaObrigatorio(sp);
         return mapaManutencaoService.mapaCodigo(mapa.getCodigo());
     }
 
@@ -388,7 +394,7 @@ public class SubprocessoService {
     public Mapa removerCompetencia(Long codSubprocesso, Long codCompetencia) {
         Subprocesso subprocesso = getSubprocessoParaEdicao(codSubprocesso);
 
-        Long codMapa = subprocesso.getMapa().getCodigo();
+        Long codMapa = obterCodigoMapaObrigatorio(subprocesso);
         mapaManutencaoService.removerCompetencia(codCompetencia);
 
         boolean ficouVazio = mapaManutencaoService.competenciasCodMapa(codMapa).isEmpty();
@@ -397,7 +403,7 @@ public class SubprocessoService {
             atualizarSituacaoMapaVazio(subprocesso, true);
         }
 
-        return mapaManutencaoService.mapaCodigo(subprocesso.getMapa().getCodigo());
+        return mapaManutencaoService.mapaCodigo(obterCodigoMapaObrigatorio(subprocesso));
     }
 
     private void atualizarSituacaoMapaVazio(Subprocesso subprocesso, boolean ficouVazio) {
@@ -424,7 +430,8 @@ public class SubprocessoService {
         }
     }
 
-    private Subprocesso getSubprocessoParaEdicao(Long codSubprocesso) {
+    @Transactional(readOnly = true)
+    public Subprocesso getSubprocessoParaEdicao(Long codSubprocesso) {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
         validacaoService.validarSituacaoPermitida(sp,
                 "Mapa só pode ser editado nas situações 'Mapa criado', 'Cadastro homologado', 'Mapa ajustado' ou 'Revisão do cadastro homologada'. Se o mapa estiver com sugestões, valide as sugestões primeiro para retornar à situação editável. Situação atual: %s".formatted(sp.getSituacao()),
@@ -452,7 +459,7 @@ public class SubprocessoService {
     @Transactional(readOnly = true)
     public MapaAjusteDto obterMapaParaAjuste(Long codSubprocesso) {
         Subprocesso sp = subprocessoRepo.buscarPorCodigoComMapaEAtividades(codSubprocesso).orElseThrow(() -> new ErroEntidadeNaoEncontrada(NOME_ENTIDADE, codSubprocesso));
-        Long codMapa = sp.getMapa().getCodigo();
+        Long codMapa = obterCodigoMapaObrigatorio(sp);
 
         Analise analise = listarAnalisesPorSubprocesso(codSubprocesso, TipoAnalise.VALIDACAO)
                 .stream()
@@ -739,15 +746,14 @@ public class SubprocessoService {
             throw new ErroAcessoNegado(Mensagens.SEM_PERMISSAO_CONSULTAR_ORIGEM);
         }
 
-        Long codMapaOrigem = spOrigem.getMapa().getCodigo();
-        Long codMapaDestino = spDestino.getMapa().getCodigo();
+        Long codMapaOrigem = obterCodigoMapaObrigatorio(spOrigem);
+        Long codMapaDestino = obterCodigoMapaObrigatorio(spDestino);
 
-        List<Long> ids = codigosAtividades;
-        int totalParaImportar = ids.size();
+        int totalParaImportar = codigosAtividades.size();
         log.info("Importando {} atividades do mapa #{} para o mapa #{}", totalParaImportar, codMapaOrigem, codMapaDestino);
-        int importadas = copiaMapaService.importarAtividadesDeOutroMapa(codMapaOrigem, codMapaDestino, ids);
+        int importadas = copiaMapaService.importarAtividadesDeOutroMapa(codMapaOrigem, codMapaDestino, codigosAtividades);
 
-        boolean temDuplicatas = !ids.isEmpty() && importadas < totalParaImportar;
+        boolean temDuplicatas = !codigosAtividades.isEmpty() && importadas < totalParaImportar;
 
         if (spDestino.getSituacao() == NAO_INICIADO) {
             var tipoProcesso = spDestino.getProcesso().getTipo();
@@ -781,7 +787,7 @@ public class SubprocessoService {
     public List<AtividadeDto> listarAtividadesSubprocesso(Long codSubprocesso) {
         Subprocesso subprocesso = subprocessoRepo.buscarPorCodigoComMapaEAtividades(codSubprocesso).orElseThrow();
 
-        Long codMapa = subprocesso.getMapa().getCodigo();
+        Long codMapa = obterCodigoMapaObrigatorio(subprocesso);
         List<Atividade> todasAtividades = mapaManutencaoService.atividadesMapaCodigoComConhecimentos(codMapa);
 
         return todasAtividades.stream().map(this::mapAtividadeToDto).toList();
@@ -839,7 +845,7 @@ public class SubprocessoService {
     }
 
     public AnaliseHistoricoDto paraHistoricoDto(Analise analise) {
-        UnidadeDto unidade = UnidadeDto.fromEntity(unidadeService.buscarPorCodigo(analise.getUnidadeCodigo()));
+        Unidade unidade = unidadeService.buscarPorCodigo(analise.getUnidadeCodigo());
 
         return AnaliseHistoricoDto.builder()
                 .dataHora(analise.getDataHora())
@@ -861,6 +867,7 @@ public class SubprocessoService {
     @Transactional(readOnly = true)
     public Unidade obterLocalizacaoAtual(Subprocesso sp) {
         if (sp.getLocalizacaoAtual() != null) return sp.getLocalizacaoAtual();
+        if (sp.getCodigo() == null) return sp.getUnidade();
         Unidade loc = movimentacaoRepo.findFirstBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo())
                 .filter(m -> m.getUnidadeDestino() != null)
                 .map(Movimentacao::getUnidadeDestino)
@@ -869,4 +876,18 @@ public class SubprocessoService {
         return loc;
     }
 
+    private Mapa obterMapaObrigatorio(Subprocesso subprocesso) {
+        Mapa mapa = subprocesso.getMapa();
+        if (mapa == null) {
+            throw new IllegalStateException("Subprocesso %s sem mapa associado".formatted(subprocesso.getCodigo()));
+        }
+        return mapa;
+    }
+
+    private Long obterCodigoMapaObrigatorio(Subprocesso subprocesso) {
+        return obterMapaObrigatorio(subprocesso).getCodigo();
+    }
+
 }
+
+

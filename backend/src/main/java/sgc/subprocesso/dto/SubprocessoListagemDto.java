@@ -1,6 +1,7 @@
 package sgc.subprocesso.dto;
 
 import lombok.*;
+import org.jspecify.annotations.*;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
 import sgc.processo.model.*;
@@ -10,21 +11,21 @@ import java.time.*;
 
 @Builder
 public record SubprocessoListagemDto(
-        Long codigo,
-        UnidadeDto unidade,
+        @Nullable Long codigo,
+        @Nullable UnidadeDto unidade,
         SituacaoSubprocesso situacao,
         LocalDateTime dataLimiteEtapa1,
-        LocalDateTime dataFimEtapa1,
-        LocalDateTime dataLimiteEtapa2,
-        LocalDateTime dataFimEtapa2,
-        Long codProcesso,
-        Long codUnidade,
-        Long codMapa,
-        String processoDescricao,
-        LocalDateTime dataCriacaoProcesso,
-        TipoProcesso tipoProcesso,
+        @Nullable LocalDateTime dataFimEtapa1,
+        @Nullable LocalDateTime dataLimiteEtapa2,
+        @Nullable LocalDateTime dataFimEtapa2,
+        @Nullable Long codProcesso,
+        @Nullable Long codUnidade,
+        @Nullable Long codMapa,
+        @Nullable String processoDescricao,
+        @Nullable LocalDateTime dataCriacaoProcesso,
+        @Nullable TipoProcesso tipoProcesso,
         boolean isEmAndamento,
-        Integer etapaAtual) {
+        @Nullable Integer etapaAtual) {
 
     public static SubprocessoListagemDto fromEntity(Subprocesso subprocesso) {
         Processo processo = subprocesso.getProcesso();
@@ -48,7 +49,7 @@ public record SubprocessoListagemDto(
                 .build();
     }
 
-    private static UnidadeDto paraUnidadeResumo(Unidade unidade) {
+    private static @Nullable UnidadeDto paraUnidadeResumo(@Nullable Unidade unidade) {
         if (unidade == null) {
             return null;
         }
@@ -57,8 +58,9 @@ public record SubprocessoListagemDto(
                 .codigo(unidade.getCodigo())
                 .nome(unidade.getNome())
                 .sigla(unidade.getSigla())
-                .tipo(unidade.getTipo() != null ? unidade.getTipo().name() : null)
+                .tipo(unidade.getTipo().name())
                 .tituloTitular(unidade.getTituloTitular())
                 .build();
     }
 }
+

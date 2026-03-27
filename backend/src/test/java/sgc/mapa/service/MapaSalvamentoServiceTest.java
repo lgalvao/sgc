@@ -16,6 +16,7 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("MapaSalvamentoService Tests")
+@SuppressWarnings("NullAway.Init")
 class MapaSalvamentoServiceTest {
     @Mock
     private MapaRepo mapaRepo;

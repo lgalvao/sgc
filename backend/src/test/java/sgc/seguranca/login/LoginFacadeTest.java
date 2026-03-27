@@ -18,6 +18,7 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("LoginFacade")
+@SuppressWarnings("NullAway.Init")
 class LoginFacadeTest {
 
     @Mock

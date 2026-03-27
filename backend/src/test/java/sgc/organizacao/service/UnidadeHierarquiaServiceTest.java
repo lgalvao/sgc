@@ -20,6 +20,7 @@ import static org.mockito.Mockito.*;
  */
 @ExtendWith(MockitoExtension.class)
 @DisplayName("UnidadeHierarquiaService")
+@SuppressWarnings("NullAway.Init")
 class UnidadeHierarquiaServiceTest {
 
     @Mock
@@ -167,3 +168,4 @@ class UnidadeHierarquiaServiceTest {
         assertThat(result.getFirst().getSigla()).isEqualTo(unidadeIntermediaria.getSigla());
     }
 }
+

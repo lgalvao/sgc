@@ -32,6 +32,7 @@ import static sgc.seguranca.AcaoPermissao.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("ProcessoService Test suite")
+@SuppressWarnings("NullAway.Init")
 class ProcessoServiceTest {
     @InjectMocks
     private ProcessoService processoService;
@@ -76,8 +77,8 @@ class ProcessoServiceTest {
 
 
         @Test
-        @DisplayName("executarAcaoEmBloco ignora ação null na categorização")
-        void executarAcaoEmBloco_IgnoraAcaoNull() {
+        @DisplayName("executarAcaoEmBloco nao executa transicoes quando subprocesso nao eh elegivel")
+        void executarAcaoEmBloco_NaoExecutaTransicoesQuandoNaoElegivel() {
             Long codProcesso = 1L;
             AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(
                     List.of(10L),
@@ -97,8 +98,15 @@ class ProcessoServiceTest {
             when(subprocessoService.listarEntidadesPorProcessoEUnidades(codProcesso, req.unidadeCodigos()))
                     .thenReturn(List.of(sub));
 
-            AcaoEmBlocoRequest reqNull = new AcaoEmBlocoRequest(List.of(10L), null, LocalDate.now());
-            processoService.executarAcaoEmBloco(codProcesso, reqNull);
+            Subprocesso subNaoElegivel = Subprocesso.builder()
+                    .codigo(101L)
+                    .unidade(Unidade.builder().codigo(10L).build())
+                    .situacao(SituacaoSubprocesso.NAO_INICIADO)
+                    .build();
+            when(subprocessoService.listarEntidadesPorProcessoEUnidades(codProcesso, req.unidadeCodigos()))
+                    .thenReturn(List.of(subNaoElegivel));
+
+            processoService.executarAcaoEmBloco(codProcesso, req);
 
             verify(transicaoService, never()).aceitarCadastroEmBloco(any(), any());
             verify(transicaoService, never()).homologarCadastroEmBloco(any(), any());

@@ -18,7 +18,7 @@ public record MapaResumoDto(
     public static MapaResumoDto fromEntity(Mapa mapa) {
         return MapaResumoDto.builder()
                 .codigo(mapa.getCodigo())
-                .subprocessoCodigo(mapa.getSubprocesso() != null ? mapa.getSubprocesso().getCodigo() : null)
+                .subprocessoCodigo(mapa.getSubprocesso().getCodigo())
                 .dataHoraDisponibilizado(mapa.getDataHoraDisponibilizado())
                 .observacoesDisponibilizacao(mapa.getObservacoesDisponibilizacao())
                 .sugestoes(mapa.getSugestoes())
@@ -26,3 +26,4 @@ public record MapaResumoDto(
                 .build();
     }
 }
+

@@ -27,7 +27,7 @@ public class AtribuicaoTemporariaViewsE2eAspect {
     )
     @Transactional
     public void sincronizarViews(Long codUnidade, CriarAtribuicaoRequest request) {
-        @Nullable String tituloAnterior = jdbcTemplate.queryForList(
+        String tituloAnterior = jdbcTemplate.queryForList(
                 "SELECT usuario_titulo FROM sgc.vw_responsabilidade WHERE unidade_codigo = ?",
                 String.class,
                 codUnidade

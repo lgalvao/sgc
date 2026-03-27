@@ -22,6 +22,7 @@ import static sgc.seguranca.AcaoPermissao.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("AtividadeFacade")
+@SuppressWarnings("NullAway.Init")
 class AtividadeFacadeTest {
     @Mock
     private MapaManutencaoService mapaManutencaoService;

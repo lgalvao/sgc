@@ -15,6 +15,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@SuppressWarnings("NullAway.Init")
 class MapaVisualizacaoServiceCoverageTest {
     @Mock
     private MapaRepo mapaRepo;

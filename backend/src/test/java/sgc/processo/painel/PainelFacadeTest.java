@@ -22,6 +22,7 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("PainelFacade Test")
+@SuppressWarnings("NullAway.Init")
 class PainelFacadeTest {
 
     @Mock

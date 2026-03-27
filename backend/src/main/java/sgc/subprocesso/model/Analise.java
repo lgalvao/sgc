@@ -3,6 +3,7 @@ package sgc.subprocesso.model;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.*;
+import org.jspecify.annotations.*;
 import sgc.comum.model.*;
 
 import java.time.*;
@@ -43,8 +44,8 @@ public class Analise extends EntidadeBase {
     private String usuarioTitulo;
 
     @Column(name = "motivo", length = 200)
-    private String motivo;
+    private @Nullable String motivo;
 
     @Column(name = "observacoes", length = 500)
-    private String observacoes;
+    private @Nullable String observacoes;
 }

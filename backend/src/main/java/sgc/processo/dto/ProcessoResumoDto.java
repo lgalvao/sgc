@@ -11,14 +11,14 @@ import java.time.*;
  */
 @Builder
 public record ProcessoResumoDto(
-        Long codigo,
+        @Nullable Long codigo,
         String descricao,
         SituacaoProcesso situacao,
-        String tipo,
+        @Nullable String tipo,
         LocalDateTime dataLimite,
         LocalDateTime dataCriacao,
-        Long unidadeCodigo,
-        String unidadeNome,
+        @Nullable Long unidadeCodigo,
+        @Nullable String unidadeNome,
         String unidadesParticipantes,
         @Nullable String linkDestino
 ) {

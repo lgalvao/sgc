@@ -15,6 +15,7 @@ import static sgc.organizacao.model.TipoUnidade.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("UnidadeHierarquiaService - Cobertura de Testes")
+@SuppressWarnings("NullAway.Init")
 class UnidadeHierarquiaServiceCoverageTest {
 
     @Mock
@@ -58,7 +59,7 @@ class UnidadeHierarquiaServiceCoverageTest {
         assertThat(result).hasSize(4);
         // u1 (elegível), u2 (intermediária - false), u3 (sem mapa - false), u4 (bloqueada - false)
         assertThat(result.stream().filter(UnidadeDto::isElegivel).count()).isEqualTo(1);
-        assertThat(result.stream().filter(UnidadeDto::isElegivel).findFirst().get().getCodigo()).isEqualTo(10L);
+        assertThat(result.stream().filter(UnidadeDto::isElegivel).findFirst().orElseThrow().getCodigo()).isEqualTo(10L);
 
         // Mocking para requerMapaVigente = false
         List<UnidadeDto> result2 = target.buscarArvoreComElegibilidade(false, Set.of(40L));

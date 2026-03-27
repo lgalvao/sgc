@@ -17,6 +17,7 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("MapaManutencaoService - Cobertura extra")
+@SuppressWarnings("NullAway.Init")
 class MapaManutencaoServiceCoverageExtraTest {
 
     @Mock private AtividadeRepo atividadeRepo;
@@ -52,7 +53,7 @@ class MapaManutencaoServiceCoverageExtraTest {
         Map<Long, Set<Long>> result = mapaService.codigosAssociacoesCompetenciaAtividade(1L);
 
         assertEquals(1, result.size());
-        assertEquals(2, result.get(1L).size());
+        assertEquals(2, result.getOrDefault(1L, Set.of()).size());
     }
 
     @Test

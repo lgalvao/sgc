@@ -15,6 +15,7 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Testes do Serviço de Cópia de Mapa")
+@SuppressWarnings("NullAway.Init")
 class CopiaMapaServiceTest {
     @Mock
     private ComumRepo repo;

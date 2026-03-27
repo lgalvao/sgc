@@ -16,7 +16,7 @@ import org.springframework.web.client.*;
 @Slf4j
 public class ClienteAcessoAdE2e extends ClienteAcessoAd {
     public ClienteAcessoAdE2e(@Nullable RestClient acessoAdRestClient) {
-        super(acessoAdRestClient);
+        super(acessoAdRestClient != null ? acessoAdRestClient : RestClient.create());
     }
 
     @Override

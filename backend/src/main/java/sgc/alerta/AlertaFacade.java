@@ -12,7 +12,6 @@ import sgc.processo.model.*;
 
 import java.time.*;
 import java.util.*;
-import java.util.Objects;
 
 @Service
 @Slf4j
@@ -82,8 +81,8 @@ public class AlertaFacade {
     }
 
     @Transactional
-    public Alerta criarAlertaTransicao(Processo processo, String descricao, Unidade origem, Unidade destino) {
-        return criarAlerta(processo, origem, destino, descricao);
+    public void criarAlertaTransicao(Processo processo, String descricao, Unidade origem, Unidade destino) {
+        criarAlerta(processo, origem, destino, descricao);
     }
 
     @Transactional
@@ -93,32 +92,34 @@ public class AlertaFacade {
         Map<Long, Unidade> todasUnidadesMap = new HashMap<>();
 
         for (Unidade unidade : unidadesParticipantes) {
-            todasUnidadesMap.put(unidade.getCodigo(), unidade);
+            Long codigoUnidade = unidade.getCodigo();
+            todasUnidadesMap.put(codigoUnidade, unidade);
             TipoUnidade tipo = unidade.getTipo();
 
             if (tipo == TipoUnidade.OPERACIONAL || tipo == TipoUnidade.INTEROPERACIONAL || tipo == TipoUnidade.RAIZ) {
-                codsOperacionais.add(unidade.getCodigo());
+                codsOperacionais.add(codigoUnidade);
             }
 
             if (tipo == TipoUnidade.INTERMEDIARIA || tipo == TipoUnidade.INTEROPERACIONAL) {
-                codsIntermediarias.add(unidade.getCodigo());
+                codsIntermediarias.add(codigoUnidade);
             }
 
             Unidade superior = unidade.getUnidadeSuperior();
             while (superior != null) {
-                todasUnidadesMap.put(superior.getCodigo(), superior);
-                codsIntermediarias.add(superior.getCodigo());
+                Long codigoSuperior = superior.getCodigo();
+                todasUnidadesMap.put(codigoSuperior, superior);
+                codsIntermediarias.add(codigoSuperior);
                 superior = superior.getUnidadeSuperior();
             }
         }
 
         List<Alerta> alertasCriados = new ArrayList<>();
         for (Long cod : codsOperacionais) {
-            alertasCriados.add(criarAlertaAdmin(processo, Objects.requireNonNull(todasUnidadesMap.get(cod)), "Início do processo"));
+            alertasCriados.add(criarAlertaAdmin(processo, obterUnidadeObrigatoria(todasUnidadesMap, cod), "Início do processo"));
         }
 
         for (Long cod : codsIntermediarias) {
-            alertasCriados.add(criarAlertaAdmin(processo, Objects.requireNonNull(todasUnidadesMap.get(cod)), "Início do processo em unidade(s) subordinada(s)"));
+            alertasCriados.add(criarAlertaAdmin(processo, obterUnidadeObrigatoria(todasUnidadesMap, cod), "Início do processo em unidade(s) subordinada(s)"));
         }
 
         return alertasCriados;
@@ -156,6 +157,14 @@ public class AlertaFacade {
                 .build();
 
         return alertaService.salvar(alerta);
+    }
+
+    private Unidade obterUnidadeObrigatoria(Map<Long, Unidade> unidadesPorCodigo, Long codigoUnidade) {
+        Unidade unidade = unidadesPorCodigo.get(codigoUnidade);
+        if (unidade == null) {
+            throw new IllegalStateException("Unidade %d ausente na construção de alertas".formatted(codigoUnidade));
+        }
+        return unidade;
     }
 
     @Transactional
@@ -216,3 +225,5 @@ public class AlertaFacade {
         criarAlertaAdmin(processo, superior, descricao);
     }
 }
+
+

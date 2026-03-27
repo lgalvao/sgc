@@ -14,15 +14,10 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("LoginController - Cobertura adicional")
+@SuppressWarnings("NullAway.Init")
 class LoginControllerCoverageTest {
     @Mock
     private LoginFacade loginFacade;
-    @Mock
-    private sgc.organizacao.UsuarioFacade usuarioFacade;
-    @Mock
-    private LimitadorTentativasLogin limitadorTentativasLogin;
-    @Mock
-    private GerenciadorJwt gerenciadorJwt;
     @Mock
     private HttpServletRequest httpRequest;
     @Mock

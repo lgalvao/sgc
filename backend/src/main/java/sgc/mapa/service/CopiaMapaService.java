@@ -26,7 +26,7 @@ public class CopiaMapaService {
         Mapa novoMapa = criarNovoMapa();
         Mapa mapaSalvo = mapaRepo.save(novoMapa);
 
-        Long codMapaFonte = fonte.getCodigoPersistido();
+        Long codMapaFonte = fonte.getCodigo();
         Map<Long, Atividade> mapaAtividades = copiarAtividades(codMapaFonte, mapaSalvo);
         copiarCompetencias(codMapaFonte, mapaSalvo, mapaAtividades);
 
@@ -39,14 +39,14 @@ public class CopiaMapaService {
 
         if (!codigosAtividades.isEmpty()) {
             Set<Long> filtro = new HashSet<>(codigosAtividades);
-            Set<Long> encontrados = atividadesOrigem.stream().map(Atividade::getCodigoPersistido).collect(java.util.stream.Collectors.toSet());
+            Set<Long> encontrados = atividadesOrigem.stream().map(Atividade::getCodigo).collect(java.util.stream.Collectors.toSet());
             Set<Long> naoEncontrados = new HashSet<>(filtro);
             naoEncontrados.removeAll(encontrados);
             if (!naoEncontrados.isEmpty()) {
                 log.warn("Atividades solicitadas não encontradas no mapa de origem {}: {}", codMapaOrigem, naoEncontrados);
             }
             atividadesOrigem = atividadesOrigem.stream()
-                    .filter(a -> filtro.contains(a.getCodigoPersistido()))
+                    .filter(a -> filtro.contains(a.getCodigo()))
                     .toList();
         }
 
@@ -80,7 +80,7 @@ public class CopiaMapaService {
         for (Atividade atividadeFonte : atividadesFonte) {
             Atividade novaAtividade = prepararCopiaAtividade(atividadeFonte, mapaSalvo);
             novasAtividades.add(novaAtividade);
-            atividadeParaCodAtividadeFonte.put(novaAtividade, atividadeFonte.getCodigoPersistido());
+            atividadeParaCodAtividadeFonte.put(novaAtividade, atividadeFonte.getCodigo());
         }
 
         if (!novasAtividades.isEmpty()) {
@@ -120,7 +120,7 @@ public class CopiaMapaService {
         for (Competencia competenciaFonte : competenciasFonte) {
             Set<Atividade> novasAtividadesAssociadas = new HashSet<>();
             for (Atividade ativOrigemAssociada : competenciaFonte.getAtividades()) {
-                Atividade novaAtividade = mapaAtividades.get(ativOrigemAssociada.getCodigoPersistido());
+                Atividade novaAtividade = mapaAtividades.get(ativOrigemAssociada.getCodigo());
                 if (novaAtividade != null) {
                     novasAtividadesAssociadas.add(novaAtividade);
                 }
@@ -144,3 +144,5 @@ public class CopiaMapaService {
                 .toList());
     }
 }
+
+

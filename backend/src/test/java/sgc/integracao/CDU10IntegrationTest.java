@@ -191,7 +191,7 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
         analiseDevolucao.setDataHora(LocalDateTime.now());
         analiseRepo.saveAndFlush(analiseDevolucao);
 
-        Subprocesso sp = subprocessoRepo.findById(subprocessoId).get();
+        Subprocesso sp = subprocessoRepo.findById(subprocessoId).orElseThrow();
         sp.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
         sp.setDataFimEtapa1(null);
         subprocessoRepo.saveAndFlush(sp);
@@ -203,7 +203,7 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
         mov.setDataHora(LocalDateTime.now().plusSeconds(1)); // Ensure it's later
         mov.setDescricao("Devolução simulada");
         // Usuario superior
-        Usuario usuarioSuperior = usuarioRepo.findById("666666666666").get();
+        Usuario usuarioSuperior = usuarioRepo.findById("666666666666").orElseThrow();
         mov.setUsuario(usuarioSuperior);
         movimentacaoRepo.saveAndFlush(mov);
 

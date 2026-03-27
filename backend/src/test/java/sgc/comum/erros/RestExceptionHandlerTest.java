@@ -210,7 +210,8 @@ class RestExceptionHandlerTest {
         };
         ResponseEntity<?> response = restExceptionHandler.handleErroNegocio(ex);
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertThat(((ErroApi) response.getBody()).getDetails()).isEmpty();
+        assertThat(response.getBody())
+                .isInstanceOfSatisfying(ErroApi.class, erroApi -> assertThat(erroApi.getDetails()).isEmpty());
     }
 
     @Test

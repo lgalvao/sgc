@@ -52,11 +52,11 @@ public class UnidadeDto {
     public static @Nullable UnidadeDto fromEntity(@Nullable Unidade entity) {
         if (entity == null) return null;
         UnidadeDto dto = UnidadeDto.builder()
-                .codigo(entity.getCodigoPersistido())
+                .codigo(entity.getCodigo())
                 .nome(entity.getNome())
                 .sigla(entity.getSigla())
-                .codigoPai(entity.getUnidadeSuperior() != null ? entity.getUnidadeSuperior().getCodigoPersistido() : null)
-                .tipo(entity.getTipo() != null ? entity.getTipo().name() : null)
+                .codigoPai(entity.getUnidadeSuperior() != null ? entity.getUnidadeSuperior().getCodigo() : null)
+                .tipo(entity.getTipo().name())
                 .tituloTitular(entity.getTituloTitular())
                 .build();
 
@@ -67,3 +67,4 @@ public class UnidadeDto {
         return dto;
     }
 }
+

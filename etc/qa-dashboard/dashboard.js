@@ -55,14 +55,12 @@ function renderizarResumo(snapshot) {
     );
 
     const git = snapshot.metadados?.git ?? {};
-    const texto = [
+    document.getElementById("metadadosResumo").textContent = [
         `Gerado em ${new Date(snapshot.metadados?.geradoEm ?? Date.now()).toLocaleString("pt-BR")}`,
         `Perfil: ${snapshot.metadados?.perfilExecucao ?? "-"}`,
         `Branch: ${git.branch ?? "-"}`,
         `Commit: ${git.commitCurto ?? git.commit ?? "-"}`
     ].join(" | ");
-
-    document.getElementById("metadadosResumo").textContent = texto;
 }
 
 function renderizarVerificacoes(snapshot) {

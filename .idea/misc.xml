@@ -1028,6 +1028,9 @@
       <entry_point TYPE="field" FQNAME="sgc.integracao.SubprocessoServiceValidacaoIntegrationTest validacaoService" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoTransicaoService validacaoService" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoTransicaoServiceCoverageIntegrationTest validacaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.comum.Mensagens ATIVIDADES_DEVEM_TER_COMPETENCIA" />
+      <entry_point TYPE="field" FQNAME="sgc.e2e.AtribuicaoTemporariaViewsE2eAspect jdbcTemplate" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.SubprocessoElegivelDto ultimaDataLimite" />
     </entry_points>
     <list size="3">
       <item index="0" class="java.lang.String" itemvalue="com.tngtech.archunit.junit.ArchTest" />
@@ -3290,6 +3293,48 @@
     <pattern value="sgc.integracao.mocks.WithMockGestorSecurityContextFactory" />
     <pattern value="sgc.processo.ProcessoControllerTest.Workflow" />
     <pattern value="sgc.processo.service.ProcessoServiceTest.Workflow" />
+    <pattern value="sgc.subprocesso.dto.SubprocessoCadastroDto" method="SubprocessoCadastroDto" />
+    <pattern value="sgc.alerta.dto.AlertaDto" method="AlertaDto" />
+    <pattern value="sgc.e2e.AtribuicaoTemporariaViewsE2eAspect" />
+    <pattern value="sgc.mapa.dto.AtualizarMapaRequest" />
+    <pattern value="sgc.mapa.dto.AtualizarMapaRequest" method="AtualizarMapaRequest" />
+    <pattern value="sgc.subprocesso.service.SubprocessoSituacaoService" method="atualizarSituacaoPorMapa" />
+    <pattern value="sgc.organizacao.service.UnidadeHierarquiaService" method="buscarIdsDescendentes" />
+    <pattern value="sgc.organizacao.UsuarioFacade" method="buscarPerfisUsuario" />
+    <pattern value="sgc.organizacao.service.UnidadeHierarquiaService" method="buscarSubordinadas" />
+    <pattern value="sgc.subprocesso.service.SubprocessoService" method="buscarSubprocessoComMapa" />
+    <pattern value="sgc.organizacao.service.UsuarioService" method="buscarTodos" />
+    <pattern value="sgc.organizacao.UsuarioFacade" method="buscarUsuariosPorTitulos" />
+    <pattern value="sgc.processo.service.ProcessoService" method="checarAcesso" />
+    <pattern value="sgc.mapa.service.MapaManutencaoService" method="codigosAssociacoesCompetenciaAtividade" />
+    <pattern value="sgc.mapa.service.MapaManutencaoService" method="competenciaCodigo" />
+    <pattern value="sgc.mapa.dto.CriarMapaRequest" />
+    <pattern value="sgc.mapa.dto.CriarMapaRequest" method="CriarMapaRequest" />
+    <pattern value="sgc.comum.erros.ErroValidacao" />
+    <pattern value="sgc.comum.erros.ErroValidacao" method="ErroValidacao" />
+    <pattern value="sgc.subprocesso.service.SubprocessoService" method="listarPorProcessoESituacoes" />
+    <pattern value="sgc.subprocesso.service.SubprocessoService" method="listarPorProcessoEUnidadeCodigosESituacoes" />
+    <pattern value="sgc.subprocesso.service.SubprocessoService" method="listarPorProcessoUnidadeESituacoes" />
+    <pattern value="sgc.mapa.dto.MapaResumoDto" />
+    <pattern value="sgc.mapa.dto.MapaResumoDto" method="MapaResumoDto" />
+    <pattern value="sgc.mapa.service.MapaManutencaoService" method="mapaSubprocesso" />
+    <pattern value="sgc.mapa.service.MapaManutencaoService" method="mapaVigenteUnidade" />
+    <pattern value="sgc.comum.Mensagens" />
+    <pattern value="sgc.parametros.ParametroDto" />
+    <pattern value="sgc.parametros.ParametroDto" method="ParametroDto" />
+    <pattern value="sgc.e2e.AtribuicaoTemporariaViewsE2eAspect" method="sincronizarViews" />
+    <pattern value="sgc.subprocesso.dto.SubprocessoCadastroDto" />
+    <pattern value="sgc.subprocesso.dto.SubprocessoListagemDto" />
+    <pattern value="sgc.subprocesso.dto.SubprocessoListagemDto" method="SubprocessoListagemDto" />
+    <pattern value="sgc.subprocesso.dto.SubprocessoResumoDto" />
+    <pattern value="sgc.subprocesso.dto.SubprocessoResumoDto" method="SubprocessoResumoDto" />
+    <pattern value="sgc.organizacao.dto.UsuarioConsultaDto" />
+    <pattern value="sgc.organizacao.dto.UsuarioConsultaDto" method="UsuarioConsultaDto" />
+    <pattern value="sgc.organizacao.dto.UsuarioResumoDto" />
+    <pattern value="sgc.organizacao.dto.UsuarioResumoDto" method="UsuarioResumoDto" />
+    <pattern value="sgc.e2e.E2eController" method="validarAmbienteE2e" />
+    <pattern value="sgc.subprocesso.service.SubprocessoValidacaoService" method="verificarAcessoUnidadeAoProcesso" />
+    <pattern value="sgc.comum.Mensagens" method="Mensagens" />
   </component>
   <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="FrameworkDetectionExcludesConfiguration">

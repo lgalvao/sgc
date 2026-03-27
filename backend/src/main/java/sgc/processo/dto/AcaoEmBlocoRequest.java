@@ -1,6 +1,7 @@
 package sgc.processo.dto;
 
 import jakarta.validation.constraints.*;
+import org.jspecify.annotations.*;
 import sgc.comum.*;
 import sgc.processo.model.*;
 
@@ -14,6 +15,6 @@ public record AcaoEmBlocoRequest(
         @NotNull(message = Mensagens.ACAO_DEVE_SER_INFORMADA)
         AcaoProcesso acao,
 
-        LocalDate dataLimite
+        @Nullable LocalDate dataLimite
 ) {
 }

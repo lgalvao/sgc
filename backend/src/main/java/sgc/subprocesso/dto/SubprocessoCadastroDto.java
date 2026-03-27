@@ -17,7 +17,7 @@ public record SubprocessoCadastroDto(
 
     public static SubprocessoCadastroDto fromEntity(Subprocesso subprocesso, List<AtividadeDto> atividades) {
         return SubprocessoCadastroDto.builder()
-                .codigo(subprocesso.getCodigoPersistido())
+                .codigo(subprocesso.getCodigo())
                 .unidade(paraUnidadeResumo(subprocesso.getUnidade()))
                 .atividades(atividades)
                 .build();
@@ -29,11 +29,12 @@ public record SubprocessoCadastroDto(
         }
 
         return UnidadeDto.builder()
-                .codigo(unidade.getCodigoPersistido())
+                .codigo(unidade.getCodigo())
                 .nome(unidade.getNome())
                 .sigla(unidade.getSigla())
-                .tipo(unidade.getTipo() != null ? unidade.getTipo().name() : null)
+                .tipo(unidade.getTipo().name())
                 .tituloTitular(unidade.getTituloTitular())
                 .build();
     }
 }
+

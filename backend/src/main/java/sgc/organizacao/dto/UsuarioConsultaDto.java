@@ -1,6 +1,7 @@
 package sgc.organizacao.dto;
 
 import lombok.*;
+import org.jspecify.annotations.*;
 import sgc.organizacao.model.*;
 
 import java.util.*;
@@ -12,21 +13,19 @@ public record UsuarioConsultaDto(
         String nome,
         String email,
         String ramal,
-        UnidadeDto unidade,
+        @Nullable UnidadeDto unidade,
         List<String> perfis) {
 
     public static UsuarioConsultaDto fromEntity(Usuario usuario) {
         Unidade unidadeLotacao = usuario.getUnidadeLotacao();
 
-        UnidadeDto unidade = unidadeLotacao != null
-                ? UnidadeDto.builder()
-                .codigo(unidadeLotacao.getCodigo())
-                .nome(unidadeLotacao.getNome())
-                .sigla(unidadeLotacao.getSigla())
-                .tipo(unidadeLotacao.getTipo() != null ? unidadeLotacao.getTipo().name() : null)
-                .tituloTitular(unidadeLotacao.getTituloTitular())
-                .build()
-                : null;
+        UnidadeDto unidade = UnidadeDto.builder()
+        .codigo(unidadeLotacao.getCodigo())
+        .nome(unidadeLotacao.getNome())
+        .sigla(unidadeLotacao.getSigla())
+        .tipo(unidadeLotacao.getTipo().name())
+        .tituloTitular(unidadeLotacao.getTituloTitular())
+        .build();
 
         return UsuarioConsultaDto.builder()
                 .tituloEleitoral(usuario.getTituloEleitoral())
@@ -39,3 +38,4 @@ public record UsuarioConsultaDto(
                 .build();
     }
 }
+

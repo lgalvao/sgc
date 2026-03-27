@@ -15,6 +15,7 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("UnidadeService")
+@SuppressWarnings("NullAway.Init")
 class UnidadeServiceTest {
 
     @Mock
@@ -106,7 +107,7 @@ class UnidadeServiceTest {
 
         service.definirMapaVigente(1L, mapa);
 
-        verify(unidadeMapaRepo).save(argThat(um -> um.getUnidadeCodigo().equals(1L) && um.getMapaVigente().equals(mapa)));
+        verify(unidadeMapaRepo).save(argThat(um -> um.getUnidadeCodigoPersistido().equals(1L) && um.getMapaVigente().equals(mapa)));
     }
 
     @Test

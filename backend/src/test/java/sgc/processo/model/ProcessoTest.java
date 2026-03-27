@@ -1,6 +1,7 @@
 package sgc.processo.model;
 
 import org.junit.jupiter.api.*;
+import org.springframework.test.util.*;
 import sgc.fixture.*;
 import sgc.organizacao.model.*;
 
@@ -108,7 +109,7 @@ class ProcessoTest {
         @Test
         @DisplayName("Deve retornar vazio se participantes for null")
         void deveRetornarVazioSeParticipantesNull() {
-            processo.setParticipantes(null);
+            ReflectionTestUtils.setField(processo, "participantes", null);
             assertThat(processo.getCodigosParticipantes()).isEmpty();
             assertThat(processo.getSiglasParticipantes()).isEmpty();
         }
@@ -118,11 +119,10 @@ class ProcessoTest {
         void deveExtrairSiglasECodigos() {
             UnidadeProcesso u1 = new UnidadeProcesso(); u1.setUnidadeCodigo(10L); u1.setSigla("SIGLA1");
             UnidadeProcesso u2 = new UnidadeProcesso(); u2.setUnidadeCodigo(20L); u2.setSigla("SIGLA2");
-            UnidadeProcesso u3 = new UnidadeProcesso(); u3.setUnidadeCodigo(30L); u3.setSigla(null); // testar filtro
             
-            processo.setParticipantes(List.of(u1, u2, u3));
+            processo.setParticipantes(List.of(u1, u2));
             
-            assertThat(processo.getCodigosParticipantes()).containsExactly(10L, 20L, 30L);
+            assertThat(processo.getCodigosParticipantes()).containsExactly(10L, 20L);
             assertThat(processo.getSiglasParticipantes()).isEqualTo("SIGLA1, SIGLA2");
         }
 

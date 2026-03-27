@@ -8,7 +8,6 @@ import org.springframework.http.converter.*;
 import org.springframework.security.access.*;
 import org.springframework.web.bind.*;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.*;
 import org.springframework.web.servlet.mvc.method.annotation.*;
 import sgc.seguranca.sanitizacao.*;

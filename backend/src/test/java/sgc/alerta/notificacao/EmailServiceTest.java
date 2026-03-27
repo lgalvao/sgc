@@ -14,6 +14,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@SuppressWarnings("NullAway.Init")
 class EmailServiceTest {
     private static final int LIMITE_CONTEUDO_NOTIFICACAO = 500;
     private static final int TAMANHO_CORPO_LONGO = 600;

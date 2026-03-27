@@ -26,6 +26,7 @@ import static sgc.processo.model.TipoProcesso.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("ProcessoService - Cobertura de Testes")
+@SuppressWarnings("NullAway.Init")
 class ProcessoServiceCoverageTest {
     @Mock private ProcessoRepo processoRepo;
     @Mock private ComumRepo repo;

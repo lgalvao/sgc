@@ -30,7 +30,7 @@ async function main() {
         sourceFiles.forEach(sf => {
             const metrics = getMetrics(sf);
             if (metrics.lineCoverage < 100 || metrics.branchCoverage < 100) {
-                const actionScore = (metrics.missedLines * 1) + (metrics.missedBranches * 2) + (metrics.complexity * 0.5);
+                const actionScore = (metrics.missedLines) + (metrics.missedBranches * 2) + (metrics.complexity * 0.5);
                 allStats.push({ className: pkgName + '.' + sf.$.name.replace('.java', ''), ...metrics, actionScore });
             }
         });

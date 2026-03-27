@@ -150,7 +150,11 @@ public class MapaSalvamentoService {
 
             for (Long codAtividade : dto.atividadesCodigos()) {
                 validarAtividadePertenceAoMapa(codAtividade, contexto.codigosAtividadesDoMapa, contexto.codMapa);
-                mapAtividadeCompetencias.get(codAtividade).add(competencia);
+                Set<Competencia> competencias = mapAtividadeCompetencias.get(codAtividade);
+                if (competencias == null) {
+                    throw new IllegalStateException("Atividade %d sem estrutura de associação preparada".formatted(codAtividade));
+                }
+                competencias.add(competencia);
             }
         }
 
@@ -166,7 +170,7 @@ public class MapaSalvamentoService {
 
     private void aplicarAssociacoes(List<Atividade> atividades, Map<Long, Set<Competencia>> mapAtividadeCompetencias) {
         for (Atividade atividade : atividades) {
-            Set<Competencia> novasCompetencias = mapAtividadeCompetencias.get(atividade.getCodigo());
+            Set<Competencia> novasCompetencias = mapAtividadeCompetencias.getOrDefault(atividade.getCodigo(), Set.of());
             atividade.setCompetencias(novasCompetencias);
             for (Competencia competencia : novasCompetencias) {
                 competencia.getAtividades().add(atividade);
@@ -198,3 +202,5 @@ public class MapaSalvamentoService {
     }
 
 }
+
+

@@ -116,12 +116,20 @@ public class LoginFacade {
                 .filter(a -> a.getUnidade().getSituacao() == SituacaoUnidade.ATIVA)
                 .map(atribuicao -> new PerfilUnidadeDto(
                         atribuicao.getPerfil(),
-                        UnidadeDto.fromEntity(atribuicao.getUnidade())))
+                        toUnidadeDtoObrigatoria(atribuicao.getUnidade())))
                 .toList();
     }
 
     private String mascarar(String valor) {
         if (valor.length() <= 4) return "***";
         return "***" + valor.substring(valor.length() - 4);
+    }
+
+    private UnidadeDto toUnidadeDtoObrigatoria(Unidade unidade) {
+        UnidadeDto dto = UnidadeDto.fromEntity(unidade);
+        if (dto == null) {
+            throw new IllegalStateException("Unidade ausente na autorização de login");
+        }
+        return dto;
     }
 }

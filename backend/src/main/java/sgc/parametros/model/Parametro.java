@@ -14,6 +14,7 @@ import sgc.comum.model.*;
 @Setter
 @NoArgsConstructor
 @SuperBuilder
+@SuppressWarnings("NullAway.Init")
 public class Parametro extends EntidadeBase {
     @JsonView(ConfiguracaoViews.Publica.class)
     @Column(name = "chave", length = 50, nullable = false)

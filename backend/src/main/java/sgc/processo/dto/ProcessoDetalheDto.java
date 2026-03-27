@@ -58,9 +58,9 @@ public class ProcessoDetalheDto {
             return UnidadeParticipanteDto.builder()
                     .nome(unidade.getNome())
                     .sigla(unidade.getSigla())
-                    .codUnidade(unidade.getCodigoPersistido())
+                    .codUnidade(unidade.getCodigo())
                     .codUnidadeSuperior(unidade.getUnidadeSuperior() != null
-                            ? unidade.getUnidadeSuperior().getCodigoPersistido()
+                            ? unidade.getUnidadeSuperior().getCodigo()
                             : null)
                     .filhos(new ArrayList<>())
                     .build();
@@ -77,4 +77,5 @@ public class ProcessoDetalheDto {
         }
     }
 }
+
 

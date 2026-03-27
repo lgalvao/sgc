@@ -4,7 +4,6 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
-import org.mockito.quality.*;
 import org.springframework.security.core.*;
 import sgc.alerta.*;
 import sgc.comum.erros.*;
@@ -27,8 +26,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = Strictness.LENIENT)
 @DisplayName("ProcessoService Extra Coverage Test")
+@SuppressWarnings("NullAway.Init")
 class ProcessoServiceExtraCoverageTest {
 
     @InjectMocks
@@ -136,7 +135,7 @@ class ProcessoServiceExtraCoverageTest {
             p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
             when(repo.buscar(Processo.class, 1L)).thenReturn(p);
 
-            AtualizarProcessoRequest req = new AtualizarProcessoRequest(1L, "desc", TipoProcesso.MAPEAMENTO, null, List.of());
+            AtualizarProcessoRequest req = new AtualizarProcessoRequest(1L, "desc", TipoProcesso.MAPEAMENTO, LocalDateTime.now().plusDays(1), List.of());
 
             assertThrows(ErroValidacao.class, () -> processoService.atualizar(1L, req));
         }
@@ -152,7 +151,7 @@ class ProcessoServiceExtraCoverageTest {
             u.setTipo(TipoUnidade.INTERMEDIARIA);
             when(unidadeService.buscarPorCodigo(1L)).thenReturn(u);
 
-            AtualizarProcessoRequest req = new AtualizarProcessoRequest(1L, "desc", TipoProcesso.MAPEAMENTO, null, List.of(1L));
+            AtualizarProcessoRequest req = new AtualizarProcessoRequest(1L, "desc", TipoProcesso.MAPEAMENTO, LocalDateTime.now().plusDays(1), List.of(1L));
 
             assertThrows(ErroValidacao.class, () -> processoService.atualizar(1L, req));
         }
@@ -172,7 +171,7 @@ class ProcessoServiceExtraCoverageTest {
 
             when(processoRepo.saveAndFlush(p)).thenReturn(p);
 
-            AtualizarProcessoRequest req = new AtualizarProcessoRequest(1L, "desc2", TipoProcesso.MAPEAMENTO, null, List.of(1L));
+            AtualizarProcessoRequest req = new AtualizarProcessoRequest(1L, "desc2", TipoProcesso.MAPEAMENTO, LocalDateTime.now().plusDays(1), List.of(1L));
 
             Processo res = processoService.atualizar(1L, req);
 

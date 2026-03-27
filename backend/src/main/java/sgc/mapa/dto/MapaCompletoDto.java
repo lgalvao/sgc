@@ -20,10 +20,11 @@ public record MapaCompletoDto(
                 .toList();
 
         return new MapaCompletoDto(
-                mapa.getCodigoPersistido(),
-                subprocesso != null ? subprocesso.getCodigoPersistido() : null,
+                mapa.getCodigo(),
+                subprocesso.getCodigo(),
                 mapa.getObservacoesDisponibilizacao(),
                 competencias,
                 null);
     }
 }
+

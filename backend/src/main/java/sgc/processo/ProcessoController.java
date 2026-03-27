@@ -110,7 +110,7 @@ public class ProcessoController {
         List<ProcessoDetalheDto.UnidadeParticipanteDto> dtos = processo.getParticipantes().stream()
                 .map(snapshot -> {
                     ProcessoDetalheDto.UnidadeParticipanteDto dto = ProcessoDetalheDto.UnidadeParticipanteDto.fromSnapshot(snapshot);
-                    Subprocesso subprocesso = subprocessosPorUnidade.get(snapshot.getUnidadeCodigo());
+                    Subprocesso subprocesso = subprocessosPorUnidade.get(snapshot.getUnidadeCodigoPersistido());
                     if (subprocesso != null) {
                         dto.setSituacaoSubprocesso(subprocesso.getSituacao());
                         dto.setDataLimite(subprocesso.getDataLimiteEtapa1());
@@ -217,3 +217,4 @@ public class ProcessoController {
         return ResponseEntity.ok().build();
     }
 }
+

@@ -17,7 +17,6 @@ import org.springframework.security.core.authority.*;
 import org.springframework.security.core.context.*;
 import org.springframework.transaction.annotation.*;
 import org.springframework.web.bind.annotation.*;
-import sgc.comum.model.*;
 import sgc.comum.erros.*;
 import sgc.mapa.model.*;
 import sgc.organizacao.*;
@@ -256,10 +255,10 @@ public class E2eController {
     @JsonView(ProcessoViews.Publica.class)
     public Processo criarProcessoFinalizadoComAtividades(@RequestBody ProcessoFixtureRequest request) {
         Processo processo = executeAsAdmin(() -> criarProcessoFixture(request, TipoProcesso.MAPEAMENTO));
-        Long codProcesso = processo.getCodigoPersistido();
+        Long codProcesso = processo.getCodigo();
         
         Unidade unidade = unidadeService.buscarPorSigla(request.unidadeSigla());
-        Long codUnidade = unidade.getCodigoPersistido();
+        Long codUnidade = unidade.getCodigo();
 
         Long codSubprocesso = subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(codProcesso, codUnidade)
                 .map(Subprocesso::getCodigo)
@@ -280,7 +279,7 @@ public class E2eController {
 
         // Atualizar status para simular finalização
         setSituacaoSubprocesso(codSubprocesso, SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
-        setSituacaoProcesso(codProcesso, SituacaoProcesso.FINALIZADO);
+        setSituacaoProcesso(codProcesso);
 
         // Tornar mapa vigente na unidade
         jdbcTemplate.update("DELETE FROM sgc.unidade_mapa WHERE unidade_codigo = ?", codUnidade);
@@ -319,13 +318,13 @@ public class E2eController {
         Processo processo = criarProcessoMapeamentoComMapaNaSituacao(request, "MAPEAMENTO_MAPA_COM_SUGESTOES");
         Unidade unidade = unidadeService.buscarPorSigla(request.unidadeSigla());
         Long codSubprocesso = subprocessoRepo
-                .findByProcessoCodigoAndUnidadeCodigo(processo.getCodigoPersistido(), unidade.getCodigoPersistido())
+                .findByProcessoCodigoAndUnidadeCodigo(processo.getCodigo(), unidade.getCodigo())
                 .map(Subprocesso::getCodigo)
                 .orElseThrow();
         Mapa mapa = mapaRepo.buscarPorSubprocesso(codSubprocesso).orElseThrow();
         mapa.setSugestoes("Sugestão de ajuste na competência via fixture E2E");
         mapaRepo.save(mapa);
-        return processoService.buscarPorCodigo(processo.getCodigoPersistido());
+        return processoService.buscarPorCodigo(processo.getCodigo());
     }
 
     /**
@@ -391,7 +390,7 @@ public class E2eController {
     }
 
     private Processo criarProcessoMapeamentoComMapaNaSituacao(ProcessoFixtureRequest request, String situacaoSubprocesso) {
-        return criarProcessoNaSituacao(request, TipoProcesso.MAPEAMENTO, situacaoSubprocesso);
+        return criarProcessoNaSituacao(request, situacaoSubprocesso);
     }
 
     private Processo criarProcessoRevisaoCadastroDisponibilizadoFixture(ProcessoFixtureRequest request) {
@@ -402,7 +401,7 @@ public class E2eController {
                 "Mapa base fixture " + System.currentTimeMillis(), request.unidadeSigla(), true, diasLimite);
         Processo processoMapeamento = criarProcessoFixture(requestMapeamento, TipoProcesso.MAPEAMENTO);
         Long codSubprocessoMapeamento = subprocessoRepo
-                .findByProcessoCodigoAndUnidadeCodigo(processoMapeamento.getCodigoPersistido(), unidade.getCodigoPersistido())
+                .findByProcessoCodigoAndUnidadeCodigo(processoMapeamento.getCodigo(), unidade.getCodigo())
                 .map(Subprocesso::getCodigo)
                 .orElseThrow();
         Long codMapaVigente = mapaRepo.buscarPorSubprocesso(codSubprocessoMapeamento)
@@ -413,36 +412,36 @@ public class E2eController {
         inserirAtividadeComConhecimento(codMapaVigente, "Atividade fixture 2", "Conhecimento fixture 2A");
 
         setSituacaoSubprocesso(codSubprocessoMapeamento, SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
-        setSituacaoProcesso(processoMapeamento.getCodigoPersistido(), SituacaoProcesso.FINALIZADO);
-        jdbcTemplate.update("DELETE FROM sgc.unidade_mapa WHERE unidade_codigo = ?", unidade.getCodigoPersistido());
+        setSituacaoProcesso(processoMapeamento.getCodigo());
+        jdbcTemplate.update("DELETE FROM sgc.unidade_mapa WHERE unidade_codigo = ?", unidade.getCodigo());
         jdbcTemplate.update("INSERT INTO sgc.unidade_mapa (unidade_codigo, mapa_vigente_codigo) VALUES (?, ?)",
-                unidade.getCodigoPersistido(), codMapaVigente);
+                unidade.getCodigo(), codMapaVigente);
 
         ProcessoFixtureRequest requestRevisao = new ProcessoFixtureRequest(
                 request.descricao(), request.unidadeSigla(), true, diasLimite);
         Processo processoRevisao = criarProcessoFixture(requestRevisao, TipoProcesso.REVISAO);
         Long codSubprocessoRevisao = subprocessoRepo
-                .findByProcessoCodigoAndUnidadeCodigo(processoRevisao.getCodigoPersistido(), unidade.getCodigoPersistido())
+                .findByProcessoCodigoAndUnidadeCodigo(processoRevisao.getCodigo(), unidade.getCodigo())
                 .map(Subprocesso::getCodigo)
                 .orElseThrow();
 
         setSituacaoSubprocesso(codSubprocessoRevisao, SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
-        registrarMovimentacaoFixture(codSubprocessoRevisao, unidade.getCodigoPersistido(),
-                obterUnidadeSuperiorObrigatoria(unidade).getCodigoPersistido(),
+        registrarMovimentacaoFixture(codSubprocessoRevisao, unidade.getCodigo(),
+                obterUnidadeSuperiorObrigatoria(unidade).getCodigo(),
                 "Disponibilização da revisão do cadastro via fixture");
 
-        return processoService.buscarPorCodigo(processoRevisao.getCodigoPersistido());
+        return processoService.buscarPorCodigo(processoRevisao.getCodigo());
     }
 
-    private Processo criarProcessoNaSituacao(ProcessoFixtureRequest request, TipoProcesso tipo, String situacaoSubprocesso) {
+    private Processo criarProcessoNaSituacao(ProcessoFixtureRequest request, String situacaoSubprocesso) {
         ProcessoFixtureRequest requestIniciado = new ProcessoFixtureRequest(
                 request.descricao(), request.unidadeSigla(), true, request.diasLimite());
-        Processo processo = executeAsAdmin(() -> criarProcessoFixture(requestIniciado, tipo));
+        Processo processo = executeAsAdmin(() -> criarProcessoFixture(requestIniciado, TipoProcesso.MAPEAMENTO));
 
-        Long codProcesso = processo.getCodigoPersistido();
+        Long codProcesso = processo.getCodigo();
         Unidade unidade = unidadeService.buscarPorSigla(request.unidadeSigla());
-        Long codSuperior = obterUnidadeSuperiorObrigatoria(unidade).getCodigoPersistido();
-        Long codUnidade = unidade.getCodigoPersistido();
+        Long codSuperior = obterUnidadeSuperiorObrigatoria(unidade).getCodigo();
+        Long codUnidade = unidade.getCodigo();
         Long codSubprocesso = subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(codProcesso, codUnidade)
                 .map(Subprocesso::getCodigo)
                 .orElseThrow();
@@ -486,10 +485,10 @@ public class E2eController {
                 request.descricao(), request.unidadeSigla(), true, request.diasLimite());
         Processo processo = criarProcessoFixture(requestIniciado, TipoProcesso.MAPEAMENTO);
 
-        Long codProcesso = processo.getCodigoPersistido();
+        Long codProcesso = processo.getCodigo();
         Unidade unidade = unidadeService.buscarPorSigla(request.unidadeSigla());
         Unidade admin = unidadeService.buscarPorSigla("ADMIN");
-        Long codSubprocesso = subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(codProcesso, unidade.getCodigoPersistido())
+        Long codSubprocesso = subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(codProcesso, unidade.getCodigo())
                 .map(Subprocesso::getCodigo)
                 .orElseThrow();
         Long codMapa = mapaRepo.buscarPorSubprocesso(codSubprocesso)
@@ -498,7 +497,7 @@ public class E2eController {
 
         inserirAtividadesFixtureMapaSemCompetencias(codMapa);
         setSituacaoSubprocesso(codSubprocesso, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
-        Long codAdmin = admin.getCodigoPersistido();
+        Long codAdmin = admin.getCodigo();
         registrarMovimentacaoFixture(codSubprocesso, codAdmin, codAdmin, "Cadastro homologado via fixture");
 
         return processoService.buscarPorCodigo(codProcesso);
@@ -514,7 +513,7 @@ public class E2eController {
         LocalDateTime agora = LocalDateTime.now();
 
         Processo processo = new Processo();
-        processo.setDescricao(descricaoFixture(request, TipoProcesso.REVISAO));
+        processo.setDescricao(descricaoFixture(request));
         processo.setTipo(TipoProcesso.REVISAO);
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
         processo.setDataCriacao(agora);
@@ -539,7 +538,7 @@ public class E2eController {
         subprocesso.setMapa(mapa);
         subprocessoRepo.saveAndFlush(subprocesso);
 
-        return processoService.buscarPorCodigo(processo.getCodigoPersistido());
+        return processoService.buscarPorCodigo(processo.getCodigo());
     }
 
     private Processo criarProcessoRevisaoCadastroHomologadoFixture(ProcessoFixtureRequest request) {
@@ -554,8 +553,8 @@ public class E2eController {
         ProcessoFixtureRequest requestMapeamento = new ProcessoFixtureRequest(
                 "Mapa base fixture " + System.currentTimeMillis(), request.unidadeSigla(), true, diasLimite);
         Processo processoMapeamento = criarProcessoFixture(requestMapeamento, TipoProcesso.MAPEAMENTO);
-        Long codProcessoMapeamento = processoMapeamento.getCodigoPersistido();
-        Long codSubprocessoMapeamento = subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(codProcessoMapeamento, unidade.getCodigoPersistido())
+        Long codProcessoMapeamento = processoMapeamento.getCodigo();
+        Long codSubprocessoMapeamento = subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(codProcessoMapeamento, unidade.getCodigo())
                 .map(Subprocesso::getCodigo)
                 .orElseThrow();
         Long codMapaVigente = mapaRepo.buscarPorSubprocesso(codSubprocessoMapeamento)
@@ -571,16 +570,16 @@ public class E2eController {
         inserirCompetenciaComAtividade(codMapaVigente, "Competência fixture 3", codAtividadeBase3);
 
         setSituacaoSubprocesso(codSubprocessoMapeamento, SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
-        setSituacaoProcesso(codProcessoMapeamento, SituacaoProcesso.FINALIZADO);
-        jdbcTemplate.update("DELETE FROM sgc.unidade_mapa WHERE unidade_codigo = ?", unidade.getCodigoPersistido());
+        setSituacaoProcesso(codProcessoMapeamento);
+        jdbcTemplate.update("DELETE FROM sgc.unidade_mapa WHERE unidade_codigo = ?", unidade.getCodigo());
         jdbcTemplate.update("INSERT INTO sgc.unidade_mapa (unidade_codigo, mapa_vigente_codigo) VALUES (?, ?)",
-                unidade.getCodigoPersistido(), codMapaVigente);
+                unidade.getCodigo(), codMapaVigente);
 
         ProcessoFixtureRequest requestRevisao = new ProcessoFixtureRequest(
                 request.descricao(), request.unidadeSigla(), true, diasLimite);
         Processo processoRevisao = criarProcessoFixture(requestRevisao, TipoProcesso.REVISAO);
-        Long codProcessoRevisao = processoRevisao.getCodigoPersistido();
-        Long codSubprocessoRevisao = subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(codProcessoRevisao, unidade.getCodigoPersistido())
+        Long codProcessoRevisao = processoRevisao.getCodigo();
+        Long codSubprocessoRevisao = subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(codProcessoRevisao, unidade.getCodigo())
                 .map(Subprocesso::getCodigo)
                 .orElseThrow();
         Long codMapaRevisao = mapaRepo.buscarPorSubprocesso(codSubprocessoRevisao)
@@ -605,7 +604,7 @@ public class E2eController {
 
         inserirAtividadeComConhecimento(codMapaRevisao, "Atividade nova revisão fixture", "Conhecimento novo");
         setSituacaoSubprocesso(codSubprocessoRevisao, SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
-        Long codAdmin = admin.getCodigoPersistido();
+        Long codAdmin = admin.getCodigo();
         registrarMovimentacaoFixture(codSubprocessoRevisao, codAdmin, codAdmin, "Revisão homologada via fixture");
 
         return processoService.buscarPorCodigo(codProcessoRevisao);
@@ -643,12 +642,12 @@ public class E2eController {
                 codSubprocesso, codOrigem, codDestino, TITULO_USUARIO_FIXTURE_ADMIN, LocalDateTime.now(), descricao);
     }
 
-    private String descricaoFixture(ProcessoFixtureRequest request, TipoProcesso tipo) {
+    private String descricaoFixture(ProcessoFixtureRequest request) {
         String descReq = request.descricao();
         if (descReq != null && !descReq.isBlank()) {
             return descReq;
         }
-        return "Processo fixture E2E " + tipo.name() + " " + System.currentTimeMillis();
+        return "Processo fixture E2E " + TipoProcesso.REVISAO.name() + " " + System.currentTimeMillis();
     }
 
     /**
@@ -694,14 +693,14 @@ public class E2eController {
                 .descricao(descricao)
                 .tipo(tipo)
                 .dataLimiteEtapa1(dataLimite)
-                .unidades(List.of(unidade.getCodigoPersistido()))
+                .unidades(List.of(unidade.getCodigo()))
                 .build();
 
         Processo processo = processoService.criar(criarReq);
 
         if (Boolean.TRUE.equals(request.iniciar())) {
-            List<Long> unidades = List.of(unidade.getCodigoPersistido());
-            Long processoCodigo = processo.getCodigoPersistido();
+            List<Long> unidades = List.of(unidade.getCodigo());
+            Long processoCodigo = processo.getCodigo();
             Usuario usuario = obterUsuarioParaIniciacao();
             processoService.iniciar(processoCodigo, unidades, usuario);
 
@@ -741,9 +740,9 @@ public class E2eController {
         return usuarioFacade.buscarPorLogin(login);
     }
 
-    private void setSituacaoProcesso(Long codProcesso, SituacaoProcesso situacao) {
+    private void setSituacaoProcesso(Long codProcesso) {
         Processo p = processoRepo.findById(codProcesso).orElseThrow();
-        p.setSituacao(situacao);
+        p.setSituacao(SituacaoProcesso.FINALIZADO);
         processoRepo.saveAndFlush(p);
     }
 
@@ -760,3 +759,4 @@ public class E2eController {
             @Nullable String descricao, String unidadeSigla, @Nullable Boolean iniciar, @Nullable Integer diasLimite) {
     }
 }
+

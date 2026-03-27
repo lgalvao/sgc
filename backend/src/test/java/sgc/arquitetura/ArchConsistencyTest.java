@@ -135,7 +135,7 @@ public class ArchConsistencyTest {
                 @Override
                 public void check(JavaMethod method, ConditionEvents events) {
                     try {
-                        if (contémEntidadeJpa(method.reflect().getGenericReturnType())) {
+                        if (contemEntidadeJpa(method.reflect().getGenericReturnType())) {
                             String mensagem = String.format(
                                     "Método %s.%s expõe entidade JPA no retorno HTTP: %s",
                                     method.getOwner().getSimpleName(), method.getName(), method.getDescription());
@@ -169,7 +169,7 @@ public class ArchConsistencyTest {
                         java.lang.reflect.Parameter[] parametros = metodoRefletido.getParameters();
                         for (java.lang.reflect.Parameter parametro : parametros) {
                             if (parametro.isAnnotationPresent(RequestBody.class)
-                                    && contémEntidadeJpa(parametro.getParameterizedType())) {
+                                    && contemEntidadeJpa(parametro.getParameterizedType())) {
                                 String mensagem = String.format(
                                         "Método %s.%s recebe entidade JPA em @RequestBody: %s",
                                         method.getOwner().getSimpleName(),
@@ -268,17 +268,17 @@ public class ArchConsistencyTest {
             .beFreeOfCycles()
             .allowEmptyShould(true);
 
-    private static boolean contémEntidadeJpa(Type tipo) {
+    private static boolean contemEntidadeJpa(Type tipo) {
         if (tipo instanceof Class<?> classe) {
             return classe.isAnnotationPresent(Entity.class);
         }
 
         if (tipo instanceof ParameterizedType parameterizedType) {
-            if (contémEntidadeJpa(parameterizedType.getRawType())) {
+            if (contemEntidadeJpa(parameterizedType.getRawType())) {
                 return true;
             }
             for (Type argumento : parameterizedType.getActualTypeArguments()) {
-                if (contémEntidadeJpa(argumento)) {
+                if (contemEntidadeJpa(argumento)) {
                     return true;
                 }
             }
@@ -287,12 +287,12 @@ public class ArchConsistencyTest {
 
         if (tipo instanceof WildcardType wildcardType) {
             for (Type upperBound : wildcardType.getUpperBounds()) {
-                if (contémEntidadeJpa(upperBound)) {
+                if (contemEntidadeJpa(upperBound)) {
                     return true;
                 }
             }
             for (Type lowerBound : wildcardType.getLowerBounds()) {
-                if (contémEntidadeJpa(lowerBound)) {
+                if (contemEntidadeJpa(lowerBound)) {
                     return true;
                 }
             }
@@ -300,7 +300,7 @@ public class ArchConsistencyTest {
         }
 
         if (tipo instanceof GenericArrayType genericArrayType) {
-            return contémEntidadeJpa(genericArrayType.getGenericComponentType());
+            return contemEntidadeJpa(genericArrayType.getGenericComponentType());
         }
 
         return false;

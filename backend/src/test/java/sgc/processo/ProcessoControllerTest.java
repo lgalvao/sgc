@@ -36,6 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @EnableMethodSecurity
 @Tag("integration")
 @DisplayName("ProcessoController")
+@SuppressWarnings("NullAway.Init")
 class ProcessoControllerTest {
     protected static final String API_PROCESSOS = "/api/processos";
     protected static final String API_PROCESSOS_1 = "/api/processos/1";
@@ -584,7 +585,7 @@ class ProcessoControllerTest {
             doThrow(new ErroValidacao("erro"))
                     .when(processoServiceMock).iniciar(anyLong(), anyList(), any());
 
-            ErroValidacao ex = assertThrows(ErroValidacao.class, () -> controller.iniciar(1L, req, null));
+            ErroValidacao ex = assertThrows(ErroValidacao.class, () -> controller.iniciar(1L, req, new Usuario()));
             assertEquals(HttpStatus.UNPROCESSABLE_CONTENT, ex.getStatus());
             assertEquals("erro", ex.getMessage());
         }

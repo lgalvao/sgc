@@ -69,8 +69,9 @@ public class SubprocessoController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<SubprocessoResumoDto> criar(@Valid @RequestBody CriarSubprocessoRequest request) {
         var salvo = subprocessoService.criarEntidade(request);
-        var subprocessoCriado = subprocessoService.buscarSubprocesso(salvo.getCodigo());
-        URI uri = URI.create("/api/subprocessos/%d".formatted(salvo.getCodigo()));
+        Long codSubprocesso = salvo.getCodigo();
+        var subprocessoCriado = subprocessoService.buscarSubprocesso(codSubprocesso);
+        URI uri = URI.create("/api/subprocessos/%d".formatted(codSubprocesso));
         return ResponseEntity.created(uri).body(SubprocessoResumoDto.fromEntity(subprocessoCriado));
     }
 
@@ -460,7 +461,7 @@ public class SubprocessoController {
             @PathVariable Long codSubprocesso,
             @RequestBody(required = false) TextoOpcionalRequest request,
             @AuthenticationPrincipal Usuario usuario) {
-        String observacoes = Optional.ofNullable(request)
+        String observacoes = Optional.of(request)
                 .map(TextoOpcionalRequest::texto)
                 .map(UtilSanitizacao::sanitizar)
                 .orElse(null);
@@ -475,7 +476,7 @@ public class SubprocessoController {
             @PathVariable Long codSubprocesso,
             @RequestBody(required = false) TextoOpcionalRequest request,
             @AuthenticationPrincipal Usuario usuario) {
-        String observacoes = Optional.ofNullable(request)
+        String observacoes = Optional.of(request)
                 .map(TextoOpcionalRequest::texto)
                 .map(UtilSanitizacao::sanitizar)
                 .orElse(null);
@@ -538,3 +539,4 @@ public class SubprocessoController {
         return subprocessoService.paraHistoricoDto(analise);
     }
 }
+

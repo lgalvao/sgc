@@ -15,8 +15,9 @@ public record AtividadeMapaDto(
                 .toList();
 
         return new AtividadeMapaDto(
-                atividade.getCodigoPersistido(),
+                atividade.getCodigo(),
                 atividade.getDescricao(),
                 conhecimentos);
     }
 }
+

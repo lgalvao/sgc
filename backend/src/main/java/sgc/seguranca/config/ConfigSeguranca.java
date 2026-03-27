@@ -3,6 +3,7 @@ package sgc.seguranca.config;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import lombok.*;
+import org.jspecify.annotations.NonNull;
 import org.springframework.context.annotation.*;
 import org.springframework.http.*;
 import org.springframework.security.access.expression.method.*;
@@ -95,9 +96,9 @@ public class ConfigSeguranca {
                         .xssProtection(HeadersConfigurer.XXssConfig::disable))
                 .addFilterAfter(new OncePerRequestFilter() {
                     @Override
-                    protected void doFilterInternal(HttpServletRequest request,
-                                                    HttpServletResponse response,
-                                                    FilterChain filterChain) throws ServletException, IOException {
+                    protected void doFilterInternal(@NonNull HttpServletRequest request,
+                                                    @NonNull HttpServletResponse response,
+                                                    @NonNull FilterChain filterChain) throws ServletException, IOException {
                         CsrfToken csrfToken = (CsrfToken) request.getAttribute(CsrfToken.class.getName());
                         if (csrfToken != null) {
                             csrfToken.getToken();

@@ -8,7 +8,8 @@ public record ConhecimentoResumoDto(
 
     public static ConhecimentoResumoDto fromEntity(Conhecimento conhecimento) {
         return new ConhecimentoResumoDto(
-                conhecimento.getCodigoPersistido(),
+                conhecimento.getCodigo(),
                 conhecimento.getDescricao());
     }
 }
+

@@ -213,7 +213,7 @@ class E2eControllerTest {
 
         var exception = Assertions.assertThrows(ErroConfiguracao.class, controller::resetDatabase);
         Assertions.assertNotNull(exception);
-        Assertions.assertTrue(exception.getMessage().contains("Arquivo seed.sql não encontrado"));
+        assertThat(exception).hasMessageContaining("Arquivo seed.sql não encontrado");
 
         verify(resourceLoader).getResource("file:../e2e/setup/seed.sql");
         verify(resourceLoader).getResource("file:e2e/setup/seed.sql");
@@ -344,7 +344,7 @@ class E2eControllerTest {
         E2eController controllerComErro = new E2eController(mockJdbc, namedJdbcTemplate, processoService, processoRepo, subprocessoRepo, mapaRepo, unidadeService, usuarioFacade, resourceLoader);
 
         var exception = Assertions.assertThrows(RuntimeException.class, () -> controllerComErro.limparProcessoCompleto(999L));
-        Assertions.assertTrue(exception.getMessage().contains("Falha na limpeza do processo"));
+        assertThat(exception).hasMessageContaining("Falha na limpeza do processo");
     }
 
     @Test

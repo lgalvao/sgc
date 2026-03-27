@@ -198,8 +198,12 @@ class UsuarioServiceTest {
             assertNotNull(result);
             assertTrue(result.containsKey(2L));
             assertTrue(result.containsKey(9L));
-            assertEquals(TITULO_CHEFE_UNIT2, result.get(2L).titularTitulo());
-            assertEquals("333333333333", result.get(9L).titularTitulo());
+            UnidadeResponsavelDto responsavel2 = result.get(2L);
+            UnidadeResponsavelDto responsavel9 = result.get(9L);
+            assertNotNull(responsavel2);
+            assertNotNull(responsavel9);
+            assertEquals(TITULO_CHEFE_UNIT2, responsavel2.titularTitulo());
+            assertEquals("333333333333", responsavel9.titularTitulo());
         }
     }
 
@@ -215,7 +219,7 @@ class UsuarioServiceTest {
             assertNotNull(result);
             assertFalse(result.isEmpty());
             assertTrue(result.stream()
-                    .anyMatch(p -> p.perfil().equals("CHEFE") && p.unidadeCodigo().equals(2L)));
+                    .anyMatch(p -> p.perfil().equals("CHEFE") && Objects.equals(p.unidadeCodigo(), 2L)));
         }
     }
 

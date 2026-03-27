@@ -65,13 +65,21 @@ public class UnidadeProcesso implements Serializable {
         snapshot.setTipo(unidade.getTipo());
         snapshot.setSituacao(unidade.getSituacao().name());
         snapshot.setUnidadeSuperiorCodigo(
-                unidade.getUnidadeSuperior() != null ? unidade.getUnidadeSuperior().getCodigoPersistido() : null
+                unidade.getUnidadeSuperior() != null ? unidade.getUnidadeSuperior().getCodigo() : null
         );
         return snapshot;
     }
 
     public @Nullable Long getUnidadeCodigo() {
         return codigo != null ? codigo.getUnidadeCodigo() : null;
+    }
+
+    public Long getUnidadeCodigoPersistido() {
+        Long unidadeCodigo = getUnidadeCodigo();
+        if (unidadeCodigo == null) {
+            throw new IllegalStateException("Snapshot de unidade sem codigo persistido");
+        }
+        return unidadeCodigo;
     }
 
     public void setUnidadeCodigo(Long unidadeCodigo) {
@@ -81,3 +89,4 @@ public class UnidadeProcesso implements Serializable {
         codigo.setUnidadeCodigo(unidadeCodigo);
     }
 }
+

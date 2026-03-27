@@ -15,32 +15,32 @@ public class HierarquiaService {
     private final UnidadeRepo unidadeRepo;
 
     public boolean isResponsavel(Unidade unidade, Usuario usuario) {
-        return responsabilidadeRepo.findById(unidade.getCodigoPersistido())
+        return responsabilidadeRepo.findById(unidade.getCodigo())
                 .map(resp -> Objects.equals(resp.getUsuarioTitulo(), usuario.getTituloEleitoral()))
                 .orElse(false);
     }
 
     public boolean isSubordinada(Unidade alvo, Unidade superior) {
-        Long codigoSuperiorAlvo = superior.getCodigoPersistido();
+        Long codigoSuperiorAlvo = superior.getCodigo();
 
         Unidade atual = alvo;
         while (atual != null) {
             Unidade proxSuperior = atual.getUnidadeSuperior();
             if (proxSuperior == null) break;
 
-            if (Objects.equals(codigoSuperiorAlvo, proxSuperior.getCodigoPersistido())) {
+            if (Objects.equals(codigoSuperiorAlvo, proxSuperior.getCodigo())) {
                 return true;
             }
             
             // Busca via repo para garantir que o próximo 'getUnidadeSuperior' funcione 
             // mesmo se estivermos lidando com proxies ou sessões parciais.
-            atual = unidadeRepo.findById(proxSuperior.getCodigoPersistido()).orElse(null);
+            atual = unidadeRepo.findById(proxSuperior.getCodigo()).orElse(null);
         }
         return false;
     }
 
     public boolean ehMesmaOuSubordinada(Unidade alvo, Unidade superior) {
-        if (Objects.equals(alvo.getCodigoPersistido(), superior.getCodigoPersistido())) return true;
+        if (Objects.equals(alvo.getCodigo(), superior.getCodigo())) return true;
 
         return isSubordinada(alvo, superior);
     }
@@ -50,6 +50,7 @@ public class HierarquiaService {
         if (superiorAlvo == null) {
             return false;
         }
-        return Objects.equals(superiorAlvo.getCodigoPersistido(), superior.getCodigoPersistido());
+        return Objects.equals(superiorAlvo.getCodigo(), superior.getCodigo());
     }
 }
+

@@ -14,6 +14,7 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("CopiaMapaService - Cobertura adicional")
+@SuppressWarnings("NullAway.Init")
 class CopiaMapaServiceCoverageTest {
 
     @Mock

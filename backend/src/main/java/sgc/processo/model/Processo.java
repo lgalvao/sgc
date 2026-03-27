@@ -82,7 +82,7 @@ public class Processo extends EntidadeBase {
                 .map(Unidade::getCodigo)
                 .collect(Collectors.toSet());
 
-        participantes.removeIf(up -> !novosCodigos.contains(up.getUnidadeCodigo()));
+        participantes.removeIf(up -> !novosCodigos.contains(up.getUnidadeCodigoPersistido()));
 
         adicionarParticipantes(novasUnidades);
     }
@@ -90,7 +90,7 @@ public class Processo extends EntidadeBase {
     public List<Long> getCodigosParticipantes() {
         if (participantes == null) return List.of();
         return participantes.stream()
-                .map(UnidadeProcesso::getUnidadeCodigo)
+                .map(UnidadeProcesso::getUnidadeCodigoPersistido)
                 .toList();
     }
 
@@ -105,3 +105,5 @@ public class Processo extends EntidadeBase {
                 .collect(Collectors.joining(", "));
     }
 }
+
+

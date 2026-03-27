@@ -22,11 +22,13 @@ public class SubprocessoValidacaoService {
     private final MapaManutencaoService mapaManutencaoService;
 
     public void validarExistenciaAtividades(Subprocesso subprocesso) {
-        if (subprocesso.getMapa() == null || subprocesso.getMapa().getCodigo() == null) {
+        Mapa mapa = subprocesso.getMapa();
+        if (mapa == null || mapa.getCodigo() == null) {
             throw new ErroValidacao(Mensagens.SUBPROCESSO_SEM_MAPA);
         }
 
-        List<Atividade> atividades = mapaManutencaoService.atividadesMapaCodigoComConhecimentos(subprocesso.getMapa().getCodigo());
+        Long codMapa = mapa.getCodigo();
+        List<Atividade> atividades = mapaManutencaoService.atividadesMapaCodigoComConhecimentos(codMapa);
         if (atividades.isEmpty()) {
             throw new ErroValidacao(Mensagens.MAPA_SEM_ATIVIDADES);
         }
@@ -63,7 +65,11 @@ public class SubprocessoValidacaoService {
     }
 
     public void validarMapaParaDisponibilizacao(Subprocesso subprocesso) {
-        Long codMapa = subprocesso.getMapa().getCodigo();
+        Mapa mapa = subprocesso.getMapa();
+        if (mapa == null) {
+            throw new ErroValidacao(Mensagens.SUBPROCESSO_SEM_MAPA);
+        }
+        Long codMapa = mapa.getCodigo();
         var competencias = mapaManutencaoService.competenciasCodMapa(codMapa);
 
         if (competencias.stream().anyMatch(c -> c.getAtividades().isEmpty())) {
@@ -94,7 +100,8 @@ public class SubprocessoValidacaoService {
     public ValidacaoCadastroDto validarCadastro(Subprocesso sp) {
         List<ValidacaoCadastroDto.Erro> erros = new ArrayList<>();
 
-        if (sp.getMapa() == null || sp.getMapa().getCodigo() == null) {
+        Mapa mapa = sp.getMapa();
+        if (mapa == null || mapa.getCodigo() == null) {
             erros.add(ValidacaoCadastroDto.Erro.builder()
                     .tipo("SEM_MAPA")
                     .mensagem("O subprocesso não possui mapa associado.")
@@ -105,7 +112,8 @@ public class SubprocessoValidacaoService {
                     .build();
         }
 
-        List<Atividade> atividades = mapaManutencaoService.atividadesMapaCodigoComConhecimentos(sp.getMapa().getCodigo());
+        Long codMapa = mapa.getCodigo();
+        List<Atividade> atividades = mapaManutencaoService.atividadesMapaCodigoComConhecimentos(codMapa);
         if (atividades.isEmpty()) {
             erros.add(ValidacaoCadastroDto.Erro.builder()
                     .tipo("SEM_ATIVIDADES")
@@ -228,3 +236,5 @@ public class SubprocessoValidacaoService {
         }
     }
 }
+
+

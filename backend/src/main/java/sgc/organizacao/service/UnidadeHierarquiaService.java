@@ -99,7 +99,7 @@ public class UnidadeHierarquiaService {
             return found.get();
         }
         Unidade u = repo.buscar(Unidade.class, codigo);
-        return UnidadeDto.fromEntity(u);
+        return toUnidadeDtoObrigatoria(u);
     }
 
     /**
@@ -137,7 +137,7 @@ public class UnidadeHierarquiaService {
      */
     public List<UnidadeDto> buscarSubordinadas(Long codUnidade) {
         return unidadeRepo.findByUnidadeSuperiorCodigo(codUnidade).stream()
-                .map(UnidadeDto::fromEntity)
+                .map(this::toUnidadeDtoObrigatoria)
                 .toList();
     }
 
@@ -152,15 +152,19 @@ public class UnidadeHierarquiaService {
 
         for (Unidade u : unidades) {
             boolean isElegivel = elegibilidadeChecker == null || elegibilidadeChecker.test(u);
-            UnidadeDto dto = UnidadeDto.fromEntity(u);
+            UnidadeDto dto = toUnidadeDtoObrigatoria(u);
             dto.setElegivel(isElegivel);
 
-            mapaUnidades.put(u.getCodigo(), dto);
-            mapaFilhas.putIfAbsent(u.getCodigo(), new ArrayList<>());
+            Long codigo = u.getCodigo();
+            mapaUnidades.put(codigo, dto);
+            mapaFilhas.putIfAbsent(codigo, new ArrayList<>());
         }
 
         for (Unidade u : unidades) {
             UnidadeDto dto = mapaUnidades.get(u.getCodigo());
+            if (dto == null) {
+                continue;
+            }
 
             Optional.ofNullable(u.getUnidadeSuperior()).ifPresentOrElse(
                     superior -> {
@@ -229,4 +233,13 @@ public class UnidadeHierarquiaService {
         resultado.add(unidade.getSigla());
         unidade.getSubunidades().forEach(filha -> coletarSiglas(filha, resultado));
     }
+
+    private UnidadeDto toUnidadeDtoObrigatoria(Unidade unidade) {
+        UnidadeDto dto = UnidadeDto.fromEntity(unidade);
+        if (dto == null) {
+            throw new IllegalStateException("Unidade ausente ao montar hierarquia");
+        }
+        return dto;
+    }
 }
+

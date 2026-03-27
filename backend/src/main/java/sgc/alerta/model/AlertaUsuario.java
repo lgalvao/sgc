@@ -3,6 +3,7 @@ package sgc.alerta.model;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.*;
+import org.jspecify.annotations.*;
 import sgc.organizacao.model.*;
 
 import java.io.*;
@@ -39,8 +40,8 @@ public class AlertaUsuario implements Serializable {
             updatable = false)
     private Usuario usuario;
 
-    @Column(name = "data_hora_leitura", nullable = false)
-    private LocalDateTime dataHoraLeitura;
+    @Column(name = "data_hora_leitura")
+    private @Nullable LocalDateTime dataHoraLeitura;
 
     /**
      * Chave primária composta para a entidade {@link AlertaUsuario}.

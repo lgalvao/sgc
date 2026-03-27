@@ -25,7 +25,7 @@
     A data limite da etapa atual no processo [DESCRICAO_PROCESSO] foi alterada para [NOVA_DATA_LIMITE].
     ```
 
-8. O sistema cria internamente um alerta com as seguintes informações:
+7. O sistema cria internamente um alerta com as seguintes informações:
 
     - `Descrição`: "Data limite da etapa [NÚMERO_ETAPA] alterada para [NOVA_DATA_LIMITE]"
     - `Processo`: [DESCRICAO_PROCESSO]
@@ -33,4 +33,4 @@
     - `Unidade de origem`: 'ADMIN'
     - `Unidade de destino`: [SIGLA_UNIDADE_SUBPROCESSO]
 
-9. O sistema fecha o modal e mostra uma mensagem de confirmação "Data limite alterada".
+8. O sistema fecha o modal e mostra uma mensagem de confirmação "Data limite alterada".

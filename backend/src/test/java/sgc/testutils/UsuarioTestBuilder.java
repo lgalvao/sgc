@@ -54,9 +54,6 @@ public class UsuarioTestBuilder {
         Usuario usuario = new Usuario();
         usuario.setTituloEleitoral(tituloEleitoral);
         usuario.setNome(nome);
-        if (unidadeLotacao != null) {
-            usuario.setUnidadeLotacao(unidadeLotacao);
-        }
         return usuario;
     }
 }

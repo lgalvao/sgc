@@ -45,9 +45,7 @@ public class TestSecurityConfig {
                         .anyRequest().permitAll())
                 .exceptionHandling(e -> e.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)));
 
-        if (filtroJwt != null) {
-            http.addFilterBefore(filtroJwt, UsernamePasswordAuthenticationFilter.class);
-        }
+        http.addFilterBefore(filtroJwt, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

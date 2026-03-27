@@ -15,8 +15,9 @@ public record CompetenciaMapaDto(
                 .toList();
 
         return new CompetenciaMapaDto(
-                competencia.getCodigoPersistido(),
+                competencia.getCodigo(),
                 competencia.getDescricao(),
                 atividades);
     }
 }
+

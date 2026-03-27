@@ -1,6 +1,7 @@
 package sgc.subprocesso.dto;
 
 import lombok.*;
+import org.jspecify.annotations.*;
 
 import java.util.*;
 
@@ -18,8 +19,8 @@ public record ValidacaoCadastroDto(
     @Builder
     public record Erro(
             String tipo,
-            Long atividadeCodigo,
-            String descricaoAtividade,
+            @Nullable Long atividadeCodigo,
+            @Nullable String descricaoAtividade,
             String mensagem
     ) {
     }

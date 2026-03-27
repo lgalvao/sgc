@@ -19,6 +19,7 @@ import static org.mockito.Mockito.*;
 import static sgc.seguranca.AcaoPermissao.*;
 
 @ExtendWith(MockitoExtension.class)
+@SuppressWarnings("NullAway.Init")
 class ImpactoMapaServiceTest {
     @Mock
     private MapaRepo mapaRepo;

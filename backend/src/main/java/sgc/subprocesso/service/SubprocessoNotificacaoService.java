@@ -1,6 +1,7 @@
 package sgc.subprocesso.service;
 
 import lombok.*;
+import org.jspecify.annotations.*;
 import org.springframework.stereotype.*;
 import org.thymeleaf.context.*;
 import org.thymeleaf.spring6.*;
@@ -58,9 +59,10 @@ public class SubprocessoNotificacaoService {
 
     private void enviarNotificacaoDireta(NotificacaoCommand cmd, Map<String, Object> variaveis) {
         TipoTransicao tipo = cmd.tipoTransicao();
+        String templateEmail = obterTemplateObrigatorio(tipo.getTemplateEmail(), "e-mail direto");
 
         String assunto = criarAssunto(tipo, cmd.subprocesso(), false);
-        String corpo = processarTemplate(tipo.getTemplateEmail(), variaveis);
+        String corpo = processarTemplate(templateEmail, variaveis);
         String emailUnidade = getEmailUnidade(cmd.unidadeDestino());
 
         emailService.enviarEmailHtml(emailUnidade, assunto, corpo);
@@ -81,7 +83,7 @@ public class SubprocessoNotificacaoService {
         String assunto = criarAssunto(cmd.tipoTransicao(), cmd.subprocesso(), true);
 
         while (superior != null) {
-            if (superior.getCodigo().equals(cmd.unidadeDestino().getCodigo())) {
+            if (Objects.equals(superior.getCodigo(), cmd.unidadeDestino().getCodigo())) {
                 superior = superior.getUnidadeSuperior();
                 continue;
             }
@@ -89,7 +91,8 @@ public class SubprocessoNotificacaoService {
             Map<String, Object> variaveis = new HashMap<>(variaveisBase);
             variaveis.put("siglaUnidadeSuperior", superior.getSigla());
 
-            String corpo = processarTemplate(cmd.tipoTransicao().getTemplateEmailSuperior(), variaveis);
+            String templateEmailSuperior = obterTemplateObrigatorio(cmd.tipoTransicao().getTemplateEmailSuperior(), "e-mail superior");
+            String corpo = processarTemplate(templateEmailSuperior, variaveis);
             String emailSuperior = getEmailUnidade(superior);
 
             emailService.enviarEmailHtml(emailSuperior, assunto, corpo);
@@ -148,4 +151,12 @@ public class SubprocessoNotificacaoService {
         context.setVariables(variables);
         return templateEngine.process(templateName, context);
     }
+
+    private String obterTemplateObrigatorio(@Nullable String template, String contexto) {
+        if (template == null || template.isBlank()) {
+            throw new IllegalStateException("Template ausente para %s".formatted(contexto));
+        }
+        return template;
+    }
 }
+

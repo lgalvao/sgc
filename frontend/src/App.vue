@@ -18,8 +18,8 @@ const version = (pkg as PackageJson).version;
 
 const shouldShowNavBarExtras = computed(() => {
   if (route.path === "/login") return false;
-  if (route.path === "/painel") return false;
-  return true;
+  return route.path !== "/painel";
+
 });
 </script>
 
