@@ -21,8 +21,12 @@ import static org.mockito.Mockito.*;
 @DisplayName("RestExceptionHandler - Cobertura de Testes")
 class RestExceptionHandlerCoverageTest {
 
-    @InjectMocks
     private RestExceptionHandler target;
+
+    @BeforeEach
+    void setUp() {
+        target = new RestExceptionHandler();
+    }
 
     private HttpMessageNotWritableException createEx() {
         return new HttpMessageNotWritableException("Erro de escrita");
@@ -60,10 +64,11 @@ class RestExceptionHandlerCoverageTest {
         Exception causaRaiz = new RuntimeException("Raiz");
         Exception causaMeio = new RuntimeException("Meio", causaRaiz);
         Exception ex = new RuntimeException("Topo", causaMeio);
+        WebRequest request = mock(WebRequest.class);
         
         target.handleHttpMessageNotWritable(
                 new HttpMessageNotWritableException("Erro", ex), 
-                null, HttpStatus.INTERNAL_SERVER_ERROR, null);
+                null, HttpStatus.INTERNAL_SERVER_ERROR, request);
     }
 
     @Test
@@ -76,11 +81,13 @@ class RestExceptionHandlerCoverageTest {
         ErroNegocioBase ex = new ErroNegocioBase("Mensagem Erro", "COD_400", HttpStatus.BAD_REQUEST, details) {};
         
         ResponseEntity<ErroApi> response = target.handleErroNegocio(ex);
+        ErroApi corpo = response.getBody();
         
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(response.getBody().getMessage()).isEqualTo("Mensagem Erro");
+        assertThat(corpo).isNotNull();
+        assertThat(corpo.getMessage()).isEqualTo("Mensagem Erro");
         
-        Map<String, Object> responseDetails = (Map<String, Object>) response.getBody().getDetails();
+        Map<String, Object> responseDetails = (Map<String, Object>) corpo.getDetails();
         assertThat(responseDetails).containsEntry("campo", "erro no campo");
     }
 
@@ -100,8 +107,10 @@ class RestExceptionHandlerCoverageTest {
         Exception ex = new NullPointerException(); 
         
         ResponseEntity<ErroApi> response = target.handleGenericException(ex);
+        ErroApi corpo = response.getBody();
         
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
-        assertThat(response.getBody().getMessage()).contains("NullPointerException");
+        assertThat(corpo).isNotNull();
+        assertThat(corpo.getMessage()).contains("NullPointerException");
     }
 }

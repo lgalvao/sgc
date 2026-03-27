@@ -249,6 +249,27 @@ class ProcessoControllerTest {
             mockMvc.perform(get(API_PROCESSOS_1))
                     .andExpect(status().isForbidden());
         }
+
+        @Test
+        @WithMockUser(roles = "GESTOR")
+        @DisplayName("Deve aceitar ação em bloco sem data limite quando ação não exigir prazo")
+        void deveAceitarAcaoEmBlocoSemDataLimiteQuandoAcaoNaoExigirPrazo() throws Exception {
+            mockMvc.perform(post("/api/processos/1/acao-em-bloco")
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content("""
+                                    {
+                                      "unidadeCodigos": [10],
+                                      "acao": "ACEITAR"
+                                    }
+                                    """))
+                    .andExpect(status().isOk());
+
+            verify(processoService).executarAcaoEmBloco(eq(1L), argThat(req ->
+                    req.unidadeCodigos().equals(List.of(10L))
+                            && req.acao() == AcaoProcesso.ACEITAR
+                            && req.dataLimite() == null));
+        }
     }
 
     @Nested

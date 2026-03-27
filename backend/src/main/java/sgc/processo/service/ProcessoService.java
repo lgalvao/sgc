@@ -261,6 +261,9 @@ public class ProcessoService {
             if (!permissionEvaluator.verificarPermissao(usuario, subprocessos, DISPONIBILIZAR_MAPA)) {
                 throw new ErroAcessoNegado(Mensagens.SEM_PERMISSAO_DISPONIBILIZAR);
             }
+            if (req.dataLimite() == null) {
+                throw new ErroValidacao(Mensagens.DATA_LIMITE_OBRIGATORIA);
+            }
             DisponibilizarMapaRequest dispReq = new DisponibilizarMapaRequest(req.dataLimite(), "Disponibilização em bloco");
             transicaoService.disponibilizarMapaEmBloco(subprocessos.stream().map(Subprocesso::getCodigo).toList(), dispReq, usuario);
             return;

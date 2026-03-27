@@ -1,5 +1,6 @@
 package sgc.processo.dto;
 
+import com.fasterxml.jackson.databind.*;
 import jakarta.validation.*;
 import org.junit.jupiter.api.*;
 import sgc.processo.model.*;
@@ -13,17 +14,27 @@ import static org.assertj.core.api.Assertions.*;
 class CriarProcessoRequestValidationTest {
     private ValidatorFactory factory;
     private Validator validator;
+    private ObjectMapper objectMapper;
 
     @BeforeEach
     void setUp() {
         factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
+        objectMapper = new ObjectMapper().findAndRegisterModules();
     }
 
     @AfterEach
     void tearDown() {
         if (factory != null) {
             factory.close();
+        }
+    }
+
+    private CriarProcessoRequest desserializarRequisicao(String json) {
+        try {
+            return objectMapper.readValue(json, CriarProcessoRequest.class);
+        } catch (Exception e) {
+            throw new AssertionError("Falha ao desserializar requisição de teste", e);
         }
     }
 
@@ -107,12 +118,14 @@ class CriarProcessoRequestValidationTest {
         @Test
         @DisplayName("Deve rejeitar data limite nula")
         void deveRejeitarDataLimiteNula() {
-            CriarProcessoRequest req = CriarProcessoRequest.builder()
-                    .descricao("Processo teste")
-                    .tipo(TipoProcesso.MAPEAMENTO)
-                    .dataLimiteEtapa1(null)
-                    .unidades(List.of(1L))
-                    .build();
+            CriarProcessoRequest req = desserializarRequisicao("""
+                    {
+                      "descricao": "Processo teste",
+                      "tipo": "MAPEAMENTO",
+                      "dataLimiteEtapa1": null,
+                      "unidades": [1]
+                    }
+                    """);
 
             Set<ConstraintViolation<CriarProcessoRequest>> violations = validator.validate(req);
 
@@ -164,12 +177,14 @@ class CriarProcessoRequestValidationTest {
         @Test
         @DisplayName("Deve rejeitar lista de unidades nula")
         void deveRejeitarUnidadesNulas() {
-            CriarProcessoRequest req = CriarProcessoRequest.builder()
-                    .descricao("Processo teste")
-                    .tipo(TipoProcesso.MAPEAMENTO)
-                    .dataLimiteEtapa1(LocalDateTime.now().plusDays(30))
-                    .unidades(null)
-                    .build();
+            CriarProcessoRequest req = desserializarRequisicao("""
+                    {
+                      "descricao": "Processo teste",
+                      "tipo": "MAPEAMENTO",
+                      "dataLimiteEtapa1": "2030-12-31T10:00:00",
+                      "unidades": null
+                    }
+                    """);
 
             Set<ConstraintViolation<CriarProcessoRequest>> violations = validator.validate(req);
 
@@ -204,12 +219,14 @@ class CriarProcessoRequestValidationTest {
         @Test
         @DisplayName("Deve reportar todas as violações quando múltiplos campos são inválidos")
         void deveReportarTodasViolacoes() {
-            CriarProcessoRequest req = CriarProcessoRequest.builder()
-                    .descricao(null)
-                    .tipo(null)
-                    .dataLimiteEtapa1(null)
-                    .unidades(null)
-                    .build();
+            CriarProcessoRequest req = desserializarRequisicao("""
+                    {
+                      "descricao": null,
+                      "tipo": null,
+                      "dataLimiteEtapa1": null,
+                      "unidades": null
+                    }
+                    """);
 
             Set<ConstraintViolation<CriarProcessoRequest>> violations = validator.validate(req);
 

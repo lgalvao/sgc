@@ -16,6 +16,6 @@ public class TestSecurityController {
     static class TestDto {
         @Size(min = 5)
         @JsonProperty("dadoSensivel")
-        public String dadoSensivel;
+        public String dadoSensivel = "";
     }
 }

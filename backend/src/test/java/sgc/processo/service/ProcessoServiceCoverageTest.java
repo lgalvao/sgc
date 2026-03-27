@@ -5,6 +5,7 @@ import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
 import sgc.alerta.*;
+import sgc.comum.*;
 import sgc.comum.erros.*;
 import sgc.comum.model.*;
 import sgc.organizacao.*;
@@ -57,6 +58,24 @@ class ProcessoServiceCoverageTest {
 
         assertThatThrownBy(() -> target.executarAcaoEmBloco(codProcesso, req))
                 .isInstanceOf(ErroAcessoNegado.class);
+    }
+
+    @Test
+    @DisplayName("executarAcaoEmBloco deve exigir data limite ao disponibilizar")
+    void deveExigirDataLimiteAoDisponibilizar() {
+        Long codProcesso = 100L;
+        AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(List.of(1L), DISPONIBILIZAR, null);
+
+        Subprocesso sp = mock(Subprocesso.class);
+        Usuario usuario = new Usuario();
+        when(subprocessoService.listarEntidadesPorProcessoEUnidades(eq(codProcesso), anyList()))
+                .thenReturn(List.of(sp));
+        when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+        when(permissionEvaluator.verificarPermissao(any(), anyList(), any())).thenReturn(true);
+
+        assertThatThrownBy(() -> target.executarAcaoEmBloco(codProcesso, req))
+                .isInstanceOf(ErroValidacao.class)
+                .hasMessage(Mensagens.DATA_LIMITE_OBRIGATORIA);
     }
 
     @Test
