@@ -159,6 +159,18 @@ class UsuarioFacadeTest {
         }
 
         @Test
+        @DisplayName("Deve buscar responsável atual delegando ao service")
+        void deveBuscarResponsavelAtual() {
+            Usuario usuario = criarUsuario("999");
+            when(responsavelUnidadeService.buscarResponsavelAtual("UNI")).thenReturn(usuario);
+
+            Usuario resultado = facade.buscarResponsavelAtual("UNI");
+
+            assertThat(resultado).isSameAs(usuario);
+            verify(responsavelUnidadeService).buscarResponsavelAtual("UNI");
+        }
+
+        @Test
         @DisplayName("Deve buscar perfis filtrando unidades inativas")
         void deveBuscarPerfisFiltrandoInativos() {
             String titulo = "123";

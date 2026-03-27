@@ -7,6 +7,7 @@ import org.mockito.junit.jupiter.*;
 import sgc.mapa.*;
 import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
+import sgc.comum.erros.*;
 import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 import sgc.seguranca.*;
@@ -124,6 +125,41 @@ class AtividadeFacadeTest {
             AtividadeOperacaoResponse result = atividadeFacade.criarAtividade(request);
 
             assertNotNull(result);
+        }
+
+        @Test
+        @DisplayName("deve lançar erro quando atividade criada não é encontrada na listagem atualizada")
+        void deveLancarErroQuandoAtividadeCriadaNaoEncontrada() {
+            Long mapaCodigo = 100L;
+            Long subCodigo = 200L;
+            Long atividadeCodigo = 300L;
+            CriarAtividadeRequest request = new CriarAtividadeRequest(mapaCodigo, "Desc");
+
+            Usuario usuario = new Usuario();
+            Mapa mapa = new Mapa();
+            mapa.setCodigo(mapaCodigo);
+            Subprocesso subprocesso = new Subprocesso();
+            subprocesso.setCodigo(subCodigo);
+            mapa.setSubprocesso(subprocesso);
+
+            Atividade salvo = Atividade.builder()
+                    .codigo(atividadeCodigo)
+                    .mapa(mapa)
+                    .descricao("Desc")
+                    .build();
+
+            when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+            when(mapaManutencaoService.criarAtividade(request)).thenReturn(salvo);
+            when(subprocessoService.obterEntidadePorCodigoMapa(mapaCodigo)).thenReturn(subprocesso);
+            when(subprocessoService.obterStatus(subCodigo)).thenReturn(new SubprocessoSituacaoDto(subCodigo, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO));
+            when(subprocessoService.listarAtividadesSubprocesso(subCodigo)).thenReturn(Collections.singletonList(
+                    new AtividadeDto(999L, "Outra atividade", List.of())
+            ));
+            when(subprocessoService.buscarSubprocesso(subCodigo)).thenReturn(subprocesso);
+
+            doReturn(true).when(permissionEvaluator).verificarPermissao(any(Usuario.class), any(Subprocesso.class), any(AcaoPermissao.class));
+
+            assertThrows(ErroEntidadeNaoEncontrada.class, () -> atividadeFacade.criarAtividade(request));
         }
     }
 

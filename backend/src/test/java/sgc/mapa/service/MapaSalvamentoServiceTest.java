@@ -9,6 +9,7 @@ import sgc.comum.model.*;
 import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
 
+import java.lang.reflect.*;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
@@ -207,5 +208,40 @@ class MapaSalvamentoServiceTest {
         assertThatThrownBy(() -> mapaSalvamentoService.salvarMapaCompleto(codMapa, request))
                 .isInstanceOf(ErroValidacao.class)
                 .hasMessageContaining("não pertence ao mapa");
+    }
+
+    @Test
+    @DisplayName("Deve lançar erro quando faltar estrutura de associação da atividade")
+    void deveLancarErroQuandoFaltarEstruturaAssociacao() throws Exception {
+        Method metodo = MapaSalvamentoService.class.getDeclaredMethod("construirMapaAssociacoes",
+                Class.forName("sgc.mapa.service.MapaSalvamentoService$ContextoSalvamento"), List.class);
+        metodo.setAccessible(true);
+
+        var classeContexto = Class.forName("sgc.mapa.service.MapaSalvamentoService$ContextoSalvamento");
+        Constructor<?> construtor = classeContexto.getDeclaredConstructor(
+                Long.class, List.class, List.class, Set.class, Set.class, SalvarMapaRequest.class);
+        construtor.setAccessible(true);
+        @SuppressWarnings("unchecked")
+        Set<Long> codigosAtividadesDoMapa = mock(Set.class);
+        when(codigosAtividadesDoMapa.iterator()).thenReturn(List.of(10L).iterator());
+        when(codigosAtividadesDoMapa.contains(20L)).thenReturn(true);
+
+        SalvarMapaRequest.CompetenciaRequest competenciaRequest = SalvarMapaRequest.CompetenciaRequest.builder()
+                .codigo(0L)
+                .descricao("Comp")
+                .atividadesCodigos(List.of(20L))
+                .build();
+        SalvarMapaRequest request = SalvarMapaRequest.builder()
+                .competencias(List.of(competenciaRequest))
+                .build();
+        Object contexto = construtor.newInstance(
+                1L, new ArrayList<Competencia>(), new ArrayList<Atividade>(), codigosAtividadesDoMapa, Set.of(0L), request);
+
+        Competencia competencia = Competencia.builder().codigo(1L).descricao("Comp").atividades(new HashSet<>()).build();
+
+        assertThatThrownBy(() -> metodo.invoke(mapaSalvamentoService, contexto, List.of(competencia)))
+                .isInstanceOf(InvocationTargetException.class)
+                .hasCauseInstanceOf(IllegalStateException.class)
+                .hasRootCauseMessage("Atividade 20 sem estrutura de associação preparada");
     }
 }

@@ -121,6 +121,22 @@ class ImpactoMapaServiceTest {
     }
 
     @Test
+    @DisplayName("Deve bloquear cálculo de impacto para perfil sem regra")
+    void deveBloquearPerfilSemRegra() {
+        mockAcessoLivre();
+        Usuario usuario = new Usuario();
+        usuario.setPerfilAtivo(Perfil.SERVIDOR);
+
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(1L);
+        subprocesso.setUnidade(unidade);
+
+        assertThrows(ErroValidacao.class, () -> impactoMapaService.verificarImpactos(subprocesso, usuario));
+    }
+
+    @Test
     @DisplayName("Deve detectar atividade removida e impacto em competência")
     void deveDetectarRemovida() {
         mockAcessoLivre();

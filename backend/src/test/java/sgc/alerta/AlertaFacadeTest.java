@@ -6,7 +6,9 @@ import org.mockito.*;
 import org.mockito.junit.jupiter.*;
 import org.springframework.data.domain.*;
 import sgc.alerta.model.*;
+import sgc.organizacao.model.*;
 
+import java.lang.reflect.*;
 import java.time.*;
 import java.util.*;
 
@@ -100,5 +102,20 @@ class AlertaFacadeTest {
 
             verify(alertaService).listarParaServidorPaginado(anyString(), any(Pageable.class));
         }
+    }
+
+    @Test
+    @DisplayName("Deve lançar erro quando unidade obrigatória estiver ausente")
+    void deveLancarErroQuandoUnidadeObrigatoriaAusente() throws Exception {
+        Method metodo = AlertaFacade.class.getDeclaredMethod("obterUnidadeObrigatoria", Map.class, Long.class);
+        metodo.setAccessible(true);
+
+        @SuppressWarnings("unchecked")
+        Map<Long, Unidade> unidadesPorCodigo = Collections.EMPTY_MAP;
+
+        assertThatThrownBy(() -> metodo.invoke(alertaFacade, unidadesPorCodigo, 999L))
+                .isInstanceOf(InvocationTargetException.class)
+                .hasCauseInstanceOf(IllegalStateException.class)
+                .hasRootCauseMessage("Unidade 999 ausente na construção de alertas");
     }
 }
