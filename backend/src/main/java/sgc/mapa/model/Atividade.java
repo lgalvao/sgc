@@ -54,7 +54,7 @@ public class Atividade extends EntidadeBase {
     @JsonView(MapaViews.Publica.class)
     @JsonProperty("mapaCodigo")
     public Long getMapaCodigo() {
-        return Objects.requireNonNull(mapa.getCodigo());
+        return mapa.getCodigo();
     }
 
     public void atualizarDe(sgc.mapa.dto.AtualizarAtividadeRequest request) {

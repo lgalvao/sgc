@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
 import org.springframework.http.*;
+import sgc.organizacao.*;
 import sgc.seguranca.*;
 import sgc.seguranca.dto.*;
 
@@ -22,6 +23,12 @@ class LoginControllerCoverageTest {
     private HttpServletRequest httpRequest;
     @Mock
     private HttpServletResponse httpResponse;
+    @Mock
+    private UsuarioFacade usuarioFacade;
+    @Mock
+    private LimitadorTentativasLogin limitadorTentativasLogin;
+    @Mock
+    private GerenciadorJwt gerenciadorJwt;
 
     @InjectMocks
     private LoginController controller;
@@ -36,6 +43,7 @@ class LoginControllerCoverageTest {
         ResponseEntity<Boolean> result = controller.autenticar(request, httpRequest, httpResponse);
 
         assertThat(result.getBody()).isFalse();
+        verify(limitadorTentativasLogin).verificar("127.0.0.1");
         verify(httpResponse, never()).addCookie(any()); // Cobertura da linha 64 (branch false)
     }
 }

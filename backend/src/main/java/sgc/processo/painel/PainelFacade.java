@@ -217,4 +217,3 @@ public class PainelFacade {
         return String.format("/processo/%s/%s", processo.getCodigo(), unidade.getSigla());
     }
 }
-

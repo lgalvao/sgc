@@ -6,8 +6,6 @@ import lombok.*;
 import lombok.experimental.*;
 import sgc.comum.model.*;
 
-import java.util.Objects;
-
 @Entity
 @Table(name = "CONHECIMENTO", schema = "sgc")
 @Getter
@@ -35,7 +33,7 @@ public class Conhecimento extends EntidadeBase {
     @JsonView(MapaViews.Publica.class)
     @JsonProperty("atividadeCodigo")
     public Long getCodigoAtividade() {
-        return Objects.requireNonNull(atividade.getCodigo());
+        return atividade.getCodigo();
     }
 
     public void atualizarDe(sgc.mapa.dto.AtualizarConhecimentoRequest request) {

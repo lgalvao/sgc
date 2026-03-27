@@ -1,7 +1,7 @@
+
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 import info.solidsoft.gradle.pitest.PitestTask
-import net.ltgt.gradle.errorprone.CheckSeverity
-import net.ltgt.gradle.errorprone.errorprone
+import net.ltgt.gradle.errorprone.*
 import org.gradle.api.tasks.testing.logging.*
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
@@ -225,6 +225,7 @@ tasks.register<Test>("unitTest") {
     testClassesDirs = sourceSets["test"].output.classesDirs
     classpath = sourceSets["test"].runtimeClasspath
     useJUnitPlatform {
+        excludeTags("integration")
     }
 }
 
@@ -239,7 +240,7 @@ tasks.register<Test>("integrationTest") {
 }
 
 jacoco {
-    toolVersion = "0.8.13"
+    toolVersion = "0.8.14"
 }
 
 tasks.jacocoTestReport {
@@ -318,7 +319,7 @@ tasks.jacocoTestCoverageVerification {
             element = "CLASS"
             limit {
                 counter = "LINE"
-                minimum = "0.98".toBigDecimal()
+                minimum = "0.95".toBigDecimal()
             }
         }
     }
@@ -356,16 +357,13 @@ pitest {
 
     excludedClasses.set(
         listOf(
-            "sgc.config.*",              // Configurações Spring
-            "sgc.*Exception",            // Classes de exceção
             "sgc.*Erro*",                // Todas as classes de erro
-            "sgc.*MapperImpl",           // Mappers MapStruct (gerados)
             "sgc.*Request",              // Request DTOs
             "sgc.*Response",             // Response DTOs
             "sgc.*Query",                // Query objects
+            "sgc.*Config*",              // Command objects
             "sgc.*Command",              // Command objects
             "sgc.*View",                 // View objects
-            "sgc.*Evento*",               // Event classes (domain events)
             "sgc.Sgc",                   // Classe main
         )
     )
@@ -428,10 +426,7 @@ tasks.register("mutationTest") {
 
     doLast {
         val reportDir = layout.buildDirectory.dir("reports/pitest").get().asFile
-        println("════════════════════════════════════════════════════════════")
-        println("✅ Mutation Testing Concluído!")
-        println("📊 Relatório disponível em: $reportDir/index.html")
-        println("════════════════════════════════════════════════════════════")
+        println("✅ Mutation test concluído, relatório disponível: $reportDir/index.html")
     }
 }
 

@@ -237,6 +237,7 @@ class SubprocessoServiceCoverageIntegrationTest {
             proc = processoRepo.save(proc);
 
             Unidade u = new Unidade();
+            u.setTipo(TipoUnidade.OPERACIONAL);
             u.setSigla("U1");
             u = unidadeRepo.save(u);
 
@@ -269,6 +270,7 @@ class SubprocessoServiceCoverageIntegrationTest {
             proc = processoRepo.save(proc);
 
             Unidade u = new Unidade();
+            u.setTipo(TipoUnidade.OPERACIONAL);
             u.setSigla("U1");
             u = unidadeRepo.save(u);
 
@@ -302,6 +304,7 @@ class SubprocessoServiceCoverageIntegrationTest {
             proc = processoRepo.save(proc);
 
             Unidade u = new Unidade();
+            u.setTipo(TipoUnidade.OPERACIONAL);
             u.setSigla("U_SERV");
             u.setSituacao(SituacaoUnidade.ATIVA);
             u = unidadeRepo.save(u);

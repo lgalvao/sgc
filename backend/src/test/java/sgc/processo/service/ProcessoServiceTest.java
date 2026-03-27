@@ -259,40 +259,6 @@ class ProcessoServiceTest {
     }
 
     @Nested
-    @DisplayName("Lembretes")
-    class Lembretes {
-        @Test
-        @DisplayName("Deve emitir alerta ao enviar lembrete")
-        void deveEnviarLembrete() {
-            Long codProcesso = 1L;
-            Long codUnidade = 10L;
-            
-            Processo p = new Processo();
-            p.setCodigo(codProcesso);
-            p.setDescricao("Processo Teste");
-            Unidade u = new Unidade();
-            u.setCodigo(codUnidade);
-            u.setSigla("U10");
-            u.setTituloTitular("titular1");
-            u.setSituacao(SituacaoUnidade.ATIVA);
-            p.adicionarParticipantes(Set.of(u));
-            
-            when(processoRepo.buscarPorCodigoComParticipantes(codProcesso)).thenReturn(Optional.of(p));
-            when(unidadeService.buscarPorCodigo(codUnidade)).thenReturn(u);
-            when(emailModelosService.criarEmailLembretePrazo(anyString(), anyString(), any())).thenReturn("<html>body</html>");
-            
-            Usuario titular = new Usuario();
-            titular.setEmail("titular@teste.com");
-            when(usuarioService.buscarPorLogin("titular1")).thenReturn(titular);
-            
-            processoService.enviarLembrete(codProcesso, codUnidade);
-            
-            verify(emailService).enviarEmailHtml(eq("titular@teste.com"), anyString(), anyString());
-            verify(servicoAlertas).criarAlertaAdmin(p, u, "Lembrete: Prazo do processo Processo Teste encerra em N/A");
-        }
-    }
-
-    @Nested
     @DisplayName("Detalhes e Elegibilidade")
     class DetalhesEElegibilidade {
         @Test

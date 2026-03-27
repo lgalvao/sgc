@@ -37,7 +37,7 @@ public class ProcessoController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ProcessoResumoDto> criar(@Valid @RequestBody CriarProcessoRequest requisicao) {
         Processo criado = processoService.criar(requisicao);
-        Long codigo = Objects.requireNonNull(criado.getCodigo(), "Código do processo não pode ser nulo");
+        Long codigo = criado.getCodigo();
 
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{codigo}")

@@ -8,7 +8,6 @@ import sgc.organizacao.model.*;
 
 import java.io.*;
 import java.time.*;
-import java.util.Objects;
 
 /**
  * Entidade que representa a associação entre um Processo e uma Unidade participante,
@@ -32,21 +31,29 @@ public class UnidadeProcesso implements Serializable {
     @JoinColumn(name = "processo_codigo")
     @JsonIgnore
     private Processo processo;
+
     @Column(name = "nome")
     private String nome;
+
     @Column(name = "sigla", length = 20)
     private String sigla;
+
     @Column(name = "matricula_titular", length = 8)
     private String matriculaTitular;
+
     @Column(name = "titulo_titular", length = 12)
     private String tituloTitular;
+
     @Column(name = "data_inicio_titularidade")
     private LocalDateTime dataInicioTitularidade;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo", length = 20)
     private TipoUnidade tipo;
+
     @Column(name = "situacao", length = 20)
     private String situacao;
+
     @Column(name = "unidade_superior_codigo")
     private @Nullable Long unidadeSuperiorCodigo;
 
@@ -56,7 +63,7 @@ public class UnidadeProcesso implements Serializable {
     public static UnidadeProcesso criarSnapshot(Processo processo, Unidade unidade) {
         UnidadeProcesso snapshot = new UnidadeProcesso();
         snapshot.setProcesso(processo);
-        snapshot.setUnidadeCodigo(Objects.requireNonNull(unidade.getCodigo()));
+        snapshot.setUnidadeCodigo(unidade.getCodigo());
         snapshot.setNome(unidade.getNome());
         snapshot.setSigla(unidade.getSigla());
         snapshot.setMatriculaTitular(unidade.getMatriculaTitular());

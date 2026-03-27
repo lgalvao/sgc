@@ -48,7 +48,7 @@ class UsuarioControllerTest {
         Usuario entity = new Usuario();
         entity.setTituloEleitoral("123");
         entity.setNome("Teste");
-        entity.setUnidadeLotacao(Unidade.builder().codigo(1L).sigla("U1").nome("Unidade 1").build());
+        entity.setUnidadeLotacao(Unidade.builder().codigo(1L).sigla("U1").nome("Unidade 1").tipo(TipoUnidade.OPERACIONAL).build());
         when(usuarioService.buscarOpt("123")).thenReturn(Optional.of(entity));
 
         mockMvc.perform(get("/api/usuarios/123"))
@@ -99,10 +99,10 @@ class UsuarioControllerTest {
     @WithMockUser(roles = "ADMIN")
     void adicionarAdministrador_DeveValidarUsuarioTitulo() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.post("/api/usuarios/administradores")
-                        .with(SecurityMockMvcRequestPostProcessors.csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{}"))
-                .andExpect(status().isBadRequest());
+                .with(SecurityMockMvcRequestPostProcessors.csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{}"))
+                .andExpect(status().is(422));
     }
 
     @Test

@@ -65,7 +65,7 @@ public class Usuario implements UserDetails {
     @JsonView(OrganizacaoViews.Publica.class)
     @JsonProperty("unidadeCodigo")
     public Long getUnidadeCodigo() {
-        return Objects.requireNonNull(Objects.requireNonNull(unidadeLotacao).getCodigo());
+        return unidadeLotacao.getCodigo();
     }
 
     @Override
@@ -94,6 +94,6 @@ public class Usuario implements UserDetails {
 
     @Override
     public String getUsername() {
-        return Objects.requireNonNull(tituloEleitoral);
+        return tituloEleitoral;
     }
 }

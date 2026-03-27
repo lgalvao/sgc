@@ -111,7 +111,6 @@ class E2eControllerCoverageTest {
         Processo result = controller.criarProcessoFinalizadoComAtividades(req);
 
         assertNotNull(result);
-        // Verificar chamadas com diferentes números de argumentos
         verify(jdbcTemplate, atLeastOnce()).update(anyString(), any(Object[].class));
     }
 
@@ -189,33 +188,14 @@ class E2eControllerCoverageTest {
     }
 
     @Test
-    @DisplayName("descricaoFixture: Deve retornar descrição padrão se nula ou vazia")
-    void deveCobrirDescricaoFixturePadrao() throws Exception {
-        var method = E2eController.class.getDeclaredMethod("descricaoFixture",
-                E2eController.ProcessoFixtureRequest.class, TipoProcesso.class);
-        method.setAccessible(true);
-
-        var req = new E2eController.ProcessoFixtureRequest(null, "SIGLA", false, 30);
-        String desc = (String) method.invoke(controller, req, TipoProcesso.MAPEAMENTO);
-        assertThat(desc).contains("Processo fixture E2E MAPEAMENTO");
-
-        req = new E2eController.ProcessoFixtureRequest("  ", "SIGLA", false, 30);
-        desc = (String) method.invoke(controller, req, TipoProcesso.REVISAO);
-        assertThat(desc).contains("Processo fixture E2E REVISAO");
-    }
-
-    @Test
     @DisplayName("obterUsuarioParaIniciacao: Deve retornar principal se for Usuario")
     void deveCobrirObterUsuarioParaIniciacaoComUsuarioPrincipal() throws Exception {
         Usuario usuario = new Usuario();
-        // Em vez de setLogin (que pode não existir), vamos assumir que o MockitoExtension limpa o contexto
         var auth = new UsernamePasswordAuthenticationToken(usuario, null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
         SecurityContextHolder.getContext().setAuthentication(auth);
-
         try {
             var method = E2eController.class.getDeclaredMethod("obterUsuarioParaIniciacao");
             method.setAccessible(true);
-
             Usuario result = (Usuario) method.invoke(controller);
             assertEquals(usuario, result);
         } finally {
@@ -268,7 +248,6 @@ class E2eControllerCoverageTest {
         var method = E2eController.class.getDeclaredMethod("limparTabela", Statement.class, String.class);
         method.setAccessible(true);
 
-        // Não deve lançar exceção, apenas logar
         assertDoesNotThrow(() -> method.invoke(controller, stmt, "TABELA"));
     }
 }

@@ -53,7 +53,7 @@ public class MapaController {
     @Operation(summary = "Cria um mapa")
     public ResponseEntity<MapaResumoDto> criar(@Valid @RequestBody CriarMapaRequest request) {
         var salvo = mapaManutencaoService.criarMapa(request);
-        Long codigo = Objects.requireNonNull(salvo.getCodigo(), "Código do mapa não pode ser nulo");
+        Long codigo = salvo.getCodigo();
 
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{codigo}")

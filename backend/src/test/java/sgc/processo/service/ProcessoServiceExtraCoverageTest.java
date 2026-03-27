@@ -461,7 +461,6 @@ class ProcessoServiceExtraCoverageTest {
             uni.setCodigo(10L);
             uni.setSigla("UNI10");
             when(unidadeService.porCodigos(anyList())).thenReturn(List.of(uni));
-            when(unidadeService.buscarPorCodigo(10L)).thenReturn(uni);
             when(unidadeService.verificarMapaVigente(10L)).thenReturn(true);
             UnidadeMapa unidadeMapa = new UnidadeMapa();
             unidadeMapa.setUnidadeCodigo(10L);

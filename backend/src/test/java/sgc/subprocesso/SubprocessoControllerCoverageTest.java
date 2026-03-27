@@ -56,11 +56,13 @@ class SubprocessoControllerCoverageTest {
         unidade.setCodigo(2L);
         unidade.setSigla("UND");
         unidade.setNome("Unidade teste");
+        unidade.setTipo(TipoUnidade.OPERACIONAL);
 
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(1L);
         sp.setProcesso(processo);
         sp.setUnidade(unidade);
+        sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         when(subprocessoService.listarTodos()).thenReturn(List.of(sp));
 
         mockMvc.perform(get("/api/subprocessos"))

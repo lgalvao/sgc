@@ -13,6 +13,7 @@ import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
 import sgc.mapa.service.*;
 import sgc.seguranca.*;
+import sgc.subprocesso.model.*;
 import tools.jackson.databind.*;
 
 import java.util.*;
@@ -52,7 +53,11 @@ class MapaControllerTest {
     @WithMockUser
     @DisplayName("Deve retornar lista de mapas")
     void deveRetornarListaDeMapas() throws Exception {
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setCodigo(1L);
+
         Mapa mapa = new Mapa();
+        mapa.setSubprocesso(subprocesso);
         mapa.setCodigo(1L);
 
         when(mapaManutencaoService.mapas()).thenReturn(List.of(mapa));
@@ -66,8 +71,12 @@ class MapaControllerTest {
     @WithMockUser
     @DisplayName("Deve retornar mapa quando existir")
     void deveRetornarMapaQuandoExistir() throws Exception {
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setCodigo(10L);
+
         Mapa mapa = new Mapa();
         mapa.setCodigo(1L);
+        mapa.setSubprocesso(subprocesso);
 
         when(mapaManutencaoService.mapaCodigo(1L)).thenReturn(mapa);
 
@@ -92,8 +101,12 @@ class MapaControllerTest {
     @WithMockUser(roles = "ADMIN")
     @DisplayName("Deve retornar Created ao criar mapa")
     void deveRetornarCreatedAoCriar() throws Exception {
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setCodigo(10L);
+
         Mapa mapa = new Mapa();
         mapa.setCodigo(1L);
+        mapa.setSubprocesso(subprocesso);
         CriarMapaRequest request = CriarMapaRequest.builder().subprocessoCodigo(10L).build();
 
         when(mapaManutencaoService.criarMapa(any(CriarMapaRequest.class))).thenReturn(mapa);
@@ -110,8 +123,12 @@ class MapaControllerTest {
     @WithMockUser(roles = "ADMIN")
     @DisplayName("Deve retornar Ok ao atualizar mapa existente")
     void deveRetornarOkAoAtualizarMapaExistente() throws Exception {
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setCodigo(10L);
+
         Mapa mapa = new Mapa();
         mapa.setCodigo(1L);
+        mapa.setSubprocesso(subprocesso);
         AtualizarMapaRequest request = AtualizarMapaRequest.builder().observacoesDisponibilizacao("Obs").build();
 
         when(mapaManutencaoService.atualizarMapa(eq(1L), any(AtualizarMapaRequest.class))).thenReturn(mapa);

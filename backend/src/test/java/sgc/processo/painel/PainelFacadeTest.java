@@ -24,7 +24,6 @@ import static org.mockito.Mockito.*;
 @DisplayName("PainelFacade Test")
 @SuppressWarnings("NullAway.Init")
 class PainelFacadeTest {
-
     @Mock
     private ProcessoService processoService;
     @Mock
@@ -206,19 +205,18 @@ class PainelFacadeTest {
     @Test
     @DisplayName("Deve cobrir merge function do toMap com participantes duplicados")
     void deveCobrirMergeFunctionComParticipantesDuplicados() {
-
         Processo p = mock(Processo.class);
         when(p.getCodigo()).thenReturn(1L);
         when(p.getSituacao()).thenReturn(SituacaoProcesso.EM_ANDAMENTO);
         when(p.getTipo()).thenReturn(TipoProcesso.MAPEAMENTO);
 
-        UnidadeProcesso up1 = mock(UnidadeProcesso.class);
-        when(up1.getUnidadeCodigo()).thenReturn(10L);
-        when(up1.getSigla()).thenReturn("U1");
+        UnidadeProcesso up1 = new UnidadeProcesso();
+        up1.setUnidadeCodigo(10L);
+        up1.setSigla("U1");
 
-        UnidadeProcesso up2 = mock(UnidadeProcesso.class);
-        when(up2.getUnidadeCodigo()).thenReturn(10L); // Mesmo código
-        when(up2.getSigla()).thenReturn("U1"); // Mock de sigla
+        UnidadeProcesso up2 = new UnidadeProcesso();
+        up2.setUnidadeCodigo(10L);
+        up2.setSigla("U1");
 
         when(p.getParticipantes()).thenReturn(List.of(up1, up2));
 
@@ -239,13 +237,13 @@ class PainelFacadeTest {
         when(p.getSituacao()).thenReturn(SituacaoProcesso.EM_ANDAMENTO);
         when(p.getTipo()).thenReturn(TipoProcesso.MAPEAMENTO);
 
-        UnidadeProcesso up1 = mock(UnidadeProcesso.class);
-        when(up1.getUnidadeCodigo()).thenReturn(1L);
-        when(up1.getSigla()).thenReturn("U1");
+        UnidadeProcesso up1 = new UnidadeProcesso();
+        up1.setUnidadeCodigo(1L);
+        up1.setSigla("U1");
 
-        UnidadeProcesso up2 = mock(UnidadeProcesso.class);
-        when(up2.getUnidadeCodigo()).thenReturn(2L);
-        when(up2.getSigla()).thenReturn("U2");
+        UnidadeProcesso up2 = new UnidadeProcesso();
+        up2.setUnidadeCodigo(2L);
+        up2.setSigla("U2");
 
         when(p.getParticipantes()).thenReturn(List.of(up1, up2));
 
@@ -271,9 +269,9 @@ class PainelFacadeTest {
         when(p.getSituacao()).thenReturn(SituacaoProcesso.EM_ANDAMENTO);
         when(p.getTipo()).thenReturn(TipoProcesso.MAPEAMENTO);
 
-        UnidadeProcesso up1 = mock(UnidadeProcesso.class);
-        when(up1.getUnidadeCodigo()).thenReturn(1L);
-        when(up1.getSigla()).thenReturn("U1");
+        UnidadeProcesso up1 = new UnidadeProcesso();
+        up1.setUnidadeCodigo(1L);
+        up1.setSigla("U1");
         when(p.getParticipantes()).thenReturn(List.of(up1));
 
         Map<Long, List<Long>> hierarquia = new HashMap<>();
@@ -306,17 +304,14 @@ class PainelFacadeTest {
         when(p.getSituacao()).thenReturn(SituacaoProcesso.EM_ANDAMENTO);
         when(p.getTipo()).thenReturn(TipoProcesso.MAPEAMENTO);
 
-        UnidadeProcesso up1 = mock(UnidadeProcesso.class);
-        when(up1.getUnidadeCodigo()).thenReturn(1L);
-        when(up1.getSigla()).thenReturn("U1");
+        UnidadeProcesso up1 = new UnidadeProcesso();
+        up1.setUnidadeCodigo(1L);
+        up1.setSigla("U1");
         when(p.getParticipantes()).thenReturn(List.of(up1));
 
         Map<Long, List<Long>> hierarquia = new HashMap<>();
-        // 1L tem pai 2L, e 2L tem pai 0L.
-        // Se 2L NÃO estiver no mapa, mapaPaiFilhos.get(2L) será null -> aciona line 186 children == null
         hierarquia.put(0L, List.of(2L));
-        // hierarquia.put(2L, ...) AUSENTE propositalmente
-        
+
         when(hierarquiaService.buscarMapaHierarquia()).thenReturn(hierarquia);
         when(processoService.listarTodos(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(p)));
 
@@ -346,12 +341,12 @@ class PainelFacadeTest {
         when(p.getTipo()).thenReturn(TipoProcesso.MAPEAMENTO);
 
         // U1 e U2 participam. U3 é pai de U1 e U2. U4 é pai de U3.
-        UnidadeProcesso up1 = mock(UnidadeProcesso.class);
-        when(up1.getUnidadeCodigo()).thenReturn(1L);
-        when(up1.getSigla()).thenReturn("U1");
-        UnidadeProcesso up2 = mock(UnidadeProcesso.class);
-        when(up2.getUnidadeCodigo()).thenReturn(2L);
-        when(up2.getSigla()).thenReturn("U2");
+        UnidadeProcesso up1 = new UnidadeProcesso();
+        up1.setUnidadeCodigo(1L);
+        up1.setSigla("U1");
+        UnidadeProcesso up2 = new UnidadeProcesso();
+        up2.setUnidadeCodigo(2L);
+        up2.setSigla("U2");
         
         when(p.getParticipantes()).thenReturn(List.of(up1, up2));
 

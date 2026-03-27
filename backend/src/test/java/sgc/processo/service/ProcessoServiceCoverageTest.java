@@ -69,8 +69,8 @@ class ProcessoServiceCoverageTest {
         when(p.getTipo()).thenReturn(DIAGNOSTICO);
         when(p.getSituacao()).thenReturn(EM_ANDAMENTO);
 
-        UnidadeProcesso up = mock(UnidadeProcesso.class);
-        when(up.getUnidadeCodigo()).thenReturn(10L);
+        UnidadeProcesso up = new UnidadeProcesso();
+        up.setUnidadeCodigo(10L);
         when(p.getParticipantes()).thenReturn(List.of(up));
 
         Unidade uni = new Unidade();
