@@ -1,5 +1,19 @@
 # Pendências consolidadas da reanálise CDU x E2E (rodada 2)
 
+## Andamento da execução (2026-03-27 - lote CDU-22, CDU-23, CDU-24, CDU-25 e CDU-33)
+- ✅ **CDU-22 (Aceitar cadastros em bloco)** reforçado com validação explícita dos botões do modal (`Cancelar` e `Registrar aceite`) no fluxo de cancelamento, mantendo evidência direta dos controles de ação do requisito.
+- ✅ **CDU-23 (Homologar cadastros em bloco)** ampliado com asserção explícita dos botões do modal (`Cancelar` e `Homologar`) antes do cancelamento, reduzindo risco de falso positivo de abertura sem controles corretos.
+- ✅ **CDU-24 (Disponibilizar mapas em bloco)** ganhou cenário dedicado de cancelamento da modal com validação de título, texto orientativo e botões obrigatórios, além de retorno para tela de detalhes do processo.
+- ✅ **CDU-25 (Aceitar validação de mapas em bloco)** passou a validar de forma explícita o título de modal e os botões de decisão (`Cancelar` e `Registrar aceite`) no cenário de interrupção da operação.
+- ✅ **CDU-33 (Reabrir revisão de cadastro)** recebeu reforço na evidência de UI da modal (campo de justificativa e botões de cancelar/confirmar) antes da confirmação da reabertura.
+- ✅ Regressão direcionada executada com sucesso para os 5 arquivos impactados em execução sequencial (`--workers=1`) conforme regra de depuração sem mistura de variáveis.
+- 🔄 Próximo passo sugerido: avançar para pendências de histórico de análise (CDU-09 e CDU-19) e itens de árvore/seleção no CDU-03 com foco em regras de habilitação/desabilitação por hierarquia.
+
+## Novos aprendizados (lote 2026-03-27)
+- Em ações em bloco, validar apenas a presença da modal não garante aderência ao requisito; é importante comprovar também os botões de decisão que materializam o fluxo (`Cancelar` e botão de confirmação específico).
+- Cenários de cancelamento continuam valiosos mesmo quando o fluxo de sucesso já está coberto, pois asseguram a regra funcional de permanência na tela de detalhes sem efeito colateral indevido.
+- Em requisitos com “solicitação de justificativa” (CDU-33), assertar o campo dedicado e o estado inicial do botão de confirmação melhora a rastreabilidade da regra de negócio no E2E.
+
 Esta versão substitui a rodada anterior e consolida pendências após segunda varredura com leitura de specs e helpers.
 
 ## Andamento da execução (2026-03-26 - continuidade CDU-28)

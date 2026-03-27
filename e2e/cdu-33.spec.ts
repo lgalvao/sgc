@@ -70,6 +70,9 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
         const modal = page.getByRole('dialog');
         await expect(modal).toBeVisible();
         await expect(modal.getByRole('heading', {name: /Reabrir revisão/i})).toBeVisible();
+        await expect(page.getByTestId('inp-justificativa-reabrir')).toBeVisible();
+        await expect(modal.getByRole('button', {name: /Cancelar/i})).toBeVisible();
+        await expect(page.getByTestId('btn-confirmar-reabrir')).toHaveText(/Reabrir/i);
 
         await expect(page.getByTestId('btn-confirmar-reabrir')).toBeDisabled();
         await modal.getByRole('button', {name: /Cancelar/i}).click();
