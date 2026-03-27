@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SGC - Dashboard de QA</title>
+    <link rel="stylesheet" href="./dashboard.css">
+</head>
+<body>
+<main class="pagina">
+    <header class="cabecalho">
+        <h1>Dashboard de QA - SGC</h1>
+        <p id="metadadosResumo">Carregando snapshot...</p>
+    </header>
+
+    <section class="grade-resumo" id="resumoCards"></section>
+
+    <section class="bloco">
+        <h2>Verificacoes da execucao</h2>
+        <div class="tabela-container">
+            <table>
+                <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Status</th>
+                    <th>Duracao</th>
+                    <th>Sumario</th>
+                </tr>
+                </thead>
+                <tbody id="tabelaVerificacoes"></tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="bloco grade-dupla">
+        <article>
+            <h2>Cobertura consolidada</h2>
+            <div id="coberturaMetricas"></div>
+        </article>
+        <article>
+            <h2>Qualidade e confiabilidade</h2>
+            <div id="qualidadeMetricas"></div>
+        </article>
+    </section>
+
+    <section class="bloco">
+        <h2>Hotspots de risco</h2>
+        <ul id="listaHotspots" class="lista-hotspots"></ul>
+    </section>
+</main>
+
+<script type="module" src="./dashboard.js"></script>
+</body>
+</html>

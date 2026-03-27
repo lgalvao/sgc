@@ -1,0 +1,230 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "sgc/qa-dashboard/snapshot.schema.json",
+  "title": "Snapshot do Dashboard de QA do SGC",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "versaoSchema",
+    "metadados",
+    "resumo",
+    "verificacoes",
+    "cobertura",
+    "qualidade",
+    "confiabilidade",
+    "hotspots"
+  ],
+  "properties": {
+    "versaoSchema": {
+      "type": "string"
+    },
+    "metadados": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "geradoEm",
+        "perfilExecucao",
+        "duracaoTotalMs",
+        "git"
+      ],
+      "properties": {
+        "geradoEm": {
+          "type": "string"
+        },
+        "perfilExecucao": {
+          "type": "string"
+        },
+        "duracaoTotalMs": {
+          "type": "number"
+        },
+        "maquina": {
+          "type": "string"
+        },
+        "sistemaOperacional": {
+          "type": "string"
+        },
+        "git": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "branch",
+            "commit",
+            "worktreeSujo"
+          ],
+          "properties": {
+            "branch": {
+              "type": "string"
+            },
+            "commit": {
+              "type": "string"
+            },
+            "commitCurto": {
+              "type": "string"
+            },
+            "worktreeSujo": {
+              "type": "boolean"
+            }
+          }
+        }
+      }
+    },
+    "resumo": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "statusGeral",
+        "indiceSaude",
+        "totais"
+      ],
+      "properties": {
+        "statusGeral": {
+          "type": "string",
+          "enum": [
+            "verde",
+            "amarelo",
+            "vermelho"
+          ]
+        },
+        "indiceSaude": {
+          "type": "number"
+        },
+        "totais": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "verificacoes",
+            "sucesso",
+            "falha",
+            "alerta",
+            "naoExecutado"
+          ],
+          "properties": {
+            "verificacoes": {
+              "type": "integer"
+            },
+            "sucesso": {
+              "type": "integer"
+            },
+            "falha": {
+              "type": "integer"
+            },
+            "alerta": {
+              "type": "integer"
+            },
+            "naoExecutado": {
+              "type": "integer"
+            }
+          }
+        }
+      }
+    },
+    "verificacoes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/verificacao"
+      }
+    },
+    "cobertura": {
+      "type": "object"
+    },
+    "qualidade": {
+      "type": "object"
+    },
+    "confiabilidade": {
+      "type": "object"
+    },
+    "hotspots": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/hotspot"
+      }
+    }
+  },
+  "$defs": {
+    "verificacao": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "codigo",
+        "nome",
+        "categoria",
+        "status",
+        "duracaoMs",
+        "sumario"
+      ],
+      "properties": {
+        "codigo": {
+          "type": "string"
+        },
+        "nome": {
+          "type": "string"
+        },
+        "categoria": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "sucesso",
+            "falha",
+            "alerta",
+            "nao_executado"
+          ]
+        },
+        "duracaoMs": {
+          "type": "number"
+        },
+        "comando": {
+          "type": "string"
+        },
+        "diretorio": {
+          "type": "string"
+        },
+        "sumario": {
+          "type": "string"
+        },
+        "metricas": {
+          "type": "object"
+        },
+        "erros": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "artefatos": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "hotspot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "codigo",
+        "nome",
+        "risco"
+      ],
+      "properties": {
+        "codigo": {
+          "type": "string"
+        },
+        "nome": {
+          "type": "string"
+        },
+        "risco": {
+          "type": "number"
+        },
+        "motivos": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

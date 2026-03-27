@@ -48,7 +48,7 @@ public class ResponsavelUnidadeService {
                 .codigo(a.getCodigo())
                 .unidadeCodigo(a.getUnidade().getCodigo())
                 .unidadeSigla(a.getUnidade().getSigla())
-                .usuario(usuario)
+                .usuario(UsuarioResumoDto.fromEntity(usuario))
                 .dataInicio(a.getDataInicio())
                 .dataTermino(a.getDataTermino())
                 .justificativa(a.getJustificativa())
@@ -91,7 +91,6 @@ public class ResponsavelUnidadeService {
     @Transactional(readOnly = true)
     public Usuario buscarResponsavelAtual(String siglaUnidade) {
         Unidade unidade = repo.buscarPorSigla(Unidade.class, siglaUnidade);
-
         Responsabilidade resp = repo.buscar(Responsabilidade.class, unidade.getCodigo());
 
         return repo.buscar(Usuario.class, resp.getUsuarioTitulo());
@@ -107,7 +106,7 @@ public class ResponsavelUnidadeService {
         Usuario usuario = repo.buscar(Usuario.class, resp.getUsuarioTitulo());
 
         return ResponsavelDto.builder()
-                .usuario(usuario)
+                .usuario(UsuarioResumoDto.fromEntity(usuario))
                 .tipo(resp.getTipo())
                 .dataInicio(resp.getDataInicio())
                 .dataFim(resp.getDataFim())
@@ -124,7 +123,6 @@ public class ResponsavelUnidadeService {
         Usuario responsavel = repo.buscar(Usuario.class, responsabilidade.getUsuarioTitulo());
 
         Usuario titularOficial = repo.buscar(Usuario.class, responsabilidade.getUnidade().getTituloTitular());
-
         return montarResponsavelDto(unidadeCodigo, responsavel, titularOficial);
     }
 
@@ -145,7 +143,7 @@ public class ResponsavelUnidadeService {
             todosTitulos.add(r.getUnidade().getTituloTitular());
         });
 
-        Map<String, Usuario> usuariosPorTitulo = usuarioRepo.findByIdInWithAtribuicoes(new ArrayList<>(todosTitulos)).stream()
+        Map<String, Usuario> usuariosPorTitulo = usuarioRepo.findByTitulosComUnidadeLotacao(new ArrayList<>(todosTitulos)).stream()
                 .collect(toMap(Usuario::getTituloEleitoral, u -> u));
 
         return responsabilidades.stream()

@@ -78,7 +78,7 @@ class SubprocessoControllerCoverageExtraTest {
     @WithMockUser
     void obterMapaCompletoErro() throws Exception {
         when(permissionEvaluator.hasPermission(any(), eq(1L), eq("Subprocesso"), eq("VISUALIZAR_SUBPROCESSO"))).thenReturn(true);
-        when(subprocessoService.mapaCompletoPorSubprocesso(1L)).thenThrow(new RuntimeException("erro"));
+        when(subprocessoService.mapaCompletoDtoPorSubprocesso(1L)).thenThrow(new RuntimeException("erro"));
 
         mockMvc.perform(get("/api/subprocessos/1/mapa-completo"))
                 .andExpect(status().isInternalServerError());

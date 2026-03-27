@@ -1,13 +1,47 @@
 # Pendências consolidadas da reanálise CDU x E2E (rodada 2)
 
+## Andamento da execução (2026-03-27 - lote CDU-22, CDU-23, CDU-24, CDU-25 e CDU-33)
+- ✅ **CDU-22 (Aceitar cadastros em bloco)** reforçado com validação explícita dos botões do modal (`Cancelar` e `Registrar aceite`) no fluxo de cancelamento, mantendo evidência direta dos controles de ação do requisito.
+- ✅ **CDU-23 (Homologar cadastros em bloco)** ampliado com asserção explícita dos botões do modal (`Cancelar` e `Homologar`) antes do cancelamento, reduzindo risco de falso positivo de abertura sem controles corretos.
+- ✅ **CDU-24 (Disponibilizar mapas em bloco)** ganhou cenário dedicado de cancelamento da modal com validação de título, texto orientativo e botões obrigatórios, além de retorno para tela de detalhes do processo.
+- ✅ **CDU-25 (Aceitar validação de mapas em bloco)** passou a validar de forma explícita o título de modal e os botões de decisão (`Cancelar` e `Registrar aceite`) no cenário de interrupção da operação.
+- ✅ **CDU-33 (Reabrir revisão de cadastro)** recebeu reforço na evidência de UI da modal (campo de justificativa e botões de cancelar/confirmar) antes da confirmação da reabertura.
+- ✅ Regressão direcionada executada com sucesso para os 5 arquivos impactados em execução sequencial (`--workers=1`) conforme regra de depuração sem mistura de variáveis.
+- 🔄 Próximo passo sugerido: avançar para pendências de histórico de análise (CDU-09 e CDU-19) e itens de árvore/seleção no CDU-03 com foco em regras de habilitação/desabilitação por hierarquia.
+
+## Novos aprendizados (lote 2026-03-27)
+- Em ações em bloco, validar apenas a presença da modal não garante aderência ao requisito; é importante comprovar também os botões de decisão que materializam o fluxo (`Cancelar` e botão de confirmação específico).
+- Cenários de cancelamento continuam valiosos mesmo quando o fluxo de sucesso já está coberto, pois asseguram a regra funcional de permanência na tela de detalhes sem efeito colateral indevido.
+- Em requisitos com “solicitação de justificativa” (CDU-33), assertar o campo dedicado e o estado inicial do botão de confirmação melhora a rastreabilidade da regra de negócio no E2E.
+
 Esta versão substitui a rodada anterior e consolida pendências após segunda varredura com leitura de specs e helpers.
+
+## Andamento da execução (2026-03-26 - continuidade CDU-28)
+- ✅ **CDU-28 reforçado na regra de árvore completa**: cenário inicial passou a validar, de forma explícita, as três secretarias da árvore (`SECRETARIA_1`, `SECRETARIA_2`, `SECRETARIA_3`) e seus principais nós subordinados antes de seguir para o fluxo de criação de atribuição.
+- ✅ A cobertura também ganhou evidência de profundidade no ramo intermediário (`COORD_11`), incluindo validação das seções filhas (`SECAO_111`, `SECAO_112`, `SECAO_113`).
+- ✅ Regressão direcionada de `e2e/cdu-28.spec.ts` executada com sucesso após a ampliação das asserções.
+- 🔄 Próximo passo sugerido: manter no E2E apenas a validação estrutural mínima da árvore e mover efeitos internos de notificação por e-mail para integração backend, evitando acoplamento desnecessário na UI.
+
+## Novos aprendizados (continuidade CDU-28 em 2026-03-26)
+- Para requisito de “árvore completa”, validar somente o ramo usado na ação principal pode deixar lacunas; uma verificação incremental por raiz e subárvore traz evidência mais fiel do comportamento esperado.
+- Reusar um helper de validação de ramo (`sigla do nó + lista de filhas`) reduz duplicação e facilita manutenção quando a estrutura da árvore evoluir no seed.
+
+## Andamento da execução (2026-03-26 - continuidade CDU-30)
+- ✅ **CDU-30 avançado em regra de validação negativa**: incluído cenário E2E para tentativa de adicionar como administrador um título já administrador (`111111`), com asserção de erro funcional retornado pela API.
+- ✅ O cenário novo também confirma permanência do modal de adição após falha, preservando o contexto de correção do usuário sem navegação inesperada.
+- ✅ Regressão direcionada do arquivo `e2e/cdu-30.spec.ts` executada com sucesso no ambiente atual.
+- 🔄 Próximo passo sugerido: cobrir no CDU-30 o ramo de validação de remoção inválida (auto-remoção e/ou único administrador) por combinação de E2E + integração backend, conforme viabilidade da massa.
+
+## Novos aprendizados (continuidade CDU-30 em 2026-03-26)
+- Em fluxos de modal administrativo, a dupla **`waitForResponse` com `status >= 400` + assert do payload de erro (`message`)** melhora evidência de regra de negócio quando a validação vem da API e não de bloqueio local.
+- Para o CDU-30, manter o modal aberto após erro de domínio é comportamento relevante do requisito funcional (usuário corrige e tenta novamente), então vale validar explicitamente esse estado.
 
 ## Andamento da execução (2026-03-26 - rodada complementar)
 - ✅ **Estabilização de execução E2E** aplicada para reduzir falsos negativos de infra em execução fria: timeout do `webServer` do Playwright ampliado para acomodar subida completa de backend/frontend no ambiente atual.
 - ✅ **Novo avanço multi-CDU** além dos relatórios: **CDU-27 (Alterar data limite)** recebeu cobertura explícita de alerta no painel da unidade destino após alteração por ADMIN.
 - ✅ No CDU-27, a asserção agora valida os campos críticos do alerta gerado (`Descrição`, `Processo`, `Data/Hora` e `Origem` com `ADMIN`) após troca de perfil para CHEFE da unidade afetada.
 - ✅ Regressão direcionada executada em lote único dos specs alterados (`cdu-27`, `cdu-35`, `cdu-36`) para evidenciar passagem conjunta dos casos trabalhados.
-- 🔄 Próximo passo sugerido: ampliar o lote para CDUs de histórico de análise ainda parciais (CDU-13/CDU-14/CDU-20), priorizando campos de tabela e regras de visibilidade por perfil.
+- 🔄 Próximo passo sugerido: avançar para o próximo lote priorizado (`CDU-28`, `CDU-30`, `CDU-36`) e deixar `CDU-13`, `CDU-14` e `CDU-20` apenas com complementos pontuais de backend ou bordas de homologação.
 
 ## Novos aprendizados (rodada complementar 2026-03-26)
 - Em ambiente com build cold de backend Java, timeout curto de `webServer` no Playwright gera falha de infraestrutura sem relação com regra de negócio; calibrar timeout evita retrabalho e ruído no ciclo.
@@ -114,14 +148,14 @@ Esta versão substitui a rodada anterior e consolida pendências após segunda v
 - **P1** `PARCIAL`: Fluxo principal não estruturado numericamente; validar leitura manual do requisito completo.
 
 ### CDU-13
-- **P1** `PARCIAL`: No painel, o usuário clica no processo de mapeamento.
-- **P1** `PARCIAL`: O sistema mostra a tela `Detalhes do processo`.
-- **P0** `NAO_COBERTO`: `Histórico de análise`
+- **P1** `PARCIAL`: Evidência direta da tela `Detalhes do processo` antes da seleção da unidade.
+- **P1** `PARCIAL`: Campos de movimentação, alerta interno e notificações não observáveis de forma estável na UI.
+- **P1** `PARCIAL`: Auditoria de `Data/hora atual` fora do histórico de análise visível.
 
 ### CDU-14
-- **P1** `PARCIAL`: `Impactos no mapa`;
-- **P1** `PARCIAL`: `Histórico de análise`;
-- **P1** `PARCIAL`: `Devolver para ajustes`; e
+- **P1** `PARCIAL`: Homologação por `ADMIN`, incluindo os ramos com e sem impacto no mapa.
+- **P1** `PARCIAL`: Mensagem final de aceite e redirecionamento ao painel com assert direto.
+- **P1** `PARCIAL`: Efeitos colaterais internos (`alerta`, e-mail, auditoria temporal) sem superfície E2E estável.
 
 ### CDU-15
 - **P1** `PARCIAL`: O sistema mostra a tela `Detalhes do subprocesso`.
@@ -147,9 +181,9 @@ Esta versão substitui a rodada anterior e consolida pendências após segunda v
 - **P1** `PARCIAL`: O sistema notifica a unidade superior hierárquica da apresentação de sugestões para o mapa, com e-mail no modelo abaixo:
 
 ### CDU-20
-- **P1** `PARCIAL`: O sistema mostra a tela `Detalhes do subprocesso`.
-- **P1** `PARCIAL`: `Histórico de análise`;
-- **P1** `PARCIAL`: `Devolver para ajustes`;
+- **P1** `PARCIAL`: Cancelamento de homologação em estado válido e estável para E2E.
+- **P1** `PARCIAL`: Notificações por e-mail e alerta interno após aceite/devolução.
+- **P1** `PARCIAL`: Campos internos de auditoria não expostos de forma consistente na UI.
 
 ### CDU-21
 - **P1** `PARCIAL`: O sistema verifica se todos os subprocessos das unidades operacionais e interoperacionais participantes estão na situação 'Mapa homologado'.

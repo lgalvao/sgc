@@ -40,6 +40,9 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
 
             const modal = page.getByRole('dialog');
             await expect(modal).toBeVisible();
+            await expect(modal.getByText(TEXTOS.acaoBloco.aceitar.TITULO_VALIDACAO)).toBeVisible();
+            await expect(modal.getByRole('button', {name: /Cancelar/i})).toBeVisible();
+            await expect(modal.getByRole('button', {name: TEXTOS.acaoBloco.aceitar.BOTAO})).toBeVisible();
             await modal.getByRole('button', {name: /Cancelar/i}).click();
             
             await expect(modal).toBeHidden();

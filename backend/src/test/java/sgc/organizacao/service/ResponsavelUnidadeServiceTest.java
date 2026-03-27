@@ -56,7 +56,7 @@ class ResponsavelUnidadeServiceTest {
 
             assertThat(resultado).hasSize(1);
             assertThat(resultado.getFirst().unidadeCodigo()).isEqualTo(10L);
-            assertThat(resultado.getFirst().usuario()).isEqualTo(usuario);
+            assertThat(resultado.getFirst().usuario().tituloEleitoral()).isEqualTo(usuario.getTituloEleitoral());
         }
     }
 

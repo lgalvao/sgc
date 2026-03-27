@@ -236,6 +236,10 @@ describe('ProcessoCadastroView.vue', () => {
     });
 
     it('updates an existing process', async () => {
+        vi.mocked(unidadeService.buscarArvoreComElegibilidade).mockResolvedValue([
+            {codigo: 1, sigla: 'U1', nome: 'Unidade 1', isElegivel: true, filhas: []}
+        ] as any);
+
         const {wrapper, processosStore} = createWrapper();
 
         wrapper.vm.processoEditando = {codigo: 123};
@@ -259,6 +263,10 @@ describe('ProcessoCadastroView.vue', () => {
     });
 
     it('initiates a process (confirmation flow)', async () => {
+        vi.mocked(unidadeService.buscarArvoreComElegibilidade).mockResolvedValue([
+            {codigo: 1, sigla: 'U1', nome: 'Unidade 1', isElegivel: true, filhas: []}
+        ] as any);
+
         const {wrapper, processosStore} = createWrapper();
 
         wrapper.vm.descricao = 'Iniciar teste';
@@ -281,6 +289,10 @@ describe('ProcessoCadastroView.vue', () => {
     });
 
     it('initiates an existing process', async () => {
+        vi.mocked(unidadeService.buscarArvoreComElegibilidade).mockResolvedValue([
+            {codigo: 1, sigla: 'U1', nome: 'Unidade 1', isElegivel: true, filhas: []}
+        ] as any);
+
         const {wrapper, processosStore} = createWrapper();
 
         wrapper.vm.processoEditando = {codigo: 123};
@@ -319,6 +331,36 @@ describe('ProcessoCadastroView.vue', () => {
         wrapper.vm.tipo = 'REVISAO';
         await nextTick();
         expect(unidadeService.buscarArvoreComElegibilidade).toHaveBeenCalledWith('REVISAO', undefined);
+    });
+
+    it('remove unidades selecionadas inelegíveis ao trocar tipo para revisão', async () => {
+        vi.mocked(unidadeService.buscarArvoreComElegibilidade).mockImplementation(async (tipoProcesso: string) => {
+            if (tipoProcesso === 'MAPEAMENTO') {
+                return [
+                    {codigo: 1, sigla: 'ASSESSORIA_11', nome: 'A11', isElegivel: true, filhas: []},
+                    {codigo: 2, sigla: 'ASSESSORIA_12', nome: 'A12', isElegivel: true, filhas: []}
+                ] as any;
+            }
+            return [
+                {codigo: 1, sigla: 'ASSESSORIA_11', nome: 'A11', isElegivel: false, filhas: []},
+                {codigo: 2, sigla: 'ASSESSORIA_12', nome: 'A12', isElegivel: true, filhas: []}
+            ] as any;
+        });
+
+        const {wrapper} = createWrapper();
+
+        wrapper.vm.tipo = 'MAPEAMENTO';
+        await nextTick();
+        await flushPromises();
+
+        wrapper.vm.unidadesSelecionadas = [1, 2];
+        await nextTick();
+
+        wrapper.vm.tipo = 'REVISAO';
+        await nextTick();
+        await flushPromises();
+
+        expect(wrapper.vm.unidadesSelecionadas).toEqual([2]);
     });
 
     it('handles error when starting a new process (creation fail)', async () => {

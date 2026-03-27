@@ -55,6 +55,10 @@ const stubs = {
         template: '<div><h1>{{ title }}</h1><slot /><slot name="actions" /></div>'
     },
     BButton: {template: '<button :data-testid="$attrs[\'data-testid\']" @click="$emit(\'click\')"><slot /></button>'},
+    BFormCheckbox: {
+        props: ['modelValue'],
+        template: '<input type="checkbox" :data-testid="$attrs[\'data-testid\']" :checked="modelValue" @change="$emit(\'update:modelValue\', $event.target.checked)" />'
+    },
     BBadge: {template: '<span><slot /></span>'},
     BAlert: {template: '<div><slot /></div>', props: ['modelValue']},
     EmptyState: {template: '<div><slot /></div>'},

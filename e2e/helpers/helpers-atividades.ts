@@ -133,6 +133,16 @@ export async function removerConhecimento(page: Page, atividadeDescricao: string
 
 export async function disponibilizarCadastro(page: Page) {
     const botao = page.getByTestId('btn-cad-atividades-disponibilizar');
+    if (await botao.isDisabled()) {
+        const checkboxSemMudancas = page.getByTestId('chk-disponibilizacao-sem-mudancas');
+        if (await checkboxSemMudancas.count() > 0) {
+            await expect(checkboxSemMudancas).toBeVisible();
+            await expect(checkboxSemMudancas).toBeEnabled();
+            await checkboxSemMudancas.check();
+            await expect(checkboxSemMudancas).toBeChecked();
+        }
+    }
+
     await expect(botao).toBeEnabled();
     await botao.click();
 

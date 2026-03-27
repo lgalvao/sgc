@@ -73,6 +73,11 @@ public class SubprocessoService {
     }
 
     @Transactional(readOnly = true)
+    public MapaCompletoDto mapaCompletoDtoPorSubprocesso(Long codSubprocesso) {
+        return MapaCompletoDto.fromEntity(mapaCompletoPorSubprocesso(codSubprocesso));
+    }
+
+    @Transactional(readOnly = true)
     public Map<String, Object> obterSugestoes(Long codSubprocesso) {
         Subprocesso subprocesso = buscarSubprocesso(codSubprocesso);
         String sugestoes = Optional.ofNullable(subprocesso.getMapa())
@@ -119,6 +124,13 @@ public class SubprocessoService {
     }
 
     @Transactional(readOnly = true)
+    public SubprocessoCadastroDto obterCadastro(Long codSubprocesso) {
+        Subprocesso subprocesso = buscarSubprocesso(codSubprocesso);
+        List<AtividadeDto> atividades = listarAtividadesSubprocesso(codSubprocesso);
+        return SubprocessoCadastroDto.fromEntity(subprocesso, atividades);
+    }
+
+    @Transactional(readOnly = true)
     public Subprocesso obterEntidadePorProcessoEUnidade(Long codProcesso, Long codUnidade) {
         return subprocessoRepo.buscarPorProcessoEUnidadeComFetch(codProcesso, codUnidade)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada(NOME_ENTIDADE, "P:%d U:%d".formatted(codProcesso, codUnidade)));
@@ -126,8 +138,8 @@ public class SubprocessoService {
 
     @Transactional
     public Subprocesso criarEntidade(CriarSubprocessoRequest request) {
-        Processo processo = Processo.builder().codigo(request.codProcesso()).build();
-        Unidade unidade = Unidade.builder().codigo(request.codUnidade()).build();
+        Processo processo = repo.buscar(Processo.class, request.codProcesso());
+        Unidade unidade = unidadeService.buscarPorCodigo(request.codUnidade());
 
         Subprocesso entity = Subprocesso.builder()
                 .processo(processo)
@@ -181,7 +193,11 @@ public class SubprocessoService {
     }
 
     private void processarAlteracoes(Subprocesso sp, AtualizarSubprocessoRequest request) {
-        Optional.of(request.codMapa()).ifPresent(cod -> {
+        Optional.ofNullable(request.codUnidade())
+                .map(unidadeService::buscarPorCodigo)
+                .ifPresent(sp::setUnidade);
+
+        Optional.ofNullable(request.codMapa()).ifPresent(cod -> {
             Mapa m = Mapa.builder().codigo(cod).build();
             Mapa mapa = sp.getMapa();
             Long codAtual = mapa != null ? mapa.getCodigo() : null;
@@ -536,9 +552,9 @@ public class SubprocessoService {
         PermissoesSubprocessoDto permissoes = obterPermissoesUI(sp, usuarioAutenticado);
 
         return SubprocessoDetalheResponse.builder()
-                .subprocesso(sp)
+                .subprocesso(SubprocessoResumoDto.fromEntity(sp))
                 .responsavel(responsavel)
-                .titular(titular)
+                .titular(UsuarioResumoDto.fromEntity(titular))
                 .movimentacoes(movimentacoes)
                 .localizacaoAtual(localizacaoAtual)
                 .permissoes(permissoes)
@@ -556,9 +572,9 @@ public class SubprocessoService {
 
         return new ContextoEdicaoResponse(
                 unidadeSp,
-                sp,
+                SubprocessoResumoDto.fromEntity(sp),
                 detalhes,
-                mapaManutencaoService.mapaCompletoSubprocesso(codSubprocesso),
+                mapaCompletoDtoPorSubprocesso(codSubprocesso),
                 atividades
         );
     }
@@ -792,11 +808,7 @@ public class SubprocessoService {
     }
 
     private AtividadeDto mapAtividadeToDto(Atividade atividade) {
-        return AtividadeDto.builder()
-                .codigo(atividade.getCodigo())
-                .descricao(atividade.getDescricao())
-                .conhecimentos(new ArrayList<>(atividade.getConhecimentos()))
-                .build();
+        return AtividadeDto.fromEntity(atividade);
     }
 
     @Transactional(readOnly = true)

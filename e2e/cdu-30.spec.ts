@@ -104,4 +104,30 @@ test.describe.serial('CDU-30 - Manter administradores', () => {
         await expect(modal).toBeVisible();
         await expect(page.locator('main table tbody tr')).not.toHaveCount(0);
     });
+
+    test('Cenário 5: ADMIN tenta adicionar usuário que já é administrador e recebe erro de validação', async ({
+        _resetAutomatico,
+        page,
+        _autenticadoComoAdmin
+    }) => {
+        await page.getByTestId('btn-administradores').click();
+        await expect(page).toHaveURL(/\/administradores/);
+
+        await page.getByRole('button', {name: TEXTOS.administracao.BOTAO_ADICIONAR}).click();
+        const modal = page.getByRole('dialog');
+        await expect(modal).toBeVisible();
+
+        await modal.getByPlaceholder(TEXTOS.administracao.PLACEHOLDER_TITULO).fill('111111');
+        const respostaErro = page.waitForResponse(resp =>
+            resp.url().includes('/usuarios/administradores') &&
+            resp.request().method() === 'POST' &&
+            resp.status() >= 400
+        );
+        await modal.getByRole('button', {name: /Adicionar|Criar/i}).click();
+        const resposta = await respostaErro;
+        const corpo = await resposta.json();
+
+        await expect(modal).toBeVisible();
+        expect(corpo.message).toContain('Usuário já é um administrador do sistema');
+    });
 });

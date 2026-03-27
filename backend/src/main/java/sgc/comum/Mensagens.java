@@ -51,6 +51,7 @@ public final class Mensagens {
     public static final String CODIGO_UNIDADE_OBRIGATORIO       = "O código da unidade é obrigatório";
 
     // ── Subprocesso ──────────────────────────────────────────────────────────
+    public static final String CODIGO_SUBPROCESSO_OBRIGATORIO = "O código do subprocesso é obrigatório";
     public static final String CODIGO_SUBPROCESSO_ORIGEM_OBRIGATORIO = "O código do subprocesso de origem é obrigatório";
     public static final String DATA_LIMITE_ETAPA1_OBRIGATORIA   = "A data limite da etapa 1 é obrigatória";
 

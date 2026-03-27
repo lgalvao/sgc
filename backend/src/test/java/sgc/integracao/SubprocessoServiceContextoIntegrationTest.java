@@ -79,7 +79,7 @@ class SubprocessoServiceContextoIntegrationTest extends BaseIntegrationTest {
         SubprocessoDetalheResponse detalhes = subprocessoService.obterDetalhes(subprocesso.getCodigo(), admin);
 
         assertThat(detalhes).isNotNull();
-        assertThat(detalhes.subprocesso().getCodigo()).isEqualTo(subprocesso.getCodigo());
+        assertThat(detalhes.subprocesso().codigo()).isEqualTo(subprocesso.getCodigo());
         assertThat(detalhes.permissoes()).isNotNull();
     }
 
@@ -89,7 +89,7 @@ class SubprocessoServiceContextoIntegrationTest extends BaseIntegrationTest {
         ContextoEdicaoResponse contexto = subprocessoService.obterContextoEdicao(subprocesso.getCodigo());
 
         assertThat(contexto).isNotNull();
-        assertThat(contexto.subprocesso().getCodigo()).isEqualTo(subprocesso.getCodigo());
+        assertThat(contexto.subprocesso().codigo()).isEqualTo(subprocesso.getCodigo());
         assertThat(contexto.detalhes()).isNotNull();
         assertThat(contexto.mapa()).isNotNull();
         assertThat(contexto.atividadesDisponiveis()).isNotNull();
@@ -104,7 +104,7 @@ class SubprocessoServiceContextoIntegrationTest extends BaseIntegrationTest {
 
         ContextoEdicaoResponse contexto = subprocessoService.obterContextoEdicao(subprocesso.getCodigo());
 
-        assertThat(contexto.detalhes().subprocesso().getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+        assertThat(contexto.detalhes().subprocesso().situacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         assertThat(subprocessoService.buscarSubprocesso(subprocesso.getCodigo()).getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
     }
 
@@ -123,7 +123,7 @@ class SubprocessoServiceContextoIntegrationTest extends BaseIntegrationTest {
 
         ContextoEdicaoResponse contexto = subprocessoService.obterContextoEdicao(subprocesso.getCodigo());
 
-        assertThat(contexto.detalhes().subprocesso().getSituacao()).isEqualTo(SituacaoSubprocesso.NAO_INICIADO);
+        assertThat(contexto.detalhes().subprocesso().situacao()).isEqualTo(SituacaoSubprocesso.NAO_INICIADO);
         assertThat(subprocessoService.buscarSubprocesso(subprocesso.getCodigo()).getSituacao()).isEqualTo(SituacaoSubprocesso.NAO_INICIADO);
     }
 

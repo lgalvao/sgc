@@ -26,14 +26,6 @@ test.describe.serial('CDU-27 - Alterar data limite de subprocesso', () => {
     const timestamp = Date.now();
     const descProcesso = `Mapeamento CDU-27 ${timestamp}`;
 
-    function calcularNovaDataIso(dias: number): string {
-        const novaData = new Date();
-        novaData.setDate(novaData.getDate() + dias);
-        const yyyy = novaData.getFullYear();
-        const mm = String(novaData.getMonth() + 1).padStart(2, '0');
-        const dd = String(novaData.getDate()).padStart(2, '0');
-        return `${yyyy}-${mm}-${dd}`;
-    }
 
     function obterDataAnterior(dataIso: string): string {
         const data = new Date(`${dataIso}T00:00:00`);

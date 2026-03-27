@@ -13,7 +13,6 @@ import org.springframework.test.web.servlet.result.*;
 import sgc.comum.erros.*;
 import sgc.integracao.mocks.*;
 import sgc.mapa.dto.*;
-import sgc.mapa.model.*;
 import sgc.seguranca.*;
 import sgc.subprocesso.dto.*;
 
@@ -45,12 +44,10 @@ class AtividadeControllerTest {
         @DisplayName("Deve obter por ID")
         void deveobterPorCodigo() throws Exception {
             Mockito.when(permissionEvaluator.hasPermission(any(org.springframework.security.core.Authentication.class), eq(1L), eq("Atividade"), eq("VISUALIZAR_SUBPROCESSO"))).thenReturn(true);
-            Atividade response = Atividade.builder()
+            AtividadeDto response = AtividadeDto.builder()
                     .codigo(1L)
                     .descricao("Atividade teste")
-                    .mapa(Mapa.builder().codigo(10L).build())
-                    .conhecimentos(new LinkedHashSet<>())
-                    .competencias(new HashSet<>())
+                    .conhecimentos(List.of())
                     .build();
             Mockito.when(atividadeFacade.obterAtividadePorCodigo(1L)).thenReturn(response);
 

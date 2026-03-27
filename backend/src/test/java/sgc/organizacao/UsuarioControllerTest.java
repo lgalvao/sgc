@@ -48,7 +48,7 @@ class UsuarioControllerTest {
         Usuario entity = new Usuario();
         entity.setTituloEleitoral("123");
         entity.setNome("Teste");
-        entity.setUnidadeLotacao(Unidade.builder().codigo(1L).build());
+        entity.setUnidadeLotacao(Unidade.builder().codigo(1L).sigla("U1").nome("Unidade 1").build());
         when(usuarioService.buscarOpt("123")).thenReturn(Optional.of(entity));
 
         mockMvc.perform(get("/api/usuarios/123"))

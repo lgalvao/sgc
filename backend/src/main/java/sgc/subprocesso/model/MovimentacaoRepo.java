@@ -16,6 +16,7 @@ public interface MovimentacaoRepo extends JpaRepository<Movimentacao, Long> {
             SELECT m FROM Movimentacao m
             LEFT JOIN FETCH m.unidadeOrigem
             LEFT JOIN FETCH m.unidadeDestino
+            LEFT JOIN FETCH m.usuario
             WHERE m.subprocesso.codigo = :subprocessoCodigo
             ORDER BY m.dataHora DESC, m.codigo DESC
             """)
@@ -25,6 +26,7 @@ public interface MovimentacaoRepo extends JpaRepository<Movimentacao, Long> {
             SELECT m FROM Movimentacao m
             LEFT JOIN FETCH m.unidadeOrigem
             LEFT JOIN FETCH m.unidadeDestino
+            LEFT JOIN FETCH m.usuario
             WHERE m.subprocesso.codigo = :subprocessoCodigo
             ORDER BY m.dataHora DESC, m.codigo DESC
             LIMIT 1

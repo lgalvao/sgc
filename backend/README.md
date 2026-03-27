@@ -2,308 +2,105 @@
 
 ## Visão geral
 
-Este diretório contém o código do backend do SGC. Ele fornece uma API REST para consumo pelo frontend. A arquitetura é
-organizada em pacotes representando domínios específicos.
+Este diretório contém o código do backend do SGC. Ele fornece uma API REST robusta para o frontend, seguindo princípios de arquitetura modular e controle de acesso rigoroso.
 
 ## 🏗️ Arquitetura e Stack
 
-A aplicação segue uma arquitetura **Modular monolith** construída com:
+A aplicação é um sistema modular construído com:
 
-* **Java 21**: Linguagem base.
-* **Spring Boot 4.0.3**: Framework de aplicação (GA).
-* **Hibernate/JPA**: Persistência de dados.
-* **Oracle**: Banco de dados de produção.
-* **H2 Database**: Banco de dados em memória para testes e desenvolvimento local rápido.
-* **Gradle**: Ferramenta de build e gerenciamento de dependências.
+* **Java 21**: Utilizando as últimas funcionalidades da linguagem (Pattern Matching, Sealed Classes, Record).
+* **Spring Boot 4.0.5**: Framework de aplicação moderno.
+* **Hibernate/JPA**: Camada de persistência com validações ricas via Bean Validation.
+* **Oracle JDBC (ojdbc11)**: Driver para banco de dados de produção.
+* **H2 Database**: Banco de dados em memória para desenvolvimento local e testes rápidos.
+* **Gradle**: Gerenciamento de build e dependências com script Kotlin (`build.gradle.kts`).
 
-## 📦 Módulos principais
+## 📦 Estrutura de Módulos (Packages)
 
-O código está organizado em `src/main/java/sgc/` com os seguintes módulos principais:
+O código está organizado em `src/main/java/sgc/` seguindo uma divisão por domínios:
 
-* **`processo`**: Orquestrador central de fluxos de alto nível.
-* **`subprocesso`**: Máquina de estados para gerenciamento de tarefas por unidade.
-* **`mapa`**: Núcleo do domínio (Mapas, Competências, Atividades, Conhecimentos).
-* **`usuario`**: Gestão de usuários, perfis e autenticação.
-* **`unidade`**: Modelagem da estrutura organizacional.
-* **`alerta` / `notificacao`**: Módulos reativos para comunicação com o usuário.
-* **`analise`**: Auditoria e histórico de revisões.
+* **`processo`**: Gerencia o ciclo de vida dos processos de Mapeamento ou Revisão.
+* **`subprocesso`**: Gerencia a execução das tarefas por unidade. Inclui o motor de estados e o módulo de **Análise/Auditoria**.
+* **`mapa`**: Núcleo do domínio de competências (Mapas, Competências, Atividades, Conhecimentos).
+* **`organizacao`**: Modelagem organizacional (Usuários, Unidades, Perfis e Hierarquia).
+* **`seguranca`**: Controle de acesso centralizado (`SgcPermissionEvaluator`) e autenticação JWT.
+* **`alerta`**: Sistema de alertas internos e notificações reativas.
+* **`relatorio`**: Geração de documentos e exportações (PDF/Excel).
+* **`parametros`**: Configurações dinâmicas do sistema.
+* **`comum`**: Utilitários, exceções base e componentes compartilhados.
 
 ## 🚀 Como executar
 
-A partir da raiz do projeto, execute:
+A partir da raiz do projeto, você pode usar o `bootRun` do Gradle. O sistema utiliza perfis para carregar variáveis de ambiente de arquivos `.env.<perfil>`.
+
+```powershell
+# Execução padrão (usa .env.test ou application.yml)
+./gradlew :backend:bootRun
+
+# Execução em perfil específico
+./gradlew :backend:bootRun -PENV=e2e
+```
+
+A API estará disponível em `http://localhost:10000`.
+
+### Perfis principais
+* `local`: Desenvolvimento com H2.
+* `hom`: Ambiente de homologação (Oracle).
+* `e2e`: Preparado para testes automáticos (fixtures e reset de banco).
+
+## 🧪 Estratégia de Testes
+
+O backend possui uma suíte rigorosa de testes para garantir 100% de cobertura na lógica de negócio.
+
+* **Testes Unitários**: Rápidos, usam Mockito e JUnit 6.
+  ```powershell
+  ./gradlew :backend:unitTest
+  ```
+* **Testes de Integração**: Testam os fluxos de ponta a ponta (CDUs).
+  ```powershell
+  ./gradlew :backend:integrationTest
+  ```
+* **Mutation Testing**: PIT é usado para validar a qualidade da suíte de testes.
+  ```powershell
+  ./gradlew :backend:mutationTest
+  ```
+
+## 🛡️ Segurança e Controle de Acesso
+
+O SGC implementa a **"Regra de Ouro"** de acesso através do `SgcPermissionEvaluator`:
+
+1.  **Leitura (Visualização)**: Baseada na **Hierarquia**. Usuários veem dados de sua unidade (Chefe/Servidor) ou de sua árvore hierárquica (Gestor).
+2.  **Escrita (Execução)**: Baseada na **Localização**. Apenas usuários lotados na unidade onde o Subprocesso se encontra no momento podem realizar alterações.
+
+A segurança é aplicada nos Controllers via expressões:
+```java
+@PreAuthorize("hasPermission(#codigo, 'Subprocesso', 'EDITAR')")
+```
+
+## 📏 Convenções de Código
+
+### Identificadores
+**NUNCA** use `id`. Use sempre `codigo` tanto no Java quanto no banco de dados.
+
+### Idioma
+Todo o código, comentários e documentação deve ser em **Português brasileiro**.
+
+### REST API
+Seguimos um padrão de ações explícitas via `POST`:
+* `GET /api/recurso/{codigo}`: Consulta.
+* `POST /api/recurso`: Criação.
+* `POST /api/recurso/{codigo}/atualizar`: Alteração.
+* `POST /api/recurso/{codigo}/excluir`: Remoção.
+* `POST /api/recurso/{codigo}/iniciar`: Ações de workflow.
+
+## 📊 Dashboard de QA
+
+Para visualizar a saúde do projeto, utilizamos o Dashboard de QA que consolida lint, testes e cobertura.
 
 ```bash
-cd backend
-./gradlew bootRun -Dspring.profiles.active=e2e
+npm run qa:dashboard
 ```
+Os resultados são gerados em `etc/qa-dashboard/latest/ultimo-resumo.md`.
 
-A API do backend estará disponível em `http://localhost:10000`.
-
-### Perfis do Spring
-
-O sistema utiliza perfis para configurar o comportamento do ambiente:
-
-* `default`/`local`: Usa banco H2 em memória. Ideal para desenvolvimento.
-* `prod`: Configurado para Oracle.
-* `test`: Ativado durante a execução de testes unitários/integração.
-* `e2e`: Ativa endpoints auxiliares para testes end-to-end (reset de banco, fixtures).
-
-## 🧪 Testes
-
-### Execução
-
-O projeto suporta a execução granular de testes através de tarefas Gradle específicas:
-
-* **Todos os Testes** (Padrão):
-  ```bash
-  ./gradlew test
-  ```
-  Executa tanto testes unitários quanto de integração.
-
-* **Apenas unitários** (Rápido, exclui tag `integration`):
-  ```bash
-  ./gradlew unitTest
-  ```
-
-* **Apenas integração** (Filtra tag `integration`):
-  ```bash
-  ./gradlew integrationTest
-  ```
-
-### Estrutura de Testes
-
-Os testes estão localizados em `src/test/java/sgc/`:
-
-* **`integracao/`**: Testes de integração cobrindo os Casos de Uso (CDU-XX).
-* **`[pacote]/`**: Testes unitários específicos de cada módulo.
-* **`architecture/`**: Testes ArchUnit garantindo a integridade arquitetural.
-
-## 🏛️ Arquitetura detalhada
-
-### Padrões arquiteturais
-
-O sistema segue uma arquitetura em camadas com padrões bem definidos:
-
-#### 1. Facade pattern
-
-Todos os módulos principais expõem uma **Facade** como ponto de entrada único:
-
-```java
-// Controllers interagem APENAS com Facades
-@RestController
-public class SubprocessoController {
-    private final SubprocessoFacade facade;  // ✅ Correto
-    
-    @PostMapping("/{codigo}/disponibilizar")
-    public void disponibilizar(@PathVariable Long id) {
-        facade.disponibilizarCadastro(id, getCurrentUser());
-    }
-}
-```
-
-**Services especializados** são package-private e usados apenas pelas Facades:
-
-* `SubprocessoCadastroWorkflowService`
-* `SubprocessoMapaWorkflowService`
-* `SubprocessoService` (CRUD)
-* `SubprocessoContextoService`
-* etc.
-
-#### 2. Security in Layers (3 Camadas)
-
-O controle de acesso segue uma arquitetura em 3 camadas:
-
-```
-CAMADA 1: HTTP (Controllers)
-┌─────────────────────────────────────────┐
-│ @PreAuthorize("hasRole('CHEFE')")      │
-│ - Verificação de autenticação          │
-│ - Verificação básica de role           │
-└─────────────────────────────────────────┘
-                 ↓
-CAMADA 2: AUTORIZAÇÃO (AccessControlService)
-┌─────────────────────────────────────────┐
-│ accessControlService.verificarPermissao │
-│ - Verifica role necessária              │
-│ - Verifica ownership (unidade)          │
-│ - Verifica hierarquia                   │
-│ - Verifica estado do recurso            │
-│ - Audita decisão                        │
-└─────────────────────────────────────────┘
-                 ↓
-CAMADA 3: LÓGICA DE NEGÓCIO (Services)
-┌─────────────────────────────────────────┐
-│ Services executam lógica                │
-│ - SEM verificações de acesso            │
-│ - Confiam que Camada 2 validou          │
-└─────────────────────────────────────────┘
-```
-
-**Componentes de Segurança:**
-
-* `AccessControlService` - Ponto central de autorização
-* `AccessPolicy<T>` - Políticas específicas por recurso
-* `HierarchyService` - Hierarquia de unidades
-* `AccessAuditService` - Auditoria automática
-
-#### 3. Domain events
-
-Comunicação assíncrona entre módulos via Spring events:
-
-```java
-// Publicação
-eventPublisher.publishEvent(new EventoProcessoIniciado(codigo));
-
-// Observação
-@EventListener
-public void onProcessoIniciado(EventoProcessoIniciado evento) {
-    // Reage sem acoplamento direto
-}
-```
-
-#### 4. Data transfer objects (DTOs)
-
-**Regra:** NUNCA expor entidades JPA diretamente.
-
-```java
-// ✅ BOM: Retorna DTO
-@GetMapping("/{codigo}")
-public SubprocessoDto obter(@PathVariable Long id) {
-    return facade.obterDto(id);
-}
-
-// ❌ RUIM: Expõe entidade JPA
-@GetMapping("/{codigo}")
-public Subprocesso obter(@PathVariable Long id) {
-    return repository.findById(id).get();
-}
-```
-
-### Fluxo de Dados
-
-#### Leitura (Query)
-
-```
-User request → Controller → Facade → Service → Repository 
-→ JPA Entity → Mapper → DTO → HTTP Response
-```
-
-#### Escrita (Command)
-
-```
-User request + DTO → Controller (@Valid) → Facade
-→ AccessControlService (autoriza)
-→ Service (valida + executa) → Repository → JPA Entity
-→ EventPublisher (opcional) → DTO → HTTP Response
-```
-
-### Módulos detalhados
-
-#### `sgc.processo`
-
-* **Facade:** `ProcessoFacade`
-* **Responsabilidade:** Gerencia ciclo de vida de processos (MAPEAMENTO ou REVISÃO)
-* **Entidades:** `Processo`, `SituacaoProcesso`, `TipoProcesso`
-* **Services:** `ProcessoConsultaService`, etc.
-
-#### `sgc.subprocesso`
-
-* **Facade:** `SubprocessoFacade`
-* **Responsabilidade:** Gerencia subprocessos vinculados a processos e unidades
-* **Entidades:** `Subprocesso`, `SituacaoSubprocesso`, `TransicaoSubprocesso`
-* **Services:** `SubprocessoCadastroWorkflowService`, `SubprocessoMapaWorkflowService`, `SubprocessoService` (CRUD),
-  `SubprocessoContextoService`
-
-#### `sgc.mapa`
-
-* **Facade:** `MapaService` (atua como facade), `AtividadeFacade`
-* **Responsabilidade:** Gerencia mapas de competências
-* **Entidades:** `Mapa`, `Competencia`, `Atividade`, `Conhecimento`
-* **Services:** `CompetenciaService`, `ConhecimentoService`, `MapaSalvamentoService`, etc.
-
-#### `sgc.organizacao`
-
-* **Services:** `UsuarioFacade`, `OrganizacaoFacade`
-* **Responsabilidade:** Estrutura organizacional (usuários, unidades, perfis)
-* **Entidades:** `Usuario`, `Unidade`, `Perfil`
-
-#### `sgc.seguranca`
-
-* **Pacote:** `sgc.seguranca.acesso` - Controle de acesso centralizado
-* **Componentes:**
-    * `AccessControlService` - Serviço central
-    * `AccessPolicy<T>` - Interface de políticas
-    * `SubprocessoAccessPolicy`, `ProcessoAccessPolicy`, etc.
-    * `HierarchyService` - Hierarquia de unidades
-    * `AccessAuditService` - Auditoria
-* **Pacote:** `sgc.seguranca.login` - Autenticação
-    * `LoginFacade`, `JwtService`, `ConfigSeguranca`
-
-#### `sgc.analise`
-
-* **Service:** `AnaliseService`
-* **Responsabilidade:** Auditoria de análises durante workflows
-* **Entidades:** `Analise`, `TipoAnalise`, `TipoAcaoAnalise`
-
-#### `sgc.notificacao` e `sgc.alerta`
-
-* **Services:** `NotificacaoEmailService`, `AlertaFacade`
-* **Responsabilidade:** Comunicação reativa com usuários
-* **Integração:** Reage a eventos de domínio
-
-### Convenções de Código
-
-#### Nomenclatura
-
-* **Classes:** `PascalCase`
-* **Métodos:** `camelCase`
-* **Constantes:** `UPPER_SNAKE_CASE`
-* **Packages:** `lowercase`
-
-#### Sufixos obrigatórios
-
-* Controllers: `{Entidade}Controller`
-* Facades: `{Entidade}Facade`
-* Services: `{Entidade}Service`
-* Repositories: `{Entidade}Repo`
-* DTOs: `{Entidade}Dto`
-* Mappers: `{Entidade}Mapper`
-* Exceções: `Erro{TipoErro}`
-
-#### Idioma
-
-**TUDO em Português brasileiro:**
-
-* Código (variáveis, métodos, classes)
-* Comentários
-* Mensagens de erro
-* Documentação
-
-#### Identificadores
-
-**SEMPRE** use `codigo` em vez de `id`:
-
-```java
-// ✅ BOM
-private Long codigo;
-@PathVariable Long codigo
-
-// ❌ RUIM
-private final Long id;
-@PathVariable Long id
-```
-
-#### REST API (Não-Padrão)
-
-```
-GET  /api/processos           - Listar
-GET  /api/processos/{codigo}      - Obter
-POST /api/processos           - Criar
-POST /api/processos/{codigo}/atualizar   - Atualizar
-POST /api/processos/{codigo}/excluir     - Excluir
-POST /api/processos/{codigo}/iniciar     - Workflow action
-```
-
-## 📚 Documentação adicional
-
-* [Backend patterns](/etc/docs/backend-padroes.md) - Padrões e convenções
+---
+*Para mais detalhes sobre padrões específicos, consulte o arquivo [AGENTS.md](../AGENTS.md) na raiz do projeto.*

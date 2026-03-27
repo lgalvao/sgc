@@ -170,6 +170,10 @@ describe('ProcessoCadastroView.vue Coverage', () => {
     });
 
     it('handles error starting process during initiation flow', async () => {
+        vi.mocked(unidadeService.buscarArvoreComElegibilidade).mockResolvedValue([
+            {codigo: 1, sigla: 'U1', nome: 'Unidade 1', isElegivel: true, filhas: []}
+        ] as any);
+
         const {wrapper, processosStore} = createWrapper();
 
         await wrapper.find('[data-testid="inp-processo-descricao"]').setValue('Teste inicio');
@@ -260,6 +264,11 @@ describe('ProcessoCadastroView.vue Coverage', () => {
 
     it('populates fields when loading an existing process', async () => {
         mockRoute.query = {codProcesso: '123'};
+        vi.mocked(unidadeService.buscarArvoreComElegibilidade).mockResolvedValue([
+            {codigo: 1, sigla: 'U1', nome: 'Unidade 1', isElegivel: true, filhas: []},
+            {codigo: 2, sigla: 'U2', nome: 'Unidade 2', isElegivel: true, filhas: []}
+        ] as any);
+
         const mockProcesso = {
             codigo: 123,
             descricao: 'Processo existente',

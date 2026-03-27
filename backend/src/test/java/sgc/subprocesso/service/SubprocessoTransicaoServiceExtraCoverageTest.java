@@ -35,6 +35,12 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
     @Mock
     private AlertaFacade alertaService;
 
+    @Mock
+    private SubprocessoValidacaoService validacaoService;
+
+    @Mock
+    private SubprocessoNotificacaoService notificacaoService;
+
     @Test
     @DisplayName("obterUnidadeLocalizacao - destino nulo")
     void obterUnidadeLocalizacao_DestinoNulo() {

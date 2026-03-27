@@ -182,6 +182,29 @@ public class MapaManutencaoService {
     }
 
     @Transactional
+    public Mapa criarMapa(CriarMapaRequest request) {
+        Subprocesso subprocesso = repo.buscar(Subprocesso.class, request.subprocessoCodigo());
+        Mapa mapa = Mapa.builder()
+                .subprocesso(subprocesso)
+                .dataHoraDisponibilizado(request.dataHoraDisponibilizado())
+                .observacoesDisponibilizacao(request.observacoesDisponibilizacao())
+                .sugestoes(request.sugestoes())
+                .dataHoraHomologado(request.dataHoraHomologado())
+                .build();
+        return mapaRepo.save(mapa);
+    }
+
+    @Transactional
+    public Mapa atualizarMapa(Long codMapa, AtualizarMapaRequest request) {
+        Mapa existente = mapaCodigo(codMapa)
+                .setDataHoraDisponibilizado(request.dataHoraDisponibilizado())
+                .setObservacoesDisponibilizacao(request.observacoesDisponibilizacao())
+                .setSugestoes(request.sugestoes())
+                .setDataHoraHomologado(request.dataHoraHomologado());
+        return mapaRepo.save(existente);
+    }
+
+    @Transactional
     public List<Mapa> salvarMapas(List<Mapa> mapas) {
         return mapaRepo.saveAll(mapas);
     }

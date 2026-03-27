@@ -108,6 +108,80 @@ Os relatórios são gerados em:
 * Backend: `backend/build/reports/`
 * Frontend: `frontend/coverage/`
 
+### Dashboard de QA
+
+O projeto possui um dashboard de desenvolvimento voltado para **saude de QA**, nao para observabilidade de producao.
+Ele consolida testes, cobertura, lint, typecheck e E2E em snapshots centralizados e estaveis.
+
+#### Como atualizar
+
+No Windows/PowerShell:
+
+```powershell
+npm run qa:dashboard
+```
+
+Perfis disponiveis:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File etc/qa-dashboard/scripts/coletar-snapshot.ps1 -Perfil rapido
+powershell -ExecutionPolicy Bypass -File etc/qa-dashboard/scripts/coletar-snapshot.ps1 -Perfil frontend
+powershell -ExecutionPolicy Bypass -File etc/qa-dashboard/scripts/coletar-snapshot.ps1 -Perfil backend
+powershell -ExecutionPolicy Bypass -File etc/qa-dashboard/scripts/coletar-snapshot.ps1 -Perfil completo
+```
+
+#### Onde consultar
+
+Os snapshots gerados ficam em:
+
+* `etc/qa-dashboard/runs/<timestamp>/snapshot.json`
+* `etc/qa-dashboard/runs/<timestamp>/resumo.md`
+
+Os aliases mais recentes ficam em:
+
+* `etc/qa-dashboard/latest/ultimo-snapshot.json`
+* `etc/qa-dashboard/latest/ultimo-resumo.md`
+
+#### Como interpretar
+
+O dashboard deve ser lido a partir dos snapshots centralizados, e nao diretamente dos artefatos transientes de build.
+
+Exemplos de sinais importantes:
+
+* `statusGeral`: semaforo agregado da execucao.
+* `indiceSaude`: panorama numerico da saude de QA.
+* `verificacoes`: resultado individual por suite.
+* `confiabilidade.suitesLentas`: suites mais caras.
+* `hotspots`: arquivos ou classes com maior risco por baixa cobertura.
+
+#### Regra importante
+
+Nao use `backend/build/`, `frontend/coverage/`, `playwright-report/` ou `test-results/` como fonte primaria para
+analise humana ou automacao do dashboard. Esses caminhos sao apenas insumos transitivos do coletor.
+
+Consulte tambem:
+
+* `etc/docs/dashboard-qa.md`
+* `etc/qa-dashboard/config/snapshot.schema.json`
+
+#### Exemplo de leitura
+
+Exemplo de interpretacao de um snapshot `completo`:
+
+* `statusGeral: vermelho`: existe pelo menos uma verificacao falhando.
+* `indiceSaude: 42.86`: panorama agregado ruim, apesar de parte da malha estar verde.
+* `verificacoes`:
+  * backend pode falhar por erro de compilacao antes mesmo de executar os testes
+  * frontend pode permanecer verde com cobertura alta
+  * E2E pode apontar regressao parcial, por exemplo `180/186` aprovados
+* `confiabilidade.suitesLentas`: ajuda a localizar rapidamente o custo das suites mais pesadas, como cobertura de
+  frontend e Playwright.
+* `hotspots`: mostra arquivos com menor cobertura e maior risco relativo, por exemplo componentes e utilitarios ainda
+  pouco protegidos por testes.
+
+Esse tipo de leitura evita depender de varios relatorios separados e concentra a analise em um unico artefato do
+dashboard.
+
 ## Documentação de Negócio
 
 Os requisitos do sistema estão documentados em casos de uso (CDUs) no diretório `etc/reqs/`.

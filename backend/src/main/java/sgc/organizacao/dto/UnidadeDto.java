@@ -46,7 +46,7 @@ public class UnidadeDto {
     private boolean isElegivel;
 
     @JsonView(OrganizacaoViews.Publica.class)
-    private Usuario responsavel;
+    private UsuarioResumoDto responsavel;
 
     public static UnidadeDto fromEntity(Unidade entity) {
         if (entity == null) return null;
@@ -55,12 +55,12 @@ public class UnidadeDto {
                 .nome(entity.getNome())
                 .sigla(entity.getSigla())
                 .codigoPai(entity.getUnidadeSuperior() != null ? entity.getUnidadeSuperior().getCodigo() : null)
-                .tipo(entity.getTipo().name())
+                .tipo(entity.getTipo() != null ? entity.getTipo().name() : null)
                 .tituloTitular(entity.getTituloTitular())
                 .build();
 
         if (entity.getResponsabilidade() != null) {
-            dto.setResponsavel(entity.getResponsabilidade().getUsuario());
+            dto.setResponsavel(UsuarioResumoDto.fromEntity(entity.getResponsabilidade().getUsuario()));
         }
 
         return dto;

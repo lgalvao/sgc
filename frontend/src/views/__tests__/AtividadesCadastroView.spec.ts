@@ -94,6 +94,10 @@ const stubs = {
         template: '<button :data-testid="$attrs[\'data-testid\']" v-bind="disabled ? { disabled: true } : {}" @click="$emit(\'click\')"><slot /></button>'
     },
     BButton: {template: '<button :data-testid="$attrs[\'data-testid\']" v-bind="$attrs" @click="$emit(\'click\')"><slot /></button>'},
+    BFormCheckbox: {
+        props: ['modelValue'],
+        template: '<input type="checkbox" :data-testid="$attrs[\'data-testid\']" :checked="modelValue" @change="$emit(\'update:modelValue\', $event.target.checked)" />'
+    },
     BDropdown: {template: '<div><slot /></div>'},
     BDropdownItem: {template: '<div :data-testid="$attrs[\'data-testid\']" @click="$emit(\'click\')"><slot /></div>'},
     BAlert: {template: '<div><slot /><button data-testid="btn-dismiss-alert" @click="$emit(\'dismissed\')">x</button></div>', props: ['modelValue']},
@@ -338,6 +342,75 @@ describe("CadastroView.vue", () => {
             conhecimentos: [{codigo: 1, descricao: "Conhecimento 1"}]
         }];
 
+        await flushPromises();
+
+        const btn = wrapper.find('[data-testid="btn-cad-atividades-disponibilizar"]');
+        expect(btn.attributes('disabled')).toBeUndefined();
+    });
+
+    it("em revisão, mantém botão desabilitado sem mudanças e checkbox desmarcada", async () => {
+        const wrapper = createWrapper();
+        await flushPromises();
+        const vm = wrapper.vm as any;
+        const subprocessosStore = subprocessosMock as any;
+        subprocessosStore.subprocessoDetalhe = {
+            ...subprocessosStore.subprocessoDetalhe,
+            situacao: "REVISAO_CADASTRO_EM_ANDAMENTO",
+            tipoProcesso: "REVISAO",
+        };
+        vm.atividades = [{
+            codigo: 1,
+            descricao: "Ativ 1",
+            conhecimentos: [{codigo: 1, descricao: "Conhecimento 1"}]
+        }];
+        vm.atividadesSnapshotInicial = JSON.stringify([{descricao: "Ativ 1", conhecimentos: ["Conhecimento 1"]}]);
+        await flushPromises();
+
+        const checkbox = wrapper.find('[data-testid="chk-disponibilizacao-sem-mudancas"]');
+        const btn = wrapper.find('[data-testid="btn-cad-atividades-disponibilizar"]');
+        expect(checkbox.exists()).toBe(true);
+        expect(btn.attributes('disabled')).toBeDefined();
+    });
+
+    it("em revisão, habilita botão ao marcar checkbox sem mudanças", async () => {
+        const wrapper = createWrapper();
+        await flushPromises();
+        const vm = wrapper.vm as any;
+        const subprocessosStore = subprocessosMock as any;
+        subprocessosStore.subprocessoDetalhe = {
+            ...subprocessosStore.subprocessoDetalhe,
+            situacao: "REVISAO_CADASTRO_EM_ANDAMENTO",
+            tipoProcesso: "REVISAO",
+        };
+        vm.atividades = [{
+            codigo: 1,
+            descricao: "Ativ 1",
+            conhecimentos: [{codigo: 1, descricao: "Conhecimento 1"}]
+        }];
+        vm.atividadesSnapshotInicial = JSON.stringify([{descricao: "Ativ 1", conhecimentos: ["Conhecimento 1"]}]);
+        vm.disponibilizacaoSemMudancas = true;
+        await flushPromises();
+
+        const btn = wrapper.find('[data-testid="btn-cad-atividades-disponibilizar"]');
+        expect(btn.attributes('disabled')).toBeUndefined();
+    });
+
+    it("em revisão, habilita botão quando houver alteração no cadastro", async () => {
+        const wrapper = createWrapper();
+        await flushPromises();
+        const vm = wrapper.vm as any;
+        const subprocessosStore = subprocessosMock as any;
+        subprocessosStore.subprocessoDetalhe = {
+            ...subprocessosStore.subprocessoDetalhe,
+            situacao: "REVISAO_CADASTRO_EM_ANDAMENTO",
+            tipoProcesso: "REVISAO",
+        };
+        vm.atividadesSnapshotInicial = JSON.stringify([{descricao: "Ativ 1", conhecimentos: ["Conhecimento 1"]}]);
+        vm.atividades = [{
+            codigo: 1,
+            descricao: "Ativ 1 alterada",
+            conhecimentos: [{codigo: 1, descricao: "Conhecimento 1"}]
+        }];
         await flushPromises();
 
         const btn = wrapper.find('[data-testid="btn-cad-atividades-disponibilizar"]');

@@ -47,6 +47,25 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
         await expect(btnDisponibilizarMapa).toBeDisabled();
     });
 
+    test('ADMIN abre modal de disponibilização em bloco e cancela operação', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
+        await acessarDetalhesProcesso(page, descProcesso);
+
+        const btnDisponibilizar = page.getByRole('button', {name: TEXTOS.acaoBloco.disponibilizar.ROTULO}).first();
+        await expect(btnDisponibilizar).toBeEnabled();
+        await btnDisponibilizar.click();
+
+        const modal = page.locator('#modal-acao-bloco');
+        await expect(modal.getByText(TEXTOS.acaoBloco.disponibilizar.TITULO)).toBeVisible();
+        await expect(modal.getByText(TEXTOS.acaoBloco.disponibilizar.TEXTO)).toBeVisible();
+        await expect(modal.getByRole('button', {name: /Cancelar/i})).toBeVisible();
+        await expect(modal.getByRole('button', {name: TEXTOS.acaoBloco.disponibilizar.BOTAO})).toBeVisible();
+
+        await modal.getByRole('button', {name: /Cancelar/i}).click();
+        await expect(modal).not.toHaveClass(/show/);
+        await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
+    });
+
+
     test('ADMIN disponibiliza mapas em bloco após associar todas as atividades', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
         await acessarDetalhesProcesso(page, descProcesso);
         await navegarParaSubprocesso(page, UNIDADE_1);

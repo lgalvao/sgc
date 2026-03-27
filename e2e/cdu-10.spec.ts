@@ -26,6 +26,7 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
     const UNIDADE_ALVO = 'SECAO_221';
     const timestamp = Date.now();
     const descProcessoRevisao = `Rev 10 ${timestamp}`;
+    const descProcessoRevisaoSemMudancas = `Rev 10 sem mudancas ${timestamp}`;
 
     test('1. Setup: Preparar processo de revisão e atividades iniciais', async ({_resetAutomatico, request, page}) => {
         // Criar processo mapeamento finalizado (gera mapa vigente)
@@ -64,6 +65,44 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await expect(page.getByTestId('btn-cad-atividades-disponibilizar')).toBeVisible();
     });
 
+    test('1.2 Cenário adicional: disponibilizar revisão sem mudanças usando checkbox', async ({_resetAutomatico, request, page}) => {
+        const unidadeSemMudancas = 'SECAO_212';
+
+        await criarProcessoFinalizadoFixture(request, {
+            unidade: unidadeSemMudancas,
+            descricao: `Base map 10 sem mudancas ${timestamp}`
+        });
+
+        const processoSemMudancas = await criarProcessoFixture(request, {
+            descricao: descProcessoRevisaoSemMudancas,
+            tipo: 'REVISAO',
+            unidade: unidadeSemMudancas,
+            iniciar: true
+        });
+        expect(processoSemMudancas.codigo).toBeGreaterThan(0);
+
+        await login(page, USUARIOS.CHEFE_SECAO_212.titulo, USUARIOS.CHEFE_SECAO_212.senha);
+        await acessarSubprocessoChefeDireto(page, descProcessoRevisaoSemMudancas, unidadeSemMudancas);
+        await navegarParaAtividades(page);
+
+        const checkboxSemMudancas = page.getByTestId('chk-disponibilizacao-sem-mudancas');
+        await expect(checkboxSemMudancas).toBeVisible();
+        await expect(checkboxSemMudancas).toBeEnabled();
+
+        const botaoDisponibilizar = page.getByTestId('btn-cad-atividades-disponibilizar');
+        await expect(botaoDisponibilizar).toBeDisabled();
+
+        await checkboxSemMudancas.check();
+        await expect(botaoDisponibilizar).toBeEnabled();
+
+        await botaoDisponibilizar.click();
+        await expect(page.getByTestId('btn-confirmar-disponibilizacao')).toBeVisible();
+        await page.getByTestId('btn-confirmar-disponibilizacao').click();
+
+        await expect(page.getByText(/disponibilizada?|Disponibilizado/i).first()).toBeVisible();
+        await verificarPaginaPainel(page);
+    });
+
     test('2. Cenário 1: Validação - Atividade sem conhecimento', async ({_resetAutomatico, page}) => {
         await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
         await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
@@ -85,7 +124,18 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
         await navegarParaAtividades(page);
         await limparNotificacoes(page);
-        await page.getByTestId('btn-cad-atividades-disponibilizar').click();
+        const botaoDisponibilizar = page.getByTestId('btn-cad-atividades-disponibilizar');
+        if (await botaoDisponibilizar.isDisabled()) {
+            const checkboxSemMudancas = page.getByTestId('chk-disponibilizacao-sem-mudancas');
+            if (await checkboxSemMudancas.count() > 0) {
+                await expect(checkboxSemMudancas).toBeVisible();
+                await expect(checkboxSemMudancas).toBeEnabled();
+                await checkboxSemMudancas.check();
+                await expect(checkboxSemMudancas).toBeChecked();
+            }
+        }
+        await expect(botaoDisponibilizar).toBeEnabled();
+        await botaoDisponibilizar.click();
         const modalConfirmacao = page.getByRole('dialog');
         await expect(modalConfirmacao.getByText(TEXTOS.atividades.MODAL_DISPONIBILIZAR_REVISAO_TITULO)).toBeVisible();
         await expect(modalConfirmacao.getByText(TEXTOS.atividades.MODAL_DISPONIBILIZAR_REVISAO_TEXTO)).toBeVisible();
@@ -182,7 +232,18 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await acessarSubprocessoChefeDireto(page, descProcessoRevisao, UNIDADE_ALVO);
         await navegarParaAtividades(page);
         await limparNotificacoes(page);
-        await page.getByTestId('btn-cad-atividades-disponibilizar').click();
+        const botaoDisponibilizar = page.getByTestId('btn-cad-atividades-disponibilizar');
+        if (await botaoDisponibilizar.isDisabled()) {
+            const checkboxSemMudancas = page.getByTestId('chk-disponibilizacao-sem-mudancas');
+            if (await checkboxSemMudancas.count() > 0) {
+                await expect(checkboxSemMudancas).toBeVisible();
+                await expect(checkboxSemMudancas).toBeEnabled();
+                await checkboxSemMudancas.check();
+                await expect(checkboxSemMudancas).toBeChecked();
+            }
+        }
+        await expect(botaoDisponibilizar).toBeEnabled();
+        await botaoDisponibilizar.click();
         await page.getByTestId('btn-disponibilizar-revisao-cancelar').click();
         await expect(page.getByRole('dialog')).toBeHidden();
         await expect(page.getByRole('heading', {name: 'Atividades e conhecimentos'})).toBeVisible();

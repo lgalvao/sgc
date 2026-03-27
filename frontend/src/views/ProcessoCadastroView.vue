@@ -168,11 +168,38 @@ const {notificacao, notify, notifyStructured, clear} = useNotification();
 const unidades = ref<Unidade[]>([]);
 const isLoadingUnidades = ref(false);
 
+function coletarCodigosElegiveis(unidadesArvore: Unidade[]): Set<number> {
+  const codigosElegiveis = new Set<number>();
+
+  const visitar = (unidade: Unidade) => {
+    if (unidade.isElegivel === true) {
+      codigosElegiveis.add(unidade.codigo);
+    }
+    (unidade.filhas ?? []).forEach(visitar);
+  };
+
+  unidadesArvore.forEach(visitar);
+  return codigosElegiveis;
+}
+
+function sincronizarUnidadesSelecionadasElegiveis(unidadesArvore: Unidade[]) {
+  const codigosElegiveis = coletarCodigosElegiveis(unidadesArvore);
+  const selecionadasFiltradas = unidadesSelecionadas.value.filter(codigo =>
+      codigosElegiveis.has(codigo),
+  );
+
+  if (selecionadasFiltradas.length !== unidadesSelecionadas.value.length) {
+    unidadesSelecionadas.value = selecionadasFiltradas;
+  }
+}
+
 async function buscarUnidadesParaProcesso(tipoProcesso: string, codProcesso?: number) {
   isLoadingUnidades.value = true;
   try {
     const response = await buscarArvoreComElegibilidade(tipoProcesso, codProcesso);
-    unidades.value = mapUnidadesArray(response as any);
+    const unidadesMapeadas = mapUnidadesArray(response as any);
+    unidades.value = unidadesMapeadas;
+    sincronizarUnidadesSelecionadasElegiveis(unidadesMapeadas);
   } catch (err: any) {
     logger.error("Erro ao buscar unidades:", err);
   } finally {

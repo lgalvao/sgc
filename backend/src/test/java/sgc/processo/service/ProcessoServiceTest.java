@@ -618,7 +618,7 @@ class ProcessoServiceTest {
         void deveobterPorCodigoOptional() {
             Long id = 100L;
             Processo processo = ProcessoFixture.processoPadrao();
-            when(repo.buscar(Processo.class, id)).thenReturn(processo);
+            when(processoRepo.buscarPorCodigoComParticipantes(id)).thenReturn(Optional.of(processo));
 
             Optional<Processo> res = processoService.buscarOpt(id);
             assertThat(res).isPresent();

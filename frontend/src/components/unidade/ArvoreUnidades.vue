@@ -105,6 +105,25 @@ function getTodasSubunidades(unidade: Unidade): Unidade[] {
   return result;
 }
 
+function coletarCodigosElegiveis(unidades: Unidade[]): Set<number> {
+  const codigosElegiveis = new Set<number>();
+
+  const visitar = (unidade: Unidade) => {
+    if (unidade.isElegivel === true) {
+      codigosElegiveis.add(unidade.codigo);
+    }
+    (unidade.filhas ?? []).forEach(visitar);
+  };
+
+  unidades.forEach(visitar);
+  return codigosElegiveis;
+}
+
+function filtrarSelecaoPorElegibilidade(selecao: number[]): number[] {
+  const codigosElegiveis = coletarCodigosElegiveis(props.unidades);
+  return selecao.filter(codigo => codigosElegiveis.has(codigo));
+}
+
 function isChecked(codigo: number): boolean {
   if (!props.modoSelecao) return false;
   return unidadesSelecionadasLocal.value.includes(codigo);
@@ -218,11 +237,12 @@ function deselecionarTodas() {
 watch(
     () => props.modelValue,
     (novoValor) => {
-      const sortedNew = [...novoValor].sort();
+      const novoValorFiltrado = filtrarSelecaoPorElegibilidade(novoValor);
+      const sortedNew = [...novoValorFiltrado].sort();
       const sortedLocal = [...unidadesSelecionadasLocal.value].sort();
 
       if (JSON.stringify(sortedNew) !== JSON.stringify(sortedLocal)) {
-        unidadesSelecionadasLocal.value = [...novoValor];
+        unidadesSelecionadasLocal.value = [...novoValorFiltrado];
       }
     },
     {deep: true},
@@ -231,6 +251,11 @@ watch(
 const expandedUnits = ref<Set<number>>(new Set());
 
 watch(() => props.unidades, (newUnidades) => {
+  const selecaoFiltrada = filtrarSelecaoPorElegibilidade(unidadesSelecionadasLocal.value);
+  if (selecaoFiltrada.length !== unidadesSelecionadasLocal.value.length) {
+    unidadesSelecionadasLocal.value = selecaoFiltrada;
+  }
+
   if (newUnidades && newUnidades.length > 0) {
     expandedUnits.value = new Set(newUnidades.map(u => u.codigo));
   }

@@ -9,6 +9,7 @@ import org.springframework.http.*;
 import org.springframework.security.access.prepost.*;
 import org.springframework.security.core.annotation.*;
 import org.springframework.web.bind.annotation.*;
+import sgc.alerta.dto.*;
 import sgc.alerta.model.*;
 import sgc.organizacao.model.*;
 import sgc.processo.dto.*;
@@ -44,7 +45,7 @@ public class PainelController {
      */
     @GetMapping("/alertas")
     @Operation(summary = "Lista alertas para o painel com base no contexto do Token JWT")
-    public ResponseEntity<Page<Alerta>> listarAlertas(
+    public ResponseEntity<Page<AlertaDto>> listarAlertas(
             @AuthenticationPrincipal Usuario usuario,
             @PageableDefault(size = 20) Pageable pageable) {
 
@@ -54,6 +55,6 @@ public class PainelController {
                 usuario.getPerfilAtivo().name(), 
                 pageable
         );
-        return ResponseEntity.ok(page);
+        return ResponseEntity.ok(page.map(AlertaDto::fromEntity));
     }
 }

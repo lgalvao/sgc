@@ -26,6 +26,14 @@ export default [
         },
     },
     {
+        files: ["etc/qa-dashboard/**/*.js"],
+        languageOptions: {
+            globals: {
+                ...globals.browser,
+            },
+        },
+    },
+    {
         files: ["e2e/**/*.ts"],
         plugins: {
             playwright: pluginPlaywright,
