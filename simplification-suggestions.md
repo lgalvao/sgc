@@ -19,6 +19,10 @@ Facade layers in the backend are considered overengineering for this project. Do
 **Action:** Remove pass-through Facades such as:
 - `PainelFacade`
 - `UsuarioFacade`
+- `LoginFacade`
+- `AlertaFacade`
+- `RelatorioFacade`
+- `AtividadeFacade`
 
 ### 2. Consolidate Fragmented Services
 Services have been artificially fragmented, increasing navigation difficulty and coupling without tangible benefits.
@@ -42,4 +46,7 @@ Pinia stores should be reserved for globally shared, durable state (like user pr
 ### 2. Avoid Pointless Wrapper Components
 Frontend components that only act as proxies—passing props and events down to base components (like those from BootstrapVueNext) without adding meaningful domain logic, UI composition, or behavior—should be eliminated.
 
-**Action:** Use the base components directly in the views rather than maintaining pass-through wrappers.
+**Action:** Use the base components directly in the views rather than maintaining pass-through wrappers. Examples include:
+- `LoadingButton.vue`
+- `InputData.vue`
+- `ModalPadrao.vue`
