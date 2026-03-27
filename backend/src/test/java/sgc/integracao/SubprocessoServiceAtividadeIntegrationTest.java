@@ -66,6 +66,7 @@ class SubprocessoServiceAtividadeIntegrationTest extends BaseIntegrationTest {
                 .unidade(unidade)
                 .situacao(SituacaoSubprocesso.NAO_INICIADO)
                 .processo(processo)
+                .dataLimiteEtapa1(LocalDateTime.now().plusDays(15))
                 .localizacaoAtual(unidade)
                 .build();
         subprocessoRepo.save(subprocessoDestino);
@@ -78,6 +79,7 @@ class SubprocessoServiceAtividadeIntegrationTest extends BaseIntegrationTest {
                 .unidade(unidade)
                 .situacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO)
                 .processo(processo)
+                .dataLimiteEtapa1(LocalDateTime.now().plusDays(15))
                 .localizacaoAtual(unidade)
                 .build();
         subprocessoRepo.save(subprocessoOrigem);

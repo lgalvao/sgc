@@ -266,7 +266,12 @@ class SubprocessoControllerCoverageTest {
         when(subprocessoService.validarCadastro(1L)).thenReturn(new ValidacaoCadastroDto(true, List.of()));
 
         mockMvc.perform(get("/api/subprocessos/1/validar-cadastro"))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.valido").value(true))
+                .andExpect(jsonPath("$.erros").isArray())
+                .andExpect(jsonPath("$.erros").isEmpty());
+
+        verify(subprocessoService).validarCadastro(1L);
     }
 
     @Test
@@ -311,7 +316,13 @@ class SubprocessoControllerCoverageTest {
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.codigo").value(1L))
+                .andExpect(jsonPath("$.subprocessoCodigo").value(1L))
+                .andExpect(jsonPath("$.observacoes").value("Obs"));
+
+        verify(subprocessoService).salvarMapa(1L, req);
+        verify(subprocessoService).mapaCompletoDtoPorSubprocesso(1L);
     }
 
     @Test

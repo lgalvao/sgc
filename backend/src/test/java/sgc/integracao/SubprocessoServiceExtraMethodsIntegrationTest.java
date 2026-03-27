@@ -49,6 +49,7 @@ class SubprocessoServiceExtraMethodsIntegrationTest extends BaseIntegrationTest 
                 .unidade(unidade)
                 .situacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO)
                 .processo(processo)
+                .dataLimiteEtapa1(LocalDateTime.now().plusDays(10))
                 .build();
         subprocessoRepo.save(subprocesso);
 

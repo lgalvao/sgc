@@ -53,6 +53,7 @@ class MovimentacaoRepoPerformanceTest {
                 .processo(p)
                 .unidade(uOrigem)
                 .situacao(SituacaoSubprocesso.NAO_INICIADO)
+                .dataLimiteEtapa1(LocalDateTime.now().plusDays(10))
                 .build();
         sp = subprocessoRepo.save(sp);
 
