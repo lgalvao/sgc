@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.*;
+import org.jspecify.annotations.*;
 import sgc.comum.*;
 import sgc.comum.erros.*;
 import sgc.comum.model.*;
@@ -35,7 +36,7 @@ public class Subprocesso extends EntidadeBase {
 
     @OneToOne(mappedBy = "subprocesso")
     @JsonView({ComumViews.Publica.class, MapaViews.Publica.class})
-    private Mapa mapa;
+    private @Nullable Mapa mapa;
 
     @JsonView({ComumViews.Publica.class, MapaViews.Publica.class})
     @Column(name = "data_limite_etapa1", nullable = false)
@@ -43,15 +44,15 @@ public class Subprocesso extends EntidadeBase {
 
     @JsonView({ComumViews.Publica.class, MapaViews.Publica.class})
     @Column(name = "data_fim_etapa1")
-    private LocalDateTime dataFimEtapa1;
+    private @Nullable LocalDateTime dataFimEtapa1;
 
     @JsonView({ComumViews.Publica.class, MapaViews.Publica.class})
     @Column(name = "data_limite_etapa2")
-    private LocalDateTime dataLimiteEtapa2;
+    private @Nullable LocalDateTime dataLimiteEtapa2;
 
     @JsonView({ComumViews.Publica.class, MapaViews.Publica.class})
     @Column(name = "data_fim_etapa2")
-    private LocalDateTime dataFimEtapa2;
+    private @Nullable LocalDateTime dataFimEtapa2;
 
     @JsonView({ComumViews.Publica.class, MapaViews.Publica.class})
     @Enumerated(EnumType.STRING)
@@ -61,7 +62,7 @@ public class Subprocesso extends EntidadeBase {
 
     @Transient
     @JsonIgnore
-    private Unidade localizacaoAtual;
+    private @Nullable Unidade localizacaoAtual;
 
     @JsonView({ComumViews.Publica.class, SubprocessoViews.Publica.class, MapaViews.Publica.class})
     public Set<Atividade> getAtividades() {
@@ -70,19 +71,19 @@ public class Subprocesso extends EntidadeBase {
 
     @JsonView(ComumViews.Publica.class)
     @JsonProperty("codProcesso")
-    public Long getCodProcesso() {
+    public @Nullable Long getCodProcesso() {
         return processo != null ? processo.getCodigo() : null;
     }
 
     @JsonView(ComumViews.Publica.class)
     @JsonProperty("codUnidade")
-    public Long getCodUnidade() {
+    public @Nullable Long getCodUnidade() {
         return unidade != null ? unidade.getCodigo() : null;
     }
 
     @JsonView(ComumViews.Publica.class)
     @JsonProperty("codMapa")
-    public Long getCodMapa() {
+    public @Nullable Long getCodMapa() {
         return mapa != null ? mapa.getCodigo() : null;
     }
 
@@ -105,7 +106,7 @@ public class Subprocesso extends EntidadeBase {
         return !situacoesFinalizadas.contains(this.situacao) && !SituacaoSubprocesso.NAO_INICIADO.equals(this.situacao);
     }
 
-    public Integer getEtapaAtual() {
+    public @Nullable Integer getEtapaAtual() {
         final List<SituacaoSubprocesso> situacoesFinalizadas =
                 Arrays.asList(MAPEAMENTO_MAPA_HOMOLOGADO, REVISAO_MAPA_HOMOLOGADO, DIAGNOSTICO_CONCLUIDO);
         return !situacoesFinalizadas.contains(this.situacao) ? 1 : null;
