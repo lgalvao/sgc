@@ -146,7 +146,6 @@ public class SubprocessoService {
                 .unidade(unidade)
                 .dataLimiteEtapa1(request.dataLimiteEtapa1())
                 .dataLimiteEtapa2(request.dataLimiteEtapa2())
-                .mapa(null)
                 .build();
 
         Subprocesso subprocessoSalvo = subprocessoRepo.save(entity);
@@ -313,7 +312,6 @@ public class SubprocessoService {
         Subprocesso subprocesso = Subprocesso.builder()
                 .processo(processo)
                 .unidade(unidade)
-                .mapa(null)
                 .situacao(situacaoInicial)
                 .dataLimiteEtapa1(processo.getDataLimite())
                 .build();
@@ -870,4 +868,5 @@ public class SubprocessoService {
         sp.setLocalizacaoAtual(loc);
         return loc;
     }
+
 }

@@ -15,6 +15,7 @@ import java.time.*;
 @Setter
 @NoArgsConstructor
 @SuperBuilder
+@SuppressWarnings("NullAway.Init")
 public class Notificacao extends EntidadeBase {
     @ManyToOne
     @JoinColumn(name = "subprocesso_codigo", nullable = false)

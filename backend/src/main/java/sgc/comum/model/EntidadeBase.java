@@ -24,6 +24,13 @@ public abstract class EntidadeBase implements Serializable {
     @JsonView(ComumViews.Publica.class)
     private @Nullable Long codigo;
 
+    public Long getCodigoPersistido() {
+        if (codigo == null) {
+            throw new IllegalStateException("Entidade %s sem codigo persistido".formatted(getClass().getSimpleName()));
+        }
+        return codigo;
+    }
+
     @Override
     public String toString() {
         return getClass().getSimpleName() + "[codigo=" + codigo + "]";

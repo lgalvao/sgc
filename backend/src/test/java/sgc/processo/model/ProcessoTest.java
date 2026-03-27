@@ -110,7 +110,7 @@ class ProcessoTest {
         void deveRetornarVazioSeParticipantesNull() {
             processo.setParticipantes(null);
             assertThat(processo.getCodigosParticipantes()).isEmpty();
-            assertThat(processo.getSiglasParticipantes()).isNull();
+            assertThat(processo.getSiglasParticipantes()).isEmpty();
         }
 
         @Test

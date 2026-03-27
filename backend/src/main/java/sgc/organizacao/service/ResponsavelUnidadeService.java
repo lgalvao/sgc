@@ -45,10 +45,10 @@ public class ResponsavelUnidadeService {
     private AtribuicaoDto toAtribuicaoTemporariaDto(AtribuicaoTemporaria a) {
         Usuario usuario = repo.buscar(Usuario.class, a.getUsuarioTitulo());
         return AtribuicaoDto.builder()
-                .codigo(a.getCodigo())
-                .unidadeCodigo(a.getUnidade().getCodigo())
+                .codigo(a.getCodigoPersistido())
+                .unidadeCodigo(a.getUnidade().getCodigoPersistido())
                 .unidadeSigla(a.getUnidade().getSigla())
-                .usuario(UsuarioResumoDto.fromEntity(usuario))
+                .usuario(UsuarioResumoDto.fromEntityObrigatorio(usuario))
                 .dataInicio(a.getDataInicio())
                 .dataTermino(a.getDataTermino())
                 .justificativa(a.getJustificativa())
@@ -91,7 +91,7 @@ public class ResponsavelUnidadeService {
     @Transactional(readOnly = true)
     public Usuario buscarResponsavelAtual(String siglaUnidade) {
         Unidade unidade = repo.buscarPorSigla(Unidade.class, siglaUnidade);
-        Responsabilidade resp = repo.buscar(Responsabilidade.class, unidade.getCodigo());
+        Responsabilidade resp = repo.buscar(Responsabilidade.class, unidade.getCodigoPersistido());
 
         return repo.buscar(Usuario.class, resp.getUsuarioTitulo());
     }
@@ -102,11 +102,11 @@ public class ResponsavelUnidadeService {
     @Transactional(readOnly = true)
     public ResponsavelDto buscarResponsabilidadeDetalhadaAtual(String siglaUnidade) {
         Unidade unidade = repo.buscarPorSigla(Unidade.class, siglaUnidade);
-        Responsabilidade resp = repo.buscar(Responsabilidade.class, unidade.getCodigo());
+        Responsabilidade resp = repo.buscar(Responsabilidade.class, unidade.getCodigoPersistido());
         Usuario usuario = repo.buscar(Usuario.class, resp.getUsuarioTitulo());
 
         return ResponsavelDto.builder()
-                .usuario(UsuarioResumoDto.fromEntity(usuario))
+                .usuario(UsuarioResumoDto.fromEntityObrigatorio(usuario))
                 .tipo(resp.getTipo())
                 .dataInicio(resp.getDataInicio())
                 .dataFim(resp.getDataFim())
@@ -148,11 +148,15 @@ public class ResponsavelUnidadeService {
 
         return responsabilidades.stream()
                 .filter(r -> usuariosPorTitulo.containsKey(r.getUsuarioTitulo()))
+                .filter(r -> usuariosPorTitulo.containsKey(r.getUnidade().getTituloTitular()))
                 .collect(toMap(
                         Responsabilidade::getUnidadeCodigo,
                         r -> {
                             Usuario responsavel = usuariosPorTitulo.get(r.getUsuarioTitulo());
                             Usuario titularOficial = usuariosPorTitulo.get(r.getUnidade().getTituloTitular());
+                            if (responsavel == null || titularOficial == null) {
+                                throw new IllegalStateException("Responsável ou titular oficial ausente para unidade %d".formatted(r.getUnidadeCodigo()));
+                            }
                             return montarResponsavelDto(r.getUnidadeCodigo(), responsavel, titularOficial);
                         }
                 ));

@@ -19,6 +19,7 @@ import java.util.stream.*;
 @NoArgsConstructor
 @SuperBuilder
 @AttributeOverride(name = "codigo", column = @Column(name = "codigo"))
+@SuppressWarnings("NullAway.Init")
 public class Processo extends EntidadeBase {
     @Serial
     private static final long serialVersionUID = 1L;
@@ -96,7 +97,7 @@ public class Processo extends EntidadeBase {
     @JsonView(ProcessoViews.Publica.class)
     @JsonProperty("unidadesParticipantes")
     public String getSiglasParticipantes() {
-        if (participantes == null) return null;
+        if (participantes == null) return "";
         return participantes.stream()
                 .map(UnidadeProcesso::getSigla)
                 .filter(Objects::nonNull)

@@ -17,6 +17,7 @@ import java.util.*;
 @Setter
 @NoArgsConstructor
 @SuperBuilder
+@SuppressWarnings("NullAway.Init")
 public class Mapa extends EntidadeBase {
     @JsonView(MapaViews.Publica.class)
     @Column(name = "data_hora_disponibilizado")

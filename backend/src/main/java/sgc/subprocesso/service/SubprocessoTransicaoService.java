@@ -254,7 +254,7 @@ public class SubprocessoTransicaoService {
                 .build());
     }
 
-    private LocalDate obterUltimaDataLimite(Subprocesso sp) {
+    private @Nullable LocalDate obterUltimaDataLimite(Subprocesso sp) {
         LocalDateTime dataLimiteEtapa1 = sp.getDataLimiteEtapa1();
         LocalDateTime dataLimiteEtapa2 = sp.getDataLimiteEtapa2();
 
@@ -356,6 +356,7 @@ public class SubprocessoTransicaoService {
         List<Movimentacao> movs = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo());
 
         Unidade unidadeDevolucao = movs.stream()
+                .filter(m -> m.getUnidadeDestino() != null)
                 .filter(m -> Objects.equals(m.getUnidadeDestino().getCodigo(), unidadeAnalise.getCodigo()))
                 .map(Movimentacao::getUnidadeOrigem)
                 .filter(unidadeOrigem -> hierarquiaService.isSubordinada(unidadeOrigem, unidadeAnalise))
@@ -479,6 +480,7 @@ public class SubprocessoTransicaoService {
         List<Movimentacao> movs = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo());
 
         Unidade unidadeDevolucao = movs.stream()
+                .filter(m -> m.getUnidadeDestino() != null)
                 .filter(m -> Objects.equals(m.getUnidadeDestino().getCodigo(), unidadeAnalise.getCodigo()))
                 .map(Movimentacao::getUnidadeOrigem)
                 .filter(unidadeOrigem -> hierarquiaService.isSubordinada(unidadeOrigem, unidadeAnalise))

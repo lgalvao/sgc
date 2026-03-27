@@ -12,6 +12,7 @@ import sgc.processo.model.*;
 
 import java.time.*;
 import java.util.*;
+import java.util.Objects;
 
 @Service
 @Slf4j
@@ -113,11 +114,11 @@ public class AlertaFacade {
 
         List<Alerta> alertasCriados = new ArrayList<>();
         for (Long cod : codsOperacionais) {
-            alertasCriados.add(criarAlertaAdmin(processo, todasUnidadesMap.get(cod), "Início do processo"));
+            alertasCriados.add(criarAlertaAdmin(processo, Objects.requireNonNull(todasUnidadesMap.get(cod)), "Início do processo"));
         }
 
         for (Long cod : codsIntermediarias) {
-            alertasCriados.add(criarAlertaAdmin(processo, todasUnidadesMap.get(cod), "Início do processo em unidade(s) subordinada(s)"));
+            alertasCriados.add(criarAlertaAdmin(processo, Objects.requireNonNull(todasUnidadesMap.get(cod)), "Início do processo em unidade(s) subordinada(s)"));
         }
 
         return alertasCriados;

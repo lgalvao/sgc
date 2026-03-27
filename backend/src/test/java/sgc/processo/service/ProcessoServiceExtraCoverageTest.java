@@ -165,6 +165,7 @@ class ProcessoServiceExtraCoverageTest {
             when(repo.buscar(Processo.class, 1L)).thenReturn(p);
 
             Unidade u = new Unidade();
+            u.setCodigo(1L);
             u.setTipo(TipoUnidade.RAIZ);
             u.setSituacao(sgc.organizacao.model.SituacaoUnidade.ATIVA);
             when(unidadeService.buscarPorCodigo(1L)).thenReturn(u);
@@ -463,6 +464,12 @@ class ProcessoServiceExtraCoverageTest {
             when(unidadeService.porCodigos(anyList())).thenReturn(List.of(uni));
             when(unidadeService.buscarPorCodigo(10L)).thenReturn(uni);
             when(unidadeService.verificarMapaVigente(10L)).thenReturn(true);
+            UnidadeMapa unidadeMapa = new UnidadeMapa();
+            unidadeMapa.setUnidadeCodigo(10L);
+            Mapa mapaVigente = new Mapa();
+            mapaVigente.setCodigo(20L);
+            unidadeMapa.setMapaVigente(mapaVigente);
+            when(unidadeService.buscarMapasPorUnidades(anyList())).thenReturn(List.of(unidadeMapa));
 
             Unidade admin = new Unidade();
             when(repo.buscarPorSigla(Unidade.class, "ADMIN")).thenReturn(admin);
@@ -481,6 +488,7 @@ class ProcessoServiceExtraCoverageTest {
         void elegivelMapa() {
             Usuario u = new Usuario();
             Subprocesso sp = new Subprocesso();
+            sp.setCodigo(100L);
             sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
             
             when(permissionEvaluator.verificarPermissao(u, sp, sgc.seguranca.AcaoPermissao.ACEITAR_MAPA)).thenReturn(true);

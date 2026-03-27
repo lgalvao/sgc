@@ -18,6 +18,7 @@ import java.util.*;
 @Setter
 @NoArgsConstructor
 @SuperBuilder
+@SuppressWarnings("NullAway.Init")
 public class Atividade extends EntidadeBase {
     @ManyToOne
     @JoinColumn(name = "mapa_codigo", nullable = false)
@@ -53,7 +54,7 @@ public class Atividade extends EntidadeBase {
     @JsonView(MapaViews.Publica.class)
     @JsonProperty("mapaCodigo")
     public Long getMapaCodigo() {
-        return mapa.getCodigo();
+        return Objects.requireNonNull(mapa.getCodigo());
     }
 
     public void atualizarDe(sgc.mapa.dto.AtualizarAtividadeRequest request) {

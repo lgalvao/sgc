@@ -8,6 +8,7 @@ import sgc.organizacao.model.*;
 
 import java.io.*;
 import java.time.*;
+import java.util.Objects;
 
 /**
  * Entidade que representa a associação entre um Processo e uma Unidade participante,
@@ -18,6 +19,7 @@ import java.time.*;
 @Getter
 @Setter
 @NoArgsConstructor
+@SuppressWarnings("NullAway.Init")
 public class UnidadeProcesso implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
@@ -54,7 +56,7 @@ public class UnidadeProcesso implements Serializable {
     public static UnidadeProcesso criarSnapshot(Processo processo, Unidade unidade) {
         UnidadeProcesso snapshot = new UnidadeProcesso();
         snapshot.setProcesso(processo);
-        snapshot.setUnidadeCodigo(unidade.getCodigo());
+        snapshot.setUnidadeCodigo(Objects.requireNonNull(unidade.getCodigo()));
         snapshot.setNome(unidade.getNome());
         snapshot.setSigla(unidade.getSigla());
         snapshot.setMatriculaTitular(unidade.getMatriculaTitular());
@@ -63,12 +65,12 @@ public class UnidadeProcesso implements Serializable {
         snapshot.setTipo(unidade.getTipo());
         snapshot.setSituacao(unidade.getSituacao().name());
         snapshot.setUnidadeSuperiorCodigo(
-                unidade.getUnidadeSuperior() != null ? unidade.getUnidadeSuperior().getCodigo() : null
+                unidade.getUnidadeSuperior() != null ? unidade.getUnidadeSuperior().getCodigoPersistido() : null
         );
         return snapshot;
     }
 
-    public Long getUnidadeCodigo() {
+    public @Nullable Long getUnidadeCodigo() {
         return codigo != null ? codigo.getUnidadeCodigo() : null;
     }
 

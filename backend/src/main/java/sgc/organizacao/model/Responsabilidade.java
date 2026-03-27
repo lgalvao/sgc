@@ -16,6 +16,7 @@ import java.time.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
+@SuppressWarnings("NullAway.Init")
 public class Responsabilidade implements Serializable {
 
     @Id

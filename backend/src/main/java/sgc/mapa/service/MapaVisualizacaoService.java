@@ -23,7 +23,7 @@ public class MapaVisualizacaoService {
     private final CompetenciaRepo competenciaRepo;
 
     public MapaVisualizacaoResponse obterMapaParaVisualizacao(Subprocesso subprocesso) {
-        Mapa mapa = mapaRepo.buscarCompletoPorSubprocesso(subprocesso.getCodigo())
+        Mapa mapa = mapaRepo.buscarCompletoPorSubprocesso(subprocesso.getCodigoPersistido())
                 .orElse(subprocesso.getMapa());
 
         if (mapa == null) {
@@ -34,14 +34,14 @@ public class MapaVisualizacaoService {
                     .build();
         }
 
-        List<Competencia> competencias = competenciaRepo.findByMapa_Codigo(mapa.getCodigo());
+        List<Competencia> competencias = competenciaRepo.findByMapa_Codigo(mapa.getCodigoPersistido());
         Set<Long> codAtividadesComCompetencia = new HashSet<>();
         competencias.forEach(comp -> comp.getAtividades().stream()
-                .map(EntidadeBase::getCodigo)
+                .map(EntidadeBase::getCodigoPersistido)
                 .forEach(codAtividadesComCompetencia::add));
 
         List<Atividade> atividadesSemCompetencia = mapa.getAtividades().stream()
-                .filter(a -> !codAtividadesComCompetencia.contains(a.getCodigo()))
+                .filter(a -> !codAtividadesComCompetencia.contains(a.getCodigoPersistido()))
                 .toList();
 
         return MapaVisualizacaoResponse.builder()

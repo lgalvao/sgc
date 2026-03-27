@@ -1,6 +1,7 @@
 package sgc.organizacao.dto;
 
 import lombok.*;
+import org.jspecify.annotations.*;
 
 /**
  * DTO para dados de responsável (titular/substituto) de uma unidade.
@@ -10,6 +11,6 @@ public record UnidadeResponsavelDto(
         Long unidadeCodigo,
         String titularTitulo,
         String titularNome,
-        String substitutoTitulo,
-        String substitutoNome) {
+        @Nullable String substitutoTitulo,
+        @Nullable String substitutoNome) {
 }

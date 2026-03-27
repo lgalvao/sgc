@@ -4,11 +4,13 @@ import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.*;
+import org.jspecify.annotations.*;
 import sgc.comum.model.*;
 import sgc.organizacao.model.*;
 import sgc.processo.model.*;
 
 import java.time.*;
+import java.util.Objects;
 
 @Entity
 @Table(name = "ALERTA", schema = "sgc")
@@ -16,6 +18,7 @@ import java.time.*;
 @Setter
 @SuperBuilder
 @NoArgsConstructor
+@SuppressWarnings("NullAway.Init")
 public class Alerta extends EntidadeBase {
     @ManyToOne
     @JoinColumn(name = "processo_codigo", nullable = false)
@@ -46,12 +49,12 @@ public class Alerta extends EntidadeBase {
 
     @Transient
     @JsonView(ComumViews.Publica.class)
-    private LocalDateTime dataHoraLeitura;
+    private @Nullable LocalDateTime dataHoraLeitura;
 
     @JsonView(ComumViews.Publica.class)
     @JsonProperty("codProcesso")
     public Long getCodProcessoSintetico() {
-        return processo.getCodigo();
+        return Objects.requireNonNull(processo.getCodigo());
     }
 
     @JsonView(ComumViews.Publica.class)

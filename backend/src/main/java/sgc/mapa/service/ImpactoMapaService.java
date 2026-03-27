@@ -34,18 +34,19 @@ public class ImpactoMapaService {
 
         checkSituacao(usuario, subprocesso);
 
-        Optional<Mapa> mapaVigenteOpt = mapaRepo.buscarMapaVigentePorUnidade(subprocesso.getUnidade().getCodigo());
+        Optional<Mapa> mapaVigenteOpt = mapaRepo.buscarMapaVigentePorUnidade(subprocesso.getUnidade().getCodigoPersistido());
         if (mapaVigenteOpt.isEmpty()) {
             log.info("Unidade sem mapa vigente, não há impactos a analisar");
             return ImpactoMapaResponse.semImpacto();
         }
 
         Mapa mapaVigente = mapaVigenteOpt.get();
-        Mapa mapaSubprocesso = mapaRepo.buscarPorSubprocesso(subprocesso.getCodigo())
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Mapa (por subprocesso)", subprocesso.getCodigo()));
+        Long codSubprocesso = subprocesso.getCodigoPersistido();
+        Mapa mapaSubprocesso = mapaRepo.buscarPorSubprocesso(codSubprocesso)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Mapa (por subprocesso)", codSubprocesso));
         List<Atividade> atividadesAtuais = obterAtividadesDoMapa(mapaSubprocesso);
         List<Atividade> atividadesVigentes = obterAtividadesDoMapa(mapaVigente);
-        List<Competencia> competenciasMapa = competenciaRepo.findByMapa_Codigo(mapaVigente.getCodigo());
+        List<Competencia> competenciasMapa = competenciaRepo.findByMapa_Codigo(mapaVigente.getCodigoPersistido());
 
         Map<Long, List<Competencia>> codAtividadeParaCompetencias = construirMapaAtividadeCompetencias(competenciasMapa);
         Map<String, Atividade> mapaVigentes = atividadesPorDescricao(atividadesVigentes);
@@ -92,7 +93,7 @@ public class ImpactoMapaService {
     }
 
     private List<Atividade> obterAtividadesDoMapa(Mapa mapa) {
-        return mapaManutencaoService.atividadesMapaCodigoComConhecimentos(mapa.getCodigo());
+        return mapaManutencaoService.atividadesMapaCodigoComConhecimentos(mapa.getCodigoPersistido());
     }
 
     private List<AtividadeImpactadaDto> detectarInseridas(List<Atividade> atuais, Set<String> descVigentes) {
@@ -100,7 +101,7 @@ public class ImpactoMapaService {
         for (Atividade atual : atuais) {
             if (!descVigentes.contains(atual.getDescricao())) {
                 AtividadeImpactadaDto dto = AtividadeImpactadaDto.builder()
-                        .codigo(atual.getCodigo())
+                        .codigo(atual.getCodigoPersistido())
                         .descricao(atual.getDescricao())
                         .tipoImpacto(TipoImpactoAtividade.INSERIDA)
                         .descricaoAnterior(atual.getDescricao())
@@ -123,7 +124,7 @@ public class ImpactoMapaService {
 
         for (Atividade vigente : vigentes) {
             if (!atuaisMap.containsKey(vigente.getDescricao())) {
-                Long vigenteCodigo = vigente.getCodigo();
+                Long vigenteCodigo = vigente.getCodigoPersistido();
                 AtividadeImpactadaDto dto = AtividadeImpactadaDto.builder()
                         .codigo(vigenteCodigo)
                         .descricao(vigente.getDescricao())
@@ -156,13 +157,13 @@ public class ImpactoMapaService {
                 if (conhecimentosDiferentes(conhecimentosAtuais, conhecimentosVigentes)) {
                     alteradas.add(
                             AtividadeImpactadaDto.builder()
-                                    .codigo(atual.getCodigo())
+                                    .codigo(atual.getCodigoPersistido())
                                     .descricao(atual.getDescricao())
                                     .tipoImpacto(TipoImpactoAtividade.ALTERADA)
                                     .descricaoAnterior(vigente.getDescricao())
                                     .conhecimentos(vigente.getConhecimentos().stream().map(Conhecimento::getDescricao).toList())
                                     .competenciasVinculadas(
-                                            obterNomesCompetencias(vigente.getCodigo(), codAtividadeParaCompetencias))
+                                            obterNomesCompetencias(vigente.getCodigoPersistido(), codAtividadeParaCompetencias))
                                     .build());
                 }
             }
@@ -215,7 +216,7 @@ public class ImpactoMapaService {
         Map<String, Long> descricaoParaCodVigente = atividadesVigentes.stream()
                 .collect(Collectors.toMap(
                         Atividade::getDescricao,
-                        Atividade::getCodigo,
+                        Atividade::getCodigoPersistido,
                         (existing, replacement) -> existing));
 
         processarRemovidas(removidas, codAtividadeParaCompetencias, mapaImpactos);
@@ -269,8 +270,8 @@ public class ImpactoMapaService {
             TipoImpactoCompetencia tipoImpacto) {
 
         CompetenciaImpactoAcumulador acumulador = mapaImpactos.computeIfAbsent(
-                comp.getCodigo(),
-                x -> new CompetenciaImpactoAcumulador(comp.getCodigo(), comp.getDescricao()));
+                comp.getCodigoPersistido(),
+                x -> new CompetenciaImpactoAcumulador(comp.getCodigoPersistido(), comp.getDescricao()));
 
         acumulador.adicionarImpacto(detalhe, tipoImpacto);
     }
@@ -287,7 +288,7 @@ public class ImpactoMapaService {
         Map<Long, List<Competencia>> mapa = new HashMap<>();
         for (Competencia comp : competencias) {
             for (Atividade ativ : comp.getAtividades()) {
-                mapa.computeIfAbsent(ativ.getCodigo(), k -> new ArrayList<>()).add(comp);
+                mapa.computeIfAbsent(ativ.getCodigoPersistido(), k -> new ArrayList<>()).add(comp);
             }
         }
         return mapa;

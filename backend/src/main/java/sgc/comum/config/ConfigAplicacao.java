@@ -14,6 +14,7 @@ import sgc.seguranca.login.*;
 @Getter
 @Component
 @ConfigurationProperties("aplicacao")
+@SuppressWarnings("NullAway.Init")
 public class ConfigAplicacao {
     @NestedConfigurationProperty
     private final OpenApi openapi = new OpenApi();
@@ -33,6 +34,7 @@ public class ConfigAplicacao {
 
     @Getter
     @Setter
+    @SuppressWarnings("NullAway.Init")
     public static class OpenApi {
         private String title;
         private String version;
@@ -41,6 +43,7 @@ public class ConfigAplicacao {
 
     @Getter
     @Setter
+    @SuppressWarnings("NullAway.Init")
     public static class Email {
         private String remetente;
         private String remetenteNome;

@@ -1,13 +1,14 @@
 package sgc.alerta.dto;
 
 import lombok.*;
+import org.jspecify.annotations.*;
 import sgc.alerta.model.*;
 
 import java.time.*;
 
 @Builder
 public record AlertaDto(
-        Long codigo,
+        @Nullable Long codigo,
         Long codProcesso,
         String processo,
         String origem,
@@ -15,7 +16,7 @@ public record AlertaDto(
         String descricao,
         String mensagem,
         LocalDateTime dataHora,
-        LocalDateTime dataHoraLeitura) {
+        @Nullable LocalDateTime dataHoraLeitura) {
 
     public static AlertaDto fromEntity(Alerta alerta) {
         return AlertaDto.builder()

@@ -99,7 +99,7 @@ public class UsuarioFacade {
     private PerfilDto toPerfilDto(UsuarioPerfil atribuicao) {
         return PerfilDto.builder()
                 .usuarioTitulo(atribuicao.getUsuario().getTituloEleitoral())
-                .unidadeCodigo(atribuicao.getUnidade().getCodigo())
+                .unidadeCodigo(atribuicao.getUnidade().getCodigoPersistido())
                 .unidadeNome(atribuicao.getUnidade().getNome())
                 .perfil(atribuicao.getPerfil().name())
                 .build();
@@ -108,9 +108,10 @@ public class UsuarioFacade {
     @Transactional(readOnly = true)
     public List<AdministradorDto> listarAdministradores() {
         return usuarioService.buscarAdministradores().stream()
-                .flatMap(admin -> usuarioService.buscarOpt(admin.getUsuarioTitulo())
-                        .map(this::toAdministradorDto)
-                        .stream())
+                .map(Administrador::getUsuarioTitulo)
+                .filter(Objects::nonNull)
+                .flatMap(titulo -> usuarioService.buscarOpt(titulo).stream())
+                .map(this::toAdministradorDto)
                 .toList();
     }
 
@@ -141,7 +142,7 @@ public class UsuarioFacade {
                 .tituloEleitoral(usuario.getTituloEleitoral())
                 .nome(usuario.getNome())
                 .matricula(usuario.getMatricula())
-                .unidadeCodigo(unidadeLotacao.getCodigo())
+                .unidadeCodigo(unidadeLotacao.getCodigoPersistido())
                 .unidadeSigla(unidadeLotacao.getSigla())
                 .build();
     }

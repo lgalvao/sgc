@@ -18,6 +18,7 @@ import java.util.*;
 @Setter
 @NoArgsConstructor
 @SuperBuilder
+@SuppressWarnings("NullAway.Init")
 public class Unidade extends EntidadeBase {
     @Column(name = "nome", nullable = false)
     @JsonView(ComumViews.Publica.class)

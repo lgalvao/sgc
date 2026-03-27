@@ -8,7 +8,7 @@ import java.util.*;
 
 public record MapaCompletoDto(
         Long codigo,
-        Long subprocessoCodigo,
+        @Nullable Long subprocessoCodigo,
         @Nullable String observacoes,
         List<CompetenciaMapaDto> competencias,
         @Nullable String situacao) {
@@ -20,8 +20,8 @@ public record MapaCompletoDto(
                 .toList();
 
         return new MapaCompletoDto(
-                mapa.getCodigo(),
-                subprocesso != null ? subprocesso.getCodigo() : null,
+                mapa.getCodigoPersistido(),
+                subprocesso != null ? subprocesso.getCodigoPersistido() : null,
                 mapa.getObservacoesDisponibilizacao(),
                 competencias,
                 null);

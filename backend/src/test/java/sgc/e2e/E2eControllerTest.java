@@ -35,6 +35,7 @@ import static org.mockito.Mockito.*;
 @Transactional
 @ActiveProfiles("test")
 @DisplayName("Testes do E2eController (Backend support)")
+@SuppressWarnings("NullAway.Init")
 class E2eControllerTest {
     @Autowired
     private JdbcTemplate jdbcTemplate;

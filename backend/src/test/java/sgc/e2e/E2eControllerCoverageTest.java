@@ -28,6 +28,7 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("E2eController - Cobertura adicional")
+@SuppressWarnings("NullAway.Init")
 class E2eControllerCoverageTest {
     @Mock private JdbcTemplate jdbcTemplate;
     @Mock private NamedParameterJdbcTemplate namedJdbcTemplate;
@@ -139,6 +140,10 @@ class E2eControllerCoverageTest {
         Mapa mapa = new Mapa();
         mapa.setCodigo(300L);
         when(mapaRepo.buscarPorSubprocesso(200L)).thenReturn(Optional.of(mapa));
+        when(jdbcTemplate.queryForObject(startsWith("SELECT codigo FROM sgc.atividade"), eq(Long.class), any(), any()))
+                .thenReturn(400L);
+        when(jdbcTemplate.queryForObject(startsWith("SELECT codigo FROM sgc.competencia"), eq(Long.class), any(), any()))
+                .thenReturn(500L);
 
         Processo result = controller.criarProcessoMapeamentoComMapaComSugestoes(req);
 
@@ -172,6 +177,8 @@ class E2eControllerCoverageTest {
         Mapa mapa = new Mapa();
         mapa.setCodigo(300L);
         when(mapaRepo.buscarPorSubprocesso(anyLong())).thenReturn(Optional.of(mapa));
+        when(jdbcTemplate.queryForObject(startsWith("SELECT codigo FROM sgc.atividade"), eq(Long.class), any(), any()))
+                .thenReturn(400L);
 
         when(processoRepo.findById(anyLong())).thenReturn(Optional.of(new Processo()));
 
@@ -241,6 +248,10 @@ class E2eControllerCoverageTest {
         Mapa mapa = new Mapa();
         mapa.setCodigo(300L);
         when(mapaRepo.buscarPorSubprocesso(anyLong())).thenReturn(Optional.of(mapa));
+        when(jdbcTemplate.queryForObject(startsWith("SELECT codigo FROM sgc.atividade"), eq(Long.class), any(), any()))
+                .thenReturn(400L);
+        when(jdbcTemplate.queryForObject(startsWith("SELECT codigo FROM sgc.competencia"), eq(Long.class), any(), any()))
+                .thenReturn(500L);
 
         Processo result = controller.criarProcessoMapeamentoComCadastroDisponibilizado(req);
 

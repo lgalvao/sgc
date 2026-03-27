@@ -19,6 +19,7 @@ import java.util.*;
 @Setter
 @NoArgsConstructor
 @SuperBuilder
+@SuppressWarnings("NullAway.Init")
 public class Usuario implements UserDetails {
     @Transient
     @JsonIgnore
@@ -64,7 +65,7 @@ public class Usuario implements UserDetails {
     @JsonView(OrganizacaoViews.Publica.class)
     @JsonProperty("unidadeCodigo")
     public Long getUnidadeCodigo() {
-        return unidadeLotacao.getCodigo();
+        return Objects.requireNonNull(Objects.requireNonNull(unidadeLotacao).getCodigo());
     }
 
     @Override
@@ -93,6 +94,6 @@ public class Usuario implements UserDetails {
 
     @Override
     public String getUsername() {
-        return tituloEleitoral;
+        return Objects.requireNonNull(tituloEleitoral);
     }
 }

@@ -336,8 +336,8 @@ tasks.register("qualityCheckFast") {
 pitest {
     pitestVersion.set("1.22.1")
     junit5PluginVersion.set("1.2.3")
-    targetClasses.set(listOf("sgc.organizacao.*"))
-    targetTests.set(listOf("sgc.organizacao.*"))
+    targetClasses.set(listOf("sgc.mapa.*"))
+    targetTests.set(listOf("sgc.mapa.*"))
 
     excludedClasses.set(
         listOf(

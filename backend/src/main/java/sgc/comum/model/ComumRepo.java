@@ -12,6 +12,7 @@ import java.util.*;
  * Evita a poluição de orElseThrow(ErroEntidadeNaoEncontrada) em toda a aplicação.
  */
 @Component
+@SuppressWarnings("NullAway.Init")
 public class ComumRepo {
 
     @PersistenceContext

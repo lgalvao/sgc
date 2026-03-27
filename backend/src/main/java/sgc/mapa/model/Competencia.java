@@ -14,6 +14,7 @@ import java.util.*;
 @Setter
 @NoArgsConstructor
 @SuperBuilder
+@SuppressWarnings("NullAway.Init")
 public class Competencia extends EntidadeBase {
     @ManyToOne
     @JoinColumn(name = "mapa_codigo", nullable = false)

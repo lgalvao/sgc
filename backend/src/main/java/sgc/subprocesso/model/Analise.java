@@ -19,6 +19,7 @@ import java.time.*;
 @Setter
 @SuperBuilder
 @NoArgsConstructor
+@SuppressWarnings("NullAway.Init")
 public class Analise extends EntidadeBase {
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo", length = 20, nullable = false)

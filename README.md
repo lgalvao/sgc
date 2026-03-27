@@ -14,17 +14,18 @@ O projeto segue uma arquitetura **Modular monolith** no backend e **Component-Ba
 
 ### Stack principal
 
-| Camada       | Tecnologias principais                                              |
-|--------------|---------------------------------------------------------------------|
-| **Backend**  | Java 21, Spring Boot 4, Hibernate 7, H2 (testes)/Oracle (produção)  |
-| **Frontend** | Vue.js 3.5, TypeScript 5.9, Vite 7.3, Pinia 3, BootstrapVueNext 0.4 |
-| **Testes**   | JUnit, Mockito, Vitest, Playwright 1.5, Storybook 10                |
+| Camada       | Tecnologias principais                                                  |
+|--------------|-------------------------------------------------------------------------|
+| **Backend**  | Java 21, Spring Boot 4.0.5, Hibernate 7, H2 (testes)/Oracle (produção)  |
+| **Frontend** | Vue.js 3.5.28, TypeScript 5.9.3, Vite 7.3.1, Pinia 3.0.4, BootstrapVueNext 0.44.0 |
+| **Testes**   | JUnit 5, Mockito, Vitest 4.0, Playwright 1.58.2, Storybook 10.3.3       |
 
 **Documentação essencial:**
 
 * **[AGENTS.md](AGENTS.md)**: **Leitura obrigatória** para desenvolvedores e agentes de IA. Contém convenções de código, padrões de projeto e regras fundamentais.
-* **[backend/README.md](backend/README.md)**: Arquitetura detalhada do backend, módulos e comunicação.
+* **[backend/README.md](backend/README.md)**: Arquitetura detalhada do backend, módulos (`mapa`, `processo`, `subprocesso`, `organizacao`, `seguranca`, etc) e comunicação.
 * **[frontend/README.md](frontend/README.md)**: Arquitetura do frontend, estrutura de pastas e componentes.
+* **[etc/docs/](etc/docs/)**: Guias detalhados sobre [regras de acesso](etc/docs/regras-acesso.md), [E2E](etc/docs/regras-e2e.md), [roteiro de testes](etc/docs/roteiro-testes.md) e mais.
 
 ---
 
@@ -32,12 +33,14 @@ O projeto segue uma arquitetura **Modular monolith** no backend e **Component-Ba
 
 ```text
 sgc/
-├── backend/            # Código da API REST (Spring Boot 4)
-├── frontend/           # Código do frontend Web (Vue.js 3.5)
-├── e2e/                # Testes end-to-End (Playwright)
-├── etc/                # Configurações, requisitos e scripts globais
-    ├── reqs/           # Especificações de requisitos (Casos de Uso)
-    └── scripts/        # Scripts utilitários
+├── backend/            # API REST (Spring Boot 4) - Módulos: mapa, processo, organizacao, etc.
+├── frontend/           # Frontend Web (Vue.js 3.5) - Componentes, Stores (Pinia), Services.
+├── e2e/                # Testes End-to-End (Playwright) e Fixtures.
+├── etc/                # Configurações, requisitos e scripts globais.
+    ├── reqs/           # Especificações de requisitos (Casos de Uso e Regras de Negócio).
+    ├── docs/           # Documentação técnica e guias de processo.
+    ├── scripts/        # Scripts utilitários (.sh e .ps1).
+    └── qa-dashboard/   # Infraestrutura do Dashboard de Saúde de QA.
 ```
 
 ---
@@ -47,11 +50,11 @@ sgc/
 ### Pré-requisitos
 
 * JDK 21+
-* Node.js 25+
+* Node.js 22+ (Recomendado 25+)
 
 ### Desenvolvimento
 
-1. **Stack completa com perfil e2e**
+1. **Stack completa com perfil e2e** (Windows/Linux)
 
    ```bash
    node e2e/lifecycle.js
@@ -84,36 +87,38 @@ O projeto possui uma suite abrangente de testes e verificações de qualidade.
 
 ### Execução de Testes
 
-| Tipo                   | Comando                              | Descrição                                                              |
-|------------------------|--------------------------------------|------------------------------------------------------------------------|
-| **Todos backend**      | `./gradlew :backend:test`            | Executa suite completa (Unitários + Integração).                       |
-| **Unitários backend**  | `./gradlew :backend:unitTest`        | Executa apenas testes isolados (Rápido).                               |
-| **Integração backend** | `./gradlew :backend:integrationTest` | Executa apenas fluxos completos (Mais lento).                          |
-| **Unitários frontend** | `cd frontend && npm run test:unit`   | Vitest para componentes e lógica.                                      |
-| **End-to-End (E2E)**   | `npm run test:e2e`                   | Playwright simulando fluxos reais.                                     |
-| **Type check**         | `npm run typecheck`                  | Verificação de erros de tipos para frontend e E2E                      |
-| **Lint (OXC)**         | `npm run lint:ox`                    | Verificação ultra-rápida com [OXC](https://github.com/oxc-project/oxc) |
-| **Lint (Completo)**    | `npm run lint`                       | Executa OXC seguido de ESLint (para regras complexas)                  |
+| Tipo                    | Comando (Linux/Bash)                 | Comando (Windows/PS)                 | Descrição                                         |
+|-------------------------|--------------------------------------|--------------------------------------|---------------------------------------------------|
+| **Todos backend**       | `./gradlew :backend:test`            | `./gradlew :backend:test`            | Suite completa (Unitários + Integração).          |
+| **Unitários backend**   | `./gradlew :backend:unitTest`        | `./gradlew :backend:unitTest`        | Apenas testes isolados (Rápido).                  |
+| **Integração backend**  | `./gradlew :backend:integrationTest` | `./gradlew :backend:integrationTest` | Apenas fluxos completos (Mais lento).             |
+| **Mutação (PIT)**       | `./gradlew :backend:mutationTest`    | `./gradlew :backend:mutationTest`    | Valida qualidade dos testes (PITest).             |
+| **Unitários frontend**  | `npm run test:unit --prefix frontend`| `npm run test:unit --prefix frontend`| Vitest para componentes e lógica.                 |
+| **End-to-End (E2E)**    | `npm run test:e2e`                   | `npm run test:e2e`                   | Playwright simulando fluxos reais.                |
+| **Type check**          | `npm run typecheck`                  | `npm run typecheck`                  | Verificação de erros de tipos (Vue + TS).         |
+| **Lint (OXC)**          | `npm run lint:ox`                    | `npm run lint:ox`                    | Verificação ultra-rápida com [OXC](https://github.com/oxc-project/oxc). |
+| **Lint (Completo)**     | `npm run lint`                       | `npm run lint`                       | OXC + ESLint (regras complexas e fix).            |
+| **Segurança (SAST)**    | `npm run sast`                       | `npm run sast`                       | Análise estática com Semgrep.                     |
 
-### Verificação de qualidade
+### Verificação de qualidade (Batch)
 
-Para rodar todas as verificações (SpotBugs, Testes, Lint, Typecheck) de uma só vez:
+Para rodar todas as verificações (Testes, Cobertura, SpotBugs, Lint, Typecheck) de uma só vez:
 
-```bash
-./etc/scripts/quality-check.sh all
-```
+* **Linux:** `./etc/scripts/quality-check.sh all`
+* **Windows:** `etc/scripts/quality-check.ps1 all`
 
 Os relatórios são gerados em:
-
-* Backend: `backend/build/reports/`
+* Backend: `backend/build/reports/` (PIT em `backend/build/reports/pitest/`)
 * Frontend: `frontend/coverage/`
 
-### Dashboard de QA
+---
 
-O projeto possui um dashboard de desenvolvimento voltado para **saude de QA**, nao para observabilidade de producao.
-Ele consolida testes, cobertura, lint, typecheck e E2E em snapshots centralizados e estaveis.
+## Dashboard de QA
 
-#### Como atualizar
+O projeto possui um dashboard de desenvolvimento voltado para **saúde de QA**.
+Ele consolida testes, cobertura, lint, typecheck e E2E em snapshots centralizados.
+
+### Como atualizar
 
 No Windows/PowerShell:
 
@@ -121,71 +126,26 @@ No Windows/PowerShell:
 npm run qa:dashboard
 ```
 
-Perfis disponiveis:
-
+Ou diretamente via script:
 ```powershell
 powershell -ExecutionPolicy Bypass -File etc/qa-dashboard/scripts/coletar-snapshot.ps1 -Perfil rapido
-powershell -ExecutionPolicy Bypass -File etc/qa-dashboard/scripts/coletar-snapshot.ps1 -Perfil frontend
-powershell -ExecutionPolicy Bypass -File etc/qa-dashboard/scripts/coletar-snapshot.ps1 -Perfil backend
-powershell -ExecutionPolicy Bypass -File etc/qa-dashboard/scripts/coletar-snapshot.ps1 -Perfil completo
 ```
 
-#### Onde consultar
+Perfis disponíveis: `rapido`, `frontend`, `backend`, `completo`.
 
-Os snapshots gerados ficam em:
+### Onde consultar
 
-* `etc/qa-dashboard/runs/<timestamp>/snapshot.json`
-* `etc/qa-dashboard/runs/<timestamp>/resumo.md`
+Os snapshots gerados ficam em `etc/qa-dashboard/runs/` e os mais recentes em `etc/qa-dashboard/latest/ultimo-resumo.md`.
 
-Os aliases mais recentes ficam em:
-
-* `etc/qa-dashboard/latest/ultimo-snapshot.json`
-* `etc/qa-dashboard/latest/ultimo-resumo.md`
-
-#### Como interpretar
-
-O dashboard deve ser lido a partir dos snapshots centralizados, e nao diretamente dos artefatos transientes de build.
-
-Exemplos de sinais importantes:
-
-* `statusGeral`: semaforo agregado da execucao.
-* `indiceSaude`: panorama numerico da saude de QA.
-* `verificacoes`: resultado individual por suite.
-* `confiabilidade.suitesLentas`: suites mais caras.
-* `hotspots`: arquivos ou classes com maior risco por baixa cobertura.
-
-#### Regra importante
-
-Nao use `backend/build/`, `frontend/coverage/`, `playwright-report/` ou `test-results/` como fonte primaria para
-analise humana ou automacao do dashboard. Esses caminhos sao apenas insumos transitivos do coletor.
-
-Consulte tambem:
-
-* `etc/docs/dashboard-qa.md`
-* `etc/qa-dashboard/config/snapshot.schema.json`
-
-#### Exemplo de leitura
-
-Exemplo de interpretacao de um snapshot `completo`:
-
-* `statusGeral: vermelho`: existe pelo menos uma verificacao falhando.
-* `indiceSaude: 42.86`: panorama agregado ruim, apesar de parte da malha estar verde.
-* `verificacoes`:
-  * backend pode falhar por erro de compilacao antes mesmo de executar os testes
-  * frontend pode permanecer verde com cobertura alta
-  * E2E pode apontar regressao parcial, por exemplo `180/186` aprovados
-* `confiabilidade.suitesLentas`: ajuda a localizar rapidamente o custo das suites mais pesadas, como cobertura de
-  frontend e Playwright.
-* `hotspots`: mostra arquivos com menor cobertura e maior risco relativo, por exemplo componentes e utilitarios ainda
-  pouco protegidos por testes.
-
-Esse tipo de leitura evita depender de varios relatorios separados e concentra a analise em um unico artefato do
-dashboard.
+---
 
 ## Documentação de Negócio
 
-Os requisitos do sistema estão documentados em casos de uso (CDUs) no diretório `etc/reqs/`.
+Os requisitos do sistema estão documentados no diretório `etc/reqs/`.
 
-* **Mapeamento**: Criação e definição de mapas de competências.
-* **Revisão**: Fluxo de aprovação e ajuste de mapas.
-* **Diagnóstico**: Avaliação de competências e identificação de gaps (apenas referências breves; requisitos serão incluídos em releases futuros). 
+* **[Regras de Negócio](etc/reqs/regras-negocio.md)**: Definições globais do sistema.
+* **Casos de Uso (CDUs)**: Especificações detalhadas de cada funcionalidade (01 a 36).
+* **Mapeamento**: Criação e definição de mapas de competências (CDU-01 a 10).
+* **Revisão**: Fluxo de aprovação e ajuste de mapas (CDU-11 a 20).
+* **Diagnóstico**: Identificação de gaps (CDUs futuras).
+ 

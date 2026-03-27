@@ -16,7 +16,7 @@ public record AtividadeDto(
 
     public static AtividadeDto fromEntity(Atividade atividade) {
         return AtividadeDto.builder()
-                .codigo(atividade.getCodigo())
+                .codigo(atividade.getCodigoPersistido())
                 .descricao(atividade.getDescricao())
                 .conhecimentos(atividade.getConhecimentos().stream()
                         .map(ConhecimentoResumoDto::fromEntity)

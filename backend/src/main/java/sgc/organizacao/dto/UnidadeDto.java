@@ -3,6 +3,7 @@ package sgc.organizacao.dto;
 import com.fasterxml.jackson.annotation.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
+import org.jspecify.annotations.*;
 import sgc.comum.*;
 import sgc.organizacao.model.*;
 
@@ -29,9 +30,9 @@ public class UnidadeDto {
     @Size(max = 20, message = Mensagens.SIGLA_MAX)
     private String sigla;
     @JsonView(OrganizacaoViews.Publica.class)
-    private Long codigoPai;
+    private @Nullable Long codigoPai;
     @JsonView(OrganizacaoViews.Publica.class)
-    private String tipo;
+    private @Nullable String tipo;
 
     @Builder.Default
     @JsonView(OrganizacaoViews.Publica.class)
@@ -46,21 +47,21 @@ public class UnidadeDto {
     private boolean isElegivel;
 
     @JsonView(OrganizacaoViews.Publica.class)
-    private UsuarioResumoDto responsavel;
+    private @Nullable UsuarioResumoDto responsavel;
 
-    public static UnidadeDto fromEntity(Unidade entity) {
+    public static @Nullable UnidadeDto fromEntity(@Nullable Unidade entity) {
         if (entity == null) return null;
         UnidadeDto dto = UnidadeDto.builder()
-                .codigo(entity.getCodigo())
+                .codigo(entity.getCodigoPersistido())
                 .nome(entity.getNome())
                 .sigla(entity.getSigla())
-                .codigoPai(entity.getUnidadeSuperior() != null ? entity.getUnidadeSuperior().getCodigo() : null)
+                .codigoPai(entity.getUnidadeSuperior() != null ? entity.getUnidadeSuperior().getCodigoPersistido() : null)
                 .tipo(entity.getTipo() != null ? entity.getTipo().name() : null)
                 .tituloTitular(entity.getTituloTitular())
                 .build();
 
         if (entity.getResponsabilidade() != null) {
-            dto.setResponsavel(UsuarioResumoDto.fromEntity(entity.getResponsabilidade().getUsuario()));
+            dto.setResponsavel(UsuarioResumoDto.fromEntityObrigatorio(entity.getResponsabilidade().getUsuario()));
         }
 
         return dto;

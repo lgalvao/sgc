@@ -1,6 +1,7 @@
 package sgc.processo.dto;
 
 import lombok.*;
+import org.jspecify.annotations.*;
 import sgc.organizacao.model.*;
 import sgc.processo.model.*;
 import sgc.subprocesso.model.*;
@@ -45,20 +46,22 @@ public class ProcessoDetalheDto {
 
         private String nome;
         private String sigla;
-        private Long codUnidade;
-        private @org.jspecify.annotations.Nullable Long codUnidadeSuperior;
+        private @Nullable Long codUnidade;
+        private @Nullable Long codUnidadeSuperior;
         private SituacaoSubprocesso situacaoSubprocesso;
         private LocalDateTime dataLimite;
-        private Long mapaCodigo;
-        private Long codSubprocesso;
-        private Long localizacaoAtualCodigo;
+        private @Nullable Long mapaCodigo;
+        private @Nullable Long codSubprocesso;
+        private @Nullable Long localizacaoAtualCodigo;
 
         public static UnidadeParticipanteDto fromUnidade(Unidade unidade) {
             return UnidadeParticipanteDto.builder()
                     .nome(unidade.getNome())
                     .sigla(unidade.getSigla())
-                    .codUnidade(unidade.getCodigo())
-                    .codUnidadeSuperior(unidade.getUnidadeSuperior() != null ? unidade.getUnidadeSuperior().getCodigo() : null)
+                    .codUnidade(unidade.getCodigoPersistido())
+                    .codUnidadeSuperior(unidade.getUnidadeSuperior() != null
+                            ? unidade.getUnidadeSuperior().getCodigoPersistido()
+                            : null)
                     .filhos(new ArrayList<>())
                     .build();
         }

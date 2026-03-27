@@ -23,6 +23,7 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 @Setter
 @NoArgsConstructor
 @SuperBuilder
+@SuppressWarnings("NullAway.Init")
 public class Subprocesso extends EntidadeBase {
     @ManyToOne
     @JoinColumn(name = "processo_codigo", nullable = false)
@@ -66,7 +67,7 @@ public class Subprocesso extends EntidadeBase {
 
     @JsonView({ComumViews.Publica.class, SubprocessoViews.Publica.class, MapaViews.Publica.class})
     public Set<Atividade> getAtividades() {
-        return mapa.getAtividades();
+        return mapa != null ? mapa.getAtividades() : Collections.emptySet();
     }
 
     @JsonView(ComumViews.Publica.class)
@@ -83,8 +84,8 @@ public class Subprocesso extends EntidadeBase {
 
     @JsonView(ComumViews.Publica.class)
     @JsonProperty("codMapa")
-    public Long getCodMapa() {
-        return mapa.getCodigo();
+    public @Nullable Long getCodMapa() {
+        return mapa != null ? mapa.getCodigo() : null;
     }
 
     public void setSituacao(SituacaoSubprocesso novaSituacao) {

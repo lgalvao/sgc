@@ -131,6 +131,7 @@ class ProcessoServiceTest {
             p.setSituacao(SituacaoProcesso.CRIADO);
             p.setTipo(TipoProcesso.MAPEAMENTO);
             Unidade uni = new Unidade();
+            uni.setCodigo(10L);
             uni.setSituacao(SituacaoUnidade.ATIVA);
             p.adicionarParticipantes(Set.of(uni));
             
@@ -333,18 +334,21 @@ class ProcessoServiceTest {
             when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
 
             Subprocesso s1 = new Subprocesso();
+            s1.setCodigo(101L);
             s1.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
             Unidade u1 = new Unidade();
             u1.setCodigo(10L);
             s1.setUnidade(u1);
 
             Subprocesso s2 = new Subprocesso();
+            s2.setCodigo(102L);
             s2.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
             Unidade u2 = new Unidade();
             u2.setCodigo(20L);
             s2.setUnidade(u2);
 
             Subprocesso s3 = new Subprocesso();
+            s3.setCodigo(103L);
             s3.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO); // Não elegível
             Unidade u3 = new Unidade();
             u3.setCodigo(30L);
@@ -465,6 +469,7 @@ class ProcessoServiceTest {
                     "Teste", TipoProcesso.MAPEAMENTO, LocalDateTime.now(), List.of(1L));
 
             Unidade uni = new Unidade();
+            uni.setCodigo(1L);
             uni.setSituacao(SituacaoUnidade.ATIVA);
             when(unidadeService.buscarPorCodigo(1L)).thenReturn(uni);
             when(processoRepo.saveAndFlush(any())).thenAnswer(i -> i.getArgument(0));

@@ -130,6 +130,7 @@ class UnidadeControllerTest {
     void deveRetornarUnidadePorSigla() throws Exception {
 
         Unidade u = new Unidade();
+        u.setCodigo(1L);
         u.setSigla("SIGLA");
         u.setTipo(TipoUnidade.OPERACIONAL);
         when(unidadeService.buscarPorSigla("SIGLA")).thenReturn(u);

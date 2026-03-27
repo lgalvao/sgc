@@ -1,6 +1,7 @@
 package sgc.e2e;
 
 import lombok.*;
+import org.jspecify.annotations.*;
 import org.aspectj.lang.annotation.*;
 import org.springframework.context.annotation.*;
 import org.springframework.jdbc.core.*;
@@ -26,21 +27,19 @@ public class AtribuicaoTemporariaViewsE2eAspect {
     )
     @Transactional
     public void sincronizarViews(Long codUnidade, CriarAtribuicaoRequest request) {
-        String tituloAnterior = jdbcTemplate.query(
+        @Nullable String tituloAnterior = jdbcTemplate.queryForList(
                 "SELECT usuario_titulo FROM sgc.vw_responsabilidade WHERE unidade_codigo = ?",
-                rs -> rs.next() ? rs.getString("usuario_titulo") : null,
-                codUnidade
-        );
-
-        String matriculaUsuario = jdbcTemplate.queryForObject(
-                "SELECT matricula FROM sgc.vw_usuario WHERE titulo = ?",
                 String.class,
+                codUnidade
+        ).stream().findFirst().orElse(null);
+
+        String matriculaUsuario = buscarValorObrigatorio(
+                "SELECT matricula FROM sgc.vw_usuario WHERE titulo = ?",
                 request.tituloEleitoralUsuario()
         );
 
-        String tipoUnidade = jdbcTemplate.queryForObject(
+        String tipoUnidade = buscarValorObrigatorio(
                 "SELECT tipo FROM sgc.vw_unidade WHERE codigo = ?",
-                String.class,
                 codUnidade
         );
 
@@ -61,7 +60,7 @@ public class AtribuicaoTemporariaViewsE2eAspect {
         sincronizarPerfisDaUnidade(request.tituloEleitoralUsuario(), codUnidade, tipoUnidade);
     }
 
-    private void removerPerfisDeResponsabilidadeAnteriores(String tituloAnterior, String novoTitulo, Long codUnidade) {
+    private void removerPerfisDeResponsabilidadeAnteriores(@Nullable String tituloAnterior, String novoTitulo, Long codUnidade) {
         if (tituloAnterior == null || tituloAnterior.equals(novoTitulo)) {
             return;
         }
@@ -108,5 +107,13 @@ public class AtribuicaoTemporariaViewsE2eAspect {
                 codUnidade,
                 perfil
         );
+    }
+
+    private String buscarValorObrigatorio(String sql, Object... args) {
+        String valor = jdbcTemplate.queryForObject(sql, String.class, args);
+        if (valor == null) {
+            throw new IllegalStateException("Fixture E2E não encontrou valor obrigatório para SQL: " + sql);
+        }
+        return valor;
     }
 }

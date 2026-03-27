@@ -234,10 +234,10 @@ public class ProcessoService {
 
     public void finalizar(Long codigo) {
         Processo processo = buscarPorCodigo(codigo);
-        validarFinalizacao(processo);
+        validarFinalizacao(codigo, processo);
 
         if (processo.getTipo() != DIAGNOSTICO) {
-            tornarMapasVigentes(processo);
+            tornarMapasVigentes(codigo, processo);
         }
         notificarFinalizacaoProcesso(processo);
 
@@ -278,7 +278,7 @@ public class ProcessoService {
         Perfil perfil = usuario.getPerfilAtivo();
 
         ProcessoDetalheDto dto = ProcessoDetalheDto.builder()
-                .codigo(processo.getCodigo())
+                .codigo(processo.getCodigoPersistido())
                 .descricao(processo.getDescricao())
                 .situacao(processo.getSituacao())
                 .tipo(processo.getTipo().name())
@@ -307,7 +307,7 @@ public class ProcessoService {
         Processo processo = buscarPorCodigoComParticipantes(codProcesso);
         Unidade unidade = unidadeService.buscarPorCodigo(unidadeCodigo);
 
-        if (processo.getParticipantes().stream().noneMatch(u -> u.getUnidadeCodigo().equals(unidadeCodigo))) {
+        if (processo.getParticipantes().stream().noneMatch(u -> Objects.equals(u.getUnidadeCodigo(), unidadeCodigo))) {
             throw new ErroValidacao(Mensagens.UNIDADE_NAO_PARTICIPA);
         }
 
@@ -336,7 +336,7 @@ public class ProcessoService {
         List<Unidade> todas = unidadeService.todasComHierarquia();
         Map<Long, List<Unidade>> porPai = todas.stream()
                 .filter(u -> u.getUnidadeSuperior() != null)
-                .collect(Collectors.groupingBy(u -> u.getUnidadeSuperior().getCodigo()));
+                .collect(Collectors.groupingBy(u -> u.getUnidadeSuperior().getCodigoPersistido()));
         
         Set<Long> result = new HashSet<>();
         Queue<Long> fila = new LinkedList<>();
@@ -347,7 +347,8 @@ public class ProcessoService {
             List<Unidade> filhos = porPai.get(atual);
             if (filhos != null) {
                 for (Unidade f : filhos) {
-                    if (result.add(f.getCodigo())) fila.add(f.getCodigo());
+                    Long codFilho = f.getCodigoPersistido();
+                    if (result.add(codFilho)) fila.add(codFilho);
                 }
             }
         }
@@ -380,15 +381,15 @@ public class ProcessoService {
         return erros;
     }
 
-    private void validarFinalizacao(Processo processo) {
+    private void validarFinalizacao(Long codProcesso, Processo processo) {
         if (processo.getSituacao() != EM_ANDAMENTO) throw new ErroValidacao(Mensagens.SITUACAO_INVALIDA);
-        if (!validacaoService.validarSubprocessosParaFinalizacao(processo.getCodigo()).valido()) 
+        if (!validacaoService.validarSubprocessosParaFinalizacao(codProcesso).valido())
             throw new ErroValidacao(Mensagens.SUBPROCESSOS_NAO_HOMOLOGADOS);
     }
 
-    private void tornarMapasVigentes(Processo processo) {
-        subprocessoService.listarEntidadesPorProcesso(processo.getCodigo())
-                .forEach(sp -> unidadeService.definirMapaVigente(sp.getUnidade().getCodigo(), sp.getMapa()));
+    private void tornarMapasVigentes(Long codProcesso, Processo processo) {
+        subprocessoService.listarEntidadesPorProcesso(codProcesso)
+                .forEach(sp -> unidadeService.definirMapaVigente(sp.getUnidade().getCodigoPersistido(), sp.getMapa()));
     }
 
     private Set<Unidade> carregarArvoreUnidades(Set<Unidade> participantes) {
@@ -403,13 +404,23 @@ public class ProcessoService {
     private void efetivarInicioSubprocessos(Processo processo, TipoProcesso tipo, List<Long> cods, Set<Unidade> pars, List<UnidadeMapa> ums, Unidade adm, Usuario user) {
         Map<Long, UnidadeMapa> mapUm = ums.stream().collect(Collectors.toMap(UnidadeMapa::getUnidadeCodigo, m -> m));
         if (tipo == MAPEAMENTO) subprocessoService.criarParaMapeamento(processo, pars, adm, user);
-        else if (tipo == REVISAO) cods.forEach(c -> subprocessoService.criarParaRevisao(processo, unidadeService.buscarPorCodigo(c), mapUm.get(c), adm, user));
-        else if (tipo == DIAGNOSTICO) pars.forEach(u -> subprocessoService.criarParaDiagnostico(processo, u, mapUm.get(u.getCodigo()), adm, user));
+        else if (tipo == REVISAO) cods.forEach(c -> subprocessoService.criarParaRevisao(
+                processo,
+                unidadeService.buscarPorCodigo(c),
+                obterUnidadeMapaObrigatorio(mapUm, c),
+                adm,
+                user));
+        else if (tipo == DIAGNOSTICO) pars.forEach(u -> subprocessoService.criarParaDiagnostico(
+                processo,
+                u,
+                obterUnidadeMapaObrigatorio(mapUm, u.getCodigoPersistido()),
+                adm,
+                user));
     }
 
     private void montarHierarquiaNoDto(ProcessoDetalheDto dto, Processo processo, List<Subprocesso> subps, Set<Long> acesso) {
         Map<Long, UnidadeParticipanteDto> mapDto = new HashMap<>();
-        Map<Long, Subprocesso> mapSp = subps.stream().collect(Collectors.toMap(s -> s.getUnidade().getCodigo(), s -> s));
+        Map<Long, Subprocesso> mapSp = subps.stream().collect(Collectors.toMap(s -> s.getUnidade().getCodigoPersistido(), s -> s));
 
         processo.getParticipantes().stream()
                 .filter(p -> acesso.contains(p.getUnidadeCodigo()))
@@ -419,9 +430,9 @@ public class ProcessoService {
                     if (sp != null) {
                         uDto.setSituacaoSubprocesso(sp.getSituacao());
                         uDto.setDataLimite(sp.getDataLimiteEtapa1());
-                        uDto.setCodSubprocesso(sp.getCodigo());
-                        if (sp.getMapa() != null) uDto.setMapaCodigo(sp.getMapa().getCodigo());
-                        uDto.setLocalizacaoAtualCodigo(obterLocalizacao(sp).getCodigo());
+                        uDto.setCodSubprocesso(sp.getCodigoPersistido());
+                        if (sp.getMapa() != null) uDto.setMapaCodigo(sp.getMapa().getCodigoPersistido());
+                        uDto.setLocalizacaoAtualCodigo(obterLocalizacao(sp).getCodigoPersistido());
                     }
                     mapDto.put(p.getUnidadeCodigo(), uDto);
                 });
@@ -490,7 +501,15 @@ public class ProcessoService {
                 .build();
     }
 
-    private LocalDateTime obterUltimaDataLimite(Subprocesso sp) {
+    private UnidadeMapa obterUnidadeMapaObrigatorio(Map<Long, UnidadeMapa> mapasPorUnidade, Long codigoUnidade) {
+        UnidadeMapa unidadeMapa = mapasPorUnidade.get(codigoUnidade);
+        if (unidadeMapa == null) {
+            throw new IllegalStateException("Unidade %d sem mapa vigente para iniciar subprocesso".formatted(codigoUnidade));
+        }
+        return unidadeMapa;
+    }
+
+    private @Nullable LocalDateTime obterUltimaDataLimite(Subprocesso sp) {
         LocalDateTime dataLimiteEtapa1 = sp.getDataLimiteEtapa1();
         LocalDateTime dataLimiteEtapa2 = sp.getDataLimiteEtapa2();
 
