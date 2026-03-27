@@ -36,7 +36,7 @@ public class Subprocesso extends EntidadeBase {
 
     @OneToOne(mappedBy = "subprocesso")
     @JsonView({ComumViews.Publica.class, MapaViews.Publica.class})
-    private @Nullable Mapa mapa;
+    private Mapa mapa;
 
     @JsonView({ComumViews.Publica.class, MapaViews.Publica.class})
     @Column(name = "data_limite_etapa1", nullable = false)
@@ -66,7 +66,7 @@ public class Subprocesso extends EntidadeBase {
 
     @JsonView({ComumViews.Publica.class, SubprocessoViews.Publica.class, MapaViews.Publica.class})
     public Set<Atividade> getAtividades() {
-        return mapa != null ? mapa.getAtividades() : Collections.emptySet();
+        return mapa.getAtividades();
     }
 
     @JsonView(ComumViews.Publica.class)
@@ -83,8 +83,8 @@ public class Subprocesso extends EntidadeBase {
 
     @JsonView(ComumViews.Publica.class)
     @JsonProperty("codMapa")
-    public @Nullable Long getCodMapa() {
-        return mapa != null ? mapa.getCodigo() : null;
+    public Long getCodMapa() {
+        return mapa.getCodigo();
     }
 
     public void setSituacao(SituacaoSubprocesso novaSituacao) {
