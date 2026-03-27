@@ -1,0 +1,145 @@
+:root {
+    color-scheme: light;
+    --cor-fundo: #f6f8fa;
+    --cor-superficie: #ffffff;
+    --cor-texto: #1f2937;
+    --cor-borda: #d1d5db;
+    --cor-verde: #15803d;
+    --cor-amarelo: #b45309;
+    --cor-vermelho: #b91c1c;
+    --cor-azul: #2563eb;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Inter, Arial, sans-serif;
+    background: var(--cor-fundo);
+    color: var(--cor-texto);
+}
+
+.pagina {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1.25rem;
+    display: grid;
+    gap: 1rem;
+}
+
+.cabecalho {
+    background: var(--cor-superficie);
+    border: 1px solid var(--cor-borda);
+    border-radius: 0.75rem;
+    padding: 1rem;
+}
+
+.cabecalho h1 {
+    margin: 0 0 0.25rem;
+}
+
+.grade-resumo {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 0.75rem;
+}
+
+.card {
+    background: var(--cor-superficie);
+    border: 1px solid var(--cor-borda);
+    border-radius: 0.75rem;
+    padding: 0.75rem;
+}
+
+.card h3 {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #6b7280;
+}
+
+.card strong {
+    display: block;
+    margin-top: 0.25rem;
+    font-size: 1.4rem;
+}
+
+.bloco {
+    background: var(--cor-superficie);
+    border: 1px solid var(--cor-borda);
+    border-radius: 0.75rem;
+    padding: 1rem;
+}
+
+.grade-dupla {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.tabela-container {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    border-bottom: 1px solid var(--cor-borda);
+    padding: 0.5rem;
+    text-align: left;
+    vertical-align: top;
+}
+
+.status {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    padding: 0.2rem 0.5rem;
+    color: #fff;
+    font-size: 0.75rem;
+}
+
+.status.sucesso,
+.status.verde {
+    background: var(--cor-verde);
+}
+
+.status.alerta,
+.status.amarelo {
+    background: var(--cor-amarelo);
+}
+
+.status.falha,
+.status.vermelho {
+    background: var(--cor-vermelho);
+}
+
+.barra {
+    background: #e5e7eb;
+    border-radius: 999px;
+    height: 0.6rem;
+    overflow: hidden;
+    margin-top: 0.35rem;
+}
+
+.barra > span {
+    display: block;
+    height: 100%;
+    background: var(--cor-azul);
+}
+
+.lista-hotspots {
+    margin: 0;
+    padding-left: 1rem;
+    display: grid;
+    gap: 0.5rem;
+}
+
+.lista-hotspots li {
+    line-height: 1.35;
+}
