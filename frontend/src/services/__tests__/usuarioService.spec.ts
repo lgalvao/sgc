@@ -56,6 +56,14 @@ describe('usuarioService', () => {
       await usuarioService.buscarUsuarioPorTitulo('123');
       expect(apiClient.get).toHaveBeenCalledWith('/usuarios/123');
     });
+
+    it('pesquisarUsuarios', async () => {
+      (apiClient.get as any).mockResolvedValueOnce({ data: [] });
+      await usuarioService.pesquisarUsuarios('maria');
+      expect(apiClient.get).toHaveBeenCalledWith('/usuarios/pesquisar', {
+        params: { termo: 'maria' }
+      });
+    });
   });
 
   describe('mappers', () => {
