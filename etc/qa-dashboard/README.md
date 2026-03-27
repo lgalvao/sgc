@@ -13,6 +13,7 @@ ferramentas.
 - `runs/`: snapshots gerados por execucao. Ignorado no Git.
 - `latest/`: atalhos para os artefatos consolidados mais recentes. Ignorado no Git.
 - `tmp/`: arquivos auxiliares temporarios. Ignorado no Git.
+- `dashboard.html`, `dashboard.js`, `dashboard.css`: interface visual do dashboard a partir de `latest/ultimo-snapshot.json`.
 
 ## Contrato
 
@@ -27,6 +28,24 @@ Os adaptadores podem consumir:
 - saidas dos comandos de QA
 
 Mas esses artefatos nao sao a fonte de verdade do dashboard.
+
+## Como coletar e visualizar
+
+1. Gere um snapshot de QA (exemplo perfil rapido):
+
+   ```bash
+   node etc/qa-dashboard/scripts/coletar-snapshot.mjs --perfil rapido
+   ```
+
+2. Sirva a raiz do repositorio com qualquer servidor HTTP simples e abra `etc/qa-dashboard/dashboard.html`.
+
+   Exemplo:
+
+   ```bash
+   npx http-server .
+   ```
+
+   Depois acesse `http://localhost:8080/etc/qa-dashboard/dashboard.html`.
 
 ## Documento principal
 
