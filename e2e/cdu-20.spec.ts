@@ -1,5 +1,4 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
-import type {Page} from '@playwright/test';
 import {
     criarProcessoMapaComSugestoesFixture,
     criarProcessoMapaDisponibilizadoFixture,
@@ -20,28 +19,6 @@ import {resetDatabase} from './hooks/hooks-limpeza.js';
 
 function validarDataHoraBrasileira(dataHoraTexto: string) {
     expect(dataHoraTexto.trim()).toMatch(/^\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}(:\d{2})?$/);
-}
-
-async function validarHistoricoAnaliseMapa(page: Page, unidadeEsperada?: string) {
-    const modal = page.getByTestId('mdl-historico-analise');
-
-    await expect(modal.getByTestId('header-historico-dataHora')).toBeVisible();
-    await expect(modal.getByTestId('header-historico-unidade')).toBeVisible();
-    await expect(modal.getByTestId('header-historico-resultado')).toBeVisible();
-    await expect(modal.getByTestId('header-historico-analista')).toBeVisible();
-    await expect(modal.getByTestId('header-historico-observacao')).toBeVisible();
-
-    const dataHora = await modal.getByTestId('cell-dataHora-0').innerText();
-    validarDataHoraBrasileira(dataHora);
-
-    if (unidadeEsperada) {
-        await expect(modal.getByTestId('cell-unidade-0')).toHaveText(unidadeEsperada);
-    } else {
-        await expect(modal.getByTestId('cell-unidade-0')).not.toHaveText('');
-    }
-
-    await expect(modal.getByTestId('cell-resultado-0')).not.toHaveText('');
-    await expect(modal.getByTestId('cell-observacao-0')).not.toHaveText('');
 }
 
 test.describe.serial('CDU-20 - Analisar validação de mapa de competências', () => {
