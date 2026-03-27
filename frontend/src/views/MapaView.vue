@@ -213,8 +213,17 @@ const atividadesSemCompetencia = computed(() => {
 
   return atividades.value.filter((atividade) => !atividadesAssociadas.has(atividade.codigo));
 });
+
+const existeCompetenciaSemCadastro = computed(() => {
+  return competencias.value.some((competencia) => (competencia.atividades?.length ?? 0) === 0);
+});
+
 const podeConfirmarDisponibilizacao = computed(() => {
-  return competencias.value.length > 0 && atividadesSemCompetencia.value.length === 0;
+  return (
+      competencias.value.length > 0
+      && atividadesSemCompetencia.value.length === 0
+      && !existeCompetenciaSemCadastro.value
+  );
 });
 const competenciaSendoEditada = ref<Competencia | null>(null);
 
@@ -385,6 +394,7 @@ defineExpose({
   podeEditarMapa,
   podeDisponibilizarMapa,
   podeConfirmarDisponibilizacao,
+  existeCompetenciaSemCadastro,
   unidade,
   competencias,
   atividades,

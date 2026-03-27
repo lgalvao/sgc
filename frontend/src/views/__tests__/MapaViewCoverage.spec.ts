@@ -216,6 +216,25 @@ describe("MapaView coverage", () => {
         expect(wrapper.find('[data-testid="btn-cad-mapa-disponibilizar"]').attributes("disabled")).toBeDefined();
     });
 
+    it("mantem o botao disponibilizar desabilitado se existir competencia sem cadastro", async () => {
+        const wrapper = createWrapper({
+            competencias: [
+                {
+                    codigo: 10,
+                    descricao: "Competência sem cadastro",
+                    atividades: []
+                }
+            ]
+        });
+
+        await flushPromises();
+
+        (wrapper.vm as any).atividades = [];
+
+        expect((wrapper.vm as any).existeCompetenciaSemCadastro).toBe(true);
+        expect(wrapper.find('[data-testid="btn-cad-mapa-disponibilizar"]').attributes("disabled")).toBeDefined();
+    });
+
     it("cobre early returns e funções de fechar modal", async () => {
         const wrapper = createWrapper();
         await flushPromises();
