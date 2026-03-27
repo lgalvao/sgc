@@ -4,22 +4,22 @@ import {logger} from '@/utils';
 /**
  * Estado de uma modal individual
  */
-interface ModalState {
-    isOpen: boolean;
-    data?: any;
+interface EstadoModal {
+    aberto: boolean;
+    dados?: any;
 }
 
 /**
  * Gerenciador de modals
  */
-interface ModalManager {
-    modals: Record<string, Ref<ModalState>>;
-    open: (name: string, data?: any) => void;
-    close: (name: string) => void;
-    toggle: (name: string) => void;
-    isOpen: (name: string) => boolean;
-    getData: (name: string) => any;
-    closeAll: () => void;
+interface GerenciadorModals {
+    modals: Record<string, Ref<EstadoModal>>;
+    abrir: (nome: string, dados?: any) => void;
+    fechar: (nome: string) => void;
+    alternar: (nome: string) => void;
+    estaAberto: (nome: string) => boolean;
+    obterDados: (nome: string) => any;
+    fecharTodos: () => void;
 }
 
 /**
@@ -30,94 +30,98 @@ interface ModalManager {
  *
  * @example
  * ```ts
- * const { modals, open, close, isOpen } = useModalManager([
- *     'confirmDelete',
- *     'editItem',
- *     'viewDetails'
+ * const { modals, abrir, fechar, estaAberto } = useGerenciadorModals([
+ *     'confirmarExclusao',
+ *     'editarItem',
+ *     'verDetalhes'
  * ]);
  *
  * // Abrir modal com dados
- * open('editItem', { id: 123, name: 'Test' });
+ * abrir('editarItem', { id: 123, nome: 'Teste' });
  *
  * // Verificar se está aberta
- * if (isOpen('confirmDelete')) { ... }
+ * if (estaAberto('confirmarExclusao')) { ... }
  *
  * // Fechar modal
- * close('editItem');
+ * fechar('editarItem');
  * ```
  */
-export function useModalManager(modalNames: string[]): ModalManager {
+export function useGerenciadorModals(nomesModals: string[]): GerenciadorModals {
     // Cria refs para cada modal
-    const modals: Record<string, Ref<ModalState>> = {};
-    modalNames.forEach(name => {
-        modals[name] = ref<ModalState>({isOpen: false});
+    const modals: Record<string, Ref<EstadoModal>> = {};
+    nomesModals.forEach(nome => {
+        modals[nome] = ref<EstadoModal>({aberto: false});
     });
 
     /**
      * Abre uma modal, opcionalmente com dados
      */
-    const open = (name: string, data?: any) => {
-        if (!modals[name]) {
-            logger.warn(`Modal "${name}" não foi registrada`);
+    const abrir = (nome: string, dados?: any) => {
+        if (!modals[nome]) {
+            logger.warn(`Modal "${nome}" não foi registrada`);
             return;
         }
-        modals[name].value = {isOpen: true, data};
+        modals[nome].value = {aberto: true, dados};
     };
 
     /**
      * Fecha uma modal e limpa seus dados
      */
-    const close = (name: string) => {
-        if (!modals[name]) {
-            logger.warn(`Modal "${name}" não foi registrada`);
+    const fechar = (nome: string) => {
+        if (!modals[nome]) {
+            logger.warn(`Modal "${nome}" não foi registrada`);
             return;
         }
-        modals[name].value = {isOpen: false, data: undefined};
+        modals[nome].value = {aberto: false, dados: undefined};
     };
 
     /**
      * Alterna o estado de uma modal
      */
-    const toggle = (name: string) => {
-        if (!modals[name]) {
-            logger.warn(`Modal "${name}" não foi registrada`);
+    const alternar = (nome: string) => {
+        if (!modals[nome]) {
+            logger.warn(`Modal "${nome}" não foi registrada`);
             return;
         }
-        const currentState = modals[name].value;
-        modals[name].value = {
-            isOpen: !currentState.isOpen,
-            data: currentState.isOpen ? undefined : currentState.data
+        const estadoAtual = modals[nome].value;
+        modals[nome].value = {
+            aberto: !estadoAtual.aberto,
+            dados: estadoAtual.aberto ? undefined : estadoAtual.dados
         };
     };
 
     /**
      * Verifica se uma modal está aberta
      */
-    const isOpen = (name: string): boolean => {
-        return modals[name]?.value.isOpen ?? false;
+    const estaAberto = (nome: string): boolean => {
+        return modals[nome]?.value.aberto ?? false;
     };
 
     /**
      * Obtém os dados de uma modal
      */
-    const getData = (name: string): any => {
-        return modals[name]?.value.data;
+    const obterDados = (nome: string): any => {
+        return modals[nome]?.value.dados;
     };
 
     /**
      * Fecha todas as modals
      */
-    const closeAll = () => {
-        Object.keys(modals).forEach(name => close(name));
+    const fecharTodos = () => {
+        Object.keys(modals).forEach(nome => fechar(nome));
     };
 
     return {
         modals,
-        open,
-        close,
-        toggle,
-        isOpen,
-        getData,
-        closeAll
+        abrir,
+        fechar,
+        alternar,
+        estaAberto,
+        obterDados,
+        fecharTodos
     };
 }
+
+// Aliases para compatibilidade legada durante a transição
+/** @deprecated Use useGerenciadorModals */
+export const useModalManager = useGerenciadorModals;
