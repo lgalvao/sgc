@@ -190,6 +190,36 @@ describe('MapaView Coverage', () => {
         });
     });
 
+    it('desabilita disponibilizacao quando existir competencia sem atividade', async () => {
+        const pinia = createTestingPinia({
+            createSpy: vi.fn,
+            initialState: {
+                mapas: {
+                    mapaCompleto: {
+                        competencias: [{codigo: 1, descricao: 'Comp 1', atividades: []}]
+                    }
+                }
+            }
+        });
+
+        const wrapper = mount(MapaView, {
+            global: {
+                plugins: [pinia],
+                stubs: commonStubs
+            }
+        });
+
+        const mapas = useMapas();
+        mapas.mapaCompleto.value = {
+            competencias: [{codigo: 1, descricao: 'Comp 1', atividades: []}]
+        } as any;
+
+        await wrapper.vm.$nextTick();
+
+        expect((wrapper.vm as any).existeCompetenciaSemAtividade).toBe(true);
+        expect((wrapper.vm as any).podeConfirmarDisponibilizacao).toBe(false);
+    });
+
     it('fecharModalImpacto closes the modal', async () => {
         const pinia = createTestingPinia();
         const wrapper = mount(MapaView, {

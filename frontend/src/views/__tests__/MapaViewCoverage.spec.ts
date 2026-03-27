@@ -216,7 +216,7 @@ describe("MapaView coverage", () => {
         expect(wrapper.find('[data-testid="btn-cad-mapa-disponibilizar"]').attributes("disabled")).toBeDefined();
     });
 
-    it("mantem o botao disponibilizar desabilitado se existir competencia sem cadastro", async () => {
+    it("mantem o botao disponibilizar desabilitado se existir competencia sem atividade", async () => {
         const wrapper = createWrapper({
             competencias: [
                 {
@@ -231,7 +231,8 @@ describe("MapaView coverage", () => {
 
         (wrapper.vm as any).atividades = [];
 
-        expect((wrapper.vm as any).existeCompetenciaSemCadastro).toBe(true);
+        expect((wrapper.vm as any).existeCompetenciaSemAtividade).toBe(true);
+        expect((wrapper.vm as any).associacoesMapaValidas).toBe(false);
         expect(wrapper.find('[data-testid="btn-cad-mapa-disponibilizar"]').attributes("disabled")).toBeDefined();
     });
 

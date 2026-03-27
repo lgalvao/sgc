@@ -187,6 +187,11 @@ onMounted(async () => {
     codSubprocesso.value = id;
     const data = await subprocessosStore.buscarContextoEdicao(id);
     if (data) {
+      if (data.mapa) {
+        mapasStore.mapaCompleto.value = data.mapa as any;
+      } else {
+        await mapasStore.buscarMapaCompleto(id);
+      }
       if (data.atividadesDisponiveis) {
         atividades.value = data.atividadesDisponiveis;
       }
@@ -214,15 +219,18 @@ const atividadesSemCompetencia = computed(() => {
   return atividades.value.filter((atividade) => !atividadesAssociadas.has(atividade.codigo));
 });
 
-const existeCompetenciaSemCadastro = computed(() => {
+const existeCompetenciaSemAtividade = computed(() => {
   return competencias.value.some((competencia) => (competencia.atividades?.length ?? 0) === 0);
+});
+
+const associacoesMapaValidas = computed(() => {
+  return !existeCompetenciaSemAtividade.value && atividadesSemCompetencia.value.length === 0;
 });
 
 const podeConfirmarDisponibilizacao = computed(() => {
   return (
       competencias.value.length > 0
-      && atividadesSemCompetencia.value.length === 0
-      && !existeCompetenciaSemCadastro.value
+      && associacoesMapaValidas.value
   );
 });
 const competenciaSendoEditada = ref<Competencia | null>(null);
@@ -394,7 +402,8 @@ defineExpose({
   podeEditarMapa,
   podeDisponibilizarMapa,
   podeConfirmarDisponibilizacao,
-  existeCompetenciaSemCadastro,
+  existeCompetenciaSemAtividade,
+  associacoesMapaValidas,
   unidade,
   competencias,
   atividades,
