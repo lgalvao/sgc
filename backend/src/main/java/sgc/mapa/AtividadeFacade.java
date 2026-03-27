@@ -155,7 +155,7 @@ public class AtividadeFacade {
         AtividadeDto atividadeVis = null;
         if (incluirAtividade) {
             atividadeVis = todasAtividades.stream()
-                    .filter(a -> a.codigo().equals(codigoAtividade))
+                    .filter(a -> Objects.equals(a.codigo(), codigoAtividade))
                     .findFirst()
                     .orElse(null);
         }

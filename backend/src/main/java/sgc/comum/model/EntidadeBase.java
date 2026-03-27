@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.*;
-import org.jspecify.annotations.*;
 
 import java.io.*;
 import java.util.*;
@@ -22,7 +21,7 @@ public abstract class EntidadeBase implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "codigo")
     @JsonView(ComumViews.Publica.class)
-    private @Nullable Long codigo;
+    private Long codigo;
 
     @Override
     public String toString() {

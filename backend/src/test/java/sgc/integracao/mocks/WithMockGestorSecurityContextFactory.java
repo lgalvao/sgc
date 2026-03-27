@@ -1,6 +1,5 @@
 package sgc.integracao.mocks;
 
-import org.jspecify.annotations.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.*;
@@ -21,7 +20,7 @@ public class WithMockGestorSecurityContextFactory
     private UsuarioPerfilRepo usuarioPerfilRepo;
 
     @Override
-    public SecurityContext createSecurityContext(@NonNull WithMockGestor customUser) {
+    public SecurityContext createSecurityContext(WithMockGestor customUser) {
         String titulo = customUser.value();
         Usuario usuario = usuarioRepo.findById(titulo)
                 .orElseThrow(() -> new IllegalStateException("Usuário não encontrado no data.sql: " + titulo));

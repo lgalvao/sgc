@@ -11,6 +11,7 @@ import java.time.*;
  */
 @Builder
 public record DisponibilizarMapaRequest(
-        @NotNull(message = Mensagens.DATA_LIMITE_VALIDACAO_OBRIGATORIA) @Future(message = Mensagens.DATA_LIMITE_VALIDACAO_FUTURA) LocalDate dataLimite,
+        @NotNull(message = Mensagens.DATA_LIMITE_VALIDACAO_OBRIGATORIA)
+        @Future(message = Mensagens.DATA_LIMITE_VALIDACAO_FUTURA) LocalDate dataLimite,
         String observacoes) {
 }

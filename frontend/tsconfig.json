@@ -23,7 +23,7 @@
       "vitest/globals",
       "node",
       "vite/client",
-      "@vitest/browser"
+      "@vitest/browser/matchers"
     ],
     "baseUrl": ".",
     "paths": {

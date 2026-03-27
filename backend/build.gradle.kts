@@ -44,7 +44,7 @@ tasks.named<JavaCompile>("compileTestJava") {
     options.errorprone.excludedPaths = listOf(
         """.*[\\/](build[\\/]generated)[\\/].*""",
         """.*[\\/]src[\\/]main[\\/]java[\\/]sgc[\\/](?!comum[\\/]erros[\\/]|processo[\\/]dto[\\/]|subprocesso[\\/]dto[\\/]|mapa[\\/]dto[\\/]).*""",
-        """.*[\\/]src[\\/]test[\\/]java[\\/]sgc[\\/]integracao[\\/].*"""
+        """.*[\\/]src[\\/]test[\\/]java[\\/]sgc[\\/](?!comum[\\/]erros[\\/]|processo[\\/]dto[\\/]).*"""
     ).joinToString("|")
 }
 

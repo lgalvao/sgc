@@ -1,8 +1,7 @@
-/// <reference types="@vitest/browser/matchers" />
 import type {Meta, StoryObj} from '@storybook/vue3-vite';
+import {expect} from 'vitest';
 import InlineEditor from './InlineEditor.vue';
 import {ref} from 'vue';
-import {expect} from 'vitest';
 import {page, userEvent} from '@vitest/browser/context';
 
 const meta: Meta<typeof InlineEditor> = {

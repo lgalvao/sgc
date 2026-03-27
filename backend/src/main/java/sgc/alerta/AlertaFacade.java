@@ -28,8 +28,6 @@ public class AlertaFacade {
 
     public List<Alerta> alertasPorUsuario(String usuarioTitulo, Long codigoUnidadeAtiva, String perfil) {
         List<Alerta> alertas;
-        
-        // Regra expressiva CDU-02 (3.2)
         if ("SERVIDOR".equals(perfil)) {
             alertas = alertaService.listarParaServidor(usuarioTitulo);
         } else {
@@ -43,7 +41,8 @@ public class AlertaFacade {
 
         Map<Long, LocalDateTime> mapaLeitura = new HashMap<>();
         for (AlertaUsuario alertaUsuario : leituras) {
-            mapaLeitura.put(alertaUsuario.getCodigo().getAlertaCodigo(), alertaUsuario.getDataHoraLeitura());
+            LocalDateTime dataHoraLeitura = alertaUsuario.getDataHoraLeitura();
+            if (dataHoraLeitura != null) mapaLeitura.put(alertaUsuario.getCodigo().getAlertaCodigo(), dataHoraLeitura);
         }
 
         alertas.forEach(alerta -> alerta.setDataHoraLeitura(mapaLeitura.get(alerta.getCodigo())));
@@ -59,7 +58,7 @@ public class AlertaFacade {
 
     public Page<Alerta> listarPorUnidade(String usuarioTitulo, Long codigoUnidade, String perfil, Pageable pageable) {
         // Regra CDU-02 (3.3): Ordenação decrescente obrigatória por data/hora
-        Pageable sortedPageable = pageable.isPaged() 
+        Pageable sortedPageable = pageable.isPaged()
                 ? PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.DESC, "dataHora"))
                 : pageable;
 

@@ -23,7 +23,7 @@ public record MovimentacaoDto(
 ) {
     public static MovimentacaoDto from(Movimentacao m) {
         Unidade unidadeOrigem = m.getUnidadeOrigem();
-        @Nullable Unidade unidadeDestino = m.getUnidadeDestino();
+        Unidade unidadeDestino = m.getUnidadeDestino();
         Usuario usuario = m.getUsuario();
 
         return MovimentacaoDto.builder()
