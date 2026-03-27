@@ -11,6 +11,7 @@ import sgc.organizacao.service.*;
 import sgc.seguranca.*;
 import sgc.seguranca.dto.*;
 
+import java.lang.reflect.*;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
@@ -181,5 +182,17 @@ class LoginFacadeTest {
         List<PerfilUnidadeDto> result = loginFacade.buscarAutorizacoesUsuario("123");
         assertThat(result).hasSize(1);
         assertThat(result.getFirst().perfil()).isEqualTo(Perfil.GESTOR);
+    }
+
+    @Test
+    @DisplayName("deve lançar erro quando unidade para autorização estiver ausente")
+    void deveLancarErroQuandoUnidadeAusenteNaAutorizacao() throws Exception {
+        Method metodo = LoginFacade.class.getDeclaredMethod("toUnidadeDtoObrigatoria", Unidade.class);
+        metodo.setAccessible(true);
+
+        assertThatThrownBy(() -> metodo.invoke(loginFacade, new Object[]{null}))
+                .isInstanceOf(InvocationTargetException.class)
+                .hasCauseInstanceOf(IllegalStateException.class)
+                .hasRootCauseMessage("Unidade ausente na autorização de login");
     }
 }
