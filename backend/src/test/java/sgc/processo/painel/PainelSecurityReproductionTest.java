@@ -6,8 +6,12 @@ import org.springframework.http.MediaType;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.*;
 import org.springframework.security.core.context.*;
+import sgc.alerta.model.*;
 import sgc.integracao.*;
 import sgc.organizacao.model.*;
+import sgc.processo.model.*;
+
+import java.time.*;
 
 import java.util.*;
 
@@ -21,12 +25,35 @@ class PainelSecurityReproductionTest extends BaseIntegrationTest {
     @Autowired
     private UsuarioRepo usuarioRepo;
 
+    @Autowired
+    private AlertaRepo alertaRepo;
+
+    @Autowired
+    private UnidadeRepo unidadeRepo;
+
+    @Autowired
+    private ProcessoRepo processoRepo;
+
     private Usuario servidor;
+    private Alerta alertaUnidadeAlheia;
 
     @BeforeEach
     void setUp() {
         // Usuário '1' é SERVIDOR na Unidade 10 (SESEL) no data.sql
         servidor = usuarioRepo.findById("1").orElseThrow();
+
+        Unidade unidadeOrigem = unidadeRepo.findById(10L).orElseThrow();
+        Unidade unidadeDestinoAlheia = unidadeRepo.findById(8L).orElseThrow();
+        Processo processo = processoRepo.findAll().stream().findFirst().orElseThrow();
+
+        Alerta alerta = new Alerta();
+        alerta.setProcesso(processo);
+        alerta.setDataHora(LocalDateTime.now());
+        alerta.setUnidadeOrigem(unidadeOrigem);
+        alerta.setUnidadeDestino(unidadeDestinoAlheia);
+        alerta.setDescricao("Alerta fixture de acesso indevido entre unidades");
+        alerta.setUsuarioDestinoTitulo(null);
+        alertaUnidadeAlheia = alertaRepo.saveAndFlush(alerta);
     }
 
     private void autenticar(Usuario usuario, Perfil perfil, Long unidadeCodigo) {
@@ -66,7 +93,7 @@ class PainelSecurityReproductionTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("SEGURANÇA: Sistema ignora unidade maliciosa na URL e usa a Unidade do Token")
+    @DisplayName("SEGURANÇA: Sistema ignora unidade maliciosa na URL e não expõe alerta de fixture de outra unidade")
     void listarAlertas_AcessoUnidadeAlheia_DeveEstarCorrigido() throws Exception {
         // Usuário está autenticado na Unidade 10
         autenticar(servidor, Perfil.SERVIDOR, 10L);
@@ -77,7 +104,31 @@ class PainelSecurityReproductionTest extends BaseIntegrationTest {
                         .param("usuarioTitulo", "TITULO_ALHEIO")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                // NÃO deve conter o alerta 70002 (que é da unidade 8)
-                .andExpect(jsonPath("$.content[*].codigo", not(hasItem(70002))));
+                .andExpect(jsonPath("$.content[*].codigo", not(hasItem(alertaUnidadeAlheia.getCodigo().intValue()))));
+    }
+
+    @Test
+    @DisplayName("SEGURANÇA: Servidor não deve receber alerta coletivo de unidade diferente")
+    void listarAlertas_NaoRetornaAlertaColetivoDeOutraUnidade() throws Exception {
+        autenticar(servidor, Perfil.SERVIDOR, 10L);
+
+        mockMvc.perform(get("/api/painel/alertas")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[*].codigo", not(hasItem(alertaUnidadeAlheia.getCodigo().intValue()))));
+    }
+
+    @Test
+    @DisplayName("SEGURANÇA: Endpoint mantém isolamento mesmo com parâmetros conflitantes")
+    void listarAlertas_ParamConflitanteMantemIsolamento() throws Exception {
+        autenticar(servidor, Perfil.SERVIDOR, 10L);
+
+        mockMvc.perform(get("/api/painel/alertas")
+                        .param("perfil", "ADMIN")
+                        .param("unidade", "1")
+                        .param("usuarioTitulo", "ADMIN")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[*].codigo", not(hasItem(alertaUnidadeAlheia.getCodigo().intValue()))));
     }
 }
