@@ -3,19 +3,19 @@ const path = require('node:path');
 const {spawnSync} = require('node:child_process');
 
 const COMANDOS = {
-    'cobertura:detalhar': 'analisar-cobertura.cjs',
-    'cobertura:prioridades': 'analisar-cobertura-total.cjs',
-    'cobertura:complexidade': 'analisar-complexidade.cjs',
-    'cobertura:lacunas': 'super-cobertura.cjs',
-    'cobertura:plano': 'gerar-plano-cobertura.cjs',
-    'cobertura:verificar': 'verificar-cobertura.cjs',
-    'cobertura:jornada': 'cobertura-100.cjs',
-    'testes:analisar': 'analyze_tests.cjs',
-    'testes:priorizar': 'prioritize_tests.cjs',
-    'testes:stub': 'gerar-stub-teste.cjs',
-    'java:fix-fqn': 'fix_fqn.cjs',
-    'java:null-checks': 'auditar-verificacoes-null.cjs',
-    'java:instalar-certs': 'instalar-certs.cjs'
+    'cobertura:detalhar': 'cobertura-analisar.cjs',
+    'cobertura:prioridades': 'cobertura-priorizar.cjs',
+    'cobertura:complexidade': 'cobertura-complexidade.cjs',
+    'cobertura:lacunas': 'cobertura-lacunas.cjs',
+    'cobertura:plano': 'cobertura-plano.cjs',
+    'cobertura:verificar': 'cobertura-verificar.cjs',
+    'cobertura:jornada': 'cobertura-jornada.cjs',
+    'testes:analisar': 'testes-analisar.cjs',
+    'testes:priorizar': 'testes-priorizar.cjs',
+    'testes:stub': 'testes-gerar-stub.cjs',
+    'java:fix-fqn': 'java-corrigir-fqn.cjs',
+    'java:null-checks': 'java-auditar-null.cjs',
+    'java:instalar-certs': 'java-instalar-certificados.cjs'
 };
 
 function imprimirAjuda() {

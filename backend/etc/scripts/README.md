@@ -2,13 +2,15 @@
 
 Este diretório reúne utilitários de análise, priorização e manutenção usados no backend do SGC.
 
+O ponto de entrada recomendado agora é `node backend/etc/scripts/sgc.cjs`, que despacha os subcomandos de cobertura, testes e manutenção Java.
+
 ## Pré-requisitos
 
 - Executar os comandos a partir da raiz do repositório: `/Users/leonardo/sgc`, salvo quando indicado o contrário.
 - Ter `Node.js` disponível no ambiente.
 - Ter as dependências JavaScript instaladas na raiz do projeto, pois alguns scripts usam `xml2js`.
 - Para os scripts de cobertura, ter o backend compilável e com relatório JaCoCo disponível em `backend/build/reports/jacoco/test/`.
-- Para `instalar-certs.cjs`, ter `keytool` disponível no `PATH` ou em `JAVA_HOME/bin`.
+- Para `java-instalar-certificados.cjs`, ter `keytool` disponível no `PATH` ou em `JAVA_HOME/bin`.
 
 Comando base para gerar o relatório JaCoCo manualmente:
 
@@ -20,23 +22,51 @@ Comando base para gerar o relatório JaCoCo manualmente:
 
 | Script | Linguagem | Finalidade principal |
 | :--- | :--- | :--- |
-| `analisar-cobertura-total.cjs` | Node.js | Prioriza classes com lacunas de cobertura e gera um plano resumido em Markdown |
-| `analisar-cobertura.cjs` | Node.js | Mostra uma visão tabular detalhada da cobertura por arquivo |
-| `analisar-complexidade.cjs` | Node.js | Gera ranking de complexidade a partir do CSV do JaCoCo |
-| `analyze_tests.cjs` | Node.js | Detecta classes sem testes unitários correspondentes |
-| `auditar-verificacoes-null.cjs` | Node.js | Audita verificações explícitas de `null` no código Java |
-| `cobertura-100.cjs` | Node.js | Orquestra uma jornada completa de diagnóstico para aumentar cobertura |
-| `fix_fqn.cjs` | Node.js | Substitui nomes totalmente qualificados por imports em arquivos Java |
-| `gerar-plano-cobertura.cjs` | Node.js | Gera um plano detalhado para buscar 100% de cobertura |
-| `gerar-stub-teste.cjs` | Node.js | Cria um stub de teste para uma classe com base no relatório JaCoCo |
-| `instalar-certs.cjs` | Node.js | Importa certificados locais no cacerts da JVM |
-| `prioritize_tests.cjs` | Node.js | Prioriza classes sem testes em P1, P2 e P3 |
-| `super-cobertura.cjs` | Node.js | Lista lacunas de cobertura e exporta JSON estruturado |
-| `verificar-cobertura.cjs` | Node.js | Consulta cobertura global, por classe e por linhas/branches perdidas |
+| `cobertura-priorizar.cjs` | Node.js | Prioriza classes com lacunas de cobertura e gera um plano resumido em Markdown |
+| `cobertura-analisar.cjs` | Node.js | Mostra uma visão tabular detalhada da cobertura por arquivo |
+| `cobertura-complexidade.cjs` | Node.js | Gera ranking de complexidade a partir do CSV do JaCoCo |
+| `testes-analisar.cjs` | Node.js | Detecta classes sem testes unitários correspondentes |
+| `java-auditar-null.cjs` | Node.js | Audita verificações explícitas de `null` no código Java |
+| `cobertura-jornada.cjs` | Node.js | Orquestra uma jornada completa de diagnóstico para aumentar cobertura |
+| `java-corrigir-fqn.cjs` | Node.js | Substitui nomes totalmente qualificados por imports em arquivos Java |
+| `cobertura-plano.cjs` | Node.js | Gera um plano detalhado para buscar 100% de cobertura |
+| `testes-gerar-stub.cjs` | Node.js | Cria um stub de teste para uma classe com base no relatório JaCoCo |
+| `java-instalar-certificados.cjs` | Node.js | Importa certificados locais no cacerts da JVM |
+| `testes-priorizar.cjs` | Node.js | Prioriza classes sem testes em P1, P2 e P3 |
+| `cobertura-lacunas.cjs` | Node.js | Lista lacunas de cobertura e exporta JSON estruturado |
+| `cobertura-verificar.cjs` | Node.js | Consulta cobertura global, por classe e por linhas/branches perdidas |
+| `sgc.cjs` | Node.js | CLI unificada para despachar os scripts do diretório |
+
+## CLI unificada
+
+Uso:
+
+```bash
+node backend/etc/scripts/sgc.cjs help
+node backend/etc/scripts/sgc.cjs cobertura:verificar --missed
+node backend/etc/scripts/sgc.cjs testes:analisar --dir backend --output analise-testes.md --output-json analise-testes.json
+node backend/etc/scripts/sgc.cjs java:fix-fqn --dry-run
+```
+
+Comandos disponíveis:
+
+- `cobertura:detalhar`
+- `cobertura:prioridades`
+- `cobertura:complexidade`
+- `cobertura:lacunas`
+- `cobertura:plano`
+- `cobertura:verificar`
+- `cobertura:jornada`
+- `testes:analisar`
+- `testes:priorizar`
+- `testes:stub`
+- `java:fix-fqn`
+- `java:null-checks`
+- `java:instalar-certs`
 
 ## Scripts
 
-### `analisar-cobertura-total.cjs`
+### `cobertura-priorizar.cjs`
 
 Gera um diagnóstico resumido das classes com cobertura abaixo de 100%, calcula um `actionScore` por classe e grava um plano em Markdown.
 
@@ -47,16 +77,16 @@ Gera um diagnóstico resumido das classes com cobertura abaixo de 100%, calcula 
 Uso:
 
 ```bash
-node backend/etc/scripts/analisar-cobertura-total.cjs
-node backend/etc/scripts/analisar-cobertura-total.cjs --skip-run
+node backend/etc/scripts/cobertura-priorizar.cjs
+node backend/etc/scripts/cobertura-priorizar.cjs --skip-run
 ```
 
 Quando usar:
 
 - Para obter rapidamente as classes mais caras em termos de lacunas de cobertura
-- Para alimentar a geração de stubs com `gerar-stub-teste.cjs`
+- Para alimentar a geração de stubs com `testes-gerar-stub.cjs`
 
-### `analisar-cobertura.cjs`
+### `cobertura-analisar.cjs`
 
 Lê o XML do JaCoCo e imprime uma tabela detalhada com métricas por arquivo: linhas, branches, complexidade e listas resumidas de linhas não cobertas.
 
@@ -67,8 +97,8 @@ Lê o XML do JaCoCo e imprime uma tabela detalhada com métricas por arquivo: li
 Uso:
 
 ```bash
-node backend/etc/scripts/analisar-cobertura.cjs
-node backend/etc/scripts/analisar-cobertura.cjs --skip-run
+node backend/etc/scripts/cobertura-analisar.cjs
+node backend/etc/scripts/cobertura-analisar.cjs --skip-run
 ```
 
 Quando usar:
@@ -76,7 +106,7 @@ Quando usar:
 - Para inspeção detalhada por arquivo sem gerar plano em Markdown
 - Para descobrir rapidamente onde estão linhas e branches faltantes
 
-### `analisar-complexidade.cjs`
+### `cobertura-complexidade.cjs`
 
 Analisa o CSV do JaCoCo e produz um ranking de classes mais complexas com base em score composto por complexidade, branches, linhas e média por método.
 
@@ -87,7 +117,7 @@ Analisa o CSV do JaCoCo e produz um ranking de classes mais complexas com base e
 Uso:
 
 ```bash
-node backend/etc/scripts/analisar-complexidade.cjs
+node backend/etc/scripts/cobertura-complexidade.cjs
 ```
 
 Quando usar:
@@ -95,7 +125,7 @@ Quando usar:
 - Para identificar hotspots de manutenção e risco
 - Para orientar priorização de testes além da cobertura bruta
 
-### `analyze_tests.cjs`
+### `testes-analisar.cjs`
 
 Varre `src/main/java` e `src/test/java`, tenta associar cada classe a arquivos de teste convencionais e gera um relatório Markdown com itens testados e não testados por categoria.
 
@@ -106,15 +136,15 @@ Varre `src/main/java` e `src/test/java`, tenta associar cada classe a arquivos d
 Uso:
 
 ```bash
-node backend/etc/scripts/analyze_tests.cjs --dir backend --output analise-testes.md --output-json analise-testes.json
+node backend/etc/scripts/testes-analisar.cjs --dir backend --output analise-testes.md --output-json analise-testes.json
 ```
 
 Quando usar:
 
 - Para identificar ausência de testes unitários por convenção de nome
-- Antes de rodar `prioritize_tests.cjs`
+- Antes de rodar `testes-priorizar.cjs`
 
-### `auditar-verificacoes-null.cjs`
+### `java-auditar-null.cjs`
 
 Procura ocorrências de `== null` e `!= null` no código Java do backend, classifica cada caso como `MAYBE_LEGIT` ou `POTENTIALLY_REDUNDANT` com base em contexto simples e gera dois relatórios.
 
@@ -126,7 +156,7 @@ Procura ocorrências de `== null` e `!= null` no código Java do backend, classi
 Uso:
 
 ```bash
-node backend/etc/scripts/auditar-verificacoes-null.cjs
+node backend/etc/scripts/java-auditar-null.cjs
 ```
 
 Quando usar:
@@ -134,23 +164,23 @@ Quando usar:
 - Para mapear verificações de nulo candidatas a refatoração
 - Para revisar excesso de checagens defensivas
 
-### `cobertura-100.cjs`
+### `cobertura-jornada.cjs`
 
 Script orquestrador que encadeia geração de relatório JaCoCo, análise detalhada, identificação de lacunas, geração de plano e priorização de testes.
 
 Etapas executadas:
 
 1. `:backend:test :backend:jacocoTestReport`
-2. `analisar-cobertura.cjs`
-3. `super-cobertura.cjs`
-4. `gerar-plano-cobertura.cjs`
-5. `analyze_tests.cjs`
-6. `prioritize_tests.cjs`
+2. `cobertura-analisar.cjs`
+3. `cobertura-lacunas.cjs`
+4. `cobertura-plano.cjs`
+5. `testes-analisar.cjs`
+6. `testes-priorizar.cjs`
 
 Uso:
 
 ```bash
-node backend/etc/scripts/cobertura-100.cjs
+node backend/etc/scripts/cobertura-jornada.cjs
 ```
 
 Arquivos gerados ao longo do fluxo:
@@ -164,9 +194,9 @@ Arquivos gerados ao longo do fluxo:
 Observações:
 
 - O script resolve seus diretórios internamente, então pode ser chamado da raiz.
-- Há referências legadas no trecho final, como `gerar-testes-cobertura.cjs` e `show cat`, que não correspondem ao estado atual do diretório. Na prática, o gerador disponível hoje é `gerar-stub-teste.cjs`.
+- Há referências legadas no trecho final, como `gerar-testes-cobertura.cjs` e `show cat`, que não correspondem ao estado atual do diretório. Na prática, o gerador disponível hoje é `testes-gerar-stub.cjs`.
 
-### `fix_fqn.cjs`
+### `java-corrigir-fqn.cjs`
 
 Varre arquivos Java em `src/main/java` e `src/test/java`, substitui referências totalmente qualificadas por nomes simples e adiciona os imports necessários quando não há colisão.
 
@@ -184,8 +214,8 @@ Regras relevantes:
 Uso:
 
 ```bash
-node backend/etc/scripts/fix_fqn.cjs
-node backend/etc/scripts/fix_fqn.cjs --dry-run
+node backend/etc/scripts/java-corrigir-fqn.cjs
+node backend/etc/scripts/java-corrigir-fqn.cjs --dry-run
 ```
 
 Quando usar:
@@ -193,7 +223,7 @@ Quando usar:
 - Após geração de código ou refatorações que deixaram muitos FQNs espalhados
 - Para reduzir ruído em testes e classes Java
 
-### `gerar-plano-cobertura.cjs`
+### `cobertura-plano.cjs`
 
 Gera um plano de ação detalhado para atingir 100% de cobertura nas classes consideradas relevantes, com categorização por prioridade e indicação de linhas e branches não cobertos.
 
@@ -204,15 +234,15 @@ Gera um plano de ação detalhado para atingir 100% de cobertura nas classes con
 Uso:
 
 ```bash
-node backend/etc/scripts/gerar-plano-cobertura.cjs
+node backend/etc/scripts/cobertura-plano.cjs
 ```
 
 Quando usar:
 
 - Para planejar uma iniciativa de aumento de cobertura com backlog claro
-- Quando a saída em JSON do `super-cobertura.cjs` não for suficiente
+- Quando a saída em JSON do `cobertura-lacunas.cjs` não for suficiente
 
-### `gerar-stub-teste.cjs`
+### `testes-gerar-stub.cjs`
 
 Cria um arquivo `CoverageTest` para uma classe alvo encontrada no XML do JaCoCo. O script lê o código-fonte da classe, detecta dependências `private final` e gera um stub com `@InjectMocks` e `@Mock`.
 
@@ -223,16 +253,16 @@ Cria um arquivo `CoverageTest` para uma classe alvo encontrada no XML do JaCoCo.
 Uso:
 
 ```bash
-node backend/etc/scripts/gerar-stub-teste.cjs NomeDaClasse
-node backend/etc/scripts/gerar-stub-teste.cjs sgc.modulo.servico.NomeDaClasse
+node backend/etc/scripts/testes-gerar-stub.cjs NomeDaClasse
+node backend/etc/scripts/testes-gerar-stub.cjs sgc.modulo.servico.NomeDaClasse
 ```
 
 Quando usar:
 
 - Para acelerar o ponto de partida de um teste de cobertura
-- Após identificar uma classe prioritária em `analisar-cobertura-total.cjs`
+- Após identificar uma classe prioritária em `cobertura-priorizar.cjs`
 
-### `instalar-certs.cjs`
+### `java-instalar-certificados.cjs`
 
 Importa os certificados `cert-tre.cer` e `cert-for.cer` no `cacerts` da JVM usando `keytool`.
 
@@ -244,7 +274,7 @@ Arquivos esperados:
 Uso:
 
 ```bash
-node backend/etc/scripts/instalar-certs.cjs
+node backend/etc/scripts/java-instalar-certificados.cjs
 ```
 
 Observações:
@@ -253,7 +283,7 @@ Observações:
 - A importação escreve no `cacerts` da JVM e normalmente exige permissões adequadas no ambiente.
 - A senha usada está fixa como `changeit`.
 
-### `prioritize_tests.cjs`
+### `testes-priorizar.cjs`
 
 Recebe um relatório Markdown de classes sem teste e reorganiza os itens em prioridades:
 
@@ -264,16 +294,16 @@ Recebe um relatório Markdown de classes sem teste e reorganiza os itens em prio
 Uso:
 
 ```bash
-node backend/etc/scripts/prioritize_tests.cjs --input analise-testes.json --output priorizacao-testes.md
-node backend/etc/scripts/prioritize_tests.cjs --input analise-testes.md --output priorizacao-testes.md
+node backend/etc/scripts/testes-priorizar.cjs --input analise-testes.json --output priorizacao-testes.md
+node backend/etc/scripts/testes-priorizar.cjs --input analise-testes.md --output priorizacao-testes.md
 ```
 
 Quando usar:
 
-- Depois de gerar um relatório com `analyze_tests.cjs`
+- Depois de gerar um relatório com `testes-analisar.cjs`
 - Para transformar uma lista bruta de pendências em backlog de implementação
 
-### `super-cobertura.cjs`
+### `cobertura-lacunas.cjs`
 
 Gera um relatório orientado a lacunas de cobertura, considerando exclusões compatíveis com o `jacocoTestReport`, e salva tudo em JSON para consumo posterior.
 
@@ -284,8 +314,8 @@ Gera um relatório orientado a lacunas de cobertura, considerando exclusões com
 Uso:
 
 ```bash
-node backend/etc/scripts/super-cobertura.cjs
-node backend/etc/scripts/super-cobertura.cjs --run
+node backend/etc/scripts/cobertura-lacunas.cjs
+node backend/etc/scripts/cobertura-lacunas.cjs --run
 ```
 
 Quando usar:
@@ -293,7 +323,7 @@ Quando usar:
 - Para consumo automatizado da lista de lacunas
 - Como base para métricas e priorização por score
 
-### `verificar-cobertura.cjs`
+### `cobertura-verificar.cjs`
 
 Ferramenta de consulta do relatório JaCoCo com dois modos principais:
 
@@ -311,11 +341,11 @@ Opções disponíveis:
 Uso:
 
 ```bash
-node backend/etc/scripts/verificar-cobertura.cjs
-node backend/etc/scripts/verificar-cobertura.cjs sgc.subprocesso --min=95
-node backend/etc/scripts/verificar-cobertura.cjs --missed
-node backend/etc/scripts/verificar-cobertura.cjs --missed --simple
-node backend/etc/scripts/verificar-cobertura.cjs --fail-under=90
+node backend/etc/scripts/cobertura-verificar.cjs
+node backend/etc/scripts/cobertura-verificar.cjs sgc.subprocesso --min=95
+node backend/etc/scripts/cobertura-verificar.cjs --missed
+node backend/etc/scripts/cobertura-verificar.cjs --missed --simple
+node backend/etc/scripts/cobertura-verificar.cjs --fail-under=90
 ```
 
 Quando usar:
@@ -329,29 +359,29 @@ Quando usar:
 
 ```bash
 ./gradlew :backend:test :backend:jacocoTestReport
-node backend/etc/scripts/verificar-cobertura.cjs --missed
-node backend/etc/scripts/analisar-cobertura.cjs --skip-run
+node backend/etc/scripts/cobertura-verificar.cjs --missed
+node backend/etc/scripts/cobertura-analisar.cjs --skip-run
 ```
 
 ### Planejamento de aumento de cobertura
 
 ```bash
-node backend/etc/scripts/super-cobertura.cjs --run
-node backend/etc/scripts/gerar-plano-cobertura.cjs
-node backend/etc/scripts/analisar-cobertura-total.cjs --skip-run
+node backend/etc/scripts/cobertura-lacunas.cjs --run
+node backend/etc/scripts/cobertura-plano.cjs
+node backend/etc/scripts/cobertura-priorizar.cjs --skip-run
 ```
 
 ### Identificação e priorização de classes sem teste
 
 ```bash
-node backend/etc/scripts/analyze_tests.cjs --dir backend --output analise-testes.md --output-json analise-testes.json
-node backend/etc/scripts/prioritize_tests.cjs --input analise-testes.json --output priorizacao-testes.md
+node backend/etc/scripts/testes-analisar.cjs --dir backend --output analise-testes.md --output-json analise-testes.json
+node backend/etc/scripts/testes-priorizar.cjs --input analise-testes.json --output priorizacao-testes.md
 ```
 
 ### Geração inicial de stub de teste
 
 ```bash
-node backend/etc/scripts/gerar-stub-teste.cjs NomeDaClasse
+node backend/etc/scripts/testes-gerar-stub.cjs NomeDaClasse
 ```
 
 ## Observações finais

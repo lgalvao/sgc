@@ -261,8 +261,8 @@
 
 ## Scripts Disponiveis
 
-1. `node backend/etc/scripts/super-cobertura.cjs --run` - Gera relatorio de lacunas
-2. `node backend/etc/scripts/verificar-cobertura.cjs --missed` - Lista arquivos com mais gaps
-3. `node backend/etc/scripts/analisar-cobertura.cjs` - Analise detalhada com tabelas
-4. `node backend/etc/scripts/analyze_tests.cjs` - Identifica arquivos sem testes
-5. `node backend/etc/scripts/prioritize_tests.cjs` - Prioriza criacao de testes
+1. `node backend/etc/scripts/cobertura-lacunas.cjs --run` - Gera relatorio de lacunas
+2. `node backend/etc/scripts/cobertura-verificar.cjs --missed` - Lista arquivos com mais gaps
+3. `node backend/etc/scripts/cobertura-analisar.cjs` - Analise detalhada com tabelas
+4. `node backend/etc/scripts/testes-analisar.cjs` - Identifica arquivos sem testes
+5. `node backend/etc/scripts/testes-priorizar.cjs` - Prioriza criacao de testes

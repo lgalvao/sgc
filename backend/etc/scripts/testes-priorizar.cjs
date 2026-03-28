@@ -54,7 +54,7 @@ function parseArgs(argv) {
 }
 
 function imprimirAjuda() {
-    console.log(`Uso: node backend/etc/scripts/prioritize_tests.cjs [opcoes]
+    console.log(`Uso: node backend/etc/scripts/testes-priorizar.cjs [opcoes]
 
 Opcoes:
   --input <arquivo>   Arquivo de entrada em JSON ou Markdown

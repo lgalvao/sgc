@@ -474,7 +474,8 @@ class SubprocessoServiceExtraCoverageTest {
             when(usuarioFacade.usuarioAutenticado()).thenReturn(user);
             when(permissionEvaluator.verificarPermissao(user, sp, AcaoPermissao.EDITAR_CADASTRO)).thenReturn(false);
 
-            assertThrows(ErroAcessoNegado.class, () -> subprocessoService.importarAtividades(1L, 2L, List.of()));
+            List<Long> itens = List.of();
+            assertThrows(ErroAcessoNegado.class, () -> subprocessoService.importarAtividades(1L, 2L, itens));
         }
 
         @Test
@@ -540,7 +541,8 @@ class SubprocessoServiceExtraCoverageTest {
             when(permissionEvaluator.verificarPermissao(user, spDest, AcaoPermissao.EDITAR_CADASTRO)).thenReturn(true);
             when(permissionEvaluator.verificarPermissao(user, spOrig, AcaoPermissao.CONSULTAR_PARA_IMPORTACAO)).thenReturn(false);
 
-            assertThrows(ErroAcessoNegado.class, () -> subprocessoService.importarAtividades(1L, 2L, List.of()));
+            List<Long> itens = List.of();
+            assertThrows(ErroAcessoNegado.class, () -> subprocessoService.importarAtividades(1L, 2L, itens));
         }
     }
 

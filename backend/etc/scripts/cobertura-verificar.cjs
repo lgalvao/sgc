@@ -15,7 +15,7 @@ const minCoverage = Number.parseFloat(minCovArg);
 
 if (help) {
     console.log(`
-Uso: node backend/etc/scripts/verificar-cobertura.cjs [filtro] [opcoes]
+Uso: node backend/etc/scripts/cobertura-verificar.cjs [filtro] [opcoes]
 
 Argumentos:
   [filtro]            Filtrar por nome de pacote ou classe (opcional)

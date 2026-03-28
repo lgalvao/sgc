@@ -191,7 +191,7 @@ function generateMarkdownReport(metrics, outputPath) {
 
 async function main() {
     if (process.argv.includes('--help') || process.argv.includes('-h')) {
-        console.log(`Uso: node backend/etc/scripts/analisar-complexidade.cjs
+        console.log(`Uso: node backend/etc/scripts/cobertura-complexidade.cjs
 
 Le o CSV do JaCoCo em backend/build/reports/jacoco/test/jacocoTestReport.csv
 e gera o arquivo complexity-ranking.md na raiz do repositorio.`);

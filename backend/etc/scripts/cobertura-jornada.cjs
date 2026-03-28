@@ -27,7 +27,7 @@ function printPreviewFromFile(filePath, lines = 50) {
 
 function main() {
     if (process.argv.includes('--help') || process.argv.includes('-h')) {
-        console.log(`Uso: node backend/etc/scripts/cobertura-100.cjs
+        console.log(`Uso: node backend/etc/scripts/cobertura-jornada.cjs
 
 Executa a jornada completa de diagnostico de cobertura:
 1. testa e gera JaCoCo
@@ -49,28 +49,28 @@ Executa a jornada completa de diagnostico de cobertura:
     console.log('');
 
     printHeader('Etapa 2: Analisar cobertura atual (visao detalhada)');
-    const coberturaDetalhada = runNodeScript('analisar-cobertura.cjs', [], {capture: true});
+    const coberturaDetalhada = runNodeScript('cobertura-analisar.cjs', [], {capture: true});
     fs.writeFileSync(path.join(ROOT_DIR, 'cobertura-detalhada.txt'), coberturaDetalhada, 'utf-8');
     console.log(coberturaDetalhada.split(/\r?\n/).slice(0, 50).join('\n'));
     console.log('');
 
     printHeader('Etapa 3: Identificar lacunas de cobertura');
-    const lacunas = runNodeScript('super-cobertura.cjs', [], {capture: true});
+    const lacunas = runNodeScript('cobertura-lacunas.cjs', [], {capture: true});
     console.log(lacunas.split(/\r?\n/).slice(0, 100).join('\n'));
     console.log('');
 
     printHeader('Etapa 4: Gerar plano de acao para 100%');
-    runNodeScript('gerar-plano-cobertura.cjs');
+    runNodeScript('cobertura-plano.cjs');
     console.log('');
 
     printHeader('Etapa 5: Analisar arquivos sem testes unitarios');
-    runNodeScript('analyze_tests.cjs', ['--dir', 'backend', '--output', 'analise-testes.md', '--output-json', 'analise-testes.json']);
+    runNodeScript('testes-analisar.cjs', ['--dir', 'backend', '--output', 'analise-testes.md', '--output-json', 'analise-testes.json']);
     console.log('');
 
     printHeader('Etapa 6: Priorizar criacao de testes');
     const caminhoJson = path.join(ROOT_DIR, 'analise-testes.json');
     if (fs.existsSync(caminhoJson)) {
-        runNodeScript('prioritize_tests.cjs', ['--input', 'analise-testes.json', '--output', 'priorizacao-testes.md']);
+        runNodeScript('testes-priorizar.cjs', ['--input', 'analise-testes.json', '--output', 'priorizacao-testes.md']);
         printPreviewFromFile(path.join(ROOT_DIR, 'priorizacao-testes.md'));
     } else {
         console.log('⚠️  Arquivo analise-testes.json nao encontrado, pulando priorizacao');
@@ -88,7 +88,7 @@ Executa a jornada completa de diagnostico de cobertura:
     console.log('Proximos passos:');
     console.log('  1. Revisar plano-100-cobertura.md');
     console.log('  2. Comecar pelos testes P1 (criticos) em priorizacao-testes.md');
-    console.log("  3. Usar 'node backend/etc/scripts/gerar-stub-teste.cjs <Classe>'");
+    console.log("  3. Usar 'node backend/etc/scripts/testes-gerar-stub.cjs <Classe>'");
     console.log('     para gerar esqueletos de testes');
     console.log('  4. Implementar os testes');
     console.log('  5. Rodar este script novamente para verificar progresso\n');

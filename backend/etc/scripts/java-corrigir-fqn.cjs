@@ -173,7 +173,7 @@ function parseArgs(argv) {
 function main() {
     const {dryRun, help} = parseArgs(process.argv.slice(2));
     if (help) {
-        console.log(`Uso: node backend/etc/scripts/fix_fqn.cjs [opcoes]
+        console.log(`Uso: node backend/etc/scripts/java-corrigir-fqn.cjs [opcoes]
 
 Opcoes:
   --dry-run     Apenas mostra os arquivos que seriam alterados

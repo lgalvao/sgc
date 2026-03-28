@@ -19,7 +19,7 @@ function formatarListaLinhas(linhas) {
 async function main() {
     const args = process.argv.slice(2);
     if (args.includes('--help') || args.includes('-h')) {
-        console.log(`Uso: node backend/etc/scripts/analisar-cobertura.cjs [opcoes]
+        console.log(`Uso: node backend/etc/scripts/cobertura-analisar.cjs [opcoes]
 
 Opcoes:
   --skip-run    Nao executa o Gradle; usa o ultimo relatorio JaCoCo disponivel

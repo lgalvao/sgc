@@ -10,7 +10,7 @@ const {
 async function main() {
     const args = process.argv.slice(2);
     if (args.includes('--help') || args.includes('-h')) {
-        console.log(`Uso: node backend/etc/scripts/super-cobertura.cjs [opcoes]
+        console.log(`Uso: node backend/etc/scripts/cobertura-lacunas.cjs [opcoes]
 
 Opcoes:
   --run         Executa o Gradle antes de analisar o relatorio JaCoCo

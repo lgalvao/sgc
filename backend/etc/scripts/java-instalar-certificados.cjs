@@ -32,7 +32,7 @@ function importarCertificado(keytoolBin, alias, certPath) {
 
 function main() {
     if (process.argv.includes('--help') || process.argv.includes('-h')) {
-        console.log(`Uso: node backend/etc/scripts/instalar-certs.cjs
+        console.log(`Uso: node backend/etc/scripts/java-instalar-certificados.cjs
 
 Importa cert-tre.cer e cert-for.cer em cacerts usando keytool.
 Requer permissao para escrita no keystore da JVM.`);

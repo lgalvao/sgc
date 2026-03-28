@@ -32,7 +32,7 @@ function parseArgs(argv) {
 }
 
 function imprimirAjuda() {
-    console.log(`Uso: node backend/etc/scripts/analyze_tests.cjs [opcoes]
+    console.log(`Uso: node backend/etc/scripts/testes-analisar.cjs [opcoes]
 
 Opcoes:
   --dir <caminho>         Diretorio raiz do backend (padrao: backend)

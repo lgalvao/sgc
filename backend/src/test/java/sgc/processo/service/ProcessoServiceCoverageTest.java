@@ -181,7 +181,9 @@ class ProcessoServiceCoverageTest {
         admin.setSituacao(sgc.organizacao.model.SituacaoUnidade.ATIVA);
         when(repo.buscarPorSigla(any(), anyString())).thenReturn(admin);
 
-        assertThatThrownBy(() -> target.iniciar(cod, List.of(10L), new Usuario()))
+        List<Long> unidadeCods = List.of(10L);
+        Usuario usuario = new Usuario();
+        assertThatThrownBy(() -> target.iniciar(cod, unidadeCods, usuario))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("sem mapa vigente");
     }
@@ -303,6 +305,8 @@ class ProcessoServiceCoverageTest {
         u.setCodigo(10L);
         u.setSigla("U1");
         u.setTituloTitular("titular");
+        u.setSituacao(sgc.organizacao.model.SituacaoUnidade.ATIVA);
+        u.setTipo(sgc.organizacao.model.TipoUnidade.OPERACIONAL);
         
         p.adicionarParticipantes(Set.of(u));
         

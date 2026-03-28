@@ -306,7 +306,7 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         sp.setMapa(new sgc.mapa.model.Mapa());
         sp.getMapa().setCodigo(1000L);
         sp.setUnidade(new Unidade());
-        sp.setProcesso(new Processo());
+        sp.setProcesso(Processo.builder().tipo(TipoProcesso.REVISAO).build());
 
         when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(100L)).thenReturn(Optional.of(sp));
         when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(anyLong())).thenReturn(List.of());

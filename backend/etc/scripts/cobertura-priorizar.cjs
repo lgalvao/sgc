@@ -21,7 +21,7 @@ function gerarMarkdown(arquivos) {
         const scoreAcao = calcularScoreAcao(arquivo);
         const prioridade = scoreAcao > 20 ? 'CRÍTICO' : (scoreAcao > 10 ? 'MÉDIO' : 'BAIXO');
         const nomeClasse = arquivo.nomeClasse.split('.').pop();
-        markdown += `| ${prioridade} | \`${arquivo.nomeClasse}\` | ${arquivo.coberturaLinhas.toFixed(1)}% | ${arquivo.coberturaBranches.toFixed(1)}% | ${scoreAcao.toFixed(1)} | \`node backend/etc/scripts/gerar-stub-teste.cjs ${nomeClasse}\` |\n`;
+        markdown += `| ${prioridade} | \`${arquivo.nomeClasse}\` | ${arquivo.coberturaLinhas.toFixed(1)}% | ${arquivo.coberturaBranches.toFixed(1)}% | ${scoreAcao.toFixed(1)} | \`node backend/etc/scripts/testes-gerar-stub.cjs ${nomeClasse}\` |\n`;
     });
 
     return markdown;
@@ -37,7 +37,7 @@ function imprimirResumo(arquivos) {
         const severidade = scoreAcao > 20 ? 'CRITICO' : (scoreAcao > 10 ? 'MEDIO' : 'BAIXO');
         console.log(`${indice + 1}. [${severidade}] [Score: ${scoreAcao.toFixed(1)}] ${arquivo.nomeClasse}`);
         console.log(`   L: ${arquivo.coberturaLinhas.toFixed(1)}% | B: ${arquivo.coberturaBranches.toFixed(1)}%`);
-        console.log(`   Comando: node backend/etc/scripts/gerar-stub-teste.cjs ${arquivo.nomeClasse.split('.').pop()}`);
+        console.log(`   Comando: node backend/etc/scripts/testes-gerar-stub.cjs ${arquivo.nomeClasse.split('.').pop()}`);
     });
 
     console.log(`\nPlano completo gerado em: ${PLANO_RESUMIDO_PATH}`);
@@ -46,7 +46,7 @@ function imprimirResumo(arquivos) {
 async function main() {
     const args = process.argv.slice(2);
     if (args.includes('--help') || args.includes('-h')) {
-        console.log(`Uso: node backend/etc/scripts/analisar-cobertura-total.cjs [opcoes]
+        console.log(`Uso: node backend/etc/scripts/cobertura-priorizar.cjs [opcoes]
 
 Opcoes:
   --skip-run    Nao executa o Gradle; usa o ultimo relatorio JaCoCo disponivel

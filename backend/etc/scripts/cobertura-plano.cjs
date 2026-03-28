@@ -115,11 +115,11 @@ function gerarMarkdown(agrupado, totais) {
 
     markdown += '---\n\n';
     markdown += '## Scripts Disponiveis\n\n';
-    markdown += '1. `node backend/etc/scripts/super-cobertura.cjs --run` - Gera relatorio de lacunas\n';
-    markdown += '2. `node backend/etc/scripts/verificar-cobertura.cjs --missed` - Lista arquivos com mais gaps\n';
-    markdown += '3. `node backend/etc/scripts/analisar-cobertura.cjs` - Analise detalhada com tabelas\n';
-    markdown += '4. `node backend/etc/scripts/analyze_tests.cjs` - Identifica arquivos sem testes\n';
-    markdown += '5. `node backend/etc/scripts/prioritize_tests.cjs` - Prioriza criacao de testes\n';
+    markdown += '1. `node backend/etc/scripts/cobertura-lacunas.cjs --run` - Gera relatorio de lacunas\n';
+    markdown += '2. `node backend/etc/scripts/cobertura-verificar.cjs --missed` - Lista arquivos com mais gaps\n';
+    markdown += '3. `node backend/etc/scripts/cobertura-analisar.cjs` - Analise detalhada com tabelas\n';
+    markdown += '4. `node backend/etc/scripts/testes-analisar.cjs` - Identifica arquivos sem testes\n';
+    markdown += '5. `node backend/etc/scripts/testes-priorizar.cjs` - Prioriza criacao de testes\n';
 
     return markdown;
 }
@@ -127,7 +127,7 @@ function gerarMarkdown(agrupado, totais) {
 async function main() {
     const args = process.argv.slice(2);
     if (args.includes('--help') || args.includes('-h')) {
-        console.log(`Uso: node backend/etc/scripts/gerar-plano-cobertura.cjs [opcoes]
+        console.log(`Uso: node backend/etc/scripts/cobertura-plano.cjs [opcoes]
 
 Opcoes:
   --run         Executa os testes e gera o relatorio JaCoCo antes da analise
