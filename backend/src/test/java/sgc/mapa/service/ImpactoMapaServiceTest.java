@@ -61,6 +61,21 @@ class ImpactoMapaServiceTest {
         doReturn(true).when(permissionEvaluator).verificarPermissao(any(), any(), any());
     }
 
+    private Subprocesso criarSubprocessoParaImpacto(
+            SituacaoSubprocesso situacao,
+            Long codigoUnidade
+    ) {
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(codigoUnidade);
+
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setSituacao(situacao);
+        subprocesso.setUnidade(unidade);
+        subprocesso.setCodigo(99L);
+
+        return subprocesso;
+    }
+
     @Test
     @DisplayName("Deve retornar sem impacto se não houver mapa vigente")
     void semMapaVigente() {
@@ -134,6 +149,61 @@ class ImpactoMapaServiceTest {
         subprocesso.setUnidade(unidade);
 
         assertThrows(ErroValidacao.class, () -> impactoMapaService.verificarImpactos(subprocesso, usuario));
+    }
+
+    @Test
+    @DisplayName("CHEFE pode verificar impacto em NAO_INICIADO")
+    void chefePodeVerificarImpactoEmNaoIniciado() {
+        mockAcessoLivre();
+        Usuario usuario = new Usuario();
+        usuario.setPerfilAtivo(Perfil.CHEFE);
+        Subprocesso subprocesso = criarSubprocessoParaImpacto(SituacaoSubprocesso.NAO_INICIADO, 7L);
+
+        when(mapaRepo.buscarMapaVigentePorUnidade(7L)).thenReturn(Optional.empty());
+
+        ImpactoMapaResponse resultado = impactoMapaService.verificarImpactos(subprocesso, usuario);
+
+        assertNotNull(resultado);
+        assertFalse(resultado.temImpactos());
+    }
+
+    @Test
+    @DisplayName("GESTOR pode verificar impacto em REVISAO_CADASTRO_DISPONIBILIZADA")
+    void gestorPodeVerificarImpactoEmRevisaoDisponibilizada() {
+        mockAcessoLivre();
+        Usuario usuario = new Usuario();
+        usuario.setPerfilAtivo(Perfil.GESTOR);
+        Subprocesso subprocesso = criarSubprocessoParaImpacto(
+                SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA,
+                8L
+        );
+
+        when(mapaRepo.buscarMapaVigentePorUnidade(8L)).thenReturn(Optional.empty());
+
+        ImpactoMapaResponse resultado = impactoMapaService.verificarImpactos(subprocesso, usuario);
+
+        assertNotNull(resultado);
+        assertFalse(resultado.temImpactos());
+    }
+
+    @Test
+    @DisplayName("CHEFE recebe mensagem formatada ao tentar situação inválida")
+    void chefeRecebeMensagemFormatadaQuandoSituacaoInvalida() {
+        mockAcessoLivre();
+        Usuario usuario = new Usuario();
+        usuario.setPerfilAtivo(Perfil.CHEFE);
+        Subprocesso subprocesso = criarSubprocessoParaImpacto(
+                SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA,
+                9L
+        );
+
+        ErroValidacao erro = assertThrows(
+                ErroValidacao.class,
+                () -> impactoMapaService.verificarImpactos(subprocesso, usuario)
+        );
+
+        assertTrue(erro.getMessage().contains("REVISAO_CADASTRO_DISPONIBILIZADA"));
+        assertTrue(erro.getMessage().contains("CHEFE"));
     }
 
     @Test

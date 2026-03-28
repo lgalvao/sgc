@@ -128,6 +128,119 @@ class MapaSalvamentoServiceTest {
     }
 
     @Test
+    @DisplayName("Deve sanitizar observações antes de persistir o mapa")
+    void deveSanitizarObservacoesAntesDePersistirMapa() {
+        Long codMapa = 1L;
+        String observacaoComHtmlPerigoso = "<script>alert('xss')</script><b>Observação segura</b>";
+
+        SalvarMapaRequest request = SalvarMapaRequest.builder()
+                .observacoes(observacaoComHtmlPerigoso)
+                .competencias(List.of())
+                .build();
+
+        Mapa mapa = Mapa.builder().codigo(codMapa).build();
+
+        when(repo.buscar(Mapa.class, codMapa)).thenReturn(mapa);
+        when(mapaRepo.save(mapa)).thenReturn(mapa);
+        when(competenciaRepo.findByMapa_Codigo(codMapa)).thenReturn(Collections.emptyList());
+        when(atividadeRepo.findByMapa_Codigo(codMapa)).thenReturn(Collections.emptyList());
+        when(competenciaRepo.saveAll(anyList())).thenReturn(Collections.emptyList());
+
+        mapaSalvamentoService.salvarMapaCompleto(codMapa, request);
+
+        assertThat(mapa.getObservacoesDisponibilizacao()).isNotNull();
+        assertThat(mapa.getObservacoesDisponibilizacao())
+                .doesNotContain("<script>")
+                .doesNotContain("alert('xss')")
+                .contains("Observação segura");
+    }
+
+    @Test
+    @DisplayName("Deve manter relacionamento bidirecional entre atividade e competência ao salvar")
+    void deveManterRelacionamentoBidirecionalAoSalvarAssociacoes() {
+        Long codMapa = 1L;
+        Long codComp = 50L;
+        Long codAtividade = 10L;
+
+        SalvarMapaRequest.CompetenciaRequest compDto = SalvarMapaRequest.CompetenciaRequest.builder()
+                .codigo(codComp)
+                .descricao("Comp 1")
+                .atividadesCodigos(List.of(codAtividade))
+                .build();
+
+        SalvarMapaRequest request = SalvarMapaRequest.builder()
+                .competencias(List.of(compDto))
+                .build();
+
+        Mapa mapa = Mapa.builder().codigo(codMapa).build();
+        Competencia competencia = Competencia.builder()
+                .codigo(codComp)
+                .descricao("Comp 1")
+                .mapa(mapa)
+                .atividades(new HashSet<>())
+                .build();
+        Atividade atividade = Atividade.builder()
+                .codigo(codAtividade)
+                .descricao("Atividade A")
+                .mapa(mapa)
+                .competencias(new HashSet<>())
+                .build();
+
+        when(repo.buscar(Mapa.class, codMapa)).thenReturn(mapa);
+        when(mapaRepo.save(mapa)).thenReturn(mapa);
+        when(competenciaRepo.findByMapa_Codigo(codMapa)).thenReturn(List.of(competencia));
+        when(atividadeRepo.findByMapa_Codigo(codMapa)).thenReturn(List.of(atividade));
+        when(competenciaRepo.saveAll(anyList())).thenAnswer(i -> i.getArgument(0));
+
+        mapaSalvamentoService.salvarMapaCompleto(codMapa, request);
+
+        assertThat(atividade.getCompetencias()).containsExactly(competencia);
+        assertThat(competencia.getAtividades()).contains(atividade);
+    }
+
+    @Test
+    @DisplayName("Não deve remover competências quando todas ainda existem na requisição")
+    void naoDeveRemoverCompetenciasQuandoTodasPermanecem() {
+        Long codMapa = 1L;
+        Long codComp = 50L;
+        Long codAtividade = 10L;
+
+        SalvarMapaRequest.CompetenciaRequest compDto = SalvarMapaRequest.CompetenciaRequest.builder()
+                .codigo(codComp)
+                .descricao("Comp mantida")
+                .atividadesCodigos(List.of(codAtividade))
+                .build();
+
+        SalvarMapaRequest request = SalvarMapaRequest.builder()
+                .competencias(List.of(compDto))
+                .build();
+
+        Mapa mapa = Mapa.builder().codigo(codMapa).build();
+        Competencia compAtual = Competencia.builder()
+                .codigo(codComp)
+                .descricao("Comp antiga")
+                .mapa(mapa)
+                .atividades(new HashSet<>())
+                .build();
+        Atividade atividade = Atividade.builder()
+                .codigo(codAtividade)
+                .mapa(mapa)
+                .competencias(new HashSet<>())
+                .build();
+
+        when(repo.buscar(Mapa.class, codMapa)).thenReturn(mapa);
+        when(mapaRepo.save(mapa)).thenReturn(mapa);
+        when(competenciaRepo.findByMapa_Codigo(codMapa)).thenReturn(List.of(compAtual));
+        when(atividadeRepo.findByMapa_Codigo(codMapa)).thenReturn(List.of(atividade));
+        when(competenciaRepo.saveAll(anyList())).thenAnswer(i -> i.getArgument(0));
+
+        mapaSalvamentoService.salvarMapaCompleto(codMapa, request);
+
+        verify(competenciaRepo, never()).deleteAll(anyCollection());
+        assertThat(compAtual.getDescricao()).isEqualTo("Comp mantida");
+    }
+
+    @Test
     @DisplayName("Deve remover competência obsoleta")
     void deveRemoverObsoleta() {
         Long codMapa = 1L;
