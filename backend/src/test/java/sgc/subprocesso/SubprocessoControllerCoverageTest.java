@@ -68,6 +68,9 @@ class SubprocessoControllerCoverageTest {
         mockMvc.perform(get("/api/subprocessos"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].codigo").value(1L));
+
+        verify(subprocessoService).listarTodos();
+        verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
     @Test
@@ -80,6 +83,9 @@ class SubprocessoControllerCoverageTest {
         mockMvc.perform(get("/api/subprocessos/1/status"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.situacao").value("MAPEAMENTO_MAPA_CRIADO"));
+
+        verify(subprocessoService).obterStatus(1L);
+        verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
     @Test
@@ -98,6 +104,10 @@ class SubprocessoControllerCoverageTest {
                         .param("siglaUnidade", "SIGLA"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.codigo").value(1L));
+
+        verify(unidadeService).buscarPorSigla("SIGLA");
+        verify(subprocessoService).obterEntidadePorProcessoEUnidade(1L, 2L);
+        verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
     @Test
@@ -127,6 +137,10 @@ class SubprocessoControllerCoverageTest {
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", "/api/subprocessos/100"))
                 .andExpect(jsonPath("$.codigo").value(100L));
+
+        verify(subprocessoService).criarEntidade(eq(req));
+        verify(subprocessoService).buscarSubprocesso(100L);
+        verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
     @Test
@@ -155,6 +169,10 @@ class SubprocessoControllerCoverageTest {
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.codigo").value(1L));
+
+        verify(subprocessoService).atualizarEntidade(eq(1L), eq(req));
+        verify(subprocessoService).buscarSubprocesso(1L);
+        verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
     @Test
@@ -166,6 +184,7 @@ class SubprocessoControllerCoverageTest {
                 .andExpect(status().isNoContent());
 
         verify(subprocessoService).excluir(1L);
+        verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
     @Test
@@ -181,6 +200,7 @@ class SubprocessoControllerCoverageTest {
                 .andExpect(status().isOk());
 
         verify(transicaoService).alterarDataLimite(eq(1L), any());
+        verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
     @Test
@@ -195,6 +215,9 @@ class SubprocessoControllerCoverageTest {
         mockMvc.perform(get("/api/subprocessos/1/historico-cadastro"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray());
+
+        verify(subprocessoService).listarHistoricoCadastro(1L);
+        verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
     @Test
@@ -227,6 +250,9 @@ class SubprocessoControllerCoverageTest {
 
         mockMvc.perform(get("/api/subprocessos/1/contexto-edicao"))
                 .andExpect(status().isOk());
+
+        verify(subprocessoService).obterContextoEdicao(1L);
+        verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
     @Test
@@ -242,6 +268,7 @@ class SubprocessoControllerCoverageTest {
                 .andExpect(status().isOk());
 
         verify(transicaoService).reabrirCadastro(1L, "Justificativa");
+        verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
     @Test
@@ -257,6 +284,7 @@ class SubprocessoControllerCoverageTest {
                 .andExpect(status().isOk());
 
         verify(transicaoService).reabrirRevisaoCadastro(1L, "Justificativa");
+        verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
     @Test
@@ -272,6 +300,7 @@ class SubprocessoControllerCoverageTest {
                 .andExpect(jsonPath("$.erros").isEmpty());
 
         verify(subprocessoService).validarCadastro(1L);
+        verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
     @Test
@@ -289,6 +318,7 @@ class SubprocessoControllerCoverageTest {
 
         verify(subprocessoService).importarAtividades(1L, 2L, List.of(30L, 31L));
         verifyNoMoreInteractions(subprocessoService);
+        verifyNoMoreInteractions(transicaoService, unidadeService);
     }
 
 
@@ -309,6 +339,7 @@ class SubprocessoControllerCoverageTest {
                 .andExpect(jsonPath("$.aviso").isNotEmpty());
 
         verify(subprocessoService).importarAtividades(1L, 2L, List.of(30L, 31L));
+        verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
     @Test
@@ -324,6 +355,7 @@ class SubprocessoControllerCoverageTest {
                 .andExpect(status().isOk());
 
         verify(transicaoService).aceitarCadastroEmBloco(anyList(), any());
+        verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
     @Test
@@ -345,6 +377,7 @@ class SubprocessoControllerCoverageTest {
 
         verify(subprocessoService).salvarMapa(1L, req);
         verify(subprocessoService).mapaCompletoDtoPorSubprocesso(1L);
+        verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
     @Test
@@ -358,8 +391,12 @@ class SubprocessoControllerCoverageTest {
         mockMvc.perform(post("/api/subprocessos/1/competencia")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(req)))
+                .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk());
+
+        verify(subprocessoService).adicionarCompetencia(1L, req);
+        verify(subprocessoService).mapaCompletoDtoPorSubprocesso(1L);
+        verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
     @Test
@@ -373,8 +410,12 @@ class SubprocessoControllerCoverageTest {
         mockMvc.perform(post("/api/subprocessos/1/competencia/10")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(req)))
+                .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk());
+
+        verify(subprocessoService).atualizarCompetencia(1L, 10L, req);
+        verify(subprocessoService).mapaCompletoDtoPorSubprocesso(1L);
+        verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
     @Test
@@ -387,6 +428,10 @@ class SubprocessoControllerCoverageTest {
         mockMvc.perform(post("/api/subprocessos/1/competencia/10/remover")
                         .with(csrf()))
                 .andExpect(status().isOk());
+
+        verify(subprocessoService).removerCompetencia(1L, 10L);
+        verify(subprocessoService).mapaCompletoDtoPorSubprocesso(1L);
+        verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
     @Test
@@ -402,6 +447,7 @@ class SubprocessoControllerCoverageTest {
                 .andExpect(status().isOk());
 
         verify(transicaoService).disponibilizarMapa(eq(1L), any(), any());
+        verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
     @Test
@@ -415,8 +461,12 @@ class SubprocessoControllerCoverageTest {
         mockMvc.perform(post("/api/subprocessos/1/mapa-completo")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(req)))
+                .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk());
+
+        verify(subprocessoService).salvarMapa(1L, req);
+        verify(subprocessoService).mapaCompletoDtoPorSubprocesso(1L);
+        verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
     @Test
@@ -428,6 +478,7 @@ class SubprocessoControllerCoverageTest {
                 .andExpect(status().isOk());
 
         verify(transicaoService).validarMapa(eq(1L), any());
+        verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
     @Test
@@ -443,6 +494,7 @@ class SubprocessoControllerCoverageTest {
                 .andExpect(status().isOk());
 
         verify(transicaoService).devolverValidacao(eq(1L), any(), any());
+        verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
     @Test
@@ -458,6 +510,7 @@ class SubprocessoControllerCoverageTest {
                 .andExpect(status().isOk());
 
         verify(transicaoService).aceitarValidacao(eq(1L), eq("Obs"), any());
+        verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
     @Test
@@ -473,6 +526,7 @@ class SubprocessoControllerCoverageTest {
                 .andExpect(status().isOk());
 
         verify(transicaoService).homologarValidacao(eq(1L), eq("Obs"), any());
+        verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
     @Test
@@ -488,6 +542,7 @@ class SubprocessoControllerCoverageTest {
                 .andExpect(status().isOk());
 
         verify(transicaoService).submeterMapaAjustado(eq(1L), any(), any());
+        verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
     @Test
@@ -503,6 +558,7 @@ class SubprocessoControllerCoverageTest {
                 .andExpect(status().isOk());
 
         verify(transicaoService).aceitarValidacaoEmBloco(anyList(), any());
+        verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
     @Test
@@ -518,6 +574,7 @@ class SubprocessoControllerCoverageTest {
                 .andExpect(status().isOk());
 
         verify(transicaoService).homologarValidacaoEmBloco(anyList(), any());
+        verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
     @Test
@@ -529,6 +586,9 @@ class SubprocessoControllerCoverageTest {
 
         mockMvc.perform(get("/api/subprocessos/1/atividades-importacao"))
                 .andExpect(status().isOk());
+
+        verify(subprocessoService).listarAtividadesParaImportacao(1L);
+        verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
     @Test
@@ -541,6 +601,9 @@ class SubprocessoControllerCoverageTest {
 
         mockMvc.perform(get("/api/subprocessos/1/mapa"))
                 .andExpect(status().isOk());
+
+        verify(subprocessoService).mapaCompletoDtoPorSubprocesso(1L);
+        verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
     @Test
@@ -553,6 +616,9 @@ class SubprocessoControllerCoverageTest {
 
         mockMvc.perform(get("/api/subprocessos/1/mapa-completo"))
                 .andExpect(status().isOk());
+
+        verify(subprocessoService).mapaCompletoDtoPorSubprocesso(1L);
+        verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
     @Test
@@ -572,6 +638,7 @@ class SubprocessoControllerCoverageTest {
                 .andExpect(jsonPath("$.erros[1].tipo").value("SEM_ATIVIDADES"));
 
         verify(subprocessoService).validarCadastro(1L);
+        verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
     @Test
@@ -585,6 +652,7 @@ class SubprocessoControllerCoverageTest {
                 .andExpect(jsonPath("$.message").value(org.hamcrest.Matchers.containsString("ERRO INESPERADO")));
 
         verify(subprocessoService).validarCadastro(1L);
+        verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
     @Test
@@ -621,6 +689,9 @@ class SubprocessoControllerCoverageTest {
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isUnprocessableContent())
                 .andExpect(jsonPath("$.message").value("Não é possível importar atividades do mesmo subprocesso."));
+
+        verify(subprocessoService).importarAtividades(1L, 2L, List.of(30L));
+        verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
     @Test
@@ -659,6 +730,7 @@ class SubprocessoControllerCoverageTest {
                 .andExpect(jsonPath("$.details").exists());
 
         verify(transicaoService, never()).alterarDataLimite(anyLong(), any());
+        verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
     @Test
@@ -675,6 +747,7 @@ class SubprocessoControllerCoverageTest {
                 .andExpect(jsonPath("$.details").exists());
 
         verify(transicaoService, never()).devolverValidacao(anyLong(), any(), any());
+        verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
     @Test
@@ -690,6 +763,7 @@ class SubprocessoControllerCoverageTest {
                 .andExpect(status().isBadRequest());
 
         verify(transicaoService, never()).aceitarCadastroEmBloco(anyList(), any());
+        verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
     @Test
@@ -706,6 +780,7 @@ class SubprocessoControllerCoverageTest {
                 .andExpect(jsonPath("$.mensagem").value("Mapa de competências disponibilizado."));
 
         verify(transicaoService).disponibilizarMapa(eq(1L), eq(req), any());
+        verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
     @Test
@@ -723,6 +798,7 @@ class SubprocessoControllerCoverageTest {
 
         verify(subprocessoService).salvarMapa(1L, req);
         verify(subprocessoService).mapaCompletoDtoPorSubprocesso(1L);
+        verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
     @Test
@@ -745,6 +821,9 @@ class SubprocessoControllerCoverageTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].motivo").value("RN-001"))
                 .andExpect(jsonPath("$[0].unidadeSigla").value("SESEL"));
+
+        verify(subprocessoService).listarHistoricoCadastro(1L);
+        verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
     @Test
@@ -756,6 +835,9 @@ class SubprocessoControllerCoverageTest {
 
         mockMvc.perform(get("/api/subprocessos/1/atividades-importacao"))
                 .andExpect(status().isInternalServerError());
+
+        verify(subprocessoService).listarAtividadesParaImportacao(1L);
+        verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
     @Test
@@ -770,6 +852,9 @@ class SubprocessoControllerCoverageTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.codigo").value(15L))
                 .andExpect(jsonPath("$.subprocessoCodigo").value(1L));
+
+        verify(subprocessoService).mapaCompletoDtoPorSubprocesso(1L);
+        verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
     @Test
@@ -783,6 +868,9 @@ class SubprocessoControllerCoverageTest {
         mockMvc.perform(get("/api/subprocessos/1/mapa-completo"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.observacoes").value("Observação detalhada"));
+
+        verify(subprocessoService).mapaCompletoDtoPorSubprocesso(1L);
+        verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
     @Test
@@ -798,6 +886,7 @@ class SubprocessoControllerCoverageTest {
                 .andExpect(status().isOk());
 
         verify(transicaoService).aceitarValidacao(eq(1L), isNull(), any());
+        verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
 }

@@ -56,8 +56,11 @@ class SubprocessoControllerCoverageExtraTest {
         when(permissionEvaluator.hasPermission(any(), eq(1L), eq("Subprocesso"), eq("DISPONIBILIZAR_CADASTRO"))).thenReturn(true);
 
         mockMvc.perform(post("/api/subprocessos/1/cadastro/disponibilizar").with(csrf()))
-                .andExpect(status().isUnprocessableContent());
+                .andExpect(status().isUnprocessableContent())
+                .andExpect(jsonPath("$.message").value("Existem atividades sem conhecimentos associados."));
 
+        verify(transicaoService).disponibilizarCadastro(eq(1L), any());
+        verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
     @Test
@@ -69,8 +72,11 @@ class SubprocessoControllerCoverageExtraTest {
         when(permissionEvaluator.hasPermission(any(), eq(1L), eq("Subprocesso"), eq("DISPONIBILIZAR_REVISAO_CADASTRO"))).thenReturn(true);
 
         mockMvc.perform(post("/api/subprocessos/1/disponibilizar-revisao").with(csrf()))
-                .andExpect(status().isUnprocessableContent());
+                .andExpect(status().isUnprocessableContent())
+                .andExpect(jsonPath("$.message").value("Existem atividades sem conhecimentos associados."));
 
+        verify(transicaoService).disponibilizarRevisao(eq(1L), any());
+        verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
     @Test
@@ -82,6 +88,9 @@ class SubprocessoControllerCoverageExtraTest {
 
         mockMvc.perform(get("/api/subprocessos/1/mapa-completo"))
                 .andExpect(status().isInternalServerError());
+
+        verify(subprocessoService).mapaCompletoDtoPorSubprocesso(1L);
+        verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
     @Test
@@ -100,6 +109,7 @@ class SubprocessoControllerCoverageExtraTest {
 
         verify(subprocessoService).salvarMapa(eq(1L), any());
         verify(subprocessoService).mapaCompletoDtoPorSubprocesso(1L);
+        verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
     @Test
@@ -116,6 +126,7 @@ class SubprocessoControllerCoverageExtraTest {
                 .andExpect(status().isOk());
 
         verify(transicaoService).disponibilizarMapaEmBloco(eq(List.of(1L)), any(), any());
+        verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
     @Test
@@ -129,6 +140,7 @@ class SubprocessoControllerCoverageExtraTest {
                 .andExpect(status().isOk());
 
         verify(subprocessoService).obterMapaParaAjuste(1L);
+        verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
     @Test
@@ -143,6 +155,7 @@ class SubprocessoControllerCoverageExtraTest {
                 .andExpect(jsonPath("$.total").value(2));
 
         verify(subprocessoService).obterSugestoes(1L);
+        verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
     @Test
@@ -167,10 +180,13 @@ class SubprocessoControllerCoverageExtraTest {
                 .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(req)))
-                .andExpect(status().isCreated());
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.tipo").value("VALIDACAO"));
 
+        verify(subprocessoService).buscarSubprocesso(1L);
         verify(transicaoService).criarAnalise(any(), any(), eq(sgc.subprocesso.model.TipoAnalise.VALIDACAO), any());
         verify(subprocessoService).paraHistoricoDto(a);
+        verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
     @Test
     @DisplayName("criarAnaliseCadastro - deve registrar análise de cadastro")
@@ -194,10 +210,13 @@ class SubprocessoControllerCoverageExtraTest {
                 .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(req)))
-                .andExpect(status().isCreated());
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.tipo").value("CADASTRO"));
 
+        verify(subprocessoService).buscarSubprocesso(1L);
         verify(transicaoService).criarAnalise(any(), any(), eq(sgc.subprocesso.model.TipoAnalise.CADASTRO), any());
         verify(subprocessoService).paraHistoricoDto(a);
+        verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
     @Test
@@ -211,6 +230,7 @@ class SubprocessoControllerCoverageExtraTest {
                 .andExpect(status().isOk());
 
         verify(subprocessoService).mapaParaVisualizacao(1L);
+        verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
     @Test
@@ -227,6 +247,7 @@ class SubprocessoControllerCoverageExtraTest {
                 .andExpect(status().isOk());
 
         verify(subprocessoService).salvarAjustesMapa(eq(1L), any());
+        verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
     @Test
@@ -243,6 +264,7 @@ class SubprocessoControllerCoverageExtraTest {
                 .andExpect(status().isOk());
 
         verify(transicaoService).apresentarSugestoes(eq(1L), eq("Sugestao"), any());
+        verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
     @Test
@@ -257,6 +279,7 @@ class SubprocessoControllerCoverageExtraTest {
                 .andExpect(jsonPath("$").isArray());
 
         verify(subprocessoService).listarHistoricoValidacao(1L);
+        verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
     @Test
@@ -270,5 +293,6 @@ class SubprocessoControllerCoverageExtraTest {
                 .andExpect(status().isOk());
 
         verify(subprocessoService).verificarImpactos(eq(1L), any());
+        verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 }
