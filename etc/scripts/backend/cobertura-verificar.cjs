@@ -108,11 +108,20 @@ async function main() {
     console.log(`| ${'Classe'.padEnd(60)} | ${'Linhas %'.padEnd(10)} | ${'Missed L'.padEnd(10)} | ${'Branches %'.padEnd(10)} | ${'Missed B'.padEnd(10)} |`);
     console.log('-'.repeat(115));
 
-    const filtrados = coleta.arquivos
+    if (!jsonMode && contadorBranch) {
         .filter(arquivo => arquivo.coberturaLinhas < minCoverage)
         .sort((a, b) => b.branchesPerdidos - a.branchesPerdidos || b.linhasPerdidas - a.linhasPerdidas);
 
-    filtrados.slice(0, 20).forEach(arquivo => {
+            if (jsonMode) {
+                imprimirJson({
+                    status: 'erro',
+                    mensagem: `Cobertura global (${coberturaAtual.toFixed(2)}%) abaixo do esperado (${meta.toFixed(2)}%).`,
+                    coberturaAtual,
+                    meta
+                });
+            } else {
+                console.error(`\nERRO: Cobertura global (${coberturaAtual.toFixed(2)}%) abaixo do esperado (${meta.toFixed(2)}%).`);
+            }
         const branchStr = arquivo.totalBranches > 0 ? `${arquivo.coberturaBranches.toFixed(2)}%` : 'N/A';
         console.log(`| ${arquivo.nomeClasse.padEnd(60)} | ${arquivo.coberturaLinhas.toFixed(2).padStart(8)}% | ${String(arquivo.linhasPerdidas).padStart(10)} | ${branchStr.padStart(10)} | ${String(arquivo.branchesPerdidos).padStart(10)} |`);
     });
