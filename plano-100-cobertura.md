@@ -264,5 +264,5 @@
 1. `node backend/etc/scripts/super-cobertura.cjs --run` - Gera relatorio de lacunas
 2. `node backend/etc/scripts/verificar-cobertura.cjs --missed` - Lista arquivos com mais gaps
 3. `node backend/etc/scripts/analisar-cobertura.cjs` - Analise detalhada com tabelas
-4. `python3 backend/etc/scripts/analyze_tests.py` - Identifica arquivos sem testes
-5. `python3 backend/etc/scripts/prioritize_tests.py` - Prioriza criacao de testes
+4. `node backend/etc/scripts/analyze_tests.cjs` - Identifica arquivos sem testes
+5. `node backend/etc/scripts/prioritize_tests.cjs` - Prioriza criacao de testes

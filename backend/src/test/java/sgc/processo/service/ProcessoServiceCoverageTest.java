@@ -153,13 +153,30 @@ class ProcessoServiceCoverageTest {
     @DisplayName("iniciar deve lançar IllegalStateException quando unidade não tem mapa no modo Revisão")
     void iniciarSemMapaRevisao() {
         Long cod = 1L;
-        Processo p = new Processo().setTipo(REVISAO).setSituacao(CRIADO);
+        Processo p = new Processo();
+        p.setCodigo(cod);
+        p.setTipo(REVISAO);
+        p.setSituacao(CRIADO);
+        
         when(repo.buscar(Processo.class, cod)).thenReturn(p);
+        
         Unidade uni = new Unidade();
         uni.setCodigo(10L);
-        when(unidadeService.porCodigos(anyList())).thenReturn(List.<Unidade>of(uni));
+        uni.setSigla("U10");
+        uni.setNome("Unidade 10");
+        uni.setTipo(sgc.organizacao.model.TipoUnidade.OPERACIONAL);
+        uni.setSituacao(sgc.organizacao.model.SituacaoUnidade.ATIVA);
+        
+        when(unidadeService.porCodigos(anyList())).thenReturn(List.of(uni));
         when(unidadeService.buscarMapasPorUnidades(anyList())).thenReturn(new ArrayList<>());
-        when(repo.buscarPorSigla(Unidade.class, "ADMIN")).thenReturn(new Unidade());
+        
+        Unidade admin = new Unidade();
+        admin.setCodigo(99L);
+        admin.setSigla("ADMIN");
+        admin.setNome("Administrador");
+        admin.setTipo(sgc.organizacao.model.TipoUnidade.RAIZ);
+        admin.setSituacao(sgc.organizacao.model.SituacaoUnidade.ATIVA);
+        when(repo.buscarPorSigla(any(), anyString())).thenReturn(admin);
 
         assertThatThrownBy(() -> target.iniciar(cod, List.of(10L), new Usuario()))
                 .isInstanceOf(IllegalStateException.class)
@@ -176,7 +193,6 @@ class ProcessoServiceCoverageTest {
             Processo p = new Processo();
             p.setCodigo(cod);
             p.setTipo(MAPEAMENTO);
-            p.setParticipantes(new ArrayList<>());
             Usuario u = new Usuario();
             u.setPerfilAtivo(Perfil.ADMIN);
             
@@ -185,20 +201,16 @@ class ProcessoServiceCoverageTest {
             sp.setSituacao(MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
             Unidade uni = new Unidade();
             uni.setCodigo(10L);
-            uni.setSigla("U1");
             sp.setUnidade(uni);
-            java.time.LocalDateTime now = java.time.LocalDateTime.now();
-            sp.setDataLimiteEtapa2(now);
+            sp.setDataLimiteEtapa2(java.time.LocalDateTime.now());
             
             when(repo.buscar(Processo.class, cod)).thenReturn(p);
             when(usuarioService.usuarioAutenticado()).thenReturn(u);
             when(subprocessoService.listarEntidadesPorProcesso(cod)).thenReturn(List.of(sp));
             when(subprocessoService.listarEntidadesPorProcessoComUnidade(cod)).thenReturn(List.of(sp));
             when(subprocessoService.obterLocalizacaoAtual(sp)).thenReturn(uni);
-            // Stubbing requirements for obtaining DTO
-            when(permissionEvaluator.verificarPermissao(eq(u), eq(p), eq(sgc.seguranca.AcaoPermissao.FINALIZAR_PROCESSO))).thenReturn(true);
+            when(permissionEvaluator.verificarPermissao(u, p, sgc.seguranca.AcaoPermissao.FINALIZAR_PROCESSO)).thenReturn(true);
             when(validacaoService.validarSubprocessosParaFinalizacao(cod)).thenReturn(sgc.subprocesso.service.SubprocessoValidacaoService.ValidationResult.ofValido());
-
             when(permissionEvaluator.verificarPermissao(eq(u), any(Subprocesso.class), any())).thenReturn(true);
 
             assertThatThrownBy(() -> target.obterDetalhesCompleto(cod, u, true))
@@ -213,7 +225,6 @@ class ProcessoServiceCoverageTest {
             Processo p = new Processo();
             p.setCodigo(cod);
             p.setTipo(MAPEAMENTO);
-            p.setParticipantes(new ArrayList<>());
             Usuario u = new Usuario();
             u.setPerfilAtivo(Perfil.ADMIN);
             
@@ -222,20 +233,18 @@ class ProcessoServiceCoverageTest {
             sp.setSituacao(MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
             Unidade uni = new Unidade();
             uni.setCodigo(10L);
-            uni.setSigla("U1");
             sp.setUnidade(uni);
             java.time.LocalDateTime now = java.time.LocalDateTime.now();
             sp.setDataLimiteEtapa1(now.plusDays(2));
             sp.setDataLimiteEtapa2(now.plusDays(1));
             
             when(repo.buscar(Processo.class, cod)).thenReturn(p);
+            when(usuarioService.usuarioAutenticado()).thenReturn(u);
             when(subprocessoService.listarEntidadesPorProcesso(cod)).thenReturn(List.of(sp));
             when(subprocessoService.listarEntidadesPorProcessoComUnidade(cod)).thenReturn(List.of(sp));
             when(subprocessoService.obterLocalizacaoAtual(sp)).thenReturn(uni);
-            // Stubbing requirements for obtaining DTO
-            when(permissionEvaluator.verificarPermissao(eq(u), eq(p), eq(sgc.seguranca.AcaoPermissao.FINALIZAR_PROCESSO))).thenReturn(true);
+            when(permissionEvaluator.verificarPermissao(u, p, sgc.seguranca.AcaoPermissao.FINALIZAR_PROCESSO)).thenReturn(true);
             when(validacaoService.validarSubprocessosParaFinalizacao(cod)).thenReturn(sgc.subprocesso.service.SubprocessoValidacaoService.ValidationResult.ofValido());
-
             when(permissionEvaluator.verificarPermissao(eq(u), any(Subprocesso.class), any())).thenReturn(true);
 
             assertThatThrownBy(() -> target.obterDetalhesCompleto(cod, u, true))
@@ -250,7 +259,6 @@ class ProcessoServiceCoverageTest {
             Processo p = new Processo();
             p.setCodigo(cod);
             p.setTipo(MAPEAMENTO);
-            p.setParticipantes(new ArrayList<>());
             Usuario u = new Usuario();
             u.setPerfilAtivo(Perfil.ADMIN);
             
@@ -259,7 +267,6 @@ class ProcessoServiceCoverageTest {
             sp.setSituacao(MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
             Unidade uni = new Unidade();
             uni.setCodigo(10L);
-            uni.setSigla("U1");
             sp.setUnidade(uni);
             java.time.LocalDateTime d1 = java.time.LocalDateTime.now().plusDays(1);
             java.time.LocalDateTime d2 = java.time.LocalDateTime.now().plusDays(2);
@@ -267,13 +274,12 @@ class ProcessoServiceCoverageTest {
             sp.setDataLimiteEtapa2(d2);
             
             when(repo.buscar(Processo.class, cod)).thenReturn(p);
+            when(usuarioService.usuarioAutenticado()).thenReturn(u);
             when(subprocessoService.listarEntidadesPorProcesso(cod)).thenReturn(List.of(sp));
             when(subprocessoService.listarEntidadesPorProcessoComUnidade(cod)).thenReturn(List.of(sp));
             when(subprocessoService.obterLocalizacaoAtual(sp)).thenReturn(uni);
-            // Stubbing requirements for obtaining DTO
-            when(permissionEvaluator.verificarPermissao(eq(u), eq(p), eq(sgc.seguranca.AcaoPermissao.FINALIZAR_PROCESSO))).thenReturn(true);
+            when(permissionEvaluator.verificarPermissao(u, p, sgc.seguranca.AcaoPermissao.FINALIZAR_PROCESSO)).thenReturn(true);
             when(validacaoService.validarSubprocessosParaFinalizacao(cod)).thenReturn(sgc.subprocesso.service.SubprocessoValidacaoService.ValidationResult.ofValido());
-
             when(permissionEvaluator.verificarPermissao(eq(u), any(Subprocesso.class), any())).thenReturn(true);
 
             ProcessoDetalheDto res = target.obterDetalhesCompleto(cod, u, true);

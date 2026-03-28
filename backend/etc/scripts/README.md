@@ -5,9 +5,10 @@ Este diretório reúne utilitários de análise, priorização e manutenção us
 ## Pré-requisitos
 
 - Executar os comandos a partir da raiz do repositório: `/Users/leonardo/sgc`, salvo quando indicado o contrário.
-- Ter `Node.js`, `python3` e `bash` disponíveis no ambiente.
+- Ter `Node.js` disponível no ambiente.
 - Ter as dependências JavaScript instaladas na raiz do projeto, pois alguns scripts usam `xml2js`.
 - Para os scripts de cobertura, ter o backend compilável e com relatório JaCoCo disponível em `backend/build/reports/jacoco/test/`.
+- Para `instalar-certs.cjs`, ter `keytool` disponível no `PATH` ou em `JAVA_HOME/bin`.
 
 Comando base para gerar o relatório JaCoCo manualmente:
 
@@ -22,14 +23,14 @@ Comando base para gerar o relatório JaCoCo manualmente:
 | `analisar-cobertura-total.cjs` | Node.js | Prioriza classes com lacunas de cobertura e gera um plano resumido em Markdown |
 | `analisar-cobertura.cjs` | Node.js | Mostra uma visão tabular detalhada da cobertura por arquivo |
 | `analisar-complexidade.cjs` | Node.js | Gera ranking de complexidade a partir do CSV do JaCoCo |
-| `analyze_tests.py` | Python | Detecta classes sem testes unitários correspondentes |
-| `auditar-verificacoes-null.js` | Node.js | Audita verificações explícitas de `null` no código Java |
-| `cobertura-100.sh` | Bash | Orquestra uma jornada completa de diagnóstico para aumentar cobertura |
-| `fix_fqn.py` | Python | Substitui nomes totalmente qualificados por imports em arquivos Java |
+| `analyze_tests.cjs` | Node.js | Detecta classes sem testes unitários correspondentes |
+| `auditar-verificacoes-null.cjs` | Node.js | Audita verificações explícitas de `null` no código Java |
+| `cobertura-100.cjs` | Node.js | Orquestra uma jornada completa de diagnóstico para aumentar cobertura |
+| `fix_fqn.cjs` | Node.js | Substitui nomes totalmente qualificados por imports em arquivos Java |
 | `gerar-plano-cobertura.cjs` | Node.js | Gera um plano detalhado para buscar 100% de cobertura |
 | `gerar-stub-teste.cjs` | Node.js | Cria um stub de teste para uma classe com base no relatório JaCoCo |
-| `instalar-certs.sh` | Bash | Importa certificados locais no cacerts da JVM |
-| `prioritize_tests.py` | Python | Prioriza classes sem testes em P1, P2 e P3 |
+| `instalar-certs.cjs` | Node.js | Importa certificados locais no cacerts da JVM |
+| `prioritize_tests.cjs` | Node.js | Prioriza classes sem testes em P1, P2 e P3 |
 | `super-cobertura.cjs` | Node.js | Lista lacunas de cobertura e exporta JSON estruturado |
 | `verificar-cobertura.cjs` | Node.js | Consulta cobertura global, por classe e por linhas/branches perdidas |
 
@@ -94,7 +95,7 @@ Quando usar:
 - Para identificar hotspots de manutenção e risco
 - Para orientar priorização de testes além da cobertura bruta
 
-### `analyze_tests.py`
+### `analyze_tests.cjs`
 
 Varre `src/main/java` e `src/test/java`, tenta associar cada classe a arquivos de teste convencionais e gera um relatório Markdown com itens testados e não testados por categoria.
 
@@ -105,15 +106,15 @@ Varre `src/main/java` e `src/test/java`, tenta associar cada classe a arquivos d
 Uso:
 
 ```bash
-python3 backend/etc/scripts/analyze_tests.py --dir backend --output analise-testes.md
+node backend/etc/scripts/analyze_tests.cjs --dir backend --output analise-testes.md --output-json analise-testes.json
 ```
 
 Quando usar:
 
 - Para identificar ausência de testes unitários por convenção de nome
-- Antes de rodar `prioritize_tests.py`
+- Antes de rodar `prioritize_tests.cjs`
 
-### `auditar-verificacoes-null.js`
+### `auditar-verificacoes-null.cjs`
 
 Procura ocorrências de `== null` e `!= null` no código Java do backend, classifica cada caso como `MAYBE_LEGIT` ou `POTENTIALLY_REDUNDANT` com base em contexto simples e gera dois relatórios.
 
@@ -125,7 +126,7 @@ Procura ocorrências de `== null` e `!= null` no código Java do backend, classi
 Uso:
 
 ```bash
-node backend/etc/scripts/auditar-verificacoes-null.js
+node backend/etc/scripts/auditar-verificacoes-null.cjs
 ```
 
 Quando usar:
@@ -133,7 +134,7 @@ Quando usar:
 - Para mapear verificações de nulo candidatas a refatoração
 - Para revisar excesso de checagens defensivas
 
-### `cobertura-100.sh`
+### `cobertura-100.cjs`
 
 Script orquestrador que encadeia geração de relatório JaCoCo, análise detalhada, identificação de lacunas, geração de plano e priorização de testes.
 
@@ -143,13 +144,13 @@ Etapas executadas:
 2. `analisar-cobertura.cjs`
 3. `super-cobertura.cjs`
 4. `gerar-plano-cobertura.cjs`
-5. `analyze_tests.py`
-6. `prioritize_tests.py`
+5. `analyze_tests.cjs`
+6. `prioritize_tests.cjs`
 
 Uso:
 
 ```bash
-bash backend/etc/scripts/cobertura-100.sh
+node backend/etc/scripts/cobertura-100.cjs
 ```
 
 Arquivos gerados ao longo do fluxo:
@@ -165,7 +166,7 @@ Observações:
 - O script resolve seus diretórios internamente, então pode ser chamado da raiz.
 - Há referências legadas no trecho final, como `gerar-testes-cobertura.cjs` e `show cat`, que não correspondem ao estado atual do diretório. Na prática, o gerador disponível hoje é `gerar-stub-teste.cjs`.
 
-### `fix_fqn.py`
+### `fix_fqn.cjs`
 
 Varre arquivos Java em `src/main/java` e `src/test/java`, substitui referências totalmente qualificadas por nomes simples e adiciona os imports necessários quando não há colisão.
 
@@ -183,7 +184,8 @@ Regras relevantes:
 Uso:
 
 ```bash
-python3 backend/etc/scripts/fix_fqn.py
+node backend/etc/scripts/fix_fqn.cjs
+node backend/etc/scripts/fix_fqn.cjs --dry-run
 ```
 
 Quando usar:
@@ -230,7 +232,7 @@ Quando usar:
 - Para acelerar o ponto de partida de um teste de cobertura
 - Após identificar uma classe prioritária em `analisar-cobertura-total.cjs`
 
-### `instalar-certs.sh`
+### `instalar-certs.cjs`
 
 Importa os certificados `cert-tre.cer` e `cert-for.cer` no `cacerts` da JVM usando `keytool`.
 
@@ -242,8 +244,7 @@ Arquivos esperados:
 Uso:
 
 ```bash
-cd backend/etc/scripts
-bash instalar-certs.sh
+node backend/etc/scripts/instalar-certs.cjs
 ```
 
 Observações:
@@ -252,7 +253,7 @@ Observações:
 - A importação escreve no `cacerts` da JVM e normalmente exige permissões adequadas no ambiente.
 - A senha usada está fixa como `changeit`.
 
-### `prioritize_tests.py`
+### `prioritize_tests.cjs`
 
 Recebe um relatório Markdown de classes sem teste e reorganiza os itens em prioridades:
 
@@ -263,12 +264,13 @@ Recebe um relatório Markdown de classes sem teste e reorganiza os itens em prio
 Uso:
 
 ```bash
-python3 backend/etc/scripts/prioritize_tests.py --input analise-testes.md --output priorizacao-testes.md
+node backend/etc/scripts/prioritize_tests.cjs --input analise-testes.json --output priorizacao-testes.md
+node backend/etc/scripts/prioritize_tests.cjs --input analise-testes.md --output priorizacao-testes.md
 ```
 
 Quando usar:
 
-- Depois de gerar um relatório com `analyze_tests.py`
+- Depois de gerar um relatório com `analyze_tests.cjs`
 - Para transformar uma lista bruta de pendências em backlog de implementação
 
 ### `super-cobertura.cjs`
@@ -342,8 +344,8 @@ node backend/etc/scripts/analisar-cobertura-total.cjs --skip-run
 ### Identificação e priorização de classes sem teste
 
 ```bash
-python3 backend/etc/scripts/analyze_tests.py --dir backend --output analise-testes.md
-python3 backend/etc/scripts/prioritize_tests.py --input analise-testes.md --output priorizacao-testes.md
+node backend/etc/scripts/analyze_tests.cjs --dir backend --output analise-testes.md --output-json analise-testes.json
+node backend/etc/scripts/prioritize_tests.cjs --input analise-testes.json --output priorizacao-testes.md
 ```
 
 ### Geração inicial de stub de teste
