@@ -48,7 +48,7 @@ Mas esses artefatos nao sao a fonte de verdade do dashboard.
 Comando direto legado, ainda funcional:
 
 ```bash
-node etc/scripts/sgc.js qa snapshot coletar --perfil rapido
+node etc/qa-dashboard/scripts/coletar-snapshot.mjs --perfil rapido
 ```
 
 ## Documento principal

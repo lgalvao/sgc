@@ -58,10 +58,10 @@ Um comando principal executa as verificacoes desejadas.
 
 Sugestao de comandos:
 
-- `node etc/scripts/sgc.js qa snapshot coletar --perfil rapido`
-- `node etc/scripts/sgc.js qa snapshot coletar --perfil completo`
-- `node etc/scripts/sgc.js qa snapshot coletar --perfil backend`
-- `node etc/scripts/sgc.js qa snapshot coletar --perfil frontend`
+- `node etc/qa-dashboard/scripts/coletar-snapshot.mjs --perfil rapido`
+- `node etc/qa-dashboard/scripts/coletar-snapshot.mjs --perfil completo`
+- `node etc/qa-dashboard/scripts/coletar-snapshot.mjs --perfil backend`
+- `node etc/qa-dashboard/scripts/coletar-snapshot.mjs --perfil frontend`
 
 ### Camada 2: Adaptadores
 

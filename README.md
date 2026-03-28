@@ -128,7 +128,7 @@ npm run qa:dashboard
 
 Ou diretamente via script:
 ```powershell
-powershell -ExecutionPolicy Bypass -File etc/scripts/qa/snapshot-coletar.ps1 -Perfil rapido
+powershell -ExecutionPolicy Bypass -File etc/qa-dashboard/scripts/coletar-snapshot.ps1 -Perfil rapido
 ```
 
 Perfis disponíveis: `rapido`, `frontend`, `backend`, `completo`.
