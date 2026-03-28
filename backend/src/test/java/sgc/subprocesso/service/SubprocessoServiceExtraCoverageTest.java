@@ -575,6 +575,39 @@ class SubprocessoServiceExtraCoverageTest {
         }
     }
 
+    @Test
+    @DisplayName("obterSugestoes - quando não tem mapa")
+    void obterSugestoesSemMapa() {
+        Subprocesso sp = new Subprocesso();
+        sp.setMapa(null);
+        when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(1L)).thenReturn(Optional.of(sp));
+        
+        Map<String, Object> res = subprocessoService.obterSugestoes(1L);
+        assertThat(res).containsEntry("sugestoes", "");
+    }
+
+    @Test
+    @DisplayName("listarEntidadesPorProcessoEUnidades - lista vazia")
+    void listarEntidadesPorProcessoEUnidadesVazia() {
+        List<Long> vazia = List.of();
+        List<Subprocesso> res = subprocessoService.listarEntidadesPorProcessoEUnidades(1L, vazia);
+        assertThat(res).isEmpty();
+    }
+
+    @Test
+    @DisplayName("criarSubprocessoComMapa - sem mapa vigente")
+    void criarSubprocessoSemMapaVigente() {
+        Processo p = new Processo();
+        Unidade u = new Unidade();
+        u.setSigla("U1");
+        UnidadeMapa um = new UnidadeMapa();
+        um.setMapaVigente(null);
+        Usuario user = new Usuario();
+        
+        assertThatThrownBy(() -> invokeMethod(subprocessoService, "criarSubprocessoComMapa", p, u, um, u, user, NAO_INICIADO, "desc"))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
     @Nested
     @DisplayName("Criação de Subprocesso")
     class CriacaoSubprocesso {

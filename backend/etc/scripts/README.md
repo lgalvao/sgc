@@ -43,26 +43,26 @@ Uso:
 
 ```bash
 node backend/etc/scripts/sgc.cjs help
-node backend/etc/scripts/sgc.cjs cobertura:verificar --missed
-node backend/etc/scripts/sgc.cjs testes:analisar --dir backend --output analise-testes.md --output-json analise-testes.json
-node backend/etc/scripts/sgc.cjs java:corrigir-fqn --dry-run
+node backend/etc/scripts/sgc.cjs cobertura verificar --missed
+node backend/etc/scripts/sgc.cjs testes analisar --dir backend --output analise-testes.md --output-json analise-testes.json
+node backend/etc/scripts/sgc.cjs java corrigir-fqn --dry-run
 ```
 
 Comandos disponíveis:
 
-- `cobertura:detalhar`
-- `cobertura:prioridades`
-- `cobertura:complexidade`
-- `cobertura:lacunas`
-- `cobertura:plano`
-- `cobertura:verificar`
-- `cobertura:jornada`
-- `testes:analisar`
-- `testes:priorizar`
-- `testes:stub`
-- `java:corrigir-fqn`
-- `java:auditar-null`
-- `java:instalar-certificados`
+- `cobertura analisar`
+- `cobertura priorizar`
+- `cobertura complexidade`
+- `cobertura lacunas`
+- `cobertura plano`
+- `cobertura verificar`
+- `cobertura jornada`
+- `testes analisar`
+- `testes priorizar`
+- `testes gerar-stub`
+- `java corrigir-fqn`
+- `java auditar-null`
+- `java instalar-certificados`
 
 ## Scripts
 
