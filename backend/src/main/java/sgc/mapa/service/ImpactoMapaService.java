@@ -287,6 +287,9 @@ public class ImpactoMapaService {
     private Map<Long, List<Competencia>> construirMapaAtividadeCompetencias(List<Competencia> competencias) {
         Map<Long, List<Competencia>> mapa = new HashMap<>();
         for (Competencia comp : competencias) {
+            if (comp.getAtividades() == null || comp.getAtividades().isEmpty()) {
+                continue;
+            }
             for (Atividade ativ : comp.getAtividades()) {
                 mapa.computeIfAbsent(ativ.getCodigo(), k -> new ArrayList<>()).add(comp);
             }
@@ -315,5 +318,4 @@ public class ImpactoMapaService {
         }
     }
 }
-
 
