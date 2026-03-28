@@ -40,7 +40,8 @@ public class MapaVisualizacaoService {
                 .map(EntidadeBase::getCodigo)
                 .forEach(codAtividadesComCompetencia::add));
 
-        List<Atividade> atividadesSemCompetencia = mapa.getAtividades().stream()
+        Set<Atividade> atividadesMapa = Objects.requireNonNullElse(mapa.getAtividades(), Set.of());
+        List<Atividade> atividadesSemCompetencia = atividadesMapa.stream()
                 .filter(a -> !codAtividadesComCompetencia.contains(a.getCodigo()))
                 .toList();
 
@@ -52,5 +53,4 @@ public class MapaVisualizacaoService {
                 .build();
     }
 }
-
 

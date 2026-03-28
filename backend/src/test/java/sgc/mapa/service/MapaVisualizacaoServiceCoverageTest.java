@@ -19,6 +19,8 @@ import static org.mockito.Mockito.*;
 class MapaVisualizacaoServiceCoverageTest {
     @Mock
     private MapaRepo mapaRepo;
+    @Mock
+    private CompetenciaRepo competenciaRepo;
 
     @InjectMocks
     private MapaVisualizacaoService service;
@@ -38,5 +40,30 @@ class MapaVisualizacaoServiceCoverageTest {
         assertThat(res.unidade()).isEqualTo(u);
         assertThat(res.competencias()).isEmpty();
         assertThat(res.atividadesSemCompetencia()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("Deve retornar atividades sem competência vazias quando mapa não possui atividades")
+    void deveRetornarAtividadesVaziasQuandoMapaSemAtividades() {
+        Subprocesso sub = new Subprocesso();
+        sub.setCodigo(2L);
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(20L);
+        sub.setUnidade(unidade);
+
+        Mapa mapa = new Mapa();
+        mapa.setCodigo(200L);
+        mapa.setAtividades(null);
+        sub.setMapa(mapa);
+
+        when(mapaRepo.buscarCompletoPorSubprocesso(2L)).thenReturn(Optional.of(mapa));
+        when(competenciaRepo.findByMapa_Codigo(200L)).thenReturn(List.of());
+
+        MapaVisualizacaoResponse res = service.obterMapaParaVisualizacao(sub);
+
+        assertThat(res).isNotNull();
+        assertThat(res.unidade()).isEqualTo(unidade);
+        assertThat(res.atividadesSemCompetencia()).isEmpty();
+        assertThat(res.competencias()).isEmpty();
     }
 }

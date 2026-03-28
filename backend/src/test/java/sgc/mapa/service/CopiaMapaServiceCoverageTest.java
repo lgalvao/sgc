@@ -154,4 +154,25 @@ class CopiaMapaServiceCoverageTest {
 
         verify(atividadeRepo, never()).saveAll(anyList());
     }
+
+    @Test
+    @DisplayName("importarAtividadesDeOutroMapa deve tratar atividade de origem sem conhecimentos")
+    void deveImportarAtividadeComConhecimentosNulos() {
+        Long mapaOrigemId = 1L;
+        Long mapaDestinoId = 2L;
+
+        Atividade ativOrigem = new Atividade();
+        ativOrigem.setCodigo(10L);
+        ativOrigem.setDescricao("Sem conhecimentos");
+        ativOrigem.setConhecimentos(null);
+
+        when(atividadeRepo.findWithConhecimentosByMapa_Codigo(mapaOrigemId)).thenReturn(List.of(ativOrigem));
+        when(atividadeRepo.findByMapa_Codigo(mapaDestinoId)).thenReturn(List.of());
+        when(repo.buscar(Mapa.class, mapaDestinoId)).thenReturn(new Mapa());
+
+        int quantidade = service.importarAtividadesDeOutroMapa(mapaOrigemId, mapaDestinoId, List.of(10L));
+
+        assertThat(quantidade).isEqualTo(1);
+        verify(atividadeRepo).saveAll(anyList());
+    }
 }
