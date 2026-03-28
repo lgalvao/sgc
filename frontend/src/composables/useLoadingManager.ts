@@ -2,21 +2,20 @@ import {computed, ref, type Ref} from 'vue';
 import {logger} from '@/utils';
 
 /**
- * Gerenciador de múltiplos estados de loading
+ * Gerenciador de múltiplos estados de carregamento
  */
-// TODO traduzir os símbolos para português
-interface LoadingManager {
-    states: Record<string, Ref<boolean>>;
-    start: (name: string) => void;
-    stop: (name: string) => void;
-    isLoading: (name: string) => boolean;
-    anyLoading: Ref<boolean>;
-    stopAll: () => void;
-    withLoading: <T>(name: string, fn: () => Promise<T>) => Promise<T>;
+interface GerenciadorCarregamento {
+    estados: Record<string, Ref<boolean>>;
+    iniciar: (nome: string) => void;
+    parar: (nome: string) => void;
+    estaCarregando: (nome: string) => boolean;
+    qualquerCarregando: Ref<boolean>;
+    pararTodos: () => void;
+    comCarregamento: <T>(nome: string, fn: () => Promise<T>) => Promise<T>;
 }
 
 /**
- * Composable para gerenciar múltiplos estados de loading
+ * Composable para gerenciar múltiplos estados de carregamento
  *
  * Simplifica o gerenciamento de estados de carregamento em componentes
  * com múltiplas operações assíncronas.
@@ -24,146 +23,152 @@ interface LoadingManager {
  *
  * @example
  * ```ts
- * const loading = useLoadingManager(['fetch', 'save', 'delete']);
+ * const carregamento = useGerenciadorCarregamento(['buscar', 'salvar', 'excluir']);
  *
- * // Iniciar loading
- * loading.start('fetch');
+ * // Iniciar carregamento
+ * carregamento.iniciar('buscar');
  *
  * // Verificar estado
- * if (loading.isLoading('fetch')) { ... }
+ * if (carregamento.estaCarregando('buscar')) { ... }
  *
- * // Parar loading
- * loading.stop('fetch');
+ * // Parar carregamento
+ * carregamento.parar('buscar');
  *
  * // Usar wrapper para async
- * await loading.withLoading('save', async () => {
- *     await saveData();
+ * await carregamento.comCarregamento('salvar', async () => {
+ *     await salvarDados();
  * });
  *
- * // Verificar se qualquer loading está ativo
- * if (loading.anyLoading.value) { ... }
+ * // Verificar se qualquer carregamento está ativo
+ * if (carregamento.qualquerCarregando.value) { ... }
  * ```
  */
-export function useLoadingManager(names: string[]): LoadingManager {
-    // Cria refs para cada estado de loading
-    const states: Record<string, Ref<boolean>> = {};
-    names.forEach(name => {
-        states[name] = ref(false);
+export function useGerenciadorCarregamento(nomes: string[]): GerenciadorCarregamento {
+    // Cria refs para cada estado de carregamento
+    const estados: Record<string, Ref<boolean>> = {};
+    nomes.forEach(nome => {
+        estados[nome] = ref(false);
     });
 
     /**
-     * Inicia um estado de loading
+     * Inicia um estado de carregamento
      */
-    const start = (name: string) => {
-        if (!states[name]) {
-            logger.warn(`Estado de loading "${name}" não foi registrado`);
+    const iniciar = (nome: string) => {
+        if (!estados[nome]) {
+            logger.warn(`Estado de carregamento "${nome}" não foi registrado`);
             return;
         }
-        states[name].value = true;
+        estados[nome].value = true;
     };
 
     /**
-     * Para um estado de loading
+     * Para um estado de carregamento
      */
-    const stop = (name: string) => {
-        if (!states[name]) {
-            logger.warn(`Estado de loading "${name}" não foi registrado`);
+    const parar = (nome: string) => {
+        if (!estados[nome]) {
+            logger.warn(`Estado de carregamento "${nome}" não foi registrado`);
             return;
         }
-        states[name].value = false;
+        estados[nome].value = false;
     };
 
     /**
      * Verifica se um estado está carregando
      */
-    const isLoading = (name: string): boolean => {
-        return states[name]?.value ?? false;
+    const estaCarregando = (nome: string): boolean => {
+        return estados[nome]?.value ?? false;
     };
 
     /**
      * Computed que retorna true se qualquer estado estiver carregando
      */
-    const anyLoading = computed(() => {
-        return Object.values(states).some(state => state.value);
+    const qualquerCarregando = computed(() => {
+        return Object.values(estados).some(estado => estado.value);
     });
 
     /**
-     * Para todos os estados de loading
+     * Para todos os estados de carregamento
      */
-    const stopAll = () => {
-        Object.keys(states).forEach(name => stop(name));
+    const pararTodos = () => {
+        Object.keys(estados).forEach(nome => parar(nome));
     };
 
     /**
-     * Wrapper para executar função assíncrona com loading automático
+     * Wrapper para executar função assíncrona com carregamento automático
      */
-    const withLoading = async <T>(name: string, fn: () => Promise<T>): Promise<T> => {
+    const comCarregamento = async <T>(nome: string, fn: () => Promise<T>): Promise<T> => {
         try {
-            start(name);
+            iniciar(nome);
             return await fn();
         } finally {
-            stop(name);
+            parar(nome);
         }
     };
 
     return {
-        states,
-        start,
-        stop,
-        isLoading,
-        anyLoading,
-        stopAll,
-        withLoading
+        estados,
+        iniciar,
+        parar,
+        estaCarregando,
+        qualquerCarregando,
+        pararTodos,
+        comCarregamento
     };
 }
 
 /**
- * Versão simplificada para um único estado de loading
+ * Versão simplificada para um único estado de carregamento
  *
  *
  * @example
  * ```ts
- * const loading = useSingleLoading();
+ * const carregamento = useCarregamentoSimples();
  *
- * loading.start();
- * if (loading.isLoading.value) { ... }
- * loading.stop();
+ * carregamento.iniciar();
+ * if (carregamento.estaCarregando.value) { ... }
+ * carregamento.parar();
  *
  * // Ou usar wrapper
- * await loading.withLoading(async () => {
- *     await fetchData();
+ * await carregamento.comCarregamento(async () => {
+ *     await buscarDados();
  * });
  * ```
  */
-export function useSingleLoading(initialValue = false) {
-    const isLoading = ref(initialValue);
+export function useCarregamentoSimples(valorInicial = false) {
+    const estaCarregando = ref(valorInicial);
 
-    const start = () => {
-        isLoading.value = true;
+    const iniciar = () => {
+        estaCarregando.value = true;
     };
 
-    const stop = () => {
-        isLoading.value = false;
+    const parar = () => {
+        estaCarregando.value = false;
     };
 
-    const toggle = () => {
-        isLoading.value = !isLoading.value;
+    const alternar = () => {
+        estaCarregando.value = !estaCarregando.value;
     };
 
-    const withLoading = async <T>(fn: () => Promise<T>): Promise<T> => {
+    const comCarregamento = async <T>(fn: () => Promise<T>): Promise<T> => {
         try {
-            start();
+            iniciar();
             return await fn();
         } finally {
-            stop();
+            parar();
         }
     };
 
     return {
-        isLoading,
-        start,
-        stop,
-        toggle,
-        withLoading
+        estaCarregando,
+        iniciar,
+        parar,
+        alternar,
+        comCarregamento
     };
 }
+
+// Aliases para compatibilidade legada durante a transição
+/** @deprecated Use useGerenciadorCarregamento */
+export const useLoadingManager = useGerenciadorCarregamento;
+/** @deprecated Use useCarregamentoSimples */
+export const useSingleLoading = useCarregamentoSimples;

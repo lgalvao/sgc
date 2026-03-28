@@ -175,8 +175,8 @@
   <SubprocessoModal
       :data-limite-atual="dataLimite"
       :etapa-atual="subprocesso?.etapaAtual || null"
-      :loading="loading.isLoading('dataLimite')"
-      :mostrar-modal="modals.isOpen('alterarDataLimite')"
+      :loading="carregamento.estaCarregando('dataLimite')"
+      :mostrar-modal="modals.estaAberto('alterarDataLimite')"
       :ultima-data-limite-subprocesso="subprocesso?.ultimaDataLimiteSubprocesso ? parseDate(subprocesso.ultimaDataLimiteSubprocesso) : null"
       @fechar-modal="fecharModalAlterarDataLimite"
       @confirmar-alteracao="confirmarAlteracaoDataLimite"
@@ -184,9 +184,9 @@
 
   <!-- Modal para reabrir cadastro/revisão -->
   <ModalConfirmacao
-      v-model="modals.modals.reabrir.value.isOpen"
+      v-model="modals.modals.reabrir.value.aberto"
       :auto-close="false"
-      :loading="loading.isLoading('reabertura')"
+      :loading="carregamento.estaCarregando('reabertura')"
       :ok-disabled="!justificativaReabertura.trim()"
       :titulo="tipoReabertura === 'cadastro' ? TEXTOS.subprocesso.REABRIR_CADASTRO_TITULO : TEXTOS.subprocesso.REABRIR_REVISAO_TITULO"
       :ok-title="TEXTOS.comum.BOTAO_REABRIR"
@@ -231,8 +231,8 @@ import AppAlert from "@/components/comum/AppAlert.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import {useMapas} from "@/composables/useMapas";
 import {useNotification} from "@/composables/useNotification";
-import {useModalManager} from "@/composables/useModalManager";
-import {useLoadingManager} from "@/composables/useLoadingManager";
+import {useGerenciadorModals} from "@/composables/useModalManager";
+import {useGerenciadorCarregamento} from "@/composables/useLoadingManager";
 import {useProcessos} from "@/composables/useProcessos";
 import {useFluxoSubprocesso} from "@/composables/useFluxoSubprocesso";
 import {useSubprocessos} from "@/composables/useSubprocessos";
@@ -272,9 +272,9 @@ const {notificacao, notify, clear} = useNotification();
 const toastStore = useToastStore();
 const toast = useToast();
 
-// Gerenciamento simplificado de modals e loading com composables
-const modals = useModalManager(['alterarDataLimite', 'reabrir']);
-const loading = useLoadingManager(['dataLimite', 'reabertura']);
+// Gerenciamento simplificado de modals e carregamento com composables
+const modals = useGerenciadorModals(['alterarDataLimite', 'reabrir']);
+const carregamento = useGerenciadorCarregamento(['dataLimite', 'reabertura']);
 
 const tipoReabertura = ref<'cadastro' | 'revisao'>('cadastro');
 const justificativaReabertura = ref('');
@@ -367,14 +367,14 @@ onMounted(async () => {
 
 function abrirModalAlterarDataLimite() {
   if (podeAlterarDataLimite.value) {
-    modals.open('alterarDataLimite');
+    modals.abrir('alterarDataLimite');
   } else {
     notify(TEXTOS.subprocesso.ERRO_SEM_PERMISSAO_DATA, 'danger');
   }
 }
 
 function fecharModalAlterarDataLimite() {
-  modals.close('alterarDataLimite');
+  modals.fechar('alterarDataLimite');
 }
 
 async function confirmarAlteracaoDataLimite(novaData: string) {
@@ -382,7 +382,7 @@ async function confirmarAlteracaoDataLimite(novaData: string) {
     return;
   }
 
-  await loading.withLoading('dataLimite', async () => {
+  await carregamento.comCarregamento('dataLimite', async () => {
     try {
       await fluxoSubprocesso.alterarDataLimiteSubprocesso(
           subprocesso.value!.codigo,
@@ -400,17 +400,17 @@ async function confirmarAlteracaoDataLimite(novaData: string) {
 function abrirModalReabrirCadastro() {
   tipoReabertura.value = 'cadastro';
   justificativaReabertura.value = '';
-  modals.open('reabrir');
+  modals.abrir('reabrir');
 }
 
 function abrirModalReabrirRevisao() {
   tipoReabertura.value = 'revisao';
   justificativaReabertura.value = '';
-  modals.open('reabrir');
+  modals.abrir('reabrir');
 }
 
 function fecharModalReabrir() {
-  modals.close('reabrir');
+  modals.fechar('reabrir');
   justificativaReabertura.value = '';
 }
 
@@ -420,7 +420,7 @@ async function confirmarReabertura() {
     return;
   }
 
-  await loading.withLoading('reabertura', async () => {
+  await carregamento.comCarregamento('reabertura', async () => {
     let sucesso: boolean;
     if (tipoReabertura.value === 'cadastro') {
       sucesso = await fluxoSubprocesso.reabrirCadastro(codSubprocesso.value!, justificativaReabertura.value);
