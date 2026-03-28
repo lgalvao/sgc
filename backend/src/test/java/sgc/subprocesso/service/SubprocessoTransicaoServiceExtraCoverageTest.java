@@ -314,6 +314,6 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         service.disponibilizarRevisao(100L, new Usuario());
 
         assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
-        verify(subprocessoRepo).save(sp); // Save chamado na linha 165
+        verify(subprocessoRepo, times(2)).save(sp); 
     }
 }

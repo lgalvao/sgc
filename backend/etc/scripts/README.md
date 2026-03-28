@@ -45,7 +45,7 @@ Uso:
 node backend/etc/scripts/sgc.cjs help
 node backend/etc/scripts/sgc.cjs cobertura:verificar --missed
 node backend/etc/scripts/sgc.cjs testes:analisar --dir backend --output analise-testes.md --output-json analise-testes.json
-node backend/etc/scripts/sgc.cjs java:fix-fqn --dry-run
+node backend/etc/scripts/sgc.cjs java:corrigir-fqn --dry-run
 ```
 
 Comandos disponíveis:
@@ -60,9 +60,9 @@ Comandos disponíveis:
 - `testes:analisar`
 - `testes:priorizar`
 - `testes:stub`
-- `java:fix-fqn`
-- `java:null-checks`
-- `java:instalar-certs`
+- `java:corrigir-fqn`
+- `java:auditar-null`
+- `java:instalar-certificados`
 
 ## Scripts
 
@@ -194,7 +194,6 @@ Arquivos gerados ao longo do fluxo:
 Observações:
 
 - O script resolve seus diretórios internamente, então pode ser chamado da raiz.
-- Há referências legadas no trecho final, como `gerar-testes-cobertura.cjs` e `show cat`, que não correspondem ao estado atual do diretório. Na prática, o gerador disponível hoje é `testes-gerar-stub.cjs`.
 
 ### `java-corrigir-fqn.cjs`
 
@@ -388,4 +387,4 @@ node backend/etc/scripts/testes-gerar-stub.cjs NomeDaClasse
 
 - A maior parte dos scripts grava artefatos fora deste diretório, normalmente na raiz do repositório.
 - Os scripts de cobertura assumem que o JaCoCo produz XML e CSV em `backend/build/reports/jacoco/test/`, o que está alinhado ao `build.gradle.kts` atual.
-- Alguns utilitários parecem ter sido criados para uso exploratório local. Antes de incorporá-los em pipelines, vale revisar mensagens, nomes de arquivos e referências legadas.
+- Alguns utilitários parecem ter sido criados para uso exploratório local. Antes de incorporá-los em pipelines, vale revisar mensagens, contratos de saída e códigos de retorno.

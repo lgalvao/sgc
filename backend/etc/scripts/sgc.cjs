@@ -13,9 +13,9 @@ const COMANDOS = {
     'testes:analisar': 'testes-analisar.cjs',
     'testes:priorizar': 'testes-priorizar.cjs',
     'testes:stub': 'testes-gerar-stub.cjs',
-    'java:fix-fqn': 'java-corrigir-fqn.cjs',
-    'java:null-checks': 'java-auditar-null.cjs',
-    'java:instalar-certs': 'java-instalar-certificados.cjs'
+    'java:corrigir-fqn': 'java-corrigir-fqn.cjs',
+    'java:auditar-null': 'java-auditar-null.cjs',
+    'java:instalar-certificados': 'java-instalar-certificados.cjs'
 };
 
 function imprimirAjuda() {
@@ -32,14 +32,14 @@ Comandos:
   testes:analisar         Detecta classes sem testes e gera Markdown/JSON
   testes:priorizar        Prioriza backlog de testes a partir de JSON/Markdown
   testes:stub             Gera CoverageTest inicial para uma classe
-  java:fix-fqn            Substitui FQNs por imports em arquivos Java
-  java:null-checks        Audita verificacoes de null no backend
-  java:instalar-certs     Importa certificados locais no cacerts
+  java:corrigir-fqn       Substitui FQNs por imports em arquivos Java
+  java:auditar-null       Audita verificacoes de null no backend
+  java:instalar-certificados Importa certificados locais no cacerts
 
 Exemplos:
   node backend/etc/scripts/sgc.cjs cobertura:verificar --missed
   node backend/etc/scripts/sgc.cjs testes:analisar --dir backend --output analise-testes.md --output-json analise-testes.json
-  node backend/etc/scripts/sgc.cjs java:fix-fqn --dry-run`);
+  node backend/etc/scripts/sgc.cjs java:corrigir-fqn --dry-run`);
 }
 
 function main() {

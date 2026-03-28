@@ -17,6 +17,7 @@ import sgc.seguranca.*;
 import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.*;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
@@ -321,5 +322,18 @@ class ProcessoServiceCoverageTest {
         target.enviarLembrete(1L, 10L);
 
         verify(emailService).enviarEmailHtml(eq("teste@teste.com"), anyString(), anyString());
+    }
+
+    @Test
+    @DisplayName("obterUltimaDataLimite - apenas etapa 1 deve retornar data 1")
+    void obterUltimaDataLimiteApenasEtapa1() {
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(100L);
+        LocalDateTime d1 = LocalDateTime.now();
+        sp.setDataLimiteEtapa1(d1);
+        sp.setDataLimiteEtapa2(null);
+
+        LocalDateTime res = org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "obterUltimaDataLimite", sp);
+        assertThat(res).isEqualTo(d1);
     }
 }
