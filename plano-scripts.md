@@ -470,10 +470,89 @@ O plano sera considerado concluido quando:
 
 ## Recomendacao imediata
 
-A proxima execucao deve iniciar pela Fase 1:
+A proxima execucao deve atacar o **acabamento da Fase 6** com foco em valor rapido:
 
-1. criar `etc/scripts/sgc.cjs`
-2. criar `etc/scripts/package.json`
-3. criar `etc/scripts/lib`
-4. mover a CLI consolidada do backend para o namespace `backend`
-5. so depois plugar frontend, QA e comandos de projeto
+1. padronizar ajuda e codigos de saida dos comandos mais usados (`backend cobertura verificar`, `frontend cobertura verificar`, `qa snapshot coletar`)
+2. concluir uma primeira trilha de migracao de `CommonJS` para ESM com baixa dependencia cruzada
+3. ampliar os testes do toolkit cobrindo `--help`, `--json` e cenarios de erro comuns
+4. revisar o `README.md` de `etc/scripts` para garantir exemplos reais e consistentes com o estado atual
+5. decidir formalmente o destino de `git-hooks/pre-push` (comando oficial vs artefato auxiliar)
+
+## Plano de execucao detalhado (curto prazo)
+
+### Ciclo A - Padronizacao da experiencia de uso
+
+Objetivo:
+
+- tornar previsivel o comportamento da CLI independentemente do dominio
+
+Entregas:
+
+- contrato minimo de ajuda para todos os comandos publicos
+- contrato de saida com `--json` nos comandos candidatos
+- padrao unico de mensagens de erro para operacao e validacao de argumentos
+
+Checklist sugerido:
+
+- [ ] mapear comandos sem `--help` consistente
+- [ ] mapear comandos que ja suportam JSON e documentar formato
+- [ ] implementar camada compartilhada de ajuda/saida para reduzir duplicacao
+- [ ] atualizar snapshots/testes do toolkit para refletir contratos
+
+### Ciclo B - Reducao de heranca CommonJS
+
+Objetivo:
+
+- reduzir risco tecnico sem reescrever todo o toolkit de uma vez
+
+Estrategia:
+
+- priorizar scripts com baixa dependencia interna
+- migrar primeiro os que ja usam utilitarios modernos de `etc/scripts/lib`
+- manter compatibilidade de CLI durante a transicao
+
+Checklist sugerido:
+
+- [ ] inventariar scripts `.cjs` por criticidade e frequencia de uso
+- [ ] migrar lote inicial de frontend (mais isolados)
+- [ ] migrar lote inicial de backend sem quebrar `backend/lib/cobertura-base`
+- [ ] remover adaptacoes temporarias quando todos os consumidores estiverem em ESM
+
+### Ciclo C - Confiabilidade e governanca
+
+Objetivo:
+
+- aumentar confianca para evolucao continua do toolkit
+
+Entregas:
+
+- suite de testes com foco em contratos publicos
+- regra clara de deprecacao e remocao de wrappers remanescentes
+- orientacao de CI para validacao minima obrigatoria
+
+Checklist sugerido:
+
+- [ ] criar matriz de testes por grupo (`backend`, `frontend`, `qa`, `projeto`, `codigo`)
+- [ ] cobrir cenarios de falha de argumentos e falha de execucao de subprocesso
+- [ ] avaliar comando `qa validar` como agregador para pipeline
+- [ ] publicar politica de deprecacao no README da CLI
+
+## Backlog executivo priorizado
+
+### Bloco 1 - Fazer agora
+
+- padronizar `--help` e codigos de saida dos comandos com maior uso diario
+- cobrir em teste os comandos `qa snapshot coletar` e `qa resumo`
+- definir padrao unico de logging interno (sem `console.log` em producao)
+
+### Bloco 2 - Fazer na sequencia
+
+- migrar lote inicial de scripts frontend `.cjs` para ESM
+- extrair utilitarios duplicados para `etc/scripts/lib`
+- revisar naming de comandos para manter consistencia semantica
+
+### Bloco 3 - Fazer depois da estabilizacao
+
+- avaliar comando de comparacao de snapshots de QA
+- expandir modos de saida estruturada para analise externa
+- revisar custo/beneficio de migrar 100% dos scripts legados de uma vez
