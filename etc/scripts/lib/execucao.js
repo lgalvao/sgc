@@ -20,7 +20,7 @@ async function executarNode(relativo, args = []) {
 }
 
 function imprimirSecao(titulo) {
-    console.log(pc.bold(pc.cyan(`\n${titulo}`)));
+    process.stdout.write(`${pc.bold(pc.cyan(`\n${titulo}`))}\n`);
 }
 
 export {

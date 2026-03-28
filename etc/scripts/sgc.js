@@ -2,9 +2,11 @@
 import {Command} from "commander";
 import pc from "picocolors";
 import {executarNode} from "./lib/execucao.js";
+import logger from "./lib/logger.js";
 import {executarDoctor} from "./projeto/doctor.js";
 import {executarLimpeza} from "./projeto/limpar.js";
 import {PERFIS, executarPerfilQualidade} from "./projeto/qualidade.js";
+import {executarSetup} from "./projeto/setup.js";
 import {executarResumoQa} from "./qa/resumo.js";
 
 function criarComandoScript(pai, nome, descricao, relativo) {
@@ -70,6 +72,13 @@ criarComandoScript(frontendTestIds, "listar-duplicados", "Lista data-test duplic
 const frontendTelas = frontend.command("telas").description("Ferramentas de captura e apoio visual.");
 criarComandoScript(frontendTelas, "capturar", "Captura telas para documentacao ou apoio visual.", "frontend/etc/scripts/capturar-telas.cjs");
 
+const codigo = program.command("codigo").description("Ferramentas de manutencao e higiene do código.");
+const codigoComentarios = codigo.command("comentarios").description("Limpeza e auditoria de comentarios.");
+criarComandoScript(codigoComentarios, "limpar-ai", "Remove comentarios redundantes e marcadores de agente.", "etc/scripts/codigo/comentarios-limpar-ai.js");
+
+const e2e = program.command("e2e").description("Ferramentas auxiliares de testes end-to-end.");
+criarComandoScript(e2e, "limpar", "Aplica limpeza automatizada em especificacoes E2E.", "etc/scripts/e2e/limpar.js");
+
 const qa = program.command("qa").description("Ferramentas de qualidade e dashboard.");
 const qaSnapshot = qa.command("snapshot").description("Coleta e consolidacao de snapshots.");
 criarComandoScript(qaSnapshot, "coletar", "Coleta snapshot de QA.", "etc/qa-dashboard/scripts/coletar-snapshot.mjs");
@@ -110,14 +119,26 @@ projeto
         await executarPerfilQualidade(perfil);
     });
 
+projeto
+    .command("setup")
+    .description("Prepara o ambiente do projeto com etapas opcionais de bootstrap.")
+    .option("--instalar-dependencias", "Executa npm install na raiz, no frontend e no toolkit.")
+    .option("--instalar-playwright", "Instala o Chromium do Playwright.")
+    .option("--importar-certificados", "Executa a importacao de certificados Java locais.")
+    .action(async (opcoes) => {
+        await executarSetup(opcoes);
+    });
+
+criarComandoScript(projeto, "arvore-linhas", "Gera arvore agregada de linhas do repositório.", "etc/scripts/projeto/arvore-linhas.js");
+
 program.addHelpText(
     "after",
-    `\nExemplos:\n  ${pc.dim("node etc/scripts/sgc.js backend cobertura verificar --min=95")}\n  ${pc.dim("node etc/scripts/sgc.js frontend mensagens analisar")}\n  ${pc.dim("node etc/scripts/sgc.js qa snapshot coletar --perfil rapido")}\n  ${pc.dim("node etc/scripts/sgc.js qa resumo")}\n  ${pc.dim("node etc/scripts/sgc.js projeto doctor --json")}\n  ${pc.dim(`node etc/scripts/sgc.js projeto qualidade rapido  # perfis: ${Object.keys(PERFIS).join(", ")}`)}`
+    `\nExemplos:\n  ${pc.dim("node etc/scripts/sgc.js backend cobertura verificar --min=95")}\n  ${pc.dim("node etc/scripts/sgc.js frontend mensagens analisar")}\n  ${pc.dim("node etc/scripts/sgc.js qa snapshot coletar --perfil rapido")}\n  ${pc.dim("node etc/scripts/sgc.js qa resumo")}\n  ${pc.dim("node etc/scripts/sgc.js projeto doctor --json")}\n  ${pc.dim(`node etc/scripts/sgc.js projeto qualidade rapido  # perfis: ${Object.keys(PERFIS).join(", ")}`)}\n  ${pc.dim("node etc/scripts/sgc.js projeto setup --instalar-dependencias")}\n  ${pc.dim("node etc/scripts/sgc.js codigo comentarios limpar-ai --dry-run")}`
 );
 
 try {
     await program.parseAsync(process.argv);
 } catch (error) {
-    console.error(pc.red(`Erro: ${error.message}`));
+    logger.error(pc.red(`Erro: ${error.message}`));
     process.exit(1);
 }

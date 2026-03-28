@@ -1,0 +1,49 @@
+{
+  "versaoSchema": "1.0.0",
+  "resumo": {
+    "statusGeral": "verde",
+    "indiceSaude": 92.5,
+    "totais": {
+      "verificacoes": 3,
+      "sucesso": 3,
+      "falha": 0,
+      "alerta": 0,
+      "naoExecutado": 0
+    }
+  },
+  "verificacoes": [
+    {
+      "codigo": "backend-cobertura",
+      "status": "sucesso",
+      "sumario": "Cobertura backend consistente."
+    },
+    {
+      "codigo": "frontend-cobertura",
+      "status": "sucesso",
+      "sumario": "Cobertura frontend acima do limiar."
+    },
+    {
+      "codigo": "frontend-lint",
+      "status": "sucesso",
+      "sumario": "Lint sem erros."
+    }
+  ],
+  "confiabilidade": {
+    "suitesLentas": [
+      {
+        "codigo": "e2e-playwright",
+        "duracaoMs": 31000
+      }
+    ]
+  },
+  "hotspots": [
+    {
+      "nome": "sgc.processo.ProcessoService",
+      "risco": 88
+    },
+    {
+      "nome": "frontend/src/views/ProcessoView.vue",
+      "risco": 72
+    }
+  ]
+}

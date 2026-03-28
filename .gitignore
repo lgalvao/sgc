@@ -14,6 +14,9 @@ frontend/node_modules/
 frontend/dist/
 frontend/build/
 frontend/coverage/
+etc/scripts/node_modules/
+etc/scripts/coverage/
+etc/scripts/.vitest/
 
 # Java
 /backend/src/main/resources/static/
@@ -51,6 +54,17 @@ frontend/coverage/coverage-final.json
 mensagens-extraidas.json
 mensagens-analise.md
 frontend-backend-validation-comparison.md
+analise-testes.md
+analise-testes.json
+complexity-ranking.md
+cobertura_lacunas.json
+null-checks-analysis.md
+null-checks-audit.txt
+plano-100-cobertura.md
+plano-cobertura-backend.md
+priorizacao-testes.md
+relatorio-testes.md
+unit-test-report.md
 
 # Playwright E2E test results
 !test-results/

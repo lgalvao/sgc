@@ -17,7 +17,7 @@ Isso gera duplicacao, descoberta ruim, nomenclatura inconsistente, multiplos pon
 
 Ao final da reorganizacao, o projeto deve ter:
 
-- um unico ponto de entrada: `node etc/scripts/sgc.cjs`
+- um unico ponto de entrada: `node etc/scripts/sgc.js`
 - uma estrutura unica de subcomandos por dominio
 - um padrao unico de linguagem: `Node.js` com ESM
 - nomes consistentes em portugues e `kebab-case`
@@ -363,6 +363,7 @@ Entregas:
 
 - `projeto doctor`
 - `projeto limpar`
+- `projeto setup`
 - `qa snapshot coletar` dentro da CLI unificada
 - namespace `frontend`
 - padrao `--json`

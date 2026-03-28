@@ -1,1 +1,0 @@
-.\gradlew :backend:unitTest; .\gradlew :backend:integrationTest
