@@ -31,7 +31,6 @@ class ModelCoverageTest {
         processo.adicionarParticipantes(Set.of(u1, u2));
         assertThat(processo.getParticipantes()).hasSize(2);
 
-        // Isso cobre both true/false do removeIf em Proceso.java:86
         processo.sincronizarParticipantes(new HashSet<>(Collections.singletonList(u2)));
 
         assertThat(processo.getParticipantes()).hasSize(1);

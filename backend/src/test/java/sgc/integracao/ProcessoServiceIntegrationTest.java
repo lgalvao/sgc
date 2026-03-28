@@ -127,14 +127,21 @@ class ProcessoServiceIntegrationTest extends BaseIntegrationTest {
         @Test
         @DisplayName("Deve lançar erro ao atualizar processo fora da situação CRIADO")
         void deveLancarErroAoAtualizarProcessoEmAndamento() {
-            Processo p = processoRepo.findById(50000L).orElseThrow();
+            Processo p = service.criar(CriarProcessoRequest.builder()
+                    .descricao("Processo em andamento")
+                    .tipo(TipoProcesso.MAPEAMENTO)
+                    .dataLimiteEtapa1(LocalDateTime.now().plusDays(30))
+                    .unidades(List.of(1L))
+                    .build());
+            p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+            processoRepo.saveAndFlush(p);
 
             AtualizarProcessoRequest request = AtualizarProcessoRequest.builder()
                     .codigo(p.getCodigo())
                     .descricao("Atualizada")
                     .tipo(TipoProcesso.MAPEAMENTO)
                     .dataLimiteEtapa1(LocalDateTime.now().plusDays(30))
-                    .unidades(List.of(8L))
+                    .unidades(List.of(1L))
                     .build();
 
             assertThatThrownBy(() -> service.atualizar(p.getCodigo(), request))
@@ -164,7 +171,14 @@ class ProcessoServiceIntegrationTest extends BaseIntegrationTest {
         @Test
         @DisplayName("Deve lançar erro ao apagar processo fora da situação CRIADO")
         void deveLancarErroAoApagarProcessoEmAndamento() {
-            Processo p = processoRepo.findById(50000L).orElseThrow();
+            Processo p = service.criar(CriarProcessoRequest.builder()
+                    .descricao("Processo não removível")
+                    .tipo(TipoProcesso.MAPEAMENTO)
+                    .dataLimiteEtapa1(LocalDateTime.now().plusDays(30))
+                    .unidades(List.of(1L))
+                    .build());
+            p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+            processoRepo.saveAndFlush(p);
 
             assertThatThrownBy(() -> service.apagar(p.getCodigo()))
                     .isInstanceOf(ErroValidacao.class);

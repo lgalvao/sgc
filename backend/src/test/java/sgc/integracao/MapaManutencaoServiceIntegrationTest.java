@@ -13,7 +13,7 @@ import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
 
-@DisplayName("Testes de Integração - MapaManutencaoService")
+@DisplayName("Testes de Integração - MapaManutencaoService (CDU-11/CDU-12)")
 class MapaManutencaoServiceIntegrationTest extends BaseIntegrationTest {
 
     @Autowired

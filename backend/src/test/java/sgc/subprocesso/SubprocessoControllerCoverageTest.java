@@ -275,7 +275,7 @@ class SubprocessoControllerCoverageTest {
     }
 
     @Test
-    @DisplayName("importarAtividades - deve chamar servico e retornar 200")
+    @DisplayName("importarAtividades - deve aplicar payload e retornar mensagem de sucesso")
     @WithMockUser
     void importarAtividades() throws Exception {
         ImportarAtividadesRequest req = new ImportarAtividadesRequest(2L, List.of(30L, 31L));
@@ -284,7 +284,29 @@ class SubprocessoControllerCoverageTest {
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("Atividades importadas."));
+
+        verify(subprocessoService).importarAtividades(1L, 2L, List.of(30L, 31L));
+        verifyNoMoreInteractions(subprocessoService);
+    }
+
+
+
+    @Test
+    @DisplayName("importarAtividades - deve retornar aviso quando houver atividades duplicadas")
+    @WithMockUser
+    void importarAtividadesComDuplicatas() throws Exception {
+        ImportarAtividadesRequest req = new ImportarAtividadesRequest(2L, List.of(30L, 31L));
+        when(subprocessoService.importarAtividades(1L, 2L, List.of(30L, 31L))).thenReturn(true);
+
+        mockMvc.perform(post("/api/subprocessos/1/importar-atividades")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("Atividades importadas."))
+                .andExpect(jsonPath("$.aviso").isNotEmpty());
 
         verify(subprocessoService).importarAtividades(1L, 2L, List.of(30L, 31L));
     }
