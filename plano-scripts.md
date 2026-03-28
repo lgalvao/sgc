@@ -15,10 +15,11 @@ Ja concluido:
 
 Pendente:
 
-- portar ou eliminar os arquivos em `etc/scripts/legado`
-- reduzir uso de `CommonJS` nos scripts herdados
+- reduzir uso de `CommonJS` nos scripts herdados de `backend/` e `frontend/`
+- normalizar saida, ajuda e logging dos scripts herdados que ainda usam `console.*`
 - ampliar cobertura de testes do toolkit
-- normalizar saida e logging dos scripts herdados
+- consolidar melhor a camada de bibliotecas compartilhadas entre backend, frontend e QA
+- revisar se ainda faz sentido manter scripts `*.cjs` ou se ja compensa migrar o toolkit inteiro para ESM puro
 
 ## Objetivo
 
@@ -31,7 +32,7 @@ O estado original possuia automacoes distribuidas em:
 - `etc/scripts`
 - `etc/qa-dashboard/scripts`
 
-Isso gera duplicacao, descoberta ruim, nomenclatura inconsistente, multiplos pontos de entrada e falta de governanca sobre artefatos e contratos de saida.
+Isso gerava duplicacao, descoberta ruim, nomenclatura inconsistente, multiplos pontos de entrada e falta de governanca sobre artefatos e contratos de saida.
 
 ## Objetivos de resultado
 
@@ -59,21 +60,43 @@ Ao final da reorganizacao, o projeto deve ter:
 
 ### Problemas operacionais
 
-- Descobrir "qual comando usar" depende de conhecer o diretorio certo.
-- Nao existe um comando de `doctor` para validar ambiente.
-- Nao existe um comando de `limpar` artefatos.
-- Nao existe um resumo consolidado do toolkit.
 - Nem todos os comandos produzem saida estruturada.
-- O dashboard de QA existe, mas ainda nao faz parte do fluxo principal do toolkit.
+- Parte dos scripts herdados ainda usa ajuda minima, `console.*` e contratos de saida irregulares.
+- A suite automatizada do toolkit ainda cobre smoke tests e fluxos simples, mas nao os cenarios mais caros de integracao.
 
 ### Problemas de manutencao
 
-- Bibliotecas compartilhadas ainda estao restritas ao backend.
-- O frontend tem scripts utilitarios que nao conversam com a CLI consolidada.
-- `etc/scripts` ja possui comandos transversais importantes, mas sem governanca central.
-- O conjunto inteiro ainda nao esta organizado como plataforma de automacao do projeto.
+- Ainda existe duplicacao de utilitarios entre scripts herdados.
+- Boa parte da superficie migrada ainda esta em `CommonJS`.
+- Falta decidir o ponto de equilibrio entre manter wrappers herdados e reescrever os scripts mais importantes em ESM.
 
 ## Direcao arquitetural
+
+### Estado alvo ajustado
+
+O toolkit ja esta centralizado em `etc/scripts`, com a seguinte organizacao operacional:
+
+```text
+etc/scripts/
+  sgc.js
+  package.json
+  README.md
+  backend/
+  frontend/
+  qa/
+  projeto/
+  codigo/
+  e2e/
+  lib/
+  test/
+```
+
+O backlog restante nao e mais de consolidacao estrutural. Agora ele e de:
+
+- acabamento
+- padronizacao
+- remocao de herancas tecnicas
+- ampliacao de testes
 
 ### Ponto de entrada unico
 
@@ -134,6 +157,16 @@ etc/scripts/
     limpar.js
     setup.js
     qualidade.js
+  codigo/
+    comentarios-limpar-ai.js
+    comentarios-limpar-generico.js
+    id-legado-identificar.js
+    title-case-identificar.js
+    title-case-corrigir.js
+  e2e/
+    limpar.js
+  test/
+    sgc.test.js
 ```
 
 ### Modelo de subcomandos
@@ -157,27 +190,25 @@ node etc/scripts/sgc.js projeto limpar
 
 Objetivo:
 
-- migrar a CLI local de backend para `etc/scripts/backend`
+- consolidado em `etc/scripts/backend`
 - manter a base compartilhada de cobertura
-- preservar a nomenclatura padronizada atual
+- reduzir a heranca `CommonJS` e padronizar logging/ajuda
 
 Itens:
 
-- mover scripts de cobertura
-- mover scripts de testes
-- mover scripts Java
-- mover bibliotecas de apoio
-- ajustar caminhos relativos
-- atualizar documentacao
+- revisar `console.*` e saídas manuais
+- migrar utilitarios compartilhados do backend para `etc/scripts/lib` quando fizer sentido
+- decidir quais scripts de backend merecem reescrita ESM completa
 
 ### Frontend
 
 Objetivo:
 
-- trazer os scripts locais de frontend para dentro da mesma arquitetura de CLI
-- padronizar nomes e ajuda
+- consolidado em `etc/scripts/frontend`
+- padronizar ajuda, saida e logging
+- avaliar migracao gradual de `CommonJS` para ESM
 
-Itens previstos:
+Itens ainda relevantes:
 
 - `verificar-cobertura.cjs` -> `frontend/cobertura-verificar.cjs`
 - `analisar-impacto-cobertura.cjs` -> `frontend/cobertura-impacto.cjs`
@@ -194,8 +225,8 @@ Itens previstos:
 
 Objetivo:
 
-- integrar `etc/qa-dashboard` ao toolkit principal
-- transformar o snapshot em funcionalidade oficial da CLI
+- integrado ao toolkit principal
+- reforcar seu papel como fonte de verdade de QA
 
 Comandos previstos:
 
@@ -204,19 +235,18 @@ Comandos previstos:
 - `qa resumo`
 - `qa dashboard servir`
 
-Itens:
+Itens ainda relevantes:
 
-- adaptar `etc/qa-dashboard/scripts/coletar-snapshot.mjs`
-- decidir se o `dashboard-servir` sera implementado ou apenas documentado
-- padronizar saida JSON do resumo
-- conectar o dashboard aos demais comandos de qualidade
+- adicionar testes do wrapper `qa snapshot coletar`
+- avaliar um comando `qa validar` orientado a CI
+- decidir se o dashboard deve ganhar mais comandos de resumo/comparacao
 
 ### Projeto
 
 Objetivo:
 
-- absorver scripts transversais que hoje estao em `etc/scripts`
-- separar comandos publicos de scripts internos
+- absorvido em boa parte
+- separar melhor comandos publicos de bibliotecas internas
 
 Comandos previstos:
 
@@ -225,14 +255,10 @@ Comandos previstos:
 - `projeto setup`
 - `projeto qualidade`
 
-Itens a consolidar:
+Itens ainda relevantes:
 
-- `setup-env.*`
-- `quality-check.*`
-- `qa-*.sh`
-- `qa-*.ps1`
-- `clean-*`
-- `qualidade.js`
+- refinar `projeto setup`
+- avaliar se `git-hooks/pre-push` deve ser absorvido por um comando ou mantido como artefato auxiliar
 
 ## Padroes obrigatorios
 
@@ -345,7 +371,7 @@ Entregas:
 
 ### Fase 4: Integracao do QA dashboard
 
-Status: parcialmente concluida
+Status: concluida em superficie publica
 
 Objetivo:
 
@@ -364,6 +390,8 @@ Status: em andamento
 Objetivo:
 
 - absorver wrappers e scripts transversais existentes
+- portar utilitarios restantes para o dominio correto
+- remover legados desnecessarios
 
 Entregas:
 
@@ -371,6 +399,10 @@ Entregas:
 - `projeto limpar`
 - `projeto setup`
 - `projeto qualidade`
+- `codigo id-legado identificar`
+- `codigo title-case identificar`
+- `codigo title-case corrigir`
+- `qa dashboard servir`
 
 ### Fase 6: Limpeza final
 
@@ -388,31 +420,34 @@ Entregas:
 - wrappers legados descontinuados
 - documentacao final unificada
 
+Restante desta fase:
+
+- reduzir `console.*` residual nos scripts herdados
+- uniformizar `--help`, `--json` e codigos de saida
+- decidir o destino final de `CommonJS`
+
 ## Funcionalidades faltantes prioritarias
 
 ### Alta prioridade
 
-- `projeto doctor`
-- `projeto limpar`
-- `projeto setup`
-- `qa snapshot coletar` dentro da CLI unificada
-- namespace `frontend`
-- padrao `--json`
-- README unico do toolkit
+- ampliar testes do toolkit
+- normalizar logging e saida dos scripts herdados
+- revisar quais comandos precisam de `--json`
+- consolidar bibliotecas compartilhadas em `etc/scripts/lib`
 
 ### Media prioridade
 
-- `qa resumo`
-- comandos de comparacao/baseline
-- resumir qualidade consolidada em um comando unico
-- servir dashboard com comando dedicado
+- comandos de comparacao/baseline para QA
+- comando orientado a CI, como `qa validar`
+- reduzir `CommonJS` em backend/frontend
+- aumentar profundidade da documentacao por dominio
 
 ### Baixa prioridade
 
-- smoke tests automatizados do toolkit
-- dry-run para mais comandos
-- colorizacao controlada de terminal
+- testes de integracao mais caros
+- `dry-run` para mais comandos
 - exportadores adicionais
+- revisar se vale trocar mais scripts herdados por bibliotecas terceiras
 
 ## Riscos e cuidados
 
@@ -429,6 +464,8 @@ O plano sera considerado concluido quando:
 - backend, frontend, QA e projeto estiverem acessiveis por essa CLI
 - a documentacao central estiver em `etc/scripts/README.md`
 - os scripts antigos espalhados deixarem de ser a forma recomendada de uso
+- os scripts herdados principais tiverem logging, ajuda e saida padronizados
+- a suite do toolkit cobrir os fluxos principais com seguranca razoavel
 - os contratos de ajuda e saida estiverem padronizados
 
 ## Recomendacao imediata
