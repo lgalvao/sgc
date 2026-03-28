@@ -3,6 +3,7 @@ const {
     executarGradleJaCoCo,
     lerRelatorioJacoco
 } = require('./lib/cobertura-base.cjs');
+const {exibirAjudaComando} = require('./lib/cli-ajuda.cjs');
 
 function formatarListaLinhas(linhas) {
     if (linhas.length === 0) {
@@ -19,11 +20,19 @@ function formatarListaLinhas(linhas) {
 async function main() {
     const args = process.argv.slice(2);
     if (args.includes('--help') || args.includes('-h')) {
-        console.log(`Uso: node backend/etc/scripts/cobertura-analisar.cjs [opcoes]
-
-Opcoes:
-  --skip-run    Nao executa o Gradle; usa o ultimo relatorio JaCoCo disponivel
-  --help, -h    Exibe esta ajuda`);
+        exibirAjudaComando({
+            comandoSgc: 'cobertura analisar',
+            scriptDireto: 'cobertura-analisar.cjs',
+            descricao: 'Mostra uma visao tabular detalhada da cobertura por arquivo.',
+            opcoes: [
+                '--skip-run    Nao executa o Gradle; usa o ultimo relatorio JaCoCo disponivel',
+                '--help, -h    Exibe esta ajuda'
+            ],
+            exemplos: [
+                'node backend/etc/scripts/sgc.cjs cobertura analisar',
+                'node backend/etc/scripts/sgc.cjs cobertura analisar --skip-run'
+            ]
+        });
         process.exit(0);
     }
 

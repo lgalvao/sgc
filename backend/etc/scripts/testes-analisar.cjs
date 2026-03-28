@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 const fs = require('node:fs');
 const path = require('node:path');
+const {exibirAjudaComando} = require('./lib/cli-ajuda.cjs');
 
 const EXTENSAO_JAVA = '.java';
 const CATEGORIAS_PRIORITARIAS = ['Controllers', 'Facades', 'Services', 'Mappers'];
@@ -32,13 +33,20 @@ function parseArgs(argv) {
 }
 
 function imprimirAjuda() {
-    console.log(`Uso: node backend/etc/scripts/testes-analisar.cjs [opcoes]
-
-Opcoes:
-  --dir <caminho>         Diretorio raiz do backend (padrao: backend)
-  --output <arquivo>      Arquivo de saida em Markdown
-  --output-json <arquivo> Arquivo de saida estruturado em JSON
-  --help, -h              Exibir esta ajuda`);
+    exibirAjudaComando({
+        comandoSgc: 'testes analisar',
+        scriptDireto: 'testes-analisar.cjs',
+        descricao: 'Analisa classes sem testes correspondentes e gera relatorios em Markdown e JSON.',
+        opcoes: [
+            '--dir <caminho>         Diretorio raiz do backend (padrao: backend)',
+            '--output <arquivo>      Arquivo de saida em Markdown',
+            '--output-json <arquivo> Arquivo de saida estruturado em JSON',
+            '--help, -h              Exibe esta ajuda'
+        ],
+        exemplos: [
+            'node backend/etc/scripts/sgc.cjs testes analisar --dir backend --output analise-testes.md --output-json analise-testes.json'
+        ]
+    });
 }
 
 function normalizarCaminho(caminho) {

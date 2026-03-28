@@ -7,6 +7,7 @@ const {
     lerRelatorioJacoco,
     ordenarPorLacunas
 } = require('./lib/cobertura-base.cjs');
+const {exibirAjudaComando} = require('./lib/cli-ajuda.cjs');
 
 const CATEGORIAS = {
     P1_CRITICAL: {
@@ -127,11 +128,19 @@ function gerarMarkdown(agrupado, totais) {
 async function main() {
     const args = process.argv.slice(2);
     if (args.includes('--help') || args.includes('-h')) {
-        console.log(`Uso: node backend/etc/scripts/cobertura-plano.cjs [opcoes]
-
-Opcoes:
-  --run         Executa os testes e gera o relatorio JaCoCo antes da analise
-  --help, -h    Exibe esta ajuda`);
+        exibirAjudaComando({
+            comandoSgc: 'cobertura plano',
+            scriptDireto: 'cobertura-plano.cjs',
+            descricao: 'Gera um plano detalhado para perseguir 100% de cobertura nas classes relevantes.',
+            opcoes: [
+                '--run         Executa os testes e gera o relatorio JaCoCo antes da analise',
+                '--help, -h    Exibe esta ajuda'
+            ],
+            exemplos: [
+                'node backend/etc/scripts/sgc.cjs cobertura plano',
+                'node backend/etc/scripts/sgc.cjs cobertura plano --run'
+            ]
+        });
         process.exit(0);
     }
 

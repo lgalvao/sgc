@@ -2,6 +2,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const {createInterface} = require('node:readline');
 const {REPORT_CSV_PATH, ROOT_DIR} = require('./lib/cobertura-base.cjs');
+const {exibirAjudaComando} = require('./lib/cli-ajuda.cjs');
 
 // Configuração
 const CSV_PATH = REPORT_CSV_PATH;
@@ -191,10 +192,14 @@ function generateMarkdownReport(metrics, outputPath) {
 
 async function main() {
     if (process.argv.includes('--help') || process.argv.includes('-h')) {
-        console.log(`Uso: node backend/etc/scripts/cobertura-complexidade.cjs
-
-Le o CSV do JaCoCo em backend/build/reports/jacoco/test/jacocoTestReport.csv
-e gera o arquivo complexity-ranking.md na raiz do repositorio.`);
+        exibirAjudaComando({
+            comandoSgc: 'cobertura complexidade',
+            scriptDireto: 'cobertura-complexidade.cjs',
+            descricao: 'Le o CSV do JaCoCo e gera um ranking de complexidade na raiz do repositorio.',
+            exemplos: [
+                'node backend/etc/scripts/sgc.cjs cobertura complexidade'
+            ]
+        });
         process.exit(0);
     }
 

@@ -6,15 +6,24 @@ const {
     lerRelatorioJacoco,
     ordenarPorLacunas
 } = require('./lib/cobertura-base.cjs');
+const {exibirAjudaComando} = require('./lib/cli-ajuda.cjs');
 
 async function main() {
     const args = process.argv.slice(2);
     if (args.includes('--help') || args.includes('-h')) {
-        console.log(`Uso: node backend/etc/scripts/cobertura-lacunas.cjs [opcoes]
-
-Opcoes:
-  --run         Executa o Gradle antes de analisar o relatorio JaCoCo
-  --help, -h    Exibe esta ajuda`);
+        exibirAjudaComando({
+            comandoSgc: 'cobertura lacunas',
+            scriptDireto: 'cobertura-lacunas.cjs',
+            descricao: 'Gera um JSON estruturado com lacunas de linhas e branches na cobertura.',
+            opcoes: [
+                '--run         Executa o Gradle antes de analisar o relatorio JaCoCo',
+                '--help, -h    Exibe esta ajuda'
+            ],
+            exemplos: [
+                'node backend/etc/scripts/sgc.cjs cobertura lacunas',
+                'node backend/etc/scripts/sgc.cjs cobertura lacunas --run'
+            ]
+        });
         process.exit(0);
     }
 

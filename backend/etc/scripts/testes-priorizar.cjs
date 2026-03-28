@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 const fs = require('node:fs');
+const {exibirAjudaComando} = require('./lib/cli-ajuda.cjs');
 
 const PADROES_P1 = [
     /Service\.java$/,
@@ -54,12 +55,19 @@ function parseArgs(argv) {
 }
 
 function imprimirAjuda() {
-    console.log(`Uso: node backend/etc/scripts/testes-priorizar.cjs [opcoes]
-
-Opcoes:
-  --input <arquivo>   Arquivo de entrada em JSON ou Markdown
-  --output <arquivo>  Arquivo de saida em Markdown
-  --help, -h          Exibir esta ajuda`);
+    exibirAjudaComando({
+        comandoSgc: 'testes priorizar',
+        scriptDireto: 'testes-priorizar.cjs',
+        descricao: 'Prioriza o backlog de testes a partir do relatorio estruturado ou Markdown.',
+        opcoes: [
+            '--input <arquivo>   Arquivo de entrada em JSON ou Markdown',
+            '--output <arquivo>  Arquivo de saida em Markdown',
+            '--help, -h          Exibe esta ajuda'
+        ],
+        exemplos: [
+            'node backend/etc/scripts/sgc.cjs testes priorizar --input analise-testes.json --output priorizacao-testes.md'
+        ]
+    });
 }
 
 function classificarArquivo(caminhoArquivo) {

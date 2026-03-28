@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 const fs = require('node:fs');
 const path = require('node:path');
+const {exibirAjudaComando} = require('./lib/cli-ajuda.cjs');
 
 const SOURCE_DIR = path.join(__dirname, '../../src/main/java/sgc');
 const AUDIT_FILE = path.join(__dirname, '../../../null-checks-audit.txt');
@@ -94,10 +95,14 @@ function generateReport(results) {
 
 try {
     if (process.argv.includes('--help') || process.argv.includes('-h')) {
-        console.log(`Uso: node backend/etc/scripts/java-auditar-null.cjs
-
-Varre backend/src/main/java/sgc em busca de verificacoes "== null" e "!= null"
-e gera os arquivos null-checks-audit.txt e null-checks-analysis.md na raiz do repositorio.`);
+        exibirAjudaComando({
+            comandoSgc: 'java auditar-null',
+            scriptDireto: 'java-auditar-null.cjs',
+            descricao: 'Audita verificacoes de null no codigo Java e gera dois relatorios na raiz do repositorio.',
+            exemplos: [
+                'node backend/etc/scripts/sgc.cjs java auditar-null'
+            ]
+        });
         process.exit(0);
     }
 

@@ -6,6 +6,7 @@ const {
     executarGradleJaCoCo,
     lerRelatorioJacoco
 } = require('./lib/cobertura-base.cjs');
+const {exibirAjudaComando} = require('./lib/cli-ajuda.cjs');
 
 function calcularScoreAcao(arquivo) {
     return arquivo.linhasPerdidas + (arquivo.branchesPerdidos * 2) + (arquivo.complexidade * 0.5);
@@ -46,11 +47,19 @@ function imprimirResumo(arquivos) {
 async function main() {
     const args = process.argv.slice(2);
     if (args.includes('--help') || args.includes('-h')) {
-        console.log(`Uso: node backend/etc/scripts/cobertura-priorizar.cjs [opcoes]
-
-Opcoes:
-  --skip-run    Nao executa o Gradle; usa o ultimo relatorio JaCoCo disponivel
-  --help, -h    Exibe esta ajuda`);
+        exibirAjudaComando({
+            comandoSgc: 'cobertura priorizar',
+            scriptDireto: 'cobertura-priorizar.cjs',
+            descricao: 'Gera um ranking resumido das classes mais prioritarias para aumento de cobertura.',
+            opcoes: [
+                '--skip-run    Nao executa o Gradle; usa o ultimo relatorio JaCoCo disponivel',
+                '--help, -h    Exibe esta ajuda'
+            ],
+            exemplos: [
+                'node backend/etc/scripts/sgc.cjs cobertura priorizar',
+                'node backend/etc/scripts/sgc.cjs cobertura priorizar --skip-run'
+            ]
+        });
         process.exit(0);
     }
 

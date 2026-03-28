@@ -2,6 +2,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const {execFileSync} = require('node:child_process');
+const {exibirAjudaComando} = require('./lib/cli-ajuda.cjs');
 
 function resolveKeytool() {
     if (process.env.JAVA_HOME) {
@@ -32,10 +33,14 @@ function importarCertificado(keytoolBin, alias, certPath) {
 
 function main() {
     if (process.argv.includes('--help') || process.argv.includes('-h')) {
-        console.log(`Uso: node backend/etc/scripts/java-instalar-certificados.cjs
-
-Importa cert-tre.cer e cert-for.cer em cacerts usando keytool.
-Requer permissao para escrita no keystore da JVM.`);
+        exibirAjudaComando({
+            comandoSgc: 'java instalar-certificados',
+            scriptDireto: 'java-instalar-certificados.cjs',
+            descricao: 'Importa cert-tre.cer e cert-for.cer em cacerts usando keytool.',
+            exemplos: [
+                'node backend/etc/scripts/sgc.cjs java instalar-certificados'
+            ]
+        });
         process.exit(0);
     }
 

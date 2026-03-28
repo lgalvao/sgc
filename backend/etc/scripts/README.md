@@ -4,6 +4,21 @@ Este diretório reúne utilitários de análise, priorização e manutenção us
 
 O ponto de entrada recomendado agora é `node backend/etc/scripts/sgc.cjs`, que despacha os subcomandos de cobertura, testes e manutenção Java.
 
+## Uso rápido
+
+Use a `sgc.cjs` como entrada principal. Estes são os comandos mais úteis no dia a dia:
+
+```bash
+node backend/etc/scripts/sgc.cjs cobertura verificar --missed
+node backend/etc/scripts/sgc.cjs cobertura plano
+node backend/etc/scripts/sgc.cjs cobertura jornada
+node backend/etc/scripts/sgc.cjs testes analisar --dir backend --output analise-testes.md --output-json analise-testes.json
+node backend/etc/scripts/sgc.cjs testes priorizar --input analise-testes.json --output priorizacao-testes.md
+node backend/etc/scripts/sgc.cjs testes gerar-stub ProcessoService
+node backend/etc/scripts/sgc.cjs java corrigir-fqn --dry-run
+node backend/etc/scripts/sgc.cjs java auditar-null
+```
+
 ## Pré-requisitos
 
 - Executar os comandos a partir da raiz do repositório: `/Users/leonardo/sgc`, salvo quando indicado o contrário.
@@ -66,6 +81,8 @@ Comandos disponíveis:
 
 ## Scripts
 
+Os exemplos abaixo usam a `sgc.cjs` como forma canônica de execução. A chamada direta dos arquivos individuais continua disponível para depuração ou uso pontual.
+
 ### `cobertura-priorizar.cjs`
 
 Gera um diagnóstico resumido das classes com cobertura abaixo de 100%, calcula um `actionScore` por classe e grava um plano em Markdown.
@@ -77,8 +94,8 @@ Gera um diagnóstico resumido das classes com cobertura abaixo de 100%, calcula 
 Uso:
 
 ```bash
-node backend/etc/scripts/cobertura-priorizar.cjs
-node backend/etc/scripts/cobertura-priorizar.cjs --skip-run
+node backend/etc/scripts/sgc.cjs cobertura priorizar
+node backend/etc/scripts/sgc.cjs cobertura priorizar --skip-run
 ```
 
 Quando usar:
@@ -97,8 +114,8 @@ Lê o XML do JaCoCo e imprime uma tabela detalhada com métricas por arquivo: li
 Uso:
 
 ```bash
-node backend/etc/scripts/cobertura-analisar.cjs
-node backend/etc/scripts/cobertura-analisar.cjs --skip-run
+node backend/etc/scripts/sgc.cjs cobertura analisar
+node backend/etc/scripts/sgc.cjs cobertura analisar --skip-run
 ```
 
 Quando usar:
@@ -117,7 +134,7 @@ Analisa o CSV do JaCoCo e produz um ranking de classes mais complexas com base e
 Uso:
 
 ```bash
-node backend/etc/scripts/cobertura-complexidade.cjs
+node backend/etc/scripts/sgc.cjs cobertura complexidade
 ```
 
 Quando usar:
@@ -136,7 +153,7 @@ Varre `src/main/java` e `src/test/java`, tenta associar cada classe a arquivos d
 Uso:
 
 ```bash
-node backend/etc/scripts/testes-analisar.cjs --dir backend --output analise-testes.md --output-json analise-testes.json
+node backend/etc/scripts/sgc.cjs testes analisar --dir backend --output analise-testes.md --output-json analise-testes.json
 ```
 
 Quando usar:
@@ -156,7 +173,7 @@ Procura ocorrências de `== null` e `!= null` no código Java do backend, classi
 Uso:
 
 ```bash
-node backend/etc/scripts/java-auditar-null.cjs
+node backend/etc/scripts/sgc.cjs java auditar-null
 ```
 
 Quando usar:
@@ -180,7 +197,7 @@ Etapas executadas:
 Uso:
 
 ```bash
-node backend/etc/scripts/cobertura-jornada.cjs
+node backend/etc/scripts/sgc.cjs cobertura jornada
 ```
 
 Arquivos gerados ao longo do fluxo:
@@ -213,8 +230,8 @@ Regras relevantes:
 Uso:
 
 ```bash
-node backend/etc/scripts/java-corrigir-fqn.cjs
-node backend/etc/scripts/java-corrigir-fqn.cjs --dry-run
+node backend/etc/scripts/sgc.cjs java corrigir-fqn
+node backend/etc/scripts/sgc.cjs java corrigir-fqn --dry-run
 ```
 
 Quando usar:
@@ -233,7 +250,7 @@ Gera um plano de ação detalhado para atingir 100% de cobertura nas classes con
 Uso:
 
 ```bash
-node backend/etc/scripts/cobertura-plano.cjs
+node backend/etc/scripts/sgc.cjs cobertura plano
 ```
 
 Quando usar:
@@ -252,8 +269,8 @@ Cria um arquivo `CoverageTest` para uma classe alvo encontrada no XML do JaCoCo.
 Uso:
 
 ```bash
-node backend/etc/scripts/testes-gerar-stub.cjs NomeDaClasse
-node backend/etc/scripts/testes-gerar-stub.cjs sgc.modulo.servico.NomeDaClasse
+node backend/etc/scripts/sgc.cjs testes gerar-stub NomeDaClasse
+node backend/etc/scripts/sgc.cjs testes gerar-stub sgc.modulo.servico.NomeDaClasse
 ```
 
 Quando usar:
@@ -273,7 +290,7 @@ Arquivos esperados:
 Uso:
 
 ```bash
-node backend/etc/scripts/java-instalar-certificados.cjs
+node backend/etc/scripts/sgc.cjs java instalar-certificados
 ```
 
 Observações:
@@ -293,8 +310,8 @@ Recebe um relatório Markdown de classes sem teste e reorganiza os itens em prio
 Uso:
 
 ```bash
-node backend/etc/scripts/testes-priorizar.cjs --input analise-testes.json --output priorizacao-testes.md
-node backend/etc/scripts/testes-priorizar.cjs --input analise-testes.md --output priorizacao-testes.md
+node backend/etc/scripts/sgc.cjs testes priorizar --input analise-testes.json --output priorizacao-testes.md
+node backend/etc/scripts/sgc.cjs testes priorizar --input analise-testes.md --output priorizacao-testes.md
 ```
 
 Quando usar:
@@ -313,8 +330,8 @@ Gera um relatório orientado a lacunas de cobertura, considerando exclusões com
 Uso:
 
 ```bash
-node backend/etc/scripts/cobertura-lacunas.cjs
-node backend/etc/scripts/cobertura-lacunas.cjs --run
+node backend/etc/scripts/sgc.cjs cobertura lacunas
+node backend/etc/scripts/sgc.cjs cobertura lacunas --run
 ```
 
 Quando usar:
@@ -340,11 +357,11 @@ Opções disponíveis:
 Uso:
 
 ```bash
-node backend/etc/scripts/cobertura-verificar.cjs
-node backend/etc/scripts/cobertura-verificar.cjs sgc.subprocesso --min=95
-node backend/etc/scripts/cobertura-verificar.cjs --missed
-node backend/etc/scripts/cobertura-verificar.cjs --missed --simple
-node backend/etc/scripts/cobertura-verificar.cjs --fail-under=90
+node backend/etc/scripts/sgc.cjs cobertura verificar
+node backend/etc/scripts/sgc.cjs cobertura verificar sgc.subprocesso --min=95
+node backend/etc/scripts/sgc.cjs cobertura verificar --missed
+node backend/etc/scripts/sgc.cjs cobertura verificar --missed --simple
+node backend/etc/scripts/sgc.cjs cobertura verificar --fail-under=90
 ```
 
 Quando usar:
@@ -358,29 +375,29 @@ Quando usar:
 
 ```bash
 ./gradlew :backend:test :backend:jacocoTestReport
-node backend/etc/scripts/cobertura-verificar.cjs --missed
-node backend/etc/scripts/cobertura-analisar.cjs --skip-run
+node backend/etc/scripts/sgc.cjs cobertura verificar --missed
+node backend/etc/scripts/sgc.cjs cobertura analisar --skip-run
 ```
 
 ### Planejamento de aumento de cobertura
 
 ```bash
-node backend/etc/scripts/cobertura-lacunas.cjs --run
-node backend/etc/scripts/cobertura-plano.cjs
-node backend/etc/scripts/cobertura-priorizar.cjs --skip-run
+node backend/etc/scripts/sgc.cjs cobertura lacunas --run
+node backend/etc/scripts/sgc.cjs cobertura plano
+node backend/etc/scripts/sgc.cjs cobertura priorizar --skip-run
 ```
 
 ### Identificação e priorização de classes sem teste
 
 ```bash
-node backend/etc/scripts/testes-analisar.cjs --dir backend --output analise-testes.md --output-json analise-testes.json
-node backend/etc/scripts/testes-priorizar.cjs --input analise-testes.json --output priorizacao-testes.md
+node backend/etc/scripts/sgc.cjs testes analisar --dir backend --output analise-testes.md --output-json analise-testes.json
+node backend/etc/scripts/sgc.cjs testes priorizar --input analise-testes.json --output priorizacao-testes.md
 ```
 
 ### Geração inicial de stub de teste
 
 ```bash
-node backend/etc/scripts/testes-gerar-stub.cjs NomeDaClasse
+node backend/etc/scripts/sgc.cjs testes gerar-stub NomeDaClasse
 ```
 
 ## Observações finais

@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 const fs = require('node:fs');
 const path = require('node:path');
+const {exibirAjudaComando} = require('./lib/cli-ajuda.cjs');
 
 const TARGET_DIRS = ['src/test/java', 'src/main/java'];
 const PACKAGE_PREFIX = 'package ';
@@ -173,11 +174,19 @@ function parseArgs(argv) {
 function main() {
     const {dryRun, help} = parseArgs(process.argv.slice(2));
     if (help) {
-        console.log(`Uso: node backend/etc/scripts/java-corrigir-fqn.cjs [opcoes]
-
-Opcoes:
-  --dry-run     Apenas mostra os arquivos que seriam alterados
-  --help, -h    Exibe esta ajuda`);
+        exibirAjudaComando({
+            comandoSgc: 'java corrigir-fqn',
+            scriptDireto: 'java-corrigir-fqn.cjs',
+            descricao: 'Substitui nomes totalmente qualificados por imports em arquivos Java.',
+            opcoes: [
+                '--dry-run     Apenas mostra os arquivos que seriam alterados',
+                '--help, -h    Exibe esta ajuda'
+            ],
+            exemplos: [
+                'node backend/etc/scripts/sgc.cjs java corrigir-fqn --dry-run',
+                'node backend/etc/scripts/sgc.cjs java corrigir-fqn'
+            ]
+        });
         process.exit(0);
     }
 

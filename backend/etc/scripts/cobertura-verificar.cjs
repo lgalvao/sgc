@@ -3,6 +3,7 @@ const {
     coletarArquivosCobertura,
     lerRelatorioJacoco
 } = require('./lib/cobertura-base.cjs');
+const {exibirAjudaComando} = require('./lib/cli-ajuda.cjs');
 
 const args = process.argv.slice(2);
 const help = args.includes('--help') || args.includes('-h');
@@ -14,19 +15,24 @@ const failUnderArg = args.find(arg => arg.startsWith('--fail-under='))?.split('=
 const minCoverage = Number.parseFloat(minCovArg);
 
 if (help) {
-    console.log(`
-Uso: node backend/etc/scripts/cobertura-verificar.cjs [filtro] [opcoes]
-
-Argumentos:
-  [filtro]            Filtrar por nome de pacote ou classe (opcional)
-
-Opcoes:
-  --min=<n>           Filtrar classes com cobertura de linha menor que <n>% (padrao: 99)
-  --missed            Exibir detalhes das linhas e branches nao cobertos
-  --simple            Saida simplificada no modo --missed
-  --fail-under=<n>    Falhar (exit 1) se a cobertura global de instrucoes for inferior a <n>%
-  --help, -h          Exibir esta ajuda
-`);
+    exibirAjudaComando({
+        comandoSgc: 'cobertura verificar',
+        scriptDireto: 'cobertura-verificar.cjs',
+        descricao: 'Consulta a cobertura global e por classe, com filtros e modo detalhado.',
+        argumentos: '[filtro]',
+        opcoes: [
+            '--min=<n>           Filtra classes com cobertura de linha menor que <n>% (padrao: 99)',
+            '--missed            Exibe detalhes das linhas e branches nao cobertos',
+            '--simple            Saida simplificada no modo --missed',
+            '--fail-under=<n>    Falha (exit 1) se a cobertura global de instrucoes for inferior a <n>%',
+            '--help, -h          Exibe esta ajuda'
+        ],
+        exemplos: [
+            'node backend/etc/scripts/sgc.cjs cobertura verificar',
+            'node backend/etc/scripts/sgc.cjs cobertura verificar sgc.subprocesso --min=95',
+            'node backend/etc/scripts/sgc.cjs cobertura verificar --missed'
+        ]
+    });
     process.exit(0);
 }
 

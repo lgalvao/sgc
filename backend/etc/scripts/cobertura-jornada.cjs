@@ -3,6 +3,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const {execFileSync} = require('node:child_process');
 const {ROOT_DIR} = require('./lib/cobertura-base.cjs');
+const {exibirAjudaComando} = require('./lib/cli-ajuda.cjs');
 
 function runNodeScript(scriptName, args = [], options = {}) {
     return execFileSync('node', [path.join('backend/etc/scripts', scriptName), ...args], {
@@ -27,15 +28,14 @@ function printPreviewFromFile(filePath, lines = 50) {
 
 function main() {
     if (process.argv.includes('--help') || process.argv.includes('-h')) {
-        console.log(`Uso: node backend/etc/scripts/cobertura-jornada.cjs
-
-Executa a jornada completa de diagnostico de cobertura:
-1. testa e gera JaCoCo
-2. analisa cobertura
-3. gera lacunas
-4. gera plano de cobertura
-5. analisa classes sem testes
-6. prioriza backlog de testes`);
+        exibirAjudaComando({
+            comandoSgc: 'cobertura jornada',
+            scriptDireto: 'cobertura-jornada.cjs',
+            descricao: 'Executa a jornada completa de cobertura: JaCoCo, analise, lacunas, plano e backlog de testes.',
+            exemplos: [
+                'node backend/etc/scripts/sgc.cjs cobertura jornada'
+            ]
+        });
         process.exit(0);
     }
 
