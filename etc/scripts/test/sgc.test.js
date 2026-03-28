@@ -8,9 +8,29 @@ import {execaNode} from "execa";
 const DIRETORIO_RAIZ = path.resolve(import.meta.dirname, "..", "..", "..");
 const CAMINHO_SGC = path.join(DIRETORIO_RAIZ, "etc", "scripts", "sgc.js");
 const FIXTURE_SNAPSHOT = path.join(DIRETORIO_RAIZ, "etc", "scripts", "test", "fixtures", "qa", "snapshot.json");
+const CAMINHO_FRONTEND_COBERTURA_VERIFICAR = path.join(DIRETORIO_RAIZ, "etc", "scripts", "frontend", "cobertura-verificar.cjs");
+const CAMINHO_BACKEND_COBERTURA_VERIFICAR = path.join(DIRETORIO_RAIZ, "etc", "scripts", "backend", "cobertura-verificar.cjs");
+const DIRETORIO_SCRIPTS_BACKEND_LEGADO = path.join(DIRETORIO_RAIZ, "backend", "etc", "scripts");
+const DIRETORIO_SCRIPTS_FRONTEND_LEGADO = path.join(DIRETORIO_RAIZ, "frontend", "etc", "scripts");
 
 async function executarSgc(args, opcoes = {}) {
     return execaNode(CAMINHO_SGC, args, {
+        cwd: DIRETORIO_RAIZ,
+        reject: false,
+        ...opcoes
+    });
+}
+
+async function executarScriptFrontendCobertura(args, opcoes = {}) {
+    return execaNode(CAMINHO_FRONTEND_COBERTURA_VERIFICAR, args, {
+        cwd: DIRETORIO_RAIZ,
+        reject: false,
+        ...opcoes
+    });
+}
+
+async function executarScriptBackendCobertura(args, opcoes = {}) {
+    return execaNode(CAMINHO_BACKEND_COBERTURA_VERIFICAR, args, {
         cwd: DIRETORIO_RAIZ,
         reject: false,
         ...opcoes
@@ -40,10 +60,37 @@ describe("CLI raiz do toolkit", () => {
         expect(json.hotspots).toHaveLength(2);
     });
 
+    test("exibe ajuda de coleta de snapshot com opcao de perfil", async () => {
+        const resultado = await executarSgc(["qa", "snapshot", "coletar", "--help"]);
+        expect(resultado.exitCode).toBe(0);
+        expect(resultado.stdout).toContain("Perfil de execucao");
+        expect(resultado.stdout).toContain("rapido");
+    });
+
+    test("falha rapido para perfil invalido de snapshot", async () => {
+        const resultado = await executarSgc(["qa", "snapshot", "coletar", "--perfil", "inexistente"]);
+        expect(resultado.exitCode).toBe(1);
+        expect(resultado.stderr).toContain("Perfil invalido");
+    });
+
     test("despacha ajuda de um comando migrado do frontend", async () => {
         const resultado = await executarSgc(["frontend", "mensagens", "extrair", "--help"]);
         expect(resultado.exitCode).toBe(0);
         expect(resultado.stdout).toContain("Extrai mensagens do projeto.");
+    });
+
+    test("exibe ajuda padronizada no script frontend cobertura verificar", async () => {
+        const resultado = await executarScriptFrontendCobertura(["--help"]);
+        expect(resultado.exitCode).toBe(0);
+        expect(resultado.stdout).toContain("--json");
+        expect(resultado.stdout).toContain("--min=<n>");
+    });
+
+    test("exibe ajuda padronizada no script backend cobertura verificar", async () => {
+        const resultado = await executarScriptBackendCobertura(["--help"]);
+        expect(resultado.exitCode).toBe(0);
+        expect(resultado.stdout).toContain("--json");
+        expect(resultado.stdout).toContain("--fail-under=<n>");
     });
 
     test("despacha ajuda do servidor do qa dashboard", async () => {
@@ -82,5 +129,10 @@ describe("CLI raiz do toolkit", () => {
         expect(jsonExecucao.modo).toBe("executar");
         expect(await fs.pathExists(path.join(diretorioBase, "backend", "build"))).toBe(false);
         expect(await fs.pathExists(path.join(diretorioBase, "plano-100-cobertura.md"))).toBe(false);
+    });
+
+    test("nao possui diretorios legados de scripts em backend/frontend", async () => {
+        expect(await fs.pathExists(DIRETORIO_SCRIPTS_BACKEND_LEGADO)).toBe(false);
+        expect(await fs.pathExists(DIRETORIO_SCRIPTS_FRONTEND_LEGADO)).toBe(false);
     });
 });
