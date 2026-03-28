@@ -2,6 +2,10 @@
 import {Command} from "commander";
 import pc from "picocolors";
 import {executarNode} from "./lib/execucao.js";
+import {executarDoctor} from "./projeto/doctor.js";
+import {executarLimpeza} from "./projeto/limpar.js";
+import {PERFIS, executarPerfilQualidade} from "./projeto/qualidade.js";
+import {executarResumoQa} from "./qa/resumo.js";
 
 function criarComandoScript(pai, nome, descricao, relativo) {
     pai
@@ -69,10 +73,46 @@ criarComandoScript(frontendTelas, "capturar", "Captura telas para documentacao o
 const qa = program.command("qa").description("Ferramentas de qualidade e dashboard.");
 const qaSnapshot = qa.command("snapshot").description("Coleta e consolidacao de snapshots.");
 criarComandoScript(qaSnapshot, "coletar", "Coleta snapshot de QA.", "etc/qa-dashboard/scripts/coletar-snapshot.mjs");
+qa
+    .command("resumo")
+    .description("Resume o snapshot mais recente do QA Dashboard.")
+    .option("--arquivo <caminho>", "Usa um snapshot especifico em vez do latest.")
+    .option("--json", "Emite saida estruturada em JSON.")
+    .option("--max-hotspots <n>", "Limita a quantidade de hotspots exibidos.", Number.parseInt)
+    .action(async (opcoes) => {
+        await executarResumoQa(opcoes);
+    });
+
+const projeto = program.command("projeto").description("Ferramentas transversais do repositório.");
+projeto
+    .command("doctor")
+    .description("Valida comandos e arquivos essenciais do ambiente.")
+    .option("--json", "Emite saida estruturada em JSON.")
+    .option("--base <diretorio>", "Sobrescreve o diretório base para diagnostico.")
+    .action(async (opcoes) => {
+        await executarDoctor(opcoes);
+    });
+
+projeto
+    .command("limpar")
+    .description("Lista ou remove artefatos transientes de QA e do toolkit.")
+    .option("--json", "Emite saida estruturada em JSON.")
+    .option("--confirmar", "Remove de fato os artefatos elegiveis.")
+    .option("--base <diretorio>", "Sobrescreve o diretório base para limpeza.")
+    .action(async (opcoes) => {
+        await executarLimpeza(opcoes);
+    });
+
+projeto
+    .command("qualidade [perfil]")
+    .description("Executa os perfis consolidados de qualidade do projeto.")
+    .action(async (perfil = "rapido") => {
+        await executarPerfilQualidade(perfil);
+    });
 
 program.addHelpText(
     "after",
-    `\nExemplos:\n  ${pc.dim("node etc/scripts/sgc.js backend cobertura verificar --min=95")}\n  ${pc.dim("node etc/scripts/sgc.js backend testes analisar --dir backend --output analise-testes.md --output-json analise-testes.json")}\n  ${pc.dim("node etc/scripts/sgc.js frontend mensagens analisar")}\n  ${pc.dim("node etc/scripts/sgc.js qa snapshot coletar --perfil rapido")}`
+    `\nExemplos:\n  ${pc.dim("node etc/scripts/sgc.js backend cobertura verificar --min=95")}\n  ${pc.dim("node etc/scripts/sgc.js frontend mensagens analisar")}\n  ${pc.dim("node etc/scripts/sgc.js qa snapshot coletar --perfil rapido")}\n  ${pc.dim("node etc/scripts/sgc.js qa resumo")}\n  ${pc.dim("node etc/scripts/sgc.js projeto doctor --json")}\n  ${pc.dim(`node etc/scripts/sgc.js projeto qualidade rapido  # perfis: ${Object.keys(PERFIS).join(", ")}`)}`
 );
 
 try {
