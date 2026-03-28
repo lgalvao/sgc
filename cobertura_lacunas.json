@@ -1,0 +1,392 @@
+{
+  "globalLineCoverage": "98.91%",
+  "globalBranchCoverage": "91.26%",
+  "totalFilesWithGaps": 27,
+  "gaps": [
+    {
+      "class": "sgc.processo.service.ProcessoService",
+      "coverage": "96.63%",
+      "branchCoverage": "86.52%",
+      "missed": [
+        322,
+        517,
+        529,
+        530,
+        531,
+        533,
+        534,
+        536,
+        537,
+        538,
+        540
+      ],
+      "partial": [
+        "319(1/2)",
+        "357(1/2)",
+        "419(1/2)",
+        "441(1/2)",
+        "477(1/4)",
+        "480(1/2)",
+        "484(1/4)",
+        "486(1/2)",
+        "487(2/2)",
+        "490(3/8)",
+        "516(1/2)",
+        "526(2/4)",
+        "529(2/2)",
+        "533(2/2)",
+        "536(2/2)",
+        "570(1/2)",
+        "577(1/6)"
+      ],
+      "score": 23
+    },
+    {
+      "class": "sgc.subprocesso.service.SubprocessoTransicaoService",
+      "coverage": "98.36%",
+      "branchCoverage": "84.31%",
+      "missed": [
+        164,
+        165,
+        262,
+        263,
+        265,
+        271,
+        707
+      ],
+      "partial": [
+        "77(1/2)",
+        "83(1/2)",
+        "163(1/2)",
+        "228(1/4)",
+        "261(1/2)",
+        "262(2/2)",
+        "270(1/2)",
+        "284(1/2)",
+        "362(1/2)",
+        "486(1/2)",
+        "494(1/2)",
+        "525(1/2)",
+        "569(1/2)",
+        "675(1/4)",
+        "706(1/2)"
+      ],
+      "score": 15
+    },
+    {
+      "class": "sgc.subprocesso.service.SubprocessoService",
+      "coverage": "99.36%",
+      "branchCoverage": "90.91%",
+      "missed": [
+        313,
+        763,
+        882
+      ],
+      "partial": [
+        "312(1/2)",
+        "354(1/4)",
+        "373(1/2)",
+        "402(1/2)",
+        "417(1/2)",
+        "548(1/2)",
+        "593(1/4)",
+        "631(1/4)",
+        "632(1/6)",
+        "660(1/4)",
+        "675(1/2)",
+        "685(1/2)",
+        "760(1/3)",
+        "799(1/4)",
+        "826(2/2)",
+        "834(1/2)",
+        "842(1/2)",
+        "869(1/2)",
+        "870(1/2)",
+        "872(2/2)",
+        "881(1/2)"
+      ],
+      "score": 14.5
+    },
+    {
+      "class": "sgc.comum.erros.RestExceptionHandler",
+      "coverage": "92.77%",
+      "branchCoverage": "91.67%",
+      "missed": [
+        189,
+        190,
+        191,
+        193,
+        194,
+        195
+      ],
+      "partial": [
+        "53(1/4)"
+      ],
+      "score": 6.5
+    },
+    {
+      "class": "sgc.seguranca.login.LimitadorTentativasLogin",
+      "coverage": "94.83%",
+      "branchCoverage": "84.38%",
+      "missed": [
+        77,
+        100,
+        103
+      ],
+      "partial": [
+        "69(1/2)",
+        "74(1/2)",
+        "99(2/4)",
+        "102(1/2)"
+      ],
+      "score": 5.5
+    },
+    {
+      "class": "sgc.subprocesso.service.SubprocessoNotificacaoService",
+      "coverage": "98.77%",
+      "branchCoverage": "78.57%",
+      "missed": [
+        157
+      ],
+      "partial": [
+        "46(1/2)",
+        "51(1/2)",
+        "76(1/2)",
+        "123(1/2)",
+        "156(2/4)"
+      ],
+      "score": 4
+    },
+    {
+      "class": "sgc.organizacao.service.ResponsavelUnidadeService",
+      "coverage": "98.77%",
+      "branchCoverage": "68.75%",
+      "missed": [
+        158
+      ],
+      "partial": [
+        "69(1/2)",
+        "79(1/2)",
+        "134(1/2)",
+        "157(2/4)"
+      ],
+      "score": 3.5
+    },
+    {
+      "class": "sgc.organizacao.service.UnidadeHierarquiaService",
+      "coverage": "98.04%",
+      "branchCoverage": "93.75%",
+      "missed": [
+        166,
+        240
+      ],
+      "partial": [
+        "165(1/2)",
+        "183(1/4)",
+        "239(1/2)"
+      ],
+      "score": 3.5
+    },
+    {
+      "class": "sgc.alerta.EmailService",
+      "coverage": "94.29%",
+      "branchCoverage": "100.00%",
+      "missed": [
+        62,
+        63
+      ],
+      "partial": [],
+      "score": 2
+    },
+    {
+      "class": "sgc.processo.painel.PainelFacade",
+      "coverage": "100.00%",
+      "branchCoverage": "92.31%",
+      "missed": [],
+      "partial": [
+        "154(2/4)",
+        "165(1/4)",
+        "190(1/4)"
+      ],
+      "score": 2
+    },
+    {
+      "class": "sgc.seguranca.dto.UsuarioAcessoAd",
+      "coverage": "0.00%",
+      "branchCoverage": "100.00%",
+      "missed": [
+        14,
+        26
+      ],
+      "partial": [],
+      "score": 2
+    },
+    {
+      "class": "sgc.mapa.service.CopiaMapaService",
+      "coverage": "98.82%",
+      "branchCoverage": "96.15%",
+      "missed": [
+        105
+      ],
+      "partial": [
+        "104(1/2)"
+      ],
+      "score": 1.5
+    },
+    {
+      "class": "sgc.mapa.service.MapaManutencaoService",
+      "coverage": "100.00%",
+      "branchCoverage": "83.33%",
+      "missed": [],
+      "partial": [
+        "133(1/2)",
+        "150(1/2)",
+        "289(1/2)"
+      ],
+      "score": 1.5
+    },
+    {
+      "class": "sgc.seguranca.SgcPermissionEvaluator",
+      "coverage": "100.00%",
+      "branchCoverage": "95.59%",
+      "missed": [],
+      "partial": [
+        "115(1/4)",
+        "190(1/2)",
+        "203(1/2)"
+      ],
+      "score": 1.5
+    },
+    {
+      "class": "sgc.organizacao.UnidadeController",
+      "coverage": "100.00%",
+      "branchCoverage": "50.00%",
+      "missed": [],
+      "partial": [
+        "60(2/4)"
+      ],
+      "score": 1
+    },
+    {
+      "class": "sgc.seguranca.LoginFacade",
+      "coverage": "100.00%",
+      "branchCoverage": "90.91%",
+      "missed": [],
+      "partial": [
+        "83(1/2)",
+        "116(1/2)"
+      ],
+      "score": 1
+    },
+    {
+      "class": "sgc.alerta.AlertaFacade",
+      "coverage": "100.00%",
+      "branchCoverage": "97.50%",
+      "missed": [],
+      "partial": [
+        "45(1/2)"
+      ],
+      "score": 0.5
+    },
+    {
+      "class": "sgc.mapa.service.ImpactoMapaService",
+      "coverage": "100.00%",
+      "branchCoverage": "98.15%",
+      "missed": [],
+      "partial": [
+        "81(1/2)"
+      ],
+      "score": 0.5
+    },
+    {
+      "class": "sgc.mapa.service.MapaSalvamentoService",
+      "coverage": "100.00%",
+      "branchCoverage": "97.22%",
+      "missed": [],
+      "partial": [
+        "148(1/2)"
+      ],
+      "score": 0.5
+    },
+    {
+      "class": "sgc.organizacao.service.HierarquiaService",
+      "coverage": "100.00%",
+      "branchCoverage": "90.00%",
+      "missed": [],
+      "partial": [
+        "27(1/2)"
+      ],
+      "score": 0.5
+    },
+    {
+      "class": "sgc.organizacao.UsuarioController",
+      "coverage": "100.00%",
+      "branchCoverage": "75.00%",
+      "missed": [],
+      "partial": [
+        "58(1/4)"
+      ],
+      "score": 0.5
+    },
+    {
+      "class": "sgc.organizacao.UsuarioFacade",
+      "coverage": "100.00%",
+      "branchCoverage": "93.75%",
+      "missed": [],
+      "partial": [
+        "46(1/6)"
+      ],
+      "score": 0.5
+    },
+    {
+      "class": "sgc.seguranca.login.ClienteAcessoAdE2e",
+      "coverage": "100.00%",
+      "branchCoverage": "75.00%",
+      "missed": [],
+      "partial": [
+        "19(1/2)"
+      ],
+      "score": 0.5
+    },
+    {
+      "class": "sgc.seguranca.login.GerenciadorJwt",
+      "coverage": "100.00%",
+      "branchCoverage": "94.44%",
+      "missed": [],
+      "partial": [
+        "34(1/4)"
+      ],
+      "score": 0.5
+    },
+    {
+      "class": "sgc.seguranca.login.LoginController",
+      "coverage": "100.00%",
+      "branchCoverage": "95.00%",
+      "missed": [],
+      "partial": [
+        "104(1/2)"
+      ],
+      "score": 0.5
+    },
+    {
+      "class": "sgc.subprocesso.model.Subprocesso",
+      "coverage": "100.00%",
+      "branchCoverage": "95.45%",
+      "missed": [],
+      "partial": [
+        "70(1/2)"
+      ],
+      "score": 0.5
+    },
+    {
+      "class": "sgc.subprocesso.service.SubprocessoValidacaoService",
+      "coverage": "100.00%",
+      "branchCoverage": "98.21%",
+      "missed": [],
+      "partial": [
+        "104(1/4)"
+      ],
+      "score": 0.5
+    }
+  ]
+}

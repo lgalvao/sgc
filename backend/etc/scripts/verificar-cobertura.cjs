@@ -1,239 +1,138 @@
-const fs = require('fs');
-const path = require('path');
-const xml2js = require('xml2js');
+const {
+    calcularPercentual,
+    coletarArquivosCobertura,
+    lerRelatorioJacoco
+} = require('./lib/cobertura-base.cjs');
 
-// Configuração
-const REPORT_PATH = path.join(__dirname, '../../build/reports/jacoco/test/jacocoTestReport.xml');
-
-// Args parsing
 const args = process.argv.slice(2);
 const help = args.includes('--help') || args.includes('-h');
-const filterArg = args.find(a => !a.startsWith('-')) || null;
-const minCovArg = args.find(a => a.startsWith('--min='))?.split('=')[1] || '99';
+const filterArg = args.find(arg => !arg.startsWith('-')) || null;
+const minCovArg = args.find(arg => arg.startsWith('--min='))?.split('=')[1] || '99';
 const showMissed = args.includes('--missed') || args.includes('--details');
 const simpleMode = args.includes('--simple');
-
-const failUnderArg = args.find(a => a.startsWith('--fail-under='))?.split('=')[1] || null;
+const failUnderArg = args.find(arg => arg.startsWith('--fail-under='))?.split('=')[1] || null;
+const minCoverage = Number.parseFloat(minCovArg);
 
 if (help) {
     console.log(`
-Uso: node scripts/backend/check-coverage.js [filtro] [opções]
+Uso: node backend/etc/scripts/verificar-cobertura.cjs [filtro] [opcoes]
 
 Argumentos:
-  [filtro]       Filtrar por nome de pacote ou classe (opcional)
+  [filtro]            Filtrar por nome de pacote ou classe (opcional)
 
-Opções:
-  --min=<n>      Filtrar classes com cobertura de linha menor que <n>% (Padrão: 99)
-  --missed       Exibir detalhes das linhas e branches não cobertos (Ranking de perdidos)
-  --simple       Saída simplificada (apenas classe e linhas/branches perdidas)
-  --fail-under=<n> Falhar (exit 1) se a cobertura global de instruções for inferior a <n>%
-  --help, -h     Exibir esta ajuda
+Opcoes:
+  --min=<n>           Filtrar classes com cobertura de linha menor que <n>% (padrao: 99)
+  --missed            Exibir detalhes das linhas e branches nao cobertos
+  --simple            Saida simplificada no modo --missed
+  --fail-under=<n>    Falhar (exit 1) se a cobertura global de instrucoes for inferior a <n>%
+  --help, -h          Exibir esta ajuda
 `);
     process.exit(0);
 }
 
-const MIN_COVERAGE = parseFloat(minCovArg);
-
-function calculatePercentage(covered, missed) {
-    const total = covered + missed;
-    if (total === 0) return 0.0;
-    return (covered / total) * 100;
-}
-
-function getCounters(element) {
-    const counters = {};
-    if (element.counter) {
-        element.counter.forEach(c => {
-            counters[c.$.type] = {
-                covered: parseInt(c.$.covered, 10),
-                missed: parseInt(c.$.missed, 10)
-            };
-        });
-    }
-    return counters;
-}
-
-async function parseXml(filePath) {
-    const parser = new xml2js.Parser();
-    const data = fs.readFileSync(filePath);
-    return parser.parseStringPromise(data);
-}
-
-function processPackage(pkg, filter) {
-    const pkgName = pkg.$.name.replaceAll('/', '.');
-    if (filter && !pkgName.includes(filter)) return null;
-
-    const metrics = getCounters(pkg);
-    const classes = [];
-
-    if (pkg.class) {
-        pkg.class.forEach(cls => {
-            const clsName = cls.$.name.replace(/\//g, '.');
-            if (filter && !clsName.includes(filter)) return;
-
-            const cMetrics = getCounters(cls);
-            if (cMetrics.LINE) {
-                // Extrair linhas perdidas se necessário
-            }
-
-            classes.push({
-                name: clsName,
-                metrics: cMetrics,
-                lineCoverage: cMetrics.LINE ? calculatePercentage(cMetrics.LINE.covered, cMetrics.LINE.missed) : 100,
-                branchCoverage: cMetrics.BRANCH ? calculatePercentage(cMetrics.BRANCH.covered, cMetrics.BRANCH.missed) : 100,
-                missedLinesCount: cMetrics.LINE ? cMetrics.LINE.missed : 0,
-                missedBranchesCount: cMetrics.BRANCH ? cMetrics.BRANCH.missed : 0
-            });
-        });
-    }
-
-    return {name: pkgName, metrics, classes};
-}
-
-// Para modo detalhado (missed lines), precisamos iterar sourcefiles
-function processSourceFiles(pkg, filter) {
-    const pkgName = pkg.$.name.replace(/\//g, '.');
-    const results = [];
-
-    if (pkg.sourcefile) {
-        pkg.sourcefile.forEach(sf => {
-            const fileName = sf.$.name;
-            const fullPath = `${pkgName}.${fileName}`;
-
-            if (filter && !fullPath.includes(filter)) return;
-
-            const missedLines = [];
-            const partialLines = [];
-
-            if (sf.line) {
-                sf.line.forEach(line => {
-                    const nr = line.$.nr;
-                    const ci = parseInt(line.$.ci || 0, 10);
-                    const mb = parseInt(line.$.mb || 0, 10);
-                    const cb = parseInt(line.$.cb || 0, 10);
-
-                    if (ci === 0) {
-                        missedLines.push(nr);
-                    } else if (mb > 0) {
-                        partialLines.push(`${nr}(${mb}/${mb + cb})`);
-                    }
-                });
-            }
-
-            const weight = missedLines.length + (partialLines.length * 0.5);
-            if (weight > 0) {
-                results.push({
-                    file: fullPath,
-                    missed: missedLines,
-                    partial: partialLines,
-                    weight
-                });
-            }
-        });
-    }
-    return results;
-}
-
 async function main() {
-    if (!fs.existsSync(REPORT_PATH)) {
-        console.error(`Erro: Arquivo ${REPORT_PATH} não encontrado.`);
-        console.error("Execute 'gradle test jacocoTestReport' primeiro.");
-        process.exit(1);
-    }
+    const relatorio = await lerRelatorioJacoco();
+    const coleta = coletarArquivosCobertura(relatorio, {
+        incluirSemLacunas: true,
+        aplicarExclusoes: false,
+        filtro: filterArg
+    });
 
-    const result = await parseXml(REPORT_PATH);
-    const root = result.report;
-
-    console.log("\n" + "=".repeat(100));
-    console.log(`RELATÓRIO DE COBERTURA JACOCO`.padStart(65));
-    console.log("=".repeat(100));
+    console.log(`\n${'='.repeat(100)}`);
+    console.log('RELATORIO DE COBERTURA JACOCO'.padStart(65));
+    console.log('='.repeat(100));
 
     if (showMissed) {
-        let allMissed = [];
-        if (root.package) {
-            root.package.forEach(pkg => {
-                allMissed = allMissed.concat(processSourceFiles(pkg, filterArg));
+        const comLacunas = coleta.arquivos
+            .filter(arquivo => arquivo.linhasPerdidas > 0 || arquivo.branchesPerdidos > 0)
+            .sort((a, b) => {
+                const scoreA = a.linhasPerdidas + (a.branchesPerdidos * 0.5);
+                const scoreB = b.linhasPerdidas + (b.branchesPerdidos * 0.5);
+                return scoreB - scoreA || a.nomeClasse.localeCompare(b.nomeClasse, 'pt-BR');
             });
-        }
 
-        allMissed.sort((a, b) => b.weight - a.weight);
+        console.log(`\nARQUIVOS COM MAIS LINHAS/BRANCHES PERDIDAS (Total: ${comLacunas.length})\n`);
 
-        console.log(`\n ARQUIVOS COM MAIS LINHAS/BRANCHES PERDIDAS (Total: ${allMissed.length})\n`);
-
-        allMissed.slice(0, 50).forEach(r => {
+        comLacunas.slice(0, 50).forEach(arquivo => {
+            const nomeArquivo = `${arquivo.nomePacote}.${arquivo.nomeArquivo}`;
             if (simpleMode) {
-                console.log(`${r.file}: MISS-L [${r.missed.join(',')}] MISS-B [${r.partial.join(',')}]`);
-            } else {
-                console.log(`📄 ${r.file}`);
-                if (r.missed.length) console.log(`   🔴 Linhas não executadas: ${r.missed.join(', ')}`);
-                if (r.partial.length) console.log(`   🟡 Branches perdidos (miss/total): ${r.partial.join(', ')}`);
-                console.log("-".repeat(50));
+                console.log(`${nomeArquivo}: MISS-L [${arquivo.linhasPerdidasLista.join(',')}] MISS-B [${arquivo.branchesPerdidosLista.join(',')}]`);
+                return;
             }
-        });
 
-    } else {
-        // Modo Tabela (substitui check_coverage.py)
-        const globalCounters = getCounters(root);
-
-        if (globalCounters.INSTRUCTION) {
-            const inst = globalCounters.INSTRUCTION;
-            const line = globalCounters.LINE || {covered: 0, missed: 0};
-            const pInst = calculatePercentage(inst.covered, inst.missed);
-            const pLine = calculatePercentage(line.covered, line.missed);
-            const totalInst = inst.covered + inst.missed;
-
-            console.log(`| ${'TOTAL DO PROJETO'.padEnd(45)} | ${pInst.toFixed(2).padStart(8)}% | ${pLine.toFixed(2).padStart(8)}% | ${inst.covered.toString().padStart(10)} | ${totalInst.toString().padStart(10)} |`);
-        }
-        console.log("=".repeat(100) + "\n");
-
-        if (globalCounters.BRANCH) {
-            const b = globalCounters.BRANCH;
-            const percB = calculatePercentage(b.covered, b.missed);
-            console.log(`Cobertura de Branches (Global): ${percB.toFixed(2)}% (${b.covered}/${b.covered + b.missed})`);
-        }
-
-        console.log("\nDETALHE POR CLASSE (Filtrado por < " + MIN_COVERAGE + "%)\n");
-        console.log(`| ${'Classe'.padEnd(60)} | ${'Linhas %'.padEnd(10)} | ${'Missed L'.padEnd(10)} | ${'Branches %'.padEnd(10)} | ${'Missed B'.padEnd(10)} |`);
-        console.log("-".repeat(115));
-
-        let lowCovClasses = [];
-        if (root.package) {
-            root.package.forEach(pkg => {
-                const pkgResult = processPackage(pkg, filterArg);
-                if (pkgResult) {
-                    lowCovClasses = lowCovClasses.concat(pkgResult.classes);
-                }
-            });
-        }
-
-        // Filtra e ordena
-        lowCovClasses = lowCovClasses.filter(c => c.lineCoverage < MIN_COVERAGE);
-        lowCovClasses.sort((a, b) => b.missedBranchesCount - a.missedBranchesCount || b.missedLinesCount - a.missedLinesCount);
-
-        lowCovClasses.slice(0, 20).forEach(c => {
-            const branchStr = c.metrics.BRANCH ? c.branchCoverage.toFixed(2) + '%' : 'N/A';
-            console.log(`| ${c.name.padEnd(60)} | ${c.lineCoverage.toFixed(2).padStart(8)}% | ${c.missedLinesCount.toString().padStart(10)} | ${branchStr.padStart(10)} | ${c.missedBranchesCount.toString().padStart(10)} |`);
-        });
-
-        if (lowCovClasses.length === 0) {
-            console.log("Nenhuma classe abaixo do limite de cobertura encontrado.");
-        } else if (lowCovClasses.length > 20) {
-            console.log(`\n... e mais ${lowCovClasses.length - 20} classes.`);
-        }
-
-        if (failUnderArg) {
-            const globalCounters = getCounters(root);
-            const inst = globalCounters.INSTRUCTION;
-            const actual = calculatePercentage(inst.covered, inst.missed);
-            const target = parseFloat(failUnderArg);
-            if (actual < target) {
-                console.error(`\n❌ ERRO: Cobertura global (${actual.toFixed(2)}%) abaixo do esperado (${target.toFixed(2)}%).`);
-                process.exit(1);
-            } else {
-                console.log(`\n✅ Cobertura global (${actual.toFixed(2)}%) atingiu a meta (${target.toFixed(2)}%).`);
+            console.log(`${nomeArquivo}`);
+            if (arquivo.linhasPerdidasLista.length > 0) {
+                console.log(`   Linhas nao executadas: ${arquivo.linhasPerdidasLista.join(', ')}`);
             }
+            if (arquivo.branchesPerdidosLista.length > 0) {
+                console.log(`   Branches perdidos (miss/total): ${arquivo.branchesPerdidosLista.join(', ')}`);
+            }
+            console.log('-'.repeat(50));
+        });
+        return;
+    }
+
+    const contadoresGlobais = relatorio.report.counter || [];
+    const contadorInstrucao = contadoresGlobais.find(contador => contador.$.type === 'INSTRUCTION');
+    const contadorLinha = contadoresGlobais.find(contador => contador.$.type === 'LINE');
+    const contadorBranch = contadoresGlobais.find(contador => contador.$.type === 'BRANCH');
+
+    if (contadorInstrucao) {
+        const instrucoesCobertas = Number.parseInt(contadorInstrucao.$.covered || 0, 10);
+        const instrucoesPerdidas = Number.parseInt(contadorInstrucao.$.missed || 0, 10);
+        const linhasCobertas = Number.parseInt(contadorLinha?.$.covered || 0, 10);
+        const linhasPerdidas = Number.parseInt(contadorLinha?.$.missed || 0, 10);
+        const percentualInstrucao = calcularPercentual(instrucoesCobertas, instrucoesPerdidas);
+        const percentualLinha = calcularPercentual(linhasCobertas, linhasPerdidas);
+        const totalInstrucoes = instrucoesCobertas + instrucoesPerdidas;
+
+        console.log(`| ${'TOTAL DO PROJETO'.padEnd(45)} | ${percentualInstrucao.toFixed(2).padStart(8)}% | ${percentualLinha.toFixed(2).padStart(8)}% | ${String(instrucoesCobertas).padStart(10)} | ${String(totalInstrucoes).padStart(10)} |`);
+    }
+
+    console.log(`${'='.repeat(100)}\n`);
+
+    if (contadorBranch) {
+        const branchesCobertos = Number.parseInt(contadorBranch.$.covered || 0, 10);
+        const branchesPerdidos = Number.parseInt(contadorBranch.$.missed || 0, 10);
+        const percentualBranch = calcularPercentual(branchesCobertos, branchesPerdidos);
+        console.log(`Cobertura de Branches (Global): ${percentualBranch.toFixed(2)}% (${branchesCobertos}/${branchesCobertos + branchesPerdidos})`);
+    }
+
+    console.log(`\nDETALHE POR CLASSE (Filtrado por < ${minCoverage}%)\n`);
+    console.log(`| ${'Classe'.padEnd(60)} | ${'Linhas %'.padEnd(10)} | ${'Missed L'.padEnd(10)} | ${'Branches %'.padEnd(10)} | ${'Missed B'.padEnd(10)} |`);
+    console.log('-'.repeat(115));
+
+    const filtrados = coleta.arquivos
+        .filter(arquivo => arquivo.coberturaLinhas < minCoverage)
+        .sort((a, b) => b.branchesPerdidos - a.branchesPerdidos || b.linhasPerdidas - a.linhasPerdidas);
+
+    filtrados.slice(0, 20).forEach(arquivo => {
+        const branchStr = arquivo.totalBranches > 0 ? `${arquivo.coberturaBranches.toFixed(2)}%` : 'N/A';
+        console.log(`| ${arquivo.nomeClasse.padEnd(60)} | ${arquivo.coberturaLinhas.toFixed(2).padStart(8)}% | ${String(arquivo.linhasPerdidas).padStart(10)} | ${branchStr.padStart(10)} | ${String(arquivo.branchesPerdidos).padStart(10)} |`);
+    });
+
+    if (filtrados.length === 0) {
+        console.log('Nenhuma classe abaixo do limite de cobertura encontrado.');
+    } else if (filtrados.length > 20) {
+        console.log(`\n... e mais ${filtrados.length - 20} classes.`);
+    }
+
+    if (failUnderArg && contadorInstrucao) {
+        const instrucoesCobertas = Number.parseInt(contadorInstrucao.$.covered || 0, 10);
+        const instrucoesPerdidas = Number.parseInt(contadorInstrucao.$.missed || 0, 10);
+        const coberturaAtual = calcularPercentual(instrucoesCobertas, instrucoesPerdidas);
+        const meta = Number.parseFloat(failUnderArg);
+
+        if (coberturaAtual < meta) {
+            console.error(`\nERRO: Cobertura global (${coberturaAtual.toFixed(2)}%) abaixo do esperado (${meta.toFixed(2)}%).`);
+            process.exit(1);
         }
+
+        console.log(`\nCobertura global (${coberturaAtual.toFixed(2)}%) atingiu a meta (${meta.toFixed(2)}%).`);
     }
 }
 
-main().catch(err => console.error(err));
+main().catch(error => {
+    console.error(`Erro ao verificar cobertura: ${error.message}`);
+    process.exit(1);
+});

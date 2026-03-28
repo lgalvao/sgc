@@ -1,153 +1,64 @@
 const fs = require('node:fs');
-const path = require('node:path');
-const {execSync} = require('node:child_process');
-const xml2js = require('xml2js');
-
-// Configuração
-const BASE_DIR = path.join(__dirname, '../../');
-const REPORT_PATH = path.join(BASE_DIR, 'build/reports/jacoco/test/jacocoTestReport.xml');
-const isWindows = process.platform === 'win32';
-const GRADLE_CMD = isWindows ? 'gradlew.bat :backend:jacocoTestReport' : './gradlew :backend:jacocoTestReport';
-
-async function parseXml(filePath) {
-    const data = fs.readFileSync(filePath);
-    const parser = new xml2js.Parser();
-    return parser.parseStringPromise(data);
-}
-
-function calculatePercentage(covered, missed) {
-    const total = covered + missed;
-    return total === 0 ? 100 : (covered / total) * 100;
-}
-
-async function runCoverage() {
-    console.log('🚀 Executando :backend:jacocoTestReport...');
-    try {
-        execSync(GRADLE_CMD, {cwd: BASE_DIR, stdio: 'inherit'});
-    } catch {
-        console.warn('⚠️ Gradle terminou com avisos/erros (testes falhando?), mas prosseguindo para análise do relatório.');
-    }
-}
+const {
+    LACUNAS_JSON_PATH,
+    coletarArquivosCobertura,
+    executarGradleJaCoCo,
+    lerRelatorioJacoco,
+    ordenarPorLacunas
+} = require('./lib/cobertura-base.cjs');
 
 async function main() {
     if (process.argv.includes('--run')) {
-        await runCoverage();
+        console.log('Executando :backend:jacocoTestReport...');
+        try {
+            executarGradleJaCoCo();
+        } catch (error) {
+            console.warn(`Gradle terminou com erro. Tentando continuar com o ultimo relatorio disponivel: ${error.message}`);
+        }
     }
 
-    if (!fs.existsSync(REPORT_PATH)) {
-        console.error(`❌ Relatório não encontrado: ${REPORT_PATH}`);
-        console.error("💡 Execute './gradlew :backend:test :backend:jacocoTestReport' primeiro para gerar o relatório.");
-        process.exit(1);
-    }
-
-    const report = await parseXml(REPORT_PATH);
-    const packages = report.report.package || [];
-
-    const results = [];
-    let totalLines = 0;
-    let coveredLines = 0;
-
-    // Exclusions matching build.gradle.kts jacocoTestReport configuration
-    const EXCLUSION_PATTERNS = [
-        /MapperImpl/,
-        /\.Sgc$/,
-        /Config$/,
-        /Properties$/,
-        /Dto$/,
-        /Request$/,
-        /Response$/,
-        /\.Erro/,
-        /Repo$/,
-        // Simple entities without business logic - match class names ending with these
-        /\.model\.(Usuario|Unidade|Administrador|Vinculacao|Atribuicao|Parametro|Movimentacao|Analise|Alerta|Conhecimento|Mapa|Atividade|Competencia|Notificacao|Processo|Perfil)$/,
-        // Also match if they have Builder suffix (Lombok generated)
-        /Builder$/,
-        /BuilderImpl$/,
-        // Simple enums - match Status or Tipo anywhere in name
-        /\.Status/,
-        /\.Tipo/
-    ];
-
-    function shouldExclude(className) {
-        return EXCLUSION_PATTERNS.some(pattern => pattern.test(className));
-    }
-
-    packages.forEach(pkg => {
-        const packageName = pkg.$.name.replace(/\//g, '.');
-        const sourceFiles = pkg.sourcefile || [];
-
-        sourceFiles.forEach(sf => {
-            const fileName = sf.$.name;
-            const className = `${packageName}.${fileName.replace('.java', '')}`;
-
-            // Skip excluded classes
-            if (shouldExclude(className)) {
-                return;
-            }
-
-            let linesTotal = 0;
-            let linesCovered = 0;
-            const missedLines = [];
-            const partialBranches = [];
-
-            if (sf.line) {
-                sf.line.forEach(line => {
-                    const nr = parseInt(line.$.nr);
-                    const ci = parseInt(line.$.ci);
-                    const mb = parseInt(line.$.mb || 0);
-                    const cb = parseInt(line.$.cb || 0);
-
-                    linesTotal++;
-                    if (ci > 0) {
-                        linesCovered++;
-                        if (mb > 0) partialBranches.push(`${nr}(${mb}/${mb + cb})`);
-                    } else {
-                        missedLines.push(nr);
-                    }
-                });
-            }
-
-            totalLines += linesTotal;
-            coveredLines += linesCovered;
-
-            if (linesCovered < linesTotal || partialBranches.length > 0) {
-                results.push({
-                    class: className,
-                    coverage: calculatePercentage(linesCovered, linesTotal - linesCovered).toFixed(2) + '%',
-                    missed: missedLines,
-                    partial: partialBranches,
-                    score: (linesTotal - linesCovered) + (partialBranches.length * 0.5)
-                });
-            }
-        });
+    const relatorio = await lerRelatorioJacoco();
+    const {arquivos, totais} = coletarArquivosCobertura(relatorio, {
+        incluirSemLacunas: false,
+        aplicarExclusoes: true
     });
+    const ordenados = ordenarPorLacunas(arquivos);
 
-    // Ordenar por "gravidade" (mais linhas/branches perdidas primeiro)
-    results.sort((a, b) => b.score - a.score);
-
-    const summary = {
-        globalLineCoverage: calculatePercentage(coveredLines, totalLines - coveredLines).toFixed(2) + '%',
-        totalFilesWithGaps: results.length,
-        gaps: results
+    const resumo = {
+        globalLineCoverage: `${totais.coberturaGlobalLinhas.toFixed(2)}%`,
+        globalBranchCoverage: `${totais.coberturaGlobalBranches.toFixed(2)}%`,
+        totalFilesWithGaps: ordenados.length,
+        gaps: ordenados.map(arquivo => ({
+            class: arquivo.nomeClasse,
+            coverage: `${arquivo.coberturaLinhas.toFixed(2)}%`,
+            branchCoverage: `${arquivo.coberturaBranches.toFixed(2)}%`,
+            missed: arquivo.linhasPerdidasLista,
+            partial: arquivo.branchesPerdidosLista,
+            score: arquivo.linhasPerdidas + (arquivo.branchesPerdidos * 0.5)
+        }))
     };
 
-    fs.writeFileSync(path.join(BASE_DIR, 'cobertura_lacunas.json'), JSON.stringify(summary, null, 2));
+    fs.writeFileSync(LACUNAS_JSON_PATH, JSON.stringify(resumo, null, 2), 'utf-8');
 
-    console.log('\n📊 RELATÓRIO DE LACUNAS DE COBERTURA (Objetivo: 100%)');
-    console.log(`Cobertura Global de Linhas: ${summary.globalLineCoverage}`);
-    console.log(`Arquivos com lacunas: ${summary.totalFilesWithGaps}`);
+    console.log('\nRELATORIO DE LACUNAS DE COBERTURA');
+    console.log(`Cobertura Global de Linhas: ${resumo.globalLineCoverage}`);
+    console.log(`Cobertura Global de Branches: ${resumo.globalBranchCoverage}`);
+    console.log(`Arquivos com lacunas: ${resumo.totalFilesWithGaps}`);
 
-    results.forEach(r => {
-        console.log(`\n📄 ${r.class} [${r.coverage}]`);
-        if (r.missed.length > 0) {
-            console.log(`   🔴 Linhas perdidas: ${r.missed.join(', ')}`);
+    ordenados.forEach(arquivo => {
+        console.log(`\n${arquivo.nomeClasse} [${arquivo.coberturaLinhas.toFixed(2)}%]`);
+        if (arquivo.linhasPerdidasLista.length > 0) {
+            console.log(`   Linhas perdidas: ${arquivo.linhasPerdidasLista.join(', ')}`);
         }
-        if (r.partial.length > 0) {
-            console.log(`   🟡 Branches parciais: ${r.partial.join(', ')}`);
+        if (arquivo.branchesPerdidosLista.length > 0) {
+            console.log(`   Branches parciais: ${arquivo.branchesPerdidosLista.join(', ')}`);
         }
     });
 
-    console.log('\n✅ Relatório completo salvo em: cobertura_lacunas.json\n');
+    console.log(`\nRelatorio completo salvo em: ${LACUNAS_JSON_PATH}\n`);
 }
 
-main().catch(console.error);
+main().catch(error => {
+    console.error(`Erro ao gerar relatorio de lacunas: ${error.message}`);
+    process.exit(1);
+});

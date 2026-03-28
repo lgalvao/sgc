@@ -24,6 +24,7 @@ import static org.mockito.Mockito.*;
 import static sgc.processo.model.AcaoProcesso.*;
 import static sgc.processo.model.SituacaoProcesso.*;
 import static sgc.processo.model.TipoProcesso.*;
+import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("ProcessoService - Cobertura de Testes")
@@ -128,5 +129,156 @@ class ProcessoServiceCoverageTest {
 
         assertThatThrownBy(() -> target.executarAcaoEmBloco(codProcesso, req))
                 .isInstanceOf(ErroValidacao.class);
+    }
+
+    @Test
+    @DisplayName("enviarLembrete deve lançar IllegalStateException quando processo não tem data limite")
+    void enviarLembreteSemDataLimite() {
+        Long codProcesso = 1L;
+        Long unidadeCodigo = 10L;
+        Processo p = new Processo();
+        UnidadeProcesso up = new UnidadeProcesso();
+        up.setUnidadeCodigo(unidadeCodigo);
+        p.setParticipantes(new ArrayList<>(List.of(up)));
+        
+        when(processoRepo.buscarPorCodigoComParticipantes(codProcesso)).thenReturn(Optional.of(p));
+        when(unidadeService.buscarPorCodigo(unidadeCodigo)).thenReturn(new Unidade());
+
+        assertThatThrownBy(() -> target.enviarLembrete(codProcesso, unidadeCodigo))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("sem data limite");
+    }
+
+    @Test
+    @DisplayName("iniciar deve lançar IllegalStateException quando unidade não tem mapa no modo Revisão")
+    void iniciarSemMapaRevisao() {
+        Long cod = 1L;
+        Processo p = new Processo().setTipo(REVISAO).setSituacao(CRIADO);
+        when(repo.buscar(Processo.class, cod)).thenReturn(p);
+        Unidade uni = new Unidade();
+        uni.setCodigo(10L);
+        when(unidadeService.porCodigos(anyList())).thenReturn(List.<Unidade>of(uni));
+        when(unidadeService.buscarMapasPorUnidades(anyList())).thenReturn(new ArrayList<>());
+        when(repo.buscarPorSigla(Unidade.class, "ADMIN")).thenReturn(new Unidade());
+
+        assertThatThrownBy(() -> target.iniciar(cod, List.of(10L), new Usuario()))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("sem mapa vigente");
+    }
+
+    @Nested
+    @DisplayName("Gaps de Data Limite no DTO")
+    class DataLimiteGaps {
+        @Test
+        @DisplayName("obterDetalhesCompleto deve lançar IllegalStateException quando etapa 2 existe sem etapa 1")
+        void etapa2SemEtapa1() {
+            Long cod = 1L;
+            Processo p = new Processo();
+            p.setCodigo(cod);
+            p.setTipo(MAPEAMENTO);
+            p.setParticipantes(new ArrayList<>());
+            Usuario u = new Usuario();
+            u.setPerfilAtivo(Perfil.ADMIN);
+            
+            Subprocesso sp = new Subprocesso();
+            sp.setCodigo(100L);
+            sp.setSituacao(MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+            Unidade uni = new Unidade();
+            uni.setCodigo(10L);
+            uni.setSigla("U1");
+            sp.setUnidade(uni);
+            java.time.LocalDateTime now = java.time.LocalDateTime.now();
+            sp.setDataLimiteEtapa2(now);
+            
+            when(repo.buscar(Processo.class, cod)).thenReturn(p);
+            when(usuarioService.usuarioAutenticado()).thenReturn(u);
+            when(subprocessoService.listarEntidadesPorProcesso(cod)).thenReturn(List.of(sp));
+            when(subprocessoService.listarEntidadesPorProcessoComUnidade(cod)).thenReturn(List.of(sp));
+            when(subprocessoService.obterLocalizacaoAtual(sp)).thenReturn(uni);
+            // Stubbing requirements for obtaining DTO
+            when(permissionEvaluator.verificarPermissao(eq(u), eq(p), eq(sgc.seguranca.AcaoPermissao.FINALIZAR_PROCESSO))).thenReturn(true);
+            when(validacaoService.validarSubprocessosParaFinalizacao(cod)).thenReturn(sgc.subprocesso.service.SubprocessoValidacaoService.ValidationResult.ofValido());
+
+            when(permissionEvaluator.verificarPermissao(eq(u), any(Subprocesso.class), any())).thenReturn(true);
+
+            assertThatThrownBy(() -> target.obterDetalhesCompleto(cod, u, true))
+                    .isInstanceOf(IllegalStateException.class)
+                    .hasMessageContaining("sem data limite da etapa 1");
+        }
+
+        @Test
+        @DisplayName("obterDetalhesCompleto deve lançar IllegalStateException quando etapa 1 é posterior à etapa 2")
+        void etapa1PosteriorEtapa2() {
+            Long cod = 1L;
+            Processo p = new Processo();
+            p.setCodigo(cod);
+            p.setTipo(MAPEAMENTO);
+            p.setParticipantes(new ArrayList<>());
+            Usuario u = new Usuario();
+            u.setPerfilAtivo(Perfil.ADMIN);
+            
+            Subprocesso sp = new Subprocesso();
+            sp.setCodigo(100L);
+            sp.setSituacao(MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+            Unidade uni = new Unidade();
+            uni.setCodigo(10L);
+            uni.setSigla("U1");
+            sp.setUnidade(uni);
+            java.time.LocalDateTime now = java.time.LocalDateTime.now();
+            sp.setDataLimiteEtapa1(now.plusDays(2));
+            sp.setDataLimiteEtapa2(now.plusDays(1));
+            
+            when(repo.buscar(Processo.class, cod)).thenReturn(p);
+            when(subprocessoService.listarEntidadesPorProcesso(cod)).thenReturn(List.of(sp));
+            when(subprocessoService.listarEntidadesPorProcessoComUnidade(cod)).thenReturn(List.of(sp));
+            when(subprocessoService.obterLocalizacaoAtual(sp)).thenReturn(uni);
+            // Stubbing requirements for obtaining DTO
+            when(permissionEvaluator.verificarPermissao(eq(u), eq(p), eq(sgc.seguranca.AcaoPermissao.FINALIZAR_PROCESSO))).thenReturn(true);
+            when(validacaoService.validarSubprocessosParaFinalizacao(cod)).thenReturn(sgc.subprocesso.service.SubprocessoValidacaoService.ValidationResult.ofValido());
+
+            when(permissionEvaluator.verificarPermissao(eq(u), any(Subprocesso.class), any())).thenReturn(true);
+
+            assertThatThrownBy(() -> target.obterDetalhesCompleto(cod, u, true))
+                    .isInstanceOf(IllegalStateException.class)
+                    .hasMessageContaining("posterior à etapa 2");
+        }
+        
+        @Test
+        @DisplayName("obterDetalhesCompleto deve retornar dataLimite2 quando válida via elegíveis")
+        void etapa2Valida() {
+            Long cod = 1L;
+            Processo p = new Processo();
+            p.setCodigo(cod);
+            p.setTipo(MAPEAMENTO);
+            p.setParticipantes(new ArrayList<>());
+            Usuario u = new Usuario();
+            u.setPerfilAtivo(Perfil.ADMIN);
+            
+            Subprocesso sp = new Subprocesso();
+            sp.setCodigo(100L);
+            sp.setSituacao(MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+            Unidade uni = new Unidade();
+            uni.setCodigo(10L);
+            uni.setSigla("U1");
+            sp.setUnidade(uni);
+            java.time.LocalDateTime d1 = java.time.LocalDateTime.now().plusDays(1);
+            java.time.LocalDateTime d2 = java.time.LocalDateTime.now().plusDays(2);
+            sp.setDataLimiteEtapa1(d1);
+            sp.setDataLimiteEtapa2(d2);
+            
+            when(repo.buscar(Processo.class, cod)).thenReturn(p);
+            when(subprocessoService.listarEntidadesPorProcesso(cod)).thenReturn(List.of(sp));
+            when(subprocessoService.listarEntidadesPorProcessoComUnidade(cod)).thenReturn(List.of(sp));
+            when(subprocessoService.obterLocalizacaoAtual(sp)).thenReturn(uni);
+            // Stubbing requirements for obtaining DTO
+            when(permissionEvaluator.verificarPermissao(eq(u), eq(p), eq(sgc.seguranca.AcaoPermissao.FINALIZAR_PROCESSO))).thenReturn(true);
+            when(validacaoService.validarSubprocessosParaFinalizacao(cod)).thenReturn(sgc.subprocesso.service.SubprocessoValidacaoService.ValidationResult.ofValido());
+
+            when(permissionEvaluator.verificarPermissao(eq(u), any(Subprocesso.class), any())).thenReturn(true);
+
+            ProcessoDetalheDto res = target.obterDetalhesCompleto(cod, u, true);
+            assertThat(res.getElegiveis()).isNotEmpty();
+            assertThat(res.getElegiveis().getFirst().getUltimaDataLimite()).isEqualTo(d2);
+        }
     }
 }

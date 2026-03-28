@@ -1,336 +1,154 @@
 #!/usr/bin/env node
-
-/**
- * Script para gerar um plano de ação abrangente para alcançar 100% de cobertura
- *
- * Este script:
- * 1. Analisa o relatório JaCoCo
- * 2. Identifica arquivos com cobertura < 100%
- * 3. Prioriza por complexidade e importância
- * 4. Gera plano de ação em Markdown com tarefas específicas
- * 5. Identifica linhas e branches específicos não cobertos
- */
-
 const fs = require('node:fs');
-const path = require('node:path');
-const {execSync} = require('node:child_process');
-const xml2js = require('xml2js');
+const {
+    PLANO_100_PATH,
+    coletarArquivosCobertura,
+    executarGradleJaCoCo,
+    lerRelatorioJacoco,
+    ordenarPorLacunas
+} = require('./lib/cobertura-base.cjs');
 
-// Configuração
-const BASE_DIR = path.join(__dirname, '../..');
-const REPORT_PATH = path.join(BASE_DIR, 'build/reports/jacoco/test/jacocoTestReport.xml');
-const OUTPUT_FILE = path.join(BASE_DIR, '../plano-100-cobertura.md');
-const isWindows = process.platform === 'win32';
-const GRADLE_CMD = isWindows ? 'gradlew.bat :backend:test :backend:jacocoTestReport' : './gradlew :backend:test :backend:jacocoTestReport';
-
-// Categorias de arquivos (para priorização)
-const CATEGORIES = {
+const CATEGORIAS = {
     P1_CRITICAL: {
-        patterns: [/Service\.java$/, /Facade\.java$/, /Policy\.java$/, /Validator\.java$/,
-            /Listener\.java$/, /Factory\.java$/, /Builder\.java$/,
-            /Calculator\.java$/, /Finalizador\.java$/, /Inicializador\.java$/],
-        priority: 1,
-        description: '🔴 CRÍTICO - Lógica de negócio central'
+        patterns: [/Service$/, /Facade$/, /Policy$/, /Validator$/, /Listener$/, /Factory$/, /Builder$/, /Calculator$/, /Finalizador$/, /Inicializador$/],
+        prioridade: 1,
+        descricao: 'CRITICO - Logica de negocio central'
     },
     P2_IMPORTANT: {
-        patterns: [/Controller\.java$/, /Mapper\.java$/],
-        priority: 2,
-        description: '🟡 IMPORTANTE - API e transformação de dados'
+        patterns: [/Controller$/, /Mapper$/],
+        prioridade: 2,
+        descricao: 'IMPORTANTE - API e transformacao de dados'
     },
     P3_NORMAL: {
-        patterns: [/Model\.java$/, /\.java$/],
-        priority: 3,
-        description: '🟢 NORMAL - Entidades e utilitários'
+        patterns: [/.+/],
+        prioridade: 3,
+        descricao: 'NORMAL - Entidades e utilitarios'
     }
 };
 
-// Arquivos que podem ser ignorados - match build.gradle.kts jacocoTestReport exclusions
-const IGNORE_PATTERNS = [
-    // Gerados automaticamente
-    /MapperImpl/,
-
-    // Bootstrap e configuração
-    /Sgc\.java$/,
-    /Config.*\.java$/,
-    /Properties\.java$/,
-
-    // DTOs e Request/Response (apenas dados)
-    /Dto\.java$/,
-    /Request\.java$/,
-    /Response\.java$/,
-
-    // Exceções (maioria simples)
-    /Erro.*\.java$/,
-    /Exception\.java$/,
-
-    // Mocks de teste
-    /Mock\.java$/,
-    /Test\.java$/,
-
-    // Repositórios (interfaces JPA)
-    /Repo\.java$/,
-
-    // Entidades JPA simples (sem lógica de negócio)
-    /model\/Perfil\.java$/,
-    /model\/Usuario\.java$/,
-    /model\/Unidade.*\.java$/,
-    /model\/Administrador\.java$/,
-    /model\/Vinculacao.*\.java$/,
-    /model\/Atribuicao.*\.java$/,
-    /model\/Parametro\.java$/,
-    /model\/Movimentacao\.java$/,
-    /model\/Analise\.java$/,
-    /model\/Alerta.*\.java$/,
-    /model\/Conhecimento\.java$/,
-    /model\/Mapa\.java$/,
-    /model\/Atividade\.java$/,
-    /model\/Competencia.*\.java$/,
-    /model\/Notificacao\.java$/,
-    /model\/Processo\.java$/,
-
-    // Enums simples sem lógica de negócio
-    /Status.*\.java$/,
-    /Tipo.*\.java$/
-];
-
-async function parseXml(filePath) {
-    const data = fs.readFileSync(filePath);
-    const parser = new xml2js.Parser();
-    return parser.parseStringPromise(data);
-}
-
-function calculatePercentage(covered, missed) {
-    const total = covered + missed;
-    return total === 0 ? 100 : (covered / total) * 100;
-}
-
-function categorizeFile(className) {
-    // Verificar se deve ser ignorado
-    if (IGNORE_PATTERNS.some(pattern => pattern.test(className))) {
-        return null;
-    }
-
-    // Categorizar por prioridade
-    for (const [categoryName, category] of Object.entries(CATEGORIES)) {
-        if (category.patterns.some(pattern => pattern.test(className))) {
-            return {name: categoryName, ...category};
+function categorizarArquivo(nomeClasse) {
+    for (const [nomeCategoria, categoria] of Object.entries(CATEGORIAS)) {
+        if (categoria.patterns.some(pattern => pattern.test(nomeClasse))) {
+            return {nome: nomeCategoria, ...categoria};
         }
     }
 
-    return CATEGORIES.P3_NORMAL;
+    return {nome: 'P3_NORMAL', ...CATEGORIAS.P3_NORMAL};
 }
 
-async function runTests() {
-    console.log('🚀 Executando testes e gerando relatório JaCoCo...');
-    try {
-        execSync(GRADLE_CMD, {cwd: BASE_DIR, stdio: 'inherit'});
-    } catch {
-        console.warn('⚠️ Alguns testes falharam, mas prosseguindo com análise...');
-    }
-}
-
-async function analyzeAndGeneratePlan() {
-    if (!fs.existsSync(REPORT_PATH)) {
-        console.error(`❌ Relatório não encontrado: ${REPORT_PATH}`);
-        console.error('Execute os testes primeiro: ./gradlew :backend:test :backend:jacocoTestReport');
-        process.exit(1);
-    }
-
-    console.log('📊 Analisando relatório JaCoCo...');
-    const report = await parseXml(REPORT_PATH);
-    const packages = report.report.package || [];
-
-    const results = {
+function agruparPorCategoria(arquivos) {
+    const agrupado = {
         P1_CRITICAL: [],
         P2_IMPORTANT: [],
         P3_NORMAL: []
     };
 
-    let totalFiles = 0;
-    let filesWithGaps = 0;
-    let totalLines = 0;
-    let coveredLines = 0;
-    let totalBranches = 0;
-    let coveredBranches = 0;
-
-    packages.forEach(pkg => {
-        const packageName = pkg.$.name.replaceAll('/', '.');
-        const sourceFiles = pkg.sourcefile || [];
-
-        sourceFiles.forEach(sf => {
-            const fileName = sf.$.name;
-            const className = `${packageName}.${fileName.replace('.java', '')}`;
-            const category = categorizeFile(className);
-
-            if (!category) return; // Ignora arquivos que não precisam de cobertura
-
-            totalFiles++;
-
-            let linesTotal = 0;
-            let linesCovered = 0;
-            let branchesTotal = 0;
-            let branchesCovered = 0;
-            const missedLines = [];
-            const missedBranches = [];
-
-            if (sf.line) {
-                sf.line.forEach(line => {
-                    const nr = Number.parseInt(line.$.nr);
-                    const ci = Number.parseInt(line.$.ci || 0);
-                    const mb = Number.parseInt(line.$.mb || 0);
-                    const cb = Number.parseInt(line.$.cb || 0);
-
-                    linesTotal++;
-                    totalLines++;
-
-                    if (ci > 0) {
-                        linesCovered++;
-                        coveredLines++;
-                    } else {
-                        missedLines.push(nr);
-                    }
-
-                    const lineBranches = mb + cb;
-                    if (lineBranches > 0) {
-                        branchesTotal += lineBranches;
-                        totalBranches += lineBranches;
-                        branchesCovered += cb;
-                        coveredBranches += cb;
-
-                        if (mb > 0) {
-                            missedBranches.push(`${nr}(${mb}/${lineBranches})`);
-                        }
-                    }
-                });
-            }
-
-            const lineCoverage = calculatePercentage(linesCovered, linesTotal - linesCovered);
-            const branchCoverage = branchesTotal > 0 ? calculatePercentage(branchesCovered, branchesTotal - branchesCovered) : 100;
-
-            // Se não tem 100% de cobertura
-            if (lineCoverage < 100 || branchCoverage < 100) {
-                filesWithGaps++;
-
-                const score = (linesTotal - linesCovered) + (branchesTotal - branchesCovered) * 0.5;
-
-                const categoryName = category.name || 'P3_NORMAL';
-                if (!results[categoryName]) {
-                    results[categoryName] = [];
-                }
-
-                results[categoryName].push({
-                    class: className,
-                    fileName: fileName,
-                    lineCoverage: lineCoverage.toFixed(2),
-                    branchCoverage: branchCoverage.toFixed(2),
-                    missedLines: missedLines.length,
-                    missedBranches: branchesTotal - branchesCovered,
-                    missedLinesDetails: missedLines.slice(0, 50), // Limita para não ficar muito grande
-                    missedBranchesDetails: missedBranches.slice(0, 20),
-                    score,
-                    priority: category.priority
-                });
-            }
+    arquivos.forEach(arquivo => {
+        const categoria = categorizarArquivo(arquivo.nomeClasse);
+        agrupado[categoria.nome].push({
+            ...arquivo,
+            prioridade: categoria.prioridade
         });
     });
 
-    // Ordenar por score (mais gaps primeiro) dentro de cada categoria
-    Object.keys(results).forEach(category => {
-        results[category].sort((a, b) => b.score - a.score);
+    Object.keys(agrupado).forEach(chave => {
+        agrupado[chave].sort((a, b) => {
+            const scoreA = a.linhasPerdidas + (a.branchesPerdidos * 0.5);
+            const scoreB = b.linhasPerdidas + (b.branchesPerdidos * 0.5);
+            return scoreB - scoreA || a.nomeClasse.localeCompare(b.nomeClasse, 'pt-BR');
+        });
     });
 
-    // Gerar Markdown
-    const globalLineCoverage = calculatePercentage(coveredLines, totalLines - coveredLines);
-    const globalBranchCoverage = totalBranches > 0 ? calculatePercentage(coveredBranches, totalBranches - coveredBranches) : 100;
+    return agrupado;
+}
 
-    let markdown = `# 🎯 Plano para Alcançar 100% de Cobertura de Testes
+function gerarMarkdown(agrupado, totais) {
+    let markdown = '# Plano para Alcançar 100% de Cobertura de Testes\n\n';
+    markdown += `**Gerado em:** ${new Date().toISOString().split('T')[0]}\n\n`;
+    markdown += '## Situacao Atual\n\n';
+    markdown += `- **Cobertura Global de Linhas:** ${totais.coberturaGlobalLinhas.toFixed(2)}%\n`;
+    markdown += `- **Cobertura Global de Branches:** ${totais.coberturaGlobalBranches.toFixed(2)}%\n`;
+    markdown += `- **Total de Arquivos Analisados:** ${totais.totalArquivos}\n`;
 
-**Gerado em:** ${new Date().toISOString().split('T')[0]}
+    const pendentes = Object.values(agrupado).reduce((soma, lista) => soma + lista.length, 0);
+    markdown += `- **Arquivos com Cobertura < 100%:** ${pendentes}\n`;
+    markdown += `- **Arquivos com 100% de Cobertura:** ${totais.totalArquivos - pendentes}\n\n`;
 
-## 📊 Situação Atual
-
-- **Cobertura Global de Linhas:** ${globalLineCoverage.toFixed(2)}%
-- **Cobertura Global de Branches:** ${globalBranchCoverage.toFixed(2)}%
-- **Total de Arquivos Analisados:** ${totalFiles}
-- **Arquivos com Cobertura < 100%:** ${filesWithGaps}
-- **Arquivos com 100% de Cobertura:** ${totalFiles - filesWithGaps}
-
-## 🎯 Objetivo
-
-Alcançar **100% de cobertura** em todas as classes relevantes do projeto.
-
-## 📋 Progresso por Categoria
-
-`;
-
-    // Adicionar resumo por categoria
-    Object.entries(CATEGORIES).forEach(([categoryName, category]) => {
-        const items = results[categoryName];
-        markdown += `- **${category.description}:** ${items.length} arquivo(s) pendente(s)\n`;
+    markdown += '## Progresso por Categoria\n\n';
+    Object.entries(CATEGORIAS).forEach(([nomeCategoria, categoria]) => {
+        markdown += `- **${categoria.descricao}:** ${agrupado[nomeCategoria].length} arquivo(s) pendente(s)\n`;
     });
 
-    markdown += `\n---\n\n`;
+    markdown += '\n---\n';
 
-    // Detalhar cada categoria
-    Object.entries(CATEGORIES).forEach(([categoryName, category]) => {
-        const items = results[categoryName];
+    Object.entries(CATEGORIAS).forEach(([nomeCategoria, categoria]) => {
+        const itens = agrupado[nomeCategoria];
+        markdown += `\n## ${categoria.descricao}\n\n`;
 
-        if (items.length === 0) {
-            markdown += `## ${category.description}\n\n✅ **Todos os arquivos desta categoria têm 100% de cobertura!**\n\n`;
+        if (itens.length === 0) {
+            markdown += 'Todos os arquivos desta categoria estao com 100% de cobertura.\n';
             return;
         }
 
-        markdown += `## ${category.description}\n\n`;
-        markdown += `**Total:** ${items.length} arquivo(s) com lacunas\n\n`;
+        markdown += `**Total:** ${itens.length} arquivo(s) com lacunas\n\n`;
 
-        items.forEach((item, index) => {
-            markdown += `### ${index + 1}. \`${item.class}\`\n\n`;
-            markdown += `- **Cobertura de Linhas:** ${item.lineCoverage}% (${item.missedLines} linha(s) não cobertas)\n`;
-            markdown += `- **Cobertura de Branches:** ${item.branchCoverage}% (${item.missedBranches} branch(es) não cobertos)\n`;
+        itens.forEach((item, indice) => {
+            markdown += `### ${indice + 1}. \`${item.nomeClasse}\`\n\n`;
+            markdown += `- **Cobertura de Linhas:** ${item.coberturaLinhas.toFixed(2)}% (${item.linhasPerdidas} linha(s) nao cobertas)\n`;
+            markdown += `- **Cobertura de Branches:** ${item.coberturaBranches.toFixed(2)}% (${item.branchesPerdidos} branch(es) nao cobertos)\n`;
 
-            if (item.missedLinesDetails.length > 0) {
-                markdown += `- **Linhas não cobertas:** ${item.missedLinesDetails.join(', ')}`;
-                if (item.missedLines > item.missedLinesDetails.length) {
-                    markdown += ` ... (+${item.missedLines - item.missedLinesDetails.length} mais)`;
+            if (item.linhasPerdidasLista.length > 0) {
+                markdown += `- **Linhas nao cobertas:** ${item.linhasPerdidasLista.slice(0, 50).join(', ')}`;
+                if (item.linhasPerdidasLista.length > 50) {
+                    markdown += ` ... (+${item.linhasPerdidasLista.length - 50} mais)`;
                 }
-                markdown += `\n`;
+                markdown += '\n';
             }
 
-            if (item.missedBranchesDetails.length > 0) {
-                markdown += `- **Branches não cobertos:** ${item.missedBranchesDetails.join(', ')}\n`;
+            if (item.branchesPerdidosLista.length > 0) {
+                markdown += `- **Branches nao cobertos:** ${item.branchesPerdidosLista.slice(0, 20).join(', ')}\n`;
             }
 
-            markdown += `\n**Ação necessária:** Criar ou expandir \`${item.fileName.replace('.java', 'CoverageTest.java')}\` para cobrir todas as linhas e branches.\n\n`;
+            markdown += `\n**Acao necessaria:** Criar ou expandir \`${item.nomeArquivo.replace('.java', 'CoverageTest.java')}\` para cobrir todas as linhas e branches.\n\n`;
         });
     });
 
-    markdown += `\n---\n\n`;
-    markdown += `## 🛠️ Scripts Disponíveis\n\n`;
-    markdown += `Use os seguintes scripts em \`backend/etc/scripts/\` para auxiliar:\n\n`;
-    markdown += `1. \`node super-cobertura.cjs --run\` - Gera relatório de lacunas\n`;
-    markdown += `2. \`node verificar-cobertura.cjs --missed\` - Lista arquivos com mais gaps\n`;
-    markdown += `3. \`node analisar-cobertura.cjs\` - Análise detalhada com tabelas\n`;
-    markdown += `4. \`python3 analyze_tests.py\` - Identifica arquivos sem testes\n`;
-    markdown += `5. \`python3 prioritize_tests.py\` - Prioriza criação de testes\n\n`;
+    markdown += '---\n\n';
+    markdown += '## Scripts Disponiveis\n\n';
+    markdown += '1. `node backend/etc/scripts/super-cobertura.cjs --run` - Gera relatorio de lacunas\n';
+    markdown += '2. `node backend/etc/scripts/verificar-cobertura.cjs --missed` - Lista arquivos com mais gaps\n';
+    markdown += '3. `node backend/etc/scripts/analisar-cobertura.cjs` - Analise detalhada com tabelas\n';
+    markdown += '4. `python3 backend/etc/scripts/analyze_tests.py` - Identifica arquivos sem testes\n';
+    markdown += '5. `python3 backend/etc/scripts/prioritize_tests.py` - Prioriza criacao de testes\n';
 
-    // Salvar arquivo
-    fs.writeFileSync(OUTPUT_FILE, markdown);
-    console.log(`\n✅ Plano de ação gerado em: ${OUTPUT_FILE}`);
-    console.log(`📊 ${filesWithGaps} arquivo(s) precisam de cobertura adicional`);
-    console.log(`🎯 Meta: De ${globalLineCoverage.toFixed(2)}% → 100%`);
+    return markdown;
 }
 
 async function main() {
-    const runTestsArg = process.argv.includes('--run');
-
-    if (runTestsArg) {
-        await runTests();
+    if (process.argv.includes('--run')) {
+        console.log('Executando testes e gerando relatorio JaCoCo...');
+        try {
+            executarGradleJaCoCo({incluirTestes: true});
+        } catch (error) {
+            console.warn(`Alguns testes falharam. Tentando continuar com o ultimo relatorio disponivel: ${error.message}`);
+        }
     }
 
-    await analyzeAndGeneratePlan();
+    const relatorio = await lerRelatorioJacoco();
+    const coleta = coletarArquivosCobertura(relatorio, {
+        incluirSemLacunas: false,
+        aplicarExclusoes: true
+    });
+    const agrupado = agruparPorCategoria(ordenarPorLacunas(coleta.arquivos));
+    const markdown = gerarMarkdown(agrupado, coleta.totais);
+
+    fs.writeFileSync(PLANO_100_PATH, markdown, 'utf-8');
+    console.log(`\nPlano de acao gerado em: ${PLANO_100_PATH}`);
+    console.log(`${coleta.arquivos.length} arquivo(s) precisam de cobertura adicional`);
+    console.log(`Meta: De ${coleta.totais.coberturaGlobalLinhas.toFixed(2)}% -> 100%`);
 }
 
-main().catch(err => {
-    console.error('❌ Erro:', err);
+main().catch(error => {
+    console.error(`Erro ao gerar plano de cobertura: ${error.message}`);
     process.exit(1);
 });

@@ -3,7 +3,7 @@
 # Script principal para alcançar 100% de cobertura de testes
 # Este script orquestra o processo de análise e melhoria de cobertura
 
-set -e  # Sai em caso de erro
+set -euo pipefail
 
 SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BACKEND_DIR="$(cd "$SCRIPTS_DIR/../" && pwd)"
@@ -49,7 +49,7 @@ echo "📍 Etapa 6: Priorizar criação de testes"
 echo "─────────────────────────────────────────"
 if [ -f "$ROOT_DIR/analise-testes.md" ]; then
     cd "$ROOT_DIR" && python3 backend/etc/scripts/prioritize_tests.py --input analise-testes.md --output priorizacao-testes.md
-   show cat "$ROOT_DIR/priorizacao-testes.md" | head -n 50
+    sed -n '1,50p' "$ROOT_DIR/priorizacao-testes.md"
 else
     echo "⚠️  Arquivo analise-testes.md não encontrado, pulando priorização"
 fi
@@ -68,7 +68,7 @@ echo ""
 echo "Próximos passos:"
 echo "  1. Revisar plano-100-cobertura.md"
 echo "  2. Começar pelos testes P1 (críticos) em priorizacao-testes.md"
-echo "  3. Usar 'node backend/etc/scripts/gerar-testes-cobertura.cjs <Classe>'"
+echo "  3. Usar 'node backend/etc/scripts/gerar-stub-teste.cjs <Classe>'"
 echo "     para gerar esqueletos de testes"
 echo "  4. Implementar os testes"
 echo "  5. Rodar este script novamente para verificar progresso"

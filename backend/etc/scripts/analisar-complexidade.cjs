@@ -1,10 +1,11 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const {createInterface} = require('node:readline');
+const {REPORT_CSV_PATH, ROOT_DIR} = require('./lib/cobertura-base.cjs');
 
 // Configuração
-const CSV_PATH = path.join(__dirname, '../../backend/build/reports/jacoco/test/jacocoTestReport.csv');
-const OUTPUT_PATH = path.join(__dirname, '../../complexity-ranking.md');
+const CSV_PATH = REPORT_CSV_PATH;
+const OUTPUT_PATH = path.join(ROOT_DIR, 'complexity-ranking.md');
 
 // Estrutura de dados para Métricas
 class ClassMetrics {
