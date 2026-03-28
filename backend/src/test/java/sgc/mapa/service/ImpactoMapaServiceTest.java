@@ -497,5 +497,107 @@ class ImpactoMapaServiceTest {
             assertEquals(1, response.alteradas().size());
             assertEquals(1, response.competenciasImpactadas().size());
         }
+
+        @Test
+        @DisplayName("verificarImpactos: Competência sem atividades não deve quebrar cálculo")
+        void verificarImpactos_CompetenciaSemAtividades() {
+            mockAcessoLivre();
+            Subprocesso sp = new Subprocesso();
+            sp.setCodigo(1L);
+            sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+            Unidade u = new Unidade();
+            u.setCodigo(100L);
+            sp.setUnidade(u);
+
+            Mapa mapaVigente = new Mapa();
+            mapaVigente.setCodigo(20L);
+
+            Mapa mapaSub = new Mapa();
+            mapaSub.setCodigo(21L);
+
+            when(mapaRepo.buscarMapaVigentePorUnidade(100L)).thenReturn(Optional.of(mapaVigente));
+            when(mapaRepo.buscarPorSubprocesso(1L)).thenReturn(Optional.of(mapaSub));
+            when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(20L)).thenReturn(Collections.emptyList());
+            when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(21L)).thenReturn(Collections.emptyList());
+
+            Competencia compSemAtividades = new Competencia();
+            compSemAtividades.setCodigo(91L);
+            compSemAtividades.setDescricao("Comp sem atividades");
+            compSemAtividades.setAtividades(null);
+            when(competenciaRepo.findByMapa_Codigo(20L)).thenReturn(List.of(compSemAtividades));
+
+            ImpactoMapaResponse response = impactoMapaService.verificarImpactos(sp, usuarioAdmin());
+
+            assertNotNull(response);
+            assertFalse(response.temImpactos());
+            assertTrue(response.competenciasImpactadas().isEmpty());
+        }
+
+        @Test
+        @DisplayName("verificarImpactos: Deve acumular tipos e detalhes de impacto na mesma competência")
+        void verificarImpactos_DeveAcumularImpactosNaMesmaCompetencia() {
+            mockAcessoLivre();
+            Subprocesso sp = new Subprocesso();
+            sp.setCodigo(1L);
+            sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+            Unidade u = new Unidade();
+            u.setCodigo(100L);
+            sp.setUnidade(u);
+
+            Mapa mapaVigente = new Mapa();
+            mapaVigente.setCodigo(20L);
+
+            Mapa mapaSub = new Mapa();
+            mapaSub.setCodigo(21L);
+
+            when(mapaRepo.buscarMapaVigentePorUnidade(100L)).thenReturn(Optional.of(mapaVigente));
+            when(mapaRepo.buscarPorSubprocesso(1L)).thenReturn(Optional.of(mapaSub));
+
+            Conhecimento conhecimentoAntigo = new Conhecimento();
+            conhecimentoAntigo.setDescricao("Legado");
+
+            Atividade removida = new Atividade();
+            removida.setCodigo(10L);
+            removida.setDescricao("Atividade removida");
+            removida.setConhecimentos(Set.of());
+
+            Atividade alteradaVigente = new Atividade();
+            alteradaVigente.setCodigo(11L);
+            alteradaVigente.setDescricao("Atividade alterada");
+            alteradaVigente.setConhecimentos(Set.of(conhecimentoAntigo));
+
+            Atividade alteradaAtual = new Atividade();
+            alteradaAtual.setCodigo(12L);
+            alteradaAtual.setDescricao("Atividade alterada");
+            alteradaAtual.setConhecimentos(Set.of());
+
+            when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(20L))
+                    .thenReturn(List.of(removida, alteradaVigente));
+            when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(21L))
+                    .thenReturn(List.of(alteradaAtual));
+
+            Competencia comp = new Competencia();
+            comp.setCodigo(50L);
+            comp.setDescricao("Comp Estratégica");
+            comp.setAtividades(Set.of(removida, alteradaVigente));
+            when(competenciaRepo.findByMapa_Codigo(20L)).thenReturn(List.of(comp));
+
+            ImpactoMapaResponse response = impactoMapaService.verificarImpactos(sp, usuarioAdmin());
+
+            assertEquals(1, response.removidas().size());
+            assertEquals(1, response.alteradas().size());
+            assertEquals(1, response.competenciasImpactadas().size());
+
+            CompetenciaImpactadaDto competenciaImpactada = response.competenciasImpactadas().getFirst();
+            assertEquals(50L, competenciaImpactada.codigo());
+            assertEquals("Comp Estratégica", competenciaImpactada.descricao());
+            assertEquals(2, competenciaImpactada.atividadesAfetadas().size());
+            assertTrue(competenciaImpactada.atividadesAfetadas().contains("Atividade removida: Atividade removida"));
+            assertTrue(competenciaImpactada.atividadesAfetadas().stream()
+                    .anyMatch(detalhe -> detalhe.contains("Atividade alterada")));
+            assertTrue(competenciaImpactada.tiposImpacto().contains(TipoImpactoCompetencia.ATIVIDADE_REMOVIDA));
+            assertTrue(competenciaImpactada.tiposImpacto().contains(TipoImpactoCompetencia.ATIVIDADE_ALTERADA));
+            assertEquals(2, competenciaImpactada.tiposImpacto().size());
+        }
     }
 }
