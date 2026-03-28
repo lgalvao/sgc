@@ -31,6 +31,14 @@ function importarCertificado(keytoolBin, alias, certPath) {
 }
 
 function main() {
+    if (process.argv.includes('--help') || process.argv.includes('-h')) {
+        console.log(`Uso: node backend/etc/scripts/instalar-certs.cjs
+
+Importa cert-tre.cer e cert-for.cer em cacerts usando keytool.
+Requer permissao para escrita no keystore da JVM.`);
+        process.exit(0);
+    }
+
     const deployDir = path.join(__dirname, '../deploy');
     const certificados = [
         {alias: 'cert-tre', caminho: path.join(deployDir, 'cert-tre.cer')},

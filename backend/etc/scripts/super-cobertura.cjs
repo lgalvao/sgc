@@ -8,7 +8,17 @@ const {
 } = require('./lib/cobertura-base.cjs');
 
 async function main() {
-    if (process.argv.includes('--run')) {
+    const args = process.argv.slice(2);
+    if (args.includes('--help') || args.includes('-h')) {
+        console.log(`Uso: node backend/etc/scripts/super-cobertura.cjs [opcoes]
+
+Opcoes:
+  --run         Executa o Gradle antes de analisar o relatorio JaCoCo
+  --help, -h    Exibe esta ajuda`);
+        process.exit(0);
+    }
+
+    if (args.includes('--run')) {
         console.log('Executando :backend:jacocoTestReport...');
         try {
             executarGradleJaCoCo();

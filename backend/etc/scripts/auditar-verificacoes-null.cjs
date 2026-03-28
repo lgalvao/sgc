@@ -93,6 +93,14 @@ function generateReport(results) {
 }
 
 try {
+    if (process.argv.includes('--help') || process.argv.includes('-h')) {
+        console.log(`Uso: node backend/etc/scripts/auditar-verificacoes-null.cjs
+
+Varre backend/src/main/java/sgc em busca de verificacoes "== null" e "!= null"
+e gera os arquivos null-checks-audit.txt e null-checks-analysis.md na raiz do repositorio.`);
+        process.exit(0);
+    }
+
     console.log('Scanning files for null checks...');
     const data = scanFiles();
     console.log(`Found null checks in ${Object.keys(data).length} files.`);

@@ -7,8 +7,15 @@ const REPORT_PATH = path.join(BASE_DIR, 'build/reports/jacoco/test/jacocoTestRep
 const SRC_DIR = path.join(BASE_DIR, 'src/main/java');
 const TEST_DIR = path.join(BASE_DIR, 'src/test/java');
 async function main() {
-    const target = process.argv[2];
-    if (!target) { console.log('Uso: node gerar-stub-teste.cjs <NomeDaClasse>'); process.exit(1); }
+    const args = process.argv.slice(2);
+    if (args.includes('--help') || args.includes('-h')) {
+        console.log(`Uso: node backend/etc/scripts/gerar-stub-teste.cjs <NomeDaClasseOuFqn>
+
+Gera um arquivo CoverageTest para a classe informada com base no relatorio JaCoCo.`);
+        process.exit(0);
+    }
+    const target = args[0];
+    if (!target) { console.log('Uso: node backend/etc/scripts/gerar-stub-teste.cjs <NomeDaClasseOuFqn>'); process.exit(1); }
     const data = fs.readFileSync(REPORT_PATH);
     const parser = new xml2js.Parser();
     const result = await parser.parseStringPromise(data);

@@ -12,14 +12,6 @@ function runNodeScript(scriptName, args = [], options = {}) {
     });
 }
 
-function runPythonFreeCommand(command, args = [], options = {}) {
-    return execFileSync(command, args, {
-        cwd: ROOT_DIR,
-        encoding: 'utf-8',
-        stdio: options.capture ? ['inherit', 'pipe', 'pipe'] : 'inherit'
-    });
-}
-
 function printHeader(title) {
     console.log(`📍 ${title}`);
     console.log('─────────────────────────────────────────');
@@ -34,6 +26,19 @@ function printPreviewFromFile(filePath, lines = 50) {
 }
 
 function main() {
+    if (process.argv.includes('--help') || process.argv.includes('-h')) {
+        console.log(`Uso: node backend/etc/scripts/cobertura-100.cjs
+
+Executa a jornada completa de diagnostico de cobertura:
+1. testa e gera JaCoCo
+2. analisa cobertura
+3. gera lacunas
+4. gera plano de cobertura
+5. analisa classes sem testes
+6. prioriza backlog de testes`);
+        process.exit(0);
+    }
+
     console.log('🎯 === JORNADA PARA 100% DE COBERTURA ===\n');
 
     printHeader('Etapa 1: Executar testes e gerar relatorio JaCoCo');

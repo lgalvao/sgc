@@ -165,12 +165,22 @@ function findBackendRoot() {
 
 function parseArgs(argv) {
     return {
+        help: argv.includes('--help') || argv.includes('-h'),
         dryRun: argv.includes('--dry-run')
     };
 }
 
 function main() {
-    const {dryRun} = parseArgs(process.argv.slice(2));
+    const {dryRun, help} = parseArgs(process.argv.slice(2));
+    if (help) {
+        console.log(`Uso: node backend/etc/scripts/fix_fqn.cjs [opcoes]
+
+Opcoes:
+  --dry-run     Apenas mostra os arquivos que seriam alterados
+  --help, -h    Exibe esta ajuda`);
+        process.exit(0);
+    }
+
     const backendRoot = findBackendRoot();
     let totalFilesAnalyzed = 0;
     let totalFilesUpdated = 0;

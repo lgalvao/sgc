@@ -125,7 +125,17 @@ function gerarMarkdown(agrupado, totais) {
 }
 
 async function main() {
-    if (process.argv.includes('--run')) {
+    const args = process.argv.slice(2);
+    if (args.includes('--help') || args.includes('-h')) {
+        console.log(`Uso: node backend/etc/scripts/gerar-plano-cobertura.cjs [opcoes]
+
+Opcoes:
+  --run         Executa os testes e gera o relatorio JaCoCo antes da analise
+  --help, -h    Exibe esta ajuda`);
+        process.exit(0);
+    }
+
+    if (args.includes('--run')) {
         console.log('Executando testes e gerando relatorio JaCoCo...');
         try {
             executarGradleJaCoCo({incluirTestes: true});

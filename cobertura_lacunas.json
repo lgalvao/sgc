@@ -1,78 +1,8 @@
 {
-  "globalLineCoverage": "98.91%",
-  "globalBranchCoverage": "91.26%",
-  "totalFilesWithGaps": 27,
+  "globalLineCoverage": "99.30%",
+  "globalBranchCoverage": "92.46%",
+  "totalFilesWithGaps": 26,
   "gaps": [
-    {
-      "class": "sgc.processo.service.ProcessoService",
-      "coverage": "96.63%",
-      "branchCoverage": "86.52%",
-      "missed": [
-        322,
-        517,
-        529,
-        530,
-        531,
-        533,
-        534,
-        536,
-        537,
-        538,
-        540
-      ],
-      "partial": [
-        "319(1/2)",
-        "357(1/2)",
-        "419(1/2)",
-        "441(1/2)",
-        "477(1/4)",
-        "480(1/2)",
-        "484(1/4)",
-        "486(1/2)",
-        "487(2/2)",
-        "490(3/8)",
-        "516(1/2)",
-        "526(2/4)",
-        "529(2/2)",
-        "533(2/2)",
-        "536(2/2)",
-        "570(1/2)",
-        "577(1/6)"
-      ],
-      "score": 23
-    },
-    {
-      "class": "sgc.subprocesso.service.SubprocessoTransicaoService",
-      "coverage": "98.36%",
-      "branchCoverage": "84.31%",
-      "missed": [
-        164,
-        165,
-        262,
-        263,
-        265,
-        271,
-        707
-      ],
-      "partial": [
-        "77(1/2)",
-        "83(1/2)",
-        "163(1/2)",
-        "228(1/4)",
-        "261(1/2)",
-        "262(2/2)",
-        "270(1/2)",
-        "284(1/2)",
-        "362(1/2)",
-        "486(1/2)",
-        "494(1/2)",
-        "525(1/2)",
-        "569(1/2)",
-        "675(1/4)",
-        "706(1/2)"
-      ],
-      "score": 15
-    },
     {
       "class": "sgc.subprocesso.service.SubprocessoService",
       "coverage": "99.36%",
@@ -106,6 +36,53 @@
         "881(1/2)"
       ],
       "score": 14.5
+    },
+    {
+      "class": "sgc.processo.service.ProcessoService",
+      "coverage": "99.69%",
+      "branchCoverage": "91.57%",
+      "missed": [
+        534
+      ],
+      "partial": [
+        "357(1/2)",
+        "419(1/2)",
+        "441(1/2)",
+        "477(1/4)",
+        "480(1/2)",
+        "484(1/4)",
+        "486(1/2)",
+        "487(2/2)",
+        "490(3/8)",
+        "533(1/2)",
+        "570(1/2)",
+        "577(1/6)"
+      ],
+      "score": 8.5
+    },
+    {
+      "class": "sgc.subprocesso.service.SubprocessoTransicaoService",
+      "coverage": "99.30%",
+      "branchCoverage": "89.22%",
+      "missed": [
+        164,
+        165,
+        263
+      ],
+      "partial": [
+        "83(1/2)",
+        "163(1/2)",
+        "228(1/4)",
+        "262(1/2)",
+        "284(1/2)",
+        "362(1/2)",
+        "486(1/2)",
+        "494(1/2)",
+        "525(1/2)",
+        "569(1/2)",
+        "675(1/4)"
+      ],
+      "score": 8.5
     },
     {
       "class": "sgc.comum.erros.RestExceptionHandler",
@@ -285,16 +262,6 @@
       "missed": [],
       "partial": [
         "45(1/2)"
-      ],
-      "score": 0.5
-    },
-    {
-      "class": "sgc.mapa.service.ImpactoMapaService",
-      "coverage": "100.00%",
-      "branchCoverage": "98.15%",
-      "missed": [],
-      "partial": [
-        "81(1/2)"
       ],
       "score": 0.5
     },

@@ -44,7 +44,17 @@ function imprimirResumo(arquivos) {
 }
 
 async function main() {
-    const skipRun = process.argv.includes('--skip-run');
+    const args = process.argv.slice(2);
+    if (args.includes('--help') || args.includes('-h')) {
+        console.log(`Uso: node backend/etc/scripts/analisar-cobertura-total.cjs [opcoes]
+
+Opcoes:
+  --skip-run    Nao executa o Gradle; usa o ultimo relatorio JaCoCo disponivel
+  --help, -h    Exibe esta ajuda`);
+        process.exit(0);
+    }
+
+    const skipRun = args.includes('--skip-run');
 
     console.log('\n[Analisador] Iniciando diagnostico de cobertura...');
 

@@ -285,4 +285,35 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         verify(alertaService).criarAlertaReaberturaRevisao(p, u, "justificativa");
         verify(alertaService).criarAlertaReaberturaRevisaoSuperior(p, sup, u);
     }
+
+    @Test
+    @DisplayName("obterUltimaDataLimite - ambas nulas deve retornar null")
+    void obterUltimaDataLimite_AmbasNulas() {
+        Subprocesso sp = new Subprocesso();
+        sp.setDataLimiteEtapa1(null);
+        sp.setDataLimiteEtapa2(null);
+
+        java.time.LocalDate res = invokeMethod(service, "obterUltimaDataLimite", sp);
+        assertThat(res).isNull();
+    }
+
+    @Test
+    @DisplayName("disponibilizarRevisao - com subprocesso não iniciado")
+    void disponibilizarRevisao_ComNaoIniciado() {
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(100L);
+        setField(sp, "situacao", SituacaoSubprocesso.NAO_INICIADO);
+        sp.setMapa(new sgc.mapa.model.Mapa());
+        sp.getMapa().setCodigo(1000L);
+        sp.setUnidade(new Unidade());
+        sp.setProcesso(new Processo());
+
+        when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(100L)).thenReturn(Optional.of(sp));
+        when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(anyLong())).thenReturn(List.of());
+
+        service.disponibilizarRevisao(100L, new Usuario());
+
+        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
+        verify(subprocessoRepo).save(sp); // Save chamado na linha 165
+    }
 }

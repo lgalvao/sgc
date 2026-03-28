@@ -190,6 +190,14 @@ function generateMarkdownReport(metrics, outputPath) {
 }
 
 async function main() {
+    if (process.argv.includes('--help') || process.argv.includes('-h')) {
+        console.log(`Uso: node backend/etc/scripts/analisar-complexidade.cjs
+
+Le o CSV do JaCoCo em backend/build/reports/jacoco/test/jacocoTestReport.csv
+e gera o arquivo complexity-ranking.md na raiz do repositorio.`);
+        process.exit(0);
+    }
+
     if (!fs.existsSync(CSV_PATH)) {
         console.error(`Erro: Arquivo ${CSV_PATH} não encontrado.`);
         console.error("Execute 'gradle test jacocoTestReport' primeiro.");

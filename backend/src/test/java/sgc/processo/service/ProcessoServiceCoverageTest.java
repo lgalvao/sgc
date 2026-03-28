@@ -39,6 +39,9 @@ class ProcessoServiceCoverageTest {
     @Mock private AlertaFacade servicoAlertas;
     @Mock private SgcPermissionEvaluator permissionEvaluator;
 
+    @Mock private EmailService emailService;
+    @Mock private EmailModelosService emailModelosService;
+
     @InjectMocks
     private ProcessoService target;
 
@@ -286,5 +289,33 @@ class ProcessoServiceCoverageTest {
             assertThat(res.getElegiveis()).isNotEmpty();
             assertThat(res.getElegiveis().getFirst().getUltimaDataLimite()).isEqualTo(d2);
         }
+    }
+
+    @Test
+    @DisplayName("enviarLembrete - sucesso")
+    void enviarLembreteSucesso() {
+        Processo p = new Processo();
+        p.setCodigo(1L);
+        p.setDescricao("Processo Teste");
+        p.setDataLimite(java.time.LocalDateTime.now().plusDays(1));
+        
+        Unidade u = new Unidade();
+        u.setCodigo(10L);
+        u.setSigla("U1");
+        u.setTituloTitular("titular");
+        
+        p.adicionarParticipantes(Set.of(u));
+        
+        Usuario titular = new Usuario();
+        titular.setEmail("teste@teste.com");
+
+        when(processoRepo.buscarPorCodigoComParticipantes(1L)).thenReturn(Optional.of(p));
+        when(unidadeService.buscarPorCodigo(10L)).thenReturn(u);
+        when(usuarioService.buscarPorLogin("titular")).thenReturn(titular);
+        when(emailModelosService.criarEmailLembretePrazo(any(), any(), any())).thenReturn("<html></html>");
+
+        target.enviarLembrete(1L, 10L);
+
+        verify(emailService).enviarEmailHtml(eq("teste@teste.com"), anyString(), anyString());
     }
 }

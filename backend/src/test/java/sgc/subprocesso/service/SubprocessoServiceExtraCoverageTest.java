@@ -24,6 +24,7 @@ import java.util.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import static org.springframework.test.util.ReflectionTestUtils.*;
 import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -644,6 +645,41 @@ class SubprocessoServiceExtraCoverageTest {
 
             assertThat(sp.getDataLimiteEtapa1()).isEqualTo(d1); // Não mudou
             assertThat(sp.getMapa().getCodigo()).isEqualTo(100L);
+        }
+
+        @Test
+        @DisplayName("obterMapaObrigatorio - deve lançar IllegalStateException se mapa for null")
+        void obterMapaObrigatorioNull() {
+            Subprocesso sp = new Subprocesso();
+            sp.setCodigo(100L);
+            sp.setMapa(null);
+            
+            assertThatThrownBy(() -> invokeMethod(subprocessoService, "obterMapaObrigatorio", sp))
+                    .isInstanceOf(IllegalStateException.class)
+                    .hasMessageContaining("sem mapa associado");
+        }
+
+        @Test
+        @DisplayName("importarAtividades - switch default branch (DIAGNOSTICO)")
+        void importarAtividadesDiagnostico() {
+            Subprocesso spDest = criarSubprocessoComMapa(1L, TipoProcesso.DIAGNOSTICO);
+            spDest.setSituacaoForcada(NAO_INICIADO);
+            spDest.getMapa().setCodigo(100L);
+
+            Subprocesso spOrig = criarSubprocessoComMapa(2L);
+            spOrig.getProcesso().setSituacao(SituacaoProcesso.FINALIZADO);
+            spOrig.getMapa().setCodigo(200L);
+            spOrig.setUnidade(new Unidade());
+
+            when(repo.buscar(Subprocesso.class, 1L)).thenReturn(spDest);
+            when(repo.buscar(Subprocesso.class, 2L)).thenReturn(spOrig);
+            Usuario user = criarUsuarioMock();
+            when(usuarioFacade.usuarioAutenticado()).thenReturn(user);
+            when(permissionEvaluator.verificarPermissao(eq(user), any(), any())).thenReturn(true);
+
+            subprocessoService.importarAtividades(1L, 2L, List.of());
+            
+            assertThat(spDest.getSituacao()).isEqualTo(NAO_INICIADO); // Não mudou no switch
         }
     }
 }
