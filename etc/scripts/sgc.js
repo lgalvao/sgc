@@ -7,6 +7,7 @@ import {executarDoctor} from "./projeto/doctor.js";
 import {executarLimpeza} from "./projeto/limpar.js";
 import {PERFIS, executarPerfilQualidade} from "./projeto/qualidade.js";
 import {executarSetup} from "./projeto/setup.js";
+import {executarSnapshotQa} from "./qa/snapshot-coletar.js";
 import {executarResumoQa} from "./qa/resumo.js";
 
 function criarComandoScript(pai, nome, descricao, relativo) {
@@ -87,7 +88,16 @@ criarComandoScript(e2e, "limpar", "Aplica limpeza automatizada em especificacoes
 
 const qa = program.command("qa").description("Ferramentas de qualidade e dashboard.");
 const qaSnapshot = qa.command("snapshot").description("Coleta e consolidacao de snapshots.");
-criarComandoScript(qaSnapshot, "coletar", "Coleta snapshot de QA.", "etc/scripts/qa/snapshot-coletar.js");
+qaSnapshot
+    .command("coletar")
+    .description("Coleta snapshot de QA.")
+    .allowUnknownOption(true)
+    .option("--perfil <perfil>", "Perfil de execucao (rapido, completo, backend, frontend).", "rapido")
+    .action(async (opcoes, comando) => {
+        const argsExtras = comando.args ?? [];
+        const args = ["--perfil", opcoes.perfil, ...argsExtras];
+        await executarSnapshotQa(args);
+    });
 qa
     .command("resumo")
     .description("Resume o snapshot mais recente do QA Dashboard.")
