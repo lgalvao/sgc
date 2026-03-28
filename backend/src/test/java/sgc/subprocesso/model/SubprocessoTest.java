@@ -178,8 +178,8 @@ class SubprocessoTest {
     }
 
     @Test
-    @DisplayName("Getters NonNull should return values")
-    void gettersNonNull() {
+    @DisplayName("Deve manter referências informadas na construção da entidade")
+    void deveManterReferenciasDaConstrucao() {
         Processo p = new Processo();
         Unidade u = new Unidade();
         Mapa m = new Mapa();

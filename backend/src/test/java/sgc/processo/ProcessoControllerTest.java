@@ -222,8 +222,7 @@ class ProcessoControllerTest {
             when(processoService.checarAcesso(any(), anyLong())).thenReturn(false);
 
             mockMvc.perform(get(API_PROCESSOS_1))
-                    .andDo(org.springframework.test.web.servlet.result.MockMvcResultHandlers.print())
-                    .andExpect(status().isForbidden());
+                                        .andExpect(status().isForbidden());
         }
 
         @Test

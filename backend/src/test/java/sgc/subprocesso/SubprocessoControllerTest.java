@@ -45,7 +45,7 @@ class SubprocessoControllerTest {
     private MockMvc mockMvc;
 
     @Nested
-    @DisplayName("CRUD Operations")
+    @DisplayName("Dado operação de consulta, quando buscar por processo e unidade, então retorna subprocesso")
     class CrudTests {
         @Test
         @DisplayName("deve buscar por processo e unidade")
@@ -64,7 +64,7 @@ class SubprocessoControllerTest {
     }
 
     @Nested
-    @DisplayName("Cadastro workflow")
+    @DisplayName("Dado fluxo de cadastro, quando executar transições, então responde com sucesso")
     class CadastroWorkflowTests {
         @Test
         @DisplayName("deve disponibilizar cadastro")
@@ -95,7 +95,7 @@ class SubprocessoControllerTest {
     }
 
     @Nested
-    @DisplayName("Mapa workflow")
+    @DisplayName("Dado fluxo de mapa, quando consultar ou disponibilizar, então aplica regras de endpoint")
     class MapaWorkflowTests {
         @Test
         @DisplayName("deve obter mapa para visualização")
@@ -122,7 +122,7 @@ class SubprocessoControllerTest {
     }
 
     @Nested
-    @DisplayName("Validação workflow")
+    @DisplayName("Dado fluxo de validação, quando apresentar sugestões, então delega ao serviço")
     class ValidacaoWorkflowTests {
         @Test
         @DisplayName("deve apresentar sugestões")
@@ -140,7 +140,7 @@ class SubprocessoControllerTest {
     }
 
     @Nested
-    @DisplayName("Análises")
+    @DisplayName("Dado fluxo de análises, quando registrar parecer, então persiste histórico")
     class AnalisesTests {
         @Test
         @DisplayName("deve criar análise de cadastro")

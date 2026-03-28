@@ -315,6 +315,23 @@ class LoginControllerTest {
             verify(httpRes).addCookie(argThat(cookie -> !cookie.getSecure()));
         }
 
+
+        @Test
+        @DisplayName("autenticar deve retornar false e não gerar cookie se falhar")
+        void autenticar_DeveRetornarFalseSemCookieQuandoFalhar() {
+            AutenticarRequest request = new AutenticarRequest("111111", "senha_errada");
+            HttpServletRequest httpRequest = mock(HttpServletRequest.class);
+            HttpServletResponse httpResponse = mock(HttpServletResponse.class);
+
+            when(loginFacadeMock.autenticar("111111", "senha_errada")).thenReturn(false);
+            when(httpRequest.getRemoteAddr()).thenReturn("127.0.0.1");
+
+            var resultado = controller.autenticar(request, httpRequest, httpResponse);
+
+            Assertions.assertFalse(Boolean.TRUE.equals(resultado.getBody()));
+            verify(httpResponse, never()).addCookie(any());
+        }
+
         @Test
         @DisplayName("entrar deve lidar com cookie invalido e lancar ErroAutenticacao")
         void entrar_CookieInvalido() {

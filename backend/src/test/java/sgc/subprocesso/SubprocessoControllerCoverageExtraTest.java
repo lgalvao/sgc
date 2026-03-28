@@ -85,7 +85,7 @@ class SubprocessoControllerCoverageExtraTest {
     }
 
     @Test
-    @DisplayName("salvarMapaCompleto - ok")
+    @DisplayName("salvarMapaCompleto - deve persistir mapa completo")
     @WithMockUser
     void salvarMapaCompletoOk() throws Exception {
         when(permissionEvaluator.hasPermission(any(), eq(1L), eq("Subprocesso"), eq("EDITAR_MAPA"))).thenReturn(true);
@@ -97,10 +97,13 @@ class SubprocessoControllerCoverageExtraTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk());
+
+        verify(subprocessoService).salvarMapa(eq(1L), any());
+        verify(subprocessoService).mapaCompletoDtoPorSubprocesso(1L);
     }
 
     @Test
-    @DisplayName("disponibilizarMapaEmBloco - ok")
+    @DisplayName("disponibilizarMapaEmBloco - deve processar lista de subprocessos")
     @WithMockUser
     void disponibilizarMapaEmBlocoOk() throws Exception {
         ProcessarEmBlocoRequest req = new ProcessarEmBlocoRequest("DISPONIBILIZAR", List.of(1L), LocalDate.now());
@@ -111,10 +114,12 @@ class SubprocessoControllerCoverageExtraTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk());
+
+        verify(transicaoService).disponibilizarMapaEmBloco(eq(List.of(1L)), any(), any());
     }
 
     @Test
-    @DisplayName("obterMapaParaAjuste - ok")
+    @DisplayName("obterMapaParaAjuste - deve retornar payload de ajuste")
     @WithMockUser
     void obterMapaParaAjusteOk() throws Exception {
         when(permissionEvaluator.hasPermission(any(), eq(1L), eq("Subprocesso"), eq("AJUSTAR_MAPA"))).thenReturn(true);
@@ -122,21 +127,26 @@ class SubprocessoControllerCoverageExtraTest {
 
         mockMvc.perform(get("/api/subprocessos/1/mapa-ajuste"))
                 .andExpect(status().isOk());
+
+        verify(subprocessoService).obterMapaParaAjuste(1L);
     }
 
     @Test
-    @DisplayName("obterSugestoes - ok")
+    @DisplayName("obterSugestoes - deve retornar sugestões consolidadas")
     @WithMockUser
     void obterSugestoesOk() throws Exception {
         when(permissionEvaluator.hasPermission(any(), eq(1L), eq("Subprocesso"), eq("VISUALIZAR_SUBPROCESSO"))).thenReturn(true);
-        when(subprocessoService.obterSugestoes(1L)).thenReturn(Map.of());
+        when(subprocessoService.obterSugestoes(1L)).thenReturn(Map.of("total", 2));
 
         mockMvc.perform(get("/api/subprocessos/1/sugestoes"))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.total").value(2));
+
+        verify(subprocessoService).obterSugestoes(1L);
     }
 
     @Test
-    @DisplayName("criarAnaliseValidacao - ok")
+    @DisplayName("criarAnaliseValidacao - deve registrar análise de validação")
     @WithMockUser(roles = {"GESTOR"})
     void criarAnaliseValidacaoOk() throws Exception {
         CriarAnaliseRequest req = new CriarAnaliseRequest("obs", "mot", sgc.subprocesso.model.TipoAcaoAnalise.ACEITE_MAPEAMENTO);
@@ -158,9 +168,12 @@ class SubprocessoControllerCoverageExtraTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isCreated());
+
+        verify(transicaoService).criarAnalise(any(), any(), eq(sgc.subprocesso.model.TipoAnalise.VALIDACAO), any());
+        verify(subprocessoService).paraHistoricoDto(a);
     }
     @Test
-    @DisplayName("criarAnaliseCadastro - ok")
+    @DisplayName("criarAnaliseCadastro - deve registrar análise de cadastro")
     @WithMockUser(roles = {"GESTOR"})
     void criarAnaliseCadastroOk() throws Exception {
         CriarAnaliseRequest req = new CriarAnaliseRequest("obs", "mot", sgc.subprocesso.model.TipoAcaoAnalise.ACEITE_MAPEAMENTO);
@@ -182,10 +195,13 @@ class SubprocessoControllerCoverageExtraTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isCreated());
+
+        verify(transicaoService).criarAnalise(any(), any(), eq(sgc.subprocesso.model.TipoAnalise.CADASTRO), any());
+        verify(subprocessoService).paraHistoricoDto(a);
     }
 
     @Test
-    @DisplayName("obterMapaParaVisualizacao - ok")
+    @DisplayName("obterMapaParaVisualizacao - deve retornar visão de leitura")
     @WithMockUser
     void obterMapaParaVisualizacaoOk() throws Exception {
         when(permissionEvaluator.hasPermission(any(), eq(1L), eq("Subprocesso"), eq("VISUALIZAR_SUBPROCESSO"))).thenReturn(true);
@@ -193,10 +209,12 @@ class SubprocessoControllerCoverageExtraTest {
 
         mockMvc.perform(get("/api/subprocessos/1/mapa-visualizacao"))
                 .andExpect(status().isOk());
+
+        verify(subprocessoService).mapaParaVisualizacao(1L);
     }
 
     @Test
-    @DisplayName("salvarAjustesMapa - ok")
+    @DisplayName("salvarAjustesMapa - deve aplicar ajustes recebidos")
     @WithMockUser
     void salvarAjustesMapaOk() throws Exception {
         when(permissionEvaluator.hasPermission(any(), eq(1L), eq("Subprocesso"), eq("EDITAR_MAPA"))).thenReturn(true);
@@ -207,10 +225,12 @@ class SubprocessoControllerCoverageExtraTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk());
+
+        verify(subprocessoService).salvarAjustesMapa(eq(1L), any());
     }
 
     @Test
-    @DisplayName("apresentarSugestoes - ok")
+    @DisplayName("apresentarSugestoes - deve encaminhar justificativa ao fluxo")
     @WithMockUser
     void apresentarSugestoesOk() throws Exception {
         when(permissionEvaluator.hasPermission(any(), eq(1L), eq("Subprocesso"), eq("APRESENTAR_SUGESTOES"))).thenReturn(true);
@@ -221,21 +241,26 @@ class SubprocessoControllerCoverageExtraTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk());
+
+        verify(transicaoService).apresentarSugestoes(eq(1L), eq("Sugestao"), any());
     }
 
     @Test
-    @DisplayName("obterHistoricoValidacao - ok")
+    @DisplayName("obterHistoricoValidacao - deve retornar histórico de validação")
     @WithMockUser
     void obterHistoricoValidacaoOk() throws Exception {
         when(permissionEvaluator.hasPermission(any(), eq(1L), eq("Subprocesso"), eq("VISUALIZAR_SUBPROCESSO"))).thenReturn(true);
         when(subprocessoService.listarHistoricoValidacao(1L)).thenReturn(List.of());
 
         mockMvc.perform(get("/api/subprocessos/1/historico-validacao"))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray());
+
+        verify(subprocessoService).listarHistoricoValidacao(1L);
     }
 
     @Test
-    @DisplayName("verificarImpactos - ok")
+    @DisplayName("verificarImpactos - deve retornar impactos calculados")
     @WithMockUser
     void verificarImpactosOk() throws Exception {
         when(permissionEvaluator.hasPermission(any(), eq(1L), eq("Subprocesso"), eq("VERIFICAR_IMPACTOS"))).thenReturn(true);
@@ -243,5 +268,7 @@ class SubprocessoControllerCoverageExtraTest {
 
         mockMvc.perform(get("/api/subprocessos/1/impactos-mapa"))
                 .andExpect(status().isOk());
+
+        verify(subprocessoService).verificarImpactos(eq(1L), any());
     }
 }

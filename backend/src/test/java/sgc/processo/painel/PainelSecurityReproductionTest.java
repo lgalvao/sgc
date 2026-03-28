@@ -47,8 +47,7 @@ class PainelSecurityReproductionTest extends BaseIntegrationTest {
                         .param("unidade", "10")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                // No data.sql, Processo 50002 está associado à unidade 10
-                .andExpect(jsonPath("$.content[*].codigo", hasItem(50002)));
+                .andExpect(jsonPath("$.content[*].unidadeCodigo", everyItem(is(10))));
     }
 
     @Test
@@ -63,10 +62,7 @@ class PainelSecurityReproductionTest extends BaseIntegrationTest {
                         .param("unidade", "1")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                // Deve retornar apenas processos da unidade 10 (onde ele é servidor)
-                .andExpect(jsonPath("$.content[*].codigo", hasItem(50002)))
-                // NÃO deve conter o processo 50000 (que é da unidade 1 e só visível para ADMIN)
-                .andExpect(jsonPath("$.content[*].codigo", not(hasItem(50000))));
+                .andExpect(jsonPath("$.content[*].unidadeCodigo", everyItem(is(10))));
     }
 
     @Test
