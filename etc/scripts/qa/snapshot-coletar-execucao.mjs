@@ -97,7 +97,7 @@ function parseArgs(argv) {
 function imprimirAjuda() {
     console.log(`
 Uso:
-  node etc/qa-dashboard/scripts/coletar-snapshot.mjs --perfil rapido
+  node etc/scripts/sgc.js qa snapshot coletar --perfil rapido
 
 Perfis disponiveis:
   rapido
