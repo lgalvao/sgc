@@ -5,15 +5,21 @@ import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
 import sgc.alerta.*;
+import sgc.mapa.dto.*;
 import sgc.mapa.service.*;
 import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
 import sgc.processo.model.*;
 import sgc.subprocesso.model.*;
+import sgc.subprocesso.dto.*;
 
 import java.time.LocalDateTime;
 import java.util.*;
+
+import static sgc.processo.model.TipoProcesso.*;
+import static sgc.subprocesso.model.SituacaoSubprocesso.*;
+import static sgc.subprocesso.model.TipoTransicao.*;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -315,5 +321,87 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
 
         assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
         verify(subprocessoRepo, times(2)).save(sp); 
+    }
+
+    @Test
+    @DisplayName("executarDevolucao - deve encontrar unidade de devolução subordinada")
+    void executarDevolucao_EncontraSubordinada() {
+        Subprocesso sp = new Subprocesso(); sp.setCodigo(1L); sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+        Unidade uBase = new Unidade(); uBase.setCodigo(10L); sp.setUnidade(uBase);
+        Processo p = new Processo(); p.setTipo(TipoProcesso.MAPEAMENTO); sp.setProcesso(p);
+
+        Unidade uAnalise = new Unidade(); uAnalise.setCodigo(20L);
+        Unidade uOrigem = new Unidade(); uOrigem.setCodigo(15L);
+
+        Movimentacao mov = new Movimentacao();
+        mov.setUnidadeDestino(uAnalise);
+        mov.setUnidadeOrigem(uOrigem);
+
+        when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(1L)).thenReturn(Optional.of(sp));
+        when(movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(1L)).thenReturn(List.of(mov));
+        when(hierarquiaService.isSubordinada(uOrigem, uAnalise)).thenReturn(true); // branch 489
+
+        service.devolverCadastro(1L, new Usuario(), "Obs");
+
+        // Deve ter devolvido para uOrigem (destino da transicao)
+        verify(notificacaoService).notificarTransicao(argThat(cmd -> cmd.unidadeDestino().equals(uOrigem)));
+    }
+
+    @Test
+    @DisplayName("executarHomologacao - com impactos em REVISAO")
+    void executarHomologacao_ComImpactos() {
+        Subprocesso sp = new Subprocesso(); sp.setCodigo(1L); sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
+        Processo p = new Processo(); p.setTipo(TipoProcesso.REVISAO); sp.setProcesso(p);
+
+        when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(1L)).thenReturn(Optional.of(sp));
+        when(impactoMapaService.verificarImpactos(any(), any())).thenReturn(ImpactoMapaResponse.builder()
+                .temImpactos(true)
+                .inseridas(List.of(AtividadeImpactadaDto.builder().descricao("Nova").build()))
+                .removidas(List.of())
+                .alteradas(List.of())
+                .competenciasImpactadas(List.of())
+                .build()); 
+
+        service.homologarRevisaoCadastro(1L, new Usuario(), "Obs"); // branch 583 (temImpactos = true)
+
+        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
+    }
+
+    @Test
+    @DisplayName("executarHomologacao - sem impactos em REVISAO")
+    void executarHomologacao_SemImpactos() {
+        Subprocesso sp = new Subprocesso(); sp.setCodigo(1L); sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
+        Processo p = new Processo(); p.setTipo(TipoProcesso.REVISAO); sp.setProcesso(p);
+
+        when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(1L)).thenReturn(Optional.of(sp));
+        when(impactoMapaService.verificarImpactos(any(), any())).thenReturn(ImpactoMapaResponse.builder()
+                .temImpactos(false)
+                .inseridas(List.of())
+                .removidas(List.of())
+                .alteradas(List.of())
+                .competenciasImpactadas(List.of())
+                .build()); 
+
+        service.homologarRevisaoCadastro(1L, new Usuario(), "Obs"); // branch 583 (temImpactos = false)
+
+        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO);
+    }
+
+    @Test
+    @DisplayName("executarDisponibilizacaoMapa - valida data limite igual")
+    void disponibilizarMapa_DataIgual() {
+        Subprocesso sp = new Subprocesso(); sp.setCodigo(1L); 
+        sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
+        Processo p = new Processo(); p.setTipo(TipoProcesso.MAPEAMENTO); sp.setProcesso(p);
+        sp.setMapa(new sgc.mapa.model.Mapa()); sp.getMapa().setCodigo(100L);
+        sp.setDataLimiteEtapa1(LocalDateTime.of(2026, 1, 1, 0, 0));
+        
+        when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(1L)).thenReturn(Optional.of(sp));
+        when(unidadeService.buscarPorSigla("ADMIN")).thenReturn(new Unidade());
+
+        sgc.subprocesso.dto.DisponibilizarMapaRequest req = new sgc.subprocesso.dto.DisponibilizarMapaRequest(java.time.LocalDate.of(2026, 1, 1), "Obs");
+        service.disponibilizarMapa(1L, req, new Usuario()); // branch 228 (ultima != null && isBefore = false)
+
+        assertThat(sp.getDataLimiteEtapa2()).isEqualTo(LocalDateTime.of(2026, 1, 1, 0, 0));
     }
 }

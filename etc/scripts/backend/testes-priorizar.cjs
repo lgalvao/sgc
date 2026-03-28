@@ -65,7 +65,7 @@ function imprimirAjuda() {
             '--help, -h          Exibe esta ajuda'
         ],
         exemplos: [
-            'node backend/etc/scripts/sgc.cjs testes priorizar --input analise-testes.json --output priorizacao-testes.md'
+            'node etc/scripts/sgc.js backend testes priorizar --input analise-testes.json --output priorizacao-testes.md'
         ]
     });
 }

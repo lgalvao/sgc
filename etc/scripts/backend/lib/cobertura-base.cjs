@@ -3,8 +3,8 @@ const path = require('node:path');
 const {execFileSync} = require('node:child_process');
 const xml2js = require('xml2js');
 
-const BACKEND_DIR = path.resolve(__dirname, '../../..');
-const ROOT_DIR = path.resolve(BACKEND_DIR, '..');
+const ROOT_DIR = path.resolve(__dirname, '../../../..');
+const BACKEND_DIR = path.join(ROOT_DIR, 'backend');
 const REPORT_XML_PATH = path.join(BACKEND_DIR, 'build/reports/jacoco/test/jacocoTestReport.xml');
 const REPORT_CSV_PATH = path.join(BACKEND_DIR, 'build/reports/jacoco/test/jacocoTestReport.csv');
 const LACUNAS_JSON_PATH = path.join(ROOT_DIR, 'cobertura_lacunas.json');

@@ -50,6 +50,7 @@ node etc/scripts/sgc.js frontend validacoes auditar
 node etc/scripts/sgc.js qa snapshot coletar --perfil rapido
 node etc/scripts/sgc.js qa resumo
 node etc/scripts/sgc.js qa resumo --json
+node etc/scripts/sgc.js qa dashboard servir --porta 4179
 ```
 
 ### Projeto
@@ -68,6 +69,10 @@ node etc/scripts/sgc.js projeto arvore-linhas --depth 2
 
 ```bash
 node etc/scripts/sgc.js codigo comentarios limpar-ai --dry-run
+node etc/scripts/sgc.js codigo comentarios limpar-generico --dry-run
+node etc/scripts/sgc.js codigo id-legado identificar
+node etc/scripts/sgc.js codigo title-case identificar
+node etc/scripts/sgc.js codigo title-case corrigir --dry-run
 node etc/scripts/sgc.js e2e limpar
 ```
 
@@ -118,6 +123,20 @@ O dashboard de QA continua tendo como fonte de verdade:
 
 O comando `qa resumo` lê esses artefatos normalizados, com fallback para o último `runs/**/snapshot.json`.
 
+### `qa dashboard servir`
+
+Inicia um servidor HTTP local para abrir o dashboard consolidado:
+
+```bash
+node etc/scripts/sgc.js qa dashboard servir --porta 4179
+```
+
+Depois abra:
+
+```text
+http://127.0.0.1:4179/etc/qa-dashboard/dashboard.html
+```
+
 ## Testes do toolkit
 
 O toolkit tem sua própria suíte inicial de testes automatizados:
@@ -130,12 +149,18 @@ Os testes atuais cobrem:
 
 - ajuda da CLI raiz
 - despacho de comandos do backend
+- despacho de comandos do frontend
 - `qa resumo` com fixture
 - `projeto doctor --json`
 - `projeto limpar` em modo prévia e remoção real
 
 ## Estado atual
 
-`backend/etc/scripts` e `frontend/etc/scripts` ainda existem como implementação legada de alguns comandos já expostos na CLI raiz. O uso recomendado, a documentação e os testes ficam centralizados em `etc/scripts`.
+Os comandos operacionais do toolkit ficam centralizados em `etc/scripts`, organizados por domínio:
 
-Os arquivos em `etc/scripts/legado/` são transitórios e não fazem parte da superfície pública do toolkit. Eles devem ser portados para ESM ou removidos.
+- `backend/`
+- `frontend/`
+- `qa/`
+- `projeto/`
+- `codigo/`
+- `e2e/`

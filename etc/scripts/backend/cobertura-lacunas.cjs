@@ -20,8 +20,8 @@ async function main() {
                 '--help, -h    Exibe esta ajuda'
             ],
             exemplos: [
-                'node backend/etc/scripts/sgc.cjs cobertura lacunas',
-                'node backend/etc/scripts/sgc.cjs cobertura lacunas --run'
+                'node etc/scripts/sgc.js backend cobertura lacunas',
+                'node etc/scripts/sgc.js backend cobertura lacunas --run'
             ]
         });
         process.exit(0);

@@ -44,7 +44,7 @@ function imprimirAjuda() {
             '--help, -h              Exibe esta ajuda'
         ],
         exemplos: [
-            'node backend/etc/scripts/sgc.cjs testes analisar --dir backend --output analise-testes.md --output-json analise-testes.json'
+            'node etc/scripts/sgc.js backend testes analisar --dir backend --output analise-testes.md --output-json analise-testes.json'
         ]
     });
 }

@@ -183,8 +183,8 @@ function main() {
                 '--help, -h    Exibe esta ajuda'
             ],
             exemplos: [
-                'node backend/etc/scripts/sgc.cjs java corrigir-fqn --dry-run',
-                'node backend/etc/scripts/sgc.cjs java corrigir-fqn'
+                'node etc/scripts/sgc.js backend java corrigir-fqn --dry-run',
+                'node etc/scripts/sgc.js backend java corrigir-fqn'
             ]
         });
         process.exit(0);

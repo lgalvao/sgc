@@ -197,7 +197,7 @@ async function main() {
             scriptDireto: 'cobertura-complexidade.cjs',
             descricao: 'Le o CSV do JaCoCo e gera um ranking de complexidade na raiz do repositorio.',
             exemplos: [
-                'node backend/etc/scripts/sgc.cjs cobertura complexidade'
+                'node etc/scripts/sgc.js backend cobertura complexidade'
             ]
         });
         process.exit(0);

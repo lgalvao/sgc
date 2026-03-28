@@ -22,7 +22,7 @@ function gerarMarkdown(arquivos) {
         const scoreAcao = calcularScoreAcao(arquivo);
         const prioridade = scoreAcao > 20 ? 'CRÍTICO' : (scoreAcao > 10 ? 'MÉDIO' : 'BAIXO');
         const nomeClasse = arquivo.nomeClasse.split('.').pop();
-        markdown += `| ${prioridade} | \`${arquivo.nomeClasse}\` | ${arquivo.coberturaLinhas.toFixed(1)}% | ${arquivo.coberturaBranches.toFixed(1)}% | ${scoreAcao.toFixed(1)} | \`node backend/etc/scripts/testes-gerar-stub.cjs ${nomeClasse}\` |\n`;
+        markdown += `| ${prioridade} | \`${arquivo.nomeClasse}\` | ${arquivo.coberturaLinhas.toFixed(1)}% | ${arquivo.coberturaBranches.toFixed(1)}% | ${scoreAcao.toFixed(1)} | \`node etc/scripts/sgc.js backend testes gerar-stub ${nomeClasse}\` |\n`;
     });
 
     return markdown;
@@ -38,7 +38,7 @@ function imprimirResumo(arquivos) {
         const severidade = scoreAcao > 20 ? 'CRITICO' : (scoreAcao > 10 ? 'MEDIO' : 'BAIXO');
         console.log(`${indice + 1}. [${severidade}] [Score: ${scoreAcao.toFixed(1)}] ${arquivo.nomeClasse}`);
         console.log(`   L: ${arquivo.coberturaLinhas.toFixed(1)}% | B: ${arquivo.coberturaBranches.toFixed(1)}%`);
-        console.log(`   Comando: node backend/etc/scripts/testes-gerar-stub.cjs ${arquivo.nomeClasse.split('.').pop()}`);
+        console.log(`   Comando: node etc/scripts/sgc.js backend testes gerar-stub ${arquivo.nomeClasse.split('.').pop()}`);
     });
 
     console.log(`\nPlano completo gerado em: ${PLANO_RESUMIDO_PATH}`);
@@ -56,8 +56,8 @@ async function main() {
                 '--help, -h    Exibe esta ajuda'
             ],
             exemplos: [
-                'node backend/etc/scripts/sgc.cjs cobertura priorizar',
-                'node backend/etc/scripts/sgc.cjs cobertura priorizar --skip-run'
+                'node etc/scripts/sgc.js backend cobertura priorizar',
+                'node etc/scripts/sgc.js backend cobertura priorizar --skip-run'
             ]
         });
         process.exit(0);

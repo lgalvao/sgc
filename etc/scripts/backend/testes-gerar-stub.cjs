@@ -3,7 +3,8 @@ const fs = require('node:fs');
 const path = require('node:path');
 const xml2js = require('xml2js');
 const {exibirAjudaComando} = require('./lib/cli-ajuda.cjs');
-const BASE_DIR = path.join(__dirname, '../..');
+const ROOT_DIR = path.join(__dirname, '../../..');
+const BASE_DIR = path.join(ROOT_DIR, 'backend');
 const REPORT_PATH = path.join(BASE_DIR, 'build/reports/jacoco/test/jacocoTestReport.xml');
 const SRC_DIR = path.join(BASE_DIR, 'src/main/java');
 const TEST_DIR = path.join(BASE_DIR, 'src/test/java');
@@ -16,8 +17,8 @@ async function main() {
             descricao: 'Gera um arquivo CoverageTest inicial para a classe informada.',
             argumentos: '<NomeDaClasseOuFqn>',
             exemplos: [
-                'node backend/etc/scripts/sgc.cjs testes gerar-stub ProcessoService',
-                'node backend/etc/scripts/sgc.cjs testes gerar-stub sgc.processo.service.ProcessoService'
+                'node etc/scripts/sgc.js backend testes gerar-stub ProcessoService',
+                'node etc/scripts/sgc.js backend testes gerar-stub sgc.processo.service.ProcessoService'
             ]
         });
         process.exit(0);

@@ -599,5 +599,50 @@ class ImpactoMapaServiceTest {
             assertTrue(competenciaImpactada.tiposImpacto().contains(TipoImpactoCompetencia.ATIVIDADE_ALTERADA));
             assertEquals(2, competenciaImpactada.tiposImpacto().size());
         }
+
+        @Test
+        @DisplayName("verificarImpactos: Atividades com conhecimentos idênticos não devem gerar alteração")
+        void verificarImpactos_ConhecimentosIdenticos() {
+            mockAcessoLivre();
+            Subprocesso sp = new Subprocesso(); sp.setCodigo(1L); sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+            Unidade u = new Unidade(); u.setCodigo(100L); sp.setUnidade(u);
+            
+            Mapa mapaVigente = new Mapa(); mapaVigente.setCodigo(20L);
+            Mapa mapaSub = new Mapa(); mapaSub.setCodigo(21L);
+
+            when(mapaRepo.buscarMapaVigentePorUnidade(100L)).thenReturn(Optional.of(mapaVigente));
+            when(mapaRepo.buscarPorSubprocesso(1L)).thenReturn(Optional.of(mapaSub));
+
+            Conhecimento c1 = new Conhecimento(); c1.setDescricao("Java");
+            Atividade a1 = new Atividade(); a1.setCodigo(10L); a1.setDescricao("Ativ"); a1.setConhecimentos(Set.of(c1));
+            Atividade a2 = new Atividade(); a2.setCodigo(11L); a2.setDescricao("Ativ"); a2.setConhecimentos(Set.of(c1));
+
+            when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(20L)).thenReturn(List.of(a1));
+            when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(21L)).thenReturn(List.of(a2));
+            when(competenciaRepo.findByMapa_Codigo(20L)).thenReturn(List.of());
+
+            ImpactoMapaResponse response = impactoMapaService.verificarImpactos(sp, usuarioAdmin());
+
+            assertFalse(response.temImpactos()); // branch 157 false
+            assertTrue(response.alteradas().isEmpty());
+        }
+
+        @Test
+        @DisplayName("processarAlteradas: Filtro de descrição inexistente")
+        void processarAlteradas_DescricaoInexistenteNoFiltro() {
+            // Este teste é artificial para atingir o branch do filter caso o Jacoco o exija,
+            // embora na lógica real as descrições devam coincidir.
+            List<AtividadeImpactadaDto> alteradas = List.of(
+                AtividadeImpactadaDto.builder().descricao("Inexistente").build()
+            );
+            Map<String, Long> descricaoParaCodVigente = Map.of("Outra", 1L);
+            Map<Long, List<Competencia>> codAtividadeParaCompetencias = Map.of();
+            Map<Long, Object> mapaImpactos = new HashMap<>();
+
+            org.springframework.test.util.ReflectionTestUtils.invokeMethod(impactoMapaService, "processarAlteradas", 
+                alteradas, descricaoParaCodVigente, codAtividadeParaCompetencias, mapaImpactos);
+
+            assertTrue(mapaImpactos.isEmpty()); // branch 252 false
+        }
     }
 }

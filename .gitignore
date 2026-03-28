@@ -57,14 +57,19 @@ frontend-backend-validation-comparison.md
 analise-testes.md
 analise-testes.json
 complexity-ranking.md
+cobertura-detalhada.txt
 cobertura_lacunas.json
+id-legacy-report.txt
 null-checks-analysis.md
 null-checks-audit.txt
 plano-100-cobertura.md
 plano-cobertura-backend.md
 priorizacao-testes.md
 relatorio-testes.md
+test-quality-report.md
+title-case-report.txt
 unit-test-report.md
+view-validations-audit.md
 
 # Playwright E2E test results
 !test-results/

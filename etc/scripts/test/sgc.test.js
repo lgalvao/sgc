@@ -40,6 +40,18 @@ describe("CLI raiz do toolkit", () => {
         expect(json.hotspots).toHaveLength(2);
     });
 
+    test("despacha ajuda de um comando migrado do frontend", async () => {
+        const resultado = await executarSgc(["frontend", "mensagens", "extrair", "--help"]);
+        expect(resultado.exitCode).toBe(0);
+        expect(resultado.stdout).toContain("Extrai mensagens do projeto.");
+    });
+
+    test("despacha ajuda do servidor do qa dashboard", async () => {
+        const resultado = await executarSgc(["qa", "dashboard", "servir", "--help"]);
+        expect(resultado.exitCode).toBe(0);
+        expect(resultado.stdout).toContain("Serve o dashboard de QA localmente.");
+    });
+
     test("executa o doctor em JSON", async () => {
         const resultado = await executarSgc(["projeto", "doctor", "--json"]);
         expect(resultado.exitCode).toBe(0);

@@ -116,11 +116,11 @@ function gerarMarkdown(agrupado, totais) {
 
     markdown += '---\n\n';
     markdown += '## Scripts Disponiveis\n\n';
-    markdown += '1. `node backend/etc/scripts/cobertura-lacunas.cjs --run` - Gera relatorio de lacunas\n';
-    markdown += '2. `node backend/etc/scripts/cobertura-verificar.cjs --missed` - Lista arquivos com mais gaps\n';
-    markdown += '3. `node backend/etc/scripts/cobertura-analisar.cjs` - Analise detalhada com tabelas\n';
-    markdown += '4. `node backend/etc/scripts/testes-analisar.cjs` - Identifica arquivos sem testes\n';
-    markdown += '5. `node backend/etc/scripts/testes-priorizar.cjs` - Prioriza criacao de testes\n';
+    markdown += '1. `node etc/scripts/sgc.js backend cobertura lacunas --run` - Gera relatorio de lacunas\n';
+    markdown += '2. `node etc/scripts/sgc.js backend cobertura verificar --missed` - Lista arquivos com mais gaps\n';
+    markdown += '3. `node etc/scripts/sgc.js backend cobertura analisar` - Analise detalhada com tabelas\n';
+    markdown += '4. `node etc/scripts/sgc.js backend testes analisar` - Identifica arquivos sem testes\n';
+    markdown += '5. `node etc/scripts/sgc.js backend testes priorizar` - Prioriza criacao de testes\n';
 
     return markdown;
 }
@@ -137,8 +137,8 @@ async function main() {
                 '--help, -h    Exibe esta ajuda'
             ],
             exemplos: [
-                'node backend/etc/scripts/sgc.cjs cobertura plano',
-                'node backend/etc/scripts/sgc.cjs cobertura plano --run'
+                'node etc/scripts/sgc.js backend cobertura plano',
+                'node etc/scripts/sgc.js backend cobertura plano --run'
             ]
         });
         process.exit(0);

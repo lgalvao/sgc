@@ -29,8 +29,8 @@ async function main() {
                 '--help, -h    Exibe esta ajuda'
             ],
             exemplos: [
-                'node backend/etc/scripts/sgc.cjs cobertura analisar',
-                'node backend/etc/scripts/sgc.cjs cobertura analisar --skip-run'
+                'node etc/scripts/sgc.js backend cobertura analisar',
+                'node etc/scripts/sgc.js backend cobertura analisar --skip-run'
             ]
         });
         process.exit(0);

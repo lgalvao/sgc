@@ -22,9 +22,11 @@ import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static sgc.processo.model.AcaoProcesso.*;
 import static sgc.processo.model.SituacaoProcesso.*;
 import static sgc.processo.model.TipoProcesso.*;
+import static sgc.seguranca.AcaoPermissao.*;
 import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -42,6 +44,7 @@ class ProcessoServiceCoverageTest {
 
     @Mock private EmailService emailService;
     @Mock private EmailModelosService emailModelosService;
+    @Mock private SubprocessoTransicaoService transicaoService;
 
     @InjectMocks
     private ProcessoService target;
@@ -59,7 +62,7 @@ class ProcessoServiceCoverageTest {
 
         when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
 
-        when(permissionEvaluator.verificarPermissao(any(), anyList(), any())).thenReturn(false);
+        when(permissionEvaluator.verificarPermissao(any(Usuario.class), any(List.class), any(AcaoPermissao.class))).thenReturn(false);
 
         assertThatThrownBy(() -> target.executarAcaoEmBloco(codProcesso, req))
                 .isInstanceOf(ErroAcessoNegado.class);
@@ -76,7 +79,7 @@ class ProcessoServiceCoverageTest {
         when(subprocessoService.listarEntidadesPorProcessoEUnidades(eq(codProcesso), anyList()))
                 .thenReturn(List.of(sp));
         when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
-        when(permissionEvaluator.verificarPermissao(any(), anyList(), any())).thenReturn(true);
+        when(permissionEvaluator.verificarPermissao(any(Usuario.class), any(List.class), any(AcaoPermissao.class))).thenReturn(true);
 
         assertThatThrownBy(() -> target.executarAcaoEmBloco(codProcesso, req))
                 .isInstanceOf(ErroValidacao.class)
@@ -291,6 +294,136 @@ class ProcessoServiceCoverageTest {
             ProcessoDetalheDto res = target.obterDetalhesCompleto(cod, u, true);
             assertThat(res.getElegiveis()).isNotEmpty();
             assertThat(res.getElegiveis().getFirst().getUltimaDataLimite()).isEqualTo(d2);
+        }
+
+        @Test
+        @DisplayName("obterDetalhesCompleto deve tratar subprocesso sem mapa")
+        void subprocessoSemMapa() {
+            Long cod = 1L;
+            Processo p = new Processo(); p.setCodigo(cod); p.setTipo(MAPEAMENTO);
+            Usuario u = new Usuario(); u.setPerfilAtivo(Perfil.ADMIN); u.setUnidadeAtivaCodigo(10L);
+            
+            Subprocesso sp = new Subprocesso(); sp.setCodigo(100L); sp.setSituacao(MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+            Unidade uni = new Unidade(); uni.setCodigo(10L); 
+            uni.setSigla("U10"); uni.setTipo(TipoUnidade.OPERACIONAL); uni.setSituacao(SituacaoUnidade.ATIVA);
+            sp.setUnidade(uni);
+            sp.setDataLimiteEtapa1(java.time.LocalDateTime.now());
+            sp.setMapa(null); // branch 441
+            
+            p.adicionarParticipantes(Set.of(uni));
+
+            when(repo.buscar(Processo.class, cod)).thenReturn(p);
+            when(subprocessoService.listarEntidadesPorProcessoComUnidade(cod)).thenReturn(List.of(sp));
+            when(subprocessoService.obterLocalizacaoAtual(sp)).thenReturn(uni);
+            when(permissionEvaluator.verificarPermissao(any(Usuario.class), any(Processo.class), any(AcaoPermissao.class))).thenReturn(true);
+            when(validacaoService.validarSubprocessosParaFinalizacao(cod)).thenReturn(sgc.subprocesso.service.SubprocessoValidacaoService.ValidationResult.ofValido());
+
+            ProcessoDetalheDto res = target.obterDetalhesCompleto(cod, u, false);
+            assertThat(res.getUnidades()).hasSize(1);
+            assertThat(res.getUnidades().get(0).getMapaCodigo()).isNull();
+        }
+    }
+
+    @Test
+    @DisplayName("iniciar deve suportar tipo DIAGNOSTICO")
+    void iniciarDiagnostico() {
+        Long cod = 1L;
+        Processo p = new Processo(); p.setCodigo(cod); p.setTipo(DIAGNOSTICO); p.setSituacao(CRIADO);
+        Unidade u = new Unidade(); u.setCodigo(10L); u.setTipo(sgc.organizacao.model.TipoUnidade.OPERACIONAL);
+        u.setSigla("U10"); u.setSituacao(SituacaoUnidade.ATIVA);
+        p.adicionarParticipantes(Set.of(u));
+
+        Unidade admin = new Unidade(); admin.setCodigo(99L); admin.setSigla("ADMIN"); admin.setSituacao(SituacaoUnidade.ATIVA);
+
+        when(repo.buscar(Processo.class, cod)).thenReturn(p);
+        when(unidadeService.porCodigos(any())).thenReturn(List.of(u));
+        UnidadeMapa um = new UnidadeMapa(); um.setUnidadeCodigo(10L); 
+        when(unidadeService.buscarMapasPorUnidades(any())).thenReturn(List.of(um));
+        when(repo.buscarPorSigla(Unidade.class, "ADMIN")).thenReturn(admin);
+
+        target.iniciar(cod, List.of(10L), new Usuario()); // branch 419 (DIAGNOSTICO)
+        verify(subprocessoService).criarParaDiagnostico(any(), any(), any(), any(), any());
+    }
+
+    @Test
+    @DisplayName("executarAcaoEmBloco - acao HOMOLOGAR")
+    void executarAcaoEmBloco_Homologar() {
+        Long codProc = 1L;
+        AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(List.of(10L), AcaoProcesso.HOMOLOGAR, null);
+        Subprocesso sp = new Subprocesso(); sp.setCodigo(100L); sp.setSituacao(MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+        Unidade u = new Unidade(); u.setCodigo(10L); sp.setUnidade(u);
+
+        when(subprocessoService.listarEntidadesPorProcessoEUnidades(eq(codProc), anyList())).thenReturn(List.of(sp));
+        when(usuarioService.usuarioAutenticado()).thenReturn(new Usuario());
+
+        target.executarAcaoEmBloco(codProc, req); // branch 570 (HOMOLOGAR)
+        verify(transicaoService).homologarCadastroEmBloco(anyList(), any());
+    }
+
+    @Nested
+    @DisplayName("Elegibilidade e Hierarquia")
+    class ElegibilidadeHierarquia {
+        @Test
+        @DisplayName("buscarDescendentes com ciclo ou repetição")
+        void buscarDescendentesRepeticao() {
+            Unidade u1 = new Unidade(); u1.setCodigo(1L);
+            Unidade u2 = new Unidade(); u2.setCodigo(2L);
+            u2.setUnidadeSuperior(u1);
+            Unidade u3 = new Unidade(); u3.setCodigo(2L); // mesma unidade 2
+            u3.setUnidadeSuperior(u1);
+
+            when(unidadeService.todasComHierarquia()).thenReturn(List.of(u1, u2, u3));
+            
+            List<Long> res = org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "buscarDescendentes", 1L);
+            assertThat(res).containsExactlyInAnyOrder(1L, 2L); // branch 357 (result.add(codFilho) == false)
+        }
+
+        @Test
+        @DisplayName("isElegivelParaAcaoEmBloco - nao elegivel por situacao")
+        void isElegivel_NaoElegivelSituacao() {
+            Usuario user = new Usuario();
+            Subprocesso sp = new Subprocesso();
+            sp.setSituacao(NAO_INICIADO);
+            
+            boolean res = (Boolean)org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "isElegivelParaAcaoEmBloco", sp, user);
+            assertThat(res).isFalse();
+        }
+
+        @Test
+        @DisplayName("isElegivelParaAcaoEmBloco - homologar cadastro autorizado")
+        void isElegivel_HomologarCadastro() {
+            Usuario user = new Usuario();
+            Subprocesso sp = new Subprocesso();
+            sp.setSituacao(MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+            
+            when(permissionEvaluator.verificarPermissao(any(Usuario.class), any(Subprocesso.class), eq(ACEITAR_CADASTRO))).thenReturn(false);
+            when(permissionEvaluator.verificarPermissao(any(Usuario.class), any(Subprocesso.class), eq(HOMOLOGAR_CADASTRO))).thenReturn(true);
+            
+            boolean res = (Boolean)org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "isElegivelParaAcaoEmBloco", sp, user);
+            assertThat(res).isTrue();
+        }
+
+        @Test
+        @DisplayName("isElegivelParaAcaoEmBloco - homologar mapa autorizado")
+        void isElegivel_HomologarMapa() {
+            Usuario user = new Usuario();
+            Subprocesso sp = new Subprocesso();
+            sp.setSituacao(MAPEAMENTO_MAPA_VALIDADO);
+            
+            when(permissionEvaluator.verificarPermissao(any(Usuario.class), any(Subprocesso.class), eq(ACEITAR_MAPA))).thenReturn(false);
+            when(permissionEvaluator.verificarPermissao(any(Usuario.class), any(Subprocesso.class), eq(HOMOLOGAR_MAPA))).thenReturn(true);
+            
+            boolean res = (Boolean)org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "isElegivelParaAcaoEmBloco", sp, user);
+            assertThat(res).isTrue();
+        }
+
+        @Test
+        @DisplayName("isSituacaoCadastro - branches 577")
+        void isSituacaoCadastro_Branches() {
+            assertThat((Boolean)org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "isSituacaoCadastro", MAPEAMENTO_CADASTRO_DISPONIBILIZADO)).isTrue();
+            assertThat((Boolean)org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "isSituacaoCadastro", REVISAO_CADASTRO_DISPONIBILIZADA)).isTrue();
+            assertThat((Boolean)org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "isSituacaoCadastro", REVISAO_CADASTRO_HOMOLOGADA)).isTrue();
+            assertThat((Boolean)org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "isSituacaoCadastro", MAPEAMENTO_MAPA_DISPONIBILIZADO)).isFalse();
         }
     }
 

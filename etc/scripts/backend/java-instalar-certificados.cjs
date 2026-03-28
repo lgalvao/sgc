@@ -38,13 +38,13 @@ function main() {
             scriptDireto: 'java-instalar-certificados.cjs',
             descricao: 'Importa cert-tre.cer e cert-for.cer em cacerts usando keytool.',
             exemplos: [
-                'node backend/etc/scripts/sgc.cjs java instalar-certificados'
+                'node etc/scripts/sgc.js backend java instalar-certificados'
             ]
         });
         process.exit(0);
     }
 
-    const deployDir = path.join(__dirname, '../deploy');
+    const deployDir = path.join(__dirname, '../../../backend/etc/deploy');
     const certificados = [
         {alias: 'cert-tre', caminho: path.join(deployDir, 'cert-tre.cer')},
         {alias: 'cert-for', caminho: path.join(deployDir, 'cert-for.cer')}

@@ -2,12 +2,12 @@
 const fs = require('fs');
 const path = require('path');
 
-const COVERAGE_PATH = path.join(__dirname, '../../coverage/coverage-final.json');
+const COVERAGE_PATH = path.join(__dirname, '../../../frontend/coverage/coverage-final.json');
 const targetFile = process.argv[2];
 
 if (!targetFile) {
-    console.error("Uso: node mostrar-linhas-sem-cobertura.cjs <caminho-do-arquivo>");
-    console.error("Exemplo: node mostrar-linhas-sem-cobertura.cjs src/views/processo/MapaVisualizacaoView.vue");
+    console.error("Uso: node etc/scripts/frontend/cobertura-linhas-sem-cobertura.cjs <caminho-do-arquivo>");
+    console.error("Exemplo: node etc/scripts/frontend/cobertura-linhas-sem-cobertura.cjs src/views/processo/MapaVisualizacaoView.vue");
     process.exit(1);
 }
 

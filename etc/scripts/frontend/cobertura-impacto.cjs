@@ -2,7 +2,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const COVERAGE_PATH = path.join(__dirname, '../../coverage/coverage-final.json');
+const COVERAGE_PATH = path.join(__dirname, '../../../frontend/coverage/coverage-final.json');
 
 try {
     if (!fs.existsSync(COVERAGE_PATH)) {

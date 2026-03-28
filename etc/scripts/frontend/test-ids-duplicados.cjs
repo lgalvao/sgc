@@ -2,7 +2,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const searchDir = path.join(__dirname, '../../src');
+const searchDir = path.join(__dirname, '../../../frontend/src');
 const extensions = ['.vue'];
 // Melhora o regex para capturar data-testid estáticos e dinâmicos
 // Suporta: data-testid="valor", :data-testid="'valor'", data-testid='valor'

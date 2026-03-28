@@ -54,7 +54,7 @@ específicas** do projeto que diferem dos padrões genéricos.
 
 * **Objetivo:** Consolidar saude de QA em snapshots estaveis para desenvolvimento.
 * **Comando rapido:** `npm run qa:dashboard`
-* **Comando direto:** `powershell -ExecutionPolicy Bypass -File etc/qa-dashboard/scripts/coletar-snapshot.ps1 -Perfil rapido`
+* **Comando direto:** `node etc/scripts/sgc.js qa snapshot coletar --perfil rapido`
 * **Perfis:** `rapido`, `frontend`, `backend`, `completo`
 * **Fonte de verdade:** `etc/qa-dashboard/latest/ultimo-snapshot.json` e `etc/qa-dashboard/latest/ultimo-resumo.md`
 * **Historico:** `etc/qa-dashboard/runs/<timestamp>/`

@@ -6,7 +6,7 @@ const {ROOT_DIR} = require('./lib/cobertura-base.cjs');
 const {exibirAjudaComando} = require('./lib/cli-ajuda.cjs');
 
 function runNodeScript(scriptName, args = [], options = {}) {
-    return execFileSync('node', [path.join('backend/etc/scripts', scriptName), ...args], {
+    return execFileSync('node', [path.join('etc/scripts/backend', scriptName), ...args], {
         cwd: ROOT_DIR,
         encoding: 'utf-8',
         stdio: options.capture ? ['inherit', 'pipe', 'pipe'] : 'inherit'
@@ -33,7 +33,7 @@ function main() {
             scriptDireto: 'cobertura-jornada.cjs',
             descricao: 'Executa a jornada completa de cobertura: JaCoCo, analise, lacunas, plano e backlog de testes.',
             exemplos: [
-                'node backend/etc/scripts/sgc.cjs cobertura jornada'
+                'node etc/scripts/sgc.js backend cobertura jornada'
             ]
         });
         process.exit(0);
@@ -88,7 +88,7 @@ function main() {
     console.log('Proximos passos:');
     console.log('  1. Revisar plano-100-cobertura.md');
     console.log('  2. Comecar pelos testes P1 (criticos) em priorizacao-testes.md');
-    console.log("  3. Usar 'node backend/etc/scripts/testes-gerar-stub.cjs <Classe>'");
+    console.log("  3. Usar 'node etc/scripts/sgc.js backend testes gerar-stub <Classe>'");
     console.log('     para gerar esqueletos de testes');
     console.log('  4. Implementar os testes');
     console.log('  5. Rodar este script novamente para verificar progresso\n');

@@ -2,7 +2,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const searchDir = path.join(__dirname, '../../src');
+const searchDir = path.join(__dirname, '../../../frontend/src');
 const extensions = ['.vue'];
 const regex = /\b(data-test-codigo|test-codigo|data-testid)=["']([^"']+)["']/g;
 

@@ -1,13 +1,33 @@
 # Plano de Reorganizacao dos Scripts do SGC
 
+## Status atual
+
+Consolidacao em andamento com base ja operacional em `etc/scripts`.
+
+Ja concluido:
+
+- CLI raiz em `node etc/scripts/sgc.js`
+- subprojeto isolado com `etc/scripts/package.json`
+- comandos transversais de `projeto` e `qa`
+- scripts operacionais centralizados em `etc/scripts/backend` e `etc/scripts/frontend`
+- remocao dos wrappers `.sh` e `.ps1` substituidos
+- testes automatizados iniciais do toolkit
+
+Pendente:
+
+- portar ou eliminar os arquivos em `etc/scripts/legado`
+- reduzir uso de `CommonJS` nos scripts herdados
+- ampliar cobertura de testes do toolkit
+- normalizar saida e logging dos scripts herdados
+
 ## Objetivo
 
 Consolidar os scripts espalhados pelo repositorio em um toolkit unico, coerente, facil de usar e facil de manter.
 
-O estado atual possui automacoes distribuidas em:
+O estado original possuia automacoes distribuidas em:
 
-- `backend/etc/scripts`
-- `frontend/etc/scripts`
+- scripts locais de backend
+- scripts locais de frontend
 - `etc/scripts`
 - `etc/qa-dashboard/scripts`
 
@@ -31,11 +51,10 @@ Ao final da reorganizacao, o projeto deve ter:
 
 ### Problemas estruturais
 
-- Scripts estao espalhados em quatro polos independentes.
-- Nao existe uma CLI raiz do projeto.
-- A documentacao esta descentralizada por area.
-- Os scripts de backend ja avancaram em padronizacao, mas os de frontend, QA e raiz ainda estao fora do mesmo modelo.
-- Ainda existem wrappers e utilitarios em shell, PowerShell, Python, `.js`, `.mjs` e `.cjs`.
+- Scripts estavam espalhados em quatro polos independentes.
+- Nao existia uma CLI raiz do projeto.
+- A documentacao estava descentralizada por area.
+- Havia multiplos wrappers e utilitarios em shell, PowerShell, Python, `.js`, `.mjs` e `.cjs`.
 - Os nomes dos scripts foram criados em momentos diferentes e sem criterio unico de dominio.
 
 ### Problemas operacionais
@@ -138,7 +157,7 @@ node etc/scripts/sgc.js projeto limpar
 
 Objetivo:
 
-- migrar a CLI atual de `backend/etc/scripts` para `etc/scripts/backend`
+- migrar a CLI local de backend para `etc/scripts/backend`
 - manter a base compartilhada de cobertura
 - preservar a nomenclatura padronizada atual
 
@@ -155,7 +174,7 @@ Itens:
 
 Objetivo:
 
-- trazer `frontend/etc/scripts` para dentro da mesma arquitetura de CLI
+- trazer os scripts locais de frontend para dentro da mesma arquitetura de CLI
 - padronizar nomes e ajuda
 
 Itens previstos:
@@ -279,6 +298,8 @@ Bibliotecas de dominio especifico podem ficar em:
 
 ### Fase 1: Fundacao da CLI raiz
 
+Status: concluida
+
 Objetivo:
 
 - criar `etc/scripts/package.json`
@@ -296,6 +317,8 @@ Entregas:
 
 ### Fase 2: Migracao do backend
 
+Status: concluida em estrutura
+
 Objetivo:
 
 - mover o toolkit atual do backend para `etc/scripts/backend`
@@ -308,9 +331,11 @@ Entregas:
 
 ### Fase 3: Migracao do frontend
 
+Status: concluida em estrutura
+
 Objetivo:
 
-- incorporar `frontend/etc/scripts`
+- incorporar os scripts locais de frontend
 
 Entregas:
 
@@ -319,6 +344,8 @@ Entregas:
 - ajuda padronizada
 
 ### Fase 4: Integracao do QA dashboard
+
+Status: parcialmente concluida
 
 Objetivo:
 
@@ -332,6 +359,8 @@ Entregas:
 
 ### Fase 5: Consolidacao de `etc/scripts`
 
+Status: em andamento
+
 Objetivo:
 
 - absorver wrappers e scripts transversais existentes
@@ -344,6 +373,8 @@ Entregas:
 - `projeto qualidade`
 
 ### Fase 6: Limpeza final
+
+Status: em andamento
 
 Objetivo:
 

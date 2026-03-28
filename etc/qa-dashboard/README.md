@@ -31,21 +31,25 @@ Mas esses artefatos nao sao a fonte de verdade do dashboard.
 
 ## Como coletar e visualizar
 
-1. Gere um snapshot de QA (exemplo perfil rapido):
+1. Gere um snapshot de QA pelo toolkit unificado (exemplo perfil rapido):
 
    ```bash
-   node etc/qa-dashboard/scripts/coletar-snapshot.mjs --perfil rapido
+   node etc/scripts/sgc.js qa snapshot coletar --perfil rapido
    ```
 
-2. Sirva a raiz do repositorio com qualquer servidor HTTP simples e abra `etc/qa-dashboard/dashboard.html`.
-
-   Exemplo:
+2. Sirva o dashboard pelo toolkit:
 
    ```bash
-   npx http-server .
+   node etc/scripts/sgc.js qa dashboard servir --porta 4179
    ```
 
-   Depois acesse `http://localhost:8080/etc/qa-dashboard/dashboard.html`.
+   Depois acesse `http://127.0.0.1:4179/etc/qa-dashboard/dashboard.html`.
+
+Comando direto legado, ainda funcional:
+
+```bash
+node etc/qa-dashboard/scripts/coletar-snapshot.mjs --perfil rapido
+```
 
 ## Documento principal
 

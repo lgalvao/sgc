@@ -2,7 +2,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const FRONTEND_DIR = path.join(__dirname, '../../src');
+const FRONTEND_DIR = path.join(__dirname, '../../../frontend/src');
 const BACKEND_DIR = path.join(__dirname, '../../../backend/src/main/java/sgc');
 const REPORT_FILE = path.join(__dirname, '../../../frontend-backend-validation-comparison.md');
 

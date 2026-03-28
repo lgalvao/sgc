@@ -28,9 +28,9 @@ if (help) {
             '--help, -h          Exibe esta ajuda'
         ],
         exemplos: [
-            'node backend/etc/scripts/sgc.cjs cobertura verificar',
-            'node backend/etc/scripts/sgc.cjs cobertura verificar sgc.subprocesso --min=95',
-            'node backend/etc/scripts/sgc.cjs cobertura verificar --missed'
+            'node etc/scripts/sgc.js backend cobertura verificar',
+            'node etc/scripts/sgc.js backend cobertura verificar sgc.subprocesso --min=95',
+            'node etc/scripts/sgc.js backend cobertura verificar --missed'
         ]
     });
     process.exit(0);

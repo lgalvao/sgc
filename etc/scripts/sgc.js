@@ -31,57 +31,63 @@ program
 
 const backend = program.command("backend").description("Ferramentas do backend.");
 const backendCobertura = backend.command("cobertura").description("Cobertura e diagnosticos do backend.");
-criarComandoScript(backendCobertura, "analisar", "Analise tabular da cobertura do backend.", "backend/etc/scripts/cobertura-analisar.cjs");
-criarComandoScript(backendCobertura, "priorizar", "Ranking resumido de prioridades de cobertura.", "backend/etc/scripts/cobertura-priorizar.cjs");
-criarComandoScript(backendCobertura, "complexidade", "Ranking de complexidade pelo CSV do JaCoCo.", "backend/etc/scripts/cobertura-complexidade.cjs");
-criarComandoScript(backendCobertura, "lacunas", "Gera JSON estruturado com lacunas de cobertura.", "backend/etc/scripts/cobertura-lacunas.cjs");
-criarComandoScript(backendCobertura, "plano", "Gera plano detalhado para 100% de cobertura.", "backend/etc/scripts/cobertura-plano.cjs");
-criarComandoScript(backendCobertura, "verificar", "Consulta cobertura global e por classe.", "backend/etc/scripts/cobertura-verificar.cjs");
-criarComandoScript(backendCobertura, "jornada", "Executa a jornada completa de cobertura.", "backend/etc/scripts/cobertura-jornada.cjs");
+criarComandoScript(backendCobertura, "analisar", "Analise tabular da cobertura do backend.", "etc/scripts/backend/cobertura-analisar.cjs");
+criarComandoScript(backendCobertura, "priorizar", "Ranking resumido de prioridades de cobertura.", "etc/scripts/backend/cobertura-priorizar.cjs");
+criarComandoScript(backendCobertura, "complexidade", "Ranking de complexidade pelo CSV do JaCoCo.", "etc/scripts/backend/cobertura-complexidade.cjs");
+criarComandoScript(backendCobertura, "lacunas", "Gera JSON estruturado com lacunas de cobertura.", "etc/scripts/backend/cobertura-lacunas.cjs");
+criarComandoScript(backendCobertura, "plano", "Gera plano detalhado para 100% de cobertura.", "etc/scripts/backend/cobertura-plano.cjs");
+criarComandoScript(backendCobertura, "verificar", "Consulta cobertura global e por classe.", "etc/scripts/backend/cobertura-verificar.cjs");
+criarComandoScript(backendCobertura, "jornada", "Executa a jornada completa de cobertura.", "etc/scripts/backend/cobertura-jornada.cjs");
 
 const backendTestes = backend.command("testes").description("Ferramentas de testes do backend.");
-criarComandoScript(backendTestes, "analisar", "Detecta classes sem testes e gera Markdown/JSON.", "backend/etc/scripts/testes-analisar.cjs");
-criarComandoScript(backendTestes, "priorizar", "Prioriza backlog de testes do backend.", "backend/etc/scripts/testes-priorizar.cjs");
-criarComandoScript(backendTestes, "gerar-stub", "Gera CoverageTest inicial para uma classe.", "backend/etc/scripts/testes-gerar-stub.cjs");
+criarComandoScript(backendTestes, "analisar", "Detecta classes sem testes e gera Markdown/JSON.", "etc/scripts/backend/testes-analisar.cjs");
+criarComandoScript(backendTestes, "priorizar", "Prioriza backlog de testes do backend.", "etc/scripts/backend/testes-priorizar.cjs");
+criarComandoScript(backendTestes, "gerar-stub", "Gera CoverageTest inicial para uma classe.", "etc/scripts/backend/testes-gerar-stub.cjs");
 
 const backendJava = backend.command("java").description("Utilitarios Java do backend.");
-criarComandoScript(backendJava, "corrigir-fqn", "Substitui FQNs por imports em arquivos Java.", "backend/etc/scripts/java-corrigir-fqn.cjs");
-criarComandoScript(backendJava, "auditar-null", "Audita verificacoes de null no backend.", "backend/etc/scripts/java-auditar-null.cjs");
-criarComandoScript(backendJava, "instalar-certificados", "Importa certificados locais no cacerts.", "backend/etc/scripts/java-instalar-certificados.cjs");
+criarComandoScript(backendJava, "corrigir-fqn", "Substitui FQNs por imports em arquivos Java.", "etc/scripts/backend/java-corrigir-fqn.cjs");
+criarComandoScript(backendJava, "auditar-null", "Audita verificacoes de null no backend.", "etc/scripts/backend/java-auditar-null.cjs");
+criarComandoScript(backendJava, "instalar-certificados", "Importa certificados locais no cacerts.", "etc/scripts/backend/java-instalar-certificados.cjs");
 
 const frontend = program.command("frontend").description("Ferramentas do frontend.");
 const frontendCobertura = frontend.command("cobertura").description("Cobertura e diagnosticos do frontend.");
-criarComandoScript(frontendCobertura, "verificar", "Lista arquivos abaixo do limiar de cobertura.", "frontend/etc/scripts/verificar-cobertura.cjs");
-criarComandoScript(frontendCobertura, "impacto", "Prioriza arquivos por impacto potencial de cobertura.", "frontend/etc/scripts/analisar-impacto-cobertura.cjs");
-criarComandoScript(frontendCobertura, "linhas-sem-cobertura", "Mostra linhas sem cobertura no frontend.", "frontend/etc/scripts/mostrar-linhas-sem-cobertura.cjs");
+criarComandoScript(frontendCobertura, "verificar", "Lista arquivos abaixo do limiar de cobertura.", "etc/scripts/frontend/cobertura-verificar.cjs");
+criarComandoScript(frontendCobertura, "impacto", "Prioriza arquivos por impacto potencial de cobertura.", "etc/scripts/frontend/cobertura-impacto.cjs");
+criarComandoScript(frontendCobertura, "linhas-sem-cobertura", "Mostra linhas sem cobertura no frontend.", "etc/scripts/frontend/cobertura-linhas-sem-cobertura.cjs");
 
 const frontendMensagens = frontend.command("mensagens").description("Analise de mensagens e strings do frontend.");
-criarComandoScript(frontendMensagens, "extrair", "Extrai mensagens do projeto.", "frontend/etc/scripts/extrair-mensagens.cjs");
-criarComandoScript(frontendMensagens, "analisar", "Analisa o JSON de mensagens extraidas.", "frontend/etc/scripts/analisar-mensagens.cjs");
+criarComandoScript(frontendMensagens, "extrair", "Extrai mensagens do projeto.", "etc/scripts/frontend/mensagens-extrair.cjs");
+criarComandoScript(frontendMensagens, "analisar", "Analisa o JSON de mensagens extraidas.", "etc/scripts/frontend/mensagens-analisar.cjs");
 
 const frontendValidacoes = frontend.command("validacoes").description("Auditorias de validacao do frontend.");
-criarComandoScript(frontendValidacoes, "auditar", "Compara validacoes de frontend e backend.", "frontend/etc/scripts/audit-frontend-validations.cjs");
+criarComandoScript(frontendValidacoes, "auditar", "Compara validacoes de frontend e backend.", "etc/scripts/frontend/validacoes-auditar.cjs");
 
 const frontendViews = frontend.command("views").description("Auditorias especificas de views.");
-criarComandoScript(frontendViews, "auditar-validacoes", "Audita links e validacoes nas views.", "frontend/etc/scripts/audit-view-validations.cjs");
+criarComandoScript(frontendViews, "auditar-validacoes", "Audita links e validacoes nas views.", "etc/scripts/frontend/views-auditar-validacoes.cjs");
 
 const frontendTestIds = frontend.command("test-ids").description("Ferramentas para atributos data-test.");
-criarComandoScript(frontendTestIds, "listar", "Lista data-test do frontend.", "frontend/etc/scripts/listar-test-ids.cjs");
-criarComandoScript(frontendTestIds, "listar-duplicados", "Lista data-test duplicados.", "frontend/etc/scripts/listar-test-ids-duplicados.cjs");
+criarComandoScript(frontendTestIds, "listar", "Lista data-test do frontend.", "etc/scripts/frontend/test-ids-listar.cjs");
+criarComandoScript(frontendTestIds, "listar-duplicados", "Lista data-test duplicados.", "etc/scripts/frontend/test-ids-duplicados.cjs");
 
 const frontendTelas = frontend.command("telas").description("Ferramentas de captura e apoio visual.");
-criarComandoScript(frontendTelas, "capturar", "Captura telas para documentacao ou apoio visual.", "frontend/etc/scripts/capturar-telas.cjs");
+criarComandoScript(frontendTelas, "capturar", "Captura telas para documentacao ou apoio visual.", "etc/scripts/frontend/telas-capturar.cjs");
 
 const codigo = program.command("codigo").description("Ferramentas de manutencao e higiene do código.");
 const codigoComentarios = codigo.command("comentarios").description("Limpeza e auditoria de comentarios.");
 criarComandoScript(codigoComentarios, "limpar-ai", "Remove comentarios redundantes e marcadores de agente.", "etc/scripts/codigo/comentarios-limpar-ai.js");
+criarComandoScript(codigoComentarios, "limpar-generico", "Remove comentarios conversacionais e obvios.", "etc/scripts/codigo/comentarios-limpar-generico.js");
+const codigoIdLegado = codigo.command("id-legado").description("Auditorias para identificadores legados.");
+criarComandoScript(codigoIdLegado, "identificar", "Gera relatorio de usos legados de `id`.", "etc/scripts/codigo/id-legado-identificar.js");
+const codigoTitleCase = codigo.command("title-case").description("Auditorias e correcoes de textos em Title Case.");
+criarComandoScript(codigoTitleCase, "identificar", "Gera relatorio de ocorrencias suspeitas de Title Case.", "etc/scripts/codigo/title-case-identificar.js");
+criarComandoScript(codigoTitleCase, "corrigir", "Aplica correcoes de Title Case a partir do relatorio.", "etc/scripts/codigo/title-case-corrigir.js");
 
 const e2e = program.command("e2e").description("Ferramentas auxiliares de testes end-to-end.");
 criarComandoScript(e2e, "limpar", "Aplica limpeza automatizada em especificacoes E2E.", "etc/scripts/e2e/limpar.js");
 
 const qa = program.command("qa").description("Ferramentas de qualidade e dashboard.");
 const qaSnapshot = qa.command("snapshot").description("Coleta e consolidacao de snapshots.");
-criarComandoScript(qaSnapshot, "coletar", "Coleta snapshot de QA.", "etc/qa-dashboard/scripts/coletar-snapshot.mjs");
+criarComandoScript(qaSnapshot, "coletar", "Coleta snapshot de QA.", "etc/scripts/qa/snapshot-coletar.js");
 qa
     .command("resumo")
     .description("Resume o snapshot mais recente do QA Dashboard.")
@@ -91,6 +97,8 @@ qa
     .action(async (opcoes) => {
         await executarResumoQa(opcoes);
     });
+const qaDashboard = qa.command("dashboard").description("Ferramentas operacionais do dashboard.");
+criarComandoScript(qaDashboard, "servir", "Serve o dashboard de QA localmente.", "etc/scripts/qa/dashboard-servir.js");
 
 const projeto = program.command("projeto").description("Ferramentas transversais do repositório.");
 projeto
@@ -133,7 +141,7 @@ criarComandoScript(projeto, "arvore-linhas", "Gera arvore agregada de linhas do 
 
 program.addHelpText(
     "after",
-    `\nExemplos:\n  ${pc.dim("node etc/scripts/sgc.js backend cobertura verificar --min=95")}\n  ${pc.dim("node etc/scripts/sgc.js frontend mensagens analisar")}\n  ${pc.dim("node etc/scripts/sgc.js qa snapshot coletar --perfil rapido")}\n  ${pc.dim("node etc/scripts/sgc.js qa resumo")}\n  ${pc.dim("node etc/scripts/sgc.js projeto doctor --json")}\n  ${pc.dim(`node etc/scripts/sgc.js projeto qualidade rapido  # perfis: ${Object.keys(PERFIS).join(", ")}`)}\n  ${pc.dim("node etc/scripts/sgc.js projeto setup --instalar-dependencias")}\n  ${pc.dim("node etc/scripts/sgc.js codigo comentarios limpar-ai --dry-run")}`
+    `\nExemplos:\n  ${pc.dim("node etc/scripts/sgc.js backend cobertura verificar --min=95")}\n  ${pc.dim("node etc/scripts/sgc.js frontend mensagens analisar")}\n  ${pc.dim("node etc/scripts/sgc.js qa snapshot coletar --perfil rapido")}\n  ${pc.dim("node etc/scripts/sgc.js qa resumo")}\n  ${pc.dim("node etc/scripts/sgc.js qa dashboard servir --porta 4179")}\n  ${pc.dim("node etc/scripts/sgc.js projeto doctor --json")}\n  ${pc.dim(`node etc/scripts/sgc.js projeto qualidade rapido  # perfis: ${Object.keys(PERFIS).join(", ")}`)}\n  ${pc.dim("node etc/scripts/sgc.js projeto setup --instalar-dependencias")}\n  ${pc.dim("node etc/scripts/sgc.js codigo comentarios limpar-ai --dry-run")}\n  ${pc.dim("node etc/scripts/sgc.js codigo id-legado identificar")}`
 );
 
 try {
