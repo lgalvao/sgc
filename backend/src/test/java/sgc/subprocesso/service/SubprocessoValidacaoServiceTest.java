@@ -93,6 +93,61 @@ class SubprocessoValidacaoServiceTest {
             assertThat(dto.erros().getFirst().tipo()).isEqualTo("ATIVIDADE_SEM_CONHECIMENTO");
         }
 
+
+
+        @Test
+        @DisplayName("deve acumular múltiplas atividades sem conhecimento no retorno")
+        void invalidoComMultiplasAtividadesSemConhecimento() {
+            Subprocesso sp = new Subprocesso();
+            Mapa mapa = new Mapa();
+            mapa.setCodigo(1L);
+            sp.setMapa(mapa);
+
+            Atividade a1 = new Atividade();
+            a1.setCodigo(10L);
+            a1.setDescricao("Atividade 1");
+            a1.setConhecimentos(Set.of());
+
+            Atividade a2 = new Atividade();
+            a2.setCodigo(11L);
+            a2.setDescricao("Atividade 2");
+            a2.setConhecimentos(Set.of());
+
+            when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(1L)).thenReturn(List.of(a1, a2));
+
+            ValidacaoCadastroDto dto = validacaoService.validarCadastro(sp);
+
+            assertThat(dto.valido()).isFalse();
+            assertThat(dto.erros()).hasSize(2);
+            assertThat(dto.erros()).allSatisfy(erro -> assertThat(erro.tipo()).isEqualTo("ATIVIDADE_SEM_CONHECIMENTO"));
+            assertThat(dto.erros().stream().map(ValidacaoCadastroDto.Erro::atividadeCodigo))
+                    .containsExactlyInAnyOrder(10L, 11L);
+        }
+
+        @Test
+        @DisplayName("deve incluir detalhes da atividade no erro de conhecimento ausente")
+        void invalidoComDetalhesDaAtividade() {
+            Subprocesso sp = new Subprocesso();
+            Mapa mapa = new Mapa();
+            mapa.setCodigo(1L);
+            sp.setMapa(mapa);
+
+            Atividade a = new Atividade();
+            a.setCodigo(77L);
+            a.setDescricao("Atividade detalhada");
+            a.setConhecimentos(Set.of());
+
+            when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(1L)).thenReturn(List.of(a));
+
+            ValidacaoCadastroDto dto = validacaoService.validarCadastro(sp);
+
+            assertThat(dto.valido()).isFalse();
+            assertThat(dto.erros()).singleElement().satisfies(erro -> {
+                assertThat(erro.atividadeCodigo()).isEqualTo(77L);
+                assertThat(erro.descricaoAtividade()).isEqualTo("Atividade detalhada");
+            });
+        }
+
         @Test
         @DisplayName("deve retornar válido se tudo estiver correto")
         void validoTudoCorreto() {
@@ -137,12 +192,14 @@ class SubprocessoValidacaoServiceTest {
     class ValidarSituacaoPermitida {
 
         @Test
-        @DisplayName("deve lançar erro se situacao for nula")
+        @DisplayName("deve lançar erro se entrada de API não informar situacao")
         void erroSituacaoNula() {
-            Subprocesso sp = new Subprocesso();
-            sp.setSituacao(null); // Explicitly ensuring null
+            Subprocesso sp = mock(Subprocesso.class);
+            when(sp.getSituacao()).thenReturn(null);
+
             assertThatThrownBy(() -> validacaoService.validarSituacaoPermitida(sp, Set.of(SituacaoSubprocesso.NAO_INICIADO)))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Situação do subprocesso não pode ser nula");
         }
 
         @Test

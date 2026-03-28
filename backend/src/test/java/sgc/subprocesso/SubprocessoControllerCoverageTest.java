@@ -554,4 +554,250 @@ class SubprocessoControllerCoverageTest {
         mockMvc.perform(get("/api/subprocessos/1/mapa-completo"))
                 .andExpect(status().isOk());
     }
+
+    @Test
+    @DisplayName("validarCadastro - deve retornar inconsistências reais quando cadastro estiver inválido")
+    @WithMockUser
+    void validarCadastroInvalido() throws Exception {
+        List<ValidacaoCadastroDto.Erro> erros = List.of(
+                new ValidacaoCadastroDto.Erro("SEM_MAPA", null, null, "Subprocesso sem mapa"),
+                new ValidacaoCadastroDto.Erro("SEM_ATIVIDADES", null, null, "Mapa sem atividades"));
+        when(subprocessoService.validarCadastro(1L)).thenReturn(new ValidacaoCadastroDto(false, erros));
+
+        mockMvc.perform(get("/api/subprocessos/1/validar-cadastro"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.valido").value(false))
+                .andExpect(jsonPath("$.erros").isArray())
+                .andExpect(jsonPath("$.erros[0].tipo").value("SEM_MAPA"))
+                .andExpect(jsonPath("$.erros[1].tipo").value("SEM_ATIVIDADES"));
+
+        verify(subprocessoService).validarCadastro(1L);
+    }
+
+    @Test
+    @DisplayName("validarCadastro - deve retornar 500 quando serviço lançar erro inesperado")
+    @WithMockUser
+    void validarCadastroErroInterno() throws Exception {
+        when(subprocessoService.validarCadastro(1L)).thenThrow(new RuntimeException("falha inesperada"));
+
+        mockMvc.perform(get("/api/subprocessos/1/validar-cadastro"))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.message").value(org.hamcrest.Matchers.containsString("ERRO INESPERADO")));
+
+        verify(subprocessoService).validarCadastro(1L);
+    }
+
+    @Test
+    @DisplayName("importarAtividades - deve retornar 400 quando código de origem não for informado")
+    @WithMockUser
+    void importarAtividadesSemOrigem() throws Exception {
+        String jsonInvalido = """
+                {
+                  "codigosAtividades": [30, 31]
+                }
+                """;
+
+        mockMvc.perform(post("/api/subprocessos/1/importar-atividades")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonInvalido))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.details").exists());
+
+        verify(subprocessoService, never()).importarAtividades(anyLong(), anyLong(), anyList());
+    }
+
+    @Test
+    @DisplayName("importarAtividades - deve propagar erro de validação de negócio")
+    @WithMockUser
+    void importarAtividadesErroValidacao() throws Exception {
+        ImportarAtividadesRequest req = new ImportarAtividadesRequest(2L, List.of(30L));
+        doThrow(new ErroValidacao("Não é possível importar atividades do mesmo subprocesso."))
+                .when(subprocessoService).importarAtividades(1L, 2L, List.of(30L));
+
+        mockMvc.perform(post("/api/subprocessos/1/importar-atividades")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isUnprocessableContent())
+                .andExpect(jsonPath("$.message").value("Não é possível importar atividades do mesmo subprocesso."));
+    }
+
+    @Test
+    @DisplayName("criar - deve retornar 400 quando payload estiver inválido")
+    @WithMockUser(roles = "ADMIN")
+    void criarPayloadInvalido() throws Exception {
+        String jsonInvalido = """
+                {
+                  "codProcesso": 1,
+                  "codUnidade": 10,
+                  "dataLimiteEtapa1": null
+                }
+                """;
+
+        mockMvc.perform(post("/api/subprocessos")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonInvalido))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.details").exists());
+
+        verify(subprocessoService, never()).criarEntidade(any());
+    }
+
+    @Test
+    @DisplayName("alterarDataLimite - deve retornar 400 quando data estiver no passado")
+    @WithMockUser(roles = "ADMIN")
+    void alterarDataLimiteInvalida() throws Exception {
+        DataRequest req = new DataRequest(LocalDate.now().minusDays(1));
+
+        mockMvc.perform(post("/api/subprocessos/1/data-limite")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.details").exists());
+
+        verify(transicaoService, never()).alterarDataLimite(anyLong(), any());
+    }
+
+    @Test
+    @DisplayName("devolverValidacao - deve retornar 400 quando justificativa estiver em branco")
+    @WithMockUser
+    void devolverValidacaoSemJustificativa() throws Exception {
+        JustificativaRequest req = new JustificativaRequest("   ");
+
+        mockMvc.perform(post("/api/subprocessos/1/devolver-validacao")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.details").exists());
+
+        verify(transicaoService, never()).devolverValidacao(anyLong(), any(), any());
+    }
+
+    @Test
+    @DisplayName("aceitarCadastroEmBloco - deve retornar 400 quando lista de subprocessos estiver vazia")
+    @WithMockUser
+    void aceitarCadastroEmBlocoSemSubprocessos() throws Exception {
+        ProcessarEmBlocoRequest req = new ProcessarEmBlocoRequest("ACEITAR", List.of(), null);
+
+        mockMvc.perform(post("/api/subprocessos/1/aceitar-cadastro-bloco")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isBadRequest());
+
+        verify(transicaoService, never()).aceitarCadastroEmBloco(anyList(), any());
+    }
+
+    @Test
+    @DisplayName("disponibilizarMapa - deve encaminhar request completo ao serviço")
+    @WithMockUser
+    void disponibilizarMapaEncaminhaRequest() throws Exception {
+        DisponibilizarMapaRequest req = new DisponibilizarMapaRequest(java.time.LocalDate.now().plusDays(15), "Observação de teste");
+
+        mockMvc.perform(post("/api/subprocessos/1/disponibilizar-mapa")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.mensagem").value("Mapa de competências disponibilizado."));
+
+        verify(transicaoService).disponibilizarMapa(eq(1L), eq(req), any());
+    }
+
+    @Test
+    @DisplayName("salvarMapa - deve retornar 500 quando não conseguir montar resposta")
+    @WithMockUser
+    void salvarMapaErroAoGerarResposta() throws Exception {
+        SalvarMapaRequest req = new SalvarMapaRequest("Obs", List.of());
+        when(subprocessoService.mapaCompletoDtoPorSubprocesso(1L)).thenThrow(new RuntimeException("falha ao montar dto"));
+
+        mockMvc.perform(post("/api/subprocessos/1/mapa")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isInternalServerError());
+
+        verify(subprocessoService).salvarMapa(1L, req);
+        verify(subprocessoService).mapaCompletoDtoPorSubprocesso(1L);
+    }
+
+    @Test
+    @DisplayName("obterHistoricoCadastro - deve retornar lista preenchida com campos de rastreabilidade")
+    @WithMockUser
+    void obterHistoricoCadastroComDados() throws Exception {
+        AnaliseHistoricoDto historico = new AnaliseHistoricoDto(
+                sgc.subprocesso.model.TipoAnalise.CADASTRO,
+                sgc.subprocesso.model.TipoAcaoAnalise.ACEITE_MAPEAMENTO,
+                "123456789012",
+                "SESEL",
+                "Secretaria",
+                LocalDateTime.now(),
+                "RN-001",
+                "Observação técnica");
+        when(permissionEvaluator.hasPermission(any(), eq(1L), eq("Subprocesso"), eq("VISUALIZAR_SUBPROCESSO"))).thenReturn(true);
+        when(subprocessoService.listarHistoricoCadastro(1L)).thenReturn(List.of(historico));
+
+        mockMvc.perform(get("/api/subprocessos/1/historico-cadastro"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].motivo").value("RN-001"))
+                .andExpect(jsonPath("$[0].unidadeSigla").value("SESEL"));
+    }
+
+    @Test
+    @DisplayName("listarAtividadesParaImportacao - deve retornar 500 quando serviço falhar")
+    @WithMockUser
+    void listarAtividadesParaImportacaoComErro() throws Exception {
+        when(permissionEvaluator.hasPermission(any(), eq(1L), eq("Subprocesso"), eq("CONSULTAR_PARA_IMPORTACAO"))).thenReturn(true);
+        when(subprocessoService.listarAtividadesParaImportacao(1L)).thenThrow(new RuntimeException("falha ao listar"));
+
+        mockMvc.perform(get("/api/subprocessos/1/atividades-importacao"))
+                .andExpect(status().isInternalServerError());
+    }
+
+    @Test
+    @DisplayName("obterMapa - deve retornar payload com código do subprocesso")
+    @WithMockUser
+    void obterMapaComPayload() throws Exception {
+        when(permissionEvaluator.hasPermission(any(), eq(1L), eq("Subprocesso"), eq("VISUALIZAR_SUBPROCESSO"))).thenReturn(true);
+        when(subprocessoService.mapaCompletoDtoPorSubprocesso(1L))
+                .thenReturn(new MapaCompletoDto(15L, 1L, "Mapa criado", List.of(), null));
+
+        mockMvc.perform(get("/api/subprocessos/1/mapa"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.codigo").value(15L))
+                .andExpect(jsonPath("$.subprocessoCodigo").value(1L));
+    }
+
+    @Test
+    @DisplayName("obterMapaCompleto - deve retornar payload com observações do mapa")
+    @WithMockUser
+    void obterMapaCompletoComObservacoes() throws Exception {
+        when(permissionEvaluator.hasPermission(any(), eq(1L), eq("Subprocesso"), eq("VISUALIZAR_SUBPROCESSO"))).thenReturn(true);
+        when(subprocessoService.mapaCompletoDtoPorSubprocesso(1L))
+                .thenReturn(new MapaCompletoDto(15L, 1L, "Observação detalhada", List.of(), null));
+
+        mockMvc.perform(get("/api/subprocessos/1/mapa-completo"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.observacoes").value("Observação detalhada"));
+    }
+
+    @Test
+    @DisplayName("aceitarValidacao - deve permitir texto opcional nulo")
+    @WithMockUser
+    void aceitarValidacaoSemTexto() throws Exception {
+        TextoOpcionalRequest req = new TextoOpcionalRequest(null);
+
+        mockMvc.perform(post("/api/subprocessos/1/aceitar-validacao")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req))
+                        .with(csrf()))
+                .andExpect(status().isOk());
+
+        verify(transicaoService).aceitarValidacao(eq(1L), isNull(), any());
+    }
+
 }
