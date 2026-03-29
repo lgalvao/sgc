@@ -17,6 +17,7 @@ describe('usuarioService', () => {
   describe('API calls', () => {
     it('login', async () => {
       const mockResponse = {
+        autenticado: true,
         requerSelecaoPerfil: true,
         perfisUnidades: [{ perfil: 'ADMIN', unidade: { codigo: 1, sigla: 'TEST', nome: 'Teste' }, siglaUnidade: 'TEST' }],
         sessao: null,
@@ -24,6 +25,7 @@ describe('usuarioService', () => {
       (apiClient.post as any).mockResolvedValueOnce({ data: mockResponse });
       const result = await usuarioService.login({ tituloEleitoral: '123', senha: '123' });
       expect(apiClient.post).toHaveBeenCalledWith('/usuarios/login', { tituloEleitoral: '123', senha: '123' });
+      expect(result.autenticado).toBe(true);
       expect(result.requerSelecaoPerfil).toBe(true);
       expect(result.perfisUnidades).toHaveLength(1);
     });
@@ -100,6 +102,7 @@ describe('usuarioService', () => {
 
     it('mapFluxoLoginToFrontend', () => {
       const result = usuarioService.mapFluxoLoginToFrontend({
+        autenticado: true,
         requerSelecaoPerfil: false,
         perfisUnidades: [{
           perfil: 'ADMIN',
@@ -113,6 +116,7 @@ describe('usuarioService', () => {
           unidadeCodigo: 1,
         }
       });
+      expect(result.autenticado).toBe(true);
       expect(result.requerSelecaoPerfil).toBe(false);
       expect(result.sessao?.tituloEleitoral).toBe('123');
     });

@@ -75,6 +75,7 @@ public class LoginController {
                     .build();
 
             return ResponseEntity.ok(FluxoLoginResponse.builder()
+                    .autenticado(true)
                     .requerSelecaoPerfil(false)
                     .perfisUnidades(perfis)
                     .sessao(sessao)
@@ -85,6 +86,7 @@ public class LoginController {
         adicionarCookiePreAuth(httpResponse, token);
 
         return ResponseEntity.ok(FluxoLoginResponse.builder()
+                .autenticado(true)
                 .requerSelecaoPerfil(perfis.size() > 1)
                 .perfisUnidades(perfis)
                 .sessao(null)
@@ -113,7 +115,6 @@ public class LoginController {
                 .unidadeCodigo(request.unidadeCodigo())
                 .build();
 
-        Cookie cookie = new Cookie("jwtToken", token);
         adicionarCookieJwt(httpResponse, token);
         limparCookiePreAuth(httpResponse);
 

@@ -67,6 +67,7 @@ export interface SessaoLogin {
 }
 
 export interface FluxoLogin {
+    autenticado: boolean;
     requerSelecaoPerfil: boolean;
     perfisUnidades: PerfilUnidade[];
     sessao: SessaoLogin | null;
@@ -83,6 +84,7 @@ export function mapSessaoLoginToFrontend(response: SessaoLoginDto): SessaoLogin 
 
 export function mapFluxoLoginToFrontend(response: FluxoLoginResponseDto): FluxoLogin {
     return {
+        autenticado: response.autenticado,
         requerSelecaoPerfil: response.requerSelecaoPerfil,
         perfisUnidades: perfisUnidadesParaDominio(response.perfisUnidades),
         sessao: response.sessao ? mapSessaoLoginToFrontend(response.sessao) : null,

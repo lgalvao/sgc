@@ -239,7 +239,7 @@ const performInitialLogin = async () => {
   try {
     const fluxoLogin = await perfilStore.iniciarLogin(titulo.value, senha.value);
 
-    if (fluxoLogin.sessao || fluxoLogin.perfisUnidades.length > 0) {
+    if (fluxoLogin.autenticado) {
       await handlePostAuth();
       } else {
         notify(TEXTOS.login.ERRO_CREDENCIAIS, 'danger');

@@ -117,7 +117,6 @@ import ArvoreUnidades from "@/components/unidade/ArvoreUnidades.vue";
 import InputData from "@/components/comum/InputData.vue";
 import type {Unidade} from "@/types/tipos";
 import {TipoProcesso} from "@/types/tipos";
-import {useValidacao} from "@/composables/useValidacao";
 import {obterAmanhaFormatado} from "@/utils/dateUtils";
 
 interface ProcessoFormData {
@@ -150,7 +149,6 @@ const inputDescricaoRef = ref<InstanceType<typeof BFormInput> | null>(null);
 const selectTipoRef = ref<any>(null);
 const inputDataLimiteRef = ref<InstanceType<typeof InputData> | null>(null);
 const containerUnidadesRef = ref<HTMLElement | null>(null);
-const {obterPrimeiroCampoComErro} = useValidacao();
 
 const tipoOptions = [
   {value: TipoProcesso.MAPEAMENTO, text: 'Mapeamento'},
@@ -163,6 +161,11 @@ function updateField<K extends keyof ProcessoFormData>(field: K, value: Processo
     ...props.modelValue,
     [field]: value
   });
+}
+
+function obterPrimeiroCampoComErro<T extends object>(erros: T): keyof T | null {
+  const chave = Object.keys(erros).find((item) => Boolean((erros as Record<string, unknown>)[item]));
+  return (chave as keyof T) ?? null;
 }
 
 function focarPrimeiroErro() {

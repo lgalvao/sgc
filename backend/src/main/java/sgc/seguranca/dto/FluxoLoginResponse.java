@@ -9,6 +9,7 @@ import java.util.*;
  */
 @Builder
 public record FluxoLoginResponse(
+        boolean autenticado,
         boolean requerSelecaoPerfil,
         List<PerfilUnidadeDto> perfisUnidades,
         EntrarResponse sessao) {

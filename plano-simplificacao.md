@@ -566,3 +566,5 @@ O plano terá sido bem executado se:
 * Mover histórico e importação para leitura direta de service reduziu a API pública de `useProcessos` sem piorar testes nem fluxo de UI. O composable ficou mais próximo de casos realmente centrados em processo: painel, detalhe, cadastro e ações em bloco.
 * Quando uma simplificação troca a fonte de dados de store singleton para service local, os testes precisam parar de assumir estado pré-carregado. No modal de importação, o ajuste correto foi alinhar os testes ao carregamento real na abertura do componente.
 * Storybook também entra no escopo da simplificação: stories que continuam simulando o desenho antigo deixam documentação executável desalinhada com o código real.
+* O painel também não precisava compartilhar lista de processos via `useProcessos`: havia um único consumidor real, nenhum reaproveitamento entre telas e nenhum ganho claro de manter paginação/lista como singleton.
+* Depois desse corte, `useProcessos` ficou concentrado em detalhe, contexto completo e ações de processo. Isso é um bom sinal de fronteira útil: menos leitura local disfarçada de estado global e mais API alinhada ao domínio.

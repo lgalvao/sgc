@@ -89,6 +89,7 @@ export const usePerfilStore = defineStore("perfil", () => {
         }).catch((error: any) => {
             if (error?.response?.status === 404 || error?.response?.status === 401) {
                 return {
+                    autenticado: false,
                     requerSelecaoPerfil: false,
                     perfisUnidades: [],
                     sessao: null,

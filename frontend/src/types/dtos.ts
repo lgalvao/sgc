@@ -108,6 +108,7 @@ export interface SessaoLoginDto {
 }
 
 export interface FluxoLoginResponseDto {
+    autenticado: boolean;
     requerSelecaoPerfil: boolean;
     perfisUnidades: PerfilUnidadeDto[];
     sessao: SessaoLoginDto | null;
