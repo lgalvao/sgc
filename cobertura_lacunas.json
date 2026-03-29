@@ -1,7 +1,7 @@
 {
-  "globalLineCoverage": "99.64%",
+  "globalLineCoverage": "99.83%",
   "globalBranchCoverage": "97.09%",
-  "totalFilesWithGaps": 16,
+  "totalFilesWithGaps": 15,
   "gaps": [
     {
       "class": "sgc.subprocesso.service.SubprocessoTransicaoService",
@@ -22,22 +22,6 @@
         "672(1/4)"
       ],
       "score": 7.5
-    },
-    {
-      "class": "sgc.organizacao.service.UnidadeService",
-      "coverage": "68.18%",
-      "branchCoverage": "100.00%",
-      "missed": [
-        61,
-        62,
-        63,
-        64,
-        65,
-        66,
-        67
-      ],
-      "partial": [],
-      "score": 7
     },
     {
       "class": "sgc.subprocesso.service.SubprocessoService",
