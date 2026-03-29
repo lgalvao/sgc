@@ -36,17 +36,24 @@ function imprimirAjuda() {
     exibirAjudaComando({
         comandoSgc: 'testes analisar',
         scriptDireto: 'testes-analisar.cjs',
-        descricao: 'Analisa classes sem testes correspondentes e gera relatorios em Markdown e JSON.',
+        descricao: 'Analisa classes sem testes correspondentes e gera relatorios em Markdown e JSON com resumo por categoria.',
         opcoes: [
             '--dir <caminho>         Diretorio raiz do backend (padrao: backend)',
             '--output <arquivo>      Arquivo de saida em Markdown',
-            '--output-json <arquivo> Arquivo de saida estruturado em JSON',
+            '--output-json <arquivo> Arquivo de saida estruturado em JSON (padrao: sidecar do Markdown)',
             '--help, -h              Exibe esta ajuda'
         ],
         exemplos: [
             'node etc/scripts/sgc.js backend testes analisar --dir backend --output analise-testes.md --output-json analise-testes.json'
         ]
     });
+}
+
+function resolverSaidaJsonPadrao(caminhoMarkdown) {
+    if (caminhoMarkdown.toLowerCase().endsWith('.md')) {
+        return caminhoMarkdown.replace(/\.md$/i, '.json');
+    }
+    return `${caminhoMarkdown}.json`;
 }
 
 function normalizarCaminho(caminho) {
@@ -289,18 +296,34 @@ function gravarArquivo(caminho, conteudo) {
     fs.writeFileSync(caminho, conteudo, 'utf-8');
 }
 
+function imprimirResumoConsole(dados) {
+    const {estatisticas, categorias} = dados;
+    console.log(`Resumo: ${estatisticas.classes_com_teste}/${estatisticas.total_classes} classes com teste (${estatisticas.cobertura_arquivos_percentual.toFixed(2)}%).`);
+
+    [...CATEGORIAS_PRIORITARIAS, ...CATEGORIAS_SECUNDARIAS].forEach(categoria => {
+        const itens = categorias[categoria];
+        const total = itens.tested.length + itens.untested.length;
+        if (total === 0) {
+            return;
+        }
+        console.log(`- ${categoria}: ${itens.tested.length}/${total} testados`);
+    });
+
+    if (estatisticas.correspondencias_ambiguas > 0) {
+        console.log(`- Correspondencias ambiguas: ${estatisticas.correspondencias_ambiguas}`);
+    }
+}
+
 function main() {
     const args = parseArgs(process.argv.slice(2));
+    const outputJson = args.outputJson ?? resolverSaidaJsonPadrao(args.output);
     const dados = analisarTestes(args.dir);
     gravarArquivo(args.output, gerarMarkdown(dados));
-    if (args.outputJson) {
-        gravarArquivo(args.outputJson, JSON.stringify(dados, null, 2));
-    }
+    gravarArquivo(outputJson, JSON.stringify(dados, null, 2));
 
+    imprimirResumoConsole(dados);
     console.log(`Relatorio Markdown gerado em: ${args.output}`);
-    if (args.outputJson) {
-        console.log(`Relatorio JSON gerado em: ${args.outputJson}`);
-    }
+    console.log(`Relatorio JSON gerado em: ${outputJson}`);
 }
 
 try {

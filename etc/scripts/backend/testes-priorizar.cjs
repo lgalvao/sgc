@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 const fs = require('node:fs');
+const path = require('node:path');
 const {exibirAjudaComando} = require('./lib/cli-ajuda.cjs');
 
 const PADROES_P1 = [
@@ -36,6 +37,7 @@ const PADROES_ESTRUTURAIS = [
 function parseArgs(argv) {
     const resultado = {
         input: 'unit-test-report.md',
+        inputExplicito: false,
         output: 'prioritized-tests.md'
     };
 
@@ -43,6 +45,7 @@ function parseArgs(argv) {
         const arg = argv[indice];
         if (arg === '--input') {
             resultado.input = argv[++indice];
+            resultado.inputExplicito = true;
         } else if (arg === '--output') {
             resultado.output = argv[++indice];
         } else if (arg === '--help' || arg === '-h') {
@@ -68,6 +71,18 @@ function imprimirAjuda() {
             'node etc/scripts/sgc.js backend testes priorizar --input analise-testes.json --output priorizacao-testes.md'
         ]
     });
+}
+
+function resolverEntradaPadrao(caminhoMarkdown) {
+    const diretorio = path.dirname(caminhoMarkdown);
+    const nomeArquivo = `${path.parse(caminhoMarkdown).name}.json`;
+    const jsonSidecar = diretorio === '.' ? nomeArquivo : path.join(diretorio, nomeArquivo);
+
+    if (fs.existsSync(jsonSidecar)) {
+        return jsonSidecar;
+    }
+
+    return caminhoMarkdown;
 }
 
 function classificarArquivo(caminhoArquivo) {
@@ -160,8 +175,10 @@ function gerarMarkdown(priorizadas) {
 
 function main() {
     const args = parseArgs(process.argv.slice(2));
-    const priorizadas = priorizar(args.input);
+    const caminhoEntrada = args.inputExplicito ? args.input : resolverEntradaPadrao(args.input);
+    const priorizadas = priorizar(caminhoEntrada);
     fs.writeFileSync(args.output, gerarMarkdown(priorizadas), 'utf-8');
+    console.log(`Entrada utilizada: ${caminhoEntrada}`);
     console.log(`Priorizacao concluida. Encontrados ${priorizadas.P1.length} P1, ${priorizadas.P2.length} P2, ${priorizadas.P3.length} P3.`);
     console.log(`Plano gerado em: ${args.output}`);
 }

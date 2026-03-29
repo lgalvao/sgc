@@ -7,6 +7,7 @@ import {execaNode} from "execa";
 
 const DIRETORIO_RAIZ = path.resolve(import.meta.dirname, "..", "..", "..");
 const CAMINHO_SGC = path.join(DIRETORIO_RAIZ, "etc", "scripts", "sgc.js");
+const CAMINHO_TESTES_PRIORIZAR = path.join(DIRETORIO_RAIZ, "etc", "scripts", "backend", "testes-priorizar.cjs");
 const FIXTURE_SNAPSHOT = path.join(DIRETORIO_RAIZ, "etc", "scripts", "test", "fixtures", "qa", "snapshot.json");
 const CAMINHO_FRONTEND_COBERTURA_VERIFICAR = path.join(DIRETORIO_RAIZ, "etc", "scripts", "frontend", "cobertura-verificar.cjs");
 const DIRETORIO_SCRIPTS_BACKEND_LEGADO = path.join(DIRETORIO_RAIZ, "backend", "etc", "scripts");
@@ -28,6 +29,14 @@ async function executarScriptFrontendCobertura(args, opcoes = {}) {
     });
 }
 
+async function executarScriptTestesPriorizar(args, opcoes = {}) {
+    return execaNode(CAMINHO_TESTES_PRIORIZAR, args, {
+        cwd: DIRETORIO_RAIZ,
+        reject: false,
+        ...opcoes
+    });
+}
+
 describe("CLI raiz do toolkit", () => {
     test("exibe a ajuda principal", async () => {
         const resultado = await executarSgc(["--help"]);
@@ -40,6 +49,57 @@ describe("CLI raiz do toolkit", () => {
         const resultado = await executarSgc(["backend", "cobertura", "verificar", "--help"]);
         expect(resultado.exitCode).toBe(0);
         expect(resultado.stdout).toContain("Consulta cobertura global e por classe.");
+    });
+
+    test("analisa testes do backend com resumo no console e sidecar JSON", async () => {
+        const diretorioSaida = await mkdtemp(path.join(os.tmpdir(), "sgc-testes-analisar-"));
+        const markdown = path.join(diretorioSaida, "relatorio.md");
+        const json = path.join(diretorioSaida, "relatorio.json");
+
+        const resultado = await executarSgc(["backend", "testes", "analisar", "--output", markdown, "--output-json", json]);
+
+        expect(resultado.exitCode).toBe(0);
+        expect(resultado.stdout).toContain("Resumo:");
+        expect(resultado.stdout).toContain("Repositories:");
+        expect(await fs.pathExists(markdown)).toBe(true);
+        expect(await fs.pathExists(json)).toBe(true);
+
+        const conteudoJson = await fs.readJson(json);
+        expect(conteudoJson.estatisticas.total_classes).toBeGreaterThan(0);
+        expect(conteudoJson.categorias.Repositories.tested.length).toBeGreaterThanOrEqual(1);
+    });
+
+    test("prioriza testes usando sidecar JSON automaticamente quando disponivel", async () => {
+        const diretorioSaida = await mkdtemp(path.join(os.tmpdir(), "sgc-testes-priorizar-"));
+        const markdown = path.join(diretorioSaida, "unit-test-report.md");
+        const json = path.join(diretorioSaida, "unit-test-report.json");
+        const saida = path.join(diretorioSaida, "prioritized-tests.md");
+
+        await fs.writeFile(markdown, "# Relatorio simplificado\n");
+        await fs.writeJson(json, {
+            categorias: {
+                Services: {
+                    untested: [
+                        {caminho_relativo: "sgc/mapa/service/MapaCriticoService.java"}
+                    ]
+                },
+                Repositories: {
+                    untested: [
+                        {caminho_relativo: "sgc/mapa/model/CompetenciaRepo.java"}
+                    ]
+                }
+            }
+        });
+
+        const resultado = await executarScriptTestesPriorizar(["--output", saida], {cwd: diretorioSaida});
+
+        expect(resultado.exitCode).toBe(0);
+        expect(resultado.stdout).toContain("Entrada utilizada: unit-test-report.json");
+        expect(resultado.stdout).toContain("Encontrados 1 P1, 0 P2, 1 P3");
+
+        const conteudo = await fs.readFile(saida, "utf-8");
+        expect(conteudo).toContain("sgc/mapa/service/MapaCriticoService.java");
+        expect(conteudo).toContain("sgc/mapa/model/CompetenciaRepo.java");
     });
 
     test("resume um snapshot de QA a partir de fixture", async () => {

@@ -20,6 +20,7 @@ import sgc.integracao.mocks.*;
 import sgc.seguranca.*;
 
 import java.util.*;
+import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -86,6 +87,19 @@ class RestExceptionHandlerTest {
     }
 
     @Test
+    @DisplayName("Deve sanitizar ErroAutenticacao (401)")
+    void deveSanitizarErroAutenticacao() throws Exception {
+        Mockito.doThrow(new ErroAutenticacao("<script>alert('x')</script>Falha"))
+                .when(controller).teste(any());
+
+        mockMvc.perform(post("/test/validacao")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(JSON_VALIDO_TESTE))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.message").value("Falha"));
+    }
+
+    @Test
     @DisplayName("Deve tratar IllegalStateException (409)")
     void deveTratarIllegalStateException() throws Exception {
         Mockito.doThrow(new IllegalStateException("Estado inválido"))
@@ -96,6 +110,21 @@ class RestExceptionHandlerTest {
                         .content(JSON_VALIDO_TESTE))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.message").value("ESTADO ILEGAL: Estado inválido"));
+    }
+
+    @Test
+    @DisplayName("Deve tratar ErroInterno (500)")
+    void deveTratarErroInterno() throws Exception {
+        Mockito.doThrow(new ErroInterno("Falha interna") {
+        })
+                .when(controller).teste(any());
+
+        mockMvc.perform(post("/test/validacao")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(JSON_VALIDO_TESTE))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.message").value("ERRO INTERNO: Falha interna"))
+                .andExpect(jsonPath("$.code").value("ERRO_INTERNO"));
     }
 
     @Test
@@ -180,6 +209,29 @@ class RestExceptionHandlerTest {
     }
 
     @Test
+    @DisplayName("Deve sanitizar mensagens em MethodArgumentNotValidException")
+    void deveSanitizarMethodArgumentNotValidException() throws Exception {
+        BindingResult bindingResult = Mockito.mock(BindingResult.class);
+        FieldError error = new FieldError("obj", "field", "<b>mensagem</b>");
+        Mockito.when(bindingResult.getFieldErrors()).thenReturn(List.of(error));
+        MethodParameter methodParameter = Mockito.mock(MethodParameter.class);
+        Mockito.when(methodParameter.getExecutable()).thenReturn(Object.class.getMethod("toString"));
+        MethodArgumentNotValidException ex = new MethodArgumentNotValidException(methodParameter, bindingResult);
+
+        ResponseEntity<Object> response = restExceptionHandler.handleMethodArgumentNotValid(
+                ex,
+                new HttpHeaders(),
+                HttpStatus.BAD_REQUEST,
+                Mockito.mock(WebRequest.class));
+
+        assertThat(Objects.requireNonNull(response).getBody())
+                .isInstanceOfSatisfying(ErroApi.class, erroApi -> {
+                    assertThat(erroApi.getSubErrors()).hasSize(1);
+                    assertThat(Objects.requireNonNull(erroApi.getSubErrors()).getFirst().message()).isEqualTo("mensagem");
+                });
+    }
+
+    @Test
     @DisplayName("Deve tratar ErroNegocioBase genérico (400)")
     void deveTratarErroNegocioBase() {
         ErroNegocioBase ex = new ErroNegocioBase("Erro base", "CODE", HttpStatus.BAD_REQUEST) {
@@ -202,6 +254,19 @@ class RestExceptionHandlerTest {
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals(details, ((ErroApi) response.getBody()).getDetails());
+    }
+
+    @Test
+    @DisplayName("Deve sanitizar mensagem de ErroNegocioBase")
+    void deveSanitizarMensagemDeErroNegocioBase() {
+        ErroNegocioBase ex = new ErroNegocioBase("<script>erro</script>", "CODE", HttpStatus.BAD_REQUEST) {
+        };
+
+        ResponseEntity<?> response = restExceptionHandler.handleErroNegocio(ex);
+
+        assertThat(response.getBody())
+                .isInstanceOfSatisfying(ErroApi.class, erroApi ->
+                        assertThat(erroApi.getMessage()).isEmpty());
     }
 
     @Test

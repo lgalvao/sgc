@@ -96,6 +96,18 @@ class EmailServiceTest {
     }
 
     @Test
+    @DisplayName("Deve aceitar e-mail válido com espaços nas bordas")
+    void deveAceitarEmailValidoComEspacosNasBordas() {
+        setupMockEmail();
+        when(notificacaoRepo.save(any(Notificacao.class))).thenAnswer(i -> i.getArgument(0));
+
+        notificacaoServico.enviarEmail("  recipient@test.com  ", "Assunto", "Corpo");
+
+        verify(notificacaoRepo).save(any(Notificacao.class));
+        verify(enviadorEmail).send(any(MimeMessage.class));
+    }
+
+    @Test
     @DisplayName("Deve truncar conteúdo longo da notificação")
     void deveTruncarConteudoLongoDaNotificacao() {
         setupMockEmail();
@@ -112,5 +124,19 @@ class EmailServiceTest {
         Notificacao notificacaoSalva = captorNotificacao.getValue();
         assertThat(notificacaoSalva.getConteudo().length()).isLessThanOrEqualTo(LIMITE_CONTEUDO_NOTIFICACAO);
         assertThat(notificacaoSalva.getConteudo()).endsWith("...");
+    }
+
+    @Test
+    @DisplayName("Deve encapsular erro de SMTP em RuntimeException")
+    void deveEncapsularErroDeSmtpEmRuntimeException() {
+        setupMockEmail();
+        when(notificacaoRepo.save(any(Notificacao.class))).thenAnswer(i -> i.getArgument(0));
+
+        assertThatThrownBy(() -> notificacaoServico.enviarEmail("a..b@test.com", "Assunto", "Corpo"))
+                .isInstanceOf(RuntimeException.class)
+                .hasCauseInstanceOf(AddressException.class);
+
+        verify(notificacaoRepo).save(any(Notificacao.class));
+        verify(enviadorEmail, never()).send(any(MimeMessage.class));
     }
 }

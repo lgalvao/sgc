@@ -4,10 +4,8 @@
 
 Estas classes contem regras de negocio, validacoes, seguranca ou orquestracao complexa. A falta de testes aqui representa alto risco.
 
-- [ ] `sgc/subprocesso/service/SubprocessoNotificacaoService.java`
-- [ ] `sgc/subprocesso/service/SubprocessoService.java`
-- [ ] `sgc/subprocesso/service/SubprocessoSituacaoService.java`
-- [ ] `sgc/subprocesso/service/SubprocessoTransicaoService.java`
+Nenhuma pendencia critica de logica encontrada.
+
 
 ## P2: Importantes (Integracao e Contratos)
 
@@ -63,8 +61,6 @@ DTOs, modelos, repositorios e configuracoes. Geralmente cobertos por testes de i
 - [ ] `sgc/mapa/dto/ResultadoOperacaoConhecimento.java`
 - [ ] `sgc/mapa/dto/SalvarMapaRequest.java`
 - [ ] `sgc/mapa/model/Atividade.java`
-- [ ] `sgc/mapa/model/AtividadeRepo.java`
-- [ ] `sgc/mapa/model/CompetenciaRepo.java`
 - [ ] `sgc/mapa/model/ConhecimentoRepo.java`
 - [ ] `sgc/mapa/model/Mapa.java`
 - [ ] `sgc/mapa/model/MapaRepo.java`
@@ -90,13 +86,11 @@ DTOs, modelos, repositorios e configuracoes. Geralmente cobertos por testes de i
 - [ ] `sgc/organizacao/model/SituacaoUnidade.java`
 - [ ] `sgc/organizacao/model/TipoUnidade.java`
 - [ ] `sgc/organizacao/model/UnidadeMapa.java`
-- [ ] `sgc/organizacao/model/UnidadeMapaRepo.java`
 - [ ] `sgc/organizacao/model/UnidadeRepo.java`
 - [ ] `sgc/organizacao/model/Usuario.java`
 - [ ] `sgc/organizacao/model/UsuarioPerfil.java`
 - [ ] `sgc/organizacao/model/UsuarioPerfilId.java`
 - [ ] `sgc/organizacao/model/UsuarioPerfilRepo.java`
-- [ ] `sgc/organizacao/model/UsuarioRepo.java`
 - [ ] `sgc/organizacao/model/VinculacaoUnidade.java`
 - [ ] `sgc/parametros/model/ConfiguracaoViews.java`
 - [ ] `sgc/parametros/model/Parametro.java`
@@ -161,7 +155,6 @@ DTOs, modelos, repositorios e configuracoes. Geralmente cobertos por testes de i
 - [ ] `sgc/subprocesso/model/Analise.java`
 - [ ] `sgc/subprocesso/model/AnaliseRepo.java`
 - [ ] `sgc/subprocesso/model/MovimentacaoRepo.java`
-- [ ] `sgc/subprocesso/model/SubprocessoRepo.java`
 - [ ] `sgc/subprocesso/model/SubprocessoViews.java`
 - [ ] `sgc/subprocesso/model/TipoAcaoAnalise.java`
 - [ ] `sgc/subprocesso/model/TipoAnalise.java`

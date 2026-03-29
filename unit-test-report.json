@@ -1,0 +1,1926 @@
+{
+  "gerado_em": "2026-03-29T13:09:28.610Z",
+  "backend_dir": "backend",
+  "estatisticas": {
+    "total_classes": 214,
+    "classes_com_teste": 73,
+    "classes_sem_teste": 141,
+    "cobertura_arquivos_percentual": 34.11,
+    "correspondencias_ambiguas": 12
+  },
+  "categorias": {
+    "Controllers": {
+      "tested": [
+        {
+          "classe": "AlertaController",
+          "caminho_relativo": "sgc/alerta/AlertaController.java",
+          "categoria": "Controllers",
+          "possui_teste": true,
+          "estrategia_correspondencia": "mesmo_pacote",
+          "testes_encontrados": [
+            "sgc/alerta/AlertaControllerTest.java"
+          ]
+        },
+        {
+          "classe": "E2eController",
+          "caminho_relativo": "sgc/e2e/E2eController.java",
+          "categoria": "Controllers",
+          "possui_teste": true,
+          "estrategia_correspondencia": "mesmo_pacote",
+          "testes_encontrados": [
+            "sgc/e2e/E2eControllerCoverageTest.java",
+            "sgc/e2e/E2eControllerTest.java"
+          ]
+        },
+        {
+          "classe": "AtividadeController",
+          "caminho_relativo": "sgc/mapa/AtividadeController.java",
+          "categoria": "Controllers",
+          "possui_teste": true,
+          "estrategia_correspondencia": "mesmo_pacote",
+          "testes_encontrados": [
+            "sgc/mapa/AtividadeControllerTest.java"
+          ]
+        },
+        {
+          "classe": "MapaController",
+          "caminho_relativo": "sgc/mapa/MapaController.java",
+          "categoria": "Controllers",
+          "possui_teste": true,
+          "estrategia_correspondencia": "mesmo_pacote",
+          "testes_encontrados": [
+            "sgc/mapa/MapaControllerTest.java"
+          ]
+        },
+        {
+          "classe": "UnidadeController",
+          "caminho_relativo": "sgc/organizacao/UnidadeController.java",
+          "categoria": "Controllers",
+          "possui_teste": true,
+          "estrategia_correspondencia": "mesmo_pacote",
+          "testes_encontrados": [
+            "sgc/organizacao/UnidadeControllerTest.java"
+          ]
+        },
+        {
+          "classe": "UsuarioController",
+          "caminho_relativo": "sgc/organizacao/UsuarioController.java",
+          "categoria": "Controllers",
+          "possui_teste": true,
+          "estrategia_correspondencia": "mesmo_pacote",
+          "testes_encontrados": [
+            "sgc/organizacao/UsuarioControllerTest.java"
+          ]
+        },
+        {
+          "classe": "ConfiguracaoController",
+          "caminho_relativo": "sgc/parametros/ConfiguracaoController.java",
+          "categoria": "Controllers",
+          "possui_teste": true,
+          "estrategia_correspondencia": "mesmo_pacote",
+          "testes_encontrados": [
+            "sgc/parametros/ConfiguracaoControllerTest.java"
+          ]
+        },
+        {
+          "classe": "ProcessoController",
+          "caminho_relativo": "sgc/processo/ProcessoController.java",
+          "categoria": "Controllers",
+          "possui_teste": true,
+          "estrategia_correspondencia": "mesmo_pacote",
+          "testes_encontrados": [
+            "sgc/processo/ProcessoControllerTest.java"
+          ]
+        },
+        {
+          "classe": "PainelController",
+          "caminho_relativo": "sgc/processo/painel/PainelController.java",
+          "categoria": "Controllers",
+          "possui_teste": true,
+          "estrategia_correspondencia": "mesmo_pacote",
+          "testes_encontrados": [
+            "sgc/processo/painel/PainelControllerTest.java"
+          ]
+        },
+        {
+          "classe": "RelatorioController",
+          "caminho_relativo": "sgc/relatorio/RelatorioController.java",
+          "categoria": "Controllers",
+          "possui_teste": true,
+          "estrategia_correspondencia": "mesmo_pacote",
+          "testes_encontrados": [
+            "sgc/relatorio/RelatorioControllerTest.java"
+          ]
+        },
+        {
+          "classe": "LoginController",
+          "caminho_relativo": "sgc/seguranca/login/LoginController.java",
+          "categoria": "Controllers",
+          "possui_teste": true,
+          "estrategia_correspondencia": "mesmo_pacote",
+          "testes_encontrados": [
+            "sgc/seguranca/login/LoginControllerTest.java"
+          ]
+        },
+        {
+          "classe": "SubprocessoController",
+          "caminho_relativo": "sgc/subprocesso/SubprocessoController.java",
+          "categoria": "Controllers",
+          "possui_teste": true,
+          "estrategia_correspondencia": "mesmo_pacote",
+          "testes_encontrados": [
+            "sgc/subprocesso/SubprocessoControllerCoverageTest.java",
+            "sgc/subprocesso/SubprocessoControllerTest.java"
+          ]
+        }
+      ],
+      "untested": []
+    },
+    "Services": {
+      "tested": [
+        {
+          "classe": "AlertaService",
+          "caminho_relativo": "sgc/alerta/AlertaService.java",
+          "categoria": "Services",
+          "possui_teste": true,
+          "estrategia_correspondencia": "mesmo_pacote",
+          "testes_encontrados": [
+            "sgc/alerta/AlertaServiceTest.java"
+          ]
+        },
+        {
+          "classe": "EmailModelosService",
+          "caminho_relativo": "sgc/alerta/EmailModelosService.java",
+          "categoria": "Services",
+          "possui_teste": true,
+          "estrategia_correspondencia": "nome_correspondente_outro_pacote",
+          "testes_encontrados": [
+            "sgc/alerta/notificacao/EmailModelosServiceTest.java"
+          ]
+        },
+        {
+          "classe": "EmailService",
+          "caminho_relativo": "sgc/alerta/EmailService.java",
+          "categoria": "Services",
+          "possui_teste": true,
+          "estrategia_correspondencia": "nome_correspondente_outro_pacote",
+          "testes_encontrados": [
+            "sgc/alerta/notificacao/EmailServiceTest.java"
+          ]
+        },
+        {
+          "classe": "CopiaMapaService",
+          "caminho_relativo": "sgc/mapa/service/CopiaMapaService.java",
+          "categoria": "Services",
+          "possui_teste": true,
+          "estrategia_correspondencia": "mesmo_pacote",
+          "testes_encontrados": [
+            "sgc/mapa/service/CopiaMapaServiceCoverageTest.java",
+            "sgc/mapa/service/CopiaMapaServiceTest.java"
+          ]
+        },
+        {
+          "classe": "ImpactoMapaService",
+          "caminho_relativo": "sgc/mapa/service/ImpactoMapaService.java",
+          "categoria": "Services",
+          "possui_teste": true,
+          "estrategia_correspondencia": "mesmo_pacote",
+          "testes_encontrados": [
+            "sgc/mapa/service/ImpactoMapaServiceCoverageTest.java",
+            "sgc/mapa/service/ImpactoMapaServiceTest.java"
+          ]
+        },
+        {
+          "classe": "MapaManutencaoService",
+          "caminho_relativo": "sgc/mapa/service/MapaManutencaoService.java",
+          "categoria": "Services",
+          "possui_teste": true,
+          "estrategia_correspondencia": "nome_correspondente_outro_pacote",
+          "testes_encontrados": [
+            "sgc/integracao/MapaManutencaoServiceIntegrationTest.java"
+          ]
+        },
+        {
+          "classe": "MapaSalvamentoService",
+          "caminho_relativo": "sgc/mapa/service/MapaSalvamentoService.java",
+          "categoria": "Services",
+          "possui_teste": true,
+          "estrategia_correspondencia": "mesmo_pacote",
+          "testes_encontrados": [
+            "sgc/mapa/service/MapaSalvamentoServiceTest.java"
+          ]
+        },
+        {
+          "classe": "MapaVisualizacaoService",
+          "caminho_relativo": "sgc/mapa/service/MapaVisualizacaoService.java",
+          "categoria": "Services",
+          "possui_teste": true,
+          "estrategia_correspondencia": "mesmo_pacote",
+          "testes_encontrados": [
+            "sgc/mapa/service/MapaVisualizacaoServiceCoverageTest.java",
+            "sgc/mapa/service/MapaVisualizacaoServiceTest.java"
+          ]
+        },
+        {
+          "classe": "HierarquiaService",
+          "caminho_relativo": "sgc/organizacao/service/HierarquiaService.java",
+          "categoria": "Services",
+          "possui_teste": true,
+          "estrategia_correspondencia": "nome_correspondente_outro_pacote",
+          "testes_encontrados": [
+            "sgc/organizacao/HierarquiaServiceTest.java"
+          ]
+        },
+        {
+          "classe": "ResponsavelUnidadeService",
+          "caminho_relativo": "sgc/organizacao/service/ResponsavelUnidadeService.java",
+          "categoria": "Services",
+          "possui_teste": true,
+          "estrategia_correspondencia": "mesmo_pacote",
+          "testes_encontrados": [
+            "sgc/organizacao/service/ResponsavelUnidadeServiceTest.java"
+          ]
+        },
+        {
+          "classe": "UnidadeHierarquiaService",
+          "caminho_relativo": "sgc/organizacao/service/UnidadeHierarquiaService.java",
+          "categoria": "Services",
+          "possui_teste": true,
+          "estrategia_correspondencia": "mesmo_pacote",
+          "testes_encontrados": [
+            "sgc/organizacao/service/UnidadeHierarquiaServiceCoverageTest.java",
+            "sgc/organizacao/service/UnidadeHierarquiaServiceTest.java"
+          ]
+        },
+        {
+          "classe": "UnidadeService",
+          "caminho_relativo": "sgc/organizacao/service/UnidadeService.java",
+          "categoria": "Services",
+          "possui_teste": true,
+          "estrategia_correspondencia": "mesmo_pacote",
+          "testes_encontrados": [
+            "sgc/organizacao/service/UnidadeServiceTest.java"
+          ]
+        },
+        {
+          "classe": "UsuarioService",
+          "caminho_relativo": "sgc/organizacao/service/UsuarioService.java",
+          "categoria": "Services",
+          "possui_teste": true,
+          "estrategia_correspondencia": "nome_correspondente_outro_pacote",
+          "testes_encontrados": [
+            "sgc/organizacao/UsuarioServiceTest.java"
+          ]
+        },
+        {
+          "classe": "ConfiguracaoService",
+          "caminho_relativo": "sgc/parametros/ConfiguracaoService.java",
+          "categoria": "Services",
+          "possui_teste": true,
+          "estrategia_correspondencia": "mesmo_pacote",
+          "testes_encontrados": [
+            "sgc/parametros/ConfiguracaoServiceTest.java"
+          ]
+        },
+        {
+          "classe": "ProcessoService",
+          "caminho_relativo": "sgc/processo/service/ProcessoService.java",
+          "categoria": "Services",
+          "possui_teste": true,
+          "estrategia_correspondencia": "mesmo_pacote",
+          "testes_encontrados": [
+            "sgc/processo/service/ProcessoServiceCoverageTest.java",
+            "sgc/processo/service/ProcessoServiceTest.java"
+          ]
+        },
+        {
+          "classe": "SubprocessoNotificacaoService",
+          "caminho_relativo": "sgc/subprocesso/service/SubprocessoNotificacaoService.java",
+          "categoria": "Services",
+          "possui_teste": true,
+          "estrategia_correspondencia": "mesmo_pacote",
+          "testes_encontrados": [
+            "sgc/subprocesso/service/SubprocessoNotificacaoServiceTest.java"
+          ]
+        },
+        {
+          "classe": "SubprocessoService",
+          "caminho_relativo": "sgc/subprocesso/service/SubprocessoService.java",
+          "categoria": "Services",
+          "possui_teste": true,
+          "estrategia_correspondencia": "mesmo_pacote",
+          "testes_encontrados": [
+            "sgc/subprocesso/service/SubprocessoServiceTest.java"
+          ]
+        },
+        {
+          "classe": "SubprocessoSituacaoService",
+          "caminho_relativo": "sgc/subprocesso/service/SubprocessoSituacaoService.java",
+          "categoria": "Services",
+          "possui_teste": true,
+          "estrategia_correspondencia": "mesmo_pacote",
+          "testes_encontrados": [
+            "sgc/subprocesso/service/SubprocessoSituacaoServiceTest.java"
+          ]
+        },
+        {
+          "classe": "SubprocessoTransicaoService",
+          "caminho_relativo": "sgc/subprocesso/service/SubprocessoTransicaoService.java",
+          "categoria": "Services",
+          "possui_teste": true,
+          "estrategia_correspondencia": "mesmo_pacote",
+          "testes_encontrados": [
+            "sgc/subprocesso/service/SubprocessoTransicaoServiceTest.java"
+          ]
+        },
+        {
+          "classe": "SubprocessoValidacaoService",
+          "caminho_relativo": "sgc/subprocesso/service/SubprocessoValidacaoService.java",
+          "categoria": "Services",
+          "possui_teste": true,
+          "estrategia_correspondencia": "mesmo_pacote",
+          "testes_encontrados": [
+            "sgc/subprocesso/service/SubprocessoValidacaoServiceCoverageTest.java",
+            "sgc/subprocesso/service/SubprocessoValidacaoServiceTest.java"
+          ]
+        }
+      ],
+      "untested": []
+    },
+    "Facades": {
+      "tested": [
+        {
+          "classe": "AlertaFacade",
+          "caminho_relativo": "sgc/alerta/AlertaFacade.java",
+          "categoria": "Facades",
+          "possui_teste": true,
+          "estrategia_correspondencia": "mesmo_pacote",
+          "testes_encontrados": [
+            "sgc/alerta/AlertaFacadeCoverageTest.java",
+            "sgc/alerta/AlertaFacadeTest.java"
+          ]
+        },
+        {
+          "classe": "AtividadeFacade",
+          "caminho_relativo": "sgc/mapa/AtividadeFacade.java",
+          "categoria": "Facades",
+          "possui_teste": true,
+          "estrategia_correspondencia": "nome_correspondente_outro_pacote",
+          "testes_encontrados": [
+            "sgc/mapa/service/AtividadeFacadeTest.java"
+          ]
+        },
+        {
+          "classe": "UsuarioFacade",
+          "caminho_relativo": "sgc/organizacao/UsuarioFacade.java",
+          "categoria": "Facades",
+          "possui_teste": true,
+          "estrategia_correspondencia": "mesmo_pacote",
+          "testes_encontrados": [
+            "sgc/organizacao/UsuarioFacadeTest.java"
+          ]
+        },
+        {
+          "classe": "PainelFacade",
+          "caminho_relativo": "sgc/processo/painel/PainelFacade.java",
+          "categoria": "Facades",
+          "possui_teste": true,
+          "estrategia_correspondencia": "mesmo_pacote",
+          "testes_encontrados": [
+            "sgc/processo/painel/PainelFacadeTest.java"
+          ]
+        },
+        {
+          "classe": "RelatorioFacade",
+          "caminho_relativo": "sgc/relatorio/RelatorioFacade.java",
+          "categoria": "Facades",
+          "possui_teste": true,
+          "estrategia_correspondencia": "nome_correspondente_outro_pacote",
+          "testes_encontrados": [
+            "sgc/relatorio/service/RelatorioFacadeTest.java"
+          ]
+        },
+        {
+          "classe": "LoginFacade",
+          "caminho_relativo": "sgc/seguranca/LoginFacade.java",
+          "categoria": "Facades",
+          "possui_teste": true,
+          "estrategia_correspondencia": "nome_correspondente_outro_pacote",
+          "testes_encontrados": [
+            "sgc/seguranca/login/LoginFacadeTest.java"
+          ]
+        }
+      ],
+      "untested": []
+    },
+    "Mappers": {
+      "tested": [],
+      "untested": []
+    },
+    "Models": {
+      "tested": [
+        {
+          "classe": "EntidadeBase",
+          "caminho_relativo": "sgc/comum/model/EntidadeBase.java",
+          "categoria": "Models",
+          "possui_teste": true,
+          "estrategia_correspondencia": "mesmo_pacote",
+          "testes_encontrados": [
+            "sgc/comum/model/EntidadeBaseTest.java"
+          ]
+        },
+        {
+          "classe": "Competencia",
+          "caminho_relativo": "sgc/mapa/model/Competencia.java",
+          "categoria": "Models",
+          "possui_teste": true,
+          "estrategia_correspondencia": "mesmo_pacote",
+          "testes_encontrados": [
+            "sgc/mapa/model/CompetenciaTest.java"
+          ]
+        },
+        {
+          "classe": "Conhecimento",
+          "caminho_relativo": "sgc/mapa/model/Conhecimento.java",
+          "categoria": "Models",
+          "possui_teste": true,
+          "estrategia_correspondencia": "mesmo_pacote",
+          "testes_encontrados": [
+            "sgc/mapa/model/ConhecimentoTest.java"
+          ]
+        },
+        {
+          "classe": "Unidade",
+          "caminho_relativo": "sgc/organizacao/model/Unidade.java",
+          "categoria": "Models",
+          "possui_teste": true,
+          "estrategia_correspondencia": "mesmo_pacote",
+          "testes_encontrados": [
+            "sgc/organizacao/model/UnidadeTest.java"
+          ]
+        },
+        {
+          "classe": "Processo",
+          "caminho_relativo": "sgc/processo/model/Processo.java",
+          "categoria": "Models",
+          "possui_teste": true,
+          "estrategia_correspondencia": "mesmo_pacote",
+          "testes_encontrados": [
+            "sgc/processo/model/ProcessoTest.java"
+          ]
+        },
+        {
+          "classe": "Movimentacao",
+          "caminho_relativo": "sgc/subprocesso/model/Movimentacao.java",
+          "categoria": "Models",
+          "possui_teste": true,
+          "estrategia_correspondencia": "mesmo_pacote",
+          "testes_encontrados": [
+            "sgc/subprocesso/model/MovimentacaoTest.java"
+          ]
+        },
+        {
+          "classe": "SituacaoSubprocesso",
+          "caminho_relativo": "sgc/subprocesso/model/SituacaoSubprocesso.java",
+          "categoria": "Models",
+          "possui_teste": true,
+          "estrategia_correspondencia": "mesmo_pacote",
+          "testes_encontrados": [
+            "sgc/subprocesso/model/SituacaoSubprocessoCoverageTest.java",
+            "sgc/subprocesso/model/SituacaoSubprocessoTest.java"
+          ]
+        },
+        {
+          "classe": "Subprocesso",
+          "caminho_relativo": "sgc/subprocesso/model/Subprocesso.java",
+          "categoria": "Models",
+          "possui_teste": true,
+          "estrategia_correspondencia": "mesmo_pacote",
+          "testes_encontrados": [
+            "sgc/subprocesso/model/SubprocessoTest.java"
+          ]
+        },
+        {
+          "classe": "TipoTransicao",
+          "caminho_relativo": "sgc/subprocesso/model/TipoTransicao.java",
+          "categoria": "Models",
+          "possui_teste": true,
+          "estrategia_correspondencia": "nome_correspondente_outro_pacote",
+          "testes_encontrados": [
+            "sgc/subprocesso/eventos/TipoTransicaoTest.java"
+          ]
+        }
+      ],
+      "untested": [
+        {
+          "classe": "Alerta",
+          "caminho_relativo": "sgc/alerta/model/Alerta.java",
+          "categoria": "Models",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "AlertaUsuario",
+          "caminho_relativo": "sgc/alerta/model/AlertaUsuario.java",
+          "categoria": "Models",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "Notificacao",
+          "caminho_relativo": "sgc/alerta/model/Notificacao.java",
+          "categoria": "Models",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "ComumViews",
+          "caminho_relativo": "sgc/comum/model/ComumViews.java",
+          "categoria": "Models",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "TituloEleitoral",
+          "caminho_relativo": "sgc/comum/model/TituloEleitoral.java",
+          "categoria": "Models",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "Atividade",
+          "caminho_relativo": "sgc/mapa/model/Atividade.java",
+          "categoria": "Models",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "Mapa",
+          "caminho_relativo": "sgc/mapa/model/Mapa.java",
+          "categoria": "Models",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "MapaViews",
+          "caminho_relativo": "sgc/mapa/model/MapaViews.java",
+          "categoria": "Models",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "TipoImpactoAtividade",
+          "caminho_relativo": "sgc/mapa/model/TipoImpactoAtividade.java",
+          "categoria": "Models",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "TipoImpactoCompetencia",
+          "caminho_relativo": "sgc/mapa/model/TipoImpactoCompetencia.java",
+          "categoria": "Models",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "Administrador",
+          "caminho_relativo": "sgc/organizacao/model/Administrador.java",
+          "categoria": "Models",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "AtribuicaoTemporaria",
+          "caminho_relativo": "sgc/organizacao/model/AtribuicaoTemporaria.java",
+          "categoria": "Models",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "OrganizacaoViews",
+          "caminho_relativo": "sgc/organizacao/model/OrganizacaoViews.java",
+          "categoria": "Models",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "Perfil",
+          "caminho_relativo": "sgc/organizacao/model/Perfil.java",
+          "categoria": "Models",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "Responsabilidade",
+          "caminho_relativo": "sgc/organizacao/model/Responsabilidade.java",
+          "categoria": "Models",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "SituacaoUnidade",
+          "caminho_relativo": "sgc/organizacao/model/SituacaoUnidade.java",
+          "categoria": "Models",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "TipoUnidade",
+          "caminho_relativo": "sgc/organizacao/model/TipoUnidade.java",
+          "categoria": "Models",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "UnidadeMapa",
+          "caminho_relativo": "sgc/organizacao/model/UnidadeMapa.java",
+          "categoria": "Models",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "Usuario",
+          "caminho_relativo": "sgc/organizacao/model/Usuario.java",
+          "categoria": "Models",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "UsuarioPerfil",
+          "caminho_relativo": "sgc/organizacao/model/UsuarioPerfil.java",
+          "categoria": "Models",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "UsuarioPerfilId",
+          "caminho_relativo": "sgc/organizacao/model/UsuarioPerfilId.java",
+          "categoria": "Models",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "VinculacaoUnidade",
+          "caminho_relativo": "sgc/organizacao/model/VinculacaoUnidade.java",
+          "categoria": "Models",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "ConfiguracaoViews",
+          "caminho_relativo": "sgc/parametros/model/ConfiguracaoViews.java",
+          "categoria": "Models",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "Parametro",
+          "caminho_relativo": "sgc/parametros/model/Parametro.java",
+          "categoria": "Models",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "AcaoProcesso",
+          "caminho_relativo": "sgc/processo/model/AcaoProcesso.java",
+          "categoria": "Models",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "ProcessoViews",
+          "caminho_relativo": "sgc/processo/model/ProcessoViews.java",
+          "categoria": "Models",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "SituacaoProcesso",
+          "caminho_relativo": "sgc/processo/model/SituacaoProcesso.java",
+          "categoria": "Models",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "TipoProcesso",
+          "caminho_relativo": "sgc/processo/model/TipoProcesso.java",
+          "categoria": "Models",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "UnidadeProcesso",
+          "caminho_relativo": "sgc/processo/model/UnidadeProcesso.java",
+          "categoria": "Models",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "UnidadeProcessoId",
+          "caminho_relativo": "sgc/processo/model/UnidadeProcessoId.java",
+          "categoria": "Models",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "Analise",
+          "caminho_relativo": "sgc/subprocesso/model/Analise.java",
+          "categoria": "Models",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "SubprocessoViews",
+          "caminho_relativo": "sgc/subprocesso/model/SubprocessoViews.java",
+          "categoria": "Models",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "TipoAcaoAnalise",
+          "caminho_relativo": "sgc/subprocesso/model/TipoAcaoAnalise.java",
+          "categoria": "Models",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "TipoAnalise",
+          "caminho_relativo": "sgc/subprocesso/model/TipoAnalise.java",
+          "categoria": "Models",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        }
+      ]
+    },
+    "DTOs": {
+      "tested": [
+        {
+          "classe": "ImpactoMapaResponse",
+          "caminho_relativo": "sgc/mapa/dto/ImpactoMapaResponse.java",
+          "categoria": "DTOs",
+          "possui_teste": true,
+          "estrategia_correspondencia": "mesmo_pacote",
+          "testes_encontrados": [
+            "sgc/mapa/dto/ImpactoMapaResponseTest.java"
+          ]
+        },
+        {
+          "classe": "PerfilDto",
+          "caminho_relativo": "sgc/organizacao/dto/PerfilDto.java",
+          "categoria": "DTOs",
+          "possui_teste": true,
+          "estrategia_correspondencia": "mesmo_pacote",
+          "testes_encontrados": [
+            "sgc/organizacao/dto/PerfilDtoTest.java"
+          ]
+        },
+        {
+          "classe": "ProcessoDetalheDto",
+          "caminho_relativo": "sgc/processo/dto/ProcessoDetalheDto.java",
+          "categoria": "DTOs",
+          "possui_teste": true,
+          "estrategia_correspondencia": "mesmo_pacote",
+          "testes_encontrados": [
+            "sgc/processo/dto/ProcessoDetalheDtoTest.java"
+          ]
+        },
+        {
+          "classe": "MapaAjusteDto",
+          "caminho_relativo": "sgc/subprocesso/dto/MapaAjusteDto.java",
+          "categoria": "DTOs",
+          "possui_teste": true,
+          "estrategia_correspondencia": "mesmo_pacote",
+          "testes_encontrados": [
+            "sgc/subprocesso/dto/MapaAjusteDtoTest.java"
+          ]
+        }
+      ],
+      "untested": [
+        {
+          "classe": "AlertaDto",
+          "caminho_relativo": "sgc/alerta/dto/AlertaDto.java",
+          "categoria": "DTOs",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "ComumDtos",
+          "caminho_relativo": "sgc/comum/ComumDtos.java",
+          "categoria": "DTOs",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "AtividadeDto",
+          "caminho_relativo": "sgc/mapa/dto/AtividadeDto.java",
+          "categoria": "DTOs",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "AtividadeImpactadaDto",
+          "caminho_relativo": "sgc/mapa/dto/AtividadeImpactadaDto.java",
+          "categoria": "DTOs",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "AtividadeMapaDto",
+          "caminho_relativo": "sgc/mapa/dto/AtividadeMapaDto.java",
+          "categoria": "DTOs",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "AtualizarAtividadeRequest",
+          "caminho_relativo": "sgc/mapa/dto/AtualizarAtividadeRequest.java",
+          "categoria": "DTOs",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "AtualizarConhecimentoRequest",
+          "caminho_relativo": "sgc/mapa/dto/AtualizarConhecimentoRequest.java",
+          "categoria": "DTOs",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "AtualizarMapaRequest",
+          "caminho_relativo": "sgc/mapa/dto/AtualizarMapaRequest.java",
+          "categoria": "DTOs",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "CompetenciaImpactadaDto",
+          "caminho_relativo": "sgc/mapa/dto/CompetenciaImpactadaDto.java",
+          "categoria": "DTOs",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "CompetenciaMapaDto",
+          "caminho_relativo": "sgc/mapa/dto/CompetenciaMapaDto.java",
+          "categoria": "DTOs",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "ConhecimentoResumoDto",
+          "caminho_relativo": "sgc/mapa/dto/ConhecimentoResumoDto.java",
+          "categoria": "DTOs",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "CriarAtividadeRequest",
+          "caminho_relativo": "sgc/mapa/dto/CriarAtividadeRequest.java",
+          "categoria": "DTOs",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "CriarConhecimentoRequest",
+          "caminho_relativo": "sgc/mapa/dto/CriarConhecimentoRequest.java",
+          "categoria": "DTOs",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "CriarMapaRequest",
+          "caminho_relativo": "sgc/mapa/dto/CriarMapaRequest.java",
+          "categoria": "DTOs",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "MapaCompletoDto",
+          "caminho_relativo": "sgc/mapa/dto/MapaCompletoDto.java",
+          "categoria": "DTOs",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "MapaResumoDto",
+          "caminho_relativo": "sgc/mapa/dto/MapaResumoDto.java",
+          "categoria": "DTOs",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "MapaVisualizacaoResponse",
+          "caminho_relativo": "sgc/mapa/dto/MapaVisualizacaoResponse.java",
+          "categoria": "DTOs",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "SalvarMapaRequest",
+          "caminho_relativo": "sgc/mapa/dto/SalvarMapaRequest.java",
+          "categoria": "DTOs",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "AdministradorDto",
+          "caminho_relativo": "sgc/organizacao/dto/AdministradorDto.java",
+          "categoria": "DTOs",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "AtribuicaoDto",
+          "caminho_relativo": "sgc/organizacao/dto/AtribuicaoDto.java",
+          "categoria": "DTOs",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "CriarAtribuicaoRequest",
+          "caminho_relativo": "sgc/organizacao/dto/CriarAtribuicaoRequest.java",
+          "categoria": "DTOs",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "ResponsavelDto",
+          "caminho_relativo": "sgc/organizacao/dto/ResponsavelDto.java",
+          "categoria": "DTOs",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "UnidadeDto",
+          "caminho_relativo": "sgc/organizacao/dto/UnidadeDto.java",
+          "categoria": "DTOs",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "UnidadeResponsavelDto",
+          "caminho_relativo": "sgc/organizacao/dto/UnidadeResponsavelDto.java",
+          "categoria": "DTOs",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "UsuarioConsultaDto",
+          "caminho_relativo": "sgc/organizacao/dto/UsuarioConsultaDto.java",
+          "categoria": "DTOs",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "UsuarioResumoDto",
+          "caminho_relativo": "sgc/organizacao/dto/UsuarioResumoDto.java",
+          "categoria": "DTOs",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "ParametroDto",
+          "caminho_relativo": "sgc/parametros/ParametroDto.java",
+          "categoria": "DTOs",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "ParametroRequest",
+          "caminho_relativo": "sgc/parametros/ParametroRequest.java",
+          "categoria": "DTOs",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "AcaoEmBlocoRequest",
+          "caminho_relativo": "sgc/processo/dto/AcaoEmBlocoRequest.java",
+          "categoria": "DTOs",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "AtualizarProcessoRequest",
+          "caminho_relativo": "sgc/processo/dto/AtualizarProcessoRequest.java",
+          "categoria": "DTOs",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "CriarProcessoRequest",
+          "caminho_relativo": "sgc/processo/dto/CriarProcessoRequest.java",
+          "categoria": "DTOs",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "EnviarLembreteRequest",
+          "caminho_relativo": "sgc/processo/dto/EnviarLembreteRequest.java",
+          "categoria": "DTOs",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "IniciarProcessoRequest",
+          "caminho_relativo": "sgc/processo/dto/IniciarProcessoRequest.java",
+          "categoria": "DTOs",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "ProcessoResumoDto",
+          "caminho_relativo": "sgc/processo/dto/ProcessoResumoDto.java",
+          "categoria": "DTOs",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "SubprocessoElegivelDto",
+          "caminho_relativo": "sgc/processo/dto/SubprocessoElegivelDto.java",
+          "categoria": "DTOs",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "RelatorioAndamentoDto",
+          "caminho_relativo": "sgc/relatorio/RelatorioAndamentoDto.java",
+          "categoria": "DTOs",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "AutenticarRequest",
+          "caminho_relativo": "sgc/seguranca/dto/AutenticarRequest.java",
+          "categoria": "DTOs",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "AutorizarRequest",
+          "caminho_relativo": "sgc/seguranca/dto/AutorizarRequest.java",
+          "categoria": "DTOs",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "EntrarRequest",
+          "caminho_relativo": "sgc/seguranca/dto/EntrarRequest.java",
+          "categoria": "DTOs",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "EntrarResponse",
+          "caminho_relativo": "sgc/seguranca/dto/EntrarResponse.java",
+          "categoria": "DTOs",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "PerfilUnidadeDto",
+          "caminho_relativo": "sgc/seguranca/dto/PerfilUnidadeDto.java",
+          "categoria": "DTOs",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "AnaliseHistoricoDto",
+          "caminho_relativo": "sgc/subprocesso/dto/AnaliseHistoricoDto.java",
+          "categoria": "DTOs",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "AtividadeAjusteDto",
+          "caminho_relativo": "sgc/subprocesso/dto/AtividadeAjusteDto.java",
+          "categoria": "DTOs",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "AtividadeOperacaoResponse",
+          "caminho_relativo": "sgc/subprocesso/dto/AtividadeOperacaoResponse.java",
+          "categoria": "DTOs",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "AtualizarSubprocessoRequest",
+          "caminho_relativo": "sgc/subprocesso/dto/AtualizarSubprocessoRequest.java",
+          "categoria": "DTOs",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "CompetenciaAjusteDto",
+          "caminho_relativo": "sgc/subprocesso/dto/CompetenciaAjusteDto.java",
+          "categoria": "DTOs",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "CompetenciaRequest",
+          "caminho_relativo": "sgc/subprocesso/dto/CompetenciaRequest.java",
+          "categoria": "DTOs",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "ConhecimentoAjusteDto",
+          "caminho_relativo": "sgc/subprocesso/dto/ConhecimentoAjusteDto.java",
+          "categoria": "DTOs",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "ContextoEdicaoResponse",
+          "caminho_relativo": "sgc/subprocesso/dto/ContextoEdicaoResponse.java",
+          "categoria": "DTOs",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "CriarAnaliseRequest",
+          "caminho_relativo": "sgc/subprocesso/dto/CriarAnaliseRequest.java",
+          "categoria": "DTOs",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "CriarSubprocessoRequest",
+          "caminho_relativo": "sgc/subprocesso/dto/CriarSubprocessoRequest.java",
+          "categoria": "DTOs",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "DisponibilizarMapaRequest",
+          "caminho_relativo": "sgc/subprocesso/dto/DisponibilizarMapaRequest.java",
+          "categoria": "DTOs",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "ImportarAtividadesRequest",
+          "caminho_relativo": "sgc/subprocesso/dto/ImportarAtividadesRequest.java",
+          "categoria": "DTOs",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "MensagemResponse",
+          "caminho_relativo": "sgc/subprocesso/dto/MensagemResponse.java",
+          "categoria": "DTOs",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "MovimentacaoDto",
+          "caminho_relativo": "sgc/subprocesso/dto/MovimentacaoDto.java",
+          "categoria": "DTOs",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "PermissoesSubprocessoDto",
+          "caminho_relativo": "sgc/subprocesso/dto/PermissoesSubprocessoDto.java",
+          "categoria": "DTOs",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "ProcessarEmBlocoRequest",
+          "caminho_relativo": "sgc/subprocesso/dto/ProcessarEmBlocoRequest.java",
+          "categoria": "DTOs",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "SalvarAjustesRequest",
+          "caminho_relativo": "sgc/subprocesso/dto/SalvarAjustesRequest.java",
+          "categoria": "DTOs",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "SubmeterMapaAjustadoRequest",
+          "caminho_relativo": "sgc/subprocesso/dto/SubmeterMapaAjustadoRequest.java",
+          "categoria": "DTOs",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "SubprocessoCadastroDto",
+          "caminho_relativo": "sgc/subprocesso/dto/SubprocessoCadastroDto.java",
+          "categoria": "DTOs",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "SubprocessoCodigoDto",
+          "caminho_relativo": "sgc/subprocesso/dto/SubprocessoCodigoDto.java",
+          "categoria": "DTOs",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "SubprocessoDetalheResponse",
+          "caminho_relativo": "sgc/subprocesso/dto/SubprocessoDetalheResponse.java",
+          "categoria": "DTOs",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "SubprocessoListagemDto",
+          "caminho_relativo": "sgc/subprocesso/dto/SubprocessoListagemDto.java",
+          "categoria": "DTOs",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "SubprocessoResumoDto",
+          "caminho_relativo": "sgc/subprocesso/dto/SubprocessoResumoDto.java",
+          "categoria": "DTOs",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "SubprocessoSituacaoDto",
+          "caminho_relativo": "sgc/subprocesso/dto/SubprocessoSituacaoDto.java",
+          "categoria": "DTOs",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "ValidacaoCadastroDto",
+          "caminho_relativo": "sgc/subprocesso/dto/ValidacaoCadastroDto.java",
+          "categoria": "DTOs",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        }
+      ]
+    },
+    "Repositories": {
+      "tested": [
+        {
+          "classe": "AtividadeRepo",
+          "caminho_relativo": "sgc/mapa/model/AtividadeRepo.java",
+          "categoria": "Repositories",
+          "possui_teste": true,
+          "estrategia_correspondencia": "mesmo_pacote",
+          "testes_encontrados": [
+            "sgc/mapa/model/AtividadeRepoTest.java"
+          ]
+        },
+        {
+          "classe": "CompetenciaRepo",
+          "caminho_relativo": "sgc/mapa/model/CompetenciaRepo.java",
+          "categoria": "Repositories",
+          "possui_teste": true,
+          "estrategia_correspondencia": "mesmo_pacote",
+          "testes_encontrados": [
+            "sgc/mapa/model/CompetenciaRepoTest.java"
+          ]
+        },
+        {
+          "classe": "UnidadeMapaRepo",
+          "caminho_relativo": "sgc/organizacao/model/UnidadeMapaRepo.java",
+          "categoria": "Repositories",
+          "possui_teste": true,
+          "estrategia_correspondencia": "mesmo_pacote",
+          "testes_encontrados": [
+            "sgc/organizacao/model/UnidadeMapaRepoTest.java"
+          ]
+        },
+        {
+          "classe": "UsuarioRepo",
+          "caminho_relativo": "sgc/organizacao/model/UsuarioRepo.java",
+          "categoria": "Repositories",
+          "possui_teste": true,
+          "estrategia_correspondencia": "mesmo_pacote",
+          "testes_encontrados": [
+            "sgc/organizacao/model/UsuarioRepoTest.java"
+          ]
+        },
+        {
+          "classe": "ProcessoRepo",
+          "caminho_relativo": "sgc/processo/model/ProcessoRepo.java",
+          "categoria": "Repositories",
+          "possui_teste": true,
+          "estrategia_correspondencia": "mesmo_pacote",
+          "testes_encontrados": [
+            "sgc/processo/model/ProcessoRepoTest.java"
+          ]
+        },
+        {
+          "classe": "SubprocessoRepo",
+          "caminho_relativo": "sgc/subprocesso/model/SubprocessoRepo.java",
+          "categoria": "Repositories",
+          "possui_teste": true,
+          "estrategia_correspondencia": "mesmo_pacote",
+          "testes_encontrados": [
+            "sgc/subprocesso/model/SubprocessoRepoTest.java"
+          ]
+        }
+      ],
+      "untested": [
+        {
+          "classe": "AlertaRepo",
+          "caminho_relativo": "sgc/alerta/model/AlertaRepo.java",
+          "categoria": "Repositories",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "AlertaUsuarioRepo",
+          "caminho_relativo": "sgc/alerta/model/AlertaUsuarioRepo.java",
+          "categoria": "Repositories",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "NotificacaoRepo",
+          "caminho_relativo": "sgc/alerta/model/NotificacaoRepo.java",
+          "categoria": "Repositories",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "ComumRepo",
+          "caminho_relativo": "sgc/comum/model/ComumRepo.java",
+          "categoria": "Repositories",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "ConhecimentoRepo",
+          "caminho_relativo": "sgc/mapa/model/ConhecimentoRepo.java",
+          "categoria": "Repositories",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "MapaRepo",
+          "caminho_relativo": "sgc/mapa/model/MapaRepo.java",
+          "categoria": "Repositories",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "AdministradorRepo",
+          "caminho_relativo": "sgc/organizacao/model/AdministradorRepo.java",
+          "categoria": "Repositories",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "AtribuicaoTemporariaRepo",
+          "caminho_relativo": "sgc/organizacao/model/AtribuicaoTemporariaRepo.java",
+          "categoria": "Repositories",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "ResponsabilidadeRepo",
+          "caminho_relativo": "sgc/organizacao/model/ResponsabilidadeRepo.java",
+          "categoria": "Repositories",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "UnidadeRepo",
+          "caminho_relativo": "sgc/organizacao/model/UnidadeRepo.java",
+          "categoria": "Repositories",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "UsuarioPerfilRepo",
+          "caminho_relativo": "sgc/organizacao/model/UsuarioPerfilRepo.java",
+          "categoria": "Repositories",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "ParametroRepo",
+          "caminho_relativo": "sgc/parametros/model/ParametroRepo.java",
+          "categoria": "Repositories",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "AnaliseRepo",
+          "caminho_relativo": "sgc/subprocesso/model/AnaliseRepo.java",
+          "categoria": "Repositories",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "MovimentacaoRepo",
+          "caminho_relativo": "sgc/subprocesso/model/MovimentacaoRepo.java",
+          "categoria": "Repositories",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        }
+      ]
+    },
+    "Others": {
+      "tested": [
+        {
+          "classe": "ConfigOpenApi",
+          "caminho_relativo": "sgc/comum/config/ConfigOpenApi.java",
+          "categoria": "Others",
+          "possui_teste": true,
+          "estrategia_correspondencia": "mesmo_pacote",
+          "testes_encontrados": [
+            "sgc/comum/config/ConfigOpenApiCoverageTest.java"
+          ]
+        },
+        {
+          "classe": "RestExceptionHandler",
+          "caminho_relativo": "sgc/comum/erros/RestExceptionHandler.java",
+          "categoria": "Others",
+          "possui_teste": true,
+          "estrategia_correspondencia": "mesmo_pacote",
+          "testes_encontrados": [
+            "sgc/comum/erros/RestExceptionHandlerCoverageTest.java",
+            "sgc/comum/erros/RestExceptionHandlerTest.java"
+          ]
+        },
+        {
+          "classe": "FormatadorData",
+          "caminho_relativo": "sgc/comum/util/FormatadorData.java",
+          "categoria": "Others",
+          "possui_teste": true,
+          "estrategia_correspondencia": "mesmo_pacote",
+          "testes_encontrados": [
+            "sgc/comum/util/FormatadorDataTest.java"
+          ]
+        },
+        {
+          "classe": "MonitoramentoAspect",
+          "caminho_relativo": "sgc/comum/util/MonitoramentoAspect.java",
+          "categoria": "Others",
+          "possui_teste": true,
+          "estrategia_correspondencia": "mesmo_pacote",
+          "testes_encontrados": [
+            "sgc/comum/util/MonitoramentoAspectTest.java"
+          ]
+        },
+        {
+          "classe": "AtribuicaoTemporariaViewsE2eAspect",
+          "caminho_relativo": "sgc/e2e/AtribuicaoTemporariaViewsE2eAspect.java",
+          "categoria": "Others",
+          "possui_teste": true,
+          "estrategia_correspondencia": "mesmo_pacote",
+          "testes_encontrados": [
+            "sgc/e2e/AtribuicaoTemporariaViewsE2eAspectIntegrationTest.java"
+          ]
+        },
+        {
+          "classe": "PdfFactory",
+          "caminho_relativo": "sgc/relatorio/PdfFactory.java",
+          "categoria": "Others",
+          "possui_teste": true,
+          "estrategia_correspondencia": "nome_correspondente_outro_pacote",
+          "testes_encontrados": [
+            "sgc/relatorio/service/PdfFactoryTest.java"
+          ]
+        },
+        {
+          "classe": "SgcPermissionEvaluator",
+          "caminho_relativo": "sgc/seguranca/SgcPermissionEvaluator.java",
+          "categoria": "Others",
+          "possui_teste": true,
+          "estrategia_correspondencia": "mesmo_pacote",
+          "testes_encontrados": [
+            "sgc/seguranca/SgcPermissionEvaluatorCoverageTest.java"
+          ]
+        },
+        {
+          "classe": "ConfigCors",
+          "caminho_relativo": "sgc/seguranca/config/ConfigCors.java",
+          "categoria": "Others",
+          "possui_teste": true,
+          "estrategia_correspondencia": "nome_correspondente_outro_pacote",
+          "testes_encontrados": [
+            "sgc/seguranca/ConfigCorsTest.java"
+          ]
+        },
+        {
+          "classe": "JwtProperties",
+          "caminho_relativo": "sgc/seguranca/config/JwtProperties.java",
+          "categoria": "Others",
+          "possui_teste": true,
+          "estrategia_correspondencia": "mesmo_pacote",
+          "testes_encontrados": [
+            "sgc/seguranca/config/JwtPropertiesTest.java"
+          ]
+        },
+        {
+          "classe": "UsuarioAcessoAd",
+          "caminho_relativo": "sgc/seguranca/dto/UsuarioAcessoAd.java",
+          "categoria": "Others",
+          "possui_teste": true,
+          "estrategia_correspondencia": "mesmo_pacote",
+          "testes_encontrados": [
+            "sgc/seguranca/dto/UsuarioAcessoAdTest.java"
+          ]
+        },
+        {
+          "classe": "ClienteAcessoAd",
+          "caminho_relativo": "sgc/seguranca/login/ClienteAcessoAd.java",
+          "categoria": "Others",
+          "possui_teste": true,
+          "estrategia_correspondencia": "mesmo_pacote",
+          "testes_encontrados": [
+            "sgc/seguranca/login/ClienteAcessoAdTest.java"
+          ]
+        },
+        {
+          "classe": "FiltroJwt",
+          "caminho_relativo": "sgc/seguranca/login/FiltroJwt.java",
+          "categoria": "Others",
+          "possui_teste": true,
+          "estrategia_correspondencia": "mesmo_pacote",
+          "testes_encontrados": [
+            "sgc/seguranca/login/FiltroJwtTest.java"
+          ]
+        },
+        {
+          "classe": "GerenciadorJwt",
+          "caminho_relativo": "sgc/seguranca/login/GerenciadorJwt.java",
+          "categoria": "Others",
+          "possui_teste": true,
+          "estrategia_correspondencia": "mesmo_pacote",
+          "testes_encontrados": [
+            "sgc/seguranca/login/GerenciadorJwtTest.java"
+          ]
+        },
+        {
+          "classe": "LimitadorTentativasLogin",
+          "caminho_relativo": "sgc/seguranca/login/LimitadorTentativasLogin.java",
+          "categoria": "Others",
+          "possui_teste": true,
+          "estrategia_correspondencia": "mesmo_pacote",
+          "testes_encontrados": [
+            "sgc/seguranca/login/LimitadorTentativasLoginCoverageTest.java",
+            "sgc/seguranca/login/LimitadorTentativasLoginTest.java"
+          ]
+        },
+        {
+          "classe": "DeserializadorHtmlSanitizado",
+          "caminho_relativo": "sgc/seguranca/sanitizacao/DeserializadorHtmlSanitizado.java",
+          "categoria": "Others",
+          "possui_teste": true,
+          "estrategia_correspondencia": "nome_correspondente_outro_pacote",
+          "testes_encontrados": [
+            "sgc/comum/json/DeserializadorHtmlSanitizadoTest.java"
+          ]
+        },
+        {
+          "classe": "UtilSanitizacao",
+          "caminho_relativo": "sgc/seguranca/sanitizacao/UtilSanitizacao.java",
+          "categoria": "Others",
+          "possui_teste": true,
+          "estrategia_correspondencia": "mesmo_pacote",
+          "testes_encontrados": [
+            "sgc/seguranca/sanitizacao/UtilSanitizacaoTest.java"
+          ]
+        }
+      ],
+      "untested": [
+        {
+          "classe": "Sgc",
+          "caminho_relativo": "sgc/Sgc.java",
+          "categoria": "Others",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "Mensagens",
+          "caminho_relativo": "sgc/comum/Mensagens.java",
+          "categoria": "Others",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "Config",
+          "caminho_relativo": "sgc/comum/config/Config.java",
+          "categoria": "Others",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "ConfigAplicacao",
+          "caminho_relativo": "sgc/comum/config/ConfigAplicacao.java",
+          "categoria": "Others",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "ConfigThymeleaf",
+          "caminho_relativo": "sgc/comum/config/ConfigThymeleaf.java",
+          "categoria": "Others",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "ErroAcessoNegado",
+          "caminho_relativo": "sgc/comum/erros/ErroAcessoNegado.java",
+          "categoria": "Others",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "ErroApi",
+          "caminho_relativo": "sgc/comum/erros/ErroApi.java",
+          "categoria": "Others",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "ErroAutenticacao",
+          "caminho_relativo": "sgc/comum/erros/ErroAutenticacao.java",
+          "categoria": "Others",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "ErroConfiguracao",
+          "caminho_relativo": "sgc/comum/erros/ErroConfiguracao.java",
+          "categoria": "Others",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "ErroEntidadeNaoEncontrada",
+          "caminho_relativo": "sgc/comum/erros/ErroEntidadeNaoEncontrada.java",
+          "categoria": "Others",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "ErroInterno",
+          "caminho_relativo": "sgc/comum/erros/ErroInterno.java",
+          "categoria": "Others",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "ErroNegocio",
+          "caminho_relativo": "sgc/comum/erros/ErroNegocio.java",
+          "categoria": "Others",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "ErroNegocioBase",
+          "caminho_relativo": "sgc/comum/erros/ErroNegocioBase.java",
+          "categoria": "Others",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "ErroSubApi",
+          "caminho_relativo": "sgc/comum/erros/ErroSubApi.java",
+          "categoria": "Others",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "ErroValidacao",
+          "caminho_relativo": "sgc/comum/erros/ErroValidacao.java",
+          "categoria": "Others",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "E2eSecurityConfig",
+          "caminho_relativo": "sgc/e2e/E2eSecurityConfig.java",
+          "categoria": "Others",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "ResultadoOperacaoConhecimento",
+          "caminho_relativo": "sgc/mapa/dto/ResultadoOperacaoConhecimento.java",
+          "categoria": "Others",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "AcaoPermissao",
+          "caminho_relativo": "sgc/seguranca/AcaoPermissao.java",
+          "categoria": "Others",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "ConfigCorsProperties",
+          "caminho_relativo": "sgc/seguranca/config/ConfigCorsProperties.java",
+          "categoria": "Others",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "ConfigSeguranca",
+          "caminho_relativo": "sgc/seguranca/config/ConfigSeguranca.java",
+          "categoria": "Others",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "ClienteAcessoAdE2e",
+          "caminho_relativo": "sgc/seguranca/login/ClienteAcessoAdE2e.java",
+          "categoria": "Others",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "ConfiguracaoAcessoAd",
+          "caminho_relativo": "sgc/seguranca/login/ConfiguracaoAcessoAd.java",
+          "categoria": "Others",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "PropriedadesAcessoAd",
+          "caminho_relativo": "sgc/seguranca/login/PropriedadesAcessoAd.java",
+          "categoria": "Others",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "SanitizarHtml",
+          "caminho_relativo": "sgc/seguranca/sanitizacao/SanitizarHtml.java",
+          "categoria": "Others",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "NotificacaoCommand",
+          "caminho_relativo": "sgc/subprocesso/dto/NotificacaoCommand.java",
+          "categoria": "Others",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "RegistrarTransicaoCommand",
+          "caminho_relativo": "sgc/subprocesso/dto/RegistrarTransicaoCommand.java",
+          "categoria": "Others",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        },
+        {
+          "classe": "RegistrarWorkflowCommand",
+          "caminho_relativo": "sgc/subprocesso/dto/RegistrarWorkflowCommand.java",
+          "categoria": "Others",
+          "possui_teste": false,
+          "estrategia_correspondencia": "nenhum",
+          "testes_encontrados": []
+        }
+      ]
+    }
+  }
+}
