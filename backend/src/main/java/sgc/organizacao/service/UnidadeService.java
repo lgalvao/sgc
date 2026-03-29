@@ -4,6 +4,7 @@ import lombok.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
 import sgc.comum.erros.*;
+import sgc.organizacao.dto.*;
 import sgc.mapa.model.*;
 import sgc.organizacao.model.*;
 
@@ -54,6 +55,17 @@ public class UnidadeService {
 
     public boolean verificarMapaVigente(Long codigoUnidade) {
         return unidadeMapaRepo.existsByUnidadeCodigo(codigoUnidade);
+    }
+
+    public Optional<MapaVigenteReferenciaDto> buscarReferenciaMapaVigente(Long codigoUnidade) {
+        return unidadeMapaRepo.findByUnidadeCodigo(codigoUnidade)
+                .map(UnidadeMapa::getMapaVigente)
+                .filter(Objects::nonNull)
+                .map(Mapa::getSubprocesso)
+                .map(subprocesso -> new MapaVigenteReferenciaDto(
+                        subprocesso.getProcesso().getCodigo(),
+                        subprocesso.getCodigo()
+                ));
     }
 
     public List<Long> buscarTodosCodigosUnidadesComMapa() {

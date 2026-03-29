@@ -3,10 +3,9 @@ import {flushPromises, mount} from '@vue/test-utils';
 import UnidadeView from '@/views/UnidadeView.vue';
 import EmptyState from '@/components/comum/EmptyState.vue';
 import {BAlert} from 'bootstrap-vue-next';
-import {useMapas} from '@/composables/useMapas';
 import {usePerfilStore} from '@/stores/perfil';
 import {buscarUsuarioPorTitulo} from '@/services/usuarioService';
-import {buscarArvoreUnidade} from '@/services/unidadeService';
+import {buscarArvoreUnidade, buscarReferenciaMapaVigente} from '@/services/unidadeService';
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 import {logger} from "@/utils";
 
@@ -67,6 +66,7 @@ vi.mock('@/services/usuarioService', async (importOriginal) => {
 vi.mock('@/services/unidadeService', () => ({
     buscarArvoreUnidade: vi.fn().mockResolvedValue(mockUnidadeData),
     buscarUnidadePorSigla: vi.fn().mockResolvedValue(mockUnidadeData),
+    buscarReferenciaMapaVigente: vi.fn().mockResolvedValue(null),
 }));
 
 vi.mock('@/services/atribuicaoTemporariaService', () => ({
@@ -88,8 +88,6 @@ describe('UnidadeView.vue', () => {
     });
 
     let perfilStore: any;
-    let mapasStore: any;
-
     const mockUnidade = mockUnidadeData;
 
     const createWrapper = (initialStateOverride = {}) => {
@@ -98,9 +96,6 @@ describe('UnidadeView.vue', () => {
                 {
                     perfil: {
                         perfilSelecionado: 'USER',
-                    },
-                    mapas: {
-                        mapaCompleto: null,
                     },
                     ...initialStateOverride
                 },
@@ -120,10 +115,8 @@ describe('UnidadeView.vue', () => {
         });
 
         perfilStore = usePerfilStore();
-        mapasStore = useMapas();
-        mapasStore.mapaCompleto.value = null;
 
-        return {wrapper: context.wrapper, perfilStore, mapasStore};
+        return {wrapper: context.wrapper, perfilStore};
     };
 
     it('fetches data on mount', async () => {
@@ -199,10 +192,9 @@ describe('UnidadeView.vue', () => {
     });
 
     it('renders and clicks "Mapa vigente" button when map exists', async () => {
-        const {wrapper, mapasStore} = createWrapper();
+        vi.mocked(buscarReferenciaMapaVigente).mockResolvedValueOnce({codProcesso: 99, codSubprocesso: 77});
+        const {wrapper} = createWrapper();
         await flushPromises();
-        mapasStore.mapaCompleto.value = {subprocessoCodigo: 99} as any;
-        await wrapper.vm.$nextTick();
 
         const btn = wrapper.find('[data-testid="btn-mapa-vigente"]');
         expect(btn.exists()).toBe(true);
@@ -212,6 +204,13 @@ describe('UnidadeView.vue', () => {
             name: 'SubprocessoVisMapa',
             params: {codProcesso: 99, siglaUnidade: 'TEST'}
         });
+    });
+
+    it('não exibe botão de mapa vigente sem referência explícita', async () => {
+        const {wrapper} = createWrapper();
+        await flushPromises();
+
+        expect(wrapper.find('[data-testid="btn-mapa-vigente"]').exists()).toBe(false);
     });
 
     it('displays error alert when fetching unit fails', async () => {

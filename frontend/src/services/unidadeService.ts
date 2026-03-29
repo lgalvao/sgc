@@ -1,4 +1,4 @@
-import type {Unidade, UnidadeSnapshot} from "@/types/tipos";
+import type {MapaVigenteReferencia, Unidade, UnidadeSnapshot} from "@/types/tipos";
 import {apiGet} from "@/utils/apiUtils";
 
 // Mappers internos (formerly in /mappers/unidades.ts)
@@ -74,6 +74,10 @@ export async function buscarArvoreComElegibilidade(
 
 export async function buscarArvoreUnidade(codigo: number) {
     return apiGet(`/unidades/${codigo}/arvore`);
+}
+
+export async function buscarReferenciaMapaVigente(codigo: number): Promise<MapaVigenteReferencia | null> {
+    return await apiGet(`/unidades/${codigo}/mapa-vigente/referencia`) ?? null;
 }
 
 export async function buscarSubordinadas(sigla: string) {

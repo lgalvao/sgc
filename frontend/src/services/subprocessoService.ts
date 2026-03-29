@@ -10,7 +10,6 @@ import type {
     SubprocessoDetalhe,
     ValidacaoCadastro
 } from "@/types/tipos";
-import {getOrNull} from "@/utils/apiError";
 import apiClient from "../axios-setup";
 
 interface ImportarAtividadesRequest {
@@ -144,18 +143,6 @@ export async function salvarMapaAjuste(
         `/subprocessos/${codSubprocesso}/mapa-ajuste/atualizar`,
         data,
     );
-}
-
-export async function verificarMapaVigente(
-    codigoUnidade: number,
-): Promise<boolean> {
-    const result = await getOrNull(async () => {
-        const response = await apiClient.get(
-            `/unidades/${codigoUnidade}/mapa-vigente`,
-        );
-        return response.data.temMapaVigente;
-    });
-    return result ?? false;
 }
 
 export async function disponibilizarMapa(

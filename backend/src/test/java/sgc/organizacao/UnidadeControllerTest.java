@@ -110,6 +110,29 @@ class UnidadeControllerTest {
     }
 
     @Test
+    @DisplayName("Deve retornar referência do mapa vigente quando existente")
+    @WithMockUser
+    void deveRetornarReferenciaMapaVigente() throws Exception {
+        when(unidadeService.buscarReferenciaMapaVigente(1L))
+                .thenReturn(Optional.of(new MapaVigenteReferenciaDto(10L, 20L)));
+
+        mockMvc.perform(get("/api/unidades/1/mapa-vigente/referencia"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.codProcesso").value(10))
+                .andExpect(jsonPath("$.codSubprocesso").value(20));
+    }
+
+    @Test
+    @DisplayName("Deve retornar 204 quando não houver referência de mapa vigente")
+    @WithMockUser
+    void deveRetornar204SemReferenciaMapaVigente() throws Exception {
+        when(unidadeService.buscarReferenciaMapaVigente(1L)).thenReturn(Optional.empty());
+
+        mockMvc.perform(get("/api/unidades/1/mapa-vigente/referencia"))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
     @DisplayName("Deve retornar lista de usuários por unidade")
     @WithMockUser(roles = "CHEFE")
     void deveRetornarListaDeUsuariosPorUnidade() throws Exception {

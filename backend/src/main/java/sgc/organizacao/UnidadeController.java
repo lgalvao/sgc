@@ -71,6 +71,13 @@ public class UnidadeController {
         return ResponseEntity.ok(Map.of("temMapaVigente", temMapaVigente));
     }
 
+    @GetMapping("/{codUnidade}/mapa-vigente/referencia")
+    public ResponseEntity<MapaVigenteReferenciaDto> buscarReferenciaMapaVigente(@PathVariable Long codUnidade) {
+        return unidadeService.buscarReferenciaMapaVigente(codUnidade)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.noContent().build());
+    }
+
     @GetMapping("/{codUnidade}/usuarios")
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")
     public ResponseEntity<List<UsuarioConsultaDto>> buscarUsuariosPorUnidade(@PathVariable Long codUnidade) {

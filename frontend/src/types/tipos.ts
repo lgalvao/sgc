@@ -44,6 +44,11 @@ export interface Unidade {
     responsavel?: Responsavel | Usuario | null;
 }
 
+export interface MapaVigenteReferencia {
+    codProcesso: number;
+    codSubprocesso: number;
+}
+
 export interface Responsavel {
     codigo: number;
     nome: string;

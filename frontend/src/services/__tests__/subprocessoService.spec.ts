@@ -138,19 +138,6 @@ describe('subprocessoService', () => {
     expect(apiClient.post).toHaveBeenCalledWith('/subprocessos/1/mapa-ajuste/atualizar', { foo: 'bar' });
   });
 
-  it('verificarMapaVigente', async () => {
-    (apiClient.get as any).mockResolvedValueOnce({ data: { temMapaVigente: true } });
-    const result = await subprocessoService.verificarMapaVigente(1);
-    expect(apiClient.get).toHaveBeenCalledWith('/unidades/1/mapa-vigente');
-    expect(result).toBe(true);
-  });
-
-  it('verificarMapaVigente catch fallback', async () => {
-    (apiClient.get as any).mockRejectedValueOnce(new Error('fail'));
-    const result = await subprocessoService.verificarMapaVigente(1);
-    expect(result).toBe(false);
-  });
-
   it('disponibilizarMapa', async () => {
     await subprocessoService.disponibilizarMapa(1, { dataLimite: '2025-01-01', observacoes: 'teste' });
     expect(apiClient.post).toHaveBeenCalledWith('/subprocessos/1/disponibilizar-mapa', { dataLimite: '2025-01-01', observacoes: 'teste' });

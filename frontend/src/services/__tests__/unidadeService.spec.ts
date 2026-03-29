@@ -2,6 +2,7 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {
     buscarArvoreComElegibilidade,
     buscarArvoreUnidade,
+    buscarReferenciaMapaVigente,
     buscarSubordinadas,
     buscarSuperior,
     buscarTodasUnidades,
@@ -51,6 +52,11 @@ describe('unidadeService', () => {
     it('deve chamar buscarArvoreUnidade corretamente', async () => {
       await buscarArvoreUnidade(123);
       expect(apiUtils.apiGet).toHaveBeenCalledWith('/unidades/123/arvore');
+    });
+
+    it('deve chamar buscarReferenciaMapaVigente corretamente', async () => {
+      await buscarReferenciaMapaVigente(123);
+      expect(apiUtils.apiGet).toHaveBeenCalledWith('/unidades/123/mapa-vigente/referencia');
     });
 
     it('deve chamar buscarSubordinadas corretamente', async () => {

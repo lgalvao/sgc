@@ -117,36 +117,38 @@ import type {Unidade, Usuario} from "@/types/tipos";
 import TreeTable from "@/components/comum/TreeTable.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
-import {buscarArvoreUnidade as buscarArvoreUnidadeServico} from "@/services/unidadeService";
+import {
+  buscarArvoreUnidade as buscarArvoreUnidadeServico,
+  buscarReferenciaMapaVigente as buscarReferenciaMapaVigenteServico
+} from "@/services/unidadeService";
 import {usePerfil} from "@/composables/usePerfil";
 import {useUnidadeAtual} from "@/composables/useUnidadeAtual";
-import {useMapas} from "@/composables/useMapas";
 import {buscarUsuarioPorTitulo} from "@/services/usuarioService";
 import {logger} from "@/utils";
 import {TEXTOS} from "@/constants/textos";
+import type {MapaVigenteReferencia} from "@/types/tipos";
 
 const props = defineProps<{ codUnidade: number }>();
 
 const router = useRouter();
 const {isAdmin} = usePerfil();
-const mapasStore = useMapas();
 const {definirUnidadeAtual} = useUnidadeAtual();
 
 const unidade = ref<Unidade | null>(null);
 const titularDetalhes = ref<Usuario | null>(null);
+const mapaVigente = ref<MapaVigenteReferencia | null>(null);
 const lastError = ref<{message: string; details?: string} | null>(null);
 
 function clearError() {
   lastError.value = null;
 }
 
-const mapaVigente = computed(() => mapasStore.mapaCompleto.value);
-
 async function carregarDados() {
   try {
     const response = await buscarArvoreUnidadeServico(props.codUnidade);
     unidade.value = response as Unidade;
     definirUnidadeAtual(unidade.value);
+    mapaVigente.value = await buscarReferenciaMapaVigenteServico(props.codUnidade);
 
     if (unidade.value?.tituloTitular) {
       titularDetalhes.value = await buscarUsuarioPorTitulo(unidade.value.tituloTitular);
@@ -170,7 +172,7 @@ function visualizarMapa() {
     router.push({
       name: "SubprocessoVisMapa",
       params: {
-        codProcesso: mapaVigente.value.subprocessoCodigo,
+        codProcesso: mapaVigente.value.codProcesso,
         siglaUnidade: unidade.value?.sigla
       }
     });

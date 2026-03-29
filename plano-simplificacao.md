@@ -379,6 +379,9 @@ O plano terá sido bem executado se:
 * `MapaVisualizacaoView` tinha quatro ações com o mesmo ciclo de loading, fechamento de modal, toast pendente e redirecionamento; helpers privados locais reduziram esse ruído sem alterar permissões nem fluxo.
 * No backend, `SubprocessoTransicaoService` ainda carregava muita ramificação binária entre cadastro e revisão; um contexto privado de fluxo reduziu condicionais repetidas em devolução, aceite, homologação e ações em bloco.
 * Em permissões, a fonte de verdade continua sendo `etc/docs/regras-acesso.md`; simplificação nessa área só pode acontecer quando o comportamento continuar exatamente alinhado à regra documental.
-* `UnidadeView` ainda parece depender de estado global implícito de mapa; esse acoplamento só deve ser removido com segurança quando houver API suficiente para reconstruir o destino da navegação sem reaproveitar estado de outra tela.
+* A frente ambiciosa de `UnidadeView` foi concluída com segurança: a tela deixou de depender de `mapasStore.mapaCompleto` e passou a usar uma referência explícita de mapa vigente vinda do backend.
+* Para viabilizar isso sem inferência frágil no frontend, foi criado um endpoint específico de referência do mapa vigente por unidade, retornando `codProcesso` e `codSubprocesso`.
+* Depois dessa mudança, o caminho `verificarMapaVigente -> useMapas.temMapaVigente` ficou morto no frontend e pôde ser removido sem impacto em produção.
+* `useMapas` ainda era mais largo do que o consumo real exigia; `mapaVisualizacao` e `mapaAjuste` não tinham mais usos de produção e foram eliminados para reduzir estado singleton ocioso.
 * `LoadingButton.vue` continua sendo um wrapper fino, mas o volume de uso torna a remoção imediata cara demais; o melhor caminho agora é impedir novos wrappers fracos e só reavaliar esse componente junto de refatorações de telas maiores.
 * A validação de backend com Gradle pode produzir falso negativo por problema de cache de build; quando `:backend:test` passa e `:backend:compileTestJava` falha só ao armazenar cache, vale repetir com `--no-configuration-cache` antes de tratar como regressão de código.
