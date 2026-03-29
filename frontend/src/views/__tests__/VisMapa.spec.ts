@@ -9,7 +9,7 @@ import {useToastStore} from "@/stores/toast";
 import {SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 import {setupComponentTest} from "@/test-utils/componentTestHelpers";
 import * as useAcessoModule from '@/composables/useAcesso';
-import * as mapaServiceModule from '@/services/mapaService';
+import * as subprocessoServiceModule from '@/services/subprocessoService';
 
 vi.mock("@/services/unidadeService", () => ({
     buscarUnidadePorSigla: vi.fn().mockResolvedValue({sigla: 'TEST', nome: 'Unidade'}),
@@ -32,8 +32,6 @@ vi.mock("@/services/processoService", () => ({
 vi.mock("@/services/subprocessoService", () => ({
     buscarSubprocessoDetalhe: vi.fn().mockResolvedValue({}),
     mapSubprocessoDetalheDtoToModel: vi.fn((dto) => dto),
-}));
-vi.mock("@/services/mapaService", () => ({
     obterMapaVisualizacao: vi.fn().mockResolvedValue({competencias: []}),
 }));
 vi.mock("@/services/analiseService", () => ({
@@ -224,7 +222,7 @@ describe("VisMapa.vue", () => {
     };
 
     it("renders correctly with data from store", async () => {
-        vi.mocked(mapaServiceModule.obterMapaVisualizacao).mockResolvedValue({
+        vi.mocked(subprocessoServiceModule.obterMapaVisualizacao).mockResolvedValue({
             codigo: 1,
             descricao: "Mapa test",
             competencias: [
@@ -525,7 +523,7 @@ describe("VisMapa.vue", () => {
     });
 
     it("shows empty state if no map", async () => {
-        vi.mocked(mapaServiceModule.obterMapaVisualizacao).mockResolvedValue({competencias: []} as any);
+        vi.mocked(subprocessoServiceModule.obterMapaVisualizacao).mockResolvedValue({competencias: []} as any);
         const {wrapper} = mountComponent({
             mapas: {
                 mapaVisualizacao: {competencias: []} // empty

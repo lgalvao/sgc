@@ -5,7 +5,7 @@ import {ref} from "vue";
 import * as useAcessoModule from "@/composables/useAcesso";
 import * as usePerfilModule from "@/composables/usePerfil";
 import * as analiseService from "@/services/analiseService";
-import * as mapaService from "@/services/mapaService";
+import * as subprocessoService from "@/services/subprocessoService";
 import * as unidadeService from "@/services/unidadeService";
 import MapaVisualizacaoView from "../MapaVisualizacaoView.vue";
 
@@ -20,7 +20,7 @@ vi.mock("@/services/analiseService", () => ({
     listarAnalisesCadastro: vi.fn(),
 }));
 
-vi.mock("@/services/mapaService", () => ({
+vi.mock("@/services/subprocessoService", () => ({
     obterMapaVisualizacao: vi.fn(),
 }));
 
@@ -83,7 +83,7 @@ describe("MapaVisualizacaoView.vue", () => {
             unidades: [{sigla: "TESTE", codSubprocesso: 123}]
         };
         vi.mocked(unidadeService.buscarUnidadePorSigla).mockResolvedValue({sigla: "TESTE", nome: "Unidade Teste"} as any);
-        vi.mocked(mapaService.obterMapaVisualizacao).mockResolvedValue({
+        vi.mocked(subprocessoService.obterMapaVisualizacao).mockResolvedValue({
             codigo: 100,
             competencias: [
                 {

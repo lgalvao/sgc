@@ -21,7 +21,7 @@ export const exemploService = {
 * **`processoService`**: Gestão de processos e cronogramas.
 * **`subprocessoService`**: Operações de fluxo de unidades.
 * **`atividadeService`**: Cadastro e listagem de atividades.
-* **`mapaService`**: Gestão de competências e revisões de mapa.
+* As consultas de mapa por subprocesso ficam centralizadas em `subprocessoService`.
 * **`diagnosticoService`**: Autoavaliação e monitoramento.
 * **`unidadeService`**: Busca e hierarquia de unidades.
 * **`alertaService`**: Recuperação de alertas do sistema.

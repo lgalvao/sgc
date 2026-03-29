@@ -73,10 +73,6 @@ vi.mock('@/services/atribuicaoTemporariaService', () => ({
     buscarTodasAtribuicoes: vi.fn().mockResolvedValue([]),
 }));
 
-vi.mock('@/services/mapaService', () => ({
-    obterMapaCompleto: vi.fn().mockResolvedValue(null),
-}));
-
 const TreeTableStub = {
     template: '<div data-testid="tree-table"></div>',
     props: ['data', 'columns', 'title'],

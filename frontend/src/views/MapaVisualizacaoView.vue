@@ -251,7 +251,7 @@ import {usePerfil} from "@/composables/usePerfil";
 import {useAcesso} from "@/composables/useAcesso";
 import logger from "@/utils/logger";
 import {listarAnalisesCadastro} from "@/services/analiseService";
-import {obterMapaVisualizacao} from "@/services/mapaService";
+import {obterMapaVisualizacao} from "@/services/subprocessoService";
 import {buscarUnidadePorSigla as buscarUnidadeServico} from "@/services/unidadeService";
 import type {Analise, MapaVisualizacao, Unidade} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
