@@ -8,7 +8,6 @@ import org.springframework.context.annotation.*;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.*;
 import org.springframework.test.context.bean.override.mockito.*;
-import org.springframework.test.util.*;
 import org.springframework.test.web.servlet.*;
 import sgc.comum.erros.*;
 import sgc.organizacao.*;
@@ -20,6 +19,7 @@ import tools.jackson.databind.*;
 
 import java.util.*;
 
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -55,75 +55,87 @@ class LoginControllerTest {
     }
 
     @Test
-    @DisplayName("POST /api/usuarios/autorizar - Deve falhar com cookies presentes mas sem pre-auth")
+    @DisplayName("POST /api/usuarios/login - Deve autenticar com sucesso e concluir sessão direta")
     @WithMockUser
-    void autorizar_CookiesSemPreAuth_DeveFalhar() throws Exception {
-        AutorizarRequest req = AutorizarRequest.builder().build();
+    void login_SessaoDiretaComSucesso() throws Exception {
+        AutenticarRequest req = criarRequestPadrao();
+        UnidadeDto unidadeDto = UnidadeDto.builder().codigo(1L).nome("Adm").sigla("ADM").build();
+        PerfilUnidadeDto perfilUnidade = new PerfilUnidadeDto(Perfil.ADMIN, unidadeDto);
+        Usuario usuario = new Usuario();
+        usuario.setNome("Admin user");
+        usuario.setTituloEleitoral("123");
 
-        mockMvc.perform(post("/api/usuarios/autorizar")
+        when(loginFacade.autenticar("123", "senha")).thenReturn(true);
+        when(loginFacade.buscarAutorizacoesUsuario("123")).thenReturn(List.of(perfilUnidade));
+        when(loginFacade.entrar(any(EntrarRequest.class), eq("123"), anyList())).thenReturn("token-jwt");
+        when(usuarioFacade.buscarPorLogin("123")).thenReturn(usuario);
+
+        mockMvc.perform(post("/api/usuarios/login")
                         .with(csrf())
-                        .cookie(new Cookie("OUTRO_COOKIE", "valor"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.requerSelecaoPerfil").value(false))
+                .andExpect(jsonPath("$.sessao.nome").value("Admin user"))
+                .andExpect(cookie().exists("jwtToken"))
+                .andExpect(cookie().maxAge("SGC_PRE_AUTH", 0));
+
+        verify(limitadorTentativasLogin).verificar(anyString());
     }
 
     @Test
-    @DisplayName("POST /api/usuarios/autenticar - Deve autenticar com sucesso")
+    @DisplayName("POST /api/usuarios/login - Deve exigir seleção quando houver múltiplos perfis")
     @WithMockUser
-    void autenticar_Sucesso() throws Exception {
-        AutenticarRequest req = AutenticarRequest.builder()
-                .tituloEleitoral("123")
-                .senha("senha")
-                .build();
+    void login_MultiplosPerfis() throws Exception {
+        AutenticarRequest req = criarRequestPadrao();
+        UnidadeDto unidadeUm = UnidadeDto.builder().codigo(1L).nome("Unidade 1").sigla("U1").build();
+        UnidadeDto unidadeDois = UnidadeDto.builder().codigo(2L).nome("Unidade 2").sigla("U2").build();
+        PerfilUnidadeDto primeiro = new PerfilUnidadeDto(Perfil.CHEFE, unidadeUm);
+        PerfilUnidadeDto segundo = new PerfilUnidadeDto(Perfil.GESTOR, unidadeDois);
 
-        doNothing().when(limitadorTentativasLogin).verificar(anyString());
         when(loginFacade.autenticar("123", "senha")).thenReturn(true);
+        when(loginFacade.buscarAutorizacoesUsuario("123")).thenReturn(List.of(primeiro, segundo));
         when(gerenciadorJwt.gerarTokenPreAuth("123")).thenReturn("token-pre-auth");
 
-        mockMvc.perform(post("/api/usuarios/autenticar")
+        mockMvc.perform(post("/api/usuarios/login")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk())
-                .andExpect(content().string("true"))
-                .andExpect(cookie().exists("SGC_PRE_AUTH"))
-                .andExpect(cookie().httpOnly("SGC_PRE_AUTH", true));
+                .andExpect(jsonPath("$.requerSelecaoPerfil").value(true))
+                .andExpect(jsonPath("$.sessao").doesNotExist())
+                .andExpect(jsonPath("$.perfisUnidades[0].perfil").value("CHEFE"))
+                .andExpect(cookie().value("SGC_PRE_AUTH", "token-pre-auth"));
 
-        verify(limitadorTentativasLogin).verificar(anyString());
+        verify(loginFacade, never()).entrar(any(EntrarRequest.class), anyString(), anyList());
     }
 
     @Test
-    @DisplayName("POST /api/usuarios/autenticar - Deve retornar false quando credenciais inválidas")
+    @DisplayName("POST /api/usuarios/login - Deve retornar 401 quando credenciais inválidas")
     @WithMockUser
-    void autenticar_FalhaAutenticacao() throws Exception {
-        AutenticarRequest req = AutenticarRequest.builder()
-                .tituloEleitoral("123")
-                .senha("senhaErrada")
-                .build();
+    void login_CredenciaisInvalidas() throws Exception {
+        AutenticarRequest req = criarRequestPadrao();
+        when(loginFacade.autenticar("123", "senha")).thenReturn(false);
 
-        doNothing().when(limitadorTentativasLogin).verificar(anyString());
-        when(loginFacade.autenticar("123", "senhaErrada")).thenReturn(false);
-
-        mockMvc.perform(post("/api/usuarios/autenticar")
+        mockMvc.perform(post("/api/usuarios/login")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
-                .andExpect(status().isOk())
-                .andExpect(content().string("false"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(cookie().doesNotExist("jwtToken"))
                 .andExpect(cookie().doesNotExist("SGC_PRE_AUTH"));
-
-        verify(limitadorTentativasLogin).verificar(anyString());
     }
 
     @Test
-    @DisplayName("POST /api/usuarios/autenticar - Deve usar RemoteAddr do request para limite de tentativas")
+    @DisplayName("POST /api/usuarios/login - Deve usar RemoteAddr do request para limite de tentativas")
     @WithMockUser
-    void autenticar_IpRemoteAddr() throws Exception {
+    void login_IpRemoteAddr() throws Exception {
         AutenticarRequest req = criarRequestPadrao();
         when(loginFacade.autenticar("123", "senha")).thenReturn(true);
+        when(loginFacade.buscarAutorizacoesUsuario("123")).thenReturn(List.of());
+        when(gerenciadorJwt.gerarTokenPreAuth("123")).thenReturn("token-pre-auth");
 
-        mockMvc.perform(post("/api/usuarios/autenticar")
+        mockMvc.perform(post("/api/usuarios/login")
                         .with(csrf())
                         .with(request -> {
                             request.setRemoteAddr("192.168.1.50");
@@ -136,26 +148,16 @@ class LoginControllerTest {
         verify(limitadorTentativasLogin).verificar("192.168.1.50");
     }
 
-    private AutenticarRequest criarRequestPadrao() {
-        return AutenticarRequest.builder()
-                .tituloEleitoral("123")
-                .senha("senha")
-                .build();
-    }
-
     @Test
-    @DisplayName("POST /api/usuarios/autenticar - Deve rejeitar título não numérico")
+    @DisplayName("POST /api/usuarios/login - Deve rejeitar título não numérico")
     @WithMockUser
-    void autenticar_DeveRejeitarTituloNaoNumerico() throws Exception {
-        // Log injection payload: Digits followed by newline and fake log
-        String maliciousTitle = "12\nFake";
-
+    void login_DeveRejeitarTituloNaoNumerico() throws Exception {
         AutenticarRequest req = AutenticarRequest.builder()
-                .tituloEleitoral(maliciousTitle)
+                .tituloEleitoral("12\nFake")
                 .senha("senha")
                 .build();
 
-        mockMvc.perform(post("/api/usuarios/autenticar")
+        mockMvc.perform(post("/api/usuarios/login")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
@@ -163,46 +165,7 @@ class LoginControllerTest {
     }
 
     @Test
-    @DisplayName("POST /api/usuarios/autorizar - Deve retornar perfis")
-    @WithMockUser
-    void autorizar_Sucesso() throws Exception {
-        UnidadeDto unidadeDto = UnidadeDto.builder().codigo(1L).nome("AdmUnit").sigla("ADM").build();
-        PerfilUnidadeDto pu = new PerfilUnidadeDto(Perfil.ADMIN, unidadeDto);
-        when(loginFacade.buscarAutorizacoesUsuario("123")).thenReturn(List.of(pu));
-        when(gerenciadorJwt.validarTokenPreAuth("token-pre-auth")).thenReturn(Optional.of("123"));
-
-        AutorizarRequest req = AutorizarRequest.builder().build();
-
-        mockMvc.perform(post("/api/usuarios/autorizar")
-                        .with(csrf())
-                        .cookie(new Cookie("SGC_PRE_AUTH", "token-pre-auth"))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(req)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].perfil").value("ADMIN"));
-    }
-
-    @Test
-    @DisplayName("POST /api/usuarios/autorizar - Deve retornar lista vazia quando usuário sem perfis ativos")
-    @WithMockUser
-    void autorizar_DeveRetornarListaVaziaQuandoSemPerfisAtivos() throws Exception {
-        when(loginFacade.buscarAutorizacoesUsuario("123")).thenReturn(List.of());
-        when(gerenciadorJwt.validarTokenPreAuth("token-pre-auth")).thenReturn(Optional.of("123"));
-
-        AutorizarRequest req = AutorizarRequest.builder().build();
-
-        mockMvc.perform(post("/api/usuarios/autorizar")
-                        .with(csrf())
-                        .cookie(new Cookie("SGC_PRE_AUTH", "token-pre-auth"))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(req)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$").isEmpty());
-    }
-
-    @Test
-    @DisplayName("POST /api/usuarios/entrar - Deve realizar login")
+    @DisplayName("POST /api/usuarios/entrar - Deve realizar login com cookie de pré-auth")
     @WithMockUser
     void entrar_Sucesso() throws Exception {
         EntrarRequest req = EntrarRequest.builder()
@@ -214,7 +177,7 @@ class LoginControllerTest {
         usuario.setNome("Admin user");
         usuario.setTituloEleitoral("123");
 
-        when(loginFacade.entrar(any(EntrarRequest.class), anyString())).thenReturn("token-jwt");
+        when(loginFacade.entrar(any(EntrarRequest.class), eq("123"))).thenReturn("token-jwt");
         when(usuarioFacade.buscarPorLogin("123")).thenReturn(usuario);
         when(gerenciadorJwt.validarTokenPreAuth("token-pre-auth")).thenReturn(Optional.of("123"));
 
@@ -224,19 +187,21 @@ class LoginControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.token").doesNotExist())
-                .andExpect(cookie().exists("jwtToken"))
+                .andExpect(jsonPath("$.nome").value("Admin user"))
                 .andExpect(cookie().value("jwtToken", "token-jwt"))
-                .andExpect(jsonPath("$.nome").value("Admin user"));
+                .andExpect(cookie().maxAge("SGC_PRE_AUTH", 0));
     }
 
     @Test
-    @DisplayName("POST /api/usuarios/autorizar - Deve falhar sem cookie")
+    @DisplayName("POST /api/usuarios/entrar - Deve falhar sem cookie")
     @WithMockUser
-    void autorizar_SemCookie_DeveFalhar() throws Exception {
-        AutorizarRequest req = AutorizarRequest.builder().build();
+    void entrar_SemCookie_DeveFalhar() throws Exception {
+        EntrarRequest req = EntrarRequest.builder()
+                .perfil("ADMIN")
+                .unidadeCodigo(1L)
+                .build();
 
-        mockMvc.perform(post("/api/usuarios/autorizar")
+        mockMvc.perform(post("/api/usuarios/entrar")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
@@ -244,13 +209,16 @@ class LoginControllerTest {
     }
 
     @Test
-    @DisplayName("POST /api/usuarios/autorizar - Deve falhar com token invalido")
+    @DisplayName("POST /api/usuarios/entrar - Deve falhar com token inválido")
     @WithMockUser
-    void autorizar_TokenInvalido_DeveFalhar() throws Exception {
-        AutorizarRequest req = AutorizarRequest.builder().build();
+    void entrar_TokenInvalido_DeveFalhar() throws Exception {
+        EntrarRequest req = EntrarRequest.builder()
+                .perfil("ADMIN")
+                .unidadeCodigo(1L)
+                .build();
         when(gerenciadorJwt.validarTokenPreAuth("token-invalido")).thenReturn(Optional.empty());
 
-        mockMvc.perform(post("/api/usuarios/autorizar")
+        mockMvc.perform(post("/api/usuarios/entrar")
                         .with(csrf())
                         .cookie(new Cookie("SGC_PRE_AUTH", "token-invalido"))
                         .contentType(MediaType.APPLICATION_JSON)
@@ -258,109 +226,10 @@ class LoginControllerTest {
                 .andExpect(status().isUnauthorized());
     }
 
-
-
-    @Nested
-    @DisplayName("Unit tests (Isolated)")
-    class UnitTests {
-
-        private LoginController controller;
-        private LoginFacade loginFacadeMock;
-        private GerenciadorJwt gerenciadorJwtMock;
-
-        @BeforeEach
-        void setUp() {
-            loginFacadeMock = mock(LoginFacade.class);
-            UsuarioFacade usuarioFacadeMock = mock(UsuarioFacade.class);
-            LimitadorTentativasLogin limitadorMock = mock(LimitadorTentativasLogin.class);
-            gerenciadorJwtMock = mock(GerenciadorJwt.class);
-
-            controller = new LoginController(
-                    loginFacadeMock,
-                    usuarioFacadeMock,
-                    limitadorMock,
-                    gerenciadorJwtMock
-            );
-        }
-
-        @Test
-        @DisplayName("autenticar deve configurar cookie seguro se ambienteTestes false")
-        void autenticar_SecureCookie() {
-            ReflectionTestUtils.setField(controller, "ambienteTestes", false);
-            AutenticarRequest req = new AutenticarRequest("user", "pass");
-            HttpServletRequest httpReq = mock(HttpServletRequest.class);
-            HttpServletResponse httpRes = mock(HttpServletResponse.class);
-
-            when(loginFacadeMock.autenticar("user", "pass")).thenReturn(true);
-            when(gerenciadorJwtMock.gerarTokenPreAuth("user")).thenReturn("token");
-
-            controller.autenticar(req, httpReq, httpRes);
-
-            verify(httpRes).addCookie(argThat(Cookie::getSecure));
-        }
-
-        @Test
-        @DisplayName("autenticar NAO deve configurar cookie seguro se ambienteTestes true")
-        void autenticar_NonSecureCookie() {
-            ReflectionTestUtils.setField(controller, "ambienteTestes", true);
-            AutenticarRequest req = new AutenticarRequest("user", "pass");
-            HttpServletRequest httpReq = mock(HttpServletRequest.class);
-            HttpServletResponse httpRes = mock(HttpServletResponse.class);
-
-            when(loginFacadeMock.autenticar("user", "pass")).thenReturn(true);
-            when(gerenciadorJwtMock.gerarTokenPreAuth("user")).thenReturn("token");
-
-            controller.autenticar(req, httpReq, httpRes);
-
-            verify(httpRes).addCookie(argThat(cookie -> !cookie.getSecure()));
-        }
-
-
-        @Test
-        @DisplayName("autenticar deve retornar false e não gerar cookie se falhar")
-        void autenticar_DeveRetornarFalseSemCookieQuandoFalhar() {
-            AutenticarRequest request = new AutenticarRequest("111111", "senha_errada");
-            HttpServletRequest httpRequest = mock(HttpServletRequest.class);
-            HttpServletResponse httpResponse = mock(HttpServletResponse.class);
-
-            when(loginFacadeMock.autenticar("111111", "senha_errada")).thenReturn(false);
-            when(httpRequest.getRemoteAddr()).thenReturn("127.0.0.1");
-
-            var resultado = controller.autenticar(request, httpRequest, httpResponse);
-
-            Assertions.assertNotEquals(Boolean.TRUE, resultado.getBody());
-            verify(httpResponse, never()).addCookie(any());
-        }
-
-        @Test
-        @DisplayName("entrar deve lidar com cookie invalido e lancar ErroAutenticacao")
-        void entrar_CookieInvalido() {
-            EntrarRequest req = new EntrarRequest("ADMIN", 1L);
-            HttpServletRequest httpReq = mock(HttpServletRequest.class);
-
-            // No cookies
-            when(httpReq.getCookies()).thenReturn(null);
-
-            HttpServletResponse httpRes = mock(HttpServletResponse.class);
-            Assertions.assertThrows(ErroAutenticacao.class,
-                    () -> controller.entrar(req, httpReq, httpRes));
-        }
-
-
-
-        @Test
-        @DisplayName("entrar deve lidar com sessao invalida (token empty)")
-        void entrar_TokenEmpty() {
-            EntrarRequest req = new EntrarRequest("ADMIN", 1L);
-            HttpServletRequest httpReq = mock(HttpServletRequest.class);
-            Cookie cookie = new Cookie("SGC_PRE_AUTH", "token");
-
-            when(httpReq.getCookies()).thenReturn(new Cookie[]{cookie});
-            when(gerenciadorJwtMock.validarTokenPreAuth("token")).thenReturn(Optional.empty());
-
-            HttpServletResponse httpRes = mock(HttpServletResponse.class);
-            Assertions.assertThrows(ErroAutenticacao.class,
-                    () -> controller.entrar(req, httpReq, httpRes));
-        }
+    private AutenticarRequest criarRequestPadrao() {
+        return AutenticarRequest.builder()
+                .tituloEleitoral("123")
+                .senha("senha")
+                .build();
     }
 }

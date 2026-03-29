@@ -1,4 +1,4 @@
-import type {LoginResponseDto, PerfilUnidadeDto, UsuarioDto} from "@/types/dtos";
+import type {FluxoLoginResponseDto, PerfilUnidadeDto, SessaoLoginDto, UsuarioDto} from "@/types/dtos";
 import type {Usuario} from "@/types/tipos";
 import apiClient from "../axios-setup";
 
@@ -59,21 +59,33 @@ export function mapUsuarioToFrontend(usuarioDto: UsuarioDto): Usuario {
     } as Usuario; // Force cast to match potentially looser frontend type
 }
 
-export interface LoginResponse {
+export interface SessaoLogin {
     tituloEleitoral: string;
     nome: string;
-    perfil: Perfil; // Usando o tipo Perfil já definido
+    perfil: Perfil;
     unidadeCodigo: number;
-    token: string;
 }
 
-export function LoginResponseToFrontend(response: LoginResponseDto): LoginResponse {
+export interface FluxoLogin {
+    requerSelecaoPerfil: boolean;
+    perfisUnidades: PerfilUnidade[];
+    sessao: SessaoLogin | null;
+}
+
+export function mapSessaoLoginToFrontend(response: SessaoLoginDto): SessaoLogin {
     return {
         tituloEleitoral: response.tituloEleitoral,
         nome: response.nome,
         perfil: response.perfil as Perfil,
         unidadeCodigo: response.unidadeCodigo,
-        token: response.token,
+    };
+}
+
+export function mapFluxoLoginToFrontend(response: FluxoLoginResponseDto): FluxoLogin {
+    return {
+        requerSelecaoPerfil: response.requerSelecaoPerfil,
+        perfisUnidades: perfisUnidadesParaDominio(response.perfisUnidades),
+        sessao: response.sessao ? mapSessaoLoginToFrontend(response.sessao) : null,
     };
 }
 
@@ -114,30 +126,22 @@ export function mapVWUsuariosArray(arr: any[] = []): Usuario[] {
     return arr.map(mapVWUsuarioToUsuario);
 }
 
-export async function autenticar(
+export async function login(
     request: AutenticacaoRequest,
-): Promise<boolean> {
-    const response = await apiClient.post<boolean>(
-        "/usuarios/autenticar",
+): Promise<FluxoLogin> {
+    const response = await apiClient.post<FluxoLoginResponseDto>(
+        "/usuarios/login",
         request,
     );
-    return response.data;
+    return mapFluxoLoginToFrontend(response.data);
 }
 
-export async function autorizar(): Promise<PerfilUnidade[]> {
-    const response = await apiClient.post<any[]>(
-        "/usuarios/autorizar",
-        {},
-    );
-    return response.data.map(mapPerfilUnidadeToFrontend);
-}
-
-export async function entrar(request: EntrarRequest): Promise<LoginResponse> {
-    const response = await apiClient.post<LoginResponse>(
+export async function entrar(request: EntrarRequest): Promise<SessaoLogin> {
+    const response = await apiClient.post<SessaoLoginDto>(
         "/usuarios/entrar",
         request,
     );
-    return response.data;
+    return mapSessaoLoginToFrontend(response.data);
 }
 
 export async function buscarTodosUsuarios() {

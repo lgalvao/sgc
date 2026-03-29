@@ -14,7 +14,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 /**
  * Helper para realizar login completo em testes de integração.
- * Executa o fluxo real: autenticar -> autorizar -> entrar.
+ * Executa o fluxo real: login direto ou login seguido de entrar.
  */
 @Component
 public class TestLoginHelper {
@@ -25,25 +25,22 @@ public class TestLoginHelper {
      * Realiza login completo e retorna o token JWT.
      */
     public String login(MockMvc mockMvc, String titulo, Perfil perfil, Long unidadeCodigo) throws Exception {
-        AutenticarRequest autenticarRequest = new AutenticarRequest(titulo, "senha123");
-        MvcResult autenticarResult = mockMvc.perform(post("/api/usuarios/autenticar")
+        AutenticarRequest loginRequest = new AutenticarRequest(titulo, "senha123");
+        MvcResult loginResult = mockMvc.perform(post("/api/usuarios/login")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(autenticarRequest)))
+                        .content(objectMapper.writeValueAsString(loginRequest)))
                 .andExpect(status().isOk())
                 .andReturn();
 
-        // Extrair cookie de pré-autenticação
-        Cookie preAuthCookie = autenticarResult.getResponse().getCookie("SGC_PRE_AUTH");
+        Cookie jwtCookieDireto = loginResult.getResponse().getCookie("jwtToken");
+        if (jwtCookieDireto != null) {
+            return jwtCookieDireto.getValue();
+        }
+
+        Cookie preAuthCookie = loginResult.getResponse().getCookie("SGC_PRE_AUTH");
         if (preAuthCookie == null) {
             throw new IllegalStateException("Cookie de pré-autenticação não encontrado");
         }
-
-        AutorizarRequest autorizarRequest = new AutorizarRequest();
-        mockMvc.perform(post("/api/usuarios/autorizar")
-                        .cookie(preAuthCookie)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(autorizarRequest)))
-                .andExpect(status().isOk());
 
         EntrarRequest entrarRequest = new EntrarRequest(perfil.name(), unidadeCodigo);
         MvcResult entrarResult = mockMvc.perform(post("/api/usuarios/entrar")

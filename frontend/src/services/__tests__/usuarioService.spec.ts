@@ -15,24 +15,21 @@ describe('usuarioService', () => {
   });
 
   describe('API calls', () => {
-    it('autenticar', async () => {
-      (apiClient.post as any).mockResolvedValueOnce({ data: true });
-      const result = await usuarioService.autenticar({ tituloEleitoral: '123', senha: '123' });
-      expect(apiClient.post).toHaveBeenCalledWith('/usuarios/autenticar', { tituloEleitoral: '123', senha: '123' });
-      expect(result).toBe(true);
-    });
-
-    it('autorizar', async () => {
-      const mockResponse = [{ perfil: 'ADMIN', unidade: { codigo: 1, sigla: 'TEST', nome: 'Teste' }, siglaUnidade: 'TEST' }];
+    it('login', async () => {
+      const mockResponse = {
+        requerSelecaoPerfil: true,
+        perfisUnidades: [{ perfil: 'ADMIN', unidade: { codigo: 1, sigla: 'TEST', nome: 'Teste' }, siglaUnidade: 'TEST' }],
+        sessao: null,
+      };
       (apiClient.post as any).mockResolvedValueOnce({ data: mockResponse });
-      const result = await usuarioService.autorizar();
-      expect(apiClient.post).toHaveBeenCalledWith('/usuarios/autorizar', {});
-      expect(result).toHaveLength(1);
-      expect(result[0].perfil).toBe('ADMIN');
+      const result = await usuarioService.login({ tituloEleitoral: '123', senha: '123' });
+      expect(apiClient.post).toHaveBeenCalledWith('/usuarios/login', { tituloEleitoral: '123', senha: '123' });
+      expect(result.requerSelecaoPerfil).toBe(true);
+      expect(result.perfisUnidades).toHaveLength(1);
     });
 
     it('entrar', async () => {
-      const mockData = { token: 'abc' };
+      const mockData = { tituloEleitoral: '123', nome: 'Teste', perfil: 'ADMIN', unidadeCodigo: 1 };
       (apiClient.post as any).mockResolvedValueOnce({ data: mockData });
       const result = await usuarioService.entrar({ perfil: 'ADMIN', unidadeCodigo: 1 });
       expect(apiClient.post).toHaveBeenCalledWith('/usuarios/entrar', { perfil: 'ADMIN', unidadeCodigo: 1 });
@@ -91,16 +88,33 @@ describe('usuarioService', () => {
       expect(result.tituloEleitoral).toBe('12345');
     });
 
-    it('LoginResponseToFrontend', () => {
-      const result = usuarioService.LoginResponseToFrontend({
+    it('mapSessaoLoginToFrontend', () => {
+      const result = usuarioService.mapSessaoLoginToFrontend({
         tituloEleitoral: '123',
         nome: 'Teste',
         perfil: 'ADMIN',
         unidadeCodigo: 1,
-        token: 'abc'
       });
-      expect(result.token).toBe('abc');
       expect(result.perfil).toBe('ADMIN');
+    });
+
+    it('mapFluxoLoginToFrontend', () => {
+      const result = usuarioService.mapFluxoLoginToFrontend({
+        requerSelecaoPerfil: false,
+        perfisUnidades: [{
+          perfil: 'ADMIN',
+          unidade: { codigo: 1, sigla: 'TST', nome: 'Teste' },
+          siglaUnidade: 'TST'
+        }],
+        sessao: {
+          tituloEleitoral: '123',
+          nome: 'Teste',
+          perfil: 'ADMIN',
+          unidadeCodigo: 1,
+        }
+      });
+      expect(result.requerSelecaoPerfil).toBe(false);
+      expect(result.sessao?.tituloEleitoral).toBe('123');
     });
 
     it('perfisUnidadesParaDominio', () => {

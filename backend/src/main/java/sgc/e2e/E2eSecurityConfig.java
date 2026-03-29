@@ -62,8 +62,7 @@ public class E2eSecurityConfig {
     @Bean
     public SecurityFilterChain e2eSecurityFilterChain(HttpSecurity http, FiltroJwt filtroJwt) {
         http.authorizeHttpRequests(auth -> auth.requestMatchers(
-                                "/api/usuarios/autenticar",
-                                "/api/usuarios/autorizar",
+                                "/api/usuarios/login",
                                 "/api/usuarios/entrar",
                                 "/actuator/**",
                                 "/e2e/**")

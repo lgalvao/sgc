@@ -237,9 +237,9 @@ const performInitialLogin = async () => {
 
   isLoading.value = true;
   try {
-    const sucessoAutenticacao = await perfilStore.loginCompleto(titulo.value, senha.value);
+    const fluxoLogin = await perfilStore.iniciarLogin(titulo.value, senha.value);
 
-    if (sucessoAutenticacao) {
+    if (fluxoLogin.sessao || fluxoLogin.perfisUnidades.length > 0) {
       await handlePostAuth();
       } else {
         notify(TEXTOS.login.ERRO_CREDENCIAIS, 'danger');
@@ -274,10 +274,7 @@ const performProfileSelection = async () => {
   if (parSelecionado.value) {
     isLoading.value = true;
     try {
-      await perfilStore.selecionarPerfilUnidade(
-          titulo.value,
-          parSelecionado.value,
-      );
+      await perfilStore.concluirLoginComPerfil(parSelecionado.value);
       await router.push("/painel");
     } catch (error) {
       logger.error("Erro ao selecionar perfil:", error);

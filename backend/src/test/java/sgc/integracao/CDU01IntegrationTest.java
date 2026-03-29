@@ -87,44 +87,23 @@ class CDU01IntegrationTest extends BaseIntegrationTest {
     @DisplayName("Testes de fluxo de login completo")
     class FluxoLoginTests {
         @Test
-        @DisplayName("Deve realizar login completo para usuário com um único perfil")
+        @DisplayName("Deve realizar login direto para usuário com um único perfil")
         void testLoginCompleto_sucessoUsuarioUnicoPerfil() throws Exception {
             String tituloEleitoral = usuarioAdmin.getTituloEleitoral();
             String senha = "password";
             AutenticarRequest authRequest = AutenticarRequest.builder().tituloEleitoral(tituloEleitoral)
                     .senha(senha).build();
 
-            Cookie[] cookies = mockMvc.perform(post(BASE_URL + "/autenticar")
+            mockMvc.perform(post(BASE_URL + "/login")
                             .with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(testUtil.toJson(authRequest)))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$").value(true))
-                    .andReturn().getResponse().getCookies();
-
-            AutorizarRequest autorizarReq = AutorizarRequest.builder()
-                    .build();
-
-            mockMvc.perform(post(BASE_URL + "/autorizar")
-                            .with(csrf())
-                            .cookie(cookies)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(testUtil.toJson(autorizarReq)))
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$[0].perfil").value("ADMIN"))
-                    .andExpect(jsonPath("$[0].unidade.sigla").value(unidadeAdmin.getSigla()));
-
-            EntrarRequest entrarReq = EntrarRequest.builder()
-                    .perfil("ADMIN")
-                    .unidadeCodigo(unidadeAdmin.getCodigo())
-                    .build();
-
-            mockMvc.perform(post(BASE_URL + "/entrar")
-                            .with(csrf())
-                            .cookie(cookies)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(testUtil.toJson(entrarReq)))
-                    .andExpect(status().isOk());
+                    .andExpect(jsonPath("$.requerSelecaoPerfil").value(false))
+                    .andExpect(jsonPath("$.perfisUnidades[0].perfil").value("ADMIN"))
+                    .andExpect(jsonPath("$.perfisUnidades[0].unidade.sigla").value(unidadeAdmin.getSigla()))
+                    .andExpect(jsonPath("$.sessao.perfil").value("ADMIN"))
+                    .andExpect(cookie().exists("jwtToken"));
         }
 
         @Test
@@ -135,26 +114,16 @@ class CDU01IntegrationTest extends BaseIntegrationTest {
             AutenticarRequest authRequest = AutenticarRequest.builder().tituloEleitoral(tituloEleitoral)
                     .senha(senha).build();
 
-            Cookie[] cookies = mockMvc.perform(post(BASE_URL + "/autenticar")
+            Cookie[] cookies = mockMvc.perform(post(BASE_URL + "/login")
                             .with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(testUtil.toJson(authRequest)))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$").value(true))
+                    .andExpect(jsonPath("$.requerSelecaoPerfil").value(true))
+                    .andExpect(jsonPath("$.perfisUnidades.length()").value(2))
+                    .andExpect(jsonPath("$.perfisUnidades[*].perfil")
+                            .value(containsInAnyOrder("ADMIN", "GESTOR")))
                     .andReturn().getResponse().getCookies();
-
-            AutorizarRequest autorizarReq = AutorizarRequest.builder()
-                    .build();
-
-            mockMvc.perform(post(BASE_URL + "/autorizar")
-                            .with(csrf())
-                            .cookie(cookies)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(testUtil.toJson(autorizarReq)))
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.length()").value(2))
-                    .andExpect(jsonPath("$[*].perfil")
-                            .value(containsInAnyOrder("ADMIN", "GESTOR")));
 
             // Entrar como GESTOR na unidadeGestor
             EntrarRequest entrarReq = EntrarRequest.builder()
@@ -170,15 +139,17 @@ class CDU01IntegrationTest extends BaseIntegrationTest {
         }
 
         @Test
-        @DisplayName("Deve falhar ao tentar autorizar com usuário não autenticado")
-        void testAutorizar_falhaUsuarioNaoAutenticado() throws Exception {
-            AutorizarRequest autorizarReq = AutorizarRequest.builder()
+        @DisplayName("Deve falhar ao tentar entrar sem pré-autenticação")
+        void testEntrar_falhaUsuarioNaoAutenticado() throws Exception {
+            EntrarRequest entrarReq = EntrarRequest.builder()
+                    .perfil("ADMIN")
+                    .unidadeCodigo(unidadeAdmin.getCodigo())
                     .build();
 
-            mockMvc.perform(post(BASE_URL + "/autorizar")
+            mockMvc.perform(post(BASE_URL + "/entrar")
                             .with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(testUtil.toJson(autorizarReq)))
+                            .content(testUtil.toJson(entrarReq)))
                     .andExpect(status().isUnauthorized());
         }
 
@@ -186,21 +157,21 @@ class CDU01IntegrationTest extends BaseIntegrationTest {
         @DisplayName("Deve falhar ao tentar entrar com unidade inexistente")
         void testEntrar_falhaUnidadeInexistente() throws Exception {
 
-            String tituloEleitoral = usuarioAdmin.getTituloEleitoral();
+            String tituloEleitoral = usuarioGestor.getTituloEleitoral();
             long codigoUnidadeInexistente = 999999L;
 
             AutenticarRequest authRequest = AutenticarRequest.builder()
                     .tituloEleitoral(tituloEleitoral)
                     .senha("any")
                     .build();
-            Cookie[] cookies = mockMvc.perform(post(BASE_URL + "/autenticar")
+            Cookie[] cookies = mockMvc.perform(post(BASE_URL + "/login")
                             .with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(testUtil.toJson(authRequest)))
                     .andReturn().getResponse().getCookies();
 
             EntrarRequest entrarReq = EntrarRequest.builder()
-                    .perfil("ADMIN")
+                    .perfil("GESTOR")
                     .unidadeCodigo(codigoUnidadeInexistente)
                     .build();
 

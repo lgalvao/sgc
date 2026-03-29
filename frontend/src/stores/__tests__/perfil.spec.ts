@@ -110,39 +110,39 @@ describe("usePerfilStore", () => {
             expect(context.store.usuarioNome).toBe("Nome teste");
         });
 
-        it("loginCompleto deve autenticar, buscar perfis e selecionar automaticamente se houver apenas um perfil", async () => {
+        it("iniciarLogin deve carregar perfis e selecionar automaticamente se houver apenas um perfil", async () => {
             const perfilUnidade = {
                 perfil: Perfil.CHEFE,
                 unidade: {codigo: 1, sigla: "UT", nome: "Unidade UT"},
                 siglaUnidade: "UT",
             };
-            const mockLoginResponse = {
-                perfil: Perfil.CHEFE,
-                unidadeCodigo: 1,
-                tituloEleitoral: "123",
-                token: "fake-token",
-                nome: "João da Silva",
+            const mockFluxoLogin = {
+                requerSelecaoPerfil: false,
+                perfisUnidades: [perfilUnidade],
+                sessao: {
+                    perfil: Perfil.CHEFE,
+                    unidadeCodigo: 1,
+                    tituloEleitoral: "123",
+                    nome: "João da Silva",
+                },
             };
 
-            mockUsuarioService.autenticar.mockResolvedValue(true);
-            mockUsuarioService.autorizar.mockResolvedValue([perfilUnidade]);
-            mockUsuarioService.entrar.mockResolvedValue(mockLoginResponse);
+            mockUsuarioService.login.mockResolvedValue(mockFluxoLogin as any);
 
-            const result = await context.store.loginCompleto("123", "pass");
+            const result = await context.store.iniciarLogin("123", "pass");
 
-            expect(mockUsuarioService.autenticar).toHaveBeenCalledWith({
+            expect(mockUsuarioService.login).toHaveBeenCalledWith({
                 tituloEleitoral: "123",
                 senha: "pass",
             });
-            expect(mockUsuarioService.autorizar).toHaveBeenCalledWith();
-            expect(mockUsuarioService.entrar).toHaveBeenCalled();
+            expect(mockUsuarioService.entrar).not.toHaveBeenCalled();
             expect(context.store.perfilSelecionado).toBe(Perfil.CHEFE);
             expect(context.store.unidadeSelecionada).toBe(1);
             expect(context.store.unidadeSelecionadaSigla).toBe("UT");
-            expect(result).toBe(true);
+            expect(result.sessao?.tituloEleitoral).toBe("123");
         });
 
-        it("loginCompleto não deve selecionar automaticamente se houver múltiplos perfis", async () => {
+        it("iniciarLogin não deve selecionar automaticamente se houver múltiplos perfis", async () => {
             const perfis = [
                 {
                     perfil: Perfil.CHEFE,
@@ -155,10 +155,13 @@ describe("usePerfilStore", () => {
                     siglaUnidade: "U2",
                 },
             ];
-            mockUsuarioService.autenticar.mockResolvedValue(true);
-            mockUsuarioService.autorizar.mockResolvedValue(perfis);
+            mockUsuarioService.login.mockResolvedValue({
+                requerSelecaoPerfil: true,
+                perfisUnidades: perfis,
+                sessao: null,
+            } as any);
 
-            await context.store.loginCompleto("123", "pass");
+            await context.store.iniciarLogin("123", "pass");
 
             expect(mockUsuarioService.entrar).not.toHaveBeenCalled();
             expect(context.store.perfisUnidades).toEqual(perfis);
@@ -167,7 +170,7 @@ describe("usePerfilStore", () => {
             expect(context.store.unidadeSelecionadaSigla).toBeNull();
         });
 
-        it("selecionarPerfilUnidade deve chamar entrar e definir o perfil", async () => {
+        it("concluirLoginComPerfil deve chamar entrar e definir o perfil", async () => {
             const perfilUnidade = {
                 perfil: Perfil.GESTOR,
                 unidade: {codigo: 2, sigla: "XYZ", nome: "Unidade XYZ"},
@@ -177,12 +180,11 @@ describe("usePerfilStore", () => {
                 perfil: Perfil.GESTOR,
                 unidadeCodigo: 2,
                 tituloEleitoral: "456",
-                token: "fake-token",
                 nome: "Maria oliveira",
             };
             mockUsuarioService.entrar.mockResolvedValue(mockLoginResponse);
 
-            await context.store.selecionarPerfilUnidade("456", perfilUnidade);
+            await context.store.concluirLoginComPerfil(perfilUnidade);
 
             expect(mockUsuarioService.entrar).toHaveBeenCalledWith({
                 perfil: Perfil.GESTOR,
@@ -194,15 +196,15 @@ describe("usePerfilStore", () => {
             expect(context.store.usuarioCodigo).toBe("456");
         });
 
-        it("deve lidar com erro em loginCompleto", async () => {
-            mockUsuarioService.autenticar.mockRejectedValue(new Error("Fail"));
-            await expect(context.store.loginCompleto("123", "pass")).rejects.toThrow(
+        it("deve lidar com erro em iniciarLogin", async () => {
+            mockUsuarioService.login.mockRejectedValue(new Error("Fail"));
+            await expect(context.store.iniciarLogin("123", "pass")).rejects.toThrow(
                 "Fail",
             );
             expect(context.store.lastError).toBeTruthy();
         });
 
-        it("deve lidar com erro em selecionarPerfilUnidade", async () => {
+        it("deve lidar com erro em concluirLoginComPerfil", async () => {
             mockUsuarioService.entrar.mockRejectedValue(new Error("Fail"));
             const perfilUnidade = {
                 perfil: Perfil.GESTOR,
@@ -210,15 +212,16 @@ describe("usePerfilStore", () => {
                 siglaUnidade: "XYZ",
             };
             await expect(
-                context.store.selecionarPerfilUnidade("123", perfilUnidade),
+                context.store.concluirLoginComPerfil(perfilUnidade),
             ).rejects.toThrow("Fail");
             expect(context.store.lastError).toBeTruthy();
         });
 
-        it("deve retornar falso se a autenticação falhar em loginCompleto", async () => {
-            mockUsuarioService.autenticar.mockResolvedValue(false);
-            const result = await context.store.loginCompleto("123", "pass");
-            expect(result).toBe(false);
+        it("deve retornar fluxo vazio se o login falhar com 401", async () => {
+            mockUsuarioService.login.mockRejectedValue({isAxiosError: true, response: {status: 401}});
+            const result = await context.store.iniciarLogin("123", "pass");
+            expect(result.perfisUnidades).toEqual([]);
+            expect(result.sessao).toBeNull();
         });
 
         it("deve fazer logout corretamente", () => {
@@ -234,19 +237,19 @@ describe("usePerfilStore", () => {
             expect(context.store.lastError).toBeNull();
         });
 
-        it("loginCompleto deve retornar false para erros 401 ou 404", async () => {
+        it("iniciarLogin deve retornar fluxo vazio para erros 401 ou 404", async () => {
             const mockUsuarioService = vi.mocked(usuarioService);
-            mockUsuarioService.autenticar.mockRejectedValue({isAxiosError: true, response: {status: 401}});
+            mockUsuarioService.login.mockRejectedValue({isAxiosError: true, response: {status: 401}});
 
-            const result = await context.store.loginCompleto("123", "pass");
-            expect(result).toBe(false);
+            const result = await context.store.iniciarLogin("123", "pass");
+            expect(result.perfisUnidades).toEqual([]);
 
-            mockUsuarioService.autenticar.mockRejectedValue({isAxiosError: true, response: {status: 404}});
-            const result2 = await context.store.loginCompleto("123", "pass");
-            expect(result2).toBe(false);
+            mockUsuarioService.login.mockRejectedValue({isAxiosError: true, response: {status: 404}});
+            const result2 = await context.store.iniciarLogin("123", "pass");
+            expect(result2.perfisUnidades).toEqual([]);
 
-            mockUsuarioService.autenticar.mockRejectedValue(new Error("Other error"));
-            await expect(context.store.loginCompleto("123", "pass")).rejects.toThrow("Other error");
+            mockUsuarioService.login.mockRejectedValue(new Error("Other error"));
+            await expect(context.store.iniciarLogin("123", "pass")).rejects.toThrow("Other error");
         });
     });
 

@@ -1,6 +1,6 @@
 import {defineStore} from "pinia";
 import {computed, ref} from "vue";
-import type {PerfilUnidade} from "@/services/usuarioService";
+import type {FluxoLogin, PerfilUnidade} from "@/services/usuarioService";
 import type {Perfil} from "@/types/tipos";
 import * as usuarioService from "../services/usuarioService";
 import {useErrorHandler} from "@/composables/useErrorHandler";
@@ -59,51 +59,46 @@ export const usePerfilStore = defineStore("perfil", () => {
         // localStorage.setItem removido - sincronização automática
     }
 
-    async function loginCompleto(tituloEleitoral: string, senha: string) {
+    async function iniciarLogin(tituloEleitoral: string, senha: string): Promise<FluxoLogin> {
         return withErrorHandling(async () => {
-            const autenticado = await usuarioService.autenticar({
+            const fluxoLogin = await usuarioService.login({
                 tituloEleitoral,
                 senha,
             });
-            if (autenticado) {
-                const responsePerfisUnidades = await usuarioService.autorizar();
-                perfisUnidades.value = responsePerfisUnidades;
+            perfisUnidades.value = fluxoLogin.perfisUnidades;
 
-                const listaPerfis = [
-                    ...new Set(
-                        responsePerfisUnidades.map((p) => p.perfil as unknown as Perfil),
-                    ),
-                ];
-                definirPerfis(listaPerfis);
+            const listaPerfis = [
+                ...new Set(
+                    fluxoLogin.perfisUnidades.map((p) => p.perfil as unknown as Perfil),
+                ),
+            ];
+            definirPerfis(listaPerfis);
 
-                // Se houver apenas uma opção, seleciona automaticamente
-                if (responsePerfisUnidades.length === 1) {
-                    const perfilUnidadeSelecionado = responsePerfisUnidades[0];
-                    const loginResponse = await usuarioService.entrar({
-                        perfil: perfilUnidadeSelecionado.perfil,
-                        unidadeCodigo: perfilUnidadeSelecionado.unidade.codigo,
-                    });
-                    definirPerfilUnidade({
-                        perfil: loginResponse.perfil as unknown as Perfil,
-                        unidadeCodigo: loginResponse.unidadeCodigo,
-                        unidadeSigla: perfilUnidadeSelecionado.unidade.sigla,
-                        nome: loginResponse.nome,
-                    });
-                    definirUsuarioCodigo(loginResponse.tituloEleitoral);
-                }
-                return true;
+            if (fluxoLogin.sessao && fluxoLogin.perfisUnidades.length === 1) {
+                const perfilUnidadeSelecionado = fluxoLogin.perfisUnidades[0];
+                definirPerfilUnidade({
+                    perfil: fluxoLogin.sessao.perfil as unknown as Perfil,
+                    unidadeCodigo: fluxoLogin.sessao.unidadeCodigo,
+                    unidadeSigla: perfilUnidadeSelecionado.unidade.sigla,
+                    nome: fluxoLogin.sessao.nome,
+                });
+                definirUsuarioCodigo(fluxoLogin.sessao.tituloEleitoral);
             }
-            return false;
+
+            return fluxoLogin;
         }).catch((error: any) => {
             if (error?.response?.status === 404 || error?.response?.status === 401) {
-                return false;
+                return {
+                    requerSelecaoPerfil: false,
+                    perfisUnidades: [],
+                    sessao: null,
+                };
             }
             throw error;
         });
     }
 
-    async function selecionarPerfilUnidade(
-        tituloEleitoral: string,
+    async function concluirLoginComPerfil(
         perfilUnidade: PerfilUnidade,
     ) {
         return withErrorHandling(async () => {
@@ -145,8 +140,8 @@ export const usePerfilStore = defineStore("perfil", () => {
         clearError,
         definirUsuarioCodigo,
         definirPerfilUnidade,
-        loginCompleto,
-        selecionarPerfilUnidade,
+        iniciarLogin,
+        concluirLoginComPerfil,
         logout,
     };
 });

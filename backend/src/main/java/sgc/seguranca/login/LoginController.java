@@ -36,11 +36,12 @@ public class LoginController {
     private boolean ambienteTestes;
 
     /**
-     * Autentica um usuário com base no título de eleitor e senha.
+     * Inicia o fluxo de login. Se houver um único par perfil/unidade disponível,
+     * a sessão já é concluída nesta chamada.
      */
-    @PostMapping("/autenticar")
-    @Operation(summary = "Autentica um usuário com título e senha")
-    public ResponseEntity<Boolean> autenticar(
+    @PostMapping("/login")
+    @Operation(summary = "Inicia o login e retorna as opções de perfil/unidade")
+    public ResponseEntity<FluxoLoginResponse> login(
             @Valid @RequestBody AutenticarRequest request,
             HttpServletRequest httpRequest,
             HttpServletResponse httpResponse) {
@@ -49,32 +50,45 @@ public class LoginController {
         if (ip != null) limitadorTentativasLogin.verificar(ip);
 
         boolean autenticado = loginFacade.autenticar(request.tituloEleitoral(), request.senha());
-
-        if (autenticado) {
-            String token = gerenciadorJwt.gerarTokenPreAuth(request.tituloEleitoral());
-            Cookie cookie = new Cookie("SGC_PRE_AUTH", token);
-            cookie.setHttpOnly(true);
-            cookie.setSecure(!ambienteTestes);
-            cookie.setPath("/");
-            cookie.setMaxAge(300); // 5 minutes
-            httpResponse.addCookie(cookie);
+        if (!autenticado) {
+            throw new ErroAutenticacao("Título ou senha inválidos.");
         }
 
-        return ResponseEntity.ok(autenticado);
-    }
+        List<PerfilUnidadeDto> perfis = loginFacade.buscarAutorizacoesUsuario(request.tituloEleitoral());
+        if (perfis.size() == 1) {
+            PerfilUnidadeDto perfilUnidade = perfis.getFirst();
+            EntrarRequest entrarRequest = EntrarRequest.builder()
+                    .perfil(perfilUnidade.perfil().name())
+                    .unidadeCodigo(perfilUnidade.unidade().getCodigo())
+                    .build();
+            String token = loginFacade.entrar(entrarRequest, request.tituloEleitoral(), perfis);
+            Usuario usuario = usuarioFacade.buscarPorLogin(request.tituloEleitoral());
 
-    /**
-     * Autoriza um usuário, retornando a lista de perfis e unidades a que tem acesso.
-     */
-    @PostMapping("/autorizar")
-    @Operation(summary = "Retorna os perfis e unidades disponíveis para o usuário")
-    public ResponseEntity<List<PerfilUnidadeDto>> autorizar(
-            @Valid @RequestBody AutorizarRequest request,
-            HttpServletRequest httpRequest) {
+            adicionarCookieJwt(httpResponse, token);
+            limparCookiePreAuth(httpResponse);
 
-        String tituloEleitoral = extrairTituloPreAuth(httpRequest);
-        List<PerfilUnidadeDto> perfis = loginFacade.buscarAutorizacoesUsuario(tituloEleitoral);
-        return ResponseEntity.ok(perfis);
+            EntrarResponse sessao = EntrarResponse.builder()
+                    .tituloEleitoral(request.tituloEleitoral())
+                    .nome(usuario.getNome())
+                    .perfil(perfilUnidade.perfil())
+                    .unidadeCodigo(perfilUnidade.unidade().getCodigo())
+                    .build();
+
+            return ResponseEntity.ok(FluxoLoginResponse.builder()
+                    .requerSelecaoPerfil(false)
+                    .perfisUnidades(perfis)
+                    .sessao(sessao)
+                    .build());
+        }
+
+        String token = gerenciadorJwt.gerarTokenPreAuth(request.tituloEleitoral());
+        adicionarCookiePreAuth(httpResponse, token);
+
+        return ResponseEntity.ok(FluxoLoginResponse.builder()
+                .requerSelecaoPerfil(perfis.size() > 1)
+                .perfisUnidades(perfis)
+                .sessao(null)
+                .build());
     }
 
     /**
@@ -100,13 +114,37 @@ public class LoginController {
                 .build();
 
         Cookie cookie = new Cookie("jwtToken", token);
+        adicionarCookieJwt(httpResponse, token);
+        limparCookiePreAuth(httpResponse);
+
+        return ResponseEntity.ok(response);
+    }
+
+    private void adicionarCookiePreAuth(HttpServletResponse response, String token) {
+        Cookie cookie = new Cookie("SGC_PRE_AUTH", token);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(!ambienteTestes);
+        cookie.setPath("/");
+        cookie.setMaxAge(300);
+        response.addCookie(cookie);
+    }
+
+    private void adicionarCookieJwt(HttpServletResponse response, String token) {
+        Cookie cookie = new Cookie("jwtToken", token);
         cookie.setHttpOnly(true);
         cookie.setSecure(!ambienteTestes);
         cookie.setPath("/");
         cookie.setMaxAge(86400);
-        httpResponse.addCookie(cookie);
+        response.addCookie(cookie);
+    }
 
-        return ResponseEntity.ok(response);
+    private void limparCookiePreAuth(HttpServletResponse response) {
+        Cookie cookie = new Cookie("SGC_PRE_AUTH", "");
+        cookie.setHttpOnly(true);
+        cookie.setSecure(!ambienteTestes);
+        cookie.setPath("/");
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
     }
 
     private String extrairTituloPreAuth(HttpServletRequest request) {

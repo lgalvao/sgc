@@ -11,7 +11,7 @@ function obterBaseUrlWorker(_workerIndex: number): string {
 }
 
 function ehErroEsperadoAutenticacao(url: string, status?: number): boolean {
-    return status === 401 && url.endsWith('/api/usuarios/autorizar');
+    return status === 401 && url.endsWith('/api/usuarios/login');
 }
 
 function ehErroEsperadoImportacaoDuplicada(url: string, status?: number, method?: string, body?: string): boolean {
@@ -70,7 +70,7 @@ export const test = base.extend<{
             }
 
             if (text.includes('Failed to load resource: the server responded with a status of 401')
-                && locationUrl.endsWith('/api/usuarios/autorizar')) {
+                && locationUrl.endsWith('/api/usuarios/login')) {
                 return;
             }
 

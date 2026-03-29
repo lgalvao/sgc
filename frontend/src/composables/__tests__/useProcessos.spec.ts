@@ -3,7 +3,6 @@ import type {Processo} from "@/types/tipos";
 import {SituacaoProcesso, TipoProcesso} from "@/types/tipos";
 import {normalizeError} from "@/utils/apiError";
 
-vi.mock("@/services/painelService");
 vi.mock("@/services/processoService");
 
 const {loggerMock} = vi.hoisted(() => ({
@@ -17,7 +16,6 @@ vi.mock("@/utils", () => ({
 }));
 
 describe("useProcessos", () => {
-    let painelService: Mocked<typeof import("@/services/painelService")>;
     let processoService: Mocked<typeof import("@/services/processoService")>;
     let useProcessos: typeof import("../useProcessos").useProcessos;
 
@@ -37,7 +35,6 @@ describe("useProcessos", () => {
         vi.clearAllMocks();
         vi.resetModules();
 
-        painelService = await import("@/services/painelService") as Mocked<typeof import("@/services/painelService")>;
         processoService = await import("@/services/processoService") as Mocked<typeof import("@/services/processoService")>;
         ({useProcessos} = await import("../useProcessos"));
     });
@@ -45,70 +42,21 @@ describe("useProcessos", () => {
     it("deve inicializar com o estado padrão", () => {
         const composable = useProcessos();
 
-        expect(composable.processosPainel.value).toEqual([]);
         expect(composable.processoDetalhe.value).toBeNull();
     });
 
     it("deve limpar o erro com clearError", async () => {
         const composable = useProcessos();
-        painelService.listarProcessos.mockRejectedValue(ERRO_MOCK);
+        processoService.buscarContextoCompleto.mockRejectedValue(ERRO_MOCK);
 
         await expect(
-            composable.buscarProcessosPainel(1, 0, 10),
+            composable.buscarContextoCompleto(1),
         ).rejects.toThrow(ERRO_MOCK);
 
         expect(composable.lastError.value).toEqual(normalizeError(ERRO_MOCK));
 
         composable.clearError();
         expect(composable.lastError.value).toBeNull();
-    });
-
-    describe("buscarProcessosPainel", () => {
-        it("deve atualizar o estado em caso de sucesso", async () => {
-            const composable = useProcessos();
-            const paginaMock = {content: [{codigo: 1}], totalPages: 1};
-            painelService.listarProcessos.mockResolvedValue(paginaMock as any);
-
-            await composable.buscarProcessosPainel(1, 0, 10);
-
-            expect(painelService.listarProcessos).toHaveBeenCalledWith(1, 0, 10, undefined, undefined);
-            expect(composable.processosPainel.value).toEqual(paginaMock.content);
-        });
-
-        it("deve respeitar ordenacao personalizada", async () => {
-            const composable = useProcessos();
-            const paginaMock = {content: [{codigo: 2}], totalPages: 1};
-            painelService.listarProcessos.mockResolvedValue(paginaMock as any);
-
-            await composable.buscarProcessosPainel(1, 0, 10, "descricao", "asc");
-
-            expect(painelService.listarProcessos).toHaveBeenCalledWith(
-                1,
-                0,
-                10,
-                "descricao",
-                "asc",
-            );
-            expect(composable.processosPainel.value).toEqual(paginaMock.content);
-        });
-
-        it("deve retornar lista vazia se painelService retornar nulo", async () => {
-            const composable = useProcessos();
-            painelService.listarProcessos.mockResolvedValue(null as any);
-            await composable.buscarProcessosPainel(1, 0, 10);
-            expect(composable.processosPainel.value).toEqual([]);
-        });
-
-        it("deve registrar erro quando a busca falhar", async () => {
-            const composable = useProcessos();
-            painelService.listarProcessos.mockRejectedValue(ERRO_MOCK);
-
-            await expect(
-                composable.buscarProcessosPainel(1, 0, 10),
-            ).rejects.toThrow(ERRO_MOCK);
-
-            expect(composable.lastError.value).toEqual(normalizeError(ERRO_MOCK));
-        });
     });
 
     describe("buscarContextoCompleto", () => {

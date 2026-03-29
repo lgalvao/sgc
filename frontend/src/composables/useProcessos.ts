@@ -3,16 +3,11 @@ import type {
     AtualizarProcessoRequest,
     CriarProcessoRequest,
     Processo,
-    ProcessoResumo,
     SubprocessoElegivel
 } from "@/types/tipos";
 import * as processoService from "@/services/processoService";
-import type {Page} from "@/services/painelService";
-import * as painelService from "@/services/painelService";
 import {useErrorHandler} from "@/composables/useErrorHandler";
 
-const processosPainel = ref<ProcessoResumo[]>([]);
-const processosPainelPage = ref<Page<ProcessoResumo>>(criarPaginaVazia<ProcessoResumo>());
 const processoDetalhe = ref<Processo | null>(null);
 const subprocessosElegiveis = ref<SubprocessoElegivel[]>([]);
 const {lastError, clearError, withErrorHandling} = useErrorHandler();
@@ -32,26 +27,6 @@ async function executarComTratamentoECarregamento<T>(
     onError?: () => void,
 ) {
     return withErrorHandling(acao, onError);
-}
-
-async function buscarProcessosPainel(
-    unidade: number,
-    page: number,
-    size: number,
-    sort?: keyof ProcessoResumo,
-    order?: "asc" | "desc",
-) {
-    return executarComTratamentoECarregamento(async () => {
-        const response = await painelService.listarProcessos(
-            unidade,
-            page,
-            size,
-            sort,
-            order,
-        );
-        processosPainel.value = response?.content ?? [];
-        processosPainelPage.value = response ?? criarPaginaVazia<ProcessoResumo>();
-    });
 }
 
 async function criarProcesso(request: CriarProcessoRequest) {
@@ -122,28 +97,12 @@ async function buscarContextoCompleto(codProcesso: number) {
     });
 }
 
-function criarPaginaVazia<T>(): Page<T> {
-    return {
-        content: [],
-        totalPages: 0,
-        totalElements: 0,
-        size: 20,
-        number: 0,
-        first: true,
-        last: true,
-        empty: true,
-    };
-}
-
 export function useProcessos() {
     return {
-        processosPainel,
-        processosPainelPage,
         processoDetalhe,
         subprocessosElegiveis,
         lastError,
         clearError,
-        buscarProcessosPainel,
         buscarProcessoDetalhe,
         criarProcesso,
         atualizarProcesso,

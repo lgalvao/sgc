@@ -7,15 +7,8 @@ import * as painelService from '@/services/painelService';
 import {createMemoryHistory, createRouter} from 'vue-router';
 
 vi.mock('@/services/painelService', () => ({
+  listarProcessos: vi.fn(),
   listarAlertas: vi.fn(),
-}));
-
-const mockBuscarProcessosPainel = vi.fn();
-vi.mock('@/composables/useProcessos', () => ({
-  useProcessos: () => ({
-    processosPainel: { value: [] },
-    buscarProcessosPainel: mockBuscarProcessosPainel,
-  }),
 }));
 
 const mockRouterPush = vi.fn();
@@ -72,6 +65,13 @@ function createMountOptions(initialStateOverrides = {}) {
 describe('PainelView', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(painelService.listarProcessos).mockResolvedValue({
+      content: [{codigo: 1, descricao: 'Proc 1'}],
+      totalElements: 1,
+      totalPages: 1,
+      size: 10,
+      number: 0,
+    } as any);
     vi.mocked(painelService.listarAlertas).mockResolvedValue({
       content: [{codigo: 1, mensagem: 'Alerta 1'}],
       totalElements: 1,
@@ -90,7 +90,7 @@ describe('PainelView', () => {
     const wrapper = mount(PainelView, options);
     await wrapper.vm.$nextTick();
 
-    expect(mockBuscarProcessosPainel).toHaveBeenCalledWith(1, 0, 10);
+    expect(painelService.listarProcessos).toHaveBeenCalledWith(1, 0, 10, undefined, undefined);
     expect(painelService.listarAlertas).toHaveBeenCalledWith(1, 0, 10, 'dataHora', 'desc');
     expect(mockToastCreate).toHaveBeenCalledWith(expect.objectContaining({ props: expect.objectContaining({ body: 'Sucesso' }) }));
   });
@@ -110,13 +110,13 @@ describe('PainelView', () => {
     // Inverter direção no mesmo critério (default é "descricao" e asc=true)
     vm.ordenarPor('descricao');
     expect(vm.asc).toBe(false);
-    expect(mockBuscarProcessosPainel).toHaveBeenCalledWith(1, 0, 10, 'descricao', 'desc');
+    expect(painelService.listarProcessos).toHaveBeenCalledWith(1, 0, 10, 'descricao', 'desc');
 
     // Mudar critério
     vm.ordenarPor('dataCriacao');
     expect(vm.criterio).toBe('dataCriacao');
     expect(vm.asc).toBe(true);
-    expect(mockBuscarProcessosPainel).toHaveBeenCalledWith(1, 0, 10, 'dataCriacao', 'asc');
+    expect(painelService.listarProcessos).toHaveBeenCalledWith(1, 0, 10, 'dataCriacao', 'asc');
   });
 
   it('deve abrir detalhes do processo se linkDestino existir', async () => {

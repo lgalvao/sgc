@@ -100,12 +100,17 @@ export interface UsuarioDto {
     perfis: string[];
 }
 
-export interface LoginResponseDto {
+export interface SessaoLoginDto {
     tituloEleitoral: string;
     nome: string;
     perfil: string;
     unidadeCodigo: number;
-    token: string;
+}
+
+export interface FluxoLoginResponseDto {
+    requerSelecaoPerfil: boolean;
+    perfisUnidades: PerfilUnidadeDto[];
+    sessao: SessaoLoginDto | null;
 }
 
 /**
@@ -128,4 +133,3 @@ export interface AtividadeOperacaoResponseDto {
     atividadesAtualizadas: AtividadeDto[];
     permissoes?: any;
 }
-

@@ -49,7 +49,7 @@ class LoginControllerLogInjectionTest {
     }
 
     @Test
-    @DisplayName("POST /api/usuarios/autenticar - Deve sanitizar IP no header X-Forwarded-For (Log injection)")
+    @DisplayName("POST /api/usuarios/login - Deve sanitizar IP no header X-Forwarded-For (Log injection)")
     @WithMockUser
     void autenticar_DeveSanitizarIpLogInjection() throws Exception {
         // Payload de Log injection: Tenta injetar uma nova linha e um log falso
@@ -62,8 +62,10 @@ class LoginControllerLogInjectionTest {
                 .build();
 
         when(loginFacade.autenticar("123", "senha")).thenReturn(true);
+        when(loginFacade.buscarAutorizacoesUsuario("123")).thenReturn(java.util.List.of());
+        when(gerenciadorJwt.gerarTokenPreAuth("123")).thenReturn("token-pre-auth");
 
-        mockMvc.perform(post("/api/usuarios/autenticar")
+        mockMvc.perform(post("/api/usuarios/login")
                         .with(csrf())
                         .with(request -> {
                             request.setRemoteAddr(ipMalicioso);

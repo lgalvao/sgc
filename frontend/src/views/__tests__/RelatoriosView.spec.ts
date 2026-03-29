@@ -2,10 +2,10 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 import {ref} from 'vue';
 import {flushPromises, mount} from '@vue/test-utils';
 import Relatorios from '@/views/RelatoriosView.vue';
-import {TipoProcesso} from '@/types/tipos';
+import {SituacaoProcesso, TipoProcesso} from '@/types/tipos';
 import {getCommonMountOptions, setupComponentTest} from '@/test-utils/componentTestHelpers';
 import * as useRelatoriosModule from '@/composables/api/useRelatorios';
-import * as useProcessosModule from '@/composables/useProcessos';
+import * as painelService from '@/services/painelService';
 
 vi.mock("@/composables/usePerfil", () => ({
     usePerfil: vi.fn(() => ({
@@ -21,6 +21,9 @@ describe('Relatorios.vue', () => {
             codigo: 1,
             descricao: 'Processo mapeamento 2024',
             tipo: TipoProcesso.MAPEAMENTO,
+            situacao: SituacaoProcesso.EM_ANDAMENTO,
+            unidadeCodigo: 5,
+            unidadeNome: 'Unidade teste',
             dataCriacao: '2024-01-01',
             dataLimite: '2024-12-31'
         },
@@ -28,6 +31,9 @@ describe('Relatorios.vue', () => {
             codigo: 2,
             descricao: 'Processo revisao 2024',
             tipo: TipoProcesso.REVISAO,
+            situacao: SituacaoProcesso.EM_ANDAMENTO,
+            unidadeCodigo: 5,
+            unidadeNome: 'Unidade teste',
             dataCriacao: '2024-01-01',
             dataLimite: '2024-12-31'
         }
@@ -65,12 +71,22 @@ describe('Relatorios.vue', () => {
             error: ref(null)
         } as any);
 
-        vi.spyOn(useProcessosModule, 'useProcessos').mockReturnValue({
-            processosPainel: ref(mockProcessos),
-            buscarProcessosPainel: vi.fn().mockResolvedValue([])
-        } as any);
+        vi.spyOn(painelService, 'listarProcessos').mockResolvedValue({
+            content: mockProcessos,
+            totalPages: 1,
+            totalElements: mockProcessos.length,
+            size: 100,
+            number: 0,
+            first: true,
+            last: true,
+            empty: false,
+        });
 
-        const mountOptions = getCommonMountOptions({}, stubs);
+        const mountOptions = getCommonMountOptions({
+            perfil: {
+                unidadeSelecionada: {codigo: 5},
+            }
+        }, stubs);
 
         ctx.wrapper = mount(Relatorios, mountOptions);
     });
@@ -84,6 +100,7 @@ describe('Relatorios.vue', () => {
     });
 
     it('deve carregar processos ao montar', async () => {
+        await flushPromises();
         expect(ctx.wrapper!.vm.opcoesProcessos.length).toBeGreaterThan(1);
     });
 
@@ -148,6 +165,7 @@ describe('Relatorios.vue', () => {
         }
 
         // Verificação de opções de processos disponíveis
+        await flushPromises();
         expect(vm.opcoesProcessos.length).toBeGreaterThan(1);
 
         // Tratamento de erros nas chamadas de serviço de relatórios
@@ -171,15 +189,12 @@ describe('Relatorios.vue', () => {
     });
 
     it('deve carregar processos no onMounted se unidade estiver selecionada', async () => {
-        const {usePerfilStore} = await import("@/stores/perfil");
-        const perfilStore = usePerfilStore();
-        perfilStore.unidadeSelecionada = {codigo: 5} as any;
-        
         const _ = mount(Relatorios, getCommonMountOptions({
-            processos: {
-                buscarProcessosPainel: vi.fn().mockResolvedValue([])
+            perfil: {
+                unidadeSelecionada: {codigo: 5},
             }
         }, stubs));
         await flushPromises();
+        expect(painelService.listarProcessos).toHaveBeenCalledWith(5, 0, 100);
     });
 });

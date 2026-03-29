@@ -93,21 +93,19 @@ import {BButton, BCard, BCol, BFormGroup, BFormSelect, BRow, BSpinner, BTab, BTa
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
-import {useProcessos} from "@/composables/useProcessos";
 import {usePerfil} from "@/composables/usePerfil";
 import {usePerfilStore} from "@/stores/perfil";
 import {useNotification} from "@/composables/useNotification";
 import {useRelatorios} from "@/composables/api/useRelatorios";
 import {TEXTOS} from "@/constants/textos";
+import * as painelService from "@/services/painelService";
+import type {ProcessoResumo} from "@/types/tipos";
 
-const {
-  processosPainel,
-  buscarProcessosPainel
-} = useProcessos();
 const perfil = usePerfil();
 const perfilStore = usePerfilStore();
 const { notify } = useNotification();
 const { obterRelatorioAndamento, downloadRelatorioAndamentoPdf, downloadRelatorioMapasPdf } = useRelatorios();
+const processosDisponiveis = ref<ProcessoResumo[]>([]);
 
 const processoIdSelecionado = ref<number | null>(null);
 const processoIdSelecionadoMapas = ref<number | null>(null);
@@ -119,7 +117,7 @@ const gerandoMapas = ref(false);
 const relatorioAndamento = ref<any[]>([]);
 
 const opcoesProcessos = computed(() => {
-  const processos = processosPainel.value || [];
+  const processos = processosDisponiveis.value;
   return [
     { value: null, text: TEXTOS.relatorios.SELECIONE },
     ...processos.map(p => ({ value: p.codigo, text: p.descricao }))
@@ -130,6 +128,26 @@ const opcoesProcessos = computed(() => {
 const opcoesUnidades = ref<Array<{ value: number | null, text: string }>>([
   { value: null, text: TEXTOS.relatorios.TODAS_UNIDADES }
 ]);
+
+function obterCodigoUnidadeSelecionada() {
+  if (!perfil.perfilSelecionado.value || !perfilStore.unidadeSelecionada) {
+    return null;
+  }
+
+  const unidadeSelecionada = perfilStore.unidadeSelecionada as any;
+  return Number(unidadeSelecionada?.codigo || unidadeSelecionada);
+}
+
+async function carregarProcessosDisponiveis() {
+  const unidadeCodigo = obterCodigoUnidadeSelecionada();
+  if (!unidadeCodigo) {
+    processosDisponiveis.value = [];
+    return;
+  }
+
+  const response = await painelService.listarProcessos(unidadeCodigo, 0, 100);
+  processosDisponiveis.value = response?.content ?? [];
+}
 
 const gerarRelatorioAndamento = async () => {
   if (!processoIdSelecionado.value) return;
@@ -168,13 +186,6 @@ const gerarRelatorioMapas = async () => {
 }
 
 onMounted(async () => {
-   if (perfil.perfilSelecionado.value && perfilStore.unidadeSelecionada) {
-      const unidadeCodigo = (perfilStore.unidadeSelecionada as any)?.codigo || perfilStore.unidadeSelecionada;
-      await buscarProcessosPainel(
-          Number(unidadeCodigo),
-          0,
-          100
-      );
-   }
+   await carregarProcessosDisponiveis();
 });
 </script>

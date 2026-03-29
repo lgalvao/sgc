@@ -73,10 +73,20 @@ public class LoginFacade {
      */
     @Transactional(readOnly = true)
     public String entrar(EntrarRequest request, String tituloEleitoral) {
-        Long codUnidade = request.unidadeCodigo();
-        unidadeService.buscarPorCodigo(codUnidade);
+        return entrar(request, tituloEleitoral, null);
+    }
 
-        List<PerfilUnidadeDto> autorizacoes = buscarAutorizacoes(tituloEleitoral);
+    @Transactional(readOnly = true)
+    public String entrar(
+            EntrarRequest request,
+            String tituloEleitoral,
+            @Nullable List<PerfilUnidadeDto> autorizacoesPreCarregadas) {
+        Long codUnidade = request.unidadeCodigo();
+        Unidade unidade = unidadeService.buscarPorCodigo(codUnidade);
+
+        List<PerfilUnidadeDto> autorizacoes = autorizacoesPreCarregadas != null
+                ? autorizacoesPreCarregadas
+                : buscarAutorizacoes(tituloEleitoral);
         Perfil perfilSolicitado = Perfil.valueOf(request.perfil());
 
         if (perfilSolicitado == ADMIN) {
@@ -96,7 +106,7 @@ public class LoginFacade {
             }
         }
 
-        String siglaUnidade = unidadeService.buscarPorCodigo(codUnidade).getSigla();
+        String siglaUnidade = unidade.getSigla();
         log.info("Usuário {} autorizado: {}-{}", mascarar(tituloEleitoral), perfilSolicitado, siglaUnidade);
 
         return gerenciadorJwt.gerarToken(

@@ -69,7 +69,6 @@ import {formatDateTimeBR} from "@/utils";
 import TabelaProcessos from "@/components/processo/TabelaProcessos.vue";
 import {usePerfilStore} from "@/stores/perfil";
 import {usePerfil} from "@/composables/usePerfil";
-import {useProcessos} from "@/composables/useProcessos";
 import {useToastStore} from "@/stores/toast";
 import type {Alerta, ProcessoResumo} from "@/types/tipos";
 import type {Page} from "@/services/painelService";
@@ -78,9 +77,9 @@ import {TEXTOS} from "@/constants/textos";
 
 const perfilStore = usePerfilStore();
 const perfil = usePerfil();
-const {processosPainel, buscarProcessosPainel} = useProcessos();
 const toastStore = useToastStore();
 const toast = useToast();
+const processosPainel = ref<ProcessoResumo[]>([]);
 const alertas = ref<Alerta[]>([]);
 const alertasPage = ref<Page<Alerta>>({} as Page<Alerta>);
 
@@ -101,6 +100,22 @@ async function buscarAlertas(
   alertasPage.value = response;
 }
 
+async function buscarProcessosPainel(
+    unidade: number,
+    page: number,
+    size: number,
+    sort?: keyof ProcessoResumo,
+    order?: "asc" | "desc",
+) {
+  const response = await painelService.listarProcessos(
+      unidade,
+      page,
+      size,
+      sort,
+      order,
+  );
+  processosPainel.value = response?.content ?? [];
+}
 
 async function carregarDados() {
   if (perfil.perfilSelecionado.value && perfilStore.unidadeSelecionada) {

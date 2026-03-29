@@ -64,8 +64,7 @@ public class ConfigSeguranca {
                                                    CorsConfigurationSource corsConfigurationSource,
                                                    FiltroJwt filtroJwt) {
         http.authorizeHttpRequests(auth -> auth.requestMatchers(
-                                "/api/usuarios/autenticar",
-                                "/api/usuarios/autorizar",
+                                "/api/usuarios/login",
                                 "/api/usuarios/entrar")
                         .permitAll()
                         .requestMatchers("/actuator/**")
@@ -79,7 +78,7 @@ public class ConfigSeguranca {
                 // Habilita CSRF usando cookies (padrão para SPAs como Vue/React)
                 // O cliente deve ler o cookie XSRF-TOKEN e enviar no header X-XSRF-TOKEN
                 .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/api/usuarios/autenticar", "/api/usuarios/autorizar", "/api/usuarios/entrar")
+                        .ignoringRequestMatchers("/api/usuarios/login", "/api/usuarios/entrar")
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                         .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler()))
                 .httpBasic(AbstractHttpConfigurer::disable)
