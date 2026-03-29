@@ -73,6 +73,7 @@ Faça uma mudança curta, valide, registre aprendizado, então siga.
 
 - Não manter estado global só por conveniência.
 - Não deixar composable escrever em store paralelo sem necessidade explícita.
+- Não usar store singleton como ponte implícita entre uma action recém-chamada e a leitura imediata da mesma tela.
 - Não tratar service, composable e store como camadas obrigatórias se uma delas só repassa chamadas sem agregar contrato.
 - Se uma única view consome o estado, prefira sincronização local ou contexto explícito.
 - Não criar wrapper visual novo sem ganho claro de contrato, acessibilidade, responsividade ou padronização.
@@ -101,6 +102,7 @@ Faça uma mudança curta, valide, registre aprendizado, então siga.
 
 - views com repetição de `loading`, erro, modal, redirect ou sincronização de dados;
 - composables que atualizam outros stores por dentro;
+- actions que já carregam um recurso, mas obrigam a view a reler um singleton para usar o resultado;
 - stores finas com um único consumidor real;
 - estado exposto mas sem uso em produção;
 - services ou wrappers que só repassam chamada sem agregar contrato;
@@ -138,6 +140,8 @@ Faça uma mudança curta, valide, registre aprendizado, então siga.
 - Se várias validações repetem a mesma coleta, centralize a coleta.
 - Se uma função altera outro store por dentro, prefira fazê-la retornar o dado.
 - Se uma tela depende de contexto herdado, prefira buscar uma referência explícita.
+- Se uma action busca um detalhe e a tela precisa dele imediatamente, prefira retornar esse detalhe em vez de depender de leitura posterior do store global.
+- Se uma recarga automática não tem consumidor real além do recurso local afetado, remova o efeito colateral e recarregue só o que a tela usa.
 
 5. Validar logo após cada bloco.
 

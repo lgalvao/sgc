@@ -243,7 +243,6 @@ import ModalPadrao from "@/components/comum/ModalPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import AceitarMapaModal from "@/components/mapa/AceitarMapaModal.vue";
 import HistoricoAnaliseModal from "@/components/processo/HistoricoAnaliseModal.vue";
-import {useProcessos} from "@/composables/useProcessos";
 import {useSubprocessos} from "@/composables/useSubprocessos";
 import {useNotification} from "@/composables/useNotification";
 import {useToastStore} from "@/stores/toast";
@@ -252,13 +251,19 @@ import {useAcesso} from "@/composables/useAcesso";
 import logger from "@/utils/logger";
 import {listarAnalisesCadastro} from "@/services/analiseService";
 import {obterMapaVisualizacao} from "@/services/subprocessoService";
+import {
+  aceitarValidacao as aceitarValidacaoService,
+  apresentarSugestoes as apresentarSugestoesService,
+  devolverValidacao as devolverValidacaoService,
+  homologarValidacao as homologarValidacaoService,
+  validarMapa as validarMapaService,
+} from "@/services/processoService";
 import {buscarUnidadePorSigla as buscarUnidadeServico} from "@/services/unidadeService";
 import type {Analise, MapaVisualizacao, Unidade} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
 
 const route = useRoute();
 const router = useRouter();
-const processos = useProcessos();
 const subprocessosStore = useSubprocessos();
 const {notify} = useNotification();
 const toastStore = useToastStore();
@@ -343,7 +348,7 @@ async function confirmarSugestoes() {
   if (!codSubprocesso.value || !sugestoes.value.trim()) return;
   try {
     await executarComLoading(async () => {
-      await processos.apresentarSugestoes(codSubprocesso.value!, {
+      await apresentarSugestoesService(codSubprocesso.value!, {
         sugestoes: sugestoes.value,
       });
       await concluirAcaoPainel(TEXTOS.sucesso.MAPA_SUBMETIDO_COM_SUGESTOES, fecharModalSugestoes);
@@ -357,7 +362,7 @@ async function confirmarValidacao() {
   if (!codSubprocesso.value) return;
   try {
     await executarComLoading(async () => {
-      await processos.validarMapa(codSubprocesso.value!);
+      await validarMapaService(codSubprocesso.value!);
       await concluirAcaoPainel(TEXTOS.sucesso.MAPA_VALIDADO_SUBMETIDO, fecharModalValidar);
     });
   } catch {
@@ -372,9 +377,9 @@ async function confirmarAceitacao(observacao = "") {
   try {
     await executarComLoading(async () => {
       if (isHomologacao) {
-        await processos.homologarValidacao(codSubprocesso.value!, {texto: observacao});
+        await homologarValidacaoService(codSubprocesso.value!, {texto: observacao});
       } else {
-        await processos.aceitarValidacao(codSubprocesso.value!, {texto: observacao});
+        await aceitarValidacaoService(codSubprocesso.value!, {texto: observacao});
       }
       await concluirAcaoPainel(
           isHomologacao ? TEXTOS.mapa.SUCESSO_HOMOLOGACAO : TEXTOS.sucesso.ACEITE_REGISTRADO,
@@ -391,7 +396,7 @@ async function confirmarDevolucao() {
   if (!codSubprocesso.value) return;
   try {
     await executarComLoading(async () => {
-      await processos.devolverValidacao(codSubprocesso.value!, {
+      await devolverValidacaoService(codSubprocesso.value!, {
         justificativa: observacaoDevolucao.value,
       });
       await concluirAcaoPainel(TEXTOS.sucesso.DEVOLUCAO_REALIZADA, fecharModalDevolucao);
