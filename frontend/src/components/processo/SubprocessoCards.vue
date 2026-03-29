@@ -6,7 +6,7 @@
           md="4"
       >
         <BCard
-            v-if="podeEditarCadastroFinal"
+            v-if="podeEditarCadastro"
             :class="['h-100', habilitarAcessoCadastro ? 'card-actionable' : 'card-disabled']"
             data-testid="card-subprocesso-atividades"
             :role="habilitarAcessoCadastro ? 'button' : undefined"
@@ -48,7 +48,7 @@
           md="4"
       >
         <BCard
-            v-if="podeEditarMapaFinal"
+            v-if="podeEditarMapa"
             class="h-100 card-actionable"
             data-testid="card-subprocesso-mapa-edicao"
             role="button"
@@ -163,9 +163,8 @@ import {BCard, BCardText, BCardTitle, BCol, BRow} from "bootstrap-vue-next";
 import {useRouter} from "vue-router";
 import {computed} from "vue";
 import {useAcesso} from "@/composables/useAcesso";
-import {useProcessos} from "@/composables/useProcessos";
 import {useSubprocessos} from "@/composables/useSubprocessos";
-import {type Mapa, type MapaCompleto, SituacaoProcesso, type SubprocessoDetalhe, TipoProcesso} from "@/types/tipos";
+import {type Mapa, type MapaCompleto, type SubprocessoDetalhe, TipoProcesso} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
 
 const TipoProcessoEnum = TipoProcesso;
@@ -182,22 +181,10 @@ const props = defineProps<{
 
 const router = useRouter();
 const subprocessosStore = useSubprocessos();
-const processos = useProcessos();
 
 const subprocesso = computed(() => props.subprocesso ?? subprocessosStore.subprocessoDetalhe);
 
-const isProcessoFinalizado = computed(() => {
-  const processoDetalhe = processos.processoDetalhe.value;
-  if (!processoDetalhe || processoDetalhe.codigo !== props.codProcesso) {
-    return false;
-  }
-  return processoDetalhe.situacao === SituacaoProcesso.FINALIZADO;
-});
-
 const {podeEditarCadastro, podeEditarMapa, habilitarAcessoCadastro, habilitarAcessoMapa} = useAcesso(subprocesso);
-
-const podeEditarCadastroFinal = computed(() => podeEditarCadastro.value && !isProcessoFinalizado.value);
-const podeEditarMapaFinal = computed(() => podeEditarMapa.value && !isProcessoFinalizado.value);
 const mapaHabilitado = computed(() => habilitarAcessoMapa.value);
 
 function navegarPara(routeName: string) {

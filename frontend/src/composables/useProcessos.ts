@@ -4,8 +4,7 @@ import type {
     CriarProcessoRequest,
     Processo,
     ProcessoResumo,
-    SubprocessoElegivel,
-    UnidadeImportacao
+    SubprocessoElegivel
 } from "@/types/tipos";
 import * as processoService from "@/services/processoService";
 import type {Page} from "@/services/painelService";
@@ -15,10 +14,7 @@ import {useErrorHandler} from "@/composables/useErrorHandler";
 const processosPainel = ref<ProcessoResumo[]>([]);
 const processosPainelPage = ref<Page<ProcessoResumo>>(criarPaginaVazia<ProcessoResumo>());
 const processoDetalhe = ref<Processo | null>(null);
-const processosFinalizados = ref<ProcessoResumo[]>([]);
-const processosParaImportacao = ref<ProcessoResumo[]>([]);
 const subprocessosElegiveis = ref<SubprocessoElegivel[]>([]);
-const carregando = ref(false);
 const {lastError, clearError, withErrorHandling} = useErrorHandler();
 
 function setProcessoDetalhe(processo: Processo | null) {
@@ -32,11 +28,9 @@ async function recarregarProcessoDetalheAtual() {
 }
 
 async function executarComCarregamento<T>(acao: () => Promise<T>) {
-    carregando.value = true;
     try {
         return await acao();
     } finally {
-        carregando.value = false;
     }
 }
 
@@ -91,22 +85,6 @@ async function iniciarProcesso(codigo: number, tipo: string, unidades: number[])
     return executarComTratamentoECarregamento(async () => {
         await processoService.iniciarProcesso(codigo, tipo, unidades);
     });
-}
-
-async function buscarProcessosFinalizados() {
-    return executarComTratamentoECarregamento(async () => {
-        processosFinalizados.value = await processoService.buscarProcessosFinalizados() ?? [];
-    });
-}
-
-async function buscarProcessosParaImportacao() {
-    return executarComTratamentoECarregamento(async () => {
-        processosParaImportacao.value = await processoService.buscarProcessosParaImportacao() ?? [];
-    });
-}
-
-async function buscarUnidadesParaImportacao(codigoProcesso: number): Promise<UnidadeImportacao[]> {
-    return withErrorHandling(async () => processoService.buscarUnidadesParaImportacao(codigoProcesso));
 }
 
 async function buscarProcessoDetalhe(codigoProcesso: number) {
@@ -169,16 +147,10 @@ export function useProcessos() {
         processosPainel,
         processosPainelPage,
         processoDetalhe,
-        processosFinalizados,
-        processosParaImportacao,
         subprocessosElegiveis,
-        carregando,
         lastError,
         clearError,
         buscarProcessosPainel,
-        buscarProcessosFinalizados,
-        buscarProcessosParaImportacao,
-        buscarUnidadesParaImportacao,
         buscarProcessoDetalhe,
         criarProcesso,
         atualizarProcesso,

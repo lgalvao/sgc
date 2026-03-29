@@ -31,7 +31,13 @@ Exemplos:
 }
 
 function isCamelCase(palavra) {
-    return [...palavra.slice(1)].some((letra) => letra === letra.toUpperCase() && letra !== letra.toLowerCase());
+    for (const letra of palavra.slice(1)) {
+        if (letra === letra.toUpperCase() && letra !== letra.toLowerCase()) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 async function listarArquivos(diretorio) {

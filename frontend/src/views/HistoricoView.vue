@@ -26,20 +26,19 @@ import {BSpinner} from 'bootstrap-vue-next';
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import PageHeader from '@/components/layout/PageHeader.vue';
 import TabelaProcessos from "@/components/processo/TabelaProcessos.vue";
-import {useProcessos} from '@/composables/useProcessos';
+import * as processoService from '@/services/processoService';
 import type {ProcessoResumo} from "@/types/tipos";
 import {logger} from '@/utils';
 
 const router = useRouter();
-const processos = useProcessos();
-const listaProcessosFinalizados = computed(() => processos.processosFinalizados.value);
+const processosFinalizados = ref<ProcessoResumo[]>([]);
 const loading = ref(false);
 
 const criterio = ref<keyof ProcessoResumo>("dataFinalizacao");
 const asc = ref(false);
 
 const processosOrdenados = computed(() => {
-  const lista = [...listaProcessosFinalizados.value];
+  const lista = [...processosFinalizados.value];
   const campo = criterio.value;
   const direcao = asc.value ? 1 : -1;
 
@@ -59,9 +58,10 @@ const processosOrdenados = computed(() => {
 async function carregarHistorico() {
   loading.value = true;
   try {
-    await processos.buscarProcessosFinalizados();
+    processosFinalizados.value = await processoService.buscarProcessosFinalizados() ?? [];
   } catch (e) {
     logger.error("Erro ao carregar histórico:", e);
+    processosFinalizados.value = [];
   } finally {
     loading.value = false;
   }

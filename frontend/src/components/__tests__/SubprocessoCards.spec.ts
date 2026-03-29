@@ -11,14 +11,6 @@ vi.mock('vue-router', () => ({
     useRouter: () => ({push: pushMock})
 }));
 
-const processosMock = {
-    processoDetalhe: ref<any>(null),
-};
-
-vi.mock('@/composables/useProcessos', () => ({
-    useProcessos: () => processosMock,
-}));
-
 describe('SubprocessoCards.vue', () => {
     const defaultProps = {
         tipoProcesso: TipoProcesso.MAPEAMENTO,
@@ -29,10 +21,6 @@ describe('SubprocessoCards.vue', () => {
     };
 
     const mountComponent = (propsOverrides: any = {}, accessOverrides: any = {}) => {
-        processosMock.processoDetalhe.value = {
-            situacao: accessOverrides.situacaoProcesso ?? 'EM_ANDAMENTO',
-        };
-
         vi.spyOn(useAcessoModule, 'useAcesso').mockReturnValue({
             podeEditarMapa: ref(accessOverrides.podeEditarMapa ?? true),
             podeEditarCadastro: ref(accessOverrides.podeEditarCadastro ?? true),

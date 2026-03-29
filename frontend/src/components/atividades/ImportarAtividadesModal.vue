@@ -26,7 +26,7 @@
         <BFormSelect
             id="processo-select"
             v-model="processoSelecionadoId"
-            :options="processos.processosParaImportacao.value"
+            :options="processosParaImportacao"
             data-testid="select-processo"
             text-field="descricao"
             value-field="codigo"
@@ -41,7 +41,7 @@
           </template>
         </BFormSelect>
         <div
-            v-if="!processos.processosParaImportacao.value.length"
+            v-if="!processosParaImportacao.length"
             class="text-center text-muted mt-3"
         >
           {{ TEXTOS.atividades.importacao.NENHUM_PROCESSO }}
@@ -138,7 +138,7 @@
 <script lang="ts" setup>
 import {BAlert, BButton, BFormCheckbox, BFormSelect, BFormSelectOption, BModal, BSpinner} from "bootstrap-vue-next";
 import {onMounted, ref, watch} from "vue";
-import {useProcessos} from "@/composables/useProcessos";
+import * as processoService from "@/services/processoService";
 import * as subprocessoService from "@/services/subprocessoService";
 import {type Atividade, type ProcessoResumo, type UnidadeImportacao,} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
@@ -154,10 +154,10 @@ const emit = defineEmits<{
   importar: [aviso?: string];
 }>();
 
-const processos = useProcessos();
 const resultadoImportacao = ref<{aviso?: string} | null>(null);
 const erroImportacao = ref<string | null>(null);
 const importando = ref(false);
+const processosParaImportacao = ref<ProcessoResumo[]>([]);
 
 const processoSelecionado = ref<ProcessoResumo | null>(null);
 const processoSelecionadoId = ref<number | null>(null);
@@ -173,17 +173,17 @@ onMounted(() => {
 
 watch(
     () => props.mostrar,
-    (mostrar) => {
+    async (mostrar) => {
       if (mostrar) {
         resetModal();
-        processos.buscarProcessosParaImportacao();
+        processosParaImportacao.value = await processoService.buscarProcessosParaImportacao() ?? [];
       }
     },
 );
 
 watch(processoSelecionadoId, async (newId) => {
   if (newId) {
-    const processo = processos.processosParaImportacao.value.find(
+    const processo = processosParaImportacao.value.find(
         (p) => p.codigo === Number(newId),
     );
     if (processo) {
@@ -225,7 +225,7 @@ async function selecionarProcesso(processo: ProcessoResumo | null) {
   processoSelecionado.value = processo;
   atividadesSelecionadas.value = [];
   if (processo) {
-    unidadesParticipantes.value = await processos.buscarUnidadesParaImportacao(processo.codigo);
+    unidadesParticipantes.value = await processoService.buscarUnidadesParaImportacao(processo.codigo);
   } else {
     unidadesParticipantes.value = [];
   }
