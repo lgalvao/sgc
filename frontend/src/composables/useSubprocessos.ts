@@ -5,6 +5,7 @@ import {
     buscarSubprocessoPorProcessoEUnidade as serviceBuscarSubprocessoPorProcessoEUnidade,
 } from "@/services/subprocessoService";
 import {usePerfilStore} from "@/stores/perfil";
+import {useMapas} from "@/composables/useMapas";
 import type {SituacaoSubprocesso, SubprocessoDetalhe} from "@/types/tipos";
 import {useErrorHandler} from "@/composables/useErrorHandler";
 import {normalizeError} from "@/utils/apiError";
@@ -131,6 +132,11 @@ async function buscarContextoEdicao(codigo: number) {
         const detalhesDto = data.detalhes || data;
 
         atualizarDetalheLocal(detalhesDto);
+
+        if (data.mapa) {
+            const {mapaCompleto} = useMapas();
+            mapaCompleto.value = data.mapa;
+        }
 
         return data;
     });
