@@ -4,11 +4,11 @@ import {createMemoryHistory, createRouter} from 'vue-router';
 import {createTestingPinia} from '@pinia/testing';
 import VisMapa from '@/views/MapaVisualizacaoView.vue';
 import AceitarMapaModal from "@/components/mapa/AceitarMapaModal.vue";
-import {ref} from 'vue';
 import {useToastStore} from "@/stores/toast";
 import {SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 import {setupComponentTest} from "@/test-utils/componentTestHelpers";
 import * as useAcessoModule from '@/composables/useAcesso';
+import * as processoServiceModule from '@/services/processoService';
 import * as subprocessoServiceModule from '@/services/subprocessoService';
 
 vi.mock("@/services/unidadeService", () => ({
@@ -28,6 +28,9 @@ vi.mock("@/services/processoService", () => ({
     }),
     validarMapa: vi.fn().mockResolvedValue({}),
     apresentarSugestoes: vi.fn().mockResolvedValue({}),
+    aceitarValidacao: vi.fn().mockResolvedValue({}),
+    homologarValidacao: vi.fn().mockResolvedValue({}),
+    devolverValidacao: vi.fn().mockResolvedValue({}),
 }));
 vi.mock("@/services/subprocessoService", () => ({
     buscarSubprocessoPorProcessoEUnidade: vi.fn().mockResolvedValue({codigo: 10}),
@@ -38,20 +41,6 @@ vi.mock("@/services/subprocessoService", () => ({
 vi.mock("@/services/analiseService", () => ({
     listarAnalisesCadastro: vi.fn().mockResolvedValue([]),
     listarAnalisesValidacao: vi.fn().mockResolvedValue([]),
-}));
-
-const processosMock = {
-    processoDetalhe: ref<any>(null),
-    buscarProcessoDetalhe: vi.fn(),
-    validarMapa: vi.fn(),
-    apresentarSugestoes: vi.fn(),
-    aceitarValidacao: vi.fn(),
-    homologarValidacao: vi.fn(),
-    devolverValidacao: vi.fn(),
-};
-
-vi.mock("@/composables/useProcessos", () => ({
-    useProcessos: () => processosMock
 }));
 
 const router = createRouter({
@@ -85,7 +74,7 @@ describe("VisMapa.vue", () => {
         await router.isReady();
     });
 
-    const mountComponent = (initialState: any = {}, siglaUnidade = "TEST", accessOverrides: any = {}) => {
+    const mountComponent = (initialState: any = {}, _ = "TEST", accessOverrides: any = {}) => {
         vi.spyOn(useAcessoModule, 'useAcesso').mockReturnValue({
             podeValidarMapa: {value: true},
             podeApresentarSugestoes: {value: true},
@@ -101,19 +90,6 @@ describe("VisMapa.vue", () => {
             podeVisualizarMapa: {value: true},
             ...accessOverrides
         });
-
-        processosMock.processoDetalhe.value = {
-            unidades: [
-                {
-                    sigla: siglaUnidade,
-                    codUnidade: 10,
-                    codSubprocesso: 10,
-                    situacaoSubprocesso: SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO,
-                },
-            ],
-            ...initialState["processos"],
-        };
-
         context.wrapper = mount(VisMapa, {
             global: {
                 plugins: [
@@ -347,7 +323,7 @@ describe("VisMapa.vue", () => {
         await confirmBtn.trigger("click");
         await flushPromises();
 
-        expect(processosMock.validarMapa).toHaveBeenCalledWith(10);
+        expect(processoServiceModule.validarMapa).toHaveBeenCalledWith(10);
         expect(toastStore.setPending).toHaveBeenCalled();
     });
 
@@ -368,7 +344,7 @@ describe("VisMapa.vue", () => {
         await confirmBtn.trigger("click");
         await flushPromises();
 
-        expect(processosMock.apresentarSugestoes).toHaveBeenCalledWith(10, {
+        expect(processoServiceModule.apresentarSugestoes).toHaveBeenCalledWith(10, {
             sugestoes: "Minhas sugestões",
         });
         expect(toastStore.setPending).toHaveBeenCalled();
@@ -403,7 +379,7 @@ describe("VisMapa.vue", () => {
         );
         await confirmBtn.trigger("click");
 
-        expect(processosMock.devolverValidacao).toHaveBeenCalledWith(10, {
+        expect(processoServiceModule.devolverValidacao).toHaveBeenCalledWith(10, {
             justificativa: "Ajustar X",
         });
     });
@@ -434,7 +410,7 @@ describe("VisMapa.vue", () => {
 
         modal.vm.$emit("confirmar-aceitacao", "Obs aceite");
 
-        expect(processosMock.aceitarValidacao).toHaveBeenCalledWith(10, {texto: "Obs aceite"});
+        expect(processoServiceModule.aceitarValidacao).toHaveBeenCalledWith(10, {texto: "Obs aceite"});
     });
 
     it("confirms homologacao (ADMIN)", async () => {
@@ -462,7 +438,7 @@ describe("VisMapa.vue", () => {
         const modal = wrapper.findComponent(AceitarMapaModal);
         modal.vm.$emit("confirmar-aceitacao", "Obs homolog");
 
-        expect(processosMock.homologarValidacao).toHaveBeenCalledWith(10, {texto: "Obs homolog"});
+        expect(processoServiceModule.homologarValidacao).toHaveBeenCalledWith(10, {texto: "Obs homolog"});
     });
 
     it("shows historico de analise", async () => {
@@ -561,7 +537,7 @@ describe("VisMapa.vue", () => {
         const modal = wrapper.findComponent(AceitarMapaModal);
         modal.vm.$emit("confirmar-aceitacao", "Obs homolog");
 
-        expect(processosMock.homologarValidacao).toHaveBeenCalledWith(10, {texto: "Obs homolog"});
+        expect(processoServiceModule.homologarValidacao).toHaveBeenCalledWith(10, {texto: "Obs homolog"});
     });
 
     it("handles error in confirmarAceitacao", async () => {
@@ -580,7 +556,7 @@ describe("VisMapa.vue", () => {
                 },
             },
         });
-        (processosMock.aceitarValidacao as any).mockRejectedValue(new Error("Fail"));
+        vi.mocked(processoServiceModule.aceitarValidacao).mockRejectedValue(new Error("Fail"));
 
         await wrapper
             .find('[data-testid="btn-mapa-homologar-aceite"]')
@@ -591,7 +567,7 @@ describe("VisMapa.vue", () => {
         modal.vm.$emit("confirmar-aceitacao", "Obs");
         await flushPromises();
 
-        expect(processosMock.aceitarValidacao).toHaveBeenCalled();
+        expect(processoServiceModule.aceitarValidacao).toHaveBeenCalled();
     });
 
     it("handles error in confirmarDevolucao", async () => {
@@ -610,7 +586,7 @@ describe("VisMapa.vue", () => {
                 },
             },
         });
-        (processosMock.devolverValidacao as any).mockRejectedValue(new Error("Fail"));
+        vi.mocked(processoServiceModule.devolverValidacao).mockRejectedValue(new Error("Fail"));
 
         await wrapper.find('[data-testid="btn-mapa-devolver"]').trigger("click");
         await wrapper.vm.$nextTick();
@@ -621,33 +597,33 @@ describe("VisMapa.vue", () => {
         await wrapper.find('[data-testid="btn-devolucao-mapa-confirmar"]').trigger("click");
         await flushPromises();
 
-        expect(processosMock.devolverValidacao).toHaveBeenCalled();
+        expect(processoServiceModule.devolverValidacao).toHaveBeenCalled();
     });
 
     it("handles error in confirmarValidacao", async () => {
         const {wrapper} = mountComponent({}, "TEST", {podeValidarMapa: {value: true}});
-        (processosMock.validarMapa as any).mockRejectedValue(new Error("Fail"));
+        vi.mocked(processoServiceModule.validarMapa).mockRejectedValue(new Error("Fail"));
 
         await wrapper.find('[data-testid="btn-mapa-validar"]').trigger("click");
         await wrapper.vm.$nextTick();
         await wrapper.find('[data-testid="btn-validar-mapa-confirmar"]').trigger("click");
         await flushPromises();
 
-        expect(processosMock.validarMapa).toHaveBeenCalled();
+        expect(processoServiceModule.validarMapa).toHaveBeenCalled();
     });
 
     it("handles error in confirmarSugestoes", async () => {
         const {wrapper} = mountComponent({
             perfil: {perfilSelecionado: "CHEFE"}
         }, "TEST", {podeValidarMapa: {value: true}});
-        (processosMock.apresentarSugestoes as any).mockRejectedValue(new Error("Fail"));
+        vi.mocked(processoServiceModule.apresentarSugestoes).mockRejectedValue(new Error("Fail"));
         await wrapper.find('[data-testid="btn-mapa-sugestoes"]').trigger("click");
         await wrapper.vm.$nextTick();
         await wrapper.find('[data-testid="inp-sugestoes-mapa-texto"]').setValue("Sugestão com erro");
         await wrapper.find('[data-testid="btn-sugestoes-mapa-confirmar"]').trigger("click");
         await flushPromises();
 
-        expect(processosMock.apresentarSugestoes).toHaveBeenCalled();
+        expect(processoServiceModule.apresentarSugestoes).toHaveBeenCalled();
     });
 
     it("closes ver sugestoes modal", async () => {
