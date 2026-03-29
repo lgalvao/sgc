@@ -1,91 +1,98 @@
 package sgc.seguranca.login;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.core.env.Environment;
 import sgc.comum.erros.ErroConfiguracao;
 
+import java.lang.reflect.Field;
 import java.time.Clock;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.Map;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 @DisplayName("LimitadorTentativasLogin - Cobertura de Testes")
 class LimitadorTentativasLoginCoverageTest {
 
     @Mock
     private Environment environment;
 
-    private Clock clock;
+    private RelogioMutavel relogio;
     private LimitadorTentativasLogin target;
 
     @BeforeEach
     void setUp() {
-        // Fixando o clock para testes de tempo
-        clock = Clock.fixed(Instant.parse("2026-03-26T10:00:00Z"), ZoneId.of("UTC"));
-        // Mock padrão: limiter HABILITADO
+        relogio = new RelogioMutavel("2026-03-26T10:00:00Z");
         when(environment.getProperty("aplicacao.ambiente-testes", Boolean.class, false)).thenReturn(false);
         when(environment.getActiveProfiles()).thenReturn(new String[]{"prod"});
-        
-        target = new LimitadorTentativasLogin(environment, 2, clock); // Max 2 entradas para testar cache cheio
+
+        target = new LimitadorTentativasLogin(environment, 2, relogio);
     }
 
     @Test
     @DisplayName("Deve cobrir a remoção do IP mais antigo quando o cache está cheio")
     void deveCobrirRemocaoIpMaisAntigoQuandoCacheCheio() {
-        // Preenche o cache com 2 IPs
         target.verificar("1.1.1.1");
         target.verificar("2.2.2.2");
-        
+
         assertThat(target.getCacheSize()).isEqualTo(2);
-        
-        // Verifica um terceiro IP - deve disparar encontrarIpMaisAntigo e remover
+
         target.verificar("3.3.3.3");
-        
+
         assertThat(target.getCacheSize()).isEqualTo(2);
-        assertThat(target.getCacheSize()).isLessThanOrEqualTo(2);
     }
 
     @Test
-    @DisplayName("Deve cobrir o caso excepcional de cache vazio em encontrarIpMaisAntigo")
+    @DisplayName("Deve cobrir o fallback de primeiro IP quando o cache contém apenas filas vazias")
+    void deveCobrirFallbackPrimeiroIpQuandoFilasVazias() throws Exception {
+        target = new LimitadorTentativasLogin(environment, 1, relogio);
+
+        @SuppressWarnings("unchecked")
+        Map<String, Deque<LocalDateTime>> cacheInterno = (Map<String, Deque<LocalDateTime>>) acessarCampo(target, "tentativasPorIp");
+        cacheInterno.put("10.0.0.1", new ConcurrentLinkedDeque<>());
+
+        target.verificar("10.0.0.2");
+
+        assertThat(target.getCacheSize()).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("Deve cobrir o caso excepcional de cache vazio ao tentar remover")
     void deveCobrirErroConfiguracaoCacheVazio() {
-        // Este é um caso difícil de atingir normalmente, mas vamos testar via reflexão 
-        // ou chamando o método privado se ele fosse acessível. 
-        // Como o método encontrarIpMaisAntigo é privado, vamos tentar induzir o erro.
-        
-        // Se conseguirmos chegar na linha 73 com tentativasPorIp vazio.
-        // O código entra em encontrarIpMaisAntigo() quando o tamanho >= maxCacheEntries.
-        // Se definirmos maxCacheEntries como 0.
-        target = new LimitadorTentativasLogin(environment, 0, clock);
-        
-        assertThatThrownBy(() -> target.verificar("any-ip"))
-            .isInstanceOf(ErroConfiguracao.class)
-            .hasMessageContaining("cache vazio");
+        target = new LimitadorTentativasLogin(environment, 0, relogio);
+
+        assertThatThrownBy(() -> target.verificar("qualquer-ip"))
+                .isInstanceOf(ErroConfiguracao.class)
+                .hasMessageContaining("cache vazio");
     }
 
     @Test
-    @DisplayName("Deve cobrir a limpeza de tentativas antigas para um IP")
-    void deveCobrirLimpezaTentativasAntigas() {
+    @DisplayName("Deve limpar tentativas antigas e remover entrada vazia antes de registrar nova tentativa")
+    void deveCobrirLimpezaTentativasAntigasComRemocaoDoIp() {
+        target = new LimitadorTentativasLogin(environment, 10, relogio);
         target.verificar("1.1.1.1");
-        
-        // Avança o clock em 2 minutos (janela é de 1 minuto)
-        Clock clockFuturo = Clock.fixed(Instant.parse("2026-03-26T10:02:00Z"), ZoneId.of("UTC"));
-        target = new LimitadorTentativasLogin(environment, 10, clockFuturo);
-        
-        // Ao verificar o mesmo IP, deve limpar as anteriores e, se ficar vazio, remover do mapa
-        // mas aqui ele vai adicionar uma nova, então não remove o IP do mapa na linha 103 imediatamente
-        // Para cobrir a linha 103 (remover IP se vazio), precisamos que o loop limpe tudo e a condição seja satisfeita.
-        
-        // Na verdade, a linha 103 é: if (tentativas.isEmpty()) { tentativasPorIp.remove(ip); }
-        // Isso acontece dentro de limparTentativasAntigas(ip).
-        
-        target.verificar("1.1.1.1"); 
-        // Aqui ele limpou a antiga (linha 101), mas adicionou uma nova (linha 55).
+
+        relogio.avancarPara("2026-03-26T10:02:00Z");
+
+        target.verificar("1.1.1.1");
+
+        assertThat(target.getCacheSize()).isEqualTo(1);
     }
 
     @Test
@@ -93,6 +100,7 @@ class LimitadorTentativasLoginCoverageTest {
     void deveCobrirIpBranco() {
         target.verificar("");
         target.verificar("   ");
+
         assertThat(target.getCacheSize()).isEqualTo(0);
     }
 
@@ -100,7 +108,132 @@ class LimitadorTentativasLoginCoverageTest {
     @DisplayName("Deve cobrir o caso em que o limiter está desabilitado por perfil")
     void deveCobrirLimiterDesabilitadoPorPerfil() {
         when(environment.getActiveProfiles()).thenReturn(new String[]{"test"});
+
         target.verificar("1.2.3.4");
+
         assertThat(target.getCacheSize()).isEqualTo(0);
+    }
+
+    @Test
+    @DisplayName("Deve cobrir filtro com fila vazia e fila preenchida ao buscar IP mais antigo")
+    void deveCobrirFiltroMistoAoBuscarIpMaisAntigo() throws Exception {
+        @SuppressWarnings("unchecked")
+        Map<String, Deque<LocalDateTime>> cacheInterno = (Map<String, Deque<LocalDateTime>>) acessarCampo(target, "tentativasPorIp");
+
+        Deque<LocalDateTime> filaVazia = new ArrayDeque<>();
+        Deque<LocalDateTime> filaPreenchida = new ArrayDeque<>();
+        filaPreenchida.add(LocalDateTime.now(relogio));
+
+        cacheInterno.put("10.0.0.1", filaVazia);
+        cacheInterno.put("10.0.0.2", filaPreenchida);
+
+        String ipMaisAntigo = (String) invocarMetodo(target, "encontrarIpMaisAntigo", new Class<?>[]{}, new Object[]{});
+        assertThat(ipMaisAntigo).isEqualTo("10.0.0.2");
+    }
+
+    @Test
+    @DisplayName("Deve cobrir fallback para primeira chave quando todas as filas estao vazias")
+    void deveCobrirFallbackPrimeiraChaveQuandoFilasVazias() throws Exception {
+        @SuppressWarnings("unchecked")
+        Map<String, Deque<LocalDateTime>> cacheInterno = (Map<String, Deque<LocalDateTime>>) acessarCampo(target, "tentativasPorIp");
+        cacheInterno.put("10.0.0.1", new ArrayDeque<>());
+        cacheInterno.put("10.0.0.2", new ArrayDeque<>());
+
+        String ipMaisAntigo = (String) invocarMetodo(target, "encontrarIpMaisAntigo", new Class<?>[]{}, new Object[]{});
+        assertThat(ipMaisAntigo).isNotBlank();
+        assertThat(cacheInterno).containsKey(ipMaisAntigo);
+    }
+
+    @Test
+    @DisplayName("Deve manter tentativa recente ao limpar tentativas antigas")
+    void deveCobrirRamoQuandoTentativaAindaEstaNaJanela() throws Exception {
+        @SuppressWarnings("unchecked")
+        Map<String, Deque<LocalDateTime>> cacheInterno = (Map<String, Deque<LocalDateTime>>) acessarCampo(target, "tentativasPorIp");
+        Deque<LocalDateTime> tentativas = new ArrayDeque<>();
+        tentativas.add(LocalDateTime.now(relogio));
+        cacheInterno.put("10.0.0.9", tentativas);
+
+        invocarMetodo(
+                target,
+                "limparTentativasAntigas",
+                new Class<?>[]{String.class},
+                new Object[]{"10.0.0.9"});
+
+        assertThat(cacheInterno).containsKey("10.0.0.9");
+        assertThat(cacheInterno.get("10.0.0.9")).hasSize(1);
+    }
+
+    @Test
+    @DisplayName("Deve remover IP quando todas as tentativas estao expiradas")
+    void deveCobrirRemocaoDoIpQuandoTentativasExpiradas() throws Exception {
+        @SuppressWarnings("unchecked")
+        Map<String, Deque<LocalDateTime>> cacheInterno = (Map<String, Deque<LocalDateTime>>) acessarCampo(target, "tentativasPorIp");
+        Deque<LocalDateTime> tentativasExpiradas = new ArrayDeque<>();
+        tentativasExpiradas.add(LocalDateTime.now(relogio).minusMinutes(5));
+        cacheInterno.put("10.0.0.10", tentativasExpiradas);
+
+        invocarMetodo(
+                target,
+                "limparTentativasAntigas",
+                new Class<?>[]{String.class},
+                new Object[]{"10.0.0.10"});
+
+        assertThat(cacheInterno).doesNotContainKey("10.0.0.10");
+    }
+
+    @Test
+    @DisplayName("Deve remover IP quando a fila de tentativas ja inicia vazia")
+    void deveCobrirRamoComFilaInicialmenteVazia() throws Exception {
+        @SuppressWarnings("unchecked")
+        Map<String, Deque<LocalDateTime>> cacheInterno = (Map<String, Deque<LocalDateTime>>) acessarCampo(target, "tentativasPorIp");
+        cacheInterno.put("10.0.0.11", new ArrayDeque<>());
+
+        invocarMetodo(
+                target,
+                "limparTentativasAntigas",
+                new Class<?>[]{String.class},
+                new Object[]{"10.0.0.11"});
+
+        assertThat(cacheInterno).doesNotContainKey("10.0.0.11");
+    }
+
+    private static Object acessarCampo(Object alvo, String nomeCampo) throws Exception {
+        Field campo = alvo.getClass().getDeclaredField(nomeCampo);
+        campo.setAccessible(true);
+        return campo.get(alvo);
+    }
+
+    private static Object invocarMetodo(
+            Object alvo, String nomeMetodo, Class<?>[] tiposParametros, Object[] argumentos) throws Exception {
+        var metodo = alvo.getClass().getDeclaredMethod(nomeMetodo, tiposParametros);
+        metodo.setAccessible(true);
+        return metodo.invoke(alvo, argumentos);
+    }
+
+    private static final class RelogioMutavel extends Clock {
+        private Instant instanteAtual;
+
+        private RelogioMutavel(String instanteInicialIso) {
+            this.instanteAtual = Instant.parse(instanteInicialIso);
+        }
+
+        private void avancarPara(String novoInstanteIso) {
+            this.instanteAtual = Instant.parse(novoInstanteIso);
+        }
+
+        @Override
+        public ZoneId getZone() {
+            return ZoneId.of("UTC");
+        }
+
+        @Override
+        public Clock withZone(ZoneId zone) {
+            return this;
+        }
+
+        @Override
+        public Instant instant() {
+            return instanteAtual;
+        }
     }
 }
