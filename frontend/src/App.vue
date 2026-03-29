@@ -17,7 +17,7 @@ const route = useRoute();
 const version = (pkg as PackageJson).version;
 
 const shouldShowNavBarExtras = computed(() => {
-  if (route.path === "/login") return false;
+  if (route.path === "/login" || route.path === "/erro") return false;
   return route.path !== "/painel";
 
 });
@@ -34,7 +34,7 @@ const shouldShowNavBarExtras = computed(() => {
   <BOrchestrator/>
 
   <div class="d-flex flex-column min-vh-100">
-    <MainNavbar v-if="route.path !== '/login'"/>
+    <MainNavbar v-if="route.path !== '/login' && route.path !== '/erro'"/>
     <div
         v-if="shouldShowNavBarExtras"
         class="bg-light border-bottom"
@@ -49,7 +49,7 @@ const shouldShowNavBarExtras = computed(() => {
     </main>
 
     <footer
-        v-if="route.path !== '/login'"
+        v-if="route.path !== '/login' && route.path !== '/erro'"
         class="bg-light text-muted border-top mt-auto"
     >
       <div class="container-fluid py-2 small d-flex justify-content-between align-items-center">

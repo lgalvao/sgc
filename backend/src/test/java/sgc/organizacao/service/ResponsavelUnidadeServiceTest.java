@@ -129,6 +129,23 @@ class ResponsavelUnidadeServiceTest {
             verify(atribuicaoTemporariaRepo).save(captor.capture());
             assertThat(captor.getValue().getDataInicio()).isNotNull();
         }
+
+        @Test
+        @DisplayName("Deve rejeitar atribuição quando dataTermino for anterior ao inicio")
+        void deveRejeitarAtribuicaoComDataTerminoAnteriorAoInicio() {
+            Long codUnidade = 1L;
+            LocalDate dataInicio = LocalDate.of(2024, 2, 10);
+            LocalDate dataTermino = LocalDate.of(2024, 2, 9);
+            CriarAtribuicaoRequest request = new CriarAtribuicaoRequest("123", dataInicio, dataTermino, "Justificativa");
+
+            when(repo.buscar(Unidade.class, codUnidade)).thenReturn(new Unidade());
+            when(repo.buscar(Usuario.class, "123")).thenReturn(new Usuario().setTituloEleitoral("123"));
+
+            assertThatThrownBy(() -> service.criarAtribuicaoTemporaria(codUnidade, request))
+                    .isInstanceOf(ErroValidacao.class);
+
+            verify(atribuicaoTemporariaRepo, never()).save(any());
+        }
     }
 
     @Nested
@@ -200,6 +217,34 @@ class ResponsavelUnidadeServiceTest {
             assertThat(resultado).isNotNull();
             assertThat(resultado.titularTitulo()).isEqualTo("111111111111");
             assertThat(resultado.substitutoTitulo()).isEqualTo("222222222222");
+        }
+
+        @Test
+        @DisplayName("Deve buscar responsável quando titular oficial é o próprio responsável")
+        void deveBuscarResponsavelQuandoTitularEhOProprioResponsavel() {
+            Long unidadeCodigo = 1L;
+
+            Usuario titular = new Usuario();
+            titular.setTituloEleitoral("111111111111");
+            titular.setNome("João Silva");
+
+            Unidade unidade = new Unidade();
+            unidade.setCodigo(unidadeCodigo);
+            unidade.setTituloTitular("111111111111");
+
+            Responsabilidade responsabilidade = new Responsabilidade();
+            responsabilidade.setUnidadeCodigo(unidadeCodigo);
+            responsabilidade.setUsuarioTitulo("111111111111");
+            responsabilidade.setUnidade(unidade);
+
+            when(repo.buscar(Responsabilidade.class, unidadeCodigo)).thenReturn(responsabilidade);
+            when(repo.buscar(Usuario.class, "111111111111")).thenReturn(titular);
+
+            UnidadeResponsavelDto resultado = service.buscarResponsavelUnidade(unidadeCodigo);
+
+            assertThat(resultado.titularTitulo()).isEqualTo("111111111111");
+            assertThat(resultado.substitutoTitulo()).isNull();
+            assertThat(resultado.substitutoNome()).isNull();
         }
     }
 

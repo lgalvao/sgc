@@ -117,6 +117,7 @@ describe("usePerfilStore", () => {
                 siglaUnidade: "UT",
             };
             const mockFluxoLogin = {
+                autenticado: true,
                 requerSelecaoPerfil: false,
                 perfisUnidades: [perfilUnidade],
                 sessao: {
@@ -139,6 +140,7 @@ describe("usePerfilStore", () => {
             expect(context.store.perfilSelecionado).toBe(Perfil.CHEFE);
             expect(context.store.unidadeSelecionada).toBe(1);
             expect(context.store.unidadeSelecionadaSigla).toBe("UT");
+            expect(result.autenticado).toBe(true);
             expect(result.sessao?.tituloEleitoral).toBe("123");
         });
 
@@ -156,6 +158,7 @@ describe("usePerfilStore", () => {
                 },
             ];
             mockUsuarioService.login.mockResolvedValue({
+                autenticado: true,
                 requerSelecaoPerfil: true,
                 perfisUnidades: perfis,
                 sessao: null,
@@ -221,6 +224,7 @@ describe("usePerfilStore", () => {
             mockUsuarioService.login.mockRejectedValue({isAxiosError: true, response: {status: 401}});
             const result = await context.store.iniciarLogin("123", "pass");
             expect(result.perfisUnidades).toEqual([]);
+            expect(result.autenticado).toBe(false);
             expect(result.sessao).toBeNull();
         });
 
@@ -243,10 +247,12 @@ describe("usePerfilStore", () => {
 
             const result = await context.store.iniciarLogin("123", "pass");
             expect(result.perfisUnidades).toEqual([]);
+            expect(result.autenticado).toBe(false);
 
             mockUsuarioService.login.mockRejectedValue({isAxiosError: true, response: {status: 404}});
             const result2 = await context.store.iniciarLogin("123", "pass");
             expect(result2.perfisUnidades).toEqual([]);
+            expect(result2.autenticado).toBe(false);
 
             mockUsuarioService.login.mockRejectedValue(new Error("Other error"));
             await expect(context.store.iniciarLogin("123", "pass")).rejects.toThrow("Other error");

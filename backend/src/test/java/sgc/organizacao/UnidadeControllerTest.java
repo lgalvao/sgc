@@ -98,6 +98,23 @@ class UnidadeControllerTest {
     }
 
     @Test
+    @DisplayName("Deve exigir mapa vigente para revisão ao buscar árvore de elegibilidade")
+    @WithMockUser
+    void deveExigirMapaVigenteParaRevisaoAoBuscarArvoreDeElegibilidade() throws Exception {
+        when(processoService.buscarIdsUnidadesComProcessosAtivos(10L))
+                .thenReturn(Set.of(1L, 2L));
+        when(hierarquiaService.buscarArvoreComElegibilidade(eq(true), eq(Set.of(1L, 2L))))
+                .thenReturn(Collections.emptyList());
+
+        mockMvc.perform(get("/api/unidades/arvore-com-elegibilidade")
+                        .param("tipoProcesso", "REVISAO")
+                        .param("codProcesso", "10"))
+                .andExpect(status().isOk());
+
+        verify(hierarquiaService).buscarArvoreComElegibilidade(true, Set.of(1L, 2L));
+    }
+
+    @Test
     @DisplayName("Deve verificar mapa vigente e retornar boolean")
     @WithMockUser
     void deveVerificarMapaVigente() throws Exception {

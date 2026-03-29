@@ -125,13 +125,15 @@ import PageHeader from "@/components/layout/PageHeader.vue";
 import AppAlert from "@/components/comum/AppAlert.vue";
 import ProcessoInfo from "@/components/processo/ProcessoInfo.vue";
 import ProcessoSubprocessosTable from "@/components/processo/ProcessoSubprocessosTable.vue";
-import {useProcessos} from "@/composables/useProcessos";
 import {usePerfilStore} from "@/stores/perfil";
 import {useNotification} from "@/composables/useNotification";
 import {useToastStore} from "@/stores/toast";
+import type {Processo, SubprocessoElegivel} from "@/types/tipos";
 import {SituacaoProcesso, SituacaoSubprocesso} from "@/types/tipos";
 import {formatSituacaoSubprocesso} from "@/utils/formatters";
 import {logger} from "@/utils";
+import {normalizeError, type NormalizedError} from "@/utils/apiError";
+import * as processoService from "@/services/processoService";
 import {TEXTOS} from "@/constants/textos";
 
 type ContextoBloco = "cadastro" | "validacao" | "misto";
@@ -145,23 +147,39 @@ type ConfiguracaoTextoAcaoBloco = {
 
 const route = useRoute();
 const router = useRouter();
-const {
-  processoDetalhe: processo,
-  subprocessosElegiveis,
-  lastError,
-  clearError,
-  buscarContextoCompleto,
-  finalizarProcesso: apiFinalizarProcesso,
-  executarAcaoBloco: apiExecutarAcaoBloco
-} = useProcessos();
 const perfilStore = usePerfilStore();
 const {notificacao, notify, clear} = useNotification();
 const toastStore = useToastStore();
 const codProcesso = Number(route.params.codProcesso || route.query.codProcesso);
+const processo = ref<Processo | null>(null);
+const subprocessosElegiveis = ref<SubprocessoElegivel[]>([]);
+const lastError = ref<NormalizedError | null>(null);
 const modalBlocoRef = ref<any>(null);
 const mostrarModalFinalizacao = ref(false);
 const acaoBlocoAtual = ref<AcaoBloco>("aceitar");
 const processandoAcaoBloco = ref(false);
+
+function clearError() {
+  lastError.value = null;
+}
+
+async function carregarContextoCompleto() {
+  clearError();
+  processo.value = null;
+  subprocessosElegiveis.value = [];
+
+  try {
+    const data = await processoService.buscarContextoCompleto(codProcesso);
+    if (data) {
+      processo.value = data;
+      subprocessosElegiveis.value = data.elegiveis ?? [];
+    }
+    return data;
+  } catch (error) {
+    lastError.value = normalizeError(error);
+    throw error;
+  }
+}
 
 const configuracoesAcaoBloco: Record<AcaoBloco, Record<ContextoBloco, ConfiguracaoTextoAcaoBloco>> = {
   aceitar: {
@@ -406,10 +424,12 @@ function finalizarProcesso() {
 
 async function confirmarFinalizacao() {
   try {
-    await apiFinalizarProcesso(codProcesso);
+    clearError();
+    await processoService.finalizarProcesso(codProcesso);
     toastStore.setPending(TEXTOS.sucesso.PROCESSO_FINALIZADO);
     await router.push("/painel");
   } catch (error: any) {
+    lastError.value = normalizeError(error);
     const mensagem = lastError.value?.message || error.message || TEXTOS.processo.ERRO_PADRAO;
     notify(mensagem, 'danger');
   }
@@ -422,11 +442,19 @@ function abrirModalBloco(acao: AcaoBloco) {
 
 async function executarAcaoBloco(dados: { ids: number[], dataLimite?: string }) {
   try {
+    clearError();
     processandoAcaoBloco.value = true;
     modalBlocoRef.value?.setProcessando(true);
     const contextoExecucao = obterContextoAtualAcao(acaoBlocoAtual.value, dados.ids);
     const mensagemSucesso = obterConfiguracaoAcaoBloco(acaoBlocoAtual.value, contextoExecucao).mensagemSucesso;
-    await apiExecutarAcaoBloco(acaoBlocoAtual.value, dados.ids, dados.dataLimite);
+    if (!processo.value) {
+      throw new Error("Detalhes do processo não carregados.");
+    }
+    await processoService.executarAcaoEmBloco(processo.value.codigo, {
+      unidadeCodigos: dados.ids,
+      acao: acaoBlocoAtual.value,
+      dataLimite: dados.dataLimite,
+    });
 
     modalBlocoRef.value?.fechar();
     const deveRedirecionarPainel = acaoBlocoAtual.value === "aceitar" ||
@@ -439,8 +467,9 @@ async function executarAcaoBloco(dados: { ids: number[], dataLimite?: string }) 
       return;
     }
     notify(mensagemSucesso, 'success');
-    await buscarContextoCompleto(codProcesso);
+    await carregarContextoCompleto();
   } catch (error: any) {
+    lastError.value = normalizeError(error);
     modalBlocoRef.value?.setErro(error.message || TEXTOS.processo.ERRO_ACAO_BLOCO);
     modalBlocoRef.value?.setProcessando(false);
   } finally {
@@ -450,7 +479,7 @@ async function executarAcaoBloco(dados: { ids: number[], dataLimite?: string }) 
 
 onMounted(async () => {
   if (codProcesso) {
-    await buscarContextoCompleto(codProcesso);
+    await carregarContextoCompleto();
   }
 });
 

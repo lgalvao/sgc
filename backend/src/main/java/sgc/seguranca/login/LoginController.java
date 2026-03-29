@@ -55,6 +55,9 @@ public class LoginController {
         }
 
         List<PerfilUnidadeDto> perfis = loginFacade.buscarAutorizacoesUsuario(request.tituloEleitoral());
+        if (perfis.isEmpty()) {
+            throw new ErroConfiguracao("Usuário autenticado sem perfil no SGC. Verifique as views de autorização.");
+        }
         if (perfis.size() == 1) {
             PerfilUnidadeDto perfilUnidade = perfis.getFirst();
             EntrarRequest entrarRequest = EntrarRequest.builder()

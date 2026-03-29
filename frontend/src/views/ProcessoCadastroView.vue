@@ -115,14 +115,14 @@ import LoadingButton from "@/components/comum/LoadingButton.vue";
 import ProcessoFormFields from "@/components/processo/ProcessoFormFields.vue";
 import AppAlert from "@/components/comum/AppAlert.vue";
 import {logger} from "@/utils";
-import {normalizeError, shouldNotifyGlobally} from "@/utils/apiError";
+import {isAxiosError, normalizeError, shouldNotifyGlobally} from "@/utils/apiError";
 import {useProcessoForm} from "@/composables/useProcessoForm";
 import {useNotification} from "@/composables/useNotification";
-import {useProcessos} from "@/composables/useProcessos";
 import {TEXTOS} from "@/constants/textos";
 
 import {useToastStore} from "@/stores/toast";
 import {buscarArvoreComElegibilidade, mapUnidadesArray} from "@/services/unidadeService";
+import * as processoService from "@/services/processoService";
 import {Processo as ProcessoModel, TipoProcesso, type Unidade} from "@/types/tipos";
 
 const {
@@ -161,7 +161,6 @@ const formFieldsRef = ref<InstanceType<typeof ProcessoFormFields> | null>(null);
 const isLoading = ref(false);
 const router = useRouter();
 const route = useRoute();
-const processos = useProcessos();
 const toastStore = useToastStore();
 const {notificacao, notify, notifyStructured, clear} = useNotification();
 
@@ -218,7 +217,7 @@ onMounted(async () => {
   if (codProcesso) {
     isLoadingData.value = true;
     try {
-      const processo = await processos.buscarProcessoDetalhe(Number(codProcesso));
+      const processo = await processoService.obterDetalhesProcesso(Number(codProcesso));
       if (processo) {
         // Redireciona se o processo não está em situação CRIADO (não pode ser editado)
         if (processo.situacao !== 'CRIADO') {
@@ -268,21 +267,22 @@ function handleApiErrors(error: any, title: string, defaultMsg: string) {
   clearErrors();
   clear();
 
-  const lastError = processos.lastError.value;
+  const erroNormalizado = normalizeError(error);
+  const usarErroEstruturado = isAxiosError(error) || (erroNormalizado.subErrors?.length ?? 0) > 0;
 
-  if (lastError) {
-    setFromNormalizedError(lastError);
+  if (usarErroEstruturado) {
+    setFromNormalizedError(erroNormalizado);
     if (fieldErrors.value.dataLimiteEtapa1) fieldErrors.value.dataLimite = fieldErrors.value.dataLimiteEtapa1;
 
     const hasFieldErrors = hasErrors();
-    const genericErrors = lastError.subErrors?.filter(e => !e.field).map(e => e.message || '') || [];
+    const genericErrors = erroNormalizado.subErrors?.filter(e => !e.field).map(e => e.message || '') || [];
 
     if (!hasFieldErrors || genericErrors.length > 0) {
       notifyStructured(
-          lastError.message || defaultMsg,
+          erroNormalizado.message || defaultMsg,
           genericErrors as string[],
           'danger',
-          lastError.stackTrace || undefined,
+          erroNormalizado.stackTrace || undefined,
       );
       window.scrollTo(0, 0);
     } else if (hasFieldErrors) {
@@ -297,7 +297,6 @@ function handleApiErrors(error: any, title: string, defaultMsg: string) {
     notify(defaultMsg, 'danger');
   }
 
-  const erroNormalizado = normalizeError(error);
   if (shouldNotifyGlobally(erroNormalizado)) {
     logger.error(title + ":", error);
   }
@@ -311,7 +310,7 @@ async function salvarProcesso() {
   try {
     if (processoEditando.value) {
       const request = construirAtualizarRequest(processoEditando.value.codigo);
-      await processos.atualizarProcesso(
+      await processoService.atualizarProcesso(
           processoEditando.value.codigo,
           request,
       );
@@ -319,7 +318,7 @@ async function salvarProcesso() {
       await router.push("/painel");
     } else {
       const request = construirCriarRequest();
-      await processos.criarProcesso(request);
+      await processoService.criarProcesso(request);
       toastStore.setPending(TEXTOS.sucesso.PROCESSO_CRIADO);
       await router.push("/painel");
     }
@@ -344,7 +343,7 @@ async function confirmarIniciarProcesso() {
   if (!codigoProcesso) {
     try {
       const request = construirCriarRequest();
-      const novoProcesso = await processos.criarProcesso(request);
+      const novoProcesso = await processoService.criarProcesso(request);
       codigoProcesso = novoProcesso.codigo;
     } catch (error) {
       mostrarModalConfirmacao.value = false;
@@ -355,7 +354,7 @@ async function confirmarIniciarProcesso() {
   }
 
   try {
-    await processos.iniciarProcesso(
+    await processoService.iniciarProcesso(
         codigoProcesso,
         tipo.value as TipoProcesso,
         unidadesSelecionadas.value,
@@ -385,7 +384,7 @@ async function confirmarRemocao() {
     isLoading.value = true;
     const descRemovida = processoEditando.value.descricao;
     try {
-      await processos.removerProcesso(processoEditando.value.codigo);
+      await processoService.excluirProcesso(processoEditando.value.codigo);
       toastStore.setPending(TEXTOS.sucesso.PROCESSO_REMOVIDO(descRemovida));
       await router.push("/painel");
       if (!processoEditando.value) {

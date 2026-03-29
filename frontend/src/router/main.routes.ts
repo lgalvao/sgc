@@ -12,6 +12,12 @@ const mainRoutes: RouteRecordRaw[] = [
         meta: {title: "Login"},
     },
     {
+        path: "/erro",
+        name: "ErroGeral",
+        component: () => import("@/views/ErroGeralView.vue"),
+        meta: {title: "Erro"},
+    },
+    {
         path: "/painel",
         name: "Painel",
         component: () => import("@/views/PainelView.vue"),

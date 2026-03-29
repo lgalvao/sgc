@@ -64,6 +64,11 @@ export const TEXTOS = {
     ERRO_SELECAO_PERFIL: "Falha ao selecionar o perfil.",
     ERRO_POR_FAVOR_SELECIONE: "Por favor, selecione um perfil.",
   },
+  erroGeral: {
+    TITULO: "Erro interno do sistema",
+    DESCRICAO: "Ocorreu uma falha interna inesperada. Tente novamente mais tarde.",
+    ACAO: "Voltar ao login",
+  },
   painel: {
     TITULO: "Painel",
     PROCESSOS: "Processos",

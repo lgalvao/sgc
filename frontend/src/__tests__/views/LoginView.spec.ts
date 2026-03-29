@@ -101,7 +101,12 @@ describe("LoginView.vue", () => {
         const wrapper = mount(LoginView, mountOptions());
         const perfilStore = usePerfilStore();
 
-        perfilStore.iniciarLogin = vi.fn().mockResolvedValue({requerSelecaoPerfil: false, perfisUnidades: [MOCK_PERFIS[0]], sessao: {}});
+        perfilStore.iniciarLogin = vi.fn().mockResolvedValue({
+            autenticado: true,
+            requerSelecaoPerfil: false,
+            perfisUnidades: [MOCK_PERFIS[0]],
+            sessao: {} as any
+        });
         perfilStore.perfisUnidades = [MOCK_PERFIS[0]];
 
         await wrapper.find('[data-testid="inp-login-usuario"]').setValue("123");
@@ -116,7 +121,12 @@ describe("LoginView.vue", () => {
         const wrapper = mount(LoginView, mountOptions());
         const perfilStore = usePerfilStore();
 
-        perfilStore.iniciarLogin = vi.fn().mockResolvedValue({requerSelecaoPerfil: false, perfisUnidades: [], sessao: null});
+        perfilStore.iniciarLogin = vi.fn().mockResolvedValue({
+            autenticado: false,
+            requerSelecaoPerfil: false,
+            perfisUnidades: [],
+            sessao: null
+        });
 
         await wrapper.find('[data-testid="inp-login-usuario"]').setValue("123");
         await wrapper.find('[data-testid="inp-login-senha"]').setValue("wrong");
@@ -130,7 +140,12 @@ describe("LoginView.vue", () => {
         const wrapper = mount(LoginView, mountOptions());
         const perfilStore = usePerfilStore();
 
-        perfilStore.iniciarLogin = vi.fn().mockResolvedValue({requerSelecaoPerfil: true, perfisUnidades: MOCK_PERFIS, sessao: null});
+        perfilStore.iniciarLogin = vi.fn().mockResolvedValue({
+            autenticado: true,
+            requerSelecaoPerfil: true,
+            perfisUnidades: MOCK_PERFIS,
+            sessao: null
+        });
         perfilStore.perfisUnidades = MOCK_PERFIS;
 
         await wrapper.find('[data-testid="inp-login-usuario"]').setValue("123");
@@ -145,7 +160,12 @@ describe("LoginView.vue", () => {
         const wrapper = mount(LoginView, mountOptions());
         const perfilStore = usePerfilStore();
 
-        perfilStore.iniciarLogin = vi.fn().mockResolvedValue({requerSelecaoPerfil: true, perfisUnidades: MOCK_PERFIS, sessao: null});
+        perfilStore.iniciarLogin = vi.fn().mockResolvedValue({
+            autenticado: true,
+            requerSelecaoPerfil: true,
+            perfisUnidades: MOCK_PERFIS,
+            sessao: null
+        });
         perfilStore.concluirLoginComPerfil = vi.fn().mockResolvedValue(true);
         perfilStore.perfisUnidades = MOCK_PERFIS;
 
@@ -167,17 +187,13 @@ describe("LoginView.vue", () => {
 
         perfilStore.iniciarLogin = vi.fn().mockRejectedValue(new Error("Erro de rede"));
 
-        const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {
-        });
-
         await wrapper.find('[data-testid="inp-login-usuario"]').setValue("123");
         await wrapper.find('[data-testid="inp-login-senha"]').setValue("pass");
         await wrapper.find('form').trigger('submit');
 
         await new Promise(resolve => setTimeout(resolve, 0));
 
-        expect(wrapper.text()).toContain("Ocorreu um erro ao tentar realizar o login.");
-        consoleSpy.mockRestore();
+        expect(routerPushMock).toHaveBeenCalledWith("/erro");
     });
 
     it("NÃO deve vazar a senha no logger.error se houver falha genérica de login (objeto Axios exposto)", async () => {
@@ -196,35 +212,23 @@ describe("LoginView.vue", () => {
 
         await new Promise(resolve => setTimeout(resolve, 0));
 
-        expect(loggerSpy).toHaveBeenCalledWith("Erro no login:", expect.not.objectContaining({ config: expect.anything() }));
+        expect(loggerSpy).toHaveBeenCalledWith("Erro interno no login:", "API Failure");
         
         loggerSpy.mockRestore();
-    });
-
-    it("deve exibir erro se nenhum perfil estiver disponível (array vazio)", async () => {
-        const wrapper = mount(LoginView, mountOptions());
-        const perfilStore = usePerfilStore();
-
-        perfilStore.iniciarLogin = vi.fn().mockResolvedValue({requerSelecaoPerfil: false, perfisUnidades: [], sessao: null});
-        perfilStore.perfisUnidades = [];
-
-        await wrapper.find('[data-testid="inp-login-usuario"]').setValue("123");
-        await wrapper.find('[data-testid="inp-login-senha"]').setValue("pass");
-        await wrapper.find('form').trigger('submit');
-
-        expect(wrapper.text()).toContain("Nenhum perfil/unidade disponível para este usuário.");
     });
 
     it("deve tratar erro genérico durante seleção de perfil (step 2)", async () => {
         const wrapper = mount(LoginView, mountOptions());
         const perfilStore = usePerfilStore();
 
-        perfilStore.iniciarLogin = vi.fn().mockResolvedValue({requerSelecaoPerfil: true, perfisUnidades: MOCK_PERFIS, sessao: null});
+        perfilStore.iniciarLogin = vi.fn().mockResolvedValue({
+            autenticado: true,
+            requerSelecaoPerfil: true,
+            perfisUnidades: MOCK_PERFIS,
+            sessao: null
+        });
         perfilStore.concluirLoginComPerfil = vi.fn().mockRejectedValue(new Error("Erro ao selecionar"));
         perfilStore.perfisUnidades = MOCK_PERFIS;
-
-        const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {
-        });
 
         await wrapper.find('[data-testid="inp-login-usuario"]').setValue("123");
         await wrapper.find('[data-testid="inp-login-senha"]').setValue("pass");
@@ -234,15 +238,14 @@ describe("LoginView.vue", () => {
 
         await new Promise(resolve => setTimeout(resolve, 0));
 
-        expect(wrapper.text()).toContain("Falha ao selecionar o perfil.");
-        consoleSpy.mockRestore();
+        expect(routerPushMock).toHaveBeenCalledWith("/erro");
     });
 
     it("deve exibir erro se tentar submeter passo 2 sem seleção (caso edge)", async () => {
         const wrapper = mount(LoginView, mountOptions());
         const perfilStore = usePerfilStore();
 
-        perfilStore.iniciarLogin = vi.fn().mockResolvedValue({requerSelecaoPerfil: true, perfisUnidades: MOCK_PERFIS, sessao: null});
+        perfilStore.iniciarLogin = vi.fn().mockResolvedValue({autenticado: true, requerSelecaoPerfil: true, perfisUnidades: MOCK_PERFIS, sessao: null});
         perfilStore.perfisUnidades = MOCK_PERFIS;
 
         await wrapper.find('[data-testid="inp-login-usuario"]').setValue("123");

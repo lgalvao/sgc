@@ -246,6 +246,11 @@ const performInitialLogin = async () => {
       }
   } catch (error: any) {
     const erroNormalizado = normalizeError(error);
+    if (erroNormalizado.kind === 'unexpected') {
+      logger.error("Erro interno no login:", erroNormalizado.message);
+      await router.push("/erro");
+      return;
+    }
     if (erroNormalizado.kind !== 'notFound' && erroNormalizado.kind !== 'unauthorized') {
       logger.error("Erro no login:", error instanceof Error ? error.message : "Erro desconhecido");
     }
@@ -277,6 +282,12 @@ const performProfileSelection = async () => {
       await perfilStore.concluirLoginComPerfil(parSelecionado.value);
       await router.push("/painel");
     } catch (error) {
+      const erroNormalizado = normalizeError(error);
+      if (erroNormalizado.kind === 'unexpected') {
+        logger.error("Erro interno ao selecionar perfil:", erroNormalizado.message);
+        await router.push("/erro");
+        return;
+      }
       logger.error("Erro ao selecionar perfil:", error);
       notify(TEXTOS.login.ERRO_SELECAO_PERFIL, 'danger');
     } finally {

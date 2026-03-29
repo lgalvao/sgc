@@ -403,6 +403,20 @@ class ProcessoServiceCoverageTest {
         }
 
         @Test
+        @DisplayName("isElegivelParaAcaoEmBloco - homologar cadastro autorizado em revisão")
+        void isElegivel_HomologarCadastroRevisao() {
+            Usuario user = new Usuario();
+            Subprocesso sp = new Subprocesso();
+            sp.setSituacao(REVISAO_CADASTRO_DISPONIBILIZADA);
+
+            when(permissionEvaluator.verificarPermissao(any(Usuario.class), any(Subprocesso.class), eq(ACEITAR_CADASTRO))).thenReturn(false);
+            when(permissionEvaluator.verificarPermissao(any(Usuario.class), any(Subprocesso.class), eq(HOMOLOGAR_CADASTRO))).thenReturn(true);
+
+            boolean res = org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "isElegivelParaAcaoEmBloco", sp, user);
+            assertThat(res).isTrue();
+        }
+
+        @Test
         @DisplayName("isElegivelParaAcaoEmBloco - homologar mapa autorizado")
         void isElegivel_HomologarMapa() {
             Usuario user = new Usuario();
@@ -412,6 +426,46 @@ class ProcessoServiceCoverageTest {
             when(permissionEvaluator.verificarPermissao(any(Usuario.class), any(Subprocesso.class), eq(ACEITAR_MAPA))).thenReturn(false);
             when(permissionEvaluator.verificarPermissao(any(Usuario.class), any(Subprocesso.class), eq(HOMOLOGAR_MAPA))).thenReturn(true);
             
+            boolean res = org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "isElegivelParaAcaoEmBloco", sp, user);
+            assertThat(res).isTrue();
+        }
+
+        @Test
+        @DisplayName("isElegivelParaAcaoEmBloco - homologar mapa autorizado em revisão")
+        void isElegivel_HomologarMapaRevisao() {
+            Usuario user = new Usuario();
+            Subprocesso sp = new Subprocesso();
+            sp.setSituacao(REVISAO_MAPA_VALIDADO);
+
+            when(permissionEvaluator.verificarPermissao(any(Usuario.class), any(Subprocesso.class), eq(ACEITAR_MAPA))).thenReturn(false);
+            when(permissionEvaluator.verificarPermissao(any(Usuario.class), any(Subprocesso.class), eq(HOMOLOGAR_MAPA))).thenReturn(true);
+
+            boolean res = org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "isElegivelParaAcaoEmBloco", sp, user);
+            assertThat(res).isTrue();
+        }
+
+        @Test
+        @DisplayName("isElegivelParaAcaoEmBloco - disponibilizar revisão homologada")
+        void isElegivel_DisponibilizarRevisaoHomologada() {
+            Usuario user = new Usuario();
+            Subprocesso sp = new Subprocesso();
+            sp.setSituacao(REVISAO_CADASTRO_HOMOLOGADA);
+
+            when(permissionEvaluator.verificarPermissao(any(Usuario.class), any(Subprocesso.class), eq(DISPONIBILIZAR_MAPA))).thenReturn(true);
+
+            boolean res = org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "isElegivelParaAcaoEmBloco", sp, user);
+            assertThat(res).isTrue();
+        }
+
+        @Test
+        @DisplayName("isElegivelParaAcaoEmBloco - disponibilizar revisão ajustada")
+        void isElegivel_DisponibilizarRevisaoAjustada() {
+            Usuario user = new Usuario();
+            Subprocesso sp = new Subprocesso();
+            sp.setSituacao(REVISAO_MAPA_AJUSTADO);
+
+            when(permissionEvaluator.verificarPermissao(any(Usuario.class), any(Subprocesso.class), eq(DISPONIBILIZAR_MAPA))).thenReturn(true);
+
             boolean res = org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "isElegivelParaAcaoEmBloco", sp, user);
             assertThat(res).isTrue();
         }

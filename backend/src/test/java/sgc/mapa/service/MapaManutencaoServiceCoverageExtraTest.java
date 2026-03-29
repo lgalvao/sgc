@@ -12,6 +12,7 @@ import sgc.subprocesso.service.*;
 
 import java.util.*;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -96,5 +97,67 @@ class MapaManutencaoServiceCoverageExtraTest {
         CriarConhecimentoRequest req = new CriarConhecimentoRequest(1L, "desc");
 
         assertThrows(ErroValidacao.class, () -> mapaService.criarConhecimento(1L, req));
+    }
+
+    @Test
+    void atualizarAtividadeNaoDeveValidarDescricaoDuplicadaQuandoDescricaoNaoMuda() {
+        Mapa mapa = new Mapa();
+        mapa.setCodigo(10L);
+
+        Atividade atividade = new Atividade();
+        atividade.setCodigo(1L);
+        atividade.setDescricao("Descricao");
+        atividade.setMapa(mapa);
+
+        when(repo.buscar(Atividade.class, 1L)).thenReturn(atividade);
+
+        mapaService.atualizarAtividade(1L, new AtualizarAtividadeRequest("descricao"));
+
+        verify(atividadeRepo, never()).findByMapaCodigoSemFetch(anyLong());
+        verify(atividadeRepo).save(atividade);
+    }
+
+    @Test
+    void atualizarDescricoesAtividadeEmBlocoDeveIgnorarDescricaoNula() {
+        Mapa mapa = new Mapa();
+        mapa.setCodigo(10L);
+
+        Atividade atividade = new Atividade();
+        atividade.setCodigo(1L);
+        atividade.setDescricao("Original");
+        atividade.setMapa(mapa);
+
+        when(atividadeRepo.findAllById(Set.of(1L))).thenReturn(List.of(atividade));
+
+        Map<Long, String> descricoesPorCodigo = new HashMap<>();
+        descricoesPorCodigo.put(1L, null);
+
+        mapaService.atualizarDescricoesAtividadeEmBloco(descricoesPorCodigo);
+
+        assertThat(atividade.getDescricao()).isEqualTo("Original");
+        verify(atividadeRepo).saveAll(List.of(atividade));
+    }
+
+    @Test
+    void atualizarConhecimentoNaoDeveValidarDescricaoDuplicadaQuandoDescricaoNaoMuda() {
+        Mapa mapa = new Mapa();
+        mapa.setCodigo(10L);
+
+        Atividade atividade = new Atividade();
+        atividade.setCodigo(1L);
+        atividade.setMapa(mapa);
+
+        Conhecimento conhecimento = new Conhecimento();
+        conhecimento.setCodigo(2L);
+        conhecimento.setDescricao("Conhecimento");
+        conhecimento.setAtividade(atividade);
+
+        when(repo.buscar(eq(Conhecimento.class), eq(Map.of("codigo", 2L, "atividade.codigo", 1L))))
+                .thenReturn(conhecimento);
+
+        mapaService.atualizarConhecimento(1L, 2L, new AtualizarConhecimentoRequest("conhecimento"));
+
+        verify(conhecimentoRepo, never()).findByAtividade_Codigo(anyLong());
+        verify(conhecimentoRepo).save(conhecimento);
     }
 }

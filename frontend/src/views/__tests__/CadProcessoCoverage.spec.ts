@@ -1,27 +1,22 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {flushPromises, mount} from '@vue/test-utils';
-import {nextTick, ref} from 'vue';
+import {nextTick} from 'vue';
 import ProcessoCadastroView from '@/views/ProcessoCadastroView.vue';
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 import * as unidadeService from '@/services/unidadeService';
+import * as processoService from '@/services/processoService';
+
+vi.mock('@/services/processoService', () => ({
+    obterDetalhesProcesso: vi.fn(),
+    criarProcesso: vi.fn(),
+    atualizarProcesso: vi.fn(),
+    iniciarProcesso: vi.fn(),
+    excluirProcesso: vi.fn(),
+}));
 
 vi.mock('@/services/unidadeService', () => ({
     buscarArvoreComElegibilidade: vi.fn().mockResolvedValue([]),
     mapUnidadesArray: vi.fn((arr) => arr || []),
-}));
-
-const processosMock = {
-    processoDetalhe: ref<any>(null),
-    lastError: ref<any>(null),
-    buscarProcessoDetalhe: vi.fn(),
-    criarProcesso: vi.fn(),
-    atualizarProcesso: vi.fn(),
-    iniciarProcesso: vi.fn(),
-    removerProcesso: vi.fn(),
-};
-
-vi.mock('@/composables/useProcessos', () => ({
-    useProcessos: () => processosMock
 }));
 
 const {mockPush, mockRoute} = vi.hoisted(() => {
@@ -62,14 +57,22 @@ const ModalConfirmacaoStub = {
     emits: ['update:modelValue', 'confirmar']
 };
 
+function criarErroApi(message: string, subErrors: Array<{field?: string | null; message?: string}> = []) {
+    return {
+        isAxiosError: true,
+        response: {
+            status: 400,
+            data: {message, subErrors}
+        }
+    } as any;
+}
+
 describe('ProcessoCadastroView.vue Coverage', () => {
     const context = setupComponentTest();
 
     const createWrapper = (initialState = {}) => {
         const processoInicial = (initialState as any).processos?.processoDetalhe ?? null;
-        processosMock.processoDetalhe.value = processoInicial;
-        processosMock.lastError.value = (initialState as any).processos?.lastError ?? null;
-        processosMock.buscarProcessoDetalhe.mockResolvedValue(processoInicial);
+        vi.mocked(processoService.obterDetalhesProcesso).mockResolvedValue(processoInicial);
 
         context.wrapper = mount(ProcessoCadastroView, {
             ...getCommonMountOptions(
@@ -99,14 +102,12 @@ describe('ProcessoCadastroView.vue Coverage', () => {
                 }
             )
         });
-        return {wrapper: context.wrapper, processosStore: processosMock};
+        return {wrapper: context.wrapper};
     };
 
     beforeEach(() => {
         vi.clearAllMocks();
-        processosMock.processoDetalhe.value = null;
-        processosMock.lastError.value = null;
-        processosMock.buscarProcessoDetalhe.mockResolvedValue(null);
+        vi.mocked(processoService.obterDetalhesProcesso).mockResolvedValue(null as any);
         mockRoute.query = {};
         vi.mocked(unidadeService.buscarArvoreComElegibilidade).mockResolvedValue([]);
         vi.mocked(unidadeService.mapUnidadesArray).mockImplementation((arr) => arr || []);
@@ -120,18 +121,15 @@ describe('ProcessoCadastroView.vue Coverage', () => {
     });
 
     it('handles mixed errors (field + generic) correctly in handleApiErrors', async () => {
-        const {wrapper, processosStore} = createWrapper();
+        const {wrapper} = createWrapper();
 
-        processosStore.criarProcesso.mockImplementation(async () => {
-            processosStore.lastError.value = {
-                message: 'Erro misto',
-                subErrors: [
-                    {field: 'descricao', message: 'Descrição inválida'},
-                    {field: null, message: 'Erro genérico de regra de negócio'}
-                ]
-            };
-            throw new Error('Mixed error');
-        });
+        vi.mocked(processoService.criarProcesso).mockRejectedValue(criarErroApi(
+            'Erro misto',
+            [
+                {field: 'descricao', message: 'Descrição inválida'},
+                {field: null, message: 'Erro genérico de regra de negócio'}
+            ],
+        ));
 
         await wrapper.find('[data-testid="inp-processo-descricao"]').setValue('Teste');
         wrapper.vm.tipo = 'MAPEAMENTO';
@@ -147,7 +145,7 @@ describe('ProcessoCadastroView.vue Coverage', () => {
     });
 
     it('handles error creating process during initiation flow (without existing process)', async () => {
-        const {wrapper, processosStore} = createWrapper();
+        const {wrapper} = createWrapper();
 
         await wrapper.find('[data-testid="inp-processo-descricao"]').setValue('Teste inicio');
         wrapper.vm.tipo = 'MAPEAMENTO';
@@ -158,15 +156,14 @@ describe('ProcessoCadastroView.vue Coverage', () => {
         expect(wrapper.vm.mostrarModalConfirmacao).toBe(true);
 
         // Configure error on create
-        processosStore.criarProcesso.mockRejectedValue(new Error('Create error'));
-        processosStore.lastError.value = {message: 'Failed to create'};
+        vi.mocked(processoService.criarProcesso).mockRejectedValue(criarErroApi('Failed to create'));
 
         const modal = wrapper.findComponent({name: 'ModalConfirmacao'});
         await modal.vm.$emit('confirmar');
         await flushPromises();
 
-        expect(processosStore.criarProcesso).toHaveBeenCalled();
-        expect(processosStore.iniciarProcesso).not.toHaveBeenCalled();
+        expect(processoService.criarProcesso).toHaveBeenCalled();
+        expect(processoService.iniciarProcesso).not.toHaveBeenCalled();
         expect(wrapper.vm.notificacao).not.toBeNull();
         expect(wrapper.vm.notificacao?.notification?.summary).toContain('Failed to create');
         expect(wrapper.vm.isLoading).toBe(false);
@@ -177,7 +174,7 @@ describe('ProcessoCadastroView.vue Coverage', () => {
             {codigo: 1, sigla: 'U1', nome: 'Unidade 1', isElegivel: true, filhas: []}
         ] as any);
 
-        const {wrapper, processosStore} = createWrapper();
+        const {wrapper} = createWrapper();
 
         await wrapper.find('[data-testid="inp-processo-descricao"]').setValue('Teste inicio');
         wrapper.vm.tipo = 'MAPEAMENTO';
@@ -187,23 +184,22 @@ describe('ProcessoCadastroView.vue Coverage', () => {
         await (wrapper.vm).abrirModalConfirmacao();
 
         // Configure success on create, failure on start
-        processosStore.criarProcesso.mockResolvedValue({codigo: 777});
-        processosStore.iniciarProcesso.mockRejectedValue(new Error('Start error'));
-        processosStore.lastError.value = {message: 'Failed to start'};
+        vi.mocked(processoService.criarProcesso).mockResolvedValue({codigo: 777} as any);
+        vi.mocked(processoService.iniciarProcesso).mockRejectedValue(criarErroApi('Failed to start'));
 
         const modal = wrapper.findComponent({name: 'ModalConfirmacao'});
         await modal.vm.$emit('confirmar');
         await flushPromises();
 
-        expect(processosStore.criarProcesso).toHaveBeenCalled();
-        expect(processosStore.iniciarProcesso).toHaveBeenCalledWith(777, 'MAPEAMENTO', [1]);
+        expect(processoService.criarProcesso).toHaveBeenCalled();
+        expect(processoService.iniciarProcesso).toHaveBeenCalledWith(777, 'MAPEAMENTO', [1]);
         expect(wrapper.vm.notificacao).not.toBeNull();
         expect(wrapper.vm.notificacao?.notification?.summary).toContain('Failed to start');
         expect(wrapper.vm.isLoading).toBe(false);
     });
 
     it('opens and confirms removal modal', async () => {
-        const {wrapper, processosStore} = createWrapper();
+        const {wrapper} = createWrapper();
 
         (wrapper.vm).processoEditando = {codigo: 123, descricao: 'Processo teste'};
         await nextTick();
@@ -211,24 +207,23 @@ describe('ProcessoCadastroView.vue Coverage', () => {
         await (wrapper.vm).abrirModalRemocao();
         expect((wrapper.vm).mostrarModalRemocao).toBe(true);
 
-        processosStore.removerProcesso.mockResolvedValue(undefined);
+        vi.mocked(processoService.excluirProcesso).mockResolvedValue(undefined);
 
         await (wrapper.vm).confirmarRemocao();
         await flushPromises();
 
-        expect(processosStore.removerProcesso).toHaveBeenCalledWith(123);
+        expect(processoService.excluirProcesso).toHaveBeenCalledWith(123);
         expect(mockPush).toHaveBeenCalledWith('/painel');
         expect((wrapper.vm).mostrarModalRemocao).toBe(false);
     });
 
     it('handles error during removal', async () => {
-        const {wrapper, processosStore} = createWrapper();
+        const {wrapper} = createWrapper();
 
         (wrapper.vm).processoEditando = {codigo: 123, descricao: 'Processo teste'};
         await nextTick();
 
-        processosStore.removerProcesso.mockRejectedValue(new Error('Delete error'));
-        processosStore.lastError.value = {message: 'Failed to delete'};
+        vi.mocked(processoService.excluirProcesso).mockRejectedValue(criarErroApi('Failed to delete'));
 
         await (wrapper.vm).confirmarRemocao();
         await flushPromises();
@@ -248,12 +243,12 @@ describe('ProcessoCadastroView.vue Coverage', () => {
     });
 
     it('confirmarRemocao does nothing if no process editing', async () => {
-        const {wrapper, processosStore} = createWrapper();
+        const {wrapper} = createWrapper();
         (wrapper.vm).processoEditando = null;
 
         await (wrapper.vm).confirmarRemocao();
 
-        expect(processosStore.removerProcesso).not.toHaveBeenCalled();
+        expect(processoService.excluirProcesso).not.toHaveBeenCalled();
     });
 
     it('triggers search for units if type changes', async () => {

@@ -122,6 +122,17 @@ class UsuarioControllerTest {
     }
 
     @Test
+    @DisplayName("POST /api/usuarios/administradores - Deve validar usuarioTitulo em branco")
+    @WithMockUser(roles = "ADMIN")
+    void adicionarAdministrador_DeveValidarUsuarioTituloEmBranco() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/usuarios/administradores")
+                        .with(SecurityMockMvcRequestPostProcessors.csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"usuarioTitulo\": \"   \"}"))
+                .andExpect(status().is(422));
+    }
+
+    @Test
     @DisplayName("POST /api/usuarios/administradores/{usuarioTitulo}/remover - Deve remover (ADMIN)")
     void removerAdministrador_Sucesso() throws Exception {
         Usuario usuarioAtual = new Usuario();

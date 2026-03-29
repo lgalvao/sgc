@@ -568,3 +568,5 @@ O plano terá sido bem executado se:
 * Storybook também entra no escopo da simplificação: stories que continuam simulando o desenho antigo deixam documentação executável desalinhada com o código real.
 * O painel também não precisava compartilhar lista de processos via `useProcessos`: havia um único consumidor real, nenhum reaproveitamento entre telas e nenhum ganho claro de manter paginação/lista como singleton.
 * Depois desse corte, `useProcessos` ficou concentrado em detalhe, contexto completo e ações de processo. Isso é um bom sinal de fronteira útil: menos leitura local disfarçada de estado global e mais API alinhada ao domínio.
+* Nem todo helper precisa continuar como composable. Quando a abstração encolhe para uma ou duas funções puramente locais, com um único consumidor real, voltar para o componente reduz navegação e custo cognitivo.
+* `useValidacao` entrou nesse caso: manter um arquivo separado só para descobrir o primeiro campo com erro já não compensava, e o melhor destino passou a ser o próprio `ProcessoFormFields`.

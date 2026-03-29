@@ -75,6 +75,7 @@ class LoginControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.autenticado").value(true))
                 .andExpect(jsonPath("$.requerSelecaoPerfil").value(false))
                 .andExpect(jsonPath("$.sessao.nome").value("Admin user"))
                 .andExpect(cookie().exists("jwtToken"))
@@ -102,8 +103,9 @@ class LoginControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.autenticado").value(true))
                 .andExpect(jsonPath("$.requerSelecaoPerfil").value(true))
-                .andExpect(jsonPath("$.sessao").doesNotExist())
+                .andExpect(jsonPath("$.sessao").isEmpty())
                 .andExpect(jsonPath("$.perfisUnidades[0].perfil").value("CHEFE"))
                 .andExpect(cookie().value("SGC_PRE_AUTH", "token-pre-auth"));
 
@@ -132,8 +134,14 @@ class LoginControllerTest {
     void login_IpRemoteAddr() throws Exception {
         AutenticarRequest req = criarRequestPadrao();
         when(loginFacade.autenticar("123", "senha")).thenReturn(true);
-        when(loginFacade.buscarAutorizacoesUsuario("123")).thenReturn(List.of());
-        when(gerenciadorJwt.gerarTokenPreAuth("123")).thenReturn("token-pre-auth");
+        UnidadeDto unidadeDto = UnidadeDto.builder().codigo(1L).nome("Adm").sigla("ADM").build();
+        PerfilUnidadeDto perfilUnidade = new PerfilUnidadeDto(Perfil.ADMIN, unidadeDto);
+        Usuario usuario = new Usuario();
+        usuario.setNome("Admin user");
+        usuario.setTituloEleitoral("123");
+        when(loginFacade.buscarAutorizacoesUsuario("123")).thenReturn(List.of(perfilUnidade));
+        when(loginFacade.entrar(any(EntrarRequest.class), eq("123"), anyList())).thenReturn("token-jwt");
+        when(usuarioFacade.buscarPorLogin("123")).thenReturn(usuario);
 
         mockMvc.perform(post("/api/usuarios/login")
                         .with(csrf())
@@ -146,6 +154,22 @@ class LoginControllerTest {
                 .andExpect(status().isOk());
 
         verify(limitadorTentativasLogin).verificar("192.168.1.50");
+    }
+
+    @Test
+    @DisplayName("POST /api/usuarios/login - Deve falhar com erro interno se usuário autenticado não tiver perfis")
+    @WithMockUser
+    void login_SemPerfis_DeveFalharComErroInterno() throws Exception {
+        AutenticarRequest req = criarRequestPadrao();
+        when(loginFacade.autenticar("123", "senha")).thenReturn(true);
+        when(loginFacade.buscarAutorizacoesUsuario("123")).thenReturn(List.of());
+
+        mockMvc.perform(post("/api/usuarios/login")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.code").value("ERRO_INTERNO"));
     }
 
     @Test

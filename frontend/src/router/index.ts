@@ -23,7 +23,7 @@ const router = createRouter({
 router.beforeEach((to) => {
     const perfilStore = usePerfilStore();
     const isAuthenticated = perfilStore.usuarioCodigo;
-    const publicPages = ["/login"];
+    const publicPages = ["/login", "/erro"];
     const authRequired = !publicPages.includes(to.path);
 
     if (authRequired && !isAuthenticated) {
