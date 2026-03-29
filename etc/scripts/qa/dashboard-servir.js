@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 import http from "node:http";
-import path from "node:path";
 import process from "node:process";
 import handler from "serve-handler";
 import {resolverNaRaiz} from "../lib/caminhos.js";

@@ -321,6 +321,46 @@ describe("CLI raiz do toolkit", () => {
         expect(conteudo).toContain("sgc/mapa/model/CompetenciaRepo.java");
     });
 
+    test("prioriza apenas backlog acionavel do JSON e preserva evidencia", async () => {
+        const diretorioSaida = await mkdtemp(path.join(os.tmpdir(), "sgc-testes-priorizar-real-"));
+        const json = path.join(diretorioSaida, "unit-test-report.json");
+        const saida = path.join(diretorioSaida, "prioritized-tests.md");
+
+        await fs.writeJson(json, {
+            categorias: {
+                Services: {
+                    untested: [
+                        {caminho_relativo: "sgc/mapa/service/MapaCriticoService.java", evidencia_qualidade: "sem_evidencia_no_escopo"}
+                    ]
+                },
+                DTOs: {
+                    untested: [
+                        {caminho_relativo: "sgc/mapa/dto/MapaRuidoCommand.java", evidencia_qualidade: "ruido_dto_estrutural", dto_ruido_ignorado: true}
+                    ]
+                },
+                Others: {
+                    untested: [
+                        {caminho_relativo: "sgc/comum/Mensagens.java", evidencia_qualidade: "fora_escopo_jacoco"},
+                        {caminho_relativo: "sgc/seguranca/AcaoPermissao.java", evidencia_qualidade: "cobertura_indireta"}
+                    ]
+                }
+            }
+        });
+
+        const resultado = await executarScriptTestesPriorizar(["--input", json, "--output", saida]);
+
+        expect(resultado.exitCode).toBe(0);
+        expect(resultado.stdout).toContain("Encontrados 1 P1, 0 P2, 1 P3");
+
+        const conteudo = await fs.readFile(saida, "utf-8");
+        expect(conteudo).toContain("sgc/mapa/service/MapaCriticoService.java");
+        expect(conteudo).toContain("sem evidência");
+        expect(conteudo).toContain("sgc/seguranca/AcaoPermissao.java");
+        expect(conteudo).toContain("cobertura indireta");
+        expect(conteudo).not.toContain("Mensagens.java");
+        expect(conteudo).not.toContain("MapaRuidoCommand.java");
+    });
+
     test("resume um snapshot de QA a partir de fixture", async () => {
         const resultado = await executarSgc(["qa", "resumo", "--json", "--arquivo", FIXTURE_SNAPSHOT]);
         expect(resultado.exitCode).toBe(0);

@@ -5,7 +5,9 @@
   "description": "Toolkit unificado de scripts do SGC",
   "scripts": {
     "sgc": "node ./sgc.js",
-    "test": "vitest run"
+    "test": "vitest run",
+    "lint": "oxlint . --node-plugin --vitest-plugin --disable-unicorn-plugin -D correctness -D suspicious --ignore-pattern node_modules --ignore-pattern test/fixtures",
+    "lint:fix": "oxlint . --node-plugin --vitest-plugin --disable-unicorn-plugin -D correctness -D suspicious --ignore-pattern node_modules --ignore-pattern test/fixtures --fix"
   },
   "dependencies": {
     "commander": "^14.0.3",
@@ -19,6 +21,7 @@
     "which": "^6.0.1"
   },
   "devDependencies": {
+    "oxlint": "^1.57.0",
     "vitest": "^4.1.2"
   }
 }

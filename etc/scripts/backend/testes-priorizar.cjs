@@ -105,7 +105,16 @@ function extrairPendenciasDeJson(caminhoEntrada) {
     const dados = JSON.parse(fs.readFileSync(caminhoEntrada, 'utf-8'));
     const pendencias = [];
     Object.values(dados.categorias || {}).forEach(categoria => {
-        (categoria.untested || []).forEach(item => pendencias.push(item.caminho_relativo));
+        (categoria.untested || []).forEach(item => {
+            const ignorado = item.dto_ruido_ignorado || item.model_ruido_ignorado || item.other_ruido_ignorado;
+            if (ignorado || item.evidencia_qualidade === 'fora_escopo_jacoco') {
+                return;
+            }
+            pendencias.push({
+                caminho_relativo: item.caminho_relativo,
+                evidencia_qualidade: item.evidencia_qualidade
+            });
+        });
     });
     return pendencias;
 }
@@ -121,24 +130,42 @@ function carregarPendencias(caminhoEntrada) {
     if (!fs.existsSync(caminhoEntrada)) {
         throw new Error(`Arquivo de entrada nao encontrado: ${caminhoEntrada}`);
     }
-    return caminhoEntrada.endsWith('.json')
+    const pendencias = caminhoEntrada.endsWith('.json')
         ? extrairPendenciasDeJson(caminhoEntrada)
         : extrairPendenciasDeMarkdown(caminhoEntrada);
+    return pendencias.map(item => typeof item === 'string' ? {caminho_relativo: item, evidencia_qualidade: 'desconhecida'} : item);
 }
 
 function priorizar(caminhoEntrada) {
     const pendencias = carregarPendencias(caminhoEntrada);
     const priorizadas = {P1: [], P2: [], P3: []};
 
-    pendencias.forEach(caminhoArquivo => {
-        const prioridade = classificarArquivo(caminhoArquivo);
+    pendencias.forEach(({caminho_relativo, evidencia_qualidade}) => {
+        const prioridade = classificarArquivo(caminho_relativo);
         if (prioridade) {
-            priorizadas[prioridade].push(caminhoArquivo);
+            priorizadas[prioridade].push({
+                caminho_relativo,
+                evidencia_qualidade
+            });
         }
     });
 
-    Object.keys(priorizadas).forEach(chave => priorizadas[chave].sort((a, b) => a.localeCompare(b, 'pt-BR')));
+    Object.keys(priorizadas).forEach(chave => priorizadas[chave].sort((a, b) => {
+        const pesoA = a.evidencia_qualidade === 'sem_evidencia_no_escopo' ? 0 : 1;
+        const pesoB = b.evidencia_qualidade === 'sem_evidencia_no_escopo' ? 0 : 1;
+        return pesoA - pesoB || a.caminho_relativo.localeCompare(b.caminho_relativo, 'pt-BR');
+    }));
     return priorizadas;
+}
+
+function descricaoEvidencia(item) {
+    if (item.evidencia_qualidade === 'cobertura_indireta') {
+        return 'cobertura indireta';
+    }
+    if (item.evidencia_qualidade === 'sem_evidencia_no_escopo') {
+        return 'sem evidência';
+    }
+    return 'pendência';
 }
 
 function gerarMarkdown(priorizadas) {
@@ -151,7 +178,7 @@ function gerarMarkdown(priorizadas) {
     if (priorizadas.P1.length === 0) {
         linhas.push('Nenhuma pendencia critica de logica encontrada.\n');
     } else {
-        priorizadas.P1.forEach(caminho => linhas.push(`- [ ] \`${caminho}\``));
+        priorizadas.P1.forEach(item => linhas.push(`- [ ] \`${item.caminho_relativo}\` (${descricaoEvidencia(item)})`));
     }
 
     linhas.push('\n## P2: Importantes (Integracao e Contratos)\n');
@@ -159,7 +186,7 @@ function gerarMarkdown(priorizadas) {
     if (priorizadas.P2.length === 0) {
         linhas.push('_Nenhum arquivo encontrado._');
     } else {
-        priorizadas.P2.forEach(caminho => linhas.push(`- [ ] \`${caminho}\``));
+        priorizadas.P2.forEach(item => linhas.push(`- [ ] \`${item.caminho_relativo}\` (${descricaoEvidencia(item)})`));
     }
 
     linhas.push('\n## P3: Baixa Prioridade (Dados e Infraestrutura)\n');
@@ -167,7 +194,7 @@ function gerarMarkdown(priorizadas) {
     if (priorizadas.P3.length === 0) {
         linhas.push('_Nenhum arquivo encontrado._');
     } else {
-        priorizadas.P3.forEach(caminho => linhas.push(`- [ ] \`${caminho}\``));
+        priorizadas.P3.forEach(item => linhas.push(`- [ ] \`${item.caminho_relativo}\` (${descricaoEvidencia(item)})`));
     }
 
     return `${linhas.join('\n')}\n`;

@@ -31,7 +31,7 @@ function classificarPerfilDto(conteudoFonte) {
         .replace(/\/\*[\s\S]*?\*\//g, '')
         .replace(/\/\/.*$/gm, '');
 
-    const possuiMetodoExplicito = /\b(public|private|protected)\s+(?!record\b|class\b|interface\b|enum\b)(static\s+)?[\w@.<>\[\]?]+\s+\w+\s*\(/.test(conteudoSemComentarios);
+    const possuiMetodoExplicito = /\b(public|private|protected)\s+(?!record\b|class\b|interface\b|enum\b)(static\s+)?[\w@.<>[\]?]+\s+\w+\s*\(/.test(conteudoSemComentarios);
     const possuiLogica = /\b(for|if|switch|while)\s*\(|->|\.stream\s*\(|\.map\s*\(|\.filter\s*\(|\.collect\s*\(|\breturn\b/.test(conteudoSemComentarios);
     const possuiValidacaoOuContrato = /@(NotNull|NotBlank|NotEmpty|Size|Pattern|Email|Future|Past|Positive|Negative|SanitizarHtml|JsonProperty|JsonView|JsonFormat|JsonIgnoreProperties)\b/.test(conteudoSemComentarios);
 
@@ -46,8 +46,7 @@ function classificarPerfilDto(conteudoFonte) {
     return 'estrutural_puro';
 }
 
-function classificarPerfilModel({nomeClasse, caminhoRelativo, conteudoFonte}) {
-    const caminhoNormalizado = normalizarCaminho(caminhoRelativo);
+function classificarPerfilModel({nomeClasse, conteudoFonte}) {
     const conteudoSemComentarios = conteudoFonte
         .replace(/\/\*[\s\S]*?\*\//g, '')
         .replace(/\/\/.*$/gm, '');
@@ -66,7 +65,7 @@ function classificarPerfilModel({nomeClasse, caminhoRelativo, conteudoFonte}) {
         return 'estrutural_contrato';
     }
 
-    const possuiMetodoExplicito = /\b(public|private|protected)\s+(?!class\b|interface\b|enum\b|record\b)(static\s+)?[\w@.<>\[\]?]+\s+\w+\s*\(/.test(conteudoSemComentarios);
+    const possuiMetodoExplicito = /\b(public|private|protected)\s+(?!class\b|interface\b|enum\b|record\b)(static\s+)?[\w@.<>[\]?]+\s+\w+\s*\(/.test(conteudoSemComentarios);
     const possuiFluxoControle = /\b(for|if|switch|while)\s*\(/.test(conteudoSemComentarios);
     const possuiOperacaoColecao = /\.stream\s*\(|\.map\s*\(|\.filter\s*\(|\.collect\s*\(|removeIf\s*\(|anyMatch\s*\(/.test(conteudoSemComentarios);
     const possuiContratoExposto = /@JsonProperty\b|@JsonView\b/.test(conteudoSemComentarios);
@@ -106,7 +105,7 @@ function classificarPerfilOther({nomeClasse, caminhoRelativo, conteudoFonte}) {
         return 'estrutural_contrato';
     }
 
-    const possuiMetodoExplicito = /\b(public|private|protected)\s+(?!class\b|interface\b|enum\b|record\b)(static\s+)?[\w@.<>\[\]?]+\s+\w+\s*\(/.test(conteudoSemComentarios);
+    const possuiMetodoExplicito = /\b(public|private|protected)\s+(?!class\b|interface\b|enum\b|record\b)(static\s+)?[\w@.<>[\]?]+\s+\w+\s*\(/.test(conteudoSemComentarios);
     const possuiFluxoControle = /\b(for|if|switch|while)\s*\(/.test(conteudoSemComentarios);
     const possuiOperacaoColecao = /\.stream\s*\(|\.map\s*\(|\.filter\s*\(|\.collect\s*\(|removeIf\s*\(|anyMatch\s*\(/.test(conteudoSemComentarios);
     const possuiDominio = /\bthrow\b|\breturn\b/.test(conteudoSemComentarios);
