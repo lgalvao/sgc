@@ -15,6 +15,25 @@ Estes princípios valem para backend e frontend e devem orientar cada rodada:
 * Remover código morto logo após a simplificação.
 * Validar em passos pequenos e registrar aprendizado no próprio plano.
 
+## Decisão atual
+
+Depois dos achados sobre protótipo inicial, round-trips excessivos e desempenho em Oracle, a decisão desta fase é:
+
+* não abrir uma frente paralela grande de instrumentação;
+* continuar simplificando por fluxos completos de tela;
+* usar medição como guarda da simplificação, não como objetivo separado.
+
+Na prática, isso significa:
+
+* frontend:
+  * reduzir round-trips e regra duplicada de workflow;
+  * paralelizar chamadas independentes quando a agregação não for viável ainda;
+  * manter testes de orçamento de chamadas para evitar regressão estrutural;
+* backend:
+  * manter o `MonitoramentoAspect` como apoio para observar o efeito real;
+  * permitir modo de trace completo quando for preciso investigar fluxo específico;
+  * evitar instrumentação invasiva enquanto o desenho ainda está sendo simplificado.
+
 ## 0. Guardrails obrigatórios
 
 Antes de qualquer simplificação, aplicar as seguintes restrições:
