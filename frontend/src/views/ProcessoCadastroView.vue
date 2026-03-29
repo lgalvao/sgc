@@ -218,8 +218,7 @@ onMounted(async () => {
   if (codProcesso) {
     isLoadingData.value = true;
     try {
-      await processos.buscarProcessoDetalhe(Number(codProcesso));
-      const processo = processos.processoDetalhe.value;
+      const processo = await processos.buscarProcessoDetalhe(Number(codProcesso));
       if (processo) {
         // Redireciona se o processo não está em situação CRIADO (não pode ser editado)
         if (processo.situacao !== 'CRIADO') {

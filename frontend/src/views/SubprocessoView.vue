@@ -235,6 +235,7 @@ import {useGerenciadorModals} from "@/composables/useModalManager";
 import {useGerenciadorCarregamento} from "@/composables/useLoadingManager";
 import {useFluxoSubprocesso} from "@/composables/useFluxoSubprocesso";
 import {useSubprocessos} from "@/composables/useSubprocessos";
+import {enviarLembrete as enviarLembreteService} from "@/services/processoService";
 
 import {useAcesso} from "@/composables/useAcesso";
 import {type Movimentacao, type SubprocessoDetalhe, TipoProcesso} from "@/types/tipos";
@@ -449,7 +450,7 @@ async function enviarLembreteConfirmado() {
     return;
   }
   try {
-    await processos.enviarLembrete(props.codProcesso, subprocesso.value.unidade.codigo);
+    await enviarLembreteService(props.codProcesso, subprocesso.value.unidade.codigo);
     await subprocessosStore.buscarSubprocessoDetalhe(codSubprocesso.value);
     modalLembreteAberto.value = false;
     notify(TEXTOS.subprocesso.SUCESSO_LEMBRETE_ENVIADO, 'success');

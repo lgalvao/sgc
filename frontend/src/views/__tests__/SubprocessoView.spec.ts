@@ -3,7 +3,7 @@ import {flushPromises, mount, RouterLinkStub} from '@vue/test-utils';
 import {createTestingPinia} from '@pinia/testing';
 import SubprocessoView from '@/views/SubprocessoView.vue';
 import {useMapas} from '@/composables/useMapas';
-import {reactive, ref} from 'vue';
+import {reactive} from 'vue';
 import {SituacaoSubprocesso, TipoProcesso} from '@/types/tipos';
 import * as processoService from '@/services/processoService';
 import * as useAcessoModule from '@/composables/useAcesso';
@@ -25,11 +25,6 @@ vi.mock('@/services/processoService', () => ({
     enviarLembrete: vi.fn(),
 }));
 
-const processosMock = {
-    processoDetalhe: ref<any>(null),
-    enviarLembrete: vi.fn(),
-};
-
 const fluxoSubprocessoMock = {
     alterarDataLimiteSubprocesso: vi.fn(),
     reabrirCadastro: vi.fn(),
@@ -44,10 +39,6 @@ const subprocessosMock = reactive({
     lastError: null as any,
     clearError: vi.fn(),
 });
-
-vi.mock('@/composables/useProcessos', () => ({
-    useProcessos: () => processosMock
-}));
 
 vi.mock('@/composables/useFluxoSubprocesso', () => ({
     useFluxoSubprocesso: () => fluxoSubprocessoMock
@@ -125,7 +116,6 @@ describe('SubprocessoView.vue', () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
-        processosMock.processoDetalhe.value = null;
         fluxoSubprocessoMock.alterarDataLimiteSubprocesso.mockResolvedValue({});
         fluxoSubprocessoMock.reabrirCadastro.mockResolvedValue(true);
         fluxoSubprocessoMock.reabrirRevisaoCadastro.mockResolvedValue(true);
@@ -166,8 +156,6 @@ describe('SubprocessoView.vue', () => {
 
         const store = subprocessosMock as any;
         const mapaStore = useMapas();
-        processosMock.processoDetalhe.value = {situacao: 'EM_ANDAMENTO'};
-
         (store.buscarSubprocessoPorProcessoEUnidade as any).mockImplementation(async () => 10);
         (store.buscarContextoEdicao as any).mockImplementation(async () => {
             store.subprocessoDetalhe = subprocessoToUse as any;
@@ -178,15 +166,6 @@ describe('SubprocessoView.vue', () => {
         });
         mapaStore.buscarMapaCompleto = vi.fn().mockResolvedValue({});
         mapaStore.mapaCompleto.value = null;
-
-        (processosMock.enviarLembrete as any).mockImplementation(async (codProcesso: number, codUnidade: number) => {
-            try {
-                await (processoService.enviarLembrete as any)(codProcesso, codUnidade);
-                return true;
-            } catch {
-                return false;
-            }
-        });
 
         const wrapper = mount(SubprocessoView, {
             global: {
@@ -203,7 +182,7 @@ describe('SubprocessoView.vue', () => {
             }
         });
 
-        return {wrapper, store, mapaStore, processos: processosMock};
+        return {wrapper, store, mapaStore};
     };
 
     it('fetches data on mount', async () => {

@@ -1,5 +1,4 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
-import {ref} from "vue";
 import {normalizeError} from "@/utils/apiError";
 
 vi.mock("@/services/cadastroService", () => ({
@@ -23,18 +22,9 @@ vi.mock("@/services/processoService", () => ({
     reabrirRevisaoCadastro: vi.fn(),
 }));
 
-const processosMock = {
-    processoDetalhe: ref<any>({codigo: 999}),
-    buscarProcessoDetalhe: vi.fn(),
-};
-
 const subprocessosStoreMock = {
     buscarSubprocessoDetalhe: vi.fn(),
 };
-
-vi.mock("@/composables/useProcessos", () => ({
-    useProcessos: () => processosMock,
-}));
 
 vi.mock("@/composables/useSubprocessos", () => ({
     useSubprocessos: () => subprocessosStoreMock,
@@ -43,7 +33,6 @@ vi.mock("@/composables/useSubprocessos", () => ({
 describe("useFluxoSubprocesso", () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        processosMock.processoDetalhe.value = {codigo: 999};
     });
 
     it("deve validar cadastro", async () => {
@@ -57,7 +46,7 @@ describe("useFluxoSubprocesso", () => {
         expect(resultado).toEqual({valido: true});
     });
 
-    it("deve disponibilizar cadastro e recarregar processo", async () => {
+    it("deve disponibilizar cadastro sem recarga implícita de processo", async () => {
         const {disponibilizarCadastro} = await import("../useFluxoSubprocesso").then((m) => m.useFluxoSubprocesso());
         const {disponibilizarCadastro: serviceDisponibilizarCadastro} = await import("@/services/cadastroService");
         (serviceDisponibilizarCadastro as any).mockResolvedValue(undefined);
@@ -66,7 +55,6 @@ describe("useFluxoSubprocesso", () => {
 
         expect(resultado).toBe(true);
         expect(serviceDisponibilizarCadastro).toHaveBeenCalledWith(10);
-        expect(processosMock.buscarProcessoDetalhe).toHaveBeenCalledWith(999);
     });
 
     it("deve homologar cadastro e recarregar subprocesso", async () => {
@@ -89,7 +77,6 @@ describe("useFluxoSubprocesso", () => {
         await alterarDataLimiteSubprocesso(10, {novaData: "2026-04-01"});
 
         expect(serviceAlterarDataLimite).toHaveBeenCalledWith(10, {novaData: "2026-04-01"});
-        expect(processosMock.buscarProcessoDetalhe).toHaveBeenCalledWith(999);
         expect(subprocessosStoreMock.buscarSubprocessoDetalhe).toHaveBeenCalledWith(10);
     });
 
@@ -168,13 +155,12 @@ describe("useFluxoSubprocesso", () => {
         expect(service).toHaveBeenCalledWith(10, "Justificativa");
     });
 
-    it("não deve recarregar processo se processoDetalhe for nulo", async () => {
-        processosMock.processoDetalhe.value = null;
+    it("não deve recarregar subprocesso quando a ação não pedir isso", async () => {
         const {disponibilizarCadastro} = await import("../useFluxoSubprocesso").then((m) => m.useFluxoSubprocesso());
         const {disponibilizarCadastro: service} = await import("@/services/cadastroService");
         (service as any).mockResolvedValue(undefined);
 
         await disponibilizarCadastro(10);
-        expect(processosMock.buscarProcessoDetalhe).not.toHaveBeenCalled();
+        expect(subprocessosStoreMock.buscarSubprocessoDetalhe).not.toHaveBeenCalled();
     });
 });

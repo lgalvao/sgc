@@ -4,7 +4,7 @@ import {createTestingPinia} from '@pinia/testing';
 import SubprocessoView from '@/views/SubprocessoView.vue';
 import {BSpinner} from 'bootstrap-vue-next';
 import * as useAcessoModule from '@/composables/useAcesso';
-import * as useProcessosModule from '@/composables/useProcessos';
+import * as processoService from '@/services/processoService';
 import {reactive, ref} from 'vue';
 
 const fluxoSubprocessoMock = {
@@ -26,7 +26,9 @@ vi.mock('@/composables/useFluxoSubprocesso', () => ({
     useFluxoSubprocesso: () => fluxoSubprocessoMock
 }));
 vi.mock('@/composables/useSubprocessos', () => ({useSubprocessos: () => subprocessosMock}));
-vi.mock('@/composables/useProcessos', () => ({useProcessos: vi.fn()}));
+vi.mock('@/services/processoService', () => ({
+    enviarLembrete: vi.fn(),
+}));
 
 const SubprocessoHeaderStub = {template: '<div />'};
 const SubprocessoCardsStub = {template: '<div />'};
@@ -75,11 +77,6 @@ describe('SubprocessoView Coverage', () => {
         });
         subprocessosMock.atualizarStatusLocal = vi.fn();
         subprocessosMock.lastError = null;
-
-        vi.mocked(useProcessosModule.useProcessos).mockReturnValue({
-            processoDetalhe: { value: null },
-            enviarLembrete: vi.fn().mockResolvedValue(undefined)
-        } as any);
     });
 
     it('renders loading state when no data and no error', () => {
@@ -285,11 +282,7 @@ describe('SubprocessoView Coverage', () => {
 
     it('confirmarEnviarLembrete and enviarLembreteConfirmado coverage', async () => {
         const pinia = createTestingPinia({createSpy: vi.fn});
-        const processosStore = {
-            enviarLembrete: vi.fn().mockResolvedValue(undefined),
-            processoDetalhe: ref({ situacao: 'EM_ANDAMENTO' })
-        };
-        vi.mocked(useProcessosModule.useProcessos).mockReturnValue(processosStore as any);
+        vi.mocked(processoService.enviarLembrete).mockResolvedValue(undefined as never);
 
         subprocessosMock.buscarSubprocessoDetalhe.mockImplementation(async () => {
             subprocessosMock.subprocessoDetalhe = {
@@ -323,10 +316,10 @@ describe('SubprocessoView Coverage', () => {
         expect(vm.modalLembreteAberto).toBe(true);
 
         await vm.enviarLembreteConfirmado();
-        expect(processosStore.enviarLembrete).toHaveBeenCalled();
+        expect(processoService.enviarLembrete).toHaveBeenCalled();
         expect(vm.modalLembreteAberto).toBe(false);
 
-        processosStore.enviarLembrete.mockRejectedValueOnce(new Error('Fail'));
+        vi.mocked(processoService.enviarLembrete).mockRejectedValueOnce(new Error('Fail'));
         await vm.enviarLembreteConfirmado();
 
         // null case for coverage

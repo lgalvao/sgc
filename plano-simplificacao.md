@@ -541,6 +541,10 @@ O plano terá sido bem executado se:
   * reduzir round-trips, reaproveitando contexto agregado e evitando chamadas em cascata;
   * reduzir latência por paralelização, quando duas chamadas ainda são necessárias mas independentes.
 * `SubprocessoView` passou a usar `buscarContextoEdicao(...)` como carga principal, eliminando uma sequência de detalhe + mapa quando o contexto já traz o mapa.
+* `SubprocessoView` ainda carregava um acoplamento implícito com `useProcessos`: lia `processoDetalhe` global para bloquear ações e calcular prazo, embora o backend já entregasse permissões suficientes e o próprio subprocesso já trouxesse datas relevantes.
+* Remover esse acoplamento simplificou a tela e evitou depender de estado herdado de outra navegação; para envio de lembrete, a view também deixou de usar `useProcessos` e passou a chamar o service direto.
+* `useFluxoSubprocesso` ficou mais previsível quando parou de recarregar `processoDetalhe` por efeito colateral; os consumidores atuais só dependiam do recarregamento explícito do subprocesso.
+* Quando uma action de composable já busca um detalhe e a tela precisa consumir esse resultado imediatamente, é melhor ela devolver o objeto carregado. Em `ProcessoCadastroView`, isso eliminou a leitura indireta de `processoDetalhe.value` como ponte entre chamada e uso.
 * `CadastroView` deixou de depender de `buscarProcessoDetalhe(...)` só para descobrir `codSubprocesso` e `tipoProcesso`; agora usa busca direta do subprocesso e o próprio contexto como fonte de verdade.
 * `CadastroVisualizacaoView` também deixou de depender de `processos.processoDetalhe` para descobrir subprocesso e tipo; isso reduziu round-trip e removeu lógica herdada de árvore de unidades na própria tela.
 * `MapaVisualizacaoView` aceitou paralelização segura no `onMounted`: busca de unidade e processo em paralelo, depois detalhe e mapa em paralelo. Isso preserva contratos e reduz tempo de espera total sem aumentar acoplamento.

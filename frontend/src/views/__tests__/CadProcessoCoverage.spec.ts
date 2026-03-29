@@ -66,8 +66,10 @@ describe('ProcessoCadastroView.vue Coverage', () => {
     const context = setupComponentTest();
 
     const createWrapper = (initialState = {}) => {
-        processosMock.processoDetalhe.value = (initialState as any).processos?.processoDetalhe ?? null;
+        const processoInicial = (initialState as any).processos?.processoDetalhe ?? null;
+        processosMock.processoDetalhe.value = processoInicial;
         processosMock.lastError.value = (initialState as any).processos?.lastError ?? null;
+        processosMock.buscarProcessoDetalhe.mockResolvedValue(processoInicial);
 
         context.wrapper = mount(ProcessoCadastroView, {
             ...getCommonMountOptions(
@@ -104,6 +106,7 @@ describe('ProcessoCadastroView.vue Coverage', () => {
         vi.clearAllMocks();
         processosMock.processoDetalhe.value = null;
         processosMock.lastError.value = null;
+        processosMock.buscarProcessoDetalhe.mockResolvedValue(null);
         mockRoute.query = {};
         vi.mocked(unidadeService.buscarArvoreComElegibilidade).mockResolvedValue([]);
         vi.mocked(unidadeService.mapUnidadesArray).mockImplementation((arr) => arr || []);

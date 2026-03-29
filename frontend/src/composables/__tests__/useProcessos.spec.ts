@@ -197,9 +197,10 @@ describe("useProcessos", () => {
             const composable = useProcessos();
             processoService.obterDetalhesProcesso.mockResolvedValue(PROCESSO_MOCK);
 
-            await composable.buscarProcessoDetalhe(1);
+            const resultado = await composable.buscarProcessoDetalhe(1);
 
             expect(processoService.obterDetalhesProcesso).toHaveBeenCalledWith(1);
+            expect(resultado).toEqual(PROCESSO_MOCK);
             expect(composable.processoDetalhe.value).toEqual(PROCESSO_MOCK);
         });
 

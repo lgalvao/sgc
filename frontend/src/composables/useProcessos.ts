@@ -119,7 +119,9 @@ async function buscarUnidadesParaImportacao(codigoProcesso: number): Promise<Uni
 async function buscarProcessoDetalhe(codigoProcesso: number) {
     return executarComTratamentoECarregamento(async () => {
         setProcessoDetalhe(null);
-        processoDetalhe.value = await processoService.obterDetalhesProcesso(codigoProcesso);
+        const processo = await processoService.obterDetalhesProcesso(codigoProcesso);
+        processoDetalhe.value = processo;
+        return processo;
     }, () => {
         setProcessoDetalhe(null);
     });
