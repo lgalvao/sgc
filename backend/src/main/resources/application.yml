@@ -63,6 +63,11 @@ aplicacao:
     remetente-nome: "Sistema de Gestão de Competências"
     assunto-prefixo: "[SGC]"
 
+sgc:
+  monitoramento:
+    trace-completo: false
+    limite-alerta-ms: 500
+
 ---
 spring:
   config:

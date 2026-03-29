@@ -7,6 +7,7 @@ import {reactive, ref} from 'vue';
 import {SituacaoSubprocesso, TipoProcesso} from '@/types/tipos';
 import * as processoService from '@/services/processoService';
 import * as useAcessoModule from '@/composables/useAcesso';
+import {contarChamadas} from '@/test-utils/orcamentoChamadas';
 
 const SubprocessoCardsStub = {
     template: '<div data-testid="subprocesso-cards"></div>',
@@ -212,6 +213,19 @@ describe('SubprocessoView.vue', () => {
         expect(store.buscarSubprocessoPorProcessoEUnidade).toHaveBeenCalledWith(1, 'TEST');
         expect(store.buscarContextoEdicao).toHaveBeenCalledWith(10);
         expect(mapaStore.mapaCompleto.value).toEqual({codigo: 100});
+    });
+
+    it('mantem orçamento enxuto de chamadas no carregamento inicial quando o contexto já traz mapa', async () => {
+        const {store, mapaStore} = mountComponent();
+        await flushPromises();
+
+        expect(contarChamadas(
+            store.buscarSubprocessoPorProcessoEUnidade,
+            store.buscarContextoEdicao,
+            mapaStore.buscarMapaCompleto as any,
+        )).toBe(2);
+        expect(store.buscarSubprocessoDetalhe).not.toHaveBeenCalled();
+        expect(mapaStore.buscarMapaCompleto).not.toHaveBeenCalled();
     });
 
     it('limpa subprocessoDetalhe imediatamente ao montar para evitar dados desatualizados', async () => {

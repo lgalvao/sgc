@@ -9,6 +9,7 @@ import * as useProcessosModule from "@/composables/useProcessos";
 import * as subprocessoService from "@/services/subprocessoService";
 import {SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 import CadastroView from "../CadastroView.vue";
+import {contarChamadas} from "@/test-utils/orcamentoChamadas";
 
 const {pushMock} = vi.hoisted(() => ({pushMock: vi.fn()}));
 const subprocessosMock = reactive({
@@ -184,6 +185,18 @@ describe("CadastroView coverage", () => {
         await (wrapper.vm as any).disponibilizarCadastro();
         await flushPromises();
         expect((wrapper.vm as any).erroGlobal).toBe("Erro genérico");
+    });
+
+    it("mantem orçamento enxuto de chamadas no carregamento inicial quando o processo já traz o subprocesso", async () => {
+        createWrapper();
+        await flushPromises();
+
+        expect(contarChamadas(
+            useProcessosModule.useProcessos().buscarProcessoDetalhe as any,
+            subprocessosMock.buscarContextoEdicao as any,
+            subprocessosMock.buscarSubprocessoPorProcessoEUnidade as any,
+        )).toBe(2);
+        expect(subprocessosMock.buscarSubprocessoPorProcessoEUnidade).not.toHaveBeenCalled();
     });
 
     it("cobre funções complementares e modais", async () => {

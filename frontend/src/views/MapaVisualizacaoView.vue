@@ -480,9 +480,11 @@ function verHistorico() {
 }
 
 onMounted(async () => {
-  const response = await buscarUnidadeServico(sigla.value);
-  unidade.value = response as Unidade;
-  await processos.buscarProcessoDetalhe(codProcesso.value);
+  const [respostaUnidade] = await Promise.all([
+    buscarUnidadeServico(sigla.value),
+    processos.buscarProcessoDetalhe(codProcesso.value),
+  ]);
+  unidade.value = respostaUnidade as Unidade;
 
   // Garantia de busca de subprocesso mais robusta após carregar detalhes do processo
   let idSubprocesso = codSubprocesso.value;
@@ -493,8 +495,11 @@ onMounted(async () => {
   }
 
   if (idSubprocesso) {
-    await subprocessosStore.buscarSubprocessoDetalhe(idSubprocesso);
-    mapa.value = await obterMapaVisualizacao(idSubprocesso);
+    const [, mapaVisualizacao] = await Promise.all([
+      subprocessosStore.buscarSubprocessoDetalhe(idSubprocesso),
+      obterMapaVisualizacao(idSubprocesso),
+    ]);
+    mapa.value = mapaVisualizacao;
   }
 });
 

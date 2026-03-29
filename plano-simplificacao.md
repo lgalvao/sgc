@@ -418,6 +418,16 @@ Os próximos passos devem ser executados como uma frente única, e não como oti
 * se duas ou mais chamadas sempre andam juntas, avaliar consolidação;
 * preferir reutilizar endpoint de contexto existente antes de criar endpoint novo;
 * criar endpoint novo apenas quando a composição atual continuar cara demais ou incompleta.
+* sempre que possível, transformar a redução de round-trips em teste com orçamento explícito de chamadas por tela.
+
+**Validação de desempenho:**
+
+* No frontend, usar testes de orçamento de chamadas para evitar regressão de round-trips lógicos.
+* No backend, confrontar os fluxos críticos com o aspecto existente em `backend/src/main/java/sgc/comum/util/MonitoramentoAspect.java`.
+* A leitura correta é combinada:
+  * menos chamadas por tela;
+  * menos ocorrências de `EXECUCAO LENTA` nos serviços e repositórios envolvidos;
+  * redução de latência percebida no fluxo completo.
 
 ### Frente C. Estreitar composables para refletir fluxos reais
 
@@ -501,5 +511,11 @@ O plano terá sido bem executado se:
 * Em `CadastroView`, a checagem local de situação antes da validação era redundante com a fonte de verdade do backend; remover esse pré-check deixou a view mais enxuta e reduziu duplicação de workflow.
 * O próximo ciclo não deve reagir a sintomas isolados. O critério correto agora é consolidar as mudanças em torno de quatro frentes: fonte de verdade no backend, redução de round-trips por tela, estreitamento de composables e agregação backend orientada ao uso real da UI.
 * Desempenho passou a ser parte explícita da simplificação. Em ambiente real com Oracle, chamadas pequenas demais e em sequência têm custo perceptível e devem entrar no critério de desenho.
+* Para não tratar desempenho só por percepção, vale manter testes de orçamento de chamadas em telas críticas. Eles não substituem medição real, mas evitam regressão de round-trips durante refatorações futuras.
+* Há dois tipos diferentes de ganho de desempenho que precisam ser tratados separadamente:
+  * reduzir round-trips, reaproveitando contexto agregado e evitando chamadas em cascata;
+  * reduzir latência por paralelização, quando duas chamadas ainda são necessárias mas independentes.
+* `SubprocessoView` passou a usar `buscarContextoEdicao(...)` como carga principal, eliminando uma sequência de detalhe + mapa quando o contexto já traz o mapa.
+* `MapaVisualizacaoView` aceitou paralelização segura no `onMounted`: busca de unidade e processo em paralelo, depois detalhe e mapa em paralelo. Isso preserva contratos e reduz tempo de espera total sem aumentar acoplamento.
 * `LoadingButton.vue` continua sendo um wrapper fino, mas o volume de uso torna a remoção imediata cara demais; o melhor caminho agora é impedir novos wrappers fracos e só reavaliar esse componente junto de refatorações de telas maiores.
 * A validação de backend com Gradle pode produzir falso negativo por problema de cache de build; quando `:backend:test` passa e `:backend:compileTestJava` falha só ao armazenar cache, vale repetir com `--no-configuration-cache` antes de tratar como regressão de código.

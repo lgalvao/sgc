@@ -8,6 +8,7 @@ import * as useSubprocessosModule from "@/composables/useSubprocessos";
 import * as subprocessoService from "@/services/subprocessoService";
 import * as analiseService from "@/services/analiseService";
 import CadastroVisualizacaoView from "../CadastroVisualizacaoView.vue";
+import {contarChamadas} from "@/test-utils/orcamentoChamadas";
 
 const {pushMock} = vi.hoisted(() => ({pushMock: vi.fn()}));
 
@@ -178,6 +179,18 @@ describe("CadastroVisualizacaoView coverage", () => {
         mapsStore.buscarImpactoMapa = vi.fn().mockResolvedValue(null);
         await (wrapper.vm as any).abrirModalImpacto();
         expect(mapsStore.buscarImpactoMapa).toHaveBeenCalledWith(123);
+    });
+
+    it("mantem orçamento enxuto de chamadas no carregamento inicial quando o processo já traz o subprocesso", async () => {
+        createWrapper();
+        await flushPromises();
+
+        expect(contarChamadas(
+            processosMock.buscarProcessoDetalhe as any,
+            vi.mocked(useSubprocessosModule.useSubprocessos)().buscarContextoEdicao as any,
+            vi.mocked(useSubprocessosModule.useSubprocessos)().buscarSubprocessoPorProcessoEUnidade as any,
+        )).toBe(2);
+        expect(vi.mocked(useSubprocessosModule.useSubprocessos)().buscarSubprocessoPorProcessoEUnidade).not.toHaveBeenCalled();
     });
 
     it("cobre ramos condicionais adicionais", async () => {
