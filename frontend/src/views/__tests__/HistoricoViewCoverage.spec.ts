@@ -3,21 +3,16 @@ import {describe, expect, it, vi} from "vitest";
 import {createTestingPinia} from "@pinia/testing";
 import HistoricoView from "@/views/HistoricoView.vue";
 import {createMemoryHistory, createRouter} from "vue-router";
-import {ref} from "vue";
 import {SituacaoProcesso, TipoProcesso} from "@/types/tipos";
+import * as processoService from "@/services/processoService";
 
-const processosMock = {
-    processosFinalizados: ref<any[]>([]),
+vi.mock("@/services/processoService", () => ({
     buscarProcessosFinalizados: vi.fn(),
-};
-
-vi.mock("@/composables/useProcessos", () => ({
-    useProcessos: () => processosMock
 }));
 
 describe("HistoricoView Coverage", () => {
     it("renders correctly and rows are accessible", async () => {
-        processosMock.processosFinalizados.value = [
+        vi.mocked(processoService.buscarProcessosFinalizados).mockResolvedValue([
             {
                 codigo: 1,
                 descricao: "Processo teste",
@@ -26,7 +21,7 @@ describe("HistoricoView Coverage", () => {
                 dataFinalizacaoFormatada: "01/01/2023",
                 situacao: SituacaoProcesso.FINALIZADO,
             },
-        ];
+        ] as any);
 
         const router = createRouter({
             history: createMemoryHistory(),
@@ -52,7 +47,7 @@ describe("HistoricoView Coverage", () => {
 
         await flushPromises();
 
-        expect(processosMock.processosFinalizados.value).toHaveLength(1);
+        expect(processoService.buscarProcessosFinalizados).toHaveBeenCalled();
 
         const row = wrapper.find("tbody tr.row-processo-1");
         expect(row.exists()).toBe(true);

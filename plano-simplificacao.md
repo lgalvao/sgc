@@ -561,3 +561,8 @@ O plano terá sido bem executado se:
 * Em `SubprocessoView`, dois modais e dois estados de loading ficaram mais simples como `ref` local do que como gerenciadores genéricos parametrizados.
 * Em `ImportarAtividadesModal`, um wrapper genérico de API não agregava contrato além de `loading + erro`; mover esse estado para o próprio componente deixou o fluxo mais direto.
 * `useSubprocessos` ainda tinha duplicação interna de pré-condição de perfil/unidade. Extrair um helper único para esse contexto melhorou a leitura sem ampliar a API pública do composable.
+* `SubprocessoCards` ainda consultava `useProcessos` só para descobrir se o processo estava finalizado. Esse bloqueio já existia na fonte de verdade do backend, então a checagem local era redundante e o componente pôde voltar a depender apenas do próprio subprocesso.
+* A nova varredura confirmou que parte da largura de `useProcessos` vinha de leituras locais empacotadas por conveniência histórica. `HistoricoView` e `ImportarAtividadesModal` não precisavam compartilhar estado de lista com o resto do app.
+* Mover histórico e importação para leitura direta de service reduziu a API pública de `useProcessos` sem piorar testes nem fluxo de UI. O composable ficou mais próximo de casos realmente centrados em processo: painel, detalhe, cadastro e ações em bloco.
+* Quando uma simplificação troca a fonte de dados de store singleton para service local, os testes precisam parar de assumir estado pré-carregado. No modal de importação, o ajuste correto foi alinhar os testes ao carregamento real na abertura do componente.
+* Storybook também entra no escopo da simplificação: stories que continuam simulando o desenho antigo deixam documentação executável desalinhada com o código real.

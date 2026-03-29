@@ -308,56 +308,6 @@ describe("useProcessos", () => {
         });
     });
 
-    describe("buscarProcessosFinalizados", () => {
-        it("deve atualizar o estado em caso de sucesso", async () => {
-            const composable = useProcessos();
-            const processosMock = [{codigo: 1}];
-            processoService.buscarProcessosFinalizados.mockResolvedValue(processosMock as any);
-
-            await composable.buscarProcessosFinalizados();
-
-            expect(composable.processosFinalizados.value).toEqual(processosMock);
-        });
-
-        it("deve usar lista vazia se service retornar nulo", async () => {
-            const composable = useProcessos();
-            processoService.buscarProcessosFinalizados.mockResolvedValue(null as any);
-            await composable.buscarProcessosFinalizados();
-            expect(composable.processosFinalizados.value).toEqual([]);
-        });
-
-        it("deve propagar erro de buscarProcessosFinalizados", async () => {
-            const composable = useProcessos();
-            processoService.buscarProcessosFinalizados.mockRejectedValue(ERRO_MOCK);
-            await expect(composable.buscarProcessosFinalizados()).rejects.toThrow(ERRO_MOCK);
-        });
-    });
-
-    describe("buscarProcessosParaImportacao", () => {
-        it("deve atualizar o estado em caso de sucesso", async () => {
-            const composable = useProcessos();
-            const processosMock = [{codigo: 1}];
-            processoService.buscarProcessosParaImportacao.mockResolvedValue(processosMock as any);
-
-            await composable.buscarProcessosParaImportacao();
-
-            expect(composable.processosParaImportacao.value).toEqual(processosMock);
-        });
-
-        it("deve usar lista vazia se service retornar nulo", async () => {
-            const composable = useProcessos();
-            processoService.buscarProcessosParaImportacao.mockResolvedValue(null as any);
-            await composable.buscarProcessosParaImportacao();
-            expect(composable.processosParaImportacao.value).toEqual([]);
-        });
-
-        it("deve propagar erro de buscarProcessosParaImportacao", async () => {
-            const composable = useProcessos();
-            processoService.buscarProcessosParaImportacao.mockRejectedValue(ERRO_MOCK);
-            await expect(composable.buscarProcessosParaImportacao()).rejects.toThrow(ERRO_MOCK);
-        });
-    });
-
     describe("executarAcaoBloco", () => {
         it("deve propagar erro do service", async () => {
             const composable = useProcessos();
@@ -365,19 +315,6 @@ describe("useProcessos", () => {
             processoService.executarAcaoEmBloco.mockRejectedValue(ERRO_MOCK);
 
             await expect(composable.executarAcaoBloco("aceitar", [1])).rejects.toThrow(ERRO_MOCK);
-        });
-    });
-
-    describe("buscarUnidadesParaImportacao", () => {
-        it("deve chamar o service e retornar dados", async () => {
-            const composable = useProcessos();
-            const unidadesMock = [{unidadeCodigo: 1, unidadeSigla: "U1"}];
-            processoService.buscarUnidadesParaImportacao.mockResolvedValue(unidadesMock as any);
-
-            const result = await composable.buscarUnidadesParaImportacao(1);
-
-            expect(processoService.buscarUnidadesParaImportacao).toHaveBeenCalledWith(1);
-            expect(result).toEqual(unidadesMock);
         });
     });
 

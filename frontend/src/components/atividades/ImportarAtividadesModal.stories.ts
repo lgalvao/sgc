@@ -1,8 +1,9 @@
 import {vi} from "vitest";
 import type {Meta, StoryObj} from '@storybook/vue3-vite';
 import ImportarAtividadesModal from './ImportarAtividadesModal.vue';
-import {createTestingPinia} from '@pinia/testing';
 import {ref} from 'vue';
+import * as processoService from '@/services/processoService';
+import * as subprocessoService from '@/services/subprocessoService';
 
 const meta: Meta<typeof ImportarAtividadesModal> = {
     title: 'Atividades/ImportarAtividadesModal',
@@ -28,6 +29,16 @@ const mockAtividades = [
     {codigo: 51, descricao: 'Atividade importada 2'},
 ];
 
+vi.mock('@/services/processoService', () => ({
+    buscarProcessosParaImportacao: vi.fn(),
+    buscarUnidadesParaImportacao: vi.fn(),
+}));
+
+vi.mock('@/services/subprocessoService', () => ({
+    listarAtividadesParaImportacao: vi.fn(),
+    importarAtividades: vi.fn(),
+}));
+
 export const Default: Story = {
     args: {
         mostrar: true,
@@ -37,21 +48,11 @@ export const Default: Story = {
         components: {ImportarAtividadesModal},
         setup() {
             const show = ref(args.mostrar);
-            const pinia = createTestingPinia({
-                createSpy: vi.fn,
-                initialState: {
-                    processos: {
-                        processosFinalizados: mockProcessos,
-                        processoDetalhe: {unidades: mockUnidades},
-                    },
-                    atividades: {
-                        atividadesPorSubprocesso: {
-                            100: mockAtividades,
-                        },
-                    },
-                },
-            });
-            return {args, show, pinia};
+            vi.mocked(processoService.buscarProcessosParaImportacao).mockResolvedValue(mockProcessos as any);
+            vi.mocked(processoService.buscarUnidadesParaImportacao).mockResolvedValue(mockUnidades as any);
+            vi.mocked(subprocessoService.listarAtividadesParaImportacao).mockResolvedValue(mockAtividades as any);
+            vi.mocked(subprocessoService.importarAtividades).mockResolvedValue({aviso: 'Importação concluída'} as any);
+            return {args, show};
         },
         template: `
       <div>
@@ -71,13 +72,11 @@ export const SemProcessos: Story = {
         components: {ImportarAtividadesModal},
         setup() {
             const show = ref(args.mostrar);
-            const pinia = createTestingPinia({
-                createSpy: vi.fn,
-                initialState: {
-                    processos: {processosFinalizados: []},
-                },
-            });
-            return {args, show, pinia};
+            vi.mocked(processoService.buscarProcessosParaImportacao).mockResolvedValue([] as any);
+            vi.mocked(processoService.buscarUnidadesParaImportacao).mockResolvedValue([] as any);
+            vi.mocked(subprocessoService.listarAtividadesParaImportacao).mockResolvedValue([] as any);
+            vi.mocked(subprocessoService.importarAtividades).mockResolvedValue({} as any);
+            return {args, show};
         },
         template: '<ImportarAtividadesModal v-bind="args" :mostrar="show" @fechar="show = false" />',
     }),

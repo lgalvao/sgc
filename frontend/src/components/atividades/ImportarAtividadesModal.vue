@@ -137,7 +137,7 @@
 
 <script lang="ts" setup>
 import {BAlert, BButton, BFormCheckbox, BFormSelect, BFormSelectOption, BModal, BSpinner} from "bootstrap-vue-next";
-import {onMounted, ref, watch} from "vue";
+import {ref, watch} from "vue";
 import * as processoService from "@/services/processoService";
 import * as subprocessoService from "@/services/subprocessoService";
 import {type Atividade, type ProcessoResumo, type UnidadeImportacao,} from "@/types/tipos";
@@ -167,10 +167,6 @@ const unidadeSelecionadaId = ref<number | null>(null);
 const atividadesParaImportar = ref<Atividade[]>([]);
 const atividadesSelecionadas = ref<Atividade[]>([]);
 
-onMounted(() => {
-  // A busca é feita ao abrir o modal
-});
-
 watch(
     () => props.mostrar,
     async (mostrar) => {
@@ -179,6 +175,7 @@ watch(
         processosParaImportacao.value = await processoService.buscarProcessosParaImportacao() ?? [];
       }
     },
+    {immediate: true},
 );
 
 watch(processoSelecionadoId, async (newId) => {

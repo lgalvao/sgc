@@ -27,18 +27,11 @@ async function recarregarProcessoDetalheAtual() {
     }
 }
 
-async function executarComCarregamento<T>(acao: () => Promise<T>) {
-    try {
-        return await acao();
-    } finally {
-    }
-}
-
 async function executarComTratamentoECarregamento<T>(
     acao: () => Promise<T>,
     onError?: () => void,
 ) {
-    return withErrorHandling(() => executarComCarregamento(acao), onError);
+    return withErrorHandling(acao, onError);
 }
 
 async function buscarProcessosPainel(
