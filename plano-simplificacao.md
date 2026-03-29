@@ -375,6 +375,10 @@ O plano terá sido bem executado se:
 * A remoção de `mapaService` foi segura porque ele só duplicava uma consulta já exposta por `subprocessoService`; a consolidação reduziu uma fronteira artificial sem mexer em contrato HTTP.
 * `useProcessos` tinha repetição interna relevante de carregamento e recarga de detalhe; helpers privados foram suficientes para reduzir ruído sem mudar a API pública do composable.
 * `UnidadesView` era um caso claro de `loading`/`erro` manual já coberto por `useAsyncAction`; a migração simplificou a tela sem alterar mensagens nem comportamento visual.
+* `AdministradoresView` também aceitou migração parcial para `useAsyncAction`; o carregamento da listagem foi simplificado e o tratamento de erro local deixou de se repetir nas mutações.
+* `MapaVisualizacaoView` tinha quatro ações com o mesmo ciclo de loading, fechamento de modal, toast pendente e redirecionamento; helpers privados locais reduziram esse ruído sem alterar permissões nem fluxo.
+* No backend, `SubprocessoTransicaoService` ainda carregava muita ramificação binária entre cadastro e revisão; um contexto privado de fluxo reduziu condicionais repetidas em devolução, aceite, homologação e ações em bloco.
 * Em permissões, a fonte de verdade continua sendo `etc/docs/regras-acesso.md`; simplificação nessa área só pode acontecer quando o comportamento continuar exatamente alinhado à regra documental.
 * `UnidadeView` ainda parece depender de estado global implícito de mapa; esse acoplamento só deve ser removido com segurança quando houver API suficiente para reconstruir o destino da navegação sem reaproveitar estado de outra tela.
 * `LoadingButton.vue` continua sendo um wrapper fino, mas o volume de uso torna a remoção imediata cara demais; o melhor caminho agora é impedir novos wrappers fracos e só reavaliar esse componente junto de refatorações de telas maiores.
+* A validação de backend com Gradle pode produzir falso negativo por problema de cache de build; quando `:backend:test` passa e `:backend:compileTestJava` falha só ao armazenar cache, vale repetir com `--no-configuration-cache` antes de tratar como regressão de código.

@@ -117,12 +117,12 @@ import {
 import {normalizeError} from '@/utils/apiError';
 import {useNotification} from '@/composables/useNotification';
 import {TEXTOS} from '@/constants/textos';
+import {useAsyncAction} from '@/composables/useAsyncAction';
 
 const {notify} = useNotification();
+const {carregando: carregandoAdmins, erro: erroAdmins, executarSilencioso} = useAsyncAction();
 
 const administradores = ref<AdministradorDto[]>([]);
-const carregandoAdmins = ref(false);
-const erroAdmins = ref<string | null>(null);
 const removendoAdmin = ref<string | null>(null);
 const mostrarModalAdicionarAdmin = ref(false);
 const mostrarModalRemoverAdmin = ref(false);
@@ -139,16 +139,14 @@ const camposAdmins = [
   {key: 'acoes', label: TEXTOS.administracao.CAMPO_ACOES, thClass: 'text-end'},
 ];
 
+function notificarErro(error: unknown) {
+  notify(normalizeError(error).message, 'danger');
+}
+
 async function carregarAdministradores() {
-  carregandoAdmins.value = true;
-  erroAdmins.value = null;
-  try {
+  await executarSilencioso(async () => {
     administradores.value = await listarAdministradores();
-  } catch (error) {
-    erroAdmins.value = normalizeError(error).message;
-  } finally {
-    carregandoAdmins.value = false;
-  }
+  }, TEXTOS.comum.ERRO_OPERACAO);
 }
 
 function abrirModalAdicionarAdmin() {
@@ -174,8 +172,7 @@ async function adicionarAdmin() {
     notify(TEXTOS.administracao.SUCESSO_ADICIONADO, 'success');
     await carregarAdministradores();
   } catch (error) {
-    const erro = normalizeError(error);
-    notify(erro.message, 'danger');
+    notificarErro(error);
   } finally {
     adicionandoAdmin.value = false;
   }
@@ -197,8 +194,7 @@ async function removerAdmin() {
     mostrarModalRemoverAdmin.value = false;
     adminParaRemover.value = null;
   } catch (error) {
-    const erro = normalizeError(error);
-    notify(erro.message, 'danger');
+    notificarErro(error);
   } finally {
     removendoAdmin.value = null;
   }

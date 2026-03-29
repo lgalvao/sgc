@@ -341,79 +341,81 @@ const isLoading = ref(false);
 const sugestoesTextareaRef = ref<InstanceType<typeof BFormTextarea> | null>(null);
 const observacaoDevolucaoRef = ref<InstanceType<typeof BFormTextarea> | null>(null);
 
-async function confirmarSugestoes() {
-  if (!codSubprocesso.value || !sugestoes.value.trim()) return;
+async function executarComLoading(acao: () => Promise<void>) {
   isLoading.value = true;
   try {
-    await processos.apresentarSugestoes(codSubprocesso.value, {
-      sugestoes: sugestoes.value,
-    });
-    fecharModalSugestoes();
-    toastStore.setPending(TEXTOS.sucesso.MAPA_SUBMETIDO_COM_SUGESTOES);
-    await router.push({name: "Painel"});
-  } catch {
-    notify(TEXTOS.mapa.ERRO_SUGESTOES, 'danger');
+    await acao();
   } finally {
     isLoading.value = false;
+  }
+}
+
+async function concluirAcaoPainel(mensagem: string, fecharModal: () => void) {
+  fecharModal();
+  toastStore.setPending(mensagem);
+  await router.push({name: "Painel"});
+}
+
+async function confirmarSugestoes() {
+  if (!codSubprocesso.value || !sugestoes.value.trim()) return;
+  try {
+    await executarComLoading(async () => {
+      await processos.apresentarSugestoes(codSubprocesso.value!, {
+        sugestoes: sugestoes.value,
+      });
+      await concluirAcaoPainel(TEXTOS.sucesso.MAPA_SUBMETIDO_COM_SUGESTOES, fecharModalSugestoes);
+    });
+  } catch {
+    notify(TEXTOS.mapa.ERRO_SUGESTOES, 'danger');
   }
 }
 
 async function confirmarValidacao() {
   if (!codSubprocesso.value) return;
-  isLoading.value = true;
   try {
-    await processos.validarMapa(codSubprocesso.value);
-    fecharModalValidar();
-    toastStore.setPending(TEXTOS.sucesso.MAPA_VALIDADO_SUBMETIDO);
-    await router.push({name: "Painel"});
+    await executarComLoading(async () => {
+      await processos.validarMapa(codSubprocesso.value!);
+      await concluirAcaoPainel(TEXTOS.sucesso.MAPA_VALIDADO_SUBMETIDO, fecharModalValidar);
+    });
   } catch {
     notify(TEXTOS.mapa.ERRO_VALIDAR, 'danger');
-  } finally {
-    isLoading.value = false;
   }
 }
 
 async function confirmarAceitacao(observacao = "") {
   if (!codSubprocesso.value) return;
-  isLoading.value = true;
   const isHomologacao = podeHomologarMapa.value || isAdmin.value;
 
   try {
-    if (isHomologacao) {
-      await processos.homologarValidacao(codSubprocesso.value, {texto: observacao});
-    } else {
-      await processos.aceitarValidacao(codSubprocesso.value, {texto: observacao});
-    }
-    fecharModalAceitar();
-    toastStore.setPending(
-        isHomologacao
-            ? TEXTOS.mapa.SUCESSO_HOMOLOGACAO
-            : TEXTOS.sucesso.ACEITE_REGISTRADO,
-    );
-    await router.push({name: "Painel"});
+    await executarComLoading(async () => {
+      if (isHomologacao) {
+        await processos.homologarValidacao(codSubprocesso.value!, {texto: observacao});
+      } else {
+        await processos.aceitarValidacao(codSubprocesso.value!, {texto: observacao});
+      }
+      await concluirAcaoPainel(
+          isHomologacao ? TEXTOS.mapa.SUCESSO_HOMOLOGACAO : TEXTOS.sucesso.ACEITE_REGISTRADO,
+          fecharModalAceitar,
+      );
+    });
   } catch (error) {
     logger.error(error);
     notify(TEXTOS.comum.ERRO_OPERACAO, 'danger');
-  } finally {
-    isLoading.value = false;
   }
 }
 
 async function confirmarDevolucao() {
   if (!codSubprocesso.value) return;
-  isLoading.value = true;
   try {
-    await processos.devolverValidacao(codSubprocesso.value, {
-      justificativa: observacaoDevolucao.value,
+    await executarComLoading(async () => {
+      await processos.devolverValidacao(codSubprocesso.value!, {
+        justificativa: observacaoDevolucao.value,
+      });
+      await concluirAcaoPainel(TEXTOS.sucesso.DEVOLUCAO_REALIZADA, fecharModalDevolucao);
     });
-    fecharModalDevolucao();
-    toastStore.setPending(TEXTOS.sucesso.DEVOLUCAO_REALIZADA);
-    await router.push({name: "Painel"});
   } catch (error) {
     logger.error(error);
     notify(TEXTOS.mapa.ERRO_DEVOLVER, 'danger');
-  } finally {
-    isLoading.value = false;
   }
 }
 

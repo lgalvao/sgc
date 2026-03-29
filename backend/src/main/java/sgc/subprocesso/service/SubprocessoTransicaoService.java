@@ -69,6 +69,19 @@ public class SubprocessoTransicaoService {
             REVISAO, REVISAO_MAPA_HOMOLOGADO
     );
 
+    private record FluxoCadastroContexto(
+            String etapa,
+            SituacaoSubprocesso situacaoDisponibilizada,
+            SituacaoSubprocesso situacaoEmAndamento,
+            SituacaoSubprocesso situacaoHomologada,
+            TipoTransicao transicaoDevolucao,
+            TipoTransicao transicaoAceite,
+            TipoTransicao transicaoHomologacao,
+            TipoAcaoAnalise acaoDevolucao,
+            TipoAcaoAnalise acaoAceite
+    ) {
+    }
+
     public void registrarTransicao(RegistrarTransicaoCommand cmd) {
         Usuario usuario = cmd.usuario();
         Subprocesso sp = cmd.sp();
@@ -458,10 +471,10 @@ public class SubprocessoTransicaoService {
     }
 
     private void executarDevolucao(Long codSubprocesso, Usuario usuario, @Nullable String observacoes, boolean isRevisao) {
-        log.info("Devolvendo {} do subprocesso {}", isRevisao ? ETAPA_REVISAO : ETAPA_CADASTRO, codSubprocesso);
+        FluxoCadastroContexto contexto = obterContextoCadastro(isRevisao);
+        log.info("Devolvendo {} do subprocesso {}", contexto.etapa(), codSubprocesso);
         Subprocesso sp = subprocessoService.buscarSubprocesso(codSubprocesso);
-        SituacaoSubprocesso situacaoAtual = isRevisao ? REVISAO_CADASTRO_DISPONIBILIZADA : MAPEAMENTO_CADASTRO_DISPONIBILIZADO;
-        validacaoService.validarSituacaoPermitida(sp, situacaoAtual);
+        validacaoService.validarSituacaoPermitida(sp, contexto.situacaoDisponibilizada());
 
         Unidade unidadeAnalise = subprocessoService.obterUnidadeLocalizacao(sp);
         List<Movimentacao> movs = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo());
@@ -474,18 +487,18 @@ public class SubprocessoTransicaoService {
                 .findFirst()
                 .orElse(sp.getUnidade());
 
-        SituacaoSubprocesso novaSituacao = situacaoAtual;
+        SituacaoSubprocesso novaSituacao = contexto.situacaoDisponibilizada();
         if (Objects.equals(unidadeDevolucao.getCodigo(), sp.getUnidade().getCodigo())) {
-            novaSituacao = isRevisao ? REVISAO_CADASTRO_EM_ANDAMENTO : MAPEAMENTO_CADASTRO_EM_ANDAMENTO;
+            novaSituacao = contexto.situacaoEmAndamento();
             sp.setDataFimEtapa1(null);
         }
 
         registrarAnalise(RegistrarWorkflowCommand.builder()
                 .sp(sp)
                 .novaSituacao(novaSituacao)
-                .tipoTransicao(isRevisao ? TipoTransicao.REVISAO_CADASTRO_DEVOLVIDA : TipoTransicao.CADASTRO_DEVOLVIDO)
+                .tipoTransicao(contexto.transicaoDevolucao())
                 .tipoAnalise(TipoAnalise.CADASTRO)
-                .tipoAcaoAnalise(isRevisao ? TipoAcaoAnalise.DEVOLUCAO_REVISAO : TipoAcaoAnalise.DEVOLUCAO_MAPEAMENTO)
+                .tipoAcaoAnalise(contexto.acaoDevolucao())
                 .unidadeAnalise(unidadeAnalise)
                 .unidadeOrigemTransicao(unidadeAnalise)
                 .unidadeDestinoTransicao(unidadeDevolucao)
@@ -506,16 +519,16 @@ public class SubprocessoTransicaoService {
     @Transactional
     public void aceitarCadastroEmBloco(List<Long> subprocessoCodigos, Usuario usuario) {
         subprocessoCodigos.forEach(codSubprocesso -> {
-            boolean isRevisao = REVISAO == subprocessoService.buscarSubprocesso(codSubprocesso).getProcesso().getTipo();
+            boolean isRevisao = isRevisao(codSubprocesso);
             executarAceite(codSubprocesso, usuario, "Avaliação em bloco", isRevisao);
         });
     }
 
     private void executarAceite(Long codSubprocesso, Usuario usuario, @Nullable String observacoes, boolean isRevisao) {
-        log.info("Aceitando {} do subprocesso {}", isRevisao ? ETAPA_REVISAO : ETAPA_CADASTRO, codSubprocesso);
+        FluxoCadastroContexto contexto = obterContextoCadastro(isRevisao);
+        log.info("Aceitando {} do subprocesso {}", contexto.etapa(), codSubprocesso);
         Subprocesso sp = subprocessoService.buscarSubprocesso(codSubprocesso);
-        SituacaoSubprocesso situacaoAtual = isRevisao ? REVISAO_CADASTRO_DISPONIBILIZADA : MAPEAMENTO_CADASTRO_DISPONIBILIZADO;
-        validacaoService.validarSituacaoPermitida(sp, situacaoAtual);
+        validacaoService.validarSituacaoPermitida(sp, contexto.situacaoDisponibilizada());
 
         Unidade unidadeAtual = subprocessoService.obterUnidadeLocalizacao(sp);
         Unidade unidadeDestino = unidadeAtual.getUnidadeSuperior();
@@ -527,10 +540,10 @@ public class SubprocessoTransicaoService {
 
         registrarAnalise(RegistrarWorkflowCommand.builder()
                 .sp(sp)
-                .novaSituacao(situacaoAtual)
-                .tipoTransicao(isRevisao ? TipoTransicao.REVISAO_CADASTRO_ACEITA : TipoTransicao.CADASTRO_ACEITO)
+                .novaSituacao(contexto.situacaoDisponibilizada())
+                .tipoTransicao(contexto.transicaoAceite())
                 .tipoAnalise(TipoAnalise.CADASTRO)
-                .tipoAcaoAnalise(isRevisao ? TipoAcaoAnalise.ACEITE_REVISAO : TipoAcaoAnalise.ACEITE_MAPEAMENTO)
+                .tipoAcaoAnalise(contexto.acaoAceite())
                 .unidadeAnalise(unidadeAtual)
                 .unidadeOrigemTransicao(unidadeAtual)
                 .unidadeDestinoTransicao(unidadeDestino)
@@ -550,16 +563,16 @@ public class SubprocessoTransicaoService {
 
     public void homologarCadastroEmBloco(List<Long> subprocessoCodigos, Usuario usuario) {
         subprocessoCodigos.forEach(codSubprocesso -> {
-            boolean isRevisao = REVISAO == subprocessoService.buscarSubprocesso(codSubprocesso).getProcesso().getTipo();
+            boolean isRevisao = isRevisao(codSubprocesso);
             executarHomologacao(codSubprocesso, usuario, "Homologação em bloco", isRevisao);
         });
     }
 
     private void executarHomologacao(Long codSubprocesso, Usuario usuario, @Nullable String observacoes, boolean isRevisao) {
-        log.info("Homologando {} do subprocesso {}", isRevisao ? ETAPA_REVISAO : ETAPA_CADASTRO, codSubprocesso);
+        FluxoCadastroContexto contexto = obterContextoCadastro(isRevisao);
+        log.info("Homologando {} do subprocesso {}", contexto.etapa(), codSubprocesso);
         Subprocesso sp = subprocessoService.buscarSubprocesso(codSubprocesso);
-        SituacaoSubprocesso situacaoAtual = isRevisao ? REVISAO_CADASTRO_DISPONIBILIZADA : MAPEAMENTO_CADASTRO_DISPONIBILIZADO;
-        validacaoService.validarSituacaoPermitida(sp, situacaoAtual);
+        validacaoService.validarSituacaoPermitida(sp, contexto.situacaoDisponibilizada());
 
         boolean deveHomologar = true;
         if (isRevisao) {
@@ -573,11 +586,11 @@ public class SubprocessoTransicaoService {
 
         if (deveHomologar) {
             Unidade admin = unidadeService.buscarPorSigla(SIGLA_ADMIN);
-            sp.setSituacao(isRevisao ? REVISAO_CADASTRO_HOMOLOGADA : MAPEAMENTO_CADASTRO_HOMOLOGADO);
+            sp.setSituacao(contexto.situacaoHomologada());
 
             registrarTransicao(RegistrarTransicaoCommand.builder()
                     .sp(sp)
-                    .tipo(isRevisao ? TipoTransicao.REVISAO_CADASTRO_HOMOLOGADA : TipoTransicao.CADASTRO_HOMOLOGADO)
+                    .tipo(contexto.transicaoHomologacao())
                     .origem(admin)
                     .destino(admin)
                     .usuario(usuario)
@@ -691,6 +704,37 @@ public class SubprocessoTransicaoService {
             throw new IllegalStateException("Tipo de processo %s sem situação configurada para %s".formatted(tipoProcesso, contexto));
         }
         return situacao;
+    }
+
+    private boolean isRevisao(Long codSubprocesso) {
+        return REVISAO == subprocessoService.buscarSubprocesso(codSubprocesso).getProcesso().getTipo();
+    }
+
+    private FluxoCadastroContexto obterContextoCadastro(boolean isRevisao) {
+        if (isRevisao) {
+            return new FluxoCadastroContexto(
+                    ETAPA_REVISAO,
+                    REVISAO_CADASTRO_DISPONIBILIZADA,
+                    REVISAO_CADASTRO_EM_ANDAMENTO,
+                    REVISAO_CADASTRO_HOMOLOGADA,
+                    REVISAO_CADASTRO_DEVOLVIDA,
+                    REVISAO_CADASTRO_ACEITA,
+                    TipoTransicao.REVISAO_CADASTRO_HOMOLOGADA,
+                    TipoAcaoAnalise.DEVOLUCAO_REVISAO,
+                    TipoAcaoAnalise.ACEITE_REVISAO
+            );
+        }
+        return new FluxoCadastroContexto(
+                ETAPA_CADASTRO,
+                MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
+                MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
+                MAPEAMENTO_CADASTRO_HOMOLOGADO,
+                CADASTRO_DEVOLVIDO,
+                CADASTRO_ACEITO,
+                TipoTransicao.CADASTRO_HOMOLOGADO,
+                TipoAcaoAnalise.DEVOLUCAO_MAPEAMENTO,
+                TipoAcaoAnalise.ACEITE_MAPEAMENTO
+        );
     }
 
 }
