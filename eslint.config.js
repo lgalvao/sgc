@@ -26,6 +26,18 @@ export default [
         },
     },
     {
+        files: ["etc/scripts/**/*.cjs"],
+        languageOptions: {
+            sourceType: "commonjs",
+            globals: {
+                ...globals.node,
+            },
+        },
+        rules: {
+            "@typescript-eslint/no-require-imports": "off",
+        },
+    },
+    {
         files: ["etc/qa-dashboard/**/*.js"],
         languageOptions: {
             globals: {

@@ -13,6 +13,11 @@ import {logger} from "@/utils";
 const subprocessoDetalhe = ref<SubprocessoDetalhe | null>(null);
 const {lastError, clearError, withErrorHandling} = useErrorHandler();
 
+type ContextoAcessoSubprocesso = {
+    perfil: string;
+    codUnidade: number | null;
+};
+
 function mapSubprocessoDetalheDtoToModel(dto: any): SubprocessoDetalhe | null {
     if (!dto) return null;
 
@@ -48,9 +53,13 @@ function obterUltimaDataLimiteSubprocesso(sp: any): string {
     return dataLimiteEtapa1 > dataLimiteEtapa2 ? dataLimiteEtapa1 : dataLimiteEtapa2;
 }
 
-async function buscarSubprocessoDetalhe(codigo: number) {
-    subprocessoDetalhe.value = null;
+function registrarErroPreCondicaoPerfil() {
+    const erro = new Error("Informações de perfil ou unidade não disponíveis.");
+    lastError.value = normalizeError(erro);
+    return null;
+}
 
+function obterContextoAcessoSubprocesso(): ContextoAcessoSubprocesso | null {
     const perfilStore = usePerfilStore();
     const perfil = perfilStore.perfilSelecionado;
     const codUnidade = perfilStore.unidadeAtual;
@@ -58,15 +67,35 @@ async function buscarSubprocessoDetalhe(codigo: number) {
 
     if (!perfil || (!perfilGlobal && codUnidade === null)) {
         logger.error("Erro de pré-condição: Perfil ou unidade não disponíveis");
-        const erro = new Error("Informações de perfil ou unidade não disponíveis.");
-        lastError.value = normalizeError(erro);
+        return registrarErroPreCondicaoPerfil();
+    }
+
+    return {
+        perfil,
+        codUnidade,
+    };
+}
+
+function atualizarDetalheLocal(dto: any) {
+    subprocessoDetalhe.value = mapSubprocessoDetalheDtoToModel(dto);
+}
+
+async function buscarSubprocessoDetalhe(codigo: number) {
+    subprocessoDetalhe.value = null;
+
+    const contextoAcesso = obterContextoAcessoSubprocesso();
+    if (!contextoAcesso) {
         subprocessoDetalhe.value = null;
         return;
     }
 
     await withErrorHandling(async () => {
-        const dto = await serviceBuscarSubprocessoDetalhe(codigo, perfil, codUnidade as number);
-        subprocessoDetalhe.value = mapSubprocessoDetalheDtoToModel(dto);
+        const dto = await serviceBuscarSubprocessoDetalhe(
+            codigo,
+            contextoAcesso.perfil,
+            contextoAcesso.codUnidade as number,
+        );
+        atualizarDetalheLocal(dto);
     }, (erro) => {
         logger.error(`Erro ao buscar detalhes do subprocesso ${codigo}:`, erro);
         subprocessoDetalhe.value = null;
@@ -88,22 +117,20 @@ async function buscarSubprocessoPorProcessoEUnidade(codProcesso: number, siglaUn
 async function buscarContextoEdicao(codigo: number) {
     subprocessoDetalhe.value = null;
 
-    const perfilStore = usePerfilStore();
-    const perfil = perfilStore.perfilSelecionado;
-    const codUnidade = perfilStore.unidadeAtual;
-    const perfilGlobal = perfil === "ADMIN" || perfil === "GESTOR";
-
-    if (!perfil || (!perfilGlobal && codUnidade === null)) {
-        const erro = new Error("Informações de perfil ou unidade não disponíveis.");
-        lastError.value = normalizeError(erro);
+    const contextoAcesso = obterContextoAcessoSubprocesso();
+    if (!contextoAcesso) {
         return;
     }
 
     return withErrorHandling(async () => {
-        const data = await serviceBuscarContextoEdicao(codigo, perfil, codUnidade as number);
+        const data = await serviceBuscarContextoEdicao(
+            codigo,
+            contextoAcesso.perfil,
+            contextoAcesso.codUnidade as number,
+        );
         const detalhesDto = data.detalhes || data;
 
-        subprocessoDetalhe.value = mapSubprocessoDetalheDtoToModel(detalhesDto);
+        atualizarDetalheLocal(detalhesDto);
 
         return data;
     });

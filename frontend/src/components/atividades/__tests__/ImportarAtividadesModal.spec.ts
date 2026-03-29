@@ -121,7 +121,7 @@ describe("ImportarAtividadesModal.vue", () => {
         (wrapper.vm as any).atividadesSelecionadas = [mockAtividades[0]];
         await flushPromises();
 
-        vi.mocked(subprocessoService.importarAtividades).mockResolvedValue(true as any);
+        vi.mocked(subprocessoService.importarAtividades).mockResolvedValue({aviso: "Importação concluída"});
 
         await wrapper.find('[data-testid="btn-importar"]').trigger("click");
         await flushPromises();

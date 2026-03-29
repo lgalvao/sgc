@@ -253,7 +253,7 @@ describe('SubprocessoView.vue', () => {
         await wrapper.find('[data-testid="btn-alterar-data-limite"]').trigger('click');
         await (wrapper.vm as any).$nextTick();
 
-        expect((wrapper.vm as any).modals.modals.alterarDataLimite.value.aberto).toBe(true);
+        expect((wrapper.vm as any).mostrarModalAlterarDataLimite).toBe(true);
     });
 
     it('shows error when opening date limit modal is not allowed', async () => {
@@ -264,7 +264,7 @@ describe('SubprocessoView.vue', () => {
         (wrapper.vm as any).abrirModalAlterarDataLimite();
         await (wrapper.vm as any).$nextTick();
 
-        expect((wrapper.vm as any).modals.modals.alterarDataLimite.value.aberto).toBe(false);
+        expect((wrapper.vm as any).mostrarModalAlterarDataLimite).toBe(false);
     });
 
     it('handles date limit update confirmation', async () => {
@@ -272,7 +272,7 @@ describe('SubprocessoView.vue', () => {
         await flushPromises();
         await (wrapper.vm as any).$nextTick();
 
-        (wrapper.vm as any).modals.abrir('alterarDataLimite');
+        (wrapper.vm as any).mostrarModalAlterarDataLimite = true;
         await (wrapper.vm as any).$nextTick();
 
         const modal = wrapper.findComponent(SubprocessoModalStub);
@@ -281,7 +281,7 @@ describe('SubprocessoView.vue', () => {
         await flushPromises();
 
         expect(fluxoSubprocessoMock.alterarDataLimiteSubprocesso).toHaveBeenCalledWith(10, {novaData: '2024-01-01'});
-        expect((wrapper.vm as any).modals.modals.alterarDataLimite.value.aberto).toBe(false);
+        expect((wrapper.vm as any).mostrarModalAlterarDataLimite).toBe(false);
     });
 
     it('trata erro ao alterar data limite', async () => {
@@ -305,7 +305,7 @@ describe('SubprocessoView.vue', () => {
         await (wrapper.vm as any).$nextTick();
 
         expect((wrapper.vm as any).tipoReabertura).toBe('cadastro');
-        expect((wrapper.vm as any).modals.modals.reabrir.value.aberto).toBe(true);
+        expect((wrapper.vm as any).mostrarModalReabrir).toBe(true);
 
         const textarea = wrapper.find('textarea');
         await textarea.setValue('Erro no preenchimento');

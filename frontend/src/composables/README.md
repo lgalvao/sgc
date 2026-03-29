@@ -6,10 +6,7 @@ Este diretório contém funções que encapsulam lógica de estado e UI reutiliz
 
 ### Lógica de UI e Estado
 
-* **`useApi.ts`**: Wrapper para chamadas de API com estados de `loading` e `error` integrados.
 * **`useErrorHandler.ts`**: Tratamento padronizado de erros de API e exibição de feedbacks.
-* **`useLoadingManager.ts`**: Controle centralizado de indicadores de carregamento.
-* **`useModalManager.ts`**: Abstração para abertura e fechamento de modais programaticamente.
 * **`useLocalStorage.ts`**: Persistência reativa de dados no navegador.
 * **`useFormErrors.ts`**: Gestão e exibição de erros de validação em formulários.
 

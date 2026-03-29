@@ -138,11 +138,11 @@
 <script lang="ts" setup>
 import {BAlert, BButton, BFormCheckbox, BFormSelect, BFormSelectOption, BModal, BSpinner} from "bootstrap-vue-next";
 import {onMounted, ref, watch} from "vue";
-import {useApi} from "@/composables/useApi";
 import {useProcessos} from "@/composables/useProcessos";
 import * as subprocessoService from "@/services/subprocessoService";
 import {type Atividade, type ProcessoResumo, type UnidadeImportacao,} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
+import {normalizeError} from "@/utils/apiError";
 
 const props = defineProps<{
   mostrar: boolean;
@@ -155,14 +155,9 @@ const emit = defineEmits<{
 }>();
 
 const processos = useProcessos();
-
-const {
-  execute: executarImportacao,
-  data: resultadoImportacao,
-  error: erroImportacao,
-  isLoading: importando,
-  clearError: limparErroImportacao,
-} = useApi(subprocessoService.importarAtividades);
+const resultadoImportacao = ref<{aviso?: string} | null>(null);
+const erroImportacao = ref<string | null>(null);
+const importando = ref(false);
 
 const processoSelecionado = ref<ProcessoResumo | null>(null);
 const processoSelecionadoId = ref<number | null>(null);
@@ -222,6 +217,10 @@ function resetModal() {
   atividadesSelecionadas.value = [];
 }
 
+function limparErroImportacao() {
+  erroImportacao.value = null;
+}
+
 async function selecionarProcesso(processo: ProcessoResumo | null) {
   processoSelecionado.value = processo;
   atividadesSelecionadas.value = [];
@@ -266,16 +265,18 @@ async function importar() {
   const idsAtividades = atividadesSelecionadas.value.map((a) => a.codigo);
 
   try {
-    await executarImportacao(
-        props.codSubprocessoDestino,
-        unidadeSelecionada.value.codSubprocesso,
-        idsAtividades,
+    importando.value = true;
+    resultadoImportacao.value = await subprocessoService.importarAtividades(
+      props.codSubprocessoDestino,
+      unidadeSelecionada.value.codSubprocesso,
+      idsAtividades,
     );
     emit("importar", resultadoImportacao.value?.aviso);
     fechar();
-  } catch {
-    // O erro já está sendo tratado pelo useApi, não é necessário fazer nada aqui
-    // a não ser que queira algum comportamento adicional no erro.
+  } catch (erro) {
+    erroImportacao.value = normalizeError(erro).message;
+  } finally {
+    importando.value = false;
   }
 }
 </script>

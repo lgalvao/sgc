@@ -175,8 +175,8 @@
   <SubprocessoModal
       :data-limite-atual="dataLimite"
       :etapa-atual="subprocesso?.etapaAtual || null"
-      :loading="carregamento.estaCarregando('dataLimite')"
-      :mostrar-modal="modals.estaAberto('alterarDataLimite')"
+      :loading="loadingDataLimite"
+      :mostrar-modal="mostrarModalAlterarDataLimite"
       :ultima-data-limite-subprocesso="subprocesso?.ultimaDataLimiteSubprocesso ? parseDate(subprocesso.ultimaDataLimiteSubprocesso) : null"
       @fechar-modal="fecharModalAlterarDataLimite"
       @confirmar-alteracao="confirmarAlteracaoDataLimite"
@@ -184,9 +184,9 @@
 
   <!-- Modal para reabrir cadastro/revisão -->
   <ModalConfirmacao
-      v-model="modals.modals.reabrir.value.aberto"
+      v-model="mostrarModalReabrir"
       :auto-close="false"
-      :loading="carregamento.estaCarregando('reabertura')"
+      :loading="loadingReabertura"
       :ok-disabled="!justificativaReabertura.trim()"
       :titulo="tipoReabertura === 'cadastro' ? TEXTOS.subprocesso.REABRIR_CADASTRO_TITULO : TEXTOS.subprocesso.REABRIR_REVISAO_TITULO"
       :ok-title="TEXTOS.comum.BOTAO_REABRIR"
@@ -222,7 +222,7 @@
 
 <script lang="ts" setup>
 import {BAlert, BButton, BCard, BCardBody, BFormTextarea, BSpinner, BTable, useToast} from "bootstrap-vue-next";
-import {computed, onMounted, ref} from "vue";
+import {computed, onMounted, ref, type Ref} from "vue";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import SubprocessoCards from "@/components/processo/SubprocessoCards.vue";
@@ -231,8 +231,6 @@ import AppAlert from "@/components/comum/AppAlert.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import {useMapas} from "@/composables/useMapas";
 import {useNotification} from "@/composables/useNotification";
-import {useGerenciadorModals} from "@/composables/useModalManager";
-import {useGerenciadorCarregamento} from "@/composables/useLoadingManager";
 import {useFluxoSubprocesso} from "@/composables/useFluxoSubprocesso";
 import {useSubprocessos} from "@/composables/useSubprocessos";
 import {enviarLembrete as enviarLembreteService} from "@/services/processoService";
@@ -271,15 +269,15 @@ const {notificacao, notify, clear} = useNotification();
 const toastStore = useToastStore();
 const toast = useToast();
 
-// Gerenciamento simplificado de modals e carregamento com composables
-const modals = useGerenciadorModals(['alterarDataLimite', 'reabrir']);
-const carregamento = useGerenciadorCarregamento(['dataLimite', 'reabertura']);
-
 const tipoReabertura = ref<'cadastro' | 'revisao'>('cadastro');
 const justificativaReabertura = ref('');
 const codSubprocesso = ref<number | null>(null);
 const erroNaoEncontrado = ref(false);
 const modalLembreteAberto = ref(false);
+const mostrarModalAlterarDataLimite = ref(false);
+const mostrarModalReabrir = ref(false);
+const loadingDataLimite = ref(false);
+const loadingReabertura = ref(false);
 
 const camposMovimentacoes = [
   {key: "dataHora", label: TEXTOS.subprocesso.MOVIMENTACOES_CAMPO_DATA},
@@ -316,6 +314,15 @@ const dataLimite = computed(() => {
   const ultimaDataLimite = subprocesso.value?.ultimaDataLimiteSubprocesso;
   return ultimaDataLimite ? parseDate(ultimaDataLimite) : null;
 });
+
+async function executarComCarregamento(loading: Ref<boolean>, acao: () => Promise<void>) {
+  loading.value = true;
+  try {
+    await acao();
+  } finally {
+    loading.value = false;
+  }
+}
 
 function exibirToastPendente() {
   const pendente = toastStore.consumePending();
@@ -364,14 +371,14 @@ onMounted(async () => {
 
 function abrirModalAlterarDataLimite() {
   if (podeAlterarDataLimite.value) {
-    modals.abrir('alterarDataLimite');
+    mostrarModalAlterarDataLimite.value = true;
   } else {
     notify(TEXTOS.subprocesso.ERRO_SEM_PERMISSAO_DATA, 'danger');
   }
 }
 
 function fecharModalAlterarDataLimite() {
-  modals.fechar('alterarDataLimite');
+  mostrarModalAlterarDataLimite.value = false;
 }
 
 async function confirmarAlteracaoDataLimite(novaData: string) {
@@ -379,7 +386,7 @@ async function confirmarAlteracaoDataLimite(novaData: string) {
     return;
   }
 
-  await carregamento.comCarregamento('dataLimite', async () => {
+  await executarComCarregamento(loadingDataLimite, async () => {
     try {
       await fluxoSubprocesso.alterarDataLimiteSubprocesso(
           subprocesso.value!.codigo,
@@ -397,17 +404,17 @@ async function confirmarAlteracaoDataLimite(novaData: string) {
 function abrirModalReabrirCadastro() {
   tipoReabertura.value = 'cadastro';
   justificativaReabertura.value = '';
-  modals.abrir('reabrir');
+  mostrarModalReabrir.value = true;
 }
 
 function abrirModalReabrirRevisao() {
   tipoReabertura.value = 'revisao';
   justificativaReabertura.value = '';
-  modals.abrir('reabrir');
+  mostrarModalReabrir.value = true;
 }
 
 function fecharModalReabrir() {
-  modals.fechar('reabrir');
+  mostrarModalReabrir.value = false;
   justificativaReabertura.value = '';
 }
 
@@ -417,7 +424,7 @@ async function confirmarReabertura() {
     return;
   }
 
-  await carregamento.comCarregamento('reabertura', async () => {
+  await executarComCarregamento(loadingReabertura, async () => {
     let sucesso: boolean;
     if (tipoReabertura.value === 'cadastro') {
       sucesso = await fluxoSubprocesso.reabrirCadastro(codSubprocesso.value!, justificativaReabertura.value);
@@ -467,6 +474,8 @@ defineExpose({
   abrirModalAlterarDataLimite,
   abrirModalReabrirCadastro,
   abrirModalReabrirRevisao,
+  mostrarModalAlterarDataLimite,
+  mostrarModalReabrir,
   modalLembreteAberto,
   justificativaReabertura
 });

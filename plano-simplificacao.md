@@ -11,6 +11,7 @@ Estes princípios valem para backend e frontend e devem orientar cada rodada:
 * Simplificar primeiro a menor fronteira segura.
 * Tornar dependências e fluxos explícitos.
 * Reduzir superfície pública antes de criar abstração nova.
+* Desconfiar de abstração genérica com um único consumidor real.
 * Preservar contratos externos, DTOs e regras de acesso.
 * Remover código morto logo após a simplificação.
 * Validar em passos pequenos e registrar aprendizado no próprio plano.
@@ -465,6 +466,7 @@ Os próximos passos devem ser executados como uma frente única, e não como oti
 
 * se o composable altera outro store por dentro, reavaliar;
 * se a view é o único consumidor, preferir helper local ou composable de escopo curto;
+* se uma abstração genérica tiver só um consumidor real, preferir estado e helpers explícitos na própria tela ou componente;
 * se o estado é realmente compartilhado, explicitar isso no plano e manter o singleton.
 
 ### Frente D. Consolidar backend para servir melhor o frontend real
@@ -554,3 +556,8 @@ O plano terá sido bem executado se:
 * `LoadingButton.vue` continua sendo um wrapper fino, mas o volume de uso torna a remoção imediata cara demais; o melhor caminho agora é impedir novos wrappers fracos e só reavaliar esse componente junto de refatorações de telas maiores.
 * A validação de backend com Gradle pode produzir falso negativo por problema de cache de build; quando `:backend:test` passa e `:backend:compileTestJava` falha só ao armazenar cache, vale repetir com `--no-configuration-cache` antes de tratar como regressão de código.
 * Endpoints com `@RequestBody(required = false)` não podem usar `Optional.of(...)` no controller; isso reintroduz `500` em fluxos válidos sem payload, como aceite e homologação da validação do mapa no CDU-20.
+* A nova varredura confirmou que o plano original já não cobria todos os alvos bons. Depois de reduzir os grandes acoplamentos do frontend, passou a fazer mais sentido procurar abstrações genéricas herdadas do protótipo com consumo real muito pequeno.
+* `useLoadingManager`, `useModalManager` e `useApi` eram exemplos claros desse padrão: abstrações genéricas para um único fluxo real. Removê-las reduziu superfície pública, arquivos para navegar e testes artificiais sem alterar contratos de negócio.
+* Em `SubprocessoView`, dois modais e dois estados de loading ficaram mais simples como `ref` local do que como gerenciadores genéricos parametrizados.
+* Em `ImportarAtividadesModal`, um wrapper genérico de API não agregava contrato além de `loading + erro`; mover esse estado para o próprio componente deixou o fluxo mais direto.
+* `useSubprocessos` ainda tinha duplicação interna de pré-condição de perfil/unidade. Extrair um helper único para esse contexto melhorou a leitura sem ampliar a API pública do composable.
