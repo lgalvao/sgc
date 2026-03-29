@@ -12,6 +12,8 @@ const {
     inferirCategoria,
     lerConteudoFonte,
     classificarPerfilDto,
+    classificarPerfilModel,
+    classificarPerfilOther,
     construirNomeClasseCompleto,
     criarItemRelatorio
 } = require('./lib/testes-analisar-regras.cjs');
@@ -227,11 +229,33 @@ async function analisarTestes(backendDir = 'backend', caminhoJacocoXml = null) {
     let totalDtosComportamentais = 0;
     let totalDtosEstruturais = 0;
     let totalDtosEstruturaisContratuais = 0;
+    let totalModelsComportamentais = 0;
+    let totalModelsEstruturais = 0;
+    let totalModelsEstruturaisContratuais = 0;
+    let totalOthersComportamentais = 0;
+    let totalOthersEstruturais = 0;
+    let totalOthersEstruturaisContratuais = 0;
 
     arquivosFonte.forEach(arquivo => {
         const conteudoFonte = lerConteudoFonte(backendSrc, arquivo.caminho_relativo);
         const perfilDto = arquivo.categoria === 'DTOs' ? classificarPerfilDto(conteudoFonte) : null;
+        const perfilModel = arquivo.categoria === 'Models'
+            ? classificarPerfilModel({
+                nomeClasse: arquivo.nome_classe,
+                caminhoRelativo: arquivo.caminho_relativo,
+                conteudoFonte
+            })
+            : null;
+        const perfilOther = arquivo.categoria === 'Others'
+            ? classificarPerfilOther({
+                nomeClasse: arquivo.nome_classe,
+                caminhoRelativo: arquivo.caminho_relativo,
+                conteudoFonte
+            })
+            : null;
         const dtoEstrutural = perfilDto === 'estrutural_puro' || perfilDto === 'estrutural_contrato';
+        const modelEstrutural = perfilModel === 'estrutural_puro' || perfilModel === 'estrutural_contrato';
+        const otherEstrutural = perfilOther === 'estrutural_puro' || perfilOther === 'estrutural_contrato';
         const {caminhos, estrategia} = localizarTestes(
             arquivo.nome_classe,
             arquivo.pacote,
@@ -248,7 +272,7 @@ async function analisarTestes(backendDir = 'backend', caminhoJacocoXml = null) {
         const item = criarItemRelatorio({
             arquivo,
             perfilDto,
-            dtoEstrutural,
+            dtoEstrutural: dtoEstrutural || modelEstrutural || otherEstrutural,
             possuiTeste,
             estaNoEscopoJacoco,
             possuiCoberturaJacoco,
@@ -258,6 +282,10 @@ async function analisarTestes(backendDir = 'backend', caminhoJacocoXml = null) {
             caminhos,
             coberturaClasse
         });
+        item.perfil_model = perfilModel;
+        item.model_ruido_ignorado = modelEstrutural;
+        item.perfil_other = perfilOther;
+        item.other_ruido_ignorado = otherEstrutural;
 
         if (arquivo.categoria === 'DTOs') {
             if (perfilDto === 'comportamental') {
@@ -270,6 +298,28 @@ async function analisarTestes(backendDir = 'backend', caminhoJacocoXml = null) {
             }
         }
 
+        if (arquivo.categoria === 'Models') {
+            if (perfilModel === 'comportamental') {
+                totalModelsComportamentais++;
+            } else {
+                totalModelsEstruturais++;
+                if (perfilModel === 'estrutural_contrato') {
+                    totalModelsEstruturaisContratuais++;
+                }
+            }
+        }
+
+        if (arquivo.categoria === 'Others') {
+            if (perfilOther === 'comportamental') {
+                totalOthersComportamentais++;
+            } else {
+                totalOthersEstruturais++;
+                if (perfilOther === 'estrutural_contrato') {
+                    totalOthersEstruturaisContratuais++;
+                }
+            }
+        }
+
         if (possuiTeste) {
             totalComTeste++;
             relatorio[arquivo.categoria].tested.push(item);
@@ -278,7 +328,7 @@ async function analisarTestes(backendDir = 'backend', caminhoJacocoXml = null) {
             }
         } else {
             relatorio[arquivo.categoria].untested.push(item);
-            if (dtoEstrutural) {
+            if (dtoEstrutural || modelEstrutural || otherEstrutural) {
                 totalRuidoIgnorado++;
             } else if (estaForaEscopoJacoco) {
                 totalForaEscopoJacoco++;
@@ -318,7 +368,13 @@ async function analisarTestes(backendDir = 'backend', caminhoJacocoXml = null) {
             jacoco_disponivel: coberturaPorClasse.size > 0,
             dtos_comportamentais: totalDtosComportamentais,
             dtos_estruturais: totalDtosEstruturais,
-            dtos_estruturais_contratuais: totalDtosEstruturaisContratuais
+            dtos_estruturais_contratuais: totalDtosEstruturaisContratuais,
+            models_comportamentais: totalModelsComportamentais,
+            models_estruturais: totalModelsEstruturais,
+            models_estruturais_contratuais: totalModelsEstruturaisContratuais,
+            others_comportamentais: totalOthersComportamentais,
+            others_estruturais: totalOthersEstruturais,
+            others_estruturais_contratuais: totalOthersEstruturaisContratuais
         },
         categorias: relatorio
     };
@@ -361,14 +417,28 @@ function gerarMarkdown(dados) {
 
         const totalRelevanteCategoria = categoria === 'DTOs'
             ? itens.tested.length + itens.untested.filter(item => !item.dto_ruido_ignorado).length
-            : total;
-        linhas.push(`### ${categoria} (${itens.tested.length}/${totalRelevanteCategoria} testados${categoria === 'DTOs' ? ' no backlog real' : ''})`);
+            : (categoria === 'Models'
+                ? itens.tested.length + itens.untested.filter(item => !item.model_ruido_ignorado).length
+                : (categoria === 'Others'
+                    ? itens.tested.length + itens.untested.filter(item => !item.other_ruido_ignorado).length
+                    : total));
+        linhas.push(`### ${categoria} (${itens.tested.length}/${totalRelevanteCategoria} testados${categoria === 'DTOs' || categoria === 'Models' || categoria === 'Others' ? ' no backlog real' : ''})`);
         if (itens.untested.length > 0) {
             const candidatos = categoria === 'DTOs'
                 ? itens.untested.filter(item => !item.dto_ruido_ignorado)
-                : itens.untested;
+                : (categoria === 'Models'
+                    ? itens.untested.filter(item => !item.model_ruido_ignorado)
+                    : (categoria === 'Others'
+                        ? itens.untested.filter(item => !item.other_ruido_ignorado)
+                        : itens.untested));
             const dtoRuido = categoria === 'DTOs'
                 ? itens.untested.filter(item => item.dto_ruido_ignorado)
+                : [];
+            const modelRuido = categoria === 'Models'
+                ? itens.untested.filter(item => item.model_ruido_ignorado)
+                : [];
+            const otherRuido = categoria === 'Others'
+                ? itens.untested.filter(item => item.other_ruido_ignorado)
                 : [];
             const indiretos = candidatos.filter(item => item.coberta_somente_indiretamente);
             const foraEscopo = candidatos.filter(item => item.fora_escopo_jacoco);
@@ -402,6 +472,20 @@ function gerarMarkdown(dados) {
                     .slice()
                     .sort((a, b) => a.caminho_relativo.localeCompare(b.caminho_relativo, 'pt-BR'))
                     .forEach(item => linhas.push(`- \`${item.caminho_relativo}\` (${item.perfil_dto})`));
+            }
+            if (modelRuido.length > 0) {
+                linhas.push(`Ignorados como model estrutural/contratual (${modelRuido.length}):`);
+                modelRuido
+                    .slice()
+                    .sort((a, b) => a.caminho_relativo.localeCompare(b.caminho_relativo, 'pt-BR'))
+                    .forEach(item => linhas.push(`- \`${item.caminho_relativo}\` (${item.perfil_model})`));
+            }
+            if (otherRuido.length > 0) {
+                linhas.push(`Ignorados como others estrutural/contratual (${otherRuido.length}):`);
+                otherRuido
+                    .slice()
+                    .sort((a, b) => a.caminho_relativo.localeCompare(b.caminho_relativo, 'pt-BR'))
+                    .forEach(item => linhas.push(`- \`${item.caminho_relativo}\` (${item.perfil_other})`));
             }
         } else {
             linhas.push('Todos cobertos.');
@@ -439,6 +523,18 @@ function imprimirResumoConsole(dados) {
         if (categoria === 'DTOs') {
             const totalRelevante = itens.tested.length + itens.untested.filter(item => !item.dto_ruido_ignorado).length;
             const ignorados = itens.untested.filter(item => item.dto_ruido_ignorado).length;
+            console.log(`- ${categoria}: ${itens.tested.length}/${totalRelevante} testados no backlog real (${ignorados} ignorados)`);
+            return;
+        }
+        if (categoria === 'Models') {
+            const totalRelevante = itens.tested.length + itens.untested.filter(item => !item.model_ruido_ignorado).length;
+            const ignorados = itens.untested.filter(item => item.model_ruido_ignorado).length;
+            console.log(`- ${categoria}: ${itens.tested.length}/${totalRelevante} testados no backlog real (${ignorados} ignorados)`);
+            return;
+        }
+        if (categoria === 'Others') {
+            const totalRelevante = itens.tested.length + itens.untested.filter(item => !item.other_ruido_ignorado).length;
+            const ignorados = itens.untested.filter(item => item.other_ruido_ignorado).length;
             console.log(`- ${categoria}: ${itens.tested.length}/${totalRelevante} testados no backlog real (${ignorados} ignorados)`);
             return;
         }

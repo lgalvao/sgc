@@ -16,7 +16,7 @@ function inferirCategoria(nomeClasse, caminhoRelativo) {
     if (nomeClasse.includes('Service') || nomeClasse.includes('Policy')) return 'Services';
     if (nomeClasse.includes('Facade')) return 'Facades';
     if (nomeClasse.includes('Mapper')) return 'Mappers';
-    if (nomeClasse.includes('Dto') || nomeClasse.includes('Request') || nomeClasse.includes('Response')) return 'DTOs';
+    if (caminhoNormalizado.includes('/dto/') || nomeClasse.includes('Dto') || nomeClasse.includes('Request') || nomeClasse.includes('Response') || nomeClasse.includes('Command')) return 'DTOs';
     if (nomeClasse.includes('Repo')) return 'Repositories';
     if (caminhoNormalizado.includes('/model/') || caminhoNormalizado.includes('/dominio/')) return 'Models';
     return 'Others';
@@ -40,6 +40,82 @@ function classificarPerfilDto(conteudoFonte) {
     }
 
     if (possuiValidacaoOuContrato) {
+        return 'estrutural_contrato';
+    }
+
+    return 'estrutural_puro';
+}
+
+function classificarPerfilModel({nomeClasse, caminhoRelativo, conteudoFonte}) {
+    const caminhoNormalizado = normalizarCaminho(caminhoRelativo);
+    const conteudoSemComentarios = conteudoFonte
+        .replace(/\/\*[\s\S]*?\*\//g, '')
+        .replace(/\/\/.*$/gm, '');
+
+    if (
+        nomeClasse.endsWith('Views')
+        || nomeClasse.startsWith('Tipo')
+        || nomeClasse.startsWith('Situacao')
+        || nomeClasse === 'Perfil'
+        || nomeClasse.endsWith('Id')
+    ) {
+        return 'estrutural_puro';
+    }
+
+    if (/\bpublic\s+@interface\b/.test(conteudoSemComentarios)) {
+        return 'estrutural_contrato';
+    }
+
+    const possuiMetodoExplicito = /\b(public|private|protected)\s+(?!class\b|interface\b|enum\b|record\b)(static\s+)?[\w@.<>\[\]?]+\s+\w+\s*\(/.test(conteudoSemComentarios);
+    const possuiFluxoControle = /\b(for|if|switch|while)\s*\(/.test(conteudoSemComentarios);
+    const possuiOperacaoColecao = /\.stream\s*\(|\.map\s*\(|\.filter\s*\(|\.collect\s*\(|removeIf\s*\(|anyMatch\s*\(/.test(conteudoSemComentarios);
+    const possuiContratoExposto = /@JsonProperty\b|@JsonView\b/.test(conteudoSemComentarios);
+    const possuiDominio = /\bthrow\b|\breturn\b/.test(conteudoSemComentarios);
+
+    if (possuiMetodoExplicito && (possuiFluxoControle || possuiOperacaoColecao || possuiContratoExposto || possuiDominio)) {
+        return 'comportamental';
+    }
+
+    if (possuiMetodoExplicito) {
+        return 'estrutural_contrato';
+    }
+
+    return 'estrutural_puro';
+}
+
+function classificarPerfilOther({nomeClasse, caminhoRelativo, conteudoFonte}) {
+    const caminhoNormalizado = normalizarCaminho(caminhoRelativo);
+    const conteudoSemComentarios = conteudoFonte
+        .replace(/\/\*[\s\S]*?\*\//g, '')
+        .replace(/\/\/.*$/gm, '');
+
+    if (
+        nomeClasse === 'Sgc'
+        || nomeClasse === 'Mensagens'
+        || nomeClasse.endsWith('Properties')
+        || nomeClasse.startsWith('Config')
+        || nomeClasse.startsWith('Erro')
+        || nomeClasse.endsWith('SecurityConfig')
+        || caminhoNormalizado.includes('/config/')
+        || caminhoNormalizado.includes('/erros/')
+    ) {
+        return 'estrutural_puro';
+    }
+
+    if (/\bpublic\s+@interface\b/.test(conteudoSemComentarios)) {
+        return 'estrutural_contrato';
+    }
+
+    const possuiMetodoExplicito = /\b(public|private|protected)\s+(?!class\b|interface\b|enum\b|record\b)(static\s+)?[\w@.<>\[\]?]+\s+\w+\s*\(/.test(conteudoSemComentarios);
+    const possuiFluxoControle = /\b(for|if|switch|while)\s*\(/.test(conteudoSemComentarios);
+    const possuiOperacaoColecao = /\.stream\s*\(|\.map\s*\(|\.filter\s*\(|\.collect\s*\(|removeIf\s*\(|anyMatch\s*\(/.test(conteudoSemComentarios);
+    const possuiDominio = /\bthrow\b|\breturn\b/.test(conteudoSemComentarios);
+
+    if (possuiMetodoExplicito && (possuiFluxoControle || possuiOperacaoColecao || possuiDominio)) {
+        return 'comportamental';
+    }
+
+    if (possuiMetodoExplicito) {
         return 'estrutural_contrato';
     }
 
@@ -106,6 +182,8 @@ module.exports = {
     inferirCategoria,
     lerConteudoFonte,
     classificarPerfilDto,
+    classificarPerfilModel,
+    classificarPerfilOther,
     construirNomeClasseCompleto,
     criarItemRelatorio
 };

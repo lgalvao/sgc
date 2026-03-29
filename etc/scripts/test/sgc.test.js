@@ -122,6 +122,107 @@ describe("CLI raiz do toolkit", () => {
         expect(dtoUntested.find((item) => item.classe === "DtoComportamental").dto_ruido_ignorado).toBe(false);
     });
 
+    test("ignora models estruturais e contratuais do backlog real", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-testes-analise-model-"));
+        const backendDir = path.join(base, "backend-fake");
+        const modelDir = path.join(backendDir, "src", "main", "java", "sgc", "exemplo", "model");
+        const markdown = path.join(base, "relatorio.md");
+        const json = path.join(base, "relatorio.json");
+
+        await fs.outputFile(
+            path.join(modelDir, "SituacaoExemplo.java"),
+            "package sgc.exemplo.model; public enum SituacaoExemplo { ATIVO }"
+        );
+        await fs.outputFile(
+            path.join(modelDir, "AnotacaoExemplo.java"),
+            "package sgc.exemplo.model; import java.lang.annotation.*; public @interface AnotacaoExemplo { String value() default \"\"; }"
+        );
+        await fs.outputFile(
+            path.join(modelDir, "ProcessoExemplo.java"),
+            "package sgc.exemplo.model; import java.util.*; public class ProcessoExemplo { public void sincronizar(Set<Long> codigos) { if (codigos.isEmpty()) return; codigos.stream().filter(Objects::nonNull).toList(); } }"
+        );
+
+        const resultado = await executarSgc([
+            "backend",
+            "testes",
+            "analisar",
+            "--dir",
+            backendDir,
+            "--output",
+            markdown,
+            "--output-json",
+            json
+        ], {cwd: base});
+
+        expect(resultado.exitCode).toBe(0);
+        expect(resultado.stdout).toContain("Models: 0/1 testados no backlog real (2 ignorados)");
+
+        const conteudoJson = await fs.readJson(json);
+        expect(conteudoJson.estatisticas.models_comportamentais).toBe(1);
+        expect(conteudoJson.estatisticas.models_estruturais).toBe(2);
+        expect(conteudoJson.estatisticas.models_estruturais_contratuais).toBe(1);
+
+        const modelUntested = conteudoJson.categorias.Models.untested;
+        expect(modelUntested.find((item) => item.classe === "SituacaoExemplo").model_ruido_ignorado).toBe(true);
+        expect(modelUntested.find((item) => item.classe === "AnotacaoExemplo").perfil_model).toBe("estrutural_contrato");
+        expect(modelUntested.find((item) => item.classe === "ProcessoExemplo").model_ruido_ignorado).toBe(false);
+    });
+
+    test("ignora others estruturais e contratuais do backlog real e reclassifica commands como DTOs", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-testes-analise-others-"));
+        const backendDir = path.join(base, "backend-fake");
+        const otherDir = path.join(backendDir, "src", "main", "java", "sgc", "exemplo");
+        const dtoDir = path.join(otherDir, "dto");
+        const markdown = path.join(base, "relatorio.md");
+        const json = path.join(base, "relatorio.json");
+
+        await fs.outputFile(
+            path.join(otherDir, "Mensagens.java"),
+            "package sgc.exemplo; public final class Mensagens { private Mensagens() {} public static final String OI = \"oi\"; }"
+        );
+        await fs.outputFile(
+            path.join(otherDir, "AnotacaoSegura.java"),
+            "package sgc.exemplo; public @interface AnotacaoSegura {}"
+        );
+        await fs.outputFile(
+            path.join(otherDir, "LimitadorExemplo.java"),
+            "package sgc.exemplo; import java.util.*; public class LimitadorExemplo { public void verificar(String valor) { if (valor.isBlank()) return; List.of(valor).stream().toList(); } }"
+        );
+        await fs.outputFile(
+            path.join(dtoDir, "WorkflowCommand.java"),
+            "package sgc.exemplo.dto; public record WorkflowCommand(String nome) {}"
+        );
+
+        const resultado = await executarSgc([
+            "backend",
+            "testes",
+            "analisar",
+            "--dir",
+            backendDir,
+            "--output",
+            markdown,
+            "--output-json",
+            json
+        ], {cwd: base});
+
+        expect(resultado.exitCode).toBe(0);
+        expect(resultado.stdout).toContain("Others: 0/1 testados no backlog real (2 ignorados)");
+        expect(resultado.stdout).toContain("DTOs: 0/0 testados no backlog real (1 ignorados)");
+
+        const conteudoJson = await fs.readJson(json);
+        expect(conteudoJson.estatisticas.others_comportamentais).toBe(1);
+        expect(conteudoJson.estatisticas.others_estruturais).toBe(2);
+        expect(conteudoJson.estatisticas.others_estruturais_contratuais).toBe(1);
+
+        const otherUntested = conteudoJson.categorias.Others.untested;
+        expect(otherUntested.find((item) => item.classe === "Mensagens").other_ruido_ignorado).toBe(true);
+        expect(otherUntested.find((item) => item.classe === "AnotacaoSegura").perfil_other).toBe("estrutural_contrato");
+        expect(otherUntested.find((item) => item.classe === "LimitadorExemplo").other_ruido_ignorado).toBe(false);
+
+        const dtoUntested = conteudoJson.categorias.DTOs.untested;
+        expect(dtoUntested.find((item) => item.classe === "WorkflowCommand").dto_ruido_ignorado).toBe(true);
+    });
+
     test("classifica separadamente teste dedicado, cobertura indireta, sem evidencia e fora do escopo", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-testes-analise-jacoco-"));
         const backendDir = path.join(base, "backend-fake");
