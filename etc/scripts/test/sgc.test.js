@@ -61,12 +61,130 @@ describe("CLI raiz do toolkit", () => {
         expect(resultado.exitCode).toBe(0);
         expect(resultado.stdout).toContain("Resumo:");
         expect(resultado.stdout).toContain("Repositories:");
+        expect(resultado.stdout).toContain("Cobertura indireta:");
+        expect(resultado.stdout).toContain("DTOs:");
         expect(await fs.pathExists(markdown)).toBe(true);
         expect(await fs.pathExists(json)).toBe(true);
 
         const conteudoJson = await fs.readJson(json);
         expect(conteudoJson.estatisticas.total_classes).toBeGreaterThan(0);
+        expect(typeof conteudoJson.estatisticas.classes_com_cobertura_indireta).toBe("number");
+        expect(typeof conteudoJson.estatisticas.classes_sem_evidencia_no_escopo).toBe("number");
+        expect(typeof conteudoJson.estatisticas.classes_fora_escopo_jacoco).toBe("number");
+        expect(typeof conteudoJson.estatisticas.classes_ruido_ignorado).toBe("number");
         expect(conteudoJson.categorias.Repositories.tested.length).toBeGreaterThanOrEqual(1);
+    });
+
+    test("ignora DTOs estruturais e contratuais do backlog real", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-testes-analise-dto-"));
+        const backendDir = path.join(base, "backend-fake");
+        const dtoDir = path.join(backendDir, "src", "main", "java", "sgc", "exemplo", "dto");
+        const markdown = path.join(base, "relatorio.md");
+        const json = path.join(base, "relatorio.json");
+
+        await fs.outputFile(
+            path.join(dtoDir, "DtoEstrutural.java"),
+            "package sgc.exemplo.dto; public record DtoEstrutural(Long codigo, String nome) {}"
+        );
+        await fs.outputFile(
+            path.join(dtoDir, "RequestContratual.java"),
+            "package sgc.exemplo.dto; import jakarta.validation.constraints.NotBlank; public record RequestContratual(@NotBlank String nome) {}"
+        );
+        await fs.outputFile(
+            path.join(dtoDir, "DtoComportamental.java"),
+            "package sgc.exemplo.dto; public class DtoComportamental { public static DtoComportamental of(String valor) { return new DtoComportamental(); } }"
+        );
+
+        const resultado = await executarSgc([
+            "backend",
+            "testes",
+            "analisar",
+            "--dir",
+            backendDir,
+            "--output",
+            markdown,
+            "--output-json",
+            json
+        ], {cwd: base});
+
+        expect(resultado.exitCode).toBe(0);
+        expect(resultado.stdout).toContain("DTOs: 0/1 testados no backlog real (2 ignorados)");
+
+        const conteudoJson = await fs.readJson(json);
+        expect(conteudoJson.estatisticas.dtos_comportamentais).toBe(1);
+        expect(conteudoJson.estatisticas.dtos_estruturais).toBe(2);
+        expect(conteudoJson.estatisticas.dtos_estruturais_contratuais).toBe(1);
+        expect(conteudoJson.estatisticas.classes_ruido_ignorado).toBe(2);
+
+        const dtoUntested = conteudoJson.categorias.DTOs.untested;
+        expect(dtoUntested.find((item) => item.classe === "DtoEstrutural").dto_ruido_ignorado).toBe(true);
+        expect(dtoUntested.find((item) => item.classe === "RequestContratual").perfil_dto).toBe("estrutural_contrato");
+        expect(dtoUntested.find((item) => item.classe === "DtoComportamental").dto_ruido_ignorado).toBe(false);
+    });
+
+    test("classifica separadamente teste dedicado, cobertura indireta, sem evidencia e fora do escopo", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-testes-analise-jacoco-"));
+        const backendDir = path.join(base, "backend-fake");
+        const srcDir = path.join(backendDir, "src", "main", "java", "sgc", "exemplo");
+        const testDir = path.join(backendDir, "src", "test", "java", "sgc", "exemplo");
+        const markdown = path.join(base, "relatorio.md");
+        const json = path.join(base, "relatorio.json");
+        const jacoco = path.join(base, "jacoco.xml");
+
+        await fs.outputFile(path.join(srcDir, "ClasseDireta.java"), "package sgc.exemplo; public class ClasseDireta {}");
+        await fs.outputFile(path.join(srcDir, "ClasseIndireta.java"), "package sgc.exemplo; public class ClasseIndireta {}");
+        await fs.outputFile(path.join(srcDir, "ClasseSemEvidencia.java"), "package sgc.exemplo; public class ClasseSemEvidencia {}");
+        await fs.outputFile(path.join(srcDir, "ClasseForaEscopo.java"), "package sgc.exemplo; public class ClasseForaEscopo {}");
+        await fs.outputFile(path.join(testDir, "ClasseDiretaTest.java"), "package sgc.exemplo; class ClasseDiretaTest {}");
+        await fs.outputFile(jacoco, `
+<report name="fake">
+  <package name="sgc/exemplo">
+    <sourcefile name="ClasseDireta.java">
+      <line nr="1" mi="0" ci="1" mb="0" cb="0"/>
+      <counter type="LINE" missed="0" covered="1"/>
+    </sourcefile>
+    <sourcefile name="ClasseIndireta.java">
+      <line nr="1" mi="0" ci="1" mb="0" cb="0"/>
+      <counter type="LINE" missed="0" covered="1"/>
+    </sourcefile>
+    <sourcefile name="ClasseSemEvidencia.java">
+      <line nr="1" mi="1" ci="0" mb="0" cb="0"/>
+      <counter type="LINE" missed="1" covered="0"/>
+    </sourcefile>
+  </package>
+</report>`.trim());
+
+        const resultado = await executarSgc([
+            "backend",
+            "testes",
+            "analisar",
+            "--dir",
+            backendDir,
+            "--output",
+            markdown,
+            "--output-json",
+            json,
+            "--jacoco-xml",
+            jacoco
+        ], {cwd: base});
+
+        expect(resultado.exitCode).toBe(0);
+        expect(resultado.stdout).toContain("Cobertura indireta: 1");
+        expect(resultado.stdout).toContain("Sem evidencia no escopo: 1");
+        expect(resultado.stdout).toContain("Fora do escopo do JaCoCo: 1");
+
+        const conteudoJson = await fs.readJson(json);
+        expect(conteudoJson.estatisticas.classes_com_teste_dedicado).toBe(1);
+        expect(conteudoJson.estatisticas.classes_com_cobertura_indireta).toBe(1);
+        expect(conteudoJson.estatisticas.classes_sem_evidencia_no_escopo).toBe(1);
+        expect(conteudoJson.estatisticas.classes_fora_escopo_jacoco).toBe(1);
+
+        const others = conteudoJson.categorias.Others;
+        expect(others.tested).toHaveLength(1);
+        expect(others.untested).toHaveLength(3);
+        expect(others.untested.find((item) => item.classe === "ClasseIndireta").coberta_somente_indiretamente).toBe(true);
+        expect(others.untested.find((item) => item.classe === "ClasseSemEvidencia").evidencia_qualidade).toBe("sem_evidencia_no_escopo");
+        expect(others.untested.find((item) => item.classe === "ClasseForaEscopo").fora_escopo_jacoco).toBe(true);
     });
 
     test("prioriza testes usando sidecar JSON automaticamente quando disponivel", async () => {

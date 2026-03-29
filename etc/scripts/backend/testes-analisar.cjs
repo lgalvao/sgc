@@ -2,17 +2,26 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const {exibirAjudaComando} = require('./lib/cli-ajuda.cjs');
-
-const EXTENSAO_JAVA = '.java';
-const CATEGORIAS_PRIORITARIAS = ['Controllers', 'Facades', 'Services', 'Mappers'];
-const CATEGORIAS_SECUNDARIAS = ['Models', 'Repositories', 'DTOs', 'Others'];
-const SUFIXOS_TESTE = ['Test', 'CoverageTest', 'UnitTest', 'IntegrationTest'];
+const {coletarArquivosCobertura, lerRelatorioJacoco} = require('./lib/cobertura-base.cjs');
+const {
+    EXTENSAO_JAVA,
+    CATEGORIAS_PRIORITARIAS,
+    CATEGORIAS_SECUNDARIAS,
+    SUFIXOS_TESTE,
+    normalizarCaminho,
+    inferirCategoria,
+    lerConteudoFonte,
+    classificarPerfilDto,
+    construirNomeClasseCompleto,
+    criarItemRelatorio
+} = require('./lib/testes-analisar-regras.cjs');
 
 function parseArgs(argv) {
     const resultado = {
         dir: 'backend',
         output: 'unit-test-report.md',
-        outputJson: null
+        outputJson: null,
+        jacocoXml: null
     };
 
     for (let indice = 0; indice < argv.length; indice++) {
@@ -23,6 +32,8 @@ function parseArgs(argv) {
             resultado.output = argv[++indice];
         } else if (arg === '--output-json') {
             resultado.outputJson = argv[++indice];
+        } else if (arg === '--jacoco-xml') {
+            resultado.jacocoXml = argv[++indice];
         } else if (arg === '--help' || arg === '-h') {
             imprimirAjuda();
             process.exit(0);
@@ -41,6 +52,7 @@ function imprimirAjuda() {
             '--dir <caminho>         Diretorio raiz do backend (padrao: backend)',
             '--output <arquivo>      Arquivo de saida em Markdown',
             '--output-json <arquivo> Arquivo de saida estruturado em JSON (padrao: sidecar do Markdown)',
+            '--jacoco-xml <arquivo>  Relatorio XML do JaCoCo para classificar cobertura indireta',
             '--help, -h              Exibe esta ajuda'
         ],
         exemplos: [
@@ -54,23 +66,6 @@ function resolverSaidaJsonPadrao(caminhoMarkdown) {
         return caminhoMarkdown.replace(/\.md$/i, '.json');
     }
     return `${caminhoMarkdown}.json`;
-}
-
-function normalizarCaminho(caminho) {
-    return caminho.replaceAll('\\', '/');
-}
-
-function inferirCategoria(nomeClasse, caminhoRelativo) {
-    const caminhoNormalizado = normalizarCaminho(caminhoRelativo);
-
-    if (nomeClasse.includes('Controller')) return 'Controllers';
-    if (nomeClasse.includes('Service') || nomeClasse.includes('Policy')) return 'Services';
-    if (nomeClasse.includes('Facade')) return 'Facades';
-    if (nomeClasse.includes('Mapper')) return 'Mappers';
-    if (nomeClasse.includes('Dto') || nomeClasse.includes('Request') || nomeClasse.includes('Response')) return 'DTOs';
-    if (nomeClasse.includes('Repo')) return 'Repositories';
-    if (caminhoNormalizado.includes('/model/') || caminhoNormalizado.includes('/dominio/')) return 'Models';
-    return 'Others';
 }
 
 function listarFontes(backendSrc) {
@@ -181,7 +176,26 @@ function localizarTestes(nomeClasse, pacote, indicePorNome, indicePorPacote) {
     };
 }
 
-function analisarTestes(backendDir = 'backend') {
+async function carregarCoberturaPorClasse(caminhoJacocoXml = null) {
+    try {
+        const relatorio = await lerRelatorioJacoco(caminhoJacocoXml || undefined);
+        const coleta = coletarArquivosCobertura(relatorio, {
+            incluirSemLacunas: true,
+            aplicarExclusoes: false
+        });
+
+        return new Map(
+            coleta.arquivos.map(arquivo => [arquivo.nomeClasse, arquivo])
+        );
+    } catch (error) {
+        if (String(error.message || '').includes('Relatório JaCoCo não encontrado')) {
+            return new Map();
+        }
+        throw error;
+    }
+}
+
+async function analisarTestes(backendDir = 'backend', caminhoJacocoXml = null) {
     const backendSrc = path.join(backendDir, 'src/main/java');
     const backendTest = path.join(backendDir, 'src/test/java');
 
@@ -191,6 +205,7 @@ function analisarTestes(backendDir = 'backend') {
 
     const arquivosFonte = listarFontes(backendSrc);
     const {indicePorNome, indicePorPacote} = indexarTestes(backendTest);
+    const coberturaPorClasse = await carregarCoberturaPorClasse(caminhoJacocoXml);
 
     const relatorio = {
         Controllers: {tested: [], untested: []},
@@ -205,8 +220,18 @@ function analisarTestes(backendDir = 'backend') {
 
     let totalComTeste = 0;
     let correspondenciasAmbiguas = 0;
+    let totalComCoberturaIndireta = 0;
+    let totalSemEvidenciaNoEscopo = 0;
+    let totalForaEscopoJacoco = 0;
+    let totalRuidoIgnorado = 0;
+    let totalDtosComportamentais = 0;
+    let totalDtosEstruturais = 0;
+    let totalDtosEstruturaisContratuais = 0;
 
     arquivosFonte.forEach(arquivo => {
+        const conteudoFonte = lerConteudoFonte(backendSrc, arquivo.caminho_relativo);
+        const perfilDto = arquivo.categoria === 'DTOs' ? classificarPerfilDto(conteudoFonte) : null;
+        const dtoEstrutural = perfilDto === 'estrutural_puro' || perfilDto === 'estrutural_contrato';
         const {caminhos, estrategia} = localizarTestes(
             arquivo.nome_classe,
             arquivo.pacote,
@@ -214,14 +239,36 @@ function analisarTestes(backendDir = 'backend') {
             indicePorPacote
         );
         const possuiTeste = caminhos.length > 0;
-        const item = {
-            classe: arquivo.nome_classe,
-            caminho_relativo: arquivo.caminho_relativo,
-            categoria: arquivo.categoria,
-            possui_teste: possuiTeste,
-            estrategia_correspondencia: estrategia,
-            testes_encontrados: caminhos
-        };
+        const nomeClasseCompleto = construirNomeClasseCompleto(arquivo.caminho_relativo);
+        const coberturaClasse = coberturaPorClasse.get(nomeClasseCompleto) || null;
+        const estaNoEscopoJacoco = coberturaPorClasse.size === 0 || coberturaClasse !== null;
+        const possuiCoberturaJacoco = coberturaClasse !== null && coberturaClasse.linhasCobertas > 0;
+        const possuiCoberturaSomenteIndireta = !possuiTeste && possuiCoberturaJacoco;
+        const estaForaEscopoJacoco = !possuiTeste && coberturaPorClasse.size > 0 && !estaNoEscopoJacoco;
+        const item = criarItemRelatorio({
+            arquivo,
+            perfilDto,
+            dtoEstrutural,
+            possuiTeste,
+            estaNoEscopoJacoco,
+            possuiCoberturaJacoco,
+            possuiCoberturaSomenteIndireta,
+            estaForaEscopoJacoco,
+            estrategia,
+            caminhos,
+            coberturaClasse
+        });
+
+        if (arquivo.categoria === 'DTOs') {
+            if (perfilDto === 'comportamental') {
+                totalDtosComportamentais++;
+            } else {
+                totalDtosEstruturais++;
+                if (perfilDto === 'estrutural_contrato') {
+                    totalDtosEstruturaisContratuais++;
+                }
+            }
+        }
 
         if (possuiTeste) {
             totalComTeste++;
@@ -231,21 +278,47 @@ function analisarTestes(backendDir = 'backend') {
             }
         } else {
             relatorio[arquivo.categoria].untested.push(item);
+            if (dtoEstrutural) {
+                totalRuidoIgnorado++;
+            } else if (estaForaEscopoJacoco) {
+                totalForaEscopoJacoco++;
+            } else if (possuiCoberturaSomenteIndireta) {
+                totalComCoberturaIndireta++;
+            } else {
+                totalSemEvidenciaNoEscopo++;
+            }
         }
     });
 
     const totalClasses = arquivosFonte.length;
     const cobertura = totalClasses > 0 ? (totalComTeste / totalClasses) * 100 : 0;
+    const totalBacklogReal = totalClasses - totalRuidoIgnorado;
+    const coberturaBacklogReal = totalBacklogReal > 0
+        ? (totalComTeste / totalBacklogReal) * 100
+        : 0;
+    const coberturaObservada = totalClasses > 0
+        ? ((totalComTeste + totalComCoberturaIndireta) / totalClasses) * 100
+        : 0;
 
     return {
         gerado_em: new Date().toISOString(),
         backend_dir: backendDir,
         estatisticas: {
             total_classes: totalClasses,
-            classes_com_teste: totalComTeste,
-            classes_sem_teste: totalClasses - totalComTeste,
+            classes_com_teste_dedicado: totalComTeste,
+            classes_com_cobertura_indireta: totalComCoberturaIndireta,
+            classes_sem_evidencia_no_escopo: totalSemEvidenciaNoEscopo,
+            classes_fora_escopo_jacoco: totalForaEscopoJacoco,
+            classes_ruido_ignorado: totalRuidoIgnorado,
+            classes_sem_teste_dedicado: totalClasses - totalComTeste,
             cobertura_arquivos_percentual: Number(cobertura.toFixed(2)),
-            correspondencias_ambiguas: correspondenciasAmbiguas
+            cobertura_backlog_real_percentual: Number(coberturaBacklogReal.toFixed(2)),
+            cobertura_observada_percentual: Number(coberturaObservada.toFixed(2)),
+            correspondencias_ambiguas: correspondenciasAmbiguas,
+            jacoco_disponivel: coberturaPorClasse.size > 0,
+            dtos_comportamentais: totalDtosComportamentais,
+            dtos_estruturais: totalDtosEstruturais,
+            dtos_estruturais_contratuais: totalDtosEstruturaisContratuais
         },
         categorias: relatorio
     };
@@ -258,13 +331,23 @@ function gerarMarkdown(dados) {
         '# Relatorio de Cobertura de Testes Unitarios (Backend)\n',
         `**Data:** ${dataFormatada}`,
         `**Total de Classes:** ${estatisticas.total_classes}`,
-        `**Com Testes Unitarios:** ${estatisticas.classes_com_teste}`,
-        `**Sem Testes Unitarios:** ${estatisticas.classes_sem_teste}`,
-        `**Cobertura (Arquivos):** ${estatisticas.cobertura_arquivos_percentual.toFixed(2)}%`
+        `**Com Teste Dedicado:** ${estatisticas.classes_com_teste_dedicado}`,
+        `**Com Cobertura Indireta:** ${estatisticas.classes_com_cobertura_indireta}`,
+        `**Sem Evidencia no Escopo do JaCoCo:** ${estatisticas.classes_sem_evidencia_no_escopo}`,
+        `**Fora do Escopo do JaCoCo:** ${estatisticas.classes_fora_escopo_jacoco}`,
+        `**Ruido Ignorado no Backlog:** ${estatisticas.classes_ruido_ignorado}`,
+        `**Sem Teste Dedicado:** ${estatisticas.classes_sem_teste_dedicado}`,
+        `**Correspondencia Direta (Arquivos):** ${estatisticas.cobertura_arquivos_percentual.toFixed(2)}%`,
+        `**Correspondencia Direta no Backlog Real:** ${estatisticas.cobertura_backlog_real_percentual.toFixed(2)}%`,
+        `**Cobertura Observada (Teste Dedicado + Indireta):** ${estatisticas.cobertura_observada_percentual.toFixed(2)}%`
     ];
 
     if (estatisticas.correspondencias_ambiguas > 0) {
         linhas.push(`**Aviso:** ${estatisticas.correspondencias_ambiguas} classe(s) foram marcadas como cobertas apenas por nome de teste em outro pacote.`);
+    }
+
+    if (!estatisticas.jacoco_disponivel) {
+        linhas.push('**Aviso:** relatório JaCoCo indisponível; a coluna de cobertura indireta não foi calculada.');
     }
 
     linhas.push('\n## Detalhamento por Categoria\n');
@@ -276,13 +359,50 @@ function gerarMarkdown(dados) {
             return;
         }
 
-        linhas.push(`### ${categoria} (${itens.tested.length}/${total} testados)`);
+        const totalRelevanteCategoria = categoria === 'DTOs'
+            ? itens.tested.length + itens.untested.filter(item => !item.dto_ruido_ignorado).length
+            : total;
+        linhas.push(`### ${categoria} (${itens.tested.length}/${totalRelevanteCategoria} testados${categoria === 'DTOs' ? ' no backlog real' : ''})`);
         if (itens.untested.length > 0) {
-            linhas.push(`**Faltando Testes (${itens.untested.length}):**`);
-            itens.untested
-                .slice()
-                .sort((a, b) => a.caminho_relativo.localeCompare(b.caminho_relativo, 'pt-BR'))
-                .forEach(item => linhas.push(`- \`${item.caminho_relativo}\``));
+            const candidatos = categoria === 'DTOs'
+                ? itens.untested.filter(item => !item.dto_ruido_ignorado)
+                : itens.untested;
+            const dtoRuido = categoria === 'DTOs'
+                ? itens.untested.filter(item => item.dto_ruido_ignorado)
+                : [];
+            const indiretos = candidatos.filter(item => item.coberta_somente_indiretamente);
+            const foraEscopo = candidatos.filter(item => item.fora_escopo_jacoco);
+            const semEvidencia = candidatos.filter(item => !item.coberta_somente_indiretamente && !item.fora_escopo_jacoco);
+
+            linhas.push(`**Faltando Testes Dedicados (${candidatos.length}):**`);
+            if (indiretos.length > 0) {
+                linhas.push(`Cobertos apenas indiretamente (${indiretos.length}):`);
+                indiretos
+                    .slice()
+                    .sort((a, b) => a.caminho_relativo.localeCompare(b.caminho_relativo, 'pt-BR'))
+                    .forEach(item => linhas.push(`- \`${item.caminho_relativo}\` (${item.cobertura?.cobertura_linhas_percentual.toFixed(2)}% linhas)`));
+            }
+            if (foraEscopo.length > 0) {
+                linhas.push(`Fora do escopo do JaCoCo (${foraEscopo.length}):`);
+                foraEscopo
+                    .slice()
+                    .sort((a, b) => a.caminho_relativo.localeCompare(b.caminho_relativo, 'pt-BR'))
+                    .forEach(item => linhas.push(`- \`${item.caminho_relativo}\``));
+            }
+            if (semEvidencia.length > 0) {
+                linhas.push(`Sem evidencia de cobertura no escopo (${semEvidencia.length}):`);
+                semEvidencia
+                    .slice()
+                    .sort((a, b) => a.caminho_relativo.localeCompare(b.caminho_relativo, 'pt-BR'))
+                    .forEach(item => linhas.push(`- \`${item.caminho_relativo}\``));
+            }
+            if (dtoRuido.length > 0) {
+                linhas.push(`Ignorados como DTO estrutural/contratual (${dtoRuido.length}):`);
+                dtoRuido
+                    .slice()
+                    .sort((a, b) => a.caminho_relativo.localeCompare(b.caminho_relativo, 'pt-BR'))
+                    .forEach(item => linhas.push(`- \`${item.caminho_relativo}\` (${item.perfil_dto})`));
+            }
         } else {
             linhas.push('Todos cobertos.');
         }
@@ -298,12 +418,28 @@ function gravarArquivo(caminho, conteudo) {
 
 function imprimirResumoConsole(dados) {
     const {estatisticas, categorias} = dados;
-    console.log(`Resumo: ${estatisticas.classes_com_teste}/${estatisticas.total_classes} classes com teste (${estatisticas.cobertura_arquivos_percentual.toFixed(2)}%).`);
+    console.log(`Resumo: ${estatisticas.classes_com_teste_dedicado}/${estatisticas.total_classes} classes com teste dedicado (${estatisticas.cobertura_arquivos_percentual.toFixed(2)}%).`);
+    console.log(`- Cobertura indireta: ${estatisticas.classes_com_cobertura_indireta}`);
+    console.log(`- Sem evidencia no escopo: ${estatisticas.classes_sem_evidencia_no_escopo}`);
+    console.log(`- Fora do escopo do JaCoCo: ${estatisticas.classes_fora_escopo_jacoco}`);
+    console.log(`- Ruido ignorado no backlog: ${estatisticas.classes_ruido_ignorado}`);
+    console.log(`- Backlog real coberto por teste dedicado: ${estatisticas.cobertura_backlog_real_percentual.toFixed(2)}%`);
+    if (estatisticas.jacoco_disponivel) {
+        console.log(`- Cobertura observada: ${estatisticas.cobertura_observada_percentual.toFixed(2)}%`);
+    } else {
+        console.log('- Cobertura observada: indisponivel (JaCoCo ausente)');
+    }
 
     [...CATEGORIAS_PRIORITARIAS, ...CATEGORIAS_SECUNDARIAS].forEach(categoria => {
         const itens = categorias[categoria];
         const total = itens.tested.length + itens.untested.length;
         if (total === 0) {
+            return;
+        }
+        if (categoria === 'DTOs') {
+            const totalRelevante = itens.tested.length + itens.untested.filter(item => !item.dto_ruido_ignorado).length;
+            const ignorados = itens.untested.filter(item => item.dto_ruido_ignorado).length;
+            console.log(`- ${categoria}: ${itens.tested.length}/${totalRelevante} testados no backlog real (${ignorados} ignorados)`);
             return;
         }
         console.log(`- ${categoria}: ${itens.tested.length}/${total} testados`);
@@ -314,10 +450,10 @@ function imprimirResumoConsole(dados) {
     }
 }
 
-function main() {
+async function main() {
     const args = parseArgs(process.argv.slice(2));
     const outputJson = args.outputJson ?? resolverSaidaJsonPadrao(args.output);
-    const dados = analisarTestes(args.dir);
+    const dados = await analisarTestes(args.dir, args.jacocoXml);
     gravarArquivo(args.output, gerarMarkdown(dados));
     gravarArquivo(outputJson, JSON.stringify(dados, null, 2));
 
@@ -326,9 +462,7 @@ function main() {
     console.log(`Relatorio JSON gerado em: ${outputJson}`);
 }
 
-try {
-    main();
-} catch (error) {
+main().catch(error => {
     console.error(`Erro ao analisar testes: ${error.message}`);
     process.exit(1);
-}
+});
