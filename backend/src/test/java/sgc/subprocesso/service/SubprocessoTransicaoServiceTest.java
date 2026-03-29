@@ -90,7 +90,7 @@ class SubprocessoTransicaoServiceTest {
         verify(movimentacaoRepo).save(argThat(mov ->
                 mov.getSubprocesso().equals(subprocesso)
                         && mov.getUnidadeOrigem().equals(origem)
-                        && mov.getUnidadeDestino().equals(destino)
+                        && Objects.equals(mov.getUnidadeDestino(), destino)
                         && mov.getDescricao().equals(CADASTRO_DISPONIBILIZADO.getDescMovimentacao())
                         && mov.getUsuario().equals(usuario)));
         verify(subprocessoRepo).save(subprocesso);

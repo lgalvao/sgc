@@ -99,7 +99,7 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
 
         invokeMethod(service, "disponibilizar", sp, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO, TipoTransicao.CADASTRO_DISPONIBILIZADO, new Usuario());
 
-        verify(movimentacaoRepo).save(argThat(mov -> mov.getUnidadeDestino().equals(admin)));
+        verify(movimentacaoRepo).save(argThat(mov -> Objects.equals(mov.getUnidadeDestino(), admin)));
     }
 
     @Test
@@ -153,7 +153,7 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
 
         service.apresentarSugestoes(100L, "sugestoes", new Usuario());
 
-        verify(movimentacaoRepo).save(argThat(mov -> mov.getUnidadeDestino().equals(u)));
+        verify(movimentacaoRepo).save(argThat(mov -> Objects.equals(mov.getUnidadeDestino(), u)));
     }
 
     @Test
@@ -176,7 +176,7 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
 
         service.validarMapa(100L, new Usuario());
 
-        verify(movimentacaoRepo).save(argThat(mov -> mov.getUnidadeDestino().equals(u)));
+        verify(movimentacaoRepo).save(argThat(mov -> Objects.equals(mov.getUnidadeDestino(), u)));
     }
 
     @Test

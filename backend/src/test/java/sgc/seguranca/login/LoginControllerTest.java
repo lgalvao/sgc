@@ -328,7 +328,7 @@ class LoginControllerTest {
 
             var resultado = controller.autenticar(request, httpRequest, httpResponse);
 
-            Assertions.assertFalse(Boolean.TRUE.equals(resultado.getBody()));
+            Assertions.assertNotEquals(Boolean.TRUE, resultado.getBody());
             verify(httpResponse, never()).addCookie(any());
         }
 

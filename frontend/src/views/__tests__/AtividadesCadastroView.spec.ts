@@ -5,7 +5,6 @@ import {reactive, ref} from "vue";
 import * as usePerfilModule from "@/composables/usePerfil";
 import * as useFluxoSubprocessoModule from "@/composables/useFluxoSubprocesso";
 import {useMapas} from "@/composables/useMapas";
-import * as useProcessosModule from "@/composables/useProcessos";
 import * as subprocessoService from "@/services/subprocessoService";
 import * as analiseService from "@/services/analiseService";
 import * as atividadeService from "@/services/atividadeService";
@@ -67,7 +66,6 @@ vi.mock("@/services/atividadeService", () => ({
 
 vi.mock("@/composables/useSubprocessos", () => ({useSubprocessos: () => subprocessosMock}));
 vi.mock("@/composables/useFluxoSubprocesso", () => ({useFluxoSubprocesso: vi.fn()}));
-vi.mock("@/composables/useProcessos", () => ({useProcessos: vi.fn()}));
 const mockAtividadeForm = {
     novaAtividade: ref(""),
     loadingAdicionar: ref(false),
@@ -214,20 +212,12 @@ describe("CadastroView.vue", () => {
             disponibilizarCadastro: vi.fn().mockResolvedValue(true),
             disponibilizarRevisaoCadastro: vi.fn().mockResolvedValue(true),
         } as any);
-        vi.mocked(useProcessosModule.useProcessos).mockReturnValue({
-            processoDetalhe: ref({
-                codigo: 1,
-                unidades: [
-                    {sigla: "TESTE", codSubprocesso: 123, filhas: []}
-                ]
-            }),
-            buscarProcessoDetalhe: vi.fn().mockResolvedValue(undefined),
-        } as any);
         vi.mocked(subprocessoService.buscarSubprocessoPorProcessoEUnidade).mockResolvedValue({codigo: 123} as any);
         vi.mocked(subprocessoService.buscarContextoEdicao).mockResolvedValue({
             detalhes: {
                 codigo: 123,
                 situacao: "MAPEAMENTO_CADASTRO_EM_ANDAMENTO",
+                tipoProcesso: "MAPEAMENTO",
                 unidade: {sigla: "TESTE"}
             },
             mapa: {codigo: 100},
@@ -522,7 +512,6 @@ describe("CadastroView.vue", () => {
         
         // Covering 351-352
         subprocessosMock.buscarSubprocessoPorProcessoEUnidade.mockResolvedValue(null);
-        vi.mocked(useProcessosModule.useProcessos().buscarProcessoDetalhe).mockResolvedValue(undefined);
         await vm.carregarContextoInicial();
 
         // 375-377 (adicionarAtividade success branch)

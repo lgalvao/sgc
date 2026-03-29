@@ -4,6 +4,7 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import sgc.comum.erros.*;
 import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
@@ -123,10 +124,10 @@ class ImpactoMapaServiceCoverageTest {
             sp.setSituacao(situacao);
             
             if (expected) {
-                assertThatCode(() -> org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "checkSituacao", user, sp))
+                assertThatCode(() -> ReflectionTestUtils.invokeMethod(target, "checkSituacao", user, sp))
                         .doesNotThrowAnyException();
             } else {
-                assertThatThrownBy(() -> org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "checkSituacao", user, sp))
+                assertThatThrownBy(() -> ReflectionTestUtils.invokeMethod(target, "checkSituacao", user, sp))
                         .isInstanceOf(ErroValidacao.class);
             }
         }
@@ -150,25 +151,25 @@ class ImpactoMapaServiceCoverageTest {
         a.setConhecimentos(Set.of(c2));
 
         Map<String, Atividade> vigentesMap = Map.of("A1", v);
-        List<AtividadeImpactadaDto> res = org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "detectarAlteradas", List.of(a), vigentesMap, Map.of());
+        List<AtividadeImpactadaDto> res = ReflectionTestUtils.invokeMethod(target, "detectarAlteradas", List.of(a), vigentesMap, Map.of());
         
         assertThat(res).hasSize(1);
-        assertThat(res.get(0).tipoImpacto()).isEqualTo(TipoImpactoAtividade.ALTERADA);
+        assertThat(res.getFirst().tipoImpacto()).isEqualTo(TipoImpactoAtividade.ALTERADA);
     }
 
     @Test
     @DisplayName("conhecimentosDiferentes - casos de borda")
     void conhecimentosDiferentesBorda() {
-        boolean res1 = org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "conhecimentosDiferentes", List.of(), List.of());
+        boolean res1 = ReflectionTestUtils.invokeMethod(target, "conhecimentosDiferentes", List.of(), List.of());
         assertThat(res1).isFalse();
 
         Conhecimento c1 = new Conhecimento(); c1.setDescricao("C1");
         Conhecimento c2 = new Conhecimento(); c2.setDescricao("C2");
 
-        boolean res2 = org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "conhecimentosDiferentes", List.of(c1), List.of(c1, c2));
+        boolean res2 = ReflectionTestUtils.invokeMethod(target, "conhecimentosDiferentes", List.of(c1), List.of(c1, c2));
         assertThat(res2).isTrue();
 
-        boolean res3 = org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "conhecimentosDiferentes", List.of(c1), List.of(c2));
+        boolean res3 = ReflectionTestUtils.invokeMethod(target, "conhecimentosDiferentes", List.of(c1), List.of(c2));
         assertThat(res3).isTrue();
     }
 
@@ -177,7 +178,7 @@ class ImpactoMapaServiceCoverageTest {
     void construirMapaSemAtividades() {
         Competencia comp = new Competencia();
         comp.setAtividades(null);
-        Map<Long, List<Competencia>> res = org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "construirMapaAtividadeCompetencias", List.of(comp));
+        Map<Long, List<Competencia>> res = ReflectionTestUtils.invokeMethod(target, "construirMapaAtividadeCompetencias", List.of(comp));
         assertThat(res).isEmpty();
     }
 }

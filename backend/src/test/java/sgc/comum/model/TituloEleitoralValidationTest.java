@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+import java.lang.reflect.*;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -96,7 +97,7 @@ class TituloEleitoralValidationTest {
         assertThat(retention).isNotNull();
         assertThat(retention.value()).isEqualTo(java.lang.annotation.RetentionPolicy.RUNTIME);
         assertThat(TituloEleitoral.class.getDeclaredMethods())
-                .extracting(method -> method.getName())
+                .extracting(Method::getName)
                 .contains("message", "groups", "payload");
     }
 

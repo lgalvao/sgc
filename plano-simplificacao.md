@@ -518,6 +518,12 @@ O plano terá sido bem executado se:
 * `UnidadesView` era um caso claro de `loading`/`erro` manual já coberto por `useAsyncAction`; a migração simplificou a tela sem alterar mensagens nem comportamento visual.
 * `AdministradoresView` também aceitou migração parcial para `useAsyncAction`; o carregamento da listagem foi simplificado e o tratamento de erro local deixou de se repetir nas mutações.
 * `MapaVisualizacaoView` tinha quatro ações com o mesmo ciclo de loading, fechamento de modal, toast pendente e redirecionamento; helpers privados locais reduziram esse ruído sem alterar permissões nem fluxo.
+* Em telas de cadastro e visualização, o frontend ainda usava `buscarProcessoDetalhe(...)` só para descobrir `codSubprocesso` e `tipoProcesso`; isso era herança do protótipo inicial e gerava round-trip desnecessário.
+* `CadastroView`, `CadastroVisualizacaoView` e `MapaVisualizacaoView` aceitaram simplificação na mesma direção: usar lookup direto do subprocesso e o próprio contexto do subprocesso como fonte de verdade, em vez de depender do processo inteiro para navegação indireta.
+* Quando a tela só precisa do subprocesso e do seu contexto, `buscarProcessoDetalhe(...)` tende a ser custo excessivo e acoplamento acidental.
+* Em `CadastroView`, o pós-sucesso de disponibilização não precisava recarregar detalhe antes de redirecionar; remover essa chamada economiza round-trip sem perda funcional.
+* Em `MapaVisualizacaoView`, depois de remover a dependência do processo inteiro, a paralelização útil ficou concentrada apenas nas chamadas realmente necessárias para detalhe e mapa.
+* Testes de orçamento de chamadas funcionam bem como guarda estrutural, mas exigem alinhar o helper de montagem ao novo ponto de verdade da tela; quando a identificação do subprocesso muda, os cenários de ação precisam inicializar esse estado de forma explícita.
 * No backend, `SubprocessoTransicaoService` ainda carregava muita ramificação binária entre cadastro e revisão; um contexto privado de fluxo reduziu condicionais repetidas em devolução, aceite, homologação e ações em bloco.
 * Em permissões, a fonte de verdade continua sendo `etc/docs/regras-acesso.md`; simplificação nessa área só pode acontecer quando o comportamento continuar exatamente alinhado à regra documental.
 * A frente ambiciosa de `UnidadeView` foi concluída com segurança: a tela deixou de depender de `mapasStore.mapaCompleto` e passou a usar uma referência explícita de mapa vigente vinda do backend.
@@ -535,6 +541,9 @@ O plano terá sido bem executado se:
   * reduzir round-trips, reaproveitando contexto agregado e evitando chamadas em cascata;
   * reduzir latência por paralelização, quando duas chamadas ainda são necessárias mas independentes.
 * `SubprocessoView` passou a usar `buscarContextoEdicao(...)` como carga principal, eliminando uma sequência de detalhe + mapa quando o contexto já traz o mapa.
+* `CadastroView` deixou de depender de `buscarProcessoDetalhe(...)` só para descobrir `codSubprocesso` e `tipoProcesso`; agora usa busca direta do subprocesso e o próprio contexto como fonte de verdade.
+* `CadastroVisualizacaoView` também deixou de depender de `processos.processoDetalhe` para descobrir subprocesso e tipo; isso reduziu round-trip e removeu lógica herdada de árvore de unidades na própria tela.
 * `MapaVisualizacaoView` aceitou paralelização segura no `onMounted`: busca de unidade e processo em paralelo, depois detalhe e mapa em paralelo. Isso preserva contratos e reduz tempo de espera total sem aumentar acoplamento.
 * `LoadingButton.vue` continua sendo um wrapper fino, mas o volume de uso torna a remoção imediata cara demais; o melhor caminho agora é impedir novos wrappers fracos e só reavaliar esse componente junto de refatorações de telas maiores.
 * A validação de backend com Gradle pode produzir falso negativo por problema de cache de build; quando `:backend:test` passa e `:backend:compileTestJava` falha só ao armazenar cache, vale repetir com `--no-configuration-cache` antes de tratar como regressão de código.
+* Endpoints com `@RequestBody(required = false)` não podem usar `Optional.of(...)` no controller; isso reintroduz `500` em fluxos válidos sem payload, como aceite e homologação da validação do mapa no CDU-20.

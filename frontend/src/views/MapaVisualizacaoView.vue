@@ -270,24 +270,7 @@ const sigla = computed(() => route.params.siglaUnidade as string);
 const codProcesso = computed(() => Number(route.params.codProcesso));
 
 const unidade = ref<Unidade | null>(null);
-
-function buscarUnidadeRecursivo(unidades: any[], siglaAlvo: string): any | null {
-  for (const u of unidades) {
-    if (u.sigla === siglaAlvo) return u;
-    if (u.filhos && u.filhos.length > 0) {
-      const encontrada = buscarUnidadeRecursivo(u.filhos, siglaAlvo);
-      if (encontrada) return encontrada;
-    }
-  }
-  return null;
-}
-
-const subprocesso = computed(() => {
-  if (!processos.processoDetalhe.value) return null;
-  return buscarUnidadeRecursivo(processos.processoDetalhe.value.unidades, sigla.value);
-});
-
-const codSubprocesso = computed(() => subprocesso.value?.codSubprocesso);
+const codSubprocesso = ref<number | null>(null);
 
 const {
   podeValidarMapa,
@@ -480,24 +463,16 @@ function verHistorico() {
 }
 
 onMounted(async () => {
-  const [respostaUnidade] = await Promise.all([
-    buscarUnidadeServico(sigla.value),
-    processos.buscarProcessoDetalhe(codProcesso.value),
-  ]);
-  unidade.value = respostaUnidade as Unidade;
+  unidade.value = await buscarUnidadeServico(sigla.value) as Unidade;
+  codSubprocesso.value = await subprocessosStore.buscarSubprocessoPorProcessoEUnidade(
+      codProcesso.value,
+      sigla.value,
+  );
 
-  // Garantia de busca de subprocesso mais robusta após carregar detalhes do processo
-  let idSubprocesso = codSubprocesso.value;
-  if (!idSubprocesso) {
-    const unidades = processos.processoDetalhe.value?.unidades || [];
-    const spEncontrado = buscarUnidadeRecursivo(unidades, sigla.value);
-    idSubprocesso = spEncontrado?.codSubprocesso;
-  }
-
-  if (idSubprocesso) {
+  if (codSubprocesso.value) {
     const [, mapaVisualizacao] = await Promise.all([
-      subprocessosStore.buscarSubprocessoDetalhe(idSubprocesso),
-      obterMapaVisualizacao(idSubprocesso),
+      subprocessosStore.buscarSubprocessoDetalhe(codSubprocesso.value),
+      obterMapaVisualizacao(codSubprocesso.value),
     ]);
     mapa.value = mapaVisualizacao;
   }

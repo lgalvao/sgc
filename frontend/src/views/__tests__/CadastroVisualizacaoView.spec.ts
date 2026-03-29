@@ -28,14 +28,6 @@ vi.mock("@/services/subprocessoService", () => ({
 
 vi.mock("@/composables/useSubprocessos", () => ({useSubprocessos: vi.fn()}));
 vi.mock("@/composables/useFluxoSubprocesso", () => ({useFluxoSubprocesso: vi.fn()}));
-const processosMock = {
-    processoDetalhe: ref<any>(null),
-    buscarProcessoDetalhe: vi.fn(),
-};
-
-vi.mock("@/composables/useProcessos", () => ({
-    useProcessos: () => processosMock
-}));
 
 const stubs = {
     LayoutPadrao: {template: '<div><slot /></div>'},
@@ -73,6 +65,13 @@ describe("CadastroVisualizacaoView coverage", () => {
             subprocessoDetalhe: null,
             buscarSubprocessoPorProcessoEUnidade: vi.fn().mockResolvedValue(123),
             buscarContextoEdicao: vi.fn().mockResolvedValue({
+                detalhes: {
+                    subprocesso: {
+                        codigo: 123,
+                        tipoProcesso: "MAPEAMENTO",
+                    },
+                    permissoes: {}
+                },
                 atividadesDisponiveis: [{codigo: 1, descricao: "Ativ 1", conhecimentos: []}],
                 unidade: {sigla: "TESTE", nome: "Teste"}
             }),
@@ -89,19 +88,25 @@ describe("CadastroVisualizacaoView coverage", () => {
             aceitarRevisaoCadastro: vi.fn().mockResolvedValue(true),
             devolverRevisaoCadastro: vi.fn().mockResolvedValue(true),
         } as any);
-        processosMock.processoDetalhe.value = null;
         vi.mocked(subprocessoService.buscarSubprocessoPorProcessoEUnidade).mockResolvedValue(123 as any);
         vi.mocked(subprocessoService.buscarContextoEdicao).mockResolvedValue({
+            detalhes: {
+                subprocesso: {
+                    codigo: 123,
+                    tipoProcesso: "MAPEAMENTO",
+                },
+                permissoes: {}
+            },
             atividadesDisponiveis: [{codigo: 1, descricao: "Ativ 1", conhecimentos: []}],
             unidade: {sigla: "TESTE", nome: "Teste"}
         } as any);
     });
 
-    function createWrapper(accessOverrides = {}, processoDetalheOverride?: any) {
-        processosMock.processoDetalhe.value = processoDetalheOverride !== undefined ? processoDetalheOverride : {
-            codigo: 1,
-            tipo: "MAPEAMENTO",
-            unidades: [{sigla: "TESTE", codSubprocesso: 123}]
+    function createWrapper(accessOverrides = {}, tipoProcesso = "MAPEAMENTO") {
+        const subprocessosStore = useSubprocessosModule.useSubprocessos() as any;
+        subprocessosStore.subprocessoDetalhe = {
+            ...subprocessosStore.subprocessoDetalhe,
+            tipoProcesso,
         };
 
         vi.spyOn(useAcessoModule, 'useAcesso').mockReturnValue({
@@ -159,20 +164,20 @@ describe("CadastroVisualizacaoView coverage", () => {
         await flushPromises();
         expect(fluxoSubprocesso.homologarCadastro).toHaveBeenCalled();
 
-        (processosMock.processoDetalhe.value as any).tipo = "REVISAO";
-        await wrapper.vm.$nextTick();
+        const wrapperRevisao = createWrapper({}, "REVISAO");
+        await flushPromises();
 
-        (wrapper.vm as any).podeHomologarCadastro = true;
-        await (wrapper.vm as any).confirmarValidacao();
+        (wrapperRevisao.vm as any).podeHomologarCadastro = true;
+        await (wrapperRevisao.vm as any).confirmarValidacao();
         expect(fluxoSubprocesso.homologarRevisaoCadastro).toHaveBeenCalled();
 
         // Aceitar Revisão
-        (wrapper.vm as any).podeHomologarCadastro = false;
-        await (wrapper.vm as any).confirmarValidacao();
+        (wrapperRevisao.vm as any).podeHomologarCadastro = false;
+        await (wrapperRevisao.vm as any).confirmarValidacao();
         expect(fluxoSubprocesso.aceitarRevisaoCadastro).toHaveBeenCalled();
 
-        (wrapper.vm as any).observacaoDevolucao = "Rev";
-        await (wrapper.vm as any).confirmarDevolucao();
+        (wrapperRevisao.vm as any).observacaoDevolucao = "Rev";
+        await (wrapperRevisao.vm as any).confirmarDevolucao();
         expect(fluxoSubprocesso.devolverRevisaoCadastro).toHaveBeenCalled();
 
         const mapsStore = (wrapper.vm as any).mapasStore;
@@ -186,11 +191,9 @@ describe("CadastroVisualizacaoView coverage", () => {
         await flushPromises();
 
         expect(contarChamadas(
-            processosMock.buscarProcessoDetalhe as any,
             vi.mocked(useSubprocessosModule.useSubprocessos)().buscarContextoEdicao as any,
             vi.mocked(useSubprocessosModule.useSubprocessos)().buscarSubprocessoPorProcessoEUnidade as any,
         )).toBe(2);
-        expect(vi.mocked(useSubprocessosModule.useSubprocessos)().buscarSubprocessoPorProcessoEUnidade).not.toHaveBeenCalled();
     });
 
     it("cobre ramos condicionais adicionais", async () => {
@@ -203,21 +206,6 @@ describe("CadastroVisualizacaoView coverage", () => {
         expect(vm.nomeUnidade).toBe("Unidade de Teste");
         vm.unidade = { sigla: "TESTE", nome: null };
         expect(vm.nomeUnidade).toBe("");
-
-        // Testar subprocesso computed com processoDetalhe nulo
-        processosMock.processoDetalhe.value = null;
-        expect(vm.subprocesso).toBeNull();
-
-        // Testar subprocesso computed com arvore de unidades aninhadas
-        processosMock.processoDetalhe.value = {
-            unidades: [
-                { sigla: "OUTRA" },
-                { sigla: "PAI", filhos: [{ sigla: "TESTE", codSubprocesso: 123 }] }
-            ]
-        };
-        expect(vm.subprocesso.codSubprocesso).toBe(123);
-        processosMock.processoDetalhe.value = { unidades: [{ sigla: "OUTRA" }] };
-        expect(vm.subprocesso).toBeUndefined();
 
         // Testar computed estadoObservacaoDevolucao
         vm.validacaoDevolucaoSubmetida = true;
@@ -253,16 +241,23 @@ describe("CadastroVisualizacaoView coverage", () => {
         await wrapper.vm.$nextTick();
     });
 
-    it("deve lidar com onMounted quando codSubprocesso está ausente mas subprocesso existe", async () => {
-        createWrapper({}, {
-            codigo: 1,
-            tipo: "MAPEAMENTO",
-            unidades: [{ sigla: "TESTE" }] // codSubprocesso undefined
-        });
+    it("deve lidar com onMounted quando o subprocesso não é encontrado", async () => {
+        vi.mocked(useSubprocessosModule.useSubprocessos).mockReturnValue({
+            subprocessoDetalhe: null,
+            buscarSubprocessoPorProcessoEUnidade: vi.fn().mockResolvedValue(null),
+            buscarContextoEdicao: vi.fn(),
+            buscarSubprocessoDetalhe: vi.fn(),
+            atualizarStatusLocal: vi.fn(),
+            lastError: null,
+            clearError: vi.fn(),
+        } as any);
+
+        createWrapper();
         
         await flushPromises();
         const store = useSubprocessosModule.useSubprocessos() as any;
         expect(store.buscarSubprocessoPorProcessoEUnidade).toHaveBeenCalledWith(1, "TESTE");
+        expect(store.buscarContextoEdicao).not.toHaveBeenCalled();
     });
 
     it("deve tratar falhas de sucesso nas validações e não fechar modais", async () => {

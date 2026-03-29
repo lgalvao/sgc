@@ -30,6 +30,7 @@ vi.mock("@/services/processoService", () => ({
     apresentarSugestoes: vi.fn().mockResolvedValue({}),
 }));
 vi.mock("@/services/subprocessoService", () => ({
+    buscarSubprocessoPorProcessoEUnidade: vi.fn().mockResolvedValue({codigo: 10}),
     buscarSubprocessoDetalhe: vi.fn().mockResolvedValue({}),
     mapSubprocessoDetalheDtoToModel: vi.fn((dto) => dto),
     obterMapaVisualizacao: vi.fn().mockResolvedValue({competencias: []}),
@@ -216,6 +217,8 @@ describe("VisMapa.vue", () => {
                 },
             },
         });
+
+        (context.wrapper.vm as any).codSubprocesso = 10;
 
         const toastStore = useToastStore();
         return {wrapper: context.wrapper, toastStore};
@@ -730,7 +733,7 @@ describe("VisMapa.vue", () => {
         expect((confirmBtn.element as HTMLButtonElement).disabled).toBe(false);
     });
 
-    it("deve gerenciar a busca recursiva de unidades, visualização de sugestões e estados nulos do subprocesso", async () => {
+    it("deve gerenciar visualização de sugestões e estados nulos do subprocesso", async () => {
         const {wrapper} = mountComponent();
         await flushPromises();
         const vm = wrapper.vm;
@@ -741,26 +744,8 @@ describe("VisMapa.vue", () => {
         const visTextarea = textareas.find(t => t.attributes('id') === 'sugestoesVisualizacao');
         if (visTextarea) await visTextarea.vm.$emit('update:modelValue', 'Sugestões');
 
-        // Busca recursiva de unidade na estrutura hierárquica do processo
-        processosMock.processoDetalhe.value = {
-            unidades: [
-                {
-                    sigla: "P1",
-                    filhos: [{sigla: "C1", codSubprocesso: 20}]
-                }
-            ]
-        };
-        await router.push("/processo/1/C1/vis-mapa");
-        await flushPromises();
-        expect(vm.subprocesso.codSubprocesso).toBe(20);
-        
-        // Tratamento de ausência de detalhes do processo
-        processosMock.processoDetalhe.value = null;
-        await vm.$nextTick();
-        expect(vm.subprocesso).toBeNull();
-
         // Verificação de retornos antecipados em funções de confirmação sem subprocesso
-        processosMock.processoDetalhe.value = null;
+        vm.codSubprocesso = null;
         await vm.$nextTick();
         await vm.confirmarSugestoes();
         await vm.confirmarValidacao();

@@ -187,7 +187,6 @@ import AtividadeItem from "@/components/atividades/AtividadeItem.vue";
 import {useAtividadeForm} from "@/composables/useAtividadeForm";
 import {useFluxoSubprocesso} from "@/composables/useFluxoSubprocesso";
 import {useImpactoMapaModal} from "@/composables/useImpactoMapaModal";
-import {useProcessos} from "@/composables/useProcessos";
 import {useSubprocessos} from "@/composables/useSubprocessos";
 import {useMapas} from "@/composables/useMapas";
 import {useNotification} from "@/composables/useNotification";
@@ -227,7 +226,6 @@ const props = defineProps<{
 const router = useRouter();
 const subprocessosStore = useSubprocessos();
 const mapasStore = useMapas();
-const processos = useProcessos();
 const fluxoSubprocesso = useFluxoSubprocesso();
 const {notify, notificacao, clear} = useNotification();
 const toastStore = useToastStore();
@@ -246,12 +244,7 @@ const {
   habilitarEditarCadastro,
   habilitarDisponibilizarCadastro
 } = useAcesso(subprocesso);
-const isRevisao = computed(() => {
-  if (subprocesso.value?.tipoProcesso === TipoProcesso.REVISAO) {
-    return true;
-  }
-  return processos.processoDetalhe.value?.tipo === TipoProcesso.REVISAO;
-});
+const isRevisao = computed(() => subprocesso.value?.tipoProcesso === TipoProcesso.REVISAO);
 const podeVerImpacto = computed(() => podeVisualizarImpacto.value);
 
 const atividades = ref<Atividade[]>([]);
@@ -376,40 +369,9 @@ function sincronizarEstadoInicialContexto(data: any) {
   });
 }
 
-type UnidadeProcesso = Unidade & {
-  codSubprocesso?: number;
-  filhas?: UnidadeProcesso[];
-};
-
-function buscarSubprocessoNoProcesso(unidades: UnidadeProcesso[] | undefined, siglaAlvo: string): number | null {
-  if (!unidades?.length) {
-    return null;
-  }
-
-  for (const unidadeAtual of unidades) {
-    if (unidadeAtual.sigla === siglaAlvo) {
-      return unidadeAtual.codSubprocesso ?? null;
-    }
-
-    const codigoFilho = buscarSubprocessoNoProcesso(unidadeAtual.filhas, siglaAlvo);
-    if (codigoFilho) {
-      return codigoFilho;
-    }
-  }
-
-  return null;
-}
-
 async function carregarContextoInicial() {
   const codProcessoRef = Number(props.codProcesso);
-
-  await processos.buscarProcessoDetalhe(codProcessoRef);
-
-  let id = buscarSubprocessoNoProcesso(processos.processoDetalhe.value?.unidades as UnidadeProcesso[] | undefined, props.sigla);
-
-  if (!id) {
-    id = await subprocessosStore.buscarSubprocessoPorProcessoEUnidade(codProcessoRef, props.sigla);
-  }
+  const id = await subprocessosStore.buscarSubprocessoPorProcessoEUnidade(codProcessoRef, props.sigla);
 
   if (!id) {
     logger.error("ERRO: Subprocesso não encontrado!");
@@ -423,6 +385,9 @@ async function carregarContextoInicial() {
   }
 
   sincronizarEstadoInicialContexto(data);
+  if (data.mapa) {
+    mapasStore.mapaCompleto.value = data.mapa as any;
+  }
   if (data.atividadesDisponiveis) {
     atividades.value = data.atividadesDisponiveis;
   }
@@ -639,7 +604,6 @@ async function confirmarDisponibilizacao() {
 
   mostrarModalConfirmacao.value = false;
   if (sucesso) {
-    await subprocessosStore.buscarSubprocessoDetalhe(codSubprocesso.value);
     const msg = isRevisao.value
         ? TEXTOS.sucesso.REVISAO_CADASTRO_ATIVIDADES_DISPONIBILIZADA
         : TEXTOS.sucesso.CADASTRO_ATIVIDADES_DISPONIBILIZADO;

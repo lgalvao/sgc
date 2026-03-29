@@ -5,7 +5,6 @@ import {reactive, ref} from "vue";
 import * as useAcessoModule from "@/composables/useAcesso";
 import * as useFluxoSubprocessoModule from "@/composables/useFluxoSubprocesso";
 import {useMapas} from "@/composables/useMapas";
-import * as useProcessosModule from "@/composables/useProcessos";
 import * as subprocessoService from "@/services/subprocessoService";
 import {SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 import CadastroView from "../CadastroView.vue";
@@ -47,7 +46,6 @@ vi.mock("@/services/analiseService", () => ({
 
 vi.mock("@/composables/useSubprocessos", () => ({useSubprocessos: () => subprocessosMock}));
 vi.mock("@/composables/useFluxoSubprocesso", () => ({useFluxoSubprocesso: vi.fn()}));
-vi.mock("@/composables/useProcessos", () => ({useProcessos: vi.fn()}));
 
 const stubs = {
     LayoutPadrao: {template: '<div><slot /></div>'},
@@ -99,19 +97,11 @@ describe("CadastroView coverage", () => {
             disponibilizarCadastro: vi.fn().mockResolvedValue(true),
             disponibilizarRevisaoCadastro: vi.fn().mockResolvedValue(true),
         } as any);
-        vi.mocked(useProcessosModule.useProcessos).mockReturnValue({
-            processoDetalhe: ref({
-                codigo: 1,
-                unidades: [
-                    {sigla: "TESTE", codSubprocesso: 123, filhas: []}
-                ]
-            }),
-            buscarProcessoDetalhe: vi.fn().mockResolvedValue(undefined),
-        } as any);
         vi.mocked(subprocessoService.buscarSubprocessoPorProcessoEUnidade).mockResolvedValue(123 as any);
         vi.mocked(subprocessoService.buscarContextoEdicao).mockResolvedValue({
             subprocesso: {codigo: 123, situacao: "MAPEAMENTO_CADASTRO_EM_ANDAMENTO", tipoProcesso: "MAPEAMENTO"},
             permissoes: {podeEditarCadastro: true, podeDisponibilizarCadastro: true, podeVisualizarImpacto: true},
+            mapa: {codigo: 100},
             atividadesDisponiveis: [],
             unidade: {sigla: "TESTE", nome: "Teste"}
         } as any);
@@ -192,11 +182,9 @@ describe("CadastroView coverage", () => {
         await flushPromises();
 
         expect(contarChamadas(
-            useProcessosModule.useProcessos().buscarProcessoDetalhe as any,
             subprocessosMock.buscarContextoEdicao as any,
             subprocessosMock.buscarSubprocessoPorProcessoEUnidade as any,
         )).toBe(2);
-        expect(subprocessosMock.buscarSubprocessoPorProcessoEUnidade).not.toHaveBeenCalled();
     });
 
     it("cobre funções complementares e modais", async () => {
@@ -326,7 +314,6 @@ describe("CadastroView coverage", () => {
         const wrapper = createWrapper();
         const vm = wrapper.vm as any;
         subprocessosMock.buscarSubprocessoPorProcessoEUnidade.mockResolvedValue(null);
-        vi.mocked(useProcessosModule.useProcessos().buscarProcessoDetalhe).mockResolvedValue(undefined);
 
         await vm.carregarContextoInicial();
 
@@ -364,18 +351,4 @@ describe("CadastroView coverage", () => {
         vi.useRealTimers();
     });
 
-    it("cobre buscarSubprocessoNoProcesso", async () => {
-        const wrapper = createWrapper();
-        const vm = wrapper.vm as any;
-
-        const unidades = [
-            {sigla: "OUTRA", codSubprocesso: 1, filhas: [
-                {sigla: "ALVO", codSubprocesso: 2}
-            ]}
-        ];
-
-        expect(vm.buscarSubprocessoNoProcesso(unidades, "ALVO")).toBe(2);
-        expect(vm.buscarSubprocessoNoProcesso(unidades, "NONE")).toBeNull();
-        expect(vm.buscarSubprocessoNoProcesso(undefined, "ALVO")).toBeNull();
-    });
 });

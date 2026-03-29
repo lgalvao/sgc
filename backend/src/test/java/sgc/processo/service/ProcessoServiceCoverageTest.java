@@ -319,7 +319,7 @@ class ProcessoServiceCoverageTest {
 
             ProcessoDetalheDto res = target.obterDetalhesCompleto(cod, u, false);
             assertThat(res.getUnidades()).hasSize(1);
-            assertThat(res.getUnidades().get(0).getMapaCodigo()).isNull();
+            assertThat(res.getUnidades().getFirst().getMapaCodigo()).isNull();
         }
     }
 

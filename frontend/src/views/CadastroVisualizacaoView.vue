@@ -163,7 +163,6 @@ import ImpactoMapaModal from "@/components/mapa/ImpactoMapaModal.vue";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import {useImpactoMapaModal} from "@/composables/useImpactoMapaModal";
-import {useProcessos} from "@/composables/useProcessos";
 import {useFluxoSubprocesso} from "@/composables/useFluxoSubprocesso";
 import {useMapas} from "@/composables/useMapas";
 import {useSubprocessos} from "@/composables/useSubprocessos";
@@ -174,8 +173,7 @@ import type {
   Atividade,
   DevolverCadastroRequest,
   HomologarCadastroRequest,
-  Unidade,
-  UnidadeParticipante
+  Unidade
 } from "@/types/tipos";
 import {TipoProcesso} from "@/types/tipos";
 import {useAcesso} from "@/composables/useAcesso";
@@ -188,7 +186,6 @@ const props = defineProps<{
 }>();
 
 const router = useRouter();
-const processos = useProcessos();
 const fluxoSubprocesso = useFluxoSubprocesso();
 const mapasStore = useMapas();
 const subprocessosStore = useSubprocessos();
@@ -199,26 +196,10 @@ const unidadeId = computed(() => props.sigla);
 const codProcesso = computed(() => Number(props.codProcesso));
 
 const unidade = ref<Unidade | null>(null);
+const codSubprocesso = ref<number | null>(null);
 
 const siglaUnidade = computed(() => unidade.value?.sigla || unidadeId.value);
 const nomeUnidade = computed(() => (unidade.value?.nome ? `${unidade.value.nome}` : ""));
-
-const subprocesso = computed(() => {
-  if (!processos.processoDetalhe.value) return null;
-
-  function encontrarUnidade(unidades: UnidadeParticipante[]): UnidadeParticipante | undefined {
-    for (const u of unidades) {
-      if (u.sigla === unidadeId.value) return u;
-      if (u.filhos && u.filhos.length > 0) {
-        const encontrada = encontrarUnidade(u.filhos);
-        if (encontrada) return encontrada;
-      }
-    }
-    return undefined;
-  }
-
-  return encontrarUnidade(processos.processoDetalhe.value.unidades);
-});
 
 const {
   podeHomologarCadastro,
@@ -234,12 +215,8 @@ const podeVerImpacto = computed(() => podeVisualizarImpacto.value);
 const isHomologacao = computed(() => podeHomologarCadastro.value);
 const habilitarAnalisarCadastro = computed(() => habilitarAceitarCadastro.value || habilitarHomologarCadastro.value);
 
-const codSubprocesso = computed(() => subprocesso.value?.codSubprocesso);
-
 const atividades = ref<Atividade[]>([]);
-
-const processoAtual = computed(() => processos.processoDetalhe.value);
-const isRevisao = computed(() => processoAtual.value?.tipo === TipoProcesso.REVISAO);
+const isRevisao = computed(() => subprocessosStore.subprocessoDetalhe?.tipoProcesso === TipoProcesso.REVISAO);
 
 const analisesCadastro = ref<Analise[]>([]);
 
@@ -376,17 +353,13 @@ async function confirmarDevolucao() {
 }
 
 onMounted(async () => {
-  await processos.buscarProcessoDetalhe(codProcesso.value);
-  
-  let codigoSubprocesso: number | null | undefined = codSubprocesso.value;
-  if (!codigoSubprocesso && subprocesso.value) {
-    codigoSubprocesso = await subprocessosStore.buscarSubprocessoPorProcessoEUnidade(
-        codProcesso.value,
-        subprocesso.value.sigla,
-    );
-  }
+  const codigoSubprocesso = await subprocessosStore.buscarSubprocessoPorProcessoEUnidade(
+      codProcesso.value,
+      unidadeId.value,
+  );
 
   if (codigoSubprocesso) {
+    codSubprocesso.value = codigoSubprocesso;
     const data = await subprocessosStore.buscarContextoEdicao(codigoSubprocesso);
     if (data) {
       if (data.atividadesDisponiveis) {
