@@ -47,13 +47,6 @@ async function executarComTratamentoECarregamento<T>(
     return withErrorHandling(() => executarComCarregamento(acao), onError);
 }
 
-async function executarAcaoComRecarga(acao: () => Promise<void>) {
-    return withErrorHandling(async () => {
-        await acao();
-        await recarregarProcessoDetalheAtual();
-    });
-}
-
 async function buscarProcessosPainel(
     unidade: number,
     page: number,
@@ -127,12 +120,6 @@ async function buscarProcessoDetalhe(codigoProcesso: number) {
     });
 }
 
-async function buscarSubprocessosElegiveis(codigoProcesso: number) {
-    return withErrorHandling(async () => {
-        subprocessosElegiveis.value = await processoService.buscarSubprocessosElegiveis(codigoProcesso) ?? [];
-    });
-}
-
 async function finalizarProcesso(codigoProcesso: number) {
     return executarComTratamentoECarregamento(async () => {
         await processoService.finalizarProcesso(codigoProcesso);
@@ -152,48 +139,6 @@ async function executarAcaoBloco(acao: "aceitar" | "homologar" | "disponibilizar
     });
 }
 
-async function alterarDataLimiteSubprocesso(codSubprocesso: number, dados: { novaData: string }) {
-    return executarAcaoComRecarga(async () => {
-        await processoService.alterarDataLimiteSubprocesso(codSubprocesso, dados);
-    });
-}
-
-async function apresentarSugestoes(codSubprocesso: number, dados: { sugestoes: string }) {
-    return executarAcaoComRecarga(async () => {
-        await processoService.apresentarSugestoes(codSubprocesso, dados);
-    });
-}
-
-async function validarMapa(codSubprocesso: number) {
-    return executarAcaoComRecarga(async () => {
-        await processoService.validarMapa(codSubprocesso);
-    });
-}
-
-async function homologarValidacao(codSubprocesso: number, dados: { texto: string }) {
-    return executarAcaoComRecarga(async () => {
-        await processoService.homologarValidacao(codSubprocesso, dados);
-    });
-}
-
-async function aceitarValidacao(codSubprocesso: number, dados: { texto: string }) {
-    return executarAcaoComRecarga(async () => {
-        await processoService.aceitarValidacao(codSubprocesso, dados);
-    });
-}
-
-async function devolverValidacao(codSubprocesso: number, dados: { justificativa: string }) {
-    return executarAcaoComRecarga(async () => {
-        await processoService.devolverValidacao(codSubprocesso, dados);
-    });
-}
-
-async function enviarLembrete(codProcesso: number, unidadeCodigo: number) {
-    return withErrorHandling(async () => {
-        await processoService.enviarLembrete(codProcesso, unidadeCodigo);
-    });
-}
-
 async function buscarContextoCompleto(codProcesso: number) {
     return withErrorHandling(async () => {
         setProcessoDetalhe(null);
@@ -203,17 +148,6 @@ async function buscarContextoCompleto(codProcesso: number) {
             subprocessosElegiveis.value = data.elegiveis ?? [];
         }
         return data;
-    });
-}
-
-async function processarCadastroBloco(payload: {
-    codProcesso: number;
-    unidades: string[];
-    tipoAcao: "aceitar" | "homologar";
-    unidadeUsuario: string;
-}) {
-    return executarAcaoComRecarga(async () => {
-        await processoService.processarAcaoEmBloco(payload);
     });
 }
 
@@ -246,22 +180,12 @@ export function useProcessos() {
         buscarProcessosParaImportacao,
         buscarUnidadesParaImportacao,
         buscarProcessoDetalhe,
-        recarregarProcessoDetalheAtual,
         criarProcesso,
         atualizarProcesso,
         removerProcesso,
         iniciarProcesso,
         finalizarProcesso,
         executarAcaoBloco,
-        buscarSubprocessosElegiveis,
-        alterarDataLimiteSubprocesso,
-        apresentarSugestoes,
-        validarMapa,
-        homologarValidacao,
-        aceitarValidacao,
-        devolverValidacao,
-        enviarLembrete,
         buscarContextoCompleto,
-        processarCadastroBloco
     };
 }
