@@ -22,7 +22,6 @@ import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
-import static org.junit.jupiter.api.Assertions.*;
 import static sgc.processo.model.AcaoProcesso.*;
 import static sgc.processo.model.SituacaoProcesso.*;
 import static sgc.processo.model.TipoProcesso.*;

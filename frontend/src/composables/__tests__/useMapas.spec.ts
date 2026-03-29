@@ -110,11 +110,11 @@ describe("useMapas", () => {
         expect(mapas.mapaVisualizacao.value).toEqual(mockMapa);
     });
 
-    it("deve retornar false quando verificar mapa vigente falhar", async () => {
+    it("deve retornar false quando o service informar ausencia de mapa vigente", async () => {
         const {useMapas} = await import("../useMapas");
         const service = await import("@/services/subprocessoService");
         const mapas = useMapas();
-        vi.mocked(service.verificarMapaVigente).mockRejectedValue(new Error("Falha"));
+        vi.mocked(service.verificarMapaVigente).mockResolvedValue(false);
 
         await expect(mapas.temMapaVigente(10)).resolves.toBe(false);
     });

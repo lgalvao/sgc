@@ -1,21 +1,19 @@
-import {defineStore} from "pinia";
 import {computed, ref} from "vue";
 import {useAsyncAction} from "@/composables/useAsyncAction";
 import {
     buscarConfiguracoes as serviceBuscarConfiguracoes,
-    type Parametro,
     salvarConfiguracoes as serviceSalvarConfiguracoes,
 } from "@/services/configuracaoService";
+import type {Parametro} from "@/services/configuracaoService";
 
 export type {Parametro};
 
-export const useConfiguracoesStore = defineStore("configuracoes", () => {
+export function useConfiguracoes() {
     const configuracoes = ref<Parametro[]>([]);
     const {carregando, erro, executarSilencioso} = useAsyncAction();
 
-    // Map para lookup O(1) de chave -> parametro
     const configuracoesMap = computed(() =>
-        new Map(configuracoes.value.map(p => [p.chave, p]))
+        new Map(configuracoes.value.map(parametro => [parametro.chave, parametro]))
     );
 
     async function carregarConfiguracoes() {
@@ -32,20 +30,19 @@ export const useConfiguracoesStore = defineStore("configuracoes", () => {
         return result ?? false;
     }
 
-    function getValor(chave: string, valorPadrao: string = ""): string {
-        const param = configuracoesMap.value.get(chave);
-        return param ? param.valor : valorPadrao;
+    function getValor(chave: string, valorPadrao = ""): string {
+        const parametro = configuracoesMap.value.get(chave);
+        return parametro ? parametro.valor : valorPadrao;
     }
 
-    // Helpers para compatibilidade e uso fácil
     function getDiasInativacaoProcesso(): number {
-        const val = getValor("DIAS_INATIVACAO_PROCESSO", "30");
-        return parseInt(val, 10) || 30;
+        const valor = getValor("DIAS_INATIVACAO_PROCESSO", "30");
+        return parseInt(valor, 10) || 30;
     }
 
     function getDiasAlertaNovo(): number {
-        const val = getValor("DIAS_ALERTA_NOVO", "3");
-        return parseInt(val, 10) || 3;
+        const valor = getValor("DIAS_ALERTA_NOVO", "3");
+        return parseInt(valor, 10) || 3;
     }
 
     return {
@@ -56,6 +53,6 @@ export const useConfiguracoesStore = defineStore("configuracoes", () => {
         salvarConfiguracoes,
         getValor,
         getDiasInativacaoProcesso,
-        getDiasAlertaNovo
+        getDiasAlertaNovo,
     };
-});
+}

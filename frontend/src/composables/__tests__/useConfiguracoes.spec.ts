@@ -1,6 +1,5 @@
-import {createPinia, setActivePinia} from 'pinia';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
-import {useConfiguracoesStore} from '../configuracoes';
+import {useConfiguracoes} from '../useConfiguracoes';
 import * as configuracaoService from '@/services/configuracaoService';
 
 vi.mock('@/services/configuracaoService', () => ({
@@ -8,107 +7,102 @@ vi.mock('@/services/configuracaoService', () => ({
     salvarConfiguracoes: vi.fn()
 }));
 
-describe('Configuracoes store', () => {
-    let store: ReturnType<typeof useConfiguracoesStore>;
-
+describe('useConfiguracoes', () => {
     beforeEach(() => {
-        setActivePinia(createPinia());
-        store = useConfiguracoesStore();
         vi.clearAllMocks();
-        vi.spyOn(console, 'error').mockImplementation(() => {
-        });
     });
 
     it('carregarConfiguracoes deve preencher configuracoes em caso de sucesso', async () => {
+        const composable = useConfiguracoes();
         const mockData = [
             {codigo: 1, chave: 'DIAS_INATIVACAO_PROCESSO', descricao: 'Desc', valor: '60'}
         ];
         vi.mocked(configuracaoService.buscarConfiguracoes).mockResolvedValue(mockData);
 
-        await store.carregarConfiguracoes();
+        await composable.carregarConfiguracoes();
 
         expect(configuracaoService.buscarConfiguracoes).toHaveBeenCalled();
-        expect(store.configuracoes).toEqual(mockData);
-        expect(store.error).toBeNull();
-        expect(store.loading).toBe(false);
+        expect(composable.configuracoes.value).toEqual(mockData);
+        expect(composable.error.value).toBeNull();
+        expect(composable.loading.value).toBe(false);
     });
 
     it('carregarConfiguracoes deve definir erro em caso de falha', async () => {
+        const composable = useConfiguracoes();
         vi.mocked(configuracaoService.buscarConfiguracoes).mockRejectedValue(new Error('Erro API'));
 
-        await store.carregarConfiguracoes();
+        await composable.carregarConfiguracoes();
 
-        expect(store.configuracoes).toEqual([]);
-        expect(store.error).toBe('Erro API');
-        expect(store.loading).toBe(false);
+        expect(composable.configuracoes.value).toEqual([]);
+        expect(composable.error.value).toBe('Erro API');
+        expect(composable.loading.value).toBe(false);
     });
 
     it('salvarConfiguracoes deve atualizar configuracoes em caso de sucesso', async () => {
+        const composable = useConfiguracoes();
         const novosParametros = [
             {codigo: 1, chave: 'DIAS_INATIVACAO_PROCESSO', descricao: 'Desc', valor: '90'}
         ];
         vi.mocked(configuracaoService.salvarConfiguracoes).mockResolvedValue(novosParametros);
 
-        const result = await store.salvarConfiguracoes(novosParametros);
+        const result = await composable.salvarConfiguracoes(novosParametros);
 
         expect(configuracaoService.salvarConfiguracoes).toHaveBeenCalledWith(novosParametros);
-        expect(store.configuracoes).toEqual(novosParametros);
+        expect(composable.configuracoes.value).toEqual(novosParametros);
         expect(result).toBe(true);
-        expect(store.error).toBeNull();
+        expect(composable.error.value).toBeNull();
     });
 
     it('salvarConfiguracoes deve definir erro em caso de falha', async () => {
+        const composable = useConfiguracoes();
         const novosParametros = [
             {codigo: 1, chave: 'DIAS_INATIVACAO_PROCESSO', descricao: 'Desc', valor: '90'}
         ];
         vi.mocked(configuracaoService.salvarConfiguracoes).mockRejectedValue(new Error('Erro API'));
 
-        const result = await store.salvarConfiguracoes(novosParametros);
+        const result = await composable.salvarConfiguracoes(novosParametros);
 
         expect(result).toBe(false);
-        expect(store.error).toBe('Erro API');
+        expect(composable.error.value).toBe('Erro API');
     });
 
     it('getValor deve retornar valor correto ou padrao', () => {
-        store.configuracoes = [
+        const composable = useConfiguracoes();
+        composable.configuracoes.value = [
             {codigo: 1, chave: 'TESTE_KEY', descricao: 'Desc', valor: 'valor_teste'}
         ];
 
-        expect(store.getValor('TESTE_KEY')).toBe('valor_teste');
-        expect(store.getValor('KEY_INEXISTENTE', 'padrao')).toBe('padrao');
+        expect(composable.getValor('TESTE_KEY')).toBe('valor_teste');
+        expect(composable.getValor('KEY_INEXISTENTE', 'padrao')).toBe('padrao');
     });
 
     it('getDiasInativacaoProcesso deve retornar valor configurado ou padrao', () => {
-        // Caso padrão
-        expect(store.getDiasInativacaoProcesso()).toBe(30);
+        const composable = useConfiguracoes();
+        expect(composable.getDiasInativacaoProcesso()).toBe(30);
 
-        // Caso configurado
-        store.configuracoes = [
+        composable.configuracoes.value = [
             {codigo: 1, chave: 'DIAS_INATIVACAO_PROCESSO', descricao: 'Desc', valor: '45'}
         ];
-        expect(store.getDiasInativacaoProcesso()).toBe(45);
+        expect(composable.getDiasInativacaoProcesso()).toBe(45);
 
-        // Caso inválido
-        store.configuracoes = [
+        composable.configuracoes.value = [
             {codigo: 1, chave: 'DIAS_INATIVACAO_PROCESSO', descricao: 'Desc', valor: 'abc'}
         ];
-        expect(store.getDiasInativacaoProcesso()).toBe(30);
+        expect(composable.getDiasInativacaoProcesso()).toBe(30);
     });
 
     it('getDiasAlertaNovo deve retornar valor configurado ou padrao', () => {
-        // Caso padrão
-        expect(store.getDiasAlertaNovo()).toBe(3);
+        const composable = useConfiguracoes();
+        expect(composable.getDiasAlertaNovo()).toBe(3);
 
-        // Caso configurado
-        store.configuracoes = [
+        composable.configuracoes.value = [
             {codigo: 1, chave: 'DIAS_ALERTA_NOVO', descricao: 'Desc', valor: '7'}
         ];
-        expect(store.getDiasAlertaNovo()).toBe(7);
+        expect(composable.getDiasAlertaNovo()).toBe(7);
 
-        // Caso inválido
-        store.configuracoes = [
+        composable.configuracoes.value = [
             {codigo: 1, chave: 'DIAS_ALERTA_NOVO', descricao: 'Desc', valor: 'xyz'}
         ];
-        expect(store.getDiasAlertaNovo()).toBe(3);
+        expect(composable.getDiasAlertaNovo()).toBe(3);
     });
 });

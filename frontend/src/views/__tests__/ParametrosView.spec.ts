@@ -1,33 +1,34 @@
 import {mount} from '@vue/test-utils';
-import {createTestingPinia} from '@pinia/testing';
+import {ref} from 'vue';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import ParametrosView from '@/views/ParametrosView.vue';
-import {useConfiguracoesStore} from '@/stores/configuracoes';
+import {useConfiguracoes} from '@/composables/useConfiguracoes';
+
+vi.mock('@/composables/useConfiguracoes', () => ({
+    useConfiguracoes: vi.fn()
+}));
 
 describe('ParametrosView', () => {
     let wrapper: any;
     let configuracoesStore: any;
 
-    const setupWrapper = (initialState: any = {}, storeParams: any[] | null = null) => {
-        const pinia = createTestingPinia({
-            stubActions: false,
-            initialState
-        });
-
-        configuracoesStore = useConfiguracoesStore(pinia);
-
-        configuracoesStore.configuracoes = storeParams !== null ? storeParams : [
-            {codigo: 1, chave: 'DIAS_INATIVACAO_PROCESSO', valor: '30', descricao: 'Desc 1'},
-            {codigo: 2, chave: 'DIAS_ALERTA_NOVO', valor: '5', descricao: 'Desc 2'}
-        ];
-        configuracoesStore.getDiasInativacaoProcesso = vi.fn().mockReturnValue(30);
-        configuracoesStore.getDiasAlertaNovo = vi.fn().mockReturnValue(5);
-        configuracoesStore.carregarConfiguracoes = vi.fn().mockResolvedValue([]);
-        configuracoesStore.salvarConfiguracoes = vi.fn().mockResolvedValue(true);
+    const setupWrapper = (loading = false, error: string | null = null, storeParams: any[] | null = null) => {
+        configuracoesStore = {
+            configuracoes: ref(storeParams !== null ? storeParams : [
+                {codigo: 1, chave: 'DIAS_INATIVACAO_PROCESSO', valor: '30', descricao: 'Desc 1'},
+                {codigo: 2, chave: 'DIAS_ALERTA_NOVO', valor: '5', descricao: 'Desc 2'}
+            ]),
+            loading: ref(loading),
+            error: ref(error),
+            getDiasInativacaoProcesso: vi.fn().mockReturnValue(30),
+            getDiasAlertaNovo: vi.fn().mockReturnValue(5),
+            carregarConfiguracoes: vi.fn().mockResolvedValue([]),
+            salvarConfiguracoes: vi.fn().mockResolvedValue(true)
+        };
+        vi.mocked(useConfiguracoes).mockReturnValue(configuracoesStore as any);
 
         wrapper = mount(ParametrosView, {
             global: {
-                plugins: [pinia],
                 stubs: {
                     LayoutPadrao: {template: '<div><slot /></div>'},
                     PageHeader: {
@@ -81,24 +82,20 @@ describe('ParametrosView', () => {
     });
 
     it('deve mostrar loading state', async () => {
-        setupWrapper({
-            configuracoes: {loading: true}
-        });
+        setupWrapper(true, null);
         await wrapper.vm.$nextTick();
         expect(wrapper.find('.spinner-border').exists()).toBe(true);
     });
 
     it('deve mostrar erro state da store', async () => {
-        setupWrapper({
-            configuracoes: {error: 'Erro de teste', loading: false}
-        });
+        setupWrapper(false, 'Erro de teste');
         await wrapper.vm.$nextTick();
         expect(wrapper.find('.alert-stub').text()).toContain('Erro de teste');
     });
 
     it('deve gerenciar o carregamento de configurações e validações de formulário de parâmetros', async () => {
         // Carregamento de configurações quando a lista está vazia
-        setupWrapper({}, []);
+        setupWrapper(false, null, []);
         await wrapper.vm.$nextTick();
         expect(configuracoesStore.carregarConfiguracoes).toHaveBeenCalled();
 

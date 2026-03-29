@@ -12,14 +12,8 @@ import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
 import sgc.processo.model.*;
 import sgc.subprocesso.model.*;
-import sgc.subprocesso.dto.*;
-
 import java.time.LocalDateTime;
 import java.util.*;
-
-import static sgc.processo.model.TipoProcesso.*;
-import static sgc.subprocesso.model.SituacaoSubprocesso.*;
-import static sgc.subprocesso.model.TipoTransicao.*;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -33,6 +27,8 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
 
     @Mock
     private SubprocessoRepo subprocessoRepo;
+    @Mock
+    private SubprocessoService subprocessoService;
 
     @Mock
     private MovimentacaoRepo movimentacaoRepo;
@@ -67,34 +63,16 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
     @Mock
     private EmailService emailService;
 
-    @Test
-    @DisplayName("obterUnidadeLocalizacao - código nulo deve retornar unidade base")
-    void obterUnidadeLocalizacao_CodigoNulo() {
-        Unidade u = new Unidade();
-        u.setCodigo(1L);
-        Subprocesso sp = new Subprocesso();
-        sp.setCodigo(null);
-        sp.setUnidade(u);
-
-        Unidade res = invokeMethod(service, "obterUnidadeLocalizacao", sp);
-        assertThat(res).isEqualTo(u);
-    }
-
-    @Test
-    @DisplayName("obterUnidadeLocalizacao - destino nulo")
-    void obterUnidadeLocalizacao_DestinoNulo() {
-        Unidade u = new Unidade();
-        u.setCodigo(1L);
-        Subprocesso sp = new Subprocesso();
-        sp.setCodigo(100L);
-        sp.setUnidade(u);
-
-        Movimentacao mov = new Movimentacao();
-        mov.setUnidadeDestino(null);
-        when(movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(100L)).thenReturn(List.of(mov));
-
-        Unidade res = invokeMethod(service, "obterUnidadeLocalizacao", sp);
-        assertThat(res).isEqualTo(u);
+    
+    @BeforeEach
+    void setUp() {
+        org.mockito.Mockito.lenient().when(subprocessoService.obterUnidadeLocalizacao(org.mockito.ArgumentMatchers.any(Subprocesso.class)))
+                .thenAnswer(inv -> {
+                    Subprocesso sp = inv.getArgument(0);
+                    return sp.getLocalizacaoAtual() != null ? sp.getLocalizacaoAtual() : sp.getUnidade();
+                });
+        org.mockito.Mockito.lenient().when(impactoMapaService.verificarImpactos(org.mockito.ArgumentMatchers.any(Subprocesso.class), org.mockito.ArgumentMatchers.any()))
+                .thenReturn(sgc.mapa.dto.ImpactoMapaResponse.semImpacto());
     }
 
     @Test
@@ -118,7 +96,6 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         admin.setSigla("ADMIN");
 
         when(unidadeService.buscarPorSigla("ADMIN")).thenReturn(admin);
-        when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(any())).thenReturn(new ArrayList<>());
 
         invokeMethod(service, "disponibilizar", sp, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO, TipoTransicao.CADASTRO_DISPONIBILIZADO, new Usuario());
 
@@ -132,39 +109,12 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         sp.setCodigo(100L);
         sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         
-        when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(100L)).thenReturn(Optional.of(sp));
+        when(subprocessoService.buscarSubprocesso(100L)).thenReturn(sp);
         doThrow(new sgc.comum.erros.ErroValidacao("erro"))
             .when(validacaoService).validarSituacaoPermitida(any(Subprocesso.class), eq(SituacaoSubprocesso.NAO_INICIADO), eq(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO));
         
         assertThatThrownBy(() -> service.disponibilizarRevisao(100L, new Usuario()))
                 .isInstanceOf(sgc.comum.erros.ErroValidacao.class);
-    }
-
-    @Test
-    @DisplayName("obterUltimaDataLimite - deve lançar IllegalStateException sem etapa 1")
-    void obterUltimaDataLimite_SemEtapa1() {
-        Subprocesso sp = new Subprocesso();
-        sp.setCodigo(100L);
-        sp.setDataLimiteEtapa1(null);
-        sp.setDataLimiteEtapa2(LocalDateTime.now());
-
-        assertThatThrownBy(() -> invokeMethod(service, "obterUltimaDataLimite", sp))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("sem data limite da etapa 1");
-    }
-
-    @Test
-    @DisplayName("obterUltimaDataLimite - deve lançar IllegalStateException se etapa 1 > etapa 2")
-    void obterUltimaDataLimite_EtapasInvertidas() {
-        Subprocesso sp = new Subprocesso();
-        sp.setCodigo(100L);
-        java.time.LocalDateTime now = java.time.LocalDateTime.now();
-        sp.setDataLimiteEtapa1(now.plusDays(2));
-        sp.setDataLimiteEtapa2(now.plusDays(1));
-
-        assertThatThrownBy(() -> invokeMethod(service, "obterUltimaDataLimite", sp))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("etapa 1 posterior à etapa 2");
     }
 
     @Test
@@ -199,7 +149,7 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         setField(sp, "situacao", SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO);
         sp.setMapa(new sgc.mapa.model.Mapa());
 
-        when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(100L)).thenReturn(Optional.of(sp));
+        when(subprocessoService.buscarSubprocesso(100L)).thenReturn(sp);
 
         service.apresentarSugestoes(100L, "sugestoes", new Usuario());
 
@@ -222,7 +172,7 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         sp.setUnidade(u);
         setField(sp, "situacao", SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO);
 
-        when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(100L)).thenReturn(Optional.of(sp));
+        when(subprocessoService.buscarSubprocesso(100L)).thenReturn(sp);
 
         service.validarMapa(100L, new Usuario());
 
@@ -245,7 +195,7 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         sp.setUnidade(u);
         setField(sp, "situacao", SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
 
-        when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(100L)).thenReturn(Optional.of(sp));
+        when(subprocessoService.buscarSubprocesso(100L)).thenReturn(sp);
 
         service.aceitarValidacao(100L, "obs", new Usuario());
 
@@ -293,17 +243,6 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
     }
 
     @Test
-    @DisplayName("obterUltimaDataLimite - ambas nulas deve retornar null")
-    void obterUltimaDataLimite_AmbasNulas() {
-        Subprocesso sp = new Subprocesso();
-        sp.setDataLimiteEtapa1(null);
-        sp.setDataLimiteEtapa2(null);
-
-        java.time.LocalDate res = invokeMethod(service, "obterUltimaDataLimite", sp);
-        assertThat(res).isNull();
-    }
-
-    @Test
     @DisplayName("disponibilizarRevisao - com subprocesso não iniciado")
     void disponibilizarRevisao_ComNaoIniciado() {
         Subprocesso sp = new Subprocesso();
@@ -314,8 +253,7 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         sp.setUnidade(new Unidade());
         sp.setProcesso(Processo.builder().tipo(TipoProcesso.REVISAO).build());
 
-        when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(100L)).thenReturn(Optional.of(sp));
-        when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(anyLong())).thenReturn(List.of());
+        when(subprocessoService.buscarSubprocesso(100L)).thenReturn(sp);
 
         service.disponibilizarRevisao(100L, new Usuario());
 
@@ -332,12 +270,13 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
 
         Unidade uAnalise = new Unidade(); uAnalise.setCodigo(20L);
         Unidade uOrigem = new Unidade(); uOrigem.setCodigo(15L);
+        sp.setLocalizacaoAtual(uAnalise);
 
         Movimentacao mov = new Movimentacao();
         mov.setUnidadeDestino(uAnalise);
         mov.setUnidadeOrigem(uOrigem);
 
-        when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(1L)).thenReturn(Optional.of(sp));
+        when(subprocessoService.buscarSubprocesso(1L)).thenReturn(sp);
         when(movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(1L)).thenReturn(List.of(mov));
         when(hierarquiaService.isSubordinada(uOrigem, uAnalise)).thenReturn(true); // branch 489
 
@@ -353,7 +292,7 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         Subprocesso sp = new Subprocesso(); sp.setCodigo(1L); sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
         Processo p = new Processo(); p.setTipo(TipoProcesso.REVISAO); sp.setProcesso(p);
 
-        when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(1L)).thenReturn(Optional.of(sp));
+        when(subprocessoService.buscarSubprocesso(1L)).thenReturn(sp);
         when(impactoMapaService.verificarImpactos(any(), any())).thenReturn(ImpactoMapaResponse.builder()
                 .temImpactos(true)
                 .inseridas(List.of(AtividadeImpactadaDto.builder().descricao("Nova").build()))
@@ -373,7 +312,7 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         Subprocesso sp = new Subprocesso(); sp.setCodigo(1L); sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
         Processo p = new Processo(); p.setTipo(TipoProcesso.REVISAO); sp.setProcesso(p);
 
-        when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(1L)).thenReturn(Optional.of(sp));
+        when(subprocessoService.buscarSubprocesso(1L)).thenReturn(sp);
         when(impactoMapaService.verificarImpactos(any(), any())).thenReturn(ImpactoMapaResponse.builder()
                 .temImpactos(false)
                 .inseridas(List.of())
@@ -396,7 +335,7 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         sp.setMapa(new sgc.mapa.model.Mapa()); sp.getMapa().setCodigo(100L);
         sp.setDataLimiteEtapa1(LocalDateTime.of(2026, 1, 1, 0, 0));
         
-        when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(1L)).thenReturn(Optional.of(sp));
+        when(subprocessoService.buscarSubprocesso(1L)).thenReturn(sp);
         when(unidadeService.buscarPorSigla("ADMIN")).thenReturn(new Unidade());
 
         sgc.subprocesso.dto.DisponibilizarMapaRequest req = new sgc.subprocesso.dto.DisponibilizarMapaRequest(java.time.LocalDate.of(2026, 1, 1), "Obs");

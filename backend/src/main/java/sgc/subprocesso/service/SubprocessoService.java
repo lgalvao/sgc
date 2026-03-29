@@ -36,6 +36,38 @@ public class SubprocessoService {
     private static final String NOME_ENTIDADE = "Subprocesso";
     private static final Set<SituacaoSubprocesso> SITUACOES_PERMITIDAS_IMPORTACAO = Set.of(
             NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, REVISAO_CADASTRO_EM_ANDAMENTO);
+    private static final Set<SituacaoSubprocesso> SITUACOES_EDICAO_CADASTRO = Set.of(
+            NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, REVISAO_CADASTRO_EM_ANDAMENTO);
+    private static final Set<SituacaoSubprocesso> SITUACOES_DISPONIBILIZACAO_CADASTRO = Set.of(
+            MAPEAMENTO_CADASTRO_EM_ANDAMENTO, REVISAO_CADASTRO_EM_ANDAMENTO);
+    private static final Set<SituacaoSubprocesso> SITUACOES_ANALISE_CADASTRO = Set.of(
+            MAPEAMENTO_CADASTRO_DISPONIBILIZADO, REVISAO_CADASTRO_DISPONIBILIZADA);
+    private static final Set<SituacaoSubprocesso> SITUACOES_DISPONIBILIZACAO_MAPA = Set.of(
+            MAPEAMENTO_CADASTRO_HOMOLOGADO,
+            MAPEAMENTO_MAPA_CRIADO,
+            MAPEAMENTO_MAPA_COM_SUGESTOES,
+            REVISAO_CADASTRO_HOMOLOGADA,
+            REVISAO_MAPA_AJUSTADO,
+            REVISAO_MAPA_COM_SUGESTOES);
+    private static final Set<SituacaoSubprocesso> SITUACOES_ANALISE_MAPA = Set.of(
+            MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO);
+    private static final Set<SituacaoSubprocesso> SITUACOES_COM_SUGESTOES_MAPA = Set.of(
+            MAPEAMENTO_MAPA_COM_SUGESTOES, REVISAO_MAPA_COM_SUGESTOES);
+    private static final Set<SituacaoSubprocesso> SITUACOES_GESTAO_MAPA = Set.of(
+            MAPEAMENTO_MAPA_COM_SUGESTOES,
+            MAPEAMENTO_MAPA_VALIDADO,
+            REVISAO_MAPA_COM_SUGESTOES,
+            REVISAO_MAPA_VALIDADO);
+    private static final Set<SituacaoSubprocesso> SITUACOES_EDICAO_MAPA = Set.of(
+            MAPEAMENTO_CADASTRO_HOMOLOGADO,
+            MAPEAMENTO_MAPA_CRIADO,
+            REVISAO_CADASTRO_HOMOLOGADA,
+            REVISAO_MAPA_AJUSTADO,
+            DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO);
+    private static final Set<SituacaoSubprocesso> SITUACOES_IMPACTO_ADMIN = Set.of(
+            REVISAO_CADASTRO_DISPONIBILIZADA,
+            REVISAO_CADASTRO_HOMOLOGADA,
+            REVISAO_MAPA_AJUSTADO);
     private final ComumRepo repo;
     private final AnaliseRepo analiseRepo;
     private final UnidadeService unidadeService;
@@ -537,19 +569,12 @@ public class SubprocessoService {
 
     public SubprocessoDetalheResponse obterDetalhes(Subprocesso sp, Usuario usuarioAutenticado) {
         String siglaUnidade = sp.getUnidade().getSigla();
-        String localizacaoAtual = siglaUnidade;
+        String localizacaoAtual = obterUnidadeLocalizacao(sp).getSigla();
 
         sgc.organizacao.dto.ResponsavelDto responsavel = usuarioFacade.buscarResponsabilidadeDetalhadaAtual(siglaUnidade);
         Usuario titular = usuarioFacade.buscarPorLogin(sp.getUnidade().getTituloTitular());
 
         List<Movimentacao> movs = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo());
-        if (!movs.isEmpty()) {
-            Unidade destino = movs.getFirst().getUnidadeDestino();
-            if (destino != null) {
-                localizacaoAtual = destino.getSigla();
-            }
-        }
-
         List<MovimentacaoDto> movimentacoes = movs.stream()
                 .map(MovimentacaoDto::from)
                 .toList();
@@ -621,23 +646,23 @@ public class SubprocessoService {
         boolean habilitarAcessoMapa = verificarAcessoMapaHabilitado(perfil, situacao, sp.getUnidade(), unidadeUsuario);
 
         return PermissoesSubprocessoDto.builder()
-                .podeEditarCadastro(isChefe && Set.of(NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, REVISAO_CADASTRO_EM_ANDAMENTO).contains(situacao))
-                .podeDisponibilizarCadastro(isChefe && Set.of(MAPEAMENTO_CADASTRO_EM_ANDAMENTO, REVISAO_CADASTRO_EM_ANDAMENTO).contains(situacao))
-                .podeDevolverCadastro((isGestor || isAdmin) && Set.of(MAPEAMENTO_CADASTRO_DISPONIBILIZADO, REVISAO_CADASTRO_DISPONIBILIZADA).contains(situacao))
-                .podeAceitarCadastro(isGestor && Set.of(MAPEAMENTO_CADASTRO_DISPONIBILIZADO, REVISAO_CADASTRO_DISPONIBILIZADA).contains(situacao))
-                .podeHomologarCadastro(isAdmin && Set.of(MAPEAMENTO_CADASTRO_DISPONIBILIZADO, REVISAO_CADASTRO_DISPONIBILIZADA).contains(situacao))
+                .podeEditarCadastro(isChefe && SITUACOES_EDICAO_CADASTRO.contains(situacao))
+                .podeDisponibilizarCadastro(isChefe && SITUACOES_DISPONIBILIZACAO_CADASTRO.contains(situacao))
+                .podeDevolverCadastro((isGestor || isAdmin) && SITUACOES_ANALISE_CADASTRO.contains(situacao))
+                .podeAceitarCadastro(isGestor && SITUACOES_ANALISE_CADASTRO.contains(situacao))
+                .podeHomologarCadastro(isAdmin && SITUACOES_ANALISE_CADASTRO.contains(situacao))
                 .podeEditarMapa(verificarEditarMapa(isAdmin, situacao))
-                .podeDisponibilizarMapa(isAdmin && Set.of(MAPEAMENTO_CADASTRO_HOMOLOGADO, MAPEAMENTO_MAPA_CRIADO, MAPEAMENTO_MAPA_COM_SUGESTOES, REVISAO_CADASTRO_HOMOLOGADA, REVISAO_MAPA_AJUSTADO, REVISAO_MAPA_COM_SUGESTOES).contains(situacao))
-                .podeValidarMapa(isChefe && Set.of(MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO).contains(situacao))
-                .podeApresentarSugestoes(isChefe && Set.of(MAPEAMENTO_MAPA_DISPONIBILIZADO, REVISAO_MAPA_DISPONIBILIZADO).contains(situacao))
-                .podeVerSugestoes((isGestor || isAdmin) && Set.of(MAPEAMENTO_MAPA_COM_SUGESTOES, REVISAO_MAPA_COM_SUGESTOES).contains(situacao))
+                .podeDisponibilizarMapa(isAdmin && SITUACOES_DISPONIBILIZACAO_MAPA.contains(situacao))
+                .podeValidarMapa(isChefe && SITUACOES_ANALISE_MAPA.contains(situacao))
+                .podeApresentarSugestoes(isChefe && SITUACOES_ANALISE_MAPA.contains(situacao))
+                .podeVerSugestoes((isGestor || isAdmin) && SITUACOES_COM_SUGESTOES_MAPA.contains(situacao))
                 .podeDevolverMapa(verificarGerirMapa(isGestor || isAdmin, situacao))
                 .podeAceitarMapa(verificarGerirMapa(isGestor, situacao))
                 .podeHomologarMapa(verificarGerirMapa(isAdmin, situacao))
                 .podeVisualizarImpacto(verificarVisualizarImpacto(temMapaVigente, mesmaUnidade, isChefe, isGestor, isAdmin, situacao))
                 .podeAlterarDataLimite(isAdmin)
-                .podeReabrirCadastro(isAdmin && situacao.ordinal() >= MAPEAMENTO_MAPA_HOMOLOGADO.ordinal() && situacao.name().startsWith("MAPEAMENTO"))
-                .podeReabrirRevisao(isAdmin && situacao.ordinal() >= REVISAO_MAPA_HOMOLOGADO.ordinal() && situacao.name().startsWith("REVISAO"))
+                .podeReabrirCadastro(isAdmin && isSituacaoMapeamentoAPartirDe(situacao, MAPEAMENTO_MAPA_HOMOLOGADO))
+                .podeReabrirRevisao(isAdmin && isSituacaoRevisaoAPartirDe(situacao, REVISAO_MAPA_HOMOLOGADO))
                 .podeEnviarLembrete(isAdmin)
                 .mesmaUnidade(mesmaUnidade)
                 .habilitarAcessoCadastro(habilitarAcessoCadastro)
@@ -678,57 +703,50 @@ public class SubprocessoService {
     }
 
     private boolean verificarCadastroDisponibilizadoParaVisualizacao(SituacaoSubprocesso situacao) {
-        if (situacao.name().startsWith("MAPEAMENTO")) {
-            return situacao.ordinal() >= MAPEAMENTO_CADASTRO_DISPONIBILIZADO.ordinal();
-        }
-        if (situacao.name().startsWith("REVISAO")) {
-            return situacao.ordinal() >= REVISAO_CADASTRO_DISPONIBILIZADA.ordinal();
-        }
-        return false;
+        return isSituacaoMapeamentoAPartirDe(situacao, MAPEAMENTO_CADASTRO_DISPONIBILIZADO)
+                || isSituacaoRevisaoAPartirDe(situacao, REVISAO_CADASTRO_DISPONIBILIZADA);
     }
 
     private boolean verificarMapaDisponibilizadoParaVisualizacao(SituacaoSubprocesso situacao) {
-        if (situacao.name().startsWith("MAPEAMENTO")) {
-            return situacao.ordinal() >= MAPEAMENTO_MAPA_DISPONIBILIZADO.ordinal();
-        }
-        if (situacao.name().startsWith("REVISAO")) {
-            return situacao.ordinal() >= REVISAO_MAPA_DISPONIBILIZADO.ordinal();
-        }
-        return false;
+        return isSituacaoMapeamentoAPartirDe(situacao, MAPEAMENTO_MAPA_DISPONIBILIZADO)
+                || isSituacaoRevisaoAPartirDe(situacao, REVISAO_MAPA_DISPONIBILIZADO);
     }
 
     private boolean verificarMapaHabilitadoParaAdmin(SituacaoSubprocesso situacao) {
-        if (situacao.name().startsWith("MAPEAMENTO")) {
-            return situacao.ordinal() >= MAPEAMENTO_CADASTRO_HOMOLOGADO.ordinal();
-        }
-        if (situacao.name().startsWith("REVISAO")) {
-            return situacao.ordinal() >= REVISAO_CADASTRO_HOMOLOGADA.ordinal();
-        }
-        return false;
+        return isSituacaoMapeamentoAPartirDe(situacao, MAPEAMENTO_CADASTRO_HOMOLOGADO)
+                || isSituacaoRevisaoAPartirDe(situacao, REVISAO_CADASTRO_HOMOLOGADA);
     }
 
     private boolean verificarVisualizarImpacto(boolean temMapaVigente, boolean mesmaUnidade, boolean isChefe, boolean isGestor, boolean isAdmin, SituacaoSubprocesso situacao) {
         return temMapaVigente && (
                 (mesmaUnidade && isChefe && situacao == REVISAO_CADASTRO_EM_ANDAMENTO) ||
                         (mesmaUnidade && isGestor && situacao == REVISAO_CADASTRO_DISPONIBILIZADA) ||
-                        (isAdmin && Set.of(REVISAO_CADASTRO_DISPONIBILIZADA, REVISAO_CADASTRO_HOMOLOGADA, REVISAO_MAPA_AJUSTADO).contains(situacao))
+                        (isAdmin && SITUACOES_IMPACTO_ADMIN.contains(situacao))
         );
     }
 
     private boolean verificarEditarMapa(boolean isAdmin, SituacaoSubprocesso situacao) {
-        return isAdmin && Set.of(
-                MAPEAMENTO_CADASTRO_HOMOLOGADO,
-                MAPEAMENTO_MAPA_CRIADO,
-                REVISAO_CADASTRO_HOMOLOGADA, REVISAO_MAPA_AJUSTADO,
-                DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO).contains(situacao);
+        return isAdmin && SITUACOES_EDICAO_MAPA.contains(situacao);
     }
 
     private boolean verificarGerirMapa(boolean isPermitido, SituacaoSubprocesso situacao) {
-        return isPermitido && Set.of(MAPEAMENTO_MAPA_COM_SUGESTOES,
-                        MAPEAMENTO_MAPA_VALIDADO,
-                        REVISAO_MAPA_COM_SUGESTOES,
-                        REVISAO_MAPA_VALIDADO)
-                .contains(situacao);
+        return isPermitido && SITUACOES_GESTAO_MAPA.contains(situacao);
+    }
+
+    private boolean isSituacaoMapeamentoAPartirDe(SituacaoSubprocesso situacaoAtual, SituacaoSubprocesso marcoInicial) {
+        return isFluxoMapeamento(situacaoAtual) && situacaoAtual.ordinal() >= marcoInicial.ordinal();
+    }
+
+    private boolean isSituacaoRevisaoAPartirDe(SituacaoSubprocesso situacaoAtual, SituacaoSubprocesso marcoInicial) {
+        return isFluxoRevisao(situacaoAtual) && situacaoAtual.ordinal() >= marcoInicial.ordinal();
+    }
+
+    private boolean isFluxoMapeamento(SituacaoSubprocesso situacao) {
+        return situacao.name().startsWith("MAPEAMENTO");
+    }
+
+    private boolean isFluxoRevisao(SituacaoSubprocesso situacao) {
+        return situacao.name().startsWith("REVISAO");
     }
 
     @Transactional
@@ -830,16 +848,16 @@ public class SubprocessoService {
 
     @Transactional(readOnly = true)
     public List<AnaliseHistoricoDto> listarHistoricoCadastro(Long codSubprocesso) {
-        return listarAnalisesPorSubprocesso(codSubprocesso).stream()
-                .filter(a -> a.getTipo() == TipoAnalise.CADASTRO)
-                .map(this::paraHistoricoDto)
-                .toList();
+        return listarHistoricoPorTipo(codSubprocesso, TipoAnalise.CADASTRO);
     }
 
     @Transactional(readOnly = true)
     public List<AnaliseHistoricoDto> listarHistoricoValidacao(Long codSubprocesso) {
-        return listarAnalisesPorSubprocesso(codSubprocesso).stream()
-                .filter(a -> a.getTipo() == TipoAnalise.VALIDACAO)
+        return listarHistoricoPorTipo(codSubprocesso, TipoAnalise.VALIDACAO);
+    }
+
+    private List<AnaliseHistoricoDto> listarHistoricoPorTipo(Long codSubprocesso, TipoAnalise tipo) {
+        return listarAnalisesPorSubprocesso(codSubprocesso, tipo).stream()
                 .map(this::paraHistoricoDto)
                 .toList();
     }
@@ -889,4 +907,3 @@ public class SubprocessoService {
     }
 
 }
-

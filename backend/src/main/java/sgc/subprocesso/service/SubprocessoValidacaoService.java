@@ -22,20 +22,8 @@ public class SubprocessoValidacaoService {
     private final MapaManutencaoService mapaManutencaoService;
 
     public void validarExistenciaAtividades(Subprocesso subprocesso) {
-        Mapa mapa = subprocesso.getMapa();
-        if (mapa == null || mapa.getCodigo() == null) {
-            throw new ErroValidacao(Mensagens.SUBPROCESSO_SEM_MAPA);
-        }
-
-        Long codMapa = mapa.getCodigo();
-        List<Atividade> atividades = mapaManutencaoService.atividadesMapaCodigoComConhecimentos(codMapa);
-        if (atividades.isEmpty()) {
-            throw new ErroValidacao(Mensagens.MAPA_SEM_ATIVIDADES);
-        }
-
-        List<Atividade> atividadesSemConhecimento = atividades.stream()
-                .filter(a -> a.getConhecimentos().isEmpty())
-                .toList();
+        List<Atividade> atividades = listarAtividadesObrigatorias(subprocesso);
+        List<Atividade> atividadesSemConhecimento = listarAtividadesSemConhecimento(atividades);
 
         if (!atividadesSemConhecimento.isEmpty()) {
             throw new ErroValidacao(Mensagens.ATIVIDADES_SEM_CONHECIMENTOS);
@@ -100,8 +88,8 @@ public class SubprocessoValidacaoService {
     public ValidacaoCadastroDto validarCadastro(Subprocesso sp) {
         List<ValidacaoCadastroDto.Erro> erros = new ArrayList<>();
 
-        Mapa mapa = sp.getMapa();
-        if (mapa == null || mapa.getCodigo() == null) {
+        Long codMapa = obterCodigoMapaOpt(sp.getMapa()).orElse(null);
+        if (codMapa == null) {
             erros.add(ValidacaoCadastroDto.Erro.builder()
                     .tipo("SEM_MAPA")
                     .mensagem("O subprocesso não possui mapa associado.")
@@ -112,7 +100,6 @@ public class SubprocessoValidacaoService {
                     .build();
         }
 
-        Long codMapa = mapa.getCodigo();
         List<Atividade> atividades = mapaManutencaoService.atividadesMapaCodigoComConhecimentos(codMapa);
         if (atividades.isEmpty()) {
             erros.add(ValidacaoCadastroDto.Erro.builder()
@@ -182,9 +169,13 @@ public class SubprocessoValidacaoService {
         }
     }
 
-    public void validarRequisitosNegocioParaDisponibilizacao(Subprocesso sp, List<Atividade> atividadesSemConhecimento) {
-        validarExistenciaAtividades(sp);
+    public void validarRequisitosNegocioParaDisponibilizacao(Subprocesso sp) {
+        List<Atividade> atividades = listarAtividadesObrigatorias(sp);
+        List<Atividade> atividadesSemConhecimento = listarAtividadesSemConhecimento(atividades);
+        validarAtividadesSemConhecimento(atividadesSemConhecimento);
+    }
 
+    private void validarAtividadesSemConhecimento(List<Atividade> atividadesSemConhecimento) {
         if (!atividadesSemConhecimento.isEmpty()) {
             var atividadesInfo = atividadesSemConhecimento.stream()
                     .map(atividade -> Map.of("codigo", atividade.getCodigo(), "descricao", atividade.getDescricao()))
@@ -193,6 +184,30 @@ public class SubprocessoValidacaoService {
                     Mensagens.ATIVIDADES_SEM_CONHECIMENTO_ASSOCIADO,
                     Map.of("atividadesSemConhecimento", atividadesInfo));
         }
+    }
+
+    private List<Atividade> listarAtividadesObrigatorias(Subprocesso subprocesso) {
+        Long codMapa = obterCodigoMapaObrigatorio(subprocesso.getMapa());
+        List<Atividade> atividades = mapaManutencaoService.atividadesMapaCodigoComConhecimentos(codMapa);
+        if (atividades.isEmpty()) {
+            throw new ErroValidacao(Mensagens.MAPA_SEM_ATIVIDADES);
+        }
+        return atividades;
+    }
+
+    private List<Atividade> listarAtividadesSemConhecimento(List<Atividade> atividades) {
+        return atividades.stream()
+                .filter(atividade -> atividade.getConhecimentos().isEmpty())
+                .toList();
+    }
+
+    private Long obterCodigoMapaObrigatorio(@Nullable Mapa mapa) {
+        return obterCodigoMapaOpt(mapa)
+                .orElseThrow(() -> new ErroValidacao(Mensagens.SUBPROCESSO_SEM_MAPA));
+    }
+
+    private Optional<Long> obterCodigoMapaOpt(@Nullable Mapa mapa) {
+        return Optional.ofNullable(mapa).map(Mapa::getCodigo);
     }
 
     public boolean verificarAcessoUnidadeAoProcesso(Long codProcesso, List<Long> unidadeCodigos) {
@@ -236,5 +251,3 @@ public class SubprocessoValidacaoService {
         }
     }
 }
-
-

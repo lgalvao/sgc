@@ -157,12 +157,7 @@ public class SubprocessoTransicaoService {
 
     private void disponibilizar(Subprocesso sp, SituacaoSubprocesso novaSituacao,
                                 TipoTransicao transicao, Usuario usuario) {
-
-        Mapa mapa = sp.getMapa();
-        List<Atividade> atividades = mapaManutencaoService.atividadesMapaCodigoComConhecimentos(mapa.getCodigo());
-        List<Atividade> atividadesSemConhecimento = atividades.isEmpty() ? List.of() : atividades.stream().filter(a -> a.getConhecimentos().isEmpty()).toList();
-
-        validacaoService.validarRequisitosNegocioParaDisponibilizacao(sp, atividadesSemConhecimento);
+        validacaoService.validarRequisitosNegocioParaDisponibilizacao(sp);
 
         Unidade origem = sp.getUnidade();
         Unidade destino = origem.getUnidadeSuperior();

@@ -148,12 +148,25 @@ tasks.withType<Test> {
     useJUnitPlatform()
 
     testLogging {
-        events(TestLogEvent.SKIPPED, TestLogEvent.FAILED, TestLogEvent.STANDARD_ERROR)
+        events(TestLogEvent.SKIPPED, TestLogEvent.FAILED)
         exceptionFormat = TestExceptionFormat.FULL
         showStackTraces = true
         showCauses = true
         showStandardStreams = false
     }
+
+    addTestOutputListener(object : org.gradle.api.tasks.testing.TestOutputListener {
+        override fun onOutput(descriptor: org.gradle.api.tasks.testing.TestDescriptor, event: org.gradle.api.tasks.testing.TestOutputEvent) {
+            if (event.destination == org.gradle.api.tasks.testing.TestOutputEvent.Destination.StdErr) {
+                val msg = event.message
+                if (!msg.contains("WARNING: A terminally deprecated method in sun.misc.Unsafe") &&
+                    !msg.contains("WARNING: sun.misc.Unsafe::") &&
+                    !msg.contains("WARNING: Please consider reporting this to the maintainers")) {
+                    System.err.print(msg)
+                }
+            }
+        }
+    })
 
     val slowTests = mutableListOf<Pair<String, Long>>()
     val showSlowTests = false

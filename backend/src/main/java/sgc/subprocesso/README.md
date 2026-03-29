@@ -2,123 +2,113 @@
 
 ## Visão geral
 
-Este pacote é o **motor do workflow** do SGC. Ele gerencia a entidade `Subprocesso`, que representa a tarefa de uma
-única unidade organizacional dentro de um `Processo` maior. Ele funciona como uma **máquina de estados**, controlando o
-ciclo de vida de cada tarefa, desde sua criação até a homologação.
+Este módulo implementa o workflow de `Subprocesso`, que representa a execução de um `Processo` por uma unidade
+organizacional específica. O módulo concentra:
 
-A principal responsabilidade deste módulo é garantir que as transições de estado (`situacao`) sigam as regras de negócio
-e que cada ação seja registrada em uma trilha de auditoria imutável (`Movimentacao`).
+* transições de situação;
+* trilha de auditoria por `Movimentacao`;
+* validações de cadastro e mapa;
+* montagem de respostas detalhadas para a API;
+* permissões derivadas do contexto do usuário e da situação atual.
 
-Para melhor organização e desacoplamento, a camada de controle foi dividida em múltiplos controladores especializados.
+O desenho atual do módulo é baseado em um controller REST unificado e em serviços especializados por responsabilidade,
+sem expor entidades JPA diretamente na API.
 
-## Arquitetura de Serviços
+## Estrutura atual
 
-A complexidade do workflow é gerenciada através de uma arquitetura de serviços coesa e granular. O `SubprocessoService`
-atua como uma fachada apenas para operações de CRUD básicas, enquanto os controladores de workflow interagem diretamente
-com serviços especializados para cada domínio de ação.
+### Controller principal
+
+* **`SubprocessoController`**:
+  concentra endpoints de consulta, cadastro, mapa, validação, ajustes, importação e ações em bloco.
+
+### Serviços principais
+
+* **`SubprocessoService`**:
+  consultas, CRUD administrativo, montagem de contexto/detalhe, permissões de UI, operações de mapa dentro do
+  contexto do subprocesso, importação de atividades e histórico.
+* **`SubprocessoTransicaoService`**:
+  workflow de cadastro, revisão, validação, homologação, reabertura e alteração de prazo.
+* **`SubprocessoValidacaoService`**:
+  validações de situação, consistência de cadastro, associação de mapa e regras para disponibilização/finalização.
+* **`SubprocessoSituacaoService`**:
+  reconciliação de situação com base no conteúdo do mapa.
+* **`SubprocessoNotificacaoService`**:
+  disparo de alertas e e-mails decorrentes das transições.
+
+## Relação entre os serviços
 
 ```mermaid
 graph TD
-    subgraph "Frontend"
-        ControleCrud(SubprocessoCrudController)
-        ControleCadastro(SubprocessoCadastroController)
-        ControleMapa(SubprocessoMapaController)
-        ControleValidacao(SubprocessoValidacaoController)
-    end
+    Controle["SubprocessoController"]
 
-    subgraph "Módulo subprocesso"
-        Facade(SubprocessoService - Fachada CRUD)
+    Subprocesso["SubprocessoService"]
+    Transicao["SubprocessoTransicaoService"]
+    Validacao["SubprocessoValidacaoService"]
+    Situacao["SubprocessoSituacaoService"]
+    Notificacao["SubprocessoNotificacaoService"]
+    Mapa["MapaManutencaoService"]
 
-        subgraph "Serviços especializados"
-            CadastroWorkflow(SubprocessoCadastroWorkflowService)
-            MapaWorkflow(SubprocessoMapaWorkflowService)
-            Consulta(SubprocessoConsultaService)
-            DtoBuilder(SubprocessoDtoService)
-            Mapa(SubprocessoMapaService)
-            Notificacao(SubprocessoNotificacaoService)
-        end
+    Controle --> Subprocesso
+    Controle --> Transicao
 
-        Repos(Repositórios JPA)
-    end
+    Subprocesso --> Validacao
+    Subprocesso --> Mapa
 
-    ControleCrud -- Utiliza --> Facade
-    ControleCadastro -- Utiliza --> CadastroWorkflow & DtoBuilder
-    ControleMapa -- Utiliza --> MapaWorkflow & Mapa & DtoBuilder & Consulta
-    ControleValidacao -- Utiliza --> MapaWorkflow & DtoBuilder
+    Transicao --> Subprocesso
+    Transicao --> Validacao
+    Transicao --> Notificacao
+    Transicao --> Mapa
 
-    CadastroWorkflow & MapaWorkflow & Consulta & DtoBuilder & Mapa & Notificacao -- Acessam --> Repos
+    Mapa --> Situacao
 ```
 
-## Componentes principais
+## Responsabilidades práticas
 
-### Controladores REST
+### Consultas e contexto
 
-- **`SubprocessoCrudControle`**:
-    - `GET /api/subprocessos/{codigo}`: Detalhes do subprocesso.
-    - `GET /api/subprocessos`: Listagem geral.
+`SubprocessoService` é o ponto principal para:
 
-- **`SubprocessoCadastroControle`**: Lida com o workflow da etapa de cadastro.
-    - `POST /disponibilizar-cadastro`
-    - `POST /devolver-cadastro`
-    - `POST /aceitar-cadastro`
+* buscar subprocesso com fetch necessário;
+* montar detalhes e contexto de edição;
+* listar atividades e históricos;
+* calcular permissões de interface.
 
-- **`SubprocessoValidacaoControle`**: Lida com o workflow da etapa de validação.
-    - `POST /devolver-mapa`
-    - `POST /validar-mapa`
-    - `POST /homologar-mapa`
+### Workflow
 
-- **`SubprocessoMapaControle`**: Gerencia o mapa de competências dentro do contexto do subprocesso.
-    - `GET /mapa-completo` e `GET /mapa-visualizacao`: Visualização do mapa.
-    - `POST /mapa-completo/atualizar`: Salva o mapa inteiro de uma vez.
-    - `GET /impactos-mapa`: Analisa diferenças entre versões.
-    - **CRUD de Competências (Exceção ao padrão POST):**
-        - `POST .../competencias`: Cria competência.
-        - `PUT .../competencias/{codigo}`: Atualiza competência.
-        - `DELETE .../competencias/{codigo}`: Remove competência.
+`SubprocessoTransicaoService` é o ponto principal para:
 
-### Serviços especializados
+* disponibilizar cadastro ou revisão;
+* devolver, aceitar e homologar cadastro;
+* disponibilizar, validar, devolver, aceitar e homologar mapa;
+* reabrir etapas;
+* alterar data limite;
+* registrar análises e movimentações.
 
-- **`SubprocessoCadastroWorkflowService`**: Gerencia a fase de cadastro de atividades e conhecimentos, incluindo
-  disponibilização, devolução, aceite e homologação do cadastro.
-- **`SubprocessoMapaWorkflowService`**: Gerencia a fase de elaboração e validação do mapa de competências. Responsável
-  pela disponibilização, validação, sugestões, aceite e homologação final do mapa.
-- **`SubprocessoConsultaService`**: Centraliza as consultas complexas (ex: buscar subprocesso com mapa carregado).
+### Validação e consistência
 
-## Diagrama da Máquina de Estados (`SituacaoSubprocesso`)
+`SubprocessoValidacaoService` centraliza regras como:
 
-```mermaid
-stateDiagram-v2
-    direction LR
+* situações permitidas por ação;
+* existência de atividades e conhecimentos;
+* associação entre competências e atividades;
+* validação de subprocessos para finalização de processo.
 
-    [*] --> PENDENTE_CADASTRO: Processo iniciado
+### Reconciliação automática de situação
 
-    state FluxoCadastro {
-        PENDENTE_CADASTRO --> CADASTRO_DISPONIBILIZADO: disponibilizarCadastro()
-        CADASTRO_DISPONIBILIZADO --> PENDENTE_AJUSTES_CADASTRO: devolverCadastro()
-        PENDENTE_AJUSTES_CADASTRO --> CADASTRO_DISPONIBILIZADO: disponibilizarCadastro()
-        CADASTRO_DISPONIBILIZADO --> REVISAO_CADASTRO_HOMOLOGADA: aceitarCadastro()
-    }
+`MapaManutencaoService` aciona `SubprocessoSituacaoService` quando alterações no mapa impactam a situação do
+subprocesso, especialmente em cenários de mapa vazio ou início de preenchimento.
 
-    state FluxoAjuste {
-         REVISAO_CADASTRO_HOMOLOGADA --> MAPA_AJUSTADO: submeterMapaAjustado()
-         MAPA_AJUSTADO --> PENDENTE_AJUSTES_MAPA: devolverMapa()
-         PENDENTE_AJUSTES_MAPA --> MAPA_AJUSTADO: submeterMapaAjustado()
-         MAPA_AJUSTADO --> MAPA_VALIDADO: validarMapa()
-    }
+## Observações arquiteturais
 
-    MAPA_VALIDADO --> MAPA_HOMOLOGADO: homologarMapa()
-    MAPA_HOMOLOGADO --> [*]: Processo finalizado
-```
-
-## Trilha de Auditoria (`Movimentacao`)
-
-Para cada transição de estado, uma nova entidade `Movimentacao` é persistida, garantindo um histórico completo de quem
-fez o quê e quando.
+* DTOs continuam sendo obrigatórios na fronteira da API.
+* Simplificações devem preservar proteção contra lazy loading e serialização acidental de entidades.
+* O módulo ainda concentra responsabilidades amplas em `SubprocessoService`; por isso, qualquer simplificação deve ser
+  incremental e guiada por duplicação real, não por remoção mecânica de camadas.
 
 ## Como testar
 
-Para executar apenas os testes deste módulo (a partir do diretório `backend`):
+Para executar os testes relacionados ao backend:
 
 ```bash
-./gradlew test --tests "sgc.subprocesso.*"
+./gradlew :backend:test
 ```

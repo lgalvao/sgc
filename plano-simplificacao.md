@@ -179,11 +179,17 @@ Documento técnico curto ou checklist no repositório com:
 * `SubprocessoTransicaoService` passou a reutilizar `SubprocessoService.obterUnidadeLocalizacao(...)`.
 * Duplicatas locais equivalentes foram removidas de `SubprocessoTransicaoService`.
 * Métodos de leitura em `SubprocessoService` passaram a reutilizar `buscarSubprocesso(...)` em vez de repetir acesso direto ao repositório com o mesmo fetch.
+* `SubprocessoService.obterDetalhes(...)` passou a reutilizar `obterUnidadeLocalizacao(...)` em vez de recalcular a localização atual inline.
+* O `README` do módulo `subprocesso` foi reescrito para refletir a arquitetura real atual.
+* A coleta de atividades e a detecção de atividades sem conhecimento foram centralizadas em `SubprocessoValidacaoService`.
+* `SubprocessoTransicaoService` deixou de repetir a leitura do mapa para disponibilização e passou a delegar a validação completa ao serviço de validação.
+* O bloco de histórico de análises em `SubprocessoService` passou a reutilizar um helper privado comum por tipo, eliminando filtragem repetida.
 
 **Novo cuidado identificado após a consolidação:**
 
 * O reaproveitamento reduziu duplicação, mas aumentou o acoplamento de `SubprocessoTransicaoService` com `SubprocessoService`.
 * Em rodada futura, avaliar se esse ponto de verdade deve permanecer em `SubprocessoService` ou migrar para um componente mais neutro de consulta/domínio.
+* Documentação de módulo também precisa entrar no ciclo de simplificação; README desatualizado mascara responsabilidades reais e atrapalha decisões de refatoração.
 
 #### Item 2. Consolidar uma duplicação de baixo risco por vez
 
@@ -207,6 +213,11 @@ Eliminar duplicações reais sem reestruturar toda a área de `subprocesso` de u
 * Preferir iniciar por duplicações internas que não alteram contrato HTTP nem mensagens de validação.
 * Reutilizar serviço já existente pode ser aceitável como etapa intermediária, desde que o acoplamento gerado fique registrado e seja reavaliado.
 * Quando já existe um método com o fetch correto e tratamento uniforme de erro, o reuso tende a ser melhor que repetir query inline.
+* Consolidação de risco médio é viável quando o ponto comum é só coleta/checagem interna e as mensagens externas permanecem intactas.
+* Ao simplificar serviços usados por testes de cobertura, preservar assinaturas públicas ou introduzir sobrecargas compatíveis evita retrabalho desnecessário.
+* Refinamento: isso vale apenas para refatorações internas. Quando a simplificação remove de fato uma API redundante, os testes devem ser atualizados para o contrato novo.
+* Reuso de overload já existente com helper privado tende a ser uma boa estratégia para reduzir duplicação sem criar novas abstrações.
+* Quando uma simplificação troca o collaborator principal de um fluxo, os testes precisam sair do ponto antigo de mock e passar a validar o collaborator novo e o comportamento real do branch.
 
 #### Item 3. Registrar diretriz de DTOs
 
@@ -353,3 +364,13 @@ O plano terá sido bem executado se:
 * A primeira consolidação de baixo risco foi viável sem mexer em DTOs, contratos HTTP ou mensagens de negócio.
 * Repetição de query com o mesmo fetch era mais espalhada do que parecia inicialmente; houve ganho imediato só com reuso de `buscarSubprocesso(...)`.
 * O próximo candidato natural continua sendo documentação do módulo ou centralização mais neutra da lógica de localização atual.
+* Ambos os candidatos naturais foram executados com baixo risco nesta rodada.
+* A primeira consolidação de risco médio também foi executada sem alterar DTOs, mensagens públicas ou endpoints.
+* Foi necessário restaurar compatibilidade de assinatura em validação para manter `compileTestJava` verde sem reintroduzir a duplicação removida.
+* Na sequência, a compatibilidade temporária foi removida e os testes foram alinhados à API simplificada, que era a direção correta para este caso.
+* O bloco de histórico/análises também aceitou simplificação incremental sem impacto externo.
+* A estabilização de testes em `SubprocessoTransicaoService` exigiu remover stubs obsoletos, alinhar mocks ao uso de `SubprocessoService` e ajustar expectativas para o fluxo real de revisão sem impactos.
+* No frontend, `configuracoes` foi um bom candidato para sair do Pinia: havia um único consumo real e nenhum benefício claro de estado global.
+* `useMapas` aceitou redução de repetição interna com helper genérico e remoção de fallback duplicado.
+* Em permissões, a fonte de verdade continua sendo `etc/docs/regras-acesso.md`; simplificação nessa área só pode acontecer quando o comportamento continuar exatamente alinhado à regra documental.
+* `UnidadeView` ainda parece depender de estado global implícito de mapa; esse acoplamento só deve ser removido com segurança quando houver API suficiente para reconstruir o destino da navegação sem reaproveitar estado de outra tela.

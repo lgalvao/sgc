@@ -300,15 +300,13 @@ class SubprocessoValidacaoServiceCoverageTest {
             Conhecimento c1 = new Conhecimento();
             a1.setConhecimentos(Set.of(c1));
 
-            // Para passar na validarExistenciaAtividades, o mapaManutencaoService deve retornar a1
-            when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(1L)).thenReturn(List.of(a1));
-
-            // Atividade sem conhecimento passada no argumento
             Atividade a2 = new Atividade();
             a2.setCodigo(20L);
             a2.setDescricao("A2");
 
-            assertThatThrownBy(() -> validacaoService.validarRequisitosNegocioParaDisponibilizacao(sp, List.of(a2)))
+            when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(1L)).thenReturn(List.of(a1, a2));
+
+            assertThatThrownBy(() -> validacaoService.validarRequisitosNegocioParaDisponibilizacao(sp))
                     .isInstanceOf(ErroValidacao.class)
                     .hasMessageContaining(Mensagens.ATIVIDADES_SEM_CONHECIMENTO_ASSOCIADO);
         }

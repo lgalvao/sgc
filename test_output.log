@@ -1,0 +1,171 @@
+Initialized native services in: /Users/leonardo/.gradle/native
+Initialized jansi services in: /Users/leonardo/.gradle/native
+Found daemon DaemonInfo{pid=61342, address=[12d683b3-c6f1-4a75-8754-4cfa26987977 port:54267, addresses:[/127.0.0.1]], state=Idle, lastBusy=1774796846095, context=DefaultDaemonContext[uid=1bb0e0a5-fb86-4684-9323-e00104b65964,javaHome=/Users/leonardo/.antigravity/extensions/redhat.java-1.53.0-darwin-arm64/jre/21.0.10-macosx-aarch64,javaVersion=21,javaVendor=Eclipse Adoptium,daemonRegistryDir=/Users/leonardo/.gradle/daemon,pid=61342,idleTimeout=10800000,priority=NORMAL,applyInstrumentationAgent=true,nativeServicesMode=ENABLED,daemonOpts=-XX:MaxMetaspaceSize=384m,-XX:+HeapDumpOnOutOfMemoryError,-Xms256m,-Xmx512m,-Dfile.encoding=UTF-8,-Duser.country=BR,-Duser.language=en,-Duser.variant]} however its context does not match the desired criteria.
+JVM is incompatible.
+Wanted: DaemonRequestContext{jvmCriteria=/Users/leonardo/.sdkman/candidates/java/25.0.1-amzn (no Daemon JVM specified, using current Java home), daemonOpts=[-XX:MaxMetaspaceSize=384m, -XX:+HeapDumpOnOutOfMemoryError, -Xms256m, -Xmx512m, -Dfile.encoding=UTF-8, -Duser.country=BR, -Duser.language=en, -Duser.variant], applyInstrumentationAgent=true, nativeServicesMode=ENABLED, priority=NORMAL}
+Actual: DefaultDaemonContext[uid=1bb0e0a5-fb86-4684-9323-e00104b65964,javaHome=/Users/leonardo/.antigravity/extensions/redhat.java-1.53.0-darwin-arm64/jre/21.0.10-macosx-aarch64,javaVersion=21,javaVendor=Eclipse Adoptium,daemonRegistryDir=/Users/leonardo/.gradle/daemon,pid=61342,idleTimeout=10800000,priority=NORMAL,applyInstrumentationAgent=true,nativeServicesMode=ENABLED,daemonOpts=-XX:MaxMetaspaceSize=384m,-XX:+HeapDumpOnOutOfMemoryError,-Xms256m,-Xmx512m,-Dfile.encoding=UTF-8,-Duser.country=BR,-Duser.language=en,-Duser.variant]
+
+  Looking for a different daemon...
+The client will now receive all logging from the daemon (pid: 75086). The daemon log file: /Users/leonardo/.gradle/daemon/9.4.0/daemon-75086.out.log
+Starting 8th build in daemon [uptime: 11 mins 13.025 secs, performance: 99%, GC rate: 0.00/s, heap usage: 0% of 512 MiB, non-heap usage: 21% of 384 MiB]
+Using 8 worker leases.
+Operational build model parameters: {cachingModelBuilding=false, configurationCache=true, configurationCacheDisabledReason=null, configurationCacheParallelLoad=true, configurationCacheParallelStore=false, configureOnDemand=false, invalidateCoupledProjects=false, isolatedProjects=false, modelAsProjectDependency=false, modelBuilding=false, parallelModelBuilding=false, parallelProjectConfiguration=false, parallelProjectExecution=true, resilientModelBuilding=false}
+Encryption key source: default Gradle keystore (pkcs12)
+Now considering [/Users/leonardo/sgc] as hierarchies to watch
+Reusing configuration cache.
+Now considering [/Users/leonardo/sgc] as hierarchies to watch
+Watching the file system is configured to be enabled if available
+File system watching is active
+Tasks to be executed: [task ':backend:compileJava', task ':backend:processResources', task ':backend:classes', task ':backend:compileTestJava', task ':backend:processTestResources', task ':backend:testClasses', task ':backend:test']
+Tasks that were excluded: []
+Resolve mutations for :backend:compileJava (Thread[#367,Execution worker,5,main]) started.
+Resolve mutations for :backend:processTestResources (Thread[#369,Execution worker Thread 3,5,main]) started.
+Resolve mutations for :backend:processResources (Thread[#368,Execution worker Thread 2,5,main]) started.
+:backend:processResources (Thread[#369,Execution worker Thread 3,5,main]) started.
+:backend:processTestResources (Thread[#366,included builds,5,main]) started.
+:backend:compileJava (Thread[#367,Execution worker,5,main]) started.
+
+> Task :backend:processTestResources
+Caching disabled for task ':backend:processTestResources' because:
+  Build cache is disabled
+  Not worth caching
+Task ':backend:processTestResources' is not up-to-date because:
+  Executed with '--rerun-tasks'.
+
+> Task :backend:processResources
+Caching disabled for task ':backend:processResources' because:
+  Build cache is disabled
+  Not worth caching
+Task ':backend:processResources' is not up-to-date because:
+  Executed with '--rerun-tasks'.
+This JVM does not support getting OS memory, so no OS memory status updates will be broadcast
+WARNING: A terminally deprecated method in sun.misc.Unsafe has been called
+WARNING: sun.misc.Unsafe::objectFieldOffset has been called by lombok.permit.Permit
+WARNING: Please consider reporting this to the maintainers of class lombok.permit.Permit
+WARNING: sun.misc.Unsafe::objectFieldOffset will be removed in a future release
+
+> Task :backend:compileJava
+Caching disabled for task ':backend:compileJava' because:
+  Build cache is disabled
+Task ':backend:compileJava' is not up-to-date because:
+  Executed with '--rerun-tasks'.
+The input changes require a full rebuild for incremental task ':backend:compileJava'.
+Compilation mode: forking compiler
+Full recompilation is required because no incremental change information is available. This is usually caused by clean builds or changing compiler arguments.
+Compiling with toolchain '/Users/leonardo/.sdkman/candidates/java/25.0.1-amzn'.
+Starting process 'Gradle Worker Daemon 7'. Working directory: /Users/leonardo/.gradle/workers Command: /Users/leonardo/.sdkman/candidates/java/25.0.1-amzn/bin/java --add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED --add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED --add-opens=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED @/Users/leonardo/.gradle/.tmp/gradle-worker-classpath1794620633006860734txt --enable-native-access=ALL-UNNAMED -Xmx512m -Dfile.encoding=UTF-8 -Duser.country=BR -Duser.language=en -Duser.variant worker.org.gradle.process.internal.worker.GradleWorkerMain 'Gradle Worker Daemon 7'
+Successfully started process 'Gradle Worker Daemon 7'
+Started Gradle worker daemon (0.176 secs) with fork options DaemonForkOptions{executable=/Users/leonardo/.sdkman/candidates/java/25.0.1-amzn/bin/java, minHeapSize=null, maxHeapSize=null, jvmArgs=[--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED, --add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED, --add-exports=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED, --add-exports=jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED, --add-exports=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED, --add-exports=jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED, --add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED, --add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED, --add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED, --add-opens=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED, --add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED, --add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED], keepAliveMode=DAEMON}.
+Compiling with JDK Java compiler API.
+Class dependency analysis for incremental compilation took 0.081 secs.
+Created classpath snapshot for incremental compilation in 0.049 secs.
+Invalidating in-memory cache of /Users/leonardo/sgc/.gradle/buildOutputCleanup/outputFiles.bin
+Resolve mutations for :backend:classes (Thread[#367,Execution worker,5,main]) started.
+:backend:classes (Thread[#367,Execution worker,5,main]) started.
+
+> Task :backend:classes
+Skipping task ':backend:classes' as it has no actions.
+Resolve mutations for :backend:compileTestJava (Thread[#367,Execution worker,5,main]) started.
+:backend:compileTestJava (Thread[#367,Execution worker,5,main]) started.
+
+> Task :backend:compileTestJava
+Deleting stale output file: /Users/leonardo/sgc/backend/build/generated/sources/headers/java/test
+Deleting stale output file: /Users/leonardo/sgc/backend/build/generated/sources/annotationProcessor/java/test
+Deleting stale output file: /Users/leonardo/sgc/backend/build/classes/java/test
+Deleting stale output file: /Users/leonardo/sgc/backend/build/tmp/compileTestJava/previous-compilation-data.bin
+Caching disabled for task ':backend:compileTestJava' because:
+  Build cache is disabled
+Task ':backend:compileTestJava' is not up-to-date because:
+  Executed with '--rerun-tasks'.
+The input changes require a full rebuild for incremental task ':backend:compileTestJava'.
+Compilation mode: forking compiler
+Full recompilation is required because no incremental change information is available. This is usually caused by clean builds or changing compiler arguments.
+Compiling with toolchain '/Users/leonardo/.sdkman/candidates/java/25.0.1-amzn'.
+Compiling with JDK Java compiler API.
+Class dependency analysis for incremental compilation took 0.026 secs.
+Created classpath snapshot for incremental compilation in 0.076 secs.
+Invalidating in-memory cache of /Users/leonardo/sgc/.gradle/buildOutputCleanup/outputFiles.bin
+Resolve mutations for :backend:testClasses (Thread[#367,Execution worker,5,main]) started.
+:backend:testClasses (Thread[#367,Execution worker,5,main]) started.
+
+> Task :backend:testClasses
+Skipping task ':backend:testClasses' as it has no actions.
+Resolve mutations for :backend:test (Thread[#367,Execution worker,5,main]) started.
+:backend:test (Thread[#367,Execution worker,5,main]) started.
+Gradle Test Executor 8 started executing tests.
+
+> Task :backend:test
+Deleting stale output file: /Users/leonardo/sgc/backend/build/reports/tests/test
+Deleting stale output file: /Users/leonardo/sgc/backend/build/jacoco/test.exec
+Deleting stale output file: /Users/leonardo/sgc/backend/build/test-results/test
+Deleting stale output file: /Users/leonardo/sgc/backend/build/test-results/test/binary
+Caching disabled for task ':backend:test' because:
+  Build cache is disabled
+Task ':backend:test' is not up-to-date because:
+  Executed with '--rerun-tasks'.
+Stopped 1 worker daemon(s).
+Starting process 'Gradle Test Executor 8'. Working directory: /Users/leonardo/sgc/backend Command: /Users/leonardo/.sdkman/candidates/java/25.0.1-amzn/bin/java -Dmockito.ext.disable=true -Dorg.gradle.internal.worker.tmpdir=/Users/leonardo/sgc/backend/build/tmp/test/work -Xshare:off -XX:+EnableDynamicAgentLoading --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/jdk.internal.misc=ALL-UNNAMED --add-opens=jdk.unsupported/sun.misc=ALL-UNNAMED -javaagent:/Users/leonardo/.gradle/caches/modules-2/files-2.1/net.bytebuddy/byte-buddy-agent/1.17.8/f09415827a71be7ed621c7bd02550678f28bc81c/byte-buddy-agent-1.17.8.jar -javaagent:/Users/leonardo/sgc/backend/build/tmp/.cache/expanded/zip_27729b840c216bdc69a9315e04b27ab1/jacocoagent.jar=destfile=build/jacoco/test.exec,append=true,inclnolocationclasses=false,dumponexit=true,output=file,jmx=false @/Users/leonardo/.gradle/.tmp/gradle-worker-classpath11845099709836467551txt -Xmx512m -Dfile.encoding=UTF-8 -Duser.country=BR -Duser.language=en -Duser.variant -ea worker.org.gradle.process.internal.worker.GradleWorkerMain 'Gradle Test Executor 8'
+Successfully started process 'Gradle Test Executor 8'
+
+SubprocessoTransicaoService > deve aceitar revisao cadastro clashing STANDARD_OUT
+    INFO  SubprocessoTransicaoService: Aceitando revisão do subprocesso 1
+    INFO  SubprocessoTransicaoService: Unidade U não possui superior direto. Encaminhando para a unidade raiz ADMIN.
+
+SubprocessoTransicaoService > aceitarValidacao deve homologar direto quando nao houver unidade superior STANDARD_OUT
+    INFO  SubprocessoTransicaoService: Validação aceita para mapa do SP 1
+
+SubprocessoTransicaoService > Cobertura Adicional de Branches > executarDevolucao deve funcionar sem movimentações (usa unidade do SP) STANDARD_OUT
+    INFO  SubprocessoTransicaoService: Devolvendo cadastro do subprocesso 1
+
+SubprocessoTransicaoService > Cobertura Adicional de Branches > Deve lançar erro quando data limite é anterior à última data (disponibilizarMapa) STANDARD_OUT
+    INFO  SubprocessoTransicaoService: Disponibilizando mapa do subprocesso 1
+
+SubprocessoTransicaoService > Cobertura Adicional de Branches > Deve aceitar cadastro em bloco para diferentes tipos de processo STANDARD_OUT
+    INFO  SubprocessoTransicaoService: Aceitando cadastro do subprocesso 10
+    INFO  SubprocessoTransicaoService: Unidade null não possui superior direto. Encaminhando para a unidade raiz ADMIN.
+    INFO  SubprocessoTransicaoService: Aceitando revisão do subprocesso 20
+    INFO  SubprocessoTransicaoService: Unidade null não possui superior direto. Encaminhando para a unidade raiz ADMIN.
+
+SubprocessoTransicaoService > Cobertura Adicional de Branches > Deve homologar cadastro em bloco para diferentes tipos de processo STANDARD_OUT
+    INFO  SubprocessoTransicaoService: Homologando cadastro do subprocesso 10
+    INFO  SubprocessoTransicaoService: Homologando revisão do subprocesso 20
+
+SubprocessoTransicaoService > Cobertura Adicional de Branches > Deve homologar cadastro em bloco para diferentes tipos de processo FAILED
+    java.lang.NullPointerException: Cannot invoke "sgc.mapa.dto.ImpactoMapaResponse.temImpactos()" because "impactos" is null
+        at sgc.subprocesso.service.SubprocessoTransicaoService.executarHomologacao(SubprocessoTransicaoService.java:567)
+        at sgc.subprocesso.service.SubprocessoTransicaoService.lambda$homologarCadastroEmBloco$0(SubprocessoTransicaoService.java:554)
+        at java.base/java.util.ImmutableCollections$List12.forEach(ImmutableCollections.java:683)
+        at sgc.subprocesso.service.SubprocessoTransicaoService.homologarCadastroEmBloco(SubprocessoTransicaoService.java:552)
+        at sgc.subprocesso.service.SubprocessoTransicaoServiceTest$CoberturaAdicional.deveHomologarCadastroEmBlocoDiferentesTipos(SubprocessoTransicaoServiceTest.java:232)
+
+SubprocessoTransicaoService > Cobertura Adicional de Branches > devolverValidacao deve ignorar movimentação sem destino e filtrar por hierarquia STANDARD_OUT
+    INFO  SubprocessoTransicaoService: Devolvida validação do mapa do SP 1
+
+Gradle Test Executor 8 finished executing tests.
+
+> Task :backend:test FAILED
+  Result: FAILURE
+  Total:     11 tests run
+  + Passed:   10
+  - Failed:   1
+  ^ Ignored: 0
+  Time:     2.04s
+
+11 tests completed, 1 failed
+Generating HTML test report...
+Finished generating test html results (0.005 secs) into: /Users/leonardo/sgc/backend/build/reports/tests/test
+Finished generating test XML results (0.0 secs) into: /Users/leonardo/sgc/backend/build/test-results/test
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':backend:test'.
+> There were failing tests. See the report at: file:///Users/leonardo/sgc/backend/build/reports/tests/test/index.html
+
+* Try:
+> Run with --scan to get full insights from a Build Scan (powered by Develocity).
+
+BUILD FAILED in 12s
+5 actionable tasks: 5 executed
+Watched directory hierarchies: [/Users/leonardo/sgc]
+Configuration cache entry reused.

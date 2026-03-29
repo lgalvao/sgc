@@ -2,12 +2,12 @@
   <LayoutPadrao>
     <PageHeader :title="TEXTOS.configuracoes.TITULO" />
 
-    <div v-if="store.loading" class="text-center py-4">
+    <div v-if="loading" class="text-center py-4">
       <BSpinner :label="TEXTOS.comum.CARREGANDO" variant="primary" />
     </div>
 
-    <BAlert v-else-if="store.error" :model-value="true" variant="danger">
-      {{ store.error }}
+    <BAlert v-else-if="error" :model-value="true" variant="danger">
+      {{ error }}
     </BAlert>
 
     <template v-else>
@@ -87,11 +87,19 @@ import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import PageHeader from '@/components/layout/PageHeader.vue';
 import AppAlert from '@/components/comum/AppAlert.vue';
 import LoadingButton from '@/components/comum/LoadingButton.vue';
-import {type Parametro, useConfiguracoesStore} from '@/stores/configuracoes';
+import {type Parametro, useConfiguracoes} from '@/composables/useConfiguracoes';
 import {useNotification} from '@/composables/useNotification';
 import {TEXTOS} from '@/constants/textos';
 
-const store = useConfiguracoesStore();
+const {
+  configuracoes,
+  loading,
+  error,
+  carregarConfiguracoes,
+  salvarConfiguracoes,
+  getDiasInativacaoProcesso,
+  getDiasAlertaNovo
+} = useConfiguracoes();
 const {notify, notificacao, clear} = useNotification();
 const salvando = ref(false);
 const validacaoSubmetida = ref(false);
@@ -112,12 +120,12 @@ const mensagemErroDiasAlertaNovo = computed(() => {
 });
 
 function atualizarFormulario() {
-  form.diasInativacao = store.getDiasInativacaoProcesso();
-  form.diasAlertaNovo = store.getDiasAlertaNovo();
+  form.diasInativacao = getDiasInativacaoProcesso();
+  form.diasAlertaNovo = getDiasAlertaNovo();
 }
 
 async function carregar() {
-  await store.carregarConfiguracoes();
+  await carregarConfiguracoes();
   atualizarFormulario();
 }
 
@@ -131,7 +139,7 @@ async function salvar() {
 
   const paramsToSave: Parametro[] = [];
 
-  const findCodigo = (chave: string) => store.configuracoes.find(p => p.chave === chave)?.codigo;
+  const findCodigo = (chave: string) => configuracoes.value.find(p => p.chave === chave)?.codigo;
 
   paramsToSave.push({
     codigo: findCodigo('DIAS_INATIVACAO_PROCESSO'),
@@ -145,7 +153,7 @@ async function salvar() {
     valor: form.diasAlertaNovo.toString()
   });
 
-  const sucesso = await store.salvarConfiguracoes(paramsToSave);
+  const sucesso = await salvarConfiguracoes(paramsToSave);
 
   if (sucesso) {
     validacaoSubmetida.value = false;
@@ -158,7 +166,7 @@ async function salvar() {
 }
 
 onMounted(async () => {
-  if (store.configuracoes.length === 0) {
+  if (configuracoes.value.length === 0) {
     await carregar();
   } else {
     atualizarFormulario();

@@ -32,7 +32,7 @@ export const useExemploStore = defineStore('exemplo', () => {
 * **`atribuicoes.ts`**: Gestão de atribuições temporárias/substituições.
 * **`analises.ts`**: Histórico de análises e auditoria.
 * **`unidades.ts`**: Árvore e dados de unidades organizacionais.
-* **`configuracoes.ts`**: Parâmetros globais do sistema.
+* Configurações do sistema ficam em composable específico de tela quando não exigem estado global compartilhado.
 
 ### UI e Feedback
 
