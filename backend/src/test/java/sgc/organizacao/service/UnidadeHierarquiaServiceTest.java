@@ -191,7 +191,7 @@ class UnidadeHierarquiaServiceTest {
         void deveLancarErroQuandoDtoNull() {
             // Simular repositório retornando lista com elemento nulo
             Unidade nullUnidade = null;
-            when(unidadeRepo.findByUnidadeSuperiorCodigo(999L)).thenReturn(Collections.singletonList(nullUnidade));
+            when(unidadeRepo.findByUnidadeSuperiorCodigo(999L)).thenReturn(Collections.singletonList(null));
             
             assertThatThrownBy(() -> service.buscarSubordinadas(999L))
                     .isInstanceOf(IllegalStateException.class)

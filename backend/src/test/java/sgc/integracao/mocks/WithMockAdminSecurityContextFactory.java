@@ -1,7 +1,6 @@
 package sgc.integracao.mocks;
 
 import lombok.extern.slf4j.*;
-import org.jspecify.annotations.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.*;
@@ -23,7 +22,7 @@ public class WithMockAdminSecurityContextFactory
     private UsuarioPerfilRepo usuarioPerfilRepo;
 
     @Override
-    public SecurityContext createSecurityContext(@NonNull WithMockAdmin customUser) {
+    public SecurityContext createSecurityContext(WithMockAdmin customUser) {
         String tituloAdmin = "111111111111"; // Título padrão Admin no data.sql
         Usuario principal = usuarioRepo.findById(tituloAdmin)
                 .orElseThrow(() -> new IllegalStateException("Usuário admin (111111111111) não encontrado no data.sql"));

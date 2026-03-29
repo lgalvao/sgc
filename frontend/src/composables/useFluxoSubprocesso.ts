@@ -15,16 +15,8 @@ import {
     reabrirRevisaoCadastro as serviceReabrirRevisaoCadastro,
 } from "@/services/processoService";
 import {useErrorHandler} from "@/composables/useErrorHandler";
-import {useProcessos} from "@/composables/useProcessos";
 import {useSubprocessos} from "@/composables/useSubprocessos";
 import type {AceitarCadastroRequest, DevolverCadastroRequest, HomologarCadastroRequest,} from "@/types/tipos";
-
-async function recarregarProcessoAtual() {
-    const processos = useProcessos();
-    if (processos.processoDetalhe.value) {
-        await processos.buscarProcessoDetalhe(processos.processoDetalhe.value.codigo);
-    }
-}
 
 export function useFluxoSubprocesso() {
     const {lastError, clearError, withErrorHandling} = useErrorHandler();
@@ -38,7 +30,6 @@ export function useFluxoSubprocesso() {
         try {
             await withErrorHandling(async () => {
                 await acao();
-                await recarregarProcessoAtual();
 
                 if (recarregarSubprocesso && codigoSubprocesso) {
                     await subprocessos.buscarSubprocessoDetalhe(codigoSubprocesso);
@@ -90,7 +81,6 @@ export function useFluxoSubprocesso() {
     async function alterarDataLimiteSubprocesso(codigoSubprocesso: number, dados: {novaData: string}) {
         return withErrorHandling(async () => {
             await serviceAlterarDataLimite(codigoSubprocesso, dados);
-            await recarregarProcessoAtual();
             await subprocessos.buscarSubprocessoDetalhe(codigoSubprocesso);
         });
     }

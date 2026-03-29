@@ -20,7 +20,6 @@ import sgc.integracao.mocks.*;
 import sgc.seguranca.*;
 
 import java.util.*;
-import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;

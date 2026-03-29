@@ -101,10 +101,6 @@ public class CopiaMapaService {
                 .mapa(mapaDestino)
                 .build();
 
-        if (novaAtividade.getConhecimentos() == null) {
-            novaAtividade.setConhecimentos(new HashSet<>());
-        }
-
         Set<Conhecimento> cs = Optional.ofNullable(atividadeFonte.getConhecimentos()).orElse(Set.of());
         if (!cs.isEmpty()) {
             cs.stream().map(c -> Conhecimento.builder()

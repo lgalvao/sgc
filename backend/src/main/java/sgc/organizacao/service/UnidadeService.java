@@ -60,7 +60,7 @@ public class UnidadeService {
     public Optional<MapaVigenteReferenciaDto> buscarReferenciaMapaVigente(Long codigoUnidade) {
         return unidadeMapaRepo.findByUnidadeCodigo(codigoUnidade)
                 .map(UnidadeMapa::getMapaVigente)
-                .filter(Objects::nonNull)
+                .filter(obj -> true)
                 .map(Mapa::getSubprocesso)
                 .map(subprocesso -> new MapaVigenteReferenciaDto(
                         subprocesso.getProcesso().getCodigo(),

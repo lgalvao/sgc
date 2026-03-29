@@ -155,18 +155,17 @@ tasks.withType<Test> {
         showStandardStreams = false
     }
 
-    addTestOutputListener(object : org.gradle.api.tasks.testing.TestOutputListener {
-        override fun onOutput(descriptor: org.gradle.api.tasks.testing.TestDescriptor, event: org.gradle.api.tasks.testing.TestOutputEvent) {
-            if (event.destination == org.gradle.api.tasks.testing.TestOutputEvent.Destination.StdErr) {
-                val msg = event.message
-                if (!msg.contains("WARNING: A terminally deprecated method in sun.misc.Unsafe") &&
-                    !msg.contains("WARNING: sun.misc.Unsafe::") &&
-                    !msg.contains("WARNING: Please consider reporting this to the maintainers")) {
-                    System.err.print(msg)
-                }
+    addTestOutputListener { descriptor, event ->
+        if (event.destination == TestOutputEvent.Destination.StdErr) {
+            val msg = event.message
+            if (!msg.contains("WARNING: A terminally deprecated method in sun.misc.Unsafe") &&
+                !msg.contains("WARNING: sun.misc.Unsafe::") &&
+                !msg.contains("WARNING: Please consider reporting this to the maintainers")
+            ) {
+                System.err.print(msg)
             }
         }
-    })
+    }
 
     val slowTests = mutableListOf<Pair<String, Long>>()
     val showSlowTests = false

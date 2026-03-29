@@ -384,7 +384,7 @@ class ProcessoServiceCoverageTest {
             Subprocesso sp = new Subprocesso();
             sp.setSituacao(NAO_INICIADO);
             
-            boolean res = (Boolean)org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "isElegivelParaAcaoEmBloco", sp, user);
+            boolean res = org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "isElegivelParaAcaoEmBloco", sp, user);
             assertThat(res).isFalse();
         }
 
@@ -398,7 +398,7 @@ class ProcessoServiceCoverageTest {
             when(permissionEvaluator.verificarPermissao(any(Usuario.class), any(Subprocesso.class), eq(ACEITAR_CADASTRO))).thenReturn(false);
             when(permissionEvaluator.verificarPermissao(any(Usuario.class), any(Subprocesso.class), eq(HOMOLOGAR_CADASTRO))).thenReturn(true);
             
-            boolean res = (Boolean)org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "isElegivelParaAcaoEmBloco", sp, user);
+            boolean res = org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "isElegivelParaAcaoEmBloco", sp, user);
             assertThat(res).isTrue();
         }
 
@@ -412,7 +412,7 @@ class ProcessoServiceCoverageTest {
             when(permissionEvaluator.verificarPermissao(any(Usuario.class), any(Subprocesso.class), eq(ACEITAR_MAPA))).thenReturn(false);
             when(permissionEvaluator.verificarPermissao(any(Usuario.class), any(Subprocesso.class), eq(HOMOLOGAR_MAPA))).thenReturn(true);
             
-            boolean res = (Boolean)org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "isElegivelParaAcaoEmBloco", sp, user);
+            boolean res = org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "isElegivelParaAcaoEmBloco", sp, user);
             assertThat(res).isTrue();
         }
 

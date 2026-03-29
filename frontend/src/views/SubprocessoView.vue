@@ -16,7 +16,7 @@
         >
           <template #actions>
             <BButton
-                v-if="podeAlterarDataLimite && !isProcessoFinalizado"
+                v-if="podeAlterarDataLimite"
                 data-testid="btn-alterar-data-limite"
                 variant="outline-secondary"
                 @click="abrirModalAlterarDataLimite"
@@ -25,7 +25,7 @@
               {{ TEXTOS.subprocesso.BOTAO_ALTERAR_DATA_LIMITE }}
             </BButton>
             <BButton
-                v-if="podeReabrirCadastro && !isProcessoFinalizado"
+                v-if="podeReabrirCadastro"
                 data-testid="btn-reabrir-cadastro"
                 variant="outline-secondary"
                 @click="abrirModalReabrirCadastro"
@@ -34,7 +34,7 @@
               {{ TEXTOS.subprocesso.BOTAO_REABRIR_CADASTRO }}
             </BButton>
             <BButton
-                v-if="podeReabrirRevisao && !isProcessoFinalizado"
+                v-if="podeReabrirRevisao"
                 data-testid="btn-reabrir-revisao"
                 variant="outline-secondary"
                 @click="abrirModalReabrirRevisao"
@@ -43,7 +43,7 @@
               {{ TEXTOS.subprocesso.BOTAO_REABRIR_REVISAO }}
             </BButton>
             <BButton
-                v-if="podeEnviarLembrete && !isProcessoFinalizado"
+                v-if="podeEnviarLembrete"
                 data-testid="btn-enviar-lembrete"
                 variant="outline-secondary"
                 @click="confirmarEnviarLembrete"
@@ -233,12 +233,11 @@ import {useMapas} from "@/composables/useMapas";
 import {useNotification} from "@/composables/useNotification";
 import {useGerenciadorModals} from "@/composables/useModalManager";
 import {useGerenciadorCarregamento} from "@/composables/useLoadingManager";
-import {useProcessos} from "@/composables/useProcessos";
 import {useFluxoSubprocesso} from "@/composables/useFluxoSubprocesso";
 import {useSubprocessos} from "@/composables/useSubprocessos";
 
 import {useAcesso} from "@/composables/useAcesso";
-import {type Movimentacao, SituacaoProcesso, type SubprocessoDetalhe, TipoProcesso} from "@/types/tipos";
+import {type Movimentacao, type SubprocessoDetalhe, TipoProcesso} from "@/types/tipos";
 import {formatDateTimeBR, logger, parseDate} from "@/utils";
 import {normalizeError} from "@/utils/apiError";
 import {formatSituacaoSubprocesso} from "@/utils/formatters";
@@ -265,7 +264,6 @@ function formatTipoResponsabilidade(resp: any): string {
 
 const subprocessosStore = useSubprocessos();
 const fluxoSubprocesso = useFluxoSubprocesso();
-const processos = useProcessos();
 
 const mapaStore = useMapas();
 const {notificacao, notify, clear} = useNotification();
@@ -306,10 +304,6 @@ const {
   podeEnviarLembrete
 } = useAcesso(subprocesso);
 
-const isProcessoFinalizado = computed(() => {
-  return processos.processoDetalhe.value?.situacao === SituacaoProcesso.FINALIZADO;
-});
-
 const mapa = computed(() => mapaStore.mapaCompleto.value);
 const movimentacoes = computed<Movimentacao[]>(
     () => subprocesso.value?.movimentacoes || [],
@@ -318,10 +312,8 @@ const dataLimite = computed(() => {
   if (subprocesso.value?.prazoEtapaAtual) {
     return parseDate(subprocesso.value.prazoEtapaAtual);
   }
-  // Se não tem prazoEtapaAtual, o subprocesso pode estar na etapa 1 (Mapeamento)
-  // e o prazo é o do processo pai.
-  const dataProcesso = processos.processoDetalhe.value?.dataLimite;
-  return dataProcesso ? parseDate(dataProcesso) : null;
+  const ultimaDataLimite = subprocesso.value?.ultimaDataLimiteSubprocesso;
+  return ultimaDataLimite ? parseDate(ultimaDataLimite) : null;
 });
 
 function exibirToastPendente() {

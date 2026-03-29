@@ -1,7 +1,6 @@
 package sgc.integracao.mocks;
 
 import lombok.extern.slf4j.*;
-import org.jspecify.annotations.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.context.*;
@@ -20,7 +19,7 @@ public class WithMockCustomUserSecurityContextFactory
     private UsuarioRepo usuarioRepo;
 
     @Override
-    public SecurityContext createSecurityContext(@NonNull WithMockCustomUser customUser) {
+    public SecurityContext createSecurityContext(WithMockCustomUser customUser) {
         String titulo = customUser.tituloEleitoral();
         Usuario principal = usuarioRepo.findById(titulo)
                 .orElseThrow(() -> new IllegalStateException("Usuário não encontrado no data.sql: " + titulo));
