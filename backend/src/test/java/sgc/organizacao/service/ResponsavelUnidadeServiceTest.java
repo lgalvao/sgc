@@ -23,6 +23,12 @@ class ResponsavelUnidadeServiceTest {
     @Mock
     private ComumRepo repo;
 
+    @Mock
+    private UsuarioRepo usuarioRepo;
+
+    @Mock
+    private ResponsabilidadeRepo responsabilidadeRepo;
+
     @InjectMocks
     private ResponsavelUnidadeService service;
 
@@ -102,6 +108,27 @@ class ResponsavelUnidadeServiceTest {
             assertThat(atribuicao.getDataTermino()).isEqualTo(dataTermino.atTime(23, 59, 59));
             assertThat(atribuicao.getJustificativa()).isEqualTo("Cobertura de férias");
         }
+
+        @Test
+        @DisplayName("Deve criar atribuição com dataInicio nula (assume hoje)")
+        void deveCriarAtribuicaoComDataInicioNula() {
+            Long codUnidade = 1L;
+            LocalDate dataTermino = LocalDate.now().plusDays(10);
+            CriarAtribuicaoRequest request = new CriarAtribuicaoRequest("123", null, dataTermino, "Justificativa");
+
+            Unidade unidade = new Unidade();
+            Usuario usuario = new Usuario();
+            usuario.setTituloEleitoral("123");
+
+            when(repo.buscar(Unidade.class, codUnidade)).thenReturn(unidade);
+            when(repo.buscar(Usuario.class, "123")).thenReturn(usuario);
+
+            service.criarAtribuicaoTemporaria(codUnidade, request);
+
+            ArgumentCaptor<AtribuicaoTemporaria> captor = ArgumentCaptor.forClass(AtribuicaoTemporaria.class);
+            verify(atribuicaoTemporariaRepo).save(captor.capture());
+            assertThat(captor.getValue().getDataInicio()).isNotNull();
+        }
     }
 
     @Nested
@@ -173,6 +200,74 @@ class ResponsavelUnidadeServiceTest {
             assertThat(resultado).isNotNull();
             assertThat(resultado.titularTitulo()).isEqualTo("111111111111");
             assertThat(resultado.substitutoTitulo()).isEqualTo("222222222222");
+        }
+    }
+
+    @Nested
+    @DisplayName("Buscar responsáveis em lote")
+    class BuscarResponsaveisEmLoteTests {
+
+        @Test
+        @DisplayName("Deve retornar mapa vazio quando lista de unidades vazia")
+        void deveRetornarVazioQuandoListaVazia() {
+            var result = service.buscarResponsaveisUnidades(List.of());
+            assertThat(result).isEmpty();
+        }
+
+        @Test
+        @DisplayName("Deve retornar mapa vazio quando nenhuma responsabilidade encontrada")
+        void deveRetornarVazioQuandoNaoEncontrado() {
+            when(responsabilidadeRepo.findByUnidadeCodigoIn(anyList())).thenReturn(List.of());
+            var result = service.buscarResponsaveisUnidades(List.of(1L));
+            assertThat(result).isEmpty();
+        }
+
+        @Test
+        @DisplayName("Deve lançar exceção quando responsável não é encontrado no repositório de usuários")
+        void deveLancarExcecaoQuandoUsuarioAusente() {
+            Long codUnidade = 1L;
+            Unidade u = new Unidade();
+            u.setCodigo(codUnidade);
+            u.setTituloTitular("TITULAR");
+
+            Responsabilidade r = new Responsabilidade();
+            r.setUnidade(u);
+            r.setUnidadeCodigo(codUnidade);
+            r.setUsuarioTitulo("RESP");
+
+            when(responsabilidadeRepo.findByUnidadeCodigoIn(anyList())).thenReturn(List.of(r));
+            // Simular que o usuário "RESP" ou "TITULAR" não foi carregado
+            when(usuarioRepo.findByTitulosComUnidadeLotacao(anyList())).thenReturn(List.of());
+
+            assertThatThrownBy(() -> service.buscarResponsaveisUnidades(List.of(codUnidade)))
+                    .isInstanceOf(IllegalStateException.class)
+                    .hasMessageContaining("Responsável ou titular oficial ausente");
+        }
+
+        @Test
+        @DisplayName("Deve retornar mapa com responsáveis quando tudo ok")
+        void deveRetornarResponsaveisComSucesso() {
+            Long codUnidade = 1L;
+            Unidade u = new Unidade();
+            u.setCodigo(codUnidade);
+            u.setTituloTitular("TIT");
+
+            Responsabilidade r = new Responsabilidade();
+            r.setUnidade(u);
+            r.setUnidadeCodigo(codUnidade);
+            r.setUsuarioTitulo("RES");
+
+            Usuario uTit = new Usuario(); uTit.setTituloEleitoral("TIT"); uTit.setNome("Titular");
+            Usuario uRes = new Usuario(); uRes.setTituloEleitoral("RES"); uRes.setNome("Responsavel");
+
+            when(responsabilidadeRepo.findByUnidadeCodigoIn(anyList())).thenReturn(List.of(r));
+            when(usuarioRepo.findByTitulosComUnidadeLotacao(anyList())).thenReturn(List.of(uTit, uRes));
+
+            var result = service.buscarResponsaveisUnidades(List.of(codUnidade));
+
+            assertThat(result).hasSize(1);
+            assertThat(result.get(codUnidade).titularTitulo()).isEqualTo("TIT");
+            assertThat(result.get(codUnidade).substitutoTitulo()).isEqualTo("RES");
         }
     }
 }

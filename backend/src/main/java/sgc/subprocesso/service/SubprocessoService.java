@@ -458,7 +458,7 @@ public class SubprocessoService {
 
     @Transactional(readOnly = true)
     public MapaAjusteDto obterMapaParaAjuste(Long codSubprocesso) {
-        Subprocesso sp = subprocessoRepo.buscarPorCodigoComMapaEAtividades(codSubprocesso).orElseThrow(() -> new ErroEntidadeNaoEncontrada(NOME_ENTIDADE, codSubprocesso));
+        Subprocesso sp = buscarSubprocesso(codSubprocesso);
         Long codMapa = obterCodigoMapaObrigatorio(sp);
 
         Analise analise = listarAnalisesPorSubprocesso(codSubprocesso, TipoAnalise.VALIDACAO)
@@ -531,7 +531,7 @@ public class SubprocessoService {
     }
 
     public SubprocessoDetalheResponse obterDetalhes(Long codigo, Usuario usuarioAutenticado) {
-        Subprocesso sp = subprocessoRepo.buscarPorCodigoComMapaEAtividades(codigo).orElseThrow();
+        Subprocesso sp = buscarSubprocesso(codigo);
         return obterDetalhes(sp, usuarioAutenticado);
     }
 
@@ -569,7 +569,7 @@ public class SubprocessoService {
     @Transactional
     public ContextoEdicaoResponse obterContextoEdicao(Long codSubprocesso) {
         Usuario usuario = usuarioFacade.usuarioAutenticado();
-        Subprocesso sp = subprocessoRepo.buscarPorCodigoComMapaEAtividades(codSubprocesso).orElseThrow();
+        Subprocesso sp = buscarSubprocesso(codSubprocesso);
         SubprocessoDetalheResponse detalhes = obterDetalhes(sp, usuario);
 
         Unidade unidadeSp = sp.getUnidade();
@@ -785,7 +785,7 @@ public class SubprocessoService {
 
     @Transactional(readOnly = true)
     public List<AtividadeDto> listarAtividadesSubprocesso(Long codSubprocesso) {
-        Subprocesso subprocesso = subprocessoRepo.buscarPorCodigoComMapaEAtividades(codSubprocesso).orElseThrow();
+        Subprocesso subprocesso = buscarSubprocesso(codSubprocesso);
 
         Long codMapa = obterCodigoMapaObrigatorio(subprocesso);
         List<Atividade> todasAtividades = mapaManutencaoService.atividadesMapaCodigoComConhecimentos(codMapa);
@@ -795,7 +795,7 @@ public class SubprocessoService {
 
     @Transactional(readOnly = true)
     public List<AtividadeDto> listarAtividadesParaImportacao(Long codSubprocesso) {
-        Subprocesso subprocesso = subprocessoRepo.buscarPorCodigoComMapaEAtividades(codSubprocesso).orElseThrow();
+        Subprocesso subprocesso = buscarSubprocesso(codSubprocesso);
         if (subprocesso.getProcesso() == null || subprocesso.getProcesso().getSituacao() != SituacaoProcesso.FINALIZADO) {
             throw new ErroValidacao(Mensagens.IMPORTACAO_SO_PROCESSOS_FINALIZADOS);
         }
@@ -889,5 +889,4 @@ public class SubprocessoService {
     }
 
 }
-
 

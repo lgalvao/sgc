@@ -147,8 +147,6 @@ public class ResponsavelUnidadeService {
                 .collect(toMap(Usuario::getTituloEleitoral, u -> u));
 
         return responsabilidades.stream()
-                .filter(r -> usuariosPorTitulo.containsKey(r.getUsuarioTitulo()))
-                .filter(r -> usuariosPorTitulo.containsKey(r.getUnidade().getTituloTitular()))
                 .collect(toMap(
                         Responsabilidade::getUnidadeCodigo,
                         r -> {

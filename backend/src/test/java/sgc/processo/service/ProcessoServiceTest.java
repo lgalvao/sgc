@@ -6,6 +6,7 @@ import org.junit.jupiter.params.*;
 import org.junit.jupiter.params.provider.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
+import org.mockito.quality.*;
 import org.springframework.data.domain.*;
 import org.springframework.security.core.*;
 import sgc.alerta.*;
@@ -779,6 +780,7 @@ class ProcessoServiceTest {
 
     @Nested
     @DisplayName("Cobertura Adicional de Branches")
+    @MockitoSettings(strictness = Strictness.LENIENT)
     class CoberturaAdicional {
 
         @Test
@@ -794,6 +796,8 @@ class ProcessoServiceTest {
             Unidade uni = new Unidade();
             uni.setCodigo(1L);
             uni.setSituacao(SituacaoUnidade.ATIVA);
+            uni.setNome("U1");
+            uni.setSigla("U1");
             p.adicionarParticipantes(Set.of(uni));
 
             when(repo.buscar(Processo.class, id)).thenReturn(p);
@@ -829,6 +833,8 @@ class ProcessoServiceTest {
             Unidade u = new Unidade();
             u.setCodigo(10L);
             u.setSituacao(SituacaoUnidade.ATIVA);
+            u.setNome("U10");
+            u.setSigla("U10");
             p.adicionarParticipantes(Set.of(u));
 
             when(repo.buscar(Processo.class, codProcesso)).thenReturn(p);
@@ -870,9 +876,9 @@ class ProcessoServiceTest {
             sp.setUnidade(new Unidade());
             sp.setSituacao(situacao);
 
-            when(subprocessoService.listarEntidadesPorProcessoEUnidades(eq(codProcesso), anyList())).thenReturn(List.of(sp));
+            lenient().when(subprocessoService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp));
             lenient().when(permissionEvaluator.verificarPermissao(any(), any(), any())).thenReturn(true);
-            when(subprocessoService.obterLocalizacaoAtual(any())).thenReturn(new Unidade());
+            lenient().when(subprocessoService.obterLocalizacaoAtual(any())).thenReturn(new Unidade());
 
             List<SubprocessoElegivelDto> result = processoService.listarSubprocessosElegiveis(codProcesso);
             assertThat(result).hasSize(1);
@@ -891,10 +897,10 @@ class ProcessoServiceTest {
             sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES);
             sp.setUnidade(new Unidade());
 
-            when(subprocessoService.listarEntidadesPorProcessoEUnidades(eq(codProcesso), anyList())).thenReturn(List.of(sp));
-            when(permissionEvaluator.verificarPermissao(usuario, sp, ACEITAR_MAPA)).thenReturn(false);
-            when(permissionEvaluator.verificarPermissao(usuario, sp, HOMOLOGAR_MAPA)).thenReturn(true);
-            when(subprocessoService.obterLocalizacaoAtual(any())).thenReturn(new Unidade());
+            lenient().when(subprocessoService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp));
+            lenient().when(permissionEvaluator.verificarPermissao(usuario, sp, ACEITAR_MAPA)).thenReturn(false);
+            lenient().when(permissionEvaluator.verificarPermissao(usuario, sp, HOMOLOGAR_MAPA)).thenReturn(true);
+            lenient().when(subprocessoService.obterLocalizacaoAtual(any())).thenReturn(new Unidade());
 
             List<SubprocessoElegivelDto> result = processoService.listarSubprocessosElegiveis(codProcesso);
             assertThat(result).hasSize(1);
@@ -927,7 +933,10 @@ class ProcessoServiceTest {
             Processo p = new Processo();
             p.setCodigo(codProcesso);
             Unidade u = new Unidade();
-            u.setUnidadeCodigo(codUnidade);
+            u.setCodigo(codUnidade);
+            u.setSigla("U10");
+            u.setSituacao(SituacaoUnidade.ATIVA);
+            u.setTituloTitular("TITULAR");
             p.adicionarParticipantes(Set.of(u));
             p.setDataLimite(null);
 

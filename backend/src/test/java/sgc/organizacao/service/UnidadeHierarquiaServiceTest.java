@@ -29,6 +29,9 @@ class UnidadeHierarquiaServiceTest {
     @Mock
     private ComumRepo repo;
 
+    @Mock
+    private UnidadeService unidadeService;
+
     @InjectMocks
     private UnidadeHierarquiaService service;
 
@@ -166,6 +169,56 @@ class UnidadeHierarquiaServiceTest {
 
         assertThat(result).hasSize(1);
         assertThat(result.getFirst().getSigla()).isEqualTo(unidadeIntermediaria.getSigla());
+    }
+
+    @Nested
+    @DisplayName("Cobertura Adicional de Casos de Borda")
+    class CoberturaAdicional {
+
+        @Test
+        @DisplayName("Deve retornar DTO sem subunidades quando lista de filhas é null")
+        void deveRetornarDtoSemSubunidadesQuandoFilhasNull() {
+            UnidadeDto dto = UnidadeDto.builder().codigo(1L).sigla("U1").build();
+            Map<Long, List<UnidadeDto>> mapaFilhas = new HashMap<>(); // Não tem a chave 1L
+            
+            UnidadeDto resultado = service.montarComSubunidades(dto, mapaFilhas);
+            
+            assertThat(resultado.getSubunidades()).isEmpty();
+        }
+
+        @Test
+        @DisplayName("Deve lançar IllegalStateException quando UnidadeDto.fromEntity retorna null")
+        void deveLancarErroQuandoDtoNull() {
+            // Simular repositório retornando lista com elemento nulo
+            Unidade nullUnidade = null;
+            when(unidadeRepo.findByUnidadeSuperiorCodigo(999L)).thenReturn(Collections.singletonList(nullUnidade));
+            
+            assertThatThrownBy(() -> service.buscarSubordinadas(999L))
+                    .isInstanceOf(IllegalStateException.class)
+                    .hasMessageContaining("Unidade ausente");
+        }
+
+        @Test
+        @DisplayName("Deve filtrar unidades na árvore de acordo com elegibilidade complexa")
+        void deveFiltrarComElegibilidadeComplexa() {
+            unidadeRaiz.setTipo(TipoUnidade.RAIZ);
+            unidadeIntermediaria.setTipo(TipoUnidade.INTERMEDIARIA); // Deve ser filtrada
+            unidadeOperacional.setTipo(TipoUnidade.OPERACIONAL);
+
+            when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(unidadeRaiz, unidadeIntermediaria, unidadeOperacional));
+            // Mockar que apenas a raiz tem mapa
+            when(unidadeService.buscarTodosCodigosUnidadesComMapa()).thenReturn(List.of(unidadeRaiz.getCodigo()));
+            
+            // Caso 1: Requer mapa, mas só a raiz tem
+            List<UnidadeDto> res1 = service.buscarArvoreComElegibilidade(true, Set.of());
+            assertThat(res1.getFirst().isElegivel()).isTrue(); // RAIZ tem mapa
+            UnidadeDto operacionalDto = res1.getFirst().getSubunidades().getFirst().getSubunidades().getFirst();
+            assertThat(operacionalDto.isElegivel()).isFalse(); // Sem mapa
+
+            // Caso 2: Bloqueada
+            List<UnidadeDto> res2 = service.buscarArvoreComElegibilidade(false, Set.of(unidadeRaiz.getCodigo()));
+            assertThat(res2.getFirst().isElegivel()).isFalse(); // Bloqueada
+        }
     }
 }
 

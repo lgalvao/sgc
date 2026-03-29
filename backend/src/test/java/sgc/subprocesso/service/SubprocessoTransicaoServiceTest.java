@@ -22,6 +22,14 @@ import static org.mockito.Mockito.*;
 import static sgc.processo.model.TipoProcesso.*;
 import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 import static sgc.subprocesso.model.TipoTransicao.*;
+import static sgc.subprocesso.model.TipoAnalise.*;
+import static sgc.subprocesso.model.TipoAcaoAnalise.*;
+import static sgc.subprocesso.model.TipoTransicao.REVISAO_CADASTRO_REABERTA;
+import static sgc.subprocesso.model.TipoTransicao.CADASTRO_REABERTO;
+import static sgc.subprocesso.model.TipoTransicao.MAPA_DISPONIBILIZADO;
+import static sgc.subprocesso.model.TipoTransicao.MAPA_VALIDACAO_DEVOLVIDA;
+import static sgc.subprocesso.model.TipoTransicao.MAPA_VALIDACAO_ACEITA;
+import static sgc.subprocesso.model.TipoTransicao.MAPA_HOMOLOGADO;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("SubprocessoTransicaoService")
@@ -137,6 +145,130 @@ class SubprocessoTransicaoServiceTest {
                 anyString(),
                 contains("25/04/2026"));
         verify(alertaService).criarAlertaAlteracaoDataLimite(eq(processo), eq(unidade), eq("25/04/2026"), eq(2));
+    }
+
+    @Nested
+    @DisplayName("Cobertura Adicional de Branches")
+    class CoberturaAdicional {
+
+        @Test
+        @DisplayName("Deve lançar erro quando data limite é anterior à última data (disponibilizarMapa)")
+        void deveLancarErroQuandoDataLimiteAnterior() {
+            Subprocesso sp = criarSubprocesso(MAPEAMENTO, MAPEAMENTO_MAPA_CRIADO, new Unidade());
+            sp.setDataLimiteEtapa1(LocalDateTime.now().plusDays(10));
+            sp.setMapa(new sgc.mapa.model.Mapa());
+            
+            DisponibilizarMapaRequest req = new DisponibilizarMapaRequest(LocalDate.now().plusDays(5), "Obs");
+            
+            when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(1L)).thenReturn(Optional.of(sp));
+            
+            assertThatThrownBy(() -> service.disponibilizarMapa(1L, req, criarUsuario()))
+                    .isInstanceOf(sgc.comum.erros.ErroValidacao.class);
+        }
+
+        @Test
+        @DisplayName("submeterMapaAjustado deve funcionar com data limite nula")
+        void submeterMapaAjustadoDeveFuncionarComDataLimiteNula() {
+            Subprocesso sp = criarSubprocesso(REVISAO, SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA, new Unidade());
+            sp.setMapa(new sgc.mapa.model.Mapa());
+            
+            when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(1L)).thenReturn(Optional.of(sp));
+            
+            SubmeterMapaAjustadoRequest req = new SubmeterMapaAjustadoRequest("Justificativa", null, List.of());
+            service.submeterMapaAjustado(1L, req, criarUsuario());
+            
+            assertThat(sp.getSituacao()).isEqualTo(REVISAO_MAPA_DISPONIBILIZADO);
+        }
+
+        @Test
+        @DisplayName("devolverValidacao deve ignorar movimentação sem destino e filtrar por hierarquia")
+        void devolverValidacaoDeveIgnorarMovimentacaoSemDestinoEFiltrar() {
+            Unidade uOrigem = criarUnidade(1L, "ORI", "Origem");
+            Unidade uAnalise = criarUnidade(2L, "ANA", "Analise");
+            Subprocesso sp = criarSubprocesso(MAPEAMENTO, MAPEAMENTO_MAPA_VALIDADO, uOrigem);
+            sp.setLocalizacaoAtual(uAnalise);
+            
+            Movimentacao m1 = new Movimentacao(); m1.setUnidadeDestino(null); // Caso line 365
+            Movimentacao m2 = new Movimentacao(); m2.setUnidadeDestino(uAnalise); m2.setUnidadeOrigem(uOrigem);
+            
+            when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(1L)).thenReturn(Optional.of(sp));
+            when(movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(1L)).thenReturn(List.of(m1, m2));
+            when(hierarquiaService.isSubordinada(uOrigem, uAnalise)).thenReturn(true);
+            
+            service.devolverValidacao(1L, "Justif", criarUsuario());
+            
+            verify(analiseRepo).save(any());
+        }
+
+        @Test
+        @DisplayName("Deve aceitar cadastro em bloco para diferentes tipos de processo")
+        void deveAceitarCadastroEmBlocoDiferentesTipos() {
+            Subprocesso spMap = criarSubprocesso(MAPEAMENTO, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO, new Unidade());
+            Subprocesso spRev = criarSubprocesso(REVISAO, SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA, new Unidade());
+            
+            when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(10L)).thenReturn(Optional.of(spMap));
+            when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(20L)).thenReturn(Optional.of(spRev));
+            
+            service.aceitarCadastroEmBloco(List.of(10L, 20L), criarUsuario());
+            
+            assertThat(spMap.getSituacao()).isEqualTo(MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+            assertThat(spRev.getSituacao()).isEqualTo(REVISAO_CADASTRO_DISPONIBILIZADA);
+        }
+
+        @Test
+        @DisplayName("Deve homologar cadastro em bloco para diferentes tipos de processo")
+        void deveHomologarCadastroEmBlocoDiferentesTipos() {
+            Subprocesso spMap = criarSubprocesso(MAPEAMENTO, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO, new Unidade());
+            Subprocesso spRev = criarSubprocesso(REVISAO, SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA, new Unidade());
+            
+            when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(10L)).thenReturn(Optional.of(spMap));
+            when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(20L)).thenReturn(Optional.of(spRev));
+            when(unidadeService.buscarPorSigla(anyString())).thenReturn(new Unidade());
+            
+            service.homologarCadastroEmBloco(List.of(10L, 20L), criarUsuario());
+            
+            assertThat(spMap.getSituacao()).isEqualTo(MAPEAMENTO_CADASTRO_HOMOLOGADO);
+            assertThat(spRev.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
+        }
+
+        @Test
+        @DisplayName("alterarDataLimite deve lançar erro quando data limite é anterior à etapa 2")
+        void alterarDataLimiteDeveLancarErroQuandoAnteriorEtapa2() {
+            Subprocesso sp = criarSubprocesso(MAPEAMENTO, MAPEAMENTO_MAPA_VALIDADO, new Unidade());
+            sp.setDataLimiteEtapa1(LocalDateTime.now().plusDays(5));
+            sp.setDataLimiteEtapa2(LocalDateTime.now().plusDays(10));
+            
+            when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(1L)).thenReturn(Optional.of(sp));
+            
+            assertThatThrownBy(() -> service.alterarDataLimite(1L, LocalDate.now().plusDays(7)))
+                    .isInstanceOf(sgc.comum.erros.ErroValidacao.class);
+        }
+
+        @Test
+        @DisplayName("executarDevolucao deve funcionar sem movimentações (usa unidade do SP)")
+        void executarDevolucaoSemMovimentacoesUsarUnidadeSP() {
+            Unidade u = criarUnidade(1L, "U", "Unid");
+            Subprocesso sp = criarSubprocesso(MAPEAMENTO, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO, u);
+            sp.setLocalizacaoAtual(u);
+            
+            when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(1L)).thenReturn(Optional.of(sp));
+            when(movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(1L)).thenReturn(List.of());
+            
+            service.devolverCadastro(1L, criarUsuario(), "Obs");
+            
+            assertThat(sp.getSituacao()).isEqualTo(MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+        }
+    }
+
+    @Test
+    @DisplayName("deve aceitar revisao cadastro clashing")
+    void deveAceitarRevisaoCadastroClashing() {
+         Unidade u = criarUnidade(1L, "U", "Unid");
+         Subprocesso sp = criarSubprocesso(REVISAO, SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA, u);
+         sp.setLocalizacaoAtual(u);
+         when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(1L)).thenReturn(Optional.of(sp));
+         service.aceitarRevisaoCadastro(1L, criarUsuario(), "Obs");
+         assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
     }
 
     private Subprocesso criarSubprocesso(TipoProcesso tipoProcesso, SituacaoSubprocesso situacao, Unidade unidade) {
