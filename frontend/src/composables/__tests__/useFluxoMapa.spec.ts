@@ -1,5 +1,4 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
-import {ref} from "vue";
 
 vi.mock("@/services/subprocessoService", () => ({
     salvarMapaCompleto: vi.fn(),
@@ -10,57 +9,48 @@ vi.mock("@/services/subprocessoService", () => ({
     removerCompetencia: vi.fn(),
 }));
 
-const mapasStoreMock = {
-    mapaCompleto: ref(null as any),
-};
-
-vi.mock("@/composables/useMapas", () => ({
-    useMapas: () => mapasStoreMock,
-}));
-
 describe("useFluxoMapa", () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        mapasStoreMock.mapaCompleto.value = null;
     });
 
-    it("deve adicionar competencia e atualizar mapaCompleto", async () => {
+    it("deve adicionar competencia e retornar mapa atualizado", async () => {
         const {useFluxoMapa} = await import("../useFluxoMapa");
         const fluxoMapa = useFluxoMapa();
         const service = await import("@/services/subprocessoService");
         const resposta = {codigo: 1, competencias: [{codigo: 2}]} as any;
         vi.mocked(service.adicionarCompetencia).mockResolvedValue(resposta);
 
-        await fluxoMapa.adicionarCompetencia(10, {descricao: "Comp", atividadesIds: []});
+        const resultado = await fluxoMapa.adicionarCompetencia(10, {descricao: "Comp", atividadesIds: []});
 
         expect(service.adicionarCompetencia).toHaveBeenCalledWith(10, {descricao: "Comp", atividadesIds: []});
-        expect(mapasStoreMock.mapaCompleto.value).toEqual(resposta);
+        expect(resultado).toEqual(resposta);
     });
 
-    it("deve atualizar competencia e atualizar mapaCompleto", async () => {
+    it("deve atualizar competencia e retornar mapa atualizado", async () => {
         const {useFluxoMapa} = await import("../useFluxoMapa");
         const fluxoMapa = useFluxoMapa();
         const service = await import("@/services/subprocessoService");
         const resposta = {codigo: 1, competencias: [{codigo: 3}]} as any;
         vi.mocked(service.atualizarCompetencia).mockResolvedValue(resposta);
 
-        await fluxoMapa.atualizarCompetencia(10, 20, {descricao: "Comp", atividadesIds: [1]});
+        const resultado = await fluxoMapa.atualizarCompetencia(10, 20, {descricao: "Comp", atividadesIds: [1]});
 
         expect(service.atualizarCompetencia).toHaveBeenCalledWith(10, 20, {descricao: "Comp", atividadesIds: [1]});
-        expect(mapasStoreMock.mapaCompleto.value).toEqual(resposta);
+        expect(resultado).toEqual(resposta);
     });
 
-    it("deve remover competencia e atualizar mapaCompleto", async () => {
+    it("deve remover competencia e retornar mapa atualizado", async () => {
         const {useFluxoMapa} = await import("../useFluxoMapa");
         const fluxoMapa = useFluxoMapa();
         const service = await import("@/services/subprocessoService");
         const resposta = {codigo: 1, competencias: []} as any;
         vi.mocked(service.removerCompetencia).mockResolvedValue(resposta);
 
-        await fluxoMapa.removerCompetencia(10, 20);
+        const resultado = await fluxoMapa.removerCompetencia(10, 20);
 
         expect(service.removerCompetencia).toHaveBeenCalledWith(10, 20);
-        expect(mapasStoreMock.mapaCompleto.value).toEqual(resposta);
+        expect(resultado).toEqual(resposta);
     });
 
     it("deve disponibilizar mapa", async () => {
@@ -81,10 +71,10 @@ describe("useFluxoMapa", () => {
         const resposta = {codigo: 1, competencias: []} as any;
         vi.mocked(service.salvarMapaCompleto).mockResolvedValue(resposta);
 
-        await fluxoMapa.salvarMapa(10, {dados: "teste"});
+        const resultado = await fluxoMapa.salvarMapa(10, {dados: "teste"});
 
         expect(service.salvarMapaCompleto).toHaveBeenCalledWith(10, {dados: "teste"});
-        expect(mapasStoreMock.mapaCompleto.value).toEqual(resposta);
+        expect(resultado).toEqual(resposta);
     });
 
     it("deve salvar ajustes do mapa", async () => {

@@ -1,11 +1,9 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import {usePerfilStore} from "@/stores/perfil";
-import {useMapas} from "@/composables/useMapas";
 import {SituacaoSubprocesso} from "@/types/tipos";
 
 vi.mock("@/services/subprocessoService");
 vi.mock("@/stores/perfil");
-vi.mock("@/composables/useMapas");
 vi.mock("@/utils", () => ({
     logger: {
         error: vi.fn(),
@@ -16,7 +14,6 @@ describe("useSubprocessos", () => {
     let useSubprocessos: typeof import("../useSubprocessos").useSubprocessos;
     let service: any;
     let perfilStore: any;
-    let mapas: any;
 
     beforeEach(async () => {
         vi.clearAllMocks();
@@ -28,11 +25,6 @@ describe("useSubprocessos", () => {
             unidadeAtual: 1,
         };
         vi.mocked(usePerfilStore).mockReturnValue(perfilStore);
-
-        mapas = {
-            mapaCompleto: {value: null},
-        };
-        vi.mocked(useMapas).mockReturnValue(mapas);
 
         ({useSubprocessos} = await import("../useSubprocessos"));
     });
@@ -107,10 +99,10 @@ describe("useSubprocessos", () => {
         };
         service.buscarContextoEdicao.mockResolvedValue(mockContexto);
 
-        await store.buscarContextoEdicao(10);
+        const resultado = await store.buscarContextoEdicao(10);
 
         expect(store.subprocessoDetalhe?.codigo).toBe(10);
-        expect(mapas.mapaCompleto.value).toEqual({codigo: 20});
+        expect(resultado).toEqual(mockContexto);
     });
 
     it("deve usar data como fallback se detalhes estiver ausente no contexto de edição", async () => {

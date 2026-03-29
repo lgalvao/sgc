@@ -128,6 +128,7 @@ import {usePerfil} from "@/composables/usePerfil";
 import {useAcesso} from "@/composables/useAcesso";
 import {useFluxoMapa} from "@/composables/useFluxoMapa";
 import {useFormErrors} from '@/composables/useFormErrors';
+import {useImpactoMapaModal} from "@/composables/useImpactoMapaModal";
 import {useMapas} from "@/composables/useMapas";
 import {useSubprocessos} from "@/composables/useSubprocessos";
 import {useToastStore} from "@/stores/toast";
@@ -162,43 +163,53 @@ const {
 } = useAcesso(subprocesso);
 const podeVerImpacto = computed(() => podeVisualizarImpacto.value);
 
-const mostrarModalImpacto = ref(false);
-const loadingImpacto = ref(false);
+const unidade = ref<Unidade | null>(null);
+const codSubprocesso = ref<number | null>(null);
+const {
+  mostrarModalImpacto,
+  loadingImpacto,
+  abrirModalImpacto,
+  fecharModalImpacto,
+} = useImpactoMapaModal(codSubprocesso, (codigo) => mapasStore.buscarImpactoMapa(codigo));
 
-function abrirModalImpacto() {
-  mostrarModalImpacto.value = true;
-  if (codSubprocesso.value) {
-    loadingImpacto.value = true;
-    mapasStore.buscarImpactoMapa(codSubprocesso.value)
-        .finally(() => loadingImpacto.value = false);
+function sincronizarMapa(mapaAtualizado: unknown) {
+  if (mapaAtualizado) {
+    mapasStore.mapaCompleto.value = mapaAtualizado as any;
   }
 }
 
-function fecharModalImpacto() {
-  mostrarModalImpacto.value = false;
+async function atualizarContextoEdicao(codigo: number) {
+  const data = await subprocessosStore.buscarContextoEdicao(codigo);
+  if (!data) {
+    return null;
+  }
+
+  if (data.atividadesDisponiveis) {
+    atividades.value = data.atividadesDisponiveis;
+  }
+
+  if (data.unidade) {
+    unidade.value = data.unidade as Unidade;
+  }
+
+  return data;
 }
 
-const unidade = ref<Unidade | null>(null);
-const codSubprocesso = ref<number | null>(null);
+async function carregarMapaInicial(codigo: number) {
+  const data = await atualizarContextoEdicao(codigo);
+  if (data?.mapa) {
+    sincronizarMapa(data.mapa);
+    return;
+  }
+
+  await mapasStore.buscarMapaCompleto(codigo);
+}
 
 onMounted(async () => {
   const id = await subprocessosStore.buscarSubprocessoPorProcessoEUnidade(codProcesso.value, siglaUnidade.value);
   if (id) {
     codSubprocesso.value = id;
-    const data = await subprocessosStore.buscarContextoEdicao(id);
-    if (data) {
-      if (data.mapa) {
-        mapasStore.mapaCompleto.value = data.mapa as any;
-      } else {
-        await mapasStore.buscarMapaCompleto(id);
-      }
-      if (data.atividadesDisponiveis) {
-        atividades.value = data.atividadesDisponiveis;
-      }
-      if (data.unidade) {
-        unidade.value = data.unidade as Unidade;
-      }
-    }
+    await carregarMapaInicial(id);
   }
 });
 
@@ -300,16 +311,12 @@ async function adicionarCompetenciaEFecharModal(dados: { descricao: string; ativ
 
   try {
     if (competenciaSendoEditada.value) {
-      await fluxoMapa.atualizarCompetencia(codSubprocesso.value, competenciaSendoEditada.value.codigo, request);
+      sincronizarMapa(await fluxoMapa.atualizarCompetencia(codSubprocesso.value, competenciaSendoEditada.value.codigo, request));
     } else {
-      await fluxoMapa.adicionarCompetencia(codSubprocesso.value, request);
+      sincronizarMapa(await fluxoMapa.adicionarCompetencia(codSubprocesso.value, request));
     }
 
-    const data = await subprocessosStore.buscarContextoEdicao(codSubprocesso.value);
-    if (data && data.atividadesDisponiveis) {
-      atividades.value = data.atividadesDisponiveis;
-    }
-
+    await atualizarContextoEdicao(codSubprocesso.value);
     fecharModalCriarNovaCompetencia();
   } catch {
     handleErrors(fluxoMapa);
@@ -328,14 +335,11 @@ async function confirmarExclusaoCompetencia() {
   if (competenciaParaExcluir.value && codSubprocesso.value) {
     loadingExclusao.value = true;
     try {
-      await fluxoMapa.removerCompetencia(
+      sincronizarMapa(await fluxoMapa.removerCompetencia(
           codSubprocesso.value,
           competenciaParaExcluir.value.codigo,
-      );
-      const data = await subprocessosStore.buscarContextoEdicao(codSubprocesso.value);
-      if (data && data.atividadesDisponiveis) {
-        atividades.value = data.atividadesDisponiveis;
-      }
+      ));
+      await atualizarContextoEdicao(codSubprocesso.value);
       fecharModalExcluirCompetencia();
     } catch {
       handleErrors(fluxoMapa);
@@ -350,7 +354,7 @@ function fecharModalExcluirCompetencia() {
   competenciaParaExcluir.value = null;
 }
 
-function removerAtividadeAssociada(competenciaId: number, codAtividade: number) {
+async function removerAtividadeAssociada(competenciaId: number, codAtividade: number) {
   if (!codSubprocesso.value) return;
   const competencia = competencias.value.find(
       (comp) => comp.codigo === competenciaId,
@@ -363,11 +367,11 @@ function removerAtividadeAssociada(competenciaId: number, codAtividade: number) 
       atividadesIds: atividadesIds,
     };
 
-    fluxoMapa.atualizarCompetencia(
+    sincronizarMapa(await fluxoMapa.atualizarCompetencia(
         codSubprocesso.value,
         competencia.codigo,
         request,
-    );
+    ));
   }
 }
 

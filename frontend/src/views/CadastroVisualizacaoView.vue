@@ -162,6 +162,7 @@ import HistoricoAnaliseModal from "@/components/processo/HistoricoAnaliseModal.v
 import ImpactoMapaModal from "@/components/mapa/ImpactoMapaModal.vue";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
+import {useImpactoMapaModal} from "@/composables/useImpactoMapaModal";
 import {useProcessos} from "@/composables/useProcessos";
 import {useFluxoSubprocesso} from "@/composables/useFluxoSubprocesso";
 import {useMapas} from "@/composables/useMapas";
@@ -246,8 +247,6 @@ const historicoAnalises = computed(() => {
   return analisesCadastro.value || [];
 });
 
-const loadingImpacto = ref(false);
-const mostrarModalImpacto = ref(false);
 const mostrarModalValidar = ref(false);
 const mostrarModalDevolver = ref(false);
 const mostrarModalHistoricoAnalise = ref(false);
@@ -262,22 +261,12 @@ const estadoObservacaoDevolucao = computed(() => {
 // Ações de validação/devolução
 const loadingValidacao = ref(false);
 const loadingDevolucao = ref(false);
-
-async function abrirModalImpacto() {
-  mostrarModalImpacto.value = true;
-  if (codSubprocesso.value) {
-    loadingImpacto.value = true;
-    try {
-      await mapasStore.buscarImpactoMapa(codSubprocesso.value);
-    } finally {
-      loadingImpacto.value = false;
-    }
-  }
-}
-
-function fecharModalImpacto() {
-  mostrarModalImpacto.value = false;
-}
+const {
+  mostrarModalImpacto,
+  loadingImpacto,
+  abrirModalImpacto,
+  fecharModalImpacto,
+} = useImpactoMapaModal(codSubprocesso, (codigo) => mapasStore.buscarImpactoMapa(codigo));
 
 async function abrirModalHistoricoAnalise() {
   if (codSubprocesso.value) {

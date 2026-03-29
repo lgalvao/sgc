@@ -350,9 +350,13 @@ onMounted(async () => {
 
     if (id) {
       erroNaoEncontrado.value = false;
-      await subprocessosStore.buscarSubprocessoDetalhe(id);
       codSubprocesso.value = id;
-      await mapaStore.buscarMapaCompleto(id);
+      const data = await subprocessosStore.buscarContextoEdicao(id);
+      if (data?.mapa) {
+        mapaStore.mapaCompleto.value = data.mapa as any;
+      } else {
+        await mapaStore.buscarMapaCompleto(id);
+      }
     } else {
       erroNaoEncontrado.value = true;
       logger.warn(`Subprocesso não encontrado para processo ${props.codProcesso} e unidade ${props.siglaUnidade}`);

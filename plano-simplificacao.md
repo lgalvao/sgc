@@ -4,6 +4,17 @@ Este plano consolida apenas recomendações concretas sustentadas pela leitura d
 complexidade acidental sem perder regras de negócio, segurança, transações, contratos de API ou padronizações úteis já
 existentes.
 
+## Princípios gerais de simplificação
+
+Estes princípios valem para backend e frontend e devem orientar cada rodada:
+
+* Simplificar primeiro a menor fronteira segura.
+* Tornar dependências e fluxos explícitos.
+* Reduzir superfície pública antes de criar abstração nova.
+* Preservar contratos externos, DTOs e regras de acesso.
+* Remover código morto logo após a simplificação.
+* Validar em passos pequenos e registrar aprendizado no próprio plano.
+
 ## 0. Guardrails obrigatórios
 
 Antes de qualquer simplificação, aplicar as seguintes restrições:
@@ -282,6 +293,20 @@ Avaliar se o singleton atual simplifica o fluxo ou apenas espalha estado compart
 * decisão documentada;
 * nenhum fluxo de mapa quebra por perda de sincronização.
 
+**Status atual:**
+
+* O singleton `useMapas` foi estreitado em rodadas anteriores com remoção de estado morto.
+* `UnidadeView` já deixou de depender de contexto herdado de `mapasStore`.
+* Nesta rodada, `useSubprocessos.buscarContextoEdicao(...)` deixou de sincronizar `useMapas` por efeito colateral.
+* Nesta rodada, `useFluxoMapa` também deixou de escrever em `useMapas` por dentro e passou a retornar o mapa atualizado para a view decidir como sincronizar.
+* `MapaView` assumiu explicitamente a sincronização de `mapaCompleto` e a recarga do contexto de edição, com helpers locais para reduzir repetição.
+
+**Aprendizado novo:**
+
+* O melhor uso de `useMapas` no SGC parece ser como estado compartilhado explícito do fluxo de mapa, não como destino implícito de escrita por outros composables.
+* Quando o composable de fluxo retorna o dado atualizado, a view fica mais previsível e os testes deixam de depender de efeito colateral escondido.
+* O frontend atual ainda carrega resquícios do protótipo sem backend; por isso, próximos cortes devem priorizar remoção de regra duplicada de workflow, validação local redundante e cálculo de permissão fora da fonte de verdade.
+
 #### Item 6. Auditar wrappers visuais finos
 
 **Objetivo:**
@@ -345,6 +370,93 @@ Evitar tanto excesso de service vazio quanto exposição indevida de persistênc
 5. Auditar wrappers visuais finos.
 6. Formalizar diretrizes para facades e acesso direto a repositórios.
 
+## 4.1 Próxima fase coesa
+
+Os próximos passos devem ser executados como uma frente única, e não como otimizações isoladas:
+
+### Frente A. Recentrar a fonte de verdade no backend
+
+**Problema consolidado:**
+
+* O frontend ainda carrega resquícios do protótipo inicial sem backend.
+* Há regras de workflow, validações e guardas locais que duplicam comportamento já protegido no backend.
+* Isso aumenta manutenção, abre risco de divergência com `etc/reqs` e `etc/docs/regras-acesso.md` e tende a produzir chamadas extras.
+
+**Objetivo:**
+
+* deixar o frontend responsável por estado de tela, navegação e feedback visual;
+* deixar o backend como fonte de verdade de permissão, situação e validação de negócio.
+
+**Critério de execução:**
+
+* remover primeiro guardas locais redundantes de situação e workflow;
+* manter apenas validações locais de formulário e consistência puramente visual;
+* evitar reimplementar regra de permissão fora de `useAcesso` e do contrato vindo do backend.
+
+### Frente B. Reduzir round-trips por tela
+
+**Problema consolidado:**
+
+* No Oracle real, o custo do vai-e-vem ficou visível.
+* O frontend ainda faz sequências de chamadas finas demais para montar uma única tela.
+
+**Objetivo:**
+
+* preferir cargas de contexto por tela ou por fluxo;
+* evitar sequências como “buscar id -> buscar detalhe -> buscar mapa -> buscar permissões” quando um endpoint de contexto já pode entregar isso junto.
+
+**Candidatos prioritários:**
+
+* `SubprocessoView`
+* `CadastroView`
+* `CadastroVisualizacaoView`
+* `MapaVisualizacaoView`
+
+**Critério de execução:**
+
+* cada tela deve ter um inventário explícito de chamadas no `onMounted`;
+* se duas ou mais chamadas sempre andam juntas, avaliar consolidação;
+* preferir reutilizar endpoint de contexto existente antes de criar endpoint novo;
+* criar endpoint novo apenas quando a composição atual continuar cara demais ou incompleta.
+
+### Frente C. Estreitar composables para refletir fluxos reais
+
+**Problema consolidado:**
+
+* Alguns composables ainda foram desenhados como infraestrutura genérica do protótipo, não como representação do fluxo real do SGC.
+* Isso gera escrita implícita em stores paralelos, API pública larga demais e acoplamento desnecessário.
+
+**Objetivo:**
+
+* manter cada composable responsável por um fluxo claro;
+* eliminar sincronizações implícitas;
+* devolver dados para a view quando isso tornar o fluxo mais legível.
+
+**Critério de execução:**
+
+* se o composable altera outro store por dentro, reavaliar;
+* se a view é o único consumidor, preferir helper local ou composable de escopo curto;
+* se o estado é realmente compartilhado, explicitar isso no plano e manter o singleton.
+
+### Frente D. Consolidar backend para servir melhor o frontend real
+
+**Problema consolidado:**
+
+* Parte da complexidade percebida no frontend nasce de endpoints finos ou fragmentados demais para o uso real das telas.
+* Simplificar só no frontend não resolve o custo de orquestração quando a tela depende de múltiplos pedaços sempre carregados juntos.
+
+**Objetivo:**
+
+* identificar onde vale expor contexto agregado útil para a tela;
+* manter DTOs e fronteiras seguras;
+* evitar que a simplificação de frontend empurre regra para a UI.
+
+**Critério de execução:**
+
+* primeiro reutilizar `contexto-edicao` e endpoints já existentes;
+* depois, se necessário, criar DTO/endpoint agregado orientado à tela;
+* nunca substituir isso por exposição direta de entidade ou acoplamento controller-repo.
+
 ## 5. Critério de sucesso
 
 O plano terá sido bem executado se:
@@ -383,5 +495,11 @@ O plano terá sido bem executado se:
 * Para viabilizar isso sem inferência frágil no frontend, foi criado um endpoint específico de referência do mapa vigente por unidade, retornando `codProcesso` e `codSubprocesso`.
 * Depois dessa mudança, o caminho `verificarMapaVigente -> useMapas.temMapaVigente` ficou morto no frontend e pôde ser removido sem impacto em produção.
 * `useMapas` ainda era mais largo do que o consumo real exigia; `mapaVisualizacao` e `mapaAjuste` não tinham mais usos de produção e foram eliminados para reduzir estado singleton ocioso.
+* `useSubprocessos.buscarContextoEdicao(...)` e `useFluxoMapa` ficaram mais estreitos quando pararam de sincronizar `useMapas` por dentro; isso reduziu o acoplamento implícito entre composables.
+* Em `MapaView`, helpers locais de sincronização e recarga reduziram repetição sem exigir nova abstração compartilhada; quando a duplicação está concentrada numa única view, helper privado costuma bastar.
+* O modal de impacto repetia o mesmo ciclo de `mostrar`, `loading` e `buscarImpactoMapa` em três views; um composable curto foi suficiente para consolidar esse comportamento sem deslocar regra de negócio.
+* Em `CadastroView`, a checagem local de situação antes da validação era redundante com a fonte de verdade do backend; remover esse pré-check deixou a view mais enxuta e reduziu duplicação de workflow.
+* O próximo ciclo não deve reagir a sintomas isolados. O critério correto agora é consolidar as mudanças em torno de quatro frentes: fonte de verdade no backend, redução de round-trips por tela, estreitamento de composables e agregação backend orientada ao uso real da UI.
+* Desempenho passou a ser parte explícita da simplificação. Em ambiente real com Oracle, chamadas pequenas demais e em sequência têm custo perceptível e devem entrar no critério de desenho.
 * `LoadingButton.vue` continua sendo um wrapper fino, mas o volume de uso torna a remoção imediata cara demais; o melhor caminho agora é impedir novos wrappers fracos e só reavaliar esse componente junto de refatorações de telas maiores.
 * A validação de backend com Gradle pode produzir falso negativo por problema de cache de build; quando `:backend:test` passa e `:backend:compileTestJava` falha só ao armazenar cache, vale repetir com `--no-configuration-cache` antes de tratar como regressão de código.

@@ -186,6 +186,7 @@ import CadAtividadeForm from "@/components/atividades/CadAtividadeForm.vue";
 import AtividadeItem from "@/components/atividades/AtividadeItem.vue";
 import {useAtividadeForm} from "@/composables/useAtividadeForm";
 import {useFluxoSubprocesso} from "@/composables/useFluxoSubprocesso";
+import {useImpactoMapaModal} from "@/composables/useImpactoMapaModal";
 import {useProcessos} from "@/composables/useProcessos";
 import {useSubprocessos} from "@/composables/useSubprocessos";
 import {useMapas} from "@/composables/useMapas";
@@ -199,7 +200,7 @@ import {
   type Conhecimento,
   type CriarConhecimentoRequest,
   type ErroValidacao,
-  SituacaoSubprocesso,
+  type SituacaoSubprocesso,
   TipoProcesso,
   type Unidade
 } from "@/types/tipos";
@@ -305,13 +306,17 @@ const historicoAnalises = computed(() => {
 const {novaAtividade, loadingAdicionar, adicionarAtividade: adicionarAtividadeAction} = useAtividadeForm();
 const erroNovaAtividade = ref<string | null>(null);
 
-const mostrarModalImpacto = ref(false);
 const mostrarModalImportar = ref(false);
 const mostrarModalConfirmacao = ref(false);
 const mostrarModalHistorico = ref(false);
 const mostrarModalConfirmacaoRemocao = ref(false);
 const dadosRemocao = ref<DadosRemocao>(null);
-const loadingImpacto = ref(false);
+const {
+  mostrarModalImpacto,
+  loadingImpacto,
+  abrirModalImpacto,
+  fecharModalImpacto,
+} = useImpactoMapaModal(codSubprocesso, (codigo) => mapasStore.buscarImpactoMapa(codigo));
 
 const loadingValidacao = ref(false);
 const errosValidacao = ref<ErroValidacao[]>([]);
@@ -594,18 +599,6 @@ function scrollParaPrimeiroErro() {
 }
 
 async function disponibilizarCadastro() {
-  const situacoesPermitidas = isRevisao.value
-      ? [SituacaoSubprocesso.NAO_INICIADO, SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO]
-      : [SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO];
-
-  if (!subprocesso.value?.situacao || !situacoesPermitidas.includes(subprocesso.value.situacao)) {
-    const situacaoReferencia = isRevisao.value
-        ? SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO
-        : SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO;
-    notify(TEXTOS.comum.ACAO_NAO_PERMITIDA_SITUACAO(formatSituacaoSubprocesso(situacaoReferencia)), 'danger');
-    return;
-  }
-
   if (codSubprocesso.value) {
     loadingValidacao.value = true;
     errosValidacao.value = [];
@@ -660,18 +653,6 @@ async function abrirModalHistorico() {
     analisesCadastro.value = await listarAnalisesCadastro(codSubprocesso.value);
   }
   mostrarModalHistorico.value = true;
-}
-
-function abrirModalImpacto() {
-  mostrarModalImpacto.value = true;
-  if (codSubprocesso.value) {
-    loadingImpacto.value = true;
-    mapasStore.buscarImpactoMapa(codSubprocesso.value).finally(() => (loadingImpacto.value = false));
-  }
-}
-
-function fecharModalImpacto() {
-  mostrarModalImpacto.value = false;
 }
 
 async function handleAdicionarAtividade() {

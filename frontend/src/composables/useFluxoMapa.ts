@@ -6,19 +6,17 @@ import {
     salvarMapaAjuste,
     salvarMapaCompleto,
 } from "@/services/subprocessoService";
-import type {DisponibilizarMapaRequest, SalvarCompetenciaRequest} from "@/types/tipos";
+import type {DisponibilizarMapaRequest, MapaCompleto, SalvarCompetenciaRequest} from "@/types/tipos";
 import {useAsyncAction} from "@/composables/useAsyncAction";
 import {useErrorHandler} from "@/composables/useErrorHandler";
-import {useMapas} from "@/composables/useMapas";
 
 export function useFluxoMapa() {
-    const mapas = useMapas();
     const {lastError, clearError} = useErrorHandler();
     const {carregando, erro, executar} = useAsyncAction();
 
-    async function salvarMapa(codSubprocesso: number, dados: any) {
-        await executar(async () => {
-            mapas.mapaCompleto.value = await salvarMapaCompleto(codSubprocesso, dados);
+    async function salvarMapa(codSubprocesso: number, dados: any): Promise<MapaCompleto | undefined> {
+        return executar(async () => {
+            return await salvarMapaCompleto(codSubprocesso, dados);
         }, "Erro ao salvar mapa completo.");
     }
 
@@ -34,21 +32,21 @@ export function useFluxoMapa() {
         }, "Erro ao disponibilizar mapa.");
     }
 
-    async function adicionarCompetencia(codSubprocesso: number, competencia: SalvarCompetenciaRequest) {
-        await executar(async () => {
-            mapas.mapaCompleto.value = await adicionarCompetenciaService(codSubprocesso, competencia);
+    async function adicionarCompetencia(codSubprocesso: number, competencia: SalvarCompetenciaRequest): Promise<MapaCompleto | undefined> {
+        return executar(async () => {
+            return await adicionarCompetenciaService(codSubprocesso, competencia);
         }, "Erro ao adicionar competência.");
     }
 
-    async function atualizarCompetencia(codSubprocesso: number, codCompetencia: number, competencia: SalvarCompetenciaRequest) {
-        await executar(async () => {
-            mapas.mapaCompleto.value = await atualizarCompetenciaService(codSubprocesso, codCompetencia, competencia);
+    async function atualizarCompetencia(codSubprocesso: number, codCompetencia: number, competencia: SalvarCompetenciaRequest): Promise<MapaCompleto | undefined> {
+        return executar(async () => {
+            return await atualizarCompetenciaService(codSubprocesso, codCompetencia, competencia);
         }, "Erro ao atualizar competência.");
     }
 
-    async function removerCompetencia(codSubprocesso: number, codCompetencia: number) {
-        await executar(async () => {
-            mapas.mapaCompleto.value = await removerCompetenciaService(codSubprocesso, codCompetencia);
+    async function removerCompetencia(codSubprocesso: number, codCompetencia: number): Promise<MapaCompleto | undefined> {
+        return executar(async () => {
+            return await removerCompetenciaService(codSubprocesso, codCompetencia);
         }, "Erro ao remover competência.");
     }
 

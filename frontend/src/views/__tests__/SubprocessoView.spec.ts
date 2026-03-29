@@ -168,9 +168,12 @@ describe('SubprocessoView.vue', () => {
         processosMock.processoDetalhe.value = {situacao: 'EM_ANDAMENTO'};
 
         (store.buscarSubprocessoPorProcessoEUnidade as any).mockImplementation(async () => 10);
-        (store.buscarSubprocessoDetalhe as any).mockImplementation(async () => {
+        (store.buscarContextoEdicao as any).mockImplementation(async () => {
             store.subprocessoDetalhe = subprocessoToUse as any;
-            return subprocessoToUse;
+            return {
+                detalhes: subprocessoToUse,
+                mapa: {codigo: 100}
+            };
         });
         mapaStore.buscarMapaCompleto = vi.fn().mockResolvedValue({});
         mapaStore.mapaCompleto.value = null;
@@ -207,8 +210,8 @@ describe('SubprocessoView.vue', () => {
         await flushPromises();
 
         expect(store.buscarSubprocessoPorProcessoEUnidade).toHaveBeenCalledWith(1, 'TEST');
-        expect(store.buscarSubprocessoDetalhe).toHaveBeenCalledWith(10);
-        expect(mapaStore.buscarMapaCompleto).toHaveBeenCalledWith(10);
+        expect(store.buscarContextoEdicao).toHaveBeenCalledWith(10);
+        expect(mapaStore.mapaCompleto.value).toEqual({codigo: 100});
     });
 
     it('limpa subprocessoDetalhe imediatamente ao montar para evitar dados desatualizados', async () => {

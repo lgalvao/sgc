@@ -62,7 +62,17 @@ describe('SubprocessoView Coverage', () => {
         subprocessosMock.subprocessoDetalhe = null;
         subprocessosMock.buscarSubprocessoPorProcessoEUnidade.mockResolvedValue(123);
         subprocessosMock.buscarSubprocessoDetalhe = vi.fn();
-        subprocessosMock.buscarContextoEdicao = vi.fn();
+        subprocessosMock.buscarContextoEdicao = vi.fn().mockImplementation(async () => {
+            subprocessosMock.subprocessoDetalhe = {
+                codigo: 123,
+                unidade: {codigo: 1, sigla: 'TEST', nome: 'Unidade teste'},
+                movimentacoes: [],
+            };
+            return {
+                detalhes: subprocessosMock.subprocessoDetalhe,
+                mapa: {codigo: 1},
+            };
+        });
         subprocessosMock.atualizarStatusLocal = vi.fn();
         subprocessosMock.lastError = null;
 
@@ -219,11 +229,15 @@ describe('SubprocessoView Coverage', () => {
     it('abrirModalAlterarDataLimite and confirmarAlteracaoDataLimite coverage', async () => {
         const pinia = createTestingPinia({createSpy: vi.fn});
 
-        subprocessosMock.buscarSubprocessoDetalhe.mockImplementation(async () => {
+        subprocessosMock.buscarContextoEdicao.mockImplementation(async () => {
             subprocessosMock.subprocessoDetalhe = {
                 codigo: 123,
                 unidade: {codigo: 1, sigla: 'TEST'},
                 prazoEtapaAtual: '2025-01-01'
+            };
+            return {
+                detalhes: subprocessosMock.subprocessoDetalhe,
+                mapa: {codigo: 1},
             };
         });
 
