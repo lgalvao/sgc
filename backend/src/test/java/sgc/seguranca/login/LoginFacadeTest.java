@@ -114,6 +114,23 @@ class LoginFacadeTest {
     }
 
     @Test
+    @DisplayName("entrar deve falhar ADMIN quando autorizações pré-carregadas não incluem admin")
+    void entrar_AdminFalhaComAutorizacoesPreCarregadasSemAdmin() {
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(1L);
+        unidade.setSigla("U1");
+        when(unidadeService.buscarPorCodigo(1L)).thenReturn(unidade);
+
+        EntrarRequest req = new EntrarRequest("ADMIN", 1L);
+        List<PerfilUnidadeDto> autorizacoes = List.of(
+                new PerfilUnidadeDto(Perfil.GESTOR, sgc.organizacao.dto.UnidadeDto.builder().codigo(1L).sigla("U1").build())
+        );
+
+        assertThatThrownBy(() -> loginFacade.entrar(req, "123", autorizacoes))
+                .isInstanceOf(ErroAcessoNegado.class);
+    }
+
+    @Test
     @DisplayName("entrar deve permitir GESTOR na unidade correta")
     void entrar_GestorSucesso() {
         Usuario user = new Usuario();

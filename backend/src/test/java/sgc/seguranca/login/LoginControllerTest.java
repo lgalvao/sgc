@@ -162,6 +162,35 @@ class LoginControllerTest {
     }
 
     @Test
+    @DisplayName("POST /api/usuarios/login - Não deve verificar limite quando IP estiver ausente")
+    @WithMockUser
+    void login_IpNulo() throws Exception {
+        AutenticarRequest req = criarRequestPadrao();
+        UnidadeDto unidadeDto = UnidadeDto.builder().codigo(1L).nome("Adm").sigla("ADM").build();
+        PerfilUnidadeDto perfilUnidade = new PerfilUnidadeDto(Perfil.ADMIN, unidadeDto);
+        Usuario usuario = new Usuario();
+        usuario.setNome("Admin user");
+        usuario.setTituloEleitoral("123");
+
+        when(loginFacade.autenticar("123", "senha")).thenReturn(true);
+        when(loginFacade.buscarAutorizacoesUsuario("123")).thenReturn(List.of(perfilUnidade));
+        when(loginFacade.entrar(any(EntrarRequest.class), eq("123"), anyList())).thenReturn("token-jwt");
+        when(usuarioFacade.buscarPorLogin("123")).thenReturn(usuario);
+
+        mockMvc.perform(post("/api/usuarios/login")
+                        .with(csrf())
+                        .with(request -> {
+                            request.setRemoteAddr(null);
+                            return request;
+                        })
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isOk());
+
+        verify(limitadorTentativasLogin, never()).verificar(anyString());
+    }
+
+    @Test
     @DisplayName("POST /api/usuarios/login - Deve falhar com erro interno se usuário autenticado não tiver perfis")
     @WithMockUser
     void login_SemPerfis_DeveFalharComErroInterno() throws Exception {
@@ -250,6 +279,23 @@ class LoginControllerTest {
         mockMvc.perform(post("/api/usuarios/entrar")
                         .with(csrf())
                         .cookie(new Cookie("SGC_PRE_AUTH", "token-invalido"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @DisplayName("POST /api/usuarios/entrar - Deve falhar quando houver cookies sem pré-auth")
+    @WithMockUser
+    void entrar_SemCookiePreAuthMesmoComOutrosCookies_DeveFalhar() throws Exception {
+        EntrarRequest req = EntrarRequest.builder()
+                .perfil("ADMIN")
+                .unidadeCodigo(1L)
+                .build();
+
+        mockMvc.perform(post("/api/usuarios/entrar")
+                        .with(csrf())
+                        .cookie(new Cookie("OUTRO", "valor"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isUnauthorized());

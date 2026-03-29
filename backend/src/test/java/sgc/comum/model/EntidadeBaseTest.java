@@ -18,4 +18,25 @@ class EntidadeBaseTest {
 
         assertThat(entidade.toString()).isEqualTo("EntidadeTeste[codigo=42]");
     }
+
+    @Test
+    @DisplayName("deve comparar igualdade por código")
+    void deveCompararIgualdadePorCodigo() {
+        EntidadeTeste primeira = new EntidadeTeste();
+        primeira.setCodigo(42L);
+        EntidadeTeste segunda = new EntidadeTeste();
+        segunda.setCodigo(42L);
+
+        assertThat(primeira).isEqualTo(segunda);
+        assertThat(primeira.hashCode()).isEqualTo(segunda.hashCode());
+    }
+
+    @Test
+    @DisplayName("não deve considerar igual quando código for nulo ou tipo for diferente")
+    void naoDeveConsiderarIgualQuandoCodigoNuloOuTipoDiferente() {
+        EntidadeTeste entidade = new EntidadeTeste();
+
+        assertThat(entidade.equals("outro")).isFalse();
+        assertThat(entidade.equals(new EntidadeTeste())).isFalse();
+    }
 }

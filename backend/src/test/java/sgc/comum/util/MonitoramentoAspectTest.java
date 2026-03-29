@@ -45,4 +45,16 @@ class MonitoramentoAspectTest {
 
         assertThat(result).isEqualTo("OK");
     }
+
+    @Test
+    @DisplayName("Deve executar com trace completo mesmo sem assinatura")
+    void deveExecutarComTraceCompletoSemAssinatura() throws Throwable {
+        MonitoramentoAspect aspectoComTrace = new MonitoramentoAspect(true, 1_000);
+        when(joinPoint.getSignature()).thenReturn(null);
+        when(joinPoint.proceed()).thenReturn("TRACE");
+
+        Object result = aspectoComTrace.monitorarExecucao(joinPoint);
+
+        assertThat(result).isEqualTo("TRACE");
+    }
 }
