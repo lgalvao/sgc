@@ -50,6 +50,8 @@ frontend/coverage/coverage-final.json
 # Jqwik
 .jqwik-database
 
+!cobertura_lacunas.json
+
 # Artefatos gerados pelos scripts de análise de mensagens
 mensagens-extraidas.json
 mensagens-analise.md
@@ -58,7 +60,6 @@ analise-testes.md
 analise-testes.json
 complexity-ranking.md
 cobertura-detalhada.txt
-cobertura_lacunas.json
 id-legacy-report.txt
 null-checks-analysis.md
 null-checks-audit.txt

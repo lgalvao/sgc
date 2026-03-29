@@ -1,0 +1,200 @@
+{
+  "globalLineCoverage": "99.64%",
+  "globalBranchCoverage": "97.09%",
+  "totalFilesWithGaps": 16,
+  "gaps": [
+    {
+      "class": "sgc.subprocesso.service.SubprocessoTransicaoService",
+      "coverage": "99.06%",
+      "branchCoverage": "89.39%",
+      "missed": [
+        256,
+        257,
+        259,
+        265
+      ],
+      "partial": [
+        "222(1/4)",
+        "255(1/2)",
+        "256(2/2)",
+        "264(1/2)",
+        "483(1/2)",
+        "672(1/4)"
+      ],
+      "score": 7.5
+    },
+    {
+      "class": "sgc.organizacao.service.UnidadeService",
+      "coverage": "68.18%",
+      "branchCoverage": "100.00%",
+      "missed": [
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67
+      ],
+      "partial": [],
+      "score": 7
+    },
+    {
+      "class": "sgc.subprocesso.service.SubprocessoService",
+      "coverage": "99.78%",
+      "branchCoverage": "98.31%",
+      "missed": [
+        838
+      ],
+      "partial": [
+        "449(1/2)",
+        "656(1/4)",
+        "657(1/6)",
+        "890(1/2)"
+      ],
+      "score": 3
+    },
+    {
+      "class": "sgc.processo.painel.PainelFacade",
+      "coverage": "100.00%",
+      "branchCoverage": "92.31%",
+      "missed": [],
+      "partial": [
+        "154(2/4)",
+        "165(1/4)",
+        "190(1/4)"
+      ],
+      "score": 2
+    },
+    {
+      "class": "sgc.processo.service.ProcessoService",
+      "coverage": "100.00%",
+      "branchCoverage": "97.75%",
+      "missed": [],
+      "partial": [
+        "419(1/2)",
+        "441(1/2)",
+        "487(1/2)",
+        "570(1/2)"
+      ],
+      "score": 2
+    },
+    {
+      "class": "sgc.seguranca.login.LoginController",
+      "coverage": "100.00%",
+      "branchCoverage": "85.71%",
+      "missed": [],
+      "partial": [
+        "93(1/2)",
+        "130(1/2)",
+        "139(1/2)",
+        "148(1/2)"
+      ],
+      "score": 2
+    },
+    {
+      "class": "sgc.organizacao.service.UnidadeHierarquiaService",
+      "coverage": "99.02%",
+      "branchCoverage": "97.92%",
+      "missed": [
+        166
+      ],
+      "partial": [
+        "165(1/2)"
+      ],
+      "score": 1.5
+    },
+    {
+      "class": "sgc.seguranca.SgcPermissionEvaluator",
+      "coverage": "100.00%",
+      "branchCoverage": "95.59%",
+      "missed": [],
+      "partial": [
+        "115(1/4)",
+        "190(1/2)",
+        "203(1/2)"
+      ],
+      "score": 1.5
+    },
+    {
+      "class": "sgc.alerta.AlertaFacade",
+      "coverage": "100.00%",
+      "branchCoverage": "97.50%",
+      "missed": [],
+      "partial": [
+        "45(1/2)"
+      ],
+      "score": 0.5
+    },
+    {
+      "class": "sgc.comum.erros.RestExceptionHandler",
+      "coverage": "100.00%",
+      "branchCoverage": "91.67%",
+      "missed": [],
+      "partial": [
+        "53(1/4)"
+      ],
+      "score": 0.5
+    },
+    {
+      "class": "sgc.mapa.service.MapaSalvamentoService",
+      "coverage": "100.00%",
+      "branchCoverage": "97.22%",
+      "missed": [],
+      "partial": [
+        "148(1/2)"
+      ],
+      "score": 0.5
+    },
+    {
+      "class": "sgc.organizacao.service.HierarquiaService",
+      "coverage": "100.00%",
+      "branchCoverage": "90.00%",
+      "missed": [],
+      "partial": [
+        "27(1/2)"
+      ],
+      "score": 0.5
+    },
+    {
+      "class": "sgc.organizacao.UsuarioFacade",
+      "coverage": "100.00%",
+      "branchCoverage": "93.75%",
+      "missed": [],
+      "partial": [
+        "46(1/6)"
+      ],
+      "score": 0.5
+    },
+    {
+      "class": "sgc.seguranca.login.ClienteAcessoAdE2e",
+      "coverage": "100.00%",
+      "branchCoverage": "75.00%",
+      "missed": [],
+      "partial": [
+        "19(1/2)"
+      ],
+      "score": 0.5
+    },
+    {
+      "class": "sgc.seguranca.login.GerenciadorJwt",
+      "coverage": "100.00%",
+      "branchCoverage": "94.44%",
+      "missed": [],
+      "partial": [
+        "34(1/4)"
+      ],
+      "score": 0.5
+    },
+    {
+      "class": "sgc.subprocesso.model.Subprocesso",
+      "coverage": "100.00%",
+      "branchCoverage": "95.45%",
+      "missed": [],
+      "partial": [
+        "70(1/2)"
+      ],
+      "score": 0.5
+    }
+  ]
+}
