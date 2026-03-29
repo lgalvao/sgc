@@ -372,5 +372,9 @@ O plano terá sido bem executado se:
 * A estabilização de testes em `SubprocessoTransicaoService` exigiu remover stubs obsoletos, alinhar mocks ao uso de `SubprocessoService` e ajustar expectativas para o fluxo real de revisão sem impactos.
 * No frontend, `configuracoes` foi um bom candidato para sair do Pinia: havia um único consumo real e nenhum benefício claro de estado global.
 * `useMapas` aceitou redução de repetição interna com helper genérico e remoção de fallback duplicado.
+* A remoção de `mapaService` foi segura porque ele só duplicava uma consulta já exposta por `subprocessoService`; a consolidação reduziu uma fronteira artificial sem mexer em contrato HTTP.
+* `useProcessos` tinha repetição interna relevante de carregamento e recarga de detalhe; helpers privados foram suficientes para reduzir ruído sem mudar a API pública do composable.
+* `UnidadesView` era um caso claro de `loading`/`erro` manual já coberto por `useAsyncAction`; a migração simplificou a tela sem alterar mensagens nem comportamento visual.
 * Em permissões, a fonte de verdade continua sendo `etc/docs/regras-acesso.md`; simplificação nessa área só pode acontecer quando o comportamento continuar exatamente alinhado à regra documental.
 * `UnidadeView` ainda parece depender de estado global implícito de mapa; esse acoplamento só deve ser removido com segurança quando houver API suficiente para reconstruir o destino da navegação sem reaproveitar estado de outra tela.
+* `LoadingButton.vue` continua sendo um wrapper fino, mas o volume de uso torna a remoção imediata cara demais; o melhor caminho agora é impedir novos wrappers fracos e só reavaliar esse componente junto de refatorações de telas maiores.

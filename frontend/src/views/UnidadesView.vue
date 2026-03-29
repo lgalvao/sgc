@@ -57,10 +57,10 @@ import EmptyState from "@/components/comum/EmptyState.vue";
 import {buscarTodasUnidades, mapUnidadesArray} from "@/services/unidadeService";
 import type {Unidade} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
+import {useAsyncAction} from "@/composables/useAsyncAction";
 
 const unidades = ref<Unidade[]>([]);
-const isLoading = ref(false);
-const erro = ref<string | null>(null);
+const {carregando: isLoading, erro, executarSilencioso} = useAsyncAction();
 
 const erroUnidades = computed(() =>
     erro.value ? {message: erro.value} : null
@@ -73,16 +73,10 @@ function clearError() {
 const selecaoVazia = ref<number[]>([]);
 
 async function carregarUnidades() {
-  isLoading.value = true;
-  erro.value = null;
-  try {
+  await executarSilencioso(async () => {
     const response = await buscarTodasUnidades();
     unidades.value = mapUnidadesArray(response as any);
-  } catch (err: any) {
-    erro.value = err.message || TEXTOS.comum.ERRO_OPERACAO;
-  } finally {
-    isLoading.value = false;
-  }
+  }, TEXTOS.comum.ERRO_OPERACAO);
 }
 
 onMounted(carregarUnidades);

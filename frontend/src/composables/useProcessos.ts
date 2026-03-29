@@ -31,6 +31,29 @@ async function recarregarProcessoDetalheAtual() {
     }
 }
 
+async function executarComCarregamento<T>(acao: () => Promise<T>) {
+    carregando.value = true;
+    try {
+        return await acao();
+    } finally {
+        carregando.value = false;
+    }
+}
+
+async function executarComTratamentoECarregamento<T>(
+    acao: () => Promise<T>,
+    onError?: () => void,
+) {
+    return withErrorHandling(() => executarComCarregamento(acao), onError);
+}
+
+async function executarAcaoComRecarga(acao: () => Promise<void>) {
+    return withErrorHandling(async () => {
+        await acao();
+        await recarregarProcessoDetalheAtual();
+    });
+}
+
 async function buscarProcessosPainel(
     unidade: number,
     page: number,
@@ -38,8 +61,7 @@ async function buscarProcessosPainel(
     sort?: keyof ProcessoResumo,
     order?: "asc" | "desc",
 ) {
-    return withErrorHandling(async () => {
-        carregando.value = true;
+    return executarComTratamentoECarregamento(async () => {
         const response = await painelService.listarProcessos(
             unidade,
             page,
@@ -49,64 +71,44 @@ async function buscarProcessosPainel(
         );
         processosPainel.value = response?.content ?? [];
         processosPainelPage.value = response ?? criarPaginaVazia<ProcessoResumo>();
-    }).finally(() => {
-        carregando.value = false;
     });
 }
 
 async function criarProcesso(request: CriarProcessoRequest) {
-    return withErrorHandling(async () => {
-        carregando.value = true;
+    return executarComTratamentoECarregamento(async () => {
         return await processoService.criarProcesso(request);
-    }).finally(() => {
-        carregando.value = false;
     });
 }
 
 async function atualizarProcesso(codigo: number, request: AtualizarProcessoRequest) {
-    return withErrorHandling(async () => {
-        carregando.value = true;
+    return executarComTratamentoECarregamento(async () => {
         const p = await processoService.atualizarProcesso(codigo, request);
         await recarregarProcessoDetalheAtual();
         return p;
-    }).finally(() => {
-        carregando.value = false;
     });
 }
 
 async function removerProcesso(codigo: number) {
-    return withErrorHandling(async () => {
-        carregando.value = true;
+    return executarComTratamentoECarregamento(async () => {
         await processoService.excluirProcesso(codigo);
-    }).finally(() => {
-        carregando.value = false;
     });
 }
 
 async function iniciarProcesso(codigo: number, tipo: string, unidades: number[]) {
-    return withErrorHandling(async () => {
-        carregando.value = true;
+    return executarComTratamentoECarregamento(async () => {
         await processoService.iniciarProcesso(codigo, tipo, unidades);
-    }).finally(() => {
-        carregando.value = false;
     });
 }
 
 async function buscarProcessosFinalizados() {
-    return withErrorHandling(async () => {
-        carregando.value = true;
+    return executarComTratamentoECarregamento(async () => {
         processosFinalizados.value = await processoService.buscarProcessosFinalizados() ?? [];
-    }).finally(() => {
-        carregando.value = false;
     });
 }
 
 async function buscarProcessosParaImportacao() {
-    return withErrorHandling(async () => {
-        carregando.value = true;
+    return executarComTratamentoECarregamento(async () => {
         processosParaImportacao.value = await processoService.buscarProcessosParaImportacao() ?? [];
-    }).finally(() => {
-        carregando.value = false;
     });
 }
 
@@ -115,14 +117,11 @@ async function buscarUnidadesParaImportacao(codigoProcesso: number): Promise<Uni
 }
 
 async function buscarProcessoDetalhe(codigoProcesso: number) {
-    return withErrorHandling(async () => {
-        carregando.value = true;
+    return executarComTratamentoECarregamento(async () => {
         setProcessoDetalhe(null);
         processoDetalhe.value = await processoService.obterDetalhesProcesso(codigoProcesso);
     }, () => {
         setProcessoDetalhe(null);
-    }).finally(() => {
-        carregando.value = false;
     });
 }
 
@@ -133,69 +132,57 @@ async function buscarSubprocessosElegiveis(codigoProcesso: number) {
 }
 
 async function finalizarProcesso(codigoProcesso: number) {
-    return withErrorHandling(async () => {
-        carregando.value = true;
+    return executarComTratamentoECarregamento(async () => {
         await processoService.finalizarProcesso(codigoProcesso);
         await recarregarProcessoDetalheAtual();
-    }).finally(() => {
-        carregando.value = false;
     });
 }
 
 async function executarAcaoBloco(acao: "aceitar" | "homologar" | "disponibilizar", unidadeCodigos: number[], dataLimite?: string) {
     if (!processoDetalhe.value) throw new Error("Detalhes do processo não carregados.");
-    return withErrorHandling(async () => {
-        carregando.value = true;
+    return executarComTratamentoECarregamento(async () => {
         await processoService.executarAcaoEmBloco(processoDetalhe.value!.codigo, {
             unidadeCodigos,
             acao,
             dataLimite
         });
         await recarregarProcessoDetalheAtual();
-    }).finally(() => {
-        carregando.value = false;
     });
 }
 
 async function alterarDataLimiteSubprocesso(codSubprocesso: number, dados: { novaData: string }) {
-    return withErrorHandling(async () => {
+    return executarAcaoComRecarga(async () => {
         await processoService.alterarDataLimiteSubprocesso(codSubprocesso, dados);
-        await recarregarProcessoDetalheAtual();
     });
 }
 
 async function apresentarSugestoes(codSubprocesso: number, dados: { sugestoes: string }) {
-    return withErrorHandling(async () => {
+    return executarAcaoComRecarga(async () => {
         await processoService.apresentarSugestoes(codSubprocesso, dados);
-        await recarregarProcessoDetalheAtual();
     });
 }
 
 async function validarMapa(codSubprocesso: number) {
-    return withErrorHandling(async () => {
+    return executarAcaoComRecarga(async () => {
         await processoService.validarMapa(codSubprocesso);
-        await recarregarProcessoDetalheAtual();
     });
 }
 
 async function homologarValidacao(codSubprocesso: number, dados: { texto: string }) {
-    return withErrorHandling(async () => {
+    return executarAcaoComRecarga(async () => {
         await processoService.homologarValidacao(codSubprocesso, dados);
-        await recarregarProcessoDetalheAtual();
     });
 }
 
 async function aceitarValidacao(codSubprocesso: number, dados: { texto: string }) {
-    return withErrorHandling(async () => {
+    return executarAcaoComRecarga(async () => {
         await processoService.aceitarValidacao(codSubprocesso, dados);
-        await recarregarProcessoDetalheAtual();
     });
 }
 
 async function devolverValidacao(codSubprocesso: number, dados: { justificativa: string }) {
-    return withErrorHandling(async () => {
+    return executarAcaoComRecarga(async () => {
         await processoService.devolverValidacao(codSubprocesso, dados);
-        await recarregarProcessoDetalheAtual();
     });
 }
 
@@ -223,9 +210,8 @@ async function processarCadastroBloco(payload: {
     tipoAcao: "aceitar" | "homologar";
     unidadeUsuario: string;
 }) {
-    return withErrorHandling(async () => {
+    return executarAcaoComRecarga(async () => {
         await processoService.processarAcaoEmBloco(payload);
-        await recarregarProcessoDetalheAtual();
     });
 }
 
