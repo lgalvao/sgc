@@ -12,6 +12,7 @@ import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
 import sgc.processo.model.*;
 import sgc.subprocesso.model.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -342,5 +343,40 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         service.disponibilizarMapa(1L, req, new Usuario()); // branch 228 (ultima != null && isBefore = false)
 
         assertThat(sp.getDataLimiteEtapa2()).isEqualTo(LocalDateTime.of(2026, 1, 1, 0, 0));
+    }
+
+    @Test
+    @DisplayName("obterUltimaDataLimite - retorna nulo quando etapa1 e etapa2 ausentes")
+    void obterUltimaDataLimite_semDatas() {
+        Subprocesso sp = new Subprocesso();
+
+        LocalDate resultado = invokeMethod(service, "obterUltimaDataLimite", sp);
+
+        assertThat(resultado).isNull();
+    }
+
+    @Test
+    @DisplayName("obterUltimaDataLimite - lança erro quando etapa2 existe sem etapa1")
+    void obterUltimaDataLimite_etapa2SemEtapa1() {
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(123L);
+        sp.setDataLimiteEtapa2(LocalDateTime.now().plusDays(5));
+
+        assertThatThrownBy(() -> invokeMethod(service, "obterUltimaDataLimite", sp))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("sem data limite da etapa 1");
+    }
+
+    @Test
+    @DisplayName("obterUltimaDataLimite - lança erro quando etapa1 é posterior à etapa2")
+    void obterUltimaDataLimite_etapa1PosteriorEtapa2() {
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(456L);
+        sp.setDataLimiteEtapa1(LocalDateTime.now().plusDays(10));
+        sp.setDataLimiteEtapa2(LocalDateTime.now().plusDays(2));
+
+        assertThatThrownBy(() -> invokeMethod(service, "obterUltimaDataLimite", sp))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("etapa 1 posterior à etapa 2");
     }
 }

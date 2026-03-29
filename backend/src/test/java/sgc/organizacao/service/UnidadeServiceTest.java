@@ -5,7 +5,10 @@ import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
 import sgc.comum.model.*;
+import sgc.organizacao.dto.*;
 import sgc.mapa.model.*;
+import sgc.processo.model.*;
+import sgc.subprocesso.model.*;
 import sgc.organizacao.model.*;
 
 import java.util.*;
@@ -97,6 +100,55 @@ class UnidadeServiceTest {
     void buscarTodosCodigosUnidadesComMapa() {
         when(unidadeMapaRepo.findAllUnidadeCodigos()).thenReturn(List.of(1L, 2L));
         assertThat(service.buscarTodosCodigosUnidadesComMapa()).hasSize(2);
+    }
+
+    @Test
+    @DisplayName("buscarReferenciaMapaVigente - Retorna vazio quando unidade não tem mapa vigente")
+    void buscarReferenciaMapaVigente_semMapaVigente() {
+        when(unidadeMapaRepo.findByUnidadeCodigo(1L)).thenReturn(Optional.empty());
+
+        Optional<MapaVigenteReferenciaDto> resultado = service.buscarReferenciaMapaVigente(1L);
+
+        assertThat(resultado).isEmpty();
+    }
+
+    @Test
+    @DisplayName("buscarReferenciaMapaVigente - Retorna vazio quando mapa não tem subprocesso")
+    void buscarReferenciaMapaVigente_mapaSemSubprocesso() {
+        UnidadeMapa unidadeMapa = new UnidadeMapa();
+        unidadeMapa.setMapaVigente(new Mapa());
+        when(unidadeMapaRepo.findByUnidadeCodigo(1L)).thenReturn(Optional.of(unidadeMapa));
+
+        Optional<MapaVigenteReferenciaDto> resultado = service.buscarReferenciaMapaVigente(1L);
+
+        assertThat(resultado).isEmpty();
+    }
+
+    @Test
+    @DisplayName("buscarReferenciaMapaVigente - Retorna referência do processo e subprocesso")
+    void buscarReferenciaMapaVigente_retornaReferencia() {
+        Processo processo = Processo.builder().build();
+        processo.setCodigo(10L);
+
+        Subprocesso subprocesso = Subprocesso.builder().build();
+        subprocesso.setCodigo(20L);
+        subprocesso.setProcesso(processo);
+
+        Mapa mapa = new Mapa();
+        mapa.setSubprocesso(subprocesso);
+
+        UnidadeMapa unidadeMapa = new UnidadeMapa();
+        unidadeMapa.setMapaVigente(mapa);
+
+        when(unidadeMapaRepo.findByUnidadeCodigo(1L)).thenReturn(Optional.of(unidadeMapa));
+
+        Optional<MapaVigenteReferenciaDto> resultado = service.buscarReferenciaMapaVigente(1L);
+
+        assertThat(resultado)
+                .isPresent()
+                .get()
+                .extracting(MapaVigenteReferenciaDto::codProcesso, MapaVigenteReferenciaDto::codSubprocesso)
+                .containsExactly(10L, 20L);
     }
 
     @Test

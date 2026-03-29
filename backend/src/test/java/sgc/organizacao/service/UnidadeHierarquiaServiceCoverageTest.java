@@ -105,4 +105,20 @@ class UnidadeHierarquiaServiceCoverageTest {
         assertThat(result).hasSize(1);
         assertThat(result.getFirst().isElegivel()).isTrue();
     }
+
+    @Test
+    @DisplayName("montarHierarquia deve ignorar unidade quando não encontrar DTO no mapa")
+    void deveIgnorarUnidadeQuandoDtoNaoEncontradoNoMapa() {
+        Unidade unidadeMutavel = mock(Unidade.class);
+        when(unidadeMutavel.getCodigo()).thenReturn(10L, 10L, 11L);
+        when(unidadeMutavel.getNome()).thenReturn("Unidade Mutável");
+        when(unidadeMutavel.getSigla()).thenReturn("UM");
+        when(unidadeMutavel.getTipo()).thenReturn(OPERACIONAL);
+        when(unidadeMutavel.getUnidadeSuperior()).thenReturn(null);
+        when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(unidadeMutavel));
+
+        List<UnidadeDto> resultado = target.buscarArvoreHierarquica();
+
+        assertThat(resultado).isEmpty();
+    }
 }

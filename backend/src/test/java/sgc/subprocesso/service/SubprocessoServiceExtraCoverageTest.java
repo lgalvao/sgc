@@ -939,6 +939,16 @@ class SubprocessoServiceExtraCoverageTest {
     @DisplayName("Análises e Histórico")
     class AnalisesEHistorico {
         @Test
+        @DisplayName("listarAnalisesPorSubprocesso sem filtro")
+        void listarAnalisesSemFiltro() {
+            Analise a1 = new Analise();
+            Analise a2 = new Analise();
+            when(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(1L)).thenReturn(List.of(a1, a2));
+
+            assertThat(subprocessoService.listarAnalisesPorSubprocesso(1L)).containsExactly(a1, a2);
+        }
+
+        @Test
         @DisplayName("listarAnalisesPorSubprocesso com filtro de tipo")
         void listarAnalisesComFiltro() {
             Analise a1 = new Analise(); a1.setTipo(TipoAnalise.CADASTRO);

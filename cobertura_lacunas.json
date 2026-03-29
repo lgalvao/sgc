@@ -1,59 +1,8 @@
 {
-  "globalLineCoverage": "99.64%",
-  "globalBranchCoverage": "97.09%",
-  "totalFilesWithGaps": 16,
+  "globalLineCoverage": "100.00%",
+  "globalBranchCoverage": "97.51%",
+  "totalFilesWithGaps": 14,
   "gaps": [
-    {
-      "class": "sgc.subprocesso.service.SubprocessoTransicaoService",
-      "coverage": "99.06%",
-      "branchCoverage": "89.39%",
-      "missed": [
-        256,
-        257,
-        259,
-        265
-      ],
-      "partial": [
-        "222(1/4)",
-        "255(1/2)",
-        "256(2/2)",
-        "264(1/2)",
-        "483(1/2)",
-        "672(1/4)"
-      ],
-      "score": 7.5
-    },
-    {
-      "class": "sgc.organizacao.service.UnidadeService",
-      "coverage": "68.18%",
-      "branchCoverage": "100.00%",
-      "missed": [
-        61,
-        62,
-        63,
-        64,
-        65,
-        66,
-        67
-      ],
-      "partial": [],
-      "score": 7
-    },
-    {
-      "class": "sgc.subprocesso.service.SubprocessoService",
-      "coverage": "99.78%",
-      "branchCoverage": "98.31%",
-      "missed": [
-        838
-      ],
-      "partial": [
-        "449(1/2)",
-        "656(1/4)",
-        "657(1/6)",
-        "890(1/2)"
-      ],
-      "score": 3
-    },
     {
       "class": "sgc.processo.painel.PainelFacade",
       "coverage": "100.00%",
@@ -93,16 +42,17 @@
       "score": 2
     },
     {
-      "class": "sgc.organizacao.service.UnidadeHierarquiaService",
-      "coverage": "99.02%",
-      "branchCoverage": "97.92%",
-      "missed": [
-        166
-      ],
+      "class": "sgc.subprocesso.service.SubprocessoService",
+      "coverage": "100.00%",
+      "branchCoverage": "98.31%",
+      "missed": [],
       "partial": [
-        "165(1/2)"
+        "449(1/2)",
+        "656(1/4)",
+        "657(1/6)",
+        "890(1/2)"
       ],
-      "score": 1.5
+      "score": 2
     },
     {
       "class": "sgc.seguranca.SgcPermissionEvaluator",
@@ -113,6 +63,18 @@
         "115(1/4)",
         "190(1/2)",
         "203(1/2)"
+      ],
+      "score": 1.5
+    },
+    {
+      "class": "sgc.subprocesso.service.SubprocessoTransicaoService",
+      "coverage": "100.00%",
+      "branchCoverage": "95.45%",
+      "missed": [],
+      "partial": [
+        "222(1/4)",
+        "483(1/2)",
+        "672(1/4)"
       ],
       "score": 1.5
     },
