@@ -1,28 +1,8 @@
 {
-  "globalLineCoverage": "99.89%",
-  "globalBranchCoverage": "97.17%",
+  "globalLineCoverage": "100.00%",
+  "globalBranchCoverage": "97.51%",
   "totalFilesWithGaps": 14,
   "gaps": [
-    {
-      "class": "sgc.subprocesso.service.SubprocessoTransicaoService",
-      "coverage": "99.06%",
-      "branchCoverage": "89.39%",
-      "missed": [
-        256,
-        257,
-        259,
-        265
-      ],
-      "partial": [
-        "222(1/4)",
-        "255(1/2)",
-        "256(2/2)",
-        "264(1/2)",
-        "483(1/2)",
-        "672(1/4)"
-      ],
-      "score": 7.5
-    },
     {
       "class": "sgc.processo.painel.PainelFacade",
       "coverage": "100.00%",
@@ -83,6 +63,18 @@
         "115(1/4)",
         "190(1/2)",
         "203(1/2)"
+      ],
+      "score": 1.5
+    },
+    {
+      "class": "sgc.subprocesso.service.SubprocessoTransicaoService",
+      "coverage": "100.00%",
+      "branchCoverage": "95.45%",
+      "missed": [],
+      "partial": [
+        "222(1/4)",
+        "483(1/2)",
+        "672(1/4)"
       ],
       "score": 1.5
     },
