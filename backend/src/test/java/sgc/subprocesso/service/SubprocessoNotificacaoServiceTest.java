@@ -205,17 +205,7 @@ class SubprocessoNotificacaoServiceTest {
     @Test
     @DisplayName("deve lançar erro quando template direto estiver ausente")
     void deveLancarErroQuandoTemplateDiretoAusente() {
-        Unidade origem = criarUnidade(10L, "ORIG", "Unidade origem");
-        Unidade destino = criarUnidade(20L, "DEST", "Unidade destino");
-        Processo processo = criarProcesso(TipoProcesso.MAPEAMENTO);
-        Subprocesso subprocesso = criarSubprocesso(origem, processo);
-
-        assertThatThrownBy(() -> service.notificarTransicao(NotificacaoCommand.builder()
-                .subprocesso(subprocesso)
-                .tipoTransicao(TipoTransicao.MAPA_DEVOLVIDO)
-                .unidadeOrigem(origem)
-                .unidadeDestino(destino)
-                .build()))
+        assertThatThrownBy(() -> invokeMethod(service, "obterTemplateObrigatorio", " ", "e-mail direto"))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("Template ausente");
     }

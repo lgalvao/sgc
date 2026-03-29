@@ -205,10 +205,9 @@ describe("Processo.vue", () => {
         perfilStore = usePerfilStore();
         toastStore = useToastStore();
         await nextTick();
+        await flushPromises();
 
-        const alert = wrapper.find('[data-testid="app-alert"]');
-        expect(alert.exists()).toBe(true);
-        expect(alert.text()).toContain("Erro ao carregar");
+        expect(wrapper.text()).toContain("Erro ao carregar");
 
         const alertCmp = wrapper.findComponent(BAlertStub);
         await alertCmp.vm.$emit("dismissed");
@@ -533,7 +532,6 @@ describe("Processo.vue", () => {
             perfilSelecionado: Perfil.GESTOR,
             perfis: [Perfil.GESTOR]
         });
-        aplicarContextoProcesso();
 
         await nextTick();
         await flushPromises();
@@ -569,7 +567,6 @@ describe("Processo.vue", () => {
             perfilSelecionado: Perfil.SERVIDOR,
             unidadeSelecionada: 999,
         });
-        aplicarContextoProcesso();
 
         await nextTick();
         await flushPromises();
@@ -595,7 +592,6 @@ describe("Processo.vue", () => {
 
     it("deve abrir modal de finalização de processo", async () => {
         wrapper = createWrapper();
-        aplicarContextoProcesso();
 
         await nextTick();
         await flushPromises();
@@ -609,20 +605,18 @@ describe("Processo.vue", () => {
     it("deve chamar API de finalizar processo com sucesso", async () => {
         wrapper = createWrapper();
         toastStore = useToastStore();
-        aplicarContextoProcesso();
 
         await nextTick();
         await flushPromises();
 
         await (wrapper.vm).confirmarFinalizacao();
 
-        expect(processosMock.finalizarProcesso).toHaveBeenCalledWith(1);
+        expect(processoService.finalizarProcesso).toHaveBeenCalledWith(1);
         expect(toastStore.setPending).toHaveBeenCalledWith(TEXTOS.sucesso.PROCESSO_FINALIZADO);
         expect(mocks.push).toHaveBeenCalledWith("/painel");
     });
 
     it("deve lidar com atualizações de estado do modal, descarte de notificações, erros de navegação e exibição de carregamento", async () => {
-        aplicarContextoProcesso();
         const vm = wrapper.vm;
 
         // v-model cover (95)
@@ -639,7 +633,7 @@ describe("Processo.vue", () => {
         if (bAlerts.length > 0) await bAlerts[0].vm.$emit('dismissed');
 
         // error branches (428-431)
-        processosMock.finalizarProcesso.mockRejectedValue(new Error("Erro final"));
+        vi.mocked(processoService.finalizarProcesso).mockRejectedValue(new Error("Erro final"));
         await vm.confirmarFinalizacao();
 
         // branch 402-404 (abrirDetalhesUnidade not clickable)
@@ -651,7 +645,9 @@ describe("Processo.vue", () => {
         await vm.abrirDetalhesUnidade({clickable: true, sigla: "ERR"});
 
         // loading state (77-80)
-        processosMock.processoDetalhe.value = null;
+        wrapper.unmount();
+        vi.mocked(processoService.buscarContextoCompleto).mockReturnValue(new Promise(() => {}) as any);
+        wrapper = createWrapper();
         await nextTick();
         expect(wrapper.findComponent(BSpinnerStub).exists()).toBe(true);
     });

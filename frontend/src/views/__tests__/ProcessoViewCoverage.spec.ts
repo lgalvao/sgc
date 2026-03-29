@@ -3,8 +3,8 @@ import {flushPromises, mount} from "@vue/test-utils";
 import Processo from "@/views/ProcessoDetalheView.vue";
 import {usePerfilStore} from "@/stores/perfil";
 import {createTestingPinia} from "@pinia/testing";
-import {ref} from "vue";
 import {SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
+import * as processoService from "@/services/processoService";
 
 const mocks = vi.hoisted(() => ({
     push: vi.fn(),
@@ -28,20 +28,6 @@ vi.mock("vue-router", () => ({
 }));
 
 vi.mock("@/services/processoService");
-
-const processosMock = {
-    processoDetalhe: ref<any>(null),
-    subprocessosElegiveis: ref<any[]>([]),
-    lastError: ref<any>(null),
-    clearError: vi.fn(),
-    buscarContextoCompleto: vi.fn().mockResolvedValue(undefined),
-    finalizarProcesso: vi.fn().mockResolvedValue(undefined),
-    executarAcaoBloco: vi.fn().mockResolvedValue(undefined),
-};
-
-vi.mock("@/composables/useProcessos", () => ({
-    useProcessos: () => processosMock
-}));
 
 const ModalAcaoBlocoStub = {
     name: 'ModalAcaoBloco',
@@ -98,18 +84,25 @@ describe("ProcessoViewCoverage.spec.ts", () => {
             store.$patch(initialState.perfil);
         }
 
-        processosMock.processoDetalhe.value = initialState.processos?.processoDetalhe ?? {
+        const processo = initialState.processos?.processoDetalhe ?? {
             codigo: 1,
             descricao: "Processo teste",
             tipo: TipoProcesso.MAPEAMENTO,
             situacao: "EM_ANDAMENTO",
             unidades: []
         };
-        processosMock.subprocessosElegiveis.value = initialState.processos?.subprocessosElegiveis ?? [];
-        processosMock.lastError.value = initialState.processos?.lastError ?? null;
-        processosMock.buscarContextoCompleto.mockResolvedValue(undefined);
-        processosMock.finalizarProcesso.mockResolvedValue(undefined);
-        processosMock.executarAcaoBloco.mockResolvedValue(undefined);
+        const subprocessosElegiveis = initialState.processos?.subprocessosElegiveis ?? [];
+
+        if (initialState.processos?.lastError) {
+            vi.mocked(processoService.buscarContextoCompleto).mockRejectedValue(new Error(initialState.processos.lastError.message));
+        } else {
+            vi.mocked(processoService.buscarContextoCompleto).mockResolvedValue({
+                ...processo,
+                elegiveis: subprocessosElegiveis,
+            } as any);
+        }
+        vi.mocked(processoService.finalizarProcesso).mockResolvedValue(undefined);
+        vi.mocked(processoService.executarAcaoEmBloco).mockResolvedValue(undefined);
 
         const options: any = {
             global: {
@@ -127,15 +120,12 @@ describe("ProcessoViewCoverage.spec.ts", () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
-        processosMock.processoDetalhe.value = null;
-        processosMock.subprocessosElegiveis.value = [];
-        processosMock.lastError.value = null;
     });
 
     it("deve lidar com erro ao finalizar processo", async () => {
         const wrapper = createWrapper();
 
-        vi.mocked(processosMock.finalizarProcesso).mockRejectedValue(new Error("Erro ao finalizar"));
+        vi.mocked(processoService.finalizarProcesso).mockRejectedValue(new Error("Erro ao finalizar"));
 
         await flushPromises();
 
@@ -227,11 +217,12 @@ describe("ProcessoViewCoverage.spec.ts", () => {
                 ]
             }
         });
+        await flushPromises();
 
         const modal = wrapper.findComponent({name: 'ModalAcaoBloco'});
 
         (wrapper.vm as any).acaoBlocoAtual = 'aceitar';
-        (processosMock.executarAcaoBloco as any).mockRejectedValue(new Error("Erro bloco"));
+        vi.mocked(processoService.executarAcaoEmBloco).mockRejectedValue(new Error("Erro bloco"));
 
         await modal.vm.$emit("confirmar", {ids: [1]});
         await flushPromises();
@@ -262,6 +253,7 @@ describe("ProcessoViewCoverage.spec.ts", () => {
                 ]
             }
         });
+        await flushPromises();
         (wrapper.vm as any).acaoBlocoAtual = 'disponibilizar';
         expect((wrapper.vm as any).unidadesElegiveis).toHaveLength(1);
         expect((wrapper.vm as any).unidadesElegiveis[0].sigla).toBe("A");
@@ -288,6 +280,7 @@ describe("ProcessoViewCoverage.spec.ts", () => {
                 ]
             }
         });
+        await flushPromises();
         (wrapper.vm as any).acaoBlocoAtual = 'homologar';
         expect((wrapper.vm as any).unidadesElegiveis).toHaveLength(1);
     });
@@ -313,6 +306,7 @@ describe("ProcessoViewCoverage.spec.ts", () => {
                 ]
             }
         });
+        await flushPromises();
         (wrapper.vm as any).acaoBlocoAtual = 'aceitar';
         expect((wrapper.vm as any).unidadesElegiveis).toHaveLength(1);
         expect((wrapper.vm as any).unidadesElegiveis[0].sigla).toBe("A");

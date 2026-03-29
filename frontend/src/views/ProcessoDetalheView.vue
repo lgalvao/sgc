@@ -479,7 +479,11 @@ async function executarAcaoBloco(dados: { ids: number[], dataLimite?: string }) 
 
 onMounted(async () => {
   if (codProcesso) {
-    await carregarContextoCompleto();
+    try {
+      await carregarContextoCompleto();
+    } catch {
+      // O erro já foi convertido em estado local para exibição inline.
+    }
   }
 });
 

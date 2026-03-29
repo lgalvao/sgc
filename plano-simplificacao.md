@@ -570,3 +570,7 @@ O plano terá sido bem executado se:
 * Depois desse corte, `useProcessos` ficou concentrado em detalhe, contexto completo e ações de processo. Isso é um bom sinal de fronteira útil: menos leitura local disfarçada de estado global e mais API alinhada ao domínio.
 * Nem todo helper precisa continuar como composable. Quando a abstração encolhe para uma ou duas funções puramente locais, com um único consumidor real, voltar para o componente reduz navegação e custo cognitivo.
 * `useValidacao` entrou nesse caso: manter um arquivo separado só para descobrir o primeiro campo com erro já não compensava, e o melhor destino passou a ser o próprio `ProcessoFormFields`.
+* `ProcessoCadastroView` também deixou de depender de `useProcessos`: a tela agora chama `processoService` diretamente e normaliza o erro localmente, o que reduziu mais uma ponte singleton usada apenas para chamadas imediatas.
+* Para preservar comportamento antigo, a tela passou a tratar erro estruturado de API de forma diferente de `Error` genérico: payload de validação continua mapeando campos, enquanto falha genérica continua exibindo a mensagem padrão da tela.
+* `ProcessoDetalheView` seguiu o mesmo caminho e passou a carregar seu próprio contexto via `processoService`, mantendo `processo`, `elegiveis` e erro de carga como estado local da view.
+* Depois dessa rodada, `useProcessos` ficou sem consumidores de produção. Isso indica que a próxima limpeza é mecânica: remover o composable e apagar mocks de teste herdados do desenho antigo.

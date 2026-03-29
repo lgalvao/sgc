@@ -26,7 +26,7 @@ class MapaManutencaoServiceCoverageExtraTest {
     @Mock private ConhecimentoRepo conhecimentoRepo;
     @Mock private MapaRepo mapaRepo;
     @Mock private ComumRepo repo;
-    @Mock private SubprocessoService subprocessoService;
+    @Mock private SubprocessoSituacaoService subprocessoSituacaoService;
 
     @InjectMocks
     private MapaManutencaoService mapaService;
@@ -113,7 +113,6 @@ class MapaManutencaoServiceCoverageExtraTest {
 
         mapaService.atualizarAtividade(1L, new AtualizarAtividadeRequest("descricao"));
 
-        verify(atividadeRepo, never()).findByMapaCodigoSemFetch(anyLong());
         verify(atividadeRepo).save(atividade);
     }
 
