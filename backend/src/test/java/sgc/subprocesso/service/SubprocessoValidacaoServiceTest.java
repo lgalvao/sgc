@@ -41,6 +41,26 @@ class SubprocessoValidacaoServiceTest {
                 .isInstanceOf(ErroValidacao.class)
                 .hasMessageContaining(Mensagens.SUBPROCESSO_SEM_MAPA);
         }
+
+        @Test
+        @DisplayName("não deve lançar erro quando todas as atividades possuem conhecimento")
+        void sucessoQuandoTodasAsAtividadesPossuemConhecimento() {
+            Subprocesso sp = new Subprocesso();
+            Mapa mapa = new Mapa();
+            mapa.setCodigo(1L);
+            sp.setMapa(mapa);
+
+            Atividade atividade = new Atividade();
+            atividade.setCodigo(10L);
+            atividade.setDescricao("Atividade");
+            atividade.setConhecimentos(Set.of(new Conhecimento()));
+
+            when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(1L)).thenReturn(List.of(atividade));
+
+            validacaoService.validarExistenciaAtividades(sp);
+
+            verify(mapaManutencaoService).atividadesMapaCodigoComConhecimentos(1L);
+        }
     }
 
     @Nested

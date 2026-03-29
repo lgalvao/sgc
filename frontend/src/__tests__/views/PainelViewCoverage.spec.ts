@@ -5,7 +5,6 @@ import PainelView from '@/views/PainelView.vue';
 import {useToastStore} from '@/stores/toast';
 import * as painelService from '@/services/painelService';
 import {useRouter} from 'vue-router';
-import {ref} from 'vue';
 
 vi.mock("vue-router", () => ({
     useRouter: vi.fn(),
@@ -37,26 +36,17 @@ vi.mock("@/services/painelService", () => ({
     listarAlertas: vi.fn(),
 }));
 
-const processosMock = {
-    processosPainel: ref([]),
-    buscarProcessosPainel: vi.fn(),
-};
-
-vi.mock("@/composables/useProcessos", () => ({
-    useProcessos: () => processosMock
-}));
-
 describe('PainelView Coverage', () => {
     let routerPushMock: any;
 
     beforeEach(() => {
         vi.clearAllMocks();
-        processosMock.processosPainel.value = [];
         routerPushMock = vi.fn();
         (useRouter as any).mockReturnValue({
             push: routerPushMock,
         });
         (painelService.listarAlertas as any).mockResolvedValue(mockPageVazia);
+        (painelService.listarProcessos as any).mockResolvedValue(mockPageVazia);
     });
 
     const commonStubs = {
@@ -98,7 +88,7 @@ describe('PainelView Coverage', () => {
 
         await wrapper.vm.$nextTick();
 
-        expect(processosMock.buscarProcessosPainel).toHaveBeenCalled();
+        expect(painelService.listarProcessos).toHaveBeenCalled();
         expect(painelService.listarAlertas).toHaveBeenCalled();
     });
 
@@ -126,12 +116,12 @@ describe('PainelView Coverage', () => {
 
         await (wrapper.vm as any).ordenarPor('descricao');
 
-        expect(processosMock.buscarProcessosPainel).toHaveBeenLastCalledWith(
+        expect(painelService.listarProcessos).toHaveBeenLastCalledWith(
             1, 0, 10, 'descricao', 'desc'
         );
 
         await (wrapper.vm as any).ordenarPor('tipo');
-        expect(processosMock.buscarProcessosPainel).toHaveBeenLastCalledWith(
+        expect(painelService.listarProcessos).toHaveBeenLastCalledWith(
             1, 0, 10, 'tipo', 'asc'
         );
     });

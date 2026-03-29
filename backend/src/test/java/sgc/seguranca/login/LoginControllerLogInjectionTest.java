@@ -11,6 +11,8 @@ import org.springframework.test.context.bean.override.mockito.*;
 import org.springframework.test.web.servlet.*;
 import sgc.comum.erros.*;
 import sgc.organizacao.*;
+import sgc.organizacao.dto.*;
+import sgc.organizacao.model.*;
 import sgc.seguranca.*;
 import sgc.seguranca.dto.*;
 
@@ -62,7 +64,10 @@ class LoginControllerLogInjectionTest {
                 .build();
 
         when(loginFacade.autenticar("123", "senha")).thenReturn(true);
-        when(loginFacade.buscarAutorizacoesUsuario("123")).thenReturn(java.util.List.of());
+        when(loginFacade.buscarAutorizacoesUsuario("123")).thenReturn(java.util.List.of(
+                new PerfilUnidadeDto(Perfil.CHEFE, UnidadeDto.builder().codigo(1L).sigla("U1").nome("Unidade 1").build()),
+                new PerfilUnidadeDto(Perfil.GESTOR, UnidadeDto.builder().codigo(2L).sigla("U2").nome("Unidade 2").build())
+        ));
         when(gerenciadorJwt.gerarTokenPreAuth("123")).thenReturn("token-pre-auth");
 
         mockMvc.perform(post("/api/usuarios/login")

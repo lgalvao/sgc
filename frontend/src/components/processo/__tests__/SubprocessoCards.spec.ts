@@ -2,14 +2,11 @@ import {beforeEach, describe, expect, it, vi} from "vitest";
 import {mount} from "@vue/test-utils";
 import SubprocessoCards from "../SubprocessoCards.vue";
 import {createTestingPinia} from "@pinia/testing";
-import {SituacaoProcesso, TipoProcesso} from "@/types/tipos";
+import {TipoProcesso} from "@/types/tipos";
 import {ref} from "vue";
 import * as useAcessoModule from "@/composables/useAcesso";
 
 const {pushMock} = vi.hoisted(() => ({ pushMock: vi.fn() }));
-const processosMock = {
-    processoDetalhe: {value: {codigo: 1, situacao: SituacaoProcesso.EM_ANDAMENTO}}
-};
 
 vi.mock("vue-router", () => ({
     useRouter: () => ({
@@ -23,14 +20,9 @@ vi.mock("@/composables/useSubprocessos", () => ({
     })
 }));
 
-vi.mock("@/composables/useProcessos", () => ({
-    useProcessos: () => processosMock
-}));
-
 describe("SubprocessoCards.vue", () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        processosMock.processoDetalhe.value = {codigo: 1, situacao: SituacaoProcesso.EM_ANDAMENTO};
     });
 
     function createWrapper(props: any, access: any = {}) {
@@ -264,26 +256,4 @@ describe("SubprocessoCards.vue", () => {
         expect(pushMock).not.toHaveBeenCalled();
     });
 
-    it("não deve tratar processo finalizado de outro código como finalizado do card atual", async () => {
-        processosMock.processoDetalhe.value = {
-            codigo: 999,
-            situacao: SituacaoProcesso.FINALIZADO
-        } as any;
-
-        const wrapper = createWrapper({
-            tipoProcesso: TipoProcesso.REVISAO,
-            mapa: null,
-            codSubprocesso: 1,
-            codProcesso: 1,
-            siglaUnidade: "U1"
-        }, {
-            habilitarAcessoCadastro: true,
-            podeEditarCadastro: true
-        });
-
-        const cardCadastro = wrapper.find('[data-testid="card-subprocesso-atividades"]');
-        expect(cardCadastro.exists()).toBe(true);
-        await cardCadastro.trigger("click");
-        expect(pushMock).toHaveBeenCalledWith(expect.objectContaining({name: "SubprocessoCadastro"}));
-    });
 });

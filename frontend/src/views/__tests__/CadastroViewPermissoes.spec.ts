@@ -3,7 +3,6 @@ import {flushPromises, mount} from "@vue/test-utils";
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import {ref} from "vue";
 import * as usePerfilModule from "@/composables/usePerfil";
-import * as useProcessosModule from "@/composables/useProcessos";
 import * as subprocessoService from "@/services/subprocessoService";
 import CadastroView from "@/views/CadastroView.vue";
 import {Perfil, SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
@@ -22,8 +21,6 @@ vi.mock("@/services/subprocessoService", () => ({
     validarCadastro: vi.fn(),
     listarAtividades: vi.fn(),
 }));
-
-vi.mock("@/composables/useProcessos", () => ({useProcessos: vi.fn()}));
 
 const stubs = {
     LayoutPadrao: {template: '<div><slot /></div>'},
@@ -52,13 +49,6 @@ describe("CadastroView - permissões no carregamento", () => {
             isChefe: ref(true),
         } as any);
 
-        vi.mocked(useProcessosModule.useProcessos).mockReturnValue({
-            processoDetalhe: ref({
-                codigo: 1,
-                unidades: []
-            }),
-            buscarProcessoDetalhe: vi.fn().mockResolvedValue(undefined),
-        } as any);
         vi.mocked(subprocessoService.buscarSubprocessoPorProcessoEUnidade).mockResolvedValue({codigo: 123} as any);
         vi.mocked(subprocessoService.buscarContextoEdicao).mockResolvedValue({
             detalhes: {

@@ -4,7 +4,6 @@ import PainelView from "@/views/PainelView.vue";
 import {createTestingPinia} from "@pinia/testing";
 import * as painelService from "@/services/painelService";
 import {useRouter} from "vue-router";
-import {ref} from "vue";
 
 vi.mock("vue-router", () => ({
     useRouter: vi.fn(),
@@ -24,21 +23,11 @@ vi.mock("@/services/painelService", () => ({
     listarAlertas: vi.fn(),
 }));
 
-const processosMock = {
-    processosPainel: ref([]),
-    buscarProcessosPainel: vi.fn(),
-};
-
-vi.mock("@/composables/useProcessos", () => ({
-    useProcessos: () => processosMock
-}));
-
 describe("PainelView.vue", () => {
     let routerPushMock: any;
 
     beforeEach(() => {
         vi.clearAllMocks();
-        processosMock.processosPainel.value = [];
         routerPushMock = vi.fn();
         (useRouter as any).mockReturnValue({
             push: routerPushMock,
@@ -134,7 +123,7 @@ describe("PainelView.vue", () => {
 
         await wrapper.vm.$nextTick();
 
-        expect(processosMock.buscarProcessosPainel).toHaveBeenCalledWith(1, 0, 10);
+        expect(painelService.listarProcessos).toHaveBeenCalledWith(1, 0, 10, undefined, undefined);
         expect(painelService.listarAlertas).toHaveBeenCalledWith(1, 0, 10, "dataHora", "desc");
     });
 
@@ -145,7 +134,7 @@ describe("PainelView.vue", () => {
 
         await wrapper.vm.$nextTick();
 
-        expect(processosMock.buscarProcessosPainel).not.toHaveBeenCalled();
+        expect(painelService.listarProcessos).not.toHaveBeenCalled();
         expect(painelService.listarAlertas).not.toHaveBeenCalled();
     });
 
@@ -168,16 +157,15 @@ describe("PainelView.vue", () => {
 
         vi.clearAllMocks(); // Limpa chamadas do onMounted
         (painelService.listarAlertas as any).mockResolvedValue(mockPageVazia);
-        processosMock.buscarProcessosPainel.mockClear();
 
         await wrapper.findComponent({name: 'TabelaProcessos'}).vm.$emit('ordenar', 'dataCriacao');
 
-        expect(processosMock.buscarProcessosPainel).toHaveBeenLastCalledWith(
+        expect(painelService.listarProcessos).toHaveBeenLastCalledWith(
             1, 0, 10, "dataCriacao", "asc"
         );
 
         await wrapper.findComponent({name: 'TabelaProcessos'}).vm.$emit('ordenar', 'dataCriacao');
-        expect(processosMock.buscarProcessosPainel).toHaveBeenLastCalledWith(
+        expect(painelService.listarProcessos).toHaveBeenLastCalledWith(
             1, 0, 10, "dataCriacao", "desc"
         );
     });

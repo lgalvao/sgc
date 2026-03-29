@@ -1,7 +1,7 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import {flushPromises, mount} from "@vue/test-utils";
-import {ref} from "vue";
 import HistoricoView from "@/views/HistoricoView.vue";
+import * as processoService from "@/services/processoService";
 
 const {mockPush} = vi.hoisted(() => ({
     mockPush: vi.fn(),
@@ -21,13 +21,8 @@ vi.mock("vue-router", () => ({
     createMemoryHistory: vi.fn(),
 }));
 
-const processosMock = {
-    processosFinalizados: ref<any[]>([]),
+vi.mock("@/services/processoService", () => ({
     buscarProcessosFinalizados: vi.fn(),
-};
-
-vi.mock("@/composables/useProcessos", () => ({
-    useProcessos: () => processosMock,
 }));
 
 const LayoutPadraoStub = {
@@ -79,14 +74,14 @@ describe("HistoricoView.vue", () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
-        processosMock.processosFinalizados.value = [...mockProcessos];
+        vi.mocked(processoService.buscarProcessosFinalizados).mockResolvedValue([...mockProcessos] as any);
     });
 
     it("deve carregar processos finalizados ao montar", async () => {
         const wrapper = createWrapper();
         await flushPromises();
 
-        expect(processosMock.buscarProcessosFinalizados).toHaveBeenCalled();
+        expect(processoService.buscarProcessosFinalizados).toHaveBeenCalled();
         expect(wrapper.find('[data-testid="tabela-processos"]').exists()).toBe(true);
     });
 
@@ -103,7 +98,7 @@ describe("HistoricoView.vue", () => {
     });
 
     it("deve repassar lista vazia para a tabela quando não houver processos", async () => {
-        processosMock.processosFinalizados.value = [];
+        vi.mocked(processoService.buscarProcessosFinalizados).mockResolvedValue([]);
         const wrapper = createWrapper();
         await flushPromises();
 

@@ -211,6 +211,14 @@ class SubprocessoNotificacaoServiceTest {
     }
 
     @Test
+    @DisplayName("deve lançar erro quando template direto for nulo")
+    void deveLancarErroQuandoTemplateDiretoForNulo() {
+        assertThatThrownBy(() -> invokeMethod(service, "obterTemplateObrigatorio", null, "e-mail direto"))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("Template ausente");
+    }
+
+    @Test
     @DisplayName("getEmailUnidade deve gerar endereco com sigla minuscula")
     void getEmailUnidadeDeveGerarEnderecoComSiglaMinuscula() {
         assertThat(service.getEmailUnidade(criarUnidade(1L, "ABC", "Unidade"))).isEqualTo("abc@tre-pe.jus.br");

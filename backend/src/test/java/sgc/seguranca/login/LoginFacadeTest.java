@@ -185,6 +185,43 @@ class LoginFacadeTest {
     }
 
     @Test
+    @DisplayName("buscarAutorizacoesUsuario deve filtrar unidades inativas")
+    void buscarAutorizacoesUsuario_DeveFiltrarUnidadesInativas() {
+        Usuario user = new Usuario();
+        user.setTituloEleitoral("123");
+        when(usuarioFacade.carregarUsuarioParaAutenticacao("123")).thenReturn(user);
+
+        Unidade unidadeAtiva = new Unidade();
+        unidadeAtiva.setCodigo(1L);
+        unidadeAtiva.setSigla("U1");
+        unidadeAtiva.setSituacao(SituacaoUnidade.ATIVA);
+        unidadeAtiva.setTipo(TipoUnidade.OPERACIONAL);
+
+        Unidade unidadeInativa = new Unidade();
+        unidadeInativa.setCodigo(2L);
+        unidadeInativa.setSigla("U2");
+        unidadeInativa.setSituacao(SituacaoUnidade.INATIVA);
+        unidadeInativa.setTipo(TipoUnidade.OPERACIONAL);
+
+        UsuarioPerfil perfilAtivo = new UsuarioPerfil();
+        perfilAtivo.setPerfil(Perfil.GESTOR);
+        perfilAtivo.setUnidade(unidadeAtiva);
+
+        UsuarioPerfil perfilInativo = new UsuarioPerfil();
+        perfilInativo.setPerfil(Perfil.CHEFE);
+        perfilInativo.setUnidade(unidadeInativa);
+
+        when(usuarioServiceInterno.buscarPerfis("123")).thenReturn(List.of(perfilAtivo, perfilInativo));
+
+        List<PerfilUnidadeDto> result = loginFacade.buscarAutorizacoesUsuario("123");
+
+        assertThat(result).singleElement().satisfies(perfil -> {
+            assertThat(perfil.perfil()).isEqualTo(Perfil.GESTOR);
+            assertThat(perfil.unidade().getCodigo()).isEqualTo(1L);
+        });
+    }
+
+    @Test
     @DisplayName("deve lançar erro quando unidade para autorização estiver ausente")
     void deveLancarErroQuandoUnidadeAusenteNaAutorizacao() throws Exception {
         Method metodo = LoginFacade.class.getDeclaredMethod("toUnidadeDtoObrigatoria", Unidade.class);

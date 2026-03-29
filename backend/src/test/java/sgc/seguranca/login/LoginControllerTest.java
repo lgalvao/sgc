@@ -4,6 +4,7 @@ import jakarta.servlet.http.*;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.boot.webmvc.test.autoconfigure.*;
+import org.springframework.mock.web.*;
 import org.springframework.context.annotation.*;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.*;
@@ -19,8 +20,10 @@ import tools.jackson.databind.*;
 
 import java.util.*;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
+import static org.springframework.test.util.ReflectionTestUtils.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -32,6 +35,8 @@ class LoginControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+    @Autowired
+    private LoginController loginController;
     @MockitoBean
     private SgcPermissionEvaluator permissionEvaluator;
 
@@ -248,6 +253,44 @@ class LoginControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @DisplayName("entrar deve aceitar cookie de pré-auth após cookies irrelevantes")
+    void entrar_ComCookiePreAuthAposCookiesIrrelevantes() {
+        when(gerenciadorJwt.validarTokenPreAuth("token-pre-auth")).thenReturn(Optional.of("123"));
+
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setCookies(new Cookie("OUTRO", "x"), new Cookie("SGC_PRE_AUTH", "token-pre-auth"));
+
+        String titulo = invokeMethod(loginController, "extrairTituloPreAuth", request);
+
+        assertThat(titulo).isEqualTo("123");
+    }
+
+    @Test
+    @DisplayName("extrairIp deve retornar nulo quando request não possui remoteAddr")
+    void extrairIp_DeveRetornarNulo() {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setRemoteAddr(null);
+
+        String ip = invokeMethod(loginController, "extrairIp", request);
+
+        assertThat(ip).isNull();
+    }
+
+    @Test
+    @DisplayName("cookies de login não devem ser secure em ambiente de testes")
+    void cookiesNaoDevemSerSecureEmAmbienteDeTestes() {
+        setField(loginController, "ambienteTestes", true);
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        invokeMethod(loginController, "adicionarCookiePreAuth", response, "token-pre-auth");
+        invokeMethod(loginController, "adicionarCookieJwt", response, "token-jwt");
+        invokeMethod(loginController, "limparCookiePreAuth", response);
+
+        assertThat(response.getCookies()).hasSize(3);
+        assertThat(Arrays.stream(response.getCookies()).allMatch(cookie -> !cookie.getSecure())).isTrue();
     }
 
     private AutenticarRequest criarRequestPadrao() {

@@ -291,6 +291,30 @@ class ResponsavelUnidadeServiceTest {
         }
 
         @Test
+        @DisplayName("Deve lançar exceção quando apenas o titular oficial estiver ausente")
+        void deveLancarExcecaoQuandoTitularOficialAusente() {
+            Long codUnidade = 1L;
+            Unidade u = new Unidade();
+            u.setCodigo(codUnidade);
+            u.setTituloTitular("TITULAR");
+
+            Responsabilidade r = new Responsabilidade();
+            r.setUnidade(u);
+            r.setUnidadeCodigo(codUnidade);
+            r.setUsuarioTitulo("RESP");
+
+            Usuario responsavel = new Usuario();
+            responsavel.setTituloEleitoral("RESP");
+
+            when(responsabilidadeRepo.findByUnidadeCodigoIn(anyList())).thenReturn(List.of(r));
+            when(usuarioRepo.findByTitulosComUnidadeLotacao(anyList())).thenReturn(List.of(responsavel));
+
+            assertThatThrownBy(() -> service.buscarResponsaveisUnidades(List.of(codUnidade)))
+                    .isInstanceOf(IllegalStateException.class)
+                    .hasMessageContaining("Responsável ou titular oficial ausente");
+        }
+
+        @Test
         @DisplayName("Deve retornar mapa com responsáveis quando tudo ok")
         void deveRetornarResponsaveisComSucesso() {
             Long codUnidade = 1L;

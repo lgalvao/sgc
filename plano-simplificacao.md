@@ -574,3 +574,5 @@ O plano terá sido bem executado se:
 * Para preservar comportamento antigo, a tela passou a tratar erro estruturado de API de forma diferente de `Error` genérico: payload de validação continua mapeando campos, enquanto falha genérica continua exibindo a mensagem padrão da tela.
 * `ProcessoDetalheView` seguiu o mesmo caminho e passou a carregar seu próprio contexto via `processoService`, mantendo `processo`, `elegiveis` e erro de carga como estado local da view.
 * Depois dessa rodada, `useProcessos` ficou sem consumidores de produção. Isso indica que a próxima limpeza é mecânica: remover o composable e apagar mocks de teste herdados do desenho antigo.
+* A limpeza mecânica foi concluída: `useProcessos` e seu teste foram removidos, e os specs que ainda o mockavam passaram a falar direto com `painelService`, `processoService` ou simplesmente deixaram de simular uma dependência que já não existia.
+* Esse é um bom critério de encerramento de simplificação: quando um composable perde todos os consumidores reais, o passo seguinte deve ser apagá-lo logo, antes que ele vire lastro e continue influenciando testes novos por inércia.
