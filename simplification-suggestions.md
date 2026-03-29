@@ -56,3 +56,12 @@ Para uma equipe focada num sistema interno com poucos usuários simultâneos:
 1. **Unificar lógica de negócio:** Mescle serviços fragmentados no backend que tratem da mesma entidade principal.
 2. **Remova os "Middlemen":** Apague Facades; faça o Controller falar com os Serviços ou diretamente com Repositórios para consultas de leitura.
 3. **Pinia apenas quando estritamente necessário:** Reduza as stores que são *wrappers* de serviços Axios no Frontend e direcione para Composables pontuais.
+
+## 4. Evitar Padrões Excessivos e Foco em Simplicidade
+
+Dado o escopo restrito do sistema (intranet, poucos usuários), a utilização de design patterns avançados ou camadas adicionais de abstração de persistência pode ser contraproducente.
+
+* **Evitar Interfaces de Uso Único**: Em Java, é comum a prática de criar uma interface `IUserService` e implementar como `UserServiceImpl`. A menos que existam múltiplas implementações reais (ex: polimorfismo genuíno, ou necessidade forte para testes onde Mockito não atende), deve-se usar a classe concreta diretamente.
+* **Simplificar Mapeamentos (DTOs)**: Evitar ao máximo bibliotecas complexas de mapeamento como MapStruct ou Dozer para casos simples. Quando os DTOs são muito similares à entidade, métodos de leitura simples (ex: listagens) do Controller podem retornar as entidades JPA diretamente (se devidamente configuradas as exclusões de laços no JSON com `@JsonIgnore`), reduzindo boilerplate de mapeamento. Se um DTO for necessário, métodos estáticos `fromEntity` ou "Records" nativos do Java 17+ são mais legíveis.
+* **Monolito Coeso**: Não há justificativa para fragmentação em microsserviços ou até mesmo uma estrutura excessivamente dividida de pacotes que emula sub-módulos independentes sem real necessidade.
+* **Manter Hexagonal e Clean Architecture Fora do Escopo**: Para a maioria dos endpoints e telas, um simples fluxo de 3 camadas (Controller -> Service -> Repository) ou até 2 camadas (Controller -> Repository para CRUD simples) é mais que suficiente e fácil de manter.

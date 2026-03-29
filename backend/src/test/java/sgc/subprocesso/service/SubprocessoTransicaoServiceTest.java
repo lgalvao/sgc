@@ -212,7 +212,7 @@ class SubprocessoTransicaoServiceTest {
             service.aceitarCadastroEmBloco(List.of(10L, 20L), criarUsuario());
             
             assertThat(spMap.getSituacao()).isEqualTo(MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
-            assertThat(spRev.getSituacao()).isEqualTo(REVISAO_CADASTRO_DISPONIBILIZADA);
+            assertThat(spRev.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
         }
 
         @Test
