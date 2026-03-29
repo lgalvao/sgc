@@ -245,7 +245,8 @@ jacoco {
 
 tasks.jacocoTestReport {
     dependsOn(tasks.named("test"))
-    executionData.setFrom(fileTree(layout.buildDirectory).include("jacoco/*.exec"))
+    // Usa apenas a execucao da tarefa `test` para evitar dependencia implicita com `unitTest`.
+    executionData.setFrom(layout.buildDirectory.file("jacoco/test.exec"))
 
     reports {
         xml.required.set(true)

@@ -1,15 +1,24 @@
-:root {
-    /* Cores semânticas baseadas em tokens do Bootstrap */
-    --cor-primaria: var(--bs-primary);
-    --cor-secundaria: var(--bs-secondary);
-    --cor-sucesso: var(--bs-success);
-    --cor-perigo: var(--bs-danger);
-    --cor-aviso: var(--bs-warning);
-    --cor-info: var(--bs-info);
-    --cor-clara: var(--bs-light);
-    --cor-escura: var(--bs-dark);
-    --cor-texto-padrao: var(--bs-body-color);
-    --cor-fundo-padrao: var(--bs-body-bg);
+    /* Cores semânticas customizadas para SGC (Acessibilidade + Estética) */
+    --cor-primaria: #0a58ca; /* Azul profundo e acessível (AA em fundo claro) */
+    --cor-primaria-light: #e7effb;
+    --cor-secundaria: #475569;
+    --cor-sucesso: #059669;
+    --cor-perigo: #dc2626;
+    --cor-aviso: #d97706;
+    --cor-info: #0891b2;
+    --cor-clara: #f8fafc;
+    --cor-escura: #0f172a;
+
+    /* Gradientes Premium */
+    --gradiente-primario: linear-gradient(135deg, #0a58ca 0%, #1e40af 100%);
+    --gradiente-suave: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+
+    /* Tokens de Design Premium */
+    --sombra-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --sombra-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --sombra-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --raio-md: 0.75rem;
+    --raio-lg: 1rem;
 
     /* Escala de espaçamento */
     --espacamento-1: 0.25rem;
@@ -18,14 +27,17 @@
     --espacamento-4: 1.5rem;
     --espacamento-5: 3rem;
 
-    /* Tipografia base */
-    --fonte-familia-base: var(--bs-font-sans-serif);
+    /* Tipografia base (Google Fonts - Inter seria ideal) */
+    --fonte-familia-base: 'Inter', system-ui, -apple-system, sans-serif;
     --fonte-tamanho-xs: 0.75rem;
     --fonte-tamanho-sm: 0.875rem;
     --fonte-tamanho-md: 1rem;
-    --fonte-tamanho-lg: 1.25rem;
+    --fonte-tamanho-lg: 1.125rem;
+    --fonte-tamanho-xl: 1.25rem;
     --fonte-peso-normal: 400;
+    --fonte-peso-medium: 500;
     --fonte-peso-semi-bold: 600;
     --fonte-peso-bold: 700;
     --linha-altura-base: 1.5;
 }
+

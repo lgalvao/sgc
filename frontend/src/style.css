@@ -1,17 +1,106 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 :root {
-    font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+    --bs-primary: #0a58ca;
+    --bs-primary-rgb: 10, 88, 202;
+    --bs-body-font-family: var(--fonte-familia-base);
+    --bs-border-radius: var(--raio-md);
+    --bs-border-radius-lg: var(--raio-lg);
+
+    font-family: var(--fonte-familia-base);
     line-height: 1.5;
     font-weight: 400;
 
     color-scheme: light dark;
-    color: rgba(255, 255, 255, 0.87);
-    background-color: #242424;
+    color: #1e293b;
+    background-color: #f8fafc;
 
     font-synthesis: none;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+}
 
+body {
+    background-color: #f8fafc;
+    color: #1e293b;
+}
+
+/* Glassmorphism e Cards Premium */
+.card, .table-responsive {
+    background: rgba(255, 255, 255, 0.8) !important;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    border-radius: var(--raio-md) !important;
+    box-shadow: var(--sombra-md) !important;
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: var(--sombra-lg) !important;
+}
+
+/* Estilização Premium de Tabelas */
+.table {
+    --bs-table-bg: transparent;
+    margin-bottom: 0;
+}
+
+.table thead th {
+    background-color: #f1f5f9;
+    color: #475569;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    padding: 1rem;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.table tbody td {
+    padding: 1rem;
+    vertical-align: middle;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(10, 88, 202, 0.03) !important;
+}
+
+/* Botões Premium */
+.btn {
+    font-weight: 500;
+    padding: 0.5rem 1.25rem;
+    border-radius: 0.5rem;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(10, 88, 202, 0.2);
+}
+
+.btn:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.btn-primary {
+    background: var(--gradiente-primario);
+    border: none;
+}
+
+.btn-outline-primary {
+    border-width: 2px;
+    color: var(--bs-primary);
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
 }
 
 /* Garantir que tabelas clicáveis sempre mostrem o cursor de ponteiro */
@@ -19,60 +108,24 @@
     cursor: pointer;
 }
 
-.table-hover tbody tr td {
-    cursor: pointer;
-    user-select: none;
-}
-
 /* Utility Classes */
 .cursor-pointer {
     cursor: pointer;
 }
 
-.content-wrapper {
-    position: relative;
-    width: 100%;
-}
-
-@media (prefers-color-scheme: light) {
+@media (prefers-color-scheme: dark) {
     :root {
-        color: #213547;
-        background-color: #ffffff;
+        color: #f8fafc;
+        background-color: #0f172a;
+    }
+    
+    body {
+        background-color: #0f172a;
     }
 
-    a:hover {
-        color: #747bff;
-    }
-
-    button {
-        background-color: #f9f9f9;
+    .card, .table-responsive {
+        background: rgba(30, 41, 59, 0.7) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
     }
 }
 
-/* Estilos Globais para Botões Desabilitados */
-button:disabled,
-.btn:disabled,
-.btn.disabled {
-    cursor: not-allowed !important;
-    opacity: 0.5 !important;
-    pointer-events: auto !important; /* Permite o hover para mostrar o cursor not-allowed */
-}
-
-/* Ajuste específico para variantes outline desabilitadas */
-.btn-outline-secondary:disabled,
-.btn-outline-primary:disabled,
-.btn-outline-success:disabled,
-.btn-outline-danger:disabled,
-.btn-outline-warning:disabled,
-.btn-outline-info:disabled {
-    border-color: rgba(0, 0, 0, 0.1) !important;
-    color: rgba(0, 0, 0, 0.3) !important;
-    background-color: transparent !important;
-}
-
-/* Aproximar as setas de ordenação do texto nos cabeçalhos de tabela (BootstrapVueNext) */
-.table thead th.b-table-sortable > div {
-    display: inline-flex !important;
-    align-items: center;
-    gap: 0.5rem;
-}

@@ -117,40 +117,74 @@ function handleLogout() {
 </script>
 
 <style scoped>
+.navbar {
+  background: rgba(15, 23, 42, 0.9) !important; /* Slate-900 com transparência */
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 0.75rem 1.5rem;
+  box-shadow: var(--sombra-md);
+}
+
+.navbar-brand {
+  letter-spacing: -0.02em;
+  font-weight: 700;
+}
+
 /* Ajuste de ícones no navbar */
+.nav-link {
+  font-weight: 500;
+  display: flex !important;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem !important;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+  color: rgba(255, 255, 255, 0.85) !important; /* Aumentado de 0.7 para 0.85 para melhor contraste */
+}
+
+
 .nav-link i {
-  vertical-align: middle;
+  font-size: 1.1rem;
   color: inherit !important;
 }
 
-/* Garantir que o texto dos links seja branco quando usar navbar-dark */
-:deep(.navbar-dark .navbar-nav .nav-link) {
-  color: rgba(255, 255, 255, 0.75) !important;
-}
-
-:deep(.navbar-dark .navbar-nav .nav-link:hover),
-:deep(.navbar-dark .navbar-nav .nav-link:focus) {
-  color: rgba(255, 255, 255, 1) !important;
-}
-
-:deep(.navbar-dark .navbar-nav .nav-link.active) {
+.nav-link:hover {
   color: #fff !important;
+  background: rgba(255, 255, 255, 0.1);
 }
 
-/* Estilo específico para o item de perfil para não parecer um link clicável se não houver ação */
+.nav-link.active {
+  color: #fff !important;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* Estilo específico para o item de perfil */
 .user-profile-item :deep(.nav-link) {
   cursor: default;
-  color: rgba(255, 255, 255, 0.9) !important; /* Mais claro que os outros links para destaque */
+  background: rgba(255, 255, 255, 0.05);
+  margin-right: 0.5rem;
 }
 
-/* Remover destaque do botão de sair para que fique igual aos outros ícones */
-[data-testid="btn-logout"] :deep(.nav-link) {
-  color: rgba(255, 255, 255, 0.75) !important;
+.user-profile-item :deep(.nav-link:hover) {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.user-info-text {
+  font-size: 0.875rem;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 @media (max-width: 992px) {
-  .user-profile-item {
-    margin-bottom: 0.5rem;
+  .navbar {
+    padding: 1rem;
+  }
+  
+  .nav-link {
+    margin-bottom: 0.25rem;
   }
 }
 </style>
+

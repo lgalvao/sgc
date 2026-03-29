@@ -302,7 +302,10 @@ public class SubprocessoTransicaoService {
                 MAPEAMENTO_MAPA_DISPONIBILIZADO,
                 REVISAO_MAPA_DISPONIBILIZADO);
 
-        sp.getMapa().setSugestoes(sugestoes);
+        Mapa mapa = sp.getMapa();
+        mapa.setSugestoes(sugestoes);
+        mapaManutencaoService.salvarMapa(mapa);
+
         sp.setSituacao(obterSituacaoObrigatoria(SITUACAO_MAPA_COM_SUGESTOES, sp, "apresentação de sugestões"));
         sp.setDataFimEtapa2(LocalDateTime.now());
 
@@ -320,7 +323,7 @@ public class SubprocessoTransicaoService {
                 .observacoes(sugestoes)
                 .build());
 
-        log.info("Sugestões aresentadas para mapa do SP {}: {}", codSubprocesso, sugestoes);
+        log.info("Sugestões apresentadas para mapa do SP {}: {}", codSubprocesso, sugestoes);
     }
 
     @Transactional
