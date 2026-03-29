@@ -1,7 +1,7 @@
 {
-  "globalLineCoverage": "99.83%",
-  "globalBranchCoverage": "97.09%",
-  "totalFilesWithGaps": 15,
+  "globalLineCoverage": "99.89%",
+  "globalBranchCoverage": "97.17%",
+  "totalFilesWithGaps": 14,
   "gaps": [
     {
       "class": "sgc.subprocesso.service.SubprocessoTransicaoService",
@@ -22,21 +22,6 @@
         "672(1/4)"
       ],
       "score": 7.5
-    },
-    {
-      "class": "sgc.subprocesso.service.SubprocessoService",
-      "coverage": "99.78%",
-      "branchCoverage": "98.31%",
-      "missed": [
-        838
-      ],
-      "partial": [
-        "449(1/2)",
-        "656(1/4)",
-        "657(1/6)",
-        "890(1/2)"
-      ],
-      "score": 3
     },
     {
       "class": "sgc.processo.painel.PainelFacade",
@@ -77,16 +62,17 @@
       "score": 2
     },
     {
-      "class": "sgc.organizacao.service.UnidadeHierarquiaService",
-      "coverage": "99.02%",
-      "branchCoverage": "97.92%",
-      "missed": [
-        166
-      ],
+      "class": "sgc.subprocesso.service.SubprocessoService",
+      "coverage": "100.00%",
+      "branchCoverage": "98.31%",
+      "missed": [],
       "partial": [
-        "165(1/2)"
+        "449(1/2)",
+        "656(1/4)",
+        "657(1/6)",
+        "890(1/2)"
       ],
-      "score": 1.5
+      "score": 2
     },
     {
       "class": "sgc.seguranca.SgcPermissionEvaluator",
