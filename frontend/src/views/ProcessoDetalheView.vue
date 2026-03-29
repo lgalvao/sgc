@@ -136,6 +136,12 @@ import {TEXTOS} from "@/constants/textos";
 
 type ContextoBloco = "cadastro" | "validacao" | "misto";
 type AcaoBloco = "aceitar" | "homologar" | "disponibilizar";
+type ConfiguracaoTextoAcaoBloco = {
+  rotulo: string;
+  titulo: string;
+  texto: string;
+  mensagemSucesso: string;
+};
 
 const route = useRoute();
 const router = useRouter();
@@ -156,6 +162,69 @@ const modalBlocoRef = ref<any>(null);
 const mostrarModalFinalizacao = ref(false);
 const acaoBlocoAtual = ref<AcaoBloco>("aceitar");
 const processandoAcaoBloco = ref(false);
+
+const configuracoesAcaoBloco: Record<AcaoBloco, Record<ContextoBloco, ConfiguracaoTextoAcaoBloco>> = {
+  aceitar: {
+    cadastro: {
+      rotulo: TEXTOS.acaoBloco.aceitar.ROTULO_CADASTRO,
+      titulo: TEXTOS.acaoBloco.aceitar.TITULO_CADASTRO,
+      texto: TEXTOS.acaoBloco.aceitar.TEXTO_CADASTRO,
+      mensagemSucesso: TEXTOS.sucesso.CADASTROS_ACEITOS_EM_BLOCO,
+    },
+    validacao: {
+      rotulo: TEXTOS.acaoBloco.aceitar.ROTULO_VALIDACAO,
+      titulo: TEXTOS.acaoBloco.aceitar.TITULO_VALIDACAO,
+      texto: TEXTOS.acaoBloco.aceitar.TEXTO_VALIDACAO,
+      mensagemSucesso: TEXTOS.sucesso.MAPAS_ACEITOS_EM_BLOCO,
+    },
+    misto: {
+      rotulo: TEXTOS.acaoBloco.aceitar.ROTULO_MISTO,
+      titulo: TEXTOS.acaoBloco.aceitar.TITULO_MISTO,
+      texto: TEXTOS.acaoBloco.aceitar.TEXTO_MISTO,
+      mensagemSucesso: TEXTOS.sucesso.ACEITES_REGISTRADOS_EM_BLOCO,
+    },
+  },
+  homologar: {
+    cadastro: {
+      rotulo: TEXTOS.acaoBloco.homologar.ROTULO_CADASTRO,
+      titulo: TEXTOS.acaoBloco.homologar.TITULO_CADASTRO,
+      texto: TEXTOS.acaoBloco.homologar.TEXTO_CADASTRO,
+      mensagemSucesso: TEXTOS.sucesso.CADASTROS_HOMOLOGADOS_EM_BLOCO,
+    },
+    validacao: {
+      rotulo: TEXTOS.acaoBloco.homologar.ROTULO_VALIDACAO,
+      titulo: TEXTOS.acaoBloco.homologar.TITULO_VALIDACAO,
+      texto: TEXTOS.acaoBloco.homologar.TEXTO_VALIDACAO,
+      mensagemSucesso: TEXTOS.sucesso.MAPAS_HOMOLOGADOS_EM_BLOCO,
+    },
+    misto: {
+      rotulo: TEXTOS.acaoBloco.homologar.ROTULO_MISTO,
+      titulo: TEXTOS.acaoBloco.homologar.TITULO_MISTO,
+      texto: TEXTOS.acaoBloco.homologar.TEXTO_MISTO,
+      mensagemSucesso: TEXTOS.sucesso.HOMOLOGACOES_REGISTRADAS_EM_BLOCO,
+    },
+  },
+  disponibilizar: {
+    cadastro: {
+      rotulo: TEXTOS.acaoBloco.disponibilizar.ROTULO,
+      titulo: TEXTOS.acaoBloco.disponibilizar.TITULO,
+      texto: TEXTOS.acaoBloco.disponibilizar.TEXTO,
+      mensagemSucesso: TEXTOS.sucesso.MAPAS_DISPONIBILIZADOS_EM_BLOCO,
+    },
+    validacao: {
+      rotulo: TEXTOS.acaoBloco.disponibilizar.ROTULO,
+      titulo: TEXTOS.acaoBloco.disponibilizar.TITULO,
+      texto: TEXTOS.acaoBloco.disponibilizar.TEXTO,
+      mensagemSucesso: TEXTOS.sucesso.MAPAS_DISPONIBILIZADOS_EM_BLOCO,
+    },
+    misto: {
+      rotulo: TEXTOS.acaoBloco.disponibilizar.ROTULO,
+      titulo: TEXTOS.acaoBloco.disponibilizar.TITULO,
+      texto: TEXTOS.acaoBloco.disponibilizar.TEXTO,
+      mensagemSucesso: TEXTOS.sucesso.MAPAS_DISPONIBILIZADOS_EM_BLOCO,
+    },
+  },
+};
 
 const participantesHierarquia = computed(() => processo.value?.unidades || []);
 
@@ -243,34 +312,8 @@ function obterContextoAtualAcao(acao: AcaoBloco, ids?: number[]): ContextoBloco 
   return obterContextoBloco(obterUnidadesContextoAcao(acao, ids));
 }
 
-function obterMensagemSucesso(
-    acao: AcaoBloco,
-    contexto: ContextoBloco
-) {
-  switch (acao) {
-    case "aceitar":
-      switch (contexto) {
-        case "cadastro":
-          return TEXTOS.sucesso.CADASTROS_ACEITOS_EM_BLOCO;
-        case "validacao":
-          return TEXTOS.sucesso.MAPAS_ACEITOS_EM_BLOCO;
-        default:
-          return TEXTOS.sucesso.ACEITES_REGISTRADOS_EM_BLOCO;
-      }
-    case "homologar":
-      switch (contexto) {
-        case "cadastro":
-          return TEXTOS.sucesso.CADASTROS_HOMOLOGADOS_EM_BLOCO;
-        case "validacao":
-          return TEXTOS.sucesso.MAPAS_HOMOLOGADOS_EM_BLOCO;
-        default:
-          return TEXTOS.sucesso.HOMOLOGACOES_REGISTRADAS_EM_BLOCO;
-      }
-    case "disponibilizar":
-      return TEXTOS.sucesso.MAPAS_DISPONIBILIZADOS_EM_BLOCO;
-    default:
-      return TEXTOS.sucesso.ACAO_EM_BLOCO_REALIZADA;
-  }
+function obterConfiguracaoAcaoBloco(acao: AcaoBloco, contexto: ContextoBloco): ConfiguracaoTextoAcaoBloco {
+  return configuracoesAcaoBloco[acao][contexto];
 }
 
 const unidadesElegiveisPorAcao = computed(() => {
@@ -300,86 +343,27 @@ const idsElegiveis = computed(() => unidadesElegiveis.value.map(u => u.codigo));
 
 const contextoAceiteBloco = computed<ContextoBloco>(() => obterContextoBloco(unidadesElegiveisPorAcao.value.aceitar));
 const contextoHomologacaoBloco = computed<ContextoBloco>(() => obterContextoBloco(unidadesElegiveisPorAcao.value.homologar));
+const contextoDisponibilizacaoBloco = computed<ContextoBloco>(() => "misto");
 
-const rotuloAcaoAceitarBloco = computed(() => {
-  switch (contextoAceiteBloco.value) {
-    case "cadastro":
-      return TEXTOS.acaoBloco.aceitar.ROTULO_CADASTRO;
-    case "validacao":
-      return TEXTOS.acaoBloco.aceitar.ROTULO_VALIDACAO;
-    default:
-      return TEXTOS.acaoBloco.aceitar.ROTULO_MISTO;
+const rotuloAcaoAceitarBloco = computed(() => obterConfiguracaoAcaoBloco("aceitar", contextoAceiteBloco.value).rotulo);
+
+const rotuloAcaoHomologarBloco = computed(() => obterConfiguracaoAcaoBloco("homologar", contextoHomologacaoBloco.value).rotulo);
+
+const rotuloAcaoDisponibilizarBloco = computed(() => obterConfiguracaoAcaoBloco("disponibilizar", contextoDisponibilizacaoBloco.value).rotulo);
+
+const contextoAtualAcaoBloco = computed<ContextoBloco>(() => {
+  if (acaoBlocoAtual.value === "aceitar") {
+    return contextoAceiteBloco.value;
   }
-});
-
-const rotuloAcaoHomologarBloco = computed(() => {
-  switch (contextoHomologacaoBloco.value) {
-    case "cadastro":
-      return TEXTOS.acaoBloco.homologar.ROTULO_CADASTRO;
-    case "validacao":
-      return TEXTOS.acaoBloco.homologar.ROTULO_VALIDACAO;
-    default:
-      return TEXTOS.acaoBloco.homologar.ROTULO_MISTO;
+  if (acaoBlocoAtual.value === "homologar") {
+    return contextoHomologacaoBloco.value;
   }
+  return contextoDisponibilizacaoBloco.value;
 });
 
-const rotuloAcaoDisponibilizarBloco = computed(() => {
-  return TEXTOS.acaoBloco.disponibilizar.ROTULO;
-});
+const tituloModalBloco = computed(() => obterConfiguracaoAcaoBloco(acaoBlocoAtual.value, contextoAtualAcaoBloco.value).titulo);
 
-const tituloModalBloco = computed(() => {
-  switch (acaoBlocoAtual.value) {
-    case "aceitar":
-      switch (contextoAceiteBloco.value) {
-        case "cadastro":
-          return TEXTOS.acaoBloco.aceitar.TITULO_CADASTRO;
-        case "validacao":
-          return TEXTOS.acaoBloco.aceitar.TITULO_VALIDACAO;
-        default:
-          return TEXTOS.acaoBloco.aceitar.TITULO_MISTO;
-      }
-    case "homologar":
-      switch (contextoHomologacaoBloco.value) {
-        case "cadastro":
-          return TEXTOS.acaoBloco.homologar.TITULO_CADASTRO;
-        case "validacao":
-          return TEXTOS.acaoBloco.homologar.TITULO_VALIDACAO;
-        default:
-          return TEXTOS.acaoBloco.homologar.TITULO_MISTO;
-      }
-    case "disponibilizar":
-      return TEXTOS.acaoBloco.disponibilizar.TITULO;
-    default:
-      return "";
-  }
-});
-
-const textoModalBloco = computed(() => {
-  switch (acaoBlocoAtual.value) {
-    case "aceitar":
-      switch (contextoAceiteBloco.value) {
-        case "cadastro":
-          return TEXTOS.acaoBloco.aceitar.TEXTO_CADASTRO;
-        case "validacao":
-          return TEXTOS.acaoBloco.aceitar.TEXTO_VALIDACAO;
-        default:
-          return TEXTOS.acaoBloco.aceitar.TEXTO_MISTO;
-      }
-    case "homologar":
-      switch (contextoHomologacaoBloco.value) {
-        case "cadastro":
-          return TEXTOS.acaoBloco.homologar.TEXTO_CADASTRO;
-        case "validacao":
-          return TEXTOS.acaoBloco.homologar.TEXTO_VALIDACAO;
-        default:
-          return TEXTOS.acaoBloco.homologar.TEXTO_MISTO;
-      }
-    case "disponibilizar":
-      return TEXTOS.acaoBloco.disponibilizar.TEXTO;
-    default:
-      return "";
-  }
-});
+const textoModalBloco = computed(() => obterConfiguracaoAcaoBloco(acaoBlocoAtual.value, contextoAtualAcaoBloco.value).texto);
 
 const rotuloBotaoBloco = computed(() => {
   switch (acaoBlocoAtual.value) {
@@ -395,10 +379,7 @@ const rotuloBotaoBloco = computed(() => {
 });
 
 const mensagemSucessoAcaoBloco = computed(() => {
-  const contexto = acaoBlocoAtual.value === "homologar"
-      ? contextoHomologacaoBloco.value
-      : contextoAceiteBloco.value;
-  return obterMensagemSucesso(acaoBlocoAtual.value, contexto);
+  return obterConfiguracaoAcaoBloco(acaoBlocoAtual.value, contextoAtualAcaoBloco.value).mensagemSucesso;
 });
 
 async function abrirDetalhesUnidade(row: any) {
@@ -444,7 +425,7 @@ async function executarAcaoBloco(dados: { ids: number[], dataLimite?: string }) 
     processandoAcaoBloco.value = true;
     modalBlocoRef.value?.setProcessando(true);
     const contextoExecucao = obterContextoAtualAcao(acaoBlocoAtual.value, dados.ids);
-    const mensagemSucesso = obterMensagemSucesso(acaoBlocoAtual.value, contextoExecucao);
+    const mensagemSucesso = obterConfiguracaoAcaoBloco(acaoBlocoAtual.value, contextoExecucao).mensagemSucesso;
     await apiExecutarAcaoBloco(acaoBlocoAtual.value, dados.ids, dados.dataLimite);
 
     modalBlocoRef.value?.fechar();
