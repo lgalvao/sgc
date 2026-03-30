@@ -8,19 +8,9 @@ import org.hibernate.stat.*;
 import org.junit.jupiter.api.*;
 import org.slf4j.*;
 import org.springframework.beans.factory.annotation.*;
-import org.springframework.boot.test.context.*;
-import org.springframework.boot.autoconfigure.*;
-import org.springframework.boot.*;
-import org.springframework.boot.context.properties.*;
-import org.springframework.context.annotation.*;
 import org.springframework.core.env.*;
 import org.springframework.data.domain.*;
-import org.springframework.mail.javamail.*;
-import org.springframework.scheduling.annotation.*;
-import org.springframework.test.context.bean.override.mockito.*;
-import org.springframework.transaction.annotation.*;
 import org.springframework.util.*;
-import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
 
@@ -35,10 +25,8 @@ import java.util.function.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assumptions.*;
 
-@SpringBootTest(classes = OrganizacaoViewsPerformanceIntegrationTest.BenchmarkApplication.class)
-@Transactional(readOnly = true)
 @Tag("integration")
-class OrganizacaoViewsPerformanceIntegrationTest {
+class OrganizacaoViewsPerformanceIntegrationTest extends BaseIntegrationTest {
     private static final int AQUECIMENTOS = 1;
     private static final int REPETICOES_MEDIDAS = 3;
     private static final int TAMANHO_AMOSTRA = 10;
@@ -77,9 +65,6 @@ class OrganizacaoViewsPerformanceIntegrationTest {
 
     @Autowired
     private ResponsavelUnidadeService responsavelUnidadeService;
-
-    @MockitoBean(name = "objectMapper")
-    private tools.jackson.databind.ObjectMapper objectMapperCompartilhado;
 
     @BeforeEach
     void garantirExecucaoSomenteNoOracle() throws SQLException {
@@ -290,10 +275,6 @@ class OrganizacaoViewsPerformanceIntegrationTest {
                 .orElse(0L);
     }
 
-    private String formatarRelatorio(List<ResultadoMedicao> resultados, AmostrasConsulta amostras) {
-        throw new UnsupportedOperationException("Use a sobrecarga com RelatorioExecucao.");
-    }
-
     private String formatarRelatorio(RelatorioExecucao relatorio, Path arquivoRelatorio) {
         StringBuilder builder = new StringBuilder();
         builder.append("Benchmark simples das views organizacionais").append(System.lineSeparator());
@@ -401,30 +382,4 @@ class OrganizacaoViewsPerformanceIntegrationTest {
     ) {
     }
 
-    @TestConfiguration
-    static class BenchmarkConfig {
-        @Bean
-        @Primary
-        JavaMailSender javaMailSender() {
-            return new JavaMailSenderImpl();
-        }
-    }
-
-    @EnableAsync
-    @EnableScheduling
-    @ConfigurationPropertiesScan
-    @SpringBootConfiguration
-    @EnableAutoConfiguration(excludeName = {
-            "org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration"
-    })
-    @ComponentScan(
-            basePackages = "sgc",
-            excludeFilters = @ComponentScan.Filter(
-                    type = FilterType.REGEX,
-                    pattern = "sgc\\.integracao\\.mocks\\..*"
-            )
-    )
-    @Import(BenchmarkConfig.class)
-    static class BenchmarkApplication {
-    }
 }
