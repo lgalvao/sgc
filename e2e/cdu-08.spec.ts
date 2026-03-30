@@ -128,7 +128,7 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
             // Editar de fato
             await AtividadeHelpers.editarConhecimento(page, atividadeEditada, conhecimento1, conhecimento1Editado);
 
-            // Item 20: após salvar edição de conhecimento, botões Editar e Remover voltam a aparecer
+            // CDU-08 Item 20: após salvar edição de conhecimento, botões Editar e Remover voltam a aparecer
             const cardPosEdicao = page.getByTestId('cad-atividades__card-atividade').filter({has: page.getByText(atividadeEditada)});
             const linhaConhPosEdicao = cardPosEdicao.getByTestId('cad-atividades__item-conhecimento').filter({hasText: conhecimento1Editado});
             await linhaConhPosEdicao.hover();
