@@ -263,10 +263,10 @@ class ValidadorDadosOrganizacionaisTest {
     ) {
         when(unidadeRepo.findAllWithHierarquia()).thenReturn(unidades);
         when(responsabilidadeRepo.findByUnidadeCodigoIn(anyList())).thenReturn(responsabilidades);
-        lenient().when(usuarioRepo.findAllById(anyList())).thenReturn(usuarios);
-        lenient().when(namedParameterJdbcTemplate.queryForList(contains("FROM sgc.vw_usuario"), ArgumentMatchers.<Map<String, ?>>any()))
+        when(usuarioRepo.findAllById(anyList())).thenReturn(usuarios);
+        when(namedParameterJdbcTemplate.queryForList(contains("FROM sgc.vw_usuario"), ArgumentMatchers.<Map<String, ?>>any()))
                 .thenReturn(linhasUsuariosDuplicados);
-        lenient().when(namedParameterJdbcTemplate.queryForList(contains("FROM sgc.vw_usuario_perfil_unidade"), ArgumentMatchers.<Map<String, ?>>any()))
+        when(namedParameterJdbcTemplate.queryForList(contains("FROM sgc.vw_usuario_perfil_unidade"), ArgumentMatchers.<Map<String, ?>>any()))
                 .thenReturn(linhasPerfis);
     }
 
