@@ -168,7 +168,6 @@ describe('Subprocessos store', () => {
             await store.buscarContextoEdicao(1);
 
             expect(store.subprocessoDetalhe).toMatchObject(mockData.detalhes);
-            expect(mockMapasStore.mapaCompleto.value).toEqual(mockData.mapa);
         });
 
         it('deve falhar se não houver perfil', async () => {

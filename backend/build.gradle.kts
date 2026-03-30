@@ -55,7 +55,7 @@ tasks.named<JavaCompile>("compileTestJava") {
 }
 
 extra["mapstruct.version"] = "1.6.3"
-extra["lombok.version"] = "1.18.42"
+extra["lombok.version"] = "1.18.44"
 extra["jjwt.version"] = "0.13.0"
 
 dependencyManagement {
@@ -108,12 +108,12 @@ dependencies {
     testImplementation("org.pitest:pitest-junit5-plugin:1.2.3")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.2")
     testImplementation("io.swagger.parser.v3:swagger-parser:2.1.37")
-    implementation("org.mozilla:rhino:1.9.0")
+    implementation("org.mozilla:rhino:1.9.1")
     testImplementation("com.atlassian.oai:swagger-request-validator-mockmvc:2.46.0")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
-    errorprone("com.google.errorprone:error_prone_core:2.41.0")
-    errorprone("com.uber.nullaway:nullaway:0.12.10")
+    errorprone("com.google.errorprone:error_prone_core:2.48.0")
+    errorprone("com.uber.nullaway:nullaway:0.13.1")
 }
 
 
@@ -161,21 +161,8 @@ tasks.withType<Test> {
         showStandardStreams = false
     }
 
-    addTestOutputListener { descriptor, event ->
-        if (event.destination == TestOutputEvent.Destination.StdErr) {
-            val msg = event.message
-            if (!msg.contains("WARNING: A terminally deprecated method in sun.misc.Unsafe") &&
-                !msg.contains("WARNING: sun.misc.Unsafe::") &&
-                !msg.contains("WARNING: Please consider reporting this to the maintainers")
-            ) {
-                System.err.print(msg)
-            }
-        }
-    }
-
     val slowTests = mutableListOf<Pair<String, Long>>()
     val showSlowTests = false
-
     addTestListener(object : TestListener {
         override fun beforeSuite(suite: TestDescriptor) {}
         override fun afterSuite(suite: TestDescriptor, result: TestResult) {
@@ -264,7 +251,6 @@ jacoco {
 
 tasks.jacocoTestReport {
     dependsOn(tasks.named("test"))
-    // Usa apenas a execucao da tarefa `test` para evitar dependencia implicita com `unitTest`.
     executionData.setFrom(layout.buildDirectory.file("jacoco/test.exec"))
 
     reports {
@@ -281,20 +267,12 @@ tasks.jacocoTestReport {
                     "sgc/e2e/**",
                     "sgc/**/config/**",
                     "sgc/**/*Config*.class",
-                    "sgc/**/*Configuration*.class",
                     "sgc/**/*Properties.class",
                     "sgc/**/*Exception.class",
                     "sgc/**/Erro*.class",
-
-                    "sgc/notificacao/NotificacaoModelosServiceMock.class",
-
                     "sgc/**/Status*.class",
                     "sgc/**/Tipo*.class",
                     "sgc/**/Situacao*.class",
-
-                    "sgc/**/*Impl.class",
-                    "sgc/**/*MapperImpl.class",
-
                     "sgc/**/*Dto.class",
                     "sgc/**/*Request.class",
                     "sgc/**/*Response.class",
@@ -303,7 +281,7 @@ tasks.jacocoTestReport {
                     "sgc/**/model/*Id.class",
                     "sgc/**/*Repo.class",
                     
-                    // Entidades simples (frequentemente apenas getters/setters/equals/hashCode)
+                    // Entidades simples
                     "sgc/**/model/Usuario.class",
                     "sgc/**/model/Unidade*.class",
                     "sgc/**/model/Administrador.class",

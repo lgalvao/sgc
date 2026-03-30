@@ -10,7 +10,7 @@ vi.mock('@/views/AdministradoresView.vue', () => ({ default: { name: 'Administra
 describe("main.routes", () => {
     it("deve exportar um array de rotas", () => {
         expect(Array.isArray(mainRoutes)).toBe(true);
-        expect(mainRoutes).toHaveLength(7);
+        expect(mainRoutes).toHaveLength(8);
     });
 
     it("deve redirecionar da raiz para /login", () => {

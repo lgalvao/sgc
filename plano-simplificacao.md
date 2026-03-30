@@ -81,6 +81,14 @@ Antes de qualquer simplificação, aplicar as seguintes restrições:
 * `UnidadeView`: referência explícita de mapa vigente vinda do backend, sem depender de `mapasStore`.
 * Modal de impacto: composable curto (`useImpactoMapaModal`) consolidou ciclo de `mostrar/loading/buscar`.
 * Stores reduzidas a 2: `perfil.ts` e `toast.ts` — ambas legitimamente globais.
+* Remoção de wrappers redundantes (ex: `podeVerImpacto` centralizada para utilizar nativamente `podeVisualizarImpacto`).
+* Validações de UI (como `isSituacaoMapaValidadoOuAjustado`) não bloqueiam o workflow, funcionam puramente como filtro reativo.
+
+#### Backend — DTOs, Desempenho e Diretrizes
+
+* Criação das `Diretrizes Arquiteturais` (`/etc/docs/diretrizes-arquiteturais.md`), amarrando formalmente a regra de injeção de DTOs e uso explícito de Facades em oposição a chamadas de cascata excessivas.
+* Correção do ciclo E2E via supressões de *LazyInitializationException*, encapsulando a população completa da coleção de `participantes` com `LEFT JOIN FETCH` diretamente nos métodos do `ProcessoRepo.java`.
+* A carga centralizada unificada por `ProcessoDetalheView` e `buscas` foi mantida intacta pois atende integralmente a redução de round-trips e performance de backend exigidos na Frente D.
 
 ### Pontos de atenção herdados
 
@@ -100,94 +108,21 @@ Antes de qualquer simplificação, aplicar as seguintes restrições:
 
 Os próximos passos devem ser executados como frentes complementares, não como otimizações isoladas.
 
-### Frente A. Recentrar a fonte de verdade no backend
+### Frente E. Redução de Classes Hipertrofiadas no Backend
 
 **Problema:**
-O frontend ainda carrega resquícios do protótipo inicial sem backend: regras de workflow, validações e guardas locais
-que duplicam comportamento já protegido no backend. Isso aumenta manutenção e abre risco de divergência com
-`etc/reqs` e `etc/docs/regras-acesso.md`.
+Serviços como `SubprocessoService` (42.7 KB) e `SubprocessoTransicaoService` (33 KB) concentram responsabilidades demais e estão difíceis de manter.
+Embora o reaproveitamento inicial tenha removido duplicações locais, o acoplamento entre esses componentes ainda é alto e o volume de linhas penaliza a manutenibilidade.
 
 **Objetivo:**
-
-* Deixar o frontend responsável por estado de tela, navegação e feedback visual.
-* Deixar o backend como fonte de verdade de permissão, situação e validação de negócio.
-
-**Critério de execução:**
-
-* Remover primeiro guardas locais redundantes de situação e workflow.
-* Manter apenas validações locais de formulário e consistência puramente visual.
-* Evitar reimplementar regra de permissão fora de `useAcesso` e do contrato vindo do backend.
-
-### Frente B. Reduzir round-trips por tela
-
-**Problema:**
-No Oracle real, o custo do vai-e-vem ficou visível. O frontend ainda faz sequências de chamadas finas demais para
-montar uma única tela.
-
-**Objetivo:**
-
-* Preferir cargas de contexto por tela ou por fluxo.
-* Evitar sequências como "buscar id → buscar detalhe → buscar mapa → buscar permissões" quando um endpoint de
-  contexto já pode entregar isso junto.
-
-**Candidatos prioritários:**
-
-* `SubprocessoView`
-* `CadastroView`
-* `CadastroVisualizacaoView`
-* `MapaVisualizacaoView`
+* Extirpar domínios paralelos (como orquestração de leitura x transições).
+* Separar fluxos de workflow num componente coeso (ex: `SubprocessoWorkflowFacade` ou segregando a orquestração).
+* Distribuir consultas (leitura) isoladas para um `SubprocessoConsultaService` puro.
 
 **Critério de execução:**
-
-* Cada tela deve ter inventário explícito de chamadas no `onMounted`.
-* Se duas ou mais chamadas sempre andam juntas, avaliar consolidação.
-* Preferir reutilizar endpoint de contexto existente antes de criar endpoint novo.
-* Criar endpoint novo apenas quando a composição atual continuar cara demais ou incompleta.
-* Sempre que possível, transformar a redução de round-trips em teste com orçamento explícito de chamadas por tela.
-
-**Validação de desempenho:**
-
-* No frontend, usar testes de orçamento de chamadas para evitar regressão de round-trips lógicos.
-* No backend, confrontar os fluxos críticos com o `MonitoramentoAspect`.
-* Leitura combinada: menos chamadas por tela + menos `EXECUCAO LENTA` + redução de latência percebida.
-
-### Frente C. Estreitar composables para refletir fluxos reais
-
-**Problema:**
-Alguns composables ainda foram desenhados como infraestrutura genérica do protótipo, não como representação do fluxo
-real do SGC. Isso gera escrita implícita em stores paralelos, API pública larga demais e acoplamento desnecessário.
-
-**Objetivo:**
-
-* Manter cada composable responsável por um fluxo claro.
-* Eliminar sincronizações implícitas.
-* Devolver dados para a view quando isso tornar o fluxo mais legível.
-
-**Critério de execução:**
-
-* Se o composable altera outro store por dentro, reavaliar.
-* Se a view é o único consumidor, preferir helper local ou composable de escopo curto.
-* Se uma abstração genérica tiver só um consumidor real, preferir estado e helpers explícitos na própria tela.
-* Se o estado é realmente compartilhado, explicitar isso e manter o singleton.
-
-### Frente D. Consolidar backend para servir melhor o frontend real
-
-**Problema:**
-Parte da complexidade percebida no frontend nasce de endpoints finos ou fragmentados demais para o uso real das telas.
-Simplificar só no frontend não resolve o custo de orquestração quando a tela depende de múltiplos pedaços sempre
-carregados juntos.
-
-**Objetivo:**
-
-* Identificar onde vale expor contexto agregado útil para a tela.
-* Manter DTOs e fronteiras seguras.
-* Evitar que a simplificação de frontend empurre regra para a UI.
-
-**Critério de execução:**
-
-* Primeiro reutilizar `contexto-edicao` e endpoints já existentes.
-* Depois, se necessário, criar DTO/endpoint agregado orientado à tela.
-* Nunca substituir isso por exposição direta de entidade ou acoplamento controller-repo.
+* Antes de cortar classes, mapear interdependências atuais.
+* Reduzir o acoplamento entre essas duas superclasses transferindo a interface de dados puramente a componentes menores quando viável.
+* Preservar o 100% de cobertura nos testes de unidade (1401 testes green).
 
 ---
 
@@ -205,22 +140,6 @@ carregados juntos.
 * Evita divergência visual entre telas?
 
 **Critério de pronto:** cada componente auditado classificado como manter, ajustar ou remover.
-
-### Formalizar diretrizes para facades e acesso direto a repositórios
-
-**Objetivo:** documentar as regras já adotadas na prática (seção Guardrails) em local visível do projeto.
-
-**Critério de pronto:** diretriz registrada; novos PRs passam a citar esse critério.
-
-### Registrar diretriz de DTOs
-
-**Objetivo:** documentar formalmente que DTO não é boilerplate descartável. Conteúdo mínimo:
-
-* DTO protege contrato e carregamento;
-* entidade JPA não deve vazar para API por conveniência;
-* remoção exige verificação de contrato, lazy loading e serialização.
-
-**Critério de pronto:** regra documentada em local visível do módulo backend.
 
 ---
 
