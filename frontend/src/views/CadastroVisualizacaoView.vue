@@ -9,7 +9,7 @@
       </template>
       <template #actions>
         <BButton
-            v-if="podeVerImpacto"
+            v-if="podeVisualizarImpacto"
             data-testid="cad-atividades__btn-impactos-mapa-visualizacao"
             variant="outline-secondary"
             @click="abrirModalImpacto"
@@ -211,7 +211,7 @@ const {
   habilitarHomologarCadastro
 } = useAcesso(computed(() => subprocessosStore.subprocessoDetalhe));
 
-const podeVerImpacto = computed(() => podeVisualizarImpacto.value);
+
 const isHomologacao = computed(() => podeHomologarCadastro.value);
 const habilitarAnalisarCadastro = computed(() => habilitarAceitarCadastro.value || habilitarHomologarCadastro.value);
 

@@ -7,9 +7,6 @@ import {setRouter} from "@/axios-setup";
 import App from "./App.vue";
 import router from "./router/index";
 
-import "./assets/css/tokens.css";
-import "./assets/css/responsividade.css";
-import "./style.css";
 import "bootstrap-vue-next/dist/bootstrap-vue-next.css";
 import "bootstrap/dist/css/bootstrap.min.css"; // Manter se houver estilos customizados
 import "bootstrap-icons/font/bootstrap-icons.css";

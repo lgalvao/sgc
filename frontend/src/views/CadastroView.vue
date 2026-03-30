@@ -15,7 +15,7 @@
       </template>
       <template #actions>
         <BButton
-            v-if="codSubprocesso && podeVerImpacto"
+            v-if="codSubprocesso && podeVisualizarImpacto"
             data-testid="cad-atividades__btn-impactos-mapa-edicao"
             variant="outline-secondary"
             @click="abrirModalImpacto"
@@ -245,7 +245,7 @@ const {
   habilitarDisponibilizarCadastro
 } = useAcesso(subprocesso);
 const isRevisao = computed(() => subprocesso.value?.tipoProcesso === TipoProcesso.REVISAO);
-const podeVerImpacto = computed(() => podeVisualizarImpacto.value);
+
 
 const atividades = ref<Atividade[]>([]);
 const atividadesSnapshotInicial = ref<string>('[]');

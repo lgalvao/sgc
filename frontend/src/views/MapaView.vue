@@ -9,7 +9,7 @@
 
       <template #actions>
         <LoadingButton
-            v-if="podeVerImpacto"
+            v-if="podeVisualizarImpacto"
             :loading="loadingImpacto"
             data-testid="cad-mapa__btn-impactos-mapa"
             icon="arrow-right-circle"
@@ -161,7 +161,7 @@ const {
   habilitarEditarMapa,
   habilitarDisponibilizarMapa
 } = useAcesso(subprocesso);
-const podeVerImpacto = computed(() => podeVisualizarImpacto.value);
+
 
 const unidade = ref<Unidade | null>(null);
 const codSubprocesso = ref<number | null>(null);
@@ -402,7 +402,7 @@ defineExpose({
   ImpactoMapaModal,
   CriarCompetenciaModal,
   DisponibilizarMapaModal,
-  podeVerImpacto,
+  podeVisualizarImpacto,
   podeEditarMapa,
   podeDisponibilizarMapa,
   podeConfirmarDisponibilizacao,
