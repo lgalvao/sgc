@@ -7,6 +7,7 @@ vi.mock('@/views/HistoricoView.vue', () => ({ default: { name: 'HistoricoView' }
 vi.mock('@/views/RelatoriosView.vue', () => ({ default: { name: 'RelatoriosView' } }));
 vi.mock('@/views/ParametrosView.vue', () => ({ default: { name: 'ParametrosView' } }));
 vi.mock('@/views/AdministradoresView.vue', () => ({ default: { name: 'AdministradoresView' } }));
+vi.mock('@/views/ErroGeralView.vue', () => ({ default: { name: 'ErroGeralView' } }));
 describe("main.routes", () => {
     it("deve exportar um array de rotas", () => {
         expect(Array.isArray(mainRoutes)).toBe(true);
@@ -24,6 +25,18 @@ describe("main.routes", () => {
         expect(route).toBeDefined();
         expect(route?.path).toBe("/login");
         expect(route?.meta?.title).toBe("Login");
+
+        if (typeof route?.component === "function") {
+            const component = await (route.component as () => Promise<any>)();
+            expect(component.default).toBeDefined();
+        }
+    }, 30000);
+
+    it("deve conter a rota ErroGeral", async () => {
+        const route = mainRoutes.find((r) => r.name === "ErroGeral");
+        expect(route).toBeDefined();
+        expect(route?.path).toBe("/erro");
+        expect(route?.meta?.title).toBe("Erro");
 
         if (typeof route?.component === "function") {
             const component = await (route.component as () => Promise<any>)();
