@@ -56,7 +56,7 @@ public class Unidade extends EntidadeBase {
     @JsonIgnore
     private List<Unidade> subunidades = new ArrayList<>();
 
-    @OneToOne(mappedBy = "unidade")
+    @OneToOne(mappedBy = "unidade", fetch = FetchType.LAZY)
     @Nullable
     @JsonIgnore
     private Responsabilidade responsabilidade;

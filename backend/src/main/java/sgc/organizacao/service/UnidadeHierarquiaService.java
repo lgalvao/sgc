@@ -76,7 +76,7 @@ public class UnidadeHierarquiaService {
      * Constrói o mapa de hierarquia (Pai -> Lista de Filhos) buscando todas as unidades.
      */
     public Map<Long, List<Long>> buscarMapaHierarquia() {
-        List<Unidade> todas = unidadeRepo.findAllWithHierarquia();
+        List<Unidade> todas = unidadeRepo.findAllAtivasComSuperior();
 
         Map<Long, List<Long>> mapPaiFilhos = new HashMap<>();
         for (Unidade u : todas) {
@@ -242,4 +242,3 @@ public class UnidadeHierarquiaService {
         return dto;
     }
 }
-
