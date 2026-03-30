@@ -3,7 +3,7 @@ import {
     criarProcessoCadastroDisponibilizadoFixture,
     criarProcessoRevisaoCadastroDisponibilizadoFixture
 } from './fixtures/fixtures-processos.js';
-import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
+import {loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
 import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
 import {fazerLogout, navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
 import {resetDatabase} from './hooks/hooks-limpeza.js';
