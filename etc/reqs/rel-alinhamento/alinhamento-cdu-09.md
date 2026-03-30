@@ -1,170 +1,116 @@
-# Alinhamento CDU-09 - Reanálise (rodada 2)
+# Alinhamento CDU-09 - Reanálise (rodada 3)
 
 ## Artefatos analisados
 - Requisito: `etc/reqs/cdu-09.md`.
-- Teste E2E: `e2e/cdu-09.spec.ts` (4 cenários `test`, 0 `test.step`).
+- Teste E2E: `e2e/cdu-09.spec.ts` (3 cenários `test` + 1 setup, 0 `test.step`).
 
 ## Resultado da comparação requisito x E2E
 - Itens do fluxo principal avaliados: **29**.
-- Status: **11 cobertos**, **15 parciais**, **3 não cobertos** (baseado em evidências textuais no spec e helpers).
+- Status: **18 cobertos**, **7 parciais**, **4 não cobertos** (baseado em evidências textuais no spec e helpers).
 
 ## Matriz de evidências
-- ✅ **[COBERTO]** 1. No painel, o usuário escolhe um processo de mapeamento na situação 'Em andamento'.
-  - Palavras-chave usadas: `processo, situação, painel, escolhe, mapeamento, andamento`
-  - Evidência (score 2): `e2e/cdu-09.spec.ts:104` -> `await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro em andamento/i);`
-  - Evidência (score 1): `e2e/cdu-09.spec.ts:3` -> `import {criarProcessoFixture} from './fixtures/fixtures-processos.js';`
-  - Evidência (score 1): `e2e/cdu-09.spec.ts:11` -> `acessarSubprocessoChefeDireto,`
-- ✅ **[COBERTO]** 2. O sistema mostra tela `Detalhes do subprocesso` da unidade.
-  - Palavras-chave usadas: `subprocesso, unidade, mostra, detalhes`
-  - Evidência (score 2): `e2e/cdu-09.spec.ts:43` -> `await acessarSubprocessoChefeDireto(page, descricaoProcesso, UNIDADE_ALVO);`
-  - Evidência (score 2): `e2e/cdu-09.spec.ts:64` -> `await acessarSubprocessoChefeDireto(page, descricaoProcesso, UNIDADE_ALVO);`
-  - Evidência (score 2): `e2e/cdu-09.spec.ts:83` -> `await acessarSubprocessoGestor(page, descricaoProcesso, UNIDADE_ALVO);`
-- ✅ **[COBERTO]** 3. O usuário clica no card `Atividades e conhecimentos`.
-  - Palavras-chave usadas: `atividades, clica, card, conhecimentos`
-  - Evidência (score 2): `e2e/cdu-09.spec.ts:24` -> `test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecimentos', () => {`
-  - Evidência (score 1): `e2e/cdu-09.spec.ts:7` -> `navegarParaAtividades,`
-  - Evidência (score 1): `e2e/cdu-09.spec.ts:8` -> `navegarParaAtividadesVisualizacao,`
-- ✅ **[COBERTO]** 4. O sistema mostra a tela `Cadastro de atividades e conhecimentos`, preenchida com os dados cadastrados até o momento.
-  - Palavras-chave usadas: `atividades, mostra, cadastro, conhecimentos, preenchida, cadastrados`
-  - Evidência (score 3): `e2e/cdu-09.spec.ts:24` -> `test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecimentos', () => {`
-  - Evidência (score 2): `e2e/cdu-09.spec.ts:77` -> `await verificarToast(page, TEXTOS.sucesso.CADASTRO_ATIVIDADES_DISPONIBILIZADO);`
-  - Evidência (score 2): `e2e/cdu-09.spec.ts:116` -> `await verificarToast(page, TEXTOS.sucesso.CADASTRO_ATIVIDADES_DISPONIBILIZADO);`
-- ✅ **[COBERTO]** 5. Se o subprocesso já tiver sido disponibilizado anteriormente e estiver localizado em unidade diferente da unidade ativa do usuário, o sistema mostra um alerta fixo no topo da tela com o texto: "Cadastro disponibilizado para análise pelas unidades superiores.", não permitindo edição ou disponibilização.
-  - Palavras-chave usadas: `subprocesso, unidade, alerta, unidades, tiver, sido`
-  - Evidência (score 2): `e2e/cdu-09.spec.ts:43` -> `await acessarSubprocessoChefeDireto(page, descricaoProcesso, UNIDADE_ALVO);`
-  - Evidência (score 2): `e2e/cdu-09.spec.ts:64` -> `await acessarSubprocessoChefeDireto(page, descricaoProcesso, UNIDADE_ALVO);`
-  - Evidência (score 2): `e2e/cdu-09.spec.ts:81` -> `await verificarAlertaPainel(page, /Cadastro da unidade SECAO_221 disponibilizado para análise/i);`
-- 🟡 **[PARCIAL]** 6. Se o subprocesso tiver retornado de análise pelas unidades superiores, deverá ser exibido, além dos botões fixos da
-  - Palavras-chave usadas: `subprocesso, unidades, tiver, retornado, análise, pelas`
-  - Evidência (score 1): `e2e/cdu-09.spec.ts:11` -> `acessarSubprocessoChefeDireto,`
-  - Evidência (score 1): `e2e/cdu-09.spec.ts:12` -> `acessarSubprocessoGestor,`
-  - Evidência (score 1): `e2e/cdu-09.spec.ts:43` -> `await acessarSubprocessoChefeDireto(page, descricaoProcesso, UNIDADE_ALVO);`
-- 🟡 **[PARCIAL]** 7. Se o usuário clicar no botão `Histórico de análise`, o sistema mostra, em tela modal, os dados das análises do
-  - Palavras-chave usadas: `clicar, botão, histórico, análise, mostra, modal`
-  - Evidência (score 1): `e2e/cdu-09.spec.ts:53` -> `const modalConfirmacao = page.getByRole('dialog');`
-  - Evidência (score 1): `e2e/cdu-09.spec.ts:54` -> `await expect(modalConfirmacao.getByRole('heading', {name: TEXTOS.atividades.MODAL_DISPONIBILIZAR_TITULO})).toBeVisibl...`
-  - Evidência (score 1): `e2e/cdu-09.spec.ts:55` -> `await expect(modalConfirmacao.getByText(TEXTOS.atividades.MODAL_DISPONIBILIZAR_TEXTO)).toBeVisible();`
-- 🟡 **[PARCIAL]** 8. As análises deverão ser apresentadas em uma pequena tabela com data/hora, sigla da unidade, resultado ('Devolução' ou 'Aceite') e observações. Essas informações poderão ser usadas como subsídio para ajustes no cadastro pelo usuário, antes da realização de nova disponibilização.
-  - Palavras-chave usadas: `unidade, análises, apresentadas, pequena, data/hora, sigla`
-  - Evidência (score 1): `e2e/cdu-09.spec.ts:25` -> `const UNIDADE_ALVO = 'SECAO_221';`
-  - Evidência (score 1): `e2e/cdu-09.spec.ts:33` -> `unidade: UNIDADE_ALVO,`
-  - Evidência (score 1): `e2e/cdu-09.spec.ts:43` -> `await acessarSubprocessoChefeDireto(page, descricaoProcesso, UNIDADE_ALVO);`
-- 🟡 **[PARCIAL]** 9. O usuário escolhe `Disponibilizar`.
-  - Palavras-chave usadas: `escolhe, disponibilizar`
-  - Evidência (score 1): `e2e/cdu-09.spec.ts:24` -> `test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecimentos', () => {`
-  - Evidência (score 1): `e2e/cdu-09.spec.ts:49` -> `await expect(page.getByTestId('btn-cad-atividades-disponibilizar')).toBeDisabled();`
-  - Evidência (score 1): `e2e/cdu-09.spec.ts:52` -> `await page.getByTestId('btn-cad-atividades-disponibilizar').click();`
-- ✅ **[COBERTO]** 10. O sistema verifica se todas as atividades têm ao menos um conhecimento associado.
-  - Palavras-chave usadas: `atividades, verifica, todas, conhecimento, associado`
-  - Evidência (score 2): `e2e/cdu-09.spec.ts:24` -> `test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecimentos', () => {`
-  - Evidência (score 2): `e2e/cdu-09.spec.ts:77` -> `await verificarToast(page, TEXTOS.sucesso.CADASTRO_ATIVIDADES_DISPONIBILIZADO);`
-  - Evidência (score 2): `e2e/cdu-09.spec.ts:116` -> `await verificarToast(page, TEXTOS.sucesso.CADASTRO_ATIVIDADES_DISPONIBILIZADO);`
-- 🟡 **[PARCIAL]** 11. Se houver esses problemas de validação, o sistema indica quais atividades estão precisando de adição de conhecimentos e interrompe a operação de disponibilização, permanecendo na mesma tela.
-  - Palavras-chave usadas: `atividades, houver, esses, problemas, validação, indica`
-  - Evidência (score 1): `e2e/cdu-09.spec.ts:7` -> `navegarParaAtividades,`
-  - Evidência (score 1): `e2e/cdu-09.spec.ts:8` -> `navegarParaAtividadesVisualizacao,`
-  - Evidência (score 1): `e2e/cdu-09.spec.ts:9` -> `} from './helpers/helpers-atividades.js';`
-- ❌ **[NAO_COBERTO]** 12. O sistema mostra um diálogo de confirmação com título "Disponibilização do cadastro", com mensagem "Confirma a finalização e a disponibilização do cadastro? Essa ação bloqueia a edição e habilita a análise do cadastro por unidades superiores", além dos botões `Confirmar` e `Cancelar`.
-  - Palavras-chave usadas: `unidades, mostra, diálogo, confirmação, título, disponibilização`
-  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
-- 🟡 **[PARCIAL]** 13. Caso o usuário escolha `Cancelar`, o sistema interrompe a operação de disponibilização, permanecendo na mesma tela.
-  - Palavras-chave usadas: `escolha, cancelar, interrompe, operação, disponibilização, permanecendo`
-  - Evidência (score 1): `e2e/cdu-09.spec.ts:57` -> `await page.getByTestId('btn-disponibilizar-revisao-cancelar').click();`
-- 🟡 **[PARCIAL]** 14. O usuário escolhe `Confirmar`.
-  - Palavras-chave usadas: `escolhe, confirmar`
-  - Evidência (score 1): `e2e/cdu-09.spec.ts:56` -> `await expect(page.getByTestId('btn-confirmar-disponibilizacao')).toBeVisible();`
-  - Evidência (score 1): `e2e/cdu-09.spec.ts:75` -> `await page.getByTestId('btn-confirmar-disponibilizacao').click();`
-  - Evidência (score 1): `e2e/cdu-09.spec.ts:97` -> `await page.getByTestId('btn-devolucao-cadastro-confirmar').click();`
-- ✅ **[COBERTO]** 15. O sistema altera a situação do subprocesso da unidade para 'Cadastro disponibilizado'
-  - Palavras-chave usadas: `situação, subprocesso, unidade, altera, cadastro, disponibilizado`
-  - Evidência (score 3): `e2e/cdu-09.spec.ts:81` -> `await verificarAlertaPainel(page, /Cadastro da unidade SECAO_221 disponibilizado para análise/i);`
-  - Evidência (score 3): `e2e/cdu-09.spec.ts:84` -> `await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro disponibilizado/i);`
-  - Evidência (score 2): `e2e/cdu-09.spec.ts:43` -> `await acessarSubprocessoChefeDireto(page, descricaoProcesso, UNIDADE_ALVO);`
-- 🟡 **[PARCIAL]** 16. O sistema registra uma movimentação para o subprocesso com os campos:
-  - Palavras-chave usadas: `subprocesso, registra, movimentação`
-  - Evidência (score 1): `e2e/cdu-09.spec.ts:11` -> `acessarSubprocessoChefeDireto,`
-  - Evidência (score 1): `e2e/cdu-09.spec.ts:12` -> `acessarSubprocessoGestor,`
-  - Evidência (score 1): `e2e/cdu-09.spec.ts:43` -> `await acessarSubprocessoChefeDireto(page, descricaoProcesso, UNIDADE_ALVO);`
-- ❌ **[NAO_COBERTO]** 17. `Data/hora`: Data/hora atual
-  - Palavras-chave usadas: `data/hora, atual`
-  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
-- 🟡 **[PARCIAL]** 18. `Unidade origem`: [SIGLA_UNIDADE_SUBPROCESSO]
-  - Palavras-chave usadas: `unidade, sigla_unidade_subprocesso, origem`
-  - Evidência (score 1): `e2e/cdu-09.spec.ts:25` -> `const UNIDADE_ALVO = 'SECAO_221';`
-  - Evidência (score 1): `e2e/cdu-09.spec.ts:33` -> `unidade: UNIDADE_ALVO,`
-  - Evidência (score 1): `e2e/cdu-09.spec.ts:43` -> `await acessarSubprocessoChefeDireto(page, descricaoProcesso, UNIDADE_ALVO);`
-- 🟡 **[PARCIAL]** 19. `Unidade destino`: [SIGLA_UNIDADE_SUPERIOR]
-  - Palavras-chave usadas: `unidade, sigla_unidade_superior, destino`
-  - Evidência (score 1): `e2e/cdu-09.spec.ts:25` -> `const UNIDADE_ALVO = 'SECAO_221';`
-  - Evidência (score 1): `e2e/cdu-09.spec.ts:33` -> `unidade: UNIDADE_ALVO,`
-  - Evidência (score 1): `e2e/cdu-09.spec.ts:43` -> `await acessarSubprocessoChefeDireto(page, descricaoProcesso, UNIDADE_ALVO);`
-- ✅ **[COBERTO]** 20. `Descrição`: 'Disponibilização do cadastro de atividades'
-  - Palavras-chave usadas: `atividades, descrição, disponibilização, cadastro`
-  - Evidência (score 2): `e2e/cdu-09.spec.ts:24` -> `test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecimentos', () => {`
-  - Evidência (score 2): `e2e/cdu-09.spec.ts:77` -> `await verificarToast(page, TEXTOS.sucesso.CADASTRO_ATIVIDADES_DISPONIBILIZADO);`
-  - Evidência (score 2): `e2e/cdu-09.spec.ts:116` -> `await verificarToast(page, TEXTOS.sucesso.CADASTRO_ATIVIDADES_DISPONIBILIZADO);`
-- 🟡 **[PARCIAL]** 21. O sistema notifica a unidade superior hierárquica quanto à disponibilização, com e-mail no modelo abaixo:
-  - Palavras-chave usadas: `unidade, notifica, superior, hierárquica, quanto, disponibilização`
-  - Evidência (score 1): `e2e/cdu-09.spec.ts:25` -> `const UNIDADE_ALVO = 'SECAO_221';`
-  - Evidência (score 1): `e2e/cdu-09.spec.ts:33` -> `unidade: UNIDADE_ALVO,`
-  - Evidência (score 1): `e2e/cdu-09.spec.ts:43` -> `await acessarSubprocessoChefeDireto(page, descricaoProcesso, UNIDADE_ALVO);`
-- 🟡 **[PARCIAL]** 22. O sistema cria internamente um alerta:
-  - Palavras-chave usadas: `alerta, cria, internamente`
-  - Evidência (score 1): `e2e/cdu-09.spec.ts:3` -> `import {criarProcessoFixture} from './fixtures/fixtures-processos.js';`
-  - Evidência (score 1): `e2e/cdu-09.spec.ts:18` -> `verificarAlertaPainel,`
-  - Evidência (score 1): `e2e/cdu-09.spec.ts:30` -> `test('Setup: Criar processo via fixture', async ({_resetAutomatico, request}) => {`
-- ✅ **[COBERTO]** 23. `Descrição`: "Cadastro da unidade [SIGLA_UNIDADE_SUBPROCESSO] disponibilizado para
-  - Palavras-chave usadas: `unidade, sigla_unidade_subprocesso, descrição, cadastro, disponibilizado`
-  - Evidência (score 3): `e2e/cdu-09.spec.ts:81` -> `await verificarAlertaPainel(page, /Cadastro da unidade SECAO_221 disponibilizado para análise/i);`
-  - Evidência (score 2): `e2e/cdu-09.spec.ts:77` -> `await verificarToast(page, TEXTOS.sucesso.CADASTRO_ATIVIDADES_DISPONIBILIZADO);`
-  - Evidência (score 2): `e2e/cdu-09.spec.ts:84` -> `await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro disponibilizado/i);`
-- 🟡 **[PARCIAL]** 24. `Processo`: [DESCRICAO_PROCESSO]
-  - Palavras-chave usadas: `processo, descricao_processo`
-  - Evidência (score 1): `e2e/cdu-09.spec.ts:3` -> `import {criarProcessoFixture} from './fixtures/fixtures-processos.js';`
-  - Evidência (score 1): `e2e/cdu-09.spec.ts:11` -> `acessarSubprocessoChefeDireto,`
-  - Evidência (score 1): `e2e/cdu-09.spec.ts:12` -> `acessarSubprocessoGestor,`
-- ❌ **[NAO_COBERTO]** 25. `Data/hora`: Data/hora atual
-  - Palavras-chave usadas: `data/hora, atual`
-  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
-- 🟡 **[PARCIAL]** 26. `Unidade de origem`: [SIGLA_UNIDADE_SUBPROCESSO]
-  - Palavras-chave usadas: `unidade, sigla_unidade_subprocesso, origem`
-  - Evidência (score 1): `e2e/cdu-09.spec.ts:25` -> `const UNIDADE_ALVO = 'SECAO_221';`
-  - Evidência (score 1): `e2e/cdu-09.spec.ts:33` -> `unidade: UNIDADE_ALVO,`
-  - Evidência (score 1): `e2e/cdu-09.spec.ts:43` -> `await acessarSubprocessoChefeDireto(page, descricaoProcesso, UNIDADE_ALVO);`
-- 🟡 **[PARCIAL]** 27. `Unidade de destino`: [SIGLA_UNIDADE_SUPERIOR].
-  - Palavras-chave usadas: `unidade, sigla_unidade_superior, destino`
-  - Evidência (score 1): `e2e/cdu-09.spec.ts:25` -> `const UNIDADE_ALVO = 'SECAO_221';`
-  - Evidência (score 1): `e2e/cdu-09.spec.ts:33` -> `unidade: UNIDADE_ALVO,`
-  - Evidência (score 1): `e2e/cdu-09.spec.ts:43` -> `await acessarSubprocessoChefeDireto(page, descricaoProcesso, UNIDADE_ALVO);`
-- ✅ **[COBERTO]** 28. O sistema define a data/hora de conclusão da etapa 1 do subprocesso da unidade como sendo a data/hora atual.
-  - Palavras-chave usadas: `subprocesso, unidade, define, data/hora, conclusão, sendo`
-  - Evidência (score 2): `e2e/cdu-09.spec.ts:43` -> `await acessarSubprocessoChefeDireto(page, descricaoProcesso, UNIDADE_ALVO);`
-  - Evidência (score 2): `e2e/cdu-09.spec.ts:64` -> `await acessarSubprocessoChefeDireto(page, descricaoProcesso, UNIDADE_ALVO);`
-  - Evidência (score 2): `e2e/cdu-09.spec.ts:83` -> `await acessarSubprocessoGestor(page, descricaoProcesso, UNIDADE_ALVO);`
-- ✅ **[COBERTO]** 29. O sistema redireciona para o Painel, mostrando a mensagem "Cadastro de atividades disponibilizado".
-  - Palavras-chave usadas: `atividades, redireciona, painel, mostrando, mensagem, cadastro`
-  - Evidência (score 2): `e2e/cdu-09.spec.ts:24` -> `test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecimentos', () => {`
-  - Evidência (score 2): `e2e/cdu-09.spec.ts:77` -> `await verificarToast(page, TEXTOS.sucesso.CADASTRO_ATIVIDADES_DISPONIBILIZADO);`
-  - Evidência (score 2): `e2e/cdu-09.spec.ts:81` -> `await verificarAlertaPainel(page, /Cadastro da unidade SECAO_221 disponibilizado para análise/i);`
 
-## Ajustes recomendados para próximo ciclo
-- Completar cobertura do item: **Se o subprocesso tiver retornado de análise pelas unidades superiores, deverá ser exibido, além dos botões fixos da** (atualmente parcial).
-- Completar cobertura do item: **Se o usuário clicar no botão `Histórico de análise`, o sistema mostra, em tela modal, os dados das análises do** (atualmente parcial).
-- Completar cobertura do item: **As análises deverão ser apresentadas em uma pequena tabela com data/hora, sigla da unidade, resultado ('Devolução' ou 'Aceite') e observações. Essas informações poderão ser usadas como subsídio para ajustes no cadastro pelo usuário, antes da realização de nova disponibilização.** (atualmente parcial).
+- ✅ **[COBERTO]** 1. No painel, o usuário escolhe um processo de mapeamento na situação 'Em andamento'.
+  - Evidência: `e2e/cdu-09.spec.ts:42` -> `await acessarSubprocessoChefeDireto(page, descricaoProcesso, UNIDADE_ALVO);`
+
+- ✅ **[COBERTO]** 2. O sistema mostra tela `Detalhes do subprocesso` da unidade.
+  - Evidência: `e2e/cdu-09.spec.ts:43` -> `await acessarSubprocessoChefeDireto(page, descricaoProcesso, UNIDADE_ALVO);`
+
+- ✅ **[COBERTO]** 3. O usuário clica no card `Atividades e conhecimentos`.
+  - Evidência: `e2e/cdu-09.spec.ts:44` -> `await navegarParaAtividades(page);`
+
+- ✅ **[COBERTO]** 4. O sistema mostra a tela `Cadastro de atividades e conhecimentos`, preenchida com os dados cadastrados até o momento.
+  - Evidência: `e2e/cdu-09.spec.ts:46` -> `await adicionarAtividade(page, atividadeDesc);`
+
+- ❌ **[NAO_COBERTO]** 5. Se o subprocesso já tiver sido disponibilizado anteriormente e estiver localizado em unidade diferente da unidade ativa do usuário, o sistema mostra um alerta fixo no topo da tela com o texto: "Cadastro disponibilizado para análise pelas unidades superiores.", não permitindo edição ou disponibilização.
+  - Não há assertion verificando esse alerta fixo na tela de cadastro de atividades quando subprocesso está em unidade diferente.
+
+- ✅ **[COBERTO]** 6. Se o subprocesso tiver retornado de análise, o botão `Histórico de análise` é habilitado.
+  - Evidência: `e2e/cdu-09.spec.ts:112` -> `const modal = await abrirHistoricoAnalise(page);` (Cenário 3 - após devolução do gestor)
+
+- ✅ **[COBERTO]** 7. Se o usuário clicar no botão `Histórico de análise`, o sistema mostra, em tela modal, os dados das análises do cadastro.
+  - Evidência: `e2e/cdu-09.spec.ts:112` -> `const modal = await abrirHistoricoAnalise(page);`
+  - Evidência: `e2e/cdu-09.spec.ts:116` -> `await expect(modal.getByTestId('cell-resultado-0')).toHaveText(/Devolu[cç][aã]o/i);`
+
+- ✅ **[COBERTO]** 8. As análises deverão ser apresentadas em uma pequena tabela com data/hora, sigla da unidade, resultado ('Devolução' ou 'Aceite') e observações.
+  - Evidência: `e2e/cdu-09.spec.ts:113` -> `await expect(modal.getByTestId('cell-dataHora-0')).not.toHaveText('');`
+  - Evidência: `e2e/cdu-09.spec.ts:114` -> `await expect(modal.getByTestId('cell-unidade-0')).toHaveText('COORD_22');`
+  - Evidência: `e2e/cdu-09.spec.ts:115` -> `await expect(modal.getByTestId('cell-resultado-0')).toHaveText(/Devolu[cç][aã]o/i);`
+  - Evidência: `e2e/cdu-09.spec.ts:116` -> `await expect(modal.getByTestId('cell-observacao-0')).toHaveText(motivo);`
+
+- ✅ **[COBERTO]** 9. O usuário escolhe `Disponibilizar`.
+  - Evidência: `e2e/cdu-09.spec.ts:49` -> `await page.getByTestId('btn-cad-atividades-disponibilizar').click();`
+
+- ✅ **[COBERTO]** 10. O sistema verifica se todas as atividades têm ao menos um conhecimento associado.
+  - Evidência: `e2e/cdu-09.spec.ts:48` -> `await expect(page.getByTestId('btn-cad-atividades-disponibilizar')).toBeDisabled();`
+
+- 🟡 **[PARCIAL]** 11. Se houver esses problemas de validação, o sistema indica quais atividades estão precisando de adição de conhecimentos e interrompe a operação de disponibilização.
+  - O btn-cad-atividades-disponibilizar fica disabled, confirmando o bloqueio, mas não há assertion explícita verificando qual atividade específica é indicada com o problema.
+  - Evidência: `e2e/cdu-09.spec.ts:48` -> `await expect(page.getByTestId('btn-cad-atividades-disponibilizar')).toBeDisabled();`
+
+- ✅ **[COBERTO]** 12. O sistema mostra um diálogo de confirmação com título "Disponibilização do cadastro" e mensagem correspondente.
+  - Evidência: `e2e/cdu-09.spec.ts:51` -> `await expect(modalConfirmacao.getByRole('heading', {name: TEXTOS.atividades.MODAL_DISPONIBILIZAR_TITULO})).toBeVisible();`
+  - Evidência: `e2e/cdu-09.spec.ts:52` -> `await expect(modalConfirmacao.getByText(TEXTOS.atividades.MODAL_DISPONIBILIZAR_TEXTO)).toBeVisible();`
+
+- ✅ **[COBERTO]** 13. Caso o usuário escolha `Cancelar`, o sistema interrompe a operação de disponibilização, permanecendo na mesma tela.
+  - Evidência: `e2e/cdu-09.spec.ts:54` -> `await page.getByTestId('btn-disponibilizar-revisao-cancelar').click();`
+  - Evidência: `e2e/cdu-09.spec.ts:55` -> `await expect(page.getByRole('heading', {name: TEXTOS.atividades.TITULO, level: 2})).toBeVisible();`
+
+- ✅ **[COBERTO]** 14. O usuário escolhe `Confirmar`.
+  - Evidência: `e2e/cdu-09.spec.ts:75` -> `await page.getByTestId('btn-confirmar-disponibilizacao').click();`
+
+- ✅ **[COBERTO]** 15. O sistema altera a situação do subprocesso da unidade para 'Cadastro disponibilizado'.
+  - Evidência: `e2e/cdu-09.spec.ts:84` -> `await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro disponibilizado/i);`
+
+- ✅ **[COBERTO]** 16. O sistema registra uma movimentação para o subprocesso.
+  - Evidência: `e2e/cdu-09.spec.ts:85` -> `await expect(page.getByTestId('tbl-movimentacoes')).toContainText(TEXTOS.movimentacao.CADASTRO_DISPONIBILIZADO);`
+
+- ❌ **[NAO_COBERTO]** 17. `Data/hora` da movimentação: Data/hora atual.
+  - Não há assertion explícita verificando o campo data/hora da movimentação com validação de timestamp.
+
+- 🟡 **[PARCIAL]** 18. `Unidade origem` da movimentação: [SIGLA_UNIDADE_SUBPROCESSO].
+  - A movimentação é verificada via containsText mas sem assertion isolada do campo Unidade origem.
+  - Evidência: `e2e/cdu-09.spec.ts:85` -> `await expect(page.getByTestId('tbl-movimentacoes')).toContainText(TEXTOS.movimentacao.CADASTRO_DISPONIBILIZADO);`
+
+- 🟡 **[PARCIAL]** 19. `Unidade destino` da movimentação: [SIGLA_UNIDADE_SUPERIOR].
+  - A movimentação é verificada mas sem assertion isolada do campo Unidade destino.
+
+- ✅ **[COBERTO]** 20. `Descrição` da movimentação: 'Disponibilização do cadastro de atividades'.
+  - Evidência: `e2e/cdu-09.spec.ts:85` -> `await expect(page.getByTestId('tbl-movimentacoes')).toContainText(TEXTOS.movimentacao.CADASTRO_DISPONIBILIZADO);`
+
+- ❌ **[NAO_COBERTO]** 21. O sistema notifica a unidade superior hierárquica por e-mail.
+  - Não testável via E2E (envio de e-mail é comportamento de infraestrutura).
+
+- ✅ **[COBERTO]** 22. O sistema cria internamente um alerta para a unidade superior.
+  - Evidência: `e2e/cdu-09.spec.ts:81` -> `await verificarAlertaPainel(page, /Cadastro da unidade SECAO_221 disponibilizado para análise/i);`
+
+- ✅ **[COBERTO]** 23. `Descrição` do alerta: "Cadastro da unidade [SIGLA_UNIDADE_SUBPROCESSO] disponibilizado para análise".
+  - Evidência: `e2e/cdu-09.spec.ts:81` -> `await verificarAlertaPainel(page, /Cadastro da unidade SECAO_221 disponibilizado para análise/i);`
+
+- 🟡 **[PARCIAL]** 24. `Processo` do alerta: [DESCRICAO_PROCESSO].
+  - O alerta é verificado via texto mas o campo Processo não é isolado no assert.
+
+- ❌ **[NAO_COBERTO]** 25. `Data/hora` do alerta: Data/hora atual.
+  - Não há assertion explícita verificando o campo data/hora do alerta.
+
+- 🟡 **[PARCIAL]** 26. `Unidade de origem` do alerta: [SIGLA_UNIDADE_SUBPROCESSO].
+  - Não há assertion isolada do campo Unidade de origem do alerta.
+
+- 🟡 **[PARCIAL]** 27. `Unidade de destino` do alerta: [SIGLA_UNIDADE_SUPERIOR].
+  - Não há assertion isolada do campo Unidade de destino do alerta.
+
+- 🟡 **[PARCIAL]** 28. O sistema define a data/hora de conclusão da etapa 1 do subprocesso da unidade como sendo a data/hora atual.
+  - Não há assertion explícita verificando este campo; a mudança de situação implica que ocorreu, mas sem verificação direta.
+
+- ✅ **[COBERTO]** 29. O sistema redireciona para o Painel, mostrando a mensagem "Cadastro de atividades disponibilizado".
+  - Evidência: `e2e/cdu-09.spec.ts:77` -> `await verificarToast(page, TEXTOS.sucesso.CADASTRO_ATIVIDADES_DISPONIBILIZADO);`
+  - Evidência: `e2e/cdu-09.spec.ts:78` -> `await verificarPaginaPainel(page);`
 
 ## Prontidão para o próximo PR de melhoria E2E
 - Status de entrada: **PRONTO_COM_GAPS**.
-- Motivos: há itens sem cobertura E2E.
-- Checklist mínimo antes de codar:
-  - [ ] confirmar massa de dados/fixtures para cenário positivo e negativo;
-  - [ ] definir assert de regra de negócio + assert de efeito colateral;
-  - [ ] validar perfil/unidade necessários no cenário (quando aplicável);
-  - [ ] mapear se precisa teste de integração backend complementar.
-- Escopo sugerido para o próximo PR deste CDU:
-  - Completar cobertura do item: **Se o subprocesso tiver retornado de análise pelas unidades superiores, deverá ser exibido, além dos botões fixos da** (atualmente parcial).
-  - Completar cobertura do item: **Se o usuário clicar no botão `Histórico de análise`, o sistema mostra, em tela modal, os dados das análises do** (atualmente parcial).
-  - Completar cobertura do item: **As análises deverão ser apresentadas em uma pequena tabela com data/hora, sigla da unidade, resultado ('Devolução' ou 'Aceite') e observações. Essas informações poderão ser usadas como subsídio para ajustes no cadastro pelo usuário, antes da realização de nova disponibilização.** (atualmente parcial).
-
-## Observações metodológicas
-- Esta rodada incluiu leitura de helpers importados para reduzir falso negativo de cobertura indireta.
-- Classificação automática por evidência textual; recomenda-se validação humana dos itens `🟡` e `❌` antes da implementação final.
+- Gaps remanescentes:
+  - Item 5 (alerta fixo "Cadastro disponibilizado para análise pelas unidades superiores." na tela de cadastro): cenário a adicionar verificando que chefe não pode editar quando subprocesso está em análise.
+  - Item 17 (data/hora da movimentação): adicionar assertion com regex de timestamp.
+  - Item 21 (e-mail): não testável via E2E.
+  - Item 25 (data/hora do alerta): adicionar assertion verificando campo data/hora no alerta.
+  - Itens 18, 19, 24, 26, 27, 28 (campos individuais de movimentação/alerta): considerar assertions por célula específica na tabela.
