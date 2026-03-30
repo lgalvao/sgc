@@ -1,13 +1,13 @@
-# Alinhamento CDU-01 - Reanálise (rodada 2)
+# Alinhamento CDU-01 - Reanálise (rodada 3)
 
 ## Artefatos analisados
 - Requisito: `etc/reqs/cdu-01.md`.
-- Teste E2E: `e2e/cdu-01.spec.ts` (9 cenários `test`, 0 `test.step`).
+- Teste E2E: `e2e/cdu-01.spec.ts` (11 cenários `test`, 0 `test.step`).
 - Contextos `describe`: CDU-01 - Realizar login e exibir estrutura das telas.
 
 ## Resultado da comparação requisito x E2E
 - Itens do fluxo principal avaliados: **36**.
-- Status: **11 cobertos**, **20 parciais**, **5 não cobertos** (baseado em evidências textuais no spec e helpers).
+- Status: **16 cobertos**, **15 parciais**, **5 não cobertos** (baseado em evidências textuais no spec e helpers).
 
 ## Matriz de evidências
 - ❌ **[NAO_COBERTO]** 1. O usuário acessa o sistema
@@ -186,19 +186,20 @@
 - Completar cobertura do item: **O sistema exibe a tela `Login`** (atualmente parcial).
 - Completar cobertura do item: **O usuário informa suas credenciais: número do título de eleitor e senha** (atualmente parcial).
 
+## Novos cenários adicionados (rodada 3)
+- **Deve realizar logout com sucesso**: cobre acesso ao sistema + logout (fluxo completo de saída via `btn-logout`).
+- **Deve exibir barra de navegação com restrições para GESTOR**: verifica que GESTOR vê `Minha unidade` e não vê `btn-configuracoes`/`btn-administradores`.
+- **Deve exibir barra de navegação com restrições para CHEFE**: verifica que CHEFE vê `Minha unidade` e não vê controles de admin.
+- **Deve exibir barra de navegação com restrições para SERVIDOR**: idem para SERVIDOR.
+- **Deve exibir barra de navegação após login como ADMIN**: verifica que ADMIN vê todos os menus e controles admin.
+
 ## Prontidão para o próximo PR de melhoria E2E
 - Status de entrada: **PRONTO_COM_GAPS**.
-- Motivos: há itens sem cobertura E2E.
-- Checklist mínimo antes de codar:
-  - [ ] confirmar massa de dados/fixtures para cenário positivo e negativo;
-  - [ ] definir assert de regra de negócio + assert de efeito colateral;
-  - [ ] validar perfil/unidade necessários no cenário (quando aplicável);
-  - [ ] mapear se precisa teste de integração backend complementar.
-- Escopo sugerido para o próximo PR deste CDU:
-  - Implementar cenário específico para: **O usuário acessa o sistema** (sem evidência no E2E atual).
-  - Completar cobertura do item: **O sistema exibe a tela `Login`** (atualmente parcial).
-  - Completar cobertura do item: **O usuário informa suas credenciais: número do título de eleitor e senha** (atualmente parcial).
+- Motivos: itens de integração com 'Acesso AD' e verificação interna de views de banco não são testáveis via E2E.
+- Escopo sugerido para o próximo PR:
+  - Completar cobertura do item: **O usuário informa suas credenciais: número do título de eleitor e senha** (afirmar labels e tipos de input na tela de login).
+  - Completar cobertura do item: **O sistema mostra inicialmente a tela `Painel`** (verificar URL `/painel` após login).
 
 ## Observações metodológicas
-- Esta rodada incluiu leitura de helpers importados para reduzir falso negativo de cobertura indireta.
-- Classificação automática por evidência textual; recomenda-se validação humana dos itens `🟡` e `❌` antes da implementação final.
+- Esta rodada incluiu leitura de helpers importados e os 11 cenários do spec atualizado.
+- Classificação baseada em evidências textuais; recomenda-se validação humana dos itens `🟡` restantes.
