@@ -199,7 +199,7 @@ import {
   type Conhecimento,
   type CriarConhecimentoRequest,
   type ErroValidacao,
-  type SituacaoSubprocesso,
+  SituacaoSubprocesso,
   TipoProcesso,
   type Unidade
 } from "@/types/tipos";
@@ -289,6 +289,33 @@ const botaoDisponibilizarDesabilitado = computed(() => {
 });
 
 const analisesCadastro = ref<Analise[]>([]);
+
+const situacaoAtual = computed(() => subprocesso.value?.situacao);
+const precisaIniciarRevisao = computed(() =>
+    isRevisao.value &&
+    situacaoAtual.value === SituacaoSubprocesso.NAO_INICIADO
+);
+
+async function iniciarRevisaoSeNecessario() {
+  if (!precisaIniciarRevisao.value || !codSubprocesso.value) return;
+
+  const sucesso = await fluxoSubprocesso.iniciarRevisaoCadastro(codSubprocesso.value);
+  if (!sucesso) {
+    logger.error('Falha ao iniciar revisão do cadastro');
+  }
+}
+
+watch(disponibilizacaoSemMudancas, async (marcado) => {
+  if (marcado && precisaIniciarRevisao.value) {
+    await iniciarRevisaoSeNecessario();
+  }
+});
+
+watch(houveAlteracaoCadastro, async (alterou) => {
+  if (alterou && precisaIniciarRevisao.value) {
+    await iniciarRevisaoSeNecessario();
+  }
+});
 
 const {withErrorHandling, lastError} = useErrorHandler();
 
@@ -564,6 +591,18 @@ function scrollParaPrimeiroErro() {
 }
 
 async function disponibilizarCadastro() {
+  const situacoesPermitidas = isRevisao.value
+      ? [SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO]
+      : [SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO];
+
+  if (!subprocesso.value?.situacao || !situacoesPermitidas.includes(subprocesso.value.situacao)) {
+    const situacaoReferencia = isRevisao.value
+        ? SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO
+        : SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO;
+    notify(TEXTOS.comum.ACAO_NAO_PERMITIDA_SITUACAO(formatSituacaoSubprocesso(situacaoReferencia)), 'danger');
+    return;
+  }
+
   if (codSubprocesso.value) {
     loadingValidacao.value = true;
     errosValidacao.value = [];

@@ -3,6 +3,7 @@ package sgc.organizacao.service;
 import lombok.*;
 import lombok.extern.slf4j.*;
 import org.springframework.stereotype.*;
+import org.springframework.transaction.annotation.*;
 import sgc.organizacao.model.*;
 
 import java.util.*;
@@ -10,6 +11,7 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional(readOnly = true)
 public class HierarquiaService {
     private final ResponsabilidadeRepo responsabilidadeRepo;
     private final UnidadeRepo unidadeRepo;
