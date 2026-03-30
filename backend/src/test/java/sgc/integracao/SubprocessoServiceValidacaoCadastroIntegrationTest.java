@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.*;
 class SubprocessoServiceValidacaoCadastroIntegrationTest extends BaseIntegrationTest {
 
     @Autowired
-    private SubprocessoService subprocessoService;
+    private SubprocessoConsultaService consultaService;
 
     @Autowired
     private MapaRepo mapaRepo;
@@ -66,7 +66,7 @@ class SubprocessoServiceValidacaoCadastroIntegrationTest extends BaseIntegration
     @Test
     @DisplayName("validarCadastro: deve retornar erro SEM_ATIVIDADES")
     void validarCadastro_SemAtividades() {
-        ValidacaoCadastroDto dto = subprocessoService.validarCadastro(subprocesso.getCodigo());
+        ValidacaoCadastroDto dto = consultaService.validarCadastro(subprocesso.getCodigo());
         assertThat(dto.valido()).isFalse();
         assertThat(dto.erros()).hasSize(1);
         assertThat(dto.erros().getFirst().tipo()).isEqualTo("SEM_ATIVIDADES");
@@ -78,7 +78,7 @@ class SubprocessoServiceValidacaoCadastroIntegrationTest extends BaseIntegration
         Atividade a = Atividade.builder().mapa(subprocesso.getMapa()).descricao("Atividade 1").build();
         atividadeRepo.save(a);
 
-        ValidacaoCadastroDto dto = subprocessoService.validarCadastro(subprocesso.getCodigo());
+        ValidacaoCadastroDto dto = consultaService.validarCadastro(subprocesso.getCodigo());
         assertThat(dto.valido()).isFalse();
         assertThat(dto.erros()).hasSize(1);
         assertThat(dto.erros().getFirst().tipo()).isEqualTo("ATIVIDADE_SEM_CONHECIMENTO");
@@ -96,7 +96,7 @@ class SubprocessoServiceValidacaoCadastroIntegrationTest extends BaseIntegration
         a.getConhecimentos().add(c);
         atividadeRepo.save(a);
 
-        ValidacaoCadastroDto dto = subprocessoService.validarCadastro(subprocesso.getCodigo());
+        ValidacaoCadastroDto dto = consultaService.validarCadastro(subprocesso.getCodigo());
         assertThat(dto.erros()).isEmpty();
     }
 }

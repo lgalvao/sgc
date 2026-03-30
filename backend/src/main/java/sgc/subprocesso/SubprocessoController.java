@@ -31,6 +31,7 @@ import java.util.*;
 @PreAuthorize("isAuthenticated()")
 public class SubprocessoController {
 
+    private final SubprocessoConsultaService consultaService;
     private final SubprocessoService subprocessoService;
     private final SubprocessoTransicaoService transicaoService;
     private final UnidadeService unidadeService;
@@ -38,7 +39,7 @@ public class SubprocessoController {
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public List<SubprocessoListagemDto> listar() {
-        return subprocessoService.listarTodos().stream()
+        return consultaService.listarTodos().stream()
                 .map(SubprocessoListagemDto::fromEntity)
                 .toList();
     }
@@ -46,14 +47,14 @@ public class SubprocessoController {
     @GetMapping("/{codSubprocesso}")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'VISUALIZAR_SUBPROCESSO')")
     public SubprocessoDetalheResponse obterPorCodigo(@PathVariable Long codSubprocesso, @AuthenticationPrincipal Usuario usuario) {
-        return subprocessoService.obterDetalhes(codSubprocesso, usuario);
+        return consultaService.obterDetalhes(codSubprocesso, usuario);
     }
 
     @GetMapping("/{codSubprocesso}/status")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'VISUALIZAR_SUBPROCESSO')")
     @Operation(summary = "Obtém apenas o status atual do subprocesso")
     public ResponseEntity<SubprocessoSituacaoDto> obterStatus(@PathVariable Long codSubprocesso) {
-        return ResponseEntity.ok(subprocessoService.obterStatus(codSubprocesso));
+        return ResponseEntity.ok(consultaService.obterStatus(codSubprocesso));
     }
 
     @GetMapping("/buscar")
@@ -61,7 +62,7 @@ public class SubprocessoController {
     public ResponseEntity<SubprocessoCodigoDto> buscarPorProcessoEUnidade(
             @RequestParam Long codProcesso, @RequestParam String siglaUnidade) {
         Unidade unidade = unidadeService.buscarPorSigla(siglaUnidade);
-        Subprocesso sp = subprocessoService.obterEntidadePorProcessoEUnidade(codProcesso, unidade.getCodigo());
+        Subprocesso sp = consultaService.obterEntidadePorProcessoEUnidade(codProcesso, unidade.getCodigo());
         return ResponseEntity.ok(new SubprocessoCodigoDto(sp.getCodigo()));
     }
 
@@ -70,7 +71,7 @@ public class SubprocessoController {
     public ResponseEntity<SubprocessoResumoDto> criar(@Valid @RequestBody CriarSubprocessoRequest request) {
         var salvo = subprocessoService.criarEntidade(request);
         Long codSubprocesso = salvo.getCodigo();
-        var subprocessoCriado = subprocessoService.buscarSubprocesso(codSubprocesso);
+        var subprocessoCriado = consultaService.buscarSubprocesso(codSubprocesso);
         URI uri = URI.create("/api/subprocessos/%d".formatted(codSubprocesso));
         return ResponseEntity.created(uri).body(SubprocessoResumoDto.fromEntity(subprocessoCriado));
     }
@@ -80,7 +81,7 @@ public class SubprocessoController {
     public ResponseEntity<SubprocessoResumoDto> atualizar(
             @PathVariable Long codSubprocesso, @Valid @RequestBody AtualizarSubprocessoRequest request) {
         subprocessoService.atualizarEntidade(codSubprocesso, request);
-        var subprocessoAtualizado = subprocessoService.buscarSubprocesso(codSubprocesso);
+        var subprocessoAtualizado = consultaService.buscarSubprocesso(codSubprocesso);
         return ResponseEntity.ok(SubprocessoResumoDto.fromEntity(subprocessoAtualizado));
     }
 
@@ -123,13 +124,13 @@ public class SubprocessoController {
     @GetMapping("/{codSubprocesso}/historico-cadastro")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'VISUALIZAR_SUBPROCESSO')")
     public List<AnaliseHistoricoDto> obterHistoricoCadastro(@PathVariable Long codSubprocesso) {
-        return subprocessoService.listarHistoricoCadastro(codSubprocesso);
+        return consultaService.listarHistoricoCadastro(codSubprocesso);
     }
 
     @GetMapping("/{codSubprocesso}/contexto-edicao")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'VISUALIZAR_SUBPROCESSO')")
     public ResponseEntity<ContextoEdicaoResponse> obterContextoEdicao(@PathVariable Long codSubprocesso) {
-        return ResponseEntity.ok(subprocessoService.obterContextoEdicao(codSubprocesso));
+        return ResponseEntity.ok(consultaService.obterContextoEdicao(codSubprocesso));
     }
 
     @GetMapping("/{codSubprocesso}/atividades-importacao")
@@ -137,20 +138,20 @@ public class SubprocessoController {
     @Operation(summary = "Lista todas as atividades de um subprocesso finalizado para importação")
     public ResponseEntity<List<AtividadeDto>> listarAtividadesParaImportacao(@PathVariable Long codSubprocesso) {
 
-        return ResponseEntity.ok(subprocessoService.listarAtividadesParaImportacao(codSubprocesso));
+        return ResponseEntity.ok(consultaService.listarAtividadesParaImportacao(codSubprocesso));
     }
 
     @GetMapping("/{codSubprocesso}/validar-cadastro")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'VISUALIZAR_SUBPROCESSO')")
     @Operation(summary = "Valida se o cadastro está pronto para disponibilização")
     public ResponseEntity<ValidacaoCadastroDto> validarCadastro(@PathVariable Long codSubprocesso) {
-        return ResponseEntity.ok(subprocessoService.validarCadastro(codSubprocesso));
+        return ResponseEntity.ok(consultaService.validarCadastro(codSubprocesso));
     }
 
     @GetMapping("/{codSubprocesso}/cadastro")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'VISUALIZAR_SUBPROCESSO')")
     public SubprocessoCadastroDto obterCadastro(@PathVariable Long codSubprocesso) {
-        return subprocessoService.obterCadastro(codSubprocesso);
+        return consultaService.obterCadastro(codSubprocesso);
     }
 
     @PostMapping("/{codSubprocesso}/cadastro/disponibilizar")
@@ -293,13 +294,13 @@ public class SubprocessoController {
     @GetMapping("/{codSubprocesso}/impactos-mapa")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'VERIFICAR_IMPACTOS')")
     public ImpactoMapaResponse verificarImpactos(@PathVariable Long codSubprocesso, @AuthenticationPrincipal Usuario usuario) {
-        return subprocessoService.verificarImpactos(codSubprocesso, usuario);
+        return consultaService.verificarImpactos(codSubprocesso, usuario);
     }
 
     @GetMapping("/{codSubprocesso}/mapa")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'VISUALIZAR_SUBPROCESSO')")
     public MapaCompletoDto obterMapa(@PathVariable Long codSubprocesso) {
-        return subprocessoService.mapaCompletoDtoPorSubprocesso(codSubprocesso);
+        return consultaService.mapaCompletoDtoPorSubprocesso(codSubprocesso);
     }
 
     @PostMapping("/{codSubprocesso}/disponibilizar-mapa")
@@ -317,7 +318,7 @@ public class SubprocessoController {
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'VISUALIZAR_SUBPROCESSO')")
     @Operation(summary = "Obtém o mapa formatado para visualização")
     public MapaVisualizacaoResponse obterMapaParaVisualizacao(@PathVariable Long codSubprocesso) {
-        return subprocessoService.mapaParaVisualizacao(codSubprocesso);
+        return consultaService.mapaParaVisualizacao(codSubprocesso);
     }
 
     @PostMapping("/{codSubprocesso}/mapa")
@@ -327,7 +328,7 @@ public class SubprocessoController {
             @PathVariable Long codSubprocesso,
             @Valid @RequestBody SalvarMapaRequest request) {
         subprocessoService.salvarMapa(codSubprocesso, request);
-        return subprocessoService.mapaCompletoDtoPorSubprocesso(codSubprocesso);
+        return consultaService.mapaCompletoDtoPorSubprocesso(codSubprocesso);
     }
 
     @GetMapping("/{codSubprocesso}/mapa-completo")
@@ -336,7 +337,7 @@ public class SubprocessoController {
     @Transactional(readOnly = true)
     public ResponseEntity<MapaCompletoDto> obterMapaCompleto(@PathVariable Long codSubprocesso) {
         try {
-            return ResponseEntity.ok(subprocessoService.mapaCompletoDtoPorSubprocesso(codSubprocesso));
+            return ResponseEntity.ok(consultaService.mapaCompletoDtoPorSubprocesso(codSubprocesso));
         } catch (Exception e) {
             log.error("Erro ao buscar mapa completo para subprocesso {}: {}", codSubprocesso, e.getMessage(), e);
             throw e;
@@ -351,7 +352,7 @@ public class SubprocessoController {
             @Valid @RequestBody SalvarMapaRequest request) {
 
         subprocessoService.salvarMapa(codSubprocesso, request);
-        return ResponseEntity.ok(subprocessoService.mapaCompletoDtoPorSubprocesso(codSubprocesso));
+        return ResponseEntity.ok(consultaService.mapaCompletoDtoPorSubprocesso(codSubprocesso));
     }
 
     @PostMapping("/{codSubprocesso}/disponibilizar-mapa-bloco")
@@ -370,7 +371,7 @@ public class SubprocessoController {
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'AJUSTAR_MAPA')")
     @Operation(summary = "Obtém dados do mapa preparados para ajuste")
     public MapaAjusteDto obterMapaParaAjuste(@PathVariable Long codSubprocesso) {
-        return subprocessoService.obterMapaParaAjuste(codSubprocesso);
+        return consultaService.obterMapaParaAjuste(codSubprocesso);
     }
 
     @PostMapping("/{codSubprocesso}/mapa-ajuste/atualizar")
@@ -389,7 +390,7 @@ public class SubprocessoController {
             @PathVariable Long codSubprocesso,
             @Valid @RequestBody CompetenciaRequest request) {
         subprocessoService.adicionarCompetencia(codSubprocesso, request);
-        return ResponseEntity.ok(subprocessoService.mapaCompletoDtoPorSubprocesso(codSubprocesso));
+        return ResponseEntity.ok(consultaService.mapaCompletoDtoPorSubprocesso(codSubprocesso));
     }
 
     @PostMapping("/{codSubprocesso}/competencia/{codCompetencia}")
@@ -400,7 +401,7 @@ public class SubprocessoController {
             @PathVariable Long codCompetencia,
             @Valid @RequestBody CompetenciaRequest request) {
         subprocessoService.atualizarCompetencia(codSubprocesso, codCompetencia, request);
-        return ResponseEntity.ok(subprocessoService.mapaCompletoDtoPorSubprocesso(codSubprocesso));
+        return ResponseEntity.ok(consultaService.mapaCompletoDtoPorSubprocesso(codSubprocesso));
     }
 
     @PostMapping("/{codSubprocesso}/competencia/{codCompetencia}/remover")
@@ -410,7 +411,7 @@ public class SubprocessoController {
             @PathVariable Long codSubprocesso,
             @PathVariable Long codCompetencia) {
         subprocessoService.removerCompetencia(codSubprocesso, codCompetencia);
-        return ResponseEntity.ok(subprocessoService.mapaCompletoDtoPorSubprocesso(codSubprocesso));
+        return ResponseEntity.ok(consultaService.mapaCompletoDtoPorSubprocesso(codSubprocesso));
     }
 
     @PostMapping("/{codSubprocesso}/apresentar-sugestoes")
@@ -426,13 +427,13 @@ public class SubprocessoController {
     @GetMapping("/{codSubprocesso}/sugestoes")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'VISUALIZAR_SUBPROCESSO')")
     public Map<String, Object> obterSugestoes(@PathVariable Long codSubprocesso) {
-        return subprocessoService.obterSugestoes(codSubprocesso);
+        return consultaService.obterSugestoes(codSubprocesso);
     }
 
     @GetMapping("/{codSubprocesso}/historico-validacao")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'VISUALIZAR_SUBPROCESSO')")
     public List<AnaliseHistoricoDto> obterHistoricoValidacao(@PathVariable Long codSubprocesso) {
-        return subprocessoService.listarHistoricoValidacao(codSubprocesso);
+        return consultaService.listarHistoricoValidacao(codSubprocesso);
     }
 
     @PostMapping("/{codSubprocesso}/validar-mapa")
@@ -534,8 +535,9 @@ public class SubprocessoController {
     }
 
     private AnaliseHistoricoDto criarAnalise(Long codSubprocesso, CriarAnaliseRequest request, TipoAnalise tipo, Usuario usuario) {
-        Subprocesso sp = subprocessoService.buscarSubprocesso(codSubprocesso);
+        Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
         Analise analise = transicaoService.criarAnalise(sp, request, tipo, usuario);
-        return subprocessoService.paraHistoricoDto(analise);
+        return consultaService.paraHistoricoDto(analise);
     }
 }
+

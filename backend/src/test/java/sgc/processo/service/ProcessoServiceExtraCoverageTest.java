@@ -44,6 +44,8 @@ class ProcessoServiceExtraCoverageTest {
 
     @Mock
     private SubprocessoService subprocessoService;
+    @Mock
+    private SubprocessoConsultaService consultaService;
 
     @Mock
     private SubprocessoValidacaoService validacaoService;
@@ -329,8 +331,8 @@ class ProcessoServiceExtraCoverageTest {
             sp.setCodigo(100L);
             sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
             sp.setUnidade(uni);
-            when(subprocessoService.listarEntidadesPorProcessoEUnidades(eq(1L), anyList())).thenReturn(List.of(sp));
-            when(subprocessoService.obterLocalizacaoAtual(sp)).thenReturn(uni);
+            when(consultaService.listarEntidadesPorProcessoEUnidades(eq(1L), anyList())).thenReturn(List.of(sp));
+            when(consultaService.obterLocalizacaoAtual(sp)).thenReturn(uni);
             when(permissionEvaluator.verificarPermissao(u, sp, sgc.seguranca.AcaoPermissao.DISPONIBILIZAR_MAPA)).thenReturn(true);
 
             List<SubprocessoElegivelDto> res = processoService.listarSubprocessosElegiveis(1L);
@@ -433,7 +435,7 @@ class ProcessoServiceExtraCoverageTest {
             sp.setUnidade(uni);
             Mapa mapa = new Mapa();
             sp.setMapa(mapa);
-            when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
+            when(consultaService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
 
             processoService.finalizar(1L);
 
@@ -494,11 +496,11 @@ class ProcessoServiceExtraCoverageTest {
             // Chamando via listarSubprocessosElegiveis para testar o metodo privado
             u.setPerfilAtivo(Perfil.ADMIN);
             when(usuarioService.usuarioAutenticado()).thenReturn(u);
-            when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
+            when(consultaService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
             Unidade uni = new Unidade();
             uni.setCodigo(1L);
             sp.setUnidade(uni);
-            when(subprocessoService.obterLocalizacaoAtual(sp)).thenReturn(uni);
+            when(consultaService.obterLocalizacaoAtual(sp)).thenReturn(uni);
 
             List<SubprocessoElegivelDto> res = processoService.listarSubprocessosElegiveis(1L);
             assertThat(res).hasSize(1);
@@ -513,7 +515,7 @@ class ProcessoServiceExtraCoverageTest {
             
             u.setPerfilAtivo(Perfil.ADMIN);
             when(usuarioService.usuarioAutenticado()).thenReturn(u);
-            when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
+            when(consultaService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
 
             List<SubprocessoElegivelDto> res = processoService.listarSubprocessosElegiveis(1L);
             assertThat(res).isEmpty();

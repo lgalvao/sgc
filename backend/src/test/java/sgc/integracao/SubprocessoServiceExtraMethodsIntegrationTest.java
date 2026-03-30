@@ -23,6 +23,8 @@ class SubprocessoServiceExtraMethodsIntegrationTest extends BaseIntegrationTest 
 
     @Autowired
     private SubprocessoService subprocessoService;
+    @Autowired
+    private SubprocessoConsultaService consultaService;
 
     @Autowired
     private MapaRepo mapaRepo;
@@ -70,7 +72,7 @@ class SubprocessoServiceExtraMethodsIntegrationTest extends BaseIntegrationTest 
     @Test
     @DisplayName("mapaCompletoPorSubprocesso: deve retornar o mapa")
     void mapaCompletoPorSubprocesso_Sucesso() {
-        Mapa result = subprocessoService.mapaCompletoPorSubprocesso(subprocesso.getCodigo());
+        Mapa result = consultaService.mapaCompletoPorSubprocesso(subprocesso.getCodigo());
         assertThat(result).isNotNull();
         assertThat(result.getCodigo()).isEqualTo(subprocesso.getMapa().getCodigo());
     }

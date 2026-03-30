@@ -22,6 +22,8 @@ class SubprocessoServiceDeletarIntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private SubprocessoService subprocessoService;
+    @Autowired
+    private SubprocessoConsultaService consultaService;
 
     @Autowired
     private EntityManager entityManager;
@@ -61,7 +63,7 @@ class SubprocessoServiceDeletarIntegrationTest extends BaseIntegrationTest {
         subprocessoService.excluir(codigo);
         entityManager.flush();
 
-        assertThatThrownBy(() -> subprocessoService.buscarSubprocesso(codigo))
+        assertThatThrownBy(() -> consultaService.buscarSubprocesso(codigo))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 }

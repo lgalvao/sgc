@@ -32,6 +32,8 @@ class SubprocessoTransicaoServiceTest {
     @Mock
     private SubprocessoService subprocessoService;
     @Mock
+    private SubprocessoConsultaService consultaService;
+    @Mock
     private MovimentacaoRepo movimentacaoRepo;
     @Mock
     private AnaliseRepo analiseRepo;
@@ -57,10 +59,10 @@ class SubprocessoTransicaoServiceTest {
     @InjectMocks
     private SubprocessoTransicaoService service;
 
-    
+
     @BeforeEach
     void setUp() {
-        org.mockito.Mockito.lenient().when(subprocessoService.obterUnidadeLocalizacao(org.mockito.ArgumentMatchers.any(Subprocesso.class)))
+        org.mockito.Mockito.lenient().when(consultaService.obterUnidadeLocalizacao(org.mockito.ArgumentMatchers.any(Subprocesso.class)))
                 .thenAnswer(inv -> {
                     Subprocesso sp = inv.getArgument(0);
                     return sp.getLocalizacaoAtual() != null ? sp.getLocalizacaoAtual() : sp.getUnidade();
@@ -112,7 +114,7 @@ class SubprocessoTransicaoServiceTest {
         subprocesso.setLocalizacaoAtual(unidade);
         Usuario usuario = criarUsuario();
 
-        when(subprocessoService.buscarSubprocesso(1L)).thenReturn(subprocesso);
+        when(consultaService.buscarSubprocesso(1L)).thenReturn(subprocesso);
         when(analiseRepo.save(any(Analise.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         service.aceitarValidacao(1L, "Aceite final", usuario);
@@ -138,7 +140,7 @@ class SubprocessoTransicaoServiceTest {
         subprocesso.setDataLimiteEtapa1(LocalDateTime.of(2026, 4, 10, 0, 0));
         subprocesso.setDataLimiteEtapa2(LocalDateTime.of(2026, 4, 20, 0, 0));
 
-        when(subprocessoService.buscarSubprocesso(1L)).thenReturn(subprocesso);
+        when(consultaService.buscarSubprocesso(1L)).thenReturn(subprocesso);
         when(notificacaoService.getEmailUnidade(unidade)).thenReturn("orig@tre-pe.jus.br");
 
         service.alterarDataLimite(1L, LocalDate.of(2026, 4, 25));
@@ -162,11 +164,11 @@ class SubprocessoTransicaoServiceTest {
             Subprocesso sp = criarSubprocesso(MAPEAMENTO, MAPEAMENTO_MAPA_CRIADO, new Unidade());
             sp.setDataLimiteEtapa1(LocalDateTime.now().plusDays(10));
             sp.setMapa(new sgc.mapa.model.Mapa());
-            
+
             DisponibilizarMapaRequest req = new DisponibilizarMapaRequest(LocalDate.now().plusDays(5), "Obs");
-            
-            when(subprocessoService.buscarSubprocesso(1L)).thenReturn(sp);
-            
+
+            when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
+
             assertThatThrownBy(() -> service.disponibilizarMapa(1L, req, criarUsuario()))
                     .isInstanceOf(sgc.comum.erros.ErroValidacao.class);
         }
@@ -176,12 +178,12 @@ class SubprocessoTransicaoServiceTest {
         void submeterMapaAjustadoDeveFuncionarComDataLimiteNula() {
             Subprocesso sp = criarSubprocesso(REVISAO, SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA, new Unidade());
             sp.setMapa(new sgc.mapa.model.Mapa());
-            
-            when(subprocessoService.buscarSubprocesso(1L)).thenReturn(sp);
-            
+
+            when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
+
             SubmeterMapaAjustadoRequest req = new SubmeterMapaAjustadoRequest("Justificativa", null, List.of());
             service.submeterMapaAjustado(1L, req, criarUsuario());
-            
+
             assertThat(sp.getSituacao()).isEqualTo(REVISAO_MAPA_DISPONIBILIZADO);
         }
 
@@ -192,16 +194,19 @@ class SubprocessoTransicaoServiceTest {
             Unidade uAnalise = criarUnidade(2L, "ANA", "Analise");
             Subprocesso sp = criarSubprocesso(MAPEAMENTO, MAPEAMENTO_MAPA_VALIDADO, uOrigem);
             sp.setLocalizacaoAtual(uAnalise);
-            
-            Movimentacao m1 = new Movimentacao(); m1.setUnidadeDestino(null); // Caso line 365
-            Movimentacao m2 = new Movimentacao(); m2.setUnidadeDestino(uAnalise); m2.setUnidadeOrigem(uOrigem);
-            
-            when(subprocessoService.buscarSubprocesso(1L)).thenReturn(sp);
+
+            Movimentacao m1 = new Movimentacao();
+            m1.setUnidadeDestino(null); // Caso line 365
+            Movimentacao m2 = new Movimentacao();
+            m2.setUnidadeDestino(uAnalise);
+            m2.setUnidadeOrigem(uOrigem);
+
+            when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
             when(movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(1L)).thenReturn(List.of(m1, m2));
             when(hierarquiaService.isSubordinada(uOrigem, uAnalise)).thenReturn(true);
-            
+
             service.devolverValidacao(1L, "Justif", criarUsuario());
-            
+
             verify(analiseRepo).save(any());
         }
 
@@ -210,12 +215,12 @@ class SubprocessoTransicaoServiceTest {
         void deveAceitarCadastroEmBlocoDiferentesTipos() {
             Subprocesso spMap = criarSubprocesso(MAPEAMENTO, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO, new Unidade());
             Subprocesso spRev = criarSubprocesso(REVISAO, SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA, new Unidade());
-            
-            when(subprocessoService.buscarSubprocesso(10L)).thenReturn(spMap);
-            when(subprocessoService.buscarSubprocesso(20L)).thenReturn(spRev);
-            
+
+            when(consultaService.buscarSubprocesso(10L)).thenReturn(spMap);
+            when(consultaService.buscarSubprocesso(20L)).thenReturn(spRev);
+
             service.aceitarCadastroEmBloco(List.of(10L, 20L), criarUsuario());
-            
+
             assertThat(spMap.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
             assertThat(spRev.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
         }
@@ -225,13 +230,13 @@ class SubprocessoTransicaoServiceTest {
         void deveHomologarCadastroEmBlocoDiferentesTipos() {
             Subprocesso spMap = criarSubprocesso(MAPEAMENTO, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO, new Unidade());
             Subprocesso spRev = criarSubprocesso(REVISAO, SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA, new Unidade());
-            
-            when(subprocessoService.buscarSubprocesso(10L)).thenReturn(spMap);
-            when(subprocessoService.buscarSubprocesso(20L)).thenReturn(spRev);
+
+            when(consultaService.buscarSubprocesso(10L)).thenReturn(spMap);
+            when(consultaService.buscarSubprocesso(20L)).thenReturn(spRev);
             when(unidadeService.buscarPorSigla(anyString())).thenReturn(new Unidade());
-            
+
             service.homologarCadastroEmBloco(List.of(10L, 20L), criarUsuario());
-            
+
             assertThat(spMap.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
             assertThat(spRev.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO);
         }
@@ -242,9 +247,9 @@ class SubprocessoTransicaoServiceTest {
             Subprocesso sp = criarSubprocesso(MAPEAMENTO, MAPEAMENTO_MAPA_VALIDADO, new Unidade());
             sp.setDataLimiteEtapa1(LocalDateTime.now().plusDays(5));
             sp.setDataLimiteEtapa2(LocalDateTime.now().plusDays(10));
-            
-            when(subprocessoService.buscarSubprocesso(1L)).thenReturn(sp);
-            
+
+            when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
+
             assertThatThrownBy(() -> service.alterarDataLimite(1L, LocalDate.now().plusDays(7)))
                     .isInstanceOf(sgc.comum.erros.ErroValidacao.class);
         }
@@ -255,12 +260,12 @@ class SubprocessoTransicaoServiceTest {
             Unidade u = criarUnidade(1L, "U", "Unid");
             Subprocesso sp = criarSubprocesso(MAPEAMENTO, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO, u);
             sp.setLocalizacaoAtual(u);
-            
-            when(subprocessoService.buscarSubprocesso(1L)).thenReturn(sp);
+
+            when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
             when(movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(1L)).thenReturn(List.of());
-            
+
             service.devolverCadastro(1L, criarUsuario(), "Obs");
-            
+
             assertThat(sp.getSituacao()).isEqualTo(MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         }
     }
@@ -268,12 +273,12 @@ class SubprocessoTransicaoServiceTest {
     @Test
     @DisplayName("deve aceitar revisao cadastro clashing")
     void deveAceitarRevisaoCadastroClashing() {
-         Unidade u = criarUnidade(1L, "U", "Unid");
-         Subprocesso sp = criarSubprocesso(REVISAO, SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA, u);
-         sp.setLocalizacaoAtual(u);
-         when(subprocessoService.buscarSubprocesso(1L)).thenReturn(sp);
-         service.aceitarRevisaoCadastro(1L, criarUsuario(), "Obs");
-         assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
+        Unidade u = criarUnidade(1L, "U", "Unid");
+        Subprocesso sp = criarSubprocesso(REVISAO, SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA, u);
+        sp.setLocalizacaoAtual(u);
+        when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
+        service.aceitarRevisaoCadastro(1L, criarUsuario(), "Obs");
+        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
     }
 
     private Subprocesso criarSubprocesso(TipoProcesso tipoProcesso, SituacaoSubprocesso situacao, Unidade unidade) {

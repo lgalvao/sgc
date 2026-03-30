@@ -47,6 +47,7 @@ public class ProcessoService {
     private final ComumRepo repo;
     private final UnidadeService unidadeService;
     private final SubprocessoService subprocessoService;
+    private final SubprocessoConsultaService consultaService;
     private final SubprocessoValidacaoService validacaoService;
     private final UsuarioFacade usuarioService;
     private final AlertaFacade servicoAlertas;
@@ -124,10 +125,10 @@ public class ProcessoService {
         Usuario usuario = usuarioService.usuarioAutenticado();
         List<Subprocesso> subprocessos;
         if (usuario.getPerfilAtivo() == Perfil.ADMIN) {
-            subprocessos = subprocessoService.listarEntidadesPorProcesso(codProcesso);
+            subprocessos = consultaService.listarEntidadesPorProcesso(codProcesso);
         } else {
             List<Long> unidadesAcesso = buscarCodigosAcesso(usuario);
-            subprocessos = subprocessoService.listarEntidadesPorProcessoEUnidades(codProcesso, unidadesAcesso);
+            subprocessos = consultaService.listarEntidadesPorProcessoEUnidades(codProcesso, unidadesAcesso);
         }
 
         return subprocessos.stream()
@@ -252,7 +253,7 @@ public class ProcessoService {
 
     public void executarAcaoEmBloco(Long codProcesso, AcaoEmBlocoRequest req) {
         Usuario usuario = usuarioService.usuarioAutenticado();
-        List<Subprocesso> subprocessos = subprocessoService.listarEntidadesPorProcessoEUnidades(codProcesso, req.unidadeCodigos());
+        List<Subprocesso> subprocessos = consultaService.listarEntidadesPorProcessoEUnidades(codProcesso, req.unidadeCodigos());
         
         if (req.unidadeCodigos().isEmpty()) throw new ErroValidacao(Mensagens.SELECIONE_AO_MENOS_UMA_UNIDADE);
         validarSelecaoBloco(req.unidadeCodigos(), subprocessos);
@@ -276,7 +277,7 @@ public class ProcessoService {
     @Transactional(readOnly = true)
     public ProcessoDetalheDto obterDetalhesCompleto(Long codProcesso, Usuario usuario, boolean incluirElegiveis) {
         Processo processo = buscarPorCodigo(codProcesso);
-        List<Subprocesso> subprocessos = subprocessoService.listarEntidadesPorProcessoComUnidade(codProcesso);
+        List<Subprocesso> subprocessos = consultaService.listarEntidadesPorProcessoComUnidade(codProcesso);
         Set<Long> unidadesAcesso = obterIdsUnidadesAcesso(processo, usuario);
         Perfil perfil = usuario.getPerfilAtivo();
 
@@ -394,7 +395,7 @@ public class ProcessoService {
     }
 
     private void tornarMapasVigentes(Long codProcesso) {
-        subprocessoService.listarEntidadesPorProcesso(codProcesso)
+        consultaService.listarEntidadesPorProcesso(codProcesso)
                 .forEach(sp -> unidadeService.definirMapaVigente(sp.getUnidade().getCodigo(), sp.getMapa()));
     }
 
@@ -454,7 +455,7 @@ public class ProcessoService {
     }
 
     private Unidade obterLocalizacao(Subprocesso sp) {
-        return subprocessoService.obterLocalizacaoAtual(sp);
+        return consultaService.obterLocalizacaoAtual(sp);
     }
 
     private Set<Long> obterIdsUnidadesAcesso(Processo pr, Usuario us) {
@@ -599,5 +600,6 @@ public class ProcessoService {
         }
     }
 }
+
 
 

@@ -36,7 +36,7 @@ class ProcessoServiceCoverageTest {
     @Mock private ComumRepo repo;
     @Mock private UnidadeService unidadeService;
     @Mock private UsuarioFacade usuarioService;
-    @Mock private SubprocessoService subprocessoService;
+    @Mock private SubprocessoService subprocessoService; @Mock private SubprocessoConsultaService consultaService;
     @Mock private SubprocessoValidacaoService validacaoService;
     @Mock private AlertaFacade servicoAlertas;
     @Mock private SgcPermissionEvaluator permissionEvaluator;
@@ -56,7 +56,7 @@ class ProcessoServiceCoverageTest {
 
         Subprocesso sp = mock(Subprocesso.class);
         Usuario usuario = new Usuario();
-        when(subprocessoService.listarEntidadesPorProcessoEUnidades(eq(codProcesso), anyList()))
+        when(consultaService.listarEntidadesPorProcessoEUnidades(eq(codProcesso), anyList()))
                 .thenReturn(List.of(sp));
 
         when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
@@ -75,7 +75,7 @@ class ProcessoServiceCoverageTest {
 
         Subprocesso sp = mock(Subprocesso.class);
         Usuario usuario = new Usuario();
-        when(subprocessoService.listarEntidadesPorProcessoEUnidades(eq(codProcesso), anyList()))
+        when(consultaService.listarEntidadesPorProcessoEUnidades(eq(codProcesso), anyList()))
                 .thenReturn(List.of(sp));
         when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
         when(permissionEvaluator.verificarPermissao(any(Usuario.class), any(List.class), any(AcaoPermissao.class))).thenReturn(true);
@@ -128,7 +128,7 @@ class ProcessoServiceCoverageTest {
         when(sp.getUnidade()).thenReturn(u);
 
         // Retorna apenas 1 subprocesso para 2 códigos solicitados
-        when(subprocessoService.listarEntidadesPorProcessoEUnidades(eq(codProcesso), anyList()))
+        when(consultaService.listarEntidadesPorProcessoEUnidades(eq(codProcesso), anyList()))
                 .thenReturn(List.of(sp));
 
         when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
@@ -214,9 +214,9 @@ class ProcessoServiceCoverageTest {
             
             when(repo.buscar(Processo.class, cod)).thenReturn(p);
             when(usuarioService.usuarioAutenticado()).thenReturn(u);
-            when(subprocessoService.listarEntidadesPorProcesso(cod)).thenReturn(List.of(sp));
-            when(subprocessoService.listarEntidadesPorProcessoComUnidade(cod)).thenReturn(List.of(sp));
-            when(subprocessoService.obterLocalizacaoAtual(sp)).thenReturn(uni);
+            when(consultaService.listarEntidadesPorProcesso(cod)).thenReturn(List.of(sp));
+            when(consultaService.listarEntidadesPorProcessoComUnidade(cod)).thenReturn(List.of(sp));
+            when(consultaService.obterLocalizacaoAtual(sp)).thenReturn(uni);
             when(permissionEvaluator.verificarPermissao(u, p, sgc.seguranca.AcaoPermissao.FINALIZAR_PROCESSO)).thenReturn(true);
             when(validacaoService.validarSubprocessosParaFinalizacao(cod)).thenReturn(sgc.subprocesso.service.SubprocessoValidacaoService.ValidationResult.ofValido());
             when(permissionEvaluator.verificarPermissao(eq(u), any(Subprocesso.class), any())).thenReturn(true);
@@ -248,9 +248,9 @@ class ProcessoServiceCoverageTest {
             
             when(repo.buscar(Processo.class, cod)).thenReturn(p);
             when(usuarioService.usuarioAutenticado()).thenReturn(u);
-            when(subprocessoService.listarEntidadesPorProcesso(cod)).thenReturn(List.of(sp));
-            when(subprocessoService.listarEntidadesPorProcessoComUnidade(cod)).thenReturn(List.of(sp));
-            when(subprocessoService.obterLocalizacaoAtual(sp)).thenReturn(uni);
+            when(consultaService.listarEntidadesPorProcesso(cod)).thenReturn(List.of(sp));
+            when(consultaService.listarEntidadesPorProcessoComUnidade(cod)).thenReturn(List.of(sp));
+            when(consultaService.obterLocalizacaoAtual(sp)).thenReturn(uni);
             when(permissionEvaluator.verificarPermissao(u, p, sgc.seguranca.AcaoPermissao.FINALIZAR_PROCESSO)).thenReturn(true);
             when(validacaoService.validarSubprocessosParaFinalizacao(cod)).thenReturn(sgc.subprocesso.service.SubprocessoValidacaoService.ValidationResult.ofValido());
             when(permissionEvaluator.verificarPermissao(eq(u), any(Subprocesso.class), any())).thenReturn(true);
@@ -283,9 +283,9 @@ class ProcessoServiceCoverageTest {
             
             when(repo.buscar(Processo.class, cod)).thenReturn(p);
             when(usuarioService.usuarioAutenticado()).thenReturn(u);
-            when(subprocessoService.listarEntidadesPorProcesso(cod)).thenReturn(List.of(sp));
-            when(subprocessoService.listarEntidadesPorProcessoComUnidade(cod)).thenReturn(List.of(sp));
-            when(subprocessoService.obterLocalizacaoAtual(sp)).thenReturn(uni);
+            when(consultaService.listarEntidadesPorProcesso(cod)).thenReturn(List.of(sp));
+            when(consultaService.listarEntidadesPorProcessoComUnidade(cod)).thenReturn(List.of(sp));
+            when(consultaService.obterLocalizacaoAtual(sp)).thenReturn(uni);
             when(permissionEvaluator.verificarPermissao(u, p, sgc.seguranca.AcaoPermissao.FINALIZAR_PROCESSO)).thenReturn(true);
             when(validacaoService.validarSubprocessosParaFinalizacao(cod)).thenReturn(sgc.subprocesso.service.SubprocessoValidacaoService.ValidationResult.ofValido());
             when(permissionEvaluator.verificarPermissao(eq(u), any(Subprocesso.class), any())).thenReturn(true);
@@ -312,8 +312,8 @@ class ProcessoServiceCoverageTest {
             p.adicionarParticipantes(Set.of(uni));
 
             when(repo.buscar(Processo.class, cod)).thenReturn(p);
-            when(subprocessoService.listarEntidadesPorProcessoComUnidade(cod)).thenReturn(List.of(sp));
-            when(subprocessoService.obterLocalizacaoAtual(sp)).thenReturn(uni);
+            when(consultaService.listarEntidadesPorProcessoComUnidade(cod)).thenReturn(List.of(sp));
+            when(consultaService.obterLocalizacaoAtual(sp)).thenReturn(uni);
             when(permissionEvaluator.verificarPermissao(any(Usuario.class), any(Processo.class), any(AcaoPermissao.class))).thenReturn(true);
             when(validacaoService.validarSubprocessosParaFinalizacao(cod)).thenReturn(sgc.subprocesso.service.SubprocessoValidacaoService.ValidationResult.ofValido());
 
@@ -352,7 +352,7 @@ class ProcessoServiceCoverageTest {
         Subprocesso sp = new Subprocesso(); sp.setCodigo(100L); sp.setSituacao(MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
         Unidade u = new Unidade(); u.setCodigo(10L); sp.setUnidade(u);
 
-        when(subprocessoService.listarEntidadesPorProcessoEUnidades(eq(codProc), anyList())).thenReturn(List.of(sp));
+        when(consultaService.listarEntidadesPorProcessoEUnidades(eq(codProc), anyList())).thenReturn(List.of(sp));
         when(usuarioService.usuarioAutenticado()).thenReturn(new Usuario());
 
         target.executarAcaoEmBloco(codProc, req); // branch 570 (HOMOLOGAR)

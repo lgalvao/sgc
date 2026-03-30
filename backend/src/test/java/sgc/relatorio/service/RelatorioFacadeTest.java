@@ -33,6 +33,8 @@ class RelatorioFacadeTest {
     @Mock
     private SubprocessoService subprocessoService;
     @Mock
+    private SubprocessoConsultaService consultaService;
+    @Mock
     private UnidadeService unidadeService;
     @Mock
     private ResponsavelUnidadeService responsavelService;
@@ -64,7 +66,7 @@ class RelatorioFacadeTest {
         sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         sp.setDataLimiteEtapa1(java.time.LocalDateTime.of(2023, 10, 10, 10, 0));
 
-        when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
+        when(consultaService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
         when(responsavelService.buscarResponsavelUnidade(1L)).thenReturn(UnidadeResponsavelDto.builder().titularNome("Resp").build());
 
         List<RelatorioAndamentoDto> resultado = relatorioService.obterRelatorioAndamento(1L);
@@ -96,7 +98,7 @@ class RelatorioFacadeTest {
         sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
         when(processoService.buscarPorCodigo(1L)).thenReturn(p);
-        when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
+        when(consultaService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
         when(responsavelService.buscarResponsavelUnidade(1L)).thenReturn(UnidadeResponsavelDto.builder().titularNome("Resp").build());
 
         OutputStream out = new ByteArrayOutputStream();
@@ -133,7 +135,7 @@ class RelatorioFacadeTest {
         c.setAtividades(Set.of(a));
 
         when(processoService.buscarPorCodigo(1L)).thenReturn(p);
-        when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
+        when(consultaService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
         when(mapaManutencaoService.competenciasCodMapa(10L)).thenReturn(List.of(c));
 
         OutputStream out = new ByteArrayOutputStream();
@@ -165,7 +167,7 @@ class RelatorioFacadeTest {
         sp2.getMapa().setCodigo(20L);
 
         when(processoService.buscarPorCodigo(1L)).thenReturn(p);
-        when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp1, sp2));
+        when(consultaService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp1, sp2));
         when(mapaManutencaoService.competenciasCodMapa(10L)).thenReturn(List.of());
 
         OutputStream out = new ByteArrayOutputStream();
@@ -193,7 +195,7 @@ class RelatorioFacadeTest {
         c.setAtividades(Set.of()); // Atividades vazias
 
         when(processoService.buscarPorCodigo(1L)).thenReturn(p);
-        when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
+        when(consultaService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
         when(mapaManutencaoService.competenciasCodMapa(10L)).thenReturn(List.of(c));
 
         OutputStream out = new ByteArrayOutputStream();
@@ -223,7 +225,7 @@ class RelatorioFacadeTest {
         c.setAtividades(Set.of(a));
 
         when(processoService.buscarPorCodigo(1L)).thenReturn(p);
-        when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
+        when(consultaService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
         when(mapaManutencaoService.competenciasCodMapa(10L)).thenReturn(List.of(c));
 
         OutputStream out = new ByteArrayOutputStream();
@@ -235,7 +237,7 @@ class RelatorioFacadeTest {
     @DisplayName("Deve cobrir erro ao gerar PDF")
     void deveCobrirErroGerarPdf() throws DocumentException {
         when(processoService.buscarPorCodigo(1L)).thenReturn(new Processo());
-        when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of());
+        when(consultaService.listarEntidadesPorProcesso(1L)).thenReturn(List.of());
         when(pdfFactory.createDocument()).thenReturn(document);
         doThrow(new DocumentException("Simulado")).when(pdfFactory).createWriter(any(), any());
 
@@ -249,7 +251,7 @@ class RelatorioFacadeTest {
     @DisplayName("Deve cobrir erro ao gerar PDF de mapas")
     void deveCobrirErroGerarPdfMapas() throws DocumentException {
         when(processoService.buscarPorCodigo(1L)).thenReturn(new Processo());
-        when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of());
+        when(consultaService.listarEntidadesPorProcesso(1L)).thenReturn(List.of());
         when(pdfFactory.createDocument()).thenReturn(document);
         doThrow(new DocumentException("Simulado")).when(pdfFactory).createWriter(any(), any());
 

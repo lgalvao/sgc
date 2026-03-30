@@ -23,7 +23,7 @@ import static org.assertj.core.api.Assertions.*;
 class SubprocessoServiceValidacaoIntegrationTest extends BaseIntegrationTest {
 
     @Autowired
-    private SubprocessoService subprocessoService;
+    private SubprocessoConsultaService consultaService;
 
     @Autowired
     private SubprocessoValidacaoService validacaoService;
@@ -97,7 +97,7 @@ class SubprocessoServiceValidacaoIntegrationTest extends BaseIntegrationTest {
     @Test
     @DisplayName("validarCadastro: deve retornar erro sem atividades")
     void validarCadastro_SemAtividades() {
-        ValidacaoCadastroDto dto = subprocessoService.validarCadastro(subprocesso.getCodigo());
+        ValidacaoCadastroDto dto = consultaService.validarCadastro(subprocesso.getCodigo());
         assertThat(dto.valido()).isFalse();
         assertThat(dto.erros()).hasSize(1);
         assertThat(dto.erros().getFirst().tipo()).isEqualTo("SEM_ATIVIDADES");
@@ -109,7 +109,7 @@ class SubprocessoServiceValidacaoIntegrationTest extends BaseIntegrationTest {
         Atividade a = Atividade.builder().mapa(subprocesso.getMapa()).descricao("Ativ 1").build();
         atividadeRepo.save(a);
 
-        ValidacaoCadastroDto dto = subprocessoService.validarCadastro(subprocesso.getCodigo());
+        ValidacaoCadastroDto dto = consultaService.validarCadastro(subprocesso.getCodigo());
         assertThat(dto.valido()).isFalse();
         assertThat(dto.erros().getFirst().tipo()).isEqualTo("ATIVIDADE_SEM_CONHECIMENTO");
     }
