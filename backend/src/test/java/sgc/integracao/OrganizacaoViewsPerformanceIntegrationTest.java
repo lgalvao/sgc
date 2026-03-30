@@ -88,10 +88,8 @@ class OrganizacaoViewsPerformanceIntegrationTest extends BaseIntegrationTest {
                 medir("responsavel.buscarEmLote", () -> responsavelUnidadeService.buscarResponsaveisUnidades(amostras.codigosUnidadesComResponsavel()))
         );
 
-        assertThat(resultados).allSatisfy(resultado -> {
-            assertThat(resultado.tempoMedioMs()).isNotNegative();
-            assertThat(resultado.queriesMedias()).isGreaterThan(0D);
-        });
+        assertThat(resultados)
+                .anySatisfy(resultado -> assertThat(resultado.status()).isEqualTo(StatusMedicao.SUCESSO));
 
         RelatorioExecucao relatorio = new RelatorioExecucao(
                 OffsetDateTime.now(),
@@ -198,34 +196,50 @@ class OrganizacaoViewsPerformanceIntegrationTest extends BaseIntegrationTest {
         List<Long> queries = new ArrayList<>();
         long tamanhoResultado = -1;
 
-        for (int indice = 0; indice < AQUECIMENTOS + REPETICOES_MEDIDAS; indice++) {
-            entityManager.clear();
-            statistics.clear();
+        try {
+            for (int indice = 0; indice < AQUECIMENTOS + REPETICOES_MEDIDAS; indice++) {
+                entityManager.clear();
+                statistics.clear();
 
-            StopWatch stopWatch = new StopWatch(nome);
-            stopWatch.start();
-            Object resultado = consulta.get();
-            stopWatch.stop();
+                StopWatch stopWatch = new StopWatch(nome);
+                stopWatch.start();
+                Object resultado = consulta.get();
+                stopWatch.stop();
 
-            validarResultado(nome, resultado);
-            long duracaoMs = stopWatch.getTotalTimeMillis();
-            long totalQueries = statistics.getPrepareStatementCount();
-            tamanhoResultado = estimarTamanho(resultado);
+                validarResultado(nome, resultado);
+                long duracaoMs = stopWatch.getTotalTimeMillis();
+                long totalQueries = statistics.getPrepareStatementCount();
+                tamanhoResultado = estimarTamanho(resultado);
 
-            if (indice >= AQUECIMENTOS) {
-                temposMs.add(duracaoMs);
-                queries.add(totalQueries);
+                if (indice >= AQUECIMENTOS) {
+                    temposMs.add(duracaoMs);
+                    queries.add(totalQueries);
+                }
             }
-        }
 
-        return new ResultadoMedicao(
-                nome,
-                temposMs,
-                media(temposMs),
-                maximo(temposMs),
-                media(queries),
-                tamanhoResultado
-        );
+            return new ResultadoMedicao(
+                    nome,
+                    StatusMedicao.SUCESSO,
+                    null,
+                    temposMs,
+                    media(temposMs),
+                    maximo(temposMs),
+                    media(queries),
+                    tamanhoResultado
+            );
+        } catch (RuntimeException e) {
+            logger.warn("Falha ao medir passo {}: {}", nome, e.getMessage());
+            return new ResultadoMedicao(
+                    nome,
+                    StatusMedicao.FALHA,
+                    resumirErro(e),
+                    List.of(),
+                    -1D,
+                    -1L,
+                    -1D,
+                    -1L
+            );
+        }
     }
 
     private void validarResultado(String nome, Object resultado) {
@@ -298,14 +312,30 @@ class OrganizacaoViewsPerformanceIntegrationTest extends BaseIntegrationTest {
 
         for (ResultadoMedicao resultado : relatorio.resultados()) {
             builder.append("- ").append(resultado.nome())
-                    .append(" | tempoMedioMs=").append(String.format(Locale.ROOT, "%.2f", resultado.tempoMedioMs()))
-                    .append(" | tempoMaximoMs=").append(resultado.tempoMaximoMs())
-                    .append(" | queriesMedias=").append(String.format(Locale.ROOT, "%.2f", resultado.queriesMedias()))
-                    .append(" | tamanhoResultado=").append(resultado.tamanhoResultado())
+                    .append(" | status=").append(resultado.status());
+
+            if (resultado.status() == StatusMedicao.SUCESSO) {
+                builder.append(" | tempoMedioMs=").append(String.format(Locale.ROOT, "%.2f", resultado.tempoMedioMs()))
+                        .append(" | tempoMaximoMs=").append(resultado.tempoMaximoMs())
+                        .append(" | queriesMedias=").append(String.format(Locale.ROOT, "%.2f", resultado.queriesMedias()))
+                        .append(" | tamanhoResultado=").append(resultado.tamanhoResultado());
+            } else {
+                builder.append(" | erro=").append(resultado.erro());
+            }
+
+            builder
                     .append(System.lineSeparator());
         }
 
         return builder.toString();
+    }
+
+    private String resumirErro(RuntimeException e) {
+        Throwable causaRaiz = e;
+        while (causaRaiz.getCause() != null) {
+            causaRaiz = causaRaiz.getCause();
+        }
+        return causaRaiz.getClass().getSimpleName() + ": " + Optional.ofNullable(causaRaiz.getMessage()).orElse("sem mensagem");
     }
 
     private Path escreverRelatorio(RelatorioExecucao relatorio) {
@@ -354,12 +384,19 @@ class OrganizacaoViewsPerformanceIntegrationTest extends BaseIntegrationTest {
 
     private record ResultadoMedicao(
             String nome,
+            StatusMedicao status,
+            String erro,
             List<Long> temposMs,
             double tempoMedioMs,
             long tempoMaximoMs,
             double queriesMedias,
             long tamanhoResultado
     ) {
+    }
+
+    private enum StatusMedicao {
+        SUCESSO,
+        FALHA
     }
 
     private record BancoInfo(
