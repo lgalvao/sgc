@@ -149,6 +149,9 @@ INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superio
                             matricula_titular, data_inicio_titularidade)
 VALUES ('904', 'CDU05-READONLY-UNIT', 'CDU05-READONLY-UNIT', 'OPERACIONAL', 'ATIVA', 2, '777', '00000777',
         CURRENT_TIMESTAMP);
+INSERT INTO SGC.VW_UNIDADE (codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo, titulo_titular,
+                            matricula_titular, data_inicio_titularidade)
+VALUES ('905', 'UNIDADE-SEM-RESP', 'UNIDADE-SEM-RESP', 'OPERACIONAL', 'ATIVA', 2, NULL, NULL, NULL);
 
 -- -------------------------------------------------------------------------------------------------
 -- UNIDADE_MAPA (relaciona unidades com mapas vigentes)

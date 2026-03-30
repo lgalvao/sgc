@@ -48,6 +48,8 @@ class ProcessoServiceTest {
     @Mock
     private UnidadeService unidadeService;
     @Mock
+    private ResponsabilidadeRepo responsabilidadeRepo;
+    @Mock
     private SubprocessoService subprocessoService;
     @Mock
     private SubprocessoConsultaService consultaService;
@@ -65,6 +67,20 @@ class ProcessoServiceTest {
     private SgcPermissionEvaluator permissionEvaluator;
     @Mock
     private SubprocessoTransicaoService transicaoService;
+
+    @BeforeEach
+    void configurarMocksPadrao() {
+        lenient().when(responsabilidadeRepo.findByUnidadeCodigoIn(anyList()))
+                .thenAnswer(invocacao -> {
+                    List<Long> codigos = invocacao.getArgument(0);
+                    return codigos.stream().map(codigo -> {
+                        Responsabilidade responsabilidade = new Responsabilidade();
+                        responsabilidade.setUnidadeCodigo(codigo);
+                        responsabilidade.setUsuarioTitulo("RESP-" + codigo);
+                        return responsabilidade;
+                    }).toList();
+                });
+    }
 
     @Nested
     @DisplayName("Cobertura e Casos de Borda")
@@ -460,6 +476,23 @@ class ProcessoServiceTest {
             assertThat(resultado).isNotNull();
             assertThat(resultado.getDescricao()).isEqualTo("Teste");
             verify(processoRepo).saveAndFlush(any());
+        }
+
+        @Test
+        @DisplayName("Deve falhar ao criar processo com unidade sem responsável efetivo")
+        void deveFalharCriacaoSemResponsavelEfetivo() {
+            CriarProcessoRequest req = new CriarProcessoRequest(
+                    "Teste", TipoProcesso.MAPEAMENTO, LocalDateTime.now(), List.of(1L));
+            Unidade unidade = new Unidade();
+            unidade.setCodigo(1L);
+            unidade.setSigla("U1");
+            unidade.setSituacao(SituacaoUnidade.ATIVA);
+            when(unidadeService.buscarPorCodigo(1L)).thenReturn(unidade);
+            when(responsabilidadeRepo.findByUnidadeCodigoIn(List.of(1L))).thenReturn(List.of());
+
+            assertThatThrownBy(() -> processoService.criar(req))
+                    .isInstanceOf(ErroValidacao.class)
+                    .hasMessageContaining(Mensagens.OPERACAO_NAO_PERMITIDA);
         }
     }
 

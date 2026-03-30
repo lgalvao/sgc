@@ -46,6 +46,7 @@ public class ProcessoService {
     private final ProcessoRepo processoRepo;
     private final ComumRepo repo;
     private final UnidadeService unidadeService;
+    private final ResponsabilidadeRepo responsabilidadeRepo;
     private final SubprocessoService subprocessoService;
     private final SubprocessoConsultaService consultaService;
     private final SubprocessoValidacaoService validacaoService;
@@ -369,6 +370,10 @@ public class ProcessoService {
                 .map(Unidade::getSigla).toList();
         if (!invalidas.isEmpty()) throw new ErroValidacao(Mensagens.UNIDADES_INTERMEDIARIA_INVALIDAS.formatted(String.join(", ", invalidas)));
 
+        if (possuiUnidadeSemResponsavelEfetivo(entidades)) {
+            throw new ErroValidacao(Mensagens.OPERACAO_NAO_PERMITIDA);
+        }
+
         if (tipo == REVISAO || tipo == DIAGNOSTICO) {
             List<String> semMapa = codigosUnidades.stream()
                     .filter(codigo -> !unidadeService.verificarMapaVigente(codigo))
@@ -379,6 +384,10 @@ public class ProcessoService {
 
     private List<String> validarUnidadesInicio(TipoProcesso tipo, List<Long> cods) {
         List<String> erros = new ArrayList<>();
+        List<Unidade> unidades = unidadeService.porCodigos(cods);
+        if (possuiUnidadeSemResponsavelEfetivo(unidades)) {
+            erros.add(Mensagens.OPERACAO_NAO_PERMITIDA);
+        }
         if (tipo == REVISAO || tipo == DIAGNOSTICO) {
             unidadeService.buscarSiglasPorCodigos(cods.stream().filter(codigo -> !unidadeService.verificarMapaVigente(codigo)).toList())
                     .stream().findFirst().ifPresent(s -> erros.add(Mensagens.UNIDADES_SEM_MAPA));
@@ -386,6 +395,15 @@ public class ProcessoService {
         List<Long> bloqueadas = processoRepo.listarUnidadesEmProcessoAtivo(EM_ANDAMENTO, cods);
         if (!bloqueadas.isEmpty()) erros.add(Mensagens.UNIDADES_EM_PROCESSO_ATIVO);
         return erros;
+    }
+
+    private boolean possuiUnidadeSemResponsavelEfetivo(List<Unidade> unidades) {
+        List<Long> codigos = unidades.stream().map(Unidade::getCodigo).toList();
+        Set<Long> unidadesComResponsavelEfetivo = responsabilidadeRepo.findByUnidadeCodigoIn(codigos).stream()
+                .filter(responsabilidade -> responsabilidade.getUsuarioTitulo() != null && !responsabilidade.getUsuarioTitulo().isBlank())
+                .map(Responsabilidade::getUnidadeCodigo)
+                .collect(Collectors.toSet());
+        return unidades.stream().anyMatch(unidade -> !unidadesComResponsavelEfetivo.contains(unidade.getCodigo()));
     }
 
     private void validarFinalizacao(Long codProcesso, Processo processo) {
@@ -600,6 +618,4 @@ public class ProcessoService {
         }
     }
 }
-
-
 

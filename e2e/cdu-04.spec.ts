@@ -19,6 +19,23 @@ import {TEXTOS} from '../frontend/src/constants/textos.js';
 
 test.describe('CDU-04 - Iniciar processo', () => {
 
+    test('Deve marcar unidade sem responsável efetivo como inelegível na árvore', async ({
+                                                                                              _resetAutomatico,
+                                                                                              page,
+                                                                                              _autenticadoComoAdmin
+    }) => {
+        await page.goto('/painel');
+        await page.getByTestId('btn-painel-criar-processo').click();
+        await expect(page).toHaveURL(/\/processo\/cadastro/);
+
+        await page.getByTestId('sel-processo-tipo').selectOption('MAPEAMENTO');
+        await page.getByTestId('btn-arvore-expand-SECRETARIA_1').click();
+
+        const checkboxUnidadeSemResponsavel = page.getByTestId('chk-arvore-unidade-SECAO_SEM_RESP');
+        await expect(checkboxUnidadeSemResponsavel).toBeVisible();
+        await expect(checkboxUnidadeSemResponsavel).toBeDisabled();
+    });
+
     test('Deve iniciar um processo e validar criação de subprocessos e alertas', async ({
                                                                                             _resetAutomatico,
                                                                                             page,

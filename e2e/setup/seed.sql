@@ -52,6 +52,9 @@ VALUES (17, 'Coordenadoria 22', 'COORD_22', 'INTERMEDIARIA', 'ATIVA', 11, '13131
 INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo, titulo_titular,
                             matricula_titular, data_inicio_titularidade)
 VALUES (18, 'Seção 221', 'SECAO_221', 'OPERACIONAL', 'ATIVA', 17, '141414', '00141414', CURRENT_TIMESTAMP);
+INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo, titulo_titular,
+                            matricula_titular, data_inicio_titularidade)
+VALUES (19, 'Seção sem responsável', 'SECAO_SEM_RESP', 'OPERACIONAL', 'ATIVA', 5, NULL, NULL, NULL);
 
 -- Nova Subárvore (Secretaria 3)
 INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao, unidade_superior_codigo, titulo_titular,
@@ -619,4 +622,3 @@ ALTER TABLE sgc.movimentacao
     ALTER COLUMN codigo RESTART WITH 50;
 ALTER TABLE sgc.alerta
     ALTER COLUMN codigo RESTART WITH 10;
-

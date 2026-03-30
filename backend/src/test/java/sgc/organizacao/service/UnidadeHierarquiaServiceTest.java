@@ -43,16 +43,19 @@ class UnidadeHierarquiaServiceTest {
     void setUp() {
         unidadeRaiz = UnidadeTestBuilder.raiz().build();
         unidadeRaiz.setCodigo(1L);
+        unidadeRaiz.setResponsabilidade(criarResponsabilidade(1L));
 
         unidadeIntermediaria = UnidadeTestBuilder.intermediaria()
                 .comSuperior(unidadeRaiz)
                 .build();
         unidadeIntermediaria.setCodigo(2L);
+        unidadeIntermediaria.setResponsabilidade(criarResponsabilidade(2L));
 
         unidadeOperacional = UnidadeTestBuilder.operacional()
                 .comSuperior(unidadeIntermediaria)
                 .build();
         unidadeOperacional.setCodigo(3L);
+        unidadeOperacional.setResponsabilidade(criarResponsabilidade(3L));
     }
 
     @Test
@@ -217,5 +220,28 @@ class UnidadeHierarquiaServiceTest {
             List<UnidadeDto> res2 = service.buscarArvoreComElegibilidade(false, Set.of(unidadeRaiz.getCodigo()));
             assertThat(res2.getFirst().isElegivel()).isFalse(); // Bloqueada
         }
+
+        @Test
+        @DisplayName("Deve marcar como inelegível unidade sem responsável efetivo")
+        void deveMarcarInelegivelSemResponsavelEfetivo() {
+            unidadeOperacional.setResponsabilidade(null);
+            when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(unidadeRaiz, unidadeIntermediaria, unidadeOperacional));
+
+            List<UnidadeDto> resultado = service.buscarArvoreComElegibilidade(false, Set.of());
+
+            UnidadeDto operacionalDto = resultado.getFirst().getSubunidades().getFirst().getSubunidades().getFirst();
+            assertThat(operacionalDto.isElegivel()).isFalse();
+        }
+    }
+
+    private Responsabilidade criarResponsabilidade(Long codigoUnidade) {
+        Responsabilidade responsabilidade = new Responsabilidade();
+        responsabilidade.setUnidadeCodigo(codigoUnidade);
+        responsabilidade.setUsuarioTitulo("RESP-" + codigoUnidade);
+        Usuario usuario = new Usuario();
+        usuario.setTituloEleitoral("RESP-" + codigoUnidade);
+        usuario.setNome("Responsável " + codigoUnidade);
+        responsabilidade.setUsuario(usuario);
+        return responsabilidade;
     }
 }

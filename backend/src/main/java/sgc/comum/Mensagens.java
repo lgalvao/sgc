@@ -137,6 +137,7 @@ public final class Mensagens {
     public static final String UNIDADES_INTERMEDIARIA_INVALIDAS = "Unidades INTERMEDIARIA inválidas: %s";
     public static final String UNIDADES_SEM_MAPA_VIGENTE        = "Unidades sem mapa vigente: %s";
     public static final String UNIDADES_SEM_SUBPROCESSOS        = "Algumas unidades selecionadas não possuem subprocessos vinculados neste processo: %s";
+    public static final String OPERACAO_NAO_PERMITIDA           = "Não foi possível concluir a operação.";
 
     // ── Histórico de Movimentações ──────────────────────────────────────────
     public static final String HIST_CADASTRO_DISPONIBILIZADO     = "Disponibilização do cadastro de atividades";

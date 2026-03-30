@@ -28,14 +28,14 @@ public class Unidade extends EntidadeBase {
     @JsonView(ComumViews.Publica.class)
     private String sigla;
 
-    @Column(name = "matricula_titular", length = 8, nullable = false)
-    private String matriculaTitular;
+    @Column(name = "matricula_titular", length = 8)
+    private @Nullable String matriculaTitular;
 
-    @Column(name = "titulo_titular", length = 12, nullable = false)
-    private String tituloTitular;
+    @Column(name = "titulo_titular", length = 12)
+    private @Nullable String tituloTitular;
 
-    @Column(name = "data_inicio_titularidade", nullable = false)
-    private LocalDateTime dataInicioTitularidade;
+    @Column(name = "data_inicio_titularidade")
+    private @Nullable LocalDateTime dataInicioTitularidade;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo", length = 20, nullable = false)
