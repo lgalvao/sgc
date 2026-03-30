@@ -1,59 +1,8 @@
 {
   "globalLineCoverage": "100.00%",
-  "globalBranchCoverage": "97.51%",
+  "globalBranchCoverage": "98.34%",
   "totalFilesWithGaps": 14,
   "gaps": [
-    {
-      "class": "sgc.processo.painel.PainelFacade",
-      "coverage": "100.00%",
-      "branchCoverage": "92.31%",
-      "missed": [],
-      "partial": [
-        "154(2/4)",
-        "165(1/4)",
-        "190(1/4)"
-      ],
-      "score": 2
-    },
-    {
-      "class": "sgc.processo.service.ProcessoService",
-      "coverage": "100.00%",
-      "branchCoverage": "97.75%",
-      "missed": [],
-      "partial": [
-        "419(1/2)",
-        "441(1/2)",
-        "487(1/2)",
-        "570(1/2)"
-      ],
-      "score": 2
-    },
-    {
-      "class": "sgc.seguranca.login.LoginController",
-      "coverage": "100.00%",
-      "branchCoverage": "85.71%",
-      "missed": [],
-      "partial": [
-        "93(1/2)",
-        "130(1/2)",
-        "139(1/2)",
-        "148(1/2)"
-      ],
-      "score": 2
-    },
-    {
-      "class": "sgc.subprocesso.service.SubprocessoService",
-      "coverage": "100.00%",
-      "branchCoverage": "98.31%",
-      "missed": [],
-      "partial": [
-        "449(1/2)",
-        "656(1/4)",
-        "657(1/6)",
-        "890(1/2)"
-      ],
-      "score": 2
-    },
     {
       "class": "sgc.seguranca.SgcPermissionEvaluator",
       "coverage": "100.00%",
@@ -77,6 +26,28 @@
         "672(1/4)"
       ],
       "score": 1.5
+    },
+    {
+      "class": "sgc.processo.painel.PainelFacade",
+      "coverage": "100.00%",
+      "branchCoverage": "96.15%",
+      "missed": [],
+      "partial": [
+        "165(1/4)",
+        "190(1/4)"
+      ],
+      "score": 1
+    },
+    {
+      "class": "sgc.processo.service.ProcessoService",
+      "coverage": "100.00%",
+      "branchCoverage": "98.88%",
+      "missed": [],
+      "partial": [
+        "419(1/2)",
+        "487(1/2)"
+      ],
+      "score": 1
     },
     {
       "class": "sgc.alerta.AlertaFacade",
@@ -149,12 +120,32 @@
       "score": 0.5
     },
     {
+      "class": "sgc.seguranca.login.LoginController",
+      "coverage": "100.00%",
+      "branchCoverage": "96.43%",
+      "missed": [],
+      "partial": [
+        "93(1/2)"
+      ],
+      "score": 0.5
+    },
+    {
       "class": "sgc.subprocesso.model.Subprocesso",
       "coverage": "100.00%",
       "branchCoverage": "95.45%",
       "missed": [],
       "partial": [
         "70(1/2)"
+      ],
+      "score": 0.5
+    },
+    {
+      "class": "sgc.subprocesso.service.SubprocessoService",
+      "coverage": "100.00%",
+      "branchCoverage": "99.58%",
+      "missed": [],
+      "partial": [
+        "449(1/2)"
       ],
       "score": 0.5
     }

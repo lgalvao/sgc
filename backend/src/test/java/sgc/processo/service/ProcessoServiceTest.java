@@ -24,6 +24,7 @@ import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.*;
 import sgc.subprocesso.service.SubprocessoValidacaoService.*;
+import sgc.mapa.model.Mapa;
 
 import java.time.*;
 import java.util.*;
@@ -32,6 +33,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static sgc.processo.model.AcaoProcesso.*;
 import static sgc.seguranca.AcaoPermissao.*;
+import static org.springframework.test.util.ReflectionTestUtils.invokeMethod;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("ProcessoService Test suite")
@@ -187,7 +189,7 @@ class ProcessoServiceTest {
             processoService.iniciar(id, List.of(1L), usuario);
 
             verify(processoRepo).save(any(Processo.class));
-            verify(subprocessoService).criarParaRevisao(eq(p), eq(uni), eq(um), eq(uniAdmin), eq(usuario));
+            verify(subprocessoService).criarParaRevisao(p, uni, um, uniAdmin, usuario);
         }
 
         @Test
@@ -284,7 +286,7 @@ class ProcessoServiceTest {
             p.adicionarParticipantes(Set.of(u));
 
             when(repo.buscar(Processo.class, codProcesso)).thenReturn(p);
-            when(permissionEvaluator.verificarPermissao(eq(usuario), eq(p), eq(AcaoPermissao.FINALIZAR_PROCESSO))).thenReturn(true);
+            when(permissionEvaluator.verificarPermissao(usuario, p, AcaoPermissao.FINALIZAR_PROCESSO)).thenReturn(true);
 
             Subprocesso sp = new Subprocesso();
             sp.setCodigo(100L);
@@ -332,8 +334,8 @@ class ProcessoServiceTest {
             s3.setUnidade(u3);
 
             when(subprocessoService.listarEntidadesPorProcessoEUnidades(eq(codProcesso), anyList())).thenReturn(List.of(s1, s2, s3));
-            when(permissionEvaluator.verificarPermissao(eq(usuario), eq(s1), eq(AcaoPermissao.ACEITAR_CADASTRO))).thenReturn(true);
-            when(permissionEvaluator.verificarPermissao(eq(usuario), eq(s2), eq(AcaoPermissao.ACEITAR_MAPA))).thenReturn(true);
+            when(permissionEvaluator.verificarPermissao(usuario, s1, AcaoPermissao.ACEITAR_CADASTRO)).thenReturn(true);
+            when(permissionEvaluator.verificarPermissao(usuario, s2, AcaoPermissao.ACEITAR_MAPA)).thenReturn(true);
             when(subprocessoService.obterLocalizacaoAtual(any())).thenReturn(u1);
 
             List<SubprocessoElegivelDto> result = processoService.listarSubprocessosElegiveis(codProcesso);
@@ -815,7 +817,7 @@ class ProcessoServiceTest {
             processoService.iniciar(id, List.of(), usuario);
 
             verify(processoRepo).save(any(Processo.class));
-            verify(subprocessoService).criarParaDiagnostico(eq(p), eq(uni), eq(um), eq(uniAdmin), eq(usuario));
+            verify(subprocessoService).criarParaDiagnostico(p, uni, um, uniAdmin, usuario);
         }
 
         @Test
@@ -854,6 +856,42 @@ class ProcessoServiceTest {
             assertThat(result.getUnidades().getFirst().getMapaCodigo()).isNull();
         }
 
+        @Test
+        @DisplayName("Deve incluir mapaCodigo no DTO quando subprocesso possuir mapa")
+        void deveIncluirMapaCodigoNoDtoQuandoSubprocessoComMapa() {
+            Long codProcesso = 1L;
+            Usuario usuario = new Usuario();
+            usuario.setPerfilAtivo(Perfil.ADMIN);
+
+            Processo p = new Processo();
+            p.setCodigo(codProcesso);
+            p.setTipo(TipoProcesso.MAPEAMENTO);
+            p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+
+            Unidade u = new Unidade();
+            u.setCodigo(10L);
+            u.setSituacao(SituacaoUnidade.ATIVA);
+            p.adicionarParticipantes(Set.of(u));
+
+            when(repo.buscar(Processo.class, codProcesso)).thenReturn(p);
+            when(validacaoService.validarSubprocessosParaFinalizacao(codProcesso)).thenReturn(ValidationResult.ofValido());
+
+            Subprocesso sp = new Subprocesso();
+            sp.setCodigo(100L);
+            sp.setUnidade(u);
+            sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+            Mapa mapa = new Mapa();
+            mapa.setCodigo(500L);
+            sp.setMapa(mapa);
+            
+            when(subprocessoService.listarEntidadesPorProcessoComUnidade(codProcesso)).thenReturn(List.of(sp));
+            when(subprocessoService.obterLocalizacaoAtual(sp)).thenReturn(u);
+
+            ProcessoDetalheDto result = processoService.obterDetalhesCompleto(codProcesso, usuario, false);
+
+            assertThat(result.getUnidades().getFirst().getMapaCodigo()).isEqualTo(500L);
+        }
+
         @ParameterizedTest
         @EnumSource(value = SituacaoSubprocesso.class, names = {
                 "REVISAO_CADASTRO_DISPONIBILIZADA",
@@ -864,6 +902,7 @@ class ProcessoServiceTest {
                 "REVISAO_CADASTRO_HOMOLOGADA",
                 "REVISAO_MAPA_AJUSTADO"
         })
+
         @DisplayName("Deve verificar elegibilidade para acao em bloco para diversas situacoes")
         void deveVerificarElegibilidadeParaDiversasSituacoes(SituacaoSubprocesso situacao) {
             Long codProcesso = 1L;
@@ -946,6 +985,16 @@ class ProcessoServiceTest {
             assertThatThrownBy(() -> processoService.enviarLembrete(codProcesso, codUnidade))
                     .isInstanceOf(IllegalStateException.class)
                     .hasMessageContaining("sem data limite");
+        }
+
+        @Test
+        @DisplayName("processarAcoesBlocoAceiteHomologacao - fall-through branch")
+        void deveNaoFazerNadaQuandoAcaoNaoForAceitarOuHomologar() {
+            AcaoEmBlocoRequest req = mock(AcaoEmBlocoRequest.class);
+            when(req.acao()).thenReturn(AcaoProcesso.DISPONIBILIZAR);
+            
+            assertThatCode(() -> invokeMethod(processoService, "processarAcoesBlocoAceiteHomologacao", req, new Usuario(), List.of()))
+                .doesNotThrowAnyException();
         }
     }
 }

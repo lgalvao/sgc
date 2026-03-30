@@ -16,7 +16,7 @@ class EntidadeBaseTest {
         EntidadeTeste entidade = new EntidadeTeste();
         entidade.setCodigo(42L);
 
-        assertThat(entidade.toString()).isEqualTo("EntidadeTeste[codigo=42]");
+        assertThat(entidade).hasToString("EntidadeTeste[codigo=42]");
     }
 
     @Test
@@ -27,8 +27,9 @@ class EntidadeBaseTest {
         EntidadeTeste segunda = new EntidadeTeste();
         segunda.setCodigo(42L);
 
-        assertThat(primeira).isEqualTo(segunda);
-        assertThat(primeira.hashCode()).isEqualTo(segunda.hashCode());
+        assertThat(primeira)
+            .isEqualTo(segunda)
+            .hasSameHashCodeAs(segunda);
     }
 
     @Test
@@ -36,7 +37,8 @@ class EntidadeBaseTest {
     void naoDeveConsiderarIgualQuandoCodigoNuloOuTipoDiferente() {
         EntidadeTeste entidade = new EntidadeTeste();
 
-        assertThat(entidade.equals("outro")).isFalse();
-        assertThat(entidade.equals(new EntidadeTeste())).isFalse();
+        assertThat(entidade)
+            .isNotEqualTo(new Object())
+            .isNotEqualTo(new EntidadeTeste());
     }
 }

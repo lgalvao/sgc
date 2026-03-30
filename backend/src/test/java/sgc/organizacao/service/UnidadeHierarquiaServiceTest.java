@@ -189,8 +189,6 @@ class UnidadeHierarquiaServiceTest {
         @Test
         @DisplayName("Deve lançar IllegalStateException quando UnidadeDto.fromEntity retorna null")
         void deveLancarErroQuandoDtoNull() {
-            // Simular repositório retornando lista com elemento nulo
-            Unidade nullUnidade = null;
             when(unidadeRepo.findByUnidadeSuperiorCodigo(999L)).thenReturn(Collections.singletonList(null));
             
             assertThatThrownBy(() -> service.buscarSubordinadas(999L))

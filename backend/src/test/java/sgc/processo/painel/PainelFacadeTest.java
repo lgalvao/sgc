@@ -18,6 +18,7 @@ import java.time.*;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -93,10 +94,6 @@ class PainelFacadeTest {
         Processo p = criarProcesso(1L, SituacaoProcesso.EM_ANDAMENTO);
         Page<Processo> page = new PageImpl<>(List.of(p));
 
-        // Simular exceção ao buscar unidade para link (usado para perfis não ADMIN/GESTOR)
-        // Mas listarProcessos chama unidadeService.buscarIdsDescendentes para GESTOR.
-        // Para CHEFE chama apenas para propria unidade.
-
         when(hierarquiaService.buscarMapaHierarquia()).thenReturn(new HashMap<>());
         when(processoService.listarIniciadosPorParticipantes(anyList(), any(Pageable.class))).thenReturn(page);
         when(unidadeService.buscarPorCodigo(100L)).thenThrow(new RuntimeException("Erro"));
@@ -137,9 +134,7 @@ class PainelFacadeTest {
     @Test
     @DisplayName("Deve listar alertas com ordenação definida (não paged ou unsorted)")
     void deveListarAlertasComOrdenacaoDefinida() {
-
         Pageable sorted = PageRequest.of(0, 10, Sort.by("dataHora"));
-
         Alerta a = new Alerta();
         a.setCodigo(1L);
         a.setProcesso(new Processo());
@@ -157,16 +152,13 @@ class PainelFacadeTest {
         when(alertaFacade.obterDataHoraLeitura(1L, "123")).thenReturn(Optional.of(LocalDateTime.now()));
 
         Page<Alerta> result = painelFacade.listarAlertas("123", 100L, "ADMIN", sorted);
-
         assertThat(result).hasSize(1);
     }
 
     @Test
     @DisplayName("Deve listar alertas com ordenação padrão (paged e unsorted)")
     void deveListarAlertasComOrdenacaoPadrao() {
-        // Paged e Unsorted
         Pageable unsortedPaged = PageRequest.of(0, 10);
-
         Alerta a = new Alerta();
         a.setCodigo(1L);
         a.setProcesso(new Processo());
@@ -180,13 +172,10 @@ class PainelFacadeTest {
         a.setDataHora(LocalDateTime.now());
 
         Page<Alerta> page = new PageImpl<>(List.of(a));
-
         when(alertaFacade.listarPorUnidade(eq("123"), eq(100L), eq("ADMIN"), any(Pageable.class))).thenReturn(page);
-
         when(alertaFacade.obterDataHoraLeitura(1L, "123")).thenReturn(Optional.of(LocalDateTime.now()));
 
         Page<Alerta> result = painelFacade.listarAlertas("123", 100L, "ADMIN", unsortedPaged);
-
         assertThat(result).hasSize(1);
     }
 
@@ -224,14 +213,12 @@ class PainelFacadeTest {
         when(processoService.listarTodos(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(p)));
 
         Page<ProcessoResumoDto> result = painelFacade.listarProcessos(Perfil.ADMIN, 100L, PageRequest.of(0, 10));
-
         assertThat(result.getContent().getFirst().unidadesParticipantes()).contains("U1");
     }
 
     @Test
     @DisplayName("Deve cobrir lógica de hierarquia visível profunda")
     void deveCobrirLogicaHierarquiaVisivelProfunda() {
-
         Processo p = mock(Processo.class);
         when(p.getCodigo()).thenReturn(1L);
         when(p.getSituacao()).thenReturn(SituacaoProcesso.EM_ANDAMENTO);
@@ -248,16 +235,14 @@ class PainelFacadeTest {
         when(p.getParticipantes()).thenReturn(List.of(up1, up2));
 
         Map<Long, List<Long>> hierarquia = new HashMap<>();
-        hierarquia.put(0L, List.of(1L)); // 0L é a raiz, 1L é o nível abaixo da raiz
-        hierarquia.put(1L, List.of(2L)); // U1 tem U2 como filho
+        hierarquia.put(0L, List.of(1L));
+        hierarquia.put(1L, List.of(2L));
         hierarquia.put(2L, new ArrayList<>());
 
         when(hierarquiaService.buscarMapaHierarquia()).thenReturn(hierarquia);
         when(processoService.listarTodos(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(p)));
 
         Page<ProcessoResumoDto> result = painelFacade.listarProcessos(Perfil.ADMIN, 100L, PageRequest.of(0, 10));
-
-        // Se U2 participa e U1 participa, e U2 é única subordinada de U1, deve mostrar apenas U1
         assertThat(result.getContent().getFirst().unidadesParticipantes()).isEqualTo("U1");
     }
 
@@ -275,19 +260,12 @@ class PainelFacadeTest {
         when(p.getParticipantes()).thenReturn(List.of(up1));
 
         Map<Long, List<Long>> hierarquia = new HashMap<>();
-        hierarquia.put(0L, List.of(1L)); 
-        // 1L tem pai 0L. Agrupamento pára em 1L.
-        // isCovered(0L) vai dar false porque não tem participantesIds.contains(0L)
+        hierarquia.put(00L, List.of(2L));
+        hierarquia.put(2L, List.of(1L));
+        hierarquia.put(1L, new ArrayList<>());
         
         when(hierarquiaService.buscarMapaHierarquia()).thenReturn(hierarquia);
         when(processoService.listarTodos(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(p)));
-        
-        // Simular que uma unidade (ID 2) "subiu" no agrupamento mas não está no snapshot
-        // Para isso, precisamos que 2L seja pai de 1L e 2L seja "covered"
-        hierarquia.clear();
-        hierarquia.put(0L, List.of(2L));
-        hierarquia.put(2L, List.of(1L));
-        hierarquia.put(1L, new ArrayList<>());
         
         Unidade u2 = new Unidade(); u2.setSigla("U2");
         when(unidadeService.porCodigos(List.of(2L))).thenReturn(List.of(u2));
@@ -320,12 +298,67 @@ class PainelFacadeTest {
     }
 
     @Test
+    @DisplayName("Deve cobrir sigla nula ou em branco")
+    void deveCobrirSiglaNulaOuEmBranco() {
+        Processo p = mock(Processo.class);
+        when(p.getCodigo()).thenReturn(1L);
+        when(p.getSituacao()).thenReturn(SituacaoProcesso.EM_ANDAMENTO);
+        when(p.getTipo()).thenReturn(TipoProcesso.MAPEAMENTO);
+
+        UnidadeProcesso up1 = new UnidadeProcesso();
+        up1.setUnidadeCodigo(1L);
+        up1.setSigla(null);
+
+        UnidadeProcesso up2 = new UnidadeProcesso();
+        up2.setUnidadeCodigo(2L);
+        up2.setSigla(" ");
+
+        when(p.getParticipantes()).thenReturn(List.of(up1, up2));
+
+        Map<Long, List<Long>> hierarquia = new HashMap<>();
+        hierarquia.put(0L, List.of(1L, 2L));
+
+        when(hierarquiaService.buscarMapaHierarquia()).thenReturn(hierarquia);
+        when(processoService.listarTodos(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(p)));
+
+        Unidade u1 = new Unidade(); u1.setSigla("U1");
+        Unidade u2 = new Unidade(); u2.setSigla("U2");
+        when(unidadeService.porCodigos(argThat(list -> list != null && list.contains(1L) && list.contains(2L)))).thenReturn(List.of(u1, u2));
+
+        Page<ProcessoResumoDto> result = painelFacade.listarProcessos(Perfil.ADMIN, 100L, PageRequest.of(0, 10));
+        assertThat(result.getContent().getFirst().unidadesParticipantes()).contains("U1", "U2");
+    }
+
+    @Test
+    @DisplayName("Deve cobrir children sendo lista vazia")
+    void deveCobrirChildrenVazia() {
+        Processo p = mock(Processo.class);
+        when(p.getCodigo()).thenReturn(1L);
+        when(p.getSituacao()).thenReturn(SituacaoProcesso.EM_ANDAMENTO);
+        when(p.getTipo()).thenReturn(TipoProcesso.MAPEAMENTO);
+
+        UnidadeProcesso up1 = new UnidadeProcesso();
+        up1.setUnidadeCodigo(1L);
+        up1.setSigla("U1");
+        when(p.getParticipantes()).thenReturn(List.of(up1));
+
+        Map<Long, List<Long>> hierarquia = new HashMap<>();
+        hierarquia.put(0L, List.of(2L));
+        hierarquia.put(2L, Collections.emptyList());
+
+        when(hierarquiaService.buscarMapaHierarquia()).thenReturn(hierarquia);
+        when(processoService.listarTodos(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(p)));
+
+        painelFacade.listarProcessos(Perfil.ADMIN, 100L, PageRequest.of(0, 10));
+        verify(processoService).listarTodos(any());
+    }
+
+    @Test
     @DisplayName("Deve cobrir ordenacao customizada")
     void deveCobrirOrdenacaoCustomizada() {
         when(hierarquiaService.buscarMapaHierarquia()).thenReturn(new HashMap<>());
         when(processoService.listarTodos(any(Pageable.class))).thenReturn(new PageImpl<>(List.of()));
 
-        // Pageable com sort -> aciona branch false na line 63
         Pageable sorted = PageRequest.of(0, 10, Sort.by("descricao"));
         painelFacade.listarProcessos(Perfil.ADMIN, 100L, sorted);
         
@@ -340,7 +373,6 @@ class PainelFacadeTest {
         when(p.getSituacao()).thenReturn(SituacaoProcesso.EM_ANDAMENTO);
         when(p.getTipo()).thenReturn(TipoProcesso.MAPEAMENTO);
 
-        // U1 e U2 participam. U3 é pai de U1 e U2. U4 é pai de U3.
         UnidadeProcesso up1 = new UnidadeProcesso();
         up1.setUnidadeCodigo(1L);
         up1.setSigla("U1");
@@ -359,9 +391,7 @@ class PainelFacadeTest {
         when(hierarquiaService.buscarMapaHierarquia()).thenReturn(hierarquia);
         when(processoService.listarTodos(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(p)));
 
-        // Isso vai forçar múltiplas chamadas de isCovered para o mesmo nó dependendo da ordem
         painelFacade.listarProcessos(Perfil.ADMIN, 100L, PageRequest.of(0, 10));
-        
         verify(processoService).listarTodos(any());
     }
 

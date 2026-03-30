@@ -648,6 +648,24 @@ class SubprocessoServiceExtraCoverageTest {
                 assertTrue(subprocessoService.obterPermissoesUI(sp, user).podeDisponibilizarMapa());
             }
         }
+
+        @Test
+        @DisplayName("obterPermissoesUI podeValidarMapa para CHEFE em situação de análise")
+        void obterPermissoesUI_ChefeAnalise() {
+            Subprocesso sp = criarSubprocessoComMapa(1L);
+            sp.setSituacaoForcada(MAPEAMENTO_MAPA_DISPONIBILIZADO);
+            Unidade u = new Unidade(); u.setCodigo(10L); sp.setUnidade(u);
+
+            Usuario user = new Usuario();
+            user.setPerfilAtivo(Perfil.CHEFE);
+            user.setUnidadeAtivaCodigo(10L);
+
+            when(unidadeService.buscarPorCodigo(10L)).thenReturn(u);
+
+            PermissoesSubprocessoDto res = subprocessoService.obterPermissoesUI(sp, user);
+            assertThat(res.podeValidarMapa()).isTrue();
+            assertThat(res.podeApresentarSugestoes()).isTrue();
+        }
     }
 
     @Nested
@@ -995,6 +1013,16 @@ class SubprocessoServiceExtraCoverageTest {
             Movimentacao m = new Movimentacao(); m.setUnidadeDestino(dest);
             when(movimentacaoRepo.findFirstBySubprocessoCodigoOrderByDataHoraDesc(1L)).thenReturn(Optional.of(m));
             assertThat(subprocessoService.obterLocalizacaoAtual(sp)).isEqualTo(dest);
+            
+            // Branch: m.getUnidadeDestino() == null
+            sp.setLocalizacaoAtual(null);
+            m.setUnidadeDestino(null);
+            assertThat(subprocessoService.obterLocalizacaoAtual(sp)).isEqualTo(u);
+            
+            // Branch: findFirstBy... returns Optional.empty()
+            sp.setLocalizacaoAtual(null);
+            when(movimentacaoRepo.findFirstBySubprocessoCodigoOrderByDataHoraDesc(1L)).thenReturn(Optional.empty());
+            assertThat(subprocessoService.obterLocalizacaoAtual(sp)).isEqualTo(u);
         }
     }
 }

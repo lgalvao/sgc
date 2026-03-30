@@ -339,6 +339,20 @@ class LoginControllerTest {
         assertThat(Arrays.stream(response.getCookies()).allMatch(cookie -> !cookie.getSecure())).isTrue();
     }
 
+    @Test
+    @DisplayName("cookies de login devem ser secure fora do ambiente de testes")
+    void cookiesDevemSerSecureForaDoAmbienteDeTestes() {
+        setField(loginController, "ambienteTestes", false);
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        invokeMethod(loginController, "adicionarCookiePreAuth", response, "token-pre-auth");
+        invokeMethod(loginController, "adicionarCookieJwt", response, "token-jwt");
+        invokeMethod(loginController, "limparCookiePreAuth", response);
+
+        assertThat(response.getCookies()).hasSize(3);
+        assertThat(Arrays.stream(response.getCookies()).allMatch(Cookie::getSecure)).isTrue();
+    }
+
     private AutenticarRequest criarRequestPadrao() {
         return AutenticarRequest.builder()
                 .tituloEleitoral("123")
