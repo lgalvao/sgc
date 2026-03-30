@@ -1,4 +1,4 @@
-import type {MapaVigenteReferencia, Unidade, UnidadeSnapshot} from "@/types/tipos";
+import type {DiagnosticoOrganizacional, MapaVigenteReferencia, Unidade, UnidadeSnapshot} from "@/types/tipos";
 import {apiGet} from "@/utils/apiUtils";
 
 // Mappers internos (formerly in /mappers/unidades.ts)
@@ -51,6 +51,10 @@ export function mapUnidadesArray(arr: any[] = []): Unidade[] {
 
 export async function buscarTodasUnidades() {
     return apiGet("/unidades");
+}
+
+export async function buscarDiagnosticoOrganizacional(): Promise<DiagnosticoOrganizacional> {
+    return apiGet("/unidades/diagnostico-organizacional");
 }
 
 export async function buscarUnidadePorSigla(sigla: string) {

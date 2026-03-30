@@ -4,15 +4,14 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
-import org.springframework.boot.*;
-import sgc.comum.erros.*;
+import org.springframework.jdbc.core.namedparam.*;
+import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
 
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
-import static sgc.organizacao.model.Perfil.*;
 import static sgc.organizacao.model.SituacaoUnidade.*;
 import static sgc.organizacao.model.TipoUnidade.*;
 
@@ -30,7 +29,7 @@ class ValidadorDadosOrganizacionaisTest {
     private ResponsabilidadeRepo responsabilidadeRepo;
 
     @Mock
-    private UsuarioPerfilRepo usuarioPerfilRepo;
+    private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     @InjectMocks
     private ValidadorDadosOrganizacionais validador;
@@ -54,14 +53,17 @@ class ValidadorDadosOrganizacionaisTest {
                         criarUsuario("RESP_INT"),
                         criarUsuario("RESP_OPE")
                 ),
+                List.of(),
                 List.of(
-                        criarPerfil("RESP_INT", 10L, GESTOR),
-                        criarPerfil("RESP_OPE", 20L, CHEFE)
+                        linhaPerfil("RESP_INT", "GESTOR", 10L),
+                        linhaPerfil("RESP_OPE", "CHEFE", 20L)
                 )
         );
 
-        assertThatCode(() -> validador.run(new DefaultApplicationArguments()))
-                .doesNotThrowAnyException();
+        DiagnosticoOrganizacionalDto diagnostico = validador.diagnosticar();
+
+        assertThat(diagnostico.possuiViolacoes()).isFalse();
+        assertThat(diagnostico.grupos()).isEmpty();
     }
 
     @Test
@@ -81,14 +83,16 @@ class ValidadorDadosOrganizacionaisTest {
                         criarUsuario("TITULO_INT"),
                         criarUsuario("MESMA_PESSOA")
                 ),
+                List.of(),
                 List.of(
-                        criarPerfil("TITULO_INT", 10L, GESTOR),
-                        criarPerfil("MESMA_PESSOA", 20L, CHEFE)
+                        linhaPerfil("TITULO_INT", "GESTOR", 10L),
+                        linhaPerfil("MESMA_PESSOA", "CHEFE", 20L)
                 )
         );
 
-        assertThatCode(() -> validador.run(new DefaultApplicationArguments()))
-                .doesNotThrowAnyException();
+        DiagnosticoOrganizacionalDto diagnostico = validador.diagnosticar();
+
+        assertThat(diagnostico.possuiViolacoes()).isFalse();
     }
 
     @Test
@@ -100,29 +104,37 @@ class ValidadorDadosOrganizacionaisTest {
                 List.of(operacional),
                 List.of(),
                 List.of(criarUsuario("TITULO_OPE")),
+                List.of(),
                 List.of()
         );
 
-        assertThatThrownBy(() -> validador.run(new DefaultApplicationArguments()))
-                .isInstanceOf(ErroConfiguracao.class)
-                .hasMessageContaining("1 violacao encontrada");
+        DiagnosticoOrganizacionalDto diagnostico = validador.diagnosticar();
+
+        assertThat(diagnostico.possuiViolacoes()).isTrue();
+        assertThat(diagnostico.quantidadeTiposViolacao()).isEqualTo(1);
+        assertThat(diagnostico.resumo())
+                .isEqualTo("Há unidades atualmente sem responsável efetivo: OPE. Essas unidades só poderão participar de processos do SGC quando a responsabilidade for definida, externamente ou via atribuição temporária no próprio sistema.");
+        assertThat(diagnostico.grupos())
+                .extracting(GrupoViolacaoOrganizacionalDto::tipo)
+                .containsExactly("Unidade participante sem responsavel efetivo");
     }
 
     @Test
-    @DisplayName("deve falhar quando unidade nao possui titular")
-    void deveFalharSemTitular() {
+    @DisplayName("deve aceitar unidade sem titular quando houver responsavel efetivo")
+    void deveAceitarSemTitularQuandoHouverResponsavelEfetivo() {
         Unidade operacional = criarUnidade(20L, "OPE", OPERACIONAL, null);
 
         mockarCenarioBase(
                 List.of(operacional),
                 List.of(criarResponsabilidade(20L, "RESP_OPE")),
                 List.of(criarUsuario("RESP_OPE")),
-                List.of(criarPerfil("RESP_OPE", 20L, CHEFE))
+                List.of(),
+                List.of(linhaPerfil("RESP_OPE", "CHEFE", 20L))
         );
 
-        assertThatThrownBy(() -> validador.run(new DefaultApplicationArguments()))
-                .isInstanceOf(ErroConfiguracao.class)
-                .hasMessageContaining("1 violacao encontrada");
+        DiagnosticoOrganizacionalDto diagnostico = validador.diagnosticar();
+
+        assertThat(diagnostico.possuiViolacoes()).isFalse();
     }
 
     @Test
@@ -134,12 +146,15 @@ class ValidadorDadosOrganizacionaisTest {
                 List.of(intermediaria),
                 List.of(criarResponsabilidade(10L, "RESP_INT")),
                 List.of(criarUsuario("TITULO_INT"), criarUsuario("RESP_INT")),
-                List.of(criarPerfil("RESP_INT", 10L, GESTOR))
+                List.of(),
+                List.of(linhaPerfil("RESP_INT", "GESTOR", 10L))
         );
 
-        assertThatThrownBy(() -> validador.run(new DefaultApplicationArguments()))
-                .isInstanceOf(ErroConfiguracao.class)
-                .hasMessageContaining("1 violacao encontrada");
+        DiagnosticoOrganizacionalDto diagnostico = validador.diagnosticar();
+
+        assertThat(diagnostico.possuiViolacoes()).isTrue();
+        assertThat(diagnostico.quantidadeTiposViolacao()).isEqualTo(1);
+        assertThat(diagnostico.grupos().getFirst().tipo()).isEqualTo("Unidade intermediaria sem filhas ativas participantes");
     }
 
     @Test
@@ -161,12 +176,15 @@ class ValidadorDadosOrganizacionaisTest {
                         criarUsuario("RESP_INT"),
                         criarUsuario("RESP_OPE")
                 ),
-                List.of(criarPerfil("RESP_OPE", 20L, CHEFE))
+                List.of(),
+                List.of(linhaPerfil("RESP_OPE", "CHEFE", 20L))
         );
 
-        assertThatThrownBy(() -> validador.run(new DefaultApplicationArguments()))
-                .isInstanceOf(ErroConfiguracao.class)
-                .hasMessageContaining("1 violacao encontrada");
+        DiagnosticoOrganizacionalDto diagnostico = validador.diagnosticar();
+
+        assertThat(diagnostico.possuiViolacoes()).isTrue();
+        assertThat(diagnostico.quantidadeTiposViolacao()).isEqualTo(1);
+        assertThat(diagnostico.grupos().getFirst().tipo()).isEqualTo("Unidade intermediaria sem perfil GESTOR");
     }
 
     @Test
@@ -178,24 +196,78 @@ class ValidadorDadosOrganizacionaisTest {
                 List.of(intermediaria),
                 List.of(criarResponsabilidade(10L, "RESP_INT")),
                 List.of(criarUsuario("RESP_INT")),
+                List.of(),
                 List.of()
         );
 
-        assertThatThrownBy(() -> validador.run(new DefaultApplicationArguments()))
-                .isInstanceOf(ErroConfiguracao.class)
-                .hasMessageContaining("3 violacoes encontradas");
+        DiagnosticoOrganizacionalDto diagnostico = validador.diagnosticar();
+
+        assertThat(diagnostico.possuiViolacoes()).isTrue();
+        assertThat(diagnostico.quantidadeTiposViolacao()).isEqualTo(2);
+    }
+
+    @Test
+    @DisplayName("deve falhar quando houver titulo duplicado na view de usuarios")
+    void deveFalharQuandoHouverTituloDuplicadoNaViewUsuarios() {
+        Unidade operacional = criarUnidade(20L, "OPE", OPERACIONAL, "TITULO_OPE");
+
+        mockarCenarioBase(
+                List.of(operacional),
+                List.of(criarResponsabilidade(20L, "RESP_OPE")),
+                List.of(
+                        criarUsuario("TITULO_OPE"),
+                        criarUsuario("RESP_OPE"),
+                        criarUsuario("RESP_OPE")
+                ),
+                List.of(Map.of("TITULO", "RESP_OPE", "QUANTIDADE", 2L)),
+                List.of(linhaPerfil("RESP_OPE", "CHEFE", 20L))
+        );
+
+        DiagnosticoOrganizacionalDto diagnostico = validador.diagnosticar();
+
+        assertThat(diagnostico.possuiViolacoes()).isTrue();
+        assertThat(diagnostico.quantidadeTiposViolacao()).isEqualTo(1);
+        assertThat(diagnostico.grupos().getFirst().tipo()).isEqualTo("VW_USUARIO com titulo duplicado");
+    }
+
+    @Test
+    @DisplayName("deve ignorar perfil nulo derivado de unidade sem responsavel efetivo")
+    void deveIgnorarPerfilNuloDerivadoDeUnidadeSemResponsavelEfetivo() {
+        Unidade operacional = criarUnidade(20L, "OPE", OPERACIONAL, null);
+
+        mockarCenarioBase(
+                List.of(operacional),
+                List.of(),
+                List.of(
+                        criarUsuario("RESP_OPE")
+                ),
+                List.of(),
+                List.of(
+                        linhaPerfil(null, "CHEFE", 20L)
+                )
+        );
+
+        DiagnosticoOrganizacionalDto diagnostico = validador.diagnosticar();
+
+        assertThat(diagnostico.possuiViolacoes()).isTrue();
+        assertThat(diagnostico.quantidadeTiposViolacao()).isEqualTo(1);
+        assertThat(diagnostico.grupos().getFirst().tipo()).isEqualTo("Unidade participante sem responsavel efetivo");
     }
 
     private void mockarCenarioBase(
             List<Unidade> unidades,
             List<Responsabilidade> responsabilidades,
             List<Usuario> usuarios,
-            List<UsuarioPerfil> perfis
+            List<Map<String, Object>> linhasUsuariosDuplicados,
+            List<Map<String, Object>> linhasPerfis
     ) {
         when(unidadeRepo.findAllWithHierarquia()).thenReturn(unidades);
         when(responsabilidadeRepo.findByUnidadeCodigoIn(anyList())).thenReturn(responsabilidades);
-        when(usuarioRepo.findAllById(anyList())).thenReturn(usuarios);
-        when(usuarioPerfilRepo.findByUnidadeCodigoIn(anyList())).thenReturn(perfis);
+        lenient().when(usuarioRepo.findAllById(anyList())).thenReturn(usuarios);
+        lenient().when(namedParameterJdbcTemplate.queryForList(contains("FROM sgc.vw_usuario"), ArgumentMatchers.<Map<String, ?>>any()))
+                .thenReturn(linhasUsuariosDuplicados);
+        lenient().when(namedParameterJdbcTemplate.queryForList(contains("FROM sgc.vw_usuario_perfil_unidade"), ArgumentMatchers.<Map<String, ?>>any()))
+                .thenReturn(linhasPerfis);
     }
 
     private Unidade criarUnidade(Long codigo, String sigla, TipoUnidade tipo, String tituloTitular) {
@@ -225,11 +297,11 @@ class ValidadorDadosOrganizacionaisTest {
         return usuario;
     }
 
-    private UsuarioPerfil criarPerfil(String usuarioTitulo, Long unidadeCodigo, Perfil perfil) {
-        return UsuarioPerfil.builder()
-                .usuarioTitulo(usuarioTitulo)
-                .unidadeCodigo(unidadeCodigo)
-                .perfil(perfil)
-                .build();
+    private Map<String, Object> linhaPerfil(String usuarioTitulo, String perfil, Long unidadeCodigo) {
+        Map<String, Object> linha = new LinkedHashMap<>();
+        linha.put("USUARIO_TITULO", usuarioTitulo);
+        linha.put("PERFIL", perfil);
+        linha.put("UNIDADE_CODIGO", unidadeCodigo);
+        return linha;
     }
 }

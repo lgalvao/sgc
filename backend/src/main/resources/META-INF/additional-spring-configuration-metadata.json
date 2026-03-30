@@ -1,9 +1,3 @@
 {
-  "properties": [
-    {
-      "name": "sgc.validacao.startup",
-      "type": "java.lang.Boolean",
-      "description": "Habilita a validacao das invariantes organizacionais na inicializacao da aplicacao."
-    }
-  ]
+  "properties": []
 }

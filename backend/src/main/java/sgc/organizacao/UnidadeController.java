@@ -29,6 +29,7 @@ public class UnidadeController {
     private final ResponsavelUnidadeService responsavelService;
     private final UsuarioService usuarioService;
     private final ProcessoService processoService;
+    private final ValidadorDadosOrganizacionais validadorDadosOrganizacionais;
 
     @PostMapping("/{codUnidade}/atribuicoes-temporarias")
     @PreAuthorize("hasRole('ADMIN')")
@@ -49,6 +50,12 @@ public class UnidadeController {
     public ResponseEntity<List<UnidadeDto>> buscarTodasUnidades() {
         List<UnidadeDto> hierarquia = hierarquiaService.buscarArvoreHierarquica();
         return ResponseEntity.ok(hierarquia);
+    }
+
+    @GetMapping("/diagnostico-organizacional")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<DiagnosticoOrganizacionalDto> buscarDiagnosticoOrganizacional() {
+        return ResponseEntity.ok(validadorDadosOrganizacionais.diagnosticar());
     }
 
     @GetMapping("/arvore-com-elegibilidade")

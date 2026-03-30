@@ -17,6 +17,13 @@ vi.mock('@/services/processoService', () => ({
 
 vi.mock('@/services/unidadeService', () => ({
     buscarArvoreComElegibilidade: vi.fn().mockResolvedValue([]),
+    buscarDiagnosticoOrganizacional: vi.fn().mockResolvedValue({
+        possuiViolacoes: false,
+        resumo: '',
+        quantidadeTiposViolacao: 0,
+        quantidadeOcorrencias: 0,
+        grupos: [],
+    }),
     mapUnidadesArray: vi.fn((arr) => arr || []),
 }));
 
@@ -113,6 +120,13 @@ describe('ProcessoCadastroView.vue', () => {
         vi.mocked(processoService.obterDetalhesProcesso).mockResolvedValue(null as any);
         mockRoute.query = {};
         vi.mocked(unidadeService.buscarArvoreComElegibilidade).mockResolvedValue([]);
+        vi.mocked(unidadeService.buscarDiagnosticoOrganizacional).mockResolvedValue({
+            possuiViolacoes: false,
+            resumo: '',
+            quantidadeTiposViolacao: 0,
+            quantidadeOcorrencias: 0,
+            grupos: [],
+        } as any);
         vi.mocked(unidadeService.mapUnidadesArray).mockImplementation((arr) => arr || []);
 
         await import('@/services/processoService');
@@ -129,6 +143,30 @@ describe('ProcessoCadastroView.vue', () => {
         expect(unidadeService.buscarArvoreComElegibilidade).not.toHaveBeenCalled();
         expect(wrapper.find('[data-testid="btn-processo-salvar"]').exists()).toBe(true);
         expect(wrapper.find('[data-testid="btn-processo-remover"]').exists()).toBe(false);
+    });
+
+    it('exibe alerta fixo de pendencias organizacionais para ADMIN', async () => {
+        vi.mocked(unidadeService.buscarDiagnosticoOrganizacional).mockResolvedValueOnce({
+            possuiViolacoes: true,
+            resumo: 'Foram encontradas 2 inconsistencias.',
+            quantidadeTiposViolacao: 1,
+            quantidadeOcorrencias: 2,
+            grupos: [
+                {
+                    tipo: 'Unidade participante sem responsavel efetivo',
+                    quantidadeOcorrencias: 2,
+                    ocorrencias: ['sigla=Z1', 'sigla=Z2'],
+                },
+            ],
+        } as any);
+
+        const {wrapper} = createWrapper({
+            perfil: {perfilSelecionado: 'ADMIN'}
+        });
+        await flushPromises();
+
+        expect(wrapper.text()).toContain('Pendências organizacionais identificadas.');
+        expect(wrapper.text()).toContain('Unidade participante sem responsavel efetivo: 2 ocorrência(s)');
     });
 
     it('disables action buttons when form is incomplete and enables when complete', async () => {

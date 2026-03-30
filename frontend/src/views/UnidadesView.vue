@@ -6,6 +6,21 @@
       </template>
     </PageHeader>
 
+    <div v-if="exibirAlertaDiagnostico" class="sticky-top mb-3">
+      <BAlert
+          :model-value="true"
+          variant="warning"
+      >
+        <strong>Pendências organizacionais identificadas.</strong>
+        <div class="mt-1">{{ resumoDiagnostico }}</div>
+        <ul v-if="gruposDiagnostico.length > 0" class="mb-0 mt-2 ps-3">
+          <li v-for="grupo in gruposDiagnostico" :key="grupo.tipo">
+            {{ grupo.tipo }}: {{ grupo.quantidadeOcorrencias }} ocorrência(s)
+          </li>
+        </ul>
+      </BAlert>
+    </div>
+
     <BAlert
         v-if="erroUnidades"
         :model-value="true"
@@ -54,16 +69,30 @@ import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import ArvoreUnidades from "@/components/unidade/ArvoreUnidades.vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
-import {buscarTodasUnidades, mapUnidadesArray} from "@/services/unidadeService";
-import type {Unidade} from "@/types/tipos";
+import {buscarDiagnosticoOrganizacional, buscarTodasUnidades, mapUnidadesArray} from "@/services/unidadeService";
+import type {DiagnosticoOrganizacional, Unidade} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
 import {useAsyncAction} from "@/composables/useAsyncAction";
+import {usePerfil} from "@/composables/usePerfil";
+import {logger} from "@/utils";
 
 const unidades = ref<Unidade[]>([]);
 const {carregando: isLoading, erro, executarSilencioso} = useAsyncAction();
+const {isAdmin} = usePerfil();
+const diagnosticoOrganizacional = ref<DiagnosticoOrganizacional | null>(null);
+const erroDiagnosticoOrganizacional = ref<string | null>(null);
 
 const erroUnidades = computed(() =>
     erro.value ? {message: erro.value} : null
+);
+const gruposDiagnostico = computed(() => diagnosticoOrganizacional.value?.grupos ?? []);
+const resumoDiagnostico = computed(() =>
+    erroDiagnosticoOrganizacional.value
+        ?? diagnosticoOrganizacional.value?.resumo
+        ?? ""
+);
+const exibirAlertaDiagnostico = computed(() =>
+    isAdmin.value && (!!erroDiagnosticoOrganizacional.value || diagnosticoOrganizacional.value?.possuiViolacoes === true)
 );
 
 function clearError() {
@@ -79,6 +108,24 @@ async function carregarUnidades() {
   }, TEXTOS.comum.ERRO_OPERACAO);
 }
 
-onMounted(carregarUnidades);
+async function carregarDiagnostico() {
+  if (!isAdmin.value) {
+    return;
+  }
+
+  try {
+    diagnosticoOrganizacional.value = await buscarDiagnosticoOrganizacional();
+    erroDiagnosticoOrganizacional.value = null;
+  } catch (error) {
+    diagnosticoOrganizacional.value = null;
+    erroDiagnosticoOrganizacional.value = "Não foi possível verificar as pendências organizacionais desta tela.";
+    logger.error("Erro ao carregar diagnostico organizacional das unidades:", error);
+  }
+}
+
+onMounted(() => {
+  void carregarDiagnostico();
+  void carregarUnidades();
+});
 
 </script>
