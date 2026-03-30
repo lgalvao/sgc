@@ -87,7 +87,7 @@ class UnidadeHierarquiaServiceTest {
     @Test
     @DisplayName("Deve buscar IDs descendentes")
     void deveBuscarIdsDescendentes() {
-        when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(unidadeRaiz, unidadeIntermediaria, unidadeOperacional));
+        when(unidadeRepo.findAllAtivasComSuperior()).thenReturn(List.of(unidadeRaiz, unidadeIntermediaria, unidadeOperacional));
 
         List<Long> descendentes = service.buscarIdsDescendentes(1L);
 
@@ -219,4 +219,3 @@ class UnidadeHierarquiaServiceTest {
         }
     }
 }
-
