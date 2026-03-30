@@ -12,7 +12,7 @@ GRANT SELECT ON SRH2.SERVIDOR TO SGC;
 GRANT SELECT ON SRH2.LOT_RAMAIS_SERVIDORES TO SGC;
 GRANT SELECT ON SRH2.QFC_SUBST_COM TO SGC;
 
--- Permissões necessárias no CORAU (SIGMA
+-- Permissões necessárias no CORAU (SIGMA)
 
 GRANT SELECT ON CORAU.RESP_CENTRAL TO SGC;
 GRANT SELECT ON CORAU.EVENTO TO SGC;
@@ -21,70 +21,60 @@ GRANT SELECT ON CORAU.CT_ZONA TO SGC;
 
 -- 1. View VW_VINCULACAO_UNIDADE
 
-CREATE
-OR REPLACE VIEW VW_VINCULACAO_UNIDADE (unidade_atual_codigo, unidade_anterior_codigo, demais_unidades_historicas) AS
+CREATE OR REPLACE VIEW VW_VINCULACAO_UNIDADE
+            (unidade_atual_codigo, unidade_anterior_codigo, demais_unidades_historicas) AS
 WITH HistoricoCompleto AS (
-  -- 1. CTE: Encontra o caminho completo da raiz até a atual
-  SELECT
-    t.CD,
-    t.COD_UNID_TSE_ANT,
-    -- Constrói o caminho completo da raiz para a atual
-    LTRIM(SYS_CONNECT_BY_PATH(t.CD, '->'), '->') AS Caminho_Completo,
-    LEVEL AS Nivel
-  FROM
-    SRH2.UNIDADE_TSE t
-  START WITH
-    t.COD_UNID_TSE_ANT IS NULL
-  CONNECT BY NOCYCLE
-    PRIOR t.CD = t.COD_UNID_TSE_ANT
-),
-HistoricoExtinto AS (
-  -- 2. CTE: Processa o histórico para tokenização e LISTAGG
-  SELECT
-    h.CD,
-    h.COD_UNID_TSE_ANT,
-    h.Nivel,
-    CASE 
-        -- A string histórica só é gerada se o nível for maior que 2 (i.e., existe mais que Atual e Antecessor)
-        WHEN h.Nivel > 2 THEN 
-            REGEXP_SUBSTR(
-                h.Caminho_Completo, 
-                '^(.*?)->[^>]+->[^>]+$', -- Expressão para isolar o histórico
-                1, 1, 'i', 1
-            )
-        END AS Historico_String_Pura
-  FROM HistoricoCompleto h
-)
-SELECT u.CD               AS unidade_atual_codigo,
-       u.COD_UNID_TSE_ANT AS unidade_anterior_codigo,
+    -- 1. CTE: Encontra o caminho completo da raiz até a atual
+    SELECT t.CD,
+           t.COD_UNID_TSE_ANT,
+           -- Constrói o caminho completo da raiz para a atual
+           LTRIM(SYS_CONNECT_BY_PATH(t.CD, '->'), '->') AS Caminho_Completo,
+           LEVEL                                        AS Nivel
+    FROM SRH2.UNIDADE_TSE t
+    START WITH t.COD_UNID_TSE_ANT IS NULL
+    CONNECT BY NOCYCLE PRIOR t.CD = t.COD_UNID_TSE_ANT),
+     HistoricoExtinto AS (
+         -- 2. CTE: Processa o histórico para tokenização e LISTAGG
+         SELECT h.CD,
+                h.COD_UNID_TSE_ANT,
+                h.Nivel,
+                CASE
+                    -- A string histórica só é gerada se o nível for maior que 2 (i.e., existe mais que Atual e Antecessor)
+                    WHEN h.Nivel > 2 THEN
+                        REGEXP_SUBSTR(
+                                h.Caminho_Completo,
+                                '^(.*?)->[^>]+->[^>]+$', -- Expressão para isolar o histórico
+                                1, 1, 'i', 1
+                        )
+                    END AS Historico_String_Pura
+         FROM HistoricoCompleto h)
+SELECT u.CD                                     AS unidade_atual_codigo,
+       u.COD_UNID_TSE_ANT                       AS unidade_anterior_codigo,
        (
            -- 3. Subconsulta para tokenização, inversão e concatenação (EXECUTADA SOMENTE SE HOUVER HISTÓRICO)
            SELECT LISTAGG(
                           LTRIM(REGEXP_SUBSTR(he.Historico_String_Pura, '[^-]+', 1, LEVEL), ' >'),
                           ', '
                   ) WITHIN
-GROUP (ORDER BY LEVEL DESC)
-FROM DUAL
-CONNECT BY LEVEL <= REGEXP_COUNT(he.Historico_String_Pura
-         , '->') + 1
-    ) AS demais_unidades_historicas
-FROM
-    SRH2.UNIDADE_TSE u -- Tabela Principal (274 registros)
-    LEFT JOIN
-    HistoricoExtinto he
-ON u.CD = he.CD
+                              GROUP (ORDER BY LEVEL DESC)
+           FROM DUAL
+           CONNECT BY LEVEL <= REGEXP_COUNT(he.Historico_String_Pura
+                                   , '->') + 1) AS demais_unidades_historicas
+FROM SRH2.UNIDADE_TSE u -- Tabela Principal (274 registros)
+         LEFT JOIN
+     HistoricoExtinto he
+     ON u.CD = he.CD
 WHERE
-    -- FILTRO DE ATIVIDADE CONFORME SOLICITADO
+   -- FILTRO DE ATIVIDADE CONFORME SOLICITADO
     u.SIT_UNID = 'C'
    OR u.SIT_UNID LIKE 'O%'
-ORDER BY
-    u.CD;
+ORDER BY u.CD;
 
 
 -- 2. View VW_ZONA_RESP_CENTRAL
 
-CREATE
-OR REPLACE VIEW VW_ZONA_RESP_CENTRAL (codigo_central, sigla_central, codigo_zona_resp, sigla_zona_resp, data_inicio_resp, data_fim_resp) AS
+CREATE OR REPLACE VIEW VW_ZONA_RESP_CENTRAL
+            (codigo_central, sigla_central, codigo_zona_resp, sigla_zona_resp, data_inicio_resp, data_fim_resp) AS
 select uni_c.cd             as codigo_central,
        uni_c.sigla_unid_tse as sigla_central,
        uni_z.cd             as codigo_zona_resp,
@@ -104,15 +94,22 @@ from (select * from srh2.unidade_tse where sigla_unid_tse like 'CAE%' and sit_un
 
 -- 3. View VW_UNIDADE
 
-CREATE
-OR REPLACE VIEW VW_UNIDADE (codigo, nome, sigla, matricula_titular, titulo_titular, data_inicio_titularidade, tipo, situacao, unidade_superior_codigo) AS
-WITH tb_unidade AS (
-    select cd, ds, sigla_unid_tse, sit_unid, 
-           case when sigla_unid_tse like 'CAE%' and sit_unid not like 'E%' then (select codigo_zona_resp from vw_zona_resp_central where codigo_central = cd)
-                when cod_unid_super in (6, 19, 37, 634, 635, 637) then 1
-                else cod_unid_super end as cod_unid_super
-    from srh2.unidade_tse where cd not in (1, 6, 19, 37, 634, 635, 637)
-)
+CREATE OR REPLACE VIEW VW_UNIDADE
+            (codigo, nome, sigla, matricula_titular, titulo_titular, data_inicio_titularidade, tipo, situacao,
+             unidade_superior_codigo)
+AS
+WITH tb_unidade AS (select cd,
+                           ds,
+                           sigla_unid_tse,
+                           sit_unid,
+                           case
+                               when sigla_unid_tse like 'CAE%' and sit_unid not like 'E%' then (select codigo_zona_resp
+                                                                                                from vw_zona_resp_central
+                                                                                                where codigo_central = cd)
+                               when cod_unid_super in (6, 19, 37, 634, 635, 637) then 1
+                               else cod_unid_super end as cod_unid_super
+                    from srh2.unidade_tse
+                    where cd not in (1, 6, 19, 37, 634, 635, 637))
 SELECT codigo,
        nome,
        sigla,
@@ -203,15 +200,14 @@ FROM (select u.cd                                                           as c
 
 -- 4. View VW_USUARIO
 
-CREATE
-OR REPLACE VIEW VW_USUARIO (titulo, matricula, nome, email, ramal, unidade_lot_codigo, unidade_comp_codigo) AS
+CREATE OR REPLACE VIEW VW_USUARIO (titulo, matricula, nome, email, ramal, unidade_lot_codigo, unidade_comp_codigo) AS
 select s.num_tit_ele                   as titulo,
        s.mat_servidor                  as matricula,
        s.nom                           as nome,
        s.e_mail                        as email,
        r.ramal_servidor                as ramal,
        l.cod_unid_tse                  as unidade_lot_codigo,
-       (select decode(tipo, 'SEM_EQUIPE',
+       (select decode(tipo, 'SEM EQUIPE',
                       decode(unidade_superior_codigo,
                              1, case
                                     when sigla = 'GP' then (select codigo
@@ -228,14 +224,19 @@ select s.num_tit_ele                   as titulo,
         where codigo = l.cod_unid_tse) as unidade_comp_codigo
 from srh2.servidor s
          join srh2.lotacao l on s.mat_servidor = l.mat_servidor and l.dt_fim_lotacao is null
-         left join srh2.lot_ramais_servidores r
-                   on s.mat_servidor = r.mat_servidor and l.cod_unid_tse = r.unid_lot and r.ramal_principal = 1;
-
+         outer apply (select ramal_servidor
+                      from (select ramal_servidor
+                            from srh2.lot_ramais_servidores
+                            where mat_servidor = s.mat_servidor
+                              and unid_lot = l.cod_unid_tse
+                              and ramal_principal = 1
+                            order by dt_ini_lotacao desc)
+                      where rownum = 1) r;
 
 -- 5. View VW_RESPONSABILIDADE
 
-CREATE
-OR REPLACE VIEW VW_RESPONSABILIDADE (unidade_codigo, usuario_matricula, usuario_titulo, tipo, data_inicio, data_fim) AS
+CREATE OR REPLACE VIEW VW_RESPONSABILIDADE
+            (unidade_codigo, usuario_matricula, usuario_titulo, tipo, data_inicio, data_fim) AS
 select u.codigo                                                                as unidade_codigo,
        coalesce(a.usuario_matricula, s.mat_serv_com_subs, u.matricula_titular) as usuario_matricula,
        coalesce(a.usuario_titulo, s.num_tit_ele, u.titulo_titular)             as usuario_titulo,
@@ -266,8 +267,7 @@ from (select codigo, matricula_titular, titulo_titular, data_inicio_titularidade
 
 -- 6. View VW_USUARIO_PERFIL_UNIDADE
 
-CREATE
-OR REPLACE VIEW VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo) AS
+CREATE OR REPLACE VIEW VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo) AS
 select usuario_titulo, perfil, unidade_codigo
 from (select a.usuario_titulo, 'ADMIN' as perfil, 1 as unidade_codigo
       from administrador a
