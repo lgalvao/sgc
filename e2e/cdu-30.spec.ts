@@ -1,5 +1,6 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
+import {USUARIOS} from './helpers/helpers-auth.js';
 
 /**
  * CDU-30 - Manter administradores
@@ -129,5 +130,86 @@ test.describe.serial('CDU-30 - Manter administradores', () => {
 
         await expect(modal).toBeVisible();
         expect(corpo.message).toContain('Usuário já é um administrador do sistema');
+    });
+
+    test('Cenário 6: ADMIN não pode remover a si mesmo como administrador', async ({
+                                                                                       _resetAutomatico,
+                                                                                       page,
+                                                                                       _autenticadoComoAdmin
+    }) => {
+        await page.getByTestId('btn-administradores').click();
+        await expect(page).toHaveURL(/\/administradores/);
+
+        const tabela = page.locator('main table');
+        // Encontra a linha do próprio usuário logado (ADMIN_1_PERFIL - 191919)
+        const linhaProprioAdmin = tabela.locator('tr').filter({hasText: USUARIOS.ADMIN_1_PERFIL.titulo});
+        await expect(linhaProprioAdmin).toBeVisible();
+        await linhaProprioAdmin.getByRole('button').click();
+
+        const modal = page.getByRole('dialog');
+        await expect(modal).toBeVisible();
+        await expect(modal.getByRole('heading', {name: TEXTOS.administracao.MODAL_REMOVER_TITULO})).toBeVisible();
+
+        const respostaErro = page.waitForResponse(resp =>
+            resp.url().includes('/usuarios/administradores') &&
+            resp.request().method() === 'POST' &&
+            resp.status() >= 400
+        );
+        await modal.getByRole('button', {name: /Remover/i}).click();
+        const resposta = await respostaErro;
+        const corpo = await resposta.json();
+
+        await expect(modal).toBeVisible();
+        expect(corpo.message).toContain('Não é permitido remover a si mesmo como administrador');
+        await modal.getByRole('button', {name: /Cancelar/i}).click();
+        await expect(modal).toBeHidden();
+    });
+
+    test('Cenário 7: ADMIN não pode remover o único administrador do sistema', async ({
+                                                                                          _resetAutomatico,
+                                                                                          page,
+                                                                                          _autenticadoComoAdmin
+    }) => {
+        await page.getByTestId('btn-administradores').click();
+        await expect(page).toHaveURL(/\/administradores/);
+
+        const tabela = page.locator('main table');
+
+        // Remove o outro administrador (111111) para deixar apenas o logado (191919)
+        const linhaOutroAdmin = tabela.locator('tr').filter({hasText: '111111'});
+        await expect(linhaOutroAdmin).toBeVisible();
+        await linhaOutroAdmin.getByRole('button').click();
+
+        const modal1 = page.getByRole('dialog');
+        await expect(modal1).toBeVisible();
+        const respostaRemocaoOk = page.waitForResponse(resp =>
+            resp.url().includes('/usuarios/administradores') &&
+            resp.request().method() === 'POST' &&
+            resp.status() < 400
+        );
+        await modal1.getByRole('button', {name: /Remover/i}).click();
+        await respostaRemocaoOk;
+        await expect(modal1).toBeHidden();
+
+        // Tenta remover o único administrador restante (191919)
+        const linhaUnicoAdmin = tabela.locator('tr').filter({hasText: USUARIOS.ADMIN_1_PERFIL.titulo});
+        await expect(linhaUnicoAdmin).toBeVisible();
+        await linhaUnicoAdmin.getByRole('button').click();
+
+        const modal2 = page.getByRole('dialog');
+        await expect(modal2).toBeVisible();
+        await expect(modal2.getByRole('heading', {name: TEXTOS.administracao.MODAL_REMOVER_TITULO})).toBeVisible();
+
+        const respostaErro = page.waitForResponse(resp =>
+            resp.url().includes('/usuarios/administradores') &&
+            resp.request().method() === 'POST' &&
+            resp.status() >= 400
+        );
+        await modal2.getByRole('button', {name: /Remover/i}).click();
+        const resposta = await respostaErro;
+        const corpo = await resposta.json();
+
+        await expect(modal2).toBeVisible();
+        expect(corpo.message).toContain('Não é permitido remover o único administrador do sistema');
     });
 });
