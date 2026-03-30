@@ -1,8 +1,9 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcessoCadastroHomologadoFixture, validarProcessoFixture} from './fixtures/fixtures-processos.js';
-import {criarCompetencia, disponibilizarMapa, navegarParaMapa} from './helpers/helpers-mapas.js';
+import {criarCompetencia, navegarParaMapa} from './helpers/helpers-mapas.js';
 import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
+import {login, USUARIOS} from './helpers/helpers-auth.js';
 
 test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
     const UNIDADE_ALVO = 'SECAO_211';
@@ -56,10 +57,15 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
         await expect(page.getByText(competencia1)).toBeVisible();
         await expect(page.getByText(competencia2)).toBeVisible();
 
-        // Cenario 2: Abrir modal
+        // Cenario 2: Abrir modal e verificar campos
         await page.getByTestId('btn-cad-mapa-disponibilizar').click();
         await expect(page.getByTestId('mdl-disponibilizar-mapa')).toBeVisible();
         await expect(page.getByText('Disponibilização do mapa')).toBeVisible();
+        // CDU-17 Passo 9: verificar campo Observações (opcional) e botões
+        await expect(page.getByTestId('inp-disponibilizar-mapa-data')).toBeVisible();
+        await expect(page.getByTestId('inp-disponibilizar-mapa-obs')).toBeVisible();
+        await expect(page.getByTestId('btn-disponibilizar-mapa-confirmar')).toBeVisible();
+        await expect(page.getByTestId('btn-disponibilizar-mapa-cancelar')).toBeVisible();
 
         // Cenario 3: Cancelar
         await page.getByTestId('btn-disponibilizar-mapa-cancelar').click();
@@ -81,11 +87,36 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
 
         await page.getByTestId('btn-disponibilizar-mapa-cancelar').click();
 
-        // Cenario 5: Disponibilizar com sucesso
-        await disponibilizarMapa(page, '2030-12-31');
+        // Cenario 5: Disponibilizar com sucesso (com observações preenchidas)
+        await page.getByTestId('btn-cad-mapa-disponibilizar').click();
+        await expect(page.getByTestId('mdl-disponibilizar-mapa')).toBeVisible();
+        await page.getByTestId('inp-disponibilizar-mapa-data').fill('2030-12-31');
+        await page.getByTestId('inp-disponibilizar-mapa-obs').fill('Mapa disponibilizado com observação de teste');
+        await page.getByTestId('btn-disponibilizar-mapa-confirmar').click();
+
         await verificarPaginaPainel(page);
         await acessarDetalhesProcesso(page, descProcesso);
         await navegarParaSubprocesso(page, 'SECAO_211');
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa disponibilizado/i);
+
+        // CDU-17 Passo 14: verificar movimentação registrada com data/hora
+        const linhaMovimentacao = page.getByTestId('tbl-movimentacoes')
+            .locator('tr', {hasText: /Disponibilização do mapa/i})
+            .first();
+        await expect(linhaMovimentacao).toBeVisible();
+        await expect(linhaMovimentacao).toContainText(/\d{2}\/\d{2}\/\d{4}/);
+        await expect(linhaMovimentacao).toContainText(/ADMIN/i);
+        await expect(linhaMovimentacao).toContainText(/SECAO_211/i);
+    });
+
+    test('Cenario 6: CHEFE recebe alerta de mapa disponibilizado no painel', async ({_resetAutomatico, page}) => {
+        // CDU-17 Passo 17: sistema cria alerta para a unidade do subprocesso (CHEFE_SECAO_211)
+        await login(page, USUARIOS.CHEFE_SECAO_211.titulo, USUARIOS.CHEFE_SECAO_211.senha);
+
+        const tabelaAlertas = page.getByTestId('tbl-alertas');
+        const linhaAlerta = tabelaAlertas.locator('tr', {hasText: descProcesso}).first();
+        await expect(linhaAlerta).toBeVisible();
+        await expect(linhaAlerta).toContainText(/SECAO_211/i);
+        await expect(linhaAlerta).toContainText(/\d{2}\/\d{2}\/\d{4}/);
     });
 });

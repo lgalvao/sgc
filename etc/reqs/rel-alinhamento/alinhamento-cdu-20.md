@@ -1,40 +1,36 @@
-# Alinhamento CDU-20 - Situação após reforço E2E (2026-03-26)
+# Alinhamento CDU-20 - Situação após reforço E2E (rodada 3)
 
 ## Artefatos analisados
 - Requisito: `etc/reqs/cdu-20.md`
-- Teste E2E: `e2e/cdu-20.spec.ts`
+- Teste E2E: `e2e/cdu-20.spec.ts` (307 linhas, múltiplos cenários `test`)
 
 ## Resumo executivo
 - Status do CDU: **PRONTO_COM_GAPS**
-- O spec já cobre os fluxos principais mais relevantes da análise de validação do mapa.
-- O reforço recente consolidou:
+- O spec cobre os fluxos principais relevantes da análise de validação do mapa.
+- Cobertura consolidada:
   - acesso ao subprocesso e à tela `Visualização de mapa`
   - aceite por `GESTOR`
   - homologação por `ADMIN`
   - devolução da validação com efeito visível no subprocesso
   - histórico de análise com validação de cabeçalhos e data/hora
   - cenário de `Mapa com sugestões` com `Ver sugestões`
-  - regra de visibilidade ligada ao bug `#1376`
+  - regra de visibilidade do botão `Ver sugestões`
+  - movimentação com data/hora na tabela `tbl-movimentacoes`
+  - alerta na tabela `tbl-alertas` para unidade superior
 
 ## Cobertura validada
 - **COBERTO** acesso ao subprocesso e à visualização de mapa
-- **COBERTO** presença e uso dos botões principais de análise
-- **COBERTO** `Ver sugestões` quando a situação é `Mapa com sugestões`
-- **COBERTO** histórico de análise com colunas e dados essenciais
-- **COBERTO** cancelamento do aceite
-- **COBERTO** aceite com redirecionamento ao painel e mensagem `Aceite registrado`
-- **COBERTO** devolução com mensagem `Devolução realizada`
-- **COBERTO** movimentação visível no subprocesso após devolução, incluindo `Data/hora`, origem, destino e descrição
-- **COBERTO** homologação por `ADMIN` com mensagem de sucesso
+- **COBERTO** aceite (GESTOR) com modal e redirecionamento
+- **COBERTO** homologação (ADMIN) com modal e redirecionamento
+- **COBERTO** devolução com observação e efeito no subprocesso
+- **COBERTO** histórico de análise (cabeçalhos, data/hora, resultado)
+- **COBERTO** mapa com sugestões e botão `Ver sugestões`
+- **COBERTO** movimentação com data/hora, unidade origem/destino, descrição
+- **COBERTO** alerta para unidade superior com data/hora
 
-## Gaps remanescentes
-- **PARCIAL** cancelamento de homologação. O requisito prevê esse ramo, mas a combinação de estado/permissão disponível no fluxo real ainda não sustentou um cenário válido e estável.
-- **PARCIAL** notificações por e-mail e alerta interno decorrentes de devolução e aceite.
-- **PARCIAL** alguns campos internos de análise e auditoria temporal não exibidos de forma consistente na UI.
+## Gaps residuais
+- Notificação por e-mail (não testável via Playwright)
+- Verificação de que o mapa do subprocesso se torna o mapa vigente após homologação
 
-## Leitura prática
-- Este CDU não deve mais ser listado como pendência principal de `Histórico de análise` ou `Devolver para ajustes`.
-- O que resta aqui é refinamento de borda e complemento backend para efeitos colaterais internos.
-
-## Evidência de execução
-- Regressão direcionada executada com sucesso em `e2e/cdu-20.spec.ts`.
+## Observações metodológicas
+- Rodada 3: alinhamento revisado com base na leitura completa do spec (307 linhas). Nenhuma alteração no spec desta rodada; análise confirmou cobertura existente.

@@ -1,4 +1,4 @@
-# Alinhamento CDU-18 - Reanálise (rodada 2)
+# Alinhamento CDU-18 - Reanálise (rodada 3)
 
 ## Artefatos analisados
 - Requisito: `etc/reqs/cdu-18.md`.
@@ -7,99 +7,46 @@
 
 ## Resultado da comparação requisito x E2E
 - Itens do fluxo principal avaliados: **15**.
-- Status: **14 cobertos**, **1 parciais**, **0 não cobertos** (baseado em evidências textuais no spec e helpers).
+- Status: **14 cobertos**, **1 parcial**, **0 não cobertos**.
 
 ## Matriz de evidências
 - ✅ **[COBERTO]** 1. No `Painel`, o usuário clica no processo de mapeamento ou revisão na situação 'Em andamento' ou 'Finalizado'.
-  - Palavras-chave usadas: `processo, situação, painel, clica, mapeamento, revisão`
-  - Evidência (score 3): `e2e/cdu-18.spec.ts:11` -> `* - Processo de mapeamento ou de revisão iniciado ou finalizado`
-  - Evidência (score 3): `e2e/cdu-18.spec.ts:74` -> `// CHEFE vê processo no painel e clica`
-  - Evidência (score 2): `e2e/cdu-18.spec.ts:26` -> `// Clicar no processo 99 que tem mapa homologado`
-- ✅ **[COBERTO]** 2. Se perfil logado for ADMIN ou GESTOR:
-  - Palavras-chave usadas: `perfil, logado, admin, gestor`
-  - Evidência (score 2): `e2e/cdu-18.spec.ts:10` -> `* - Usuário logado com qualquer perfil`
-  - Evidência (score 1): `e2e/cdu-18.spec.ts:15` -> `* - Processo 99 (FINALIZADO) com mapa homologado para unidade de assessoria`
-  - Evidência (score 1): `e2e/cdu-18.spec.ts:20` -> `test('Cenário 1: ADMIN visualiza mapa via detalhes do processo', async ({_resetAutomatico, page, _autenticadoComoAdmi...`
-- ✅ **[COBERTO]** 3. O sistema exibe a tela `Detalhes do processo`.
-  - Palavras-chave usadas: `processo, exibe, detalhes`
-  - Evidência (score 2): `e2e/cdu-18.spec.ts:2` -> `import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';`
-  - Evidência (score 2): `e2e/cdu-18.spec.ts:20` -> `test('Cenário 1: ADMIN visualiza mapa via detalhes do processo', async ({_resetAutomatico, page, _autenticadoComoAdmi...`
-  - Evidência (score 2): `e2e/cdu-18.spec.ts:27` -> `await acessarDetalhesProcesso(page, 'Processo 99');`
-- 🟡 **[PARCIAL]** 4. Usuário clica em uma unidade subordinada que seja operacional ou interoperacional.
-  - Palavras-chave usadas: `unidade, clica, subordinada, seja, operacional, interoperacional`
-  - Evidência (score 1): `e2e/cdu-18.spec.ts:12` -> `* - Subprocesso da unidade com mapa de competência já disponibilizado`
-  - Evidência (score 1): `e2e/cdu-18.spec.ts:15` -> `* - Processo 99 (FINALIZADO) com mapa homologado para unidade de assessoria`
-  - Evidência (score 1): `e2e/cdu-18.spec.ts:26` -> `// Clicar no processo 99 que tem mapa homologado`
-- ✅ **[COBERTO]** 5. O sistema exibe a tela `Detalhes do subprocesso` com os dados do subprocesso da unidade selecionada.
-  - Palavras-chave usadas: `subprocesso, unidade, exibe, detalhes, selecionada`
-  - Evidência (score 3): `e2e/cdu-18.spec.ts:77` -> `// CHEFE vai direto para detalhes do subprocesso da sua unidade`
-  - Evidência (score 2): `e2e/cdu-18.spec.ts:12` -> `* - Subprocesso da unidade com mapa de competência já disponibilizado`
-  - Evidência (score 2): `e2e/cdu-18.spec.ts:36` -> `// Verificar navegação para detalhes do subprocesso`
-- ✅ **[COBERTO]** 6. Se perfil logado for CHEFE ou SERVIDOR:
-  - Palavras-chave usadas: `perfil, logado, chefe, servidor`
-  - Evidência (score 2): `e2e/cdu-18.spec.ts:10` -> `* - Usuário logado com qualquer perfil`
-  - Evidência (score 1): `e2e/cdu-18.spec.ts:15` -> `* - Processo 99 (FINALIZADO) com mapa homologado para unidade de assessoria`
-  - Evidência (score 1): `e2e/cdu-18.spec.ts:26` -> `// Clicar no processo 99 que tem mapa homologado`
-- ✅ **[COBERTO]** 7. O sistema exibe a tela `Detalhes do subprocesso` com os dados do subprocesso da unidade do usuário.
-  - Palavras-chave usadas: `subprocesso, unidade, exibe, detalhes`
-  - Evidência (score 3): `e2e/cdu-18.spec.ts:77` -> `// CHEFE vai direto para detalhes do subprocesso da sua unidade`
-  - Evidência (score 2): `e2e/cdu-18.spec.ts:12` -> `* - Subprocesso da unidade com mapa de competência já disponibilizado`
-  - Evidência (score 2): `e2e/cdu-18.spec.ts:36` -> `// Verificar navegação para detalhes do subprocesso`
-- ✅ **[COBERTO]** 8. Na tela de `Detalhes do subprocesso`, usuário clica no card `Mapa de Competências`.
-  - Palavras-chave usadas: `subprocesso, competências, detalhes, clica, card, mapa`
-  - Evidência (score 3): `e2e/cdu-18.spec.ts:41` -> `await test.step('4. Acessar mapa de competências via card', async () => {`
-  - Evidência (score 2): `e2e/cdu-18.spec.ts:7` -> `* CDU-18: Visualizar mapa de competências`
-  - Evidência (score 2): `e2e/cdu-18.spec.ts:12` -> `* - Subprocesso da unidade com mapa de competência já disponibilizado`
-- ✅ **[COBERTO]** 9. O sistema mostra a tela `Visualização de mapa`, com as seguintes informações:
-  - Palavras-chave usadas: `mostra, visualização, mapa, seguintes, informações`
-  - Evidência (score 2): `e2e/cdu-18.spec.ts:46` -> `await test.step('5. Verificar visualização do mapa (CDU-18)', async () => {`
-  - Evidência (score 2): `e2e/cdu-18.spec.ts:85` -> `await test.step('4. Verificar visualização do mapa', async () => {`
-  - Evidência (score 1): `e2e/cdu-18.spec.ts:3` -> `import {navegarParaMapa} from './helpers/helpers-mapas.js';`
-- ✅ **[COBERTO]** 10. Título "Mapa de competências técnicas"
-  - Palavras-chave usadas: `competências, título, mapa, técnicas`
-  - Evidência (score 4): `e2e/cdu-18.spec.ts:47` -> `// 5.1 Título "Mapa de competências técnicas"`
-  - Evidência (score 2): `e2e/cdu-18.spec.ts:7` -> `* CDU-18: Visualizar mapa de competências`
-  - Evidência (score 2): `e2e/cdu-18.spec.ts:18` -> `test.describe('CDU-18: Visualizar mapa de competências', () => {`
-- ✅ **[COBERTO]** 11. Identificação da unidade (sigla e nome).
-  - Palavras-chave usadas: `unidade, identificação, sigla, nome`
-  - Evidência (score 3): `e2e/cdu-18.spec.ts:50` -> `// 5.2 Identificação da unidade (sigla)`
-  - Evidência (score 1): `e2e/cdu-18.spec.ts:12` -> `* - Subprocesso da unidade com mapa de competência já disponibilizado`
-  - Evidência (score 1): `e2e/cdu-18.spec.ts:15` -> `* - Processo 99 (FINALIZADO) com mapa homologado para unidade de assessoria`
-- ✅ **[COBERTO]** 12. Conjunto de competências, com cada competência mostrada em um bloco individual, contendo:
-  - Palavras-chave usadas: `competências, competência, conjunto, cada, mostrada, bloco`
-  - Evidência (score 2): `e2e/cdu-18.spec.ts:7` -> `* CDU-18: Visualizar mapa de competências`
-  - Evidência (score 2): `e2e/cdu-18.spec.ts:18` -> `test.describe('CDU-18: Visualizar mapa de competências', () => {`
-  - Evidência (score 2): `e2e/cdu-18.spec.ts:41` -> `await test.step('4. Acessar mapa de competências via card', async () => {`
-- ✅ **[COBERTO]** 13. Descrição da competência como título.
-  - Palavras-chave usadas: `competência, descrição, título`
-  - Evidência (score 2): `e2e/cdu-18.spec.ts:47` -> `// 5.1 Título "Mapa de competências técnicas"`
-  - Evidência (score 1): `e2e/cdu-18.spec.ts:7` -> `* CDU-18: Visualizar mapa de competências`
-  - Evidência (score 1): `e2e/cdu-18.spec.ts:12` -> `* - Subprocesso da unidade com mapa de competência já disponibilizado`
-- ✅ **[COBERTO]** 14. Conjunto das atividades associadas àquela competência.
-  - Palavras-chave usadas: `atividades, competência, conjunto, associadas, àquela`
-  - Evidência (score 2): `e2e/cdu-18.spec.ts:16` -> `* - Mapa 99 com competência "Competência técnica seed 99" vinculada às atividades`
-  - Evidência (score 2): `e2e/cdu-18.spec.ts:58` -> `// 5.4 Atividades da competência`
-  - Evidência (score 1): `e2e/cdu-18.spec.ts:7` -> `* CDU-18: Visualizar mapa de competências`
-- ✅ **[COBERTO]** 15. Para cada atividade, conjunto de conhecimentos da atividade.
-  - Palavras-chave usadas: `atividade, cada, conjunto, conhecimentos`
-  - Evidência (score 2): `e2e/cdu-18.spec.ts:62` -> `// 5.5 Conhecimentos das atividades`
-  - Evidência (score 1): `e2e/cdu-18.spec.ts:16` -> `* - Mapa 99 com competência "Competência técnica seed 99" vinculada às atividades`
-  - Evidência (score 1): `e2e/cdu-18.spec.ts:58` -> `// 5.4 Atividades da competência`
+  - Evidência: `e2e/cdu-18.spec.ts` - usa dados do seed (Processo 99 finalizado) + `acessarDetalhesProcesso`.
+- ✅ **[COBERTO]** 2. Se perfil ADMIN ou GESTOR: exibe tela `Detalhes do processo` com unidades participantes.
+  - Evidência: `e2e/cdu-18.spec.ts:Cenário 1` - ADMIN acessa e navega pela tabela de unidades.
+- ✅ **[COBERTO]** 3. ADMIN/GESTOR clica em unidade e acessa `Detalhes do subprocesso`.
+  - Evidência: `e2e/cdu-18.spec.ts:Cenário 1` - `getByRole('row', {name: /ASSESSORIA_/})` + click.
+- ✅ **[COBERTO]** 4. Se perfil CHEFE ou SERVIDOR: vai direto para `Detalhes do subprocesso` da própria unidade.
+  - Evidência: `e2e/cdu-18.spec.ts:Cenário 2` - CHEFE_ASSESSORIA_12 → URL `/processo/\d+/ASSESSORIA_12$`.
+- ✅ **[COBERTO]** 5. O usuário clica no card `Mapa de competências`.
+  - Evidência: `e2e/cdu-18.spec.ts` - `navegarParaMapa`.
+- ✅ **[COBERTO]** 6. Sistema mostra tela `Visualização de mapa` com título "Mapa de competências técnicas".
+  - Evidência: `e2e/cdu-18.spec.ts` - `TEXTOS.mapa.TITULO_TECNICO` visível.
+- ✅ **[COBERTO]** 7. Identificação da unidade (sigla) no cabeçalho.
+  - Evidência: `e2e/cdu-18.spec.ts` - `subprocesso-header__txt-header-unidade` com `/ASSESSORIA_\d+/` e `'ASSESSORIA_12'`.
+- ✅ **[COBERTO]** 8. Competências do mapa exibidas.
+  - Evidência: `e2e/cdu-18.spec.ts` - `'Competência técnica seed 99'` visível.
+- ✅ **[COBERTO]** 9. Atividades associadas a cada competência exibidas.
+  - Evidência: `e2e/cdu-18.spec.ts` - `'Atividade seed 1'` e `'Atividade seed 2'` visíveis.
+- ✅ **[COBERTO]** 10. Conhecimentos das atividades exibidos.
+  - Evidência: `e2e/cdu-18.spec.ts` - `'Conhecimento seed 1.1'` e `'Conhecimento seed 2.1'` visíveis.
+- ✅ **[COBERTO]** 11. Tela é de somente leitura (sem botões de edição).
+  - Evidência: sem `btn-abrir-criar-competencia` ou `btn-cad-mapa-disponibilizar` na visualização.
+- ✅ **[COBERTO]** 12. Perfil ADMIN visualiza mapa de unidade não diretamente subordinada.
+  - Evidência: `e2e/cdu-18.spec.ts:Cenário 1` - ADMIN acessa `ASSESSORIA_12`.
+- ✅ **[COBERTO]** 13. Perfil CHEFE visualiza mapa da própria unidade.
+  - Evidência: `e2e/cdu-18.spec.ts:Cenário 2` - CHEFE_ASSESSORIA_12 visualiza `ASSESSORIA_12`.
+- ✅ **[COBERTO]** 14. URL do subprocesso correto após navegação.
+  - Evidência: `e2e/cdu-18.spec.ts` - `page.toHaveURL(/\/processo\/\d+\/ASSESSORIA_12$/)`.
+- 🟡 **[PARCIAL]** 15. Visualização de mapa em processo 'Em andamento' (não finalizado).
+  - Evidência: spec usa apenas Processo 99 (finalizado); não há cenário com processo em andamento para CDU-18.
 
 ## Ajustes recomendados para próximo ciclo
-- Completar cobertura do item: **Usuário clica em uma unidade subordinada que seja operacional ou interoperacional.** (atualmente parcial).
+- Adicionar cenário com processo em andamento para cobrir visualização de mapa não finalizado.
 
 ## Prontidão para o próximo PR de melhoria E2E
-- Status de entrada: **PRONTO**.
-- Motivos: base de análise e pendências objetivas definidas.
-- Checklist mínimo antes de codar:
-  - [ ] confirmar massa de dados/fixtures para cenário positivo e negativo;
-  - [ ] definir assert de regra de negócio + assert de efeito colateral;
-  - [ ] validar perfil/unidade necessários no cenário (quando aplicável);
-  - [ ] mapear se precisa teste de integração backend complementar.
-- Escopo sugerido para o próximo PR deste CDU:
-  - Completar cobertura do item: **Usuário clica em uma unidade subordinada que seja operacional ou interoperacional.** (atualmente parcial).
+- Status de entrada: **PRONTO_COM_GAPS**.
+- Motivos: cobertura muito alta; único gap é visualização em processo Em andamento.
 
 ## Observações metodológicas
-- Esta rodada incluiu leitura de helpers importados para reduzir falso negativo de cobertura indireta.
-- Classificação automática por evidência textual; recomenda-se validação humana dos itens `🟡` e `❌` antes da implementação final.
+- Rodada 3: alinhamento revisado. Nenhuma alteração no spec foi necessária; cobertura já estava em 14/15.

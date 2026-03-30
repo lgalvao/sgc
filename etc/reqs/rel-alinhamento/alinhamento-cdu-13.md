@@ -1,43 +1,31 @@
-# Alinhamento CDU-13 - Situação após reforço E2E (2026-03-26)
+# Alinhamento CDU-13 - Situação após reforço E2E (rodada 3)
 
 ## Artefatos analisados
 - Requisito: `etc/reqs/cdu-13.md`
-- Teste E2E: `e2e/cdu-13.spec.ts`
+- Teste E2E: `e2e/cdu-13.spec.ts` (206 linhas, múltiplos cenários `test`)
 
 ## Resumo executivo
 - Status do CDU: **PRONTO_COM_GAPS**
-- Houve avanço material na cobertura E2E do fluxo de análise do cadastro.
-- O spec agora cobre de forma explícita:
-  - entrada no subprocesso e navegação até `Atividades e conhecimentos`
-  - visibilidade das ações de análise por perfil
-  - histórico de análise com validação de cabeçalhos, data/hora preenchida, unidade, resultado e observação
-  - devolução com redirecionamento ao painel e mudança de situação
+- O spec cobre de forma explícita os principais fluxos do CDU-13.
+- Cobertura consolidada:
+  - acesso ao subprocesso e navegação até `Atividades e conhecimentos`
+  - visibilidade das ações de análise por perfil (GESTOR, CHEFE, ADMIN)
+  - histórico de análise com validação de cabeçalhos: `header-historico-dataHora`, `header-historico-unidade`, `header-historico-resultado`, `header-historico-analista`, `header-historico-observacao`
+  - devolução com observação e redirecionamento ao painel
   - cancelamento de devolução
-  - aceite por unidades hierárquicas
+  - aceite por unidades hierárquicas (COORD_21, SECRETARIA_2)
   - homologação por `ADMIN`
   - cancelamento de homologação
   - mensagem final de homologação
 
-## Cobertura validada
-- **COBERTO** fluxo principal de acesso ao subprocesso e ao card `Atividades e conhecimentos`
-- **COBERTO** botão `Histórico de análise` e conteúdo principal da tabela modal
-- **COBERTO** devolução para ajustes, incluindo cancelamento
-- **COBERTO** aceite por `GESTOR`
-- **COBERTO** homologação por `ADMIN`, incluindo cancelamento
-- **COBERTO** mudança de situação observável na UI
-- **COBERTO** redirecionamentos finais e mensagens de sucesso observáveis
+## Gaps residuais
+- Verificação de timestamp (data/hora) na linha de histórico de análise
+- Verificação de alerta na tabela `tbl-alertas` após disponibilização do cadastro
+- Notificação por e-mail (não testável via Playwright)
 
-## Gaps remanescentes
-- **PARCIAL** prova literal do passo "o sistema mostra a tela `Detalhes do processo`" antes da seleção da unidade. O fluxo passa por esse caminho via helpers, mas a evidência direta no spec ainda é fraca.
-- **PARCIAL** campos de movimentação e alerta interno associados à devolução e ao aceite, quando a UI não expõe tudo de forma estável no mesmo fluxo.
-- **PARCIAL** auditoria de `Data/hora atual` fora do histórico visível, especialmente para movimentações e alertas.
-- **PARCIAL** notificações por e-mail e alerta interno, por serem efeitos colaterais sem superfície E2E suficientemente estável.
+## Prontidão para o próximo PR de melhoria E2E
+- Status: **PRONTO_COM_GAPS**.
+- Principais melhorias possíveis: timestamp no histórico de análise, alerta na tabela `tbl-alertas`.
 
-## Leitura prática
-- Este CDU não deve mais ser tratado como pendência centrada em `Histórico de análise`.
-- O próximo incremento, se houver, deve mirar:
-  - evidência direta da tela `Detalhes do processo`
-  - complemento por integração backend para notificação, alerta e auditoria temporal
-
-## Evidência de execução
-- Regressão direcionada executada com sucesso em `e2e/cdu-13.spec.ts`.
+## Observações metodológicas
+- Rodada 3: alinhamento revisado com base na leitura completa do spec (206 linhas). Nenhuma alteração no spec desta rodada.
