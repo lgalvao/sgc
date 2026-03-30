@@ -84,3 +84,6 @@ test-results/.last-run.json
 etc/qa-dashboard/runs/
 etc/qa-dashboard/latest/
 etc/qa-dashboard/tmp/
+
+# Documento de acesso HOM
+**/como_logar_hom.md
