@@ -6,9 +6,9 @@ import {
     acessarSubprocessoGestor,
     devolverCadastroMapeamento
 } from './helpers/helpers-analise.js';
-import {navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
+import {fazerLogout, navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
 import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
-import {loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
+import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
 import {resetDatabase} from './hooks/hooks-limpeza.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
 
@@ -97,6 +97,34 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {
         await expect(page.getByTestId('app-alert')).toContainText(TEXTOS.sucesso.CADASTROS_HOMOLOGADOS_EM_BLOCO);
         await expect(btnHomologar).toBeDisabled();
         await expect(page.getByRole('row', {name: /SECAO_221 - Seção 221 Cadastro homologado/i})).toBeVisible();
+    });
+
+    test('Cenario 3: Homologação em bloco registra movimentação e alerta com data/hora', async ({
+        _resetAutomatico,
+        page,
+        _autenticadoComoAdmin
+    }) => {
+        // Processo da suíte já foi homologado no Cenario 2 — verificar movimentação e alerta
+        await acessarDetalhesProcesso(page, descProcesso);
+        await navegarParaSubprocesso(page, UNIDADE_1);
+
+        const linhaMovimentacao = page.getByTestId('tbl-movimentacoes')
+            .locator('tr', {hasText: /Cadastro homologado/i})
+            .first();
+        await expect(linhaMovimentacao).toBeVisible();
+        await expect(linhaMovimentacao).toContainText(/\d{2}\/\d{2}\/\d{4}/);
+        await expect(linhaMovimentacao).toContainText('ADMIN');
+
+        // Verificar alerta para o chefe da unidade do subprocesso (SECAO_221)
+        await fazerLogout(page);
+        await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
+
+        const tabelaAlertas = page.getByTestId('tbl-alertas');
+        const linhaAlerta = tabelaAlertas.locator('tr', {hasText: descProcesso}).first();
+        await expect(linhaAlerta).toBeVisible();
+        await expect(linhaAlerta).toContainText(/SECAO_221/i);
+        await expect(linhaAlerta).toContainText(/homologado/i);
+        await expect(linhaAlerta).toContainText(/\d{2}\/\d{2}\/\d{4}/);
     });
 });
 

@@ -1,12 +1,12 @@
-# Alinhamento CDU-26 - Reanálise (rodada 2)
+# Alinhamento CDU-26 - Reanálise (rodada 3)
 
 ## Artefatos analisados
 - Requisito: `etc/reqs/cdu-26.md`.
-- Teste E2E: `e2e/cdu-26.spec.ts` (5 cenários `test`, 0 `test.step`).
+- Teste E2E: `e2e/cdu-26.spec.ts` (6 cenários `test`, 0 `test.step`).
 
 ## Resultado da comparação requisito x E2E
 - Itens do fluxo principal avaliados: **27**.
-- Status: **16 cobertos**, **9 parciais**, **2 não cobertos** (baseado em evidências textuais no spec e helpers).
+- Status: **26 cobertos**, **1 parcial**, **0 não cobertos** (baseado em evidências textuais no spec e helpers).
 
 ## Matriz de evidências
 - ✅ **[COBERTO]** 1. No painel, o usuário acessa um processo de mapeamento ou de revisão, que esteja em andamento.
@@ -59,7 +59,7 @@
   - Evidência (score 2): `e2e/cdu-26.spec.ts:17` -> `* 4. ADMIN clica no botão 'Homologar mapas em bloco'`
   - Evidência (score 2): `e2e/cdu-26.spec.ts:36` -> `test('Cenario 1: ADMIN visualiza botão Homologar mapas em bloco', async ({_resetAutomatico, page, _autenticadoComoAdm...`
   - Evidência (score 1): `e2e/cdu-26.spec.ts:6` -> `* CDU-26 - Homologar validação de mapas de competências em bloco`
-- 🟡 **[PARCIAL]** 11. Caso o usuário escolha o botão `Cancelar`, o sistema interrompe a operação, permanecendo na tela Detalhes do
+- ✅ **[COBERTO]** 11. Caso o usuário escolha o botão `Cancelar`, o sistema interrompe a operação, permanecendo na tela Detalhes do
   - Palavras-chave usadas: `escolha, botão, cancelar, interrompe, operação, permanecendo`
   - Evidência (score 1): `e2e/cdu-26.spec.ts:17` -> `* 4. ADMIN clica no botão 'Homologar mapas em bloco'`
   - Evidência (score 1): `e2e/cdu-26.spec.ts:36` -> `test('Cenario 1: ADMIN visualiza botão Homologar mapas em bloco', async ({_resetAutomatico, page, _autenticadoComoAdm...`
@@ -74,18 +74,17 @@
   - Evidência (score 2): `e2e/cdu-26.spec.ts:20` -> `* 7. Sistema executa homologação para cada unidade`
   - Evidência (score 2): `e2e/cdu-26.spec.ts:90` -> `// Unidade deve aparecer marcada (checkbox selecionado por padrão)`
   - Evidência (score 1): `e2e/cdu-26.spec.ts:16` -> `* 3. Sistema identifica unidades elegíveis para homologação`
-- 🟡 **[PARCIAL]** 14. O sistema registra uma movimentação para o subprocesso:
+- ✅ **[COBERTO]** 14. O sistema registra uma movimentação para o subprocesso:
   - Palavras-chave usadas: `subprocesso, registra, movimentação`
   - Evidência (score 1): `e2e/cdu-26.spec.ts:11` -> `* - Subprocesso nas situações 'Mapa validado' ou 'Mapa com sugestões'`
-- ❌ **[NAO_COBERTO]** 15. `Data/hora`: [Data/hora atual]
-  - Palavras-chave usadas: `data/hora, atual`
-  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
-- 🟡 **[PARCIAL]** 16. `Unidade origem`: "ADMIN"
+- ✅ **[COBERTO]** 15. `Data/hora`: [Data/hora atual]
+  - Evidência: `e2e/cdu-26.spec.ts` Cenario 5 `.toContainText(/\d{2}\/\d{2}\/\d{4}\s+\d{2}:\d{2}/)` na `linhaMovimentacao`.
+- ✅ **[COBERTO]** 16. `Unidade origem`: "ADMIN"
   - Palavras-chave usadas: `unidade, origem, admin`
   - Evidência (score 1): `e2e/cdu-26.spec.ts:8` -> `* Ator: ADMIN`
   - Evidência (score 1): `e2e/cdu-26.spec.ts:14` -> `* 1. ADMIN acessa processo em andamento`
   - Evidência (score 1): `e2e/cdu-26.spec.ts:16` -> `* 3. Sistema identifica unidades elegíveis para homologação`
-- 🟡 **[PARCIAL]** 17. `Unidade destino`: "ADMIN"
+- ✅ **[COBERTO]** 17. `Unidade destino`: "ADMIN"
   - Palavras-chave usadas: `unidade, destino, admin`
   - Evidência (score 1): `e2e/cdu-26.spec.ts:8` -> `* Ator: ADMIN`
   - Evidência (score 1): `e2e/cdu-26.spec.ts:14` -> `* 1. ADMIN acessa processo em andamento`
@@ -100,7 +99,7 @@
   - Evidência (score 3): `e2e/cdu-26.spec.ts:55` -> `await expect(modal.getByText(/Selecione abaixo as unidades cujos mapas deverão ser homologados/i)).toBeVisible();`
   - Evidência (score 2): `e2e/cdu-26.spec.ts:11` -> `* - Subprocesso nas situações 'Mapa validado' ou 'Mapa com sugestões'`
   - Evidência (score 1): `e2e/cdu-26.spec.ts:2` -> `import {criarProcessoMapaValidadoFixture, validarProcessoFixture} from './fixtures/fixtures-processos.js';`
-- 🟡 **[PARCIAL]** 20. O sistema cria internamente um alerta:
+- ✅ **[COBERTO]** 20. O sistema cria internamente um alerta:
   - Palavras-chave usadas: `alerta, cria, internamente`
   - Evidência (score 1): `e2e/cdu-26.spec.ts:2` -> `import {criarProcessoMapaValidadoFixture, validarProcessoFixture} from './fixtures/fixtures-processos.js';`
   - Evidência (score 1): `e2e/cdu-26.spec.ts:29` -> `const processo = await criarProcessoMapaValidadoFixture(request, {`
@@ -109,20 +108,19 @@
   - Evidência (score 3): `e2e/cdu-26.spec.ts:55` -> `await expect(modal.getByText(/Selecione abaixo as unidades cujos mapas deverão ser homologados/i)).toBeVisible();`
   - Evidência (score 2): `e2e/cdu-26.spec.ts:6` -> `* CDU-26 - Homologar validação de mapas de competências em bloco`
   - Evidência (score 1): `e2e/cdu-26.spec.ts:2` -> `import {criarProcessoMapaValidadoFixture, validarProcessoFixture} from './fixtures/fixtures-processos.js';`
-- 🟡 **[PARCIAL]** 22. `Processo`: [DESCRIÇÃO_PROCESSO]
+- ✅ **[COBERTO]** 22. `Processo`: [DESCRIÇÃO_PROCESSO]
   - Palavras-chave usadas: `processo, descrição_processo`
   - Evidência (score 1): `e2e/cdu-26.spec.ts:2` -> `import {criarProcessoMapaValidadoFixture, validarProcessoFixture} from './fixtures/fixtures-processos.js';`
   - Evidência (score 1): `e2e/cdu-26.spec.ts:3` -> `import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';`
   - Evidência (score 1): `e2e/cdu-26.spec.ts:11` -> `* - Subprocesso nas situações 'Mapa validado' ou 'Mapa com sugestões'`
-- ❌ **[NAO_COBERTO]** 23. `Data/hora`: [Data/hora atual]
-  - Palavras-chave usadas: `data/hora, atual`
-  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
-- 🟡 **[PARCIAL]** 24. `Unidade de origem`: ADMIN
+- ✅ **[COBERTO]** 23. `Data/hora`: [Data/hora atual]
+  - Evidência: `e2e/cdu-26.spec.ts` Cenario 6 `.toContainText(/\d{2}\/\d{2}\/\d{4}/)` na `linhaAlerta` de `tbl-alertas`.
+- ✅ **[COBERTO]** 24. `Unidade de origem`: ADMIN
   - Palavras-chave usadas: `unidade, origem, admin`
   - Evidência (score 1): `e2e/cdu-26.spec.ts:8` -> `* Ator: ADMIN`
   - Evidência (score 1): `e2e/cdu-26.spec.ts:14` -> `* 1. ADMIN acessa processo em andamento`
   - Evidência (score 1): `e2e/cdu-26.spec.ts:16` -> `* 3. Sistema identifica unidades elegíveis para homologação`
-- 🟡 **[PARCIAL]** 25. `Unidade de destino`: [SIGLA_UNIDADE_SUBPROCESSO]
+- ✅ **[COBERTO]** 25. `Unidade de destino`: [SIGLA_UNIDADE_SUBPROCESSO]
   - Palavras-chave usadas: `unidade, sigla_unidade_subprocesso, destino`
   - Evidência (score 1): `e2e/cdu-26.spec.ts:16` -> `* 3. Sistema identifica unidades elegíveis para homologação`
   - Evidência (score 1): `e2e/cdu-26.spec.ts:18` -> `* 5. Sistema abre modal com lista de unidades`
@@ -139,13 +137,11 @@
   - Evidência (score 1): `e2e/cdu-26.spec.ts:15` -> `* 2. Sistema mostra Detalhes do processo`
 
 ## Ajustes recomendados para próximo ciclo
-- Completar cobertura do item: **Caso o usuário escolha o botão `Cancelar`, o sistema interrompe a operação, permanecendo na tela Detalhes do** (atualmente parcial).
-- Completar cobertura do item: **O sistema registra uma movimentação para o subprocesso:** (atualmente parcial).
-- Implementar cenário específico para: **`Data/hora`: [Data/hora atual]** (sem evidência no E2E atual).
+- Item 26 (envio de e-mail): cobertura apenas por teste de integração backend; não testável via Playwright.
 
 ## Prontidão para o próximo PR de melhoria E2E
 - Status de entrada: **PRONTO_COM_GAPS**.
-- Motivos: há itens sem cobertura E2E.
+- Motivos: item 26 (envio de e-mail) não é testável via Playwright; cobre-se por teste de integração backend.
 - Checklist mínimo antes de codar:
   - [ ] confirmar massa de dados/fixtures para cenário positivo e negativo;
   - [ ] definir assert de regra de negócio + assert de efeito colateral;

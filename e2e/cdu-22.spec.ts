@@ -3,8 +3,9 @@ import {
     criarProcessoCadastroDisponibilizadoFixture,
     criarProcessoRevisaoCadastroDisponibilizadoFixture
 } from './fixtures/fixtures-processos.js';
-import {loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
+import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
 import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
+import {fazerLogout, navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
 import {resetDatabase} from './hooks/hooks-limpeza.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
 
@@ -103,6 +104,48 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
         const btnAceitar = page.getByTestId('btn-processo-aceitar-bloco');
         await expect(btnAceitar).toBeVisible();
         await expect(btnAceitar).toBeDisabled();
+    });
+
+    test('Cenario 5: Aceite em bloco registra movimentação e alerta com data/hora', async ({
+        _resetAutomatico,
+        request,
+        page,
+        _autenticadoComoGestorCoord22
+    }) => {
+        const descIsolada = `CDU-22 alerta ${Date.now()}`;
+        const processoIsolado = await criarProcessoCadastroDisponibilizadoFixture(request, {
+            descricao: descIsolada,
+            unidade: UNIDADE_1
+        });
+        expect(processoIsolado.codigo).toBeGreaterThan(0);
+
+        await acessarDetalhesProcesso(page, descIsolada);
+        await page.getByTestId('btn-processo-aceitar-bloco').click();
+
+        const modal = page.locator('#modal-acao-bloco');
+        await expect(modal).toHaveClass(/show/);
+        await modal.getByRole('button', {name: TEXTOS.acaoBloco.aceitar.BOTAO}).click();
+        await expect(page.getByText(TEXTOS.sucesso.CADASTROS_ACEITOS_EM_BLOCO).first()).toBeVisible();
+
+        // Verificar movimentação no subprocesso
+        await page.goto(`/processo/${processoIsolado.codigo}`);
+        await navegarParaSubprocesso(page, UNIDADE_1);
+
+        const linhaMovimentacao = page.getByTestId('tbl-movimentacoes')
+            .locator('tr', {hasText: /Cadastro aceito/i})
+            .first();
+        await expect(linhaMovimentacao).toBeVisible();
+        await expect(linhaMovimentacao).toContainText(/\d{2}\/\d{2}\/\d{4}/);
+
+        // Verificar alerta para a unidade superior (SECRETARIA_2, acima de COORD_22)
+        await fazerLogout(page);
+        await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
+
+        const tabelaAlertas = page.getByTestId('tbl-alertas');
+        const linhaAlerta = tabelaAlertas.locator('tr', {hasText: descIsolada}).first();
+        await expect(linhaAlerta).toBeVisible();
+        await expect(linhaAlerta).toContainText(/SECAO_221/i);
+        await expect(linhaAlerta).toContainText(/\d{2}\/\d{2}\/\d{4}/);
     });
 });
 
