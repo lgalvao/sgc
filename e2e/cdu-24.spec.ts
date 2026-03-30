@@ -2,7 +2,8 @@ import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcessoCadastroHomologadoFixture, validarProcessoFixture} from './fixtures/fixtures-processos.js';
 import {criarCompetencia, navegarParaMapa} from './helpers/helpers-mapas.js';
 import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
-import {navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
+import {fazerLogout, navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
+import {login, USUARIOS} from './helpers/helpers-auth.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
 
 /**
@@ -94,5 +95,33 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
         await modal.getByRole('button', {name: TEXTOS.acaoBloco.disponibilizar.BOTAO}).click();
         await expect(page.getByText(TEXTOS.sucesso.MAPAS_DISPONIBILIZADOS_EM_BLOCO).first()).toBeVisible();
         await expect(page).toHaveURL(/\/painel/);
+    });
+
+    test('Cenario 4: Disponibilização em bloco registra movimentação e alerta com data/hora', async ({
+        _resetAutomatico,
+        page,
+        _autenticadoComoAdmin
+    }) => {
+        // O processo foi disponibilizado no Cenario 3 — verificar movimentação e alerta
+        await acessarDetalhesProcesso(page, descProcesso);
+        await navegarParaSubprocesso(page, UNIDADE_1);
+
+        const linhaMovimentacao = page.getByTestId('tbl-movimentacoes')
+            .locator('tr', {hasText: /Disponibilização do mapa de competências/i})
+            .first();
+        await expect(linhaMovimentacao).toBeVisible();
+        await expect(linhaMovimentacao).toContainText(/\d{2}\/\d{2}\/\d{4}/);
+        await expect(linhaMovimentacao).toContainText('ADMIN');
+
+        // Verificar alerta para o chefe da unidade do subprocesso (SECAO_221)
+        await fazerLogout(page);
+        await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
+
+        const tabelaAlertas = page.getByTestId('tbl-alertas');
+        const linhaAlerta = tabelaAlertas.locator('tr', {hasText: descProcesso}).first();
+        await expect(linhaAlerta).toBeVisible();
+        await expect(linhaAlerta).toContainText(/SECAO_221/i);
+        await expect(linhaAlerta).toContainText(/disponibilizado/i);
+        await expect(linhaAlerta).toContainText(/\d{2}\/\d{2}\/\d{4}/);
     });
 });

@@ -62,4 +62,16 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
         await expect(linhaMovimentacao).toContainText('ADMIN');
         await expect(linhaMovimentacao).toContainText(UNIDADE_1);
     });
+
+    test('Cenário complementar: unidade alvo visualiza alerta de reabertura de cadastro no painel', async ({
+                                                                                                               _resetAutomatico,
+                                                                                                               page,
+                                                                                                               _autenticadoComoChefeSecao221
+    }) => {
+        const tabelaAlertas = page.getByTestId('tbl-alertas');
+        await expect(tabelaAlertas).toBeVisible();
+        await expect(tabelaAlertas).toContainText(descProcesso);
+        await expect(tabelaAlertas).toContainText(/Cadastro de atividades reaberto/i);
+        await expect(tabelaAlertas).toContainText(/\d{2}\/\d{2}\/\d{4}/);
+    });
 });

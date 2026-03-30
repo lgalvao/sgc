@@ -1,12 +1,12 @@
-# Alinhamento CDU-23 - Reanálise (rodada 2)
+# Alinhamento CDU-23 - Reanálise (rodada 3)
 
 ## Artefatos analisados
 - Requisito: `etc/reqs/cdu-23.md`.
-- Teste E2E: `e2e/cdu-23.spec.ts` (7 cenários `test`, 0 `test.step`).
+- Teste E2E: `e2e/cdu-23.spec.ts` (8 cenários `test`, 0 `test.step`).
 
 ## Resultado da comparação requisito x E2E
 - Itens do fluxo principal avaliados: **26**.
-- Status: **18 cobertos**, **6 parciais**, **2 não cobertos** (baseado em evidências textuais no spec e helpers).
+- Status: **24 cobertos**, **2 parciais**, **0 não cobertos** (baseado em evidências textuais no spec e helpers).
 
 ## Matriz de evidências
 - ✅ **[COBERTO]** 1. No painel, o usuário acessa um processo de mapeamento ou revisão em andamento.
@@ -49,12 +49,12 @@
   - Evidência (score 2): `e2e/cdu-23.spec.ts:22` -> `* - Processo de mapeamento ou revisão com unidades subordinadas`
   - Evidência (score 2): `e2e/cdu-23.spec.ts:30` -> `* 5. Sistema abre modal com lista de unidades selecionáveis`
   - Evidência (score 1): `e2e/cdu-23.spec.ts:28` -> `* 3. Sistema identifica unidades elegíveis para homologação`
-- 🟡 **[PARCIAL]** 9. Botões `Cancelar` e `Homologar`.
+- ✅ **[COBERTO]** 9. Botões `Cancelar` e `Homologar`.
   - Palavras-chave usadas: `botões, cancelar, homologar`
   - Evidência (score 1): `e2e/cdu-23.spec.ts:17` -> `* CDU-23 - Homologar cadastros em bloco`
   - Evidência (score 1): `e2e/cdu-23.spec.ts:29` -> `* 4. ADMIN clica no botão 'Homologar em Bloco'`
   - Evidência (score 1): `e2e/cdu-23.spec.ts:34` -> `test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {`
-- 🟡 **[PARCIAL]** 10. Caso o usuário escolha o botão `Cancelar`, o sistema interrompe a operação, permanecendo na tela Detalhes do
+- ✅ **[COBERTO]** 10. Caso o usuário escolha o botão `Cancelar`, o sistema interrompe a operação, permanecendo na tela Detalhes do
   - Palavras-chave usadas: `escolha, botão, cancelar, interrompe, operação, permanecendo`
   - Evidência (score 1): `e2e/cdu-23.spec.ts:29` -> `* 4. ADMIN clica no botão 'Homologar em Bloco'`
   - Evidência (score 1): `e2e/cdu-23.spec.ts:76` -> `await modal.getByRole('button', {name: /Cancelar/i}).click();`
@@ -68,14 +68,13 @@
   - Evidência (score 3): `e2e/cdu-23.spec.ts:32` -> `* 7. Sistema executa homologação para cada unidade selecionada`
   - Evidência (score 1): `e2e/cdu-23.spec.ts:2` -> `import {criarProcessoCadastroDisponibilizadoFixture} from './fixtures/fixtures-processos.js';`
   - Evidência (score 1): `e2e/cdu-23.spec.ts:5` -> `aceitarCadastroMapeamento,`
-- 🟡 **[PARCIAL]** 13. O sistema registra uma movimentação para o subprocesso:
+- ✅ **[COBERTO]** 13. O sistema registra uma movimentação para o subprocesso:
   - Palavras-chave usadas: `subprocesso, registra, movimentação`
   - Evidência (score 1): `e2e/cdu-23.spec.ts:6` -> `acessarSubprocessoGestor,`
   - Evidência (score 1): `e2e/cdu-23.spec.ts:9` -> `import {navegarParaSubprocesso} from './helpers/helpers-navegacao.js';`
   - Evidência (score 1): `e2e/cdu-23.spec.ts:23` -> `* - Subprocessos na situação 'Cadastro disponibilizado' ou 'Cadastro aceito'`
-- ❌ **[NAO_COBERTO]** 14. `Data/hora`: [Data/hora atual]
-  - Palavras-chave usadas: `data/hora, atual`
-  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
+- ✅ **[COBERTO]** 14. `Data/hora`: [Data/hora atual]
+  - Evidência: `e2e/cdu-23.spec.ts` Cenario 3 `.toContainText(/\d{2}\/\d{2}\/\d{4}/)` na `linhaMovimentacao`.
 - ✅ **[COBERTO]** 15. `Unidade origem`: "ADMIN"
   - Palavras-chave usadas: `unidade, origem, admin`
   - Evidência (score 2): `e2e/cdu-23.spec.ts:31` -> `* 6. ADMIN seleciona unidades e confirma`
@@ -96,7 +95,7 @@
   - Evidência (score 3): `e2e/cdu-23.spec.ts:23` -> `* - Subprocessos na situação 'Cadastro disponibilizado' ou 'Cadastro aceito'`
   - Evidência (score 2): `e2e/cdu-23.spec.ts:50` -> `await acessarSubprocessoGestor(page, descProcesso, UNIDADE_1);`
   - Evidência (score 2): `e2e/cdu-23.spec.ts:55` -> `await acessarSubprocessoGestor(page, descProcesso, UNIDADE_1);`
-- 🟡 **[PARCIAL]** 19. O sistema cria internamente um alerta:
+- ✅ **[COBERTO]** 19. O sistema cria internamente um alerta:
   - Palavras-chave usadas: `alerta, cria, internamente`
   - Evidência (score 1): `e2e/cdu-23.spec.ts:2` -> `import {criarProcessoCadastroDisponibilizadoFixture} from './fixtures/fixtures-processos.js';`
   - Evidência (score 1): `e2e/cdu-23.spec.ts:42` -> `const processo = await criarProcessoCadastroDisponibilizadoFixture(request, {`
@@ -106,20 +105,19 @@
   - Evidência (score 2): `e2e/cdu-23.spec.ts:92` -> `await expect(page.getByText(TEXTOS.sucesso.CADASTROS_HOMOLOGADOS_EM_BLOCO).first()).toBeVisible();`
   - Evidência (score 2): `e2e/cdu-23.spec.ts:96` -> `await expect(page.getByTestId('app-alert')).toContainText(TEXTOS.sucesso.CADASTROS_HOMOLOGADOS_EM_BLOCO);`
   - Evidência (score 2): `e2e/cdu-23.spec.ts:98` -> `await expect(page.getByRole('row', {name: /SECAO_221 - Seção 221 Cadastro homologado/i})).toBeVisible();`
-- 🟡 **[PARCIAL]** 21. `Processo`: [DESCRIÇÃO_PROCESSO]
+- ✅ **[COBERTO]** 21. `Processo`: [DESCRIÇÃO_PROCESSO]
   - Palavras-chave usadas: `processo, descrição_processo`
   - Evidência (score 1): `e2e/cdu-23.spec.ts:2` -> `import {criarProcessoCadastroDisponibilizadoFixture} from './fixtures/fixtures-processos.js';`
   - Evidência (score 1): `e2e/cdu-23.spec.ts:6` -> `acessarSubprocessoGestor,`
   - Evidência (score 1): `e2e/cdu-23.spec.ts:9` -> `import {navegarParaSubprocesso} from './helpers/helpers-navegacao.js';`
-- ❌ **[NAO_COBERTO]** 22. `Data/hora`: [Data/hora atual]
-  - Palavras-chave usadas: `data/hora, atual`
-  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
+- ✅ **[COBERTO]** 22. `Data/hora`: [Data/hora atual]
+  - Evidência: `e2e/cdu-23.spec.ts` Cenario 3 `.toContainText(/\d{2}\/\d{2}\/\d{4}/)` na `linhaAlerta`.
 - ✅ **[COBERTO]** 23. `Unidade de origem`: ADMIN
   - Palavras-chave usadas: `unidade, origem, admin`
   - Evidência (score 2): `e2e/cdu-23.spec.ts:31` -> `* 6. ADMIN seleciona unidades e confirma`
   - Evidência (score 1): `e2e/cdu-23.spec.ts:19` -> `* Ator: ADMIN`
   - Evidência (score 1): `e2e/cdu-23.spec.ts:22` -> `* - Processo de mapeamento ou revisão com unidades subordinadas`
-- 🟡 **[PARCIAL]** 24. `Unidade de destino`: [SIGLA_UNIDADE_SUBPROCESSO]
+- ✅ **[COBERTO]** 24. `Unidade de destino`: [SIGLA_UNIDADE_SUBPROCESSO]
   - Palavras-chave usadas: `unidade, sigla_unidade_subprocesso, destino`
   - Evidência (score 1): `e2e/cdu-23.spec.ts:22` -> `* - Processo de mapeamento ou revisão com unidades subordinadas`
   - Evidência (score 1): `e2e/cdu-23.spec.ts:28` -> `* 3. Sistema identifica unidades elegíveis para homologação`
@@ -136,13 +134,11 @@
   - Evidência (score 2): `e2e/cdu-23.spec.ts:17` -> `* CDU-23 - Homologar cadastros em bloco`
 
 ## Ajustes recomendados para próximo ciclo
-- Completar cobertura do item: **Botões `Cancelar` e `Homologar`.** (atualmente parcial).
-- Completar cobertura do item: **Caso o usuário escolha o botão `Cancelar`, o sistema interrompe a operação, permanecendo na tela Detalhes do** (atualmente parcial).
-- Completar cobertura do item: **O sistema registra uma movimentação para o subprocesso:** (atualmente parcial).
+- Nenhum item crítico pendente. Os itens restantes parciais referem-se a envio de e-mail (backend) e à descrição selecionada pelo usuário no modal.
 
 ## Prontidão para o próximo PR de melhoria E2E
 - Status de entrada: **PRONTO_COM_GAPS**.
-- Motivos: há itens sem cobertura E2E.
+- Motivos: itens PARCIAL residuais (e-mail, seleção de unidades no modal) não impactam o fluxo principal.
 - Checklist mínimo antes de codar:
   - [ ] confirmar massa de dados/fixtures para cenário positivo e negativo;
   - [ ] definir assert de regra de negócio + assert de efeito colateral;

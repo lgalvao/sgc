@@ -53,4 +53,40 @@ test.describe.serial('CDU-36 - Gerar relatório de mapas', () => {
 
         expect(download.suggestedFilename()).toContain(`relatorio-mapas-${processo.codigo}.pdf`);
     });
+
+    test('Cenário CDU-36: Filtrar por unidade específica inclui unidadeId na URL ao gerar PDF', async ({_resetAutomatico, page, request, _autenticadoComoAdmin}) => {
+        test.slow();
+        const descricaoProcesso = `Relatório CDU-36 filtro ${Date.now()}`;
+        const processo = await criarProcessoMapaHomologadoFixture(request, {
+            descricao: descricaoProcesso,
+            unidade: 'ASSESSORIA_12',
+            diasLimite: 30
+        });
+
+        await page.goto('/painel');
+        await expect(page.getByTestId('tbl-processos').getByText(descricaoProcesso).first()).toBeVisible();
+
+        await page.getByRole('link', {name: /Relatórios/i}).click();
+        await page.getByRole('tab', {name: 'Mapas'}).click();
+
+        const painelMapas = page.getByRole('tabpanel', {name: /^Mapas$/i});
+        const selectProcesso = painelMapas.getByLabel('Selecione o Processo');
+        const selectUnidade = painelMapas.getByLabel('Selecione a unidade');
+        const botaoGerar = painelMapas.getByRole('button', {name: 'Gerar PDF'});
+
+        await selectProcesso.selectOption({label: descricaoProcesso});
+        await expect(botaoGerar).toBeEnabled();
+
+        // Seleciona a primeira unidade específica disponível (índice 1 = pula "Todas as unidades")
+        await selectUnidade.selectOption({index: 1});
+
+        const requisicaoComFiltroUnidade = page.waitForRequest((req) => {
+            return req.url().includes(`/relatorios/mapas/${processo.codigo}/exportar`) && req.url().includes('unidadeId=');
+        });
+
+        const downloadPromise = page.waitForEvent('download');
+        await botaoGerar.click();
+        await requisicaoComFiltroUnidade;
+        await downloadPromise;
+    });
 });
