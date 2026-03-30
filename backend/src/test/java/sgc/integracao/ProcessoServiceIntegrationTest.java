@@ -94,6 +94,22 @@ class ProcessoServiceIntegrationTest extends BaseIntegrationTest {
                     .isInstanceOf(ErroValidacao.class)
                     .hasMessageContaining("mapa vigente");
         }
+
+        @Test
+        @DisplayName("Deve lançar erro ao criar processo com unidade sem responsável efetivo")
+        void deveLancarErroAoCriarComUnidadeSemResponsavelEfetivo() {
+            LocalDateTime dataLimite = LocalDateTime.now().plusDays(30);
+            CriarProcessoRequest request = CriarProcessoRequest.builder()
+                    .descricao("Processo com unidade inelegível")
+                    .tipo(TipoProcesso.MAPEAMENTO)
+                    .dataLimiteEtapa1(dataLimite)
+                    .unidades(List.of(905L))
+                    .build();
+
+            assertThatThrownBy(() -> service.criar(request))
+                    .isInstanceOf(ErroValidacao.class)
+                    .hasMessageContaining("Não foi possível concluir a operação.");
+        }
     }
 
     @Nested

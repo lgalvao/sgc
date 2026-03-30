@@ -51,9 +51,17 @@ public class UnidadeHierarquiaService {
 
         return buscarArvoreComElegibilidade(u ->
                 u.getTipo() != INTERMEDIARIA
+                        && possuiResponsavelEfetivo(u)
                         && (!requerMapaVigente || unidadesComMapa.contains(u.getCodigo()))
                         && !unidadesBloqueadas.contains(u.getCodigo())
         );
+    }
+
+    private boolean possuiResponsavelEfetivo(Unidade unidade) {
+        Responsabilidade responsabilidade = unidade.getResponsabilidade();
+        return responsabilidade != null
+                && responsabilidade.getUsuarioTitulo() != null
+                && !responsabilidade.getUsuarioTitulo().isBlank();
     }
 
     /**
