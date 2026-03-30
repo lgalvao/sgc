@@ -190,12 +190,12 @@ class ValidadorDadosOrganizacionaisTest {
     @Test
     @DisplayName("deve acumular multiplas violacoes")
     void deveAcumularMultiplasViolacoes() {
-        Unidade intermediaria = criarUnidade(10L, "INT", INTERMEDIARIA, null);
+        Unidade intermediaria = criarUnidade(10L, "INT", INTERMEDIARIA, "DUMMY_TITULAR");
 
         mockarCenarioBase(
                 List.of(intermediaria),
                 List.of(criarResponsabilidade(10L, "RESP_INT")),
-                List.of(criarUsuario("RESP_INT")),
+                List.of(criarUsuario("RESP_INT"), criarUsuario("DUMMY_TITULAR")),
                 List.of(),
                 List.of()
         );
@@ -233,13 +233,14 @@ class ValidadorDadosOrganizacionaisTest {
     @Test
     @DisplayName("deve ignorar perfil nulo derivado de unidade sem responsavel efetivo")
     void deveIgnorarPerfilNuloDerivadoDeUnidadeSemResponsavelEfetivo() {
-        Unidade operacional = criarUnidade(20L, "OPE", OPERACIONAL, null);
+        Unidade operacional = criarUnidade(20L, "OPE", OPERACIONAL, "DUMMY_TITULAR");
 
         mockarCenarioBase(
                 List.of(operacional),
                 List.of(),
                 List.of(
-                        criarUsuario("RESP_OPE")
+                        criarUsuario("RESP_OPE"),
+                        criarUsuario("DUMMY_TITULAR")
                 ),
                 List.of(),
                 List.of(

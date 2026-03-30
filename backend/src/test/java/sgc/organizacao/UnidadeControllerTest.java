@@ -43,6 +43,9 @@ class UnidadeControllerTest {
     @MockitoBean
     private ProcessoService processoService;
 
+    @MockitoBean
+    private ValidadorDadosOrganizacionais validadorDadosOrganizacionais;
+
     @Autowired
     private MockMvc mockMvc;
     @MockitoBean
