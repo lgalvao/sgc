@@ -10,12 +10,14 @@ import org.slf4j.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.boot.test.context.*;
 import org.springframework.boot.autoconfigure.*;
+import org.springframework.boot.*;
 import org.springframework.boot.context.properties.*;
 import org.springframework.context.annotation.*;
 import org.springframework.core.env.*;
 import org.springframework.data.domain.*;
 import org.springframework.mail.javamail.*;
 import org.springframework.scheduling.annotation.*;
+import org.springframework.test.context.bean.override.mockito.*;
 import org.springframework.transaction.annotation.*;
 import org.springframework.util.*;
 import sgc.organizacao.dto.*;
@@ -75,6 +77,9 @@ class OrganizacaoViewsPerformanceIntegrationTest {
 
     @Autowired
     private ResponsavelUnidadeService responsavelUnidadeService;
+
+    @MockitoBean(name = "objectMapper")
+    private tools.jackson.databind.ObjectMapper objectMapperCompartilhado;
 
     @BeforeEach
     void garantirExecucaoSomenteNoOracle() throws SQLException {
