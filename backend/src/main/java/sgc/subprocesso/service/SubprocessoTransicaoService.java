@@ -596,6 +596,11 @@ public class SubprocessoTransicaoService {
                     .usuario(usuario)
                     .observacoes(observacoes)
                     .build());
+
+            String descAlerta = isRevisao
+                    ? Mensagens.ALERTA_REVISAO_HOMOLOGADA.formatted(sp.getUnidade().getSigla())
+                    : Mensagens.ALERTA_CADASTRO_HOMOLOGADO.formatted(sp.getUnidade().getSigla());
+            alertaService.criarAlertaTransicao(sp.getProcesso(), descAlerta, admin, sp.getUnidade());
         }
     }
 

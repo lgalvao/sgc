@@ -3,7 +3,7 @@ import {
     criarProcessoCadastroDisponibilizadoFixture,
     criarProcessoRevisaoCadastroDisponibilizadoFixture
 } from './fixtures/fixtures-processos.js';
-import {loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
+import {loginComPerfil, login, USUARIOS} from './helpers/helpers-auth.js';
 import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
 import {fazerLogout, navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
 import {resetDatabase} from './hooks/hooks-limpeza.js';
@@ -110,8 +110,10 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
         _resetAutomatico,
         request,
         page,
-        _autenticadoComoGestorCoord22
+        _autenticadoComoGestorCoord22: _
     }) => {
+        // Reseta o banco para evitar conflito com unidade já em processo ativo dos cenários anteriores
+        await resetDatabase(request);
         const descIsolada = `CDU-22 alerta ${Date.now()}`;
         const processoIsolado = await criarProcessoCadastroDisponibilizadoFixture(request, {
             descricao: descIsolada,
@@ -119,6 +121,7 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
         });
         expect(processoIsolado.codigo).toBeGreaterThan(0);
 
+        await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
         await acessarDetalhesProcesso(page, descIsolada);
         await page.getByTestId('btn-processo-aceitar-bloco').click();
 
