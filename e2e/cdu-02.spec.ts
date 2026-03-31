@@ -157,12 +157,12 @@ test.describe('CDU-02 - Visualizar painel', () => {
             await expect(page).toHaveURL(/\/painel/);
             await page.goto('/painel');
 
-            // Verifica que o processo foi criado e aparece na tabela
+            // Verifica que o processo foi criado com as filhas operacionais (COORD_11 é INTERMEDIARIA e é filtrada)
             await verificarProcessoNaTabela(page, {
                 descricao: descricaoProcesso,
                 situacao: 'Criado',
                 tipo: 'Mapeamento',
-                unidadesParticipantes: ['COORD_11']
+                unidadesParticipantes: ['SECAO_111', 'SECAO_112', 'SECAO_113']
             });
         });
 
@@ -302,7 +302,7 @@ test.describe('CDU-02 - Visualizar painel', () => {
                 tipo: 'MAPEAMENTO',
                 diasLimite: 30,
                 unidade: 'SECAO_113',
-                expandir: ['SECRETARIA_1'],
+                expandir: ['SECRETARIA_1', 'COORD_11'],
                 iniciar: true
             });
 

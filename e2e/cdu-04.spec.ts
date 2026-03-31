@@ -30,6 +30,7 @@ test.describe('CDU-04 - Iniciar processo', () => {
 
         await page.getByTestId('sel-processo-tipo').selectOption('MAPEAMENTO');
         await page.getByTestId('btn-arvore-expand-SECRETARIA_1').click();
+        await page.getByTestId('btn-arvore-expand-COORD_11').click();
 
         const checkboxUnidadeSemResponsavel = page.getByTestId('chk-arvore-unidade-SECAO_SEM_RESP');
         await expect(checkboxUnidadeSemResponsavel).toBeVisible();
