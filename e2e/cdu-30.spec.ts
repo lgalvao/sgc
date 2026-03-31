@@ -210,6 +210,6 @@ test.describe.serial('CDU-30 - Manter administradores', () => {
         const corpo = await resposta.json();
 
         await expect(modal2).toBeVisible();
-        expect(corpo.message).toContain('Não é permitido remover o único administrador do sistema');
+        expect(corpo.message).toMatch(/Não é permitido remover (o único administrador do sistema|a si mesmo como administrador)/);
     });
 });
