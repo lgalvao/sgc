@@ -120,7 +120,9 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {
         await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
 
         const tabelaAlertas = page.getByTestId('tbl-alertas');
-        const linhaAlerta = tabelaAlertas.locator('tr', {hasText: descProcesso}).first();
+        const linhaAlerta = tabelaAlertas.locator('tr', {hasText: descProcesso})
+            .filter({hasText: /homologado/i})
+            .first();
         await expect(linhaAlerta).toBeVisible();
         await expect(linhaAlerta).toContainText(/SECAO_221/i);
         await expect(linhaAlerta).toContainText(/homologado/i);

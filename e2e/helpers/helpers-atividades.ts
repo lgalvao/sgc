@@ -11,6 +11,8 @@ export async function navegarParaAtividades(page: Page) {
 
     await expect(page.getByRole('heading', {name: TEXTOS.atividades.TITULO, level: 2})).toBeVisible();
     await expect(page.getByTestId('inp-nova-atividade')).toBeVisible();
+    // Aguarda o badge de situação para garantir que os dados do subprocesso foram carregados
+    await expect(page.getByTestId('cad-atividades__txt-badge-situacao')).toBeVisible();
 }
 
 export async function navegarParaAtividadesVisualizacao(page: Page) {
