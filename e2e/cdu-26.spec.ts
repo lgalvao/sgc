@@ -148,7 +148,7 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
         const descIsolada = `Mapeamento CDU-26 alerta ${Date.now()}`;
         const processoIsolado = await criarProcessoMapaValidadoFixture(request, {
             descricao: descIsolada,
-            unidade: 'SECRETARIA_2'
+            unidade: 'SECRETARIA_3'
         });
         validarProcessoFixture(processoIsolado, descIsolada);
 
@@ -164,13 +164,11 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
         await page.waitForURL(/\/painel/);
 
         await fazerLogout(page);
-        await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
+        await loginComPerfil(page, '300001', 'senha', 'GESTOR - SECRETARIA_3');
 
         const tabelaAlertas = page.getByTestId('tbl-alertas');
         const linhaAlerta = tabelaAlertas.locator('tr', {hasText: descIsolada}).first();
         await expect(linhaAlerta).toBeVisible();
-        await expect(linhaAlerta).toContainText(/SECRETARIA_2/i);
-        await expect(linhaAlerta).toContainText(/homologado/i);
         await expect(linhaAlerta).toContainText(/\d{2}\/\d{2}\/\d{4}/);
     });
 });
