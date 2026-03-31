@@ -3,7 +3,7 @@ import {criarProcessoMapaDisponibilizadoFixture, validarProcessoFixture} from '.
 import {navegarParaMapa} from './helpers/helpers-mapas.js';
 import {login, USUARIOS} from './helpers/helpers-auth.js';
 import {acessarSubprocessoGestor} from './helpers/helpers-analise.js';
-import {verificarPaginaPainel} from './helpers/helpers-navegacao.js';
+import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
 import {resetDatabase} from './hooks/hooks-limpeza.js';
 
@@ -57,6 +57,15 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
         await verificarPaginaPainel(page);
         await acessarDetalhesProcesso(page, descProcesso);
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa validado/i);
+
+        // CDU-19 Passo 5.4/5.5: verificar movimentação registrada no subprocesso com data/hora
+        await navegarParaSubprocesso(page, UNIDADE_ALVO);
+        const linhaMovimentacao = page.getByTestId('tbl-movimentacoes')
+            .locator('tr', {hasText: /Validação do mapa/i})
+            .first();
+        await expect(linhaMovimentacao).toBeVisible();
+        await expect(linhaMovimentacao).toContainText(/\d{2}\/\d{2}\/\d{4}/);
+        await expect(linhaMovimentacao).toContainText(/SECAO_221/i);
     });
 });
 
@@ -99,6 +108,17 @@ test.describe.serial('CDU-19 - Apresentar sugestões e pré-preenchimento', () =
         await verificarPaginaPainel(page);
         await acessarDetalhesProcesso(page, descProcesso);
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa com sugestões/i);
+    });
+
+    test('Cenario 1b: GESTOR superior vê alerta de sugestões no painel', async ({_resetAutomatico, page}) => {
+        // CDU-19 Passo 4.5: sistema cria alerta para unidade superior (COORD_22 acima de SECAO_221)
+        await login(page, GESTOR_SUPERIOR.titulo, GESTOR_SUPERIOR.senha);
+
+        const tabelaAlertas = page.getByTestId('tbl-alertas');
+        const linhaAlerta = tabelaAlertas.locator('tr', {hasText: descProcesso}).first();
+        await expect(linhaAlerta).toBeVisible();
+        await expect(linhaAlerta).toContainText(/SECAO_221/i);
+        await expect(linhaAlerta).toContainText(/\d{2}\/\d{2}\/\d{4}/);
     });
 
     test('Cenario 2: GESTOR devolve mapa para ajustes', async ({_resetAutomatico, page}) => {

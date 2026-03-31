@@ -127,7 +127,14 @@ test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {
             await AtividadeHelpers.cancelarEdicaoConhecimento(page, atividadeEditada, conhecimento1, conhecimentoCancelado);
             // Editar de fato
             await AtividadeHelpers.editarConhecimento(page, atividadeEditada, conhecimento1, conhecimento1Editado);
-            
+
+            // CDU-08 Item 20: após salvar edição de conhecimento, botões Editar e Remover voltam a aparecer
+            const cardPosEdicao = page.getByTestId('cad-atividades__card-atividade').filter({has: page.getByText(atividadeEditada)});
+            const linhaConhPosEdicao = cardPosEdicao.getByTestId('cad-atividades__item-conhecimento').filter({hasText: conhecimento1Editado});
+            await linhaConhPosEdicao.hover();
+            await expect(linhaConhPosEdicao.getByTestId('btn-editar-conhecimento')).toBeVisible();
+            await expect(linhaConhPosEdicao.getByTestId('btn-remover-conhecimento')).toBeVisible();
+
             await AtividadeHelpers.removerConhecimento(page, atividadeEditada, conhecimento1Editado);
             
             await AtividadeHelpers.removerAtividade(page, atividadeEditada);

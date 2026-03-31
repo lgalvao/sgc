@@ -293,4 +293,26 @@ test.describe('CDU-02 - Visualizar painel', () => {
             await expect(linhaAlertaLida).not.toHaveClass(/fw-bold/);
         });
     });
+
+    test.describe('Visibilidade de alertas por perfil', () => {
+        test('SERVIDOR não deve ver alertas de unidade', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
+            const descricao = `Proc servidor alertas - ${Date.now()}`;
+            await criarProcesso(page, {
+                descricao,
+                tipo: 'MAPEAMENTO',
+                diasLimite: 30,
+                unidade: 'SECAO_113',
+                expandir: ['SECRETARIA_1'],
+                iniciar: true
+            });
+
+            await fazerLogout(page);
+            await login(page, USUARIOS.SERVIDOR.titulo, USUARIOS.SERVIDOR.senha);
+
+            // SERVIDOR vê apenas alertas pessoais, não alertas de unidade
+            const tblAlertas = page.getByTestId('tbl-alertas');
+            const linhaAlerta = tblAlertas.locator('tr', {hasText: descricao}).first();
+            await expect(linhaAlerta).toBeHidden();
+        });
+    });
 });

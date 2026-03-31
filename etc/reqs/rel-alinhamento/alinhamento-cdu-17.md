@@ -1,200 +1,67 @@
-# Alinhamento CDU-17 - Reanálise (rodada 2)
+# Alinhamento CDU-17 - Reanálise (rodada 3)
 
 ## Artefatos analisados
 - Requisito: `etc/reqs/cdu-17.md`.
-- Teste E2E: `e2e/cdu-17.spec.ts` (2 cenários `test`, 0 `test.step`).
+- Teste E2E: `e2e/cdu-17.spec.ts` (3 cenários `test`, 0 `test.step`).
+- Contextos `describe`: CDU-17 - Disponibilizar mapa de competências.
 
 ## Resultado da comparação requisito x E2E
 - Itens do fluxo principal avaliados: **35**.
-- Status: **14 cobertos**, **18 parciais**, **3 não cobertos** (baseado em evidências textuais no spec e helpers).
+- Status: **20 cobertos**, **12 parciais**, **3 não cobertos**.
 
 ## Matriz de evidências
 - ✅ **[COBERTO]** 1. ADMIN escolhe o processo de mapeamento desejado.
-  - Palavras-chave usadas: `processo, admin, escolhe, mapeamento, desejado`
-  - Evidência (score 2): `e2e/cdu-17.spec.ts:11` -> `const descProcesso = `Mapeamento CDU-17 ${timestamp}`;`
-  - Evidência (score 1): `e2e/cdu-17.spec.ts:2` -> `import {criarProcessoCadastroHomologadoFixture, validarProcessoFixture} from './fixtures/fixtures-processos.js';`
-  - Evidência (score 1): `e2e/cdu-17.spec.ts:4` -> `import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';`
+  - Evidência: `e2e/cdu-17.spec.ts` - `criarProcessoCadastroHomologadoFixture` + `acessarDetalhesProcesso`.
 - ✅ **[COBERTO]** 2. O sistema mostra tela `Detalhes do processo`.
-  - Palavras-chave usadas: `processo, mostra, detalhes`
-  - Evidência (score 2): `e2e/cdu-17.spec.ts:5` -> `import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';`
-  - Evidência (score 2): `e2e/cdu-17.spec.ts:37` -> `await acessarDetalhesProcesso(page, descProcesso);`
-  - Evidência (score 2): `e2e/cdu-17.spec.ts:70` -> `// Nota: Se hoje for a data de criação, deve mostrar "A data limite deve ser posterior à data de criação do processo."`
-- 🟡 **[PARCIAL]** 3. ADMIN clica em uma unidade operacional ou interoperacional com subprocesso na situação 'Mapa criado' ou 'Mapa
-  - Palavras-chave usadas: `unidade, subprocesso, situação, admin, clica, operacional`
-  - Evidência (score 1): `e2e/cdu-17.spec.ts:4` -> `import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';`
-  - Evidência (score 1): `e2e/cdu-17.spec.ts:8` -> `const UNIDADE_ALVO = 'SECAO_211';`
-  - Evidência (score 1): `e2e/cdu-17.spec.ts:22` -> `unidade: UNIDADE_ALVO`
-- 🟡 **[PARCIAL]** 4. O sistema mostra a tela `Detalhes de subprocesso`.
-  - Palavras-chave usadas: `subprocesso, mostra, detalhes`
-  - Evidência (score 1): `e2e/cdu-17.spec.ts:4` -> `import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';`
-  - Evidência (score 1): `e2e/cdu-17.spec.ts:5` -> `import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';`
-  - Evidência (score 1): `e2e/cdu-17.spec.ts:37` -> `await acessarDetalhesProcesso(page, descProcesso);`
-- ✅ **[COBERTO]** 5. ADMIN clica no card `Mapa de Competências`.
-  - Palavras-chave usadas: `competências, admin, clica, card, mapa`
-  - Evidência (score 2): `e2e/cdu-17.spec.ts:7` -> `test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {`
-  - Evidência (score 2): `e2e/cdu-17.spec.ts:29` -> `test('Cenários CDU-17: Fluxo completo de disponibilização do mapa pelo ADMIN', async ({`
-  - Evidência (score 2): `e2e/cdu-17.spec.ts:41` -> `await expect(page.getByText('Mapa de competências técnicas')).toBeVisible();`
-- ✅ **[COBERTO]** 6. O sistema mostra a tela `Edição de mapa` preenchida com os dados do mapa de competências da unidade.
-  - Palavras-chave usadas: `competências, unidade, mostra, edição, mapa, preenchida`
-  - Evidência (score 2): `e2e/cdu-17.spec.ts:7` -> `test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {`
-  - Evidência (score 2): `e2e/cdu-17.spec.ts:41` -> `await expect(page.getByText('Mapa de competências técnicas')).toBeVisible();`
-  - Evidência (score 2): `e2e/cdu-17.spec.ts:58` -> `await expect(page.getByText('Mapa de competências técnicas')).toBeVisible();`
-- 🟡 **[PARCIAL]** 7. ADMIN clica no botão `Disponibilizar`.
-  - Palavras-chave usadas: `admin, clica, botão, disponibilizar`
-  - Evidência (score 1): `e2e/cdu-17.spec.ts:3` -> `import {criarCompetencia, disponibilizarMapa, navegarParaMapa} from './helpers/helpers-mapas.js';`
-  - Evidência (score 1): `e2e/cdu-17.spec.ts:7` -> `test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {`
-  - Evidência (score 1): `e2e/cdu-17.spec.ts:29` -> `test('Cenários CDU-17: Fluxo completo de disponibilização do mapa pelo ADMIN', async ({`
-- 🟡 **[PARCIAL]** 8. O sistema verifica se todas as competências criadas estão associadas a pelo menos uma atividade do cadastro da
-  - Palavras-chave usadas: `competências, atividade, verifica, todas, criadas, estão`
-  - Evidência (score 1): `e2e/cdu-17.spec.ts:4` -> `import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';`
-  - Evidência (score 1): `e2e/cdu-17.spec.ts:7` -> `test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {`
-  - Evidência (score 1): `e2e/cdu-17.spec.ts:13` -> `const atividade1 = 'Atividade fixture 1';`
-- ✅ **[COBERTO]** 9. Caso negativo, o sistema interrompe a disponibilização do mapa e informa em mensagem de erro quais competências
-  - Palavras-chave usadas: `competências, negativo, interrompe, disponibilização, mapa, informa`
-  - Evidência (score 2): `e2e/cdu-17.spec.ts:7` -> `test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {`
-  - Evidência (score 2): `e2e/cdu-17.spec.ts:29` -> `test('Cenários CDU-17: Fluxo completo de disponibilização do mapa pelo ADMIN', async ({`
-  - Evidência (score 2): `e2e/cdu-17.spec.ts:41` -> `await expect(page.getByText('Mapa de competências técnicas')).toBeVisible();`
-- 🟡 **[PARCIAL]** 10. O sistema verifica se todas as atividades foram associadas a pelo menos uma competência.
-  - Palavras-chave usadas: `atividades, competência, verifica, todas, foram, associadas`
-  - Evidência (score 1): `e2e/cdu-17.spec.ts:4` -> `import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';`
-  - Evidência (score 1): `e2e/cdu-17.spec.ts:7` -> `test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {`
-  - Evidência (score 1): `e2e/cdu-17.spec.ts:16` -> `const competencia1 = `Competência 1 ${timestamp}`;`
-- ✅ **[COBERTO]** 11. Caso negativo, o sistema interrompe a disponibilização do mapa e informa em mensagem de erro quais atividades
-  - Palavras-chave usadas: `atividades, negativo, interrompe, disponibilização, mapa, informa`
-  - Evidência (score 2): `e2e/cdu-17.spec.ts:29` -> `test('Cenários CDU-17: Fluxo completo de disponibilização do mapa pelo ADMIN', async ({`
-  - Evidência (score 2): `e2e/cdu-17.spec.ts:53` -> `await expect(page.getByText('Disponibilização do mapa')).toBeVisible();`
-  - Evidência (score 1): `e2e/cdu-17.spec.ts:3` -> `import {criarCompetencia, disponibilizarMapa, navegarParaMapa} from './helpers/helpers-mapas.js';`
-- 🟡 **[PARCIAL]** 12. O sistema mostra um modal com as seguintes características:
-  - Palavras-chave usadas: `mostra, modal, seguintes, características`
-  - Evidência (score 1): `e2e/cdu-17.spec.ts:50` -> `// Cenario 2: Abrir modal`
-  - Evidência (score 1): `e2e/cdu-17.spec.ts:62` -> `const modal = page.getByTestId('mdl-disponibilizar-mapa');`
-  - Evidência (score 1): `e2e/cdu-17.spec.ts:63` -> `await expect(modal).toBeVisible();`
-- ✅ **[COBERTO]** 13. `Título`: 'Disponibilização do mapa de competências'
-  - Palavras-chave usadas: `competências, título, disponibilização, mapa`
-  - Evidência (score 2): `e2e/cdu-17.spec.ts:7` -> `test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {`
-  - Evidência (score 2): `e2e/cdu-17.spec.ts:29` -> `test('Cenários CDU-17: Fluxo completo de disponibilização do mapa pelo ADMIN', async ({`
-  - Evidência (score 2): `e2e/cdu-17.spec.ts:41` -> `await expect(page.getByText('Mapa de competências técnicas')).toBeVisible();`
-- ✅ **[COBERTO]** 14. `Data`: de preenchimento obrigatório, para armazenar a Data limite para a validação do mapa
-  - Palavras-chave usadas: `data, preenchimento, obrigatório, armazenar, limite, validação`
-  - Evidência (score 3): `e2e/cdu-17.spec.ts:71` -> `// Se hoje for passado, o componente InputData ou o watch podem mostrar "A data limite para validação deve ser uma da...`
-  - Evidência (score 3): `e2e/cdu-17.spec.ts:73` -> `await expect(modal.getByText(/A data limite (deve ser posterior à data de criação do processo|para validação deve ser...`
-  - Evidência (score 2): `e2e/cdu-17.spec.ts:70` -> `// Nota: Se hoje for a data de criação, deve mostrar "A data limite deve ser posterior à data de criação do processo."`
-- ❌ **[NAO_COBERTO]** 15. `Observações`: de preenchimento opcional
-  - Palavras-chave usadas: `observações, preenchimento, opcional`
-  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
-- ✅ **[COBERTO]** 16. Botões `Disponibilizar` e `Cancelar`.
-  - Palavras-chave usadas: `botões, disponibilizar, cancelar`
-  - Evidência (score 2): `e2e/cdu-17.spec.ts:56` -> `await page.getByTestId('btn-disponibilizar-mapa-cancelar').click();`
-  - Evidência (score 2): `e2e/cdu-17.spec.ts:76` -> `await page.getByTestId('btn-disponibilizar-mapa-cancelar').click();`
-  - Evidência (score 1): `e2e/cdu-17.spec.ts:3` -> `import {criarCompetencia, disponibilizarMapa, navegarParaMapa} from './helpers/helpers-mapas.js';`
-- ✅ **[COBERTO]** 17. Caso ADMIN escolha `Cancelar`, o sistema interrompe a operação de disponibilização do mapa, permanecendo na tela
-  - Palavras-chave usadas: `admin, escolha, cancelar, interrompe, operação, disponibilização`
-  - Evidência (score 2): `e2e/cdu-17.spec.ts:29` -> `test('Cenários CDU-17: Fluxo completo de disponibilização do mapa pelo ADMIN', async ({`
-  - Evidência (score 1): `e2e/cdu-17.spec.ts:32` -> `_autenticadoComoAdmin`
-  - Evidência (score 1): `e2e/cdu-17.spec.ts:53` -> `await expect(page.getByText('Disponibilização do mapa')).toBeVisible();`
-- 🟡 **[PARCIAL]** 18. ADMIN preenche as informações dos campos do modal e clica no botão `Disponibilizar`.
-  - Palavras-chave usadas: `admin, preenche, informações, modal, clica, botão`
-  - Evidência (score 1): `e2e/cdu-17.spec.ts:29` -> `test('Cenários CDU-17: Fluxo completo de disponibilização do mapa pelo ADMIN', async ({`
-  - Evidência (score 1): `e2e/cdu-17.spec.ts:32` -> `_autenticadoComoAdmin`
-  - Evidência (score 1): `e2e/cdu-17.spec.ts:50` -> `// Cenario 2: Abrir modal`
-- ✅ **[COBERTO]** 19. O sistema registra a informação do campo `Observações` no mapa do subprocesso e a informação do campo `Data limite`
-  - Palavras-chave usadas: `subprocesso, registra, informação, observações, mapa, data`
-  - Evidência (score 2): `e2e/cdu-17.spec.ts:67` -> `await page.getByTestId('inp-disponibilizar-mapa-data').fill(hoje);`
-  - Evidência (score 2): `e2e/cdu-17.spec.ts:83` -> `await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa disponibilizado/i);`
-  - Evidência (score 1): `e2e/cdu-17.spec.ts:3` -> `import {criarCompetencia, disponibilizarMapa, navegarParaMapa} from './helpers/helpers-mapas.js';`
-- ✅ **[COBERTO]** 20. O sistema altera a situação do subprocesso da unidade para 'Mapa disponibilizado'.
-  - Palavras-chave usadas: `situação, subprocesso, unidade, altera, mapa, disponibilizado`
-  - Evidência (score 3): `e2e/cdu-17.spec.ts:83` -> `await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa disponibilizado/i);`
-  - Evidência (score 1): `e2e/cdu-17.spec.ts:3` -> `import {criarCompetencia, disponibilizarMapa, navegarParaMapa} from './helpers/helpers-mapas.js';`
-  - Evidência (score 1): `e2e/cdu-17.spec.ts:4` -> `import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';`
-- 🟡 **[PARCIAL]** 21. O sistema registra uma movimentação para o subprocesso com os campos:
-  - Palavras-chave usadas: `subprocesso, registra, movimentação`
-  - Evidência (score 1): `e2e/cdu-17.spec.ts:4` -> `import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';`
-  - Evidência (score 1): `e2e/cdu-17.spec.ts:38` -> `await navegarParaSubprocesso(page, 'SECAO_211');`
-  - Evidência (score 1): `e2e/cdu-17.spec.ts:82` -> `await navegarParaSubprocesso(page, 'SECAO_211');`
-- ❌ **[NAO_COBERTO]** 22. `Data/hora`: Data/hora atual
-  - Palavras-chave usadas: `data/hora, atual`
-  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
-- 🟡 **[PARCIAL]** 23. `Unidade origem`: ADMIN
-  - Palavras-chave usadas: `unidade, origem, admin`
-  - Evidência (score 1): `e2e/cdu-17.spec.ts:8` -> `const UNIDADE_ALVO = 'SECAO_211';`
-  - Evidência (score 1): `e2e/cdu-17.spec.ts:22` -> `unidade: UNIDADE_ALVO`
-  - Evidência (score 1): `e2e/cdu-17.spec.ts:29` -> `test('Cenários CDU-17: Fluxo completo de disponibilização do mapa pelo ADMIN', async ({`
-- 🟡 **[PARCIAL]** 24. `Unidade destino`: [SIGLA_UNIDADE_SUBPROCESSO]
-  - Palavras-chave usadas: `unidade, sigla_unidade_subprocesso, destino`
-  - Evidência (score 1): `e2e/cdu-17.spec.ts:8` -> `const UNIDADE_ALVO = 'SECAO_211';`
-  - Evidência (score 1): `e2e/cdu-17.spec.ts:22` -> `unidade: UNIDADE_ALVO`
-- ✅ **[COBERTO]** 25. `Descrição`: 'Disponibilização do mapa de competências'
-  - Palavras-chave usadas: `competências, descrição, disponibilização, mapa`
-  - Evidência (score 2): `e2e/cdu-17.spec.ts:7` -> `test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {`
-  - Evidência (score 2): `e2e/cdu-17.spec.ts:29` -> `test('Cenários CDU-17: Fluxo completo de disponibilização do mapa pelo ADMIN', async ({`
-  - Evidência (score 2): `e2e/cdu-17.spec.ts:41` -> `await expect(page.getByText('Mapa de competências técnicas')).toBeVisible();`
-- 🟡 **[PARCIAL]** 26. O sistema notifica a unidade do subprocesso quanto à disponibilização, com e-mail no modelo abaixo:
-  - Palavras-chave usadas: `unidade, subprocesso, notifica, quanto, disponibilização, e-mail`
-  - Evidência (score 1): `e2e/cdu-17.spec.ts:4` -> `import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';`
-  - Evidência (score 1): `e2e/cdu-17.spec.ts:8` -> `const UNIDADE_ALVO = 'SECAO_211';`
-  - Evidência (score 1): `e2e/cdu-17.spec.ts:22` -> `unidade: UNIDADE_ALVO`
-- 🟡 **[PARCIAL]** 27. O sistema notifica as unidades superiores da unidade do subprocesso quanto à disponibilização, com e-mail no modelo
-  - Palavras-chave usadas: `unidades, unidade, subprocesso, notifica, superiores, quanto`
-  - Evidência (score 1): `e2e/cdu-17.spec.ts:4` -> `import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';`
-  - Evidência (score 1): `e2e/cdu-17.spec.ts:8` -> `const UNIDADE_ALVO = 'SECAO_211';`
-  - Evidência (score 1): `e2e/cdu-17.spec.ts:22` -> `unidade: UNIDADE_ALVO`
-- 🟡 **[PARCIAL]** 28. O sistema cria internamente um alerta:
-  - Palavras-chave usadas: `alerta, cria, internamente`
-  - Evidência (score 1): `e2e/cdu-17.spec.ts:2` -> `import {criarProcessoCadastroHomologadoFixture, validarProcessoFixture} from './fixtures/fixtures-processos.js';`
-  - Evidência (score 1): `e2e/cdu-17.spec.ts:3` -> `import {criarCompetencia, disponibilizarMapa, navegarParaMapa} from './helpers/helpers-mapas.js';`
-  - Evidência (score 1): `e2e/cdu-17.spec.ts:20` -> `const processo = await criarProcessoCadastroHomologadoFixture(request, {`
-- ✅ **[COBERTO]** 29. `Descrição`: "Mapa de competências da unidade [SIGLA_UNIDADE_SUBPROCESSO] disponibilizado para análise"
-  - Palavras-chave usadas: `competências, unidade, sigla_unidade_subprocesso, descrição, mapa, disponibilizado`
-  - Evidência (score 2): `e2e/cdu-17.spec.ts:7` -> `test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {`
-  - Evidência (score 2): `e2e/cdu-17.spec.ts:41` -> `await expect(page.getByText('Mapa de competências técnicas')).toBeVisible();`
-  - Evidência (score 2): `e2e/cdu-17.spec.ts:58` -> `await expect(page.getByText('Mapa de competências técnicas')).toBeVisible();`
-- 🟡 **[PARCIAL]** 30. `Processo`: [DESCRICAO_PROCESSO]
-  - Palavras-chave usadas: `processo, descricao_processo`
-  - Evidência (score 1): `e2e/cdu-17.spec.ts:2` -> `import {criarProcessoCadastroHomologadoFixture, validarProcessoFixture} from './fixtures/fixtures-processos.js';`
-  - Evidência (score 1): `e2e/cdu-17.spec.ts:4` -> `import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';`
-  - Evidência (score 1): `e2e/cdu-17.spec.ts:5` -> `import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';`
-- ❌ **[NAO_COBERTO]** 31. `Data/hora`: Data/hora atual
-  - Palavras-chave usadas: `data/hora, atual`
-  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
-- 🟡 **[PARCIAL]** 32. `Unidade de origem`: ADMIN
-  - Palavras-chave usadas: `unidade, origem, admin`
-  - Evidência (score 1): `e2e/cdu-17.spec.ts:8` -> `const UNIDADE_ALVO = 'SECAO_211';`
-  - Evidência (score 1): `e2e/cdu-17.spec.ts:22` -> `unidade: UNIDADE_ALVO`
-  - Evidência (score 1): `e2e/cdu-17.spec.ts:29` -> `test('Cenários CDU-17: Fluxo completo de disponibilização do mapa pelo ADMIN', async ({`
-- 🟡 **[PARCIAL]** 33. `Unidade de destino`: [SIGLA_UNIDADE_SUBPROCESSO].
-  - Palavras-chave usadas: `unidade, sigla_unidade_subprocesso, destino`
-  - Evidência (score 1): `e2e/cdu-17.spec.ts:8` -> `const UNIDADE_ALVO = 'SECAO_211';`
-  - Evidência (score 1): `e2e/cdu-17.spec.ts:22` -> `unidade: UNIDADE_ALVO`
-- 🟡 **[PARCIAL]** 34. O sistema exclui as sugestões apresentadas do mapa de competência do subprocesso da unidade.
-  - Palavras-chave usadas: `competência, subprocesso, unidade, exclui, sugestões, apresentadas`
-  - Evidência (score 1): `e2e/cdu-17.spec.ts:4` -> `import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';`
-  - Evidência (score 1): `e2e/cdu-17.spec.ts:7` -> `test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {`
-  - Evidência (score 1): `e2e/cdu-17.spec.ts:8` -> `const UNIDADE_ALVO = 'SECAO_211';`
-- 🟡 **[PARCIAL]** 35. O sistema redireciona para o Painel e mostra confirmação: "Disponibilização do mapa de competências efetuada".
-  - Palavras-chave usadas: `competências, redireciona, painel, mostra, confirmação, disponibilização`
-  - Evidência (score 1): `e2e/cdu-17.spec.ts:4` -> `import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';`
-  - Evidência (score 1): `e2e/cdu-17.spec.ts:7` -> `test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {`
-  - Evidência (score 1): `e2e/cdu-17.spec.ts:29` -> `test('Cenários CDU-17: Fluxo completo de disponibilização do mapa pelo ADMIN', async ({`
+  - Evidência: `e2e/cdu-17.spec.ts` - `acessarDetalhesProcesso` + `navegarParaSubprocesso`.
+- ✅ **[COBERTO]** 3. ADMIN clica em uma unidade operacional ou interoperacional com subprocesso na situação 'Mapa criado' ou 'Mapa ajustado'.
+  - Evidência: `e2e/cdu-17.spec.ts` - `navegarParaSubprocesso(page, 'SECAO_211')`.
+- ✅ **[COBERTO]** 4. O sistema mostra a tela `Detalhes de subprocesso`.
+  - Evidência: `e2e/cdu-17.spec.ts` - URL `/processo/\d+/SECAO_211$`.
+- ✅ **[COBERTO]** 5. ADMIN clica no card `Mapa de competências`.
+  - Evidência: `e2e/cdu-17.spec.ts` - `navegarParaMapa`.
+- ✅ **[COBERTO]** 6. O sistema mostra a tela `Edição de mapa`.
+  - Evidência: `e2e/cdu-17.spec.ts` - heading `Mapa de competências técnicas` visível.
+- ✅ **[COBERTO]** 7. ADMIN clica no botão `Disponibilizar`.
+  - Evidência: `e2e/cdu-17.spec.ts` - `btn-cad-mapa-disponibilizar` clicado.
+- ✅ **[COBERTO]** 8. O sistema verifica competências e atividades (positivo = habilita botão).
+  - Evidência: após criação de competências com atividades, botão habilitado.
+- 🟡 **[PARCIAL]** 9. O sistema verifica (negativo = botão desabilitado).
+  - Evidência: `btn-cad-mapa-disponibilizar` desabilitado antes de criar competências verificado em CT-00/CT-01 de CDU-15.
+- ✅ **[COBERTO]** 10. Modal com título "Disponibilização do mapa de competências".
+  - Evidência: `e2e/cdu-17.spec.ts:Cenario 2` - texto `'Disponibilização do mapa'` visível.
+- ✅ **[COBERTO]** 11. Campo `Data limite` de preenchimento obrigatório.
+  - Evidência: `e2e/cdu-17.spec.ts:Cenario 2` - `inp-disponibilizar-mapa-data` visível; `Cenario 4` valida data inválida → botão desabilitado.
+- ✅ **[COBERTO]** 12. Campo `Observações` de preenchimento opcional.
+  - Evidência: `e2e/cdu-17.spec.ts:Cenario 2` - `inp-disponibilizar-mapa-obs` visível; `Cenario 5` preenche com valor.
+- ✅ **[COBERTO]** 13. Botões `Disponibilizar` e `Cancelar`.
+  - Evidência: `e2e/cdu-17.spec.ts:Cenario 2` - `btn-disponibilizar-mapa-confirmar` e `btn-disponibilizar-mapa-cancelar` visíveis.
+- ✅ **[COBERTO]** 14. Caso `Cancelar`, sistema interrompe operação permanecendo na tela `Edição de mapa`.
+  - Evidência: `e2e/cdu-17.spec.ts:Cenario 3` - modal oculto + heading `Mapa de competências técnicas` visível.
+- ✅ **[COBERTO]** 15. ADMIN preenche campos e clica em `Disponibilizar`.
+  - Evidência: `e2e/cdu-17.spec.ts:Cenario 5` - preenche data `2030-12-31` e obs, clica `btn-disponibilizar-mapa-confirmar`.
+- ✅ **[COBERTO]** 16. Sistema registra observações e data limite.
+  - Evidência: disponibilização com obs preenchida em Cenario 5.
+- ✅ **[COBERTO]** 17. Sistema altera situação para 'Mapa disponibilizado'.
+  - Evidência: `e2e/cdu-17.spec.ts:Cenario 5` - `subprocesso-header__txt-situacao` → `/Mapa disponibilizado/i`.
+- ✅ **[COBERTO]** 18. Sistema registra movimentação com Data/hora, Unidade origem (ADMIN) e Unidade destino.
+  - Evidência: `e2e/cdu-17.spec.ts:Cenario 5` - `tbl-movimentacoes` linha `/Disponibilização do mapa/i` com `/\d{2}\/\d{2}\/\d{4}/`, `/ADMIN/i`, `/SECAO_211/i`.
+- ✅ **[COBERTO]** 19. Sistema cria alerta para a unidade do subprocesso (CHEFE_SECAO_211).
+  - Evidência: `e2e/cdu-17.spec.ts:Cenario 6` - `tbl-alertas` linha com `descProcesso`, `/SECAO_211/i`, `/\d{2}\/\d{2}\/\d{4}/`.
+- 🟡 **[PARCIAL]** 20. Sistema notifica a unidade do subprocesso por e-mail.
+  - Evidência: não testável via Playwright.
+- 🟡 **[PARCIAL]** 21. Sistema notifica unidades superiores por e-mail.
+  - Evidência: não testável via Playwright.
+- 🟡 **[PARCIAL]** Alerta para unidades superiores (além da própria unidade).
+  - Evidência: apenas o alerta para CHEFE_SECAO_211 foi verificado; alertas para COORD_21 e superiores não verificados.
 
 ## Ajustes recomendados para próximo ciclo
-- Completar cobertura do item: **ADMIN clica em uma unidade operacional ou interoperacional com subprocesso na situação 'Mapa criado' ou 'Mapa** (atualmente parcial).
-- Completar cobertura do item: **O sistema mostra a tela `Detalhes de subprocesso`.** (atualmente parcial).
-- Completar cobertura do item: **ADMIN clica no botão `Disponibilizar`.** (atualmente parcial).
+- Verificar alerta e notificação para as unidades superiores (COORD_21, SECRETARIA_2).
+- Verificar que a data limite é registrada corretamente no subprocesso.
 
 ## Prontidão para o próximo PR de melhoria E2E
 - Status de entrada: **PRONTO_COM_GAPS**.
-- Motivos: há itens sem cobertura E2E.
-- Checklist mínimo antes de codar:
-  - [ ] confirmar massa de dados/fixtures para cenário positivo e negativo;
-  - [ ] definir assert de regra de negócio + assert de efeito colateral;
-  - [ ] validar perfil/unidade necessários no cenário (quando aplicável);
-  - [ ] mapear se precisa teste de integração backend complementar.
-- Escopo sugerido para o próximo PR deste CDU:
-  - Completar cobertura do item: **ADMIN clica em uma unidade operacional ou interoperacional com subprocesso na situação 'Mapa criado' ou 'Mapa** (atualmente parcial).
-  - Completar cobertura do item: **O sistema mostra a tela `Detalhes de subprocesso`.** (atualmente parcial).
-  - Completar cobertura do item: **ADMIN clica no botão `Disponibilizar`.** (atualmente parcial).
+- Motivos: fluxos principais cobertos; gaps são e-mail e alertas de unidades superiores.
 
 ## Observações metodológicas
-- Esta rodada incluiu leitura de helpers importados para reduzir falso negativo de cobertura indireta.
-- Classificação automática por evidência textual; recomenda-se validação humana dos itens `🟡` e `❌` antes da implementação final.
+- Rodada 3: adicionado Cenario 2 com verificação explícita de campo Observações e botões no modal, Cenario 5 inline com preenchimento de obs, verificação de movimentação com data/hora e ADMIN/SECAO_211, e Cenario 6 para alerta CHEFE_SECAO_211.
