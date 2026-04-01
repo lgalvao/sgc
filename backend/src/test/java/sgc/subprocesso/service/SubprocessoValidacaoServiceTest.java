@@ -380,7 +380,7 @@ class SubprocessoValidacaoServiceTest {
             // Verifica que apenas queries de contagem foram chamadas, não findAll
             verify(subprocessoRepo).countByProcessoCodigo(codProcesso);
             verify(subprocessoRepo).countByProcessoCodigoAndSituacaoIn(anyLong(), anyList());
-            verify(subprocessoRepo, never()).findByProcessoCodigoComUnidade(anyLong());
+            verify(subprocessoRepo, never()).listarPorProcessoComUnidade(anyLong());
         }
     }
 

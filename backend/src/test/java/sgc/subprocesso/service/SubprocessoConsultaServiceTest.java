@@ -78,6 +78,6 @@ class SubprocessoConsultaServiceTest {
     @DisplayName("listarEntidadesPorProcessoEUnidades deve retornar vazio quando lista de unidades estiver vazia")
     void listarEntidadesPorProcessoEUnidadesDeveRetornarVazioQuandoListaDeUnidadesEstiverVazia() {
         assertThat(service.listarEntidadesPorProcessoEUnidades(1L, List.of())).isEmpty();
-        verify(subprocessoRepo, never()).findByProcessoCodigoAndUnidadeCodigoInWithUnidade(anyLong(), anyList());
+        verify(subprocessoRepo, never()).listarPorProcessoEUnidadesComUnidade(anyLong(), anyList());
     }
 }

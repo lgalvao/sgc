@@ -263,7 +263,7 @@ class ResponsavelUnidadeServiceTest {
         @Test
         @DisplayName("Deve retornar mapa vazio quando nenhuma responsabilidade encontrada")
         void deveRetornarVazioQuandoNaoEncontrado() {
-            when(responsabilidadeRepo.findByUnidadeCodigoIn(anyList())).thenReturn(List.of());
+            when(responsabilidadeRepo.listarPorCodigosUnidade(anyList())).thenReturn(List.of());
             var result = service.buscarResponsaveisUnidades(List.of(1L));
             assertThat(result).isEmpty();
         }
@@ -281,9 +281,9 @@ class ResponsavelUnidadeServiceTest {
             r.setUnidadeCodigo(codUnidade);
             r.setUsuarioTitulo("RESP");
 
-            when(responsabilidadeRepo.findByUnidadeCodigoIn(anyList())).thenReturn(List.of(r));
+            when(responsabilidadeRepo.listarPorCodigosUnidade(anyList())).thenReturn(List.of(r));
             // Simular que o usuário "RESP" ou "TITULAR" não foi carregado
-            when(usuarioRepo.findByTitulosComUnidadeLotacao(anyList())).thenReturn(List.of());
+            when(usuarioRepo.listarPorTitulosComUnidadeLotacao(anyList())).thenReturn(List.of());
 
             assertThatThrownBy(() -> service.buscarResponsaveisUnidades(List.of(codUnidade)))
                     .isInstanceOf(IllegalStateException.class)
@@ -306,8 +306,8 @@ class ResponsavelUnidadeServiceTest {
             Usuario responsavel = new Usuario();
             responsavel.setTituloEleitoral("RESP");
 
-            when(responsabilidadeRepo.findByUnidadeCodigoIn(anyList())).thenReturn(List.of(r));
-            when(usuarioRepo.findByTitulosComUnidadeLotacao(anyList())).thenReturn(List.of(responsavel));
+            when(responsabilidadeRepo.listarPorCodigosUnidade(anyList())).thenReturn(List.of(r));
+            when(usuarioRepo.listarPorTitulosComUnidadeLotacao(anyList())).thenReturn(List.of(responsavel));
 
             assertThatThrownBy(() -> service.buscarResponsaveisUnidades(List.of(codUnidade)))
                     .isInstanceOf(IllegalStateException.class)
@@ -330,8 +330,8 @@ class ResponsavelUnidadeServiceTest {
             Usuario uTit = new Usuario(); uTit.setTituloEleitoral("TIT"); uTit.setNome("Titular");
             Usuario uRes = new Usuario(); uRes.setTituloEleitoral("RES"); uRes.setNome("Responsavel");
 
-            when(responsabilidadeRepo.findByUnidadeCodigoIn(anyList())).thenReturn(List.of(r));
-            when(usuarioRepo.findByTitulosComUnidadeLotacao(anyList())).thenReturn(List.of(uTit, uRes));
+            when(responsabilidadeRepo.listarPorCodigosUnidade(anyList())).thenReturn(List.of(r));
+            when(usuarioRepo.listarPorTitulosComUnidadeLotacao(anyList())).thenReturn(List.of(uTit, uRes));
 
             var result = service.buscarResponsaveisUnidades(List.of(codUnidade));
 

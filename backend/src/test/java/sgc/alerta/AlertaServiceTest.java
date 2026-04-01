@@ -83,12 +83,12 @@ class AlertaServiceTest {
     void deveBuscarAlertasUsuarios() {
         List<Long> codigosAlertas = List.of(10L, 20L);
         List<AlertaUsuario> alertasUsuarios = List.of(new AlertaUsuario());
-        when(alertaUsuarioRepo.findByUsuarioAndAlertas("123", codigosAlertas)).thenReturn(alertasUsuarios);
+        when(alertaUsuarioRepo.listarPorUsuarioEAlertas("123", codigosAlertas)).thenReturn(alertasUsuarios);
 
         List<AlertaUsuario> resultado = alertaService.alertasUsuarios("123", codigosAlertas);
 
         assertThat(resultado).hasSize(1);
-        verify(alertaUsuarioRepo).findByUsuarioAndAlertas("123", codigosAlertas);
+        verify(alertaUsuarioRepo).listarPorUsuarioEAlertas("123", codigosAlertas);
     }
 
     @Test

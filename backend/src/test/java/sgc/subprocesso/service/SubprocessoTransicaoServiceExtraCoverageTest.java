@@ -280,7 +280,7 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         mov.setUnidadeOrigem(uOrigem);
 
         when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
-        when(movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(1L)).thenReturn(List.of(mov));
+        when(movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(1L)).thenReturn(List.of(mov));
         when(hierarquiaService.isSubordinada(uOrigem, uAnalise)).thenReturn(true); // branch 489
 
         service.devolverCadastro(1L, new Usuario(), "Obs");
@@ -294,6 +294,7 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
     void executarHomologacao_ComImpactos() {
         Subprocesso sp = new Subprocesso(); sp.setCodigo(1L); sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
         Processo p = new Processo(); p.setTipo(TipoProcesso.REVISAO); sp.setProcesso(p);
+        Unidade unidade = new Unidade(); unidade.setCodigo(10L); unidade.setSigla("U10"); sp.setUnidade(unidade);
 
         when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
         when(impactoMapaService.verificarImpactos(any(), any())).thenReturn(ImpactoMapaResponse.builder()
@@ -314,6 +315,7 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
     void executarHomologacao_SemImpactos() {
         Subprocesso sp = new Subprocesso(); sp.setCodigo(1L); sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
         Processo p = new Processo(); p.setTipo(TipoProcesso.REVISAO); sp.setProcesso(p);
+        Unidade unidade = new Unidade(); unidade.setCodigo(10L); unidade.setSigla("U10"); sp.setUnidade(unidade);
 
         when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
         when(impactoMapaService.verificarImpactos(any(), any())).thenReturn(ImpactoMapaResponse.builder()

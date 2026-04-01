@@ -86,7 +86,7 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             Movimentacao mov = new Movimentacao();
             mov.setUnidadeDestino(u2);
 
-            when(movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(100L)).thenReturn(List.of(mov));
+            when(movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(100L)).thenReturn(List.of(mov));
 
             assertThat(consultaService.obterUnidadeLocalizacao(sp)).isEqualTo(u2);
         }
@@ -101,7 +101,7 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             Movimentacao mov = new Movimentacao();
             mov.setUnidadeDestino(null);
 
-            when(movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(100L)).thenReturn(List.of(mov));
+            when(movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(100L)).thenReturn(List.of(mov));
 
             assertThat(consultaService.obterUnidadeLocalizacao(sp)).isEqualTo(u1);
         }
@@ -121,7 +121,7 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             Unidade u = new Unidade();
             Subprocesso sp = criarSubprocessoComMapa(1L);
             sp.setUnidade(u);
-            when(movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(1L)).thenReturn(List.of());
+            when(movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(1L)).thenReturn(List.of());
             assertThat(consultaService.obterUnidadeLocalizacao(sp)).isEqualTo(u);
         }
     }
@@ -151,7 +151,7 @@ class SubprocessoConsultaServiceExtraCoverageTest {
 
             when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(1L)).thenReturn(Optional.of(sp));
             when(usuarioFacade.buscarPorLogin("titular")).thenReturn(user);
-            when(movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(1L)).thenReturn(List.of());
+            when(movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(1L)).thenReturn(List.of());
             when(unidadeService.buscarPorCodigo(10L)).thenReturn(u);
 
             SubprocessoDetalheResponse res = consultaService.obterDetalhes(1L, user);
@@ -186,7 +186,7 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             mov.setUsuario(user);
 
             when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(1L)).thenReturn(Optional.of(sp));
-            when(movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(1L)).thenReturn(List.of(mov));
+            when(movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(1L)).thenReturn(List.of(mov));
             when(unidadeService.buscarPorCodigo(10L)).thenReturn(u);
             when(usuarioFacade.buscarPorLogin("titular")).thenReturn(user);
 
@@ -216,7 +216,7 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             mov.setUsuario(user);
 
             when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(1L)).thenReturn(Optional.of(sp));
-            when(movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(1L)).thenReturn(List.of(mov));
+            when(movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(1L)).thenReturn(List.of(mov));
             when(unidadeService.buscarPorCodigo(10L)).thenReturn(u);
             when(usuarioFacade.buscarPorLogin("titular")).thenReturn(user);
 
@@ -238,7 +238,7 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             user.setUnidadeAtivaCodigo(20L); // Diferente
 
             when(unidadeService.buscarPorCodigo(20L)).thenReturn(new Unidade());
-            when(unidadeService.verificarMapaVigente(10L)).thenReturn(true);
+            when(unidadeService.temMapaVigente(10L)).thenReturn(true);
             when(hierarquiaService.ehMesmaOuSubordinada(any(), any())).thenReturn(true);
 
             PermissoesSubprocessoDto res = consultaService.obterPermissoesUI(sp, user);
@@ -259,7 +259,7 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             user.setUnidadeAtivaCodigo(10L);
 
             when(unidadeService.buscarPorCodigo(10L)).thenReturn(u);
-            when(unidadeService.verificarMapaVigente(10L)).thenReturn(false);
+            when(unidadeService.temMapaVigente(10L)).thenReturn(false);
 
             PermissoesSubprocessoDto res = consultaService.obterPermissoesUI(sp, user);
             assertThat(res.habilitarAcessoMapa()).isTrue();
@@ -285,7 +285,7 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             user.setUnidadeAtivaCodigo(20L);
 
             when(unidadeService.buscarPorCodigo(20L)).thenReturn(new Unidade());
-            when(unidadeService.verificarMapaVigente(10L)).thenReturn(true);
+            when(unidadeService.temMapaVigente(10L)).thenReturn(true);
 
             PermissoesSubprocessoDto res = consultaService.obterPermissoesUI(sp, user);
             assertThat(res.habilitarAcessoMapa()).isTrue();
@@ -305,7 +305,7 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             user.setUnidadeAtivaCodigo(10L);
 
             when(unidadeService.buscarPorCodigo(10L)).thenReturn(new Unidade());
-            when(unidadeService.verificarMapaVigente(10L)).thenReturn(true);
+            when(unidadeService.temMapaVigente(10L)).thenReturn(true);
 
             PermissoesSubprocessoDto res = consultaService.obterPermissoesUI(sp, user);
             assertThat(res.habilitarAcessoCadastro()).isFalse();
@@ -328,7 +328,7 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             user.setUnidadeAtivaCodigo(10L);
 
             when(unidadeService.buscarPorCodigo(10L)).thenReturn(new Unidade());
-            when(unidadeService.verificarMapaVigente(10L)).thenReturn(true);
+            when(unidadeService.temMapaVigente(10L)).thenReturn(true);
 
             PermissoesSubprocessoDto res = consultaService.obterPermissoesUI(sp, user);
             assertThat(res.habilitarAcessoCadastro()).isTrue();
@@ -350,7 +350,7 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             user.setUnidadeAtivaCodigo(20L); // Unidade diferente
 
             when(unidadeService.buscarPorCodigo(20L)).thenReturn(new Unidade());
-            when(unidadeService.verificarMapaVigente(10L)).thenReturn(true);
+            when(unidadeService.temMapaVigente(10L)).thenReturn(true);
             when(hierarquiaService.ehMesmaOuSubordinada(any(), any())).thenReturn(false);
 
             PermissoesSubprocessoDto res = consultaService.obterPermissoesUI(sp, user);
@@ -372,7 +372,7 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             user.setUnidadeAtivaCodigo(10L);
 
             when(unidadeService.buscarPorCodigo(10L)).thenReturn(u);
-            when(unidadeService.verificarMapaVigente(10L)).thenReturn(true);
+            when(unidadeService.temMapaVigente(10L)).thenReturn(true);
 
             PermissoesSubprocessoDto res = consultaService.obterPermissoesUI(sp, user);
             assertThat(res.podeValidarMapa()).isFalse();
@@ -512,7 +512,7 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             Subprocesso sp2 = criarSubprocessoComMapa(null);
             sp2.setSituacaoForcada(MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
 
-            when(subprocessoRepo.findByProcessoCodigoAndUnidadeCodigoInWithUnidade(1L, List.of(10L, 11L)))
+            when(subprocessoRepo.listarPorProcessoEUnidadesComUnidade(1L, List.of(10L, 11L)))
                     .thenReturn(List.of(sp1, sp2));
 
             List<Subprocesso> res = consultaService.listarPorProcessoEUnidadeCodigosESituacoes(1L, List.of(10L, 11L), List.of(MAPEAMENTO_CADASTRO_EM_ANDAMENTO));
@@ -617,7 +617,7 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             sp.setCodigo(1L);
             Unidade dest = new Unidade();
             Movimentacao m = new Movimentacao(); m.setUnidadeDestino(dest);
-            when(movimentacaoRepo.findFirstBySubprocessoCodigoOrderByDataHoraDesc(1L)).thenReturn(Optional.of(m));
+            when(movimentacaoRepo.buscarUltimaPorSubprocesso(1L)).thenReturn(Optional.of(m));
             assertThat(consultaService.obterLocalizacaoAtual(sp)).isEqualTo(dest);
             
             // Branch: m.getUnidadeDestino() == null
@@ -627,7 +627,7 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             
             // Branch: findFirstBy... returns Optional.empty()
             sp.setLocalizacaoAtual(null);
-            when(movimentacaoRepo.findFirstBySubprocessoCodigoOrderByDataHoraDesc(1L)).thenReturn(Optional.empty());
+            when(movimentacaoRepo.buscarUltimaPorSubprocesso(1L)).thenReturn(Optional.empty());
             assertThat(consultaService.obterLocalizacaoAtual(sp)).isEqualTo(u);
         }
     }

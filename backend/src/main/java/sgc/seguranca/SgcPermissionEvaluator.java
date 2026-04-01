@@ -189,7 +189,7 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
         if (sp.getLocalizacaoAtual() != null) return sp.getLocalizacaoAtual();
         if (sp.getCodigo() == null) return sp.getUnidade();
 
-        Unidade localizacao = movimentacaoRepo.findFirstBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo())
+        Unidade localizacao = movimentacaoRepo.buscarUltimaPorSubprocesso(sp.getCodigo())
                 .map(Movimentacao::getUnidadeDestino)
                 .orElse(sp.getUnidade());
 

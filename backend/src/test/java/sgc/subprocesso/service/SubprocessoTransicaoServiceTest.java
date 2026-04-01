@@ -202,7 +202,7 @@ class SubprocessoTransicaoServiceTest {
             m2.setUnidadeOrigem(uOrigem);
 
             when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
-            when(movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(1L)).thenReturn(List.of(m1, m2));
+            when(movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(1L)).thenReturn(List.of(m1, m2));
             when(hierarquiaService.isSubordinada(uOrigem, uAnalise)).thenReturn(true);
 
             service.devolverValidacao(1L, "Justif", criarUsuario());
@@ -262,7 +262,7 @@ class SubprocessoTransicaoServiceTest {
             sp.setLocalizacaoAtual(u);
 
             when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
-            when(movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(1L)).thenReturn(List.of());
+            when(movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(1L)).thenReturn(List.of());
 
             service.devolverCadastro(1L, criarUsuario(), "Obs");
 

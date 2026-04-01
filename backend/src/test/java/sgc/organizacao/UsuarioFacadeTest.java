@@ -71,7 +71,7 @@ class UsuarioFacadeTest {
             Usuario usuario = criarUsuario(titulo);
 
             configurarAutenticacao(titulo);
-            when(usuarioService.buscarComAtribuicoes(titulo)).thenReturn(usuario);
+            when(usuarioService.buscar(titulo)).thenReturn(usuario);
 
             Usuario resultado = facade.usuarioAutenticado();
 
@@ -130,7 +130,7 @@ class UsuarioFacadeTest {
             String titulo = "123456";
             Usuario usuario = criarUsuario(titulo);
 
-            when(usuarioService.buscarComAtribuicoesOpt(titulo))
+            when(usuarioService.buscarOpt(titulo))
                     .thenReturn(Optional.of(usuario));
 
             Usuario resultado = facade.carregarUsuarioParaAutenticacao(titulo);
@@ -143,7 +143,7 @@ class UsuarioFacadeTest {
         @Test
         @DisplayName("Deve retornar null se usuário não encontrado")
         void deveRetornarNullSeNaoEncontrado() {
-            when(usuarioService.buscarComAtribuicoesOpt(any())).thenReturn(Optional.empty());
+            when(usuarioService.buscarOpt(any())).thenReturn(Optional.empty());
             assertThat(facade.carregarUsuarioParaAutenticacao("1")).isNull();
         }
     }
@@ -175,7 +175,7 @@ class UsuarioFacadeTest {
         void deveBuscarPerfisFiltrandoInativos() {
             String titulo = "123";
             Usuario user = criarUsuario(titulo);
-            when(usuarioService.buscarComAtribuicoesOpt(titulo)).thenReturn(Optional.of(user));
+            when(usuarioService.buscarOpt(titulo)).thenReturn(Optional.of(user));
             
             Unidade uAtiva = criarUnidade(1L, "U1");
             Unidade uInativa = criarUnidade(2L, "U2");

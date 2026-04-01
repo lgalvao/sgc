@@ -46,7 +46,7 @@ public class ProcessoService {
     private final ProcessoRepo processoRepo;
     private final ComumRepo repo;
     private final UnidadeService unidadeService;
-    private final ResponsabilidadeRepo responsabilidadeRepo;
+    private final ResponsavelUnidadeService responsavelUnidadeService;
     private final SubprocessoService subprocessoService;
     private final SubprocessoConsultaService consultaService;
     private final SubprocessoValidacaoService validacaoService;
@@ -205,14 +205,14 @@ public class ProcessoService {
                 throw new ErroValidacao(Mensagens.LISTA_UNIDADES_OBRIGATORIA_REVISAO);
             }
             codigosUnidades = codsUnidadesParam;
-            unidadesParaProcessar = new HashSet<>(unidadeService.porCodigos(codigosUnidades));
+            unidadesParaProcessar = new HashSet<>(unidadeService.buscarPorCodigos(codigosUnidades));
             processo.sincronizarParticipantes(carregarArvoreUnidades(unidadesParaProcessar));
         } else {
             codigosUnidades = processo.getCodigosParticipantes();
             if (codigosUnidades.isEmpty()) {
                 throw new ErroValidacao(Mensagens.SEM_UNIDADES_PARTICIPANTES);
             }
-            unidadesParaProcessar = new HashSet<>(unidadeService.porCodigos(codigosUnidades));
+            unidadesParaProcessar = new HashSet<>(unidadeService.buscarPorCodigos(codigosUnidades));
         }
 
         List<String> erros = validarUnidadesInicio(tipo, codigosUnidades);
@@ -341,7 +341,7 @@ public class ProcessoService {
     }
 
     private List<Long> buscarDescendentes(Long codRaiz) {
-        List<Unidade> todas = unidadeService.todasComHierarquia();
+        List<Unidade> todas = unidadeService.buscarTodasComHierarquia();
         Map<Long, List<Unidade>> porPai = todas.stream()
                 .filter(u -> u.getUnidadeSuperior() != null)
                 .collect(Collectors.groupingBy(u -> u.getUnidadeSuperior().getCodigo()));
@@ -376,7 +376,7 @@ public class ProcessoService {
 
         if (tipo == REVISAO || tipo == DIAGNOSTICO) {
             List<String> semMapa = codigosUnidades.stream()
-                    .filter(codigo -> !unidadeService.verificarMapaVigente(codigo))
+                    .filter(codigo -> !unidadeService.temMapaVigente(codigo))
                     .map(codigo -> unidadeService.buscarPorCodigo(codigo).getSigla()).toList();
             if (!semMapa.isEmpty()) throw new ErroValidacao(Mensagens.UNIDADES_SEM_MAPA_VIGENTE.formatted(String.join(", ", semMapa)));
         }
@@ -384,12 +384,12 @@ public class ProcessoService {
 
     private List<String> validarUnidadesInicio(TipoProcesso tipo, List<Long> cods) {
         List<String> erros = new ArrayList<>();
-        List<Unidade> unidades = unidadeService.porCodigos(cods);
+        List<Unidade> unidades = unidadeService.buscarPorCodigos(cods);
         if (possuiUnidadeSemResponsavelEfetivo(unidades)) {
             erros.add(Mensagens.OPERACAO_NAO_PERMITIDA);
         }
         if (tipo == REVISAO || tipo == DIAGNOSTICO) {
-            unidadeService.buscarSiglasPorCodigos(cods.stream().filter(codigo -> !unidadeService.verificarMapaVigente(codigo)).toList())
+            unidadeService.buscarSiglasPorCodigos(cods.stream().filter(codigo -> !unidadeService.temMapaVigente(codigo)).toList())
                     .stream().findFirst().ifPresent(s -> erros.add(Mensagens.UNIDADES_SEM_MAPA));
         }
         List<Long> bloqueadas = processoRepo.listarUnidadesEmProcessoAtivo(EM_ANDAMENTO, cods);
@@ -399,11 +399,7 @@ public class ProcessoService {
 
     private boolean possuiUnidadeSemResponsavelEfetivo(List<Unidade> unidades) {
         List<Long> codigos = unidades.stream().map(Unidade::getCodigo).toList();
-        Set<Long> unidadesComResponsavelEfetivo = responsabilidadeRepo.findByUnidadeCodigoIn(codigos).stream()
-                .filter(responsabilidade -> responsabilidade.getUsuarioTitulo() != null && !responsabilidade.getUsuarioTitulo().isBlank())
-                .map(Responsabilidade::getUnidadeCodigo)
-                .collect(Collectors.toSet());
-        return unidades.stream().anyMatch(unidade -> !unidadesComResponsavelEfetivo.contains(unidade.getCodigo()));
+        return !responsavelUnidadeService.todasPossuemResponsavelEfetivo(codigos);
     }
 
     private void validarFinalizacao(Long codProcesso, Processo processo) {
@@ -567,7 +563,7 @@ public class ProcessoService {
     private void notificarFinalizacaoProcesso(Processo p) {
         log.info("Notificando finalização do processo {}", p.getCodigo());
         List<Long> unidadesCods = p.getParticipantes().stream().map(UnidadeProcesso::getUnidadeCodigoPersistido).toList();
-        List<Unidade> participantes = unidadeService.porCodigos(unidadesCods);
+        List<Unidade> participantes = unidadeService.buscarPorCodigos(unidadesCods);
         for (Unidade u : participantes) {
             servicoAlertas.criarAlertaAdmin(p, u, "Processo finalizado: " + p.getDescricao());
         }
@@ -618,4 +614,3 @@ public class ProcessoService {
         }
     }
 }
-

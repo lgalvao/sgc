@@ -142,7 +142,7 @@ class CDU23IntegrationTest extends BaseIntegrationTest {
         Subprocesso s1 = subprocessoRepo.findById(subprocesso1.getCodigo()).orElseThrow();
         assertThat(s1.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
 
-        List<Movimentacao> movs1 = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(s1.getCodigo());
+        List<Movimentacao> movs1 = movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(s1.getCodigo());
         assertThat(movs1).isNotEmpty();
         assertThat(movs1.getFirst().getDescricao()).contains("homologado");
 
@@ -150,7 +150,7 @@ class CDU23IntegrationTest extends BaseIntegrationTest {
         Subprocesso s2 = subprocessoRepo.findById(subprocesso2.getCodigo()).orElseThrow();
         assertThat(s2.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
 
-        List<Movimentacao> movs2 = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(s2.getCodigo());
+        List<Movimentacao> movs2 = movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(s2.getCodigo());
         assertThat(movs2).isNotEmpty();
         assertThat(movs2.getFirst().getDescricao()).contains("homologado");
     }

@@ -353,7 +353,7 @@ public class SubprocessoTransicaoService {
                 REVISAO_MAPA_VALIDADO);
 
         Unidade unidadeAnalise = consultaService.obterUnidadeLocalizacao(sp);
-        List<Movimentacao> movs = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo());
+        List<Movimentacao> movs = movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(sp.getCodigo());
 
         Unidade unidadeDevolucao = movs.stream()
                 .filter(m -> m.getUnidadeDestino() != null)
@@ -477,7 +477,7 @@ public class SubprocessoTransicaoService {
         validacaoService.validarSituacaoPermitida(sp, contexto.situacaoDisponibilizada());
 
         Unidade unidadeAnalise = consultaService.obterUnidadeLocalizacao(sp);
-        List<Movimentacao> movs = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo());
+        List<Movimentacao> movs = movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(sp.getCodigo());
 
         Unidade unidadeDevolucao = movs.stream()
                 .filter(m -> m.getUnidadeDestino() != null)

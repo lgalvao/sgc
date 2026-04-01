@@ -89,7 +89,7 @@ class CDU19IntegrationTest extends BaseIntegrationTest {
             assertThat(subprocessoAtualizado.getMapa().getSugestoes()).isEqualTo(sugestoes);
 
             List<Movimentacao> movimentacoes =
-                    movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(
+                    movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(
                             subprocesso.getCodigo());
             assertThat(movimentacoes).hasSize(1);
             assertThat(movimentacoes.getFirst().getDescricao())
@@ -126,7 +126,7 @@ class CDU19IntegrationTest extends BaseIntegrationTest {
                     .isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
 
             List<Movimentacao> movimentacoes =
-                    movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(
+                    movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(
                             subprocesso.getCodigo());
             assertThat(movimentacoes).hasSize(1);
             assertThat(movimentacoes.getFirst().getDescricao())

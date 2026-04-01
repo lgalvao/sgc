@@ -22,7 +22,7 @@ class UsuarioRepoTest {
     @Test
     @DisplayName("deve buscar usuario por titulo com unidade de lotacao carregada")
     void deveBuscarUsuarioPorTituloComUnidadeDeLotacaoCarregada() {
-        Usuario usuario = usuarioRepo.findByTituloComUnidadeLotacao("1").orElseThrow();
+        Usuario usuario = usuarioRepo.buscarPorTituloComUnidadeLotacao("1").orElseThrow();
 
         assertThat(usuario.getNome()).isEqualTo("Ana Paula Souza");
         assertThat(Hibernate.isInitialized(usuario.getUnidadeLotacao())).isTrue();
@@ -32,7 +32,7 @@ class UsuarioRepoTest {
     @Test
     @DisplayName("deve buscar usuarios por titulos com unidade de lotacao")
     void deveBuscarUsuariosPorTitulosComUnidadeDeLotacao() {
-        List<Usuario> usuarios = usuarioRepo.findByTitulosComUnidadeLotacao(List.of("1", "4", "17"));
+        List<Usuario> usuarios = usuarioRepo.listarPorTitulosComUnidadeLotacao(List.of("1", "4", "17"));
 
         assertThat(usuarios)
                 .extracting(Usuario::getTituloEleitoral)

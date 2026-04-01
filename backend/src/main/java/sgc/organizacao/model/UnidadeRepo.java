@@ -22,7 +22,7 @@ public interface UnidadeRepo extends JpaRepository<Unidade, Long> {
             WHERE u.codigo IN :codigos
             AND u.situacao = SituacaoUnidade.ATIVA
             """)
-    List<String> findSiglasByCodigos(@Param("codigos") List<Long> codigos);
+    List<String> buscarSiglasPorCodigos(@Param("codigos") List<Long> codigos);
 
     @Query("""
             SELECT u FROM Unidade u
@@ -31,14 +31,14 @@ public interface UnidadeRepo extends JpaRepository<Unidade, Long> {
             LEFT JOIN FETCH u.responsabilidade.usuario
             WHERE u.situacao = SituacaoUnidade.ATIVA
             """)
-    List<Unidade> findAllWithHierarquia();
+    List<Unidade> listarTodasComHierarquia();
 
     @Query("""
             SELECT u FROM Unidade u
             LEFT JOIN FETCH u.unidadeSuperior
             WHERE u.situacao = SituacaoUnidade.ATIVA
             """)
-    List<Unidade> findAllAtivasComSuperior();
+    List<Unidade> listarAtivasComSuperior();
 
     @Query("""
             SELECT u FROM Unidade u
@@ -48,7 +48,7 @@ public interface UnidadeRepo extends JpaRepository<Unidade, Long> {
             WHERE u.codigo = :codigo
             AND u.situacao = SituacaoUnidade.ATIVA
             """)
-    Optional<Unidade> findByCodigoComResponsavel(@Param("codigo") Long codigo);
+    Optional<Unidade> buscarPorCodigoComResponsavel(@Param("codigo") Long codigo);
 
     @Query("""
             SELECT u FROM Unidade u
@@ -58,7 +58,7 @@ public interface UnidadeRepo extends JpaRepository<Unidade, Long> {
             WHERE UPPER(u.sigla) = UPPER(:sigla)
             AND u.situacao = SituacaoUnidade.ATIVA
             """)
-    Optional<Unidade> findBySiglaComResponsavel(@Param("sigla") String sigla);
+    Optional<Unidade> buscarPorSiglaComResponsavel(@Param("sigla") String sigla);
 
     List<Unidade> findByUnidadeSuperiorCodigoAndSituacao(Long unidadeSuperiorCodigo, SituacaoUnidade situacao);
 

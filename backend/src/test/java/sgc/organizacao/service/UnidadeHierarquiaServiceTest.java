@@ -61,7 +61,7 @@ class UnidadeHierarquiaServiceTest {
     @Test
     @DisplayName("Deve buscar árvore hierárquica completa")
     void deveBuscarArvoreHierarquica() {
-        when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(unidadeRaiz, unidadeIntermediaria, unidadeOperacional));
+        when(unidadeRepo.listarTodasComHierarquia()).thenReturn(List.of(unidadeRaiz, unidadeIntermediaria, unidadeOperacional));
 
         List<UnidadeDto> resultado = service.buscarArvoreHierarquica();
 
@@ -74,7 +74,7 @@ class UnidadeHierarquiaServiceTest {
     @Test
     @DisplayName("Deve buscar árvore com elegibilidade")
     void deveBuscarComElegibilidade() {
-        when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(unidadeRaiz, unidadeIntermediaria, unidadeOperacional));
+        when(unidadeRepo.listarTodasComHierarquia()).thenReturn(List.of(unidadeRaiz, unidadeIntermediaria, unidadeOperacional));
 
         Predicate<Unidade> soOperacional = u -> u.getCodigo().equals(3L);
         List<UnidadeDto> resultado = service.buscarArvoreComElegibilidade(soOperacional);
@@ -90,7 +90,7 @@ class UnidadeHierarquiaServiceTest {
     @Test
     @DisplayName("Deve buscar IDs descendentes")
     void deveBuscarIdsDescendentes() {
-        when(unidadeRepo.findAllAtivasComSuperior()).thenReturn(List.of(unidadeRaiz, unidadeIntermediaria, unidadeOperacional));
+        when(unidadeRepo.listarAtivasComSuperior()).thenReturn(List.of(unidadeRaiz, unidadeIntermediaria, unidadeOperacional));
 
         List<Long> descendentes = service.buscarIdsDescendentes(1L);
 
@@ -100,7 +100,7 @@ class UnidadeHierarquiaServiceTest {
     @Test
     @DisplayName("Deve buscar árvore por código (nível profundo)")
     void deveBuscarArvorePorCodigo() {
-        when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(unidadeRaiz, unidadeIntermediaria, unidadeOperacional));
+        when(unidadeRepo.listarTodasComHierarquia()).thenReturn(List.of(unidadeRaiz, unidadeIntermediaria, unidadeOperacional));
 
         UnidadeDto resultado = service.buscarArvore(3L);
 
@@ -110,7 +110,7 @@ class UnidadeHierarquiaServiceTest {
     @Test
     @DisplayName("Deve buscar siglas subordinadas (a partir da raiz)")
     void deveBuscarSiglasSubordinadas() {
-        when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(unidadeRaiz, unidadeIntermediaria, unidadeOperacional));
+        when(unidadeRepo.listarTodasComHierarquia()).thenReturn(List.of(unidadeRaiz, unidadeIntermediaria, unidadeOperacional));
 
         List<String> siglas = service.buscarSiglasSubordinadas(unidadeRaiz.getSigla());
 
@@ -124,7 +124,7 @@ class UnidadeHierarquiaServiceTest {
     @Test
     @DisplayName("buscarArvore deve buscar no repo se não encontrar na hierarquia")
     void buscarArvore_DeveBuscarNoRepoSeNaoEncontrarNaHierarquia() {
-        when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(unidadeRaiz));
+        when(unidadeRepo.listarTodasComHierarquia()).thenReturn(List.of(unidadeRaiz));
         Unidade extra = Unidade.builder()
                 .codigo(99L)
                 .sigla("EXTRA")
@@ -140,7 +140,7 @@ class UnidadeHierarquiaServiceTest {
     @Test
     @DisplayName("buscarSiglasSubordinadas deve retornar vazio se não encontrar sigla")
     void buscarSiglasSubordinadas_DeveRetornarVazioSeNaoEncontrar() {
-        when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(unidadeRaiz));
+        when(unidadeRepo.listarTodasComHierarquia()).thenReturn(List.of(unidadeRaiz));
         Unidade extra = Unidade.builder()
                 .codigo(999L)
                 .sigla("INEXISTENTE")
@@ -206,7 +206,7 @@ class UnidadeHierarquiaServiceTest {
             unidadeIntermediaria.setTipo(TipoUnidade.INTERMEDIARIA); // Deve ser filtrada
             unidadeOperacional.setTipo(TipoUnidade.OPERACIONAL);
 
-            when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(unidadeRaiz, unidadeIntermediaria, unidadeOperacional));
+            when(unidadeRepo.listarTodasComHierarquia()).thenReturn(List.of(unidadeRaiz, unidadeIntermediaria, unidadeOperacional));
             // Mockar que apenas a raiz tem mapa
             when(unidadeService.buscarTodosCodigosUnidadesComMapa()).thenReturn(List.of(unidadeRaiz.getCodigo()));
             
@@ -225,7 +225,7 @@ class UnidadeHierarquiaServiceTest {
         @DisplayName("Deve marcar como inelegível unidade sem responsável efetivo")
         void deveMarcarInelegivelSemResponsavelEfetivo() {
             unidadeOperacional.setResponsabilidade(null);
-            when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(unidadeRaiz, unidadeIntermediaria, unidadeOperacional));
+            when(unidadeRepo.listarTodasComHierarquia()).thenReturn(List.of(unidadeRaiz, unidadeIntermediaria, unidadeOperacional));
 
             List<UnidadeDto> resultado = service.buscarArvoreComElegibilidade(false, Set.of());
 

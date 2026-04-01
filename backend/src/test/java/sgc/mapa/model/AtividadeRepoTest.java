@@ -52,7 +52,7 @@ class AtividadeRepoTest {
     @Test
     @DisplayName("deve buscar atividades de um mapa sem carregar relacionamentos")
     void deveBuscarAtividadesDeUmMapaSemCarregarRelacionamentos() {
-        List<Atividade> atividades = atividadeRepo.findByMapaCodigoSemFetch(1004L);
+        List<Atividade> atividades = atividadeRepo.listarPorMapaSemRelacionamentos(1004L);
 
         assertThat(atividades).hasSize(1);
         Atividade atividade = atividades.getFirst();
@@ -64,7 +64,7 @@ class AtividadeRepoTest {
     @Test
     @DisplayName("deve buscar atividades com conhecimentos carregados por mapa")
     void deveBuscarAtividadesComConhecimentosCarregadosPorMapa() {
-        List<Atividade> atividades = atividadeRepo.findWithConhecimentosByMapa_Codigo(1004L);
+        List<Atividade> atividades = atividadeRepo.listarPorMapaComConhecimentos(1004L);
 
         assertThat(atividades).hasSize(1);
         Atividade atividade = atividades.getFirst();
@@ -78,7 +78,7 @@ class AtividadeRepoTest {
     @Test
     @DisplayName("deve buscar atividades por subprocesso")
     void deveBuscarAtividadesPorSubprocesso() {
-        List<Atividade> atividades = atividadeRepo.findBySubprocessoCodigo(60004L);
+        List<Atividade> atividades = atividadeRepo.listarPorCodigoSubprocesso(60004L);
 
         assertThat(atividades)
                 .extracting(Atividade::getCodigo)

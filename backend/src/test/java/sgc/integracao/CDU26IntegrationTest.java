@@ -139,7 +139,7 @@ class CDU26IntegrationTest extends BaseIntegrationTest {
         Subprocesso s1 = subprocessoRepo.findById(subprocesso1.getCodigo()).orElseThrow();
         assertThat(s1.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
 
-        List<Movimentacao> movs1 = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(s1.getCodigo());
+        List<Movimentacao> movs1 = movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(s1.getCodigo());
         assertThat(movs1).isNotEmpty();
         // A mensagem de homologação pode variar. "Mapa de competências homologado"
         assertThat(movs1.getFirst().getDescricao()).contains("homologado");

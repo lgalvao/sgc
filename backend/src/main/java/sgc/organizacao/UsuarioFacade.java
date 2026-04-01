@@ -27,7 +27,7 @@ public class UsuarioFacade {
 
     @Transactional(readOnly = true)
     public @Nullable Usuario carregarUsuarioParaAutenticacao(String titulo) {
-        Usuario usuario = usuarioService.buscarComAtribuicoesOpt(titulo).orElse(null);
+        Usuario usuario = usuarioService.buscarOpt(titulo).orElse(null);
         if (usuario != null) {
             carregarAtribuicoes(usuario);
         }
@@ -36,7 +36,7 @@ public class UsuarioFacade {
 
     @Transactional(readOnly = true)
     public Usuario buscarPorLogin(String login) {
-        Usuario usuario = usuarioService.buscarComAtribuicoes(login);
+        Usuario usuario = usuarioService.buscar(login);
         carregarAtribuicoes(usuario);
         return usuario;
     }
@@ -57,7 +57,7 @@ public class UsuarioFacade {
         }
         return tituloUsuarioAutenticado()
                 .map(login -> {
-                    Usuario usuario = usuarioService.buscarComAtribuicoes(login);
+                    Usuario usuario = usuarioService.buscar(login);
                     carregarAtribuicoes(usuario);
                     return usuario;
                 })
@@ -76,7 +76,7 @@ public class UsuarioFacade {
 
     @Transactional(readOnly = true)
     public List<PerfilDto> buscarPerfisUsuario(String titulo) {
-        return usuarioService.buscarComAtribuicoesOpt(titulo)
+        return usuarioService.buscarOpt(titulo)
                 .map(usuario -> {
                     List<UsuarioPerfil> atribuicoes = usuarioService.buscarPerfis(usuario.getTituloEleitoral());
                     return atribuicoes.stream()
@@ -147,4 +147,3 @@ public class UsuarioFacade {
                 .build();
     }
 }
-

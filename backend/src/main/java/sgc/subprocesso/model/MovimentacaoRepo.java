@@ -20,7 +20,7 @@ public interface MovimentacaoRepo extends JpaRepository<Movimentacao, Long> {
             WHERE m.subprocesso.codigo = :subprocessoCodigo
             ORDER BY m.dataHora DESC, m.codigo DESC
             """)
-    List<Movimentacao> findBySubprocessoCodigoOrderByDataHoraDesc(@Param("subprocessoCodigo") Long subprocessoCodigo);
+    List<Movimentacao> listarPorSubprocessoOrdenadasPorDataHoraDesc(@Param("subprocessoCodigo") Long subprocessoCodigo);
 
     @Query("""
             SELECT m FROM Movimentacao m
@@ -31,7 +31,7 @@ public interface MovimentacaoRepo extends JpaRepository<Movimentacao, Long> {
             ORDER BY m.dataHora DESC, m.codigo DESC
             LIMIT 1
             """)
-    Optional<Movimentacao> findFirstBySubprocessoCodigoOrderByDataHoraDesc(@Param("subprocessoCodigo") Long subprocessoCodigo);
+    Optional<Movimentacao> buscarUltimaPorSubprocesso(@Param("subprocessoCodigo") Long subprocessoCodigo);
 
     List<Movimentacao> findBySubprocessoCodigo(Long subprocessoCodigo);
 }

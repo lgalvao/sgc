@@ -107,7 +107,7 @@ public class SubprocessoConsultaService {
     }
 
     public List<Subprocesso> listarEntidadesPorProcesso(Long codProcesso) {
-        return subprocessoRepo.findByProcessoCodigoComUnidade(codProcesso);
+        return subprocessoRepo.listarPorProcessoComUnidade(codProcesso);
     }
 
     public SubprocessoSituacaoDto obterStatus(Long codSubprocesso) {
@@ -140,21 +140,21 @@ public class SubprocessoConsultaService {
 
     public List<Subprocesso> listarEntidadesPorProcessoEUnidades(Long codProcesso, List<Long> codUnidades) {
         if (codUnidades.isEmpty()) return List.of();
-        return subprocessoRepo.findByProcessoCodigoAndUnidadeCodigoInWithUnidade(codProcesso, codUnidades);
+        return subprocessoRepo.listarPorProcessoEUnidadesComUnidade(codProcesso, codUnidades);
     }
 
     public List<Subprocesso> listarPorProcessoESituacoes(Long codProcesso, List<SituacaoSubprocesso> situacoes) {
-        return subprocessoRepo.findByProcessoCodigoAndSituacaoInWithUnidade(codProcesso, situacoes);
+        return subprocessoRepo.listarPorProcessoESituacoesComUnidade(codProcesso, situacoes);
     }
 
     public List<Subprocesso> listarPorProcessoEUnidadeCodigosESituacoes(Long codProcesso, List<Long> codigosUnidades, List<SituacaoSubprocesso> situacoes) {
-        return subprocessoRepo.findByProcessoCodigoAndUnidadeCodigoInWithUnidade(codProcesso, codigosUnidades).stream()
+        return subprocessoRepo.listarPorProcessoEUnidadesComUnidade(codProcesso, codigosUnidades).stream()
                 .filter(sp -> situacoes.contains(sp.getSituacao()))
                 .toList();
     }
 
     public List<Subprocesso> listarPorProcessoUnidadeESituacoes(Long codProcesso, Long codUnidade, List<SituacaoSubprocesso> situacoes) {
-        return subprocessoRepo.findByProcessoCodigoAndUnidadeCodigoAndSituacaoInComUnidade(codProcesso, codUnidade, situacoes);
+        return subprocessoRepo.listarPorProcessoUnidadeESituacoesComUnidade(codProcesso, codUnidade, situacoes);
     }
 
     public ValidacaoCadastroDto validarCadastro(Long codSubprocesso) {
@@ -166,7 +166,7 @@ public class SubprocessoConsultaService {
         if (sp.getLocalizacaoAtual() != null) return sp.getLocalizacaoAtual();
         Unidade unidade = sp.getUnidade();
         if (sp.getCodigo() == null) return unidade;
-        List<Movimentacao> movs = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo());
+        List<Movimentacao> movs = movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(sp.getCodigo());
         if (movs.isEmpty()) return unidade;
         Unidade destino = movs.getFirst().getUnidadeDestino();
         return (destino != null) ? destino : unidade;
@@ -182,7 +182,7 @@ public class SubprocessoConsultaService {
         String localizacaoAtual = obterUnidadeLocalizacao(sp).getSigla();
         ResponsavelDto responsavel = usuarioFacade.buscarResponsabilidadeDetalhadaAtual(siglaUnidade);
         Usuario titular = usuarioFacade.buscarPorLogin(sp.getUnidade().getTituloTitular());
-        List<Movimentacao> movs = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo());
+        List<Movimentacao> movs = movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(sp.getCodigo());
         List<MovimentacaoDto> movimentacoes = movs.stream().map(MovimentacaoDto::from).toList();
         PermissoesSubprocessoDto permissoes = obterPermissoesUI(sp, usuarioAutenticado);
 
@@ -228,7 +228,7 @@ public class SubprocessoConsultaService {
         Long codUnidadeUsuario = usuario.getUnidadeAtivaCodigo();
         Long codUnidadeLocalizacao = obterUnidadeLocalizacao(sp).getCodigo();
         boolean mesmaUnidade = Objects.equals(codUnidadeUsuario, codUnidadeLocalizacao);
-        boolean temMapaVigente = unidadeService.verificarMapaVigente(sp.getUnidade().getCodigo());
+        boolean temMapaVigente = unidadeService.temMapaVigente(sp.getUnidade().getCodigo());
         return construirPermissoes(mesmaUnidade, usuario, sp, temMapaVigente);
     }
 
@@ -374,13 +374,13 @@ public class SubprocessoConsultaService {
     }
 
     public List<Subprocesso> listarEntidadesPorProcessoComUnidade(Long codProcesso) {
-        return subprocessoRepo.findByProcessoCodigoComUnidade(codProcesso);
+        return subprocessoRepo.listarPorProcessoComUnidade(codProcesso);
     }
 
     @org.jspecify.annotations.NonNull public Unidade obterLocalizacaoAtual(Subprocesso sp) {
         if (sp.getLocalizacaoAtual() != null) return sp.getLocalizacaoAtual();
         if (sp.getCodigo() == null) return sp.getUnidade();
-        Unidade loc = movimentacaoRepo.findFirstBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo())
+        Unidade loc = movimentacaoRepo.buscarUltimaPorSubprocesso(sp.getCodigo())
                 .filter(m -> m.getUnidadeDestino() != null)
                 .map(Movimentacao::getUnidadeDestino)
                 .orElse(sp.getUnidade());

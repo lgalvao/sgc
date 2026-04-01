@@ -46,7 +46,7 @@ class CopiaMapaServiceCoverageTest {
         Atividade ativFonte = new Atividade();
         ativFonte.setCodigo(100L);
         ativFonte.setDescricao("Atividade teste");
-        when(atividadeRepo.findWithConhecimentosByMapa_Codigo(codMapaOrigem)).thenReturn(List.of(ativFonte));
+        when(atividadeRepo.listarPorMapaComConhecimentos(codMapaOrigem)).thenReturn(List.of(ativFonte));
 
         Competencia compFonte = new Competencia();
         compFonte.setCodigo(200L);
@@ -78,7 +78,7 @@ class CopiaMapaServiceCoverageTest {
                 .conhecimentos(new HashSet<>())
                 .build();
 
-        when(atividadeRepo.findWithConhecimentosByMapa_Codigo(mapaOrigemId)).thenReturn(List.of(ativOrigem));
+        when(atividadeRepo.listarPorMapaComConhecimentos(mapaOrigemId)).thenReturn(List.of(ativOrigem));
         when(atividadeRepo.findByMapa_Codigo(mapaDestinoId)).thenReturn(List.of()); // Destino vazio
         when(repo.buscar(Mapa.class, mapaDestinoId)).thenReturn(new Mapa());
 
@@ -100,7 +100,7 @@ class CopiaMapaServiceCoverageTest {
         Atividade ativ2 = Atividade.builder().descricao("Nao selecionada").conhecimentos(new HashSet<>()).build();
         ativ2.setCodigo(20L);
 
-        when(atividadeRepo.findWithConhecimentosByMapa_Codigo(mapaOrigemId)).thenReturn(List.of(ativ1, ativ2));
+        when(atividadeRepo.listarPorMapaComConhecimentos(mapaOrigemId)).thenReturn(List.of(ativ1, ativ2));
         when(atividadeRepo.findByMapa_Codigo(mapaDestinoId)).thenReturn(List.of());
         when(repo.buscar(Mapa.class, mapaDestinoId)).thenReturn(new Mapa());
 
@@ -123,7 +123,7 @@ class CopiaMapaServiceCoverageTest {
         Atividade ativ1 = Atividade.builder().descricao("Existente").conhecimentos(new HashSet<>()).build();
         ativ1.setCodigo(10L);
 
-        when(atividadeRepo.findWithConhecimentosByMapa_Codigo(mapaOrigemId)).thenReturn(List.of(ativ1));
+        when(atividadeRepo.listarPorMapaComConhecimentos(mapaOrigemId)).thenReturn(List.of(ativ1));
         when(atividadeRepo.findByMapa_Codigo(mapaDestinoId)).thenReturn(List.of());
         when(repo.buscar(Mapa.class, mapaDestinoId)).thenReturn(new Mapa());
 
@@ -145,7 +145,7 @@ class CopiaMapaServiceCoverageTest {
         Atividade ativOrigem = Atividade.builder().descricao("Existente").build();
         Atividade ativDestino = Atividade.builder().descricao("Existente").build();
 
-        when(atividadeRepo.findWithConhecimentosByMapa_Codigo(mapaOrigemId)).thenReturn(List.of(ativOrigem));
+        when(atividadeRepo.listarPorMapaComConhecimentos(mapaOrigemId)).thenReturn(List.of(ativOrigem));
         when(atividadeRepo.findByMapa_Codigo(mapaDestinoId)).thenReturn(List.of(ativDestino));
         when(repo.buscar(Mapa.class, mapaDestinoId)).thenReturn(new Mapa());
 
@@ -166,7 +166,7 @@ class CopiaMapaServiceCoverageTest {
         ativOrigem.setDescricao("Sem conhecimentos");
         ativOrigem.setConhecimentos(null);
 
-        when(atividadeRepo.findWithConhecimentosByMapa_Codigo(mapaOrigemId)).thenReturn(List.of(ativOrigem));
+        when(atividadeRepo.listarPorMapaComConhecimentos(mapaOrigemId)).thenReturn(List.of(ativOrigem));
         when(atividadeRepo.findByMapa_Codigo(mapaDestinoId)).thenReturn(List.of());
         when(repo.buscar(Mapa.class, mapaDestinoId)).thenReturn(new Mapa());
 

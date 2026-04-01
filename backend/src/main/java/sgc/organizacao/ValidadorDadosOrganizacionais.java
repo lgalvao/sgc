@@ -139,7 +139,7 @@ public class ValidadorDadosOrganizacionais {
     }
 
     private List<Unidade> carregarUnidadesParticipantes() {
-        return unidadeRepo.findAllWithHierarquia().stream()
+        return unidadeRepo.listarTodasComHierarquia().stream()
                 .filter(unidade -> unidade.getSituacao() == ATIVA)
                 .filter(unidade -> TIPOS_PARTICIPANTES.contains(unidade.getTipo()))
                 .toList();
@@ -154,7 +154,7 @@ public class ValidadorDadosOrganizacionais {
             return Map.of();
         }
 
-        return responsabilidadeRepo.findByUnidadeCodigoIn(codigos).stream()
+        return responsabilidadeRepo.listarPorCodigosUnidade(codigos).stream()
                 .collect(Collectors.toMap(
                         Responsabilidade::getUnidadeCodigo,
                         Function.identity(),

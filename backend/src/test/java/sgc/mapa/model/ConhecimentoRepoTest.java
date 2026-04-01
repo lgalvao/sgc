@@ -34,7 +34,7 @@ class ConhecimentoRepoTest {
     @Test
     @DisplayName("deve buscar conhecimentos por mapa")
     void deveBuscarConhecimentosPorMapa() {
-        List<Conhecimento> conhecimentos = conhecimentoRepo.findByMapaCodigo(201L);
+        List<Conhecimento> conhecimentos = conhecimentoRepo.listarPorMapa(201L);
 
         assertThat(conhecimentos)
                 .extracting(Conhecimento::getCodigo)
@@ -47,7 +47,7 @@ class ConhecimentoRepoTest {
     @Test
     @DisplayName("deve retornar vazio quando o mapa nao possui conhecimentos")
     void deveRetornarVazioQuandoOMapaNaoPossuiConhecimentos() {
-        List<Conhecimento> conhecimentos = conhecimentoRepo.findByMapaCodigo(1003L);
+        List<Conhecimento> conhecimentos = conhecimentoRepo.listarPorMapa(1003L);
 
         assertThat(conhecimentos).isEmpty();
     }

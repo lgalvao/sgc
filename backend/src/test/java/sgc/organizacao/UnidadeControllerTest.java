@@ -138,7 +138,7 @@ class UnidadeControllerTest {
     @WithMockUser
     void deveVerificarMapaVigente() throws Exception {
 
-        when(unidadeService.verificarMapaVigente(1L)).thenReturn(true);
+        when(unidadeService.temMapaVigente(1L)).thenReturn(true);
 
         mockMvc.perform(get("/api/unidades/1/mapa-vigente"))
                 .andExpect(status().isOk())

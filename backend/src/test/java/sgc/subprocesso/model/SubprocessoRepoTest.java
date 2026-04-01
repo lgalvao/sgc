@@ -23,7 +23,7 @@ class SubprocessoRepoTest {
     @Test
     @DisplayName("deve listar subprocessos por processo com unidade carregada")
     void deveListarSubprocessosPorProcessoComUnidadeCarregada() {
-        List<Subprocesso> resultado = subprocessoRepo.findByProcessoCodigoComUnidade(50002L);
+        List<Subprocesso> resultado = subprocessoRepo.listarPorProcessoComUnidade(50002L);
 
         assertThat(resultado)
                 .extracting(Subprocesso::getCodigo)

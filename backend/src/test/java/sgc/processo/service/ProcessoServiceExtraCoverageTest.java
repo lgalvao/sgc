@@ -43,6 +43,9 @@ class ProcessoServiceExtraCoverageTest {
     private UnidadeService unidadeService;
 
     @Mock
+    private ResponsavelUnidadeService responsavelUnidadeService;
+
+    @Mock
     private SubprocessoService subprocessoService;
     @Mock
     private SubprocessoConsultaService consultaService;
@@ -64,6 +67,11 @@ class ProcessoServiceExtraCoverageTest {
 
     @Mock
     private SgcPermissionEvaluator permissionEvaluator;
+
+    @BeforeEach
+    void configurarMocksPadrao() {
+        lenient().when(responsavelUnidadeService.todasPossuemResponsavelEfetivo(anyList())).thenReturn(true);
+    }
 
     @Nested
     @DisplayName("buscarPorCodigoComParticipantes")
@@ -116,7 +124,7 @@ class ProcessoServiceExtraCoverageTest {
 
             Unidade uni = new Unidade();
             uni.setCodigo(1L);
-            when(unidadeService.todasComHierarquia()).thenReturn(List.of(uni));
+            when(unidadeService.buscarTodasComHierarquia()).thenReturn(List.of(uni));
 
             Processo p = new Processo();
             when(processoRepo.listarPorSituacaoEUnidadeCodigos(eq(SituacaoProcesso.FINALIZADO), anyList())).thenReturn(List.of(p));
@@ -325,7 +333,7 @@ class ProcessoServiceExtraCoverageTest {
 
             Unidade uni = new Unidade();
             uni.setCodigo(1L);
-            when(unidadeService.todasComHierarquia()).thenReturn(List.of(uni));
+            when(unidadeService.buscarTodasComHierarquia()).thenReturn(List.of(uni));
 
             Subprocesso sp = new Subprocesso();
             sp.setCodigo(100L);
@@ -379,7 +387,7 @@ class ProcessoServiceExtraCoverageTest {
 
             Unidade uni = new Unidade();
             uni.setCodigo(1L);
-            when(unidadeService.todasComHierarquia()).thenReturn(List.of(uni));
+            when(unidadeService.buscarTodasComHierarquia()).thenReturn(List.of(uni));
 
             Processo p = new Processo();
             UnidadeProcesso up = new UnidadeProcesso();
@@ -402,7 +410,7 @@ class ProcessoServiceExtraCoverageTest {
 
             Unidade uni = new Unidade();
             uni.setCodigo(1L);
-            when(unidadeService.todasComHierarquia()).thenReturn(List.of(uni));
+            when(unidadeService.buscarTodasComHierarquia()).thenReturn(List.of(uni));
 
             Processo p = new Processo();
             UnidadeProcesso up = new UnidadeProcesso();
@@ -462,8 +470,8 @@ class ProcessoServiceExtraCoverageTest {
             Unidade uni = new Unidade();
             uni.setCodigo(10L);
             uni.setSigla("UNI10");
-            when(unidadeService.porCodigos(anyList())).thenReturn(List.of(uni));
-            when(unidadeService.verificarMapaVigente(10L)).thenReturn(true);
+            when(unidadeService.buscarPorCodigos(anyList())).thenReturn(List.of(uni));
+            when(unidadeService.temMapaVigente(10L)).thenReturn(true);
             UnidadeMapa unidadeMapa = new UnidadeMapa();
             unidadeMapa.setUnidadeCodigo(10L);
             Mapa mapaVigente = new Mapa();

@@ -95,24 +95,27 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
         await modal.getByRole('button', {name: TEXTOS.acaoBloco.aceitar.BOTAO}).click();
         await expect(page.getByText(TEXTOS.sucesso.MAPAS_ACEITOS_EM_BLOCO)).toBeVisible();
 
-        // Verificar movimentação no subprocesso
+        await fazerLogout(page);
+        await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
         await page.goto(`/processo/${processoIsolado.codigo}`);
         await navegarParaSubprocesso(page, UNIDADE_1);
 
         const linhaMovimentacao = page.getByTestId('tbl-movimentacoes')
-            .locator('tr', {hasText: /Mapa de competências aceito/i})
+            .locator('tr', {hasText: TEXTOS.movimentacao.MAPA_VALIDACAO_ACEITA})
             .first();
         await expect(linhaMovimentacao).toBeVisible();
         await expect(linhaMovimentacao).toContainText(/\d{2}\/\d{2}\/\d{4}/);
 
-        // Verificar alerta para a unidade superior (SECRETARIA_2, acima de COORD_21)
-        await fazerLogout(page);
-        await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
+        await page.goto('/painel');
+        await verificarPaginaPainel(page);
 
         const tabelaAlertas = page.getByTestId('tbl-alertas');
-        const linhaAlerta = tabelaAlertas.locator('tr', {hasText: descIsolada}).first();
+        const linhaAlerta = tabelaAlertas.locator('tr', {
+            hasText: /Validação do mapa de competências da unidade SECAO_211 submetida para análise/i
+        }).first();
         await expect(linhaAlerta).toBeVisible();
         await expect(linhaAlerta).toContainText(/SECAO_211/i);
+        await expect(tabelaAlertas).toContainText(descIsolada);
         await expect(linhaAlerta).toContainText(/\d{2}\/\d{2}\/\d{4}/);
     });
 });

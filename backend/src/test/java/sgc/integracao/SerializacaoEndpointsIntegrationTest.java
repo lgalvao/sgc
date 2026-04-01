@@ -133,7 +133,7 @@ class SerializacaoEndpointsIntegrationTest extends BaseIntegrationTest {
         atividade.getConhecimentos().add(conhecimento);
         atividadeRepo.saveAndFlush(atividade);
 
-        Usuario chefe = usuarioRepo.findByTituloComUnidadeLotacao("3").orElseThrow();
+        Usuario chefe = usuarioRepo.buscarPorTituloComUnidadeLotacao("3").orElseThrow();
         Movimentacao movimentacao = Movimentacao.builder()
                 .subprocesso(subprocesso)
                 .unidadeOrigem(unidade)
@@ -153,8 +153,8 @@ class SerializacaoEndpointsIntegrationTest extends BaseIntegrationTest {
                 .build();
         alertaRepo.saveAndFlush(alerta);
 
-        usuarioConsulta = usuarioRepo.findByTitulosComUnidadeLotacao(List.of("1", "3", "6", "8")).stream()
-                .filter(usuario -> !usuarioRepo.findByUnidadeLotacaoCodigo(usuario.getUnidadeLotacao().getCodigo()).isEmpty())
+        usuarioConsulta = usuarioRepo.listarPorTitulosComUnidadeLotacao(List.of("1", "3", "6", "8")).stream()
+                .filter(usuario -> !usuarioRepo.listarPorCodigoUnidadeLotacao(usuario.getUnidadeLotacao().getCodigo()).isEmpty())
                 .findFirst()
                 .orElseThrow();
     }

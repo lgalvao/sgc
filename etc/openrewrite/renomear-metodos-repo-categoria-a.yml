@@ -1,0 +1,71 @@
+type: specs.openrewrite.org/v1beta/recipe
+name: sgc.java.renomearMetodosRepoCategoriaA
+displayName: Renomear metodos de repositorio da Categoria A
+description: Renomeia metodos com @Query que usam nomes derivados/hibridos para nomes semanticos em portugues.
+recipeList:
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: sgc.organizacao.model.UnidadeRepo findSiglasByCodigos(..)
+      newMethodName: buscarSiglasPorCodigos
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: sgc.organizacao.model.UnidadeRepo findAllWithHierarquia()
+      newMethodName: listarTodasComHierarquia
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: sgc.organizacao.model.UnidadeRepo findAllAtivasComSuperior()
+      newMethodName: listarAtivasComSuperior
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: sgc.organizacao.model.UnidadeRepo findByCodigoComResponsavel(..)
+      newMethodName: buscarPorCodigoComResponsavel
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: sgc.organizacao.model.UnidadeRepo findBySiglaComResponsavel(..)
+      newMethodName: buscarPorSiglaComResponsavel
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: sgc.organizacao.model.ResponsabilidadeRepo findByUnidadeCodigoIn(..)
+      newMethodName: listarPorCodigosUnidade
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: sgc.organizacao.model.UsuarioRepo findByUnidadeLotacaoCodigo(..)
+      newMethodName: listarPorCodigoUnidadeLotacao
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: sgc.organizacao.model.UsuarioRepo findByTituloComUnidadeLotacao(..)
+      newMethodName: buscarPorTituloComUnidadeLotacao
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: sgc.organizacao.model.UsuarioRepo findByTitulosComUnidadeLotacao(..)
+      newMethodName: listarPorTitulosComUnidadeLotacao
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: sgc.alerta.model.AlertaUsuarioRepo findByUsuarioAndAlertas(..)
+      newMethodName: listarPorUsuarioEAlertas
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: sgc.mapa.model.AtividadeRepo findByMapaCodigoSemFetch(..)
+      newMethodName: listarPorMapaSemRelacionamentos
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: sgc.mapa.model.AtividadeRepo findWithConhecimentosByMapa_Codigo(..)
+      newMethodName: listarPorMapaComConhecimentos
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: sgc.mapa.model.AtividadeRepo findBySubprocessoCodigo(..)
+      newMethodName: listarPorCodigoSubprocesso
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: sgc.mapa.model.CompetenciaRepo findCompetenciaAndAtividadeIdsByMapaCodigo(..)
+      newMethodName: listarCodigosCompetenciaEAtividadePorMapa
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: sgc.mapa.model.CompetenciaRepo findByMapaCodigoSemFetch(..)
+      newMethodName: listarPorMapaSemRelacionamentos
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: sgc.mapa.model.ConhecimentoRepo findByMapaCodigo(..)
+      newMethodName: listarPorMapa
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: sgc.subprocesso.model.MovimentacaoRepo findBySubprocessoCodigoOrderByDataHoraDesc(..)
+      newMethodName: listarPorSubprocessoOrdenadasPorDataHoraDesc
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: sgc.subprocesso.model.MovimentacaoRepo findFirstBySubprocessoCodigoOrderByDataHoraDesc(..)
+      newMethodName: buscarUltimaPorSubprocesso
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: sgc.subprocesso.model.SubprocessoRepo findByProcessoCodigoComUnidade(..)
+      newMethodName: listarPorProcessoComUnidade
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: sgc.subprocesso.model.SubprocessoRepo findByProcessoCodigoAndUnidadeCodigoAndSituacaoInComUnidade(..)
+      newMethodName: listarPorProcessoUnidadeESituacoesComUnidade
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: sgc.subprocesso.model.SubprocessoRepo findByProcessoCodigoAndUnidadeCodigoInWithUnidade(..)
+      newMethodName: listarPorProcessoEUnidadesComUnidade
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: sgc.subprocesso.model.SubprocessoRepo findByProcessoCodigoAndSituacaoInWithUnidade(..)
+      newMethodName: listarPorProcessoESituacoesComUnidade

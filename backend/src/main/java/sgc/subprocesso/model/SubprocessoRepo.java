@@ -18,7 +18,7 @@ public interface SubprocessoRepo extends JpaRepository<Subprocesso, Long> {
               join fetch s.unidade u
               left join fetch s.mapa m
             where s.processo.codigo = :codProcesso""")
-    List<Subprocesso> findByProcessoCodigoComUnidade(@Param("codProcesso") Long codProcesso);
+    List<Subprocesso> listarPorProcessoComUnidade(@Param("codProcesso") Long codProcesso);
 
     @Query("""
             select s from Subprocesso s
@@ -26,7 +26,7 @@ public interface SubprocessoRepo extends JpaRepository<Subprocesso, Long> {
             where s.processo.codigo = :codProcesso
               and s.unidade.codigo = :codUnidade
               and s.situacao in :situacoes""")
-    List<Subprocesso> findByProcessoCodigoAndUnidadeCodigoAndSituacaoInComUnidade(
+    List<Subprocesso> listarPorProcessoUnidadeESituacoesComUnidade(
             @Param("codProcesso") Long codProcesso,
             @Param("codUnidade") Long codUnidade,
             @Param("situacoes") List<SituacaoSubprocesso> situacoes);
@@ -36,7 +36,7 @@ public interface SubprocessoRepo extends JpaRepository<Subprocesso, Long> {
               join fetch s.unidade u
             where s.processo.codigo = :codProcesso
               and s.unidade.codigo in :unidadeCodigos""")
-    List<Subprocesso> findByProcessoCodigoAndUnidadeCodigoInWithUnidade(
+    List<Subprocesso> listarPorProcessoEUnidadesComUnidade(
             @Param("codProcesso") Long codProcesso,
             @Param("unidadeCodigos") List<Long> unidadeCodigos);
 
@@ -45,7 +45,7 @@ public interface SubprocessoRepo extends JpaRepository<Subprocesso, Long> {
               join fetch s.unidade u
             where s.processo.codigo = :codProcesso
               and s.situacao in :situacoes""")
-    List<Subprocesso> findByProcessoCodigoAndSituacaoInWithUnidade(
+    List<Subprocesso> listarPorProcessoESituacoesComUnidade(
             @Param("codProcesso") Long codProcesso,
             @Param("situacoes") List<SituacaoSubprocesso> situacoes);
 

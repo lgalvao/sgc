@@ -262,8 +262,8 @@ class ValidadorDadosOrganizacionaisTest {
             List<Map<String, Object>> linhasUsuariosDuplicados,
             List<Map<String, Object>> linhasPerfis
     ) {
-        when(unidadeRepo.findAllWithHierarquia()).thenReturn(unidades);
-        when(responsabilidadeRepo.findByUnidadeCodigoIn(anyList())).thenReturn(responsabilidades);
+        when(unidadeRepo.listarTodasComHierarquia()).thenReturn(unidades);
+        when(responsabilidadeRepo.listarPorCodigosUnidade(anyList())).thenReturn(responsabilidades);
         when(usuarioRepo.findAllById(anyList())).thenReturn(usuarios);
         when(namedParameterJdbcTemplate.queryForList(contains("FROM sgc.vw_usuario"), ArgumentMatchers.<Map<String, ?>>any()))
                 .thenReturn(linhasUsuariosDuplicados);

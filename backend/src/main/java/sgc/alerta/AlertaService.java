@@ -53,7 +53,7 @@ public class AlertaService {
     }
 
     public List<AlertaUsuario> alertasUsuarios(String usuarioTitulo, List<Long> alertaCodigos) {
-        return alertaUsuarioRepo.findByUsuarioAndAlertas(usuarioTitulo, alertaCodigos);
+        return alertaUsuarioRepo.listarPorUsuarioEAlertas(usuarioTitulo, alertaCodigos);
     }
 
     public AlertaUsuario salvarAlertaUsuario(AlertaUsuario au) {

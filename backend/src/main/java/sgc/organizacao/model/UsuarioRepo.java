@@ -13,21 +13,21 @@ public interface UsuarioRepo extends JpaRepository<Usuario, String> {
             JOIN FETCH u.unidadeLotacao
             WHERE u.unidadeLotacao.codigo = :codigoUnidade
             """)
-    List<Usuario> findByUnidadeLotacaoCodigo(@Param("codigoUnidade") Long codigoUnidade);
+    List<Usuario> listarPorCodigoUnidadeLotacao(@Param("codigoUnidade") Long codigoUnidade);
 
     @Query("""
             SELECT u FROM Usuario u
             JOIN FETCH u.unidadeLotacao
             WHERE u.tituloEleitoral = :titulo
             """)
-    Optional<Usuario> findByTituloComUnidadeLotacao(@Param("titulo") String titulo);
+    Optional<Usuario> buscarPorTituloComUnidadeLotacao(@Param("titulo") String titulo);
 
     @Query("""
             SELECT DISTINCT u FROM Usuario u
             JOIN FETCH u.unidadeLotacao
             WHERE u.tituloEleitoral IN :titulos
             """)
-    List<Usuario> findByTitulosComUnidadeLotacao(@Param("titulos") List<String> titulos);
+    List<Usuario> listarPorTitulosComUnidadeLotacao(@Param("titulos") List<String> titulos);
 
     @Query("""
             SELECT DISTINCT u FROM Usuario u

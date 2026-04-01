@@ -200,7 +200,7 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
                     .containsExactlyInAnyOrder("Conhecimento 2.1", "Conhecimento 2.2");
 
             List<Movimentacao> movimentacoes =
-                    movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(
+                    movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(
                             subprocessoDestino.getCodigo());
             assertThat(movimentacoes).hasSize(1);
             assertThat(movimentacoes.getFirst().getDescricao()).contains("Importação de atividades do subprocesso #" + subprocessoOrigem.getCodigo());

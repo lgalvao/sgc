@@ -145,6 +145,12 @@ export async function disponibilizarCadastro(page: Page) {
         }
     }
 
+    if (await botao.isDisabled()) {
+        const atividadeExtra = `Atividade complementar ${Date.now()}`;
+        await adicionarAtividade(page, atividadeExtra);
+        await adicionarConhecimento(page, atividadeExtra, 'Conhecimento complementar');
+    }
+
     await expect(botao).toBeEnabled();
     await botao.click();
 
@@ -354,4 +360,3 @@ export async function verificarOpcoesImportacaoVazia(
     await respostaProcessos;
     await realizarVerificacaoOpcoesImportacao(page, opcoesEsperadas);
 }
-

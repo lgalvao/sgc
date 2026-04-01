@@ -3,6 +3,7 @@ package sgc.integracao;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.*;
 import org.springframework.test.web.servlet.*;
 import org.springframework.transaction.annotation.*;
 import sgc.fixture.*;
@@ -27,6 +28,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("CDU-05: Iniciar processo de revisão")
 class CDU05IntegrationTest extends BaseIntegrationTest {
     private static final String API_PROCESSOS_ID_INICIAR = "/api/processos/{codigo}/iniciar";
+    private static final String SQL_INSERIR_RESPONSABILIDADE = """
+            INSERT INTO SGC.VW_RESPONSABILIDADE (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio)
+            VALUES (?, ?, ?, ?, ?)
+            """;
 
     @Autowired
     private UnidadeMapaRepo unidadeMapaRepo;
@@ -40,6 +45,12 @@ class CDU05IntegrationTest extends BaseIntegrationTest {
     @Autowired
     private MovimentacaoRepo movimentacaoRepo;
 
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    private UsuarioRepo usuarioRepo;
+
     private Unidade unidade;
     private Mapa mapaOriginal;
     private Competencia competenciaOriginal;
@@ -52,6 +63,8 @@ class CDU05IntegrationTest extends BaseIntegrationTest {
         unidade.setSigla("U_REV");
         unidade.setNome("Unidade revisão");
         unidade = unidadeRepo.save(unidade);
+        registrarUsuarioSeNecessario("111111111111");
+        registrarResponsabilidade(unidade.getCodigo(), "111111111111", "11111111");
 
         mapaOriginal = new Mapa();
         mapaRepo.save(mapaOriginal);
@@ -81,6 +94,22 @@ class CDU05IntegrationTest extends BaseIntegrationTest {
                 .build());
     }
 
+    private void registrarResponsabilidade(Long codUnidade, String tituloUsuario, String matriculaUsuario) {
+        jdbcTemplate.update(SQL_INSERIR_RESPONSABILIDADE,
+                codUnidade,
+                tituloUsuario,
+                matriculaUsuario,
+                "TITULAR",
+                LocalDateTime.now());
+    }
+
+    private void registrarUsuarioSeNecessario(String tituloUsuario) {
+        if (usuarioRepo.findById(tituloUsuario).isPresent()) {
+            return;
+        }
+        usuarioRepo.saveAndFlush(UsuarioFixture.usuarioComTitulo(tituloUsuario));
+    }
+
     private CriarProcessoRequest criarCriarProcessoReq(String descricao, List<Long> unidades,
                                                        LocalDateTime dataLimiteEtapa1) {
         return new CriarProcessoRequest(descricao, TipoProcesso.REVISAO, dataLimiteEtapa1, unidades);
@@ -94,6 +123,8 @@ class CDU05IntegrationTest extends BaseIntegrationTest {
         unidadeSuperior.setSigla("U_SUP");
         unidadeSuperior.setNome("Unidade superior");
         unidadeSuperior = unidadeRepo.save(unidadeSuperior);
+        registrarUsuarioSeNecessario("202020202020");
+        registrarResponsabilidade(unidadeSuperior.getCodigo(), "202020202020", "20202020");
 
         unidade.setUnidadeSuperior(unidadeSuperior);
         unidade = unidadeRepo.save(unidade);
@@ -130,7 +161,7 @@ class CDU05IntegrationTest extends BaseIntegrationTest {
         assertThat(processo.getParticipantes().stream().map(UnidadeProcesso::getSigla).toList())
                 .containsExactlyInAnyOrder("U_REV", "U_SUP");
 
-        List<Subprocesso> subprocessos = subprocessoRepo.findByProcessoCodigoComUnidade(codProcesso);
+        List<Subprocesso> subprocessos = subprocessoRepo.listarPorProcessoComUnidade(codProcesso);
         assertThat(subprocessos).hasSize(1);
         Subprocesso subprocessoCriado = subprocessos.getFirst();
         Mapa mapaCopiado = subprocessoCriado.getMapa();
@@ -161,6 +192,8 @@ class CDU05IntegrationTest extends BaseIntegrationTest {
         unidadeSemMapa.setSigla("U_SEM_MAPA");
         unidadeSemMapa.setNome("Unidade sem mapa");
         unidadeSemMapa = unidadeRepo.save(unidadeSemMapa);
+        registrarUsuarioSeNecessario("303030303030");
+        registrarResponsabilidade(unidadeSemMapa.getCodigo(), "303030303030", "30303030");
 
         List<Long> unidades = new ArrayList<>();
         unidades.add(unidadeSemMapa.getCodigo());

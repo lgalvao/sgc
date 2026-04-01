@@ -25,20 +25,20 @@ public interface AtividadeRepo extends JpaRepository<Atividade, Long> {
      * Busca atividades por código de mapa sem carregar relacionamentos.
      */
     @Query("SELECT a FROM Atividade a WHERE a.mapa.codigo = :mapaCodigo")
-    List<Atividade> findByMapaCodigoSemFetch(@Param("mapaCodigo") Long mapaCodigo);
+    List<Atividade> listarPorMapaSemRelacionamentos(@Param("mapaCodigo") Long mapaCodigo);
 
     /**
      * Busca atividades por código de mapa com conhecimentos carregados.
      */
     @Query("SELECT DISTINCT a FROM Atividade a LEFT JOIN FETCH a.conhecimentos WHERE a.mapa.codigo = :mapaCodigo")
-    List<Atividade> findWithConhecimentosByMapa_Codigo(@Param("mapaCodigo") Long mapaCodigo);
+    List<Atividade> listarPorMapaComConhecimentos(@Param("mapaCodigo") Long mapaCodigo);
 
     @Query("""
             SELECT a FROM Atividade a
             JOIN Subprocesso s ON a.mapa.codigo = s.mapa.codigo
             WHERE s.codigo = :subprocessoCodigo
             """)
-    List<Atividade> findBySubprocessoCodigo(@Param("subprocessoCodigo") Long subprocessoCodigo);
+    List<Atividade> listarPorCodigoSubprocesso(@Param("subprocessoCodigo") Long subprocessoCodigo);
 
     @Query("""
             SELECT DISTINCT a FROM Atividade a

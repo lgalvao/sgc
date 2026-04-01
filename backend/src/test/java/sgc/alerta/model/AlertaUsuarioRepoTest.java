@@ -34,7 +34,7 @@ class AlertaUsuarioRepoTest {
                 Timestamp.valueOf(LocalDateTime.of(2025, 1, 2, 10, 0))
         );
 
-        List<AlertaUsuario> encontrados = alertaUsuarioRepo.findByUsuarioAndAlertas("8", List.of(70002L, 70003L));
+        List<AlertaUsuario> encontrados = alertaUsuarioRepo.listarPorUsuarioEAlertas("8", List.of(70002L, 70003L));
 
         assertThat(encontrados).singleElement().satisfies(alertaUsuario -> {
             assertThat(alertaUsuario.getCodigo().getAlertaCodigo()).isEqualTo(70002L);

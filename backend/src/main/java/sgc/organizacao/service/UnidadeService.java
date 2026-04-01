@@ -32,33 +32,33 @@ public class UnidadeService {
     private final UnidadeRepo unidadeRepo;
     private final UnidadeMapaRepo unidadeMapaRepo;
     public Unidade buscarPorCodigo(Long codigo) {
-        return unidadeRepo.findByCodigoComResponsavel(codigo)
+        return unidadeRepo.buscarPorCodigoComResponsavel(codigo)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada(Unidade.class.getSimpleName(), codigo));
     }
 
     public Unidade buscarPorSigla(String sigla) {
-        return unidadeRepo.findBySiglaComResponsavel(sigla)
+        return unidadeRepo.buscarPorSiglaComResponsavel(sigla)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada(Unidade.class.getSimpleName(), sigla));
     }
 
-    public List<Unidade> porCodigos(List<Long> codigos) {
+    public List<Unidade> buscarPorCodigos(List<Long> codigos) {
         return unidadeRepo.findAllById(codigos);
     }
 
-    public List<Unidade> todasComHierarquia() {
-        return unidadeRepo.findAllWithHierarquia();
+    public List<Unidade> buscarTodasComHierarquia() {
+        return unidadeRepo.listarTodasComHierarquia();
     }
 
     public List<String> buscarSiglasPorCodigos(List<Long> codigos) {
-        return unidadeRepo.findSiglasByCodigos(codigos);
+        return unidadeRepo.buscarSiglasPorCodigos(codigos);
     }
 
-    public boolean verificarMapaVigente(Long codigoUnidade) {
-        return unidadeMapaRepo.existsByUnidadeCodigo(codigoUnidade);
+    public boolean temMapaVigente(Long codigoUnidade) {
+        return unidadeMapaRepo.existsById(codigoUnidade);
     }
 
     public Optional<MapaVigenteReferenciaDto> buscarReferenciaMapaVigente(Long codigoUnidade) {
-        return unidadeMapaRepo.findByUnidadeCodigo(codigoUnidade)
+        return unidadeMapaRepo.findById(codigoUnidade)
                 .map(UnidadeMapa::getMapaVigente)
                 .filter(obj -> true)
                 .map(Mapa::getSubprocesso)
@@ -69,16 +69,16 @@ public class UnidadeService {
     }
 
     public List<Long> buscarTodosCodigosUnidadesComMapa() {
-        return unidadeMapaRepo.findAllUnidadeCodigos();
+        return unidadeMapaRepo.listarTodosCodigosUnidade();
     }
 
     public List<UnidadeMapa> buscarMapasPorUnidades(List<Long> codigosUnidades) {
-        return unidadeMapaRepo.findAllByUnidadeCodigoIn(codigosUnidades);
+        return unidadeMapaRepo.findAllById(codigosUnidades);
     }
 
     @Transactional
     public void definirMapaVigente(Long codigoUnidade, Mapa mapa) {
-        UnidadeMapa unidadeMapa = unidadeMapaRepo.findByUnidadeCodigo(codigoUnidade).orElse(new UnidadeMapa());
+        UnidadeMapa unidadeMapa = unidadeMapaRepo.findById(codigoUnidade).orElse(new UnidadeMapa());
         unidadeMapa.setUnidadeCodigo(codigoUnidade);
         unidadeMapa.setMapaVigente(mapa);
 

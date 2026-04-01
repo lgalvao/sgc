@@ -16,7 +16,7 @@ public interface AlertaUsuarioRepo extends JpaRepository<AlertaUsuario, AlertaUs
              WHERE au.codigo.usuarioTitulo = :usuarioTitulo AND
                    au.codigo.alertaCodigo IN :alertaCodigos
             """)
-    List<AlertaUsuario> findByUsuarioAndAlertas(
+    List<AlertaUsuario> listarPorUsuarioEAlertas(
             @Param("usuarioTitulo") String usuarioTitulo,
             @Param("alertaCodigos") List<Long> alertaCodigos);
 }

@@ -12,6 +12,7 @@ plugins {
     jacoco
     id("org.springframework.boot") version "4.0.5"
     id("io.spring.dependency-management") version "1.1.7"
+    id("org.openrewrite.rewrite")
     id("com.github.spotbugs") version "6.4.8"
     id("net.ltgt.errorprone") version "4.3.0"
     id("info.solidsoft.pitest") version "1.19.0-rc.3"
@@ -114,6 +115,19 @@ dependencies {
 
     errorprone("com.google.errorprone:error_prone_core:2.48.0")
     errorprone("com.uber.nullaway:nullaway:0.13.1")
+
+    rewrite("org.openrewrite:rewrite-java:8.75.5")
+}
+
+rewrite {
+    activeRecipe("sgc.java.renomearMetodosRepoCategoriaA")
+    configFile = rootProject.file("etc/openrewrite/renomear-metodos-repo-categoria-a.yml")
+}
+
+listOf("rewriteDiscover", "rewriteDryRun", "rewriteRun").forEach { nomeTarefa ->
+    tasks.named(nomeTarefa) {
+        notCompatibleWithConfigurationCache("OpenRewrite ainda nao e compativel com configuration cache neste build")
+    }
 }
 
 

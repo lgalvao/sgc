@@ -27,7 +27,7 @@ public class UnidadeHierarquiaService {
      * Busca a árvore hierárquica completa de unidades.
      */
     public List<UnidadeDto> buscarArvoreHierarquica() {
-        List<Unidade> todasUnidades = unidadeRepo.findAllWithHierarquia();
+        List<Unidade> todasUnidades = unidadeRepo.listarTodasComHierarquia();
         return montarHierarquia(todasUnidades);
     }
 
@@ -35,7 +35,7 @@ public class UnidadeHierarquiaService {
      * Busca a árvore hierárquica com filtro de elegibilidade.
      */
     public List<UnidadeDto> buscarArvoreComElegibilidade(Predicate<Unidade> elegibilidadeChecker) {
-        List<Unidade> todasUnidades = unidadeRepo.findAllWithHierarquia();
+        List<Unidade> todasUnidades = unidadeRepo.listarTodasComHierarquia();
         return montarHierarquia(todasUnidades, elegibilidadeChecker);
     }
 
@@ -84,7 +84,7 @@ public class UnidadeHierarquiaService {
      * Constrói o mapa de hierarquia (Pai -> Lista de Filhos) buscando todas as unidades.
      */
     public Map<Long, List<Long>> buscarMapaHierarquia() {
-        List<Unidade> todas = unidadeRepo.findAllAtivasComSuperior();
+        List<Unidade> todas = unidadeRepo.listarAtivasComSuperior();
 
         Map<Long, List<Long>> mapPaiFilhos = new HashMap<>();
         for (Unidade u : todas) {

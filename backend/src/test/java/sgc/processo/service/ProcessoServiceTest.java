@@ -48,7 +48,7 @@ class ProcessoServiceTest {
     @Mock
     private UnidadeService unidadeService;
     @Mock
-    private ResponsabilidadeRepo responsabilidadeRepo;
+    private ResponsavelUnidadeService responsavelUnidadeService;
     @Mock
     private SubprocessoService subprocessoService;
     @Mock
@@ -70,16 +70,7 @@ class ProcessoServiceTest {
 
     @BeforeEach
     void configurarMocksPadrao() {
-        lenient().when(responsabilidadeRepo.findByUnidadeCodigoIn(anyList()))
-                .thenAnswer(invocacao -> {
-                    List<Long> codigos = invocacao.getArgument(0);
-                    return codigos.stream().map(codigo -> {
-                        Responsabilidade responsabilidade = new Responsabilidade();
-                        responsabilidade.setUnidadeCodigo(codigo);
-                        responsabilidade.setUsuarioTitulo("RESP-" + codigo);
-                        return responsabilidade;
-                    }).toList();
-                });
+        lenient().when(responsavelUnidadeService.todasPossuemResponsavelEfetivo(anyList())).thenReturn(true);
     }
 
     @Nested
@@ -192,9 +183,9 @@ class ProcessoServiceTest {
             p.adicionarParticipantes(Set.of(uni));
 
             when(repo.buscar(Processo.class, id)).thenReturn(p);
-            when(unidadeService.porCodigos(anyList())).thenReturn(List.of(uni));
+            when(unidadeService.buscarPorCodigos(anyList())).thenReturn(List.of(uni));
             when(unidadeService.buscarPorCodigo(1L)).thenReturn(uni);
-            when(unidadeService.verificarMapaVigente(1L)).thenReturn(true);
+            when(unidadeService.temMapaVigente(1L)).thenReturn(true);
             
             UnidadeMapa um = new UnidadeMapa();
             um.setUnidadeCodigo(1L);
@@ -251,9 +242,9 @@ class ProcessoServiceTest {
             p.adicionarParticipantes(Set.of(uni));
 
             when(repo.buscar(Processo.class, id)).thenReturn(p);
-            when(unidadeService.porCodigos(anyList())).thenReturn(List.of(uni));
+            when(unidadeService.buscarPorCodigos(anyList())).thenReturn(List.of(uni));
             // Simular que a unidade não tem mapa vigente
-            when(unidadeService.verificarMapaVigente(1L)).thenReturn(false);
+            when(unidadeService.temMapaVigente(1L)).thenReturn(false);
             when(unidadeService.buscarSiglasPorCodigos(anyList())).thenReturn(List.of("U1"));
 
             assertThatThrownBy(() -> processoService.iniciar(id, List.of(1L), usuario))
@@ -271,7 +262,7 @@ class ProcessoServiceTest {
             p.setTipo(TipoProcesso.DIAGNOSTICO);
             
             when(repo.buscar(Processo.class, id)).thenReturn(p);
-            when(unidadeService.porCodigos(anyList())).thenReturn(List.of());
+            when(unidadeService.buscarPorCodigos(anyList())).thenReturn(List.of());
             when(validacaoService.validarSubprocessosParaFinalizacao(id))
                     .thenReturn(ValidationResult.ofValido());
             
@@ -395,7 +386,7 @@ class ProcessoServiceTest {
             p.adicionarParticipantes(Set.of(uSemSub));
 
             when(repo.buscar(Processo.class, codProcesso)).thenReturn(p);
-            when(unidadeService.todasComHierarquia()).thenReturn(List.of(uPai, uFilho, uSemSub));
+            when(unidadeService.buscarTodasComHierarquia()).thenReturn(List.of(uPai, uFilho, uSemSub));
 
             Subprocesso sp = new Subprocesso();
             sp.setCodigo(100L);
@@ -488,7 +479,7 @@ class ProcessoServiceTest {
             unidade.setSigla("U1");
             unidade.setSituacao(SituacaoUnidade.ATIVA);
             when(unidadeService.buscarPorCodigo(1L)).thenReturn(unidade);
-            when(responsabilidadeRepo.findByUnidadeCodigoIn(List.of(1L))).thenReturn(List.of());
+            when(responsavelUnidadeService.todasPossuemResponsavelEfetivo(List.of(1L))).thenReturn(false);
 
             assertThatThrownBy(() -> processoService.criar(req))
                     .isInstanceOf(ErroValidacao.class)
@@ -586,7 +577,7 @@ class ProcessoServiceTest {
             u.setCodigo(1L);
             gestor.setUnidadeAtivaCodigo(1L);
             when(usuarioService.usuarioAutenticado()).thenReturn(gestor);
-            when(unidadeService.todasComHierarquia()).thenReturn(List.of(u));
+            when(unidadeService.buscarTodasComHierarquia()).thenReturn(List.of(u));
 
             Processo p = new Processo();
             when(processoRepo.listarPorSituacaoEUnidadeCodigos(eq(SituacaoProcesso.EM_ANDAMENTO), anyList())).thenReturn(List.of(p));
@@ -838,8 +829,8 @@ class ProcessoServiceTest {
             p.adicionarParticipantes(Set.of(uni));
 
             when(repo.buscar(Processo.class, id)).thenReturn(p);
-            when(unidadeService.porCodigos(anyList())).thenReturn(List.of(uni));
-            when(unidadeService.verificarMapaVigente(1L)).thenReturn(true);
+            when(unidadeService.buscarPorCodigos(anyList())).thenReturn(List.of(uni));
+            when(unidadeService.temMapaVigente(1L)).thenReturn(true);
             
             UnidadeMapa um = new UnidadeMapa();
             um.setUnidadeCodigo(1L);

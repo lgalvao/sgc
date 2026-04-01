@@ -107,7 +107,7 @@ class CDU33IntegrationTest extends BaseIntegrationTest {
         assertThat(spReaberto.getSituacao()).isEqualTo(REVISAO_CADASTRO_EM_ANDAMENTO);
 
         // Verificar se foi criada uma movimentação
-        List<Movimentacao> movimentacoes = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(codSp);
+        List<Movimentacao> movimentacoes = movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(codSp);
         assertThat(movimentacoes).isNotEmpty();
         boolean movimentacaoExiste = movimentacoes.stream()
                 .anyMatch(m -> m.getDescricao().contains("Reabertura de revisão de cadastro"));

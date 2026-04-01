@@ -35,6 +35,7 @@ class ProcessoServiceCoverageTest {
     @Mock private ProcessoRepo processoRepo;
     @Mock private ComumRepo repo;
     @Mock private UnidadeService unidadeService;
+    @Mock private ResponsavelUnidadeService responsavelUnidadeService;
     @Mock private UsuarioFacade usuarioService;
     @Mock private SubprocessoService subprocessoService; @Mock private SubprocessoConsultaService consultaService;
     @Mock private SubprocessoValidacaoService validacaoService;
@@ -47,6 +48,11 @@ class ProcessoServiceCoverageTest {
 
     @InjectMocks
     private ProcessoService target;
+
+    @BeforeEach
+    void configurarMocksPadrao() {
+        lenient().when(responsavelUnidadeService.todasPossuemResponsavelEfetivo(anyList())).thenReturn(true);
+    }
 
     @Test
     @DisplayName("executarAcaoEmBloco deve lançar ErroAcessoNegado quando não houver permissão")
@@ -101,7 +107,7 @@ class ProcessoServiceCoverageTest {
 
         Unidade uni = new Unidade();
         uni.setCodigo(10L);
-        when(unidadeService.porCodigos(anyList())).thenReturn(List.of(uni));
+        when(unidadeService.buscarPorCodigos(anyList())).thenReturn(List.of(uni));
 
         when(repo.buscar(Processo.class, codigo)).thenReturn(p);
 
@@ -173,7 +179,7 @@ class ProcessoServiceCoverageTest {
         uni.setTipo(sgc.organizacao.model.TipoUnidade.OPERACIONAL);
         uni.setSituacao(sgc.organizacao.model.SituacaoUnidade.ATIVA);
         
-        when(unidadeService.porCodigos(anyList())).thenReturn(List.of(uni));
+        when(unidadeService.buscarPorCodigos(anyList())).thenReturn(List.of(uni));
         when(unidadeService.buscarMapasPorUnidades(anyList())).thenReturn(new ArrayList<>());
         
         Unidade admin = new Unidade();
@@ -335,7 +341,7 @@ class ProcessoServiceCoverageTest {
         Unidade admin = new Unidade(); admin.setCodigo(99L); admin.setSigla("ADMIN"); admin.setSituacao(SituacaoUnidade.ATIVA);
 
         when(repo.buscar(Processo.class, cod)).thenReturn(p);
-        when(unidadeService.porCodigos(any())).thenReturn(List.of(u));
+        when(unidadeService.buscarPorCodigos(any())).thenReturn(List.of(u));
         UnidadeMapa um = new UnidadeMapa(); um.setUnidadeCodigo(10L); 
         when(unidadeService.buscarMapasPorUnidades(any())).thenReturn(List.of(um));
         when(repo.buscarPorSigla(Unidade.class, "ADMIN")).thenReturn(admin);
@@ -371,7 +377,7 @@ class ProcessoServiceCoverageTest {
             Unidade u3 = new Unidade(); u3.setCodigo(2L); // mesma unidade 2
             u3.setUnidadeSuperior(u1);
 
-            when(unidadeService.todasComHierarquia()).thenReturn(List.of(u1, u2, u3));
+            when(unidadeService.buscarTodasComHierarquia()).thenReturn(List.of(u1, u2, u3));
             
             List<Long> res = org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "buscarDescendentes", 1L);
             assertThat(res).containsExactlyInAnyOrder(1L, 2L); // branch 357 (result.add(codFilho) == false)

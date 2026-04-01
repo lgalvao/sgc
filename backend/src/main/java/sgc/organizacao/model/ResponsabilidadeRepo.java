@@ -13,7 +13,7 @@ public interface ResponsabilidadeRepo extends JpaRepository<Responsabilidade, Lo
             JOIN FETCH r.unidade u
             WHERE r.unidadeCodigo IN :unidadeCodigos
             """)
-    List<Responsabilidade> findByUnidadeCodigoIn(@Param("unidadeCodigos") List<Long> unidadeCodigos);
+    List<Responsabilidade> listarPorCodigosUnidade(@Param("unidadeCodigos") List<Long> unidadeCodigos);
 
     List<Responsabilidade> findByUsuarioTitulo(String usuarioTitulo);
 }

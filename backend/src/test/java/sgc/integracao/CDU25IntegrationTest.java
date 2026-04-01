@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.authority.*;
 import org.springframework.transaction.annotation.*;
 import sgc.fixture.*;
 import sgc.integracao.mocks.*;
@@ -127,12 +128,61 @@ class CDU25IntegrationTest extends BaseIntegrationTest {
         assertThat(analises1).isNotEmpty();
         assertThat(analises1.getFirst().getAcao()).isEqualTo(TipoAcaoAnalise.ACEITE_MAPEAMENTO);
 
-        List<Movimentacao> movs1 = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(s1.getCodigo());
+        List<Movimentacao> movs1 = movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(s1.getCodigo());
         assertThat(movs1).isNotEmpty();
         assertThat(movs1.getFirst().getDescricao()).contains("Mapa de competências validado");
 
         // Check subprocesso 2
         Subprocesso s2 = subprocessoRepo.findById(subprocesso2.getCodigo()).orElseThrow();
         assertThat(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(s2.getCodigo())).isNotEmpty();
+    }
+
+    @Test
+    @DisplayName("Gestor da secretaria superior deve visualizar alerta no painel após aceite de validação")
+    void gestorSecretariaSuperiorDeveVisualizarAlertaNoPainel() throws Exception {
+        Unidade secao211 = unidadeRepo.findById(15L).orElseThrow();
+        Unidade coord21 = unidadeRepo.findById(14L).orElseThrow();
+        Unidade secretaria2 = unidadeRepo.findById(11L).orElseThrow();
+
+        Processo processoPainel = ProcessoFixture.processoPadrao();
+        processoPainel.setCodigo(null);
+        processoPainel.setTipo(TipoProcesso.MAPEAMENTO);
+        processoPainel.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+        processoPainel.setDescricao("Processo painel CDU-25");
+        processoPainel = processoRepo.saveAndFlush(processoPainel);
+
+        Subprocesso subprocessoPainel = SubprocessoFixture.subprocessoPadrao(processoPainel, secao211);
+        subprocessoPainel.setCodigo(null);
+        subprocessoPainel.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
+        subprocessoPainel = subprocessoRepo.saveAndFlush(subprocessoPainel);
+
+        Movimentacao movimentacaoInicial = Movimentacao.builder()
+                .subprocesso(subprocessoPainel)
+                .unidadeOrigem(secao211)
+                .unidadeDestino(coord21)
+                .descricao("Mapa validado")
+                .dataHora(LocalDateTime.now())
+                .build();
+        movimentacaoRepo.saveAndFlush(movimentacaoInicial);
+
+        Usuario usuarioCoord21 = usuarioRepo.findById("999999").orElseThrow();
+        usuarioCoord21.setPerfilAtivo(Perfil.GESTOR);
+        usuarioCoord21.setUnidadeAtivaCodigo(coord21.getCodigo());
+        usuarioCoord21.setAuthorities(Set.of(new SimpleGrantedAuthority("ROLE_GESTOR")));
+
+        mockMvc.perform(post("/api/subprocessos/{codigo}/aceitar-validacao", subprocessoPainel.getCodigo())
+                        .with(user(usuarioCoord21))
+                        .with(csrf()))
+                .andExpect(status().isOk());
+
+        Usuario usuarioSecretaria2 = usuarioRepo.findById("212121").orElseThrow();
+        usuarioSecretaria2.setPerfilAtivo(Perfil.GESTOR);
+        usuarioSecretaria2.setUnidadeAtivaCodigo(secretaria2.getCodigo());
+        usuarioSecretaria2.setAuthorities(Set.of(new SimpleGrantedAuthority("ROLE_GESTOR")));
+
+        mockMvc.perform(get("/api/painel/alertas")
+                        .with(user(usuarioSecretaria2)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[?(@.descricao =~ /.*SECAO_211.*/)]").exists());
     }
 }
