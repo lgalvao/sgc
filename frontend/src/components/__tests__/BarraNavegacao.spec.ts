@@ -21,7 +21,12 @@ vi.mock("vue-router", () => ({
 }));
 
 // Helper to create mock routes
-const createMockRoute = (path: string, matched: any[], routeName = "", params: Record<string, string> = {}) => ({
+const createMockRoute = (
+    path: string,
+    matched: any[],
+    routeName = "",
+    params: Record<string, string> = {},
+) => ({
     path,
     matched,
     params,
