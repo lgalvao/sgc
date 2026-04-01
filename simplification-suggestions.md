@@ -28,14 +28,14 @@ Dado o contexto estrito do SGC (intranet, 5-10 usuários simultâneos), muitas d
     *   **Solução:** Permitir que os Controllers (ex: `ProcessoController`, `SubprocessoController`) injetem e utilizem diretamente as interfaces de Repository.
 
 3.  **Remoção de Facades Desnecessárias:**
-    *   **Problema:** Facades como `AtividadeFacade` (`backend/src/main/java/sgc/mapa/AtividadeFacade.java`) adicionam indireção sem abstração significativa.
-    *   **Solução:** Mover a lógica da Facade diretamente para os serviços de domínio relevantes.
+    *   **Problema:** Facades como `AtividadeFacade` (`backend/src/main/java/sgc/mapa/AtividadeFacade.java`), `PainelFacade`, `AlertaFacade`, `RelatorioFacade`, `LoginFacade`, e `UsuarioFacade` adicionam indireção sem abstração significativa. Elas atuam quase unicamente como "pass-through", transferindo chamadas diretamente aos serviços subjacentes sem adicionar valor claro de negócio.
+    *   **Solução:** Mover a lógica da Facade diretamente para os serviços de domínio relevantes. Por exemplo, unificar `LoginFacade` com o serviço de autenticação principal, ou mover operações específicas de `AtividadeFacade` para `MapaManutencaoService`.
 
 ## Situação Atual (Frontend - Vue.js / TypeScript)
 
 1.  **Remoção de Wrappers Visuais Finos:**
-    *   **Problema:** Componentes como `LoadingButton.vue` são wrappers finos sobre `BButton`.
-    *   **Solução:** Remover e usar `<BButton>` nativo diretamente com um `<BSpinner>`.
+    *   **Problema:** Componentes como `LoadingButton.vue` são wrappers finos sobre `BButton` (`frontend/src/components/comum/LoadingButton.vue`), adicionando sobrecarga na árvore do Vue sem muita justificativa, e com baixa reusabilidade. A mesma lógica é repetida em diversas views.
+    *   **Solução:** Remover `LoadingButton.vue` e usar `<BButton>` nativo diretamente com um `<BSpinner>` na aplicação para manter a árvore de componentes plana e simples. A complexidade do wrapper não compensa seu benefício no contexto de um sistema pequeno.
 
 2.  **Redução de Complexidade em Views:**
     *   **Problema:** Views muito extensas (ex: `ProcessoDetalheView.vue` e `MapaView.vue`).
