@@ -137,6 +137,7 @@ public final class Mensagens {
     public static final String UNIDADES_INTERMEDIARIA_INVALIDAS = "Unidades INTERMEDIARIA inválidas: %s";
     public static final String UNIDADES_SEM_MAPA_VIGENTE        = "Unidades sem mapa vigente: %s";
     public static final String UNIDADES_SEM_SUBPROCESSOS        = "Algumas unidades selecionadas não possuem subprocessos vinculados neste processo: %s";
+    public static final String OPERACAO_NAO_PERMITIDA           = "Não foi possível concluir a operação.";
 
     // ── Histórico de Movimentações ──────────────────────────────────────────
     public static final String HIST_CADASTRO_DISPONIBILIZADO     = "Disponibilização do cadastro de atividades";
@@ -171,6 +172,8 @@ public final class Mensagens {
     public static final String ALERTA_MAPA_SUGESTOES             = "Sugestões para o mapa de competências da unidade %s aguardando análise";
     public static final String ALERTA_MAPA_VALIDACAO_PENDENTE    = "Validação do mapa de competências da unidade %s aguardando análise";
     public static final String ALERTA_MAPA_VALIDACAO_DEVOLVIDA   = "Validação do mapa da unidade %s devolvida para ajustes";
+    public static final String ALERTA_CADASTRO_HOMOLOGADO        = "Cadastro da unidade %s homologado";
+    public static final String ALERTA_REVISAO_HOMOLOGADA         = "Revisão do cadastro da unidade %s homologada";
     public static final String ALERTA_MAPA_VALIDACAO_ACEITA      = "Validação do mapa da unidade %s submetida para análise";
     public static final String ALERTA_PROCESSO_INICIADO          = "Início do processo";
 

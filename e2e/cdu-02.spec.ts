@@ -157,12 +157,12 @@ test.describe('CDU-02 - Visualizar painel', () => {
             await expect(page).toHaveURL(/\/painel/);
             await page.goto('/painel');
 
-            // Verifica que o processo foi criado e aparece na tabela
+            // Verifica que o processo foi criado com as filhas operacionais (COORD_11 é INTERMEDIARIA e é filtrada)
             await verificarProcessoNaTabela(page, {
                 descricao: descricaoProcesso,
                 situacao: 'Criado',
                 tipo: 'Mapeamento',
-                unidadesParticipantes: ['COORD_11']
+                unidadesParticipantes: ['SECAO_111', 'SECAO_112', 'SECAO_113']
             });
         });
 
@@ -291,6 +291,28 @@ test.describe('CDU-02 - Visualizar painel', () => {
                 .first();
             await expect(linhaAlertaLida).toBeVisible();
             await expect(linhaAlertaLida).not.toHaveClass(/fw-bold/);
+        });
+    });
+
+    test.describe('Visibilidade de alertas por perfil', () => {
+        test('SERVIDOR não deve ver alertas de unidade', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
+            const descricao = `Proc servidor alertas - ${Date.now()}`;
+            await criarProcesso(page, {
+                descricao,
+                tipo: 'MAPEAMENTO',
+                diasLimite: 30,
+                unidade: 'SECAO_113',
+                expandir: ['SECRETARIA_1', 'COORD_11'],
+                iniciar: true
+            });
+
+            await fazerLogout(page);
+            await login(page, USUARIOS.SERVIDOR.titulo, USUARIOS.SERVIDOR.senha);
+
+            // SERVIDOR vê apenas alertas pessoais, não alertas de unidade
+            const tblAlertas = page.getByTestId('tbl-alertas');
+            const linhaAlerta = tblAlertas.locator('tr', {hasText: descricao}).first();
+            await expect(linhaAlerta).toBeHidden();
         });
     });
 });

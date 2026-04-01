@@ -24,14 +24,14 @@ import java.util.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.util.ReflectionTestUtils.*;
 import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("SubprocessoService Extra Coverage Test")
 @SuppressWarnings("NullAway.Init")
 class SubprocessoServiceExtraCoverageTest {
-
+    @Mock
+    private SubprocessoConsultaService consultaService;
     @Mock
     private SubprocessoRepo subprocessoRepo;
     @Mock
@@ -81,61 +81,6 @@ class SubprocessoServiceExtraCoverageTest {
     }
 
     @Nested
-    @DisplayName("obterUnidadeLocalizacao")
-    class ObterUnidadeLocalizacao {
-        @Test
-        @DisplayName("deve retornar a unidade destino da ultima movimentacao se localizacaoAtual for null")
-        void deveRetornarDestinoMovimentacao() {
-            Unidade u1 = new Unidade();
-            u1.setCodigo(1L);
-            Unidade u2 = new Unidade();
-            u2.setCodigo(2L);
-            Subprocesso sp = criarSubprocessoComMapa(100L);
-            sp.setUnidade(u1);
-            Movimentacao mov = new Movimentacao();
-            mov.setUnidadeDestino(u2);
-
-            when(movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(100L)).thenReturn(List.of(mov));
-
-            assertThat(subprocessoService.obterUnidadeLocalizacao(sp)).isEqualTo(u2);
-        }
-
-        @Test
-        @DisplayName("deve retornar unidade do subprocesso se movimentacao nao tiver destino e localizacaoAtual for null")
-        void deveRetornarUnidadeSubprocesso() {
-            Unidade u1 = new Unidade();
-            u1.setCodigo(1L);
-            Subprocesso sp = criarSubprocessoComMapa(100L);
-            sp.setUnidade(u1);
-            Movimentacao mov = new Movimentacao();
-            mov.setUnidadeDestino(null);
-
-            when(movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(100L)).thenReturn(List.of(mov));
-
-            assertThat(subprocessoService.obterUnidadeLocalizacao(sp)).isEqualTo(u1);
-        }
-
-        @Test
-        @DisplayName("deve retornar unidade do subprocesso se codigo for null")
-        void codNull() {
-            Unidade u = new Unidade();
-            Subprocesso sp = criarSubprocessoComMapa(null);
-            sp.setUnidade(u);
-            assertThat(subprocessoService.obterUnidadeLocalizacao(sp)).isEqualTo(u);
-        }
-
-        @Test
-        @DisplayName("deve retornar unidade do subprocesso se movimentacoes vazio")
-        void movVazio() {
-            Unidade u = new Unidade();
-            Subprocesso sp = criarSubprocessoComMapa(1L);
-            sp.setUnidade(u);
-            when(movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(1L)).thenReturn(List.of());
-            assertThat(subprocessoService.obterUnidadeLocalizacao(sp)).isEqualTo(u);
-        }
-    }
-
-    @Nested
     @DisplayName("Manutenção de Mapa")
     class ManutencaoMapa {
         @Test
@@ -145,7 +90,8 @@ class SubprocessoServiceExtraCoverageTest {
             sp.setSituacaoForcada(MAPEAMENTO_CADASTRO_HOMOLOGADO);
             sp.getMapa().setCodigo(100L);
 
-            when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(1L)).thenReturn(Optional.of(sp));
+            when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
+            when(consultaService.obterCodigoMapaObrigatorio(any())).thenReturn(100L);
             when(mapaManutencaoService.competenciasCodMapa(100L)).thenReturn(List.of()); // eraVazio = true
             when(mapaSalvamentoService.salvarMapaCompleto(eq(100L), any())).thenReturn(sp.getMapa());
 
@@ -163,7 +109,8 @@ class SubprocessoServiceExtraCoverageTest {
             sp.setSituacaoForcada(REVISAO_CADASTRO_HOMOLOGADA);
             sp.getMapa().setCodigo(100L);
 
-            when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(1L)).thenReturn(Optional.of(sp));
+            when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
+            when(consultaService.obterMapaObrigatorio(any())).thenReturn(sp.getMapa());
             when(mapaManutencaoService.competenciasCodMapa(100L)).thenReturn(List.of()); // eraVazio = true
             when(mapaManutencaoService.mapaCodigo(100L)).thenReturn(sp.getMapa());
 
@@ -179,7 +126,8 @@ class SubprocessoServiceExtraCoverageTest {
             sp.setSituacaoForcada(MAPEAMENTO_MAPA_CRIADO);
             sp.getMapa().setCodigo(100L);
 
-            when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(1L)).thenReturn(Optional.of(sp));
+            when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
+            when(consultaService.obterCodigoMapaObrigatorio(any())).thenReturn(100L);
             when(mapaManutencaoService.competenciasCodMapa(100L)).thenReturn(List.of()); // ficouVazio = true
             when(mapaManutencaoService.mapaCodigo(100L)).thenReturn(sp.getMapa());
 
@@ -195,7 +143,8 @@ class SubprocessoServiceExtraCoverageTest {
             sp.setSituacaoForcada(REVISAO_MAPA_AJUSTADO);
             sp.getMapa().setCodigo(100L);
 
-            when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(1L)).thenReturn(Optional.of(sp));
+            when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
+            when(consultaService.obterCodigoMapaObrigatorio(any())).thenReturn(100L);
             when(mapaManutencaoService.competenciasCodMapa(100L)).thenReturn(List.of()); // ficouVazio = true
             when(mapaManutencaoService.mapaCodigo(100L)).thenReturn(sp.getMapa());
 
@@ -211,7 +160,8 @@ class SubprocessoServiceExtraCoverageTest {
             sp.setSituacaoForcada(MAPEAMENTO_CADASTRO_HOMOLOGADO);
             sp.getMapa().setCodigo(100L);
 
-            when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(1L)).thenReturn(Optional.of(sp));
+            when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
+            when(consultaService.obterCodigoMapaObrigatorio(any())).thenReturn(100L);
             when(mapaManutencaoService.competenciasCodMapa(100L)).thenReturn(List.of()); // eraVazio = true
             when(mapaSalvamentoService.salvarMapaCompleto(eq(100L), any())).thenReturn(sp.getMapa());
 
@@ -228,7 +178,8 @@ class SubprocessoServiceExtraCoverageTest {
             sp.setSituacaoForcada(MAPEAMENTO_CADASTRO_HOMOLOGADO);
             sp.getMapa().setCodigo(100L);
 
-            when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(1L)).thenReturn(Optional.of(sp));
+            when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
+            when(consultaService.obterCodigoMapaObrigatorio(any())).thenReturn(100L);
             when(mapaManutencaoService.competenciasCodMapa(100L)).thenReturn(List.of(new Competencia())); // eraVazio = false
             when(mapaSalvamentoService.salvarMapaCompleto(eq(100L), any())).thenReturn(sp.getMapa());
 
@@ -245,7 +196,8 @@ class SubprocessoServiceExtraCoverageTest {
             sp.setSituacaoForcada(MAPEAMENTO_CADASTRO_HOMOLOGADO);
             sp.getMapa().setCodigo(100L);
 
-            when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(1L)).thenReturn(Optional.of(sp));
+            when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
+            when(consultaService.obterCodigoMapaObrigatorio(any())).thenReturn(100L);
             when(mapaManutencaoService.competenciasCodMapa(100L)).thenReturn(List.of(new Competencia())); // eraVazio = false
             when(mapaSalvamentoService.salvarMapaCompleto(eq(100L), any())).thenReturn(sp.getMapa());
 
@@ -262,7 +214,8 @@ class SubprocessoServiceExtraCoverageTest {
             sp.setSituacaoForcada(REVISAO_CADASTRO_HOMOLOGADA);
             sp.getMapa().setCodigo(100L);
 
-            when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(1L)).thenReturn(Optional.of(sp));
+            when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
+            when(consultaService.obterMapaObrigatorio(any())).thenReturn(sp.getMapa());
             when(mapaManutencaoService.competenciasCodMapa(100L)).thenReturn(List.of(new Competencia())); // eraVazio = false
             when(mapaManutencaoService.mapaCodigo(100L)).thenReturn(sp.getMapa());
 
@@ -278,7 +231,8 @@ class SubprocessoServiceExtraCoverageTest {
             sp.setSituacaoForcada(MAPEAMENTO_MAPA_CRIADO);
             sp.getMapa().setCodigo(100L);
 
-            when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(1L)).thenReturn(Optional.of(sp));
+            when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
+            when(consultaService.obterCodigoMapaObrigatorio(any())).thenReturn(100L);
             when(mapaManutencaoService.competenciasCodMapa(100L)).thenReturn(List.of(new Competencia())); // ficouVazio = false
             when(mapaManutencaoService.mapaCodigo(100L)).thenReturn(sp.getMapa());
 
@@ -306,385 +260,93 @@ class SubprocessoServiceExtraCoverageTest {
     }
 
     @Nested
-    @DisplayName("Permissões e Detalhes")
-    class PermissoesEDetalhes {
+    @DisplayName("Criação de Subprocesso")
+    class CriacaoSubprocesso {
         @Test
-        @DisplayName("deve obter detalhes e permissoes para CHEFE em processo finalizado")
-        void obterDetalhes_Chefe_ProcessoFinalizado() {
-            Subprocesso sp = criarSubprocessoComMapa(1L);
-            sp.setSituacaoForcada(MAPEAMENTO_MAPA_HOMOLOGADO);
-
-            Unidade u = new Unidade();
-            u.setTipo(TipoUnidade.OPERACIONAL);
-            u.setCodigo(10L);
-            u.setSigla("U1");
-            u.setTituloTitular("titular");
-            sp.setUnidade(u);
-
-            Processo p = sp.getProcesso();
-            p.setSituacao(SituacaoProcesso.FINALIZADO);
-
-            Usuario user = criarUsuarioMock();
-            user.setPerfilAtivo(Perfil.CHEFE);
-            user.setUnidadeAtivaCodigo(10L);
-
-            when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(1L)).thenReturn(Optional.of(sp));
-            when(usuarioFacade.buscarPorLogin("titular")).thenReturn(user);
-            when(movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(1L)).thenReturn(List.of());
-            when(unidadeService.buscarPorCodigo(10L)).thenReturn(u);
-
-            SubprocessoDetalheResponse res = subprocessoService.obterDetalhes(1L, user);
-
-            assertThat(res.permissoes().habilitarAcessoCadastro()).isTrue();
-            assertThat(res.permissoes().habilitarAcessoMapa()).isTrue();
-        }
-
-        @Test
-        @DisplayName("obterDetalhes com movimentacao completa")
-        void obterDetalhes_MovimentacaoCompleta() {
-            Subprocesso sp = criarSubprocessoComMapa(1L);
-            sp.setSituacaoForcada(MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
-            Unidade u = new Unidade();
-            u.setTipo(TipoUnidade.OPERACIONAL);
-            u.setSigla("U1");
-            u.setCodigo(10L);
-            u.setTituloTitular("titular");
-            sp.setUnidade(u);
-
-            Usuario user = criarUsuarioMock();
-            user.setPerfilAtivo(Perfil.ADMIN);
-            user.setUnidadeAtivaCodigo(10L);
-
-            Unidade dest = new Unidade();
-            dest.setCodigo(20L);
-            dest.setSigla("U2");
-            dest.setNome("Dest");
-            Movimentacao mov = new Movimentacao();
-            mov.setUnidadeOrigem(u);
-            mov.setUnidadeDestino(dest);
-            mov.setUsuario(user);
-
-            when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(1L)).thenReturn(Optional.of(sp));
-            when(movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(1L)).thenReturn(List.of(mov));
-            when(unidadeService.buscarPorCodigo(10L)).thenReturn(u);
-            when(usuarioFacade.buscarPorLogin("titular")).thenReturn(user);
-
-            SubprocessoDetalheResponse res = subprocessoService.obterDetalhes(1L, user);
-            assertThat(res.localizacaoAtual()).isEqualTo("U2");
-        }
-
-        @Test
-        @DisplayName("obterDetalhes com destino null na movimentacao")
-        void obterDetalhes_MovimentacaoDestinoNull() {
-            Subprocesso sp = criarSubprocessoComMapa(1L);
-            sp.setSituacaoForcada(MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
-            Unidade u = new Unidade();
-            u.setTipo(TipoUnidade.OPERACIONAL);
-            u.setSigla("U1");
-            u.setCodigo(10L);
-            u.setTituloTitular("titular");
-            sp.setUnidade(u);
-
-            Usuario user = criarUsuarioMock();
-            user.setPerfilAtivo(Perfil.ADMIN);
-            user.setUnidadeAtivaCodigo(10L);
-
-            Movimentacao mov = new Movimentacao();
-            mov.setUnidadeOrigem(u);
-            mov.setUnidadeDestino(null);
-            mov.setUsuario(user);
-
-            when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(1L)).thenReturn(Optional.of(sp));
-            when(movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(1L)).thenReturn(List.of(mov));
-            when(unidadeService.buscarPorCodigo(10L)).thenReturn(u);
-            when(usuarioFacade.buscarPorLogin("titular")).thenReturn(user);
-
-            SubprocessoDetalheResponse res = subprocessoService.obterDetalhes(1L, user);
-            assertThat(res.localizacaoAtual()).isEqualTo("U1");
-        }
-
-        @Test
-        @DisplayName("obterPermissoesUI para GESTOR")
-        void obterPermissoesUI_Gestor() {
-            Subprocesso sp = criarSubprocessoComMapa(1L);
-            sp.setSituacaoForcada(MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
-            Unidade u = new Unidade();
-            u.setCodigo(10L);
-            sp.setUnidade(u);
-
-            Usuario user = criarUsuarioMock();
-            user.setPerfilAtivo(Perfil.GESTOR);
-            user.setUnidadeAtivaCodigo(20L); // Diferente
-
-            when(unidadeService.buscarPorCodigo(20L)).thenReturn(new Unidade());
-            when(unidadeService.verificarMapaVigente(10L)).thenReturn(true);
-            when(hierarquiaService.ehMesmaOuSubordinada(any(), any())).thenReturn(true);
-
-            PermissoesSubprocessoDto res = subprocessoService.obterPermissoesUI(sp, user);
-            assertThat(res.habilitarAcessoCadastro()).isTrue();
-        }
-
-        @Test
-        @DisplayName("obterPermissoesUI para SERVIDOR mesma unidade")
-        void obterPermissoesUI_Servidor() {
-            Subprocesso sp = criarSubprocessoComMapa(1L);
-            sp.setSituacaoForcada(MAPEAMENTO_MAPA_DISPONIBILIZADO);
-            Unidade u = new Unidade();
-            u.setCodigo(10L);
-            sp.setUnidade(u);
-
-            Usuario user = criarUsuarioMock();
-            user.setPerfilAtivo(Perfil.SERVIDOR);
-            user.setUnidadeAtivaCodigo(10L);
-
-            when(unidadeService.buscarPorCodigo(10L)).thenReturn(u);
-            when(unidadeService.verificarMapaVigente(10L)).thenReturn(false);
-
-            PermissoesSubprocessoDto res = subprocessoService.obterPermissoesUI(sp, user);
-            assertThat(res.habilitarAcessoMapa()).isTrue();
-        }
-
-        @Test
-        @DisplayName("obterPermissoesUI para ADMIN sem processo e com movimentacao de destino")
-        void obterPermissoesUI_Admin() {
-            Subprocesso sp = criarSubprocessoComMapa(1L);
-            sp.setSituacaoForcada(REVISAO_MAPA_COM_SUGESTOES);
-            Unidade u = new Unidade();
-            u.setCodigo(10L);
-            sp.setUnidade(u);
-
-            Unidade dest = new Unidade();
-            dest.setCodigo(30L);
-            Movimentacao mov = new Movimentacao();
-            mov.setUnidadeDestino(dest);
-            sp.setLocalizacaoAtual(dest);
-
-            Usuario user = new Usuario();
-            user.setPerfilAtivo(Perfil.ADMIN);
-            user.setUnidadeAtivaCodigo(20L);
-
-            when(unidadeService.buscarPorCodigo(20L)).thenReturn(new Unidade());
-            when(unidadeService.verificarMapaVigente(10L)).thenReturn(true);
-
-            PermissoesSubprocessoDto res = subprocessoService.obterPermissoesUI(sp, user);
-            assertThat(res.habilitarAcessoMapa()).isTrue();
-        }
-
-        @Test
-        @DisplayName("obterPermissoesUI situacao DIAGNOSTICO")
-        void obterPermissoesUI_Diagnostico() {
-            Subprocesso sp = criarSubprocessoComMapa(1L);
-            sp.setSituacaoForcada(DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO);
-            Unidade u = new Unidade();
-            u.setCodigo(10L);
-            sp.setUnidade(u);
-
-            Usuario user = new Usuario();
-            user.setPerfilAtivo(Perfil.ADMIN);
-            user.setUnidadeAtivaCodigo(10L);
-
-            when(unidadeService.buscarPorCodigo(10L)).thenReturn(new Unidade());
-            when(unidadeService.verificarMapaVigente(10L)).thenReturn(true);
-
-            PermissoesSubprocessoDto res = subprocessoService.obterPermissoesUI(sp, user);
-            assertThat(res.habilitarAcessoCadastro()).isFalse();
-            assertThat(res.habilitarAcessoMapa()).isFalse();
-            assertThat(res.podeReabrirCadastro()).isFalse();
-            assertThat(res.podeReabrirRevisao()).isFalse();
-        }
-
-        @Test
-        @DisplayName("obterPermissoesUI para ADMIN em REVISAO")
-        void obterPermissoesUI_Admin_Revisao() {
-            Subprocesso sp = criarSubprocessoComMapa(1L);
-            sp.setSituacaoForcada(REVISAO_MAPA_HOMOLOGADO);
-            Unidade u = new Unidade();
-            u.setCodigo(10L);
-            sp.setUnidade(u);
-
-            Usuario user = new Usuario();
-            user.setPerfilAtivo(Perfil.ADMIN);
-            user.setUnidadeAtivaCodigo(10L);
-
-            when(unidadeService.buscarPorCodigo(10L)).thenReturn(new Unidade());
-            when(unidadeService.verificarMapaVigente(10L)).thenReturn(true);
-
-            PermissoesSubprocessoDto res = subprocessoService.obterPermissoesUI(sp, user);
-            assertThat(res.habilitarAcessoCadastro()).isTrue();
-            assertThat(res.habilitarAcessoMapa()).isTrue();
-            assertThat(res.podeReabrirRevisao()).isTrue();
-        }
-
-        @Test
-        @DisplayName("obterPermissoesUI para GESTOR falha hierarquia")
-        void obterPermissoesUI_Gestor_FalhaHierarquia() {
-            Subprocesso sp = criarSubprocessoComMapa(1L);
-            sp.setSituacaoForcada(REVISAO_MAPA_DISPONIBILIZADO);
-            Unidade u = new Unidade();
-            u.setCodigo(10L);
-            sp.setUnidade(u);
-
-            Usuario user = criarUsuarioMock();
-            user.setPerfilAtivo(Perfil.GESTOR);
-            user.setUnidadeAtivaCodigo(20L); // Unidade diferente
-
-            when(unidadeService.buscarPorCodigo(20L)).thenReturn(new Unidade());
-            when(unidadeService.verificarMapaVigente(10L)).thenReturn(true);
-            when(hierarquiaService.ehMesmaOuSubordinada(any(), any())).thenReturn(false);
-
-            PermissoesSubprocessoDto res = subprocessoService.obterPermissoesUI(sp, user);
-            assertThat(res.habilitarAcessoCadastro()).isFalse();
-            assertThat(res.habilitarAcessoMapa()).isFalse();
-        }
-
-        @Test
-        @DisplayName("obterPermissoesUI isChefe false branch e isAdmin false branch em situacao especifica")
-        void obterPermissoesUI_FalseBranches() {
-            Subprocesso sp = criarSubprocessoComMapa(1L);
-            sp.setSituacaoForcada(NAO_INICIADO);
-            Unidade u = new Unidade();
-            u.setCodigo(10L);
-            sp.setUnidade(u);
-
-            Usuario user = criarUsuarioMock();
-            user.setPerfilAtivo(Perfil.SERVIDOR); // isChefe=false, isAdmin=false
-            user.setUnidadeAtivaCodigo(10L);
-
-            when(unidadeService.buscarPorCodigo(10L)).thenReturn(u);
-            when(unidadeService.verificarMapaVigente(10L)).thenReturn(true);
-
-            PermissoesSubprocessoDto res = subprocessoService.obterPermissoesUI(sp, user);
-            assertThat(res.podeValidarMapa()).isFalse();
-            assertThat(res.podeDisponibilizarMapa()).isFalse();
-        }
-
-        @Test
-        @DisplayName("obterPermissoesUI processo null")
-        void obterPermissoesUI_ProcessoNull() {
-            Subprocesso sp = new Subprocesso();
-            sp.setProcesso(null);
-            sp.setSituacaoForcada(NAO_INICIADO);
-            sp.setUnidade(new Unidade());
-            sp.setCodigo(1L);
-
-            Usuario user = new Usuario();
-            user.setUnidadeAtivaCodigo(10L);
-            user.setPerfilAtivo(Perfil.ADMIN);
-
-            when(unidadeService.buscarPorCodigo(10L)).thenReturn(new Unidade());
-
-            PermissoesSubprocessoDto res = subprocessoService.obterPermissoesUI(sp, user);
-            assertThat(res).isNotNull();
-        }
-
-        @Test
-        @DisplayName("obterPermissoesUI Gestor em unidade subordinada")
-        void obterPermissoesUI_GestorSubordinada() {
-            Subprocesso sp = criarSubprocessoComMapa(1L);
-            sp.setSituacaoForcada(MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
-            Unidade uAlvo = new Unidade(); uAlvo.setCodigo(10L);
-            sp.setUnidade(uAlvo);
-
-            Usuario user = new Usuario();
-            user.setUnidadeAtivaCodigo(20L);
-            user.setPerfilAtivo(Perfil.GESTOR);
-            Unidade uGestor = new Unidade(); uGestor.setCodigo(20L);
-
-            when(unidadeService.buscarPorCodigo(20L)).thenReturn(uGestor);
-            when(hierarquiaService.ehMesmaOuSubordinada(uAlvo, uGestor)).thenReturn(true);
-
-            PermissoesSubprocessoDto res = subprocessoService.obterPermissoesUI(sp, user);
-            assertTrue(res.habilitarAcessoCadastro());
-        }
-
-        @Test
-        @DisplayName("obterPermissoesUI Servidor em unidade diferente")
-        void obterPermissoesUI_ServidorDiferente() {
-            Subprocesso sp = criarSubprocessoComMapa(1L);
-            sp.setSituacaoForcada(MAPEAMENTO_MAPA_DISPONIBILIZADO);
-            Unidade uAlvo = new Unidade(); uAlvo.setCodigo(10L);
-            sp.setUnidade(uAlvo);
-
-            Usuario user = new Usuario();
-            user.setUnidadeAtivaCodigo(20L);
-            user.setPerfilAtivo(Perfil.SERVIDOR);
-            Unidade uUser = new Unidade(); uUser.setCodigo(20L);
-
-            when(unidadeService.buscarPorCodigo(20L)).thenReturn(uUser);
-
-            PermissoesSubprocessoDto res = subprocessoService.obterPermissoesUI(sp, user);
-            assertFalse(res.habilitarAcessoMapa());
-        }
-
-        @Test
-        @DisplayName("obterPermissoesUI situações de revisão para visualização")
-        void obterPermissoesUI_SituacoesRevisaoVisualizacao() {
-            Subprocesso sp = criarSubprocessoComMapa(1L, TipoProcesso.REVISAO);
-            sp.setSituacaoForcada(REVISAO_CADASTRO_DISPONIBILIZADA);
-            Unidade u = new Unidade(); u.setCodigo(10L); sp.setUnidade(u);
-
-            Usuario user = new Usuario(); user.setPerfilAtivo(Perfil.ADMIN); user.setUnidadeAtivaCodigo(10L);
-            when(unidadeService.buscarPorCodigo(10L)).thenReturn(u);
-
-            PermissoesSubprocessoDto res = subprocessoService.obterPermissoesUI(sp, user);
-            assertTrue(res.habilitarAcessoCadastro()); // branch 685 (REVISAO)
-            
-            sp.setSituacaoForcada(REVISAO_MAPA_DISPONIBILIZADO);
-            res = subprocessoService.obterPermissoesUI(sp, user);
-            assertTrue(res.habilitarAcessoMapa()); // branch 695 (REVISAO)
-        }
-
-        @Test
-        @DisplayName("obterPermissoesUI podeDisponibilizarMapa varied situations")
-        void obterPermissoesUI_PodeDisponibilizarMapa() {
-            Subprocesso sp = criarSubprocessoComMapa(1L);
-            Unidade u = new Unidade(); u.setCodigo(10L); sp.setUnidade(u);
-            Usuario user = new Usuario(); user.setPerfilAtivo(Perfil.ADMIN); user.setUnidadeAtivaCodigo(10L);
-            when(unidadeService.buscarPorCodigo(10L)).thenReturn(u);
-
-            // test a few from the set in line 630
-            for (SituacaoSubprocesso s : List.of(MAPEAMENTO_CADASTRO_HOMOLOGADO, MAPEAMENTO_MAPA_COM_SUGESTOES, REVISAO_MAPA_AJUSTADO)) {
-                sp.setSituacaoForcada(s);
-                assertTrue(subprocessoService.obterPermissoesUI(sp, user).podeDisponibilizarMapa());
-            }
-        }
-
-        @Test
-        @DisplayName("obterPermissoesUI podeValidarMapa para CHEFE em situação de análise")
-        void obterPermissoesUI_ChefeAnalise() {
-            Subprocesso sp = criarSubprocessoComMapa(1L);
-            sp.setSituacaoForcada(MAPEAMENTO_MAPA_DISPONIBILIZADO);
-            Unidade u = new Unidade(); u.setCodigo(10L); sp.setUnidade(u);
-
-            Usuario user = new Usuario();
-            user.setPerfilAtivo(Perfil.CHEFE);
-            user.setUnidadeAtivaCodigo(10L);
-
-            when(unidadeService.buscarPorCodigo(10L)).thenReturn(u);
-
-            PermissoesSubprocessoDto res = subprocessoService.obterPermissoesUI(sp, user);
-            assertThat(res.podeValidarMapa()).isTrue();
-            assertThat(res.podeApresentarSugestoes()).isTrue();
+        @DisplayName("criarParaMapeamento com todos os tipos de unidades")
+        void criarParaMapeamento_TiposUnidades() {
+            Processo p = new Processo();
+            p.setCodigo(1L);
+            p.setDataLimite(LocalDateTime.now());
+            Unidade u1 = new Unidade(); u1.setCodigo(1L); u1.setTipo(TipoUnidade.OPERACIONAL);
+            Unidade u2 = new Unidade(); u2.setCodigo(2L); u2.setTipo(TipoUnidade.INTEROPERACIONAL);
+            Unidade u3 = new Unidade(); u3.setCodigo(3L); u3.setTipo(TipoUnidade.RAIZ);
+            Unidade u4 = new Unidade(); u4.setCodigo(4L); u4.setTipo(TipoUnidade.INTERMEDIARIA); // Elegivel=false
+
+            subprocessoService.criarParaMapeamento(p, List.of(u1, u2, u3, u4), null, new Usuario());
+
+            verify(subprocessoRepo).saveAll(any());
         }
     }
 
     @Nested
-    @DisplayName("listarPorProcessoEUnidadeCodigosESituacoes")
-    class ListarPorProcessoEUnidadeCodigosESituacoes {
+    @DisplayName("Atualizacao de Subprocesso")
+    class AtualizacaoDeSubprocesso {
         @Test
-        @DisplayName("deve filtrar por situacoes")
-        void deveFiltrar() {
-            Subprocesso sp1 = criarSubprocessoComMapa(null);
-            sp1.setSituacaoForcada(MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
-            Subprocesso sp2 = criarSubprocessoComMapa(null);
-            sp2.setSituacaoForcada(MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+        @DisplayName("deve atualizar subprocesso com todas as datas e mapa")
+        void atualizarSubprocesso_Completo() {
+            Subprocesso sp = criarSubprocessoComMapa(1L);
+            when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
 
-            when(subprocessoRepo.findByProcessoCodigoAndUnidadeCodigoInWithUnidade(1L, List.of(10L, 11L)))
-                    .thenReturn(List.of(sp1, sp2));
+            LocalDateTime d1 = LocalDateTime.now();
+            LocalDateTime f1 = LocalDateTime.now().plusDays(1);
+            LocalDateTime d2 = LocalDateTime.now().plusDays(2);
+            LocalDateTime f2 = LocalDateTime.now().plusDays(3);
 
-            List<Subprocesso> res = subprocessoService.listarPorProcessoEUnidadeCodigosESituacoes(1L, List.of(10L, 11L), List.of(MAPEAMENTO_CADASTRO_EM_ANDAMENTO));
+            AtualizarSubprocessoRequest request = new AtualizarSubprocessoRequest(10L, 100L, d1, f1, d2, f2);
 
-            assertThat(res).containsExactly(sp1);
+            when(subprocessoRepo.save(any())).thenReturn(sp);
+
+            subprocessoService.atualizarEntidade(1L, request);
+
+            assertThat(sp.getDataLimiteEtapa1()).isEqualTo(d1);
+            assertThat(sp.getDataFimEtapa1()).isEqualTo(f1);
+            assertThat(sp.getDataLimiteEtapa2()).isEqualTo(d2);
+            assertThat(sp.getDataFimEtapa2()).isEqualTo(f2);
+            assertThat(sp.getMapa()).isNotNull();
+            assertThat(sp.getMapa().getCodigo()).isEqualTo(100L);
+        }
+
+        @Test
+        @DisplayName("deve atualizar subprocesso ignorando datas nulas")
+        void atualizarSubprocesso_DatasNulas() {
+            Subprocesso sp = criarSubprocessoComMapa(1L);
+            when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
+            LocalDateTime d1 = LocalDateTime.now();
+            sp.setDataLimiteEtapa1(d1);
+
+            AtualizarSubprocessoRequest request = new AtualizarSubprocessoRequest(10L, 100L, null, null, null, null);
+
+            when(subprocessoRepo.save(any())).thenReturn(sp);
+
+            subprocessoService.atualizarEntidade(1L, request);
+
+            assertThat(sp.getDataLimiteEtapa1()).isEqualTo(d1); // Não mudou
+            assertThat(sp.getMapa().getCodigo()).isEqualTo(100L);
+        }
+
+        @Test
+        @DisplayName("importarAtividades - switch default branch (DIAGNOSTICO)")
+        void importarAtividadesDiagnostico() {
+            Subprocesso spDest = criarSubprocessoComMapa(1L, TipoProcesso.DIAGNOSTICO);
+            spDest.setSituacaoForcada(NAO_INICIADO);
+            spDest.getMapa().setCodigo(100L);
+
+            Subprocesso spOrig = criarSubprocessoComMapa(2L);
+            spOrig.getProcesso().setSituacao(SituacaoProcesso.FINALIZADO);
+            spOrig.getMapa().setCodigo(200L);
+            spOrig.setUnidade(new Unidade());
+
+            when(repo.buscar(Subprocesso.class, 1L)).thenReturn(spDest);
+            when(repo.buscar(Subprocesso.class, 2L)).thenReturn(spOrig);
+            Usuario user = criarUsuarioMock();
+            when(usuarioFacade.usuarioAutenticado()).thenReturn(user);
+            when(permissionEvaluator.verificarPermissao(eq(user), any(), any())).thenReturn(true);
+            when(consultaService.obterCodigoMapaObrigatorio(any())).thenReturn(0L);
+
+            subprocessoService.importarAtividades(1L, 2L, List.of());
+            
+            assertThat(spDest.getSituacao()).isEqualTo(NAO_INICIADO); // Não mudou no switch
         }
     }
 
@@ -724,6 +386,9 @@ class SubprocessoServiceExtraCoverageTest {
             when(usuarioFacade.usuarioAutenticado()).thenReturn(user);
             when(permissionEvaluator.verificarPermissao(user, spDest, AcaoPermissao.EDITAR_CADASTRO)).thenReturn(true);
             when(permissionEvaluator.verificarPermissao(user, spOrig, AcaoPermissao.CONSULTAR_PARA_IMPORTACAO)).thenReturn(true);
+            
+            when(consultaService.obterCodigoMapaObrigatorio(spOrig)).thenReturn(200L);
+            when(consultaService.obterCodigoMapaObrigatorio(spDest)).thenReturn(100L);
 
             subprocessoService.importarAtividades(1L, 2L, List.of());
             verify(subprocessoRepo).save(spDest);
@@ -749,6 +414,9 @@ class SubprocessoServiceExtraCoverageTest {
             when(usuarioFacade.usuarioAutenticado()).thenReturn(user);
             when(permissionEvaluator.verificarPermissao(eq(user), eq(spDest), any())).thenReturn(true);
             when(permissionEvaluator.verificarPermissao(eq(user), eq(spOrig), any())).thenReturn(true);
+            
+            when(consultaService.obterCodigoMapaObrigatorio(spOrig)).thenReturn(200L);
+            when(consultaService.obterCodigoMapaObrigatorio(spDest)).thenReturn(100L);
 
             subprocessoService.importarAtividades(1L, 2L, List.of());
             assertThat(spDest.getSituacao()).isEqualTo(REVISAO_CADASTRO_EM_ANDAMENTO);
@@ -769,260 +437,6 @@ class SubprocessoServiceExtraCoverageTest {
 
             List<Long> itens = List.of();
             assertThrows(ErroAcessoNegado.class, () -> subprocessoService.importarAtividades(1L, 2L, itens));
-        }
-    }
-
-    @Nested
-    @DisplayName("listarAtividadesParaImportacao")
-    class ListarAtividadesParaImportacao {
-        @Test
-        @DisplayName("deve lancar erro se processo nao finalizado")
-        void processoNaoFinalizado() {
-            Subprocesso sp = criarSubprocessoComMapa(null);
-            Processo p = sp.getProcesso();
-            p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
-            when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(1L)).thenReturn(Optional.of(sp));
-            assertThrows(ErroValidacao.class, () -> subprocessoService.listarAtividadesParaImportacao(1L));
-        }
-
-        @Test
-        @DisplayName("deve lancar erro se processo for null")
-        void processoNull() {
-            Subprocesso sp = new Subprocesso();
-            sp.setProcesso(null);
-            when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(1L)).thenReturn(Optional.of(sp));
-            assertThrows(ErroValidacao.class, () -> subprocessoService.listarAtividadesParaImportacao(1L));
-        }
-
-        @Test
-        @DisplayName("deve retornar lista de atividades")
-        void deveRetornarLista() {
-            Subprocesso sp = criarSubprocessoComMapa(1L);
-            sp.getProcesso().setSituacao(SituacaoProcesso.FINALIZADO);
-            Mapa mapa = sp.getMapa();
-            mapa.setCodigo(10L);
-
-            when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(1L)).thenReturn(Optional.of(sp));
-            when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(10L)).thenReturn(List.of());
-
-            subprocessoService.listarAtividadesParaImportacao(1L);
-            verify(mapaManutencaoService).atividadesMapaCodigoComConhecimentos(10L);
-        }
-    }
-
-    @Test
-    @DisplayName("obterSugestoes - quando não tem mapa")
-    void obterSugestoesSemMapa() {
-        Subprocesso sp = new Subprocesso();
-        sp.setMapa(null);
-        when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(1L)).thenReturn(Optional.of(sp));
-        
-        Map<String, Object> res = subprocessoService.obterSugestoes(1L);
-        assertThat(res).containsEntry("sugestoes", "");
-    }
-
-    @Test
-    @DisplayName("listarEntidadesPorProcessoEUnidades - lista vazia")
-    void listarEntidadesPorProcessoEUnidadesVazia() {
-        List<Long> vazia = List.of();
-        List<Subprocesso> res = subprocessoService.listarEntidadesPorProcessoEUnidades(1L, vazia);
-        assertThat(res).isEmpty();
-    }
-
-    @Test
-    @DisplayName("criarSubprocessoComMapa - sem mapa vigente")
-    void criarSubprocessoSemMapaVigente() {
-        Processo p = new Processo();
-        Unidade u = new Unidade();
-        u.setSigla("U1");
-        UnidadeMapa um = new UnidadeMapa();
-        um.setMapaVigente(null);
-        Usuario user = new Usuario();
-        
-        assertThatThrownBy(() -> invokeMethod(subprocessoService, "criarSubprocessoComMapa", p, u, um, u, user, NAO_INICIADO, "desc"))
-                .isInstanceOf(IllegalStateException.class);
-    }
-
-    @Nested
-    @DisplayName("Criação de Subprocesso")
-    class CriacaoSubprocesso {
-        @Test
-        @DisplayName("criarParaMapeamento com todos os tipos de unidades")
-        void criarParaMapeamento_TiposUnidades() {
-            Processo p = new Processo();
-            p.setCodigo(1L);
-            p.setDataLimite(LocalDateTime.now());
-            Unidade u1 = new Unidade();
-            u1.setCodigo(1L);
-            u1.setTipo(TipoUnidade.OPERACIONAL);
-            Unidade u2 = new Unidade();
-            u2.setCodigo(2L);
-            u2.setTipo(TipoUnidade.INTEROPERACIONAL);
-            Unidade u3 = new Unidade();
-            u3.setCodigo(3L);
-            u3.setTipo(TipoUnidade.RAIZ);
-            Unidade u4 = new Unidade();
-            u4.setCodigo(4L);
-            u4.setTipo(TipoUnidade.INTERMEDIARIA); // Elegivel=false
-
-            subprocessoService.criarParaMapeamento(p, List.of(u1, u2, u3, u4), null, new Usuario());
-
-            verify(subprocessoRepo).saveAll(any());
-        }
-    }
-
-    @Nested
-    @DisplayName("Atualizacao de Subprocesso")
-    class AtualizacaoDeSubprocesso {
-        @Test
-        @DisplayName("deve atualizar subprocesso com todas as datas e mapa")
-        void atualizarSubprocesso_Completo() {
-            Subprocesso sp = criarSubprocessoComMapa(1L);
-
-            LocalDateTime d1 = LocalDateTime.now();
-            LocalDateTime f1 = LocalDateTime.now().plusDays(1);
-            LocalDateTime d2 = LocalDateTime.now().plusDays(2);
-            LocalDateTime f2 = LocalDateTime.now().plusDays(3);
-
-            AtualizarSubprocessoRequest request = new AtualizarSubprocessoRequest(10L, 100L, d1, f1, d2, f2);
-
-            when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(1L)).thenReturn(Optional.of(sp));
-            when(subprocessoRepo.save(any())).thenReturn(sp);
-
-            subprocessoService.atualizarEntidade(1L, request);
-
-            assertThat(sp.getDataLimiteEtapa1()).isEqualTo(d1);
-            assertThat(sp.getDataFimEtapa1()).isEqualTo(f1);
-            assertThat(sp.getDataLimiteEtapa2()).isEqualTo(d2);
-            assertThat(sp.getDataFimEtapa2()).isEqualTo(f2);
-            assertThat(sp.getMapa()).isNotNull();
-            assertThat(sp.getMapa().getCodigo()).isEqualTo(100L);
-        }
-
-        @Test
-        @DisplayName("deve atualizar subprocesso ignorando datas nulas")
-        void atualizarSubprocesso_DatasNulas() {
-            Subprocesso sp = criarSubprocessoComMapa(1L);
-            LocalDateTime d1 = LocalDateTime.now();
-            sp.setDataLimiteEtapa1(d1);
-
-            AtualizarSubprocessoRequest request = new AtualizarSubprocessoRequest(10L, 100L, null, null, null, null);
-
-            when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(1L)).thenReturn(Optional.of(sp));
-            when(subprocessoRepo.save(any())).thenReturn(sp);
-
-            subprocessoService.atualizarEntidade(1L, request);
-
-            assertThat(sp.getDataLimiteEtapa1()).isEqualTo(d1); // Não mudou
-            assertThat(sp.getMapa().getCodigo()).isEqualTo(100L);
-        }
-
-        @Test
-        @DisplayName("obterMapaObrigatorio - deve lançar IllegalStateException se mapa for null")
-        void obterMapaObrigatorioNull() {
-            Subprocesso sp = new Subprocesso();
-            sp.setCodigo(100L);
-            sp.setMapa(null);
-            
-            assertThatThrownBy(() -> invokeMethod(subprocessoService, "obterMapaObrigatorio", sp))
-                    .isInstanceOf(IllegalStateException.class)
-                    .hasMessageContaining("sem mapa associado");
-        }
-
-        @Test
-        @DisplayName("importarAtividades - switch default branch (DIAGNOSTICO)")
-        void importarAtividadesDiagnostico() {
-            Subprocesso spDest = criarSubprocessoComMapa(1L, TipoProcesso.DIAGNOSTICO);
-            spDest.setSituacaoForcada(NAO_INICIADO);
-            spDest.getMapa().setCodigo(100L);
-
-            Subprocesso spOrig = criarSubprocessoComMapa(2L);
-            spOrig.getProcesso().setSituacao(SituacaoProcesso.FINALIZADO);
-            spOrig.getMapa().setCodigo(200L);
-            spOrig.setUnidade(new Unidade());
-
-            when(repo.buscar(Subprocesso.class, 1L)).thenReturn(spDest);
-            when(repo.buscar(Subprocesso.class, 2L)).thenReturn(spOrig);
-            Usuario user = criarUsuarioMock();
-            when(usuarioFacade.usuarioAutenticado()).thenReturn(user);
-            when(permissionEvaluator.verificarPermissao(eq(user), any(), any())).thenReturn(true);
-
-            subprocessoService.importarAtividades(1L, 2L, List.of());
-            
-            assertThat(spDest.getSituacao()).isEqualTo(NAO_INICIADO); // Não mudou no switch
-        }
-    }
-
-    @Nested
-    @DisplayName("Análises e Histórico")
-    class AnalisesEHistorico {
-        @Test
-        @DisplayName("listarAnalisesPorSubprocesso sem filtro")
-        void listarAnalisesSemFiltro() {
-            Analise a1 = new Analise();
-            Analise a2 = new Analise();
-            when(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(1L)).thenReturn(List.of(a1, a2));
-
-            assertThat(subprocessoService.listarAnalisesPorSubprocesso(1L)).containsExactly(a1, a2);
-        }
-
-        @Test
-        @DisplayName("listarAnalisesPorSubprocesso com filtro de tipo")
-        void listarAnalisesComFiltro() {
-            Analise a1 = new Analise(); a1.setTipo(TipoAnalise.CADASTRO);
-            Analise a2 = new Analise(); a2.setTipo(TipoAnalise.VALIDACAO);
-            when(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(1L)).thenReturn(List.of(a1, a2));
-
-            assertThat(subprocessoService.listarAnalisesPorSubprocesso(1L, TipoAnalise.CADASTRO)).containsExactly(a1);
-        }
-
-        @Test
-        @DisplayName("listarHistoricoCadastro e Validacao")
-        void listarHistoricos() {
-            Analise a1 = new Analise(); a1.setTipo(TipoAnalise.CADASTRO); a1.setUnidadeCodigo(10L);
-            Analise a2 = new Analise(); a2.setTipo(TipoAnalise.VALIDACAO); a2.setUnidadeCodigo(10L);
-            when(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(1L)).thenReturn(List.of(a1, a2));
-            when(unidadeService.buscarPorCodigo(10L)).thenReturn(new Unidade());
-
-            assertThat(subprocessoService.listarHistoricoCadastro(1L)).hasSize(1);
-            assertThat(subprocessoService.listarHistoricoValidacao(1L)).hasSize(1);
-        }
-    }
-
-    @Nested
-    @DisplayName("Localização Atual")
-    class LocalizacaoAtual {
-        @Test
-        @DisplayName("obterLocalizacaoAtual - varios branches")
-        void obterLocalizacaoAtual_Branches() {
-            Subprocesso sp = new Subprocesso();
-            Unidade u = new Unidade(); sp.setUnidade(u);
-            
-            // Branch: sp.getLocalizacaoAtual() != null
-            sp.setLocalizacaoAtual(u);
-            assertThat(subprocessoService.obterLocalizacaoAtual(sp)).isEqualTo(u);
-
-            // Branch: sp.getCodigo() == null
-            sp.setLocalizacaoAtual(null);
-            sp.setCodigo(null);
-            assertThat(subprocessoService.obterLocalizacaoAtual(sp)).isEqualTo(u);
-
-            // Branch: m.getUnidadeDestino() != null
-            sp.setCodigo(1L);
-            Unidade dest = new Unidade();
-            Movimentacao m = new Movimentacao(); m.setUnidadeDestino(dest);
-            when(movimentacaoRepo.findFirstBySubprocessoCodigoOrderByDataHoraDesc(1L)).thenReturn(Optional.of(m));
-            assertThat(subprocessoService.obterLocalizacaoAtual(sp)).isEqualTo(dest);
-            
-            // Branch: m.getUnidadeDestino() == null
-            sp.setLocalizacaoAtual(null);
-            m.setUnidadeDestino(null);
-            assertThat(subprocessoService.obterLocalizacaoAtual(sp)).isEqualTo(u);
-            
-            // Branch: findFirstBy... returns Optional.empty()
-            sp.setLocalizacaoAtual(null);
-            when(movimentacaoRepo.findFirstBySubprocessoCodigoOrderByDataHoraDesc(1L)).thenReturn(Optional.empty());
-            assertThat(subprocessoService.obterLocalizacaoAtual(sp)).isEqualTo(u);
         }
     }
 }

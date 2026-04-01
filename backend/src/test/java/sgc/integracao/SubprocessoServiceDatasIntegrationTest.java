@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.*;
 class SubprocessoServiceDatasIntegrationTest extends BaseIntegrationTest {
 
     @Autowired
-    private SubprocessoService subprocessoService;
+    private SubprocessoConsultaService consultaService;
 
     @Autowired
     private SubprocessoTransicaoService transicaoService;
@@ -78,7 +78,7 @@ class SubprocessoServiceDatasIntegrationTest extends BaseIntegrationTest {
         LocalDate novaData = LocalDate.now().plusDays(5);
         transicaoService.alterarDataLimite(subprocesso.getCodigo(), novaData);
 
-        Subprocesso atualizado = subprocessoService.buscarSubprocesso(subprocesso.getCodigo());
+        Subprocesso atualizado = consultaService.buscarSubprocesso(subprocesso.getCodigo());
         assertThat(atualizado.getDataLimiteEtapa1().toLocalDate()).isEqualTo(novaData);
     }
 
@@ -95,7 +95,7 @@ class SubprocessoServiceDatasIntegrationTest extends BaseIntegrationTest {
         LocalDate novaData = LocalDate.now().plusDays(5);
         transicaoService.alterarDataLimite(subprocesso.getCodigo(), novaData);
 
-        Subprocesso atualizado = subprocessoService.buscarSubprocesso(subprocesso.getCodigo());
+        Subprocesso atualizado = consultaService.buscarSubprocesso(subprocesso.getCodigo());
         assertThat(atualizado.getDataLimiteEtapa2().toLocalDate()).isEqualTo(novaData);
     }
 
@@ -106,7 +106,7 @@ class SubprocessoServiceDatasIntegrationTest extends BaseIntegrationTest {
         subprocessoRepo.flush();
         mapaManutencaoService.criarAtividade(new CriarAtividadeRequest(subprocesso.getMapa().getCodigo(), "Atividade inicial"));
 
-        Subprocesso atualizado = subprocessoService.buscarSubprocesso(subprocesso.getCodigo());
+        Subprocesso atualizado = consultaService.buscarSubprocesso(subprocesso.getCodigo());
         assertThat(atualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
     }
 
@@ -120,7 +120,7 @@ class SubprocessoServiceDatasIntegrationTest extends BaseIntegrationTest {
         subprocessoRepo.flush();
         mapaManutencaoService.criarAtividade(new CriarAtividadeRequest(subprocesso.getMapa().getCodigo(), "Atividade inicial revisao"));
 
-        Subprocesso atualizado = subprocessoService.buscarSubprocesso(subprocesso.getCodigo());
+        Subprocesso atualizado = consultaService.buscarSubprocesso(subprocesso.getCodigo());
         assertThat(atualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
     }
 
@@ -140,7 +140,7 @@ class SubprocessoServiceDatasIntegrationTest extends BaseIntegrationTest {
                 .forEach(atividade -> mapaManutencaoService.excluirAtividade(atividade.getCodigo()));
         subprocessoRepo.flush();
 
-        Subprocesso atualizado = subprocessoService.buscarSubprocesso(subprocesso.getCodigo());
+        Subprocesso atualizado = consultaService.buscarSubprocesso(subprocesso.getCodigo());
         assertThat(atualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.NAO_INICIADO);
     }
 }

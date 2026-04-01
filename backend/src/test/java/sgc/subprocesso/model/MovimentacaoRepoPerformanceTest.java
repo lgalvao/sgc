@@ -75,7 +75,7 @@ class MovimentacaoRepoPerformanceTest {
                 .build();
         movimentacaoRepo.save(m2);
 
-        List<Movimentacao> result = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(sp.getCodigo());
+        List<Movimentacao> result = movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(sp.getCodigo());
 
         assertThat(result).hasSize(2);
         assertThat(result.get(0).getDescricao()).isEqualTo("Mov 2");

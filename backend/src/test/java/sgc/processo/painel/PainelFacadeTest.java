@@ -268,7 +268,7 @@ class PainelFacadeTest {
         when(processoService.listarTodos(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(p)));
         
         Unidade u2 = new Unidade(); u2.setSigla("U2");
-        when(unidadeService.porCodigos(List.of(2L))).thenReturn(List.of(u2));
+        when(unidadeService.buscarPorCodigos(List.of(2L))).thenReturn(List.of(u2));
 
         Page<ProcessoResumoDto> result = painelFacade.listarProcessos(Perfil.ADMIN, 100L, PageRequest.of(0, 10));
         assertThat(result.getContent().getFirst().unidadesParticipantes()).isEqualTo("U2");
@@ -323,7 +323,7 @@ class PainelFacadeTest {
 
         Unidade u1 = new Unidade(); u1.setSigla("U1");
         Unidade u2 = new Unidade(); u2.setSigla("U2");
-        when(unidadeService.porCodigos(argThat(list -> list != null && list.contains(1L) && list.contains(2L)))).thenReturn(List.of(u1, u2));
+        when(unidadeService.buscarPorCodigos(argThat(list -> list != null && list.contains(1L) && list.contains(2L)))).thenReturn(List.of(u1, u2));
 
         Page<ProcessoResumoDto> result = painelFacade.listarProcessos(Perfil.ADMIN, 100L, PageRequest.of(0, 10));
         assertThat(result.getContent().getFirst().unidadesParticipantes()).contains("U1", "U2");

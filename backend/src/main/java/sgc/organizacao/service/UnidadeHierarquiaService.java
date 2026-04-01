@@ -27,7 +27,7 @@ public class UnidadeHierarquiaService {
      * Busca a árvore hierárquica completa de unidades.
      */
     public List<UnidadeDto> buscarArvoreHierarquica() {
-        List<Unidade> todasUnidades = unidadeRepo.findAllWithHierarquia();
+        List<Unidade> todasUnidades = unidadeRepo.listarTodasComHierarquia();
         return montarHierarquia(todasUnidades);
     }
 
@@ -35,7 +35,7 @@ public class UnidadeHierarquiaService {
      * Busca a árvore hierárquica com filtro de elegibilidade.
      */
     public List<UnidadeDto> buscarArvoreComElegibilidade(Predicate<Unidade> elegibilidadeChecker) {
-        List<Unidade> todasUnidades = unidadeRepo.findAllWithHierarquia();
+        List<Unidade> todasUnidades = unidadeRepo.listarTodasComHierarquia();
         return montarHierarquia(todasUnidades, elegibilidadeChecker);
     }
 
@@ -51,9 +51,17 @@ public class UnidadeHierarquiaService {
 
         return buscarArvoreComElegibilidade(u ->
                 u.getTipo() != INTERMEDIARIA
+                        && possuiResponsavelEfetivo(u)
                         && (!requerMapaVigente || unidadesComMapa.contains(u.getCodigo()))
                         && !unidadesBloqueadas.contains(u.getCodigo())
         );
+    }
+
+    private boolean possuiResponsavelEfetivo(Unidade unidade) {
+        Responsabilidade responsabilidade = unidade.getResponsabilidade();
+        return responsabilidade != null
+                && responsabilidade.getUsuarioTitulo() != null
+                && !responsabilidade.getUsuarioTitulo().isBlank();
     }
 
     /**
@@ -76,7 +84,7 @@ public class UnidadeHierarquiaService {
      * Constrói o mapa de hierarquia (Pai -> Lista de Filhos) buscando todas as unidades.
      */
     public Map<Long, List<Long>> buscarMapaHierarquia() {
-        List<Unidade> todas = unidadeRepo.findAllWithHierarquia();
+        List<Unidade> todas = unidadeRepo.listarAtivasComSuperior();
 
         Map<Long, List<Long>> mapPaiFilhos = new HashMap<>();
         for (Unidade u : todas) {
@@ -242,4 +250,3 @@ public class UnidadeHierarquiaService {
         return dto;
     }
 }
-

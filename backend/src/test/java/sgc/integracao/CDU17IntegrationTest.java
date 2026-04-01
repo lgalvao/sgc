@@ -147,7 +147,7 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
             Mapa mapaAtualizado = mapaRepo.findById(mapa.getCodigo()).orElseThrow();
             assertThat(mapaAtualizado.getSugestoes()).isEqualTo(observacoes);
 
-            List<Movimentacao> movimentacoes = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(
+            List<Movimentacao> movimentacoes = movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(
                     subprocesso.getCodigo());
             assertThat(movimentacoes).hasSizeGreaterThanOrEqualTo(1);
 

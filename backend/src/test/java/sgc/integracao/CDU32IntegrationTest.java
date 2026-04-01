@@ -104,7 +104,7 @@ class CDU32IntegrationTest extends BaseIntegrationTest {
 
         // Verificar se foi criada uma movimentação
         List<Movimentacao> movimentacoes = movimentacaoRepo
-                .findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
+                .listarPorSubprocessoOrdenadasPorDataHoraDesc(subprocesso.getCodigo());
 
         assertThat(movimentacoes).isNotEmpty();
 

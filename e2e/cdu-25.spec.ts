@@ -1,8 +1,9 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcessoMapaValidadoFixture} from './fixtures/fixtures-processos.js';
-import {login, USUARIOS} from './helpers/helpers-auth.js';
+import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
 import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
-import {verificarPaginaPainel} from './helpers/helpers-navegacao.js';
+import {fazerLogout, navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
+import {resetDatabase} from './hooks/hooks-limpeza.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
 
 /**
@@ -66,5 +67,60 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
             await expect(page.getByText(TEXTOS.sucesso.MAPAS_ACEITOS_EM_BLOCO)).toBeVisible();
             await verificarPaginaPainel(page);
         });
+    });
+
+    test('Cenario 4: Aceite em bloco registra movimentação e alerta com data/hora', async ({
+        _resetAutomatico,
+        request,
+        page
+    }) => {
+        // Reseta o banco para evitar conflito com unidade já em processo ativo dos cenários anteriores
+        await resetDatabase(request);
+        const descIsolada = `Mapeamento CDU-25 alerta ${Date.now()}`;
+        const processoIsolado = await criarProcessoMapaValidadoFixture(request, {
+            unidade: UNIDADE_1,
+            descricao: descIsolada
+        });
+        expect(processoIsolado.codigo).toBeGreaterThan(0);
+
+        await login(page, USUARIOS.GESTOR_COORD_21.titulo, USUARIOS.GESTOR_COORD_21.senha);
+        await acessarDetalhesProcesso(page, descIsolada);
+
+        const btnAceitar = page.getByRole('button', {name: TEXTOS.acaoBloco.aceitar.ROTULO_VALIDACAO}).first();
+        await expect(btnAceitar).toBeVisible();
+        await btnAceitar.click();
+
+        const modal = page.getByRole('dialog');
+        await expect(modal).toBeVisible();
+        await modal.getByRole('button', {name: TEXTOS.acaoBloco.aceitar.BOTAO}).click();
+        await expect(page.getByText(TEXTOS.sucesso.MAPAS_ACEITOS_EM_BLOCO)).toBeVisible();
+
+        await fazerLogout(page);
+        await loginComPerfil(
+            page,
+            USUARIOS.GESTOR_SECRETARIA_2.titulo,
+            USUARIOS.GESTOR_SECRETARIA_2.senha,
+            USUARIOS.GESTOR_SECRETARIA_2.perfil!
+        );
+        await page.goto(`/processo/${processoIsolado.codigo}`);
+        await navegarParaSubprocesso(page, UNIDADE_1);
+
+        const linhaMovimentacao = page.getByTestId('tbl-movimentacoes')
+            .locator('tr', {hasText: TEXTOS.movimentacao.MAPA_VALIDACAO_ACEITA})
+            .first();
+        await expect(linhaMovimentacao).toBeVisible();
+        await expect(linhaMovimentacao).toContainText(/\d{2}\/\d{2}\/\d{4}/);
+
+        await page.goto('/painel');
+        await verificarPaginaPainel(page);
+
+        const tabelaAlertas = page.getByTestId('tbl-alertas');
+        const linhaAlerta = tabelaAlertas.locator('tr', {
+            hasText: /Validação do mapa da unidade SECAO_211 submetida para análise/i
+        }).first();
+        await expect(linhaAlerta).toBeVisible();
+        await expect(linhaAlerta).toContainText(/SECAO_211/i);
+        await expect(tabelaAlertas).toContainText(descIsolada);
+        await expect(linhaAlerta).toContainText(/\d{2}\/\d{2}\/\d{4}/);
     });
 });

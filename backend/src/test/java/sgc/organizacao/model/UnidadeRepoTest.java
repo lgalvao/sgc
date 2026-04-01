@@ -31,10 +31,10 @@ class UnidadeRepoTest {
     @Test
     @DisplayName("deve buscar siglas e hierarquia com responsavel carregado")
     void deveBuscarSiglasEHierarquiaComResponsavelCarregado() {
-        assertThat(unidadeRepo.findSiglasByCodigos(List.of(8L, 9L, 10L)))
+        assertThat(unidadeRepo.buscarSiglasPorCodigos(List.of(8L, 9L, 10L)))
                 .containsExactlyInAnyOrder("SEDESENV", "SEDIA", "SESEL");
 
-        Unidade unidade = unidadeRepo.findByCodigoComResponsavel(8L).orElseThrow();
+        Unidade unidade = unidadeRepo.buscarPorCodigoComResponsavel(8L).orElseThrow();
 
         assertThat(Hibernate.isInitialized(unidade.getResponsabilidade())).isTrue();
         assertThat(unidade.getResponsabilidade().getUsuarioTitulo()).isEqualTo("3");

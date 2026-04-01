@@ -21,14 +21,14 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RelatorioFacade {
     private final ProcessoService processoService;
-    private final SubprocessoService subprocessoService;
+    private final SubprocessoConsultaService consultaService;
     private final ResponsavelUnidadeService responsavelService;
     private final MapaManutencaoService mapaManutencaoService;
     private final PdfFactory pdfFactory;
 
     @Transactional(readOnly = true)
     public List<RelatorioAndamentoDto> obterRelatorioAndamento(Long codProcesso) {
-        List<Subprocesso> subprocessos = subprocessoService.listarEntidadesPorProcesso(codProcesso);
+        List<Subprocesso> subprocessos = consultaService.listarEntidadesPorProcesso(codProcesso);
 
         return subprocessos.stream().map(sp -> {
             Unidade unidade = sp.getUnidade();
@@ -51,7 +51,7 @@ public class RelatorioFacade {
     @Transactional(readOnly = true)
     public void gerarRelatorioAndamento(Long codProcesso, OutputStream outputStream) {
         Processo processo = processoService.buscarPorCodigo(codProcesso);
-        List<Subprocesso> subprocessos = subprocessoService.listarEntidadesPorProcesso(codProcesso);
+        List<Subprocesso> subprocessos = consultaService.listarEntidadesPorProcesso(codProcesso);
 
         try (Document document = pdfFactory.createDocument()) {
             pdfFactory.createWriter(document, outputStream);
@@ -78,7 +78,7 @@ public class RelatorioFacade {
     @Transactional(readOnly = true)
     public void gerarRelatorioMapas(Long codProcesso, Long codUnidade, OutputStream outputStream) {
         Processo processo = processoService.buscarPorCodigo(codProcesso);
-        List<Subprocesso> subprocessos = subprocessoService.listarEntidadesPorProcesso(codProcesso);
+        List<Subprocesso> subprocessos = consultaService.listarEntidadesPorProcesso(codProcesso);
 
         subprocessos = subprocessos.stream()
                 .filter(sp -> sp.getUnidade().getCodigo().equals(codUnidade))
@@ -112,4 +112,5 @@ public class RelatorioFacade {
         }
     }
 }
+
 

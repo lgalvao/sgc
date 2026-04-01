@@ -13,6 +13,7 @@ import org.springframework.stereotype.*;
 import org.springframework.web.bind.annotation.*;
 
 import java.lang.reflect.*;
+import java.util.*;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.*;
 import static com.tngtech.archunit.library.dependencies.SlicesRuleDefinition.*;
@@ -222,6 +223,66 @@ public class ArchConsistencyTest {
             .haveSimpleNameEndingWith("Repo")
             .because("Repositories should have 'Repo' suffix for consistency");
 
+    @ArchTest
+    static final ArchRule repositories_with_query_should_not_use_derived_method_prefixes = classes()
+            .that()
+            .areAssignableTo(JpaRepository.class)
+            .should(new ArchCondition<>("não declarar @Query com nome derivado do Spring Data") {
+                @Override
+                public void check(JavaClass item, ConditionEvents events) {
+                    for (JavaMethod method : item.getMethods()) {
+                        if (!method.getOwner().equals(item) || !method.isAnnotatedWith(org.springframework.data.jpa.repository.Query.class)) {
+                            continue;
+                        }
+
+                        if (usaPrefixoDerivadoSpringData(method.getName())) {
+                            String mensagem = String.format(
+                                    "Repositório %s declara @Query no método %s com prefixo derivado do Spring Data",
+                                    item.getSimpleName(), method.getName());
+                            events.add(SimpleConditionEvent.violated(method, mensagem));
+                        }
+                    }
+                }
+            })
+            .because("@Query manual deve usar nome semântico em português, e não simular query derivada");
+
+    @ArchTest
+    static final ArchRule repositories_should_not_have_default_methods_with_derived_prefixes = classes()
+            .that()
+            .areAssignableTo(JpaRepository.class)
+            .should(new ArchCondition<>("não declarar métodos default com prefixo derivado artificial") {
+                @Override
+                public void check(JavaClass item, ConditionEvents events) {
+                    for (JavaMethod method : item.getMethods()) {
+                        if (!method.getOwner().equals(item)) {
+                            continue;
+                        }
+
+                        try {
+                            Method metodoRefletido = method.reflect();
+                            boolean delegaParaMetodoBaseJpa = method.getMethodCallsFromSelf().stream()
+                                    .map(call -> call.getTarget().getName())
+                                    .anyMatch(ArchConsistencyTest::ehMetodoBaseJpaPorChavePrimaria);
+
+                            if (metodoRefletido.isDefault()
+                                    && usaPrefixoDerivadoSpringData(method.getName())
+                                    && delegaParaMetodoBaseJpa) {
+                                String mensagem = String.format(
+                                        "Repositório %s declara método default %s com prefixo derivado artificial",
+                                        item.getSimpleName(), method.getName());
+                                events.add(SimpleConditionEvent.violated(method, mensagem));
+                            }
+                        } catch (Exception e) {
+                            String mensagem = String.format(
+                                    "Não foi possível inspecionar o método default %s.%s: %s",
+                                    item.getSimpleName(), method.getName(), e.getMessage());
+                            events.add(SimpleConditionEvent.violated(method, mensagem));
+                        }
+                    }
+                }
+            })
+            .because("Wrappers default em Repo que simulam métodos derivados devem ser removidos");
+
     /**
      * Verifica ausência de ciclos internos nos pacotes workflow de cada módulo.
      *
@@ -304,5 +365,13 @@ public class ArchConsistencyTest {
         }
 
         return false;
+    }
+
+    private static boolean usaPrefixoDerivadoSpringData(String nomeMetodo) {
+        return nomeMetodo.matches("^(find|exists|count|delete)(By|AllBy|FirstBy|TopBy).*");
+    }
+
+    private static boolean ehMetodoBaseJpaPorChavePrimaria(String nomeMetodo) {
+        return Set.of("findById", "existsById", "findAllById", "deleteById", "getReferenceById").contains(nomeMetodo);
     }
 }

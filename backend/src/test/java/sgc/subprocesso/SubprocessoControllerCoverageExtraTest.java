@@ -35,6 +35,7 @@ class SubprocessoControllerCoverageExtraTest {
 
     @MockitoBean
     private SubprocessoService subprocessoService;
+    @MockitoBean private SubprocessoConsultaService consultaService;
     
     @MockitoBean
     private SubprocessoTransicaoService transicaoService;
@@ -84,12 +85,12 @@ class SubprocessoControllerCoverageExtraTest {
     @WithMockUser
     void obterMapaCompletoErro() throws Exception {
         when(permissionEvaluator.hasPermission(any(), eq(1L), eq("Subprocesso"), eq("VISUALIZAR_SUBPROCESSO"))).thenReturn(true);
-        when(subprocessoService.mapaCompletoDtoPorSubprocesso(1L)).thenThrow(new RuntimeException("erro"));
+        when(consultaService.mapaCompletoDtoPorSubprocesso(1L)).thenThrow(new RuntimeException("erro"));
 
         mockMvc.perform(get("/api/subprocessos/1/mapa-completo"))
                 .andExpect(status().isInternalServerError());
 
-        verify(subprocessoService).mapaCompletoDtoPorSubprocesso(1L);
+        verify(consultaService).mapaCompletoDtoPorSubprocesso(1L);
         verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
@@ -108,7 +109,7 @@ class SubprocessoControllerCoverageExtraTest {
                 .andExpect(status().isOk());
 
         verify(subprocessoService).salvarMapa(eq(1L), any());
-        verify(subprocessoService).mapaCompletoDtoPorSubprocesso(1L);
+        verify(consultaService).mapaCompletoDtoPorSubprocesso(1L);
         verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
@@ -134,12 +135,12 @@ class SubprocessoControllerCoverageExtraTest {
     @WithMockUser
     void obterMapaParaAjusteOk() throws Exception {
         when(permissionEvaluator.hasPermission(any(), eq(1L), eq("Subprocesso"), eq("AJUSTAR_MAPA"))).thenReturn(true);
-        when(subprocessoService.obterMapaParaAjuste(1L)).thenReturn(MapaAjusteDto.builder().build());
+        when(consultaService.obterMapaParaAjuste(1L)).thenReturn(MapaAjusteDto.builder().build());
 
         mockMvc.perform(get("/api/subprocessos/1/mapa-ajuste"))
                 .andExpect(status().isOk());
 
-        verify(subprocessoService).obterMapaParaAjuste(1L);
+        verify(consultaService).obterMapaParaAjuste(1L);
         verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
@@ -148,13 +149,13 @@ class SubprocessoControllerCoverageExtraTest {
     @WithMockUser
     void obterSugestoesOk() throws Exception {
         when(permissionEvaluator.hasPermission(any(), eq(1L), eq("Subprocesso"), eq("VISUALIZAR_SUBPROCESSO"))).thenReturn(true);
-        when(subprocessoService.obterSugestoes(1L)).thenReturn(Map.of("total", 2));
+        when(consultaService.obterSugestoes(1L)).thenReturn(Map.of("total", 2));
 
         mockMvc.perform(get("/api/subprocessos/1/sugestoes"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.total").value(2));
 
-        verify(subprocessoService).obterSugestoes(1L);
+        verify(consultaService).obterSugestoes(1L);
         verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
@@ -163,10 +164,10 @@ class SubprocessoControllerCoverageExtraTest {
     @WithMockUser(roles = {"GESTOR"})
     void criarAnaliseValidacaoOk() throws Exception {
         CriarAnaliseRequest req = new CriarAnaliseRequest("obs", "mot", sgc.subprocesso.model.TipoAcaoAnalise.ACEITE_MAPEAMENTO);
-        when(subprocessoService.buscarSubprocesso(1L)).thenReturn(new Subprocesso());
+        when(consultaService.buscarSubprocesso(1L)).thenReturn(new Subprocesso());
         Analise a = new Analise();
         when(transicaoService.criarAnalise(any(), any(), eq(sgc.subprocesso.model.TipoAnalise.VALIDACAO), any())).thenReturn(a);
-        when(subprocessoService.paraHistoricoDto(a)).thenReturn(new AnaliseHistoricoDto(
+        when(consultaService.paraHistoricoDto(a)).thenReturn(new AnaliseHistoricoDto(
                 TipoAnalise.VALIDACAO,
                 TipoAcaoAnalise.ACEITE_MAPEAMENTO,
                 "123456789012",
@@ -183,9 +184,9 @@ class SubprocessoControllerCoverageExtraTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.tipo").value("VALIDACAO"));
 
-        verify(subprocessoService).buscarSubprocesso(1L);
+        verify(consultaService).buscarSubprocesso(1L);
         verify(transicaoService).criarAnalise(any(), any(), eq(sgc.subprocesso.model.TipoAnalise.VALIDACAO), any());
-        verify(subprocessoService).paraHistoricoDto(a);
+        verify(consultaService).paraHistoricoDto(a);
         verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
     @Test
@@ -193,10 +194,10 @@ class SubprocessoControllerCoverageExtraTest {
     @WithMockUser(roles = {"GESTOR"})
     void criarAnaliseCadastroOk() throws Exception {
         CriarAnaliseRequest req = new CriarAnaliseRequest("obs", "mot", sgc.subprocesso.model.TipoAcaoAnalise.ACEITE_MAPEAMENTO);
-        when(subprocessoService.buscarSubprocesso(1L)).thenReturn(new Subprocesso());
+        when(consultaService.buscarSubprocesso(1L)).thenReturn(new Subprocesso());
         Analise a = new Analise();
         when(transicaoService.criarAnalise(any(), any(), eq(sgc.subprocesso.model.TipoAnalise.CADASTRO), any())).thenReturn(a);
-        when(subprocessoService.paraHistoricoDto(a)).thenReturn(new AnaliseHistoricoDto(
+        when(consultaService.paraHistoricoDto(a)).thenReturn(new AnaliseHistoricoDto(
                 TipoAnalise.CADASTRO,
                 TipoAcaoAnalise.ACEITE_MAPEAMENTO,
                 "123456789012",
@@ -213,9 +214,9 @@ class SubprocessoControllerCoverageExtraTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.tipo").value("CADASTRO"));
 
-        verify(subprocessoService).buscarSubprocesso(1L);
+        verify(consultaService).buscarSubprocesso(1L);
         verify(transicaoService).criarAnalise(any(), any(), eq(sgc.subprocesso.model.TipoAnalise.CADASTRO), any());
-        verify(subprocessoService).paraHistoricoDto(a);
+        verify(consultaService).paraHistoricoDto(a);
         verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
@@ -224,12 +225,12 @@ class SubprocessoControllerCoverageExtraTest {
     @WithMockUser
     void obterMapaParaVisualizacaoOk() throws Exception {
         when(permissionEvaluator.hasPermission(any(), eq(1L), eq("Subprocesso"), eq("VISUALIZAR_SUBPROCESSO"))).thenReturn(true);
-        when(subprocessoService.mapaParaVisualizacao(1L)).thenReturn(MapaVisualizacaoResponse.builder().build());
+        when(consultaService.mapaParaVisualizacao(1L)).thenReturn(MapaVisualizacaoResponse.builder().build());
 
         mockMvc.perform(get("/api/subprocessos/1/mapa-visualizacao"))
                 .andExpect(status().isOk());
 
-        verify(subprocessoService).mapaParaVisualizacao(1L);
+        verify(consultaService).mapaParaVisualizacao(1L);
         verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
@@ -272,13 +273,13 @@ class SubprocessoControllerCoverageExtraTest {
     @WithMockUser
     void obterHistoricoValidacaoOk() throws Exception {
         when(permissionEvaluator.hasPermission(any(), eq(1L), eq("Subprocesso"), eq("VISUALIZAR_SUBPROCESSO"))).thenReturn(true);
-        when(subprocessoService.listarHistoricoValidacao(1L)).thenReturn(List.of());
+        when(consultaService.listarHistoricoValidacao(1L)).thenReturn(List.of());
 
         mockMvc.perform(get("/api/subprocessos/1/historico-validacao"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray());
 
-        verify(subprocessoService).listarHistoricoValidacao(1L);
+        verify(consultaService).listarHistoricoValidacao(1L);
         verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
@@ -287,12 +288,12 @@ class SubprocessoControllerCoverageExtraTest {
     @WithMockUser
     void verificarImpactosOk() throws Exception {
         when(permissionEvaluator.hasPermission(any(), eq(1L), eq("Subprocesso"), eq("VERIFICAR_IMPACTOS"))).thenReturn(true);
-        when(subprocessoService.verificarImpactos(eq(1L), any())).thenReturn(ImpactoMapaResponse.builder().build());
+        when(consultaService.verificarImpactos(eq(1L), any())).thenReturn(ImpactoMapaResponse.builder().build());
 
         mockMvc.perform(get("/api/subprocessos/1/impactos-mapa"))
                 .andExpect(status().isOk());
 
-        verify(subprocessoService).verificarImpactos(eq(1L), any());
+        verify(consultaService).verificarImpactos(eq(1L), any());
         verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 }

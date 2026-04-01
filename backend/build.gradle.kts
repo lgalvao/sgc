@@ -12,6 +12,7 @@ plugins {
     jacoco
     id("org.springframework.boot") version "4.0.5"
     id("io.spring.dependency-management") version "1.1.7"
+    id("org.openrewrite.rewrite")
     id("com.github.spotbugs") version "6.4.8"
     id("net.ltgt.errorprone") version "4.3.0"
     id("info.solidsoft.pitest") version "1.19.0-rc.3"
@@ -114,6 +115,19 @@ dependencies {
 
     errorprone("com.google.errorprone:error_prone_core:2.48.0")
     errorprone("com.uber.nullaway:nullaway:0.13.1")
+
+    rewrite("org.openrewrite:rewrite-java:8.75.5")
+}
+
+rewrite {
+    activeRecipe("sgc.java.renomearMetodosRepoCategoriaA")
+    configFile = rootProject.file("etc/openrewrite/renomear-metodos-repo-categoria-a.yml")
+}
+
+listOf("rewriteDiscover", "rewriteDryRun", "rewriteRun").forEach { nomeTarefa ->
+    tasks.named(nomeTarefa) {
+        notCompatibleWithConfigurationCache("OpenRewrite ainda nao e compativel com configuration cache neste build")
+    }
 }
 
 
@@ -126,9 +140,9 @@ tasks.named<org.springframework.boot.gradle.tasks.run.BootRun>("bootRun") {
     mainClass.set("sgc.Sgc")
 
     // Carregar variáveis do arquivo .env apropriado baseado na variável ENV
-    // Uso: ./gradlew bootRun -PENV=hom (ou test, e2e)
+    // Uso: ./gradlew bootRun -PENV=hom (ou e2e, test)
     // Também aceita -Dspring.profiles.active=hom
-    val env = (project.findProperty("ENV") ?: System.getProperty("spring.profiles.active"))?.toString() ?: "test"
+    val env = (project.findProperty("ENV") ?: System.getProperty("spring.profiles.active"))?.toString() ?: "e2e"
     val envFile = rootProject.file(".env.$env")
 
     systemProperty("spring.profiles.active", env)

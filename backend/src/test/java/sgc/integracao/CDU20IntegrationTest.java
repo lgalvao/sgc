@@ -131,7 +131,7 @@ class CDU20IntegrationTest extends BaseIntegrationTest {
 
         // Adicionar verificação de Movimentacao e Alerta após devolução
         List<Movimentacao> movimentacoesDevolucao =
-                movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(
+                movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(
                         subprocesso.getCodigo());
         assertThat(movimentacoesDevolucao).hasSize(2); // Setup + Devolução
         assertThat(movimentacoesDevolucao.getFirst().getDescricao())
@@ -186,7 +186,7 @@ class CDU20IntegrationTest extends BaseIntegrationTest {
 
         // Adicionar verificação de Movimentacao e Alerta após aceite
         List<Movimentacao> movimentacoesAceite =
-                movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(
+                movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(
                         subprocesso.getCodigo());
         assertThat(movimentacoesAceite).hasSize(4); // Setup + devolução + validação + aceite
         assertThat(movimentacoesAceite.getFirst().getDescricao())
@@ -235,7 +235,7 @@ class CDU20IntegrationTest extends BaseIntegrationTest {
         assertThat(atualizado.getLocalizacaoAtual().getSigla()).isEqualTo(unidadeSuperiorSuperior.getSigla());
 
         List<Movimentacao> movimentacoes =
-                movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo());
+                movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(subprocesso.getCodigo());
         assertThat(movimentacoes.getFirst().getDescricao()).isEqualTo("Mapa de competências validado");
         assertThat(movimentacoes.getFirst().getUnidadeOrigem().getSigla()).isEqualTo(unidadeSuperior.getSigla());
         assertThat(movimentacoes.getFirst().getUnidadeDestino().getSigla()).isEqualTo(unidadeSuperiorSuperior.getSigla());
@@ -283,7 +283,7 @@ class CDU20IntegrationTest extends BaseIntegrationTest {
                 .isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
 
         List<Movimentacao> movimentacoes =
-                movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(
+                movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(
                         subprocesso.getCodigo());
         // Deve ter o setup + homologação
         assertThat(movimentacoes).hasSizeGreaterThanOrEqualTo(2);

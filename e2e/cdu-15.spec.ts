@@ -41,6 +41,15 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
         await expect(page.getByTestId('btn-abrir-criar-competencia')).toBeVisible();
         await expect(page.getByTestId('btn-cad-mapa-disponibilizar')).toBeDisabled();
 
+        // CT-01b: Verificar botões do modal de criação de competência (CDU-15 item 14)
+        await page.getByTestId('btn-abrir-criar-competencia').click();
+        const modalCriacao = page.getByTestId('mdl-criar-competencia');
+        await expect(modalCriacao).toBeVisible();
+        await expect(modalCriacao.getByTestId('btn-criar-competencia-salvar')).toBeVisible();
+        await expect(modalCriacao.getByRole('button', {name: /Cancelar/i})).toBeVisible();
+        await modalCriacao.getByRole('button', {name: /Cancelar/i}).click();
+        await expect(modalCriacao).toBeHidden();
+
         // CT-02: Criar competência
         const compDesc = `Competência 1 ${timestamp}`;
         await criarCompetencia(page, compDesc, [ATIVIDADE_1]);

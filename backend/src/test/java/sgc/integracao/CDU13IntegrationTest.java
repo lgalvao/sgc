@@ -169,7 +169,7 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
         assertThat(analiseRegistrada.getObservacoes()).isEqualTo(observacoes);
         assertThat(analiseRegistrada.getUnidadeCodigo()).isEqualTo(unidadeSuperior.getCodigo());
 
-        List<Movimentacao> movimentacoes = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(
+        List<Movimentacao> movimentacoes = movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(
                 subprocesso.getCodigo());
         assertThat(movimentacoes).hasSize(2);
         Movimentacao movimentacaoDevolucao = movimentacoes.getFirst();
@@ -210,7 +210,7 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
         assertThat(analiseRegistrada.getUsuarioTitulo())
                 .isEqualTo("132313231323");
 
-        List<Movimentacao> movimentacoes = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(
+        List<Movimentacao> movimentacoes = movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(
                 subprocesso.getCodigo());
         assertThat(movimentacoes).hasSize(2);
         Movimentacao movimentacaoAceite = movimentacoes.getFirst();
@@ -251,7 +251,7 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
         assertThat(subprocessoAtualizado.getSituacao())
                 .isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
 
-        List<Movimentacao> movimentacoes = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(
+        List<Movimentacao> movimentacoes = movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(
                 subprocesso.getCodigo());
         assertThat(movimentacoes).hasSize(2);
         Movimentacao movimentacaoHomologacao = movimentacoes.getFirst();

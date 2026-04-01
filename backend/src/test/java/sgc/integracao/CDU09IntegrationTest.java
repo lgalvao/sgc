@@ -108,7 +108,7 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
 
         assertThat(atualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
 
-        List<Movimentacao> movs = movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(spCodigo);
+        List<Movimentacao> movs = movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(spCodigo);
         assertThat(movs).isNotEmpty();
         assertThat(movs.getFirst().getDescricao()).isEqualTo("Disponibilização do cadastro de atividades");
         assertThat(movs.getFirst().getUnidadeOrigem().getSigla()).isEqualTo("SEDESENV");

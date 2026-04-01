@@ -40,7 +40,7 @@ public class UnidadeDto {
 
     @JsonView(OrganizacaoViews.Publica.class)
     @JsonProperty("tituloTitular")
-    private String tituloTitular;
+    private @Nullable String tituloTitular;
 
     @JsonView(OrganizacaoViews.Publica.class)
     @JsonProperty("isElegivel")
@@ -67,4 +67,3 @@ public class UnidadeDto {
         return dto;
     }
 }
-

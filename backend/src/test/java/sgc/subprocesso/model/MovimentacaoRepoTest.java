@@ -53,7 +53,7 @@ class MovimentacaoRepoTest {
                 .dataHora(LocalDateTime.of(2099, 1, 5, 9, 0))
                 .build());
 
-        assertThat(movimentacaoRepo.findFirstBySubprocessoCodigoOrderByDataHoraDesc(60000L))
+        assertThat(movimentacaoRepo.buscarUltimaPorSubprocesso(60000L))
                 .get()
                 .extracting(Movimentacao::getDescricao)
                 .isEqualTo("Movimentacao recente");

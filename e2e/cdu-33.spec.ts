@@ -89,6 +89,23 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
 
         await verificarAppAlert(page, /Revisão reaberta/i);
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Revisão em andamento/i);
-        await expect(page.getByTestId('tbl-movimentacoes')).toContainText(/Reabertura de revisão de cadastro/i);
+
+        const linhaMovimentacao = page.getByTestId('tbl-movimentacoes')
+            .locator('tr', {hasText: /Reabertura de revisão de cadastro/i})
+            .first();
+        await expect(linhaMovimentacao).toBeVisible();
+        await expect(linhaMovimentacao).toContainText(/\d{2}\/\d{2}\/\d{4}/);
+    });
+
+    test('Cenário complementar: unidade alvo visualiza alerta de reabertura de revisão no painel', async ({
+                                                                                                              _resetAutomatico,
+                                                                                                              page,
+                                                                                                              _autenticadoComoChefeSecao212
+    }) => {
+        const tabelaAlertas = page.getByTestId('tbl-alertas');
+        await expect(tabelaAlertas).toBeVisible();
+        await expect(tabelaAlertas).toContainText(descRevisao);
+        await expect(tabelaAlertas).toContainText(/Revisão de cadastro.*reaberta/i);
+        await expect(tabelaAlertas).toContainText(/\d{2}\/\d{2}\/\d{4}/);
     });
 });

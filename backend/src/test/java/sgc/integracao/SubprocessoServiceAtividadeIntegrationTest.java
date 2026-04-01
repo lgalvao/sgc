@@ -26,6 +26,8 @@ class SubprocessoServiceAtividadeIntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private SubprocessoService subprocessoService;
+    @Autowired
+    private SubprocessoConsultaService consultaService;
 
     @Autowired
     private UsuarioRepo usuarioRepo;
@@ -185,7 +187,7 @@ class SubprocessoServiceAtividadeIntegrationTest extends BaseIntegrationTest {
     void listarAtividadesSubprocesso_Sucesso() {
         subprocessoService.importarAtividades(subprocessoDestino.getCodigo(), subprocessoOrigem.getCodigo(), List.of());
         
-        List<sgc.mapa.dto.AtividadeDto> atividades = subprocessoService.listarAtividadesSubprocesso(subprocessoDestino.getCodigo());
+        List<sgc.mapa.dto.AtividadeDto> atividades = consultaService.listarAtividadesSubprocesso(subprocessoDestino.getCodigo());
         
         assertThat(atividades).hasSize(1);
         assertThat(atividades.getFirst().descricao()).isEqualTo("Atividade importada");

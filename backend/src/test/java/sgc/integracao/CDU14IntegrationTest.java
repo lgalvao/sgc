@@ -109,7 +109,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
     private Long criarEComecarProcessoDeRevisao() throws Exception {
         Processo processo = criarEIniciarProcessoDeRevisao();
 
-        Subprocesso sp = subprocessoRepo.findByProcessoCodigoComUnidade(processo.getCodigo()).stream()
+        Subprocesso sp = subprocessoRepo.listarPorProcessoComUnidade(processo.getCodigo()).stream()
                 .findFirst()
                 .orElseThrow();
         sp.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);

@@ -21,7 +21,7 @@ class UnidadeMapaRepoTest {
     @Test
     @DisplayName("deve listar codigos de unidade com mapa vigente")
     void deveListarCodigosDeUnidadeComMapaVigente() {
-        List<Long> codigos = unidadeMapaRepo.findAllUnidadeCodigos();
+        List<Long> codigos = unidadeMapaRepo.listarTodosCodigosUnidade();
 
         assertThat(codigos).contains(8L, 9L, 10L, 102L);
     }
@@ -29,10 +29,10 @@ class UnidadeMapaRepoTest {
     @Test
     @DisplayName("deve buscar e verificar existencia por unidade codigo")
     void deveBuscarEVerificarExistenciaPorUnidadeCodigo() {
-        UnidadeMapa unidadeMapa = unidadeMapaRepo.findByUnidadeCodigo(8L).orElseThrow();
+        UnidadeMapa unidadeMapa = unidadeMapaRepo.findById(8L).orElseThrow();
 
-        assertThat(unidadeMapaRepo.existsByUnidadeCodigo(8L)).isTrue();
-        assertThat(unidadeMapaRepo.existsByUnidadeCodigo(999L)).isFalse();
+        assertThat(unidadeMapaRepo.existsById(8L)).isTrue();
+        assertThat(unidadeMapaRepo.existsById(999L)).isFalse();
         assertThat(unidadeMapa.getUnidadeCodigoPersistido()).isEqualTo(8L);
         assertThat(unidadeMapa.getMapaVigente()).isNotNull();
         assertThat(unidadeMapa.getMapaVigente().getCodigo()).isEqualTo(1001L);
@@ -41,7 +41,7 @@ class UnidadeMapaRepoTest {
     @Test
     @DisplayName("deve buscar varios registros por lista de unidades")
     void deveBuscarVariosRegistrosPorListaDeUnidades() {
-        List<UnidadeMapa> registros = unidadeMapaRepo.findAllByUnidadeCodigoIn(List.of(8L, 10L, 904L));
+        List<UnidadeMapa> registros = unidadeMapaRepo.findAllById(List.of(8L, 10L, 904L));
 
         assertThat(registros)
                 .extracting(UnidadeMapa::getUnidadeCodigoPersistido)

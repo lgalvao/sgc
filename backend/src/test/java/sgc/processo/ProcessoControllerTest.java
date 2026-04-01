@@ -54,6 +54,7 @@ class ProcessoControllerTest {
 
     @MockitoBean
     private SubprocessoService subprocessoService;
+    @MockitoBean private SubprocessoConsultaService consultaService;
 
     @MockitoBean
     private SgcPermissionEvaluator permissionEvaluator;
@@ -213,40 +214,34 @@ class ProcessoControllerTest {
                     .andExpect(status().isOk());
         }
 
+        private void performAccessCheck(boolean hasAccess, int expectedStatus) throws Exception {
+            var processo = Processo.builder().codigo(1L).descricao("Teste").build();
+            when(processoService.buscarOpt(1L)).thenReturn(Optional.of(processo));
+            when(processoService.checarAcesso(any(), anyLong())).thenReturn(hasAccess);
+
+            mockMvc.perform(get(API_PROCESSOS_1))
+                    .andExpect(status().is(expectedStatus));
+        }
+
         @Test
         @WithMockUser(roles = "CHEFE")
         @DisplayName("Deve retornar 403 Forbidden quando CHEFE tenta acessar processo de outra unidade (correção IDOR)")
         void deveRetornarForbiddenQuandoChefeNaoTemAcesso() throws Exception {
-            var processo = Processo.builder().codigo(1L).descricao("Teste").build();
-            when(processoService.buscarOpt(1L)).thenReturn(Optional.of(processo));
-            when(processoService.checarAcesso(any(), anyLong())).thenReturn(false);
-
-            mockMvc.perform(get(API_PROCESSOS_1))
-                                        .andExpect(status().isForbidden());
+            performAccessCheck(false, 403);
         }
 
         @Test
         @WithMockUser(roles = "GESTOR")
         @DisplayName("Deve retornar 200 OK quando GESTOR tem acesso a processo de sua sub-árvore (correção IDOR)")
         void deveRetornarOkQuandoGestorTemAcesso() throws Exception {
-            var processo = Processo.builder().codigo(1L).descricao("Teste").build();
-            when(processoService.buscarOpt(1L)).thenReturn(Optional.of(processo));
-            when(processoService.checarAcesso(any(), anyLong())).thenReturn(true);
-
-            mockMvc.perform(get(API_PROCESSOS_1))
-                    .andExpect(status().isOk());
+            performAccessCheck(true, 200);
         }
 
         @Test
         @WithMockUser(roles = "GESTOR")
         @DisplayName("Deve retornar 403 Forbidden quando GESTOR tenta acessar processo fora de sua sub-árvore (correção IDOR)")
         void deveRetornarForbiddenQuandoGestorNaoTemAcesso() throws Exception {
-            var processo = Processo.builder().codigo(1L).descricao("Teste").build();
-            when(processoService.buscarOpt(1L)).thenReturn(Optional.of(processo));
-            when(processoService.checarAcesso(any(), anyLong())).thenReturn(false);
-
-            mockMvc.perform(get(API_PROCESSOS_1))
-                    .andExpect(status().isForbidden());
+            performAccessCheck(false, 403);
         }
 
         @Test
@@ -365,7 +360,7 @@ class ProcessoControllerTest {
         @DisplayName("Deve retornar lista de subprocessos")
         void deveRetornarListaDeSubprocessos() throws Exception {
 
-            when(subprocessoService.listarEntidadesPorProcesso(1L))
+            when(consultaService.listarEntidadesPorProcesso(1L))
                     .thenReturn(List.of(Subprocesso.builder().codigo(10L).build()));
 
             mockMvc.perform(get("/api/processos/1/subprocessos"))
@@ -411,7 +406,7 @@ class ProcessoControllerTest {
                 .unidade(unidade)
                 .dataLimiteEtapa1(LocalDateTime.now())
                 .build();
-            when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sub));
+            when(consultaService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sub));
 
             mockMvc.perform(get("/api/processos/1/unidades-importacao"))
                     .andExpect(status().isOk())
@@ -455,7 +450,7 @@ class ProcessoControllerTest {
                 .localizacaoAtual(unidade)
                 .dataLimiteEtapa1(LocalDateTime.now())
                 .build();
-            when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sub));
+            when(consultaService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sub));
 
             mockMvc.perform(get("/api/processos/1/unidades-importacao"))
                     .andExpect(status().isOk())
@@ -492,7 +487,7 @@ class ProcessoControllerTest {
 
             when(processoService.buscarPorCodigoComParticipantes(1L)).thenReturn(processo);
             // Retornar lista vazia para forçar subprocesso = null na iteração
-            when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of());
+            when(consultaService.listarEntidadesPorProcesso(1L)).thenReturn(List.of());
 
             mockMvc.perform(get("/api/processos/1/unidades-importacao"))
                     .andExpect(status().isOk())
@@ -594,8 +589,7 @@ class ProcessoControllerTest {
         @BeforeEach
         void setUp() {
             processoServiceMock = mock(ProcessoService.class);
-            SubprocessoService subprocessoServiceMock = mock(SubprocessoService.class);
-            controller = new ProcessoController(processoServiceMock, subprocessoServiceMock);
+            controller = new ProcessoController(processoServiceMock, consultaService);
         }
 
         @Test

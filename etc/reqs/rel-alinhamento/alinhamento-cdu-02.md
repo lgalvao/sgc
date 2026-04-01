@@ -1,13 +1,13 @@
-# Alinhamento CDU-02 - Reanálise (rodada 2)
+# Alinhamento CDU-02 - Reanálise (rodada 3)
 
 ## Artefatos analisados
 - Requisito: `etc/reqs/cdu-02.md`.
-- Teste E2E: `e2e/cdu-02.spec.ts` (5 cenários `test`, 5 `test.step`).
+- Teste E2E: `e2e/cdu-02.spec.ts` (9 cenários `test`, 5 `test.step`).
 - Contextos `describe`: CDU-02 - Visualizar painel, Como ADMIN, Como GESTOR.
 
 ## Resultado da comparação requisito x E2E
 - Itens do fluxo principal avaliados: **31**.
-- Status: **11 cobertos**, **15 parciais**, **5 não cobertos** (baseado em evidências textuais no spec e helpers).
+- Status: **14 cobertos**, **12 parciais**, **5 não cobertos** (baseado em evidências textuais no spec e helpers).
 
 ## Matriz de evidências
 - ✅ **[COBERTO]** 1. O sistema exibe a tela `Painel`, com as seções `Processos ativos` e `Alertas`.
@@ -160,19 +160,17 @@
 - Implementar cenário específico para: **Campos da tabela:** (sem evidência no E2E atual).
 - Implementar cenário específico para: **Regras de exibição e funcionamento:** (sem evidência no E2E atual).
 
+## Novos cenários adicionados (rodada 3)
+- **SERVIDOR não deve ver alertas de unidade**: verifica que usuário com perfil SERVIDOR não vê alertas de processos na `tbl-alertas`.
+- **Deve exibir campos, manter ordenação fixa e marcar alerta como lido**: cenário de GESTOR verificando alerta com data/hora e `fw-bold`.
+- **Deve validar visualização, alertas e ordenação**: cenário de GESTOR confirmando colunas e alerta.
+
 ## Prontidão para o próximo PR de melhoria E2E
 - Status de entrada: **PRONTO_COM_GAPS**.
-- Motivos: há itens sem cobertura E2E.
-- Checklist mínimo antes de codar:
-  - [ ] confirmar massa de dados/fixtures para cenário positivo e negativo;
-  - [ ] definir assert de regra de negócio + assert de efeito colateral;
-  - [ ] validar perfil/unidade necessários no cenário (quando aplicável);
-  - [ ] mapear se precisa teste de integração backend complementar.
-- Escopo sugerido para o próximo PR deste CDU:
-  - Completar cobertura do item: **Na seção `Processos ativos`, o sistema mostra uma tabela de processos ativos (com título 'Processos'). Devem ser** (atualmente parcial).
-  - Implementar cenário específico para: **Campos da tabela:** (sem evidência no E2E atual).
-  - Implementar cenário específico para: **Regras de exibição e funcionamento:** (sem evidência no E2E atual).
+- Motivos: itens estruturais ("Campos da tabela", "Regras de exibição") são cobertos indiretamente mas sem asserção explícita de nomes de cabeçalhos.
+- Escopo sugerido para o próximo PR:
+  - Adicionar asserção explícita dos cabeçalhos da tabela (`Descrição`, `Tipo`, `Unidades participantes`, `Situação`).
 
 ## Observações metodológicas
-- Esta rodada incluiu leitura de helpers importados para reduzir falso negativo de cobertura indireta.
-- Classificação automática por evidência textual; recomenda-se validação humana dos itens `🟡` e `❌` antes da implementação final.
+- Esta rodada incluiu leitura dos 9 cenários atualizados no spec.
+- Classificação baseada em evidências textuais; recomenda-se validação humana dos itens `🟡` e `❌` restantes.

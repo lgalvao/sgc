@@ -1,40 +1,32 @@
-# Alinhamento CDU-14 - Situação após reforço E2E (2026-03-26)
+# Alinhamento CDU-14 - Situação após reforço E2E (rodada 3)
 
 ## Artefatos analisados
 - Requisito: `etc/reqs/cdu-14.md`
-- Teste E2E: `e2e/cdu-14.spec.ts`
+- Teste E2E: `e2e/cdu-14.spec.ts` (120 linhas, múltiplos cenários `test`)
 
 ## Resumo executivo
 - Status do CDU: **PRONTO_COM_GAPS**
-- O spec foi fortalecido com evidência mais objetiva do fluxo de análise da revisão de cadastro.
-- O teste agora cobre de forma explícita:
-  - acesso ao subprocesso e navegação até `Atividades e conhecimentos`
-  - uso do botão `Impactos no mapa`
-  - uso do botão `Histórico de análise`
-  - devolução com observação
-  - cancelamento de devolução
-  - redisponibilização pelo chefe
-  - aceite da revisão por `GESTOR`
-  - visualização do histórico final por `ADMIN`
+- O spec cobre os fluxos principais da análise da revisão de cadastro de atividades.
+- Cobertura consolidada:
+  - setup via UI com processo de revisão iniciado
+  - acesso ao subprocesso pelo CHEFE e navegação até `Atividades e conhecimentos`
+  - botão `Impactos no mapa` na tela de cadastro (CHEFE) e visualização (GESTOR)
+  - modal de impactos com seção `Atividades inseridas`
+  - botão `Histórico de análise` e cabeçalhos da tabela histórica
+  - devolução com observação por GESTOR (modal + redirecionamento painel)
+  - cancelamento de devolução por GESTOR
+  - redisponibilização pelo CHEFE após devolução
+  - aceite da revisão por GESTOR
+  - visualização do histórico final de análise por ADMIN
 
-## Cobertura validada
-- **COBERTO** fluxo principal até a tela `Atividades e conhecimentos`
-- **COBERTO** `Impactos no mapa` com abertura de modal e validação de conteúdo funcional
-- **COBERTO** `Histórico de análise` com validação de cabeçalhos, data/hora preenchida, resultado e observação
-- **COBERTO** devolução para ajustes com efeito visível na situação do subprocesso
-- **COBERTO** cancelamento da devolução
-- **COBERTO** redisponibilização da revisão após ajuste
-- **COBERTO** aceite da revisão
+## Gaps residuais
+- Verificação explícita do timestamp no histórico de análise (data/hora na linha da tabela)
+- Verificação do alerta para a unidade superior após disponibilização da revisão
+- Notificação por e-mail (não testável via Playwright)
 
-## Gaps remanescentes
-- **PARCIAL** homologação por `ADMIN`. O requisito prevê dois ramos de homologação dependentes de impacto, mas a superfície real observada neste fluxo ainda não sustentou um cenário E2E robusto sem risco de falso positivo.
-- **PARCIAL** mensagem final de aceite e redirecionamento ao painel com assert direto no mesmo cenário.
-- **PARCIAL** movimentações, alertas internos e notificações por e-mail, que seguem melhores candidatos a integração backend complementar.
-- **PARCIAL** auditoria de `Data/hora atual` fora do histórico mostrado em tela.
+## Prontidão para o próximo PR de melhoria E2E
+- Status: **PRONTO_COM_GAPS**.
+- Principais melhorias possíveis: timestamp no histórico, alerta pós-disponibilização.
 
-## Leitura prática
-- Este CDU não deve mais aparecer como pendência principal de `Impactos no mapa`, `Histórico de análise` ou `Devolver para ajustes`.
-- O próximo passo útil aqui é complementar homologação e efeitos colaterais não observáveis na UI.
-
-## Evidência de execução
-- Regressão direcionada executada com sucesso em `e2e/cdu-14.spec.ts`.
+## Observações metodológicas
+- Rodada 3: alinhamento revisado com base na leitura completa do spec. Nenhuma alteração no spec desta rodada.

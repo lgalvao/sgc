@@ -1,5 +1,10 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
-import {criarProcessoMapaHomologadoFixture, criarProcessoRevisaoMapaHomologadoFixture, validarProcessoFixture} from './fixtures/fixtures-processos.js';
+import {
+    criarProcessoMapaHomologadoFixture,
+    criarProcessoMapaValidadoFixture,
+    criarProcessoRevisaoMapaHomologadoFixture,
+    validarProcessoFixture
+} from './fixtures/fixtures-processos.js';
 import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
 import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
@@ -42,7 +47,14 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
 
         const modal = page.getByRole('dialog');
         await expect(modal).toBeVisible();
-        await expect(modal.getByText(/Confirma a finalização/i)).toBeVisible();
+
+        // CDU-21 Passo 6: verificar título, mensagem completa e botões do modal
+        await expect(modal.getByRole('heading', {name: TEXTOS.processo.FINALIZACAO_TITULO})).toBeVisible();
+        await expect(modal.getByText(TEXTOS.processo.FINALIZACAO_CONFIRMACAO_PREFIXO)).toBeVisible();
+        await expect(modal.getByText(descProcesso)).toBeVisible();
+        await expect(modal.getByText(TEXTOS.processo.FINALIZACAO_CONFIRMACAO_COMPLEMENTO)).toBeVisible();
+        await expect(page.getByTestId('btn-finalizar-processo-cancelar')).toBeVisible();
+        await expect(page.getByTestId('btn-finalizar-processo-confirmar')).toBeVisible();
 
         await page.getByTestId('btn-finalizar-processo-cancelar').click();
 
@@ -96,6 +108,29 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
         await expect(page.getByTestId('card-subprocesso-atividades')).toBeHidden();
         // Deve aparecer o de visualização
         await expect(page.getByTestId('card-subprocesso-atividades-vis')).toBeVisible();
+    });
+});
+
+test.describe.serial('CDU-21 - Processo com mapas não homologados', () => {
+    const UNIDADE_ALVO = 'SECAO_221';
+    const timestamp = Date.now();
+    const descProcessoErro = `Mapeamento CDU-21 Erro ${timestamp}`;
+
+    test('Setup data: processo com mapa validado mas não homologado', async ({_resetAutomatico, request}) => {
+        const processo = await criarProcessoMapaValidadoFixture(request, {
+            descricao: descProcessoErro,
+            unidade: UNIDADE_ALVO
+        });
+        validarProcessoFixture(processo, descProcessoErro);
+    });
+
+    test('Cenario 5: ADMIN não vê botão Finalizar quando mapas não estão todos homologados', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
+        // CDU-21 Passos 4-5: sistema verifica situação dos subprocessos e bloqueia finalização
+        await acessarDetalhesProcesso(page, descProcessoErro);
+        await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
+
+        // Processo com mapa validado (não homologado): botão Finalizar não deve estar disponível
+        await expect(page.getByTestId('btn-processo-finalizar')).toBeHidden();
     });
 });
 

@@ -111,4 +111,11 @@ test.describe('CDU-01 - Realizar login e exibir estrutura das telas', () => {
 
         await expect(page.getByText(TEXTOS.comum.RODAPE)).toBeVisible();
     });
+
+    test('Deve realizar logout com sucesso', async ({page, _autenticadoComoAdmin}) => {
+        await expect(page).toHaveURL(/\/painel/);
+        await page.getByTestId('btn-logout').click();
+        await expect(page).toHaveURL(/\/login/);
+        await verificarTelaLogin(page);
+    });
 });

@@ -1,7 +1,9 @@
 package sgc.integracao;
 
 import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.*;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.*;
 import org.springframework.test.web.servlet.*;
 import org.springframework.transaction.annotation.*;
 import sgc.fixture.*;
@@ -27,6 +29,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class CDU03IntegrationTest extends BaseIntegrationTest {
     private static final String API_PROCESSOS = "/api/processos";
     private static final String API_PROCESSOS_ID = "/api/processos/{codigo}";
+    private static final String SQL_INSERIR_RESPONSABILIDADE = """
+            INSERT INTO SGC.VW_RESPONSABILIDADE (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio)
+            VALUES (?, ?, ?, ?, ?)
+            """;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    private UsuarioRepo usuarioRepo;
 
     private Unidade unidade1;
     private Unidade unidade2;
@@ -39,12 +51,32 @@ class CDU03IntegrationTest extends BaseIntegrationTest {
         unidade1.setNome("Unidade 1");
         unidade1.setSigla("U1");
         unidade1 = unidadeRepo.saveAndFlush(unidade1);
+        registrarUsuarioSeNecessario("111111111111");
+        registrarResponsabilidade(unidade1.getCodigo(), "111111111111", "11111111");
 
         unidade2 = UnidadeFixture.unidadePadrao();
         unidade2.setCodigo(null);
         unidade2.setNome("Unidade 2");
         unidade2.setSigla("U2");
         unidade2 = unidadeRepo.saveAndFlush(unidade2);
+        registrarUsuarioSeNecessario("202020202020");
+        registrarResponsabilidade(unidade2.getCodigo(), "202020202020", "20202020");
+    }
+
+    private void registrarUsuarioSeNecessario(String tituloUsuario) {
+        if (usuarioRepo.findById(tituloUsuario).isPresent()) {
+            return;
+        }
+        usuarioRepo.saveAndFlush(UsuarioFixture.usuarioComTitulo(tituloUsuario));
+    }
+
+    private void registrarResponsabilidade(Long codUnidade, String tituloUsuario, String matriculaUsuario) {
+        jdbcTemplate.update(SQL_INSERIR_RESPONSABILIDADE,
+                codUnidade,
+                tituloUsuario,
+                matriculaUsuario,
+                "TITULAR",
+                LocalDateTime.now());
     }
 
     private CriarProcessoRequest criarCriarProcessoReq(

@@ -31,7 +31,7 @@ import java.util.stream.*;
 @PreAuthorize("isAuthenticated()")
 public class ProcessoController {
     private final ProcessoService processoService;
-    private final SubprocessoService subprocessoService;
+    private final SubprocessoConsultaService consultaService;
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
@@ -105,7 +105,7 @@ public class ProcessoController {
         if (processo.getSituacao() != SituacaoProcesso.FINALIZADO) {
             throw new ErroValidacao(Mensagens.PROCESSO_DEVE_ESTAR_FINALIZADO);
         }
-        Map<Long, Subprocesso> subprocessosPorUnidade = subprocessoService.listarEntidadesPorProcesso(codigo).stream()
+        Map<Long, Subprocesso> subprocessosPorUnidade = consultaService.listarEntidadesPorProcesso(codigo).stream()
                 .collect(Collectors.toMap(sp -> sp.getUnidade().getCodigo(), Function.identity(), (primeiro, duplicado) -> primeiro));
         List<ProcessoDetalheDto.UnidadeParticipanteDto> dtos = processo.getParticipantes().stream()
                 .map(snapshot -> {
@@ -193,7 +193,7 @@ public class ProcessoController {
     @PreAuthorize("hasRole('ADMIN') or @processoService.checarAcesso(authentication, #codigo)")
     @Operation(summary = "Lista todos os subprocessos de um processo")
     public ResponseEntity<List<SubprocessoListagemDto>> listarSubprocessos(@PathVariable Long codigo) {
-        return ResponseEntity.ok(subprocessoService.listarEntidadesPorProcesso(codigo).stream()
+        return ResponseEntity.ok(consultaService.listarEntidadesPorProcesso(codigo).stream()
                 .map(SubprocessoListagemDto::fromEntity)
                 .toList());
     }
@@ -217,4 +217,5 @@ public class ProcessoController {
         return ResponseEntity.ok().build();
     }
 }
+
 

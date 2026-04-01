@@ -133,7 +133,7 @@ public class ResponsavelUnidadeService {
     public Map<Long, UnidadeResponsavelDto> buscarResponsaveisUnidades(List<Long> unidadesCodigos) {
         if (unidadesCodigos.isEmpty()) return Collections.emptyMap();
 
-        List<Responsabilidade> responsabilidades = responsabilidadeRepo.findByUnidadeCodigoIn(unidadesCodigos);
+        List<Responsabilidade> responsabilidades = responsabilidadeRepo.listarPorCodigosUnidade(unidadesCodigos);
         if (responsabilidades.isEmpty()) return Collections.emptyMap();
 
         // Coletar todos os títulos (responsáveis atuais e titulares oficiais) para busca em lote
@@ -143,7 +143,7 @@ public class ResponsavelUnidadeService {
             todosTitulos.add(r.getUnidade().getTituloTitular());
         });
 
-        Map<String, Usuario> usuariosPorTitulo = usuarioRepo.findByTitulosComUnidadeLotacao(new ArrayList<>(todosTitulos)).stream()
+        Map<String, Usuario> usuariosPorTitulo = usuarioRepo.listarPorTitulosComUnidadeLotacao(new ArrayList<>(todosTitulos)).stream()
                 .collect(toMap(Usuario::getTituloEleitoral, u -> u));
 
         return responsabilidades.stream()
@@ -191,5 +191,21 @@ public class ResponsavelUnidadeService {
                 .map(Responsabilidade::getUnidadeCodigo)
                 .toList();
     }
-}
 
+    /**
+     * Verifica se todas as unidades informadas possuem responsável efetivo vigente.
+     */
+    @Transactional(readOnly = true)
+    public boolean todasPossuemResponsavelEfetivo(List<Long> unidadesCodigos) {
+        if (unidadesCodigos.isEmpty()) {
+            return true;
+        }
+
+        Set<Long> unidadesComResponsavelEfetivo = responsabilidadeRepo.listarPorCodigosUnidade(unidadesCodigos).stream()
+                .filter(responsabilidade -> responsabilidade.getUsuarioTitulo() != null && !responsabilidade.getUsuarioTitulo().isBlank())
+                .map(Responsabilidade::getUnidadeCodigo)
+                .collect(toSet());
+
+        return unidadesCodigos.stream().allMatch(unidadesComResponsavelEfetivo::contains);
+    }
+}

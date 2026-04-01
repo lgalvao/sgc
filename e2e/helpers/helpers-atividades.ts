@@ -11,6 +11,8 @@ export async function navegarParaAtividades(page: Page) {
 
     await expect(page.getByRole('heading', {name: TEXTOS.atividades.TITULO, level: 2})).toBeVisible();
     await expect(page.getByTestId('inp-nova-atividade')).toBeVisible();
+    // Aguarda o badge de situação para garantir que os dados do subprocesso foram carregados
+    await expect(page.getByTestId('cad-atividades__txt-badge-situacao')).toBeVisible();
 }
 
 export async function navegarParaAtividadesVisualizacao(page: Page) {
@@ -147,6 +149,12 @@ export async function disponibilizarCadastro(page: Page) {
             await checkboxSemMudancas.check();
             await expect(checkboxSemMudancas).toBeChecked();
         }
+    }
+
+    if (await botao.isDisabled()) {
+        const atividadeExtra = `Atividade complementar ${Date.now()}`;
+        await adicionarAtividade(page, atividadeExtra);
+        await adicionarConhecimento(page, atividadeExtra, 'Conhecimento complementar');
     }
 
     await expect(botao).toBeEnabled();
@@ -358,4 +366,3 @@ export async function verificarOpcoesImportacaoVazia(
     await respostaProcessos;
     await realizarVerificacaoOpcoesImportacao(page, opcoesEsperadas);
 }
-

@@ -30,6 +30,8 @@ class SubprocessoServiceCoverageIntegrationTest {
 
     @Autowired
     private SubprocessoService subprocessoService;
+    @Autowired
+    private SubprocessoConsultaService consultaService;
 
     @MockitoBean
     private UsuarioFacade usuarioFacade;
@@ -80,7 +82,7 @@ class SubprocessoServiceCoverageIntegrationTest {
         @Test
         @DisplayName("deve retornar vazio se lista de unidades for vazia")
         void vazioSeVazio() {
-            java.util.List<Subprocesso> lista = subprocessoService.listarEntidadesPorProcessoEUnidades(1L, java.util.List.of());
+            java.util.List<Subprocesso> lista = consultaService.listarEntidadesPorProcessoEUnidades(1L, java.util.List.of());
             assertThat(lista).isEmpty();
         }
     }
@@ -105,7 +107,7 @@ class SubprocessoServiceCoverageIntegrationTest {
 
             subprocessoService.criarParaMapeamento(proc, java.util.List.of(u), u, user);
 
-            assertThat(subprocessoRepo.findByProcessoCodigoComUnidade(proc.getCodigo())).isEmpty();
+            assertThat(subprocessoRepo.listarPorProcessoComUnidade(proc.getCodigo())).isEmpty();
         }
     }
 
@@ -137,7 +139,7 @@ class SubprocessoServiceCoverageIntegrationTest {
             sp.setMapa(mapa);
             sp = subprocessoRepo.saveAndFlush(sp);
 
-            sgc.subprocesso.dto.MapaAjusteDto dto = subprocessoService.obterMapaParaAjuste(sp.getCodigo());
+            sgc.subprocesso.dto.MapaAjusteDto dto = consultaService.obterMapaParaAjuste(sp.getCodigo());
 
             assertThat(dto).isNotNull();
             assertThat(dto.getCodMapa()).isEqualTo(mapa.getCodigo());
@@ -200,7 +202,7 @@ class SubprocessoServiceCoverageIntegrationTest {
             sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
             sp = subprocessoRepo.saveAndFlush(sp);
 
-            java.util.List<Subprocesso> lista = subprocessoService.listarPorProcessoESituacoes(proc.getCodigo(), java.util.List.of(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO));
+            java.util.List<Subprocesso> lista = consultaService.listarPorProcessoESituacoes(proc.getCodigo(), java.util.List.of(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO));
             assertThat(lista).hasSize(1);
             assertThat(lista.getFirst().getCodigo()).isEqualTo(sp.getCodigo());
         }
@@ -227,7 +229,7 @@ class SubprocessoServiceCoverageIntegrationTest {
             sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
             sp = subprocessoRepo.saveAndFlush(sp);
 
-            java.util.List<Subprocesso> lista = subprocessoService.listarPorProcessoUnidadeESituacoes(proc.getCodigo(), u.getCodigo(), java.util.List.of(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO));
+            java.util.List<Subprocesso> lista = consultaService.listarPorProcessoUnidadeESituacoes(proc.getCodigo(), u.getCodigo(), java.util.List.of(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO));
             assertThat(lista).hasSize(1);
             assertThat(lista.getFirst().getCodigo()).isEqualTo(sp.getCodigo());
         }
@@ -346,7 +348,7 @@ class SubprocessoServiceCoverageIntegrationTest {
 
             // Simulando perfil SERVIDOR
             try {
-                ContextoEdicaoResponse resp = subprocessoService.obterContextoEdicao(sp.getCodigo());
+                ContextoEdicaoResponse resp = consultaService.obterContextoEdicao(sp.getCodigo());
                 assertThat(resp).isNotNull();
             } finally {
                 SecurityContextHolder.clearContext();
@@ -428,7 +430,7 @@ class SubprocessoServiceCoverageIntegrationTest {
             sp.setMapa(mapa);
             sp = subprocessoRepo.saveAndFlush(sp);
 
-            java.util.List<AtividadeDto> lista = subprocessoService.listarAtividadesParaImportacao(sp.getCodigo());
+            java.util.List<AtividadeDto> lista = consultaService.listarAtividadesParaImportacao(sp.getCodigo());
             assertThat(lista).isNotNull();
         }
     }

@@ -27,7 +27,7 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 @RequiredArgsConstructor
 public class AtividadeFacade {
     private final MapaManutencaoService mapaManutencaoService;
-    private final SubprocessoService subprocessoService;
+    private final SubprocessoConsultaService consultaService;
     private final SgcPermissionEvaluator permissionEvaluator;
     private final UsuarioFacade usuarioService;
 
@@ -104,7 +104,7 @@ public class AtividadeFacade {
     }
 
     private void verificarPermissaoEdicao(Long mapaCodigo, Usuario usuario) {
-        Subprocesso sp = subprocessoService.obterEntidadePorCodigoMapa(mapaCodigo);
+        Subprocesso sp = consultaService.obterEntidadePorCodigoMapa(mapaCodigo);
 
         if (!permissionEvaluator.verificarPermissao(usuario, sp, EDITAR_CADASTRO)) {
             throw new ErroAcessoNegado(Mensagens.SEM_PERMISSAO_EDITAR_ATIVIDADES);
@@ -133,7 +133,7 @@ public class AtividadeFacade {
     }
 
     private Long obterCodigoSubprocessoPorMapa(Long codMapa) {
-        Subprocesso subprocesso = subprocessoService.obterEntidadePorCodigoMapa(codMapa);
+        Subprocesso subprocesso = consultaService.obterEntidadePorCodigoMapa(codMapa);
         return subprocesso.getCodigo();
     }
 
@@ -145,12 +145,12 @@ public class AtividadeFacade {
     }
 
     private AtividadeOperacaoResponse criarRespostaOperacao(Long codSubprocesso, Long codigoAtividade, boolean incluirAtividade) {
-        SubprocessoSituacaoDto situacaoDto = subprocessoService.obterStatus(codSubprocesso);
-        List<AtividadeDto> todasAtividades = subprocessoService.listarAtividadesSubprocesso(codSubprocesso);
+        SubprocessoSituacaoDto situacaoDto = consultaService.obterStatus(codSubprocesso);
+        List<AtividadeDto> todasAtividades = consultaService.listarAtividadesSubprocesso(codSubprocesso);
 
         Usuario usuario = usuarioService.usuarioAutenticado();
-        Subprocesso sp = subprocessoService.buscarSubprocesso(codSubprocesso);
-        PermissoesSubprocessoDto permissoes = subprocessoService.obterPermissoesUI(sp, usuario);
+        Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
+        PermissoesSubprocessoDto permissoes = consultaService.obterPermissoesUI(sp, usuario);
 
         AtividadeDto atividadeVis = null;
         if (incluirAtividade) {
@@ -172,4 +172,6 @@ public class AtividadeFacade {
                 .build();
     }
 }
+
+
 

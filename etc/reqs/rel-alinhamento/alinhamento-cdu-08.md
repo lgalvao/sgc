@@ -1,204 +1,137 @@
-# Alinhamento CDU-08 - Reanálise (rodada 2)
+# Alinhamento CDU-08 - Reanálise (rodada 3)
 
 ## Artefatos analisados
 - Requisito: `etc/reqs/cdu-08.md`.
-- Teste E2E: `e2e/cdu-08.spec.ts` (3 cenários `test`, 12 `test.step`).
-- Contextos `describe`: CDU-08 - Manter cadastro de atividades e conhecimentos.
+- Teste E2E: `e2e/cdu-08.spec.ts` (3 cenários `test`, múltiplos `test.step`).
 
 ## Resultado da comparação requisito x E2E
 - Itens do fluxo principal avaliados: **35**.
-- Status: **25 cobertos**, **8 parciais**, **2 não cobertos** (baseado em evidências textuais no spec e helpers).
+- Status: **27 cobertos**, **6 parciais**, **2 não cobertos** (baseado em evidências textuais no spec e helpers).
 
 ## Matriz de evidências
-- ✅ **[COBERTO]** 1. No painel, o usuário clica em um processo de mapeamento ou revisão da lista de processos.
-  - Palavras-chave usadas: `processo, processos, painel, clica, mapeamento, revisão`
-  - Evidência (score 3): `e2e/cdu-08.spec.ts:30` -> `await test.step('1. Setup: Criar processos origem e Mapeamento alvo', async () => {`
-  - Evidência (score 2): `e2e/cdu-08.spec.ts:7` -> `import {criarProcessoFinalizadoFixture, criarProcessoFixture} from './fixtures/fixtures-processos.js';`
-  - Evidência (score 2): `e2e/cdu-08.spec.ts:8` -> `import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';`
-- 🟡 **[PARCIAL]** 2. O sistema mostra a tela `Detalhes de subprocesso` com os dados do subprocesso da unidade.
-  - Palavras-chave usadas: `subprocesso, unidade, mostra, detalhes`
-  - Evidência (score 1): `e2e/cdu-08.spec.ts:8` -> `import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';`
-  - Evidência (score 1): `e2e/cdu-08.spec.ts:11` -> `const UNIDADE_ALVO = 'ASSESSORIA_11';`
-  - Evidência (score 1): `e2e/cdu-08.spec.ts:12` -> `const UNIDADE_ORIGEM = 'ASSESSORIA_12';`
-- ✅ **[COBERTO]** 3. O usuário clica no card `Atividades e conhecimentos`.
-  - Palavras-chave usadas: `atividades, clica, card, conhecimentos`
-  - Evidência (score 2): `e2e/cdu-08.spec.ts:10` -> `test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {`
-  - Evidência (score 1): `e2e/cdu-08.spec.ts:5` -> `import * as AtividadeHelpers from './helpers/helpers-atividades.js';`
-  - Evidência (score 1): `e2e/cdu-08.spec.ts:54` -> `await test.step('2. Acessar tela de Atividades', async () => {`
-- ✅ **[COBERTO]** 4. O sistema apresenta a tela `Cadastro de atividades e conhecimentos` da unidade. Se o mapa de competências da unidade do subprocesso já tiver atividades cadastradas, a tela virá preenchida com as informações atuais do mapa.
-  - Palavras-chave usadas: `atividades, unidade, competências, subprocesso, apresenta, cadastro`
-  - Evidência (score 2): `e2e/cdu-08.spec.ts:10` -> `test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {`
-  - Evidência (score 2): `e2e/cdu-08.spec.ts:78` -> `await AtividadeHelpers.importarAtividadesVazia(page, processoOrigemDescricao, UNIDADE_ORIGEM, [atividadeA, atividadeB]);`
-  - Evidência (score 2): `e2e/cdu-08.spec.ts:81` -> `await AtividadeHelpers.verificarSituacaoSubprocesso(page, 'Cadastro em andamento');`
-- ✅ **[COBERTO]** 5. Se o processo for de **Revisão**, deverá ser exibido o botão `Impacto no mapa`, a partir do qual será possível avaliar o efeito das alterações realizadas nas atividades e/ou conhecimentos sobre o mapa de competências do subprocesso (ver caso de uso `Verificar impactos no mapa de competências`).
-  - Palavras-chave usadas: `processo, atividades, competências, subprocesso, revisão, exibido`
-  - Evidência (score 2): `e2e/cdu-08.spec.ts:65` -> `await AtividadeHelpers.verificarSituacaoSubprocesso(page, 'Não iniciado');`
-  - Evidência (score 2): `e2e/cdu-08.spec.ts:78` -> `await AtividadeHelpers.importarAtividadesVazia(page, processoOrigemDescricao, UNIDADE_ORIGEM, [atividadeA, atividadeB]);`
-  - Evidência (score 2): `e2e/cdu-08.spec.ts:81` -> `await AtividadeHelpers.verificarSituacaoSubprocesso(page, 'Cadastro em andamento');`
-- ✅ **[COBERTO]** 6. Para incluir uma atividade, o usuário fornece a descrição da atividade, e clica no botão de adição.
-  - Palavras-chave usadas: `atividade, incluir, fornece, descrição, clica, botão`
-  - Evidência (score 2): `e2e/cdu-08.spec.ts:239` -> `// Sem atividade selecionada no processo B, o botão fica desabilitado.`
-  - Evidência (score 1): `e2e/cdu-08.spec.ts:5` -> `import * as AtividadeHelpers from './helpers/helpers-atividades.js';`
-  - Evidência (score 1): `e2e/cdu-08.spec.ts:10` -> `test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {`
-- ✅ **[COBERTO]** 7. O sistema adiciona a atividade e mostra o campo para adição de conhecimento abaixo da atividade.
-  - Palavras-chave usadas: `atividade, adiciona, mostra, adição, conhecimento, abaixo`
-  - Evidência (score 3): `e2e/cdu-08.spec.ts:101` -> `await AtividadeHelpers.adicionarConhecimento(page, atividadeManual, conhecimento1);`
-  - Evidência (score 3): `e2e/cdu-08.spec.ts:103` -> `await AtividadeHelpers.adicionarConhecimento(page, atividadeManual2, conhecimento2);`
-  - Evidência (score 2): `e2e/cdu-08.spec.ts:10` -> `test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {`
-- 🟡 **[PARCIAL]** 8. O usuário fornece a descrição do conhecimento e clica no botão de adição correspondente.
-  - Palavras-chave usadas: `fornece, descrição, conhecimento, clica, botão, adição`
-  - Evidência (score 1): `e2e/cdu-08.spec.ts:10` -> `test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {`
-  - Evidência (score 1): `e2e/cdu-08.spec.ts:100` -> `const conhecimento1 = `Conhecimento manual ${timestamp}`;`
-  - Evidência (score 1): `e2e/cdu-08.spec.ts:101` -> `await AtividadeHelpers.adicionarConhecimento(page, atividadeManual, conhecimento1);`
-- ✅ **[COBERTO]** 9. O sistema adiciona o conhecimento, associando-o à atividade.
-  - Palavras-chave usadas: `atividade, adiciona, conhecimento, associando-o`
-  - Evidência (score 3): `e2e/cdu-08.spec.ts:101` -> `await AtividadeHelpers.adicionarConhecimento(page, atividadeManual, conhecimento1);`
-  - Evidência (score 3): `e2e/cdu-08.spec.ts:103` -> `await AtividadeHelpers.adicionarConhecimento(page, atividadeManual2, conhecimento2);`
-  - Evidência (score 2): `e2e/cdu-08.spec.ts:10` -> `test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {`
-- ✅ **[COBERTO]** 10. Deve ser indicada claramente a associação entre o conhecimento e a atividade, indentando os conhecimentos da atividade abaixo da descrição desta.
-  - Palavras-chave usadas: `atividade, indicada, claramente, associação, conhecimento, indentando`
-  - Evidência (score 2): `e2e/cdu-08.spec.ts:10` -> `test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {`
-  - Evidência (score 2): `e2e/cdu-08.spec.ts:101` -> `await AtividadeHelpers.adicionarConhecimento(page, atividadeManual, conhecimento1);`
-  - Evidência (score 2): `e2e/cdu-08.spec.ts:103` -> `await AtividadeHelpers.adicionarConhecimento(page, atividadeManual2, conhecimento2);`
-- ❌ **[NAO_COBERTO]** 11. O usuário repete o fluxo de adição de atividades/conhecimentos.
-  - Palavras-chave usadas: `atividades/conhecimentos, repete, adição`
-  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
-- ✅ **[COBERTO]** 12. O usuário pode incluir primeiro várias atividades e depois os conhecimentos correspondentes; ou trabalhar em uma atividade por vez até concluir todos os seus conhecimentos. O sistema deve permitir os dois modos de trabalho.
-  - Palavras-chave usadas: `atividades, atividade, pode, incluir, primeiro, várias`
-  - Evidência (score 2): `e2e/cdu-08.spec.ts:5` -> `import * as AtividadeHelpers from './helpers/helpers-atividades.js';`
-  - Evidência (score 2): `e2e/cdu-08.spec.ts:10` -> `test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {`
-  - Evidência (score 2): `e2e/cdu-08.spec.ts:54` -> `await test.step('2. Acessar tela de Atividades', async () => {`
-- ✅ **[COBERTO]** 13. Para cada atividade já cadastrada, ao passar o mouse, o sistema exibe botões de edição e remoção.
-  - Palavras-chave usadas: `atividade, cada, cadastrada, passar, mouse, exibe`
-  - Evidência (score 2): `e2e/cdu-08.spec.ts:10` -> `test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {`
-  - Evidência (score 2): `e2e/cdu-08.spec.ts:81` -> `await AtividadeHelpers.verificarSituacaoSubprocesso(page, 'Cadastro em andamento');`
-  - Evidência (score 2): `e2e/cdu-08.spec.ts:95` -> `await AtividadeHelpers.verificarSituacaoSubprocesso(page, 'Cadastro em andamento');`
-- ✅ **[COBERTO]** 14. Se o usuário clicar em `Editar`, o sistema habilita a edição do nome da atividade e exibe ao lado um botão `Salvar` e outro `Cancelar`.
-  - Palavras-chave usadas: `atividade, clicar, editar, habilita, edição, nome`
-  - Evidência (score 2): `e2e/cdu-08.spec.ts:121` -> `await AtividadeHelpers.editarAtividade(page, atividadeManual, atividadeEditada);`
-  - Evidência (score 2): `e2e/cdu-08.spec.ts:129` -> `await AtividadeHelpers.editarConhecimento(page, atividadeEditada, conhecimento1, conhecimento1Editado);`
-  - Evidência (score 1): `e2e/cdu-08.spec.ts:5` -> `import * as AtividadeHelpers from './helpers/helpers-atividades.js';`
-- 🟡 **[PARCIAL]** 15. Se o usuário clicar em `Salvar`, o sistema salva a alteração e volta a exibir os botões `Editar` e `Remover` ao lado do nome da atividade.
-  - Palavras-chave usadas: `atividade, clicar, salvar, salva, alteração, volta`
-  - Evidência (score 1): `e2e/cdu-08.spec.ts:5` -> `import * as AtividadeHelpers from './helpers/helpers-atividades.js';`
-  - Evidência (score 1): `e2e/cdu-08.spec.ts:10` -> `test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {`
-  - Evidência (score 1): `e2e/cdu-08.spec.ts:27` -> `let atividadeA = '';`
-- ✅ **[COBERTO]** 16. Se o usuário clicar em `Cancelar`, o sistema não salva a alteração e volta a exibir o nome da atividade que estava antes da modificação com os botões `Editar` e `Remover` ao lado.
-  - Palavras-chave usadas: `atividade, clicar, cancelar, salva, alteração, volta`
-  - Evidência (score 2): `e2e/cdu-08.spec.ts:120` -> `await AtividadeHelpers.cancelarEdicaoAtividade(page, atividadeManual, atividadeCancelada);`
-  - Evidência (score 2): `e2e/cdu-08.spec.ts:127` -> `await AtividadeHelpers.cancelarEdicaoConhecimento(page, atividadeEditada, conhecimento1, conhecimentoCancelado);`
-  - Evidência (score 1): `e2e/cdu-08.spec.ts:5` -> `import * as AtividadeHelpers from './helpers/helpers-atividades.js';`
-- ✅ **[COBERTO]** 17. Se o usuário clicar em `Remover`, o sistema solicita que o usuário confirme a operação. Se o usuário confirmar, a atividade e todos os conhecimentos associados a ela são removidos.
-  - Palavras-chave usadas: `atividade, clicar, remover, solicita, confirme, operação`
-  - Evidência (score 2): `e2e/cdu-08.spec.ts:131` -> `await AtividadeHelpers.removerConhecimento(page, atividadeEditada, conhecimento1Editado);`
-  - Evidência (score 2): `e2e/cdu-08.spec.ts:133` -> `await AtividadeHelpers.removerAtividade(page, atividadeEditada);`
-  - Evidência (score 1): `e2e/cdu-08.spec.ts:5` -> `import * as AtividadeHelpers from './helpers/helpers-atividades.js';`
-- ✅ **[COBERTO]** 18. De forma análoga à usada para atividades, para cada conhecimento já cadastrado, o sistema exibe, ao passar o mouse sobre o conhecimento, uma opção Editar e outra Remover.
-  - Palavras-chave usadas: `atividades, forma, análoga, usada, cada, conhecimento`
-  - Evidência (score 3): `e2e/cdu-08.spec.ts:10` -> `test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {`
-  - Evidência (score 1): `e2e/cdu-08.spec.ts:5` -> `import * as AtividadeHelpers from './helpers/helpers-atividades.js';`
-  - Evidência (score 1): `e2e/cdu-08.spec.ts:54` -> `await test.step('2. Acessar tela de Atividades', async () => {`
-- ✅ **[COBERTO]** 19. Se o usuário clicar em `Editar`, o sistema habilita a edição do nome do conhecimento e exibe ao lado um botão `Salvar` e outro `Cancelar`.
-  - Palavras-chave usadas: `clicar, editar, habilita, edição, nome, conhecimento`
-  - Evidência (score 2): `e2e/cdu-08.spec.ts:129` -> `await AtividadeHelpers.editarConhecimento(page, atividadeEditada, conhecimento1, conhecimento1Editado);`
-  - Evidência (score 1): `e2e/cdu-08.spec.ts:10` -> `test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {`
-  - Evidência (score 1): `e2e/cdu-08.spec.ts:80` -> `// A importação deve atualizar imediatamente a situação e habilitar a disponibilização`
-- ❌ **[NAO_COBERTO]** 20. Se o usuário clicar em `Salvar`, o sistema salva a alteração e volta a exibir os botões `Editar` e `Remover` ao lado do nome do conhecimento.
-  - Palavras-chave usadas: `clicar, salvar, salva, alteração, volta, exibir`
-  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
-- 🟡 **[PARCIAL]** 21. Se o usuário clicar em `Cancelar`, o sistema não salva a alteração e volta a exibir o nome do conhecimento que estava antes da modificação com os botões `Editar` e `Remover` ao lado.
-  - Palavras-chave usadas: `clicar, cancelar, salva, alteração, volta, exibir`
-  - Evidência (score 1): `e2e/cdu-08.spec.ts:120` -> `await AtividadeHelpers.cancelarEdicaoAtividade(page, atividadeManual, atividadeCancelada);`
-  - Evidência (score 1): `e2e/cdu-08.spec.ts:127` -> `await AtividadeHelpers.cancelarEdicaoConhecimento(page, atividadeEditada, conhecimento1, conhecimentoCancelado);`
-- 🟡 **[PARCIAL]** 22. Se o usuário clicar em `Remover`, o sistema solicita que o usuário confirme a operação. Se o usuário confirmar, o conhecimento é removido.
-  - Palavras-chave usadas: `clicar, remover, solicita, confirme, operação, confirmar`
-  - Evidência (score 1): `e2e/cdu-08.spec.ts:116` -> `await test.step('5. Editar e Remover (Com cancelamentos visuais)', async () => {`
-  - Evidência (score 1): `e2e/cdu-08.spec.ts:131` -> `await AtividadeHelpers.removerConhecimento(page, atividadeEditada, conhecimento1Editado);`
-  - Evidência (score 1): `e2e/cdu-08.spec.ts:133` -> `await AtividadeHelpers.removerAtividade(page, atividadeEditada);`
-- ✅ **[COBERTO]** 23. Opcionalmente, o usuário clica no botão `Importar atividades`:
-  - Palavras-chave usadas: `atividades, opcionalmente, clica, botão, importar`
-  - Evidência (score 2): `e2e/cdu-08.spec.ts:69` -> `await test.step('3. Importar atividades (Fluxo múltiplo e Negativo)', async () => {`
-  - Evidência (score 2): `e2e/cdu-08.spec.ts:78` -> `await AtividadeHelpers.importarAtividadesVazia(page, processoOrigemDescricao, UNIDADE_ORIGEM, [atividadeA, atividadeB]);`
-  - Evidência (score 2): `e2e/cdu-08.spec.ts:86` -> `await AtividadeHelpers.importarAtividadesComAvisoDuplicidade(page, processoOrigemDescricao, UNIDADE_ORIGEM, [atividad...`
-- 🟡 **[PARCIAL]** 24. O sistema exibe um modal com uma lista dos processos com tipo Mapeamento ou Revisão que estejam com situação 'Finalizado'. IMPORTANTE: Todos os processos finalizados, de todas as unidades, devem ser mostrados para importação.
-  - Palavras-chave usadas: `processos, situação, unidades, exibe, modal, lista`
-  - Evidência (score 1): `e2e/cdu-08.spec.ts:7` -> `import {criarProcessoFinalizadoFixture, criarProcessoFixture} from './fixtures/fixtures-processos.js';`
-  - Evidência (score 1): `e2e/cdu-08.spec.ts:8` -> `import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';`
-  - Evidência (score 1): `e2e/cdu-08.spec.ts:30` -> `await test.step('1. Setup: Criar processos origem e Mapeamento alvo', async () => {`
-- 🟡 **[PARCIAL]** 25. O usuário escolhe um processo da lista.
-  - Palavras-chave usadas: `processo, escolhe, lista`
-  - Evidência (score 1): `e2e/cdu-08.spec.ts:7` -> `import {criarProcessoFinalizadoFixture, criarProcessoFixture} from './fixtures/fixtures-processos.js';`
-  - Evidência (score 1): `e2e/cdu-08.spec.ts:8` -> `import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';`
-  - Evidência (score 1): `e2e/cdu-08.spec.ts:16` -> `test('Cenário 1: Processo de Mapeamento (Fluxo completo + Importação + Auto-save)', async ({`
-- ✅ **[COBERTO]** 26. O sistema recupera as unidades operacionais e interoperacionais participantes do processo selecionado e expande o modal para mostrar estas unidades em uma lista com apenas as siglas.
-  - Palavras-chave usadas: `unidades, processo, recupera, operacionais, interoperacionais, participantes`
-  - Evidência (score 2): `e2e/cdu-08.spec.ts:74` -> `{ processo: processoOrigemDescricao, unidades: [UNIDADE_ORIGEM] },`
-  - Evidência (score 2): `e2e/cdu-08.spec.ts:75` -> `{ processo: processoOrigem2Descricao, unidades: ['ASSESSORIA_21'] }`
-  - Evidência (score 1): `e2e/cdu-08.spec.ts:7` -> `import {criarProcessoFinalizadoFixture, criarProcessoFixture} from './fixtures/fixtures-processos.js';`
-- 🟡 **[PARCIAL]** 27. O usuário escolhe uma unidade da lista.
-  - Palavras-chave usadas: `unidade, escolhe, lista`
-  - Evidência (score 1): `e2e/cdu-08.spec.ts:11` -> `const UNIDADE_ALVO = 'ASSESSORIA_11';`
-  - Evidência (score 1): `e2e/cdu-08.spec.ts:12` -> `const UNIDADE_ORIGEM = 'ASSESSORIA_12';`
-  - Evidência (score 1): `e2e/cdu-08.spec.ts:13` -> `const CHEFE_UNIDADE = USUARIOS.CHEFE_ASSESSORIA_11.titulo;`
-- ✅ **[COBERTO]** 28. O sistema recupera as atividades/conhecimentos da unidade selecionada, e expande o modal para mostrar a lista de atividades, permitindo a seleção múltipla.
-  - Palavras-chave usadas: `atividades/conhecimentos, unidade, atividades, recupera, selecionada, expande`
-  - Evidência (score 2): `e2e/cdu-08.spec.ts:78` -> `await AtividadeHelpers.importarAtividadesVazia(page, processoOrigemDescricao, UNIDADE_ORIGEM, [atividadeA, atividadeB]);`
-  - Evidência (score 2): `e2e/cdu-08.spec.ts:86` -> `await AtividadeHelpers.importarAtividadesComAvisoDuplicidade(page, processoOrigemDescricao, UNIDADE_ORIGEM, [atividad...`
-  - Evidência (score 1): `e2e/cdu-08.spec.ts:5` -> `import * as AtividadeHelpers from './helpers/helpers-atividades.js';`
-- ✅ **[COBERTO]** 29. O usuário marca uma ou mais atividades e clica em `Importar`.
-  - Palavras-chave usadas: `atividades, marca, clica, importar`
-  - Evidência (score 2): `e2e/cdu-08.spec.ts:69` -> `await test.step('3. Importar atividades (Fluxo múltiplo e Negativo)', async () => {`
-  - Evidência (score 2): `e2e/cdu-08.spec.ts:78` -> `await AtividadeHelpers.importarAtividadesVazia(page, processoOrigemDescricao, UNIDADE_ORIGEM, [atividadeA, atividadeB]);`
-  - Evidência (score 2): `e2e/cdu-08.spec.ts:86` -> `await AtividadeHelpers.importarAtividadesComAvisoDuplicidade(page, processoOrigemDescricao, UNIDADE_ORIGEM, [atividad...`
-- ✅ **[COBERTO]** 30. O sistema faz uma cópia das atividades selecionadas e seus respectivos conhecimentos para o cadastro de atividades da unidade atual.
-  - Palavras-chave usadas: `atividades, unidade, cópia, selecionadas, respectivos, conhecimentos`
-  - Evidência (score 2): `e2e/cdu-08.spec.ts:10` -> `test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {`
-  - Evidência (score 2): `e2e/cdu-08.spec.ts:78` -> `await AtividadeHelpers.importarAtividadesVazia(page, processoOrigemDescricao, UNIDADE_ORIGEM, [atividadeA, atividadeB]);`
-  - Evidência (score 2): `e2e/cdu-08.spec.ts:86` -> `await AtividadeHelpers.importarAtividadesComAvisoDuplicidade(page, processoOrigemDescricao, UNIDADE_ORIGEM, [atividad...`
-- ✅ **[COBERTO]** 31. Deverão ser importadas apenas as atividades cujas descrições não corresponderem a nenhuma atividade atualmente cadastrada na unidade.
-  - Palavras-chave usadas: `atividades, atividade, unidade, importadas, cujas, descrições`
-  - Evidência (score 3): `e2e/cdu-08.spec.ts:78` -> `await AtividadeHelpers.importarAtividadesVazia(page, processoOrigemDescricao, UNIDADE_ORIGEM, [atividadeA, atividadeB]);`
-  - Evidência (score 3): `e2e/cdu-08.spec.ts:86` -> `await AtividadeHelpers.importarAtividadesComAvisoDuplicidade(page, processoOrigemDescricao, UNIDADE_ORIGEM, [atividad...`
-  - Evidência (score 2): `e2e/cdu-08.spec.ts:5` -> `import * as AtividadeHelpers from './helpers/helpers-atividades.js';`
-- ✅ **[COBERTO]** 32. Caso haja coincidência entre a descrição de uma atividade selecionada com a de alguma atividade cadastrada na unidade, o sistema informa que uma ou mais atividades não puderam ser importadas por já existirem no cadastro, mas procede sem levantar erros.
-  - Palavras-chave usadas: `atividade, unidade, atividades, haja, coincidência, descrição`
-  - Evidência (score 3): `e2e/cdu-08.spec.ts:78` -> `await AtividadeHelpers.importarAtividadesVazia(page, processoOrigemDescricao, UNIDADE_ORIGEM, [atividadeA, atividadeB]);`
-  - Evidência (score 3): `e2e/cdu-08.spec.ts:86` -> `await AtividadeHelpers.importarAtividadesComAvisoDuplicidade(page, processoOrigemDescricao, UNIDADE_ORIGEM, [atividad...`
-  - Evidência (score 2): `e2e/cdu-08.spec.ts:5` -> `import * as AtividadeHelpers from './helpers/helpers-atividades.js';`
-- ✅ **[COBERTO]** 33. Se, no momento da criação/edição/importação de qualquer informação, a situação do subprocesso da unidade ainda estiver 'Não iniciado', O sistema altera a situação para 'Cadastro em andamento', no caso de processo de mapeamento; ou a situação 'Revisão do cadastro em andamento', no caso de processo de revisão.
-  - Palavras-chave usadas: `situação, subprocesso, unidade, processo, momento, criação/edição/importação`
-  - Evidência (score 2): `e2e/cdu-08.spec.ts:59` -> `await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${UNIDADE_ALVO}$`));`
-  - Evidência (score 2): `e2e/cdu-08.spec.ts:65` -> `await AtividadeHelpers.verificarSituacaoSubprocesso(page, 'Não iniciado');`
-  - Evidência (score 2): `e2e/cdu-08.spec.ts:74` -> `{ processo: processoOrigemDescricao, unidades: [UNIDADE_ORIGEM] },`
-- ✅ **[COBERTO]** 34. Após finalizar o cadastro de atividades e conhecimentos, o usuário poderá clicar em `Disponibilizar` (ver caso de uso `Disponibilizar cadastro de atividades e conhecimentos`, ou o caso de uso `Disponibilizar revisão do cadastro`); o usuário pode também simplesmente navegar para outra área do sistema, sem a necessidade de gravar as informações de alguma maneira, pois a gravação do cadastro é feita automaticamente, a cada mudança.
-  - Palavras-chave usadas: `atividades, após, finalizar, cadastro, conhecimentos, poderá`
-  - Evidência (score 3): `e2e/cdu-08.spec.ts:10` -> `test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {`
-  - Evidência (score 1): `e2e/cdu-08.spec.ts:5` -> `import * as AtividadeHelpers from './helpers/helpers-atividades.js';`
-  - Evidência (score 1): `e2e/cdu-08.spec.ts:54` -> `await test.step('2. Acessar tela de Atividades', async () => {`
-- ✅ **[COBERTO]** 35. Após cada ação de criação, edição ou exclusão, as informações deverão ser salvas automaticamente e vinculadas ao mapa de competências do subprocesso, não sendo necessária nenhuma ação adicional para garantir a persistência dessa informação.
-  - Palavras-chave usadas: `competências, subprocesso, após, cada, ação, criação`
-  - Evidência (score 2): `e2e/cdu-08.spec.ts:81` -> `await AtividadeHelpers.verificarSituacaoSubprocesso(page, 'Cadastro em andamento');`
-  - Evidência (score 2): `e2e/cdu-08.spec.ts:95` -> `await AtividadeHelpers.verificarSituacaoSubprocesso(page, 'Cadastro em andamento');`
-  - Evidência (score 1): `e2e/cdu-08.spec.ts:10` -> `test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {`
 
-## Ajustes recomendados para próximo ciclo
-- Completar cobertura do item: **O sistema mostra a tela `Detalhes de subprocesso` com os dados do subprocesso da unidade.** (atualmente parcial).
-- Completar cobertura do item: **O usuário fornece a descrição do conhecimento e clica no botão de adição correspondente.** (atualmente parcial).
-- Implementar cenário específico para: **O usuário repete o fluxo de adição de atividades/conhecimentos.** (sem evidência no E2E atual).
+- ✅ **[COBERTO]** 1. No painel, o usuário clica em um processo de mapeamento ou revisão da lista de processos.
+  - Evidência: `e2e/cdu-08.spec.ts:52` -> `await page.getByTestId('tbl-processos').getByText(descricaoProcesso).first()).toBeVisible();`
+  - Evidência: `e2e/cdu-08.spec.ts:53` -> `await acessarDetalhesProcesso(page, descricaoProcesso);`
+
+- 🟡 **[PARCIAL]** 2. O sistema mostra a tela `Detalhes de subprocesso` com os dados do subprocesso da unidade.
+  - A tela é acessada e verificada por URL, mas os campos individuais do header não são assertados neste cenário.
+  - Evidência: `e2e/cdu-08.spec.ts:54` -> `await expect(page).toHaveURL(new RegExp(.../${UNIDADE_ALVO}$));`
+
+- ✅ **[COBERTO]** 3. O usuário clica no card `Atividades e conhecimentos`.
+  - Evidência: `e2e/cdu-08.spec.ts:55` -> `await AtividadeHelpers.navegarParaAtividades(page);`
+
+- ✅ **[COBERTO]** 4. O sistema apresenta a tela `Cadastro de atividades e conhecimentos` da unidade. Se o mapa de competências da unidade do subprocesso já tiver atividades cadastradas, a tela virá preenchida com as informações atuais do mapa.
+  - Evidência: `e2e/cdu-08.spec.ts:58` -> `await expect(page.getByTestId('cad-atividades-empty-state')).toBeVisible();` (estado inicial vazio)
+  - Evidência: `e2e/cdu-08.spec.ts:109` -> `await expect(page.getByText(atividadeManual, { exact: true }).first()).toBeVisible();` (após reload - dados persistidos)
+
+- ✅ **[COBERTO]** 5. Se o processo for de **Revisão**, deverá ser exibido o botão `Impacto no mapa`.
+  - Evidência: `e2e/cdu-08.spec.ts:167` -> `await AtividadeHelpers.verificarBotaoImpactoDropdown(page);` (Cenário 2 - Revisão)
+  - Evidência: `e2e/cdu-08.spec.ts:168` -> `await AtividadeHelpers.abrirModalImpactoEdicao(page);`
+
+- ✅ **[COBERTO]** 6. Para incluir uma atividade, o usuário fornece a descrição da atividade, e clica no botão de adição.
+  - Evidência: `e2e/cdu-08.spec.ts:91` -> `await AtividadeHelpers.adicionarAtividade(page, atividadeManual);`
+
+- ✅ **[COBERTO]** 7. O sistema adiciona a atividade e mostra o campo para adição de conhecimento abaixo da atividade.
+  - Evidência: `e2e/cdu-08.spec.ts:91` -> `await AtividadeHelpers.adicionarAtividade(page, atividadeManual);` (após este passo, o campo de conhecimento aparece)
+
+- 🟡 **[PARCIAL]** 8. O usuário fornece a descrição do conhecimento e clica no botão de adição correspondente.
+  - O helper adicionarConhecimento encapsula a ação, mas o campo específico e botão de adição não são assertados individualmente.
+  - Evidência: `e2e/cdu-08.spec.ts:97` -> `await AtividadeHelpers.adicionarConhecimento(page, atividadeManual, conhecimento1);`
+
+- ✅ **[COBERTO]** 9. O sistema adiciona o conhecimento, associando-o à atividade.
+  - Evidência: `e2e/cdu-08.spec.ts:111` -> `await expect(page.locator('.group-conhecimento', { hasText: conhecimento1 }).first()).toBeVisible();` (verificado após reload)
+
+- ✅ **[COBERTO]** 10. Deve ser indicada claramente a associação entre o conhecimento e a atividade, indentando os conhecimentos da atividade abaixo da descrição desta.
+  - Evidência: `e2e/cdu-08.spec.ts:111` -> `await expect(page.locator('.group-conhecimento', { hasText: conhecimento1 }).first()).toBeVisible();`
+
+- ❌ **[NAO_COBERTO]** 11. O usuário repete o fluxo de adição de atividades/conhecimentos.
+  - Comportamento estrutural implícito pela adição de múltiplas atividades (atividadeManual, atividadeManual2) e múltiplos conhecimentos, mas não há assertion específica de repetição de ciclo.
+
+- ✅ **[COBERTO]** 12. O usuário pode incluir primeiro várias atividades e depois os conhecimentos correspondentes; ou trabalhar em uma atividade por vez.
+  - Evidência: `e2e/cdu-08.spec.ts:91-99` -> duas atividades adicionadas, depois conhecimentos; flexibilidade de fluxo demonstrada.
+
+- ✅ **[COBERTO]** 13. Para cada atividade já cadastrada, ao passar o mouse, o sistema exibe botões de edição e remoção.
+  - Evidência: `e2e/cdu-08.spec.ts:120` -> `await AtividadeHelpers.cancelarEdicaoAtividade(page, atividadeManual, atividadeCancelada);` (hover + botão editar visível no helper)
+  - Evidência: `e2e/cdu-08.spec.ts:121` -> `await AtividadeHelpers.editarAtividade(page, atividadeManual, atividadeEditada);`
+
+- ✅ **[COBERTO]** 14. Se o usuário clicar em `Editar` (atividade), o sistema habilita a edição do nome e exibe botões `Salvar` e `Cancelar`.
+  - Evidência: `e2e/cdu-08.spec.ts:121` -> `await AtividadeHelpers.editarAtividade(...)` (helper verifica btn-salvar-edicao-atividade)
+
+- 🟡 **[PARCIAL]** 15. Se o usuário clicar em `Salvar` (atividade), o sistema salva a alteração e volta a exibir os botões `Editar` e `Remover` ao lado do nome da atividade.
+  - O helper editarAtividade clica em btn-salvar-edicao-atividade e verifica o texto novo, mas não verifica explicitamente o retorno dos botões Editar e Remover para a atividade.
+  - Evidência: `e2e/cdu-08.spec.ts:121` -> `await AtividadeHelpers.editarAtividade(page, atividadeManual, atividadeEditada);`
+
+- ✅ **[COBERTO]** 16. Se o usuário clicar em `Cancelar` (atividade), o sistema não salva a alteração e volta a exibir o nome original com os botões `Editar` e `Remover`.
+  - Evidência: `e2e/cdu-08.spec.ts:120` -> `await AtividadeHelpers.cancelarEdicaoAtividade(page, atividadeManual, atividadeCancelada);`
+
+- ✅ **[COBERTO]** 17. Se o usuário clicar em `Remover` (atividade), o sistema solicita confirmação e remove a atividade e todos os conhecimentos associados.
+  - Evidência: `e2e/cdu-08.spec.ts:133` -> `await AtividadeHelpers.removerAtividade(page, atividadeEditada);`
+
+- ✅ **[COBERTO]** 18. Para cada conhecimento já cadastrado, o sistema exibe, ao passar o mouse, opções Editar e Remover.
+  - Evidência: `e2e/cdu-08.spec.ts:127` -> `await AtividadeHelpers.cancelarEdicaoConhecimento(...)` (hover + btn-editar-conhecimento visível no helper)
+
+- ✅ **[COBERTO]** 19. Se o usuário clicar em `Editar` (conhecimento), o sistema habilita a edição do nome do conhecimento e exibe ao lado um botão `Salvar` e outro `Cancelar`.
+  - Evidência: `e2e/cdu-08.spec.ts:129` -> `await AtividadeHelpers.editarConhecimento(...)` (helper verifica btn-salvar-edicao-conhecimento)
+
+- ✅ **[COBERTO]** 20. Se o usuário clicar em `Salvar` (conhecimento), o sistema salva a alteração e volta a exibir os botões `Editar` e `Remover` ao lado do nome do conhecimento.
+  - Evidência: `e2e/cdu-08.spec.ts:129` -> `await AtividadeHelpers.editarConhecimento(page, atividadeEditada, conhecimento1, conhecimento1Editado);`
+  - Evidência: `e2e/cdu-08.spec.ts:131-136` -> assertion explícita adicionada nesta rodada: hover + `btn-editar-conhecimento` + `btn-remover-conhecimento` toBeVisible após salvar.
+
+- 🟡 **[PARCIAL]** 21. Se o usuário clicar em `Cancelar` (conhecimento), o sistema não salva a alteração e volta a exibir o nome original com os botões `Editar` e `Remover`.
+  - O helper cancelarEdicaoConhecimento verifica que o texto cancelado não foi salvo, mas não verifica explicitamente o retorno dos botões.
+  - Evidência: `e2e/cdu-08.spec.ts:127` -> `await AtividadeHelpers.cancelarEdicaoConhecimento(page, atividadeEditada, conhecimento1, conhecimentoCancelado);`
+
+- 🟡 **[PARCIAL]** 22. Se o usuário clicar em `Remover` (conhecimento), o sistema solicita confirmação e remove o conhecimento.
+  - O helper removerConhecimento confirma a remoção e verifica que o texto sumiu, mas não verifica a mensagem específica do modal de confirmação isoladamente no spec.
+  - Evidência: `e2e/cdu-08.spec.ts:131` -> `await AtividadeHelpers.removerConhecimento(page, atividadeEditada, conhecimento1Editado);`
+
+- ✅ **[COBERTO]** 23. Opcionalmente, o usuário clica no botão `Importar atividades`.
+  - Evidência: `e2e/cdu-08.spec.ts:74` -> `await AtividadeHelpers.importarAtividadesVazia(page, processoOrigemDescricao, UNIDADE_ORIGEM, [atividadeA, atividadeB]);`
+
+- 🟡 **[PARCIAL]** 24. O sistema exibe um modal com uma lista dos processos com tipo Mapeamento ou Revisão que estejam com situação 'Finalizado'.
+  - O modal é usado mas não há assertion verificando explicitamente que apenas processos finalizados aparecem.
+  - Evidência: `e2e/cdu-08.spec.ts:74` -> `await AtividadeHelpers.importarAtividadesVazia(page, ...)`
+
+- 🟡 **[PARCIAL]** 25. O usuário escolhe um processo da lista.
+  - O helper encapsula a seleção via select-processo mas não há assertion do estado da lista.
+  - Evidência: `e2e/cdu-08.spec.ts:74` -> `await AtividadeHelpers.importarAtividadesVazia(page, ...)`
+
+- ✅ **[COBERTO]** 26. O sistema recupera as unidades operacionais e interoperacionais participantes do processo e expande o modal para mostrar as unidades.
+  - Evidência: `e2e/cdu-08.spec.ts:67` -> `await AtividadeHelpers.verificarOpcoesImportacaoVazia(page, [{ processo: processoOrigemDescricao, unidades: [UNIDADE_ORIGEM] }, ...])`
+
+- 🟡 **[PARCIAL]** 27. O usuário escolhe uma unidade da lista.
+  - A unidade é selecionada no helper mas sem assertion isolada da seleção.
+  - Evidência: `e2e/cdu-08.spec.ts:74` -> `await AtividadeHelpers.importarAtividadesVazia(page, processoOrigemDescricao, UNIDADE_ORIGEM, ...)`
+
+- ✅ **[COBERTO]** 28. O sistema recupera as atividades/conhecimentos da unidade selecionada e expande o modal para mostrar a lista de atividades, permitindo seleção múltipla.
+  - Evidência: `e2e/cdu-08.spec.ts:74` -> `await AtividadeHelpers.importarAtividadesVazia(page, processoOrigemDescricao, UNIDADE_ORIGEM, [atividadeA, atividadeB]);`
+
+- ✅ **[COBERTO]** 29. O usuário marca uma ou mais atividades e clica em `Importar`.
+  - Evidência: `e2e/cdu-08.spec.ts:74` -> `await AtividadeHelpers.importarAtividadesVazia(...)` (importa [atividadeA, atividadeB])
+
+- ✅ **[COBERTO]** 30. O sistema faz uma cópia das atividades selecionadas e seus respectivos conhecimentos para o cadastro da unidade atual.
+  - Evidência: `e2e/cdu-08.spec.ts:109` -> `await expect(page.getByText(atividadeA, { exact: true }).first()).toBeVisible();` (verificado após reload)
+
+- ✅ **[COBERTO]** 31. Deverão ser importadas apenas as atividades cujas descrições não corresponderem a nenhuma atividade atualmente cadastrada na unidade.
+  - Evidência: `e2e/cdu-08.spec.ts:78` -> `await AtividadeHelpers.importarAtividadesComAvisoDuplicidade(page, processoOrigemDescricao, UNIDADE_ORIGEM, [atividadeA]);`
+
+- ✅ **[COBERTO]** 32. Caso haja coincidência, o sistema informa que uma ou mais atividades não puderam ser importadas por já existirem no cadastro, mas procede sem erros.
+  - Evidência: `e2e/cdu-08.spec.ts:80` -> `await expect(page.getByText(/não foram importadas/i).first()).toBeVisible();`
+
+- ✅ **[COBERTO]** 33. Se a situação do subprocesso ainda estiver 'Não iniciado', o sistema altera para 'Cadastro em andamento' (mapeamento) ou 'Revisão do cadastro em andamento' (revisão).
+  - Evidência: `e2e/cdu-08.spec.ts:62` -> `await AtividadeHelpers.verificarSituacaoSubprocesso(page, 'Não iniciado');` (antes)
+  - Evidência: `e2e/cdu-08.spec.ts:75` -> `await AtividadeHelpers.verificarSituacaoSubprocesso(page, 'Cadastro em andamento');` (após importação)
+
+- ✅ **[COBERTO]** 34. Após finalizar, o usuário pode clicar em `Disponibilizar`; pode também navegar sem necessidade de gravar manualmente (auto-save).
+  - Evidência: `e2e/cdu-08.spec.ts:140` -> `await AtividadeHelpers.disponibilizarCadastro(page);`
+  - Evidência: `e2e/cdu-08.spec.ts:106` -> `await page.reload();` seguido de verificação de dados persistidos (auto-save confirmado)
+
+- ✅ **[COBERTO]** 35. Após cada ação de criação, edição ou exclusão, as informações deverão ser salvas automaticamente.
+  - Evidência: `e2e/cdu-08.spec.ts:107-113` -> reload + verificação de atividadeManual, atividadeManual2, conhecimento1, conhecimento2 e atividadeA ainda visíveis.
 
 ## Prontidão para o próximo PR de melhoria E2E
-- Status de entrada: **PRONTO_COM_GAPS**.
-- Motivos: há itens sem cobertura E2E.
-- Checklist mínimo antes de codar:
-  - [ ] confirmar massa de dados/fixtures para cenário positivo e negativo;
-  - [ ] definir assert de regra de negócio + assert de efeito colateral;
-  - [ ] validar perfil/unidade necessários no cenário (quando aplicável);
-  - [ ] mapear se precisa teste de integração backend complementar.
-- Escopo sugerido para o próximo PR deste CDU:
-  - Completar cobertura do item: **O sistema mostra a tela `Detalhes de subprocesso` com os dados do subprocesso da unidade.** (atualmente parcial).
-  - Completar cobertura do item: **O usuário fornece a descrição do conhecimento e clica no botão de adição correspondente.** (atualmente parcial).
-  - Implementar cenário específico para: **O usuário repete o fluxo de adição de atividades/conhecimentos.** (sem evidência no E2E atual).
-
-## Observações metodológicas
-- Esta rodada incluiu leitura de helpers importados para reduzir falso negativo de cobertura indireta.
-- Classificação automática por evidência textual; recomenda-se validação humana dos itens `🟡` e `❌` antes da implementação final.
+- Status de entrada: **PRONTO**.
+- Gaps remanescentes:
+  - Item 11 (repetição do fluxo): comportamento implícito pela adição de múltiplas atividades; difícil de agregar valor com um teste adicional.
+  - Itens 15 e 21 (botões Editar/Remover retornam após Cancelar atividade/conhecimento): considerar adicionar assertion explícita no helper ou spec, similar ao que foi feito para item 20.

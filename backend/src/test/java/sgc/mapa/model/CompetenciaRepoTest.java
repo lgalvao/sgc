@@ -37,7 +37,7 @@ class CompetenciaRepoTest {
     @Test
     @DisplayName("deve projetar competencia e codigo de atividade por mapa")
     void deveProjetarCompetenciaECodigoDeAtividadePorMapa() {
-        List<Object[]> linhas = competenciaRepo.findCompetenciaAndAtividadeIdsByMapaCodigo(1004L);
+        List<Object[]> linhas = competenciaRepo.listarCodigosCompetenciaEAtividadePorMapa(1004L);
 
         assertThat(linhas).hasSize(1);
         assertThat(linhas.getFirst())
@@ -47,7 +47,7 @@ class CompetenciaRepoTest {
     @Test
     @DisplayName("deve manter atividade nula na projecao quando competencia nao possui associacao")
     void deveManterAtividadeNulaNaProjecaoQuandoCompetenciaNaoPossuiAssociacao() {
-        List<Object[]> linhas = competenciaRepo.findCompetenciaAndAtividadeIdsByMapaCodigo(1003L);
+        List<Object[]> linhas = competenciaRepo.listarCodigosCompetenciaEAtividadePorMapa(1003L);
 
         assertThat(linhas).hasSize(2);
         assertThat(linhas)
@@ -58,7 +58,7 @@ class CompetenciaRepoTest {
     @Test
     @DisplayName("deve buscar competencias sem carregar atividades")
     void deveBuscarCompetenciasSemCarregarAtividades() {
-        List<Competencia> competencias = competenciaRepo.findByMapaCodigoSemFetch(1004L);
+        List<Competencia> competencias = competenciaRepo.listarPorMapaSemRelacionamentos(1004L);
 
         assertThat(competencias).hasSize(1);
         Competencia competencia = competencias.getFirst();
@@ -70,11 +70,11 @@ class CompetenciaRepoTest {
     @Test
     @DisplayName("deve remover competencias por mapa")
     void deveRemoverCompetenciasPorMapa() {
-        assertThat(competenciaRepo.findByMapaCodigoSemFetch(1003L)).hasSize(2);
+        assertThat(competenciaRepo.listarPorMapaSemRelacionamentos(1003L)).hasSize(2);
 
         competenciaRepo.deleteByMapa_Codigo(1003L);
         competenciaRepo.flush();
 
-        assertThat(competenciaRepo.findByMapaCodigoSemFetch(1003L)).isEmpty();
+        assertThat(competenciaRepo.listarPorMapaSemRelacionamentos(1003L)).isEmpty();
     }
 }

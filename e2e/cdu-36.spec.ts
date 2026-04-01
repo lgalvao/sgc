@@ -53,4 +53,39 @@ test.describe.serial('CDU-36 - Gerar relatório de mapas', () => {
 
         expect(download.suggestedFilename()).toContain(`relatorio-mapas-${processo.codigo}.pdf`);
     });
+
+    test('Cenário CDU-36: Mantém opção única de unidade e gera PDF sem unidadeId', async ({_resetAutomatico, page, request, _autenticadoComoAdmin}) => {
+        test.slow();
+        const descricaoProcesso = `Relatório CDU-36 filtro ${Date.now()}`;
+        const processo = await criarProcessoMapaHomologadoFixture(request, {
+            descricao: descricaoProcesso,
+            unidade: 'SECRETARIA_1',
+            diasLimite: 30
+        });
+
+        await page.goto('/painel');
+        await expect(page.getByTestId('tbl-processos').getByText(descricaoProcesso).first()).toBeVisible();
+
+        await page.getByRole('link', {name: /Relatórios/i}).click();
+        await page.getByRole('tab', {name: 'Mapas'}).click();
+
+        const painelMapas = page.getByRole('tabpanel', {name: /^Mapas$/i});
+        const selectProcesso = painelMapas.getByLabel('Selecione o Processo');
+        const selectUnidade = painelMapas.getByLabel('Selecione a unidade');
+        const botaoGerar = painelMapas.getByRole('button', {name: 'Gerar PDF'});
+
+        await selectProcesso.selectOption({label: descricaoProcesso});
+        await expect(botaoGerar).toBeEnabled();
+
+        await expect(selectUnidade.locator('option')).toHaveCount(1);
+
+        const requisicaoSemFiltroUnidade = page.waitForRequest((req) => {
+            return req.url().includes(`/relatorios/mapas/${processo.codigo}/exportar`) && !req.url().includes('unidadeId=');
+        });
+
+        const downloadPromise = page.waitForEvent('download');
+        await botaoGerar.click();
+        await requisicaoSemFiltroUnidade;
+        await downloadPromise;
+    });
 });

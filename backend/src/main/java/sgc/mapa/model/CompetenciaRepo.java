@@ -15,8 +15,8 @@ import java.util.*;
  *
  * <ul>
  * <li>{@link #findByMapa_Codigo(Long)} - Carrega competências com atividades (EntityGraph)</li>
- * <li>{@link #findCompetenciaAndAtividadeIdsByMapaCodigo(Long)} - Projeção SQL otimizada</li>
- * <li>{@link #findByMapaCodigoSemFetch(Long)} - Sem relacionamentos (mais leve)</li>
+ * <li>{@link #listarCodigosCompetenciaEAtividadePorMapa(Long)} - Projeção SQL otimizada</li>
+ * <li>{@link #listarPorMapaSemRelacionamentos(Long)} - Sem relacionamentos (mais leve)</li>
  * </ul>
  */
 @Repository
@@ -51,7 +51,7 @@ public interface CompetenciaRepo extends JpaRepository<Competencia, Long> {
             LEFT JOIN c.atividades a
             WHERE c.mapa.codigo = :mapaCodigo
             """)
-    List<Object[]> findCompetenciaAndAtividadeIdsByMapaCodigo(@Param("mapaCodigo") Long mapaCodigo);
+    List<Object[]> listarCodigosCompetenciaEAtividadePorMapa(@Param("mapaCodigo") Long mapaCodigo);
 
     /**
      * Busca competências de um mapa sem carregar relacionamentos.
@@ -67,7 +67,7 @@ public interface CompetenciaRepo extends JpaRepository<Competencia, Long> {
      * @see sgc.mapa.service.MapaManutencaoService#competenciasCodMapaSemRels(Long)
      */
     @Query("SELECT c FROM Competencia c WHERE c.mapa.codigo = :mapaCodigo")
-    List<Competencia> findByMapaCodigoSemFetch(@Param("mapaCodigo") Long mapaCodigo);
+    List<Competencia> listarPorMapaSemRelacionamentos(@Param("mapaCodigo") Long mapaCodigo);
 
     /**
      * Remove todas as competências de um mapa.

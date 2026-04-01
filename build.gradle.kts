@@ -1,6 +1,7 @@
 plugins {
     id("org.springframework.boot") version "4.0.5"
     id("io.spring.dependency-management") version "1.1.7"
+    id("org.openrewrite.rewrite") version "7.18.0" apply false
 }
 
 apply(plugin = "base")
@@ -117,4 +118,3 @@ tasks.register<Exec>("qualityCheckFast") {
 
     isIgnoreExitValue = true
 }
-

@@ -29,6 +29,7 @@ public class UnidadeController {
     private final ResponsavelUnidadeService responsavelService;
     private final UsuarioService usuarioService;
     private final ProcessoService processoService;
+    private final ValidadorDadosOrganizacionais validadorDadosOrganizacionais;
 
     @PostMapping("/{codUnidade}/atribuicoes-temporarias")
     @PreAuthorize("hasRole('ADMIN')")
@@ -51,6 +52,12 @@ public class UnidadeController {
         return ResponseEntity.ok(hierarquia);
     }
 
+    @GetMapping("/diagnostico-organizacional")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<DiagnosticoOrganizacionalDto> buscarDiagnosticoOrganizacional() {
+        return ResponseEntity.ok(validadorDadosOrganizacionais.diagnosticar());
+    }
+
     @GetMapping("/arvore-com-elegibilidade")
     public ResponseEntity<List<UnidadeDto>> buscarArvoreComElegibilidade(
             @RequestParam("tipoProcesso") String tipoProcesso,
@@ -66,8 +73,8 @@ public class UnidadeController {
     }
 
     @GetMapping("/{codUnidade}/mapa-vigente")
-    public ResponseEntity<Map<String, Boolean>> verificarMapaVigente(@PathVariable Long codUnidade) {
-        boolean temMapaVigente = unidadeService.verificarMapaVigente(codUnidade);
+    public ResponseEntity<Map<String, Boolean>> temMapaVigente(@PathVariable Long codUnidade) {
+        boolean temMapaVigente = unidadeService.temMapaVigente(codUnidade);
         return ResponseEntity.ok(Map.of("temMapaVigente", temMapaVigente));
     }
 

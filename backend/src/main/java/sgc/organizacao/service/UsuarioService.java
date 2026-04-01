@@ -28,19 +28,11 @@ public class UsuarioService {
     }
 
     public Optional<Usuario> buscarOpt(String titulo) {
-        return usuarioRepo.findByTituloComUnidadeLotacao(titulo);
-    }
-
-    public Usuario buscarComAtribuicoes(String titulo) {
-        return repo.buscar(Usuario.class, titulo);
-    }
-
-    public Optional<Usuario> buscarComAtribuicoesOpt(String titulo) {
-        return usuarioRepo.findByTituloComUnidadeLotacao(titulo);
+        return usuarioRepo.buscarPorTituloComUnidadeLotacao(titulo);
     }
 
     public List<Usuario> buscarPorUnidadeLotacao(Long codUnidade) {
-        return usuarioRepo.findByUnidadeLotacaoCodigo(codUnidade);
+        return usuarioRepo.listarPorCodigoUnidadeLotacao(codUnidade);
     }
 
     public List<Usuario> buscarTodos() {
@@ -48,7 +40,7 @@ public class UsuarioService {
     }
 
     public List<Usuario> buscarPorTitulos(List<String> titulos) {
-        return usuarioRepo.findByTitulosComUnidadeLotacao(titulos);
+        return usuarioRepo.listarPorTitulosComUnidadeLotacao(titulos);
     }
 
     public List<Usuario> buscarPorNomeOuMatricula(String termo) {

@@ -10,7 +10,7 @@ import pluginVueA11y from "eslint-plugin-vuejs-accessibility";
 
 export default [
     {
-        ignores: ["dist/", "node_modules/", "*.config.js"],
+        ignores: ["dist/", "node_modules/", "*.config.js", "coverage/"],
     }, {
         languageOptions: {
             ecmaVersion: "latest",

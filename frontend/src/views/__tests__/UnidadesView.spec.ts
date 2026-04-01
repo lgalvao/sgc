@@ -8,8 +8,21 @@ vi.mock("vue-router", () => ({
     useRouter: () => ({ push: vi.fn() }),
 }));
 
+vi.mock("@/composables/usePerfil", () => ({
+    usePerfil: () => ({
+        isAdmin: {value: true}
+    })
+}));
+
 vi.mock("@/services/unidadeService", () => ({
     buscarTodasUnidades: vi.fn(),
+    buscarDiagnosticoOrganizacional: vi.fn().mockResolvedValue({
+        possuiViolacoes: false,
+        resumo: '',
+        quantidadeTiposViolacao: 0,
+        quantidadeOcorrencias: 0,
+        grupos: [],
+    }),
     mapUnidadesArray: vi.fn((arr) => arr || []),
 }));
 
@@ -19,6 +32,13 @@ describe("Unidades.vue", () => {
     beforeEach(() => {
         vi.clearAllMocks();
         vi.mocked(unidadeService.buscarTodasUnidades).mockResolvedValue([]);
+        vi.mocked(unidadeService.buscarDiagnosticoOrganizacional).mockResolvedValue({
+            possuiViolacoes: false,
+            resumo: '',
+            quantidadeTiposViolacao: 0,
+            quantidadeOcorrencias: 0,
+            grupos: [],
+        } as any);
         vi.mocked(unidadeService.mapUnidadesArray).mockImplementation((arr) => arr || []);
     });
 
@@ -73,6 +93,37 @@ describe("Unidades.vue", () => {
         createWrapper();
         await flushPromises();
         expect(unidadeService.buscarTodasUnidades).toHaveBeenCalled();
+    });
+
+    it("deve exibir alerta fixo com resumo do diagnostico para ADMIN", async () => {
+        vi.mocked(unidadeService.buscarDiagnosticoOrganizacional).mockResolvedValueOnce({
+            possuiViolacoes: true,
+            resumo: "Foram encontradas 3 inconsistencias.",
+            quantidadeTiposViolacao: 2,
+            quantidadeOcorrencias: 3,
+            grupos: [
+                {
+                    tipo: "VW_USUARIO com titulo duplicado",
+                    quantidadeOcorrencias: 2,
+                    ocorrencias: ["titulo=1", "titulo=2"]
+                },
+                {
+                    tipo: "Unidade participante sem responsavel efetivo",
+                    quantidadeOcorrencias: 1,
+                    ocorrencias: ["sigla=43ª Z.E."]
+                }
+            ]
+        } as any);
+
+        const wrapper = createWrapper({
+            perfil: {perfilSelecionado: "ADMIN"},
+            unidades: mockUnidades
+        } as any);
+        await flushPromises();
+
+        expect(wrapper.text()).toContain("Pendências organizacionais identificadas.");
+        expect(wrapper.text()).toContain("VW_USUARIO com titulo duplicado: 2 ocorrência(s)");
+        expect(wrapper.text()).toContain("Unidade participante sem responsavel efetivo: 1 ocorrência(s)");
     });
 
     it("deve exibir spinner durante carregamento", async () => {

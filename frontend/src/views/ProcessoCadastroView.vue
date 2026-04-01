@@ -45,6 +45,21 @@
         </template>
       </PageHeader>
 
+      <div v-if="exibirAlertaDiagnostico" class="sticky-top mb-3 pt-2">
+        <BAlert
+            :model-value="true"
+            variant="warning"
+        >
+          <strong>Pendências organizacionais identificadas.</strong>
+          <div class="mt-1">{{ resumoDiagnostico }}</div>
+          <ul class="mb-0 mt-2 ps-3">
+            <li v-for="grupo in gruposDiagnostico" :key="grupo.tipo">
+              {{ grupo.tipo }}: {{ grupo.quantidadeOcorrencias }} ocorrência(s)
+            </li>
+          </ul>
+        </BAlert>
+      </div>
+
       <BForm class="mt-4">
         <AppAlert
             v-if="notificacao"
@@ -105,7 +120,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BButton, BForm} from "bootstrap-vue-next";
+import {BAlert, BButton, BForm} from "bootstrap-vue-next";
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import {computed, nextTick, onMounted, ref, watch} from "vue";
 import {useRoute, useRouter} from "vue-router";
@@ -121,9 +136,10 @@ import {useNotification} from "@/composables/useNotification";
 import {TEXTOS} from "@/constants/textos";
 
 import {useToastStore} from "@/stores/toast";
-import {buscarArvoreComElegibilidade, mapUnidadesArray} from "@/services/unidadeService";
+import {buscarArvoreComElegibilidade, buscarDiagnosticoOrganizacional, mapUnidadesArray} from "@/services/unidadeService";
 import * as processoService from "@/services/processoService";
-import {Processo as ProcessoModel, TipoProcesso, type Unidade} from "@/types/tipos";
+import {type DiagnosticoOrganizacional, Processo as ProcessoModel, TipoProcesso, type Unidade} from "@/types/tipos";
+import {usePerfil} from "@/composables/usePerfil";
 
 const {
   descricao,
@@ -163,9 +179,22 @@ const router = useRouter();
 const route = useRoute();
 const toastStore = useToastStore();
 const {notificacao, notify, notifyStructured, clear} = useNotification();
+const {isAdmin} = usePerfil();
 
 const unidades = ref<Unidade[]>([]);
 const isLoadingUnidades = ref(false);
+const diagnosticoOrganizacional = ref<DiagnosticoOrganizacional | null>(null);
+const erroDiagnosticoOrganizacional = ref<string | null>(null);
+
+const gruposDiagnostico = computed(() => diagnosticoOrganizacional.value?.grupos ?? []);
+const resumoDiagnostico = computed(() =>
+    erroDiagnosticoOrganizacional.value
+        ?? diagnosticoOrganizacional.value?.resumo
+        ?? ""
+);
+const exibirAlertaDiagnostico = computed(() =>
+    isAdmin.value && (!!erroDiagnosticoOrganizacional.value || diagnosticoOrganizacional.value?.possuiViolacoes === true)
+);
 
 function coletarCodigosElegiveis(unidadesArvore: Unidade[]): Set<number> {
   const codigosElegiveis = new Set<number>();
@@ -206,6 +235,21 @@ async function buscarUnidadesParaProcesso(tipoProcesso: string, codProcesso?: nu
   }
 }
 
+async function carregarDiagnosticoOrganizacional() {
+  if (!isAdmin.value) {
+    return;
+  }
+
+  try {
+    diagnosticoOrganizacional.value = await buscarDiagnosticoOrganizacional();
+    erroDiagnosticoOrganizacional.value = null;
+  } catch (err) {
+    diagnosticoOrganizacional.value = null;
+    erroDiagnosticoOrganizacional.value = "Não foi possível verificar as pendências organizacionais desta operação.";
+    logger.error("Erro ao carregar diagnostico organizacional:", err);
+  }
+}
+
 const mostrarModalConfirmacao = ref(false);
 const mostrarModalRemocao = ref(false);
 const processoEditando = ref<ProcessoModel | null>(null);
@@ -213,6 +257,8 @@ const processoEditando = ref<ProcessoModel | null>(null);
 const isLoadingData = ref(false);
 
 onMounted(async () => {
+  void carregarDiagnosticoOrganizacional();
+
   const codProcesso = route.query.codProcesso;
   if (codProcesso) {
     isLoadingData.value = true;

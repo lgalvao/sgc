@@ -75,7 +75,7 @@ class CDU21IntegrationTest extends BaseIntegrationTest {
         Processo atualizado = processoRepo.findById(processo.getCodigo()).orElseThrow();
         assertThat(atualizado.getSituacao()).isEqualTo(SituacaoProcesso.EM_ANDAMENTO);
         assertThat(atualizado.getDataFinalizacao()).isNull();
-        assertThat(unidadeMapaRepo.findByUnidadeCodigo(unidade.getCodigo())).isEmpty();
+        assertThat(unidadeMapaRepo.findById(unidade.getCodigo())).isEmpty();
     }
 
     @Test
@@ -93,7 +93,7 @@ class CDU21IntegrationTest extends BaseIntegrationTest {
         assertThat(atualizado.getSituacao()).isEqualTo(SituacaoProcesso.FINALIZADO);
         assertThat(atualizado.getDataFinalizacao()).isNotNull();
 
-        UnidadeMapa unidadeMapa = unidadeMapaRepo.findByUnidadeCodigo(unidade.getCodigo()).orElseThrow();
+        UnidadeMapa unidadeMapa = unidadeMapaRepo.findById(unidade.getCodigo()).orElseThrow();
         assertThat(unidadeMapa.getMapaVigente()).isNotNull();
         assertThat(unidadeMapa.getMapaVigente().getCodigo()).isEqualTo(subprocesso.getMapa().getCodigo());
     }

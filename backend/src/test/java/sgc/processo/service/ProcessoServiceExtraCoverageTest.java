@@ -43,7 +43,12 @@ class ProcessoServiceExtraCoverageTest {
     private UnidadeService unidadeService;
 
     @Mock
+    private ResponsavelUnidadeService responsavelUnidadeService;
+
+    @Mock
     private SubprocessoService subprocessoService;
+    @Mock
+    private SubprocessoConsultaService consultaService;
 
     @Mock
     private SubprocessoValidacaoService validacaoService;
@@ -62,6 +67,11 @@ class ProcessoServiceExtraCoverageTest {
 
     @Mock
     private SgcPermissionEvaluator permissionEvaluator;
+
+    @BeforeEach
+    void configurarMocksPadrao() {
+        lenient().when(responsavelUnidadeService.todasPossuemResponsavelEfetivo(anyList())).thenReturn(true);
+    }
 
     @Nested
     @DisplayName("buscarPorCodigoComParticipantes")
@@ -114,7 +124,7 @@ class ProcessoServiceExtraCoverageTest {
 
             Unidade uni = new Unidade();
             uni.setCodigo(1L);
-            when(unidadeService.todasComHierarquia()).thenReturn(List.of(uni));
+            when(unidadeService.buscarTodasComHierarquia()).thenReturn(List.of(uni));
 
             Processo p = new Processo();
             when(processoRepo.listarPorSituacaoEUnidadeCodigos(eq(SituacaoProcesso.FINALIZADO), anyList())).thenReturn(List.of(p));
@@ -323,14 +333,14 @@ class ProcessoServiceExtraCoverageTest {
 
             Unidade uni = new Unidade();
             uni.setCodigo(1L);
-            when(unidadeService.todasComHierarquia()).thenReturn(List.of(uni));
+            when(unidadeService.buscarTodasComHierarquia()).thenReturn(List.of(uni));
 
             Subprocesso sp = new Subprocesso();
             sp.setCodigo(100L);
             sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
             sp.setUnidade(uni);
-            when(subprocessoService.listarEntidadesPorProcessoEUnidades(eq(1L), anyList())).thenReturn(List.of(sp));
-            when(subprocessoService.obterLocalizacaoAtual(sp)).thenReturn(uni);
+            when(consultaService.listarEntidadesPorProcessoEUnidades(eq(1L), anyList())).thenReturn(List.of(sp));
+            when(consultaService.obterLocalizacaoAtual(sp)).thenReturn(uni);
             when(permissionEvaluator.verificarPermissao(u, sp, sgc.seguranca.AcaoPermissao.DISPONIBILIZAR_MAPA)).thenReturn(true);
 
             List<SubprocessoElegivelDto> res = processoService.listarSubprocessosElegiveis(1L);
@@ -377,7 +387,7 @@ class ProcessoServiceExtraCoverageTest {
 
             Unidade uni = new Unidade();
             uni.setCodigo(1L);
-            when(unidadeService.todasComHierarquia()).thenReturn(List.of(uni));
+            when(unidadeService.buscarTodasComHierarquia()).thenReturn(List.of(uni));
 
             Processo p = new Processo();
             UnidadeProcesso up = new UnidadeProcesso();
@@ -400,7 +410,7 @@ class ProcessoServiceExtraCoverageTest {
 
             Unidade uni = new Unidade();
             uni.setCodigo(1L);
-            when(unidadeService.todasComHierarquia()).thenReturn(List.of(uni));
+            when(unidadeService.buscarTodasComHierarquia()).thenReturn(List.of(uni));
 
             Processo p = new Processo();
             UnidadeProcesso up = new UnidadeProcesso();
@@ -433,7 +443,7 @@ class ProcessoServiceExtraCoverageTest {
             sp.setUnidade(uni);
             Mapa mapa = new Mapa();
             sp.setMapa(mapa);
-            when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
+            when(consultaService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
 
             processoService.finalizar(1L);
 
@@ -460,8 +470,8 @@ class ProcessoServiceExtraCoverageTest {
             Unidade uni = new Unidade();
             uni.setCodigo(10L);
             uni.setSigla("UNI10");
-            when(unidadeService.porCodigos(anyList())).thenReturn(List.of(uni));
-            when(unidadeService.verificarMapaVigente(10L)).thenReturn(true);
+            when(unidadeService.buscarPorCodigos(anyList())).thenReturn(List.of(uni));
+            when(unidadeService.temMapaVigente(10L)).thenReturn(true);
             UnidadeMapa unidadeMapa = new UnidadeMapa();
             unidadeMapa.setUnidadeCodigo(10L);
             Mapa mapaVigente = new Mapa();
@@ -494,11 +504,11 @@ class ProcessoServiceExtraCoverageTest {
             // Chamando via listarSubprocessosElegiveis para testar o metodo privado
             u.setPerfilAtivo(Perfil.ADMIN);
             when(usuarioService.usuarioAutenticado()).thenReturn(u);
-            when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
+            when(consultaService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
             Unidade uni = new Unidade();
             uni.setCodigo(1L);
             sp.setUnidade(uni);
-            when(subprocessoService.obterLocalizacaoAtual(sp)).thenReturn(uni);
+            when(consultaService.obterLocalizacaoAtual(sp)).thenReturn(uni);
 
             List<SubprocessoElegivelDto> res = processoService.listarSubprocessosElegiveis(1L);
             assertThat(res).hasSize(1);
@@ -513,7 +523,7 @@ class ProcessoServiceExtraCoverageTest {
             
             u.setPerfilAtivo(Perfil.ADMIN);
             when(usuarioService.usuarioAutenticado()).thenReturn(u);
-            when(subprocessoService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
+            when(consultaService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
 
             List<SubprocessoElegivelDto> res = processoService.listarSubprocessosElegiveis(1L);
             assertThat(res).isEmpty();

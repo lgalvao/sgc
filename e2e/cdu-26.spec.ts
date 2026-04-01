@@ -1,7 +1,8 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcessoMapaValidadoFixture, validarProcessoFixture} from './fixtures/fixtures-processos.js';
-import {navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
+import {fazerLogout, navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
 import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
+import {loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
 
 /**
  * CDU-26 - Homologar validação de mapas de competências em bloco
@@ -136,5 +137,38 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
         await expect(linhaMovimentacao).toBeVisible();
         await expect(linhaMovimentacao).toContainText(/\d{2}\/\d{2}\/\d{4}\s+\d{2}:\d{2}/);
         await expect(linhaMovimentacao).toContainText('ADMIN');
+    });
+
+    test('Cenario 6: Homologação em bloco registra alerta com data/hora para unidade do subprocesso', async ({
+        _resetAutomatico,
+        request,
+        page,
+        _autenticadoComoAdmin
+    }) => {
+        const descIsolada = `Mapeamento CDU-26 alerta ${Date.now()}`;
+        const processoIsolado = await criarProcessoMapaValidadoFixture(request, {
+            descricao: descIsolada,
+            unidade: 'SECRETARIA_3'
+        });
+        validarProcessoFixture(processoIsolado, descIsolada);
+
+        await page.goto(`/processo/${processoIsolado.codigo}`);
+
+        const btnHomologar = page.getByRole('button', {name: /^Homologar mapas em bloco$/i}).first();
+        await expect(btnHomologar).toBeVisible();
+        await btnHomologar.click();
+
+        const modal = page.getByRole('dialog');
+        await expect(modal).toBeVisible();
+        await modal.getByRole('button', {name: /^Homologar$/i}).click();
+        await page.waitForURL(/\/painel/);
+
+        await fazerLogout(page);
+        await loginComPerfil(page, '300001', 'senha', 'GESTOR - SECRETARIA_3');
+
+        const tabelaAlertas = page.getByTestId('tbl-alertas');
+        const linhaAlerta = tabelaAlertas.locator('tr', {hasText: descIsolada}).first();
+        await expect(linhaAlerta).toBeVisible();
+        await expect(linhaAlerta).toContainText(/\d{2}\/\d{2}\/\d{4}/);
     });
 });

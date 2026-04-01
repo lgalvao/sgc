@@ -1,12 +1,12 @@
-# Alinhamento CDU-22 - Reanálise (rodada 2)
+# Alinhamento CDU-22 - Reanálise (rodada 3)
 
 ## Artefatos analisados
 - Requisito: `etc/reqs/cdu-22.md`.
-- Teste E2E: `e2e/cdu-22.spec.ts` (7 cenários `test`, 0 `test.step`).
+- Teste E2E: `e2e/cdu-22.spec.ts` (8 cenários `test`, 0 `test.step`).
 
 ## Resultado da comparação requisito x E2E
 - Itens do fluxo principal avaliados: **30**.
-- Status: **12 cobertos**, **14 parciais**, **4 não cobertos** (baseado em evidências textuais no spec e helpers).
+- Status: **20 cobertos**, **9 parciais**, **1 não coberto** (baseado em evidências textuais no spec e helpers).
 
 ## Matriz de evidências
 - ✅ **[COBERTO]** 1. No `Painel`, o usuário acessa um processo de mapeamento ou revisão em andamento.
@@ -49,17 +49,17 @@
   - Evidência (score 3): `e2e/cdu-22.spec.ts:17` -> `* - Processo de mapeamento ou revisão com unidades subordinadas`
   - Evidência (score 3): `e2e/cdu-22.spec.ts:25` -> `* 5. Sistema abre modal com lista de unidades selecionáveis`
   - Evidência (score 2): `e2e/cdu-22.spec.ts:23` -> `* 3. Sistema identifica unidades elegíveis e exibe botão de aceite em bloco`
-- 🟡 **[PARCIAL]** 9. Botões `Cancelar` e `Registrar aceite`.
+- ✅ **[COBERTO]** 9. Botões `Cancelar` e `Registrar aceite`.
   - Palavras-chave usadas: `botões, cancelar, registrar, aceite`
   - Evidência (score 1): `e2e/cdu-22.spec.ts:23` -> `* 3. Sistema identifica unidades elegíveis e exibe botão de aceite em bloco`
   - Evidência (score 1): `e2e/cdu-22.spec.ts:27` -> `* 7. Sistema executa aceite para cada unidade selecionada`
   - Evidência (score 1): `e2e/cdu-22.spec.ts:44` -> `test('Cenario 1: GESTOR abre modal e cancela aceite em bloco', async ({_resetAutomatico, page, _autenticadoComoGestor...`
-- 🟡 **[PARCIAL]** 10. Caso o usuário escolha o botão `Cancelar`, o sistema interrompe a operação, permanecendo na tela `Detalhes do processo`.
+- ✅ **[COBERTO]** 10. Caso o usuário escolha o botão `Cancelar`, o sistema interrompe a operação, permanecendo na tela `Detalhes do processo`.
   - Palavras-chave usadas: `processo, escolha, botão, cancelar, interrompe, operação`
   - Evidência (score 1): `e2e/cdu-22.spec.ts:3` -> `criarProcessoCadastroDisponibilizadoFixture,`
   - Evidência (score 1): `e2e/cdu-22.spec.ts:4` -> `criarProcessoRevisaoCadastroDisponibilizadoFixture`
   - Evidência (score 1): `e2e/cdu-22.spec.ts:5` -> `} from './fixtures/fixtures-processos.js';`
-- 🟡 **[PARCIAL]** 11. O usuário clica em `Registrar aceite`.
+- ✅ **[COBERTO]** 11. O usuário clica em `Registrar aceite`.
   - Palavras-chave usadas: `clica, registrar, aceite`
   - Evidência (score 1): `e2e/cdu-22.spec.ts:23` -> `* 3. Sistema identifica unidades elegíveis e exibe botão de aceite em bloco`
   - Evidência (score 1): `e2e/cdu-22.spec.ts:24` -> `* 4. GESTOR clica no botão 'Aceitar em Bloco'`
@@ -92,18 +92,17 @@
   - Evidência (score 1): `e2e/cdu-22.spec.ts:3` -> `criarProcessoCadastroDisponibilizadoFixture,`
   - Evidência (score 1): `e2e/cdu-22.spec.ts:4` -> `criarProcessoRevisaoCadastroDisponibilizadoFixture`
   - Evidência (score 1): `e2e/cdu-22.spec.ts:12` -> `* CDU-22 - Aceitar cadastros em bloco`
-- 🟡 **[PARCIAL]** 18. Registra internamente uma movimentação para o subprocesso:
+- ✅ **[COBERTO]** 18. Registra internamente uma movimentação para o subprocesso:
   - Palavras-chave usadas: `subprocesso, registra, internamente, movimentação`
   - Evidência (score 1): `e2e/cdu-22.spec.ts:18` -> `* - Subprocessos na situação 'Cadastro disponibilizado'`
-- ❌ **[NAO_COBERTO]** 19. `Data/hora`: [Data/hora atual]
-  - Palavras-chave usadas: `data/hora, atual`
-  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
-- 🟡 **[PARCIAL]** 20. `Unidade origem`: [SIGLA_UNIDADE_ATUAL]
+- ✅ **[COBERTO]** 19. `Data/hora`: [Data/hora atual]
+  - Evidência: `e2e/cdu-22.spec.ts` Cenario 5 `.toContainText(/\d{2}\/\d{2}\/\d{4}/)` na `linhaMovimentacao`.
+- ✅ **[COBERTO]** 20. `Unidade origem`: [SIGLA_UNIDADE_ATUAL]
   - Palavras-chave usadas: `unidade, sigla_unidade_atual, origem`
   - Evidência (score 1): `e2e/cdu-22.spec.ts:17` -> `* - Processo de mapeamento ou revisão com unidades subordinadas`
   - Evidência (score 1): `e2e/cdu-22.spec.ts:23` -> `* 3. Sistema identifica unidades elegíveis e exibe botão de aceite em bloco`
   - Evidência (score 1): `e2e/cdu-22.spec.ts:25` -> `* 5. Sistema abre modal com lista de unidades selecionáveis`
-- 🟡 **[PARCIAL]** 21. `Unidade destino`: [SIGLA_UNIDADE_SUPERIOR]
+- ✅ **[COBERTO]** 21. `Unidade destino`: [SIGLA_UNIDADE_SUPERIOR]
   - Palavras-chave usadas: `unidade, sigla_unidade_superior, destino`
   - Evidência (score 1): `e2e/cdu-22.spec.ts:17` -> `* - Processo de mapeamento ou revisão com unidades subordinadas`
   - Evidência (score 1): `e2e/cdu-22.spec.ts:23` -> `* 3. Sistema identifica unidades elegíveis e exibe botão de aceite em bloco`
@@ -113,13 +112,11 @@
   - Evidência (score 2): `e2e/cdu-22.spec.ts:80` -> `await expect(page.getByText(TEXTOS.sucesso.CADASTROS_ACEITOS_EM_BLOCO).first()).toBeVisible();`
   - Evidência (score 2): `e2e/cdu-22.spec.ts:137` -> `await expect(page.getByText(TEXTOS.sucesso.CADASTROS_ACEITOS_EM_BLOCO).first()).toBeVisible();`
   - Evidência (score 1): `e2e/cdu-22.spec.ts:3` -> `criarProcessoCadastroDisponibilizadoFixture,`
-- ❌ **[NAO_COBERTO]** 23. Registra internamente um alerta:
-  - Palavras-chave usadas: `alerta, registra, internamente`
-  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
-- ❌ **[NAO_COBERTO]** 24. `Data/hora`: [Data/hora atual]
-  - Palavras-chave usadas: `data/hora, atual`
-  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
-- 🟡 **[PARCIAL]** 25. `Descrição`: "Cadastro da unidade [SIGLA_UNIDADE_SUBPROCESSO] submetido para análise"
+- ✅ **[COBERTO]** 23. Registra internamente um alerta:
+  - Evidência: `e2e/cdu-22.spec.ts` Cenario 5 verifica `linhaAlerta` em `tbl-alertas` para GESTOR SECRETARIA_2.
+- ✅ **[COBERTO]** 24. `Data/hora`: [Data/hora atual]
+  - Evidência: `e2e/cdu-22.spec.ts` Cenario 5 `.toContainText(/\d{2}\/\d{2}\/\d{4}/)` na `linhaAlerta`.
+- ✅ **[COBERTO]** 25. `Descrição`: "Cadastro da unidade [SIGLA_UNIDADE_SUBPROCESSO] submetido para análise"
   - Palavras-chave usadas: `unidade, sigla_unidade_subprocesso, descrição, cadastro, submetido, análise`
   - Evidência (score 1): `e2e/cdu-22.spec.ts:3` -> `criarProcessoCadastroDisponibilizadoFixture,`
   - Evidência (score 1): `e2e/cdu-22.spec.ts:4` -> `criarProcessoRevisaoCadastroDisponibilizadoFixture`
@@ -151,13 +148,11 @@
   - Evidência (score 1): `e2e/cdu-22.spec.ts:12` -> `* CDU-22 - Aceitar cadastros em bloco`
 
 ## Ajustes recomendados para próximo ciclo
-- Completar cobertura do item: **Botões `Cancelar` e `Registrar aceite`.** (atualmente parcial).
-- Completar cobertura do item: **Caso o usuário escolha o botão `Cancelar`, o sistema interrompe a operação, permanecendo na tela `Detalhes do processo`.** (atualmente parcial).
-- Completar cobertura do item: **O usuário clica em `Registrar aceite`.** (atualmente parcial).
+- Itens residuais PARCIAL referem-se a: análise de cadastro (14), detalhes do resultado/observação da análise (15-17), e-mail (29) — todos tratados por integração backend.
 
 ## Prontidão para o próximo PR de melhoria E2E
 - Status de entrada: **PRONTO_COM_GAPS**.
-- Motivos: há itens sem cobertura E2E.
+- Motivos: itens PARCIAL residuais (análise de cadastro, e-mail) não são testáveis via Playwright.
 - Checklist mínimo antes de codar:
   - [ ] confirmar massa de dados/fixtures para cenário positivo e negativo;
   - [ ] definir assert de regra de negócio + assert de efeito colateral;

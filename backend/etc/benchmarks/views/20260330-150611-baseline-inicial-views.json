@@ -1,0 +1,94 @@
+{
+  "dataHoraExecucao" : 1774893971.159434000,
+  "descricaoExecucao" : "baseline-inicial-views",
+  "perfisAtivos" : [ "test" ],
+  "banco" : {
+    "produto" : "Oracle",
+    "versao" : "Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production\nVersion 19.26.0.0.0",
+    "url" : "jdbc:oracle:thin:@desenvolvimentobd:1521:admdes2",
+    "usuario" : "SGC"
+  },
+  "aquecimentos" : 1,
+  "repeticoesMedidas" : 3,
+  "amostras" : {
+    "tituloUsuario" : "049391480884",
+    "codigoUnidadeLotacao" : 888,
+    "termoBuscaUsuario" : "AND",
+    "tituloUsuarioComPerfil" : "000048910876",
+    "siglaUnidadeComResponsavel" : "1ª Z.E.",
+    "codigosUnidadesComResponsavel" : [ 48, 49, 50, 51, 52, 53, 54, 55, 56, 60 ]
+  },
+  "resultados" : [ {
+    "nome" : "hierarquia.buscarArvoreHierarquica",
+    "status" : "FALHA",
+    "erro" : "NullPointerException: Cannot invoke \"sgc.organizacao.model.Usuario.getTituloEleitoral()\" because \"usuario\" is null",
+    "temposMs" : [ ],
+    "tempoMedioMs" : -1.0,
+    "tempoMaximoMs" : -1,
+    "queriesMedias" : -1.0,
+    "tamanhoResultado" : -1
+  }, {
+    "nome" : "hierarquia.buscarMapaHierarquia",
+    "status" : "SUCESSO",
+    "erro" : null,
+    "temposMs" : [ 873, 889, 866 ],
+    "tempoMedioMs" : 876.0,
+    "tempoMaximoMs" : 889,
+    "queriesMedias" : 2.0,
+    "tamanhoResultado" : 47
+  }, {
+    "nome" : "usuario.buscarPorTitulo",
+    "status" : "SUCESSO",
+    "erro" : null,
+    "temposMs" : [ 221, 144, 145 ],
+    "tempoMedioMs" : 170.0,
+    "tempoMaximoMs" : 221,
+    "queriesMedias" : 2.0,
+    "tamanhoResultado" : 1
+  }, {
+    "nome" : "usuario.buscarPorUnidadeLotacao",
+    "status" : "SUCESSO",
+    "erro" : null,
+    "temposMs" : [ 32, 32, 32 ],
+    "tempoMedioMs" : 32.0,
+    "tempoMaximoMs" : 32,
+    "queriesMedias" : 2.0,
+    "tamanhoResultado" : 10
+  }, {
+    "nome" : "usuario.buscarPorNomeOuMatricula",
+    "status" : "SUCESSO",
+    "erro" : null,
+    "temposMs" : [ 2483, 2603, 2340 ],
+    "tempoMedioMs" : 2475.3333333333335,
+    "tempoMaximoMs" : 2603,
+    "queriesMedias" : 99.0,
+    "tamanhoResultado" : 135
+  }, {
+    "nome" : "usuario.buscarPerfis",
+    "status" : "SUCESSO",
+    "erro" : null,
+    "temposMs" : [ 917, 976, 672 ],
+    "tempoMedioMs" : 855.0,
+    "tempoMaximoMs" : 976,
+    "queriesMedias" : 1.0,
+    "tamanhoResultado" : 1
+  }, {
+    "nome" : "responsavel.buscarAtualPorSigla",
+    "status" : "SUCESSO",
+    "erro" : null,
+    "temposMs" : [ 155, 127, 132 ],
+    "tempoMedioMs" : 138.0,
+    "tempoMaximoMs" : 155,
+    "queriesMedias" : 3.0,
+    "tamanhoResultado" : 1
+  }, {
+    "nome" : "responsavel.buscarEmLote",
+    "status" : "SUCESSO",
+    "erro" : null,
+    "temposMs" : [ 563, 517, 463 ],
+    "tempoMedioMs" : 514.3333333333334,
+    "tempoMaximoMs" : 563,
+    "queriesMedias" : 12.0,
+    "tamanhoResultado" : 10
+  } ]
+}

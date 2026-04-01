@@ -36,6 +36,9 @@ class UnidadeHierarquiaServiceCoverageTest {
         u1.setCodigo(10L);
         u1.setTipo(OPERACIONAL);
         u1.setSigla("U1");
+        Responsabilidade responsabilidadeU1 = new Responsabilidade(10L, null, "111", null, null, null, null, new Usuario());
+        responsabilidadeU1.getUsuario().setTituloEleitoral("111");
+        u1.setResponsabilidade(responsabilidadeU1);
         
         Unidade u2 = new Unidade();
         u2.setCodigo(20L);
@@ -46,13 +49,19 @@ class UnidadeHierarquiaServiceCoverageTest {
         u3.setCodigo(30L);
         u3.setTipo(OPERACIONAL);
         u3.setSigla("U3");
+        Responsabilidade responsabilidadeU3 = new Responsabilidade(30L, null, "333", null, null, null, null, new Usuario());
+        responsabilidadeU3.getUsuario().setTituloEleitoral("333");
+        u3.setResponsabilidade(responsabilidadeU3);
 
         Unidade u4 = new Unidade(); // Bloqueada
         u4.setCodigo(40L);
         u4.setTipo(OPERACIONAL);
         u4.setSigla("U4");
+        Responsabilidade responsabilidadeU4 = new Responsabilidade(40L, null, "444", null, null, null, null, new Usuario());
+        responsabilidadeU4.getUsuario().setTituloEleitoral("444");
+        u4.setResponsabilidade(responsabilidadeU4);
 
-        when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u1, u2, u3, u4));
+        when(unidadeRepo.listarTodasComHierarquia()).thenReturn(List.of(u1, u2, u3, u4));
 
         List<UnidadeDto> result = target.buscarArvoreComElegibilidade(true, Set.of(40L));
         
@@ -82,7 +91,7 @@ class UnidadeHierarquiaServiceCoverageTest {
         uSub.setTipo(OPERACIONAL);
         uSub.setUnidadeSuperior(uRaiz);
         
-        when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(uRaiz, uSub));
+        when(unidadeRepo.listarTodasComHierarquia()).thenReturn(List.of(uRaiz, uSub));
         
         List<String> siglas = target.buscarSiglasSubordinadas("SUB");
         assertThat(siglas).contains("SUB");
@@ -99,7 +108,7 @@ class UnidadeHierarquiaServiceCoverageTest {
         u1.setTipo(OPERACIONAL);
         u1.setSigla("U1");
         
-        when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(u1));
+        when(unidadeRepo.listarTodasComHierarquia()).thenReturn(List.of(u1));
         
         List<UnidadeDto> result = target.buscarArvoreHierarquica();
         assertThat(result).hasSize(1);
@@ -115,7 +124,7 @@ class UnidadeHierarquiaServiceCoverageTest {
         when(unidadeMutavel.getSigla()).thenReturn("UM");
         when(unidadeMutavel.getTipo()).thenReturn(OPERACIONAL);
         when(unidadeMutavel.getUnidadeSuperior()).thenReturn(null);
-        when(unidadeRepo.findAllWithHierarquia()).thenReturn(List.of(unidadeMutavel));
+        when(unidadeRepo.listarTodasComHierarquia()).thenReturn(List.of(unidadeMutavel));
 
         List<UnidadeDto> resultado = target.buscarArvoreHierarquica();
 

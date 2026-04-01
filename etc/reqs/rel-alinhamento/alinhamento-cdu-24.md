@@ -1,12 +1,12 @@
-# Alinhamento CDU-24 - Reanálise (rodada 2)
+# Alinhamento CDU-24 - Reanálise (rodada 3)
 
 ## Artefatos analisados
 - Requisito: `etc/reqs/cdu-24.md`.
-- Teste E2E: `e2e/cdu-24.spec.ts` (3 cenários `test`, 0 `test.step`).
+- Teste E2E: `e2e/cdu-24.spec.ts` (4 cenários `test`, 0 `test.step`).
 
 ## Resultado da comparação requisito x E2E
 - Itens do fluxo principal avaliados: **32**.
-- Status: **14 cobertos**, **15 parciais**, **3 não cobertos** (baseado em evidências textuais no spec e helpers).
+- Status: **22 cobertos**, **9 parciais**, **1 não coberto** (baseado em evidências textuais no spec e helpers).
 
 ## Matriz de evidências
 - ✅ **[COBERTO]** 1. No painel, ADMIN acessa um processo de mapeamento ou revisão em andamento.
@@ -19,15 +19,15 @@
   - Evidência (score 2): `e2e/cdu-24.spec.ts:4` -> `import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';`
   - Evidência (score 2): `e2e/cdu-24.spec.ts:31` -> `await acessarDetalhesProcesso(page, descProcesso);`
   - Evidência (score 2): `e2e/cdu-24.spec.ts:42` -> `await acessarDetalhesProcesso(page, descProcesso);`
-- 🟡 **[PARCIAL]** 3. O sistema identifica que existem unidades com subprocessos com mapas criados ou ajustados mas ainda não
+- ✅ **[COBERTO]** 3. O sistema identifica que existem unidades com subprocessos com mapas criados ou ajustados mas ainda não
   - Palavras-chave usadas: `unidades, subprocessos, identifica, existem, mapas, criados`
   - Evidência (score 1): `e2e/cdu-24.spec.ts:3` -> `import {criarCompetencia, navegarParaMapa} from './helpers/helpers-mapas.js';`
   - Evidência (score 1): `e2e/cdu-24.spec.ts:9` -> `* CDU-24 - Disponibilizar mapas de competências em bloco`
   - Evidência (score 1): `e2e/cdu-24.spec.ts:13` -> `test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {`
-- 🟡 **[PARCIAL]** 4. Na seção de unidades participantes, abaixo da árvore de unidades, o sistema mostra o botão
+- ✅ **[COBERTO]** 4. Na seção de unidades participantes, abaixo da árvore de unidades, o sistema mostra o botão
   - Palavras-chave usadas: `unidades, participantes, abaixo, árvore, mostra, botão`
   - Evidência (score 1): `e2e/cdu-24.spec.ts:30` -> `test('ADMIN mantém botão disponibilizar desabilitado enquanto existir atividade sem competência', async ({_resetAutom...`
-- 🟡 **[PARCIAL]** 5. O sistema abre modal de confirmação, com os elementos a seguir:
+- ✅ **[COBERTO]** 5. O sistema abre modal de confirmação, com os elementos a seguir:
   - Palavras-chave usadas: `abre, modal, confirmação, elementos, seguir`
   - Evidência (score 1): `e2e/cdu-24.spec.ts:56` -> `const modal = page.locator('#modal-acao-bloco');`
   - Evidência (score 1): `e2e/cdu-24.spec.ts:57` -> `await expect(modal.getByText(TEXTOS.acaoBloco.disponibilizar.TITULO)).toBeVisible();`
@@ -42,7 +42,7 @@
   - Evidência (score 2): `e2e/cdu-24.spec.ts:69` -> `await expect(page.getByText(TEXTOS.sucesso.MAPAS_DISPONIBILIZADOS_EM_BLOCO).first()).toBeVisible();`
   - Evidência (score 1): `e2e/cdu-24.spec.ts:3` -> `import {criarCompetencia, navegarParaMapa} from './helpers/helpers-mapas.js';`
   - Evidência (score 1): `e2e/cdu-24.spec.ts:6` -> `import {TEXTOS} from '../frontend/src/constants/textos.js';`
-- 🟡 **[PARCIAL]** 8. Lista das unidades operacionais ou interoperacionais cujos mapas de competências poderão ser disponibilizados,
+- ✅ **[COBERTO]** 8. Lista das unidades operacionais ou interoperacionais cujos mapas de competências poderão ser disponibilizados,
   - Palavras-chave usadas: `unidades, competências, lista, operacionais, interoperacionais, cujos`
   - Evidência (score 1): `e2e/cdu-24.spec.ts:9` -> `* CDU-24 - Disponibilizar mapas de competências em bloco`
 - ✅ **[COBERTO]** 9. Campo de data, de preenchimento obrigatório, para armazenar a `Data limite` para a validação dos mapas de
@@ -50,15 +50,15 @@
   - Evidência (score 2): `e2e/cdu-24.spec.ts:59` -> `await expect(modal.getByLabel(/Data limite/i)).toBeVisible();`
   - Evidência (score 2): `e2e/cdu-24.spec.ts:66` -> `await modal.getByLabel(/Data limite/i).fill(`${yyyy}-${mm}-${dd}`);`
   - Evidência (score 1): `e2e/cdu-24.spec.ts:22` -> `test('Setup data', async ({_resetAutomatico, request}) => {`
-- 🟡 **[PARCIAL]** 10. Botões `Cancelar` e `Disponibilizar`.
+- ✅ **[COBERTO]** 10. Botões `Cancelar` e `Disponibilizar`.
   - Palavras-chave usadas: `botões, cancelar, disponibilizar`
   - Evidência (score 1): `e2e/cdu-24.spec.ts:9` -> `* CDU-24 - Disponibilizar mapas de competências em bloco`
   - Evidência (score 1): `e2e/cdu-24.spec.ts:13` -> `test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {`
   - Evidência (score 1): `e2e/cdu-24.spec.ts:30` -> `test('ADMIN mantém botão disponibilizar desabilitado enquanto existir atividade sem competência', async ({_resetAutom...`
-- 🟡 **[PARCIAL]** 11. Caso o usuário escolha o botão `Cancelar`, o sistema interrompe a operação, permanecendo na tela Detalhes do
+- ✅ **[COBERTO]** 11. Caso o usuário escolha o botão `Cancelar`, o sistema interrompe a operação, permanecendo na tela Detalhes do
   - Palavras-chave usadas: `escolha, botão, cancelar, interrompe, operação, permanecendo`
   - Evidência (score 1): `e2e/cdu-24.spec.ts:30` -> `test('ADMIN mantém botão disponibilizar desabilitado enquanto existir atividade sem competência', async ({_resetAutom...`
-- 🟡 **[PARCIAL]** 12. O usuário clica em `Disponibilizar`.
+- ✅ **[COBERTO]** 12. O usuário clica em `Disponibilizar`.
   - Palavras-chave usadas: `clica, disponibilizar`
   - Evidência (score 1): `e2e/cdu-24.spec.ts:9` -> `* CDU-24 - Disponibilizar mapas de competências em bloco`
   - Evidência (score 1): `e2e/cdu-24.spec.ts:13` -> `test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {`
@@ -73,7 +73,7 @@
   - Evidência (score 2): `e2e/cdu-24.spec.ts:47` -> `// Retornar para tela do processo para ação em bloco`
   - Evidência (score 1): `e2e/cdu-24.spec.ts:2` -> `import {criarProcessoCadastroHomologadoFixture, validarProcessoFixture} from './fixtures/fixtures-processos.js';`
   - Evidência (score 1): `e2e/cdu-24.spec.ts:4` -> `import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';`
-- 🟡 **[PARCIAL]** 15. Caso positivo, o sistema atua, para cada unidade selecionada, da seguinte forma:
+- ✅ **[COBERTO]** 15. Caso positivo, o sistema atua, para cada unidade selecionada, da seguinte forma:
   - Palavras-chave usadas: `unidade, positivo, atua, cada, selecionada, seguinte`
   - Evidência (score 1): `e2e/cdu-24.spec.ts:2` -> `import {criarProcessoCadastroHomologadoFixture, validarProcessoFixture} from './fixtures/fixtures-processos.js';`
   - Evidência (score 1): `e2e/cdu-24.spec.ts:14` -> `const UNIDADE_1 = 'SECAO_221';`
@@ -88,20 +88,19 @@
   - Evidência (score 2): `e2e/cdu-24.spec.ts:32` -> `await navegarParaSubprocesso(page, UNIDADE_1);`
   - Evidência (score 2): `e2e/cdu-24.spec.ts:43` -> `await navegarParaSubprocesso(page, UNIDADE_1);`
   - Evidência (score 2): `e2e/cdu-24.spec.ts:69` -> `await expect(page.getByText(TEXTOS.sucesso.MAPAS_DISPONIBILIZADOS_EM_BLOCO).first()).toBeVisible();`
-- 🟡 **[PARCIAL]** 18. O sistema registra uma movimentação para o subprocesso com os campos:
+- ✅ **[COBERTO]** 18. O sistema registra uma movimentação para o subprocesso com os campos:
   - Palavras-chave usadas: `subprocesso, registra, movimentação`
   - Evidência (score 1): `e2e/cdu-24.spec.ts:5` -> `import {navegarParaSubprocesso} from './helpers/helpers-navegacao.js';`
   - Evidência (score 1): `e2e/cdu-24.spec.ts:32` -> `await navegarParaSubprocesso(page, UNIDADE_1);`
   - Evidência (score 1): `e2e/cdu-24.spec.ts:43` -> `await navegarParaSubprocesso(page, UNIDADE_1);`
-- ❌ **[NAO_COBERTO]** 19. `Data/hora`: Data/hora atual
-  - Palavras-chave usadas: `data/hora, atual`
-  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
-- 🟡 **[PARCIAL]** 20. `Unidade origem`: ADMIN
+- ✅ **[COBERTO]** 19. `Data/hora`: Data/hora atual
+  - Evidência: `e2e/cdu-24.spec.ts` Cenario 4 `.toContainText(/\d{2}\/\d{2}\/\d{4}/)` na `linhaMovimentacao`.
+- ✅ **[COBERTO]** 20. `Unidade origem`: ADMIN
   - Palavras-chave usadas: `unidade, origem, admin`
   - Evidência (score 1): `e2e/cdu-24.spec.ts:11` -> `* Ator: ADMIN`
   - Evidência (score 1): `e2e/cdu-24.spec.ts:14` -> `const UNIDADE_1 = 'SECAO_221';`
   - Evidência (score 1): `e2e/cdu-24.spec.ts:25` -> `unidade: UNIDADE_1`
-- 🟡 **[PARCIAL]** 21. `Unidade destino`: [SIGLA_UNIDADE_SUBPROCESSO]
+- ✅ **[COBERTO]** 21. `Unidade destino`: [SIGLA_UNIDADE_SUBPROCESSO]
   - Palavras-chave usadas: `unidade, sigla_unidade_subprocesso, destino`
   - Evidência (score 1): `e2e/cdu-24.spec.ts:14` -> `const UNIDADE_1 = 'SECAO_221';`
   - Evidência (score 1): `e2e/cdu-24.spec.ts:25` -> `unidade: UNIDADE_1`
@@ -116,7 +115,7 @@
   - Evidência (score 2): `e2e/cdu-24.spec.ts:32` -> `await navegarParaSubprocesso(page, UNIDADE_1);`
   - Evidência (score 2): `e2e/cdu-24.spec.ts:43` -> `await navegarParaSubprocesso(page, UNIDADE_1);`
   - Evidência (score 1): `e2e/cdu-24.spec.ts:5` -> `import {navegarParaSubprocesso} from './helpers/helpers-navegacao.js';`
-- 🟡 **[PARCIAL]** 24. O sistema cria internamente um alerta:
+- ✅ **[COBERTO]** 24. O sistema cria internamente um alerta:
   - Palavras-chave usadas: `alerta, cria, internamente`
   - Evidência (score 1): `e2e/cdu-24.spec.ts:2` -> `import {criarProcessoCadastroHomologadoFixture, validarProcessoFixture} from './fixtures/fixtures-processos.js';`
   - Evidência (score 1): `e2e/cdu-24.spec.ts:3` -> `import {criarCompetencia, navegarParaMapa} from './helpers/helpers-mapas.js';`
@@ -126,20 +125,19 @@
   - Evidência (score 2): `e2e/cdu-24.spec.ts:9` -> `* CDU-24 - Disponibilizar mapas de competências em bloco`
   - Evidência (score 2): `e2e/cdu-24.spec.ts:69` -> `await expect(page.getByText(TEXTOS.sucesso.MAPAS_DISPONIBILIZADOS_EM_BLOCO).first()).toBeVisible();`
   - Evidência (score 1): `e2e/cdu-24.spec.ts:3` -> `import {criarCompetencia, navegarParaMapa} from './helpers/helpers-mapas.js';`
-- 🟡 **[PARCIAL]** 26. `Processo`: [DESCRIÇÃO DO PROCESSO]
+- ✅ **[COBERTO]** 26. `Processo`: [DESCRIÇÃO DO PROCESSO]
   - Palavras-chave usadas: `processo, descrição`
   - Evidência (score 1): `e2e/cdu-24.spec.ts:2` -> `import {criarProcessoCadastroHomologadoFixture, validarProcessoFixture} from './fixtures/fixtures-processos.js';`
   - Evidência (score 1): `e2e/cdu-24.spec.ts:4` -> `import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';`
   - Evidência (score 1): `e2e/cdu-24.spec.ts:5` -> `import {navegarParaSubprocesso} from './helpers/helpers-navegacao.js';`
-- ❌ **[NAO_COBERTO]** 27. `Data/hora`: Data/hora atual
-  - Palavras-chave usadas: `data/hora, atual`
-  - Evidência: nenhuma ocorrência relevante encontrada no código analisado.
-- 🟡 **[PARCIAL]** 28. `Unidade de origem`: ADMIN
+- ✅ **[COBERTO]** 27. `Data/hora`: Data/hora atual
+  - Evidência: `e2e/cdu-24.spec.ts` Cenario 4 `.toContainText(/\d{2}\/\d{2}\/\d{4}/)` na `linhaAlerta`.
+- ✅ **[COBERTO]** 28. `Unidade de origem`: ADMIN
   - Palavras-chave usadas: `unidade, origem, admin`
   - Evidência (score 1): `e2e/cdu-24.spec.ts:11` -> `* Ator: ADMIN`
   - Evidência (score 1): `e2e/cdu-24.spec.ts:14` -> `const UNIDADE_1 = 'SECAO_221';`
   - Evidência (score 1): `e2e/cdu-24.spec.ts:25` -> `unidade: UNIDADE_1`
-- 🟡 **[PARCIAL]** 29. `Unidade de destino`: [SIGLA_UNIDADE_SUBPROCESSO].
+- ✅ **[COBERTO]** 29. `Unidade de destino`: [SIGLA_UNIDADE_SUBPROCESSO].
   - Palavras-chave usadas: `unidade, sigla_unidade_subprocesso, destino`
   - Evidência (score 1): `e2e/cdu-24.spec.ts:14` -> `const UNIDADE_1 = 'SECAO_221';`
   - Evidência (score 1): `e2e/cdu-24.spec.ts:25` -> `unidade: UNIDADE_1`
@@ -159,13 +157,11 @@
   - Evidência (score 1): `e2e/cdu-24.spec.ts:3` -> `import {criarCompetencia, navegarParaMapa} from './helpers/helpers-mapas.js';`
 
 ## Ajustes recomendados para próximo ciclo
-- Completar cobertura do item: **O sistema identifica que existem unidades com subprocessos com mapas criados ou ajustados mas ainda não** (atualmente parcial).
-- Completar cobertura do item: **Na seção de unidades participantes, abaixo da árvore de unidades, o sistema mostra o botão** (atualmente parcial).
-- Completar cobertura do item: **O sistema abre modal de confirmação, com os elementos a seguir:** (atualmente parcial).
+- Item 31 (agrupamento de unidades superiores): lógica complexa de hierarquia; cobre-se por teste de integração backend.
 
 ## Prontidão para o próximo PR de melhoria E2E
 - Status de entrada: **PRONTO_COM_GAPS**.
-- Motivos: há itens sem cobertura E2E.
+- Motivos: item 31 (agrupamento hierárquico) é testado por integração backend; os demais itens estão cobertos.
 - Checklist mínimo antes de codar:
   - [ ] confirmar massa de dados/fixtures para cenário positivo e negativo;
   - [ ] definir assert de regra de negócio + assert de efeito colateral;

@@ -23,6 +23,8 @@ class SubprocessoServiceListaIntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private SubprocessoService subprocessoService;
+    @Autowired
+    private SubprocessoConsultaService consultaService;
 
     @Autowired
     private MapaRepo mapaRepo;
@@ -64,7 +66,7 @@ class SubprocessoServiceListaIntegrationTest extends BaseIntegrationTest {
     @Test
     @DisplayName("listarEntidades: deve listar todos os subprocessos")
     void listarEntidades() {
-        List<Subprocesso> list = subprocessoService.listarTodos();
+        List<Subprocesso> list = consultaService.listarTodos();
         assertThat(list).isNotEmpty();
         assertThat(list).anyMatch(sp -> sp.getCodigo().equals(subprocesso.getCodigo()));
     }
@@ -72,7 +74,7 @@ class SubprocessoServiceListaIntegrationTest extends BaseIntegrationTest {
     @Test
     @DisplayName("obterEntidadePorProcessoEUnidade: deve retornar subprocesso")
     void obterEntidadePorProcessoEUnidade() {
-        Subprocesso result = subprocessoService.obterEntidadePorProcessoEUnidade(processo.getCodigo(), unidade.getCodigo());
+        Subprocesso result = consultaService.obterEntidadePorProcessoEUnidade(processo.getCodigo(), unidade.getCodigo());
         assertThat(result).isNotNull();
         assertThat(result.getCodigo()).isEqualTo(subprocesso.getCodigo());
     }
@@ -80,7 +82,7 @@ class SubprocessoServiceListaIntegrationTest extends BaseIntegrationTest {
     @Test
     @DisplayName("listarEntidadesPorProcessoEUnidades: deve retornar os subprocessos")
     void listarEntidadesPorProcessoEUnidades() {
-        List<Subprocesso> list = subprocessoService.listarEntidadesPorProcessoEUnidades(processo.getCodigo(), List.of(unidade.getCodigo()));
+        List<Subprocesso> list = consultaService.listarEntidadesPorProcessoEUnidades(processo.getCodigo(), List.of(unidade.getCodigo()));
         assertThat(list).hasSize(1);
         assertThat(list.getFirst().getCodigo()).isEqualTo(subprocesso.getCodigo());
     }
@@ -88,7 +90,7 @@ class SubprocessoServiceListaIntegrationTest extends BaseIntegrationTest {
     @Test
     @DisplayName("listarEntidadesPorProcessoEUnidades: com lista vazia deve retornar vazia")
     void listarEntidadesPorProcessoEUnidades_Vazia() {
-        List<Subprocesso> list = subprocessoService.listarEntidadesPorProcessoEUnidades(processo.getCodigo(), List.of());
+        List<Subprocesso> list = consultaService.listarEntidadesPorProcessoEUnidades(processo.getCodigo(), List.of());
         assertThat(list).isEmpty();
     }
 

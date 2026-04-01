@@ -30,6 +30,8 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
     private SubprocessoRepo subprocessoRepo;
     @Mock
     private SubprocessoService subprocessoService;
+    @Mock
+    private SubprocessoConsultaService consultaService;
 
     @Mock
     private MovimentacaoRepo movimentacaoRepo;
@@ -67,7 +69,7 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
     
     @BeforeEach
     void setUp() {
-        org.mockito.Mockito.lenient().when(subprocessoService.obterUnidadeLocalizacao(org.mockito.ArgumentMatchers.any(Subprocesso.class)))
+        org.mockito.Mockito.lenient().when(consultaService.obterUnidadeLocalizacao(org.mockito.ArgumentMatchers.any(Subprocesso.class)))
                 .thenAnswer(inv -> {
                     Subprocesso sp = inv.getArgument(0);
                     return sp.getLocalizacaoAtual() != null ? sp.getLocalizacaoAtual() : sp.getUnidade();
@@ -110,7 +112,7 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         sp.setCodigo(100L);
         sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         
-        when(subprocessoService.buscarSubprocesso(100L)).thenReturn(sp);
+        when(consultaService.buscarSubprocesso(100L)).thenReturn(sp);
         doThrow(new sgc.comum.erros.ErroValidacao("erro"))
             .when(validacaoService).validarSituacaoPermitida(any(Subprocesso.class), eq(SituacaoSubprocesso.NAO_INICIADO), eq(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO));
         
@@ -150,7 +152,7 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         setField(sp, "situacao", SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO);
         sp.setMapa(new sgc.mapa.model.Mapa());
 
-        when(subprocessoService.buscarSubprocesso(100L)).thenReturn(sp);
+        when(consultaService.buscarSubprocesso(100L)).thenReturn(sp);
 
         service.apresentarSugestoes(100L, "sugestoes", new Usuario());
 
@@ -173,7 +175,7 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         sp.setUnidade(u);
         setField(sp, "situacao", SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO);
 
-        when(subprocessoService.buscarSubprocesso(100L)).thenReturn(sp);
+        when(consultaService.buscarSubprocesso(100L)).thenReturn(sp);
 
         service.validarMapa(100L, new Usuario());
 
@@ -196,7 +198,7 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         sp.setUnidade(u);
         setField(sp, "situacao", SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
 
-        when(subprocessoService.buscarSubprocesso(100L)).thenReturn(sp);
+        when(consultaService.buscarSubprocesso(100L)).thenReturn(sp);
 
         service.aceitarValidacao(100L, "obs", new Usuario());
 
@@ -254,7 +256,7 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         sp.setUnidade(new Unidade());
         sp.setProcesso(Processo.builder().tipo(TipoProcesso.REVISAO).build());
 
-        when(subprocessoService.buscarSubprocesso(100L)).thenReturn(sp);
+        when(consultaService.buscarSubprocesso(100L)).thenReturn(sp);
 
         service.disponibilizarRevisao(100L, new Usuario());
 
@@ -277,8 +279,8 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         mov.setUnidadeDestino(uAnalise);
         mov.setUnidadeOrigem(uOrigem);
 
-        when(subprocessoService.buscarSubprocesso(1L)).thenReturn(sp);
-        when(movimentacaoRepo.findBySubprocessoCodigoOrderByDataHoraDesc(1L)).thenReturn(List.of(mov));
+        when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
+        when(movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(1L)).thenReturn(List.of(mov));
         when(hierarquiaService.isSubordinada(uOrigem, uAnalise)).thenReturn(true); // branch 489
 
         service.devolverCadastro(1L, new Usuario(), "Obs");
@@ -292,8 +294,9 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
     void executarHomologacao_ComImpactos() {
         Subprocesso sp = new Subprocesso(); sp.setCodigo(1L); sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
         Processo p = new Processo(); p.setTipo(TipoProcesso.REVISAO); sp.setProcesso(p);
+        Unidade unidade = new Unidade(); unidade.setCodigo(10L); unidade.setSigla("U10"); sp.setUnidade(unidade);
 
-        when(subprocessoService.buscarSubprocesso(1L)).thenReturn(sp);
+        when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
         when(impactoMapaService.verificarImpactos(any(), any())).thenReturn(ImpactoMapaResponse.builder()
                 .temImpactos(true)
                 .inseridas(List.of(AtividadeImpactadaDto.builder().descricao("Nova").build()))
@@ -312,8 +315,9 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
     void executarHomologacao_SemImpactos() {
         Subprocesso sp = new Subprocesso(); sp.setCodigo(1L); sp.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
         Processo p = new Processo(); p.setTipo(TipoProcesso.REVISAO); sp.setProcesso(p);
+        Unidade unidade = new Unidade(); unidade.setCodigo(10L); unidade.setSigla("U10"); sp.setUnidade(unidade);
 
-        when(subprocessoService.buscarSubprocesso(1L)).thenReturn(sp);
+        when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
         when(impactoMapaService.verificarImpactos(any(), any())).thenReturn(ImpactoMapaResponse.builder()
                 .temImpactos(false)
                 .inseridas(List.of())
@@ -336,7 +340,7 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         sp.setMapa(new sgc.mapa.model.Mapa()); sp.getMapa().setCodigo(100L);
         sp.setDataLimiteEtapa1(LocalDateTime.of(2026, 1, 1, 0, 0));
         
-        when(subprocessoService.buscarSubprocesso(1L)).thenReturn(sp);
+        when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
         when(unidadeService.buscarPorSigla("ADMIN")).thenReturn(new Unidade());
 
         sgc.subprocesso.dto.DisponibilizarMapaRequest req = new sgc.subprocesso.dto.DisponibilizarMapaRequest(java.time.LocalDate.of(2026, 1, 1), "Obs");

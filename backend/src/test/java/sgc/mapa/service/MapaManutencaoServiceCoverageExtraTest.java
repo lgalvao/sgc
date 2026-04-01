@@ -33,23 +33,23 @@ class MapaManutencaoServiceCoverageExtraTest {
 
     @Test
     void atividadesMapaCodigoSemRelacionamentos_ok() {
-        when(atividadeRepo.findByMapaCodigoSemFetch(1L)).thenReturn(List.of(new Atividade()));
+        when(atividadeRepo.listarPorMapaSemRelacionamentos(1L)).thenReturn(List.of(new Atividade()));
         mapaService.atividadesMapaCodigoSemRels(1L);
-        verify(atividadeRepo).findByMapaCodigoSemFetch(1L);
+        verify(atividadeRepo).listarPorMapaSemRelacionamentos(1L);
     }
 
     @Test
     void competenciasCodMapaSemRelacionamentos_ok() {
-        when(competenciaRepo.findByMapaCodigoSemFetch(1L)).thenReturn(List.of(new Competencia()));
+        when(competenciaRepo.listarPorMapaSemRelacionamentos(1L)).thenReturn(List.of(new Competencia()));
         mapaService.competenciasCodMapaSemRels(1L);
-        verify(competenciaRepo).findByMapaCodigoSemFetch(1L);
+        verify(competenciaRepo).listarPorMapaSemRelacionamentos(1L);
     }
 
     @Test
     void codigosAssociacoesCompetenciaAtividade_ok() {
         Object[] row1 = new Object[]{1L, null, 2L};
         Object[] row2 = new Object[]{1L, null, 3L};
-        when(competenciaRepo.findCompetenciaAndAtividadeIdsByMapaCodigo(1L)).thenReturn(List.of(row1, row2));
+        when(competenciaRepo.listarCodigosCompetenciaEAtividadePorMapa(1L)).thenReturn(List.of(row1, row2));
 
         Map<Long, Set<Long>> result = mapaService.codigosAssociacoesCompetenciaAtividade(1L);
 
@@ -59,9 +59,9 @@ class MapaManutencaoServiceCoverageExtraTest {
 
     @Test
     void conhecimentosCodMapa_ok() {
-        when(conhecimentoRepo.findByMapaCodigo(1L)).thenReturn(List.of(new Conhecimento()));
+        when(conhecimentoRepo.listarPorMapa(1L)).thenReturn(List.of(new Conhecimento()));
         mapaService.conhecimentosCodMapa(1L);
-        verify(conhecimentoRepo).findByMapaCodigo(1L);
+        verify(conhecimentoRepo).listarPorMapa(1L);
     }
 
     @Test
@@ -81,7 +81,7 @@ class MapaManutencaoServiceCoverageExtraTest {
     void validarDescricaoAtividadeUnica_erro() {
         Atividade a = new Atividade();
         a.setDescricao("Desc");
-        when(atividadeRepo.findByMapaCodigoSemFetch(1L)).thenReturn(List.of(a));
+        when(atividadeRepo.listarPorMapaSemRelacionamentos(1L)).thenReturn(List.of(a));
 
         CriarAtividadeRequest req = new CriarAtividadeRequest(1L, "desc");
 

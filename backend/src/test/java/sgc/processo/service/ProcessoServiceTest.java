@@ -48,7 +48,11 @@ class ProcessoServiceTest {
     @Mock
     private UnidadeService unidadeService;
     @Mock
+    private ResponsavelUnidadeService responsavelUnidadeService;
+    @Mock
     private SubprocessoService subprocessoService;
+    @Mock
+    private SubprocessoConsultaService consultaService;
     @Mock
     private SubprocessoValidacaoService validacaoService;
     @Mock
@@ -63,6 +67,11 @@ class ProcessoServiceTest {
     private SgcPermissionEvaluator permissionEvaluator;
     @Mock
     private SubprocessoTransicaoService transicaoService;
+
+    @BeforeEach
+    void configurarMocksPadrao() {
+        lenient().when(responsavelUnidadeService.todasPossuemResponsavelEfetivo(anyList())).thenReturn(true);
+    }
 
     @Nested
     @DisplayName("Cobertura e Casos de Borda")
@@ -100,7 +109,7 @@ class ProcessoServiceTest {
                     .situacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO)
                     .build();
 
-            when(subprocessoService.listarEntidadesPorProcessoEUnidades(codProcesso, req.unidadeCodigos()))
+            when(consultaService.listarEntidadesPorProcessoEUnidades(codProcesso, req.unidadeCodigos()))
                     .thenReturn(List.of(sub));
 
             Subprocesso subNaoElegivel = Subprocesso.builder()
@@ -108,7 +117,7 @@ class ProcessoServiceTest {
                     .unidade(Unidade.builder().codigo(10L).build())
                     .situacao(SituacaoSubprocesso.NAO_INICIADO)
                     .build();
-            when(subprocessoService.listarEntidadesPorProcessoEUnidades(codProcesso, req.unidadeCodigos()))
+            when(consultaService.listarEntidadesPorProcessoEUnidades(codProcesso, req.unidadeCodigos()))
                     .thenReturn(List.of(subNaoElegivel));
 
             processoService.executarAcaoEmBloco(codProcesso, req);
@@ -174,9 +183,9 @@ class ProcessoServiceTest {
             p.adicionarParticipantes(Set.of(uni));
 
             when(repo.buscar(Processo.class, id)).thenReturn(p);
-            when(unidadeService.porCodigos(anyList())).thenReturn(List.of(uni));
+            when(unidadeService.buscarPorCodigos(anyList())).thenReturn(List.of(uni));
             when(unidadeService.buscarPorCodigo(1L)).thenReturn(uni);
-            when(unidadeService.verificarMapaVigente(1L)).thenReturn(true);
+            when(unidadeService.temMapaVigente(1L)).thenReturn(true);
             
             UnidadeMapa um = new UnidadeMapa();
             um.setUnidadeCodigo(1L);
@@ -233,9 +242,9 @@ class ProcessoServiceTest {
             p.adicionarParticipantes(Set.of(uni));
 
             when(repo.buscar(Processo.class, id)).thenReturn(p);
-            when(unidadeService.porCodigos(anyList())).thenReturn(List.of(uni));
+            when(unidadeService.buscarPorCodigos(anyList())).thenReturn(List.of(uni));
             // Simular que a unidade não tem mapa vigente
-            when(unidadeService.verificarMapaVigente(1L)).thenReturn(false);
+            when(unidadeService.temMapaVigente(1L)).thenReturn(false);
             when(unidadeService.buscarSiglasPorCodigos(anyList())).thenReturn(List.of("U1"));
 
             assertThatThrownBy(() -> processoService.iniciar(id, List.of(1L), usuario))
@@ -253,7 +262,7 @@ class ProcessoServiceTest {
             p.setTipo(TipoProcesso.DIAGNOSTICO);
             
             when(repo.buscar(Processo.class, id)).thenReturn(p);
-            when(unidadeService.porCodigos(anyList())).thenReturn(List.of());
+            when(unidadeService.buscarPorCodigos(anyList())).thenReturn(List.of());
             when(validacaoService.validarSubprocessosParaFinalizacao(id))
                     .thenReturn(ValidationResult.ofValido());
             
@@ -292,8 +301,8 @@ class ProcessoServiceTest {
             sp.setCodigo(100L);
             sp.setUnidade(u);
             sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
-            when(subprocessoService.listarEntidadesPorProcessoComUnidade(codProcesso)).thenReturn(List.of(sp));
-            when(subprocessoService.obterLocalizacaoAtual(sp)).thenReturn(u);
+            when(consultaService.listarEntidadesPorProcessoComUnidade(codProcesso)).thenReturn(List.of(sp));
+            when(consultaService.obterLocalizacaoAtual(sp)).thenReturn(u);
             when(validacaoService.validarSubprocessosParaFinalizacao(codProcesso)).thenReturn(ValidationResult.ofValido());
 
             ProcessoDetalheDto result = processoService.obterDetalhesCompleto(codProcesso, usuario, false);
@@ -333,10 +342,10 @@ class ProcessoServiceTest {
             u3.setCodigo(30L);
             s3.setUnidade(u3);
 
-            when(subprocessoService.listarEntidadesPorProcessoEUnidades(eq(codProcesso), anyList())).thenReturn(List.of(s1, s2, s3));
+            when(consultaService.listarEntidadesPorProcessoEUnidades(eq(codProcesso), anyList())).thenReturn(List.of(s1, s2, s3));
             when(permissionEvaluator.verificarPermissao(usuario, s1, AcaoPermissao.ACEITAR_CADASTRO)).thenReturn(true);
             when(permissionEvaluator.verificarPermissao(usuario, s2, AcaoPermissao.ACEITAR_MAPA)).thenReturn(true);
-            when(subprocessoService.obterLocalizacaoAtual(any())).thenReturn(u1);
+            when(consultaService.obterLocalizacaoAtual(any())).thenReturn(u1);
 
             List<SubprocessoElegivelDto> result = processoService.listarSubprocessosElegiveis(codProcesso);
 
@@ -377,7 +386,7 @@ class ProcessoServiceTest {
             p.adicionarParticipantes(Set.of(uSemSub));
 
             when(repo.buscar(Processo.class, codProcesso)).thenReturn(p);
-            when(unidadeService.todasComHierarquia()).thenReturn(List.of(uPai, uFilho, uSemSub));
+            when(unidadeService.buscarTodasComHierarquia()).thenReturn(List.of(uPai, uFilho, uSemSub));
 
             Subprocesso sp = new Subprocesso();
             sp.setCodigo(100L);
@@ -385,8 +394,8 @@ class ProcessoServiceTest {
             sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
             // Filho não tem subprocesso para cobrir branch sp != null
 
-            when(subprocessoService.listarEntidadesPorProcessoComUnidade(codProcesso)).thenReturn(List.of(sp));
-            when(subprocessoService.obterLocalizacaoAtual(sp)).thenReturn(uPai);
+            when(consultaService.listarEntidadesPorProcessoComUnidade(codProcesso)).thenReturn(List.of(sp));
+            when(consultaService.obterLocalizacaoAtual(sp)).thenReturn(uPai);
 
             ProcessoDetalheDto result = processoService.obterDetalhesCompleto(codProcesso, usuario, false);
 
@@ -421,7 +430,7 @@ class ProcessoServiceTest {
             sVal.setCodigo(20L);
             sVal.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
 
-            when(subprocessoService.listarEntidadesPorProcessoEUnidades(eq(1L), anyList()))
+            when(consultaService.listarEntidadesPorProcessoEUnidades(eq(1L), anyList()))
                     .thenReturn(List.of(sCad, sVal));
 
             // Teste ACEITAR
@@ -458,6 +467,23 @@ class ProcessoServiceTest {
             assertThat(resultado).isNotNull();
             assertThat(resultado.getDescricao()).isEqualTo("Teste");
             verify(processoRepo).saveAndFlush(any());
+        }
+
+        @Test
+        @DisplayName("Deve falhar ao criar processo com unidade sem responsável efetivo")
+        void deveFalharCriacaoSemResponsavelEfetivo() {
+            CriarProcessoRequest req = new CriarProcessoRequest(
+                    "Teste", TipoProcesso.MAPEAMENTO, LocalDateTime.now(), List.of(1L));
+            Unidade unidade = new Unidade();
+            unidade.setCodigo(1L);
+            unidade.setSigla("U1");
+            unidade.setSituacao(SituacaoUnidade.ATIVA);
+            when(unidadeService.buscarPorCodigo(1L)).thenReturn(unidade);
+            when(responsavelUnidadeService.todasPossuemResponsavelEfetivo(List.of(1L))).thenReturn(false);
+
+            assertThatThrownBy(() -> processoService.criar(req))
+                    .isInstanceOf(ErroValidacao.class)
+                    .hasMessageContaining(Mensagens.OPERACAO_NAO_PERMITIDA);
         }
     }
 
@@ -551,7 +577,7 @@ class ProcessoServiceTest {
             u.setCodigo(1L);
             gestor.setUnidadeAtivaCodigo(1L);
             when(usuarioService.usuarioAutenticado()).thenReturn(gestor);
-            when(unidadeService.todasComHierarquia()).thenReturn(List.of(u));
+            when(unidadeService.buscarTodasComHierarquia()).thenReturn(List.of(u));
 
             Processo p = new Processo();
             when(processoRepo.listarPorSituacaoEUnidadeCodigos(eq(SituacaoProcesso.EM_ANDAMENTO), anyList())).thenReturn(List.of(p));
@@ -643,7 +669,7 @@ class ProcessoServiceTest {
                 Subprocesso sp1 = Subprocesso.builder().codigo(1001L).unidade(Unidade.builder().codigo(1L).build()).build();
                 Subprocesso sp2 = Subprocesso.builder().codigo(1002L).unidade(Unidade.builder().codigo(2L).build()).build();
                 Subprocesso sp3 = Subprocesso.builder().codigo(1003L).unidade(Unidade.builder().codigo(3L).build()).build();
-                when(subprocessoService.listarEntidadesPorProcessoEUnidades(100L, List.of(1L, 2L, 3L))).thenReturn(List.of(sp1, sp2, sp3));
+                when(consultaService.listarEntidadesPorProcessoEUnidades(100L, List.of(1L, 2L, 3L))).thenReturn(List.of(sp1, sp2, sp3));
                 doReturn(true).when(permissionEvaluator).verificarPermissao(eq(usuario), any(), eq(DISPONIBILIZAR_MAPA));
 
                 processoService.executarAcaoEmBloco(100L, req);
@@ -683,7 +709,7 @@ class ProcessoServiceTest {
                         .situacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO)
                         .build();
 
-                when(subprocessoService.listarEntidadesPorProcessoEUnidades(100L, List.of(10L, 20L))).thenReturn(List.of(sp1, sp2));
+                when(consultaService.listarEntidadesPorProcessoEUnidades(100L, List.of(10L, 20L))).thenReturn(List.of(sp1, sp2));
 
                 AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(
                         List.of(10L, 20L),
@@ -709,7 +735,7 @@ class ProcessoServiceTest {
                         .situacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO)
                         .build();
 
-                when(subprocessoService.listarEntidadesPorProcessoEUnidades(100L, List.of(10L))).thenReturn(List.of(sp1));
+                when(consultaService.listarEntidadesPorProcessoEUnidades(100L, List.of(10L))).thenReturn(List.of(sp1));
 
                 AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(
                         List.of(10L),
@@ -739,7 +765,7 @@ class ProcessoServiceTest {
                         .situacao(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA)
                         .build();
 
-                when(subprocessoService.listarEntidadesPorProcessoEUnidades(100L, List.of(10L))).thenReturn(List.of(sp1));
+                when(consultaService.listarEntidadesPorProcessoEUnidades(100L, List.of(10L))).thenReturn(List.of(sp1));
 
                 AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(
                         List.of(10L),
@@ -765,7 +791,7 @@ class ProcessoServiceTest {
                         .situacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO)
                         .build();
 
-                when(subprocessoService.listarEntidadesPorProcessoEUnidades(100L, List.of(10L))).thenReturn(List.of(sp1));
+                when(consultaService.listarEntidadesPorProcessoEUnidades(100L, List.of(10L))).thenReturn(List.of(sp1));
 
                 AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(
                         List.of(10L),
@@ -803,8 +829,8 @@ class ProcessoServiceTest {
             p.adicionarParticipantes(Set.of(uni));
 
             when(repo.buscar(Processo.class, id)).thenReturn(p);
-            when(unidadeService.porCodigos(anyList())).thenReturn(List.of(uni));
-            when(unidadeService.verificarMapaVigente(1L)).thenReturn(true);
+            when(unidadeService.buscarPorCodigos(anyList())).thenReturn(List.of(uni));
+            when(unidadeService.temMapaVigente(1L)).thenReturn(true);
             
             UnidadeMapa um = new UnidadeMapa();
             um.setUnidadeCodigo(1L);
@@ -848,8 +874,8 @@ class ProcessoServiceTest {
             sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
             sp.setMapa(null); // Explicitly null
             
-            when(subprocessoService.listarEntidadesPorProcessoComUnidade(codProcesso)).thenReturn(List.of(sp));
-            when(subprocessoService.obterLocalizacaoAtual(sp)).thenReturn(u);
+            when(consultaService.listarEntidadesPorProcessoComUnidade(codProcesso)).thenReturn(List.of(sp));
+            when(consultaService.obterLocalizacaoAtual(sp)).thenReturn(u);
 
             ProcessoDetalheDto result = processoService.obterDetalhesCompleto(codProcesso, usuario, false);
 
@@ -884,8 +910,8 @@ class ProcessoServiceTest {
             mapa.setCodigo(500L);
             sp.setMapa(mapa);
             
-            when(subprocessoService.listarEntidadesPorProcessoComUnidade(codProcesso)).thenReturn(List.of(sp));
-            when(subprocessoService.obterLocalizacaoAtual(sp)).thenReturn(u);
+            when(consultaService.listarEntidadesPorProcessoComUnidade(codProcesso)).thenReturn(List.of(sp));
+            when(consultaService.obterLocalizacaoAtual(sp)).thenReturn(u);
 
             ProcessoDetalheDto result = processoService.obterDetalhesCompleto(codProcesso, usuario, false);
 
@@ -915,9 +941,9 @@ class ProcessoServiceTest {
             sp.setUnidade(new Unidade());
             sp.setSituacao(situacao);
 
-            lenient().when(subprocessoService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp));
+            lenient().when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp));
             lenient().when(permissionEvaluator.verificarPermissao(any(), any(), any())).thenReturn(true);
-            lenient().when(subprocessoService.obterLocalizacaoAtual(any())).thenReturn(new Unidade());
+            lenient().when(consultaService.obterLocalizacaoAtual(any())).thenReturn(new Unidade());
 
             List<SubprocessoElegivelDto> result = processoService.listarSubprocessosElegiveis(codProcesso);
             assertThat(result).hasSize(1);
@@ -936,10 +962,10 @@ class ProcessoServiceTest {
             sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES);
             sp.setUnidade(new Unidade());
 
-            lenient().when(subprocessoService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp));
+            lenient().when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp));
             lenient().when(permissionEvaluator.verificarPermissao(usuario, sp, ACEITAR_MAPA)).thenReturn(false);
             lenient().when(permissionEvaluator.verificarPermissao(usuario, sp, HOMOLOGAR_MAPA)).thenReturn(true);
-            lenient().when(subprocessoService.obterLocalizacaoAtual(any())).thenReturn(new Unidade());
+            lenient().when(consultaService.obterLocalizacaoAtual(any())).thenReturn(new Unidade());
 
             List<SubprocessoElegivelDto> result = processoService.listarSubprocessosElegiveis(codProcesso);
             assertThat(result).hasSize(1);

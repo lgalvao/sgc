@@ -37,7 +37,7 @@ class UnidadeServiceTest {
     @DisplayName("buscarPorCodigo - Sucesso")
     void buscarPorCodigo() {
         Unidade u = new Unidade();
-        when(unidadeRepo.findByCodigoComResponsavel(1L)).thenReturn(Optional.of(u));
+        when(unidadeRepo.buscarPorCodigoComResponsavel(1L)).thenReturn(Optional.of(u));
 
         Unidade result = service.buscarPorCodigo(1L);
 
@@ -48,7 +48,7 @@ class UnidadeServiceTest {
     @DisplayName("buscarPorSigla - Sucesso")
     void buscarPorSigla() {
         Unidade u = new Unidade();
-        when(unidadeRepo.findBySiglaComResponsavel("U1")).thenReturn(Optional.of(u));
+        when(unidadeRepo.buscarPorSiglaComResponsavel("U1")).thenReturn(Optional.of(u));
 
         Unidade result = service.buscarPorSigla("U1");
 
@@ -57,22 +57,22 @@ class UnidadeServiceTest {
 
     @Test
     @DisplayName("buscarEntidadesPorIds - Sucesso")
-    void porCodigos() {
+    void buscarPorCodigos() {
         List<Unidade> lista = List.of(new Unidade());
         when(unidadeRepo.findAllById(any())).thenReturn(lista);
 
-        List<Unidade> result = service.porCodigos(List.of(1L));
+        List<Unidade> result = service.buscarPorCodigos(List.of(1L));
 
         assertThat(result).hasSize(1);
     }
 
     @Test
     @DisplayName("buscarTodasEntidadesComHierarquia - Sucesso")
-    void todasComHierarquia() {
+    void buscarTodasComHierarquia() {
         List<Unidade> lista = List.of(new Unidade());
-        when(unidadeRepo.findAllWithHierarquia()).thenReturn(lista);
+        when(unidadeRepo.listarTodasComHierarquia()).thenReturn(lista);
 
-        List<Unidade> result = service.todasComHierarquia();
+        List<Unidade> result = service.buscarTodasComHierarquia();
 
         assertThat(result).hasSize(1);
     }
@@ -81,7 +81,7 @@ class UnidadeServiceTest {
     @DisplayName("buscarSiglasPorCodigos - Sucesso")
     void buscarSiglasPorCodigos() {
         List<String> lista = List.of("U1");
-        when(unidadeRepo.findSiglasByCodigos(any())).thenReturn(lista);
+        when(unidadeRepo.buscarSiglasPorCodigos(any())).thenReturn(lista);
 
         List<String> result = service.buscarSiglasPorCodigos(List.of(1L));
 
@@ -90,22 +90,22 @@ class UnidadeServiceTest {
 
     @Test
     @DisplayName("verificarMapaVigente - Sucesso")
-    void verificarMapaVigente() {
-        when(unidadeMapaRepo.existsByUnidadeCodigo(1L)).thenReturn(true);
-        assertThat(service.verificarMapaVigente(1L)).isTrue();
+    void temMapaVigente() {
+        when(unidadeMapaRepo.existsById(1L)).thenReturn(true);
+        assertThat(service.temMapaVigente(1L)).isTrue();
     }
 
     @Test
     @DisplayName("buscarTodosCodigosUnidadesComMapa - Sucesso")
     void buscarTodosCodigosUnidadesComMapa() {
-        when(unidadeMapaRepo.findAllUnidadeCodigos()).thenReturn(List.of(1L, 2L));
+        when(unidadeMapaRepo.listarTodosCodigosUnidade()).thenReturn(List.of(1L, 2L));
         assertThat(service.buscarTodosCodigosUnidadesComMapa()).hasSize(2);
     }
 
     @Test
     @DisplayName("buscarReferenciaMapaVigente - Retorna vazio quando unidade não tem mapa vigente")
     void buscarReferenciaMapaVigente_semMapaVigente() {
-        when(unidadeMapaRepo.findByUnidadeCodigo(1L)).thenReturn(Optional.empty());
+        when(unidadeMapaRepo.findById(1L)).thenReturn(Optional.empty());
 
         Optional<MapaVigenteReferenciaDto> resultado = service.buscarReferenciaMapaVigente(1L);
 
@@ -117,7 +117,7 @@ class UnidadeServiceTest {
     void buscarReferenciaMapaVigente_mapaSemSubprocesso() {
         UnidadeMapa unidadeMapa = new UnidadeMapa();
         unidadeMapa.setMapaVigente(new Mapa());
-        when(unidadeMapaRepo.findByUnidadeCodigo(1L)).thenReturn(Optional.of(unidadeMapa));
+        when(unidadeMapaRepo.findById(1L)).thenReturn(Optional.of(unidadeMapa));
 
         Optional<MapaVigenteReferenciaDto> resultado = service.buscarReferenciaMapaVigente(1L);
 
@@ -140,7 +140,7 @@ class UnidadeServiceTest {
         UnidadeMapa unidadeMapa = new UnidadeMapa();
         unidadeMapa.setMapaVigente(mapa);
 
-        when(unidadeMapaRepo.findByUnidadeCodigo(1L)).thenReturn(Optional.of(unidadeMapa));
+        when(unidadeMapaRepo.findById(1L)).thenReturn(Optional.of(unidadeMapa));
 
         Optional<MapaVigenteReferenciaDto> resultado = service.buscarReferenciaMapaVigente(1L);
 
@@ -154,7 +154,7 @@ class UnidadeServiceTest {
     @Test
     @DisplayName("definirMapaVigente - Criar novo")
     void definirMapaVigente_Novo() {
-        when(unidadeMapaRepo.findByUnidadeCodigo(1L)).thenReturn(Optional.empty());
+        when(unidadeMapaRepo.findById(1L)).thenReturn(Optional.empty());
         Mapa mapa = new Mapa();
 
         service.definirMapaVigente(1L, mapa);
@@ -166,7 +166,7 @@ class UnidadeServiceTest {
     @DisplayName("definirMapaVigente - Atualizar existente")
     void definirMapaVigente_Existente() {
         UnidadeMapa existente = new UnidadeMapa();
-        when(unidadeMapaRepo.findByUnidadeCodigo(1L)).thenReturn(Optional.of(existente));
+        when(unidadeMapaRepo.findById(1L)).thenReturn(Optional.of(existente));
         Mapa mapa = new Mapa();
 
         service.definirMapaVigente(1L, mapa);

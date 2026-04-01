@@ -3,6 +3,7 @@ package sgc.integracao;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.*;
 import org.springframework.transaction.annotation.*;
 import sgc.alerta.model.*;
 import sgc.fixture.*;
@@ -26,6 +27,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 @DisplayName("CDU-04: Iniciar processo de mapeamento")
 class CDU04IntegrationTest extends BaseIntegrationTest {
+    private static final String SQL_INSERIR_RESPONSABILIDADE = """
+            INSERT INTO SGC.VW_RESPONSABILIDADE (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio)
+            VALUES (?, ?, ?, ?, ?)
+            """;
+
     @Autowired
     private AlertaRepo alertaRepo;
 
@@ -37,6 +43,9 @@ class CDU04IntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private UsuarioPerfilRepo usuarioPerfilRepo;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     private Unidade unidadeLivre;
 
@@ -71,6 +80,13 @@ class CDU04IntegrationTest extends BaseIntegrationTest {
                 .perfil(Perfil.CHEFE)
                 .build();
         usuarioPerfilRepo.save(perfilChefe);
+
+        jdbcTemplate.update(SQL_INSERIR_RESPONSABILIDADE,
+                unidadeLivre.getCodigo(),
+                titular.getTituloEleitoral(),
+                titular.getMatricula(),
+                "TITULAR",
+                LocalDateTime.now());
     }
 
     @Test
@@ -104,7 +120,7 @@ class CDU04IntegrationTest extends BaseIntegrationTest {
         Processo processo = processoRepo.findById(codProcesso).orElseThrow();
         assertThat(processo.getSituacao()).isEqualTo(SituacaoProcesso.EM_ANDAMENTO);
 
-        List<Subprocesso> subprocessos = subprocessoRepo.findByProcessoCodigoComUnidade(codProcesso);
+        List<Subprocesso> subprocessos = subprocessoRepo.listarPorProcessoComUnidade(codProcesso);
         assertThat(subprocessos).hasSize(1);
 
         // Verificar subprocesso da unidade livre

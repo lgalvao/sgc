@@ -43,11 +43,11 @@ public class MapaManutencaoService {
     }
 
     public List<Atividade> atividadesMapaCodigoSemRels(Long mapaCodigo) {
-        return atividadeRepo.findByMapaCodigoSemFetch(mapaCodigo);
+        return atividadeRepo.listarPorMapaSemRelacionamentos(mapaCodigo);
     }
 
     public List<Atividade> atividadesMapaCodigoComConhecimentos(Long mapaCodigo) {
-        return atividadeRepo.findWithConhecimentosByMapa_Codigo(mapaCodigo);
+        return atividadeRepo.listarPorMapaComConhecimentos(mapaCodigo);
     }
 
     public Competencia competenciaCodigo(Long codCompetencia) {
@@ -59,11 +59,11 @@ public class MapaManutencaoService {
     }
 
     public List<Competencia> competenciasCodMapaSemRels(Long codMapa) {
-        return competenciaRepo.findByMapaCodigoSemFetch(codMapa);
+        return competenciaRepo.listarPorMapaSemRelacionamentos(codMapa);
     }
 
     public Map<Long, Set<Long>> codigosAssociacoesCompetenciaAtividade(Long codMapa) {
-        List<Object[]> rows = competenciaRepo.findCompetenciaAndAtividadeIdsByMapaCodigo(codMapa);
+        List<Object[]> rows = competenciaRepo.listarCodigosCompetenciaEAtividadePorMapa(codMapa);
         Map<Long, Set<Long>> result = new HashMap<>();
 
         for (Object[] row : rows) {
@@ -81,7 +81,7 @@ public class MapaManutencaoService {
     }
 
     public List<Conhecimento> conhecimentosCodMapa(Long codMapa) {
-        return conhecimentoRepo.findByMapaCodigo(codMapa);
+        return conhecimentoRepo.listarPorMapa(codMapa);
     }
 
     public List<Competencia> competenciasCodigos(List<Long> codigos) {
@@ -339,7 +339,7 @@ public class MapaManutencaoService {
     }
 
     private void validarDescricaoAtividadeUnica(Long codMapa, String desc) {
-        boolean existe = atividadeRepo.findByMapaCodigoSemFetch(codMapa).stream()
+        boolean existe = atividadeRepo.listarPorMapaSemRelacionamentos(codMapa).stream()
                 .anyMatch(a -> a.getDescricao().equalsIgnoreCase(desc));
 
         if (existe) throw new ErroValidacao(Mensagens.DESCRICAO_ATIVIDADE_DUPLICADA);

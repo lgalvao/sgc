@@ -23,7 +23,7 @@ import static org.assertj.core.api.Assertions.*;
 class SubprocessoServiceMethodsIntegrationTest extends BaseIntegrationTest {
 
     @Autowired
-    private SubprocessoService subprocessoService;
+    private SubprocessoConsultaService consultaService;
 
     @Autowired
     private MapaRepo mapaRepo;
@@ -64,7 +64,7 @@ class SubprocessoServiceMethodsIntegrationTest extends BaseIntegrationTest {
     @Test
     @DisplayName("buscarSubprocessoComMapa: deve buscar com sucesso")
     void buscarSubprocessoComMapa_Sucesso() {
-        Subprocesso result = subprocessoService.buscarSubprocessoComMapa(subprocesso.getCodigo());
+        Subprocesso result = consultaService.buscarSubprocessoComMapa(subprocesso.getCodigo());
         assertThat(result).isNotNull();
         assertThat(result.getCodigo()).isEqualTo(subprocesso.getCodigo());
     }
@@ -72,7 +72,7 @@ class SubprocessoServiceMethodsIntegrationTest extends BaseIntegrationTest {
     @Test
     @DisplayName("obterStatus: deve retornar situacao correta")
     void obterStatus_Sucesso() {
-        SubprocessoSituacaoDto result = subprocessoService.obterStatus(subprocesso.getCodigo());
+        SubprocessoSituacaoDto result = consultaService.obterStatus(subprocesso.getCodigo());
         assertThat(result).isNotNull();
         assertThat(result.codigo()).isEqualTo(subprocesso.getCodigo());
         assertThat(result.situacao()).isEqualTo(SituacaoSubprocesso.NAO_INICIADO);
@@ -81,7 +81,7 @@ class SubprocessoServiceMethodsIntegrationTest extends BaseIntegrationTest {
     @Test
     @DisplayName("obterEntidadePorCodigoMapa: deve retornar subprocesso")
     void obterEntidadePorCodigoMapa_Sucesso() {
-        Subprocesso result = subprocessoService.obterEntidadePorCodigoMapa(subprocesso.getMapa().getCodigo());
+        Subprocesso result = consultaService.obterEntidadePorCodigoMapa(subprocesso.getMapa().getCodigo());
         assertThat(result).isNotNull();
         assertThat(result.getCodigo()).isEqualTo(subprocesso.getCodigo());
     }
@@ -89,7 +89,7 @@ class SubprocessoServiceMethodsIntegrationTest extends BaseIntegrationTest {
     @Test
     @DisplayName("obterEntidadePorCodigoMapa: deve lancar erro se nao encontrar")
     void obterEntidadePorCodigoMapa_NaoEncontrado() {
-        assertThatThrownBy(() -> subprocessoService.obterEntidadePorCodigoMapa(999L))
+        assertThatThrownBy(() -> consultaService.obterEntidadePorCodigoMapa(999L))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 
@@ -99,14 +99,14 @@ class SubprocessoServiceMethodsIntegrationTest extends BaseIntegrationTest {
         subprocesso.getMapa().setSugestoes("Sugestão de integração");
         mapaRepo.saveAndFlush(subprocesso.getMapa());
 
-        Map<String, Object> result = subprocessoService.obterSugestoes(subprocesso.getCodigo());
+        Map<String, Object> result = consultaService.obterSugestoes(subprocesso.getCodigo());
         assertThat(result).containsEntry("sugestoes", "Sugestão de integração");
     }
 
     @Test
     @DisplayName("listarEntidadesPorProcesso: deve listar por processo")
     void listarEntidadesPorProcesso() {
-        List<Subprocesso> list = subprocessoService.listarEntidadesPorProcesso(processo.getCodigo());
+        List<Subprocesso> list = consultaService.listarEntidadesPorProcesso(processo.getCodigo());
         assertThat(list).hasSize(1);
         assertThat(list.getFirst().getCodigo()).isEqualTo(subprocesso.getCodigo());
     }
