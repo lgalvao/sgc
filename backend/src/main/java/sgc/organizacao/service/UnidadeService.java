@@ -58,9 +58,8 @@ public class UnidadeService {
     }
 
     public Optional<MapaVigenteReferenciaDto> buscarReferenciaMapaVigente(Long codigoUnidade) {
-        return unidadeMapaRepo.findById(codigoUnidade)
+        return buscarRegistroMapaVigente(codigoUnidade)
                 .map(UnidadeMapa::getMapaVigente)
-                .filter(obj -> true)
                 .map(Mapa::getSubprocesso)
                 .map(subprocesso -> new MapaVigenteReferenciaDto(
                         subprocesso.getProcesso().getCodigo(),
@@ -78,10 +77,14 @@ public class UnidadeService {
 
     @Transactional
     public void definirMapaVigente(Long codigoUnidade, Mapa mapa) {
-        UnidadeMapa unidadeMapa = unidadeMapaRepo.findById(codigoUnidade).orElse(new UnidadeMapa());
+        UnidadeMapa unidadeMapa = buscarRegistroMapaVigente(codigoUnidade).orElse(new UnidadeMapa());
         unidadeMapa.setUnidadeCodigo(codigoUnidade);
         unidadeMapa.setMapaVigente(mapa);
 
         unidadeMapaRepo.save(unidadeMapa);
+    }
+
+    private Optional<UnidadeMapa> buscarRegistroMapaVigente(Long codigoUnidade) {
+        return unidadeMapaRepo.findById(codigoUnidade);
     }
 }

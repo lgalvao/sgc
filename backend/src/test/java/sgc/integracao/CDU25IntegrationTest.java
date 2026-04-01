@@ -32,6 +32,9 @@ class CDU25IntegrationTest extends BaseIntegrationTest {
     private AnaliseRepo analiseRepo;
 
     @Autowired
+    private UsuarioRepo usuarioRepo;
+
+    @Autowired
     private EntityManager entityManager;
 
     private Subprocesso subprocesso1;

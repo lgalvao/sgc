@@ -96,7 +96,12 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
         await expect(page.getByText(TEXTOS.sucesso.MAPAS_ACEITOS_EM_BLOCO)).toBeVisible();
 
         await fazerLogout(page);
-        await loginComPerfil(page, USUARIOS.CHEFE_SECRETARIA_2.titulo, USUARIOS.CHEFE_SECRETARIA_2.senha, 'GESTOR - SECRETARIA_2');
+        await loginComPerfil(
+            page,
+            USUARIOS.GESTOR_SECRETARIA_2.titulo,
+            USUARIOS.GESTOR_SECRETARIA_2.senha,
+            USUARIOS.GESTOR_SECRETARIA_2.perfil!
+        );
         await page.goto(`/processo/${processoIsolado.codigo}`);
         await navegarParaSubprocesso(page, UNIDADE_1);
 
@@ -111,7 +116,7 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
 
         const tabelaAlertas = page.getByTestId('tbl-alertas');
         const linhaAlerta = tabelaAlertas.locator('tr', {
-            hasText: /Validação do mapa de competências da unidade SECAO_211 submetida para análise/i
+            hasText: /Validação do mapa da unidade SECAO_211 submetida para análise/i
         }).first();
         await expect(linhaAlerta).toBeVisible();
         await expect(linhaAlerta).toContainText(/SECAO_211/i);
