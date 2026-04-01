@@ -143,9 +143,9 @@ class CDU25IntegrationTest extends BaseIntegrationTest {
     @Test
     @DisplayName("Gestor da secretaria superior deve visualizar alerta no painel após aceite de validação")
     void gestorSecretariaSuperiorDeveVisualizarAlertaNoPainel() throws Exception {
-        Unidade secao211 = unidadeRepo.findById(15L).orElseThrow();
-        Unidade coord21 = unidadeRepo.findById(14L).orElseThrow();
-        Unidade secretaria2 = unidadeRepo.findById(11L).orElseThrow();
+        Unidade secaoDesenvolvimento = unidadeRepo.findById(8L).orElseThrow();
+        Unidade coordenadoriaSistemas = unidadeRepo.findById(6L).orElseThrow();
+        Unidade secretariaInformatica = unidadeRepo.findById(2L).orElseThrow();
 
         Processo processoPainel = ProcessoFixture.processoPadrao();
         processoPainel.setCodigo(null);
@@ -154,38 +154,38 @@ class CDU25IntegrationTest extends BaseIntegrationTest {
         processoPainel.setDescricao("Processo painel CDU-25");
         processoPainel = processoRepo.saveAndFlush(processoPainel);
 
-        Subprocesso subprocessoPainel = SubprocessoFixture.subprocessoPadrao(processoPainel, secao211);
+        Subprocesso subprocessoPainel = SubprocessoFixture.subprocessoPadrao(processoPainel, secaoDesenvolvimento);
         subprocessoPainel.setCodigo(null);
         subprocessoPainel.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
         subprocessoPainel = subprocessoRepo.saveAndFlush(subprocessoPainel);
 
         Movimentacao movimentacaoInicial = Movimentacao.builder()
                 .subprocesso(subprocessoPainel)
-                .unidadeOrigem(secao211)
-                .unidadeDestino(coord21)
+                .unidadeOrigem(secaoDesenvolvimento)
+                .unidadeDestino(coordenadoriaSistemas)
                 .descricao("Mapa validado")
                 .dataHora(LocalDateTime.now())
                 .build();
         movimentacaoRepo.saveAndFlush(movimentacaoInicial);
 
-        Usuario usuarioCoord21 = usuarioRepo.findById("999999").orElseThrow();
-        usuarioCoord21.setPerfilAtivo(Perfil.GESTOR);
-        usuarioCoord21.setUnidadeAtivaCodigo(coord21.getCodigo());
-        usuarioCoord21.setAuthorities(Set.of(new SimpleGrantedAuthority("ROLE_GESTOR")));
+        Usuario usuarioCoordenadoria = usuarioRepo.findById("666666666666").orElseThrow();
+        usuarioCoordenadoria.setPerfilAtivo(Perfil.GESTOR);
+        usuarioCoordenadoria.setUnidadeAtivaCodigo(coordenadoriaSistemas.getCodigo());
+        usuarioCoordenadoria.setAuthorities(Set.of(new SimpleGrantedAuthority("ROLE_GESTOR")));
 
         mockMvc.perform(post("/api/subprocessos/{codigo}/aceitar-validacao", subprocessoPainel.getCodigo())
-                        .with(user(usuarioCoord21))
+                        .with(user(usuarioCoordenadoria))
                         .with(csrf()))
                 .andExpect(status().isOk());
 
-        Usuario usuarioSecretaria2 = usuarioRepo.findById("212121").orElseThrow();
-        usuarioSecretaria2.setPerfilAtivo(Perfil.GESTOR);
-        usuarioSecretaria2.setUnidadeAtivaCodigo(secretaria2.getCodigo());
-        usuarioSecretaria2.setAuthorities(Set.of(new SimpleGrantedAuthority("ROLE_GESTOR")));
+        Usuario usuarioSecretaria = usuarioRepo.findById("999999999999").orElseThrow();
+        usuarioSecretaria.setPerfilAtivo(Perfil.GESTOR);
+        usuarioSecretaria.setUnidadeAtivaCodigo(secretariaInformatica.getCodigo());
+        usuarioSecretaria.setAuthorities(Set.of(new SimpleGrantedAuthority("ROLE_GESTOR")));
 
         mockMvc.perform(get("/api/painel/alertas")
-                        .with(user(usuarioSecretaria2)))
+                        .with(user(usuarioSecretaria)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content[?(@.descricao =~ /.*SECAO_211.*/)]").exists());
+                .andExpect(jsonPath("$.content[?(@.descricao =~ /.*SEDESENV.*/)]").exists());
     }
 }
