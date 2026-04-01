@@ -164,6 +164,14 @@ public class SubprocessoController {
         return ResponseEntity.ok(new MensagemResponse("Cadastro de atividades disponibilizado"));
     }
 
+    @PostMapping("/{codSubprocesso}/iniciar-revisao-cadastro")
+    @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'EDITAR_CADASTRO')")
+    @Operation(summary = "Inicia a revisão do cadastro de atividades (transiciona de NAO_INICIADO para REVISAO_CADASTRO_EM_ANDAMENTO)")
+    public ResponseEntity<MensagemResponse> iniciarRevisaoCadastro(@PathVariable Long codSubprocesso) {
+        transicaoService.iniciarRevisaoCadastro(codSubprocesso);
+        return ResponseEntity.ok(new MensagemResponse("Revisão do cadastro iniciada"));
+    }
+
     @PostMapping("/{codSubprocesso}/disponibilizar-revisao")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'DISPONIBILIZAR_REVISAO_CADASTRO')")
     @Operation(summary = "Disponibiliza a revisão do cadastro de atividades para análise")

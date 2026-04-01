@@ -154,16 +154,19 @@ public class SubprocessoTransicaoService {
         disponibilizar(sp, MAPEAMENTO_CADASTRO_DISPONIBILIZADO, TipoTransicao.CADASTRO_DISPONIBILIZADO, usuario);
     }
 
+    public void iniciarRevisaoCadastro(Long codSubprocesso) {
+        log.info("Iniciando revisão do cadastro do subprocesso {}", codSubprocesso);
+        Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
+        validacaoService.validarSituacaoPermitida(sp, NAO_INICIADO);
+
+        sp.setSituacao(REVISAO_CADASTRO_EM_ANDAMENTO);
+        subprocessoRepo.save(sp);
+        log.info("Subprocesso {} transicionado para REVISAO_CADASTRO_EM_ANDAMENTO", codSubprocesso);
+    }
+
     public void disponibilizarRevisao(Long codSubprocesso, Usuario usuario) {
         log.info("Disponibilizando revisão do subprocesso {}", codSubprocesso);
         Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
-        validacaoService.validarSituacaoPermitida(sp, NAO_INICIADO, REVISAO_CADASTRO_EM_ANDAMENTO);
-
-        if (sp.getSituacao() == NAO_INICIADO) {
-            sp.setSituacao(REVISAO_CADASTRO_EM_ANDAMENTO);
-            subprocessoRepo.save(sp);
-        }
-
         validacaoService.validarSituacaoPermitida(sp, REVISAO_CADASTRO_EM_ANDAMENTO);
         disponibilizar(sp, REVISAO_CADASTRO_DISPONIBILIZADA, TipoTransicao.REVISAO_CADASTRO_DISPONIBILIZADA, usuario);
     }
@@ -574,34 +577,22 @@ public class SubprocessoTransicaoService {
         Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
         validacaoService.validarSituacaoPermitida(sp, contexto.situacaoDisponibilizada());
 
-        boolean deveHomologar = true;
-        if (isRevisao) {
-            var impactos = impactoMapaService.verificarImpactos(sp, usuario);
-            if (!impactos.temImpactos()) {
-                sp.setSituacao(REVISAO_MAPA_HOMOLOGADO);
-                subprocessoRepo.save(sp);
-                deveHomologar = false;
-            }
-        }
+        Unidade admin = unidadeService.buscarPorSigla(SIGLA_ADMIN);
+        sp.setSituacao(contexto.situacaoHomologada());
 
-        if (deveHomologar) {
-            Unidade admin = unidadeService.buscarPorSigla(SIGLA_ADMIN);
-            sp.setSituacao(contexto.situacaoHomologada());
+        registrarTransicao(RegistrarTransicaoCommand.builder()
+                .sp(sp)
+                .tipo(contexto.transicaoHomologacao())
+                .origem(admin)
+                .destino(admin)
+                .usuario(usuario)
+                .observacoes(observacoes)
+                .build());
 
-            registrarTransicao(RegistrarTransicaoCommand.builder()
-                    .sp(sp)
-                    .tipo(contexto.transicaoHomologacao())
-                    .origem(admin)
-                    .destino(admin)
-                    .usuario(usuario)
-                    .observacoes(observacoes)
-                    .build());
-
-            String descAlerta = isRevisao
-                    ? Mensagens.ALERTA_REVISAO_HOMOLOGADA.formatted(sp.getUnidade().getSigla())
-                    : Mensagens.ALERTA_CADASTRO_HOMOLOGADO.formatted(sp.getUnidade().getSigla());
-            alertaService.criarAlertaTransicao(sp.getProcesso(), descAlerta, admin, sp.getUnidade());
-        }
+        String descAlerta = isRevisao
+                ? Mensagens.ALERTA_REVISAO_HOMOLOGADA.formatted(sp.getUnidade().getSigla())
+                : Mensagens.ALERTA_CADASTRO_HOMOLOGADO.formatted(sp.getUnidade().getSigla());
+        alertaService.criarAlertaTransicao(sp.getProcesso(), descAlerta, admin, sp.getUnidade());
     }
 
     public void reabrirCadastro(Long codigo, String justificativa) {

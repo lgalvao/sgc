@@ -2,6 +2,7 @@ import {expect, test} from './fixtures/complete-fixtures.js';
 import {
     criarProcessoMapaHomologadoFixture,
     criarProcessoMapaValidadoFixture,
+    criarProcessoRevisaoMapaHomologadoFixture,
     validarProcessoFixture
 } from './fixtures/fixtures-processos.js';
 import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
@@ -130,5 +131,54 @@ test.describe.serial('CDU-21 - Processo com mapas não homologados', () => {
 
         // Processo com mapa validado (não homologado): botão Finalizar não deve estar disponível
         await expect(page.getByTestId('btn-processo-finalizar')).toBeHidden();
+    });
+});
+
+test.describe.serial('CDU-21 - Finalizar processo de REVISÃO', () => {
+    const UNIDADE_ALVO = 'SECAO_212';
+
+    const timestamp = Date.now();
+    const descProcessoRevisao = `Revisão CDU-21 ${timestamp}`;
+    let codProcessoRevisao: number;
+
+    test('Setup: Criar processo de revisão com mapa homologado', async ({_resetAutomatico, request}) => {
+        const processo = await criarProcessoRevisaoMapaHomologadoFixture(request, {
+            descricao: descProcessoRevisao,
+            unidade: UNIDADE_ALVO
+        });
+        codProcessoRevisao = processo.codigo;
+        validarProcessoFixture(processo, descProcessoRevisao);
+    });
+
+    test('Cenario 1: ADMIN finaliza processo de revisão com sucesso', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
+        await acessarDetalhesProcesso(page, descProcessoRevisao);
+
+        // Verificar que é processo de revisão
+        await expect(page.getByText(/Revisão/i).first()).toBeVisible();
+        await expect(page.getByTestId('btn-processo-finalizar')).toBeVisible();
+
+        await page.getByTestId('btn-processo-finalizar').click();
+
+        const modal = page.getByRole('dialog');
+        await expect(modal).toBeVisible();
+        await expect(modal.getByText(/Confirma a finalização/i)).toBeVisible();
+
+        await page.getByTestId('btn-finalizar-processo-confirmar').click();
+
+        await verificarPaginaPainel(page);
+        await expect(page.getByText(TEXTOS.sucesso.PROCESSO_FINALIZADO)).toBeVisible();
+    });
+
+    test('Cenario 2: Verificar ausência de botões em processo de revisão finalizado', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
+        await page.goto(`/processo/${codProcessoRevisao}`);
+        await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
+
+        await expect(page.getByText(/Situação:\s*Finalizado/i)).toBeVisible();
+
+        await expect(page.getByTestId('btn-processo-finalizar')).toBeHidden();
+
+        await navegarParaSubprocesso(page, UNIDADE_ALVO);
+        await expect(page.getByTestId('btn-enviar-lembrete')).toBeHidden();
+        await expect(page.getByTestId('btn-reabrir-revisao')).toBeHidden();
     });
 });

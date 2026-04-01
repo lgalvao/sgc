@@ -7,6 +7,7 @@ import {
     disponibilizarRevisaoCadastro as serviceDisponibilizarRevisaoCadastro,
     homologarCadastro as serviceHomologarCadastro,
     homologarRevisaoCadastro as serviceHomologarRevisaoCadastro,
+    iniciarRevisaoCadastro as serviceIniciarRevisaoCadastro,
 } from "@/services/cadastroService";
 import {validarCadastro as serviceValidarCadastro} from "@/services/subprocessoService";
 import {
@@ -54,6 +55,10 @@ export function useFluxoSubprocesso() {
         return executarAcao(() => serviceDisponibilizarRevisaoCadastro(codigoSubprocesso));
     }
 
+    async function iniciarRevisaoCadastro(codigoSubprocesso: number) {
+        return executarAcao(() => serviceIniciarRevisaoCadastro(codigoSubprocesso), codigoSubprocesso, true);
+    }
+
     async function devolverCadastro(codigoSubprocesso: number, req: DevolverCadastroRequest) {
         return executarAcao(() => serviceDevolverCadastro(codigoSubprocesso, req));
     }
@@ -99,6 +104,7 @@ export function useFluxoSubprocesso() {
         validarCadastro,
         disponibilizarCadastro,
         disponibilizarRevisaoCadastro,
+        iniciarRevisaoCadastro,
         devolverCadastro,
         devolverRevisaoCadastro,
         aceitarCadastro,

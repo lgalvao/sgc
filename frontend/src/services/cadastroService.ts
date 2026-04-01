@@ -4,6 +4,10 @@ export async function disponibilizarCadastro(codSubprocesso: number): Promise<vo
     await apiClient.post(`/subprocessos/${codSubprocesso}/cadastro/disponibilizar`);
 }
 
+export async function iniciarRevisaoCadastro(codSubprocesso: number): Promise<void> {
+    await apiClient.post(`/subprocessos/${codSubprocesso}/iniciar-revisao-cadastro`);
+}
+
 export async function disponibilizarRevisaoCadastro(codSubprocesso: number): Promise<void> {
     await apiClient.post(`/subprocessos/${codSubprocesso}/disponibilizar-revisao`);
 }
