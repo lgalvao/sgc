@@ -15,7 +15,8 @@ Este checklist serve como inventário, critério de decisão e guia de execuçã
 - Categoria A aplicada no backend com OpenRewrite.
 - Categoria B executada em `sgc.organizacao.model.UnidadeMapaRepo`.
 - Guardrails automatizados adicionados em `sgc.arquitetura.ArchConsistencyTest`.
-- Restante do checklist continua como guia para proximas rodadas.
+- Ajustes principais da Categoria D executados em `UsuarioService`, `UnidadeService`, `SubprocessoConsultaService` e `MapaManutencaoService`.
+- O restante do checklist permanece como inventario historico e guia para refinamentos opcionais.
 
 ## Regra de decisão
 
@@ -80,6 +81,11 @@ Métodos derivados reais do Spring Data, sem `@Query`, desde que simples e sem d
 ### Categoria D: revisar depois da renomeação dos repositórios
 
 Métodos de `service` que vazam nomes de persistência em vez de linguagem de domínio.
+
+Status atual:
+
+- pontos principais alinhados nas rodadas executadas;
+- itens remanescentes desta categoria devem ser tratados como refinamento de contrato, nao como desvio critico.
 
 ## Inventário da Categoria A
 
