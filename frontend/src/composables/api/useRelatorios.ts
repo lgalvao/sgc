@@ -1,5 +1,17 @@
 import apiClient from '@/axios-setup';
 
+function baixarArquivoPdf(dadosArquivo: BlobPart, nomeArquivo: string) {
+  const urlTemporaria = globalThis.URL.createObjectURL(new Blob([dadosArquivo]));
+  const link = document.createElement('a');
+
+  link.href = urlTemporaria;
+  link.setAttribute('download', nomeArquivo);
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  globalThis.URL.revokeObjectURL(urlTemporaria);
+}
+
 export function useRelatorios() {
   const axios = apiClient;
 
@@ -12,34 +24,17 @@ export function useRelatorios() {
     const response = await axios.get(`/relatorios/andamento/${codProcesso}/exportar`, {
       responseType: 'blob'
     });
-    
-    // Create a download link for the PDF blob
-    const url = globalThis.URL.createObjectURL(new Blob([response.data]));
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', `relatorio-andamento-${codProcesso}.pdf`);
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
+
+    baixarArquivoPdf(response.data, `relatorio-andamento-${codProcesso}.pdf`);
   };
-  
+
   const downloadRelatorioMapasPdf = async (codProcesso: number, unidadeId?: number) => {
-    let urlStr = `/relatorios/mapas/${codProcesso}/exportar`;
-    if (unidadeId) {
-      urlStr += `?unidadeId=${unidadeId}`;
-    }
-    
-    const response = await axios.get(urlStr, {
+    const sufixoUnidade = unidadeId ? `?unidadeId=${unidadeId}` : '';
+    const response = await axios.get(`/relatorios/mapas/${codProcesso}/exportar${sufixoUnidade}`, {
       responseType: 'blob'
     });
-    
-    const url = globalThis.URL.createObjectURL(new Blob([response.data]));
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', `relatorio-mapas-${codProcesso}.pdf`);
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
+
+    baixarArquivoPdf(response.data, `relatorio-mapas-${codProcesso}.pdf`);
   };
 
   return {

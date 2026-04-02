@@ -52,6 +52,7 @@ describe('useRelatorios', () => {
     
     expect(global.URL.createObjectURL).toHaveBeenCalled();
     expect(document.createElement).toHaveBeenCalledWith('a');
+    expect(global.URL.revokeObjectURL).toHaveBeenCalledWith('blob:http://localhost/mock-url');
   });
 
   it('deve fazer o download do relatorio de mapas em pdf sem unidadeId', async () => {

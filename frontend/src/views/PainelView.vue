@@ -118,28 +118,25 @@ async function buscarProcessosPainel(
 }
 
 async function carregarDados() {
-  if (perfil.perfilSelecionado.value && perfilStore.unidadeSelecionada) {
-    const unidadeCodigo = (perfilStore.unidadeSelecionada as any).codigo || perfilStore.unidadeSelecionada;
-    const promises: Promise<any>[] = [
-      buscarProcessosPainel(
-          unidadeCodigo,
-          0,
-          10,
-      ), // Paginação inicial
-    ];
-
-    promises.push(
-        buscarAlertas(
-            unidadeCodigo,
-            0,
-            10,
-            "dataHora",
-            "desc"
-        ), // Paginação inicial ordenada por dataHora DESC
-    );
-
-    await Promise.all(promises);
+  const unidadeCodigo = obterCodigoUnidadeSelecionada();
+  if (!perfil.perfilSelecionado.value || !unidadeCodigo) {
+    return;
   }
+
+  await Promise.all([
+    buscarProcessosPainel(
+      unidadeCodigo,
+      0,
+      10,
+    ),
+    buscarAlertas(
+      unidadeCodigo,
+      0,
+      10,
+      "dataHora",
+      "desc"
+    ),
+  ]);
 }
 
 function exibirToastPendente() {
@@ -176,7 +173,11 @@ function ordenarPor(campo: keyof ProcessoResumo) {
     criterio.value = campo;
     asc.value = true;
   }
-  const unidadeCodigo = (perfilStore.unidadeSelecionada as any)?.codigo || perfilStore.unidadeSelecionada;
+  const unidadeCodigo = obterCodigoUnidadeSelecionada();
+  if (!unidadeCodigo) {
+    return;
+  }
+
   buscarProcessosPainel(
       unidadeCodigo,
       0,
@@ -184,6 +185,20 @@ function ordenarPor(campo: keyof ProcessoResumo) {
       criterio.value,
       asc.value ? "asc" : "desc",
   );
+}
+
+function obterCodigoUnidadeSelecionada() {
+  const unidadeSelecionada = perfilStore.unidadeSelecionada as unknown;
+
+  if (typeof unidadeSelecionada === "number") {
+    return unidadeSelecionada;
+  }
+
+  if (typeof unidadeSelecionada === "object" && unidadeSelecionada !== null && "codigo" in unidadeSelecionada) {
+    return Number(unidadeSelecionada.codigo);
+  }
+
+  return null;
 }
 
 function abrirDetalhesProcesso(processo: ProcessoResumo | undefined) {
