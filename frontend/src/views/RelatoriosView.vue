@@ -185,24 +185,27 @@ async function carregarProcessosDisponiveis() {
 }
 
 const gerarRelatorioAndamento = async () => {
-  if (!processoIdSelecionado.value) return;
+  const codProcesso = processoIdSelecionado.value;
+  if (!codProcesso) return;
   await executarComCarregamento(async () => {
-    relatorioAndamento.value = await obterRelatorioAndamento(processoIdSelecionado.value);
+    relatorioAndamento.value = await obterRelatorioAndamento(codProcesso);
   }, TEXTOS.relatorios.ERRO_BUSCA, gerandoAndamento);
 };
 
 const exportarPdfAndamento = async () => {
-  if (!processoIdSelecionado.value) return;
+  const codProcesso = processoIdSelecionado.value;
+  if (!codProcesso) return;
   await executarComCarregamento(async () => {
-    await downloadRelatorioAndamentoPdf(processoIdSelecionado.value!);
+    await downloadRelatorioAndamentoPdf(codProcesso);
   }, TEXTOS.relatorios.ERRO_EXPORTAR);
 };
 
 const gerarRelatorioMapas = async () => {
-    if (!processoIdSelecionadoMapas.value) return;
+    const codProcesso = processoIdSelecionadoMapas.value;
+    if (!codProcesso) return;
     await executarComCarregamento(async () => {
       await downloadRelatorioMapasPdf(
-        processoIdSelecionadoMapas.value!,
+        codProcesso,
         unidadeIdSelecionadaMapas.value || undefined
       );
     }, TEXTOS.relatorios.ERRO_GERAR, gerandoMapas);
