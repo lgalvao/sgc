@@ -38,5 +38,21 @@ Dado o contexto estrito do SGC (intranet, 5-10 usuários simultâneos), muitas d
     *   **Solução:** Remover `LoadingButton.vue` e usar `<BButton>` nativo diretamente com um `<BSpinner>` na aplicação para manter a árvore de componentes plana e simples. A complexidade do wrapper não compensa seu benefício no contexto de um sistema pequeno.
 
 2.  **Redução de Complexidade em Views:**
-    *   **Problema:** Views muito extensas (ex: `ProcessoDetalheView.vue` e `MapaView.vue`).
-    *   **Solução:** Extrair lógica reativa complexa para composables específicos da view.
+    *   **Problema:** Views muito extensas (ex: `ProcessoDetalheView.vue` e `MapaView.vue`). Essas views possuem muita lógica de UI, verificação de condições e formatação de dados dentro do próprio arquivo Vue.
+    *   **Solução:** Extrair lógica reativa complexa para composables específicos da view, focando apenas na apresentação dentro dos arquivos `.vue`.
+
+## Atualizações com Base na Análise de Código Recente (Março/2025)
+
+As seguintes observações foram confirmadas através da análise recente da base de código:
+
+1.  **Excesso de `Facades` no Backend:**
+    *   O backend possui várias classes Facade como `AtividadeFacade`, `AlertaFacade`, e `UsuarioFacade`.
+    *   Na maioria dos casos, essas classes atuam apenas como repassadoras (*pass-throughs*), delegando a execução para serviços subjacentes, muitas vezes com mínima ou nenhuma lógica de orquestração significativa. Por exemplo, `AlertaFacade` repassa chamadas simples para `AlertaService`.
+    *   Essa fragmentação adiciona complexidade e dificultando o acompanhamento do fluxo de controle. A recomendação de removê-las permanece válida. A lógica pode ser consolidada nos respectivos serviços, e chamadas aos *Services* devem ser feitas diretamente pelos *Controllers*.
+
+2.  **Abstração Excessiva em Testes e Contextos de Segurança:**
+    *   A camada de testes possui abstrações em excesso, como o uso do padrão `Builder` (`UsuarioTestBuilder`, `UnidadeTestBuilder`) que podem ser muito pesados para necessidades simples de teste em um sistema desse escopo.
+    *   Existem várias *Factories* dedicadas à configuração do contexto de segurança (`WithMockGestorSecurityContextFactory`, `WithMockAdminSecurityContextFactory`, `WithMockChefeSecurityContextFactory`). Em um sistema pequeno, o mock do contexto de autenticação deve ser pragmático e mais direto, evitando a explosão do número de fábricas para casos triviais de teste.
+
+3.  **Encapsulamento Frontend Desnecessário (`LoadingButton.vue`):**
+    *   Confirma-se que `LoadingButton.vue` continua presente e é utilizado como um *wrapper* fino adicional sobre componentes nativos. Conforme a recomendação anterior, seu uso adiciona sobrecarga desnecessária na árvore do DOM virtual e deve ser removido em favor do uso direto da biblioteca original, combinada com lógicas simples de `<BSpinner>`.
