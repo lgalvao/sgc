@@ -15,28 +15,29 @@ Dado o contexto estrito do SGC (intranet, 5-10 usuários simultâneos), muitas d
 *   **Wrappers Visuais e Componentes de Pass-through:** Questione a necessidade de componentes Vue que apenas envelopam bibliotecas de UI (como `BButton`) sem adicionar valor semântico ou lógico significativo (e.g., `LoadingButton.vue`). Use os componentes originais sempre que possível para manter a árvore do Vue rasa.
 *   **Devolução de Entidades JPA (Leituras Simples):** DTOs continuam importantes para fronteiras externas de mutação (Criação/Atualização), mas para leituras simples (GET) onde não há risco de exposição de dados ou N+1, o Controller pode retornar a entidade JPA diretamente para evitar mapeamentos (boilerplate) redundantes. Se usar DTOs, prefira Java Records estritos.
 
-## Situação Atual (Backend - Java / Spring Boot)
+## Sugestões de Ação Imediata (Backend - Java / Spring Boot)
 
-1.  **Consolidação de Serviços do Subprocesso:**
-    *   **Problema:** Alta fragmentação e tamanho excessivo nas classes `SubprocessoService` (42KB), `SubprocessoTransicaoService` (33KB), `SubprocessoConsultaService`, etc. A lógica de negócio relacionada a subprocessos está muito dispersa e acoplada.
-    *   **Solução:** Consolidar a lógica coesa em serviços de domínio mais diretos.
-        *   Avaliar a real necessidade de separar `SubprocessoTransicaoService` e `SubprocessoService`. Uma abordagem mais simples reduz a navegação mental.
-    *   **Ação:** Refatorar o pacote `sgc.subprocesso.service` fundindo serviços afins.
+1.  **Remoção de Facades Desnecessárias:**
+    *   **Problema:** Existem diversas Facades que não orquestram múltiplos domínios ou isolam integrações complexas. Pelo contrário, elas atuam quase puramente como repassadoras (pass-through) para os serviços de domínio. Exemplos encontrados no repositório:
+        *   `AlertaFacade` (`backend/src/main/java/sgc/alerta/AlertaFacade.java`)
+        *   `UsuarioFacade` (`backend/src/main/java/sgc/organizacao/UsuarioFacade.java`)
+        *   `AtividadeFacade` (`backend/src/main/java/sgc/mapa/AtividadeFacade.java`)
+        *   `PainelFacade` (`backend/src/main/java/sgc/processo/painel/PainelFacade.java`)
+        *   `LoginFacade` (`backend/src/main/java/sgc/seguranca/LoginFacade.java`)
+        *   `RelatorioFacade` (`backend/src/main/java/sgc/relatorio/RelatorioFacade.java`)
+    *   **Recomendação de Refatoração:**
+        *   Transferir a lógica contida nestas classes diretamente para os Serviços correspondentes (ex: mover métodos de `AlertaFacade` para `AlertaService`).
+        *   Ajustar os Controllers para injetarem e chamarem os Serviços de Domínio ou, em casos de leitura trivial, as próprias interfaces de Repositório (`Spring Data JPA`).
+        *   Deletar as classes Facade do código.
 
-2.  **Acesso Direto ao Repositório (CRUD Simples):**
-    *   **Problema:** Camadas de serviço atuando apenas como repassadoras.
-    *   **Solução:** Permitir que os Controllers (ex: `ProcessoController`, `SubprocessoController`) injetem e utilizem diretamente as interfaces de Repository.
+2.  **Consolidação de Serviços Excessivamente Fragmentados:**
+    *   **Problema:** Observa-se uma hiper-fragmentação na lógica de negócios de subprocessos. Classes como `SubprocessoService` (aprox. 19KB / 42KB em iterações anteriores) e `SubprocessoTransicaoService` (aprox. 32KB / 33KB) ainda dividem a responsabilidade do ciclo de vida das transições. Esse acoplamento força desenvolvedores a saltarem entre múltiplos arquivos para entender o fluxo único do negócio.
+    *   **Recomendação de Refatoração:** Consolidar lógicas coesas. Em sistemas para poucos usuários simultâneos, concentrar operações de ciclo de vida, transição e regras de validação associadas ao `Subprocesso` em um único (ou significativamente menos) domínio coeso é melhor que separar estritamente cada pequena responsabilidade de orquestração em uma injeção de dependência separada.
 
-3.  **Remoção de Facades Desnecessárias:**
-    *   **Problema:** Facades como `AtividadeFacade` (`backend/src/main/java/sgc/mapa/AtividadeFacade.java`), `PainelFacade`, `AlertaFacade`, `RelatorioFacade`, `LoginFacade`, e `UsuarioFacade` adicionam indireção sem abstração significativa. Elas atuam quase unicamente como "pass-through", transferindo chamadas diretamente aos serviços subjacentes sem adicionar valor claro de negócio.
-    *   **Solução:** Mover a lógica da Facade diretamente para os serviços de domínio relevantes. Por exemplo, unificar `LoginFacade` com o serviço de autenticação principal, ou mover operações específicas de `AtividadeFacade` para `MapaManutencaoService`.
+## Sugestões de Ação Imediata (Frontend - Vue.js / TypeScript)
 
-## Situação Atual (Frontend - Vue.js / TypeScript)
-
-1.  **Remoção de Wrappers Visuais Finos:**
-    *   **Problema:** Componentes como `LoadingButton.vue` são wrappers finos sobre `BButton` (`frontend/src/components/comum/LoadingButton.vue`), adicionando sobrecarga na árvore do Vue sem muita justificativa, e com baixa reusabilidade. A mesma lógica é repetida em diversas views.
-    *   **Solução:** Remover `LoadingButton.vue` e usar `<BButton>` nativo diretamente com um `<BSpinner>` na aplicação para manter a árvore de componentes plana e simples. A complexidade do wrapper não compensa seu benefício no contexto de um sistema pequeno.
-
-2.  **Redução de Complexidade em Views:**
-    *   **Problema:** Views muito extensas (ex: `ProcessoDetalheView.vue` e `MapaView.vue`).
-    *   **Solução:** Extrair lógica reativa complexa para composables específicos da view.
+1.  **Remoção de Wrappers Visuais Pass-Through:**
+    *   **Problema:** A existência de componentes como `LoadingButton.vue` (`frontend/src/components/comum/LoadingButton.vue`). Este componente se limita a envelopar o `BButton` (`bootstrap-vue-next`) apenas para repassar propriedades e controlar um `BSpinner`. No contexto de restrição de overengineering, wrappers muito finos acrescentam ruído na árvore do DOM virtual (Vue Devtools) e aumentam o número de arquivos para manter sem agregar abstrações significativas (sem reusabilidade sistêmica de negócio).
+    *   **Recomendação de Refatoração:**
+        *   Remover o arquivo `LoadingButton.vue`.
+        *   Substituir seus usos por `<BButton>` nativo emparelhado com `<BSpinner>` in-line ou diretamente na view onde a reatividade/lógica de carregamento ocorre, achatando a árvore de componentes.
