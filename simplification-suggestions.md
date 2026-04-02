@@ -18,9 +18,9 @@ Dado o contexto estrito do SGC (intranet, 5-10 usuários simultâneos), muitas d
 ## Situação Atual (Backend - Java / Spring Boot)
 
 1.  **Consolidação de Serviços do Subprocesso:**
-    *   **Problema:** Alta fragmentação e tamanho excessivo nas classes `SubprocessoService` (42KB), `SubprocessoTransicaoService` (33KB), `SubprocessoConsultaService`, etc. A lógica de negócio relacionada a subprocessos está muito dispersa e acoplada.
+    *   **Problema:** Alta fragmentação e tamanho excessivo nas classes de serviço em `sgc.subprocesso.service`, como `SubprocessoTransicaoService` (~32KB), `SubprocessoConsultaService` (~21KB), e `SubprocessoService` (~19KB). A lógica de negócio relacionada a subprocessos está muito dispersa e acoplada, exigindo navegação por múltiplos arquivos para entender um único fluxo.
     *   **Solução:** Consolidar a lógica coesa em serviços de domínio mais diretos.
-        *   Avaliar a real necessidade de separar `SubprocessoTransicaoService` e `SubprocessoService`. Uma abordagem mais simples reduz a navegação mental.
+        *   Avaliar a real necessidade de separar `SubprocessoTransicaoService` e `SubprocessoService`. Uma abordagem mais simples reduz a carga cognitiva.
     *   **Ação:** Refatorar o pacote `sgc.subprocesso.service` fundindo serviços afins.
 
 2.  **Acesso Direto ao Repositório (CRUD Simples):**
@@ -34,8 +34,8 @@ Dado o contexto estrito do SGC (intranet, 5-10 usuários simultâneos), muitas d
 ## Situação Atual (Frontend - Vue.js / TypeScript)
 
 1.  **Remoção de Wrappers Visuais Finos:**
-    *   **Problema:** Componentes como `LoadingButton.vue` são wrappers finos sobre `BButton` (`frontend/src/components/comum/LoadingButton.vue`), adicionando sobrecarga na árvore do Vue sem muita justificativa, e com baixa reusabilidade. A mesma lógica é repetida em diversas views.
-    *   **Solução:** Remover `LoadingButton.vue` e usar `<BButton>` nativo diretamente com um `<BSpinner>` na aplicação para manter a árvore de componentes plana e simples. A complexidade do wrapper não compensa seu benefício no contexto de um sistema pequeno.
+    *   **Problema:** Componentes como `LoadingButton.vue` são wrappers finos sobre `BButton` (`frontend/src/components/comum/LoadingButton.vue`), adicionando sobrecarga na árvore do Vue sem muita justificativa, e com baixa reusabilidade. A mesma lógica é repetida em diversas views e componentes (ex: `DisponibilizarMapaModal.vue`, `CadAtividadeForm.vue`, `CadastroView.vue`, `LoginView.vue`, etc).
+    *   **Solução:** Remover `LoadingButton.vue` e usar `<BButton>` nativo diretamente com um `<BSpinner v-if="loading" small />` na aplicação para manter a árvore de componentes plana e simples. A complexidade do wrapper não compensa seu benefício no contexto de um sistema pequeno.
 
 2.  **Redução de Complexidade em Views:**
     *   **Problema:** Views muito extensas (ex: `ProcessoDetalheView.vue` e `MapaView.vue`).
