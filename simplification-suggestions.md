@@ -18,25 +18,28 @@ Dado o contexto estrito do SGC (intranet, 5-10 usuários simultâneos), muitas d
 ## Situação Atual (Backend - Java / Spring Boot)
 
 1.  **Consolidação de Serviços do Subprocesso:**
-    *   **Problema:** Alta fragmentação e tamanho excessivo nas classes `SubprocessoService` (42KB), `SubprocessoTransicaoService` (33KB), `SubprocessoConsultaService`, etc. A lógica de negócio relacionada a subprocessos está muito dispersa e acoplada.
-    *   **Solução:** Consolidar a lógica coesa em serviços de domínio mais diretos.
-        *   Avaliar a real necessidade de separar `SubprocessoTransicaoService` e `SubprocessoService`. Uma abordagem mais simples reduz a navegação mental.
+    *   **Problema:** Alta fragmentação e tamanho excessivo nas classes `SubprocessoService` (~19KB) e `SubprocessoTransicaoService` (~32KB). A lógica de negócio relacionada a subprocessos está muito dispersa e acoplada.
+    *   **Solução:** Consolidar a lógica coesa em serviços de domínio mais diretos. Avaliar a real necessidade de separar `SubprocessoTransicaoService` e `SubprocessoService`. Uma abordagem mais simples reduz a navegação mental.
     *   **Ação:** Refatorar o pacote `sgc.subprocesso.service` fundindo serviços afins.
 
 2.  **Acesso Direto ao Repositório (CRUD Simples):**
     *   **Problema:** Camadas de serviço atuando apenas como repassadoras.
-    *   **Solução:** Permitir que os Controllers (ex: `ProcessoController`, `SubprocessoController`) injetem e utilizem diretamente as interfaces de Repository.
+    *   **Solução:** Permitir que os Controllers (ex: `ProcessoController`, `SubprocessoController`) injetem e utilizem diretamente as interfaces de Repository para casos simples.
 
 3.  **Remoção de Facades Desnecessárias:**
-    *   **Problema:** Facades como `AtividadeFacade` (`backend/src/main/java/sgc/mapa/AtividadeFacade.java`), `PainelFacade`, `AlertaFacade`, `RelatorioFacade`, `LoginFacade`, e `UsuarioFacade` adicionam indireção sem abstração significativa. Elas atuam quase unicamente como "pass-through", transferindo chamadas diretamente aos serviços subjacentes sem adicionar valor claro de negócio.
-    *   **Solução:** Mover a lógica da Facade diretamente para os serviços de domínio relevantes. Por exemplo, unificar `LoginFacade` com o serviço de autenticação principal, ou mover operações específicas de `AtividadeFacade` para `MapaManutencaoService`.
+    *   **Problema:** Facades como `AtividadeFacade`, `PainelFacade`, `AlertaFacade`, `RelatorioFacade`, `LoginFacade`, e `UsuarioFacade` adicionam indireção sem abstração significativa. Elas atuam quase unicamente como "pass-through", transferindo chamadas diretamente aos serviços subjacentes sem adicionar valor claro de negócio.
+    *   **Solução:** Mover a lógica da Facade diretamente para os serviços de domínio relevantes ou Controllers. Por exemplo, unificar `LoginFacade` com o serviço de autenticação principal, ou mover operações específicas de `AtividadeFacade` para `MapaManutencaoService`.
 
 ## Situação Atual (Frontend - Vue.js / TypeScript)
 
 1.  **Remoção de Wrappers Visuais Finos:**
-    *   **Problema:** Componentes como `LoadingButton.vue` são wrappers finos sobre `BButton` (`frontend/src/components/comum/LoadingButton.vue`), adicionando sobrecarga na árvore do Vue sem muita justificativa, e com baixa reusabilidade. A mesma lógica é repetida em diversas views.
-    *   **Solução:** Remover `LoadingButton.vue` e usar `<BButton>` nativo diretamente com um `<BSpinner>` na aplicação para manter a árvore de componentes plana e simples. A complexidade do wrapper não compensa seu benefício no contexto de um sistema pequeno.
+    *   **Problema:** Componentes como `LoadingButton.vue` são wrappers finos sobre `BButton`, adicionando sobrecarga na árvore do Vue sem muita justificativa, e com baixa reusabilidade. A mesma lógica é repetida em diversas views.
+    *   **Solução:** Remover `LoadingButton.vue` e usar `<BButton>` nativo diretamente com um `<BSpinner>` ou a prop `loading` nativa na aplicação para manter a árvore de componentes plana e simples. A complexidade do wrapper não compensa seu benefício no contexto de um sistema pequeno.
 
 2.  **Redução de Complexidade em Views:**
-    *   **Problema:** Views muito extensas (ex: `ProcessoDetalheView.vue` e `MapaView.vue`).
-    *   **Solução:** Extrair lógica reativa complexa para composables específicos da view.
+    *   **Problema:** Views muito extensas (ex: `ProcessoDetalheView.vue` com ~17KB e `MapaView.vue` com ~13KB).
+    *   **Solução:** Extrair lógica reativa complexa para composables específicos da view. Separar os componentes grandes em pedaços menores e mais bem delimitados (ex. `ProcessoDetalheHeader`, `ProcessoDetalheHistorico`, etc.).
+
+3.  **Redução de Pass-Through Pinia:**
+    *   **Problema:** O uso de Pinia para estado que não é globalmente compartilhado apenas cria um pass-through em torno das APIs.
+    *   **Solução:** Migrar lógicas que não exigem reatividade global compartilhada de stores para composables que consomem a API diretamente (já vimos o esforço inicial usando composables em `frontend/src/composables`).
