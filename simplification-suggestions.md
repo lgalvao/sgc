@@ -1,15 +1,15 @@
 # Sugestões de Simplificação Arquitetural - SGC
 
-Este documento contém recomendações para simplificar a arquitetura e reduzir a complexidade e fragmentação no projeto SGC, focando no contexto de um sistema intranet para 5-10 usuários simultâneos, conforme as diretrizes estabelecidas.
+Este documento contém recomendações para simplificar a arquitetura e reduzir a complexidade e fragmentação no projeto SGC, focando no contexto de um sistema intranet para **5-10 usuários simultâneos**, conforme as diretrizes estabelecidas.
 
 ## Diretrizes de Combate ao Overengineering (Sistema Intranet 5-10 Usuários)
 
 Dado o contexto estrito do SGC (intranet, 5-10 usuários simultâneos), muitas diretrizes aplicáveis a sistemas altamente escaláveis e super-modularizados **não se aplicam**. A arquitetura deve privilegiar a simplicidade extrema, a legibilidade direta e a ausência de camadas desnecessárias.
 
-*   **Proibição de Facades e Camadas Pass-Through:** Evite criar `Facades` (como `PainelFacade`, `UsuarioFacade`, ou `AtividadeFacade`). A lógica de negócio deve residir diretamente nos Serviços de domínio. Camadas intermediárias que apenas repassam chamadas aumentam a carga cognitiva e dificultam a manutenção.
+*   **Proibição de Facades e Camadas Pass-Through:** Evite criar `Facades` (como `PainelFacade`, `UsuarioFacade`, ou `AtividadeFacade`). A lógica de negócio deve residir diretamente nos Serviços de domínio. Camadas intermediárias que apenas repassam chamadas aumentam a carga cognitiva e dificultam a manutenção. Exemplo: `AtividadeFacade` atua unicamente como "pass-through", transferindo chamadas diretamente para `MapaManutencaoService` e afins.
 *   **Acesso Direto a Repositórios:** Controllers estão **autorizados e encorajados** a acessar diretamente as interfaces de Repositório (`Spring Data JPA`) para operações CRUD básicas ou leituras triviais. Não crie um Serviço apenas para delegar um `findById` ou `findAll`.
 *   **Rejeição de Arquiteturas Complexas:** Padrões como Onion Architecture, Hexagonal Architecture (Ports and Adapters) e Clean Architecture estrita adicionam abstrações (interfaces, mapeamentos de domínio-para-entidade) que são injustificadas. Utilize o modelo de Entidades JPA diretamente como o modelo de domínio principal.
-*   **Procedural vs Orientação a Objetos Pura:** Para lógicas de negócio diretas, abrace métodos procedurais claros nos Serviços. Evite criar hierarquias complexas de herança, múltiplos Design Patterns (Factories, Builders para objetos simples) ou abstrações genéricas projetadas para casos de uso que não existem.
+*   **Procedural vs Orientação a Objetos Pura:** Para lógicas de negócio diretas, abrace métodos procedurais claros nos Serviços. Evite criar hierarquias complexas de herança, múltiplos Design Patterns (Factories, Builders para objetos simples) ou abstrações genéricas projetadas para casos de uso que não existem. Evite interfaces de implementação única.
 *   **Consolidação de Serviços:** Evite a "explosão de classes". Agrupe lógicas altamente coesas em um mesmo Serviço. Por exemplo, unifique `SubprocessoTransicaoService` e `SubprocessoValidacaoService` para dentro de `SubprocessoService` em vez de fragmentá-los, a menos que o arquivo se torne intragovernável.
 *   **Pinia Stores Essenciais (Frontend):** Reduza o uso de Pinia Stores que atuam apenas como "pass-through" (repassadores) para chamadas de API (`axios`). Utilize Composables simples (e.g., `useProcessos`) ou faça as chamadas diretamente nos componentes/views. O Pinia deve ser reservado para estado genuinamente global e compartilhado.
 *   **Wrappers Visuais e Componentes de Pass-through:** Questione a necessidade de componentes Vue que apenas envelopam bibliotecas de UI (como `BButton`) sem adicionar valor semântico ou lógico significativo (e.g., `LoadingButton.vue`). Use os componentes originais sempre que possível para manter a árvore do Vue rasa.
@@ -21,15 +21,15 @@ Dado o contexto estrito do SGC (intranet, 5-10 usuários simultâneos), muitas d
     *   **Problema:** Alta fragmentação e tamanho excessivo nas classes `SubprocessoService` (42KB), `SubprocessoTransicaoService` (33KB), `SubprocessoConsultaService`, etc. A lógica de negócio relacionada a subprocessos está muito dispersa e acoplada.
     *   **Solução:** Consolidar a lógica coesa em serviços de domínio mais diretos.
         *   Avaliar a real necessidade de separar `SubprocessoTransicaoService` e `SubprocessoService`. Uma abordagem mais simples reduz a navegação mental.
-    *   **Ação:** Refatorar o pacote `sgc.subprocesso.service` fundindo serviços afins.
+    *   **Ação:** Refatorar o pacote `sgc.subprocesso.service` fundindo serviços afins, isolando também consultas de workflow puro.
 
 2.  **Acesso Direto ao Repositório (CRUD Simples):**
     *   **Problema:** Camadas de serviço atuando apenas como repassadoras.
-    *   **Solução:** Permitir que os Controllers (ex: `ProcessoController`, `SubprocessoController`) injetem e utilizem diretamente as interfaces de Repository.
+    *   **Solução:** Permitir que os Controllers (ex: `ProcessoController`, `SubprocessoController`) injetem e utilizem diretamente as interfaces de Repository para consultas simples e paginação direta, eliminando métodos "delegators" inúteis no serviço.
 
 3.  **Remoção de Facades Desnecessárias:**
-    *   **Problema:** Facades como `AtividadeFacade` (`backend/src/main/java/sgc/mapa/AtividadeFacade.java`), `PainelFacade`, `AlertaFacade`, `RelatorioFacade`, `LoginFacade`, e `UsuarioFacade` adicionam indireção sem abstração significativa. Elas atuam quase unicamente como "pass-through", transferindo chamadas diretamente aos serviços subjacentes sem adicionar valor claro de negócio.
-    *   **Solução:** Mover a lógica da Facade diretamente para os serviços de domínio relevantes. Por exemplo, unificar `LoginFacade` com o serviço de autenticação principal, ou mover operações específicas de `AtividadeFacade` para `MapaManutencaoService`.
+    *   **Problema:** Facades como `AtividadeFacade` (`backend/src/main/java/sgc/mapa/AtividadeFacade.java`), `PainelFacade`, `AlertaFacade`, `RelatorioFacade`, `LoginFacade`, e `UsuarioFacade` adicionam indireção sem abstração significativa. Elas atuam quase unicamente como "pass-through", transferindo chamadas diretamente aos serviços subjacentes sem adicionar valor claro de negócio, e aumentando o overhead de injeção e teste.
+    *   **Solução:** Mover a lógica da Facade diretamente para os serviços de domínio relevantes. Por exemplo, unificar `LoginFacade` com o serviço de autenticação principal, ou mover operações específicas de `AtividadeFacade` (como verificação de permissões do mapeamento) para `MapaManutencaoService`.
 
 ## Situação Atual (Frontend - Vue.js / TypeScript)
 
@@ -39,4 +39,10 @@ Dado o contexto estrito do SGC (intranet, 5-10 usuários simultâneos), muitas d
 
 2.  **Redução de Complexidade em Views:**
     *   **Problema:** Views muito extensas (ex: `ProcessoDetalheView.vue` e `MapaView.vue`).
-    *   **Solução:** Extrair lógica reativa complexa para composables específicos da view.
+    *   **Solução:** Extrair lógica reativa complexa para composables específicos da view, focando no gerenciamento do fluxo em si e deixando a view apenas com a responsabilidade visual.
+
+## Ações Recomendadas Imediatas
+
+*   Auditar o diretório `backend/src/main/java` procurando por sufixos `*Facade` e iniciar a sua fusão com o Serviço correspondente.
+*   Verificar endpoints `GET` em Controllers que chamam Serviços apenas para executar um `repository.findById()` ou `repository.findAll()` e migrá-los para acessar o Repository diretamente.
+*   Eliminar interfaces no backend que possuam apenas uma implementação concreta (ex. `*Impl.java`).
