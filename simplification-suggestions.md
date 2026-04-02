@@ -1,42 +1,53 @@
 # Sugestões de Simplificação Arquitetural - SGC
 
-Este documento contém recomendações para simplificar a arquitetura e reduzir a complexidade e fragmentação no projeto SGC, focando no contexto de um sistema intranet para 5-10 usuários simultâneos, conforme as diretrizes estabelecidas.
+Este documento contém recomendações para simplificar a arquitetura e reduzir a complexidade e fragmentação no projeto SGC, focando no contexto de um sistema intranet para 5-10 usuários simultâneos.
 
-## Diretrizes de Combate ao Overengineering (Sistema Intranet 5-10 Usuários)
+## Diretrizes de Combate ao Overengineering
 
-Dado o contexto estrito do SGC (intranet, 5-10 usuários simultâneos), muitas diretrizes aplicáveis a sistemas altamente escaláveis e super-modularizados **não se aplicam**. A arquitetura deve privilegiar a simplicidade extrema, a legibilidade direta e a ausência de camadas desnecessárias.
+Muitas diretrizes de sistemas altamente escaláveis não se aplicam a um projeto de intranet restrito como o SGC. A arquitetura deve focar na extrema simplicidade e na ausência de camadas intermediárias.
 
-*   **Proibição de Facades e Camadas Pass-Through:** Evite criar `Facades` (como `PainelFacade`, `UsuarioFacade`, ou `AtividadeFacade`). A lógica de negócio deve residir diretamente nos Serviços de domínio. Camadas intermediárias que apenas repassam chamadas aumentam a carga cognitiva e dificultam a manutenção.
-*   **Acesso Direto a Repositórios:** Controllers estão **autorizados e encorajados** a acessar diretamente as interfaces de Repositório (`Spring Data JPA`) para operações CRUD básicas ou leituras triviais. Não crie um Serviço apenas para delegar um `findById` ou `findAll`.
-*   **Rejeição de Arquiteturas Complexas:** Padrões como Onion Architecture, Hexagonal Architecture (Ports and Adapters) e Clean Architecture estrita adicionam abstrações (interfaces, mapeamentos de domínio-para-entidade) que são injustificadas. Utilize o modelo de Entidades JPA diretamente como o modelo de domínio principal.
-*   **Procedural vs Orientação a Objetos Pura:** Para lógicas de negócio diretas, abrace métodos procedurais claros nos Serviços. Evite criar hierarquias complexas de herança, múltiplos Design Patterns (Factories, Builders para objetos simples) ou abstrações genéricas projetadas para casos de uso que não existem.
-*   **Consolidação de Serviços:** Evite a "explosão de classes". Agrupe lógicas altamente coesas em um mesmo Serviço. Por exemplo, unifique `SubprocessoTransicaoService` e `SubprocessoValidacaoService` para dentro de `SubprocessoService` em vez de fragmentá-los, a menos que o arquivo se torne intragovernável.
-*   **Pinia Stores Essenciais (Frontend):** Reduza o uso de Pinia Stores que atuam apenas como "pass-through" (repassadores) para chamadas de API (`axios`). Utilize Composables simples (e.g., `useProcessos`) ou faça as chamadas diretamente nos componentes/views. O Pinia deve ser reservado para estado genuinamente global e compartilhado.
-*   **Wrappers Visuais e Componentes de Pass-through:** Questione a necessidade de componentes Vue que apenas envelopam bibliotecas de UI (como `BButton`) sem adicionar valor semântico ou lógico significativo (e.g., `LoadingButton.vue`). Use os componentes originais sempre que possível para manter a árvore do Vue rasa.
-*   **Devolução de Entidades JPA (Leituras Simples):** DTOs continuam importantes para fronteiras externas de mutação (Criação/Atualização), mas para leituras simples (GET) onde não há risco de exposição de dados ou N+1, o Controller pode retornar a entidade JPA diretamente para evitar mapeamentos (boilerplate) redundantes. Se usar DTOs, prefira Java Records estritos.
+*   **Acesso Direto a Repositórios:** Controllers estão **autorizados** a injetar e acessar interfaces de Repositório (`Spring Data JPA`) diretamente para operações CRUD ou de busca, sem necessidade de pass-through de serviços.
+*   **Abolição de Facades e Camadas Intermediárias:** Não utilizar o padrão `Facade`. Classes cuja única função seja delegar chamadas de Controllers para Services ou coordenar chamadas básicas devem ser extintas. A lógica deve ir para o Controller ou ser absorvida pelo Serviço raiz.
+*   **Entidades Diretas vs DTOs:** Para respostas simples de GET, especialmente em estruturas não-complexas sem risco de lazy-loading massivo ou exposição indevida, **Controllers podem retornar Entidades JPA diretamente**. DTOs (preferencialmente `records` no Java) devem ser usados essencialmente para payloads de mutação (Criação/Atualização).
+*   **Procedural no Domínio:** Privilegiar a legibilidade procedural. Evitar criar interfaces genéricas com uma única implementação, evitar heranças profundas ou Padrões de Projeto abstratos para lógicas diretas.
+*   **Evite Wrappers UI no Frontend:** Eliminar componentes Vue que apenas englobam bibliotecas de UI base (como BootstrapVueNext) sem adicionar valor semântico. Usar a biblioteca base diretamente para manter a DOM e a árvore do Vue planas.
+*   **Stores Pinia Enxutas:** Utilizar as Stores estritamente para estado compartilhado em escopo global da aplicação. Fetch de dados e regras de tela devem viver em Composables específicos da funcionalidade que injetam estado direto onde for preciso.
 
-## Situação Atual (Backend - Java / Spring Boot)
+---
 
-1.  **Consolidação de Serviços do Subprocesso:**
-    *   **Problema:** Alta fragmentação e tamanho excessivo nas classes `SubprocessoService` (42KB), `SubprocessoTransicaoService` (33KB), `SubprocessoConsultaService`, etc. A lógica de negócio relacionada a subprocessos está muito dispersa e acoplada.
-    *   **Solução:** Consolidar a lógica coesa em serviços de domínio mais diretos.
-        *   Avaliar a real necessidade de separar `SubprocessoTransicaoService` e `SubprocessoService`. Uma abordagem mais simples reduz a navegação mental.
-    *   **Ação:** Refatorar o pacote `sgc.subprocesso.service` fundindo serviços afins.
+## Situação Atual & Backlog de Simplificação (Backend - Java)
 
-2.  **Acesso Direto ao Repositório (CRUD Simples):**
-    *   **Problema:** Camadas de serviço atuando apenas como repassadoras.
-    *   **Solução:** Permitir que os Controllers (ex: `ProcessoController`, `SubprocessoController`) injetem e utilizem diretamente as interfaces de Repository.
+### 1. Extinção das Facades de Pass-Through
+As Facades atuais agem predominantemente como camadas de delegação, engordando a base de código e aumentando os níveis de indireção.
 
-3.  **Remoção de Facades Desnecessárias:**
-    *   **Problema:** Facades como `AtividadeFacade` (`backend/src/main/java/sgc/mapa/AtividadeFacade.java`), `PainelFacade`, `AlertaFacade`, `RelatorioFacade`, `LoginFacade`, e `UsuarioFacade` adicionam indireção sem abstração significativa. Elas atuam quase unicamente como "pass-through", transferindo chamadas diretamente aos serviços subjacentes sem adicionar valor claro de negócio.
-    *   **Solução:** Mover a lógica da Facade diretamente para os serviços de domínio relevantes. Por exemplo, unificar `LoginFacade` com o serviço de autenticação principal, ou mover operações específicas de `AtividadeFacade` para `MapaManutencaoService`.
+**Ação:** Remover as seguintes classes, realocando sua lógica para os Controllers que as chamam ou para os Services adjacentes:
+*   `AtividadeFacade.java`
+*   `AlertaFacade.java`
+*   `PainelFacade.java`
+*   `UsuarioFacade.java`
+*   `RelatorioFacade.java`
+*   `LoginFacade.java`
 
-## Situação Atual (Frontend - Vue.js / TypeScript)
+### 2. Consolidação de Serviços de Subprocesso
+O pacote `sgc.subprocesso.service` foi segmentado excessivamente. A divisão pretendia reduzir o tamanho dos arquivos, mas gerou alto acoplamento e fragmentação.
 
-1.  **Remoção de Wrappers Visuais Finos:**
-    *   **Problema:** Componentes como `LoadingButton.vue` são wrappers finos sobre `BButton` (`frontend/src/components/comum/LoadingButton.vue`), adicionando sobrecarga na árvore do Vue sem muita justificativa, e com baixa reusabilidade. A mesma lógica é repetida em diversas views.
-    *   **Solução:** Remover `LoadingButton.vue` e usar `<BButton>` nativo diretamente com um `<BSpinner>` na aplicação para manter a árvore de componentes plana e simples. A complexidade do wrapper não compensa seu benefício no contexto de um sistema pequeno.
+**Problema:** `SubprocessoTransicaoService` tem ~32KB e `SubprocessoService` tem ~19KB, além de outros serviços (`ConsultaService`, `ValidacaoService`).
+**Ação:** Refatorar, agrupando funções altamente coesas. Centralizar as lógicas de negócio centrais dentro de `SubprocessoService` ou separá-las não de forma mecânica (por tamanho), mas por responsabilidade estrita e isolada.
 
-2.  **Redução de Complexidade em Views:**
-    *   **Problema:** Views muito extensas (ex: `ProcessoDetalheView.vue` e `MapaView.vue`).
-    *   **Solução:** Extrair lógica reativa complexa para composables específicos da view.
+---
+
+## Situação Atual & Backlog de Simplificação (Frontend - Vue.js)
+
+### 1. Remoção do Wrapper Fino `LoadingButton.vue`
+**Problema:** O componente `frontend/src/components/comum/LoadingButton.vue` funciona primariamente como um envelope fino sobre o `<BButton>`. A lógica de estado de `loading` é trivial (exibir spinner e desabilitar) e pode ser tratada nativamente nos componentes ou com um composable genérico de botão (se realmente houver lógica cruzada a preservar).
+**Ação:** Substituir todas as importações de `LoadingButton` por `<BButton>` nos arquivos `.vue` (ex: `CadastroView`, `ParametrosView`, `AtividadesCadastroView`, etc). Excluir o arquivo `LoadingButton.vue` e seus respectivos arquivos de teste/história (`LoadingButton.spec.ts`, `LoadingButton.stories.ts`).
+
+### 2. Substituição Progressiva do Store de Processos por Composables
+A lógica que só é utilizada na árvore de componentes de `Processo` (e que não necessita ser retida quando o usuário navega para outras seções do sistema) deve abandonar o `Pinia` e migrar para funções com estado utilizando Vue Composables, instanciados nos níveis adequados.
+
+---
+
+## Objetivos e Métricas de Conclusão
+- Redução quantificável da contagem de arquivos totais ao mesclar as `Facades`.
+- Redução na profundidade da árvore do Vue DevTools após remover wrappers finos de UI.
+- Garantir que todos os testes passem (manter `coverage` como base de segurança da refatoração).
