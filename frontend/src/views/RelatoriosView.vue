@@ -88,7 +88,7 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, onMounted, ref} from "vue";
+import {computed, onMounted, ref, type Ref} from "vue";
 import {BButton, BCard, BCol, BFormGroup, BFormSelect, BRow, BSpinner, BTab, BTable, BTabs} from "bootstrap-vue-next";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
@@ -114,7 +114,7 @@ const unidadeIdSelecionadaMapas = ref<number | null>(null);
 const gerandoAndamento = ref(false);
 const gerandoMapas = ref(false);
 
-const relatorioAndamento = ref<any[]>([]);
+const relatorioAndamento = ref<Array<Record<string, unknown>>>([]);
 
 const opcoesProcessos = computed(() => {
   const processos = processosDisponiveis.value;
@@ -124,18 +124,53 @@ const opcoesProcessos = computed(() => {
   ];
 });
 
-// Options for units (mocked for now, will connect to useUnidadesStore if necessary)
-const opcoesUnidades = ref<Array<{ value: number | null, text: string }>>([
-  { value: null, text: TEXTOS.relatorios.TODAS_UNIDADES }
-]);
+const opcoesUnidades = computed<Array<{ value: number | null, text: string }>>(() => {
+  const codigoUnidade = obterCodigoUnidadeSelecionada();
+  const opcoesBase = [{ value: null, text: TEXTOS.relatorios.TODAS_UNIDADES }];
+
+  if (!codigoUnidade) {
+    return opcoesBase;
+  }
+
+  const sigla = perfilStore.unidadeSelecionadaSigla ?? `Unidade ${codigoUnidade}`;
+  return [...opcoesBase, { value: codigoUnidade, text: sigla }];
+});
 
 function obterCodigoUnidadeSelecionada() {
   if (!perfil.perfilSelecionado.value || !perfilStore.unidadeSelecionada) {
     return null;
   }
 
-  const unidadeSelecionada = perfilStore.unidadeSelecionada as any;
-  return Number(unidadeSelecionada?.codigo || unidadeSelecionada);
+  const unidadeSelecionada = perfilStore.unidadeSelecionada as unknown;
+  if (typeof unidadeSelecionada === "number") {
+    return unidadeSelecionada;
+  }
+
+  if (typeof unidadeSelecionada === "object" && unidadeSelecionada !== null && "codigo" in unidadeSelecionada) {
+    return Number(unidadeSelecionada.codigo);
+  }
+
+  return null;
+}
+
+async function executarComCarregamento(
+  acao: () => Promise<void>,
+  mensagemErro: string,
+  carregando?: Ref<boolean>
+) {
+  if (carregando) {
+    carregando.value = true;
+  }
+
+  try {
+    await acao();
+  } catch {
+    notify(mensagemErro, "danger");
+  } finally {
+    if (carregando) {
+      carregando.value = false;
+    }
+  }
 }
 
 async function carregarProcessosDisponiveis() {
@@ -151,38 +186,26 @@ async function carregarProcessosDisponiveis() {
 
 const gerarRelatorioAndamento = async () => {
   if (!processoIdSelecionado.value) return;
-  gerandoAndamento.value = true;
-  try {
-     relatorioAndamento.value = await obterRelatorioAndamento(processoIdSelecionado.value);
-  } catch {
-     notify(TEXTOS.relatorios.ERRO_BUSCA, "danger");
-  } finally {
-     gerandoAndamento.value = false;
-  }
+  await executarComCarregamento(async () => {
+    relatorioAndamento.value = await obterRelatorioAndamento(processoIdSelecionado.value);
+  }, TEXTOS.relatorios.ERRO_BUSCA, gerandoAndamento);
 };
 
 const exportarPdfAndamento = async () => {
   if (!processoIdSelecionado.value) return;
-  try {
-      await downloadRelatorioAndamentoPdf(processoIdSelecionado.value);
-  } catch {
-      notify(TEXTOS.relatorios.ERRO_EXPORTAR, "danger");
-  }
+  await executarComCarregamento(async () => {
+    await downloadRelatorioAndamentoPdf(processoIdSelecionado.value!);
+  }, TEXTOS.relatorios.ERRO_EXPORTAR);
 };
 
 const gerarRelatorioMapas = async () => {
     if (!processoIdSelecionadoMapas.value) return;
-    gerandoMapas.value = true;
-    try {
-        await downloadRelatorioMapasPdf(
-            processoIdSelecionadoMapas.value, 
-            unidadeIdSelecionadaMapas.value || undefined
-        );
-    } catch {
-       notify(TEXTOS.relatorios.ERRO_GERAR, "danger");
-    } finally {
-       gerandoMapas.value = false;
-    }
+    await executarComCarregamento(async () => {
+      await downloadRelatorioMapasPdf(
+        processoIdSelecionadoMapas.value!,
+        unidadeIdSelecionadaMapas.value || undefined
+      );
+    }, TEXTOS.relatorios.ERRO_GERAR, gerandoMapas);
 }
 
 onMounted(async () => {
