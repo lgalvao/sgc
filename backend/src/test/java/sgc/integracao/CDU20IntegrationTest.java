@@ -268,6 +268,7 @@ class CDU20IntegrationTest extends BaseIntegrationTest {
                 .unidadeDestino(adminUnit)
                 .descricao("Enviado para Admin para Homologação")
                 .dataHora(LocalDateTime.now())
+                .usuario(usuarioGestor)
                 .build();
         movimentacaoRepo.save(movAdmin);
 
@@ -382,6 +383,7 @@ class CDU20IntegrationTest extends BaseIntegrationTest {
                 .unidadeDestino(adminUnit)
                 .descricao("Aceite com sugestões encaminhado ao admin")
                 .dataHora(LocalDateTime.now())
+                .usuario(usuarioGestor)
                 .build();
         movimentacaoRepo.save(movAdmin);
         subprocessoRepo.flush();

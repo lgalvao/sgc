@@ -33,6 +33,8 @@ class CDU16IntegrationTest extends BaseIntegrationTest {
     @Autowired
     private MovimentacaoRepo movimentacaoRepo;
     @Autowired
+    private UsuarioRepo usuarioRepo;
+    @Autowired
     private org.springframework.jdbc.core.JdbcTemplate jdbcTemplate;
 
     private Subprocesso subprocesso;
@@ -76,12 +78,14 @@ class CDU16IntegrationTest extends BaseIntegrationTest {
 
         // Garante que o subprocesso esteja na unidade do ADMIN (1) para permitir ajuste
         Unidade adminUnit = unidadeRepo.findById(1L).orElseThrow();
+        Usuario admin = usuarioRepo.findById("111111111111").orElseThrow();
         Movimentacao movAdmin = Movimentacao.builder()
                 .subprocesso(subprocesso)
                 .unidadeOrigem(unidade)
                 .unidadeDestino(adminUnit)
                 .descricao("Enviado para Admin para Ajuste")
                 .dataHora(LocalDateTime.now())
+                .usuario(admin)
                 .build();
         movimentacaoRepo.save(movAdmin);
 

@@ -42,6 +42,7 @@ class CDU26IntegrationTest extends BaseIntegrationTest {
     private Subprocesso subprocesso1;
     private Subprocesso subprocesso2;
     private Processo processo;
+    private Usuario admin;
 
     @BeforeEach
     void setUp() {
@@ -57,9 +58,7 @@ class CDU26IntegrationTest extends BaseIntegrationTest {
         unidade1 = unidadeRepo.findById(idUnidade1).orElseThrow();
         unidade2 = unidadeRepo.findById(idUnidade2).orElseThrow();
 
-        Usuario admin = UsuarioFixture.usuarioPadrao();
-        admin.setTituloEleitoral("555555555555");
-        usuarioRepo.save(admin);
+        admin = usuarioRepo.findById("111111111111").orElseThrow();
 
         processo = ProcessoFixture.processoPadrao();
         processo.setCodigo(null);
@@ -105,6 +104,7 @@ class CDU26IntegrationTest extends BaseIntegrationTest {
                 .unidadeDestino(adminUnit)
                 .descricao("Enviado para Admin")
                 .dataHora(LocalDateTime.now())
+                .usuario(admin)
                 .build();
         movimentacaoRepo.save(movAdmin1);
 
@@ -114,6 +114,7 @@ class CDU26IntegrationTest extends BaseIntegrationTest {
                 .unidadeDestino(adminUnit)
                 .descricao("Enviado para Admin")
                 .dataHora(LocalDateTime.now())
+                .usuario(admin)
                 .build();
         movimentacaoRepo.save(movAdmin2);
 

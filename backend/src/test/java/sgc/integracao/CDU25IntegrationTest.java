@@ -40,6 +40,7 @@ class CDU25IntegrationTest extends BaseIntegrationTest {
     private Subprocesso subprocesso1;
     private Subprocesso subprocesso2;
     private Processo processo;
+    private Usuario usuarioGestor;
 
     @BeforeEach
     void setUp() {
@@ -53,6 +54,7 @@ class CDU25IntegrationTest extends BaseIntegrationTest {
                 .orElseThrow(() -> new RuntimeException("Unit 8 not found in data.sql"));
         Unidade unidade2 = unidadeRepo.findById(9L)
                 .orElseThrow(() -> new RuntimeException("Unit 9 not found in data.sql"));
+        usuarioGestor = usuarioRepo.findById("666666666666").orElseThrow();
 
         // Create test process
         processo = ProcessoFixture.processoPadrao();
@@ -81,6 +83,7 @@ class CDU25IntegrationTest extends BaseIntegrationTest {
                 .unidadeDestino(unidadeSuperior)
                 .descricao("Mapa validado")
                 .dataHora(LocalDateTime.now())
+                .usuario(usuarioGestor)
                 .build();
         movimentacaoRepo.save(m1);
 
@@ -90,6 +93,7 @@ class CDU25IntegrationTest extends BaseIntegrationTest {
                 .unidadeDestino(unidadeSuperior)
                 .descricao("Mapa validado")
                 .dataHora(LocalDateTime.now())
+                .usuario(usuarioGestor)
                 .build();
         movimentacaoRepo.save(m2);
 
@@ -159,19 +163,20 @@ class CDU25IntegrationTest extends BaseIntegrationTest {
         subprocessoPainel.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
         subprocessoPainel = subprocessoRepo.saveAndFlush(subprocessoPainel);
 
+        Usuario usuarioCoordenadoria = usuarioRepo.findById("666666666666").orElseThrow();
+        usuarioCoordenadoria.setPerfilAtivo(Perfil.GESTOR);
+        usuarioCoordenadoria.setUnidadeAtivaCodigo(coordenadoriaSistemas.getCodigo());
+        usuarioCoordenadoria.setAuthorities(Set.of(new SimpleGrantedAuthority("ROLE_GESTOR")));
+
         Movimentacao movimentacaoInicial = Movimentacao.builder()
                 .subprocesso(subprocessoPainel)
                 .unidadeOrigem(secaoDesenvolvimento)
                 .unidadeDestino(coordenadoriaSistemas)
                 .descricao("Mapa validado")
                 .dataHora(LocalDateTime.now())
+                .usuario(usuarioCoordenadoria)
                 .build();
         movimentacaoRepo.saveAndFlush(movimentacaoInicial);
-
-        Usuario usuarioCoordenadoria = usuarioRepo.findById("666666666666").orElseThrow();
-        usuarioCoordenadoria.setPerfilAtivo(Perfil.GESTOR);
-        usuarioCoordenadoria.setUnidadeAtivaCodigo(coordenadoriaSistemas.getCodigo());
-        usuarioCoordenadoria.setAuthorities(Set.of(new SimpleGrantedAuthority("ROLE_GESTOR")));
 
         mockMvc.perform(post("/api/subprocessos/{codigo}/aceitar-validacao", subprocessoPainel.getCodigo())
                         .with(user(usuarioCoordenadoria))

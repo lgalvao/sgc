@@ -43,6 +43,7 @@ class CDU23IntegrationTest extends BaseIntegrationTest {
     private Subprocesso subprocesso1;
     private Subprocesso subprocesso2;
     private Processo processo;
+    private Usuario admin;
 
     @BeforeEach
     void setUp() {
@@ -60,10 +61,7 @@ class CDU23IntegrationTest extends BaseIntegrationTest {
         unidade1 = unidadeRepo.findById(idUnidade1).orElseThrow();
         unidade2 = unidadeRepo.findById(idUnidade2).orElseThrow();
 
-        // Criar usuário
-        Usuario admin = UsuarioFixture.usuarioPadrao();
-        admin.setTituloEleitoral("999999999999");
-        usuarioRepo.save(admin);
+        admin = usuarioRepo.findById("111111111111").orElseThrow();
 
         // Criar processo
         processo = ProcessoFixture.processoPadrao();
@@ -111,6 +109,7 @@ class CDU23IntegrationTest extends BaseIntegrationTest {
                 .unidadeDestino(adminUnit)
                 .descricao("Enviado para Admin")
                 .dataHora(LocalDateTime.now())
+                .usuario(admin)
                 .build();
         movimentacaoRepo.save(m1);
 
@@ -120,6 +119,7 @@ class CDU23IntegrationTest extends BaseIntegrationTest {
                 .unidadeDestino(adminUnit)
                 .descricao("Enviado para Admin")
                 .dataHora(LocalDateTime.now())
+                .usuario(admin)
                 .build();
         movimentacaoRepo.save(m2);
 

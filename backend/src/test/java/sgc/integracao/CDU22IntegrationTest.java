@@ -29,6 +29,8 @@ class CDU22IntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private AnaliseRepo analiseRepo;
+    @Autowired
+    private UsuarioRepo usuarioRepo;
 
     @Autowired
     private EntityManager entityManager;
@@ -37,6 +39,7 @@ class CDU22IntegrationTest extends BaseIntegrationTest {
     private Subprocesso subprocesso1;
     private Subprocesso subprocesso2;
     private Processo processo;
+    private Usuario usuarioGestor;
 
     @BeforeEach
     void setUp() {
@@ -51,6 +54,7 @@ class CDU22IntegrationTest extends BaseIntegrationTest {
                 .orElseThrow(() -> new RuntimeException("Unit 8 not found in data.sql"));
         Unidade unidade2 = unidadeRepo.findById(9L)
                 .orElseThrow(() -> new RuntimeException("Unit 9 not found in data.sql"));
+        usuarioGestor = usuarioRepo.findById("666666666666").orElseThrow();
 
         // Create test process
         processo = ProcessoFixture.processoPadrao();
@@ -79,6 +83,7 @@ class CDU22IntegrationTest extends BaseIntegrationTest {
                 .unidadeOrigem(unidade1)
                 .unidadeDestino(unidadeSuperior)
                 .descricao("Cadastro disponibilizado")
+                .usuario(usuarioGestor)
                 .build();
         movimentacaoRepo.save(m1);
 
@@ -87,6 +92,7 @@ class CDU22IntegrationTest extends BaseIntegrationTest {
                 .unidadeOrigem(unidade2)
                 .unidadeDestino(unidadeSuperior)
                 .descricao("Cadastro disponibilizado")
+                .usuario(usuarioGestor)
                 .build();
         movimentacaoRepo.save(m2);
 

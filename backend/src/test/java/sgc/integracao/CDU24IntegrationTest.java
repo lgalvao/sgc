@@ -34,12 +34,15 @@ class CDU24IntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private EntityManager entityManager;
+    @Autowired
+    private UsuarioRepo usuarioRepo;
 
     private Unidade unidade1;
     private Unidade unidade2;
     private Processo processo;
     private Subprocesso subprocesso1;
     private Subprocesso subprocesso2;
+    private Usuario admin;
 
     @BeforeEach
     void setUp() {
@@ -51,6 +54,7 @@ class CDU24IntegrationTest extends BaseIntegrationTest {
                 .orElseThrow(() -> new RuntimeException("Unit 8 not found in data.sql"));
         unidade2 = unidadeRepo.findById(9L)
                 .orElseThrow(() -> new RuntimeException("Unit 9 not found in data.sql"));
+        admin = usuarioRepo.findById("111111111111").orElseThrow();
 
         // Create test process
         processo = ProcessoFixture.processoPadrao();
@@ -119,6 +123,7 @@ class CDU24IntegrationTest extends BaseIntegrationTest {
                 .unidadeDestino(adminUnit)
                 .descricao("Enviado para Admin")
                 .dataHora(LocalDateTime.now())
+                .usuario(admin)
                 .build();
         movimentacaoRepo.save(movAdmin1);
 
@@ -128,6 +133,7 @@ class CDU24IntegrationTest extends BaseIntegrationTest {
                 .unidadeDestino(adminUnit)
                 .descricao("Enviado para Admin")
                 .dataHora(LocalDateTime.now())
+                .usuario(admin)
                 .build();
         movimentacaoRepo.save(movAdmin2);
 
@@ -180,6 +186,7 @@ class CDU24IntegrationTest extends BaseIntegrationTest {
                 .unidadeDestino(adminUnit)
                 .descricao("Enviado para Admin")
                 .dataHora(LocalDateTime.now())
+                .usuario(admin)
                 .build());
 
         ProcessarEmBlocoRequest request = ProcessarEmBlocoRequest.builder()
@@ -212,6 +219,7 @@ class CDU24IntegrationTest extends BaseIntegrationTest {
                 .unidadeDestino(adminUnit)
                 .descricao("Enviado para Admin")
                 .dataHora(LocalDateTime.now())
+                .usuario(admin)
                 .build());
 
         ProcessarEmBlocoRequest request = ProcessarEmBlocoRequest.builder()
