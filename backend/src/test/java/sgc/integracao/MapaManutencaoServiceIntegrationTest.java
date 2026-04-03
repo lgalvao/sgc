@@ -95,6 +95,7 @@ class MapaManutencaoServiceIntegrationTest extends BaseIntegrationTest {
 
             CriarAtividadeRequest request = CriarAtividadeRequest.builder()
                     .mapaCodigo(mapa.getCodigo())
+                    .descricao("Nova atividade")
                     .build();
 
             Atividade res = service.criarAtividade(request);

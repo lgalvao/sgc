@@ -30,6 +30,9 @@ class MovimentacaoRepoPerformanceTest {
     @Autowired
     private SubprocessoRepo subprocessoRepo;
 
+    @Autowired
+    private UsuarioRepo usuarioRepo;
+
     @Test
     @DisplayName("Deve buscar movimentações com join fetch")
     void deveBuscarMovimentacoesComJoinFetch() {
@@ -47,7 +50,14 @@ class MovimentacaoRepoPerformanceTest {
         uDestino = unidadeRepo.save(uDestino);
 
         Processo p = new Processo();
+        p.setDescricao("Processo teste movimentação");
+        p.setTipo(TipoProcesso.MAPEAMENTO);
+        p.setSituacao(SituacaoProcesso.CRIADO);
+        p.setDataCriacao(LocalDateTime.now());
+        p.setDataLimite(LocalDateTime.now().plusDays(30));
         p = processoRepo.save(p);
+
+        Usuario usuario = usuarioRepo.findById("111111111111").orElseThrow();
 
         Subprocesso sp = Subprocesso.builder()
                 .processo(p)
@@ -63,6 +73,7 @@ class MovimentacaoRepoPerformanceTest {
                 .unidadeDestino(uDestino)
                 .descricao("Mov 1")
                 .dataHora(LocalDateTime.now().minusHours(1))
+                .usuario(usuario)
                 .build();
         movimentacaoRepo.save(m1);
 
@@ -72,6 +83,7 @@ class MovimentacaoRepoPerformanceTest {
                 .unidadeDestino(uOrigem)
                 .descricao("Mov 2")
                 .dataHora(LocalDateTime.now())
+                .usuario(usuario)
                 .build();
         movimentacaoRepo.save(m2);
 

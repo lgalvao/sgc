@@ -64,7 +64,7 @@ class E2eFixtureEndpointTest {
         E2eController.ProcessoFixtureRequest request =
                 new E2eController.ProcessoFixtureRequest(
                         "Processo fixture teste mapeamento iniciado",
-                        "ADMIN", // Unidade raiz
+                        "ASSESSORIA_11",
                         true, // iniciar = true
                         30);
 
