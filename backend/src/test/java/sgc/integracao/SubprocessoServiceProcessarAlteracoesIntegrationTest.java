@@ -56,8 +56,18 @@ class SubprocessoServiceProcessarAlteracoesIntegrationTest extends BaseIntegrati
     @Test
     @DisplayName("atualizarEntidade: altera mapa de null para mapa existente")
     void atualizarEntidade_SemMapaAntes() {
-        Mapa novoMapa = new Mapa();
-        mapaRepo.save(novoMapa);
+        Subprocesso subprocessoComMapa = Subprocesso.builder()
+                .unidade(unidade)
+                .situacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO)
+                .processo(subprocesso.getProcesso())
+                .dataLimiteEtapa1(LocalDateTime.now().plusDays(10))
+                .build();
+        subprocessoRepo.save(subprocessoComMapa);
+
+        Mapa novoMapa = Mapa.builder().subprocesso(subprocessoComMapa).build();
+        novoMapa = mapaRepo.save(novoMapa);
+        subprocessoComMapa.setMapa(novoMapa);
+        subprocessoRepo.save(subprocessoComMapa);
 
         AtualizarSubprocessoRequest request = new AtualizarSubprocessoRequest(
                 unidade.getCodigo(), novoMapa.getCodigo(), null, null, null, null

@@ -72,6 +72,21 @@ class SubprocessoTransicaoServiceCoverageIntegrationTest {
     @MockitoBean
     private AlertaFacade alertaService;
 
+    private Processo criarProcessoPersistido(TipoProcesso tipo) {
+        Processo processo = new Processo();
+        processo.setDescricao("Processo teste");
+        processo.setTipo(tipo);
+        processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+        processo.setDataLimite(LocalDateTime.now().plusDays(30));
+        return processoRepo.save(processo);
+    }
+
+    private Usuario criarUsuarioPersistido(Unidade unidade) {
+        Usuario usuario = usuarioRepo.getReferenceById("111111111111");
+        usuario.setUnidadeAtivaCodigo(unidade.getCodigo());
+        return usuario;
+    }
+
     @Nested
     @DisplayName("criarAnalise")
     class CriarAnalise {
@@ -79,10 +94,7 @@ class SubprocessoTransicaoServiceCoverageIntegrationTest {
         @Test
         @DisplayName("deve criar analise e retornar")
         void deveCriarAnalise() {
-            Processo proc = new Processo();
-            proc.setDescricao("Processo 1");
-            proc.setTipo(TipoProcesso.MAPEAMENTO);
-            proc = processoRepo.save(proc);
+            Processo proc = criarProcessoPersistido(TipoProcesso.MAPEAMENTO);
 
             Unidade unidade = new Unidade();
             unidade.setSigla("U1");
@@ -128,10 +140,7 @@ class SubprocessoTransicaoServiceCoverageIntegrationTest {
         @Test
         @DisplayName("deve alterar data limite e enviar email/alerta para subprocesso em mapeamento")
         void deveAlterarDataLimiteEtapa1() {
-            Processo proc = new Processo();
-            proc.setDescricao("Processo");
-            proc.setTipo(TipoProcesso.MAPEAMENTO);
-            proc = processoRepo.save(proc);
+            Processo proc = criarProcessoPersistido(TipoProcesso.MAPEAMENTO);
 
             Unidade unidade = new Unidade();
             unidade.setSigla("U1");
@@ -154,10 +163,7 @@ class SubprocessoTransicaoServiceCoverageIntegrationTest {
         @Test
         @DisplayName("deve alterar data limite e enviar email/alerta para subprocesso no mapa")
         void deveAlterarDataLimiteEtapa2() {
-            Processo proc = new Processo();
-            proc.setDescricao("Processo");
-            proc.setTipo(TipoProcesso.MAPEAMENTO);
-            proc = processoRepo.save(proc);
+            Processo proc = criarProcessoPersistido(TipoProcesso.MAPEAMENTO);
 
             Unidade unidade = new Unidade();
             unidade.setSigla("U1");
@@ -180,10 +186,7 @@ class SubprocessoTransicaoServiceCoverageIntegrationTest {
         @Test
         @DisplayName("deve alterar data limite etapa1 para situacoes desconhecidas")
         void deveAlterarDataLimiteDesconhecido() {
-            Processo proc = new Processo();
-            proc.setDescricao("Processo");
-            proc.setTipo(TipoProcesso.MAPEAMENTO);
-            proc = processoRepo.save(proc);
+            Processo proc = criarProcessoPersistido(TipoProcesso.MAPEAMENTO);
 
             Unidade unidade = new Unidade();
             unidade.setSigla("U1");
@@ -210,16 +213,17 @@ class SubprocessoTransicaoServiceCoverageIntegrationTest {
     class Disponibilizar {
 
         @Test
-        @DisplayName("deve usar a propria unidade se nao tiver superior")
-        void semSuperior() {
-            Processo proc = new Processo();
-            proc.setDescricao("Proc");
-            proc.setTipo(TipoProcesso.MAPEAMENTO);
-            proc = processoRepo.save(proc);
+        @DisplayName("deve disponibilizar cadastro com unidade superior valida")
+        void comSuperior() {
+            Processo proc = criarProcessoPersistido(TipoProcesso.MAPEAMENTO);
+
+            Unidade uSup = new Unidade();
+            uSup.setSigla("ADMIN");
+            uSup = unidadeRepo.save(uSup);
 
             Unidade uSp = new Unidade();
             uSp.setSigla("U4");
-            uSp.setUnidadeSuperior(null); // Explicitamente sem superior
+            uSp.setUnidadeSuperior(uSup);
             uSp = unidadeRepo.save(uSp);
 
             Subprocesso sp = new Subprocesso();
@@ -234,9 +238,7 @@ class SubprocessoTransicaoServiceCoverageIntegrationTest {
             mapa.setSubprocesso(sp);
             mapa = mapaRepo.saveAndFlush(mapa);
 
-            Usuario user = new Usuario();
-            user.setTituloEleitoral("123");
-            user = usuarioRepo.save(user);
+            Usuario user = criarUsuarioPersistido(uSp);
 
             // Need to flush and let Hibernate re-associate in a new query context so mapping exists
             subprocessoRepo.flush();
@@ -260,10 +262,7 @@ class SubprocessoTransicaoServiceCoverageIntegrationTest {
         @Test
         @DisplayName("deve disponibilizar mapa e salvar observacoes")
         void comObservacoes() {
-            Processo proc = new Processo();
-            proc.setDescricao("Proc");
-            proc.setTipo(TipoProcesso.MAPEAMENTO);
-            proc = processoRepo.save(proc);
+            Processo proc = criarProcessoPersistido(TipoProcesso.MAPEAMENTO);
 
             Unidade uAdmin = new Unidade();
             uAdmin.setSigla("ADMIN");
@@ -289,9 +288,7 @@ class SubprocessoTransicaoServiceCoverageIntegrationTest {
             sp.setMapa(mapa);
             subprocessoRepo.saveAndFlush(sp);
 
-            Usuario user = new Usuario();
-            user.setTituloEleitoral("123");
-            user = usuarioRepo.save(user);
+            Usuario user = criarUsuarioPersistido(uSp);
 
             proc.setDataCriacao(java.time.LocalDateTime.now().plusDays(5));
             proc = processoRepo.saveAndFlush(proc);
@@ -316,10 +313,7 @@ class SubprocessoTransicaoServiceCoverageIntegrationTest {
         @Test
         @DisplayName("deve submeter e alterar a data limite")
         void comDataLimite() {
-            Processo proc = new Processo();
-            proc.setDescricao("Proc");
-            proc.setTipo(TipoProcesso.REVISAO);
-            proc = processoRepo.save(proc);
+            Processo proc = criarProcessoPersistido(TipoProcesso.REVISAO);
 
             Unidade uSp = new Unidade();
             uSp.setSigla("U5");
@@ -340,9 +334,7 @@ class SubprocessoTransicaoServiceCoverageIntegrationTest {
             sp.setMapa(mapa);
             subprocessoRepo.saveAndFlush(sp);
 
-            Usuario user = new Usuario();
-            user.setTituloEleitoral("123");
-            user = usuarioRepo.save(user);
+            Usuario user = criarUsuarioPersistido(uSp);
 
             sgc.subprocesso.dto.SubmeterMapaAjustadoRequest request = sgc.subprocesso.dto.SubmeterMapaAjustadoRequest.builder()
                 .justificativa("ajustes realizados")
@@ -364,10 +356,7 @@ class SubprocessoTransicaoServiceCoverageIntegrationTest {
         @Test
         @DisplayName("deve devolver validacao do mapa corretamente")
         void deveDevolver() {
-            Processo proc = new Processo();
-            proc.setDescricao("Proc");
-            proc.setTipo(TipoProcesso.MAPEAMENTO);
-            proc = processoRepo.save(proc);
+            Processo proc = criarProcessoPersistido(TipoProcesso.MAPEAMENTO);
 
             Unidade uSp = new Unidade();
             uSp.setSigla("U6");
@@ -388,9 +377,7 @@ class SubprocessoTransicaoServiceCoverageIntegrationTest {
             sp.setMapa(mapa);
             subprocessoRepo.saveAndFlush(sp);
 
-            Usuario user = new Usuario();
-            user.setTituloEleitoral("123");
-            user = usuarioRepo.save(user);
+            Usuario user = criarUsuarioPersistido(uSp);
 
             when(unidadeService.buscarPorSigla("U6")).thenReturn(uSp);
 
@@ -408,10 +395,7 @@ class SubprocessoTransicaoServiceCoverageIntegrationTest {
         @Test
         @DisplayName("deve aceitar validacao do mapa com superior")
         void deveAceitarValidacao() {
-            Processo proc = new Processo();
-            proc.setDescricao("Proc");
-            proc.setTipo(TipoProcesso.MAPEAMENTO);
-            proc = processoRepo.save(proc);
+            Processo proc = criarProcessoPersistido(TipoProcesso.MAPEAMENTO);
 
             Unidade uSup = new Unidade();
             uSup.setSigla("USUP");
@@ -437,9 +421,7 @@ class SubprocessoTransicaoServiceCoverageIntegrationTest {
             sp.setMapa(mapa);
             subprocessoRepo.saveAndFlush(sp);
 
-            Usuario user = new Usuario();
-            user.setTituloEleitoral("123");
-            user = usuarioRepo.save(user);
+            Usuario user = criarUsuarioPersistido(uSp);
 
             when(unidadeService.buscarPorSigla("U7")).thenReturn(uSp);
 

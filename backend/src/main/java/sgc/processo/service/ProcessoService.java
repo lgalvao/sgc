@@ -417,7 +417,13 @@ public class ProcessoService {
         Set<Unidade> arvore = new HashSet<>(participantes);
         for (Unidade u : participantes) {
             Unidade sup = u.getUnidadeSuperior();
-            while (sup != null) { arvore.add(sup); sup = sup.getUnidadeSuperior(); }
+            while (sup != null) {
+                if (sup.getTipo() == TipoUnidade.RAIZ) {
+                    break;
+                }
+                arvore.add(sup);
+                sup = sup.getUnidadeSuperior();
+            }
         }
         return arvore;
     }

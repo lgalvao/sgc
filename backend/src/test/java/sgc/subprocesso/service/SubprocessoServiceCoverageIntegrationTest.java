@@ -8,6 +8,7 @@ import org.springframework.security.core.context.*;
 import org.springframework.test.context.*;
 import org.springframework.test.context.bean.override.mockito.*;
 import org.springframework.transaction.annotation.*;
+import org.springframework.mail.javamail.*;
 import sgc.*;
 import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
@@ -36,6 +37,9 @@ class SubprocessoServiceCoverageIntegrationTest {
     @MockitoBean
     private UsuarioFacade usuarioFacade;
 
+    @MockitoBean
+    private JavaMailSender javaMailSender;
+
     @Autowired
     private SubprocessoRepo subprocessoRepo;
 
@@ -48,6 +52,30 @@ class SubprocessoServiceCoverageIntegrationTest {
     @Autowired
     private MapaRepo mapaRepo;
 
+    private Processo criarProcessoPersistido() {
+        Processo processo = new Processo();
+        processo.setDescricao("Processo de teste");
+        processo.setTipo(TipoProcesso.MAPEAMENTO);
+        processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+        processo.setDataLimite(LocalDateTime.now().plusDays(30));
+        return processoRepo.save(processo);
+    }
+
+    private Processo criarProcessoPersistido(TipoProcesso tipo, SituacaoProcesso situacao) {
+        Processo processo = new Processo();
+        processo.setDescricao("Processo de teste");
+        processo.setTipo(tipo);
+        processo.setSituacao(situacao);
+        processo.setDataLimite(LocalDateTime.now().plusDays(30));
+        return processoRepo.save(processo);
+    }
+
+    private Mapa criarMapaParaSubprocesso(Subprocesso subprocesso) {
+        Mapa mapa = new Mapa();
+        mapa.setSubprocesso(subprocesso);
+        return mapaRepo.saveAndFlush(mapa);
+    }
+
     @Nested
     @DisplayName("excluir")
     class Excluir {
@@ -55,8 +83,7 @@ class SubprocessoServiceCoverageIntegrationTest {
         @Test
         @DisplayName("deve excluir subprocesso")
         void deveExcluir() {
-            Processo proc = new Processo();
-            proc = processoRepo.save(proc);
+            Processo proc = criarProcessoPersistido();
 
             Unidade u = new Unidade();
             u.setSigla("U1");
@@ -94,8 +121,7 @@ class SubprocessoServiceCoverageIntegrationTest {
         @Test
         @DisplayName("deve abortar se nenhuma unidade elegivel for encontrada")
         void semElegiveis() {
-            Processo proc = new Processo();
-            proc = processoRepo.save(proc);
+            Processo proc = criarProcessoPersistido();
 
             Unidade u = new Unidade();
             u.setSigla("U1");
@@ -118,8 +144,7 @@ class SubprocessoServiceCoverageIntegrationTest {
         @Test
         @DisplayName("deve buscar mapa e montar dto")
         void deveBuscarMapa() {
-            Processo proc = new Processo();
-            proc = processoRepo.save(proc);
+            Processo proc = criarProcessoPersistido();
 
             Unidade u = new Unidade();
             u.setSigla("U2");
@@ -153,8 +178,7 @@ class SubprocessoServiceCoverageIntegrationTest {
         @Test
         @DisplayName("deve salvar ajustes e alterar a situacao")
         void salvarAjustes() {
-            Processo proc = new Processo();
-            proc = processoRepo.save(proc);
+            Processo proc = criarProcessoPersistido();
 
             Unidade u = new Unidade();
             u.setSigla("U3");
@@ -188,8 +212,7 @@ class SubprocessoServiceCoverageIntegrationTest {
         @Test
         @DisplayName("deve listar por processo e situacao")
         void deveListar() {
-            Processo proc = new Processo();
-            proc = processoRepo.save(proc);
+            Processo proc = criarProcessoPersistido();
 
             Unidade u = new Unidade();
             u.setSigla("U10");
@@ -215,8 +238,7 @@ class SubprocessoServiceCoverageIntegrationTest {
         @Test
         @DisplayName("deve listar por processo, unidade e situacao")
         void deveListar() {
-            Processo proc = new Processo();
-            proc = processoRepo.save(proc);
+            Processo proc = criarProcessoPersistido();
 
             Unidade u = new Unidade();
             u.setSigla("U11");
@@ -242,27 +264,32 @@ class SubprocessoServiceCoverageIntegrationTest {
         @Test
         @DisplayName("deve atualizar e mudar o mapa quando for diferente")
         void deveMudarMapaQuandoDiferente() {
-            Processo proc = new Processo();
-            proc = processoRepo.save(proc);
+            Processo proc = criarProcessoPersistido();
 
             Unidade u = new Unidade();
             u.setTipo(TipoUnidade.OPERACIONAL);
             u.setSigla("U1");
             u = unidadeRepo.save(u);
 
-            Mapa mapaAntigo = new Mapa();
-            mapaAntigo = mapaRepo.save(mapaAntigo);
-
-            Mapa mapaNovo = new Mapa();
-            mapaNovo = mapaRepo.save(mapaNovo);
-
             Subprocesso sp = new Subprocesso();
             sp.setDataLimiteEtapa1(LocalDateTime.now().plusDays(30));
             sp.setProcesso(proc);
             sp.setUnidade(u);
-            sp.setMapa(mapaAntigo);
             sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
             sp = subprocessoRepo.saveAndFlush(sp);
+
+            Mapa mapaAntigo = criarMapaParaSubprocesso(sp);
+            sp.setMapa(mapaAntigo);
+            sp = subprocessoRepo.saveAndFlush(sp);
+
+            Subprocesso spOutro = new Subprocesso();
+            spOutro.setDataLimiteEtapa1(LocalDateTime.now().plusDays(30));
+            spOutro.setProcesso(proc);
+            spOutro.setUnidade(u);
+            spOutro.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+            spOutro = subprocessoRepo.saveAndFlush(spOutro);
+
+            Mapa mapaNovo = criarMapaParaSubprocesso(spOutro);
 
             AtualizarSubprocessoRequest request = AtualizarSubprocessoRequest.builder()
                     .codMapa(mapaNovo.getCodigo())
@@ -276,23 +303,22 @@ class SubprocessoServiceCoverageIntegrationTest {
         @Test
         @DisplayName("nao deve mudar mapa se for o mesmo")
         void naoDeveMudarMapaSeForMesmo() {
-            Processo proc = new Processo();
-            proc = processoRepo.save(proc);
+            Processo proc = criarProcessoPersistido();
 
             Unidade u = new Unidade();
             u.setTipo(TipoUnidade.OPERACIONAL);
             u.setSigla("U1");
             u = unidadeRepo.save(u);
 
-            Mapa mapaAntigo = new Mapa();
-            mapaAntigo = mapaRepo.save(mapaAntigo);
-
             Subprocesso sp = new Subprocesso();
             sp.setDataLimiteEtapa1(LocalDateTime.now().plusDays(30));
             sp.setProcesso(proc);
             sp.setUnidade(u);
-            sp.setMapa(mapaAntigo);
             sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+            sp = subprocessoRepo.saveAndFlush(sp);
+
+            Mapa mapaAntigo = criarMapaParaSubprocesso(sp);
+            sp.setMapa(mapaAntigo);
             sp = subprocessoRepo.saveAndFlush(sp);
 
             AtualizarSubprocessoRequest request = AtualizarSubprocessoRequest.builder()
@@ -311,8 +337,7 @@ class SubprocessoServiceCoverageIntegrationTest {
         @Test
         @DisplayName("deve retornar permissoes para usuario sem perfil especial (SERVIDOR)")
         void usuarioServidor() {
-            Processo proc = new Processo();
-            proc = processoRepo.save(proc);
+            Processo proc = criarProcessoPersistido();
 
             Unidade u = new Unidade();
             u.setTipo(TipoUnidade.OPERACIONAL);
@@ -362,9 +387,7 @@ class SubprocessoServiceCoverageIntegrationTest {
         @Test
         @DisplayName("deve importar atividades em processo de diagnostico (cobre default do switch)")
         void diagnostico() {
-            Processo proc = new Processo();
-            proc.setTipo(TipoProcesso.DIAGNOSTICO);
-            proc = processoRepo.save(proc);
+            Processo proc = criarProcessoPersistido(TipoProcesso.DIAGNOSTICO, SituacaoProcesso.EM_ANDAMENTO);
 
             Unidade u = new Unidade();
             u.setSigla("U_DIAG");
@@ -410,9 +433,7 @@ class SubprocessoServiceCoverageIntegrationTest {
         @Test
         @DisplayName("deve listar atividades quando processo esta finalizado")
         void processoFinalizado() {
-            Processo proc = new Processo();
-            proc.setSituacao(SituacaoProcesso.FINALIZADO);
-            proc = processoRepo.save(proc);
+            Processo proc = criarProcessoPersistido(TipoProcesso.MAPEAMENTO, SituacaoProcesso.FINALIZADO);
 
             Unidade u = new Unidade();
             u.setSigla("U_FIN");

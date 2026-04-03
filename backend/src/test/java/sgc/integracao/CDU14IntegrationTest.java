@@ -79,9 +79,26 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
         // Unit 9 already has mapa 1002 in data.sql, so use it
         // Add test data to mapa 1002 if needed
         Mapa mapaVigente = mapaRepo.findById(1002L).orElseGet(() -> {
-            Mapa novoMapa = MapaFixture.mapaPadrao(null);
+            Processo processoVigente = ProcessoFixture.processoPadrao();
+            processoVigente.setCodigo(null);
+            processoVigente.setTipo(TipoProcesso.MAPEAMENTO);
+            processoVigente.setSituacao(SituacaoProcesso.FINALIZADO);
+            processoVigente.setDataFinalizacao(LocalDateTime.now().minusDays(1));
+            processoVigente = processoRepo.save(processoVigente);
+
+            Subprocesso subprocessoVigente = SubprocessoFixture.subprocessoPadrao(processoVigente, unidadeChefe);
+            subprocessoVigente.setCodigo(null);
+            subprocessoVigente.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
+            subprocessoVigente.setDataFimEtapa1(LocalDateTime.now().minusDays(2));
+            subprocessoVigente.setDataFimEtapa2(LocalDateTime.now().minusDays(1));
+            subprocessoVigente = subprocessoRepo.save(subprocessoVigente);
+
+            Mapa novoMapa = MapaFixture.mapaPadrao(subprocessoVigente);
             novoMapa.setCodigo(1002L);
-            return mapaRepo.save(novoMapa);
+            novoMapa = mapaRepo.save(novoMapa);
+            subprocessoVigente.setMapa(novoMapa);
+            subprocessoRepo.save(subprocessoVigente);
+            return novoMapa;
         });
 
         if (atividadeRepo.findByMapa_Codigo(mapaVigente.getCodigo()).isEmpty()) {

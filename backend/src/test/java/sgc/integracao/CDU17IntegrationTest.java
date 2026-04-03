@@ -43,6 +43,8 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
     private AnaliseRepo analiseRepo;
     @Autowired
     private JdbcTemplate jdbcTemplate;
+    @Autowired
+    private UsuarioRepo usuarioRepo;
 
     private Unidade unidade;
     private Subprocesso subprocesso;
@@ -70,18 +72,18 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
         processo.setTipo(TipoProcesso.REVISAO);
         processo = processoRepo.save(processo);
 
-        // Criar mapa
-        mapa = MapaFixture.mapaPadrao(null);
-        mapa.setCodigo(null);
-        mapa = mapaRepo.save(mapa);
-
         // Criar subprocesso via Fixture
         subprocesso = SubprocessoFixture.subprocessoPadrao(processo, unidade);
         subprocesso.setCodigo(null);
-        subprocesso.setMapa(mapa);
         subprocesso.setSituacaoForcada(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
         subprocesso.setDataLimiteEtapa2(null);
         subprocesso.setDataFimEtapa2(null);
+        subprocesso = subprocessoRepo.save(subprocesso);
+
+        mapa = MapaFixture.mapaPadrao(subprocesso);
+        mapa.setCodigo(null);
+        mapa = mapaRepo.save(mapa);
+        subprocesso.setMapa(mapa);
         subprocesso = subprocessoRepo.save(subprocesso);
 
         Unidade adminUnit = unidadeRepo.findById(1L).orElseThrow();
@@ -89,6 +91,7 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
                 .subprocesso(subprocesso)
                 .unidadeOrigem(unidade)
                 .unidadeDestino(adminUnit)
+                .usuario(usuarioRepo.findById("111111111111").orElseThrow())
                 .descricao("Enviado para Admin para Ajuste")
                 .dataHora(LocalDateTime.now())
                 .build();
@@ -117,6 +120,11 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
         void disponibilizarMapa_comDadosValidos_retornaOk() throws Exception {
             Analise analiseAntiga = new Analise();
             analiseAntiga.setSubprocesso(subprocesso);
+            analiseAntiga.setTipo(TipoAnalise.VALIDACAO);
+            analiseAntiga.setAcao(TipoAcaoAnalise.ACEITE_REVISAO);
+            analiseAntiga.setUnidadeCodigo(unidade.getCodigo());
+            analiseAntiga.setUsuarioTitulo("111111111111");
+            analiseAntiga.setDataHora(LocalDateTime.now().minusDays(1));
             analiseAntiga.setObservacoes("Análise antiga que deve ser removida.");
             analiseRepo.save(analiseAntiga);
 

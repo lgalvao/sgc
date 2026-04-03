@@ -7,8 +7,6 @@ import org.springframework.beans.factory.annotation.*;
 import org.springframework.boot.test.context.*;
 import org.springframework.transaction.annotation.*;
 import sgc.organizacao.model.*;
-import sgc.testutils.*;
-
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
@@ -29,17 +27,18 @@ class ProcessoRepoPerformanceTest {
     @Test
     void listarPorSituacaoComParticipantes_deveCarregarParticipantesComFetch() {
 
-        Unidade unidade = UnidadeTestBuilder.umaDe()
-                .comNome("Unidade teste")
-                .comSigla("UT")
-                .comTituloTitular("Titular")
-                .build();
+        Unidade unidade = new Unidade();
+        unidade.setNome("Unidade teste");
+        unidade.setSigla("UT");
+        unidade.setTipo(TipoUnidade.OPERACIONAL);
+        unidade.setSituacao(SituacaoUnidade.ATIVA);
         unidadeRepo.save(unidade);
 
         Processo processo = new Processo();
         processo.setDescricao("Processo finalizado");
         processo.setSituacao(SituacaoProcesso.FINALIZADO);
         processo.setTipo(TipoProcesso.MAPEAMENTO);
+        processo.setDataLimite(java.time.LocalDateTime.now().plusDays(30));
         processo.adicionarParticipantes(Set.of(unidade));
         processoRepo.save(processo);
 
@@ -64,4 +63,3 @@ class ProcessoRepoPerformanceTest {
         assertThat(returnedProcess.getParticipantes()).hasSize(1);
     }
 }
-

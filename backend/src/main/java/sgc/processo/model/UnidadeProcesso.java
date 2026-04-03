@@ -22,6 +22,8 @@ import java.time.*;
 public class UnidadeProcesso implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
+    private static final java.util.Set<TipoUnidade> TIPOS_SNAPSHOT_SUPORTADOS =
+            java.util.EnumSet.of(TipoUnidade.OPERACIONAL, TipoUnidade.INTERMEDIARIA, TipoUnidade.INTEROPERACIONAL);
 
     @EmbeddedId
     private UnidadeProcessoId codigo = new UnidadeProcessoId();
@@ -61,6 +63,10 @@ public class UnidadeProcesso implements Serializable {
      * Cria um snapshot de uma unidade para um processo.
      */
     public static UnidadeProcesso criarSnapshot(Processo processo, Unidade unidade) {
+        if (!TIPOS_SNAPSHOT_SUPORTADOS.contains(unidade.getTipo())) {
+            throw new IllegalArgumentException(
+                    "Tipo de unidade nao suportado em snapshot de processo: " + unidade.getTipo());
+        }
         UnidadeProcesso snapshot = new UnidadeProcesso();
         snapshot.setProcesso(processo);
         snapshot.setUnidadeCodigo(unidade.getCodigo());
@@ -96,4 +102,3 @@ public class UnidadeProcesso implements Serializable {
         codigo.setUnidadeCodigo(unidadeCodigo);
     }
 }
-

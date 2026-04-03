@@ -96,8 +96,29 @@ class SubprocessoServiceSalvarIntegrationTest extends BaseIntegrationTest {
         Usuario user = Usuario.builder().tituloEleitoral("12345").matricula("123").nome("User diag").email("a@a.com").build();
         usuarioRepo.save(user);
 
-        Mapa mapaVigente = new Mapa();
-        mapaRepo.save(mapaVigente);
+        Processo processoVigente = Processo.builder()
+                .descricao("Processo vigente diag")
+                .tipo(TipoProcesso.MAPEAMENTO)
+                .situacao(SituacaoProcesso.FINALIZADO)
+                .dataLimite(LocalDateTime.now().minusDays(1))
+                .dataFinalizacao(LocalDateTime.now().minusHours(1))
+                .build();
+        processoRepo.save(processoVigente);
+
+        Subprocesso subprocessoVigente = Subprocesso.builder()
+                .unidade(uniDiag)
+                .situacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO)
+                .processo(processoVigente)
+                .dataLimiteEtapa1(LocalDateTime.now().minusDays(10))
+                .dataFimEtapa1(LocalDateTime.now().minusDays(5))
+                .dataFimEtapa2(LocalDateTime.now().minusHours(1))
+                .build();
+        subprocessoRepo.save(subprocessoVigente);
+
+        Mapa mapaVigente = Mapa.builder().subprocesso(subprocessoVigente).build();
+        mapaVigente = mapaRepo.save(mapaVigente);
+        subprocessoVigente.setMapa(mapaVigente);
+        subprocessoRepo.save(subprocessoVigente);
 
         UnidadeMapa um = UnidadeMapa.builder()
                 .unidadeCodigo(uniDiag.getCodigo())
