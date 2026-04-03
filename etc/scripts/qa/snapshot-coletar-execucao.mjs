@@ -225,6 +225,18 @@ function calcularPercentual(covered, missed) {
     return Number(((covered / total) * 100).toFixed(2));
 }
 
+function calcularPercentualPorTotal(cobertos, total) {
+    if (total <= 0) {
+        return 0;
+    }
+
+    return Number(((cobertos / total) * 100).toFixed(2));
+}
+
+function extrairInteiroCounter(counter, campo) {
+    return Number.parseInt(counter?.$?.[campo] ?? "0", 10);
+}
+
 async function extrairCoberturaJacoco(caminhoXml) {
     const conteudo = await lerArquivoSeExistir(caminhoXml);
     if (!conteudo) {
@@ -241,8 +253,8 @@ async function extrairCoberturaJacoco(caminhoXml) {
             const countersClasse = classe.counter ?? [];
             const line = countersClasse.find((counter) => counter.$.type === "LINE");
             const branch = countersClasse.find((counter) => counter.$.type === "BRANCH");
-            const covered = Number.parseInt(line?.$.covered ?? "0", 10);
-            const missed = Number.parseInt(line?.$.missed ?? "0", 10);
+            const covered = extrairInteiroCounter(line, "covered");
+            const missed = extrairInteiroCounter(line, "missed");
             const percentual = calcularPercentual(covered, missed);
 
             classes.push({
@@ -251,8 +263,8 @@ async function extrairCoberturaJacoco(caminhoXml) {
                 linhasCobertas: covered,
                 linhasPerdidas: missed,
                 branchesPercentual: calcularPercentual(
-                    Number.parseInt(branch?.$.covered ?? "0", 10),
-                    Number.parseInt(branch?.$.missed ?? "0", 10)
+                    extrairInteiroCounter(branch, "covered"),
+                    extrairInteiroCounter(branch, "missed")
                 )
             });
         }
@@ -261,11 +273,11 @@ async function extrairCoberturaJacoco(caminhoXml) {
     const resumo = {};
     for (const counter of counters) {
         resumo[counter.$.type] = {
-            cobertos: Number.parseInt(counter.$.covered, 10),
-            perdidos: Number.parseInt(counter.$.missed, 10),
+            cobertos: extrairInteiroCounter(counter, "covered"),
+            perdidos: extrairInteiroCounter(counter, "missed"),
             percentual: calcularPercentual(
-                Number.parseInt(counter.$.covered, 10),
-                Number.parseInt(counter.$.missed, 10)
+                extrairInteiroCounter(counter, "covered"),
+                extrairInteiroCounter(counter, "missed")
             )
         };
     }
@@ -279,6 +291,43 @@ async function extrairCoberturaJacoco(caminhoXml) {
     };
 }
 
+function extrairContagemCobertura(mapaCobertura = {}) {
+    const total = Object.keys(mapaCobertura).length;
+    const cobertos = Object.values(mapaCobertura).filter((valor) => valor > 0).length;
+    return {total, cobertos};
+}
+
+function extrairContagemBranches(mapaBranches = {}) {
+    const total = Object.values(mapaBranches).reduce((acumulado, valores) => acumulado + valores.length, 0);
+    const cobertos = Object.values(mapaBranches).reduce(
+        (acumulado, valores) => acumulado + valores.filter((valor) => valor > 0).length,
+        0
+    );
+    return {total, cobertos};
+}
+
+function criarTotaisCoberturaFrontend() {
+    return {
+        statements: {cobertos: 0, total: 0},
+        branches: {cobertos: 0, total: 0},
+        functions: {cobertos: 0, total: 0},
+        lines: {cobertos: 0, total: 0}
+    };
+}
+
+function acumularTotaisCobertura(totais, chave, contagem) {
+    totais[chave].total += contagem.total;
+    totais[chave].cobertos += contagem.cobertos;
+}
+
+function criarResumoCobertura(cobertos, total) {
+    return {
+        cobertos,
+        total,
+        percentual: calcularPercentualPorTotal(cobertos, total)
+    };
+}
+
 async function extrairCoberturaFrontend(caminhoJson) {
     const conteudo = await lerArquivoSeExistir(caminhoJson);
     if (!conteudo) {
@@ -287,73 +336,36 @@ async function extrairCoberturaFrontend(caminhoJson) {
 
     const cobertura = JSON.parse(conteudo);
     const arquivos = [];
-    const totais = {
-        statements: {cobertos: 0, total: 0},
-        branches: {cobertos: 0, total: 0},
-        functions: {cobertos: 0, total: 0},
-        lines: {cobertos: 0, total: 0}
-    };
+    const totais = criarTotaisCoberturaFrontend();
 
     for (const [arquivo, dados] of Object.entries(cobertura)) {
-        const statementTotal = Object.keys(dados.s ?? {}).length;
-        const statementCobertos = Object.values(dados.s ?? {}).filter((valor) => valor > 0).length;
-        const functionTotal = Object.keys(dados.f ?? {}).length;
-        const functionCobertos = Object.values(dados.f ?? {}).filter((valor) => valor > 0).length;
-        const branchTotal = Object.values(dados.b ?? {}).reduce((total, valores) => total + valores.length, 0);
-        const branchCobertos = Object.values(dados.b ?? {}).reduce(
-            (total, valores) => total + valores.filter((valor) => valor > 0).length,
-            0
-        );
-        const lineTotal = Object.keys(dados.statementMap ?? {}).length;
-        const lineCobertos = statementCobertos;
+        const statements = extrairContagemCobertura(dados.s ?? {});
+        const functions = extrairContagemCobertura(dados.f ?? {});
+        const branches = extrairContagemBranches(dados.b ?? {});
+        const lines = {
+            total: Object.keys(dados.statementMap ?? {}).length,
+            cobertos: statements.cobertos
+        };
 
-        totais.statements.total += statementTotal;
-        totais.statements.cobertos += statementCobertos;
-        totais.functions.total += functionTotal;
-        totais.functions.cobertos += functionCobertos;
-        totais.branches.total += branchTotal;
-        totais.branches.cobertos += branchCobertos;
-        totais.lines.total += lineTotal;
-        totais.lines.cobertos += lineCobertos;
+        acumularTotaisCobertura(totais, "statements", statements);
+        acumularTotaisCobertura(totais, "functions", functions);
+        acumularTotaisCobertura(totais, "branches", branches);
+        acumularTotaisCobertura(totais, "lines", lines);
 
         arquivos.push({
             arquivo: caminhoRelativo(arquivo),
-            statementsPercentual: statementTotal > 0 ? Number(((statementCobertos / statementTotal) * 100).toFixed(2)) : 0,
-            branchesPercentual: branchTotal > 0 ? Number(((branchCobertos / branchTotal) * 100).toFixed(2)) : 0,
-            functionsPercentual: functionTotal > 0 ? Number(((functionCobertos / functionTotal) * 100).toFixed(2)) : 0,
-            linesPercentual: lineTotal > 0 ? Number(((lineCobertos / lineTotal) * 100).toFixed(2)) : 0
+            statementsPercentual: calcularPercentualPorTotal(statements.cobertos, statements.total),
+            branchesPercentual: calcularPercentualPorTotal(branches.cobertos, branches.total),
+            functionsPercentual: calcularPercentualPorTotal(functions.cobertos, functions.total),
+            linesPercentual: calcularPercentualPorTotal(lines.cobertos, lines.total)
         });
     }
 
     return {
-        statements: {
-            cobertos: totais.statements.cobertos,
-            total: totais.statements.total,
-            percentual: totais.statements.total > 0
-                ? Number(((totais.statements.cobertos / totais.statements.total) * 100).toFixed(2))
-                : 0
-        },
-        branches: {
-            cobertos: totais.branches.cobertos,
-            total: totais.branches.total,
-            percentual: totais.branches.total > 0
-                ? Number(((totais.branches.cobertos / totais.branches.total) * 100).toFixed(2))
-                : 0
-        },
-        functions: {
-            cobertos: totais.functions.cobertos,
-            total: totais.functions.total,
-            percentual: totais.functions.total > 0
-                ? Number(((totais.functions.cobertos / totais.functions.total) * 100).toFixed(2))
-                : 0
-        },
-        lines: {
-            cobertos: totais.lines.cobertos,
-            total: totais.lines.total,
-            percentual: totais.lines.total > 0
-                ? Number(((totais.lines.cobertos / totais.lines.total) * 100).toFixed(2))
-                : 0
-        },
+        statements: criarResumoCobertura(totais.statements.cobertos, totais.statements.total),
+        branches: criarResumoCobertura(totais.branches.cobertos, totais.branches.total),
+        functions: criarResumoCobertura(totais.functions.cobertos, totais.functions.total),
+        lines: criarResumoCobertura(totais.lines.cobertos, totais.lines.total),
         arquivos: arquivos.sort((a, b) => a.linesPercentual - b.linesPercentual).slice(0, 20)
     };
 }
