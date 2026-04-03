@@ -470,7 +470,7 @@ public class SubprocessoController {
             @PathVariable Long codSubprocesso,
             @RequestBody(required = false) TextoOpcionalRequest request,
             @AuthenticationPrincipal Usuario usuario) {
-        String observacoes = Optional.of(request)
+        String observacoes = Optional.ofNullable(request)
                 .map(TextoOpcionalRequest::texto)
                 .map(UtilSanitizacao::sanitizar)
                 .orElse(null);
@@ -485,7 +485,7 @@ public class SubprocessoController {
             @PathVariable Long codSubprocesso,
             @RequestBody(required = false) TextoOpcionalRequest request,
             @AuthenticationPrincipal Usuario usuario) {
-        String observacoes = Optional.of(request)
+        String observacoes = Optional.ofNullable(request)
                 .map(TextoOpcionalRequest::texto)
                 .map(UtilSanitizacao::sanitizar)
                 .orElse(null);
@@ -548,4 +548,3 @@ public class SubprocessoController {
         return consultaService.paraHistoricoDto(analise);
     }
 }
-
