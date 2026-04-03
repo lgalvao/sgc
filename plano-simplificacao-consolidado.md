@@ -40,6 +40,7 @@ Se este plano divergir do código real, prevalece o código verificado e o plano
 * `SubprocessoTransicaoService` continua sendo o maior concentrador de responsabilidades do fluxo de workflow.
 * `LoadingButton.vue` segue como wrapper fino, mas ainda possui adoção ampla o suficiente para exigir auditoria antes de remoção.
 * A suíte de backend voltou a ficar íntegra com `./gradlew --no-configuration-cache :backend:test` verde, após saneamento das invariáveis de domínio refletidas no `schema.sql`.
+* O backend permanece íntegro após nova rodada de simplificação: `1412` testes executados, `1411` passando e `1` ignorado.
 
 ### Aprendizados consolidados da rodada mais recente
 
@@ -50,6 +51,8 @@ Se este plano divergir do código real, prevalece o código verificado e o plano
 * `Mapa` exige sempre vínculo com `Subprocesso`.
 * `Processo` exige `dataLimite`.
 * O conjunto `schema.sql`, `data.sql` e `seed.sql` passou a funcionar como superfície principal de alinhamento dos testes, reduzindo ruído estrutural antes da próxima simplificação.
+* Testes unitários que constroem services manualmente precisam acompanhar a evolução das dependências explícitas; isso não deve ser compensado com afrouxamento do código de produção.
+* Parte da rodada recente revelou bugs reais fora da frente principal, como nulidade defensiva ausente em `ImpactoMapaService` e configuração insegura do `TestSecurityConfig`; esses ajustes foram tratados como correções de robustez, não como mudança de escopo arquitetural.
 
 ### Premissas antigas que deixam de valer
 
@@ -162,16 +165,21 @@ Estado da frente:
   * fallback hierárquico indevido para `ADMIN`;
   * aceitação indevida de `RAIZ` como participante de subprocesso;
   * cenários de teste que violavam invariáveis já exigidas pelo schema.
-* O próximo corte desta frente deve voltar ao service e não ao ambiente de testes.
+* A rodada atual avançou a simplificação interna do service sem abrir nova classe:
+  * extração da transição recorrente para unidade superior;
+  * centralização dos fluxos explícitos com `ADMIN` em helpers privados;
+  * consolidação da montagem repetida de `RegistrarWorkflowCommand` em helper com destino explícito.
+* O núcleo de workflow ficou mais explícito, mas `SubprocessoTransicaoService` ainda concentra persistência, notificação, e-mail e alertas no mesmo ponto.
+* A próxima etapa deve ser precedida por uma limpeza geral do workspace para reduzir ruído acumulado antes de novos cortes estruturais.
 
 Próximo corte recomendado:
 
-* Extrair a resolução de destino hierárquico recorrente dos fluxos de aceite, disponibilização e encaminhamento.
-* Separar o núcleo de persistência de workflow em torno de:
-  * `registrarTransicao`;
-  * `registrarAnalise`;
-  * criação de alertas/notificações derivadas.
-* Reavaliar, após esse corte, se a fronteira natural é um colaborador interno de workflow ou apenas helpers privados mais explícitos.
+* Fazer uma limpeza geral e reavaliar o diff acumulado antes de continuar a Frente 1.
+* Retomar em seguida a separação entre:
+  * persistência de workflow;
+  * notificação/e-mail;
+  * criação de alertas.
+* Só considerar extração de colaborador interno depois dessa limpeza e de nova medição do arquivo.
 
 Restrições:
 
@@ -281,10 +289,10 @@ Para cada rodada:
 
 ### Sequência recomendada da próxima rodada
 
-1. Isolar e nomear a regra de resolução de destino hierárquico em `SubprocessoTransicaoService`.
-2. Consolidar o trecho comum de persistência de workflow sem criar facade nova.
-3. Validar a suíte focada de `SubprocessoTransicaoService`.
-4. Só então reconsiderar extração de classe.
+1. Fazer limpeza geral do workspace e revisar alterações acumuladas.
+2. Medir novamente `SubprocessoTransicaoService` após os cortes já feitos.
+3. Escolher o próximo corte entre efeitos derivados de notificação/e-mail/alerta.
+4. Validar suíte focada e, ao fim da rodada, validar o backend completo.
 
 ## Validação mínima por frente
 

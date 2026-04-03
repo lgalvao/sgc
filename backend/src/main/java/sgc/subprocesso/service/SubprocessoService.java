@@ -85,11 +85,11 @@ public class SubprocessoService {
     }
 
     private void processarAlteracoes(Subprocesso sp, AtualizarSubprocessoRequest request) {
-        Optional.ofNullable(request.codUnidade())
+        Optional.of(request.codUnidade())
                 .map(unidadeService::buscarPorCodigo)
                 .ifPresent(sp::setUnidade);
 
-        Optional.ofNullable(request.codMapa()).ifPresent(cod -> {
+        Optional.of(request.codMapa()).ifPresent(cod -> {
             Mapa m = Mapa.builder().codigo(cod).build();
             Mapa mapa = sp.getMapa();
             Long codAtual = mapa != null ? mapa.getCodigo() : null;

@@ -8,6 +8,4 @@ import java.util.*;
 @Repository
 public interface UsuarioPerfilRepo extends JpaRepository<UsuarioPerfil, UsuarioPerfilId> {
     List<UsuarioPerfil> findByUsuarioTitulo(String usuarioTitulo);
-
-    List<UsuarioPerfil> findByUnidadeCodigoIn(List<Long> unidadeCodigos);
 }

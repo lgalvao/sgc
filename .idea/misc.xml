@@ -12,25 +12,14 @@
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoContextoService accessControlService" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.workflow.SubprocessoMapaWorkflowService accessControlService" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoPermissaoCalculator accessControlService" />
-      <entry_point TYPE="field" FQNAME="sgc.comum.config.ConfigAplicacao acessoAd" />
-      <entry_point TYPE="field" FQNAME="sgc.seguranca.login.ClienteAcessoAd acessoAdRestClient" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.UsuarioService administradorRepo" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoFacade adminWorkflowService" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoFacade ajusteMapaService" />
-      <entry_point TYPE="field" FQNAME="sgc.alerta.model.AlertaUsuario alerta" />
-      <entry_point TYPE="field" FQNAME="sgc.alerta.model.AlertaUsuario.Chave alertaCodigo" />
-      <entry_point TYPE="field" FQNAME="sgc.alerta.AlertaController alertaFacade" />
       <entry_point TYPE="field" FQNAME="sgc.alerta.AlertaFacade alertaMapper" />
-      <entry_point TYPE="field" FQNAME="sgc.alerta.AlertaService alertaRepo" />
-      <entry_point TYPE="field" FQNAME="sgc.alerta.AlertaFacade alertaService" />
       <entry_point TYPE="field" FQNAME="sgc.painel.PainelFacade alertaService" />
       <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoFacade alertaService" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.workflow.SubprocessoAdminWorkflowService alertaService" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.workflow.SubprocessoCadastroWorkflowService alertaService" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.notificacao.SubprocessoComunicacaoListener alertaService" />
-      <entry_point TYPE="field" FQNAME="sgc.alerta.AlertaService alertaUsuarioRepo" />
-      <entry_point TYPE="field" FQNAME="sgc.comum.config.ConfigAplicacao ambienteTestes" />
-      <entry_point TYPE="field" FQNAME="sgc.seguranca.login.LoginController ambienteTestes" />
       <entry_point TYPE="field" FQNAME="sgc.seguranca.login.LoginFacade ambienteTestes" />
       <entry_point TYPE="field" FQNAME="sgc.analise.AnaliseController analiseFacade" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoAjusteMapaService analiseFacade" />
@@ -44,65 +33,31 @@
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.SubprocessoMapaController analiseMapper" />
       <entry_point TYPE="field" FQNAME="sgc.analise.AnaliseService analiseRepo" />
       <entry_point TYPE="field" FQNAME="sgc.analise.AnaliseFacade analiseService" />
-      <entry_point TYPE="field" FQNAME="sgc.comum.config.ConfigAplicacao.Email assuntoPrefixo" />
-      <entry_point TYPE="field" FQNAME="sgc.mapa.model.Conhecimento atividade" />
       <entry_point TYPE="field" FQNAME="sgc.seguranca.acesso.AccessControlService atividadeAccessPolicy" />
-      <entry_point TYPE="field" FQNAME="sgc.mapa.AtividadeController atividadeFacade" />
       <entry_point TYPE="field" FQNAME="sgc.mapa.service.MapaManutencaoService atividadeMapper" />
-      <entry_point TYPE="field" FQNAME="sgc.mapa.service.CopiaMapaService atividadeRepo" />
-      <entry_point TYPE="field" FQNAME="sgc.mapa.service.MapaManutencaoService atividadeRepo" />
-      <entry_point TYPE="field" FQNAME="sgc.mapa.service.MapaSalvamentoService atividadeRepo" />
-      <entry_point TYPE="field" FQNAME="sgc.mapa.model.Competencia atividades" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.dto.CompetenciaAjusteDto atividades" />
-      <entry_point TYPE="field" FQNAME="sgc.mapa.model.Mapa atividades" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoContextoService atividadeService" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoFacade atividadeService" />
       <entry_point TYPE="field" FQNAME="sgc.organizacao.service.UnidadeResponsavelService atribuicaoTemporariaRepo" />
       <entry_point TYPE="field" FQNAME="sgc.seguranca.acesso.AccessControlService auditService" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.Usuario authorities" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoFacade cadastroWorkflowService" />
       <entry_point TYPE="field" FQNAME="sgc.relatorio.service.ErroRelatorio causa" />
       <entry_point TYPE="field" FQNAME="sgc.configuracao.model.Parametro chave" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.dto.CompetenciaAjusteDto codCompetencia" />
-      <entry_point TYPE="field" FQNAME="sgc.comum.erros.ErroApi code" />
-      <entry_point TYPE="field" FQNAME="sgc.comum.erros.ErroNegocioBase code" />
       <entry_point TYPE="field" FQNAME="sgc.alerta.dto.AlertaDto codigo" />
-      <entry_point TYPE="field" FQNAME="sgc.comum.model.EntidadeBase codigo" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto codigo" />
       <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDto codigo" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.dto.SubprocessoElegivelDto codigo" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.dto.UnidadeDto codigo" />
       <entry_point TYPE="field" FQNAME="sgc.seguranca.login.dto.UsuarioAcessoAd.LotacaoAd codigo" />
       <entry_point TYPE="field" FQNAME="sgc.mapa.eventos.EventoImportacaoAtividades codigoMapaDestino" />
       <entry_point TYPE="field" FQNAME="sgc.mapa.eventos.EventoImportacaoAtividades codigoMapaOrigem" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.dto.UnidadeDto codigoPai" />
       <entry_point TYPE="field" FQNAME="sgc.mapa.eventos.EventoImportacaoAtividades codigoSubprocesso" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.dto.MapaAjusteDto codMapa" />
       <entry_point TYPE="field" FQNAME="sgc.alerta.dto.AlertaDto codProcesso" />
       <entry_point TYPE="field" FQNAME="sgc.processo.eventos.EventoProcessoFinalizado codProcesso" />
       <entry_point TYPE="field" FQNAME="sgc.processo.eventos.EventoProcessoIniciado codProcesso" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto.UnidadeParticipanteDto codSubprocesso" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto.UnidadeParticipanteDto codUnidade" />
       <entry_point TYPE="field" FQNAME="sgc.processo.eventos.EventoProcessoIniciado codUnidades" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto.UnidadeParticipanteDto codUnidadeSuperior" />
-      <entry_point TYPE="field" FQNAME="sgc.mapa.service.CopiaMapaService competenciaRepo" />
-      <entry_point TYPE="field" FQNAME="sgc.mapa.service.ImpactoMapaService competenciaRepo" />
-      <entry_point TYPE="field" FQNAME="sgc.mapa.service.MapaManutencaoService competenciaRepo" />
-      <entry_point TYPE="field" FQNAME="sgc.mapa.service.MapaSalvamentoService competenciaRepo" />
-      <entry_point TYPE="field" FQNAME="sgc.mapa.service.MapaVisualizacaoService competenciaRepo" />
-      <entry_point TYPE="field" FQNAME="sgc.mapa.model.Atividade competencias" />
-      <entry_point TYPE="field" FQNAME="sgc.mapa.model.Mapa competencias" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.dto.MapaAjusteDto competencias" />
-      <entry_point TYPE="field" FQNAME="sgc.comum.config.ConfigOpenApi config" />
       <entry_point TYPE="field" FQNAME="sgc.notificacao.NotificacaoEmailAsyncExecutor config" />
       <entry_point TYPE="field" FQNAME="sgc.configuracao.ConfiguracaoController configuracaoService" />
       <entry_point TYPE="field" FQNAME="sgc.mapa.service.MapaManutencaoService conhecimentoMapper" />
-      <entry_point TYPE="field" FQNAME="sgc.mapa.service.MapaManutencaoService conhecimentoRepo" />
-      <entry_point TYPE="field" FQNAME="sgc.mapa.model.Atividade conhecimentos" />
       <entry_point TYPE="field" FQNAME="sgc.notificacao.model.Notificacao conteudo" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoFacade contextoService" />
       <entry_point TYPE="field" FQNAME="sgc.mapa.service.MapaImportacaoListener copiaMapaService" />
-      <entry_point TYPE="field" FQNAME="sgc.comum.config.ConfigAplicacao cors" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.workflow.SubprocessoAdminWorkflowService crudService" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoAjusteMapaService crudService" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoAtividadeService crudService" />
@@ -112,105 +67,49 @@
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.workflow.SubprocessoMapaWorkflowService crudService" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoPermissaoCalculator crudService" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.crud.SubprocessoValidacaoService crudService" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.model.Processo dataCriacao" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto dataCriacao" />
       <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDto dataCriacao" />
       <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto dataCriacaoFormatada" />
       <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDto dataCriacaoFormatada" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.Responsabilidade dataFim" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.model.Subprocesso dataFimEtapa1" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.model.Subprocesso dataFimEtapa2" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.model.Processo dataFinalizacao" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto dataFinalizacao" />
       <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDto dataFinalizacao" />
       <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto dataFinalizacaoFormatada" />
       <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDto dataFinalizacaoFormatada" />
-      <entry_point TYPE="field" FQNAME="sgc.alerta.model.Alerta dataHora" />
       <entry_point TYPE="field" FQNAME="sgc.alerta.dto.AlertaDto dataHora" />
       <entry_point TYPE="field" FQNAME="sgc.analise.model.Analise dataHora" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.model.Movimentacao dataHora" />
       <entry_point TYPE="field" FQNAME="sgc.notificacao.model.Notificacao dataHora" />
-      <entry_point TYPE="field" FQNAME="sgc.mapa.model.Mapa dataHoraDisponibilizado" />
       <entry_point TYPE="field" FQNAME="sgc.processo.eventos.EventoProcessoFinalizado dataHoraFinalizacao" />
       <entry_point TYPE="field" FQNAME="sgc.alerta.dto.AlertaDto dataHoraFormatada" />
-      <entry_point TYPE="field" FQNAME="sgc.mapa.model.Mapa dataHoraHomologado" />
       <entry_point TYPE="field" FQNAME="sgc.processo.eventos.EventoProcessoIniciado dataHoraInicio" />
       <entry_point TYPE="field" FQNAME="sgc.alerta.dto.AlertaDto dataHoraLeitura" />
-      <entry_point TYPE="field" FQNAME="sgc.alerta.model.AlertaUsuario dataHoraLeitura" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.AtribuicaoTemporaria dataInicio" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.Responsabilidade dataInicio" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.Unidade dataInicioTitularidade" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.model.UnidadeProcesso dataInicioTitularidade" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.model.Processo dataLimite" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto dataLimite" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto.UnidadeParticipanteDto dataLimite" />
       <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDto dataLimite" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.model.Subprocesso dataLimiteEtapa1" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.model.Subprocesso dataLimiteEtapa2" />
       <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto dataLimiteFormatada" />
       <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto.UnidadeParticipanteDto dataLimiteFormatada" />
       <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDto dataLimiteFormatada" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.AtribuicaoTemporaria dataTermino" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.VinculacaoUnidade demaisUnidadesHistoricas" />
       <entry_point TYPE="field" FQNAME="sgc.seguranca.acesso.Acao descricao" />
-      <entry_point TYPE="field" FQNAME="sgc.alerta.model.Alerta descricao" />
       <entry_point TYPE="field" FQNAME="sgc.alerta.dto.AlertaDto descricao" />
-      <entry_point TYPE="field" FQNAME="sgc.mapa.model.Atividade descricao" />
-      <entry_point TYPE="field" FQNAME="sgc.mapa.model.Competencia descricao" />
-      <entry_point TYPE="field" FQNAME="sgc.mapa.model.Conhecimento descricao" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.model.Movimentacao descricao" />
       <entry_point TYPE="field" FQNAME="sgc.configuracao.model.Parametro descricao" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.model.Processo descricao" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto descricao" />
       <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDto descricao" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.model.SituacaoSubprocesso descricao" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.eventos.TipoTransicao descricaoMovimentacao" />
-      <entry_point TYPE="field" FQNAME="sgc.comum.config.ConfigAplicacao.OpenApi description" />
-      <entry_point TYPE="field" FQNAME="sgc.comum.erros.ErroApi details" />
-      <entry_point TYPE="field" FQNAME="sgc.comum.erros.ErroNegocioBase details" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto elegiveis" />
-      <entry_point TYPE="field" FQNAME="sgc.comum.config.ConfigAplicacao email" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.Usuario email" />
       <entry_point TYPE="field" FQNAME="sgc.seguranca.login.dto.UsuarioAcessoAd email" />
       <entry_point TYPE="field" FQNAME="sgc.notificacao.NotificacaoEmailService emailExecutor" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.notificacao.SubprocessoComunicacaoListener emailService" />
       <entry_point TYPE="field" FQNAME="sgc.notificacao.NotificacaoEmailAsyncExecutor enviadorDeEmail" />
-      <entry_point TYPE="field" FQNAME="sgc.seguranca.login.GerenciadorJwt environment" />
       <entry_point TYPE="field" FQNAME="sgc.mapa.service.MapaManutencaoService eventPublisher" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoAtividadeService eventPublisher" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.workflow.SubprocessoTransicaoService eventPublisher" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto.UnidadeParticipanteDto filhos" />
-      <entry_point TYPE="field" FQNAME="sgc.seguranca.login.FiltroJwt gerenciadorJwt" />
-      <entry_point TYPE="field" FQNAME="sgc.seguranca.login.LoginController gerenciadorJwt" />
       <entry_point TYPE="field" FQNAME="sgc.seguranca.acesso.AbstractAccessPolicy hierarquiaService" />
       <entry_point TYPE="field" FQNAME="sgc.organizacao.UnidadeFacade hierarquiaService" />
       <entry_point TYPE="field" FQNAME="sgc.alerta.model.AlertaUsuario id" />
       <entry_point TYPE="field" FQNAME="sgc.processo.model.UnidadeProcesso id" />
       <entry_point TYPE="field" FQNAME="sgc.mapa.service.MapaFacade impactoMapaService" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.workflow.SubprocessoCadastroWorkflowService impactoMapaService" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.SituacaoUnidade INATIVA" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.dto.UnidadeDto isElegivel" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.AtribuicaoTemporaria justificativa" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.dto.MapaAjusteDto justificativaDevolucao" />
-      <entry_point TYPE="field" FQNAME="sgc.comum.config.ConfigAplicacao jwt" />
-      <entry_point TYPE="field" FQNAME="sgc.seguranca.login.GerenciadorJwt jwtProperties" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.model.SituacaoProcesso label" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.model.TipoProcesso label" />
-      <entry_point TYPE="field" FQNAME="sgc.seguranca.login.LoginController limitadorTentativasLogin" />
       <entry_point TYPE="field" FQNAME="sgc.seguranca.login.dto.UsuarioAcessoAd login" />
-      <entry_point TYPE="field" FQNAME="sgc.seguranca.login.LoginController loginFacade" />
       <entry_point TYPE="field" FQNAME="sgc.seguranca.login.dto.UsuarioAcessoAd lotacao" />
-      <entry_point TYPE="field" FQNAME="sgc.mapa.model.Atividade mapa" />
-      <entry_point TYPE="field" FQNAME="sgc.mapa.model.Competencia mapa" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.model.Subprocesso mapa" />
       <entry_point TYPE="field" FQNAME="sgc.seguranca.acesso.AccessControlService mapaAccessPolicy" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoAjusteMapaService mapaAjusteMapper" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto.UnidadeParticipanteDto mapaCodigo" />
       <entry_point TYPE="field" FQNAME="sgc.mapa.MapaController mapaFacade" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoContextoService mapaFacade" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.SubprocessoMapaController mapaFacade" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.workflow.SubprocessoMapaWorkflowService mapaFacade" />
-      <entry_point TYPE="field" FQNAME="sgc.mapa.service.ImpactoMapaService mapaManutencaoService" />
       <entry_point TYPE="field" FQNAME="sgc.mapa.service.MapaFacade mapaManutencaoService" />
       <entry_point TYPE="field" FQNAME="sgc.relatorio.service.RelatorioFacade mapaManutencaoService" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoAjusteMapaService mapaManutencaoService" />
@@ -218,21 +117,11 @@
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoContextoService mapaManutencaoService" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.workflow.SubprocessoMapaWorkflowService mapaManutencaoService" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.crud.SubprocessoValidacaoService mapaManutencaoService" />
-      <entry_point TYPE="field" FQNAME="sgc.mapa.service.CopiaMapaService mapaRepo" />
-      <entry_point TYPE="field" FQNAME="sgc.mapa.service.ImpactoMapaService mapaRepo" />
-      <entry_point TYPE="field" FQNAME="sgc.mapa.service.MapaManutencaoService mapaRepo" />
-      <entry_point TYPE="field" FQNAME="sgc.mapa.service.MapaSalvamentoService mapaRepo" />
-      <entry_point TYPE="field" FQNAME="sgc.mapa.service.MapaVisualizacaoService mapaRepo" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.factory.SubprocessoFactory mapaRepo" />
       <entry_point TYPE="field" FQNAME="sgc.mapa.service.MapaFacade mapaSalvamentoService" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.UnidadeMapa mapaVigente" />
       <entry_point TYPE="field" FQNAME="sgc.mapa.service.MapaFacade mapaVisualizacaoService" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoFacade mapaWorkflowService" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.Usuario matricula" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.Unidade matriculaTitular" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.model.UnidadeProcesso matriculaTitular" />
       <entry_point TYPE="field" FQNAME="sgc.alerta.dto.AlertaDto mensagem" />
-      <entry_point TYPE="field" FQNAME="sgc.comum.erros.ErroApi message" />
       <entry_point TYPE="field" FQNAME="sgc.analise.model.Analise motivo" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.workflow.SubprocessoAdminWorkflowService movimentacaoRepo" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoAtividadeService movimentacaoRepo" />
@@ -240,12 +129,6 @@
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.factory.SubprocessoFactory movimentacaoRepo" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.workflow.SubprocessoTransicaoService movimentacaoRepo" />
       <entry_point TYPE="field" FQNAME="sgc.seguranca.login.dto.UsuarioAcessoAd nivel" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.dto.CompetenciaAjusteDto nome" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto.UnidadeParticipanteDto nome" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.Unidade nome" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.dto.UnidadeDto nome" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.model.UnidadeProcesso nome" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.Usuario nome" />
       <entry_point TYPE="field" FQNAME="sgc.seguranca.login.dto.UsuarioAcessoAd nome" />
       <entry_point TYPE="field" FQNAME="sgc.seguranca.login.dto.UsuarioAcessoAd.LotacaoAd nome" />
       <entry_point TYPE="field" FQNAME="sgc.seguranca.login.dto.UsuarioAcessoAd nomeNivel" />
@@ -256,8 +139,6 @@
       <entry_point TYPE="field" FQNAME="sgc.processo.listener.EventoProcessoListener notificacaoModelosService" />
       <entry_point TYPE="field" FQNAME="sgc.analise.model.Analise observacoes" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.eventos.EventoTransicaoSubprocesso observacoes" />
-      <entry_point TYPE="field" FQNAME="sgc.mapa.model.Mapa observacoesDisponibilizacao" />
-      <entry_point TYPE="field" FQNAME="sgc.comum.config.ConfigAplicacao openapi" />
       <entry_point TYPE="field" FQNAME="sgc.seguranca.login.LoginController organizacaoFacade" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.SubprocessoCadastroController organizacaoFacade" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.SubprocessoCrudController organizacaoFacade" />
@@ -265,27 +146,13 @@
       <entry_point TYPE="field" FQNAME="sgc.painel.PainelController painelFacade" />
       <entry_point TYPE="field" FQNAME="sgc.configuracao.ConfiguracaoController parametroMapper" />
       <entry_point TYPE="field" FQNAME="sgc.configuracao.ConfiguracaoService parametroRepo" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.model.Processo participantes" />
       <entry_point TYPE="field" FQNAME="sgc.relatorio.service.RelatorioFacade pdfFactory" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.AtribuicaoTemporaria perfil" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.UsuarioPerfil perfil" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.UsuarioPerfilId perfil" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.Usuario perfilAtivo" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoContextoService permissaoCalculator" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoFacade permissaoCalculator" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto podeAceitarCadastroBloco" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto podeDisponibilizarMapaBloco" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto podeFinalizar" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto podeHomologarCadastro" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto podeHomologarMapa" />
-      <entry_point TYPE="field" FQNAME="sgc.alerta.model.Alerta processo" />
       <entry_point TYPE="field" FQNAME="sgc.alerta.dto.AlertaDto processo" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.model.Subprocesso processo" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.model.UnidadeProcesso processo" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.eventos.TipoTransicao PROCESSO_INICIADO" />
       <entry_point TYPE="field" FQNAME="sgc.seguranca.acesso.AccessControlService processoAccessPolicy" />
       <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoFacade processoAcessoService" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.model.UnidadeProcessoId processoCodigo" />
       <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoFacade processoConsultaService" />
       <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoManutencaoService processoConsultaService" />
       <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoFacade processoDetalheBuilder" />
@@ -306,66 +173,37 @@
       <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoFinalizador processoValidador" />
       <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoInicializador processoValidador" />
       <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoManutencaoService processoValidador" />
-      <entry_point TYPE="field" FQNAME="sgc.seguranca.login.ConfiguracaoAcessoAd properties" />
       <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoFinalizador publicadorEventos" />
       <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoInicializador publicadorEventos" />
       <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoAcessoService queryService" />
       <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoFinalizador queryService" />
       <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoValidador queryService" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.Usuario ramal" />
       <entry_point TYPE="field" FQNAME="sgc.relatorio.controller.RelatorioController relatorioService" />
-      <entry_point TYPE="field" FQNAME="sgc.comum.config.ConfigAplicacao.Email remetente" />
-      <entry_point TYPE="field" FQNAME="sgc.comum.config.ConfigAplicacao.Email remetenteNome" />
-      <entry_point TYPE="field" FQNAME="sgc.mapa.service.CopiaMapaService repo" />
       <entry_point TYPE="field" FQNAME="sgc.mapa.service.ImpactoMapaService repo" />
-      <entry_point TYPE="field" FQNAME="sgc.mapa.service.MapaManutencaoService repo" />
-      <entry_point TYPE="field" FQNAME="sgc.mapa.service.MapaSalvamentoService repo" />
       <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoConsultaService repo" />
       <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoFinalizador repo" />
       <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoInicializador repo" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.workflow.SubprocessoAdminWorkflowService repo" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoAjusteMapaService repo" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoAtividadeService repo" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.UnidadeHierarquiaService repo" />
       <entry_point TYPE="field" FQNAME="sgc.organizacao.service.UnidadeResponsavelService repo" />
       <entry_point TYPE="field" FQNAME="sgc.organizacao.service.UnidadeService repo" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.UsuarioService repo" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.crud.SubprocessoCrudService repositorioComum" />
       <entry_point TYPE="field" FQNAME="sgc.notificacao.NotificacaoEmailService repositorioNotificacao" />
       <entry_point TYPE="field" FQNAME="sgc.organizacao.service.UnidadeResponsavelService responsabilidadeRepo" />
       <entry_point TYPE="field" FQNAME="sgc.organizacao.service.ValidadorDadosOrgService responsabilidadeRepo" />
       <entry_point TYPE="field" FQNAME="sgc.organizacao.UnidadeFacade responsavelService" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto resumoSubprocessos" />
-      <entry_point TYPE="field" FQNAME="sgc.comum.model.EntidadeBase serialVersionUID" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.model.Processo serialVersionUID" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.model.UnidadeProcesso serialVersionUID" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.model.UnidadeProcessoId serialVersionUID" />
       <entry_point TYPE="field" FQNAME="sgc.processo.listener.EventoProcessoListener servicoAlertas" />
       <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoConsultaService servicoConsultas" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.factory.SubprocessoFactory servicoDeCopiaDeMapa" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto.UnidadeParticipanteDto sigla" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.Unidade sigla" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.dto.UnidadeDto sigla" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.model.UnidadeProcesso sigla" />
       <entry_point TYPE="field" FQNAME="sgc.seguranca.login.dto.UsuarioAcessoAd.LotacaoAd sigla" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.model.Processo situacao" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto situacao" />
       <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDto situacao" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.model.Subprocesso situacao" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.dto.SubprocessoElegivelDto situacao" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.Unidade situacao" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.model.UnidadeProcesso situacao" />
       <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto situacaoLabel" />
       <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto.UnidadeParticipanteDto situacaoLabel" />
       <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDto situacaoLabel" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto.UnidadeParticipanteDto situacaoSubprocesso" />
       <entry_point TYPE="field" FQNAME="sgc.notificacao.NotificacaoEmailAsyncExecutor sleeper" />
-      <entry_point TYPE="field" FQNAME="sgc.comum.erros.ErroApi status" />
-      <entry_point TYPE="field" FQNAME="sgc.comum.erros.ErroNegocioBase status" />
       <entry_point TYPE="field" FQNAME="sgc.analise.model.Analise subprocesso" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.eventos.EventoTransicaoSubprocesso subprocesso" />
-      <entry_point TYPE="field" FQNAME="sgc.mapa.model.Mapa subprocesso" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.model.Movimentacao subprocesso" />
       <entry_point TYPE="field" FQNAME="sgc.notificacao.model.Notificacao subprocesso" />
       <entry_point TYPE="field" FQNAME="sgc.seguranca.acesso.AccessControlService subprocessoAccessPolicy" />
       <entry_point TYPE="field" FQNAME="sgc.analise.AnaliseController subprocessoFacade" />
@@ -388,75 +226,33 @@
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.crud.SubprocessoCrudService subprocessoRepo" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.factory.SubprocessoFactory subprocessoRepo" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.workflow.SubprocessoMapaWorkflowService subprocessoRepo" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.Unidade subunidades" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.dto.UnidadeDto subunidades" />
-      <entry_point TYPE="field" FQNAME="sgc.mapa.model.Mapa sugestoes" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.eventos.TipoTransicao templateAlerta" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.eventos.TipoTransicao templateEmail" />
       <entry_point TYPE="field" FQNAME="sgc.notificacao.NotificacaoModelosService templateEngine" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.notificacao.SubprocessoEmailService templateEngine" />
-      <entry_point TYPE="field" FQNAME="sgc.comum.erros.ErroApi timestamp" />
       <entry_point TYPE="field" FQNAME="sgc.analise.model.Analise tipo" />
       <entry_point TYPE="field" FQNAME="sgc.processo.eventos.EventoProcessoIniciado tipo" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.eventos.EventoTransicaoSubprocesso tipo" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.model.Processo tipo" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto tipo" />
       <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDto tipo" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.Responsabilidade tipo" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.Unidade tipo" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.dto.UnidadeDto tipo" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.model.UnidadeProcesso tipo" />
       <entry_point TYPE="field" FQNAME="sgc.seguranca.login.dto.UsuarioAcessoAd tipo" />
       <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto tipoLabel" />
       <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDto tipoLabel" />
-      <entry_point TYPE="field" FQNAME="sgc.comum.config.ConfigAplicacao.OpenApi title" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.Usuario tituloEleitoral" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.Unidade tituloTitular" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.dto.UnidadeDto tituloTitular" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.model.UnidadeProcesso tituloTitular" />
-      <entry_point TYPE="field" FQNAME="sgc.comum.erros.ErroApi traceId" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.workflow.SubprocessoCadastroWorkflowService transicaoService" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.workflow.SubprocessoMapaWorkflowService transicaoService" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.AtribuicaoTemporaria unidade" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.Responsabilidade unidade" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.model.Subprocesso unidade" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.UsuarioPerfil unidade" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.VinculacaoUnidade unidadeAnteriorCodigo" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.Usuario unidadeAtivaCodigo" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.VinculacaoUnidade unidadeAtualCodigo" />
       <entry_point TYPE="field" FQNAME="sgc.analise.model.Analise unidadeCodigo" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.Responsabilidade unidadeCodigo" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.dto.SubprocessoElegivelDto unidadeCodigo" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.UnidadeMapa unidadeCodigo" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.model.UnidadeProcessoId unidadeCodigo" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.UsuarioPerfil unidadeCodigo" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.UsuarioPerfilId unidadeCodigo" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.Usuario unidadeCompetencia" />
-      <entry_point TYPE="field" FQNAME="sgc.alerta.model.Alerta unidadeDestino" />
       <entry_point TYPE="field" FQNAME="sgc.alerta.dto.AlertaDto unidadeDestino" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.eventos.EventoTransicaoSubprocesso unidadeDestino" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.model.Movimentacao unidadeDestino" />
       <entry_point TYPE="field" FQNAME="sgc.notificacao.model.Notificacao unidadeDestino" />
       <entry_point TYPE="field" FQNAME="sgc.organizacao.OrganizacaoFacade unidadeFacade" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoContextoService unidadeFacade" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.Usuario unidadeLotacao" />
       <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoInicializador unidadeMapaRepo" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.UnidadeService unidadeMapaRepo" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.dto.MapaAjusteDto unidadeNome" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.dto.SubprocessoElegivelDto unidadeNome" />
-      <entry_point TYPE="field" FQNAME="sgc.alerta.model.Alerta unidadeOrigem" />
       <entry_point TYPE="field" FQNAME="sgc.alerta.dto.AlertaDto unidadeOrigem" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.eventos.EventoTransicaoSubprocesso unidadeOrigem" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.model.Movimentacao unidadeOrigem" />
       <entry_point TYPE="field" FQNAME="sgc.notificacao.model.Notificacao unidadeOrigem" />
       <entry_point TYPE="field" FQNAME="sgc.analise.mapper.AnaliseMapper unidadeRepo" />
       <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoInicializador unidadeRepo" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.UnidadeHierarquiaService unidadeRepo" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.UnidadeService unidadeRepo" />
       <entry_point TYPE="field" FQNAME="sgc.organizacao.service.ValidadorDadosOrgService unidadeRepo" />
       <entry_point TYPE="field" FQNAME="sgc.organizacao.UsuarioFacade unidadeResponsavelService" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto unidades" />
-      <entry_point TYPE="field" FQNAME="sgc.alerta.AlertaFacade unidadeService" />
       <entry_point TYPE="field" FQNAME="sgc.analise.AnaliseFacade unidadeService" />
       <entry_point TYPE="field" FQNAME="sgc.processo.listener.EventoProcessoListener unidadeService" />
       <entry_point TYPE="field" FQNAME="sgc.painel.PainelFacade unidadeService" />
@@ -469,34 +265,17 @@
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.workflow.SubprocessoAdminWorkflowService unidadeService" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.workflow.SubprocessoCadastroWorkflowService unidadeService" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.workflow.SubprocessoMapaWorkflowService unidadeService" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.UnidadeController unidadeService" />
       <entry_point TYPE="field" FQNAME="sgc.organizacao.UnidadeFacade unidadeService" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.dto.SubprocessoElegivelDto unidadeSigla" />
       <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDto unidadesParticipantes" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.Unidade unidadeSuperior" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.model.UnidadeProcesso unidadeSuperiorCodigo" />
-      <entry_point TYPE="field" FQNAME="sgc.comum.config.ConfigAplicacao urlAcessoHom" />
-      <entry_point TYPE="field" FQNAME="sgc.comum.config.ConfigAplicacao urlAcessoProd" />
-      <entry_point TYPE="field" FQNAME="sgc.alerta.model.AlertaUsuario usuario" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.AtribuicaoTemporaria usuario" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.eventos.EventoTransicaoSubprocesso usuario" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.model.Movimentacao usuario" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.Responsabilidade usuario" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.UsuarioPerfil usuario" />
       <entry_point TYPE="field" FQNAME="sgc.alerta.model.Alerta usuarioDestino" />
       <entry_point TYPE="field" FQNAME="sgc.organizacao.OrganizacaoFacade usuarioFacade" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.workflow.SubprocessoTransicaoService usuarioFacade" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.AtribuicaoTemporaria usuarioMatricula" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.Responsabilidade usuarioMatricula" />
       <entry_point TYPE="field" FQNAME="sgc.seguranca.acesso.AbstractAccessPolicy usuarioPerfilRepo" />
       <entry_point TYPE="field" FQNAME="sgc.organizacao.service.UnidadeResponsavelService usuarioPerfilRepo" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.UsuarioService usuarioPerfilRepo" />
       <entry_point TYPE="field" FQNAME="sgc.organizacao.service.UnidadeResponsavelService usuarioRepo" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.UsuarioService usuarioRepo" />
       <entry_point TYPE="field" FQNAME="sgc.organizacao.service.ValidadorDadosOrgService usuarioRepo" />
-      <entry_point TYPE="field" FQNAME="sgc.alerta.AlertaFacade usuarioService" />
       <entry_point TYPE="field" FQNAME="sgc.processo.listener.EventoProcessoListener usuarioService" />
-      <entry_point TYPE="field" FQNAME="sgc.seguranca.login.FiltroJwt usuarioService" />
       <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoAcessoService usuarioService" />
       <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoConsultaService usuarioService" />
       <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoFacade usuarioService" />
@@ -505,71 +284,31 @@
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoContextoService usuarioService" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoFacade usuarioService" />
       <entry_point TYPE="field" FQNAME="sgc.organizacao.UnidadeFacade usuarioService" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.UsuarioController usuarioService" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.UsuarioFacade usuarioService" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.workflow.SubprocessoCadastroWorkflowService usuarioServiceFacade" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.Administrador usuarioTitulo" />
-      <entry_point TYPE="field" FQNAME="sgc.alerta.model.AlertaUsuario.Chave usuarioTitulo" />
       <entry_point TYPE="field" FQNAME="sgc.analise.model.Analise usuarioTitulo" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.AtribuicaoTemporaria usuarioTitulo" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.Responsabilidade usuarioTitulo" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.UsuarioPerfil usuarioTitulo" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.UsuarioPerfilId usuarioTitulo" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.workflow.SubprocessoCadastroWorkflowService validacaoService" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoFacade validacaoService" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.workflow.SubprocessoMapaWorkflowService validacaoService" />
       <entry_point TYPE="field" FQNAME="sgc.configuracao.model.Parametro valor" />
-      <entry_point TYPE="field" FQNAME="sgc.comum.config.ConfigAplicacao.OpenApi version" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.model.Analise acao" />
       <entry_point TYPE="field" FQNAME="sgc.processo.painel.PainelFacade alertaService" />
       <entry_point TYPE="field" FQNAME="sgc.processo.ProcessoFacade alertaService" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoService alertaService" />
       <entry_point TYPE="field" FQNAME="sgc.seguranca.LoginFacade ambienteTestes" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoService analiseRepo" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.ResponsavelUnidadeService atribuicaoTemporariaRepo" />
       <entry_point TYPE="field" FQNAME="sgc.relatorio.ErroRelatorio causa" />
-      <entry_point TYPE="field" FQNAME="sgc.parametros.model.Parametro chave" />
-      <entry_point TYPE="field" FQNAME="sgc.seguranca.dto.UsuarioAcessoAd.LotacaoAd codigo" />
-      <entry_point TYPE="field" FQNAME="sgc.alerta.EmailService config" />
-      <entry_point TYPE="field" FQNAME="sgc.parametros.ConfiguracaoController configuracaoService" />
       <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoAcessoService consultas" />
-      <entry_point TYPE="field" FQNAME="sgc.alerta.model.Notificacao conteudo" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoService copiaMapaService" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.model.Analise dataHora" />
-      <entry_point TYPE="field" FQNAME="sgc.alerta.model.Notificacao dataHora" />
-      <entry_point TYPE="field" FQNAME="sgc.alerta.model.Alerta dataHoraLeitura" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.model.TipoTransicao descMovimentacao" />
-      <entry_point TYPE="field" FQNAME="sgc.parametros.model.Parametro descricao" />
-      <entry_point TYPE="field" FQNAME="sgc.seguranca.dto.UsuarioAcessoAd email" />
       <entry_point TYPE="field" FQNAME="sgc.processo.ProcessoFacade emailModelosService" />
       <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoNotificacaoService emailModelosService" />
       <entry_point TYPE="field" FQNAME="sgc.processo.ProcessoFacade emailService" />
       <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoNotificacaoService emailService" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoService emailService" />
-      <entry_point TYPE="field" FQNAME="sgc.alerta.EmailService enviadorEmail" />
       <entry_point TYPE="field" FQNAME="sgc.organizacao.OrganizacaoFacade hierarquiaService" />
-      <entry_point TYPE="field" FQNAME="sgc.seguranca.SgcPermissionEvaluator hierarquiaService" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoService impactoMapaService" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.model.Subprocesso localizacaoAtual" />
-      <entry_point TYPE="field" FQNAME="sgc.seguranca.dto.UsuarioAcessoAd login" />
-      <entry_point TYPE="field" FQNAME="sgc.seguranca.dto.UsuarioAcessoAd lotacao" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoService mapaAjusteMapper" />
-      <entry_point TYPE="field" FQNAME="sgc.mapa.MapaController mapaManutencaoService" />
-      <entry_point TYPE="field" FQNAME="sgc.relatorio.RelatorioFacade mapaManutencaoService" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoService mapaManutencaoService" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoService mapaSalvamentoService" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoService mapaVisualizacaoService" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.model.Analise motivo" />
-      <entry_point TYPE="field" FQNAME="sgc.seguranca.SgcPermissionEvaluator movimentacaoRepo" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoService movimentacaoRepo" />
-      <entry_point TYPE="field" FQNAME="sgc.seguranca.dto.UsuarioAcessoAd nivel" />
-      <entry_point TYPE="field" FQNAME="sgc.seguranca.dto.UsuarioAcessoAd nome" />
-      <entry_point TYPE="field" FQNAME="sgc.seguranca.dto.UsuarioAcessoAd.LotacaoAd nome" />
-      <entry_point TYPE="field" FQNAME="sgc.seguranca.dto.UsuarioAcessoAd nomeNivel" />
       <entry_point TYPE="field" FQNAME="sgc.alerta.EmailService notificacaoRepo" />
       <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoFinalizador notificacaoService" />
       <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoInicializador notificacaoService" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.model.Analise observacoes" />
       <entry_point TYPE="field" FQNAME="sgc.alerta.AlertaFacade organizacaoFacade" />
       <entry_point TYPE="field" FQNAME="sgc.processo.painel.PainelFacade organizacaoFacade" />
       <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoAcessoService organizacaoFacade" />
@@ -582,15 +321,9 @@
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.SubprocessoController organizacaoFacade" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoService organizacaoFacade" />
       <entry_point TYPE="field" FQNAME="sgc.organizacao.UnidadeController organizacaoFacade" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.painel.PainelController painelFacade" />
       <entry_point TYPE="field" FQNAME="sgc.parametros.ConfiguracaoController parametroMapper" />
-      <entry_point TYPE="field" FQNAME="sgc.parametros.ConfiguracaoService parametroRepo" />
-      <entry_point TYPE="field" FQNAME="sgc.relatorio.RelatorioFacade pdfFactory" />
-      <entry_point TYPE="field" FQNAME="sgc.mapa.service.ImpactoMapaService permissionEvaluator" />
       <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoDetalheBuilder permissionEvaluator" />
       <entry_point TYPE="field" FQNAME="sgc.processo.ProcessoFacade permissionEvaluator" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoService permissionEvaluator" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.model.TipoTransicao PROCESSO_INICIADO" />
       <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoConsultaService processoAcessoService" />
       <entry_point TYPE="field" FQNAME="sgc.processo.ProcessoFacade processoAcessoService" />
       <entry_point TYPE="field" FQNAME="sgc.processo.ProcessoFacade processoConsultaService" />
@@ -601,51 +334,22 @@
       <entry_point TYPE="field" FQNAME="sgc.processo.ProcessoFacade processoInicializador" />
       <entry_point TYPE="field" FQNAME="sgc.processo.ProcessoFacade processoManutencaoService" />
       <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoNotificacaoService processoRepo" />
-      <entry_point TYPE="field" FQNAME="sgc.seguranca.SgcPermissionEvaluator processoRepo" />
-      <entry_point TYPE="field" FQNAME="sgc.relatorio.RelatorioController relatorioService" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.ResponsavelUnidadeService repo" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoService repo" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.Unidade responsabilidade" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.HierarquiaService responsabilidadeRepo" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.ResponsavelUnidadeService responsabilidadeRepo" />
       <entry_point TYPE="field" FQNAME="sgc.organizacao.OrganizacaoFacade responsavelService" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.UsuarioFacade responsavelUnidadeService" />
       <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoNotificacaoService servicoAlertas" />
-      <entry_point TYPE="field" FQNAME="sgc.seguranca.dto.UsuarioAcessoAd.LotacaoAd sigla" />
       <entry_point TYPE="field" FQNAME="sgc.comum.erros.ErroApi stackTrace" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.model.Analise subprocesso" />
-      <entry_point TYPE="field" FQNAME="sgc.alerta.model.Notificacao subprocesso" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.ConsultasSubprocessoService subprocessoRepo" />
-      <entry_point TYPE="field" FQNAME="sgc.seguranca.SgcPermissionEvaluator subprocessoRepo" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoService subprocessoRepo" />
       <entry_point TYPE="field" FQNAME="sgc.processo.ProcessoFacade subprocessoService" />
       <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoInicializador subprocessoService" />
       <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoNotificacaoService subprocessoService" />
       <entry_point TYPE="field" FQNAME="sgc.relatorio.RelatorioFacade subprocessoService" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.SubprocessoController subprocessoService" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.model.TipoTransicao templateAlerta" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.model.TipoTransicao templateEmail" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.model.TipoTransicao templateEmailSuperior" />
-      <entry_point TYPE="field" FQNAME="sgc.alerta.EmailModelosService templateEngine" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoService templateEngine" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.model.Analise tipo" />
-      <entry_point TYPE="field" FQNAME="sgc.seguranca.dto.UsuarioAcessoAd tipo" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.model.Analise unidadeCodigo" />
-      <entry_point TYPE="field" FQNAME="sgc.alerta.model.Notificacao unidadeDestino" />
-      <entry_point TYPE="field" FQNAME="sgc.alerta.model.Notificacao unidadeOrigem" />
       <entry_point TYPE="field" FQNAME="sgc.organizacao.OrganizacaoFacade unidadeService" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoService usuarioFacade" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.ResponsavelUnidadeService usuarioRepo" />
       <entry_point TYPE="field" FQNAME="sgc.organizacao.OrganizacaoFacade usuarioService" />
       <entry_point TYPE="field" FQNAME="sgc.processo.ProcessoFacade usuarioService" />
       <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoNotificacaoService usuarioService" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.model.Analise usuarioTitulo" />
-      <entry_point TYPE="field" FQNAME="sgc.parametros.model.Parametro valor" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoService hierarquiaService" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.model.TipoUnidade SEM_EQUIPE" />
       <entry_point TYPE="field" FQNAME="sgc.integracao.CDU30IntegrationTest administradorRepo" />
       <entry_point TYPE="field" FQNAME="sgc.alerta.AlertaControllerTest alertaFacade" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.painel.PainelFacade alertaFacade" />
       <entry_point TYPE="field" FQNAME="sgc.integracao.CDU02IntegrationTest alertaRepo" />
       <entry_point TYPE="field" FQNAME="sgc.integracao.CDU04IntegrationTest alertaRepo" />
       <entry_point TYPE="field" FQNAME="sgc.integracao.CDU09IntegrationTest alertaRepo" />
@@ -657,8 +361,6 @@
       <entry_point TYPE="field" FQNAME="sgc.integracao.CDU32IntegrationTest alertaRepo" />
       <entry_point TYPE="field" FQNAME="sgc.integracao.CDU33IntegrationTest alertaRepo" />
       <entry_point TYPE="field" FQNAME="sgc.integracao.CDU34IntegrationTest alertaRepo" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoNotificacaoService alertaService" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoTransicaoService alertaService" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoTransicaoServiceCoverageIntegrationTest alertaService" />
       <entry_point TYPE="field" FQNAME="sgc.integracao.CDU09IntegrationTest analiseRepo" />
       <entry_point TYPE="field" FQNAME="sgc.integracao.CDU10IntegrationTest analiseRepo" />
@@ -667,10 +369,8 @@
       <entry_point TYPE="field" FQNAME="sgc.integracao.CDU17IntegrationTest analiseRepo" />
       <entry_point TYPE="field" FQNAME="sgc.integracao.CDU22IntegrationTest analiseRepo" />
       <entry_point TYPE="field" FQNAME="sgc.integracao.CDU25IntegrationTest analiseRepo" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoTransicaoService analiseRepo" />
       <entry_point TYPE="field" FQNAME="sgc.mapa.AtividadeControllerTest atividadeFacade" />
       <entry_point TYPE="field" FQNAME="sgc.integracao.BaseIntegrationTest atividadeRepo" />
-      <entry_point TYPE="field" FQNAME="sgc.seguranca.SgcPermissionEvaluator atividadeRepo" />
       <entry_point TYPE="field" FQNAME="sgc.integracao.SubprocessoFluxoIntegrationTest atividadeRepo" />
       <entry_point TYPE="field" FQNAME="sgc.integracao.SubprocessoServiceAjusteIntegrationTest atividadeRepo" />
       <entry_point TYPE="field" FQNAME="sgc.integracao.SubprocessoServiceAtividadeIntegrationTest atividadeRepo" />
@@ -678,8 +378,6 @@
       <entry_point TYPE="field" FQNAME="sgc.integracao.SubprocessoServiceSalvarIntegrationTest atividadeRepo" />
       <entry_point TYPE="field" FQNAME="sgc.integracao.SubprocessoServiceValidacaoCadastroIntegrationTest atividadeRepo" />
       <entry_point TYPE="field" FQNAME="sgc.integracao.SubprocessoServiceValidacaoIntegrationTest atividadeRepo" />
-      <entry_point TYPE="field" FQNAME="sgc.alerta.model.AlertaUsuario codigo" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.model.UnidadeProcesso codigo" />
       <entry_point TYPE="field" FQNAME="sgc.integracao.CDU04IntegrationTest competenciaRepo" />
       <entry_point TYPE="field" FQNAME="sgc.integracao.CDU05IntegrationTest competenciaRepo" />
       <entry_point TYPE="field" FQNAME="sgc.integracao.CDU09IntegrationTest competenciaRepo" />
@@ -713,11 +411,7 @@
       <entry_point TYPE="field" FQNAME="sgc.arquitetura.ArchConsistencyTest controllers_should_not_return_jpa_entities_without_json_view" />
       <entry_point TYPE="field" FQNAME="sgc.comum.erros.TestSecurityController.TestDto dadoSensivel" />
       <entry_point TYPE="field" FQNAME="sgc.arquitetura.ArchConsistencyTest dtos_should_not_be_jpa_entities" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoService emailModelosService" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoService emailService" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoNotificacaoService emailService" />
       <entry_point TYPE="field" FQNAME="sgc.integracao.SubprocessoServiceEmailIntegrationTest emailService" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoTransicaoService emailService" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoTransicaoServiceCoverageIntegrationTest emailService" />
       <entry_point TYPE="field" FQNAME="sgc.integracao.CDU01IntegrationTest entityManager" />
       <entry_point TYPE="field" FQNAME="sgc.integracao.CDU08IntegrationTest entityManager" />
@@ -748,13 +442,9 @@
       <entry_point TYPE="field" FQNAME="sgc.seguranca.login.LoginControllerTest gerenciadorJwt" />
       <entry_point TYPE="field" FQNAME="sgc.integracao.SecurityVulnerabilityIntegrationTest gerenciadorJwt" />
       <entry_point TYPE="field" FQNAME="sgc.integracao.BaseIntegrationTest greenMail" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.painel.PainelFacade hierarquiaService" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoTransicaoService hierarquiaService" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoTransicaoServiceCoverageIntegrationTest hierarquiaService" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.UnidadeController hierarquiaService" />
       <entry_point TYPE="field" FQNAME="sgc.organizacao.UnidadeControllerTest hierarquiaService" />
       <entry_point TYPE="field" FQNAME="sgc.organizacao.UsuarioServiceTest hierarquiaService" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoTransicaoService impactoMapaService" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoTransicaoServiceCoverageIntegrationTest impactoMapaService" />
       <entry_point TYPE="field" FQNAME="sgc.integracao.CDU01IntegrationTest jdbcTemplate" />
       <entry_point TYPE="field" FQNAME="sgc.integracao.CDU10IntegrationTest jdbcTemplate" />
@@ -765,29 +455,21 @@
       <entry_point TYPE="field" FQNAME="sgc.integracao.CDU17IntegrationTest jdbcTemplate" />
       <entry_point TYPE="field" FQNAME="sgc.integracao.CDU23IntegrationTest jdbcTemplate" />
       <entry_point TYPE="field" FQNAME="sgc.integracao.CDU26IntegrationTest jdbcTemplate" />
-      <entry_point TYPE="field" FQNAME="sgc.e2e.E2eController jdbcTemplate" />
       <entry_point TYPE="field" FQNAME="sgc.e2e.E2eControllerTest jdbcTemplate" />
       <entry_point TYPE="field" FQNAME="sgc.integracao.SubprocessoFluxoIntegrationTest jdbcTemplate" />
       <entry_point TYPE="field" FQNAME="sgc.integracao.SubprocessoServiceEmailIntegrationTest jdbcTemplate" />
       <entry_point TYPE="field" FQNAME="sgc.seguranca.login.LoginControllerLogInjectionTest limitadorTentativasLogin" />
       <entry_point TYPE="field" FQNAME="sgc.seguranca.login.LoginControllerTest limitadorTentativasLogin" />
       <entry_point TYPE="field" FQNAME="sgc.integracao.SecurityVulnerabilityIntegrationTest limitadorTentativasLogin" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.dto.ProcessoDetalheDto.UnidadeParticipanteDto localizacaoAtualCodigo" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.dto.SubprocessoElegivelDto localizacaoCodigo" />
       <entry_point TYPE="field" FQNAME="sgc.seguranca.login.LoginControllerLogInjectionTest loginFacade" />
       <entry_point TYPE="field" FQNAME="sgc.seguranca.login.LoginControllerTest loginFacade" />
       <entry_point TYPE="field" FQNAME="sgc.integracao.CDU11IntegrationTest loginHelper" />
-      <entry_point TYPE="field" FQNAME="sgc.mapa.AtividadeFacade mapaManutencaoService" />
       <entry_point TYPE="field" FQNAME="sgc.integracao.CDU09IntegrationTest mapaManutencaoService" />
       <entry_point TYPE="field" FQNAME="sgc.mapa.MapaControllerTest mapaManutencaoService" />
       <entry_point TYPE="field" FQNAME="sgc.integracao.SubprocessoServiceContextoIntegrationTest mapaManutencaoService" />
       <entry_point TYPE="field" FQNAME="sgc.integracao.SubprocessoServiceDatasIntegrationTest mapaManutencaoService" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoTransicaoService mapaManutencaoService" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoTransicaoServiceCoverageIntegrationTest mapaManutencaoService" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoValidacaoService mapaManutencaoService" />
       <entry_point TYPE="field" FQNAME="sgc.integracao.BaseIntegrationTest mapaRepo" />
-      <entry_point TYPE="field" FQNAME="sgc.e2e.E2eController mapaRepo" />
-      <entry_point TYPE="field" FQNAME="sgc.seguranca.SgcPermissionEvaluator mapaRepo" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoServiceCoverageIntegrationTest mapaRepo" />
       <entry_point TYPE="field" FQNAME="sgc.integracao.SubprocessoServiceDatasIntegrationTest mapaRepo" />
       <entry_point TYPE="field" FQNAME="sgc.integracao.SubprocessoServiceExtraMethodsIntegrationTest mapaRepo" />
@@ -833,12 +515,9 @@
       <entry_point TYPE="field" FQNAME="sgc.integracao.CDU32IntegrationTest movimentacaoRepo" />
       <entry_point TYPE="field" FQNAME="sgc.integracao.CDU33IntegrationTest movimentacaoRepo" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.model.MovimentacaoRepoPerformanceTest movimentacaoRepo" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoTransicaoService movimentacaoRepo" />
-      <entry_point TYPE="field" FQNAME="sgc.e2e.E2eController namedJdbcTemplate" />
       <entry_point TYPE="field" FQNAME="sgc.e2e.E2eControllerTest namedJdbcTemplate" />
       <entry_point TYPE="field" FQNAME="sgc.arquitetura.ArchConsistencyTest no_cycles_within_service_packages" />
       <entry_point TYPE="field" FQNAME="sgc.arquitetura.ArchConsistencyTest no_lazy_annotation_allowed" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoTransicaoService notificacaoService" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoTransicaoServiceCoverageIntegrationTest notificacaoService" />
       <entry_point TYPE="field" FQNAME="sgc.mapa.model.AtividadeJsonViewTest objectMapper" />
       <entry_point TYPE="field" FQNAME="sgc.integracao.BaseIntegrationTest objectMapper" />
@@ -850,17 +529,14 @@
       <entry_point TYPE="field" FQNAME="sgc.organizacao.model.UsuarioJsonViewTest objectMapper" />
       <entry_point TYPE="field" FQNAME="sgc.processo.painel.PainelControllerTest painelFacade" />
       <entry_point TYPE="field" FQNAME="sgc.integracao.CDU31IntegrationTest parametroRepo" />
-      <entry_point TYPE="field" FQNAME="sgc.seguranca.AcaoPermissao perfisPermitidos" />
       <entry_point TYPE="field" FQNAME="sgc.alerta.AlertaControllerTest permissionEvaluator" />
       <entry_point TYPE="field" FQNAME="sgc.mapa.AtividadeControllerTest permissionEvaluator" />
-      <entry_point TYPE="field" FQNAME="sgc.mapa.AtividadeFacade permissionEvaluator" />
       <entry_point TYPE="field" FQNAME="sgc.parametros.ConfiguracaoControllerTest permissionEvaluator" />
       <entry_point TYPE="field" FQNAME="sgc.seguranca.login.LoginControllerLogInjectionTest permissionEvaluator" />
       <entry_point TYPE="field" FQNAME="sgc.seguranca.login.LoginControllerTest permissionEvaluator" />
       <entry_point TYPE="field" FQNAME="sgc.mapa.MapaControllerTest permissionEvaluator" />
       <entry_point TYPE="field" FQNAME="sgc.processo.painel.PainelControllerTest permissionEvaluator" />
       <entry_point TYPE="field" FQNAME="sgc.processo.ProcessoControllerTest permissionEvaluator" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoService permissionEvaluator" />
       <entry_point TYPE="field" FQNAME="sgc.integracao.ReproducaoBugHierarquiaIntegrationTest permissionEvaluator" />
       <entry_point TYPE="field" FQNAME="sgc.comum.erros.RestExceptionHandlerSecurityTest permissionEvaluator" />
       <entry_point TYPE="field" FQNAME="sgc.comum.erros.RestExceptionHandlerTest permissionEvaluator" />
@@ -870,50 +546,31 @@
       <entry_point TYPE="field" FQNAME="sgc.organizacao.UnidadeControllerTest permissionEvaluator" />
       <entry_point TYPE="field" FQNAME="sgc.organizacao.UsuarioControllerTest permissionEvaluator" />
       <entry_point TYPE="field" FQNAME="sgc.integracao.BaseIntegrationTest processoRepo" />
-      <entry_point TYPE="field" FQNAME="sgc.e2e.E2eController processoRepo" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.model.MovimentacaoRepoPerformanceTest processoRepo" />
       <entry_point TYPE="field" FQNAME="sgc.processo.model.ProcessoRepoPerformanceTest processoRepo" />
       <entry_point TYPE="field" FQNAME="sgc.processo.model.ProcessoRepoTest processoRepo" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoService processoRepo" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoServiceCoverageIntegrationTest processoRepo" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoTransicaoServiceCoverageIntegrationTest processoRepo" />
-      <entry_point TYPE="field" FQNAME="sgc.e2e.E2eController processoService" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.painel.PainelFacade processoService" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.ProcessoController processoService" />
       <entry_point TYPE="field" FQNAME="sgc.processo.ProcessoControllerTest processoService" />
-      <entry_point TYPE="field" FQNAME="sgc.relatorio.RelatorioFacade processoService" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.UnidadeController processoService" />
       <entry_point TYPE="field" FQNAME="sgc.organizacao.UnidadeControllerTest processoService" />
       <entry_point TYPE="field" FQNAME="sgc.mapa.service.ImpactoMapaServiceTest repo" />
       <entry_point TYPE="field" FQNAME="sgc.mapa.service.MapaManutencaoServiceCoverageExtraTest repo" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoService repo" />
       <entry_point TYPE="field" FQNAME="sgc.arquitetura.ArchConsistencyTest repositories_should_have_repo_suffix" />
-      <entry_point TYPE="field" FQNAME="sgc.e2e.E2eController resourceLoader" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.dto.UnidadeDto responsavel" />
       <entry_point TYPE="field" FQNAME="sgc.integracao.CDU35IntegrationTest responsavelService" />
-      <entry_point TYPE="field" FQNAME="sgc.relatorio.RelatorioFacade responsavelService" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoNotificacaoService responsavelService" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.UnidadeController responsavelService" />
       <entry_point TYPE="field" FQNAME="sgc.organizacao.UnidadeControllerTest responsavelService" />
       <entry_point TYPE="field" FQNAME="sgc.organizacao.UsuarioServiceTest responsavelService" />
       <entry_point TYPE="field" FQNAME="sgc.comum.erros.RestExceptionHandlerTest restExceptionHandler" />
       <entry_point TYPE="field" FQNAME="sgc.integracao.MapaManutencaoServiceIntegrationTest service" />
       <entry_point TYPE="field" FQNAME="sgc.integracao.ProcessoServiceIntegrationTest service" />
       <entry_point TYPE="field" FQNAME="sgc.arquitetura.ArchConsistencyTest services_should_not_access_other_modules_repositories" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoService servicoAlertas" />
       <entry_point TYPE="field" FQNAME="sgc.integracao.BaseIntegrationTest subprocessoRepo" />
-      <entry_point TYPE="field" FQNAME="sgc.e2e.E2eController subprocessoRepo" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.model.MovimentacaoRepoPerformanceTest subprocessoRepo" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoServiceCoverageIntegrationTest subprocessoRepo" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoSituacaoService subprocessoRepo" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoTransicaoService subprocessoRepo" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoTransicaoServiceCoverageIntegrationTest subprocessoRepo" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoValidacaoService subprocessoRepo" />
       <entry_point TYPE="field" FQNAME="sgc.mapa.AtividadeFacade subprocessoService" />
       <entry_point TYPE="field" FQNAME="sgc.mapa.service.MapaManutencaoServiceCoverageExtraTest subprocessoService" />
       <entry_point TYPE="field" FQNAME="sgc.processo.ProcessoController subprocessoService" />
       <entry_point TYPE="field" FQNAME="sgc.processo.ProcessoControllerTest subprocessoService" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoService subprocessoService" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.SubprocessoControllerCoverageExtraTest subprocessoService" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.SubprocessoControllerCoverageTest subprocessoService" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.SubprocessoControllerTest subprocessoService" />
@@ -930,12 +587,7 @@
       <entry_point TYPE="field" FQNAME="sgc.integracao.SubprocessoServiceSalvarIntegrationTest subprocessoService" />
       <entry_point TYPE="field" FQNAME="sgc.integracao.SubprocessoServiceValidacaoCadastroIntegrationTest subprocessoService" />
       <entry_point TYPE="field" FQNAME="sgc.integracao.SubprocessoServiceValidacaoIntegrationTest subprocessoService" />
-      <entry_point TYPE="field" FQNAME="sgc.mapa.service.MapaManutencaoService subprocessoSituacaoService" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoNotificacaoService templateEngine" />
       <entry_point TYPE="field" FQNAME="sgc.integracao.CDU01IntegrationTest testUtil" />
-      <entry_point TYPE="field" FQNAME="sgc.seguranca.AcaoPermissao tipo" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoService transicaoService" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.SubprocessoController transicaoService" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.SubprocessoControllerCoverageExtraTest transicaoService" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.SubprocessoControllerCoverageTest transicaoService" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.SubprocessoControllerTest transicaoService" />
@@ -947,36 +599,23 @@
       <entry_point TYPE="field" FQNAME="sgc.integracao.SubprocessoServiceSalvarIntegrationTest unidadeMapaRepo" />
       <entry_point TYPE="field" FQNAME="sgc.security.ActuatorSecurityTest unidadeRepo" />
       <entry_point TYPE="field" FQNAME="sgc.integracao.BaseIntegrationTest unidadeRepo" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.HierarquiaService unidadeRepo" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.model.MovimentacaoRepoPerformanceTest unidadeRepo" />
       <entry_point TYPE="field" FQNAME="sgc.processo.model.ProcessoRepoPerformanceTest unidadeRepo" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoServiceCoverageIntegrationTest unidadeRepo" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoTransicaoServiceCoverageIntegrationTest unidadeRepo" />
       <entry_point TYPE="field" FQNAME="sgc.integracao.mocks.WithMockCustomUserSecurityContextFactory unidadeRepo" />
-      <entry_point TYPE="field" FQNAME="sgc.e2e.E2eController unidadeService" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.painel.PainelFacade unidadeService" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoService unidadeService" />
       <entry_point TYPE="field" FQNAME="sgc.relatorio.service.RelatorioFacadeTest unidadeService" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.SubprocessoController unidadeService" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.SubprocessoControllerCoverageExtraTest unidadeService" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.SubprocessoControllerCoverageTest unidadeService" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.SubprocessoControllerTest unidadeService" />
       <entry_point TYPE="field" FQNAME="sgc.integracao.SubprocessoFluxoIntegrationTest unidadeService" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoService unidadeService" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoTransicaoService unidadeService" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoTransicaoServiceCoverageIntegrationTest unidadeService" />
       <entry_point TYPE="field" FQNAME="sgc.organizacao.UnidadeControllerTest unidadeService" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.UnidadeHierarquiaService unidadeService" />
       <entry_point TYPE="field" FQNAME="sgc.organizacao.UsuarioServiceTest unidadeService2" />
-      <entry_point TYPE="field" FQNAME="sgc.alerta.model.Alerta usuarioDestinoTitulo" />
-      <entry_point TYPE="field" FQNAME="sgc.e2e.E2eController usuarioFacade" />
-      <entry_point TYPE="field" FQNAME="sgc.seguranca.login.LoginController usuarioFacade" />
       <entry_point TYPE="field" FQNAME="sgc.seguranca.login.LoginControllerLogInjectionTest usuarioFacade" />
       <entry_point TYPE="field" FQNAME="sgc.seguranca.login.LoginControllerTest usuarioFacade" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoServiceCoverageIntegrationTest usuarioFacade" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoTransicaoService usuarioFacade" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoTransicaoServiceCoverageIntegrationTest usuarioFacade" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.UsuarioController usuarioFacade" />
       <entry_point TYPE="field" FQNAME="sgc.organizacao.UsuarioControllerTest usuarioFacade" />
       <entry_point TYPE="field" FQNAME="sgc.security.ActuatorSecurityTest usuarioPerfilRepo" />
       <entry_point TYPE="field" FQNAME="sgc.integracao.CDU04IntegrationTest usuarioPerfilRepo" />
@@ -1011,26 +650,16 @@
       <entry_point TYPE="field" FQNAME="sgc.integracao.mocks.WithMockChefeSecurityContextFactory usuarioRepo" />
       <entry_point TYPE="field" FQNAME="sgc.integracao.mocks.WithMockCustomUserSecurityContextFactory usuarioRepo" />
       <entry_point TYPE="field" FQNAME="sgc.integracao.mocks.WithMockGestorSecurityContextFactory usuarioRepo" />
-      <entry_point TYPE="field" FQNAME="sgc.mapa.AtividadeFacade usuarioService" />
       <entry_point TYPE="field" FQNAME="sgc.integracao.CDU06IntegrationTest usuarioService" />
       <entry_point TYPE="field" FQNAME="sgc.integracao.CDU14IntegrationTest usuarioService" />
       <entry_point TYPE="field" FQNAME="sgc.integracao.CDU20IntegrationTest usuarioService" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoService usuarioService" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoNotificacaoService usuarioService" />
-      <entry_point TYPE="field" FQNAME="sgc.organizacao.UnidadeController usuarioService" />
       <entry_point TYPE="field" FQNAME="sgc.organizacao.UsuarioControllerTest usuarioService" />
       <entry_point TYPE="field" FQNAME="sgc.organizacao.UsuarioServiceTest usuarioService" />
       <entry_point TYPE="field" FQNAME="sgc.organizacao.UnidadeControllerTest usuarioServiceBean" />
       <entry_point TYPE="field" FQNAME="sgc.organizacao.UsuarioServiceTest usuarioServiceInternal" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoService validacaoService" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoService validacaoService" />
       <entry_point TYPE="field" FQNAME="sgc.integracao.SubprocessoServiceCoverageIntegrationTest validacaoService" />
       <entry_point TYPE="field" FQNAME="sgc.integracao.SubprocessoServiceValidacaoIntegrationTest validacaoService" />
-      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoTransicaoService validacaoService" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoTransicaoServiceCoverageIntegrationTest validacaoService" />
-      <entry_point TYPE="field" FQNAME="sgc.comum.Mensagens ATIVIDADES_DEVEM_TER_COMPETENCIA" />
-      <entry_point TYPE="field" FQNAME="sgc.e2e.AtribuicaoTemporariaViewsE2eAspect jdbcTemplate" />
-      <entry_point TYPE="field" FQNAME="sgc.processo.dto.SubprocessoElegivelDto ultimaDataLimite" />
     </entry_points>
     <list size="3">
       <item index="0" class="java.lang.String" itemvalue="com.tngtech.archunit.junit.ArchTest" />

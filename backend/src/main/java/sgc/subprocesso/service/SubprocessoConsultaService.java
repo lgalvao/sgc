@@ -181,7 +181,10 @@ public class SubprocessoConsultaService {
         String siglaUnidade = sp.getUnidade().getSigla();
         String localizacaoAtual = obterUnidadeLocalizacao(sp).getSigla();
         ResponsavelDto responsavel = usuarioFacade.buscarResponsabilidadeDetalhadaAtual(siglaUnidade);
-        Usuario titular = usuarioFacade.buscarPorLogin(sp.getUnidade().getTituloTitular());
+        String tituloTitular = sp.getUnidade().getTituloTitular();
+        Usuario titular = (tituloTitular == null || tituloTitular.isBlank())
+                ? null
+                : usuarioFacade.buscarPorLogin(tituloTitular);
         List<Movimentacao> movs = movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(sp.getCodigo());
         List<MovimentacaoDto> movimentacoes = movs.stream().map(MovimentacaoDto::from).toList();
         PermissoesSubprocessoDto permissoes = obterPermissoesUI(sp, usuarioAutenticado);

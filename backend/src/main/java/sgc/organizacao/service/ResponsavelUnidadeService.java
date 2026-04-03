@@ -140,7 +140,7 @@ public class ResponsavelUnidadeService {
         Set<String> todosTitulos = new HashSet<>();
         responsabilidades.forEach(r -> {
             todosTitulos.add(r.getUsuarioTitulo());
-            todosTitulos.add(r.getUnidade().getTituloTitular());
+            todosTitulos.add(obterTituloTitularObrigatorio(r.getUnidade(), r.getUnidadeCodigo()));
         });
 
         Map<String, Usuario> usuariosPorTitulo = usuarioRepo.listarPorTitulosComUnidadeLotacao(new ArrayList<>(todosTitulos)).stream()
@@ -151,13 +151,21 @@ public class ResponsavelUnidadeService {
                         Responsabilidade::getUnidadeCodigo,
                         r -> {
                             Usuario responsavel = usuariosPorTitulo.get(r.getUsuarioTitulo());
-                            Usuario titularOficial = usuariosPorTitulo.get(r.getUnidade().getTituloTitular());
+                            Usuario titularOficial = usuariosPorTitulo.get(obterTituloTitularObrigatorio(r.getUnidade(), r.getUnidadeCodigo()));
                             if (responsavel == null || titularOficial == null) {
                                 throw new IllegalStateException("Responsável ou titular oficial ausente para unidade %d".formatted(r.getUnidadeCodigo()));
                             }
                             return montarResponsavelDto(r.getUnidadeCodigo(), responsavel, titularOficial);
                         }
                 ));
+    }
+
+    private String obterTituloTitularObrigatorio(Unidade unidade, Long unidadeCodigo) {
+        String tituloTitular = unidade.getTituloTitular();
+        if (tituloTitular == null || tituloTitular.isBlank()) {
+            throw new IllegalStateException("Titular oficial ausente para unidade %d".formatted(unidadeCodigo));
+        }
+        return tituloTitular;
     }
 
     private UnidadeResponsavelDto montarResponsavelDto(Long unidadeCodigo, Usuario responsavel, Usuario titularOficial) {

@@ -325,7 +325,11 @@ public class ProcessoService {
         }
         String corpoHtml = emailModelosService.criarEmailLembretePrazo(unidade.getSigla(), processo.getDescricao(), dataLimite);
 
-        Usuario titular = usuarioService.buscarPorLogin(unidade.getTituloTitular());
+        String tituloTitular = unidade.getTituloTitular();
+        if (tituloTitular == null || tituloTitular.isBlank()) {
+            throw new IllegalStateException("Unidade %d sem titular oficial para envio de lembrete".formatted(unidadeCodigo));
+        }
+        Usuario titular = usuarioService.buscarPorLogin(tituloTitular);
         emailService.enviarEmailHtml(titular.getEmail(), "SGC: Lembrete - " + processo.getDescricao(), corpoHtml);
         servicoAlertas.criarAlertaAdmin(processo, unidade,
                 "Lembrete: Prazo do processo " + processo.getDescricao() + " encerra em " + dataLimiteText);

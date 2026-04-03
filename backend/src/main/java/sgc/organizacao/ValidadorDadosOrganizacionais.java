@@ -101,7 +101,7 @@ public class ValidadorDadosOrganizacionais {
                 .getOrDefault("Unidade participante sem responsavel efetivo", List.of())
                 .stream()
                 .map(this::extrairSigla)
-                .filter(Objects::nonNull)
+                .flatMap(Stream::ofNullable)
                 .distinct()
                 .toList();
 
@@ -119,9 +119,6 @@ public class ValidadorDadosOrganizacionais {
 
     @Nullable
     private String extrairSigla(String detalhe) {
-        if (detalhe == null) {
-            return null;
-        }
 
         String prefixo = "sigla=";
         int inicio = detalhe.indexOf(prefixo);
@@ -262,10 +259,10 @@ public class ValidadorDadosOrganizacionais {
     }
 
     @Nullable
-    private Long lerLong(Map<String, Object> linha, String coluna) {
-        Object valor = linha.get(coluna);
+    private Long lerLong(Map<String, Object> linha) {
+        Object valor = linha.get("unidade_codigo");
         if (valor == null) {
-            valor = linha.get(coluna.toUpperCase(Locale.ROOT));
+            valor = linha.get("unidade_codigo".toUpperCase(Locale.ROOT));
         }
         if (valor == null) {
             return null;
@@ -300,11 +297,11 @@ public class ValidadorDadosOrganizacionais {
             Map<Long, Responsabilidade> responsabilidadesPorUnidade
     ) {
         return unidades.stream()
-                .filter(unidade -> {
-                    Responsabilidade responsabilidade = responsabilidadesPorUnidade.get(unidade.getCodigo());
+                .map(Unidade::getCodigo)
+                .filter(codigo -> {
+                    Responsabilidade responsabilidade = responsabilidadesPorUnidade.get(codigo);
                     return responsabilidade == null || estaVazio(responsabilidade.getUsuarioTitulo());
                 })
-                .map(Unidade::getCodigo)
                 .collect(Collectors.toSet());
     }
 
@@ -315,10 +312,11 @@ public class ValidadorDadosOrganizacionais {
             Map<String, List<String>> violacoesPorTipo
     ) {
         for (Unidade unidade : unidades) {
+            String tituloTitular = unidade.getTituloTitular();
             validarUsuarioExistente(
-                    unidade.getTituloTitular(),
+                    tituloTitular,
                     "Titular referenciado ausente na VW_USUARIO",
-                    "sigla=%s, titulo_titular=%s".formatted(unidade.getSigla(), unidade.getTituloTitular()),
+                    "sigla=%s, titulo_titular=%s".formatted(unidade.getSigla(), valorOuNulo(tituloTitular)),
                     usuariosPorTitulo,
                     violacoesPorTipo
             );
@@ -337,7 +335,7 @@ public class ValidadorDadosOrganizacionais {
     }
 
     private void validarUsuarioExistente(
-            String titulo,
+            @Nullable String titulo,
             String tipoViolacao,
             String detalheViolacao,
             Map<String, Usuario> usuariosPorTitulo,
@@ -404,7 +402,7 @@ public class ValidadorDadosOrganizacionais {
     private void processarLinhaPerfil(Map<String, Object> linha, ContextoCargaPerfis contexto) {
         String usuarioTitulo = lerString(linha, "usuario_titulo");
         String perfilBruto = lerString(linha, "perfil");
-        Long unidadeCodigo = lerLong(linha, "unidade_codigo");
+        Long unidadeCodigo = lerLong(linha);
 
         if (estaVazio(usuarioTitulo)) {
             contexto.perfisInvalidos().add(new PerfilInvalido(
@@ -434,7 +432,7 @@ public class ValidadorDadosOrganizacionais {
         try {
             Perfil perfil = Perfil.valueOf(dados.perfilBruto());
             ChavePerfilUsuarioUnidade chave = new ChavePerfilUsuarioUnidade(dados.titulo(), perfil, dados.codigo());
-            contexto.contagemPorChave().merge(chave, 1, (v1, v2) -> v1 + v2);
+            contexto.contagemPorChave().merge(chave, 1, Integer::sum);
             contexto.perfisPorUnidade().computeIfAbsent(dados.codigo(), c -> new LinkedHashSet<>())
                     .add(new PerfilUsuarioUnidade(dados.titulo(), perfil));
         } catch (IllegalArgumentException ex) {

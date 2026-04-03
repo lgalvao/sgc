@@ -436,14 +436,16 @@ public class SubprocessoTransicaoService {
             @Nullable String observacoes
     ) {
         Unidade unidade = sp.getUnidade();
-        registrarTransicao(RegistrarTransicaoCommand.builder()
-                .sp(sp)
-                .tipo(tipoTransicao)
-                .origem(unidade)
-                .destino(unidade.getUnidadeSuperior())
-                .usuario(usuario)
-                .observacoes(observacoes)
-                .build());
+        if (unidade.getUnidadeSuperior() != null) {
+            registrarTransicao(RegistrarTransicaoCommand.builder()
+                    .sp(sp)
+                    .tipo(tipoTransicao)
+                    .origem(unidade)
+                    .destino(unidade.getUnidadeSuperior())
+                    .usuario(usuario)
+                    .observacoes(observacoes)
+                    .build());
+        }
     }
 
     private void registrarWorkflowParaSuperiorAtual(
@@ -459,18 +461,20 @@ public class SubprocessoTransicaoService {
         Unidade unidadeAtual = consultaService.obterUnidadeLocalizacao(sp);
         Unidade unidadeDestino = unidadeAtual.getUnidadeSuperior();
 
-        registrarWorkflowComDestino(
-                sp,
-                novaSituacao,
-                tipoTransicao,
-                tipoAnalise,
-                tipoAcaoAnalise,
-                unidadeAtual,
-                unidadeDestino,
-                usuario,
-                motivoAnalise,
-                observacoes
-        );
+        if (unidadeDestino != null) {
+            registrarWorkflowComDestino(
+                    sp,
+                    novaSituacao,
+                    tipoTransicao,
+                    tipoAnalise,
+                    tipoAcaoAnalise,
+                    unidadeAtual,
+                    unidadeDestino,
+                    usuario,
+                    motivoAnalise,
+                    observacoes
+            );
+        }
     }
 
     private void registrarWorkflowComDestino(
