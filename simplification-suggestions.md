@@ -17,17 +17,21 @@ Dado o contexto estrito do SGC (intranet, 5-10 usuários simultâneos), muitas d
 
 ## Situação Atual (Backend - Java / Spring Boot)
 
-1.  **Consolidação de Serviços do Subprocesso:**
+1.  **Remoção de Factories Complexas:**
+    *   **Problema:** Padrões de projeto como Factory (`PdfFactory.java`) podem ser excessivos para um sistema desse porte. A abstração de geração de PDF através de Factory adiciona uma camada que pode ser simplificada.
+    *   **Solução:** Mover a lógica procedural de geração de PDF diretamente para o serviço (`RelatorioService`), eliminando a necessidade da classe `PdfFactory`.
+
+2.  **Consolidação de Serviços do Subprocesso:**
     *   **Problema:** Alta fragmentação e tamanho excessivo nas classes `SubprocessoService` (42KB), `SubprocessoTransicaoService` (33KB), `SubprocessoConsultaService`, etc. A lógica de negócio relacionada a subprocessos está muito dispersa e acoplada.
     *   **Solução:** Consolidar a lógica coesa em serviços de domínio mais diretos.
         *   Avaliar a real necessidade de separar `SubprocessoTransicaoService` e `SubprocessoService`. Uma abordagem mais simples reduz a navegação mental.
     *   **Ação:** Refatorar o pacote `sgc.subprocesso.service` fundindo serviços afins.
 
-2.  **Acesso Direto ao Repositório (CRUD Simples):**
+3.  **Acesso Direto ao Repositório (CRUD Simples):**
     *   **Problema:** Camadas de serviço atuando apenas como repassadoras.
     *   **Solução:** Permitir que os Controllers (ex: `ProcessoController`, `SubprocessoController`) injetem e utilizem diretamente as interfaces de Repository.
 
-3.  **Remoção de Facades Desnecessárias:**
+4.  **Remoção de Facades Desnecessárias:**
     *   **Problema:** Facades como `AtividadeFacade` (`backend/src/main/java/sgc/mapa/AtividadeFacade.java`), `PainelFacade`, `AlertaFacade`, `RelatorioFacade`, `LoginFacade`, e `UsuarioFacade` adicionam indireção sem abstração significativa. Elas atuam quase unicamente como "pass-through", transferindo chamadas diretamente aos serviços subjacentes sem adicionar valor claro de negócio.
     *   **Solução:** Mover a lógica da Facade diretamente para os serviços de domínio relevantes. Por exemplo, unificar `LoginFacade` com o serviço de autenticação principal, ou mover operações específicas de `AtividadeFacade` para `MapaManutencaoService`.
 
@@ -40,3 +44,7 @@ Dado o contexto estrito do SGC (intranet, 5-10 usuários simultâneos), muitas d
 2.  **Redução de Complexidade em Views:**
     *   **Problema:** Views muito extensas (ex: `ProcessoDetalheView.vue` e `MapaView.vue`).
     *   **Solução:** Extrair lógica reativa complexa para composables específicos da view.
+
+3.  **Remoção de Composables Triviais (Overengineering Frontend):**
+    *   **Problema:** Composables como `useLoadingManager` e `useModalManager` apenas encapsulam lógicas triviais como `const estaCarregando = ref(false)` ou `const mostrarModal = ref(false)`. Isso cria indireção desnecessária sem adicionar valor.
+    *   **Solução:** As views ou componentes devem instanciar e gerenciar essas refs locais diretamente. Composables devem ser reservados para lógicas reutilizáveis e mais complexas.
