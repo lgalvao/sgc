@@ -15,7 +15,7 @@ import {
 import {TEXTOS} from '../frontend/src/constants/textos.js';
 
 test.describe.serial('CDU-15 - Manter mapa de competências', () => {
-    const UNIDADE_ALVO = 'ADMIN';
+    const UNIDADE_ALVO = 'SECRETARIA_1';
 
     const timestamp = Date.now();
     const descProcesso = `Processo CDU-15 ${timestamp}`;

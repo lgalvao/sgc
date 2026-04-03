@@ -133,9 +133,10 @@ export async function removerConhecimento(page: Page, atividadeDescricao: string
     await expect(card.getByText(conhecimento)).toBeHidden();
 }
 
-export async function disponibilizarCadastro(page: Page) {
+export async function disponibilizarCadastro(page: Page): Promise<string | null> {
     const botao = page.getByTestId('btn-cad-atividades-disponibilizar');
     const checkboxSemMudancas = page.getByTestId('chk-disponibilizacao-sem-mudancas');
+    let atividadeExtraCriada: string | null = null;
     
     // Se o botão está desabilitado e o checkbox existe, marcar para habilitar
     const botaoDesabilitado = await botao.isDisabled();
@@ -152,9 +153,9 @@ export async function disponibilizarCadastro(page: Page) {
     }
 
     if (await botao.isDisabled()) {
-        const atividadeExtra = `Atividade complementar ${Date.now()}`;
-        await adicionarAtividade(page, atividadeExtra);
-        await adicionarConhecimento(page, atividadeExtra, 'Conhecimento complementar');
+        atividadeExtraCriada = `Atividade complementar ${Date.now()}`;
+        await adicionarAtividade(page, atividadeExtraCriada);
+        await adicionarConhecimento(page, atividadeExtraCriada, 'Conhecimento complementar');
     }
 
     await expect(botao).toBeEnabled();
@@ -168,6 +169,7 @@ export async function disponibilizarCadastro(page: Page) {
     await btnConfirmar.click();
     await verificarToast(page, /disponibilizada?|Disponibilizado/i);
     await verificarPaginaPainel(page);
+    return atividadeExtraCriada;
 }
 
 export async function verificarSituacaoSubprocesso(page: Page, situacao: string) {

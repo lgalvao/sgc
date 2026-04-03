@@ -30,6 +30,8 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
     const timestamp = Date.now();
     const descProcMapeamento = `Mapeamento setup ${timestamp}`;
     const descProcRevisao = `Revisão teste ${timestamp}`;
+    const descAtividadePrincipal = `Atividade teste ${timestamp}`;
+    let atividadeComplementarCriada: string | null = null;
 
     // PASSOS DE PREPARAÇÃO - PROCESSO DE MAPEAMENTO
 
@@ -87,17 +89,16 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await navegarParaAtividades(page);
 
         // Adicionar atividade e Conhecimento usando helpers
-        const descAtividade = `Atividade teste ${timestamp}`;
-        await adicionarAtividade(page, descAtividade);
-        await adicionarConhecimento(page, descAtividade, 'Conhecimento teste');
-        await expect(page.getByText(descAtividade)).toBeVisible();
+        await adicionarAtividade(page, descAtividadePrincipal);
+        await adicionarConhecimento(page, descAtividadePrincipal, 'Conhecimento teste');
+        await expect(page.getByText(descAtividadePrincipal)).toBeVisible();
     });
 
     test('Fase 1.3: CHEFE disponibiliza cadastro', async ({_resetAutomatico, page}) => {
         await login(page, USUARIO_CHEFE, SENHA_CHEFE);
         await acessarSubprocessoChefeDireto(page, descProcMapeamento, UNIDADE_ALVO);
         await navegarParaAtividades(page);
-        await disponibilizarCadastro(page);
+        atividadeComplementarCriada = await disponibilizarCadastro(page);
         await verificarPaginaPainel(page);
     });
 
@@ -122,7 +123,10 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
 
         await acessarSubprocessoAdmin(page, descProcMapeamento, UNIDADE_ALVO);
         await navegarParaMapa(page);
-        await criarCompetencia(page, `Competência teste ${timestamp}`, [`Atividade teste ${timestamp}`]);
+        const atividadesCompetencia = [descAtividadePrincipal, atividadeComplementarCriada].filter(
+            (atividade): atividade is string => Boolean(atividade)
+        );
+        await criarCompetencia(page, `Competência teste ${timestamp}`, atividadesCompetencia);
         await disponibilizarMapa(page, '2030-12-31');
         await verificarPaginaPainel(page);
     });

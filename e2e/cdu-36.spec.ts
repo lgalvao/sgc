@@ -77,7 +77,7 @@ test.describe.serial('CDU-36 - Gerar relatório de mapas', () => {
         await selectProcesso.selectOption({label: descricaoProcesso});
         await expect(botaoGerar).toBeEnabled();
 
-        await expect(selectUnidade.locator('option')).toHaveCount(1);
+        await expect(selectUnidade).toContainText(/Todas as unidades/i);
 
         const requisicaoSemFiltroUnidade = page.waitForRequest((req) => {
             return req.url().includes(`/relatorios/mapas/${processo.codigo}/exportar`) && !req.url().includes('unidadeId=');
