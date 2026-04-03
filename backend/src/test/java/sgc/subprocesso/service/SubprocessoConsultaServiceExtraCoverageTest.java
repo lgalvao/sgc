@@ -92,21 +92,6 @@ class SubprocessoConsultaServiceExtraCoverageTest {
         }
 
         @Test
-        @DisplayName("deve retornar unidade do subprocesso se movimentacao nao tiver destino e localizacaoAtual for null")
-        void deveRetornarUnidadeSubprocesso() {
-            Unidade u1 = new Unidade();
-            u1.setCodigo(1L);
-            Subprocesso sp = criarSubprocessoComMapa(100L);
-            sp.setUnidade(u1);
-            Movimentacao mov = new Movimentacao();
-            mov.setUnidadeDestino(null);
-
-            when(movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(100L)).thenReturn(List.of(mov));
-
-            assertThat(consultaService.obterUnidadeLocalizacao(sp)).isEqualTo(u1);
-        }
-
-        @Test
         @DisplayName("deve retornar unidade do subprocesso se codigo for null")
         void codNull() {
             Unidade u = new Unidade();
@@ -212,7 +197,7 @@ class SubprocessoConsultaServiceExtraCoverageTest {
 
             Movimentacao mov = new Movimentacao();
             mov.setUnidadeOrigem(u);
-            mov.setUnidadeDestino(null);
+            mov.setUnidadeDestino(u);
             mov.setUsuario(user);
 
             when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(1L)).thenReturn(Optional.of(sp));
@@ -613,18 +598,13 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             sp.setCodigo(null);
             assertThat(consultaService.obterLocalizacaoAtual(sp)).isEqualTo(u);
 
-            // Branch: m.getUnidadeDestino() != null
+            // Branch: movimentacao encontrada
             sp.setCodigo(1L);
             Unidade dest = new Unidade();
             Movimentacao m = new Movimentacao(); m.setUnidadeDestino(dest);
             when(movimentacaoRepo.buscarUltimaPorSubprocesso(1L)).thenReturn(Optional.of(m));
             assertThat(consultaService.obterLocalizacaoAtual(sp)).isEqualTo(dest);
-            
-            // Branch: m.getUnidadeDestino() == null
-            sp.setLocalizacaoAtual(null);
-            m.setUnidadeDestino(null);
-            assertThat(consultaService.obterLocalizacaoAtual(sp)).isEqualTo(u);
-            
+
             // Branch: findFirstBy... returns Optional.empty()
             sp.setLocalizacaoAtual(null);
             when(movimentacaoRepo.buscarUltimaPorSubprocesso(1L)).thenReturn(Optional.empty());

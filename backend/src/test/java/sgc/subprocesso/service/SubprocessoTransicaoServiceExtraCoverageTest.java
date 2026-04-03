@@ -79,13 +79,17 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
     }
 
     @Test
-    @DisplayName("disponibilizar - destino nulo deve buscar ADMIN")
-    void disponibilizar_DestinoNulo() {
+    @DisplayName("disponibilizar - deve encaminhar para unidade superior")
+    void disponibilizar_DeveEncaminharParaUnidadeSuperior() {
         Processo p = new Processo();
         p.setTipo(TipoProcesso.MAPEAMENTO);
         Unidade u = new Unidade();
         u.setCodigo(1L);
         u.setSigla("U1");
+        Unidade admin = new Unidade();
+        admin.setCodigo(99L);
+        admin.setSigla("ADMIN");
+        u.setUnidadeSuperior(admin);
         
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(100L);
@@ -93,12 +97,6 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         sp.setUnidade(u);
         sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         sp.setMapa(new sgc.mapa.model.Mapa());
-
-        Unidade admin = new Unidade();
-        admin.setCodigo(99L);
-        admin.setSigla("ADMIN");
-
-        when(unidadeService.buscarPorSigla("ADMIN")).thenReturn(admin);
 
         invokeMethod(service, "disponibilizar", sp, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO, TipoTransicao.CADASTRO_DISPONIBILIZADO, new Usuario());
 
@@ -136,14 +134,17 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
     }
 
     @Test
-    @DisplayName("apresentarSugestoes - sem unidade superior")
-    void apresentarSugestoes_SemSuperior() {
+    @DisplayName("apresentarSugestoes - envia para unidade superior")
+    void apresentarSugestoes_ComSuperior() {
         Processo p = new Processo();
         p.setTipo(TipoProcesso.MAPEAMENTO);
         
         Unidade u = new Unidade();
         u.setCodigo(1L);
-        u.setUnidadeSuperior(null);
+        Unidade admin = new Unidade();
+        admin.setCodigo(99L);
+        admin.setSigla("ADMIN");
+        u.setUnidadeSuperior(admin);
 
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(100L);
@@ -156,18 +157,21 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
 
         service.apresentarSugestoes(100L, "sugestoes", new Usuario());
 
-        verify(movimentacaoRepo).save(argThat(mov -> Objects.equals(mov.getUnidadeDestino(), u)));
+        verify(movimentacaoRepo).save(argThat(mov -> Objects.equals(mov.getUnidadeDestino(), admin)));
     }
 
     @Test
-    @DisplayName("validarMapa - sem unidade superior")
-    void validarMapa_SemSuperior() {
+    @DisplayName("validarMapa - envia para unidade superior")
+    void validarMapa_ComSuperior() {
         Processo p = new Processo();
         p.setTipo(TipoProcesso.MAPEAMENTO);
         
         Unidade u = new Unidade();
         u.setCodigo(1L);
-        u.setUnidadeSuperior(null);
+        Unidade admin = new Unidade();
+        admin.setCodigo(99L);
+        admin.setSigla("ADMIN");
+        u.setUnidadeSuperior(admin);
 
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(100L);
@@ -179,18 +183,21 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
 
         service.validarMapa(100L, new Usuario());
 
-        verify(movimentacaoRepo).save(argThat(mov -> Objects.equals(mov.getUnidadeDestino(), u)));
+        verify(movimentacaoRepo).save(argThat(mov -> Objects.equals(mov.getUnidadeDestino(), admin)));
     }
 
     @Test
-    @DisplayName("aceitarValidacao - sem unidade superior (homologa)")
-    void aceitarValidacao_SemSuperior() {
+    @DisplayName("aceitarValidacao - encaminha para unidade superior")
+    void aceitarValidacao_ComSuperior() {
         Processo p = new Processo();
         p.setTipo(TipoProcesso.MAPEAMENTO);
         
         Unidade u = new Unidade();
         u.setCodigo(1L);
-        u.setUnidadeSuperior(null);
+        Unidade admin = new Unidade();
+        admin.setCodigo(99L);
+        admin.setSigla("ADMIN");
+        u.setUnidadeSuperior(admin);
 
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(100L);
@@ -202,8 +209,9 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
 
         service.aceitarValidacao(100L, "obs", new Usuario());
 
-        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
+        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
         verify(analiseRepo).save(any());
+        verify(notificacaoService).notificarTransicao(argThat(cmd -> Objects.equals(cmd.unidadeDestino(), admin)));
     }
 
     @Test
@@ -327,8 +335,6 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         sp.setDataLimiteEtapa1(LocalDateTime.of(2026, 1, 1, 0, 0));
         
         when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
-        when(unidadeService.buscarPorSigla("ADMIN")).thenReturn(new Unidade());
-
         sgc.subprocesso.dto.DisponibilizarMapaRequest req = new sgc.subprocesso.dto.DisponibilizarMapaRequest(java.time.LocalDate.of(2026, 1, 1), "Obs");
         service.disponibilizarMapa(1L, req, new Usuario()); // branch 228 (ultima != null && isBefore = false)
 

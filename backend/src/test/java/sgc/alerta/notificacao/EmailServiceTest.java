@@ -7,7 +7,6 @@ import org.mockito.*;
 import org.mockito.junit.jupiter.*;
 import org.springframework.mail.javamail.*;
 import sgc.alerta.*;
-import sgc.alerta.model.*;
 import sgc.comum.config.*;
 
 import static org.assertj.core.api.Assertions.*;
@@ -16,11 +15,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings("NullAway.Init")
 class EmailServiceTest {
-    private static final int LIMITE_CONTEUDO_NOTIFICACAO = 500;
-    private static final int TAMANHO_CORPO_LONGO = 600;
     private static final String DESTINATARIO = "recipient@test.com";
-    @Mock
-    private NotificacaoRepo notificacaoRepo;
     @Mock
     private JavaMailSender enviadorEmail;
     @Mock
@@ -43,14 +38,12 @@ class EmailServiceTest {
     @DisplayName("Deve enviar e-mail HTML")
     void enviarEmailHtmlDeveEnviarComSucesso() {
         setupMockEmail();
-        when(notificacaoRepo.save(any(Notificacao.class))).thenAnswer(i -> i.getArgument(0));
 
         String assunto = "Test subject";
         String corpoHtml = "<h1>Test body</h1>";
 
         notificacaoServico.enviarEmailHtml(DESTINATARIO, assunto, corpoHtml);
 
-        verify(notificacaoRepo, times(1)).save(any(Notificacao.class));
         verify(enviadorEmail, times(1)).send(any(MimeMessage.class));
     }
 
@@ -64,21 +57,18 @@ class EmailServiceTest {
         notificacaoServico.enviarEmailHtml(para, assunto, corpoHtml);
 
         verify(enviadorEmail, never()).send(any(MimeMessage.class));
-        verify(notificacaoRepo, never()).save(any(Notificacao.class));
     }
 
     @Test
     @DisplayName("Deve enviar e-mail de texto simples")
     void deveEnviarEmailTextoSimples() {
         setupMockEmail();
-        when(notificacaoRepo.save(any(Notificacao.class))).thenAnswer(i -> i.getArgument(0));
 
         String assunto = "Test subject plain";
         String corpo = "This is plain text";
 
         notificacaoServico.enviarEmail(DESTINATARIO, assunto, corpo);
 
-        verify(notificacaoRepo, times(1)).save(any(Notificacao.class));
         verify(enviadorEmail, times(1)).send(any(MimeMessage.class));
     }
 
@@ -92,51 +82,27 @@ class EmailServiceTest {
         notificacaoServico.enviarEmail(para, assunto, corpo);
 
         verify(enviadorEmail, never()).send(any(MimeMessage.class));
-        verify(notificacaoRepo, never()).save(any(Notificacao.class));
     }
 
     @Test
     @DisplayName("Deve aceitar e-mail válido com espaços nas bordas")
     void deveAceitarEmailValidoComEspacosNasBordas() {
         setupMockEmail();
-        when(notificacaoRepo.save(any(Notificacao.class))).thenAnswer(i -> i.getArgument(0));
 
         notificacaoServico.enviarEmail("  recipient@test.com  ", "Assunto", "Corpo");
 
-        verify(notificacaoRepo).save(any(Notificacao.class));
         verify(enviadorEmail).send(any(MimeMessage.class));
-    }
-
-    @Test
-    @DisplayName("Deve truncar conteúdo longo da notificação")
-    void deveTruncarConteudoLongoDaNotificacao() {
-        setupMockEmail();
-        when(notificacaoRepo.save(any(Notificacao.class))).thenAnswer(i -> i.getArgument(0));
-
-        String assunto = "Test";
-        String corpoLongo = "A".repeat(TAMANHO_CORPO_LONGO);
-
-        notificacaoServico.enviarEmail(DESTINATARIO, assunto, corpoLongo);
-
-        ArgumentCaptor<Notificacao> captorNotificacao = ArgumentCaptor.forClass(Notificacao.class);
-        verify(notificacaoRepo).save(captorNotificacao.capture());
-
-        Notificacao notificacaoSalva = captorNotificacao.getValue();
-        assertThat(notificacaoSalva.getConteudo().length()).isLessThanOrEqualTo(LIMITE_CONTEUDO_NOTIFICACAO);
-        assertThat(notificacaoSalva.getConteudo()).endsWith("...");
     }
 
     @Test
     @DisplayName("Deve encapsular erro de SMTP em RuntimeException")
     void deveEncapsularErroDeSmtpEmRuntimeException() {
         setupMockEmail();
-        when(notificacaoRepo.save(any(Notificacao.class))).thenAnswer(i -> i.getArgument(0));
 
         assertThatThrownBy(() -> notificacaoServico.enviarEmail("a..b@test.com", "Assunto", "Corpo"))
                 .isInstanceOf(RuntimeException.class)
                 .hasCauseInstanceOf(AddressException.class);
 
-        verify(notificacaoRepo).save(any(Notificacao.class));
         verify(enviadorEmail, never()).send(any(MimeMessage.class));
     }
 }

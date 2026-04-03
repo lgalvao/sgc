@@ -15,8 +15,8 @@ public record MovimentacaoDto(
         String unidadeOrigemSigla,
         String unidadeOrigemNome,
         @Nullable Long unidadeDestinoCodigo,
-        @Nullable String unidadeDestinoSigla,
-        @Nullable String unidadeDestinoNome,
+        String unidadeDestinoSigla,
+        String unidadeDestinoNome,
         String usuarioTitulo,
         String usuarioNome,
         String descricao
@@ -32,9 +32,9 @@ public record MovimentacaoDto(
                 .unidadeOrigemCodigo(unidadeOrigem.getCodigo())
                 .unidadeOrigemSigla(unidadeOrigem.getSigla())
                 .unidadeOrigemNome(unidadeOrigem.getNome())
-                .unidadeDestinoCodigo(unidadeDestino != null ? unidadeDestino.getCodigo() : null)
-                .unidadeDestinoSigla(unidadeDestino != null ? unidadeDestino.getSigla() : null)
-                .unidadeDestinoNome(unidadeDestino != null ? unidadeDestino.getNome() : null)
+                .unidadeDestinoCodigo(unidadeDestino.getCodigo())
+                .unidadeDestinoSigla(unidadeDestino.getSigla())
+                .unidadeDestinoNome(unidadeDestino.getNome())
                 .usuarioTitulo(usuario.getTituloEleitoral())
                 .usuarioNome(usuario.getNome())
                 .descricao(m.getDescricao())

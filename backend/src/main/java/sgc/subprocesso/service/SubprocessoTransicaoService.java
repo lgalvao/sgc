@@ -177,20 +177,15 @@ public class SubprocessoTransicaoService {
 
         Unidade origem = sp.getUnidade();
         Unidade destino = origem.getUnidadeSuperior();
-        if (destino == null) {
-            log.info("Unidade {} não possui superior. Encaminhando para unidade central ADMIN.", origem.getSigla());
-            destino = unidadeService.buscarPorSigla(SIGLA_ADMIN);
-        }
 
         sp.setSituacao(novaSituacao);
         sp.setDataFimEtapa1(LocalDateTime.now());
 
-        final Unidade destinoFinal = destino;
         registrarTransicao(RegistrarTransicaoCommand.builder()
                 .sp(sp)
                 .tipo(transicao)
                 .origem(origem)
-                .destino(destinoFinal)
+                .destino(destino)
                 .usuario(usuario)
                 .build());
     }
@@ -307,9 +302,6 @@ public class SubprocessoTransicaoService {
         sp.setDataFimEtapa2(LocalDateTime.now());
 
         Unidade destino = sp.getUnidade().getUnidadeSuperior();
-        if (destino == null) {
-            destino = sp.getUnidade();
-        }
 
         registrarTransicao(RegistrarTransicaoCommand.builder()
                 .sp(sp)
@@ -332,9 +324,6 @@ public class SubprocessoTransicaoService {
         sp.setDataFimEtapa2(LocalDateTime.now());
 
         Unidade destino = sp.getUnidade().getUnidadeSuperior();
-        if (destino == null) {
-            destino = sp.getUnidade();
-        }
 
         registrarTransicao(RegistrarTransicaoCommand.builder()
                 .sp(sp)
@@ -398,33 +387,20 @@ public class SubprocessoTransicaoService {
         Unidade unidadeAtual = consultaService.obterUnidadeLocalizacao(sp);
         Unidade proximaUnidade = unidadeAtual.getUnidadeSuperior();
 
-        if (proximaUnidade == null) {
-            CriarAnaliseRequest request = CriarAnaliseRequest.builder()
-                    .observacoes(observacoes)
-                    .acao(TipoAcaoAnalise.ACEITE_MAPEAMENTO)
-                    .motivo("Aceite da validação")
-                    .build();
-
-            criarAnalise(sp, request, TipoAnalise.VALIDACAO, usuario);
-
-            sp.setSituacao(obterSituacaoObrigatoria(SITUACAO_MAPA_HOMOLOGADO, sp, "aceite final de validação"));
-            subprocessoRepo.save(sp);
-        } else {
-            SituacaoSubprocesso novaSituacao = sp.getSituacao();
-            registrarAnalise(RegistrarWorkflowCommand.builder()
-                    .sp(sp)
-                    .novaSituacao(novaSituacao)
-                    .tipoTransicao(TipoTransicao.MAPA_VALIDACAO_ACEITA)
-                    .tipoAnalise(TipoAnalise.VALIDACAO)
-                    .tipoAcaoAnalise(TipoAcaoAnalise.ACEITE_MAPEAMENTO)
-                    .unidadeAnalise(unidadeAtual)
-                    .unidadeOrigemTransicao(unidadeAtual)
-                    .unidadeDestinoTransicao(proximaUnidade)
-                    .usuario(usuario)
-                    .motivoAnalise("Aceite da validação")
-                    .observacoes(observacoes)
-                    .build());
-        }
+        SituacaoSubprocesso novaSituacao = sp.getSituacao();
+        registrarAnalise(RegistrarWorkflowCommand.builder()
+                .sp(sp)
+                .novaSituacao(novaSituacao)
+                .tipoTransicao(TipoTransicao.MAPA_VALIDACAO_ACEITA)
+                .tipoAnalise(TipoAnalise.VALIDACAO)
+                .tipoAcaoAnalise(TipoAcaoAnalise.ACEITE_MAPEAMENTO)
+                .unidadeAnalise(unidadeAtual)
+                .unidadeOrigemTransicao(unidadeAtual)
+                .unidadeDestinoTransicao(proximaUnidade)
+                .usuario(usuario)
+                .motivoAnalise("Aceite da validação")
+                .observacoes(observacoes)
+                .build());
 
         log.info("Validação aceita para mapa do SP {}", codSubprocesso);
     }
@@ -499,7 +475,6 @@ public class SubprocessoTransicaoService {
         List<Movimentacao> movimentacoes = movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(sp.getCodigo());
 
         return movimentacoes.stream()
-                .filter(movimentacao -> movimentacao.getUnidadeDestino() != null)
                 .filter(movimentacao -> Objects.equals(movimentacao.getUnidadeDestino().getCodigo(), unidadeAnalise.getCodigo()))
                 .map(Movimentacao::getUnidadeOrigem)
                 .filter(unidadeOrigem -> hierarquiaService.isSubordinada(unidadeOrigem, unidadeAnalise))
@@ -531,11 +506,6 @@ public class SubprocessoTransicaoService {
 
         Unidade unidadeAtual = consultaService.obterUnidadeLocalizacao(sp);
         Unidade unidadeDestino = unidadeAtual.getUnidadeSuperior();
-        
-        if (unidadeDestino == null) {
-            log.info("Unidade {} não possui superior direto. Encaminhando para a unidade raiz ADMIN.", unidadeAtual.getSigla());
-            unidadeDestino = unidadeService.buscarPorSigla(SIGLA_ADMIN);
-        }
 
         registrarAnalise(RegistrarWorkflowCommand.builder()
                 .sp(sp)

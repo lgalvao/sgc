@@ -246,7 +246,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
         }
 
         @Test
-        @DisplayName("ADMIN homologa SEM impactos, alterando status para MAPA_HOMOLOGADO")
+        @DisplayName("ADMIN homologa SEM impactos, alterando status para REVISAO_CADASTRO_HOMOLOGADA")
         void adminHomologaSemImpactos() throws Exception {
             admin.setUnidadeAtivaCodigo(2L); // No STIC após aceite do Gestor
             mockMvc.perform(post(API_SUBPROCESSOS_ID_HOMOLOGAR, subprocessoId)
@@ -257,7 +257,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
                     .andExpect(status().isOk());
 
             Subprocesso sp = subprocessoRepo.findById(subprocessoId).orElseThrow();
-            assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO);
+            assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
         }
 
         @Test

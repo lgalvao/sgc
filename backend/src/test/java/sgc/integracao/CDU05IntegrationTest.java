@@ -66,8 +66,24 @@ class CDU05IntegrationTest extends BaseIntegrationTest {
         registrarUsuarioSeNecessario("111111111111");
         registrarResponsabilidade(unidade.getCodigo(), "111111111111", "11111111");
 
-        mapaOriginal = new Mapa();
-        mapaRepo.save(mapaOriginal);
+        Processo processoVigente = ProcessoFixture.processoPadrao();
+        processoVigente.setCodigo(null);
+        processoVigente.setTipo(TipoProcesso.MAPEAMENTO);
+        processoVigente.setSituacao(SituacaoProcesso.FINALIZADO);
+        processoVigente.setDataFinalizacao(LocalDateTime.now().minusDays(1));
+        processoVigente = processoRepo.save(processoVigente);
+
+        Subprocesso subprocessoVigente = SubprocessoFixture.subprocessoPadrao(processoVigente, unidade);
+        subprocessoVigente.setCodigo(null);
+        subprocessoVigente.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
+        subprocessoVigente.setDataFimEtapa1(LocalDateTime.now().minusDays(2));
+        subprocessoVigente.setDataFimEtapa2(LocalDateTime.now().minusDays(1));
+        subprocessoVigente = subprocessoRepo.save(subprocessoVigente);
+
+        mapaOriginal = Mapa.builder().subprocesso(subprocessoVigente).build();
+        mapaOriginal = mapaRepo.save(mapaOriginal);
+        subprocessoVigente.setMapa(mapaOriginal);
+        subprocessoRepo.save(subprocessoVigente);
 
         competenciaOriginal = Competencia.builder()
                 .descricao("Competencia original")

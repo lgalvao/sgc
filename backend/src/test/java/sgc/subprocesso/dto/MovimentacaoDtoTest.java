@@ -12,8 +12,8 @@ import static org.assertj.core.api.Assertions.*;
 class MovimentacaoDtoTest {
 
     @Test
-    @DisplayName("deve mapear movimentacao com destino opcional")
-    void deveMapearMovimentacaoComDestinoOpcional() {
+    @DisplayName("deve mapear movimentacao com origem e destino obrigatorios")
+    void deveMapearMovimentacaoComOrigemEDestinoObrigatorios() {
         Unidade origem = new Unidade();
         origem.setCodigo(1L);
         origem.setSigla("ORG");

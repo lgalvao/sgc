@@ -7,6 +7,7 @@ import org.mockito.junit.jupiter.*;
 import sgc.comum.erros.*;
 import sgc.comum.model.*;
 import sgc.mapa.model.*;
+import sgc.subprocesso.model.*;
 
 import java.util.*;
 
@@ -41,6 +42,8 @@ class CopiaMapaServiceTest {
         Mapa mapaOrigem = new Mapa();
         mapaOrigem.setCodigo(origemId);
         mapaOrigem.setObservacoesDisponibilizacao("Obs");
+        Subprocesso subprocessoDestino = new Subprocesso();
+        subprocessoDestino.setCodigo(99L);
 
         Mapa mapaSalvo = new Mapa();
         mapaSalvo.setCodigo(3L);
@@ -68,7 +71,7 @@ class CopiaMapaServiceTest {
 
         when(competenciaRepo.findByMapa_Codigo(origemId)).thenReturn(List.of(competenciaOrigem));
 
-        Mapa resultado = service.copiarMapaParaUnidade(origemId);
+        Mapa resultado = service.copiarMapaParaUnidade(origemId, subprocessoDestino);
 
         assertThat(resultado).isNotNull();
         verify(mapaRepo).save(any(Mapa.class));
@@ -89,7 +92,7 @@ class CopiaMapaServiceTest {
     @DisplayName("Deve lançar erro se mapa origem não existir")
     void deveLancarErroSeMapaOrigemNaoExistir() {
         when(repo.buscar(Mapa.class, 1L)).thenThrow(new ErroEntidadeNaoEncontrada("Mapa", 1L));
-        assertThatThrownBy(() -> service.copiarMapaParaUnidade(1L))
+        assertThatThrownBy(() -> service.copiarMapaParaUnidade(1L, new Subprocesso()))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 
@@ -99,13 +102,15 @@ class CopiaMapaServiceTest {
         Long origemId = 1L;
         Mapa mapaOrigem = new Mapa();
         mapaOrigem.setCodigo(origemId);
+        Subprocesso subprocessoDestino = new Subprocesso();
+        subprocessoDestino.setCodigo(99L);
 
         when(repo.buscar(Mapa.class, origemId)).thenReturn(mapaOrigem);
         when(mapaRepo.save(any(Mapa.class))).thenReturn(new Mapa());
         when(atividadeRepo.listarPorMapaComConhecimentos(origemId)).thenReturn(List.of()); // Empty list
         when(competenciaRepo.findByMapa_Codigo(origemId)).thenReturn(List.of()); // Empty list
 
-        Mapa resultado = service.copiarMapaParaUnidade(origemId);
+        Mapa resultado = service.copiarMapaParaUnidade(origemId, subprocessoDestino);
 
         assertThat(resultado).isNotNull();
         verify(atividadeRepo, never()).saveAll(anyList());
@@ -118,6 +123,8 @@ class CopiaMapaServiceTest {
         Long origemId = 1L;
         Mapa mapaOrigem = new Mapa();
         mapaOrigem.setCodigo(origemId);
+        Subprocesso subprocessoDestino = new Subprocesso();
+        subprocessoDestino.setCodigo(99L);
 
         Atividade atividadeOrigem = new Atividade();
         atividadeOrigem.setCodigo(10L);
@@ -128,7 +135,7 @@ class CopiaMapaServiceTest {
         when(atividadeRepo.listarPorMapaComConhecimentos(origemId)).thenReturn(List.of(atividadeOrigem));
         when(competenciaRepo.findByMapa_Codigo(origemId)).thenReturn(List.of());
 
-        service.copiarMapaParaUnidade(origemId);
+        service.copiarMapaParaUnidade(origemId, subprocessoDestino);
 
         verify(atividadeRepo).saveAll(anyList());
     }

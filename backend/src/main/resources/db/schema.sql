@@ -216,7 +216,7 @@ create table if not exists sgc.processo
     timestamp
 (
     6
-),
+) not null,
     data_finalizacao timestamp
 (
     6
@@ -228,7 +228,7 @@ create table if not exists sgc.processo
     situacao varchar
 (
     20
-) check
+) not null check
 (
     situacao
     in
@@ -240,7 +240,7 @@ create table if not exists sgc.processo
     tipo varchar
 (
     20
-) check
+) not null check
 (
     tipo
     in
@@ -252,7 +252,7 @@ create table if not exists sgc.processo
     descricao varchar
 (
     255
-),
+) not null,
     primary key
 (
     codigo
@@ -268,7 +268,7 @@ create table if not exists sgc.mapa
     default as
     identity,
     subprocesso_codigo
-    bigint,
+    bigint not null,
     data_hora_disponibilizado
     timestamp
 (
@@ -317,7 +317,7 @@ create table if not exists sgc.subprocesso
 (
     6
 ),
-    processo_codigo bigint,
+    processo_codigo bigint not null,
     unidade_codigo bigint not null,
     situacao varchar
 (
@@ -418,12 +418,12 @@ create table if not exists sgc.analise
     timestamp
 (
     6
-),
-    subprocesso_codigo bigint,
+) not null,
+    subprocesso_codigo bigint not null,
     acao varchar
 (
     20
-) check
+) not null check
 (
     acao
     in
@@ -436,7 +436,7 @@ create table if not exists sgc.analise
     tipo varchar
 (
     20
-) check
+) not null check
 (
     tipo
     in
@@ -444,11 +444,11 @@ create table if not exists sgc.analise
     'CADASTRO',
     'VALIDACAO'
 )),
-    unidade_codigo bigint,
+    unidade_codigo bigint not null,
     usuario_titulo varchar
 (
     12
-),
+) not null,
     motivo varchar
 (
     200
@@ -472,12 +472,12 @@ create table if not exists sgc.atividade
     default as
     identity,
     mapa_codigo
-    bigint,
+    bigint not null,
     descricao
     varchar
 (
     255
-),
+) not null,
     primary key
 (
     codigo
@@ -529,12 +529,12 @@ create table if not exists sgc.competencia
     default as
     identity,
     mapa_codigo
-    bigint,
+    bigint not null,
     descricao
     varchar
 (
     255
-),
+) not null,
     primary key
 (
     codigo
@@ -562,7 +562,7 @@ create table if not exists sgc.competencia_atividade
 create table if not exists sgc.conhecimento
 (
     atividade_codigo
-    bigint,
+    bigint not null,
     codigo
     bigint
     generated
@@ -573,7 +573,7 @@ create table if not exists sgc.conhecimento
     varchar
 (
     255
-),
+) not null,
     primary key
 (
     codigo
@@ -593,7 +593,7 @@ create table if not exists sgc.movimentacao
 (
     6
 ) not null,
-    subprocesso_codigo bigint,
+    subprocesso_codigo bigint not null,
     unidade_destino_codigo bigint not null,
     unidade_origem_codigo bigint not null,
     usuario_titulo varchar
@@ -622,14 +622,14 @@ create table if not exists sgc.notificacao
     timestamp
 (
     6
-),
-    subprocesso_codigo bigint,
-    unidade_destino_codigo bigint,
-    unidade_origem_codigo bigint,
+) not null,
+    subprocesso_codigo bigint not null,
+    unidade_destino_codigo bigint not null,
+    unidade_origem_codigo bigint not null,
     conteudo varchar
 (
     500
-),
+) not null,
     primary key
 (
     codigo
@@ -648,7 +648,7 @@ create table if not exists sgc.parametro
     varchar
 (
     50
-),
+) not null,
     descricao varchar
 (
     255
@@ -656,7 +656,7 @@ create table if not exists sgc.parametro
     valor varchar
 (
     255
-),
+) not null,
     primary key
 (
     codigo

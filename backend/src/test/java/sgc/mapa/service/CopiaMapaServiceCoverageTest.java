@@ -6,6 +6,7 @@ import org.mockito.*;
 import org.mockito.junit.jupiter.*;
 import sgc.comum.model.*;
 import sgc.mapa.model.*;
+import sgc.subprocesso.model.*;
 
 import java.util.*;
 
@@ -39,6 +40,8 @@ class CopiaMapaServiceCoverageTest {
         Long codMapaOrigem = 1L;
         Mapa fonte = new Mapa();
         fonte.setCodigo(codMapaOrigem);
+        Subprocesso subprocessoDestino = new Subprocesso();
+        subprocessoDestino.setCodigo(10L);
 
         when(repo.buscar(Mapa.class, codMapaOrigem)).thenReturn(fonte);
         when(mapaRepo.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
@@ -60,7 +63,7 @@ class CopiaMapaServiceCoverageTest {
         when(competenciaRepo.findByMapa_Codigo(codMapaOrigem)).thenReturn(List.of(compFonte));
 
 
-        service.copiarMapaParaUnidade(codMapaOrigem);
+        service.copiarMapaParaUnidade(codMapaOrigem, subprocessoDestino);
 
 
         verify(competenciaRepo).saveAll(anyList());

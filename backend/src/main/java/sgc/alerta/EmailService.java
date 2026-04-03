@@ -8,11 +8,9 @@ import org.springframework.mail.javamail.*;
 import org.springframework.scheduling.annotation.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.*;
-import sgc.alerta.model.*;
 import sgc.comum.config.*;
 
 import java.io.*;
-import java.time.*;
 import java.util.regex.*;
 
 @Service
@@ -21,7 +19,6 @@ import java.util.regex.*;
 public class EmailService {
     private static final Pattern PADRAO_EMAIL = Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
 
-    private final NotificacaoRepo notificacaoRepo;
     private final JavaMailSender enviadorEmail;
     private final ConfigAplicacao config;
 
@@ -43,8 +40,6 @@ public class EmailService {
             return;
         }
 
-        Notificacao notificacao = criarNotificacao(para, assunto, corpo);
-        notificacaoRepo.save(notificacao);
         enviarEmailSmtp(para, assunto, corpo, html);
     }
 
@@ -62,19 +57,6 @@ public class EmailService {
         } catch (MessagingException | UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private Notificacao criarNotificacao(String para, String assunto, String corpo) {
-        Notificacao notificacao = new Notificacao();
-        notificacao.setDataHora(LocalDateTime.now());
-        String conteudo = String.format("Para: %s | Assunto: %s | Corpo: %s", para, assunto, corpo);
-
-        final int limite = 500;
-        if (conteudo.length() > limite) {
-            conteudo = "%s...".formatted(conteudo.substring(0, limite - 3));
-        }
-        notificacao.setConteudo(conteudo);
-        return notificacao;
     }
 
     private boolean isEmailValido(String email) {

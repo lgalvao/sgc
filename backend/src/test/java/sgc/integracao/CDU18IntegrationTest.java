@@ -45,16 +45,17 @@ class CDU18IntegrationTest extends BaseIntegrationTest {
         processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
         processo = processoRepo.save(processo);
 
-        // Criar mapa via Fixture
-        Mapa mapa = MapaFixture.mapaPadrao(null);
-        mapa.setCodigo(null);
-        mapa = mapaRepo.save(mapa);
-
         // Criar subprocesso via Fixture
         subprocesso = SubprocessoFixture.subprocessoPadrao(processo, unidade);
         subprocesso.setCodigo(null);
-        subprocesso.setMapa(mapa);
         subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
+        subprocesso = subprocessoRepo.save(subprocesso);
+
+        // Criar mapa via Fixture
+        Mapa mapa = MapaFixture.mapaPadrao(subprocesso);
+        mapa.setCodigo(null);
+        mapa = mapaRepo.save(mapa);
+        subprocesso.setMapa(mapa);
         subprocesso = subprocessoRepo.save(subprocesso);
 
         Atividade atividade1 = Atividade.builder().mapa(mapa).descricao("Atividade 1").build();

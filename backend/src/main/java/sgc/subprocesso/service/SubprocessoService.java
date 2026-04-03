@@ -115,7 +115,7 @@ public class SubprocessoService {
     public void criarParaMapeamento(Processo processo, Collection<Unidade> unidades, Unidade unidadeOrigem, Usuario usuario) {
         List<Unidade> unidadesElegiveis = unidades.stream().filter(u -> {
             TipoUnidade tipo = u.getTipo();
-            return tipo == OPERACIONAL || tipo == INTEROPERACIONAL || tipo == RAIZ;
+            return tipo == OPERACIONAL || tipo == INTEROPERACIONAL;
         }).toList();
 
         if (unidadesElegiveis.isEmpty()) {
@@ -189,8 +189,7 @@ public class SubprocessoService {
 
         Subprocesso subprocessoSalvo = subprocessoRepo.save(subprocesso);
 
-        Mapa mapaCopiado = copiaMapaService.copiarMapaParaUnidade(codMapaVigente);
-        mapaCopiado.setSubprocesso(subprocessoSalvo);
+        Mapa mapaCopiado = copiaMapaService.copiarMapaParaUnidade(codMapaVigente, subprocessoSalvo);
 
         Mapa mapaSalvo = mapaManutencaoService.salvarMapa(mapaCopiado);
         subprocessoSalvo.setMapa(mapaSalvo);
@@ -433,5 +432,3 @@ public class SubprocessoService {
         return temDuplicatas;
     }
 }
-
-

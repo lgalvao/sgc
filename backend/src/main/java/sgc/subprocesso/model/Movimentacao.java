@@ -34,9 +34,9 @@ public class Movimentacao extends EntidadeBase {
     private Unidade unidadeOrigem;
 
     @ManyToOne
-    @JoinColumn(name = "unidade_destino_codigo")
+    @JoinColumn(name = "unidade_destino_codigo", nullable = false)
     @JsonView(ComumViews.Publica.class)
-    private @Nullable Unidade unidadeDestino;
+    private Unidade unidadeDestino;
 
     @Column(name = "descricao")
     @JsonView(ComumViews.Publica.class)

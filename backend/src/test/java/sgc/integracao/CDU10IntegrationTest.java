@@ -80,16 +80,13 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
         processoRevisao.setDataLimite(LocalDateTime.now().plusDays(30));
         processoRevisao = processoRepo.save(processoRevisao);
 
-        var mapa = mapaRepo.save(new Mapa());
-
         subprocessoRevisao = SubprocessoFixture.subprocessoPadrao(processoRevisao, unidadeChefe);
         subprocessoRevisao.setCodigo(null);
         subprocessoRevisao.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
         subprocessoRevisao.setDataLimiteEtapa1(processoRevisao.getDataLimite());
         subprocessoRevisao = subprocessoRepo.save(subprocessoRevisao);
 
-        mapa.setSubprocesso(subprocessoRevisao);
-        mapa = mapaRepo.save(mapa);
+        var mapa = mapaRepo.save(Mapa.builder().subprocesso(subprocessoRevisao).build());
         subprocessoRevisao.setMapa(mapa);
 
         // Garante que existe movimentação para a unidade do Chefe
@@ -97,6 +94,7 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
                 .subprocesso(subprocessoRevisao)
                 .unidadeOrigem(unidadeChefe)
                 .unidadeDestino(unidadeChefe)
+                .usuario(usuarioChefe)
                 .descricao("Inicialização")
                 .dataHora(LocalDateTime.now())
                 .build();
@@ -178,14 +176,18 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
 
         Analise analiseAceite = new Analise();
         analiseAceite.setSubprocesso(subprocessoRevisao);
+        analiseAceite.setTipo(TipoAnalise.CADASTRO);
         analiseAceite.setUnidadeCodigo(unidadeSuperior.getCodigo());
+        analiseAceite.setUsuarioTitulo("666666666666");
         analiseAceite.setAcao(TipoAcaoAnalise.ACEITE_REVISAO);
         analiseAceite.setDataHora(LocalDateTime.now());
         analiseRepo.saveAndFlush(analiseAceite);
 
         Analise analiseDevolucao = new Analise();
         analiseDevolucao.setSubprocesso(subprocessoRevisao);
+        analiseDevolucao.setTipo(TipoAnalise.CADASTRO);
         analiseDevolucao.setUnidadeCodigo(unidadeSuperior.getCodigo());
+        analiseDevolucao.setUsuarioTitulo("666666666666");
         analiseDevolucao.setAcao(TipoAcaoAnalise.DEVOLUCAO_REVISAO);
         analiseDevolucao.setObservacoes("Segunda devolução");
         analiseDevolucao.setDataHora(LocalDateTime.now());

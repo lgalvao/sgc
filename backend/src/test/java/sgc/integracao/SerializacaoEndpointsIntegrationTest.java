@@ -104,16 +104,14 @@ class SerializacaoEndpointsIntegrationTest extends BaseIntegrationTest {
         processo.adicionarParticipantes(Set.of(unidade));
         processo = processoRepo.saveAndFlush(processo);
 
-        Mapa mapa = mapaRepo.saveAndFlush(new Mapa());
-
         subprocesso = SubprocessoFixture.subprocessoPadrao(processo, unidade);
         subprocesso.setCodigo(null);
-        subprocesso.setMapa(mapa);
         subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         subprocesso = subprocessoRepo.saveAndFlush(subprocesso);
 
-        mapa.setSubprocesso(subprocesso);
-        mapaRepo.saveAndFlush(mapa);
+        Mapa mapa = mapaRepo.saveAndFlush(Mapa.builder().subprocesso(subprocesso).build());
+        subprocesso.setMapa(mapa);
+        subprocesso = subprocessoRepo.saveAndFlush(subprocesso);
 
         subprocessoSemMapa = SubprocessoFixture.subprocessoPadrao(processo, unidadeCriacao);
         subprocessoSemMapa.setCodigo(null);

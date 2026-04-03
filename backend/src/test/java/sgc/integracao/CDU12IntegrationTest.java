@@ -54,6 +54,8 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
+    @Autowired
+    private UsuarioRepo usuarioRepo;
 
     private Atividade atividadeVigente1;
     private Atividade atividadeVigente2;
@@ -75,9 +77,30 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
         processoRevisao.setDataLimite(LocalDateTime.now().plusMonths(3));
         processoRevisao = processoRepo.save(processoRevisao);
 
+        Processo processoVigente = ProcessoFixture.processoPadrao();
+        processoVigente.setCodigo(null);
+        processoVigente.setDescricao("Processo de Mapeamento Vigente");
+        processoVigente.setTipo(TipoProcesso.MAPEAMENTO);
+        processoVigente.setSituacao(SituacaoProcesso.FINALIZADO);
+        processoVigente.setDataFinalizacao(LocalDateTime.now().minusMonths(6));
+        processoVigente.setDataLimite(LocalDateTime.now().minusMonths(7));
+        processoVigente = processoRepo.save(processoVigente);
+
+        Subprocesso subprocessoVigente = SubprocessoFixture.subprocessoPadrao(processoVigente, unidade);
+        subprocessoVigente.setCodigo(null);
+        subprocessoVigente.setMapa(null);
+        subprocessoVigente.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
+        subprocessoVigente.setDataLimiteEtapa1(processoVigente.getDataLimite());
+        subprocessoVigente.setDataFimEtapa1(LocalDateTime.now().minusMonths(7));
+        subprocessoVigente.setDataFimEtapa2(LocalDateTime.now().minusMonths(6));
+        subprocessoVigente = subprocessoRepo.save(subprocessoVigente);
+
         Mapa mapaVigente = new Mapa();
+        mapaVigente.setSubprocesso(subprocessoVigente);
         mapaVigente.setDataHoraHomologado(LocalDateTime.now().minusMonths(6));
         mapaVigente = mapaRepo.save(mapaVigente);
+        subprocessoVigente.setMapa(mapaVigente);
+        subprocessoRepo.save(subprocessoVigente);
 
         unidadeMapaRepo.save(UnidadeMapa.builder().unidadeCodigo(unidade.getCodigo()).mapaVigente(mapaVigente).build());
 
@@ -292,6 +315,7 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
                     .subprocesso(sp)
                     .unidadeOrigem(unidade)
                     .unidadeDestino(unidade.getUnidadeSuperior())
+                    .usuario(usuarioRepo.findById(GESTOR_TITULO).orElseThrow())
                     .descricao("Enviado para Gestor")
                     .dataHora(LocalDateTime.now())
                     .build();

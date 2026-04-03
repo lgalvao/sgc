@@ -58,7 +58,7 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
         Integer countSuperior = jdbcTemplate.queryForObject("SELECT count(*) FROM SGC.VW_UNIDADE WHERE codigo = ?", Integer.class, idSuperior);
         if (countSuperior != null && countSuperior == 0) {
             jdbcTemplate.update(sqlInsertUnidade, idSuperior, "Coordenação de Sistemas teste", "COSIS-TEST",
-                    "INTERMEDIARIA", "ATIVA", null, "132313231323");
+                    "INTERMEDIARIA", "ATIVA", 1L, "132313231323");
         }
 
         Integer countUnidade = jdbcTemplate.queryForObject("SELECT count(*) FROM SGC.VW_UNIDADE WHERE codigo = ?", Integer.class, codUnidade);
@@ -79,7 +79,7 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
         String tituloAdmin = "101010101010";
         if (usuarioRepo.findById(tituloAdmin).isEmpty()) {
             jdbcTemplate.update(sqlInsertUsuario, tituloAdmin, "Admin mock", "admin@test.com", "1010", idSuperior, "12345");
-            jdbcTemplate.update(sqlInsertPerfil, tituloAdmin, "ADMIN", idSuperior);
+            jdbcTemplate.update(sqlInsertPerfil, tituloAdmin, "ADMIN", 1L);
         }
 
         String tituloGestor = "132313231323";

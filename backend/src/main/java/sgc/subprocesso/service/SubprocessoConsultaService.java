@@ -381,7 +381,6 @@ public class SubprocessoConsultaService {
         if (sp.getLocalizacaoAtual() != null) return sp.getLocalizacaoAtual();
         if (sp.getCodigo() == null) return sp.getUnidade();
         Unidade loc = movimentacaoRepo.buscarUltimaPorSubprocesso(sp.getCodigo())
-                .filter(m -> m.getUnidadeDestino() != null)
                 .map(Movimentacao::getUnidadeDestino)
                 .orElse(sp.getUnidade());
         sp.setLocalizacaoAtual(loc);

@@ -118,8 +118,8 @@ class E2eControllerTest {
         jdbcTemplate.execute(
                 "INSERT INTO sgc.vw_usuario (titulo, nome) VALUES ('123', 'User teste')");
         jdbcTemplate.execute(
-                "INSERT INTO sgc.processo (codigo, descricao, situacao, tipo) VALUES (100,"
-                        + " 'Processo teste', 'CRIADO', 'MAPEAMENTO')");
+                "INSERT INTO sgc.processo (codigo, descricao, situacao, tipo, data_criacao, data_limite) VALUES (100,"
+                        + " 'Processo teste', 'CRIADO', 'MAPEAMENTO', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP + 30)");
 
         jdbcTemplate.execute(
                 "INSERT INTO sgc.subprocesso (codigo, processo_codigo, unidade_codigo, situacao, data_limite_etapa1) VALUES (300, 100, 999, 'NAO_INICIADO', CURRENT_TIMESTAMP)");
@@ -180,7 +180,8 @@ class E2eControllerTest {
                 "INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao) VALUES (888, 'Reset"
                         + " Unit', 'RST', 'OPERACIONAL', 'ATIVA')");
         jdbcTemplate.execute(
-                "INSERT INTO sgc.processo (codigo, descricao) VALUES (888, 'Reset proc')");
+                "INSERT INTO sgc.processo (codigo, descricao, situacao, tipo, data_criacao, data_limite)"
+                        + " VALUES (888, 'Reset proc', 'CRIADO', 'MAPEAMENTO', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP + 30)");
 
         assertCount("sgc.vw_unidade WHERE codigo=888", 1);
         assertCount("sgc.processo WHERE codigo=888", 1);
@@ -319,7 +320,9 @@ class E2eControllerTest {
     @DisplayName("Deve limpar processo sem dependentes")
     void deveLimparProcessoSemDependentes() {
         // Create only process, no subprocess/mapa
-        jdbcTemplate.execute("INSERT INTO sgc.processo (codigo, descricao, situacao, tipo) VALUES (101, 'Proc empty', 'CRIADO', 'MAPEAMENTO')");
+        jdbcTemplate.execute(
+                "INSERT INTO sgc.processo (codigo, descricao, situacao, tipo, data_criacao, data_limite)"
+                        + " VALUES (101, 'Proc empty', 'CRIADO', 'MAPEAMENTO', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP + 30)");
 
         controller.limparProcessoComDependentes(101L);
 

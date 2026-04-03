@@ -357,8 +357,8 @@ VALUES ('999999999999');
 -- -------------------------------------------------------------------------------------------------
 -- OBS: Competências e atividades são inseridas junto com seus mapas correspondentes mais abaixo
 
-INSERT INTO SGC.PROCESSO (codigo, descricao, situacao, data_criacao, tipo)
-VALUES ('50000', 'Processo Teste A', 'EM_ANDAMENTO', CURRENT_TIMESTAMP, 'MAPEAMENTO');
+INSERT INTO SGC.PROCESSO (codigo, descricao, situacao, data_criacao, tipo, data_limite)
+VALUES ('50000', 'Processo Teste A', 'EM_ANDAMENTO', CURRENT_TIMESTAMP, 'MAPEAMENTO', CURRENT_TIMESTAMP + 30);
 INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo,
                                   titulo_titular, matricula_titular, data_inicio_titularidade)
 VALUES ('50000', 8, 'Seção de Desenvolvimento de Sistemas', 'SEDESENV', 'OPERACIONAL', 'ATIVA', 6, '3', '00000003',
@@ -367,8 +367,8 @@ INSERT INTO SGC.ALERTA (codigo, processo_codigo, unidade_origem_codigo, unidade_
                         descricao, data_hora)
 VALUES ('70000', 50000, 1, 8, 50001, 'Alerta de teste para processo A', CURRENT_TIMESTAMP);
 
-INSERT INTO SGC.PROCESSO (codigo, descricao, situacao, data_criacao, tipo)
-VALUES ('50001', 'Processo Teste B', 'FINALIZADO', CURRENT_TIMESTAMP, 'MAPEAMENTO');
+INSERT INTO SGC.PROCESSO (codigo, descricao, situacao, data_criacao, tipo, data_limite)
+VALUES ('50001', 'Processo Teste B', 'FINALIZADO', CURRENT_TIMESTAMP, 'MAPEAMENTO', CURRENT_TIMESTAMP);
 INSERT INTO SGC.UNIDADE_PROCESSO (processo_codigo, unidade_codigo, NOME, SIGLA, TIPO, SITUACAO, unidade_superior_codigo,
                                   titulo_titular, matricula_titular, data_inicio_titularidade)
 VALUES ('50001', 9, 'Seção de Dados e Inteligência Artificial', 'SEDIA', 'OPERACIONAL', 'ATIVA', 6, '333333333333',

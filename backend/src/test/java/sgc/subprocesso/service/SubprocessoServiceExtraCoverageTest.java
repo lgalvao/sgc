@@ -263,7 +263,7 @@ class SubprocessoServiceExtraCoverageTest {
     @DisplayName("Criação de Subprocesso")
     class CriacaoSubprocesso {
         @Test
-        @DisplayName("criarParaMapeamento com todos os tipos de unidades")
+        @DisplayName("criarParaMapeamento deve ignorar unidade raiz e tipos nao elegiveis")
         void criarParaMapeamento_TiposUnidades() {
             Processo p = new Processo();
             p.setCodigo(1L);
@@ -275,7 +275,13 @@ class SubprocessoServiceExtraCoverageTest {
 
             subprocessoService.criarParaMapeamento(p, List.of(u1, u2, u3, u4), null, new Usuario());
 
-            verify(subprocessoRepo).saveAll(any());
+            verify(subprocessoRepo).saveAll(argThat(subprocessos -> {
+                int quantidade = 0;
+                for (Subprocesso ignored : subprocessos) {
+                    quantidade++;
+                }
+                return quantidade == 2;
+            }));
         }
     }
 

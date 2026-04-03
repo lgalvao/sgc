@@ -105,10 +105,11 @@ class SubprocessoTransicaoServiceTest {
     }
 
     @Test
-    @DisplayName("aceitarValidacao deve homologar direto quando nao houver unidade superior")
-    void aceitarValidacaoDeveHomologarDiretoQuandoNaoHouverUnidadeSuperior() {
+    @DisplayName("aceitarValidacao deve encaminhar para a unidade superior")
+    void aceitarValidacaoDeveEncaminharParaUnidadeSuperior() {
         Unidade unidade = criarUnidade(10L, "ORIG", "Origem");
-        unidade.setUnidadeSuperior(null);
+        Unidade admin = criarUnidade(1L, "ADMIN", "Administração");
+        unidade.setUnidadeSuperior(admin);
 
         Subprocesso subprocesso = criarSubprocesso(MAPEAMENTO, MAPEAMENTO_MAPA_VALIDADO, unidade);
         subprocesso.setLocalizacaoAtual(unidade);
@@ -125,9 +126,13 @@ class SubprocessoTransicaoServiceTest {
                         && analise.getAcao() == TipoAcaoAnalise.ACEITE_MAPEAMENTO
                         && "Aceite final".equals(analise.getObservacoes())
                         && "Aceite da validação".equals(analise.getMotivo())));
-        verify(subprocessoRepo).save(subprocesso);
-        verify(notificacaoService, never()).notificarTransicao(any());
-        assertThat(subprocesso.getSituacao()).isEqualTo(MAPEAMENTO_MAPA_HOMOLOGADO);
+        verify(notificacaoService).notificarTransicao(argThat(cmd ->
+                cmd.subprocesso().equals(subprocesso)
+                        && cmd.tipoTransicao() == MAPA_VALIDACAO_ACEITA
+                        && cmd.unidadeOrigem().equals(unidade)
+                        && cmd.unidadeDestino().equals(admin)
+                        && "Aceite final".equals(cmd.observacoes())));
+        assertThat(subprocesso.getSituacao()).isEqualTo(MAPEAMENTO_MAPA_VALIDADO);
     }
 
     @Test
@@ -188,15 +193,17 @@ class SubprocessoTransicaoServiceTest {
         }
 
         @Test
-        @DisplayName("devolverValidacao deve ignorar movimentação sem destino e filtrar por hierarquia")
-        void devolverValidacaoDeveIgnorarMovimentacaoSemDestinoEFiltrar() {
+        @DisplayName("devolverValidacao deve filtrar movimentacao por unidade de analise e hierarquia")
+        void devolverValidacaoDeveFiltrarMovimentacaoPorUnidadeAnaliseEHierarquia() {
             Unidade uOrigem = criarUnidade(1L, "ORI", "Origem");
             Unidade uAnalise = criarUnidade(2L, "ANA", "Analise");
+            Unidade outraUnidade = criarUnidade(3L, "OUT", "Outra");
             Subprocesso sp = criarSubprocesso(MAPEAMENTO, MAPEAMENTO_MAPA_VALIDADO, uOrigem);
             sp.setLocalizacaoAtual(uAnalise);
 
             Movimentacao m1 = new Movimentacao();
-            m1.setUnidadeDestino(null); // Caso line 365
+            m1.setUnidadeDestino(outraUnidade);
+            m1.setUnidadeOrigem(outraUnidade);
             Movimentacao m2 = new Movimentacao();
             m2.setUnidadeDestino(uAnalise);
             m2.setUnidadeOrigem(uOrigem);

@@ -69,7 +69,7 @@ class MovimentacaoRepoPerformanceTest {
         Movimentacao m2 = Movimentacao.builder()
                 .subprocesso(sp)
                 .unidadeOrigem(uOrigem)
-                .unidadeDestino(null)
+                .unidadeDestino(uOrigem)
                 .descricao("Mov 2")
                 .dataHora(LocalDateTime.now())
                 .build();
@@ -82,6 +82,6 @@ class MovimentacaoRepoPerformanceTest {
         assertThat(result.get(1).getDescricao()).isEqualTo("Mov 1");
 
         assertThat(result.get(1).getUnidadeDestino().getSigla()).isEqualTo("UD");
-        assertThat(result.get(0).getUnidadeDestino()).isNull();
+        assertThat(result.get(0).getUnidadeDestino().getSigla()).isEqualTo("UO");
     }
 }

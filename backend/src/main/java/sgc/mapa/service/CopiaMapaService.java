@@ -6,6 +6,7 @@ import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
 import sgc.comum.model.*;
 import sgc.mapa.model.*;
+import sgc.subprocesso.model.*;
 
 import java.util.*;
 
@@ -20,10 +21,10 @@ public class CopiaMapaService {
     private final CompetenciaRepo competenciaRepo;
 
     @Transactional
-    public Mapa copiarMapaParaUnidade(Long codMapaOrigem) {
+    public Mapa copiarMapaParaUnidade(Long codMapaOrigem, Subprocesso subprocessoDestino) {
         Mapa fonte = repo.buscar(Mapa.class, codMapaOrigem);
 
-        Mapa novoMapa = criarNovoMapa();
+        Mapa novoMapa = criarNovoMapa(subprocessoDestino);
         Mapa mapaSalvo = mapaRepo.save(novoMapa);
 
         Long codMapaFonte = fonte.getCodigo();
@@ -62,8 +63,9 @@ public class CopiaMapaService {
         return atividadesParaSalvar.size();
     }
 
-    private Mapa criarNovoMapa() {
+    private Mapa criarNovoMapa(Subprocesso subprocessoDestino) {
         return Mapa.builder()
+                .subprocesso(subprocessoDestino)
                 .dataHoraDisponibilizado(null)
                 .observacoesDisponibilizacao(null)
                 .sugestoes(null)
@@ -144,4 +146,3 @@ public class CopiaMapaService {
                 .toList());
     }
 }
-

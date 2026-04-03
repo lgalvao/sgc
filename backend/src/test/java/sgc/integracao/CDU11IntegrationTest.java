@@ -82,17 +82,15 @@ class CDU11IntegrationTest extends BaseIntegrationTest {
         processo = processoRepo.save(processo);
 
         // Mapa e Subprocesso
-        var mapa = mapaRepo.save(new Mapa());
-
         subprocesso = SubprocessoFixture.subprocessoPadrao(processo, unidade);
         subprocesso.setCodigo(null);
-        subprocesso.setMapa(mapa);
         subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
         subprocesso.setDataLimiteEtapa1(processo.getDataLimite());
         subprocesso = subprocessoRepo.save(subprocesso);
 
-        mapa.setSubprocesso(subprocesso);
-        mapaRepo.save(mapa);
+        var mapa = mapaRepo.save(Mapa.builder().subprocesso(subprocesso).build());
+        subprocesso.setMapa(mapa);
+        subprocesso = subprocessoRepo.save(subprocesso);
 
         // Atividades e Conhecimentos
         Atividade atividade1 = AtividadeFixture.atividadePadrao(mapa);
@@ -169,14 +167,13 @@ class CDU11IntegrationTest extends BaseIntegrationTest {
         @Test
         @DisplayName("Deve retornar uma lista de atividades vazia quando o mapa não tem atividades")
         void deveRetornarListaVazia_QuandoNaoHaAtividades() throws Exception {
-            var mapaVazio = mapaRepo.save(new Mapa());
             Subprocesso subprocessoSemAtividades = SubprocessoFixture.subprocessoPadrao(processo, unidade);
             subprocessoSemAtividades.setCodigo(null);
-            subprocessoSemAtividades.setMapa(mapaVazio);
             subprocessoSemAtividades = subprocessoRepo.save(subprocessoSemAtividades);
 
-            mapaVazio.setSubprocesso(subprocessoSemAtividades);
-            mapaRepo.save(mapaVazio);
+            var mapaVazio = mapaRepo.save(Mapa.builder().subprocesso(subprocessoSemAtividades).build());
+            subprocessoSemAtividades.setMapa(mapaVazio);
+            subprocessoSemAtividades = subprocessoRepo.save(subprocessoSemAtividades);
 
             mockMvc.perform(get(API_SUBPROCESSOS_ID_CADASTRO, subprocessoSemAtividades.getCodigo())
                             .header("Authorization", "Bearer " + tokenAdmin))
@@ -191,15 +188,13 @@ class CDU11IntegrationTest extends BaseIntegrationTest {
         @Test
         @DisplayName("Deve retornar uma atividade com a lista de conhecimentos vazia")
         void deveRetornarAtividadeComConhecimentosVazios() throws Exception {
-            Mapa mapaNovo = mapaRepo.save(new Mapa());
-
             Subprocesso subprocessoAtividadeSemConhecimento = SubprocessoFixture.subprocessoPadrao(processo, unidade);
             subprocessoAtividadeSemConhecimento.setCodigo(null);
-            subprocessoAtividadeSemConhecimento.setMapa(mapaNovo);
             subprocessoAtividadeSemConhecimento = subprocessoRepo.save(subprocessoAtividadeSemConhecimento);
 
-            mapaNovo.setSubprocesso(subprocessoAtividadeSemConhecimento);
-            mapaRepo.save(mapaNovo);
+            Mapa mapaNovo = mapaRepo.save(Mapa.builder().subprocesso(subprocessoAtividadeSemConhecimento).build());
+            subprocessoAtividadeSemConhecimento.setMapa(mapaNovo);
+            subprocessoAtividadeSemConhecimento = subprocessoRepo.save(subprocessoAtividadeSemConhecimento);
 
             Atividade atividadeSemConhecimento = AtividadeFixture.atividadePadrao(mapaNovo);
             atividadeSemConhecimento.setDescricao("Atividade sem conhecimento");
