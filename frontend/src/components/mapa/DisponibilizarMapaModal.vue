@@ -4,7 +4,7 @@
       :loading="loading"
       :model-value="mostrar"
       data-testid="mdl-disponibilizar-mapa"
-      test-id-cancelar="btn-disponibilizar-mapa-cancelar"
+      test-codigo-cancelar="btn-disponibilizar-mapa-cancelar"
       texto-acao="Disponibilizar"
       texto-acao-carregando="Disponibilizando..."
       titulo="Disponibilização do mapa de competências"

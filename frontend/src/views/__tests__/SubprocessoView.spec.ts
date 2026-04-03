@@ -87,8 +87,8 @@ describe('SubprocessoView.vue', () => {
         SubprocessoModal: SubprocessoModalStub,
         ModalConfirmacao: {
             name: 'ModalConfirmacao',
-            template: '<div><slot /><button :data-testid="testIdConfirmar" :disabled="okDisabled" @click="$emit(\'confirmar\')">OK</button></div>',
-            props: ['modelValue', 'titulo', 'testIdConfirmar', 'okDisabled'],
+            template: '<div><slot /><button :data-testid="testCodigoConfirmar" :disabled="okDisabled" @click="$emit(\'confirmar\')">OK</button></div>',
+            props: ['modelValue', 'titulo', 'testCodigoConfirmar', 'okDisabled'],
             emits: ['update:modelValue', 'confirmar']
         },
         AppAlert: {

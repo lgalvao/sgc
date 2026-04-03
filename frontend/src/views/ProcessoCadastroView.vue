@@ -90,8 +90,8 @@
         :cancel-title="TEXTOS.comum.BOTAO_CANCELAR"
         :ok-title="TEXTOS.comum.BOTAO_INICIAR"
         variant="success"
-        test-id-cancelar="btn-iniciar-processo-cancelar"
-        test-id-confirmar="btn-iniciar-processo-confirmar"
+        test-codigo-cancelar="btn-iniciar-processo-cancelar"
+        test-codigo-confirmar="btn-iniciar-processo-confirmar"
         :titulo="TEXTOS.processo.cadastro.INICIAR_TITULO"
         @confirmar="confirmarIniciarProcesso"
     >

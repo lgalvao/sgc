@@ -10,7 +10,7 @@ const ModalPadraoStub = {
         <div v-if="modelValue" data-testid="modal-stub">
             <slot />
             <button
-                :data-testid="testIdCancelar || 'btn-modal-padrao-cancelar'"
+                :data-testid="testCodigoCancelar || 'btn-modal-padrao-cancelar'"
                 :disabled="loading"
                 @click="$emit('fechar')"
             >
@@ -19,7 +19,7 @@ const ModalPadraoStub = {
             <slot name="acao" />
         </div>
     `,
-    props: ["modelValue", "testIdCancelar", "loading"],
+    props: ["modelValue", "testCodigoCancelar", "loading"],
     emits: ["update:modelValue", "fechar", "confirmar"],
 };
 

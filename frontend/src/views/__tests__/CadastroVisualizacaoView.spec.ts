@@ -53,7 +53,7 @@ const stubs = {
     HistoricoAnaliseModal: {template: '<div></div>', props: ['mostrar']},
     ModalConfirmacao: {
         name: 'ModalConfirmacao',
-        template: '<div v-if="modelValue"> <slot /> <button :data-testid="$attrs[\'test-id-confirmar\']" @click="$emit(\'confirmar\')">Confirmar</button> </div>', 
+        template: '<div v-if="modelValue"> <slot /> <button :data-testid="$attrs[\'test-codigo-confirmar\']" @click="$emit(\'confirmar\')">Confirmar</button> </div>',
         props: ['modelValue']
     },
 };

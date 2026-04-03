@@ -182,8 +182,8 @@ describe("VisMapa.vue", () => {
                     },
                     ModalPadrao: {
                         name: 'ModalPadrao',
-                        props: ['modelValue', 'testIdCancelar'],
-                        template: '<div v-if="modelValue"><slot /><button :data-testid="testIdCancelar" @click="$emit(\'fechar\')">Fechar</button></div>'
+                        props: ['modelValue', 'testCodigoCancelar'],
+                        template: '<div v-if="modelValue"><slot /><button :data-testid="testCodigoCancelar" @click="$emit(\'fechar\')">Fechar</button></div>'
                     },
                     EmptyState: {
                         name: 'EmptyState',

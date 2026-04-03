@@ -6,8 +6,8 @@
       :ok-title="rotuloConfirmar"
       :titulo="tituloModal"
       ok-variant="success"
-      test-id-cancelar="btn-aceite-mapa-cancelar"
-      test-id-confirmar="btn-aceite-mapa-confirmar"
+      test-codigo-cancelar="btn-aceite-mapa-cancelar"
+      test-codigo-confirmar="btn-aceite-mapa-confirmar"
       variant="success"
       @confirmar="confirmarAceitacao"
   >
