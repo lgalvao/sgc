@@ -345,3 +345,42 @@ Este arquivo passa a ser a referência consolidada para novas rodadas.
 
 Os arquivos históricos `plano-simplificacao.md`, `simplification-plan.md` e `simplification-suggestions.md` devem ser
 tratados como insumos de contexto.
+
+
+## Continuação operacional (rodada atual)
+
+### Checklist objetivo da Frente 1
+
+1. Medir o estado atual de `SubprocessoTransicaoService` com foco em:
+   * quantidade de métodos com mais de uma responsabilidade visível;
+   * pontos de chamada para persistência, notificação, e-mail e alerta;
+   * duplicações de montagem de comandos e eventos de workflow.
+2. Registrar o recorte escolhido da rodada em até um parágrafo neste plano antes de alterar código.
+3. Aplicar apenas um corte estrutural por vez, mantendo validação curta entre cortes.
+4. Atualizar este arquivo com resultado objetivo (o que saiu, o que ficou e por quê).
+
+### Definição de pronto da rodada atual
+
+A rodada atual só deve ser encerrada quando todos os itens abaixo estiverem verdadeiros:
+
+* existe registro explícito do corte realizado em `SubprocessoTransicaoService`;
+* a separação entre transição de estado e efeitos derivados ficou mais legível no diff;
+* nenhum contrato público foi alterado sem justificativa registrada;
+* a suíte mínima de backend executou sem regressão atribuível ao corte.
+
+### Registro padrão por rodada (preencher ao final)
+
+* **Data da rodada:**
+* **Frente principal:**
+* **Arquivo(s) alvo:**
+* **Corte aplicado:**
+* **Risco principal observado:**
+* **Validação executada:**
+* **Pendência aberta para próxima rodada:**
+
+### Fila sugerida após a rodada atual
+
+1. Consolidar um ponto único para efeitos de notificação/e-mail/alerta disparados por transição.
+2. Reavaliar se ainda há ganho em extrair colaborador interno focado apenas em persistência de workflow.
+3. Iniciar mapeamento fino de `SubprocessoConsultaService` separando leitura simples e composição de contexto.
+4. Rodar triagem de wrappers visuais começando por `LoadingButton.vue`, com decisão explícita de manter, ajustar ou remover.
