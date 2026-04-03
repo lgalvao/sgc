@@ -434,7 +434,7 @@ public class ValidadorDadosOrganizacionais {
         try {
             Perfil perfil = Perfil.valueOf(dados.perfilBruto());
             ChavePerfilUsuarioUnidade chave = new ChavePerfilUsuarioUnidade(dados.titulo(), perfil, dados.codigo());
-            contexto.contagemPorChave().merge(chave, 1, (v1, v2) -> Integer.valueOf(v1.intValue() + v2.intValue()));
+            contexto.contagemPorChave().merge(chave, 1, (v1, v2) -> v1 + v2);
             contexto.perfisPorUnidade().computeIfAbsent(dados.codigo(), c -> new LinkedHashSet<>())
                     .add(new PerfilUsuarioUnidade(dados.titulo(), perfil));
         } catch (IllegalArgumentException ex) {

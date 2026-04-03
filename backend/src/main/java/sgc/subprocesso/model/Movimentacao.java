@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.*;
-import org.jspecify.annotations.*;
 import sgc.comum.model.*;
 import sgc.organizacao.model.*;
 

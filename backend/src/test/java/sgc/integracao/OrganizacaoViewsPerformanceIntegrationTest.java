@@ -247,18 +247,18 @@ class OrganizacaoViewsPerformanceIntegrationTest extends BaseIntegrationTest {
                 .as("A consulta %s nao deveria retornar nulo", nome)
                 .isNotNull();
 
-        if (resultado instanceof Optional<?> optional) {
-            assertThat(optional)
+        switch (resultado) {
+            case Optional<?> optional -> assertThat(optional)
                     .as("A consulta %s deveria retornar Optional preenchido", nome)
                     .isPresent();
-        } else if (resultado instanceof Collection<?> collection) {
-            assertThat(collection)
+            case Collection<?> collection -> assertThat(collection)
                     .as("A consulta %s deveria retornar colecao nao vazia", nome)
                     .isNotEmpty();
-        } else if (resultado instanceof Map<?, ?> map) {
-            assertThat(map)
+            case Map<?, ?> map -> assertThat(map)
                     .as("A consulta %s deveria retornar mapa nao vazio", nome)
                     .isNotEmpty();
+            default -> {
+            }
         }
     }
 

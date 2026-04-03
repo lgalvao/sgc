@@ -162,7 +162,7 @@ public class SubprocessoConsultaService {
         return validacaoService.validarCadastro(sp);
     }
 
-    @org.jspecify.annotations.NonNull public Unidade obterUnidadeLocalizacao(Subprocesso sp) {
+    public Unidade obterUnidadeLocalizacao(Subprocesso sp) {
         if (sp.getLocalizacaoAtual() != null) return sp.getLocalizacaoAtual();
         Unidade unidade = sp.getUnidade();
         if (sp.getCodigo() == null) return unidade;
@@ -377,7 +377,7 @@ public class SubprocessoConsultaService {
         return subprocessoRepo.listarPorProcessoComUnidade(codProcesso);
     }
 
-    @org.jspecify.annotations.NonNull public Unidade obterLocalizacaoAtual(Subprocesso sp) {
+    public Unidade obterLocalizacaoAtual(Subprocesso sp) {
         if (sp.getLocalizacaoAtual() != null) return sp.getLocalizacaoAtual();
         if (sp.getCodigo() == null) return sp.getUnidade();
         Unidade loc = movimentacaoRepo.buscarUltimaPorSubprocesso(sp.getCodigo())

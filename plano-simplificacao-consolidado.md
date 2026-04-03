@@ -39,6 +39,17 @@ Se este plano divergir do código real, prevalece o código verificado e o plano
 * `SubprocessoService` não é mais o principal hotspot do módulo `subprocesso`.
 * `SubprocessoTransicaoService` continua sendo o maior concentrador de responsabilidades do fluxo de workflow.
 * `LoadingButton.vue` segue como wrapper fino, mas ainda possui adoção ampla o suficiente para exigir auditoria antes de remoção.
+* A suíte de backend voltou a ficar íntegra com `./gradlew --no-configuration-cache :backend:test` verde, após saneamento das invariáveis de domínio refletidas no `schema.sql`.
+
+### Aprendizados consolidados da rodada mais recente
+
+* A limpeza de simplificação ficou bloqueada por inconsistências reais entre modelo, schema e testes. Esse débito já foi reduzido e não deve mais competir com a Frente 1.
+* `ADMIN` deve ser tratado como unidade virtual raiz, não como unidade participante de processo.
+* Fluxos hierárquicos de subida não devem ter fallback para `ADMIN`; a invariável correta é que toda unidade participante possui superior.
+* `Movimentacao` exige sempre `unidadeOrigem`, `unidadeDestino` e `usuario`.
+* `Mapa` exige sempre vínculo com `Subprocesso`.
+* `Processo` exige `dataLimite`.
+* O conjunto `schema.sql`, `data.sql` e `seed.sql` passou a funcionar como superfície principal de alinhamento dos testes, reduzindo ruído estrutural antes da próxima simplificação.
 
 ### Premissas antigas que deixam de valer
 
@@ -97,6 +108,7 @@ Direção:
 * Priorizar extrações coesas dentro de `SubprocessoTransicaoService`.
 * Fatiar `SubprocessoConsultaService` por responsabilidade real, sem quebrar contratos.
 * Tratar `SubprocessoService` como frente secundária de limpeza interna.
+* Evitar abrir novas frentes estruturais no backend antes de concluir pelo menos um corte pequeno em `SubprocessoTransicaoService`.
 
 ### 3. Backend `e2e`
 
@@ -142,6 +154,24 @@ Escopo inicial:
   * alteração de data limite e notificações derivadas.
 * Extrair primeiro helpers privados ou componentes internos coesos.
 * Só promover nova classe quando houver fronteira semântica estável e mais de um uso relevante.
+
+Estado da frente:
+
+* O primeiro corte técnico já ocorreu: foi removida duplicação no algoritmo de devolução dentro de `SubprocessoTransicaoService`.
+* A rodada seguinte eliminou ruído que mascarava a simplificação principal:
+  * fallback hierárquico indevido para `ADMIN`;
+  * aceitação indevida de `RAIZ` como participante de subprocesso;
+  * cenários de teste que violavam invariáveis já exigidas pelo schema.
+* O próximo corte desta frente deve voltar ao service e não ao ambiente de testes.
+
+Próximo corte recomendado:
+
+* Extrair a resolução de destino hierárquico recorrente dos fluxos de aceite, disponibilização e encaminhamento.
+* Separar o núcleo de persistência de workflow em torno de:
+  * `registrarTransicao`;
+  * `registrarAnalise`;
+  * criação de alertas/notificações derivadas.
+* Reavaliar, após esse corte, se a fronteira natural é um colaborador interno de workflow ou apenas helpers privados mais explícitos.
 
 Restrições:
 
@@ -248,6 +278,13 @@ Para cada rodada:
 3. Escolher o menor corte seguro.
 4. Validar imediatamente após a mudança.
 5. Registrar aprendizado novo neste plano.
+
+### Sequência recomendada da próxima rodada
+
+1. Isolar e nomear a regra de resolução de destino hierárquico em `SubprocessoTransicaoService`.
+2. Consolidar o trecho comum de persistência de workflow sem criar facade nova.
+3. Validar a suíte focada de `SubprocessoTransicaoService`.
+4. Só então reconsiderar extração de classe.
 
 ## Validação mínima por frente
 

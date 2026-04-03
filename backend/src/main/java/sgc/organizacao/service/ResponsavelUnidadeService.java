@@ -202,10 +202,10 @@ public class ResponsavelUnidadeService {
         }
 
         Set<Long> unidadesComResponsavelEfetivo = responsabilidadeRepo.listarPorCodigosUnidade(unidadesCodigos).stream()
-                .filter(responsabilidade -> responsabilidade.getUsuarioTitulo() != null && !responsabilidade.getUsuarioTitulo().isBlank())
+                .filter(responsabilidade -> !responsabilidade.getUsuarioTitulo().isBlank())
                 .map(Responsabilidade::getUnidadeCodigo)
                 .collect(toSet());
 
-        return unidadesCodigos.stream().allMatch(unidadesComResponsavelEfetivo::contains);
+        return unidadesComResponsavelEfetivo.containsAll(unidadesCodigos);
     }
 }

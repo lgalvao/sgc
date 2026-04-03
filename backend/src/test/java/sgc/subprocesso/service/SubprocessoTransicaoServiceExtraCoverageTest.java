@@ -5,7 +5,6 @@ import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
 import sgc.alerta.*;
-import sgc.mapa.dto.*;
 import sgc.mapa.service.*;
 import sgc.organizacao.*;
 import sgc.organizacao.model.*;
@@ -47,10 +46,8 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
 
     @Mock
     private SubprocessoNotificacaoService notificacaoService;
-
     @Mock
     private UnidadeService unidadeService;
-
     @Mock
     private MapaManutencaoService mapaManutencaoService;
 
@@ -60,13 +57,6 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
     @Mock
     private ImpactoMapaService impactoMapaService;
 
-    @Mock
-    private UsuarioFacade usuarioFacade;
-
-    @Mock
-    private EmailService emailService;
-
-    
     @BeforeEach
     void setUp() {
         org.mockito.Mockito.lenient().when(consultaService.obterUnidadeLocalizacao(org.mockito.ArgumentMatchers.any(Subprocesso.class)))
@@ -76,6 +66,10 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
                 });
         org.mockito.Mockito.lenient().when(impactoMapaService.verificarImpactos(org.mockito.ArgumentMatchers.any(Subprocesso.class), org.mockito.ArgumentMatchers.any()))
                 .thenReturn(sgc.mapa.dto.ImpactoMapaResponse.semImpacto());
+        Unidade admin = new Unidade();
+        admin.setCodigo(99L);
+        admin.setSigla("ADMIN");
+        org.mockito.Mockito.lenient().when(unidadeService.buscarPorSigla("ADMIN")).thenReturn(admin);
     }
 
     @Test

@@ -131,7 +131,6 @@ public final class Mensagens {
 
     // ── Regras de Negócio — Importação e Estrutura ───────────────────────────
     public static final String IMPORTACAO_ATIVIDADES_DUPLICADAS = "Uma ou mais atividades selecionadas já existentes no cadastro não puderam ser importadas.";
-    public static final String IMPORTACAO_SO_PROCESSOS_FINALIZADOS = "A importação de atividades só permite subprocessos de processos finalizados.";
     public static final String ATIVIDADES_PENDENTES_PREFIXO     = "Todas as atividades devem estar associadas a pelo menos uma competência.%nAtividades pendentes: %s";
     public static final String ATIVIDADES_DEVEM_TER_COMPETENCIA = "Todas as atividades devem estar associadas a pelo menos uma competência.";
     public static final String UNIDADES_INTERMEDIARIA_INVALIDAS = "Unidades INTERMEDIARIA inválidas: %s";

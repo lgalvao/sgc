@@ -41,13 +41,6 @@ class SubprocessoConsultaServiceExtraCoverageTest {
     private HierarquiaService hierarquiaService;
     @Mock
     private AnaliseRepo analiseRepo;
-    @Mock
-    private SubprocessoValidacaoService validacaoService;
-    @Mock
-    private ImpactoMapaService impactoMapaService;
-    @Mock
-    private MapaVisualizacaoService mapaVisualizacaoService;
-
     @InjectMocks
     private SubprocessoConsultaService consultaService;
 

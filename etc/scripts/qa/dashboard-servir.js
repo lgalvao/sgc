@@ -37,6 +37,7 @@ const servidor = http.createServer((request, response) => handler(request, respo
 
 servidor.listen(porta, host, () => {
     imprimirCabecalho("QA Dashboard", "Servidor iniciado.");
+    // noinspection HttpUrlsUsage
     process.stdout.write(`Abra: http://${host}:${porta}${caminhoDashboard}\n`);
 });
 

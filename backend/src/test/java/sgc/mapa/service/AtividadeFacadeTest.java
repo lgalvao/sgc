@@ -28,8 +28,6 @@ class AtividadeFacadeTest {
     @Mock
     private MapaManutencaoService mapaManutencaoService;
     @Mock
-    private SubprocessoService subprocessoService;
-    @Mock
     private SubprocessoConsultaService consultaService;
     @Mock
     private SgcPermissionEvaluator permissionEvaluator;

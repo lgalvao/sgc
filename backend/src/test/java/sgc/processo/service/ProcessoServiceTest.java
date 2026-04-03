@@ -60,10 +60,6 @@ class ProcessoServiceTest {
     @Mock
     private AlertaFacade servicoAlertas;
     @Mock
-    private EmailService emailService;
-    @Mock
-    private EmailModelosService emailModelosService;
-    @Mock
     private SgcPermissionEvaluator permissionEvaluator;
     @Mock
     private SubprocessoTransicaoService transicaoService;

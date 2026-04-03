@@ -27,23 +27,16 @@ import static org.mockito.Mockito.*;
 @DisplayName("RelatorioFacade Test")
 @SuppressWarnings("NullAway.Init")
 class RelatorioFacadeTest {
-
     @Mock
     private ProcessoService processoService;
     @Mock
-    private SubprocessoService subprocessoService;
-    @Mock
     private SubprocessoConsultaService consultaService;
-    @Mock
-    private UnidadeService unidadeService;
     @Mock
     private ResponsavelUnidadeService responsavelService;
     @Mock
     private MapaManutencaoService mapaManutencaoService;
-
     @Mock
     private PdfFactory pdfFactory;
-
     @Mock
     private Document document;
 

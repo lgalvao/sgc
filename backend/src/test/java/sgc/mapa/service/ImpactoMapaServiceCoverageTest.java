@@ -21,13 +21,10 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 @ExtendWith(MockitoExtension.class)
 @DisplayName("ImpactoMapaService - Cobertura de Testes")
 class ImpactoMapaServiceCoverageTest {
-
     @InjectMocks
     private ImpactoMapaService target;
 
     @Mock private MapaRepo mapaRepo;
-    @Mock private CompetenciaRepo competenciaRepo;
-    @Mock private MapaManutencaoService mapaManutencaoService;
     @Mock private SgcPermissionEvaluator permissionEvaluator;
 
     @Test

@@ -59,9 +59,7 @@ public class UnidadeHierarquiaService {
 
     private boolean possuiResponsavelEfetivo(Unidade unidade) {
         Responsabilidade responsabilidade = unidade.getResponsabilidade();
-        return responsabilidade != null
-                && responsabilidade.getUsuarioTitulo() != null
-                && !responsabilidade.getUsuarioTitulo().isBlank();
+        return responsabilidade != null && !responsabilidade.getUsuarioTitulo().isBlank();
     }
 
     /**
