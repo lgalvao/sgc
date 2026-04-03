@@ -14,6 +14,8 @@ import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("Testes de Integração - ProcessoService")
 class ProcessoServiceIntegrationTest extends BaseIntegrationTest {
+    private static final Long CODIGO_UNIDADE_MAPEAMENTO = 8L;
+    private static final Long CODIGO_UNIDADE_SEM_MAPA = 15L;
 
     @Autowired
     private ProcessoService service;
@@ -69,7 +71,7 @@ class ProcessoServiceIntegrationTest extends BaseIntegrationTest {
                     .descricao("Processo de Mapeamento")
                     .tipo(TipoProcesso.MAPEAMENTO)
                     .dataLimiteEtapa1(dataLimite)
-                    .unidades(List.of(1L))
+                    .unidades(List.of(CODIGO_UNIDADE_MAPEAMENTO))
                     .build();
 
             Processo resultado = service.criar(request);
@@ -87,12 +89,12 @@ class ProcessoServiceIntegrationTest extends BaseIntegrationTest {
                     .tipo(TipoProcesso.REVISAO)
                     .dataLimiteEtapa1(dataLimite)
 
-                    .unidades(List.of(1L))
+                    .unidades(List.of(CODIGO_UNIDADE_SEM_MAPA))
                     .build();
 
             assertThatThrownBy(() -> service.criar(request))
                     .isInstanceOf(ErroValidacao.class)
-                    .hasMessageContaining("mapa vigente");
+                    .hasMessageContaining("Não foi possível concluir a operação.");
         }
 
         @Test
@@ -124,7 +126,7 @@ class ProcessoServiceIntegrationTest extends BaseIntegrationTest {
                     .descricao("Original")
                     .tipo(TipoProcesso.MAPEAMENTO)
                     .dataLimiteEtapa1(dataLimite)
-                    .unidades(List.of(1L))
+                    .unidades(List.of(CODIGO_UNIDADE_MAPEAMENTO))
                     .build());
 
             AtualizarProcessoRequest request = AtualizarProcessoRequest.builder()
@@ -132,7 +134,7 @@ class ProcessoServiceIntegrationTest extends BaseIntegrationTest {
                     .descricao("Atualizada")
                     .tipo(TipoProcesso.MAPEAMENTO)
                     .dataLimiteEtapa1(dataLimite)
-                    .unidades(List.of(1L))
+                    .unidades(List.of(CODIGO_UNIDADE_MAPEAMENTO))
                     .build();
 
             Processo resultado = service.atualizar(criado.getCodigo(), request);
@@ -147,7 +149,7 @@ class ProcessoServiceIntegrationTest extends BaseIntegrationTest {
                     .descricao("Processo em andamento")
                     .tipo(TipoProcesso.MAPEAMENTO)
                     .dataLimiteEtapa1(LocalDateTime.now().plusDays(30))
-                    .unidades(List.of(1L))
+                    .unidades(List.of(CODIGO_UNIDADE_MAPEAMENTO))
                     .build());
             p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
             processoRepo.saveAndFlush(p);
@@ -157,7 +159,7 @@ class ProcessoServiceIntegrationTest extends BaseIntegrationTest {
                     .descricao("Atualizada")
                     .tipo(TipoProcesso.MAPEAMENTO)
                     .dataLimiteEtapa1(LocalDateTime.now().plusDays(30))
-                    .unidades(List.of(1L))
+                    .unidades(List.of(CODIGO_UNIDADE_MAPEAMENTO))
                     .build();
 
             assertThatThrownBy(() -> service.atualizar(p.getCodigo(), request))
@@ -176,7 +178,7 @@ class ProcessoServiceIntegrationTest extends BaseIntegrationTest {
                     .descricao("A apagar")
                     .tipo(TipoProcesso.MAPEAMENTO)
                     .dataLimiteEtapa1(LocalDateTime.now().plusDays(30))
-                    .unidades(List.of(1L))
+                    .unidades(List.of(CODIGO_UNIDADE_MAPEAMENTO))
                     .build());
 
             service.apagar(criado.getCodigo());
@@ -191,7 +193,7 @@ class ProcessoServiceIntegrationTest extends BaseIntegrationTest {
                     .descricao("Processo não removível")
                     .tipo(TipoProcesso.MAPEAMENTO)
                     .dataLimiteEtapa1(LocalDateTime.now().plusDays(30))
-                    .unidades(List.of(1L))
+                    .unidades(List.of(CODIGO_UNIDADE_MAPEAMENTO))
                     .build());
             p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
             processoRepo.saveAndFlush(p);

@@ -69,6 +69,16 @@ class ProcessoControllerTest {
 
     private AutoCloseable closeable;
 
+    private Unidade criarUnidadeParticipante() {
+        return Unidade.builder()
+                .codigo(10L)
+                .sigla("U1")
+                .nome("Unidade 1")
+                .tipo(TipoUnidade.OPERACIONAL)
+                .situacao(SituacaoUnidade.ATIVA)
+                .build();
+    }
+
     @BeforeEach
     void setUp() {
         closeable = MockitoAnnotations.openMocks(this);
@@ -395,7 +405,7 @@ class ProcessoControllerTest {
                 .situacao(SituacaoProcesso.FINALIZADO)
                 .build();
 
-            Unidade unidade = Unidade.builder().codigo(10L).sigla("U1").nome("Unidade 1").situacao(SituacaoUnidade.ATIVA).build();
+            Unidade unidade = criarUnidadeParticipante();
             processo.adicionarParticipantes(Set.of(unidade));
 
             when(processoService.buscarPorCodigoComParticipantes(1L)).thenReturn(processo);
@@ -437,7 +447,7 @@ class ProcessoControllerTest {
                 .situacao(SituacaoProcesso.FINALIZADO)
                 .build();
 
-            Unidade unidade = Unidade.builder().codigo(10L).sigla("U1").nome("Unidade 1").situacao(SituacaoUnidade.ATIVA).build();
+            Unidade unidade = criarUnidadeParticipante();
             processo.adicionarParticipantes(Set.of(unidade));
 
             when(processoService.buscarPorCodigoComParticipantes(1L)).thenReturn(processo);
@@ -482,7 +492,7 @@ class ProcessoControllerTest {
                 .situacao(SituacaoProcesso.FINALIZADO)
                 .build();
 
-            Unidade unidade = Unidade.builder().codigo(10L).sigla("U1").nome("Unidade 1").situacao(SituacaoUnidade.ATIVA).build();
+            Unidade unidade = criarUnidadeParticipante();
             processo.adicionarParticipantes(Set.of(unidade));
 
             when(processoService.buscarPorCodigoComParticipantes(1L)).thenReturn(processo);

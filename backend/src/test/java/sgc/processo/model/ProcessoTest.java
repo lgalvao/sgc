@@ -129,9 +129,9 @@ class ProcessoTest {
         @Test
         @DisplayName("Deve sincronizar participantes corretamente")
         void deveSincronizarParticipantes() {
-            Unidade u1 = new Unidade(); u1.setCodigo(1L); u1.setSituacao(SituacaoUnidade.ATIVA);
-            Unidade u2 = new Unidade(); u2.setCodigo(2L); u2.setSituacao(SituacaoUnidade.ATIVA);
-            Unidade u3 = new Unidade(); u3.setCodigo(3L); u3.setSituacao(SituacaoUnidade.ATIVA);
+            Unidade u1 = new Unidade(); u1.setCodigo(1L); u1.setSituacao(SituacaoUnidade.ATIVA); u1.setTipo(TipoUnidade.OPERACIONAL);
+            Unidade u2 = new Unidade(); u2.setCodigo(2L); u2.setSituacao(SituacaoUnidade.ATIVA); u2.setTipo(TipoUnidade.OPERACIONAL);
+            Unidade u3 = new Unidade(); u3.setCodigo(3L); u3.setSituacao(SituacaoUnidade.ATIVA); u3.setTipo(TipoUnidade.OPERACIONAL);
 
             processo.adicionarParticipantes(Set.of(u1, u2));
             assertThat(processo.getParticipantes()).hasSize(2);

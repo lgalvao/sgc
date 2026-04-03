@@ -17,6 +17,7 @@ class ModelCoverageTest {
         Unidade u1 = new Unidade();
         u1.setCodigo(1L);
         u1.setSigla("U1");
+        u1.setTipo(TipoUnidade.OPERACIONAL);
         u1.setSituacao(SituacaoUnidade.ATIVA);
         u1.setMatriculaTitular("1234");
         u1.setTituloTitular("123456");
@@ -24,6 +25,7 @@ class ModelCoverageTest {
         Unidade u2 = new Unidade();
         u2.setCodigo(2L);
         u2.setSigla("U2");
+        u2.setTipo(TipoUnidade.OPERACIONAL);
         u2.setSituacao(SituacaoUnidade.ATIVA);
         u2.setMatriculaTitular("5678");
         u2.setTituloTitular("789012");

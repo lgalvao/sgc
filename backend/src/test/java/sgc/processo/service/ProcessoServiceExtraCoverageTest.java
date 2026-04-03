@@ -73,6 +73,14 @@ class ProcessoServiceExtraCoverageTest {
         lenient().when(responsavelUnidadeService.todasPossuemResponsavelEfetivo(anyList())).thenReturn(true);
     }
 
+    private Unidade criarUnidadeValida(Long codigo) {
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(codigo);
+        unidade.setTipo(TipoUnidade.OPERACIONAL);
+        unidade.setSituacao(SituacaoUnidade.ATIVA);
+        return unidade;
+    }
+
     @Nested
     @DisplayName("buscarPorCodigoComParticipantes")
     class BuscarPorCodigoComParticipantes {
@@ -173,10 +181,7 @@ class ProcessoServiceExtraCoverageTest {
             p.setSituacao(SituacaoProcesso.CRIADO);
             when(repo.buscar(Processo.class, 1L)).thenReturn(p);
 
-            Unidade u = new Unidade();
-            u.setCodigo(1L);
-            u.setTipo(TipoUnidade.RAIZ);
-            u.setSituacao(sgc.organizacao.model.SituacaoUnidade.ATIVA);
+            Unidade u = criarUnidadeValida(1L);
             when(unidadeService.buscarPorCodigo(1L)).thenReturn(u);
 
             when(processoRepo.saveAndFlush(p)).thenReturn(p);

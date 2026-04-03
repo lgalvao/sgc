@@ -73,6 +73,16 @@ class ProcessoServiceTest {
         lenient().when(responsavelUnidadeService.todasPossuemResponsavelEfetivo(anyList())).thenReturn(true);
     }
 
+    private Unidade criarUnidadeValida(Long codigo) {
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(codigo);
+        unidade.setTipo(TipoUnidade.OPERACIONAL);
+        unidade.setSituacao(SituacaoUnidade.ATIVA);
+        unidade.setSigla("U" + codigo);
+        unidade.setNome("Unidade " + codigo);
+        return unidade;
+    }
+
     @Nested
     @DisplayName("Cobertura e Casos de Borda")
     class CoverageTests {
@@ -152,9 +162,7 @@ class ProcessoServiceTest {
             p.setCodigo(id);
             p.setSituacao(SituacaoProcesso.CRIADO);
             p.setTipo(TipoProcesso.MAPEAMENTO);
-            Unidade uni = new Unidade();
-            uni.setCodigo(10L);
-            uni.setSituacao(SituacaoUnidade.ATIVA);
+            Unidade uni = criarUnidadeValida(10L);
             p.adicionarParticipantes(Set.of(uni));
             
             when(repo.buscar(Processo.class, id)).thenReturn(p);
@@ -177,9 +185,7 @@ class ProcessoServiceTest {
             p.setCodigo(id);
             p.setSituacao(SituacaoProcesso.CRIADO);
             p.setTipo(TipoProcesso.REVISAO);
-            Unidade uni = new Unidade();
-            uni.setCodigo(1L);
-            uni.setSituacao(SituacaoUnidade.ATIVA);
+            Unidade uni = criarUnidadeValida(1L);
             p.adicionarParticipantes(Set.of(uni));
 
             when(repo.buscar(Processo.class, id)).thenReturn(p);
@@ -211,9 +217,7 @@ class ProcessoServiceTest {
             p.setCodigo(id);
             p.setSituacao(SituacaoProcesso.CRIADO);
             p.setTipo(TipoProcesso.MAPEAMENTO);
-            Unidade uni = new Unidade();
-            uni.setCodigo(1L);
-            uni.setSituacao(SituacaoUnidade.ATIVA);
+            Unidade uni = criarUnidadeValida(1L);
             p.adicionarParticipantes(Set.of(uni));
 
             when(repo.buscar(Processo.class, id)).thenReturn(p);
@@ -236,9 +240,7 @@ class ProcessoServiceTest {
             p.setCodigo(id);
             p.setSituacao(SituacaoProcesso.CRIADO);
             p.setTipo(TipoProcesso.REVISAO);
-            Unidade uni = new Unidade();
-            uni.setCodigo(1L);
-            uni.setSituacao(SituacaoUnidade.ATIVA);
+            Unidade uni = criarUnidadeValida(1L);
             p.adicionarParticipantes(Set.of(uni));
 
             when(repo.buscar(Processo.class, id)).thenReturn(p);
@@ -288,10 +290,7 @@ class ProcessoServiceTest {
             p.setTipo(TipoProcesso.MAPEAMENTO);
             p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
 
-            Unidade u = new Unidade();
-            u.setCodigo(10L);
-            u.setSigla("U10");
-            u.setSituacao(SituacaoUnidade.ATIVA);
+            Unidade u = criarUnidadeValida(10L);
             p.adicionarParticipantes(Set.of(u));
 
             when(repo.buscar(Processo.class, codProcesso)).thenReturn(p);
@@ -366,23 +365,17 @@ class ProcessoServiceTest {
             p.setTipo(TipoProcesso.MAPEAMENTO);
             p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
 
-            Unidade uPai = new Unidade();
-            uPai.setCodigo(10L);
+            Unidade uPai = criarUnidadeValida(10L);
             uPai.setSigla("PAI");
-            uPai.setSituacao(SituacaoUnidade.ATIVA);
             p.adicionarParticipantes(Set.of(uPai));
 
-            Unidade uFilho = new Unidade();
-            uFilho.setCodigo(20L);
+            Unidade uFilho = criarUnidadeValida(20L);
             uFilho.setSigla("FILHO");
-            uFilho.setSituacao(SituacaoUnidade.ATIVA);
             uFilho.setUnidadeSuperior(uPai);
             p.adicionarParticipantes(Set.of(uFilho));
 
-            Unidade uSemSub = new Unidade();
-            uSemSub.setCodigo(30L);
+            Unidade uSemSub = criarUnidadeValida(30L);
             uSemSub.setSigla("SEMSUB");
-            uSemSub.setSituacao(SituacaoUnidade.ATIVA);
             p.adicionarParticipantes(Set.of(uSemSub));
 
             when(repo.buscar(Processo.class, codProcesso)).thenReturn(p);
@@ -456,9 +449,7 @@ class ProcessoServiceTest {
             CriarProcessoRequest req = new CriarProcessoRequest(
                     "Teste", TipoProcesso.MAPEAMENTO, LocalDateTime.now(), List.of(1L));
 
-            Unidade uni = new Unidade();
-            uni.setCodigo(1L);
-            uni.setSituacao(SituacaoUnidade.ATIVA);
+            Unidade uni = criarUnidadeValida(1L);
             when(unidadeService.buscarPorCodigo(1L)).thenReturn(uni);
             when(processoRepo.saveAndFlush(any())).thenAnswer(i -> i.getArgument(0));
 
@@ -527,9 +518,7 @@ class ProcessoServiceTest {
             when(auth.getPrincipal()).thenReturn(user);
 
             Processo p = new Processo();
-            Unidade u = new Unidade();
-            u.setCodigo(10L);
-            u.setSituacao(SituacaoUnidade.ATIVA);
+            Unidade u = criarUnidadeValida(10L);
             p.adicionarParticipantes(Set.of(u));
 
             when(processoRepo.buscarPorCodigoComParticipantes(1L)).thenReturn(Optional.of(p));
@@ -821,11 +810,7 @@ class ProcessoServiceTest {
             p.setCodigo(id);
             p.setSituacao(SituacaoProcesso.CRIADO);
             p.setTipo(TipoProcesso.DIAGNOSTICO);
-            Unidade uni = new Unidade();
-            uni.setCodigo(1L);
-            uni.setSituacao(SituacaoUnidade.ATIVA);
-            uni.setNome("U1");
-            uni.setSigla("U1");
+            Unidade uni = criarUnidadeValida(1L);
             p.adicionarParticipantes(Set.of(uni));
 
             when(repo.buscar(Processo.class, id)).thenReturn(p);
@@ -858,11 +843,7 @@ class ProcessoServiceTest {
             p.setTipo(TipoProcesso.MAPEAMENTO);
             p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
 
-            Unidade u = new Unidade();
-            u.setCodigo(10L);
-            u.setSituacao(SituacaoUnidade.ATIVA);
-            u.setNome("U10");
-            u.setSigla("U10");
+            Unidade u = criarUnidadeValida(10L);
             p.adicionarParticipantes(Set.of(u));
 
             when(repo.buscar(Processo.class, codProcesso)).thenReturn(p);
@@ -894,9 +875,7 @@ class ProcessoServiceTest {
             p.setTipo(TipoProcesso.MAPEAMENTO);
             p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
 
-            Unidade u = new Unidade();
-            u.setCodigo(10L);
-            u.setSituacao(SituacaoUnidade.ATIVA);
+            Unidade u = criarUnidadeValida(10L);
             p.adicionarParticipantes(Set.of(u));
 
             when(repo.buscar(Processo.class, codProcesso)).thenReturn(p);
@@ -997,10 +976,7 @@ class ProcessoServiceTest {
 
             Processo p = new Processo();
             p.setCodigo(codProcesso);
-            Unidade u = new Unidade();
-            u.setCodigo(codUnidade);
-            u.setSigla("U10");
-            u.setSituacao(SituacaoUnidade.ATIVA);
+            Unidade u = criarUnidadeValida(codUnidade);
             u.setTituloTitular("TITULAR");
             p.adicionarParticipantes(Set.of(u));
             p.setDataLimite(null);
