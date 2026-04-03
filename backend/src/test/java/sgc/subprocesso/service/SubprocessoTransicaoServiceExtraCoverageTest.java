@@ -114,7 +114,7 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         
         when(consultaService.buscarSubprocesso(100L)).thenReturn(sp);
         doThrow(new sgc.comum.erros.ErroValidacao("erro"))
-            .when(validacaoService).validarSituacaoPermitida(any(Subprocesso.class), eq(SituacaoSubprocesso.NAO_INICIADO), eq(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO));
+            .when(validacaoService).validarSituacaoPermitida(any(Subprocesso.class), eq(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO));
         
         assertThatThrownBy(() -> service.disponibilizarRevisao(100L, new Usuario()))
                 .isInstanceOf(sgc.comum.erros.ErroValidacao.class);
@@ -246,8 +246,8 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
     }
 
     @Test
-    @DisplayName("disponibilizarRevisao - com subprocesso não iniciado")
-    void disponibilizarRevisao_ComNaoIniciado() {
+    @DisplayName("iniciarRevisaoCadastro - com subprocesso não iniciado")
+    void iniciarRevisaoCadastro_ComNaoIniciado() {
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(100L);
         setField(sp, "situacao", SituacaoSubprocesso.NAO_INICIADO);
@@ -258,10 +258,10 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
 
         when(consultaService.buscarSubprocesso(100L)).thenReturn(sp);
 
-        service.disponibilizarRevisao(100L, new Usuario());
+        service.iniciarRevisaoCadastro(100L);
 
-        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
-        verify(subprocessoRepo, times(2)).save(sp); 
+        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
+        verify(subprocessoRepo).save(sp);
     }
 
     @Test
@@ -297,13 +297,6 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         Unidade unidade = new Unidade(); unidade.setCodigo(10L); unidade.setSigla("U10"); sp.setUnidade(unidade);
 
         when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
-        when(impactoMapaService.verificarImpactos(any(), any())).thenReturn(ImpactoMapaResponse.builder()
-                .temImpactos(true)
-                .inseridas(List.of(AtividadeImpactadaDto.builder().descricao("Nova").build()))
-                .removidas(List.of())
-                .alteradas(List.of())
-                .competenciasImpactadas(List.of())
-                .build()); 
 
         service.homologarRevisaoCadastro(1L, new Usuario(), "Obs"); // branch 583 (temImpactos = true)
 
@@ -318,17 +311,10 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         Unidade unidade = new Unidade(); unidade.setCodigo(10L); unidade.setSigla("U10"); sp.setUnidade(unidade);
 
         when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
-        when(impactoMapaService.verificarImpactos(any(), any())).thenReturn(ImpactoMapaResponse.builder()
-                .temImpactos(false)
-                .inseridas(List.of())
-                .removidas(List.of())
-                .alteradas(List.of())
-                .competenciasImpactadas(List.of())
-                .build()); 
 
         service.homologarRevisaoCadastro(1L, new Usuario(), "Obs"); // branch 583 (temImpactos = false)
 
-        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO);
+        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
     }
 
     @Test

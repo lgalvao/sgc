@@ -1,0 +1,302 @@
+# Plano Consolidado de Simplificação do SGC
+
+Este documento consolida os aprendizados e as ações pendentes dos arquivos `plano-simplificacao.md`,
+`simplification-plan.md` e `simplification-suggestions.md`, reconciliando o plano com o estado atual do código.
+
+O objetivo é reduzir complexidade acidental sem alterar regras de negócio, contratos HTTP, DTOs externos,
+segurança, transações, notificações ou textos relevantes de interface.
+
+## Fontes de verdade
+
+Antes de qualquer rodada de simplificação, considerar em ordem de precedência:
+
+* `AGENTS.md`
+* `etc/docs/regras-acesso.md`
+* `etc/reqs`
+* este plano consolidado
+
+Se este plano divergir do código real, prevalece o código verificado e o plano deve ser atualizado na mesma rodada.
+
+## Princípios e guardrails
+
+* Simplificar primeiro a menor fronteira segura.
+* Tornar dependências e fluxos explícitos.
+* Reduzir superfície pública antes de criar abstração nova.
+* Preservar DTOs como fronteira externa padrão.
+* Não expor entidade JPA por conveniência.
+* Não colapsar controller em repositório quando houver regra, segurança, transação ou montagem de resposta.
+* Não criar facade nova sem regra transversal clara e comprovada.
+* Se um método passar de 3 parâmetros, usar objeto de transporte.
+* Remover código morto assim que a simplificação o tornar órfão.
+* Validar em passos pequenos e registrar aprendizado no plano.
+
+## Estado consolidado
+
+### O que já foi confirmado
+
+* As rodadas anteriores já reduziram parte da complexidade em scripts de QA.
+* `SubprocessoConsultaService` já existe e centraliza parte relevante das leituras.
+* `SubprocessoService` não é mais o principal hotspot do módulo `subprocesso`.
+* `SubprocessoTransicaoService` continua sendo o maior concentrador de responsabilidades do fluxo de workflow.
+* `LoadingButton.vue` segue como wrapper fino, mas ainda possui adoção ampla o suficiente para exigir auditoria antes de remoção.
+
+### Premissas antigas que deixam de valer
+
+* `SubprocessoService` não deve mais ser tratado como “superclasse” prioritária por tamanho.
+* O objetivo não é criar um `SubprocessoConsultaService`; ele já existe.
+* A próxima rodada de backend não deve partir automaticamente para uma `SubprocessoWorkflowFacade`.
+
+### Hipóteses de `simplification-suggestions.md` absorvidas com ajuste
+
+* Interfaces de implementação única continuam sem valor por padrão, mas isso não autoriza colapsar fronteiras úteis já existentes.
+* Wrappers visuais finos continuam sob suspeita e devem passar por auditoria explícita.
+* Stores e composables pass-through continuam sendo maus alvos e devem ser reduzidos quando não houver estado compartilhado real.
+* Hotspots como `PdfFactory`, facades específicas e views extensas entram como candidatos de investigação, não como remoção automática.
+
+### Hipóteses de `simplification-suggestions.md` rejeitadas neste plano
+
+* Controllers não devem ser encorajados a acessar repositórios diretamente fora de leituras triviais sem regra, segurança contextual ou montagem de resposta.
+* O plano não autoriza retorno direto de entidades JPA como política geral para GET.
+* `SubprocessoTransicaoService`, `SubprocessoValidacaoService` e `SubprocessoService` não devem ser fundidos mecanicamente.
+* Facades existentes não devem ser removidas por decreto; primeiro é preciso comprovar que são pass-through reais e que a remoção não espalha regra, permissão ou composição.
+
+## Diagnóstico consolidado por área
+
+### 1. Scripts de QA
+
+Diagnóstico:
+
+* Havia concentração de complexidade em `etc/scripts/qa/snapshot-coletar-execucao.mjs`.
+* Parte dessa complexidade era justificável pela consolidação de múltiplas fontes.
+* Parte era acidental, especialmente repetição de parse, agregação e cálculo de percentuais.
+
+Situação:
+
+* A simplificação dessa frente já foi iniciada.
+* Os ganhos medidos anteriormente continuam válidos como evidência histórica.
+* Esta frente deixa de ser prioridade arquitetural principal e passa a entrar em manutenção incremental.
+
+### 2. Backend `subprocesso`
+
+Diagnóstico:
+
+* O principal hotspot atual é `backend/src/main/java/sgc/subprocesso/service/SubprocessoTransicaoService.java`.
+* O problema dominante não é apenas tamanho de arquivo, e sim mistura de responsabilidades:
+  * transição de estado;
+  * criação de análise;
+  * persistência de movimentação;
+  * notificação;
+  * envio de e-mail;
+  * criação de alertas;
+  * regras específicas de fluxos de cadastro, revisão e validação.
+* `SubprocessoConsultaService` ainda acumula leitura com composição de contexto e permissões, então não está “puro”.
+* `SubprocessoService` ainda merece limpeza pontual, mas não deve liderar a fila de refatoração.
+
+Direção:
+
+* Priorizar extrações coesas dentro de `SubprocessoTransicaoService`.
+* Fatiar `SubprocessoConsultaService` por responsabilidade real, sem quebrar contratos.
+* Tratar `SubprocessoService` como frente secundária de limpeza interna.
+
+### 3. Backend `e2e`
+
+Diagnóstico:
+
+* `backend/src/main/java/sgc/e2e/E2eController.java` segue como hotspot relevante por tamanho.
+* Ainda não há, neste plano, evidência suficiente para prescrever o corte ideal.
+
+Direção:
+
+* Medir métodos e agrupamentos internos antes de escolher extração.
+* Evitar refatoração ampla baseada só em volume de linhas.
+
+### 4. Frontend
+
+Diagnóstico:
+
+* Existem views grandes com mistura de responsabilidades.
+* O plano anterior corretamente mira lógica demais em `<script setup>`, normalização de erro e duplicação de parsing.
+* `LoadingButton.vue` é fino, mas o número de usos, stories e testes indica que ele precisa de auditoria formal antes de qualquer remoção.
+
+Direção:
+
+* Priorizar views com fetch, transformação, decisão e sincronização local misturados no mesmo arquivo.
+* Reduzir estado global desnecessário e efeito colateral implícito.
+* Auditar wrappers visuais finos com critério explícito de manter, ajustar ou remover.
+
+## Frentes priorizadas
+
+## Frente 1 — Quebra coesa de `SubprocessoTransicaoService`
+
+Objetivo:
+
+* Reduzir acoplamento interno e tornar o workflow mais navegável sem alterar contrato externo.
+
+Escopo inicial:
+
+* Mapear blocos por responsabilidade:
+  * transição e movimentação;
+  * análise de workflow;
+  * aceite, devolução e homologação;
+  * reabertura;
+  * alteração de data limite e notificações derivadas.
+* Extrair primeiro helpers privados ou componentes internos coesos.
+* Só promover nova classe quando houver fronteira semântica estável e mais de um uso relevante.
+
+Restrições:
+
+* Não criar facade adicional apenas para “esconder” o service atual.
+* Não misturar simplificação estrutural com mudança de regra.
+* Preservar testes e assinaturas públicas relevantes.
+
+Critério de pronto:
+
+* menos branches por método crítico;
+* menos dependências diretas por classe ou responsabilidade mais clara por agrupamento;
+* sem regressão em testes do backend.
+
+## Frente 2 — Fatiamento de leitura e contexto em `SubprocessoConsultaService`
+
+Objetivo:
+
+* Separar leitura pura de composição de contexto, permissões e detalhe de tela.
+
+Escopo inicial:
+
+* Identificar métodos de consulta simples versus métodos de montagem de resposta rica.
+* Separar, quando viável, leitura de entidade/mapa/status da composição de contexto de edição e permissões.
+* Preservar DTOs externos e evitar retorno de entidade por conveniência.
+
+Critério de pronto:
+
+* leitura básica mais previsível;
+* menos mistura entre fetch, permissão e montagem de payload;
+* sem impacto nos controllers e contratos HTTP.
+
+## Frente 3 — Limpeza seletiva de `SubprocessoService`
+
+Objetivo:
+
+* Remover duplicação interna e helpers largos sem tratá-lo como principal gargalo arquitetural.
+
+Escopo inicial:
+
+* Revisar trechos de criação, ajuste de mapa e importação de atividades.
+* Consolidar validações e obtenção de contexto repetidas.
+* Remover APIs internas redundantes liberadas por simplificações anteriores.
+
+Critério de pronto:
+
+* menos navegação para entender operações comuns;
+* menor duplicação interna;
+* sem criação de novas camadas desnecessárias.
+
+## Frente 4 — Auditoria de wrappers visuais e views grandes
+
+Objetivo:
+
+* Reduzir abstrações finas sem contrato real e simplificar views com responsabilidades mistas.
+
+Escopo inicial:
+
+* Classificar `LoadingButton.vue` como manter, ajustar ou remover.
+* Aplicar a mesma triagem a outros wrappers visuais pequenos.
+* Identificar views grandes onde a simplificação reduz estado implícito, parsing repetido e tratamento de erro duplicado.
+
+Perguntas de triagem para wrappers:
+
+* Padroniza algo recorrente?
+* Reduz duplicação material?
+* Adiciona acessibilidade ou comportamento?
+* Evita divergência visual entre telas?
+
+Critério de pronto:
+
+* cada wrapper auditado com decisão explícita;
+* views alvo com menos lógica incidental em `<script setup>`;
+* `normalizeError` usado de forma consistente nas camadas corretas.
+
+## Frente 5 — Hotspots fora de `subprocesso`
+
+Objetivo:
+
+* Atacar arquivos extensos fora do fluxo principal apenas com diagnóstico suficiente.
+
+Escopo inicial:
+
+* Reavaliar `E2eController` com medição de métodos e responsabilidades.
+* Auditar `PdfFactory` e facades citadas em `simplification-suggestions.md` para separar pass-through real de fronteira útil.
+* Continuar manutenção incremental dos scripts de QA quando houver ganho claro e local.
+
+Critério de pronto:
+
+* hotspot priorizado por evidência, não por impressão;
+* cortes pequenos com validação direcionada.
+
+## Estratégia de execução
+
+Para cada rodada:
+
+1. Mapear o acoplamento real do alvo.
+2. Classificar o problema:
+   * duplicação interna;
+   * superfície larga demais;
+   * efeito colateral escondido;
+   * estado global desnecessário;
+   * wrapper fino;
+   * código morto.
+3. Escolher o menor corte seguro.
+4. Validar imediatamente após a mudança.
+5. Registrar aprendizado novo neste plano.
+
+## Validação mínima por frente
+
+### Backend
+
+* `./gradlew :backend:compileTestJava`
+* `./gradlew :backend:test`
+* Se houver falha suspeita de cache: `./gradlew --no-configuration-cache :backend:compileTestJava`
+
+### Frontend
+
+* `npm run typecheck`
+* `npm run lint`
+* `npm run test:unit`
+
+### QA dashboard
+
+* Quando a rodada afetar testes, lint, typecheck, cobertura ou E2E, atualizar snapshot com:
+  * `npm run qa:dashboard`
+  * ou `node etc/scripts/sgc.js qa snapshot coletar --perfil rapido`
+* Usar `etc/qa-dashboard/latest/ultimo-snapshot.json` e `etc/qa-dashboard/latest/ultimo-resumo.md` como fonte de verdade.
+
+## Critérios de sucesso
+
+O plano terá sido bem executado se:
+
+* houver menos pontos de navegação para seguir um fluxo simples;
+* não houver perda de regras de segurança, transação, notificação ou permissão;
+* o backend tiver menos concentração de workflow em um único service;
+* o frontend reduzir estado implícito e wrappers sem contrato claro;
+* os componentes e services remanescentes tiverem justificativa explícita de existência.
+
+## Aprendizados consolidados
+
+1. Duplicação antes de fusão.
+2. Reuso intermediário é aceitável, desde que o acoplamento fique registrado.
+3. Assinaturas públicas só devem mudar quando a API redundante realmente deixar de fazer sentido.
+4. Testes precisam seguir o collaborator real após a simplificação.
+5. Singleton só quando houver compartilhamento real.
+6. A view deve sincronizar explicitamente o que consome.
+7. Round-trips seguem sendo critério de design.
+8. Erro estruturado e erro genérico não devem ser tratados do mesmo jeito.
+9. Falhas de cache de build não devem ser confundidas com regressão de código.
+10. Stories e README também precisam acompanhar simplificações estruturais.
+11. Em `SubprocessoTransicaoService`, o primeiro corte seguro foi extrair algoritmo duplicado de devolução antes de mover fluxos inteiros para novas classes.
+
+## Fonte de verdade operacional
+
+Este arquivo passa a ser a referência consolidada para novas rodadas.
+
+Os arquivos históricos `plano-simplificacao.md`, `simplification-plan.md` e `simplification-suggestions.md` devem ser
+tratados como insumos de contexto.

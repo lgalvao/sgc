@@ -356,15 +356,7 @@ public class SubprocessoTransicaoService {
                 REVISAO_MAPA_VALIDADO);
 
         Unidade unidadeAnalise = consultaService.obterUnidadeLocalizacao(sp);
-        List<Movimentacao> movs = movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(sp.getCodigo());
-
-        Unidade unidadeDevolucao = movs.stream()
-                .filter(m -> m.getUnidadeDestino() != null)
-                .filter(m -> Objects.equals(m.getUnidadeDestino().getCodigo(), unidadeAnalise.getCodigo()))
-                .map(Movimentacao::getUnidadeOrigem)
-                .filter(unidadeOrigem -> hierarquiaService.isSubordinada(unidadeOrigem, unidadeAnalise))
-                .findFirst()
-                .orElse(sp.getUnidade());
+        Unidade unidadeDevolucao = obterUnidadeDevolucao(sp, unidadeAnalise);
 
         SituacaoSubprocesso novaSituacao = obterSituacaoObrigatoria(SITUACAO_MAPA_DISPONIBILIZADO, sp, "devolução de validação");
         sp.setDataFimEtapa2(null);
@@ -480,15 +472,7 @@ public class SubprocessoTransicaoService {
         validacaoService.validarSituacaoPermitida(sp, contexto.situacaoDisponibilizada());
 
         Unidade unidadeAnalise = consultaService.obterUnidadeLocalizacao(sp);
-        List<Movimentacao> movs = movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(sp.getCodigo());
-
-        Unidade unidadeDevolucao = movs.stream()
-                .filter(m -> m.getUnidadeDestino() != null)
-                .filter(m -> Objects.equals(m.getUnidadeDestino().getCodigo(), unidadeAnalise.getCodigo()))
-                .map(Movimentacao::getUnidadeOrigem)
-                .filter(unidadeOrigem -> hierarquiaService.isSubordinada(unidadeOrigem, unidadeAnalise))
-                .findFirst()
-                .orElse(sp.getUnidade());
+        Unidade unidadeDevolucao = obterUnidadeDevolucao(sp, unidadeAnalise);
 
         SituacaoSubprocesso novaSituacao = contexto.situacaoDisponibilizada();
         if (Objects.equals(unidadeDevolucao.getCodigo(), sp.getUnidade().getCodigo())) {
@@ -509,6 +493,18 @@ public class SubprocessoTransicaoService {
                 .motivoAnalise(observacoes)
                 .observacoes(observacoes)
                 .build());
+    }
+
+    private Unidade obterUnidadeDevolucao(Subprocesso sp, Unidade unidadeAnalise) {
+        List<Movimentacao> movimentacoes = movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(sp.getCodigo());
+
+        return movimentacoes.stream()
+                .filter(movimentacao -> movimentacao.getUnidadeDestino() != null)
+                .filter(movimentacao -> Objects.equals(movimentacao.getUnidadeDestino().getCodigo(), unidadeAnalise.getCodigo()))
+                .map(Movimentacao::getUnidadeOrigem)
+                .filter(unidadeOrigem -> hierarquiaService.isSubordinada(unidadeOrigem, unidadeAnalise))
+                .findFirst()
+                .orElse(sp.getUnidade());
     }
 
     public void aceitarCadastro(Long codSubprocesso, Usuario usuario, @Nullable String observacoes) {

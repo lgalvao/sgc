@@ -238,7 +238,7 @@ class SubprocessoTransicaoServiceTest {
             service.homologarCadastroEmBloco(List.of(10L, 20L), criarUsuario());
 
             assertThat(spMap.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
-            assertThat(spRev.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO);
+            assertThat(spRev.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
         }
 
         @Test
