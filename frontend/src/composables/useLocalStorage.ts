@@ -1,62 +1,42 @@
-import {ref, type Ref, watch} from 'vue';
+import type {Ref} from 'vue';
+import {
+    removerDoArmazenamento,
+    removerMultiplosDoArmazenamento,
+    useWebStorage
+} from '@/composables/useWebStorage';
 
 /**
  * Composable para sincronizar ref com localStorage
  */
-export function useLocalStorage<T>(key: string, defaultValue: T): Ref<T> {
-    const readValue = (): T => {
-        const item = localStorage.getItem(key);
-        if (item === null) {
-            return defaultValue;
-        }
-
-        try {
-            return JSON.parse(item) as T;
-        } catch {
-            return item as unknown as T;
-        }
-    };
-
-    // Cria ref com valor inicial do localStorage
-    const storedValue = ref(readValue()) as Ref<T>;
-
-    // Observa mudanças e sincroniza com localStorage
-    watch(storedValue, (newValue) => {
-        if (newValue === null || newValue === undefined) {
-            localStorage.removeItem(key);
-        } else {
-            localStorage.setItem(key, JSON.stringify(newValue));
-        }
-    }, {deep: true});
-
-    return storedValue;
+export function useLocalStorage<T>(chave: string, valorPadrao: T): Ref<T> {
+    return useWebStorage(localStorage, chave, valorPadrao);
 }
 
 /**
  * Composable para sincronizar múltiplas refs com localStorage
  */
 export function useLocalStorageMultiple<T extends Record<string, any>>(
-    items: T
+    itens: T
 ): { [K in keyof T]: Ref<T[K]> } {
-    const result = {} as { [K in keyof T]: Ref<T[K]> };
+    const resultado = {} as { [K in keyof T]: Ref<T[K]> };
 
-    for (const [key, defaultValue] of Object.entries(items)) {
-        result[key as keyof T] = useLocalStorage(key, defaultValue);
+    for (const [chave, valorPadrao] of Object.entries(itens)) {
+        resultado[chave as keyof T] = useLocalStorage(chave, valorPadrao);
     }
 
-    return result;
+    return resultado;
 }
 
 /**
  * Remove item do localStorage
  */
-export function removeFromLocalStorage(key: string): void {
-    localStorage.removeItem(key);
+export function removeFromLocalStorage(chave: string): void {
+    removerDoArmazenamento(localStorage, chave);
 }
 
 /**
  * Remove múltiplos itens do localStorage
  */
-export function removeMultipleFromLocalStorage(keys: string[]): void {
-    keys.forEach(key => localStorage.removeItem(key));
+export function removeMultipleFromLocalStorage(chaves: string[]): void {
+    removerMultiplosDoArmazenamento(localStorage, chaves);
 }
