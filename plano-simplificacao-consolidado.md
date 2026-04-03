@@ -359,6 +359,10 @@ tratados como insumos de contexto.
 3. Aplicar apenas um corte estrutural por vez, mantendo validação curta entre cortes.
 4. Atualizar este arquivo com resultado objetivo (o que saiu, o que ficou e por quê).
 
+### Recorte escolhido desta rodada
+
+Após nova medição local, o ponto mais repetitivo entre transição e efeitos derivados está na etapa de homologação de cadastro/revisão e na alteração de data limite, onde a regra principal fica misturada com envio de e-mail e criação de alerta. O corte desta rodada será manter o fluxo de estado no método principal e extrair a execução de efeitos derivados para helpers privados nomeados por contexto, sem criar nova classe e sem alterar contratos públicos.
+
 ### Definição de pronto da rodada atual
 
 A rodada atual só deve ser encerrada quando todos os itens abaixo estiverem verdadeiros:
@@ -384,3 +388,19 @@ A rodada atual só deve ser encerrada quando todos os itens abaixo estiverem ver
 2. Reavaliar se ainda há ganho em extrair colaborador interno focado apenas em persistência de workflow.
 3. Iniciar mapeamento fino de `SubprocessoConsultaService` separando leitura simples e composição de contexto.
 4. Rodar triagem de wrappers visuais começando por `LoadingButton.vue`, com decisão explícita de manter, ajustar ou remover.
+
+### Resultado objetivo da rodada atual
+
+Saiu a mistura direta de regra principal com efeitos derivados em dois pontos de `SubprocessoTransicaoService`: homologação de cadastro/revisão e alteração de data limite agora delegam para helpers privados focados em alerta e e-mail. Ficou no service a mesma orquestração de transição, persistência e validação de estado, sem nova classe nesta etapa para manter o corte pequeno e seguro. Esse recorte melhora leitura do fluxo principal e prepara a próxima rodada para eventual consolidação de efeitos derivados em fronteira interna única.
+
+Na continuação desta rodada, o ponto central `registrarTransicao` também foi fatiado em duas etapas explícitas: persistência da transição e disparo de notificação. Com isso, o fluxo principal passou a evidenciar melhor a separação entre mudança de estado e efeito derivado sem alterar assinatura pública nem semântica do método.
+
+### Registro da rodada
+
+* **Data da rodada:** 2026-04-03
+* **Frente principal:** Frente 1 — Quebra coesa de `SubprocessoTransicaoService`
+* **Arquivo(s) alvo:** `backend/src/main/java/sgc/subprocesso/service/SubprocessoTransicaoService.java`, `plano-simplificacao-consolidado.md`
+* **Corte aplicado:** extração de helpers privados para efeitos derivados (alertas/e-mail) mantendo o fluxo de transição explícito nos métodos de negócio.
+* **Risco principal observado:** possível alteração acidental na ordem de disparo dos efeitos derivados após persistência.
+* **Validação executada:** compilação de testes do backend e suíte focada de testes de `SubprocessoTransicaoService`, reexecutadas após fatiar `registrarTransicao`.
+* **Pendência aberta para próxima rodada:** avaliar consolidação adicional dos efeitos derivados de transição em ponto único sem ampliar superfície pública, especialmente alertas de reabertura.
