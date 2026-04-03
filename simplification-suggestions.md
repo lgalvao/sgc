@@ -33,13 +33,19 @@ Dado o contexto estrito do SGC (intranet, 5-10 usuários simultâneos), muitas d
 
 4.  **Remoção de Facades Desnecessárias:**
     *   **Problema:** Facades como `AtividadeFacade` (`backend/src/main/java/sgc/mapa/AtividadeFacade.java`), `PainelFacade`, `AlertaFacade`, `RelatorioFacade`, `LoginFacade`, e `UsuarioFacade` adicionam indireção sem abstração significativa. Elas atuam quase unicamente como "pass-through", transferindo chamadas diretamente aos serviços subjacentes sem adicionar valor claro de negócio.
-    *   **Solução:** Mover a lógica da Facade diretamente para os serviços de domínio relevantes. Por exemplo, unificar `LoginFacade` com o serviço de autenticação principal, ou mover operações específicas de `AtividadeFacade` para `MapaManutencaoService`.
+    *   **Ação Mapeada:**
+        *   Remover `backend/src/main/java/sgc/mapa/AtividadeFacade.java` e migrar lógicas de composição para `MapaManutencaoService` (ou `AtividadeService`).
+        *   Remover `backend/src/main/java/sgc/processo/painel/PainelFacade.java` e migrar fluxos de busca agregada para `ProcessoService` (ou diretamente injetar no Controller).
+        *   Remover `backend/src/main/java/sgc/alerta/AlertaFacade.java` e centralizar notificações em `AlertaService`.
+        *   Remover `backend/src/main/java/sgc/relatorio/RelatorioFacade.java` consolidando na exportação do `RelatorioService`.
+        *   Remover `backend/src/main/java/sgc/seguranca/LoginFacade.java` inserindo fluxo de geração no Auth provider/`GerenciadorJwt`.
+        *   Remover `backend/src/main/java/sgc/organizacao/UsuarioFacade.java` movendo buscas para `UsuarioService` ou repositórios específicos.
 
 ## Situação Atual (Frontend - Vue.js / TypeScript)
 
 1.  **Remoção de Wrappers Visuais Finos:**
     *   **Problema:** Componentes como `LoadingButton.vue` são wrappers finos sobre `BButton` (`frontend/src/components/comum/LoadingButton.vue`), adicionando sobrecarga na árvore do Vue sem muita justificativa, e com baixa reusabilidade. A mesma lógica é repetida em diversas views.
-    *   **Solução:** Remover `LoadingButton.vue` e usar `<BButton>` nativo diretamente com um `<BSpinner>` na aplicação para manter a árvore de componentes plana e simples. A complexidade do wrapper não compensa seu benefício no contexto de um sistema pequeno.
+    *   **Solução:** Depreciar e remover `LoadingButton.vue`. Onde for necessário, usar o `<BButton>` nativo diretamente com a prop `loading` ou um `<BSpinner>` interno.
 
 2.  **Redução de Complexidade em Views:**
     *   **Problema:** Views muito extensas (ex: `ProcessoDetalheView.vue` e `MapaView.vue`).
