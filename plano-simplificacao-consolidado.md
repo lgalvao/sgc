@@ -395,12 +395,14 @@ Saiu a mistura direta de regra principal com efeitos derivados em dois pontos de
 
 Na continuação desta rodada, o ponto central `registrarTransicao` também foi fatiado em duas etapas explícitas: persistência da transição e disparo de notificação. Com isso, o fluxo principal passou a evidenciar melhor a separação entre mudança de estado e efeito derivado sem alterar assinatura pública nem semântica do método.
 
+Ainda nesta sequência, o fluxo de alteração de data limite recebeu um corte interno adicional para reduzir regra implícita duplicada por `contains("MAPA")`: a escolha do campo de data e o cálculo da etapa de alerta passaram a ter helpers dedicados, deixando a regra principal mais direta.
+
 ### Registro da rodada
 
 * **Data da rodada:** 2026-04-03
 * **Frente principal:** Frente 1 — Quebra coesa de `SubprocessoTransicaoService`
 * **Arquivo(s) alvo:** `backend/src/main/java/sgc/subprocesso/service/SubprocessoTransicaoService.java`, `plano-simplificacao-consolidado.md`
-* **Corte aplicado:** extração de helpers privados para efeitos derivados (alertas/e-mail) mantendo o fluxo de transição explícito nos métodos de negócio.
+* **Corte aplicado:** extração de helpers privados para efeitos derivados (alertas/e-mail), fatiamento de `registrarTransicao` e isolamento da regra de etapa/data na alteração de data limite.
 * **Risco principal observado:** possível alteração acidental na ordem de disparo dos efeitos derivados após persistência.
-* **Validação executada:** compilação de testes do backend e suíte focada de testes de `SubprocessoTransicaoService`, reexecutadas após fatiar `registrarTransicao`.
-* **Pendência aberta para próxima rodada:** avaliar consolidação adicional dos efeitos derivados de transição em ponto único sem ampliar superfície pública, especialmente alertas de reabertura.
+* **Validação executada:** compilação de testes do backend e suíte focada de testes de `SubprocessoTransicaoService`, reexecutadas após os cortes incrementais no fluxo de transição e data limite.
+* **Pendência aberta para próxima rodada:** avaliar consolidação adicional dos efeitos derivados de transição em ponto único sem ampliar superfície pública, especialmente alertas de reabertura e trilha de e-mail.
