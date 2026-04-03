@@ -83,21 +83,27 @@ public class SubprocessoTransicaoService {
     }
 
     public void registrarTransicao(RegistrarTransicaoCommand cmd) {
-        Usuario usuario = cmd.usuario();
-        Subprocesso sp = cmd.sp();
+        persistirTransicao(cmd);
+        notificarTransicao(cmd);
+    }
 
+    private void persistirTransicao(RegistrarTransicaoCommand cmd) {
+        Subprocesso sp = cmd.sp();
         Movimentacao movimentacao = Movimentacao.builder()
                 .subprocesso(sp)
                 .unidadeOrigem(cmd.origem())
                 .unidadeDestino(cmd.destino())
                 .descricao(cmd.tipo().getDescMovimentacao())
-                .usuario(usuario)
+                .usuario(cmd.usuario())
                 .build();
         movimentacaoRepo.save(movimentacao);
 
         sp.setLocalizacaoAtual(cmd.destino());
         subprocessoRepo.save(sp);
+    }
 
+    private void notificarTransicao(RegistrarTransicaoCommand cmd) {
+        Subprocesso sp = cmd.sp();
         notificacaoService.notificarTransicao(NotificacaoCommand.builder()
                 .subprocesso(sp)
                 .tipoTransicao(cmd.tipo())
@@ -600,6 +606,10 @@ public class SubprocessoTransicaoService {
 
         registrarTransicaoDentroDoAdmin(sp, contexto.transicaoHomologacao(), usuario, observacoes);
 
+        executarEfeitosDerivadosHomologacaoCadastro(sp, isRevisao);
+    }
+
+    private void executarEfeitosDerivadosHomologacaoCadastro(Subprocesso sp, boolean isRevisao) {
         String descAlerta = isRevisao
                 ? Mensagens.ALERTA_REVISAO_HOMOLOGADA.formatted(sp.getUnidade().getSigla())
                 : Mensagens.ALERTA_CADASTRO_HOMOLOGADO.formatted(sp.getUnidade().getSigla());
@@ -665,35 +675,50 @@ public class SubprocessoTransicaoService {
 
     public void alterarDataLimite(Long codSubprocesso, LocalDate novaDataLimite) {
         Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
-        SituacaoSubprocesso s = sp.getSituacao();
-        String situacaoSp = s.name();
+        String situacaoSp = sp.getSituacao().name();
         LocalDate ultimaDataLimite = obterUltimaDataLimite(sp);
 
         if (ultimaDataLimite != null && novaDataLimite.isBefore(ultimaDataLimite)) {
             throw new sgc.comum.erros.ErroValidacao(Mensagens.DATA_LIMITE_MAIOR_OU_IGUAL_ULTIMA_DATA_SUBPROCESSO);
         }
 
-        LocalDateTime dataLimiteEtapa1 = novaDataLimite.atStartOfDay();
-        if (situacaoSp.contains("CADASTRO")) {
-            sp.setDataLimiteEtapa1(dataLimiteEtapa1);
-        } else if (situacaoSp.contains("MAPA")) {
-            sp.setDataLimiteEtapa2(dataLimiteEtapa1);
-        } else {
-            sp.setDataLimiteEtapa1(dataLimiteEtapa1);
-        }
+        atualizarDataLimitePorSituacao(sp, situacaoSp, novaDataLimite.atStartOfDay());
 
         subprocessoRepo.save(sp);
 
+        executarEfeitosDerivadosAlteracaoDataLimite(sp, novaDataLimite, situacaoSp);
+    }
+
+    private void atualizarDataLimitePorSituacao(Subprocesso sp, String situacaoSp, LocalDateTime novaDataLimiteInicioDoDia) {
+        if (situacaoSp.contains("MAPA")) {
+            sp.setDataLimiteEtapa2(novaDataLimiteInicioDoDia);
+            return;
+        }
+        sp.setDataLimiteEtapa1(novaDataLimiteInicioDoDia);
+    }
+
+    private void executarEfeitosDerivadosAlteracaoDataLimite(Subprocesso sp, LocalDate novaDataLimite, String situacaoSp) {
         String novaDataStr = novaDataLimite.format(DATE_FORMATTER);
+        enviarEmailAlteracaoDataLimite(sp, novaDataStr);
+        criarAlertaAlteracaoDataLimite(sp, situacaoSp, novaDataStr);
+    }
+
+    private void enviarEmailAlteracaoDataLimite(Subprocesso sp, String novaDataStr) {
         String assunto = Mensagens.ASSUNTO_DATA_LIMITE_ALTERADA;
         String corpo = Mensagens.CORPO_DATA_LIMITE_ALTERADA
                 .formatted(sp.getUnidade().getSigla(), sp.getProcesso().getDescricao(), novaDataStr);
 
         String emailDestino = notificacaoService.getEmailUnidade(sp.getUnidade());
         emailService.enviarEmail(emailDestino, assunto, corpo);
+    }
 
-        int etapa = situacaoSp.contains("MAPA") ? 2 : 1;
+    private void criarAlertaAlteracaoDataLimite(Subprocesso sp, String situacaoSp, String novaDataStr) {
+        int etapa = obterEtapaPorSituacao(situacaoSp);
         alertaService.criarAlertaAlteracaoDataLimite(sp.getProcesso(), sp.getUnidade(), novaDataStr, etapa);
+    }
+
+    private int obterEtapaPorSituacao(String situacaoSp) {
+        return situacaoSp.contains("MAPA") ? 2 : 1;
     }
 
 
