@@ -10,8 +10,10 @@ import org.springframework.test.web.servlet.*;
 import org.springframework.test.web.servlet.setup.*;
 import org.springframework.web.context.*;
 import sgc.processo.model.*;
+import sgc.subprocesso.model.*;
 import tools.jackson.databind.*;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -28,6 +30,10 @@ class E2eFixtureEndpointTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+    @Autowired
+    private SubprocessoRepo subprocessoRepo;
+    @Autowired
+    private MovimentacaoRepo movimentacaoRepo;
 
     private MockMvc mockMvc;
 
@@ -216,5 +222,13 @@ class E2eFixtureEndpointTest {
                 .andExpect(jsonPath("$.descricao").value("Processo fixture revisão homologada"))
                 .andExpect(jsonPath("$.tipo").value("REVISAO"))
                 .andExpect(jsonPath("$.situacao").value(SituacaoProcesso.EM_ANDAMENTO.name()));
+
+        Subprocesso subprocesso = subprocessoRepo.buscarPorProcessoEUnidadeComFetch(401L, 4L).orElseThrow();
+        assertThat(subprocesso.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO);
+        assertThat(movimentacaoRepo.buscarUltimaPorSubprocesso(subprocesso.getCodigo()))
+                .isPresent()
+                .get()
+                .extracting(Movimentacao::getDescricao)
+                .isEqualTo("Mapa homologado via fixture");
     }
 }

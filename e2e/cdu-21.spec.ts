@@ -5,7 +5,7 @@ import {
     criarProcessoRevisaoMapaHomologadoFixture,
     validarProcessoFixture
 } from './fixtures/fixtures-processos.js';
-import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
+import {acessarDetalhesProcesso, verificarDetalhesProcesso} from './helpers/helpers-processos.js';
 import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
 
@@ -154,7 +154,11 @@ test.describe.serial('CDU-21 - Finalizar processo de REVISÃO', () => {
         await acessarDetalhesProcesso(page, descProcessoRevisao);
 
         // Verificar que é processo de revisão
-        await expect(page.getByText(/Revisão/i).first()).toBeVisible();
+        await verificarDetalhesProcesso(page, {
+            descricao: descProcessoRevisao,
+            tipo: 'Revisão',
+            situacao: 'Em andamento'
+        });
         await expect(page.getByTestId('btn-processo-finalizar')).toBeVisible();
 
         await page.getByTestId('btn-processo-finalizar').click();

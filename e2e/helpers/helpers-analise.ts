@@ -37,8 +37,6 @@ export async function acessarSubprocessoAdmin(page: Page, descricaoProcesso: str
     await expect(page.getByTestId('tbl-processos').getByText(descricaoProcesso).first()).toBeVisible();
     await page.getByTestId('tbl-processos').getByText(descricaoProcesso).first().click();
 
-    await expect(page.getByRole('heading', {name: TEXTOS.subprocesso.DETALHE_UNIDADES_TITULO})).toBeVisible();
-
     await navegarParaSubprocesso(page, siglaUnidade);
 }
 

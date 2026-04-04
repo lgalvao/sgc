@@ -517,6 +517,7 @@ public class E2eController {
         }
 
         Unidade unidade = unidadeService.buscarPorSigla(request.unidadeSigla());
+        Unidade admin = unidadeService.buscarPorSigla("ADMIN");
         int diasLimite = request.diasLimite() != null ? request.diasLimite() : 30;
         LocalDateTime agora = LocalDateTime.now();
 
@@ -548,6 +549,13 @@ public class E2eController {
 
         subprocesso.setMapa(mapa);
         subprocessoRepo.saveAndFlush(subprocesso);
+
+        registrarMovimentacaoFixture(
+                subprocesso.getCodigo(),
+                admin.getCodigo(),
+                admin.getCodigo(),
+                "Mapa homologado via fixture"
+        );
 
         return processoService.buscarPorCodigo(processo.getCodigo());
     }
