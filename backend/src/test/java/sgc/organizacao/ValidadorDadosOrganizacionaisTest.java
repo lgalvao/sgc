@@ -255,6 +255,111 @@ class ValidadorDadosOrganizacionaisTest {
         assertThat(diagnostico.grupos().getFirst().tipo()).isEqualTo("Unidade participante sem responsavel efetivo");
     }
 
+    @Test
+    @DisplayName("deve reportar inconsistencias de perfis invalidos e chave duplicada na view")
+    void deveReportarInconsistenciasPerfisInvalidosEChaveDuplicada() {
+        Unidade operacional = criarUnidade(20L, "OPE", OPERACIONAL, "TITULO_OPE");
+
+        mockarCenarioBase(
+                List.of(operacional),
+                List.of(criarResponsabilidade(20L, "RESP_OPE")),
+                List.of(criarUsuario("TITULO_OPE"), criarUsuario("RESP_OPE")),
+                List.of(),
+                List.of(
+                        linhaPerfil(null, "CHEFE", 20L),
+                        linhaPerfil("RESP_OPE", null, 20L),
+                        linhaPerfil("RESP_OPE", "CHEFE", null),
+                        linhaPerfil("RESP_OPE", "PERFIL_INVALIDO", 20L),
+                        linhaPerfil("RESP_OPE", "CHEFE", 20L),
+                        linhaPerfil("RESP_OPE", "CHEFE", 20L)
+                )
+        );
+
+        DiagnosticoOrganizacionalDto diagnostico = validador.diagnosticar();
+
+        assertThat(diagnostico.possuiViolacoes()).isTrue();
+        assertThat(diagnostico.grupos())
+                .extracting(GrupoViolacaoOrganizacionalDto::tipo)
+                .contains(
+                        "VW_USUARIO_PERFIL_UNIDADE com usuario_titulo nulo",
+                        "VW_USUARIO_PERFIL_UNIDADE com perfil nulo",
+                        "VW_USUARIO_PERFIL_UNIDADE com unidade_codigo nulo",
+                        "VW_USUARIO_PERFIL_UNIDADE com perfil invalido",
+                        "VW_USUARIO_PERFIL_UNIDADE com chave duplicada"
+                );
+    }
+
+    @Test
+    @DisplayName("deve considerar responsabilidade com usuario em branco como ausente")
+    void deveConsiderarResponsabilidadeComUsuarioEmBrancoComoAusente() {
+        Unidade operacional = criarUnidade(20L, "OPE", OPERACIONAL, "TITULO_OPE");
+
+        mockarCenarioBase(
+                List.of(operacional),
+                List.of(criarResponsabilidade(20L, "   ")),
+                List.of(criarUsuario("TITULO_OPE")),
+                List.of(),
+                List.of()
+        );
+
+        DiagnosticoOrganizacionalDto diagnostico = validador.diagnosticar();
+
+        assertThat(diagnostico.possuiViolacoes()).isTrue();
+        assertThat(diagnostico.grupos())
+                .extracting(GrupoViolacaoOrganizacionalDto::tipo)
+                .contains("Unidade participante sem responsavel efetivo");
+    }
+
+    @Test
+    @DisplayName("deve reportar quando responsavel de unidade intermediaria nao possui perfil gestor correspondente")
+    void deveReportarQuandoResponsavelIntermediarioNaoTemPerfilGestorCorrespondente() {
+        Unidade intermediaria = criarUnidade(10L, "INT", INTERMEDIARIA, "TITULO_INT");
+        Unidade operacional = criarUnidade(20L, "OPE", OPERACIONAL, "TITULO_OPE");
+        operacional.setUnidadeSuperior(intermediaria);
+
+        mockarCenarioBase(
+                List.of(intermediaria, operacional),
+                List.of(
+                        criarResponsabilidade(10L, "RESP_INT"),
+                        criarResponsabilidade(20L, "RESP_OPE")
+                ),
+                List.of(
+                        criarUsuario("TITULO_INT"),
+                        criarUsuario("TITULO_OPE"),
+                        criarUsuario("RESP_INT"),
+                        criarUsuario("RESP_OPE"),
+                        criarUsuario("OUTRO_GESTOR")
+                ),
+                List.of(),
+                List.of(
+                        linhaPerfil("OUTRO_GESTOR", "GESTOR", 10L),
+                        linhaPerfil("RESP_OPE", "CHEFE", 20L)
+                )
+        );
+
+        DiagnosticoOrganizacionalDto diagnostico = validador.diagnosticar();
+
+        assertThat(diagnostico.possuiViolacoes()).isTrue();
+        assertThat(diagnostico.grupos())
+                .extracting(GrupoViolacaoOrganizacionalDto::tipo)
+                .contains("Responsavel de unidade intermediaria sem perfil GESTOR correspondente");
+    }
+
+    @Test
+    @DisplayName("deve retornar sem violacoes quando nao houver unidades participantes ativas")
+    void deveRetornarSemViolacoesSemUnidadesParticipantesAtivas() {
+        Unidade raiz = criarUnidade(1L, "RAIZ", RAIZ, null);
+        Unidade operacionalInativa = criarUnidade(2L, "INAT", OPERACIONAL, "TITULO_INAT");
+        operacionalInativa.setSituacao(INATIVA);
+
+        when(unidadeRepo.listarTodasComHierarquia()).thenReturn(List.of(raiz, operacionalInativa));
+
+        DiagnosticoOrganizacionalDto diagnostico = validador.diagnosticar();
+
+        assertThat(diagnostico.possuiViolacoes()).isFalse();
+        assertThat(diagnostico.grupos()).isEmpty();
+    }
+
     private void mockarCenarioBase(
             List<Unidade> unidades,
             List<Responsabilidade> responsabilidades,
