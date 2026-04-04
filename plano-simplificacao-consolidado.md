@@ -476,3 +476,67 @@ Na continuação da Frente 2, o próximo ponto misto é `obterContextoEdicao`, q
 ### Recorte escolhido da continuação seguinte
 
 Na sequência da Frente 2, a duplicação remanescente mais objetiva está entre `obterUnidadeLocalizacao` e `obterLocalizacaoAtual`: ambos resolvem a localização com a mesma regra de fallback, mas apenas um persiste o valor em cache no próprio `Subprocesso`. O corte desta etapa será centralizar a resolução em helper privado único, preservando a diferença externa entre leitura sem cache e leitura com cache.
+
+### Interrupção crítica tratada durante a Frente 2
+
+Ao revisar a duplicação de localização, a rodada encontrou um problema de domínio que inviabilizava seguir apenas com simplificação estrutural: a `localizacaoAtual` era derivada em múltiplos pontos, dependia de campo `@Transient` em `Subprocesso` e tolerava, de forma implícita, subprocessos persistidos em situação avançada sem qualquer `Movimentacao`.
+
+Como a regra de acesso por escrita depende diretamente da localização atual do subprocesso, a simplificação só permaneceu segura após tratar esse ponto como correção estrutural obrigatória. Nesta exceção controlada, a Frente 2 precisou combinar simplificação com endurecimento de regra de domínio.
+
+### Resultado objetivo da interrupção crítica
+
+`localizacaoAtual` deixou de existir como estado cacheado na entidade e passou a ser derivada em ponto único por `LocalizacaoSubprocessoService`. Consulta, segurança e controller passaram a usar a mesma regra de resolução. Na mesma rodada, o sistema deixou de aceitar silenciosamente subprocesso persistido sem movimentação em situação avançada: a ausência de histórico só permanece válida em `NAO_INICIADO`; nos demais casos, o backend lança erro explícito de inconsistência.
+
+O trabalho também revelou dívida de testes e seed: parte das suítes de integração e o `data.sql` do backend montavam estados impossíveis para subprocessos já avançados. Esses cenários foram saneados para registrar a movimentação inicial mínima coerente com o estado persistido. O seed de E2E foi auditado e já estava íntegro para essa regra.
+
+### Registro da interrupção crítica
+
+* **Data da rodada:** 2026-04-04
+* **Frente principal:** Frente 2 — Fatiamento de leitura e contexto em `SubprocessoConsultaService`
+* **Arquivo(s) alvo:** `backend/src/main/java/sgc/subprocesso/service/LocalizacaoSubprocessoService.java`, `backend/src/main/java/sgc/subprocesso/service/SubprocessoConsultaService.java`, `backend/src/main/java/sgc/seguranca/SgcPermissionEvaluator.java`, `backend/src/main/java/sgc/processo/ProcessoController.java`, `backend/src/main/java/sgc/subprocesso/model/Subprocesso.java`, `backend/src/test/resources/data.sql`, `e2e/setup/seed.sql`, `backend/src/test/java/sgc/subprocesso/service/LocalizacaoSubprocessoServiceTest.java`, testes de integração e cobertura relacionados
+* **Corte aplicado:** eliminação do campo transitório `localizacaoAtual`, criação de ponto único de cálculo por service dedicado e endurecimento da regra para tratar subprocesso persistido sem movimentação fora de `NAO_INICIADO` como erro grave.
+* **Risco principal observado:** quebra ampla de testes e cenários seedados por revelar estados antes tolerados, além de risco de mascarar erro funcional se a ordem das validações de negócio continuasse consultando localização cedo demais.
+* **Validação executada:** suíte focada dos grupos quebrados após o endurecimento, criação de suíte dedicada para `LocalizacaoSubprocessoService` e execução completa de `./gradlew :backend:test`.
+* **Pendência aberta para próxima rodada:** retomar a Frente 2 a partir do novo ponto de verdade de localização, revisando a redução adicional de mistura entre leitura simples, contexto rico e permissões de UI em `SubprocessoConsultaService`.
+
+### Próximo alvo natural da Frente 2
+
+Com a localização já consolidada e endurecida, o próximo corte seguro volta a ser estrutural: enxugar a montagem de permissões e detalhe em `SubprocessoConsultaService`, agora sem duplicação de regra de localização e sem cache transitório na entidade. O foco deve permanecer em reduzir mistura entre fetch, composição de payload e decisão de UI, sem reabrir a discussão de domínio já estabilizada nesta interrupção.
+
+### Continuação após estabilização da localização
+
+Com a localização atual já resolvida em ponto único, a continuação imediata da Frente 2 passou a atacar a costura entre detalhe de tela e permissões de UI em `SubprocessoConsultaService`. O problema remanescente era menos de regra duplicada e mais de dependência implícita: detalhe e permissões recalculavam partes do mesmo contexto de consulta em caminhos diferentes, especialmente localização, unidade do usuário e flags derivadas de processo finalizado, mesma unidade e mapa vigente.
+
+### Resultado objetivo da continuação
+
+`SubprocessoConsultaService` passou a montar um contexto interno único de consulta (`ContextoConsultaSubprocesso`) antes de compor detalhe e permissões. Com isso, a localização atual, a unidade do usuário, a condição de processo finalizado e os indicadores derivados deixaram de ser recalculados de forma espalhada entre `obterDetalhes`, `obterPermissoesUI` e helpers privados. O contrato público permaneceu igual, mas a diferença entre coleta de contexto e decisão de UI ficou mais explícita.
+
+Na mesma rodada, `ContextoPermissaoSubprocesso` deixou de depender implicitamente do `Subprocesso` espalhado pelo call stack e passou a carregar também a unidade-alvo do subprocesso, reduzindo acoplamento acidental nos helpers de habilitação de acesso.
+
+### Registro da continuação
+
+* **Data da rodada:** 2026-04-04
+* **Frente principal:** Frente 2 — Fatiamento de leitura e contexto em `SubprocessoConsultaService`
+* **Arquivo(s) alvo:** `backend/src/main/java/sgc/subprocesso/service/SubprocessoConsultaService.java`, `plano-simplificacao-consolidado.md`
+* **Corte aplicado:** criação de contexto interno único para consulta rica (`ContextoConsultaSubprocesso`) e eliminação de recálculo disperso entre detalhe e permissões de UI.
+* **Risco principal observado:** regressão discreta nas permissões exibidas em detalhe, principalmente no branch de processo finalizado e na conciliação entre mesma unidade/localização derivada.
+* **Validação executada:** `./gradlew :backend:test --tests "sgc.subprocesso.service.SubprocessoConsultaServiceExtraCoverageTest" --tests "sgc.integracao.SubprocessoServiceContextoIntegrationTest" --tests "sgc.integracao.CDU06IntegrationTest" --tests "sgc.subprocesso.service.SubprocessoServiceCoverageIntegrationTest"`.
+* **Pendência aberta para próxima rodada:** revisar se a leitura de atividades/mapa e a montagem de contexto de edição ainda justificam fetchs separados em `SubprocessoConsultaService`, agora que detalhe e permissões compartilham o mesmo contexto interno.
+
+### Continuação focada em contexto de edição
+
+Na sequência imediata, o ponto ainda redundante estava em `obterContextoEdicao`: o método já carregava o `Subprocesso`, mas seguia chamando caminhos públicos que refaziam busca e resolução de mapa/atividades a partir do código. O corte aplicado foi interno e conservador: reaproveitar o `Subprocesso` já carregado para derivar mapa completo e atividades, sem abrir nova API pública nem alterar DTO externo.
+
+### Resultado objetivo da continuação focada
+
+`obterContextoEdicao` deixou de acionar refetchs desnecessários do próprio `Subprocesso` durante a composição do contexto. A montagem agora reaproveita a entidade já carregada para obter o mapa completo e listar atividades, mantendo os mesmos contratos externos e a mesma regra de validação de mapa obrigatório.
+
+### Registro da continuação focada
+
+* **Data da rodada:** 2026-04-04
+* **Frente principal:** Frente 2 — Fatiamento de leitura e contexto em `SubprocessoConsultaService`
+* **Arquivo(s) alvo:** `backend/src/main/java/sgc/subprocesso/service/SubprocessoConsultaService.java`, `plano-simplificacao-consolidado.md`
+* **Corte aplicado:** eliminação de refetch interno de `Subprocesso` na montagem de contexto de edição por meio de helpers privados que operam sobre a entidade já carregada.
+* **Risco principal observado:** divergência silenciosa entre o caminho público de listagem de atividades e o caminho privado reutilizado por contexto de edição.
+* **Validação executada:** `./gradlew :backend:test --tests "sgc.subprocesso.service.SubprocessoConsultaServiceExtraCoverageTest" --tests "sgc.integracao.SubprocessoServiceContextoIntegrationTest" --tests "sgc.integracao.CDU08IntegrationTest"`.
+* **Pendência aberta para próxima rodada:** avaliar se `obterMapaParaAjuste` e o histórico de análises ainda podem compartilhar uma fronteira interna de leitura obrigatória por mapa sem ampliar responsabilidade pública do service.

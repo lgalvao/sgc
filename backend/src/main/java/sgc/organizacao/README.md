@@ -38,7 +38,7 @@ Entidades de usuário:
 
 Entidades de unidade:
 
-- `Unidade`, `UnidadeMapa`, `AtribuicaoTemporaria`, `VinculacaoUnidade`
+- `Unidade`, `UnidadeMapa`, `AtribuicaoTemporaria`
 
 ## Integração com Segurança
 

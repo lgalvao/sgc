@@ -152,25 +152,6 @@ create table if not exists sgc.vw_usuario_perfil_unidade
 )
     );
 
-create table if not exists sgc.vw_vinculacao_unidade
-(
-    unidade_atual_codigo
-    bigint
-    not
-    null,
-    unidade_anterior_codigo
-    bigint,
-    demais_unidades_historicas
-    varchar
-(
-    1000
-),
-    primary key
-(
-    unidade_atual_codigo
-)
-    );
-
 create table if not exists sgc.vw_responsabilidade
 (
     unidade_codigo
@@ -780,10 +761,6 @@ alter table if exists sgc.vw_responsabilidade
     add constraint fk_responsabilidade_unidade foreign key (unidade_codigo) references sgc.vw_unidade;
 alter table if exists sgc.vw_responsabilidade
     add constraint fk_responsabilidade_usuario foreign key (usuario_titulo) references sgc.vw_usuario;
--- FK de unidade_anterior_codigo removida: campo pode ser NULL para unidades raiz
-alter table if exists sgc.vw_vinculacao_unidade
-    add constraint fk_vinculacao_unidade_atual foreign key (unidade_atual_codigo) references sgc.vw_unidade;
-
 -- Tabelas do Módulo de Diagnóstico
 create table if not exists sgc.diagnostico
 (
