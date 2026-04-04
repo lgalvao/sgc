@@ -159,6 +159,19 @@ class UsuarioFacadeTest {
             when(usuarioService.buscarOpt(any())).thenReturn(Optional.empty());
             assertThat(facade.carregarUsuarioParaAutenticacao("1")).isNull();
         }
+
+        @Test
+        @DisplayName("Deve buscar usuário por login com sucesso")
+        void deveBuscarPorLogin() {
+            String login = "user123";
+            Usuario usuario = criarUsuario(login);
+            when(usuarioService.buscar(login)).thenReturn(usuario);
+
+            Usuario resultado = facade.buscarPorLogin(login);
+
+            assertThat(resultado).isSameAs(usuario);
+            verify(usuarioService).carregarAuthorities(usuario);
+        }
     }
 
     @Nested
@@ -204,6 +217,14 @@ class UsuarioFacadeTest {
             assertThat(result).hasSize(1);
             assertThat(result.getFirst().unidadeCodigo()).isEqualTo(1L);
         }
+
+        @Test
+        @DisplayName("Deve retornar lista vazia se usuário não encontrado ao buscar perfis")
+        void deveRetornarListaVaziaSeUsuarioNaoEncontradoAoBuscarPerfis() {
+            when(usuarioService.buscarOpt("999")).thenReturn(Optional.empty());
+            List<PerfilDto> resultado = facade.buscarPerfisUsuario("999");
+            assertThat(resultado).isEmpty();
+        }
     }
 
     @Nested
@@ -225,6 +246,20 @@ class UsuarioFacadeTest {
 
             assertThat(resultado).hasSize(1);
             assertThat(resultado.getFirst().tituloEleitoral()).isEqualTo(titulo);
+        }
+
+        @Test
+        @DisplayName("Deve ignorar administrador se usuário correspondente não for encontrado")
+        void deveIgnorarAdministradorSeUsuarioNaoEncontrado() {
+            Administrador admin = new Administrador();
+            admin.setUsuarioTitulo("titulo-fantasma");
+
+            when(usuarioService.buscarAdministradores()).thenReturn(List.of(admin));
+            when(usuarioService.buscarOpt("titulo-fantasma")).thenReturn(Optional.empty());
+
+            List<AdministradorDto> resultado = facade.listarAdministradores();
+
+            assertThat(resultado).isEmpty();
         }
 
         @Test
@@ -280,6 +315,20 @@ class UsuarioFacadeTest {
             Map<String, Usuario> resultado = facade.buscarUsuariosPorTitulos(titulos);
 
             assertThat(resultado).hasSize(2).containsKeys("111111", "222222");
+        }
+
+        @Test
+        @DisplayName("Deve lidar com duplicatas ao buscar usuários por títulos")
+        void deveLidarComDuplicatasAoBuscarUsuariosPorTitulos() {
+            List<String> titulos = List.of("1", "1");
+            Usuario u1 = criarUsuario("1");
+
+            when(usuarioService.buscarPorTitulos(anyList())).thenReturn(List.of(u1, u1));
+
+            Map<String, Usuario> resultado = facade.buscarUsuariosPorTitulos(titulos);
+
+            assertThat(resultado).hasSize(1);
+            assertThat(resultado.get("1")).isEqualTo(u1);
         }
     }
 }

@@ -457,10 +457,10 @@ class ProcessoControllerTest {
                 .situacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO)
                 .unidade(unidade)
                 .mapa(sgc.mapa.model.Mapa.builder().codigo(500L).build())
-                .localizacaoAtual(unidade)
                 .dataLimiteEtapa1(LocalDateTime.now())
                 .build();
             when(consultaService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sub));
+            when(consultaService.obterLocalizacaoAtual(sub)).thenReturn(unidade);
 
             mockMvc.perform(get("/api/processos/1/unidades-importacao"))
                     .andExpect(status().isOk())

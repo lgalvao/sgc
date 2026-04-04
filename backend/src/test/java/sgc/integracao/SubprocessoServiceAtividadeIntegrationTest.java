@@ -69,7 +69,6 @@ class SubprocessoServiceAtividadeIntegrationTest extends BaseIntegrationTest {
                 .situacao(SituacaoSubprocesso.NAO_INICIADO)
                 .processo(processo)
                 .dataLimiteEtapa1(LocalDateTime.now().plusDays(15))
-                .localizacaoAtual(unidade)
                 .build();
         subprocessoRepo.save(subprocessoDestino);
         Mapa mapaDestino = new Mapa();
@@ -82,7 +81,6 @@ class SubprocessoServiceAtividadeIntegrationTest extends BaseIntegrationTest {
                 .situacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO)
                 .processo(processo)
                 .dataLimiteEtapa1(LocalDateTime.now().plusDays(15))
-                .localizacaoAtual(unidade)
                 .build();
         subprocessoRepo.save(subprocessoOrigem);
         Mapa mapaOrigem = new Mapa();

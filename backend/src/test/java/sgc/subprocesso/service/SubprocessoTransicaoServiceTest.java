@@ -61,18 +61,6 @@ class SubprocessoTransicaoServiceTest {
     @InjectMocks
     private SubprocessoTransicaoService service;
 
-
-    @BeforeEach
-    void setUp() {
-        org.mockito.Mockito.lenient().when(consultaService.obterUnidadeLocalizacao(org.mockito.ArgumentMatchers.any(Subprocesso.class)))
-                .thenAnswer(inv -> {
-                    Subprocesso sp = inv.getArgument(0);
-                    return sp.getLocalizacaoAtual() != null ? sp.getLocalizacaoAtual() : sp.getUnidade();
-                });
-        org.mockito.Mockito.lenient().when(impactoMapaService.verificarImpactos(org.mockito.ArgumentMatchers.any(Subprocesso.class), org.mockito.ArgumentMatchers.any()))
-                .thenReturn(sgc.mapa.dto.ImpactoMapaResponse.semImpacto());
-    }
-
     @Test
     @DisplayName("registrarTransicao deve persistir movimentacao, atualizar localizacao e delegar notificacao")
     void registrarTransicaoDevePersistirMovimentacaoAtualizarLocalizacaoEDelegarNotificacao() {
@@ -103,7 +91,6 @@ class SubprocessoTransicaoServiceTest {
                         && cmd.unidadeOrigem().equals(origem)
                         && cmd.unidadeDestino().equals(destino)
                         && "Observacao".equals(cmd.observacoes())));
-        assertThat(subprocesso.getLocalizacaoAtual()).isEqualTo(destino);
     }
 
     @Test
@@ -114,10 +101,10 @@ class SubprocessoTransicaoServiceTest {
         unidade.setUnidadeSuperior(admin);
 
         Subprocesso subprocesso = criarSubprocesso(MAPEAMENTO, MAPEAMENTO_MAPA_VALIDADO, unidade);
-        subprocesso.setLocalizacaoAtual(unidade);
         Usuario usuario = criarUsuario();
 
         when(consultaService.buscarSubprocesso(1L)).thenReturn(subprocesso);
+        when(consultaService.obterUnidadeLocalizacao(subprocesso)).thenReturn(unidade);
         when(analiseRepo.save(any(Analise.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         service.aceitarValidacao(1L, "Aceite final", usuario);
@@ -201,7 +188,6 @@ class SubprocessoTransicaoServiceTest {
             Unidade uAnalise = criarUnidade(2L, "ANA", "Analise");
             Unidade outraUnidade = criarUnidade(3L, "OUT", "Outra");
             Subprocesso sp = criarSubprocesso(MAPEAMENTO, MAPEAMENTO_MAPA_VALIDADO, uOrigem);
-            sp.setLocalizacaoAtual(uAnalise);
 
             Movimentacao m1 = new Movimentacao();
             m1.setUnidadeDestino(outraUnidade);
@@ -211,6 +197,7 @@ class SubprocessoTransicaoServiceTest {
             m2.setUnidadeOrigem(uOrigem);
 
             when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
+            when(consultaService.obterUnidadeLocalizacao(sp)).thenReturn(uAnalise);
             when(movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(1L)).thenReturn(List.of(m1, m2));
             when(hierarquiaService.isSubordinada(uOrigem, uAnalise)).thenReturn(true);
 
@@ -227,6 +214,8 @@ class SubprocessoTransicaoServiceTest {
 
             when(consultaService.buscarSubprocesso(10L)).thenReturn(spMap);
             when(consultaService.buscarSubprocesso(20L)).thenReturn(spRev);
+            when(consultaService.obterUnidadeLocalizacao(spMap)).thenReturn(spMap.getUnidade());
+            when(consultaService.obterUnidadeLocalizacao(spRev)).thenReturn(spRev.getUnidade());
 
             service.aceitarCadastroEmBloco(List.of(10L, 20L), criarUsuario());
 
@@ -268,9 +257,9 @@ class SubprocessoTransicaoServiceTest {
         void executarDevolucaoSemMovimentacoesUsarUnidadeSP() {
             Unidade u = criarUnidade(1L, "U", "Unid");
             Subprocesso sp = criarSubprocesso(MAPEAMENTO, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO, u);
-            sp.setLocalizacaoAtual(u);
 
             when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
+            when(consultaService.obterUnidadeLocalizacao(sp)).thenReturn(u);
             when(movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(1L)).thenReturn(List.of());
 
             service.devolverCadastro(1L, criarUsuario(), "Obs");
@@ -318,10 +307,10 @@ class SubprocessoTransicaoServiceTest {
             unidade.setUnidadeSuperior(null);
 
             Subprocesso subprocesso = criarSubprocesso(MAPEAMENTO, MAPEAMENTO_MAPA_VALIDADO, unidade);
-            subprocesso.setLocalizacaoAtual(unidade);
             Usuario usuario = criarUsuario();
 
             when(consultaService.buscarSubprocesso(1L)).thenReturn(subprocesso);
+            when(consultaService.obterUnidadeLocalizacao(subprocesso)).thenReturn(unidade);
 
             service.aceitarValidacao(1L, "Obs", usuario);
 
@@ -378,8 +367,8 @@ class SubprocessoTransicaoServiceTest {
     void deveAceitarRevisaoCadastroClashing() {
         Unidade u = criarUnidade(1L, "U", "Unid");
         Subprocesso sp = criarSubprocesso(REVISAO, SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA, u);
-        sp.setLocalizacaoAtual(u);
         when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
+        when(consultaService.obterUnidadeLocalizacao(sp)).thenReturn(u);
         service.aceitarRevisaoCadastro(1L, criarUsuario(), "Obs");
         assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
     }

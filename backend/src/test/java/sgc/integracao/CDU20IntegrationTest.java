@@ -232,7 +232,10 @@ class CDU20IntegrationTest extends BaseIntegrationTest {
 
         Subprocesso atualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
         assertThat(atualizado.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES);
-        assertThat(atualizado.getLocalizacaoAtual().getSigla()).isEqualTo(unidadeSuperiorSuperior.getSigla());
+        assertThat(movimentacaoRepo.buscarUltimaPorSubprocesso(atualizado.getCodigo()))
+                .get()
+                .extracting(mov -> mov.getUnidadeDestino().getSigla())
+                .isEqualTo(unidadeSuperiorSuperior.getSigla());
 
         List<Movimentacao> movimentacoes =
                 movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(subprocesso.getCodigo());

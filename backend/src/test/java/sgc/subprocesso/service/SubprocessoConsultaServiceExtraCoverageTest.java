@@ -5,6 +5,7 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
+import org.springframework.test.util.*;
 import sgc.comum.erros.*;
 import sgc.mapa.model.*;
 import sgc.mapa.service.*;
@@ -45,6 +46,11 @@ class SubprocessoConsultaServiceExtraCoverageTest {
     @InjectMocks
     private SubprocessoConsultaService consultaService;
 
+    @BeforeEach
+    void setUp() {
+        ReflectionTestUtils.setField(consultaService, "localizacaoSubprocessoService", new LocalizacaoSubprocessoService(movimentacaoRepo));
+    }
+
     private Subprocesso criarSubprocessoComMapa(@Nullable Long codigo) {
         return criarSubprocessoComMapa(codigo, TipoProcesso.MAPEAMENTO);
     }
@@ -80,7 +86,7 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             Movimentacao mov = new Movimentacao();
             mov.setUnidadeDestino(u2);
 
-            when(movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(100L)).thenReturn(List.of(mov));
+            when(movimentacaoRepo.buscarUltimaPorSubprocesso(100L)).thenReturn(Optional.of(mov));
 
             assertThat(consultaService.obterUnidadeLocalizacao(sp)).isEqualTo(u2);
         }
@@ -100,7 +106,7 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             Unidade u = new Unidade();
             Subprocesso sp = criarSubprocessoComMapa(1L);
             sp.setUnidade(u);
-            when(movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(1L)).thenReturn(List.of());
+            when(movimentacaoRepo.buscarUltimaPorSubprocesso(1L)).thenReturn(Optional.empty());
             assertThat(consultaService.obterUnidadeLocalizacao(sp)).isEqualTo(u);
         }
 
@@ -112,8 +118,6 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             sp.setUnidade(u);
             Movimentacao mov = new Movimentacao();
             mov.setUnidadeDestino(null);
-
-            when(movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(2L)).thenReturn(List.of(mov));
 
             assertThat(consultaService.obterUnidadeLocalizacao(sp)).isEqualTo(u);
         }
@@ -182,6 +186,7 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             when(movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(1L)).thenReturn(List.of(mov));
             when(unidadeService.buscarPorCodigo(10L)).thenReturn(u);
             when(usuarioFacade.buscarPorLogin("titular")).thenReturn(user);
+            when(movimentacaoRepo.buscarUltimaPorSubprocesso(1L)).thenReturn(Optional.of(mov));
 
             SubprocessoDetalheResponse res = consultaService.obterDetalhes(1L, user);
             assertThat(res.localizacaoAtual()).isEqualTo("U2");
@@ -300,9 +305,9 @@ class SubprocessoConsultaServiceExtraCoverageTest {
 
             Unidade dest = new Unidade();
             dest.setCodigo(30L);
-            Movimentacao mov = new Movimentacao();
-            mov.setUnidadeDestino(dest);
-            sp.setLocalizacaoAtual(dest);
+            Movimentacao movLocalizacao = new Movimentacao();
+            movLocalizacao.setUnidadeDestino(dest);
+            when(movimentacaoRepo.buscarUltimaPorSubprocesso(1L)).thenReturn(Optional.of(movLocalizacao));
 
             Usuario user = new Usuario();
             user.setPerfilAtivo(Perfil.ADMIN);
@@ -628,25 +633,23 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             Subprocesso sp = new Subprocesso();
             Unidade u = new Unidade(); sp.setUnidade(u);
             
-            // Branch: sp.getLocalizacaoAtual() != null
-            sp.setLocalizacaoAtual(u);
+            // Branch: localização resolvida para a própria unidade
             assertThat(consultaService.obterLocalizacaoAtual(sp)).isEqualTo(u);
 
             // Branch: sp.getCodigo() == null
-            sp.setLocalizacaoAtual(null);
             sp.setCodigo(null);
             assertThat(consultaService.obterLocalizacaoAtual(sp)).isEqualTo(u);
 
             // Branch: movimentacao encontrada
             sp.setCodigo(1L);
             Unidade dest = new Unidade();
-            Movimentacao m = new Movimentacao(); m.setUnidadeDestino(dest);
-            when(movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(1L)).thenReturn(List.of(m));
+            Movimentacao m = new Movimentacao();
+            m.setUnidadeDestino(dest);
+            when(movimentacaoRepo.buscarUltimaPorSubprocesso(1L)).thenReturn(Optional.of(m));
             assertThat(consultaService.obterLocalizacaoAtual(sp)).isEqualTo(dest);
 
-            // Branch: findFirstBy... returns Optional.empty()
-            sp.setLocalizacaoAtual(null);
-            when(movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(1L)).thenReturn(List.of());
+            // Branch: sem movimentação útil, usa unidade base
+            when(movimentacaoRepo.buscarUltimaPorSubprocesso(1L)).thenReturn(Optional.empty());
             assertThat(consultaService.obterLocalizacaoAtual(sp)).isEqualTo(u);
         }
     }

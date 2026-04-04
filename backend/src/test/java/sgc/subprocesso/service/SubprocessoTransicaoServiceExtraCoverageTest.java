@@ -59,21 +59,6 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
     @Mock
     private UsuarioFacade usuarioFacade;
 
-    @BeforeEach
-    void setUp() {
-        org.mockito.Mockito.lenient().when(consultaService.obterUnidadeLocalizacao(org.mockito.ArgumentMatchers.any(Subprocesso.class)))
-                .thenAnswer(inv -> {
-                    Subprocesso sp = inv.getArgument(0);
-                    return sp.getLocalizacaoAtual() != null ? sp.getLocalizacaoAtual() : sp.getUnidade();
-                });
-        org.mockito.Mockito.lenient().when(impactoMapaService.verificarImpactos(org.mockito.ArgumentMatchers.any(Subprocesso.class), org.mockito.ArgumentMatchers.any()))
-                .thenReturn(sgc.mapa.dto.ImpactoMapaResponse.semImpacto());
-        Unidade admin = new Unidade();
-        admin.setCodigo(99L);
-        admin.setSigla("ADMIN");
-        org.mockito.Mockito.lenient().when(unidadeService.buscarPorSigla("ADMIN")).thenReturn(admin);
-    }
-
     @Test
     @DisplayName("disponibilizar - deve encaminhar para unidade superior")
     void disponibilizar_DeveEncaminharParaUnidadeSuperior() {
@@ -202,6 +187,7 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         setField(sp, "situacao", SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
 
         when(consultaService.buscarSubprocesso(100L)).thenReturn(sp);
+        when(consultaService.obterUnidadeLocalizacao(sp)).thenReturn(u);
 
         service.aceitarValidacao(100L, "obs", new Usuario());
 
@@ -300,13 +286,13 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
 
         Unidade uAnalise = new Unidade(); uAnalise.setCodigo(20L);
         Unidade uOrigem = new Unidade(); uOrigem.setCodigo(15L);
-        sp.setLocalizacaoAtual(uAnalise);
 
         Movimentacao mov = new Movimentacao();
         mov.setUnidadeDestino(uAnalise);
         mov.setUnidadeOrigem(uOrigem);
 
         when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
+        when(consultaService.obterUnidadeLocalizacao(sp)).thenReturn(uAnalise);
         when(movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(1L)).thenReturn(List.of(mov));
         when(hierarquiaService.isSubordinada(uOrigem, uAnalise)).thenReturn(true); // branch 489
 
