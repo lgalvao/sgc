@@ -397,6 +397,8 @@ Na continuação desta rodada, o ponto central `registrarTransicao` também foi 
 
 Ainda nesta sequência, o fluxo de alteração de data limite recebeu um corte interno adicional para reduzir regra implícita duplicada por `contains("MAPA")`: a escolha do campo de data e o cálculo da etapa de alerta passaram a ter helpers dedicados, deixando a regra principal mais direta.
 
+Na continuidade da Frente 1 em 2026-04-04, o fluxo de reabertura teve os efeitos derivados de alerta isolados em ponto único (`enviarAlertasReabertura`) com helpers por destinatário (unidade e cadeia hierárquica). O método principal de reabertura preserva estado e transição, enquanto os alertas ficam explícitos e centralizados sem criação de nova classe.
+
 ### Registro da rodada
 
 * **Data da rodada:** 2026-04-03
@@ -406,3 +408,29 @@ Ainda nesta sequência, o fluxo de alteração de data limite recebeu um corte i
 * **Risco principal observado:** possível alteração acidental na ordem de disparo dos efeitos derivados após persistência.
 * **Validação executada:** compilação de testes do backend e suíte focada de testes de `SubprocessoTransicaoService`, reexecutadas após os cortes incrementais no fluxo de transição e data limite.
 * **Pendência aberta para próxima rodada:** avaliar consolidação adicional dos efeitos derivados de transição em ponto único sem ampliar superfície pública, especialmente alertas de reabertura e trilha de e-mail.
+
+### Registro da rodada
+
+* **Data da rodada:** 2026-04-04
+* **Frente principal:** Frente 1 — Quebra coesa de `SubprocessoTransicaoService`
+* **Arquivo(s) alvo:** `backend/src/main/java/sgc/subprocesso/service/SubprocessoTransicaoService.java`, `plano-simplificacao-consolidado.md`
+* **Corte aplicado:** centralização dos efeitos derivados de reabertura em helper único, com extração dos disparos de alerta por destinatário para reduzir ramificações no laço hierárquico.
+* **Risco principal observado:** alteração acidental de ordem ou público-alvo dos alertas de reabertura.
+* **Validação executada:** compilação de testes do backend e suíte focada de `SubprocessoTransicaoService`.
+* **Pendência aberta para próxima rodada:** unificar, em fronteira interna única, a trilha de efeitos derivados entre homologação, reabertura e alteração de data limite para reduzir dispersão de regras de notificação.
+
+### Resultado objetivo da continuação (2026-04-04, etapa final da Frente 1)
+
+O fluxo interno de workflow deixou de trafegar listas extensas de parâmetros soltos: os pontos de registro de análise/transição agora recebem um objeto interno de transporte (`RegistrarWorkflowInternoCommand`), reduzindo acoplamento por assinatura e deixando explícito o contexto completo da operação. Na mesma etapa, a reabertura passou a usar `ReaberturaCommand` e `AlertaReaberturaContexto`, separando estado/transição dos efeitos derivados de alerta sem criar nova classe pública.
+
+Com esse corte, a Frente 1 é encerrada nesta rodada: `SubprocessoTransicaoService` mantém a orquestração central, mas com menos superfície acidental por método e com fronteiras internas mais explícitas para workflow e efeitos derivados.
+
+### Registro da rodada
+
+* **Data da rodada:** 2026-04-04
+* **Frente principal:** Frente 1 — Quebra coesa de `SubprocessoTransicaoService` (encerramento)
+* **Arquivo(s) alvo:** `backend/src/main/java/sgc/subprocesso/service/SubprocessoTransicaoService.java`, `backend/src/test/java/sgc/subprocesso/service/SubprocessoTransicaoServiceExtraCoverageTest.java`, `plano-simplificacao-consolidado.md`
+* **Corte aplicado:** substituição de assinaturas internas extensas por objetos de transporte internos para workflow e reabertura, com ajuste dos testes para validar comportamento por API pública em vez de acoplamento reflexivo ao formato de método privado.
+* **Risco principal observado:** regressão na montagem de comando interno de workflow (origem/destino de transição) e nos gatilhos de alerta em reabertura.
+* **Validação executada:** compilação de testes e suíte focada de `SubprocessoTransicaoService` (unit e cobertura extra), incluindo execução agregada dos testes do service.
+* **Pendência aberta para próxima rodada:** iniciar Frente 2 com mapeamento de leitura simples versus composição de contexto em `SubprocessoConsultaService`.

@@ -56,6 +56,8 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
 
     @Mock
     private ImpactoMapaService impactoMapaService;
+    @Mock
+    private UsuarioFacade usuarioFacade;
 
     @BeforeEach
     void setUp() {
@@ -213,16 +215,28 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
     void enviarAlertasReabertura_Loop() {
         Processo p = new Processo();
         Unidade u = new Unidade();
+        u.setCodigo(20L);
         Unidade sup1 = new Unidade();
+        sup1.setCodigo(30L);
         Unidade sup2 = new Unidade();
+        sup2.setCodigo(40L);
         u.setUnidadeSuperior(sup1);
         sup1.setUnidadeSuperior(sup2);
+        Unidade admin = new Unidade();
+        admin.setCodigo(1L);
+        admin.setSigla("ADMIN");
 
         Subprocesso sp = new Subprocesso();
+        sp.setCodigo(100L);
         sp.setProcesso(p);
         sp.setUnidade(u);
+        setField(sp, "situacao", SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
 
-        invokeMethod(service, "enviarAlertasReabertura", sp, "justificativa", false);
+        when(consultaService.buscarSubprocesso(100L)).thenReturn(sp);
+        when(usuarioFacade.usuarioAutenticado()).thenReturn(new Usuario());
+        when(unidadeService.buscarPorSigla("ADMIN")).thenReturn(admin);
+
+        service.reabrirCadastro(100L, "justificativa");
 
         verify(alertaService, times(1)).criarAlertaReaberturaCadastro(p, u);
         verify(alertaService, times(1)).criarAlertaReaberturaCadastroSuperior(p, sup1, u);
@@ -234,14 +248,25 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
     void enviarAlertasReabertura_RevisaoLoop() {
         Processo p = new Processo();
         Unidade u = new Unidade();
+        u.setCodigo(20L);
         Unidade sup = new Unidade();
+        sup.setCodigo(30L);
         u.setUnidadeSuperior(sup);
+        Unidade admin = new Unidade();
+        admin.setCodigo(1L);
+        admin.setSigla("ADMIN");
 
         Subprocesso sp = new Subprocesso();
+        sp.setCodigo(100L);
         sp.setProcesso(p);
         sp.setUnidade(u);
+        setField(sp, "situacao", SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO);
 
-        invokeMethod(service, "enviarAlertasReabertura", sp, "justificativa", true);
+        when(consultaService.buscarSubprocesso(100L)).thenReturn(sp);
+        when(usuarioFacade.usuarioAutenticado()).thenReturn(new Usuario());
+        when(unidadeService.buscarPorSigla("ADMIN")).thenReturn(admin);
+
+        service.reabrirRevisaoCadastro(100L, "justificativa");
 
         verify(alertaService).criarAlertaReaberturaRevisao(p, u, "justificativa");
         verify(alertaService).criarAlertaReaberturaRevisaoSuperior(p, sup, u);
