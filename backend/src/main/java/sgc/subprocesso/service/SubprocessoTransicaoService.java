@@ -82,6 +82,38 @@ public class SubprocessoTransicaoService {
     ) {
     }
 
+    private record RegistrarWorkflowInternoCommand(
+            Subprocesso sp,
+            SituacaoSubprocesso novaSituacao,
+            TipoTransicao tipoTransicao,
+            TipoAnalise tipoAnalise,
+            TipoAcaoAnalise tipoAcaoAnalise,
+            Unidade unidadeAnalise,
+            Unidade unidadeDestino,
+            Usuario usuario,
+            @Nullable String motivoAnalise,
+            @Nullable String observacoes
+    ) {
+    }
+
+    private record ReaberturaCommand(
+            Long codigo,
+            String justificativa,
+            SituacaoSubprocesso situacaoMinima,
+            SituacaoSubprocesso novaSituacao,
+            TipoTransicao tipoTransicao,
+            boolean revisao
+    ) {
+    }
+
+    private record AlertaReaberturaContexto(
+            Processo processo,
+            Unidade unidadeOrigem,
+            String justificativa,
+            boolean revisao
+    ) {
+    }
+
     public void registrarTransicao(RegistrarTransicaoCommand cmd) {
         persistirTransicao(cmd);
         notificarTransicao(cmd);
@@ -321,7 +353,7 @@ public class SubprocessoTransicaoService {
         SituacaoSubprocesso novaSituacao = obterSituacaoObrigatoria(SITUACAO_MAPA_DISPONIBILIZADO, sp, "devolução de validação");
         sp.setDataFimEtapa2(null);
 
-        registrarWorkflowComDestino(
+        registrarWorkflowComDestino(new RegistrarWorkflowInternoCommand(
                 sp,
                 novaSituacao,
                 TipoTransicao.MAPA_VALIDACAO_DEVOLVIDA,
@@ -332,7 +364,7 @@ public class SubprocessoTransicaoService {
                 usuario,
                 justificativa,
                 justificativa
-        );
+        ));
         log.info("Devolvida validação do mapa do SP {}", codSubprocesso);
     }
 
@@ -353,16 +385,18 @@ public class SubprocessoTransicaoService {
                 REVISAO_MAPA_VALIDADO);
 
         SituacaoSubprocesso novaSituacao = sp.getSituacao();
-        registrarWorkflowParaSuperiorAtual(
+        registrarWorkflowParaSuperiorAtual(new RegistrarWorkflowInternoCommand(
                 sp,
                 novaSituacao,
                 TipoTransicao.MAPA_VALIDACAO_ACEITA,
                 TipoAnalise.VALIDACAO,
                 TipoAcaoAnalise.ACEITE_MAPEAMENTO,
+                null,
+                null,
                 usuario,
                 "Aceite da validação",
                 observacoes
-        );
+        ));
 
         log.info("Validação aceita para mapa do SP {}", codSubprocesso);
     }
@@ -410,7 +444,7 @@ public class SubprocessoTransicaoService {
             sp.setDataFimEtapa1(null);
         }
 
-        registrarWorkflowComDestino(
+        registrarWorkflowComDestino(new RegistrarWorkflowInternoCommand(
                 sp,
                 novaSituacao,
                 contexto.transicaoDevolucao(),
@@ -421,7 +455,7 @@ public class SubprocessoTransicaoService {
                 usuario,
                 observacoes,
                 observacoes
-        );
+        ));
     }
 
     private Unidade obterUnidadeDevolucao(Subprocesso sp, Unidade unidadeAnalise) {
@@ -454,59 +488,39 @@ public class SubprocessoTransicaoService {
         }
     }
 
-    private void registrarWorkflowParaSuperiorAtual(
-            Subprocesso sp,
-            SituacaoSubprocesso novaSituacao,
-            TipoTransicao tipoTransicao,
-            TipoAnalise tipoAnalise,
-            TipoAcaoAnalise tipoAcaoAnalise,
-            Usuario usuario,
-            @Nullable String motivoAnalise,
-            @Nullable String observacoes
-    ) {
-        Unidade unidadeAtual = consultaService.obterUnidadeLocalizacao(sp);
+    private void registrarWorkflowParaSuperiorAtual(RegistrarWorkflowInternoCommand cmd) {
+        Unidade unidadeAtual = consultaService.obterUnidadeLocalizacao(cmd.sp());
         Unidade unidadeDestino = unidadeAtual.getUnidadeSuperior();
 
         if (unidadeDestino != null) {
-            registrarWorkflowComDestino(
-                    sp,
-                    novaSituacao,
-                    tipoTransicao,
-                    tipoAnalise,
-                    tipoAcaoAnalise,
+            registrarWorkflowComDestino(new RegistrarWorkflowInternoCommand(
+                    cmd.sp(),
+                    cmd.novaSituacao(),
+                    cmd.tipoTransicao(),
+                    cmd.tipoAnalise(),
+                    cmd.tipoAcaoAnalise(),
                     unidadeAtual,
                     unidadeDestino,
-                    usuario,
-                    motivoAnalise,
-                    observacoes
-            );
+                    cmd.usuario(),
+                    cmd.motivoAnalise(),
+                    cmd.observacoes()
+            ));
         }
     }
 
-    private void registrarWorkflowComDestino(
-            Subprocesso sp,
-            SituacaoSubprocesso novaSituacao,
-            TipoTransicao tipoTransicao,
-            TipoAnalise tipoAnalise,
-            TipoAcaoAnalise tipoAcaoAnalise,
-            Unidade unidadeAnalise,
-            Unidade unidadeDestino,
-            Usuario usuario,
-            @Nullable String motivoAnalise,
-            @Nullable String observacoes
-    ) {
+    private void registrarWorkflowComDestino(RegistrarWorkflowInternoCommand cmd) {
         registrarAnalise(RegistrarWorkflowCommand.builder()
-                .sp(sp)
-                .novaSituacao(novaSituacao)
-                .tipoTransicao(tipoTransicao)
-                .tipoAnalise(tipoAnalise)
-                .tipoAcaoAnalise(tipoAcaoAnalise)
-                .unidadeAnalise(unidadeAnalise)
-                .unidadeOrigemTransicao(unidadeAnalise)
-                .unidadeDestinoTransicao(unidadeDestino)
-                .usuario(usuario)
-                .motivoAnalise(motivoAnalise)
-                .observacoes(observacoes)
+                .sp(cmd.sp())
+                .novaSituacao(cmd.novaSituacao())
+                .tipoTransicao(cmd.tipoTransicao())
+                .tipoAnalise(cmd.tipoAnalise())
+                .tipoAcaoAnalise(cmd.tipoAcaoAnalise())
+                .unidadeAnalise(cmd.unidadeAnalise())
+                .unidadeOrigemTransicao(cmd.unidadeAnalise())
+                .unidadeDestinoTransicao(cmd.unidadeDestino())
+                .usuario(cmd.usuario())
+                .motivoAnalise(cmd.motivoAnalise())
+                .observacoes(cmd.observacoes())
                 .build());
     }
 
@@ -569,16 +583,18 @@ public class SubprocessoTransicaoService {
         Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
         validacaoService.validarSituacaoPermitida(sp, contexto.situacaoDisponibilizada());
 
-        registrarWorkflowParaSuperiorAtual(
+        registrarWorkflowParaSuperiorAtual(new RegistrarWorkflowInternoCommand(
                 sp,
                 contexto.situacaoDisponibilizada(),
                 contexto.transicaoAceite(),
                 TipoAnalise.CADASTRO,
                 contexto.acaoAceite(),
+                null,
+                null,
                 usuario,
                 observacoes,
                 observacoes
-        );
+        ));
     }
 
     public void homologarCadastro(Long codSubprocesso, Usuario usuario, @Nullable String observacoes) {
@@ -618,67 +634,72 @@ public class SubprocessoTransicaoService {
     }
 
     public void reabrirCadastro(Long codigo, String justificativa) {
-        executarReabertura(codigo, justificativa, MAPEAMENTO_MAPA_HOMOLOGADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
-                TipoTransicao.CADASTRO_REABERTO, false);
+        executarReabertura(new ReaberturaCommand(
+                codigo,
+                justificativa,
+                MAPEAMENTO_MAPA_HOMOLOGADO,
+                MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
+                TipoTransicao.CADASTRO_REABERTO,
+                false
+        ));
     }
 
     public void reabrirRevisaoCadastro(Long codigo, String justificativa) {
-        executarReabertura(codigo,
+        executarReabertura(new ReaberturaCommand(
+                codigo,
                 justificativa,
                 REVISAO_MAPA_HOMOLOGADO,
                 REVISAO_CADASTRO_EM_ANDAMENTO,
                 REVISAO_CADASTRO_REABERTA,
                 true
-        );
+        ));
     }
 
-    private void executarReabertura(Long codigo, String justificativa, SituacaoSubprocesso situacaoMinima,
-                                    SituacaoSubprocesso novaSituacao, TipoTransicao tipoTransicao, boolean isRevisao) {
+    private void executarReabertura(ReaberturaCommand cmd) {
 
-        Subprocesso sp = consultaService.buscarSubprocesso(codigo);
+        Subprocesso sp = consultaService.buscarSubprocesso(cmd.codigo());
         validacaoService.validarSituacaoMinima(sp,
-                situacaoMinima,
-                Mensagens.ERRO_SUBPROCESSO_EM_FASE.formatted(isRevisao ? ETAPA_REVISAO : ETAPA_CADASTRO)
+                cmd.situacaoMinima(),
+                Mensagens.ERRO_SUBPROCESSO_EM_FASE.formatted(cmd.revisao() ? ETAPA_REVISAO : ETAPA_CADASTRO)
         );
 
         Usuario usuario = usuarioFacade.usuarioAutenticado();
 
-        sp.setSituacao(novaSituacao);
+        sp.setSituacao(cmd.novaSituacao());
         sp.setDataFimEtapa1(null);
 
-        registrarTransicaoDoAdminParaUnidade(sp, tipoTransicao, usuario, justificativa);
+        registrarTransicaoDoAdminParaUnidade(sp, cmd.tipoTransicao(), usuario, cmd.justificativa());
 
-        enviarAlertasReabertura(sp, justificativa, isRevisao);
-        log.info("Reaberto {} do SP {}", isRevisao ? ETAPA_REVISAO : ETAPA_CADASTRO, codigo);
+        enviarAlertasReabertura(new AlertaReaberturaContexto(sp.getProcesso(), sp.getUnidade(), cmd.justificativa(), cmd.revisao()));
+        log.info("Reaberto {} do SP {}", cmd.revisao() ? ETAPA_REVISAO : ETAPA_CADASTRO, cmd.codigo());
     }
 
-    private void enviarAlertasReabertura(Subprocesso sp, String justificativa, boolean isRevisao) {
-        Processo processo = sp.getProcesso();
-        Unidade unidade = sp.getUnidade();
+    private void enviarAlertasReabertura(AlertaReaberturaContexto contexto) {
+        Unidade unidade = contexto.unidadeOrigem();
 
-        criarAlertaReaberturaUnidade(processo, unidade, justificativa, isRevisao);
+        criarAlertaReaberturaUnidade(contexto);
 
         Unidade superior = unidade.getUnidadeSuperior();
         while (superior != null) {
-            criarAlertaReaberturaSuperior(processo, superior, unidade, isRevisao);
+            criarAlertaReaberturaSuperior(contexto, superior);
             superior = superior.getUnidadeSuperior();
         }
     }
 
-    private void criarAlertaReaberturaUnidade(Processo processo, Unidade unidade, String justificativa, boolean isRevisao) {
-        if (isRevisao) {
-            alertaService.criarAlertaReaberturaRevisao(processo, unidade, justificativa);
+    private void criarAlertaReaberturaUnidade(AlertaReaberturaContexto contexto) {
+        if (contexto.revisao()) {
+            alertaService.criarAlertaReaberturaRevisao(contexto.processo(), contexto.unidadeOrigem(), contexto.justificativa());
             return;
         }
-        alertaService.criarAlertaReaberturaCadastro(processo, unidade);
+        alertaService.criarAlertaReaberturaCadastro(contexto.processo(), contexto.unidadeOrigem());
     }
 
-    private void criarAlertaReaberturaSuperior(Processo processo, Unidade unidadeSuperior, Unidade unidadeOrigem, boolean isRevisao) {
-        if (isRevisao) {
-            alertaService.criarAlertaReaberturaRevisaoSuperior(processo, unidadeSuperior, unidadeOrigem);
+    private void criarAlertaReaberturaSuperior(AlertaReaberturaContexto contexto, Unidade unidadeSuperior) {
+        if (contexto.revisao()) {
+            alertaService.criarAlertaReaberturaRevisaoSuperior(contexto.processo(), unidadeSuperior, contexto.unidadeOrigem());
             return;
         }
-        alertaService.criarAlertaReaberturaCadastroSuperior(processo, unidadeSuperior, unidadeOrigem);
+        alertaService.criarAlertaReaberturaCadastroSuperior(contexto.processo(), unidadeSuperior, contexto.unidadeOrigem());
     }
 
     public void alterarDataLimite(Long codSubprocesso, LocalDate novaDataLimite) {

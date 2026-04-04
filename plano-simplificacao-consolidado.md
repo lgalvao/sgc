@@ -418,3 +418,19 @@ Na continuidade da Frente 1 em 2026-04-04, o fluxo de reabertura teve os efeitos
 * **Risco principal observado:** alteração acidental de ordem ou público-alvo dos alertas de reabertura.
 * **Validação executada:** compilação de testes do backend e suíte focada de `SubprocessoTransicaoService`.
 * **Pendência aberta para próxima rodada:** unificar, em fronteira interna única, a trilha de efeitos derivados entre homologação, reabertura e alteração de data limite para reduzir dispersão de regras de notificação.
+
+### Resultado objetivo da continuação (2026-04-04, etapa final da Frente 1)
+
+O fluxo interno de workflow deixou de trafegar listas extensas de parâmetros soltos: os pontos de registro de análise/transição agora recebem um objeto interno de transporte (`RegistrarWorkflowInternoCommand`), reduzindo acoplamento por assinatura e deixando explícito o contexto completo da operação. Na mesma etapa, a reabertura passou a usar `ReaberturaCommand` e `AlertaReaberturaContexto`, separando estado/transição dos efeitos derivados de alerta sem criar nova classe pública.
+
+Com esse corte, a Frente 1 é encerrada nesta rodada: `SubprocessoTransicaoService` mantém a orquestração central, mas com menos superfície acidental por método e com fronteiras internas mais explícitas para workflow e efeitos derivados.
+
+### Registro da rodada
+
+* **Data da rodada:** 2026-04-04
+* **Frente principal:** Frente 1 — Quebra coesa de `SubprocessoTransicaoService` (encerramento)
+* **Arquivo(s) alvo:** `backend/src/main/java/sgc/subprocesso/service/SubprocessoTransicaoService.java`, `backend/src/test/java/sgc/subprocesso/service/SubprocessoTransicaoServiceExtraCoverageTest.java`, `plano-simplificacao-consolidado.md`
+* **Corte aplicado:** substituição de assinaturas internas extensas por objetos de transporte internos para workflow e reabertura, com ajuste dos testes para validar comportamento por API pública em vez de acoplamento reflexivo ao formato de método privado.
+* **Risco principal observado:** regressão na montagem de comando interno de workflow (origem/destino de transição) e nos gatilhos de alerta em reabertura.
+* **Validação executada:** compilação de testes e suíte focada de `SubprocessoTransicaoService` (unit e cobertura extra), incluindo execução agregada dos testes do service.
+* **Pendência aberta para próxima rodada:** iniciar Frente 2 com mapeamento de leitura simples versus composição de contexto em `SubprocessoConsultaService`.
