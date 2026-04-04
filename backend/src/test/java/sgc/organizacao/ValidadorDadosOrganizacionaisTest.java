@@ -5,6 +5,7 @@ import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
 import org.springframework.jdbc.core.namedparam.*;
+import org.springframework.test.util.ReflectionTestUtils;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
 
@@ -431,24 +432,25 @@ class ValidadorDadosOrganizacionaisTest {
     @Test
     @DisplayName("deve lidar com casos de borda na extracao de sigla")
     void deveLidarComCasosBordaExtracaoSigla() {
-        // Sigla no fim da string (sem virgula depois)
-        Unidade intermediaria = criarUnidade(10L, "INT_FIM", INTERMEDIARIA, "TIT_INT");
+        String siglaNoFim = ReflectionTestUtils.invokeMethod(validador, "extrairSigla", "sigla=INT_FIM");
+        assertThat(siglaNoFim).isEqualTo("INT_FIM");
 
-        // Sigla em branco e Sigla nao encontrada
-        Unidade operacional = criarUnidade(20L, "  ", OPERACIONAL, "TIT_OPE");
+        String siglaNoMeio = ReflectionTestUtils.invokeMethod(validador, "extrairSigla", "sigla=INT_MEIO, tipo=OPERACIONAL");
+        assertThat(siglaNoMeio).isEqualTo("INT_MEIO");
 
-        mockarCenarioBase(
-                List.of(intermediaria, operacional),
-                List.of(criarResponsabilidade(10L, "RESP_INT")),
-                List.of(criarUsuario("TIT_INT"), criarUsuario("TIT_OPE"), criarUsuario("RESP_INT")),
-                List.of(),
-                List.of(linhaPerfil("RESP_INT", "GESTOR", 10L))
-        );
+        String siglaEmBranco = ReflectionTestUtils.invokeMethod(validador, "extrairSigla", "sigla=  , tipo=OPERACIONAL");
+        assertThat(siglaEmBranco).isNull();
 
-        DiagnosticoOrganizacionalDto diagnostico = validador.diagnosticar();
+        String siglaNaoEncontrada = ReflectionTestUtils.invokeMethod(validador, "extrairSigla", "sem_sigla_aqui");
+        assertThat(siglaNaoEncontrada).isNull();
+    }
 
-        assertThat(diagnostico.resumo()).contains("INT_FIM");
-        assertThat(diagnostico.resumo()).doesNotContain(" ,");
+    @Test
+    @DisplayName("deve verificar se string esta vazia ou nula")
+    void deveVerificarSeStringEstaVazia() {
+        assertThat((Boolean) ReflectionTestUtils.invokeMethod(validador, "estaVazio", (Object) null)).isTrue();
+        assertThat((Boolean) ReflectionTestUtils.invokeMethod(validador, "estaVazio", "   ")).isTrue();
+        assertThat((Boolean) ReflectionTestUtils.invokeMethod(validador, "estaVazio", "valor")).isFalse();
     }
 
     @Test

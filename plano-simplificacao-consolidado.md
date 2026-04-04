@@ -472,3 +472,7 @@ Na continuação da Frente 2, o próximo ponto misto é `obterContextoEdicao`, q
 * **Risco principal observado:** regressão na composição do contexto completo de edição, especialmente conciliação entre detalhe, mapa e lista de atividades.
 * **Validação executada:** `./gradlew :backend:compileTestJava` e `./gradlew :backend:test --tests "sgc.subprocesso.service.SubprocessoConsultaServiceExtraCoverageTest" --tests "sgc.integracao.SubprocessoServiceContextoIntegrationTest"`.
 * **Pendência aberta para próxima rodada:** revisar se `obterUnidadeLocalizacao` e `obterLocalizacaoAtual` ainda justificam coexistência separada e mapear possível consolidação segura sem efeito colateral oculto.
+
+### Recorte escolhido da continuação seguinte
+
+Na sequência da Frente 2, a duplicação remanescente mais objetiva está entre `obterUnidadeLocalizacao` e `obterLocalizacaoAtual`: ambos resolvem a localização com a mesma regra de fallback, mas apenas um persiste o valor em cache no próprio `Subprocesso`. O corte desta etapa será centralizar a resolução em helper privado único, preservando a diferença externa entre leitura sem cache e leitura com cache.

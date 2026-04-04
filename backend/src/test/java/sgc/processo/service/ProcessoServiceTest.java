@@ -268,6 +268,28 @@ class ProcessoServiceTest {
             verify(processoRepo).save(p);
             assertThat(p.getSituacao()).isEqualTo(SituacaoProcesso.FINALIZADO);
         }
+
+        @Test
+        @DisplayName("Deve falhar ao iniciar processo se houver unidades sem responsavel efetivo")
+        void deveFalharAoIniciarSeHouverUnidadesSemResponsavelEfetivo() {
+            Long id = 100L;
+            Usuario usuario = new Usuario();
+
+            Processo p = new Processo();
+            p.setCodigo(id);
+            p.setSituacao(SituacaoProcesso.CRIADO);
+            p.setTipo(TipoProcesso.MAPEAMENTO);
+            Unidade uni = criarUnidadeValida(1L);
+            p.adicionarParticipantes(Set.of(uni));
+
+            when(repo.buscar(Processo.class, id)).thenReturn(p);
+            when(unidadeService.buscarPorCodigos(anyList())).thenReturn(List.of(uni));
+            when(responsavelUnidadeService.todasPossuemResponsavelEfetivo(anyList())).thenReturn(false);
+
+            assertThatThrownBy(() -> processoService.iniciar(id, List.of(), usuario))
+                    .isInstanceOf(ErroValidacao.class)
+                    .hasMessageContaining(Mensagens.OPERACAO_NAO_PERMITIDA);
+        }
     }
 
     @Nested
@@ -390,6 +412,47 @@ class ProcessoServiceTest {
 
             assertThat(result.getUnidades()).isNotEmpty();
             assertThat(result.getUnidades().getFirst().getFilhos()).isNotEmpty();
+        }
+
+        @Test
+        @DisplayName("isElegivelParaAcaoEmBloco deve retornar false quando elegivelMapa mas sem permissao ACEITAR ou HOMOLOGAR")
+        void isElegivelParaAcaoEmBloco_DeveRetornarFalseQuandoElegivelMapaSemPermissoes() {
+            Long codProcesso = 1L;
+            Usuario usuario = new Usuario();
+            usuario.setPerfilAtivo(Perfil.ADMIN);
+            when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+
+            Subprocesso sp = new Subprocesso();
+            sp.setCodigo(100L);
+            sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
+            sp.setUnidade(new Unidade());
+
+            when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp));
+            when(permissionEvaluator.verificarPermissao(usuario, sp, ACEITAR_MAPA)).thenReturn(false);
+            when(permissionEvaluator.verificarPermissao(usuario, sp, HOMOLOGAR_MAPA)).thenReturn(false);
+
+            List<SubprocessoElegivelDto> result = processoService.listarSubprocessosElegiveis(codProcesso);
+            assertThat(result).isEmpty();
+        }
+
+        @Test
+        @DisplayName("isElegivelParaAcaoEmBloco deve retornar false quando elegivelDisponibilizacao mas sem permissao DISPONIBILIZAR_MAPA")
+        void isElegivelParaAcaoEmBloco_DeveRetornarFalseQuandoElegivelDisponibilizacaoSemPermissao() {
+            Long codProcesso = 1L;
+            Usuario usuario = new Usuario();
+            usuario.setPerfilAtivo(Perfil.ADMIN);
+            when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+
+            Subprocesso sp = new Subprocesso();
+            sp.setCodigo(100L);
+            sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
+            sp.setUnidade(new Unidade());
+
+            when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp));
+            when(permissionEvaluator.verificarPermissao(usuario, sp, DISPONIBILIZAR_MAPA)).thenReturn(false);
+
+            List<SubprocessoElegivelDto> result = processoService.listarSubprocessosElegiveis(codProcesso);
+            assertThat(result).isEmpty();
         }
     }
 

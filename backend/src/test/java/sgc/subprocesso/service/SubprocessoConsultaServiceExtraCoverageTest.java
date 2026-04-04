@@ -641,12 +641,12 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             sp.setCodigo(1L);
             Unidade dest = new Unidade();
             Movimentacao m = new Movimentacao(); m.setUnidadeDestino(dest);
-            when(movimentacaoRepo.buscarUltimaPorSubprocesso(1L)).thenReturn(Optional.of(m));
+            when(movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(1L)).thenReturn(List.of(m));
             assertThat(consultaService.obterLocalizacaoAtual(sp)).isEqualTo(dest);
 
             // Branch: findFirstBy... returns Optional.empty()
             sp.setLocalizacaoAtual(null);
-            when(movimentacaoRepo.buscarUltimaPorSubprocesso(1L)).thenReturn(Optional.empty());
+            when(movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(1L)).thenReturn(List.of());
             assertThat(consultaService.obterLocalizacaoAtual(sp)).isEqualTo(u);
         }
     }

@@ -163,13 +163,7 @@ public class SubprocessoConsultaService {
     }
 
     public Unidade obterUnidadeLocalizacao(Subprocesso sp) {
-        if (sp.getLocalizacaoAtual() != null) return sp.getLocalizacaoAtual();
-        Unidade unidade = sp.getUnidade();
-        if (sp.getCodigo() == null) return unidade;
-        List<Movimentacao> movs = movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(sp.getCodigo());
-        if (movs.isEmpty()) return unidade;
-        Unidade destino = movs.getFirst().getUnidadeDestino();
-        return (destino != null) ? destino : unidade;
+        return resolverLocalizacaoAtual(sp);
     }
 
     public SubprocessoDetalheResponse obterDetalhes(Long codigo, Usuario usuarioAutenticado) {
@@ -359,10 +353,7 @@ public class SubprocessoConsultaService {
 
     public Unidade obterLocalizacaoAtual(Subprocesso sp) {
         if (sp.getLocalizacaoAtual() != null) return sp.getLocalizacaoAtual();
-        if (sp.getCodigo() == null) return sp.getUnidade();
-        Unidade loc = movimentacaoRepo.buscarUltimaPorSubprocesso(sp.getCodigo())
-                .map(Movimentacao::getUnidadeDestino)
-                .orElse(sp.getUnidade());
+        Unidade loc = resolverLocalizacaoAtual(sp);
         sp.setLocalizacaoAtual(loc);
         return loc;
     }
@@ -425,6 +416,16 @@ public class SubprocessoConsultaService {
         return movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(sp.getCodigo()).stream()
                 .map(MovimentacaoDto::from)
                 .toList();
+    }
+
+    private Unidade resolverLocalizacaoAtual(Subprocesso sp) {
+        if (sp.getLocalizacaoAtual() != null) return sp.getLocalizacaoAtual();
+        Unidade unidade = sp.getUnidade();
+        if (sp.getCodigo() == null) return unidade;
+        List<Movimentacao> movs = movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(sp.getCodigo());
+        if (movs.isEmpty()) return unidade;
+        Unidade destino = movs.getFirst().getUnidadeDestino();
+        return (destino != null) ? destino : unidade;
     }
 
     private ContextoPermissaoSubprocesso montarContextoPermissao(Subprocesso sp, Usuario usuario) {
