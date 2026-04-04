@@ -622,6 +622,13 @@ public class ProcessoService {
         transicaoService.disponibilizarMapaEmBloco(subprocessos.stream().map(Subprocesso::getCodigo).toList(), dispReq, usuario);
     }
 
+    private void processarAcoesBlocoAceiteHomologacao(AcaoEmBlocoRequest req, Usuario user, List<Subprocesso> list) {
+        if (req.acao() == DISPONIBILIZAR) {
+            return;
+        }
+        processarAcoesBlocoAceiteHomologacao(new ProcessarAnaliseEmBlocoCommand(req.unidadeCodigos(), req.acao()), user, list);
+    }
+
     private void processarAcoesBlocoAceiteHomologacao(ProcessarAnaliseEmBlocoCommand req, Usuario user, List<Subprocesso> list) {
         Map<Boolean, List<Long>> separacao = list.stream()
                 .collect(Collectors.partitioningBy(
