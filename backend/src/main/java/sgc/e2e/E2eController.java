@@ -397,8 +397,7 @@ public class E2eController {
         int diasLimite = request.diasLimite() != null ? request.diasLimite() : 30;
         Unidade unidade = unidadeService.buscarPorSigla(request.unidadeSigla());
 
-        ProcessoFixtureRequest requestMapeamento = new ProcessoFixtureRequest(
-                "Mapa base fixture " + System.currentTimeMillis(), request.unidadeSigla(), true, diasLimite);
+        ProcessoFixtureRequest requestMapeamento = ProcessoFixtureRequest.mapaBase(request.unidadeSigla(), diasLimite);
         Processo processoMapeamento = criarProcessoFixture(requestMapeamento, TipoProcesso.MAPEAMENTO);
         Long codSubprocessoMapeamento = subprocessoRepo
                 .findByProcessoCodigoAndUnidadeCodigo(processoMapeamento.getCodigo(), unidade.getCodigo())
@@ -417,8 +416,11 @@ public class E2eController {
         jdbcTemplate.update("INSERT INTO sgc.unidade_mapa (unidade_codigo, mapa_vigente_codigo) VALUES (?, ?)",
                 unidade.getCodigo(), codMapaVigente);
 
-        ProcessoFixtureRequest requestRevisao = new ProcessoFixtureRequest(
-                request.descricao(), request.unidadeSigla(), true, diasLimite);
+        ProcessoFixtureRequest requestRevisao = ProcessoFixtureRequest.iniciado(
+                request.descricao(),
+                request.unidadeSigla(),
+                diasLimite
+        );
         Processo processoRevisao = criarProcessoFixture(requestRevisao, TipoProcesso.REVISAO);
         Long codSubprocessoRevisao = subprocessoRepo
                 .findByProcessoCodigoAndUnidadeCodigo(processoRevisao.getCodigo(), unidade.getCodigo())
@@ -434,8 +436,11 @@ public class E2eController {
     }
 
     private Processo criarProcessoNaSituacao(ProcessoFixtureRequest request, String situacaoSubprocesso) {
-        ProcessoFixtureRequest requestIniciado = new ProcessoFixtureRequest(
-                request.descricao(), request.unidadeSigla(), true, request.diasLimite());
+        ProcessoFixtureRequest requestIniciado = ProcessoFixtureRequest.iniciado(
+                request.descricao(),
+                request.unidadeSigla(),
+                request.diasLimite()
+        );
         Processo processo = executeAsAdmin(() -> criarProcessoFixture(requestIniciado, TipoProcesso.MAPEAMENTO));
 
         Long codProcesso = processo.getCodigo();
@@ -481,8 +486,11 @@ public class E2eController {
     }
 
     private Processo criarProcessoMapeamentoCadastroHomologadoFixture(ProcessoFixtureRequest request) {
-        ProcessoFixtureRequest requestIniciado = new ProcessoFixtureRequest(
-                request.descricao(), request.unidadeSigla(), true, request.diasLimite());
+        ProcessoFixtureRequest requestIniciado = ProcessoFixtureRequest.iniciado(
+                request.descricao(),
+                request.unidadeSigla(),
+                request.diasLimite()
+        );
         Processo processo = criarProcessoFixture(requestIniciado, TipoProcesso.MAPEAMENTO);
 
         Long codProcesso = processo.getCodigo();
@@ -512,27 +520,30 @@ public class E2eController {
         int diasLimite = request.diasLimite() != null ? request.diasLimite() : 30;
         LocalDateTime agora = LocalDateTime.now();
 
-        Processo processo = new Processo();
-        processo.setDescricao(descricaoFixture(request));
-        processo.setTipo(TipoProcesso.REVISAO);
-        processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
-        processo.setDataCriacao(agora);
-        processo.setDataLimite(LocalDate.now().plusDays(diasLimite).atStartOfDay());
+        Processo processo = Processo.builder()
+                .descricao(descricaoFixture(request))
+                .tipo(TipoProcesso.REVISAO)
+                .situacao(SituacaoProcesso.EM_ANDAMENTO)
+                .dataCriacao(agora)
+                .dataLimite(LocalDate.now().plusDays(diasLimite).atStartOfDay())
+                .build();
         processo.adicionarParticipantes(Set.of(unidade));
         processo = processoRepo.saveAndFlush(processo);
 
-        Subprocesso subprocesso = new Subprocesso();
-        subprocesso.setProcesso(processo);
-        subprocesso.setUnidade(unidade);
-        subprocesso.setSituacaoForcada(SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO);
-        subprocesso.setDataLimiteEtapa1(agora.plusDays(diasLimite));
-        subprocesso.setDataFimEtapa1(agora);
+        Subprocesso subprocesso = Subprocesso.builder()
+                .processo(processo)
+                .unidade(unidade)
+                .situacao(SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO)
+                .dataLimiteEtapa1(agora.plusDays(diasLimite))
+                .dataFimEtapa1(agora)
+                .build();
         subprocesso = subprocessoRepo.saveAndFlush(subprocesso);
 
-        Mapa mapa = new Mapa();
-        mapa.setSubprocesso(subprocesso);
-        mapa.setDataHoraDisponibilizado(agora.minusHours(1));
-        mapa.setDataHoraHomologado(agora);
+        Mapa mapa = Mapa.builder()
+                .subprocesso(subprocesso)
+                .dataHoraDisponibilizado(agora.minusHours(1))
+                .dataHoraHomologado(agora)
+                .build();
         mapa = mapaRepo.saveAndFlush(mapa);
 
         subprocesso.setMapa(mapa);
@@ -550,8 +561,7 @@ public class E2eController {
         Unidade unidade = unidadeService.buscarPorSigla(request.unidadeSigla());
         Unidade admin = unidadeService.buscarPorSigla("ADMIN");
 
-        ProcessoFixtureRequest requestMapeamento = new ProcessoFixtureRequest(
-                "Mapa base fixture " + System.currentTimeMillis(), request.unidadeSigla(), true, diasLimite);
+        ProcessoFixtureRequest requestMapeamento = ProcessoFixtureRequest.mapaBase(request.unidadeSigla(), diasLimite);
         Processo processoMapeamento = criarProcessoFixture(requestMapeamento, TipoProcesso.MAPEAMENTO);
         Long codProcessoMapeamento = processoMapeamento.getCodigo();
         Long codSubprocessoMapeamento = subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(codProcessoMapeamento, unidade.getCodigo())
@@ -575,8 +585,11 @@ public class E2eController {
         jdbcTemplate.update("INSERT INTO sgc.unidade_mapa (unidade_codigo, mapa_vigente_codigo) VALUES (?, ?)",
                 unidade.getCodigo(), codMapaVigente);
 
-        ProcessoFixtureRequest requestRevisao = new ProcessoFixtureRequest(
-                request.descricao(), request.unidadeSigla(), true, diasLimite);
+        ProcessoFixtureRequest requestRevisao = ProcessoFixtureRequest.iniciado(
+                request.descricao(),
+                request.unidadeSigla(),
+                diasLimite
+        );
         Processo processoRevisao = criarProcessoFixture(requestRevisao, TipoProcesso.REVISAO);
         Long codProcessoRevisao = processoRevisao.getCodigo();
         Long codSubprocessoRevisao = subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(codProcessoRevisao, unidade.getCodigo())
@@ -757,6 +770,12 @@ public class E2eController {
      */
     public record ProcessoFixtureRequest(
             @Nullable String descricao, String unidadeSigla, @Nullable Boolean iniciar, @Nullable Integer diasLimite) {
+        private static ProcessoFixtureRequest iniciado(@Nullable String descricao, String unidadeSigla, @Nullable Integer diasLimite) {
+            return new ProcessoFixtureRequest(descricao, unidadeSigla, true, diasLimite);
+        }
+
+        private static ProcessoFixtureRequest mapaBase(String unidadeSigla, @Nullable Integer diasLimite) {
+            return iniciado("Mapa base fixture " + System.currentTimeMillis(), unidadeSigla, diasLimite);
+        }
     }
 }
-

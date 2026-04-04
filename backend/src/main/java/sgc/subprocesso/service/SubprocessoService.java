@@ -379,14 +379,14 @@ public class SubprocessoService {
     @Transactional
     public boolean importarAtividades(Long codSubprocessoDestino, Long codSubprocessoOrigem, List<Long> codigosAtividades) {
         final Subprocesso spDestino = repo.buscar(Subprocesso.class, codSubprocessoDestino);
-        Usuario usuario = usuarioFacade.usuarioAutenticado();
-
-        if (!permissionEvaluator.verificarPermissao(usuario, spDestino, EDITAR_CADASTRO)) {
-            throw new ErroAcessoNegado(Mensagens.SEM_PERMISSAO_IMPORTAR);
-        }
         validacaoService.validarSituacaoPermitida(spDestino,
                 Mensagens.SITUACAO_IMPEDE_IMPORTACAO.formatted(spDestino.getSituacao()),
                 SITUACOES_PERMITIDAS_IMPORTACAO.toArray(new SituacaoSubprocesso[0]));
+
+        Usuario usuario = usuarioFacade.usuarioAutenticado();
+        if (!permissionEvaluator.verificarPermissao(usuario, spDestino, EDITAR_CADASTRO)) {
+            throw new ErroAcessoNegado(Mensagens.SEM_PERMISSAO_IMPORTAR);
+        }
 
         Subprocesso spOrigem = repo.buscar(Subprocesso.class, codSubprocessoOrigem);
         if (!permissionEvaluator.verificarPermissao(usuario, spOrigem, CONSULTAR_PARA_IMPORTACAO)) {

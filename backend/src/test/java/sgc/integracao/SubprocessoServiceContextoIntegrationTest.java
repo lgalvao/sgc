@@ -34,6 +34,9 @@ class SubprocessoServiceContextoIntegrationTest extends BaseIntegrationTest {
     @Autowired
     private MapaManutencaoService mapaManutencaoService;
 
+    @Autowired
+    private MovimentacaoRepo movimentacaoRepo;
+
     private Usuario admin;
     private Subprocesso subprocesso;
     private Processo processo;
@@ -66,6 +69,14 @@ class SubprocessoServiceContextoIntegrationTest extends BaseIntegrationTest {
                 .dataLimiteEtapa1(LocalDateTime.now().plusDays(20))
                 .build();
         subprocessoRepo.save(subprocesso);
+
+        movimentacaoRepo.save(Movimentacao.builder()
+                .subprocesso(subprocesso)
+                .unidadeOrigem(unidade)
+                .unidadeDestino(unidade)
+                .usuario(admin)
+                .descricao("Movimentação inicial de teste")
+                .build());
         
         Mapa mapa = new Mapa();
         mapa.setSubprocesso(subprocesso);

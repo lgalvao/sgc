@@ -80,6 +80,33 @@ public class SubprocessoTransicaoService {
             TipoAcaoAnalise acaoDevolucao,
             TipoAcaoAnalise acaoAceite
     ) {
+        private static FluxoCadastroContexto revisao() {
+            return new FluxoCadastroContexto(
+                    ETAPA_REVISAO,
+                    REVISAO_CADASTRO_DISPONIBILIZADA,
+                    REVISAO_CADASTRO_EM_ANDAMENTO,
+                    REVISAO_CADASTRO_HOMOLOGADA,
+                    REVISAO_CADASTRO_DEVOLVIDA,
+                    REVISAO_CADASTRO_ACEITA,
+                    TipoTransicao.REVISAO_CADASTRO_HOMOLOGADA,
+                    TipoAcaoAnalise.DEVOLUCAO_REVISAO,
+                    TipoAcaoAnalise.ACEITE_REVISAO
+            );
+        }
+
+        private static FluxoCadastroContexto mapeamento() {
+            return new FluxoCadastroContexto(
+                    ETAPA_CADASTRO,
+                    MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
+                    MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
+                    MAPEAMENTO_CADASTRO_HOMOLOGADO,
+                    CADASTRO_DEVOLVIDO,
+                    CADASTRO_ACEITO,
+                    TipoTransicao.CADASTRO_HOMOLOGADO,
+                    TipoAcaoAnalise.DEVOLUCAO_MAPEAMENTO,
+                    TipoAcaoAnalise.ACEITE_MAPEAMENTO
+            );
+        }
     }
 
     private record RegistrarWorkflowInternoCommand(
@@ -94,6 +121,91 @@ public class SubprocessoTransicaoService {
             @Nullable String motivoAnalise,
             @Nullable String observacoes
     ) {
+        private static RegistrarWorkflowInternoCommand devolucaoValidacao(
+                Subprocesso sp,
+                SituacaoSubprocesso novaSituacao,
+                Unidade unidadeAnalise,
+                Unidade unidadeDevolucao,
+                Usuario usuario,
+                @Nullable String justificativa
+        ) {
+            return new RegistrarWorkflowInternoCommand(
+                    sp,
+                    novaSituacao,
+                    TipoTransicao.MAPA_VALIDACAO_DEVOLVIDA,
+                    TipoAnalise.VALIDACAO,
+                    TipoAcaoAnalise.DEVOLUCAO_MAPEAMENTO,
+                    unidadeAnalise,
+                    unidadeDevolucao,
+                    usuario,
+                    justificativa,
+                    justificativa
+            );
+        }
+
+        private static RegistrarWorkflowInternoCommand aceiteValidacao(
+                Subprocesso sp,
+                SituacaoSubprocesso novaSituacao,
+                Usuario usuario,
+                @Nullable String observacoes
+        ) {
+            return new RegistrarWorkflowInternoCommand(
+                    sp,
+                    novaSituacao,
+                    TipoTransicao.MAPA_VALIDACAO_ACEITA,
+                    TipoAnalise.VALIDACAO,
+                    TipoAcaoAnalise.ACEITE_MAPEAMENTO,
+                    null,
+                    null,
+                    usuario,
+                    "Aceite da validação",
+                    observacoes
+            );
+        }
+
+        private static RegistrarWorkflowInternoCommand cadastroComDestino(
+                Subprocesso sp,
+                SituacaoSubprocesso novaSituacao,
+                FluxoCadastroContexto contexto,
+                Unidade unidadeAnalise,
+                Unidade unidadeDestino,
+                Usuario usuario,
+                @Nullable String observacoes
+        ) {
+            return new RegistrarWorkflowInternoCommand(
+                    sp,
+                    novaSituacao,
+                    contexto.transicaoDevolucao(),
+                    TipoAnalise.CADASTRO,
+                    contexto.acaoDevolucao(),
+                    unidadeAnalise,
+                    unidadeDestino,
+                    usuario,
+                    observacoes,
+                    observacoes
+            );
+        }
+
+        private static RegistrarWorkflowInternoCommand cadastroParaSuperiorAtual(
+                Subprocesso sp,
+                SituacaoSubprocesso novaSituacao,
+                FluxoCadastroContexto contexto,
+                Usuario usuario,
+                @Nullable String observacoes
+        ) {
+            return new RegistrarWorkflowInternoCommand(
+                    sp,
+                    novaSituacao,
+                    contexto.transicaoAceite(),
+                    TipoAnalise.CADASTRO,
+                    contexto.acaoAceite(),
+                    null,
+                    null,
+                    usuario,
+                    observacoes,
+                    observacoes
+            );
+        }
     }
 
     private record ReaberturaCommand(
@@ -104,6 +216,27 @@ public class SubprocessoTransicaoService {
             TipoTransicao tipoTransicao,
             boolean revisao
     ) {
+        private static ReaberturaCommand cadastro(Long codigo, String justificativa) {
+            return new ReaberturaCommand(
+                    codigo,
+                    justificativa,
+                    MAPEAMENTO_MAPA_HOMOLOGADO,
+                    MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
+                    TipoTransicao.CADASTRO_REABERTO,
+                    false
+            );
+        }
+
+        private static ReaberturaCommand revisao(Long codigo, String justificativa) {
+            return new ReaberturaCommand(
+                    codigo,
+                    justificativa,
+                    REVISAO_MAPA_HOMOLOGADO,
+                    REVISAO_CADASTRO_EM_ANDAMENTO,
+                    REVISAO_CADASTRO_REABERTA,
+                    true
+            );
+        }
     }
 
     private record AlertaReaberturaContexto(
@@ -352,16 +485,12 @@ public class SubprocessoTransicaoService {
         SituacaoSubprocesso novaSituacao = obterSituacaoObrigatoria(SITUACAO_MAPA_DISPONIBILIZADO, sp, "devolução de validação");
         sp.setDataFimEtapa2(null);
 
-        registrarWorkflowComDestino(new RegistrarWorkflowInternoCommand(
+        registrarWorkflowComDestino(RegistrarWorkflowInternoCommand.devolucaoValidacao(
                 sp,
                 novaSituacao,
-                TipoTransicao.MAPA_VALIDACAO_DEVOLVIDA,
-                TipoAnalise.VALIDACAO,
-                TipoAcaoAnalise.DEVOLUCAO_MAPEAMENTO,
                 unidadeAnalise,
                 unidadeDevolucao,
                 usuario,
-                justificativa,
                 justificativa
         ));
         log.info("Devolvida validação do mapa do SP {}", codSubprocesso);
@@ -384,16 +513,10 @@ public class SubprocessoTransicaoService {
                 REVISAO_MAPA_VALIDADO);
 
         SituacaoSubprocesso novaSituacao = sp.getSituacao();
-        registrarWorkflowParaSuperiorAtual(new RegistrarWorkflowInternoCommand(
+        registrarWorkflowParaSuperiorAtual(RegistrarWorkflowInternoCommand.aceiteValidacao(
                 sp,
                 novaSituacao,
-                TipoTransicao.MAPA_VALIDACAO_ACEITA,
-                TipoAnalise.VALIDACAO,
-                TipoAcaoAnalise.ACEITE_MAPEAMENTO,
-                null,
-                null,
                 usuario,
-                "Aceite da validação",
                 observacoes
         ));
 
@@ -443,16 +566,13 @@ public class SubprocessoTransicaoService {
             sp.setDataFimEtapa1(null);
         }
 
-        registrarWorkflowComDestino(new RegistrarWorkflowInternoCommand(
+        registrarWorkflowComDestino(RegistrarWorkflowInternoCommand.cadastroComDestino(
                 sp,
                 novaSituacao,
-                contexto.transicaoDevolucao(),
-                TipoAnalise.CADASTRO,
-                contexto.acaoDevolucao(),
+                contexto,
                 unidadeAnalise,
                 unidadeDevolucao,
                 usuario,
-                observacoes,
                 observacoes
         ));
     }
@@ -582,16 +702,11 @@ public class SubprocessoTransicaoService {
         Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
         validacaoService.validarSituacaoPermitida(sp, contexto.situacaoDisponibilizada());
 
-        registrarWorkflowParaSuperiorAtual(new RegistrarWorkflowInternoCommand(
+        registrarWorkflowParaSuperiorAtual(RegistrarWorkflowInternoCommand.cadastroParaSuperiorAtual(
                 sp,
                 contexto.situacaoDisponibilizada(),
-                contexto.transicaoAceite(),
-                TipoAnalise.CADASTRO,
-                contexto.acaoAceite(),
-                null,
-                null,
+                contexto,
                 usuario,
-                observacoes,
                 observacoes
         ));
     }
@@ -633,25 +748,11 @@ public class SubprocessoTransicaoService {
     }
 
     public void reabrirCadastro(Long codigo, String justificativa) {
-        executarReabertura(new ReaberturaCommand(
-                codigo,
-                justificativa,
-                MAPEAMENTO_MAPA_HOMOLOGADO,
-                MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
-                TipoTransicao.CADASTRO_REABERTO,
-                false
-        ));
+        executarReabertura(ReaberturaCommand.cadastro(codigo, justificativa));
     }
 
     public void reabrirRevisaoCadastro(Long codigo, String justificativa) {
-        executarReabertura(new ReaberturaCommand(
-                codigo,
-                justificativa,
-                REVISAO_MAPA_HOMOLOGADO,
-                REVISAO_CADASTRO_EM_ANDAMENTO,
-                REVISAO_CADASTRO_REABERTA,
-                true
-        ));
+        executarReabertura(ReaberturaCommand.revisao(codigo, justificativa));
     }
 
     private void executarReabertura(ReaberturaCommand cmd) {
@@ -765,29 +866,9 @@ public class SubprocessoTransicaoService {
 
     private FluxoCadastroContexto obterContextoCadastro(boolean isRevisao) {
         if (isRevisao) {
-            return new FluxoCadastroContexto(
-                    ETAPA_REVISAO,
-                    REVISAO_CADASTRO_DISPONIBILIZADA,
-                    REVISAO_CADASTRO_EM_ANDAMENTO,
-                    REVISAO_CADASTRO_HOMOLOGADA,
-                    REVISAO_CADASTRO_DEVOLVIDA,
-                    REVISAO_CADASTRO_ACEITA,
-                    TipoTransicao.REVISAO_CADASTRO_HOMOLOGADA,
-                    TipoAcaoAnalise.DEVOLUCAO_REVISAO,
-                    TipoAcaoAnalise.ACEITE_REVISAO
-            );
+            return FluxoCadastroContexto.revisao();
         }
-        return new FluxoCadastroContexto(
-                ETAPA_CADASTRO,
-                MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
-                MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
-                MAPEAMENTO_CADASTRO_HOMOLOGADO,
-                CADASTRO_DEVOLVIDO,
-                CADASTRO_ACEITO,
-                TipoTransicao.CADASTRO_HOMOLOGADO,
-                TipoAcaoAnalise.DEVOLUCAO_MAPEAMENTO,
-                TipoAcaoAnalise.ACEITE_MAPEAMENTO
-        );
+        return FluxoCadastroContexto.mapeamento();
     }
 
 }
