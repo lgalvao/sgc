@@ -74,4 +74,16 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
         await expect(tabelaAlertas).toContainText(/Cadastro de atividades reaberto/i);
         await expect(tabelaAlertas).toContainText(/\d{2}\/\d{2}\/\d{4}/);
     });
+
+    test('Cenário complementar: unidade superior visualiza alerta de reabertura no painel', async ({
+                                                                                                        _resetAutomatico,
+                                                                                                        page,
+                                                                                                        _autenticadoComoGestorCoord22
+    }) => {
+        const tabelaAlertas = page.getByTestId('tbl-alertas');
+        await expect(tabelaAlertas).toBeVisible();
+        await expect(tabelaAlertas).toContainText(descProcesso);
+        await expect(tabelaAlertas).toContainText(/Cadastro da unidade SECAO_221 reaberto/i);
+        await expect(tabelaAlertas).toContainText(/\d{2}\/\d{2}\/\d{4}/);
+    });
 });

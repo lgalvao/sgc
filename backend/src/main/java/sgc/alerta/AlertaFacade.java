@@ -208,7 +208,7 @@ public class AlertaFacade {
 
     @Transactional
     public void criarAlertaReaberturaCadastroSuperior(Processo processo, Unidade superior, Unidade subordinada) {
-        String descricao = "Cadastro da %s reaberto".formatted(subordinada.getSigla());
+        String descricao = "Cadastro da unidade %s reaberto".formatted(subordinada.getSigla());
         criarAlertaAdmin(processo, superior, descricao);
     }
 
@@ -224,5 +224,4 @@ public class AlertaFacade {
         criarAlertaAdmin(processo, superior, descricao);
     }
 }
-
 

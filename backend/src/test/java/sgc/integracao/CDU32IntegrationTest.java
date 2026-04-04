@@ -51,10 +51,9 @@ class CDU32IntegrationTest extends BaseIntegrationTest {
             unidadeRepo.save(admin);
         }
 
-        // Obter unidade
-        Unidade unidade = unidadeRepo.findById(1L).orElseGet(() -> {
+        // Obter unidade com cadeia hierárquica conhecida
+        Unidade unidade = unidadeRepo.findBySigla("SEDESENV").orElseGet(() -> {
             Unidade u = new Unidade();
-            u.setCodigo(1L);
             u.setSigla("TESTE");
             u.setNome("Unidade teste");
             u.setSituacao(SituacaoUnidade.ATIVA);
@@ -119,6 +118,17 @@ class CDU32IntegrationTest extends BaseIntegrationTest {
                         a.getUnidadeDestino().getCodigo().equals(reaberto.getUnidade().getCodigo()) &&
                         a.getDescricao().contains("reaberto"));
         assertThat(alertaExiste).isTrue();
+
+        Long codigoUnidadeSuperior = Optional.ofNullable(reaberto.getUnidade().getUnidadeSuperior())
+                .map(Unidade::getCodigo)
+                .orElse(null);
+        assertThat(codigoUnidadeSuperior).isNotNull();
+
+        boolean alertaSuperiorExiste = alerts.stream()
+                .anyMatch(a -> a.getUnidadeDestino() != null &&
+                        Objects.equals(a.getUnidadeDestino().getCodigo(), codigoUnidadeSuperior) &&
+                        a.getDescricao().contains("Cadastro da unidade %s reaberto".formatted(reaberto.getUnidade().getSigla())));
+        assertThat(alertaSuperiorExiste).isTrue();
     }
 
     @Test

@@ -108,4 +108,16 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
         await expect(tabelaAlertas).toContainText(/Revisão de cadastro.*reaberta/i);
         await expect(tabelaAlertas).toContainText(/\d{2}\/\d{2}\/\d{4}/);
     });
+
+    test('Cenário complementar: unidade superior visualiza alerta de reabertura de revisão no painel', async ({
+                                                                                                                   _resetAutomatico,
+                                                                                                                   page,
+                                                                                                                   _autenticadoComoGestorCoord21
+    }) => {
+        const tabelaAlertas = page.getByTestId('tbl-alertas');
+        await expect(tabelaAlertas).toBeVisible();
+        await expect(tabelaAlertas).toContainText(descRevisao);
+        await expect(tabelaAlertas).toContainText(/Revisão de cadastro da unidade SECAO_212 reaberta/i);
+        await expect(tabelaAlertas).toContainText(/\d{2}\/\d{2}\/\d{4}/);
+    });
 });

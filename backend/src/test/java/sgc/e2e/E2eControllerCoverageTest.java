@@ -5,6 +5,7 @@ import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
 import org.springframework.core.io.*;
+import org.springframework.cache.*;
 import org.springframework.jdbc.core.*;
 import org.springframework.jdbc.core.namedparam.*;
 import org.springframework.security.authentication.*;
@@ -39,6 +40,7 @@ class E2eControllerCoverageTest {
     @Mock private UnidadeService unidadeService;
     @Mock private UsuarioFacade usuarioFacade;
     @Mock private ResourceLoader resourceLoader;
+    @Mock private CacheManager cacheManager;
 
     @InjectMocks
     private E2eController controller;
@@ -46,7 +48,7 @@ class E2eControllerCoverageTest {
     @BeforeEach
     void setUp() {
         SecurityContextHolder.clearContext();
-        controller = new E2eController(jdbcTemplate, namedJdbcTemplate, processoService, processoRepo, subprocessoRepo, mapaRepo, unidadeService, usuarioFacade, resourceLoader);
+        controller = new E2eController(jdbcTemplate, namedJdbcTemplate, processoService, processoRepo, subprocessoRepo, mapaRepo, unidadeService, usuarioFacade, resourceLoader, cacheManager);
     }
 
     @Test
