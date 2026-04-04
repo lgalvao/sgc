@@ -7,11 +7,11 @@ const ModalConfirmacaoStub = {
     template: `
         <div v-if="modelValue" :data-ok-title="okTitle" :data-titulo="titulo" data-testid="modal-stub">
             <slot />
-            <button :data-testid="testIdCancelar" :disabled="loading" @click="$emit('update:modelValue', false)">Cancelar</button>
-            <button :data-testid="testIdConfirmar" :disabled="loading" @click="$emit('confirmar')">{{ okTitle }}</button>
+            <button :data-testid="testCodigoCancelar" :disabled="loading" @click="$emit('update:modelValue', false)">Cancelar</button>
+            <button :data-testid="testCodigoConfirmar" :disabled="loading" @click="$emit('confirmar')">{{ okTitle }}</button>
         </div>
     `,
-    props: ["modelValue", "titulo", "okTitle", "testIdCancelar", "testIdConfirmar", "loading"],
+    props: ["modelValue", "titulo", "okTitle", "testCodigoCancelar", "testCodigoConfirmar", "loading"],
     emits: ["update:modelValue", "confirmar"],
 };
 

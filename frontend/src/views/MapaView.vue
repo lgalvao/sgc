@@ -99,7 +99,7 @@
         :loading="loadingExclusao"
         :mensagem="TEXTOS.mapa.EXCLUSAO_CONFIRMACAO(competenciaParaExcluir?.descricao || '')"
         data-testid="mdl-excluir-competencia"
-        test-id-confirmar="btn-confirmar-exclusao-competencia"
+        test-codigo-confirmar="btn-confirmar-exclusao-competencia"
         :titulo="TEXTOS.mapa.EXCLUSAO_TITULO"
         variant="danger"
         @confirmar="confirmarExclusaoCompetencia"
