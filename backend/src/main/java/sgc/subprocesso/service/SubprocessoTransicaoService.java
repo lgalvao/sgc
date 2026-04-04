@@ -656,21 +656,29 @@ public class SubprocessoTransicaoService {
         Processo processo = sp.getProcesso();
         Unidade unidade = sp.getUnidade();
 
-        if (isRevisao) {
-            alertaService.criarAlertaReaberturaRevisao(processo, unidade, justificativa);
-        } else {
-            alertaService.criarAlertaReaberturaCadastro(processo, unidade);
-        }
+        criarAlertaReaberturaUnidade(processo, unidade, justificativa, isRevisao);
 
         Unidade superior = unidade.getUnidadeSuperior();
         while (superior != null) {
-            if (isRevisao) {
-                alertaService.criarAlertaReaberturaRevisaoSuperior(processo, superior, unidade);
-            } else {
-                alertaService.criarAlertaReaberturaCadastroSuperior(processo, superior, unidade);
-            }
+            criarAlertaReaberturaSuperior(processo, superior, unidade, isRevisao);
             superior = superior.getUnidadeSuperior();
         }
+    }
+
+    private void criarAlertaReaberturaUnidade(Processo processo, Unidade unidade, String justificativa, boolean isRevisao) {
+        if (isRevisao) {
+            alertaService.criarAlertaReaberturaRevisao(processo, unidade, justificativa);
+            return;
+        }
+        alertaService.criarAlertaReaberturaCadastro(processo, unidade);
+    }
+
+    private void criarAlertaReaberturaSuperior(Processo processo, Unidade unidadeSuperior, Unidade unidadeOrigem, boolean isRevisao) {
+        if (isRevisao) {
+            alertaService.criarAlertaReaberturaRevisaoSuperior(processo, unidadeSuperior, unidadeOrigem);
+            return;
+        }
+        alertaService.criarAlertaReaberturaCadastroSuperior(processo, unidadeSuperior, unidadeOrigem);
     }
 
     public void alterarDataLimite(Long codSubprocesso, LocalDate novaDataLimite) {
