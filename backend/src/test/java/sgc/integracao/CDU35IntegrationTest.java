@@ -12,6 +12,7 @@ import sgc.processo.model.*;
 import sgc.subprocesso.model.*;
 
 import java.time.*;
+import java.util.*;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
@@ -33,9 +34,9 @@ class CDU35IntegrationTest extends BaseIntegrationTest {
     void setUp() {
         Unidade unidadeRaiz = unidadeRepo.findById(1L).orElseThrow();
 
-        when(responsavelService.buscarResponsavelUnidade(anyLong())).thenReturn(UnidadeResponsavelDto.builder()
-                .titularNome("Responsável teste")
-                .build());
+        when(responsavelService.buscarResponsaveisUnidades(anyList())).thenReturn(Map.of(
+                1L, UnidadeResponsavelDto.builder().titularNome("Responsável teste").build()
+        ));
 
         processo = ProcessoFixture.novoProcesso()
                 .setTipo(TipoProcesso.MAPEAMENTO)

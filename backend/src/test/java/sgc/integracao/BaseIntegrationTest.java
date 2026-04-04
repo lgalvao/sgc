@@ -8,6 +8,7 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.boot.test.context.*;
 import org.springframework.boot.webmvc.test.autoconfigure.*;
+import org.springframework.cache.*;
 import org.springframework.context.annotation.*;
 import org.springframework.test.context.*;
 import org.springframework.test.web.servlet.*;
@@ -56,10 +57,18 @@ public abstract class BaseIntegrationTest {
     protected UsuarioRepo usuarioRepo;
     @Autowired
     private WebApplicationContext context;
+    @Autowired
+    private CacheManager cacheManager;
 
     @BeforeEach
     void setupMockMvc() {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
+        cacheManager.getCacheNames().forEach(nome -> {
+            Cache cache = cacheManager.getCache(nome);
+            if (cache != null) {
+                cache.clear();
+            }
+        });
         if (greenMail != null) {
             try {
                 greenMail.purgeEmailFromAllMailboxes();

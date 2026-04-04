@@ -231,7 +231,7 @@ class SubprocessoTransicaoServiceTest {
 
             when(consultaService.buscarSubprocesso(10L)).thenReturn(spMap);
             when(consultaService.buscarSubprocesso(20L)).thenReturn(spRev);
-            when(unidadeService.buscarPorSigla(anyString())).thenReturn(new Unidade());
+            when(unidadeService.buscarAdmin()).thenReturn(new Unidade());
 
             service.homologarCadastroEmBloco(List.of(10L, 20L), criarUsuario());
 
@@ -278,7 +278,7 @@ class SubprocessoTransicaoServiceTest {
             DisponibilizarMapaRequest req = new DisponibilizarMapaRequest(LocalDate.now().plusDays(5), "Obs");
 
             when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
-            when(unidadeService.buscarPorSigla(anyString())).thenReturn(new Unidade());
+            when(unidadeService.buscarAdmin()).thenReturn(new Unidade());
 
             service.disponibilizarMapa(1L, req, criarUsuario());
 

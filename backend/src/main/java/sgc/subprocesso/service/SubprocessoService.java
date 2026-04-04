@@ -262,8 +262,10 @@ public class SubprocessoService {
 
     private ContextoEdicaoMapa carregarContextoEdicaoMapa(Long codSubprocesso) {
         Subprocesso subprocesso = getSubprocessoParaEdicao(codSubprocesso);
-        Mapa mapa = consultaService.obterMapaObrigatorio(subprocesso);
-        Long codMapa = mapa.getCodigo();
+        Mapa mapa = Optional.ofNullable(subprocesso.getMapa())
+                .orElseGet(() -> consultaService.obterMapaObrigatorio(subprocesso));
+        Long codMapa = Optional.ofNullable(mapa.getCodigo())
+                .orElseGet(() -> consultaService.obterCodigoMapaObrigatorio(subprocesso));
         boolean mapaEstavaVazio = mapaManutencaoService.competenciasCodMapa(codMapa).isEmpty();
         return new ContextoEdicaoMapa(subprocesso, mapa, codMapa, mapaEstavaVazio);
     }

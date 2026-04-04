@@ -91,7 +91,6 @@ class SubprocessoServiceExtraCoverageTest {
             sp.getMapa().setCodigo(100L);
 
             when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
-            when(consultaService.obterCodigoMapaObrigatorio(any())).thenReturn(100L);
             when(mapaManutencaoService.competenciasCodMapa(100L)).thenReturn(List.of()); // eraVazio = true
             when(mapaSalvamentoService.salvarMapaCompleto(eq(100L), any())).thenReturn(sp.getMapa());
 
@@ -110,7 +109,6 @@ class SubprocessoServiceExtraCoverageTest {
             sp.getMapa().setCodigo(100L);
 
             when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
-            when(consultaService.obterMapaObrigatorio(any())).thenReturn(sp.getMapa());
             when(mapaManutencaoService.competenciasCodMapa(100L)).thenReturn(List.of()); // eraVazio = true
             when(mapaManutencaoService.mapaCodigo(100L)).thenReturn(sp.getMapa());
 
@@ -127,7 +125,6 @@ class SubprocessoServiceExtraCoverageTest {
             sp.getMapa().setCodigo(100L);
 
             when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
-            when(consultaService.obterCodigoMapaObrigatorio(any())).thenReturn(100L);
             when(mapaManutencaoService.competenciasCodMapa(100L)).thenReturn(List.of()); // ficouVazio = true
             when(mapaManutencaoService.mapaCodigo(100L)).thenReturn(sp.getMapa());
 
@@ -144,7 +141,6 @@ class SubprocessoServiceExtraCoverageTest {
             sp.getMapa().setCodigo(100L);
 
             when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
-            when(consultaService.obterCodigoMapaObrigatorio(any())).thenReturn(100L);
             when(mapaManutencaoService.competenciasCodMapa(100L)).thenReturn(List.of()); // ficouVazio = true
             when(mapaManutencaoService.mapaCodigo(100L)).thenReturn(sp.getMapa());
 
@@ -161,7 +157,6 @@ class SubprocessoServiceExtraCoverageTest {
             sp.getMapa().setCodigo(100L);
 
             when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
-            when(consultaService.obterCodigoMapaObrigatorio(any())).thenReturn(100L);
             when(mapaManutencaoService.competenciasCodMapa(100L)).thenReturn(List.of()); // eraVazio = true
             when(mapaSalvamentoService.salvarMapaCompleto(eq(100L), any())).thenReturn(sp.getMapa());
 
@@ -179,7 +174,6 @@ class SubprocessoServiceExtraCoverageTest {
             sp.getMapa().setCodigo(100L);
 
             when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
-            when(consultaService.obterCodigoMapaObrigatorio(any())).thenReturn(100L);
             when(mapaManutencaoService.competenciasCodMapa(100L)).thenReturn(List.of(new Competencia())); // eraVazio = false
             when(mapaSalvamentoService.salvarMapaCompleto(eq(100L), any())).thenReturn(sp.getMapa());
 
@@ -197,7 +191,6 @@ class SubprocessoServiceExtraCoverageTest {
             sp.getMapa().setCodigo(100L);
 
             when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
-            when(consultaService.obterCodigoMapaObrigatorio(any())).thenReturn(100L);
             when(mapaManutencaoService.competenciasCodMapa(100L)).thenReturn(List.of(new Competencia())); // eraVazio = false
             when(mapaSalvamentoService.salvarMapaCompleto(eq(100L), any())).thenReturn(sp.getMapa());
 
@@ -215,7 +208,6 @@ class SubprocessoServiceExtraCoverageTest {
             sp.getMapa().setCodigo(100L);
 
             when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
-            when(consultaService.obterMapaObrigatorio(any())).thenReturn(sp.getMapa());
             when(mapaManutencaoService.competenciasCodMapa(100L)).thenReturn(List.of(new Competencia())); // eraVazio = false
             when(mapaManutencaoService.mapaCodigo(100L)).thenReturn(sp.getMapa());
 
@@ -232,7 +224,6 @@ class SubprocessoServiceExtraCoverageTest {
             sp.getMapa().setCodigo(100L);
 
             when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
-            when(consultaService.obterCodigoMapaObrigatorio(any())).thenReturn(100L);
             when(mapaManutencaoService.competenciasCodMapa(100L)).thenReturn(List.of(new Competencia())); // ficouVazio = false
             when(mapaManutencaoService.mapaCodigo(100L)).thenReturn(sp.getMapa());
 

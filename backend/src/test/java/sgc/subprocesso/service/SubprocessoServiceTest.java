@@ -160,7 +160,6 @@ class SubprocessoServiceTest {
         sp.setMapa(mapa);
 
         when(consultaService.buscarSubprocesso(codSubprocesso)).thenReturn(sp);
-        when(consultaService.obterCodigoMapaObrigatorio(sp)).thenReturn(codMapa);
         when(mapaManutencaoService.competenciasCodMapa(codMapa)).thenReturn(List.of());
         when(mapaManutencaoService.mapaCodigo(codMapa)).thenReturn(mapa);
 
@@ -192,7 +191,6 @@ class SubprocessoServiceTest {
         sp.setMapa(mapa);
 
         when(consultaService.buscarSubprocesso(codSubprocesso)).thenReturn(sp);
-        when(consultaService.obterMapaObrigatorio(sp)).thenReturn(mapa);
         when(mapaManutencaoService.competenciasCodMapa(codMapa)).thenReturn(List.of());
         when(mapaManutencaoService.mapaCodigo(codMapa)).thenReturn(mapa);
 
@@ -227,7 +225,6 @@ class SubprocessoServiceTest {
         sp.setMapa(mapa);
 
         when(consultaService.buscarSubprocesso(codSubprocesso)).thenReturn(sp);
-        when(consultaService.obterCodigoMapaObrigatorio(sp)).thenReturn(codMapa);
         when(mapaManutencaoService.competenciasCodMapa(codMapa)).thenReturn(List.of());
         when(mapaSalvamentoService.salvarMapaCompleto(eq(codMapa), any())).thenReturn(mapa);
 
