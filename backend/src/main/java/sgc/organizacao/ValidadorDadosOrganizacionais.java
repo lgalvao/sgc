@@ -2,9 +2,8 @@ package sgc.organizacao;
 
 import lombok.*;
 import lombok.extern.slf4j.*;
-
-import org.jspecify.annotations.Nullable;
-import org.springframework.cache.annotation.Cacheable;
+import org.jspecify.annotations.*;
+import org.springframework.cache.annotation.*;
 import org.springframework.jdbc.core.namedparam.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
@@ -30,6 +29,7 @@ import static sgc.organizacao.model.TipoUnidade.*;
 @RequiredArgsConstructor
 @Slf4j
 public class ValidadorDadosOrganizacionais {
+    boolean logado = false;
 
     private static final Set<TipoUnidade> TIPOS_PARTICIPANTES = Set.of(OPERACIONAL, INTERMEDIARIA, INTEROPERACIONAL);
 
@@ -63,11 +63,15 @@ public class ValidadorDadosOrganizacionais {
             return DiagnosticoOrganizacionalDto.semViolacoes();
         }
 
-        violacoesPorTipo.forEach((tipo, detalhes) ->
-                log.warn("DIAGN. ORGANIZACIONAL [{}]: {} ocorrencia(s). {}",
-                        tipo,
-                        detalhes.size(),
-                        String.join("; ", detalhes))
+        violacoesPorTipo.forEach((tipo, detalhes) -> {
+                    if (!logado) {
+                        log.warn("DIAGN. ORGANIZACIONAL [{}]: {} ocorrencia(s). {}",
+                                tipo,
+                                detalhes.size(),
+                                String.join("; ", detalhes));
+                        logado = true;
+                    }
+                }
         );
 
         int quantidadeOcorrencias = violacoesPorTipo.values().stream()
@@ -101,7 +105,7 @@ public class ValidadorDadosOrganizacionais {
 
     private String construirResumo(Map<String, List<String>> violacoesPorTipo) {
         List<String> unidadesSemResponsavel = violacoesPorTipo
-                .getOrDefault("Unidade participante sem responsavel efetivo", List.of())
+                .getOrDefault("Unidade sem responsavel efetivo", List.of())
                 .stream()
                 .map(this::extrairSigla)
                 .flatMap(Stream::ofNullable)
