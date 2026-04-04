@@ -540,3 +540,21 @@ Na sequência imediata, o ponto ainda redundante estava em `obterContextoEdicao`
 * **Risco principal observado:** divergência silenciosa entre o caminho público de listagem de atividades e o caminho privado reutilizado por contexto de edição.
 * **Validação executada:** `./gradlew :backend:test --tests "sgc.subprocesso.service.SubprocessoConsultaServiceExtraCoverageTest" --tests "sgc.integracao.SubprocessoServiceContextoIntegrationTest" --tests "sgc.integracao.CDU08IntegrationTest"`.
 * **Pendência aberta para próxima rodada:** avaliar se `obterMapaParaAjuste` e o histórico de análises ainda podem compartilhar uma fronteira interna de leitura obrigatória por mapa sem ampliar responsabilidade pública do service.
+
+### Continuação focada em mapa de ajuste e histórico
+
+Na sequência, a redundância remanescente mais direta estava em duas leituras correlatas: `obterMapaParaAjuste` montava dependências de mapa e análise de validação de forma espalhada, enquanto o histórico filtrava análises por tipo repetindo a mesma coleta base. O corte aplicado foi interno: explicitar helpers privados para leituras de análise por tipo e para carregamento dos dados de mapa usados no ajuste.
+
+### Resultado objetivo da continuação de mapa e histórico
+
+`SubprocessoConsultaService` passou a tratar análise por tipo e dados de mapa para ajuste como fronteiras internas nomeadas, em vez de recompor essas leituras diretamente nos métodos públicos. O service continua com a mesma API, mas `obterMapaParaAjuste`, `listarAnalisesPorSubprocesso(tipo)` e o histórico por tipo deixaram de repetir a mesma coleta base em linha.
+
+### Registro da continuação de mapa e histórico
+
+* **Data da rodada:** 2026-04-04
+* **Frente principal:** Frente 2 — Fatiamento de leitura e contexto em `SubprocessoConsultaService`
+* **Arquivo(s) alvo:** `backend/src/main/java/sgc/subprocesso/service/SubprocessoConsultaService.java`, `plano-simplificacao-consolidado.md`
+* **Corte aplicado:** extração de helpers privados para análise por tipo e carregamento de dados de mapa usados em `obterMapaParaAjuste`.
+* **Risco principal observado:** regressão discreta no mapa de ajuste por troca indireta de ordem entre leitura da análise mais recente e coleta de competências/atividades/conhecimentos.
+* **Validação executada:** `./gradlew :backend:test --tests "sgc.subprocesso.service.SubprocessoConsultaServiceExtraCoverageTest" --tests "sgc.subprocesso.service.SubprocessoServiceCoverageIntegrationTest"`.
+* **Pendência aberta para próxima rodada:** medir se a Frente 2 já chegou ao ponto de rendimento decrescente e, se sim, preparar a transição para a Frente 3 em `SubprocessoService`, especialmente nos fluxos de criação e importação.

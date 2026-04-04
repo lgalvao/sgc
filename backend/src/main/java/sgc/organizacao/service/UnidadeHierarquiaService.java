@@ -21,22 +21,24 @@ import static sgc.organizacao.model.TipoUnidade.*;
 public class UnidadeHierarquiaService {
     private final UnidadeRepo unidadeRepo;
     private final UnidadeService unidadeService;
+    private final ResponsabilidadeRepo responsabilidadeRepo;
     private final ComumRepo repo;
 
     /**
      * Busca a árvore hierárquica completa de unidades.
      */
     public List<UnidadeDto> buscarArvoreHierarquica() {
-        List<Unidade> todasUnidades = unidadeRepo.listarTodasComHierarquia();
-        return montarHierarquia(todasUnidades);
+        List<UnidadeHierarquiaLeitura> todasUnidades = unidadeRepo.listarEstruturasAtivas();
+        return montarHierarquia(todasUnidades, Map.of(), null);
     }
 
     /**
      * Busca a árvore hierárquica com filtro de elegibilidade.
      */
     public List<UnidadeDto> buscarArvoreComElegibilidade(Predicate<Unidade> elegibilidadeChecker) {
-        List<Unidade> todasUnidades = unidadeRepo.listarTodasComHierarquia();
-        return montarHierarquia(todasUnidades, elegibilidadeChecker);
+        List<UnidadeHierarquiaLeitura> todasUnidades = unidadeRepo.listarEstruturasAtivas();
+        Map<Long, String> titulosResponsavel = carregarTitulosResponsavel(todasUnidades);
+        return montarHierarquia(todasUnidades, titulosResponsavel, elegibilidadeChecker);
     }
 
     /**
@@ -82,12 +84,12 @@ public class UnidadeHierarquiaService {
      * Constrói o mapa de hierarquia (Pai -> Lista de Filhos) buscando todas as unidades.
      */
     public Map<Long, List<Long>> buscarMapaHierarquia() {
-        List<Unidade> todas = unidadeRepo.listarAtivasComSuperior();
+        List<UnidadeHierarquiaLeitura> todas = unidadeRepo.listarEstruturasAtivas();
 
         Map<Long, List<Long>> mapPaiFilhos = new HashMap<>();
-        for (Unidade u : todas) {
-            Optional.ofNullable(u.getUnidadeSuperior()).ifPresent(superior ->
-                    mapPaiFilhos.computeIfAbsent(superior.getCodigo(), k -> new ArrayList<>()).add(u.getCodigo())
+        for (UnidadeHierarquiaLeitura u : todas) {
+            Optional.ofNullable(u.unidadeSuperiorCodigo()).ifPresent(codigoPai ->
+                    mapPaiFilhos.computeIfAbsent(codigoPai, k -> new ArrayList<>()).add(u.codigo())
             );
         }
         return mapPaiFilhos;
@@ -147,36 +149,53 @@ public class UnidadeHierarquiaService {
                 .toList();
     }
 
-    private List<UnidadeDto> montarHierarquia(List<Unidade> unidades) {
-        return montarHierarquia(unidades, null);
+    private Map<Long, String> carregarTitulosResponsavel(List<UnidadeHierarquiaLeitura> unidades) {
+        List<Long> codigos = unidades.stream()
+                .map(UnidadeHierarquiaLeitura::codigo)
+                .toList();
+
+        if (codigos.isEmpty()) {
+            return Map.of();
+        }
+
+        return responsabilidadeRepo.listarLeiturasPorCodigosUnidade(codigos).stream()
+                .collect(HashMap::new,
+                        (mapa, leitura) -> mapa.put(leitura.unidadeCodigo(), leitura.usuarioTitulo()),
+                        HashMap::putAll);
     }
 
-    private List<UnidadeDto> montarHierarquia(List<Unidade> unidades, @Nullable Predicate<Unidade> elegibilidadeChecker) {
+    private List<UnidadeDto> montarHierarquia(List<UnidadeHierarquiaLeitura> unidades, Map<Long, String> titulosResponsavel,
+                                              @Nullable Predicate<Unidade> elegibilidadeChecker) {
         Map<Long, UnidadeDto> mapaUnidades = new HashMap<>();
         Map<Long, List<UnidadeDto>> mapaFilhas = new HashMap<>();
         List<UnidadeDto> raizes = new ArrayList<>();
 
-        for (Unidade u : unidades) {
-            boolean isElegivel = elegibilidadeChecker == null || elegibilidadeChecker.test(u);
-            UnidadeDto dto = toUnidadeDtoObrigatoria(u);
+        for (UnidadeHierarquiaLeitura u : unidades) {
+            Unidade unidadeLeve = criarUnidadeLeve(u, titulosResponsavel.get(u.codigo()));
+            boolean isElegivel = elegibilidadeChecker == null || elegibilidadeChecker.test(unidadeLeve);
+            UnidadeDto dto = UnidadeDto.builder()
+                    .codigo(u.codigo())
+                    .nome(u.nome())
+                    .sigla(u.sigla())
+                    .codigoPai(u.unidadeSuperiorCodigo())
+                    .tipo(u.tipo().name())
+                    .tituloTitular(u.tituloTitular())
+                    .build();
             dto.setElegivel(isElegivel);
 
-            Long codigo = u.getCodigo();
+            Long codigo = u.codigo();
             mapaUnidades.put(codigo, dto);
             mapaFilhas.putIfAbsent(codigo, new ArrayList<>());
         }
 
-        for (Unidade u : unidades) {
-            UnidadeDto dto = mapaUnidades.get(u.getCodigo());
+        for (UnidadeHierarquiaLeitura u : unidades) {
+            UnidadeDto dto = mapaUnidades.get(u.codigo());
             if (dto == null) {
                 continue;
             }
 
-            Optional.ofNullable(u.getUnidadeSuperior()).ifPresentOrElse(
-                    superior -> {
-                        Long codigoPai = superior.getCodigo();
-                        mapaFilhas.computeIfAbsent(codigoPai, k -> new ArrayList<>()).add(dto);
-                    },
+            Optional.ofNullable(u.unidadeSuperiorCodigo()).ifPresentOrElse(
+                    codigoPai -> mapaFilhas.computeIfAbsent(codigoPai, k -> new ArrayList<>()).add(dto),
                     () -> raizes.add(dto)
             );
         }
@@ -238,6 +257,31 @@ public class UnidadeHierarquiaService {
     private void coletarSiglas(UnidadeDto unidade, List<String> resultado) {
         resultado.add(unidade.getSigla());
         unidade.getSubunidades().forEach(filha -> coletarSiglas(filha, resultado));
+    }
+
+    private Unidade criarUnidadeLeve(UnidadeHierarquiaLeitura unidade, @Nullable String usuarioTituloResponsavel) {
+        Unidade unidadeLeve = new Unidade();
+        unidadeLeve.setCodigo(unidade.codigo());
+        unidadeLeve.setNome(unidade.nome());
+        unidadeLeve.setSigla(unidade.sigla());
+        unidadeLeve.setTituloTitular(unidade.tituloTitular());
+        unidadeLeve.setTipo(unidade.tipo());
+        unidadeLeve.setSituacao(unidade.situacao());
+
+        if (unidade.unidadeSuperiorCodigo() != null) {
+            Unidade superior = new Unidade();
+            superior.setCodigo(unidade.unidadeSuperiorCodigo());
+            unidadeLeve.setUnidadeSuperior(superior);
+        }
+
+        if (usuarioTituloResponsavel != null) {
+            Responsabilidade responsabilidade = new Responsabilidade();
+            responsabilidade.setUnidadeCodigo(unidade.codigo());
+            responsabilidade.setUsuarioTitulo(usuarioTituloResponsavel);
+            unidadeLeve.setResponsabilidade(responsabilidade);
+        }
+
+        return unidadeLeve;
     }
 
     private UnidadeDto toUnidadeDtoObrigatoria(Unidade unidade) {

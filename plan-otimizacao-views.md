@@ -16,7 +16,8 @@ As views mais sensiveis identificadas em [backend/etc/sql/ddl_views.sql](/C:/sgc
 - `VW_USUARIO`
 - `VW_RESPONSABILIDADE`
 - `VW_USUARIO_PERFIL_UNIDADE`
-- `VW_VINCULACAO_UNIDADE`
+
+`VW_VINCULACAO_UNIDADE` saiu do escopo de otimizacao JPA nesta etapa porque o mapeamento foi removido do backend e ela nao participa dos fluxos atuais de producao.
 
 ## Diagnostico
 
@@ -35,7 +36,31 @@ Esse desenho traz alguns custos:
 - consultas com `join fetch` sobre views encadeadas aumentam muito o trabalho do banco
 - metodos amplos, como `findAll()`, ficam caros mesmo para casos de uso simples
 
-O ponto mais sensivel hoje e [backend/src/main/java/sgc/organizacao/model/UnidadeRepo.java](/C:/sgc/backend/src/main/java/sgc/organizacao/model/UnidadeRepo.java), especialmente o metodo `findAllWithHierarquia()`, que faz `left join fetch` de relacionamentos sobre `VW_UNIDADE`, `VW_RESPONSABILIDADE` e `VW_USUARIO`.
+O ponto mais sensivel hoje e [backend/src/main/java/sgc/organizacao/model/UnidadeRepo.java](/C:/sgc/backend/src/main/java/sgc/organizacao/model/UnidadeRepo.java), especialmente o metodo `listarTodasComHierarquia()`, que faz `left join fetch` de relacionamentos sobre `VW_UNIDADE`, `VW_RESPONSABILIDADE` e `VW_USUARIO`.
+
+## Estado Atual Confirmado
+
+Levantamento no backend em 2026-04-04:
+
+- a arvore de unidades e a arvore com elegibilidade usam [backend/src/main/java/sgc/organizacao/service/UnidadeHierarquiaService.java](/Users/leonardo/sgc/backend/src/main/java/sgc/organizacao/service/UnidadeHierarquiaService.java), com carga ampla de hierarquia
+- o login usa `VW_USUARIO_PERFIL_UNIDADE` e navega pela associacao para `Unidade`
+- `ComumRepo` ainda permite `find` e criteria generica sobre views pesadas, escondendo o custo real do acesso
+- o diagnostico organizacional ja usa JDBC direto para perfis, mas ainda depende de carga ampla de unidades
+- nao ha cache declarativo no modulo organizacional neste momento
+
+## Rodada Atual
+
+### Melhoria iniciada
+
+- substituir a montagem da hierarquia por leitura achatada de `VW_UNIDADE`
+- buscar responsabilidades em lote e montar a elegibilidade em memoria
+- preservar os contratos HTTP e os DTOs atuais
+
+### Fora desta rodada
+
+- cache de aplicacao
+- refactor do fluxo de login
+- remocao ampla das associacoes JPA restantes
 
 ## Diretriz Principal
 
@@ -268,7 +293,7 @@ Levantar pelo menos:
 
 ## Fase 2. Refactor estrutural de leitura
 
-- substituir `findAllWithHierarquia()` por projecao enxuta
+- substituir `listarTodasComHierarquia()` por projecao enxuta nos fluxos de arvore
 - criar DTOs especificos para responsaveis de unidade
 - criar DTOs especificos para perfis por usuario
 - reduzir relacionamentos JPA entre views
@@ -323,8 +348,8 @@ Considerar a otimizacao bem-sucedida quando:
 Iniciar pela hierarquia de unidades:
 
 1. criar uma projecao simples para leitura de `VW_UNIDADE`
-2. refatorar a montagem de arvore em [backend/src/main/java/sgc/organizacao/service/UnidadeHierarquiaService.java](/C:/sgc/backend/src/main/java/sgc/organizacao/service/UnidadeHierarquiaService.java)
-3. remover a dependencia de `findAllWithHierarquia()`
+2. refatorar a montagem de arvore em [backend/src/main/java/sgc/organizacao/service/UnidadeHierarquiaService.java](/Users/leonardo/sgc/backend/src/main/java/sgc/organizacao/service/UnidadeHierarquiaService.java)
+3. remover a dependencia de `join fetch` entre `VW_UNIDADE`, `VW_RESPONSABILIDADE` e `VW_USUARIO` nesse fluxo
 4. medir o ganho
 
 Esse caminho tem boa chance de entregar impacto rapido com risco controlado.
