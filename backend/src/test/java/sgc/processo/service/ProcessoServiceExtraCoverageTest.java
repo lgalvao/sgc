@@ -5,6 +5,7 @@ import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
 import org.springframework.security.core.*;
+import org.springframework.test.util.*;
 import sgc.alerta.*;
 import sgc.comum.erros.*;
 import sgc.comum.model.*;
@@ -79,6 +80,20 @@ class ProcessoServiceExtraCoverageTest {
         unidade.setTipo(TipoUnidade.OPERACIONAL);
         unidade.setSituacao(SituacaoUnidade.ATIVA);
         return unidade;
+    }
+
+    private Processo criarProcessoComParticipante(Long codProcesso, Long codUnidade) {
+        Processo processo = new Processo();
+        processo.setCodigo(codProcesso);
+        processo.setDescricao("Processo " + codProcesso);
+        processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+        processo.setDataLimite(LocalDateTime.now().plusDays(5));
+
+        UnidadeProcesso participante = new UnidadeProcesso();
+        participante.setUnidadeCodigo(codUnidade);
+        participante.setSigla("U" + codUnidade);
+        processo.setParticipantes(List.of(participante));
+        return processo;
     }
 
     @Nested
@@ -280,6 +295,268 @@ class ProcessoServiceExtraCoverageTest {
 
             assertThrows(ErroValidacao.class, () -> processoService.finalizar(1L));
         }
+    }
+
+    @Test
+    @DisplayName("enviarLembrete deve falhar quando processo estiver sem data limite")
+    void enviarLembreteDeveFalharSemDataLimite() {
+        Processo processo = criarProcessoComParticipante(1L, 10L);
+        processo.setDataLimite(null);
+        when(processoRepo.buscarPorCodigoComParticipantes(1L)).thenReturn(Optional.of(processo));
+
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(10L);
+        unidade.setSigla("U10");
+        unidade.setTituloTitular("TITULO10");
+        when(unidadeService.buscarPorCodigo(10L)).thenReturn(unidade);
+
+        assertThatThrownBy(() -> processoService.enviarLembrete(1L, 10L))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("sem data limite");
+    }
+
+    @Test
+    @DisplayName("enviarLembrete deve falhar quando unidade estiver sem titular oficial")
+    void enviarLembreteDeveFalharSemTitularOficial() {
+        Processo processo = criarProcessoComParticipante(2L, 20L);
+        when(processoRepo.buscarPorCodigoComParticipantes(2L)).thenReturn(Optional.of(processo));
+
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(20L);
+        unidade.setSigla("U20");
+        unidade.setTituloTitular("   ");
+        when(unidadeService.buscarPorCodigo(20L)).thenReturn(unidade);
+
+        when(emailModelosService.criarEmailLembretePrazo(anyString(), anyString(), any())).thenReturn("<html/>");
+
+        assertThatThrownBy(() -> processoService.enviarLembrete(2L, 20L))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("sem titular oficial");
+    }
+
+    @Test
+    @DisplayName("validarUnidadesInicio deve ignorar erro de mapa quando nenhuma sigla for retornada")
+    void validarUnidadesInicioSemSiglaNaoAdicionaErroMapa() {
+        when(unidadeService.buscarPorCodigos(List.of(30L))).thenReturn(List.of(criarUnidadeValida(30L)));
+        when(responsavelUnidadeService.todasPossuemResponsavelEfetivo(List.of(30L))).thenReturn(true);
+        when(unidadeService.temMapaVigente(30L)).thenReturn(false);
+        when(unidadeService.buscarSiglasPorCodigos(List.of(30L))).thenReturn(List.of());
+        when(processoRepo.listarUnidadesEmProcessoAtivo(SituacaoProcesso.EM_ANDAMENTO, List.of(30L))).thenReturn(List.of());
+
+        @SuppressWarnings("unchecked")
+        List<String> erros = (List<String>) ReflectionTestUtils.invokeMethod(
+                processoService,
+                "validarUnidadesInicio",
+                TipoProcesso.REVISAO,
+                List.of(30L)
+        );
+
+        assertThat(erros).isEmpty();
+    }
+
+    @Test
+    @DisplayName("efetivarInicioSubprocessos deve executar fluxo de diagnostico")
+    void efetivarInicioSubprocessosDeveExecutarFluxoDiagnostico() {
+        Processo processo = new Processo();
+        Unidade unidade = criarUnidadeValida(40L);
+        Set<Unidade> participantes = Set.of(unidade);
+
+        UnidadeMapa unidadeMapa = new UnidadeMapa();
+        unidadeMapa.setUnidadeCodigo(40L);
+        unidadeMapa.setMapaVigente(new Mapa());
+        List<UnidadeMapa> unidadesMapa = List.of(unidadeMapa);
+
+        Unidade unidadeAdmin = criarUnidadeValida(99L);
+        Usuario usuario = new Usuario();
+
+        ReflectionTestUtils.invokeMethod(
+                processoService,
+                "efetivarInicioSubprocessos",
+                processo,
+                TipoProcesso.DIAGNOSTICO,
+                List.of(40L),
+                participantes,
+                unidadesMapa,
+                unidadeAdmin,
+                usuario
+        );
+
+        verify(subprocessoService).criarParaDiagnostico(eq(processo), eq(unidade), eq(unidadeMapa), eq(unidadeAdmin), eq(usuario));
+    }
+
+    @Test
+    @DisplayName("isElegivelParaAcaoEmBloco deve aceitar revisao mapa ajustado quando houver permissao")
+    void isElegivelParaAcaoEmBlocoDeveAceitarRevisaoMapaAjustado() {
+        Usuario usuario = new Usuario();
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setSituacao(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
+
+        when(permissionEvaluator.verificarPermissao(usuario, subprocesso, AcaoPermissao.DISPONIBILIZAR_MAPA)).thenReturn(true);
+
+        Boolean elegivel = ReflectionTestUtils.invokeMethod(
+                processoService,
+                "isElegivelParaAcaoEmBloco",
+                subprocesso,
+                usuario
+        );
+
+        assertThat(elegivel).isTrue();
+    }
+
+    @Test
+    @DisplayName("enviarLembrete deve falhar quando unidade não participa do processo")
+    void enviarLembreteDeveFalharQuandoUnidadeNaoParticipa() {
+        Processo processo = criarProcessoComParticipante(3L, 30L);
+        when(processoRepo.buscarPorCodigoComParticipantes(3L)).thenReturn(Optional.of(processo));
+        when(unidadeService.buscarPorCodigo(99L)).thenReturn(criarUnidadeValida(99L));
+
+        assertThatThrownBy(() -> processoService.enviarLembrete(3L, 99L))
+                .isInstanceOf(ErroValidacao.class)
+                .hasMessageContaining("não participa");
+    }
+
+    @Test
+    @DisplayName("validarUnidadesInicio deve retornar erro quando houver unidade bloqueada em processo ativo")
+    void validarUnidadesInicioDeveRetornarErroQuandoHouverUnidadeBloqueada() {
+        when(unidadeService.buscarPorCodigos(List.of(50L))).thenReturn(List.of(criarUnidadeValida(50L)));
+        when(responsavelUnidadeService.todasPossuemResponsavelEfetivo(List.of(50L))).thenReturn(true);
+        when(processoRepo.listarUnidadesEmProcessoAtivo(SituacaoProcesso.EM_ANDAMENTO, List.of(50L))).thenReturn(List.of(50L));
+
+        @SuppressWarnings("unchecked")
+        List<String> erros = (List<String>) ReflectionTestUtils.invokeMethod(
+                processoService,
+                "validarUnidadesInicio",
+                TipoProcesso.MAPEAMENTO,
+                List.of(50L)
+        );
+
+        assertThat(erros).isNotEmpty();
+    }
+
+    @Test
+    @DisplayName("efetivarInicioSubprocessos deve executar fluxo de revisão")
+    void efetivarInicioSubprocessosDeveExecutarFluxoRevisao() {
+        Processo processo = new Processo();
+        Unidade unidade = criarUnidadeValida(60L);
+        UnidadeMapa unidadeMapa = new UnidadeMapa();
+        unidadeMapa.setUnidadeCodigo(60L);
+        unidadeMapa.setMapaVigente(new Mapa());
+        Unidade unidadeAdmin = criarUnidadeValida(99L);
+        Usuario usuario = new Usuario();
+
+        when(unidadeService.buscarPorCodigo(60L)).thenReturn(unidade);
+
+        ReflectionTestUtils.invokeMethod(
+                processoService,
+                "efetivarInicioSubprocessos",
+                processo,
+                TipoProcesso.REVISAO,
+                List.of(60L),
+                Set.of(unidade),
+                List.of(unidadeMapa),
+                unidadeAdmin,
+                usuario
+        );
+
+        verify(subprocessoService).criarParaRevisao(eq(processo), eq(unidade), eq(unidadeMapa), eq(unidadeAdmin), eq(usuario));
+    }
+
+    @Test
+    @DisplayName("isElegivelParaAcaoEmBloco deve retornar falso para situação não elegível")
+    void isElegivelParaAcaoEmBlocoDeveRetornarFalsoParaSituacaoNaoElegivel() {
+        Usuario usuario = new Usuario();
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
+
+        Boolean elegivel = ReflectionTestUtils.invokeMethod(
+                processoService,
+                "isElegivelParaAcaoEmBloco",
+                subprocesso,
+                usuario
+        );
+
+        assertThat(elegivel).isFalse();
+    }
+
+    @Test
+    @DisplayName("enviarLembrete deve falhar quando titular oficial for nulo")
+    void enviarLembreteDeveFalharQuandoTitularForNulo() {
+        Processo processo = criarProcessoComParticipante(4L, 40L);
+        when(processoRepo.buscarPorCodigoComParticipantes(4L)).thenReturn(Optional.of(processo));
+
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(40L);
+        unidade.setSigla("U40");
+        unidade.setTituloTitular(null);
+        when(unidadeService.buscarPorCodigo(40L)).thenReturn(unidade);
+        when(emailModelosService.criarEmailLembretePrazo(anyString(), anyString(), any())).thenReturn("<html/>");
+
+        assertThatThrownBy(() -> processoService.enviarLembrete(4L, 40L))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("sem titular oficial");
+    }
+
+    @Test
+    @DisplayName("validarUnidadesInicio deve adicionar erro de mapa para processo de diagnostico")
+    void validarUnidadesInicioDeveAdicionarErroMapaParaDiagnostico() {
+        when(unidadeService.buscarPorCodigos(List.of(70L))).thenReturn(List.of(criarUnidadeValida(70L)));
+        when(responsavelUnidadeService.todasPossuemResponsavelEfetivo(List.of(70L))).thenReturn(true);
+        when(unidadeService.temMapaVigente(70L)).thenReturn(false);
+        when(unidadeService.buscarSiglasPorCodigos(List.of(70L))).thenReturn(List.of("U70"));
+        when(processoRepo.listarUnidadesEmProcessoAtivo(SituacaoProcesso.EM_ANDAMENTO, List.of(70L))).thenReturn(List.of());
+
+        @SuppressWarnings("unchecked")
+        List<String> erros = (List<String>) ReflectionTestUtils.invokeMethod(
+                processoService,
+                "validarUnidadesInicio",
+                TipoProcesso.DIAGNOSTICO,
+                List.of(70L)
+        );
+
+        assertThat(erros).isNotEmpty();
+    }
+
+    @Test
+    @DisplayName("efetivarInicioSubprocessos deve executar fluxo de mapeamento")
+    void efetivarInicioSubprocessosDeveExecutarFluxoMapeamento() {
+        Processo processo = new Processo();
+        Unidade unidade = criarUnidadeValida(80L);
+        Unidade unidadeAdmin = criarUnidadeValida(99L);
+        Usuario usuario = new Usuario();
+
+        ReflectionTestUtils.invokeMethod(
+                processoService,
+                "efetivarInicioSubprocessos",
+                processo,
+                TipoProcesso.MAPEAMENTO,
+                List.of(80L),
+                Set.of(unidade),
+                List.of(),
+                unidadeAdmin,
+                usuario
+        );
+
+        verify(subprocessoService).criarParaMapeamento(eq(processo), eq(Set.of(unidade)), eq(unidadeAdmin), eq(usuario));
+    }
+
+    @Test
+    @DisplayName("isElegivelParaAcaoEmBloco deve aceitar fluxo de mapa quando houver permissão de homologação")
+    void isElegivelParaAcaoEmBlocoDeveAceitarFluxoMapaComHomologacao() {
+        Usuario usuario = new Usuario();
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setSituacao(SituacaoSubprocesso.REVISAO_MAPA_VALIDADO);
+
+        when(permissionEvaluator.verificarPermissao(usuario, subprocesso, AcaoPermissao.ACEITAR_MAPA)).thenReturn(false);
+        when(permissionEvaluator.verificarPermissao(usuario, subprocesso, AcaoPermissao.HOMOLOGAR_MAPA)).thenReturn(true);
+
+        Boolean elegivel = ReflectionTestUtils.invokeMethod(
+                processoService,
+                "isElegivelParaAcaoEmBloco",
+                subprocesso,
+                usuario
+        );
+
+        assertThat(elegivel).isTrue();
     }
 
     @Nested

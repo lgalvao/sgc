@@ -7,6 +7,8 @@ import org.mockito.junit.jupiter.*;
 import org.springframework.data.domain.*;
 import sgc.alerta.model.*;
 import sgc.organizacao.model.*;
+import sgc.organizacao.service.*;
+import sgc.processo.model.*;
 
 import java.lang.reflect.*;
 import java.time.*;
@@ -21,6 +23,10 @@ import static org.mockito.Mockito.*;
 class AlertaFacadeTest {
     @Mock
     private AlertaService alertaService;
+    @Mock
+    private UsuarioService usuarioService;
+    @Mock
+    private UnidadeService unidadeService;
 
     @InjectMocks
     private AlertaFacade alertaFacade;
@@ -117,5 +123,77 @@ class AlertaFacadeTest {
                 .isInstanceOf(InvocationTargetException.class)
                 .hasCauseInstanceOf(IllegalStateException.class)
                 .hasRootCauseMessage("Unidade 999 ausente na construção de alertas");
+    }
+
+    @Test
+    @DisplayName("Deve manter alerta como não lido quando leitura estiver nula")
+    void deveManterAlertaNaoLidoQuandoLeituraNula() {
+        String titulo = "123";
+        Alerta alerta = new Alerta();
+        alerta.setCodigo(1L);
+
+        AlertaUsuario leitura = new AlertaUsuario();
+        leitura.setCodigo(AlertaUsuario.Chave.builder().alertaCodigo(1L).usuarioTitulo(titulo).build());
+        leitura.setDataHoraLeitura(null);
+
+        when(alertaService.listarParaGestao(1L, titulo)).thenReturn(List.of(alerta));
+        when(alertaService.alertasUsuarios(titulo, List.of(1L))).thenReturn(List.of(leitura));
+
+        List<Alerta> resultado = alertaFacade.alertasPorUsuario(titulo, 1L, "GESTOR");
+
+        assertThat(resultado).hasSize(1);
+        assertThat(resultado.getFirst().getDataHoraLeitura()).isNull();
+    }
+
+    @Test
+    @DisplayName("Deve criar alertas para unidade interoperacional e cadeia superior")
+    void deveCriarAlertasParaUnidadeInteroperacionalECadeiaSuperior() {
+        Processo processo = new Processo();
+        processo.setCodigo(10L);
+
+        Unidade raiz = new Unidade();
+        raiz.setCodigo(1L);
+        raiz.setTipo(TipoUnidade.RAIZ);
+        raiz.setSigla("RAIZ");
+
+        Unidade superior = new Unidade();
+        superior.setCodigo(2L);
+        superior.setTipo(TipoUnidade.INTERMEDIARIA);
+        superior.setSigla("SUP");
+        superior.setUnidadeSuperior(raiz);
+
+        Unidade interoperacional = new Unidade();
+        interoperacional.setCodigo(3L);
+        interoperacional.setTipo(TipoUnidade.INTEROPERACIONAL);
+        interoperacional.setSigla("INTOP");
+        interoperacional.setUnidadeSuperior(superior);
+
+        when(unidadeService.buscarPorCodigo(1L)).thenReturn(raiz);
+        when(alertaService.salvar(any(Alerta.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        List<Alerta> alertas = alertaFacade.criarAlertasProcessoIniciado(processo, List.of(interoperacional));
+
+        assertThat(alertas).isNotEmpty();
+        assertThat(alertas).allMatch(a -> a.getProcesso() == processo);
+    }
+
+    @Test
+    @DisplayName("Deve criar alerta para participante do tipo raiz")
+    void deveCriarAlertaParaParticipanteRaiz() {
+        Processo processo = new Processo();
+        processo.setCodigo(11L);
+
+        Unidade raiz = new Unidade();
+        raiz.setCodigo(1L);
+        raiz.setTipo(TipoUnidade.RAIZ);
+        raiz.setSigla("RAIZ");
+
+        when(unidadeService.buscarPorCodigo(1L)).thenReturn(raiz);
+        when(alertaService.salvar(any(Alerta.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        List<Alerta> alertas = alertaFacade.criarAlertasProcessoIniciado(processo, List.of(raiz));
+
+        assertThat(alertas).isNotEmpty();
+        assertThat(alertas).anyMatch(alerta -> alerta.getUnidadeDestino() == raiz);
     }
 }

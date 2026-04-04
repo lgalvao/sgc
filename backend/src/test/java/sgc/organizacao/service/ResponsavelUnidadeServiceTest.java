@@ -339,5 +339,80 @@ class ResponsavelUnidadeServiceTest {
             assertThat(result.get(codUnidade).titularTitulo()).isEqualTo("TIT");
             assertThat(result.get(codUnidade).substitutoTitulo()).isEqualTo("RES");
         }
+
+        @Test
+        @DisplayName("Deve lançar exceção quando titular oficial estiver nulo")
+        void deveLancarExcecaoQuandoTitularOficialNulo() {
+            Long codUnidade = 2L;
+            Unidade u = new Unidade();
+            u.setCodigo(codUnidade);
+            u.setTituloTitular(null);
+
+            Responsabilidade r = new Responsabilidade();
+            r.setUnidade(u);
+            r.setUnidadeCodigo(codUnidade);
+            r.setUsuarioTitulo("RESP");
+
+            when(responsabilidadeRepo.listarPorCodigosUnidade(anyList())).thenReturn(List.of(r));
+
+            assertThatThrownBy(() -> service.buscarResponsaveisUnidades(List.of(codUnidade)))
+                    .isInstanceOf(IllegalStateException.class)
+                    .hasMessageContaining("Titular oficial ausente");
+        }
+
+        @Test
+        @DisplayName("Deve lançar exceção quando titular oficial estiver em branco")
+        void deveLancarExcecaoQuandoTitularOficialEmBranco() {
+            Long codUnidade = 3L;
+            Unidade u = new Unidade();
+            u.setCodigo(codUnidade);
+            u.setTituloTitular("   ");
+
+            Responsabilidade r = new Responsabilidade();
+            r.setUnidade(u);
+            r.setUnidadeCodigo(codUnidade);
+            r.setUsuarioTitulo("RESP");
+
+            when(responsabilidadeRepo.listarPorCodigosUnidade(anyList())).thenReturn(List.of(r));
+
+            assertThatThrownBy(() -> service.buscarResponsaveisUnidades(List.of(codUnidade)))
+                    .isInstanceOf(IllegalStateException.class)
+                    .hasMessageContaining("Titular oficial ausente");
+        }
+    }
+
+    @Test
+    @DisplayName("todasPossuemResponsavelEfetivo deve retornar false para responsável com título em branco")
+    void todasPossuemResponsavelEfetivoDeveRetornarFalseComTituloEmBranco() {
+        Responsabilidade responsabilidade = new Responsabilidade();
+        responsabilidade.setUnidadeCodigo(10L);
+        responsabilidade.setUsuarioTitulo(" ");
+
+        when(responsabilidadeRepo.listarPorCodigosUnidade(List.of(10L))).thenReturn(List.of(responsabilidade));
+
+        boolean resultado = service.todasPossuemResponsavelEfetivo(List.of(10L));
+
+        assertThat(resultado).isFalse();
+    }
+
+    @Test
+    @DisplayName("todasPossuemResponsavelEfetivo deve retornar false quando faltar unidade na resposta")
+    void todasPossuemResponsavelEfetivoDeveRetornarFalseQuandoFaltarUnidade() {
+        Responsabilidade responsabilidade = new Responsabilidade();
+        responsabilidade.setUnidadeCodigo(10L);
+        responsabilidade.setUsuarioTitulo("RESP");
+
+        when(responsabilidadeRepo.listarPorCodigosUnidade(List.of(10L, 11L))).thenReturn(List.of(responsabilidade));
+
+        boolean resultado = service.todasPossuemResponsavelEfetivo(List.of(10L, 11L));
+
+        assertThat(resultado).isFalse();
+    }
+
+    @Test
+    @DisplayName("todasPossuemResponsavelEfetivo deve retornar true quando lista estiver vazia")
+    void todasPossuemResponsavelEfetivoDeveRetornarTrueQuandoListaVazia() {
+        boolean resultado = service.todasPossuemResponsavelEfetivo(List.of());
+        assertThat(resultado).isTrue();
     }
 }

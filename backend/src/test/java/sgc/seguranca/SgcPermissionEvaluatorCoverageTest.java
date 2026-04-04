@@ -20,6 +20,7 @@ import static org.mockito.Mockito.*;
 class SgcPermissionEvaluatorCoverageTest {
 
     @Mock private SubprocessoRepo subprocessoRepo;
+    @Mock private MovimentacaoRepo movimentacaoRepo;
     @Mock private ProcessoRepo processoRepo;
     @Mock private MapaRepo mapaRepo;
     @Mock private AtividadeRepo atividadeRepo;
@@ -350,5 +351,48 @@ class SgcPermissionEvaluatorCoverageTest {
         sp.setUnidade(unidadeAlvo);
 
         evaluator.verificarPermissao(usuarioMock, sp, AcaoPermissao.VISUALIZAR_SUBPROCESSO);
+    }
+
+    @Test
+    @DisplayName("verificarSubprocesso: Importação deve negar quando não finalizado e fora da hierarquia")
+    void verificarSubprocessoImportacaoDeveNegarForaDaHierarquia() {
+        Usuario usuario = Usuario.builder()
+                .perfilAtivo(Perfil.CHEFE)
+                .unidadeAtivaCodigo(1L)
+                .build();
+
+        Processo processo = Processo.builder().situacao(SituacaoProcesso.EM_ANDAMENTO).build();
+        Subprocesso sp = new Subprocesso();
+        sp.setProcesso(processo);
+        sp.setUnidade(Unidade.builder().codigo(2L).build());
+
+        assertThat(evaluator.verificarPermissao(usuario, sp, AcaoPermissao.CONSULTAR_PARA_IMPORTACAO)).isFalse();
+    }
+
+    @Test
+    @DisplayName("obterUnidadeLocalizacao: deve usar unidade quando subprocesso não persistido")
+    void obterUnidadeLocalizacaoDeveUsarUnidadeQuandoSubprocessoNaoPersistido() {
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(null);
+        Unidade unidade = Unidade.builder().codigo(5L).build();
+        sp.setUnidade(unidade);
+
+        Unidade localizacao = org.springframework.test.util.ReflectionTestUtils.invokeMethod(
+                evaluator,
+                "obterUnidadeLocalizacao",
+                sp
+        );
+        assertThat(localizacao).isEqualTo(unidade);
+    }
+
+    @Test
+    @DisplayName("mascarar: deve cobrir retorno curto")
+    void mascararRetornoCurto() {
+        String resultado = org.springframework.test.util.ReflectionTestUtils.invokeMethod(
+                evaluator,
+                "mascarar",
+                "1234"
+        );
+        assertThat(resultado).isEqualTo("***");
     }
 }
