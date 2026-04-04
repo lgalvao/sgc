@@ -100,10 +100,83 @@ class RegrasNegocioProcessoExecucaoIntegrationTest extends BaseIntegrationTest {
                 .andExpect(jsonPath("$.message").value("Apenas processos na situação &#39;CRIADO&#39; podem ser removidos."));
     }
 
+    @Test
+    @DisplayName("RN-04.03: processo nasce na situação CRIADO")
+    void deveCriarProcessoNaSituacaoCriado() throws Exception {
+        CriarProcessoRequest request = criarProcessoReq("Processo com situação inicial", TipoProcesso.MAPEAMENTO, List.of(unidadeParticipante.getCodigo()));
+
+        mockMvc.perform(post(API_PROCESSOS)
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.situacao").value("CRIADO"));
+    }
+
+    @Test
+    @DisplayName("RN-04.15: descrição é obrigatória na criação")
+    void deveValidarDescricaoObrigatoriaNaCriacao() throws Exception {
+        CriarProcessoRequest request = criarProcessoReq("", TipoProcesso.MAPEAMENTO, List.of(unidadeParticipante.getCodigo()));
+
+        mockMvc.perform(post(API_PROCESSOS)
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.subErrors[0].message").value("Preencha a descrição"));
+    }
+
+    @Test
+    @DisplayName("RN-04.15: ao menos uma unidade participante é obrigatória")
+    void deveValidarUnidadesObrigatoriasNaCriacao() throws Exception {
+        CriarProcessoRequest request = criarProcessoReq("Processo sem unidades", TipoProcesso.MAPEAMENTO, Collections.emptyList());
+
+        mockMvc.perform(post(API_PROCESSOS)
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.subErrors[0].message").value("Pelo menos uma unidade participante deve ser incluída."));
+    }
+
+    @Test
+    @DisplayName("RN-04.07: unidade não pode iniciar dois processos ativos do mesmo tipo")
+    void deveImpedirMesmoParticipanteEmDoisProcessosAtivosDoMesmoTipo() throws Exception {
+        Long primeiroProcesso = criarProcessoComoAdmin("Primeiro processo ativo");
+        iniciarProcessoComoAdmin(primeiroProcesso);
+
+        Long segundoProcesso = criarProcessoComoAdmin("Segundo processo com unidade repetida");
+        IniciarProcessoRequest iniciar = new IniciarProcessoRequest(TipoProcesso.MAPEAMENTO, List.of(unidadeParticipante.getCodigo()));
+
+        mockMvc.perform(post(API_PROCESSOS + "/{codigo}/iniciar", segundoProcesso)
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(iniciar)))
+                .andExpect(status().is(422))
+                .andExpect(jsonPath("$.message").value("Unidades já em processo ativo."));
+    }
+
+    @Test
+    @DisplayName("RN-04.06: revisão exige mapa de competências vigente")
+    void deveImpedirCriacaoDeProcessoRevisaoSemMapaVigente() throws Exception {
+        CriarProcessoRequest request = criarProcessoReq("Revisão sem mapa vigente", TipoProcesso.REVISAO, List.of(unidadeParticipante.getCodigo()));
+
+                mockMvc.perform(post(API_PROCESSOS)
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().is(422))
+                .andExpect(jsonPath("$.message").value("Unidades sem mapa vigente: URG"));
+    }
+
     private CriarProcessoRequest criarProcessoReq(String descricao, List<Long> unidades) {
+        return criarProcessoReq(descricao, TipoProcesso.MAPEAMENTO, unidades);
+    }
+
+    private CriarProcessoRequest criarProcessoReq(String descricao, TipoProcesso tipo, List<Long> unidades) {
         return new CriarProcessoRequest(
                 descricao,
-                TipoProcesso.MAPEAMENTO,
+                tipo,
                 LocalDateTime.now().plusDays(15),
                 unidades
         );
