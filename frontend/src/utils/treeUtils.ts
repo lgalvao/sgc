@@ -17,11 +17,11 @@
  * @example
  * // Com filhos (processos)
  * const arvore = [
- *   { id: 1, filhos: [{ id: 2 }] },
- *   { id: 3 }
+ *   { codigo: 1, filhos: [{ codigo: 2 }] },
+ *   { codigo: 3 }
  * ];
  * const plano = flattenTree(arvore, 'filhos');
- * // Resultado: [{ id: 1, ... }, { id: 2 }, { id: 3 }]
+ * // Resultado: [{ codigo: 1, ... }, { codigo: 2 }, { codigo: 3 }]
  */
 export function flattenTree<T extends Record<string, any>>(
     items: T[],

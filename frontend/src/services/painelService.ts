@@ -12,48 +12,50 @@ export interface Page<T> {
     empty: boolean;
 }
 
+export interface ListarParams<T = string> {
+    codUnidade?: number;
+    page?: number;
+    size?: number;
+    sort?: T;
+    order?: "asc" | "desc";
+}
+
 export async function listarProcessos(
-    codUnidade?: number,
-    page: number = 0,
-    size: number = 20,
-    sort?: keyof ProcessoResumo,
-    order?: "asc" | "desc",
+    params: ListarParams<keyof ProcessoResumo> = {}
 ): Promise<Page<ProcessoResumo>> {
-    const params: any = {
+    const { codUnidade, page = 0, size = 20, sort, order } = params;
+    const queryParams: any = {
         page,
         size,
     };
     if (codUnidade !== undefined && codUnidade !== null) {
-        params.unidade = codUnidade;
+        queryParams.unidade = codUnidade;
     }
     if (sort) {
-        params.sort = `${sort},${order}`;
+        queryParams.sort = `${sort},${order}`;
     }
     const response = await apiClient.get<Page<ProcessoResumo>>("/painel/processos", {
-        params,
+        params: queryParams,
     });
     return response.data;
 }
 
 export async function listarAlertas(
-    codUnidade?: number,
-    page: number = 0,
-    size: number = 20,
-    sort?: "dataHora" | "processo",
-    order?: "asc" | "desc",
+    params: ListarParams<"dataHora" | "processo"> = {}
 ): Promise<Page<Alerta>> {
-    const params: any = {
+    const { codUnidade, page = 0, size = 20, sort, order } = params;
+    const queryParams: any = {
         page,
         size,
     };
     if (codUnidade !== undefined && codUnidade !== null) {
-        params.unidade = codUnidade;
+        queryParams.unidade = codUnidade;
     }
     if (sort) {
-        params.sort = `${sort},${order}`;
+        queryParams.sort = `${sort},${order}`;
     }
     const response = await apiClient.get<Page<Alerta>>("/painel/alertas", {
-        params,
+        params: queryParams,
     });
     return response.data;
 }

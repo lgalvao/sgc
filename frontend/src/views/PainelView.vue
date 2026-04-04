@@ -89,31 +89,17 @@ const criterio = ref<keyof ProcessoResumo>("descricao");
 const asc = ref(true);
 
 async function buscarAlertas(
-    unidade: number,
-    page: number,
-    size: number,
-    sort?: "dataHora" | "processo",
-    order?: "asc" | "desc",
+    params: painelService.ListarParams<"dataHora" | "processo">
 ) {
-  const response = await painelService.listarAlertas(unidade, page, size, sort, order);
+  const response = await painelService.listarAlertas(params);
   alertas.value = response.content;
   alertasPage.value = response;
 }
 
 async function buscarProcessosPainel(
-    unidade: number,
-    page: number,
-    size: number,
-    sort?: keyof ProcessoResumo,
-    order?: "asc" | "desc",
+    params: painelService.ListarParams<keyof ProcessoResumo>
 ) {
-  const response = await painelService.listarProcessos(
-      unidade,
-      page,
-      size,
-      sort,
-      order,
-  );
+  const response = await painelService.listarProcessos(params);
   processosPainel.value = response?.content ?? [];
 }
 
@@ -124,18 +110,18 @@ async function carregarDados() {
   }
 
   await Promise.all([
-    buscarProcessosPainel(
-      unidadeCodigo,
-      0,
-      10,
-    ),
-    buscarAlertas(
-      unidadeCodigo,
-      0,
-      10,
-      "dataHora",
-      "desc"
-    ),
+    buscarProcessosPainel({
+      codUnidade: unidadeCodigo,
+      page: 0,
+      size: 10,
+    }),
+    buscarAlertas({
+      codUnidade: unidadeCodigo,
+      page: 0,
+      size: 10,
+      sort: "dataHora",
+      order: "desc"
+    }),
   ]);
 }
 
@@ -178,13 +164,13 @@ function ordenarPor(campo: keyof ProcessoResumo) {
     return;
   }
 
-  buscarProcessosPainel(
-      unidadeCodigo,
-      0,
-      10,
-      criterio.value,
-      asc.value ? "asc" : "desc",
-  );
+  buscarProcessosPainel({
+      codUnidade: unidadeCodigo,
+      page: 0,
+      size: 10,
+      sort: criterio.value,
+      order: asc.value ? "asc" : "desc",
+  });
 }
 
 function obterCodigoUnidadeSelecionada() {

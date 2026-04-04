@@ -195,6 +195,6 @@ describe('Relatorios.vue', () => {
             }
         }, stubs));
         await flushPromises();
-        expect(painelService.listarProcessos).toHaveBeenCalledWith(5, 0, 100);
+        expect(painelService.listarProcessos).toHaveBeenCalledWith({codUnidade: 5, page: 0, size: 100});
     });
 });

@@ -27,7 +27,7 @@ describe("painelService", () => {
             };
             mockApi.get.mockResolvedValueOnce({data: responseData});
 
-            const result = await service.listarProcessos(1);
+            const result = await service.listarProcessos({codUnidade: 1});
 
             expect(mockApi.get).toHaveBeenCalledWith("/painel/processos", {
                 params: {unidade: 1, page: 0, size: 20},
@@ -37,7 +37,7 @@ describe("painelService", () => {
 
         it("deve lidar com paginação", async () => {
             mockApi.get.mockResolvedValueOnce({data: {content: []}});
-            await service.listarProcessos(undefined, 2, 10);
+            await service.listarProcessos({page: 2, size: 10});
             expect(mockApi.get).toHaveBeenCalledWith("/painel/processos", {
                 params: {page: 2, size: 10},
             });
@@ -45,13 +45,13 @@ describe("painelService", () => {
 
         it("deve lidar com ordenação", async () => {
             mockApi.get.mockResolvedValueOnce({data: {content: []}});
-            await service.listarProcessos(undefined, 0, 10, "descricao", "desc");
+            await service.listarProcessos({page: 0, size: 10, sort: "descricao", order: "desc"});
             expect(mockApi.get).toHaveBeenCalledWith("/painel/processos", {
                 params: {page: 0, size: 10, sort: "descricao,desc"},
             });
         });
 
-        testErrorHandling(() => service.listarProcessos(1));
+        testErrorHandling(() => service.listarProcessos({codUnidade: 1}));
     });
 
     describe("listarAlertas", () => {
@@ -69,7 +69,7 @@ describe("painelService", () => {
             };
             mockApi.get.mockResolvedValueOnce({data: responseData});
 
-            const result = await service.listarAlertas(1);
+            const result = await service.listarAlertas({codUnidade: 1});
 
             expect(mockApi.get).toHaveBeenCalledWith("/painel/alertas", {
                 params: {unidade: 1, page: 0, size: 20},
@@ -79,12 +79,12 @@ describe("painelService", () => {
 
         it("deve lidar com ordenação", async () => {
             mockApi.get.mockResolvedValueOnce({data: {content: []}});
-            await service.listarAlertas(1, 0, 10, "dataHora", "asc");
+            await service.listarAlertas({codUnidade: 1, page: 0, size: 10, sort: "dataHora", order: "asc"});
             expect(mockApi.get).toHaveBeenCalledWith("/painel/alertas", {
                 params: {unidade: 1, page: 0, size: 10, sort: "dataHora,asc"},
             });
         });
 
-        testErrorHandling(() => service.listarAlertas(1));
+        testErrorHandling(() => service.listarAlertas({codUnidade: 1}));
     });
 });

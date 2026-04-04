@@ -180,7 +180,11 @@ async function carregarProcessosDisponiveis() {
     return;
   }
 
-  const response = await painelService.listarProcessos(unidadeCodigo, 0, 100);
+  const response = await painelService.listarProcessos({
+    codUnidade: unidadeCodigo,
+    page: 0,
+    size: 100
+  });
   processosDisponiveis.value = response?.content ?? [];
 }
 

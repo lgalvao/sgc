@@ -123,8 +123,8 @@ describe("PainelView.vue", () => {
 
         await wrapper.vm.$nextTick();
 
-        expect(painelService.listarProcessos).toHaveBeenCalledWith(1, 0, 10, undefined, undefined);
-        expect(painelService.listarAlertas).toHaveBeenCalledWith(1, 0, 10, "dataHora", "desc");
+        expect(painelService.listarProcessos).toHaveBeenCalledWith({codUnidade: 1, page: 0, size: 10});
+        expect(painelService.listarAlertas).toHaveBeenCalledWith({codUnidade: 1, page: 0, size: 10, sort: "dataHora", order: "desc"});
     });
 
     it("não deve carregar dados se perfil não estiver selecionado", async () => {
@@ -160,14 +160,14 @@ describe("PainelView.vue", () => {
 
         await wrapper.findComponent({name: 'TabelaProcessos'}).vm.$emit('ordenar', 'dataCriacao');
 
-        expect(painelService.listarProcessos).toHaveBeenLastCalledWith(
-            1, 0, 10, "dataCriacao", "asc"
-        );
+        expect(painelService.listarProcessos).toHaveBeenLastCalledWith({
+            codUnidade: 1, page: 0, size: 10, sort: "dataCriacao", order: "asc"
+        });
 
         await wrapper.findComponent({name: 'TabelaProcessos'}).vm.$emit('ordenar', 'dataCriacao');
-        expect(painelService.listarProcessos).toHaveBeenLastCalledWith(
-            1, 0, 10, "dataCriacao", "desc"
-        );
+        expect(painelService.listarProcessos).toHaveBeenLastCalledWith({
+            codUnidade: 1, page: 0, size: 10, sort: "dataCriacao", order: "desc"
+        });
     });
 
     it("deve navegar ao selecionar processo", async () => {
