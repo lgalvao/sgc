@@ -94,7 +94,7 @@ class SubprocessoServiceAtividadeIntegrationTest extends BaseIntegrationTest {
         atividadeRepo.save(atividadeOrigem);
     }
 
-    private void registrarMovimentacaoInicial(Subprocesso subprocesso) {
+    private void registrarMovimentacaoInicialDoTeste(Subprocesso subprocesso) {
         movimentacaoRepo.save(Movimentacao.builder()
                 .subprocesso(subprocesso)
                 .unidadeOrigem(subprocesso.getUnidade())
@@ -174,7 +174,7 @@ class SubprocessoServiceAtividadeIntegrationTest extends BaseIntegrationTest {
     void importarAtividades_SituacaoJaIniciada() {
         subprocessoDestino.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         subprocessoRepo.save(subprocessoDestino);
-        registrarMovimentacaoInicial(subprocessoDestino);
+        registrarMovimentacaoInicialDoTeste(subprocessoDestino);
 
         subprocessoService.importarAtividades(subprocessoDestino.getCodigo(), subprocessoOrigem.getCodigo(), List.of());
 

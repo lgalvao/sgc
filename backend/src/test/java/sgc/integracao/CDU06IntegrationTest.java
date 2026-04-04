@@ -97,13 +97,14 @@ class CDU06IntegrationTest extends BaseIntegrationTest {
         processo.adicionarParticipantes(Set.of(unidade));
         processoRepo.save(processo);
 
-        subprocessoRepo.save(Subprocesso.builder()
+        Subprocesso subprocesso = subprocessoRepo.save(Subprocesso.builder()
                 .processo(processo)
                 .unidade(unidade)
                 .mapa(null)
                 .situacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO)
                 .dataLimiteEtapa1(processo.getDataLimite())
                 .build());
+        registrarMovimentacaoInicial(subprocesso);
 
         mockMvc.perform(get("/api/processos/{codigo}/detalhes", processo.getCodigo()))
                 .andExpect(status().isOk())
@@ -124,13 +125,14 @@ class CDU06IntegrationTest extends BaseIntegrationTest {
     void testPodeFinalizar_true_comAdmin() throws Exception {
         processo.adicionarParticipantes(Set.of(unidade));
         processoRepo.save(processo);
-        subprocessoRepo.save(Subprocesso.builder()
+        Subprocesso subprocesso = subprocessoRepo.save(Subprocesso.builder()
                 .processo(processo)
                 .unidade(unidade)
                 .mapa(null)
                 .situacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO)
                 .dataLimiteEtapa1(processo.getDataLimite())
                 .build());
+        registrarMovimentacaoInicial(subprocesso);
 
         mockMvc.perform(get("/api/processos/{codigo}/detalhes", processo.getCodigo()))
                 .andExpect(status().isOk())
@@ -143,13 +145,14 @@ class CDU06IntegrationTest extends BaseIntegrationTest {
         processo.adicionarParticipantes(Set.of(unidade));
         processoRepo.save(processo);
         Authentication auth = setupSecurityContext(unidade, Perfil.CHEFE);
-        subprocessoRepo.save(Subprocesso.builder()
+        Subprocesso subprocesso = subprocessoRepo.save(Subprocesso.builder()
                 .processo(processo)
                 .unidade(unidade)
                 .mapa(null)
                 .situacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO)
                 .dataLimiteEtapa1(processo.getDataLimite())
                 .build());
+        registrarMovimentacaoInicial(subprocesso);
 
         mockMvc.perform(get("/api/processos/{codigo}/detalhes", processo.getCodigo()).with(authentication(auth)))
                 .andExpect(status().isOk())
@@ -162,13 +165,14 @@ class CDU06IntegrationTest extends BaseIntegrationTest {
         processo.adicionarParticipantes(Set.of(unidade));
         processoRepo.save(processo);
         Authentication auth = setupSecurityContext(unidade, Perfil.GESTOR);
-        subprocessoRepo.save(Subprocesso.builder()
+        Subprocesso subprocesso = subprocessoRepo.save(Subprocesso.builder()
                 .processo(processo)
                 .unidade(unidade)
                 .mapa(null)
                 .situacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO)
                 .dataLimiteEtapa1(processo.getDataLimite())
                 .build());
+        registrarMovimentacaoInicial(subprocesso);
 
         mockMvc.perform(get("/api/processos/{codigo}/detalhes", processo.getCodigo()).with(authentication(auth)))
                 .andExpect(status().isOk())
@@ -181,13 +185,14 @@ class CDU06IntegrationTest extends BaseIntegrationTest {
         processo.adicionarParticipantes(Set.of(unidade));
         processoRepo.save(processo);
         Authentication auth = setupSecurityContext(unidade, Perfil.GESTOR);
-        subprocessoRepo.save(Subprocesso.builder()
+        Subprocesso subprocesso = subprocessoRepo.save(Subprocesso.builder()
                 .processo(processo)
                 .unidade(unidade)
                 .mapa(null)
                 .situacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO)
                 .dataLimiteEtapa1(processo.getDataLimite())
                 .build());
+        registrarMovimentacaoInicial(subprocesso);
 
         mockMvc.perform(get("/api/processos/{codigo}/detalhes", processo.getCodigo()).with(authentication(auth)))
                 .andExpect(status().isOk())
@@ -208,7 +213,8 @@ class CDU06IntegrationTest extends BaseIntegrationTest {
                 .situacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO)
                 .dataLimiteEtapa1(processo.getDataLimite())
                 .build();
-        subprocessoRepo.save(subprocesso);
+        subprocesso = subprocessoRepo.save(subprocesso);
+        registrarMovimentacaoInicial(subprocesso);
 
         mockMvc.perform(get("/api/processos/{codigo}/detalhes", processo.getCodigo()))
                 .andExpect(status().isOk())

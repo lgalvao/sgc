@@ -55,6 +55,7 @@ class CDU19IntegrationTest extends BaseIntegrationTest {
         subprocesso.setCodigo(null);
         subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO);
         subprocesso = subprocessoRepo.save(subprocesso);
+        registrarMovimentacaoInicial(subprocesso);
 
         Mapa mapa = MapaFixture.mapaPadrao(subprocesso);
         mapa.setCodigo(null);
@@ -92,7 +93,7 @@ class CDU19IntegrationTest extends BaseIntegrationTest {
             List<Movimentacao> movimentacoes =
                     movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(
                             subprocesso.getCodigo());
-            assertThat(movimentacoes).hasSize(1);
+            assertThat(movimentacoes).hasSize(2);
             assertThat(movimentacoes.getFirst().getDescricao())
                     .isEqualTo("Sugestões apresentadas para o mapa de competências");
 
@@ -129,7 +130,7 @@ class CDU19IntegrationTest extends BaseIntegrationTest {
             List<Movimentacao> movimentacoes =
                     movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(
                             subprocesso.getCodigo());
-            assertThat(movimentacoes).hasSize(1);
+            assertThat(movimentacoes).hasSize(2);
             assertThat(movimentacoes.getFirst().getDescricao())
                     .isEqualTo("Validação do mapa de competências");
             assertThat(movimentacoes.getFirst().getUnidadeOrigem().getSigla())

@@ -415,6 +415,9 @@ VALUES ('1700', 1700, 8, 'REVISAO_CADASTRO_HOMOLOGADA', '2025-12-31 23:59:59');
 
 INSERT INTO SGC.MAPA (codigo, subprocesso_codigo)
 VALUES (1700, 1700);
+INSERT INTO SGC.MOVIMENTACAO (codigo, subprocesso_codigo, usuario_titulo, descricao, data_hora, unidade_origem_codigo,
+                              unidade_destino_codigo)
+VALUES ('81700', 1700, '111111111111', 'Movimentação inicial do seed', CURRENT_TIMESTAMP, 8, 8);
 
 INSERT INTO SGC.ATIVIDADE (codigo, mapa_codigo, descricao)
 VALUES ('17001', 1700, 'Atividade Teste CDU-17');
@@ -446,6 +449,9 @@ VALUES ('60002', 50001, 9, 'DIAGNOSTICO_CONCLUIDO', CURRENT_TIMESTAMP);
 
 INSERT INTO SGC.MAPA (codigo, subprocesso_codigo)
 VALUES (1002, 60002);
+INSERT INTO SGC.MOVIMENTACAO (codigo, subprocesso_codigo, usuario_titulo, descricao, data_hora, unidade_origem_codigo,
+                              unidade_destino_codigo)
+VALUES ('86002', 60002, '111111111111', 'Movimentação inicial do seed', CURRENT_TIMESTAMP, 9, 9);
 
 INSERT INTO SGC.COMPETENCIA (codigo, mapa_codigo, descricao)
 VALUES ('10003', 1002, 'Análise de Dados');
@@ -462,6 +468,9 @@ VALUES ('60003', 50002, 10, 'MAPEAMENTO_MAPA_HOMOLOGADO', CURRENT_TIMESTAMP);
 
 INSERT INTO SGC.MAPA (codigo, subprocesso_codigo)
 VALUES (1003, 60003);
+INSERT INTO SGC.MOVIMENTACAO (codigo, subprocesso_codigo, usuario_titulo, descricao, data_hora, unidade_origem_codigo,
+                              unidade_destino_codigo)
+VALUES ('86003', 60003, '111111111111', 'Movimentação inicial do seed', CURRENT_TIMESTAMP, 10, 10);
 
 INSERT INTO SGC.COMPETENCIA (codigo, mapa_codigo, descricao)
 VALUES ('10005', 1003, 'Segurança da Informação');
@@ -478,6 +487,9 @@ VALUES ('60004', 50002, 102, 'MAPEAMENTO_MAPA_HOMOLOGADO', CURRENT_TIMESTAMP);
 
 INSERT INTO SGC.MAPA (codigo, subprocesso_codigo)
 VALUES (1004, 60004);
+INSERT INTO SGC.MOVIMENTACAO (codigo, subprocesso_codigo, usuario_titulo, descricao, data_hora, unidade_origem_codigo,
+                              unidade_destino_codigo)
+VALUES ('86004', 60004, '111111111111', 'Movimentação inicial do seed', CURRENT_TIMESTAMP, 102, 102);
 
 INSERT INTO SGC.COMPETENCIA (codigo, mapa_codigo, descricao)
 VALUES ('10007', 1004, 'Gestão Administrativa');
@@ -499,6 +511,9 @@ VALUES ('60201', 50002, 201, 'MAPEAMENTO_MAPA_HOMOLOGADO', CURRENT_TIMESTAMP);
 
 INSERT INTO SGC.MAPA (codigo, subprocesso_codigo)
 VALUES (201, 60201);
+INSERT INTO SGC.MOVIMENTACAO (codigo, subprocesso_codigo, usuario_titulo, descricao, data_hora, unidade_origem_codigo,
+                              unidade_destino_codigo)
+VALUES ('86201', 60201, '111111111111', 'Movimentação inicial do seed', CURRENT_TIMESTAMP, 201, 201);
 
 INSERT INTO SGC.COMPETENCIA (codigo, mapa_codigo, descricao)
 VALUES ('20001', 201, 'Gestão Administrativa');

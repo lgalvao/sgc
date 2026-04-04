@@ -97,6 +97,7 @@ class SubprocessoFluxoIntegrationTest extends BaseIntegrationTest {
                 .processo(processo)
                 .build();
         subprocessoRepo.save(subprocesso);
+        registrarMovimentacaoInicial(subprocesso);
 
         Mapa mapa = new Mapa();
         mapa.setSubprocesso(subprocesso);

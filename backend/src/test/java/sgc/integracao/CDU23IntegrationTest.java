@@ -77,12 +77,14 @@ class CDU23IntegrationTest extends BaseIntegrationTest {
         subprocesso1.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
         subprocesso1.setDataLimiteEtapa1(LocalDateTime.now().plusDays(10));
         subprocesso1 = subprocessoRepo.save(subprocesso1);
+        registrarMovimentacaoInicial(subprocesso1);
 
         subprocesso2 = SubprocessoFixture.subprocessoPadrao(processo, unidade2);
         subprocesso2.setCodigo(null);
         subprocesso2.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
         subprocesso2.setDataLimiteEtapa1(LocalDateTime.now().plusDays(10));
         subprocesso2 = subprocessoRepo.save(subprocesso2);
+        registrarMovimentacaoInicial(subprocesso2);
 
         entityManager.flush();
         entityManager.clear();

@@ -10,6 +10,7 @@ import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
 import sgc.processo.model.*;
 import sgc.subprocesso.model.*;
+import sgc.subprocesso.service.*;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -25,6 +26,7 @@ class SgcPermissionEvaluatorCoverageTest {
     @Mock private MapaRepo mapaRepo;
     @Mock private AtividadeRepo atividadeRepo;
     @Mock private HierarquiaService hierarquiaService;
+    @Mock private LocalizacaoSubprocessoService localizacaoSubprocessoService;
     @Mock private Authentication authentication;
 
     @InjectMocks
@@ -370,19 +372,24 @@ class SgcPermissionEvaluatorCoverageTest {
     }
 
     @Test
-    @DisplayName("obterUnidadeLocalizacao: deve usar unidade quando subprocesso não persistido")
-    void obterUnidadeLocalizacaoDeveUsarUnidadeQuandoSubprocessoNaoPersistido() {
+    @DisplayName("verificarPermissao: deve usar localizacao derivada quando a acao depende de escrita")
+    void verificarPermissaoDeveUsarLocalizacaoDerivada() {
         Subprocesso sp = new Subprocesso();
-        sp.setCodigo(null);
-        Unidade unidade = Unidade.builder().codigo(5L).build();
-        sp.setUnidade(unidade);
+        Unidade unidadeResponsavel = Unidade.builder().codigo(5L).build();
+        Unidade unidadeAtual = Unidade.builder().codigo(6L).build();
+        sp.setCodigo(10L);
+        sp.setUnidade(unidadeResponsavel);
+        sp.setProcesso(Processo.builder().situacao(SituacaoProcesso.EM_ANDAMENTO).build());
 
-        Unidade localizacao = org.springframework.test.util.ReflectionTestUtils.invokeMethod(
-                evaluator,
-                "obterUnidadeLocalizacao",
-                sp
-        );
-        assertThat(localizacao).isEqualTo(unidade);
+        Usuario usuario = Usuario.builder()
+                .perfilAtivo(Perfil.CHEFE)
+                .unidadeAtivaCodigo(6L)
+                .build();
+
+        when(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).thenReturn(unidadeAtual);
+
+        assertThat(evaluator.verificarPermissao(usuario, sp, AcaoPermissao.EDITAR_CADASTRO)).isTrue();
+        verify(localizacaoSubprocessoService).obterLocalizacaoAtual(sp);
     }
 
     @Test

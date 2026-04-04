@@ -51,6 +51,21 @@ class SubprocessoServiceCoverageIntegrationTest {
 
     @Autowired
     private MapaRepo mapaRepo;
+    @Autowired
+    private MovimentacaoRepo movimentacaoRepo;
+    @Autowired
+    private UsuarioRepo usuarioRepo;
+
+    private void registrarMovimentacaoInicial(Subprocesso subprocesso) {
+        Usuario usuario = usuarioRepo.findById("111111111111").orElseThrow();
+        movimentacaoRepo.save(Movimentacao.builder()
+                .subprocesso(subprocesso)
+                .unidadeOrigem(subprocesso.getUnidade())
+                .unidadeDestino(subprocesso.getUnidade())
+                .usuario(usuario)
+                .descricao("Movimentação inicial de teste")
+                .build());
+    }
 
     private Processo criarProcessoPersistido() {
         Processo processo = new Processo();
@@ -95,6 +110,7 @@ class SubprocessoServiceCoverageIntegrationTest {
             sp.setUnidade(u);
             sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
             sp = subprocessoRepo.saveAndFlush(sp);
+            registrarMovimentacaoInicial(sp);
 
             subprocessoService.excluir(sp.getCodigo());
 
@@ -156,6 +172,7 @@ class SubprocessoServiceCoverageIntegrationTest {
             sp.setUnidade(u);
             sp.setSituacaoForcada(SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
             sp = subprocessoRepo.saveAndFlush(sp);
+            registrarMovimentacaoInicial(sp);
 
             Mapa mapa = new Mapa();
             mapa.setSubprocesso(sp);
@@ -190,6 +207,7 @@ class SubprocessoServiceCoverageIntegrationTest {
             sp.setUnidade(u);
             sp.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
             sp = subprocessoRepo.saveAndFlush(sp);
+            registrarMovimentacaoInicial(sp);
 
             Mapa mapa = new Mapa();
             mapa.setSubprocesso(sp);
@@ -224,6 +242,7 @@ class SubprocessoServiceCoverageIntegrationTest {
             sp.setUnidade(u);
             sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
             sp = subprocessoRepo.saveAndFlush(sp);
+            registrarMovimentacaoInicial(sp);
 
             java.util.List<Subprocesso> lista = consultaService.listarPorProcessoESituacoes(proc.getCodigo(), java.util.List.of(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO));
             assertThat(lista).hasSize(1);
@@ -250,6 +269,7 @@ class SubprocessoServiceCoverageIntegrationTest {
             sp.setUnidade(u);
             sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
             sp = subprocessoRepo.saveAndFlush(sp);
+            registrarMovimentacaoInicial(sp);
 
             java.util.List<Subprocesso> lista = consultaService.listarPorProcessoUnidadeESituacoes(proc.getCodigo(), u.getCodigo(), java.util.List.of(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO));
             assertThat(lista).hasSize(1);
@@ -277,6 +297,7 @@ class SubprocessoServiceCoverageIntegrationTest {
             sp.setUnidade(u);
             sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
             sp = subprocessoRepo.saveAndFlush(sp);
+            registrarMovimentacaoInicial(sp);
 
             Mapa mapaAntigo = criarMapaParaSubprocesso(sp);
             sp.setMapa(mapaAntigo);
@@ -288,6 +309,7 @@ class SubprocessoServiceCoverageIntegrationTest {
             spOutro.setUnidade(u);
             spOutro.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
             spOutro = subprocessoRepo.saveAndFlush(spOutro);
+            registrarMovimentacaoInicial(spOutro);
 
             Mapa mapaNovo = criarMapaParaSubprocesso(spOutro);
 
@@ -316,6 +338,7 @@ class SubprocessoServiceCoverageIntegrationTest {
             sp.setUnidade(u);
             sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
             sp = subprocessoRepo.saveAndFlush(sp);
+            registrarMovimentacaoInicial(sp);
 
             Mapa mapaAntigo = criarMapaParaSubprocesso(sp);
             sp.setMapa(mapaAntigo);
@@ -351,6 +374,7 @@ class SubprocessoServiceCoverageIntegrationTest {
             sp.setUnidade(u);
             sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
             sp = subprocessoRepo.saveAndFlush(sp);
+            registrarMovimentacaoInicial(sp);
 
             Mapa mapa = new Mapa();
             mapa.setSubprocesso(sp);
@@ -412,6 +436,7 @@ class SubprocessoServiceCoverageIntegrationTest {
             spOrigem.setUnidade(u);
             spOrigem.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
             spOrigem = subprocessoRepo.saveAndFlush(spOrigem);
+            registrarMovimentacaoInicial(spOrigem);
 
             Mapa mapaOrigem = new Mapa();
             mapaOrigem.setSubprocesso(spOrigem);

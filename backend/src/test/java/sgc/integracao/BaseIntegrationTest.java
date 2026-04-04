@@ -51,6 +51,10 @@ public abstract class BaseIntegrationTest {
     @Autowired
     protected MapaRepo mapaRepo;
     @Autowired
+    protected MovimentacaoRepo movimentacaoRepo;
+    @Autowired
+    protected UsuarioRepo usuarioRepo;
+    @Autowired
     private WebApplicationContext context;
 
     @BeforeEach
@@ -85,6 +89,17 @@ public abstract class BaseIntegrationTest {
             }
         }
         return false;
+    }
+
+    protected Movimentacao registrarMovimentacaoInicial(Subprocesso subprocesso) {
+        Usuario usuario = usuarioRepo.findById("111111111111").orElseThrow();
+        return movimentacaoRepo.save(Movimentacao.builder()
+                .subprocesso(subprocesso)
+                .unidadeOrigem(subprocesso.getUnidade())
+                .unidadeDestino(subprocesso.getUnidade())
+                .usuario(usuario)
+                .descricao("Movimentação inicial de teste")
+                .build());
     }
 
     private String extrairHtmlDaMensagem(Part part) throws Exception {

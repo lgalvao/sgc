@@ -106,6 +106,7 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
                 .processo(processoOrigem)
                 .build();
         subprocessoRepo.save(subprocessoOrigem);
+        registrarMovimentacaoInicial(subprocessoOrigem);
 
         Mapa mapaOrigem = new Mapa();
         mapaOrigem.setSubprocesso(subprocessoOrigem);
@@ -137,6 +138,7 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
                 .processo(processoDestino)
                 .build();
         subprocessoRepo.save(subprocessoDestino);
+        registrarMovimentacaoInicial(subprocessoDestino);
 
         Mapa mapa = new Mapa();
         mapa.setSubprocesso(subprocessoDestino);
@@ -202,7 +204,7 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
             List<Movimentacao> movimentacoes =
                     movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(
                             subprocessoDestino.getCodigo());
-            assertThat(movimentacoes).hasSize(1);
+            assertThat(movimentacoes).hasSize(2);
             assertThat(movimentacoes.getFirst().getDescricao()).contains("Importação de atividades do subprocesso #" + subprocessoOrigem.getCodigo());
         }
 

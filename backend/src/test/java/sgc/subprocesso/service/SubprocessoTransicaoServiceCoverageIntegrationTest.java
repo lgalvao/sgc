@@ -44,6 +44,8 @@ class SubprocessoTransicaoServiceCoverageIntegrationTest {
 
     @Autowired
     private UsuarioRepo usuarioRepo;
+    @Autowired
+    private MovimentacaoRepo movimentacaoRepo;
 
     @MockitoBean
     private SubprocessoValidacaoService validacaoService;
@@ -85,6 +87,17 @@ class SubprocessoTransicaoServiceCoverageIntegrationTest {
         Usuario usuario = usuarioRepo.getReferenceById("111111111111");
         usuario.setUnidadeAtivaCodigo(unidade.getCodigo());
         return usuario;
+    }
+
+    private void registrarMovimentacaoInicial(Subprocesso subprocesso) {
+        Usuario usuario = usuarioRepo.getReferenceById("111111111111");
+        movimentacaoRepo.save(Movimentacao.builder()
+                .subprocesso(subprocesso)
+                .unidadeOrigem(subprocesso.getUnidade())
+                .unidadeDestino(subprocesso.getUnidade())
+                .usuario(usuario)
+                .descricao("Movimentação inicial de teste")
+                .build());
     }
 
     @Nested
@@ -152,6 +165,7 @@ class SubprocessoTransicaoServiceCoverageIntegrationTest {
             sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
             sp.setDataLimiteEtapa1(LocalDateTime.now().plusDays(30));
             sp = subprocessoRepo.save(sp);
+            registrarMovimentacaoInicial(sp);
 
             java.time.LocalDate novaData = java.time.LocalDate.now().plusDays(30);
             transicaoService.alterarDataLimite(sp.getCodigo(), novaData);
@@ -175,6 +189,7 @@ class SubprocessoTransicaoServiceCoverageIntegrationTest {
             sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO);
             sp.setDataLimiteEtapa1(LocalDateTime.now().plusDays(30));
             sp = subprocessoRepo.save(sp);
+            registrarMovimentacaoInicial(sp);
 
             java.time.LocalDate novaData = java.time.LocalDate.now().plusDays(30);
             transicaoService.alterarDataLimite(sp.getCodigo(), novaData);
@@ -232,6 +247,7 @@ class SubprocessoTransicaoServiceCoverageIntegrationTest {
             sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
             sp.setDataLimiteEtapa1(LocalDateTime.now().plusDays(30));
             sp = subprocessoRepo.saveAndFlush(sp);
+            registrarMovimentacaoInicial(sp);
 
             Mapa mapa = new Mapa();
             mapa.setSugestoes("Sugestoes");
@@ -279,6 +295,7 @@ class SubprocessoTransicaoServiceCoverageIntegrationTest {
             sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
             sp.setDataLimiteEtapa1(LocalDateTime.now().plusDays(1));
             sp = subprocessoRepo.saveAndFlush(sp);
+            registrarMovimentacaoInicial(sp);
 
             Mapa mapa = new Mapa();
             mapa.setSugestoes(null);
@@ -325,6 +342,7 @@ class SubprocessoTransicaoServiceCoverageIntegrationTest {
             sp.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
             sp.setDataLimiteEtapa1(LocalDateTime.now().plusDays(30));
             sp = subprocessoRepo.saveAndFlush(sp);
+            registrarMovimentacaoInicial(sp);
 
             Mapa mapa = new Mapa();
             mapa.setSugestoes(null);
@@ -368,6 +386,7 @@ class SubprocessoTransicaoServiceCoverageIntegrationTest {
             sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
             sp.setDataLimiteEtapa1(LocalDateTime.now().plusDays(30));
             sp = subprocessoRepo.saveAndFlush(sp);
+            registrarMovimentacaoInicial(sp);
 
             Mapa mapa = new Mapa();
             mapa.setSugestoes(null);
@@ -412,6 +431,7 @@ class SubprocessoTransicaoServiceCoverageIntegrationTest {
             sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
             sp.setDataLimiteEtapa1(LocalDateTime.now().plusDays(30));
             sp = subprocessoRepo.saveAndFlush(sp);
+            registrarMovimentacaoInicial(sp);
 
             Mapa mapa = new Mapa();
             mapa.setSugestoes(null);
