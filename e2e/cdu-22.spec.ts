@@ -109,8 +109,7 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
     test('Cenario 5: Aceite em bloco registra movimentação e alerta com data/hora', async ({
         _resetAutomatico,
         request,
-        page,
-        _autenticadoComoGestorCoord22: _
+        page
     }) => {
         // Reseta o banco para evitar conflito com unidade já em processo ativo dos cenários anteriores
         await resetDatabase(request);

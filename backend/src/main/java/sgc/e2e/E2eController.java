@@ -5,6 +5,7 @@ import jakarta.annotation.*;
 import lombok.*;
 import lombok.extern.slf4j.*;
 import org.jspecify.annotations.Nullable;
+import org.springframework.cache.*;
 import org.springframework.boot.autoconfigure.condition.*;
 import org.springframework.context.annotation.*;
 import org.springframework.core.io.*;
@@ -53,6 +54,7 @@ public class E2eController {
     private final UnidadeService unidadeService;
     private final UsuarioFacade usuarioFacade;
     private final ResourceLoader resourceLoader;
+    private final CacheManager cacheManager;
 
     @PostConstruct
     public void validarAmbienteE2e() {
@@ -85,11 +87,22 @@ public class E2eController {
 
         try (Connection conn = dataSource.getConnection()) {
             executeDatabaseReset(conn);
-            log.info("Reset do banco de dados concluído.");
+            limparCaches();
+            log.info("Reset do banco de dados e caches concluído.");
         } catch (Exception e) {
             log.error("Erro crítico ao resetar banco de dados", e);
             throw new ErroConfiguracao("Falha no reset do banco: %s".formatted(e.getMessage()));
         }
+    }
+
+    private void limparCaches() {
+        cacheManager.getCacheNames().forEach(cacheName -> {
+            Cache cache = cacheManager.getCache(cacheName);
+            if (cache != null) {
+                cache.clear();
+            }
+        });
+        log.info("Todos os caches de aplicação foram limpos.");
     }
 
     private void executeDatabaseReset(Connection conn) throws Exception {
@@ -284,6 +297,7 @@ public class E2eController {
         // Tornar mapa vigente na unidade
         jdbcTemplate.update("DELETE FROM sgc.unidade_mapa WHERE unidade_codigo = ?", codUnidade);
         jdbcTemplate.update("INSERT INTO sgc.unidade_mapa (unidade_codigo, mapa_vigente_codigo) VALUES (?, ?)", codUnidade, codMapa);
+        limparCaches();
 
         return processoService.buscarPorCodigo(codProcesso);
     }
@@ -415,6 +429,7 @@ public class E2eController {
         jdbcTemplate.update("DELETE FROM sgc.unidade_mapa WHERE unidade_codigo = ?", unidade.getCodigo());
         jdbcTemplate.update("INSERT INTO sgc.unidade_mapa (unidade_codigo, mapa_vigente_codigo) VALUES (?, ?)",
                 unidade.getCodigo(), codMapaVigente);
+        limparCaches();
 
         ProcessoFixtureRequest requestRevisao = ProcessoFixtureRequest.iniciado(
                 request.descricao(),
@@ -592,6 +607,7 @@ public class E2eController {
         jdbcTemplate.update("DELETE FROM sgc.unidade_mapa WHERE unidade_codigo = ?", unidade.getCodigo());
         jdbcTemplate.update("INSERT INTO sgc.unidade_mapa (unidade_codigo, mapa_vigente_codigo) VALUES (?, ?)",
                 unidade.getCodigo(), codMapaVigente);
+        limparCaches();
 
         ProcessoFixtureRequest requestRevisao = ProcessoFixtureRequest.iniciado(
                 request.descricao(),
