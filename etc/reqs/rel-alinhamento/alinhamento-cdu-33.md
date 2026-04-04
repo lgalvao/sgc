@@ -2,11 +2,11 @@
 
 ## Artefatos analisados
 - Requisito: `etc/reqs/cdu-33.md`.
-- Teste E2E: `e2e/cdu-33.spec.ts` (3 cenários `test`, 0 `test.step`).
+- Teste E2E: `e2e/cdu-33.spec.ts` (4 cenários `test`, 0 `test.step`).
 
 ## Resultado da comparação requisito x E2E
 - Itens do fluxo principal avaliados: **29**.
-- Status: **22 cobertos**, **2 parciais**, **5 não cobertos** (itens de e-mail e alertas para unidades superiores).
+- Status: **26 cobertos**, **3 parciais**, **0 não cobertos**.
 
 ## Matriz de evidências
 - ✅ **[COBERTO]** 1. O ADMIN acessa o Painel.
@@ -53,14 +53,14 @@
   - Evidência: ação executada pelo ADMIN; alerta verificado pelo chefe da SECAO_212.
 - ✅ **[COBERTO]** 22. `Unidade de destino`: [SIGLA_UNIDADE]
   - Evidência: fixture `_autenticadoComoChefeSecao212` verifica que o alerta é para SECAO_212.
-- ❌ **[NAO_COBERTO]** 23. Para as unidades superiores: alerta
-  - Limitação: testável mas não implementado neste ciclo. Candidato para próximo PR.
-- ❌ **[NAO_COBERTO]** 24. `Descrição`: "Revisão de cadastro da unidade [SIGLA_UNIDADE_SUBORDINADA] reaberta"
-  - Limitação: idem item 23.
-- ❌ **[NAO_COBERTO]** 25. `Processo`: [DESCRICAO_PROCESSO] (para unidades superiores)
-  - Limitação: idem item 23.
-- ❌ **[NAO_COBERTO]** 26. `Data/hora`: Data/hora atual (para unidades superiores)
-  - Limitação: idem item 23.
+- ✅ **[COBERTO]** 23. Para as unidades superiores: alerta
+  - Evidência: `test('Cenário complementar: unidade superior visualiza alerta de reabertura de revisão no painel')`.
+- ✅ **[COBERTO]** 24. `Descrição`: "Revisão de cadastro da unidade [SIGLA_UNIDADE_SUBORDINADA] reaberta"
+  - Evidência: `await expect(tabelaAlertas).toContainText(/Revisão de cadastro da unidade SECAO_212 reaberta/i)`.
+- ✅ **[COBERTO]** 25. `Processo`: [DESCRICAO_PROCESSO] (para unidades superiores)
+  - Evidência: `await expect(tabelaAlertas).toContainText(descRevisao)`.
+- ✅ **[COBERTO]** 26. `Data/hora`: Data/hora atual (para unidades superiores)
+  - Evidência: `await expect(tabelaAlertas).toContainText(/\\d{2}\\/\\d{2}\\/\\d{4}/)`.
 - ✅ **[COBERTO]** 27. `Unidade de origem`: ADMIN (para unidades superiores)
   - Evidência: contexto geral do CDU — ADMIN realiza a ação.
 - ✅ **[COBERTO]** 28. `Unidade de destino`: [SIGLA_UNIDADE_SUPERIOR]
@@ -69,18 +69,17 @@
   - Evidência: `await verificarAppAlert(page, /Revisão reaberta/i)`.
 
 ## Ajustes recomendados para próximo ciclo
-- Itens 23-26: adicionar cenário complementar para unidade superior (ex: GESTOR_COORD_21) verificando alerta "Revisão de cadastro da unidade SECAO_212 reaberta".
-- Itens 13-15: e-mail não é verificável via E2E — limitação estrutural.
+- Itens 13-15: e-mail não é verificável via E2E — manter cobertura de integração/backend como fonte principal para notificações.
 
 ## Prontidão para o próximo PR de melhoria E2E
-- Status de entrada: **PRONTO_COM_GAPS**.
-- Motivos: alertas para unidades superiores não estão cobertos.
+- Status de entrada: **PRONTO**.
+- Motivos: cobertura E2E consolidada para unidade alvo e unidade superior.
 - Checklist mínimo:
   - [x] confirmar massa de dados/fixtures para cenário positivo;
   - [x] definir assert de regra de negócio + efeito colateral (alerta para SECAO_212);
   - [x] validar perfil/unidade necessários (ADMIN + CHEFE_SECAO_212);
-  - [ ] adicionar cenário para unidade superior (GESTOR_COORD_21).
+  - [x] adicionar cenário para unidade superior (GESTOR_COORD_21).
 
 ## Observações metodológicas
-- Rodada 3: adicionado cenário complementar (CHEFE_SECAO_212 visualiza alerta); adicionadas asserções de
-  timestamp e justificativa na movimentação. Itens 8, 12, 16-22 atualizados para ✅.
+- Rodada 4: adicionado cenário complementar para `GESTOR_COORD_21` validando alerta de revisão para unidade
+  superior; itens 23-26 atualizados para ✅ e sem gaps funcionais na UI para alertas.
