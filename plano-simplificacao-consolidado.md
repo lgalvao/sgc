@@ -558,3 +558,103 @@ Na sequência, a redundância remanescente mais direta estava em duas leituras c
 * **Risco principal observado:** regressão discreta no mapa de ajuste por troca indireta de ordem entre leitura da análise mais recente e coleta de competências/atividades/conhecimentos.
 * **Validação executada:** `./gradlew :backend:test --tests "sgc.subprocesso.service.SubprocessoConsultaServiceExtraCoverageTest" --tests "sgc.subprocesso.service.SubprocessoServiceCoverageIntegrationTest"`.
 * **Pendência aberta para próxima rodada:** medir se a Frente 2 já chegou ao ponto de rendimento decrescente e, se sim, preparar a transição para a Frente 3 em `SubprocessoService`, especialmente nos fluxos de criação e importação.
+
+### Abertura da Frente 3 em importação de atividades
+
+Com a Frente 2 já em rendimento decrescente, o próximo corte seguro passou a ser o fluxo de `importarAtividades` em `SubprocessoService`. O método concentrava busca de origem/destino, validação de situação, checagem de permissões, resolução de mapas, atualização de situação e registro de movimentação no mesmo bloco. A abertura da Frente 3 começou por separar essas responsabilidades em helpers privados pequenos e por explicitar um contexto interno de importação, sem alterar assinatura pública nem mensagens de negócio.
+
+### Resultado objetivo da abertura da Frente 3
+
+`importarAtividades` passou a operar sobre um `ImportacaoAtividadesContexto`, montado depois da validação de situação permitida e das permissões de origem/destino. A atualização de situação pós-importação e o registro de movimentação saíram do corpo principal do método, deixando a ordem de validação mais legível e a costura do fluxo mais estável para próximas simplificações em criação e revisão de subprocessos.
+
+### Registro da abertura da Frente 3
+
+* **Data da rodada:** 2026-04-04
+* **Frente principal:** Frente 3 — Simplificação de fluxos concentrados em `SubprocessoService`
+* **Arquivo(s) alvo:** `backend/src/main/java/sgc/subprocesso/service/SubprocessoService.java`, `plano-simplificacao-consolidado.md`
+* **Corte aplicado:** extração de contexto interno e helpers privados para `importarAtividades`, isolando validação, atualização de situação e histórico de movimentação.
+* **Risco principal observado:** mascarar a ordem funcional de falhas entre situação inválida, ausência de permissão no destino e ausência de permissão na origem.
+* **Validação executada:** `./gradlew --no-configuration-cache :backend:test --tests "sgc.subprocesso.service.SubprocessoServiceExtraCoverageTest"` e `./gradlew --no-configuration-cache :backend:test --tests "sgc.integracao.SubprocessoServiceAtividadeIntegrationTest"`.
+* **Pendência aberta para próxima rodada:** atacar a duplicação remanescente entre criação para mapeamento/revisão/diagnóstico, especialmente a costura entre subprocesso, mapa e movimentação inicial.
+
+### Baseline de métricas da simplificação
+
+Para evitar que a simplificação vire percepção subjetiva, foi definido um baseline pequeno e comparável entre rodadas. A ideia não é montar um painel grande agora, mas manter métricas suficientes para detectar redução real de superfície, acoplamento e duplicação de regra.
+
+### Métricas-base escolhidas
+
+* **Tamanho da classe:** linhas totais por classe alvo.
+* **Superfície pública:** quantidade de métodos públicos.
+* **Acoplamento direto:** quantidade de dependências injetadas (`private final`).
+* **Complexidade aproximada de métodos críticos:** contagem simples de pontos de decisão visíveis (`if`, `switch`, `case`, operadores booleanos encadeados e loops relevantes), usada apenas como régua comparativa entre rodadas.
+* **Ponto único de regra crítica:** quantidade de lugares que realmente recalculam uma regra sensível de domínio, mesmo que existam wrappers finos.
+
+### Baseline atual em 2026-04-04
+
+* `SubprocessoConsultaService`: 554 linhas, 35 métodos públicos, 11 dependências injetadas.
+* `SubprocessoService`: 477 linhas, 14 métodos públicos, 11 dependências injetadas.
+* `LocalizacaoSubprocessoService`: 36 linhas, 1 método público, 1 dependência injetada.
+
+### Métodos críticos observados no baseline
+
+* `SubprocessoConsultaService.obterContextoEdicao`: baixo desvio de fluxo; hoje funciona mais como adaptador fino para `DadosContextoEdicao`.
+* `SubprocessoConsultaService.montarContextoConsulta`: complexidade aproximada baixa para média; concentra as decisões de processo finalizado, mesma unidade e mapa vigente.
+* `SubprocessoConsultaService.obterPermissoesUI`: baixo desvio de fluxo no método público, mas ainda depende de blocos internos com alta densidade de regra em `construirPermissoes`.
+* `SubprocessoService.importarAtividades`: baixo desvio de fluxo no método público após a extração do contexto interno; a complexidade foi deslocada para helpers menores e nomeados.
+* `SubprocessoService.atualizarSituacaoDestinoAposImportacao`: complexidade aproximada média; concentra `if` inicial e `switch` por tipo de processo.
+* `SubprocessoService.criarParaMapeamento`: complexidade aproximada média; ainda mistura filtragem elegível, persistência em lote, associação de mapa e criação de movimentação inicial.
+* `SubprocessoService.criarSubprocessoComMapa`: complexidade aproximada baixa, mas já concentra a costura de subprocesso, cópia de mapa e movimentação inicial para revisão/diagnóstico.
+* `LocalizacaoSubprocessoService.obterLocalizacaoAtual`: complexidade aproximada baixa; hoje existe um único cálculo real da localização derivada, com guarda explícita para subprocesso persistido sem movimentação fora de `NAO_INICIADO`.
+
+### Leitura objetiva do baseline
+
+* O principal hotspot atual de superfície continua sendo `SubprocessoConsultaService`, não por um método isolado muito longo, mas pela combinação de API pública larga com regra de permissão concentrada.
+* `SubprocessoService` já está abaixo de `SubprocessoConsultaService` em tamanho bruto, mas ainda mistura criação, edição, ajustes e importação no mesmo service.
+* A regra crítica de localização está consolidada em um único cálculo real, o que reduz um risco arquitetural que antes não aparecia só por contagem de linhas.
+
+### Como comparar as próximas rodadas
+
+* Recoletar essas mesmas métricas sempre que uma frente mover responsabilidade relevante.
+* Considerar ganho real quando houver pelo menos um destes efeitos:
+* queda de linhas na classe alvo sem aumento equivalente em outra classe irmã;
+* queda de métodos públicos ou da quantidade de dependências injetadas;
+* redução da complexidade aparente do método-alvo por extração legítima, e não só por empurrar branch para helper genérico;
+* redução de pontos reais de cálculo da mesma regra de domínio.
+
+### Continuação da Frente 3 em criação inicial de subprocesso
+
+Depois da abertura por `importarAtividades`, a duplicação mais direta de `SubprocessoService` continuou no bloco de criação inicial. `criarParaMapeamento` ainda montava manualmente subprocesso base, associação de mapa e movimentação inicial, enquanto revisão e diagnóstico usavam outra costura privada para subprocesso, cópia de mapa e histórico. O corte aplicado foi novamente interno: explicitar helpers pequenos para subprocesso inicial, movimentação inicial, mapa vigente obrigatório e associação de mapas em lote.
+
+### Resultado objetivo da continuação em criação
+
+`criarParaMapeamento`, `criarParaRevisao` e `criarParaDiagnostico` continuam semanticamente distintos, mas agora compartilham as mesmas operações elementares de criação de subprocesso e histórico inicial. Isso reduz duplicação de montagem e deixa mais visível o que realmente difere entre os fluxos: criação de mapa vazio em lote para mapeamento versus cópia de mapa vigente para revisão/diagnóstico.
+
+### Registro da continuação da Frente 3
+
+* **Data da rodada:** 2026-04-04
+* **Frente principal:** Frente 3 — Simplificação de fluxos concentrados em `SubprocessoService`
+* **Arquivo(s) alvo:** `backend/src/main/java/sgc/subprocesso/service/SubprocessoService.java`, `plano-simplificacao-consolidado.md`
+* **Corte aplicado:** extração de helpers privados para subprocesso inicial, movimentação inicial, mapa vigente obrigatório e associação de mapas aos subprocessos salvos.
+* **Risco principal observado:** regressão discreta na costura entre subprocesso salvo, mapa associado e movimentação inicial, principalmente na diferença entre mapa vazio de mapeamento e cópia de mapa para revisão/diagnóstico.
+* **Validação executada:** `./gradlew --no-configuration-cache :backend:test --tests "sgc.subprocesso.service.SubprocessoServiceExtraCoverageTest"` e `./gradlew --no-configuration-cache :backend:test --tests "sgc.subprocesso.service.SubprocessoServiceCoverageIntegrationTest"`.
+* **Observação de ambiente:** `./gradlew --no-configuration-cache :backend:test --tests "sgc.subprocesso.service.SubprocessoServiceTest"` executou `9/9` testes com sucesso, mas o Gradle falhou depois ao gravar artefato em `backend/build/test-results`, sem indício de regressão funcional no recorte.
+* **Pendência aberta para próxima rodada:** avaliar se `SubprocessoService` já permite separar melhor os fluxos de criação e manutenção de mapa, ou se o próximo ganho real passa a ser reduzir a superfície pública de `SubprocessoConsultaService`.
+
+### Continuação da Frente 3 em manutenção de mapa
+
+Na sequência, o ponto mais redundante dentro de `SubprocessoService` passou a ser a manutenção de mapa. `salvarMapaSubprocesso`, `adicionarCompetencia` e `removerCompetencia` repetiam a mesma costura de carregamento do subprocesso editável, resolução de mapa obrigatório, obtenção do código do mapa e checagem de vazio para decidir a transição de situação. O corte aplicado foi novamente interno: introduzir um contexto pequeno de edição de mapa e explicitar helpers para atualização de situação após preenchimento ou esvaziamento.
+
+### Resultado objetivo da continuação em manutenção de mapa
+
+Os três fluxos de manutenção continuam separados do ponto de vista funcional, mas agora compartilham a mesma fronteira interna para subprocesso editável, mapa obrigatório, código do mapa e estado de vazio inicial. Isso reduz a repetição acidental e deixa mais claro o que varia de verdade em cada operação: salvar o mapa completo, criar competência ou remover competência.
+
+### Registro da continuação em manutenção de mapa
+
+* **Data da rodada:** 2026-04-04
+* **Frente principal:** Frente 3 — Simplificação de fluxos concentrados em `SubprocessoService`
+* **Arquivo(s) alvo:** `backend/src/main/java/sgc/subprocesso/service/SubprocessoService.java`, `plano-simplificacao-consolidado.md`
+* **Corte aplicado:** extração de `ContextoEdicaoMapa` e de helpers privados para atualização de situação após preenchimento/esvaziamento do mapa.
+* **Risco principal observado:** mudança sutil na ordem entre reconciliação de situação, verificação de mapa vazio e retorno do mapa atualizado.
+* **Validação executada:** `./gradlew --no-configuration-cache :backend:test --tests "sgc.integracao.SubprocessoServiceSalvarIntegrationTest"`.
+* **Observação de ambiente:** novas execuções de `SubprocessoServiceExtraCoverageTest` e `SubprocessoServiceTest` foram interrompidas por inconsistências de artefatos em `backend/build/classes/java/test` durante `compileTestJava`, sem sinal de falha funcional específica do recorte.
+* **Pendência aberta para próxima rodada:** reavaliar o baseline de `SubprocessoService` após esses cortes e decidir se o melhor ganho seguinte permanece no service de escrita ou volta para a superfície pública de `SubprocessoConsultaService`.

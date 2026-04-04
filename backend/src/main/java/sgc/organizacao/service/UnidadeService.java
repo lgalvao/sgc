@@ -1,8 +1,12 @@
 package sgc.organizacao.service;
 
 import lombok.*;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
+import sgc.comum.config.CacheConfig;
 import sgc.comum.erros.*;
 import sgc.organizacao.dto.*;
 import sgc.mapa.model.*;
@@ -67,6 +71,7 @@ public class UnidadeService {
                 ));
     }
 
+    @Cacheable(cacheNames = CacheConfig.CACHE_UNIDADES_COM_MAPA, sync = true)
     public List<Long> buscarTodosCodigosUnidadesComMapa() {
         return unidadeMapaRepo.listarTodosCodigosUnidade();
     }
@@ -76,6 +81,10 @@ public class UnidadeService {
     }
 
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(cacheNames = CacheConfig.CACHE_UNIDADES_COM_MAPA, allEntries = true),
+            @CacheEvict(cacheNames = CacheConfig.CACHE_DIAGNOSTICO_ORGANIZACIONAL, allEntries = true)
+    })
     public void definirMapaVigente(Long codigoUnidade, Mapa mapa) {
         UnidadeMapa unidadeMapa = buscarRegistroMapaVigente(codigoUnidade).orElse(new UnidadeMapa());
         unidadeMapa.setUnidadeCodigo(codigoUnidade);

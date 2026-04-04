@@ -68,6 +68,7 @@ dependencyManagement {
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-aspectj")
+    implementation("org.springframework.boot:spring-boot-starter-cache")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-webmvc")
     implementation("org.springframework.boot:spring-boot-starter-validation")
@@ -112,6 +113,7 @@ dependencies {
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.2")
     testImplementation("io.swagger.parser.v3:swagger-parser:2.1.37")
     implementation("org.mozilla:rhino:1.9.1")
+    implementation("com.github.ben-manes.caffeine:caffeine")
     testImplementation("com.atlassian.oai:swagger-request-validator-mockmvc:2.46.0")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 

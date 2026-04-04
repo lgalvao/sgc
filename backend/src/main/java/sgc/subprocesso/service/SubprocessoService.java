@@ -42,7 +42,7 @@ public class SubprocessoService {
     private final MovimentacaoRepo movimentacaoRepo;
     private final CopiaMapaService copiaMapaService;
     private final MapaManutencaoService mapaManutencaoService;
-        private final SubprocessoConsultaService consultaService;
+    private final SubprocessoConsultaService consultaService;
 
     private static final Set<SituacaoSubprocesso> SITUACOES_PERMITIDAS_IMPORTACAO = Set.of(
             NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, REVISAO_CADASTRO_EM_ANDAMENTO);
@@ -113,10 +113,7 @@ public class SubprocessoService {
 
     @Transactional
     public void criarParaMapeamento(Processo processo, Collection<Unidade> unidades, Unidade unidadeOrigem, Usuario usuario) {
-        List<Unidade> unidadesElegiveis = unidades.stream().filter(u -> {
-            TipoUnidade tipo = u.getTipo();
-            return tipo == OPERACIONAL || tipo == INTEROPERACIONAL;
-        }).toList();
+        List<Unidade> unidadesElegiveis = listarUnidadesElegiveisParaMapeamento(unidades);
 
         if (unidadesElegiveis.isEmpty()) {
             log.warn("Nenhuma unidade elegível encontrada para o processo {}", processo.getCodigo());
@@ -125,12 +122,7 @@ public class SubprocessoService {
 
         log.info("Criando {} subprocessos para o processo {}", unidadesElegiveis.size(), processo.getCodigo());
         List<Subprocesso> subprocessos = unidadesElegiveis.stream()
-                .map(unidade -> Subprocesso.builder()
-                        .processo(processo)
-                        .unidade(unidade)
-                        .situacao(NAO_INICIADO)
-                        .dataLimiteEtapa1(processo.getDataLimite())
-                        .build())
+                .map(unidade -> criarSubprocessoInicial(processo, unidade, NAO_INICIADO))
                 .map(Subprocesso.class::cast)
                 .toList();
 
@@ -142,20 +134,11 @@ public class SubprocessoService {
                 .toList();
 
         List<Mapa> mapasSalvos = mapaManutencaoService.salvarMapas(mapas);
-        for (int i = 0; i < subprocessosSalvos.size(); i++) {
-            subprocessosSalvos.get(i).setMapa(mapasSalvos.get(i));
-        }
+        associarMapasASubprocessos(subprocessosSalvos, mapasSalvos);
 
-        List<Movimentacao> movimentacoes = new ArrayList<>();
-        for (Subprocesso sp : subprocessosSalvos) {
-            movimentacoes.add(Movimentacao.builder()
-                    .subprocesso(sp)
-                    .unidadeOrigem(unidadeOrigem)
-                    .unidadeDestino(sp.getUnidade())
-                    .usuario(usuario)
-                    .descricao("Processo iniciado")
-                    .build());
-        }
+        List<Movimentacao> movimentacoes = subprocessosSalvos.stream()
+                .map(subprocesso -> criarMovimentacaoInicial(subprocesso, unidadeOrigem, usuario, "Processo iniciado"))
+                .toList();
         movimentacaoRepo.saveAll(movimentacoes);
     }
 
@@ -173,18 +156,8 @@ public class SubprocessoService {
     private Subprocesso criarSubprocessoComMapa(Processo processo, Unidade unidade, UnidadeMapa unidadeMapa,
                                                 Unidade unidadeOrigem, Usuario usuario,
                                                 SituacaoSubprocesso situacaoInicial, String descMovimentacao) {
-
-        Mapa mapaVigente = unidadeMapa.getMapaVigente();
-        if (mapaVigente == null) {
-            throw new IllegalStateException("Unidade %s sem mapa vigente para revisão/diagnóstico".formatted(unidade.getSigla()));
-        }
-        Long codMapaVigente = mapaVigente.getCodigo();
-        Subprocesso subprocesso = Subprocesso.builder()
-                .processo(processo)
-                .unidade(unidade)
-                .situacao(situacaoInicial)
-                .dataLimiteEtapa1(processo.getDataLimite())
-                .build();
+        Long codMapaVigente = obterCodigoMapaVigenteObrigatorio(unidadeMapa, unidade);
+        Subprocesso subprocesso = criarSubprocessoInicial(processo, unidade, situacaoInicial);
 
         Subprocesso subprocessoSalvo = subprocessoRepo.save(subprocesso);
 
@@ -193,52 +166,73 @@ public class SubprocessoService {
         Mapa mapaSalvo = mapaManutencaoService.salvarMapa(mapaCopiado);
         subprocessoSalvo.setMapa(mapaSalvo);
 
-        movimentacaoRepo.save(Movimentacao.builder()
-                .subprocesso(subprocessoSalvo)
-                .unidadeOrigem(unidadeOrigem)
-                .unidadeDestino(unidade)
-                .usuario(usuario)
-                .descricao(descMovimentacao)
-                .build());
+        movimentacaoRepo.save(criarMovimentacaoInicial(subprocessoSalvo, unidadeOrigem, usuario, descMovimentacao));
 
         return subprocessoSalvo;
     }
 
+    private List<Unidade> listarUnidadesElegiveisParaMapeamento(Collection<Unidade> unidades) {
+        return unidades.stream()
+                .filter(unidade -> {
+                    TipoUnidade tipo = unidade.getTipo();
+                    return tipo == OPERACIONAL || tipo == INTEROPERACIONAL;
+                })
+                .toList();
+    }
+
+    private Subprocesso criarSubprocessoInicial(Processo processo, Unidade unidade, SituacaoSubprocesso situacaoInicial) {
+        return Subprocesso.builder()
+                .processo(processo)
+                .unidade(unidade)
+                .situacao(situacaoInicial)
+                .dataLimiteEtapa1(processo.getDataLimite())
+                .build();
+    }
+
+    private void associarMapasASubprocessos(List<Subprocesso> subprocessos, List<Mapa> mapas) {
+        for (int i = 0; i < subprocessos.size(); i++) {
+            subprocessos.get(i).setMapa(mapas.get(i));
+        }
+    }
+
+    private Long obterCodigoMapaVigenteObrigatorio(UnidadeMapa unidadeMapa, Unidade unidade) {
+        Mapa mapaVigente = unidadeMapa.getMapaVigente();
+        if (mapaVigente == null) {
+            throw new IllegalStateException("Unidade %s sem mapa vigente para revisão/diagnóstico".formatted(unidade.getSigla()));
+        }
+        return mapaVigente.getCodigo();
+    }
+
+    private Movimentacao criarMovimentacaoInicial(Subprocesso subprocesso, Unidade unidadeOrigem, Usuario usuario, String descricao) {
+        return Movimentacao.builder()
+                .subprocesso(subprocesso)
+                .unidadeOrigem(unidadeOrigem)
+                .unidadeDestino(subprocesso.getUnidade())
+                .usuario(usuario)
+                .descricao(descricao)
+                .build();
+    }
+
     @Transactional
     public Mapa salvarMapaSubprocesso(Long codSubprocesso, SalvarMapaRequest request) {
-        Subprocesso subprocesso = getSubprocessoParaEdicao(codSubprocesso);
-        Long codMapa = consultaService.obterCodigoMapaObrigatorio(subprocesso);
-
-        boolean eraVazio = mapaManutencaoService.competenciasCodMapa(codMapa).isEmpty();
+        ContextoEdicaoMapa contexto = carregarContextoEdicaoMapa(codSubprocesso);
         boolean temNovasCompetencias = !request.competencias().isEmpty();
 
-        Mapa mapa = mapaSalvamentoService.salvarMapaCompleto(codMapa, request);
-        mapaManutencaoService.reconciliarSituacaoSubprocesso(subprocesso);
-
-        if (eraVazio && temNovasCompetencias) {
-            atualizarSituacaoMapaVazio(subprocesso, false);
-        }
+        Mapa mapa = mapaSalvamentoService.salvarMapaCompleto(contexto.codMapa(), request);
+        mapaManutencaoService.reconciliarSituacaoSubprocesso(contexto.subprocesso());
+        atualizarSituacaoAposPreenchimentoMapa(contexto.subprocesso(), contexto.mapaEstavaVazio() && temNovasCompetencias);
 
         return mapa;
     }
 
     @Transactional
     public Mapa adicionarCompetencia(Long codSubprocesso, CompetenciaRequest request) {
-        Subprocesso subprocesso = getSubprocessoParaEdicao(codSubprocesso);
-        Mapa mapa = consultaService.obterMapaObrigatorio(subprocesso);
-        Long codMapa = mapa.getCodigo();
-
+        ContextoEdicaoMapa contexto = carregarContextoEdicaoMapa(codSubprocesso);
         validarCompetenciaParaCriacao(request);
-
-        boolean eraVazio = mapaManutencaoService.competenciasCodMapa(codMapa).isEmpty();
-
-        mapaManutencaoService.criarCompetenciaComAtividades(mapa, request.descricao(), request.atividadesIds());
-
-        if (eraVazio) {
-            atualizarSituacaoMapaVazio(subprocesso, false);
-        }
-
-        return mapaManutencaoService.mapaCodigo(mapa.getCodigo());
+        mapaManutencaoService.criarCompetenciaComAtividades(
+                contexto.mapa(), request.descricao(), request.atividadesIds());
+        atualizarSituacaoAposPreenchimentoMapa(contexto.subprocesso(), contexto.mapaEstavaVazio());
+        return mapaManutencaoService.mapaCodigo(contexto.codMapa());
     }
 
     public Mapa atualizarCompetencia(Long codSubprocesso, Long codCompetencia, CompetenciaRequest request) {
@@ -256,18 +250,34 @@ public class SubprocessoService {
     }
 
     public Mapa removerCompetencia(Long codSubprocesso, Long codCompetencia) {
-        Subprocesso subprocesso = getSubprocessoParaEdicao(codSubprocesso);
-
-        Long codMapa = consultaService.obterCodigoMapaObrigatorio(subprocesso);
+        ContextoEdicaoMapa contexto = carregarContextoEdicaoMapa(codSubprocesso);
         mapaManutencaoService.removerCompetencia(codCompetencia);
 
-        boolean ficouVazio = mapaManutencaoService.competenciasCodMapa(codMapa).isEmpty();
-        mapaManutencaoService.reconciliarSituacaoSubprocesso(subprocesso);
-        if (ficouVazio) {
+        boolean ficouVazio = mapaManutencaoService.competenciasCodMapa(contexto.codMapa()).isEmpty();
+        mapaManutencaoService.reconciliarSituacaoSubprocesso(contexto.subprocesso());
+        atualizarSituacaoAposEsvaziamentoMapa(contexto.subprocesso(), ficouVazio);
+
+        return mapaManutencaoService.mapaCodigo(contexto.codMapa());
+    }
+
+    private ContextoEdicaoMapa carregarContextoEdicaoMapa(Long codSubprocesso) {
+        Subprocesso subprocesso = getSubprocessoParaEdicao(codSubprocesso);
+        Mapa mapa = consultaService.obterMapaObrigatorio(subprocesso);
+        Long codMapa = mapa.getCodigo();
+        boolean mapaEstavaVazio = mapaManutencaoService.competenciasCodMapa(codMapa).isEmpty();
+        return new ContextoEdicaoMapa(subprocesso, mapa, codMapa, mapaEstavaVazio);
+    }
+
+    private void atualizarSituacaoAposPreenchimentoMapa(Subprocesso subprocesso, boolean deveAtualizarSituacao) {
+        if (deveAtualizarSituacao) {
+            atualizarSituacaoMapaVazio(subprocesso, false);
+        }
+    }
+
+    private void atualizarSituacaoAposEsvaziamentoMapa(Subprocesso subprocesso, boolean mapaFicouVazio) {
+        if (mapaFicouVazio) {
             atualizarSituacaoMapaVazio(subprocesso, true);
         }
-
-        return mapaManutencaoService.mapaCodigo(consultaService.obterCodigoMapaObrigatorio(subprocesso));
     }
 
     private void atualizarSituacaoMapaVazio(Subprocesso subprocesso, boolean ficouVazio) {
@@ -378,54 +388,108 @@ public class SubprocessoService {
 
     @Transactional
     public boolean importarAtividades(Long codSubprocessoDestino, Long codSubprocessoOrigem, List<Long> codigosAtividades) {
-        final Subprocesso spDestino = repo.buscar(Subprocesso.class, codSubprocessoDestino);
-        validacaoService.validarSituacaoPermitida(spDestino,
-                Mensagens.SITUACAO_IMPEDE_IMPORTACAO.formatted(spDestino.getSituacao()),
-                SITUACOES_PERMITIDAS_IMPORTACAO.toArray(new SituacaoSubprocesso[0]));
+        ImportacaoAtividadesContexto contexto = montarContextoImportacaoAtividades(codSubprocessoDestino, codSubprocessoOrigem);
+        int totalSolicitado = codigosAtividades.size();
+
+        log.info("Importando {} atividades do mapa #{} para o mapa #{}",
+                totalSolicitado, contexto.codMapaOrigem(), contexto.codMapaDestino());
+
+        int totalImportado = copiaMapaService.importarAtividadesDeOutroMapa(
+                contexto.codMapaOrigem(), contexto.codMapaDestino(), codigosAtividades);
+
+        atualizarSituacaoDestinoAposImportacao(contexto.subprocessoDestino());
+        registrarMovimentacaoImportacao(contexto);
+
+        return houveDuplicidadeNaImportacao(totalSolicitado, totalImportado);
+    }
+
+    private ImportacaoAtividadesContexto montarContextoImportacaoAtividades(Long codSubprocessoDestino, Long codSubprocessoOrigem) {
+        Subprocesso subprocessoDestino = repo.buscar(Subprocesso.class, codSubprocessoDestino);
+        validarDestinoParaImportacao(subprocessoDestino);
 
         Usuario usuario = usuarioFacade.usuarioAutenticado();
-        if (!permissionEvaluator.verificarPermissao(usuario, spDestino, EDITAR_CADASTRO)) {
+        validarPermissaoImportacaoNoDestino(usuario, subprocessoDestino);
+
+        Subprocesso subprocessoOrigem = repo.buscar(Subprocesso.class, codSubprocessoOrigem);
+        validarPermissaoConsultaNaOrigem(usuario, subprocessoOrigem);
+
+        return new ImportacaoAtividadesContexto(
+                subprocessoDestino,
+                subprocessoOrigem,
+                usuario,
+                consultaService.obterCodigoMapaObrigatorio(subprocessoDestino),
+                consultaService.obterCodigoMapaObrigatorio(subprocessoOrigem));
+    }
+
+    private void validarDestinoParaImportacao(Subprocesso subprocessoDestino) {
+        validacaoService.validarSituacaoPermitida(subprocessoDestino,
+                Mensagens.SITUACAO_IMPEDE_IMPORTACAO.formatted(subprocessoDestino.getSituacao()),
+                SITUACOES_PERMITIDAS_IMPORTACAO.toArray(new SituacaoSubprocesso[0]));
+    }
+
+    private void validarPermissaoImportacaoNoDestino(Usuario usuario, Subprocesso subprocessoDestino) {
+        if (!permissionEvaluator.verificarPermissao(usuario, subprocessoDestino, EDITAR_CADASTRO)) {
             throw new ErroAcessoNegado(Mensagens.SEM_PERMISSAO_IMPORTAR);
         }
+    }
 
-        Subprocesso spOrigem = repo.buscar(Subprocesso.class, codSubprocessoOrigem);
-        if (!permissionEvaluator.verificarPermissao(usuario, spOrigem, CONSULTAR_PARA_IMPORTACAO)) {
+    private void validarPermissaoConsultaNaOrigem(Usuario usuario, Subprocesso subprocessoOrigem) {
+        if (!permissionEvaluator.verificarPermissao(usuario, subprocessoOrigem, CONSULTAR_PARA_IMPORTACAO)) {
             throw new ErroAcessoNegado(Mensagens.SEM_PERMISSAO_CONSULTAR_ORIGEM);
         }
+    }
 
-        Long codMapaOrigem = consultaService.obterCodigoMapaObrigatorio(spOrigem);
-        Long codMapaDestino = consultaService.obterCodigoMapaObrigatorio(spDestino);
-
-        int totalParaImportar = codigosAtividades.size();
-        log.info("Importando {} atividades do mapa #{} para o mapa #{}", totalParaImportar, codMapaOrigem, codMapaDestino);
-        int importadas = copiaMapaService.importarAtividadesDeOutroMapa(codMapaOrigem, codMapaDestino, codigosAtividades);
-
-        boolean temDuplicatas = !codigosAtividades.isEmpty() && importadas < totalParaImportar;
-
-        if (spDestino.getSituacao() == NAO_INICIADO) {
-            var tipoProcesso = spDestino.getProcesso().getTipo();
-            switch (tipoProcesso) {
-                case MAPEAMENTO -> spDestino.setSituacao(MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
-                case REVISAO -> spDestino.setSituacao(REVISAO_CADASTRO_EM_ANDAMENTO);
-                default -> log.debug("Tipo de processo {} não requer atualização de situação.", tipoProcesso);
-            }
-            subprocessoRepo.save(spDestino);
+    private void atualizarSituacaoDestinoAposImportacao(Subprocesso subprocessoDestino) {
+        if (subprocessoDestino.getSituacao() != NAO_INICIADO) {
+            return;
         }
 
-        final Unidade unidadeOrigem = spOrigem.getUnidade();
-        String descMovimentacao = Mensagens.HIST_IMPORTACAO_ATIVIDADES.formatted(
-                spOrigem.getCodigo(),
+        switch (subprocessoDestino.getProcesso().getTipo()) {
+            case MAPEAMENTO -> subprocessoDestino.setSituacao(MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+            case REVISAO -> subprocessoDestino.setSituacao(REVISAO_CADASTRO_EM_ANDAMENTO);
+            default -> {
+                log.debug("Tipo de processo {} não requer atualização de situação.",
+                        subprocessoDestino.getProcesso().getTipo());
+                return;
+            }
+        }
+
+        subprocessoRepo.save(subprocessoDestino);
+    }
+
+    private void registrarMovimentacaoImportacao(ImportacaoAtividadesContexto contexto) {
+        Unidade unidadeOrigem = contexto.subprocessoOrigem().getUnidade();
+        String descricao = Mensagens.HIST_IMPORTACAO_ATIVIDADES.formatted(
+                contexto.subprocessoOrigem().getCodigo(),
                 unidadeOrigem.getSigla());
 
-        Movimentacao movimentacao = Movimentacao.builder()
-                .subprocesso(spDestino)
+        movimentacaoRepo.save(Movimentacao.builder()
+                .subprocesso(contexto.subprocessoDestino())
                 .unidadeOrigem(unidadeOrigem)
-                .unidadeDestino(spDestino.getUnidade())
-                .descricao(descMovimentacao)
-                .usuario(usuario)
-                .build();
+                .unidadeDestino(contexto.subprocessoDestino().getUnidade())
+                .descricao(descricao)
+                .usuario(contexto.usuario())
+                .build());
+    }
 
-        movimentacaoRepo.save(movimentacao);
-        return temDuplicatas;
+    private boolean houveDuplicidadeNaImportacao(int totalSolicitado, int totalImportado) {
+        return totalSolicitado > 0 && totalImportado < totalSolicitado;
+    }
+
+    private record ContextoEdicaoMapa(
+            Subprocesso subprocesso,
+            Mapa mapa,
+            Long codMapa,
+            boolean mapaEstavaVazio
+    ) {
+    }
+
+    private record ImportacaoAtividadesContexto(
+            Subprocesso subprocessoDestino,
+            Subprocesso subprocessoOrigem,
+            Usuario usuario,
+            Long codMapaDestino,
+            Long codMapaOrigem
+    ) {
     }
 }

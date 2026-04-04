@@ -4,7 +4,6 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
-import sgc.comum.model.*;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
 import sgc.testutils.*;
@@ -25,9 +24,6 @@ class UnidadeHierarquiaServiceTest {
 
     @Mock
     private UnidadeRepo unidadeRepo;
-
-    @Mock
-    private ComumRepo repo;
 
     @Mock
     private UnidadeService unidadeService;
@@ -135,7 +131,7 @@ class UnidadeHierarquiaServiceTest {
                 .sigla("EXTRA")
                 .tipo(TipoUnidade.OPERACIONAL)
                 .build();
-        when(repo.buscar(Unidade.class, 99L)).thenReturn(extra);
+        when(unidadeService.buscarPorCodigo(99L)).thenReturn(extra);
 
         UnidadeDto resultado = service.buscarArvore(99L);
 
@@ -151,7 +147,7 @@ class UnidadeHierarquiaServiceTest {
                 .sigla("INEXISTENTE")
                 .tipo(TipoUnidade.OPERACIONAL)
                 .build();
-        when(repo.buscarPorSigla(Unidade.class, "INEXISTENTE")).thenReturn(extra);
+        when(unidadeService.buscarPorSigla("INEXISTENTE")).thenReturn(extra);
 
         List<String> resultado = service.buscarSiglasSubordinadas("INEXISTENTE");
 
@@ -161,7 +157,7 @@ class UnidadeHierarquiaServiceTest {
     @Test
     @DisplayName("Deve buscar sigla superior")
     void deveBuscarSiglaSuperior() {
-        when(repo.buscarPorSigla(Unidade.class, unidadeIntermediaria.getSigla())).thenReturn(unidadeIntermediaria);
+        when(unidadeService.buscarPorSigla(unidadeIntermediaria.getSigla())).thenReturn(unidadeIntermediaria);
 
         Optional<String> superior = service.buscarSiglaSuperior(unidadeIntermediaria.getSigla());
 

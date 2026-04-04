@@ -1,9 +1,11 @@
 package sgc.organizacao.service;
 
 import lombok.*;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
 import sgc.comum.*;
+import sgc.comum.config.CacheConfig;
 import sgc.comum.erros.*;
 import sgc.comum.model.*;
 import sgc.organizacao.dto.*;
@@ -38,21 +40,41 @@ public class ResponsavelUnidadeService {
      * Busca todas as atribuições temporárias cadastradas.
      */
     public List<AtribuicaoDto> buscarTodasAtribuicoes() {
-        return atribuicaoTemporariaRepo.findAll().stream()
-                .map(this::toAtribuicaoTemporariaDto)
+        List<AtribuicaoTemporaria> atribuicoes = atribuicaoTemporariaRepo.listarTodasComUnidade();
+        Map<String, Usuario> usuariosPorTitulo = carregarUsuariosPorTitulo(atribuicoes);
+
+        return atribuicoes.stream()
+                .map(atribuicao -> toAtribuicaoTemporariaDto(atribuicao, usuariosPorTitulo))
                 .toList();
     }
 
-    private AtribuicaoDto toAtribuicaoTemporariaDto(AtribuicaoTemporaria a) {
-        Usuario usuario = repo.buscar(Usuario.class, a.getUsuarioTitulo());
+    private Map<String, Usuario> carregarUsuariosPorTitulo(List<AtribuicaoTemporaria> atribuicoes) {
+        List<String> titulos = atribuicoes.stream()
+                .map(AtribuicaoTemporaria::getUsuarioTitulo)
+                .distinct()
+                .toList();
+
+        if (titulos.isEmpty()) {
+            return Map.of();
+        }
+
+        return usuarioRepo.listarPorTitulosComUnidadeLotacao(titulos).stream()
+                .collect(toMap(Usuario::getTituloEleitoral, usuario -> usuario));
+    }
+
+    private AtribuicaoDto toAtribuicaoTemporariaDto(AtribuicaoTemporaria atribuicao, Map<String, Usuario> usuariosPorTitulo) {
+        Usuario usuario = Optional.ofNullable(usuariosPorTitulo.get(atribuicao.getUsuarioTitulo()))
+                .orElseThrow(() -> new IllegalStateException(
+                        "Usuário ausente para atribuição temporária %d".formatted(atribuicao.getCodigo())));
+
         return AtribuicaoDto.builder()
-                .codigo(a.getCodigo())
-                .unidadeCodigo(a.getUnidade().getCodigo())
-                .unidadeSigla(a.getUnidade().getSigla())
+                .codigo(atribuicao.getCodigo())
+                .unidadeCodigo(atribuicao.getUnidade().getCodigo())
+                .unidadeSigla(atribuicao.getUnidade().getSigla())
                 .usuario(UsuarioResumoDto.fromEntityObrigatorio(usuario))
-                .dataInicio(a.getDataInicio())
-                .dataTermino(a.getDataTermino())
-                .justificativa(a.getJustificativa())
+                .dataInicio(atribuicao.getDataInicio())
+                .dataTermino(atribuicao.getDataTermino())
+                .justificativa(atribuicao.getJustificativa())
                 .build();
     }
 
@@ -61,6 +83,7 @@ public class ResponsavelUnidadeService {
      *
      * @throws ErroValidacao se a data de término for anterior à data de início
      */
+    @CacheEvict(cacheNames = CacheConfig.CACHE_DIAGNOSTICO_ORGANIZACIONAL, allEntries = true)
     public void criarAtribuicaoTemporaria(Long codUnidade, CriarAtribuicaoRequest request) {
         Unidade unidade = repo.buscar(Unidade.class, codUnidade);
 

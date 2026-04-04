@@ -224,7 +224,7 @@ public class ProcessoService {
                 ? unidadeService.buscarMapasPorUnidades(codigosUnidades)
                 : List.of();
 
-        Unidade admin = repo.buscarPorSigla(Unidade.class, "ADMIN");
+        Unidade admin = unidadeService.buscarPorSigla("ADMIN");
         efetivarInicioSubprocessos(processo, tipo, codigosUnidades, unidadesParaProcessar, unidadesMapas, admin, usuario);
         
         processo.setSituacao(EM_ANDAMENTO);

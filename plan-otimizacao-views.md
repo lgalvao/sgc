@@ -52,15 +52,15 @@ Levantamento no backend em 2026-04-04:
 
 ### Melhoria iniciada
 
-- substituir a montagem da hierarquia por leitura achatada de `VW_UNIDADE`
-- buscar responsabilidades em lote e montar a elegibilidade em memoria
+- eliminar N+1 residual em `VW_RESPONSABILIDADE`, `VW_USUARIO` e `VW_UNIDADE`
+- trocar relatorios e atribuicoes temporarias para carga em lote
+- reaproveitar caches do Spring para verificacoes de hierarquia sem consulta por nivel
 - preservar os contratos HTTP e os DTOs atuais
 
 ### Fora desta rodada
 
-- cache de aplicacao
-- refactor do fluxo de login
 - remocao ampla das associacoes JPA restantes
+- observabilidade fina por metrica de query no banco
 
 ## Diretriz Principal
 

@@ -2,12 +2,13 @@ package sgc.organizacao.service;
 
 import lombok.*;
 import lombok.extern.slf4j.*;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.core.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
+import sgc.comum.config.CacheConfig;
 import sgc.comum.*;
 import sgc.comum.erros.*;
-import sgc.comum.model.*;
 import sgc.organizacao.model.*;
 
 import java.util.*;
@@ -21,10 +22,10 @@ public class UsuarioService {
     private final UsuarioRepo usuarioRepo;
     private final UsuarioPerfilRepo usuarioPerfilRepo;
     private final AdministradorRepo administradorRepo;
-    private final ComumRepo repo;
 
     public Usuario buscar(String titulo) {
-        return repo.buscar(Usuario.class, titulo);
+        return usuarioRepo.buscarPorTituloComUnidadeLotacao(titulo)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(Usuario.class.getSimpleName(), titulo));
     }
 
     public Optional<Usuario> buscarOpt(String titulo) {
@@ -70,6 +71,7 @@ public class UsuarioService {
     }
 
     @Transactional
+    @CacheEvict(cacheNames = CacheConfig.CACHE_DIAGNOSTICO_ORGANIZACIONAL, allEntries = true)
     public void adicionarAdministrador(String usuarioTitulo) {
         if (isAdministrador(usuarioTitulo)) {
             throw new ErroValidacao(Mensagens.USUARIO_JA_ADMINISTRADOR);
@@ -82,6 +84,7 @@ public class UsuarioService {
     }
 
     @Transactional
+    @CacheEvict(cacheNames = CacheConfig.CACHE_DIAGNOSTICO_ORGANIZACIONAL, allEntries = true)
     public void removerAdministrador(String usuarioTitulo) {
         long totalAdministradores = administradorRepo.count();
         if (totalAdministradores <= 1) {

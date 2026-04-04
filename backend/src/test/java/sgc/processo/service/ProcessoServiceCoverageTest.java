@@ -180,6 +180,7 @@ class ProcessoServiceCoverageTest {
         
         when(unidadeService.buscarPorCodigos(anyList())).thenReturn(List.of(uni));
         when(unidadeService.buscarMapasPorUnidades(anyList())).thenReturn(new ArrayList<>());
+        mockarResponsaveisEfetivos();
         
         Unidade admin = new Unidade();
         admin.setCodigo(99L);
@@ -344,6 +345,7 @@ class ProcessoServiceCoverageTest {
         UnidadeMapa um = new UnidadeMapa(); um.setUnidadeCodigo(10L); 
         when(unidadeService.buscarMapasPorUnidades(any())).thenReturn(List.of(um));
         when(repo.buscarPorSigla(Unidade.class, "ADMIN")).thenReturn(admin);
+        mockarResponsaveisEfetivos();
 
         target.iniciar(cod, List.of(10L), new Usuario()); // branch 419 (DIAGNOSTICO)
         verify(subprocessoService).criarParaDiagnostico(any(), any(), any(), any(), any());

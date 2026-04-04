@@ -163,6 +163,7 @@ class ProcessoServiceTest {
             Unidade uniAdmin = new Unidade();
             uniAdmin.setSituacao(SituacaoUnidade.ATIVA);
             when(repo.buscarPorSigla(Unidade.class, "ADMIN")).thenReturn(uniAdmin);
+            mockarResponsaveisEfetivos();
 
             processoService.iniciar(id, List.of(), usuario);
 
@@ -194,6 +195,7 @@ class ProcessoServiceTest {
             Unidade uniAdmin = new Unidade();
             uniAdmin.setSituacao(SituacaoUnidade.ATIVA);
             when(repo.buscarPorSigla(Unidade.class, "ADMIN")).thenReturn(uniAdmin);
+            mockarResponsaveisEfetivos();
 
             processoService.iniciar(id, List.of(1L), usuario);
 
@@ -218,6 +220,7 @@ class ProcessoServiceTest {
             // Simular que a unidade já está em outro processo
             when(processoRepo.listarUnidadesEmProcessoAtivo(eq(SituacaoProcesso.EM_ANDAMENTO), anyList()))
                     .thenReturn(List.of(1L));
+            mockarResponsaveisEfetivos();
 
             assertThatThrownBy(() -> processoService.iniciar(id, List.of(), usuario))
                     .isInstanceOf(ErroValidacao.class)
@@ -242,6 +245,7 @@ class ProcessoServiceTest {
             // Simular que a unidade não tem mapa vigente
             when(unidadeService.temMapaVigente(1L)).thenReturn(false);
             when(unidadeService.buscarSiglasPorCodigos(anyList())).thenReturn(List.of("U1"));
+            mockarResponsaveisEfetivos();
 
             assertThatThrownBy(() -> processoService.iniciar(id, List.of(1L), usuario))
                     .isInstanceOf(ErroValidacao.class)
@@ -509,6 +513,7 @@ class ProcessoServiceTest {
             Unidade uni = criarUnidadeValida(1L);
             when(unidadeService.buscarPorCodigo(1L)).thenReturn(uni);
             when(processoRepo.saveAndFlush(any())).thenAnswer(i -> i.getArgument(0));
+            mockarResponsaveisEfetivos();
 
             Processo resultado = processoService.criar(req);
 
@@ -854,7 +859,6 @@ class ProcessoServiceTest {
 
     @Nested
     @DisplayName("Cobertura Adicional de Branches")
-    @MockitoSettings(strictness = Strictness.LENIENT)
     class CoberturaAdicional {
 
         @Test
@@ -881,6 +885,7 @@ class ProcessoServiceTest {
             Unidade uniAdmin = new Unidade();
             uniAdmin.setSituacao(SituacaoUnidade.ATIVA);
             when(repo.buscarPorSigla(Unidade.class, "ADMIN")).thenReturn(uniAdmin);
+            mockarResponsaveisEfetivos();
 
             processoService.iniciar(id, List.of(), usuario);
 
@@ -977,9 +982,9 @@ class ProcessoServiceTest {
             sp.setUnidade(new Unidade());
             sp.setSituacao(situacao);
 
-            lenient().when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp));
-            lenient().when(permissionEvaluator.verificarPermissao(any(), any(), any())).thenReturn(true);
-            lenient().when(consultaService.obterLocalizacaoAtual(any())).thenReturn(new Unidade());
+            when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp));
+            when(permissionEvaluator.verificarPermissao(any(), any(), any())).thenReturn(true);
+            when(consultaService.obterLocalizacaoAtual(any())).thenReturn(new Unidade());
 
             List<SubprocessoElegivelDto> result = processoService.listarSubprocessosElegiveis(codProcesso);
             assertThat(result).hasSize(1);
@@ -998,10 +1003,10 @@ class ProcessoServiceTest {
             sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES);
             sp.setUnidade(new Unidade());
 
-            lenient().when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp));
-            lenient().when(permissionEvaluator.verificarPermissao(usuario, sp, ACEITAR_MAPA)).thenReturn(false);
-            lenient().when(permissionEvaluator.verificarPermissao(usuario, sp, HOMOLOGAR_MAPA)).thenReturn(true);
-            lenient().when(consultaService.obterLocalizacaoAtual(any())).thenReturn(new Unidade());
+            when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp));
+            when(permissionEvaluator.verificarPermissao(usuario, sp, ACEITAR_MAPA)).thenReturn(false);
+            when(permissionEvaluator.verificarPermissao(usuario, sp, HOMOLOGAR_MAPA)).thenReturn(true);
+            when(consultaService.obterLocalizacaoAtual(any())).thenReturn(new Unidade());
 
             List<SubprocessoElegivelDto> result = processoService.listarSubprocessosElegiveis(codProcesso);
             assertThat(result).hasSize(1);
@@ -1019,6 +1024,7 @@ class ProcessoServiceTest {
             p.setTipo(TipoProcesso.REVISAO);
 
             when(repo.buscar(Processo.class, id)).thenReturn(p);
+            mockarResponsaveisEfetivos();
 
             assertThatThrownBy(() -> processoService.iniciar(id, List.of(), usuario))
                     .isInstanceOf(ErroValidacao.class)

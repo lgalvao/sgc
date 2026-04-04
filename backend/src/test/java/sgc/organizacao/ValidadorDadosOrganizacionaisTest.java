@@ -353,7 +353,10 @@ class ValidadorDadosOrganizacionaisTest {
         Unidade operacionalInativa = criarUnidade(2L, "INAT", OPERACIONAL, "TITULO_INAT");
         operacionalInativa.setSituacao(INATIVA);
 
-        when(unidadeRepo.listarTodasComHierarquia()).thenReturn(List.of(raiz, operacionalInativa));
+        when(unidadeRepo.listarEstruturasAtivas()).thenReturn(List.of(
+                toLeitura(raiz),
+                toLeitura(operacionalInativa)
+        ));
 
         DiagnosticoOrganizacionalDto diagnostico = validador.diagnosticar();
 
@@ -474,12 +477,12 @@ class ValidadorDadosOrganizacionaisTest {
     @Test
     @DisplayName("deve lidar com lista de unidades vazia ao carregar responsabilidades")
     void deveLidarComListaUnidadesVazia() {
-        when(unidadeRepo.listarTodasComHierarquia()).thenReturn(List.of());
+        when(unidadeRepo.listarEstruturasAtivas()).thenReturn(List.of());
 
         DiagnosticoOrganizacionalDto diagnostico = validador.diagnosticar();
 
         assertThat(diagnostico.possuiViolacoes()).isFalse();
-        verify(responsabilidadeRepo, never()).listarPorCodigosUnidade(anyList());
+        verify(responsabilidadeRepo, never()).listarLeiturasPorCodigosUnidade(anyList());
     }
 
     @Test
@@ -522,8 +525,12 @@ class ValidadorDadosOrganizacionaisTest {
             List<Map<String, Object>> linhasUsuariosDuplicados,
             List<Map<String, Object>> linhasPerfis
     ) {
-        when(unidadeRepo.listarTodasComHierarquia()).thenReturn(unidades);
-        when(responsabilidadeRepo.listarPorCodigosUnidade(anyList())).thenReturn(responsabilidades);
+        when(unidadeRepo.listarEstruturasAtivas()).thenReturn(unidades.stream().map(this::toLeitura).toList());
+        when(responsabilidadeRepo.listarLeiturasPorCodigosUnidade(anyList())).thenReturn(
+                responsabilidades.stream()
+                        .map(r -> new ResponsabilidadeLeitura(r.getUnidadeCodigo(), r.getUsuarioTitulo()))
+                        .toList()
+        );
         when(usuarioRepo.findAllById(anyList())).thenReturn(usuarios);
         when(namedParameterJdbcTemplate.queryForList(contains("FROM sgc.vw_usuario"), ArgumentMatchers.<Map<String, ?>>any()))
                 .thenReturn(linhasUsuariosDuplicados);
@@ -564,5 +571,17 @@ class ValidadorDadosOrganizacionaisTest {
         linha.put("PERFIL", perfil);
         linha.put("UNIDADE_CODIGO", unidadeCodigo);
         return linha;
+    }
+
+    private UnidadeHierarquiaLeitura toLeitura(Unidade unidade) {
+        return new UnidadeHierarquiaLeitura(
+                unidade.getCodigo(),
+                unidade.getNome(),
+                unidade.getSigla(),
+                unidade.getTituloTitular(),
+                unidade.getTipo(),
+                unidade.getSituacao(),
+                unidade.getUnidadeSuperior() != null ? unidade.getUnidadeSuperior().getCodigo() : null
+        );
     }
 }

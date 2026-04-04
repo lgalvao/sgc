@@ -50,6 +50,7 @@ class ResponsavelUnidadeServiceTest {
 
             Usuario usuario = new Usuario();
             usuario.setTituloEleitoral("123456789012");
+            usuario.setNome("Usuario Teste");
 
             AtribuicaoTemporaria atribuicao = new AtribuicaoTemporaria();
             atribuicao.setCodigo(1L);
@@ -59,14 +60,50 @@ class ResponsavelUnidadeServiceTest {
             atribuicao.setDataTermino(LocalDateTime.now().plusDays(1));
             atribuicao.setJustificativa("Teste");
 
-            when(atribuicaoTemporariaRepo.findAll()).thenReturn(List.of(atribuicao));
-            when(repo.buscar(Usuario.class, "123456789012")).thenReturn(usuario);
+            when(atribuicaoTemporariaRepo.listarTodasComUnidade()).thenReturn(List.of(atribuicao));
+            when(usuarioRepo.listarPorTitulosComUnidadeLotacao(List.of("123456789012"))).thenReturn(List.of(usuario));
 
             List<AtribuicaoDto> resultado = service.buscarTodasAtribuicoes();
 
             assertThat(resultado).hasSize(1);
             assertThat(resultado.getFirst().unidadeCodigo()).isEqualTo(10L);
             assertThat(resultado.getFirst().usuario().tituloEleitoral()).isEqualTo(usuario.getTituloEleitoral());
+        }
+
+        @Test
+        @DisplayName("Deve carregar usuários em lote ao buscar atribuições temporárias")
+        void deveCarregarUsuariosEmLoteAoBuscarAtribuicoes() {
+            Unidade unidade = new Unidade();
+            unidade.setCodigo(10L);
+            unidade.setSigla("UNIT");
+
+            AtribuicaoTemporaria atribuicao1 = new AtribuicaoTemporaria();
+            atribuicao1.setCodigo(1L);
+            atribuicao1.setUnidade(unidade);
+            atribuicao1.setUsuarioTitulo("111");
+            atribuicao1.setDataInicio(LocalDateTime.now());
+            atribuicao1.setDataTermino(LocalDateTime.now().plusDays(1));
+
+            AtribuicaoTemporaria atribuicao2 = new AtribuicaoTemporaria();
+            atribuicao2.setCodigo(2L);
+            atribuicao2.setUnidade(unidade);
+            atribuicao2.setUsuarioTitulo("222");
+            atribuicao2.setDataInicio(LocalDateTime.now());
+            atribuicao2.setDataTermino(LocalDateTime.now().plusDays(1));
+
+            Usuario usuario1 = new Usuario();
+            usuario1.setTituloEleitoral("111");
+            Usuario usuario2 = new Usuario();
+            usuario2.setTituloEleitoral("222");
+
+            when(atribuicaoTemporariaRepo.listarTodasComUnidade()).thenReturn(List.of(atribuicao1, atribuicao2));
+            when(usuarioRepo.listarPorTitulosComUnidadeLotacao(List.of("111", "222")))
+                    .thenReturn(List.of(usuario1, usuario2));
+
+            service.buscarTodasAtribuicoes();
+
+            verify(usuarioRepo).listarPorTitulosComUnidadeLotacao(List.of("111", "222"));
+            verify(repo, never()).buscar(eq(Usuario.class), anyString());
         }
     }
 

@@ -2,9 +2,10 @@ package sgc.organizacao.service;
 
 import lombok.*;
 import org.jspecify.annotations.*;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.*;
+import sgc.comum.config.CacheConfig;
 import sgc.comum.erros.*;
-import sgc.comum.model.*;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
 
@@ -22,11 +23,11 @@ public class UnidadeHierarquiaService {
     private final UnidadeRepo unidadeRepo;
     private final UnidadeService unidadeService;
     private final ResponsabilidadeRepo responsabilidadeRepo;
-    private final ComumRepo repo;
 
     /**
      * Busca a árvore hierárquica completa de unidades.
      */
+    @Cacheable(cacheNames = CacheConfig.CACHE_ARVORE_UNIDADES, sync = true)
     public List<UnidadeDto> buscarArvoreHierarquica() {
         List<UnidadeHierarquiaLeitura> todasUnidades = unidadeRepo.listarEstruturasAtivas();
         return montarHierarquia(todasUnidades, Map.of(), null);
@@ -83,6 +84,7 @@ public class UnidadeHierarquiaService {
     /**
      * Constrói o mapa de hierarquia (Pai -> Lista de Filhos) buscando todas as unidades.
      */
+    @Cacheable(cacheNames = CacheConfig.CACHE_MAPA_HIERARQUIA_UNIDADES, sync = true)
     public Map<Long, List<Long>> buscarMapaHierarquia() {
         List<UnidadeHierarquiaLeitura> todas = unidadeRepo.listarEstruturasAtivas();
 
@@ -106,7 +108,7 @@ public class UnidadeHierarquiaService {
         if (found.isPresent()) {
             return found.get();
         }
-        Unidade u = repo.buscar(Unidade.class, codigo);
+        Unidade u = unidadeService.buscarPorCodigo(codigo);
         return toUnidadeDtoObrigatoria(u);
     }
 
@@ -120,7 +122,7 @@ public class UnidadeHierarquiaService {
         Optional<UnidadeDto> found = buscarNaHierarquiaPorSigla(todas, sigla);
 
         if (found.isEmpty()) {
-            repo.buscarPorSigla(Unidade.class, sigla);
+            unidadeService.buscarPorSigla(sigla);
             return List.of();
         }
 
@@ -135,7 +137,7 @@ public class UnidadeHierarquiaService {
      * @throws ErroEntidadeNaoEncontrada se a unidade não for encontrada
      */
     public Optional<String> buscarSiglaSuperior(String sigla) {
-        Unidade unidade = repo.buscarPorSigla(Unidade.class, sigla);
+        Unidade unidade = unidadeService.buscarPorSigla(sigla);
 
         return Optional.ofNullable(unidade.getUnidadeSuperior()).map(Unidade::getSigla);
     }

@@ -15,7 +15,9 @@ import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.*;
 
 import java.io.*;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -29,10 +31,11 @@ public class RelatorioFacade {
     @Transactional(readOnly = true)
     public List<RelatorioAndamentoDto> obterRelatorioAndamento(Long codProcesso) {
         List<Subprocesso> subprocessos = consultaService.listarEntidadesPorProcesso(codProcesso);
+        Map<Long, UnidadeResponsavelDto> responsaveisPorUnidade = buscarResponsaveisPorUnidade(subprocessos);
 
         return subprocessos.stream().map(sp -> {
             Unidade unidade = sp.getUnidade();
-            UnidadeResponsavelDto respDto = responsavelService.buscarResponsavelUnidade(unidade.getCodigo());
+            UnidadeResponsavelDto respDto = obterResponsavelObrigatorio(unidade.getCodigo(), responsaveisPorUnidade);
             String responsavel = respDto.titularNome();
 
             java.time.LocalDateTime dataMovimentacao = sp.getDataLimiteEtapa1();
@@ -52,6 +55,7 @@ public class RelatorioFacade {
     public void gerarRelatorioAndamento(Long codProcesso, OutputStream outputStream) {
         Processo processo = processoService.buscarPorCodigo(codProcesso);
         List<Subprocesso> subprocessos = consultaService.listarEntidadesPorProcesso(codProcesso);
+        Map<Long, UnidadeResponsavelDto> responsaveisPorUnidade = buscarResponsaveisPorUnidade(subprocessos);
 
         try (Document document = pdfFactory.createDocument()) {
             pdfFactory.createWriter(document, outputStream);
@@ -62,7 +66,7 @@ public class RelatorioFacade {
 
             for (Subprocesso sp : subprocessos) {
                 Unidade unidade = sp.getUnidade();
-                UnidadeResponsavelDto respDto = responsavelService.buscarResponsavelUnidade(unidade.getCodigo());
+                UnidadeResponsavelDto respDto = obterResponsavelObrigatorio(unidade.getCodigo(), responsaveisPorUnidade);
                 String responsavel = respDto.titularNome();
 
                 String texto = String.format(
@@ -111,6 +115,28 @@ public class RelatorioFacade {
             throw new RuntimeException("Erro ao gerar PDF", e);
         }
     }
-}
 
+    private Map<Long, UnidadeResponsavelDto> buscarResponsaveisPorUnidade(List<Subprocesso> subprocessos) {
+        List<Long> codigosUnidade = subprocessos.stream()
+                .map(Subprocesso::getUnidade)
+                .map(Unidade::getCodigo)
+                .distinct()
+                .toList();
+
+        if (codigosUnidade.isEmpty()) {
+            return Map.of();
+        }
+
+        return new HashMap<>(responsavelService.buscarResponsaveisUnidades(codigosUnidade));
+    }
+
+    private UnidadeResponsavelDto obterResponsavelObrigatorio(
+            Long unidadeCodigo, Map<Long, UnidadeResponsavelDto> responsaveisPorUnidade) {
+        UnidadeResponsavelDto responsavel = responsaveisPorUnidade.get(unidadeCodigo);
+        if (responsavel == null) {
+            throw new IllegalStateException("Responsável ausente para unidade %d".formatted(unidadeCodigo));
+        }
+        return responsavel;
+    }
+}
 

@@ -60,7 +60,8 @@ class RelatorioFacadeTest {
         sp.setDataLimiteEtapa1(java.time.LocalDateTime.of(2023, 10, 10, 10, 0));
 
         when(consultaService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
-        when(responsavelService.buscarResponsavelUnidade(1L)).thenReturn(UnidadeResponsavelDto.builder().titularNome("Resp").build());
+        when(responsavelService.buscarResponsaveisUnidades(List.of(1L)))
+                .thenReturn(Map.of(1L, UnidadeResponsavelDto.builder().titularNome("Resp").build()));
 
         List<RelatorioAndamentoDto> resultado = relatorioService.obterRelatorioAndamento(1L);
 
@@ -92,11 +93,45 @@ class RelatorioFacadeTest {
 
         when(processoService.buscarPorCodigo(1L)).thenReturn(p);
         when(consultaService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
-        when(responsavelService.buscarResponsavelUnidade(1L)).thenReturn(UnidadeResponsavelDto.builder().titularNome("Resp").build());
+        when(responsavelService.buscarResponsaveisUnidades(List.of(1L)))
+                .thenReturn(Map.of(1L, UnidadeResponsavelDto.builder().titularNome("Resp").build()));
 
         OutputStream out = new ByteArrayOutputStream();
         relatorioService.gerarRelatorioAndamento(1L, out);
         verify(document, atLeastOnce()).add(any());
+    }
+
+    @Test
+    @DisplayName("Deve buscar responsáveis em lote no relatório de andamento")
+    void deveBuscarResponsaveisEmLoteNoRelatorioDeAndamento() {
+        Unidade u1 = new Unidade();
+        u1.setSigla("U1");
+        u1.setNome("Unidade 1");
+        u1.setCodigo(1L);
+
+        Unidade u2 = new Unidade();
+        u2.setSigla("U2");
+        u2.setNome("Unidade 2");
+        u2.setCodigo(2L);
+
+        Subprocesso sp1 = new Subprocesso();
+        sp1.setUnidade(u1);
+        sp1.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+
+        Subprocesso sp2 = new Subprocesso();
+        sp2.setUnidade(u2);
+        sp2.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+
+        when(consultaService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp1, sp2));
+        when(responsavelService.buscarResponsaveisUnidades(List.of(1L, 2L))).thenReturn(Map.of(
+                1L, UnidadeResponsavelDto.builder().titularNome("Resp 1").build(),
+                2L, UnidadeResponsavelDto.builder().titularNome("Resp 2").build()
+        ));
+
+        relatorioService.obterRelatorioAndamento(1L);
+
+        verify(responsavelService).buscarResponsaveisUnidades(List.of(1L, 2L));
+        verify(responsavelService, never()).buscarResponsavelUnidade(anyLong());
     }
 
     @Test

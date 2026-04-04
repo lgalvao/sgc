@@ -4,9 +4,11 @@ import lombok.*;
 import lombok.extern.slf4j.*;
 
 import org.jspecify.annotations.Nullable;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.namedparam.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
+import sgc.comum.config.CacheConfig;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
 
@@ -36,12 +38,13 @@ public class ValidadorDadosOrganizacionais {
     private final ResponsabilidadeRepo responsabilidadeRepo;
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
+    @Cacheable(CacheConfig.CACHE_DIAGNOSTICO_ORGANIZACIONAL)
     @Transactional(readOnly = true)
     public DiagnosticoOrganizacionalDto diagnosticar() {
         log.info("Gerando diagnostico das invariantes organizacionais...");
 
-        List<Unidade> unidadesParticipantes = carregarUnidadesParticipantes();
-        Map<Long, Responsabilidade> responsabilidadesPorUnidade = carregarResponsabilidades(unidadesParticipantes);
+        List<UnidadeHierarquiaLeitura> unidadesParticipantes = carregarUnidadesParticipantes();
+        Map<Long, ResponsabilidadeLeitura> responsabilidadesPorUnidade = carregarResponsabilidades(unidadesParticipantes);
         Map<String, List<String>> violacoesPorTipo = new LinkedHashMap<>();
         ResultadoCargaUsuarios resultadoUsuarios = carregarUsuarios(unidadesParticipantes, responsabilidadesPorUnidade);
         Map<String, Usuario> usuariosPorTitulo = resultadoUsuarios.usuariosPorTitulo();
@@ -135,37 +138,37 @@ public class ValidadorDadosOrganizacionais {
         return sigla.isBlank() ? null : sigla;
     }
 
-    private List<Unidade> carregarUnidadesParticipantes() {
-        return unidadeRepo.listarTodasComHierarquia().stream()
-                .filter(unidade -> unidade.getSituacao() == ATIVA)
-                .filter(unidade -> TIPOS_PARTICIPANTES.contains(unidade.getTipo()))
+    private List<UnidadeHierarquiaLeitura> carregarUnidadesParticipantes() {
+        return unidadeRepo.listarEstruturasAtivas().stream()
+                .filter(unidade -> unidade.situacao() == ATIVA)
+                .filter(unidade -> TIPOS_PARTICIPANTES.contains(unidade.tipo()))
                 .toList();
     }
 
-    private Map<Long, Responsabilidade> carregarResponsabilidades(List<Unidade> unidades) {
+    private Map<Long, ResponsabilidadeLeitura> carregarResponsabilidades(List<UnidadeHierarquiaLeitura> unidades) {
         List<Long> codigos = unidades.stream()
-                .map(Unidade::getCodigo)
+                .map(UnidadeHierarquiaLeitura::codigo)
                 .toList();
 
         if (codigos.isEmpty()) {
             return Map.of();
         }
 
-        return responsabilidadeRepo.listarPorCodigosUnidade(codigos).stream()
+        return responsabilidadeRepo.listarLeiturasPorCodigosUnidade(codigos).stream()
                 .collect(Collectors.toMap(
-                        Responsabilidade::getUnidadeCodigo,
+                        ResponsabilidadeLeitura::unidadeCodigo,
                         Function.identity(),
                         (responsabilidadeAtual, responsabilidadeDuplicada) -> responsabilidadeAtual
                 ));
     }
 
     private ResultadoCargaUsuarios carregarUsuarios(
-            List<Unidade> unidades,
-            Map<Long, Responsabilidade> responsabilidadesPorUnidade
+            List<UnidadeHierarquiaLeitura> unidades,
+            Map<Long, ResponsabilidadeLeitura> responsabilidadesPorUnidade
     ) {
         List<String> titulos = Stream.concat(
-                        unidades.stream().map(Unidade::getTituloTitular),
-                        responsabilidadesPorUnidade.values().stream().map(Responsabilidade::getUsuarioTitulo)
+                        unidades.stream().map(UnidadeHierarquiaLeitura::tituloTitular),
+                        responsabilidadesPorUnidade.values().stream().map(ResponsabilidadeLeitura::usuarioTitulo)
                 )
                 .filter(Objects::nonNull)
                 .map(String::trim)
@@ -189,9 +192,9 @@ public class ValidadorDadosOrganizacionais {
         return new ResultadoCargaUsuarios(usuariosPorTitulo, titulosDuplicados);
     }
 
-    private ResultadoCargaPerfis carregarPerfis(List<Unidade> unidades) {
+    private ResultadoCargaPerfis carregarPerfis(List<UnidadeHierarquiaLeitura> unidades) {
         List<Long> codigos = unidades.stream()
-                .map(Unidade::getCodigo)
+                .map(UnidadeHierarquiaLeitura::codigo)
                 .toList();
 
         if (codigos.isEmpty()) {
@@ -278,55 +281,55 @@ public class ValidadorDadosOrganizacionais {
     }
 
     private void validarResponsabilidade(
-            List<Unidade> unidades,
-            Map<Long, Responsabilidade> responsabilidadesPorUnidade,
+            List<UnidadeHierarquiaLeitura> unidades,
+            Map<Long, ResponsabilidadeLeitura> responsabilidadesPorUnidade,
             Map<String, List<String>> violacoesPorTipo
     ) {
-        for (Unidade unidade : unidades) {
-            Responsabilidade responsabilidade = responsabilidadesPorUnidade.get(unidade.getCodigo());
-            if (responsabilidade == null || estaVazio(responsabilidade.getUsuarioTitulo())) {
+        for (UnidadeHierarquiaLeitura unidade : unidades) {
+            ResponsabilidadeLeitura responsabilidade = responsabilidadesPorUnidade.get(unidade.codigo());
+            if (responsabilidade == null || estaVazio(responsabilidade.usuarioTitulo())) {
                 adicionarViolacao(violacoesPorTipo,
                         "Unidade participante sem responsavel efetivo",
-                        "sigla=%s, tipo=%s".formatted(unidade.getSigla(), unidade.getTipo()));
+                        "sigla=%s, tipo=%s".formatted(unidade.sigla(), unidade.tipo()));
             }
         }
     }
 
     private Set<Long> obterUnidadesSemResponsavel(
-            List<Unidade> unidades,
-            Map<Long, Responsabilidade> responsabilidadesPorUnidade
+            List<UnidadeHierarquiaLeitura> unidades,
+            Map<Long, ResponsabilidadeLeitura> responsabilidadesPorUnidade
     ) {
         return unidades.stream()
-                .map(Unidade::getCodigo)
+                .map(UnidadeHierarquiaLeitura::codigo)
                 .filter(codigo -> {
-                    Responsabilidade responsabilidade = responsabilidadesPorUnidade.get(codigo);
-                    return responsabilidade == null || estaVazio(responsabilidade.getUsuarioTitulo());
+                    ResponsabilidadeLeitura responsabilidade = responsabilidadesPorUnidade.get(codigo);
+                    return responsabilidade == null || estaVazio(responsabilidade.usuarioTitulo());
                 })
                 .collect(Collectors.toSet());
     }
 
     private void validarUsuariosReferenciados(
-            List<Unidade> unidades,
-            Map<Long, Responsabilidade> responsabilidadesPorUnidade,
+            List<UnidadeHierarquiaLeitura> unidades,
+            Map<Long, ResponsabilidadeLeitura> responsabilidadesPorUnidade,
             Map<String, Usuario> usuariosPorTitulo,
             Map<String, List<String>> violacoesPorTipo
     ) {
-        for (Unidade unidade : unidades) {
-            String tituloTitular = unidade.getTituloTitular();
+        for (UnidadeHierarquiaLeitura unidade : unidades) {
+            String tituloTitular = unidade.tituloTitular();
             validarUsuarioExistente(
                     tituloTitular,
                     "Titular referenciado ausente na VW_USUARIO",
-                    "sigla=%s, titulo_titular=%s".formatted(unidade.getSigla(), valorOuNulo(tituloTitular)),
+                    "sigla=%s, titulo_titular=%s".formatted(unidade.sigla(), valorOuNulo(tituloTitular)),
                     usuariosPorTitulo,
                     violacoesPorTipo
             );
 
-            Responsabilidade responsabilidade = responsabilidadesPorUnidade.get(unidade.getCodigo());
+            ResponsabilidadeLeitura responsabilidade = responsabilidadesPorUnidade.get(unidade.codigo());
             if (responsabilidade != null) {
                 validarUsuarioExistente(
-                        responsabilidade.getUsuarioTitulo(),
+                        responsabilidade.usuarioTitulo(),
                         "Responsavel referenciado ausente na VW_USUARIO",
-                        "sigla=%s, usuario_titulo=%s".formatted(unidade.getSigla(), responsabilidade.getUsuarioTitulo()),
+                        "sigla=%s, usuario_titulo=%s".formatted(unidade.sigla(), responsabilidade.usuarioTitulo()),
                         usuariosPorTitulo,
                         violacoesPorTipo
                 );
@@ -374,22 +377,21 @@ public class ValidadorDadosOrganizacionais {
     }
 
     private void validarUnidadesIntermediarias(
-            List<Unidade> unidades,
-            Map<Long, Responsabilidade> responsabilidadesPorUnidade,
+            List<UnidadeHierarquiaLeitura> unidades,
+            Map<Long, ResponsabilidadeLeitura> responsabilidadesPorUnidade,
             Map<Long, Set<PerfilUsuarioUnidade>> perfisPorUnidade,
             Map<String, List<String>> violacoesPorTipo
     ) {
         Set<Long> unidadesComFilhas = unidades.stream()
-                .map(Unidade::getUnidadeSuperior)
+                .map(UnidadeHierarquiaLeitura::unidadeSuperiorCodigo)
                 .filter(Objects::nonNull)
-                .map(Unidade::getCodigo)
                 .collect(Collectors.toSet());
 
         ContextoValidacaoIntermediaria contexto = new ContextoValidacaoIntermediaria(
                 unidadesComFilhas, responsabilidadesPorUnidade, perfisPorUnidade, violacoesPorTipo);
 
-        for (Unidade unidade : unidades) {
-            if (unidade.getTipo() == INTERMEDIARIA) {
+        for (UnidadeHierarquiaLeitura unidade : unidades) {
+            if (unidade.tipo() == INTERMEDIARIA) {
                 validarUnidadeIntermediaria(unidade, contexto);
             }
         }
@@ -444,37 +446,37 @@ public class ValidadorDadosOrganizacionais {
         }
     }
 
-    private void validarUnidadeIntermediaria(Unidade unidade, ContextoValidacaoIntermediaria contexto) {
-        if (!contexto.unidadesComFilhas().contains(unidade.getCodigo())) {
+    private void validarUnidadeIntermediaria(UnidadeHierarquiaLeitura unidade, ContextoValidacaoIntermediaria contexto) {
+        if (!contexto.unidadesComFilhas().contains(unidade.codigo())) {
             adicionarViolacao(contexto.violacoesPorTipo(),
                     "Unidade intermediaria sem filhas ativas participantes",
-                    "sigla=%s".formatted(unidade.getSigla()));
+                    "sigla=%s".formatted(unidade.sigla()));
         }
 
-        Responsabilidade responsabilidade = contexto.responsabilidadesPorUnidade().get(unidade.getCodigo());
-        Set<PerfilUsuarioUnidade> perfis = contexto.perfisPorUnidade().getOrDefault(unidade.getCodigo(), Set.of());
+        ResponsabilidadeLeitura responsabilidade = contexto.responsabilidadesPorUnidade().get(unidade.codigo());
+        Set<PerfilUsuarioUnidade> perfis = contexto.perfisPorUnidade().getOrDefault(unidade.codigo(), Set.of());
         boolean possuiGestor = perfis.stream()
                 .anyMatch(perfil -> perfil.perfil() == GESTOR);
 
         if (!possuiGestor) {
             adicionarViolacao(contexto.violacoesPorTipo(),
                     "Unidade intermediaria sem perfil GESTOR",
-                    "sigla=%s".formatted(unidade.getSigla()));
-        } else if (responsabilidade != null && !estaVazio(responsabilidade.getUsuarioTitulo())) {
+                    "sigla=%s".formatted(unidade.sigla()));
+        } else if (responsabilidade != null && !estaVazio(responsabilidade.usuarioTitulo())) {
             validarGestorResponsavel(unidade, responsabilidade, contexto);
         }
     }
 
-    private void validarGestorResponsavel(Unidade u, Responsabilidade r, ContextoValidacaoIntermediaria c) {
-        Set<PerfilUsuarioUnidade> perfis = c.perfisPorUnidade().getOrDefault(u.getCodigo(), Set.of());
+    private void validarGestorResponsavel(UnidadeHierarquiaLeitura u, ResponsabilidadeLeitura r, ContextoValidacaoIntermediaria c) {
+        Set<PerfilUsuarioUnidade> perfis = c.perfisPorUnidade().getOrDefault(u.codigo(), Set.of());
         boolean responsavelPossuiPerfilGestor = perfis.stream()
                 .anyMatch(perfil -> perfil.perfil() == GESTOR
-                        && Objects.equals(perfil.usuarioTitulo(), r.getUsuarioTitulo()));
+                        && Objects.equals(perfil.usuarioTitulo(), r.usuarioTitulo()));
 
         if (!responsavelPossuiPerfilGestor) {
             adicionarViolacao(c.violacoesPorTipo(),
                     "Responsavel de unidade intermediaria sem perfil GESTOR correspondente",
-                    "sigla=%s, usuario_titulo=%s".formatted(u.getSigla(), r.getUsuarioTitulo()));
+                    "sigla=%s, usuario_titulo=%s".formatted(u.sigla(), r.usuarioTitulo()));
         }
     }
 
@@ -494,7 +496,7 @@ public class ValidadorDadosOrganizacionais {
 
     private record ContextoValidacaoIntermediaria(
             Set<Long> unidadesComFilhas,
-            Map<Long, Responsabilidade> responsabilidadesPorUnidade,
+            Map<Long, ResponsabilidadeLeitura> responsabilidadesPorUnidade,
             Map<Long, Set<PerfilUsuarioUnidade>> perfisPorUnidade,
             Map<String, List<String>> violacoesPorTipo
     ) {

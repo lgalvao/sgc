@@ -197,6 +197,7 @@ class ProcessoServiceExtraCoverageTest {
 
             Unidade u = criarUnidadeValida(1L);
             when(unidadeService.buscarPorCodigo(1L)).thenReturn(u);
+            mockarResponsaveisEfetivos();
 
             when(processoRepo.saveAndFlush(p)).thenReturn(p);
 
@@ -759,6 +760,7 @@ class ProcessoServiceExtraCoverageTest {
             mapaVigente.setCodigo(20L);
             unidadeMapa.setMapaVigente(mapaVigente);
             when(unidadeService.buscarMapasPorUnidades(anyList())).thenReturn(List.of(unidadeMapa));
+            mockarResponsaveisEfetivos();
 
             Unidade admin = new Unidade();
             when(repo.buscarPorSigla(Unidade.class, "ADMIN")).thenReturn(admin);

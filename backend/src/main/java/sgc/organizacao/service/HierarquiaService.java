@@ -14,7 +14,7 @@ import java.util.*;
 @Transactional(readOnly = true)
 public class HierarquiaService {
     private final ResponsabilidadeRepo responsabilidadeRepo;
-    private final UnidadeRepo unidadeRepo;
+    private final UnidadeHierarquiaService unidadeHierarquiaService;
 
     public boolean isResponsavel(Unidade unidade, Usuario usuario) {
         return responsabilidadeRepo.findById(unidade.getCodigo())
@@ -23,22 +23,13 @@ public class HierarquiaService {
     }
 
     public boolean isSubordinada(Unidade alvo, Unidade superior) {
-        Long codigoSuperiorAlvo = superior.getCodigo();
-
-        Unidade atual = alvo;
-        while (atual != null) {
-            Unidade proxSuperior = atual.getUnidadeSuperior();
-            if (proxSuperior == null) break;
-
-            if (Objects.equals(codigoSuperiorAlvo, proxSuperior.getCodigo())) {
-                return true;
-            }
-            
-            // Busca via repo para garantir que o próximo 'getUnidadeSuperior' funcione 
-            // mesmo se estivermos lidando com proxies ou sessões parciais.
-            atual = unidadeRepo.findById(proxSuperior.getCodigo()).orElse(null);
+        List<Long> descendentes = unidadeHierarquiaService.buscarIdsDescendentes(superior.getCodigo());
+        if (descendentes.contains(alvo.getCodigo())) {
+            return true;
         }
-        return false;
+
+        Unidade unidadeSuperior = alvo.getUnidadeSuperior();
+        return unidadeSuperior != null && Objects.equals(unidadeSuperior.getCodigo(), superior.getCodigo());
     }
 
     public boolean ehMesmaOuSubordinada(Unidade alvo, Unidade superior) {
@@ -55,4 +46,3 @@ public class HierarquiaService {
         return Objects.equals(superiorAlvo.getCodigo(), superior.getCodigo());
     }
 }
-

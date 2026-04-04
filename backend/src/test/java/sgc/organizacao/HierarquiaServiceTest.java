@@ -20,7 +20,7 @@ class HierarquiaServiceTest {
     private ResponsabilidadeRepo responsabilidadeRepo;
 
     @Mock
-    private UnidadeRepo unidadeRepo;
+    private UnidadeHierarquiaService unidadeHierarquiaService;
 
     @InjectMocks
     private HierarquiaService hierarquiaService;
@@ -95,6 +95,7 @@ class HierarquiaServiceTest {
     void deveRetornarTrueQuandoUnidadeDiretamenteSubordinada() {
         Unidade superior = criarUnidade(1L, null);
         Unidade alvo = criarUnidade(2L, superior);
+        when(unidadeHierarquiaService.buscarIdsDescendentes(1L)).thenReturn(List.of(2L));
 
         assertThat(hierarquiaService.isSubordinada(alvo, superior)).isTrue();
     }
@@ -105,9 +106,7 @@ class HierarquiaServiceTest {
         Unidade raiz = criarUnidade(1L, null);
         Unidade intermediaria = criarUnidade(2L, raiz);
         Unidade alvo = criarUnidade(3L, intermediaria);
-
-        // O novo isSubordinada sobe a árvore via repo se necessário
-        when(unidadeRepo.findById(2L)).thenReturn(Optional.of(intermediaria));
+        when(unidadeHierarquiaService.buscarIdsDescendentes(1L)).thenReturn(List.of(2L, 3L));
 
         assertThat(hierarquiaService.isSubordinada(alvo, raiz)).isTrue();
     }
@@ -118,24 +117,19 @@ class HierarquiaServiceTest {
         Unidade raiz1 = criarUnidade(1L, null);
         Unidade raiz2 = criarUnidade(2L, null);
         Unidade alvo = criarUnidade(3L, raiz1);
-
-        // O novo isSubordinada sobe a árvore via repo se necessário
-        // No loop: atual=alvo(3), proxSuperior=raiz1(1). 1 != 2.
-        // Em seguida busca 1 no repo.
-        when(unidadeRepo.findById(1L)).thenReturn(Optional.of(raiz1));
+        when(unidadeHierarquiaService.buscarIdsDescendentes(2L)).thenReturn(List.of());
 
         assertThat(hierarquiaService.isSubordinada(alvo, raiz2)).isFalse();
     }
 
     @Test
-    @DisplayName("Deve parar loop se unidade superior nao for encontrada no repo")
-    void devePararLoopSeSuperiorNaoEncontrada() {
+    @DisplayName("Deve usar superior imediato quando alvo nao aparece no mapa")
+    void deveUsarSuperiorImediatoQuandoAlvoNaoApareceNoMapa() {
         Unidade raiz = criarUnidade(1L, null);
         Unidade alvo = criarUnidade(2L, raiz);
+        when(unidadeHierarquiaService.buscarIdsDescendentes(1L)).thenReturn(List.of());
 
-        when(unidadeRepo.findById(1L)).thenReturn(Optional.empty());
-
-        assertThat(hierarquiaService.isSubordinada(alvo, criarUnidade(3L, null))).isFalse();
+        assertThat(hierarquiaService.isSubordinada(alvo, raiz)).isTrue();
     }
 
     @Test
