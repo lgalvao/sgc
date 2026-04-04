@@ -4,6 +4,7 @@ import org.junit.jupiter.api.*;
 import org.mockito.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.boot.test.context.*;
+import org.springframework.cache.*;
 import org.springframework.core.io.*;
 import org.springframework.jdbc.core.*;
 import org.springframework.jdbc.core.namedparam.*;
@@ -63,6 +64,8 @@ class E2eControllerTest {
 
     @Mock
     private MapaRepo mapaRepo;
+    @Mock
+    private CacheManager cacheManager;
 
     private E2eController controller;
 
@@ -72,7 +75,7 @@ class E2eControllerTest {
     void setUp() {
         closeable = MockitoAnnotations.openMocks(this);
         mockResourceLoader("file:../e2e/setup/seed.sql", true);
-        controller = new E2eController(jdbcTemplate, namedJdbcTemplate, processoService, processoRepo, subprocessoRepo, mapaRepo, unidadeService, usuarioFacade, resourceLoader);
+        controller = new E2eController(jdbcTemplate, namedJdbcTemplate, processoService, processoRepo, subprocessoRepo, mapaRepo, unidadeService, usuarioFacade, resourceLoader, cacheManager);
     }
 
     @AfterEach
@@ -311,7 +314,7 @@ class E2eControllerTest {
         when(mockJdbc.getDataSource()).thenReturn(mockDataSource);
         when(mockDataSource.getConnection()).thenThrow(new SQLException("Error"));
 
-        E2eController controllerComErro = new E2eController(mockJdbc, namedJdbcTemplate, processoService, processoRepo, subprocessoRepo, mapaRepo, unidadeService, usuarioFacade, resourceLoader);
+        E2eController controllerComErro = new E2eController(mockJdbc, namedJdbcTemplate, processoService, processoRepo, subprocessoRepo, mapaRepo, unidadeService, usuarioFacade, resourceLoader, cacheManager);
         var exception = Assertions.assertThrows(RuntimeException.class, controllerComErro::resetDatabase);
         Assertions.assertNotNull(exception);
     }
@@ -344,7 +347,7 @@ class E2eControllerTest {
         when(mockJdbc.getDataSource()).thenReturn(mockDataSource);
         when(mockDataSource.getConnection()).thenThrow(new SQLException("Erro simulado na conexao"));
 
-        E2eController controllerComErro = new E2eController(mockJdbc, namedJdbcTemplate, processoService, processoRepo, subprocessoRepo, mapaRepo, unidadeService, usuarioFacade, resourceLoader);
+        E2eController controllerComErro = new E2eController(mockJdbc, namedJdbcTemplate, processoService, processoRepo, subprocessoRepo, mapaRepo, unidadeService, usuarioFacade, resourceLoader, cacheManager);
 
         var exception = Assertions.assertThrows(RuntimeException.class, () -> controllerComErro.limparProcessoCompleto(999L));
         assertThat(exception).hasMessageContaining("Falha na limpeza do processo");
@@ -356,7 +359,7 @@ class E2eControllerTest {
         JdbcTemplate mockJdbc = Mockito.mock(JdbcTemplate.class);
         when(mockJdbc.getDataSource()).thenReturn(null);
 
-        E2eController controllerComErro = new E2eController(mockJdbc, namedJdbcTemplate, processoService, processoRepo, subprocessoRepo, mapaRepo, unidadeService, usuarioFacade, resourceLoader);
+        E2eController controllerComErro = new E2eController(mockJdbc, namedJdbcTemplate, processoService, processoRepo, subprocessoRepo, mapaRepo, unidadeService, usuarioFacade, resourceLoader, cacheManager);
 
         // Deve retornar silenciosamente
         Assertions.assertDoesNotThrow(() -> controllerComErro.limparProcessoCompleto(999L));
@@ -439,7 +442,8 @@ class E2eControllerTest {
             var processoRepoMock = mock(ProcessoRepo.class);
             var subprocessoRepoMock = mock(SubprocessoRepo.class);
             var mapaRepoMock = mock(MapaRepo.class);
-            controllerIsolado = new E2eController(jdbcTemplateMock, namedJdbcTemplateMock, processoServiceMock, processoRepoMock, subprocessoRepoMock, mapaRepoMock, unidadeServiceMock, usuarioFacadeMock, resourceLoaderMock);
+            CacheManager cacheManagerMock = mock(CacheManager.class);
+            controllerIsolado = new E2eController(jdbcTemplateMock, namedJdbcTemplateMock, processoServiceMock, processoRepoMock, subprocessoRepoMock, mapaRepoMock, unidadeServiceMock, usuarioFacadeMock, resourceLoaderMock, cacheManagerMock);
         }
 
         @Test
