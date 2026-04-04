@@ -25,5 +25,33 @@ public interface ResponsabilidadeRepo extends JpaRepository<Responsabilidade, Lo
             """)
     List<ResponsabilidadeLeitura> listarLeiturasPorCodigosUnidade(@Param("unidadeCodigos") List<Long> unidadeCodigos);
 
+    @Query("""
+            SELECT new sgc.organizacao.model.ResponsabilidadeUnidadeLeitura(
+                r.unidadeCodigo,
+                r.usuarioTitulo,
+                r.unidade.tituloTitular,
+                r.tipo,
+                r.dataInicio,
+                r.dataFim
+            )
+            FROM Responsabilidade r
+            WHERE r.unidadeCodigo = :unidadeCodigo
+            """)
+    Optional<ResponsabilidadeUnidadeLeitura> buscarLeituraDetalhadaPorCodigoUnidade(@Param("unidadeCodigo") Long unidadeCodigo);
+
+    @Query("""
+            SELECT new sgc.organizacao.model.ResponsabilidadeUnidadeLeitura(
+                r.unidadeCodigo,
+                r.usuarioTitulo,
+                r.unidade.tituloTitular,
+                r.tipo,
+                r.dataInicio,
+                r.dataFim
+            )
+            FROM Responsabilidade r
+            WHERE r.unidadeCodigo IN :unidadeCodigos
+            """)
+    List<ResponsabilidadeUnidadeLeitura> listarLeiturasDetalhadasPorCodigosUnidade(@Param("unidadeCodigos") List<Long> unidadeCodigos);
+
     List<Responsabilidade> findByUsuarioTitulo(String usuarioTitulo);
 }

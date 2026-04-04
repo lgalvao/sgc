@@ -69,9 +69,8 @@ class ProcessoServiceExtraCoverageTest {
     @Mock
     private SgcPermissionEvaluator permissionEvaluator;
 
-    @BeforeEach
-    void configurarMocksPadrao() {
-        lenient().when(responsavelUnidadeService.todasPossuemResponsavelEfetivo(anyList())).thenReturn(true);
+    private void mockarResponsaveisEfetivos() {
+        when(responsavelUnidadeService.todasPossuemResponsavelEfetivo(anyList())).thenReturn(true);
     }
 
     private Unidade criarUnidadeValida(Long codigo) {

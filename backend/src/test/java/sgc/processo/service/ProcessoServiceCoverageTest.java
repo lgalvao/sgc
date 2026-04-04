@@ -49,9 +49,8 @@ class ProcessoServiceCoverageTest {
     @InjectMocks
     private ProcessoService target;
 
-    @BeforeEach
-    void configurarMocksPadrao() {
-        lenient().when(responsavelUnidadeService.todasPossuemResponsavelEfetivo(anyList())).thenReturn(true);
+    private void mockarResponsaveisEfetivos() {
+        when(responsavelUnidadeService.todasPossuemResponsavelEfetivo(anyList())).thenReturn(true);
     }
 
     @Test

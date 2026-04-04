@@ -28,6 +28,7 @@ import static java.util.stream.Collectors.*;
 @Service
 @RequiredArgsConstructor
 public class ResponsavelUnidadeService {
+    private final UnidadeRepo unidadeRepo;
     private final UsuarioRepo usuarioRepo;
     private final AtribuicaoTemporariaRepo atribuicaoTemporariaRepo;
     private final ResponsabilidadeRepo responsabilidadeRepo;
@@ -90,10 +91,9 @@ public class ResponsavelUnidadeService {
      */
     @Transactional(readOnly = true)
     public Usuario buscarResponsavelAtual(String siglaUnidade) {
-        Unidade unidade = repo.buscarPorSigla(Unidade.class, siglaUnidade);
-        Responsabilidade resp = repo.buscar(Responsabilidade.class, unidade.getCodigo());
-
-        return repo.buscar(Usuario.class, resp.getUsuarioTitulo());
+        Long unidadeCodigo = buscarCodigoUnidadePorSigla(siglaUnidade);
+        ResponsabilidadeUnidadeLeitura responsabilidade = buscarResponsabilidadeDetalhada(unidadeCodigo);
+        return repo.buscar(Usuario.class, responsabilidade.usuarioTitulo());
     }
 
     /**
@@ -101,15 +101,15 @@ public class ResponsavelUnidadeService {
      */
     @Transactional(readOnly = true)
     public ResponsavelDto buscarResponsabilidadeDetalhadaAtual(String siglaUnidade) {
-        Unidade unidade = repo.buscarPorSigla(Unidade.class, siglaUnidade);
-        Responsabilidade resp = repo.buscar(Responsabilidade.class, unidade.getCodigo());
-        Usuario usuario = repo.buscar(Usuario.class, resp.getUsuarioTitulo());
+        Long unidadeCodigo = buscarCodigoUnidadePorSigla(siglaUnidade);
+        ResponsabilidadeUnidadeLeitura responsabilidade = buscarResponsabilidadeDetalhada(unidadeCodigo);
+        Usuario usuario = repo.buscar(Usuario.class, responsabilidade.usuarioTitulo());
 
         return ResponsavelDto.builder()
                 .usuario(UsuarioResumoDto.fromEntityObrigatorio(usuario))
-                .tipo(resp.getTipo())
-                .dataInicio(resp.getDataInicio())
-                .dataFim(resp.getDataFim())
+                .tipo(responsabilidade.tipo())
+                .dataInicio(responsabilidade.dataInicio())
+                .dataFim(responsabilidade.dataFim())
                 .build();
     }
 
@@ -119,10 +119,9 @@ public class ResponsavelUnidadeService {
      * @throws ErroEntidadeNaoEncontrada se não houver responsável
      */
     public UnidadeResponsavelDto buscarResponsavelUnidade(Long unidadeCodigo) {
-        Responsabilidade responsabilidade = repo.buscar(Responsabilidade.class, unidadeCodigo);
-        Usuario responsavel = repo.buscar(Usuario.class, responsabilidade.getUsuarioTitulo());
-
-        Usuario titularOficial = repo.buscar(Usuario.class, responsabilidade.getUnidade().getTituloTitular());
+        ResponsabilidadeUnidadeLeitura responsabilidade = buscarResponsabilidadeDetalhada(unidadeCodigo);
+        Usuario responsavel = repo.buscar(Usuario.class, responsabilidade.usuarioTitulo());
+        Usuario titularOficial = repo.buscar(Usuario.class, obterTituloTitularObrigatorio(responsabilidade));
         return montarResponsavelDto(unidadeCodigo, responsavel, titularOficial);
     }
 
@@ -133,14 +132,14 @@ public class ResponsavelUnidadeService {
     public Map<Long, UnidadeResponsavelDto> buscarResponsaveisUnidades(List<Long> unidadesCodigos) {
         if (unidadesCodigos.isEmpty()) return Collections.emptyMap();
 
-        List<Responsabilidade> responsabilidades = responsabilidadeRepo.listarPorCodigosUnidade(unidadesCodigos);
+        List<ResponsabilidadeUnidadeLeitura> responsabilidades = responsabilidadeRepo.listarLeiturasDetalhadasPorCodigosUnidade(unidadesCodigos);
         if (responsabilidades.isEmpty()) return Collections.emptyMap();
 
         // Coletar todos os títulos (responsáveis atuais e titulares oficiais) para busca em lote
         Set<String> todosTitulos = new HashSet<>();
         responsabilidades.forEach(r -> {
-            todosTitulos.add(r.getUsuarioTitulo());
-            todosTitulos.add(obterTituloTitularObrigatorio(r.getUnidade(), r.getUnidadeCodigo()));
+            todosTitulos.add(r.usuarioTitulo());
+            todosTitulos.add(obterTituloTitularObrigatorio(r));
         });
 
         Map<String, Usuario> usuariosPorTitulo = usuarioRepo.listarPorTitulosComUnidadeLotacao(new ArrayList<>(todosTitulos)).stream()
@@ -148,22 +147,22 @@ public class ResponsavelUnidadeService {
 
         return responsabilidades.stream()
                 .collect(toMap(
-                        Responsabilidade::getUnidadeCodigo,
+                        ResponsabilidadeUnidadeLeitura::unidadeCodigo,
                         r -> {
-                            Usuario responsavel = usuariosPorTitulo.get(r.getUsuarioTitulo());
-                            Usuario titularOficial = usuariosPorTitulo.get(obterTituloTitularObrigatorio(r.getUnidade(), r.getUnidadeCodigo()));
+                            Usuario responsavel = usuariosPorTitulo.get(r.usuarioTitulo());
+                            Usuario titularOficial = usuariosPorTitulo.get(obterTituloTitularObrigatorio(r));
                             if (responsavel == null || titularOficial == null) {
-                                throw new IllegalStateException("Responsável ou titular oficial ausente para unidade %d".formatted(r.getUnidadeCodigo()));
+                                throw new IllegalStateException("Responsável ou titular oficial ausente para unidade %d".formatted(r.unidadeCodigo()));
                             }
-                            return montarResponsavelDto(r.getUnidadeCodigo(), responsavel, titularOficial);
+                            return montarResponsavelDto(r.unidadeCodigo(), responsavel, titularOficial);
                         }
                 ));
     }
 
-    private String obterTituloTitularObrigatorio(Unidade unidade, Long unidadeCodigo) {
-        String tituloTitular = unidade.getTituloTitular();
+    private String obterTituloTitularObrigatorio(ResponsabilidadeUnidadeLeitura responsabilidade) {
+        String tituloTitular = responsabilidade.tituloTitular();
         if (tituloTitular == null || tituloTitular.isBlank()) {
-            throw new IllegalStateException("Titular oficial ausente para unidade %d".formatted(unidadeCodigo));
+            throw new IllegalStateException("Titular oficial ausente para unidade %d".formatted(responsabilidade.unidadeCodigo()));
         }
         return tituloTitular;
     }
@@ -209,11 +208,21 @@ public class ResponsavelUnidadeService {
             return true;
         }
 
-        Set<Long> unidadesComResponsavelEfetivo = responsabilidadeRepo.listarPorCodigosUnidade(unidadesCodigos).stream()
-                .filter(responsabilidade -> !responsabilidade.getUsuarioTitulo().isBlank())
-                .map(Responsabilidade::getUnidadeCodigo)
+        Set<Long> unidadesComResponsavelEfetivo = responsabilidadeRepo.listarLeiturasPorCodigosUnidade(unidadesCodigos).stream()
+                .filter(responsabilidade -> !responsabilidade.usuarioTitulo().isBlank())
+                .map(ResponsabilidadeLeitura::unidadeCodigo)
                 .collect(toSet());
 
         return unidadesComResponsavelEfetivo.containsAll(unidadesCodigos);
+    }
+
+    private Long buscarCodigoUnidadePorSigla(String siglaUnidade) {
+        return unidadeRepo.buscarCodigoAtivoPorSigla(siglaUnidade)
+                .orElseGet(() -> repo.buscarPorSigla(Unidade.class, siglaUnidade).getCodigo());
+    }
+
+    private ResponsabilidadeUnidadeLeitura buscarResponsabilidadeDetalhada(Long unidadeCodigo) {
+        return responsabilidadeRepo.buscarLeituraDetalhadaPorCodigoUnidade(unidadeCodigo)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(Responsabilidade.class.getSimpleName(), unidadeCodigo));
     }
 }

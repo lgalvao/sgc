@@ -18,6 +18,13 @@ public interface UnidadeRepo extends JpaRepository<Unidade, Long> {
     }
 
     @Query("""
+            SELECT u.codigo FROM Unidade u
+            WHERE UPPER(u.sigla) = UPPER(:sigla)
+            AND u.situacao = SituacaoUnidade.ATIVA
+            """)
+    Optional<Long> buscarCodigoAtivoPorSigla(@Param("sigla") String sigla);
+
+    @Query("""
             SELECT u.sigla FROM Unidade u
             WHERE u.codigo IN :codigos
             AND u.situacao = SituacaoUnidade.ATIVA

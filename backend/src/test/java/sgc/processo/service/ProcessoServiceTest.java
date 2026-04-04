@@ -6,7 +6,6 @@ import org.junit.jupiter.params.*;
 import org.junit.jupiter.params.provider.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
-import org.mockito.quality.*;
 import org.springframework.data.domain.*;
 import org.springframework.security.core.*;
 import sgc.alerta.*;
@@ -64,9 +63,8 @@ class ProcessoServiceTest {
     @Mock
     private SubprocessoTransicaoService transicaoService;
 
-    @BeforeEach
-    void configurarMocksPadrao() {
-        lenient().when(responsavelUnidadeService.todasPossuemResponsavelEfetivo(anyList())).thenReturn(true);
+    private void mockarResponsaveisEfetivos() {
+        when(responsavelUnidadeService.todasPossuemResponsavelEfetivo(anyList())).thenReturn(true);
     }
 
     private Unidade criarUnidadeValida(Long codigo) {

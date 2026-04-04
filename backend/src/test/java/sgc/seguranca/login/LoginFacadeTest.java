@@ -88,11 +88,9 @@ class LoginFacadeTest {
         unidade.setSituacao(SituacaoUnidade.ATIVA);
         unidade.setTipo(TipoUnidade.OPERACIONAL);
 
-        UsuarioPerfil up = new UsuarioPerfil();
-        up.setPerfil(Perfil.ADMIN);
-        up.setUnidade(unidade);
-
-        when(usuarioServiceInterno.buscarPerfis("123")).thenReturn(List.of(up));
+        when(usuarioServiceInterno.buscarAutorizacoesPerfil("123")).thenReturn(List.of(
+                new UsuarioPerfilAutorizacaoLeitura("123", Perfil.ADMIN, 1L, null, "U1", TipoUnidade.OPERACIONAL, SituacaoUnidade.ATIVA)
+        ));
         when(gerenciadorJwt.gerarToken("123", Perfil.ADMIN, 1L)).thenReturn("token");
         when(unidadeService.buscarPorCodigo(1L)).thenReturn(unidade);
 
@@ -106,7 +104,7 @@ class LoginFacadeTest {
         Usuario user = new Usuario();
         user.setTituloEleitoral("123");
         when(usuarioFacade.carregarUsuarioParaAutenticacao("123")).thenReturn(user);
-        when(usuarioServiceInterno.buscarPerfis("123")).thenReturn(List.of());
+        when(usuarioServiceInterno.buscarAutorizacoesPerfil("123")).thenReturn(List.of());
 
         EntrarRequest req = new EntrarRequest("ADMIN", 1L);
         assertThatThrownBy(() -> loginFacade.entrar(req, "123"))
@@ -142,11 +140,9 @@ class LoginFacadeTest {
         unidade.setSituacao(SituacaoUnidade.ATIVA);
         unidade.setTipo(TipoUnidade.OPERACIONAL);
 
-        UsuarioPerfil up = new UsuarioPerfil();
-        up.setPerfil(Perfil.GESTOR);
-        up.setUnidade(unidade);
-
-        when(usuarioServiceInterno.buscarPerfis("123")).thenReturn(List.of(up));
+        when(usuarioServiceInterno.buscarAutorizacoesPerfil("123")).thenReturn(List.of(
+                new UsuarioPerfilAutorizacaoLeitura("123", Perfil.GESTOR, 1L, null, "U1", TipoUnidade.OPERACIONAL, SituacaoUnidade.ATIVA)
+        ));
         when(gerenciadorJwt.gerarToken("123", Perfil.GESTOR, 1L)).thenReturn("token");
         when(unidadeService.buscarPorCodigo(1L)).thenReturn(unidade);
 
@@ -166,11 +162,9 @@ class LoginFacadeTest {
         unidade.setSituacao(SituacaoUnidade.ATIVA);
         unidade.setTipo(TipoUnidade.OPERACIONAL);
 
-        UsuarioPerfil up = new UsuarioPerfil();
-        up.setPerfil(Perfil.GESTOR);
-        up.setUnidade(unidade);
-
-        when(usuarioServiceInterno.buscarPerfis("123")).thenReturn(List.of(up));
+        when(usuarioServiceInterno.buscarAutorizacoesPerfil("123")).thenReturn(List.of(
+                new UsuarioPerfilAutorizacaoLeitura("123", Perfil.GESTOR, 2L, null, "U2", TipoUnidade.OPERACIONAL, SituacaoUnidade.ATIVA)
+        ));
 
         EntrarRequest req = new EntrarRequest("GESTOR", 1L);
         assertThatThrownBy(() -> loginFacade.entrar(req, "123"))
@@ -190,11 +184,9 @@ class LoginFacadeTest {
         unidade.setSituacao(SituacaoUnidade.ATIVA);
         unidade.setTipo(TipoUnidade.OPERACIONAL);
 
-        UsuarioPerfil up = new UsuarioPerfil();
-        up.setPerfil(Perfil.GESTOR);
-        up.setUnidade(unidade);
-
-        when(usuarioServiceInterno.buscarPerfis("123")).thenReturn(List.of(up));
+        when(usuarioServiceInterno.buscarAutorizacoesPerfil("123")).thenReturn(List.of(
+                new UsuarioPerfilAutorizacaoLeitura("123", Perfil.GESTOR, 1L, "Unidade 1", "U1", TipoUnidade.OPERACIONAL, SituacaoUnidade.ATIVA)
+        ));
 
         List<PerfilUnidadeDto> result = loginFacade.buscarAutorizacoesUsuario("123");
         assertThat(result).hasSize(1);
@@ -220,15 +212,10 @@ class LoginFacadeTest {
         unidadeInativa.setSituacao(SituacaoUnidade.INATIVA);
         unidadeInativa.setTipo(TipoUnidade.OPERACIONAL);
 
-        UsuarioPerfil perfilAtivo = new UsuarioPerfil();
-        perfilAtivo.setPerfil(Perfil.GESTOR);
-        perfilAtivo.setUnidade(unidadeAtiva);
-
-        UsuarioPerfil perfilInativo = new UsuarioPerfil();
-        perfilInativo.setPerfil(Perfil.CHEFE);
-        perfilInativo.setUnidade(unidadeInativa);
-
-        when(usuarioServiceInterno.buscarPerfis("123")).thenReturn(List.of(perfilAtivo, perfilInativo));
+        when(usuarioServiceInterno.buscarAutorizacoesPerfil("123")).thenReturn(List.of(
+                new UsuarioPerfilAutorizacaoLeitura("123", Perfil.GESTOR, 1L, "Unidade 1", "U1", TipoUnidade.OPERACIONAL, SituacaoUnidade.ATIVA),
+                new UsuarioPerfilAutorizacaoLeitura("123", Perfil.CHEFE, 2L, "Unidade 2", "U2", TipoUnidade.OPERACIONAL, SituacaoUnidade.INATIVA)
+        ));
 
         List<PerfilUnidadeDto> result = loginFacade.buscarAutorizacoesUsuario("123");
 
@@ -241,7 +228,7 @@ class LoginFacadeTest {
     @Test
     @DisplayName("deve lançar erro quando unidade para autorização estiver ausente")
     void deveLancarErroQuandoUnidadeAusenteNaAutorizacao() throws Exception {
-        Method metodo = LoginFacade.class.getDeclaredMethod("toUnidadeDtoObrigatoria", Unidade.class);
+        Method metodo = LoginFacade.class.getDeclaredMethod("toUnidadeDtoObrigatoria", UsuarioPerfilAutorizacaoLeitura.class);
         metodo.setAccessible(true);
 
         assertThatThrownBy(() -> metodo.invoke(loginFacade, new Object[]{null}))

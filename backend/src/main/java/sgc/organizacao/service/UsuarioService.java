@@ -51,11 +51,15 @@ public class UsuarioService {
         return usuarioPerfilRepo.findByUsuarioTitulo(usuarioTitulo);
     }
 
+    public List<UsuarioPerfilAutorizacaoLeitura> buscarAutorizacoesPerfil(String usuarioTitulo) {
+        return usuarioPerfilRepo.listarAutorizacoesPorUsuarioTitulo(usuarioTitulo);
+    }
+
     public void carregarAuthorities(Usuario usuario) {
-        List<UsuarioPerfil> perfis = usuarioPerfilRepo.findByUsuarioTitulo(usuario.getTituloEleitoral());
+        List<Perfil> perfis = usuarioPerfilRepo.listarPerfisPorUsuarioTitulo(usuario.getTituloEleitoral());
 
         Set<GrantedAuthority> authorities = perfis.stream()
-                .map(a -> a.getPerfil().toGrantedAuthority())
+                .map(Perfil::toGrantedAuthority)
                 .collect(Collectors.toSet());
 
         usuario.setAuthorities(authorities);

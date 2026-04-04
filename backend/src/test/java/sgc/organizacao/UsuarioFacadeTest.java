@@ -203,14 +203,10 @@ class UsuarioFacadeTest {
             Usuario user = criarUsuario(titulo);
             when(usuarioService.buscarOpt(titulo)).thenReturn(Optional.of(user));
             
-            Unidade uAtiva = criarUnidade(1L, "U1");
-            Unidade uInativa = criarUnidade(2L, "U2");
-            uInativa.setSituacao(SituacaoUnidade.INATIVA);
-            
-            UsuarioPerfil p1 = new UsuarioPerfil(); p1.setUnidade(uAtiva); p1.setPerfil(Perfil.CHEFE); p1.setUsuario(user);
-            UsuarioPerfil p2 = new UsuarioPerfil(); p2.setUnidade(uInativa); p2.setPerfil(Perfil.GESTOR); p2.setUsuario(user);
-            
-            when(usuarioService.buscarPerfis(titulo)).thenReturn(List.of(p1, p2));
+            when(usuarioService.buscarAutorizacoesPerfil(titulo)).thenReturn(List.of(
+                    new UsuarioPerfilAutorizacaoLeitura(titulo, Perfil.CHEFE, 1L, "U1", "U1", TipoUnidade.OPERACIONAL, SituacaoUnidade.ATIVA),
+                    new UsuarioPerfilAutorizacaoLeitura(titulo, Perfil.GESTOR, 2L, "U2", "U2", TipoUnidade.OPERACIONAL, SituacaoUnidade.INATIVA)
+            ));
             
             List<PerfilDto> result = facade.buscarPerfisUsuario(titulo);
             

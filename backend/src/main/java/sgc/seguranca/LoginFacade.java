@@ -121,12 +121,12 @@ public class LoginFacade {
             throw new ErroAutenticacao(Mensagens.CREDENCIAIS_INVALIDAS);
         }
 
-        List<UsuarioPerfil> atribuicoes = usuarioService.buscarPerfis(usuario.getTituloEleitoral());
+        List<UsuarioPerfilAutorizacaoLeitura> atribuicoes = usuarioService.buscarAutorizacoesPerfil(usuario.getTituloEleitoral());
         return atribuicoes.stream()
-                .filter(a -> a.getUnidade().getSituacao() == SituacaoUnidade.ATIVA)
+                .filter(a -> a.unidadeSituacao() == SituacaoUnidade.ATIVA)
                 .map(atribuicao -> new PerfilUnidadeDto(
-                        atribuicao.getPerfil(),
-                        toUnidadeDtoObrigatoria(atribuicao.getUnidade())))
+                        atribuicao.perfil(),
+                        toUnidadeDtoObrigatoria(atribuicao)))
                 .toList();
     }
 
@@ -135,11 +135,15 @@ public class LoginFacade {
         return "***" + valor.substring(valor.length() - 4);
     }
 
-    private UnidadeDto toUnidadeDtoObrigatoria(Unidade unidade) {
-        UnidadeDto dto = UnidadeDto.fromEntity(unidade);
-        if (dto == null) {
+    private UnidadeDto toUnidadeDtoObrigatoria(@Nullable UsuarioPerfilAutorizacaoLeitura atribuicao) {
+        if (atribuicao == null) {
             throw new IllegalStateException("Unidade ausente na autorização de login");
         }
-        return dto;
+        return UnidadeDto.builder()
+                .codigo(atribuicao.unidadeCodigo())
+                .nome(atribuicao.unidadeNome())
+                .sigla(atribuicao.unidadeSigla())
+                .tipo(atribuicao.unidadeTipo().name())
+                .build();
     }
 }

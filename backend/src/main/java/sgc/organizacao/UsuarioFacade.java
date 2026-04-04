@@ -78,9 +78,9 @@ public class UsuarioFacade {
     public List<PerfilDto> buscarPerfisUsuario(String titulo) {
         return usuarioService.buscarOpt(titulo)
                 .map(usuario -> {
-                    List<UsuarioPerfil> atribuicoes = usuarioService.buscarPerfis(usuario.getTituloEleitoral());
+                    List<UsuarioPerfilAutorizacaoLeitura> atribuicoes = usuarioService.buscarAutorizacoesPerfil(usuario.getTituloEleitoral());
                     return atribuicoes.stream()
-                            .filter(a -> a.getUnidade().getSituacao() == SituacaoUnidade.ATIVA)
+                            .filter(a -> a.unidadeSituacao() == SituacaoUnidade.ATIVA)
                             .map(this::toPerfilDto)
                             .toList();
                 })
@@ -96,12 +96,13 @@ public class UsuarioFacade {
                 .collect(toMap(Usuario::getTituloEleitoral, u -> u, (u1, u2) -> u1));
     }
 
-    private PerfilDto toPerfilDto(UsuarioPerfil atribuicao) {
+    private PerfilDto toPerfilDto(UsuarioPerfilAutorizacaoLeitura atribuicao) {
         return PerfilDto.builder()
-                .usuarioTitulo(atribuicao.getUsuario().getTituloEleitoral())
-                .unidadeCodigo(atribuicao.getUnidade().getCodigo())
-                .unidadeNome(atribuicao.getUnidade().getNome())
-                .perfil(atribuicao.getPerfil().name())
+                .usuarioTitulo(atribuicao.usuarioTitulo())
+                .unidadeCodigo(atribuicao.unidadeCodigo())
+                .unidadeNome(atribuicao.unidadeNome())
+                .perfil(atribuicao.perfil().name())
+                .descricao(atribuicao.perfil().name())
                 .build();
     }
 
