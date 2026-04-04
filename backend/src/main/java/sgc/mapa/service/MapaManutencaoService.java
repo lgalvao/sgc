@@ -182,25 +182,26 @@ public class MapaManutencaoService {
     }
 
     @Transactional
-    public Mapa criarMapa(CriarMapaRequest request) {
-        Subprocesso subprocesso = repo.buscar(Subprocesso.class, request.subprocessoCodigo());
+    public Mapa criarMapa(CriarMapaCommand command) {
+        Subprocesso subprocesso = repo.buscar(Subprocesso.class, command.subprocessoCodigo());
+        AtualizarEstadoMapaCommand estadoInicial = command.estadoInicial();
         Mapa mapa = Mapa.builder()
                 .subprocesso(subprocesso)
-                .dataHoraDisponibilizado(request.dataHoraDisponibilizado())
-                .observacoesDisponibilizacao(request.observacoesDisponibilizacao())
-                .sugestoes(request.sugestoes())
-                .dataHoraHomologado(request.dataHoraHomologado())
+                .dataHoraDisponibilizado(estadoInicial != null ? estadoInicial.dataHoraDisponibilizado() : null)
+                .observacoesDisponibilizacao(estadoInicial != null ? estadoInicial.observacoesDisponibilizacao() : null)
+                .sugestoes(estadoInicial != null ? estadoInicial.sugestoes() : null)
+                .dataHoraHomologado(estadoInicial != null ? estadoInicial.dataHoraHomologado() : null)
                 .build();
         return mapaRepo.save(mapa);
     }
 
     @Transactional
-    public Mapa atualizarMapa(Long codMapa, AtualizarMapaRequest request) {
+    public Mapa atualizarEstadoMapa(Long codMapa, AtualizarEstadoMapaCommand command) {
         Mapa existente = mapaCodigo(codMapa)
-                .setDataHoraDisponibilizado(request.dataHoraDisponibilizado())
-                .setObservacoesDisponibilizacao(request.observacoesDisponibilizacao())
-                .setSugestoes(request.sugestoes())
-                .setDataHoraHomologado(request.dataHoraHomologado());
+                .setDataHoraDisponibilizado(command.dataHoraDisponibilizado())
+                .setObservacoesDisponibilizacao(command.observacoesDisponibilizacao())
+                .setSugestoes(command.sugestoes())
+                .setDataHoraHomologado(command.dataHoraHomologado());
         return mapaRepo.save(existente);
     }
 
@@ -352,4 +353,3 @@ public class MapaManutencaoService {
         if (existe) throw new ErroValidacao(Mensagens.DESCRICAO_CONHECIMENTO_DUPLICADA);
     }
 }
-

@@ -61,6 +61,9 @@ Levantamento no backend em 2026-04-04:
 - consolidar `buscarResponsaveisUnidades(...)` em projecao unica para evitar segunda leitura em `VW_USUARIO`
 - centralizar a unidade `ADMIN` em metodo dedicado com cache agressivo do Spring
 - validar painel e detalhe de subprocesso com budget local de queries para evitar regressao fora do modulo organizacional
+- medir budgets separando statements que tocam `VW_*` de consultas em tabelas normais
+- trocar autocomplete de usuarios para busca por nome com DTO leve e limite explicito
+- tirar os endpoints de consulta de usuario (`/usuarios/{titulo}` e `/unidades/{codigo}/usuarios`) do caminho de entidade JPA completa
 - preservar os contratos HTTP e os DTOs atuais
 
 ### Fora desta rodada

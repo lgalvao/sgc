@@ -47,7 +47,7 @@ class OrganizacaoViewsQueryBudgetIntegrationTest extends BaseIntegrationTest {
         assertThat(contarQueriesViews(() -> unidadeHierarquiaService.buscarMapaHierarquia())).isLessThanOrEqualTo(1);
         assertThat(contarQueriesViews(() -> usuarioService.buscarOpt(amostras.tituloUsuario()))).isLessThanOrEqualTo(2);
         assertThat(contarQueriesViews(() -> usuarioService.buscarPorUnidadeLotacao(amostras.codigoUnidadeLotacao()))).isLessThanOrEqualTo(2);
-        assertThat(contarQueriesViews(() -> usuarioService.buscarPorNome(amostras.termoBuscaUsuario()))).isLessThanOrEqualTo(3);
+        assertThat(contarQueriesViews(() -> usuarioService.pesquisarPorNome(amostras.termoBuscaUsuario()))).isLessThanOrEqualTo(1);
         assertThat(contarQueriesViews(() -> usuarioService.buscarPerfis(amostras.tituloUsuarioComPerfil()))).isLessThanOrEqualTo(1);
         assertThat(contarQueriesViews(() -> responsavelUnidadeService.buscarResponsavelAtual(amostras.siglaUnidadeComResponsavel()))).isLessThanOrEqualTo(3);
         assertThat(contarQueriesViews(() -> responsavelUnidadeService.buscarResponsaveisUnidades(amostras.codigosUnidadesComResponsavel()))).isLessThanOrEqualTo(2);

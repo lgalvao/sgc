@@ -71,12 +71,12 @@
               <BListGroup v-else-if="usuariosEncontrados.length > 0" flush>
                 <BListGroupItem
                     v-for="(usuario, indice) in usuariosEncontrados"
-                    :id="`opcao-usuario-${usuario.codigo}`"
-                    :key="usuario.codigo"
+                    :id="`opcao-usuario-${usuario.tituloEleitoral}`"
+                    :key="usuario.tituloEleitoral"
                     action
                     button
                     :active="indiceUsuarioDestacado === indice"
-                    :data-testid="`opcao-usuario-${usuario.codigo}`"
+                    :data-testid="`opcao-usuario-${usuario.tituloEleitoral}`"
                     @mousedown.prevent="selecionarUsuario(usuario)"
                 >
                   {{ usuario.nome }}
@@ -163,7 +163,7 @@ import {
 import {computed, nextTick, onBeforeUnmount, onMounted, ref, watch} from "vue";
 import {useRouter} from "vue-router";
 import {logger} from "@/utils";
-import type {Unidade, Usuario} from "@/types/tipos";
+import type {Unidade, UsuarioPesquisa} from "@/types/tipos";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import LoadingButton from "@/components/comum/LoadingButton.vue";
 import AppAlert from "@/components/comum/AppAlert.vue";
@@ -184,7 +184,7 @@ const codUnidade = computed(() => props.codUnidade);
 const unidade = ref<Unidade | null>(null);
 const usuarioSelecionado = ref<string | null>(null);
 const termoUsuario = ref("");
-const usuariosEncontrados = ref<Usuario[]>([]);
+const usuariosEncontrados = ref<UsuarioPesquisa[]>([]);
 const pesquisandoUsuarios = ref(false);
 const mostrarResultadosUsuarios = ref(false);
 const indiceUsuarioDestacado = ref(-1);
@@ -279,7 +279,7 @@ function atualizarUsuarioSelecionadoPorNome(nome: string) {
   usuarioSelecionado.value = usuario?.tituloEleitoral ?? null;
 }
 
-function selecionarUsuario(usuario: Usuario) {
+function selecionarUsuario(usuario: UsuarioPesquisa) {
   usuarioSelecionado.value = usuario.tituloEleitoral;
   termoUsuario.value = usuario.nome;
   mostrarResultadosUsuarios.value = false;
@@ -303,7 +303,7 @@ async function destacarUsuario(indice: number) {
   const usuario = usuariosEncontrados.value[indice];
   if (!usuario) return;
 
-  const elemento = document.getElementById(`opcao-usuario-${usuario.codigo}`);
+  const elemento = document.getElementById(`opcao-usuario-${usuario.tituloEleitoral}`);
   elemento?.scrollIntoView({block: "nearest"});
 }
 

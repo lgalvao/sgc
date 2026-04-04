@@ -109,7 +109,7 @@ class MapaControllerTest {
         mapa.setSubprocesso(subprocesso);
         CriarMapaRequest request = CriarMapaRequest.builder().subprocessoCodigo(10L).build();
 
-        when(mapaManutencaoService.criarMapa(any(CriarMapaRequest.class))).thenReturn(mapa);
+        when(mapaManutencaoService.criarMapa(any(CriarMapaCommand.class))).thenReturn(mapa);
 
         mockMvc.perform(post(API_MAPAS)
                         .with(csrf())
@@ -131,7 +131,7 @@ class MapaControllerTest {
         mapa.setSubprocesso(subprocesso);
         AtualizarMapaRequest request = AtualizarMapaRequest.builder().observacoesDisponibilizacao("Obs").build();
 
-        when(mapaManutencaoService.atualizarMapa(eq(1L), any(AtualizarMapaRequest.class))).thenReturn(mapa);
+        when(mapaManutencaoService.atualizarEstadoMapa(eq(1L), any(AtualizarEstadoMapaCommand.class))).thenReturn(mapa);
 
         mockMvc.perform(post(API_MAPAS_1_ATUALIZAR)
                         .with(csrf())

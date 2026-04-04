@@ -27,18 +27,16 @@ public class UsuarioController {
 
     @GetMapping("/{titulo}")
     public ResponseEntity<UsuarioConsultaDto> buscarUsuarioPorTitulo(@PathVariable String titulo) {
-        return usuarioService.buscarOpt(titulo)
-                .map(UsuarioConsultaDto::fromEntity)
+        return usuarioService.buscarConsultaPorTitulo(titulo)
+                .map(UsuarioConsultaDto::fromLeitura)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/pesquisar")
     @Operation(summary = "Pesquisa usuários por nome")
-    public ResponseEntity<List<UsuarioConsultaDto>> pesquisarUsuarios(@RequestParam String termo) {
-        return ResponseEntity.ok(usuarioService.buscarPorNome(termo).stream()
-                .map(UsuarioConsultaDto::fromEntity)
-                .toList());
+    public ResponseEntity<List<UsuarioPesquisaDto>> pesquisarUsuarios(@RequestParam String termo) {
+        return ResponseEntity.ok(usuarioService.pesquisarPorNome(termo));
     }
 
     @GetMapping("/administradores")

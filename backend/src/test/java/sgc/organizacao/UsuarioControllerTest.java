@@ -45,11 +45,10 @@ class UsuarioControllerTest {
     @DisplayName("GET /api/usuarios/{titulo} - Deve retornar usuário quando encontrado")
     @WithMockUser
     void buscarUsuarioPorTitulo_Sucesso() throws Exception {
-        Usuario entity = new Usuario();
-        entity.setTituloEleitoral("123");
-        entity.setNome("Teste");
-        entity.setUnidadeLotacao(Unidade.builder().codigo(1L).sigla("U1").nome("Unidade 1").tipo(TipoUnidade.OPERACIONAL).build());
-        when(usuarioService.buscarOpt("123")).thenReturn(Optional.of(entity));
+        UsuarioConsultaLeitura entity = new UsuarioConsultaLeitura(
+                "123", "111", "Teste", "teste@x.com", "1234", 1L, "Unidade 1", "U1", TipoUnidade.OPERACIONAL, null
+        );
+        when(usuarioService.buscarConsultaPorTitulo("123")).thenReturn(Optional.of(entity));
 
         mockMvc.perform(get("/api/usuarios/123"))
                 .andExpect(status().isOk())
@@ -61,7 +60,7 @@ class UsuarioControllerTest {
     @DisplayName("GET /api/usuarios/{titulo} - Deve retornar 404 quando não encontrado")
     @WithMockUser
     void buscarUsuarioPorTitulo_NaoEncontrado() throws Exception {
-        when(usuarioService.buscarOpt("999")).thenReturn(Optional.empty());
+        when(usuarioService.buscarConsultaPorTitulo("999")).thenReturn(Optional.empty());
 
         mockMvc.perform(get("/api/usuarios/999"))
                 .andExpect(status().isNotFound());
@@ -83,11 +82,11 @@ class UsuarioControllerTest {
     @DisplayName("GET /api/usuarios/pesquisar - Deve pesquisar por termo")
     @WithMockUser
     void pesquisarUsuarios_Sucesso() throws Exception {
-        Usuario usuario = new Usuario();
-        usuario.setTituloEleitoral("123");
-        usuario.setNome("Fulano");
-        usuario.setUnidadeLotacao(Unidade.builder().codigo(1L).sigla("U1").nome("Unidade 1").tipo(TipoUnidade.OPERACIONAL).build());
-        when(usuarioService.buscarPorNome("ful")).thenReturn(List.of(usuario));
+        UsuarioPesquisaDto usuario = UsuarioPesquisaDto.builder()
+                .tituloEleitoral("123")
+                .nome("Fulano")
+                .build();
+        when(usuarioService.pesquisarPorNome("ful")).thenReturn(List.of(usuario));
 
         mockMvc.perform(get("/api/usuarios/pesquisar").param("termo", "ful"))
                 .andExpect(status().isOk())

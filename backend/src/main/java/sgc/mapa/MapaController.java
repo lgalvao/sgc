@@ -52,7 +52,7 @@ public class MapaController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Cria um mapa")
     public ResponseEntity<MapaResumoDto> criar(@Valid @RequestBody CriarMapaRequest request) {
-        var salvo = mapaManutencaoService.criarMapa(request);
+        var salvo = mapaManutencaoService.criarMapa(request.paraCommand());
         Long codigo = salvo.getCodigo();
 
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
@@ -67,7 +67,7 @@ public class MapaController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Atualiza um mapa existente")
     public ResponseEntity<MapaResumoDto> atualizar(@PathVariable Long codMapa, @Valid @RequestBody AtualizarMapaRequest request) {
-        var atualizado = mapaManutencaoService.atualizarMapa(codMapa, request);
+        var atualizado = mapaManutencaoService.atualizarEstadoMapa(codMapa, request.paraCommand());
         return ResponseEntity.ok(MapaResumoDto.fromEntity(atualizado));
     }
 

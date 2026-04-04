@@ -88,8 +88,8 @@ public class UnidadeController {
     @GetMapping("/{codUnidade}/usuarios")
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")
     public ResponseEntity<List<UsuarioConsultaDto>> buscarUsuariosPorUnidade(@PathVariable Long codUnidade) {
-        List<UsuarioConsultaDto> usuarios = usuarioService.buscarPorUnidadeLotacao(codUnidade).stream()
-                .map(UsuarioConsultaDto::fromEntity)
+        List<UsuarioConsultaDto> usuarios = usuarioService.buscarConsultasPorUnidadeLotacao(codUnidade).stream()
+                .map(UsuarioConsultaDto::fromLeitura)
                 .toList();
         return ResponseEntity.ok(usuarios);
     }

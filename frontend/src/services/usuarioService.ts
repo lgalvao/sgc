@@ -1,5 +1,5 @@
 import type {FluxoLoginResponseDto, PerfilUnidadeDto, SessaoLoginDto, UsuarioDto} from "@/types/dtos";
-import type {Usuario} from "@/types/tipos";
+import type {Usuario, UsuarioPesquisa} from "@/types/tipos";
 import apiClient from "../axios-setup";
 
 // Mappers internos (formerly in /mappers/sgrh.ts & /mappers/usuarios.ts)
@@ -165,8 +165,8 @@ export async function buscarUsuarioPorTitulo(
     return response.data;
 }
 
-export async function pesquisarUsuarios(termo: string): Promise<Usuario[]> {
-    const response = await apiClient.get(`/usuarios/pesquisar`, {
+export async function pesquisarUsuarios(termo: string): Promise<UsuarioPesquisa[]> {
+    const response = await apiClient.get<UsuarioPesquisa[]>(`/usuarios/pesquisar`, {
         params: {termo}
     });
     return response.data;

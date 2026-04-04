@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.*;
 import org.springframework.stereotype.*;
 import org.springframework.data.domain.*;
+import sgc.organizacao.dto.*;
 
 import java.util.*;
 
@@ -17,11 +18,56 @@ public interface UsuarioRepo extends JpaRepository<Usuario, String> {
     List<Usuario> listarPorCodigoUnidadeLotacao(@Param("codigoUnidade") Long codigoUnidade);
 
     @Query("""
+            SELECT new sgc.organizacao.model.UsuarioConsultaLeitura(
+                u.tituloEleitoral,
+                u.matricula,
+                u.nome,
+                u.email,
+                u.ramal,
+                unidade.codigo,
+                unidade.nome,
+                unidade.sigla,
+                unidade.tipo,
+                unidade.tituloTitular
+            )
+            FROM Usuario u
+            JOIN u.unidadeLotacao unidade
+            WHERE unidade.codigo = :codigoUnidade
+            ORDER BY u.nome
+            """)
+    List<UsuarioConsultaLeitura> listarConsultasPorCodigoUnidadeLotacao(@Param("codigoUnidade") Long codigoUnidade);
+
+    @Query("""
+            SELECT u FROM Usuario u
+            WHERE u.tituloEleitoral = :titulo
+            """)
+    Optional<Usuario> buscarPorTitulo(@Param("titulo") String titulo);
+
+    @Query("""
             SELECT u FROM Usuario u
             JOIN FETCH u.unidadeLotacao
             WHERE u.tituloEleitoral = :titulo
             """)
     Optional<Usuario> buscarPorTituloComUnidadeLotacao(@Param("titulo") String titulo);
+
+    @Query("""
+            SELECT new sgc.organizacao.model.UsuarioConsultaLeitura(
+                u.tituloEleitoral,
+                u.matricula,
+                u.nome,
+                u.email,
+                u.ramal,
+                unidade.codigo,
+                unidade.nome,
+                unidade.sigla,
+                unidade.tipo,
+                unidade.tituloTitular
+            )
+            FROM Usuario u
+            JOIN u.unidadeLotacao unidade
+            WHERE u.tituloEleitoral = :titulo
+            """)
+    Optional<UsuarioConsultaLeitura> buscarConsultaPorTitulo(@Param("titulo") String titulo);
 
     @Query("""
             SELECT DISTINCT u FROM Usuario u
@@ -31,10 +77,13 @@ public interface UsuarioRepo extends JpaRepository<Usuario, String> {
     List<Usuario> listarPorTitulosComUnidadeLotacao(@Param("titulos") List<String> titulos);
 
     @Query("""
-            SELECT DISTINCT u FROM Usuario u
-            JOIN FETCH u.unidadeLotacao
+            SELECT new sgc.organizacao.dto.UsuarioPesquisaDto(
+                u.tituloEleitoral,
+                u.nome
+            )
+            FROM Usuario u
             WHERE LOWER(u.nome) LIKE LOWER(CONCAT(:termo, '%'))
             ORDER BY u.nome
             """)
-    List<Usuario> buscarPorNomeComUnidadeLotacao(@Param("termo") String termo, Pageable pageable);
+    List<UsuarioPesquisaDto> pesquisarPorNome(@Param("termo") String termo, Pageable pageable);
 }

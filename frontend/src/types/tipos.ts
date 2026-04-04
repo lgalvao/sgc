@@ -64,6 +64,11 @@ export interface Responsavel {
     dataFim: string | null;
 }
 
+export interface UsuarioPesquisa {
+    tituloEleitoral: string;
+    nome: string;
+}
+
 /**
  * Tipos de situação de um subprocesso.
  */

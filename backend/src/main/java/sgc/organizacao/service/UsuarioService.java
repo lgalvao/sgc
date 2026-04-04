@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.*;
 import sgc.comum.config.CacheConfig;
 import sgc.comum.*;
 import sgc.comum.erros.*;
+import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
 
 import java.util.*;
@@ -27,16 +28,24 @@ public class UsuarioService {
     private final AdministradorRepo administradorRepo;
 
     public Usuario buscar(String titulo) {
-        return usuarioRepo.buscarPorTituloComUnidadeLotacao(titulo)
+        return usuarioRepo.buscarPorTitulo(titulo)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada(Usuario.class.getSimpleName(), titulo));
     }
 
     public Optional<Usuario> buscarOpt(String titulo) {
-        return usuarioRepo.buscarPorTituloComUnidadeLotacao(titulo);
+        return usuarioRepo.buscarPorTitulo(titulo);
     }
 
     public List<Usuario> buscarPorUnidadeLotacao(Long codUnidade) {
         return usuarioRepo.listarPorCodigoUnidadeLotacao(codUnidade);
+    }
+
+    public Optional<UsuarioConsultaLeitura> buscarConsultaPorTitulo(String titulo) {
+        return usuarioRepo.buscarConsultaPorTitulo(titulo);
+    }
+
+    public List<UsuarioConsultaLeitura> buscarConsultasPorUnidadeLotacao(Long codUnidade) {
+        return usuarioRepo.listarConsultasPorCodigoUnidadeLotacao(codUnidade);
     }
 
     public List<Usuario> buscarTodos() {
@@ -47,13 +56,13 @@ public class UsuarioService {
         return usuarioRepo.listarPorTitulosComUnidadeLotacao(titulos);
     }
 
-    public List<Usuario> buscarPorNome(String termo) {
+    public List<UsuarioPesquisaDto> pesquisarPorNome(String termo) {
         String termoNormalizado = Optional.ofNullable(termo).orElse("").trim();
         if (termoNormalizado.length() < 2) {
             return List.of();
         }
 
-        return usuarioRepo.buscarPorNomeComUnidadeLotacao(
+        return usuarioRepo.pesquisarPorNome(
                 termoNormalizado,
                 PageRequest.of(0, LIMITE_PESQUISA_USUARIO)
         );

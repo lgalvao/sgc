@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.*;
 import org.springframework.boot.test.context.*;
 import org.springframework.data.domain.*;
 import org.springframework.transaction.annotation.*;
+import sgc.organizacao.dto.*;
 
 import java.util.*;
 
@@ -45,10 +46,8 @@ class UsuarioRepoTest {
     @Test
     @DisplayName("deve buscar usuarios por prefixo do nome com limite")
     void deveBuscarUsuariosPorNome() {
-        List<Usuario> porNome = usuarioRepo.buscarPorNomeComUnidadeLotacao("Ana", PageRequest.of(0, 20));
+        List<UsuarioPesquisaDto> porNome = usuarioRepo.pesquisarPorNome("Ana", PageRequest.of(0, 20));
 
-        assertThat(porNome).extracting(Usuario::getTituloEleitoral).contains("1");
-        assertThat(porNome)
-                .allSatisfy(usuario -> assertThat(Hibernate.isInitialized(usuario.getUnidadeLotacao())).isTrue());
+        assertThat(porNome).extracting(UsuarioPesquisaDto::tituloEleitoral).contains("1");
     }
 }

@@ -92,13 +92,13 @@ class UsuarioServiceTest {
         }
 
         @Test
-        @DisplayName("Deve buscar usuários por nome")
-        void deveBuscarUsuariosPorNome() {
-            List<Usuario> resultado = usuarioServiceInternal.buscarPorNome("Admin");
+        @DisplayName("Deve pesquisar usuários por nome")
+        void devePesquisarUsuariosPorNome() {
+            List<UsuarioPesquisaDto> resultado = usuarioServiceInternal.pesquisarPorNome("Admin");
 
             assertNotNull(resultado);
             assertFalse(resultado.isEmpty());
-            assertTrue(resultado.stream().anyMatch(usuario -> usuario.getNome().contains("Admin")));
+            assertTrue(resultado.stream().anyMatch(usuario -> usuario.nome().contains("Admin")));
         }
     }
 

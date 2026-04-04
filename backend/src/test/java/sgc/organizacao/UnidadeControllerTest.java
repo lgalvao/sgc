@@ -184,13 +184,10 @@ class UnidadeControllerTest {
     @DisplayName("Deve retornar lista de usuários por unidade")
     @WithMockUser(roles = "CHEFE")
     void deveRetornarListaDeUsuariosPorUnidade() throws Exception {
-
-        Usuario usuario = Usuario.builder()
-                .tituloEleitoral("123")
-                .nome("Teste")
-                .unidadeLotacao(Unidade.builder().codigo(1L).sigla("U1").tipo(TipoUnidade.OPERACIONAL).nome("Unidade 1").build())
-                .build();
-        when(usuarioServiceBean.buscarPorUnidadeLotacao(1L)).thenReturn(List.of(usuario));
+        UsuarioConsultaLeitura usuario = new UsuarioConsultaLeitura(
+                "123", "111", "Teste", "teste@x.com", "1234", 1L, "Unidade 1", "U1", TipoUnidade.OPERACIONAL, null
+        );
+        when(usuarioServiceBean.buscarConsultasPorUnidadeLotacao(1L)).thenReturn(List.of(usuario));
 
         mockMvc.perform(get("/api/unidades/1/usuarios")).andExpect(status().isOk());
     }

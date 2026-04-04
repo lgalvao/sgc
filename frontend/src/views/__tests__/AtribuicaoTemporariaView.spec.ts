@@ -267,7 +267,7 @@ describe('AtribuicaoTemporariaView', () => {
     vm.usuariosEncontrados = [{codigo: 1, nome: 'User', tituloEleitoral: '123'}];
     vm.mostrarResultadosUsuarios = true;
     await vm.$nextTick();
-    const item = wrapper.find('[data-testid="opcao-usuario-1"]');
+    const item = wrapper.find('[data-testid="opcao-usuario-123"]');
     if (item.exists()) await item.trigger('mousedown');
     expect(vm.usuarioSelecionado).toBe('123');
 

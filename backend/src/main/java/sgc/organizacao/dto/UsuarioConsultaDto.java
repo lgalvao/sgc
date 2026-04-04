@@ -37,5 +37,24 @@ public record UsuarioConsultaDto(
                 .perfis(List.of())
                 .build();
     }
-}
 
+    public static UsuarioConsultaDto fromLeitura(UsuarioConsultaLeitura usuario) {
+        UnidadeDto unidade = UnidadeDto.builder()
+                .codigo(usuario.unidadeCodigo())
+                .nome(usuario.unidadeNome())
+                .sigla(usuario.unidadeSigla())
+                .tipo(usuario.unidadeTipo() != null ? usuario.unidadeTipo().name() : null)
+                .tituloTitular(usuario.unidadeTituloTitular())
+                .build();
+
+        return UsuarioConsultaDto.builder()
+                .tituloEleitoral(usuario.tituloEleitoral())
+                .matricula(usuario.matricula())
+                .nome(usuario.nome())
+                .email(usuario.email())
+                .ramal(usuario.ramal())
+                .unidade(unidade)
+                .perfis(List.of())
+                .build();
+    }
+}
