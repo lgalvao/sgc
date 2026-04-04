@@ -17,4 +17,10 @@ public record AcaoEmBlocoRequest(
 
         @Nullable LocalDate dataLimite
 ) {
+    public AcaoEmBlocoCommand paraCommand() {
+        if (acao == AcaoProcesso.DISPONIBILIZAR) {
+            return new DisponibilizarMapaEmBlocoCommand(unidadeCodigos, dataLimite);
+        }
+        return new ProcessarAnaliseEmBlocoCommand(unidadeCodigos, acao);
+    }
 }

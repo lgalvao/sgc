@@ -102,13 +102,20 @@ public class ProcessoService {
 
     @Transactional(readOnly = true)
     public Page<Processo> listarTodos(Pageable pageable) {
-        return carregarPaginaComParticipantes(processoRepo.listarCodigos(pageable), pageable);
+        Page<Long> paginaCodigos = processoRepo.listarCodigos(pageable);
+        if (paginaCodigos == null) {
+            return processoRepo.findAll(pageable);
+        }
+        return carregarPaginaComParticipantes(paginaCodigos, pageable);
     }
 
     @Transactional(readOnly = true)
     public Page<Processo> listarIniciadosPorParticipantes(List<Long> unidadeCodigos, Pageable pageable) {
         Page<Long> paginaCodigos = processoRepo.listarCodigosPorParticipantesESituacaoDiferente(
                 unidadeCodigos, CRIADO, pageable);
+        if (paginaCodigos == null) {
+            return processoRepo.listarPorParticipantesESituacaoDiferente(unidadeCodigos, CRIADO, pageable);
+        }
         return carregarPaginaComParticipantes(paginaCodigos, pageable);
     }
 
@@ -252,26 +259,25 @@ public class ProcessoService {
     }
 
 
-    public void executarAcaoEmBloco(Long codProcesso, AcaoEmBlocoRequest req) {
-        Usuario usuario = usuarioService.usuarioAutenticado();
-        List<Subprocesso> subprocessos = consultaService.listarEntidadesPorProcessoEUnidades(codProcesso, req.unidadeCodigos());
-        
-        if (req.unidadeCodigos().isEmpty()) throw new ErroValidacao(Mensagens.SELECIONE_AO_MENOS_UMA_UNIDADE);
-        validarSelecaoBloco(req.unidadeCodigos(), subprocessos);
+    void executarAcaoEmBloco(Long codProcesso, AcaoEmBlocoRequest req) {
+        executarAcaoEmBloco(codProcesso, req.paraCommand());
+    }
 
-        if (req.acao() == DISPONIBILIZAR) {
-            if (!permissionEvaluator.verificarPermissao(usuario, subprocessos, DISPONIBILIZAR_MAPA)) {
-                throw new ErroAcessoNegado(Mensagens.SEM_PERMISSAO_DISPONIBILIZAR);
-            }
-            if (req.dataLimite() == null) {
-                throw new ErroValidacao(Mensagens.DATA_LIMITE_OBRIGATORIA);
-            }
-            DisponibilizarMapaRequest dispReq = new DisponibilizarMapaRequest(req.dataLimite(), "Disponibilização em bloco");
-            transicaoService.disponibilizarMapaEmBloco(subprocessos.stream().map(Subprocesso::getCodigo).toList(), dispReq, usuario);
+
+    public void executarAcaoEmBloco(Long codProcesso, AcaoEmBlocoCommand command) {
+        Usuario usuario = usuarioService.usuarioAutenticado();
+        List<Long> unidadeCodigos = command.unidadeCodigos();
+        List<Subprocesso> subprocessos = consultaService.listarEntidadesPorProcessoEUnidades(codProcesso, unidadeCodigos);
+
+        if (unidadeCodigos.isEmpty()) throw new ErroValidacao(Mensagens.SELECIONE_AO_MENOS_UMA_UNIDADE);
+        validarSelecaoBloco(unidadeCodigos, subprocessos);
+
+        if (command instanceof DisponibilizarMapaEmBlocoCommand disponibilizacao) {
+            executarDisponibilizacaoMapaEmBloco(disponibilizacao, usuario, subprocessos);
             return;
         }
 
-        processarAcoesBlocoAceiteHomologacao(req, usuario, subprocessos);
+        processarAcoesBlocoAceiteHomologacao((ProcessarAnaliseEmBlocoCommand) command, usuario, subprocessos);
     }
 
 
@@ -601,7 +607,22 @@ public class ProcessoService {
         }
     }
 
-    private void processarAcoesBlocoAceiteHomologacao(AcaoEmBlocoRequest req, Usuario user, List<Subprocesso> list) {
+    private void executarDisponibilizacaoMapaEmBloco(
+            DisponibilizarMapaEmBlocoCommand command,
+            Usuario usuario,
+            List<Subprocesso> subprocessos
+    ) {
+        if (!permissionEvaluator.verificarPermissao(usuario, subprocessos, DISPONIBILIZAR_MAPA)) {
+            throw new ErroAcessoNegado(Mensagens.SEM_PERMISSAO_DISPONIBILIZAR);
+        }
+        if (command.dataLimite() == null) {
+            throw new ErroValidacao(Mensagens.DATA_LIMITE_OBRIGATORIA);
+        }
+        DisponibilizarMapaRequest dispReq = new DisponibilizarMapaRequest(command.dataLimite(), "Disponibilização em bloco");
+        transicaoService.disponibilizarMapaEmBloco(subprocessos.stream().map(Subprocesso::getCodigo).toList(), dispReq, usuario);
+    }
+
+    private void processarAcoesBlocoAceiteHomologacao(ProcessarAnaliseEmBlocoCommand req, Usuario user, List<Subprocesso> list) {
         Map<Boolean, List<Long>> separacao = list.stream()
                 .collect(Collectors.partitioningBy(
                         sp -> isSituacaoCadastro(sp.getSituacao()),

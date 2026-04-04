@@ -211,8 +211,7 @@ public class ProcessoController {
     public ResponseEntity<Void> executarAcaoEmBloco(
             @PathVariable Long codigo,
             @Valid @RequestBody AcaoEmBlocoRequest request) {
-        processoService.executarAcaoEmBloco(codigo, request);
+        processoService.executarAcaoEmBloco(codigo, request.paraCommand());
         return ResponseEntity.ok().build();
     }
 }
-

@@ -269,10 +269,10 @@ class ProcessoControllerTest {
                                     """))
                     .andExpect(status().isOk());
 
-            verify(processoService).executarAcaoEmBloco(eq(1L), argThat(req ->
-                    req.unidadeCodigos().equals(List.of(10L))
-                            && req.acao() == AcaoProcesso.ACEITAR
-                            && req.dataLimite() == null));
+            verify(processoService).executarAcaoEmBloco(eq(1L), argThat(command ->
+                    command instanceof ProcessarAnaliseEmBlocoCommand req
+                            && req.unidadeCodigos().equals(List.of(10L))
+                            && req.acao() == AcaoProcesso.ACEITAR));
         }
     }
 
@@ -622,7 +622,7 @@ class ProcessoControllerTest {
             AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(List.of(10L), AcaoProcesso.ACEITAR, LocalDate.now());
             ResponseEntity<Void> response = controller.executarAcaoEmBloco(codigo, req);
 
-            verify(processoServiceMock).executarAcaoEmBloco(codigo, req);
+            verify(processoServiceMock).executarAcaoEmBloco(codigo, req.paraCommand());
             assertEquals(200, response.getStatusCode().value());
         }
     }

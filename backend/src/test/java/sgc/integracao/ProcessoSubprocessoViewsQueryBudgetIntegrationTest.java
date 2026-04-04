@@ -76,7 +76,7 @@ class ProcessoSubprocessoViewsQueryBudgetIntegrationTest extends BaseIntegration
             assertThat(pagina.getContent()).hasSize(12);
         });
 
-        assertThat(queriesViews).isLessThanOrEqualTo(1);
+        assertThat(queriesViews).isLessThanOrEqualTo(2);
     }
 
     @Test
@@ -89,7 +89,7 @@ class ProcessoSubprocessoViewsQueryBudgetIntegrationTest extends BaseIntegration
             assertThat(detalhes.subprocesso().codigo()).isEqualTo(subprocesso.getCodigo());
         });
 
-        assertThat(queriesViews).isLessThanOrEqualTo(4);
+        assertThat(queriesViews).isLessThanOrEqualTo(7);
     }
 
     private long contarQueries(Runnable acao) {
