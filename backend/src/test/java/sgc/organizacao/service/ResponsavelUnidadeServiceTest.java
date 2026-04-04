@@ -306,7 +306,7 @@ class ResponsavelUnidadeServiceTest {
         @Test
         @DisplayName("Deve retornar mapa vazio quando nenhuma responsabilidade encontrada")
         void deveRetornarVazioQuandoNaoEncontrado() {
-            when(responsabilidadeRepo.listarLeiturasDetalhadasPorCodigosUnidade(anyList())).thenReturn(List.of());
+            when(responsabilidadeRepo.listarResumosPorCodigosUnidade(anyList())).thenReturn(List.of());
             var result = service.buscarResponsaveisUnidades(List.of(1L));
             assertThat(result).isEmpty();
         }
@@ -315,10 +315,8 @@ class ResponsavelUnidadeServiceTest {
         @DisplayName("Deve lançar exceção quando responsável não é encontrado no repositório de usuários")
         void deveLancarExcecaoQuandoUsuarioAusente() {
             Long codUnidade = 1L;
-            when(responsabilidadeRepo.listarLeiturasDetalhadasPorCodigosUnidade(anyList()))
-                    .thenReturn(List.of(new ResponsabilidadeUnidadeLeitura(codUnidade, "RESP", "TITULAR", null, null, null)));
-            // Simular que o usuário "RESP" ou "TITULAR" não foi carregado
-            when(usuarioRepo.listarPorTitulosComUnidadeLotacao(anyList())).thenReturn(List.of());
+            when(responsabilidadeRepo.listarResumosPorCodigosUnidade(anyList()))
+                    .thenReturn(List.of(new ResponsabilidadeUnidadeResumoLeitura(codUnidade, "RESP", null, "TITULAR", "Titular")));
 
             assertThatThrownBy(() -> service.buscarResponsaveisUnidades(List.of(codUnidade)))
                     .isInstanceOf(IllegalStateException.class)
@@ -329,12 +327,8 @@ class ResponsavelUnidadeServiceTest {
         @DisplayName("Deve lançar exceção quando apenas o titular oficial estiver ausente")
         void deveLancarExcecaoQuandoTitularOficialAusente() {
             Long codUnidade = 1L;
-            Usuario responsavel = new Usuario();
-            responsavel.setTituloEleitoral("RESP");
-
-            when(responsabilidadeRepo.listarLeiturasDetalhadasPorCodigosUnidade(anyList()))
-                    .thenReturn(List.of(new ResponsabilidadeUnidadeLeitura(codUnidade, "RESP", "TITULAR", null, null, null)));
-            when(usuarioRepo.listarPorTitulosComUnidadeLotacao(anyList())).thenReturn(List.of(responsavel));
+            when(responsabilidadeRepo.listarResumosPorCodigosUnidade(anyList()))
+                    .thenReturn(List.of(new ResponsabilidadeUnidadeResumoLeitura(codUnidade, "RESP", "Responsavel", "TITULAR", null)));
 
             assertThatThrownBy(() -> service.buscarResponsaveisUnidades(List.of(codUnidade)))
                     .isInstanceOf(IllegalStateException.class)
@@ -345,12 +339,8 @@ class ResponsavelUnidadeServiceTest {
         @DisplayName("Deve retornar mapa com responsáveis quando tudo ok")
         void deveRetornarResponsaveisComSucesso() {
             Long codUnidade = 1L;
-            Usuario uTit = new Usuario(); uTit.setTituloEleitoral("TIT"); uTit.setNome("Titular");
-            Usuario uRes = new Usuario(); uRes.setTituloEleitoral("RES"); uRes.setNome("Responsavel");
-
-            when(responsabilidadeRepo.listarLeiturasDetalhadasPorCodigosUnidade(anyList()))
-                    .thenReturn(List.of(new ResponsabilidadeUnidadeLeitura(codUnidade, "RES", "TIT", null, null, null)));
-            when(usuarioRepo.listarPorTitulosComUnidadeLotacao(anyList())).thenReturn(List.of(uTit, uRes));
+            when(responsabilidadeRepo.listarResumosPorCodigosUnidade(anyList()))
+                    .thenReturn(List.of(new ResponsabilidadeUnidadeResumoLeitura(codUnidade, "RES", "Responsavel", "TIT", "Titular")));
 
             var result = service.buscarResponsaveisUnidades(List.of(codUnidade));
 
@@ -363,8 +353,8 @@ class ResponsavelUnidadeServiceTest {
         @DisplayName("Deve lançar exceção quando titular oficial estiver nulo")
         void deveLancarExcecaoQuandoTitularOficialNulo() {
             Long codUnidade = 2L;
-            when(responsabilidadeRepo.listarLeiturasDetalhadasPorCodigosUnidade(anyList()))
-                    .thenReturn(List.of(new ResponsabilidadeUnidadeLeitura(codUnidade, "RESP", null, null, null, null)));
+            when(responsabilidadeRepo.listarResumosPorCodigosUnidade(anyList()))
+                    .thenReturn(List.of(new ResponsabilidadeUnidadeResumoLeitura(codUnidade, "RESP", "Responsavel", null, null)));
 
             assertThatThrownBy(() -> service.buscarResponsaveisUnidades(List.of(codUnidade)))
                     .isInstanceOf(IllegalStateException.class)
@@ -375,8 +365,8 @@ class ResponsavelUnidadeServiceTest {
         @DisplayName("Deve lançar exceção quando titular oficial estiver em branco")
         void deveLancarExcecaoQuandoTitularOficialEmBranco() {
             Long codUnidade = 3L;
-            when(responsabilidadeRepo.listarLeiturasDetalhadasPorCodigosUnidade(anyList()))
-                    .thenReturn(List.of(new ResponsabilidadeUnidadeLeitura(codUnidade, "RESP", "   ", null, null, null)));
+            when(responsabilidadeRepo.listarResumosPorCodigosUnidade(anyList()))
+                    .thenReturn(List.of(new ResponsabilidadeUnidadeResumoLeitura(codUnidade, "RESP", "Responsavel", "   ", null)));
 
             assertThatThrownBy(() -> service.buscarResponsaveisUnidades(List.of(codUnidade)))
                     .isInstanceOf(IllegalStateException.class)

@@ -41,6 +41,11 @@ public class UsuarioFacade {
         return usuario;
     }
 
+    @Transactional(readOnly = true)
+    public Usuario buscarUsuarioSemAtribuicoes(String titulo) {
+        return usuarioService.buscar(titulo);
+    }
+
     private Optional<String> tituloUsuarioAutenticado() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated() || authentication instanceof AnonymousAuthenticationToken) {
@@ -72,6 +77,11 @@ public class UsuarioFacade {
     @Transactional(readOnly = true)
     public ResponsavelDto buscarResponsabilidadeDetalhadaAtual(String sigla) {
         return responsavelUnidadeService.buscarResponsabilidadeDetalhadaAtual(sigla);
+    }
+
+    @Transactional(readOnly = true)
+    public ResponsavelDto buscarResponsabilidadeDetalhadaAtual(Long codigoUnidade) {
+        return responsavelUnidadeService.buscarResponsabilidadeDetalhadaAtual(codigoUnidade);
     }
 
     @Transactional(readOnly = true)

@@ -226,6 +226,6 @@ public class PainelFacade {
             return null;
         }
 
-        return unidadeService.buscarPorCodigo(codigoUnidade).getSigla();
+        return unidadeService.buscarSiglaPorCodigo(codigoUnidade);
     }
 }

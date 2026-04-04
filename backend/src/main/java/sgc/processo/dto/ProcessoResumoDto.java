@@ -11,7 +11,7 @@ import java.time.*;
  */
 @Builder
 public record ProcessoResumoDto(
-        @Nullable Long codigo,
+        Long codigo,
         String descricao,
         SituacaoProcesso situacao,
         @Nullable String tipo,

@@ -43,27 +43,27 @@ class OrganizacaoViewsQueryBudgetIntegrationTest extends BaseIntegrationTest {
     void deveManterBudgetDeQueriesNasLeiturasOrganizacionaisMaisComuns() {
         AmostrasConsulta amostras = carregarAmostras();
 
-        assertThat(contarQueries(() -> unidadeHierarquiaService.buscarArvoreHierarquica())).isLessThanOrEqualTo(1);
-        assertThat(contarQueries(() -> unidadeHierarquiaService.buscarMapaHierarquia())).isLessThanOrEqualTo(1);
-        assertThat(contarQueries(() -> usuarioService.buscarOpt(amostras.tituloUsuario()))).isLessThanOrEqualTo(2);
-        assertThat(contarQueries(() -> usuarioService.buscarPorUnidadeLotacao(amostras.codigoUnidadeLotacao()))).isLessThanOrEqualTo(2);
-        assertThat(contarQueries(() -> usuarioService.buscarPorNomeOuMatricula(amostras.termoBuscaUsuario()))).isLessThanOrEqualTo(5);
-        assertThat(contarQueries(() -> usuarioService.buscarPerfis(amostras.tituloUsuarioComPerfil()))).isLessThanOrEqualTo(1);
-        assertThat(contarQueries(() -> responsavelUnidadeService.buscarResponsavelAtual(amostras.siglaUnidadeComResponsavel()))).isLessThanOrEqualTo(3);
-        assertThat(contarQueries(() -> responsavelUnidadeService.buscarResponsaveisUnidades(amostras.codigosUnidadesComResponsavel()))).isLessThanOrEqualTo(10);
+        assertThat(contarQueriesViews(() -> unidadeHierarquiaService.buscarArvoreHierarquica())).isLessThanOrEqualTo(1);
+        assertThat(contarQueriesViews(() -> unidadeHierarquiaService.buscarMapaHierarquia())).isLessThanOrEqualTo(1);
+        assertThat(contarQueriesViews(() -> usuarioService.buscarOpt(amostras.tituloUsuario()))).isLessThanOrEqualTo(2);
+        assertThat(contarQueriesViews(() -> usuarioService.buscarPorUnidadeLotacao(amostras.codigoUnidadeLotacao()))).isLessThanOrEqualTo(2);
+        assertThat(contarQueriesViews(() -> usuarioService.buscarPorNomeOuMatricula(amostras.termoBuscaUsuario()))).isLessThanOrEqualTo(5);
+        assertThat(contarQueriesViews(() -> usuarioService.buscarPerfis(amostras.tituloUsuarioComPerfil()))).isLessThanOrEqualTo(1);
+        assertThat(contarQueriesViews(() -> responsavelUnidadeService.buscarResponsavelAtual(amostras.siglaUnidadeComResponsavel()))).isLessThanOrEqualTo(2);
+        assertThat(contarQueriesViews(() -> responsavelUnidadeService.buscarResponsaveisUnidades(amostras.codigosUnidadesComResponsavel()))).isLessThanOrEqualTo(2);
     }
 
     @Test
     @DisplayName("Deve reutilizar cache sem preparar novas queries nos acessos repetidos")
     void deveReutilizarCacheSemPrepararNovasQueriesNosAcessosRepetidos() {
-        assertThat(contarQueries(() -> unidadeHierarquiaService.buscarArvoreHierarquica())).isLessThanOrEqualTo(1);
-        assertThat(contarQueries(() -> unidadeHierarquiaService.buscarArvoreHierarquica())).isZero();
+        assertThat(contarQueriesViews(() -> unidadeHierarquiaService.buscarArvoreHierarquica())).isLessThanOrEqualTo(1);
+        assertThat(contarQueriesViews(() -> unidadeHierarquiaService.buscarArvoreHierarquica())).isZero();
 
-        assertThat(contarQueries(() -> unidadeHierarquiaService.buscarMapaHierarquia())).isLessThanOrEqualTo(1);
-        assertThat(contarQueries(() -> unidadeHierarquiaService.buscarMapaHierarquia())).isZero();
+        assertThat(contarQueriesViews(() -> unidadeHierarquiaService.buscarMapaHierarquia())).isLessThanOrEqualTo(1);
+        assertThat(contarQueriesViews(() -> unidadeHierarquiaService.buscarMapaHierarquia())).isZero();
 
-        assertThat(contarQueries(unidadeService::buscarAdmin)).isLessThanOrEqualTo(1);
-        assertThat(contarQueries(unidadeService::buscarAdmin)).isZero();
+        assertThat(contarQueriesViews(unidadeService::buscarAdmin)).isLessThanOrEqualTo(1);
+        assertThat(contarQueriesViews(unidadeService::buscarAdmin)).isZero();
     }
 
     private long contarQueries(Runnable acao) {
@@ -72,10 +72,16 @@ class OrganizacaoViewsQueryBudgetIntegrationTest extends BaseIntegrationTest {
 
         entityManager.clear();
         estatisticas.clear();
+        sgc.integracao.mocks.ColetorSqlTeste.limpar();
 
         acao.run();
 
         return estatisticas.getPrepareStatementCount();
+    }
+
+    private long contarQueriesViews(Runnable acao) {
+        contarQueries(acao);
+        return sgc.integracao.mocks.ColetorSqlTeste.contarSqlsViewsOrganizacionais();
     }
 
     private AmostrasConsulta carregarAmostras() {

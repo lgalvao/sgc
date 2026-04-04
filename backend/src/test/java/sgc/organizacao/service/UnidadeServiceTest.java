@@ -78,6 +78,27 @@ class UnidadeServiceTest {
     }
 
     @Test
+    @DisplayName("buscarSiglaPorCodigo - Sucesso")
+    void buscarSiglaPorCodigo() {
+        when(unidadeRepo.buscarSiglaPorCodigo(1L)).thenReturn(Optional.of("U1"));
+
+        String result = service.buscarSiglaPorCodigo(1L);
+
+        assertThat(result).isEqualTo("U1");
+    }
+
+    @Test
+    @DisplayName("buscarPorCodigoComSuperior - Sucesso")
+    void buscarPorCodigoComSuperior() {
+        Unidade unidade = new Unidade();
+        when(unidadeRepo.buscarPorCodigoComSuperior(1L)).thenReturn(Optional.of(unidade));
+
+        Unidade result = service.buscarPorCodigoComSuperior(1L);
+
+        assertThat(result).isSameAs(unidade);
+    }
+
+    @Test
     @DisplayName("verificarMapaVigente - Sucesso")
     void temMapaVigente() {
         when(unidadeMapaRepo.existsById(1L)).thenReturn(true);

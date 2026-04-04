@@ -125,6 +125,14 @@ public class ResponsavelUnidadeService {
     @Transactional(readOnly = true)
     public ResponsavelDto buscarResponsabilidadeDetalhadaAtual(String siglaUnidade) {
         Long unidadeCodigo = buscarCodigoUnidadePorSigla(siglaUnidade);
+        return buscarResponsabilidadeDetalhadaAtual(unidadeCodigo);
+    }
+
+    /**
+     * Busca o responsável atual de uma unidade com detalhes da responsabilidade.
+     */
+    @Transactional(readOnly = true)
+    public ResponsavelDto buscarResponsabilidadeDetalhadaAtual(Long unidadeCodigo) {
         ResponsabilidadeUnidadeLeitura responsabilidade = buscarResponsabilidadeDetalhada(unidadeCodigo);
         Usuario usuario = repo.buscar(Usuario.class, responsabilidade.usuarioTitulo());
 
@@ -155,35 +163,26 @@ public class ResponsavelUnidadeService {
     public Map<Long, UnidadeResponsavelDto> buscarResponsaveisUnidades(List<Long> unidadesCodigos) {
         if (unidadesCodigos.isEmpty()) return Collections.emptyMap();
 
-        List<ResponsabilidadeUnidadeLeitura> responsabilidades = responsabilidadeRepo.listarLeiturasDetalhadasPorCodigosUnidade(unidadesCodigos);
+        List<ResponsabilidadeUnidadeResumoLeitura> responsabilidades = responsabilidadeRepo.listarResumosPorCodigosUnidade(unidadesCodigos);
         if (responsabilidades.isEmpty()) return Collections.emptyMap();
-
-        // Coletar todos os títulos (responsáveis atuais e titulares oficiais) para busca em lote
-        Set<String> todosTitulos = new HashSet<>();
-        responsabilidades.forEach(r -> {
-            todosTitulos.add(r.usuarioTitulo());
-            todosTitulos.add(obterTituloTitularObrigatorio(r));
-        });
-
-        Map<String, Usuario> usuariosPorTitulo = usuarioRepo.listarPorTitulosComUnidadeLotacao(new ArrayList<>(todosTitulos)).stream()
-                .collect(toMap(Usuario::getTituloEleitoral, u -> u));
 
         return responsabilidades.stream()
                 .collect(toMap(
-                        ResponsabilidadeUnidadeLeitura::unidadeCodigo,
-                        r -> {
-                            Usuario responsavel = usuariosPorTitulo.get(r.usuarioTitulo());
-                            Usuario titularOficial = usuariosPorTitulo.get(obterTituloTitularObrigatorio(r));
-                            if (responsavel == null || titularOficial == null) {
-                                throw new IllegalStateException("Responsável ou titular oficial ausente para unidade %d".formatted(r.unidadeCodigo()));
-                            }
-                            return montarResponsavelDto(r.unidadeCodigo(), responsavel, titularOficial);
-                        }
+                        ResponsabilidadeUnidadeResumoLeitura::unidadeCodigo,
+                        this::montarResponsavelDto
                 ));
     }
 
     private String obterTituloTitularObrigatorio(ResponsabilidadeUnidadeLeitura responsabilidade) {
         String tituloTitular = responsabilidade.tituloTitular();
+        if (tituloTitular == null || tituloTitular.isBlank()) {
+            throw new IllegalStateException("Titular oficial ausente para unidade %d".formatted(responsabilidade.unidadeCodigo()));
+        }
+        return tituloTitular;
+    }
+
+    private String obterTituloTitularObrigatorio(ResponsabilidadeUnidadeResumoLeitura responsabilidade) {
+        String tituloTitular = responsabilidade.titularTitulo();
         if (tituloTitular == null || tituloTitular.isBlank()) {
             throw new IllegalStateException("Titular oficial ausente para unidade %d".formatted(responsabilidade.unidadeCodigo()));
         }
@@ -209,6 +208,31 @@ public class ResponsavelUnidadeService {
                 .titularNome(titularOficial.getNome())
                 .substitutoTitulo(responsavel.getTituloEleitoral())
                 .substitutoNome(responsavel.getNome())
+                .build();
+    }
+
+    private UnidadeResponsavelDto montarResponsavelDto(ResponsabilidadeUnidadeResumoLeitura responsabilidade) {
+        String titularTitulo = obterTituloTitularObrigatorio(responsabilidade);
+        if (responsabilidade.responsavelNome() == null || responsabilidade.titularNome() == null) {
+            throw new IllegalStateException("Responsável ou titular oficial ausente para unidade %d".formatted(responsabilidade.unidadeCodigo()));
+        }
+
+        if (responsabilidade.responsavelTitulo().equals(titularTitulo)) {
+            return UnidadeResponsavelDto.builder()
+                    .unidadeCodigo(responsabilidade.unidadeCodigo())
+                    .titularTitulo(titularTitulo)
+                    .titularNome(responsabilidade.responsavelNome())
+                    .substitutoTitulo(null)
+                    .substitutoNome(null)
+                    .build();
+        }
+
+        return UnidadeResponsavelDto.builder()
+                .unidadeCodigo(responsabilidade.unidadeCodigo())
+                .titularTitulo(titularTitulo)
+                .titularNome(responsabilidade.titularNome())
+                .substitutoTitulo(responsabilidade.responsavelTitulo())
+                .substitutoNome(responsabilidade.responsavelNome())
                 .build();
     }
 

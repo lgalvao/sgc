@@ -123,9 +123,14 @@ dependencies {
     rewrite("org.openrewrite:rewrite-java:8.75.5")
 }
 
+val receitaRewriteAtiva = providers.gradleProperty("rewriteRecipe")
+    .orElse("sgc.java.renomearMetodosRepoCategoriaA")
+val arquivoConfigRewrite = providers.gradleProperty("rewriteConfig")
+    .orElse("etc/openrewrite/renomear-metodos-repo-categoria-a.yml")
+
 rewrite {
-    activeRecipe("sgc.java.renomearMetodosRepoCategoriaA")
-    configFile = rootProject.file("etc/openrewrite/renomear-metodos-repo-categoria-a.yml")
+    activeRecipe(receitaRewriteAtiva.get())
+    configFile = rootProject.file(arquivoConfigRewrite.get())
 }
 
 listOf("rewriteDiscover", "rewriteDryRun", "rewriteRun").forEach { nomeTarefa ->

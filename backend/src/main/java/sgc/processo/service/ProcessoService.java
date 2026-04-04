@@ -102,13 +102,14 @@ public class ProcessoService {
 
     @Transactional(readOnly = true)
     public Page<Processo> listarTodos(Pageable pageable) {
-        return processoRepo.findAll(pageable);
+        return carregarPaginaComParticipantes(processoRepo.listarCodigos(pageable), pageable);
     }
 
     @Transactional(readOnly = true)
     public Page<Processo> listarIniciadosPorParticipantes(List<Long> unidadeCodigos, Pageable pageable) {
-        return processoRepo.listarPorParticipantesESituacaoDiferente(
+        Page<Long> paginaCodigos = processoRepo.listarCodigosPorParticipantesESituacaoDiferente(
                 unidadeCodigos, CRIADO, pageable);
+        return carregarPaginaComParticipantes(paginaCodigos, pageable);
     }
 
     @Transactional(readOnly = true)
@@ -341,6 +342,23 @@ public class ProcessoService {
             return buscarDescendentes(root);
         }
         return List.of(root);
+    }
+
+    private Page<Processo> carregarPaginaComParticipantes(Page<Long> paginaCodigos, Pageable pageable) {
+        List<Long> codigos = paginaCodigos.getContent();
+        if (codigos.isEmpty()) {
+            return new PageImpl<>(List.of(), pageable, paginaCodigos.getTotalElements());
+        }
+
+        Map<Long, Processo> processosPorCodigo = processoRepo.listarPorCodigosComParticipantes(codigos).stream()
+                .collect(Collectors.toMap(Processo::getCodigo, processo -> processo));
+
+        List<Processo> processosOrdenados = codigos.stream()
+                .map(processosPorCodigo::get)
+                .filter(Objects::nonNull)
+                .toList();
+
+        return new PageImpl<>(processosOrdenados, pageable, paginaCodigos.getTotalElements());
     }
 
     private List<Long> buscarDescendentes(Long codRaiz) {

@@ -58,7 +58,9 @@ Levantamento no backend em 2026-04-04:
 - remover lookup repetido de `VW_UNIDADE` em painel, historico de analises e inicio de processo
 - substituir o uso restante de `listarTodasComHierarquia()` em `ProcessoService` pelo mapa cacheado de hierarquia
 - remover do backend o caminho legado `listarTodasComHierarquia()` agora que ele nao participa mais dos fluxos ativos
+- consolidar `buscarResponsaveisUnidades(...)` em projecao unica para evitar segunda leitura em `VW_USUARIO`
 - centralizar a unidade `ADMIN` em metodo dedicado com cache agressivo do Spring
+- validar painel e detalhe de subprocesso com budget local de queries para evitar regressao fora do modulo organizacional
 - preservar os contratos HTTP e os DTOs atuais
 
 ### Fora desta rodada

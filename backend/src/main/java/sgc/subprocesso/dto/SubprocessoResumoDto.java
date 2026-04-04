@@ -11,7 +11,7 @@ import java.time.*;
 
 @Builder
 public record SubprocessoResumoDto(
-        @Nullable Long codigo,
+        Long codigo,
         UnidadeDto unidade,
         SituacaoSubprocesso situacao,
         LocalDateTime dataLimiteEtapa1,
@@ -63,4 +63,3 @@ public record SubprocessoResumoDto(
                 .build();
     }
 }
-

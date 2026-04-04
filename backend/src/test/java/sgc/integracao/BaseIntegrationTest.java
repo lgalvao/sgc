@@ -63,6 +63,7 @@ public abstract class BaseIntegrationTest {
     @BeforeEach
     void setupMockMvc() {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
+        ColetorSqlTeste.limpar();
         cacheManager.getCacheNames().forEach(nome -> {
             Cache cache = cacheManager.getCache(nome);
             if (cache != null) {

@@ -165,8 +165,9 @@ public class SubprocessoConsultaService {
     }
 
     public SubprocessoDetalheResponse obterDetalhes(Subprocesso sp, Usuario usuarioAutenticado) {
-        ContextoConsultaSubprocesso contexto = montarContextoConsulta(sp, usuarioAutenticado);
-        DadosDetalheSubprocesso dadosDetalhe = montarDadosDetalhe(contexto);
+        List<Movimentacao> movimentacoes = listarMovimentacoes(sp);
+        ContextoConsultaSubprocesso contexto = montarContextoConsulta(sp, usuarioAutenticado, movimentacoes);
+        DadosDetalheSubprocesso dadosDetalhe = montarDadosDetalhe(contexto, movimentacoes);
 
         return SubprocessoDetalheResponse.builder()
                 .subprocesso(SubprocessoResumoDto.fromEntity(sp))
@@ -397,14 +398,13 @@ public class SubprocessoConsultaService {
         return obterMapaObrigatorio(subprocesso).getCodigo();
     }
 
-    private DadosDetalheSubprocesso montarDadosDetalhe(ContextoConsultaSubprocesso contexto) {
-        String siglaUnidade = contexto.unidadeAlvo().getSigla();
+    private DadosDetalheSubprocesso montarDadosDetalhe(ContextoConsultaSubprocesso contexto, List<Movimentacao> movimentacoes) {
         ContextoPermissaoSubprocesso contextoPermissao = montarContextoPermissao(contexto);
         return new DadosDetalheSubprocesso(
                 contexto.localizacaoAtual().getSigla(),
-                usuarioFacade.buscarResponsabilidadeDetalhadaAtual(siglaUnidade),
+                usuarioFacade.buscarResponsabilidadeDetalhadaAtual(contexto.unidadeAlvo().getCodigo()),
                 buscarTitularSeInformado(contexto.unidadeAlvo()),
-                listarMovimentacoesDto(contexto.subprocesso()),
+                listarMovimentacoesDto(movimentacoes),
                 contextoPermissao.processoFinalizado()
                         ? construirPermissoesProcessoFinalizado(contextoPermissao)
                         : construirPermissoes(contextoPermissao)
@@ -457,19 +457,31 @@ public class SubprocessoConsultaService {
         if (tituloTitular == null || tituloTitular.isBlank()) {
             return null;
         }
-        return usuarioFacade.buscarPorLogin(tituloTitular);
+        return usuarioFacade.buscarUsuarioSemAtribuicoes(tituloTitular);
     }
 
     private List<MovimentacaoDto> listarMovimentacoesDto(Subprocesso sp) {
-        return movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(sp.getCodigo()).stream()
+        return listarMovimentacoesDto(listarMovimentacoes(sp));
+    }
+
+    private List<MovimentacaoDto> listarMovimentacoesDto(List<Movimentacao> movimentacoes) {
+        return movimentacoes.stream()
                 .map(MovimentacaoDto::from)
                 .toList();
     }
 
+    private List<Movimentacao> listarMovimentacoes(Subprocesso sp) {
+        return movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(sp.getCodigo());
+    }
+
     private ContextoConsultaSubprocesso montarContextoConsulta(Subprocesso sp, Usuario usuario) {
+        return montarContextoConsulta(sp, usuario, listarMovimentacoes(sp));
+    }
+
+    private ContextoConsultaSubprocesso montarContextoConsulta(Subprocesso sp, Usuario usuario, List<Movimentacao> movimentacoes) {
         Processo processo = sp.getProcesso();
-        Unidade unidadeUsuario = unidadeService.buscarPorCodigo(usuario.getUnidadeAtivaCodigo());
-        Unidade localizacaoAtual = obterUnidadeLocalizacao(sp);
+        Unidade unidadeUsuario = unidadeService.buscarPorCodigoComSuperior(usuario.getUnidadeAtivaCodigo());
+        Unidade localizacaoAtual = obterLocalizacaoAtual(sp, movimentacoes);
         boolean processoFinalizado = processo != null && processo.getSituacao() == SituacaoProcesso.FINALIZADO;
         boolean mesmaUnidade = !processoFinalizado
                 && Objects.equals(usuario.getUnidadeAtivaCodigo(), localizacaoAtual.getCodigo());
@@ -483,6 +495,13 @@ public class SubprocessoConsultaService {
                 mesmaUnidade,
                 temMapaVigente
         );
+    }
+
+    private Unidade obterLocalizacaoAtual(Subprocesso sp, List<Movimentacao> movimentacoes) {
+        if (!movimentacoes.isEmpty()) {
+            return movimentacoes.getFirst().getUnidadeDestino();
+        }
+        return obterUnidadeLocalizacao(sp);
     }
 
     private ContextoPermissaoSubprocesso montarContextoPermissao(ContextoConsultaSubprocesso contextoConsulta) {

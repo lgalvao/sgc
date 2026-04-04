@@ -81,20 +81,20 @@ class PainelFacadeTest {
 
         when(hierarquiaService.buscarMapaHierarquia()).thenReturn(new HashMap<>());
         when(processoService.listarIniciadosPorParticipantes(anyList(), any(Pageable.class))).thenReturn(page);
-        when(unidadeService.buscarPorCodigo(100L)).thenReturn(unidade);
+        when(unidadeService.buscarSiglaPorCodigo(100L)).thenReturn(unidade.getSigla());
 
         Page<ProcessoResumoDto> result = painelFacade.listarProcessos(Perfil.CHEFE, 100L, PageRequest.of(0, 10));
 
         assertThat(result).hasSize(2);
         assertThat(result.getContent().getFirst().linkDestino()).isEqualTo("/processo/1/ASSESSORIA_22");
         assertThat(result.getContent().get(1).linkDestino()).isEqualTo("/processo/2/ASSESSORIA_22");
-        verify(unidadeService).buscarPorCodigo(100L);
+        verify(unidadeService).buscarSiglaPorCodigo(100L);
     }
 
     @Test
     @DisplayName("Deve propagar erro ao calcular link sem fallback")
     void devePropagarErroAoCalcularLink() {
-        when(unidadeService.buscarPorCodigo(100L)).thenThrow(new RuntimeException("Erro"));
+        when(unidadeService.buscarSiglaPorCodigo(100L)).thenThrow(new RuntimeException("Erro"));
 
         PageRequest pageRequest = PageRequest.of(0, 10);
         assertThatThrownBy(() -> painelFacade.listarProcessos(Perfil.CHEFE, 100L, pageRequest))

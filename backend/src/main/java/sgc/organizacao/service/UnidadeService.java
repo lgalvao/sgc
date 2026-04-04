@@ -60,6 +60,16 @@ public class UnidadeService {
         return unidadeRepo.buscarSiglasPorCodigos(codigos);
     }
 
+    public String buscarSiglaPorCodigo(Long codigo) {
+        return unidadeRepo.buscarSiglaPorCodigo(codigo)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(Unidade.class.getSimpleName(), codigo));
+    }
+
+    public Unidade buscarPorCodigoComSuperior(Long codigo) {
+        return unidadeRepo.buscarPorCodigoComSuperior(codigo)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(Unidade.class.getSimpleName(), codigo));
+    }
+
     public boolean temMapaVigente(Long codigoUnidade) {
         return unidadeMapaRepo.existsById(codigoUnidade);
     }

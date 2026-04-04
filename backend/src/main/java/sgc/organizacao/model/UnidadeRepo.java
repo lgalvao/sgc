@@ -32,6 +32,13 @@ public interface UnidadeRepo extends JpaRepository<Unidade, Long> {
     List<String> buscarSiglasPorCodigos(@Param("codigos") List<Long> codigos);
 
     @Query("""
+            SELECT u.sigla FROM Unidade u
+            WHERE u.codigo = :codigo
+            AND u.situacao = SituacaoUnidade.ATIVA
+            """)
+    Optional<String> buscarSiglaPorCodigo(@Param("codigo") Long codigo);
+
+    @Query("""
             SELECT new sgc.organizacao.model.UnidadeHierarquiaLeitura(
                 u.codigo,
                 u.nome,
@@ -62,6 +69,14 @@ public interface UnidadeRepo extends JpaRepository<Unidade, Long> {
             AND u.situacao = SituacaoUnidade.ATIVA
             """)
     Optional<Unidade> buscarPorCodigoComResponsavel(@Param("codigo") Long codigo);
+
+    @Query("""
+            SELECT u FROM Unidade u
+            LEFT JOIN FETCH u.unidadeSuperior
+            WHERE u.codigo = :codigo
+            AND u.situacao = SituacaoUnidade.ATIVA
+            """)
+    Optional<Unidade> buscarPorCodigoComSuperior(@Param("codigo") Long codigo);
 
     @Query("""
             SELECT u FROM Unidade u

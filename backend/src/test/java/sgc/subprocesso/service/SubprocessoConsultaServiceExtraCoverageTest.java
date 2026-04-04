@@ -157,9 +157,9 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             user.setUnidadeAtivaCodigo(10L);
 
             when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(1L)).thenReturn(Optional.of(sp));
-            when(usuarioFacade.buscarPorLogin("titular")).thenReturn(user);
+            when(usuarioFacade.buscarUsuarioSemAtribuicoes("titular")).thenReturn(user);
             when(movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(1L)).thenReturn(List.of());
-            when(unidadeService.buscarPorCodigo(10L)).thenReturn(u);
+            when(unidadeService.buscarPorCodigoComSuperior(10L)).thenReturn(u);
             stubUltimaMovimentacaoNaUnidade(sp);
 
             SubprocessoDetalheResponse res = consultaService.obterDetalhes(1L, user);
@@ -195,9 +195,8 @@ class SubprocessoConsultaServiceExtraCoverageTest {
 
             when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(1L)).thenReturn(Optional.of(sp));
             when(movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(1L)).thenReturn(List.of(mov));
-            when(unidadeService.buscarPorCodigo(10L)).thenReturn(u);
-            when(usuarioFacade.buscarPorLogin("titular")).thenReturn(user);
-            when(movimentacaoRepo.buscarUltimaPorSubprocesso(1L)).thenReturn(Optional.of(mov));
+            when(unidadeService.buscarPorCodigoComSuperior(10L)).thenReturn(u);
+            when(usuarioFacade.buscarUsuarioSemAtribuicoes("titular")).thenReturn(user);
 
             SubprocessoDetalheResponse res = consultaService.obterDetalhes(1L, user);
             assertThat(res.localizacaoAtual()).isEqualTo("U2");
@@ -226,9 +225,8 @@ class SubprocessoConsultaServiceExtraCoverageTest {
 
             when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(1L)).thenReturn(Optional.of(sp));
             when(movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(1L)).thenReturn(List.of(mov));
-            when(unidadeService.buscarPorCodigo(10L)).thenReturn(u);
-            when(usuarioFacade.buscarPorLogin("titular")).thenReturn(user);
-            when(movimentacaoRepo.buscarUltimaPorSubprocesso(1L)).thenReturn(Optional.of(mov));
+            when(unidadeService.buscarPorCodigoComSuperior(10L)).thenReturn(u);
+            when(usuarioFacade.buscarUsuarioSemAtribuicoes("titular")).thenReturn(user);
 
             SubprocessoDetalheResponse res = consultaService.obterDetalhes(1L, user);
             assertThat(res.localizacaoAtual()).isEqualTo("U1");
@@ -256,7 +254,7 @@ class SubprocessoConsultaServiceExtraCoverageTest {
 
             when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(11L)).thenReturn(Optional.of(sp));
             when(movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(11L)).thenReturn(List.of());
-            when(usuarioFacade.buscarResponsabilidadeDetalhadaAtual("U11")).thenReturn(responsavel);
+            when(usuarioFacade.buscarResponsabilidadeDetalhadaAtual(11L)).thenReturn(responsavel);
             when(unidadeService.temMapaVigente(11L)).thenReturn(true);
             stubUltimaMovimentacaoNaUnidade(sp);
 
@@ -279,7 +277,7 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             user.setPerfilAtivo(Perfil.GESTOR);
             user.setUnidadeAtivaCodigo(20L); // Diferente
 
-            when(unidadeService.buscarPorCodigo(20L)).thenReturn(new Unidade());
+            when(unidadeService.buscarPorCodigoComSuperior(20L)).thenReturn(new Unidade());
             when(unidadeService.temMapaVigente(10L)).thenReturn(true);
             when(hierarquiaService.ehMesmaOuSubordinada(any(), any())).thenReturn(true);
             stubUltimaMovimentacaoNaUnidade(sp);
@@ -301,7 +299,7 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             user.setPerfilAtivo(Perfil.SERVIDOR);
             user.setUnidadeAtivaCodigo(10L);
 
-            when(unidadeService.buscarPorCodigo(10L)).thenReturn(u);
+            when(unidadeService.buscarPorCodigoComSuperior(10L)).thenReturn(u);
             when(unidadeService.temMapaVigente(10L)).thenReturn(false);
             stubUltimaMovimentacaoNaUnidade(sp);
 
@@ -328,7 +326,7 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             user.setPerfilAtivo(Perfil.ADMIN);
             user.setUnidadeAtivaCodigo(20L);
 
-            when(unidadeService.buscarPorCodigo(20L)).thenReturn(new Unidade());
+            when(unidadeService.buscarPorCodigoComSuperior(20L)).thenReturn(new Unidade());
             when(unidadeService.temMapaVigente(10L)).thenReturn(true);
 
             PermissoesSubprocessoDto res = consultaService.obterPermissoesUI(sp, user);
@@ -348,7 +346,7 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             user.setPerfilAtivo(Perfil.ADMIN);
             user.setUnidadeAtivaCodigo(10L);
 
-            when(unidadeService.buscarPorCodigo(10L)).thenReturn(new Unidade());
+            when(unidadeService.buscarPorCodigoComSuperior(10L)).thenReturn(new Unidade());
             when(unidadeService.temMapaVigente(10L)).thenReturn(true);
             stubUltimaMovimentacaoNaUnidade(sp);
 
@@ -372,7 +370,7 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             user.setPerfilAtivo(Perfil.ADMIN);
             user.setUnidadeAtivaCodigo(10L);
 
-            when(unidadeService.buscarPorCodigo(10L)).thenReturn(new Unidade());
+            when(unidadeService.buscarPorCodigoComSuperior(10L)).thenReturn(new Unidade());
             when(unidadeService.temMapaVigente(10L)).thenReturn(true);
             stubUltimaMovimentacaoNaUnidade(sp);
 
@@ -395,7 +393,7 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             user.setPerfilAtivo(Perfil.GESTOR);
             user.setUnidadeAtivaCodigo(20L); // Unidade diferente
 
-            when(unidadeService.buscarPorCodigo(20L)).thenReturn(new Unidade());
+            when(unidadeService.buscarPorCodigoComSuperior(20L)).thenReturn(new Unidade());
             when(unidadeService.temMapaVigente(10L)).thenReturn(true);
             when(hierarquiaService.ehMesmaOuSubordinada(any(), any())).thenReturn(false);
             stubUltimaMovimentacaoNaUnidade(sp);
@@ -418,7 +416,7 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             user.setPerfilAtivo(Perfil.SERVIDOR); // isChefe=false, isAdmin=false
             user.setUnidadeAtivaCodigo(10L);
 
-            when(unidadeService.buscarPorCodigo(10L)).thenReturn(u);
+            when(unidadeService.buscarPorCodigoComSuperior(10L)).thenReturn(u);
             when(unidadeService.temMapaVigente(10L)).thenReturn(true);
 
             PermissoesSubprocessoDto res = consultaService.obterPermissoesUI(sp, user);
@@ -439,7 +437,7 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             user.setUnidadeAtivaCodigo(10L);
             user.setPerfilAtivo(Perfil.ADMIN);
 
-            when(unidadeService.buscarPorCodigo(10L)).thenReturn(new Unidade());
+            when(unidadeService.buscarPorCodigoComSuperior(10L)).thenReturn(new Unidade());
 
             PermissoesSubprocessoDto res = consultaService.obterPermissoesUI(sp, user);
             assertThat(res).isNotNull();
@@ -458,7 +456,7 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             user.setPerfilAtivo(Perfil.GESTOR);
             Unidade uGestor = new Unidade(); uGestor.setCodigo(20L);
 
-            when(unidadeService.buscarPorCodigo(20L)).thenReturn(uGestor);
+            when(unidadeService.buscarPorCodigoComSuperior(20L)).thenReturn(uGestor);
             when(hierarquiaService.ehMesmaOuSubordinada(uAlvo, uGestor)).thenReturn(true);
             stubUltimaMovimentacaoNaUnidade(sp);
 
@@ -479,7 +477,7 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             user.setPerfilAtivo(Perfil.SERVIDOR);
             Unidade uUser = new Unidade(); uUser.setCodigo(20L);
 
-            when(unidadeService.buscarPorCodigo(20L)).thenReturn(uUser);
+            when(unidadeService.buscarPorCodigoComSuperior(20L)).thenReturn(uUser);
             stubUltimaMovimentacaoNaUnidade(sp);
 
             PermissoesSubprocessoDto res = consultaService.obterPermissoesUI(sp, user);
@@ -494,7 +492,7 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             Unidade u = new Unidade(); u.setCodigo(10L); sp.setUnidade(u);
 
             Usuario user = new Usuario(); user.setPerfilAtivo(Perfil.ADMIN); user.setUnidadeAtivaCodigo(10L);
-            when(unidadeService.buscarPorCodigo(10L)).thenReturn(u);
+            when(unidadeService.buscarPorCodigoComSuperior(10L)).thenReturn(u);
             stubUltimaMovimentacaoNaUnidade(sp);
 
             PermissoesSubprocessoDto res = consultaService.obterPermissoesUI(sp, user);
@@ -511,7 +509,7 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             Subprocesso sp = criarSubprocessoComMapa(1L);
             Unidade u = new Unidade(); u.setCodigo(10L); sp.setUnidade(u);
             Usuario user = new Usuario(); user.setPerfilAtivo(Perfil.ADMIN); user.setUnidadeAtivaCodigo(10L);
-            when(unidadeService.buscarPorCodigo(10L)).thenReturn(u);
+            when(unidadeService.buscarPorCodigoComSuperior(10L)).thenReturn(u);
             stubUltimaMovimentacaoNaUnidade(sp);
 
             // test a few from the set in line 630
@@ -532,7 +530,7 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             user.setPerfilAtivo(Perfil.CHEFE);
             user.setUnidadeAtivaCodigo(10L);
 
-            when(unidadeService.buscarPorCodigo(10L)).thenReturn(u);
+            when(unidadeService.buscarPorCodigoComSuperior(10L)).thenReturn(u);
             stubUltimaMovimentacaoNaUnidade(sp);
 
             PermissoesSubprocessoDto res = consultaService.obterPermissoesUI(sp, user);

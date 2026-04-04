@@ -1,0 +1,25 @@
+type: specs.openrewrite.org/v1beta/recipe
+name: sgc.java.reduzirNullableDtosCategoriaA
+displayName: Reduzir @Nullable redundante em DTOs da Categoria A
+description: Remove anotacoes @Nullable redundantes em DTOs cujo proprio mapper ja garante preenchimento obrigatorio.
+recipeList:
+  - org.openrewrite.text.FindAndReplace:
+      find: "@Nullable Long codigo,"
+      replace: "Long codigo,"
+      regex: false
+      filePattern: "**/subprocesso/dto/SubprocessoResumoDto.java"
+  - org.openrewrite.text.FindAndReplace:
+      find: "@Nullable Long codigo,"
+      replace: "Long codigo,"
+      regex: false
+      filePattern: "**/mapa/dto/MapaResumoDto.java"
+  - org.openrewrite.text.FindAndReplace:
+      find: "@Nullable Long subprocessoCodigo,"
+      replace: "Long subprocessoCodigo,"
+      regex: false
+      filePattern: "**/mapa/dto/MapaResumoDto.java"
+  - org.openrewrite.text.FindAndReplace:
+      find: "@Nullable Long codigo,"
+      replace: "Long codigo,"
+      regex: false
+      filePattern: "**/processo/dto/ProcessoResumoDto.java"
