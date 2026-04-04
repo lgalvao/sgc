@@ -92,9 +92,9 @@ class UsuarioServiceTest {
         }
 
         @Test
-        @DisplayName("Deve buscar usuários por nome ou matrícula")
-        void deveBuscarUsuariosPorNomeOuMatricula() {
-            List<Usuario> resultado = usuarioServiceInternal.buscarPorNomeOuMatricula("Admin");
+        @DisplayName("Deve buscar usuários por nome")
+        void deveBuscarUsuariosPorNome() {
+            List<Usuario> resultado = usuarioServiceInternal.buscarPorNome("Admin");
 
             assertNotNull(resultado);
             assertFalse(resultado.isEmpty());

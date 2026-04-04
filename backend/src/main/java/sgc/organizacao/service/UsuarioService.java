@@ -3,6 +3,7 @@ package sgc.organizacao.service;
 import lombok.*;
 import lombok.extern.slf4j.*;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.data.domain.*;
 import org.springframework.security.core.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
@@ -19,6 +20,8 @@ import java.util.stream.*;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class UsuarioService {
+    private static final int LIMITE_PESQUISA_USUARIO = 20;
+
     private final UsuarioRepo usuarioRepo;
     private final UsuarioPerfilRepo usuarioPerfilRepo;
     private final AdministradorRepo administradorRepo;
@@ -44,8 +47,16 @@ public class UsuarioService {
         return usuarioRepo.listarPorTitulosComUnidadeLotacao(titulos);
     }
 
-    public List<Usuario> buscarPorNomeOuMatricula(String termo) {
-        return usuarioRepo.buscarPorNomeOuMatriculaComUnidadeLotacao(termo);
+    public List<Usuario> buscarPorNome(String termo) {
+        String termoNormalizado = Optional.ofNullable(termo).orElse("").trim();
+        if (termoNormalizado.length() < 2) {
+            return List.of();
+        }
+
+        return usuarioRepo.buscarPorNomeComUnidadeLotacao(
+                termoNormalizado,
+                PageRequest.of(0, LIMITE_PESQUISA_USUARIO)
+        );
     }
 
     public List<UsuarioPerfil> buscarPerfis(String usuarioTitulo) {

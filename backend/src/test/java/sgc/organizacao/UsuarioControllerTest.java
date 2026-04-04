@@ -87,7 +87,7 @@ class UsuarioControllerTest {
         usuario.setTituloEleitoral("123");
         usuario.setNome("Fulano");
         usuario.setUnidadeLotacao(Unidade.builder().codigo(1L).sigla("U1").nome("Unidade 1").tipo(TipoUnidade.OPERACIONAL).build());
-        when(usuarioService.buscarPorNomeOuMatricula("ful")).thenReturn(List.of(usuario));
+        when(usuarioService.buscarPorNome("ful")).thenReturn(List.of(usuario));
 
         mockMvc.perform(get("/api/usuarios/pesquisar").param("termo", "ful"))
                 .andExpect(status().isOk())

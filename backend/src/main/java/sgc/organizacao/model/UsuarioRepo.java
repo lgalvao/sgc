@@ -3,6 +3,7 @@ package sgc.organizacao.model;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.*;
 import org.springframework.stereotype.*;
+import org.springframework.data.domain.*;
 
 import java.util.*;
 
@@ -32,8 +33,8 @@ public interface UsuarioRepo extends JpaRepository<Usuario, String> {
     @Query("""
             SELECT DISTINCT u FROM Usuario u
             JOIN FETCH u.unidadeLotacao
-            WHERE LOWER(u.nome) LIKE LOWER(CONCAT('%', :termo, '%'))
-            OR u.matricula LIKE CONCAT('%', :termo, '%')
+            WHERE LOWER(u.nome) LIKE LOWER(CONCAT(:termo, '%'))
+            ORDER BY u.nome
             """)
-    List<Usuario> buscarPorNomeOuMatriculaComUnidadeLotacao(@Param("termo") String termo);
+    List<Usuario> buscarPorNomeComUnidadeLotacao(@Param("termo") String termo, Pageable pageable);
 }

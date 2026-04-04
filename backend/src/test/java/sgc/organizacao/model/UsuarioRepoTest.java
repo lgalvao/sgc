@@ -4,6 +4,7 @@ import org.hibernate.*;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.boot.test.context.*;
+import org.springframework.data.domain.*;
 import org.springframework.transaction.annotation.*;
 
 import java.util.*;
@@ -42,13 +43,12 @@ class UsuarioRepoTest {
     }
 
     @Test
-    @DisplayName("deve buscar usuarios por nome ou matricula")
-    void deveBuscarUsuariosPorNomeOuMatricula() {
-        List<Usuario> porNome = usuarioRepo.buscarPorNomeOuMatriculaComUnidadeLotacao("Ana Paula");
-        List<Usuario> porMatricula = usuarioRepo.buscarPorNomeOuMatriculaComUnidadeLotacao("00000017");
+    @DisplayName("deve buscar usuarios por prefixo do nome com limite")
+    void deveBuscarUsuariosPorNome() {
+        List<Usuario> porNome = usuarioRepo.buscarPorNomeComUnidadeLotacao("Ana", PageRequest.of(0, 20));
 
         assertThat(porNome).extracting(Usuario::getTituloEleitoral).contains("1");
-        assertThat(porMatricula).extracting(Usuario::getTituloEleitoral).containsExactly("17");
-        assertThat(porMatricula.getFirst().getUnidadeLotacao().getCodigo()).isEqualTo(10L);
+        assertThat(porNome)
+                .allSatisfy(usuario -> assertThat(Hibernate.isInitialized(usuario.getUnidadeLotacao())).isTrue());
     }
 }

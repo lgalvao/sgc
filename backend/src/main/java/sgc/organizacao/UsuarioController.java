@@ -34,9 +34,9 @@ public class UsuarioController {
     }
 
     @GetMapping("/pesquisar")
-    @Operation(summary = "Pesquisa usuários por nome ou matrícula")
+    @Operation(summary = "Pesquisa usuários por nome")
     public ResponseEntity<List<UsuarioConsultaDto>> pesquisarUsuarios(@RequestParam String termo) {
-        return ResponseEntity.ok(usuarioService.buscarPorNomeOuMatricula(termo).stream()
+        return ResponseEntity.ok(usuarioService.buscarPorNome(termo).stream()
                 .map(UsuarioConsultaDto::fromEntity)
                 .toList());
     }
