@@ -22,6 +22,7 @@ Este documento consolida todas as regras de negócio do Sistema de Gestão de Co
 14. [Atribuição temporária de Responsabilidade](#14-atribuição-temporária-de-responsabilidade)
 15. [Integração com Sistemas externos (SGRH e CORAU)](#15-integração-com-sistemas-externos-sgrh-e-corau)
 16. [Views do Sistema](#16-views-do-sistema)
+17. [Navegação e Breadcrumbs](#17-navegação-e-breadcrumbs)
 
 ---
 
@@ -136,7 +137,7 @@ Este documento consolida todas as regras de negócio do Sistema de Gestão de Co
 **RN-04.07** — Uma unidade **não pode participar de dois processos ativos do mesmo tipo simultaneamente**. A lista de unidades disponíveis para seleção deve marcar como não selecionáveis as unidades já participando de processo ativo do mesmo tipo.
 > Fonte: `cdu-03.md` (passo 2 — campo Unidades participantes), `design/arvore-unidades.md` (Elegibilidade)
 
-**RN-04.08** — Unidades do tipo **INTERMEDIÁRIA** nunca participam diretamente de um processo como unidade com subprocesso; elas participam apenas no papel de validadoras na hierarquia. Na seleção de unidades, o comportamento da árvore filtra automaticamente as INTERMEDIÁRIAS antes do envio ao backend (porém mostra as unidades para facilitar o entendi,m.
+**RN-04.08** — Unidades do tipo **INTERMEDIÁRIA** nunca participam diretamente de um processo como unidade com subprocesso; elas participam apenas no papel de validadoras na hierarquia. Na seleção de unidades, o comportamento da árvore filtra automaticamente as INTERMEDIÁRIAS antes do envio ao backend (podendo mantê-las visíveis para facilitar o entendimento da hierarquia pelo usuário).
 > Fonte: `cdu-04.md` (passo 9), `design/arvore-unidades.md` (Filtro transparente)
 
 **RN-04.09** — Ao se iniciar um processo de qualquer tipo, o sistema notifica por e-mail e cria alertas para todas as unidades participantes (operacionais e interoperacionais recebem notificação de início; intermediárias recebem notificação consolidada sobre suas subordinadas).
@@ -156,6 +157,19 @@ Este documento consolida todas as regras de negócio do Sistema de Gestão de Co
 
 **RN-04.14** — Processos são considerados **ativos** enquanto não finalizados, ou enquanto finalizados há menos de `DIAS_INATIVACAO_PROCESSO` dias (configuração do sistema, padrão 10 dias). Após esse prazo, o processo fica **inativo** e disponível apenas em consulta via a tela `Histórico de processos`.
 > Fonte: `_intro-glossario.md` (Processos ativos/inativos), `cdu-31.md`
+
+**RN-04.15** — Na criação/edição de processo, a **descrição é obrigatória** e ao menos **uma unidade participante** deve ser selecionada. Mensagens de validação:
+- "Preencha a descrição".
+- "Pelo menos uma unidade participante deve ser incluída."
+> Fonte: `cdu-03.md` (passos 4.1 e 4.2)
+
+**RN-04.16** — A árvore de seleção de unidades na criação/edição de processo deve respeitar comportamento hierárquico:
+- Selecionar unidade intermediária seleciona automaticamente toda subárvore.
+- Nó raiz de subárvore fica selecionado quando todos os descendentes estiverem selecionados.
+- Nó raiz fica em estado intermediário quando houver seleção parcial.
+- Nó raiz perde seleção quando todos os descendentes forem desmarcados.
+- Se a raiz for INTEROPERACIONAL, ela pode ser selecionada mesmo sem selecionar subordinadas.
+> Fonte: `cdu-03.md` (passo 2), `design/arvore-unidades.md`
 
 ---
 
@@ -186,7 +200,7 @@ Este documento consolida todas as regras de negócio do Sistema de Gestão de Co
 **RN-05.08** — O ADMIN pode **reabrir o cadastro** de um subprocesso de Mapeamento, desde que tenha passado da situação 'Mapa homologado', retornando-o para 'Cadastro em andamento'. A reabertura exige **justificativa** obrigatória e notifica a unidade e suas superiores.
 > Fonte: `cdu-32.md`
 
-**RN-05.09** — O ADMIN pode **reabrir a revisão de cadastro** de um subprocesso de Revisão, que tenha passado da situacao 'Mapa homologado', retornando-o para 'Revisão do cadastro em andamento'. A reabertura exige **justificativa** obrigatória e notifica a unidade e suas superiores.
+**RN-05.09** — O ADMIN pode **reabrir a revisão de cadastro** de um subprocesso de Revisão, que tenha passado da situação 'Mapa homologado', retornando-o para 'Revisão do cadastro em andamento'. A reabertura exige **justificativa** obrigatória e notifica a unidade e suas superiores.
 > Fonte: `cdu-33.md`
 
 **RN-05.10** — No processo de **devolução** para ajustes (seja de cadastro ou de mapa), o sistema identifica a unidade de devolução como sendo a **unidade de origem da última movimentação** do subprocesso.
@@ -194,6 +208,18 @@ Este documento consolida todas as regras de negócio do Sistema de Gestão de Co
 
 **RN-05.11** — Se a unidade de devolução for a **própria unidade do subprocesso**, a situação retorna para 'Cadastro em andamento' (mapeamento) ou 'Revisão do cadastro em andamento' (revisão) e a data de conclusão da etapa correspondente é apagada.
 > Fonte: `cdu-13.md` (passo 9.8), `cdu-14.md` (passo 10.8), `cdu-20.md` (passo 8.8)
+
+**RN-05.12** — Na tela de detalhamento de subprocesso, as seções obrigatórias são: **Dados da unidade**, **Movimentações** e **Elementos do processo**. Em Dados da unidade, devem ser exibidos sigla/nome da unidade, responsável, situação, localização atual e prazo da etapa atual; titular é exibido apenas quando diferente do responsável.
+> Fonte: `cdu-07.md` (passo 2.1)
+
+**RN-05.13** — No detalhamento de subprocesso, o card **Atividades e conhecimentos** fica sempre habilitado para CHEFE (com edição condicionada à situação do subprocesso); para os demais perfis, só é liberado após disponibilização do cadastro.
+> Fonte: `cdu-07.md` (passo 2.3.1), `cdu-11.md`
+
+**RN-05.14** — No detalhamento de subprocesso, o card **Mapa de competências** fica inicialmente habilitado apenas para ADMIN após homologação do cadastro/revisão; após disponibilização do mapa, o card é liberado para os demais perfis em modo somente leitura.
+> Fonte: `cdu-07.md` (passo 2.3.1), `cdu-18.md`
+
+**RN-05.15** — Em processos do tipo **Diagnóstico**, o detalhamento de subprocesso deve expor os cards **Diagnóstico da equipe** e **Ocupações críticas**.
+> Fonte: `cdu-07.md` (passo 2.3.2)
 
 ---
 
@@ -307,8 +333,8 @@ Este documento consolida todas as regras de negócio do Sistema de Gestão de Co
 **RN-09.03** — Alertas não visualizados pelo usuário são exibidos em **negrito** no Painel. Na primeira visualização, o alerta é marcado como lido para aquele usuário específico.
 > Fonte: `cdu-02.md` (passo 3.2)
 
-**RN-09.04** — Os alertas são exibidos no Painel ordenados primariamente pelo processo (asc/desc) e secundariamente pela data/hora (desc).
-> Fonte: `cdu-02.md` (passo 3.2)
+**RN-09.04** — Os alertas são exibidos no Painel em ordem **decrescente de data/hora**, sem permitir reordenação pelo usuário.
+> Fonte: `cdu-02.md` (passo 3.3)
 
 **RN-09.05** — O **ADMIN** pode enviar manualmente um **lembrete de prazo** para unidades com pendências, gerando e-mail, alerta e registrando uma movimentação interna no subprocesso.
 > Fonte: `cdu-34.md`
@@ -334,6 +360,12 @@ Este documento consolida todas as regras de negócio do Sistema de Gestão de Co
 
 **RN-10.04** — A coluna **'Unidades participantes'** no Painel exibe apenas as unidades de nível mais alto da hierarquia que tenham todas as suas subordinadas participando do processo. Por exemplo, se apenas as seções de uma coordenadoria participam, aparece apenas o nome da coordenadoria.
 > Fonte: `cdu-02.md` (passo 2.1), `cdu-29.md` (passo 2)
+
+**RN-10.05** — No Painel, os cabeçalhos da tabela de **processos ativos** são clicáveis e devem permitir ordenação crescente/decrescente.
+> Fonte: `cdu-02.md` (passo 2.2)
+
+**RN-10.06** — O botão **Criar processo** é exibido somente para usuário logado com perfil ADMIN.
+> Fonte: `cdu-02.md` (passo 2.3)
 
 ---
 
@@ -387,7 +419,7 @@ Este documento consolida todas as regras de negócio do Sistema de Gestão de Co
 **RN-14.03** — O usuário que recebe uma atribuição temporária passa a ter os direitos do perfil **CHEFE** durante o período da atribuição. A atribuição tem prioridade sobre os dados de titularidade lidos do SGRH.
 > Fonte: `cdu-28.md` (passo 11)
 
-**RN-14.04** — Ao criar uma atribuição temporária, o sistema notifica por e-mail o servidor atribuídoe cria um alerta pessoal endereçado a ele.
+**RN-14.04** — Ao criar uma atribuição temporária, o sistema notifica por e-mail o servidor atribuído e cria um alerta pessoal endereçado a ele.
 > Fonte: `cdu-28.md` (passos 9–10)
 
 **RN-14.05** — A hierarquia de precedência para determinação do responsável efetivo de uma unidade é: (1) **Atribuição temporária** (maior prioridade, cadastrada no SGC) > (2) **Substituição formal** (do SGRH) > (3) **Titularidade** (menor prioridade, do SGRH).
@@ -395,6 +427,12 @@ Este documento consolida todas as regras de negócio do Sistema de Gestão de Co
 
 **RN-14.06** — As atribuições temporárias são vigentes quando a data atual estiver no intervalo `[data_inicio, data_termino]` (inclusive). A verificação de vigência usa `SYSDATE BETWEEN TRUNC(data_inicio) AND TRUNC(data_termino + 1)`.
 > Fonte: `views/view-05-responsabilidade.md` (RN-VIEW05-04)
+
+**RN-14.07** — Regras de integridade de atribuição temporária:
+- não pode haver múltiplas atribuições vigentes para a mesma unidade;
+- `data_inicio` deve ser menor ou igual a `data_termino`;
+- períodos de atribuição da mesma unidade não podem se sobrepor.
+> Fonte: `views/view-05-responsabilidade.md` (seção de validações/regras)
 
 ---
 
@@ -439,6 +477,22 @@ Este documento consolida todas as regras de negócio do Sistema de Gestão de Co
 
 **RN-16.06 (VW_USUARIO_PERFIL_UNIDADE)** — View que é o coração do sistema de autorização. Estabelece o mapeamento completo entre usuários, perfis (ADMIN, GESTOR, CHEFE, SERVIDOR) e unidades. É consultada em cada login e em todas as validações de permissão.
 > Fonte: `views/view-06-usuario-perfil-unidade.md`
+
+---
+
+## 17. Navegação e Breadcrumbs
+
+**RN-17.01** — A barra de navegação (botão voltar + breadcrumbs) é exibida em todas as páginas, exceto **Login** e **Painel**.
+> Fonte: `design/breadcrumbs.md` (Visão geral, componentes)
+
+**RN-17.02** — O primeiro item do breadcrumb é sempre o ícone de casa (🏠), que direciona ao Painel; o último item é ativo e não clicável.
+> Fonte: `design/breadcrumbs.md` (Links nos breadcrumbs)
+
+**RN-17.03** — Em rotas de processo/subprocesso, para perfis CHEFE e SERVIDOR, o item intermediário **Detalhes do processo** deve ser omitido.
+> Fonte: `design/breadcrumbs.md` (Estrutura por tipo de rota)
+
+**RN-17.04** — O botão voltar da barra de navegação usa histórico de navegação (`router.back()`), não devendo reconstruir rotas manualmente.
+> Fonte: `design/breadcrumbs.md` (Botão voltar)
 
 ---
 
