@@ -238,7 +238,7 @@ Este documento consolida todas as regras de negócio do Sistema de Gestão de Co
 > Fonte: `cdu-08.md` (passo 14)
 
 **RN-06.05** — O CHEFE pode **importar atividades** de processos de mapeamento ou revisão finalizados, de qualquer unidade. Devem ser exibidos **todos** os processos finalizados, de todas as unidades, independentemente da hierarquia.
-> Fonte: `cdu-08.md` (passo 13.1), memória armazenada (CDU-08)
+> Fonte: `cdu-08.md` (passo 13.1)
 
 **RN-06.06** — Na importação, são copiadas apenas as atividades cujas descrições **não coincidam** com nenhuma atividade já cadastrada na unidade. Se houver coincidência, o sistema informa sobre as atividades não importadas, mas prossegue sem erro.
 > Fonte: `cdu-08.md` (passos 13.7.1–13.7.2)
@@ -254,6 +254,9 @@ Este documento consolida todas as regras de negócio do Sistema de Gestão de Co
 
 **RN-06.10** — O cadastro de atividades e conhecimentos pode ser **visualizado** (somente leitura) por qualquer perfil, desde que o cadastro já tenha sido disponibilizado pelo CHEFE.
 > Fonte: `cdu-11.md`
+
+**RN-06.11** — Ao abrir a tela de cadastro de atividades e conhecimentos, se já existirem atividades no mapa vinculado ao subprocesso da unidade, a tela deve ser exibida previamente preenchida com essas informações.
+> Fonte: `cdu-08.md` (passo 4)
 
 ---
 
@@ -366,6 +369,9 @@ Este documento consolida todas as regras de negócio do Sistema de Gestão de Co
 
 **RN-10.06** — O botão **Criar processo** é exibido somente para usuário logado com perfil ADMIN.
 > Fonte: `cdu-02.md` (passo 2.3)
+
+**RN-10.07** — Na tela `Detalhes do processo`, os botões de operações em bloco de cadastro e de mapa só devem ser exibidos quando existirem unidades subordinadas com subprocessos elegíveis e localizados na unidade do usuário.
+> Fonte: `cdu-06.md` (passo 2.2.2)
 
 ---
 
