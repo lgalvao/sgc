@@ -259,11 +259,6 @@ public class ProcessoService {
     }
 
 
-    void executarAcaoEmBloco(Long codProcesso, AcaoEmBlocoRequest req) {
-        executarAcaoEmBloco(codProcesso, req.paraCommand());
-    }
-
-
     public void executarAcaoEmBloco(Long codProcesso, AcaoEmBlocoCommand command) {
         Usuario usuario = usuarioService.usuarioAutenticado();
         List<Long> unidadeCodigos = command.unidadeCodigos();
@@ -620,13 +615,6 @@ public class ProcessoService {
         }
         DisponibilizarMapaRequest dispReq = new DisponibilizarMapaRequest(command.dataLimite(), "Disponibilização em bloco");
         transicaoService.disponibilizarMapaEmBloco(subprocessos.stream().map(Subprocesso::getCodigo).toList(), dispReq, usuario);
-    }
-
-    private void processarAcoesBlocoAceiteHomologacao(AcaoEmBlocoRequest req, Usuario user, List<Subprocesso> list) {
-        if (req.acao() == DISPONIBILIZAR) {
-            return;
-        }
-        processarAcoesBlocoAceiteHomologacao(new ProcessarAnaliseEmBlocoCommand(req.unidadeCodigos(), req.acao()), user, list);
     }
 
     private void processarAcoesBlocoAceiteHomologacao(ProcessarAnaliseEmBlocoCommand req, Usuario user, List<Subprocesso> list) {

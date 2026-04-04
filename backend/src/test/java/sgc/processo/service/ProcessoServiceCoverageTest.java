@@ -58,7 +58,7 @@ class ProcessoServiceCoverageTest {
     @DisplayName("executarAcaoEmBloco deve lançar ErroAcessoNegado quando não houver permissão")
     void deveLancarErroAcessoNegado() {
         Long codProcesso = 100L;
-        AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(List.of(1L), DISPONIBILIZAR, null);
+        DisponibilizarMapaEmBlocoCommand req = new DisponibilizarMapaEmBlocoCommand(List.of(1L), null);
 
         Subprocesso sp = mock(Subprocesso.class);
         Usuario usuario = new Usuario();
@@ -77,7 +77,7 @@ class ProcessoServiceCoverageTest {
     @DisplayName("executarAcaoEmBloco deve exigir data limite ao disponibilizar")
     void deveExigirDataLimiteAoDisponibilizar() {
         Long codProcesso = 100L;
-        AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(List.of(1L), DISPONIBILIZAR, null);
+        DisponibilizarMapaEmBlocoCommand req = new DisponibilizarMapaEmBlocoCommand(List.of(1L), null);
 
         Subprocesso sp = mock(Subprocesso.class);
         Usuario usuario = new Usuario();
@@ -125,7 +125,7 @@ class ProcessoServiceCoverageTest {
     @DisplayName("validarSelecaoBloco deve lançar ErroValidacao quando tamanhos diferirem")
     void deveLancarErroValidacaoEmBloco() {
         Long codProcesso = 100L;
-        AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(List.of(1L, 2L), DISPONIBILIZAR, null);
+        DisponibilizarMapaEmBlocoCommand req = new DisponibilizarMapaEmBlocoCommand(List.of(1L, 2L), null);
 
         Subprocesso sp = mock(Subprocesso.class);
         Unidade u = new Unidade();
@@ -356,7 +356,7 @@ class ProcessoServiceCoverageTest {
     @DisplayName("executarAcaoEmBloco - acao HOMOLOGAR")
     void executarAcaoEmBloco_Homologar() {
         Long codProc = 1L;
-        AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(List.of(10L), AcaoProcesso.HOMOLOGAR, null);
+        ProcessarAnaliseEmBlocoCommand req = new ProcessarAnaliseEmBlocoCommand(List.of(10L), AcaoProcesso.HOMOLOGAR);
         Subprocesso sp = new Subprocesso(); sp.setCodigo(100L); sp.setSituacao(MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
         Unidade u = new Unidade(); u.setCodigo(10L); sp.setUnidade(u);
 

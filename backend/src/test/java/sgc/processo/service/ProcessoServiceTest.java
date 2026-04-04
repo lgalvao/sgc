@@ -100,10 +100,9 @@ class ProcessoServiceTest {
         @DisplayName("executarAcaoEmBloco nao executa transicoes quando subprocesso nao eh elegivel")
         void executarAcaoEmBloco_NaoExecutaTransicoesQuandoNaoElegivel() {
             Long codProcesso = 1L;
-            AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(
+            ProcessarAnaliseEmBlocoCommand req = new ProcessarAnaliseEmBlocoCommand(
                     List.of(10L),
-                    ACEITAR, // Mock a valid action for the initial check, then we'll test categorization
-                    LocalDate.now()
+                    ACEITAR
             );
 
             Usuario usuario = new Usuario();
@@ -465,7 +464,7 @@ class ProcessoServiceTest {
         @Test
         @DisplayName("Deve falhar ao executar ação em bloco sem unidades")
         void deveFalharAoExecutarAcaoEmBlocoSemUnidades() {
-            AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(List.of(), ACEITAR, LocalDate.now());
+            ProcessarAnaliseEmBlocoCommand req = new ProcessarAnaliseEmBlocoCommand(List.of(), ACEITAR);
             assertThatThrownBy(() -> processoService.executarAcaoEmBloco(1L, req))
                     .isInstanceOf(ErroValidacao.class)
                     .hasMessageContaining(Mensagens.SELECIONE_AO_MENOS_UMA_UNIDADE);
@@ -489,13 +488,13 @@ class ProcessoServiceTest {
                     .thenReturn(List.of(sCad, sVal));
 
             // Teste ACEITAR
-            AcaoEmBlocoRequest reqAceitar = new AcaoEmBlocoRequest(List.of(10L, 20L), ACEITAR, LocalDate.now());
+            ProcessarAnaliseEmBlocoCommand reqAceitar = new ProcessarAnaliseEmBlocoCommand(List.of(10L, 20L), ACEITAR);
             processoService.executarAcaoEmBloco(1L, reqAceitar);
             verify(transicaoService).aceitarCadastroEmBloco(List.of(10L), usuario);
             verify(transicaoService).aceitarValidacaoEmBloco(List.of(20L), usuario);
 
             // Teste HOMOLOGAR
-            AcaoEmBlocoRequest reqHomologar = new AcaoEmBlocoRequest(List.of(10L, 20L), HOMOLOGAR, LocalDate.now());
+            ProcessarAnaliseEmBlocoCommand reqHomologar = new ProcessarAnaliseEmBlocoCommand(List.of(10L, 20L), HOMOLOGAR);
             processoService.executarAcaoEmBloco(1L, reqHomologar);
             verify(transicaoService).homologarCadastroEmBloco(List.of(10L), usuario);
             verify(transicaoService).homologarValidacaoEmBloco(List.of(20L), usuario);
@@ -712,9 +711,8 @@ class ProcessoServiceTest {
                 when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
 
                 LocalDate dataLimite = LocalDate.now().plusDays(30);
-                AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(
+                DisponibilizarMapaEmBlocoCommand req = new DisponibilizarMapaEmBlocoCommand(
                         List.of(1L, 2L, 3L),
-                        AcaoProcesso.DISPONIBILIZAR,
                         dataLimite
                 );
 
@@ -763,10 +761,9 @@ class ProcessoServiceTest {
 
                 when(consultaService.listarEntidadesPorProcessoEUnidades(100L, List.of(10L, 20L))).thenReturn(List.of(sp1, sp2));
 
-                AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(
+                ProcessarAnaliseEmBlocoCommand req = new ProcessarAnaliseEmBlocoCommand(
                         List.of(10L, 20L),
-                        ACEITAR,
-                        null
+                        ACEITAR
                 );
 
                 processoService.executarAcaoEmBloco(100L, req);
@@ -789,10 +786,9 @@ class ProcessoServiceTest {
 
                 when(consultaService.listarEntidadesPorProcessoEUnidades(100L, List.of(10L))).thenReturn(List.of(sp1));
 
-                AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(
+                ProcessarAnaliseEmBlocoCommand req = new ProcessarAnaliseEmBlocoCommand(
                         List.of(10L),
-                        ACEITAR,
-                        null
+                        ACEITAR
                 );
 
                 processoService.executarAcaoEmBloco(100L, req);
@@ -819,10 +815,9 @@ class ProcessoServiceTest {
 
                 when(consultaService.listarEntidadesPorProcessoEUnidades(100L, List.of(10L))).thenReturn(List.of(sp1));
 
-                AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(
+                ProcessarAnaliseEmBlocoCommand req = new ProcessarAnaliseEmBlocoCommand(
                         List.of(10L),
-                        HOMOLOGAR,
-                        null
+                        HOMOLOGAR
                 );
 
                 processoService.executarAcaoEmBloco(100L, req);
@@ -845,10 +840,9 @@ class ProcessoServiceTest {
 
                 when(consultaService.listarEntidadesPorProcessoEUnidades(100L, List.of(10L))).thenReturn(List.of(sp1));
 
-                AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(
+                ProcessarAnaliseEmBlocoCommand req = new ProcessarAnaliseEmBlocoCommand(
                         List.of(10L),
-                        HOMOLOGAR,
-                        null
+                        HOMOLOGAR
                 );
 
                 processoService.executarAcaoEmBloco(100L, req);
@@ -1051,8 +1045,7 @@ class ProcessoServiceTest {
         @Test
         @DisplayName("processarAcoesBlocoAceiteHomologacao - fall-through branch")
         void deveNaoFazerNadaQuandoAcaoNaoForAceitarOuHomologar() {
-            AcaoEmBlocoRequest req = mock(AcaoEmBlocoRequest.class);
-            when(req.acao()).thenReturn(AcaoProcesso.DISPONIBILIZAR);
+            ProcessarAnaliseEmBlocoCommand req = new ProcessarAnaliseEmBlocoCommand(List.of(), AcaoProcesso.DISPONIBILIZAR);
             
             assertThatCode(() -> invokeMethod(processoService, "processarAcoesBlocoAceiteHomologacao", req, new Usuario(), List.of()))
                 .doesNotThrowAnyException();
