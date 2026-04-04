@@ -178,112 +178,86 @@ public class SubprocessoConsultaService {
     }
 
     public SubprocessoDetalheResponse obterDetalhes(Subprocesso sp, Usuario usuarioAutenticado) {
-        String siglaUnidade = sp.getUnidade().getSigla();
-        String localizacaoAtual = obterUnidadeLocalizacao(sp).getSigla();
-        ResponsavelDto responsavel = usuarioFacade.buscarResponsabilidadeDetalhadaAtual(siglaUnidade);
-        String tituloTitular = sp.getUnidade().getTituloTitular();
-        Usuario titular = (tituloTitular == null || tituloTitular.isBlank())
-                ? null
-                : usuarioFacade.buscarPorLogin(tituloTitular);
-        List<Movimentacao> movs = movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(sp.getCodigo());
-        List<MovimentacaoDto> movimentacoes = movs.stream().map(MovimentacaoDto::from).toList();
-        PermissoesSubprocessoDto permissoes = obterPermissoesUI(sp, usuarioAutenticado);
+        DadosDetalheSubprocesso dadosDetalhe = montarDadosDetalhe(sp, usuarioAutenticado);
 
         return SubprocessoDetalheResponse.builder()
                 .subprocesso(SubprocessoResumoDto.fromEntity(sp))
-                .responsavel(responsavel)
-                .titular(UsuarioResumoDto.fromEntity(titular))
-                .movimentacoes(movimentacoes)
-                .localizacaoAtual(localizacaoAtual)
-                .permissoes(permissoes)
+                .responsavel(dadosDetalhe.responsavel())
+                .titular(UsuarioResumoDto.fromEntity(dadosDetalhe.titular()))
+                .movimentacoes(dadosDetalhe.movimentacoes())
+                .localizacaoAtual(dadosDetalhe.localizacaoAtual())
+                .permissoes(dadosDetalhe.permissoes())
                 .build();
     }
 
     public ContextoEdicaoResponse obterContextoEdicao(Long codSubprocesso) {
         Usuario usuario = usuarioFacade.usuarioAutenticado();
-        Subprocesso sp = buscarSubprocesso(codSubprocesso);
-        SubprocessoDetalheResponse detalhes = obterDetalhes(sp, usuario);
-        Unidade unidadeSp = sp.getUnidade();
-        List<AtividadeDto> atividades = listarAtividadesSubprocesso(codSubprocesso);
-
+        DadosContextoEdicao dadosContexto = montarDadosContextoEdicao(codSubprocesso, usuario);
         return new ContextoEdicaoResponse(
-                unidadeSp,
-                SubprocessoResumoDto.fromEntity(sp),
-                detalhes,
-                mapaCompletoDtoPorSubprocesso(codSubprocesso),
-                atividades
+                dadosContexto.unidade(),
+                SubprocessoResumoDto.fromEntity(dadosContexto.subprocesso()),
+                dadosContexto.detalhes(),
+                dadosContexto.mapa(),
+                dadosContexto.atividades()
         );
     }
 
     public PermissoesSubprocessoDto obterPermissoesUI(Subprocesso sp, Usuario usuario) {
-        Processo processo = sp.getProcesso();
-        Perfil perfil = usuario.getPerfilAtivo();
-        SituacaoSubprocesso situacao = sp.getSituacao();
-
-        if (processo != null && processo.getSituacao() == SituacaoProcesso.FINALIZADO) {
-            Unidade unidadeUsuario = unidadeService.buscarPorCodigo(usuario.getUnidadeAtivaCodigo());
-            return PermissoesSubprocessoDto.builder()
-                    .habilitarAcessoCadastro(verificarAcessoCadastroHabilitado(perfil, situacao, sp.getUnidade(), unidadeUsuario))
-                    .habilitarAcessoMapa(verificarAcessoMapaHabilitado(perfil, situacao, sp.getUnidade(), unidadeUsuario))
-                    .build();
+        ContextoPermissaoSubprocesso contexto = montarContextoPermissao(sp, usuario);
+        if (contexto.processoFinalizado()) {
+            return construirPermissoesProcessoFinalizado(contexto, sp);
         }
-
-        Long codUnidadeUsuario = usuario.getUnidadeAtivaCodigo();
-        Long codUnidadeLocalizacao = obterUnidadeLocalizacao(sp).getCodigo();
-        boolean mesmaUnidade = Objects.equals(codUnidadeUsuario, codUnidadeLocalizacao);
-        boolean temMapaVigente = unidadeService.temMapaVigente(sp.getUnidade().getCodigo());
-        return construirPermissoes(mesmaUnidade, usuario, sp, temMapaVigente);
+        return construirPermissoes(contexto, sp);
     }
 
-    private PermissoesSubprocessoDto construirPermissoes(boolean mesmaUnidade, Usuario usuario, Subprocesso sp, boolean temMapaVigente) {
-        Perfil perfil = usuario.getPerfilAtivo();
-        SituacaoSubprocesso situacao = sp.getSituacao();
-        Unidade unidadeUsuario = unidadeService.buscarPorCodigo(usuario.getUnidadeAtivaCodigo());
-
-        boolean isChefe = perfil == Perfil.CHEFE;
-        boolean isGestor = perfil == Perfil.GESTOR;
-        boolean isAdmin = perfil == Perfil.ADMIN;
-
-        boolean habilitarAcessoCadastro = verificarAcessoCadastroHabilitado(perfil, situacao, sp.getUnidade(), unidadeUsuario);
-        boolean habilitarAcessoMapa = verificarAcessoMapaHabilitado(perfil, situacao, sp.getUnidade(), unidadeUsuario);
+    private PermissoesSubprocessoDto construirPermissoes(ContextoPermissaoSubprocesso contexto, Subprocesso sp) {
+        boolean habilitarAcessoCadastro = verificarAcessoCadastroHabilitado(contexto, sp.getUnidade());
+        boolean habilitarAcessoMapa = verificarAcessoMapaHabilitado(contexto, sp.getUnidade());
 
         return PermissoesSubprocessoDto.builder()
-                .podeEditarCadastro(isChefe && SITUACOES_EDICAO_CADASTRO.contains(situacao))
-                .podeDisponibilizarCadastro(isChefe && SITUACOES_DISPONIBILIZACAO_CADASTRO.contains(situacao))
-                .podeDevolverCadastro((isGestor || isAdmin) && SITUACOES_ANALISE_CADASTRO.contains(situacao))
-                .podeAceitarCadastro(isGestor && SITUACOES_ANALISE_CADASTRO.contains(situacao))
-                .podeHomologarCadastro(isAdmin && SITUACOES_ANALISE_CADASTRO.contains(situacao))
-                .podeEditarMapa(verificarEditarMapa(isAdmin, situacao))
-                .podeDisponibilizarMapa(isAdmin && SITUACOES_DISPONIBILIZACAO_MAPA.contains(situacao))
-                .podeValidarMapa(isChefe && SITUACOES_ANALISE_MAPA.contains(situacao))
-                .podeApresentarSugestoes(isChefe && SITUACOES_ANALISE_MAPA.contains(situacao))
-                .podeVerSugestoes((isGestor || isAdmin) && SITUACOES_COM_SUGESTOES_MAPA.contains(situacao))
-                .podeDevolverMapa(verificarGerirMapa(isGestor || isAdmin, situacao))
-                .podeAceitarMapa(verificarGerirMapa(isGestor, situacao))
-                .podeHomologarMapa(verificarGerirMapa(isAdmin, situacao))
-                .podeVisualizarImpacto(verificarVisualizarImpacto(temMapaVigente, mesmaUnidade, isChefe, isGestor, isAdmin, situacao))
-                .podeAlterarDataLimite(isAdmin)
-                .podeReabrirCadastro(isAdmin && isSituacaoMapeamentoAPartirDe(situacao, MAPEAMENTO_MAPA_HOMOLOGADO))
-                .podeReabrirRevisao(isAdmin && isSituacaoRevisaoAPartirDe(situacao, REVISAO_MAPA_HOMOLOGADO))
-                .podeEnviarLembrete(isAdmin)
-                .mesmaUnidade(mesmaUnidade)
+                .podeEditarCadastro(contexto.isChefe() && SITUACOES_EDICAO_CADASTRO.contains(contexto.situacao()))
+                .podeDisponibilizarCadastro(contexto.isChefe() && SITUACOES_DISPONIBILIZACAO_CADASTRO.contains(contexto.situacao()))
+                .podeDevolverCadastro(contexto.isGestorOuAdmin() && SITUACOES_ANALISE_CADASTRO.contains(contexto.situacao()))
+                .podeAceitarCadastro(contexto.isGestor() && SITUACOES_ANALISE_CADASTRO.contains(contexto.situacao()))
+                .podeHomologarCadastro(contexto.isAdmin() && SITUACOES_ANALISE_CADASTRO.contains(contexto.situacao()))
+                .podeEditarMapa(verificarEditarMapa(contexto))
+                .podeDisponibilizarMapa(contexto.isAdmin() && SITUACOES_DISPONIBILIZACAO_MAPA.contains(contexto.situacao()))
+                .podeValidarMapa(contexto.isChefe() && SITUACOES_ANALISE_MAPA.contains(contexto.situacao()))
+                .podeApresentarSugestoes(contexto.isChefe() && SITUACOES_ANALISE_MAPA.contains(contexto.situacao()))
+                .podeVerSugestoes(contexto.isGestorOuAdmin() && SITUACOES_COM_SUGESTOES_MAPA.contains(contexto.situacao()))
+                .podeDevolverMapa(verificarGerirMapa(contexto.isGestorOuAdmin(), contexto.situacao()))
+                .podeAceitarMapa(verificarGerirMapa(contexto.isGestor(), contexto.situacao()))
+                .podeHomologarMapa(verificarGerirMapa(contexto.isAdmin(), contexto.situacao()))
+                .podeVisualizarImpacto(verificarVisualizarImpacto(contexto))
+                .podeAlterarDataLimite(contexto.isAdmin())
+                .podeReabrirCadastro(contexto.isAdmin() && isSituacaoMapeamentoAPartirDe(contexto.situacao(), MAPEAMENTO_MAPA_HOMOLOGADO))
+                .podeReabrirRevisao(contexto.isAdmin() && isSituacaoRevisaoAPartirDe(contexto.situacao(), REVISAO_MAPA_HOMOLOGADO))
+                .podeEnviarLembrete(contexto.isAdmin())
+                .mesmaUnidade(contexto.mesmaUnidade())
                 .habilitarAcessoCadastro(habilitarAcessoCadastro)
                 .habilitarAcessoMapa(habilitarAcessoMapa)
                 .build();
     }
 
-    private boolean verificarAcessoCadastroHabilitado(Perfil perfil, SituacaoSubprocesso situacao, Unidade unidadeAlvo, Unidade unidadeUsuario) {
-        if (perfil == Perfil.CHEFE) return Objects.equals(unidadeAlvo.getCodigo(), unidadeUsuario.getCodigo());
-        boolean cadastroDisponibilizado = verificarCadastroDisponibilizadoParaVisualizacao(situacao);
-        if (perfil == Perfil.ADMIN) return cadastroDisponibilizado;
-        if (perfil == Perfil.GESTOR) return cadastroDisponibilizado && hierarquiaService.ehMesmaOuSubordinada(unidadeAlvo, unidadeUsuario);
-        return cadastroDisponibilizado && Objects.equals(unidadeAlvo.getCodigo(), unidadeUsuario.getCodigo());
+    private PermissoesSubprocessoDto construirPermissoesProcessoFinalizado(ContextoPermissaoSubprocesso contexto, Subprocesso sp) {
+        return PermissoesSubprocessoDto.builder()
+                .habilitarAcessoCadastro(verificarAcessoCadastroHabilitado(contexto, sp.getUnidade()))
+                .habilitarAcessoMapa(verificarAcessoMapaHabilitado(contexto, sp.getUnidade()))
+                .build();
     }
 
-    private boolean verificarAcessoMapaHabilitado(Perfil perfil, SituacaoSubprocesso situacao, Unidade unidadeAlvo, Unidade unidadeUsuario) {
-        if (perfil == Perfil.ADMIN) return verificarMapaHabilitadoParaAdmin(situacao);
-        if (perfil == Perfil.GESTOR) return verificarMapaDisponibilizadoParaVisualizacao(situacao) && hierarquiaService.ehMesmaOuSubordinada(unidadeAlvo, unidadeUsuario);
-        if (perfil == Perfil.CHEFE || perfil == Perfil.SERVIDOR) return verificarMapaDisponibilizadoParaVisualizacao(situacao) && Objects.equals(unidadeAlvo.getCodigo(), unidadeUsuario.getCodigo());
+    private boolean verificarAcessoCadastroHabilitado(ContextoPermissaoSubprocesso contexto, Unidade unidadeAlvo) {
+        if (contexto.isChefe()) return Objects.equals(unidadeAlvo.getCodigo(), contexto.unidadeUsuario().getCodigo());
+        boolean cadastroDisponibilizado = verificarCadastroDisponibilizadoParaVisualizacao(contexto.situacao());
+        if (contexto.isAdmin()) return cadastroDisponibilizado;
+        if (contexto.isGestor()) return cadastroDisponibilizado && hierarquiaService.ehMesmaOuSubordinada(unidadeAlvo, contexto.unidadeUsuario());
+        return cadastroDisponibilizado && Objects.equals(unidadeAlvo.getCodigo(), contexto.unidadeUsuario().getCodigo());
+    }
+
+    private boolean verificarAcessoMapaHabilitado(ContextoPermissaoSubprocesso contexto, Unidade unidadeAlvo) {
+        if (contexto.isAdmin()) return verificarMapaHabilitadoParaAdmin(contexto.situacao());
+        if (contexto.isGestor()) return verificarMapaDisponibilizadoParaVisualizacao(contexto.situacao()) && hierarquiaService.ehMesmaOuSubordinada(unidadeAlvo, contexto.unidadeUsuario());
+        if (contexto.isChefe() || contexto.isServidor()) return verificarMapaDisponibilizadoParaVisualizacao(contexto.situacao()) && Objects.equals(unidadeAlvo.getCodigo(), contexto.unidadeUsuario().getCodigo());
         return false;
     }
 
@@ -299,12 +273,15 @@ public class SubprocessoConsultaService {
         return isSituacaoMapeamentoAPartirDe(situacao, MAPEAMENTO_CADASTRO_HOMOLOGADO) || isSituacaoRevisaoAPartirDe(situacao, REVISAO_CADASTRO_HOMOLOGADA);
     }
 
-    private boolean verificarVisualizarImpacto(boolean temMapaVigente, boolean mesmaUnidade, boolean isChefe, boolean isGestor, boolean isAdmin, SituacaoSubprocesso situacao) {
-        return temMapaVigente && ((mesmaUnidade && isChefe && situacao == REVISAO_CADASTRO_EM_ANDAMENTO) || (mesmaUnidade && isGestor && situacao == REVISAO_CADASTRO_DISPONIBILIZADA) || (isAdmin && SITUACOES_IMPACTO_ADMIN.contains(situacao)));
+    private boolean verificarVisualizarImpacto(ContextoPermissaoSubprocesso contexto) {
+        return contexto.temMapaVigente()
+                && ((contexto.mesmaUnidade() && contexto.isChefe() && contexto.situacao() == REVISAO_CADASTRO_EM_ANDAMENTO)
+                || (contexto.mesmaUnidade() && contexto.isGestor() && contexto.situacao() == REVISAO_CADASTRO_DISPONIBILIZADA)
+                || (contexto.isAdmin() && SITUACOES_IMPACTO_ADMIN.contains(contexto.situacao())));
     }
 
-    private boolean verificarEditarMapa(boolean isAdmin, SituacaoSubprocesso situacao) {
-        return isAdmin && SITUACOES_EDICAO_MAPA.contains(situacao);
+    private boolean verificarEditarMapa(ContextoPermissaoSubprocesso contexto) {
+        return contexto.isAdmin() && SITUACOES_EDICAO_MAPA.contains(contexto.situacao());
     }
 
     private boolean verificarGerirMapa(boolean isPermitido, SituacaoSubprocesso situacao) {
@@ -329,7 +306,7 @@ public class SubprocessoConsultaService {
 
     public List<AtividadeDto> listarAtividadesSubprocesso(Long codSubprocesso) {
         Subprocesso subprocesso = buscarSubprocesso(codSubprocesso);
-        Long codMapa = subprocesso.getMapa().getCodigo();
+        Long codMapa = obterCodigoMapaObrigatorio(subprocesso);
         List<Atividade> todasAtividades = mapaManutencaoService.atividadesMapaCodigoComConhecimentos(codMapa);
         return todasAtividades.stream().map(AtividadeDto::fromEntity).toList();
     }
@@ -392,7 +369,7 @@ public class SubprocessoConsultaService {
 
     public MapaAjusteDto obterMapaParaAjuste(Long codSubprocesso) {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
-        Long codMapa = sp.getMapa().getCodigo();
+        Long codMapa = obterCodigoMapaObrigatorio(sp);
 
         Analise analise = listarAnalisesPorSubprocesso(codSubprocesso, TipoAnalise.VALIDACAO).stream().findFirst().orElse(null);
         List<sgc.mapa.model.Competencia> competencias = mapaManutencaoService.competenciasCodMapaSemRels(codMapa);
@@ -412,5 +389,106 @@ public class SubprocessoConsultaService {
 
     public Long obterCodigoMapaObrigatorio(Subprocesso subprocesso) {
         return obterMapaObrigatorio(subprocesso).getCodigo();
+    }
+
+    private DadosDetalheSubprocesso montarDadosDetalhe(Subprocesso sp, Usuario usuarioAutenticado) {
+        String siglaUnidade = sp.getUnidade().getSigla();
+        return new DadosDetalheSubprocesso(
+                obterUnidadeLocalizacao(sp).getSigla(),
+                usuarioFacade.buscarResponsabilidadeDetalhadaAtual(siglaUnidade),
+                buscarTitularSeInformado(sp.getUnidade()),
+                listarMovimentacoesDto(sp),
+                obterPermissoesUI(sp, usuarioAutenticado)
+        );
+    }
+
+    private DadosContextoEdicao montarDadosContextoEdicao(Long codSubprocesso, Usuario usuario) {
+        Subprocesso sp = buscarSubprocesso(codSubprocesso);
+        return new DadosContextoEdicao(
+                sp,
+                sp.getUnidade(),
+                obterDetalhes(sp, usuario),
+                mapaCompletoDtoPorSubprocesso(codSubprocesso),
+                listarAtividadesSubprocesso(codSubprocesso)
+        );
+    }
+
+    private Usuario buscarTitularSeInformado(Unidade unidade) {
+        String tituloTitular = unidade.getTituloTitular();
+        if (tituloTitular == null || tituloTitular.isBlank()) {
+            return null;
+        }
+        return usuarioFacade.buscarPorLogin(tituloTitular);
+    }
+
+    private List<MovimentacaoDto> listarMovimentacoesDto(Subprocesso sp) {
+        return movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(sp.getCodigo()).stream()
+                .map(MovimentacaoDto::from)
+                .toList();
+    }
+
+    private ContextoPermissaoSubprocesso montarContextoPermissao(Subprocesso sp, Usuario usuario) {
+        Processo processo = sp.getProcesso();
+        Unidade unidadeUsuario = unidadeService.buscarPorCodigo(usuario.getUnidadeAtivaCodigo());
+        boolean processoFinalizado = processo != null && processo.getSituacao() == SituacaoProcesso.FINALIZADO;
+        boolean mesmaUnidade = !processoFinalizado
+                && Objects.equals(usuario.getUnidadeAtivaCodigo(), obterUnidadeLocalizacao(sp).getCodigo());
+        boolean temMapaVigente = !processoFinalizado && unidadeService.temMapaVigente(sp.getUnidade().getCodigo());
+        return new ContextoPermissaoSubprocesso(
+                usuario.getPerfilAtivo(),
+                sp.getSituacao(),
+                unidadeUsuario,
+                mesmaUnidade,
+                temMapaVigente,
+                processoFinalizado
+        );
+    }
+
+    private record DadosDetalheSubprocesso(
+            String localizacaoAtual,
+            ResponsavelDto responsavel,
+            Usuario titular,
+            List<MovimentacaoDto> movimentacoes,
+            PermissoesSubprocessoDto permissoes
+    ) {
+    }
+
+    private record DadosContextoEdicao(
+            Subprocesso subprocesso,
+            Unidade unidade,
+            SubprocessoDetalheResponse detalhes,
+            MapaCompletoDto mapa,
+            List<AtividadeDto> atividades
+    ) {
+    }
+
+    private record ContextoPermissaoSubprocesso(
+            Perfil perfil,
+            SituacaoSubprocesso situacao,
+            Unidade unidadeUsuario,
+            boolean mesmaUnidade,
+            boolean temMapaVigente,
+            boolean processoFinalizado
+    ) {
+
+        private boolean isChefe() {
+            return perfil == Perfil.CHEFE;
+        }
+
+        private boolean isGestor() {
+            return perfil == Perfil.GESTOR;
+        }
+
+        private boolean isAdmin() {
+            return perfil == Perfil.ADMIN;
+        }
+
+        private boolean isServidor() {
+            return perfil == Perfil.SERVIDOR;
+        }
+
+        private boolean isGestorOuAdmin() {
+            return isGestor() || isAdmin();
+        }
     }
 }

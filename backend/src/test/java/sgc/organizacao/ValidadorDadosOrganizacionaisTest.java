@@ -360,6 +360,159 @@ class ValidadorDadosOrganizacionaisTest {
         assertThat(diagnostico.grupos()).isEmpty();
     }
 
+    @Test
+    @DisplayName("deve ler string de mapa com chaves em diferentes cases")
+    void deveLerStringComDiferentesCases() {
+        Unidade operacional = criarUnidade(20L, "OPE", OPERACIONAL, "TITULO_OPE");
+
+        Map<String, Object> linhaMinusc = new HashMap<>();
+        linhaMinusc.put("titulo", "TITULO_1");
+        linhaMinusc.put("quantidade", 2L);
+
+        Map<String, Object> linhaMajusc = new HashMap<>();
+        linhaMajusc.put("TITULO", "TITULO_2");
+        linhaMajusc.put("QUANTIDADE", 2L);
+
+        Map<String, Object> linhaNull = new HashMap<>();
+        linhaNull.put("titulo", null);
+
+        mockarCenarioBase(
+                List.of(operacional),
+                List.of(criarResponsabilidade(20L, "RESP_OPE")),
+                List.of(criarUsuario("TITULO_OPE"), criarUsuario("RESP_OPE")),
+                List.of(linhaMinusc, linhaMajusc, linhaNull),
+                List.of(linhaPerfil("RESP_OPE", "GESTOR", 20L))
+        );
+
+        DiagnosticoOrganizacionalDto diagnostico = validador.diagnosticar();
+
+        assertThat(diagnostico.grupos().stream()
+                .filter(g -> g.tipo().equals("VW_USUARIO com titulo duplicado"))
+                .flatMap(g -> g.ocorrencias().stream())
+                .toList())
+                .containsExactlyInAnyOrder("titulo=TITULO_1", "titulo=TITULO_2");
+    }
+
+    @Test
+    @DisplayName("deve ler unidade_codigo em diferentes formatos e cases")
+    void deveLerUnidadeCodigoEmDiferentesFormatosECases() {
+        Unidade operacional = criarUnidade(20L, "OPE", OPERACIONAL, "TITULO_OPE");
+
+        Map<String, Object> linha1 = new HashMap<>();
+        linha1.put("usuario_titulo", "U1");
+        linha1.put("perfil", "GESTOR");
+        linha1.put("unidade_codigo", "20");
+
+        Map<String, Object> linha2 = new HashMap<>();
+        linha2.put("usuario_titulo", "U2");
+        linha2.put("perfil", "GESTOR");
+        linha2.put("UNIDADE_CODIGO", 20L);
+
+        Map<String, Object> linha3 = new HashMap<>();
+        linha3.put("usuario_titulo", "U3");
+        linha3.put("perfil", "GESTOR");
+        linha3.put("unidade_codigo", null);
+
+        mockarCenarioBase(
+                List.of(operacional),
+                List.of(criarResponsabilidade(20L, "RESP_OPE")),
+                List.of(criarUsuario("TITULO_OPE"), criarUsuario("RESP_OPE"), criarUsuario("U1"), criarUsuario("U2")),
+                List.of(),
+                List.of(linha1, linha2, linha3)
+        );
+
+        DiagnosticoOrganizacionalDto diagnostico = validador.diagnosticar();
+
+        assertThat(diagnostico.grupos())
+                .extracting(GrupoViolacaoOrganizacionalDto::tipo)
+                .contains("VW_USUARIO_PERFIL_UNIDADE com unidade_codigo nulo");
+    }
+
+    @Test
+    @DisplayName("deve lidar com casos de borda na extracao de sigla")
+    void deveLidarComCasosBordaExtracaoSigla() {
+        // Sigla no fim da string (sem virgula depois)
+        Unidade intermediaria = criarUnidade(10L, "INT_FIM", INTERMEDIARIA, "TIT_INT");
+
+        // Sigla em branco e Sigla nao encontrada
+        Unidade operacional = criarUnidade(20L, "  ", OPERACIONAL, "TIT_OPE");
+
+        mockarCenarioBase(
+                List.of(intermediaria, operacional),
+                List.of(criarResponsabilidade(10L, "RESP_INT")),
+                List.of(criarUsuario("TIT_INT"), criarUsuario("TIT_OPE"), criarUsuario("RESP_INT")),
+                List.of(),
+                List.of(linhaPerfil("RESP_INT", "GESTOR", 10L))
+        );
+
+        DiagnosticoOrganizacionalDto diagnostico = validador.diagnosticar();
+
+        assertThat(diagnostico.resumo()).contains("INT_FIM");
+        assertThat(diagnostico.resumo()).doesNotContain(" ,");
+    }
+
+    @Test
+    @DisplayName("deve usar pluralizacao correta no resumo")
+    void deveUsarPluralizacaoCorretaNoResumo() {
+        Unidade operacional = criarUnidade(20L, "OPE", OPERACIONAL, "TIT_OPE");
+
+        // 2 tipos, 2 ocorrencias: sem responsavel e titular ausente
+        mockarCenarioBase(
+                List.of(operacional),
+                List.of(),
+                List.of(),
+                List.of(),
+                List.of()
+        );
+
+        DiagnosticoOrganizacionalDto diagnostico = validador.diagnosticar();
+        assertThat(diagnostico.resumo()).contains("2 tipos de inconsistencias, totalizando 2 ocorrencias");
+    }
+
+    @Test
+    @DisplayName("deve lidar com lista de unidades vazia ao carregar responsabilidades")
+    void deveLidarComListaUnidadesVazia() {
+        when(unidadeRepo.listarTodasComHierarquia()).thenReturn(List.of());
+
+        DiagnosticoOrganizacionalDto diagnostico = validador.diagnosticar();
+
+        assertThat(diagnostico.possuiViolacoes()).isFalse();
+        verify(responsabilidadeRepo, never()).listarPorCodigosUnidade(anyList());
+    }
+
+    @Test
+    @DisplayName("deve processar linha de perfil com valores vazios ou nulos")
+    void deveProcessarLinhaPerfilComValoresVazios() {
+        Unidade operacional = criarUnidade(20L, "OPE", OPERACIONAL, "TIT_OPE");
+
+        Map<String, Object> linhaVazia = new HashMap<>();
+        linhaVazia.put("usuario_titulo", "  ");
+        linhaVazia.put("perfil", "GESTOR");
+        linhaVazia.put("unidade_codigo", 20L);
+
+        Map<String, Object> perfilVazio = new HashMap<>();
+        perfilVazio.put("usuario_titulo", "U1");
+        perfilVazio.put("perfil", "");
+        perfilVazio.put("unidade_codigo", 20L);
+
+        mockarCenarioBase(
+                List.of(operacional),
+                List.of(criarResponsabilidade(20L, "RESP_OPE")),
+                List.of(criarUsuario("TIT_OPE"), criarUsuario("RESP_OPE")),
+                List.of(),
+                List.of(linhaVazia, perfilVazio)
+        );
+
+        DiagnosticoOrganizacionalDto diagnostico = validador.diagnosticar();
+
+        assertThat(diagnostico.grupos())
+                .extracting(GrupoViolacaoOrganizacionalDto::tipo)
+                .contains(
+                        "VW_USUARIO_PERFIL_UNIDADE com usuario_titulo nulo",
+                        "VW_USUARIO_PERFIL_UNIDADE com perfil nulo"
+                );
+    }
+
     private void mockarCenarioBase(
             List<Unidade> unidades,
             List<Responsabilidade> responsabilidades,

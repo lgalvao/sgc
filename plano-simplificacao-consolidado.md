@@ -434,3 +434,41 @@ Com esse corte, a Frente 1 é encerrada nesta rodada: `SubprocessoTransicaoServi
 * **Risco principal observado:** regressão na montagem de comando interno de workflow (origem/destino de transição) e nos gatilhos de alerta em reabertura.
 * **Validação executada:** compilação de testes e suíte focada de `SubprocessoTransicaoService` (unit e cobertura extra), incluindo execução agregada dos testes do service.
 * **Pendência aberta para próxima rodada:** iniciar Frente 2 com mapeamento de leitura simples versus composição de contexto em `SubprocessoConsultaService`.
+
+## Continuação operacional (início da Frente 2)
+
+### Recorte escolhido desta rodada
+
+Após mapear `SubprocessoConsultaService`, o ponto mais acoplado entre leitura e composição está na montagem de detalhe/contexto e no cálculo de permissões de UI. O corte desta rodada será manter as APIs públicas atuais e extrair contexto interno explícito para permissões, além de helpers privados de detalhe e leitura obrigatória de mapa, reduzindo parâmetros soltos e deixando mais nítida a diferença entre consulta simples e composição de resposta.
+
+### Resultado objetivo da rodada
+
+`SubprocessoConsultaService` passou a tratar a composição de detalhe e de permissões com contexto interno explícito, sem alterar contratos públicos. A montagem de `SubprocessoDetalheResponse` agora delega a helpers privados para coletar responsável, titular, movimentações e permissões, enquanto o cálculo de permissões de UI deixou de trafegar múltiplos parâmetros soltos e passou a operar sobre `ContextoPermissaoSubprocesso`. Na mesma rodada, leituras que dependem obrigatoriamente de mapa (`listarAtividadesSubprocesso` e `obterMapaParaAjuste`) passaram a reutilizar a fronteira interna de mapa obrigatório, reduzindo regra implícita duplicada.
+
+### Registro da rodada
+
+* **Data da rodada:** 2026-04-04
+* **Frente principal:** Frente 2 — Fatiamento de leitura e contexto em `SubprocessoConsultaService`
+* **Arquivo(s) alvo:** `backend/src/main/java/sgc/subprocesso/service/SubprocessoConsultaService.java`, `plano-simplificacao-consolidado.md`
+* **Corte aplicado:** extração de contexto interno para permissões e de helpers privados para montagem de detalhe e leitura obrigatória de mapa, preservando APIs públicas e DTOs externos.
+* **Risco principal observado:** regressão discreta na combinação de permissões por perfil/situação e na montagem de detalhe consumida por contexto de edição.
+* **Validação executada:** `./gradlew :backend:compileTestJava` e `./gradlew :backend:test --tests "sgc.subprocesso.service.SubprocessoConsultaServiceExtraCoverageTest" --tests "sgc.integracao.SubprocessoServiceContextoIntegrationTest"`.
+* **Pendência aberta para próxima rodada:** continuar o mapeamento fino da Frente 2 separando leitura simples de composição de contexto em pontos ainda mistos, especialmente `obterContextoEdicao` e leituras de histórico/localização relacionadas a UI.
+
+### Recorte escolhido da continuação imediata
+
+Na continuação da Frente 2, o próximo ponto misto é `obterContextoEdicao`, que ainda concentra a coleta de subprocesso, detalhe, mapa e atividades no mesmo método público. O corte será extrair um contexto interno único para edição e deixar o método público apenas como adaptador para `ContextoEdicaoResponse`, mantendo a API externa estável.
+
+### Resultado objetivo da continuação imediata
+
+`obterContextoEdicao` deixou de concentrar montagem espalhada e passou a operar sobre um contexto interno único de edição. O método público agora só adapta `DadosContextoEdicao` para `ContextoEdicaoResponse`, enquanto a coleta de subprocesso, detalhe, mapa e atividades ficou centralizada em helper privado. Com isso, a Frente 2 avança na separação entre leitura simples e composição de resposta sem abrir nova classe pública nem alterar contratos.
+
+### Registro da continuação imediata
+
+* **Data da rodada:** 2026-04-04
+* **Frente principal:** Frente 2 — Fatiamento de leitura e contexto em `SubprocessoConsultaService`
+* **Arquivo(s) alvo:** `backend/src/main/java/sgc/subprocesso/service/SubprocessoConsultaService.java`, `plano-simplificacao-consolidado.md`
+* **Corte aplicado:** extração de contexto interno de edição (`DadosContextoEdicao`) para remover a orquestração espalhada de `obterContextoEdicao`.
+* **Risco principal observado:** regressão na composição do contexto completo de edição, especialmente conciliação entre detalhe, mapa e lista de atividades.
+* **Validação executada:** `./gradlew :backend:compileTestJava` e `./gradlew :backend:test --tests "sgc.subprocesso.service.SubprocessoConsultaServiceExtraCoverageTest" --tests "sgc.integracao.SubprocessoServiceContextoIntegrationTest"`.
+* **Pendência aberta para próxima rodada:** revisar se `obterUnidadeLocalizacao` e `obterLocalizacaoAtual` ainda justificam coexistência separada e mapear possível consolidação segura sem efeito colateral oculto.
