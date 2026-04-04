@@ -155,7 +155,6 @@ public class SubprocessoService {
                     .usuario(usuario)
                     .descricao("Processo iniciado")
                     .build());
-            sp.setLocalizacaoAtual(sp.getUnidade());
         }
         movimentacaoRepo.saveAll(movimentacoes);
     }
@@ -202,7 +201,6 @@ public class SubprocessoService {
                 .descricao(descMovimentacao)
                 .build());
 
-        subprocessoSalvo.setLocalizacaoAtual(unidade);
         return subprocessoSalvo;
     }
 
@@ -428,7 +426,6 @@ public class SubprocessoService {
                 .build();
 
         movimentacaoRepo.save(movimentacao);
-        spDestino.setLocalizacaoAtual(spDestino.getUnidade());
         return temDuplicatas;
     }
 }

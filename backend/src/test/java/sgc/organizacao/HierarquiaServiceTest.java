@@ -120,11 +120,22 @@ class HierarquiaServiceTest {
         Unidade alvo = criarUnidade(3L, raiz1);
 
         // O novo isSubordinada sobe a árvore via repo se necessário
-        // No loop: atual=alvo(3), proxSuperior=raiz1(1). 1 != 2. 
+        // No loop: atual=alvo(3), proxSuperior=raiz1(1). 1 != 2.
         // Em seguida busca 1 no repo.
         when(unidadeRepo.findById(1L)).thenReturn(Optional.of(raiz1));
 
         assertThat(hierarquiaService.isSubordinada(alvo, raiz2)).isFalse();
+    }
+
+    @Test
+    @DisplayName("Deve parar loop se unidade superior nao for encontrada no repo")
+    void devePararLoopSeSuperiorNaoEncontrada() {
+        Unidade raiz = criarUnidade(1L, null);
+        Unidade alvo = criarUnidade(2L, raiz);
+
+        when(unidadeRepo.findById(1L)).thenReturn(Optional.empty());
+
+        assertThat(hierarquiaService.isSubordinada(alvo, criarUnidade(3L, null))).isFalse();
     }
 
     @Test

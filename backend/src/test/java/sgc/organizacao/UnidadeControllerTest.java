@@ -86,6 +86,18 @@ class UnidadeControllerTest {
     }
 
     @Test
+    @DisplayName("Deve retornar diagnostico organizacional para ADMIN")
+    @WithMockUser(roles = "ADMIN")
+    void deveRetornarDiagnosticoOrganizacional() throws Exception {
+        when(validadorDadosOrganizacionais.diagnosticar()).thenReturn(DiagnosticoOrganizacionalDto.semViolacoes());
+
+        mockMvc.perform(get("/api/unidades/diagnostico-organizacional"))
+                .andExpect(status().isOk());
+
+        verify(validadorDadosOrganizacionais).diagnosticar();
+    }
+
+    @Test
     @DisplayName("Deve retornar árvore de elegibilidade")
     @WithMockUser
     void deveRetornarArvoreDeElegibilidade() throws Exception {

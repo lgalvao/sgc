@@ -116,9 +116,7 @@ public class ProcessoController {
                         dto.setDataLimite(subprocesso.getDataLimiteEtapa1());
                         dto.setCodSubprocesso(subprocesso.getCodigo());
                         if (subprocesso.getMapa() != null) dto.setMapaCodigo(subprocesso.getMapa().getCodigo());
-                        if (subprocesso.getLocalizacaoAtual() != null) {
-                            dto.setLocalizacaoAtualCodigo(subprocesso.getLocalizacaoAtual().getCodigo());
-                        }
+                        dto.setLocalizacaoAtualCodigo(consultaService.obterLocalizacaoAtual(subprocesso).getCodigo());
                     }
                     return dto;
                 })
@@ -217,5 +215,4 @@ public class ProcessoController {
         return ResponseEntity.ok().build();
     }
 }
-
 

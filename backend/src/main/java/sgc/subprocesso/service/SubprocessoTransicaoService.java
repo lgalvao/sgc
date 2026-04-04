@@ -130,7 +130,6 @@ public class SubprocessoTransicaoService {
                 .build();
         movimentacaoRepo.save(movimentacao);
 
-        sp.setLocalizacaoAtual(cmd.destino());
         subprocessoRepo.save(sp);
     }
 

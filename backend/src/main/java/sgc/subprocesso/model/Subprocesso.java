@@ -61,10 +61,6 @@ public class Subprocesso extends EntidadeBase {
     @lombok.Builder.Default
     private SituacaoSubprocesso situacao = SituacaoSubprocesso.NAO_INICIADO;
 
-    @Transient
-    @JsonIgnore
-    private @Nullable Unidade localizacaoAtual;
-
     @JsonView({ComumViews.Publica.class, SubprocessoViews.Publica.class, MapaViews.Publica.class})
     public Set<Atividade> getAtividades() {
         return mapa != null ? mapa.getAtividades() : Collections.emptySet();

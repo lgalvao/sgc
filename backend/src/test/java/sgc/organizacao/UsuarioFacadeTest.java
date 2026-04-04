@@ -102,6 +102,19 @@ class UsuarioFacadeTest {
         }
 
         @Test
+        @DisplayName("Deve lançar ErroAcessoNegado se autenticação estiver presente mas não autenticada")
+        void deveLancarErroAcessoNegadoSeNaoAutenticadoMesmoComAuth() {
+            Authentication auth = mock(Authentication.class);
+            when(auth.isAuthenticated()).thenReturn(false);
+            SecurityContextHolder.getContext().setAuthentication(auth);
+
+            assertThatThrownBy(() -> facade.usuarioAutenticado())
+                    .isInstanceOf(ErroAcessoNegado.class);
+
+            SecurityContextHolder.clearContext();
+        }
+
+        @Test
         @DisplayName("Deve obter usuário diretamente do principal se já for instância de Usuario")
         void deveObterUsuarioDiretamenteDoPrincipal() {
 

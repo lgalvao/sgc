@@ -13,6 +13,7 @@ import sgc.processo.model.*;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
 
+import org.springframework.test.util.*;
 import java.time.*;
 import java.util.*;
 
@@ -26,6 +27,7 @@ import static sgc.subprocesso.model.TipoTransicao.*;
 @DisplayName("SubprocessoTransicaoService")
 @SuppressWarnings("NullAway.Init")
 class SubprocessoTransicaoServiceTest {
+    // ... (rest of mocks and InjectMocks)
 
     @Mock
     private SubprocessoRepo subprocessoRepo;
@@ -274,6 +276,100 @@ class SubprocessoTransicaoServiceTest {
             service.devolverCadastro(1L, criarUsuario(), "Obs");
 
             assertThat(sp.getSituacao()).isEqualTo(MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+        }
+
+        @Test
+        @DisplayName("disponibilizarMapa deve funcionar quando não há data limite anterior")
+        void disponibilizarMapaDeveFuncionarQuandoNaoHaDataLimiteAnterior() {
+            Subprocesso sp = criarSubprocesso(MAPEAMENTO, MAPEAMENTO_MAPA_CRIADO, new Unidade());
+            sp.setDataLimiteEtapa1(null);
+            sp.setDataLimiteEtapa2(null);
+            sp.setMapa(new sgc.mapa.model.Mapa());
+
+            DisponibilizarMapaRequest req = new DisponibilizarMapaRequest(LocalDate.now().plusDays(5), "Obs");
+
+            when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
+            when(unidadeService.buscarPorSigla(anyString())).thenReturn(new Unidade());
+
+            service.disponibilizarMapa(1L, req, criarUsuario());
+
+            assertThat(sp.getSituacao()).isEqualTo(MAPEAMENTO_MAPA_DISPONIBILIZADO);
+        }
+
+        @Test
+        @DisplayName("alterarDataLimite deve funcionar quando não há data limite anterior")
+        void alterarDataLimiteDeveFuncionarQuandoNaoHaDataLimiteAnterior() {
+            Subprocesso sp = criarSubprocesso(MAPEAMENTO, MAPEAMENTO_MAPA_DISPONIBILIZADO, new Unidade());
+            sp.setDataLimiteEtapa1(null);
+            sp.setDataLimiteEtapa2(null);
+
+            when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
+            when(notificacaoService.getEmailUnidade(any())).thenReturn("email@test.com");
+
+            service.alterarDataLimite(1L, LocalDate.now().plusDays(5));
+
+            assertThat(sp.getDataLimiteEtapa2()).isEqualTo(LocalDate.now().plusDays(5).atStartOfDay());
+        }
+
+        @Test
+        @DisplayName("aceitarValidacao não deve fazer nada quando não há superior")
+        void aceitarValidacaoNaoDeveFazerNadaQuandoNaoHaSuperior() {
+            Unidade unidade = criarUnidade(10L, "ORIG", "Origem");
+            unidade.setUnidadeSuperior(null);
+
+            Subprocesso subprocesso = criarSubprocesso(MAPEAMENTO, MAPEAMENTO_MAPA_VALIDADO, unidade);
+            subprocesso.setLocalizacaoAtual(unidade);
+            Usuario usuario = criarUsuario();
+
+            when(consultaService.buscarSubprocesso(1L)).thenReturn(subprocesso);
+
+            service.aceitarValidacao(1L, "Obs", usuario);
+
+            verify(analiseRepo, never()).save(any());
+            verify(notificacaoService, never()).notificarTransicao(any());
+        }
+
+        @Nested
+        @DisplayName("obterUltimaDataLimite private method")
+        class ObterUltimaDataLimiteTests {
+
+            @Test
+            @DisplayName("deve lançar IllegalStateException quando etapa 2 existe sem etapa 1")
+            void deveLancarIllegalStateExceptionQuandoEtapa2SemEtapa1() {
+                Subprocesso sp = new Subprocesso();
+                sp.setCodigo(1L);
+                sp.setDataLimiteEtapa1(null);
+                sp.setDataLimiteEtapa2(LocalDateTime.now());
+
+                assertThatThrownBy(() -> ReflectionTestUtils.invokeMethod(service, "obterUltimaDataLimite", sp))
+                        .isInstanceOf(IllegalStateException.class)
+                        .hasMessageContaining("etapa 2 sem data limite da etapa 1");
+            }
+
+            @Test
+            @DisplayName("deve lançar IllegalStateException quando etapa 1 é posterior à etapa 2")
+            void deveLancarIllegalStateExceptionQuandoEtapa1PosteriorEtapa2() {
+                Subprocesso sp = new Subprocesso();
+                sp.setCodigo(1L);
+                sp.setDataLimiteEtapa1(LocalDateTime.now().plusDays(10));
+                sp.setDataLimiteEtapa2(LocalDateTime.now().plusDays(5));
+
+                assertThatThrownBy(() -> ReflectionTestUtils.invokeMethod(service, "obterUltimaDataLimite", sp))
+                        .isInstanceOf(IllegalStateException.class)
+                        .hasMessageContaining("etapa 1 posterior à etapa 2");
+            }
+
+            @Test
+            @DisplayName("deve retornar null quando ambas são nulas")
+            void deveRetornarNullQuandoAmbasNulas() {
+                Subprocesso sp = new Subprocesso();
+                sp.setDataLimiteEtapa1(null);
+                sp.setDataLimiteEtapa2(null);
+
+                LocalDate result = ReflectionTestUtils.invokeMethod(service, "obterUltimaDataLimite", sp);
+
+                assertThat(result).isNull();
+            }
         }
     }
 

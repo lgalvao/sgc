@@ -11,6 +11,7 @@ import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
 import sgc.processo.model.*;
 import sgc.subprocesso.model.*;
+import sgc.subprocesso.service.*;
 
 import java.io.*;
 import java.util.*;
@@ -34,11 +35,11 @@ import static sgc.processo.model.SituacaoProcesso.*;
 @Slf4j
 public class SgcPermissionEvaluator implements PermissionEvaluator {
     private final SubprocessoRepo subprocessoRepo;
-    private final MovimentacaoRepo movimentacaoRepo;
     private final HierarquiaService hierarquiaService;
     private final ProcessoRepo processoRepo;
     private final MapaRepo mapaRepo;
     private final AtividadeRepo atividadeRepo;
+    private final LocalizacaoSubprocessoService localizacaoSubprocessoService;
 
     // ── Interface Spring Security ───────────────────────────────────
 
@@ -172,7 +173,7 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
     // ── Verificação de Localização ──────────────────────────────────
 
     private boolean verificarLocalizacao(Usuario usuario, Subprocesso sp) {
-        Unidade localizacao = obterUnidadeLocalizacao(sp);
+        Unidade localizacao = localizacaoSubprocessoService.obterLocalizacaoAtual(sp);
         boolean permitido = Objects.equals(usuario.getUnidadeAtivaCodigo(), localizacao.getCodigo());
 
         if (!permitido) {
@@ -183,18 +184,6 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
                     localizacao.getCodigo());
         }
         return permitido;
-    }
-
-    private Unidade obterUnidadeLocalizacao(Subprocesso sp) {
-        if (sp.getLocalizacaoAtual() != null) return sp.getLocalizacaoAtual();
-        if (sp.getCodigo() == null) return sp.getUnidade();
-
-        Unidade localizacao = movimentacaoRepo.buscarUltimaPorSubprocesso(sp.getCodigo())
-                .map(Movimentacao::getUnidadeDestino)
-                .orElse(sp.getUnidade());
-
-        sp.setLocalizacaoAtual(localizacao);
-        return localizacao;
     }
 
     // ── Utilitário ──────────────────────────────────────────────────
@@ -212,4 +201,3 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
         }
     }
 }
-

@@ -2,9 +2,12 @@ package sgc.subprocesso.service;
 
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
+import org.junit.jupiter.params.*;
+import org.junit.jupiter.params.provider.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
 import sgc.comum.model.*;
+import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
 import sgc.mapa.service.*;
 import sgc.organizacao.*;
@@ -16,8 +19,11 @@ import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
 
 import java.time.*;
+import java.util.*;
+
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("SubprocessoService")
@@ -101,5 +107,133 @@ class SubprocessoServiceTest {
         assertThat(resultado.getUnidade()).isEqualTo(unidade);
         assertThat(resultado.getDataLimiteEtapa1()).isEqualTo(dataLimiteEtapa1);
         assertThat(resultado.getMapa()).isEqualTo(mapaSalvo);
+    }
+
+    @Test
+    @DisplayName("criarParaRevisao deve lançar exceção se unidadeMapa não tem mapa vigente")
+    void criarParaRevisaoDeveLancarExcecaoSeUnidadeMapaNaoTemMapaVigente() {
+        Processo processo = new Processo();
+        Unidade unidade = new Unidade();
+        unidade.setSigla("UNIT");
+        UnidadeMapa unidadeMapa = new UnidadeMapa();
+        unidadeMapa.setMapaVigente(null);
+        Unidade unidadeOrigem = new Unidade();
+        Usuario usuario = new Usuario();
+
+        assertThatThrownBy(() -> service.criarParaRevisao(processo, unidade, unidadeMapa, unidadeOrigem, usuario))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("Unidade UNIT sem mapa vigente para revisão/diagnóstico");
+    }
+
+    @Test
+    @DisplayName("criarParaDiagnostico deve lançar exceção se unidadeMapa não tem mapa vigente")
+    void criarParaDiagnosticoDeveLancarExcecaoSeUnidadeMapaNaoTemMapaVigente() {
+        Processo processo = new Processo();
+        Unidade unidade = new Unidade();
+        unidade.setSigla("UNIT");
+        UnidadeMapa unidadeMapa = new UnidadeMapa();
+        unidadeMapa.setMapaVigente(null);
+        Unidade unidadeOrigem = new Unidade();
+        Usuario usuario = new Usuario();
+
+        assertThatThrownBy(() -> service.criarParaDiagnostico(processo, unidade, unidadeMapa, unidadeOrigem, usuario))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("Unidade UNIT sem mapa vigente para revisão/diagnóstico");
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "MAPEAMENTO_MAPA_CRIADO, MAPEAMENTO_CADASTRO_HOMOLOGADO",
+            "REVISAO_MAPA_AJUSTADO, REVISAO_CADASTRO_HOMOLOGADA"
+    })
+    @DisplayName("removerCompetencia deve atualizar situação quando mapa fica vazio")
+    void removerCompetenciaDeveAtualizarSituacaoQuandoMapaFicaVazio(SituacaoSubprocesso situacaoInicial, SituacaoSubprocesso situacaoFinal) {
+        Long codSubprocesso = 1L;
+        Long codCompetencia = 10L;
+        Long codMapa = 100L;
+
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(codSubprocesso);
+        sp.setSituacao(situacaoInicial);
+        Mapa mapa = new Mapa();
+        mapa.setCodigo(codMapa);
+        sp.setMapa(mapa);
+
+        when(consultaService.buscarSubprocesso(codSubprocesso)).thenReturn(sp);
+        when(consultaService.obterCodigoMapaObrigatorio(sp)).thenReturn(codMapa);
+        when(mapaManutencaoService.competenciasCodMapa(codMapa)).thenReturn(List.of());
+        when(mapaManutencaoService.mapaCodigo(codMapa)).thenReturn(mapa);
+
+        service.removerCompetencia(codSubprocesso, codCompetencia);
+
+        assertThat(sp.getSituacao()).isEqualTo(situacaoFinal);
+        verify(subprocessoRepo).save(sp);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "MAPEAMENTO_CADASTRO_HOMOLOGADO, MAPEAMENTO_MAPA_CRIADO",
+            "REVISAO_CADASTRO_HOMOLOGADA, REVISAO_MAPA_AJUSTADO"
+    })
+    @DisplayName("adicionarCompetencia deve atualizar situação quando mapa deixa de ser vazio")
+    void adicionarCompetenciaDeveAtualizarSituacaoQuandoMapaDeixaDeSerVazio(SituacaoSubprocesso situacaoInicial, SituacaoSubprocesso situacaoFinal) {
+        Long codSubprocesso = 1L;
+        Long codMapa = 100L;
+        CompetenciaRequest request = CompetenciaRequest.builder()
+                .descricao("Nova Comp")
+                .atividadesIds(List.of(10L))
+                .build();
+
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(codSubprocesso);
+        sp.setSituacao(situacaoInicial);
+        Mapa mapa = new Mapa();
+        mapa.setCodigo(codMapa);
+        sp.setMapa(mapa);
+
+        when(consultaService.buscarSubprocesso(codSubprocesso)).thenReturn(sp);
+        when(consultaService.obterMapaObrigatorio(sp)).thenReturn(mapa);
+        when(mapaManutencaoService.competenciasCodMapa(codMapa)).thenReturn(List.of());
+        when(mapaManutencaoService.mapaCodigo(codMapa)).thenReturn(mapa);
+
+        service.adicionarCompetencia(codSubprocesso, request);
+
+        assertThat(sp.getSituacao()).isEqualTo(situacaoFinal);
+        verify(subprocessoRepo).save(sp);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "MAPEAMENTO_CADASTRO_HOMOLOGADO, MAPEAMENTO_MAPA_CRIADO",
+            "REVISAO_CADASTRO_HOMOLOGADA, REVISAO_MAPA_AJUSTADO"
+    })
+    @DisplayName("salvarMapaSubprocesso deve atualizar situação quando mapa deixa de ser vazio")
+    void salvarMapaSubprocessoDeveAtualizarSituacaoQuandoMapaDeixaDeSerVazio(SituacaoSubprocesso situacaoInicial, SituacaoSubprocesso situacaoFinal) {
+        Long codSubprocesso = 1L;
+        Long codMapa = 100L;
+
+        SalvarMapaRequest request = SalvarMapaRequest.builder()
+                .competencias(List.of(SalvarMapaRequest.CompetenciaRequest.builder()
+                        .descricao("Comp")
+                        .atividadesCodigos(List.of(10L))
+                        .build()))
+                .build();
+
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(codSubprocesso);
+        sp.setSituacao(situacaoInicial);
+        Mapa mapa = new Mapa();
+        mapa.setCodigo(codMapa);
+        sp.setMapa(mapa);
+
+        when(consultaService.buscarSubprocesso(codSubprocesso)).thenReturn(sp);
+        when(consultaService.obterCodigoMapaObrigatorio(sp)).thenReturn(codMapa);
+        when(mapaManutencaoService.competenciasCodMapa(codMapa)).thenReturn(List.of());
+        when(mapaSalvamentoService.salvarMapaCompleto(eq(codMapa), any())).thenReturn(mapa);
+
+        service.salvarMapaSubprocesso(codSubprocesso, request);
+
+        assertThat(sp.getSituacao()).isEqualTo(situacaoFinal);
+        verify(subprocessoRepo).save(sp);
     }
 }

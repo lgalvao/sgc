@@ -189,6 +189,18 @@ class SubprocessoControllerTest {
         }
 
         @Test
+        @DisplayName("deve iniciar revisão do cadastro")
+        @WithMockUser(roles = "CHEFE")
+        void deveIniciarRevisaoCadastro() throws Exception {
+            mockMvc.perform(post("/api/subprocessos/1/iniciar-revisao-cadastro")
+                            .with(csrf()))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.mensagem").value("Revisão do cadastro iniciada"));
+
+            verify(transicaoService).iniciarRevisaoCadastro(1L);
+        }
+
+        @Test
         @DisplayName("deve devolver revisão de cadastro")
         @WithMockUser(roles = "GESTOR")
         void deveDevolverRevisaoCadastro() throws Exception {

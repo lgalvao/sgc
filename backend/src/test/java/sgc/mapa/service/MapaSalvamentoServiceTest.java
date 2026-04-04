@@ -324,6 +324,39 @@ class MapaSalvamentoServiceTest {
     }
 
     @Test
+    @DisplayName("Deve parar processamento de associações se número de competências salvas for menor que o esperado")
+    void devePararProcessamentoSeMenosCompetenciasSalvas() {
+        Long codMapa = 1L;
+
+        SalvarMapaRequest.CompetenciaRequest compDto1 = SalvarMapaRequest.CompetenciaRequest.builder()
+                .codigo(0L).descricao("Comp 1").atividadesCodigos(List.of(10L)).build();
+        SalvarMapaRequest.CompetenciaRequest compDto2 = SalvarMapaRequest.CompetenciaRequest.builder()
+                .codigo(0L).descricao("Comp 2").atividadesCodigos(List.of(10L)).build();
+
+        SalvarMapaRequest request = SalvarMapaRequest.builder()
+                .competencias(List.of(compDto1, compDto2))
+                .build();
+
+        Mapa mapa = Mapa.builder().codigo(codMapa).build();
+        Atividade ativ = Atividade.builder().codigo(10L).mapa(mapa).competencias(new HashSet<>()).build();
+
+        when(repo.buscar(Mapa.class, codMapa)).thenReturn(mapa);
+        when(mapaRepo.save(mapa)).thenReturn(mapa);
+        when(competenciaRepo.findByMapa_Codigo(codMapa)).thenReturn(Collections.emptyList());
+        when(atividadeRepo.findByMapa_Codigo(codMapa)).thenReturn(List.of(ativ));
+
+        // Simular que apenas 1 competência foi salva apesar de 2 pedidas
+        Competencia salvas = Competencia.builder().codigo(100L).mapa(mapa).atividades(new HashSet<>()).build();
+        when(competenciaRepo.saveAll(anyList())).thenReturn(List.of(salvas));
+
+        Mapa result = mapaSalvamentoService.salvarMapaCompleto(codMapa, request);
+
+        assertThat(result).isNotNull();
+        // Apenas a primeira competência deve ter sido associada
+        assertThat(ativ.getCompetencias()).hasSize(1);
+    }
+
+    @Test
     @DisplayName("Deve lançar erro quando faltar estrutura de associação da atividade")
     void deveLancarErroQuandoFaltarEstruturaAssociacao() throws Exception {
         Method metodo = MapaSalvamentoService.class.getDeclaredMethod("construirMapaAssociacoes",
