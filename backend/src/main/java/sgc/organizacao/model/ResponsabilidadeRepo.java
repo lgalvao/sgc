@@ -29,12 +29,13 @@ public interface ResponsabilidadeRepo extends JpaRepository<Responsabilidade, Lo
             SELECT new sgc.organizacao.model.ResponsabilidadeUnidadeLeitura(
                 r.unidadeCodigo,
                 r.usuarioTitulo,
-                r.unidade.tituloTitular,
+                u.tituloTitular,
                 r.tipo,
                 r.dataInicio,
                 r.dataFim
             )
             FROM Responsabilidade r
+            JOIN Unidade u ON u.codigo = r.unidadeCodigo
             WHERE r.unidadeCodigo = :unidadeCodigo
             """)
     Optional<ResponsabilidadeUnidadeLeitura> buscarLeituraDetalhadaPorCodigoUnidade(@Param("unidadeCodigo") Long unidadeCodigo);
@@ -43,12 +44,13 @@ public interface ResponsabilidadeRepo extends JpaRepository<Responsabilidade, Lo
             SELECT new sgc.organizacao.model.ResponsabilidadeUnidadeLeitura(
                 r.unidadeCodigo,
                 r.usuarioTitulo,
-                r.unidade.tituloTitular,
+                u.tituloTitular,
                 r.tipo,
                 r.dataInicio,
                 r.dataFim
             )
             FROM Responsabilidade r
+            JOIN Unidade u ON u.codigo = r.unidadeCodigo
             WHERE r.unidadeCodigo IN :unidadeCodigos
             """)
     List<ResponsabilidadeUnidadeLeitura> listarLeiturasDetalhadasPorCodigosUnidade(@Param("unidadeCodigos") List<Long> unidadeCodigos);

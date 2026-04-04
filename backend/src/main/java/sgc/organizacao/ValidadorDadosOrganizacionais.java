@@ -105,7 +105,7 @@ public class ValidadorDadosOrganizacionais {
 
     private String construirResumo(Map<String, List<String>> violacoesPorTipo) {
         List<String> unidadesSemResponsavel = violacoesPorTipo
-                .getOrDefault("Unidade sem responsavel efetivo", List.of())
+                .getOrDefault("Unidade participante sem responsavel efetivo", List.of())
                 .stream()
                 .map(this::extrairSigla)
                 .flatMap(Stream::ofNullable)

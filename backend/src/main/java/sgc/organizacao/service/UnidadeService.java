@@ -56,10 +56,6 @@ public class UnidadeService {
         return unidadeRepo.findAllById(codigos);
     }
 
-    public List<Unidade> buscarTodasComHierarquia() {
-        return unidadeRepo.listarTodasComHierarquia();
-    }
-
     public List<String> buscarSiglasPorCodigos(List<Long> codigos) {
         return unidadeRepo.buscarSiglasPorCodigos(codigos);
     }

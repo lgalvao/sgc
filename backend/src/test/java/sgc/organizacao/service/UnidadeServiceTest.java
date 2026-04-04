@@ -67,17 +67,6 @@ class UnidadeServiceTest {
     }
 
     @Test
-    @DisplayName("buscarTodasEntidadesComHierarquia - Sucesso")
-    void buscarTodasComHierarquia() {
-        List<Unidade> lista = List.of(new Unidade());
-        when(unidadeRepo.listarTodasComHierarquia()).thenReturn(lista);
-
-        List<Unidade> result = service.buscarTodasComHierarquia();
-
-        assertThat(result).hasSize(1);
-    }
-
-    @Test
     @DisplayName("buscarSiglasPorCodigos - Sucesso")
     void buscarSiglasPorCodigos() {
         List<String> lista = List.of("U1");

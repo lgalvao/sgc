@@ -161,7 +161,7 @@ class AlertaFacadeCoverageTest {
 
         ArgumentCaptor<Alerta> captor = ArgumentCaptor.forClass(Alerta.class);
         verify(alertaService).salvar(captor.capture());
-        assertThat(captor.getValue().getDescricao()).contains("Cadastro da SUB reaberto");
+        assertThat(captor.getValue().getDescricao()).contains("Cadastro da unidade SUB reaberto");
     }
 
     @Test
