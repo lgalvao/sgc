@@ -55,6 +55,9 @@ Levantamento no backend em 2026-04-04:
 - eliminar N+1 residual em `VW_RESPONSABILIDADE`, `VW_USUARIO` e `VW_UNIDADE`
 - trocar relatorios e atribuicoes temporarias para carga em lote
 - reaproveitar caches do Spring para verificacoes de hierarquia sem consulta por nivel
+- remover lookup repetido de `VW_UNIDADE` em painel, historico de analises e inicio de processo
+- substituir o uso restante de `listarTodasComHierarquia()` em `ProcessoService` pelo mapa cacheado de hierarquia
+- centralizar a unidade `ADMIN` em metodo dedicado com cache agressivo do Spring
 - preservar os contratos HTTP e os DTOs atuais
 
 ### Fora desta rodada

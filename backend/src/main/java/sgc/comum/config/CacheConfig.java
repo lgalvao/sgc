@@ -14,6 +14,7 @@ public class CacheConfig {
     public static final String CACHE_ARVORE_UNIDADES = "arvoreUnidades";
     public static final String CACHE_MAPA_HIERARQUIA_UNIDADES = "mapaHierarquiaUnidades";
     public static final String CACHE_UNIDADES_COM_MAPA = "unidadesComMapa";
+    public static final String CACHE_UNIDADE_ADMIN = "unidadeAdmin";
 
     @Bean
     public CacheManager cacheManager() {
@@ -21,11 +22,16 @@ public class CacheConfig {
                 CACHE_DIAGNOSTICO_ORGANIZACIONAL,
                 CACHE_ARVORE_UNIDADES,
                 CACHE_MAPA_HIERARQUIA_UNIDADES,
-                CACHE_UNIDADES_COM_MAPA
+                CACHE_UNIDADES_COM_MAPA,
+                CACHE_UNIDADE_ADMIN
         );
         cacheManager.setCaffeine(Caffeine.newBuilder()
                 .maximumSize(100)
                 .expireAfterWrite(java.time.Duration.ofMinutes(5)));
+        cacheManager.registerCustomCache(CACHE_UNIDADE_ADMIN, Caffeine.newBuilder()
+                .maximumSize(1)
+                .expireAfterWrite(java.time.Duration.ofHours(12))
+                .build());
         return cacheManager;
     }
 }

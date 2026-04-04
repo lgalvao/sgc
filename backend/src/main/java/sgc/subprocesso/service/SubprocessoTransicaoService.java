@@ -46,7 +46,6 @@ public class SubprocessoTransicaoService {
     private final EmailService emailService;
     private final AlertaFacade alertaService;
 
-    private static final String SIGLA_ADMIN = "ADMIN";
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     private static final String ETAPA_REVISAO = "revisão";
@@ -677,7 +676,7 @@ public class SubprocessoTransicaoService {
     }
 
     private Unidade obterUnidadeAdmin() {
-        return unidadeService.buscarPorSigla(SIGLA_ADMIN);
+        return unidadeService.buscarAdmin();
     }
 
     public void aceitarCadastro(Long codSubprocesso, Usuario usuario, @Nullable String observacoes) {

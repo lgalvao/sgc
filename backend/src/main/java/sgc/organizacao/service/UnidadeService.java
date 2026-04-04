@@ -33,6 +33,8 @@ import java.util.*;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class UnidadeService {
+    private static final String SIGLA_ADMIN = "ADMIN";
+
     private final UnidadeRepo unidadeRepo;
     private final UnidadeMapaRepo unidadeMapaRepo;
     public Unidade buscarPorCodigo(Long codigo) {
@@ -43,6 +45,11 @@ public class UnidadeService {
     public Unidade buscarPorSigla(String sigla) {
         return unidadeRepo.buscarPorSiglaComResponsavel(sigla)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada(Unidade.class.getSimpleName(), sigla));
+    }
+
+    @Cacheable(cacheNames = CacheConfig.CACHE_UNIDADE_ADMIN, sync = true)
+    public Unidade buscarAdmin() {
+        return buscarPorSigla(SIGLA_ADMIN);
     }
 
     public List<Unidade> buscarPorCodigos(List<Long> codigos) {

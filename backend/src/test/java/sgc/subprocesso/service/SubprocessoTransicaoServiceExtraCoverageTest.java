@@ -220,7 +220,7 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
 
         when(consultaService.buscarSubprocesso(100L)).thenReturn(sp);
         when(usuarioFacade.usuarioAutenticado()).thenReturn(new Usuario());
-        when(unidadeService.buscarPorSigla("ADMIN")).thenReturn(admin);
+        when(unidadeService.buscarAdmin()).thenReturn(admin);
 
         service.reabrirCadastro(100L, "justificativa");
 
@@ -250,7 +250,7 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
 
         when(consultaService.buscarSubprocesso(100L)).thenReturn(sp);
         when(usuarioFacade.usuarioAutenticado()).thenReturn(new Usuario());
-        when(unidadeService.buscarPorSigla("ADMIN")).thenReturn(admin);
+        when(unidadeService.buscarAdmin()).thenReturn(admin);
 
         service.reabrirRevisaoCadastro(100L, "justificativa");
 

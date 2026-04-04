@@ -82,12 +82,8 @@ public class SubprocessoConsultaService {
         return impactoMapaService.verificarImpactos(sp, usuario);
     }
 
-    public Mapa mapaCompletoPorSubprocesso(Long codSubprocesso) {
-        return mapaManutencaoService.mapaCompletoSubprocesso(codSubprocesso);
-    }
-
     public MapaCompletoDto mapaCompletoDtoPorSubprocesso(Long codSubprocesso) {
-        return MapaCompletoDto.fromEntity(mapaCompletoPorSubprocesso(codSubprocesso));
+        return MapaCompletoDto.fromEntity(mapaManutencaoService.mapaCompletoSubprocesso(codSubprocesso));
     }
 
     public Map<String, Object> obterSugestoes(Long codSubprocesso) {
@@ -101,10 +97,6 @@ public class SubprocessoConsultaService {
     public Subprocesso buscarSubprocesso(Long codigo) {
         return subprocessoRepo.buscarPorCodigoComMapaEAtividades(codigo)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada(NOME_ENTIDADE, codigo));
-    }
-
-    public Subprocesso buscarSubprocessoComMapa(Long codigo) {
-        return buscarSubprocesso(codigo);
     }
 
     public List<Subprocesso> listarEntidadesPorProcesso(Long codProcesso) {
@@ -330,11 +322,22 @@ public class SubprocessoConsultaService {
     }
 
     private List<AnaliseHistoricoDto> listarHistoricoPorTipo(Long codSubprocesso, TipoAnalise tipo) {
-        return listarAnalisesPorTipo(codSubprocesso, tipo).stream().map(this::paraHistoricoDto).toList();
+        List<Analise> analises = listarAnalisesPorTipo(codSubprocesso, tipo);
+        Map<Long, Unidade> unidadesPorCodigo = carregarUnidadesPorCodigo(analises);
+        return analises.stream()
+                .map(analise -> paraHistoricoDto(analise, unidadesPorCodigo))
+                .toList();
     }
 
     public AnaliseHistoricoDto paraHistoricoDto(Analise analise) {
-        Unidade unidade = unidadeService.buscarPorCodigo(analise.getUnidadeCodigo());
+        return paraHistoricoDto(analise, carregarUnidadesPorCodigo(List.of(analise)));
+    }
+
+    private AnaliseHistoricoDto paraHistoricoDto(Analise analise, Map<Long, Unidade> unidadesPorCodigo) {
+        Unidade unidade = Optional.ofNullable(unidadesPorCodigo.get(analise.getUnidadeCodigo()))
+                .orElseThrow(() -> new IllegalStateException(
+                        "Unidade %d ausente no histórico de análises".formatted(analise.getUnidadeCodigo())));
+
         return AnaliseHistoricoDto.builder()
                 .dataHora(analise.getDataHora())
                 .observacoes(analise.getObservacoes())
@@ -345,6 +348,20 @@ public class SubprocessoConsultaService {
                 .motivo(analise.getMotivo())
                 .tipo(analise.getTipo())
                 .build();
+    }
+
+    private Map<Long, Unidade> carregarUnidadesPorCodigo(List<Analise> analises) {
+        List<Long> codigos = analises.stream()
+                .map(Analise::getUnidadeCodigo)
+                .distinct()
+                .toList();
+
+        if (codigos.isEmpty()) {
+            return Map.of();
+        }
+
+        return unidadeService.buscarPorCodigos(codigos).stream()
+                .collect(HashMap::new, (mapa, unidade) -> mapa.put(unidade.getCodigo(), unidade), HashMap::putAll);
     }
 
     public List<Subprocesso> listarEntidadesPorProcessoComUnidade(Long codProcesso) {

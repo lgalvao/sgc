@@ -62,9 +62,9 @@ class SubprocessoServiceMethodsIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("buscarSubprocessoComMapa: deve buscar com sucesso")
-    void buscarSubprocessoComMapa_Sucesso() {
-        Subprocesso result = consultaService.buscarSubprocessoComMapa(subprocesso.getCodigo());
+    @DisplayName("buscarSubprocesso: deve buscar com sucesso")
+    void buscarSubprocesso_Sucesso() {
+        Subprocesso result = consultaService.buscarSubprocesso(subprocesso.getCodigo());
         assertThat(result).isNotNull();
         assertThat(result.getCodigo()).isEqualTo(subprocesso.getCodigo());
     }

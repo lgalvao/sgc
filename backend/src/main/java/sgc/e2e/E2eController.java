@@ -495,7 +495,7 @@ public class E2eController {
 
         Long codProcesso = processo.getCodigo();
         Unidade unidade = unidadeService.buscarPorSigla(request.unidadeSigla());
-        Unidade admin = unidadeService.buscarPorSigla("ADMIN");
+        Unidade admin = unidadeService.buscarAdmin();
         Long codSubprocesso = subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(codProcesso, unidade.getCodigo())
                 .map(Subprocesso::getCodigo)
                 .orElseThrow();
@@ -517,7 +517,7 @@ public class E2eController {
         }
 
         Unidade unidade = unidadeService.buscarPorSigla(request.unidadeSigla());
-        Unidade admin = unidadeService.buscarPorSigla("ADMIN");
+        Unidade admin = unidadeService.buscarAdmin();
         int diasLimite = request.diasLimite() != null ? request.diasLimite() : 30;
         LocalDateTime agora = LocalDateTime.now();
 
@@ -567,7 +567,7 @@ public class E2eController {
 
         int diasLimite = request.diasLimite() != null ? request.diasLimite() : 30;
         Unidade unidade = unidadeService.buscarPorSigla(request.unidadeSigla());
-        Unidade admin = unidadeService.buscarPorSigla("ADMIN");
+        Unidade admin = unidadeService.buscarAdmin();
 
         ProcessoFixtureRequest requestMapeamento = ProcessoFixtureRequest.mapaBase(request.unidadeSigla(), diasLimite);
         Processo processoMapeamento = criarProcessoFixture(requestMapeamento, TipoProcesso.MAPEAMENTO);

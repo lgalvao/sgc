@@ -2,6 +2,7 @@ package sgc.processo.painel;
 
 import lombok.*;
 import lombok.extern.slf4j.*;
+import org.jspecify.annotations.*;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
@@ -41,6 +42,7 @@ public class PainelFacade {
     public Page<ProcessoResumoDto> listarProcessos(Perfil perfil, Long codigoUnidade, Pageable pageable) {
         Pageable sortedPageable = garantirOrdenacaoPadrao(pageable);
         Page<Processo> processos;
+        String siglaUnidadeUsuario = obterSiglaUnidadeUsuario(perfil, codigoUnidade);
 
         Map<Long, List<Long>> mapaPaiFilhos = hierarquiaService.buscarMapaHierarquia();
         if (perfil == Perfil.ADMIN) {
@@ -53,7 +55,7 @@ public class PainelFacade {
             codigosUnidades.add(codigoUnidade);
             processos = processoService.listarIniciadosPorParticipantes(codigosUnidades, sortedPageable);
         }
-        return processos.map(processo -> paraProcessoResumoDto(processo, perfil, codigoUnidade, mapaPaiFilhos));
+        return processos.map(processo -> paraProcessoResumoDto(processo, perfil, siglaUnidadeUsuario, mapaPaiFilhos));
     }
 
     private Pageable garantirOrdenacaoPadrao(Pageable pageable) {
@@ -95,7 +97,7 @@ public class PainelFacade {
 
     private ProcessoResumoDto paraProcessoResumoDto(Processo processo,
                                                     Perfil perfil,
-                                                    Long codigoUnidade,
+                                                    @Nullable String siglaUnidadeUsuario,
                                                     Map<Long, List<Long>> mapaPaiFilhos) {
 
         var participantes = processo.getParticipantes();
@@ -104,7 +106,7 @@ public class PainelFacade {
         Long codUnidMapeado = participante.getUnidadeCodigoPersistido();
         String nomeUnidMapeado = participante.getNome();
 
-        String linkDestino = calcularLinkDestinoProcesso(processo, perfil, codigoUnidade);
+        String linkDestino = calcularLinkDestinoProcesso(processo, perfil, siglaUnidadeUsuario);
         String unidadesParticipantes = formatarUnidadesParticipantes(participantes, mapaPaiFilhos);
 
         return ProcessoResumoDto.builder()
@@ -204,7 +206,7 @@ public class PainelFacade {
         return allCovered;
     }
 
-    private String calcularLinkDestinoProcesso(Processo processo, Perfil perfil, Long codigoUnidade) {
+    private String calcularLinkDestinoProcesso(Processo processo, Perfil perfil, @Nullable String siglaUnidadeUsuario) {
         if (perfil == Perfil.ADMIN && processo.getSituacao() == SituacaoProcesso.CRIADO) {
             return String.format("/processo/cadastro?codProcesso=%s", processo.getCodigo());
         }
@@ -213,7 +215,17 @@ public class PainelFacade {
             return "/processo/" + processo.getCodigo();
         }
 
-        var unidade = unidadeService.buscarPorCodigo(codigoUnidade);
-        return String.format("/processo/%s/%s", processo.getCodigo(), unidade.getSigla());
+        if (siglaUnidadeUsuario == null || siglaUnidadeUsuario.isBlank()) {
+            throw new IllegalStateException("Sigla da unidade do usuário ausente");
+        }
+        return String.format("/processo/%s/%s", processo.getCodigo(), siglaUnidadeUsuario);
+    }
+
+    private @Nullable String obterSiglaUnidadeUsuario(Perfil perfil, Long codigoUnidade) {
+        if (perfil == Perfil.ADMIN || perfil == Perfil.GESTOR) {
+            return null;
+        }
+
+        return unidadeService.buscarPorCodigo(codigoUnidade).getSigla();
     }
 }

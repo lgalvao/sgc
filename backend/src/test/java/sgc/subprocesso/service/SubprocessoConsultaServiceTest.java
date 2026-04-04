@@ -4,6 +4,7 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
+import sgc.organizacao.model.*;
 import sgc.comum.erros.*;
 import sgc.mapa.service.*;
 import sgc.organizacao.*;
@@ -20,6 +21,10 @@ import static org.mockito.Mockito.*;
 class SubprocessoConsultaServiceTest {
     @Mock
     private SubprocessoRepo subprocessoRepo;
+    @Mock
+    private AnaliseRepo analiseRepo;
+    @Mock
+    private UnidadeService unidadeService;
 
     @InjectMocks
     private SubprocessoConsultaService service;
@@ -51,5 +56,34 @@ class SubprocessoConsultaServiceTest {
     void listarEntidadesPorProcessoEUnidadesDeveRetornarVazioQuandoListaDeUnidadesEstiverVazia() {
         assertThat(service.listarEntidadesPorProcessoEUnidades(1L, List.of())).isEmpty();
         verify(subprocessoRepo, never()).listarPorProcessoEUnidadesComUnidade(anyLong(), anyList());
+    }
+
+    @Test
+    @DisplayName("listarHistoricoCadastro deve carregar unidades em lote")
+    void listarHistoricoCadastroDeveCarregarUnidadesEmLote() {
+        Analise analise1 = new Analise();
+        analise1.setUnidadeCodigo(10L);
+        analise1.setTipo(TipoAnalise.CADASTRO);
+
+        Analise analise2 = new Analise();
+        analise2.setUnidadeCodigo(20L);
+        analise2.setTipo(TipoAnalise.CADASTRO);
+
+        Unidade unidade1 = new Unidade();
+        unidade1.setCodigo(10L);
+        unidade1.setSigla("U10");
+        unidade1.setNome("Unidade 10");
+
+        Unidade unidade2 = new Unidade();
+        unidade2.setCodigo(20L);
+        unidade2.setSigla("U20");
+        unidade2.setNome("Unidade 20");
+
+        when(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(1L)).thenReturn(List.of(analise1, analise2));
+        when(unidadeService.buscarPorCodigos(List.of(10L, 20L))).thenReturn(List.of(unidade1, unidade2));
+
+        assertThat(service.listarHistoricoCadastro(1L)).hasSize(2);
+        verify(unidadeService).buscarPorCodigos(List.of(10L, 20L));
+        verify(unidadeService, never()).buscarPorCodigo(anyLong());
     }
 }

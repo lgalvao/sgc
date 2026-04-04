@@ -45,6 +45,7 @@ public class ProcessoService {
 
     private final ProcessoRepo processoRepo;
     private final ComumRepo repo;
+    private final UnidadeHierarquiaService unidadeHierarquiaService;
     private final UnidadeService unidadeService;
     private final ResponsavelUnidadeService responsavelUnidadeService;
     private final SubprocessoService subprocessoService;
@@ -141,11 +142,10 @@ public class ProcessoService {
 
     public Processo criar(CriarProcessoRequest req) {
         List<Long> codigosUnidades = new ArrayList<>(req.unidades());
-        validarUnidadesParaProcesso(req.tipo(), codigosUnidades);
+        Map<Long, Unidade> unidadesPorCodigo = carregarUnidadesPorCodigo(codigosUnidades);
+        validarUnidadesParaProcesso(req.tipo(), unidadesPorCodigo);
 
-        Set<Unidade> participantes = codigosUnidades.stream()
-                .map(unidadeService::buscarPorCodigo)
-                .collect(Collectors.toSet());
+        Set<Unidade> participantes = new HashSet<>(unidadesPorCodigo.values());
 
         Processo processo = new Processo()
                 .setDescricao(req.descricao())
@@ -165,11 +165,10 @@ public class ProcessoService {
             throw new ErroValidacao(Mensagens.PROCESSO_SO_EDITAVEL_EM_CRIADO);
         }
 
-        validarUnidadesParaProcesso(req.tipo(), new ArrayList<>(req.unidades()));
+        Map<Long, Unidade> unidadesPorCodigo = carregarUnidadesPorCodigo(new ArrayList<>(req.unidades()));
+        validarUnidadesParaProcesso(req.tipo(), unidadesPorCodigo);
 
-        Set<Unidade> participantes = req.unidades().stream()
-                .map(unidadeService::buscarPorCodigo)
-                .collect(Collectors.toSet());
+        Set<Unidade> participantes = new HashSet<>(unidadesPorCodigo.values());
 
         processo.setDescricao(req.descricao());
         processo.setTipo(req.tipo());
@@ -224,7 +223,7 @@ public class ProcessoService {
                 ? unidadeService.buscarMapasPorUnidades(codigosUnidades)
                 : List.of();
 
-        Unidade admin = unidadeService.buscarPorSigla("ADMIN");
+        Unidade admin = unidadeService.buscarAdmin();
         efetivarInicioSubprocessos(processo, tipo, codigosUnidades, unidadesParaProcessar, unidadesMapas, admin, usuario);
         
         processo.setSituacao(EM_ANDAMENTO);
@@ -345,30 +344,15 @@ public class ProcessoService {
     }
 
     private List<Long> buscarDescendentes(Long codRaiz) {
-        List<Unidade> todas = unidadeService.buscarTodasComHierarquia();
-        Map<Long, List<Unidade>> porPai = todas.stream()
-                .filter(u -> u.getUnidadeSuperior() != null)
-                .collect(Collectors.groupingBy(u -> u.getUnidadeSuperior().getCodigo()));
-        
-        Set<Long> result = new HashSet<>();
-        Queue<Long> fila = new LinkedList<>();
-        fila.add(codRaiz);
-        result.add(codRaiz);
-        while (!fila.isEmpty()) {
-            Long atual = fila.poll();
-            List<Unidade> filhos = porPai.get(atual);
-            if (filhos != null) {
-                for (Unidade f : filhos) {
-                    Long codFilho = f.getCodigo();
-                    if (result.add(codFilho)) fila.add(codFilho);
-                }
-            }
-        }
-        return new ArrayList<>(result);
+        List<Long> descendentes = unidadeHierarquiaService.buscarIdsDescendentes(codRaiz);
+        List<Long> resultado = new ArrayList<>(descendentes.size() + 1);
+        resultado.add(codRaiz);
+        resultado.addAll(descendentes);
+        return resultado;
     }
 
-    private void validarUnidadesParaProcesso(TipoProcesso tipo, List<Long> codigosUnidades) {
-        List<Unidade> entidades = codigosUnidades.stream().map(unidadeService::buscarPorCodigo).toList();
+    private void validarUnidadesParaProcesso(TipoProcesso tipo, Map<Long, Unidade> unidadesPorCodigo) {
+        List<Unidade> entidades = new ArrayList<>(unidadesPorCodigo.values());
         List<String> invalidas = entidades.stream()
                 .filter(u -> u.getTipo() == TipoUnidade.INTERMEDIARIA)
                 .map(Unidade::getSigla).toList();
@@ -379,9 +363,11 @@ public class ProcessoService {
         }
 
         if (tipo == REVISAO || tipo == DIAGNOSTICO) {
-            List<String> semMapa = codigosUnidades.stream()
-                    .filter(codigo -> !unidadeService.temMapaVigente(codigo))
-                    .map(codigo -> unidadeService.buscarPorCodigo(codigo).getSigla()).toList();
+            Set<Long> unidadesComMapa = new HashSet<>(unidadeService.buscarTodosCodigosUnidadesComMapa());
+            List<String> semMapa = entidades.stream()
+                    .filter(unidade -> !unidadesComMapa.contains(unidade.getCodigo()))
+                    .map(Unidade::getSigla)
+                    .toList();
             if (!semMapa.isEmpty()) throw new ErroValidacao(Mensagens.UNIDADES_SEM_MAPA_VIGENTE.formatted(String.join(", ", semMapa)));
         }
     }
@@ -393,7 +379,10 @@ public class ProcessoService {
             erros.add(Mensagens.OPERACAO_NAO_PERMITIDA);
         }
         if (tipo == REVISAO || tipo == DIAGNOSTICO) {
-            unidadeService.buscarSiglasPorCodigos(cods.stream().filter(codigo -> !unidadeService.temMapaVigente(codigo)).toList())
+            Set<Long> unidadesComMapa = new HashSet<>(unidadeService.buscarTodosCodigosUnidadesComMapa());
+            unidadeService.buscarSiglasPorCodigos(cods.stream()
+                            .filter(codigo -> !unidadesComMapa.contains(codigo))
+                            .toList())
                     .stream().findFirst().ifPresent(s -> erros.add(Mensagens.UNIDADES_SEM_MAPA));
         }
         List<Long> bloqueadas = processoRepo.listarUnidadesEmProcessoAtivo(EM_ANDAMENTO, cods);
@@ -434,10 +423,12 @@ public class ProcessoService {
 
     private void efetivarInicioSubprocessos(Processo processo, TipoProcesso tipo, List<Long> cods, Set<Unidade> pars, List<UnidadeMapa> ums, Unidade adm, Usuario user) {
         Map<Long, UnidadeMapa> mapUm = ums.stream().collect(Collectors.toMap(UnidadeMapa::getUnidadeCodigoPersistido, m -> m));
+        Map<Long, Unidade> unidadesPorCodigo = pars.stream()
+                .collect(Collectors.toMap(Unidade::getCodigo, unidade -> unidade));
         if (tipo == MAPEAMENTO) subprocessoService.criarParaMapeamento(processo, pars, adm, user);
         else if (tipo == REVISAO) cods.forEach(c -> subprocessoService.criarParaRevisao(
                 processo,
-                unidadeService.buscarPorCodigo(c),
+                obterUnidadeObrigatoria(unidadesPorCodigo, c),
                 obterUnidadeMapaObrigatorio(mapUm, c),
                 adm,
                 user));
@@ -542,6 +533,19 @@ public class ProcessoService {
             throw new IllegalStateException("Unidade %d sem mapa vigente para iniciar subprocesso".formatted(codigoUnidade));
         }
         return unidadeMapa;
+    }
+
+    private Unidade obterUnidadeObrigatoria(Map<Long, Unidade> unidadesPorCodigo, Long codigoUnidade) {
+        Unidade unidade = unidadesPorCodigo.get(codigoUnidade);
+        if (unidade == null) {
+            throw new IllegalStateException("Unidade %d ausente para iniciar subprocesso".formatted(codigoUnidade));
+        }
+        return unidade;
+    }
+
+    private Map<Long, Unidade> carregarUnidadesPorCodigo(List<Long> codigosUnidades) {
+        return unidadeService.buscarPorCodigos(codigosUnidades).stream()
+                .collect(Collectors.toMap(Unidade::getCodigo, unidade -> unidade, (primeira, duplicada) -> primeira));
     }
 
     private @Nullable LocalDateTime obterUltimaDataLimite(Subprocesso sp) {

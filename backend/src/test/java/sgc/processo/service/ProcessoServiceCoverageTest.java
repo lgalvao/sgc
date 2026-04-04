@@ -34,6 +34,7 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 class ProcessoServiceCoverageTest {
     @Mock private ProcessoRepo processoRepo;
     @Mock private ComumRepo repo;
+    @Mock private UnidadeHierarquiaService unidadeHierarquiaService;
     @Mock private UnidadeService unidadeService;
     @Mock private ResponsavelUnidadeService responsavelUnidadeService;
     @Mock private UsuarioFacade usuarioService;
@@ -188,7 +189,7 @@ class ProcessoServiceCoverageTest {
         admin.setNome("Administrador");
         admin.setTipo(sgc.organizacao.model.TipoUnidade.RAIZ);
         admin.setSituacao(sgc.organizacao.model.SituacaoUnidade.ATIVA);
-        when(repo.buscarPorSigla(any(), anyString())).thenReturn(admin);
+        when(unidadeService.buscarAdmin()).thenReturn(admin);
 
         List<Long> unidadeCods = List.of(10L);
         Usuario usuario = new Usuario();
@@ -344,7 +345,7 @@ class ProcessoServiceCoverageTest {
         when(unidadeService.buscarPorCodigos(any())).thenReturn(List.of(u));
         UnidadeMapa um = new UnidadeMapa(); um.setUnidadeCodigo(10L); 
         when(unidadeService.buscarMapasPorUnidades(any())).thenReturn(List.of(um));
-        when(repo.buscarPorSigla(Unidade.class, "ADMIN")).thenReturn(admin);
+        when(unidadeService.buscarAdmin()).thenReturn(admin);
         mockarResponsaveisEfetivos();
 
         target.iniciar(cod, List.of(10L), new Usuario()); // branch 419 (DIAGNOSTICO)
@@ -378,7 +379,7 @@ class ProcessoServiceCoverageTest {
             Unidade u3 = new Unidade(); u3.setCodigo(2L); // mesma unidade 2
             u3.setUnidadeSuperior(u1);
 
-            when(unidadeService.buscarTodasComHierarquia()).thenReturn(List.of(u1, u2, u3));
+            when(unidadeHierarquiaService.buscarIdsDescendentes(1L)).thenReturn(List.of(2L));
             
             List<Long> res = org.springframework.test.util.ReflectionTestUtils.invokeMethod(target, "buscarDescendentes", 1L);
             assertThat(res).containsExactlyInAnyOrder(1L, 2L); // branch 357 (result.add(codFilho) == false)

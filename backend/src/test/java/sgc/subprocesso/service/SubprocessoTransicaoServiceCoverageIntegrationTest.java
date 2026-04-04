@@ -283,7 +283,7 @@ class SubprocessoTransicaoServiceCoverageIntegrationTest {
             Unidade uAdmin = new Unidade();
             uAdmin.setSigla("ADMIN");
             uAdmin = unidadeRepo.save(uAdmin);
-            when(unidadeService.buscarPorSigla("ADMIN")).thenReturn(uAdmin);
+            when(unidadeService.buscarAdmin()).thenReturn(uAdmin);
 
             Unidade uSp = new Unidade();
             uSp.setSigla("U4");

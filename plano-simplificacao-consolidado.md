@@ -658,3 +658,27 @@ Os três fluxos de manutenção continuam separados do ponto de vista funcional,
 * **Validação executada:** `./gradlew --no-configuration-cache :backend:test --tests "sgc.integracao.SubprocessoServiceSalvarIntegrationTest"`.
 * **Observação de ambiente:** novas execuções de `SubprocessoServiceExtraCoverageTest` e `SubprocessoServiceTest` foram interrompidas por inconsistências de artefatos em `backend/build/classes/java/test` durante `compileTestJava`, sem sinal de falha funcional específica do recorte.
 * **Pendência aberta para próxima rodada:** reavaliar o baseline de `SubprocessoService` após esses cortes e decidir se o melhor ganho seguinte permanece no service de escrita ou volta para a superfície pública de `SubprocessoConsultaService`.
+
+### Reavaliação de baseline e retorno ao hotspot de consulta
+
+Após os dois cortes da Frente 3, `SubprocessoService` ficou mais legível por dentro, mas não reduziu sua superfície pública nem o número de dependências. Na prática, a simplificação local melhorou a costura dos fluxos, porém o principal hotspot estrutural voltou a ser `SubprocessoConsultaService`, que ainda concentrava aliases públicos redundantes e uma API larga demais para o papel que exerce.
+
+### Resultado objetivo da reavaliação
+
+* `SubprocessoService`: 495 linhas, 14 métodos públicos, 11 dependências injetadas.
+* `SubprocessoConsultaService`: caiu de 554 para 546 linhas e de 35 para 33 métodos públicos após remover aliases públicos redundantes sem regra própria.
+
+### Continuação focada em aliases redundantes de consulta
+
+O corte aplicado em `SubprocessoConsultaService` foi propositalmente pequeno: remoção de `buscarSubprocessoComMapa` e `mapaCompletoPorSubprocesso`, dois métodos públicos que apenas repassavam chamadas sem agregar regra de negócio, segurança, montagem ou contrato útil distinto. Os testes de integração que existiam só para esses aliases passaram a cobrir `buscarSubprocesso` e `mapaCompletoDtoPorSubprocesso`, que são as fronteiras efetivamente úteis.
+
+### Registro da continuação em consulta
+
+* **Data da rodada:** 2026-04-04
+* **Frente principal:** Frente 2 — Redução de superfície pública redundante em `SubprocessoConsultaService`
+* **Arquivo(s) alvo:** `backend/src/main/java/sgc/subprocesso/service/SubprocessoConsultaService.java`, `backend/src/test/java/sgc/integracao/SubprocessoServiceMethodsIntegrationTest.java`, `backend/src/test/java/sgc/integracao/SubprocessoServiceExtraMethodsIntegrationTest.java`, `plano-simplificacao-consolidado.md`
+* **Corte aplicado:** remoção de dois aliases públicos redundantes e ajuste da cobertura para os métodos remanescentes com contrato útil.
+* **Risco principal observado:** referências residuais a métodos removidos em testes ou pontos de integração de baixa visibilidade.
+* **Validação executada:** tentativa de executar `SubprocessoServiceMethodsIntegrationTest`, `SubprocessoServiceExtraMethodsIntegrationTest` e `SubprocessoConsultaServiceExtraCoverageTest`.
+* **Observação de ambiente:** a validação voltou a ser bloqueada por falhas de `compileTestJava`/empacotamento do Gradle em artefatos do diretório `backend/build`, sem indicação direta de referência quebrada aos aliases removidos.
+* **Pendência aberta para próxima rodada:** seguir reduzindo superfície pública redundante e pass-throughs de `SubprocessoConsultaService`, priorizando cortes que reduzam API exposta sem mudar contrato HTTP.

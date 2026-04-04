@@ -70,7 +70,9 @@ class PainelFacadeTest {
     void deveListarProcessoRevisaoParaChefe() {
         Processo p = criarProcesso(1L, SituacaoProcesso.EM_ANDAMENTO);
         p.setTipo(TipoProcesso.REVISAO);
-        Page<Processo> page = new PageImpl<>(List.of(p));
+        Processo p2 = criarProcesso(2L, SituacaoProcesso.EM_ANDAMENTO);
+        p2.setTipo(TipoProcesso.REVISAO);
+        Page<Processo> page = new PageImpl<>(List.of(p, p2));
         Unidade unidade = UnidadeTestBuilder.umaDe()
                 .comCodigo("100")
                 .comSigla("ASSESSORIA_22")
@@ -83,18 +85,15 @@ class PainelFacadeTest {
 
         Page<ProcessoResumoDto> result = painelFacade.listarProcessos(Perfil.CHEFE, 100L, PageRequest.of(0, 10));
 
-        assertThat(result).hasSize(1);
+        assertThat(result).hasSize(2);
         assertThat(result.getContent().getFirst().linkDestino()).isEqualTo("/processo/1/ASSESSORIA_22");
+        assertThat(result.getContent().get(1).linkDestino()).isEqualTo("/processo/2/ASSESSORIA_22");
+        verify(unidadeService).buscarPorCodigo(100L);
     }
 
     @Test
     @DisplayName("Deve propagar erro ao calcular link sem fallback")
     void devePropagarErroAoCalcularLink() {
-        Processo p = criarProcesso(1L, SituacaoProcesso.EM_ANDAMENTO);
-        Page<Processo> page = new PageImpl<>(List.of(p));
-
-        when(hierarquiaService.buscarMapaHierarquia()).thenReturn(new HashMap<>());
-        when(processoService.listarIniciadosPorParticipantes(anyList(), any(Pageable.class))).thenReturn(page);
         when(unidadeService.buscarPorCodigo(100L)).thenThrow(new RuntimeException("Erro"));
 
         PageRequest pageRequest = PageRequest.of(0, 10);
