@@ -9,6 +9,7 @@ import sgc.comum.erros.*;
 import sgc.mapa.model.*;
 import sgc.mapa.service.*;
 import sgc.organizacao.*;
+import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
 import sgc.processo.model.*;
@@ -100,6 +101,20 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             Subprocesso sp = criarSubprocessoComMapa(1L);
             sp.setUnidade(u);
             when(movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(1L)).thenReturn(List.of());
+            assertThat(consultaService.obterUnidadeLocalizacao(sp)).isEqualTo(u);
+        }
+
+        @Test
+        @DisplayName("deve retornar unidade quando última movimentação não possui destino")
+        void destinoNuloNaMovimentacao() {
+            Unidade u = new Unidade();
+            Subprocesso sp = criarSubprocessoComMapa(2L);
+            sp.setUnidade(u);
+            Movimentacao mov = new Movimentacao();
+            mov.setUnidadeDestino(null);
+
+            when(movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(2L)).thenReturn(List.of(mov));
+
             assertThat(consultaService.obterUnidadeLocalizacao(sp)).isEqualTo(u);
         }
     }
@@ -200,6 +215,37 @@ class SubprocessoConsultaServiceExtraCoverageTest {
 
             SubprocessoDetalheResponse res = consultaService.obterDetalhes(1L, user);
             assertThat(res.localizacaoAtual()).isEqualTo("U1");
+        }
+
+        @Test
+        @DisplayName("obterDetalhes não deve buscar titular quando título for em branco")
+        void obterDetalhesSemTitularQuandoTituloEmBranco() {
+            Subprocesso sp = criarSubprocessoComMapa(11L);
+            sp.setSituacaoForcada(MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+
+            Unidade unidade = new Unidade();
+            unidade.setCodigo(11L);
+            unidade.setSigla("U11");
+            unidade.setTipo(TipoUnidade.OPERACIONAL);
+            unidade.setNome("Unidade 11");
+            unidade.setTituloTitular("   ");
+            sp.setUnidade(unidade);
+
+            Usuario usuario = criarUsuarioMock();
+            usuario.setPerfilAtivo(Perfil.ADMIN);
+            usuario.setUnidadeAtivaCodigo(11L);
+
+            ResponsavelDto responsavel = ResponsavelDto.builder().build();
+
+            when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(11L)).thenReturn(Optional.of(sp));
+            when(movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(11L)).thenReturn(List.of());
+            when(usuarioFacade.buscarResponsabilidadeDetalhadaAtual("U11")).thenReturn(responsavel);
+            when(unidadeService.temMapaVigente(11L)).thenReturn(true);
+
+            SubprocessoDetalheResponse response = consultaService.obterDetalhes(11L, usuario);
+
+            assertThat(response.titular()).isNull();
+            verify(usuarioFacade, never()).buscarPorLogin(anyString());
         }
 
         @Test

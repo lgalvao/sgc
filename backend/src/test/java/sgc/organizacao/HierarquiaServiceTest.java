@@ -67,6 +67,21 @@ class HierarquiaServiceTest {
     }
 
     @Test
+    @DisplayName("Deve retornar true se responsabilidade e usuário tiverem título nulo")
+    void deveRetornarTrueSeTitulosNulos() {
+        Unidade unidade = Unidade.builder().codigo(1L).build();
+        Usuario usuario = Usuario.builder().tituloEleitoral(null).build();
+        Responsabilidade responsabilidade = Responsabilidade.builder()
+                .unidadeCodigo(1L)
+                .usuarioTitulo(null)
+                .build();
+
+        when(responsabilidadeRepo.findById(1L)).thenReturn(Optional.of(responsabilidade));
+
+        assertThat(hierarquiaService.isResponsavel(unidade, usuario)).isTrue();
+    }
+
+    @Test
     @DisplayName("Deve retornar false quando unidade alvo não tem superior")
     void deveRetornarFalseQuandoUnidadeAlvoNaoTemSuperior() {
         Unidade alvo = criarUnidade(1L, null);

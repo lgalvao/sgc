@@ -232,6 +232,21 @@ class UnidadeHierarquiaServiceTest {
             UnidadeDto operacionalDto = resultado.getFirst().getSubunidades().getFirst().getSubunidades().getFirst();
             assertThat(operacionalDto.isElegivel()).isFalse();
         }
+
+        @Test
+        @DisplayName("Deve marcar como inelegível unidade com responsável em branco")
+        void deveMarcarInelegivelComResponsavelEmBranco() {
+            Responsabilidade responsabilidade = criarResponsabilidade(3L);
+            responsabilidade.setUsuarioTitulo("   ");
+            unidadeOperacional.setResponsabilidade(responsabilidade);
+
+            when(unidadeRepo.listarTodasComHierarquia()).thenReturn(List.of(unidadeRaiz, unidadeIntermediaria, unidadeOperacional));
+
+            List<UnidadeDto> resultado = service.buscarArvoreComElegibilidade(false, Set.of());
+
+            UnidadeDto operacionalDto = resultado.getFirst().getSubunidades().getFirst().getSubunidades().getFirst();
+            assertThat(operacionalDto.isElegivel()).isFalse();
+        }
     }
 
     private Responsabilidade criarResponsabilidade(Long codigoUnidade) {
