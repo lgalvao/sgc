@@ -26,9 +26,11 @@ public class CacheConfig {
                 CACHE_UNIDADE_ADMIN
         );
         cacheManager.setCaffeine(Caffeine.newBuilder()
+                .recordStats()
                 .maximumSize(100)
                 .expireAfterWrite(java.time.Duration.ofMinutes(5)));
         cacheManager.registerCustomCache(CACHE_UNIDADE_ADMIN, Caffeine.newBuilder()
+                .recordStats()
                 .maximumSize(1)
                 .expireAfterWrite(java.time.Duration.ofHours(12))
                 .build());
