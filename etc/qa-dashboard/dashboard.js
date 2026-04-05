@@ -182,4 +182,4 @@ async function inicializarDashboard() {
     }
 }
 
-inicializarDashboard();
+inicializarDashboard().catch(console.error);

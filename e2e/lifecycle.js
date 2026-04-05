@@ -110,9 +110,9 @@ const LOG_FILTERS = [
     /➜ {2}Network:/,
     /use --host to expose/,
     // eslint-disable-next-line no-control-regex
-    /\u001b\[vite\] {2}connecting/,
+    /\u001b\[vite] {2}connecting/,
     // eslint-disable-next-line no-control-regex
-    /\u001b\[vite\] {2}connected/,
+    /\u001b\[vite] {2}connected/,
     /debug:/,
 
     // Logs de serviços mockados

@@ -4,7 +4,7 @@ import {
     criarProcessoMapaDisponibilizadoFixture,
     criarProcessoMapaValidadoFixture,
     validarProcessoFixture
-} from './fixtures/fixtures-processos.js';
+} from './fixtures/index.js';
 import {navegarParaMapa} from './helpers/helpers-mapas.js';
 import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
 import {

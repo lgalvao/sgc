@@ -165,18 +165,4 @@ function salvar() {
   border-color: var(--bs-primary);
 }
 
-.atividade-card-item .form-check-label {
-  cursor: pointer;
-  padding: 0.25rem 0;
-}
-
-.atividade-card-item.checked .form-check-label {
-  font-weight: bold;
-  color: var(--bs-primary);
-}
-
-.atividade-card-item .card-body {
-  padding: 0.5rem 0.75rem;
-}
-
 </style>

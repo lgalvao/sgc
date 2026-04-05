@@ -102,34 +102,6 @@ const shouldShowBreadcrumbs = computed(
   margin-bottom: 0 !important;
 }
 
-:deep(.breadcrumb-item) {
-  display: flex;
-  align-items: center;
-  font-size: 0.85rem;
-}
-
-:deep(.breadcrumb-item a) {
-  text-decoration: none !important;
-  color: #6c757d !important;
-  transition: color 0.2s;
-}
-
-:deep(.breadcrumb-item a:hover) {
-  color: #212529 !important;
-}
-
-:deep(.breadcrumb-item.active) {
-  color: #212529 !important;
-  font-weight: 400;
-}
-
-:deep(.breadcrumb-item + .breadcrumb-item::before) {
-  content: var(--bs-breadcrumb-divider, '›') !important;
-  color: #adb5bd;
-  padding: 0 0.5rem;
-  line-height: normal;
-}
-
 :deep(.bi-house-door) {
   color: #6c757d;
   font-size: 0.9rem;

@@ -4,7 +4,7 @@ import {
     criarProcessoMapaValidadoFixture,
     criarProcessoRevisaoMapaHomologadoFixture,
     validarProcessoFixture
-} from './fixtures/fixtures-processos.js';
+} from './fixtures/index.js';
 import {acessarDetalhesProcesso, verificarDetalhesProcesso} from './helpers/helpers-processos.js';
 import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';

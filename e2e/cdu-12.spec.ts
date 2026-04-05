@@ -4,7 +4,7 @@ import {
     criarProcessoFinalizadoFixture,
     criarProcessoFixture,
     validarProcessoFixture
-} from './fixtures/fixtures-processos.js';
+} from './fixtures/index.js';
 import {
     abrirModalImpactoEdicao,
     abrirModalImpactoVisualizacao,

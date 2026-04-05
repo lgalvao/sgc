@@ -104,18 +104,15 @@ td {
     font-size: 0.75rem;
 }
 
-.status.sucesso,
-.status.verde {
+.status.sucesso {
     background: var(--cor-verde);
 }
 
-.status.alerta,
-.status.amarelo {
+.status.alerta {
     background: var(--cor-amarelo);
 }
 
-.status.falha,
-.status.vermelho {
+.status.falha {
     background: var(--cor-vermelho);
 }
 

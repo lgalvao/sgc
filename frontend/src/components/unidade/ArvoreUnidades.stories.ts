@@ -72,7 +72,7 @@ export const Default: Story = {
         },
         template: `
       <div>
-        <ArvoreUnidades v-bind="args" v-model="selected" />
+        <ArvoreUnidades v-bind="args" v-model="selected" :unidades="args.unidades" />
         <div class="mt-3 p-2 bg-light border rounded">
           <strong>Selecionados IDs:</strong> {{ selected }}
         </div>
@@ -100,7 +100,7 @@ export const ComPreSelecao: Story = {
         },
         template: `
       <div>
-        <ArvoreUnidades v-bind="args" v-model="selected" />
+        <ArvoreUnidades v-bind="args" v-model="selected" :unidades="args.unidades" />
         <div class="mt-3 p-2 bg-light border rounded">
           <strong>Selecionados IDs:</strong> {{ selected }}
         </div>
@@ -134,7 +134,7 @@ export const OcultandoRaiz: Story = {
         template: `
       <div>
         <p class="text-muted small mb-2">A raiz "Presidência" deve estar oculta, mostrando apenas seus filhos diretos.</p>
-        <ArvoreUnidades v-bind="args" v-model="selected" />
+        <ArvoreUnidades v-bind="args" v-model="selected" :unidades="args.unidades" />
         <div class="mt-3 p-2 bg-light border rounded">
           <strong>Selecionados IDs:</strong> {{ selected }}
         </div>

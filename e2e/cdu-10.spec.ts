@@ -1,7 +1,7 @@
 import type {Page} from '@playwright/test';
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {login, USUARIOS} from './helpers/helpers-auth.js';
-import {criarProcessoFinalizadoFixture, criarProcessoFixture} from './fixtures/fixtures-processos.js';
+import {criarProcessoFinalizadoFixture, criarProcessoFixture} from './fixtures/index.js';
 import {
     adicionarAtividade,
     adicionarConhecimento,

@@ -33,7 +33,7 @@ export const Default: Story = {
         template: `
       <div>
         <button class="btn btn-primary" @click="show = true">Abrir modal</button>
-        <ModalPadrao v-bind="args" v-model="show">
+        <ModalPadrao v-bind="args" v-model="show" :titulo="args.titulo">
           <p>Conteúdo interno do modal. Você pode colocar qualquer elemento aqui.</p>
         </ModalPadrao>
       </div>

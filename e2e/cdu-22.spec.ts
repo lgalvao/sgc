@@ -2,7 +2,7 @@ import {expect, test} from './fixtures/complete-fixtures.js';
 import {
     criarProcessoCadastroDisponibilizadoFixture,
     criarProcessoRevisaoCadastroDisponibilizadoFixture
-} from './fixtures/fixtures-processos.js';
+} from './fixtures/index.js';
 import {loginComPerfil, login, USUARIOS} from './helpers/helpers-auth.js';
 import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
 import {fazerLogout, navegarParaSubprocesso} from './helpers/helpers-navegacao.js';

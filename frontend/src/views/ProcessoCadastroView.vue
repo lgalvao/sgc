@@ -305,9 +305,8 @@ onMounted(async () => {
 
   // Auto-focus na descrição ao carregar
   if (!processoEditando.value) {
-    nextTick(() => {
-      formFieldsRef.value?.inputDescricaoRef?.$el?.focus();
-    });
+    await nextTick();
+    formFieldsRef.value?.inputDescricaoRef?.$el?.focus();
   }
 });
 

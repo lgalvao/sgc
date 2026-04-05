@@ -47,7 +47,7 @@ export const NovoProcesso: Story = {
             const form = ref(args.modelValue);
             return {args, form};
         },
-        template: '<ProcessoFormFields v-bind="args" v-model="form" />',
+        template: '<ProcessoFormFields v-bind="args" v-model="form" :unidades="args.unidades" :field-errors="args.fieldErrors" :is-loading-unidades="args.isLoadingUnidades" />',
     }),
 };
 

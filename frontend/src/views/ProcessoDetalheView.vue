@@ -469,7 +469,9 @@ async function executarAcaoBloco(dados: { ids: number[], dataLimite?: string }) 
     const contextoExecucao = obterContextoAtualAcao(acaoBlocoAtual.value, dados.ids);
     const mensagemSucesso = obterConfiguracaoAcaoBloco(acaoBlocoAtual.value, contextoExecucao).mensagemSucesso;
     if (!processo.value) {
-      throw new Error("Detalhes do processo não carregados.");
+      modalBlocoRef.value?.setErro("Detalhes do processo não carregados.");
+      processandoAcaoBloco.value = false;
+      return;
     }
     await processoService.executarAcaoEmBloco(processo.value.codigo, {
       unidadeCodigos: dados.ids,

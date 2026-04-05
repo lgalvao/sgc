@@ -4,7 +4,7 @@ import {expect, test} from './fixtures/complete-fixtures.js';
 import {login, USUARIOS} from './helpers/helpers-auth.js';
 import * as AtividadeHelpers from './helpers/helpers-atividades.js';
 import {fazerLogout} from './helpers/helpers-navegacao.js';
-import {criarProcessoFinalizadoFixture, criarProcessoFixture} from './fixtures/fixtures-processos.js';
+import {criarProcessoFinalizadoFixture, criarProcessoFixture} from './fixtures/index.js';
 import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
 
 test.describe('CDU-08 - Manter cadastro de atividades e conhecimentos', () => {

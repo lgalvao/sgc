@@ -247,7 +247,7 @@ describe('Subprocessos store', () => {
             vi.mocked(buscarContextoEdicao).mockReturnValue(new Promise(() => {
             }));
 
-            store.buscarContextoEdicao(2);
+            void store.buscarContextoEdicao(2);
 
             expect(store.subprocessoDetalhe).toBeNull();
         });

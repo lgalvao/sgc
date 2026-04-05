@@ -57,7 +57,7 @@ export const Default: Story = {
         template: `
       <div>
         <button class="btn btn-primary" @click="show = true">Importar atividades</button>
-        <ImportarAtividadesModal v-bind="args" :mostrar="show" @fechar="show = false" />
+        <ImportarAtividadesModal v-bind="args" :mostrar="show" :cod-subprocesso-destino="args.codSubprocessoDestino" @fechar="show = false" />
       </div>
     `,
     }),
@@ -78,6 +78,6 @@ export const SemProcessos: Story = {
             vi.mocked(subprocessoService.importarAtividades).mockResolvedValue({} as any);
             return {args, show};
         },
-        template: '<ImportarAtividadesModal v-bind="args" :mostrar="show" @fechar="show = false" />',
+        template: '<ImportarAtividadesModal v-bind="args" :mostrar="show" :cod-subprocesso-destino="args.codSubprocessoDestino" @fechar="show = false" />',
     }),
 };

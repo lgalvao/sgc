@@ -61,10 +61,4 @@ const shouldShowNavBarExtras = computed(() => {
 </template>
 
 <style>
-.toast-body {
-  white-space: pre-wrap;
-  font-size: 0.85rem;
-  max-height: 400px;
-  overflow-y: auto;
-}
 </style>

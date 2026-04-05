@@ -31,7 +31,7 @@ function cleanFile(filePath) {
 
     // 2. Limpar assinaturas de teste: async ({page, autenticadoComoAdmin}: { page: Page, ... }) =>
     // Procura por padrões de desestruturação em assinaturas de teste
-    content = content.replace(/async\s*\(\s*\{([^}]+)\}\s*(:\s*\{[^}]+\})?\s*\)\s*=>/g, (match, p1, p2) => {
+    content = content.replace(/async\s*\(\s*\{([^}]+)}\s*(:\s*\{[^}]+})?\s*\)\s*=>/g, (match, p1, p2) => {
         let args = p1.split(',').map(s => s.trim());
         
         // Remove fixtures de auth

@@ -171,11 +171,6 @@ function adicionarConhecimento() {
 </script>
 
 <style scoped>
-.atividade-edicao-input {
-  flex-grow: 1;
-  min-width: 0;
-}
-
 .atividade-card {
   transition: box-shadow 0.2s;
 }
@@ -187,32 +182,6 @@ function adicionarConhecimento() {
 .atividade-com-erro {
   border-left: 4px solid var(--bs-danger) !important;
   box-shadow: 0 2px 8px 0 rgba(var(--bs-danger-rgb), 0.1) !important;
-}
-
-.botoes-acao-atividade {
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.2s;
-  top: 0.5rem;
-  right: 0.5rem;
-  z-index: 10;
-}
-
-.botoes-acao {
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.2s;
-  position: relative;
-  z-index: 1;
-}
-
-/* Show buttons when card is hovered or has focus */
-.atividade-card:hover .botoes-acao-atividade,
-.atividade-card:focus-within .botoes-acao-atividade,
-.conhecimento-hover-row:hover .botoes-acao,
-.conhecimento-hover-row:focus-within .botoes-acao {
-  opacity: 1;
-  pointer-events: auto;
 }
 
 .botao-acao {
@@ -235,10 +204,6 @@ function adicionarConhecimento() {
 .botao-acao:hover {
   background: var(--bs-primary-bg-subtle);
   box-shadow: 0 0 0 2px var(--bs-primary);
-}
-
-.fade-group {
-  transition: opacity 0.2s;
 }
 
 .atividade-descricao {

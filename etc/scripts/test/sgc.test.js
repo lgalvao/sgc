@@ -293,6 +293,7 @@ describe("CLI raiz do toolkit", () => {
             "package sgc.exemplo; public class ClasseForaEscopo { public int contarPositivos(java.util.List<Integer> valores) { return (int) valores.stream().filter(valor -> valor > 0).count(); } }"
         );
         await fs.outputFile(path.join(testDir, "ClasseDiretaTest.java"), "package sgc.exemplo; class ClasseDiretaTest {}");
+        // language=XML
         await fs.outputFile(jacoco, `
 <report name="fake">
   <package name="sgc/exemplo">

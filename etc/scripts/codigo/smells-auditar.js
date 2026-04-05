@@ -86,7 +86,7 @@ const PADROES = [
         filtroArquivo: ({caminhoRelativo}) =>
             caminhoRelativo.startsWith("frontend/src/")
             && !ehArquivoTesteOuStory(caminhoRelativo),
-        regexes: [/\|\|\s*(?:\[\]|\{\}|["'`]{2}|false|true|0)(?![\w$])/g]
+        regexes: [/\|\|\s*(?:\[]|\{}|["'`]{2}|false|true|0)(?![\w$])/g]
     }
 ];
 

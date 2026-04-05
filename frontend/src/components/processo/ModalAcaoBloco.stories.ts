@@ -41,7 +41,7 @@ export const AceiteEmBloco: Story = {
         template: `
       <div>
         <button class="btn btn-primary" @click="abrir">Abrir aceite em Bloco</button>
-        <ModalAcaoBloco v-bind="args" ref="modalRef" />
+        <ModalAcaoBloco v-bind="args" ref="modalRef" :unidades="args.unidades" :titulo="args.titulo" :unidades-pre-selecionadas="args.unidadesPreSelecionadas" :id="args.id" :texto="args.texto" :rotulo-botao="args.rotuloBotao" />
       </div>
     `,
     }),
@@ -67,7 +67,7 @@ export const AlterarDataLimiteEmBloco: Story = {
         template: `
       <div>
         <button class="btn btn-warning" @click="abrir">Alterar datas em Bloco</button>
-        <ModalAcaoBloco v-bind="args" ref="modalRef" />
+        <ModalAcaoBloco v-bind="args" ref="modalRef" :unidades="args.unidades" :titulo="args.titulo" :unidades-pre-selecionadas="args.unidadesPreSelecionadas" :id="args.id" :texto="args.texto" :rotulo-botao="args.rotuloBotao" />
       </div>
     `,
     }),

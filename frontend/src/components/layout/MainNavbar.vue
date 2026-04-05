@@ -117,58 +117,6 @@ function handleLogout() {
 </script>
 
 <style scoped>
-.navbar {
-  background: rgba(15, 23, 42, 0.9) !important; /* Slate-900 com transparência */
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  padding: 0.75rem 1.5rem;
-  box-shadow: var(--bs-box-shadow-sm);
-}
-
-.navbar-brand {
-  letter-spacing: -0.02em;
-  font-weight: 700;
-}
-
-/* Ajuste de ícones no navbar */
-.nav-link {
-  font-weight: 500;
-  display: flex !important;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem !important;
-  border-radius: 0.5rem;
-  transition: all 0.2s ease;
-  color: rgba(255, 255, 255, 0.85) !important; /* Aumentado de 0.7 para 0.85 para melhor contraste */
-}
-
-
-.nav-link i {
-  font-size: 1.1rem;
-  color: inherit !important;
-}
-
-.nav-link:hover {
-  color: #fff !important;
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.nav-link.active {
-  color: #fff !important;
-  background: rgba(255, 255, 255, 0.15);
-}
-
-/* Estilo específico para o item de perfil */
-.user-profile-item :deep(.nav-link) {
-  cursor: default;
-  background: rgba(255, 255, 255, 0.05);
-  margin-right: 0.5rem;
-}
-
-.user-profile-item :deep(.nav-link:hover) {
-  background: rgba(255, 255, 255, 0.05);
-}
-
 .user-info-text {
   font-size: 0.875rem;
   max-width: 200px;
@@ -178,12 +126,5 @@ function handleLogout() {
 }
 
 @media (max-width: 992px) {
-  .navbar {
-    padding: 1rem;
-  }
-  
-  .nav-link {
-    margin-bottom: 0.25rem;
-  }
 }
 </style>

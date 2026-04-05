@@ -1,5 +1,5 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
-import {criarProcessoMapaDisponibilizadoFixture, validarProcessoFixture} from './fixtures/fixtures-processos.js';
+import {criarProcessoMapaDisponibilizadoFixture, validarProcessoFixture} from './fixtures/index.js';
 import {navegarParaMapa} from './helpers/helpers-mapas.js';
 import {login, USUARIOS} from './helpers/helpers-auth.js';
 import {acessarSubprocessoGestor} from './helpers/helpers-analise.js';

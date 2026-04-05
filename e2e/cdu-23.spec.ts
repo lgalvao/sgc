@@ -1,5 +1,5 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
-import {criarProcessoCadastroDisponibilizadoFixture, validarProcessoFixture} from './fixtures/fixtures-processos.js';
+import {criarProcessoCadastroDisponibilizadoFixture, validarProcessoFixture} from './fixtures/index.js';
 import {navegarParaAtividadesVisualizacao} from './helpers/helpers-atividades.js';
 import {
     aceitarCadastroMapeamento,

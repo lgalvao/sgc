@@ -1,6 +1,6 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {login, USUARIOS} from './helpers/helpers-auth.js';
-import {criarProcessoFixture} from './fixtures/fixtures-processos.js';
+import {criarProcessoFixture} from './fixtures/index.js';
 import {
     adicionarAtividade,
     adicionarConhecimento,

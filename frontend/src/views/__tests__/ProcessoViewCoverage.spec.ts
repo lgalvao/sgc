@@ -152,7 +152,7 @@ describe("ProcessoViewCoverage.spec.ts", () => {
         await flushPromises();
 
         const item = {clickable: true, sigla: "U1", codigo: 10};
-        (wrapper.vm as any).abrirDetalhesUnidade(item);
+        await (wrapper.vm as any).abrirDetalhesUnidade(item);
 
         expect(mocks.push).toHaveBeenCalledWith(expect.objectContaining({
             name: "Subprocesso",
@@ -164,7 +164,7 @@ describe("ProcessoViewCoverage.spec.ts", () => {
         const wrapper = createWrapper();
         await flushPromises();
 
-        (wrapper.vm as any).abrirDetalhesUnidade({clickable: false});
+        await (wrapper.vm as any).abrirDetalhesUnidade({clickable: false});
         expect(mocks.push).not.toHaveBeenCalled();
     });
 
@@ -179,7 +179,7 @@ describe("ProcessoViewCoverage.spec.ts", () => {
         await flushPromises();
 
         // Tenta abrir unidade 10 — agora permitido, backend controla acesso
-        (wrapper.vm as any).abrirDetalhesUnidade({clickable: true, codigo: 10, sigla: "U1", unidadeAtual: "U1"});
+        await (wrapper.vm as any).abrirDetalhesUnidade({clickable: true, codigo: 10, sigla: "U1", unidadeAtual: "U1"});
 
         expect(mocks.push).toHaveBeenCalledWith(expect.objectContaining({
             params: {codProcesso: "1", siglaUnidade: "U1"}
@@ -197,7 +197,7 @@ describe("ProcessoViewCoverage.spec.ts", () => {
         await flushPromises();
 
         // Abre unidade 10
-        (wrapper.vm as any).abrirDetalhesUnidade({clickable: true, codigo: 10, sigla: "U1"});
+        await (wrapper.vm as any).abrirDetalhesUnidade({clickable: true, codigo: 10, sigla: "U1"});
 
         expect(mocks.push).toHaveBeenCalledWith(expect.objectContaining({
             params: {codProcesso: "1", siglaUnidade: "U1"}

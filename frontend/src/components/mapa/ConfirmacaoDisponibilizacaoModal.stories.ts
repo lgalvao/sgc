@@ -29,7 +29,7 @@ export const Cadastro: Story = {
         template: `
       <div>
         <button class="btn btn-primary" @click="show = true">Disponibilizar cadastro</button>
-        <ConfirmacaoDisponibilizacaoModal v-bind="args" :mostrar="show" @fechar="show = false" />
+        <ConfirmacaoDisponibilizacaoModal v-bind="args" :mostrar="show" :is-revisao="args.isRevisao" @fechar="show = false" />
       </div>
     `,
     }),
@@ -49,7 +49,7 @@ export const Revisao: Story = {
         template: `
       <div>
         <button class="btn btn-primary" @click="show = true">Disponibilizar revisão</button>
-        <ConfirmacaoDisponibilizacaoModal v-bind="args" :mostrar="show" @fechar="show = false" />
+        <ConfirmacaoDisponibilizacaoModal v-bind="args" :mostrar="show" :is-revisao="args.isRevisao" @fechar="show = false" />
       </div>
     `,
     }),

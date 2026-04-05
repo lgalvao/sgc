@@ -49,7 +49,7 @@ export const Default: Story = {
         template: `
       <div>
         <button class="btn btn-primary" @click="show = true">Ver histórico de Análise</button>
-        <HistoricoAnaliseModal v-bind="args" :mostrar="show" @fechar="show = false" />
+        <HistoricoAnaliseModal v-bind="args" :mostrar="show" :historico="args.historico" @fechar="show = false" />
       </div>
     `,
     }),

@@ -39,7 +39,7 @@ export const ComAcoes: Story = {
             return {args};
         },
         template: `
-      <PageHeader v-bind="args">
+      <PageHeader v-bind="args" :title="args.title">
         <template #actions>
           <button class="btn btn-outline-secondary btn-sm">Editar</button>
           <button class="btn btn-primary btn-sm">Salvar alterações</button>

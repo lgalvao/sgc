@@ -5,7 +5,7 @@ import {
     criarProcessoFinalizadoFixture,
     criarProcessoFixture,
     criarProcessoMapaDisponibilizadoFixture
-} from './fixtures/fixtures-processos.js';
+} from './fixtures/index.js';
 import {login, USUARIOS} from './helpers/helpers-auth.js';
 import {
     esperarPaginaDetalhesProcesso,

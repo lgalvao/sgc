@@ -341,7 +341,7 @@ WHERE up.unidade_codigo IN (:lista_unidades_usuario)
 
 **Implementação (frontend):**
 
-```typescript
+```vue
 // Verificar se usuário tem perfil ADMIN em alguma unidade
 const temPerfilAdmin = perfisUsuario.some(p => p.perfil === 'ADMIN');
 

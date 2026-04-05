@@ -35,6 +35,7 @@ const Template = (args: any) => ({
       <ModalConfirmacao
         v-bind="args"
         v-model="show"
+        :titulo="args.titulo"
         @confirmar="() => { show = false; }"
       />
     </div>

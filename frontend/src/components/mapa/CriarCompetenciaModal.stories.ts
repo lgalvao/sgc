@@ -51,7 +51,7 @@ export const Criacao: Story = {
         template: `
       <div>
         <button class="btn btn-primary" @click="show = true">Criar competência</button>
-        <CriarCompetenciaModal v-bind="args" :mostrar="show" @fechar="show = false" />
+        <CriarCompetenciaModal v-bind="args" :mostrar="show" :atividades="args.atividades" @fechar="show = false" />
       </div>
     `,
     }),
@@ -73,7 +73,7 @@ export const Edicao: Story = {
             const show = ref(args.mostrar);
             return {args, show};
         },
-        template: '<CriarCompetenciaModal v-bind="args" :mostrar="show" @fechar="show = false" />',
+        template: '<CriarCompetenciaModal v-bind="args" :mostrar="show" :atividades="args.atividades" @fechar="show = false" />',
     }),
 };
 
@@ -93,6 +93,6 @@ export const ComErros: Story = {
             const show = ref(args.mostrar);
             return {args, show};
         },
-        template: '<CriarCompetenciaModal v-bind="args" :mostrar="show" @fechar="show = false" />',
+        template: '<CriarCompetenciaModal v-bind="args" :mostrar="show" :atividades="args.atividades" @fechar="show = false" />',
     }),
 };

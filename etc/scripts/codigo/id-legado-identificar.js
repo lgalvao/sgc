@@ -14,7 +14,7 @@ const SEPARADOR = " | ";
 const PADROES = [
     /\bid\b/g,
     /\bId\b/g,
-    /\{id\}/g,
+    /\{id}/g,
     /\b\w+Id\b/g,
     /\bid[A-Z]\w*\b/g,
     /\bget[A-Z]\w*Id\b/g,

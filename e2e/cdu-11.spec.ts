@@ -3,7 +3,7 @@ import {
     criarProcessoCadastroDisponibilizadoFixture,
     criarProcessoFinalizadoFixture,
     validarProcessoFixture
-} from './fixtures/fixtures-processos.js';
+} from './fixtures/index.js';
 import {navegarParaAtividadesVisualizacao} from './helpers/helpers-atividades.js';
 import {navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
 import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
