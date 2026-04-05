@@ -3,6 +3,7 @@ package sgc.processo.dto;
 import jakarta.validation.constraints.*;
 import org.jspecify.annotations.*;
 import sgc.comum.*;
+import sgc.comum.erros.*;
 import sgc.processo.model.*;
 
 import java.time.*;
@@ -19,8 +20,15 @@ public record AcaoEmBlocoRequest(
 ) {
     public AcaoEmBlocoCommand paraCommand() {
         if (acao == AcaoProcesso.DISPONIBILIZAR) {
-            return new DisponibilizarMapaEmBlocoCommand(unidadeCodigos, dataLimite);
+            return new DisponibilizarMapaEmBlocoCommand(unidadeCodigos, exigirDataLimiteDisponibilizacao());
         }
         return new ProcessarAnaliseEmBlocoCommand(unidadeCodigos, acao);
+    }
+
+    private LocalDate exigirDataLimiteDisponibilizacao() {
+        if (dataLimite == null) {
+            throw new ErroValidacao(Mensagens.DATA_LIMITE_OBRIGATORIA);
+        }
+        return dataLimite;
     }
 }

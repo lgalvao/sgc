@@ -581,10 +581,6 @@ public class ProcessoService {
         if (dataLimiteEtapa2 == null) {
             return dataLimiteEtapa1;
         }
-        if (dataLimiteEtapa1.isAfter(dataLimiteEtapa2)) {
-            throw new IllegalStateException("Subprocesso %d com data limite da etapa 1 posterior à etapa 2"
-                    .formatted(sp.getCodigo()));
-        }
         return dataLimiteEtapa2;
     }
 
