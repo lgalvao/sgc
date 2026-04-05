@@ -72,9 +72,9 @@ public class SubprocessoService {
     }
 
     @Transactional
-    public Subprocesso atualizarEntidade(Long codigo, AtualizarSubprocessoRequest request) {
+    public Subprocesso atualizarEntidade(Long codigo, AtualizarSubprocessoCommand command) {
         Subprocesso subprocesso = consultaService.buscarSubprocesso(codigo);
-        processarAlteracoes(subprocesso, request);
+        processarAlteracoes(subprocesso, command);
         return subprocessoRepo.save(subprocesso);
     }
 
@@ -84,12 +84,12 @@ public class SubprocessoService {
         subprocessoRepo.deleteById(codigo);
     }
 
-    private void processarAlteracoes(Subprocesso sp, AtualizarSubprocessoRequest request) {
-        Optional.ofNullable(request.codUnidade())
+    private void processarAlteracoes(Subprocesso sp, AtualizarSubprocessoCommand command) {
+        Optional.ofNullable(command.codUnidade())
                 .map(unidadeService::buscarPorCodigo)
                 .ifPresent(sp::setUnidade);
 
-        Optional.ofNullable(request.codMapa()).ifPresent(cod -> {
+        Optional.ofNullable(command.codMapa()).ifPresent(cod -> {
             Mapa m = Mapa.builder().codigo(cod).build();
             Mapa mapa = sp.getMapa();
             Long codAtual = mapa != null ? mapa.getCodigo() : null;
@@ -98,16 +98,16 @@ public class SubprocessoService {
             }
         });
 
-        LocalDateTime dataLimiteEtapa1 = request.dataLimiteEtapa1();
+        LocalDateTime dataLimiteEtapa1 = command.dataLimiteEtapa1();
         if (dataLimiteEtapa1 != null) sp.setDataLimiteEtapa1(dataLimiteEtapa1);
 
-        LocalDateTime dataFimEtapa1 = request.dataFimEtapa1();
+        LocalDateTime dataFimEtapa1 = command.dataFimEtapa1();
         if (dataFimEtapa1 != null) sp.setDataFimEtapa1(dataFimEtapa1);
 
-        LocalDateTime dataLimiteEtapa2 = request.dataLimiteEtapa2();
+        LocalDateTime dataLimiteEtapa2 = command.dataLimiteEtapa2();
         if (dataLimiteEtapa2 != null) sp.setDataLimiteEtapa2(dataLimiteEtapa2);
 
-        LocalDateTime dataFimEtapa2 = request.dataFimEtapa2();
+        LocalDateTime dataFimEtapa2 = command.dataFimEtapa2();
         if (dataFimEtapa2 != null) sp.setDataFimEtapa2(dataFimEtapa2);
     }
 
