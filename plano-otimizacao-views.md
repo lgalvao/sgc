@@ -27,6 +27,9 @@ As acoes abaixo foram implementadas e nao requerem mais atencao:
 - cache agressivo da unidade ADMIN com `buscarAdmin()` e TTL de 12h
 - perfis por usuario migrados para `UsuarioPerfilAutorizacaoLeitura` record
 - contratos HTTP e DTOs preservados
+- codigo morto `UsuarioService.buscarTodos()` (JPA `findAll` em view) removido
+- codigo morto `UsuarioConsultaDto.fromEntity()` (navegacao lazy herdada) removido
+- refatorado `Predicate<Unidade>` na elegibilidade (uso do record `UnidadeElegibilidadeInfo`, eliminando `criarUnidadeLeve()`)
 
 ## Diretriz Principal
 
@@ -38,25 +41,10 @@ Views complexas devem ser tratadas como modelos de leitura, nao como entidades r
 - mover composicao para a camada de servico
 - nao usar associacoes bidirecionais entre views
 
+
 ## Tarefas Pendentes
 
-### 1. Remover `UsuarioService.buscarTodos()`
-
-**Arquivo:** [UsuarioService.java#L51](backend/src/main/java/sgc/organizacao/service/UsuarioService.java#L51)
-
-O metodo faz `usuarioRepo.findAll()` na `VW_USUARIO` inteira sem filtro. Nao ha nenhum chamador ativo no backend — a busca por `usuarioService.buscarTodos` retorna vazio. O metodo e codigo morto e deve ser removido.
-
-**Acao:** remover `buscarTodos()` de `UsuarioService`.
-
-### 2. Remover `UsuarioConsultaDto.fromEntity()`
-
-**Arquivo:** [UsuarioConsultaDto.java#L18](backend/src/main/java/sgc/organizacao/dto/UsuarioConsultaDto.java#L18)
-
-O metodo `fromEntity(Usuario)` navega `usuario.getUnidadeLotacao()` mas nao tem nenhum chamador. Todos os caminhos ativos ja usam `fromLeitura()`. E codigo morto herdado do caminho JPA antigo.
-
-**Acao:** remover `fromEntity()` de `UsuarioConsultaDto`.
-
-### 3. Eliminar `ComumRepo` de `ResponsavelUnidadeService`
+### 1. Eliminar `ComumRepo` de `ResponsavelUnidadeService`
 
 **Arquivo:** [ResponsavelUnidadeService.java](backend/src/main/java/sgc/organizacao/service/ResponsavelUnidadeService.java)
 
@@ -81,20 +69,7 @@ O servico depende de `ComumRepo` para 7 chamadas genericas que escondem o custo 
 - L268: o fallback `repo.buscarPorSigla` e improvavel (a consulta por codigo acima ja cobre o caso normal) — avaliar remocao
 - Remover campo `ComumRepo repo` ao final
 
-### 4. Refatorar `Predicate<Unidade>` na elegibilidade
-
-**Arquivo:** [UnidadeHierarquiaService.java#L39](backend/src/main/java/sgc/organizacao/service/UnidadeHierarquiaService.java#L39)
-
-O metodo `buscarArvoreComElegibilidade(Predicate<Unidade>)` obriga a construir uma entidade `Unidade` falsa via `criarUnidadeLeve()` apenas para testar o predicado. Isso e um resquicio do modelo antigo.
-
-**Acao:** trocar `Predicate<Unidade>` por `Predicate<UnidadeHierarquiaLeitura>` ou por um predicado dedicado que opere sobre campos escalares. Eliminar `criarUnidadeLeve()`.
-
-**Impacto:** o unico chamador com predicado customizado e `buscarArvoreComElegibilidade(boolean, Set<Long>)` na L48, que testa:
-- `u.getTipo() != INTERMEDIARIA` → campo disponivel no record
-- `possuiResponsavelEfetivo(u)` → precisa de `usuarioTitulo` do responsavel, ja carregado no mapa `titulosResponsavel`
-- unidadesComMapa / unidadesBloqueadas → acesso por codigo, disponivel no record
-
-### 5. Implementar observabilidade de queries
+### 2. Implementar observabilidade de queries
 
 Nao ha nenhuma instrumentacao de tempo ou contagem de queries por request. Sem isso, nao da para:
 
@@ -113,7 +88,7 @@ Nao ha nenhuma instrumentacao de tempo ou contagem de queries por request. Sem i
 - expor metricas via Micrometer (Actuator)
 - separar statements que tocam `VW_*` de consultas em tabelas normais
 
-### 6. Navegacao `getUnidadeSuperior()` fora do modulo organizacional
+### 3. Navegacao `getUnidadeSuperior()` fora do modulo organizacional
 
 A associacao `Unidade.unidadeSuperior` e acessada via navegacao lazy em **varios servicos** fora do modulo organizacional:
 
@@ -133,7 +108,7 @@ Esses acessos sao navegacoes lazy sobre `VW_UNIDADE` que podem gerar queries adi
 
 **Risco:** essa e a maior mudanca estrutural restante. Migrar por fluxo, nao por classe.
 
-### 7. Navegacao `getUnidadeLotacao()` em `UsuarioFacade`
+### 4. Navegacao `getUnidadeLotacao()` em `UsuarioFacade`
 
 **Arquivo:** [UsuarioFacade.java#L150](backend/src/main/java/sgc/organizacao/UsuarioFacade.java#L150)
 
@@ -141,7 +116,7 @@ O metodo `toAdministradorDto` navega `usuario.getUnidadeLotacao()` para extrair 
 
 **Acao:** trocar para `buscarPorTituloComUnidadeLotacao()` (que ja existe no `UsuarioRepo`) ou criar projecao leve `AdministradorLeitura`.
 
-### 8. Reduzir associacoes JPA entre views
+### 5. Reduzir associacoes JPA entre views
 
 As associacoes abaixo ainda existem nas entidades mas a maioria ja nao e usada nos fluxos principais:
 
@@ -168,14 +143,12 @@ As associacoes abaixo ainda existem nas entidades mas a maioria ja nao e usada n
 
 | Prioridade | Tarefa | Risco | Esforco |
 |---|---|---|---|
-| 1 | Remover `buscarTodos()` e `fromEntity()` (tarefas 1 e 2) | Baixo | Minimo |
-| 2 | Eliminar `ComumRepo` de `ResponsavelUnidadeService` (tarefa 3) | Baixo | Medio |
-| 3 | Refatorar `Predicate<Unidade>` na elegibilidade (tarefa 4) | Baixo | Medio |
-| 4 | Corrigir lazy de `getUnidadeLotacao()` em `UsuarioFacade` (tarefa 7) | Baixo | Minimo |
-| 5 | Remover associacoes orfas (tarefa 8 — parte facil) | Baixo | Medio |
-| 6 | Observabilidade de queries (tarefa 5) | Baixo | Medio |
-| 7 | Migrar navegacao `getUnidadeSuperior()` para mapa cacheado (tarefa 6) | Medio | Alto |
-| 8 | Remover associacoes restantes (tarefa 8 — parte dificil) | Alto | Alto |
+| 1 | Eliminar `ComumRepo` de `ResponsavelUnidadeService` (tarefa 1) | Baixo | Medio |
+| 2 | Corrigir lazy de `getUnidadeLotacao()` em `UsuarioFacade` (tarefa 4) | Baixo | Minimo |
+| 3 | Remover associacoes orfas (tarefa 5 — parte facil) | Baixo | Medio |
+| 4 | Observabilidade de queries (tarefa 2) | Baixo | Medio |
+| 5 | Migrar navegacao `getUnidadeSuperior()` para mapa cacheado (tarefa 3) | Medio | Alto |
+| 6 | Remover associacoes restantes (tarefa 5 — parte dificil) | Alto | Alto |
 
 ## Riscos e Cuidados
 

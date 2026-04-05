@@ -4,10 +4,10 @@ import lombok.*;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
-import sgc.comum.*;
+import sgc.comum.Mensagens;
 import sgc.comum.config.CacheConfig;
 import sgc.comum.erros.*;
-import sgc.comum.model.*;
+
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
 
@@ -34,7 +34,7 @@ public class ResponsavelUnidadeService {
     private final UsuarioRepo usuarioRepo;
     private final AtribuicaoTemporariaRepo atribuicaoTemporariaRepo;
     private final ResponsabilidadeRepo responsabilidadeRepo;
-    private final ComumRepo repo;
+
 
     /**
      * Busca todas as atribuições temporárias cadastradas.
@@ -85,10 +85,12 @@ public class ResponsavelUnidadeService {
      */
     @CacheEvict(cacheNames = CacheConfig.CACHE_DIAGNOSTICO_ORGANIZACIONAL, allEntries = true)
     public void criarAtribuicaoTemporaria(Long codUnidade, CriarAtribuicaoRequest request) {
-        Unidade unidade = repo.buscar(Unidade.class, codUnidade);
+        Unidade unidade = unidadeRepo.findById(codUnidade)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(Unidade.class.getSimpleName(), codUnidade));
 
         String titulo = request.tituloEleitoralUsuario();
-        Usuario usuario = repo.buscar(Usuario.class, titulo);
+        Usuario usuario = usuarioRepo.findById(titulo)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(Usuario.class.getSimpleName(), titulo));
 
         LocalDate inicio = request.dataInicio() != null ? request.dataInicio() : LocalDate.now();
 
@@ -116,7 +118,8 @@ public class ResponsavelUnidadeService {
     public Usuario buscarResponsavelAtual(String siglaUnidade) {
         Long unidadeCodigo = buscarCodigoUnidadePorSigla(siglaUnidade);
         ResponsabilidadeUnidadeLeitura responsabilidade = buscarResponsabilidadeDetalhada(unidadeCodigo);
-        return repo.buscar(Usuario.class, responsabilidade.usuarioTitulo());
+        return usuarioRepo.findById(responsabilidade.usuarioTitulo())
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(Usuario.class.getSimpleName(), responsabilidade.usuarioTitulo()));
     }
 
     /**
@@ -134,7 +137,8 @@ public class ResponsavelUnidadeService {
     @Transactional(readOnly = true)
     public ResponsavelDto buscarResponsabilidadeDetalhadaAtual(Long unidadeCodigo) {
         ResponsabilidadeUnidadeLeitura responsabilidade = buscarResponsabilidadeDetalhada(unidadeCodigo);
-        Usuario usuario = repo.buscar(Usuario.class, responsabilidade.usuarioTitulo());
+        Usuario usuario = usuarioRepo.findById(responsabilidade.usuarioTitulo())
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(Usuario.class.getSimpleName(), responsabilidade.usuarioTitulo()));
 
         return ResponsavelDto.builder()
                 .usuario(UsuarioResumoDto.fromEntityObrigatorio(usuario))
@@ -150,10 +154,11 @@ public class ResponsavelUnidadeService {
      * @throws ErroEntidadeNaoEncontrada se não houver responsável
      */
     public UnidadeResponsavelDto buscarResponsavelUnidade(Long unidadeCodigo) {
-        ResponsabilidadeUnidadeLeitura responsabilidade = buscarResponsabilidadeDetalhada(unidadeCodigo);
-        Usuario responsavel = repo.buscar(Usuario.class, responsabilidade.usuarioTitulo());
-        Usuario titularOficial = repo.buscar(Usuario.class, obterTituloTitularObrigatorio(responsabilidade));
-        return montarResponsavelDto(unidadeCodigo, responsavel, titularOficial);
+        List<ResponsabilidadeUnidadeResumoLeitura> lista = responsabilidadeRepo.listarResumosPorCodigosUnidade(List.of(unidadeCodigo));
+        if (lista.isEmpty()) {
+            throw new ErroEntidadeNaoEncontrada(Responsabilidade.class.getSimpleName(), unidadeCodigo);
+        }
+        return montarResponsavelDto(lista.getFirst());
     }
 
     /**
@@ -173,14 +178,6 @@ public class ResponsavelUnidadeService {
                 ));
     }
 
-    private String obterTituloTitularObrigatorio(ResponsabilidadeUnidadeLeitura responsabilidade) {
-        String tituloTitular = responsabilidade.tituloTitular();
-        if (tituloTitular == null || tituloTitular.isBlank()) {
-            throw new IllegalStateException("Titular oficial ausente para unidade %d".formatted(responsabilidade.unidadeCodigo()));
-        }
-        return tituloTitular;
-    }
-
     private String obterTituloTitularObrigatorio(ResponsabilidadeUnidadeResumoLeitura responsabilidade) {
         String tituloTitular = responsabilidade.titularTitulo();
         if (tituloTitular == null || tituloTitular.isBlank()) {
@@ -189,27 +186,6 @@ public class ResponsavelUnidadeService {
         return tituloTitular;
     }
 
-    private UnidadeResponsavelDto montarResponsavelDto(Long unidadeCodigo, Usuario responsavel, Usuario titularOficial) {
-        // Se o responsável é o próprio titular
-        if (responsavel.getTituloEleitoral().equals(titularOficial.getTituloEleitoral())) {
-            return UnidadeResponsavelDto.builder()
-                    .unidadeCodigo(unidadeCodigo)
-                    .titularTitulo(responsavel.getTituloEleitoral())
-                    .titularNome(responsavel.getNome())
-                    .substitutoTitulo(null)
-                    .substitutoNome(null)
-                    .build();
-        }
-
-        // Caso o responsável seja um substituto ou atribuição temporária
-        return UnidadeResponsavelDto.builder()
-                .unidadeCodigo(unidadeCodigo)
-                .titularTitulo(titularOficial.getTituloEleitoral())
-                .titularNome(titularOficial.getNome())
-                .substitutoTitulo(responsavel.getTituloEleitoral())
-                .substitutoNome(responsavel.getNome())
-                .build();
-    }
 
     private UnidadeResponsavelDto montarResponsavelDto(ResponsabilidadeUnidadeResumoLeitura responsabilidade) {
         String titularTitulo = obterTituloTitularObrigatorio(responsabilidade);
@@ -265,7 +241,7 @@ public class ResponsavelUnidadeService {
 
     private Long buscarCodigoUnidadePorSigla(String siglaUnidade) {
         return unidadeRepo.buscarCodigoAtivoPorSigla(siglaUnidade)
-                .orElseGet(() -> repo.buscarPorSigla(Unidade.class, siglaUnidade).getCodigo());
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(Unidade.class.getSimpleName(), siglaUnidade));
     }
 
     private ResponsabilidadeUnidadeLeitura buscarResponsabilidadeDetalhada(Long unidadeCodigo) {

@@ -5,7 +5,7 @@ import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
 import sgc.comum.erros.*;
-import sgc.comum.model.*;
+
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
 
@@ -20,9 +20,6 @@ import static org.mockito.Mockito.*;
 class ResponsavelUnidadeServiceTest {
     @Mock
     private AtribuicaoTemporariaRepo atribuicaoTemporariaRepo;
-
-    @Mock
-    private ComumRepo repo;
 
     @Mock
     private UsuarioRepo usuarioRepo;
@@ -103,7 +100,7 @@ class ResponsavelUnidadeServiceTest {
             service.buscarTodasAtribuicoes();
 
             verify(usuarioRepo).listarPorTitulosComUnidadeLotacao(List.of("111", "222"));
-            verify(repo, never()).buscar(eq(Usuario.class), anyString());
+            verify(usuarioRepo).listarPorTitulosComUnidadeLotacao(List.of("111", "222"));
         }
     }
 
@@ -133,8 +130,8 @@ class ResponsavelUnidadeServiceTest {
             usuario.setTituloEleitoral("123456789012");
             usuario.setMatricula("12345678");
 
-            when(repo.buscar(Unidade.class, codUnidade)).thenReturn(unidade);
-            when(repo.buscar(Usuario.class, "123456789012")).thenReturn(usuario);
+            when(unidadeRepo.findById(codUnidade)).thenReturn(Optional.of(unidade));
+            when(usuarioRepo.findById("123456789012")).thenReturn(Optional.of(usuario));
 
             service.criarAtribuicaoTemporaria(codUnidade, request);
 
@@ -161,8 +158,8 @@ class ResponsavelUnidadeServiceTest {
             Usuario usuario = new Usuario();
             usuario.setTituloEleitoral("123");
 
-            when(repo.buscar(Unidade.class, codUnidade)).thenReturn(unidade);
-            when(repo.buscar(Usuario.class, "123")).thenReturn(usuario);
+            when(unidadeRepo.findById(codUnidade)).thenReturn(Optional.of(unidade));
+            when(usuarioRepo.findById("123")).thenReturn(Optional.of(usuario));
 
             service.criarAtribuicaoTemporaria(codUnidade, request);
 
@@ -179,8 +176,8 @@ class ResponsavelUnidadeServiceTest {
             LocalDate dataTermino = LocalDate.of(2024, 2, 9);
             CriarAtribuicaoRequest request = new CriarAtribuicaoRequest("123", dataInicio, dataTermino, "Justificativa");
 
-            when(repo.buscar(Unidade.class, codUnidade)).thenReturn(new Unidade());
-            when(repo.buscar(Usuario.class, "123")).thenReturn(new Usuario().setTituloEleitoral("123"));
+            when(unidadeRepo.findById(codUnidade)).thenReturn(Optional.of(new Unidade()));
+            when(usuarioRepo.findById("123")).thenReturn(Optional.of(new Usuario().setTituloEleitoral("123")));
 
             assertThatThrownBy(() -> service.criarAtribuicaoTemporaria(codUnidade, request))
                     .isInstanceOf(ErroValidacao.class);
@@ -214,7 +211,7 @@ class ResponsavelUnidadeServiceTest {
             when(unidadeRepo.buscarCodigoAtivoPorSigla(siglaUnidade)).thenReturn(Optional.of(1L));
             when(responsabilidadeRepo.buscarLeituraDetalhadaPorCodigoUnidade(1L))
                     .thenReturn(Optional.of(new ResponsabilidadeUnidadeLeitura(1L, "123456789012", null, null, null, null)));
-            when(repo.buscar(Usuario.class, "123456789012")).thenReturn(usuarioCompleto);
+            when(usuarioRepo.findById("123456789012")).thenReturn(Optional.of(usuarioCompleto));
 
             Usuario resultado = service.buscarResponsavelAtual(siglaUnidade);
 
@@ -233,27 +230,11 @@ class ResponsavelUnidadeServiceTest {
 
             Long unidadeCodigo = 1L;
 
-            Usuario titularOficial = new Usuario();
-            titularOficial.setTituloEleitoral("111111111111");
-            titularOficial.setNome("João silva");
-
-            Usuario substituto = new Usuario();
-            substituto.setTituloEleitoral("222222222222");
-            substituto.setNome("Maria santos");
-
-            Unidade unidade = new Unidade();
-            unidade.setCodigo(unidadeCodigo);
-            unidade.setTituloTitular("111111111111");
-
-            Responsabilidade responsabilidade = new Responsabilidade();
-            responsabilidade.setUnidadeCodigo(unidadeCodigo);
-            responsabilidade.setUsuarioTitulo("222222222222");
-            responsabilidade.setUnidade(unidade);
-
-            when(responsabilidadeRepo.buscarLeituraDetalhadaPorCodigoUnidade(unidadeCodigo))
-                    .thenReturn(Optional.of(new ResponsabilidadeUnidadeLeitura(unidadeCodigo, "222222222222", "111111111111", null, null, null)));
-            when(repo.buscar(Usuario.class, "222222222222")).thenReturn(substituto);
-            when(repo.buscar(Usuario.class, "111111111111")).thenReturn(titularOficial);
+            ResponsabilidadeUnidadeResumoLeitura resumo = new ResponsabilidadeUnidadeResumoLeitura(
+                    unidadeCodigo, "222222222222", "Maria santos", "111111111111", "João silva"
+            );
+            when(responsabilidadeRepo.listarResumosPorCodigosUnidade(List.of(unidadeCodigo)))
+                    .thenReturn(List.of(resumo));
 
             UnidadeResponsavelDto resultado = service.buscarResponsavelUnidade(unidadeCodigo);
 
@@ -267,22 +248,11 @@ class ResponsavelUnidadeServiceTest {
         void deveBuscarResponsavelQuandoTitularEhOProprioResponsavel() {
             Long unidadeCodigo = 1L;
 
-            Usuario titular = new Usuario();
-            titular.setTituloEleitoral("111111111111");
-            titular.setNome("João Silva");
-
-            Unidade unidade = new Unidade();
-            unidade.setCodigo(unidadeCodigo);
-            unidade.setTituloTitular("111111111111");
-
-            Responsabilidade responsabilidade = new Responsabilidade();
-            responsabilidade.setUnidadeCodigo(unidadeCodigo);
-            responsabilidade.setUsuarioTitulo("111111111111");
-            responsabilidade.setUnidade(unidade);
-
-            when(responsabilidadeRepo.buscarLeituraDetalhadaPorCodigoUnidade(unidadeCodigo))
-                    .thenReturn(Optional.of(new ResponsabilidadeUnidadeLeitura(unidadeCodigo, "111111111111", "111111111111", null, null, null)));
-            when(repo.buscar(Usuario.class, "111111111111")).thenReturn(titular);
+            ResponsabilidadeUnidadeResumoLeitura resumo = new ResponsabilidadeUnidadeResumoLeitura(
+                    unidadeCodigo, "111111111111", "João Silva", "111111111111", "João Silva"
+            );
+            when(responsabilidadeRepo.listarResumosPorCodigosUnidade(List.of(unidadeCodigo)))
+                    .thenReturn(List.of(resumo));
 
             UnidadeResponsavelDto resultado = service.buscarResponsavelUnidade(unidadeCodigo);
 
