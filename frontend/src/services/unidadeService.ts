@@ -3,50 +3,95 @@ import {apiGet} from "@/utils/apiUtils";
 
 // Mappers internos (formerly in /mappers/unidades.ts)
 
-export function mapUnidadeSnapshot(obj: any): UnidadeSnapshot {
+type RegistroBruto = Record<string, unknown>;
+
+function asRegistro(valor: unknown): RegistroBruto {
+    return typeof valor === "object" && valor !== null ? valor as RegistroBruto : {};
+}
+
+function lerTexto(obj: RegistroBruto, ...chaves: string[]): string {
+    for (const chave of chaves) {
+        const valor = obj[chave];
+        if (typeof valor === "string") {
+            return valor;
+        }
+    }
+
+    return "";
+}
+
+function lerNumero(obj: RegistroBruto, ...chaves: string[]): number {
+    for (const chave of chaves) {
+        const valor = obj[chave];
+        if (typeof valor === "number") {
+            return valor;
+        }
+    }
+
+    return 0;
+}
+
+function lerBooleanoOpcional(obj: RegistroBruto, chave: string): boolean | undefined {
+    const valor = obj[chave];
+    return typeof valor === "boolean" ? valor : undefined;
+}
+
+function lerLista(obj: RegistroBruto, ...chaves: string[]): unknown[] {
+    for (const chave of chaves) {
+        const valor = obj[chave];
+        if (Array.isArray(valor)) {
+            return valor;
+        }
+    }
+
+    return [];
+}
+
+export function mapUnidadeSnapshot(objetoBruto: unknown): UnidadeSnapshot {
+    const obj = asRegistro(objetoBruto);
+
     return {
-        codigo: obj.codigo ?? 0,
-        nome: obj.nome ?? obj.nome_unidade ?? "",
-        sigla: obj.sigla ?? obj.sigla_unidade ?? obj.unidade ?? "",
-        filhas: Array.isArray(obj.filhas || obj.subunidades)
-            ? (obj.filhas || obj.subunidades).map(mapUnidadeSnapshot)
-            : [],
+        codigo: lerNumero(obj, "codigo"),
+        nome: lerTexto(obj, "nome", "nome_unidade"),
+        sigla: lerTexto(obj, "sigla", "sigla_unidade", "unidade"),
+        filhas: lerLista(obj, "filhas", "subunidades").map(mapUnidadeSnapshot),
     };
 }
 
-export function mapUnidade(obj: any): Unidade {
+export function mapUnidade(objetoBruto: unknown): Unidade {
+    const obj = asRegistro(objetoBruto);
+    const responsavelBruto = obj.responsavel;
+    const responsavel = asRegistro(responsavelBruto);
+
     return {
-        codigo: obj.codigo ?? obj.codigo_unidade ?? 0,
-        sigla: obj.sigla ?? obj.sigla_unidade ?? "",
-        tipo: obj.tipo ?? obj.tipo_unidade ?? "",
-        nome: obj.nome ?? obj.nome_unidade ?? "",
-        isElegivel: obj.isElegivel,
-        usuarioCodigo:
-            obj.usuarioCodigo ?? obj.idServidorTitular ?? 0,
-        responsavel: obj.responsavel
+        codigo: lerNumero(obj, "codigo", "codigo_unidade"),
+        sigla: lerTexto(obj, "sigla", "sigla_unidade"),
+        tipo: lerTexto(obj, "tipo", "tipo_unidade"),
+        nome: lerTexto(obj, "nome", "nome_unidade"),
+        isElegivel: lerBooleanoOpcional(obj, "isElegivel"),
+        usuarioCodigo: lerNumero(obj, "usuarioCodigo", "idServidorTitular"),
+        responsavel: responsavelBruto
             ? {
-                codigo: obj.responsavel.codigo ?? 0,
-                nome: obj.responsavel.nome ?? "",
-                tituloEleitoral: obj.responsavel.tituloEleitoral ?? "",
-                unidade: obj.responsavel.unidade ?? ({} as Unidade),
-                email: obj.responsavel.email ?? "",
-                ramal: obj.responsavel.ramal ?? "",
-                usuarioTitulo: obj.responsavel.usuarioTitulo ?? "",
-                unidadeCodigo: obj.responsavel.unidadeCodigo ?? 0,
-                usuarioCodigo: obj.responsavel.usuarioCodigo ?? obj.responsavel.idServidorResponsavel ?? 0,
-                tipo: obj.responsavel.tipo ?? "",
-                dataInicio: obj.responsavel.dataInicio ?? "",
-                dataFim: obj.responsavel.dataFim ?? null,
+                codigo: lerNumero(responsavel, "codigo"),
+                nome: lerTexto(responsavel, "nome"),
+                tituloEleitoral: lerTexto(responsavel, "tituloEleitoral"),
+                unidade: mapUnidade(responsavel.unidade),
+                email: lerTexto(responsavel, "email"),
+                ramal: lerTexto(responsavel, "ramal"),
+                usuarioTitulo: lerTexto(responsavel, "usuarioTitulo"),
+                unidadeCodigo: lerNumero(responsavel, "unidadeCodigo"),
+                usuarioCodigo: lerNumero(responsavel, "usuarioCodigo", "idServidorResponsavel"),
+                tipo: lerTexto(responsavel, "tipo"),
+                dataInicio: lerTexto(responsavel, "dataInicio"),
+                dataFim: typeof responsavel.dataFim === "string" ? responsavel.dataFim : null,
             }
             : null,
-        filhas: Array.isArray(obj.filhas || obj.subunidades)
-            ? (obj.filhas || obj.subunidades).map(mapUnidade)
-            : [],
+        filhas: lerLista(obj, "filhas", "subunidades").map(mapUnidade),
     };
 }
 
-export function mapUnidadesArray(arr: any[] = []): Unidade[] {
-    return arr.map(mapUnidade);
+export function mapUnidadesArray(arr: Unidade[] = []): Unidade[] {
+    return (arr as unknown[]).map(mapUnidade);
 }
 
 export async function buscarTodasUnidades() {
@@ -81,7 +126,7 @@ export async function buscarArvoreUnidade(codigo: number) {
 }
 
 export async function buscarReferenciaMapaVigente(codigo: number): Promise<MapaVigenteReferencia | null> {
-    return await apiGet(`/unidades/${codigo}/mapa-vigente/referencia`) ?? null;
+    return (await apiGet(`/unidades/${codigo}/mapa-vigente/referencia`)) ?? null;
 }
 
 export async function buscarSubordinadas(sigla: string) {
@@ -89,5 +134,5 @@ export async function buscarSubordinadas(sigla: string) {
 }
 
 export async function buscarSuperior(sigla: string) {
-    return apiGet(`/unidades/sigla/${sigla}/superior`) || null;
+    return apiGet(`/unidades/sigla/${sigla}/superior`);
 }

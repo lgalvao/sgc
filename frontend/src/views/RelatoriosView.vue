@@ -136,6 +136,10 @@ const opcoesUnidades = computed<Array<{ value: number | null, text: string }>>((
   return [...opcoesBase, { value: codigoUnidade, text: sigla }];
 });
 
+function possuiCodigo(valor: unknown): valor is {codigo: number | string} {
+  return typeof valor === "object" && valor !== null && "codigo" in valor;
+}
+
 function obterCodigoUnidadeSelecionada() {
   if (!perfil.perfilSelecionado.value || !perfilStore.unidadeSelecionada) {
     return null;
@@ -146,7 +150,7 @@ function obterCodigoUnidadeSelecionada() {
     return unidadeSelecionada;
   }
 
-  if (typeof unidadeSelecionada === "object" && unidadeSelecionada !== null && "codigo" in unidadeSelecionada) {
+  if (possuiCodigo(unidadeSelecionada)) {
     return Number(unidadeSelecionada.codigo);
   }
 
@@ -210,7 +214,7 @@ const gerarRelatorioMapas = async () => {
     await executarComCarregamento(async () => {
       await downloadRelatorioMapasPdf(
         codProcesso,
-        unidadeIdSelecionadaMapas.value || undefined
+        unidadeIdSelecionadaMapas.value ?? undefined
       );
     }, TEXTOS.relatorios.ERRO_GERAR, gerandoMapas);
 }

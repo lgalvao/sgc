@@ -39,6 +39,7 @@ node etc/scripts/sgc.js backend java corrigir-fqn --dry-run
 
 ```bash
 node etc/scripts/sgc.js frontend cobertura verificar
+node etc/scripts/sgc.js frontend cobertura priorizar-defensivos
 node etc/scripts/sgc.js frontend mensagens extrair
 node etc/scripts/sgc.js frontend mensagens analisar
 node etc/scripts/sgc.js frontend validacoes auditar

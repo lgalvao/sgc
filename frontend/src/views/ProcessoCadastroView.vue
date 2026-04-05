@@ -196,6 +196,13 @@ const exibirAlertaDiagnostico = computed(() =>
     isAdmin.value && (!!erroDiagnosticoOrganizacional.value || diagnosticoOrganizacional.value?.possuiViolacoes === true)
 );
 
+function extrairErrosGenericos(error: ReturnType<typeof normalizeError>): string[] {
+  return error.subErrors
+      ?.filter(subError => !subError.field)
+      .map(subError => subError.message ?? "")
+      .filter(Boolean) ?? [];
+}
+
 function coletarCodigosElegiveis(unidadesArvore: Unidade[]): Set<number> {
   const codigosElegiveis = new Set<number>();
 
@@ -221,15 +228,15 @@ function sincronizarUnidadesSelecionadasElegiveis(unidadesArvore: Unidade[]) {
   }
 }
 
-async function buscarUnidadesParaProcesso(tipoProcesso: string, codProcesso?: number) {
+async function buscarUnidadesParaProcesso(tipoProcesso: TipoProcesso, codProcesso?: number) {
   isLoadingUnidades.value = true;
   try {
     const response = await buscarArvoreComElegibilidade(tipoProcesso, codProcesso);
-    const unidadesMapeadas = mapUnidadesArray(response as any);
+    const unidadesMapeadas = mapUnidadesArray(Array.isArray(response) ? response : []);
     unidades.value = unidadesMapeadas;
     sincronizarUnidadesSelecionadasElegiveis(unidadesMapeadas);
-  } catch (err: any) {
-    logger.error("Erro ao buscar unidades:", err);
+  } catch (error) {
+    logger.error("Erro ao buscar unidades:", error);
   } finally {
     isLoadingUnidades.value = false;
   }
@@ -273,7 +280,7 @@ onMounted(async () => {
 
         processoEditando.value = processo;
         descricao.value = processo.descricao;
-        tipo.value = processo.tipo as any;
+        tipo.value = processo.tipo;
         dataLimite.value = processo.dataLimite.split("T")[0];
         unidadesSelecionadas.value = processo.unidades.map((u) => u.codUnidade);
         await buscarUnidadesParaProcesso(
@@ -309,7 +316,7 @@ watch(tipo, async (novoTipo) => {
   }
 });
 
-function handleApiErrors(error: any, title: string, defaultMsg: string) {
+function handleApiErrors(error: unknown, title: string, defaultMsg: string) {
   clearErrors();
   clear();
 
@@ -321,12 +328,12 @@ function handleApiErrors(error: any, title: string, defaultMsg: string) {
     if (fieldErrors.value.dataLimiteEtapa1) fieldErrors.value.dataLimite = fieldErrors.value.dataLimiteEtapa1;
 
     const hasFieldErrors = hasErrors();
-    const genericErrors = erroNormalizado.subErrors?.filter(e => !e.field).map(e => e.message || '') || [];
+    const genericErrors = extrairErrosGenericos(erroNormalizado);
 
     if (!hasFieldErrors || genericErrors.length > 0) {
       notifyStructured(
           erroNormalizado.message || defaultMsg,
-          genericErrors as string[],
+          genericErrors,
           {
             variant: 'danger',
             stackTrace: erroNormalizado.stackTrace || undefined,
@@ -402,9 +409,16 @@ async function confirmarIniciarProcesso() {
   }
 
   try {
+    if (!tipo.value) {
+      notify(TEXTOS.processo.cadastro.ERRO_INICIAR_PROCESSO, "danger");
+      mostrarModalConfirmacao.value = false;
+      isLoading.value = false;
+      return;
+    }
+
     await processoService.iniciarProcesso(
         codigoProcesso,
-        tipo.value as TipoProcesso,
+        tipo.value,
         unidadesSelecionadas.value,
     );
 

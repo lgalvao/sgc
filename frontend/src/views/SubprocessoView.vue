@@ -10,8 +10,8 @@
     <div v-if="subprocesso">
       <div data-testid="header-subprocesso">
         <PageHeader
-            :subtitle="subprocesso.unidade.nome"
-            :title="subprocesso.unidade.sigla"
+            :subtitle="subprocesso.unidade?.nome ?? ''"
+            :title="subprocesso.unidade?.sigla ?? props.siglaUnidade"
             title-test-codigo="subprocesso-header__txt-header-unidade"
         >
           <template #actions>
@@ -215,7 +215,7 @@
       @confirmar="enviarLembreteConfirmado"
   >
     <p data-testid="txt-modelo-lembrete">
-      {{ TEXTOS.subprocesso.LEMBRETE_MODELO_PREFIXO(subprocesso?.unidade.sigla ?? '') }}
+      {{ TEXTOS.subprocesso.LEMBRETE_MODELO_PREFIXO(subprocesso?.unidade?.sigla ?? '') }}
     </p>
   </ModalConfirmacao>
 </template>

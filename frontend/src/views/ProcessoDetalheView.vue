@@ -144,6 +144,27 @@ type ConfiguracaoTextoAcaoBloco = {
   texto: string;
   mensagemSucesso: string;
 };
+type LinhaParticipante = {
+  clickable?: boolean;
+  sigla?: string;
+  situacaoSubprocesso?: SituacaoSubprocesso;
+  situacao?: SituacaoSubprocesso;
+  unidadeCodigo: number;
+  unidadeSigla: string;
+  unidadeNome: string;
+  ultimaDataLimite?: string;
+  localizacaoCodigo?: number;
+};
+type ModalAcaoBlocoRef = {
+  abrir: () => void;
+  fechar: () => void;
+  setProcessando: (valor: boolean) => void;
+  setErro: (mensagem: string) => void;
+};
+type LinhaCliqueSubprocesso = {
+  clickable?: boolean;
+  sigla?: string;
+};
 
 const route = useRoute();
 const router = useRouter();
@@ -154,7 +175,7 @@ const codProcesso = Number(route.params.codProcesso || route.query.codProcesso);
 const processo = ref<Processo | null>(null);
 const subprocessosElegiveis = ref<SubprocessoElegivel[]>([]);
 const lastError = ref<NormalizedError | null>(null);
-const modalBlocoRef = ref<any>(null);
+const modalBlocoRef = ref<ModalAcaoBlocoRef | null>(null);
 const mostrarModalFinalizacao = ref(false);
 const acaoBlocoAtual = ref<AcaoBloco>("aceitar");
 const processandoAcaoBloco = ref(false);
@@ -299,7 +320,7 @@ function obterSituacao(item: { situacaoSubprocesso?: SituacaoSubprocesso, situac
   return item.situacaoSubprocesso ?? item.situacao;
 }
 
-function obterContextoBloco(unidades: any[]): ContextoBloco {
+function obterContextoBloco(unidades: Array<Pick<LinhaParticipante, "situacaoSubprocesso" | "situacao">>): ContextoBloco {
   const temCadastro = unidades.some(u => {
     const situacao = obterSituacao(u);
     return situacao ? isSituacaoCadastroPronto(situacao) : false;
@@ -400,7 +421,7 @@ const mensagemSucessoAcaoBloco = computed(() => {
   return obterConfiguracaoAcaoBloco(acaoBlocoAtual.value, contextoAtualAcaoBloco.value).mensagemSucesso;
 });
 
-async function abrirDetalhesUnidade(row: any) {
+async function abrirDetalhesUnidade(row: LinhaCliqueSubprocesso) {
   if (!row.clickable || !row.sigla) {
     return;
   }
@@ -428,9 +449,9 @@ async function confirmarFinalizacao() {
     await processoService.finalizarProcesso(codProcesso);
     toastStore.setPending(TEXTOS.sucesso.PROCESSO_FINALIZADO);
     await router.push("/painel");
-  } catch (error: any) {
+  } catch (error) {
     lastError.value = normalizeError(error);
-    const mensagem = lastError.value?.message || error.message || TEXTOS.processo.ERRO_PADRAO;
+    const mensagem = lastError.value?.message || TEXTOS.processo.ERRO_PADRAO;
     notify(mensagem, 'danger');
   }
 }
@@ -468,9 +489,9 @@ async function executarAcaoBloco(dados: { ids: number[], dataLimite?: string }) 
     }
     notify(mensagemSucesso, 'success');
     await carregarContextoCompleto();
-  } catch (error: any) {
+  } catch (error) {
     lastError.value = normalizeError(error);
-    modalBlocoRef.value?.setErro(error.message || TEXTOS.processo.ERRO_ACAO_BLOCO);
+    modalBlocoRef.value?.setErro(lastError.value?.message || TEXTOS.processo.ERRO_ACAO_BLOCO);
     modalBlocoRef.value?.setProcessando(false);
   } finally {
     processandoAcaoBloco.value = false;

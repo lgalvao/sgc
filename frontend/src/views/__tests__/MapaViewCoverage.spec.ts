@@ -7,7 +7,7 @@ import * as useFluxoMapaModule from "@/composables/useFluxoMapa";
 import {useMapas} from "@/composables/useMapas";
 import * as subprocessoService from "@/services/subprocessoService";
 import MapaView from "../MapaView.vue";
-import type {ContextoEdicaoSubprocesso} from "@/types/tipos";
+import type {ContextoEdicaoSubprocesso, MapaCompleto, Subprocesso, SubprocessoDetalhe, Unidade} from "@/types/tipos";
 import {TipoProcesso, SituacaoSubprocesso} from "@/types/tipos";
 
 type CompetenciaMapa = {
@@ -24,6 +24,7 @@ type MapaViewVm = {
     mostrarModalDisponibilizar: boolean;
     loadingImpacto: boolean;
     loadingExclusao: boolean;
+    loadingDisponibilizacao: boolean;
     notificacaoDisponibilizacao: string;
     campoBusca?: string;
     atividades: Array<{codigo: number; descricao: string}>;
@@ -33,6 +34,7 @@ type MapaViewVm = {
     atividadesSemCompetencia: Array<{codigo: number; descricao: string}>;
     existeCompetenciaSemAtividade: boolean;
     associacoesMapaValidas: boolean;
+    unidade: Unidade | null;
     abrirModalImpacto: () => Promise<void> | void;
     fecharModalImpacto: () => void;
     abrirModalCriarLimpo: () => void;
@@ -58,10 +60,74 @@ type FluxoMapaMock = {
     disponibilizarMapa: ReturnType<typeof vi.fn>;
 };
 
-function criarContextoEdicao(): Pick<ContextoEdicaoSubprocesso, "atividadesDisponiveis" | "unidade"> {
+function criarMapaCompleto(competencias: CompetenciaMapa[] = []): MapaCompleto {
+    return {
+        codigo: 100,
+        subprocessoCodigo: 123,
+        observacoes: "",
+        competencias: competencias as MapaCompleto["competencias"],
+        situacao: "CRIADO",
+    };
+}
+
+function criarContextoEdicao(): ContextoEdicaoSubprocesso {
+    const unidade: Unidade = {codigo: 1, sigla: "TESTE", nome: "Teste", filhas: [], usuarioCodigo: 0, responsavel: null};
+    const subprocesso: Subprocesso = {
+        codigo: 123,
+        unidade,
+        situacao: SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO,
+        dataLimite: "2025-01-01T00:00:00",
+        dataFimEtapa1: "",
+        dataLimiteEtapa2: "",
+        atividades: [],
+        codUnidade: unidade.codigo,
+    };
+    const detalhes: SubprocessoDetalhe = {
+        codigo: 123,
+        unidade,
+        titular: null,
+        responsavel: null,
+        situacao: SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO,
+        localizacaoAtual: "TESTE",
+        processoDescricao: "Processo",
+        dataCriacaoProcesso: "2024-01-01T00:00:00",
+        ultimaDataLimiteSubprocesso: "2025-01-01T00:00:00",
+        tipoProcesso: TipoProcesso.MAPEAMENTO,
+        prazoEtapaAtual: "2025-01-01T00:00:00",
+        isEmAndamento: true,
+        etapaAtual: 2,
+        movimentacoes: [],
+        elementosProcesso: [],
+        permissoes: {
+            podeEditarCadastro: false,
+            podeDisponibilizarCadastro: false,
+            podeDevolverCadastro: false,
+            podeAceitarCadastro: false,
+            podeHomologarCadastro: false,
+            podeEditarMapa: true,
+            podeDisponibilizarMapa: true,
+            podeValidarMapa: false,
+            podeApresentarSugestoes: false,
+            podeVerSugestoes: false,
+            podeDevolverMapa: false,
+            podeAceitarMapa: false,
+            podeHomologarMapa: false,
+            podeVisualizarImpacto: true,
+            podeAlterarDataLimite: false,
+            podeReabrirCadastro: false,
+            podeReabrirRevisao: false,
+            podeEnviarLembrete: false,
+            mesmaUnidade: true,
+            habilitarAcessoCadastro: false,
+            habilitarAcessoMapa: true,
+        },
+    };
     return {
         atividadesDisponiveis: [],
-        unidade: {sigla: "TESTE", nome: "Teste"}
+        unidade,
+        subprocesso,
+        detalhes,
+        mapa: criarMapaCompleto(),
     };
 }
 
@@ -122,10 +188,7 @@ describe("MapaView coverage", () => {
         vi.clearAllMocks();
         subprocessosMock.subprocessoDetalhe = null;
         subprocessosMock.buscarSubprocessoPorProcessoEUnidade = vi.fn().mockResolvedValue(123);
-        subprocessosMock.buscarContextoEdicao = vi.fn().mockResolvedValue({
-            atividadesDisponiveis: [],
-            unidade: {sigla: "TESTE", nome: "Teste"}
-        });
+        subprocessosMock.buscarContextoEdicao = vi.fn().mockResolvedValue(criarContextoEdicao());
         subprocessosMock.buscarSubprocessoDetalhe = vi.fn();
         subprocessosMock.atualizarStatusLocal = vi.fn();
         subprocessosMock.lastError = null;
@@ -137,11 +200,11 @@ describe("MapaView coverage", () => {
         fluxoMapaMock.removerCompetencia = vi.fn();
         fluxoMapaMock.disponibilizarMapa = vi.fn();
         vi.mocked(useFluxoMapaModule.useFluxoMapa).mockReturnValue(fluxoMapaMock as unknown as ReturnType<typeof useFluxoMapaModule.useFluxoMapa>);
-        vi.mocked(subprocessoService.buscarSubprocessoPorProcessoEUnidade).mockResolvedValue(123);
+        vi.mocked(subprocessoService.buscarSubprocessoPorProcessoEUnidade).mockResolvedValue({codigo: 123} as never);
         vi.mocked(subprocessoService.buscarContextoEdicao).mockResolvedValue(criarContextoEdicao());
     });
 
-    function createWrapper(initialMapaCompleto: {competencias: CompetenciaMapa[]} = {competencias: []}) {
+    function createWrapper(initialMapaCompleto: MapaCompleto = criarMapaCompleto()) {
         vi.spyOn(useAcessoModule, 'useAcesso').mockReturnValue({
             podeVisualizarImpacto: ref(true),
             podeEditarMapa: ref(true),
@@ -241,15 +304,13 @@ describe("MapaView coverage", () => {
     });
 
     it("mantém o botão disponibilizar desabilitado enquanto houver atividade sem competência", async () => {
-        const wrapper = createWrapper({
-            competencias: [
-                {
-                    codigo: 10,
-                    descricao: "Competência 1",
-                    atividades: [{codigo: 1, descricao: "Atividade 1"}]
-                }
-            ]
-        });
+        const wrapper = createWrapper(criarMapaCompleto([
+            {
+                codigo: 10,
+                descricao: "Competência 1",
+                atividades: [{codigo: 1, descricao: "Atividade 1"}]
+            }
+        ]));
         const store = useMapas();
         await flushPromises();
 
@@ -258,34 +319,37 @@ describe("MapaView coverage", () => {
             {codigo: 1, descricao: "Atividade 1"},
             {codigo: 2, descricao: "Atividade 2"}
         ];
-        store.mapaCompleto.value = {
-            competencias: [
-                {
-                    codigo: 10,
-                    descricao: "Competência 1",
-                    atividades: [{codigo: 1, descricao: "Atividade 1"}]
-                }
-            ]
-        } as unknown as typeof store.mapaCompleto.value;
+        store.mapaCompleto.value = criarMapaCompleto([
+            {
+                codigo: 10,
+                descricao: "Competência 1",
+                atividades: [{codigo: 1, descricao: "Atividade 1"}]
+            }
+        ]);
 
         expect(vm.atividadesSemCompetencia).toHaveLength(1);
         expect(wrapper.find('[data-testid="btn-cad-mapa-disponibilizar"]').attributes("disabled")).toBeDefined();
     });
 
     it("mantem o botao disponibilizar desabilitado se existir competencia sem atividade", async () => {
-        const wrapper = createWrapper({
-            competencias: [
-                {
-                    codigo: 10,
-                    descricao: "Competência sem cadastro",
-                    atividades: []
-                }
-            ]
-        });
+        const wrapper = createWrapper(criarMapaCompleto([
+            {
+                codigo: 10,
+                descricao: "Competência sem cadastro",
+                atividades: []
+            }
+        ]));
 
         await flushPromises();
 
         const vm = wrapper.vm as unknown as MapaViewVm;
+        useMapas().mapaCompleto.value = criarMapaCompleto([
+            {
+                codigo: 10,
+                descricao: "Competência sem cadastro",
+                atividades: []
+            }
+        ]);
         vm.atividades = [];
 
         expect(vm.existeCompetenciaSemAtividade).toBe(true);
@@ -334,7 +398,7 @@ describe("MapaView coverage", () => {
         
         // Cobre não encontrar competência em excluirCompetencia
         const store = useMapas();
-        store.mapaCompleto.value = { competencias: [{ codigo: 1, descricao: "C1" }] } as unknown as typeof store.mapaCompleto.value;
+        store.mapaCompleto.value = criarMapaCompleto([{ codigo: 1, descricao: "C1" }]);
         vm.excluirCompetencia(999);
         expect(vm.competenciaParaExcluir).toBeNull();
 
@@ -358,8 +422,8 @@ describe("MapaView coverage", () => {
         const subprocessosStore = subprocessosMock;
         
         subprocessosStore.buscarContextoEdicao = vi.fn().mockResolvedValue({
-            atividadesDisponiveis: [{codigo: 1, descricao: "Ativ"}],
-            unidade: {sigla: "TESTE", nome: "Teste"}
+            ...criarContextoEdicao(),
+            atividadesDisponiveis: [{codigo: 1, descricao: "Ativ", conhecimentos: []}],
         });
 
         // Simulando o retorno da action buscarSubprocessoPorProcessoEUnidade
@@ -377,10 +441,10 @@ describe("MapaView coverage", () => {
 
         // E injetamos os mocks na instância diretamente
         vm.atividades = [{codigo: 1, descricao: "Ativ"}];
-        vm.unidade = {sigla: "TESTE", nome: "Teste"};
+        vm.unidade = {codigo: 1, sigla: "TESTE", nome: "Teste"};
 
         expect(vm.atividades).toHaveLength(1);
-        expect(vm.unidade.sigla).toBe("TESTE");
+        expect(vm.unidade?.sigla).toBe("TESTE");
 
         // Cobre abrirModalDisponibilizar
         vm.abrirModalDisponibilizar();
@@ -417,7 +481,7 @@ describe("MapaView coverage", () => {
 
         // Cobre iniciarEdicaoCompetencia
         vm.iniciarEdicaoCompetencia({codigo: 2, descricao: "C2"});
-        expect(vm.competenciaSendoEditada.codigo).toBe(2);
+        expect(vm.competenciaSendoEditada).toEqual(expect.objectContaining({codigo: 2}));
         expect(vm.mostrarModalCriarNovaCompetencia).toBe(true);
 
         // Cobre exclusão sucesso

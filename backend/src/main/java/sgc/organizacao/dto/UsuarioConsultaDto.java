@@ -1,7 +1,6 @@
 package sgc.organizacao.dto;
 
 import lombok.*;
-import org.jspecify.annotations.*;
 import sgc.organizacao.model.*;
 
 import java.util.*;
@@ -33,13 +32,14 @@ public record UsuarioConsultaDto(
     }
 
     public static UsuarioConsultaDto fromLeitura(UsuarioConsultaLeitura usuario) {
-        UnidadeDto unidade = UnidadeDto.builder()
-                .codigo(usuario.unidadeCodigo())
-                .nome(usuario.unidadeNome())
-                .sigla(usuario.unidadeSigla())
-                .tipo(usuario.unidadeTipo() != null ? usuario.unidadeTipo().name() : null)
-                .tituloTitular(usuario.unidadeTituloTitular())
-                .build();
+        UnidadeDto unidade = UnidadeDto.fromResumoObrigatorio(
+                usuario.unidadeCodigo(),
+                usuario.unidadeNome(),
+                usuario.unidadeSigla(),
+                null,
+                usuario.unidadeTipo(),
+                usuario.unidadeTituloTitular()
+        );
 
         return UsuarioConsultaDto.builder()
                 .tituloEleitoral(usuario.tituloEleitoral())

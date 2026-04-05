@@ -131,7 +131,7 @@ class RegrasNegocioDocumentoIntegrationTest {
             return caminhos
                     .map(Path::getFileName)
                     .map(Path::toString)
-                    .map(nome -> PADRAO_NOME_CLASSE_INTEGRACAO.matcher(nome))
+                    .map(PADRAO_NOME_CLASSE_INTEGRACAO::matcher)
                     .filter(Matcher::matches)
                     .map(matcher -> matcher.group(1))
                     .collect(Collectors.toCollection(TreeSet::new));

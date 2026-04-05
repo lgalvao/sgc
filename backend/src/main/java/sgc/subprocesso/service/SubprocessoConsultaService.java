@@ -2,6 +2,7 @@ package sgc.subprocesso.service;
 
 import lombok.*;
 import lombok.extern.slf4j.*;
+import org.jspecify.annotations.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
 import sgc.comum.erros.*;
@@ -439,7 +440,7 @@ public class SubprocessoConsultaService {
                 .toList();
     }
 
-    private Analise obterAnaliseMaisRecentePorTipo(Long codSubprocesso) {
+    private @Nullable Analise obterAnaliseMaisRecentePorTipo(Long codSubprocesso) {
         return listarAnalisesPorTipo(codSubprocesso, TipoAnalise.VALIDACAO).stream().findFirst().orElse(null);
     }
 
@@ -452,7 +453,7 @@ public class SubprocessoConsultaService {
         );
     }
 
-    private Usuario buscarTitularSeInformado(Unidade unidade) {
+    private @Nullable Usuario buscarTitularSeInformado(Unidade unidade) {
         String tituloTitular = unidade.getTituloTitular();
         if (tituloTitular == null || tituloTitular.isBlank()) {
             return null;

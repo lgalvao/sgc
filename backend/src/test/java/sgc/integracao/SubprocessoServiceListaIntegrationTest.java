@@ -117,7 +117,12 @@ class SubprocessoServiceListaIntegrationTest extends BaseIntegrationTest {
     @DisplayName("atualizarEntidade: deve atualizar dados")
     void atualizarEntidade() {
         LocalDateTime novaData = LocalDateTime.now().plusDays(10);
-        AtualizarSubprocessoRequest request = new AtualizarSubprocessoRequest(unidade.getCodigo(), subprocesso.getMapa().getCodigo(), novaData, null, novaData, null);
+        AtualizarSubprocessoRequest request = AtualizarSubprocessoRequest.builder()
+                .codUnidade(unidade.getCodigo())
+                .codMapa(subprocesso.getMapa().getCodigo())
+                .dataLimiteEtapa1(novaData)
+                .dataLimiteEtapa2(novaData)
+                .build();
 
         Subprocesso atualizado = subprocessoService.atualizarEntidade(subprocesso.getCodigo(), request.paraCommand());
 

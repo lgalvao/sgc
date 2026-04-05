@@ -74,7 +74,8 @@ public class SubprocessoService {
     @Transactional
     public Subprocesso atualizarEntidade(Long codigo, AtualizarSubprocessoCommand command) {
         Subprocesso subprocesso = consultaService.buscarSubprocesso(codigo);
-        processarAlteracoes(subprocesso, command);
+        processarVinculos(subprocesso, command.vinculos());
+        processarPrazos(subprocesso, command.prazos());
         return subprocessoRepo.save(subprocesso);
     }
 
@@ -84,7 +85,7 @@ public class SubprocessoService {
         subprocessoRepo.deleteById(codigo);
     }
 
-    private void processarAlteracoes(Subprocesso sp, AtualizarSubprocessoCommand command) {
+    private void processarVinculos(Subprocesso sp, AtualizarVinculosSubprocessoCommand command) {
         Optional.ofNullable(command.codUnidade())
                 .map(unidadeService::buscarPorCodigo)
                 .ifPresent(sp::setUnidade);
@@ -97,7 +98,9 @@ public class SubprocessoService {
                 sp.setMapa(m);
             }
         });
+    }
 
+    private void processarPrazos(Subprocesso sp, AtualizarPrazosSubprocessoCommand command) {
         LocalDateTime dataLimiteEtapa1 = command.dataLimiteEtapa1();
         if (dataLimiteEtapa1 != null) sp.setDataLimiteEtapa1(dataLimiteEtapa1);
 
@@ -123,7 +126,6 @@ public class SubprocessoService {
         log.info("Criando {} subprocessos para o processo {}", unidadesElegiveis.size(), processo.getCodigo());
         List<Subprocesso> subprocessos = unidadesElegiveis.stream()
                 .map(unidade -> criarSubprocessoInicial(processo, unidade, NAO_INICIADO))
-                .map(t -> t)
                 .toList();
 
         List<Subprocesso> subprocessosSalvos = subprocessoRepo.saveAll(subprocessos);

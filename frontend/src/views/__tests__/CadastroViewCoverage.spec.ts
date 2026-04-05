@@ -6,7 +6,7 @@ import * as useAcessoModule from "@/composables/useAcesso";
 import * as useFluxoSubprocessoModule from "@/composables/useFluxoSubprocesso";
 import {useMapas} from "@/composables/useMapas";
 import * as subprocessoService from "@/services/subprocessoService";
-import type {ContextoEdicaoSubprocesso, PermissoesSubprocesso} from "@/types/tipos";
+import type {ContextoEdicaoSubprocesso, MapaCompleto, PermissoesSubprocesso, Subprocesso, SubprocessoDetalhe, Unidade} from "@/types/tipos";
 import {SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 import CadastroView from "../CadastroView.vue";
 import {contarChamadas} from "@/test-utils/orcamentoChamadas";
@@ -15,6 +15,7 @@ const {pushMock} = vi.hoisted(() => ({pushMock: vi.fn()}));
 
 type SubprocessoMinimo = {
     codigo: number;
+    unidade: Unidade;
     situacao: SituacaoSubprocesso;
     tipoProcesso: TipoProcesso;
 };
@@ -129,34 +130,104 @@ const stubs = {
 };
 
 describe("CadastroView coverage", () => {
-    const permissoesPadrao: Pick<PermissoesSubprocesso, "podeEditarCadastro" | "podeDisponibilizarCadastro" | "podeVisualizarImpacto"> = {
+    const permissoesPadrao: PermissoesSubprocesso = {
         podeEditarCadastro: true,
         podeDisponibilizarCadastro: true,
+        podeDevolverCadastro: false,
+        podeAceitarCadastro: false,
+        podeHomologarCadastro: false,
+        podeEditarMapa: false,
+        podeDisponibilizarMapa: false,
+        podeValidarMapa: false,
+        podeApresentarSugestoes: false,
+        podeVerSugestoes: false,
+        podeDevolverMapa: false,
+        podeAceitarMapa: false,
+        podeHomologarMapa: false,
         podeVisualizarImpacto: true,
+        podeAlterarDataLimite: false,
+        podeReabrirCadastro: false,
+        podeReabrirRevisao: false,
+        podeEnviarLembrete: false,
+        mesmaUnidade: false,
+        habilitarAcessoCadastro: false,
+        habilitarAcessoMapa: false,
     };
+
+    const unidadeContexto: Unidade = {
+        codigo: 1,
+        sigla: "TESTE",
+        nome: "Teste",
+        filhas: [],
+        usuarioCodigo: 0,
+        responsavel: null,
+    };
+
+    const mapaContexto: MapaCompleto = {
+        codigo: 100,
+        subprocessoCodigo: 123,
+        observacoes: "",
+        competencias: [],
+        situacao: "CRIADO",
+    };
+
+    function criarSubprocessoContexto(): Subprocesso {
+        return {
+            codigo: 123,
+            unidade: unidadeContexto,
+            situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
+            dataLimite: "2025-01-01T00:00:00",
+            dataFimEtapa1: "",
+            dataLimiteEtapa2: "",
+            atividades: [],
+            codUnidade: unidadeContexto.codigo,
+        };
+    }
+
+    function criarSubprocessoMinimo(situacao = SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, tipoProcesso = TipoProcesso.MAPEAMENTO): SubprocessoMinimo {
+        return {
+            codigo: 123,
+            unidade: unidadeContexto,
+            situacao,
+            tipoProcesso,
+        };
+    }
+
+    function criarDetalhesContexto(): SubprocessoDetalhe {
+        return {
+            codigo: 123,
+            unidade: unidadeContexto,
+            titular: null,
+            responsavel: null,
+            situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
+            localizacaoAtual: "TESTE",
+            processoDescricao: "Processo",
+            dataCriacaoProcesso: "2024-01-01T00:00:00",
+            ultimaDataLimiteSubprocesso: "2025-01-01T00:00:00",
+            tipoProcesso: TipoProcesso.MAPEAMENTO,
+            prazoEtapaAtual: "2025-01-01T00:00:00",
+            isEmAndamento: true,
+            etapaAtual: 1,
+            movimentacoes: [],
+            elementosProcesso: [],
+            permissoes: permissoesPadrao,
+        };
+    }
 
     function criarContextoEdicao(): ContextoEdicaoSubprocesso {
         return {
-            subprocesso: {
-                codigo: 123,
-                situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
-                tipoProcesso: TipoProcesso.MAPEAMENTO
-            },
-            detalhes: {
-                permissoes: permissoesPadrao,
-            },
-            mapa: {codigo: 100},
+            subprocesso: criarSubprocessoContexto(),
+            detalhes: criarDetalhesContexto(),
+            mapa: mapaContexto,
             atividadesDisponiveis: [],
-            unidade: {sigla: "TESTE", nome: "Teste"}
+            unidade: unidadeContexto
         };
     }
 
     beforeEach(() => {
         vi.clearAllMocks();
         subprocessosMock.subprocessoDetalhe = {
-            codigo: 123,
-            situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
-            tipoProcesso: TipoProcesso.MAPEAMENTO
+            ...criarSubprocessoMinimo(),
         };
         subprocessosMock.buscarSubprocessoPorProcessoEUnidade = vi.fn().mockResolvedValue(123);
         subprocessosMock.buscarContextoEdicao = vi.fn().mockResolvedValue(criarContextoEdicao());
@@ -167,8 +238,8 @@ describe("CadastroView coverage", () => {
             validarCadastro: vi.fn(),
             disponibilizarCadastro: vi.fn().mockResolvedValue(true),
             disponibilizarRevisaoCadastro: vi.fn().mockResolvedValue(true),
-        } as unknown as FluxoSubprocessoMock);
-        vi.mocked(subprocessoService.buscarSubprocessoPorProcessoEUnidade).mockResolvedValue(123);
+        } as unknown as ReturnType<typeof useFluxoSubprocessoModule.useFluxoSubprocesso>);
+        vi.mocked(subprocessoService.buscarSubprocessoPorProcessoEUnidade).mockResolvedValue({codigo: 123} as never);
         vi.mocked(subprocessoService.buscarContextoEdicao).mockResolvedValue(criarContextoEdicao());
     });
 
@@ -223,14 +294,14 @@ describe("CadastroView coverage", () => {
 
         // Cobre disponibilizar com erro de situacao
         store.subprocessoDetalhe = {
-            ...store.subprocessoDetalhe,
+            ...criarSubprocessoMinimo(),
             situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO
         };
         await vm.disponibilizarCadastro();
 
         // Cobre disponibilizar com erros de validação
         store.subprocessoDetalhe = {
-            ...store.subprocessoDetalhe,
+            ...criarSubprocessoMinimo(),
             situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO
         };
         const fluxoSubprocesso = useFluxoSubprocessoModule.useFluxoSubprocesso() as unknown as FluxoSubprocessoMock;
@@ -297,9 +368,7 @@ describe("CadastroView coverage", () => {
         // confirmarDisponibilizacao (Revisao)
         const store = subprocessosMock;
         store.subprocessoDetalhe = {
-            codigo: 123,
-            situacao: SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO,
-            tipoProcesso: TipoProcesso.REVISAO
+            ...criarSubprocessoMinimo(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO, TipoProcesso.REVISAO),
         };
         const fluxoSubprocesso = useFluxoSubprocessoModule.useFluxoSubprocesso() as unknown as FluxoSubprocessoMock;
         fluxoSubprocesso.disponibilizarRevisaoCadastro.mockResolvedValue(true);
@@ -308,9 +377,7 @@ describe("CadastroView coverage", () => {
 
         // confirmarDisponibilizacao (Mapeamento)
         store.subprocessoDetalhe = {
-            codigo: 123,
-            situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
-            tipoProcesso: TipoProcesso.MAPEAMENTO
+            ...criarSubprocessoMinimo(),
         };
         fluxoSubprocesso.disponibilizarCadastro.mockResolvedValue(true);
         await vm.confirmarDisponibilizacao();
@@ -368,10 +435,7 @@ describe("CadastroView coverage", () => {
         vm.codSubprocesso = 123;
 
         subprocessosMock.subprocessoDetalhe = {
-            codigo: 123,
-            situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO
-            ,
-            tipoProcesso: TipoProcesso.MAPEAMENTO
+            ...criarSubprocessoMinimo(),
         };
 
         const fluxoSubprocesso = useFluxoSubprocessoModule.useFluxoSubprocesso() as unknown as FluxoSubprocessoMock;

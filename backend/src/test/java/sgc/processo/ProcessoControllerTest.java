@@ -79,6 +79,38 @@ class ProcessoControllerTest {
                 .build();
     }
 
+    private Processo criarProcessoResumoValido() {
+        return Processo.builder()
+                .codigo(1L)
+                .descricao("Teste")
+                .tipo(TipoProcesso.MAPEAMENTO)
+                .situacao(SituacaoProcesso.CRIADO)
+                .dataCriacao(LocalDateTime.now())
+                .dataLimite(LocalDateTime.now().plusDays(30))
+                .build();
+    }
+
+    private Processo criarProcessoResumoValido(String descricao, SituacaoProcesso situacao) {
+        return Processo.builder()
+                .codigo(1L)
+                .descricao(descricao)
+                .tipo(TipoProcesso.MAPEAMENTO)
+                .situacao(situacao)
+                .dataCriacao(LocalDateTime.now())
+                .dataLimite(LocalDateTime.now().plusDays(30))
+                .build();
+    }
+
+    private Subprocesso criarSubprocessoValido(Long codigo, Processo processo, Unidade unidade) {
+        return Subprocesso.builder()
+                .codigo(codigo)
+                .processo(processo)
+                .unidade(unidade)
+                .situacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO)
+                .dataLimiteEtapa1(LocalDateTime.now().plusDays(10))
+                .build();
+    }
+
     @BeforeEach
     void setUp() {
         closeable = MockitoAnnotations.openMocks(this);
@@ -216,7 +248,7 @@ class ProcessoControllerTest {
         @WithMockUser(roles = "CHEFE")
         @DisplayName("Deve retornar 200 OK quando CHEFE tem acesso ao processo (correção IDOR)")
         void deveRetornarOkQuandoChefeTemAcesso() throws Exception {
-            var processo = Processo.builder().codigo(1L).descricao("Teste").build();
+            var processo = criarProcessoResumoValido();
             when(processoService.buscarOpt(1L)).thenReturn(Optional.of(processo));
             when(processoService.checarAcesso(any(), eq(1L))).thenReturn(true);
 
@@ -225,7 +257,7 @@ class ProcessoControllerTest {
         }
 
         private void performAccessCheck(boolean hasAccess, int expectedStatus) throws Exception {
-            var processo = Processo.builder().codigo(1L).descricao("Teste").build();
+            var processo = criarProcessoResumoValido();
             when(processoService.buscarOpt(1L)).thenReturn(Optional.of(processo));
             when(processoService.checarAcesso(any(), anyLong())).thenReturn(hasAccess);
 
@@ -270,9 +302,9 @@ class ProcessoControllerTest {
                     .andExpect(status().isOk());
 
             verify(processoService).executarAcaoEmBloco(eq(1L), argThat(command ->
-                    command instanceof ProcessarAnaliseEmBlocoCommand req
-                            && req.unidadeCodigos().equals(List.of(10L))
-                            && req.acao() == AcaoProcesso.ACEITAR));
+                    command instanceof ProcessarAnaliseEmBlocoCommand(List<Long> unidadeCodigos, AcaoProcesso acao)
+                            && unidadeCodigos.equals(List.of(10L))
+                            && acao == AcaoProcesso.ACEITAR));
         }
     }
 
@@ -322,7 +354,7 @@ class ProcessoControllerTest {
         @DisplayName("Deve retornar 200 OK ao iniciar mapeamento com sucesso")
         void deveRetornarOkAoIniciarMapeamentoQuandoValido() throws Exception {
             IniciarProcessoRequest req = new IniciarProcessoRequest(TipoProcesso.MAPEAMENTO, List.of(1L));
-            Processo processo = Processo.builder().codigo(1L).descricao("Processo teste").build();
+            Processo processo = criarProcessoResumoValido("Processo teste", SituacaoProcesso.EM_ANDAMENTO);
 
             when(processoService.buscarPorCodigoComParticipantes(1L)).thenReturn(processo);
             doNothing().when(processoService).iniciar(eq(1L), anyList(), any());
@@ -357,7 +389,7 @@ class ProcessoControllerTest {
         @DisplayName("Deve retornar lista de processos finalizados")
         void deveRetornarListaDeProcessosFinalizados() throws Exception {
             when(processoService.listarFinalizados())
-                    .thenReturn(List.of(Processo.builder().codigo(1L).build()));
+                    .thenReturn(List.of(criarProcessoResumoValido("Teste", SituacaoProcesso.FINALIZADO)));
 
             mockMvc.perform(get("/api/processos/finalizados"))
                     .andExpect(status().isOk())
@@ -369,9 +401,11 @@ class ProcessoControllerTest {
         @WithMockUser(roles = "ADMIN")
         @DisplayName("Deve retornar lista de subprocessos")
         void deveRetornarListaDeSubprocessos() throws Exception {
+            Processo processo = criarProcessoResumoValido();
+            Unidade unidade = criarUnidadeParticipante();
 
             when(consultaService.listarEntidadesPorProcesso(1L))
-                    .thenReturn(List.of(Subprocesso.builder().codigo(10L).build()));
+                    .thenReturn(List.of(criarSubprocessoValido(10L, processo, unidade)));
 
             mockMvc.perform(get("/api/processos/1/subprocessos"))
                     .andExpect(status().isOk())
@@ -388,7 +422,7 @@ class ProcessoControllerTest {
         @DisplayName("listarParaImportacao deve retornar lista de processos para importacao")
         void deveListarParaImportacao() throws Exception {
             when(processoService.listarParaImportacao())
-                    .thenReturn(List.of(Processo.builder().codigo(1L).build()));
+                    .thenReturn(List.of(criarProcessoResumoValido("Teste", SituacaoProcesso.FINALIZADO)));
 
             mockMvc.perform(get("/api/processos/para-importacao"))
                     .andExpect(status().isOk())
@@ -412,6 +446,7 @@ class ProcessoControllerTest {
 
             Subprocesso sub = Subprocesso.builder()
                 .codigo(100L)
+                .processo(processo)
                 .situacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO)
                 .unidade(unidade)
                 .dataLimiteEtapa1(LocalDateTime.now())
@@ -455,6 +490,7 @@ class ProcessoControllerTest {
 
             Subprocesso sub = Subprocesso.builder()
                 .codigo(100L)
+                .processo(processo)
                 .situacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO)
                 .unidade(unidade)
                 .mapa(sgc.mapa.model.Mapa.builder().codigo(500L).build())
@@ -510,7 +546,7 @@ class ProcessoControllerTest {
         @WithMockUser(roles = "ADMIN")
         @DisplayName("listarAtivos deve retornar lista de processos em andamento")
         void deveListarAtivos() throws Exception {
-            when(processoService.listarAtivos()).thenReturn(List.of(Processo.builder().codigo(1L).build()));
+            when(processoService.listarAtivos()).thenReturn(List.of(criarProcessoResumoValido("Teste", SituacaoProcesso.EM_ANDAMENTO)));
 
             mockMvc.perform(get("/api/processos/ativos"))
                     .andExpect(status().isOk())

@@ -148,7 +148,10 @@ class SubprocessoControllerCoverageTest {
     @DisplayName("atualizar - deve chamar servico e retornar 200")
     @WithMockUser(roles = "ADMIN")
     void atualizar() throws Exception {
-        AtualizarSubprocessoRequest req = new AtualizarSubprocessoRequest(10L, 20L, null, null, null, null);
+        AtualizarSubprocessoRequest req = AtualizarSubprocessoRequest.builder()
+                .codUnidade(10L)
+                .codMapa(20L)
+                .build();
         Unidade unidade = new Unidade();
         unidade.setCodigo(10L);
         unidade.setSigla("UND");

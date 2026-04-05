@@ -63,4 +63,33 @@ class UnidadeDtoTest {
         assertThat(dto.getSigla()).isEqualTo("UND");
         assertThat(dto.getTipo()).isEqualTo("OPERACIONAL");
     }
+
+    @Test
+    @DisplayName("deve mapear unidade resumida obrigatoria")
+    void deveMapearUnidadeResumidaObrigatoria() {
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(2L);
+        unidade.setNome("Unidade");
+        unidade.setSigla("UND");
+        unidade.setTipo(TipoUnidade.OPERACIONAL);
+        unidade.setTituloTitular("Titular");
+
+        UnidadeDto dto = UnidadeDto.fromEntityResumoObrigatoria(unidade);
+
+        assertThat(dto.getCodigo()).isEqualTo(2L);
+        assertThat(dto.getNome()).isEqualTo("Unidade");
+        assertThat(dto.getSigla()).isEqualTo("UND");
+        assertThat(dto.getTipo()).isEqualTo("OPERACIONAL");
+        assertThat(dto.getTituloTitular()).isEqualTo("Titular");
+        assertThat(dto.getCodigoPai()).isNull();
+        assertThat(dto.getResponsavel()).isNull();
+    }
+
+    @Test
+    @DisplayName("deve falhar ao mapear unidade resumida nula")
+    void deveFalharAoMapearUnidadeResumidaNula() {
+        assertThatThrownBy(() -> UnidadeDto.fromEntityResumoObrigatoria(null))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("Unidade obrigatoria para resumo");
+    }
 }

@@ -26,6 +26,7 @@ O projeto segue uma arquitetura **Modular monolith** no backend e **Component-Ba
 * **[backend/README.md](backend/README.md)**: Arquitetura detalhada do backend, módulos (`mapa`, `processo`, `subprocesso`, `organizacao`, `seguranca`, etc) e comunicação.
 * **[frontend/README.md](frontend/README.md)**: Arquitetura do frontend, estrutura de pastas e componentes.
 * **[etc/docs/](etc/docs/)**: Guias detalhados sobre [regras de acesso](etc/docs/regras-acesso.md), [E2E](etc/docs/regras-e2e.md), [roteiro de testes](etc/docs/roteiro-testes.md) e mais.
+* **[Princípios de contratos, DTOs e fixtures](etc/docs/principios-contratos-fixtures.md)**: Regras para evitar DTOs frouxos, mocks inválidos e branches defensivos sem cenário real.
 
 ---
 
@@ -106,6 +107,10 @@ Para rodar todas as verificações (Testes, Cobertura, SpotBugs, Lint, Typecheck
 
 * **Linux:** `./etc/scripts/quality-check.sh all`
 * **Windows:** `etc/scripts/quality-check.ps1 all`
+
+Para um smoke test mínimo de qualidade na raiz do projeto:
+
+* **Linux/macOS:** `./smoke-test.sh`
 
 Os relatórios são gerados em:
 * Backend: `backend/build/reports/` (PIT em `backend/build/reports/pitest/`)

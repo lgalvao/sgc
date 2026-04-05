@@ -290,7 +290,14 @@ class SubprocessoServiceExtraCoverageTest {
             LocalDateTime d2 = LocalDateTime.now().plusDays(2);
             LocalDateTime f2 = LocalDateTime.now().plusDays(3);
 
-            AtualizarSubprocessoRequest request = new AtualizarSubprocessoRequest(10L, 100L, d1, f1, d2, f2);
+            AtualizarSubprocessoRequest request = AtualizarSubprocessoRequest.builder()
+                    .codUnidade(10L)
+                    .codMapa(100L)
+                    .dataLimiteEtapa1(d1)
+                    .dataFimEtapa1(f1)
+                    .dataLimiteEtapa2(d2)
+                    .dataFimEtapa2(f2)
+                    .build();
 
             when(subprocessoRepo.save(any())).thenReturn(sp);
 
@@ -312,7 +319,10 @@ class SubprocessoServiceExtraCoverageTest {
             LocalDateTime d1 = LocalDateTime.now();
             sp.setDataLimiteEtapa1(d1);
 
-            AtualizarSubprocessoRequest request = new AtualizarSubprocessoRequest(10L, 100L, null, null, null, null);
+            AtualizarSubprocessoRequest request = AtualizarSubprocessoRequest.builder()
+                    .codUnidade(10L)
+                    .codMapa(100L)
+                    .build();
 
             when(subprocessoRepo.save(any())).thenReturn(sp);
 

@@ -6,8 +6,6 @@ import org.mockito.*;
 import org.mockito.junit.jupiter.*;
 import sgc.organizacao.model.*;
 import sgc.comum.erros.*;
-import sgc.mapa.service.*;
-import sgc.organizacao.*;
 import sgc.organizacao.service.*;
 import sgc.subprocesso.model.*;
 import java.util.*;

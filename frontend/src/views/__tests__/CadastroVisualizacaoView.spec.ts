@@ -9,6 +9,113 @@ import * as subprocessoService from "@/services/subprocessoService";
 import * as analiseService from "@/services/analiseService";
 import CadastroVisualizacaoView from "../CadastroVisualizacaoView.vue";
 import {contarChamadas} from "@/test-utils/orcamentoChamadas";
+import type {ContextoEdicaoSubprocesso, MapaCompleto, Subprocesso, SubprocessoDetalhe, Unidade} from "@/types/tipos";
+import {SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
+import type {NormalizedError} from "@/utils/apiError";
+
+type CadastroVisualizacaoVm = {
+    observacaoDevolucao: string;
+    observacaoValidacao: string;
+    podeHomologarCadastro: boolean;
+    mostrarModalImpacto: boolean;
+    mostrarModalHistoricoAnalise: boolean;
+    mostrarModalValidar: boolean;
+    mostrarModalDevolver: boolean;
+    validacaoDevolucaoSubmetida: boolean;
+    atividades: Array<{codigo: number; descricao: string; conhecimentos: Array<{codigo: number; descricao: string}>}>;
+    unidade: {sigla: string; nome: string | null};
+    mapasStore: {buscarImpactoMapa: ReturnType<typeof vi.fn>};
+    nomeUnidade: string;
+    estadoObservacaoDevolucao: boolean | null;
+    confirmarValidacao: () => Promise<void>;
+    confirmarDevolucao: () => Promise<void>;
+    abrirModalImpacto: () => Promise<void>;
+    fecharModalImpacto: () => void;
+    fecharModalHistoricoAnalise: () => void;
+    fecharModalValidar: () => void;
+    fecharModalDevolver: () => void;
+    $nextTick: () => Promise<void>;
+};
+
+type FluxoSubprocessoMock = {
+    aceitarCadastro: ReturnType<typeof vi.fn>;
+    devolverCadastro: ReturnType<typeof vi.fn>;
+    homologarCadastro: ReturnType<typeof vi.fn>;
+    homologarRevisaoCadastro: ReturnType<typeof vi.fn>;
+    aceitarRevisaoCadastro: ReturnType<typeof vi.fn>;
+    devolverRevisaoCadastro: ReturnType<typeof vi.fn>;
+};
+
+type SubprocessoStoreMock = {
+    subprocessoDetalhe: SubprocessoDetalhe | null;
+    buscarSubprocessoPorProcessoEUnidade: ReturnType<typeof vi.fn>;
+    buscarContextoEdicao: ReturnType<typeof vi.fn>;
+    buscarSubprocessoDetalhe: ReturnType<typeof vi.fn>;
+    atualizarStatusLocal: ReturnType<typeof vi.fn>;
+    lastError: NormalizedError | null;
+    clearError: ReturnType<typeof vi.fn>;
+};
+
+function criarContextoEdicao(tipoProcesso: TipoProcesso = TipoProcesso.MAPEAMENTO): ContextoEdicaoSubprocesso {
+    const unidade: Unidade = {codigo: 1, sigla: "TESTE", nome: "Teste", filhas: [], usuarioCodigo: 0, responsavel: null};
+    const mapa: MapaCompleto = {codigo: 100, subprocessoCodigo: 123, observacoes: "", competencias: [], situacao: "CRIADO"};
+    const subprocesso: Subprocesso = {
+        codigo: 123,
+        unidade,
+        situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
+        dataLimite: "2025-01-01T00:00:00",
+        dataFimEtapa1: "",
+        dataLimiteEtapa2: "",
+        atividades: [],
+        codUnidade: unidade.codigo,
+    };
+    return {
+        subprocesso,
+        detalhes: {
+            codigo: 123,
+            unidade,
+            titular: null,
+            responsavel: null,
+            situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
+            localizacaoAtual: "TESTE",
+            processoDescricao: "Processo",
+            dataCriacaoProcesso: "2024-01-01T00:00:00",
+            ultimaDataLimiteSubprocesso: "2025-01-01T00:00:00",
+            tipoProcesso,
+            prazoEtapaAtual: "2025-01-01T00:00:00",
+            isEmAndamento: true,
+            etapaAtual: 1,
+            movimentacoes: [],
+            elementosProcesso: [],
+            permissoes: {
+                podeEditarCadastro: false,
+                podeDisponibilizarCadastro: false,
+                podeDevolverCadastro: false,
+                podeAceitarCadastro: false,
+                podeHomologarCadastro: false,
+                podeEditarMapa: false,
+                podeDisponibilizarMapa: false,
+                podeValidarMapa: false,
+                podeApresentarSugestoes: false,
+                podeVerSugestoes: false,
+                podeDevolverMapa: false,
+                podeAceitarMapa: false,
+                podeHomologarMapa: false,
+                podeVisualizarImpacto: false,
+                podeAlterarDataLimite: false,
+                podeReabrirCadastro: false,
+                podeReabrirRevisao: false,
+                podeEnviarLembrete: false,
+                mesmaUnidade: false,
+                habilitarAcessoCadastro: false,
+                habilitarAcessoMapa: false,
+            }
+        },
+        mapa,
+        atividadesDisponiveis: [{codigo: 1, descricao: "Ativ 1", conhecimentos: []}],
+        unidade
+    };
+}
 
 const {pushMock} = vi.hoisted(() => ({pushMock: vi.fn()}));
 
@@ -64,22 +171,12 @@ describe("CadastroVisualizacaoView coverage", () => {
         vi.mocked(useSubprocessosModule.useSubprocessos).mockReturnValue({
             subprocessoDetalhe: null,
             buscarSubprocessoPorProcessoEUnidade: vi.fn().mockResolvedValue(123),
-            buscarContextoEdicao: vi.fn().mockResolvedValue({
-                detalhes: {
-                    subprocesso: {
-                        codigo: 123,
-                        tipoProcesso: "MAPEAMENTO",
-                    },
-                    permissoes: {}
-                },
-                atividadesDisponiveis: [{codigo: 1, descricao: "Ativ 1", conhecimentos: []}],
-                unidade: {sigla: "TESTE", nome: "Teste"}
-            }),
+            buscarContextoEdicao: vi.fn().mockResolvedValue(criarContextoEdicao()),
             buscarSubprocessoDetalhe: vi.fn(),
             atualizarStatusLocal: vi.fn(),
             lastError: null,
             clearError: vi.fn(),
-        } as any);
+        } as unknown as ReturnType<typeof useSubprocessosModule.useSubprocessos>);
         vi.mocked(useFluxoSubprocessoModule.useFluxoSubprocesso).mockReturnValue({
             aceitarCadastro: vi.fn().mockResolvedValue(true),
             devolverCadastro: vi.fn().mockResolvedValue(true),
@@ -87,25 +184,15 @@ describe("CadastroVisualizacaoView coverage", () => {
             homologarRevisaoCadastro: vi.fn().mockResolvedValue(true),
             aceitarRevisaoCadastro: vi.fn().mockResolvedValue(true),
             devolverRevisaoCadastro: vi.fn().mockResolvedValue(true),
-        } as any);
-        vi.mocked(subprocessoService.buscarSubprocessoPorProcessoEUnidade).mockResolvedValue(123 as any);
-        vi.mocked(subprocessoService.buscarContextoEdicao).mockResolvedValue({
-            detalhes: {
-                subprocesso: {
-                    codigo: 123,
-                    tipoProcesso: "MAPEAMENTO",
-                },
-                permissoes: {}
-            },
-            atividadesDisponiveis: [{codigo: 1, descricao: "Ativ 1", conhecimentos: []}],
-            unidade: {sigla: "TESTE", nome: "Teste"}
-        } as any);
+        } as unknown as ReturnType<typeof useFluxoSubprocessoModule.useFluxoSubprocesso>);
+        vi.mocked(subprocessoService.buscarSubprocessoPorProcessoEUnidade).mockResolvedValue({codigo: 123} as never);
+        vi.mocked(subprocessoService.buscarContextoEdicao).mockResolvedValue(criarContextoEdicao());
     });
 
-    function createWrapper(accessOverrides = {}, tipoProcesso = "MAPEAMENTO") {
-        const subprocessosStore = useSubprocessosModule.useSubprocessos() as any;
+    function createWrapper(accessOverrides = {}, tipoProcesso: TipoProcesso = TipoProcesso.MAPEAMENTO) {
+        const subprocessosStore = useSubprocessosModule.useSubprocessos() as unknown as SubprocessoStoreMock;
         subprocessosStore.subprocessoDetalhe = {
-            ...subprocessosStore.subprocessoDetalhe,
+            ...criarContextoEdicao(tipoProcesso).detalhes,
             tipoProcesso,
         };
 
@@ -118,7 +205,7 @@ describe("CadastroVisualizacaoView coverage", () => {
             habilitarAceitarCadastro: ref(true),
             habilitarDevolverCadastro: ref(true),
             ...accessOverrides
-        } as any);
+        } as unknown as ReturnType<typeof useAcessoModule.useAcesso>);
 
         return mount(CadastroVisualizacaoView, {
             global: {
@@ -139,7 +226,8 @@ describe("CadastroVisualizacaoView coverage", () => {
         const wrapper = createWrapper();
         await flushPromises();
 
-        const fluxoSubprocesso = useFluxoSubprocessoModule.useFluxoSubprocesso() as any;
+        const fluxoSubprocesso = useFluxoSubprocessoModule.useFluxoSubprocesso() as unknown as FluxoSubprocessoMock;
+        const vm = wrapper.vm as unknown as CadastroVisualizacaoVm;
 
         vi.mocked(analiseService.listarAnalisesCadastro).mockResolvedValue([]);
         await wrapper.find('[data-testid="btn-vis-atividades-historico"]').trigger("click");
@@ -147,42 +235,43 @@ describe("CadastroVisualizacaoView coverage", () => {
         expect(analiseService.listarAnalisesCadastro).toHaveBeenCalledWith(123);
 
         await wrapper.find('[data-testid="btn-acao-devolver"]').trigger("click");
-        (wrapper.vm as any).observacaoDevolucao = "Obs devolução";
+        vm.observacaoDevolucao = "Obs devolução";
         await wrapper.find('[data-testid="btn-devolucao-cadastro-confirmar"]').trigger("click");
         await flushPromises();
         expect(fluxoSubprocesso.devolverCadastro).toHaveBeenCalled();
 
-        (wrapper.vm as any).podeHomologarCadastro = false;
+        vm.podeHomologarCadastro = false;
         await wrapper.find('[data-testid="btn-acao-analisar-principal"]').trigger("click");
         await wrapper.find('[data-testid="btn-aceite-cadastro-confirmar"]').trigger("click");
         await flushPromises();
         expect(fluxoSubprocesso.aceitarCadastro).toHaveBeenCalled();
 
-        (wrapper.vm as any).podeHomologarCadastro = true;
+        vm.podeHomologarCadastro = true;
         await wrapper.find('[data-testid="btn-acao-analisar-principal"]').trigger("click");
         await wrapper.find('[data-testid="btn-aceite-cadastro-confirmar"]').trigger("click");
         await flushPromises();
         expect(fluxoSubprocesso.homologarCadastro).toHaveBeenCalled();
 
-        const wrapperRevisao = createWrapper({}, "REVISAO");
+        const wrapperRevisao = createWrapper({}, TipoProcesso.REVISAO);
         await flushPromises();
 
-        (wrapperRevisao.vm as any).podeHomologarCadastro = true;
-        await (wrapperRevisao.vm as any).confirmarValidacao();
+        const vmRevisao = wrapperRevisao.vm as unknown as CadastroVisualizacaoVm;
+        vmRevisao.podeHomologarCadastro = true;
+        await vmRevisao.confirmarValidacao();
         expect(fluxoSubprocesso.homologarRevisaoCadastro).toHaveBeenCalled();
 
         // Aceitar Revisão
-        (wrapperRevisao.vm as any).podeHomologarCadastro = false;
-        await (wrapperRevisao.vm as any).confirmarValidacao();
+        vmRevisao.podeHomologarCadastro = false;
+        await vmRevisao.confirmarValidacao();
         expect(fluxoSubprocesso.aceitarRevisaoCadastro).toHaveBeenCalled();
 
-        (wrapperRevisao.vm as any).observacaoDevolucao = "Rev";
-        await (wrapperRevisao.vm as any).confirmarDevolucao();
+        vmRevisao.observacaoDevolucao = "Rev";
+        await vmRevisao.confirmarDevolucao();
         expect(fluxoSubprocesso.devolverRevisaoCadastro).toHaveBeenCalled();
 
-        const mapsStore = (wrapper.vm as any).mapasStore;
+        const mapsStore = vm.mapasStore;
         mapsStore.buscarImpactoMapa = vi.fn().mockResolvedValue(null);
-        await (wrapper.vm as any).abrirModalImpacto();
+        await vm.abrirModalImpacto();
         expect(mapsStore.buscarImpactoMapa).toHaveBeenCalledWith(123);
     });
 
@@ -191,15 +280,15 @@ describe("CadastroVisualizacaoView coverage", () => {
         await flushPromises();
 
         expect(contarChamadas(
-            vi.mocked(useSubprocessosModule.useSubprocessos)().buscarContextoEdicao as any,
-            vi.mocked(useSubprocessosModule.useSubprocessos)().buscarSubprocessoPorProcessoEUnidade as any,
+            vi.mocked(useSubprocessosModule.useSubprocessos)().buscarContextoEdicao as unknown as {mock?: {calls: unknown[][]}},
+            vi.mocked(useSubprocessosModule.useSubprocessos)().buscarSubprocessoPorProcessoEUnidade as unknown as {mock?: {calls: unknown[][]}},
         )).toBe(2);
     });
 
     it("cobre ramos condicionais adicionais", async () => {
         const wrapper = createWrapper();
         await flushPromises();
-        const vm = wrapper.vm as any;
+        const vm = wrapper.vm as unknown as CadastroVisualizacaoVm;
 
         // Testar computed nomeUnidade
         vm.unidade = { sigla: "TESTE", nome: "Unidade de Teste" };
@@ -250,12 +339,12 @@ describe("CadastroVisualizacaoView coverage", () => {
             atualizarStatusLocal: vi.fn(),
             lastError: null,
             clearError: vi.fn(),
-        } as any);
+        } as unknown as ReturnType<typeof useSubprocessosModule.useSubprocessos>);
 
         createWrapper();
         
         await flushPromises();
-        const store = useSubprocessosModule.useSubprocessos() as any;
+        const store = useSubprocessosModule.useSubprocessos() as unknown as SubprocessoStoreMock;
         expect(store.buscarSubprocessoPorProcessoEUnidade).toHaveBeenCalledWith(1, "TESTE");
         expect(store.buscarContextoEdicao).not.toHaveBeenCalled();
     });
@@ -263,8 +352,8 @@ describe("CadastroVisualizacaoView coverage", () => {
     it("deve tratar falhas de sucesso nas validações e não fechar modais", async () => {
         const wrapper = createWrapper();
         await flushPromises();
-        const vm = wrapper.vm as any;
-        const fluxoSubprocesso = useFluxoSubprocessoModule.useFluxoSubprocesso() as any;
+        const vm = wrapper.vm as unknown as CadastroVisualizacaoVm;
+        const fluxoSubprocesso = useFluxoSubprocessoModule.useFluxoSubprocesso() as unknown as FluxoSubprocessoMock;
 
         // Falha no aceite
         fluxoSubprocesso.aceitarCadastro.mockResolvedValue(false);
@@ -315,7 +404,7 @@ describe("CadastroVisualizacaoView coverage", () => {
     it("deve gerenciar atualizações de estado do modal de confirmação e campos de observação", async () => {
         const wrapper = createWrapper();
         await flushPromises();
-        const vm = wrapper.vm as any;
+        const vm = wrapper.vm as unknown as CadastroVisualizacaoVm;
 
         // v-model cover (92, 116)
         const modals = wrapper.findAllComponents({name: 'ModalConfirmacao'});

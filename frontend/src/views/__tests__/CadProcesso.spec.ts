@@ -421,6 +421,8 @@ describe('ProcessoCadastroView.vue', () => {
         const {wrapper} = createWrapper();
 
         wrapper.vm.processoEditando = {codigo: 123};
+        wrapper.vm.tipo = 'MAPEAMENTO';
+        wrapper.vm.unidadesSelecionadas = [1];
         wrapper.vm.mostrarModalConfirmacao = true;
         await nextTick();
 

@@ -65,7 +65,7 @@ describe('unidadeService', () => {
     });
 
     it('deve chamar buscarSuperior corretamente', async () => {
-      (apiUtils.apiGet as any).mockResolvedValueOnce({ codigo: 1 });
+      vi.mocked(apiUtils.apiGet).mockResolvedValueOnce({ codigo: 1 });
       const res = await buscarSuperior('TESTE');
       expect(apiUtils.apiGet).toHaveBeenCalledWith('/unidades/sigla/TESTE/superior');
       expect(res).toEqual({ codigo: 1 });
@@ -136,13 +136,13 @@ describe('unidadeService', () => {
     });
 
     it('deve mapear mapUnidadesArray', () => {
-      const result = mapUnidadesArray([{ codigo: 1 }]);
+      const result = mapUnidadesArray([{ codigo: 1, nome: 'Unidade 1', sigla: 'U1' }]);
       expect(result).toHaveLength(1);
       expect(result[0].codigo).toBe(1);
     });
     
     it('deve mapear mapUnidadesArray com valor default', () => {
-      const result = mapUnidadesArray(undefined as unknown as any[]);
+      const result = mapUnidadesArray(undefined);
       expect(result).toHaveLength(0);
     });
   });

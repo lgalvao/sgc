@@ -8,7 +8,7 @@ import {ref} from "vue";
  * ```ts
  * const {carregando, erro, executar} = useAsyncAction();
  *
- * async function salvar(dados: any) {
+ * async function salvar(dados: {descricao: string}) {
  *     await executar(
  *         () => salvarService(dados),
  *         "Erro ao salvar"
@@ -20,6 +20,14 @@ export function useAsyncAction() {
     const carregando = ref(false);
     const erro = ref<string | null>(null);
 
+    function obterMensagemErro(error: unknown, mensagemPadrao: string): string {
+        if (error instanceof Error && error.message) {
+            return error.message;
+        }
+
+        return mensagemPadrao;
+    }
+
     async function executar<T>(
         acao: () => Promise<T>,
         mensagemErro = "Erro na operação"
@@ -28,9 +36,9 @@ export function useAsyncAction() {
         erro.value = null;
         try {
             return await acao();
-        } catch (e: any) {
-            erro.value = e.message || mensagemErro;
-            throw e;
+        } catch (error: unknown) {
+            erro.value = obterMensagemErro(error, mensagemErro);
+            throw error;
         } finally {
             carregando.value = false;
         }
@@ -48,8 +56,8 @@ export function useAsyncAction() {
         erro.value = null;
         try {
             return await acao();
-        } catch (e: any) {
-            erro.value = e.message || mensagemErro;
+        } catch (error: unknown) {
+            erro.value = obterMensagemErro(error, mensagemErro);
             return undefined;
         } finally {
             carregando.value = false;

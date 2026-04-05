@@ -3,6 +3,10 @@
 Este documento registra decisões e diretrizes concretas que regem a arquitetura do backend. Elas devem ser
 consultadas antes de simplificações, refatorações ou criação de novas camadas.
 
+Complemento recomendado para contratos e testes:
+
+- [Princípios de Contratos, DTOs e Fixtures](./principios-contratos-fixtures.md)
+
 ## 1. DTOs
 
 * **DTO não é boilerplate descartável por padrão.**

@@ -132,7 +132,7 @@ import {useImpactoMapaModal} from "@/composables/useImpactoMapaModal";
 import {useMapas} from "@/composables/useMapas";
 import {useSubprocessos} from "@/composables/useSubprocessos";
 import {useToastStore} from "@/stores/toast";
-import type {Atividade, Competencia, SalvarCompetenciaRequest, Unidade} from "@/types/tipos";
+import type {Atividade, Competencia, MapaCompleto, SalvarCompetenciaRequest, Unidade} from "@/types/tipos";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import {TEXTOS} from "@/constants/textos";
 
@@ -172,9 +172,9 @@ const {
   fecharModalImpacto,
 } = useImpactoMapaModal(codSubprocesso, (codigo) => mapasStore.buscarImpactoMapa(codigo));
 
-function sincronizarMapa(mapaAtualizado: unknown) {
+function sincronizarMapa(mapaAtualizado: MapaCompleto | null | undefined) {
   if (mapaAtualizado) {
-    mapasStore.mapaCompleto.value = mapaAtualizado as any;
+    mapasStore.mapaCompleto.value = mapaAtualizado;
   }
 }
 
@@ -185,7 +185,7 @@ async function atualizarContextoEdicao(codigo: number) {
   }
 
   atividades.value = data.atividadesDisponiveis;
-  unidade.value = data.unidade as Unidade;
+  unidade.value = data.unidade;
 
   return data;
 }

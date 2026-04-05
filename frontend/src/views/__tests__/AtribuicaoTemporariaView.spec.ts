@@ -6,6 +6,36 @@ import {pesquisarUsuarios} from '@/services/usuarioService';
 import {criarAtribuicaoTemporaria} from '@/services/atribuicaoTemporariaService';
 import {createMemoryHistory, createRouter} from 'vue-router';
 import {createPinia, setActivePinia} from 'pinia';
+import type {Unidade, UsuarioPesquisa} from '@/types/tipos';
+
+type AtribuicaoTemporariaVm = {
+  unidade: Unidade | null;
+  erroUsuario: string;
+  criarAtribuicao: () => Promise<void>;
+  aoAlterarTermoUsuario: (termo: string) => void;
+  selecionarUsuario: (usuario: UsuarioPesquisa) => void;
+  usuarioSelecionado: string | null;
+  termoUsuario: string;
+  mostrarResultadosUsuarios: boolean;
+  usuariosEncontrados: UsuarioPesquisa[];
+  dataInicio: string;
+  dataTermino: string;
+  justificativa: string;
+  agendarOcultacaoResultadosUsuarios: () => void;
+  aoPressionarTeclaUsuario: (evento: Pick<KeyboardEvent, 'key' | 'preventDefault'>) => Promise<void>;
+  indiceUsuarioDestacado: number;
+  notify: (mensagem: string, variante: string) => void;
+  timeoutPesquisaUsuarios: ReturnType<typeof setTimeout> | null;
+  timeoutOcultarResultadosUsuarios: ReturnType<typeof setTimeout> | null;
+  $nextTick: () => Promise<void>;
+};
+
+const unidadeMinima: Unidade = {codigo: 1, sigla: 'TESTE', nome: 'Unidade de Teste'};
+const usuarioMinimo = (sobrescritas: Partial<UsuarioPesquisa> = {}): UsuarioPesquisa => ({
+  nome: 'Usuário Teste',
+  tituloEleitoral: '999',
+  ...sobrescritas,
+});
 
 vi.mock('@/services/unidadeService', () => ({
   buscarUnidadePorCodigo: vi.fn(),
@@ -102,7 +132,7 @@ describe('AtribuicaoTemporariaView', () => {
   });
 
   it('deve validar formulário vazio', async () => {
-    vi.mocked(buscarUnidadePorCodigo).mockResolvedValue({ codigo: 1 } as any);
+    vi.mocked(buscarUnidadePorCodigo).mockResolvedValue(unidadeMinima);
     const wrapper = mount(AtribuicaoTemporariaView, mountOptions);
     await vi.dynamicImportSettled();
 
@@ -114,8 +144,8 @@ describe('AtribuicaoTemporariaView', () => {
 
   it('deve pesquisar usuarios com debounce', async () => {
     vi.useFakeTimers();
-    vi.mocked(buscarUnidadePorCodigo).mockResolvedValue({ codigo: 1 } as any);
-    vi.mocked(pesquisarUsuarios).mockResolvedValue([{codigo: 10, nome: 'João da Silva', tituloEleitoral: '123' }] as any);
+    vi.mocked(buscarUnidadePorCodigo).mockResolvedValue(unidadeMinima);
+    vi.mocked(pesquisarUsuarios).mockResolvedValue([usuarioMinimo({nome: 'João da Silva', tituloEleitoral: '123'})]);
 
     const wrapper = mount(AtribuicaoTemporariaView, mountOptions);
     await vi.dynamicImportSettled();
@@ -134,7 +164,7 @@ describe('AtribuicaoTemporariaView', () => {
 
   it('deve tratar erro na pesquisa de usuários', async () => {
     vi.useFakeTimers();
-    vi.mocked(buscarUnidadePorCodigo).mockResolvedValue({ codigo: 1 } as any);
+    vi.mocked(buscarUnidadePorCodigo).mockResolvedValue(unidadeMinima);
     vi.mocked(pesquisarUsuarios).mockRejectedValue(new Error('Erro na busca'));
 
     const wrapper = mount(AtribuicaoTemporariaView, mountOptions);
@@ -151,11 +181,11 @@ describe('AtribuicaoTemporariaView', () => {
   });
 
   it('deve selecionar usuario encontrado', async () => {
-    vi.mocked(buscarUnidadePorCodigo).mockResolvedValue({ codigo: 1 } as any);
+    vi.mocked(buscarUnidadePorCodigo).mockResolvedValue(unidadeMinima);
     const wrapper = mount(AtribuicaoTemporariaView, mountOptions);
     await vi.dynamicImportSettled();
 
-    wrapper.vm.selecionarUsuario({codigo: 10, nome: 'José', tituloEleitoral: '12345' } as any);
+    (wrapper.vm as unknown as AtribuicaoTemporariaVm).selecionarUsuario(usuarioMinimo({nome: 'José', tituloEleitoral: '12345'}));
 
     expect(wrapper.vm.usuarioSelecionado).toBe('12345');
     expect(wrapper.vm.termoUsuario).toBe('José');
@@ -163,14 +193,14 @@ describe('AtribuicaoTemporariaView', () => {
   });
 
   it('deve criar atribuicao com sucesso', async () => {
-    vi.mocked(buscarUnidadePorCodigo).mockResolvedValue({ codigo: 1 } as any);
-    vi.mocked(criarAtribuicaoTemporaria).mockResolvedValue({} as any);
+    vi.mocked(buscarUnidadePorCodigo).mockResolvedValue(unidadeMinima);
+    vi.mocked(criarAtribuicaoTemporaria).mockResolvedValue();
 
     const wrapper = mount(AtribuicaoTemporariaView, mountOptions);
     await vi.dynamicImportSettled();
 
     // Preenchendo o formulário
-    wrapper.vm.selecionarUsuario({codigo: 10, nome: 'Usuário Teste', tituloEleitoral: '999' } as any);
+    (wrapper.vm as unknown as AtribuicaoTemporariaVm).selecionarUsuario(usuarioMinimo());
     wrapper.vm.dataInicio = '2025-01-01';
     wrapper.vm.dataTermino = '2025-12-31';
     wrapper.vm.justificativa = 'Teste de justificativa';
@@ -189,13 +219,13 @@ describe('AtribuicaoTemporariaView', () => {
   });
 
   it('deve lidar com erro ao criar atribuicao', async () => {
-    vi.mocked(buscarUnidadePorCodigo).mockResolvedValue({ codigo: 1 } as any);
+    vi.mocked(buscarUnidadePorCodigo).mockResolvedValue(unidadeMinima);
     vi.mocked(criarAtribuicaoTemporaria).mockRejectedValue(new Error('Erro no servidor'));
 
     const wrapper = mount(AtribuicaoTemporariaView, mountOptions);
     await vi.dynamicImportSettled();
 
-    wrapper.vm.selecionarUsuario({codigo: 10, nome: 'Usuário Teste', tituloEleitoral: '999' } as any);
+    (wrapper.vm as unknown as AtribuicaoTemporariaVm).selecionarUsuario(usuarioMinimo());
     wrapper.vm.dataInicio = '2025-01-01';
     wrapper.vm.dataTermino = '2025-12-31';
     wrapper.vm.justificativa = 'Teste de justificativa';
@@ -208,7 +238,7 @@ describe('AtribuicaoTemporariaView', () => {
 
   it('deve esconder resultados após blur', async () => {
     vi.useFakeTimers();
-    vi.mocked(buscarUnidadePorCodigo).mockResolvedValue({ codigo: 1 } as any);
+    vi.mocked(buscarUnidadePorCodigo).mockResolvedValue(unidadeMinima);
     const wrapper = mount(AtribuicaoTemporariaView, mountOptions);
     await vi.dynamicImportSettled();
 
@@ -222,33 +252,34 @@ describe('AtribuicaoTemporariaView', () => {
   });
 
   it('deve lidar com teclas no input de usuário', async () => {
-    vi.mocked(buscarUnidadePorCodigo).mockResolvedValue({ codigo: 1 } as any);
+    vi.mocked(buscarUnidadePorCodigo).mockResolvedValue(unidadeMinima);
     const wrapper = mount(AtribuicaoTemporariaView, mountOptions);
     await vi.dynamicImportSettled();
+    const vm = wrapper.vm as unknown as AtribuicaoTemporariaVm;
 
-    wrapper.vm.termoUsuario = 'Ana';
-    wrapper.vm.mostrarResultadosUsuarios = true;
-    wrapper.vm.usuariosEncontrados = [{codigo: 1, nome: 'Ana 1', tituloEleitoral: '1' }] as any;
+    vm.termoUsuario = 'Ana';
+    vm.mostrarResultadosUsuarios = true;
+    vm.usuariosEncontrados = [usuarioMinimo({nome: 'Ana 1', tituloEleitoral: '1'})];
 
     const event = new KeyboardEvent('keydown', { key: 'ArrowDown' });
     Object.defineProperty(event, 'preventDefault', { value: vi.fn() });
     
-    await wrapper.vm.aoPressionarTeclaUsuario(event);
+    await vm.aoPressionarTeclaUsuario(event);
     expect(event.preventDefault).toHaveBeenCalled();
     expect(wrapper.vm.indiceUsuarioDestacado).toBe(0);
 
     const enterEvent = new KeyboardEvent('keydown', { key: 'Enter' });
     Object.defineProperty(enterEvent, 'preventDefault', { value: vi.fn() });
     
-    await wrapper.vm.aoPressionarTeclaUsuario(enterEvent);
-    expect(wrapper.vm.usuarioSelecionado).toBe('1');
+    await vm.aoPressionarTeclaUsuario(enterEvent);
+    expect(vm.usuarioSelecionado).toBe('1');
   });
 
   it('deve gerenciar pesquisa de usuários, seleção de resultados e limpeza de timers de interface', async () => {
-    vi.mocked(buscarUnidadePorCodigo).mockResolvedValue({ codigo: 1 } as any);
+    vi.mocked(buscarUnidadePorCodigo).mockResolvedValue(unidadeMinima);
     const wrapper = mount(AtribuicaoTemporariaView, mountOptions);
     await vi.dynamicImportSettled();
-    const vm = wrapper.vm as any;
+    const vm = wrapper.vm as unknown as AtribuicaoTemporariaVm;
 
     // Descarte de alerta de notificação
     vm.notify("Msg", "info");
@@ -264,7 +295,7 @@ describe('AtribuicaoTemporariaView', () => {
     expect(vm.mostrarResultadosUsuarios).toBe(true);
 
     // Seleção de usuário ao clicar no resultado
-    vm.usuariosEncontrados = [{codigo: 1, nome: 'User', tituloEleitoral: '123'}];
+    vm.usuariosEncontrados = [{nome: 'User', tituloEleitoral: '123'}];
     vm.mostrarResultadosUsuarios = true;
     await vm.$nextTick();
     const item = wrapper.find('[data-testid="opcao-usuario-123"]');
@@ -278,7 +309,7 @@ describe('AtribuicaoTemporariaView', () => {
 
     // Reinicialização para testes de alteração de termo de busca
     const wrapper2 = mount(AtribuicaoTemporariaView, mountOptions);
-    const vm2 = wrapper2.vm as any;
+    const vm2 = wrapper2.vm as unknown as AtribuicaoTemporariaVm;
 
     // Reinicialização de timer de pesquisa ao alterar termo
     vm2.timeoutPesquisaUsuarios = setTimeout(() => {}, 100);
@@ -299,16 +330,16 @@ describe('AtribuicaoTemporariaView', () => {
     // Keyboard events gaps
     vm2.mostrarResultadosUsuarios = false;
     vm2.termoUsuario = "Abc";
-    await vm2.aoPressionarTeclaUsuario({ key: 'ArrowDown', preventDefault: vi.fn() } as any);
+    await vm2.aoPressionarTeclaUsuario({ key: 'ArrowDown', preventDefault: vi.fn() });
     expect(vm2.mostrarResultadosUsuarios).toBe(true);
 
-    vm2.usuariosEncontrados = [{codigo: 1, nome: 'U1'}, {codigo: 2, nome: 'U2'}];
+    vm2.usuariosEncontrados = [usuarioMinimo({nome: 'U1'}), usuarioMinimo({nome: 'U2', tituloEleitoral: '2'})];
     vm2.mostrarResultadosUsuarios = true;
     vm2.indiceUsuarioDestacado = 0;
-    await vm2.aoPressionarTeclaUsuario({ key: 'ArrowDown', preventDefault: vi.fn() } as any);
+    await vm2.aoPressionarTeclaUsuario({ key: 'ArrowDown', preventDefault: vi.fn() });
     // Note: coverage is the goal here, the exact index might depend on how many times nextTick is needed
     
-    await vm2.aoPressionarTeclaUsuario({ key: 'ArrowUp', preventDefault: vi.fn() } as any);
-    await vm2.aoPressionarTeclaUsuario({ key: 'Escape', preventDefault: vi.fn() } as any);
+    await vm2.aoPressionarTeclaUsuario({ key: 'ArrowUp', preventDefault: vi.fn() });
+    await vm2.aoPressionarTeclaUsuario({ key: 'Escape', preventDefault: vi.fn() });
   });
 });

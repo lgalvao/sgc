@@ -37,18 +37,16 @@ class ProcessoSubprocessoViewsQueryBudgetIntegrationTest extends BaseIntegration
     @Autowired
     private ResponsabilidadeRepo responsabilidadeRepo;
 
-    private Unidade unidadeRaiz;
     private Unidade unidadeFilha;
-    private Usuario usuarioChefe;
     private Usuario usuarioAdmin;
     private Subprocesso subprocesso;
 
     @BeforeEach
     void setUp() {
-        unidadeRaiz = criarUnidade("UNR", "Unidade raiz budget", null);
+        Unidade unidadeRaiz = criarUnidade("UNR", "Unidade raiz budget", null);
         unidadeFilha = criarUnidade("UNF", "Unidade filha budget", unidadeRaiz);
 
-        usuarioChefe = usuarioRepo.findById("111111111111").orElseThrow();
+        Usuario usuarioChefe = usuarioRepo.findById("111111111111").orElseThrow();
         usuarioChefe.setPerfilAtivo(Perfil.CHEFE);
         usuarioChefe.setUnidadeAtivaCodigo(unidadeFilha.getCodigo());
 

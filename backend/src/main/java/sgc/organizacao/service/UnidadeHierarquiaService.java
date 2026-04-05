@@ -175,14 +175,14 @@ public class UnidadeHierarquiaService {
         for (UnidadeHierarquiaLeitura u : unidades) {
             Unidade unidadeLeve = criarUnidadeLeve(u, titulosResponsavel.get(u.codigo()));
             boolean isElegivel = elegibilidadeChecker == null || elegibilidadeChecker.test(unidadeLeve);
-            UnidadeDto dto = UnidadeDto.builder()
-                    .codigo(u.codigo())
-                    .nome(u.nome())
-                    .sigla(u.sigla())
-                    .codigoPai(u.unidadeSuperiorCodigo())
-                    .tipo(u.tipo().name())
-                    .tituloTitular(u.tituloTitular())
-                    .build();
+            UnidadeDto dto = UnidadeDto.fromResumoObrigatorio(
+                    u.codigo(),
+                    u.nome(),
+                    u.sigla(),
+                    u.unidadeSuperiorCodigo(),
+                    u.tipo(),
+                    u.tituloTitular()
+            );
             dto.setElegivel(isElegivel);
 
             Long codigo = u.codigo();
@@ -287,6 +287,9 @@ public class UnidadeHierarquiaService {
     }
 
     private UnidadeDto toUnidadeDtoObrigatoria(Unidade unidade) {
+        if (unidade == null) {
+            throw new IllegalStateException("Unidade ausente na hierarquia");
+        }
         return UnidadeDto.fromEntityObrigatoria(unidade);
     }
 }

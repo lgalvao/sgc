@@ -36,7 +36,7 @@ public record SubprocessoResumoDto(
 
         return SubprocessoResumoDto.builder()
                 .codigo(subprocesso.getCodigo())
-                .unidade(paraUnidadeResumo(unidade))
+                .unidade(UnidadeDto.fromEntityResumoObrigatoria(unidade))
                 .situacao(subprocesso.getSituacao())
                 .dataLimiteEtapa1(subprocesso.getDataLimiteEtapa1())
                 .dataFimEtapa1(subprocesso.getDataFimEtapa1())
@@ -50,16 +50,6 @@ public record SubprocessoResumoDto(
                 .tipoProcesso(processo.getTipo())
                 .isEmAndamento(subprocesso.isEmAndamento())
                 .etapaAtual(subprocesso.getEtapaAtual())
-                .build();
-    }
-
-    private static UnidadeDto paraUnidadeResumo(Unidade unidade) {
-        return UnidadeDto.builder()
-                .codigo(unidade.getCodigo())
-                .nome(unidade.getNome())
-                .sigla(unidade.getSigla())
-                .tipo(unidade.getTipo().name())
-                .tituloTitular(unidade.getTituloTitular())
                 .build();
     }
 }

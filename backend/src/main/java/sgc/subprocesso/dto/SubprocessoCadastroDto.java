@@ -1,7 +1,6 @@
 package sgc.subprocesso.dto;
 
 import lombok.*;
-import org.jspecify.annotations.*;
 import sgc.mapa.dto.*;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
@@ -16,24 +15,15 @@ public record SubprocessoCadastroDto(
         List<AtividadeDto> atividades) {
 
     public static SubprocessoCadastroDto fromEntity(Subprocesso subprocesso, List<AtividadeDto> atividades) {
-        return SubprocessoCadastroDto.builder()
-                .codigo(subprocesso.getCodigo())
-                .unidade(paraUnidadeResumo(subprocesso.getUnidade()))
-                .atividades(atividades)
-                .build();
-    }
-
-    private static UnidadeDto paraUnidadeResumo(@Nullable Unidade unidade) {
+        Unidade unidade = subprocesso.getUnidade();
         if (unidade == null) {
             throw new IllegalStateException("Subprocesso deve possuir unidade associada");
         }
 
-        return UnidadeDto.builder()
-                .codigo(unidade.getCodigo())
-                .nome(unidade.getNome())
-                .sigla(unidade.getSigla())
-                .tipo(unidade.getTipo().name())
-                .tituloTitular(unidade.getTituloTitular())
+        return SubprocessoCadastroDto.builder()
+                .codigo(subprocesso.getCodigo())
+                .unidade(UnidadeDto.fromEntityResumoObrigatoria(unidade))
+                .atividades(atividades)
                 .build();
     }
 }

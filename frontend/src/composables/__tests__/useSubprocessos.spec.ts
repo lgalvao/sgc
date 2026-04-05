@@ -1,6 +1,8 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import {usePerfilStore} from "@/stores/perfil";
-import {SituacaoSubprocesso} from "@/types/tipos";
+import type {SubprocessoDetalhe} from "@/types/tipos";
+import {SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
+import type {NormalizedError} from "@/utils/apiError";
 
 vi.mock("@/services/subprocessoService");
 vi.mock("@/stores/perfil");
@@ -36,8 +38,28 @@ const permissoesPadrao = {
 
 describe("useSubprocessos", () => {
     let useSubprocessos: typeof import("../useSubprocessos").useSubprocessos;
-    let service: any;
-    let perfilStore: any;
+    let service: typeof import("@/services/subprocessoService");
+    let perfilStore: {perfilSelecionado: string | null; unidadeAtual: number | null};
+
+    const criarDetalheMinimo = (sobrescritas: Partial<SubprocessoDetalhe> = {}): SubprocessoDetalhe => ({
+        codigo: 10,
+        unidade: {codigo: 1, sigla: "U1", nome: "Unidade 1", tipo: "Setor", filhas: [], usuarioCodigo: 1, responsavel: null},
+        titular: null,
+        responsavel: null,
+        situacao: SituacaoSubprocesso.NAO_INICIADO,
+        localizacaoAtual: "U1",
+        processoDescricao: "Processo",
+        dataCriacaoProcesso: "2024-01-01T00:00:00",
+        ultimaDataLimiteSubprocesso: "2025-01-01T00:00:00",
+        tipoProcesso: TipoProcesso.MAPEAMENTO,
+        prazoEtapaAtual: "2025-01-01T00:00:00",
+        isEmAndamento: false,
+        etapaAtual: 1,
+        movimentacoes: [],
+        elementosProcesso: [],
+        permissoes: permissoesPadrao,
+        ...sobrescritas,
+    });
 
     beforeEach(async () => {
         vi.clearAllMocks();
@@ -48,7 +70,7 @@ describe("useSubprocessos", () => {
             perfilSelecionado: "ADMIN",
             unidadeAtual: 1,
         };
-        vi.mocked(usePerfilStore).mockReturnValue(perfilStore);
+        vi.mocked(usePerfilStore).mockReturnValue(perfilStore as unknown as ReturnType<typeof usePerfilStore>);
 
         ({useSubprocessos} = await import("../useSubprocessos"));
     });
@@ -76,7 +98,7 @@ describe("useSubprocessos", () => {
             movimentacoes: [],
             permissoes: permissoesPadrao,
         };
-        service.buscarSubprocessoDetalhe.mockResolvedValue(mockDto);
+        vi.mocked(service.buscarSubprocessoDetalhe).mockResolvedValue(mockDto as never);
 
         await store.buscarSubprocessoDetalhe(10);
 
@@ -86,7 +108,7 @@ describe("useSubprocessos", () => {
 
     it("deve lidar com erro ao buscar detalhe", async () => {
         const store = useSubprocessos();
-        service.buscarSubprocessoDetalhe.mockRejectedValue(new Error("Falha"));
+        vi.mocked(service.buscarSubprocessoDetalhe).mockRejectedValue(new Error("Falha"));
 
         await store.buscarSubprocessoDetalhe(10).catch(() => {});
 
@@ -106,7 +128,7 @@ describe("useSubprocessos", () => {
 
     it("deve retornar null se buscarSubprocessoPorProcessoEUnidade falhar", async () => {
         const store = useSubprocessos();
-        service.buscarSubprocessoPorProcessoEUnidade.mockRejectedValue(new Error("Erro busca ID"));
+        vi.mocked(service.buscarSubprocessoPorProcessoEUnidade).mockRejectedValue(new Error("Erro busca ID"));
 
         const id = await store.buscarSubprocessoPorProcessoEUnidade(1, "U1");
 
@@ -142,7 +164,7 @@ describe("useSubprocessos", () => {
             },
             mapa: {codigo: 20},
         };
-        service.buscarContextoEdicao.mockResolvedValue(mockContexto);
+        vi.mocked(service.buscarContextoEdicao).mockResolvedValue(mockContexto as never);
 
         const resultado = await store.buscarContextoEdicao(10);
 
@@ -161,7 +183,7 @@ describe("useSubprocessos", () => {
             },
             mapa: {codigo: 1}
         };
-        service.buscarContextoEdicao.mockResolvedValue(dataMock);
+        vi.mocked(service.buscarContextoEdicao).mockResolvedValue(dataMock as never);
 
         await store.buscarContextoEdicao(10);
 
@@ -170,7 +192,7 @@ describe("useSubprocessos", () => {
 
     it("deve buscar ID por processo e unidade", async () => {
         const store = useSubprocessos();
-        service.buscarSubprocessoPorProcessoEUnidade.mockResolvedValue({codigo: 99});
+        vi.mocked(service.buscarSubprocessoPorProcessoEUnidade).mockResolvedValue({codigo: 99} as never);
 
         const id = await store.buscarSubprocessoPorProcessoEUnidade(1, "U1");
 
@@ -179,7 +201,7 @@ describe("useSubprocessos", () => {
 
     it("deve atualizar status local", () => {
         const store = useSubprocessos();
-        store.subprocessoDetalhe = {codigo: 10, situacao: SituacaoSubprocesso.NAO_INICIADO} as any;
+        store.subprocessoDetalhe = criarDetalheMinimo({situacao: SituacaoSubprocesso.NAO_INICIADO});
 
         store.atualizarStatusLocal({
             codigo: 10,
@@ -203,16 +225,16 @@ describe("useSubprocessos", () => {
 
     it("deve permitir setar erro e detalhe manualmente", () => {
         const store = useSubprocessos();
-        store.subprocessoDetalhe = {codigo: 5} as any;
+        store.subprocessoDetalhe = criarDetalheMinimo({codigo: 5});
         expect(store.subprocessoDetalhe?.codigo).toBe(5);
 
-        store.lastError = {message: "Erro manual"} as any;
+        store.lastError = {kind: "unexpected", message: "Erro manual"} as NormalizedError;
         expect(store.lastError?.message).toBe("Erro manual");
     });
 
     it("deve mapear resposta detalhada do backend", async () => {
         const store = useSubprocessos();
-        service.buscarSubprocessoDetalhe.mockResolvedValue({
+        vi.mocked(service.buscarSubprocessoDetalhe).mockResolvedValue({
             subprocesso: {
                 codigo: 10,
                 situacao: SituacaoSubprocesso.NAO_INICIADO,
@@ -232,7 +254,7 @@ describe("useSubprocessos", () => {
             localizacaoAtual: "U1",
             movimentacoes: [],
             permissoes: permissoesPadrao
-        });
+        } as never);
 
         await store.buscarSubprocessoDetalhe(10);
         expect(store.subprocessoDetalhe?.codigo).toBe(10);

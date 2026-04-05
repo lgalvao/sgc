@@ -139,11 +139,13 @@ public class LoginFacade {
         if (atribuicao == null) {
             throw new IllegalStateException("Unidade ausente na autorização de login");
         }
-        return UnidadeDto.builder()
-                .codigo(atribuicao.unidadeCodigo())
-                .nome(atribuicao.unidadeNome())
-                .sigla(atribuicao.unidadeSigla())
-                .tipo(atribuicao.unidadeTipo().name())
-                .build();
+        return UnidadeDto.fromResumoObrigatorio(
+                atribuicao.unidadeCodigo(),
+                atribuicao.unidadeNome(),
+                atribuicao.unidadeSigla(),
+                null,
+                atribuicao.unidadeTipo(),
+                null
+        );
     }
 }

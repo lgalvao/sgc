@@ -55,19 +55,54 @@ public class UnidadeDto {
     }
 
     public static UnidadeDto fromEntityObrigatoria(Unidade entity) {
-        UnidadeDto dto = UnidadeDto.builder()
-                .codigo(entity.getCodigo())
-                .nome(entity.getNome())
-                .sigla(entity.getSigla())
-                .codigoPai(entity.getUnidadeSuperior() != null ? entity.getUnidadeSuperior().getCodigo() : null)
-                .tipo(entity.getTipo().name())
-                .tituloTitular(entity.getTituloTitular())
-                .build();
+        Objects.requireNonNull(entity, "Unidade obrigatoria para montagem do DTO");
+
+        UnidadeDto dto = fromResumoObrigatorio(
+                entity.getCodigo(),
+                entity.getNome(),
+                entity.getSigla(),
+                entity.getUnidadeSuperior() != null ? entity.getUnidadeSuperior().getCodigo() : null,
+                entity.getTipo(),
+                entity.getTituloTitular()
+        );
 
         if (entity.getResponsabilidade() != null) {
             dto.setResponsavel(UsuarioResumoDto.fromEntityObrigatorio(entity.getResponsabilidade().getUsuario()));
         }
 
         return dto;
+    }
+
+    public static UnidadeDto fromEntityResumoObrigatoria(@Nullable Unidade entity) {
+        if (entity == null) {
+            throw new IllegalStateException("Unidade obrigatoria para resumo");
+        }
+
+        return fromResumoObrigatorio(
+                entity.getCodigo(),
+                entity.getNome(),
+                entity.getSigla(),
+                null,
+                entity.getTipo(),
+                entity.getTituloTitular()
+        );
+    }
+
+    public static UnidadeDto fromResumoObrigatorio(
+            Long codigo,
+            String nome,
+            String sigla,
+            Long codigoPai,
+            TipoUnidade tipo,
+            String tituloTitular
+    ) {
+        return UnidadeDto.builder()
+                .codigo(Objects.requireNonNull(codigo, "Codigo da unidade obrigatorio"))
+                .nome(Objects.requireNonNull(nome, "Nome da unidade obrigatorio"))
+                .sigla(Objects.requireNonNull(sigla, "Sigla da unidade obrigatoria"))
+                .codigoPai(codigoPai)
+                .tipo(tipo != null ? tipo.name() : null)
+                .tituloTitular(tituloTitular)
+                .build();
     }
 }

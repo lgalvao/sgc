@@ -69,9 +69,10 @@ class SubprocessoServiceProcessarAlteracoesIntegrationTest extends BaseIntegrati
         subprocessoComMapa.setMapa(novoMapa);
         subprocessoRepo.save(subprocessoComMapa);
 
-        AtualizarSubprocessoRequest request = new AtualizarSubprocessoRequest(
-                unidade.getCodigo(), novoMapa.getCodigo(), null, null, null, null
-        );
+        AtualizarSubprocessoRequest request = AtualizarSubprocessoRequest.builder()
+                .codUnidade(unidade.getCodigo())
+                .codMapa(novoMapa.getCodigo())
+                .build();
 
         Subprocesso atualizado = subprocessoService.atualizarEntidade(subprocesso.getCodigo(), request.paraCommand());
         assertThat(atualizado.getMapa().getCodigo()).isEqualTo(novoMapa.getCodigo());
@@ -86,9 +87,10 @@ class SubprocessoServiceProcessarAlteracoesIntegrationTest extends BaseIntegrati
         subprocesso.setMapa(mapa);
         subprocessoRepo.save(subprocesso);
 
-        AtualizarSubprocessoRequest request = new AtualizarSubprocessoRequest(
-                unidade.getCodigo(), mapa.getCodigo(), null, null, null, null
-        );
+        AtualizarSubprocessoRequest request = AtualizarSubprocessoRequest.builder()
+                .codUnidade(unidade.getCodigo())
+                .codMapa(mapa.getCodigo())
+                .build();
 
         Subprocesso atualizado = subprocessoService.atualizarEntidade(subprocesso.getCodigo(), request.paraCommand());
         assertThat(atualizado.getMapa().getCodigo()).isEqualTo(mapa.getCodigo());

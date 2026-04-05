@@ -1,18 +1,21 @@
 package sgc.subprocesso.dto;
 
-import org.jspecify.annotations.*;
-
-import java.time.*;
+import lombok.*;
 
 /**
  * Command interno para atualização de subprocesso.
  */
+@Builder
 public record AtualizarSubprocessoCommand(
-        Long codUnidade,
-        Long codMapa,
-        @Nullable LocalDateTime dataLimiteEtapa1,
-        @Nullable LocalDateTime dataFimEtapa1,
-        @Nullable LocalDateTime dataLimiteEtapa2,
-        @Nullable LocalDateTime dataFimEtapa2
+        AtualizarVinculosSubprocessoCommand vinculos,
+        AtualizarPrazosSubprocessoCommand prazos
 ) {
+    public AtualizarSubprocessoCommand {
+        if (vinculos == null) {
+            vinculos = AtualizarVinculosSubprocessoCommand.builder().build();
+        }
+        if (prazos == null) {
+            prazos = AtualizarPrazosSubprocessoCommand.builder().build();
+        }
+    }
 }

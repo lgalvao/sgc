@@ -55,6 +55,7 @@ const frontendCobertura = frontend.command("cobertura").description("Cobertura e
 criarComandoScript(frontendCobertura, "verificar", "Lista arquivos abaixo do limiar de cobertura.", "etc/scripts/frontend/cobertura-verificar.cjs");
 criarComandoScript(frontendCobertura, "impacto", "Prioriza arquivos por impacto potencial de cobertura.", "etc/scripts/frontend/cobertura-impacto.cjs");
 criarComandoScript(frontendCobertura, "linhas-sem-cobertura", "Mostra linhas sem cobertura no frontend.", "etc/scripts/frontend/cobertura-linhas-sem-cobertura.cjs");
+criarComandoScript(frontendCobertura, "priorizar-defensivos", "Prioriza branches residuais em arquivos ja muito cobertos.", "etc/scripts/frontend/cobertura-priorizar-defensivos.cjs");
 
 const frontendMensagens = frontend.command("mensagens").description("Analise de mensagens e strings do frontend.");
 criarComandoScript(frontendMensagens, "extrair", "Extrai mensagens do projeto.", "etc/scripts/frontend/mensagens-extrair.cjs");

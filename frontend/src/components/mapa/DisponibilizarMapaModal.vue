@@ -18,14 +18,14 @@
     <BFormGroup
         label="Data limite para validação"
         label-for="dataLimite"
-        :state="(fieldErrors?.dataLimite || erroLocalDataLimite) ? false : null"
-        :invalid-feedback="fieldErrors?.dataLimite || erroLocalDataLimite"
+        :state="mensagemErroDataLimite ? false : null"
+        :invalid-feedback="mensagemErroDataLimite"
         class="mb-3"
     >
       <InputData
           id="dataLimite"
           v-model="dataLimiteValidacao"
-          :state="(fieldErrors?.dataLimite || erroLocalDataLimite) ? false : null"
+          :state="mensagemErroDataLimite ? false : null"
           data-testid="inp-disponibilizar-mapa-data"
           max="2099-12-31"
           :min="dataMinimaPermitida"
@@ -102,6 +102,7 @@ const observacoesDisponibilizacao = ref("");
 const erroLocalDataLimite = ref("");
 
 const ultimaDataLimiteFormatada = computed(() => extrairData(props.ultimaDataLimiteSubprocesso));
+const mensagemErroDataLimite = computed(() => props.fieldErrors?.dataLimite ?? erroLocalDataLimite.value);
 const dataMinimaPermitida = computed(() => {
   const amanha = obterAmanhaFormatado();
   const ultimaDataLimite = ultimaDataLimiteFormatada.value;
@@ -146,6 +147,6 @@ function disponibilizar() {
 }
 
 function extrairData(data?: string) {
-  return data?.split("T")[0] || "";
+  return data?.split("T")[0] ?? "";
 }
 </script>

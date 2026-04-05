@@ -3,9 +3,22 @@ import {mount} from "@vue/test-utils";
 import ModalAcaoBloco from "../processo/ModalAcaoBloco.vue";
 import {BButton} from "bootstrap-vue-next";
 import {obterAmanhaFormatado} from "@/utils/dateUtils";
+import type {UnidadeSelecao} from "../processo/ModalAcaoBloco.vue";
+
+type ModalAcaoBlocoVm = {
+    mostrar: boolean;
+    processando: boolean;
+    erro: string | null;
+    dataLimite: string;
+    abrir: () => void;
+    fechar: () => void;
+    confirmar: () => void | Promise<void>;
+    setProcessando: (valor: boolean) => void;
+    setErro: (mensagem: string | null) => void;
+};
 
 describe("ModalAcaoBloco.vue", () => {
-    const mockUnidades = [
+    const mockUnidades: UnidadeSelecao[] = [
         { codigo: 1, sigla: "U1", nome: "Unidade 1", situacao: "Pendente" },
         { codigo: 2, sigla: "U2", nome: "Unidade 2", situacao: "Pendente" },
     ];
@@ -51,17 +64,22 @@ describe("ModalAcaoBloco.vue", () => {
         vi.clearAllMocks();
     });
 
+    function obterVm(wrapper: ReturnType<typeof createWrapper>): ModalAcaoBlocoVm {
+        return wrapper.vm as unknown as ModalAcaoBlocoVm;
+    }
+
     it("deve inicializar e abrir o modal", async () => {
         const wrapper = createWrapper();
         await wrapper.vm.$nextTick();
 
-        (wrapper.vm as any).abrir();
-        expect((wrapper.vm as any).mostrar).toBe(true);
+        const vm = obterVm(wrapper);
+        vm.abrir();
+        expect(vm.mostrar).toBe(true);
     });
 
     it("deve selecionar/deselecionar todas as unidades", async () => {
         const wrapper = createWrapper();
-        (wrapper.vm as any).abrir();
+        obterVm(wrapper).abrir();
         await wrapper.vm.$nextTick();
 
         const checkboxTodos = wrapper.find('thead input[type="checkbox"]');
@@ -79,7 +97,7 @@ describe("ModalAcaoBloco.vue", () => {
 
     it("deve inicializar com unidades pré-selecionadas", async () => {
         const wrapper = createWrapper({ unidadesPreSelecionadas: [1] });
-        (wrapper.vm as any).abrir();
+        obterVm(wrapper).abrir();
         await wrapper.vm.$nextTick();
 
         const checkboxes = wrapper.findAll('tbody input[type="checkbox"]');
@@ -90,7 +108,7 @@ describe("ModalAcaoBloco.vue", () => {
 
     it("deve emitir 'confirmar' com os IDs selecionados", async () => {
         const wrapper = createWrapper({ unidadesPreSelecionadas: [2] });
-        (wrapper.vm as any).abrir();
+        obterVm(wrapper).abrir();
         await wrapper.vm.$nextTick();
 
         const btnConfirmar = wrapper.findAllComponents(BButton).find(b => b.text().includes("Confirmar"));
@@ -109,21 +127,22 @@ describe("ModalAcaoBloco.vue", () => {
             unidadesPreSelecionadas: [1],
             mostrarDataLimite: true
         });
-        (wrapper.vm as any).abrir();
+        const vm = obterVm(wrapper);
+        vm.abrir();
         await wrapper.vm.$nextTick();
 
         // Chamar confirmar diretamente pois o botão está desabilitado via :disabled
-        await (wrapper.vm as any).confirmar();
+        await vm.confirmar();
         await wrapper.vm.$nextTick();
         
         expect(wrapper.emitted('confirmar')).toBeFalsy();
-        expect((wrapper.vm as any).erro).toBe("A data limite é obrigatória.");
+        expect(vm.erro).toBe("A data limite é obrigatória.");
 
         const amanha = obterAmanhaFormatado();
-        (wrapper.vm as any).dataLimite = amanha;
+        vm.dataLimite = amanha;
         await wrapper.vm.$nextTick();
         
-        await (wrapper.vm as any).confirmar();
+        await vm.confirmar();
 
         expect(wrapper.emitted('confirmar')).toBeTruthy();
         expect(wrapper.emitted('confirmar')![0][0]).toEqual({
@@ -134,15 +153,15 @@ describe("ModalAcaoBloco.vue", () => {
 
     it("deve fechar o modal e limpar estado", () => {
         const wrapper = createWrapper();
-        (wrapper.vm as any).abrir();
-        (wrapper.vm as any).setProcessando(true);
-        (wrapper.vm as any).setErro("Erro");
+        const vm = obterVm(wrapper);
+        vm.abrir();
+        vm.setProcessando(true);
+        vm.setErro("Erro");
 
-        (wrapper.vm as any).fechar();
+        vm.fechar();
 
-        expect((wrapper.vm as any).mostrar).toBe(false);
-        expect((wrapper.vm as any).processando).toBe(false);
-        expect((wrapper.vm as any).erro).toBe(null);
+        expect(vm.mostrar).toBe(false);
+        expect(vm.processando).toBe(false);
+        expect(vm.erro).toBe(null);
     });
 });
-

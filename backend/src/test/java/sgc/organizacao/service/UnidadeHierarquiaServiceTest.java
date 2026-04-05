@@ -128,6 +128,7 @@ class UnidadeHierarquiaServiceTest {
         when(unidadeRepo.listarEstruturasAtivas()).thenReturn(List.of(toLeitura(unidadeRaiz)));
         Unidade extra = Unidade.builder()
                 .codigo(99L)
+                .nome("Unidade Extra")
                 .sigla("EXTRA")
                 .tipo(TipoUnidade.OPERACIONAL)
                 .build();
@@ -144,6 +145,7 @@ class UnidadeHierarquiaServiceTest {
         when(unidadeRepo.listarEstruturasAtivas()).thenReturn(List.of(toLeitura(unidadeRaiz)));
         Unidade extra = Unidade.builder()
                 .codigo(999L)
+                .nome("Unidade Inexistente")
                 .sigla("INEXISTENTE")
                 .tipo(TipoUnidade.OPERACIONAL)
                 .build();

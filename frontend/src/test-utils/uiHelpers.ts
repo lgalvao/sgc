@@ -1,10 +1,11 @@
 import {expect} from "vitest";
+import type {VueWrapper} from "@vue/test-utils";
 
 /**
  * Seleciona processo e unidade nos selects do modal e aguarda atualizações reativas.
  */
 export async function selecionarProcessoEUnidade(
-    wrapper: any,
+    wrapper: VueWrapper,
     codProcesso = 1,
     unidadeId = 1,
 ) {
@@ -22,12 +23,12 @@ export async function selecionarProcessoEUnidade(
 /**
  * Assertions helpers para o botão Importar
  */
-export function expectImportButtonDisabled(wrapper: any) {
+export function expectImportButtonDisabled(wrapper: VueWrapper) {
     const importarButton = wrapper.find(".btn-outline-primary");
     expect(importarButton.attributes("disabled")).toBeDefined();
 }
 
-export function expectImportButtonEnabled(wrapper: any) {
+export function expectImportButtonEnabled(wrapper: VueWrapper) {
     const importarButton = wrapper.find(".btn-outline-primary");
     expect(importarButton.attributes("disabled")).toBeUndefined();
 }
@@ -35,7 +36,7 @@ export function expectImportButtonEnabled(wrapper: any) {
 /**
  * Seleciona a primeira checkbox de atividade
  */
-export async function selectFirstCheckbox(wrapper: any) {
+export async function selectFirstCheckbox(wrapper: VueWrapper) {
     const checkboxes = wrapper.findAll('.form-check-input[type="checkbox"]');
     if (checkboxes.length > 0) {
         await checkboxes[0].setValue(true);
@@ -47,7 +48,7 @@ export async function selectFirstCheckbox(wrapper: any) {
  * Verifica as opções do select de unidades (inclui opção disabled inicial).
  * labels é array de strings esperadas nas options (sem contar a opção disabled)
  */
-export function assertUnidadeOptions(wrapper: any, labels: string[]) {
+export function assertUnidadeOptions(wrapper: VueWrapper, labels: string[]) {
     const unidadeSelect = wrapper.find("select#unidade-select");
     expect(unidadeSelect.attributes("disabled")).toBeUndefined();
 
@@ -64,8 +65,8 @@ export function assertUnidadeOptions(wrapper: any, labels: string[]) {
  * expectedLabels é um array com os labels (excluindo 'Home' que sempre é o primeiro crumb).
  */
 export async function navigateAndAssertBreadcrumbs(
-    router: any,
-    mountFn: () => Promise<any>,
+    router: {push: (path: string) => unknown},
+    mountFn: () => Promise<VueWrapper>,
     path: string,
     expectedLabels: string[],
 ) {
@@ -84,7 +85,7 @@ export async function navigateAndAssertBreadcrumbs(
  * Helper para verificar que um array contém todos os itens esperados.
  * Útil para reduzir múltiplas chamadas repetitivas a expect(array).toContain(...)
  */
-export function expectContainsAll(array: any[], items: string[]) {
+export function expectContainsAll<T>(array: T[], items: T[]) {
     for (const item of items) {
         expect(array).toContain(item);
     }

@@ -16,6 +16,7 @@ import type {
 import {useErrorHandler} from "@/composables/useErrorHandler";
 import {normalizeError} from "@/utils/apiError";
 import {logger} from "@/utils";
+import {Perfil} from "@/types/tipos";
 
 const subprocessoDetalhe = ref<SubprocessoDetalhe | null>(null);
 const {lastError, clearError, withErrorHandling} = useErrorHandler();
@@ -38,7 +39,7 @@ function mapRespostaDetalheParaModel(dto: SubprocessoDetalheResponse): Subproces
         dataCriacaoProcesso: sp.dataCriacaoProcesso,
         ultimaDataLimiteSubprocesso: obterUltimaDataLimiteSubprocesso(sp),
         tipoProcesso: sp.tipoProcesso,
-        prazoEtapaAtual: sp.dataLimiteEtapa2 || sp.dataLimiteEtapa1,
+        prazoEtapaAtual: sp.dataLimiteEtapa2 ?? sp.dataLimiteEtapa1,
         isEmAndamento: sp.isEmAndamento,
         etapaAtual: sp.etapaAtual ?? 1,
         movimentacoes: dto.movimentacoes,
@@ -65,7 +66,7 @@ function obterContextoAcessoSubprocesso(): ContextoAcessoSubprocesso | null {
     const perfilStore = usePerfilStore();
     const perfil = perfilStore.perfilSelecionado;
     const codUnidade = perfilStore.unidadeAtual;
-    const perfilGlobal = perfil === "ADMIN" || perfil === "GESTOR";
+    const perfilGlobal = perfil === Perfil.ADMIN || perfil === Perfil.GESTOR;
 
     if (!perfil || (!perfilGlobal && codUnidade === null)) {
         logger.error("Erro de pré-condição: Perfil ou unidade não disponíveis");
@@ -110,7 +111,7 @@ async function buscarSubprocessoPorProcessoEUnidade(codProcesso: number, siglaUn
             const dto = await serviceBuscarSubprocessoPorProcessoEUnidade(codProcesso, siglaUnidade);
             return dto.codigo;
         });
-    } catch (error) {
+    } catch (error: unknown) {
         logger.error("Erro ao buscar ID do subprocesso:", error);
         return null;
     }

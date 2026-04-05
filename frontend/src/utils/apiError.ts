@@ -1,17 +1,32 @@
 import logger from '@/utils/logger';
 
+type ErrorLike = {
+    stack?: string;
+    isAxiosError?: boolean;
+};
+
+function obterStack(erro: unknown): string | undefined {
+    return typeof erro === "object" && erro !== null && "stack" in erro
+        ? (erro as ErrorLike).stack
+        : undefined;
+}
+
+function asPayload(data: unknown): ApiErrorPayload {
+    return typeof data === "object" && data !== null ? data as ApiErrorPayload : {};
+}
+
 export interface ApiErrorPayload {
     timestamp?: string;
     status?: number;
     message?: string;
     code?: string;
-    details?: Record<string, any>;
+    details?: Record<string, unknown>;
     traceId?: string;
     stackTrace?: string;
     subErrors?: Array<{
         object?: string;
         field?: string;
-        rejectedValue?: any;
+        rejectedValue?: unknown;
         message?: string;
     }>;
 }
@@ -30,7 +45,7 @@ export interface NormalizedError {
     message: string;
     code?: string;
     status?: number;
-    details?: Record<string, any>;
+    details?: Record<string, unknown>;
     subErrors?: Array<{ message?: string; field?: string; }>;
     traceId?: string;
     stackTrace?: string;
@@ -43,7 +58,7 @@ export function normalizeError(err: unknown): NormalizedError {
         return {
             kind: 'network',
             message: 'Não foi possível conectar ao servidor. Verifique sua conexão.',
-            stackTrace: (err as any).stack,
+            stackTrace: obterStack(err),
             originalError: err
         };
     }
@@ -51,8 +66,7 @@ export function normalizeError(err: unknown): NormalizedError {
     // Erro HTTP com resposta da API
     if (isAxiosError(err) && err.response) {
         const {status, data} = err.response;
-        // data can be unknown, cast to ApiErrorPayload if it matches
-        const payload = (data || {}) as ApiErrorPayload;
+        const payload = asPayload(data);
 
         return {
             kind: mapStatusToKind(status),
@@ -62,7 +76,7 @@ export function normalizeError(err: unknown): NormalizedError {
             details: payload?.details,
             subErrors: payload?.subErrors,
             traceId: payload?.traceId,
-            stackTrace: payload?.stackTrace || (err as any).stack,
+            stackTrace: payload?.stackTrace || obterStack(err),
             originalError: err
         };
     }
@@ -81,7 +95,7 @@ export function normalizeError(err: unknown): NormalizedError {
     return {
         kind: 'unexpected',
         message: 'Erro desconhecido ou não mapeado pela aplicação.',
-        stackTrace: (err as any)?.stack || String(err),
+        stackTrace: obterStack(err) || String(err),
         originalError: err
     };
 }
@@ -97,12 +111,9 @@ function mapStatusToKind(status: number): ErrorKind {
 }
 
 export function isAxiosError(error: unknown): error is import('axios').AxiosError {
-    return (
-        error !== null &&
+    return (error !== null &&
         typeof error === 'object' &&
-        'isAxiosError' in error &&
-        (error as any).isAxiosError === true
-    );
+        'isAxiosError' in error && (error as ErrorLike).isAxiosError);
 }
 
 /**

@@ -13,7 +13,8 @@ import ConfirmacaoDisponibilizacaoModal from "@/components/mapa/ConfirmacaoDispo
 import HistoricoAnaliseModal from "@/components/processo/HistoricoAnaliseModal.vue";
 import ImpactoMapaModal from "@/components/mapa/ImpactoMapaModal.vue";
 import * as useAcessoModule from '@/composables/useAcesso';
-import {Perfil} from "@/types/tipos";
+import type {AtividadeOperacaoResponse, ContextoEdicaoSubprocesso, MapaCompleto, PermissoesSubprocesso, Subprocesso, SubprocessoDetalhe, Unidade} from "@/types/tipos";
+import {Perfil, SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 
 vi.mock("@/utils/logger", () => ({
     default: {
@@ -25,13 +26,131 @@ vi.mock("@/utils/logger", () => ({
 }));
 
 const {pushMock} = vi.hoisted(() => ({pushMock: vi.fn()}));
+
+type AtividadeMinima = {
+    codigo: number;
+    descricao?: string;
+    conhecimentos?: Array<{codigo: number; descricao?: string}>;
+};
+
+type CadastroViewVm = {
+    codSubprocesso: number | null;
+    unidade: {sigla: string; nome: string} | null;
+    atividades: AtividadeMinima[];
+    atividadesSnapshotInicial: string;
+    disponibilizacaoSemMudancas: boolean;
+    mostrarModalConfirmacao: boolean;
+    mostrarModalImportar: boolean;
+    mostrarModalConfirmacaoRemocao: boolean;
+    dadosRemocao: {tipo: string; index?: number; conhecimentoCodigo?: number} | null;
+    erroGlobal: string | null;
+    notificacao: unknown;
+    novaAtividade: string;
+    timeoutLimparErros: ReturnType<typeof setTimeout> | null;
+    podeHomologarCadastro?: boolean;
+    handleImportAtividades: () => Promise<void>;
+    disponibilizarCadastro: () => Promise<void>;
+    adicionarAtividade: () => Promise<void>;
+    confirmarRemocao: () => Promise<void>;
+    processarRespostaLocal: (payload: {atividadesAtualizadas?: unknown[]}) => void;
+    notify: (mensagem: string, variante: string) => void;
+    carregarContextoInicial: () => Promise<void>;
+    timeoutLimpezaErros: () => void;
+    $nextTick: () => Promise<void>;
+};
+
+type FluxoSubprocessoMock = {
+    validarCadastro: ReturnType<typeof vi.fn>;
+    disponibilizarCadastro: ReturnType<typeof vi.fn>;
+    disponibilizarRevisaoCadastro: ReturnType<typeof vi.fn>;
+};
+
+type SubprocessoStoreMock = {
+    subprocessoDetalhe: {
+        codigo: number;
+        situacao: SituacaoSubprocesso | string;
+        tipoProcesso: TipoProcesso | string;
+        unidade?: {sigla: string};
+        permissoes?: Record<string, boolean>;
+    } | null;
+    buscarContextoEdicao: ReturnType<typeof vi.fn>;
+    buscarSubprocessoPorProcessoEUnidade: ReturnType<typeof vi.fn>;
+    buscarSubprocessoDetalhe: ReturnType<typeof vi.fn>;
+    atualizarStatusLocal: ReturnType<typeof vi.fn>;
+    lastError: {message: string} | null;
+    clearError: ReturnType<typeof vi.fn>;
+};
+
+function criarContextoEdicao(): ContextoEdicaoSubprocesso {
+    const permissoes: PermissoesSubprocesso = {
+        podeEditarCadastro: false,
+        podeDisponibilizarCadastro: false,
+        podeDevolverCadastro: false,
+        podeAceitarCadastro: false,
+        podeHomologarCadastro: false,
+        podeEditarMapa: false,
+        podeDisponibilizarMapa: false,
+        podeValidarMapa: false,
+        podeApresentarSugestoes: false,
+        podeVerSugestoes: false,
+        podeDevolverMapa: false,
+        podeAceitarMapa: false,
+        podeHomologarMapa: false,
+        podeVisualizarImpacto: false,
+        podeAlterarDataLimite: false,
+        podeReabrirCadastro: false,
+        podeReabrirRevisao: false,
+        podeEnviarLembrete: false,
+        mesmaUnidade: false,
+        habilitarAcessoCadastro: false,
+        habilitarAcessoMapa: false,
+    };
+    const unidade: Unidade = {codigo: 1, sigla: "TESTE", nome: "Teste", filhas: [], usuarioCodigo: 0, responsavel: null};
+    const mapa: MapaCompleto = {codigo: 100, subprocessoCodigo: 123, observacoes: "", competencias: [], situacao: "CRIADO"};
+    const subprocesso: Subprocesso = {
+        codigo: 123,
+        unidade,
+        situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
+        dataLimite: "2025-01-01T00:00:00",
+        dataFimEtapa1: "",
+        dataLimiteEtapa2: "",
+        atividades: [],
+        codUnidade: unidade.codigo,
+    };
+    const detalhes: SubprocessoDetalhe = {
+        codigo: 123,
+        unidade,
+        titular: null,
+        responsavel: null,
+        situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
+        localizacaoAtual: "TESTE",
+        processoDescricao: "Processo",
+        dataCriacaoProcesso: "2024-01-01T00:00:00",
+        ultimaDataLimiteSubprocesso: "2025-01-01T00:00:00",
+        tipoProcesso: TipoProcesso.MAPEAMENTO,
+        prazoEtapaAtual: "2025-01-01T00:00:00",
+        isEmAndamento: true,
+        etapaAtual: 1,
+        movimentacoes: [],
+        elementosProcesso: [],
+        permissoes,
+    };
+    return {
+        subprocesso,
+        detalhes,
+        mapa,
+        atividadesDisponiveis: [{codigo: 1, descricao: "Ativ 1", conhecimentos: [{codigo: 1, descricao: "Conhecimento 1"}]}],
+        unidade
+    };
+}
+
 const subprocessosMock = reactive({
-    subprocessoDetalhe: null as any,
+    subprocessoDetalhe: null as SubprocessoStoreMock["subprocessoDetalhe"],
     buscarContextoEdicao: vi.fn(),
     buscarSubprocessoPorProcessoEUnidade: vi.fn(),
     buscarSubprocessoDetalhe: vi.fn(),
     atualizarStatusLocal: vi.fn(),
-    lastError: null as any,
+    lastError: null as SubprocessoStoreMock["lastError"],
     clearError: vi.fn(),
 });
 
@@ -106,7 +225,7 @@ const stubs = {
         template: '<div data-testid="cad-atividade-form"></div>', 
         props: ['modelValue'],
         expose: ['inputRef'],
-        setup(_: any, {emit: __}: any) {
+        setup() {
             return {
                 inputRef: {
                     $el: {
@@ -143,12 +262,12 @@ function createWrapper(customState = {}, accessOverrides = {}) {
         mesmaUnidade: ref(true),
         habilitarAcessoCadastro: ref(true),
         ...accessOverrides
-    } as any);
+    } as unknown as ReturnType<typeof useAcessoModule.useAcesso>);
 
     vi.mocked(usePerfilModule.usePerfil).mockReturnValue({
         perfilSelecionado: ref(Perfil.CHEFE),
         isChefe: ref(true),
-    } as any);
+    } as unknown as ReturnType<typeof usePerfilModule.usePerfil>);
 
     const wrapper = mount(CadastroView, {
         global: {
@@ -182,12 +301,13 @@ function createWrapper(customState = {}, accessOverrides = {}) {
     });
 
     const mapas = useMapas();
-    mapas.mapaCompleto.value = {codigo: 100} as any;
+    mapas.mapaCompleto.value = {codigo: 100} as unknown as typeof mapas.mapaCompleto.value;
     mapas.impactoMapa.value = null;
     mapas.erro.value = null;
 
-    (wrapper.vm as any).codSubprocesso = 123;
-    (wrapper.vm as any).unidade = {sigla: "TESTE", nome: "Teste"};
+    const vm = wrapper.vm as unknown as CadastroViewVm;
+    vm.codSubprocesso = 123;
+    vm.unidade = {sigla: "TESTE", nome: "Teste"};
 
     return wrapper;
 }
@@ -211,19 +331,9 @@ describe("CadastroView.vue", () => {
             validarCadastro: vi.fn().mockResolvedValue({valido: true}),
             disponibilizarCadastro: vi.fn().mockResolvedValue(true),
             disponibilizarRevisaoCadastro: vi.fn().mockResolvedValue(true),
-        } as any);
-        vi.mocked(subprocessoService.buscarSubprocessoPorProcessoEUnidade).mockResolvedValue({codigo: 123} as any);
-        vi.mocked(subprocessoService.buscarContextoEdicao).mockResolvedValue({
-            detalhes: {
-                codigo: 123,
-                situacao: "MAPEAMENTO_CADASTRO_EM_ANDAMENTO",
-                tipoProcesso: "MAPEAMENTO",
-                unidade: {sigla: "TESTE"}
-            },
-            mapa: {codigo: 100},
-            atividadesDisponiveis: [{codigo: 1, descricao: "Ativ 1", conhecimentos: [{codigo: 1, descricao: "Conhecimento 1"}]}],
-            unidade: {sigla: "TESTE", nome: "Teste"}
-        } as any);
+        } as unknown as ReturnType<typeof useFluxoSubprocessoModule.useFluxoSubprocesso>);
+        vi.mocked(subprocessoService.buscarSubprocessoPorProcessoEUnidade).mockResolvedValue({codigo: 123} as never);
+        vi.mocked(subprocessoService.buscarContextoEdicao).mockResolvedValue(criarContextoEdicao());
     });
 
     it("renderiza corretamente", async () => {
@@ -235,40 +345,42 @@ describe("CadastroView.vue", () => {
     it("chama validação antes de disponibilizar", async () => {
         const wrapper = createWrapper();
         await flushPromises();
-        (wrapper.vm as any).atividades = [{codigo: 1, conhecimentos: [{codigo: 1}]}];
+        const vm = wrapper.vm as unknown as CadastroViewVm;
+        vm.atividades = [{codigo: 1, conhecimentos: [{codigo: 1}]}];
         await wrapper.vm.$nextTick();
-        const subprocessosStore = subprocessosMock as any;
-        const fluxoSubprocesso = useFluxoSubprocessoModule.useFluxoSubprocesso() as any;
+        const subprocessosStore = subprocessosMock;
+        const fluxoSubprocesso = useFluxoSubprocessoModule.useFluxoSubprocesso() as unknown as FluxoSubprocessoMock;
         subprocessosStore.subprocessoDetalhe = {
             codigo: 123,
             situacao: "MAPEAMENTO_CADASTRO_EM_ANDAMENTO",
             tipoProcesso: "MAPEAMENTO",
             unidade: {sigla: "TESTE"},
             permissoes: {}
-        } as any;
+        };
 
-        await (wrapper.vm as any).disponibilizarCadastro();
+        await vm.disponibilizarCadastro();
 
         expect(fluxoSubprocesso.validarCadastro).toHaveBeenCalledWith(123);
-        expect((wrapper.vm as any).mostrarModalConfirmacao).toBe(true);
+        expect(vm.mostrarModalConfirmacao).toBe(true);
     });
 
     it("confirma disponibilização e redireciona", async () => {
         const wrapper = createWrapper();
         await flushPromises();
-        (wrapper.vm as any).atividades = [{codigo: 1, conhecimentos: [{codigo: 1}]}];
+        const vm = wrapper.vm as unknown as CadastroViewVm;
+        vm.atividades = [{codigo: 1, conhecimentos: [{codigo: 1}]}];
         await wrapper.vm.$nextTick();
-        const subprocessosStore = subprocessosMock as any;
-        const fluxoSubprocesso = useFluxoSubprocessoModule.useFluxoSubprocesso() as any;
+        const subprocessosStore = subprocessosMock;
+        const fluxoSubprocesso = useFluxoSubprocessoModule.useFluxoSubprocesso() as unknown as FluxoSubprocessoMock;
         subprocessosStore.subprocessoDetalhe = {
             codigo: 123,
             situacao: "MAPEAMENTO_CADASTRO_EM_ANDAMENTO",
             tipoProcesso: "MAPEAMENTO",
             unidade: {sigla: "TESTE"},
             permissoes: {}
-        } as any;
+        };
 
-        await (wrapper.vm as any).disponibilizarCadastro();
+        await vm.disponibilizarCadastro();
         await flushPromises();
 
         const modal = wrapper.findComponent(ConfirmacaoDisponibilizacaoModal);
@@ -309,7 +421,8 @@ describe("CadastroView.vue", () => {
         await flushPromises();
 
         // Atividade sem conhecimentos
-        (wrapper.vm as any).atividades = [{
+        const vm = wrapper.vm as unknown as CadastroViewVm;
+        vm.atividades = [{
             codigo: 1,
             descricao: "Atividade 1",
             conhecimentos: []
@@ -326,7 +439,8 @@ describe("CadastroView.vue", () => {
         await flushPromises();
 
         // Atividade com conhecimentos
-        (wrapper.vm as any).atividades = [{
+        const vm = wrapper.vm as unknown as CadastroViewVm;
+        vm.atividades = [{
             codigo: 1,
             descricao: "Atividade 1",
             conhecimentos: [{codigo: 1, descricao: "Conhecimento 1"}]
@@ -341,12 +455,14 @@ describe("CadastroView.vue", () => {
     it("em revisão, mantém botão desabilitado sem mudanças e checkbox desmarcada", async () => {
         const wrapper = createWrapper();
         await flushPromises();
-        const vm = wrapper.vm as any;
-        const subprocessosStore = subprocessosMock as any;
+        const vm = wrapper.vm as unknown as CadastroViewVm;
+        const subprocessosStore = subprocessosMock;
         subprocessosStore.subprocessoDetalhe = {
-            ...subprocessosStore.subprocessoDetalhe,
+            codigo: 123,
             situacao: "REVISAO_CADASTRO_EM_ANDAMENTO",
             tipoProcesso: "REVISAO",
+            unidade: {sigla: "TESTE"},
+            permissoes: {}
         };
         vm.atividades = [{
             codigo: 1,
@@ -365,12 +481,14 @@ describe("CadastroView.vue", () => {
     it("em revisão, habilita botão ao marcar checkbox sem mudanças", async () => {
         const wrapper = createWrapper();
         await flushPromises();
-        const vm = wrapper.vm as any;
-        const subprocessosStore = subprocessosMock as any;
+        const vm = wrapper.vm as unknown as CadastroViewVm;
+        const subprocessosStore = subprocessosMock;
         subprocessosStore.subprocessoDetalhe = {
-            ...subprocessosStore.subprocessoDetalhe,
+            codigo: 123,
             situacao: "REVISAO_CADASTRO_EM_ANDAMENTO",
             tipoProcesso: "REVISAO",
+            unidade: {sigla: "TESTE"},
+            permissoes: {}
         };
         vm.atividades = [{
             codigo: 1,
@@ -388,12 +506,14 @@ describe("CadastroView.vue", () => {
     it("em revisão, habilita botão quando houver alteração no cadastro", async () => {
         const wrapper = createWrapper();
         await flushPromises();
-        const vm = wrapper.vm as any;
-        const subprocessosStore = subprocessosMock as any;
+        const vm = wrapper.vm as unknown as CadastroViewVm;
+        const subprocessosStore = subprocessosMock;
         subprocessosStore.subprocessoDetalhe = {
-            ...subprocessosStore.subprocessoDetalhe,
+            codigo: 123,
             situacao: "REVISAO_CADASTRO_EM_ANDAMENTO",
             tipoProcesso: "REVISAO",
+            unidade: {sigla: "TESTE"},
+            permissoes: {}
         };
         vm.atividadesSnapshotInicial = JSON.stringify([{descricao: "Ativ 1", conhecimentos: ["Conhecimento 1"]}]);
         vm.atividades = [{
@@ -423,27 +543,25 @@ describe("CadastroView.vue", () => {
     it("recarrega contexto completo apos importar atividades", async () => {
         const wrapper = createWrapper();
         await flushPromises();
-        const subprocessosStore = subprocessosMock as any;
+        const subprocessosStore = subprocessosMock;
         subprocessosStore.buscarContextoEdicao = vi.fn().mockResolvedValue({
+            ...criarContextoEdicao(),
             detalhes: {
-                subprocesso: {
-                    codigo: 123,
-                    situacao: "MAPEAMENTO_CADASTRO_EM_ANDAMENTO",
-                    unidade: {sigla: "TESTE"},
-                },
+                ...criarContextoEdicao().detalhes,
                 permissoes: {
+                    ...criarContextoEdicao().detalhes.permissoes,
                     podeEditarCadastro: true,
                     podeDisponibilizarCadastro: true,
                 },
             },
             atividadesDisponiveis: [{codigo: 2, descricao: "Atividade importada", conhecimentos: [{codigo: 2, descricao: "Conhecimento importado"}]}],
-            unidade: {sigla: "TESTE", nome: "Teste"}
-        } as any);
+        });
 
-        await (wrapper.vm as any).handleImportAtividades();
+        const vm = wrapper.vm as unknown as CadastroViewVm;
+        await vm.handleImportAtividades();
 
         expect(subprocessosStore.buscarContextoEdicao).toHaveBeenCalledWith(123);
-        expect((wrapper.vm as any).atividades).toEqual([
+        expect(vm.atividades).toEqual([
             {codigo: 2, descricao: "Atividade importada", conhecimentos: [{codigo: 2, descricao: "Conhecimento importado"}]}
         ]);
     });
@@ -451,7 +569,7 @@ describe("CadastroView.vue", () => {
     it("deve gerenciar interações com formulários de atividades, modais de importação e alertas de erro", async () => {
         const wrapper = createWrapper();
         await flushPromises();
-        const vm = wrapper.vm as any;
+        const vm = wrapper.vm as unknown as CadastroViewVm;
         vm.atividades = [{codigo: 1, descricao: "A1", conhecimentos: [{codigo: 1}]}];
         await vm.$nextTick();
 
@@ -525,7 +643,12 @@ describe("CadastroView.vue", () => {
         await vm.adicionarAtividade();
 
         // 404 (confirmarRemocao success branch)
-        vi.mocked(atividadeService.excluirAtividade).mockResolvedValue({atividadesAtualizadas: []} as any);
+        vi.mocked(atividadeService.excluirAtividade).mockResolvedValue({
+            atividade: null,
+            subprocesso: {codigo: 123, situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO},
+            atividadesAtualizadas: [],
+            permissoes: criarContextoEdicao().detalhes.permissoes,
+        } as AtividadeOperacaoResponse);
         vm.dadosRemocao = {tipo: "atividade", index: 0};
         await vm.confirmarRemocao();
         
