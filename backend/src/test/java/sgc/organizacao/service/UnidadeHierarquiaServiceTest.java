@@ -4,6 +4,7 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
+import org.springframework.beans.factory.ObjectProvider;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
 import sgc.testutils.*;
@@ -31,6 +32,9 @@ class UnidadeHierarquiaServiceTest {
     @Mock
     private ResponsabilidadeRepo responsabilidadeRepo;
 
+    @Mock
+    private ObjectProvider<UnidadeHierarquiaService> selfProvider;
+
     @InjectMocks
     private UnidadeHierarquiaService service;
 
@@ -40,6 +44,7 @@ class UnidadeHierarquiaServiceTest {
 
     @BeforeEach
     void setUp() {
+        lenient().when(selfProvider.getObject()).thenReturn(service);
         unidadeRaiz = UnidadeTestBuilder.raiz().build();
         unidadeRaiz.setCodigo(1L);
         unidadeRaiz.setResponsabilidade(criarResponsabilidade(1L));

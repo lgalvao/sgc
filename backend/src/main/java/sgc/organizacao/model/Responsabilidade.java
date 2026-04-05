@@ -42,7 +42,7 @@ public class Responsabilidade implements Serializable {
     @JoinColumn(name = "usuario_titulo", referencedColumnName = "titulo", insertable = false, updatable = false)
     private Usuario usuario;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "unidade_codigo", referencedColumnName = "codigo", insertable = false, updatable = false)
     private Unidade unidade;
 }

@@ -122,7 +122,7 @@ function handleLogout() {
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   padding: 0.75rem 1.5rem;
-  box-shadow: var(--sombra-md);
+  box-shadow: var(--bs-box-shadow-sm);
 }
 
 .navbar-brand {
@@ -187,4 +187,3 @@ function handleLogout() {
   }
 }
 </style>
-

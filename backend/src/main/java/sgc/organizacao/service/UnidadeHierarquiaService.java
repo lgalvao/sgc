@@ -2,6 +2,7 @@ package sgc.organizacao.service;
 
 import lombok.*;
 import org.jspecify.annotations.*;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.*;
 import sgc.comum.config.CacheConfig;
@@ -23,6 +24,7 @@ public class UnidadeHierarquiaService {
     private final UnidadeRepo unidadeRepo;
     private final UnidadeService unidadeService;
     private final ResponsabilidadeRepo responsabilidadeRepo;
+    private final ObjectProvider<UnidadeHierarquiaService> selfProvider;
 
     /**
      * Busca a árvore hierárquica completa de unidades.
@@ -64,7 +66,7 @@ public class UnidadeHierarquiaService {
      * Busca todos os IDs de unidades descendentes de uma unidade.
      */
     public List<Long> buscarIdsDescendentes(Long codigoUnidade) {
-        return buscarDescendentes(codigoUnidade, buscarMapaHierarquia());
+        return buscarDescendentes(codigoUnidade, self().buscarMapaHierarquia());
     }
 
     /**
@@ -95,7 +97,7 @@ public class UnidadeHierarquiaService {
      * Retorna a lista de códigos dos ancestores de uma unidade, do pai imediato até a raiz.
      */
     public List<Long> buscarCodigosSuperiores(Long codigoInicial) {
-        Map<Long, Long> mapFilhoPai = buscarMapaFilhoPai();
+        Map<Long, Long> mapFilhoPai = self().buscarMapaFilhoPai();
         List<Long> superiores = new ArrayList<>();
         Long atual = mapFilhoPai.get(codigoInicial);
         while (atual != null) {
@@ -106,7 +108,7 @@ public class UnidadeHierarquiaService {
     }
 
     public @Nullable Long buscarCodigoPai(Long codigoFilho) {
-        return buscarMapaFilhoPai().get(codigoFilho);
+        return self().buscarMapaFilhoPai().get(codigoFilho);
     }
 
     /**
@@ -131,7 +133,7 @@ public class UnidadeHierarquiaService {
      * @throws ErroEntidadeNaoEncontrada se a unidade não for encontrada
      */
     public UnidadeDto buscarArvore(Long codigo) {
-        List<UnidadeDto> todas = buscarArvoreHierarquica();
+        List<UnidadeDto> todas = self().buscarArvoreHierarquica();
         Optional<UnidadeDto> found = buscarNaHierarquia(todas, codigo);
         if (found.isPresent()) {
             return found.get();
@@ -146,7 +148,7 @@ public class UnidadeHierarquiaService {
      * @throws ErroEntidadeNaoEncontrada se a unidade não for encontrada
      */
     public List<String> buscarSiglasSubordinadas(String sigla) {
-        List<UnidadeDto> todas = buscarArvoreHierarquica();
+        List<UnidadeDto> todas = self().buscarArvoreHierarquica();
         Optional<UnidadeDto> found = buscarNaHierarquiaPorSigla(todas, sigla);
 
         if (found.isEmpty()) {
@@ -193,6 +195,10 @@ public class UnidadeHierarquiaService {
                 .collect(HashMap::new,
                         (mapa, leitura) -> mapa.put(leitura.unidadeCodigo(), leitura.usuarioTitulo()),
                         HashMap::putAll);
+    }
+
+    private UnidadeHierarquiaService self() {
+        return selfProvider.getObject();
     }
 
     private List<UnidadeDto> montarHierarquia(List<UnidadeHierarquiaLeitura> unidades, Map<Long, String> titulosResponsavel,

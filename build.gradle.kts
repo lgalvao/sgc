@@ -4,6 +4,11 @@ plugins {
     id("org.openrewrite.rewrite") version "7.18.0" apply false
 }
 
+fun detectarWindows(): Boolean {
+    val nomeSistemaOperacional: String = System.getProperty("os.name") ?: return false
+    return nomeSistemaOperacional.lowercase().contains("win")
+}
+
 apply(plugin = "base")
 
 allprojects {
@@ -41,7 +46,7 @@ subprojects {
 
 tasks.register<Exec>("installFrontend") {
     workingDir = file("frontend")
-    commandLine = if (System.getProperty("os.name").lowercase().contains("win")) listOf(
+    commandLine = if (detectarWindows()) listOf(
         "cmd",
         "/c",
         "npm",
@@ -52,7 +57,7 @@ tasks.register<Exec>("installFrontend") {
 tasks.register<Exec>("buildFrontend") {
     dependsOn("installFrontend")
     workingDir = file("frontend")
-    commandLine = if (System.getProperty("os.name").lowercase().contains("win")) listOf(
+    commandLine = if (detectarWindows()) listOf(
         "cmd",
         "/c",
         "npm",
@@ -76,7 +81,7 @@ tasks.register<Exec>("frontendQualityCheck") {
     description = "Executa verificações de qualidade do frontend (testes, lint, typecheck)"
     dependsOn("installFrontend")
     workingDir = file("frontend")
-    commandLine = if (System.getProperty("os.name").lowercase().contains("win")) listOf(
+    commandLine = if (detectarWindows()) listOf(
         "cmd",
         "/c",
         "npm",
@@ -111,7 +116,7 @@ tasks.register<Exec>("qualityCheckFast") {
     dependsOn("backendQualityCheckFast")
 
     workingDir = file("frontend")
-    val isWindows = System.getProperty("os.name").lowercase().contains("win")
+    val isWindows: Boolean = detectarWindows()
     commandLine =
         if (isWindows) listOf("cmd", "/c", "npm", "run", "quality:test")
         else listOf("npm", "run", "quality:test")

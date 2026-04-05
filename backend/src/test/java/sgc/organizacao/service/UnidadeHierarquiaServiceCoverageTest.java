@@ -4,6 +4,7 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
+import org.springframework.beans.factory.ObjectProvider;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
 
@@ -26,8 +27,16 @@ class UnidadeHierarquiaServiceCoverageTest {
     @Mock
     private ResponsabilidadeRepo responsabilidadeRepo;
 
+    @Mock
+    private ObjectProvider<UnidadeHierarquiaService> selfProvider;
+
     @InjectMocks
     private UnidadeHierarquiaService target;
+
+    @BeforeEach
+    void configurarSelfProvider() {
+        lenient().when(selfProvider.getObject()).thenReturn(target);
+    }
 
     @Test
     @DisplayName("Deve cobrir as linhas [48, 49, 50, 52, 53, 54, 55] do método buscarArvoreComElegibilidade")
