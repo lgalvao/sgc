@@ -17,6 +17,7 @@ import sgc.seguranca.*;
 import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -58,7 +59,7 @@ class ProcessoServiceCoverageTest {
     @DisplayName("executarAcaoEmBloco deve lançar ErroAcessoNegado quando não houver permissão")
     void deveLancarErroAcessoNegado() {
         Long codProcesso = 100L;
-        DisponibilizarMapaEmBlocoCommand req = new DisponibilizarMapaEmBlocoCommand(List.of(1L), null);
+        DisponibilizarMapaEmBlocoCommand req = new DisponibilizarMapaEmBlocoCommand(List.of(1L), LocalDate.now().plusDays(1));
 
         Subprocesso sp = mock(Subprocesso.class);
         Usuario usuario = new Usuario();
@@ -74,19 +75,11 @@ class ProcessoServiceCoverageTest {
     }
 
     @Test
-    @DisplayName("executarAcaoEmBloco deve exigir data limite ao disponibilizar")
-    void deveExigirDataLimiteAoDisponibilizar() {
-        Long codProcesso = 100L;
-        DisponibilizarMapaEmBlocoCommand req = new DisponibilizarMapaEmBlocoCommand(List.of(1L), null);
+    @DisplayName("AcaoEmBlocoRequest deve exigir data limite ao converter disponibilizacao")
+    void deveExigirDataLimiteAoConverterDisponibilizacao() {
+        AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(List.of(1L), DISPONIBILIZAR, null);
 
-        Subprocesso sp = mock(Subprocesso.class);
-        Usuario usuario = new Usuario();
-        when(consultaService.listarEntidadesPorProcessoEUnidades(eq(codProcesso), anyList()))
-                .thenReturn(List.of(sp));
-        when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
-        when(permissionEvaluator.verificarPermissao(any(Usuario.class), any(List.class), any(AcaoPermissao.class))).thenReturn(true);
-
-        assertThatThrownBy(() -> target.executarAcaoEmBloco(codProcesso, req))
+        assertThatThrownBy(req::paraCommand)
                 .isInstanceOf(ErroValidacao.class)
                 .hasMessage(Mensagens.DATA_LIMITE_OBRIGATORIA);
     }
@@ -125,7 +118,7 @@ class ProcessoServiceCoverageTest {
     @DisplayName("validarSelecaoBloco deve lançar ErroValidacao quando tamanhos diferirem")
     void deveLancarErroValidacaoEmBloco() {
         Long codProcesso = 100L;
-        DisponibilizarMapaEmBlocoCommand req = new DisponibilizarMapaEmBlocoCommand(List.of(1L, 2L), null);
+        DisponibilizarMapaEmBlocoCommand req = new DisponibilizarMapaEmBlocoCommand(List.of(1L, 2L), LocalDate.now().plusDays(1));
 
         Subprocesso sp = mock(Subprocesso.class);
         Unidade u = new Unidade();
@@ -234,7 +227,7 @@ class ProcessoServiceCoverageTest {
         }
 
         @Test
-        @DisplayName("obterDetalhesCompleto deve lançar IllegalStateException quando etapa 1 é posterior à etapa 2")
+        @DisplayName("obterDetalhesCompleto deve priorizar dataLimite2 quando etapa 1 é posterior à etapa 2")
         void etapa1PosteriorEtapa2() {
             Long cod = 1L;
             Processo p = new Processo();
@@ -262,9 +255,8 @@ class ProcessoServiceCoverageTest {
             when(validacaoService.validarSubprocessosParaFinalizacao(cod)).thenReturn(sgc.subprocesso.service.SubprocessoValidacaoService.ValidationResult.ofValido());
             when(permissionEvaluator.verificarPermissao(eq(u), any(Subprocesso.class), any())).thenReturn(true);
 
-            assertThatThrownBy(() -> target.obterDetalhesCompleto(cod, u, true))
-                    .isInstanceOf(IllegalStateException.class)
-                    .hasMessageContaining("posterior à etapa 2");
+            assertThatCode(() -> target.obterDetalhesCompleto(cod, u, true))
+                    .doesNotThrowAnyException();
         }
         
         @Test

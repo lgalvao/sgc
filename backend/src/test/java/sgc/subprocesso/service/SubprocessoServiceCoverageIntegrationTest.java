@@ -317,7 +317,7 @@ class SubprocessoServiceCoverageIntegrationTest {
                     .codMapa(mapaNovo.getCodigo())
                     .build();
 
-            Subprocesso atualizado = subprocessoService.atualizarEntidade(sp.getCodigo(), request);
+            Subprocesso atualizado = subprocessoService.atualizarEntidade(sp.getCodigo(), request.paraCommand());
 
             assertThat(atualizado.getMapa().getCodigo()).isEqualTo(mapaNovo.getCodigo());
         }
@@ -348,7 +348,7 @@ class SubprocessoServiceCoverageIntegrationTest {
                     .codMapa(mapaAntigo.getCodigo())
                     .build();
 
-            Subprocesso atualizado = subprocessoService.atualizarEntidade(sp.getCodigo(), request);
+            Subprocesso atualizado = subprocessoService.atualizarEntidade(sp.getCodigo(), request.paraCommand());
 
             assertThat(atualizado.getMapa().getCodigo()).isEqualTo(mapaAntigo.getCodigo());
         }

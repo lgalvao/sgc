@@ -20,4 +20,14 @@ public record AtualizarSubprocessoRequest(
         @Nullable LocalDateTime dataFimEtapa1,
         @Nullable LocalDateTime dataLimiteEtapa2,
         @Nullable LocalDateTime dataFimEtapa2) {
+    public AtualizarSubprocessoCommand paraCommand() {
+        return new AtualizarSubprocessoCommand(
+                codUnidade,
+                codMapa,
+                dataLimiteEtapa1,
+                dataFimEtapa1,
+                dataLimiteEtapa2,
+                dataFimEtapa2
+        );
+    }
 }
