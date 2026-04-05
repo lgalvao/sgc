@@ -467,8 +467,10 @@ class E2eControllerTest {
 
                 controllerIsolado.resetDatabase();
 
-                verify(stmt, never()).execute(argThat(s -> s != null && s.contains("TRUNCATE")));
-                verify(stmt).execute(contains("DELETE FROM sgc.TABELA_TESTE"));
+                ArgumentCaptor<String> sqls = ArgumentCaptor.forClass(String.class);
+                verify(stmt, atLeastOnce()).execute(sqls.capture());
+                assertThat(sqls.getAllValues()).noneMatch(sql -> sql.contains("TRUNCATE"));
+                assertThat(sqls.getAllValues()).anyMatch(sql -> sql.contains("DELETE FROM sgc.TABELA_TESTE"));
             }
         }
 

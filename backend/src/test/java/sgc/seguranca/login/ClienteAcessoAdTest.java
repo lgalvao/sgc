@@ -101,14 +101,15 @@ class ClienteAcessoAdTest {
 
         // Valida ErrorHandler
         HttpRequest request = mock(HttpRequest.class);
-        ClientHttpResponse response = mock(ClientHttpResponse.class);
-        when(response.getStatusCode()).thenReturn(HttpStatusCode.valueOf(400));
-        when(response.getBody()).thenReturn(new ByteArrayInputStream("Erro detalhado".getBytes(StandardCharsets.UTF_8)));
+        try (ClientHttpResponse response = mock(ClientHttpResponse.class)) {
+            when(response.getStatusCode()).thenReturn(HttpStatusCode.valueOf(400));
+            when(response.getBody()).thenReturn(new ByteArrayInputStream("Erro detalhado".getBytes(StandardCharsets.UTF_8)));
 
-        var errorHandler = handlerCaptor.getValue();
-        var exception = assertThrows(ErroAutenticacao.class, () ->
-                errorHandler.handle(request, response)
-        );
-        assertNotNull(exception);
+            var errorHandler = handlerCaptor.getValue();
+            var exception = assertThrows(ErroAutenticacao.class, () ->
+                    errorHandler.handle(request, response)
+            );
+            assertNotNull(exception);
+        }
     }
 }

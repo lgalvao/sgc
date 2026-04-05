@@ -133,7 +133,7 @@ class UnidadeControllerTest {
     @DisplayName("Deve exigir mapa vigente para diagnóstico ao buscar árvore de elegibilidade")
     @WithMockUser
     void deveExigirMapaVigenteParaDiagnosticoAoBuscarArvoreDeElegibilidade() throws Exception {
-        when(processoService.buscarIdsUnidadesComProcessosAtivos(null))
+        when(processoService.buscarIdsUnidadesComProcessosAtivos(any()))
                 .thenReturn(Set.of());
         when(hierarquiaService.buscarArvoreComElegibilidade(eq(true), eq(Set.of())))
                 .thenReturn(Collections.emptyList());

@@ -1,5 +1,7 @@
 package sgc.integracao;
 
+import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.datatype.jsr310.*;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.transaction.annotation.*;
@@ -20,6 +22,7 @@ import static org.assertj.core.api.Assertions.*;
 @Transactional
 @DisplayName("Integração: SubprocessoService - Cobertura de Listas e CRUD Básico")
 class SubprocessoServiceListaIntegrationTest extends BaseIntegrationTest {
+    private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
     @Autowired
     private SubprocessoService subprocessoService;
@@ -96,14 +99,26 @@ class SubprocessoServiceListaIntegrationTest extends BaseIntegrationTest {
 
     @Test
     @DisplayName("criarEntidade: deve criar novo subprocesso")
-    void criarEntidade() {
+    void criarEntidade() throws Exception {
         Unidade unidade2 = UnidadeFixture.unidadePadrao();
         unidade2.setCodigo(null);
         unidade2.setSigla("U2");
         unidade2 = unidadeRepo.save(unidade2);
 
-        CriarSubprocessoRequest request = new CriarSubprocessoRequest(
-                processo.getCodigo(), unidade2.getCodigo(), null, LocalDateTime.now(), LocalDateTime.now().plusDays(5));
+        LocalDateTime dataLimiteEtapa1 = LocalDateTime.now();
+        LocalDateTime dataLimiteEtapa2 = dataLimiteEtapa1.plusDays(5);
+        CriarSubprocessoRequest request = objectMapper.readValue("""
+                {
+                  "codProcesso": %d,
+                  "codUnidade": %d,
+                  "dataLimiteEtapa1": "%s",
+                  "dataLimiteEtapa2": "%s"
+                }
+                """.formatted(
+                processo.getCodigo(),
+                unidade2.getCodigo(),
+                dataLimiteEtapa1,
+                dataLimiteEtapa2), CriarSubprocessoRequest.class);
 
         Subprocesso novo = subprocessoService.criarEntidade(request);
 

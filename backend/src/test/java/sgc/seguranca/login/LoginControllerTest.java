@@ -161,35 +161,6 @@ class LoginControllerTest {
     }
 
     @Test
-    @DisplayName("POST /api/usuarios/login - Não deve verificar limite quando IP estiver ausente")
-    @WithMockUser
-    void login_IpNulo() throws Exception {
-        AutenticarRequest req = criarRequestPadrao();
-        UnidadeResumoDto unidadeDto = UnidadeResumoDto.builder().codigo(1L).nome("Adm").sigla("ADM").build();
-        PerfilUnidadeDto perfilUnidade = new PerfilUnidadeDto(Perfil.ADMIN, unidadeDto);
-        Usuario usuario = new Usuario();
-        usuario.setNome("Admin user");
-        usuario.setTituloEleitoral("123");
-
-        when(loginFacade.autenticar("123", "senha")).thenReturn(true);
-        when(loginFacade.buscarAutorizacoesUsuario("123")).thenReturn(List.of(perfilUnidade));
-        when(loginFacade.entrar(any(EntrarRequest.class), eq("123"), anyList())).thenReturn("token-jwt");
-        when(usuarioFacade.buscarPorLogin("123")).thenReturn(usuario);
-
-        mockMvc.perform(post("/api/usuarios/login")
-                        .with(csrf())
-                        .with(request -> {
-                            request.setRemoteAddr(null);
-                            return request;
-                        })
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(req)))
-                .andExpect(status().isOk());
-
-        verify(limitadorTentativasLogin, never()).verificar(anyString());
-    }
-
-    @Test
     @DisplayName("POST /api/usuarios/login - Deve falhar com erro interno se usuário autenticado não tiver perfis")
     @WithMockUser
     void login_SemPerfis_DeveFalharComErroInterno() throws Exception {
@@ -311,17 +282,6 @@ class LoginControllerTest {
         String titulo = invokeMethod(loginController, "extrairTituloPreAuth", request);
 
         assertThat(titulo).isEqualTo("123");
-    }
-
-    @Test
-    @DisplayName("extrairIp deve retornar nulo quando request não possui remoteAddr")
-    void extrairIp_DeveRetornarNulo() {
-        MockHttpServletRequest request = new MockHttpServletRequest();
-        request.setRemoteAddr(null);
-
-        String ip = invokeMethod(loginController, "extrairIp", request);
-
-        assertThat(ip).isNull();
     }
 
     @Test

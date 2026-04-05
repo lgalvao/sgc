@@ -15,6 +15,20 @@ class AlertaDtoTest {
     @Test
     @DisplayName("deve mapear alerta a partir da entidade")
     void deveMapearAlertaAPartirDaEntidade() {
+        Alerta alerta = criarAlerta();
+
+        AlertaDto dto = AlertaDto.fromEntity(alerta);
+
+        assertThat(dto.codigo()).isEqualTo(5L);
+        assertThat(dto.codProcesso()).isEqualTo(10L);
+        assertThat(dto.processo()).isEqualTo("Processo X");
+        assertThat(dto.origem()).isEqualTo("ORG");
+        assertThat(dto.unidadeDestino()).isEqualTo("DST");
+        assertThat(dto.mensagem()).isEqualTo("Mensagem");
+        assertThat(dto.dataHoraLeitura()).isEqualTo(LocalDateTime.of(2025, 1, 1, 11, 0));
+    }
+
+    private Alerta criarAlerta() {
         Processo processo = new Processo();
         processo.setCodigo(10L);
         processo.setDescricao("Processo X");
@@ -33,15 +47,6 @@ class AlertaDtoTest {
         alerta.setDescricao("Mensagem");
         alerta.setDataHora(LocalDateTime.of(2025, 1, 1, 10, 0));
         alerta.setDataHoraLeitura(LocalDateTime.of(2025, 1, 1, 11, 0));
-
-        AlertaDto dto = AlertaDto.fromEntity(alerta);
-
-        assertThat(dto.codigo()).isEqualTo(5L);
-        assertThat(dto.codProcesso()).isEqualTo(10L);
-        assertThat(dto.processo()).isEqualTo("Processo X");
-        assertThat(dto.origem()).isEqualTo("ORG");
-        assertThat(dto.unidadeDestino()).isEqualTo("DST");
-        assertThat(dto.mensagem()).isEqualTo("Mensagem");
-        assertThat(dto.dataHoraLeitura()).isEqualTo(LocalDateTime.of(2025, 1, 1, 11, 0));
+        return alerta;
     }
 }

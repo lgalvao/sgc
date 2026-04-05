@@ -14,6 +14,17 @@ class MovimentacaoDtoTest {
     @Test
     @DisplayName("deve mapear movimentacao com origem e destino obrigatorios")
     void deveMapearMovimentacaoComOrigemEDestinoObrigatorios() {
+        Movimentacao movimentacao = criarMovimentacao();
+
+        MovimentacaoDto dto = MovimentacaoDto.from(movimentacao);
+
+        assertThat(dto.codigo()).isEqualTo(7L);
+        assertThat(dto.unidadeOrigemSigla()).isEqualTo("ORG");
+        assertThat(dto.unidadeDestinoSigla()).isEqualTo("DST");
+        assertThat(dto.usuarioNome()).isEqualTo("Servidor");
+    }
+
+    private Movimentacao criarMovimentacao() {
         Unidade origem = new Unidade();
         origem.setCodigo(1L);
         origem.setSigla("ORG");
@@ -35,12 +46,6 @@ class MovimentacaoDtoTest {
         movimentacao.setUnidadeDestino(destino);
         movimentacao.setUsuario(usuario);
         movimentacao.setDescricao("Movimentação");
-
-        MovimentacaoDto dto = MovimentacaoDto.from(movimentacao);
-
-        assertThat(dto.codigo()).isEqualTo(7L);
-        assertThat(dto.unidadeOrigemSigla()).isEqualTo("ORG");
-        assertThat(dto.unidadeDestinoSigla()).isEqualTo("DST");
-        assertThat(dto.usuarioNome()).isEqualTo("Servidor");
+        return movimentacao;
     }
 }

@@ -1,6 +1,5 @@
 package sgc.integracao.mocks;
 
-import org.springframework.beans.factory.annotation.*;
 import org.springframework.beans.factory.*;
 import org.springframework.boot.autoconfigure.condition.*;
 import org.springframework.boot.test.context.*;

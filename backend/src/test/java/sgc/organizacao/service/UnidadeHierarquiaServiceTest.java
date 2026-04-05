@@ -220,7 +220,9 @@ class UnidadeHierarquiaServiceTest {
         @Test
         @DisplayName("Deve lançar IllegalStateException quando UnidadeDto.fromEntity retorna null")
         void deveLancarErroQuandoDtoNull() {
-            when(unidadeRepo.findByUnidadeSuperiorCodigo(999L)).thenReturn(Collections.singletonList(null));
+            List<Unidade> subordinadas = new ArrayList<>();
+            subordinadas.add(null);
+            when(unidadeRepo.findByUnidadeSuperiorCodigo(999L)).thenReturn(subordinadas);
             
             assertThatThrownBy(() -> service.buscarSubordinadas(999L))
                     .isInstanceOf(IllegalStateException.class)

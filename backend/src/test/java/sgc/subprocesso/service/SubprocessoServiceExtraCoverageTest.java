@@ -259,12 +259,14 @@ class SubprocessoServiceExtraCoverageTest {
             Processo p = new Processo();
             p.setCodigo(1L);
             p.setDataLimite(LocalDateTime.now());
+            Unidade unidadeOrigem = new Unidade();
+            unidadeOrigem.setCodigo(99L);
             Unidade u1 = new Unidade(); u1.setCodigo(1L); u1.setTipo(TipoUnidade.OPERACIONAL);
             Unidade u2 = new Unidade(); u2.setCodigo(2L); u2.setTipo(TipoUnidade.INTEROPERACIONAL);
             Unidade u3 = new Unidade(); u3.setCodigo(3L); u3.setTipo(TipoUnidade.RAIZ);
             Unidade u4 = new Unidade(); u4.setCodigo(4L); u4.setTipo(TipoUnidade.INTERMEDIARIA); // Elegivel=false
-
-            subprocessoService.criarParaMapeamento(p, List.of(u1, u2, u3, u4), null, new Usuario());
+ 
+            subprocessoService.criarParaMapeamento(p, List.of(u1, u2, u3, u4), unidadeOrigem, new Usuario());
 
             verify(subprocessoRepo).saveAll(argThat(subprocessos -> {
                 long quantidade = java.util.stream.StreamSupport.stream(subprocessos.spliterator(), false).count();

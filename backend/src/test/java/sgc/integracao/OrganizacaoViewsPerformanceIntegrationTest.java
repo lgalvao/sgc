@@ -168,7 +168,7 @@ class OrganizacaoViewsPerformanceIntegrationTest extends BaseIntegrationTest {
     }
 
     private String extrairTermoBusca(Usuario usuario) {
-        String nome = usuario.getNome() == null ? "" : usuario.getNome().trim();
+        String nome = usuario.getNome().trim();
         if (!nome.isBlank()) {
             String primeiroToken = nome.split("\\s+")[0];
             if (primeiroToken.length() >= 3) {
@@ -177,7 +177,7 @@ class OrganizacaoViewsPerformanceIntegrationTest extends BaseIntegrationTest {
             return primeiroToken;
         }
 
-        String matricula = usuario.getMatricula() == null ? "" : usuario.getMatricula().trim();
+        String matricula = usuario.getMatricula().trim();
         if (matricula.length() >= 3) {
             return matricula.substring(0, 3);
         }

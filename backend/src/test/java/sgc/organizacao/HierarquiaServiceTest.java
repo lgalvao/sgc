@@ -70,11 +70,9 @@ class HierarquiaServiceTest {
     @DisplayName("Deve retornar true se responsabilidade e usuário tiverem título nulo")
     void deveRetornarTrueSeTitulosNulos() {
         Unidade unidade = Unidade.builder().codigo(1L).build();
-        Usuario usuario = Usuario.builder().tituloEleitoral(null).build();
-        Responsabilidade responsabilidade = Responsabilidade.builder()
-                .unidadeCodigo(1L)
-                .usuarioTitulo(null)
-                .build();
+        Usuario usuario = new Usuario();
+        Responsabilidade responsabilidade = new Responsabilidade();
+        responsabilidade.setUnidadeCodigo(1L);
 
         when(responsabilidadeRepo.findById(1L)).thenReturn(Optional.of(responsabilidade));
 

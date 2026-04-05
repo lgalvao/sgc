@@ -35,9 +35,11 @@ class UnidadeRepoTest {
                 .containsExactlyInAnyOrder("SEDESENV", "SEDIA", "SESEL");
 
         Unidade unidade = unidadeRepo.buscarPorCodigoComResponsavel(8L).orElseThrow();
+        Responsabilidade responsabilidade = unidade.getResponsabilidade();
 
-        assertThat(Hibernate.isInitialized(unidade.getResponsabilidade())).isTrue();
-        assertThat(unidade.getResponsabilidade().getUsuarioTitulo()).isEqualTo("3");
+        assertThat(Hibernate.isInitialized(responsabilidade)).isTrue();
+        assertThat(responsabilidade).isNotNull();
+        assertThat(responsabilidade.getUsuarioTitulo()).isEqualTo("3");
         assertThat(unidadeRepo.findByUnidadeSuperiorCodigo(6L))
                 .extracting(Unidade::getCodigo)
                 .contains(8L, 9L, 10L);

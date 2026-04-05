@@ -115,7 +115,7 @@ class SubprocessoControllerCoverageTest {
     @DisplayName("criar - deve chamar servico e retornar 201")
     @WithMockUser(roles = "ADMIN")
     void criar() throws Exception {
-        CriarSubprocessoRequest req = new CriarSubprocessoRequest(1L, 10L, null, LocalDateTime.now(), LocalDateTime.now());
+        String req = criarJsonSubprocesso(1L, 10L, LocalDateTime.now(), LocalDateTime.now());
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(100L);
         Processo processo = new Processo();
@@ -134,12 +134,12 @@ class SubprocessoControllerCoverageTest {
         mockMvc.perform(post("/api/subprocessos")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(req)))
+                        .content(req))
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", "/api/subprocessos/100"))
                 .andExpect(jsonPath("$.codigo").value(100L));
 
-        verify(subprocessoService).criarEntidade(req);
+        verify(subprocessoService).criarEntidade(any());
         verify(consultaService).buscarSubprocesso(100L);
         verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
@@ -247,8 +247,14 @@ class SubprocessoControllerCoverageTest {
             new ContextoEdicaoResponse(
                     unidade,
                     SubprocessoResumoDto.fromEntity(subprocesso),
-                    null,
-                    null,
+                    SubprocessoDetalheResponse.builder()
+                            .subprocesso(SubprocessoResumoDto.fromEntity(subprocesso))
+                            .responsavel(sgc.organizacao.dto.ResponsavelDto.builder().tipo("RESPONSAVEL").build())
+                            .movimentacoes(List.of())
+                            .localizacaoAtual("UND")
+                            .permissoes(PermissoesSubprocessoDto.builder().build())
+                            .build(),
+                    new MapaCompletoDto(10L, 1L, null, List.of(), null),
                     List.of())
         );
 
@@ -350,12 +356,12 @@ class SubprocessoControllerCoverageTest {
     @DisplayName("aceitarCadastroEmBloco - deve chamar servico e retornar 200")
     @WithMockUser
     void aceitarCadastroEmBloco() throws Exception {
-        ProcessarEmBlocoRequest req = new ProcessarEmBlocoRequest("ACEITAR", List.of(1L, 2L), null);
+        String req = criarJsonProcessamentoEmBloco("ACEITAR", List.of(1L, 2L));
 
         mockMvc.perform(post("/api/subprocessos/1/aceitar-cadastro-bloco")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(req)))
+                        .content(req))
                 .andExpect(status().isOk());
 
         verify(transicaoService).aceitarCadastroEmBloco(anyList(), any());
@@ -553,12 +559,12 @@ class SubprocessoControllerCoverageTest {
     @DisplayName("aceitarValidacaoEmBloco - deve chamar servico e retornar 200")
     @WithMockUser
     void aceitarValidacaoEmBloco() throws Exception {
-        ProcessarEmBlocoRequest req = new ProcessarEmBlocoRequest("ACEITAR", List.of(1L), null);
+        String req = criarJsonProcessamentoEmBloco("ACEITAR", List.of(1L));
 
         mockMvc.perform(post("/api/subprocessos/1/aceitar-validacao-bloco")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(req)))
+                        .content(req))
                 .andExpect(status().isOk());
 
         verify(transicaoService).aceitarValidacaoEmBloco(anyList(), any());
@@ -569,12 +575,12 @@ class SubprocessoControllerCoverageTest {
     @DisplayName("homologarValidacaoEmBloco - deve chamar servico e retornar 200")
     @WithMockUser
     void homologarValidacaoEmBloco() throws Exception {
-        ProcessarEmBlocoRequest req = new ProcessarEmBlocoRequest("HOMOLOGAR", List.of(1L), null);
+        String req = criarJsonProcessamentoEmBloco("HOMOLOGAR", List.of(1L));
 
         mockMvc.perform(post("/api/subprocessos/1/homologar-validacao-bloco")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(req)))
+                        .content(req))
                 .andExpect(status().isOk());
 
         verify(transicaoService).homologarValidacaoEmBloco(anyList(), any());
@@ -758,12 +764,12 @@ class SubprocessoControllerCoverageTest {
     @DisplayName("aceitarCadastroEmBloco - deve retornar 400 quando lista de subprocessos estiver vazia")
     @WithMockUser
     void aceitarCadastroEmBlocoSemSubprocessos() throws Exception {
-        ProcessarEmBlocoRequest req = new ProcessarEmBlocoRequest("ACEITAR", List.of(), null);
+        String req = criarJsonProcessamentoEmBloco("ACEITAR", List.of());
 
         mockMvc.perform(post("/api/subprocessos/1/aceitar-cadastro-bloco")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(req)))
+                        .content(req))
                 .andExpect(status().isBadRequest());
 
         verify(transicaoService, never()).aceitarCadastroEmBloco(anyList(), any());
@@ -891,6 +897,23 @@ class SubprocessoControllerCoverageTest {
 
         verify(transicaoService).aceitarValidacao(eq(1L), isNull(), any());
         verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
+    }
+
+    private String criarJsonSubprocesso(Long codProcesso, Long codUnidade, LocalDateTime dataLimiteEtapa1,
+                                        LocalDateTime dataLimiteEtapa2) throws Exception {
+        var json = objectMapper.createObjectNode();
+        json.put("codProcesso", codProcesso);
+        json.put("codUnidade", codUnidade);
+        json.put("dataLimiteEtapa1", dataLimiteEtapa1.toString());
+        json.put("dataLimiteEtapa2", dataLimiteEtapa2.toString());
+        return objectMapper.writeValueAsString(json);
+    }
+
+    private String criarJsonProcessamentoEmBloco(String acao, List<Long> subprocessos) throws Exception {
+        var json = objectMapper.createObjectNode();
+        json.put("acao", acao);
+        json.putPOJO("subprocessos", subprocessos);
+        return objectMapper.writeValueAsString(json);
     }
 
 }

@@ -9,6 +9,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
 
+import java.lang.reflect.*;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
@@ -450,10 +451,13 @@ class ValidadorDadosOrganizacionaisTest {
 
     @Test
     @DisplayName("deve verificar se string esta vazia ou nula")
-    void deveVerificarSeStringEstaVazia() {
-        assertThat((Boolean) ReflectionTestUtils.invokeMethod(validador, "estaVazio", (Object) null)).isTrue();
-        assertThat((Boolean) ReflectionTestUtils.invokeMethod(validador, "estaVazio", "   ")).isTrue();
-        assertThat((Boolean) ReflectionTestUtils.invokeMethod(validador, "estaVazio", "valor")).isFalse();
+    void deveVerificarSeStringEstaVazia() throws Exception {
+        Method metodo = ValidadorDadosOrganizacionais.class.getDeclaredMethod("estaVazio", String.class);
+        metodo.setAccessible(true);
+
+        assertThat((Boolean) metodo.invoke(validador, new Object[]{null})).isTrue();
+        assertThat((Boolean) metodo.invoke(validador, "   ")).isTrue();
+        assertThat((Boolean) metodo.invoke(validador, "valor")).isFalse();
     }
 
     @Test

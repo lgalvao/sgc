@@ -169,7 +169,8 @@ class UnidadeServiceTest {
 
         service.definirMapaVigente(1L, mapa);
 
-        verify(unidadeMapaRepo).save(argThat(um -> um.getUnidadeCodigoPersistido().equals(1L) && um.getMapaVigente().equals(mapa)));
+        verify(unidadeMapaRepo).save(argThat(um ->
+                Objects.equals(um.getUnidadeCodigoPersistido(), 1L) && Objects.equals(um.getMapaVigente(), mapa)));
     }
 
     @Test

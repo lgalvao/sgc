@@ -128,7 +128,7 @@ class CDU30IntegrationTest extends BaseIntegrationTest {
         long totalAdmins = administradorRepo.count();
         if (totalAdmins > 1) {
             administradorRepo.findAll().stream()
-                    .filter(adm -> !adm.getUsuarioTitulo().equals(usuario1.getTituloEleitoral()))
+                    .filter(adm -> !Objects.equals(adm.getUsuarioTitulo(), usuario1.getTituloEleitoral()))
                     .forEach(adm -> administradorRepo.deleteById(adm.getUsuarioTitulo()));
             entityManager.flush();
             entityManager.clear();

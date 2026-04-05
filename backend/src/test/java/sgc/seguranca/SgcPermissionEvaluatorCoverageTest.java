@@ -274,10 +274,9 @@ class SgcPermissionEvaluatorCoverageTest {
     @Test
     @DisplayName("verificarHierarquia: Deve cobrir log de acesso negado (perfil inesperado)")
     void perfilInesperado() {
-        Usuario usuario = mock(Usuario.class);
-        when(usuario.getPerfilAtivo()).thenReturn(null);
-        when(usuario.getTituloEleitoral()).thenReturn("123456789012"); // 12 chars
-        when(usuario.getUnidadeAtivaCodigo()).thenReturn(1L);
+        Usuario usuario = new Usuario();
+        usuario.setTituloEleitoral("123456789012");
+        usuario.setUnidadeAtivaCodigo(1L);
         
         Unidade unidadeAlvo = Unidade.builder().codigo(2L).build();
         Subprocesso sp = new Subprocesso();
@@ -342,10 +341,9 @@ class SgcPermissionEvaluatorCoverageTest {
     @Test
     @DisplayName("mascarar: Deve cobrir 12 chars com sucesso")
     void mascararSucesso() {
-        Usuario usuarioMock = mock(Usuario.class);
-        when(usuarioMock.getPerfilAtivo()).thenReturn(null);
-        when(usuarioMock.getTituloEleitoral()).thenReturn("123456789012");
-        when(usuarioMock.getUnidadeAtivaCodigo()).thenReturn(1L);
+        Usuario usuarioMock = new Usuario();
+        usuarioMock.setTituloEleitoral("123456789012");
+        usuarioMock.setUnidadeAtivaCodigo(1L);
         
         Unidade unidadeAlvo = Unidade.builder().codigo(2L).build();
         Subprocesso sp = new Subprocesso();

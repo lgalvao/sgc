@@ -16,6 +16,7 @@ import sgc.subprocesso.model.*;
 
 import java.time.*;
 import java.util.*;
+import java.lang.reflect.*;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -218,9 +219,13 @@ class SubprocessoNotificacaoServiceTest {
 
     @Test
     @DisplayName("deve lançar erro quando template direto for nulo")
-    void deveLancarErroQuandoTemplateDiretoForNulo() {
-        assertThatThrownBy(() -> invokeMethod(service, "obterTemplateObrigatorio", null, "e-mail direto"))
-                .isInstanceOf(IllegalStateException.class)
+    void deveLancarErroQuandoTemplateDiretoForNulo() throws Exception {
+        Method metodo = SubprocessoNotificacaoService.class.getDeclaredMethod("obterTemplateObrigatorio", String.class, String.class);
+        metodo.setAccessible(true);
+        assertThatThrownBy(() -> metodo.invoke(service, null, "e-mail direto"))
+                .isInstanceOf(InvocationTargetException.class)
+                .hasCauseInstanceOf(IllegalStateException.class)
+                .rootCause()
                 .hasMessageContaining("Template ausente");
     }
 

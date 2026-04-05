@@ -56,7 +56,7 @@ class FiltroJwtTest {
         String token = "valid-token";
         when(request.getHeader("Authorization")).thenReturn("Bearer " + token);
 
-        GerenciadorJwt.JwtClaims claims = new GerenciadorJwt.JwtClaims("12345", null, null);
+        GerenciadorJwt.JwtClaims claims = new GerenciadorJwt.JwtClaims("12345", Perfil.SERVIDOR, 10L);
         when(jwtService.validarToken(token)).thenReturn(Optional.of(claims));
 
         when(usuarioService.carregarUsuarioParaAutenticacao("12345")).thenReturn(null);
