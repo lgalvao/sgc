@@ -1,5 +1,6 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {usePerfilStore} from '@/stores/perfil';
+import type {RouteLocationNormalized, Router} from 'vue-router';
 import {createMemoryHistory, createRouter} from 'vue-router';
 import mainRoutes from '../main.routes';
 import processoRoutes from '../processo.routes';
@@ -35,8 +36,11 @@ const routes = [
 ];
 
 describe('Router guards', () => {
-    let router: any;
-    let perfilStoreMock: any;
+    let router: Router;
+    let perfilStoreMock: {
+        usuarioCodigo: number | null;
+        perfisUnidades: never[];
+    };
 
     beforeEach(() => {
         vi.clearAllMocks();
@@ -45,7 +49,7 @@ describe('Router guards', () => {
             usuarioCodigo: null,
             perfisUnidades: [],
         };
-        (usePerfilStore as any).mockReturnValue(perfilStoreMock);
+        vi.mocked(usePerfilStore).mockReturnValue(perfilStoreMock as never);
 
         // Create fresh router with mock routes first to avoid loading real components
         router = createRouter({
@@ -58,7 +62,7 @@ describe('Router guards', () => {
         });
 
         // Copying logic from router/index.ts for testing
-        router.beforeEach((to: any) => {
+        router.beforeEach((to: RouteLocationNormalized) => {
             const perfilStore = usePerfilStore();
             const isAuthenticated = perfilStore.usuarioCodigo;
             const publicPages = ["/login"];
@@ -71,8 +75,8 @@ describe('Router guards', () => {
             return true;
         });
 
-        router.afterEach((to: any) => {
-            const meta = to.meta || {};
+        router.afterEach((to: RouteLocationNormalized) => {
+            const meta = to.meta;
             const titleBase = typeof meta.title === "string" ? meta.title : (to.name as string) || "SGC";
             document.title = `${titleBase} - SGC`;
         });
@@ -104,14 +108,19 @@ describe('Router guards', () => {
 });
 
 describe('Route props logic', () => {
+    type PropsRoute = {
+        params: Record<string, string>;
+        query?: Record<string, string>;
+    };
+
     it('Processo routes props transformation', () => {
         const subprocessoRoute = processoRoutes.find(r => r.name === 'Subprocesso')!;
-        const propsFn = subprocessoRoute.props as (...args: any[]) => any;
+        const propsFn = subprocessoRoute.props as (route: PropsRoute) => unknown;
         expect(propsFn({params: {codProcesso: '10', siglaUnidade: 'TIC'}}))
             .toEqual({codProcesso: 10, siglaUnidade: 'TIC'});
 
         const mapaRoute = processoRoutes.find(r => r.name === 'SubprocessoMapa')!;
-        const mapaProps = (mapaRoute.props as (...args: any[]) => any)({
+        const mapaProps = (mapaRoute.props as (route: PropsRoute) => unknown)({
             params: {
                 codProcesso: '11',
                 siglaUnidade: 'DIP'
@@ -120,7 +129,7 @@ describe('Route props logic', () => {
         expect(mapaProps).toEqual({codProcesso: 11, sigla: 'DIP'});
 
         const visMapaRoute = processoRoutes.find(r => r.name === 'SubprocessoVisMapa')!;
-        const visMapaProps = (visMapaRoute.props as (...args: any[]) => any)({
+        const visMapaProps = (visMapaRoute.props as (route: PropsRoute) => unknown)({
             params: {
                 codProcesso: '12',
                 siglaUnidade: 'ABC'
@@ -129,7 +138,7 @@ describe('Route props logic', () => {
         expect(visMapaProps).toEqual({codProcesso: 12, sigla: 'ABC'});
 
         const cadastroRoute = processoRoutes.find(r => r.name === 'SubprocessoCadastro')!;
-        const cadastroProps = (cadastroRoute.props as (...args: any[]) => any)({
+        const cadastroProps = (cadastroRoute.props as (route: PropsRoute) => unknown)({
             params: {
                 codProcesso: '13',
                 siglaUnidade: 'XYZ'
@@ -138,7 +147,7 @@ describe('Route props logic', () => {
         expect(cadastroProps).toEqual({codProcesso: 13, sigla: 'XYZ'});
 
         const visCadastroRoute = processoRoutes.find(r => r.name === 'SubprocessoVisCadastro')!;
-        const visCadastroProps = (visCadastroRoute.props as (...args: any[]) => any)({
+        const visCadastroProps = (visCadastroRoute.props as (route: PropsRoute) => unknown)({
             params: {
                 codProcesso: '14',
                 siglaUnidade: 'TEST'
@@ -149,13 +158,13 @@ describe('Route props logic', () => {
 
     it('Unidade routes props transformation', () => {
         const mapaRoute = unidadeRoutes.find(r => r.name === 'Mapa')!;
-        const propsFn = mapaRoute.props as (...args: any[]) => any;
+        const propsFn = mapaRoute.props as (route: PropsRoute) => unknown;
         // Mapa route uses query param for codProcesso and params for codUnidade
         expect(propsFn({params: {codUnidade: '10'}, query: {codProcesso: '99'}}))
             .toEqual({codUnidade: 10, codProcesso: 99});
 
         const atribuicaoRoute = unidadeRoutes.find(r => r.name === 'AtribuicaoTemporariaForm')!;
-        const atribProps = (atribuicaoRoute.props as (...args: any[]) => any)({params: {codUnidade: '20'}});
+        const atribProps = (atribuicaoRoute.props as (route: PropsRoute) => unknown)({params: {codUnidade: '20'}});
         expect(atribProps).toEqual({codUnidade: 20});
     });
 });

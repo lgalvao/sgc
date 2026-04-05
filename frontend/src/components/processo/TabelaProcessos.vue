@@ -1,9 +1,13 @@
 <script lang="ts" setup>
 import {BBadge, BButton, BTable} from "bootstrap-vue-next";
+import type {BTableSortBy} from "bootstrap-vue-next";
 import {computed} from "vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
 import {type ProcessoResumo, SituacaoProcesso} from "@/types/tipos";
 import {formatDate, formatSituacaoProcesso, formatTipoProcesso} from "@/utils/formatters";
+
+type CampoOrdenacaoProcesso = keyof ProcessoResumo | "dataFinalizacao";
+type EventoLinhaProcesso = ProcessoResumo | { item: ProcessoResumo };
 
 function getBadgeVariant(situacao: SituacaoProcesso | string) {
   if (situacao === SituacaoProcesso.FINALIZADO) return "success";
@@ -14,7 +18,7 @@ function getBadgeVariant(situacao: SituacaoProcesso | string) {
 
 const props = defineProps<{
   processos: ProcessoResumo[];
-  criterioOrdenacao: keyof ProcessoResumo | "dataFinalizacao";
+  criterioOrdenacao: CampoOrdenacaoProcesso;
   direcaoOrdenacaoAsc: boolean;
   showDataFinalizacao?: boolean;
   compacto?: boolean;
@@ -23,7 +27,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: "ordenar", campo: keyof ProcessoResumo | "dataFinalizacao"): void;
+  (e: "ordenar", campo: CampoOrdenacaoProcesso): void;
   (e: "selecionarProcesso", processo: ProcessoResumo): void;
   (e: "ctaVazio"): void;
 }>();
@@ -51,20 +55,22 @@ const fields = computed(() => {
 
 const internalSortBy = computed(() => [{
   key: props.criterioOrdenacao,
-  order: (props.direcaoOrdenacaoAsc ? 'asc' : 'desc') as any
-}]);
+  order: props.direcaoOrdenacaoAsc ? 'asc' : 'desc'
+}] satisfies BTableSortBy[]);
 
-function handleSortChange(val: any) {
+function handleSortChange(val: readonly BTableSortBy[] | undefined) {
   const sortBy = Array.isArray(val) ? val[0] : val;
-  if (sortBy?.key) {
-    if (sortBy.key !== props.criterioOrdenacao || (sortBy.order === 'asc') !== props.direcaoOrdenacaoAsc) {
-      emit("ordenar", sortBy.key);
-    }
+  if (!sortBy) {
+    return;
+  }
+
+  if (sortBy.key !== props.criterioOrdenacao || (sortBy.order === 'asc') !== props.direcaoOrdenacaoAsc) {
+    emit("ordenar", sortBy.key);
   }
 }
 
-function handleSelecionarProcesso(processo: any) {
-  const item = processo?.item || processo;
+function handleSelecionarProcesso(processo: EventoLinhaProcesso) {
+  const item = "item" in processo ? processo.item : processo;
   emit("selecionarProcesso", item);
 }
 

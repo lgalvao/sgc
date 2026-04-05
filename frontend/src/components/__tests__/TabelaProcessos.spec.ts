@@ -1,10 +1,15 @@
 import {mount} from "@vue/test-utils";
-import {BTable as _BTable} from "bootstrap-vue-next";
 import {describe, expect, it} from "vitest";
 import {type ProcessoResumo, SituacaoProcesso, TipoProcesso,} from "@/types/tipos";
 import TabelaProcessos from "../processo/TabelaProcessos.vue";
 import EmptyState from "../comum/EmptyState.vue";
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
+
+const BTableSortStub = {
+    name: "BTable",
+    template: "<table><slot /></table>",
+    emits: ["update:sort-by"],
+};
 
 const mockProcessos: ProcessoResumo[] = [
     {
@@ -46,7 +51,7 @@ describe("TabelaProcessos.vue", () => {
             },
         });
 
-        const table = context.wrapper.findComponent(_BTable as any) as any;
+        const table = context.wrapper.findComponent({name: "BTable"});
         expect(table.exists()).toBe(true);
 
         await context.wrapper.vm.$nextTick();
@@ -91,8 +96,7 @@ describe("TabelaProcessos.vue", () => {
         context.wrapper = mount(TabelaProcessos, {
             ...getCommonMountOptions({}, {
                 BTable: {
-                    template: "<table><slot></slot></table>",
-                    emits: ["update:sort-by"],
+                    ...BTableSortStub,
                 }
             }),
             props: {
@@ -102,9 +106,7 @@ describe("TabelaProcessos.vue", () => {
             },
         });
 
-        await (
-            context.wrapper.findComponent(_BTable as any) as any
-        ).vm.$emit("update:sort-by", [{key: "tipo", order: "asc"}]);
+        await context.wrapper.findComponent({name: "BTable"}).vm.$emit("update:sort-by", [{key: "tipo", order: "asc"}]);
 
         expect(context.wrapper.emitted("ordenar")).toBeTruthy();
         expect(context.wrapper.emitted("ordenar")![0]).toEqual(["tipo"]);
@@ -198,8 +200,8 @@ describe("TabelaProcessos.vue", () => {
             {
                 ...mockProcessos[0],
                 codigo: 4,
-                situacao: "OUTRA_SITUACAO" as any,
-                tipo: "OUTRO_TIPO" as any,
+                situacao: "OUTRA_SITUACAO" as unknown as SituacaoProcesso,
+                tipo: "OUTRO_TIPO" as unknown as TipoProcesso,
             }
         ];
 
@@ -303,18 +305,17 @@ describe("TabelaProcessos.vue", () => {
                 },
             });
 
-            const table = context.wrapper.findComponent(_BTable as any) as any;
-            const fields = (table.props("fields") as any[]);
+            const table = context.wrapper.findComponent({name: "BTable"});
+            const fields = table.props("fields") as Array<{key: string; sortable?: boolean}>;
             const desc = fields.find(f => f.key === "descricao");
-            expect(desc.sortable).toBe(true);
+            expect(desc?.sortable).toBe(true);
         });
 
         it("deve emitir evento de ordenação ao clicar no cabeçalho em modo compacto", async () => {
             context.wrapper = mount(TabelaProcessos, {
                 ...getCommonMountOptions({}, {
-                    BTable: {
-                        template: "<table><slot></slot></table>",
-                        emits: ["update:sort-by"],
+                BTable: {
+                        ...BTableSortStub,
                     }
                 }),
                 props: {
@@ -325,9 +326,7 @@ describe("TabelaProcessos.vue", () => {
                 },
             });
 
-            await (
-                context.wrapper.findComponent(_BTable as any) as any
-            ).vm.$emit("update:sort-by", [{key: "tipo", order: "asc"}]);
+            await context.wrapper.findComponent({name: "BTable"}).vm.$emit("update:sort-by", [{key: "tipo", order: "asc"}]);
 
             expect(context.wrapper.emitted("ordenar")).toBeTruthy();
             expect(context.wrapper.emitted("ordenar")![0]).toEqual(["tipo"]);

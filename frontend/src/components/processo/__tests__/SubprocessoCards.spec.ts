@@ -2,7 +2,8 @@ import {beforeEach, describe, expect, it, vi} from "vitest";
 import {mount} from "@vue/test-utils";
 import SubprocessoCards from "../SubprocessoCards.vue";
 import {createTestingPinia} from "@pinia/testing";
-import {TipoProcesso} from "@/types/tipos";
+import type {PermissoesSubprocesso, SubprocessoDetalhe} from "@/types/tipos";
+import {SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 import {ref} from "vue";
 import * as useAcessoModule from "@/composables/useAcesso";
 
@@ -25,7 +26,56 @@ describe("SubprocessoCards.vue", () => {
         vi.clearAllMocks();
     });
 
-    function createWrapper(props: any, access: any = {}) {
+    function criarPermissoes(parciais: Partial<PermissoesSubprocesso> = {}): PermissoesSubprocesso {
+        return {
+            podeEditarCadastro: false,
+            podeDisponibilizarCadastro: false,
+            podeDevolverCadastro: false,
+            podeAceitarCadastro: false,
+            podeHomologarCadastro: false,
+            podeEditarMapa: false,
+            podeDisponibilizarMapa: false,
+            podeValidarMapa: false,
+            podeApresentarSugestoes: false,
+            podeVerSugestoes: false,
+            podeDevolverMapa: false,
+            podeAceitarMapa: false,
+            podeHomologarMapa: false,
+            podeVisualizarImpacto: false,
+            podeAlterarDataLimite: false,
+            podeReabrirCadastro: false,
+            podeReabrirRevisao: false,
+            podeEnviarLembrete: false,
+            mesmaUnidade: false,
+            habilitarAcessoCadastro: false,
+            habilitarAcessoMapa: false,
+            ...parciais,
+        };
+    }
+
+    function criarSubprocesso(parciais: Partial<SubprocessoDetalhe> = {}): SubprocessoDetalhe {
+        return {
+            codigo: 1,
+            unidade: {codigo: 1, sigla: "ASSESSORIA_22", nome: "Assessoria 22"},
+            titular: null,
+            responsavel: null,
+            situacao: SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO,
+            localizacaoAtual: "ASSESSORIA_22",
+            processoDescricao: "Processo",
+            dataCriacaoProcesso: "2025-01-01T00:00:00",
+            tipoProcesso: TipoProcesso.REVISAO,
+            prazoEtapaAtual: "2025-01-01T00:00:00",
+            ultimaDataLimiteSubprocesso: "2025-01-01T00:00:00",
+            isEmAndamento: true,
+            etapaAtual: 1,
+            movimentacoes: [],
+            elementosProcesso: [],
+            permissoes: criarPermissoes(),
+            ...parciais,
+        };
+    }
+
+    function createWrapper(props: InstanceType<typeof SubprocessoCards>["$props"], access: Partial<PermissoesSubprocesso> = {}) {
         const pinia = createTestingPinia();
 
         vi.spyOn(useAcessoModule, 'useAcesso').mockReturnValue({
@@ -33,7 +83,7 @@ describe("SubprocessoCards.vue", () => {
             podeEditarMapa: ref(access.podeEditarMapa ?? false),
             habilitarAcessoCadastro: ref(access.habilitarAcessoCadastro ?? false),
             habilitarAcessoMapa: ref(access.habilitarAcessoMapa ?? false),
-        } as any);
+        } as ReturnType<typeof useAcessoModule.useAcesso>);
 
         return mount(SubprocessoCards, {
             global: {
@@ -107,16 +157,16 @@ describe("SubprocessoCards.vue", () => {
                 plugins: [createTestingPinia({
                     createSpy: vi.fn,
                     initialState: {
-                        subprocessos: {
-                            subprocessoDetalhe: {
+                subprocessos: {
+                            subprocessoDetalhe: criarSubprocesso({
                                 codigo: 999,
-                                permissoes: {
+                                permissoes: criarPermissoes({
                                     podeEditarCadastro: false,
                                     habilitarAcessoCadastro: true,
                                     podeEditarMapa: false,
                                     habilitarAcessoMapa: false,
-                                }
-                            }
+                                }),
+                            })
                         }
                     }
                 })],
@@ -134,28 +184,14 @@ describe("SubprocessoCards.vue", () => {
                 codSubprocesso: 1,
                 codProcesso: 401,
                 siglaUnidade: "ASSESSORIA_22",
-                subprocesso: {
-                    codigo: 1,
-                    unidade: {codigo: 1, sigla: "ASSESSORIA_22", nome: "Assessoria 22"},
-                    titular: {codigo: 1, nome: "Titular"} as any,
-                    responsavel: {codigo: 1, usuario: {nome: "Responsavel"}} as any,
-                    situacao: "REVISAO_CADASTRO_EM_ANDAMENTO" as any,
-                    localizacaoAtual: "ASSESSORIA_22",
-                    processoDescricao: "Processo",
-                    dataCriacaoProcesso: "2025-01-01T00:00:00",
-                    tipoProcesso: TipoProcesso.REVISAO,
-                    prazoEtapaAtual: "2025-01-01T00:00:00",
-                    isEmAndamento: true,
-                    etapaAtual: 1,
-                    movimentacoes: [],
-                    elementosProcesso: [],
-                    permissoes: {
+                subprocesso: criarSubprocesso({
+                    permissoes: criarPermissoes({
                         podeEditarCadastro: true,
                         habilitarAcessoCadastro: true,
                         podeEditarMapa: false,
                         habilitarAcessoMapa: false,
-                    }
-                } as any
+                    })
+                })
             }
         });
 
@@ -190,7 +226,7 @@ describe("SubprocessoCards.vue", () => {
     it("navega para visualização de mapa se habilitado mas não pode editar", async () => {
         const wrapper = createWrapper({
             tipoProcesso: TipoProcesso.MAPEAMENTO,
-            mapa: { codigo: 1 } as any,
+            mapa: null,
             codSubprocesso: 1,
             codProcesso: 1,
             siglaUnidade: "U1"
