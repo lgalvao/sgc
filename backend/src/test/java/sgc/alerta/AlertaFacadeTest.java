@@ -27,6 +27,8 @@ class AlertaFacadeTest {
     private UsuarioService usuarioService;
     @Mock
     private UnidadeService unidadeService;
+    @Mock
+    private UnidadeHierarquiaService unidadeHierarquiaService;
 
     @InjectMocks
     private AlertaFacade alertaFacade;
@@ -169,6 +171,8 @@ class AlertaFacadeTest {
         interoperacional.setUnidadeSuperior(superior);
 
         when(unidadeService.buscarPorCodigo(1L)).thenReturn(raiz);
+        when(unidadeHierarquiaService.buscarCodigosSuperiores(3L)).thenReturn(List.of(2L, 1L));
+        when(unidadeService.buscarPorCodigos(List.of(1L, 2L))).thenReturn(List.of(raiz, superior));
         when(alertaService.salvar(any(Alerta.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         List<Alerta> alertas = alertaFacade.criarAlertasProcessoIniciado(processo, List.of(interoperacional));

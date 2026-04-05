@@ -1,5 +1,6 @@
 package sgc.integracao;
 
+import jakarta.persistence.*;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.http.MediaType;
@@ -32,6 +33,11 @@ class CDU05IntegrationTest extends BaseIntegrationTest {
             INSERT INTO SGC.VW_RESPONSABILIDADE (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio)
             VALUES (?, ?, ?, ?, ?)
             """;
+    private static final String SQL_ATUALIZAR_UNIDADE_SUPERIOR = """
+            UPDATE SGC.VW_UNIDADE
+            SET unidade_superior_codigo = ?
+            WHERE codigo = ?
+            """;
 
     @Autowired
     private UnidadeMapaRepo unidadeMapaRepo;
@@ -50,6 +56,9 @@ class CDU05IntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private UsuarioRepo usuarioRepo;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     private Unidade unidade;
     private Mapa mapaOriginal;
@@ -142,8 +151,10 @@ class CDU05IntegrationTest extends BaseIntegrationTest {
         registrarUsuarioSeNecessario("202020202020");
         registrarResponsabilidade(unidadeSuperior.getCodigo(), "202020202020", "20202020");
 
-        unidade.setUnidadeSuperior(unidadeSuperior);
-        unidade = unidadeRepo.save(unidade);
+        jdbcTemplate.update(SQL_ATUALIZAR_UNIDADE_SUPERIOR, unidadeSuperior.getCodigo(), unidade.getCodigo());
+        entityManager.flush();
+        entityManager.clear();
+        unidade = unidadeRepo.findById(unidade.getCodigo()).orElseThrow();
 
         mapaOriginal.setSugestoes("Sugestões legadas");
         mapaOriginal.setObservacoesDisponibilizacao("Observações legadas");

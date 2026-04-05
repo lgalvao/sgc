@@ -15,6 +15,7 @@ public class CacheConfig {
     public static final String CACHE_MAPA_HIERARQUIA_UNIDADES = "mapaHierarquiaUnidades";
     public static final String CACHE_UNIDADES_COM_MAPA = "unidadesComMapa";
     public static final String CACHE_UNIDADE_ADMIN = "unidadeAdmin";
+    public static final String CACHE_MAPA_FILHO_PAI = "mapaFilhoPai";
 
     @Bean
     public CacheManager cacheManager() {
@@ -30,6 +31,11 @@ public class CacheConfig {
                 .maximumSize(100)
                 .expireAfterWrite(java.time.Duration.ofMinutes(5)));
         cacheManager.registerCustomCache(CACHE_UNIDADE_ADMIN, Caffeine.newBuilder()
+                .recordStats()
+                .maximumSize(1)
+                .expireAfterWrite(java.time.Duration.ofHours(12))
+                .build());
+        cacheManager.registerCustomCache(CACHE_MAPA_FILHO_PAI, Caffeine.newBuilder()
                 .recordStats()
                 .maximumSize(1)
                 .expireAfterWrite(java.time.Duration.ofHours(12))

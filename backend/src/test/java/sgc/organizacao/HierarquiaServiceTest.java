@@ -128,6 +128,7 @@ class HierarquiaServiceTest {
         Unidade raiz = criarUnidade(1L, null);
         Unidade alvo = criarUnidade(2L, raiz);
         when(unidadeHierarquiaService.buscarIdsDescendentes(1L)).thenReturn(List.of());
+        when(unidadeHierarquiaService.buscarCodigoPai(2L)).thenReturn(1L);
 
         assertThat(hierarquiaService.isSubordinada(alvo, raiz)).isTrue();
     }
@@ -145,6 +146,7 @@ class HierarquiaServiceTest {
     void deveRetornarTrueParaUnidadeSubordinadaEmEhMesmaOuSubordinada() {
         Unidade superior = criarUnidade(1L, null);
         Unidade alvo = criarUnidade(2L, superior);
+        when(unidadeHierarquiaService.buscarCodigoPai(2L)).thenReturn(1L);
 
         assertThat(hierarquiaService.ehMesmaOuSubordinada(alvo, superior)).isTrue();
     }
@@ -154,6 +156,7 @@ class HierarquiaServiceTest {
     void deveRetornarTrueQuandoSuperiorImediata() {
         Unidade superior = criarUnidade(1L, null);
         Unidade alvo = criarUnidade(2L, superior);
+        when(unidadeHierarquiaService.buscarCodigoPai(2L)).thenReturn(1L);
 
         assertThat(hierarquiaService.isSuperiorImediata(alvo, superior)).isTrue();
     }

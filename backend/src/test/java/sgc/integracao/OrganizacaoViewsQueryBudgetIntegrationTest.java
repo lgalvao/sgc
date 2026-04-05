@@ -6,6 +6,7 @@ import org.hibernate.stat.*;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.data.domain.*;
+import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
 
@@ -37,6 +38,8 @@ class OrganizacaoViewsQueryBudgetIntegrationTest extends BaseIntegrationTest {
     private ResponsabilidadeRepo responsabilidadeRepo;
     @Autowired
     private UnidadeRepo unidadeRepo;
+    @Autowired
+    private UsuarioFacade usuarioFacade;
 
     @Test
     @DisplayName("Deve manter budget de queries nas leituras organizacionais mais comuns")
@@ -48,7 +51,7 @@ class OrganizacaoViewsQueryBudgetIntegrationTest extends BaseIntegrationTest {
         assertThat(contarQueriesViews(() -> usuarioService.buscarOpt(amostras.tituloUsuario()))).isLessThanOrEqualTo(2);
         assertThat(contarQueriesViews(() -> usuarioService.buscarPorUnidadeLotacao(amostras.codigoUnidadeLotacao()))).isLessThanOrEqualTo(2);
         assertThat(contarQueriesViews(() -> usuarioService.pesquisarPorNome(amostras.termoBuscaUsuario()))).isLessThanOrEqualTo(1);
-        assertThat(contarQueriesViews(() -> usuarioService.buscarPerfis(amostras.tituloUsuarioComPerfil()))).isLessThanOrEqualTo(1);
+        assertThat(contarQueriesViews(() -> usuarioService.buscarAutorizacoesPerfil(amostras.tituloUsuarioComPerfil()))).isLessThanOrEqualTo(1);
         assertThat(contarQueriesViews(() -> responsavelUnidadeService.buscarResponsavelAtual(amostras.siglaUnidadeComResponsavel()))).isLessThanOrEqualTo(3);
         assertThat(contarQueriesViews(() -> responsavelUnidadeService.buscarResponsaveisUnidades(amostras.codigosUnidadesComResponsavel()))).isLessThanOrEqualTo(2);
     }
@@ -64,6 +67,12 @@ class OrganizacaoViewsQueryBudgetIntegrationTest extends BaseIntegrationTest {
 
         assertThat(contarQueriesViews(unidadeService::buscarAdmin)).isLessThanOrEqualTo(1);
         assertThat(contarQueriesViews(unidadeService::buscarAdmin)).isZero();
+    }
+
+    @Test
+    @DisplayName("Deve manter budget de queries ao listar administradores")
+    void deveManterBudgetDeQueriesAoListarAdministradores() {
+        assertThat(contarQueriesViews(usuarioFacade::listarAdministradores)).isLessThanOrEqualTo(10);
     }
 
     private long contarQueries(Runnable acao) {

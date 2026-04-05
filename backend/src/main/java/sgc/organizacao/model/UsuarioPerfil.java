@@ -31,14 +31,6 @@ public class UsuarioPerfil implements Serializable {
     @Column(name = "perfil", nullable = false)
     private Perfil perfil;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "usuario_titulo", insertable = false, updatable = false)
-    private Usuario usuario;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "unidade_codigo", insertable = false, updatable = false)
-    private Unidade unidade;
-
     @Override
     public boolean equals(@Nullable Object obj) {
         if (this == obj) return true;

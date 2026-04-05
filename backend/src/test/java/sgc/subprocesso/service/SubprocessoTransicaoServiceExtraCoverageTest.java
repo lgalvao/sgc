@@ -53,6 +53,8 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
 
     @Mock
     private HierarquiaService hierarquiaService;
+    @Mock
+    private UnidadeHierarquiaService unidadeHierarquiaService;
 
     @Mock
     private ImpactoMapaService impactoMapaService;
@@ -78,6 +80,8 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         sp.setUnidade(u);
         sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         sp.setMapa(new sgc.mapa.model.Mapa());
+        when(unidadeHierarquiaService.buscarCodigoPai(1L)).thenReturn(99L);
+        when(unidadeService.buscarPorCodigo(99L)).thenReturn(admin);
 
         invokeMethod(service, "disponibilizar", sp, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO, TipoTransicao.CADASTRO_DISPONIBILIZADO, new Usuario());
 
@@ -135,6 +139,8 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         sp.setMapa(new sgc.mapa.model.Mapa());
 
         when(consultaService.buscarSubprocesso(100L)).thenReturn(sp);
+        when(unidadeHierarquiaService.buscarCodigoPai(1L)).thenReturn(99L);
+        when(unidadeService.buscarPorCodigo(99L)).thenReturn(admin);
 
         service.apresentarSugestoes(100L, "sugestoes", new Usuario());
 
@@ -161,6 +167,8 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         setField(sp, "situacao", SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO);
 
         when(consultaService.buscarSubprocesso(100L)).thenReturn(sp);
+        when(unidadeHierarquiaService.buscarCodigoPai(1L)).thenReturn(99L);
+        when(unidadeService.buscarPorCodigo(99L)).thenReturn(admin);
 
         service.validarMapa(100L, new Usuario());
 
@@ -188,6 +196,8 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
 
         when(consultaService.buscarSubprocesso(100L)).thenReturn(sp);
         when(consultaService.obterUnidadeLocalizacao(sp)).thenReturn(u);
+        when(unidadeHierarquiaService.buscarCodigoPai(1L)).thenReturn(99L);
+        when(unidadeService.buscarPorCodigo(99L)).thenReturn(admin);
 
         service.aceitarValidacao(100L, "obs", new Usuario());
 
@@ -221,6 +231,8 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         when(consultaService.buscarSubprocesso(100L)).thenReturn(sp);
         when(usuarioFacade.usuarioAutenticado()).thenReturn(new Usuario());
         when(unidadeService.buscarAdmin()).thenReturn(admin);
+        when(unidadeHierarquiaService.buscarCodigosSuperiores(20L)).thenReturn(List.of(30L, 40L));
+        when(unidadeService.buscarPorCodigos(List.of(30L, 40L))).thenReturn(List.of(sup1, sup2));
 
         service.reabrirCadastro(100L, "justificativa");
 
@@ -251,6 +263,8 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         when(consultaService.buscarSubprocesso(100L)).thenReturn(sp);
         when(usuarioFacade.usuarioAutenticado()).thenReturn(new Usuario());
         when(unidadeService.buscarAdmin()).thenReturn(admin);
+        when(unidadeHierarquiaService.buscarCodigosSuperiores(20L)).thenReturn(List.of(30L));
+        when(unidadeService.buscarPorCodigos(List.of(30L))).thenReturn(List.of(sup));
 
         service.reabrirRevisaoCadastro(100L, "justificativa");
 

@@ -427,15 +427,14 @@ public class ProcessoService {
 
     private Set<Unidade> carregarArvoreUnidades(Set<Unidade> participantes) {
         Set<Unidade> arvore = new HashSet<>(participantes);
+        Set<Long> codigosSuperiores = new HashSet<>();
         for (Unidade u : participantes) {
-            Unidade sup = u.getUnidadeSuperior();
-            while (sup != null) {
-                if (sup.getTipo() == TipoUnidade.RAIZ) {
-                    break;
-                }
-                arvore.add(sup);
-                sup = sup.getUnidadeSuperior();
-            }
+            codigosSuperiores.addAll(unidadeHierarquiaService.buscarCodigosSuperiores(u.getCodigo()));
+        }
+        if (!codigosSuperiores.isEmpty()) {
+            unidadeService.buscarPorCodigos(new ArrayList<>(codigosSuperiores)).stream()
+                    .filter(u -> u.getTipo() != TipoUnidade.RAIZ)
+                    .forEach(arvore::add);
         }
         return arvore;
     }

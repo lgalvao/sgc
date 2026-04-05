@@ -21,6 +21,7 @@ public class AlertaFacade {
     private final AlertaService alertaService;
     private final UsuarioService usuarioService;
     private final UnidadeService unidadeService;
+    private final UnidadeHierarquiaService unidadeHierarquiaService;
 
     private Unidade unidadeRaiz() {
         return unidadeService.buscarPorCodigo(1L);
@@ -102,13 +103,19 @@ public class AlertaFacade {
             if (tipo == TipoUnidade.INTERMEDIARIA || tipo == TipoUnidade.INTEROPERACIONAL) {
                 codsIntermediarias.add(codigoUnidade);
             }
+        }
 
-            Unidade superior = unidade.getUnidadeSuperior();
-            while (superior != null) {
-                Long codigoSuperior = superior.getCodigo();
-                todasUnidadesMap.put(codigoSuperior, superior);
-                codsIntermediarias.add(codigoSuperior);
-                superior = superior.getUnidadeSuperior();
+        Set<Long> codigosSuperiores = new HashSet<>();
+        for (Unidade unidade : unidadesParticipantes) {
+            codigosSuperiores.addAll(unidadeHierarquiaService.buscarCodigosSuperiores(unidade.getCodigo()));
+        }
+        if (!codigosSuperiores.isEmpty()) {
+            List<Unidade> unidadesSuperiores = unidadeService.buscarPorCodigos(new java.util.ArrayList<>(codigosSuperiores));
+            if (unidadesSuperiores != null) {
+                unidadesSuperiores.forEach(u -> {
+                    todasUnidadesMap.put(u.getCodigo(), u);
+                    codsIntermediarias.add(u.getCodigo());
+                });
             }
         }
 
@@ -224,4 +231,3 @@ public class AlertaFacade {
         criarAlertaAdmin(processo, superior, descricao);
     }
 }
-

@@ -77,6 +77,39 @@ public class UnidadeHierarquiaService {
     }
 
     /**
+     * Constrói o mapa filho→pai (filhoCodigo → codigoPai) a partir de todas as unidades ativas.
+     */
+    @Cacheable(cacheNames = CacheConfig.CACHE_MAPA_FILHO_PAI, sync = true)
+    public Map<Long, Long> buscarMapaFilhoPai() {
+        List<UnidadeHierarquiaLeitura> todas = unidadeRepo.listarEstruturasAtivas();
+        Map<Long, Long> mapFilhoPai = new HashMap<>();
+        for (UnidadeHierarquiaLeitura u : todas) {
+            if (u.unidadeSuperiorCodigo() != null) {
+                mapFilhoPai.put(u.codigo(), u.unidadeSuperiorCodigo());
+            }
+        }
+        return mapFilhoPai;
+    }
+
+    /**
+     * Retorna a lista de códigos dos ancestores de uma unidade, do pai imediato até a raiz.
+     */
+    public List<Long> buscarCodigosSuperiores(Long codigoInicial) {
+        Map<Long, Long> mapFilhoPai = buscarMapaFilhoPai();
+        List<Long> superiores = new ArrayList<>();
+        Long atual = mapFilhoPai.get(codigoInicial);
+        while (atual != null) {
+            superiores.add(atual);
+            atual = mapFilhoPai.get(atual);
+        }
+        return superiores;
+    }
+
+    public @Nullable Long buscarCodigoPai(Long codigoFilho) {
+        return buscarMapaFilhoPai().get(codigoFilho);
+    }
+
+    /**
      * Constrói o mapa de hierarquia (Pai -> Lista de Filhos) buscando todas as unidades.
      */
     @Cacheable(cacheNames = CacheConfig.CACHE_MAPA_HIERARQUIA_UNIDADES, sync = true)
@@ -133,8 +166,9 @@ public class UnidadeHierarquiaService {
      */
     public Optional<String> buscarSiglaSuperior(String sigla) {
         Unidade unidade = unidadeService.buscarPorSigla(sigla);
-
-        return Optional.ofNullable(unidade.getUnidadeSuperior()).map(Unidade::getSigla);
+        Long codigoPai = buscarCodigoPai(unidade.getCodigo());
+        if (codigoPai == null) return Optional.empty();
+        return unidadeRepo.buscarSiglaPorCodigo(codigoPai);
     }
 
     /**

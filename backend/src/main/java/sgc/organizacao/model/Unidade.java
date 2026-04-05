@@ -9,7 +9,6 @@ import org.jspecify.annotations.*;
 import sgc.comum.model.*;
 
 import java.time.*;
-import java.util.*;
 
 @Entity
 @Immutable
@@ -50,11 +49,6 @@ public class Unidade extends EntidadeBase {
     @Nullable
     @JsonIgnore
     private Unidade unidadeSuperior;
-
-    @OneToMany(mappedBy = "unidadeSuperior", fetch = FetchType.LAZY)
-    @Builder.Default
-    @JsonIgnore
-    private List<Unidade> subunidades = new ArrayList<>();
 
     @OneToOne(mappedBy = "unidade", fetch = FetchType.LAZY)
     @Nullable

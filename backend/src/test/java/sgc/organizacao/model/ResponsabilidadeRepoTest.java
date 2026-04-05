@@ -21,8 +21,8 @@ class ResponsabilidadeRepoTest {
     @Test
     @DisplayName("deve buscar responsabilidades por unidades")
     void deveBuscarResponsabilidadesPorUnidades() {
-        assertThat(responsabilidadeRepo.listarPorCodigosUnidade(List.of(8L, 10L)))
-                .extracting(Responsabilidade::getUnidadeCodigo)
+        assertThat(responsabilidadeRepo.listarLeiturasPorCodigosUnidade(List.of(8L, 10L)))
+                .extracting(sgc.organizacao.model.ResponsabilidadeLeitura::unidadeCodigo)
                 .containsExactlyInAnyOrder(8L, 10L);
     }
 

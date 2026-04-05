@@ -57,11 +57,6 @@ public class Usuario implements UserDetails {
     @JsonIgnore
     private Unidade unidadeLotacao;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "unidade_comp_codigo")
-    @JsonIgnore
-    private Unidade unidadeCompetencia;
-
     @JsonView(OrganizacaoViews.Publica.class)
     @JsonProperty("unidadeCodigo")
     public Long getUnidadeCodigo() {

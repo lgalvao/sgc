@@ -36,6 +36,10 @@ public class UsuarioService {
         return usuarioRepo.buscarPorTitulo(titulo);
     }
 
+    public Optional<Usuario> buscarOptComUnidadeLotacao(String titulo) {
+        return usuarioRepo.buscarPorTituloComUnidadeLotacao(titulo);
+    }
+
     public List<Usuario> buscarPorUnidadeLotacao(Long codUnidade) {
         return usuarioRepo.listarPorCodigoUnidadeLotacao(codUnidade);
     }
@@ -62,10 +66,6 @@ public class UsuarioService {
                 termoNormalizado,
                 PageRequest.of(0, LIMITE_PESQUISA_USUARIO)
         );
-    }
-
-    public List<UsuarioPerfil> buscarPerfis(String usuarioTitulo) {
-        return usuarioPerfilRepo.findByUsuarioTitulo(usuarioTitulo);
     }
 
     public List<UsuarioPerfilAutorizacaoLeitura> buscarAutorizacoesPerfil(String usuarioTitulo) {

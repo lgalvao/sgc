@@ -74,9 +74,7 @@ class CDU04IntegrationTest extends BaseIntegrationTest {
         // seja encontrado pelo UsuarioFacade
         UsuarioPerfil perfilChefe = UsuarioPerfil.builder()
                 .usuarioTitulo(titular.getTituloEleitoral())
-                .usuario(titular)
                 .unidadeCodigo(unidadeLivre.getCodigo())
-                .unidade(unidadeLivre)
                 .perfil(Perfil.CHEFE)
                 .build();
         usuarioPerfilRepo.save(perfilChefe);

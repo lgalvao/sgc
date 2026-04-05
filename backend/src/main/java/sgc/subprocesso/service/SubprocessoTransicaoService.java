@@ -40,6 +40,7 @@ public class SubprocessoTransicaoService {
     private final SubprocessoNotificacaoService notificacaoService;
     private final UnidadeService unidadeService;
     private final HierarquiaService hierarquiaService;
+    private final UnidadeHierarquiaService unidadeHierarquiaService;
     private final UsuarioFacade usuarioFacade;
     private final MapaManutencaoService mapaManutencaoService;
     private final EmailService emailService;
@@ -600,22 +601,22 @@ public class SubprocessoTransicaoService {
             @Nullable String observacoes
     ) {
         Unidade unidade = sp.getUnidade();
-        if (unidade.getUnidadeSuperior() != null) {
+        Unidade unidadeSuperior = buscarSuperiorImediato(unidade.getCodigo());
+        if (unidadeSuperior != null) {
             registrarTransicao(RegistrarTransicaoCommand.builder()
-                    .sp(sp)
-                    .tipo(tipoTransicao)
-                    .origem(unidade)
-                    .destino(unidade.getUnidadeSuperior())
-                    .usuario(usuario)
-                    .observacoes(observacoes)
-                    .build());
+                .sp(sp)
+                .tipo(tipoTransicao)
+                .origem(unidade)
+                .destino(unidadeSuperior)
+                .usuario(usuario)
+                .observacoes(observacoes)
+                .build());
         }
     }
 
     private void registrarWorkflowParaSuperiorAtual(RegistrarWorkflowInternoCommand cmd) {
         Unidade unidadeAtual = consultaService.obterUnidadeLocalizacao(cmd.sp());
-        Unidade unidadeDestino = unidadeAtual.getUnidadeSuperior();
-
+        Unidade unidadeDestino = buscarSuperiorImediato(unidadeAtual.getCodigo());
         if (unidadeDestino != null) {
             registrarWorkflowComDestino(new RegistrarWorkflowInternoCommand(
                     cmd.sp(),
@@ -786,11 +787,28 @@ public class SubprocessoTransicaoService {
 
         criarAlertaReaberturaUnidade(contexto);
 
-        Unidade superior = unidade.getUnidadeSuperior();
-        while (superior != null) {
-            criarAlertaReaberturaSuperior(contexto, superior);
-            superior = superior.getUnidadeSuperior();
+        List<Long> codigosSuperiores = unidadeHierarquiaService.buscarCodigosSuperiores(unidade.getCodigo());
+        if (!codigosSuperiores.isEmpty()) {
+            Map<Long, Unidade> mapaUnidades = new HashMap<>();
+            List<Unidade> superioresCarregados = unidadeService.buscarPorCodigos(codigosSuperiores);
+            if (superioresCarregados != null) {
+                superioresCarregados.forEach(u -> mapaUnidades.put(u.getCodigo(), u));
+            }
+            for (Long codigoAncestor : codigosSuperiores) {
+                Unidade superior = mapaUnidades.get(codigoAncestor);
+                if (superior != null) {
+                    criarAlertaReaberturaSuperior(contexto, superior);
+                }
+            }
         }
+    }
+
+    private @Nullable Unidade buscarSuperiorImediato(Long codigoUnidade) {
+        Long codigoPai = unidadeHierarquiaService.buscarCodigoPai(codigoUnidade);
+        if (codigoPai == null) {
+            return null;
+        }
+        return unidadeService.buscarPorCodigo(codigoPai);
     }
 
     private void criarAlertaReaberturaUnidade(AlertaReaberturaContexto contexto) {

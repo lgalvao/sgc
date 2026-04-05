@@ -145,10 +145,13 @@ function clearError() {
 
 async function carregarDados() {
   try {
-    const response = await buscarArvoreUnidadeServico(props.codUnidade);
-    unidade.value = response as Unidade;
+    const [unidadeResp, mapaResp] = await Promise.all([
+      buscarArvoreUnidadeServico(props.codUnidade),
+      buscarReferenciaMapaVigenteServico(props.codUnidade),
+    ]);
+    unidade.value = unidadeResp as Unidade;
     definirUnidadeAtual(unidade.value);
-    mapaVigente.value = await buscarReferenciaMapaVigenteServico(props.codUnidade);
+    mapaVigente.value = mapaResp;
 
     if (unidade.value?.tituloTitular) {
       titularDetalhes.value = await buscarUsuarioPorTitulo(unidade.value.tituloTitular);

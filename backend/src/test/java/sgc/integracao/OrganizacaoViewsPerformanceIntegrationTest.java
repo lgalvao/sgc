@@ -83,7 +83,7 @@ class OrganizacaoViewsPerformanceIntegrationTest extends BaseIntegrationTest {
                 medir("usuario.buscarPorTitulo", () -> usuarioService.buscarOpt(amostras.tituloUsuario())),
                 medir("usuario.buscarPorUnidadeLotacao", () -> usuarioService.buscarPorUnidadeLotacao(amostras.codigoUnidadeLotacao())),
                 medir("usuario.pesquisarPorNome", () -> usuarioService.pesquisarPorNome(amostras.termoBuscaUsuario())),
-                medir("usuario.buscarPerfis", () -> usuarioService.buscarPerfis(amostras.tituloUsuarioComPerfil())),
+                medir("usuario.buscarAutorizacoesPerfil", () -> usuarioService.buscarAutorizacoesPerfil(amostras.tituloUsuarioComPerfil())),
                 medir("responsavel.buscarAtualPorSigla", () -> responsavelUnidadeService.buscarResponsavelAtual(amostras.siglaUnidadeComResponsavel())),
                 medir("responsavel.buscarEmLote", () -> responsavelUnidadeService.buscarResponsaveisUnidades(amostras.codigosUnidadesComResponsavel()))
         );

@@ -28,8 +28,8 @@ public class HierarquiaService {
             return true;
         }
 
-        Unidade unidadeSuperior = alvo.getUnidadeSuperior();
-        return unidadeSuperior != null && Objects.equals(unidadeSuperior.getCodigo(), superior.getCodigo());
+        Long codigoPai = unidadeHierarquiaService.buscarCodigoPai(alvo.getCodigo());
+        return codigoPai != null && codigoPai.equals(superior.getCodigo());
     }
 
     public boolean ehMesmaOuSubordinada(Unidade alvo, Unidade superior) {
@@ -39,10 +39,7 @@ public class HierarquiaService {
     }
 
     public boolean isSuperiorImediata(Unidade alvo, Unidade superior) {
-        Unidade superiorAlvo = alvo.getUnidadeSuperior();
-        if (superiorAlvo == null) {
-            return false;
-        }
-        return Objects.equals(superiorAlvo.getCodigo(), superior.getCodigo());
+        Long codigoPai = unidadeHierarquiaService.buscarCodigoPai(alvo.getCodigo());
+        return codigoPai != null && codigoPai.equals(superior.getCodigo());
     }
 }

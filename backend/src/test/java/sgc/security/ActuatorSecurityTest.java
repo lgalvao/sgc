@@ -62,9 +62,7 @@ class ActuatorSecurityTest {
 
         UsuarioPerfil usuarioPerfil = UsuarioPerfil.builder()
                 .usuarioTitulo(titulo)
-                .usuario(usuario)
                 .unidadeCodigo(unidade.getCodigo())
-                .unidade(unidade)
                 .perfil(perfil)
                 .build();
         usuarioPerfilRepo.save(usuarioPerfil);

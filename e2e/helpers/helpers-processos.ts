@@ -64,7 +64,10 @@ export async function criarProcesso(page: Page, options: {
             tipo: options.tipo
         });
     } else {
-        await page.getByTestId('btn-processo-salvar').click();
+        const botaoSalvar = page.getByTestId('btn-processo-salvar');
+        await botaoSalvar.scrollIntoViewIfNeeded();
+        await expect(botaoSalvar).toBeInViewport();
+        await botaoSalvar.click();
         await expect(page).toHaveURL(/\/painel(?:\?|$)/);
     }
 }

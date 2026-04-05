@@ -183,6 +183,7 @@ const {isAdmin} = usePerfil();
 
 const unidades = ref<Unidade[]>([]);
 const isLoadingUnidades = ref(false);
+const ultimaBuscaUnidadesKey = ref<string | null>(null);
 const diagnosticoOrganizacional = ref<DiagnosticoOrganizacional | null>(null);
 const erroDiagnosticoOrganizacional = ref<string | null>(null);
 
@@ -229,6 +230,9 @@ function sincronizarUnidadesSelecionadasElegiveis(unidadesArvore: Unidade[]) {
 }
 
 async function buscarUnidadesParaProcesso(tipoProcesso: TipoProcesso, codProcesso?: number) {
+  const chave = `${tipoProcesso}-${codProcesso ?? ''}`;
+  if (chave === ultimaBuscaUnidadesKey.value) return;
+  ultimaBuscaUnidadesKey.value = chave;
   isLoadingUnidades.value = true;
   try {
     const response = await buscarArvoreComElegibilidade(tipoProcesso, codProcesso);

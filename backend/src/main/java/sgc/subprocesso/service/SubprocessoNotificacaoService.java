@@ -27,6 +27,8 @@ public class SubprocessoNotificacaoService {
     private final ResponsavelUnidadeService responsavelService;
     private final UsuarioService usuarioService;
     private final SpringTemplateEngine templateEngine;
+    private final UnidadeHierarquiaService unidadeHierarquiaService;
+    private final UnidadeService unidadeService;
 
     public void notificarTransicao(NotificacaoCommand cmd) {
         TipoTransicao tipoTransicao = cmd.tipoTransicao();
@@ -79,14 +81,23 @@ public class SubprocessoNotificacaoService {
     }
 
     private void enviarNotificacaoSuperior(NotificacaoCommand cmd, Map<String, Object> variaveisBase) {
-        Unidade superior = cmd.unidadeOrigem().getUnidadeSuperior();
         String assunto = criarAssunto(cmd.tipoTransicao(), cmd.subprocesso(), true);
+        List<Long> codigosSuperiores = unidadeHierarquiaService.buscarCodigosSuperiores(cmd.unidadeOrigem().getCodigo());
+        if (codigosSuperiores.isEmpty()) return;
 
-        while (superior != null) {
-            if (Objects.equals(superior.getCodigo(), cmd.unidadeDestino().getCodigo())) {
-                superior = superior.getUnidadeSuperior();
+        Map<Long, Unidade> mapaUnidades = new HashMap<>();
+        List<Unidade> superioresCarregados = unidadeService.buscarPorCodigos(codigosSuperiores);
+        if (superioresCarregados != null) {
+            superioresCarregados.forEach(u -> mapaUnidades.put(u.getCodigo(), u));
+        }
+
+        for (Long codigoSuperior : codigosSuperiores) {
+            if (Objects.equals(codigoSuperior, cmd.unidadeDestino().getCodigo())) {
                 continue;
             }
+
+            Unidade superior = mapaUnidades.get(codigoSuperior);
+            if (superior == null) continue;
 
             Map<String, Object> variaveis = new HashMap<>(variaveisBase);
             variaveis.put("siglaUnidadeSuperior", superior.getSigla());
@@ -96,7 +107,6 @@ public class SubprocessoNotificacaoService {
             String emailSuperior = getEmailUnidade(superior);
 
             emailService.enviarEmailHtml(emailSuperior, assunto, corpo);
-            superior = superior.getUnidadeSuperior();
         }
     }
 
@@ -159,4 +169,3 @@ public class SubprocessoNotificacaoService {
         return template;
     }
 }
-

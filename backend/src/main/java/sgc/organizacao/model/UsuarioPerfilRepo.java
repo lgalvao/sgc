@@ -28,7 +28,7 @@ public interface UsuarioPerfilRepo extends JpaRepository<UsuarioPerfil, UsuarioP
                 u.situacao
             )
             FROM UsuarioPerfil up
-            JOIN up.unidade u
+            JOIN Unidade u ON u.codigo = up.unidadeCodigo
             WHERE up.usuarioTitulo = :usuarioTitulo
             """)
     List<UsuarioPerfilAutorizacaoLeitura> listarAutorizacoesPorUsuarioTitulo(@Param("usuarioTitulo") String usuarioTitulo);

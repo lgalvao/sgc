@@ -73,9 +73,7 @@ class SubprocessoFluxoIntegrationTest extends BaseIntegrationTest {
         chefe = usuarioRepo.save(chefe);
 
         UsuarioPerfil perfilChefe = UsuarioPerfil.builder()
-                .usuario(chefe)
                 .usuarioTitulo(chefe.getTituloEleitoral())
-                .unidade(unidadeFilha)
                 .unidadeCodigo(unidadeFilha.getCodigo())
                 .perfil(Perfil.CHEFE)
                 .build();

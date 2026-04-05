@@ -36,6 +36,10 @@ class SubprocessoNotificacaoServiceTest {
     private UsuarioService usuarioService;
     @Mock
     private SpringTemplateEngine templateEngine;
+    @Mock
+    private UnidadeHierarquiaService unidadeHierarquiaService;
+    @Mock
+    private UnidadeService unidadeService;
 
     @InjectMocks
     private SubprocessoNotificacaoService service;
@@ -117,6 +121,8 @@ class SubprocessoNotificacaoServiceTest {
                         .titularTitulo("titular")
                         .titularNome("Titular")
                         .build());
+        when(unidadeHierarquiaService.buscarCodigosSuperiores(10L)).thenReturn(List.of(20L, 30L));
+        when(unidadeService.buscarPorCodigos(List.of(20L, 30L))).thenReturn(List.of(destino, superiorFinal));
 
         service.notificarTransicao(NotificacaoCommand.builder()
                 .subprocesso(subprocesso)

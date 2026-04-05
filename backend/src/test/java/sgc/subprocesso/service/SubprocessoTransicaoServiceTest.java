@@ -56,6 +56,8 @@ class SubprocessoTransicaoServiceTest {
     @Mock
     private EmailService emailService;
     @Mock
+    private UnidadeHierarquiaService unidadeHierarquiaService;
+    @Mock
     private AlertaFacade alertaService;
 
     @InjectMocks
@@ -106,6 +108,8 @@ class SubprocessoTransicaoServiceTest {
         when(consultaService.buscarSubprocesso(1L)).thenReturn(subprocesso);
         when(consultaService.obterUnidadeLocalizacao(subprocesso)).thenReturn(unidade);
         when(analiseRepo.save(any(Analise.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(unidadeHierarquiaService.buscarCodigoPai(10L)).thenReturn(1L);
+        when(unidadeService.buscarPorCodigo(1L)).thenReturn(admin);
 
         service.aceitarValidacao(1L, "Aceite final", usuario);
 

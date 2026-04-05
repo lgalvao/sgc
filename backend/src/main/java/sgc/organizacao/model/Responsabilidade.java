@@ -38,11 +38,11 @@ public class Responsabilidade implements Serializable {
     @Column(name = "data_fim")
     private LocalDateTime dataFim;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "unidade_codigo", insertable = false, updatable = false)
-    private Unidade unidade;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_titulo", referencedColumnName = "titulo", insertable = false, updatable = false)
     private Usuario usuario;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "unidade_codigo", referencedColumnName = "codigo", insertable = false, updatable = false)
+    private Unidade unidade;
 }

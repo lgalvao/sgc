@@ -121,14 +121,15 @@ public class UsuarioFacade {
         return usuarioService.buscarAdministradores().stream()
                 .map(Administrador::getUsuarioTitulo)
                 .filter(Objects::nonNull)
-                .flatMap(titulo -> usuarioService.buscarOpt(titulo).stream())
+                .flatMap(titulo -> usuarioService.buscarOptComUnidadeLotacao(titulo).stream())
                 .map(this::toAdministradorDto)
                 .toList();
     }
 
     @Transactional
     public AdministradorDto adicionarAdministrador(String usuarioTitulo) {
-        Usuario usuario = usuarioService.buscar(usuarioTitulo);
+        Usuario usuario = usuarioService.buscarOptComUnidadeLotacao(usuarioTitulo)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(Usuario.class.getSimpleName(), usuarioTitulo));
 
         usuarioService.adicionarAdministrador(usuarioTitulo);
 

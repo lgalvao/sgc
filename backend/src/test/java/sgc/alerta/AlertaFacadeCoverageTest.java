@@ -25,6 +25,8 @@ class AlertaFacadeCoverageTest {
     private UnidadeService unidadeService;
     @Mock
     private UsuarioService usuarioService;
+    @Mock
+    private UnidadeHierarquiaService unidadeHierarquiaService;
 
     @InjectMocks
     private AlertaFacade alertaFacade;

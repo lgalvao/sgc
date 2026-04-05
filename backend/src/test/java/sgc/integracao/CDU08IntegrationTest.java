@@ -77,9 +77,7 @@ class CDU08IntegrationTest extends BaseIntegrationTest {
 
         UsuarioPerfil perfilChefe = UsuarioPerfil.builder()
                 .usuarioTitulo(chefe.getTituloEleitoral())
-                .usuario(chefe)
                 .unidadeCodigo(unidadeDestino.getCodigo())
-                .unidade(unidadeDestino)
                 .perfil(Perfil.CHEFE)
                 .build();
         usuarioPerfilRepo.save(perfilChefe);

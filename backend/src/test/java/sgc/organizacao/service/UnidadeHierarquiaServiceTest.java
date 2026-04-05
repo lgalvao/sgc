@@ -160,6 +160,9 @@ class UnidadeHierarquiaServiceTest {
     @DisplayName("Deve buscar sigla superior")
     void deveBuscarSiglaSuperior() {
         when(unidadeService.buscarPorSigla(unidadeIntermediaria.getSigla())).thenReturn(unidadeIntermediaria);
+        when(unidadeRepo.listarEstruturasAtivas()).thenReturn(hierarquiaBasica());
+        when(unidadeRepo.buscarSiglaPorCodigo(unidadeRaiz.getCodigo()))
+                .thenReturn(Optional.of(unidadeRaiz.getSigla()));
 
         Optional<String> superior = service.buscarSiglaSuperior(unidadeIntermediaria.getSigla());
 
@@ -175,6 +178,28 @@ class UnidadeHierarquiaServiceTest {
 
         assertThat(result).hasSize(1);
         assertThat(result.getFirst().getSigla()).isEqualTo(unidadeIntermediaria.getSigla());
+    }
+
+    @Test
+    @DisplayName("buscarCodigosSuperiores deve usar apenas o mapa filho pai")
+    void buscarCodigosSuperiores_DeveUsarApenasMapaFilhoPai() {
+        when(unidadeRepo.listarEstruturasAtivas()).thenReturn(hierarquiaBasica());
+
+        List<Long> resultado = service.buscarCodigosSuperiores(3L);
+
+        assertThat(resultado).containsExactly(2L, 1L);
+        verifyNoInteractions(unidadeService);
+    }
+
+    @Test
+    @DisplayName("buscarCodigoPai deve retornar vazio quando relacao nao existe no mapa")
+    void buscarCodigoPai_DeveRetornarNullQuandoRelacaoNaoExisteNoMapa() {
+        when(unidadeRepo.listarEstruturasAtivas()).thenReturn(List.of(toLeitura(unidadeRaiz)));
+
+        Long resultado = service.buscarCodigoPai(99L);
+
+        assertThat(resultado).isNull();
+        verifyNoInteractions(unidadeService);
     }
 
     @Nested
