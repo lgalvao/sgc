@@ -523,7 +523,7 @@ class ImpactoMapaServiceTest {
             Competencia compSemAtividades = new Competencia();
             compSemAtividades.setCodigo(91L);
             compSemAtividades.setDescricao("Comp sem atividades");
-            compSemAtividades.setAtividades(null);
+            compSemAtividades.setAtividades(Set.of());
             when(competenciaRepo.findByMapa_Codigo(20L)).thenReturn(List.of(compSemAtividades));
 
             ImpactoMapaResponse response = impactoMapaService.verificarImpactos(sp, usuarioAdmin());

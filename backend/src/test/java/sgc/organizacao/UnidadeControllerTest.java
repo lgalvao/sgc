@@ -199,6 +199,7 @@ class UnidadeControllerTest {
 
         Unidade u = new Unidade();
         u.setCodigo(1L);
+        u.setNome("Unidade SIGLA");
         u.setSigla("SIGLA");
         u.setTipo(TipoUnidade.OPERACIONAL);
         when(unidadeService.buscarPorSigla("SIGLA")).thenReturn(u);
@@ -213,6 +214,8 @@ class UnidadeControllerTest {
 
         Unidade un = new Unidade();
         un.setCodigo(1L);
+        un.setNome("Unidade 1");
+        un.setSigla("U1");
         un.setTipo(TipoUnidade.OPERACIONAL);
         when(unidadeService.buscarPorCodigo(1L)).thenReturn(un);
 

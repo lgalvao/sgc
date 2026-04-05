@@ -173,7 +173,7 @@ class ImpactoMapaServiceCoverageTest {
     @DisplayName("construirMapaAtividadeCompetencias - ignora competências sem atividades")
     void construirMapaSemAtividades() {
         Competencia comp = new Competencia();
-        comp.setAtividades(null);
+        comp.setAtividades(Set.of());
         Map<Long, List<Competencia>> res = ReflectionTestUtils.invokeMethod(target, "construirMapaAtividadeCompetencias", List.of(comp));
         assertThat(res).isEmpty();
     }

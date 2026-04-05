@@ -60,7 +60,12 @@ class SubprocessoConsultaServiceExtraCoverageTest {
         sp.setCodigo(codigo);
         sp.setMapa(new Mapa());
         sp.setSituacaoForcada(NAO_INICIADO);
-        sp.setProcesso(Processo.builder().tipo(tipo).situacao(SituacaoProcesso.EM_ANDAMENTO).build());
+        sp.setProcesso(Processo.builder()
+                .tipo(tipo)
+                .descricao("Processo teste")
+                .dataCriacao(java.time.LocalDateTime.of(2025, 1, 1, 10, 0))
+                .situacao(SituacaoProcesso.EM_ANDAMENTO)
+                .build());
         return sp;
     }
 
@@ -145,6 +150,7 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             Unidade u = new Unidade();
             u.setTipo(TipoUnidade.OPERACIONAL);
             u.setCodigo(10L);
+            u.setNome("Unidade 1");
             u.setSigla("U1");
             u.setTituloTitular("titular");
             sp.setUnidade(u);
@@ -177,6 +183,7 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             u.setTipo(TipoUnidade.OPERACIONAL);
             u.setSigla("U1");
             u.setCodigo(10L);
+            u.setNome("Unidade 1");
             u.setTituloTitular("titular");
             sp.setUnidade(u);
 
@@ -211,6 +218,7 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             u.setTipo(TipoUnidade.OPERACIONAL);
             u.setSigla("U1");
             u.setCodigo(10L);
+            u.setNome("Unidade 1");
             u.setTituloTitular("titular");
             sp.setUnidade(u);
 

@@ -14,7 +14,8 @@ public record MapaCompletoDto(
         @Nullable String situacao) {
 
     public static MapaCompletoDto fromEntity(Mapa mapa) {
-        Subprocesso subprocesso = mapa.getSubprocesso();
+        Subprocesso subprocesso = Optional.ofNullable(mapa.getSubprocesso())
+                .orElseThrow(() -> new IllegalStateException("Mapa deve possuir subprocesso associado"));
         List<CompetenciaMapaDto> competencias = mapa.getCompetencias().stream()
                 .map(CompetenciaMapaDto::fromEntity)
                 .toList();

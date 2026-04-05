@@ -167,7 +167,7 @@ class CopiaMapaServiceCoverageTest {
         Atividade ativOrigem = new Atividade();
         ativOrigem.setCodigo(10L);
         ativOrigem.setDescricao("Sem conhecimentos");
-        ativOrigem.setConhecimentos(null);
+        ativOrigem.setConhecimentos(Set.of());
 
         when(atividadeRepo.listarPorMapaComConhecimentos(mapaOrigemId)).thenReturn(List.of(ativOrigem));
         when(atividadeRepo.findByMapa_Codigo(mapaDestinoId)).thenReturn(List.of());

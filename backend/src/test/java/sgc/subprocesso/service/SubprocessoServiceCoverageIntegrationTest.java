@@ -101,6 +101,7 @@ class SubprocessoServiceCoverageIntegrationTest {
             Processo proc = criarProcessoPersistido();
 
             Unidade u = new Unidade();
+            u.setNome("Unidade U1");
             u.setSigla("U1");
             u = unidadeRepo.save(u);
 
@@ -140,6 +141,7 @@ class SubprocessoServiceCoverageIntegrationTest {
             Processo proc = criarProcessoPersistido();
 
             Unidade u = new Unidade();
+            u.setNome("Unidade U1");
             u.setSigla("U1");
             u.setTipo(sgc.organizacao.model.TipoUnidade.INTERMEDIARIA); // Nao elegivel
             u = unidadeRepo.save(u);
@@ -163,6 +165,7 @@ class SubprocessoServiceCoverageIntegrationTest {
             Processo proc = criarProcessoPersistido();
 
             Unidade u = new Unidade();
+            u.setNome("Unidade U2");
             u.setSigla("U2");
             u = unidadeRepo.save(u);
 
@@ -198,6 +201,7 @@ class SubprocessoServiceCoverageIntegrationTest {
             Processo proc = criarProcessoPersistido();
 
             Unidade u = new Unidade();
+            u.setNome("Unidade U3");
             u.setSigla("U3");
             u = unidadeRepo.save(u);
 
@@ -233,6 +237,7 @@ class SubprocessoServiceCoverageIntegrationTest {
             Processo proc = criarProcessoPersistido();
 
             Unidade u = new Unidade();
+            u.setNome("Unidade U10");
             u.setSigla("U10");
             u = unidadeRepo.save(u);
 
@@ -260,6 +265,7 @@ class SubprocessoServiceCoverageIntegrationTest {
             Processo proc = criarProcessoPersistido();
 
             Unidade u = new Unidade();
+            u.setNome("Unidade U11");
             u.setSigla("U11");
             u = unidadeRepo.save(u);
 
@@ -288,6 +294,7 @@ class SubprocessoServiceCoverageIntegrationTest {
 
             Unidade u = new Unidade();
             u.setTipo(TipoUnidade.OPERACIONAL);
+            u.setNome("Unidade U1");
             u.setSigla("U1");
             u = unidadeRepo.save(u);
 
@@ -329,6 +336,7 @@ class SubprocessoServiceCoverageIntegrationTest {
 
             Unidade u = new Unidade();
             u.setTipo(TipoUnidade.OPERACIONAL);
+            u.setNome("Unidade U1");
             u.setSigla("U1");
             u = unidadeRepo.save(u);
 
@@ -364,6 +372,7 @@ class SubprocessoServiceCoverageIntegrationTest {
 
             Unidade u = new Unidade();
             u.setTipo(TipoUnidade.OPERACIONAL);
+            u.setNome("Unidade U_SERV");
             u.setSigla("U_SERV");
             u.setSituacao(SituacaoUnidade.ATIVA);
             u = unidadeRepo.save(u);
@@ -414,6 +423,7 @@ class SubprocessoServiceCoverageIntegrationTest {
             Processo proc = criarProcessoPersistido(TipoProcesso.DIAGNOSTICO, SituacaoProcesso.EM_ANDAMENTO);
 
             Unidade u = new Unidade();
+            u.setNome("Unidade U_DIAG");
             u.setSigla("U_DIAG");
             u = unidadeRepo.save(u);
 
@@ -461,6 +471,7 @@ class SubprocessoServiceCoverageIntegrationTest {
             Processo proc = criarProcessoPersistido(TipoProcesso.MAPEAMENTO, SituacaoProcesso.FINALIZADO);
 
             Unidade u = new Unidade();
+            u.setNome("Unidade U_FIN");
             u.setSigla("U_FIN");
             u = unidadeRepo.save(u);
 

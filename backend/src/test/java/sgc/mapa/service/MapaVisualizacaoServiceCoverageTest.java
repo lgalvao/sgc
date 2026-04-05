@@ -53,7 +53,7 @@ class MapaVisualizacaoServiceCoverageTest {
 
         Mapa mapa = new Mapa();
         mapa.setCodigo(200L);
-        mapa.setAtividades(null);
+        mapa.setAtividades(Set.of());
         sub.setMapa(mapa);
 
         when(mapaRepo.buscarCompletoPorSubprocesso(2L)).thenReturn(Optional.of(mapa));

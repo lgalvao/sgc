@@ -89,7 +89,7 @@ class LoginFacadeTest {
         unidade.setTipo(TipoUnidade.OPERACIONAL);
 
         when(usuarioServiceInterno.buscarAutorizacoesPerfil("123")).thenReturn(List.of(
-                new UsuarioPerfilAutorizacaoLeitura("123", Perfil.ADMIN, 1L, null, "U1", TipoUnidade.OPERACIONAL, SituacaoUnidade.ATIVA)
+                new UsuarioPerfilAutorizacaoLeitura("123", Perfil.ADMIN, 1L, "Unidade 1", "U1", TipoUnidade.OPERACIONAL, SituacaoUnidade.ATIVA)
         ));
         when(gerenciadorJwt.gerarToken("123", Perfil.ADMIN, 1L)).thenReturn("token");
         when(unidadeService.buscarPorCodigo(1L)).thenReturn(unidade);
@@ -121,7 +121,7 @@ class LoginFacadeTest {
 
         EntrarRequest req = new EntrarRequest("ADMIN", 1L);
         List<PerfilUnidadeDto> autorizacoes = List.of(
-                new PerfilUnidadeDto(Perfil.GESTOR, sgc.organizacao.dto.UnidadeDto.builder().codigo(1L).sigla("U1").build())
+                new PerfilUnidadeDto(Perfil.GESTOR, sgc.organizacao.dto.UnidadeDto.builder().codigo(1L).nome("Unidade 1").sigla("U1").build())
         );
 
         assertThatThrownBy(() -> loginFacade.entrar(req, "123", autorizacoes))
@@ -141,7 +141,7 @@ class LoginFacadeTest {
         unidade.setTipo(TipoUnidade.OPERACIONAL);
 
         when(usuarioServiceInterno.buscarAutorizacoesPerfil("123")).thenReturn(List.of(
-                new UsuarioPerfilAutorizacaoLeitura("123", Perfil.GESTOR, 1L, null, "U1", TipoUnidade.OPERACIONAL, SituacaoUnidade.ATIVA)
+                new UsuarioPerfilAutorizacaoLeitura("123", Perfil.GESTOR, 1L, "Unidade 1", "U1", TipoUnidade.OPERACIONAL, SituacaoUnidade.ATIVA)
         ));
         when(gerenciadorJwt.gerarToken("123", Perfil.GESTOR, 1L)).thenReturn("token");
         when(unidadeService.buscarPorCodigo(1L)).thenReturn(unidade);
@@ -163,7 +163,7 @@ class LoginFacadeTest {
         unidade.setTipo(TipoUnidade.OPERACIONAL);
 
         when(usuarioServiceInterno.buscarAutorizacoesPerfil("123")).thenReturn(List.of(
-                new UsuarioPerfilAutorizacaoLeitura("123", Perfil.GESTOR, 2L, null, "U2", TipoUnidade.OPERACIONAL, SituacaoUnidade.ATIVA)
+                new UsuarioPerfilAutorizacaoLeitura("123", Perfil.GESTOR, 2L, "Unidade 2", "U2", TipoUnidade.OPERACIONAL, SituacaoUnidade.ATIVA)
         ));
 
         EntrarRequest req = new EntrarRequest("GESTOR", 1L);
