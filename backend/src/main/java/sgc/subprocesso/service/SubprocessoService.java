@@ -73,8 +73,14 @@ public class SubprocessoService {
     @Transactional
     public Subprocesso atualizarEntidade(Long codigo, AtualizarSubprocessoCommand command) {
         Subprocesso subprocesso = consultaService.buscarSubprocesso(codigo);
-        processarVinculos(subprocesso, command.vinculos());
-        processarPrazos(subprocesso, command.prazos());
+        processarVinculos(subprocesso, Objects.requireNonNullElseGet(
+                command.vinculos(),
+                () -> AtualizarVinculosSubprocessoCommand.builder().build()
+        ));
+        processarPrazos(subprocesso, Objects.requireNonNullElseGet(
+                command.prazos(),
+                () -> AtualizarPrazosSubprocessoCommand.builder().build()
+        ));
         return subprocessoRepo.save(subprocesso);
     }
 

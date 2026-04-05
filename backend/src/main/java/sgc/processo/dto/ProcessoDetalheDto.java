@@ -69,7 +69,7 @@ public class ProcessoDetalheDto {
             return criarBase(
                     snapshot.getNome(),
                     snapshot.getSigla(),
-                    snapshot.getUnidadeCodigo(),
+                    snapshot.getUnidadeCodigoPersistido(),
                     snapshot.getUnidadeSuperiorCodigo()
             );
         }
@@ -99,4 +99,3 @@ public class ProcessoDetalheDto {
         }
     }
 }
-

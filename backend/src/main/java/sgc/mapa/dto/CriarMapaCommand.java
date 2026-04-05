@@ -1,13 +1,10 @@
 package sgc.mapa.dto;
 
 import lombok.*;
+import org.jspecify.annotations.*;
 
 @Builder
 public record CriarMapaCommand(
         Long subprocessoCodigo,
-        AtualizarEstadoMapaCommand estadoInicial
-) {
-    public CriarMapaCommand {
-        estadoInicial = estadoInicial != null ? estadoInicial : AtualizarEstadoMapaCommand.builder().build();
-    }
+        @Nullable AtualizarEstadoMapaCommand estadoInicial) {
 }

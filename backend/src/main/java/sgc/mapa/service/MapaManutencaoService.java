@@ -184,13 +184,15 @@ public class MapaManutencaoService {
     @Transactional
     public Mapa criarMapa(CriarMapaCommand command) {
         Subprocesso subprocesso = repo.buscar(Subprocesso.class, command.subprocessoCodigo());
-        AtualizarEstadoMapaCommand estadoInicial = command.estadoInicial();
+        AtualizarEstadoMapaCommand estadoInicial = command.estadoInicial() != null
+                ? command.estadoInicial()
+                : AtualizarEstadoMapaCommand.builder().build();
         Mapa mapa = Mapa.builder()
                 .subprocesso(subprocesso)
-                .dataHoraDisponibilizado(estadoInicial.dataHoraDisponibilizado().orElse(null))
-                .observacoesDisponibilizacao(estadoInicial.observacoesDisponibilizacao().orElse(null))
-                .sugestoes(estadoInicial.sugestoes().orElse(null))
-                .dataHoraHomologado(estadoInicial.dataHoraHomologado().orElse(null))
+                .dataHoraDisponibilizado(estadoInicial.dataHoraDisponibilizado())
+                .observacoesDisponibilizacao(estadoInicial.observacoesDisponibilizacao())
+                .sugestoes(estadoInicial.sugestoes())
+                .dataHoraHomologado(estadoInicial.dataHoraHomologado())
                 .build();
         return mapaRepo.save(mapa);
     }
@@ -198,10 +200,10 @@ public class MapaManutencaoService {
     @Transactional
     public Mapa atualizarEstadoMapa(Long codMapa, AtualizarEstadoMapaCommand command) {
         Mapa existente = mapaCodigo(codMapa)
-                .setDataHoraDisponibilizado(command.dataHoraDisponibilizado().orElse(null))
-                .setObservacoesDisponibilizacao(command.observacoesDisponibilizacao().orElse(null))
-                .setSugestoes(command.sugestoes().orElse(null))
-                .setDataHoraHomologado(command.dataHoraHomologado().orElse(null));
+                .setDataHoraDisponibilizado(command.dataHoraDisponibilizado())
+                .setObservacoesDisponibilizacao(command.observacoesDisponibilizacao())
+                .setSugestoes(command.sugestoes())
+                .setDataHoraHomologado(command.dataHoraHomologado());
         return mapaRepo.save(existente);
     }
 

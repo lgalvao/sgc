@@ -517,7 +517,7 @@ public class SubprocessoConsultaService {
     private record DadosDetalheSubprocesso(
             String localizacaoAtual,
             ResponsavelDto responsavel,
-            Usuario titular,
+            @Nullable Usuario titular,
             List<MovimentacaoDto> movimentacoes,
             PermissoesSubprocessoDto permissoes
     ) {

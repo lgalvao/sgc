@@ -1,21 +1,13 @@
 package sgc.subprocesso.dto;
 
 import lombok.*;
+import org.jspecify.annotations.*;
 
 /**
  * Command interno para atualização de subprocesso.
  */
 @Builder
 public record AtualizarSubprocessoCommand(
-        AtualizarVinculosSubprocessoCommand vinculos,
-        AtualizarPrazosSubprocessoCommand prazos
-) {
-    public AtualizarSubprocessoCommand {
-        if (vinculos == null) {
-            vinculos = AtualizarVinculosSubprocessoCommand.builder().build();
-        }
-        if (prazos == null) {
-            prazos = AtualizarPrazosSubprocessoCommand.builder().build();
-        }
-    }
+        @Nullable AtualizarVinculosSubprocessoCommand vinculos,
+        @Nullable AtualizarPrazosSubprocessoCommand prazos) {
 }

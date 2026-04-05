@@ -470,10 +470,7 @@ public class SubprocessoController {
             @PathVariable Long codSubprocesso,
             @RequestBody(required = false) TextoOpcionalRequest request,
             @AuthenticationPrincipal Usuario usuario) {
-        String observacoes = Optional.ofNullable(request)
-                .map(TextoOpcionalRequest::texto)
-                .map(UtilSanitizacao::sanitizar)
-                .orElse(null);
+        String observacoes = sanitizarTextoOpcional(request);
         transicaoService.aceitarValidacao(codSubprocesso, observacoes, usuario);
         return ResponseEntity.ok().build();
     }
@@ -485,12 +482,17 @@ public class SubprocessoController {
             @PathVariable Long codSubprocesso,
             @RequestBody(required = false) TextoOpcionalRequest request,
             @AuthenticationPrincipal Usuario usuario) {
-        String observacoes = Optional.ofNullable(request)
-                .map(TextoOpcionalRequest::texto)
-                .map(UtilSanitizacao::sanitizar)
-                .orElse(null);
+        String observacoes = sanitizarTextoOpcional(request);
         transicaoService.homologarValidacao(codSubprocesso, observacoes, usuario);
         return ResponseEntity.ok().build();
+    }
+
+    private @org.jspecify.annotations.Nullable String sanitizarTextoOpcional(
+            @org.jspecify.annotations.Nullable TextoOpcionalRequest request) {
+        if (request == null || request.texto() == null) {
+            return null;
+        }
+        return UtilSanitizacao.sanitizar(request.texto());
     }
 
     @PostMapping("/{codSubprocesso}/submeter-mapa-ajustado")

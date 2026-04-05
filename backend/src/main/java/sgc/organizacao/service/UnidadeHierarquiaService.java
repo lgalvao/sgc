@@ -286,7 +286,7 @@ public class UnidadeHierarquiaService {
         return unidadeLeve;
     }
 
-    private UnidadeDto toUnidadeDtoObrigatoria(Unidade unidade) {
+    private UnidadeDto toUnidadeDtoObrigatoria(@Nullable Unidade unidade) {
         if (unidade == null) {
             throw new IllegalStateException("Unidade ausente na hierarquia");
         }

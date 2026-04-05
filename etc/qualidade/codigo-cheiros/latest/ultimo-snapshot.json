@@ -1,18 +1,18 @@
 {
-  "geradoEm": "2026-04-05T15:43:49.619Z",
+  "geradoEm": "2026-04-05T15:52:10.408Z",
   "base": "/Users/leonardo/sgc",
   "pontuacao": {
-    "total": 1355,
+    "total": 1382,
     "faixa": "critico",
     "porEscopo": {
-      "backend": 810,
+      "backend": 837,
       "frontend": 226,
       "frontend_testes": 319
     }
   },
   "contagens": {
-    "backend_nullable_dto": 82,
-    "backend_null_checks": 195,
+    "backend_nullable_dto": 89,
+    "backend_null_checks": 191,
     "backend_objects_null": 5,
     "frontend_any_producao": 38,
     "frontend_any_testes": 319,
@@ -21,8 +21,8 @@
     "frontend_fallback_or": 24
   },
   "deltas": {
-    "backend_nullable_dto": 2,
-    "backend_null_checks": 1,
+    "backend_nullable_dto": 7,
+    "backend_null_checks": -4,
     "backend_objects_null": 0,
     "frontend_any_producao": 0,
     "frontend_any_testes": 0,
@@ -86,6 +86,13 @@
       }
     },
     {
+      "arquivo": "backend/src/main/java/sgc/mapa/dto/AtualizarEstadoMapaCommand.java",
+      "pontuacao": 20,
+      "categorias": {
+        "backend_nullable_dto": 4
+      }
+    },
+    {
       "arquivo": "backend/src/main/java/sgc/mapa/dto/AtualizarMapaRequest.java",
       "pontuacao": 20,
       "categorias": {
@@ -132,13 +139,6 @@
       "pontuacao": 16,
       "categorias": {
         "backend_null_checks": 8
-      }
-    },
-    {
-      "arquivo": "frontend/src/test-utils/serviceTestHelpers.ts",
-      "pontuacao": 16,
-      "categorias": {
-        "frontend_any_producao": 4
       }
     }
   ]

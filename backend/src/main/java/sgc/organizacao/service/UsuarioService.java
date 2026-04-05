@@ -57,7 +57,7 @@ public class UsuarioService {
     }
 
     public List<UsuarioPesquisaDto> pesquisarPorNome(String termo) {
-        String termoNormalizado = Optional.ofNullable(termo).orElse("").trim();
+        String termoNormalizado = termo.trim();
         if (termoNormalizado.length() < 2) {
             return List.of();
         }

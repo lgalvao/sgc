@@ -6,8 +6,6 @@ import org.jspecify.annotations.*;
 import sgc.comum.*;
 
 import java.time.*;
-import java.util.*;
-
 @Builder
 public record CriarMapaRequest(
         @NotNull(message = Mensagens.CODIGO_SUBPROCESSO_OBRIGATORIO)
@@ -21,10 +19,10 @@ public record CriarMapaRequest(
         return CriarMapaCommand.builder()
                 .subprocessoCodigo(subprocessoCodigo)
                 .estadoInicial(AtualizarEstadoMapaCommand.builder()
-                        .dataHoraDisponibilizado(Optional.ofNullable(dataHoraDisponibilizado))
-                        .observacoesDisponibilizacao(Optional.ofNullable(observacoesDisponibilizacao))
-                        .sugestoes(Optional.ofNullable(sugestoes))
-                        .dataHoraHomologado(Optional.ofNullable(dataHoraHomologado))
+                        .dataHoraDisponibilizado(dataHoraDisponibilizado)
+                        .observacoesDisponibilizacao(observacoesDisponibilizacao)
+                        .sugestoes(sugestoes)
+                        .dataHoraHomologado(dataHoraHomologado)
                         .build())
                 .build();
     }
