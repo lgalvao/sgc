@@ -115,7 +115,7 @@ class SubprocessoControllerCoverageTest {
     @DisplayName("criar - deve chamar servico e retornar 201")
     @WithMockUser(roles = "ADMIN")
     void criar() throws Exception {
-        String req = criarJsonSubprocesso(1L, 10L, LocalDateTime.now(), LocalDateTime.now());
+        String req = criarJsonSubprocesso(LocalDateTime.now(), LocalDateTime.now());
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(100L);
         Processo processo = new Processo();
@@ -899,11 +899,10 @@ class SubprocessoControllerCoverageTest {
         verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
 
-    private String criarJsonSubprocesso(Long codProcesso, Long codUnidade, LocalDateTime dataLimiteEtapa1,
-                                        LocalDateTime dataLimiteEtapa2) throws Exception {
+    private String criarJsonSubprocesso(LocalDateTime dataLimiteEtapa1, LocalDateTime dataLimiteEtapa2) throws Exception {
         var json = objectMapper.createObjectNode();
-        json.put("codProcesso", codProcesso);
-        json.put("codUnidade", codUnidade);
+        json.put("codProcesso", 1L);
+        json.put("codUnidade", 10L);
         json.put("dataLimiteEtapa1", dataLimiteEtapa1.toString());
         json.put("dataLimiteEtapa2", dataLimiteEtapa2.toString());
         return objectMapper.writeValueAsString(json);

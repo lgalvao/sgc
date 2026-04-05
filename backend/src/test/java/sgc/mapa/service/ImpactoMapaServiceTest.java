@@ -305,7 +305,7 @@ class ImpactoMapaServiceTest {
         mockAcessoLivre();
         Mapa mapaVigente = Mapa.builder().codigo(100L).build();
         Mapa mapaAtual = Mapa.builder().codigo(200L).build();
-        Subprocesso subprocesso = criarSubprocesso(1L, mapaAtual);
+        Subprocesso subprocesso = criarSubprocesso(mapaAtual);
         subprocesso.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
 
         Usuario usuario = usuarioAdmin();
@@ -340,7 +340,7 @@ class ImpactoMapaServiceTest {
         mockAcessoLivre();
         Mapa mapaVigente = Mapa.builder().codigo(100L).build();
         Mapa mapaAtual = Mapa.builder().codigo(200L).build();
-        Subprocesso subprocesso = criarSubprocesso(1L, mapaAtual);
+        Subprocesso subprocesso = criarSubprocesso(mapaAtual);
         subprocesso.setSituacao(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
 
         Usuario usuario = usuarioAdmin();
@@ -375,9 +375,9 @@ class ImpactoMapaServiceTest {
         assertEquals("Ativ teste", result.alteradas().getFirst().descricao());
     }
 
-    private Subprocesso criarSubprocesso(Long unidadeCodigo, Mapa mapa) {
+    private Subprocesso criarSubprocesso(Mapa mapa) {
         Unidade unidade = Unidade.builder()
-                .codigo(unidadeCodigo)
+                .codigo(1L)
                 .sigla("UNID")
                 .nome("Unidade teste")
                 .build();

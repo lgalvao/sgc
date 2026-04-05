@@ -149,10 +149,10 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
         }
     }
 
-    private void setupChefeForUnidade(String titulo, Unidade unidade) {
+    private void setupChefeForUnidade(Unidade unidade) {
         jdbcTemplate.update(
                 "INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, unidade_codigo, perfil) VALUES (?, ?, ?)",
-                titulo, unidade.getCodigo(), Perfil.CHEFE.name()
+                CHEFE_TITULO, unidade.getCodigo(), Perfil.CHEFE.name()
         );
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -161,7 +161,7 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
         }
     }
 
-    private void setupGestorForUnidadeSuperior(String titulo, Unidade unidadeSubordinada) {
+    private void setupGestorForUnidadeSuperior(Unidade unidadeSubordinada) {
         Unidade unidadeSuperior = UnidadeFixture.unidadeComSigla("SUP_" + unidadeSubordinada.getSigla());
         unidadeSuperior.setCodigo(null);
         unidadeSuperior = unidadeRepo.save(unidadeSuperior);
@@ -170,7 +170,7 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
         unidadeRepo.save(unidadeSubordinada);
 
         jdbcTemplate.update("INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, unidade_codigo, perfil) VALUES (?, ?, ?)",
-                titulo, unidadeSuperior.getCodigo(), Perfil.GESTOR.name());
+                GESTOR_TITULO, unidadeSuperior.getCodigo(), Perfil.GESTOR.name());
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.getPrincipal() instanceof Usuario usuario) {
@@ -185,7 +185,7 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
         @WithMockChefe(CHEFE_TITULO)
         @DisplayName("Não deve detectar impactos quando o cadastro de atividades é idêntico ao mapa vigente")
         void semImpactos_QuandoCadastroIdentico() throws Exception {
-            setupChefeForUnidade(CHEFE_TITULO, unidade);
+            setupChefeForUnidade(unidade);
 
             atividadeRepo.save(Atividade.builder()
                     .mapa(mapaSubprocesso)
@@ -207,7 +207,7 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
         @WithMockChefe(CHEFE_TITULO)
         @DisplayName("Deve detectar atividades inseridas")
         void deveDetectarAtividadesInseridas() throws Exception {
-            setupChefeForUnidade(CHEFE_TITULO, unidade);
+            setupChefeForUnidade(unidade);
 
             atividadeRepo.save(Atividade.builder().mapa(mapaSubprocesso).descricao(atividadeVigente1.getDescricao()).build());
             atividadeRepo.save(Atividade.builder().mapa(mapaSubprocesso).descricao(atividadeVigente2.getDescricao()).build());
@@ -224,7 +224,7 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
         @WithMockChefe(CHEFE_TITULO)
         @DisplayName("Deve detectar atividades removidas e as competências relacionadas")
         void deveDetectarAtividadesRemovidas() throws Exception {
-            setupChefeForUnidade(CHEFE_TITULO, unidade);
+            setupChefeForUnidade(unidade);
 
             atividadeRepo.save(Atividade.builder().mapa(mapaSubprocesso).descricao(atividadeVigente1.getDescricao()).build());
 
@@ -239,7 +239,7 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
         @WithMockChefe(CHEFE_TITULO)
         @DisplayName("Deve detectar atividades alteradas como uma remoção e uma inserção")
         void deveDetectarAtividadesAlteradas() throws Exception {
-            setupChefeForUnidade(CHEFE_TITULO, unidade);
+            setupChefeForUnidade(unidade);
 
             Atividade atividadeAlterada = Atividade.builder().mapa(mapaSubprocesso).descricao("Elaborar relatórios gerenciais e estratégicos.").build();
             atividadeRepo.save(atividadeAlterada);
@@ -256,7 +256,7 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
         @WithMockChefe(CHEFE_TITULO)
         @DisplayName("Deve identificar competências impactadas por remoções e alterações")
         void deveIdentificarCompetenciasImpactadas() throws Exception {
-            setupChefeForUnidade(CHEFE_TITULO, unidade);
+            setupChefeForUnidade(unidade);
 
             Atividade atividadeNova = Atividade.builder()
                     .mapa(mapaSubprocesso)
@@ -278,7 +278,7 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
         @WithMockChefe(CHEFE_TITULO)
         @DisplayName("Não deve detectar impactos se a unidade não possui mapa vigente")
         void semImpactos_QuandoNaoExisteMapaVigente() throws Exception {
-            setupChefeForUnidade(CHEFE_TITULO, unidade);
+            setupChefeForUnidade(unidade);
             unidadeMapaRepo.deleteById(unidade.getCodigo());
 
             mockMvc.perform(get(API_SUBPROCESSOS_ID_IMPACTOS_MAPA, sp.getCodigo()))
@@ -294,7 +294,7 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
         @WithMockChefe(CHEFE_TITULO)
         @DisplayName("CHEFE pode acessar se subprocesso está em 'Revisão do cadastro em andamento'")
         void chefePodeAcessar_EmRevisaoCadastro() throws Exception {
-            setupChefeForUnidade(CHEFE_TITULO, unidade);
+            setupChefeForUnidade(unidade);
             sp.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
             subprocessoRepo.save(sp);
 
@@ -306,7 +306,7 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
         @WithMockGestor(GESTOR_TITULO)
         @DisplayName("GESTOR pode acessar se subprocesso está em 'Revisão do cadastro disponibilizada'")
         void gestorPodeAcessar_EmRevisaoDisponibilizada() throws Exception {
-            setupGestorForUnidadeSuperior(GESTOR_TITULO, unidade);
+            setupGestorForUnidadeSuperior(unidade);
             sp.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
             subprocessoRepo.save(sp);
 
@@ -354,7 +354,7 @@ class CDU12IntegrationTest extends BaseIntegrationTest {
         @WithMockChefe(CHEFE_TITULO)
         @DisplayName("CHEFE recebe erro 422 se sp em situação diferente de 'Revisão do cadastro em andamento' mas com permissão de vis.")
         void chefeRecebeErroValidacao_EmSituacaoIncorreta() throws Exception {
-            setupChefeForUnidade(CHEFE_TITULO, unidade);
+            setupChefeForUnidade(unidade);
             sp.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
             subprocessoRepo.save(sp);
 

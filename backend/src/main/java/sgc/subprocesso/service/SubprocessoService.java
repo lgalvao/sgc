@@ -226,21 +226,20 @@ public class SubprocessoService {
     }
 
     @Transactional
-    public Mapa adicionarCompetencia(Long codSubprocesso, CompetenciaRequest request) {
+    public void adicionarCompetencia(Long codSubprocesso, CompetenciaRequest request) {
         ContextoEdicaoMapa contexto = carregarContextoEdicaoMapa(codSubprocesso);
         validarCompetenciaParaCriacao(request);
         mapaManutencaoService.criarCompetenciaComAtividades(
                 contexto.mapa(), request.descricao(), request.atividadesIds());
         atualizarSituacaoAposPreenchimentoMapa(contexto.subprocesso(), contexto.mapaEstavaVazio());
-        return mapaManutencaoService.mapaCodigo(contexto.codMapa());
     }
 
-    public Mapa atualizarCompetencia(Long codSubprocesso, Long codCompetencia, CompetenciaRequest request) {
+    public void atualizarCompetencia(Long codSubprocesso, Long codCompetencia, CompetenciaRequest request) {
         Subprocesso sp = getSubprocessoParaEdicao(codSubprocesso);
         mapaManutencaoService.atualizarCompetencia(codCompetencia, request.descricao(), request.atividadesIds());
 
         Mapa mapa = consultaService.obterMapaObrigatorio(sp);
-        return mapaManutencaoService.mapaCodigo(mapa.getCodigo());
+        mapaManutencaoService.mapaCodigo(mapa.getCodigo());
     }
 
     private void validarCompetenciaParaCriacao(CompetenciaRequest request) {
@@ -249,15 +248,14 @@ public class SubprocessoService {
         }
     }
 
-    public Mapa removerCompetencia(Long codSubprocesso, Long codCompetencia) {
+    public void removerCompetencia(Long codSubprocesso, Long codCompetencia) {
         ContextoEdicaoMapa contexto = carregarContextoEdicaoMapa(codSubprocesso);
         mapaManutencaoService.removerCompetencia(codCompetencia);
 
         boolean ficouVazio = mapaManutencaoService.competenciasCodMapa(contexto.codMapa()).isEmpty();
         mapaManutencaoService.reconciliarSituacaoSubprocesso(contexto.subprocesso());
         atualizarSituacaoAposEsvaziamentoMapa(contexto.subprocesso(), ficouVazio);
-
-        return mapaManutencaoService.mapaCodigo(contexto.codMapa());
+        mapaManutencaoService.mapaCodigo(contexto.codMapa());
     }
 
     private ContextoEdicaoMapa carregarContextoEdicaoMapa(Long codSubprocesso) {

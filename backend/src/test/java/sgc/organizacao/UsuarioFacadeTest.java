@@ -37,14 +37,14 @@ class UsuarioFacadeTest {
         usuario.setNome("Usuário teste");
         usuario.setEmail("usuario@test.com");
         usuario.setMatricula("12345");
-        usuario.setUnidadeLotacao(criarUnidade(1L, "UNID1"));
+        usuario.setUnidadeLotacao(criarUnidadePadrao());
         return usuario;
     }
 
-    private Unidade criarUnidade(Long codigo, String sigla) {
+    private Unidade criarUnidadePadrao() {
         Unidade unidade = new Unidade();
-        unidade.setCodigo(codigo);
-        unidade.setSigla(sigla);
+        unidade.setCodigo(1L);
+        unidade.setSigla("UNID1");
         unidade.setNome("Unidade teste");
         unidade.setSituacao(SituacaoUnidade.ATIVA);
         unidade.setTipo(TipoUnidade.OPERACIONAL);

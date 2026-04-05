@@ -74,13 +74,12 @@ public class ProcessoDetalheDto {
             );
         }
 
-        public UnidadeParticipanteDto preencherComSubprocesso(Subprocesso subprocesso, Unidade localizacaoAtual) {
+        public void preencherComSubprocesso(Subprocesso subprocesso, Unidade localizacaoAtual) {
             this.situacaoSubprocesso = subprocesso.getSituacao();
             this.dataLimite = subprocesso.getDataLimiteEtapa1();
             this.codSubprocesso = subprocesso.getCodigo();
             this.mapaCodigo = subprocesso.getMapa() != null ? subprocesso.getMapa().getCodigo() : null;
             this.localizacaoAtualCodigo = localizacaoAtual.getCodigo();
-            return this;
         }
 
         private static UnidadeParticipanteDto criarBase(

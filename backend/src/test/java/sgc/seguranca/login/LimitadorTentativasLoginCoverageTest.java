@@ -38,7 +38,7 @@ class LimitadorTentativasLoginCoverageTest {
 
     @BeforeEach
     void setUp() {
-        relogio = new RelogioMutavel("2026-03-26T10:00:00Z");
+        relogio = new RelogioMutavel();
         when(environment.getProperty("aplicacao.ambiente-testes", Boolean.class, false)).thenReturn(false);
         when(environment.getActiveProfiles()).thenReturn(new String[]{"prod"});
 
@@ -64,7 +64,7 @@ class LimitadorTentativasLoginCoverageTest {
         target = new LimitadorTentativasLogin(environment, 1, relogio);
 
         @SuppressWarnings("unchecked")
-        Map<String, Deque<LocalDateTime>> cacheInterno = (Map<String, Deque<LocalDateTime>>) acessarCampo(target, "tentativasPorIp");
+        Map<String, Deque<LocalDateTime>> cacheInterno = (Map<String, Deque<LocalDateTime>>) acessarCampo(target);
         cacheInterno.put("10.0.0.1", new ConcurrentLinkedDeque<>());
 
         target.verificar("10.0.0.2");
@@ -88,7 +88,7 @@ class LimitadorTentativasLoginCoverageTest {
         target = new LimitadorTentativasLogin(environment, 10, relogio);
         target.verificar("1.1.1.1");
 
-        relogio.avancarPara("2026-03-26T10:02:00Z");
+        relogio.avancarDoisMinutos();
 
         target.verificar("1.1.1.1");
 
@@ -118,7 +118,7 @@ class LimitadorTentativasLoginCoverageTest {
     @DisplayName("Deve cobrir filtro com fila vazia e fila preenchida ao buscar IP mais antigo")
     void deveCobrirFiltroMistoAoBuscarIpMaisAntigo() throws Exception {
         @SuppressWarnings("unchecked")
-        Map<String, Deque<LocalDateTime>> cacheInterno = (Map<String, Deque<LocalDateTime>>) acessarCampo(target, "tentativasPorIp");
+        Map<String, Deque<LocalDateTime>> cacheInterno = (Map<String, Deque<LocalDateTime>>) acessarCampo(target);
 
         Deque<LocalDateTime> filaVazia = new ArrayDeque<>();
         Deque<LocalDateTime> filaPreenchida = new ArrayDeque<>();
@@ -135,7 +135,7 @@ class LimitadorTentativasLoginCoverageTest {
     @DisplayName("Deve cobrir fallback para primeira chave quando todas as filas estao vazias")
     void deveCobrirFallbackPrimeiraChaveQuandoFilasVazias() throws Exception {
         @SuppressWarnings("unchecked")
-        Map<String, Deque<LocalDateTime>> cacheInterno = (Map<String, Deque<LocalDateTime>>) acessarCampo(target, "tentativasPorIp");
+        Map<String, Deque<LocalDateTime>> cacheInterno = (Map<String, Deque<LocalDateTime>>) acessarCampo(target);
         cacheInterno.put("10.0.0.1", new ArrayDeque<>());
         cacheInterno.put("10.0.0.2", new ArrayDeque<>());
 
@@ -148,7 +148,7 @@ class LimitadorTentativasLoginCoverageTest {
     @DisplayName("Deve manter tentativa recente ao limpar tentativas antigas")
     void deveCobrirRamoQuandoTentativaAindaEstaNaJanela() throws Exception {
         @SuppressWarnings("unchecked")
-        Map<String, Deque<LocalDateTime>> cacheInterno = (Map<String, Deque<LocalDateTime>>) acessarCampo(target, "tentativasPorIp");
+        Map<String, Deque<LocalDateTime>> cacheInterno = (Map<String, Deque<LocalDateTime>>) acessarCampo(target);
         Deque<LocalDateTime> tentativas = new ArrayDeque<>();
         tentativas.add(LocalDateTime.now(relogio));
         cacheInterno.put("10.0.0.9", tentativas);
@@ -167,7 +167,7 @@ class LimitadorTentativasLoginCoverageTest {
     @DisplayName("Deve remover IP quando todas as tentativas estao expiradas")
     void deveCobrirRemocaoDoIpQuandoTentativasExpiradas() throws Exception {
         @SuppressWarnings("unchecked")
-        Map<String, Deque<LocalDateTime>> cacheInterno = (Map<String, Deque<LocalDateTime>>) acessarCampo(target, "tentativasPorIp");
+        Map<String, Deque<LocalDateTime>> cacheInterno = (Map<String, Deque<LocalDateTime>>) acessarCampo(target);
         Deque<LocalDateTime> tentativasExpiradas = new ArrayDeque<>();
         tentativasExpiradas.add(LocalDateTime.now(relogio).minusMinutes(5));
         cacheInterno.put("10.0.0.10", tentativasExpiradas);
@@ -185,7 +185,7 @@ class LimitadorTentativasLoginCoverageTest {
     @DisplayName("Deve remover IP quando a fila de tentativas ja inicia vazia")
     void deveCobrirRamoComFilaInicialmenteVazia() throws Exception {
         @SuppressWarnings("unchecked")
-        Map<String, Deque<LocalDateTime>> cacheInterno = (Map<String, Deque<LocalDateTime>>) acessarCampo(target, "tentativasPorIp");
+        Map<String, Deque<LocalDateTime>> cacheInterno = (Map<String, Deque<LocalDateTime>>) acessarCampo(target);
         cacheInterno.put("10.0.0.11", new ArrayDeque<>());
 
         invocarMetodo(
@@ -197,8 +197,8 @@ class LimitadorTentativasLoginCoverageTest {
         assertThat(cacheInterno).doesNotContainKey("10.0.0.11");
     }
 
-    private static Object acessarCampo(Object alvo, String nomeCampo) throws Exception {
-        Field campo = alvo.getClass().getDeclaredField(nomeCampo);
+    private static Object acessarCampo(Object alvo) throws Exception {
+        Field campo = alvo.getClass().getDeclaredField("tentativasPorIp");
         campo.setAccessible(true);
         return campo.get(alvo);
     }
@@ -213,12 +213,12 @@ class LimitadorTentativasLoginCoverageTest {
     private static final class RelogioMutavel extends Clock {
         private Instant instanteAtual;
 
-        private RelogioMutavel(String instanteInicialIso) {
-            this.instanteAtual = Instant.parse(instanteInicialIso);
+        private RelogioMutavel() {
+            this.instanteAtual = Instant.parse("2026-03-26T10:00:00Z");
         }
 
-        private void avancarPara(String novoInstanteIso) {
-            this.instanteAtual = Instant.parse(novoInstanteIso);
+        private void avancarDoisMinutos() {
+            this.instanteAtual = Instant.parse("2026-03-26T10:02:00Z");
         }
 
         @Override

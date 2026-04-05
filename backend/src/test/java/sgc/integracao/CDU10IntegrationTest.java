@@ -69,7 +69,7 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
         usuarioSuperior.setUnidadeLotacao(unidadeSuperior);
         usuarioSuperior = usuarioRepo.saveAndFlush(usuarioSuperior);
 
-        setupUsuarioPerfil(usuarioChefe, unidadeChefe, Perfil.CHEFE);
+        setupUsuarioPerfil(usuarioChefe, unidadeChefe);
         definirTitular(unidadeChefe, usuarioChefe);
         definirTitular(unidadeSuperior, usuarioSuperior);
 
@@ -103,10 +103,10 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
         autenticarUsuario(usuarioChefe, Perfil.CHEFE);
     }
 
-    private void setupUsuarioPerfil(Usuario usuario, Unidade unidade, Perfil perfil) {
+    private void setupUsuarioPerfil(Usuario usuario, Unidade unidade) {
         jdbcTemplate.update(
                 "INSERT INTO SGC.VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, unidade_codigo, perfil) VALUES (?, ?, ?)",
-                usuario.getTituloEleitoral(), unidade.getCodigo(), perfil.name());
+                usuario.getTituloEleitoral(), unidade.getCodigo(), Perfil.CHEFE.name());
 
         // Agora o perfil é configurado na sessão ativa via autenticarUsuario
     }
@@ -144,7 +144,7 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
         outraUnidade.setCodigo(null);
         outraUnidade = unidadeRepo.save(outraUnidade);
 
-        setupUsuarioPerfil(outroChefe, outraUnidade, Perfil.CHEFE);
+        setupUsuarioPerfil(outroChefe, outraUnidade);
         autenticarUsuario(outroChefe, Perfil.CHEFE);
 
         mockMvc.perform(post("/api/subprocessos/{codigo}/disponibilizar-revisao", subprocessoRevisao.getCodigo()))

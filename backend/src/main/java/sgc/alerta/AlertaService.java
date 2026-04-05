@@ -56,8 +56,8 @@ public class AlertaService {
         return alertaUsuarioRepo.listarPorUsuarioEAlertas(usuarioTitulo, alertaCodigos);
     }
 
-    public AlertaUsuario salvarAlertaUsuario(AlertaUsuario au) {
-        return alertaUsuarioRepo.save(au);
+    public void salvarAlertaUsuario(AlertaUsuario au) {
+        alertaUsuarioRepo.save(au);
     }
 
     public Optional<LocalDateTime> dataHoraLeituraAlertaUsuario(Long codigoAlerta, String usuarioTitulo) {

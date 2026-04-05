@@ -49,8 +49,8 @@ class RegrasNegocioProcessoExecucaoIntegrationTest extends BaseIntegrationTest {
         unidadeParticipante.setSigla("URG");
         unidadeParticipante = unidadeRepo.saveAndFlush(unidadeParticipante);
 
-        registrarUsuarioSeNecessario("151515151515");
-        registrarResponsabilidade(unidadeParticipante.getCodigo(), "151515151515", "15151515");
+        registrarUsuarioSeNecessario();
+        registrarResponsabilidade(unidadeParticipante.getCodigo());
     }
 
     @Test
@@ -208,19 +208,20 @@ class RegrasNegocioProcessoExecucaoIntegrationTest extends BaseIntegrationTest {
                 .andExpect(status().isOk());
     }
 
-    private void registrarUsuarioSeNecessario(String tituloUsuario) {
+    private void registrarUsuarioSeNecessario() {
+        String tituloUsuario = "151515151515";
         if (usuarioRepo.findById(tituloUsuario).isPresent()) {
             return;
         }
         usuarioRepo.saveAndFlush(UsuarioFixture.usuarioComTitulo(tituloUsuario));
     }
 
-    private void registrarResponsabilidade(Long codUnidade, String tituloUsuario, String matriculaUsuario) {
+    private void registrarResponsabilidade(Long codUnidade) {
         jdbcTemplate.update(
                 SQL_INSERIR_RESPONSABILIDADE,
                 codUnidade,
-                tituloUsuario,
-                matriculaUsuario,
+                "151515151515",
+                "15151515",
                 "TITULAR",
                 LocalDateTime.now()
         );

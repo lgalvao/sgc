@@ -13,6 +13,21 @@ class UnidadeProcessoTest {
     @Test
     @DisplayName("deve criar snapshot da unidade para o processo")
     void deveCriarSnapshotDaUnidadeParaOProcesso() {
+        Unidade unidade = criarUnidade();
+
+        Processo processo = new Processo();
+        processo.setCodigo(50L);
+
+        UnidadeProcesso snapshot = UnidadeProcesso.criarSnapshot(processo, unidade);
+
+        assertThat(snapshot.getProcesso()).isSameAs(processo);
+        assertThat(snapshot.getUnidadeCodigoPersistido()).isEqualTo(8L);
+        assertThat(snapshot.getSigla()).isEqualTo("SEC");
+        assertThat(snapshot.getSituacao()).isEqualTo("ATIVA");
+        assertThat(snapshot.getUnidadeSuperiorCodigo()).isEqualTo(6L);
+    }
+
+    private Unidade criarUnidade() {
         Unidade superior = new Unidade();
         superior.setCodigo(6L);
 
@@ -26,17 +41,7 @@ class UnidadeProcessoTest {
         unidade.setTipo(TipoUnidade.OPERACIONAL);
         unidade.setSituacao(SituacaoUnidade.ATIVA);
         unidade.setUnidadeSuperior(superior);
-
-        Processo processo = new Processo();
-        processo.setCodigo(50L);
-
-        UnidadeProcesso snapshot = UnidadeProcesso.criarSnapshot(processo, unidade);
-
-        assertThat(snapshot.getProcesso()).isSameAs(processo);
-        assertThat(snapshot.getUnidadeCodigoPersistido()).isEqualTo(8L);
-        assertThat(snapshot.getSigla()).isEqualTo("SEC");
-        assertThat(snapshot.getSituacao()).isEqualTo("ATIVA");
-        assertThat(snapshot.getUnidadeSuperiorCodigo()).isEqualTo(6L);
+        return unidade;
     }
 
     @Test

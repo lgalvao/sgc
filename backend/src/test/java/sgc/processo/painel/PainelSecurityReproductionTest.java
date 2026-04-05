@@ -56,10 +56,10 @@ class PainelSecurityReproductionTest extends BaseIntegrationTest {
         alertaUnidadeAlheia = alertaRepo.saveAndFlush(alerta);
     }
 
-    private void autenticar(Usuario usuario, Perfil perfil, Long unidadeCodigo) {
-        usuario.setPerfilAtivo(perfil);
-        usuario.setUnidadeAtivaCodigo(unidadeCodigo);
-        usuario.setAuthorities(Set.of(new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_" + perfil.name())));
+    private void autenticar(Usuario usuario) {
+        usuario.setPerfilAtivo(Perfil.SERVIDOR);
+        usuario.setUnidadeAtivaCodigo(10L);
+        usuario.setAuthorities(Set.of(new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_" + Perfil.SERVIDOR.name())));
         Authentication auth = new UsernamePasswordAuthenticationToken(usuario, null, usuario.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(auth);
     }
@@ -67,7 +67,7 @@ class PainelSecurityReproductionTest extends BaseIntegrationTest {
     @Test
     @DisplayName("CENÁRIO POSITIVO: SERVIDOR vê processos da sua unidade")
     void listarProcessos_Sucesso() throws Exception {
-        autenticar(servidor, Perfil.SERVIDOR, 10L);
+        autenticar(servidor);
 
         mockMvc.perform(get("/api/painel/processos")
                         .param("perfil", "SERVIDOR")
@@ -81,7 +81,7 @@ class PainelSecurityReproductionTest extends BaseIntegrationTest {
     @DisplayName("SEGURANÇA: Sistema ignora perfil malicioso na URL e usa o Perfil do Token")
     void listarProcessos_BypassPerfil_DeveEstarCorrigido() throws Exception {
         // Usuário está autenticado como SERVIDOR na Unidade 10
-        autenticar(servidor, Perfil.SERVIDOR, 10L);
+        autenticar(servidor);
 
         // Atacante tenta passar ADMIN e Unidade 1 na URL
         mockMvc.perform(get("/api/painel/processos")
@@ -96,7 +96,7 @@ class PainelSecurityReproductionTest extends BaseIntegrationTest {
     @DisplayName("SEGURANÇA: Sistema ignora unidade maliciosa na URL e não expõe alerta de fixture de outra unidade")
     void listarAlertas_AcessoUnidadeAlheia_DeveEstarCorrigido() throws Exception {
         // Usuário está autenticado na Unidade 10
-        autenticar(servidor, Perfil.SERVIDOR, 10L);
+        autenticar(servidor);
 
         // Atacante tenta listar alertas da Unidade 8 pela URL
         mockMvc.perform(get("/api/painel/alertas")
@@ -110,7 +110,7 @@ class PainelSecurityReproductionTest extends BaseIntegrationTest {
     @Test
     @DisplayName("SEGURANÇA: Servidor não deve receber alerta coletivo de unidade diferente")
     void listarAlertas_NaoRetornaAlertaColetivoDeOutraUnidade() throws Exception {
-        autenticar(servidor, Perfil.SERVIDOR, 10L);
+        autenticar(servidor);
 
         mockMvc.perform(get("/api/painel/alertas")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -121,7 +121,7 @@ class PainelSecurityReproductionTest extends BaseIntegrationTest {
     @Test
     @DisplayName("SEGURANÇA: Endpoint mantém isolamento mesmo com parâmetros conflitantes")
     void listarAlertas_ParamConflitanteMantemIsolamento() throws Exception {
-        autenticar(servidor, Perfil.SERVIDOR, 10L);
+        autenticar(servidor);
 
         mockMvc.perform(get("/api/painel/alertas")
                         .param("perfil", "ADMIN")
