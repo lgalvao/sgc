@@ -100,6 +100,16 @@ class UsuarioServiceTest {
             assertFalse(resultado.isEmpty());
             assertTrue(resultado.stream().anyMatch(usuario -> usuario.nome().contains("Admin")));
         }
+
+        @Test
+        @DisplayName("Deve pesquisar usuários por título eleitoral")
+        void devePesquisarUsuariosPorTituloEleitoral() {
+            List<UsuarioPesquisaDto> resultado = usuarioServiceInternal.pesquisarPorNome("17");
+
+            assertNotNull(resultado);
+            assertFalse(resultado.isEmpty());
+            assertTrue(resultado.stream().anyMatch(usuario -> "17".equals(usuario.tituloEleitoral())));
+        }
     }
 
     @Nested

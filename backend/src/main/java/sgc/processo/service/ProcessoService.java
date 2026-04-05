@@ -578,10 +578,7 @@ public class ProcessoService {
             throw new IllegalStateException("Subprocesso %d com data limite da etapa 2 sem data limite da etapa 1"
                     .formatted(sp.getCodigo()));
         }
-        if (dataLimiteEtapa2 == null) {
-            return dataLimiteEtapa1;
-        }
-        return dataLimiteEtapa2;
+        return Objects.requireNonNullElse(dataLimiteEtapa2, dataLimiteEtapa1);
     }
 
     private void notificarInicioProcesso(Processo p, List<Unidade> participantes) {

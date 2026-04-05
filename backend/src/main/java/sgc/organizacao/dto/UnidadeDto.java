@@ -51,6 +51,10 @@ public class UnidadeDto {
 
     public static @Nullable UnidadeDto fromEntity(@Nullable Unidade entity) {
         if (entity == null) return null;
+        return fromEntityObrigatoria(entity);
+    }
+
+    public static UnidadeDto fromEntityObrigatoria(Unidade entity) {
         UnidadeDto dto = UnidadeDto.builder()
                 .codigo(entity.getCodigo())
                 .nome(entity.getNome())

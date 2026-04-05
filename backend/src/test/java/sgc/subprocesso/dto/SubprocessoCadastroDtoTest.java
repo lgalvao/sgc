@@ -35,4 +35,17 @@ class SubprocessoCadastroDtoTest {
         assertThat(dto.unidade().getSigla()).isEqualTo("UND");
         assertThat(dto.atividades()).hasSize(1);
     }
+
+    @Test
+    @DisplayName("deve falhar quando subprocesso nao possuir unidade")
+    void deveFalharQuandoSubprocessoNaoPossuirUnidade() {
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setCodigo(20L);
+
+        List<AtividadeDto> atividades = List.of();
+
+        assertThatThrownBy(() -> SubprocessoCadastroDto.fromEntity(subprocesso, atividades))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("Subprocesso deve possuir unidade associada");
+    }
 }

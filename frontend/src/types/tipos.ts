@@ -321,8 +321,8 @@ export interface ResponsavelDto {
 export interface SubprocessoDetalhe {
     codigo: number;
     unidade: Unidade;
-    titular: Usuario;
-    responsavel: ResponsavelDto;
+    titular: Usuario | null;
+    responsavel: ResponsavelDto | null;
     situacao: SituacaoSubprocesso;
     localizacaoAtual: string;
     processoDescricao: string;
@@ -335,6 +335,36 @@ export interface SubprocessoDetalhe {
     movimentacoes: Movimentacao[];
     elementosProcesso: any[];
     permissoes: PermissoesSubprocesso;
+}
+
+export interface SubprocessoDetalheResponse {
+    subprocesso: {
+        codigo: number;
+        unidade: Unidade;
+        situacao: SituacaoSubprocesso;
+        dataLimiteEtapa1: string;
+        dataFimEtapa1: string | null;
+        dataLimiteEtapa2: string | null;
+        dataFimEtapa2: string | null;
+        processoDescricao: string;
+        dataCriacaoProcesso: string;
+        tipoProcesso: TipoProcesso;
+        isEmAndamento: boolean;
+        etapaAtual: number | null;
+    };
+    responsavel: ResponsavelDto | null;
+    titular: Usuario | null;
+    movimentacoes: Movimentacao[];
+    localizacaoAtual: string;
+    permissoes: PermissoesSubprocesso;
+}
+
+export interface ContextoEdicaoSubprocesso {
+    unidade: Unidade;
+    subprocesso: Subprocesso;
+    detalhes: SubprocessoDetalhe;
+    mapa: MapaCompleto;
+    atividadesDisponiveis: Atividade[];
 }
 
 export interface MapaVisualizacao {

@@ -46,4 +46,16 @@ class MapaCompletoDtoTest {
             });
         });
     }
+
+    @Test
+    @DisplayName("deve falhar quando mapa não possuir subprocesso")
+    void deveFalharQuandoMapaNaoPossuirSubprocesso() {
+        Mapa mapa = new Mapa();
+        mapa.setCodigo(10L);
+        mapa.setCompetencias(new LinkedHashSet<>());
+
+        assertThatThrownBy(() -> MapaCompletoDto.fromEntity(mapa))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("Mapa deve possuir subprocesso associado");
+    }
 }

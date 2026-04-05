@@ -184,13 +184,8 @@ async function atualizarContextoEdicao(codigo: number) {
     return null;
   }
 
-  if (data.atividadesDisponiveis) {
-    atividades.value = data.atividadesDisponiveis;
-  }
-
-  if (data.unidade) {
-    unidade.value = data.unidade as Unidade;
-  }
+  atividades.value = data.atividadesDisponiveis;
+  unidade.value = data.unidade as Unidade;
 
   return data;
 }

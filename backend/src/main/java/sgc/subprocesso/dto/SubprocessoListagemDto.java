@@ -11,8 +11,8 @@ import java.time.*;
 
 @Builder
 public record SubprocessoListagemDto(
-        @Nullable Long codigo,
-        @Nullable UnidadeDto unidade,
+        Long codigo,
+        UnidadeDto unidade,
         SituacaoSubprocesso situacao,
         LocalDateTime dataLimiteEtapa1,
         @Nullable LocalDateTime dataFimEtapa1,
@@ -21,18 +21,22 @@ public record SubprocessoListagemDto(
         @Nullable Long codProcesso,
         @Nullable Long codUnidade,
         @Nullable Long codMapa,
-        @Nullable String processoDescricao,
-        @Nullable LocalDateTime dataCriacaoProcesso,
-        @Nullable TipoProcesso tipoProcesso,
+        String processoDescricao,
+        LocalDateTime dataCriacaoProcesso,
+        TipoProcesso tipoProcesso,
         boolean isEmAndamento,
         @Nullable Integer etapaAtual) {
 
     public static SubprocessoListagemDto fromEntity(Subprocesso subprocesso) {
         Processo processo = subprocesso.getProcesso();
+        Unidade unidade = subprocesso.getUnidade();
+        if (processo == null || unidade == null) {
+            throw new IllegalStateException("Subprocesso deve possuir processo e unidade associados");
+        }
 
         return SubprocessoListagemDto.builder()
                 .codigo(subprocesso.getCodigo())
-                .unidade(paraUnidadeResumo(subprocesso.getUnidade()))
+                .unidade(paraUnidadeResumo(unidade))
                 .situacao(subprocesso.getSituacao())
                 .dataLimiteEtapa1(subprocesso.getDataLimiteEtapa1())
                 .dataFimEtapa1(subprocesso.getDataFimEtapa1())
@@ -41,19 +45,15 @@ public record SubprocessoListagemDto(
                 .codProcesso(subprocesso.getCodProcesso())
                 .codUnidade(subprocesso.getCodUnidade())
                 .codMapa(subprocesso.getCodMapa())
-                .processoDescricao(processo != null ? processo.getDescricao() : null)
-                .dataCriacaoProcesso(processo != null ? processo.getDataCriacao() : null)
-                .tipoProcesso(processo != null ? processo.getTipo() : null)
+                .processoDescricao(processo.getDescricao())
+                .dataCriacaoProcesso(processo.getDataCriacao())
+                .tipoProcesso(processo.getTipo())
                 .isEmAndamento(subprocesso.isEmAndamento())
                 .etapaAtual(subprocesso.getEtapaAtual())
                 .build();
     }
 
-    private static @Nullable UnidadeDto paraUnidadeResumo(@Nullable Unidade unidade) {
-        if (unidade == null) {
-            return null;
-        }
-
+    private static UnidadeDto paraUnidadeResumo(Unidade unidade) {
         return UnidadeDto.builder()
                 .codigo(unidade.getCodigo())
                 .nome(unidade.getNome())
@@ -63,4 +63,3 @@ public record SubprocessoListagemDto(
                 .build();
     }
 }
-

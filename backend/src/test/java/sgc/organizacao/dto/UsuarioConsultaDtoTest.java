@@ -33,4 +33,26 @@ class UsuarioConsultaDtoTest {
         assertThat(dto.unidade().getCodigo()).isEqualTo(10L);
         assertThat(dto.perfis()).isEmpty();
     }
+
+    @Test
+    @DisplayName("deve mapear leitura com unidade obrigatoria")
+    void deveMapearLeituraComUnidadeObrigatoria() {
+        UsuarioConsultaLeitura usuario = new UsuarioConsultaLeitura(
+                "123",
+                "0001",
+                "João",
+                "joao@tre.jus.br",
+                "1234",
+                10L,
+                "Unidade",
+                "UND",
+                TipoUnidade.OPERACIONAL,
+                "999");
+
+        UsuarioConsultaDto dto = UsuarioConsultaDto.fromLeitura(usuario);
+
+        assertThat(dto.unidade()).isNotNull();
+        assertThat(dto.unidade().getCodigo()).isEqualTo(10L);
+        assertThat(dto.unidade().getSigla()).isEqualTo("UND");
+    }
 }

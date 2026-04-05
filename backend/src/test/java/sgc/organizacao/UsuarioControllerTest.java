@@ -86,9 +86,9 @@ class UsuarioControllerTest {
                 .tituloEleitoral("123")
                 .nome("Fulano")
                 .build();
-        when(usuarioService.pesquisarPorNome("ful")).thenReturn(List.of(usuario));
+        when(usuarioService.pesquisarPorNome("123")).thenReturn(List.of(usuario));
 
-        mockMvc.perform(get("/api/usuarios/pesquisar").param("termo", "ful"))
+        mockMvc.perform(get("/api/usuarios/pesquisar").param("termo", "123"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].tituloEleitoral").value("123"))
                 .andExpect(jsonPath("$[0].nome").value("Fulano"));

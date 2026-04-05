@@ -1,12 +1,14 @@
 import type {
     Analise,
     Atividade,
+    ContextoEdicaoSubprocesso,
     DisponibilizarMapaRequest,
     ImpactoMapa,
     MapaAjuste,
     MapaCompleto,
     MapaVisualizacao,
     SalvarCompetenciaRequest,
+    SubprocessoDetalheResponse,
     SubprocessoDetalhe,
     ValidacaoCadastro
 } from "@/types/tipos";
@@ -34,8 +36,8 @@ export async function importarAtividades(
 }
 
 export async function listarAtividades(codSubprocesso: number): Promise<Atividade[]> {
-    const response = await apiClient.get<any>(`/subprocessos/${codSubprocesso}/contexto-edicao`);
-    return response.data.atividadesDisponiveis as Atividade[];
+    const response = await apiClient.get<ContextoEdicaoSubprocesso>(`/subprocessos/${codSubprocesso}/contexto-edicao`);
+    return response.data.atividadesDisponiveis;
 }
 
 export async function listarAtividadesParaImportacao(codSubprocesso: number): Promise<Atividade[]> {
@@ -57,19 +59,19 @@ export async function buscarSubprocessoDetalhe(
     codSubprocesso: number,
     perfil: string,
     unidadeCodigo: number,
-) {
-    const response = await apiClient.get(`/subprocessos/${codSubprocesso}`, {
+): Promise<SubprocessoDetalheResponse> {
+    const response = await apiClient.get<SubprocessoDetalheResponse>(`/subprocessos/${codSubprocesso}`, {
         params: {perfil, unidadeUsuario: unidadeCodigo},
     });
-    return response.data as SubprocessoDetalhe;
+    return response.data;
 }
 
 export async function buscarContextoEdicao(
     codSubprocesso: number,
     perfil: string,
     unidadeCodigo: number,
-) {
-    const response = await apiClient.get(`/subprocessos/${codSubprocesso}/contexto-edicao`, {
+): Promise<ContextoEdicaoSubprocesso> {
+    const response = await apiClient.get<ContextoEdicaoSubprocesso>(`/subprocessos/${codSubprocesso}/contexto-edicao`, {
         params: {perfil, unidadeUsuario: unidadeCodigo},
     });
     return response.data;

@@ -65,7 +65,7 @@
             </p>
             <p>
               <span class="fw-bold me-1">{{ TEXTOS.subprocesso.LABEL_LOCALIZACAO }}:</span>
-              <span data-testid="subprocesso-header__txt-localizacao">{{ subprocesso.localizacaoAtual || subprocesso.unidade.sigla }}</span>
+              <span data-testid="subprocesso-header__txt-localizacao">{{ subprocesso.localizacaoAtual }}</span>
             </p>
             <p v-if="subprocesso.prazoEtapaAtual">
               <span class="fw-bold me-1">{{ TEXTOS.subprocesso.LABEL_PRAZO_ETAPA }}:</span>
@@ -352,7 +352,7 @@ onMounted(async () => {
       erroNaoEncontrado.value = false;
       codSubprocesso.value = codigo;
       const data = await subprocessosStore.buscarContextoEdicao(codigo);
-      if (data?.mapa) {
+      if (data) {
         mapaStore.mapaCompleto.value = data.mapa as any;
       } else {
         await mapaStore.buscarMapaCompleto(codigo);

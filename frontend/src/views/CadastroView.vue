@@ -383,8 +383,8 @@ function processarRespostaLocal(response: any) {
 }
 
 function sincronizarEstadoInicialContexto(data: any) {
-  const subprocessoContexto = data?.detalhes?.subprocesso ?? data?.subprocesso;
-  const permissoesContexto = data?.detalhes?.permissoes ?? data?.permissoes;
+  const subprocessoContexto = data?.subprocesso;
+  const permissoesContexto = data?.detalhes?.permissoes;
 
   if (!subprocessoContexto || !permissoesContexto) {
     return;
@@ -412,17 +412,11 @@ async function carregarContextoInicial() {
   }
 
   sincronizarEstadoInicialContexto(data);
-  if (data.mapa) {
-    mapasStore.mapaCompleto.value = data.mapa as any;
-  }
-  if (data.atividadesDisponiveis) {
-    atividades.value = data.atividadesDisponiveis;
-  }
+  mapasStore.mapaCompleto.value = data.mapa as any;
+  atividades.value = data.atividadesDisponiveis;
   atividadesSnapshotInicial.value = serializarAtividades(atividades.value);
   disponibilizacaoSemMudancas.value = false;
-  if (data.unidade) {
-    unidade.value = data.unidade as Unidade;
-  }
+  unidade.value = data.unidade as Unidade;
 }
 
 async function adicionarAtividade(): Promise<boolean> {
@@ -557,12 +551,10 @@ async function handleImportAtividades(aviso?: string) {
       const data = await subprocessosStore.buscarContextoEdicao(codigoSubprocesso);
       if (data) {
         sincronizarEstadoInicialContexto(data);
-        atividades.value = data.atividadesDisponiveis ?? [];
+        atividades.value = data.atividadesDisponiveis;
         atividadesSnapshotInicial.value = serializarAtividades(atividades.value);
         disponibilizacaoSemMudancas.value = false;
-        if (data.unidade) {
-          unidade.value = data.unidade as Unidade;
-        }
+        unidade.value = data.unidade as Unidade;
       }
     });
   }

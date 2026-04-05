@@ -47,4 +47,20 @@ class UnidadeDtoTest {
         assertThat(dto.getResponsavel()).isNotNull();
         assertThat(dto.getResponsavel().nome()).isEqualTo("Maria");
     }
+
+    @Test
+    @DisplayName("deve mapear unidade obrigatoria")
+    void deveMapearUnidadeObrigatoria() {
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(2L);
+        unidade.setNome("Unidade");
+        unidade.setSigla("UND");
+        unidade.setTipo(TipoUnidade.OPERACIONAL);
+
+        UnidadeDto dto = UnidadeDto.fromEntityObrigatoria(unidade);
+
+        assertThat(dto.getCodigo()).isEqualTo(2L);
+        assertThat(dto.getSigla()).isEqualTo("UND");
+        assertThat(dto.getTipo()).isEqualTo("OPERACIONAL");
+    }
 }

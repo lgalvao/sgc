@@ -6,7 +6,13 @@ import {
 } from "@/services/subprocessoService";
 import {usePerfilStore} from "@/stores/perfil";
 import {useMapas} from "@/composables/useMapas";
-import type {SituacaoSubprocesso, SubprocessoDetalhe} from "@/types/tipos";
+import type {
+    ContextoEdicaoSubprocesso,
+    PermissoesSubprocesso,
+    SituacaoSubprocesso,
+    SubprocessoDetalhe,
+    SubprocessoDetalheResponse,
+} from "@/types/tipos";
 import {useErrorHandler} from "@/composables/useErrorHandler";
 import {normalizeError} from "@/utils/apiError";
 import {logger} from "@/utils";
@@ -19,37 +25,32 @@ type ContextoAcessoSubprocesso = {
     codUnidade: number | null;
 };
 
-function mapSubprocessoDetalheDtoToModel(dto: any): SubprocessoDetalhe | null {
-    if (!dto) return null;
-
-    const sp = dto.subprocesso || dto;
-    const ultimaDataLimiteSubprocesso = obterUltimaDataLimiteSubprocesso(sp);
-
+function mapRespostaDetalheParaModel(dto: SubprocessoDetalheResponse): SubprocessoDetalhe {
+    const sp = dto.subprocesso;
     return {
         codigo: sp.codigo,
         unidade: sp.unidade,
         titular: dto.titular,
         responsavel: dto.responsavel,
         situacao: sp.situacao,
-        localizacaoAtual: dto.localizacaoAtual || sp.unidade?.sigla,
-        processoDescricao: sp.processoDescricao || sp.processo?.descricao,
-        dataCriacaoProcesso: sp.dataCriacaoProcesso || sp.processo?.dataCriacao,
-        ultimaDataLimiteSubprocesso,
-        tipoProcesso: sp.tipoProcesso || sp.processo?.tipo,
-        prazoEtapaAtual: sp.prazoEtapaAtual || sp.dataLimite || sp.dataLimiteEtapa2 || sp.dataLimiteEtapa1,
-        isEmAndamento: sp.isEmAndamento ?? true,
-        etapaAtual: sp.etapaAtual || 1,
-        movimentacoes: dto.movimentacoes || [],
+        localizacaoAtual: dto.localizacaoAtual,
+        processoDescricao: sp.processoDescricao,
+        dataCriacaoProcesso: sp.dataCriacaoProcesso,
+        ultimaDataLimiteSubprocesso: obterUltimaDataLimiteSubprocesso(sp),
+        tipoProcesso: sp.tipoProcesso,
+        prazoEtapaAtual: sp.dataLimiteEtapa2 || sp.dataLimiteEtapa1,
+        isEmAndamento: sp.isEmAndamento,
+        etapaAtual: sp.etapaAtual ?? 1,
+        movimentacoes: dto.movimentacoes,
         elementosProcesso: [],
-        permissoes: dto.permissoes || {},
+        permissoes: dto.permissoes,
     };
 }
 
-function obterUltimaDataLimiteSubprocesso(sp: any): string {
-    const dataLimiteEtapa1 = sp.dataLimiteEtapa1 || sp.dataLimite;
+function obterUltimaDataLimiteSubprocesso(sp: SubprocessoDetalheResponse["subprocesso"]): string {
+    const dataLimiteEtapa1 = sp.dataLimiteEtapa1;
     const dataLimiteEtapa2 = sp.dataLimiteEtapa2;
 
-    if (!dataLimiteEtapa1) return dataLimiteEtapa2 || "";
     if (!dataLimiteEtapa2) return dataLimiteEtapa1;
     return dataLimiteEtapa1 > dataLimiteEtapa2 ? dataLimiteEtapa1 : dataLimiteEtapa2;
 }
@@ -77,8 +78,8 @@ function obterContextoAcessoSubprocesso(): ContextoAcessoSubprocesso | null {
     };
 }
 
-function atualizarDetalheLocal(dto: any) {
-    subprocessoDetalhe.value = mapSubprocessoDetalheDtoToModel(dto);
+function atualizarDetalheLocal(detalhe: SubprocessoDetalhe) {
+    subprocessoDetalhe.value = detalhe;
 }
 
 async function buscarSubprocessoDetalhe(codigo: number) {
@@ -96,7 +97,7 @@ async function buscarSubprocessoDetalhe(codigo: number) {
             contextoAcesso.perfil,
             contextoAcesso.codUnidade as number,
         );
-        atualizarDetalheLocal(dto);
+        atualizarDetalheLocal(mapRespostaDetalheParaModel(dto));
     }, (erro) => {
         logger.error(`Erro ao buscar detalhes do subprocesso ${codigo}:`, erro);
         subprocessoDetalhe.value = null;
@@ -129,23 +130,23 @@ async function buscarContextoEdicao(codigo: number) {
             contextoAcesso.perfil,
             contextoAcesso.codUnidade as number,
         );
-        const detalhesDto = data.detalhes || data;
-
-        atualizarDetalheLocal(detalhesDto);
-
-        if (data.mapa) {
-            const {mapaCompleto} = useMapas();
-            mapaCompleto.value = data.mapa;
-        }
+        atualizarContextoEdicaoLocal(data);
 
         return data;
     });
 }
 
+function atualizarContextoEdicaoLocal(data: ContextoEdicaoSubprocesso) {
+    atualizarDetalheLocal(data.detalhes);
+
+    const {mapaCompleto} = useMapas();
+    mapaCompleto.value = data.mapa;
+}
+
 function atualizarStatusLocal(status: {
     codigo: number;
     situacao: SituacaoSubprocesso;
-    permissoes?: any;
+    permissoes?: PermissoesSubprocesso;
 }) {
     if (!subprocessoDetalhe.value) {
         return;
@@ -154,7 +155,7 @@ function atualizarStatusLocal(status: {
     subprocessoDetalhe.value = {
         ...subprocessoDetalhe.value,
         situacao: status.situacao,
-        permissoes: status.permissoes || subprocessoDetalhe.value.permissoes,
+        permissoes: status.permissoes ?? subprocessoDetalhe.value.permissoes,
     };
 }
 

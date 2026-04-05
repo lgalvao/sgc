@@ -123,7 +123,7 @@ public class SubprocessoService {
         log.info("Criando {} subprocessos para o processo {}", unidadesElegiveis.size(), processo.getCodigo());
         List<Subprocesso> subprocessos = unidadesElegiveis.stream()
                 .map(unidade -> criarSubprocessoInicial(processo, unidade, NAO_INICIADO))
-                .map(Subprocesso.class::cast)
+                .map(t -> t)
                 .toList();
 
         List<Subprocesso> subprocessosSalvos = subprocessoRepo.saveAll(subprocessos);

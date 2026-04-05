@@ -83,7 +83,27 @@ describe('Subprocessos store', () => {
         it('deve buscar com sucesso para ADMIN (global)', async () => {
             mockPerfilStore.perfilSelecionado = 'ADMIN' as any;
             mockPerfilStore.unidadeAtual = null;
-            (buscarSubprocessoDetalhe as any).mockResolvedValue({codigo: 1, situacao: 'CRIADO'});
+            (buscarSubprocessoDetalhe as any).mockResolvedValue({
+                subprocesso: {
+                    codigo: 1,
+                    situacao: 'CRIADO',
+                    unidade: {codigo: 10, sigla: 'UND'},
+                    dataLimiteEtapa1: '2025-01-01T00:00:00',
+                    dataFimEtapa1: null,
+                    dataLimiteEtapa2: null,
+                    dataFimEtapa2: null,
+                    processoDescricao: 'Processo',
+                    dataCriacaoProcesso: '2024-01-01T00:00:00',
+                    tipoProcesso: 'MAPEAMENTO',
+                    isEmAndamento: true,
+                    etapaAtual: 1
+                },
+                titular: null,
+                responsavel: null,
+                localizacaoAtual: 'UND',
+                movimentacoes: [],
+                permissoes: {}
+            });
 
             await store.buscarSubprocessoDetalhe(1);
 
@@ -98,7 +118,27 @@ describe('Subprocessos store', () => {
             mockPerfilStore.perfisUnidades = [{perfil: 'SERVIDOR', unidade: {codigo: 10}}] as any;
             mockPerfilStore.unidadeAtual = 10;
 
-            (buscarSubprocessoDetalhe as any).mockResolvedValue({codigo: 1, situacao: 'CRIADO'});
+            (buscarSubprocessoDetalhe as any).mockResolvedValue({
+                subprocesso: {
+                    codigo: 1,
+                    situacao: 'CRIADO',
+                    unidade: {codigo: 10, sigla: 'UND'},
+                    dataLimiteEtapa1: '2025-01-01T00:00:00',
+                    dataFimEtapa1: null,
+                    dataLimiteEtapa2: null,
+                    dataFimEtapa2: null,
+                    processoDescricao: 'Processo',
+                    dataCriacaoProcesso: '2024-01-01T00:00:00',
+                    tipoProcesso: 'MAPEAMENTO',
+                    isEmAndamento: true,
+                    etapaAtual: 1
+                },
+                titular: null,
+                responsavel: null,
+                localizacaoAtual: 'UND',
+                movimentacoes: [],
+                permissoes: {}
+            });
 
             await store.buscarSubprocessoDetalhe(1);
 
@@ -158,7 +198,7 @@ describe('Subprocessos store', () => {
         it('deve popular stores relacionados com dados retornados', async () => {
             mockPerfilStore.perfilSelecionado = 'ADMIN' as any;
             const mockData = {
-                detalhes: {codigo: 1},
+                detalhes: {codigo: 1, localizacaoAtual: 'UND', permissoes: {}},
                 unidade: {codigo: 10, nome: 'Teste'},
                 mapa: {id: 5},
                 atividadesDisponiveis: [{id: 100}]

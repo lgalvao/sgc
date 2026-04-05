@@ -50,4 +50,12 @@ class UsuarioRepoTest {
 
         assertThat(porNome).extracting(UsuarioPesquisaDto::tituloEleitoral).contains("1");
     }
+
+    @Test
+    @DisplayName("deve buscar usuarios por prefixo do titulo eleitoral com limite")
+    void deveBuscarUsuariosPorTituloEleitoral() {
+        List<UsuarioPesquisaDto> porTitulo = usuarioRepo.pesquisarPorNome("17", PageRequest.of(0, 20));
+
+        assertThat(porTitulo).extracting(UsuarioPesquisaDto::tituloEleitoral).contains("17");
+    }
 }

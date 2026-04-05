@@ -287,10 +287,6 @@ public class UnidadeHierarquiaService {
     }
 
     private UnidadeDto toUnidadeDtoObrigatoria(Unidade unidade) {
-        UnidadeDto dto = UnidadeDto.fromEntity(unidade);
-        if (dto == null) {
-            throw new IllegalStateException("Unidade ausente ao montar hierarquia");
-        }
-        return dto;
+        return UnidadeDto.fromEntityObrigatoria(unidade);
     }
 }

@@ -7,14 +7,17 @@ import sgc.subprocesso.model.*;
 import java.util.*;
 
 public record MapaCompletoDto(
-        @Nullable Long codigo,
-        @Nullable Long subprocessoCodigo,
+        Long codigo,
+        Long subprocessoCodigo,
         @Nullable String observacoes,
         List<CompetenciaMapaDto> competencias,
         @Nullable String situacao) {
 
     public static MapaCompletoDto fromEntity(Mapa mapa) {
         Subprocesso subprocesso = mapa.getSubprocesso();
+        if (subprocesso == null) {
+            throw new IllegalStateException("Mapa deve possuir subprocesso associado");
+        }
         List<CompetenciaMapaDto> competencias = mapa.getCompetencias().stream()
                 .map(CompetenciaMapaDto::fromEntity)
                 .toList();
@@ -27,4 +30,3 @@ public record MapaCompletoDto(
                 null);
     }
 }
-

@@ -379,7 +379,7 @@ public class SubprocessoConsultaService {
 
         return MapaAjusteDto.of(
                 sp,
-                obterAnaliseMaisRecentePorTipo(codSubprocesso, TipoAnalise.VALIDACAO),
+                obterAnaliseMaisRecentePorTipo(codSubprocesso),
                 dadosMapaAjuste.competencias(),
                 dadosMapaAjuste.atividades(),
                 dadosMapaAjuste.conhecimentos()
@@ -439,8 +439,8 @@ public class SubprocessoConsultaService {
                 .toList();
     }
 
-    private Analise obterAnaliseMaisRecentePorTipo(Long codSubprocesso, TipoAnalise tipo) {
-        return listarAnalisesPorTipo(codSubprocesso, tipo).stream().findFirst().orElse(null);
+    private Analise obterAnaliseMaisRecentePorTipo(Long codSubprocesso) {
+        return listarAnalisesPorTipo(codSubprocesso, TipoAnalise.VALIDACAO).stream().findFirst().orElse(null);
     }
 
     private DadosMapaAjuste carregarDadosMapaAjuste(Subprocesso subprocesso) {

@@ -83,6 +83,7 @@ public interface UsuarioRepo extends JpaRepository<Usuario, String> {
             )
             FROM Usuario u
             WHERE LOWER(u.nome) LIKE LOWER(CONCAT(:termo, '%'))
+               OR u.tituloEleitoral LIKE CONCAT(:termo, '%')
             ORDER BY u.nome
             """)
     List<UsuarioPesquisaDto> pesquisarPorNome(@Param("termo") String termo, Pageable pageable);

@@ -13,19 +13,13 @@ public record UsuarioConsultaDto(
         String nome,
         String email,
         String ramal,
-        @Nullable UnidadeDto unidade,
+        UnidadeDto unidade,
         List<String> perfis) {
 
     public static UsuarioConsultaDto fromEntity(Usuario usuario) {
         Unidade unidadeLotacao = usuario.getUnidadeLotacao();
 
-        UnidadeDto unidade = UnidadeDto.builder()
-        .codigo(unidadeLotacao.getCodigo())
-        .nome(unidadeLotacao.getNome())
-        .sigla(unidadeLotacao.getSigla())
-        .tipo(unidadeLotacao.getTipo().name())
-        .tituloTitular(unidadeLotacao.getTituloTitular())
-        .build();
+        UnidadeDto unidade = UnidadeDto.fromEntityObrigatoria(unidadeLotacao);
 
         return UsuarioConsultaDto.builder()
                 .tituloEleitoral(usuario.getTituloEleitoral())

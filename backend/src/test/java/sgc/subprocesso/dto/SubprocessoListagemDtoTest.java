@@ -52,4 +52,14 @@ class SubprocessoListagemDtoTest {
         assertThat(dto.isEmAndamento()).isTrue();
         assertThat(dto.etapaAtual()).isEqualTo(1);
     }
+
+    @Test
+    @DisplayName("deve falhar quando processo ou unidade estiverem ausentes")
+    void deveFalharQuandoProcessoOuUnidadeEstiveremAusentes() {
+        Subprocesso subprocesso = new Subprocesso();
+
+        assertThatThrownBy(() -> SubprocessoListagemDto.fromEntity(subprocesso))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("Subprocesso deve possuir processo e unidade associados");
+    }
 }

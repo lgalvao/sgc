@@ -11,8 +11,8 @@ import java.util.*;
 
 @Builder
 public record SubprocessoCadastroDto(
-        @Nullable Long codigo,
-        @Nullable UnidadeDto unidade,
+        Long codigo,
+        UnidadeDto unidade,
         List<AtividadeDto> atividades) {
 
     public static SubprocessoCadastroDto fromEntity(Subprocesso subprocesso, List<AtividadeDto> atividades) {
@@ -23,9 +23,9 @@ public record SubprocessoCadastroDto(
                 .build();
     }
 
-    private static @Nullable UnidadeDto paraUnidadeResumo(@Nullable Unidade unidade) {
+    private static UnidadeDto paraUnidadeResumo(@Nullable Unidade unidade) {
         if (unidade == null) {
-            return null;
+            throw new IllegalStateException("Subprocesso deve possuir unidade associada");
         }
 
         return UnidadeDto.builder()
@@ -37,4 +37,3 @@ public record SubprocessoCadastroDto(
                 .build();
     }
 }
-

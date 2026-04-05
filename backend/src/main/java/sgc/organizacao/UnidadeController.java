@@ -98,13 +98,13 @@ public class UnidadeController {
     public ResponseEntity<UnidadeDto> buscarUnidadePorSigla(
             @PathVariable @Pattern(regexp = "^[a-zA-Z0-9_.-]+$") String siglaUnidade) {
         Unidade unidade = unidadeService.buscarPorSigla(siglaUnidade);
-        return ResponseEntity.ok(UnidadeDto.fromEntity(unidade));
+        return ResponseEntity.ok(UnidadeDto.fromEntityObrigatoria(unidade));
     }
 
     @GetMapping("/{codigo}")
     public ResponseEntity<UnidadeDto> buscarUnidadePorCodigo(@PathVariable Long codigo) {
         Unidade unidade = unidadeService.buscarPorCodigo(codigo);
-        return ResponseEntity.ok(UnidadeDto.fromEntity(unidade));
+        return ResponseEntity.ok(UnidadeDto.fromEntityObrigatoria(unidade));
     }
 
     @GetMapping("/{codigo}/arvore")

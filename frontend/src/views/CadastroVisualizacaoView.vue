@@ -362,12 +362,8 @@ onMounted(async () => {
     codSubprocesso.value = codigoSubprocesso;
     const data = await subprocessosStore.buscarContextoEdicao(codigoSubprocesso);
     if (data) {
-      if (data.atividadesDisponiveis) {
-        atividades.value = data.atividadesDisponiveis;
-      }
-      if (data.unidade) {
-        unidade.value = data.unidade as Unidade;
-      }
+      atividades.value = data.atividadesDisponiveis;
+      unidade.value = data.unidade as Unidade;
     }
   }
 });

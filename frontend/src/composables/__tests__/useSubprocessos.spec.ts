@@ -10,6 +10,30 @@ vi.mock("@/utils", () => ({
     },
 }));
 
+const permissoesPadrao = {
+    podeEditarCadastro: false,
+    podeDisponibilizarCadastro: false,
+    podeDevolverCadastro: false,
+    podeAceitarCadastro: false,
+    podeHomologarCadastro: false,
+    podeEditarMapa: false,
+    podeDisponibilizarMapa: false,
+    podeValidarMapa: false,
+    podeApresentarSugestoes: false,
+    podeVerSugestoes: false,
+    podeDevolverMapa: false,
+    podeAceitarMapa: false,
+    podeHomologarMapa: false,
+    podeVisualizarImpacto: false,
+    podeAlterarDataLimite: false,
+    podeReabrirCadastro: false,
+    podeReabrirRevisao: false,
+    podeEnviarLembrete: false,
+    mesmaUnidade: false,
+    habilitarAcessoCadastro: false,
+    habilitarAcessoMapa: false,
+};
+
 describe("useSubprocessos", () => {
     let useSubprocessos: typeof import("../useSubprocessos").useSubprocessos;
     let service: any;
@@ -32,9 +56,25 @@ describe("useSubprocessos", () => {
     it("deve buscar detalhe do subprocesso com sucesso", async () => {
         const store = useSubprocessos();
         const mockDto = {
-            codigo: 10,
-            situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
-            unidade: {sigla: "U1"},
+            subprocesso: {
+                codigo: 10,
+                situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
+                unidade: {sigla: "U1"},
+                dataLimiteEtapa1: "2025-01-01T00:00:00",
+                dataFimEtapa1: null,
+                dataLimiteEtapa2: null,
+                dataFimEtapa2: null,
+                processoDescricao: "Processo",
+                dataCriacaoProcesso: "2024-01-01T00:00:00",
+                tipoProcesso: "MAPEAMENTO",
+                isEmAndamento: true,
+                etapaAtual: 1,
+            },
+            titular: null,
+            responsavel: null,
+            localizacaoAtual: "U1",
+            movimentacoes: [],
+            permissoes: permissoesPadrao,
         };
         service.buscarSubprocessoDetalhe.mockResolvedValue(mockDto);
 
@@ -94,7 +134,12 @@ describe("useSubprocessos", () => {
     it("deve buscar contexto de edicao", async () => {
         const store = useSubprocessos();
         const mockContexto = {
-            detalhes: {codigo: 10, situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO},
+            detalhes: {
+                codigo: 10,
+                situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
+                localizacaoAtual: "U1",
+                permissoes: permissoesPadrao,
+            },
             mapa: {codigo: 20},
         };
         service.buscarContextoEdicao.mockResolvedValue(mockContexto);
@@ -105,11 +150,15 @@ describe("useSubprocessos", () => {
         expect(resultado).toEqual(mockContexto);
     });
 
-    it("deve usar data como fallback se detalhes estiver ausente no contexto de edição", async () => {
+    it("deve usar detalhes obrigatorios do contexto de edição", async () => {
         const store = useSubprocessos();
         const dataMock = {
-            codigo: 123,
-            situacao: SituacaoSubprocesso.NAO_INICIADO,
+            detalhes: {
+                codigo: 123,
+                situacao: SituacaoSubprocesso.NAO_INICIADO,
+                localizacaoAtual: "U1",
+                permissoes: permissoesPadrao,
+            },
             mapa: {codigo: 1}
         };
         service.buscarContextoEdicao.mockResolvedValue(dataMock);
@@ -135,11 +184,11 @@ describe("useSubprocessos", () => {
         store.atualizarStatusLocal({
             codigo: 10,
             situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
-            permissoes: {podeEditar: true}
+            permissoes: {...permissoesPadrao, podeEditarCadastro: true}
         });
 
         expect(store.subprocessoDetalhe?.situacao).toBe(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
-        expect(store.subprocessoDetalhe?.permissoes).toEqual({podeEditar: true});
+        expect(store.subprocessoDetalhe?.permissoes).toEqual({...permissoesPadrao, podeEditarCadastro: true});
     });
 
     it("deve lidar com o cenário sem perfil Global e sem unidade", async () => {
@@ -161,38 +210,36 @@ describe("useSubprocessos", () => {
         expect(store.lastError?.message).toBe("Erro manual");
     });
 
-    it("deve lidar com DTO minimalista no mapSubprocessoDetalheDtoToModel", async () => {
+    it("deve mapear resposta detalhada do backend", async () => {
         const store = useSubprocessos();
-        // DTO that triggers all fallback branches in mapSubprocessoDetalheDtoToModel
         service.buscarSubprocessoDetalhe.mockResolvedValue({
-            codigo: 10,
-            situacao: SituacaoSubprocesso.NAO_INICIADO,
-            unidade: null,
+            subprocesso: {
+                codigo: 10,
+                situacao: SituacaoSubprocesso.NAO_INICIADO,
+                unidade: {sigla: "U1"},
+                dataLimiteEtapa1: "2025-01-01T00:00:00",
+                dataFimEtapa1: null,
+                dataLimiteEtapa2: "2025-02-01T00:00:00",
+                dataFimEtapa2: null,
+                processoDescricao: "Processo",
+                dataCriacaoProcesso: "2024-01-01T00:00:00",
+                tipoProcesso: "MAPEAMENTO",
+                isEmAndamento: true,
+                etapaAtual: null,
+            },
             titular: null,
             responsavel: null,
-            localizacaoAtual: null,
-            processoDescricao: null,
-            tipoProcesso: null,
-            prazoEtapaAtual: null,
-            isEmAndamento: null,
-            etapaAtual: null,
-            movimentacoes: null,
-            permissoes: null
+            localizacaoAtual: "U1",
+            movimentacoes: [],
+            permissoes: permissoesPadrao
         });
 
         await store.buscarSubprocessoDetalhe(10);
         expect(store.subprocessoDetalhe?.codigo).toBe(10);
+        expect(store.subprocessoDetalhe?.localizacaoAtual).toBe("U1");
         expect(store.subprocessoDetalhe?.etapaAtual).toBe(1);
         expect(store.subprocessoDetalhe?.isEmAndamento).toBe(true);
         expect(store.subprocessoDetalhe?.movimentacoes).toEqual([]);
-    });
-
-    it("deve limpar detalhe se service retornar nulo", async () => {
-        const store = useSubprocessos();
-        service.buscarSubprocessoDetalhe.mockResolvedValue(null);
-
-        await store.buscarSubprocessoDetalhe(10);
-        expect(store.subprocessoDetalhe).toBeNull();
     });
 
     it("não deve atualizar status local se detalhe for nulo", () => {
