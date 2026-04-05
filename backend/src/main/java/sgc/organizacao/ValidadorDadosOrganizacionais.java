@@ -107,8 +107,12 @@ public class ValidadorDadosOrganizacionais {
         List<String> unidadesSemResponsavel = violacoesPorTipo
                 .getOrDefault("Unidade participante sem responsavel efetivo", List.of())
                 .stream()
-                .map(this::extrairSigla)
-                .flatMap(Stream::ofNullable)
+                .<String>mapMulti((detalhe, consumer) -> {
+                    String sigla = extrairSigla(detalhe);
+                    if (sigla != null) {
+                        consumer.accept(sigla);
+                    }
+                })
                 .distinct()
                 .toList();
 
@@ -387,8 +391,12 @@ public class ValidadorDadosOrganizacionais {
             Map<String, List<String>> violacoesPorTipo
     ) {
         Set<Long> unidadesComFilhas = unidades.stream()
-                .map(UnidadeHierarquiaLeitura::unidadeSuperiorCodigo)
-                .filter(Objects::nonNull)
+                .<Long>mapMulti((unidade, consumer) -> {
+                    Long codigoSuperior = unidade.unidadeSuperiorCodigo();
+                    if (codigoSuperior != null) {
+                        consumer.accept(codigoSuperior);
+                    }
+                })
                 .collect(Collectors.toSet());
 
         ContextoValidacaoIntermediaria contexto = new ContextoValidacaoIntermediaria(
