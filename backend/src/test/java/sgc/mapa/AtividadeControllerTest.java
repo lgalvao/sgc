@@ -15,6 +15,7 @@ import sgc.integracao.mocks.*;
 import sgc.mapa.dto.*;
 import sgc.seguranca.*;
 import sgc.subprocesso.dto.*;
+import sgc.subprocesso.model.*;
 
 import java.util.*;
 
@@ -66,7 +67,7 @@ class AtividadeControllerTest {
 
             AtividadeOperacaoResponse response = AtividadeOperacaoResponse.builder()
                     .atividade(dto)
-                    .subprocesso(SubprocessoSituacaoDto.builder().build())
+                    .subprocesso(SubprocessoSituacaoDto.builder().codigo(1L).situacao(SituacaoSubprocesso.NAO_INICIADO).build())
                     .build();
 
             Mockito.when(atividadeFacade.criarAtividade(any())).thenReturn(response);
@@ -110,7 +111,7 @@ class AtividadeControllerTest {
         void deveRetornarErroQuandoCriacaoNaoRetornaAtividade() throws Exception {
             AtividadeOperacaoResponse response = AtividadeOperacaoResponse.builder()
                     .atividade(null)
-                    .subprocesso(SubprocessoSituacaoDto.builder().build())
+                    .subprocesso(SubprocessoSituacaoDto.builder().codigo(1L).situacao(SituacaoSubprocesso.NAO_INICIADO).build())
                     .build();
             Mockito.when(atividadeFacade.criarAtividade(any())).thenReturn(response);
 

@@ -1,7 +1,57 @@
 import {describe, expect, it} from 'vitest';
 import {useAcesso} from '../useAcesso';
 import {ref} from 'vue';
-import type {SubprocessoDetalhe} from '@/types/tipos';
+import type {PermissoesSubprocesso, SubprocessoDetalhe} from '@/types/tipos';
+import {SituacaoSubprocesso, TipoProcesso} from '@/types/tipos';
+
+function criarPermissoes(parciais: Partial<PermissoesSubprocesso> = {}): PermissoesSubprocesso {
+  return {
+    podeEditarCadastro: false,
+    podeDisponibilizarCadastro: false,
+    podeDevolverCadastro: false,
+    podeAceitarCadastro: false,
+    podeHomologarCadastro: false,
+    podeEditarMapa: false,
+    podeDisponibilizarMapa: false,
+    podeValidarMapa: false,
+    podeApresentarSugestoes: false,
+    podeVerSugestoes: false,
+    podeDevolverMapa: false,
+    podeAceitarMapa: false,
+    podeHomologarMapa: false,
+    podeVisualizarImpacto: false,
+    podeAlterarDataLimite: false,
+    podeReabrirCadastro: false,
+    podeReabrirRevisao: false,
+    podeEnviarLembrete: false,
+    mesmaUnidade: false,
+    habilitarAcessoCadastro: false,
+    habilitarAcessoMapa: false,
+    ...parciais,
+  };
+}
+
+function criarSubprocesso(parciais: Partial<SubprocessoDetalhe> = {}): SubprocessoDetalhe {
+    return {
+      codigo: 1,
+      unidade: {codigo: 10, nome: 'Unidade', sigla: 'UND'},
+      titular: null,
+      responsavel: null,
+    situacao: SituacaoSubprocesso.NAO_INICIADO,
+      localizacaoAtual: 'UND',
+      processoDescricao: 'Processo',
+      dataCriacaoProcesso: '2024-01-01T00:00:00',
+      ultimaDataLimiteSubprocesso: '2025-01-01T00:00:00',
+    tipoProcesso: TipoProcesso.MAPEAMENTO,
+      prazoEtapaAtual: '2025-01-01T00:00:00',
+      isEmAndamento: true,
+    etapaAtual: 1,
+    movimentacoes: [],
+    elementosProcesso: [],
+    permissoes: criarPermissoes(),
+    ...parciais,
+  };
+}
 
 describe('useAcesso', () => {
   it('deve retornar false por padrao quando permissoes sao nulas', () => {
@@ -11,8 +61,8 @@ describe('useAcesso', () => {
     expect(acesso.podeEditarCadastro.value).toBe(false);
   });
 
-  it('deve retornar false por padrao quando subprocesso existe mas permissoes é undefined', () => {
-    const subprocesso = ref<SubprocessoDetalhe>({} as any);
+  it('deve retornar false por padrao quando subprocesso existe sem detalhe carregado', () => {
+    const subprocesso = ref<SubprocessoDetalhe | null>(null);
     const acesso = useAcesso(subprocesso);
 
     expect(acesso.podeEditarCadastro.value).toBe(false);
@@ -37,8 +87,8 @@ describe('useAcesso', () => {
     expect(acesso.habilitarAcessoCadastro.value).toBe(false);
   });
 
-  it('deve retornar false por padrao quando permissoes esta vazio', () => {
-    const subprocesso = ref<SubprocessoDetalhe>({ permissoes: {} } as any);
+  it('deve retornar false por padrao quando permissoes estao falsas', () => {
+    const subprocesso = ref(criarSubprocesso());
     const acesso = useAcesso(subprocesso);
 
     expect(acesso.podeVerSugestoes.value).toBe(false);
@@ -46,8 +96,8 @@ describe('useAcesso', () => {
   });
 
   it('deve mapear permissoes corretamente a partir do backend', () => {
-    const subprocesso = ref<SubprocessoDetalhe>({
-      permissoes: {
+    const subprocesso = ref(criarSubprocesso({
+      permissoes: criarPermissoes({
         podeEditarCadastro: true,
         podeDisponibilizarCadastro: true,
         podeDevolverCadastro: false,
@@ -66,8 +116,8 @@ describe('useAcesso', () => {
         podeReabrirRevisao: false,
         podeEnviarLembrete: true,
         habilitarAcessoMapa: true
-      }
-    } as unknown as SubprocessoDetalhe);
+      }),
+    }));
     
     const acesso = useAcesso(subprocesso);
 
@@ -92,11 +142,11 @@ describe('useAcesso', () => {
   });
 
   it('deve lidar com input não-ref (objeto direto)', () => {
-    const subprocesso = {
-      permissoes: {
+    const subprocesso = criarSubprocesso({
+      permissoes: criarPermissoes({
         podeEditarCadastro: true
-      }
-    } as unknown as SubprocessoDetalhe;
+      }),
+    });
 
     const acesso = useAcesso(subprocesso);
     expect(acesso.podeEditarCadastro.value).toBe(true);
@@ -104,32 +154,32 @@ describe('useAcesso', () => {
   });
 
   it('deve calcular podeAnalisarCadastro e podeAnalisarMapa corretamente', () => {
-    const subprocesso = { permissoes: { podeDevolverCadastro: true, podeDevolverMapa: true } } as any;
+    const subprocesso = criarSubprocesso({permissoes: criarPermissoes({podeDevolverCadastro: true, podeDevolverMapa: true})});
     const acesso = useAcesso(subprocesso);
     expect(acesso.podeAnalisarCadastro.value).toBe(true);
     expect(acesso.podeAnalisarMapa.value).toBe(true);
 
-    const subprocesso2 = { permissoes: { podeAceitarCadastro: true, podeAceitarMapa: true } } as any;
+    const subprocesso2 = criarSubprocesso({permissoes: criarPermissoes({podeAceitarCadastro: true, podeAceitarMapa: true})});
     const acesso2 = useAcesso(subprocesso2);
     expect(acesso2.podeAnalisarCadastro.value).toBe(true);
     expect(acesso2.podeAnalisarMapa.value).toBe(true);
 
-    const subprocesso3 = { permissoes: { podeHomologarCadastro: true, podeHomologarMapa: true } } as any;
+    const subprocesso3 = criarSubprocesso({permissoes: criarPermissoes({podeHomologarCadastro: true, podeHomologarMapa: true})});
     const acesso3 = useAcesso(subprocesso3);
     expect(acesso3.podeAnalisarCadastro.value).toBe(true);
     expect(acesso3.podeAnalisarMapa.value).toBe(true);
   });
 
   it('deve retornar permissoes adicionais como podeVerSugestoes e habilitarAcessoCadastro', () => {
-    const subprocesso = { permissoes: { podeVerSugestoes: true, habilitarAcessoCadastro: true } } as any;
+    const subprocesso = criarSubprocesso({permissoes: criarPermissoes({podeVerSugestoes: true, habilitarAcessoCadastro: true})});
     const acesso = useAcesso(subprocesso);
     expect(acesso.podeVerSugestoes.value).toBe(true);
     expect(acesso.habilitarAcessoCadastro.value).toBe(true);
   });
 
   it('deve calcular habilitadores baseados na mesmaUnidade', () => {
-    const subprocesso = {
-      permissoes: {
+    const subprocesso = criarSubprocesso({
+      permissoes: criarPermissoes({
         mesmaUnidade: true,
         podeEditarCadastro: true,
         podeDisponibilizarCadastro: true,
@@ -143,8 +193,8 @@ describe('useAcesso', () => {
         podeDevolverMapa: true,
         podeAceitarMapa: true,
         podeHomologarMapa: true,
-      }
-    } as any;
+      }),
+    });
     const acesso = useAcesso(subprocesso);
 
     expect(acesso.habilitarEditarCadastro.value).toBe(true);
@@ -161,14 +211,14 @@ describe('useAcesso', () => {
     expect(acesso.habilitarHomologarMapa.value).toBe(true);
 
     // Test false case for mesmaUnidade
-    const subprocessoFalse = { permissoes: { mesmaUnidade: false, podeEditarCadastro: true } } as any;
+    const subprocessoFalse = criarSubprocesso({permissoes: criarPermissoes({mesmaUnidade: false, podeEditarCadastro: true})});
     const acessoFalse = useAcesso(subprocessoFalse);
     expect(acessoFalse.habilitarEditarCadastro.value).toBe(false);
   });
 
   it('deve calcular analisadores de mapa e flags de habilitação de mapa', () => {
-    const subprocesso = {
-      permissoes: {
+    const subprocesso = criarSubprocesso({
+      permissoes: criarPermissoes({
         mesmaUnidade: true,
         podeDevolverMapa: true,
         podeAceitarMapa: false,
@@ -177,8 +227,8 @@ describe('useAcesso', () => {
         podeDisponibilizarMapa: true,
         podeValidarMapa: true,
         podeApresentarSugestoes: true,
-      }
-    } as any;
+      }),
+    });
     const acesso = useAcesso(subprocesso);
 
     expect(acesso.podeAnalisarMapa.value).toBe(true);

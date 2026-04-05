@@ -9,7 +9,6 @@ import type {
     MapaVisualizacao,
     SalvarCompetenciaRequest,
     SubprocessoDetalheResponse,
-    SubprocessoDetalhe,
     ValidacaoCadastro
 } from "@/types/tipos";
 import apiClient from "../axios-setup";

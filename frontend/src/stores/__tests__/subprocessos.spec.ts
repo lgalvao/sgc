@@ -2,7 +2,8 @@ import {createPinia, setActivePinia} from 'pinia';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {useMapas} from '@/composables/useMapas';
 import {useSubprocessos} from '@/composables/useSubprocessos';
-import {SituacaoSubprocesso} from '@/types/tipos';
+import type {ContextoEdicaoSubprocesso, PermissoesSubprocesso, SubprocessoDetalhe, SubprocessoDetalheResponse} from '@/types/tipos';
+import {SituacaoSubprocesso, TipoProcesso} from '@/types/tipos';
 import {usePerfilStore} from '../perfil';
 import {
     buscarContextoEdicao,
@@ -35,17 +36,111 @@ vi.mock('@/axios-setup', () => ({
     apiClient: mockApiClient
 }));
 
+function criarPermissoes(parciais: Partial<PermissoesSubprocesso> = {}): PermissoesSubprocesso {
+    return {
+        podeEditarCadastro: false,
+        podeDisponibilizarCadastro: false,
+        podeDevolverCadastro: false,
+        podeAceitarCadastro: false,
+        podeHomologarCadastro: false,
+        podeEditarMapa: false,
+        podeDisponibilizarMapa: false,
+        podeValidarMapa: false,
+        podeApresentarSugestoes: false,
+        podeVerSugestoes: false,
+        podeDevolverMapa: false,
+        podeAceitarMapa: false,
+        podeHomologarMapa: false,
+        podeVisualizarImpacto: false,
+        podeAlterarDataLimite: false,
+        podeReabrirCadastro: false,
+        podeReabrirRevisao: false,
+        podeEnviarLembrete: false,
+        mesmaUnidade: false,
+        habilitarAcessoCadastro: false,
+        habilitarAcessoMapa: false,
+        ...parciais,
+    };
+}
+
+function criarDetalhe(parciais: Partial<SubprocessoDetalhe> = {}): SubprocessoDetalhe {
+    return {
+        codigo: 1,
+        unidade: {codigo: 10, nome: 'Unidade', sigla: 'UND'},
+        titular: null,
+        responsavel: null,
+        situacao: SituacaoSubprocesso.NAO_INICIADO,
+        localizacaoAtual: 'UND',
+        processoDescricao: 'Processo',
+        dataCriacaoProcesso: '2024-01-01T00:00:00',
+        ultimaDataLimiteSubprocesso: '2025-01-01T00:00:00',
+        tipoProcesso: TipoProcesso.MAPEAMENTO,
+        prazoEtapaAtual: '2025-01-01T00:00:00',
+        isEmAndamento: true,
+        etapaAtual: 1,
+        movimentacoes: [],
+        elementosProcesso: [],
+        permissoes: criarPermissoes(),
+        ...parciais,
+    };
+}
+
+function criarRespostaDetalhe(parciais: Partial<SubprocessoDetalheResponse> = {}): SubprocessoDetalheResponse {
+    return {
+        subprocesso: {
+            codigo: 1,
+            situacao: SituacaoSubprocesso.NAO_INICIADO,
+            unidade: {codigo: 10, nome: 'Unidade', sigla: 'UND'},
+            dataLimiteEtapa1: '2025-01-01T00:00:00',
+            dataFimEtapa1: null,
+            dataLimiteEtapa2: null,
+            dataFimEtapa2: null,
+            processoDescricao: 'Processo',
+            dataCriacaoProcesso: '2024-01-01T00:00:00',
+            tipoProcesso: TipoProcesso.MAPEAMENTO,
+            isEmAndamento: true,
+            etapaAtual: 1,
+        },
+        titular: null,
+        responsavel: null,
+        localizacaoAtual: 'UND',
+        movimentacoes: [],
+        permissoes: criarPermissoes(),
+        ...parciais,
+    };
+}
+
+function criarContexto(parciais: Partial<ContextoEdicaoSubprocesso> = {}): ContextoEdicaoSubprocesso {
+    return {
+        unidade: {codigo: 10, nome: 'Teste', sigla: 'UND'},
+        subprocesso: {
+            codigo: 1,
+            unidade: {codigo: 10, nome: 'Teste', sigla: 'UND'},
+            situacao: SituacaoSubprocesso.NAO_INICIADO,
+            dataLimite: '2025-01-01T00:00:00',
+            dataFimEtapa1: '',
+            dataLimiteEtapa2: '',
+            atividades: [],
+            codUnidade: 10,
+        },
+        detalhes: criarDetalhe(),
+        mapa: {codigo: 5} as ContextoEdicaoSubprocesso['mapa'],
+        atividadesDisponiveis: [],
+        ...parciais,
+    };
+}
+
 describe('Subprocessos store', () => {
     let store: ReturnType<typeof useSubprocessos>;
 
     const mockPerfilStore = {
         perfilSelecionado: null as string | null,
         unidadeSelecionada: null as number | null,
-        perfisUnidades: [] as any[],
+        perfisUnidades: [] as Array<{perfil: string; unidade: {codigo: number}}>,
         unidadeAtual: null as number | null,
     };
     const mockMapasStore = {
-        mapaCompleto: {value: null as any},
+        mapaCompleto: {value: null as ContextoEdicaoSubprocesso['mapa'] | null},
     };
 
     beforeEach(() => {
@@ -53,16 +148,16 @@ describe('Subprocessos store', () => {
 
         vi.clearAllMocks();
 
-        (usePerfilStore as any).mockReturnValue(mockPerfilStore);
-        (useMapas as any).mockReturnValue(mockMapasStore);
+        vi.mocked(usePerfilStore).mockReturnValue(mockPerfilStore as never);
+        vi.mocked(useMapas).mockReturnValue(mockMapasStore as never);
 
         store = useSubprocessos();
     });
 
     describe('buscarSubprocessoDetalhe', () => {
         it('deve limpar o estado anterior antes de buscar novo detalhe', async () => {
-            store.subprocessoDetalhe = {codigo: 1} as any;
-            (buscarSubprocessoDetalhe as any).mockReturnValue(new Promise(() => {
+            store.subprocessoDetalhe = criarDetalhe();
+            vi.mocked(buscarSubprocessoDetalhe).mockReturnValue(new Promise(() => {
             }));
 
             store.buscarSubprocessoDetalhe(2);
@@ -81,64 +176,26 @@ describe('Subprocessos store', () => {
         });
 
         it('deve buscar com sucesso para ADMIN (global)', async () => {
-            mockPerfilStore.perfilSelecionado = 'ADMIN' as any;
+            mockPerfilStore.perfilSelecionado = 'ADMIN';
             mockPerfilStore.unidadeAtual = null;
-            (buscarSubprocessoDetalhe as any).mockResolvedValue({
-                subprocesso: {
-                    codigo: 1,
-                    situacao: 'CRIADO',
-                    unidade: {codigo: 10, sigla: 'UND'},
-                    dataLimiteEtapa1: '2025-01-01T00:00:00',
-                    dataFimEtapa1: null,
-                    dataLimiteEtapa2: null,
-                    dataFimEtapa2: null,
-                    processoDescricao: 'Processo',
-                    dataCriacaoProcesso: '2024-01-01T00:00:00',
-                    tipoProcesso: 'MAPEAMENTO',
-                    isEmAndamento: true,
-                    etapaAtual: 1
-                },
-                titular: null,
-                responsavel: null,
-                localizacaoAtual: 'UND',
-                movimentacoes: [],
-                permissoes: {}
-            });
+            vi.mocked(buscarSubprocessoDetalhe).mockResolvedValue(
+                criarRespostaDetalhe({subprocesso: {...criarRespostaDetalhe().subprocesso, situacao: SituacaoSubprocesso.NAO_INICIADO}})
+            );
 
             await store.buscarSubprocessoDetalhe(1);
 
             expect(buscarSubprocessoDetalhe).toHaveBeenCalledWith(1, 'ADMIN', null);
-            expect(store.subprocessoDetalhe).toMatchObject({codigo: 1, situacao: 'CRIADO'});
+            expect(store.subprocessoDetalhe).toMatchObject({codigo: 1, situacao: SituacaoSubprocesso.NAO_INICIADO});
             expect(store.lastError).toBeNull();
         });
 
         it('deve buscar com sucesso para SERVIDOR com unidade selecionada', async () => {
-            mockPerfilStore.perfilSelecionado = 'SERVIDOR' as any;
+            mockPerfilStore.perfilSelecionado = 'SERVIDOR';
             mockPerfilStore.unidadeSelecionada = 10;
-            mockPerfilStore.perfisUnidades = [{perfil: 'SERVIDOR', unidade: {codigo: 10}}] as any;
+            mockPerfilStore.perfisUnidades = [{perfil: 'SERVIDOR', unidade: {codigo: 10}}];
             mockPerfilStore.unidadeAtual = 10;
 
-            (buscarSubprocessoDetalhe as any).mockResolvedValue({
-                subprocesso: {
-                    codigo: 1,
-                    situacao: 'CRIADO',
-                    unidade: {codigo: 10, sigla: 'UND'},
-                    dataLimiteEtapa1: '2025-01-01T00:00:00',
-                    dataFimEtapa1: null,
-                    dataLimiteEtapa2: null,
-                    dataFimEtapa2: null,
-                    processoDescricao: 'Processo',
-                    dataCriacaoProcesso: '2024-01-01T00:00:00',
-                    tipoProcesso: 'MAPEAMENTO',
-                    isEmAndamento: true,
-                    etapaAtual: 1
-                },
-                titular: null,
-                responsavel: null,
-                localizacaoAtual: 'UND',
-                movimentacoes: [],
-                permissoes: {}
-            });
+            vi.mocked(buscarSubprocessoDetalhe).mockResolvedValue(criarRespostaDetalhe());
 
             await store.buscarSubprocessoDetalhe(1);
 
@@ -146,8 +203,8 @@ describe('Subprocessos store', () => {
         });
 
         it('deve lidar com erro do serviço', async () => {
-            mockPerfilStore.perfilSelecionado = 'ADMIN' as any;
-            (buscarSubprocessoDetalhe as any).mockRejectedValue(new Error('Erro backend'));
+            mockPerfilStore.perfilSelecionado = 'ADMIN';
+            vi.mocked(buscarSubprocessoDetalhe).mockRejectedValue(new Error('Erro backend'));
 
             await expect(store.buscarSubprocessoDetalhe(1)).rejects.toThrow('Erro backend');
 
@@ -162,7 +219,7 @@ describe('Subprocessos store', () => {
 
     describe('buscarSubprocessoPorProcessoEUnidade', () => {
         it('deve retornar codigo em caso de sucesso', async () => {
-            (buscarSubprocessoPorProcessoEUnidade as any).mockResolvedValue({codigo: 123});
+            vi.mocked(buscarSubprocessoPorProcessoEUnidade).mockResolvedValue({codigo: 123});
 
             const result = await store.buscarSubprocessoPorProcessoEUnidade(1, 'SESEL');
 
@@ -171,7 +228,7 @@ describe('Subprocessos store', () => {
         });
 
         it('deve retornar null em caso de erro', async () => {
-            (buscarSubprocessoPorProcessoEUnidade as any).mockRejectedValue(new Error('Não encontrado'));
+            vi.mocked(buscarSubprocessoPorProcessoEUnidade).mockRejectedValue(new Error('Não encontrado'));
 
             const result = await store.buscarSubprocessoPorProcessoEUnidade(1, 'SESEL');
 
@@ -186,8 +243,8 @@ describe('Subprocessos store', () => {
 
     describe('buscarContextoEdicao', () => {
         it('deve limpar o estado anterior antes de buscar novo contexto', async () => {
-            store.subprocessoDetalhe = {codigo: 1} as any;
-            (buscarContextoEdicao as any).mockReturnValue(new Promise(() => {
+            store.subprocessoDetalhe = criarDetalhe();
+            vi.mocked(buscarContextoEdicao).mockReturnValue(new Promise(() => {
             }));
 
             store.buscarContextoEdicao(2);
@@ -196,14 +253,12 @@ describe('Subprocessos store', () => {
         });
 
         it('deve popular stores relacionados com dados retornados', async () => {
-            mockPerfilStore.perfilSelecionado = 'ADMIN' as any;
-            const mockData = {
-                detalhes: {codigo: 1, localizacaoAtual: 'UND', permissoes: {}},
-                unidade: {codigo: 10, nome: 'Teste'},
-                mapa: {id: 5},
-                atividadesDisponiveis: [{id: 100}]
-            };
-            (buscarContextoEdicao as any).mockResolvedValue(mockData);
+            mockPerfilStore.perfilSelecionado = 'ADMIN';
+            const mockData = criarContexto({
+                detalhes: criarDetalhe({codigo: 1, localizacaoAtual: 'UND'}),
+                atividadesDisponiveis: [{codigo: 100, descricao: 'Atividade', conhecimentos: []}],
+            });
+            vi.mocked(buscarContextoEdicao).mockResolvedValue(mockData);
 
             await store.buscarContextoEdicao(1);
 
@@ -218,8 +273,8 @@ describe('Subprocessos store', () => {
         });
 
         it('deve lidar com erro do serviço', async () => {
-            mockPerfilStore.perfilSelecionado = 'ADMIN' as any;
-            (buscarContextoEdicao as any).mockRejectedValue(new Error("Fail"));
+            mockPerfilStore.perfilSelecionado = 'ADMIN';
+            vi.mocked(buscarContextoEdicao).mockRejectedValue(new Error("Fail"));
             await expect(store.buscarContextoEdicao(1)).rejects.toThrow("Fail");
             expect(store.lastError).toBeTruthy();
         });
@@ -227,7 +282,7 @@ describe('Subprocessos store', () => {
 
     describe('atualizarStatusLocal', () => {
         it('deve atualizar o status se houver detalhe carregado', () => {
-            store.subprocessoDetalhe = {situacao: 'CRIADO'} as any;
+            store.subprocessoDetalhe = criarDetalhe();
             store.atualizarStatusLocal({codigo: 1, situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO});
             expect(store.subprocessoDetalhe?.situacao).toBe(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         });

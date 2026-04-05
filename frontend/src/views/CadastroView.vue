@@ -195,8 +195,10 @@ import {usePerfil} from "@/composables/usePerfil";
 import {useAcesso} from "@/composables/useAcesso";
 import {
   type Analise,
+  type AtividadeOperacaoResponse,
   type Atividade,
   type Conhecimento,
+  type ContextoEdicaoSubprocesso,
   type CriarConhecimentoRequest,
   type ErroValidacao,
   SituacaoSubprocesso,
@@ -211,11 +213,12 @@ import {useErrorHandler} from "@/composables/useErrorHandler";
 import {TEXTOS} from "@/constants/textos";
 
 type DadosRemocao = { tipo: "atividade" | "conhecimento"; index: number; conhecimentoCodigo?: number } | null;
+type VarianteBadge = "primary" | "secondary" | "success" | "danger" | "warning" | "info" | "light" | "dark";
 
-function badgeVariant(situacao: SituacaoSubprocesso): any {
+function badgeVariant(situacao: SituacaoSubprocesso): VarianteBadge {
   const cls = badgeClass(situacao);
   const match = cls.match(/bg-(\w+)/);
-  return match ? match[1] : 'secondary';
+  return match ? match[1] as VarianteBadge : 'secondary';
 }
 
 const props = defineProps<{
@@ -235,7 +238,7 @@ const perfil = usePerfil();
 const isChefe = computed(() => perfil.isChefe.value);
 const codSubprocesso = ref<number | null>(null);
 
-const codMapa = computed(() => mapasStore.mapaCompleto.value?.codigo || null);
+const codMapa = computed(() => mapasStore.mapaCompleto.value?.codigo ?? null);
 const subprocesso = computed(() => subprocessosStore.subprocessoDetalhe);
 const unidade = ref<Unidade | null>(null);
 const {
@@ -370,29 +373,21 @@ const erroGlobalFormatado = computed(() =>
     erroGlobal.value ? {message: erroGlobal.value} : null
 );
 
-function processarRespostaLocal(response: any) {
-  if (response?.atividadesAtualizadas) {
-    atividades.value = response.atividadesAtualizadas;
-  }
-  if (response?.subprocesso) {
-    subprocessosStore.atualizarStatusLocal({
-      ...response.subprocesso,
-      permissoes: response.permissoes
-    });
-  }
+type RespostaLocalCadastro = Pick<AtividadeOperacaoResponse, "subprocesso" | "permissoes" | "atividadesAtualizadas">;
+
+function processarRespostaLocal(response: RespostaLocalCadastro) {
+  atividades.value = response.atividadesAtualizadas;
+  subprocessosStore.atualizarStatusLocal({
+    ...response.subprocesso,
+    permissoes: response.permissoes
+  });
 }
 
-function sincronizarEstadoInicialContexto(data: any) {
-  const subprocessoContexto = data?.subprocesso;
-  const permissoesContexto = data?.detalhes?.permissoes;
-
-  if (!subprocessoContexto || !permissoesContexto) {
-    return;
-  }
-
+function sincronizarEstadoInicialContexto(data: ContextoEdicaoSubprocesso) {
   processarRespostaLocal({
-    subprocesso: subprocessoContexto,
-    permissoes: permissoesContexto
+    subprocesso: data.subprocesso,
+    permissoes: data.detalhes.permissoes,
+    atividadesAtualizadas: data.atividadesDisponiveis,
   });
 }
 
@@ -412,11 +407,11 @@ async function carregarContextoInicial() {
   }
 
   sincronizarEstadoInicialContexto(data);
-  mapasStore.mapaCompleto.value = data.mapa as any;
+  mapasStore.mapaCompleto.value = data.mapa;
   atividades.value = data.atividadesDisponiveis;
   atividadesSnapshotInicial.value = serializarAtividades(atividades.value);
   disponibilizacaoSemMudancas.value = false;
-  unidade.value = data.unidade as Unidade;
+  unidade.value = data.unidade;
 }
 
 async function adicionarAtividade(): Promise<boolean> {
@@ -554,7 +549,7 @@ async function handleImportAtividades(aviso?: string) {
         atividades.value = data.atividadesDisponiveis;
         atividadesSnapshotInicial.value = serializarAtividades(atividades.value);
         disponibilizacaoSemMudancas.value = false;
-        unidade.value = data.unidade as Unidade;
+        unidade.value = data.unidade;
       }
     });
   }

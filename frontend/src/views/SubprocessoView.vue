@@ -174,7 +174,7 @@
 
   <SubprocessoModal
       :data-limite-atual="dataLimite"
-      :etapa-atual="subprocesso?.etapaAtual || null"
+      :etapa-atual="subprocesso?.etapaAtual ?? null"
       :loading="loadingDataLimite"
       :mostrar-modal="mostrarModalAlterarDataLimite"
       :ultima-data-limite-subprocesso="subprocesso?.ultimaDataLimiteSubprocesso ? parseDate(subprocesso.ultimaDataLimiteSubprocesso) : null"
@@ -215,7 +215,7 @@
       @confirmar="enviarLembreteConfirmado"
   >
     <p data-testid="txt-modelo-lembrete">
-      {{ TEXTOS.subprocesso.LEMBRETE_MODELO_PREFIXO(subprocesso?.unidade?.sigla || '') }}
+      {{ TEXTOS.subprocesso.LEMBRETE_MODELO_PREFIXO(subprocesso?.unidade.sigla ?? '') }}
     </p>
   </ModalConfirmacao>
 </template>
@@ -236,7 +236,7 @@ import {useSubprocessos} from "@/composables/useSubprocessos";
 import {enviarLembrete as enviarLembreteService} from "@/services/processoService";
 
 import {useAcesso} from "@/composables/useAcesso";
-import {type Movimentacao, type SubprocessoDetalhe, TipoProcesso} from "@/types/tipos";
+import {type Movimentacao, type ResponsavelDto, type SubprocessoDetalhe, TipoProcesso} from "@/types/tipos";
 import {formatDateTimeBR, logger, parseDate} from "@/utils";
 import {normalizeError} from "@/utils/apiError";
 import {formatSituacaoSubprocesso} from "@/utils/formatters";
@@ -251,8 +251,8 @@ function formatDataSimples(dataStr: string | null): string {
   return data.toLocaleDateString('pt-BR');
 }
 
-function formatTipoResponsabilidade(resp: any): string {
-  if (!resp || !resp.tipo) return '';
+function formatTipoResponsabilidade(resp: ResponsavelDto | null): string {
+  if (!resp?.tipo) return '';
   if (resp.tipo === 'Substituição' && resp.dataFim) {
     return `Substituição (até ${formatDataSimples(resp.dataFim)})`;
   } else if (resp.tipo === 'Atribuição temporária' && resp.dataFim) {
@@ -305,7 +305,7 @@ const {
 
 const mapa = computed(() => mapaStore.mapaCompleto.value);
 const movimentacoes = computed<Movimentacao[]>(
-    () => subprocesso.value?.movimentacoes || [],
+    () => subprocesso.value?.movimentacoes ?? [],
 );
 const dataLimite = computed(() => {
   if (subprocesso.value?.prazoEtapaAtual) {
@@ -353,7 +353,7 @@ onMounted(async () => {
       codSubprocesso.value = codigo;
       const data = await subprocessosStore.buscarContextoEdicao(codigo);
       if (data) {
-        mapaStore.mapaCompleto.value = data.mapa as any;
+        mapaStore.mapaCompleto.value = data.mapa;
       } else {
         await mapaStore.buscarMapaCompleto(codigo);
       }
@@ -361,10 +361,10 @@ onMounted(async () => {
       erroNaoEncontrado.value = true;
       logger.warn(`Subprocesso não encontrado para processo ${props.codProcesso} e unidade ${props.siglaUnidade}`);
     }
-  } catch (error: any) {
-    const errorBody = error.response?.data || error.message;
+  } catch (error: unknown) {
+    const erroNormalizado = normalizeError(error);
     if (normalizeError(error).kind !== 'unauthorized') {
-      logger.error(`Erro ao carregar detalhes do subprocesso:`, error, errorBody);
+      logger.error(`Erro ao carregar detalhes do subprocesso:`, error, erroNormalizado.message);
     }
   }
 });

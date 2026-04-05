@@ -75,6 +75,28 @@ const stubs = {
 };
 
 describe("CadastroView coverage", () => {
+    const permissoesPadrao = {
+        podeEditarCadastro: true,
+        podeDisponibilizarCadastro: true,
+        podeVisualizarImpacto: true,
+    };
+
+    function criarContextoEdicao() {
+        return {
+            subprocesso: {
+                codigo: 123,
+                situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
+                tipoProcesso: TipoProcesso.MAPEAMENTO
+            },
+            detalhes: {
+                permissoes: permissoesPadrao,
+            },
+            mapa: {codigo: 100},
+            atividadesDisponiveis: [],
+            unidade: {sigla: "TESTE", nome: "Teste"}
+        };
+    }
+
     beforeEach(() => {
         vi.clearAllMocks();
         subprocessosMock.subprocessoDetalhe = {
@@ -83,12 +105,7 @@ describe("CadastroView coverage", () => {
             tipoProcesso: TipoProcesso.MAPEAMENTO
         };
         subprocessosMock.buscarSubprocessoPorProcessoEUnidade = vi.fn().mockResolvedValue(123);
-        subprocessosMock.buscarContextoEdicao = vi.fn().mockResolvedValue({
-            subprocesso: {codigo: 123, situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, tipoProcesso: TipoProcesso.MAPEAMENTO},
-            permissoes: {podeEditarCadastro: true, podeDisponibilizarCadastro: true, podeVisualizarImpacto: true},
-            atividadesDisponiveis: [],
-            unidade: {sigla: "TESTE", nome: "Teste"}
-        });
+        subprocessosMock.buscarContextoEdicao = vi.fn().mockResolvedValue(criarContextoEdicao());
         subprocessosMock.buscarSubprocessoDetalhe = vi.fn();
         subprocessosMock.atualizarStatusLocal = vi.fn();
         subprocessosMock.lastError = null;
@@ -98,13 +115,7 @@ describe("CadastroView coverage", () => {
             disponibilizarRevisaoCadastro: vi.fn().mockResolvedValue(true),
         } as any);
         vi.mocked(subprocessoService.buscarSubprocessoPorProcessoEUnidade).mockResolvedValue(123 as any);
-        vi.mocked(subprocessoService.buscarContextoEdicao).mockResolvedValue({
-            subprocesso: {codigo: 123, situacao: "MAPEAMENTO_CADASTRO_EM_ANDAMENTO", tipoProcesso: "MAPEAMENTO"},
-            permissoes: {podeEditarCadastro: true, podeDisponibilizarCadastro: true, podeVisualizarImpacto: true},
-            mapa: {codigo: 100},
-            atividadesDisponiveis: [],
-            unidade: {sigla: "TESTE", nome: "Teste"}
-        } as any);
+        vi.mocked(subprocessoService.buscarContextoEdicao).mockResolvedValue(criarContextoEdicao() as any);
     });
 
     function createWrapper() {
@@ -205,7 +216,7 @@ describe("CadastroView coverage", () => {
         expect(el.scrollIntoView).toHaveBeenCalled();
 
         // confirmarRemocao (conhecimento)
-        vi.mocked(subprocessoService.buscarContextoEdicao).mockResolvedValue({} as any);
+        subprocessosMock.buscarContextoEdicao.mockResolvedValue(criarContextoEdicao());
         vm.atividades = [{codigo: 1, descricao: "A1"}];
         vm.dadosRemocao = {tipo: "conhecimento", index: 0, conhecimentoCodigo: 2};
         await vm.confirmarRemocao();
@@ -252,9 +263,6 @@ describe("CadastroView coverage", () => {
         expect(vm.mostrarModalImpacto).toBe(true);
         vm.fecharModalImpacto();
         expect(vm.mostrarModalImpacto).toBe(false);
-
-        // Sincronizar contexto null
-        vm.sincronizarEstadoInicialContexto(null);
 
         // bad badge situations
         expect(vm.badgeVariant("MAPEAMENTO_CADASTRO_EM_ANDAMENTO")).toBe("secondary");
