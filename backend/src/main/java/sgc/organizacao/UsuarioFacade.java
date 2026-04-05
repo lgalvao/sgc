@@ -86,15 +86,19 @@ public class UsuarioFacade {
 
     @Transactional(readOnly = true)
     public List<PerfilDto> buscarPerfisUsuario(String titulo) {
-        return usuarioService.buscarOpt(titulo)
-                .map(usuario -> {
-                    List<UsuarioPerfilAutorizacaoLeitura> atribuicoes = usuarioService.buscarAutorizacoesPerfil(usuario.getTituloEleitoral());
-                    return atribuicoes.stream()
-                            .filter(a -> a.unidadeSituacao() == SituacaoUnidade.ATIVA)
-                            .map(this::toPerfilDto)
-                            .toList();
-                })
-                .orElse(Collections.emptyList());
+        Usuario usuario;
+        try {
+            usuario = usuarioService.buscar(titulo);
+        } catch (ErroEntidadeNaoEncontrada ex) {
+            throw new ErroInconsistenciaInterna(
+                    "Usuario %s ausente ao buscar perfis; isso indica inconsistencia interna do sistema".formatted(titulo)
+            );
+        }
+        List<UsuarioPerfilAutorizacaoLeitura> atribuicoes = usuarioService.buscarAutorizacoesPerfil(usuario.getTituloEleitoral());
+        return atribuicoes.stream()
+                .filter(a -> a.unidadeSituacao() == SituacaoUnidade.ATIVA)
+                .map(this::toPerfilDto)
+                .toList();
     }
 
     private void carregarAtribuicoes(Usuario usuario) {

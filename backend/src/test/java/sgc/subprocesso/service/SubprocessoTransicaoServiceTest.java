@@ -257,8 +257,8 @@ class SubprocessoTransicaoServiceTest {
         }
 
         @Test
-        @DisplayName("executarDevolucao deve funcionar sem movimentações (usa unidade do SP)")
-        void executarDevolucaoSemMovimentacoesUsarUnidadeSP() {
+        @DisplayName("executarDevolucao deve falhar sem movimentações compativeis")
+        void executarDevolucaoSemMovimentacoesCompativeisDeveFalhar() {
             Unidade u = criarUnidade(1L, "U", "Unid");
             Subprocesso sp = criarSubprocesso(MAPEAMENTO, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO, u);
 
@@ -266,9 +266,9 @@ class SubprocessoTransicaoServiceTest {
             when(consultaService.obterUnidadeLocalizacao(sp)).thenReturn(u);
             when(movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(1L)).thenReturn(List.of());
 
-            service.devolverCadastro(1L, criarUsuario(), "Obs");
-
-            assertThat(sp.getSituacao()).isEqualTo(MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+            assertThatThrownBy(() -> service.devolverCadastro(1L, criarUsuario(), "Obs"))
+                    .isInstanceOf(sgc.comum.erros.ErroInconsistenciaInterna.class)
+                    .hasMessageContaining("Historico de movimentacoes inconsistente");
         }
 
         @Test

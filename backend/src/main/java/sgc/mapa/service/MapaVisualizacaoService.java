@@ -4,6 +4,7 @@ import lombok.*;
 import lombok.extern.slf4j.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
+import sgc.comum.erros.*;
 import sgc.comum.model.*;
 import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
@@ -27,11 +28,13 @@ public class MapaVisualizacaoService {
                 .orElse(subprocesso.getMapa());
 
         if (mapa == null) {
-            return MapaVisualizacaoResponse.builder()
-                    .unidade(subprocesso.getUnidade())
-                    .competencias(List.of())
-                    .atividadesSemCompetencia(List.of())
-                    .build();
+            if (subprocesso.getSituacao() != null && subprocesso.getSituacao().name().contains("MAPA")) {
+                throw new ErroInconsistenciaInterna(
+                        "Subprocesso %s em etapa de mapa sem mapa vinculado para visualizacao"
+                                .formatted(subprocesso.getCodigo())
+                );
+            }
+            return criarRespostaVazia(subprocesso);
         }
 
         List<Competencia> competencias = competenciaRepo.findByMapa_Codigo(mapa.getCodigo());
@@ -50,6 +53,14 @@ public class MapaVisualizacaoService {
                 .competencias(competencias)
                 .atividadesSemCompetencia(atividadesSemCompetencia)
                 .sugestoes(Objects.toString(mapa.getSugestoes(), ""))
+                .build();
+    }
+
+    private MapaVisualizacaoResponse criarRespostaVazia(Subprocesso subprocesso) {
+        return MapaVisualizacaoResponse.builder()
+                .unidade(subprocesso.getUnidade())
+                .competencias(List.of())
+                .atividadesSemCompetencia(List.of())
                 .build();
     }
 }

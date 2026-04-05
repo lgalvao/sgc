@@ -376,6 +376,10 @@ class SubprocessoTransicaoServiceCoverageIntegrationTest {
         void deveDevolver() {
             Processo proc = criarProcessoPersistido(TipoProcesso.MAPEAMENTO);
 
+            Unidade uAnalise = new Unidade();
+            uAnalise.setSigla("U6-ANA");
+            uAnalise = unidadeRepo.save(uAnalise);
+
             Unidade uSp = new Unidade();
             uSp.setSigla("U6");
             uSp = unidadeRepo.save(uSp);
@@ -387,6 +391,13 @@ class SubprocessoTransicaoServiceCoverageIntegrationTest {
             sp.setDataLimiteEtapa1(LocalDateTime.now().plusDays(30));
             sp = subprocessoRepo.saveAndFlush(sp);
             registrarMovimentacaoInicial(sp);
+            movimentacaoRepo.saveAndFlush(Movimentacao.builder()
+                    .subprocesso(sp)
+                    .unidadeOrigem(uSp)
+                    .unidadeDestino(uAnalise)
+                    .usuario(usuarioRepo.getReferenceById("111111111111"))
+                    .descricao("Encaminhamento para validacao")
+                    .build());
 
             Mapa mapa = new Mapa();
             mapa.setSugestoes(null);
@@ -399,6 +410,7 @@ class SubprocessoTransicaoServiceCoverageIntegrationTest {
             Usuario user = criarUsuarioPersistido(uSp);
 
             when(unidadeService.buscarPorSigla("U6")).thenReturn(uSp);
+            when(hierarquiaService.isSubordinada(uSp, uAnalise)).thenReturn(true);
 
             transicaoService.devolverValidacao(sp.getCodigo(), "justificativa erro", user);
 

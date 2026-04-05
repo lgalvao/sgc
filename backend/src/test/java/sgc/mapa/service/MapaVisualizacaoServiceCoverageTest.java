@@ -26,10 +26,11 @@ class MapaVisualizacaoServiceCoverageTest {
     private MapaVisualizacaoService service;
 
     @Test
-    @DisplayName("Deve retornar resposta vazia se mapa não encontrado")
-    void deveRetornarVazioSeMapaNaoEncontrado() {
+    @DisplayName("Deve retornar resposta vazia se mapa não encontrado fora de etapa de mapa")
+    void deveRetornarVazioSeMapaNaoEncontradoForaDeEtapaDeMapa() {
         Subprocesso sub = new Subprocesso();
         sub.setCodigo(1L);
+        sub.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
         Unidade u = new Unidade();
         sub.setUnidade(u);
@@ -40,6 +41,20 @@ class MapaVisualizacaoServiceCoverageTest {
         assertThat(res.unidade()).isEqualTo(u);
         assertThat(res.competencias()).isEmpty();
         assertThat(res.atividadesSemCompetencia()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("Deve falhar se mapa não encontrado em etapa de mapa")
+    void deveFalharSeMapaNaoEncontradoEmEtapaDeMapa() {
+        Subprocesso sub = new Subprocesso();
+        sub.setCodigo(1L);
+        sub.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO);
+        sub.setUnidade(new Unidade());
+        when(mapaRepo.buscarCompletoPorSubprocesso(1L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.obterMapaParaVisualizacao(sub))
+                .isInstanceOf(sgc.comum.erros.ErroInconsistenciaInterna.class)
+                .hasMessageContaining("sem mapa vinculado para visualizacao");
     }
 
     @Test

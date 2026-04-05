@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.*;
 import org.springframework.util.*;
 import sgc.alerta.*;
 import sgc.comum.*;
+import sgc.comum.erros.*;
 import sgc.mapa.model.*;
 import sgc.mapa.service.*;
 import sgc.organizacao.*;
@@ -591,7 +592,10 @@ public class SubprocessoTransicaoService {
                 .map(Movimentacao::getUnidadeOrigem)
                 .filter(unidadeOrigem -> hierarquiaService.isSubordinada(unidadeOrigem, unidadeAnalise))
                 .findFirst()
-                .orElse(sp.getUnidade());
+                .orElseThrow(() -> new ErroInconsistenciaInterna(
+                        "Historico de movimentacoes inconsistente para devolucao do subprocesso %s na unidade %s"
+                                .formatted(sp.getCodigo(), unidadeAnalise.getCodigo())
+                ));
     }
 
     private void registrarTransicaoParaSuperiorDaUnidade(
