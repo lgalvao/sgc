@@ -12,14 +12,14 @@ import java.time.*;
 @Builder
 public record SubprocessoResumoDto(
         Long codigo,
-        UnidadeDto unidade,
+        UnidadeResumoDto unidade,
         SituacaoSubprocesso situacao,
         LocalDateTime dataLimiteEtapa1,
         @Nullable LocalDateTime dataFimEtapa1,
         @Nullable LocalDateTime dataLimiteEtapa2,
         @Nullable LocalDateTime dataFimEtapa2,
-        @Nullable Long codProcesso,
-        @Nullable Long codUnidade,
+        Long codProcesso,
+        Long codUnidade,
         @Nullable Long codMapa,
         String processoDescricao,
         LocalDateTime dataCriacaoProcesso,
@@ -36,14 +36,14 @@ public record SubprocessoResumoDto(
 
         return SubprocessoResumoDto.builder()
                 .codigo(subprocesso.getCodigo())
-                .unidade(UnidadeDto.fromEntityResumoObrigatoria(unidade))
+                .unidade(UnidadeResumoDto.fromEntityObrigatoria(unidade))
                 .situacao(subprocesso.getSituacao())
                 .dataLimiteEtapa1(subprocesso.getDataLimiteEtapa1())
                 .dataFimEtapa1(subprocesso.getDataFimEtapa1())
                 .dataLimiteEtapa2(subprocesso.getDataLimiteEtapa2())
                 .dataFimEtapa2(subprocesso.getDataFimEtapa2())
-                .codProcesso(subprocesso.getCodProcesso())
-                .codUnidade(subprocesso.getCodUnidade())
+                .codProcesso(processo.getCodigo())
+                .codUnidade(unidade.getCodigo())
                 .codMapa(subprocesso.getCodMapa())
                 .processoDescricao(processo.getDescricao())
                 .dataCriacaoProcesso(processo.getDataCriacao())

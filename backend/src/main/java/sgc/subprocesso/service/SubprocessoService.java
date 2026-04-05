@@ -18,7 +18,6 @@ import sgc.seguranca.*;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
 
-import java.time.*;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.*;
@@ -101,17 +100,10 @@ public class SubprocessoService {
     }
 
     private void processarPrazos(Subprocesso sp, AtualizarPrazosSubprocessoCommand command) {
-        LocalDateTime dataLimiteEtapa1 = command.dataLimiteEtapa1();
-        if (dataLimiteEtapa1 != null) sp.setDataLimiteEtapa1(dataLimiteEtapa1);
-
-        LocalDateTime dataFimEtapa1 = command.dataFimEtapa1();
-        if (dataFimEtapa1 != null) sp.setDataFimEtapa1(dataFimEtapa1);
-
-        LocalDateTime dataLimiteEtapa2 = command.dataLimiteEtapa2();
-        if (dataLimiteEtapa2 != null) sp.setDataLimiteEtapa2(dataLimiteEtapa2);
-
-        LocalDateTime dataFimEtapa2 = command.dataFimEtapa2();
-        if (dataFimEtapa2 != null) sp.setDataFimEtapa2(dataFimEtapa2);
+        command.dataLimiteEtapa1().ifPresent(sp::setDataLimiteEtapa1);
+        command.dataFimEtapa1().ifPresent(sp::setDataFimEtapa1);
+        command.dataLimiteEtapa2().ifPresent(sp::setDataLimiteEtapa2);
+        command.dataFimEtapa2().ifPresent(sp::setDataFimEtapa2);
     }
 
     @Transactional

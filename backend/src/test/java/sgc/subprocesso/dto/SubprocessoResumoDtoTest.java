@@ -46,7 +46,9 @@ class SubprocessoResumoDtoTest {
         SubprocessoResumoDto dto = SubprocessoResumoDto.fromEntity(subprocesso);
 
         assertThat(dto.codigo()).isEqualTo(20L);
-        assertThat(dto.unidade().getNome()).isEqualTo("Unidade");
+        assertThat(dto.codProcesso()).isEqualTo(50L);
+        assertThat(dto.codUnidade()).isEqualTo(10L);
+        assertThat(dto.unidade().nome()).isEqualTo("Unidade");
         assertThat(dto.processoDescricao()).isEqualTo("Processo");
         assertThat(dto.isEmAndamento()).isTrue();
     }

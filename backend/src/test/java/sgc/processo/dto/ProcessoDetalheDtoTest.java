@@ -1,9 +1,11 @@
 package sgc.processo.dto;
 
 import org.junit.jupiter.api.*;
+import sgc.mapa.model.*;
 import sgc.organizacao.model.*;
 import sgc.processo.dto.ProcessoDetalheDto.*;
 import sgc.processo.model.*;
+import sgc.subprocesso.model.*;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -61,5 +63,36 @@ class ProcessoDetalheDtoTest {
         assertThat(dto.getSigla()).isEqualTo("SU");
         assertThat(dto.getCodUnidadeSuperior()).isEqualTo(20L);
         assertThat(dto.getFilhos()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("UnidadeParticipanteDto.preencherComSubprocesso deve mapear dados de subprocesso")
+    void preencherComSubprocessoDeveMapearDados() {
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(10L);
+        unidade.setNome("Unidade 1");
+        unidade.setSigla("U1");
+
+        UnidadeParticipanteDto dto = UnidadeParticipanteDto.fromUnidade(unidade);
+
+        Mapa mapa = new Mapa();
+        mapa.setCodigo(99L);
+
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setCodigo(30L);
+        subprocesso.setMapa(mapa);
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+        subprocesso.setDataLimiteEtapa1(java.time.LocalDateTime.of(2026, 1, 15, 10, 0));
+
+        Unidade localizacao = new Unidade();
+        localizacao.setCodigo(77L);
+
+        dto.preencherComSubprocesso(subprocesso, localizacao);
+
+        assertThat(dto.getSituacaoSubprocesso()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+        assertThat(dto.getDataLimite()).isEqualTo(java.time.LocalDateTime.of(2026, 1, 15, 10, 0));
+        assertThat(dto.getCodSubprocesso()).isEqualTo(30L);
+        assertThat(dto.getMapaCodigo()).isEqualTo(99L);
+        assertThat(dto.getLocalizacaoAtualCodigo()).isEqualTo(77L);
     }
 }

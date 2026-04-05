@@ -470,11 +470,7 @@ public class ProcessoService {
                     UnidadeParticipanteDto uDto = UnidadeParticipanteDto.fromSnapshot(p);
                     Subprocesso sp = mapSp.get(codigoUnidadeParticipante);
                     if (sp != null) {
-                        uDto.setSituacaoSubprocesso(sp.getSituacao());
-                        uDto.setDataLimite(sp.getDataLimiteEtapa1());
-                        uDto.setCodSubprocesso(sp.getCodigo());
-                        if (sp.getMapa() != null) uDto.setMapaCodigo(sp.getMapa().getCodigo());
-                        uDto.setLocalizacaoAtualCodigo(obterLocalizacao(sp).getCodigo());
+                        uDto.preencherComSubprocesso(sp, obterLocalizacao(sp));
                     }
                     mapDto.put(codigoUnidadeParticipante, uDto);
                 });

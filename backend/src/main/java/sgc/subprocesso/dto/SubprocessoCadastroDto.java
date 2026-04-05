@@ -11,7 +11,7 @@ import java.util.*;
 @Builder
 public record SubprocessoCadastroDto(
         Long codigo,
-        UnidadeDto unidade,
+        UnidadeResumoDto unidade,
         List<AtividadeDto> atividades) {
 
     public static SubprocessoCadastroDto fromEntity(Subprocesso subprocesso, List<AtividadeDto> atividades) {
@@ -22,7 +22,7 @@ public record SubprocessoCadastroDto(
 
         return SubprocessoCadastroDto.builder()
                 .codigo(subprocesso.getCodigo())
-                .unidade(UnidadeDto.fromEntityResumoObrigatoria(unidade))
+                .unidade(UnidadeResumoDto.fromEntityObrigatoria(unidade))
                 .atividades(atividades)
                 .build();
     }

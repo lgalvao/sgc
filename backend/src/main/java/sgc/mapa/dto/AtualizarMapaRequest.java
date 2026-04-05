@@ -4,6 +4,7 @@ import lombok.*;
 import org.jspecify.annotations.*;
 
 import java.time.*;
+import java.util.*;
 
 @Builder
 public record AtualizarMapaRequest(
@@ -14,10 +15,10 @@ public record AtualizarMapaRequest(
 
     public AtualizarEstadoMapaCommand paraCommand() {
         return AtualizarEstadoMapaCommand.builder()
-                .dataHoraDisponibilizado(dataHoraDisponibilizado)
-                .observacoesDisponibilizacao(observacoesDisponibilizacao)
-                .sugestoes(sugestoes)
-                .dataHoraHomologado(dataHoraHomologado)
+                .dataHoraDisponibilizado(Optional.ofNullable(dataHoraDisponibilizado))
+                .observacoesDisponibilizacao(Optional.ofNullable(observacoesDisponibilizacao))
+                .sugestoes(Optional.ofNullable(sugestoes))
+                .dataHoraHomologado(Optional.ofNullable(dataHoraHomologado))
                 .build();
     }
 }

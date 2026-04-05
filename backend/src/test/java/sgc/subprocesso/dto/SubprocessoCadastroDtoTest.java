@@ -32,7 +32,7 @@ class SubprocessoCadastroDtoTest {
 
         assertThat(dto.codigo()).isEqualTo(20L);
         assertThat(dto.unidade()).isNotNull();
-        assertThat(dto.unidade().getSigla()).isEqualTo("UND");
+        assertThat(dto.unidade().sigla()).isEqualTo("UND");
         assertThat(dto.atividades()).hasSize(1);
     }
 

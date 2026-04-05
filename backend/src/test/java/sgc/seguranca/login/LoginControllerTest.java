@@ -335,7 +335,7 @@ class LoginControllerTest {
         invokeMethod(loginController, "limparCookiePreAuth", response);
 
         assertThat(response.getCookies()).hasSize(3);
-        assertThat(Arrays.stream(response.getCookies()).allMatch(cookie -> !cookie.getSecure())).isTrue();
+        assertThat(Arrays.stream(response.getCookies()).noneMatch(Cookie::getSecure)).isTrue();
     }
 
     @Test

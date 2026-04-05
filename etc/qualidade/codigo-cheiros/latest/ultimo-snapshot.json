@@ -1,18 +1,18 @@
 {
-  "geradoEm": "2026-04-05T15:06:11.993Z",
+  "geradoEm": "2026-04-05T15:43:49.619Z",
   "base": "/Users/leonardo/sgc",
   "pontuacao": {
-    "total": 1396,
+    "total": 1355,
     "faixa": "critico",
     "porEscopo": {
-      "backend": 851,
+      "backend": 810,
       "frontend": 226,
       "frontend_testes": 319
     }
   },
   "contagens": {
-    "backend_nullable_dto": 89,
-    "backend_null_checks": 198,
+    "backend_nullable_dto": 82,
+    "backend_null_checks": 195,
     "backend_objects_null": 5,
     "frontend_any_producao": 38,
     "frontend_any_testes": 319,
@@ -21,8 +21,8 @@
     "frontend_fallback_or": 24
   },
   "deltas": {
-    "backend_nullable_dto": -7,
-    "backend_null_checks": 0,
+    "backend_nullable_dto": 2,
+    "backend_null_checks": 1,
     "backend_objects_null": 0,
     "frontend_any_producao": 0,
     "frontend_any_testes": 0,
@@ -40,33 +40,34 @@
       }
     },
     {
-      "arquivo": "backend/src/main/java/sgc/subprocesso/dto/SubprocessoResumoDto.java",
-      "pontuacao": 39,
-      "categorias": {
-        "backend_nullable_dto": 7,
-        "backend_null_checks": 2
-      }
-    },
-    {
-      "arquivo": "backend/src/main/java/sgc/subprocesso/dto/SubprocessoListagemDto.java",
-      "pontuacao": 35,
-      "categorias": {
-        "backend_nullable_dto": 7
-      }
-    },
-    {
-      "arquivo": "backend/src/main/java/sgc/processo/service/ProcessoService.java",
-      "pontuacao": 32,
-      "categorias": {
-        "backend_null_checks": 15,
-        "backend_objects_null": 1
-      }
-    },
-    {
       "arquivo": "backend/src/main/java/sgc/e2e/E2eController.java",
       "pontuacao": 30,
       "categorias": {
         "backend_null_checks": 15
+      }
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/processo/service/ProcessoService.java",
+      "pontuacao": 30,
+      "categorias": {
+        "backend_null_checks": 14,
+        "backend_objects_null": 1
+      }
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/processo/dto/ProcessoDetalheDto.java",
+      "pontuacao": 29,
+      "categorias": {
+        "backend_nullable_dto": 5,
+        "backend_null_checks": 2
+      }
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/subprocesso/dto/SubprocessoResumoDto.java",
+      "pontuacao": 29,
+      "categorias": {
+        "backend_nullable_dto": 5,
+        "backend_null_checks": 2
       }
     },
     {
@@ -78,18 +79,10 @@
       }
     },
     {
-      "arquivo": "backend/src/main/java/sgc/processo/dto/ProcessoDetalheDto.java",
-      "pontuacao": 27,
+      "arquivo": "backend/src/main/java/sgc/subprocesso/dto/SubprocessoListagemDto.java",
+      "pontuacao": 25,
       "categorias": {
-        "backend_nullable_dto": 5,
-        "backend_null_checks": 1
-      }
-    },
-    {
-      "arquivo": "backend/src/main/java/sgc/mapa/dto/AtualizarEstadoMapaCommand.java",
-      "pontuacao": 20,
-      "categorias": {
-        "backend_nullable_dto": 4
+        "backend_nullable_dto": 5
       }
     },
     {
@@ -139,6 +132,13 @@
       "pontuacao": 16,
       "categorias": {
         "backend_null_checks": 8
+      }
+    },
+    {
+      "arquivo": "frontend/src/test-utils/serviceTestHelpers.ts",
+      "pontuacao": 16,
+      "categorias": {
+        "frontend_any_producao": 4
       }
     }
   ]

@@ -35,13 +35,12 @@ public record AtualizarSubprocessoRequest(
                 .build();
     }
 
-    @SuppressWarnings("NullAway")
     public AtualizarPrazosSubprocessoCommand paraPrazosCommand() {
         return AtualizarPrazosSubprocessoCommand.builder()
-                .dataLimiteEtapa1(dataLimiteEtapa1)
-                .dataFimEtapa1(dataFimEtapa1)
-                .dataLimiteEtapa2(dataLimiteEtapa2)
-                .dataFimEtapa2(dataFimEtapa2)
+                .dataLimiteEtapa1(Optional.ofNullable(dataLimiteEtapa1))
+                .dataFimEtapa1(Optional.ofNullable(dataFimEtapa1))
+                .dataLimiteEtapa2(Optional.ofNullable(dataLimiteEtapa2))
+                .dataFimEtapa2(Optional.ofNullable(dataFimEtapa2))
                 .build();
     }
 }

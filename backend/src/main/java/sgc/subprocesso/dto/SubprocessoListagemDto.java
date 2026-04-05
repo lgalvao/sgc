@@ -11,14 +11,14 @@ import java.time.*;
 @Builder
 public record SubprocessoListagemDto(
         Long codigo,
-        UnidadeDto unidade,
+        UnidadeResumoDto unidade,
         SituacaoSubprocesso situacao,
         LocalDateTime dataLimiteEtapa1,
         @Nullable LocalDateTime dataFimEtapa1,
         @Nullable LocalDateTime dataLimiteEtapa2,
         @Nullable LocalDateTime dataFimEtapa2,
-        @Nullable Long codProcesso,
-        @Nullable Long codUnidade,
+        Long codProcesso,
+        Long codUnidade,
         @Nullable Long codMapa,
         String processoDescricao,
         LocalDateTime dataCriacaoProcesso,

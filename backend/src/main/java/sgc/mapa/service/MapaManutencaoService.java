@@ -187,10 +187,10 @@ public class MapaManutencaoService {
         AtualizarEstadoMapaCommand estadoInicial = command.estadoInicial();
         Mapa mapa = Mapa.builder()
                 .subprocesso(subprocesso)
-                .dataHoraDisponibilizado(estadoInicial != null ? estadoInicial.dataHoraDisponibilizado() : null)
-                .observacoesDisponibilizacao(estadoInicial != null ? estadoInicial.observacoesDisponibilizacao() : null)
-                .sugestoes(estadoInicial != null ? estadoInicial.sugestoes() : null)
-                .dataHoraHomologado(estadoInicial != null ? estadoInicial.dataHoraHomologado() : null)
+                .dataHoraDisponibilizado(estadoInicial.dataHoraDisponibilizado().orElse(null))
+                .observacoesDisponibilizacao(estadoInicial.observacoesDisponibilizacao().orElse(null))
+                .sugestoes(estadoInicial.sugestoes().orElse(null))
+                .dataHoraHomologado(estadoInicial.dataHoraHomologado().orElse(null))
                 .build();
         return mapaRepo.save(mapa);
     }
@@ -198,10 +198,10 @@ public class MapaManutencaoService {
     @Transactional
     public Mapa atualizarEstadoMapa(Long codMapa, AtualizarEstadoMapaCommand command) {
         Mapa existente = mapaCodigo(codMapa)
-                .setDataHoraDisponibilizado(command.dataHoraDisponibilizado())
-                .setObservacoesDisponibilizacao(command.observacoesDisponibilizacao())
-                .setSugestoes(command.sugestoes())
-                .setDataHoraHomologado(command.dataHoraHomologado());
+                .setDataHoraDisponibilizado(command.dataHoraDisponibilizado().orElse(null))
+                .setObservacoesDisponibilizacao(command.observacoesDisponibilizacao().orElse(null))
+                .setSugestoes(command.sugestoes().orElse(null))
+                .setDataHoraHomologado(command.dataHoraHomologado().orElse(null));
         return mapaRepo.save(existente);
     }
 

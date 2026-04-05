@@ -47,7 +47,9 @@ class SubprocessoListagemDtoTest {
 
         assertThat(dto.codigo()).isEqualTo(20L);
         assertThat(dto.codProcesso()).isEqualTo(50L);
+        assertThat(dto.codUnidade()).isEqualTo(10L);
         assertThat(dto.codMapa()).isEqualTo(60L);
+        assertThat(dto.unidade().sigla()).isEqualTo("UND");
         assertThat(dto.processoDescricao()).isEqualTo("Processo");
         assertThat(dto.isEmAndamento()).isTrue();
         assertThat(dto.etapaAtual()).isEqualTo(1);

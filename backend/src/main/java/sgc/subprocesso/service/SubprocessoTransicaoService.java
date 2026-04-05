@@ -117,8 +117,8 @@ public class SubprocessoTransicaoService {
             Unidade unidadeAnalise,
             Unidade unidadeDestino,
             Usuario usuario,
-            @Nullable String motivoAnalise,
-            @Nullable String observacoes
+            Optional<String> motivoAnalise,
+            Optional<String> observacoes
     ) {
         private static RegistrarWorkflowInternoCommand devolucaoValidacao(
                 Subprocesso sp,
@@ -126,7 +126,7 @@ public class SubprocessoTransicaoService {
                 Unidade unidadeAnalise,
                 Unidade unidadeDevolucao,
                 Usuario usuario,
-                @Nullable String justificativa
+                Optional<String> justificativa
         ) {
             return new RegistrarWorkflowInternoCommand(
                     sp,
@@ -146,7 +146,7 @@ public class SubprocessoTransicaoService {
                 Subprocesso sp,
                 SituacaoSubprocesso novaSituacao,
                 Usuario usuario,
-                @Nullable String observacoes
+                Optional<String> observacoes
         ) {
             return new RegistrarWorkflowInternoCommand(
                     sp,
@@ -157,7 +157,7 @@ public class SubprocessoTransicaoService {
                     null,
                     null,
                     usuario,
-                    "Aceite da validação",
+                    Optional.of("Aceite da validação"),
                     observacoes
             );
         }
@@ -169,7 +169,7 @@ public class SubprocessoTransicaoService {
                 Unidade unidadeAnalise,
                 Unidade unidadeDestino,
                 Usuario usuario,
-                @Nullable String observacoes
+                Optional<String> observacoes
         ) {
             return new RegistrarWorkflowInternoCommand(
                     sp,
@@ -190,7 +190,7 @@ public class SubprocessoTransicaoService {
                 SituacaoSubprocesso novaSituacao,
                 FluxoCadastroContexto contexto,
                 Usuario usuario,
-                @Nullable String observacoes
+                Optional<String> observacoes
         ) {
             return new RegistrarWorkflowInternoCommand(
                     sp,
@@ -244,6 +244,10 @@ public class SubprocessoTransicaoService {
             String justificativa,
             boolean revisao
     ) {
+    }
+
+    private static Optional<String> textoOpt(@Nullable String texto) {
+        return Optional.ofNullable(texto);
     }
 
     public void registrarTransicao(RegistrarTransicaoCommand cmd) {
@@ -346,7 +350,7 @@ public class SubprocessoTransicaoService {
 
         sp.setSituacao(novaSituacao);
         sp.setDataFimEtapa1(LocalDateTime.now());
-        registrarTransicaoParaSuperiorDaUnidade(sp, transicao, usuario, null);
+        registrarTransicaoParaSuperiorDaUnidade(sp, transicao, usuario, Optional.empty());
     }
 
     @Transactional
@@ -394,7 +398,7 @@ public class SubprocessoTransicaoService {
         sp.setDataLimiteEtapa2(request.dataLimite().atStartOfDay());
         sp.setDataFimEtapa1(LocalDateTime.now());
 
-        registrarTransicaoDoAdminParaUnidade(sp, TipoTransicao.MAPA_DISPONIBILIZADO, usuario, observacoes);
+        registrarTransicaoDoAdminParaUnidade(sp, TipoTransicao.MAPA_DISPONIBILIZADO, usuario, textoOpt(observacoes));
     }
 
     private @Nullable LocalDate obterUltimaDataLimite(Subprocesso sp) {
@@ -452,7 +456,7 @@ public class SubprocessoTransicaoService {
         sp.setSituacao(obterSituacaoObrigatoria(SITUACAO_MAPA_COM_SUGESTOES, sp, "apresentação de sugestões"));
         sp.setDataFimEtapa2(LocalDateTime.now());
 
-        registrarTransicaoParaSuperiorDaUnidade(sp, TipoTransicao.MAPA_SUGESTOES_APRESENTADAS, usuario, sugestoes);
+        registrarTransicaoParaSuperiorDaUnidade(sp, TipoTransicao.MAPA_SUGESTOES_APRESENTADAS, usuario, textoOpt(sugestoes));
 
         log.info("Sugestões apresentadas para mapa do SP {}: {}", codSubprocesso, sugestoes);
     }
@@ -465,7 +469,7 @@ public class SubprocessoTransicaoService {
         sp.setSituacao(obterSituacaoObrigatoria(SITUACAO_MAPA_VALIDADO, sp, "validação de mapa"));
         sp.setDataFimEtapa2(LocalDateTime.now());
 
-        registrarTransicaoParaSuperiorDaUnidade(sp, TipoTransicao.MAPA_VALIDADO, usuario, null);
+        registrarTransicaoParaSuperiorDaUnidade(sp, TipoTransicao.MAPA_VALIDADO, usuario, Optional.empty());
 
         log.info("Validado mapa do SP {}", codSubprocesso);
     }
@@ -490,7 +494,7 @@ public class SubprocessoTransicaoService {
                 unidadeAnalise,
                 unidadeDevolucao,
                 usuario,
-                justificativa
+                textoOpt(justificativa)
         ));
         log.info("Devolvida validação do mapa do SP {}", codSubprocesso);
     }
@@ -516,7 +520,7 @@ public class SubprocessoTransicaoService {
                 sp,
                 novaSituacao,
                 usuario,
-                observacoes
+                textoOpt(observacoes)
         ));
 
         log.info("Validação aceita para mapa do SP {}", codSubprocesso);
@@ -539,7 +543,7 @@ public class SubprocessoTransicaoService {
 
         sp.setSituacao(obterSituacaoObrigatoria(SITUACAO_MAPA_HOMOLOGADO, sp, "homologação de validação"));
 
-        registrarTransicaoDentroDoAdmin(sp, TipoTransicao.MAPA_HOMOLOGADO, usuario, observacoes);
+        registrarTransicaoDentroDoAdmin(sp, TipoTransicao.MAPA_HOMOLOGADO, usuario, textoOpt(observacoes));
     }
 
     public void devolverCadastro(Long codSubprocesso, Usuario usuario, @Nullable String observacoes) {
@@ -572,7 +576,7 @@ public class SubprocessoTransicaoService {
                 unidadeAnalise,
                 unidadeDevolucao,
                 usuario,
-                observacoes
+                textoOpt(observacoes)
         ));
     }
 
@@ -591,7 +595,7 @@ public class SubprocessoTransicaoService {
             Subprocesso sp,
             TipoTransicao tipoTransicao,
             Usuario usuario,
-            @Nullable String observacoes
+            Optional<String> observacoes
     ) {
         Unidade unidade = sp.getUnidade();
         if (unidade.getUnidadeSuperior() != null) {
@@ -601,7 +605,7 @@ public class SubprocessoTransicaoService {
                     .origem(unidade)
                     .destino(unidade.getUnidadeSuperior())
                     .usuario(usuario)
-                    .observacoes(observacoes)
+                    .observacoes(observacoes.orElse(null))
                     .build());
         }
     }
@@ -637,8 +641,8 @@ public class SubprocessoTransicaoService {
                 .unidadeOrigemTransicao(cmd.unidadeAnalise())
                 .unidadeDestinoTransicao(cmd.unidadeDestino())
                 .usuario(cmd.usuario())
-                .motivoAnalise(cmd.motivoAnalise())
-                .observacoes(cmd.observacoes())
+                .motivoAnalise(cmd.motivoAnalise().orElse(null))
+                .observacoes(cmd.observacoes().orElse(null))
                 .build());
     }
 
@@ -646,7 +650,7 @@ public class SubprocessoTransicaoService {
             Subprocesso sp,
             TipoTransicao tipoTransicao,
             Usuario usuario,
-            @Nullable String observacoes
+            Optional<String> observacoes
     ) {
         registrarTransicao(RegistrarTransicaoCommand.builder()
                 .sp(sp)
@@ -654,7 +658,7 @@ public class SubprocessoTransicaoService {
                 .origem(obterUnidadeAdmin())
                 .destino(sp.getUnidade())
                 .usuario(usuario)
-                .observacoes(observacoes)
+                .observacoes(observacoes.orElse(null))
                 .build());
     }
 
@@ -662,7 +666,7 @@ public class SubprocessoTransicaoService {
             Subprocesso sp,
             TipoTransicao tipoTransicao,
             Usuario usuario,
-            @Nullable String observacoes
+            Optional<String> observacoes
     ) {
         Unidade admin = obterUnidadeAdmin();
         registrarTransicao(RegistrarTransicaoCommand.builder()
@@ -671,7 +675,7 @@ public class SubprocessoTransicaoService {
                 .origem(admin)
                 .destino(admin)
                 .usuario(usuario)
-                .observacoes(observacoes)
+                .observacoes(observacoes.orElse(null))
                 .build());
     }
 
@@ -706,7 +710,7 @@ public class SubprocessoTransicaoService {
                 contexto.situacaoDisponibilizada(),
                 contexto,
                 usuario,
-                observacoes
+                textoOpt(observacoes)
         ));
     }
 
@@ -733,7 +737,7 @@ public class SubprocessoTransicaoService {
 
         sp.setSituacao(contexto.situacaoHomologada());
 
-        registrarTransicaoDentroDoAdmin(sp, contexto.transicaoHomologacao(), usuario, observacoes);
+        registrarTransicaoDentroDoAdmin(sp, contexto.transicaoHomologacao(), usuario, textoOpt(observacoes));
 
         executarEfeitosDerivadosHomologacaoCadastro(sp, isRevisao);
     }
@@ -767,7 +771,7 @@ public class SubprocessoTransicaoService {
         sp.setSituacao(cmd.novaSituacao());
         sp.setDataFimEtapa1(null);
 
-        registrarTransicaoDoAdminParaUnidade(sp, cmd.tipoTransicao(), usuario, cmd.justificativa());
+        registrarTransicaoDoAdminParaUnidade(sp, cmd.tipoTransicao(), usuario, Optional.of(cmd.justificativa()));
 
         enviarAlertasReabertura(new AlertaReaberturaContexto(sp.getProcesso(), sp.getUnidade(), cmd.justificativa(), cmd.revisao()));
         log.info("Reaberto {} do SP {}", cmd.revisao() ? ETAPA_REVISAO : ETAPA_CADASTRO, cmd.codigo());

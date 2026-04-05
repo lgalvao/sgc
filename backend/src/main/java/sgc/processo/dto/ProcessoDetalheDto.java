@@ -46,7 +46,7 @@ public class ProcessoDetalheDto {
 
         private String nome;
         private String sigla;
-        private @Nullable Long codUnidade;
+        private Long codUnidade;
         private @Nullable Long codUnidadeSuperior;
         private SituacaoSubprocesso situacaoSubprocesso;
         private LocalDateTime dataLimite;
@@ -55,27 +55,48 @@ public class ProcessoDetalheDto {
         private @Nullable Long localizacaoAtualCodigo;
 
         public static UnidadeParticipanteDto fromUnidade(Unidade unidade) {
-            return UnidadeParticipanteDto.builder()
-                    .nome(unidade.getNome())
-                    .sigla(unidade.getSigla())
-                    .codUnidade(unidade.getCodigo())
-                    .codUnidadeSuperior(unidade.getUnidadeSuperior() != null
+            return criarBase(
+                    unidade.getNome(),
+                    unidade.getSigla(),
+                    unidade.getCodigo(),
+                    unidade.getUnidadeSuperior() != null
                             ? unidade.getUnidadeSuperior().getCodigo()
-                            : null)
-                    .filhos(new ArrayList<>())
-                    .build();
+                            : null
+            );
         }
 
         public static UnidadeParticipanteDto fromSnapshot(UnidadeProcesso snapshot) {
+            return criarBase(
+                    snapshot.getNome(),
+                    snapshot.getSigla(),
+                    snapshot.getUnidadeCodigo(),
+                    snapshot.getUnidadeSuperiorCodigo()
+            );
+        }
+
+        public UnidadeParticipanteDto preencherComSubprocesso(Subprocesso subprocesso, Unidade localizacaoAtual) {
+            this.situacaoSubprocesso = subprocesso.getSituacao();
+            this.dataLimite = subprocesso.getDataLimiteEtapa1();
+            this.codSubprocesso = subprocesso.getCodigo();
+            this.mapaCodigo = subprocesso.getMapa() != null ? subprocesso.getMapa().getCodigo() : null;
+            this.localizacaoAtualCodigo = localizacaoAtual.getCodigo();
+            return this;
+        }
+
+        private static UnidadeParticipanteDto criarBase(
+                String nome,
+                String sigla,
+                Long codUnidade,
+                @Nullable Long codUnidadeSuperior
+        ) {
             return UnidadeParticipanteDto.builder()
-                    .nome(snapshot.getNome())
-                    .sigla(snapshot.getSigla())
-                    .codUnidade(snapshot.getUnidadeCodigo())
-                    .codUnidadeSuperior(snapshot.getUnidadeSuperiorCodigo())
+                    .nome(nome)
+                    .sigla(sigla)
+                    .codUnidade(Objects.requireNonNull(codUnidade, "Codigo da unidade participante obrigatorio"))
+                    .codUnidadeSuperior(codUnidadeSuperior)
                     .filhos(new ArrayList<>())
                     .build();
         }
     }
 }
-
 
