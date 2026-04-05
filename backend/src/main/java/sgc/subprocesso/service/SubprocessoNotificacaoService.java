@@ -87,9 +87,7 @@ public class SubprocessoNotificacaoService {
 
         Map<Long, Unidade> mapaUnidades = new HashMap<>();
         List<Unidade> superioresCarregados = unidadeService.buscarPorCodigos(codigosSuperiores);
-        if (superioresCarregados != null) {
-            superioresCarregados.forEach(u -> mapaUnidades.put(u.getCodigo(), u));
-        }
+        superioresCarregados.forEach(u -> mapaUnidades.put(u.getCodigo(), u));
 
         for (Long codigoSuperior : codigosSuperiores) {
             if (Objects.equals(codigoSuperior, cmd.unidadeDestino().getCodigo())) {

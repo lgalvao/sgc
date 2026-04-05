@@ -89,9 +89,17 @@ public class SubprocessoConsultaService {
 
     public Map<String, Object> obterSugestoes(Long codSubprocesso) {
         Subprocesso subprocesso = buscarSubprocesso(codSubprocesso);
-        String sugestoes = Optional.ofNullable(subprocesso.getMapa())
-                .map(Mapa::getSugestoes)
-                .orElse("");
+        Mapa mapa = subprocesso.getMapa();
+        if (mapa == null) {
+            if (subprocesso.getSituacao() != null && subprocesso.getSituacao().name().contains("MAPA")) {
+                throw new ErroInconsistenciaInterna(
+                        "Subprocesso %s em etapa de mapa sem mapa vinculado para leitura de sugestoes"
+                                .formatted(codSubprocesso)
+                );
+            }
+            return Map.of("sugestoes", "");
+        }
+        String sugestoes = Optional.ofNullable(mapa.getSugestoes()).orElse("");
         return Map.of("sugestoes", sugestoes);
     }
 

@@ -24,8 +24,7 @@ public class MapaVisualizacaoService {
     private final CompetenciaRepo competenciaRepo;
 
     public MapaVisualizacaoResponse obterMapaParaVisualizacao(Subprocesso subprocesso) {
-        Mapa mapa = mapaRepo.buscarCompletoPorSubprocesso(subprocesso.getCodigo())
-                .orElse(subprocesso.getMapa());
+        Mapa mapa = mapaRepo.buscarCompletoPorSubprocesso(subprocesso.getCodigo()).orElse(null);
 
         if (mapa == null) {
             if (subprocesso.getSituacao() != null && subprocesso.getSituacao().name().contains("MAPA")) {

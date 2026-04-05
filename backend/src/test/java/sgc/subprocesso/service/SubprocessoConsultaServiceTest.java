@@ -39,14 +39,29 @@ class SubprocessoConsultaServiceTest {
     }
 
     @Test
-    @DisplayName("obterSugestoes deve retornar string vazia quando mapa estiver ausente")
-    void obterSugestoesDeveRetornarStringVaziaQuandoMapaEstiverAusente() {
+    @DisplayName("obterSugestoes deve retornar string vazia quando mapa estiver ausente fora de etapa de mapa")
+    void obterSugestoesDeveRetornarStringVaziaQuandoMapaEstiverAusenteForaDeEtapaDeMapa() {
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setCodigo(1L);
+        subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
         when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(1L)).thenReturn(Optional.of(subprocesso));
 
         assertThat(service.obterSugestoes(1L)).containsEntry("sugestoes", "");
+    }
+
+    @Test
+    @DisplayName("obterSugestoes deve falhar quando mapa estiver ausente em etapa de mapa")
+    void obterSugestoesDeveFalharQuandoMapaEstiverAusenteEmEtapaDeMapa() {
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setCodigo(1L);
+        subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO);
+
+        when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(1L)).thenReturn(Optional.of(subprocesso));
+
+        assertThatThrownBy(() -> service.obterSugestoes(1L))
+                .isInstanceOf(ErroInconsistenciaInterna.class)
+                .hasMessageContaining("sem mapa vinculado para leitura de sugestoes");
     }
 
     @Test

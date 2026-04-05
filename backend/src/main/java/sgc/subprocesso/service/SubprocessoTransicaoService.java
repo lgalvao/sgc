@@ -795,9 +795,7 @@ public class SubprocessoTransicaoService {
         if (!codigosSuperiores.isEmpty()) {
             Map<Long, Unidade> mapaUnidades = new HashMap<>();
             List<Unidade> superioresCarregados = unidadeService.buscarPorCodigos(codigosSuperiores);
-            if (superioresCarregados != null) {
-                superioresCarregados.forEach(u -> mapaUnidades.put(u.getCodigo(), u));
-            }
+            superioresCarregados.forEach(u -> mapaUnidades.put(u.getCodigo(), u));
             for (Long codigoAncestor : codigosSuperiores) {
                 Unidade superior = mapaUnidades.get(codigoAncestor);
                 if (superior != null) {

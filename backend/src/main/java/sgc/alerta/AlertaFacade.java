@@ -111,12 +111,10 @@ public class AlertaFacade {
         }
         if (!codigosSuperiores.isEmpty()) {
             List<Unidade> unidadesSuperiores = unidadeService.buscarPorCodigos(new java.util.ArrayList<>(codigosSuperiores));
-            if (unidadesSuperiores != null) {
-                unidadesSuperiores.forEach(u -> {
-                    todasUnidadesMap.put(u.getCodigo(), u);
-                    codsIntermediarias.add(u.getCodigo());
-                });
-            }
+            unidadesSuperiores.forEach(u -> {
+                todasUnidadesMap.put(u.getCodigo(), u);
+                codsIntermediarias.add(u.getCodigo());
+            });
         }
 
         List<Alerta> alertasCriados = new ArrayList<>();

@@ -50,11 +50,31 @@ class MapaVisualizacaoServiceCoverageTest {
         sub.setCodigo(1L);
         sub.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO);
         sub.setUnidade(new Unidade());
+        sub.setMapa(new Mapa());
         when(mapaRepo.buscarCompletoPorSubprocesso(1L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.obterMapaParaVisualizacao(sub))
                 .isInstanceOf(sgc.comum.erros.ErroInconsistenciaInterna.class)
                 .hasMessageContaining("sem mapa vinculado para visualizacao");
+    }
+
+    @Test
+    @DisplayName("Deve ignorar mapa pendurado no subprocesso quando o carregamento completo nao encontrar mapa")
+    void deveIgnorarMapaPenduradoQuandoCarregamentoCompletoNaoEncontrarMapa() {
+        Subprocesso sub = new Subprocesso();
+        sub.setCodigo(3L);
+        sub.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
+        sub.setUnidade(new Unidade());
+        Mapa mapaPendurado = new Mapa();
+        mapaPendurado.setCodigo(300L);
+        mapaPendurado.setAtividades(Set.of());
+        sub.setMapa(mapaPendurado);
+        when(mapaRepo.buscarCompletoPorSubprocesso(3L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.obterMapaParaVisualizacao(sub))
+                .isInstanceOf(sgc.comum.erros.ErroInconsistenciaInterna.class)
+                .hasMessageContaining("sem mapa vinculado para visualizacao");
+        verify(competenciaRepo, never()).findByMapa_Codigo(anyLong());
     }
 
     @Test

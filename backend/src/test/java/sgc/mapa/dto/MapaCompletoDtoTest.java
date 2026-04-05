@@ -48,14 +48,20 @@ class MapaCompletoDtoTest {
     }
 
     @Test
-    @DisplayName("deve falhar quando mapa não possuir subprocesso")
-    void deveFalharQuandoMapaNaoPossuirSubprocesso() {
+    @DisplayName("deve mapear mapa com lista de competencias vazia")
+    void deveMapearMapaComListaDeCompetenciasVazia() {
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setCodigo(70L);
+
         Mapa mapa = new Mapa();
         mapa.setCodigo(10L);
+        mapa.setSubprocesso(subprocesso);
         mapa.setCompetencias(new LinkedHashSet<>());
 
-        assertThatThrownBy(() -> MapaCompletoDto.fromEntity(mapa))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessage("Mapa deve possuir subprocesso associado");
+        MapaCompletoDto dto = MapaCompletoDto.fromEntity(mapa);
+
+        assertThat(dto.codigo()).isEqualTo(10L);
+        assertThat(dto.subprocessoCodigo()).isEqualTo(70L);
+        assertThat(dto.competencias()).isEmpty();
     }
 }
