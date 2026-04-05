@@ -96,6 +96,7 @@ public class ProcessoController {
                 .toList());
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     @GetMapping("/{codigo}/unidades-importacao")
     @PreAuthorize("hasRole('CHEFE')")
     @Operation(summary = "Lista todas as unidades participantes de um processo finalizado para importação")
@@ -146,6 +147,7 @@ public class ProcessoController {
         return ResponseEntity.ok(processoService.obterDetalhesCompleto(codigo, usuario, true));
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     @PostMapping("/{codigo}/iniciar")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Inicia um processo")

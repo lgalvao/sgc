@@ -96,8 +96,6 @@ class OrganizacaoViewsPerformanceIntegrationTest extends BaseIntegrationTest {
                 descricaoExecucao(),
                 List.of(environment.getActiveProfiles()),
                 bancoInfo,
-                AQUECIMENTOS,
-                REPETICOES_MEDIDAS,
                 amostras,
                 resultados
         );
@@ -301,8 +299,8 @@ class OrganizacaoViewsPerformanceIntegrationTest extends BaseIntegrationTest {
         builder.append("Banco: ").append(relatorio.banco().produto())
                 .append(" | usuario=").append(relatorio.banco().usuario())
                 .append(System.lineSeparator());
-        builder.append("Aquecimentos: ").append(relatorio.aquecimentos())
-                .append(" | Repeticoes medidas: ").append(relatorio.repeticoesMedidas())
+        builder.append("Aquecimentos: ").append(AQUECIMENTOS)
+                .append(" | Repeticoes medidas: ").append(REPETICOES_MEDIDAS)
                 .append(System.lineSeparator());
         builder.append("Amostras: tituloUsuario=").append(relatorio.amostras().tituloUsuario())
                 .append(", unidadeLotacao=").append(relatorio.amostras().codigoUnidadeLotacao())
@@ -412,8 +410,6 @@ class OrganizacaoViewsPerformanceIntegrationTest extends BaseIntegrationTest {
             String descricaoExecucao,
             List<String> perfisAtivos,
             BancoInfo banco,
-            int aquecimentos,
-            int repeticoesMedidas,
             AmostrasConsulta amostras,
             List<ResultadoMedicao> resultados
     ) {

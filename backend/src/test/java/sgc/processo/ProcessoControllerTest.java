@@ -101,9 +101,9 @@ class ProcessoControllerTest {
                 .build();
     }
 
-    private Subprocesso criarSubprocessoValido(Long codigo, Processo processo, Unidade unidade) {
+    private Subprocesso criarSubprocessoValido(Processo processo, Unidade unidade) {
         return Subprocesso.builder()
-                .codigo(codigo)
+                .codigo(10L)
                 .processo(processo)
                 .unidade(unidade)
                 .situacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO)
@@ -405,7 +405,7 @@ class ProcessoControllerTest {
             Unidade unidade = criarUnidadeParticipante();
 
             when(consultaService.listarEntidadesPorProcesso(1L))
-                    .thenReturn(List.of(criarSubprocessoValido(10L, processo, unidade)));
+                    .thenReturn(List.of(criarSubprocessoValido(processo, unidade)));
 
             mockMvc.perform(get("/api/processos/1/subprocessos"))
                     .andExpect(status().isOk())

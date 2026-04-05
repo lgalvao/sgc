@@ -100,7 +100,7 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
                 .build();
         movimentacaoRepo.save(mov);
 
-        autenticarUsuario(usuarioChefe, Perfil.CHEFE);
+        autenticarUsuario(usuarioChefe);
     }
 
     private void setupUsuarioPerfil(Usuario usuario, Unidade unidade) {
@@ -122,13 +122,13 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
         unidade.setMatriculaTitular(usuario.getMatricula());
     }
 
-    private void autenticarUsuario(Usuario usuario, Perfil perfil) {
-        usuario.setPerfilAtivo(perfil);
+    private void autenticarUsuario(Usuario usuario) {
+        usuario.setPerfilAtivo(Perfil.CHEFE);
         // Tenta pegar o código da unidade do usuário ou da unidade de lotação
         Long codUnidade = usuario.getUnidadeLotacao().getCodigo();
         usuario.setUnidadeAtivaCodigo(codUnidade);
 
-        usuario.setAuthorities(Set.of(new SimpleGrantedAuthority("ROLE_" + perfil.name())));
+        usuario.setAuthorities(Set.of(new SimpleGrantedAuthority("ROLE_" + Perfil.CHEFE.name())));
         Authentication auth = new UsernamePasswordAuthenticationToken(usuario, null, usuario.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(auth);
     }
@@ -145,7 +145,7 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
         outraUnidade = unidadeRepo.save(outraUnidade);
 
         setupUsuarioPerfil(outroChefe, outraUnidade);
-        autenticarUsuario(outroChefe, Perfil.CHEFE);
+        autenticarUsuario(outroChefe);
 
         mockMvc.perform(post("/api/subprocessos/{codigo}/disponibilizar-revisao", subprocessoRevisao.getCodigo()))
                 .andExpect(status().isForbidden());

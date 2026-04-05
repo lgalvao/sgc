@@ -101,9 +101,9 @@ public abstract class BaseIntegrationTest {
         return false;
     }
 
-    protected Movimentacao registrarMovimentacaoInicial(Subprocesso subprocesso) {
+    protected void registrarMovimentacaoInicial(Subprocesso subprocesso) {
         Usuario usuario = usuarioRepo.findById("111111111111").orElseThrow();
-        return movimentacaoRepo.save(Movimentacao.builder()
+        movimentacaoRepo.save(Movimentacao.builder()
                 .subprocesso(subprocesso)
                 .unidadeOrigem(subprocesso.getUnidade())
                 .unidadeDestino(subprocesso.getUnidade())

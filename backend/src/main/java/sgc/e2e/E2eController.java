@@ -375,6 +375,7 @@ public class E2eController {
     /**
      * Cria um processo de revisão já iniciado, com mapa preenchido e homologado
      */
+    @SuppressWarnings("UnusedReturnValue")
     @PostMapping("/fixtures/processo-revisao-com-mapa-homologado")
     @Transactional
     @JsonView(ProcessoViews.Publica.class)
@@ -386,6 +387,7 @@ public class E2eController {
      * Cria um processo de revisão já iniciado, com cadastro homologado pelo admin
      * e mapa vigente prévio suficiente para exibir impactos na tela de ajuste.
      */
+    @SuppressWarnings("UnusedReturnValue")
     @PostMapping("/fixtures/processo-revisao-com-cadastro-homologado")
     @Transactional
     @JsonView(ProcessoViews.Publica.class)

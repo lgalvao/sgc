@@ -90,7 +90,7 @@ class ProcessoSubprocessoViewsQueryBudgetIntegrationTest extends BaseIntegration
         assertThat(queriesViews).isLessThanOrEqualTo(7);
     }
 
-    private long contarQueries(Runnable acao) {
+    private void contarQueries(Runnable acao) {
         Statistics estatisticas = entityManagerFactory.unwrap(SessionFactory.class).getStatistics();
         estatisticas.setStatisticsEnabled(true);
 
@@ -99,8 +99,6 @@ class ProcessoSubprocessoViewsQueryBudgetIntegrationTest extends BaseIntegration
         sgc.integracao.mocks.ColetorSqlTeste.limpar();
 
         acao.run();
-
-        return estatisticas.getPrepareStatementCount();
     }
 
     private long contarQueriesViews(Runnable acao) {

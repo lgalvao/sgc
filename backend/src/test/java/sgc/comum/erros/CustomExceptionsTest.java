@@ -49,7 +49,7 @@ class CustomExceptionsTest {
         assertThat(erro2.getDetails()).isEmpty();
 
         RuntimeException cause = new RuntimeException("causa");
-        ErroNegocioBase erro3 = new ErroNegocioBase("msg", "CODE", HttpStatus.BAD_REQUEST, cause) {
+        ErroNegocioBase erro3 = new ErroNegocioBase(cause) {
         };
         assertThat(erro3.getCause()).isEqualTo(cause);
         assertThat(erro3.getDetails()).isEmpty();

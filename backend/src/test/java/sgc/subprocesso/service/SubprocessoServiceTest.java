@@ -191,7 +191,6 @@ class SubprocessoServiceTest {
 
         when(consultaService.buscarSubprocesso(codSubprocesso)).thenReturn(sp);
         when(mapaManutencaoService.competenciasCodMapa(codMapa)).thenReturn(List.of());
-        when(mapaManutencaoService.mapaCodigo(codMapa)).thenReturn(mapa);
 
         service.adicionarCompetencia(codSubprocesso, request);
 

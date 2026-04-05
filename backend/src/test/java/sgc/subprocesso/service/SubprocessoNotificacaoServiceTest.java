@@ -57,7 +57,7 @@ class SubprocessoNotificacaoServiceTest {
 
         Unidade origem = criarUnidade(10L, "ORIG", "Unidade origem");
         Unidade destino = criarUnidade(20L, "DEST", "Unidade destino");
-        Processo processo = criarProcesso(TipoProcesso.MAPEAMENTO);
+        Processo processo = criarProcesso();
         Subprocesso subprocesso = criarSubprocesso(origem, processo);
         subprocesso.setDataLimiteEtapa1(LocalDateTime.of(2026, 4, 10, 9, 0));
         subprocesso.setDataLimiteEtapa2(LocalDateTime.of(2026, 4, 20, 17, 0));
@@ -113,7 +113,7 @@ class SubprocessoNotificacaoServiceTest {
         Unidade origem = criarUnidade(10L, "ORIG", "Unidade origem");
         origem.setUnidadeSuperior(destino);
 
-        Processo processo = criarProcesso(TipoProcesso.MAPEAMENTO);
+        Processo processo = criarProcesso();
         Subprocesso subprocesso = criarSubprocesso(origem, processo);
 
         when(responsavelService.buscarResponsavelUnidade(destino.getCodigo()))
@@ -148,7 +148,7 @@ class SubprocessoNotificacaoServiceTest {
 
         Unidade origem = criarUnidade(10L, "ORIG", "Unidade origem");
         Unidade destino = criarUnidade(20L, "DEST", "Unidade destino");
-        Processo processo = criarProcesso(TipoProcesso.MAPEAMENTO);
+        Processo processo = criarProcesso();
         Subprocesso subprocesso = criarSubprocesso(origem, processo);
 
         when(responsavelService.buscarResponsavelUnidade(destino.getCodigo()))
@@ -178,7 +178,7 @@ class SubprocessoNotificacaoServiceTest {
     void naoDeveAcionarAlertaOuEmailQuandoATransicaoNaoExigirNotificacao() {
         Unidade origem = criarUnidade(10L, "ORIG", "Unidade origem");
         Unidade destino = criarUnidade(20L, "DEST", "Unidade destino");
-        Processo processo = criarProcesso(TipoProcesso.MAPEAMENTO);
+        Processo processo = criarProcesso();
         Subprocesso subprocesso = criarSubprocesso(origem, processo);
 
         service.notificarTransicao(NotificacaoCommand.builder()
@@ -196,7 +196,7 @@ class SubprocessoNotificacaoServiceTest {
     void deveIgnorarEnvioDeEmailQuandoTipoNaoEnviaEmail() {
         Unidade origem = criarUnidade(10L, "ORIG", "Unidade origem");
         Unidade destino = criarUnidade(20L, "DEST", "Unidade destino");
-        Processo processo = criarProcesso(TipoProcesso.MAPEAMENTO);
+        Processo processo = criarProcesso();
         Subprocesso subprocesso = criarSubprocesso(origem, processo);
 
         invokeMethod(service, "notificarMovimentacaoEmail", NotificacaoCommand.builder()
@@ -235,10 +235,10 @@ class SubprocessoNotificacaoServiceTest {
         assertThat(service.getEmailUnidade(criarUnidade(1L, "ABC", "Unidade"))).isEqualTo("abc@tre-pe.jus.br");
     }
 
-    private Processo criarProcesso(TipoProcesso tipo) {
+    private Processo criarProcesso() {
         Processo processo = new Processo();
         processo.setDescricao("Processo teste");
-        processo.setTipo(tipo);
+        processo.setTipo(TipoProcesso.MAPEAMENTO);
         return processo;
     }
 
