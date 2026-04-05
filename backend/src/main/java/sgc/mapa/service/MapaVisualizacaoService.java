@@ -41,9 +41,9 @@ public class MapaVisualizacaoService {
                 .forEach(codAtividadesComCompetencia::add));
 
         Set<Atividade> atividadesMapa = mapa.getAtividades();
-        List<Atividade> atividadesSemCompetencia = atividadesMapa.stream()
+        List<Atividade> atividadesSemCompetencia = (atividadesMapa != null) ? atividadesMapa.stream()
                 .filter(a -> !codAtividadesComCompetencia.contains(a.getCodigo()))
-                .toList();
+                .toList() : List.of();
 
         return MapaVisualizacaoResponse.builder()
                 .unidade(subprocesso.getUnidade())

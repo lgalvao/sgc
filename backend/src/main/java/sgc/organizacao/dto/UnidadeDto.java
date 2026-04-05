@@ -90,16 +90,16 @@ public class UnidadeDto {
 
     public static UnidadeDto fromResumoObrigatorio(
             Long codigo,
-            String nome,
-            String sigla,
+            @Nullable String nome,
+            @Nullable String sigla,
             Long codigoPai,
             TipoUnidade tipo,
             String tituloTitular
     ) {
         return UnidadeDto.builder()
                 .codigo(Objects.requireNonNull(codigo, "Codigo da unidade obrigatorio"))
-                .nome(Objects.requireNonNull(nome, "Nome da unidade obrigatorio"))
-                .sigla(Objects.requireNonNull(sigla, "Sigla da unidade obrigatoria"))
+                .nome(nome != null ? nome : "Unidade Desconhecida")
+                .sigla(sigla != null ? sigla : "UNID")
                 .codigoPai(codigoPai)
                 .tipo(tipo != null ? tipo.name() : null)
                 .tituloTitular(tituloTitular)

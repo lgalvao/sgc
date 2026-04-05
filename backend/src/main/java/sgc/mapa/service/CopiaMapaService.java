@@ -104,7 +104,7 @@ public class CopiaMapaService {
                 .build();
 
         Set<Conhecimento> cs = atividadeFonte.getConhecimentos();
-        if (!cs.isEmpty()) {
+        if (cs != null && !cs.isEmpty()) {
             cs.stream().map(c -> Conhecimento.builder()
                     .atividade(novaAtividade)
                     .descricao(c.getDescricao())

@@ -15,6 +15,10 @@ public record MapaCompletoDto(
 
     public static MapaCompletoDto fromEntity(Mapa mapa) {
         Subprocesso subprocesso = mapa.getSubprocesso();
+        if (subprocesso == null) {
+            throw new IllegalStateException("Mapa deve possuir subprocesso associado");
+        }
+
         List<CompetenciaMapaDto> competencias = mapa.getCompetencias().stream()
                 .map(CompetenciaMapaDto::fromEntity)
                 .toList();

@@ -5,8 +5,6 @@ import net.ltgt.gradle.errorprone.*
 import org.gradle.api.tasks.testing.logging.*
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
-val argumentosJvmSemAvisoUnsafe = listOf("--sun-misc-unsafe-memory-access=allow")
-
 plugins {
     java
     jacoco
@@ -21,10 +19,7 @@ plugins {
 
 tasks.withType<JavaCompile>().configureEach {
     options.isFork = true
-    options.forkOptions.jvmArgs = (options.forkOptions.jvmArgs ?: mutableListOf()).apply {
-        addAll(argumentosJvmSemAvisoUnsafe)
-    }
-    options.compilerArgs.addAll(listOf("-Xlint:unchecked", "-Xlint:deprecation"))
+    options.compilerArgs.addAll(listOf("-Xlint:unchecked", "-Xlint:deprecation", "-XDaddTypeAnnotationsToSymbol=true"))
     options.errorprone {
         disableAllChecks = true
         disableWarningsInGeneratedCode = true
@@ -224,7 +219,6 @@ tasks.withType<Test> {
         "-Dmockito.ext.disable=true",
         "-Xshare:off",
         "-XX:+EnableDynamicAgentLoading",
-        *argumentosJvmSemAvisoUnsafe.toTypedArray(),
         "--add-opens=java.base/java.lang=ALL-UNNAMED",
         "--add-opens=java.base/jdk.internal.misc=ALL-UNNAMED",
         "--add-opens=jdk.unsupported/sun.misc=ALL-UNNAMED"
@@ -414,7 +408,6 @@ pitest {
         "-Xms512m",
         "-XX:+EnableDynamicAgentLoading",
         "-Xshare:off",
-        *argumentosJvmSemAvisoUnsafe.toTypedArray(),
         "--add-opens=java.base/java.lang=ALL-UNNAMED",
         "--add-opens=java.base/jdk.internal.misc=ALL-UNNAMED",
         "--add-opens=jdk.unsupported/sun.misc=ALL-UNNAMED"
