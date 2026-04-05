@@ -34,8 +34,8 @@ class ValidadorDadosOrganizacionaisExtraCoverageTest {
         ResponsabilidadeLeitura r2 = new ResponsabilidadeLeitura(1L, "T2");
         when(responsabilidadeRepo.listarLeiturasPorCodigosUnidade(anyList())).thenReturn(List.of(r1, r2));
         
-        lenient().when(usuarioRepo.findAllById(anyList())).thenReturn(Collections.emptyList());
-        lenient().when(namedParameterJdbcTemplate.queryForList(anyString(), any(Map.class))).thenReturn(Collections.emptyList());
+        when(usuarioRepo.findAllById(anyList())).thenReturn(Collections.emptyList());
+        when(namedParameterJdbcTemplate.queryForList(anyString(), ArgumentMatchers.<Map<String, ?>>any())).thenReturn(Collections.emptyList());
 
         DiagnosticoOrganizacionalDto res = target.diagnosticar();
         assertThat(res).isNotNull();
@@ -47,8 +47,6 @@ class ValidadorDadosOrganizacionaisExtraCoverageTest {
         UnidadeHierarquiaLeitura u = new UnidadeHierarquiaLeitura(1L, "Nome", "U1", null, TipoUnidade.OPERACIONAL, SituacaoUnidade.ATIVA, null);
         when(unidadeRepo.listarEstruturasAtivas()).thenReturn(List.of(u));
         when(responsabilidadeRepo.listarLeiturasPorCodigosUnidade(anyList())).thenReturn(Collections.emptyList());
-        lenient().when(usuarioRepo.findAllById(anyList())).thenReturn(Collections.emptyList());
-        lenient().when(namedParameterJdbcTemplate.queryForList(anyString(), any(Map.class))).thenReturn(Collections.emptyList());
 
         DiagnosticoOrganizacionalDto res = target.diagnosticar();
         assertThat(res.resumo()).contains("U1");
@@ -65,16 +63,16 @@ class ValidadorDadosOrganizacionaisExtraCoverageTest {
         ResponsabilidadeLeitura r1 = new ResponsabilidadeLeitura(1L, "GESTOR1");
         when(responsabilidadeRepo.listarLeiturasPorCodigosUnidade(anyList())).thenReturn(List.of(r1));
         
-        lenient().when(usuarioRepo.findAllById(anyList())).thenReturn(Collections.emptyList());
+        when(usuarioRepo.findAllById(anyList())).thenReturn(Collections.emptyList());
         
         Map<String, Object> p1 = new HashMap<>();
         p1.put("USUARIO_TITULO", "GESTOR1");
         p1.put("PERFIL", "GESTOR");
         p1.put("UNIDADE_CODIGO", 1L);
         
-        when(namedParameterJdbcTemplate.queryForList(contains("vw_usuario_perfil_unidade"), any(Map.class)))
+        when(namedParameterJdbcTemplate.queryForList(contains("vw_usuario_perfil_unidade"), ArgumentMatchers.<Map<String, ?>>any()))
                 .thenReturn(List.of(p1));
-        lenient().when(namedParameterJdbcTemplate.queryForList(contains("vw_usuario"), any(Map.class)))
+        when(namedParameterJdbcTemplate.queryForList(contains("FROM sgc.vw_usuario\n"), ArgumentMatchers.<Map<String, ?>>any()))
                 .thenReturn(Collections.emptyList());
 
         DiagnosticoOrganizacionalDto res = target.diagnosticar();

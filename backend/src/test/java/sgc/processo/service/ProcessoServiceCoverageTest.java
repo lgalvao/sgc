@@ -364,7 +364,9 @@ class ProcessoServiceCoverageTest {
         mockarResponsaveisEfetivos();
         when(unidadeService.buscarAdmin()).thenReturn(new Unidade());
 
-        assertThatThrownBy(() -> target.iniciar(cod, List.of(10L, 11L), new Usuario()))
+        List<Long> codigos = List.of(10L, 11L);
+        Usuario usuario = new Usuario();
+        assertThatThrownBy(() -> target.iniciar(cod, codigos, usuario))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("Unidade 11 ausente para iniciar subprocesso");
     }

@@ -267,10 +267,7 @@ class SubprocessoServiceExtraCoverageTest {
             subprocessoService.criarParaMapeamento(p, List.of(u1, u2, u3, u4), null, new Usuario());
 
             verify(subprocessoRepo).saveAll(argThat(subprocessos -> {
-                int quantidade = 0;
-                for (Subprocesso ignored : subprocessos) {
-                    quantidade++;
-                }
+                long quantidade = java.util.stream.StreamSupport.stream(subprocessos.spliterator(), false).count();
                 return quantidade == 2;
             }));
         }
