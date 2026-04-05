@@ -3,7 +3,7 @@
       :columns="colunas"
       :data="mapeamentoHierarquia"
       :title="TEXTOS.subprocesso.DETALHE_UNIDADES_TITULO"
-      @row-click="$emit('row-click', $event)"
+      @row-click="emitirCliqueLinha"
   />
 </template>
 
@@ -14,12 +14,24 @@ import type {UnidadeParticipante} from "@/types/tipos";
 import {formatDate, formatSituacaoSubprocesso} from "@/utils/formatters";
 import {TEXTOS} from "@/constants/textos";
 
+type LinhaSubprocessoArvore = {
+  codigo: number;
+  unidadeAtual: string;
+  sigla: string;
+  situacao: string;
+  situacaoTooltip: string;
+  dataLimite: string;
+  children: LinhaSubprocessoArvore[];
+  expanded: true;
+  clickable: boolean;
+};
+
 const props = defineProps<{
   participantesHierarquia: UnidadeParticipante[];
 }>();
 
-defineEmits<{
-  'row-click': [item: any];
+const emit = defineEmits<{
+  'row-click': [item: LinhaSubprocessoArvore];
 }>();
 
 const colunas = [
@@ -32,8 +44,7 @@ const mapeamentoHierarquia = computed(() => {
   return mapUnidades(props.participantesHierarquia);
 });
 
-function mapUnidades(unidades: UnidadeParticipante[]): any[] {
-  if (!unidades) return [];
+function mapUnidades(unidades: UnidadeParticipante[]): LinhaSubprocessoArvore[] {
   return unidades.map(u => ({
     codigo: u.codUnidade,
     unidadeAtual: `${u.sigla} - ${u.nome}`,
@@ -45,5 +56,9 @@ function mapUnidades(unidades: UnidadeParticipante[]): any[] {
     expanded: true,
     clickable: u.codSubprocesso > 0
   }));
+}
+
+function emitirCliqueLinha(item: unknown) {
+  emit('row-click', item as LinhaSubprocessoArvore);
 }
 </script>

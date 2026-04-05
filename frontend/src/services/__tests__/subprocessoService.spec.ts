@@ -1,6 +1,7 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import * as subprocessoService from '../subprocessoService';
 import apiClient from '@/axios-setup';
+import {SituacaoSubprocesso, TipoProcesso} from '@/types/tipos';
 
 vi.mock('@/axios-setup', () => ({
   default: {
@@ -18,9 +19,12 @@ describe('subprocessoService', () => {
     vi.clearAllMocks();
   });
 
+  const getMock = vi.mocked(apiClient.get);
+  const postMock = vi.mocked(apiClient.post);
+
   describe('importarAtividades', () => {
     it('deve chamar a API corretamente com codigos', async () => {
-      (apiClient.post as any).mockResolvedValueOnce({ data: { message: 'Atividades importadas.' } });
+      postMock.mockResolvedValueOnce({ data: { message: 'Atividades importadas.' } } as never);
       await subprocessoService.importarAtividades(1, 2, [3, 4]);
       expect(apiClient.post).toHaveBeenCalledWith('/subprocessos/1/importar-atividades', {
         codSubprocessoOrigem: 2,
@@ -29,7 +33,7 @@ describe('subprocessoService', () => {
     });
 
     it('deve chamar a API corretamente sem codigos', async () => {
-      (apiClient.post as any).mockResolvedValueOnce({ data: { message: 'Atividades importadas.' } });
+      postMock.mockResolvedValueOnce({ data: { message: 'Atividades importadas.' } } as never);
       await subprocessoService.importarAtividades(1, 2);
       expect(apiClient.post).toHaveBeenCalledWith('/subprocessos/1/importar-atividades', {
         codSubprocessoOrigem: 2
@@ -38,38 +42,58 @@ describe('subprocessoService', () => {
 
     it('deve retornar aviso quando há duplicatas', async () => {
       const aviso = 'Uma ou mais atividades selecionadas já existem no cadastro e não foram importadas.';
-      (apiClient.post as any).mockResolvedValueOnce({ data: { message: 'Atividades importadas.', aviso } });
+      postMock.mockResolvedValueOnce({ data: { message: 'Atividades importadas.', aviso } } as never);
       const resultado = await subprocessoService.importarAtividades(1, 2, [3]);
       expect(resultado.aviso).toBe(aviso);
     });
   });
 
   it('listarAtividades', async () => {
-    (apiClient.get as any).mockResolvedValueOnce({ data: { atividadesDisponiveis: [] } });
+    getMock.mockResolvedValueOnce({ data: { atividadesDisponiveis: [] } } as never);
     await subprocessoService.listarAtividades(1);
     expect(apiClient.get).toHaveBeenCalledWith('/subprocessos/1/contexto-edicao');
   });
 
   it('listarAtividadesParaImportacao', async () => {
-    (apiClient.get as any).mockResolvedValueOnce({ data: [] });
+    getMock.mockResolvedValueOnce({ data: [] } as never);
     await subprocessoService.listarAtividadesParaImportacao(1);
     expect(apiClient.get).toHaveBeenCalledWith('/subprocessos/1/atividades-importacao');
   });
 
   it('validarCadastro', async () => {
-    (apiClient.get as any).mockResolvedValueOnce({ data: { isValid: true } });
+    getMock.mockResolvedValueOnce({ data: { valido: true, erros: [] } } as never);
     await subprocessoService.validarCadastro(1);
     expect(apiClient.get).toHaveBeenCalledWith('/subprocessos/1/validar-cadastro');
   });
 
   it('obterStatus', async () => {
-    (apiClient.get as any).mockResolvedValueOnce({ data: {} });
+    getMock.mockResolvedValueOnce({ data: { codigo: 1, situacao: SituacaoSubprocesso.NAO_INICIADO } } as never);
     await subprocessoService.obterStatus(1);
     expect(apiClient.get).toHaveBeenCalledWith('/subprocessos/1/status');
   });
 
   it('buscarSubprocessoDetalhe', async () => {
-    (apiClient.get as any).mockResolvedValueOnce({ data: {} });
+    getMock.mockResolvedValueOnce({ data: {
+      subprocesso: {
+        codigo: 1,
+        unidade: { codigo: 1, nome: 'Unidade', sigla: 'UND' },
+        situacao: SituacaoSubprocesso.NAO_INICIADO,
+        dataLimiteEtapa1: '2025-01-01T00:00:00',
+        dataFimEtapa1: null,
+        dataLimiteEtapa2: null,
+        dataFimEtapa2: null,
+        processoDescricao: 'Processo',
+        dataCriacaoProcesso: '2024-01-01T00:00:00',
+        tipoProcesso: TipoProcesso.MAPEAMENTO,
+        isEmAndamento: true,
+        etapaAtual: 1,
+      },
+      titular: null,
+      responsavel: null,
+      movimentacoes: [],
+      localizacaoAtual: 'UND',
+      permissoes: {},
+    } } as never);
     await subprocessoService.buscarSubprocessoDetalhe(1, 'ADMIN', 2);
     expect(apiClient.get).toHaveBeenCalledWith('/subprocessos/1', {
       params: { perfil: 'ADMIN', unidadeUsuario: 2 }
@@ -77,7 +101,39 @@ describe('subprocessoService', () => {
   });
 
   it('buscarContextoEdicao', async () => {
-    (apiClient.get as any).mockResolvedValueOnce({ data: {} });
+    getMock.mockResolvedValueOnce({ data: {
+      unidade: { codigo: 1, nome: 'Unidade', sigla: 'UND' },
+      subprocesso: {
+        codigo: 1,
+        unidade: { codigo: 1, nome: 'Unidade', sigla: 'UND' },
+        situacao: SituacaoSubprocesso.NAO_INICIADO,
+        dataLimite: '2025-01-01T00:00:00',
+        dataFimEtapa1: '',
+        dataLimiteEtapa2: '',
+        atividades: [],
+        codUnidade: 1,
+      },
+      detalhes: {
+        codigo: 1,
+        unidade: { codigo: 1, nome: 'Unidade', sigla: 'UND' },
+        titular: null,
+        responsavel: null,
+        situacao: SituacaoSubprocesso.NAO_INICIADO,
+        localizacaoAtual: 'UND',
+        processoDescricao: 'Processo',
+        dataCriacaoProcesso: '2024-01-01T00:00:00',
+        ultimaDataLimiteSubprocesso: '2025-01-01T00:00:00',
+        tipoProcesso: TipoProcesso.MAPEAMENTO,
+        prazoEtapaAtual: '2025-01-01T00:00:00',
+        isEmAndamento: true,
+        etapaAtual: 1,
+        movimentacoes: [],
+        elementosProcesso: [],
+        permissoes: {},
+      },
+      mapa: { codigo: 1, subprocessoCodigo: 1, observacoes: '', competencias: [], situacao: '' },
+      atividadesDisponiveis: [],
+    } } as never);
     await subprocessoService.buscarContextoEdicao(1, 'ADMIN', 2);
     expect(apiClient.get).toHaveBeenCalledWith('/subprocessos/1/contexto-edicao', {
       params: { perfil: 'ADMIN', unidadeUsuario: 2 }
@@ -85,7 +141,7 @@ describe('subprocessoService', () => {
   });
 
   it('buscarSubprocessoPorProcessoEUnidade', async () => {
-    (apiClient.get as any).mockResolvedValueOnce({ data: {} });
+    getMock.mockResolvedValueOnce({ data: { codigo: 1 } } as never);
     await subprocessoService.buscarSubprocessoPorProcessoEUnidade(1, 'SIGLA');
     expect(apiClient.get).toHaveBeenCalledWith('/subprocessos/buscar', {
       params: { codProcesso: 1, siglaUnidade: 'SIGLA' }
@@ -93,49 +149,51 @@ describe('subprocessoService', () => {
   });
 
   it('obterMapaVisualizacao', async () => {
-    (apiClient.get as any).mockResolvedValueOnce({ data: {} });
+    getMock.mockResolvedValueOnce({ data: { codigo: 1, descricao: '', competencias: [] } } as never);
     await subprocessoService.obterMapaVisualizacao(1);
     expect(apiClient.get).toHaveBeenCalledWith('/subprocessos/1/mapa-visualizacao');
   });
 
   it('verificarImpactosMapa', async () => {
-    (apiClient.get as any).mockResolvedValueOnce({ 
+    getMock.mockResolvedValueOnce({ 
       data: { 
         temImpactos: true,
-        inseridas: [1],
+        inseridas: [],
         totalInseridas: 1
       } 
-    });
+    } as never);
     const result = await subprocessoService.verificarImpactosMapa(1);
     expect(apiClient.get).toHaveBeenCalledWith('/subprocessos/1/impactos-mapa');
     expect(result.temImpactos).toBe(true);
-    expect(result.atividadesInseridas).toEqual([1]);
+    expect(result.atividadesInseridas).toEqual([]);
     expect(result.atividadesRemovidas).toEqual([]); // fallback
     expect(result.totalAtividadesInseridas).toBe(1);
   });
 
   it('obterMapaCompleto', async () => {
-    (apiClient.get as any).mockResolvedValueOnce({ data: {} });
+    getMock.mockResolvedValueOnce({ data: { codigo: 1, subprocessoCodigo: 1, observacoes: '', competencias: [], situacao: '' } } as never);
     await subprocessoService.obterMapaCompleto(1);
     expect(apiClient.get).toHaveBeenCalledWith('/subprocessos/1/mapa-completo');
   });
 
   it('salvarMapaCompleto', async () => {
-    (apiClient.post as any).mockResolvedValueOnce({ data: {} });
-    await subprocessoService.salvarMapaCompleto(1, { foo: 'bar' });
-    expect(apiClient.post).toHaveBeenCalledWith('/subprocessos/1/mapa-completo', { foo: 'bar' });
+    const payload = { competencias: [] };
+    postMock.mockResolvedValueOnce({ data: { codigo: 1, subprocessoCodigo: 1, observacoes: '', competencias: [], situacao: '' } } as never);
+    await subprocessoService.salvarMapaCompleto(1, payload);
+    expect(apiClient.post).toHaveBeenCalledWith('/subprocessos/1/mapa-completo', payload);
   });
 
   it('obterMapaAjuste', async () => {
-    (apiClient.get as any).mockResolvedValueOnce({ data: {} });
+    getMock.mockResolvedValueOnce({ data: { codigo: 1, descricao: '', competencias: [] } } as never);
     await subprocessoService.obterMapaAjuste(1);
     expect(apiClient.get).toHaveBeenCalledWith('/subprocessos/1/mapa-ajuste');
   });
 
   it('salvarMapaAjuste', async () => {
-    (apiClient.post as any).mockResolvedValueOnce({ data: {} });
-    await subprocessoService.salvarMapaAjuste(1, { foo: 'bar' });
-    expect(apiClient.post).toHaveBeenCalledWith('/subprocessos/1/mapa-ajuste/atualizar', { foo: 'bar' });
+    const payload = { competencias: [], atividades: [], sugestoes: '' };
+    postMock.mockResolvedValueOnce({ data: {} } as never);
+    await subprocessoService.salvarMapaAjuste(1, payload);
+    expect(apiClient.post).toHaveBeenCalledWith('/subprocessos/1/mapa-ajuste/atualizar', payload);
   });
 
   it('disponibilizarMapa', async () => {
@@ -144,19 +202,19 @@ describe('subprocessoService', () => {
   });
 
   it('adicionarCompetencia', async () => {
-    (apiClient.post as any).mockResolvedValueOnce({ data: {} });
+    postMock.mockResolvedValueOnce({ data: { codigo: 1, subprocessoCodigo: 1, observacoes: '', competencias: [], situacao: '' } } as never);
     await subprocessoService.adicionarCompetencia(1, { descricao: 'desc', atividadesIds: [1] });
     expect(apiClient.post).toHaveBeenCalledWith('/subprocessos/1/competencia', { descricao: 'desc', atividadesIds: [1] });
   });
 
   it('atualizarCompetencia', async () => {
-    (apiClient.post as any).mockResolvedValueOnce({ data: {} });
+    postMock.mockResolvedValueOnce({ data: { codigo: 1, subprocessoCodigo: 1, observacoes: '', competencias: [], situacao: '' } } as never);
     await subprocessoService.atualizarCompetencia(1, 2, { descricao: 'desc', atividadesIds: [1] });
     expect(apiClient.post).toHaveBeenCalledWith('/subprocessos/1/competencia/2', { descricao: 'desc', atividadesIds: [1] });
   });
 
   it('removerCompetencia', async () => {
-    (apiClient.post as any).mockResolvedValueOnce({ data: {} });
+    postMock.mockResolvedValueOnce({ data: { codigo: 1, subprocessoCodigo: 1, observacoes: '', competencias: [], situacao: '' } } as never);
     await subprocessoService.removerCompetencia(1, 2);
     expect(apiClient.post).toHaveBeenCalledWith('/subprocessos/1/competencia/2/remover');
   });
@@ -187,13 +245,13 @@ describe('subprocessoService', () => {
   });
 
   it('listarAnalisesCadastro', async () => {
-    (apiClient.get as any).mockResolvedValueOnce({ data: [] });
+    getMock.mockResolvedValueOnce({ data: [] } as never);
     await subprocessoService.listarAnalisesCadastro(1);
     expect(apiClient.get).toHaveBeenCalledWith('/subprocessos/1/historico-cadastro');
   });
 
   it('listarAnalisesValidacao', async () => {
-    (apiClient.get as any).mockResolvedValueOnce({ data: [] });
+    getMock.mockResolvedValueOnce({ data: [] } as never);
     await subprocessoService.listarAnalisesValidacao(1);
     expect(apiClient.get).toHaveBeenCalledWith('/subprocessos/1/historico-validacao');
   });

@@ -1,17 +1,17 @@
 import {describe, expect, it} from "vitest";
 import {mount} from "@vue/test-utils";
 import ProcessoSubprocessosTable from "../ProcessoSubprocessosTable.vue";
-import {SituacaoSubprocesso} from "@/types/tipos";
+import {SituacaoSubprocesso, type UnidadeParticipante} from "@/types/tipos";
 
 describe("ProcessoSubprocessosTable.vue", () => {
-    const participantesMock = [
+    const participantesMock: UnidadeParticipante[] = [
         {
             codUnidade: 1,
             sigla: "ADMIN",
             nome: "Administração",
             codSubprocesso: 0, // Unidade sem subprocesso
-            situacaoSubprocesso: null as any,
-            dataLimite: null as any,
+            situacaoSubprocesso: SituacaoSubprocesso.NAO_INICIADO,
+            dataLimite: "",
             filhos: [
                 {
                     codUnidade: 2,
@@ -36,13 +36,17 @@ describe("ProcessoSubprocessosTable.vue", () => {
         // O mapeamentoHierarquia é uma computed, podemos verificar via vm (em teste unitário)
         // ou verificando as propriedades passadas para o TreeTable
         const treeTable = wrapper.findComponent({ name: 'TreeTable' });
-        const data = treeTable.props('data');
+        const data = treeTable.props('data') as Array<{
+            sigla: string;
+            clickable: boolean;
+            children: Array<{sigla: string; clickable: boolean}>;
+        }>;
 
-        const admin = data.find((u: any) => u.sigla === "ADMIN");
-        const sec = admin.children.find((u: any) => u.sigla === "SEC");
+        const admin = data.find((u) => u.sigla === "ADMIN");
+        const sec = admin?.children.find((u) => u.sigla === "SEC");
 
-        expect(admin.clickable).toBe(false);
-        expect(sec.clickable).toBe(true);
+        expect(admin?.clickable).toBe(false);
+        expect(sec?.clickable).toBe(true);
     });
 
     it("deve formatar corretamente os dados para a tabela", () => {

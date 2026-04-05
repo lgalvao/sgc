@@ -1,13 +1,18 @@
 import type {
     Analise,
     Atividade,
+    AtividadeImpactada,
+    CompetenciaImpactada,
     ContextoEdicaoSubprocesso,
     DisponibilizarMapaRequest,
     ImpactoMapa,
     MapaAjuste,
     MapaCompleto,
     MapaVisualizacao,
+    SalvarAjustesRequest,
     SalvarCompetenciaRequest,
+    SalvarMapaRequest,
+    SubprocessoStatus,
     SubprocessoDetalheResponse,
     ValidacaoCadastro
 } from "@/types/tipos";
@@ -16,6 +21,22 @@ import apiClient from "../axios-setup";
 interface ImportarAtividadesRequest {
     codSubprocessoOrigem: number;
     codigosAtividades?: number[];
+}
+
+interface BuscarSubprocessoPorProcessoEUnidadeResponse {
+    codigo: number;
+}
+
+interface ImpactoMapaResponse {
+    temImpactos: boolean;
+    inseridas?: AtividadeImpactada[];
+    removidas?: AtividadeImpactada[];
+    alteradas?: AtividadeImpactada[];
+    competenciasImpactadas?: CompetenciaImpactada[];
+    totalInseridas?: number;
+    totalRemovidas?: number;
+    totalAlteradas?: number;
+    totalCompetenciasImpactadas?: number;
 }
 
 export async function importarAtividades(
@@ -49,8 +70,8 @@ export async function validarCadastro(codSubprocesso: number): Promise<Validacao
     return response.data;
 }
 
-export async function obterStatus(codSubprocesso: number): Promise<any> {
-    const response = await apiClient.get<any>(`/subprocessos/${codSubprocesso}/status`);
+export async function obterStatus(codSubprocesso: number): Promise<SubprocessoStatus> {
+    const response = await apiClient.get<SubprocessoStatus>(`/subprocessos/${codSubprocesso}/status`);
     return response.data;
 }
 
@@ -79,8 +100,8 @@ export async function buscarContextoEdicao(
 export async function buscarSubprocessoPorProcessoEUnidade(
     codProcesso: number,
     siglaUnidade: string,
-) {
-    const response = await apiClient.get("/subprocessos/buscar", {
+): Promise<BuscarSubprocessoPorProcessoEUnidadeResponse> {
+    const response = await apiClient.get<BuscarSubprocessoPorProcessoEUnidadeResponse>("/subprocessos/buscar", {
         params: {codProcesso, siglaUnidade},
     });
     return response.data;
@@ -98,47 +119,46 @@ export async function obterMapaVisualizacao(
 }
 
 export async function verificarImpactosMapa(codSubprocesso: number): Promise<ImpactoMapa> {
-    const response = await apiClient.get<any>(`/subprocessos/${codSubprocesso}/impactos-mapa`);
+    const response = await apiClient.get<ImpactoMapaResponse>(`/subprocessos/${codSubprocesso}/impactos-mapa`);
     const data = response.data;
 
-    // Mapeamento manual para garantir compatibilidade com a interface do frontend
     return {
         temImpactos: data.temImpactos,
-        atividadesInseridas: data.inseridas || [],
-        atividadesRemovidas: data.removidas || [],
-        atividadesAlteradas: data.alteradas || [],
-        competenciasImpactadas: data.competenciasImpactadas || [],
-        totalAtividadesInseridas: data.totalInseridas || 0,
-        totalAtividadesRemovidas: data.totalRemovidas || 0,
-        totalAtividadesAlteradas: data.totalAlteradas || 0,
-        totalCompetenciasImpactadas: data.totalCompetenciasImpactadas || 0
+        atividadesInseridas: data.inseridas ?? [],
+        atividadesRemovidas: data.removidas ?? [],
+        atividadesAlteradas: data.alteradas ?? [],
+        competenciasImpactadas: data.competenciasImpactadas ?? [],
+        totalAtividadesInseridas: data.totalInseridas ?? 0,
+        totalAtividadesRemovidas: data.totalRemovidas ?? 0,
+        totalAtividadesAlteradas: data.totalAlteradas ?? 0,
+        totalCompetenciasImpactadas: data.totalCompetenciasImpactadas ?? 0
     };
 }
 
 export async function obterMapaCompleto(codSubprocesso: number): Promise<MapaCompleto> {
-    const response = await apiClient.get(`/subprocessos/${codSubprocesso}/mapa-completo`);
-    return response.data as MapaCompleto;
+    const response = await apiClient.get<MapaCompleto>(`/subprocessos/${codSubprocesso}/mapa-completo`);
+    return response.data;
 }
 
 export async function salvarMapaCompleto(
     codSubprocesso: number,
-    data: any,
+    data: SalvarMapaRequest,
 ): Promise<MapaCompleto> {
-    const response = await apiClient.post(
+    const response = await apiClient.post<MapaCompleto>(
         `/subprocessos/${codSubprocesso}/mapa-completo`,
         data,
     );
-    return response.data as MapaCompleto;
+    return response.data;
 }
 
 export async function obterMapaAjuste(codSubprocesso: number): Promise<MapaAjuste> {
-    const response = await apiClient.get(`/subprocessos/${codSubprocesso}/mapa-ajuste`);
-    return response.data as MapaAjuste;
+    const response = await apiClient.get<MapaAjuste>(`/subprocessos/${codSubprocesso}/mapa-ajuste`);
+    return response.data;
 }
 
 export async function salvarMapaAjuste(
     codSubprocesso: number,
-    data: any,
+    data: SalvarAjustesRequest,
 ): Promise<void> {
     await apiClient.post(
         `/subprocessos/${codSubprocesso}/mapa-ajuste/atualizar`,
@@ -252,10 +272,10 @@ export async function disponibilizarMapaEmBloco(
 export const listarAnalisesCadastro = async (
     codSubprocesso: number,
 ): Promise<Analise[]> => {
-    const response = await apiClient.get(
+    const response = await apiClient.get<Analise[]>(
         `/subprocessos/${codSubprocesso}/historico-cadastro`,
     );
-    return response.data as Analise[];
+    return response.data;
 };
 
 export const listarAnalisesValidacao = async (
