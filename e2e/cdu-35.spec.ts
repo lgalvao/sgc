@@ -1,5 +1,5 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
-import {criarProcessoFixture} from './fixtures/fixtures-processos.js';
+import {criarProcessoFixture} from './fixtures/index.js';
 
 /**
  * CDU-35 - Gerar relatório de andamento

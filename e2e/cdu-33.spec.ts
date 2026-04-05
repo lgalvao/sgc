@@ -2,7 +2,7 @@ import {expect, test} from './fixtures/complete-fixtures.js';
 import {
     criarProcessoMapaHomologadoFixture,
     criarProcessoRevisaoMapaHomologadoFixture
-} from './fixtures/fixtures-processos.js';
+} from './fixtures/index.js';
 import {acessarSubprocessoAdmin} from './helpers/helpers-analise.js';
 import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
 import {verificarAppAlert, verificarPaginaPainel} from './helpers/helpers-navegacao.js';

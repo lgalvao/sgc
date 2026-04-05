@@ -1,5 +1,5 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
-import {criarProcessoFixture} from './fixtures/fixtures-processos.js';
+import {criarProcessoFixture} from './fixtures/index.js';
 import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';

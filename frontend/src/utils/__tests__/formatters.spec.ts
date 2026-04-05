@@ -5,7 +5,7 @@ import {
     formatSituacaoProcesso,
     formatSituacaoSubprocesso,
     formatTipoProcesso
-} from '../formatters';
+} from '@/utils';
 import {SituacaoProcesso, SituacaoSubprocesso, TipoProcesso} from '@/types/tipos';
 
 describe('formatters', () => {

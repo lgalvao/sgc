@@ -1,5 +1,5 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
-import {criarProcessoMapaHomologadoFixture} from './fixtures/fixtures-processos.js';
+import {criarProcessoMapaHomologadoFixture} from './fixtures/index.js';
 
 /**
  * CDU-36 - Gerar relatório de mapas
