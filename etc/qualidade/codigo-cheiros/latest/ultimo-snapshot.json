@@ -1,0 +1,152 @@
+{
+  "geradoEm": "2026-04-05T13:47:59.250Z",
+  "base": "/Users/leonardo/sgc",
+  "pontuacao": {
+    "total": 1683,
+    "faixa": "critico",
+    "porEscopo": {
+      "backend": 857,
+      "frontend": 351,
+      "frontend_testes": 475
+    }
+  },
+  "contagens": {
+    "backend_nullable_dto": 91,
+    "backend_null_checks": 196,
+    "backend_objects_null": 5,
+    "frontend_any_producao": 66,
+    "frontend_any_testes": 475,
+    "frontend_catch_any": 9,
+    "frontend_null_checks": 16,
+    "frontend_fallback_or": 28
+  },
+  "deltas": {
+    "backend_nullable_dto": 0,
+    "backend_null_checks": 0,
+    "backend_objects_null": 0,
+    "frontend_any_producao": 0,
+    "frontend_any_testes": -108,
+    "frontend_catch_any": 0,
+    "frontend_null_checks": 0,
+    "frontend_fallback_or": 0
+  },
+  "hotspots": [
+    {
+      "arquivo": "backend/src/main/java/sgc/subprocesso/dto/SubprocessoListagemDto.java",
+      "pontuacao": 39,
+      "categorias": {
+        "backend_nullable_dto": 7,
+        "backend_null_checks": 2
+      }
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/subprocesso/dto/SubprocessoResumoDto.java",
+      "pontuacao": 39,
+      "categorias": {
+        "backend_nullable_dto": 7,
+        "backend_null_checks": 2
+      }
+    },
+    {
+      "arquivo": "frontend/src/views/__tests__/AtividadesCadastroView.spec.ts",
+      "pontuacao": 37,
+      "categorias": {
+        "frontend_any_testes": 37
+      }
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/organizacao/dto/UnidadeDto.java",
+      "pontuacao": 36,
+      "categorias": {
+        "backend_nullable_dto": 6,
+        "backend_null_checks": 3
+      }
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/processo/service/ProcessoService.java",
+      "pontuacao": 32,
+      "categorias": {
+        "backend_null_checks": 15,
+        "backend_objects_null": 1
+      }
+    },
+    {
+      "arquivo": "frontend/src/views/__tests__/SubprocessoView.spec.ts",
+      "pontuacao": 31,
+      "categorias": {
+        "frontend_any_testes": 31
+      }
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/e2e/E2eController.java",
+      "pontuacao": 30,
+      "categorias": {
+        "backend_null_checks": 15
+      }
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/organizacao/ValidadorDadosOrganizacionais.java",
+      "pontuacao": 28,
+      "categorias": {
+        "backend_null_checks": 12,
+        "backend_objects_null": 2
+      }
+    },
+    {
+      "arquivo": "frontend/src/test-utils/uiHelpers.ts",
+      "pontuacao": 28,
+      "categorias": {
+        "frontend_any_producao": 7
+      }
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/processo/dto/ProcessoDetalheDto.java",
+      "pontuacao": 27,
+      "categorias": {
+        "backend_nullable_dto": 5,
+        "backend_null_checks": 1
+      }
+    },
+    {
+      "arquivo": "frontend/src/views/__tests__/CadastroVisualizacaoView.spec.ts",
+      "pontuacao": 26,
+      "categorias": {
+        "frontend_any_testes": 26
+      }
+    },
+    {
+      "arquivo": "frontend/src/views/ProcessoDetalheView.vue",
+      "pontuacao": 26,
+      "categorias": {
+        "frontend_any_producao": 4,
+        "frontend_catch_any": 2,
+        "frontend_fallback_or": 4
+      }
+    },
+    {
+      "arquivo": "frontend/src/utils/apiError.ts",
+      "pontuacao": 23,
+      "categorias": {
+        "frontend_any_producao": 5,
+        "frontend_null_checks": 1,
+        "frontend_fallback_or": 1
+      }
+    },
+    {
+      "arquivo": "frontend/src/views/__tests__/AtribuicaoTemporariaView.spec.ts",
+      "pontuacao": 21,
+      "categorias": {
+        "frontend_any_testes": 21
+      }
+    },
+    {
+      "arquivo": "frontend/src/views/ProcessoCadastroView.vue",
+      "pontuacao": 21,
+      "categorias": {
+        "frontend_any_producao": 4,
+        "frontend_catch_any": 1,
+        "frontend_fallback_or": 2
+      }
+    }
+  ]
+}

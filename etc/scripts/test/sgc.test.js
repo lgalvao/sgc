@@ -51,6 +51,53 @@ describe("CLI raiz do toolkit", () => {
         expect(resultado.stdout).toContain("Consulta cobertura global e por classe.");
     });
 
+    test("audita cheiros de codigo em um recorte controlado", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-smells-"));
+        const frontendDir = path.join(base, "frontend", "src");
+        const backendDir = path.join(base, "backend", "src", "main", "java", "sgc", "exemplo", "dto");
+
+        await fs.outputFile(
+            path.join(frontendDir, "Exemplo.ts"),
+            [
+                "export function exemplo(valor: any) {",
+                "  if (valor === null) return valor || [];",
+                "  return valor as any;",
+                "}"
+            ].join("\n")
+        );
+
+        await fs.outputFile(
+            path.join(backendDir, "ExemploDto.java"),
+            [
+                "package sgc.exemplo.dto;",
+                "import org.jspecify.annotations.Nullable;",
+                "public record ExemploDto(@Nullable String nome) {",
+                "  public boolean vazio(String valor) {",
+                "    return valor == null;",
+                "  }",
+                "}"
+            ].join("\n")
+        );
+
+        const resultado = await executarSgc([
+            "codigo",
+            "smells",
+            "auditar",
+            "--json",
+            "--sem-gravar",
+            "--base",
+            base
+        ]);
+
+        expect(resultado.exitCode).toBe(0);
+        const conteudo = JSON.parse(resultado.stdout);
+        expect(conteudo.contagens.backend_nullable_dto).toBe(1);
+        expect(conteudo.contagens.backend_null_checks).toBe(1);
+        expect(conteudo.contagens.frontend_any_producao).toBe(2);
+        expect(conteudo.contagens.frontend_null_checks).toBe(1);
+        expect(conteudo.contagens.frontend_fallback_or).toBe(1);
+    });
+
     test("analisa testes do backend com resumo no console e sidecar JSON", async () => {
         const diretorioSaida = await mkdtemp(path.join(os.tmpdir(), "sgc-testes-analisar-"));
         const markdown = path.join(diretorioSaida, "relatorio.md");
@@ -233,9 +280,18 @@ describe("CLI raiz do toolkit", () => {
         const jacoco = path.join(base, "jacoco.xml");
 
         await fs.outputFile(path.join(srcDir, "ClasseDireta.java"), "package sgc.exemplo; public class ClasseDireta {}");
-        await fs.outputFile(path.join(srcDir, "ClasseIndireta.java"), "package sgc.exemplo; public class ClasseIndireta {}");
-        await fs.outputFile(path.join(srcDir, "ClasseSemEvidencia.java"), "package sgc.exemplo; public class ClasseSemEvidencia {}");
-        await fs.outputFile(path.join(srcDir, "ClasseForaEscopo.java"), "package sgc.exemplo; public class ClasseForaEscopo {}");
+        await fs.outputFile(
+            path.join(srcDir, "ClasseIndireta.java"),
+            "package sgc.exemplo; public class ClasseIndireta { public String calcular(boolean ativo) { return ativo ? \"ok\" : \"pendente\"; } }"
+        );
+        await fs.outputFile(
+            path.join(srcDir, "ClasseSemEvidencia.java"),
+            "package sgc.exemplo; public class ClasseSemEvidencia { public boolean validar(String valor) { return valor != null && !valor.isBlank(); } }"
+        );
+        await fs.outputFile(
+            path.join(srcDir, "ClasseForaEscopo.java"),
+            "package sgc.exemplo; public class ClasseForaEscopo { public int contarPositivos(java.util.List<Integer> valores) { return (int) valores.stream().filter(valor -> valor > 0).count(); } }"
+        );
         await fs.outputFile(path.join(testDir, "ClasseDiretaTest.java"), "package sgc.exemplo; class ClasseDiretaTest {}");
         await fs.outputFile(jacoco, `
 <report name="fake">

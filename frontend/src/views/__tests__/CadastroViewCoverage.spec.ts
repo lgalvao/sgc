@@ -6,18 +6,72 @@ import * as useAcessoModule from "@/composables/useAcesso";
 import * as useFluxoSubprocessoModule from "@/composables/useFluxoSubprocesso";
 import {useMapas} from "@/composables/useMapas";
 import * as subprocessoService from "@/services/subprocessoService";
+import type {ContextoEdicaoSubprocesso, PermissoesSubprocesso} from "@/types/tipos";
 import {SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 import CadastroView from "../CadastroView.vue";
 import {contarChamadas} from "@/test-utils/orcamentoChamadas";
 
 const {pushMock} = vi.hoisted(() => ({pushMock: vi.fn()}));
+
+type SubprocessoMinimo = {
+    codigo: number;
+    situacao: SituacaoSubprocesso;
+    tipoProcesso: TipoProcesso;
+};
+
+type AtividadeMinima = {
+    codigo: number;
+    descricao?: string;
+    conhecimentos?: Array<{codigo: number; descricao?: string}>;
+};
+
+type CadastroViewVm = {
+    codSubprocesso: number | null;
+    erroGlobal: string | null;
+    atividades: AtividadeMinima[];
+    mostrarModalConfirmacaoRemocao: boolean;
+    mostrarModalImportar: boolean;
+    mostrarModalConfirmacao: boolean;
+    mostrarModalHistorico: boolean;
+    mostrarModalImpacto: boolean;
+    errosValidacao: Array<{atividadeCodigo?: number; mensagem: string}>;
+    dadosRemocao: {tipo: string; index?: number; conhecimentoCodigo?: number} | null;
+    atividadeRefs: Map<number, Element>;
+    unidade: {sigla: string; nome: string} | null;
+    habilitarDisponibilizar: boolean;
+    handleAdicionarAtividade: () => Promise<void>;
+    removerAtividade: (indice: number) => void;
+    badgeVariant: (situacao: string) => string;
+    disponibilizarCadastro: () => Promise<void>;
+    setAtividadeRef: (codigo: number, elemento: Element | null) => void;
+    scrollParaPrimeiroErro: () => void;
+    confirmarRemocao: () => Promise<void>;
+    salvarEdicaoAtividade: (codigo: number, descricao: string) => Promise<void>;
+    adicionarConhecimento: (indiceAtividade: number, descricao: string) => Promise<void>;
+    removerConhecimento: (indiceAtividade: number, codigoConhecimento: number) => void;
+    salvarEdicaoConhecimento: (codigoAtividade: number, codigoConhecimento: number, descricao: string) => Promise<void>;
+    handleImportAtividades: (mensagem?: string) => Promise<void>;
+    confirmarDisponibilizacao: () => Promise<void>;
+    abrirModalHistorico: () => Promise<void>;
+    abrirModalImpacto: () => void;
+    fecharModalImpacto: () => void;
+    carregarContextoInicial: () => Promise<void>;
+    timeoutLimpezaErros: () => void;
+};
+
+type FluxoSubprocessoMock = {
+    validarCadastro: ReturnType<typeof vi.fn>;
+    disponibilizarCadastro: ReturnType<typeof vi.fn>;
+    disponibilizarRevisaoCadastro: ReturnType<typeof vi.fn>;
+};
+
 const subprocessosMock = reactive({
-    subprocessoDetalhe: null as any,
+    subprocessoDetalhe: null as SubprocessoMinimo | null,
     buscarSubprocessoPorProcessoEUnidade: vi.fn(),
     buscarContextoEdicao: vi.fn(),
     buscarSubprocessoDetalhe: vi.fn(),
     atualizarStatusLocal: vi.fn(),
-    lastError: null as any,
+    lastError: null as {message: string} | null,
     clearError: vi.fn(),
 });
 
@@ -75,13 +129,13 @@ const stubs = {
 };
 
 describe("CadastroView coverage", () => {
-    const permissoesPadrao = {
+    const permissoesPadrao: Pick<PermissoesSubprocesso, "podeEditarCadastro" | "podeDisponibilizarCadastro" | "podeVisualizarImpacto"> = {
         podeEditarCadastro: true,
         podeDisponibilizarCadastro: true,
         podeVisualizarImpacto: true,
     };
 
-    function criarContextoEdicao() {
+    function criarContextoEdicao(): ContextoEdicaoSubprocesso {
         return {
             subprocesso: {
                 codigo: 123,
@@ -113,9 +167,9 @@ describe("CadastroView coverage", () => {
             validarCadastro: vi.fn(),
             disponibilizarCadastro: vi.fn().mockResolvedValue(true),
             disponibilizarRevisaoCadastro: vi.fn().mockResolvedValue(true),
-        } as any);
-        vi.mocked(subprocessoService.buscarSubprocessoPorProcessoEUnidade).mockResolvedValue(123 as any);
-        vi.mocked(subprocessoService.buscarContextoEdicao).mockResolvedValue(criarContextoEdicao() as any);
+        } as unknown as FluxoSubprocessoMock);
+        vi.mocked(subprocessoService.buscarSubprocessoPorProcessoEUnidade).mockResolvedValue(123);
+        vi.mocked(subprocessoService.buscarContextoEdicao).mockResolvedValue(criarContextoEdicao());
     });
 
     function createWrapper() {
@@ -123,11 +177,11 @@ describe("CadastroView coverage", () => {
             podeEditarCadastro: ref(true),
             podeDisponibilizarCadastro: ref(true),
             podeVisualizarImpacto: ref(true),
-        } as any);
+        } as unknown as ReturnType<typeof useAcessoModule.useAcesso>);
 
         const pinia = createTestingPinia({stubActions: true});
         const mapas = useMapas();
-        mapas.mapaCompleto.value = {codigo: 100} as any;
+        mapas.mapaCompleto.value = {codigo: 100} as unknown as typeof mapas.mapaCompleto.value;
         mapas.impactoMapa.value = null;
         mapas.erro.value = null;
 
@@ -146,46 +200,47 @@ describe("CadastroView coverage", () => {
     it("cobre ramos de erro e fluxos alternativos", async () => {
         const wrapper = createWrapper();
         await flushPromises();
+        const vm = wrapper.vm as unknown as CadastroViewVm;
 
         // Cobre handleAdicionarAtividade com erro
-        const store = subprocessosMock as any;
+        const store = subprocessosMock;
 
         // Simula falha ao adicionar
-        await (wrapper.vm as any).handleAdicionarAtividade();
+        await vm.handleAdicionarAtividade();
 
         // Cobre erroGlobal
-        (wrapper.vm as any).erroGlobal = "Erro Global";
+        vm.erroGlobal = "Erro Global";
         await wrapper.vm.$nextTick();
         expect(wrapper.text()).toContain("Erro Global");
 
         // Cobre remoção cancelada
-        (wrapper.vm as any).atividades = [{codigo: 1, descricao: "A1"}];
-        (wrapper.vm as any).removerAtividade(0);
-        expect((wrapper.vm as any).mostrarModalConfirmacaoRemocao).toBe(true);
+        vm.atividades = [{codigo: 1, descricao: "A1"}];
+        vm.removerAtividade(0);
+        expect(vm.mostrarModalConfirmacaoRemocao).toBe(true);
 
         // Cobre badgeVariant default
-        expect((wrapper.vm as any).badgeVariant("INVALIDO")).toBe("secondary");
+        expect(vm.badgeVariant("INVALIDO")).toBe("secondary");
 
         // Cobre disponibilizar com erro de situacao
         store.subprocessoDetalhe = {
             ...store.subprocessoDetalhe,
             situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO
-        } as any;
-        await (wrapper.vm as any).disponibilizarCadastro();
+        };
+        await vm.disponibilizarCadastro();
 
         // Cobre disponibilizar com erros de validação
         store.subprocessoDetalhe = {
             ...store.subprocessoDetalhe,
             situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO
-        } as any;
-        const fluxoSubprocesso = useFluxoSubprocessoModule.useFluxoSubprocesso() as any;
+        };
+        const fluxoSubprocesso = useFluxoSubprocessoModule.useFluxoSubprocesso() as unknown as FluxoSubprocessoMock;
         fluxoSubprocesso.validarCadastro.mockResolvedValue({
             valido: false,
             erros: [{mensagem: "Erro genérico"}, {atividadeCodigo: 1, mensagem: "Erro na atividade"}]
         });
-        await (wrapper.vm as any).disponibilizarCadastro();
+        await vm.disponibilizarCadastro();
         await flushPromises();
-        expect((wrapper.vm as any).erroGlobal).toBe("Erro genérico");
+        expect(vm.erroGlobal).toBe("Erro genérico");
     });
 
     it("mantem orçamento enxuto de chamadas no carregamento inicial quando o processo já traz o subprocesso", async () => {
@@ -193,15 +248,15 @@ describe("CadastroView coverage", () => {
         await flushPromises();
 
         expect(contarChamadas(
-            subprocessosMock.buscarContextoEdicao as any,
-            subprocessosMock.buscarSubprocessoPorProcessoEUnidade as any,
+            subprocessosMock.buscarContextoEdicao,
+            subprocessosMock.buscarSubprocessoPorProcessoEUnidade,
         )).toBe(2);
     });
 
     it("cobre funções complementares e modais", async () => {
         const wrapper = createWrapper();
         await flushPromises();
-        const vm = wrapper.vm as any;
+        const vm = wrapper.vm as unknown as CadastroViewVm;
         vm.codSubprocesso = 123;
         
         // setAtividadeRef
@@ -240,15 +295,23 @@ describe("CadastroView coverage", () => {
         expect(vm.mostrarModalImportar).toBe(false);
         
         // confirmarDisponibilizacao (Revisao)
-        const store = subprocessosMock as any;
-        store.subprocessoDetalhe = {tipoProcesso: TipoProcesso.REVISAO} as any;
-        const fluxoSubprocesso = useFluxoSubprocessoModule.useFluxoSubprocesso() as any;
+        const store = subprocessosMock;
+        store.subprocessoDetalhe = {
+            codigo: 123,
+            situacao: SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO,
+            tipoProcesso: TipoProcesso.REVISAO
+        };
+        const fluxoSubprocesso = useFluxoSubprocessoModule.useFluxoSubprocesso() as unknown as FluxoSubprocessoMock;
         fluxoSubprocesso.disponibilizarRevisaoCadastro.mockResolvedValue(true);
         await vm.confirmarDisponibilizacao();
         expect(vm.mostrarModalConfirmacao).toBe(false);
 
         // confirmarDisponibilizacao (Mapeamento)
-        store.subprocessoDetalhe = {tipoProcesso: TipoProcesso.MAPEAMENTO} as any;
+        store.subprocessoDetalhe = {
+            codigo: 123,
+            situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
+            tipoProcesso: TipoProcesso.MAPEAMENTO
+        };
         fluxoSubprocesso.disponibilizarCadastro.mockResolvedValue(true);
         await vm.confirmarDisponibilizacao();
 
@@ -271,11 +334,11 @@ describe("CadastroView coverage", () => {
     it("cobre ramos de erro em confirmarRemocao e salvarEdicao", async () => {
         const wrapper = createWrapper();
         await flushPromises();
-        const vm = wrapper.vm as any;
+        const vm = wrapper.vm as unknown as CadastroViewVm;
         vm.codSubprocesso = 123;
 
-        const service = await import("@/services/atividadeService") as any;
-        (service.excluirAtividade as any).mockRejectedValue(new Error("Falha"));
+        const service = await import("@/services/atividadeService");
+        vi.mocked(service.excluirAtividade).mockRejectedValue(new Error("Falha"));
 
         vm.dadosRemocao = { tipo: "atividade", index: 0 };
         vm.atividades = [{codigo: 1}];
@@ -286,29 +349,32 @@ describe("CadastroView coverage", () => {
         await vm.confirmarRemocao();
 
         // Simular salvarEdicaoAtividade com erro
-        (service.atualizarAtividade as any).mockRejectedValue(new Error("Falha"));
+        vi.mocked(service.atualizarAtividade).mockRejectedValue(new Error("Falha"));
         await vm.salvarEdicaoAtividade(1, "Desc");
 
         // Simular adicionarConhecimento com erro
-        (service.criarConhecimento as any).mockRejectedValue(new Error("Falha"));
+        vi.mocked(service.criarConhecimento).mockRejectedValue(new Error("Falha"));
         await vm.adicionarConhecimento(0, "Desc");
 
         // Simular salvarEdicaoConhecimento com erro
-        (service.atualizarConhecimento as any).mockRejectedValue(new Error("Falha"));
+        vi.mocked(service.atualizarConhecimento).mockRejectedValue(new Error("Falha"));
         await vm.salvarEdicaoConhecimento(1, 2, "Desc");
     });
 
     it("cobre disponibilizarCadastro com erro sem atividade", async () => {
         const wrapper = createWrapper();
         await flushPromises();
-        const vm = wrapper.vm as any;
+        const vm = wrapper.vm as unknown as CadastroViewVm;
         vm.codSubprocesso = 123;
 
         subprocessosMock.subprocessoDetalhe = {
+            codigo: 123,
             situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO
-        } as any;
+            ,
+            tipoProcesso: TipoProcesso.MAPEAMENTO
+        };
 
-        const fluxoSubprocesso = useFluxoSubprocessoModule.useFluxoSubprocesso() as any;
+        const fluxoSubprocesso = useFluxoSubprocessoModule.useFluxoSubprocesso() as unknown as FluxoSubprocessoMock;
         fluxoSubprocesso.validarCadastro.mockResolvedValue({
             valido: false,
             erros: [{mensagem: "Erro Global Sem ID"}]
@@ -320,7 +386,7 @@ describe("CadastroView coverage", () => {
 
     it("cobre ramos de erro ao buscar contexto", async () => {
         const wrapper = createWrapper();
-        const vm = wrapper.vm as any;
+        const vm = wrapper.vm as unknown as CadastroViewVm;
         subprocessosMock.buscarSubprocessoPorProcessoEUnidade.mockResolvedValue(null);
 
         await vm.carregarContextoInicial();
@@ -333,7 +399,7 @@ describe("CadastroView coverage", () => {
 
     it("cobre habilitarDisponibilizar ramos", async () => {
         const wrapper = createWrapper();
-        const vm = wrapper.vm as any;
+        const vm = wrapper.vm as unknown as CadastroViewVm;
         vm.atividades = [];
         expect(vm.habilitarDisponibilizar).toBe(false);
 
@@ -347,7 +413,7 @@ describe("CadastroView coverage", () => {
     it("cobre timeout de limpeza de erros", async () => {
         vi.useFakeTimers();
         const wrapper = createWrapper();
-        const vm = wrapper.vm as any;
+        const vm = wrapper.vm as unknown as CadastroViewVm;
         vm.errosValidacao = [{mensagem: "Erro"}];
         vm.erroGlobal = "Global";
 

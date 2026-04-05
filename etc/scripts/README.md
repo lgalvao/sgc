@@ -70,6 +70,7 @@ node etc/scripts/sgc.js projeto arvore-linhas --depth 2
 ```bash
 node etc/scripts/sgc.js codigo comentarios limpar-ai --dry-run
 node etc/scripts/sgc.js codigo comentarios limpar-generico --dry-run
+node etc/scripts/sgc.js codigo smells auditar
 node etc/scripts/sgc.js codigo id-legado identificar
 node etc/scripts/sgc.js codigo title-case identificar
 node etc/scripts/sgc.js codigo title-case corrigir --dry-run

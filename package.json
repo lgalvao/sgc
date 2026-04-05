@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "sgc": "node etc/scripts/sgc.js",
+    "smells:auditar": "node etc/scripts/sgc.js codigo smells auditar",
     "test": "npm test --prefix frontend",
     "test:unit": "npm run test:unit --prefix frontend",
     "test:e2e": "playwright test",

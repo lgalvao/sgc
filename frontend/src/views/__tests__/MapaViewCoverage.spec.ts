@@ -7,6 +7,63 @@ import * as useFluxoMapaModule from "@/composables/useFluxoMapa";
 import {useMapas} from "@/composables/useMapas";
 import * as subprocessoService from "@/services/subprocessoService";
 import MapaView from "../MapaView.vue";
+import type {ContextoEdicaoSubprocesso} from "@/types/tipos";
+import {TipoProcesso, SituacaoSubprocesso} from "@/types/tipos";
+
+type CompetenciaMapa = {
+    codigo: number;
+    descricao: string;
+    atividades?: Array<{codigo: number; descricao?: string}>;
+};
+
+type MapaViewVm = {
+    codSubprocesso: number | null;
+    mostrarModalImpacto: boolean;
+    mostrarModalCriarNovaCompetencia: boolean;
+    mostrarModalExcluirCompetencia: boolean;
+    mostrarModalDisponibilizar: boolean;
+    loadingImpacto: boolean;
+    loadingExclusao: boolean;
+    notificacaoDisponibilizacao: string;
+    campoBusca?: string;
+    atividades: Array<{codigo: number; descricao: string}>;
+    competenciaSendoEditada: {codigo: number; descricao: string} | null;
+    competenciaParaExcluir: {codigo: number; descricao?: string} | null;
+    fieldErrors: Record<string, string | undefined>;
+    atividadesSemCompetencia: Array<{codigo: number; descricao: string}>;
+    existeCompetenciaSemAtividade: boolean;
+    associacoesMapaValidas: boolean;
+    abrirModalImpacto: () => Promise<void> | void;
+    fecharModalImpacto: () => void;
+    abrirModalCriarLimpo: () => void;
+    adicionarCompetenciaEFecharModal: (payload: {descricao: string; atividadesSelecionadas: number[]}) => Promise<void>;
+    excluirCompetencia: (codigo: number) => void;
+    confirmarExclusaoCompetencia: () => Promise<void>;
+    disponibilizarMapa: (payload: {dataLimite?: string; observacoes?: string}) => Promise<void>;
+    removerAtividadeAssociada: (codigoCompetencia: number, codigoAtividade: number) => void;
+    fecharModalExcluirCompetencia: () => void;
+    fecharModalDisponibilizar: () => void;
+    abrirModalDisponibilizar: () => void;
+    fecharModalCriarNovaCompetencia: () => void;
+    iniciarEdicaoCompetencia: (competencia: {codigo: number; descricao: string}) => void;
+};
+
+type FluxoMapaMock = {
+    erro: {message: string} | null;
+    lastError: {message?: string; details?: Record<string, string>; subErrors?: Array<{field?: string; message?: string}>} | null;
+    clearError: ReturnType<typeof vi.fn>;
+    adicionarCompetencia: ReturnType<typeof vi.fn>;
+    atualizarCompetencia: ReturnType<typeof vi.fn>;
+    removerCompetencia: ReturnType<typeof vi.fn>;
+    disponibilizarMapa: ReturnType<typeof vi.fn>;
+};
+
+function criarContextoEdicao(): Pick<ContextoEdicaoSubprocesso, "atividadesDisponiveis" | "unidade"> {
+    return {
+        atividadesDisponiveis: [],
+        unidade: {sigla: "TESTE", nome: "Teste"}
+    };
+}
 
 const {pushMock} = vi.hoisted(() => ({pushMock: vi.fn()}));
 
@@ -21,18 +78,18 @@ vi.mock("@/services/subprocessoService", () => ({
 }));
 vi.mock("@/composables/useFluxoMapa", () => ({useFluxoMapa: vi.fn()}));
 const subprocessosMock = reactive({
-    subprocessoDetalhe: null as any,
+    subprocessoDetalhe: null as {codigo: number; situacao: SituacaoSubprocesso; tipoProcesso: TipoProcesso} | null,
     buscarSubprocessoPorProcessoEUnidade: vi.fn(),
     buscarContextoEdicao: vi.fn(),
     buscarSubprocessoDetalhe: vi.fn(),
     atualizarStatusLocal: vi.fn(),
-    lastError: null as any,
+    lastError: null as {message: string} | null,
     clearError: vi.fn(),
 });
 vi.mock("@/composables/useSubprocessos", () => ({useSubprocessos: () => subprocessosMock}));
 const fluxoMapaMock = reactive({
-    erro: null as any,
-    lastError: null as any,
+    erro: null as {message: string} | null,
+    lastError: null as FluxoMapaMock["lastError"],
     clearError: vi.fn(),
     adicionarCompetencia: vi.fn(),
     atualizarCompetencia: vi.fn(),
@@ -79,20 +136,17 @@ describe("MapaView coverage", () => {
         fluxoMapaMock.atualizarCompetencia = vi.fn();
         fluxoMapaMock.removerCompetencia = vi.fn();
         fluxoMapaMock.disponibilizarMapa = vi.fn();
-        vi.mocked(useFluxoMapaModule.useFluxoMapa).mockReturnValue(fluxoMapaMock as any);
-        vi.mocked(subprocessoService.buscarSubprocessoPorProcessoEUnidade).mockResolvedValue(123 as any);
-        vi.mocked(subprocessoService.buscarContextoEdicao).mockResolvedValue({
-            atividadesDisponiveis: [],
-            unidade: {sigla: "TESTE", nome: "Teste"}
-        } as any);
+        vi.mocked(useFluxoMapaModule.useFluxoMapa).mockReturnValue(fluxoMapaMock as unknown as ReturnType<typeof useFluxoMapaModule.useFluxoMapa>);
+        vi.mocked(subprocessoService.buscarSubprocessoPorProcessoEUnidade).mockResolvedValue(123);
+        vi.mocked(subprocessoService.buscarContextoEdicao).mockResolvedValue(criarContextoEdicao());
     });
 
-    function createWrapper(initialMapaCompleto: any = {competencias: []}) {
+    function createWrapper(initialMapaCompleto: {competencias: CompetenciaMapa[]} = {competencias: []}) {
         vi.spyOn(useAcessoModule, 'useAcesso').mockReturnValue({
             podeVisualizarImpacto: ref(true),
             podeEditarMapa: ref(true),
             podeDisponibilizarMapa: ref(true),
-        } as any);
+        } as unknown as ReturnType<typeof useAcessoModule.useAcesso>);
 
         const mapas = useMapas();
         mapas.mapaCompleto.value = initialMapaCompleto;
@@ -129,6 +183,7 @@ describe("MapaView coverage", () => {
     it("cobre fluxos de erro e modais", async () => {
         const wrapper = createWrapper();
         await flushPromises();
+        const vm = wrapper.vm as unknown as MapaViewVm;
 
         const store = useMapas();
         store.buscarImpactoMapa = vi.fn().mockResolvedValue(null);
@@ -137,7 +192,7 @@ describe("MapaView coverage", () => {
         fluxoMapaMock.removerCompetencia = vi.fn().mockRejectedValue(new Error("Erro"));
         fluxoMapaMock.disponibilizarMapa = vi.fn().mockRejectedValue(new Error("Erro"));
 
-        (wrapper.vm as any).codSubprocesso = 123;
+        vm.codSubprocesso = 123;
         await wrapper.vm.$nextTick();
 
         // Cobre erro no store
@@ -146,42 +201,42 @@ describe("MapaView coverage", () => {
         expect(wrapper.text()).toContain("Erro no Mapa");
 
         // Cobre abrir modal impacto
-        await (wrapper.vm as any).abrirModalImpacto();
-        expect((wrapper.vm as any).mostrarModalImpacto).toBe(true);
+        await vm.abrirModalImpacto();
+        expect(vm.mostrarModalImpacto).toBe(true);
         expect(store.buscarImpactoMapa).toHaveBeenCalledWith(123);
 
         // Cobre fechar modal impacto
-        (wrapper.vm as any).fecharModalImpacto();
-        expect((wrapper.vm as any).mostrarModalImpacto).toBe(false);
+        vm.fecharModalImpacto();
+        expect(vm.mostrarModalImpacto).toBe(false);
 
         // Cobre abrir modal criar limpo
-        (wrapper.vm as any).abrirModalCriarLimpo();
-        expect((wrapper.vm as any).mostrarModalCriarNovaCompetencia).toBe(true);
-        expect((wrapper.vm as any).competenciaSendoEditada).toBeNull();
+        vm.abrirModalCriarLimpo();
+        expect(vm.mostrarModalCriarNovaCompetencia).toBe(true);
+        expect(vm.competenciaSendoEditada).toBeNull();
 
         // Cobre salvar competencia com erro
         fluxoMapaMock.lastError = {message: "Erro ao salvar", details: {}};
-        await (wrapper.vm as any).adicionarCompetenciaEFecharModal({descricao: "C1", atividadesSelecionadas: [1]});
-        expect((wrapper.vm as any).fieldErrors.generic).toBeDefined();
+        await vm.adicionarCompetenciaEFecharModal({descricao: "C1", atividadesSelecionadas: [1]});
+        expect(vm.fieldErrors.generic).toBeDefined();
 
         // Cobre excluir competencia
-        store.mapaCompleto.value = {competencias: [{codigo: 1, descricao: "C1"}]} as any;
-        (wrapper.vm as any).excluirCompetencia(1);
-        expect((wrapper.vm as any).mostrarModalExcluirCompetencia).toBe(true);
-        expect((wrapper.vm as any).competenciaParaExcluir.codigo).toBe(1);
+        store.mapaCompleto.value = {competencias: [{codigo: 1, descricao: "C1"}]} as unknown as typeof store.mapaCompleto.value;
+        vm.excluirCompetencia(1);
+        expect(vm.mostrarModalExcluirCompetencia).toBe(true);
+        expect(vm.competenciaParaExcluir?.codigo).toBe(1);
 
         // Cobre confirmar exclusão com erro
         fluxoMapaMock.lastError = {message: "Erro ao excluir"};
-        await (wrapper.vm as any).confirmarExclusaoCompetencia();
-        expect((wrapper.vm as any).fieldErrors.generic).toBeDefined();
+        await vm.confirmarExclusaoCompetencia();
+        expect(vm.fieldErrors.generic).toBeDefined();
 
         // Cobre disponibilizar com erro
         fluxoMapaMock.lastError = {message: "Erro ao disponibilizar"};
-        await (wrapper.vm as any).disponibilizarMapa({dataLimite: "2025-12-31", observacoes: "obs"});
-        expect((wrapper.vm as any).fieldErrors.generic).toBeDefined();
+        await vm.disponibilizarMapa({dataLimite: "2025-12-31", observacoes: "obs"});
+        expect(vm.fieldErrors.generic).toBeDefined();
 
         // Cobre remover atividade associada
-        (wrapper.vm as any).removerAtividadeAssociada(1, 10);
+        vm.removerAtividadeAssociada(1, 10);
         expect(fluxoMapaMock.atualizarCompetencia).toHaveBeenCalled();
     });
 
@@ -198,7 +253,8 @@ describe("MapaView coverage", () => {
         const store = useMapas();
         await flushPromises();
 
-        (wrapper.vm as any).atividades = [
+        const vm = wrapper.vm as unknown as MapaViewVm;
+        vm.atividades = [
             {codigo: 1, descricao: "Atividade 1"},
             {codigo: 2, descricao: "Atividade 2"}
         ];
@@ -210,9 +266,9 @@ describe("MapaView coverage", () => {
                     atividades: [{codigo: 1, descricao: "Atividade 1"}]
                 }
             ]
-        } as any;
+        } as unknown as typeof store.mapaCompleto.value;
 
-        expect((wrapper.vm as any).atividadesSemCompetencia).toHaveLength(1);
+        expect(vm.atividadesSemCompetencia).toHaveLength(1);
         expect(wrapper.find('[data-testid="btn-cad-mapa-disponibilizar"]').attributes("disabled")).toBeDefined();
     });
 
@@ -229,10 +285,11 @@ describe("MapaView coverage", () => {
 
         await flushPromises();
 
-        (wrapper.vm as any).atividades = [];
+        const vm = wrapper.vm as unknown as MapaViewVm;
+        vm.atividades = [];
 
-        expect((wrapper.vm as any).existeCompetenciaSemAtividade).toBe(true);
-        expect((wrapper.vm as any).associacoesMapaValidas).toBe(false);
+        expect(vm.existeCompetenciaSemAtividade).toBe(true);
+        expect(vm.associacoesMapaValidas).toBe(false);
         expect(wrapper.find('[data-testid="btn-cad-mapa-disponibilizar"]').attributes("disabled")).toBeDefined();
     });
 
@@ -240,7 +297,7 @@ describe("MapaView coverage", () => {
         const wrapper = createWrapper();
         await flushPromises();
 
-        const vm = wrapper.vm as any;
+        const vm = wrapper.vm as unknown as MapaViewVm;
         vm.codSubprocesso = null;
         
         // Cobre early return em abrirModalImpacto se codSubprocesso for nulo
@@ -277,7 +334,7 @@ describe("MapaView coverage", () => {
         
         // Cobre não encontrar competência em excluirCompetencia
         const store = useMapas();
-        store.mapaCompleto.value = { competencias: [{ codigo: 1, descricao: "C1" }] } as any;
+        store.mapaCompleto.value = { competencias: [{ codigo: 1, descricao: "C1" }] } as unknown as typeof store.mapaCompleto.value;
         vm.excluirCompetencia(999);
         expect(vm.competenciaParaExcluir).toBeNull();
 
@@ -296,9 +353,9 @@ describe("MapaView coverage", () => {
     it("cobre caminhos de sucesso e interações visuais adicionais", async () => {
         const wrapper = createWrapper();
         await flushPromises();
-        const vm = wrapper.vm as any;
+        const vm = wrapper.vm as unknown as MapaViewVm;
         const store = useMapas();
-        const subprocessosStore = subprocessosMock as any;
+        const subprocessosStore = subprocessosMock;
         
         subprocessosStore.buscarContextoEdicao = vi.fn().mockResolvedValue({
             atividadesDisponiveis: [{codigo: 1, descricao: "Ativ"}],

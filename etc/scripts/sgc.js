@@ -77,6 +77,8 @@ const codigo = program.command("codigo").description("Ferramentas de manutencao 
 const codigoComentarios = codigo.command("comentarios").description("Limpeza e auditoria de comentarios.");
 criarComandoScript(codigoComentarios, "limpar-ai", "Remove comentarios redundantes e marcadores de agente.", "etc/scripts/codigo/comentarios-limpar-ai.js");
 criarComandoScript(codigoComentarios, "limpar-generico", "Remove comentarios conversacionais e obvios.", "etc/scripts/codigo/comentarios-limpar-generico.js");
+const codigoSmells = codigo.command("smells").description("Auditorias de cheiros de codigo.");
+criarComandoScript(codigoSmells, "auditar", "Gera snapshot de sinais de complexidade acidental e codigo defensivo.", "etc/scripts/codigo/smells-auditar.js");
 const codigoIdLegado = codigo.command("id-legado").description("Auditorias para identificadores legados.");
 criarComandoScript(codigoIdLegado, "identificar", "Gera relatorio de usos legados de `id`.", "etc/scripts/codigo/id-legado-identificar.js");
 const codigoTitleCase = codigo.command("title-case").description("Auditorias e correcoes de textos em Title Case.");
@@ -151,7 +153,7 @@ criarComandoScript(projeto, "arvore-linhas", "Gera arvore agregada de linhas do 
 
 program.addHelpText(
     "after",
-    `\nExemplos:\n  ${pc.dim("node etc/scripts/sgc.js backend cobertura verificar --min=95")}\n  ${pc.dim("node etc/scripts/sgc.js frontend mensagens analisar")}\n  ${pc.dim("node etc/scripts/sgc.js qa snapshot coletar --perfil rapido")}\n  ${pc.dim("node etc/scripts/sgc.js qa resumo")}\n  ${pc.dim("node etc/scripts/sgc.js qa dashboard servir --porta 4179")}\n  ${pc.dim("node etc/scripts/sgc.js projeto doctor --json")}\n  ${pc.dim(`node etc/scripts/sgc.js projeto qualidade rapido  # perfis: ${Object.keys(PERFIS).join(", ")}`)}\n  ${pc.dim("node etc/scripts/sgc.js projeto setup --instalar-dependencias")}\n  ${pc.dim("node etc/scripts/sgc.js codigo comentarios limpar-ai --dry-run")}\n  ${pc.dim("node etc/scripts/sgc.js codigo id-legado identificar")}`
+    `\nExemplos:\n  ${pc.dim("node etc/scripts/sgc.js backend cobertura verificar --min=95")}\n  ${pc.dim("node etc/scripts/sgc.js frontend mensagens analisar")}\n  ${pc.dim("node etc/scripts/sgc.js qa snapshot coletar --perfil rapido")}\n  ${pc.dim("node etc/scripts/sgc.js qa resumo")}\n  ${pc.dim("node etc/scripts/sgc.js qa dashboard servir --porta 4179")}\n  ${pc.dim("node etc/scripts/sgc.js projeto doctor --json")}\n  ${pc.dim(`node etc/scripts/sgc.js projeto qualidade rapido  # perfis: ${Object.keys(PERFIS).join(", ")}`)}\n  ${pc.dim("node etc/scripts/sgc.js projeto setup --instalar-dependencias")}\n  ${pc.dim("node etc/scripts/sgc.js codigo comentarios limpar-ai --dry-run")}\n  ${pc.dim("node etc/scripts/sgc.js codigo id-legado identificar")}\n  ${pc.dim("node etc/scripts/sgc.js codigo smells auditar --json")}`
 );
 
 try {
