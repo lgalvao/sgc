@@ -1,7 +1,6 @@
 package sgc.organizacao.model;
 
 import org.springframework.data.jpa.repository.*;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.*;
 
 import java.util.*;

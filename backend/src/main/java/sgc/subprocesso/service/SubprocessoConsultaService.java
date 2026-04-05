@@ -460,10 +460,6 @@ public class SubprocessoConsultaService {
         return usuarioFacade.buscarUsuarioSemAtribuicoes(tituloTitular);
     }
 
-    private List<MovimentacaoDto> listarMovimentacoesDto(Subprocesso sp) {
-        return listarMovimentacoesDto(listarMovimentacoes(sp));
-    }
-
     private List<MovimentacaoDto> listarMovimentacoesDto(List<Movimentacao> movimentacoes) {
         return movimentacoes.stream()
                 .map(MovimentacaoDto::from)

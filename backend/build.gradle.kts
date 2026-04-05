@@ -123,9 +123,9 @@ dependencies {
     rewrite("org.openrewrite:rewrite-java:8.75.5")
 }
 
-val receitaRewriteAtiva = providers.gradleProperty("rewriteRecipe")
+val receitaRewriteAtiva: Provider<String?>? = providers.gradleProperty("rewriteRecipe")
     .orElse("sgc.java.renomearMetodosRepoCategoriaA")
-val arquivoConfigRewrite = providers.gradleProperty("rewriteConfig")
+val arquivoConfigRewrite: Provider<String?>? = providers.gradleProperty("rewriteConfig")
     .orElse("etc/openrewrite/renomear-metodos-repo-categoria-a.yml")
 
 rewrite {

@@ -56,13 +56,6 @@ public interface UnidadeRepo extends JpaRepository<Unidade, Long> {
     @Query("""
             SELECT u FROM Unidade u
             LEFT JOIN FETCH u.unidadeSuperior
-            WHERE u.situacao = SituacaoUnidade.ATIVA
-            """)
-    List<Unidade> listarAtivasComSuperior();
-
-    @Query("""
-            SELECT u FROM Unidade u
-            LEFT JOIN FETCH u.unidadeSuperior
             LEFT JOIN FETCH u.responsabilidade
             LEFT JOIN FETCH u.responsabilidade.usuario
             WHERE u.codigo = :codigo

@@ -66,7 +66,7 @@ public class E2eController {
         try (Connection conn = dataSource.getConnection()) {
             String jdbcUrl = conn.getMetaData().getURL();
             String databaseProductName = conn.getMetaData().getDatabaseProductName();
-            boolean h2 = databaseProductName != null && databaseProductName.equalsIgnoreCase("H2");
+            boolean h2 = "H2".equalsIgnoreCase(databaseProductName);
             boolean jdbcH2 = jdbcUrl != null && jdbcUrl.startsWith("jdbc:h2:");
 
             if (!h2 || !jdbcH2) {
