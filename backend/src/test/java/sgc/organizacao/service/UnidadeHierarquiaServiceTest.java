@@ -77,7 +77,7 @@ class UnidadeHierarquiaServiceTest {
         when(responsabilidadeRepo.listarLeiturasPorCodigosUnidade(List.of(1L, 2L, 3L)))
                 .thenReturn(responsabilidadesBasicas());
 
-        Predicate<Unidade> soOperacional = u -> u.getCodigo().equals(3L);
+        Predicate<UnidadeElegibilidadeInfo> soOperacional = info -> info.codigo().equals(3L);
         List<UnidadeDto> resultado = service.buscarArvoreComElegibilidade(soOperacional);
 
         assertThat(resultado).hasSize(1);

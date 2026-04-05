@@ -345,6 +345,31 @@ class ProcessoServiceCoverageTest {
     }
 
     @Test
+    @DisplayName("iniciar deve lançar IllegalStateException quando unidade obrigatória está ausente")
+    void iniciarUnidadeObrigatoriaAusente() {
+        Long cod = 1L;
+        Processo p = new Processo(); p.setCodigo(cod); p.setTipo(REVISAO); p.setSituacao(CRIADO);
+        
+        when(repo.buscar(Processo.class, cod)).thenReturn(p);
+        
+        Unidade u10 = new Unidade(); u10.setCodigo(10L); u10.setSigla("U10"); u10.setTipo(sgc.organizacao.model.TipoUnidade.OPERACIONAL); u10.setSituacao(SituacaoUnidade.ATIVA);
+        
+        // Retorna apenas U10, mas vamos pedir 10 e 11
+        when(unidadeService.buscarPorCodigos(anyList())).thenReturn(List.of(u10));
+        
+        UnidadeMapa um10 = new UnidadeMapa(); um10.setUnidadeCodigo(10L);
+        UnidadeMapa um11 = new UnidadeMapa(); um11.setUnidadeCodigo(11L);
+        when(unidadeService.buscarMapasPorUnidades(anyList())).thenReturn(List.of(um10, um11));
+        
+        mockarResponsaveisEfetivos();
+        when(unidadeService.buscarAdmin()).thenReturn(new Unidade());
+
+        assertThatThrownBy(() -> target.iniciar(cod, List.of(10L, 11L), new Usuario()))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("Unidade 11 ausente para iniciar subprocesso");
+    }
+
+    @Test
     @DisplayName("executarAcaoEmBloco - acao HOMOLOGAR")
     void executarAcaoEmBloco_Homologar() {
         Long codProc = 1L;

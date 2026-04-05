@@ -146,11 +146,6 @@ export async function entrar(request: EntrarRequest): Promise<SessaoLogin> {
     return mapSessaoLoginToFrontend(response.data);
 }
 
-export async function buscarTodosUsuarios() {
-    const response = await apiClient.get("/usuarios");
-    return response.data;
-}
-
 export async function buscarUsuariosPorUnidade(
     codigoUnidade: number,
 ): Promise<Usuario[]> {

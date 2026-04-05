@@ -67,17 +67,6 @@ class UsuarioServiceTest {
         }
 
         @Test
-        @DisplayName("Deve buscar usuários ativos")
-        void deveBuscarUsuariosAtivos() {
-
-            List<Usuario> result = usuarioServiceInternal.buscarTodos();
-
-            assertNotNull(result);
-            assertFalse(result.isEmpty());
-            assertTrue(result.size() >= 2);
-        }
-
-        @Test
         @DisplayName("Deve buscar usuários por lista de títulos")
         void deveBuscarUsuariosPorTitulos() {
 

@@ -41,7 +41,6 @@ public class SubprocessoTransicaoService {
     private final UnidadeService unidadeService;
     private final HierarquiaService hierarquiaService;
     private final UsuarioFacade usuarioFacade;
-    private final ImpactoMapaService impactoMapaService;
     private final MapaManutencaoService mapaManutencaoService;
     private final EmailService emailService;
     private final AlertaFacade alertaService;

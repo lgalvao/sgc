@@ -38,12 +38,6 @@ describe('usuarioService', () => {
       expect(result).toEqual(mockData);
     });
 
-    it('buscarTodosUsuarios', async () => {
-      (apiClient.get as any).mockResolvedValueOnce({ data: [] });
-      await usuarioService.buscarTodosUsuarios();
-      expect(apiClient.get).toHaveBeenCalledWith('/usuarios');
-    });
-
     it('buscarUsuariosPorUnidade', async () => {
       (apiClient.get as any).mockResolvedValueOnce({ data: [] });
       await usuarioService.buscarUsuariosPorUnidade(1);

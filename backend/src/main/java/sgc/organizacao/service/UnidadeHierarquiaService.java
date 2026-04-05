@@ -36,7 +36,7 @@ public class UnidadeHierarquiaService {
     /**
      * Busca a árvore hierárquica com filtro de elegibilidade.
      */
-    public List<UnidadeDto> buscarArvoreComElegibilidade(Predicate<Unidade> elegibilidadeChecker) {
+    public List<UnidadeDto> buscarArvoreComElegibilidade(Predicate<UnidadeElegibilidadeInfo> elegibilidadeChecker) {
         List<UnidadeHierarquiaLeitura> todasUnidades = unidadeRepo.listarEstruturasAtivas();
         Map<Long, String> titulosResponsavel = carregarTitulosResponsavel(todasUnidades);
         return montarHierarquia(todasUnidades, titulosResponsavel, elegibilidadeChecker);
@@ -52,17 +52,12 @@ public class UnidadeHierarquiaService {
                 ? new HashSet<>(unidadeService.buscarTodosCodigosUnidadesComMapa())
                 : Collections.emptySet();
 
-        return buscarArvoreComElegibilidade(u ->
-                u.getTipo() != INTERMEDIARIA
-                        && possuiResponsavelEfetivo(u)
-                        && (!requerMapaVigente || unidadesComMapa.contains(u.getCodigo()))
-                        && !unidadesBloqueadas.contains(u.getCodigo())
+        return buscarArvoreComElegibilidade(info ->
+                info.tipo() != INTERMEDIARIA
+                        && info.possuiResponsavelEfetivo()
+                        && (!requerMapaVigente || unidadesComMapa.contains(info.codigo()))
+                        && !unidadesBloqueadas.contains(info.codigo())
         );
-    }
-
-    private boolean possuiResponsavelEfetivo(Unidade unidade) {
-        Responsabilidade responsabilidade = unidade.getResponsabilidade();
-        return responsabilidade != null && !responsabilidade.getUsuarioTitulo().isBlank();
     }
 
     /**
@@ -167,14 +162,14 @@ public class UnidadeHierarquiaService {
     }
 
     private List<UnidadeDto> montarHierarquia(List<UnidadeHierarquiaLeitura> unidades, Map<Long, String> titulosResponsavel,
-                                              @Nullable Predicate<Unidade> elegibilidadeChecker) {
+                                              @Nullable Predicate<UnidadeElegibilidadeInfo> elegibilidadeChecker) {
         Map<Long, UnidadeDto> mapaUnidades = new HashMap<>();
         Map<Long, List<UnidadeDto>> mapaFilhas = new HashMap<>();
         List<UnidadeDto> raizes = new ArrayList<>();
 
         for (UnidadeHierarquiaLeitura u : unidades) {
-            Unidade unidadeLeve = criarUnidadeLeve(u, titulosResponsavel.get(u.codigo()));
-            boolean isElegivel = elegibilidadeChecker == null || elegibilidadeChecker.test(unidadeLeve);
+            var info = new UnidadeElegibilidadeInfo(u.codigo(), u.tipo(), titulosResponsavel.get(u.codigo()));
+            boolean isElegivel = elegibilidadeChecker == null || elegibilidadeChecker.test(info);
             UnidadeDto dto = UnidadeDto.fromResumoObrigatorio(
                     u.codigo(),
                     u.nome(),
@@ -261,30 +256,6 @@ public class UnidadeHierarquiaService {
         unidade.getSubunidades().forEach(filha -> coletarSiglas(filha, resultado));
     }
 
-    private Unidade criarUnidadeLeve(UnidadeHierarquiaLeitura unidade, @Nullable String usuarioTituloResponsavel) {
-        Unidade unidadeLeve = new Unidade();
-        unidadeLeve.setCodigo(unidade.codigo());
-        unidadeLeve.setNome(unidade.nome());
-        unidadeLeve.setSigla(unidade.sigla());
-        unidadeLeve.setTituloTitular(unidade.tituloTitular());
-        unidadeLeve.setTipo(unidade.tipo());
-        unidadeLeve.setSituacao(unidade.situacao());
-
-        if (unidade.unidadeSuperiorCodigo() != null) {
-            Unidade superior = new Unidade();
-            superior.setCodigo(unidade.unidadeSuperiorCodigo());
-            unidadeLeve.setUnidadeSuperior(superior);
-        }
-
-        if (usuarioTituloResponsavel != null) {
-            Responsabilidade responsabilidade = new Responsabilidade();
-            responsabilidade.setUnidadeCodigo(unidade.codigo());
-            responsabilidade.setUsuarioTitulo(usuarioTituloResponsavel);
-            unidadeLeve.setResponsabilidade(responsabilidade);
-        }
-
-        return unidadeLeve;
-    }
 
     private UnidadeDto toUnidadeDtoObrigatoria(@Nullable Unidade unidade) {
         if (unidade == null) {

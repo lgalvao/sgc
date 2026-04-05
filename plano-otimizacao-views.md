@@ -1,364 +1,195 @@
 # Plano de Otimizacao de Views no Backend
 
-## Objetivo
+Atualizado em 2026-04-05.
 
-Reduzir o custo de acesso as views organizacionais complexas no backend, sem depender inicialmente de alteracoes no Oracle. O foco deste plano e otimizar:
+## Contexto
 
-- modelagem JPA
-- formato das consultas
-- padrao de carregamento de dados
-- cache de aplicacao
-- observabilidade das consultas
-
-As views mais sensiveis identificadas em [backend/etc/sql/ddl_views.sql](/C:/sgc/backend/etc/sql/ddl_views.sql) sao:
+Este plano trata da otimizacao do acesso as views organizacionais complexas do Oracle no backend, sem depender de alteracoes no banco. As views envolvidas:
 
 - `VW_UNIDADE`
 - `VW_USUARIO`
 - `VW_RESPONSABILIDADE`
 - `VW_USUARIO_PERFIL_UNIDADE`
 
-`VW_VINCULACAO_UNIDADE` saiu do escopo de otimizacao JPA nesta etapa porque o mapeamento foi removido do backend e ela nao participa dos fluxos atuais de producao.
+## O que ja foi entregue
 
-## Diagnostico
+As acoes abaixo foram implementadas e nao requerem mais atencao:
 
-Hoje o backend mapeia views complexas como entidades JPA com relacionamentos navegaveis. Isso aparece principalmente em:
-
-- [backend/src/main/java/sgc/organizacao/model/Unidade.java](/C:/sgc/backend/src/main/java/sgc/organizacao/model/Unidade.java)
-- [backend/src/main/java/sgc/organizacao/model/Usuario.java](/C:/sgc/backend/src/main/java/sgc/organizacao/model/Usuario.java)
-- [backend/src/main/java/sgc/organizacao/model/Responsabilidade.java](/C:/sgc/backend/src/main/java/sgc/organizacao/model/Responsabilidade.java)
-- [backend/src/main/java/sgc/organizacao/model/UsuarioPerfil.java](/C:/sgc/backend/src/main/java/sgc/organizacao/model/UsuarioPerfil.java)
-
-Esse desenho traz alguns custos:
-
-- a view ja chega derivada e pesada do banco
-- o Hibernate adiciona joins, proxies e gerenciamento de contexto de persistencia
-- servicos passam a navegar no grafo ORM em vez de consumir somente os dados necessarios
-- consultas com `join fetch` sobre views encadeadas aumentam muito o trabalho do banco
-- metodos amplos, como `findAll()`, ficam caros mesmo para casos de uso simples
-
-O ponto mais sensivel hoje e [backend/src/main/java/sgc/organizacao/model/UnidadeRepo.java](/C:/sgc/backend/src/main/java/sgc/organizacao/model/UnidadeRepo.java), especialmente o metodo `listarTodasComHierarquia()`, que faz `left join fetch` de relacionamentos sobre `VW_UNIDADE`, `VW_RESPONSABILIDADE` e `VW_USUARIO`.
-
-## Estado Atual Confirmado
-
-Levantamento no backend em 2026-04-04:
-
-- a arvore de unidades e a arvore com elegibilidade usam [backend/src/main/java/sgc/organizacao/service/UnidadeHierarquiaService.java](/Users/leonardo/sgc/backend/src/main/java/sgc/organizacao/service/UnidadeHierarquiaService.java), com carga ampla de hierarquia
-- o login usa `VW_USUARIO_PERFIL_UNIDADE` e navega pela associacao para `Unidade`
-- `ComumRepo` ainda permite `find` e criteria generica sobre views pesadas, escondendo o custo real do acesso
-- o diagnostico organizacional ja usa JDBC direto para perfis, mas ainda depende de carga ampla de unidades
-- nao ha cache declarativo no modulo organizacional neste momento
-
-## Rodada Atual
-
-### Melhoria iniciada
-
-- eliminar N+1 residual em `VW_RESPONSABILIDADE`, `VW_USUARIO` e `VW_UNIDADE`
-- trocar relatorios e atribuicoes temporarias para carga em lote
-- reaproveitar caches do Spring para verificacoes de hierarquia sem consulta por nivel
-- remover lookup repetido de `VW_UNIDADE` em painel, historico de analises e inicio de processo
-- substituir o uso restante de `listarTodasComHierarquia()` em `ProcessoService` pelo mapa cacheado de hierarquia
-- remover do backend o caminho legado `listarTodasComHierarquia()` agora que ele nao participa mais dos fluxos ativos
-- consolidar `buscarResponsaveisUnidades(...)` em projecao unica para evitar segunda leitura em `VW_USUARIO`
-- centralizar a unidade `ADMIN` em metodo dedicado com cache agressivo do Spring
-- validar painel e detalhe de subprocesso com budget local de queries para evitar regressao fora do modulo organizacional
-- medir budgets separando statements que tocam `VW_*` de consultas em tabelas normais
-- trocar autocomplete de usuarios para busca por nome com DTO leve e limite explicito
-- tirar os endpoints de consulta de usuario (`/usuarios/{titulo}` e `/unidades/{codigo}/usuarios`) do caminho de entidade JPA completa
-- preservar os contratos HTTP e os DTOs atuais
-
-### Fora desta rodada
-
-- remocao ampla das associacoes JPA restantes
-- observabilidade fina por metrica de query no banco
+- projecao `UnidadeHierarquiaLeitura` record substituiu `listarTodasComHierarquia()` com `join fetch` triplo
+- `listarTodasComHierarquia()` removido por completo — sem referencia restante no backend
+- cache Caffeine em 5 pontos: arvore de unidades, mapa de hierarquia, unidade ADMIN (12h), unidades com mapa, diagnostico organizacional
+- responsabilidades migradas para 3 records de projecao: `ResponsabilidadeLeitura`, `ResponsabilidadeUnidadeLeitura`, `ResponsabilidadeUnidadeResumoLeitura`
+- `buscarResponsaveisUnidades()` consolidado em projecao unica via `listarResumosPorCodigosUnidade()` — sem segunda leitura em `VW_USUARIO`
+- atribuicoes temporarias carregadas em lote via `carregarUsuariosPorTitulo()`
+- autocomplete de usuarios migrado para `UsuarioPesquisaDto` record com `PageRequest.of(0, 20)`
+- endpoints `/usuarios/{titulo}` e `/unidades/{codigo}/usuarios` migrados para `UsuarioConsultaLeitura` → `UsuarioConsultaDto.fromLeitura()`
+- `@Immutable` aplicado em todas as entidades de view
+- cache agressivo da unidade ADMIN com `buscarAdmin()` e TTL de 12h
+- perfis por usuario migrados para `UsuarioPerfilAutorizacaoLeitura` record
+- contratos HTTP e DTOs preservados
 
 ## Diretriz Principal
 
-Views complexas devem ser tratadas como modelos de leitura, e nao como entidades ricas com relacionamentos navegaveis.
-
-Na pratica:
+Views complexas devem ser tratadas como modelos de leitura, nao como entidades ricas com relacionamentos navegaveis.
 
 - manter `@Immutable` para reforcar somente leitura
-- reduzir ou eliminar associacoes JPA entre views
-- preferir consultas por projecao ou DTO
-- carregar apenas colunas necessarias para cada caso de uso
-- mover a composicao final para a camada de servico
+- preferir projecao ou DTO por caso de uso
+- carregar apenas colunas necessarias
+- mover composicao para a camada de servico
+- nao usar associacoes bidirecionais entre views
 
-## Estrategia de Otimizacao
+## Tarefas Pendentes
 
-## 1. Simplificar o mapeamento das views
+### 1. Remover `UsuarioService.buscarTodos()`
 
-### Problema
+**Arquivo:** [UsuarioService.java#L51](backend/src/main/java/sgc/organizacao/service/UsuarioService.java#L51)
 
-As entidades de view hoje possuem relacionamentos como:
+O metodo faz `usuarioRepo.findAll()` na `VW_USUARIO` inteira sem filtro. Nao ha nenhum chamador ativo no backend — a busca por `usuarioService.buscarTodos` retorna vazio. O metodo e codigo morto e deve ser removido.
 
-- `@ManyToOne`
-- `@OneToOne`
-- `@OneToMany`
+**Acao:** remover `buscarTodos()` de `UsuarioService`.
 
-Isso aparece, por exemplo, em:
+### 2. Remover `UsuarioConsultaDto.fromEntity()`
 
-- [backend/src/main/java/sgc/organizacao/model/Unidade.java#L48](/C:/sgc/backend/src/main/java/sgc/organizacao/model/Unidade.java#L48)
-- [backend/src/main/java/sgc/organizacao/model/Usuario.java#L55](/C:/sgc/backend/src/main/java/sgc/organizacao/model/Usuario.java#L55)
-- [backend/src/main/java/sgc/organizacao/model/Responsabilidade.java#L41](/C:/sgc/backend/src/main/java/sgc/organizacao/model/Responsabilidade.java#L41)
-- [backend/src/main/java/sgc/organizacao/model/UsuarioPerfil.java#L34](/C:/sgc/backend/src/main/java/sgc/organizacao/model/UsuarioPerfil.java#L34)
+**Arquivo:** [UsuarioConsultaDto.java#L18](backend/src/main/java/sgc/organizacao/dto/UsuarioConsultaDto.java#L18)
 
-### Acao recomendada
+O metodo `fromEntity(Usuario)` navega `usuario.getUnidadeLotacao()` mas nao tem nenhum chamador. Todos os caminhos ativos ja usam `fromLeitura()`. E codigo morto herdado do caminho JPA antigo.
 
-Transformar gradualmente essas entidades em modelos mais achatados:
+**Acao:** remover `fromEntity()` de `UsuarioConsultaDto`.
 
-- manter os campos escalares da propria view
-- substituir referencias de objeto por codigos simples quando possivel
-- evitar colecoes derivadas de view, como `subunidades`
+### 3. Eliminar `ComumRepo` de `ResponsavelUnidadeService`
 
-### Resultado esperado
+**Arquivo:** [ResponsavelUnidadeService.java](backend/src/main/java/sgc/organizacao/service/ResponsavelUnidadeService.java)
 
-- menos joins implicitos
-- menos risco de `lazy loading` acidental
-- consultas mais previsiveis
-- menor custo de hidratacao no Hibernate
+O servico depende de `ComumRepo` para 7 chamadas genericas que escondem o custo real do acesso:
 
-## 2. Trocar entidades navegaveis por projecoes e DTOs
+| Linha | Chamada | Problema |
+|---|---|---|
+| 88 | `repo.buscar(Unidade.class, codUnidade)` | Carrega entidade JPA completa de `VW_UNIDADE` |
+| 91 | `repo.buscar(Usuario.class, titulo)` | Carrega entidade JPA completa de `VW_USUARIO` |
+| 119 | `repo.buscar(Usuario.class, ...)` | Idem |
+| 137 | `repo.buscar(Usuario.class, ...)` | Idem |
+| 154 | `repo.buscar(Usuario.class, ...)` | Idem |
+| 155 | `repo.buscar(Usuario.class, ...)` | Idem |
+| 268 | `repo.buscarPorSigla(Unidade.class, ...)` | Fallback generico |
 
-### Problema
+**Acao:**
 
-Casos de uso de leitura normalmente nao precisam de um grafo completo. Eles precisam de um subconjunto estavel de campos.
+- L88: substituir por `unidadeRepo.findById()` (entidade simples necessaria para criar `AtribuicaoTemporaria`)
+- L91: substituir por `usuarioRepo.buscarPorTitulo()`
+- L119, 137: os metodos `buscarResponsavelAtual` e `buscarResponsabilidadeDetalhadaAtual` so precisam de `nome`, `titulo`, `matricula` do responsavel — avaliar se um record leve basta
+- L154-155: `buscarResponsavelUnidade` faz 2 buscas em `VW_USUARIO` por chamada — considerar projecao enxuta
+- L268: o fallback `repo.buscarPorSigla` e improvavel (a consulta por codigo acima ja cobre o caso normal) — avaliar remocao
+- Remover campo `ComumRepo repo` ao final
 
-### Acao recomendada
+### 4. Refatorar `Predicate<Unidade>` na elegibilidade
 
-Criar consultas dedicadas por caso de uso usando:
+**Arquivo:** [UnidadeHierarquiaService.java#L39](backend/src/main/java/sgc/organizacao/service/UnidadeHierarquiaService.java#L39)
 
-- projecoes por interface do Spring Data
-- DTOs com `record`
-- JPQL enxuta
-- consulta nativa quando simplificar a leitura
+O metodo `buscarArvoreComElegibilidade(Predicate<Unidade>)` obriga a construir uma entidade `Unidade` falsa via `criarUnidadeLeve()` apenas para testar o predicado. Isso e um resquicio do modelo antigo.
 
-### Exemplos de uso
+**Acao:** trocar `Predicate<Unidade>` por `Predicate<UnidadeHierarquiaLeitura>` ou por um predicado dedicado que opere sobre campos escalares. Eliminar `criarUnidadeLeve()`.
 
-Para hierarquia de unidades:
+**Impacto:** o unico chamador com predicado customizado e `buscarArvoreComElegibilidade(boolean, Set<Long>)` na L48, que testa:
+- `u.getTipo() != INTERMEDIARIA` → campo disponivel no record
+- `possuiResponsavelEfetivo(u)` → precisa de `usuarioTitulo` do responsavel, ja carregado no mapa `titulosResponsavel`
+- unidadesComMapa / unidadesBloqueadas → acesso por codigo, disponivel no record
 
-- `codigo`
-- `nome`
-- `sigla`
-- `tipo`
-- `situacao`
-- `unidadeSuperiorCodigo`
+### 5. Implementar observabilidade de queries
 
-Para responsavel de unidade:
+Nao ha nenhuma instrumentacao de tempo ou contagem de queries por request. Sem isso, nao da para:
 
-- `unidadeCodigo`
-- `tituloTitular`
-- `usuarioTituloResponsavel`
-- `tipoResponsabilidade`
-- `dataInicio`
-- `dataFim`
+- comprovar o ganho das otimizacoes ja feitas
+- detectar regressoes futuras
+- priorizar proximos alvos
 
-Para perfis:
+**Acao minima:**
 
-- `usuarioTitulo`
-- `perfil`
-- `unidadeCodigo`
+- ativar `datasource-proxy` ou `spring.jpa.properties.hibernate.generate_statistics=true` no perfil de dev
+- logar `queryExecutionCount` e `queryExecutionMaxTime` por request em endpoints organizacionais
+- considerar budget assertions nos testes: "este endpoint nao deve gerar mais que N queries"
 
-### Resultado esperado
+**Acao opcional (fase posterior):**
 
-- SQL menor
-- menor trafego de dados entre banco e aplicacao
-- menos objetos em memoria
-- servicos mais simples e explicitos
+- expor metricas via Micrometer (Actuator)
+- separar statements que tocam `VW_*` de consultas em tabelas normais
 
-## 3. Reescrever consultas amplas que usam `join fetch`
+### 6. Navegacao `getUnidadeSuperior()` fora do modulo organizacional
 
-### Problema
+A associacao `Unidade.unidadeSuperior` e acessada via navegacao lazy em **varios servicos** fora do modulo organizacional:
 
-O metodo [backend/src/main/java/sgc/organizacao/model/UnidadeRepo.java#L27](/C:/sgc/backend/src/main/java/sgc/organizacao/model/UnidadeRepo.java#L27) busca todas as unidades ativas e ainda faz fetch de:
+| Arquivo | Contexto |
+|---|---|
+| `SubprocessoTransicaoService` (L604, 618, 790, 793) | Navegacao encadeada para subir niveis hierarquicos |
+| `SubprocessoNotificacaoService` (L82, 87, 99) | Sobe hierarquia para notificar destinatarios |
+| `ProcessoService` (L431, 437) | Navegacao encadeada para localizar gestor |
+| `AlertaFacade` (L106, 111) | Sobe hierarquia para encontrar superior |
+| `HierarquiaService` (L31, 42) | Verifica hierarquia por navegacao |
+| `ProcessoDetalheDto` (L62-63) | Extrai codigo da superior para DTO |
+| `UnidadeProcesso` (L81) | Similar |
 
-- unidade superior
-- responsabilidade
-- usuario da responsabilidade
+Esses acessos sao navegacoes lazy sobre `VW_UNIDADE` que podem gerar queries adicionais. Muitos deles fazem loop de subida (`while (superior != null) { superior = superior.getUnidadeSuperior() }`) que gera N queries.
 
-Em views encadeadas, isso tende a ampliar muito o custo.
+**Acao:** os servicos que sobem hierarquia devem usar o mapa cacheado `buscarMapaHierarquia()` (ja disponivel e cacheado no `UnidadeHierarquiaService`) ou um mapa invertido `filho → pai`. Isso eliminaria todas as queries de navegacao encadeada.
 
-### Acao recomendada
+**Risco:** essa e a maior mudanca estrutural restante. Migrar por fluxo, nao por classe.
 
-Substituir consultas amplas por duas ou tres consultas menores e deterministicas:
+### 7. Navegacao `getUnidadeLotacao()` em `UsuarioFacade`
 
-1. buscar a estrutura basica da hierarquia
-2. buscar responsabilidades em lote
-3. buscar usuarios necessarios em lote
+**Arquivo:** [UsuarioFacade.java#L150](backend/src/main/java/sgc/organizacao/UsuarioFacade.java#L150)
 
-Depois montar o resultado em memoria no servico.
+O metodo `toAdministradorDto` navega `usuario.getUnidadeLotacao()` para extrair `codigo` e `sigla`. O usuario vem de `buscarOpt(titulo)` que naofaz fetch join — risco de lazy loading em `VW_UNIDADE`.
 
-### Resultado esperado
+**Acao:** trocar para `buscarPorTituloComUnidadeLotacao()` (que ja existe no `UsuarioRepo`) ou criar projecao leve `AdministradorLeitura`.
 
-- menos explosao de join
-- melhor controle do volume de dados
-- menor risco de consulta monstruosa gerada pelo ORM
+### 8. Reduzir associacoes JPA entre views
 
-## 4. Eliminar `findAll()` em views pesadas
+As associacoes abaixo ainda existem nas entidades mas a maioria ja nao e usada nos fluxos principais:
 
-### Problema
+**`Responsabilidade.java`**
+- `@OneToOne Unidade unidade` — usada apenas em `listarPorCodigosUnidade()` (`JOIN FETCH`). Os fluxos principais ja usam projecao.
+- `@ManyToOne Usuario usuario` — acessada em `UnidadeDto.fromEntityObrigatoria()`. Os fluxos de arvore ja nao passam por aqui.
 
-Chamadas genericas em views grandes podem trazer muito mais dados do que o caso de uso precisa. Exemplo:
+**`UsuarioPerfil.java`**
+- `@ManyToOne Usuario usuario` — verificar se ha chamador que navega
+- `@ManyToOne Unidade unidade` — verificar se ha chamador que navega
 
-- [backend/src/main/java/sgc/organizacao/service/UsuarioService.java#L46](/C:/sgc/backend/src/main/java/sgc/organizacao/service/UsuarioService.java#L46)
+**`Usuario.java`**
+- `@ManyToOne Unidade unidadeLotacao` — usada por varios fluxos (ver tarefa 7 e achados de navegacao). Nao pode ser removida agora.
+- `@ManyToOne Unidade unidadeCompetencia` — verificar se ha chamador
 
-### Acao recomendada
+**`Unidade.java`**
+- `@ManyToOne Unidade unidadeSuperior` — usada extensivamente (ver tarefa 6). Nao pode ser removida agora.
+- `@OneToMany List<Unidade> subunidades` — provavelmente nao usada em producao (os fluxos de arvore montam em memoria). Verificar e remover.
+- `@OneToOne Responsabilidade responsabilidade` — usada em `possuiResponsavelEfetivo()` e `UnidadeDto.fromEntityObrigatoria()`. Migrar para projecao.
 
-Substituir `findAll()` por:
+**Acao:** remover as associacoes comprovadamente orfas agora. As demais ficam para depois da tarefa 6.
 
-- paginação
-- filtros obrigatorios
-- metodos especificos por necessidade funcional
+## Ordem de Execucao Sugerida
 
-### Resultado esperado
-
-- menor custo por request
-- menor consumo de memoria
-- menor risco de degradacao conforme a base crescer
-
-## 5. Introduzir cache de aplicacao para leituras quase estaticas
-
-### Problema
-
-Hierarquia organizacional, perfis e responsabilidades sao lidos com frequencia e tendem a mudar pouco durante o dia.
-
-### Acao recomendada
-
-Adicionar cache com Spring Cache nas leituras mais reutilizadas, especialmente em:
-
-- [backend/src/main/java/sgc/organizacao/service/UnidadeHierarquiaService.java#L29](/C:/sgc/backend/src/main/java/sgc/organizacao/service/UnidadeHierarquiaService.java#L29)
-- [backend/src/main/java/sgc/organizacao/service/UnidadeHierarquiaService.java#L78](/C:/sgc/backend/src/main/java/sgc/organizacao/service/UnidadeHierarquiaService.java#L78)
-- consultas de perfis por usuario
-- consultas de responsavel atual por unidade
-
-### Recomendacoes de desenho
-
-- usar chaves de cache pequenas e deterministicas
-- definir invalidacao explicita quando houver alteracoes internas que impactem as views consumidas
-- evitar cache em metodos muito genericos ou pouco repetidos
-
-### Resultado esperado
-
-- menos repeticao de leitura nas mesmas views
-- latencia melhor em endpoints organizacionais
-- alivio de carga no banco
-
-## 6. Separar claramente leitura externa de escrita interna
-
-### Problema
-
-Hoje o ORM sugere que tudo faz parte de um unico grafo de dominio, mas parte importante desses dados vem de views derivadas de sistemas externos.
-
-### Acao recomendada
-
-Adotar uma divisao mais explicita:
-
-- tabelas internas do SGC continuam como entidades JPA completas
-- views externas passam a ser somente fonte de leitura
-- a composicao entre dados internos e externos ocorre nos servicos
-
-### Resultado esperado
-
-- menor acoplamento
-- modelo mais honesto com a origem dos dados
-- manutencao mais simples
-
-## 7. Medir antes e depois
-
-### Problema
-
-Sem medicao, fica dificil comprovar ganho e priorizar os pontos certos.
-
-### Acao recomendada
-
-Levantar pelo menos:
-
-- tempo medio das consultas principais
-- quantidade de queries por request
-- volume de linhas retornadas
-- endpoints que mais acessam essas views
-
-### Ferramentas possiveis
-
-- logs SQL com tempo
-- metricas por metodo de servico
-- datasource proxy ou observabilidade equivalente
-- analise de endpoints mais lentos
-
-### Resultado esperado
-
-- priorizacao orientada por evidencias
-- comparacao objetiva antes e depois
-- melhor conversa com o DBA na segunda fase
-
-## Ordem de Implementacao Sugerida
-
-## Fase 1. Ganho rapido com baixo risco
-
-- mapear os endpoints e servicos que mais usam `VW_UNIDADE`, `VW_USUARIO` e `VW_RESPONSABILIDADE`
-- remover `findAll()` desnecessarios
-- adicionar paginação onde couber
-- adicionar medicao basica de tempo e quantidade de consultas
-- introduzir cache para hierarquia e leituras repetidas
-
-## Fase 2. Refactor estrutural de leitura
-
-- substituir `listarTodasComHierarquia()` por projecao enxuta nos fluxos de arvore
-- criar DTOs especificos para responsaveis de unidade
-- criar DTOs especificos para perfis por usuario
-- reduzir relacionamentos JPA entre views
-
-## Fase 3. Consolidacao
-
-- revisar servicos para eliminar navegacao de grafo ORM sobre views
-- padronizar consultas de leitura por caso de uso
-- documentar quais views permanecem como entidade simples e quais passam a projecao apenas
-
-## Primeiros Alvos no Codigo
-
-Os pontos mais promissores para iniciar sao:
-
-- [backend/src/main/java/sgc/organizacao/model/UnidadeRepo.java](/C:/sgc/backend/src/main/java/sgc/organizacao/model/UnidadeRepo.java)
-- [backend/src/main/java/sgc/organizacao/service/UnidadeHierarquiaService.java](/C:/sgc/backend/src/main/java/sgc/organizacao/service/UnidadeHierarquiaService.java)
-- [backend/src/main/java/sgc/organizacao/service/ResponsavelUnidadeService.java](/C:/sgc/backend/src/main/java/sgc/organizacao/service/ResponsavelUnidadeService.java)
-- [backend/src/main/java/sgc/organizacao/service/UsuarioService.java](/C:/sgc/backend/src/main/java/sgc/organizacao/service/UsuarioService.java)
-- [backend/src/main/java/sgc/organizacao/model/UsuarioRepo.java](/C:/sgc/backend/src/main/java/sgc/organizacao/model/UsuarioRepo.java)
-
-## Decisoes Arquiteturais Recomendadas
-
-- nao usar entidade JPA rica para view complexa
-- nao usar associacoes bidirecionais entre views, salvo necessidade muito clara
-- preferir leitura por caso de uso em vez de reuso excessivo de entidade
-- usar cache somente em dados realmente estaveis e de alto reuso
-- manter a camada de servico responsavel pela composicao final
+| Prioridade | Tarefa | Risco | Esforco |
+|---|---|---|---|
+| 1 | Remover `buscarTodos()` e `fromEntity()` (tarefas 1 e 2) | Baixo | Minimo |
+| 2 | Eliminar `ComumRepo` de `ResponsavelUnidadeService` (tarefa 3) | Baixo | Medio |
+| 3 | Refatorar `Predicate<Unidade>` na elegibilidade (tarefa 4) | Baixo | Medio |
+| 4 | Corrigir lazy de `getUnidadeLotacao()` em `UsuarioFacade` (tarefa 7) | Baixo | Minimo |
+| 5 | Remover associacoes orfas (tarefa 8 — parte facil) | Baixo | Medio |
+| 6 | Observabilidade de queries (tarefa 5) | Baixo | Medio |
+| 7 | Migrar navegacao `getUnidadeSuperior()` para mapa cacheado (tarefa 6) | Medio | Alto |
+| 8 | Remover associacoes restantes (tarefa 8 — parte dificil) | Alto | Alto |
 
 ## Riscos e Cuidados
 
-- refactors parciais podem manter parte do custo se o servico continuar navegando em relacionamentos antigos
+- refactors parciais podem manter parte do custo se servicos continuarem navegando em relacionamentos antigos
 - cache sem invalidacao clara pode gerar leitura desatualizada
-- consultas projetadas demais podem se multiplicar sem padronizacao minima
-
-Para reduzir esses riscos:
-
-- migrar por fluxo funcional, nao por classe isolada
-- medir impacto por endpoint
-- documentar os novos padroes de leitura no modulo organizacional
+- a navegacao encadeada de `getUnidadeSuperior()` e o ponto mais sensivel — migrar por fluxo funcional, testando cada servico antes de mover para o proximo
+- testes E2E devem passar apos cada tarefa para garantir que contratos HTTP nao foram alterados
 
 ## Definicao de Sucesso
 
-Considerar a otimizacao bem-sucedida quando:
+A otimizacao estara completa quando:
 
-- os principais endpoints organizacionais reduzirem tempo medio de resposta
-- cair a quantidade de queries por request
-- desaparecer a dependencia de `join fetch` sobre views complexas
-- leituras repetidas de hierarquia e perfis passarem a ser atendidas por cache ou por consultas enxutas
-
-## Proximo Passo Sugerido
-
-Iniciar pela hierarquia de unidades:
-
-1. criar uma projecao simples para leitura de `VW_UNIDADE`
-2. refatorar a montagem de arvore em [backend/src/main/java/sgc/organizacao/service/UnidadeHierarquiaService.java](/Users/leonardo/sgc/backend/src/main/java/sgc/organizacao/service/UnidadeHierarquiaService.java)
-3. remover a dependencia de `join fetch` entre `VW_UNIDADE`, `VW_RESPONSABILIDADE` e `VW_USUARIO` nesse fluxo
-4. medir o ganho
-
-Esse caminho tem boa chance de entregar impacto rapido com risco controlado.
+- nenhum servico navegar pelo grafo ORM para consultar dados de views
+- todas as leituras de views usarem projecao ou DTO especifico
+- a navegacao de hierarquia usar o mapa cacheado em vez de queries encadeadas
+- houver instrumentacao minima para medir queries por request nos endpoints organizacionais
+- `ComumRepo` nao for mais usado no modulo organizacional para acessar views

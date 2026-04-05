@@ -48,10 +48,6 @@ public class UsuarioService {
         return usuarioRepo.listarConsultasPorCodigoUnidadeLotacao(codUnidade);
     }
 
-    public List<Usuario> buscarTodos() {
-        return usuarioRepo.findAll();
-    }
-
     public List<Usuario> buscarPorTitulos(List<String> titulos) {
         return usuarioRepo.listarPorTitulosComUnidadeLotacao(titulos);
     }

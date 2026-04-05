@@ -346,7 +346,6 @@ class ProcessoServiceExtraCoverageTest {
         when(unidadeService.buscarSiglasPorCodigos(List.of(30L))).thenReturn(List.of());
         when(processoRepo.listarUnidadesEmProcessoAtivo(SituacaoProcesso.EM_ANDAMENTO, List.of(30L))).thenReturn(List.of());
 
-        @SuppressWarnings("unchecked")
         List<String> erros = ReflectionTestUtils.invokeMethod(
                 processoService,
                 "validarUnidadesInicio",
@@ -425,7 +424,6 @@ class ProcessoServiceExtraCoverageTest {
         when(responsavelUnidadeService.todasPossuemResponsavelEfetivo(List.of(50L))).thenReturn(true);
         when(processoRepo.listarUnidadesEmProcessoAtivo(SituacaoProcesso.EM_ANDAMENTO, List.of(50L))).thenReturn(List.of(50L));
 
-        @SuppressWarnings("unchecked")
         List<String> erros = ReflectionTestUtils.invokeMethod(
                 processoService,
                 "validarUnidadesInicio",
@@ -506,7 +504,6 @@ class ProcessoServiceExtraCoverageTest {
         when(unidadeService.buscarSiglasPorCodigos(List.of(70L))).thenReturn(List.of("U70"));
         when(processoRepo.listarUnidadesEmProcessoAtivo(SituacaoProcesso.EM_ANDAMENTO, List.of(70L))).thenReturn(List.of());
 
-        @SuppressWarnings("unchecked")
         List<String> erros = ReflectionTestUtils.invokeMethod(
                 processoService,
                 "validarUnidadesInicio",
