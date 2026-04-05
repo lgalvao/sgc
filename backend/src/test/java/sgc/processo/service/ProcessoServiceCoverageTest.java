@@ -17,6 +17,7 @@ import sgc.seguranca.*;
 import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -58,7 +59,7 @@ class ProcessoServiceCoverageTest {
     @DisplayName("executarAcaoEmBloco deve lançar ErroAcessoNegado quando não houver permissão")
     void deveLancarErroAcessoNegado() {
         Long codProcesso = 100L;
-        AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(List.of(1L), DISPONIBILIZAR, null);
+        DisponibilizarMapaEmBlocoCommand req = new DisponibilizarMapaEmBlocoCommand(List.of(1L), LocalDate.now().plusDays(1));
 
         Subprocesso sp = mock(Subprocesso.class);
         Usuario usuario = new Usuario();
@@ -74,19 +75,11 @@ class ProcessoServiceCoverageTest {
     }
 
     @Test
-    @DisplayName("executarAcaoEmBloco deve exigir data limite ao disponibilizar")
-    void deveExigirDataLimiteAoDisponibilizar() {
-        Long codProcesso = 100L;
+    @DisplayName("AcaoEmBlocoRequest deve exigir data limite ao converter disponibilizacao")
+    void deveExigirDataLimiteAoConverterDisponibilizacao() {
         AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(List.of(1L), DISPONIBILIZAR, null);
 
-        Subprocesso sp = mock(Subprocesso.class);
-        Usuario usuario = new Usuario();
-        when(consultaService.listarEntidadesPorProcessoEUnidades(eq(codProcesso), anyList()))
-                .thenReturn(List.of(sp));
-        when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
-        when(permissionEvaluator.verificarPermissao(any(Usuario.class), any(List.class), any(AcaoPermissao.class))).thenReturn(true);
-
-        assertThatThrownBy(() -> target.executarAcaoEmBloco(codProcesso, req))
+        assertThatThrownBy(req::paraCommand)
                 .isInstanceOf(ErroValidacao.class)
                 .hasMessage(Mensagens.DATA_LIMITE_OBRIGATORIA);
     }
@@ -125,7 +118,7 @@ class ProcessoServiceCoverageTest {
     @DisplayName("validarSelecaoBloco deve lançar ErroValidacao quando tamanhos diferirem")
     void deveLancarErroValidacaoEmBloco() {
         Long codProcesso = 100L;
-        AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(List.of(1L, 2L), DISPONIBILIZAR, null);
+        DisponibilizarMapaEmBlocoCommand req = new DisponibilizarMapaEmBlocoCommand(List.of(1L, 2L), LocalDate.now().plusDays(1));
 
         Subprocesso sp = mock(Subprocesso.class);
         Unidade u = new Unidade();
