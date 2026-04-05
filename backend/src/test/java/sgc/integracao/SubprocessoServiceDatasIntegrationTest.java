@@ -96,6 +96,7 @@ class SubprocessoServiceDatasIntegrationTest extends BaseIntegrationTest {
         transicaoService.alterarDataLimite(subprocesso.getCodigo(), novaData);
 
         Subprocesso atualizado = consultaService.buscarSubprocesso(subprocesso.getCodigo());
+        assertThat(atualizado.getDataLimiteEtapa2()).isNotNull();
         assertThat(atualizado.getDataLimiteEtapa2().toLocalDate()).isEqualTo(novaData);
     }
 

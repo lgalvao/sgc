@@ -1,6 +1,7 @@
 package sgc.integracao.mocks;
 
 import org.springframework.beans.factory.annotation.*;
+import org.springframework.beans.factory.*;
 import org.springframework.boot.autoconfigure.condition.*;
 import org.springframework.boot.test.context.*;
 import org.springframework.context.annotation.*;
@@ -37,7 +38,7 @@ public class TestSecurityConfig {
     @Bean
     @Primary
     @Profile({"test"})
-    public SecurityFilterChain testFilterChain(HttpSecurity http, @Autowired(required = false) FiltroJwt filtroJwt) {
+    public SecurityFilterChain testFilterChain(HttpSecurity http, ObjectProvider<FiltroJwt> filtroJwtProvider) {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/usuarios/login", "/api/usuarios/entrar").permitAll()
@@ -45,9 +46,9 @@ public class TestSecurityConfig {
                         .anyRequest().permitAll())
                 .exceptionHandling(e -> e.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)));
 
-        if (filtroJwt != null) {
-            http.addFilterBefore(filtroJwt, UsernamePasswordAuthenticationFilter.class);
-        }
+        filtroJwtProvider.ifAvailable(filtroJwt ->
+                http.addFilterBefore(filtroJwt, UsernamePasswordAuthenticationFilter.class)
+        );
 
         return http.build();
     }

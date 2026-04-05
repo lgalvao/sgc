@@ -133,7 +133,7 @@ class OrganizacaoViewsQueryBudgetIntegrationTest extends BaseIntegrationTest {
     }
 
     private String extrairTermoBusca(Usuario usuario) {
-        String nome = Optional.ofNullable(usuario.getNome()).orElse("").trim();
+        String nome = usuario.getNome() == null ? "" : usuario.getNome().trim();
         if (!nome.isBlank()) {
             String primeiroToken = nome.split("\\s+")[0];
             if (primeiroToken.length() >= 3) {
@@ -142,7 +142,7 @@ class OrganizacaoViewsQueryBudgetIntegrationTest extends BaseIntegrationTest {
             return primeiroToken;
         }
 
-        String matricula = Optional.ofNullable(usuario.getMatricula()).orElse("").trim();
+        String matricula = usuario.getMatricula() == null ? "" : usuario.getMatricula().trim();
         if (matricula.length() >= 3) {
             return matricula.substring(0, 3);
         }

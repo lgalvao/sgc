@@ -120,6 +120,7 @@ class CDU27IntegrationTest extends BaseIntegrationTest {
         entityManager.clear();
 
         Subprocesso atualizado = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
+        assertThat(atualizado.getDataLimiteEtapa2()).isNotNull();
         assertThat(atualizado.getDataLimiteEtapa2().toLocalDate()).isEqualTo(novaData);
 
         // Verificar Alerta para Etapa 2

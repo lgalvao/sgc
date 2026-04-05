@@ -41,6 +41,7 @@ class UnidadeDtoTest {
 
         UnidadeDto dto = UnidadeDto.fromEntity(unidade);
 
+        assertThat(dto).isNotNull();
         assertThat(dto.getCodigo()).isEqualTo(2L);
         assertThat(dto.getCodigoPai()).isEqualTo(1L);
         assertThat(dto.getTipo()).isEqualTo("OPERACIONAL");

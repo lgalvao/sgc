@@ -92,6 +92,7 @@ class MapaVisualizacaoServiceTest {
         MapaVisualizacaoResponse response = service.obterMapaParaVisualizacao(sub);
 
         assertThat(response.atividadesSemCompetencia().getFirst().getConhecimentos()).hasSize(1);
-        assertThat(response.atividadesSemCompetencia().getFirst().getConhecimentos().stream().findFirst().get().getDescricao()).isEqualTo("K1");
+        assertThat(response.atividadesSemCompetencia().getFirst().getConhecimentos().stream().findFirst())
+                .hasValueSatisfying(conhecimento -> assertThat(conhecimento.getDescricao()).isEqualTo("K1"));
     }
 }
