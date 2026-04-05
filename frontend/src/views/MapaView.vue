@@ -206,10 +206,10 @@ async function carregarMapaInicial(codigo: number) {
 }
 
 onMounted(async () => {
-  const id = await subprocessosStore.buscarSubprocessoPorProcessoEUnidade(codProcesso.value, siglaUnidade.value);
-  if (id) {
-    codSubprocesso.value = id;
-    await carregarMapaInicial(id);
+  const codigo = await subprocessosStore.buscarSubprocessoPorProcessoEUnidade(codProcesso.value, siglaUnidade.value);
+  if (codigo) {
+    codSubprocesso.value = codigo;
+    await carregarMapaInicial(codigo);
   }
 });
 

@@ -564,7 +564,7 @@ describe('ProcessoCadastroView.vue', () => {
 
     it('shows alert with multiple errors', async () => {
         const {wrapper} = createWrapper();
-        (wrapper.vm).notifyStructured('Corpo', ['Erro 1', 'Erro 2'], 'danger');
+        (wrapper.vm).notifyStructured('Corpo', ['Erro 1', 'Erro 2'], {variant: 'danger'});
         await nextTick();
 
         expect(wrapper.vm.notificacao).not.toBeNull();

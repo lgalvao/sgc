@@ -90,8 +90,8 @@ describe('PainelView', () => {
     const wrapper = mount(PainelView, options);
     await wrapper.vm.$nextTick();
 
-    expect(painelService.listarProcessos).toHaveBeenCalledWith(1, 0, 10, undefined, undefined);
-    expect(painelService.listarAlertas).toHaveBeenCalledWith(1, 0, 10, 'dataHora', 'desc');
+    expect(painelService.listarProcessos).toHaveBeenCalledWith({codUnidade: 1, page: 0, size: 10});
+    expect(painelService.listarAlertas).toHaveBeenCalledWith({codUnidade: 1, page: 0, size: 10, sort: 'dataHora', order: 'desc'});
     expect(mockToastCreate).toHaveBeenCalledWith(expect.objectContaining({ props: expect.objectContaining({ body: 'Sucesso' }) }));
   });
 
@@ -110,13 +110,13 @@ describe('PainelView', () => {
     // Inverter direção no mesmo critério (default é "descricao" e asc=true)
     vm.ordenarPor('descricao');
     expect(vm.asc).toBe(false);
-    expect(painelService.listarProcessos).toHaveBeenCalledWith(1, 0, 10, 'descricao', 'desc');
+    expect(painelService.listarProcessos).toHaveBeenCalledWith({codUnidade: 1, page: 0, size: 10, sort: 'descricao', order: 'desc'});
 
     // Mudar critério
     vm.ordenarPor('dataCriacao');
     expect(vm.criterio).toBe('dataCriacao');
     expect(vm.asc).toBe(true);
-    expect(painelService.listarProcessos).toHaveBeenCalledWith(1, 0, 10, 'dataCriacao', 'asc');
+    expect(painelService.listarProcessos).toHaveBeenCalledWith({codUnidade: 1, page: 0, size: 10, sort: 'dataCriacao', order: 'asc'});
   });
 
   it('deve abrir detalhes do processo se linkDestino existir', async () => {

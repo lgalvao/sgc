@@ -15,12 +15,12 @@ describe('treeUtils', () => {
 
         it('deve achatar uma arvore com diferentes chaves de filhos', () => {
             const arvore = [
-                {id: 1, filhos: [{id: 2}]},
-                {id: 3}
+                {codigo: 1, filhos: [{codigo: 2}]},
+                {codigo: 3}
             ];
             const resultado = flattenTree(arvore, 'filhos');
             expect(resultado).toHaveLength(3);
-            expect(resultado.map(i => i.id)).toEqual([1, 2, 3]);
+            expect(resultado.map(i => i.codigo)).toEqual([1, 2, 3]);
         });
 
         it('deve lidar com array vazio', () => {
@@ -49,17 +49,17 @@ describe('treeUtils', () => {
         it('deve lidar recursivamente com multiplos níveis', () => {
             const arvore = [
                 {
-                    id: 1,
+                    codigo: 1,
                     children: [
                         {
-                            id: 2,
-                            children: [{id: 3}]
+                            codigo: 2,
+                            children: [{codigo: 3}]
                         }
                     ]
                 }
             ];
             const resultado = flattenTree(arvore, 'children');
-            expect(resultado.map(i => i.id)).toEqual([1, 2, 3]);
+            expect(resultado.map(i => i.codigo)).toEqual([1, 2, 3]);
         });
     });
 });

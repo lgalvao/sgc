@@ -116,14 +116,14 @@ describe('PainelView Coverage', () => {
 
         await (wrapper.vm as any).ordenarPor('descricao');
 
-        expect(painelService.listarProcessos).toHaveBeenLastCalledWith(
-            1, 0, 10, 'descricao', 'desc'
-        );
+        expect(painelService.listarProcessos).toHaveBeenLastCalledWith({
+            codUnidade: 1, page: 0, size: 10, sort: 'descricao', order: 'desc'
+        });
 
         await (wrapper.vm as any).ordenarPor('tipo');
-        expect(painelService.listarProcessos).toHaveBeenLastCalledWith(
-            1, 0, 10, 'tipo', 'asc'
-        );
+        expect(painelService.listarProcessos).toHaveBeenLastCalledWith({
+            codUnidade: 1, page: 0, size: 10, sort: 'tipo', order: 'asc'
+        });
     });
 
     it('redirects to CadProcesso on cta-vazio event', async () => {

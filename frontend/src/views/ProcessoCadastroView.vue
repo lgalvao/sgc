@@ -327,8 +327,10 @@ function handleApiErrors(error: any, title: string, defaultMsg: string) {
       notifyStructured(
           erroNormalizado.message || defaultMsg,
           genericErrors as string[],
-          'danger',
-          erroNormalizado.stackTrace || undefined,
+          {
+            variant: 'danger',
+            stackTrace: erroNormalizado.stackTrace || undefined,
+          }
       );
       window.scrollTo(0, 0);
     } else if (hasFieldErrors) {

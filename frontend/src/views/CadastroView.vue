@@ -398,15 +398,15 @@ function sincronizarEstadoInicialContexto(data: any) {
 
 async function carregarContextoInicial() {
   const codProcessoRef = Number(props.codProcesso);
-  const id = await subprocessosStore.buscarSubprocessoPorProcessoEUnidade(codProcessoRef, props.sigla);
+  const codigo = await subprocessosStore.buscarSubprocessoPorProcessoEUnidade(codProcessoRef, props.sigla);
 
-  if (!id) {
+  if (!codigo) {
     logger.error("ERRO: Subprocesso não encontrado!");
     return;
   }
 
-  codSubprocesso.value = id;
-  const data = await subprocessosStore.buscarContextoEdicao(id);
+  codSubprocesso.value = codigo;
+  const data = await subprocessosStore.buscarContextoEdicao(codigo);
   if (!data) {
     return;
   }

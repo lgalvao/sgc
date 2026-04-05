@@ -343,19 +343,19 @@ onMounted(async () => {
   exibirToastPendente();
   subprocessosStore.subprocessoDetalhe = null;
   try {
-    const id = await subprocessosStore.buscarSubprocessoPorProcessoEUnidade(
+    const codigo = await subprocessosStore.buscarSubprocessoPorProcessoEUnidade(
         props.codProcesso,
         props.siglaUnidade,
     );
 
-    if (id) {
+    if (codigo) {
       erroNaoEncontrado.value = false;
-      codSubprocesso.value = id;
-      const data = await subprocessosStore.buscarContextoEdicao(id);
+      codSubprocesso.value = codigo;
+      const data = await subprocessosStore.buscarContextoEdicao(codigo);
       if (data?.mapa) {
         mapaStore.mapaCompleto.value = data.mapa as any;
       } else {
-        await mapaStore.buscarMapaCompleto(id);
+        await mapaStore.buscarMapaCompleto(codigo);
       }
     } else {
       erroNaoEncontrado.value = true;

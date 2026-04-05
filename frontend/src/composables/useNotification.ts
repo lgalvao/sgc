@@ -25,10 +25,13 @@ export function useNotification() {
     function notifyStructured(
         summary: string,
         details: string[],
-        variant: VarianteAlerta = 'danger',
-        stackTrace?: string,
-        dismissible = true,
+        options: {
+            variant?: VarianteAlerta;
+            stackTrace?: string;
+            dismissible?: boolean;
+        } = {}
     ) {
+        const {variant = 'danger', stackTrace, dismissible = true} = options;
         notificacao.value = {notification: {summary, details}, variant, stackTrace, dismissible};
     }
 
