@@ -80,7 +80,7 @@ public class SubprocessoController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<SubprocessoResumoDto> atualizar(
             @PathVariable Long codSubprocesso, @Valid @RequestBody AtualizarSubprocessoRequest request) {
-        subprocessoService.atualizarEntidade(codSubprocesso, request.paraCommand());
+        subprocessoService.atualizarEntidade(codSubprocesso, request);
         var subprocessoAtualizado = consultaService.buscarSubprocesso(codSubprocesso);
         return ResponseEntity.ok(SubprocessoResumoDto.fromEntity(subprocessoAtualizado));
     }

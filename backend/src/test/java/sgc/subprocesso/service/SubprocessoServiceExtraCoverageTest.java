@@ -294,7 +294,7 @@ class SubprocessoServiceExtraCoverageTest {
 
             when(subprocessoRepo.save(any())).thenReturn(sp);
 
-            subprocessoService.atualizarEntidade(1L, request.paraCommand());
+            subprocessoService.atualizarEntidade(1L, request);
 
             assertThat(sp.getDataLimiteEtapa1()).isEqualTo(d1);
             assertThat(sp.getDataFimEtapa1()).isEqualTo(f1);
@@ -316,7 +316,7 @@ class SubprocessoServiceExtraCoverageTest {
 
             when(subprocessoRepo.save(any())).thenReturn(sp);
 
-            subprocessoService.atualizarEntidade(1L, request.paraCommand());
+            subprocessoService.atualizarEntidade(1L, request);
 
             assertThat(sp.getDataLimiteEtapa1()).isEqualTo(d1); // Não mudou
             assertThat(sp.getMapa().getCodigo()).isEqualTo(100L);

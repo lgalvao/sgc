@@ -119,7 +119,7 @@ class SubprocessoServiceListaIntegrationTest extends BaseIntegrationTest {
         LocalDateTime novaData = LocalDateTime.now().plusDays(10);
         AtualizarSubprocessoRequest request = new AtualizarSubprocessoRequest(unidade.getCodigo(), subprocesso.getMapa().getCodigo(), novaData, null, novaData, null);
 
-        Subprocesso atualizado = subprocessoService.atualizarEntidade(subprocesso.getCodigo(), request.paraCommand());
+        Subprocesso atualizado = subprocessoService.atualizarEntidade(subprocesso.getCodigo(), request);
 
         assertThat(atualizado.getDataLimiteEtapa1()).isEqualTo(novaData);
         assertThat(atualizado.getDataLimiteEtapa2()).isEqualTo(novaData);

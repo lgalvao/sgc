@@ -171,7 +171,7 @@ class SubprocessoControllerCoverageTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.codigo").value(1L));
 
-        verify(subprocessoService).atualizarEntidade(1L, req.paraCommand());
+        verify(subprocessoService).atualizarEntidade(1L, req);
         verify(consultaService).buscarSubprocesso(1L);
         verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
     }
