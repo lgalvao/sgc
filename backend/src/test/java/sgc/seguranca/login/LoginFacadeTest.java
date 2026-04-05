@@ -121,7 +121,7 @@ class LoginFacadeTest {
 
         EntrarRequest req = new EntrarRequest("ADMIN", 1L);
         List<PerfilUnidadeDto> autorizacoes = List.of(
-                new PerfilUnidadeDto(Perfil.GESTOR, sgc.organizacao.dto.UnidadeDto.builder().codigo(1L).nome("Unidade 1").sigla("U1").build())
+                new PerfilUnidadeDto(Perfil.GESTOR, sgc.organizacao.dto.UnidadeResumoDto.builder().codigo(1L).nome("Unidade 1").sigla("U1").build())
         );
 
         assertThatThrownBy(() -> loginFacade.entrar(req, "123", autorizacoes))
@@ -221,14 +221,14 @@ class LoginFacadeTest {
 
         assertThat(result).singleElement().satisfies(perfil -> {
             assertThat(perfil.perfil()).isEqualTo(Perfil.GESTOR);
-            assertThat(perfil.unidade().getCodigo()).isEqualTo(1L);
+            assertThat(perfil.unidade().codigo()).isEqualTo(1L);
         });
     }
 
     @Test
     @DisplayName("deve lançar erro quando unidade para autorização estiver ausente")
     void deveLancarErroQuandoUnidadeAusenteNaAutorizacao() throws Exception {
-        Method metodo = LoginFacade.class.getDeclaredMethod("toUnidadeDtoObrigatoria", UsuarioPerfilAutorizacaoLeitura.class);
+        Method metodo = LoginFacade.class.getDeclaredMethod("toUnidadeResumoObrigatoria", UsuarioPerfilAutorizacaoLeitura.class);
         metodo.setAccessible(true);
 
         assertThatThrownBy(() -> metodo.invoke(loginFacade, new Object[]{null}))

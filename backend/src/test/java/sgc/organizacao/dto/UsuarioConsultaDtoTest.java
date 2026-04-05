@@ -30,7 +30,7 @@ class UsuarioConsultaDtoTest {
 
         assertThat(dto.tituloEleitoral()).isEqualTo("123");
         assertThat(dto.unidade()).isNotNull();
-        assertThat(dto.unidade().getCodigo()).isEqualTo(10L);
+        assertThat(dto.unidade().codigo()).isEqualTo(10L);
         assertThat(dto.perfis()).isEmpty();
     }
 
@@ -52,7 +52,7 @@ class UsuarioConsultaDtoTest {
         UsuarioConsultaDto dto = UsuarioConsultaDto.fromLeitura(usuario);
 
         assertThat(dto.unidade()).isNotNull();
-        assertThat(dto.unidade().getCodigo()).isEqualTo(10L);
-        assertThat(dto.unidade().getSigla()).isEqualTo("UND");
+        assertThat(dto.unidade().codigo()).isEqualTo(10L);
+        assertThat(dto.unidade().sigla()).isEqualTo("UND");
     }
 }

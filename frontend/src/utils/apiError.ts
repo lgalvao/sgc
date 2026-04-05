@@ -113,7 +113,7 @@ function mapStatusToKind(status: number): ErrorKind {
 export function isAxiosError(error: unknown): error is import('axios').AxiosError {
     return (error !== null &&
         typeof error === 'object' &&
-        'isAxiosError' in error && (error as ErrorLike).isAxiosError);
+        'isAxiosError' in error && (error as ErrorLike).isAxiosError === true);
 }
 
 /**

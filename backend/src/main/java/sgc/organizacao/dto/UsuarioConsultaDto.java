@@ -12,13 +12,13 @@ public record UsuarioConsultaDto(
         String nome,
         String email,
         String ramal,
-        UnidadeDto unidade,
+        UnidadeResumoDto unidade,
         List<String> perfis) {
 
     public static UsuarioConsultaDto fromEntity(Usuario usuario) {
         Unidade unidadeLotacao = usuario.getUnidadeLotacao();
 
-        UnidadeDto unidade = UnidadeDto.fromEntityObrigatoria(unidadeLotacao);
+        UnidadeResumoDto unidade = UnidadeResumoDto.fromEntityObrigatoria(unidadeLotacao);
 
         return UsuarioConsultaDto.builder()
                 .tituloEleitoral(usuario.getTituloEleitoral())
@@ -32,11 +32,10 @@ public record UsuarioConsultaDto(
     }
 
     public static UsuarioConsultaDto fromLeitura(UsuarioConsultaLeitura usuario) {
-        UnidadeDto unidade = UnidadeDto.fromResumoObrigatorio(
+        UnidadeResumoDto unidade = UnidadeResumoDto.fromResumoObrigatorio(
                 usuario.unidadeCodigo(),
                 usuario.unidadeNome(),
                 usuario.unidadeSigla(),
-                null,
                 usuario.unidadeTipo(),
                 usuario.unidadeTituloTitular()
         );

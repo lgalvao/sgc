@@ -98,7 +98,7 @@ public class LoginFacade {
             boolean autorizado = autorizacoes.stream()
                     .anyMatch(pu -> {
                         Perfil perfil = pu.perfil();
-                        Long codigoUnidade = pu.unidade().getCodigo();
+                        Long codigoUnidade = pu.unidade().codigo();
                         return perfil == perfilSolicitado && codigoUnidade.equals(codUnidade);
                     });
             if (!autorizado) {
@@ -126,7 +126,7 @@ public class LoginFacade {
                 .filter(a -> a.unidadeSituacao() == SituacaoUnidade.ATIVA)
                 .map(atribuicao -> new PerfilUnidadeDto(
                         atribuicao.perfil(),
-                        toUnidadeDtoObrigatoria(atribuicao)))
+                        toUnidadeResumoObrigatoria(atribuicao)))
                 .toList();
     }
 
@@ -135,15 +135,14 @@ public class LoginFacade {
         return "***" + valor.substring(valor.length() - 4);
     }
 
-    private UnidadeDto toUnidadeDtoObrigatoria(@Nullable UsuarioPerfilAutorizacaoLeitura atribuicao) {
+    private UnidadeResumoDto toUnidadeResumoObrigatoria(@Nullable UsuarioPerfilAutorizacaoLeitura atribuicao) {
         if (atribuicao == null) {
             throw new IllegalStateException("Unidade ausente na autorização de login");
         }
-        return UnidadeDto.fromResumoObrigatorio(
+        return UnidadeResumoDto.fromResumoObrigatorio(
                 atribuicao.unidadeCodigo(),
                 atribuicao.unidadeNome(),
                 atribuicao.unidadeSigla(),
-                null,
                 atribuicao.unidadeTipo(),
                 null
         );

@@ -63,7 +63,7 @@ class LoginControllerTest {
     @WithMockUser
     void login_SessaoDiretaComSucesso() throws Exception {
         AutenticarRequest req = criarRequestPadrao();
-        UnidadeDto unidadeDto = UnidadeDto.builder().codigo(1L).nome("Adm").sigla("ADM").build();
+        UnidadeResumoDto unidadeDto = UnidadeResumoDto.builder().codigo(1L).nome("Adm").sigla("ADM").build();
         PerfilUnidadeDto perfilUnidade = new PerfilUnidadeDto(Perfil.ADMIN, unidadeDto);
         Usuario usuario = new Usuario();
         usuario.setNome("Admin user");
@@ -93,8 +93,8 @@ class LoginControllerTest {
     @WithMockUser
     void login_MultiplosPerfis() throws Exception {
         AutenticarRequest req = criarRequestPadrao();
-        UnidadeDto unidadeUm = UnidadeDto.builder().codigo(1L).nome("Unidade 1").sigla("U1").build();
-        UnidadeDto unidadeDois = UnidadeDto.builder().codigo(2L).nome("Unidade 2").sigla("U2").build();
+        UnidadeResumoDto unidadeUm = UnidadeResumoDto.builder().codigo(1L).nome("Unidade 1").sigla("U1").build();
+        UnidadeResumoDto unidadeDois = UnidadeResumoDto.builder().codigo(2L).nome("Unidade 2").sigla("U2").build();
         PerfilUnidadeDto primeiro = new PerfilUnidadeDto(Perfil.CHEFE, unidadeUm);
         PerfilUnidadeDto segundo = new PerfilUnidadeDto(Perfil.GESTOR, unidadeDois);
 
@@ -138,7 +138,7 @@ class LoginControllerTest {
     void login_IpRemoteAddr() throws Exception {
         AutenticarRequest req = criarRequestPadrao();
         when(loginFacade.autenticar("123", "senha")).thenReturn(true);
-        UnidadeDto unidadeDto = UnidadeDto.builder().codigo(1L).nome("Adm").sigla("ADM").build();
+        UnidadeResumoDto unidadeDto = UnidadeResumoDto.builder().codigo(1L).nome("Adm").sigla("ADM").build();
         PerfilUnidadeDto perfilUnidade = new PerfilUnidadeDto(Perfil.ADMIN, unidadeDto);
         Usuario usuario = new Usuario();
         usuario.setNome("Admin user");
@@ -165,7 +165,7 @@ class LoginControllerTest {
     @WithMockUser
     void login_IpNulo() throws Exception {
         AutenticarRequest req = criarRequestPadrao();
-        UnidadeDto unidadeDto = UnidadeDto.builder().codigo(1L).nome("Adm").sigla("ADM").build();
+        UnidadeResumoDto unidadeDto = UnidadeResumoDto.builder().codigo(1L).nome("Adm").sigla("ADM").build();
         PerfilUnidadeDto perfilUnidade = new PerfilUnidadeDto(Perfil.ADMIN, unidadeDto);
         Usuario usuario = new Usuario();
         usuario.setNome("Admin user");

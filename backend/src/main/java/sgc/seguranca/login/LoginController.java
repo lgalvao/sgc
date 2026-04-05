@@ -62,7 +62,7 @@ public class LoginController {
             PerfilUnidadeDto perfilUnidade = perfis.getFirst();
             EntrarRequest entrarRequest = EntrarRequest.builder()
                     .perfil(perfilUnidade.perfil().name())
-                    .unidadeCodigo(perfilUnidade.unidade().getCodigo())
+                    .unidadeCodigo(perfilUnidade.unidade().codigo())
                     .build();
             String token = loginFacade.entrar(entrarRequest, request.tituloEleitoral(), perfis);
             Usuario usuario = usuarioFacade.buscarPorLogin(request.tituloEleitoral());
@@ -74,7 +74,7 @@ public class LoginController {
                     .tituloEleitoral(request.tituloEleitoral())
                     .nome(usuario.getNome())
                     .perfil(perfilUnidade.perfil())
-                    .unidadeCodigo(perfilUnidade.unidade().getCodigo())
+                    .unidadeCodigo(perfilUnidade.unidade().codigo())
                     .build();
 
             return ResponseEntity.ok(FluxoLoginResponse.builder()

@@ -8,5 +8,5 @@ import sgc.organizacao.model.*;
  */
 public record PerfilUnidadeDto(
         Perfil perfil,
-        UnidadeDto unidade) {
+        UnidadeResumoDto unidade) {
 }
