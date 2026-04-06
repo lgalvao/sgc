@@ -18,7 +18,6 @@ public class CacheConfig {
     public static final String CACHE_MAPA_FILHO_PAI = "mapaFilhoPai";
     public static final String CACHE_USUARIO_PERFIS = "usuarioPerfis";
     public static final String CACHE_USUARIO_AUTORIZACOES = "usuarioAutorizacoes";
-    public static final String CACHE_LOCALIZACAO_SUBPROCESSO = "localizacaoSubprocesso";
 
     @Bean
     public CacheManager cacheManager() {
@@ -29,8 +28,7 @@ public class CacheConfig {
                 CACHE_UNIDADES_COM_MAPA,
                 CACHE_UNIDADE_ADMIN,
                 CACHE_USUARIO_PERFIS,
-                CACHE_USUARIO_AUTORIZACOES,
-                CACHE_LOCALIZACAO_SUBPROCESSO
+                CACHE_USUARIO_AUTORIZACOES
         );
         cacheManager.setCaffeine(Caffeine.newBuilder()
                 .recordStats()
@@ -54,11 +52,6 @@ public class CacheConfig {
         cacheManager.registerCustomCache(CACHE_USUARIO_AUTORIZACOES, Caffeine.newBuilder()
                 .recordStats()
                 .maximumSize(1000)
-                .expireAfterWrite(java.time.Duration.ofHours(2))
-                .build());
-        cacheManager.registerCustomCache(CACHE_LOCALIZACAO_SUBPROCESSO, Caffeine.newBuilder()
-                .recordStats()
-                .maximumSize(20_000)
                 .expireAfterWrite(java.time.Duration.ofHours(2))
                 .build());
         return cacheManager;

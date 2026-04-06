@@ -646,9 +646,9 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             Analise a1 = new Analise(); a1.setTipo(TipoAnalise.CADASTRO); a1.setUnidadeCodigo(10L);
             Analise a2 = new Analise(); a2.setTipo(TipoAnalise.VALIDACAO); a2.setUnidadeCodigo(10L);
             when(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(1L)).thenReturn(List.of(a1, a2));
-            Unidade unidade = new Unidade();
-            unidade.setCodigo(10L);
-            when(unidadeService.buscarPorCodigos(List.of(10L))).thenReturn(List.of(unidade));
+            when(unidadeService.buscarResumosPorCodigos(List.of(10L))).thenReturn(List.of(
+                    new UnidadeResumoLeitura(10L, "Unidade 10", "U10", TipoUnidade.OPERACIONAL)
+            ));
 
             assertThat(consultaService.listarHistoricoCadastro(1L)).hasSize(1);
             assertThat(consultaService.listarHistoricoValidacao(1L)).hasSize(1);

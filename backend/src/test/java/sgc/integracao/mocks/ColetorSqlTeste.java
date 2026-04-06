@@ -28,6 +28,18 @@ public class ColetorSqlTeste implements StatementInspector {
         return SQLS.get().size();
     }
 
+    public static long contarSqlsContendo(String trecho) {
+        String trechoMaiusculo = trecho.toUpperCase(Locale.ROOT);
+        return SQLS.get().stream()
+                .map(sql -> sql.toUpperCase(Locale.ROOT))
+                .filter(sql -> sql.contains(trechoMaiusculo))
+                .count();
+    }
+
+    public static List<String> listarSqls() {
+        return List.copyOf(SQLS.get());
+    }
+
     public static long contarSqlsViewsOrganizacionais() {
         return SQLS.get().stream()
                 .map(String::toUpperCase)

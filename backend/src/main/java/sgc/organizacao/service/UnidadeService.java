@@ -60,6 +60,10 @@ public class UnidadeService {
         return unidadeRepo.buscarSiglasPorCodigos(codigos);
     }
 
+    public List<UnidadeResumoLeitura> buscarResumosPorCodigos(List<Long> codigos) {
+        return unidadeRepo.listarResumosPorCodigos(codigos);
+    }
+
     public String buscarSiglaPorCodigo(Long codigo) {
         return unidadeRepo.buscarSiglaPorCodigo(codigo)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada(Unidade.class.getSimpleName(), codigo));

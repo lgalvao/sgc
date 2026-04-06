@@ -82,21 +82,14 @@ class SubprocessoConsultaServiceTest {
         analise2.setUnidadeCodigo(20L);
         analise2.setTipo(TipoAnalise.CADASTRO);
 
-        Unidade unidade1 = new Unidade();
-        unidade1.setCodigo(10L);
-        unidade1.setSigla("U10");
-        unidade1.setNome("Unidade 10");
-
-        Unidade unidade2 = new Unidade();
-        unidade2.setCodigo(20L);
-        unidade2.setSigla("U20");
-        unidade2.setNome("Unidade 20");
-
         when(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(1L)).thenReturn(List.of(analise1, analise2));
-        when(unidadeService.buscarPorCodigos(List.of(10L, 20L))).thenReturn(List.of(unidade1, unidade2));
+        when(unidadeService.buscarResumosPorCodigos(List.of(10L, 20L))).thenReturn(List.of(
+                new UnidadeResumoLeitura(10L, "Unidade 10", "U10", TipoUnidade.OPERACIONAL),
+                new UnidadeResumoLeitura(20L, "Unidade 20", "U20", TipoUnidade.OPERACIONAL)
+        ));
 
         assertThat(service.listarHistoricoCadastro(1L)).hasSize(2);
-        verify(unidadeService).buscarPorCodigos(List.of(10L, 20L));
+        verify(unidadeService).buscarResumosPorCodigos(List.of(10L, 20L));
         verify(unidadeService, never()).buscarPorCodigo(anyLong());
     }
 }

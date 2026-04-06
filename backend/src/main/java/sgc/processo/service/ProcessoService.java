@@ -226,7 +226,7 @@ public class ProcessoService {
             unidadesParaProcessar = new HashSet<>(unidadeService.buscarPorCodigos(codigosUnidades));
         }
 
-        List<String> erros = validarUnidadesInicio(tipo, codigosUnidades);
+        List<String> erros = validarUnidadesInicio(tipo, codigosUnidades, unidadesParaProcessar);
         if (!erros.isEmpty()) {
             throw new ErroValidacao(String.join(", ", erros));
         }
@@ -397,8 +397,12 @@ public class ProcessoService {
     }
 
     private List<String> validarUnidadesInicio(TipoProcesso tipo, List<Long> cods) {
+        return validarUnidadesInicio(tipo, cods, unidadeService.buscarPorCodigos(cods));
+    }
+
+    private List<String> validarUnidadesInicio(TipoProcesso tipo, List<Long> cods, Collection<Unidade> unidadesCarregadas) {
         List<String> erros = new ArrayList<>();
-        List<Unidade> unidades = unidadeService.buscarPorCodigos(cods);
+        List<Unidade> unidades = new ArrayList<>(unidadesCarregadas);
         if (possuiUnidadeSemResponsavelEfetivo(unidades)) {
             erros.add(Mensagens.OPERACAO_NAO_PERMITIDA);
         }

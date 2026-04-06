@@ -85,24 +85,28 @@ public class SubprocessoNotificacaoService {
         List<Long> codigosSuperiores = unidadeHierarquiaService.buscarCodigosSuperiores(cmd.unidadeOrigem().getCodigo());
         if (codigosSuperiores.isEmpty()) return;
 
-        Map<Long, Unidade> mapaUnidades = new HashMap<>();
-        List<Unidade> superioresCarregados = unidadeService.buscarPorCodigos(codigosSuperiores);
-        superioresCarregados.forEach(u -> mapaUnidades.put(u.getCodigo(), u));
+        Map<Long, UnidadeResumoLeitura> mapaUnidades = unidadeService.buscarResumosPorCodigos(codigosSuperiores).stream()
+                .collect(java.util.stream.Collectors.toMap(
+                        UnidadeResumoLeitura::codigo,
+                        unidade -> unidade,
+                        (primeira, ignorada) -> primeira,
+                        HashMap::new
+                ));
 
         for (Long codigoSuperior : codigosSuperiores) {
             if (Objects.equals(codigoSuperior, cmd.unidadeDestino().getCodigo())) {
                 continue;
             }
 
-            Unidade superior = mapaUnidades.get(codigoSuperior);
+            UnidadeResumoLeitura superior = mapaUnidades.get(codigoSuperior);
             if (superior == null) continue;
 
             Map<String, Object> variaveis = new HashMap<>(variaveisBase);
-            variaveis.put("siglaUnidadeSuperior", superior.getSigla());
+            variaveis.put("siglaUnidadeSuperior", superior.sigla());
 
             String templateEmailSuperior = obterTemplateObrigatorio(cmd.tipoTransicao().getTemplateEmailSuperior(), "e-mail superior");
             String corpo = processarTemplate(templateEmailSuperior, variaveis);
-            String emailSuperior = getEmailUnidade(superior);
+            String emailSuperior = "%s@tre-pe.jus.br".formatted(superior.sigla().toLowerCase());
 
             emailService.enviarEmailHtml(emailSuperior, assunto, corpo);
         }

@@ -5,7 +5,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.organizacao.UsuarioFacade;
+import sgc.organizacao.model.TipoUnidade;
 import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.UnidadeResumoLeitura;
 import sgc.organizacao.service.HierarquiaService;
 import sgc.subprocesso.dto.AnaliseHistoricoDto;
 import sgc.subprocesso.model.Analise;
@@ -78,19 +80,15 @@ class SubprocessoConsultaServiceCoverageTest {
                 .usuarioTitulo("123456789012") // TituloEleitoral (12 chars)
                 .build();
 
-        Unidade unidade = Unidade.builder()
-                .codigo(codUnidade)
-                .sigla("SIGLA")
-                .nome("Nome da Unidade")
-                .build();
-
-        when(unidadeService.buscarPorCodigos(List.of(codUnidade))).thenReturn(List.of(unidade));
+        when(unidadeService.buscarResumosPorCodigos(List.of(codUnidade))).thenReturn(List.of(
+                new UnidadeResumoLeitura(codUnidade, "Nome da Unidade", "SIGLA", TipoUnidade.OPERACIONAL)
+        ));
 
         AnaliseHistoricoDto dto = target.paraHistoricoDto(analise);
 
         assertThat(dto).isNotNull();
         assertThat(dto.unidadeSigla()).isEqualTo("SIGLA");
-        verify(unidadeService).buscarPorCodigos(List.of(codUnidade));
+        verify(unidadeService).buscarResumosPorCodigos(List.of(codUnidade));
     }
 
     @Test
@@ -102,7 +100,7 @@ class SubprocessoConsultaServiceCoverageTest {
                 .build();
 
         // Fazemos unidadeService retornar lista vazia para simular ausência
-        when(unidadeService.buscarPorCodigos(List.of(codUnidade))).thenReturn(Collections.emptyList());
+        when(unidadeService.buscarResumosPorCodigos(List.of(codUnidade))).thenReturn(Collections.emptyList());
 
         assertThatThrownBy(() -> target.paraHistoricoDto(analise))
                 .isInstanceOf(IllegalStateException.class)
@@ -119,6 +117,6 @@ class SubprocessoConsultaServiceCoverageTest {
         List<AnaliseHistoricoDto> resultado = target.listarHistoricoValidacao(codSubprocesso);
 
         assertThat(resultado).isEmpty();
-        verify(unidadeService, never()).buscarPorCodigos(anyList());
+        verify(unidadeService, never()).buscarResumosPorCodigos(anyList());
     }
 }

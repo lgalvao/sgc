@@ -7,6 +7,7 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.data.domain.*;
 import org.springframework.transaction.annotation.*;
+import sgc.alerta.model.*;
 import sgc.mapa.model.*;
 import sgc.organizacao.model.*;
 import sgc.processo.dto.*;
@@ -36,6 +37,10 @@ class ProcessoSubprocessoViewsQueryBudgetIntegrationTest extends BaseIntegration
     private SubprocessoConsultaService subprocessoConsultaService;
     @Autowired
     private ResponsabilidadeRepo responsabilidadeRepo;
+    @Autowired
+    private AlertaRepo alertaRepo;
+    @Autowired
+    private AlertaUsuarioRepo alertaUsuarioRepo;
 
     private Unidade unidadeFilha;
     private Usuario usuarioAdmin;
@@ -56,6 +61,7 @@ class ProcessoSubprocessoViewsQueryBudgetIntegrationTest extends BaseIntegration
 
         criarProcessosPainel(unidadeFilha);
         subprocesso = criarSubprocessoDetalhe(unidadeFilha);
+        criarAlertasPainel(unidadeFilha);
 
         entityManager.flush();
         entityManager.clear();
@@ -71,7 +77,9 @@ class ProcessoSubprocessoViewsQueryBudgetIntegrationTest extends BaseIntegration
                     PageRequest.of(0, 20)
             );
 
-            assertThat(pagina.getContent()).hasSize(12);
+            assertThat(pagina.getContent())
+                    .filteredOn(dto -> dto.descricao().startsWith("Processo budget"))
+                    .hasSize(12);
         });
 
         assertThat(queriesViews).isLessThanOrEqualTo(2);
@@ -88,6 +96,37 @@ class ProcessoSubprocessoViewsQueryBudgetIntegrationTest extends BaseIntegration
         });
 
         assertThat(queriesViews).isLessThanOrEqualTo(7);
+    }
+
+    @Test
+    @DisplayName("Painel deve listar alertas sem lookup unitario de leitura")
+    void painelDeveListarAlertasSemLookupUnitarioDeLeitura() {
+        contarQueries(() -> {
+            Page<Alerta> pagina = painelFacade.listarAlertas(
+                    usuarioAdmin.getTituloEleitoral(),
+                    unidadeFilha.getCodigo(),
+                    Perfil.ADMIN.name(),
+                    PageRequest.of(0, 10)
+            );
+
+            assertThat(pagina.getContent()).hasSize(8);
+            assertThat(pagina.getContent()).allMatch(alerta -> alerta.getDataHoraLeitura() != null);
+        });
+
+        assertThat(sgc.integracao.mocks.ColetorSqlTeste.contarSqlsContendo("ALERTA_USUARIO")).isLessThanOrEqualTo(1);
+        assertThat(sgc.integracao.mocks.ColetorSqlTeste.contarSqls()).isLessThanOrEqualTo(4);
+    }
+
+    @Test
+    @DisplayName("Historico de validacao deve carregar unidades em lote")
+    void historicoDeValidacaoDeveCarregarUnidadesEmLote() {
+        long queriesViews = contarQueriesViews(() -> {
+            List<AnaliseHistoricoDto> historico = subprocessoConsultaService.listarHistoricoValidacao(subprocesso.getCodigo());
+            assertThat(historico).hasSize(2);
+        });
+
+        assertThat(queriesViews).isLessThanOrEqualTo(2);
+        assertThat(sgc.integracao.mocks.ColetorSqlTeste.contarSqls()).isLessThanOrEqualTo(2);
     }
 
     private void contarQueries(Runnable acao) {
@@ -168,6 +207,57 @@ class ProcessoSubprocessoViewsQueryBudgetIntegrationTest extends BaseIntegration
         responsabilidade.setDataInicio(LocalDateTime.now().minusDays(1));
         responsabilidadeRepo.save(responsabilidade);
 
+        entityManager.persist(Analise.builder()
+                .subprocesso(novoSubprocesso)
+                .dataHora(LocalDateTime.now().minusHours(1))
+                .observacoes("Validacao 1")
+                .acao(TipoAcaoAnalise.ACEITE_MAPEAMENTO)
+                .unidadeCodigo(unidade.getCodigo())
+                .usuarioTitulo(usuarioAdmin.getTituloEleitoral())
+                .tipo(TipoAnalise.VALIDACAO)
+                .build());
+        entityManager.persist(Analise.builder()
+                .subprocesso(novoSubprocesso)
+                .dataHora(LocalDateTime.now().minusHours(2))
+                .observacoes("Validacao 2")
+                .acao(TipoAcaoAnalise.DEVOLUCAO_MAPEAMENTO)
+                .unidadeCodigo(unidade.getCodigo())
+                .usuarioTitulo(usuarioAdmin.getTituloEleitoral())
+                .tipo(TipoAnalise.VALIDACAO)
+                .build());
+
         return novoSubprocesso;
+    }
+
+    private void criarAlertasPainel(Unidade unidade) {
+        Processo processoAlerta = Processo.builder()
+                .descricao("Processo alerta budget")
+                .tipo(TipoProcesso.MAPEAMENTO)
+                .situacao(SituacaoProcesso.EM_ANDAMENTO)
+                .dataCriacao(LocalDateTime.now())
+                .dataLimite(LocalDateTime.now().plusDays(15))
+                .build();
+        processoAlerta.adicionarParticipantes(Set.of(unidade));
+        processoRepo.save(processoAlerta);
+
+        for (int indice = 0; indice < 8; indice++) {
+            Alerta alerta = Alerta.builder()
+                    .processo(processoAlerta)
+                    .dataHora(LocalDateTime.now().minusMinutes(indice))
+                    .unidadeOrigem(unidade)
+                    .unidadeDestino(unidade)
+                    .descricao("Alerta budget %d".formatted(indice))
+                    .build();
+            alertaRepo.save(alerta);
+            alertaUsuarioRepo.save(AlertaUsuario.builder()
+                    .codigo(AlertaUsuario.Chave.builder()
+                            .alertaCodigo(alerta.getCodigo())
+                            .usuarioTitulo(usuarioAdmin.getTituloEleitoral())
+                            .build())
+                    .alerta(alerta)
+                    .usuario(usuarioAdmin)
+                    .dataHoraLeitura(LocalDateTime.now().minusMinutes(1))
+                    .build());
+        }
     }
 }

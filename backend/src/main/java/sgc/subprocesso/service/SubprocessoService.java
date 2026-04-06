@@ -2,10 +2,8 @@ package sgc.subprocesso.service;
 
 import lombok.*;
 import lombok.extern.slf4j.*;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
-import sgc.comum.config.CacheConfig;
 import sgc.comum.*;
 import sgc.comum.erros.*;
 import sgc.comum.model.*;
@@ -73,7 +71,6 @@ public class SubprocessoService {
     }
 
     @Transactional
-    @CacheEvict(cacheNames = CacheConfig.CACHE_LOCALIZACAO_SUBPROCESSO, allEntries = true)
     public Subprocesso atualizarEntidade(Long codigo, AtualizarSubprocessoCommand command) {
         Subprocesso subprocesso = consultaService.buscarSubprocesso(codigo);
         processarVinculos(subprocesso, Objects.requireNonNullElseGet(
@@ -88,7 +85,6 @@ public class SubprocessoService {
     }
 
     @Transactional
-    @CacheEvict(cacheNames = CacheConfig.CACHE_LOCALIZACAO_SUBPROCESSO, allEntries = true)
     public void excluir(Long codigo) {
         consultaService.buscarSubprocesso(codigo);
         subprocessoRepo.deleteById(codigo);
@@ -117,7 +113,6 @@ public class SubprocessoService {
     }
 
     @Transactional
-    @CacheEvict(cacheNames = CacheConfig.CACHE_LOCALIZACAO_SUBPROCESSO, allEntries = true)
     public void criarParaMapeamento(Processo processo, Collection<Unidade> unidades, Unidade unidadeOrigem, Usuario usuario) {
         List<Unidade> unidadesElegiveis = listarUnidadesElegiveisParaMapeamento(unidades);
 
@@ -147,13 +142,11 @@ public class SubprocessoService {
         movimentacaoRepo.saveAll(movimentacoes);
     }
 
-    @CacheEvict(cacheNames = CacheConfig.CACHE_LOCALIZACAO_SUBPROCESSO, allEntries = true)
     public void criarParaRevisao(Processo processo, Unidade unidade, UnidadeMapa unidadeMapa, Unidade unidadeOrigem, Usuario usuario) {
         criarSubprocessoComMapa(processo, unidade, unidadeMapa, unidadeOrigem, usuario, NAO_INICIADO, "Processo iniciado");
         log.info("Criado subprocesso para unidade {}", unidade.getSigla());
     }
 
-    @CacheEvict(cacheNames = CacheConfig.CACHE_LOCALIZACAO_SUBPROCESSO, allEntries = true)
     public void criarParaDiagnostico(Processo processo, Unidade unidade, UnidadeMapa unidadeMapa, Unidade unidadeOrigem, Usuario usuario) {
         Subprocesso subprocessoSalvo = criarSubprocessoComMapa(processo, unidade, unidadeMapa, unidadeOrigem, usuario,
                 DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO, "Processo de diagnóstico iniciado");
@@ -394,7 +387,6 @@ public class SubprocessoService {
     }
 
     @Transactional
-    @CacheEvict(cacheNames = CacheConfig.CACHE_LOCALIZACAO_SUBPROCESSO, allEntries = true)
     public boolean importarAtividades(Long codSubprocessoDestino, Long codSubprocessoOrigem, List<Long> codigosAtividades) {
         ImportacaoAtividadesContexto contexto = montarContextoImportacaoAtividades(codSubprocessoDestino, codSubprocessoOrigem);
         int totalSolicitado = codigosAtividades.size();

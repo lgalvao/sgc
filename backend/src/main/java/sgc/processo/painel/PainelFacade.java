@@ -175,8 +175,7 @@ public class PainelFacade {
         });
 
         if (!missingIds.isEmpty()) {
-            List<Unidade> missingUnidades = unidadeService.buscarPorCodigos(missingIds);
-            missingUnidades.forEach(u -> siglas.add(u.getSigla()));
+            siglas.addAll(unidadeService.buscarSiglasPorCodigos(missingIds));
         }
 
         return siglas.stream().sorted().collect(Collectors.joining(", "));

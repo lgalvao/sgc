@@ -3,10 +3,8 @@ package sgc.subprocesso.service;
 import lombok.*;
 import lombok.extern.slf4j.*;
 import org.jspecify.annotations.*;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
-import sgc.comum.config.CacheConfig;
 import org.springframework.util.*;
 import sgc.alerta.*;
 import sgc.comum.*;
@@ -256,7 +254,6 @@ public class SubprocessoTransicaoService {
         return texto.trim();
     }
 
-    @CacheEvict(cacheNames = CacheConfig.CACHE_LOCALIZACAO_SUBPROCESSO, allEntries = true)
     public void registrarTransicao(RegistrarTransicaoCommand cmd) {
         persistirTransicao(cmd);
         notificarTransicao(cmd);

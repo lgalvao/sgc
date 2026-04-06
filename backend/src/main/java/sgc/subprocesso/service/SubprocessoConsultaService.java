@@ -333,7 +333,7 @@ public class SubprocessoConsultaService {
 
     private List<AnaliseHistoricoDto> listarHistoricoPorTipo(Long codSubprocesso, TipoAnalise tipo) {
         List<Analise> analises = listarAnalisesPorTipo(codSubprocesso, tipo);
-        Map<Long, Unidade> unidadesPorCodigo = carregarUnidadesPorCodigo(analises);
+        Map<Long, UnidadeResumoLeitura> unidadesPorCodigo = carregarUnidadesPorCodigo(analises);
         return analises.stream()
                 .map(analise -> paraHistoricoDto(analise, unidadesPorCodigo))
                 .toList();
@@ -343,8 +343,8 @@ public class SubprocessoConsultaService {
         return paraHistoricoDto(analise, carregarUnidadesPorCodigo(List.of(analise)));
     }
 
-    private AnaliseHistoricoDto paraHistoricoDto(Analise analise, Map<Long, Unidade> unidadesPorCodigo) {
-        Unidade unidade = Optional.ofNullable(unidadesPorCodigo.get(analise.getUnidadeCodigo()))
+    private AnaliseHistoricoDto paraHistoricoDto(Analise analise, Map<Long, UnidadeResumoLeitura> unidadesPorCodigo) {
+        UnidadeResumoLeitura unidade = Optional.ofNullable(unidadesPorCodigo.get(analise.getUnidadeCodigo()))
                 .orElseThrow(() -> new IllegalStateException(
                         "Unidade %d ausente no histórico de análises".formatted(analise.getUnidadeCodigo())));
 
@@ -352,15 +352,15 @@ public class SubprocessoConsultaService {
                 .dataHora(analise.getDataHora())
                 .observacoes(analise.getObservacoes())
                 .acao(analise.getAcao())
-                .unidadeSigla(unidade.getSigla())
-                .unidadeNome(unidade.getNome())
+                .unidadeSigla(unidade.sigla())
+                .unidadeNome(unidade.nome())
                 .analistaUsuarioTitulo(analise.getUsuarioTitulo())
                 .motivo(analise.getMotivo())
                 .tipo(analise.getTipo())
                 .build();
     }
 
-    private Map<Long, Unidade> carregarUnidadesPorCodigo(List<Analise> analises) {
+    private Map<Long, UnidadeResumoLeitura> carregarUnidadesPorCodigo(List<Analise> analises) {
         List<Long> codigos = analises.stream()
                 .map(Analise::getUnidadeCodigo)
                 .distinct()
@@ -370,8 +370,8 @@ public class SubprocessoConsultaService {
             return Map.of();
         }
 
-        return unidadeService.buscarPorCodigos(codigos).stream()
-                .collect(HashMap::new, (mapa, unidade) -> mapa.put(unidade.getCodigo(), unidade), HashMap::putAll);
+        return unidadeService.buscarResumosPorCodigos(codigos).stream()
+                .collect(HashMap::new, (mapa, unidade) -> mapa.put(unidade.codigo(), unidade), HashMap::putAll);
     }
 
     public List<Subprocesso> listarEntidadesPorProcessoComUnidade(Long codProcesso) {

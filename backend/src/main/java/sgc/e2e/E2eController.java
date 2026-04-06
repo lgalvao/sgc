@@ -131,7 +131,6 @@ public class E2eController {
     private void limparTabela(Statement stmt, String table) {
         log.debug("Limpando tabela: sgc.{}", table);
         try {
-            // nosemgrep: java.lang.security.audit.formatted-sql-string.formatted-sql-string
             stmt.execute("DELETE FROM sgc." + table);
         } catch (Exception e) {
             log.warn("Erro ao limpar tabela {}: {}", table, e.getMessage());

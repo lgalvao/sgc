@@ -32,6 +32,19 @@ public interface UnidadeRepo extends JpaRepository<Unidade, Long> {
     List<String> buscarSiglasPorCodigos(@Param("codigos") List<Long> codigos);
 
     @Query("""
+            SELECT new sgc.organizacao.model.UnidadeResumoLeitura(
+                u.codigo,
+                u.nome,
+                u.sigla,
+                u.tipo
+            )
+            FROM Unidade u
+            WHERE u.codigo IN :codigos
+            AND u.situacao = SituacaoUnidade.ATIVA
+            """)
+    List<UnidadeResumoLeitura> listarResumosPorCodigos(@Param("codigos") List<Long> codigos);
+
+    @Query("""
             SELECT u.sigla FROM Unidade u
             WHERE u.codigo = :codigo
             AND u.situacao = SituacaoUnidade.ATIVA

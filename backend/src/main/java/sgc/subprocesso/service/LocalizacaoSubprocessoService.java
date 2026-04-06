@@ -1,10 +1,8 @@
 package sgc.subprocesso.service;
 
 import lombok.*;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
-import sgc.comum.config.CacheConfig;
 import sgc.comum.erros.*;
 import sgc.organizacao.model.*;
 import sgc.subprocesso.model.*;
@@ -20,11 +18,6 @@ public class LocalizacaoSubprocessoService {
 
     private final MovimentacaoRepo movimentacaoRepo;
 
-    @Cacheable(
-            cacheNames = CacheConfig.CACHE_LOCALIZACAO_SUBPROCESSO,
-            key = "#subprocesso.codigo",
-            condition = "#subprocesso.codigo != null",
-            sync = true)
     public Unidade obterLocalizacaoAtual(Subprocesso subprocesso) {
         Unidade unidadeBase = subprocesso.getUnidade();
         if (subprocesso.getCodigo() == null) {

@@ -123,7 +123,10 @@ class SubprocessoNotificacaoServiceTest {
                         .titularNome("Titular")
                         .build());
         when(unidadeHierarquiaService.buscarCodigosSuperiores(10L)).thenReturn(List.of(20L, 30L));
-        when(unidadeService.buscarPorCodigos(List.of(20L, 30L))).thenReturn(List.of(destino, superiorFinal));
+        when(unidadeService.buscarResumosPorCodigos(List.of(20L, 30L))).thenReturn(List.of(
+                new UnidadeResumoLeitura(20L, "Unidade destino", "DEST", TipoUnidade.OPERACIONAL),
+                new UnidadeResumoLeitura(30L, "Superior final", "SUP2", TipoUnidade.INTERMEDIARIA)
+        ));
 
         service.notificarTransicao(NotificacaoCommand.builder()
                 .subprocesso(subprocesso)

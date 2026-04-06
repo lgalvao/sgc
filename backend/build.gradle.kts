@@ -5,7 +5,11 @@ import net.ltgt.gradle.errorprone.*
 import org.gradle.api.tasks.testing.logging.*
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
-val argumentosJvmSemAvisoUnsafe = listOf("--sun-misc-unsafe-memory-access=allow")
+val argumentosJvmSemAvisoUnsafe = if (JavaVersion.current().majorVersion.toInt() >= 24) {
+    listOf("--sun-misc-unsafe-memory-access=allow")
+} else {
+    emptyList()
+}
 
 plugins {
     java

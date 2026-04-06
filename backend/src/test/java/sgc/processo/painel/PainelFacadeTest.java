@@ -268,8 +268,7 @@ class PainelFacadeTest {
         when(hierarquiaService.buscarMapaHierarquia()).thenReturn(hierarquia);
         when(processoService.listarTodos(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(p)));
         
-        Unidade u2 = new Unidade(); u2.setSigla("U2");
-        when(unidadeService.buscarPorCodigos(List.of(2L))).thenReturn(List.of(u2));
+        when(unidadeService.buscarSiglasPorCodigos(List.of(2L))).thenReturn(List.of("U2"));
 
         Page<ProcessoResumoDto> result = painelFacade.listarProcessos(Perfil.ADMIN, 100L, PageRequest.of(0, 10));
         assertThat(result.getContent().getFirst().unidadesParticipantes()).isEqualTo("U2");
@@ -322,9 +321,8 @@ class PainelFacadeTest {
         when(hierarquiaService.buscarMapaHierarquia()).thenReturn(hierarquia);
         when(processoService.listarTodos(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(p)));
 
-        Unidade u1 = new Unidade(); u1.setSigla("U1");
-        Unidade u2 = new Unidade(); u2.setSigla("U2");
-        when(unidadeService.buscarPorCodigos(argThat(list -> list.contains(1L) && list.contains(2L)))).thenReturn(List.of(u1, u2));
+        when(unidadeService.buscarSiglasPorCodigos(argThat(list -> list.contains(1L) && list.contains(2L))))
+                .thenReturn(List.of("U1", "U2"));
 
         Page<ProcessoResumoDto> result = painelFacade.listarProcessos(Perfil.ADMIN, 100L, PageRequest.of(0, 10));
         assertThat(result.getContent().getFirst().unidadesParticipantes()).contains("U1", "U2");

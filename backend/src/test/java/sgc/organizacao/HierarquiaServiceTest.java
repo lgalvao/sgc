@@ -93,7 +93,7 @@ class HierarquiaServiceTest {
     void deveRetornarTrueQuandoUnidadeDiretamenteSubordinada() {
         Unidade superior = criarUnidade(1L, null);
         Unidade alvo = criarUnidade(2L, superior);
-        when(unidadeHierarquiaService.buscarCodigoPai(2L)).thenReturn(1L);
+        when(unidadeHierarquiaService.buscarIdsDescendentes(1L)).thenReturn(List.of(2L));
 
         assertThat(hierarquiaService.isSubordinada(alvo, superior)).isTrue();
     }
@@ -104,8 +104,7 @@ class HierarquiaServiceTest {
         Unidade raiz = criarUnidade(1L, null);
         Unidade intermediaria = criarUnidade(2L, raiz);
         Unidade alvo = criarUnidade(3L, intermediaria);
-        when(unidadeHierarquiaService.buscarCodigoPai(3L)).thenReturn(2L);
-        when(unidadeHierarquiaService.buscarCodigoPai(2L)).thenReturn(1L);
+        when(unidadeHierarquiaService.buscarIdsDescendentes(1L)).thenReturn(List.of(2L, 3L));
 
         assertThat(hierarquiaService.isSubordinada(alvo, raiz)).isTrue();
     }
@@ -116,8 +115,7 @@ class HierarquiaServiceTest {
         Unidade raiz1 = criarUnidade(1L, null);
         Unidade raiz2 = criarUnidade(2L, null);
         Unidade alvo = criarUnidade(3L, raiz1);
-        when(unidadeHierarquiaService.buscarCodigoPai(3L)).thenReturn(1L);
-        when(unidadeHierarquiaService.buscarCodigoPai(1L)).thenReturn(null);
+        when(unidadeHierarquiaService.buscarIdsDescendentes(2L)).thenReturn(List.of());
 
         assertThat(hierarquiaService.isSubordinada(alvo, raiz2)).isFalse();
     }
@@ -127,6 +125,7 @@ class HierarquiaServiceTest {
     void deveUsarSuperiorImediatoQuandoAlvoNaoApareceNoMapa() {
         Unidade raiz = criarUnidade(1L, null);
         Unidade alvo = criarUnidade(2L, raiz);
+        when(unidadeHierarquiaService.buscarIdsDescendentes(1L)).thenReturn(List.of());
         when(unidadeHierarquiaService.buscarCodigoPai(2L)).thenReturn(1L);
 
         assertThat(hierarquiaService.isSubordinada(alvo, raiz)).isTrue();
