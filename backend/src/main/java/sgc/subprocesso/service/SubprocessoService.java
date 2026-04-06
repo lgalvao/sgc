@@ -2,10 +2,10 @@ package sgc.subprocesso.service;
 
 import lombok.*;
 import lombok.extern.slf4j.*;
-import org.springframework.cache.annotation.*;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
-import sgc.comum.config.*;
+import sgc.comum.config.CacheConfig;
 import sgc.comum.*;
 import sgc.comum.erros.*;
 import sgc.comum.model.*;
