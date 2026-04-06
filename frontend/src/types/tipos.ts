@@ -333,7 +333,7 @@ export interface SubprocessoDetalhe {
     isEmAndamento: boolean;
     etapaAtual: number;
     movimentacoes: Movimentacao[];
-    elementosProcesso: any[];
+    elementosProcesso: unknown[];
     permissoes: PermissoesSubprocesso;
 }
 

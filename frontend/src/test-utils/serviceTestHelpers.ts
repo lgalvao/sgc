@@ -32,9 +32,9 @@ export function setupServiceTest() {
  * Testa chamada GET
  */
 export function testGetEndpoint(
-    action: () => Promise<any>,
+    action: () => Promise<unknown>,
     url: string,
-    response: any = {}
+    response: unknown = {}
 ) {
     it(`deve fazer GET em ${url}`, async () => {
         mockApi.get.mockResolvedValue({data: response});
@@ -48,10 +48,10 @@ export function testGetEndpoint(
  * Testa chamada POST
  */
 export function testPostEndpoint(
-    action: () => Promise<any>,
+    action: () => Promise<unknown>,
     url: string,
-    payload?: any,
-    response: any = {}
+    payload?: unknown,
+    response: unknown = {}
 ) {
     it(`deve fazer POST em ${url}`, async () => {
         mockApi.post.mockResolvedValue({data: response});
@@ -69,7 +69,7 @@ export function testPostEndpoint(
  * Testa tratamento de erros comuns
  */
 export function testErrorHandling(
-    action: () => Promise<any>,
+    action: () => Promise<unknown>,
     method: 'get' | 'post' | 'put' | 'delete' = 'get'
 ) {
     it(`deve lidar com erro 404`, async () => {

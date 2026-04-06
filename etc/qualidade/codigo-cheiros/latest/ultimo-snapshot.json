@@ -1,31 +1,31 @@
 {
-  "geradoEm": "2026-04-05T15:52:10.408Z",
-  "base": "/Users/leonardo/sgc",
+  "geradoEm": "2026-04-06T01:26:14.857Z",
+  "base": "/app",
   "pontuacao": {
-    "total": 1382,
+    "total": 1254,
     "faixa": "critico",
     "porEscopo": {
       "backend": 837,
-      "frontend": 226,
-      "frontend_testes": 319
+      "frontend": 102,
+      "frontend_testes": 315
     }
   },
   "contagens": {
     "backend_nullable_dto": 89,
-    "backend_null_checks": 191,
-    "backend_objects_null": 5,
-    "frontend_any_producao": 38,
-    "frontend_any_testes": 319,
-    "frontend_catch_any": 4,
+    "backend_null_checks": 192,
+    "backend_objects_null": 4,
+    "frontend_any_producao": 10,
+    "frontend_any_testes": 315,
+    "frontend_catch_any": 0,
     "frontend_null_checks": 19,
     "frontend_fallback_or": 24
   },
   "deltas": {
-    "backend_nullable_dto": 7,
-    "backend_null_checks": -4,
+    "backend_nullable_dto": 0,
+    "backend_null_checks": 0,
     "backend_objects_null": 0,
-    "frontend_any_producao": 0,
-    "frontend_any_testes": 0,
+    "frontend_any_producao": -9,
+    "frontend_any_testes": -3,
     "frontend_catch_any": 0,
     "frontend_null_checks": 0,
     "frontend_fallback_or": 0
@@ -47,7 +47,7 @@
       }
     },
     {
-      "arquivo": "backend/src/main/java/sgc/processo/service/ProcessoService.java",
+      "arquivo": "backend/src/main/java/sgc/organizacao/ValidadorDadosOrganizacionais.java",
       "pontuacao": 30,
       "categorias": {
         "backend_null_checks": 14,
@@ -71,11 +71,11 @@
       }
     },
     {
-      "arquivo": "backend/src/main/java/sgc/organizacao/ValidadorDadosOrganizacionais.java",
-      "pontuacao": 28,
+      "arquivo": "backend/src/main/java/sgc/processo/service/ProcessoService.java",
+      "pontuacao": 26,
       "categorias": {
         "backend_null_checks": 12,
-        "backend_objects_null": 2
+        "backend_objects_null": 1
       }
     },
     {
@@ -83,6 +83,13 @@
       "pontuacao": 25,
       "categorias": {
         "backend_nullable_dto": 5
+      }
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/subprocesso/service/SubprocessoTransicaoService.java",
+      "pontuacao": 22,
+      "categorias": {
+        "backend_null_checks": 11
       }
     },
     {
@@ -118,13 +125,6 @@
       "pontuacao": 20,
       "categorias": {
         "backend_nullable_dto": 4
-      }
-    },
-    {
-      "arquivo": "backend/src/main/java/sgc/subprocesso/service/SubprocessoTransicaoService.java",
-      "pontuacao": 20,
-      "categorias": {
-        "backend_null_checks": 10
       }
     },
     {

@@ -24,7 +24,7 @@ export async function listarProcessos(
     params: ListarParams<keyof ProcessoResumo> = {}
 ): Promise<Page<ProcessoResumo>> {
     const { codUnidade, page = 0, size = 20, sort, order } = params;
-    const queryParams: any = {
+    const queryParams: Record<string, string | number> = {
         page,
         size,
     };
@@ -44,7 +44,7 @@ export async function listarAlertas(
     params: ListarParams<"dataHora" | "processo"> = {}
 ): Promise<Page<Alerta>> {
     const { codUnidade, page = 0, size = 20, sort, order } = params;
-    const queryParams: any = {
+    const queryParams: Record<string, string | number> = {
         page,
         size,
     };

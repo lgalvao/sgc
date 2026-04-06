@@ -19,7 +19,7 @@ export const apiClient = axios.create({
     },
 });
 
-const handleResponseError = (error: any) => {
+const handleResponseError = (error: unknown) => {
     const normalized = normalizeError(error);
 
     // Caso especial: 401 - redirecionar para login

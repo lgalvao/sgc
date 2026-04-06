@@ -114,7 +114,7 @@ import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import {computed, onMounted, ref, watch} from "vue";
 import {useRouter} from "vue-router";
 import type {Unidade, Usuario} from "@/types/tipos";
-import TreeTable from "@/components/comum/TreeTable.vue";
+import TreeTable, { type TreeItem } from "@/components/comum/TreeTable.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
 import {
@@ -156,8 +156,9 @@ async function carregarDados() {
     if (unidade.value?.tituloTitular) {
       titularDetalhes.value = await buscarUsuarioPorTitulo(unidade.value.tituloTitular);
     }
-  } catch (error: any) {
-    lastError.value = {message: error.message || TEXTOS.unidade.ERRO_CARREGAR};
+  } catch (error: unknown) {
+    const err = error as Error;
+    lastError.value = {message: err.message || TEXTOS.unidade.ERRO_CARREGAR};
     logger.error("Erro ao carregar dados da unidade:", error);
   }
 }
@@ -166,7 +167,7 @@ function irParaCriarAtribuicao() {
   router.push({path: `/unidade/${props.codUnidade}/atribuicao`});
 }
 
-function navegarParaUnidadeSubordinada(row: any) {
+function navegarParaUnidadeSubordinada(row: TreeItem) {
   router.push({path: `/unidade/${row.codigo}`});
 }
 
@@ -198,6 +199,7 @@ interface UnidadeFormatada {
   nome: string;
   expanded: boolean;
   children?: UnidadeFormatada[];
+  [key: string]: unknown;
 }
 
 function formatarDadosParaArvore(dados: Unidade[]): UnidadeFormatada[] {

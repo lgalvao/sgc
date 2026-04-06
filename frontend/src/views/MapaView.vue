@@ -133,6 +133,7 @@ import {useMapas} from "@/composables/useMapas";
 import {useSubprocessos} from "@/composables/useSubprocessos";
 import {useToastStore} from "@/stores/toast";
 import type {Atividade, Competencia, MapaCompleto, SalvarCompetenciaRequest, Unidade} from "@/types/tipos";
+import type {NormalizedError} from "@/utils/apiError";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import {TEXTOS} from "@/constants/textos";
 
@@ -259,8 +260,8 @@ const {errors: fieldErrors, setFromNormalizedError, clearErrors} = useFormErrors
   'generic'
 ]);
 
-function handleErrors(store: any) {
-  setFromNormalizedError(store.lastError);
+function handleErrors(store: { lastError: unknown }) {
+  setFromNormalizedError(store.lastError as NormalizedError | null);
   if (fieldErrors.value.atividadesAssociadas) fieldErrors.value.atividades = fieldErrors.value.atividadesAssociadas;
   if (fieldErrors.value.atividadesIds) fieldErrors.value.atividades = fieldErrors.value.atividadesIds;
 }

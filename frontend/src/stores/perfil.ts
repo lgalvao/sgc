@@ -86,7 +86,7 @@ export const usePerfilStore = defineStore("perfil", () => {
             }
 
             return fluxoLogin;
-        }).catch((error: any) => {
+        }).catch((error: { response?: { status: number } }) => {
             if (error?.response?.status === 404 || error?.response?.status === 401) {
                 return {
                     autenticado: false,
