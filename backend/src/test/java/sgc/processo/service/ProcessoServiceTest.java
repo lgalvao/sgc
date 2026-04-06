@@ -420,6 +420,55 @@ class ProcessoServiceTest {
         }
 
         @Test
+        @DisplayName("Deve ordenar detalhes mesmo quando houver sigla nula em snapshot legado")
+        void deveOrdenarDetalhesMesmoQuandoHouverSiglaNula() {
+            Long codProcesso = 1L;
+            Usuario usuario = new Usuario();
+            usuario.setPerfilAtivo(Perfil.ADMIN);
+
+            Processo p = new Processo();
+            p.setCodigo(codProcesso);
+            p.setDescricao("Processo");
+            p.setTipo(TipoProcesso.MAPEAMENTO);
+            p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+
+            Unidade unidadeComSigla = criarUnidadeValida(10L);
+            unidadeComSigla.setSigla("ABC");
+            Unidade unidadeSemSigla = criarUnidadeValida(20L);
+            unidadeSemSigla.setSigla(null);
+            p.adicionarParticipantes(Set.of(unidadeComSigla, unidadeSemSigla));
+            p.getParticipantes().stream()
+                    .filter(participante -> Objects.equals(participante.getUnidadeCodigoPersistido(), 20L))
+                    .findFirst()
+                    .ifPresent(participante -> participante.setSigla(null));
+
+            Subprocesso sp1 = new Subprocesso();
+            sp1.setCodigo(100L);
+            sp1.setUnidade(unidadeComSigla);
+            sp1.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+
+            Subprocesso sp2 = new Subprocesso();
+            sp2.setCodigo(200L);
+            sp2.setUnidade(unidadeSemSigla);
+            sp2.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+
+            when(repo.buscar(Processo.class, codProcesso)).thenReturn(p);
+            when(permissionEvaluator.verificarPermissao(usuario, p, AcaoPermissao.FINALIZAR_PROCESSO)).thenReturn(true);
+            when(consultaService.listarEntidadesPorProcessoComUnidade(codProcesso)).thenReturn(List.of(sp1, sp2));
+            when(consultaService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(
+                    sp1.getCodigo(), unidadeComSigla,
+                    sp2.getCodigo(), unidadeSemSigla
+            ));
+            when(validacaoService.validarSubprocessosParaFinalizacao(codProcesso)).thenReturn(ValidationResult.ofValido());
+
+            ProcessoDetalheDto result = processoService.obterDetalhesCompleto(codProcesso, usuario, false);
+
+            assertThat(result.getUnidades()).hasSize(2);
+            assertThat(result.getUnidades().get(0).getSigla()).isEqualTo("ABC");
+            assertThat(result.getUnidades().get(1).getSigla()).isNull();
+        }
+
+        @Test
         @DisplayName("isElegivelParaAcaoEmBloco deve retornar false quando elegivelMapa mas sem permissao ACEITAR ou HOMOLOGAR")
         void isElegivelParaAcaoEmBloco_DeveRetornarFalseQuandoElegivelMapaSemPermissoes() {
             Long codProcesso = 1L;

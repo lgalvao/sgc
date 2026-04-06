@@ -48,6 +48,10 @@ A API estará disponível em `http://localhost:10000`.
 * `hom`: Ambiente de homologação (Oracle).
 * `e2e`: Preparado para testes automáticos (fixtures e reset de banco).
 
+Para rodar o benchmark de desempenho contra homologacao usando as variaveis de `.env.hom`, use `..\benchmark-hom.ps1` no Windows ou `../benchmark-hom.sh` no shell.
+
+No profile `hom`, administradores tambem podem remover um processo inteiro para limpar dados de teste via `POST /api/processos/{codigo}/excluir-completo`.
+
 ## 🧪 Estratégia de Testes
 
 O backend possui uma suíte rigorosa de testes para garantir 100% de cobertura na lógica de negócio.

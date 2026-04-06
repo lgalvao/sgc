@@ -494,8 +494,11 @@ public class ProcessoService {
             if (pai != null) pai.getFilhos().add(u);
             else dto.getUnidades().add(u);
         });
-        dto.getUnidades().sort(Comparator.comparing(UnidadeParticipanteDto::getSigla));
-        mapDto.values().forEach(u -> u.getFilhos().sort(Comparator.comparing(UnidadeParticipanteDto::getSigla)));
+        Comparator<UnidadeParticipanteDto> comparadorPorSigla =
+                Comparator.comparing(UnidadeParticipanteDto::getSigla,
+                        Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER));
+        dto.getUnidades().sort(comparadorPorSigla);
+        mapDto.values().forEach(u -> u.getFilhos().sort(comparadorPorSigla));
     }
 
     private Unidade obterLocalizacao(Subprocesso sp) {

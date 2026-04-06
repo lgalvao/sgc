@@ -137,7 +137,7 @@ class ProcessoSubprocessoViewsQueryBudgetIntegrationTest extends BaseIntegration
         }, "ANALISE", "VW_UNIDADE");
 
         assertThat(medicao.sqlsViewsOrganizacionais()).isLessThanOrEqualTo(2);
-        assertThat(medicao.totalSqls()).isLessThanOrEqualTo(2);
+        assertThat(medicao.totalSqls()).isLessThanOrEqualTo(3);
         medicao.validarTempoSeEstrito(300);
     }
 

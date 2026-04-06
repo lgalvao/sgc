@@ -1,8 +1,47 @@
 import {config, RouterLinkStub} from "@vue/test-utils";
 import {createBootstrap} from "bootstrap-vue-next";
 import {vi} from "vitest";
+import apiClient from "@/axios-setup";
 
 HTMLCanvasElement.prototype.getContext = vi.fn();
+
+apiClient.defaults.adapter = async (config) => {
+    const metodo = config.method?.toUpperCase() ?? "GET";
+    const url = config.url ?? "(url-desconhecida)";
+    throw new Error(`Requisicao HTTP nao mockada em teste: ${metodo} ${url}`);
+};
+
+const xmlHttpRequestOpenOriginal = XMLHttpRequest.prototype.open;
+const xmlHttpRequestSendOriginal = XMLHttpRequest.prototype.send;
+
+Object.defineProperty(XMLHttpRequest.prototype, "open", {
+    configurable: true,
+    writable: true,
+    value: function (
+        this: XMLHttpRequest & {_sgcMetodo?: string; _sgcUrl?: string},
+        method: string,
+        url: string | URL,
+        ...args: unknown[]
+    ) {
+        this._sgcMetodo = method;
+        this._sgcUrl = String(url);
+        return xmlHttpRequestOpenOriginal.call(this, method, url, ...args as []);
+    },
+});
+
+Object.defineProperty(XMLHttpRequest.prototype, "send", {
+    configurable: true,
+    writable: true,
+    value: function (
+        this: XMLHttpRequest & {_sgcMetodo?: string; _sgcUrl?: string},
+        ...args: unknown[]
+    ) {
+        const metodo = this._sgcMetodo ?? "GET";
+        const url = this._sgcUrl ?? "(url-desconhecida)";
+        throw new Error(`XMLHttpRequest nao mockado em teste: ${metodo} ${url}`);
+        return xmlHttpRequestSendOriginal.call(this, ...args as []);
+    },
+});
 
 
 vi.mock("@/utils/logger", () => ({

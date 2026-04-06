@@ -1,6 +1,7 @@
 package sgc.integracao;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import org.junit.jupiter.api.DisplayName;
@@ -8,10 +9,13 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.TestPropertySource;
 import sgc.alerta.model.Alerta;
 import sgc.organizacao.model.Perfil;
@@ -42,10 +46,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 @SpringBootTest
+@ActiveProfiles("hom")
 @Tag("integration")
 @DisplayName("Benchmark Oracle de Processo e Subprocesso")
 @TestPropertySource(properties = {
-        "spring.jpa.properties.hibernate.session_factory.statement_inspector=sgc.integracao.mocks.ColetorSqlTeste"
+        "spring.jpa.properties.hibernate.session_factory.statement_inspector=sgc.integracao.mocks.ColetorSqlTeste",
+        "spring.datasource.url=${DB_URL}",
+        "spring.datasource.username=${DB_USERNAME}",
+        "spring.datasource.password=${DB_PASSWORD}",
+        "spring.datasource.driver-class-name=oracle.jdbc.OracleDriver",
+        "spring.sql.init.mode=never"
 })
 class ProcessoSubprocessoPerformanceOracleIntegrationTest {
     private static final Logger logger = LoggerFactory.getLogger(ProcessoSubprocessoPerformanceOracleIntegrationTest.class);
@@ -67,6 +77,8 @@ class ProcessoSubprocessoPerformanceOracleIntegrationTest {
     private PainelFacade painelFacade;
     @Autowired
     private sgc.subprocesso.service.SubprocessoConsultaService subprocessoConsultaService;
+    @MockitoBean
+    private JavaMailSender javaMailSender;
 
     @Test
     @DisplayName("Deve medir hotspots de processo e subprocesso no Oracle real")
@@ -79,13 +91,20 @@ class ProcessoSubprocessoPerformanceOracleIntegrationTest {
 
         List<MetricasExecucaoTeste.ResultadoMedicao> resultados = new ArrayList<>();
         resultados.add(medidor.medir(
-                "painel.listarProcessos.admin",
-                () -> painelFacade.listarProcessos(Perfil.ADMIN, amostras.codigoUnidadeBase(), PageRequest.of(0, 20)),
+                "painel.listarProcessos.gestor",
+                () -> painelFacade.listarProcessos(
+                        amostras.perfilPainel(),
+                        amostras.codigoUnidadeBase(),
+                        PageRequest.of(0, 20)),
                 "VW_UNIDADE", "PROCESSO"
         ));
         resultados.add(medidor.medir(
-                "painel.listarAlertas.admin",
-                () -> painelFacade.listarAlertas(amostras.usuarioBase().getTituloEleitoral(), amostras.codigoUnidadeBase(), Perfil.ADMIN.name(), PageRequest.of(0, 20)),
+                "painel.listarAlertas.gestor",
+                () -> painelFacade.listarAlertas(
+                        amostras.usuarioBase().getTituloEleitoral(),
+                        amostras.codigoUnidadeBase(),
+                        amostras.perfilPainel().name(),
+                        PageRequest.of(0, 20)),
                 "ALERTA", "ALERTA_USUARIO"
         ));
         resultados.add(medidor.medir(
@@ -111,7 +130,10 @@ class ProcessoSubprocessoPerformanceOracleIntegrationTest {
         Path arquivo = DIRETORIO_RELATORIOS.resolve(
                 "oracle-" + DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss").format(OffsetDateTime.now()) + ".json"
         );
-        new ObjectMapper().writerWithDefaultPrettyPrinter().writeValue(arquivo.toFile(), relatorio);
+        ObjectMapper objectMapper = JsonMapper.builder()
+                .findAndAddModules()
+                .build();
+        objectMapper.writerWithDefaultPrettyPrinter().writeValue(arquivo.toFile(), relatorio);
 
         logger.info("\n{}", formatarRelatorio(relatorio, arquivo));
     }
@@ -138,10 +160,11 @@ class ProcessoSubprocessoPerformanceOracleIntegrationTest {
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("Nenhum usuario encontrado para benchmark Oracle."));
 
-        Long codigoSubprocessoDetalhe = subprocessoRepo.findAll(PageRequest.of(0, 1)).getContent().stream()
-                .map(Subprocesso::getCodigo)
+        Subprocesso subprocessoBase = subprocessoRepo.findAll(PageRequest.of(0, 20)).getContent().stream()
+                .filter(subprocesso -> subprocesso.getUnidade() != null)
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("Nenhum subprocesso encontrado para benchmark Oracle."));
+        Long codigoSubprocessoDetalhe = subprocessoBase.getCodigo();
 
         Long codigoSubprocessoHistorico = analiseRepo.findAll(PageRequest.of(0, 1)).getContent().stream()
                 .map(Analise::getSubprocesso)
@@ -149,9 +172,13 @@ class ProcessoSubprocessoPerformanceOracleIntegrationTest {
                 .findFirst()
                 .orElse(codigoSubprocessoDetalhe);
 
+        Long codigoUnidadeBase = subprocessoBase.getUnidade().getCodigo();
+        Perfil perfilPainel = Perfil.GESTOR;
+
         return new AmostrasBenchmark(
                 usuarioBase,
-                usuarioBase.getUnidadeLotacao().getCodigo(),
+                codigoUnidadeBase,
+                perfilPainel,
                 codigoSubprocessoDetalhe,
                 codigoSubprocessoHistorico
         );
@@ -198,6 +225,7 @@ class ProcessoSubprocessoPerformanceOracleIntegrationTest {
     private record AmostrasBenchmark(
             Usuario usuarioBase,
             Long codigoUnidadeBase,
+            Perfil perfilPainel,
             Long codigoSubprocessoDetalhe,
             Long codigoSubprocessoHistorico
     ) {

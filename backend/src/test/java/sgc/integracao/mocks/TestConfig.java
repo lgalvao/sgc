@@ -1,6 +1,7 @@
 package sgc.integracao.mocks;
 
 import com.icegreen.greenmail.util.*;
+import org.springframework.boot.test.context.*;
 import org.springframework.context.annotation.*;
 import org.springframework.core.task.*;
 import org.springframework.mail.javamail.*;
@@ -16,7 +17,7 @@ import java.util.concurrent.*;
  * GreenMail é sempre iniciado no perfil "test", eliminando a necessidade de um perfil "email-test" separado.
  * Testes que não verificam e-mail podem simplesmente usar @MockitoBean em EmailService.
  */
-@Configuration
+@TestConfiguration
 public class TestConfig implements AsyncConfigurer {
     @Bean(destroyMethod = "stop")
     @Profile({"test", "e2e", "secure-test"})
