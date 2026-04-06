@@ -153,7 +153,7 @@ describe('ProcessoCadastroView.vue', () => {
             quantidadeOcorrencias: 2,
             grupos: [
                 {
-                    tipo: 'Unidade participante sem responsavel efetivo',
+                    tipo: 'Unidade sem responsável',
                     quantidadeOcorrencias: 2,
                     ocorrencias: ['sigla=Z1', 'sigla=Z2'],
                 },
@@ -166,7 +166,7 @@ describe('ProcessoCadastroView.vue', () => {
         await flushPromises();
 
         expect(wrapper.text()).toContain('Pendências organizacionais identificadas.');
-        expect(wrapper.text()).toContain('Unidade participante sem responsavel efetivo: 2 ocorrência(s)');
+        expect(wrapper.text()).toContain('Unidade sem responsável: 2 ocorrência(s)');
     });
 
     it('disables action buttons when form is incomplete and enables when complete', async () => {

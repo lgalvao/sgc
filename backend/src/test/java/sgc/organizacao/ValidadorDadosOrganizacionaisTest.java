@@ -118,7 +118,7 @@ class ValidadorDadosOrganizacionaisTest {
                 .isEqualTo("Há unidades atualmente sem responsável efetivo: OPE. Essas unidades só poderão participar de processos do SGC quando a responsabilidade for definida, externamente ou via atribuição temporária no próprio sistema.");
         assertThat(diagnostico.grupos())
                 .extracting(GrupoViolacaoOrganizacionalDto::tipo)
-                .containsExactly("Unidade participante sem responsavel efetivo");
+                .containsExactly("Unidade sem responsável");
     }
 
     @Test
@@ -254,7 +254,7 @@ class ValidadorDadosOrganizacionaisTest {
 
         assertThat(diagnostico.possuiViolacoes()).isTrue();
         assertThat(diagnostico.quantidadeTiposViolacao()).isEqualTo(1);
-        assertThat(diagnostico.grupos().getFirst().tipo()).isEqualTo("Unidade participante sem responsavel efetivo");
+        assertThat(diagnostico.grupos().getFirst().tipo()).isEqualTo("Unidade sem responsável");
     }
 
     @Test
@@ -309,7 +309,7 @@ class ValidadorDadosOrganizacionaisTest {
         assertThat(diagnostico.possuiViolacoes()).isTrue();
         assertThat(diagnostico.grupos())
                 .extracting(GrupoViolacaoOrganizacionalDto::tipo)
-                .contains("Unidade participante sem responsavel efetivo");
+                .contains("Unidade sem responsável");
     }
 
     @Test

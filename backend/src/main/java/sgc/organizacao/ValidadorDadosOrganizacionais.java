@@ -105,7 +105,7 @@ public class ValidadorDadosOrganizacionais {
 
     private String construirResumo(Map<String, List<String>> violacoesPorTipo) {
         List<String> unidadesSemResponsavel = violacoesPorTipo
-                .getOrDefault("Unidade participante sem responsavel efetivo", List.of())
+                .getOrDefault("Unidade sem responsável", List.of())
                 .stream()
                 .<String>mapMulti((detalhe, consumer) -> {
                     String sigla = extrairSigla(detalhe);
@@ -297,7 +297,7 @@ public class ValidadorDadosOrganizacionais {
             ResponsabilidadeLeitura responsabilidade = responsabilidadesPorUnidade.get(unidade.codigo());
             if (responsabilidade == null || estaVazio(responsabilidade.usuarioTitulo())) {
                 adicionarViolacao(violacoesPorTipo,
-                        "Unidade participante sem responsavel efetivo",
+                        "Unidade sem responsável",
                         "sigla=%s, tipo=%s".formatted(unidade.sigla(), unidade.tipo()));
             }
         }

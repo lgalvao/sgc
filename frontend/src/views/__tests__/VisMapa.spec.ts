@@ -77,7 +77,7 @@ vi.mock("@/services/subprocessoService", () => ({
             habilitarAcessoMapa: true,
         },
     }),
-    mapSubprocessoDetalheDtoToModel: vi.fn((dto) => dto),
+    mapSubprocessoDetalheResponseParaModel: vi.fn((dto) => dto),
     obterMapaVisualizacao: vi.fn().mockResolvedValue({competencias: []}),
 }));
 vi.mock("@/services/analiseService", () => ({

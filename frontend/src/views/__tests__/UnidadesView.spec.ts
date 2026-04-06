@@ -108,7 +108,7 @@ describe("Unidades.vue", () => {
                     ocorrencias: ["titulo=1", "titulo=2"]
                 },
                 {
-                    tipo: "Unidade participante sem responsavel efetivo",
+                    tipo: "Unidade sem responsável",
                     quantidadeOcorrencias: 1,
                     ocorrencias: ["sigla=43ª Z.E."]
                 }
@@ -123,7 +123,7 @@ describe("Unidades.vue", () => {
 
         expect(wrapper.text()).toContain("Pendências organizacionais identificadas.");
         expect(wrapper.text()).toContain("VW_USUARIO com titulo duplicado: 2 ocorrência(s)");
-        expect(wrapper.text()).toContain("Unidade participante sem responsavel efetivo: 1 ocorrência(s)");
+        expect(wrapper.text()).toContain("Unidade sem responsável: 1 ocorrência(s)");
     });
 
     it("deve exibir spinner durante carregamento", async () => {
