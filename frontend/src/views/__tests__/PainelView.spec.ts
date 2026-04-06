@@ -96,7 +96,7 @@ describe('PainelView', () => {
     const toastStore = useToastStore(pinia);
     toastStore.consumePending = vi.fn().mockReturnValue({ body: 'Sucesso' });
 
-    const wrapper = mount(PainelView, options);
+    mount(PainelView, options);
     await flushPromises();
 
     expect(painelService.listarProcessos).toHaveBeenCalledWith({codUnidade: 1, page: 0, size: 10});

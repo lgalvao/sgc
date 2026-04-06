@@ -386,13 +386,6 @@ describe("TreeTable.vue", () => {
 
         expect((wrapper.vm as any).internalData).toEqual([
             {
-                codigo: 1,
-                sigla: "GP",
-                unidade: "GP - Gabinete da Presidencia",
-                expanded: false,
-                children: [],
-            },
-            {
                 codigo: "raiz-zonas-eleitorais",
                 unidade: "ZONAS ELEITORAIS",
                 expanded: true,
@@ -414,6 +407,13 @@ describe("TreeTable.vue", () => {
                     },
                 ],
             },
+            {
+                codigo: 1,
+                sigla: "GP",
+                unidade: "GP - Gabinete da Presidencia",
+                expanded: false,
+                children: [],
+            },
         ]);
     });
 
@@ -431,7 +431,7 @@ describe("TreeTable.vue", () => {
             global: {stubs: {TreeRowItem: mockTreeRow}},
         });
 
-        expect((wrapper.vm as any).internalData.map((item: any) => item.codigo)).toEqual([2, 3, 1, 4]);
+        expect((wrapper.vm as any).internalData.map((item: any) => item.codigo)).toEqual([2, 3, 4, 1]);
     });
 
     it("deve ordenar em blocos: secretarias, zonas eleitorais e demais em ordem alfabetica", () => {

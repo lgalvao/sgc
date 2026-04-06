@@ -182,7 +182,7 @@ const agruparZonasEleitorais = (
     const children = item.children
         ? agruparZonasEleitorais(item.children, `unidade-${item.codigo}`)
         : [];
-    const itemNormalizado = {
+    const itemNormalizado: TreeItem = {
       ...item,
       children,
     };
@@ -208,7 +208,7 @@ const priorizarSecretarias = (items: TreeItem[]): TreeItem[] => {
 
   for (const item of items) {
     const children = item.children ? priorizarSecretarias(item.children) : [];
-    const itemNormalizado = {
+    const itemNormalizado: TreeItem = {
       ...item,
       children,
     };
@@ -227,8 +227,8 @@ const priorizarSecretarias = (items: TreeItem[]): TreeItem[] => {
   }
 
   demais.sort((a, b) => {
-    const textoA = typeof a.unidade === "string" ? a.unidade : "";
-    const textoB = typeof b.unidade === "string" ? b.unidade : "";
+    const textoA = typeof a.unidade === "string" ? (a.unidade as string) : "";
+    const textoB = typeof b.unidade === "string" ? (b.unidade as string) : "";
     return textoA.localeCompare(textoB, "pt-BR", {sensitivity: "base"});
   });
 
