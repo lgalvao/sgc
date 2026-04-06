@@ -111,6 +111,10 @@ export async function excluirProcesso(codProcesso: number): Promise<void> {
     await apiClient.post(`/processos/${codProcesso}/excluir`);
 }
 
+export async function excluirProcessoCompleto(codProcesso: number): Promise<void> {
+    await apiClient.post(`/processos/${codProcesso}/excluir-completo`);
+}
+
 export async function obterDetalhesProcesso(codProcesso: number): Promise<Processo> {
     const response = await apiClient.get<Processo>(`/processos/${codProcesso}/detalhes`);
     return response.data;

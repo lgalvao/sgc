@@ -10,6 +10,8 @@ import org.springframework.transaction.annotation.*;
 import sgc.comum.erros.*;
 import sgc.processo.model.*;
 
+import java.util.Locale;
+
 @Service
 @Profile("hom")
 @RequiredArgsConstructor
@@ -36,15 +38,7 @@ public class ProcessoExclusaoCompletaService {
                 WHERE alerta_codigo IN (SELECT codigo FROM sgc.alerta WHERE processo_codigo = ?)""", codigo);
         jdbcTemplate.update("DELETE FROM sgc.alerta WHERE processo_codigo = ?", codigo);
 
-        jdbcTemplate.update("""
-                DELETE FROM sgc.avaliacao_servidor
-                WHERE diagnostico_codigo IN """ + SUBQUERY_DIAGNOSTICOS +
-                " OR competencia_codigo IN " + SUBQUERY_COMPETENCIAS, codigo, codigo);
-        jdbcTemplate.update("""
-                DELETE FROM sgc.ocupacao_critica
-                WHERE diagnostico_codigo IN """ + SUBQUERY_DIAGNOSTICOS +
-                " OR competencia_codigo IN " + SUBQUERY_COMPETENCIAS, codigo, codigo);
-        jdbcTemplate.update("DELETE FROM sgc.diagnostico WHERE subprocesso_codigo IN " + SUBQUERY_SUBPROCESSOS, codigo);
+        excluirDiagnosticoSePresente(codigo);
 
         jdbcTemplate.update("DELETE FROM sgc.conhecimento WHERE atividade_codigo IN " + SUBQUERY_ATIVIDADES, codigo);
         jdbcTemplate.update("DELETE FROM sgc.competencia_atividade WHERE atividade_codigo IN " + SUBQUERY_ATIVIDADES, codigo);
@@ -63,6 +57,35 @@ public class ProcessoExclusaoCompletaService {
 
         limparCaches();
         log.warn("Processo {} e seus dependentes foram excluidos via endpoint administrativo de homologacao.", codigo);
+    }
+
+    private void excluirDiagnosticoSePresente(Long codigoProcesso) {
+        if (tabelaExiste("AVALIACAO_SERVIDOR")) {
+            jdbcTemplate.update("""
+                    DELETE FROM sgc.avaliacao_servidor
+                    WHERE diagnostico_codigo IN """ + SUBQUERY_DIAGNOSTICOS +
+                    " OR competencia_codigo IN " + SUBQUERY_COMPETENCIAS, codigoProcesso, codigoProcesso);
+        }
+
+        if (tabelaExiste("OCUPACAO_CRITICA")) {
+            jdbcTemplate.update("""
+                    DELETE FROM sgc.ocupacao_critica
+                    WHERE diagnostico_codigo IN """ + SUBQUERY_DIAGNOSTICOS +
+                    " OR competencia_codigo IN " + SUBQUERY_COMPETENCIAS, codigoProcesso, codigoProcesso);
+        }
+
+        if (tabelaExiste("DIAGNOSTICO")) {
+            jdbcTemplate.update("DELETE FROM sgc.diagnostico WHERE subprocesso_codigo IN " + SUBQUERY_SUBPROCESSOS, codigoProcesso);
+        }
+    }
+
+    private boolean tabelaExiste(String nomeTabela) {
+        Integer quantidade = jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM user_tables WHERE table_name = ?",
+                Integer.class,
+                nomeTabela.toUpperCase(Locale.ROOT)
+        );
+        return quantidade != null && quantidade > 0;
     }
 
     private void limparCaches() {

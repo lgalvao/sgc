@@ -483,6 +483,7 @@ public class ProcessoService {
                     Long codigoUnidadeParticipante = p.getUnidadeCodigoPersistido();
                     UnidadeParticipanteDto uDto = UnidadeParticipanteDto.fromSnapshot(p);
                     Subprocesso sp = mapSp.get(codigoUnidadeParticipante);
+                    validarDadosBasicosParticipante(processo.getCodigo(), uDto);
                     if (sp != null) {
                         uDto.preencherComSubprocesso(sp, obterLocalizacaoAtual(sp, localizacoesPorSubprocesso));
                     }
@@ -499,6 +500,15 @@ public class ProcessoService {
                         Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER));
         dto.getUnidades().sort(comparadorPorSigla);
         mapDto.values().forEach(u -> u.getFilhos().sort(comparadorPorSigla));
+    }
+
+    private void validarDadosBasicosParticipante(Long codigoProcesso, UnidadeParticipanteDto unidadeDto) {
+        if (unidadeDto.getNome() == null || unidadeDto.getNome().isBlank()
+                || unidadeDto.getSigla() == null || unidadeDto.getSigla().isBlank()) {
+            throw new IllegalStateException(
+                    "Snapshot inconsistente de unidade participante no processo %d para unidade %d"
+                            .formatted(codigoProcesso, unidadeDto.getCodUnidade()));
+        }
     }
 
     private Unidade obterLocalizacao(Subprocesso sp) {

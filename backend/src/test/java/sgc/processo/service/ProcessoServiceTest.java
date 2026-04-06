@@ -420,8 +420,8 @@ class ProcessoServiceTest {
         }
 
         @Test
-        @DisplayName("Deve ordenar detalhes mesmo quando houver sigla nula em snapshot legado")
-        void deveOrdenarDetalhesMesmoQuandoHouverSiglaNula() {
+        @DisplayName("Deve falhar quando houver snapshot legado sem nome ou sigla")
+        void deveFalharQuandoHouverSnapshotLegadoSemNomeOuSigla() {
             Long codProcesso = 1L;
             Usuario usuario = new Usuario();
             usuario.setPerfilAtivo(Perfil.ADMIN);
@@ -461,11 +461,11 @@ class ProcessoServiceTest {
             ));
             when(validacaoService.validarSubprocessosParaFinalizacao(codProcesso)).thenReturn(ValidationResult.ofValido());
 
-            ProcessoDetalheDto result = processoService.obterDetalhesCompleto(codProcesso, usuario, false);
-
-            assertThat(result.getUnidades()).hasSize(2);
-            assertThat(result.getUnidades().get(0).getSigla()).isEqualTo("ABC");
-            assertThat(result.getUnidades().get(1).getSigla()).isNull();
+            assertThatThrownBy(() -> processoService.obterDetalhesCompleto(codProcesso, usuario, false))
+                    .isInstanceOf(IllegalStateException.class)
+                    .hasMessageContaining("Snapshot inconsistente de unidade participante")
+                    .hasMessageContaining("processo 1")
+                    .hasMessageContaining("unidade 20");
         }
 
         @Test

@@ -2,14 +2,24 @@
   <LayoutPadrao>
     <PageHeader :title="TEXTOS.administracao.TITULO">
       <template #actions>
-        <BButton
-            data-testid="btn-abrir-modal-add-admin"
-            size="sm"
-            variant="outline-primary"
-            @click="abrirModalAdicionarAdmin"
-        >
-          <i aria-hidden="true" class="bi bi-person-plus"></i> {{ TEXTOS.administracao.BOTAO_ADICIONAR }}
-        </BButton>
+        <div class="d-flex gap-2">
+          <BButton
+              data-testid="btn-abrir-limpeza-processos"
+              size="sm"
+              variant="outline-danger"
+              @click="abrirLimpezaProcessos"
+          >
+            <i aria-hidden="true" class="bi bi-trash"></i> {{ TEXTOS.administracao.BOTAO_LIMPEZA_PROCESSOS }}
+          </BButton>
+          <BButton
+              data-testid="btn-abrir-modal-add-admin"
+              size="sm"
+              variant="outline-primary"
+              @click="abrirModalAdicionarAdmin"
+          >
+            <i aria-hidden="true" class="bi bi-person-plus"></i> {{ TEXTOS.administracao.BOTAO_ADICIONAR }}
+          </BButton>
+        </div>
       </template>
     </PageHeader>
 
@@ -103,6 +113,7 @@
 <script lang="ts" setup>
 import {onMounted, ref} from 'vue';
 import {BAlert, BButton, BFormGroup, BFormInput, BSpinner, BTable} from 'bootstrap-vue-next';
+import {useRouter} from 'vue-router';
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import PageHeader from '@/components/layout/PageHeader.vue';
 import EmptyState from '@/components/comum/EmptyState.vue';
@@ -121,6 +132,7 @@ import {useAsyncAction} from '@/composables/useAsyncAction';
 
 const {notify} = useNotification();
 const {carregando: carregandoAdmins, erro: erroAdmins, executarSilencioso} = useAsyncAction();
+const router = useRouter();
 
 const administradores = ref<AdministradorDto[]>([]);
 const removendoAdmin = ref<string | null>(null);
@@ -152,6 +164,10 @@ async function carregarAdministradores() {
 function abrirModalAdicionarAdmin() {
   novoAdminTitulo.value = '';
   mostrarModalAdicionarAdmin.value = true;
+}
+
+function abrirLimpezaProcessos() {
+  router.push('/administracao/limpeza-processos');
 }
 
 function fecharModalAdicionarAdmin() {

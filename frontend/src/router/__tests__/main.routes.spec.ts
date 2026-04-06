@@ -7,11 +7,12 @@ vi.mock('@/views/HistoricoView.vue', () => ({ default: { name: 'HistoricoView' }
 vi.mock('@/views/RelatoriosView.vue', () => ({ default: { name: 'RelatoriosView' } }));
 vi.mock('@/views/ParametrosView.vue', () => ({ default: { name: 'ParametrosView' } }));
 vi.mock('@/views/AdministradoresView.vue', () => ({ default: { name: 'AdministradoresView' } }));
+vi.mock('@/views/LimpezaProcessosView.vue', () => ({ default: { name: 'LimpezaProcessosView' } }));
 vi.mock('@/views/ErroGeralView.vue', () => ({ default: { name: 'ErroGeralView' } }));
 describe("main.routes", () => {
     it("deve exportar um array de rotas", () => {
         expect(Array.isArray(mainRoutes)).toBe(true);
-        expect(mainRoutes).toHaveLength(8);
+        expect(mainRoutes).toHaveLength(9);
     });
 
     it("deve redirecionar da raiz para /login", () => {
@@ -97,6 +98,20 @@ describe("main.routes", () => {
         expect(route).toBeDefined();
         expect(route?.path).toBe("/administradores");
         expect(route?.meta?.title).toBe("Administradores");
+        expect(route?.meta?.requiresAdmin).toBe(true);
+
+        if (typeof route?.component === "function") {
+            const component = await (route.component as () => Promise<any>)();
+            expect(component.default).toBeDefined();
+        }
+    }, 30000);
+
+    it("deve conter a rota LimpezaProcessos", async () => {
+        const route = mainRoutes.find((r) => r.name === "LimpezaProcessos");
+        expect(route).toBeDefined();
+        expect(route?.path).toBe("/administracao/limpeza-processos");
+        expect(route?.meta?.title).toBe("Limpeza de processos");
+        expect(route?.meta?.requiresAdmin).toBe(true);
 
         if (typeof route?.component === "function") {
             const component = await (route.component as () => Promise<any>)();

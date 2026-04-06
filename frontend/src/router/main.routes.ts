@@ -45,7 +45,13 @@ const mainRoutes: RouteRecordRaw[] = [
         path: "/administradores",
         name: "Administradores",
         component: () => import("@/views/AdministradoresView.vue"),
-        meta: {title: "Administradores"},
+        meta: {title: "Administradores", requiresAdmin: true},
+    },
+    {
+        path: "/administracao/limpeza-processos",
+        name: "LimpezaProcessos",
+        component: () => import("@/views/LimpezaProcessosView.vue"),
+        meta: {title: "Limpeza de processos", requiresAdmin: true},
     },
 ];
 

@@ -3,11 +3,22 @@ import {flushPromises, mount} from "@vue/test-utils";
 import AdministradoresView from "@/views/AdministradoresView.vue";
 import * as administradorService from "@/services/administradorService";
 import {createTestingPinia} from "@pinia/testing";
+import {useRouter} from "vue-router";
 
 vi.mock("@/services/administradorService", () => ({
     listarAdministradores: vi.fn(),
     adicionarAdministrador: vi.fn(),
     removerAdministrador: vi.fn()
+}));
+
+const {pushMock} = vi.hoisted(() => ({
+    pushMock: vi.fn(),
+}));
+
+vi.mock("vue-router", () => ({
+    useRouter: vi.fn(() => ({
+        push: pushMock,
+    })),
 }));
 
 describe("AdministradoresView.vue", () => {
@@ -19,6 +30,7 @@ describe("AdministradoresView.vue", () => {
     beforeEach(() => {
         vi.clearAllMocks();
         vi.mocked(administradorService.listarAdministradores).mockResolvedValue(mockAdmins);
+        vi.mocked(useRouter).mockReturnValue({push: pushMock} as any);
     });
 
     const createWrapper = () => {
@@ -84,6 +96,15 @@ describe("AdministradoresView.vue", () => {
         await flushPromises();
 
         expect(administradorService.adicionarAdministrador).toHaveBeenCalledWith("333");
+    });
+
+    it("deve navegar para a tela de limpeza de processos", async () => {
+        const wrapper = createWrapper();
+        await flushPromises();
+
+        await wrapper.find('button[data-testid="btn-abrir-limpeza-processos"]').trigger("click");
+
+        expect(pushMock).toHaveBeenCalledWith("/administracao/limpeza-processos");
     });
 
     it("deve remover administrador", async () => {

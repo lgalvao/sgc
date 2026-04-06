@@ -188,6 +188,12 @@ describe('processoService', () => {
         expect(apiClient.post).toHaveBeenCalledWith(`/processos/${codProcesso}/excluir`);
     });
 
+    it('excluirProcessoCompleto deve fazer requisição POST', async () => {
+        const codProcesso = 1;
+        await processoService.excluirProcessoCompleto(codProcesso);
+        expect(apiClient.post).toHaveBeenCalledWith(`/processos/${codProcesso}/excluir-completo`);
+    });
+
     it('obterDetalhesProcesso deve fazer requisição GET', async () => {
         const codProcesso = 1;
         const responseData = {codigo: 1, descricao: 'Detalhes'};
