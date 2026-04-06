@@ -1,5 +1,5 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
-import {mount} from '@vue/test-utils';
+import {flushPromises, mount} from '@vue/test-utils';
 import {createTestingPinia} from '@pinia/testing';
 import PainelView from '@/views/PainelView.vue';
 import {useToastStore} from '@/stores/toast';
@@ -63,7 +63,7 @@ describe('PainelView Coverage', () => {
             emits: ['ordenar']
         },
         BContainer: {template: '<div><slot /></div>'},
-        BButton: {template: '<button />'}
+        BButton: {template: '<button v-bind="$attrs" />'}
     };
 
     it('carregarDados calls buscarProcessosPainel and listarAlertas when unit is present', async () => {
@@ -135,6 +135,7 @@ describe('PainelView Coverage', () => {
             }
         });
         const wrapper = mount(PainelView, { global: { plugins: [pinia], stubs: commonStubs } });
+        await flushPromises();
         
         // Chamando a função via emit no stub pelo nome
         await wrapper.findComponent({ name: 'TabelaProcessos' }).vm.$emit('cta-vazio');

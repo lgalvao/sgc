@@ -62,7 +62,7 @@ describe("PainelView.vue", () => {
             ],
             stubs: {
                 BContainer: {template: '<div><slot /></div>'},
-                BButton: {template: '<button @click="$emit(\'click\')"><slot /></button>'},
+                BButton: {template: '<button v-bind="$attrs" @click="$emit(\'click\')"><slot /></button>'},
                 PageHeader: {
                     name: 'PageHeader',
                     props: ['title'],
@@ -143,17 +143,20 @@ describe("PainelView.vue", () => {
         const wrapperAdmin = mount(PainelView, mountOptions({
             perfil: {perfilSelecionado: "ADMIN"}
         }));
+        await flushPromises();
         expect(wrapperAdmin.find('[data-testid="btn-painel-criar-processo"]').exists()).toBe(true);
 
         // Not admin
         const wrapperUser = mount(PainelView, mountOptions({
             perfil: {perfilSelecionado: "USER"}
         }));
+        await flushPromises();
         expect(wrapperUser.find('[data-testid="btn-painel-criar-processo"]').exists()).toBe(false);
     });
 
     it("deve reordenar processos ao receber evento da tabela", async () => {
         const wrapper = mount(PainelView, mountOptions());
+        await flushPromises();
 
         vi.clearAllMocks(); // Limpa chamadas do onMounted
         (painelService.listarAlertas as any).mockResolvedValue(mockPageVazia);
@@ -172,6 +175,7 @@ describe("PainelView.vue", () => {
 
     it("deve navegar ao selecionar processo", async () => {
         const wrapper = mount(PainelView, mountOptions());
+        await flushPromises();
 
         const processoMock = {codigo: 1, descricao: "Teste", linkDestino: "/processo/1"};
         await wrapper.findComponent({name: 'TabelaProcessos'}).vm.$emit('selecionar-processo', processoMock);
