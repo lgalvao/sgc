@@ -50,6 +50,7 @@ describe("main.routes", () => {
         expect(route).toBeDefined();
         expect(route?.path).toBe("/painel");
         expect(route?.meta?.title).toBe("Painel");
+        expect(route?.meta?.keepAlive).toBe(true);
 
         if (typeof route?.component === "function") {
             const component = await (route.component as () => Promise<any>)();
@@ -62,6 +63,7 @@ describe("main.routes", () => {
         expect(route).toBeDefined();
         expect(route?.path).toBe("/historico");
         expect(route?.meta?.title).toBe("Histórico");
+        expect(route?.meta?.keepAlive).toBe(true);
 
         if (typeof route?.component === "function") {
             const component = await (route.component as () => Promise<any>)();
@@ -74,6 +76,7 @@ describe("main.routes", () => {
         expect(route).toBeDefined();
         expect(route?.path).toBe("/relatorios");
         expect(route?.meta?.title).toBe("Relatórios");
+        expect(route?.meta?.keepAlive).toBe(true);
 
         if (typeof route?.component === "function") {
             const component = await (route.component as () => Promise<any>)();

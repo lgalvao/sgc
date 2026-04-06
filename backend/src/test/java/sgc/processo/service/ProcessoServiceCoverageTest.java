@@ -85,6 +85,47 @@ class ProcessoServiceCoverageTest {
     }
 
     @Test
+    @DisplayName("obterDetalhesCompleto deve reutilizar subprocessos ja carregados ao listar elegiveis")
+    void deveReutilizarSubprocessosAoListarElegiveisNoContextoCompleto() {
+        Long cod = 1L;
+        Processo processo = new Processo();
+        processo.setCodigo(cod);
+        processo.setTipo(MAPEAMENTO);
+        processo.setSituacao(EM_ANDAMENTO);
+
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(10L);
+        unidade.setSigla("U10");
+        unidade.setNome("Unidade 10");
+        unidade.setTipo(TipoUnidade.OPERACIONAL);
+        unidade.setSituacao(SituacaoUnidade.ATIVA);
+        processo.adicionarParticipantes(Set.of(unidade));
+
+        Usuario usuario = new Usuario();
+        usuario.setPerfilAtivo(Perfil.ADMIN);
+        usuario.setUnidadeAtivaCodigo(10L);
+
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setCodigo(100L);
+        subprocesso.setUnidade(unidade);
+        subprocesso.setSituacao(MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+        subprocesso.setDataLimiteEtapa1(LocalDateTime.now().plusDays(1));
+
+        when(repo.buscar(Processo.class, cod)).thenReturn(processo);
+        when(consultaService.listarEntidadesPorProcessoComUnidade(cod)).thenReturn(List.of(subprocesso));
+        when(consultaService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(subprocesso.getCodigo(), unidade));
+        when(permissionEvaluator.verificarPermissao(usuario, processo, FINALIZAR_PROCESSO)).thenReturn(false);
+        when(permissionEvaluator.verificarPermissao(eq(usuario), any(Subprocesso.class), any(AcaoPermissao.class))).thenReturn(true);
+
+        ProcessoDetalheDto resultado = target.obterDetalhesCompleto(cod, usuario, true);
+
+        assertThat(resultado.getElegiveis()).hasSize(1);
+        verify(consultaService).listarEntidadesPorProcessoComUnidade(cod);
+        verify(consultaService, never()).listarEntidadesPorProcesso(cod);
+        verify(consultaService, times(1)).obterLocalizacoesAtuais(anyCollection());
+    }
+
+    @Test
     @DisplayName("finalizar deve notificar participantes")
     void deveNotificarParticipantesAoFinalizar() {
         Long codigo = 1L;
@@ -213,8 +254,6 @@ class ProcessoServiceCoverageTest {
             sp.setDataLimiteEtapa2(java.time.LocalDateTime.now());
             
             when(repo.buscar(Processo.class, cod)).thenReturn(p);
-            when(usuarioService.usuarioAutenticado()).thenReturn(u);
-            when(consultaService.listarEntidadesPorProcesso(cod)).thenReturn(List.of(sp));
             when(consultaService.listarEntidadesPorProcessoComUnidade(cod)).thenReturn(List.of(sp));
             when(consultaService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), uni));
             when(permissionEvaluator.verificarPermissao(u, p, sgc.seguranca.AcaoPermissao.FINALIZAR_PROCESSO)).thenReturn(true);
@@ -247,8 +286,6 @@ class ProcessoServiceCoverageTest {
             sp.setDataLimiteEtapa2(now.plusDays(1));
             
             when(repo.buscar(Processo.class, cod)).thenReturn(p);
-            when(usuarioService.usuarioAutenticado()).thenReturn(u);
-            when(consultaService.listarEntidadesPorProcesso(cod)).thenReturn(List.of(sp));
             when(consultaService.listarEntidadesPorProcessoComUnidade(cod)).thenReturn(List.of(sp));
             when(consultaService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), uni));
             when(permissionEvaluator.verificarPermissao(u, p, sgc.seguranca.AcaoPermissao.FINALIZAR_PROCESSO)).thenReturn(true);
@@ -281,8 +318,6 @@ class ProcessoServiceCoverageTest {
             sp.setDataLimiteEtapa2(d2);
             
             when(repo.buscar(Processo.class, cod)).thenReturn(p);
-            when(usuarioService.usuarioAutenticado()).thenReturn(u);
-            when(consultaService.listarEntidadesPorProcesso(cod)).thenReturn(List.of(sp));
             when(consultaService.listarEntidadesPorProcessoComUnidade(cod)).thenReturn(List.of(sp));
             when(consultaService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), uni));
             when(permissionEvaluator.verificarPermissao(u, p, sgc.seguranca.AcaoPermissao.FINALIZAR_PROCESSO)).thenReturn(true);
@@ -303,7 +338,7 @@ class ProcessoServiceCoverageTest {
             
             Subprocesso sp = new Subprocesso(); sp.setCodigo(100L); sp.setSituacao(MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
             Unidade uni = new Unidade(); uni.setCodigo(10L); 
-            uni.setSigla("U10"); uni.setTipo(TipoUnidade.OPERACIONAL); uni.setSituacao(SituacaoUnidade.ATIVA);
+            uni.setSigla("U10"); uni.setNome("Unidade 10"); uni.setTipo(TipoUnidade.OPERACIONAL); uni.setSituacao(SituacaoUnidade.ATIVA);
             sp.setUnidade(uni);
             sp.setDataLimiteEtapa1(java.time.LocalDateTime.now());
             sp.setMapa(null); // branch 441

@@ -145,7 +145,9 @@ function exibirToastPendente() {
         noProgress: true,
       }
     });
+    return true;
   }
+  return false;
 }
 
 onMounted(async () => {
@@ -154,8 +156,10 @@ onMounted(async () => {
 });
 
 onActivated(async () => {
-  exibirToastPendente();
-  await carregarDados();
+  const exibiuToast = exibirToastPendente();
+  if (exibiuToast) {
+    await carregarDados();
+  }
 });
 
 const processosOrdenados = computed(() => processosPainel.value);

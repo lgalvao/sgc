@@ -20,6 +20,7 @@ describe('processo.routes.ts', () => {
     it('deve tratar corretamente as props da rota para Subprocesso', () => {
         const route = processoRoutes.find(r => r.name === 'Subprocesso');
         expect(route).toBeDefined();
+        expect(route?.meta?.keepAlive).toBe(true);
 
         if (route && typeof route.props === 'function') {
             const props = route.props({
@@ -42,6 +43,14 @@ describe('processo.routes.ts', () => {
         } else {
             throw new Error('Props deve ser uma função');
         }
+    });
+
+    it('deve manter em cache as views de detalhe de processo e subprocesso', () => {
+        const processo = processoRoutes.find(r => r.name === 'Processo');
+        const subprocesso = processoRoutes.find(r => r.name === 'Subprocesso');
+
+        expect(processo?.meta?.keepAlive).toBe(true);
+        expect(subprocesso?.meta?.keepAlive).toBe(true);
     });
 
     it('deve tratar corretamente as props da rota para SubprocessoVisMapa', () => {

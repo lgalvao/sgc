@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import {computed} from "vue";
+import {computed, KeepAlive} from "vue";
 import {useRoute} from "vue-router";
 import {BOrchestrator} from "bootstrap-vue-next";
 import pkg from "../package.json";
@@ -21,6 +21,8 @@ const shouldShowNavBarExtras = computed(() => {
   return route.path !== "/painel";
 
 });
+
+const maximoRotasEmCache = 10;
 </script>
 
 <template>
@@ -45,7 +47,20 @@ const shouldShowNavBarExtras = computed(() => {
     </div>
 
     <main id="main-content" class="flex-grow-1 pb-3">
-      <router-view/>
+      <router-view v-slot="{ Component, route: currentRoute }">
+        <KeepAlive :max="maximoRotasEmCache">
+          <component
+              :is="Component"
+              v-if="currentRoute.meta?.keepAlive"
+              :key="currentRoute.fullPath"
+          />
+        </KeepAlive>
+        <component
+            :is="Component"
+            v-if="!currentRoute.meta?.keepAlive"
+            :key="currentRoute.fullPath"
+        />
+      </router-view>
     </main>
 
     <footer

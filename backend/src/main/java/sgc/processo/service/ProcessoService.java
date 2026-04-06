@@ -141,10 +141,20 @@ public class ProcessoService {
             subprocessos = consultaService.listarEntidadesPorProcessoEUnidades(codProcesso, unidadesAcesso);
         }
 
+        return listarSubprocessosElegiveis(subprocessos, usuario, null);
+    }
+
+    private List<SubprocessoElegivelDto> listarSubprocessosElegiveis(
+            List<Subprocesso> subprocessos,
+            Usuario usuario,
+            Map<Long, Unidade> localizacoesPrecarregadas
+    ) {
         List<Subprocesso> subprocessosElegiveis = subprocessos.stream()
                 .filter(subprocesso -> isElegivelParaAcaoEmBloco(subprocesso, usuario))
                 .toList();
-        Map<Long, Unidade> localizacoesPorSubprocesso = consultaService.obterLocalizacoesAtuais(subprocessosElegiveis);
+        Map<Long, Unidade> localizacoesPorSubprocesso = localizacoesPrecarregadas != null
+                ? localizacoesPrecarregadas
+                : consultaService.obterLocalizacoesAtuais(subprocessosElegiveis);
 
         return subprocessosElegiveis.stream()
                 .map(subprocesso -> toElegivelDto(subprocesso, obterLocalizacaoAtual(subprocesso, localizacoesPorSubprocesso)))
@@ -307,7 +317,12 @@ public class ProcessoService {
 
         montarHierarquiaNoDto(dto, processo, subprocessos, unidadesAcesso, localizacoesPorSubprocesso);
         if (incluirElegiveis) {
-            dto.getElegiveis().addAll(listarSubprocessosElegiveis(codProcesso));
+            List<Subprocesso> subprocessosVisiveis = usuario.getPerfilAtivo() == Perfil.ADMIN
+                    ? subprocessos
+                    : subprocessos.stream()
+                    .filter(subprocesso -> unidadesAcesso.contains(subprocesso.getUnidade().getCodigo()))
+                    .toList();
+            dto.getElegiveis().addAll(listarSubprocessosElegiveis(subprocessosVisiveis, usuario, localizacoesPorSubprocesso));
         }
 
         return dto;

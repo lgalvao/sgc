@@ -307,6 +307,13 @@ public class SubprocessoConsultaService {
         return listarAtividadesSubprocesso(subprocesso);
     }
 
+    private List<AtividadeDto> listarAtividadesSubprocesso(Subprocesso subprocesso) {
+        Long codMapa = obterCodigoMapaObrigatorio(subprocesso);
+        return mapaManutencaoService.atividadesMapaCodigoComConhecimentos(codMapa).stream()
+                .map(AtividadeDto::fromEntity)
+                .toList();
+    }
+
     public List<AtividadeDto> listarAtividadesParaImportacao(Long codSubprocesso) {
         Subprocesso subprocesso = buscarSubprocesso(codSubprocesso);
         if (subprocesso.getProcesso() == null || subprocesso.getProcesso().getSituacao() != SituacaoProcesso.FINALIZADO) {
@@ -426,24 +433,16 @@ public class SubprocessoConsultaService {
 
     private DadosContextoEdicao montarDadosContextoEdicao(Long codSubprocesso, Usuario usuario) {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
+        Mapa mapaCompleto = mapaManutencaoService.mapaCompletoSubprocesso(sp.getCodigo());
         return new DadosContextoEdicao(
                 sp,
                 sp.getUnidade(),
                 obterDetalhes(sp, usuario),
-                obterMapaCompletoDto(sp),
-                listarAtividadesSubprocesso(sp)
+                MapaCompletoDto.fromEntity(mapaCompleto),
+                mapaCompleto.getAtividades().stream()
+                        .map(AtividadeDto::fromEntity)
+                        .toList()
         );
-    }
-
-    private List<AtividadeDto> listarAtividadesSubprocesso(Subprocesso subprocesso) {
-        Long codMapa = obterCodigoMapaObrigatorio(subprocesso);
-        return mapaManutencaoService.atividadesMapaCodigoComConhecimentos(codMapa).stream()
-                .map(AtividadeDto::fromEntity)
-                .toList();
-    }
-
-    private MapaCompletoDto obterMapaCompletoDto(Subprocesso subprocesso) {
-        return MapaCompletoDto.fromEntity(mapaManutencaoService.mapaCompletoSubprocesso(subprocesso.getCodigo()));
     }
 
     private List<Analise> listarAnalisesPorTipo(Long codSubprocesso, TipoAnalise tipo) {

@@ -21,19 +21,19 @@ const mainRoutes: RouteRecordRaw[] = [
         path: "/painel",
         name: "Painel",
         component: () => import("@/views/PainelView.vue"),
-        meta: {title: "Painel"},
+        meta: {title: "Painel", keepAlive: true},
     },
     {
         path: "/historico",
         name: "Historico",
         component: () => import("@/views/HistoricoView.vue"),
-        meta: {title: "Histórico"},
+        meta: {title: "Histórico", keepAlive: true},
     },
     {
         path: "/relatorios",
         name: "Relatorios",
         component: () => import("@/views/RelatoriosView.vue"),
-        meta: {title: "Relatórios"},
+        meta: {title: "Relatórios", keepAlive: true},
     },
     {
         path: "/configuracoes",

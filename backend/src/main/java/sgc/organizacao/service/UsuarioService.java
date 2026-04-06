@@ -3,7 +3,6 @@ package sgc.organizacao.service;
 import lombok.*;
 import lombok.extern.slf4j.*;
 import org.springframework.cache.annotation.*;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.*;
 import org.springframework.security.core.*;
 import org.springframework.stereotype.*;
@@ -25,8 +24,8 @@ public class UsuarioService {
     private static final int LIMITE_PESQUISA_USUARIO = 20;
 
     private final UsuarioRepo usuarioRepo;
-    private final UsuarioPerfilRepo usuarioPerfilRepo;
     private final AdministradorRepo administradorRepo;
+    private final UsuarioPerfilCacheService usuarioPerfilCacheService;
 
     public Usuario buscar(String titulo) {
         return usuarioRepo.buscarPorTitulo(titulo)
@@ -69,14 +68,12 @@ public class UsuarioService {
         );
     }
 
-    @Cacheable(cacheNames = CacheConfig.CACHE_USUARIO_AUTORIZACOES, key = "#usuarioTitulo", sync = true)
     public List<UsuarioPerfilAutorizacaoLeitura> buscarAutorizacoesPerfil(String usuarioTitulo) {
-        return usuarioPerfilRepo.listarAutorizacoesPorUsuarioTitulo(usuarioTitulo);
+        return usuarioPerfilCacheService.buscarAutorizacoesPerfil(usuarioTitulo);
     }
 
-    @Cacheable(cacheNames = CacheConfig.CACHE_USUARIO_PERFIS, key = "#usuarioTitulo", sync = true)
     public List<Perfil> buscarPerfisPorUsuarioTitulo(String usuarioTitulo) {
-        return usuarioPerfilRepo.listarPerfisPorUsuarioTitulo(usuarioTitulo);
+        return usuarioPerfilCacheService.buscarPerfisPorUsuarioTitulo(usuarioTitulo);
     }
 
     public void carregarAuthorities(Usuario usuario) {

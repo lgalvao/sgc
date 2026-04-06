@@ -8,6 +8,7 @@ const unidadeRoutes: RouteRecordRaw[] = [
         meta: {
             title: "Unidades",
             breadcrumb: "Unidades",
+            keepAlive: true,
         },
     },
     {
@@ -21,6 +22,7 @@ const unidadeRoutes: RouteRecordRaw[] = [
             title: "Unidade",
             breadcrumb: (route: RouteLocationNormalized) =>
                 `${route.params.codUnidade ?? ""}`,
+            keepAlive: true,
         },
     },
     {

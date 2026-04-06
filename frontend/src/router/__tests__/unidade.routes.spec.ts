@@ -19,6 +19,7 @@ describe("unidade.routes", () => {
         expect(route?.path).toBe("/unidades");
         expect(route?.meta?.title).toBe("Unidades");
         expect(route?.meta?.breadcrumb).toBe("Unidades");
+        expect(route?.meta?.keepAlive).toBe(true);
 
         if (typeof route?.component === "function") {
             const component = await (route.component as () => Promise<any>)();
@@ -30,6 +31,7 @@ describe("unidade.routes", () => {
         const route = unidadeRoutes.find((r) => r.name === "Unidade");
         expect(route).toBeDefined();
         expect(route?.path).toBe("/unidade/:codUnidade");
+        expect(route?.meta?.keepAlive).toBe(true);
 
         const mockRoute = {
             params: {codUnidade: "123"}

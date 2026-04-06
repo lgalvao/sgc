@@ -15,6 +15,7 @@ const processoRoutes: RouteRecordRaw[] = [
         meta: {
             title: "Unidades do Processo",
             breadcrumb: "Detalhes do processo",
+            keepAlive: true,
         },
     },
     {
@@ -28,6 +29,7 @@ const processoRoutes: RouteRecordRaw[] = [
         meta: {
             title: "Processos da Unidade",
             breadcrumb: (route: RouteLocationNormalized) => route.params.siglaUnidade as string,
+            keepAlive: true,
         },
     },
     {
