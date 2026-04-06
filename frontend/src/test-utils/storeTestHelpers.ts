@@ -21,9 +21,9 @@ export function setupStoreTest<T>(useStore: () => T) {
  */
 export function testServiceCall<T>(
     action: () => Promise<T>,
-    service: any,
+    service: Record<string, any>,
     method: string,
-    expectedArgs: any[]
+    expectedArgs: unknown[]
 ) {
     it("deve chamar o service com os parâmetros corretos", async () => {
         await action();
@@ -36,7 +36,7 @@ export function testServiceCall<T>(
  */
 export function testErrorHandling<T>(
     action: () => Promise<T>,
-    errorType?: Error | any
+    errorType?: Error | unknown
 ) {
     it("deve lançar um erro em caso de falha", async () => {
         if (errorType) {

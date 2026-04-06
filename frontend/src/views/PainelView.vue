@@ -194,7 +194,7 @@ function abrirDetalhesProcesso(processo: ProcessoResumo | undefined) {
 }
 
 const camposAlertas = [
-  {key: "dataHora", label: TEXTOS.painel.CAMPOS_ALERTAS.DATA_HORA, sortable: false, formatter: (v: any) => formatDateTimeBR(v)},
+  {key: "dataHora", label: TEXTOS.painel.CAMPOS_ALERTAS.DATA_HORA, sortable: false, formatter: (v: unknown) => formatDateTimeBR(v as string | Date)},
   {key: "mensagem", label: TEXTOS.painel.CAMPOS_ALERTAS.DESCRICAO},
   {key: "processo", label: TEXTOS.painel.CAMPOS_ALERTAS.PROCESSO, sortable: false},
   {key: "origem", label: TEXTOS.painel.CAMPOS_ALERTAS.ORIGEM},

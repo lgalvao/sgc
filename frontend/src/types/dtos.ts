@@ -75,7 +75,7 @@ export interface ProcessoDetalheDto {
     dataFinalizacao?: string;
     unidades?: UnidadeParticipanteDto[];
 
-    [key: string]: any; // Para campos adicionais do spread
+    [key: string]: unknown; // Para campos adicionais do spread
 }
 
 // DTOs para SGRH (autenticação e login)
@@ -132,5 +132,5 @@ export interface AtividadeOperacaoResponseDto {
     atividade: AtividadeDto | null;
     subprocesso: SubprocessoSituacaoDto;
     atividadesAtualizadas: AtividadeDto[];
-    permissoes?: any;
+    permissoes?: unknown;
 }

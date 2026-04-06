@@ -6,7 +6,13 @@ import {
     salvarMapaAjuste,
     salvarMapaCompleto,
 } from "@/services/subprocessoService";
-import type {DisponibilizarMapaRequest, MapaCompleto, SalvarCompetenciaRequest} from "@/types/tipos";
+import type {
+    DisponibilizarMapaRequest,
+    MapaCompleto,
+    SalvarAjustesRequest,
+    SalvarCompetenciaRequest,
+    SalvarMapaRequest
+} from "@/types/tipos";
 import {useAsyncAction} from "@/composables/useAsyncAction";
 import {useErrorHandler} from "@/composables/useErrorHandler";
 
@@ -14,13 +20,13 @@ export function useFluxoMapa() {
     const {lastError, clearError} = useErrorHandler();
     const {carregando, erro, executar} = useAsyncAction();
 
-    async function salvarMapa(codSubprocesso: number, dados: any): Promise<MapaCompleto | undefined> {
+    async function salvarMapa(codSubprocesso: number, dados: SalvarMapaRequest): Promise<MapaCompleto | undefined> {
         return executar(async () => {
             return await salvarMapaCompleto(codSubprocesso, dados);
         }, "Erro ao salvar mapa completo.");
     }
 
-    async function salvarAjustes(codSubprocesso: number, request: any) {
+    async function salvarAjustes(codSubprocesso: number, request: SalvarAjustesRequest) {
         await executar(async () => {
             await salvarMapaAjuste(codSubprocesso, request);
         }, "Erro ao salvar ajustes do mapa.");

@@ -28,9 +28,9 @@ const mockUnidadeRaiz = {
 
 const mockFunctions = {
     isChecked: (codigo: number | string) => codigo === 2,
-    getEstadoSelecao: (unidade: any) => unidade.codigo === 2,
-    isExpanded: (unidade: any) => unidade.codigo === 1,
-    isHabilitado: (_: any) => true,
+    getEstadoSelecao: (unidade: { codigo: number }) => unidade.codigo === 2,
+    isExpanded: (unidade: { codigo: number }) => unidade.codigo === 1,
+    isHabilitado: (_: unknown) => true,
     onToggle: vi.fn(),
     onToggleExpand: vi.fn(),
 };

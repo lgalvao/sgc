@@ -244,7 +244,7 @@ const performInitialLogin = async () => {
       } else {
         notify(TEXTOS.login.ERRO_CREDENCIAIS, 'danger');
       }
-  } catch (error: any) {
+  } catch (error: unknown) {
     const erroNormalizado = normalizeError(error);
     if (erroNormalizado.kind === 'unexpected') {
       logger.error("Erro interno no login:", erroNormalizado.message);
@@ -255,7 +255,7 @@ const performInitialLogin = async () => {
       logger.error("Erro no login:", error instanceof Error ? error.message : "Erro desconhecido");
     }
 
-    if (error.response?.status === 404 || error.response?.status === 401) {
+    if (erroNormalizado.kind === 'notFound' || erroNormalizado.kind === 'unauthorized') {
       notify(TEXTOS.login.ERRO_CREDENCIAIS, 'danger');
     } else {
       notify(TEXTOS.login.ERRO_GENERICO, 'danger');

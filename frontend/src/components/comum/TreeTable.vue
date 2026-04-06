@@ -81,13 +81,13 @@ import {computed, nextTick, ref, toRaw, watch} from "vue";
 import TreeRowItem from "./TreeRowItem.vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
 
-interface TreeItem {
+export interface TreeItem {
   codigo: number | string;
   expanded?: boolean;
   children?: TreeItem[];
   level?: number;
 
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 interface FlattenedTreeItem extends TreeItem {
@@ -208,7 +208,7 @@ const collapseAll = () => {
 };
 
 const handleTreeRowClick = (clickedItem: TreeItem) => {
-  emit("row-click", clickedItem);
+  emit("row-click", toRaw(clickedItem));
 };
 
 defineExpose({

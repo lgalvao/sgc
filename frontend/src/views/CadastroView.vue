@@ -457,8 +457,8 @@ async function confirmarRemocao() {
     });
     mostrarModalConfirmacaoRemocao.value = false;
     dadosRemocao.value = null;
-  } catch (e: any) {
-    const err = lastError.value?.message || e.message;
+  } catch (e: unknown) {
+    const err = lastError.value?.message || (e as Error).message;
     notify(err || TEXTOS.atividades.ERRO_REMOVER, 'danger');
     mostrarModalConfirmacaoRemocao.value = false;
   }

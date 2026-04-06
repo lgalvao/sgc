@@ -71,9 +71,10 @@ describe("useFluxoMapa", () => {
         const resposta = {codigo: 1, competencias: []} as any;
         vi.mocked(service.salvarMapaCompleto).mockResolvedValue(resposta);
 
-        const resultado = await fluxoMapa.salvarMapa(10, {dados: "teste"});
+        const dados = {competencias: []};
+        const resultado = await fluxoMapa.salvarMapa(10, dados);
 
-        expect(service.salvarMapaCompleto).toHaveBeenCalledWith(10, {dados: "teste"});
+        expect(service.salvarMapaCompleto).toHaveBeenCalledWith(10, dados);
         expect(resultado).toEqual(resposta);
     });
 
@@ -83,9 +84,10 @@ describe("useFluxoMapa", () => {
         const service = await import("@/services/subprocessoService");
         vi.mocked(service.salvarMapaAjuste).mockResolvedValue(undefined);
 
-        await fluxoMapa.salvarAjustes(10, {dados: "ajuste"});
+        const dados = {competencias: [], atividades: [], sugestoes: "ajuste"};
+        await fluxoMapa.salvarAjustes(10, dados);
 
-        expect(service.salvarMapaAjuste).toHaveBeenCalledWith(10, {dados: "ajuste"});
+        expect(service.salvarMapaAjuste).toHaveBeenCalledWith(10, dados);
     });
 
     it("deve propagar erro se salvarAjustes falhar", async () => {
@@ -94,7 +96,8 @@ describe("useFluxoMapa", () => {
         const service = await import("@/services/subprocessoService");
         vi.mocked(service.salvarMapaAjuste).mockRejectedValue(new Error("Erro ajuste"));
 
-        await expect(fluxoMapa.salvarAjustes(10, {})).rejects.toThrow("Erro ajuste");
+        const dados = {competencias: [], atividades: [], sugestoes: ""};
+        await expect(fluxoMapa.salvarAjustes(10, dados)).rejects.toThrow("Erro ajuste");
     });
 
     it("deve propagar erro se salvarMapa falhar", async () => {
@@ -103,7 +106,8 @@ describe("useFluxoMapa", () => {
         const service = await import("@/services/subprocessoService");
         vi.mocked(service.salvarMapaCompleto).mockRejectedValue(new Error("Erro grave"));
 
-        await expect(fluxoMapa.salvarMapa(10, {})).rejects.toThrow("Erro grave");
+        const dados = {competencias: []};
+        await expect(fluxoMapa.salvarMapa(10, dados)).rejects.toThrow("Erro grave");
         expect(fluxoMapa.erro.value).toBe("Erro grave");
     });
 });

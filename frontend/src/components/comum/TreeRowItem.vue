@@ -11,7 +11,7 @@
         v-for="(column, index) in columns"
         :key="column.key"
         :style="index === 0 ? { paddingLeft: (level * 1.25) + 'rem' } : {}"
-        :title="item[column.key + 'Tooltip'] || ''"
+        :title="(item[column.key + 'Tooltip'] as string) || ''"
     >
       <BButton
           v-if="index === 0 && item.children && item.children.length > 0"
@@ -45,7 +45,7 @@ interface TreeItem {
   clickable?: boolean;
   level?: number;
 
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 const props = defineProps<{

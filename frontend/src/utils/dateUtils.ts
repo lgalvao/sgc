@@ -39,7 +39,7 @@ function parseStringDate(s: string): Date | null {
     return null;
 }
 
-export function parseDate(dateInput: any): Date | null {
+export function parseDate(dateInput: unknown): Date | null {
     if (dateInput === null || dateInput === undefined || dateInput === "") {
         return null;
     }

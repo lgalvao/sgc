@@ -55,7 +55,7 @@ export function mapUsuarioToFrontend(usuarioDto: UsuarioDto): Usuario {
             nome: usuarioDto.unidade.nome,
             sigla: usuarioDto.unidade.sigla,
         },
-        perfis: usuarioDto.perfis as any[], // Casting to match generic array if needed, or specific
+        perfis: usuarioDto.perfis as unknown[], // Casting to match generic array if needed, or specific
     } as Usuario; // Force cast to match potentially looser frontend type
 }
 
@@ -105,7 +105,22 @@ export function perfisUnidadesParaDominio(
     }));
 }
 
-export function mapVWUsuarioToUsuario(vw: any): Usuario {
+export interface VWUsuario {
+    codigo?: number;
+    titulo?: string;
+    nome?: string;
+    nome_completo?: string;
+    nome_usuario?: string;
+    unidade?: unknown;
+    unidade_sigla?: string;
+    unidade_codigo?: number;
+    email?: string | null;
+    ramal?: string | null;
+    ramal_telefone?: string | null;
+    titulo_eleitoral?: string;
+}
+
+export function mapVWUsuarioToUsuario(vw: VWUsuario): Usuario {
     const candidateId =
         vw?.codigo ??
         (typeof vw?.titulo === "string" && /^\d+$/.test(vw.titulo)
@@ -117,14 +132,14 @@ export function mapVWUsuarioToUsuario(vw: any): Usuario {
     return {
         codigo,
         nome: vw?.nome ?? vw?.nome_completo ?? vw?.nome_usuario ?? "",
-        unidade: vw?.unidade ?? vw?.unidade_sigla ?? vw?.unidade_codigo ?? "",
+        unidade: (vw?.unidade ?? vw?.unidade_sigla ?? vw?.unidade_codigo ?? "") as any,
         email: vw?.email ?? null,
         ramal: vw?.ramal ?? vw?.ramal_telefone ?? null,
         tituloEleitoral: vw?.titulo_eleitoral ?? vw?.titulo ?? "",
     } as Usuario;
 }
 
-export function mapVWUsuariosArray(arr: any[] = []): Usuario[] {
+export function mapVWUsuariosArray(arr: VWUsuario[] = []): Usuario[] {
     return arr.map(mapVWUsuarioToUsuario);
 }
 
