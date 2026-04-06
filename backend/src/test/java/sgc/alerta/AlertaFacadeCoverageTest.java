@@ -62,11 +62,10 @@ class AlertaFacadeCoverageTest {
         Unidade raiz = new Unidade();
         raiz.setCodigo(1L);
         when(unidadeService.buscarPorCodigo(1L)).thenReturn(raiz);
-        when(alertaService.salvar(any(Alerta.class))).thenAnswer(invocation -> invocation.getArgument(0));
-
+        when(alertaService.salvarTodos(anyList())).thenAnswer(invocation -> invocation.getArgument(0));
         alertaFacade.criarAlertasProcessoIniciado(processo, List.of(unidadeInteroperacional));
 
-        verify(alertaService, times(2)).salvar(any(Alerta.class));
+        verify(alertaService).salvarTodos(argThat(alertas -> alertas.size() == 2));
     }
 
     @Test
@@ -81,10 +80,11 @@ class AlertaFacadeCoverageTest {
         Unidade raiz = new Unidade();
         raiz.setCodigo(1L);
         when(unidadeService.buscarPorCodigo(1L)).thenReturn(raiz);
+        when(alertaService.salvarTodos(anyList())).thenAnswer(invocation -> invocation.getArgument(0));
 
         alertaFacade.criarAlertasProcessoIniciado(processo, List.of(unidadeIntermediaria));
 
-        verify(alertaService, atLeastOnce()).salvar(any(Alerta.class));
+        verify(alertaService).salvarTodos(anyList());
     }
 
     @Test
@@ -115,13 +115,15 @@ class AlertaFacadeCoverageTest {
         when(usuarioService.buscar(usuarioTitulo)).thenReturn(usuario);
 
         AlertaUsuario au = new AlertaUsuario();
+        au.setCodigo(AlertaUsuario.Chave.builder().alertaCodigo(100L).usuarioTitulo(usuarioTitulo).build());
         au.setDataHoraLeitura(null);
-        when(alertaService.alertaUsuario(any())).thenReturn(Optional.of(au));
+        when(alertaService.alertasUsuarios(usuarioTitulo, codigos)).thenReturn(List.of(au));
+        when(alertaService.salvarAlertasUsuarios(anyList())).thenAnswer(invocation -> invocation.getArgument(0));
 
         alertaFacade.marcarComoLidos(usuarioTitulo, codigos);
 
         assertThat(au.getDataHoraLeitura()).isNotNull();
-        verify(alertaService).salvarAlertaUsuario(au);
+        verify(alertaService).salvarAlertasUsuarios(argThat(alertasUsuarios -> alertasUsuarios.contains(au)));
     }
 
     @Test
@@ -136,13 +138,14 @@ class AlertaFacadeCoverageTest {
 
         LocalDateTime leituraAnterior = LocalDateTime.now().minusDays(1);
         AlertaUsuario au = new AlertaUsuario();
+        au.setCodigo(AlertaUsuario.Chave.builder().alertaCodigo(100L).usuarioTitulo(usuarioTitulo).build());
         au.setDataHoraLeitura(leituraAnterior);
-        when(alertaService.alertaUsuario(any())).thenReturn(Optional.of(au));
+        when(alertaService.alertasUsuarios(usuarioTitulo, codigos)).thenReturn(List.of(au));
 
         alertaFacade.marcarComoLidos(usuarioTitulo, codigos);
 
         assertThat(au.getDataHoraLeitura()).isEqualTo(leituraAnterior);
-        verify(alertaService, never()).salvarAlertaUsuario(au);
+        verify(alertaService, never()).salvarAlertasUsuarios(anyList());
     }
 
     @Test

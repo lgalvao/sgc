@@ -102,7 +102,10 @@ public class UsuarioFacade {
     }
 
     private void carregarAtribuicoes(Usuario usuario) {
-        usuarioService.carregarAuthorities(usuario);
+        Set<GrantedAuthority> authorities = usuarioService.buscarPerfisPorUsuarioTitulo(usuario.getTituloEleitoral()).stream()
+                .map(Perfil::toGrantedAuthority)
+                .collect(toSet());
+        usuario.setAuthorities(authorities);
     }
 
     public Map<String, Usuario> buscarUsuariosPorTitulos(List<String> titulos) {

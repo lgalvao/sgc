@@ -119,7 +119,8 @@ class PainelFacadeTest {
 
         Page<Alerta> page = new PageImpl<>(List.of(a));
         when(alertaFacade.listarPorUnidade(eq("123"), eq(100L), eq("ADMIN"), any(Pageable.class))).thenReturn(page);
-        when(alertaFacade.obterDataHoraLeitura(1L, "123")).thenReturn(Optional.of(LocalDateTime.now()));
+        when(alertaFacade.obterMapaDataHoraLeitura("123", List.of(1L)))
+                .thenReturn(Map.of(1L, LocalDateTime.now()));
 
         Page<Alerta> result = painelFacade.listarAlertas("123", 100L, "ADMIN", Pageable.unpaged());
 
@@ -147,7 +148,8 @@ class PainelFacadeTest {
 
         Page<Alerta> page = new PageImpl<>(List.of(a));
         when(alertaFacade.listarPorUnidade(eq("123"), eq(100L), eq("ADMIN"), any(Pageable.class))).thenReturn(page);
-        when(alertaFacade.obterDataHoraLeitura(1L, "123")).thenReturn(Optional.of(LocalDateTime.now()));
+        when(alertaFacade.obterMapaDataHoraLeitura("123", List.of(1L)))
+                .thenReturn(Map.of(1L, LocalDateTime.now()));
 
         Page<Alerta> result = painelFacade.listarAlertas("123", 100L, "ADMIN", sorted);
         assertThat(result).hasSize(1);
@@ -171,7 +173,8 @@ class PainelFacadeTest {
 
         Page<Alerta> page = new PageImpl<>(List.of(a));
         when(alertaFacade.listarPorUnidade(eq("123"), eq(100L), eq("ADMIN"), any(Pageable.class))).thenReturn(page);
-        when(alertaFacade.obterDataHoraLeitura(1L, "123")).thenReturn(Optional.of(LocalDateTime.now()));
+        when(alertaFacade.obterMapaDataHoraLeitura("123", List.of(1L)))
+                .thenReturn(Map.of(1L, LocalDateTime.now()));
 
         Page<Alerta> result = painelFacade.listarAlertas("123", 100L, "ADMIN", unsortedPaged);
         assertThat(result).hasSize(1);

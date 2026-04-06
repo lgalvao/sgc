@@ -72,12 +72,13 @@ class UsuarioFacadeTest {
 
             configurarAutenticacao(titulo);
             when(usuarioService.buscar(titulo)).thenReturn(usuario);
+            when(usuarioService.buscarPerfisPorUsuarioTitulo(titulo)).thenReturn(List.of());
 
             Usuario resultado = facade.usuarioAutenticado();
 
             assertThat(resultado).isNotNull();
             assertThat(resultado.getTituloEleitoral()).isEqualTo(titulo);
-            verify(usuarioService).carregarAuthorities(usuario);
+            verify(usuarioService).buscarPerfisPorUsuarioTitulo(titulo);
             SecurityContextHolder.clearContext();
         }
 
@@ -145,12 +146,13 @@ class UsuarioFacadeTest {
 
             when(usuarioService.buscarOpt(titulo))
                     .thenReturn(Optional.of(usuario));
+            when(usuarioService.buscarPerfisPorUsuarioTitulo(titulo)).thenReturn(List.of());
 
             Usuario resultado = facade.carregarUsuarioParaAutenticacao(titulo);
 
             assertThat(resultado).isNotNull();
             assertThat(resultado.getTituloEleitoral()).isEqualTo(titulo);
-            verify(usuarioService).carregarAuthorities(usuario);
+            verify(usuarioService).buscarPerfisPorUsuarioTitulo(titulo);
         }
 
         @Test
@@ -166,11 +168,12 @@ class UsuarioFacadeTest {
             String login = "user123";
             Usuario usuario = criarUsuario(login);
             when(usuarioService.buscar(login)).thenReturn(usuario);
+            when(usuarioService.buscarPerfisPorUsuarioTitulo(login)).thenReturn(List.of());
 
             Usuario resultado = facade.buscarPorLogin(login);
 
             assertThat(resultado).isSameAs(usuario);
-            verify(usuarioService).carregarAuthorities(usuario);
+            verify(usuarioService).buscarPerfisPorUsuarioTitulo(login);
         }
     }
 

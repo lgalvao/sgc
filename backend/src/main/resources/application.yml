@@ -11,6 +11,10 @@ spring:
     properties:
       hibernate.default_schema: sgc
       hibernate.jdbc.fetch_size: 50
+      hibernate.jdbc.batch_size: 50
+      hibernate.order_inserts: true
+      hibernate.order_updates: true
+      hibernate.jdbc.batch_versioned_data: true
     show-sql: false
     defer-datasource-initialization: false
   sql.init.mode: always
@@ -86,6 +90,9 @@ spring:
     show-sql: false
     properties:
       hibernate.format_sql: false
+      hibernate.jdbc.batch_size: 50
+      hibernate.order_inserts: true
+      hibernate.order_updates: true
   sql:
     init:
       mode: always
@@ -134,6 +141,10 @@ spring:
     hibernate.ddl-auto: validate
     properties:
       hibernate.jdbc.fetch_size: 50
+      hibernate.jdbc.batch_size: 50
+      hibernate.order_inserts: true
+      hibernate.order_updates: true
+      hibernate.jdbc.batch_versioned_data: true
     show-sql: false
   sql:
     init:
@@ -174,6 +185,10 @@ spring:
     hibernate.ddl-auto: validate
     properties:
       hibernate.default_schema: sgc
+      hibernate.jdbc.batch_size: 50
+      hibernate.order_inserts: true
+      hibernate.order_updates: true
+      hibernate.jdbc.batch_versioned_data: true
     show-sql: false
   sql:
     init:

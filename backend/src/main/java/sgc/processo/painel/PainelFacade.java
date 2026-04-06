@@ -78,10 +78,13 @@ public class PainelFacade {
                 : pageable;
 
         Page<Alerta> alertasPage = alertaFacade.listarPorUnidade(usuarioTitulo, codigoUnidade, perfil, sortedPageable);
+        Map<Long, LocalDateTime> leiturasPorAlerta = alertaFacade.obterMapaDataHoraLeitura(
+                usuarioTitulo,
+                alertasPage.stream().map(Alerta::getCodigo).toList());
         List<Long> alertasNaoLidosVisualizados = new ArrayList<>();
         alertasPage.forEach(alerta -> {
             Long codigoAlerta = alerta.getCodigo();
-            LocalDateTime dataHoraLeitura = alertaFacade.obterDataHoraLeitura(codigoAlerta, usuarioTitulo).orElse(null);
+            LocalDateTime dataHoraLeitura = leiturasPorAlerta.get(codigoAlerta);
             if (dataHoraLeitura == null) {
                 alertasNaoLidosVisualizados.add(codigoAlerta);
             }

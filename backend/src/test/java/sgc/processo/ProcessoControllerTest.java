@@ -452,7 +452,7 @@ class ProcessoControllerTest {
                 .dataLimiteEtapa1(LocalDateTime.now())
                 .build();
             when(consultaService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sub));
-            when(consultaService.obterLocalizacaoAtual(sub)).thenReturn(unidade);
+            when(consultaService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sub.getCodigo(), unidade));
 
             mockMvc.perform(get("/api/processos/1/unidades-importacao"))
                     .andExpect(status().isOk())
@@ -497,7 +497,7 @@ class ProcessoControllerTest {
                 .dataLimiteEtapa1(LocalDateTime.now())
                 .build();
             when(consultaService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sub));
-            when(consultaService.obterLocalizacaoAtual(sub)).thenReturn(unidade);
+            when(consultaService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sub.getCodigo(), unidade));
 
             mockMvc.perform(get("/api/processos/1/unidades-importacao"))
                     .andExpect(status().isOk())

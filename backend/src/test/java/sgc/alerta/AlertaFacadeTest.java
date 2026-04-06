@@ -173,8 +173,7 @@ class AlertaFacadeTest {
         when(unidadeService.buscarPorCodigo(1L)).thenReturn(raiz);
         when(unidadeHierarquiaService.buscarCodigosSuperiores(3L)).thenReturn(List.of(2L, 1L));
         when(unidadeService.buscarPorCodigos(List.of(1L, 2L))).thenReturn(List.of(raiz, superior));
-        when(alertaService.salvar(any(Alerta.class))).thenAnswer(invocation -> invocation.getArgument(0));
-
+        when(alertaService.salvarTodos(anyList())).thenAnswer(invocation -> invocation.getArgument(0));
         List<Alerta> alertas = alertaFacade.criarAlertasProcessoIniciado(processo, List.of(interoperacional));
 
         assertThat(alertas).isNotEmpty();
@@ -193,8 +192,7 @@ class AlertaFacadeTest {
         raiz.setSigla("RAIZ");
 
         when(unidadeService.buscarPorCodigo(1L)).thenReturn(raiz);
-        when(alertaService.salvar(any(Alerta.class))).thenAnswer(invocation -> invocation.getArgument(0));
-
+        when(alertaService.salvarTodos(anyList())).thenAnswer(invocation -> invocation.getArgument(0));
         List<Alerta> alertas = alertaFacade.criarAlertasProcessoIniciado(processo, List.of(raiz));
 
         assertThat(alertas).isNotEmpty();

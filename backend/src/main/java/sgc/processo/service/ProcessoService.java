@@ -141,9 +141,13 @@ public class ProcessoService {
             subprocessos = consultaService.listarEntidadesPorProcessoEUnidades(codProcesso, unidadesAcesso);
         }
 
-        return subprocessos.stream()
+        List<Subprocesso> subprocessosElegiveis = subprocessos.stream()
                 .filter(subprocesso -> isElegivelParaAcaoEmBloco(subprocesso, usuario))
-                .map(this::toElegivelDto)
+                .toList();
+        Map<Long, Unidade> localizacoesPorSubprocesso = consultaService.obterLocalizacoesAtuais(subprocessosElegiveis);
+
+        return subprocessosElegiveis.stream()
+                .map(subprocesso -> toElegivelDto(subprocesso, obterLocalizacaoAtual(subprocesso, localizacoesPorSubprocesso)))
                 .toList();
     }
 
@@ -280,6 +284,7 @@ public class ProcessoService {
     public ProcessoDetalheDto obterDetalhesCompleto(Long codProcesso, Usuario usuario, boolean incluirElegiveis) {
         Processo processo = buscarPorCodigo(codProcesso);
         List<Subprocesso> subprocessos = consultaService.listarEntidadesPorProcessoComUnidade(codProcesso);
+        Map<Long, Unidade> localizacoesPorSubprocesso = consultaService.obterLocalizacoesAtuais(subprocessos);
         Set<Long> unidadesAcesso = obterIdsUnidadesAcesso(processo, usuario);
         Perfil perfil = usuario.getPerfilAtivo();
 
@@ -300,7 +305,7 @@ public class ProcessoService {
                 .unidades(new ArrayList<>())
                 .build();
 
-        montarHierarquiaNoDto(dto, processo, subprocessos, unidadesAcesso);
+        montarHierarquiaNoDto(dto, processo, subprocessos, unidadesAcesso, localizacoesPorSubprocesso);
         if (incluirElegiveis) {
             dto.getElegiveis().addAll(listarSubprocessosElegiveis(codProcesso));
         }
@@ -458,7 +463,13 @@ public class ProcessoService {
                 user));
     }
 
-    private void montarHierarquiaNoDto(ProcessoDetalheDto dto, Processo processo, List<Subprocesso> subps, Set<Long> acesso) {
+    private void montarHierarquiaNoDto(
+            ProcessoDetalheDto dto,
+            Processo processo,
+            List<Subprocesso> subps,
+            Set<Long> acesso,
+            Map<Long, Unidade> localizacoesPorSubprocesso
+    ) {
         Map<Long, UnidadeParticipanteDto> mapDto = new HashMap<>();
         Map<Long, Subprocesso> mapSp = subps.stream().collect(Collectors.toMap(s -> s.getUnidade().getCodigo(), s -> s));
 
@@ -469,7 +480,7 @@ public class ProcessoService {
                     UnidadeParticipanteDto uDto = UnidadeParticipanteDto.fromSnapshot(p);
                     Subprocesso sp = mapSp.get(codigoUnidadeParticipante);
                     if (sp != null) {
-                        uDto.preencherComSubprocesso(sp, obterLocalizacao(sp));
+                        uDto.preencherComSubprocesso(sp, obterLocalizacaoAtual(sp, localizacoesPorSubprocesso));
                     }
                     mapDto.put(codigoUnidadeParticipante, uDto);
                 });
@@ -485,6 +496,10 @@ public class ProcessoService {
 
     private Unidade obterLocalizacao(Subprocesso sp) {
         return consultaService.obterLocalizacaoAtual(sp);
+    }
+
+    private Unidade obterLocalizacaoAtual(Subprocesso sp, Map<Long, Unidade> localizacoesPorSubprocesso) {
+        return Objects.requireNonNullElseGet(localizacoesPorSubprocesso.get(sp.getCodigo()), () -> obterLocalizacao(sp));
     }
 
     private Set<Long> obterIdsUnidadesAcesso(Processo pr, Usuario us) {
@@ -528,8 +543,7 @@ public class ProcessoService {
         return permissionEvaluator.verificarPermissao(usuario, subprocesso, DISPONIBILIZAR_MAPA);
     }
 
-    private SubprocessoElegivelDto toElegivelDto(Subprocesso sp) {
-        Unidade localizacao = obterLocalizacao(sp);
+    private SubprocessoElegivelDto toElegivelDto(Subprocesso sp, Unidade localizacao) {
         return SubprocessoElegivelDto.builder()
                 .codigo(sp.getCodigo())
                 .unidadeCodigo(sp.getUnidade().getCodigo())

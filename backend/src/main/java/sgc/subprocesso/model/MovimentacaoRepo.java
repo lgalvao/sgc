@@ -33,5 +33,22 @@ public interface MovimentacaoRepo extends JpaRepository<Movimentacao, Long> {
             """)
     Optional<Movimentacao> buscarUltimaPorSubprocesso(@Param("subprocessoCodigo") Long subprocessoCodigo);
 
+    @Query("""
+            SELECT m FROM Movimentacao m
+            LEFT JOIN FETCH m.unidadeOrigem
+            LEFT JOIN FETCH m.unidadeDestino
+            LEFT JOIN FETCH m.usuario
+            WHERE m.subprocesso.codigo IN :subprocessoCodigos
+              AND NOT EXISTS (
+                  SELECT 1 FROM Movimentacao maisRecente
+                  WHERE maisRecente.subprocesso.codigo = m.subprocesso.codigo
+                    AND (
+                        maisRecente.dataHora > m.dataHora
+                        OR (maisRecente.dataHora = m.dataHora AND maisRecente.codigo > m.codigo)
+                    )
+              )
+            """)
+    List<Movimentacao> listarUltimasPorSubprocessos(@Param("subprocessoCodigos") List<Long> subprocessoCodigos);
+
     List<Movimentacao> findBySubprocessoCodigo(Long subprocessoCodigo);
 }

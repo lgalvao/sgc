@@ -382,6 +382,10 @@ public class SubprocessoConsultaService {
         return localizacaoSubprocessoService.obterLocalizacaoAtual(sp);
     }
 
+    public Map<Long, Unidade> obterLocalizacoesAtuais(Collection<Subprocesso> subprocessos) {
+        return localizacaoSubprocessoService.obterLocalizacoesAtuais(subprocessos);
+    }
+
     public MapaAjusteDto obterMapaParaAjuste(Long codSubprocesso) {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
         DadosMapaAjuste dadosMapaAjuste = carregarDadosMapaAjuste(sp);

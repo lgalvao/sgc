@@ -20,6 +20,10 @@ public class AlertaService {
         return alertaRepo.save(alerta);
     }
 
+    public List<Alerta> salvarTodos(List<Alerta> alertas) {
+        return alertaRepo.saveAll(alertas);
+    }
+
     public Optional<Alerta> porCodigo(Long codigo) {
         return alertaRepo.findById(codigo);
     }
@@ -56,8 +60,16 @@ public class AlertaService {
         return alertaUsuarioRepo.listarPorUsuarioEAlertas(usuarioTitulo, alertaCodigos);
     }
 
+    public List<Alerta> listarPorCodigos(List<Long> codigos) {
+        return alertaRepo.findAllById(codigos);
+    }
+
     public void salvarAlertaUsuario(AlertaUsuario au) {
         alertaUsuarioRepo.save(au);
+    }
+
+    public List<AlertaUsuario> salvarAlertasUsuarios(List<AlertaUsuario> alertasUsuarios) {
+        return alertaUsuarioRepo.saveAll(alertasUsuarios);
     }
 
     public Optional<LocalDateTime> dataHoraLeituraAlertaUsuario(Long codigoAlerta, String usuarioTitulo) {

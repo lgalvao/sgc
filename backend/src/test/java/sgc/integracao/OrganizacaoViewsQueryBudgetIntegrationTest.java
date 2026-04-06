@@ -67,6 +67,10 @@ class OrganizacaoViewsQueryBudgetIntegrationTest extends BaseIntegrationTest {
 
         assertThat(contarQueriesViews(unidadeService::buscarAdmin)).isLessThanOrEqualTo(1);
         assertThat(contarQueriesViews(unidadeService::buscarAdmin)).isZero();
+
+        AmostrasConsulta amostras = carregarAmostras();
+        assertThat(contarQueriesViews(() -> usuarioService.buscarAutorizacoesPerfil(amostras.tituloUsuarioComPerfil()))).isLessThanOrEqualTo(1);
+        assertThat(contarQueriesViews(() -> usuarioService.buscarAutorizacoesPerfil(amostras.tituloUsuarioComPerfil()))).isZero();
     }
 
     @Test

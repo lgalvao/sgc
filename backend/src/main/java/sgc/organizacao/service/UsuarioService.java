@@ -2,6 +2,7 @@ package sgc.organizacao.service;
 
 import lombok.*;
 import lombok.extern.slf4j.*;
+import org.springframework.cache.annotation.*;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.*;
 import org.springframework.security.core.*;
@@ -68,12 +69,18 @@ public class UsuarioService {
         );
     }
 
+    @Cacheable(cacheNames = CacheConfig.CACHE_USUARIO_AUTORIZACOES, key = "#usuarioTitulo", sync = true)
     public List<UsuarioPerfilAutorizacaoLeitura> buscarAutorizacoesPerfil(String usuarioTitulo) {
         return usuarioPerfilRepo.listarAutorizacoesPorUsuarioTitulo(usuarioTitulo);
     }
 
+    @Cacheable(cacheNames = CacheConfig.CACHE_USUARIO_PERFIS, key = "#usuarioTitulo", sync = true)
+    public List<Perfil> buscarPerfisPorUsuarioTitulo(String usuarioTitulo) {
+        return usuarioPerfilRepo.listarPerfisPorUsuarioTitulo(usuarioTitulo);
+    }
+
     public void carregarAuthorities(Usuario usuario) {
-        List<Perfil> perfis = usuarioPerfilRepo.listarPerfisPorUsuarioTitulo(usuario.getTituloEleitoral());
+        List<Perfil> perfis = buscarPerfisPorUsuarioTitulo(usuario.getTituloEleitoral());
 
         Set<GrantedAuthority> authorities = perfis.stream()
                 .map(Perfil::toGrantedAuthority)
@@ -87,7 +94,11 @@ public class UsuarioService {
     }
 
     @Transactional
-    @CacheEvict(cacheNames = CacheConfig.CACHE_DIAGNOSTICO_ORGANIZACIONAL, allEntries = true)
+    @Caching(evict = {
+            @CacheEvict(cacheNames = CacheConfig.CACHE_DIAGNOSTICO_ORGANIZACIONAL, allEntries = true),
+            @CacheEvict(cacheNames = CacheConfig.CACHE_USUARIO_PERFIS, key = "#usuarioTitulo"),
+            @CacheEvict(cacheNames = CacheConfig.CACHE_USUARIO_AUTORIZACOES, key = "#usuarioTitulo")
+    })
     public void adicionarAdministrador(String usuarioTitulo) {
         if (isAdministrador(usuarioTitulo)) {
             throw new ErroValidacao(Mensagens.USUARIO_JA_ADMINISTRADOR);
@@ -100,7 +111,11 @@ public class UsuarioService {
     }
 
     @Transactional
-    @CacheEvict(cacheNames = CacheConfig.CACHE_DIAGNOSTICO_ORGANIZACIONAL, allEntries = true)
+    @Caching(evict = {
+            @CacheEvict(cacheNames = CacheConfig.CACHE_DIAGNOSTICO_ORGANIZACIONAL, allEntries = true),
+            @CacheEvict(cacheNames = CacheConfig.CACHE_USUARIO_PERFIS, key = "#usuarioTitulo"),
+            @CacheEvict(cacheNames = CacheConfig.CACHE_USUARIO_AUTORIZACOES, key = "#usuarioTitulo")
+    })
     public void removerAdministrador(String usuarioTitulo) {
         long totalAdministradores = administradorRepo.count();
         if (totalAdministradores <= 1) {

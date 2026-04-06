@@ -71,6 +71,20 @@ public class AlertaFacade {
         }
     }
 
+    public Map<Long, LocalDateTime> obterMapaDataHoraLeitura(String usuarioTitulo, List<Long> alertaCodigos) {
+        if (alertaCodigos.isEmpty()) {
+            return Map.of();
+        }
+        return alertaService.alertasUsuarios(usuarioTitulo, alertaCodigos).stream()
+                .filter(alertaUsuario -> alertaUsuario.getDataHoraLeitura() != null)
+                .collect(java.util.stream.Collectors.toMap(
+                        alertaUsuario -> alertaUsuario.getCodigo().getAlertaCodigo(),
+                        AlertaUsuario::getDataHoraLeitura,
+                        (primeira, ignorada) -> primeira,
+                        HashMap::new
+                ));
+    }
+
     public Optional<LocalDateTime> obterDataHoraLeitura(Long codigoAlerta, String usuarioTitulo) {
         return alertaService.dataHoraLeituraAlertaUsuario(codigoAlerta, usuarioTitulo);
     }
@@ -119,14 +133,16 @@ public class AlertaFacade {
 
         List<Alerta> alertasCriados = new ArrayList<>();
         for (Long cod : codsOperacionais) {
-            alertasCriados.add(criarAlertaAdmin(processo, obterUnidadeObrigatoria(todasUnidadesMap, cod), "Início do processo"));
+            alertasCriados.add(criarAlertaEntidade(processo, unidadeRaiz(),
+                    obterUnidadeObrigatoria(todasUnidadesMap, cod), "Início do processo"));
         }
 
         for (Long cod : codsIntermediarias) {
-            alertasCriados.add(criarAlertaAdmin(processo, obterUnidadeObrigatoria(todasUnidadesMap, cod), "Início do processo em unidade(s) subordinada(s)"));
+            alertasCriados.add(criarAlertaEntidade(processo, unidadeRaiz(),
+                    obterUnidadeObrigatoria(todasUnidadesMap, cod), "Início do processo em unidade(s) subordinada(s)"));
         }
 
-        return alertasCriados;
+        return alertaService.salvarTodos(alertasCriados);
     }
 
     @Transactional
@@ -152,15 +168,19 @@ public class AlertaFacade {
     }
 
     private Alerta criarAlerta(Processo processo, Unidade origem, Unidade destino, String descricao) {
-        Alerta alerta = Alerta.builder()
+        Alerta alerta = criarAlertaEntidade(processo, origem, destino, descricao);
+
+        return alertaService.salvar(alerta);
+    }
+
+    private Alerta criarAlertaEntidade(Processo processo, Unidade origem, Unidade destino, String descricao) {
+        return Alerta.builder()
                 .processo(processo)
                 .dataHora(LocalDateTime.now())
                 .unidadeOrigem(origem)
                 .unidadeDestino(destino)
                 .descricao(descricao)
                 .build();
-
-        return alertaService.salvar(alerta);
     }
 
     private Unidade obterUnidadeObrigatoria(Map<Long, Unidade> unidadesPorCodigo, Long codigoUnidade) {
@@ -173,35 +193,59 @@ public class AlertaFacade {
 
     @Transactional
     public void marcarComoLidos(String usuarioTitulo, List<Long> alertaCodigos) {
+        if (alertaCodigos.isEmpty()) {
+            return;
+        }
+
         Usuario usuario = usuarioService.buscar(usuarioTitulo);
         LocalDateTime agora = LocalDateTime.now();
+        Map<Long, AlertaUsuario> existentesPorCodigo = alertaService.alertasUsuarios(usuarioTitulo, alertaCodigos).stream()
+                .collect(java.util.stream.Collectors.toMap(
+                        alertaUsuario -> alertaUsuario.getCodigo().getAlertaCodigo(),
+                        alertaUsuario -> alertaUsuario,
+                        (primeiro, ignorado) -> primeiro,
+                        HashMap::new
+                ));
 
-        for (Long codigo : alertaCodigos) {
-            AlertaUsuario.Chave chave = AlertaUsuario.Chave.builder()
-                    .alertaCodigo(codigo)
-                    .usuarioTitulo(usuarioTitulo)
-                    .build();
-
-            Optional<AlertaUsuario> optAlertaUsuario = alertaService.alertaUsuario(chave);
-
-            if (optAlertaUsuario.isPresent()) {
-                AlertaUsuario au = optAlertaUsuario.get();
-                if (au.getDataHoraLeitura() == null) {
-                    au.setDataHoraLeitura(agora);
-                    alertaService.salvarAlertaUsuario(au);
-                }
-                continue;
+        List<AlertaUsuario> alertasUsuariosParaSalvar = new ArrayList<>();
+        for (AlertaUsuario alertaUsuario : existentesPorCodigo.values()) {
+            if (alertaUsuario.getDataHoraLeitura() == null) {
+                alertaUsuario.setDataHoraLeitura(agora);
+                alertasUsuariosParaSalvar.add(alertaUsuario);
             }
+        }
 
-            alertaService.porCodigo(codigo).ifPresent(alerta -> {
-                AlertaUsuario novo = AlertaUsuario.builder()
-                        .codigo(chave)
+        List<Long> codigosAusentes = alertaCodigos.stream()
+                .filter(codigo -> !existentesPorCodigo.containsKey(codigo))
+                .toList();
+        if (!codigosAusentes.isEmpty()) {
+            Map<Long, Alerta> alertasPorCodigo = alertaService.listarPorCodigos(codigosAusentes).stream()
+                    .collect(java.util.stream.Collectors.toMap(
+                            Alerta::getCodigo,
+                            alerta -> alerta,
+                            (primeiro, ignorado) -> primeiro,
+                            HashMap::new
+                    ));
+
+            codigosAusentes.forEach(codigo -> {
+                Alerta alerta = alertasPorCodigo.get(codigo);
+                if (alerta == null) {
+                    return;
+                }
+                alertasUsuariosParaSalvar.add(AlertaUsuario.builder()
+                        .codigo(AlertaUsuario.Chave.builder()
+                                .alertaCodigo(codigo)
+                                .usuarioTitulo(usuarioTitulo)
+                                .build())
                         .alerta(alerta)
                         .usuario(usuario)
                         .dataHoraLeitura(agora)
-                        .build();
-                alertaService.salvarAlertaUsuario(novo);
+                        .build());
             });
+        }
+
+        if (!alertasUsuariosParaSalvar.isEmpty()) {
+            alertaService.salvarAlertasUsuarios(alertasUsuariosParaSalvar);
         }
     }
 

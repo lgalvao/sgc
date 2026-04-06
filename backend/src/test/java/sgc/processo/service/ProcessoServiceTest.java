@@ -321,7 +321,7 @@ class ProcessoServiceTest {
             sp.setUnidade(u);
             sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
             when(consultaService.listarEntidadesPorProcessoComUnidade(codProcesso)).thenReturn(List.of(sp));
-            when(consultaService.obterLocalizacaoAtual(sp)).thenReturn(u);
+            when(consultaService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), u));
             when(validacaoService.validarSubprocessosParaFinalizacao(codProcesso)).thenReturn(ValidationResult.ofValido());
 
             ProcessoDetalheDto result = processoService.obterDetalhesCompleto(codProcesso, usuario, false);
@@ -362,9 +362,12 @@ class ProcessoServiceTest {
             s3.setUnidade(u3);
 
             when(consultaService.listarEntidadesPorProcessoEUnidades(eq(codProcesso), anyList())).thenReturn(List.of(s1, s2, s3));
+            when(consultaService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(
+                    s1.getCodigo(), u1,
+                    s2.getCodigo(), u1
+            ));
             when(permissionEvaluator.verificarPermissao(usuario, s1, AcaoPermissao.ACEITAR_CADASTRO)).thenReturn(true);
             when(permissionEvaluator.verificarPermissao(usuario, s2, AcaoPermissao.ACEITAR_MAPA)).thenReturn(true);
-            when(consultaService.obterLocalizacaoAtual(any())).thenReturn(u1);
 
             List<SubprocessoElegivelDto> result = processoService.listarSubprocessosElegiveis(codProcesso);
 
@@ -408,7 +411,7 @@ class ProcessoServiceTest {
             // Filho não tem subprocesso para cobrir branch sp != null
 
             when(consultaService.listarEntidadesPorProcessoComUnidade(codProcesso)).thenReturn(List.of(sp));
-            when(consultaService.obterLocalizacaoAtual(sp)).thenReturn(uPai);
+            when(consultaService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), uPai));
 
             ProcessoDetalheDto result = processoService.obterDetalhesCompleto(codProcesso, usuario, false);
 
@@ -911,7 +914,7 @@ class ProcessoServiceTest {
             sp.setMapa(null); // Explicitly null
             
             when(consultaService.listarEntidadesPorProcessoComUnidade(codProcesso)).thenReturn(List.of(sp));
-            when(consultaService.obterLocalizacaoAtual(sp)).thenReturn(u);
+            when(consultaService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), u));
 
             ProcessoDetalheDto result = processoService.obterDetalhesCompleto(codProcesso, usuario, false);
 
@@ -943,7 +946,7 @@ class ProcessoServiceTest {
             sp.setMapa(mapa);
             
             when(consultaService.listarEntidadesPorProcessoComUnidade(codProcesso)).thenReturn(List.of(sp));
-            when(consultaService.obterLocalizacaoAtual(sp)).thenReturn(u);
+            when(consultaService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), u));
 
             ProcessoDetalheDto result = processoService.obterDetalhesCompleto(codProcesso, usuario, false);
 

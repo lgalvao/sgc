@@ -23,13 +23,15 @@ public class HierarquiaService {
     }
 
     public boolean isSubordinada(Unidade alvo, Unidade superior) {
-        List<Long> descendentes = unidadeHierarquiaService.buscarIdsDescendentes(superior.getCodigo());
-        if (descendentes.contains(alvo.getCodigo())) {
-            return true;
-        }
-
+        Long codigoSuperior = superior.getCodigo();
         Long codigoPai = unidadeHierarquiaService.buscarCodigoPai(alvo.getCodigo());
-        return codigoPai != null && codigoPai.equals(superior.getCodigo());
+        while (codigoPai != null) {
+            if (codigoPai.equals(codigoSuperior)) {
+                return true;
+            }
+            codigoPai = unidadeHierarquiaService.buscarCodigoPai(codigoPai);
+        }
+        return false;
     }
 
     public boolean ehMesmaOuSubordinada(Unidade alvo, Unidade superior) {
