@@ -4,8 +4,10 @@ import Unidades from "@/views/UnidadesView.vue";
 import * as unidadeService from "@/services/unidadeService";
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 
+const mockPush = vi.fn();
+
 vi.mock("vue-router", () => ({
-    useRouter: () => ({ push: vi.fn() }),
+    useRouter: () => ({ push: mockPush }),
 }));
 
 vi.mock("@/composables/usePerfil", () => ({
@@ -31,6 +33,7 @@ describe("Unidades.vue", () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
+        mockPush.mockReset();
         vi.mocked(unidadeService.buscarTodasUnidades).mockResolvedValue([]);
         vi.mocked(unidadeService.buscarDiagnosticoOrganizacional).mockResolvedValue({
             possuiViolacoes: false,
@@ -43,7 +46,12 @@ describe("Unidades.vue", () => {
     });
 
     const mockUnidades = [
-        {codigo: 1, sigla: "ROOT", nome: "Raiz", filhas: []}
+        {
+            codigo: 1,
+            sigla: "ROOT",
+            nome: "Raiz",
+            filhas: [{codigo: 2, sigla: "DTI", nome: "Diretoria", filhas: []}]
+        }
     ];
 
     const createWrapper = (serviceOverride: Partial<{
@@ -69,7 +77,18 @@ describe("Unidades.vue", () => {
                     },
                     TreeTable: {
                         name: "TreeTable",
-                        template: "<div data-testid='tree-table'></div>",
+                        template: `
+                          <div data-testid="tree-table">
+                            <button
+                              v-if="data && data.length > 0"
+                              data-testid="tree-table-row-click"
+                              type="button"
+                              @click="$emit('row-click', data[0])"
+                            >
+                              Abrir
+                            </button>
+                          </div>
+                        `,
                         props: ["data", "columns", "title"]
                     },
                     BContainer: {template: "<div><slot /></div>"},
@@ -154,21 +173,31 @@ describe("Unidades.vue", () => {
         expect(wrapper.text()).not.toContain("Erro de API");
     });
 
-    it("deve exibir ArvoreUnidades quando houver unidades", async () => {
+    it("deve exibir TreeTable quando houver unidades", async () => {
         vi.mocked(unidadeService.buscarTodasUnidades).mockResolvedValueOnce(mockUnidades as any);
         vi.mocked(unidadeService.mapUnidadesArray).mockReturnValueOnce(mockUnidades as any);
         const wrapper = createWrapper();
         await flushPromises();
-        const arvore = wrapper.findComponent({name: 'ArvoreUnidades'});
+        const arvore = wrapper.findComponent({name: 'TreeTable'});
         expect(arvore.exists()).toBe(true);
-        expect(arvore.props("unidades")).toBeDefined();
+        expect(arvore.props("data")).toEqual([
+            {
+                codigo: 2,
+                sigla: "DTI",
+                unidade: "DTI - Diretoria",
+                tipo: undefined,
+                children: [],
+                expanded: true,
+                clickable: true,
+            }
+        ]);
     });
 
     it("deve exibir mensagem quando não houver unidades", async () => {
         const wrapper = createWrapper({unidades: []});
         await flushPromises();
         expect(wrapper.text()).toContain("Nenhuma unidade encontrada.");
-        expect(wrapper.findComponent({name: 'ArvoreUnidades'}).exists()).toBe(false);
+        expect(wrapper.findComponent({name: 'TreeTable'}).exists()).toBe(false);
     });
 
     it("deve lidar com erro sem mensagem", async () => {
@@ -187,4 +216,22 @@ describe("Unidades.vue", () => {
         await recarregarBtn.trigger("click");
         expect(unidadeService.buscarTodasUnidades).toHaveBeenCalled();
     });
+
+    it("deve navegar para o detalhe da unidade ao clicar em uma linha", async () => {
+        const unidades = [
+            {
+                codigo: 1,
+                sigla: "ROOT",
+                nome: "Raiz",
+                filhas: [{codigo: 2, sigla: "DTI", nome: "Diretoria", filhas: []}]
+            }
+        ];
+        const wrapper = createWrapper({unidades});
+        await flushPromises();
+
+        await wrapper.find('[data-testid="tree-table-row-click"]').trigger("click");
+
+        expect(mockPush).toHaveBeenCalledWith({path: "/unidade/2"});
+    });
+
 });

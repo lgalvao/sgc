@@ -91,15 +91,12 @@ const toggleExpand = (codigo: number | string) => {
   emit("toggle", codigo);
 };
 
-const ESPACAMENTO_BASE_REM = 0.75;
-const RECUO_NIVEL_REM = 1.25;
 const LARGURA_TOGGLE_REM = 1.75;
-
-const obterLarguraGutter = (level: number) =>
-    `${ESPACAMENTO_BASE_REM + (level * RECUO_NIVEL_REM) + LARGURA_TOGGLE_REM}rem`;
+const RECUO_NIVEL_REM = 1;
 
 const obterEstiloPrimeiraColuna = (level: number) => ({
-  "--tree-table-largura-gutter": obterLarguraGutter(level),
+  "--tree-table-largura-gutter": `${LARGURA_TOGGLE_REM}rem`,
+  "--tree-table-recuo-nivel": `${level * RECUO_NIVEL_REM}rem`,
 });
 
 const handleRowClick = () => {
@@ -129,7 +126,7 @@ defineExpose({
 .tree-table-primeira-coluna-conteudo {
   min-height: 1.5rem;
   min-width: 0;
-  padding-left: calc(var(--tree-table-largura-gutter) + 0.375rem);
+  padding-left: calc(var(--tree-table-largura-gutter) + var(--tree-table-recuo-nivel));
   position: relative;
 }
 
@@ -137,6 +134,7 @@ defineExpose({
   display: inline-flex;
   inset: 0 auto 0 0;
   position: absolute;
+  transform: translateX(var(--tree-table-recuo-nivel));
   width: var(--tree-table-largura-gutter);
 }
 
@@ -150,11 +148,12 @@ defineExpose({
   display: inline-flex;
   height: 100%;
   inset: 0 auto 0 0;
-  justify-content: flex-end;
+  justify-content: center;
   line-height: 1;
   margin: 0;
-  padding: 0 0.375rem 0 0;
+  padding: 0;
   position: absolute;
+  transform: translateX(var(--tree-table-recuo-nivel));
   width: var(--tree-table-largura-gutter);
 }
 

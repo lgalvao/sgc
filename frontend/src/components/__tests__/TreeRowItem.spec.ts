@@ -47,7 +47,7 @@ describe("TreeRowItem.vue", () => {
         expect(wrapper.find(".tree-table-texto").text()).toBe("Item 1");
     });
 
-    it("deve aplicar paddingLeft com base no level", () => {
+    it("deve aplicar recuo adicional em niveis mais profundos", () => {
         const item = {codigo: 1, nome: "Item 1"};
         const columns = [{key: "nome", label: "Nome"}];
         const wrapper = mount(TreeRowItem, {
@@ -55,7 +55,8 @@ describe("TreeRowItem.vue", () => {
         });
 
         const conteudo = wrapper.find(".tree-table-primeira-coluna-conteudo");
-        expect(conteudo.attributes().style).toContain("--tree-table-largura-gutter: 5rem;");
+        expect(conteudo.attributes().style).toContain("--tree-table-largura-gutter: 1.75rem;");
+        expect(conteudo.attributes().style).toContain("--tree-table-recuo-nivel: 2rem;");
     });
 
     it("deve manter respiro interno na primeira coluna no nivel raiz", () => {
@@ -66,7 +67,9 @@ describe("TreeRowItem.vue", () => {
         });
 
         expect(wrapper.find(".tree-table-primeira-coluna-conteudo").attributes().style)
-            .toContain("--tree-table-largura-gutter: 2.5rem;");
+            .toContain("--tree-table-largura-gutter: 1.75rem;");
+        expect(wrapper.find(".tree-table-primeira-coluna-conteudo").attributes().style)
+            .toContain("--tree-table-recuo-nivel: 0rem;");
     });
 
     it("deve exibir o toggle-icon se houver children", () => {

@@ -36,11 +36,11 @@
       <p class="mt-2 text-muted">{{ TEXTOS.unidades.CARREGANDO_ARVORE }}</p>
     </div>
 
-    <div v-else-if="unidades.length > 0">
-      <ArvoreUnidades
-          v-model="selecaoVazia"
-          :modo-selecao="false"
-          :unidades="unidades"
+    <div v-else-if="dadosArvore.length > 0">
+      <TreeTable
+          :columns="colunas"
+          :data="dadosArvore"
+          @row-click="abrirDetalheUnidade"
       />
     </div>
 
@@ -65,10 +65,11 @@
 <script lang="ts" setup>
 import {computed, onMounted, ref} from "vue";
 import {BAlert, BButton, BSpinner} from "bootstrap-vue-next";
+import {useRouter} from "vue-router";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
-import ArvoreUnidades from "@/components/unidade/ArvoreUnidades.vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
+import TreeTable from "@/components/comum/TreeTable.vue";
 import {buscarDiagnosticoOrganizacional, buscarTodasUnidades, mapUnidadesArray} from "@/services/unidadeService";
 import type {DiagnosticoOrganizacional, Unidade} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
@@ -76,11 +77,22 @@ import {useAsyncAction} from "@/composables/useAsyncAction";
 import {usePerfil} from "@/composables/usePerfil";
 import {logger} from "@/utils";
 
+type LinhaUnidadeArvore = {
+  codigo: number;
+  sigla: string;
+  unidade: string;
+  children: LinhaUnidadeArvore[];
+  tipo?: string;
+  expanded: boolean;
+  clickable: boolean;
+};
+
 const unidades = ref<Unidade[]>([]);
 const {carregando: isLoading, erro, executarSilencioso} = useAsyncAction();
 const {isAdmin} = usePerfil();
 const diagnosticoOrganizacional = ref<DiagnosticoOrganizacional | null>(null);
 const erroDiagnosticoOrganizacional = ref<string | null>(null);
+const router = useRouter();
 
 const erroUnidades = computed(() =>
     erro.value ? {message: erro.value} : null
@@ -95,11 +107,27 @@ const exibirAlertaDiagnostico = computed(() =>
     isAdmin.value && (!!erroDiagnosticoOrganizacional.value || diagnosticoOrganizacional.value?.possuiViolacoes === true)
 );
 
+const colunas = [
+  {key: "unidade", label: TEXTOS.subprocesso.COLUNA_UNIDADE, width: "100%"},
+];
+
+const unidadesExibidas = computed(() => {
+  const lista: Unidade[] = [];
+
+  for (const unidade of unidades.value) {
+    if (unidade.filhas && unidade.filhas.length > 0) {
+      lista.push(...unidade.filhas);
+    }
+  }
+
+  return lista;
+});
+
+const dadosArvore = computed(() => mapearUnidadesParaLinhas(unidadesExibidas.value));
+
 function clearError() {
   erro.value = null;
 }
-
-const selecaoVazia = ref<number[]>([]);
 
 async function carregarUnidades() {
   await executarSilencioso(async () => {
@@ -121,6 +149,27 @@ async function carregarDiagnostico() {
     erroDiagnosticoOrganizacional.value = "Não foi possível verificar as pendências organizacionais desta tela.";
     logger.error("Erro ao carregar diagnostico organizacional das unidades:", error);
   }
+}
+
+function mapearUnidadeParaLinha(unidade: Unidade): LinhaUnidadeArvore {
+  return {
+    codigo: unidade.codigo,
+    sigla: unidade.sigla,
+    unidade: `${unidade.sigla} - ${unidade.nome}`,
+    tipo: unidade.tipo,
+    children: mapearUnidadesParaLinhas(unidade.filhas ?? []),
+    expanded: true,
+    clickable: true,
+  };
+}
+
+function mapearUnidadesParaLinhas(unidadesOrigem: Unidade[]): LinhaUnidadeArvore[] {
+  return unidadesOrigem.map(mapearUnidadeParaLinha);
+}
+
+function abrirDetalheUnidade(item: unknown) {
+  const unidade = item as LinhaUnidadeArvore;
+  void router.push({path: `/unidade/${unidade.codigo}`});
 }
 
 onMounted(() => {

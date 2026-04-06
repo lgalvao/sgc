@@ -1,11 +1,18 @@
 <template>
   <div>
     <div
-        v-if="title"
-        class="d-flex justify-content-between align-items-center mb-3"
+        v-if="title || flattenedData.length > 0"
+        :class="[
+          'd-flex',
+          'align-items-center',
+          'mb-3',
+          title ? 'justify-content-between' : 'justify-content-end',
+        ]"
     >
       <h4 class="mb-0">
-        {{ title }}
+        <template v-if="title">
+          {{ title }}
+        </template>
       </h4>
 
       <div>
@@ -128,6 +135,105 @@ const emit = defineEmits<{
 }>();
 
 const internalData = ref<TreeItem[]>([]);
+const TIPO_ZONA_ELEITORAL = "ZONA ELEITORAL";
+const TITULO_GRUPO_ZONAS_ELEITORAIS = "ZONAS ELEITORAIS";
+
+const ehTextoZonaEleitoral = (valor: unknown) =>
+    typeof valor === "string"
+    && valor.trim().toUpperCase().includes(TIPO_ZONA_ELEITORAL);
+
+const ehSiglaZonaEleitoral = (valor: unknown) =>
+    typeof valor === "string"
+    && /Z\.?\s*E\.?/i.test(valor.trim());
+
+const ehZonaEleitoral = (item: TreeItem) =>
+    ehTextoZonaEleitoral(item.tipo)
+    || ehSiglaZonaEleitoral(item.sigla)
+    || ehTextoZonaEleitoral(item.unidade)
+    || ehTextoZonaEleitoral(item.nome);
+
+const ehTextoSecretaria = (valor: unknown) =>
+    typeof valor === "string"
+    && valor.trim().toUpperCase().includes("SECRETARIA");
+
+const ehSecretaria = (item: TreeItem) =>
+    ehTextoSecretaria(item.unidade)
+    || ehTextoSecretaria(item.nome);
+
+const criarGrupoZonasEleitorais = (
+    children: TreeItem[],
+    identificadorGrupo: string,
+): TreeItem => ({
+  codigo: `${identificadorGrupo}-zonas-eleitorais`,
+  unidade: TITULO_GRUPO_ZONAS_ELEITORAIS,
+  children,
+  expanded: true,
+  clickable: false,
+});
+
+const agruparZonasEleitorais = (
+    items: TreeItem[],
+    identificadorGrupo = "raiz",
+): TreeItem[] => {
+  const agrupados: TreeItem[] = [];
+  const zonasEleitorais: TreeItem[] = [];
+
+  for (const item of items) {
+    const children = item.children
+        ? agruparZonasEleitorais(item.children, `unidade-${item.codigo}`)
+        : [];
+    const itemNormalizado = {
+      ...item,
+      children,
+    };
+
+    if (ehZonaEleitoral(itemNormalizado)) {
+      if (zonasEleitorais.length === 0) {
+        agrupados.push(criarGrupoZonasEleitorais(zonasEleitorais, identificadorGrupo));
+      }
+      zonasEleitorais.push(itemNormalizado);
+      continue;
+    }
+
+    agrupados.push(itemNormalizado);
+  }
+
+  return agrupados;
+};
+
+const priorizarSecretarias = (items: TreeItem[]): TreeItem[] => {
+  const secretarias: TreeItem[] = [];
+  const grupoZonasEleitorais: TreeItem[] = [];
+  const demais: TreeItem[] = [];
+
+  for (const item of items) {
+    const children = item.children ? priorizarSecretarias(item.children) : [];
+    const itemNormalizado = {
+      ...item,
+      children,
+    };
+
+    if (ehSecretaria(itemNormalizado)) {
+      secretarias.push(itemNormalizado);
+      continue;
+    }
+
+    if (itemNormalizado.unidade === TITULO_GRUPO_ZONAS_ELEITORAIS) {
+      grupoZonasEleitorais.push(itemNormalizado);
+      continue;
+    }
+
+    demais.push(itemNormalizado);
+  }
+
+  demais.sort((a, b) => {
+    const textoA = typeof a.unidade === "string" ? a.unidade : "";
+    const textoB = typeof b.unidade === "string" ? b.unidade : "";
+    return textoA.localeCompare(textoB, "pt-BR", {sensitivity: "base"});
+  });
+
+  return [...secretarias, ...grupoZonasEleitorais, ...demais];
+};
 
 const obterLarguraPadraoColuna = (index: number) => {
   if (props.columns.length <= 1) {
@@ -156,7 +262,9 @@ watch(
     () => props.data,
     (newData) => {
       internalData.value = initializeExpanded(
-          structuredClone(toRaw(newData)),
+          priorizarSecretarias(
+              agruparZonasEleitorais(structuredClone(toRaw(newData))),
+          ),
       );
     },
     {immediate: true, deep: true},
@@ -261,5 +369,25 @@ defineExpose({
 :deep(.tree-row-transition-leave-to) {
   opacity: 0;
   transform: translateY(-0.25rem);
+}
+
+:deep(.tree-row-transition-enter-active td),
+:deep(.tree-row-transition-leave-active td) {
+  transition:
+      opacity 0.18s ease,
+      transform 0.18s ease,
+      padding-top 0.18s ease,
+      padding-bottom 0.18s ease;
+}
+
+:deep(.tree-row-transition-enter-from td),
+:deep(.tree-row-transition-leave-to td) {
+  opacity: 0;
+  transform: translateY(-0.25rem);
+}
+
+:deep(.tree-row-transition-leave-to td) {
+  padding-bottom: 0;
+  padding-top: 0;
 }
 </style>

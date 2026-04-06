@@ -48,6 +48,18 @@ describe("TreeTable.vue", () => {
         expect(wrapper.find("h4").exists()).toBe(false);
     });
 
+    it("deve exibir botoes de expandir e recolher mesmo sem titulo quando houver dados", async () => {
+        const wrapper = mount(TreeTable, {
+            props: {data: mockData, columns: mockColumns},
+            global: {stubs: {TreeRowItem: mockTreeRow}},
+        });
+
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.find('[data-testid="btn-expandir-todas"]').exists()).toBe(true);
+        expect(wrapper.find('button[aria-label="Recolher todas as linhas"]').exists()).toBe(true);
+    });
+
     it("deve renderizar os cabeçalhos da tabela corretamente", () => {
         const wrapper = mount(TreeTable, {
             props: {data: [], columns: mockColumns},
@@ -311,5 +323,141 @@ describe("TreeTable.vue", () => {
         expect(colunas[0].attributes("style")).toContain("width: 50%;");
         expect(colunas[1].attributes("style")).toContain("width: 25%;");
         expect(colunas[2].attributes("style")).toContain("width: 25%;");
+    });
+
+    it("deve agrupar itens de zona eleitoral sob um no visual", () => {
+        const wrapper = mount(TreeTable, {
+            props: {
+                data: [
+                    {codigo: 1, unidade: "SGP - Secretaria", tipo: "SECRETARIA"},
+                    {codigo: 101, unidade: "1 ZE - Primeira Zona", tipo: "ZONA ELEITORAL"},
+                    {codigo: 102, unidade: "2 ZE - Segunda Zona", tipo: "ZONA ELEITORAL"},
+                ],
+                columns: [{key: "unidade", label: "Unidade"}],
+            },
+            global: {stubs: {TreeRowItem: mockTreeRow}},
+        });
+
+        expect((wrapper.vm as any).internalData).toEqual([
+            {
+                codigo: 1,
+                unidade: "SGP - Secretaria",
+                tipo: "SECRETARIA",
+                expanded: false,
+                children: [],
+            },
+            {
+                codigo: "raiz-zonas-eleitorais",
+                unidade: "ZONAS ELEITORAIS",
+                expanded: true,
+                clickable: false,
+                children: [
+                    {
+                        codigo: 101,
+                        unidade: "1 ZE - Primeira Zona",
+                        tipo: "ZONA ELEITORAL",
+                        expanded: false,
+                        children: [],
+                    },
+                    {
+                        codigo: 102,
+                        unidade: "2 ZE - Segunda Zona",
+                        tipo: "ZONA ELEITORAL",
+                        expanded: false,
+                        children: [],
+                    },
+                ],
+            },
+        ]);
+    });
+
+    it("deve agrupar zonas eleitorais usando a sigla quando o tipo nao vier preenchido", () => {
+        const wrapper = mount(TreeTable, {
+            props: {
+                data: [
+                    {codigo: 1, sigla: "GP", unidade: "GP - Gabinete da Presidencia"},
+                    {codigo: 101, sigla: "1ª Z.E.", unidade: "1ª Z.E. - 1ª ZONA ELEITORAL"},
+                    {codigo: 102, sigla: "2ª Z.E.", unidade: "2ª Z.E. - 2ª ZONA ELEITORAL"},
+                ],
+                columns: [{key: "unidade", label: "Unidade"}],
+            },
+            global: {stubs: {TreeRowItem: mockTreeRow}},
+        });
+
+        expect((wrapper.vm as any).internalData).toEqual([
+            {
+                codigo: 1,
+                sigla: "GP",
+                unidade: "GP - Gabinete da Presidencia",
+                expanded: false,
+                children: [],
+            },
+            {
+                codigo: "raiz-zonas-eleitorais",
+                unidade: "ZONAS ELEITORAIS",
+                expanded: true,
+                clickable: false,
+                children: [
+                    {
+                        codigo: 101,
+                        sigla: "1ª Z.E.",
+                        unidade: "1ª Z.E. - 1ª ZONA ELEITORAL",
+                        expanded: false,
+                        children: [],
+                    },
+                    {
+                        codigo: 102,
+                        sigla: "2ª Z.E.",
+                        unidade: "2ª Z.E. - 2ª ZONA ELEITORAL",
+                        expanded: false,
+                        children: [],
+                    },
+                ],
+            },
+        ]);
+    });
+
+    it("deve colocar secretarias nas primeiras posicoes", () => {
+        const wrapper = mount(TreeTable, {
+            props: {
+                data: [
+                    {codigo: 1, unidade: "GP - GABINETE DA PRESIDENCIA"},
+                    {codigo: 2, unidade: "SJ - SECRETARIA JUDICIARIA"},
+                    {codigo: 3, unidade: "SGP - SECRETARIA DE GESTAO DE PESSOAS"},
+                    {codigo: 4, unidade: "CAE01 - CENTRAL DE ATENDIMENTO AO ELEITOR DA CAPITAL"},
+                ],
+                columns: [{key: "unidade", label: "Unidade"}],
+            },
+            global: {stubs: {TreeRowItem: mockTreeRow}},
+        });
+
+        expect((wrapper.vm as any).internalData.map((item: any) => item.codigo)).toEqual([2, 3, 1, 4]);
+    });
+
+    it("deve ordenar em blocos: secretarias, zonas eleitorais e demais em ordem alfabetica", () => {
+        const wrapper = mount(TreeTable, {
+            props: {
+                data: [
+                    {codigo: 1, unidade: "GP - GABINETE DA PRESIDENCIA"},
+                    {codigo: 2, unidade: "SJ - SECRETARIA JUDICIARIA"},
+                    {codigo: 3, sigla: "2ª Z.E.", unidade: "2ª Z.E. - 2ª ZONA ELEITORAL"},
+                    {codigo: 4, unidade: "CAE01 - CENTRAL DE ATENDIMENTO AO ELEITOR DA CAPITAL"},
+                    {codigo: 5, unidade: "SGP - SECRETARIA DE GESTAO DE PESSOAS"},
+                    {codigo: 6, unidade: "AAA - ASSESSORIA DE APOIO"},
+                    {codigo: 7, sigla: "1ª Z.E.", unidade: "1ª Z.E. - 1ª ZONA ELEITORAL"},
+                ],
+                columns: [{key: "unidade", label: "Unidade"}],
+            },
+            global: {stubs: {TreeRowItem: mockTreeRow}},
+        });
+
+        expect((wrapper.vm as any).internalData.map((item: any) => item.codigo)).toEqual([
+            2,
+            5,
+            "raiz-zonas-eleitorais",
+            6,
+            4,
+            1,
+        ]);
     });
 });
