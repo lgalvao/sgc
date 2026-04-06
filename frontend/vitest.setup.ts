@@ -4,6 +4,31 @@ import {vi} from "vitest";
 
 HTMLCanvasElement.prototype.getContext = vi.fn();
 
+function isErroRedeXhrJsdom(error: unknown): boolean {
+    if (!(error instanceof Error)) {
+        return false;
+    }
+
+    const stack = error.stack ?? "";
+    return error.name === "AggregateError"
+        && (stack.includes("jsdom\\lib\\jsdom\\living\\xhr\\xhr-utils.js")
+            || stack.includes("jsdom\\lib\\jsdom\\living\\xhr\\XMLHttpRequest-impl.js"));
+}
+
+// Alguns testes deixam XHR do jsdom morrerem fora da assercao; filtramos apenas esse ruido especifico.
+globalThis.addEventListener("error", (event) => {
+    if (isErroRedeXhrJsdom(event.error)) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+    }
+});
+
+globalThis.addEventListener("unhandledrejection", (event) => {
+    if (isErroRedeXhrJsdom(event.reason)) {
+        event.preventDefault();
+    }
+});
+
 
 vi.mock("@/utils/logger", () => ({
     default: {
