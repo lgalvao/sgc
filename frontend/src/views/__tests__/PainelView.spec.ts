@@ -1,5 +1,5 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
-import {mount} from '@vue/test-utils';
+import {flushPromises, mount} from '@vue/test-utils';
 import PainelView from '../PainelView.vue';
 import {createTestingPinia} from '@pinia/testing';
 import {useToastStore} from '@/stores/toast';
@@ -54,12 +54,21 @@ function createMountOptions(initialStateOverrides = {}) {
       stubs: {
         LayoutPadrao: { template: '<div><slot></slot></div>' },
         PageHeader: { template: '<div><slot></slot><slot name="actions"></slot></div>', props: ['title'] },
-        TabelaProcessos: { template: '<div></div>' },
+        TabelaProcessos: { template: '<div data-testid="tbl-processos"></div>' },
         BTable: { template: '<div><slot name="cell(mensagem)" :item="{}" :value="123"></slot></div>', props: ['items', 'fields'] },
-        EmptyState: { template: '<div></div>' },
+        EmptyState: { template: '<div data-testid="empty-state-alertas"></div>' },
+        BSpinner: { template: '<div data-testid="spinner-painel"></div>' },
       },
     },
   };
+}
+
+function criarPromessaPendente<T>() {
+  let resolve!: (value: T) => void;
+  const promise = new Promise<T>((res) => {
+    resolve = res;
+  });
+  return {promise, resolve};
 }
 
 describe('PainelView', () => {
@@ -88,11 +97,46 @@ describe('PainelView', () => {
     toastStore.consumePending = vi.fn().mockReturnValue({ body: 'Sucesso' });
 
     const wrapper = mount(PainelView, options);
-    await wrapper.vm.$nextTick();
+    await flushPromises();
 
     expect(painelService.listarProcessos).toHaveBeenCalledWith({codUnidade: 1, page: 0, size: 10});
     expect(painelService.listarAlertas).toHaveBeenCalledWith({codUnidade: 1, page: 0, size: 10, sort: 'dataHora', order: 'desc'});
     expect(mockToastCreate).toHaveBeenCalledWith(expect.objectContaining({ props: expect.objectContaining({ body: 'Sucesso' }) }));
+  });
+
+  it('deve manter o carregando ate processos e alertas concluirem', async () => {
+    const processos = criarPromessaPendente<any>();
+    const alertas = criarPromessaPendente<any>();
+    vi.mocked(painelService.listarProcessos).mockReturnValueOnce(processos.promise);
+    vi.mocked(painelService.listarAlertas).mockReturnValueOnce(alertas.promise);
+
+    const wrapper = mount(PainelView, createMountOptions());
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.find('[data-testid="painel-carregando"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="tbl-processos"]').exists()).toBe(false);
+
+    processos.resolve({
+      content: [{codigo: 1, descricao: 'Proc 1'}],
+      totalElements: 1,
+      totalPages: 1,
+      size: 10,
+      number: 0,
+    });
+    await flushPromises();
+    expect(wrapper.find('[data-testid="painel-carregando"]').exists()).toBe(true);
+
+    alertas.resolve({
+      content: [{codigo: 1, mensagem: 'Alerta 1'}],
+      totalElements: 1,
+      totalPages: 1,
+      size: 10,
+      number: 0,
+    });
+    await flushPromises();
+
+    expect(wrapper.find('[data-testid="painel-carregando"]').exists()).toBe(false);
+    expect(wrapper.find('[data-testid="tbl-processos"]').exists()).toBe(true);
   });
 
   it('nao deve carregar alertas se unidadeSelecionada for nula', async () => {
@@ -103,7 +147,7 @@ describe('PainelView', () => {
 
   it('deve ordenar processos corretamente', async () => {
     const wrapper = mount(PainelView, createMountOptions());
-    await wrapper.vm.$nextTick();
+    await flushPromises();
 
     const vm = wrapper.vm as any;
     
@@ -121,6 +165,7 @@ describe('PainelView', () => {
 
   it('deve abrir detalhes do processo se linkDestino existir', async () => {
     const wrapper = mount(PainelView, createMountOptions());
+    await flushPromises();
     const vm = wrapper.vm as any;
 
     vm.abrirDetalhesProcesso(undefined); // nao deve falhar nem chamar router
@@ -135,6 +180,7 @@ describe('PainelView', () => {
 
   it('deve retornar classes e atributos da linha de alertas corretamente', async () => {
     const wrapper = mount(PainelView, createMountOptions());
+    await flushPromises();
     const vm = wrapper.vm as any;
 
     // null checks

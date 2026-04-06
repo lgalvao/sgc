@@ -1,65 +1,71 @@
 <template>
   <LayoutPadrao>
     <h1 class="visually-hidden">{{ TEXTOS.painel.TITULO }}</h1>
-    <!-- Tabela de Processos -->
-    <div class="mb-5">
-      <PageHeader :title="TEXTOS.painel.PROCESSOS" title-test-codigo="txt-painel-titulo-processos">
-        <template #actions>
-          <BButton
-              v-if="perfil.podeCriarProcesso.value"
-              :to="{ name: 'CadProcesso' }"
-              data-testid="btn-painel-criar-processo"
-              variant="outline-primary"
-          >
-            <i aria-hidden="true" class="bi bi-plus-lg"/> Criar processo
-          </BButton>
-        </template>
-      </PageHeader>
-      <TabelaProcessos
-          :compacto="true"
-          :criterio-ordenacao="criterio"
-          :direcao-ordenacao-asc="asc"
-          :mostrar-cta-vazio="perfil.podeVisualizarTabelaCtaVazio.value"
-          :processos="processosOrdenados"
-          @ordenar="ordenarPor"
-          @selecionar-processo="abrirDetalhesProcesso"
-          @cta-vazio="router.push({ name: 'CadProcesso' })"
-      />
+    <div v-if="carregandoPainel" class="text-center py-5" data-testid="painel-carregando">
+      <BSpinner :label="TEXTOS.comum.CARREGANDO_DADOS" variant="primary" />
+      <p class="mt-2 text-muted">{{ TEXTOS.comum.CARREGANDO_DADOS }}</p>
     </div>
-
-    <div>
-      <PageHeader :title="TEXTOS.painel.ALERTAS" title-test-codigo="txt-painel-titulo-alertas"/>
-      <div v-if="alertas.length > 0" class="table-responsive">
-        <BTable
-            :fields="camposAlertas"
-            :items="alertas"
-            :tbody-tr-props="rowAttrAlerta"
-            :tbody-tr-class="rowClassAlerta"
-            aria-label="Alertas"
-            data-testid="tbl-alertas"
-            responsive
-            stacked="md"
-            small
-        >
-          <template #cell(mensagem)="data">
-            <span v-if="!data.item.dataHoraLeitura" class="visually-hidden">{{ TEXTOS.comum.NAO_LIDO }}</span>
-            {{ data.value }}
+    <template v-else>
+      <!-- Tabela de Processos -->
+      <div class="mb-5">
+        <PageHeader :title="TEXTOS.painel.PROCESSOS" title-test-codigo="txt-painel-titulo-processos">
+          <template #actions>
+            <BButton
+                v-if="perfil.podeCriarProcesso.value"
+                :to="{ name: 'CadProcesso' }"
+                data-testid="btn-painel-criar-processo"
+                variant="outline-primary"
+            >
+              <i aria-hidden="true" class="bi bi-plus-lg"/> Criar processo
+            </BButton>
           </template>
-        </BTable>
+        </PageHeader>
+        <TabelaProcessos
+            :compacto="true"
+            :criterio-ordenacao="criterio"
+            :direcao-ordenacao-asc="asc"
+            :mostrar-cta-vazio="perfil.podeVisualizarTabelaCtaVazio.value"
+            :processos="processosOrdenados"
+            @ordenar="ordenarPor"
+            @selecionar-processo="abrirDetalhesProcesso"
+            @cta-vazio="router.push({ name: 'CadProcesso' })"
+        />
       </div>
-      <EmptyState
-          v-else
-          class="border-0 bg-transparent mb-0"
-          data-testid="empty-state-alertas"
-          icon="bi-bell-slash"
-          :title="TEXTOS.painel.NENHUM_ALERTA"
-      />
-    </div>
+
+      <div>
+        <PageHeader :title="TEXTOS.painel.ALERTAS" title-test-codigo="txt-painel-titulo-alertas"/>
+        <div v-if="alertas.length > 0" class="table-responsive">
+          <BTable
+              :fields="camposAlertas"
+              :items="alertas"
+              :tbody-tr-props="rowAttrAlerta"
+              :tbody-tr-class="rowClassAlerta"
+              aria-label="Alertas"
+              data-testid="tbl-alertas"
+              responsive
+              stacked="md"
+              small
+          >
+            <template #cell(mensagem)="data">
+              <span v-if="!data.item.dataHoraLeitura" class="visually-hidden">{{ TEXTOS.comum.NAO_LIDO }}</span>
+              {{ data.value }}
+            </template>
+          </BTable>
+        </div>
+        <EmptyState
+            v-else
+            class="border-0 bg-transparent mb-0"
+            data-testid="empty-state-alertas"
+            icon="bi-bell-slash"
+            :title="TEXTOS.painel.NENHUM_ALERTA"
+        />
+      </div>
+    </template>
   </LayoutPadrao>
 </template>
 
 <script lang="ts" setup>
-import {BButton, BTable, useToast} from "bootstrap-vue-next";
+import {BButton, BSpinner, BTable, useToast} from "bootstrap-vue-next";
 import {computed, onActivated, onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
@@ -82,19 +88,12 @@ const toast = useToast();
 const processosPainel = ref<ProcessoResumo[]>([]);
 const alertas = ref<Alerta[]>([]);
 const alertasPage = ref<Page<Alerta>>({} as Page<Alerta>);
+const carregandoPainel = ref(true);
 
 const router = useRouter();
 
 const criterio = ref<keyof ProcessoResumo>("descricao");
 const asc = ref(true);
-
-async function buscarAlertas(
-    params: painelService.ListarParams<"dataHora" | "processo">
-) {
-  const response = await painelService.listarAlertas(params);
-  alertas.value = response.content;
-  alertasPage.value = response;
-}
 
 async function buscarProcessosPainel(
     params: painelService.ListarParams<keyof ProcessoResumo>
@@ -106,23 +105,32 @@ async function buscarProcessosPainel(
 async function carregarDados() {
   const unidadeCodigo = obterCodigoUnidadeSelecionada();
   if (!perfil.perfilSelecionado.value || !unidadeCodigo) {
+    carregandoPainel.value = false;
     return;
   }
 
-  await Promise.all([
-    buscarProcessosPainel({
-      codUnidade: unidadeCodigo,
-      page: 0,
-      size: 10,
-    }),
-    buscarAlertas({
-      codUnidade: unidadeCodigo,
-      page: 0,
-      size: 10,
-      sort: "dataHora",
-      order: "desc"
-    }),
-  ]);
+  carregandoPainel.value = true;
+  try {
+    const [processosResponse, alertasResponse] = await Promise.all([
+      painelService.listarProcessos({
+        codUnidade: unidadeCodigo,
+        page: 0,
+        size: 10,
+      }),
+      painelService.listarAlertas({
+        codUnidade: unidadeCodigo,
+        page: 0,
+        size: 10,
+        sort: "dataHora",
+        order: "desc"
+      }),
+    ]);
+    processosPainel.value = processosResponse?.content ?? [];
+    alertas.value = alertasResponse.content;
+    alertasPage.value = alertasResponse;
+  } finally {
+    carregandoPainel.value = false;
+  }
 }
 
 function exibirToastPendente() {

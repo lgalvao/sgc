@@ -3,6 +3,7 @@ import {
     buscarContextoEdicao as serviceBuscarContextoEdicao,
     buscarSubprocessoDetalhe as serviceBuscarSubprocessoDetalhe,
     buscarSubprocessoPorProcessoEUnidade as serviceBuscarSubprocessoPorProcessoEUnidade,
+    mapSubprocessoDetalheResponseParaModel,
 } from "@/services/subprocessoService";
 import {usePerfilStore} from "@/stores/perfil";
 import {useMapas} from "@/composables/useMapas";
@@ -11,7 +12,6 @@ import type {
     PermissoesSubprocesso,
     SituacaoSubprocesso,
     SubprocessoDetalhe,
-    SubprocessoDetalheResponse,
 } from "@/types/tipos";
 import {useErrorHandler} from "@/composables/useErrorHandler";
 import {normalizeError} from "@/utils/apiError";
@@ -25,36 +25,6 @@ type ContextoAcessoSubprocesso = {
     perfil: string;
     codUnidade: number | null;
 };
-
-function mapRespostaDetalheParaModel(dto: SubprocessoDetalheResponse): SubprocessoDetalhe {
-    const sp = dto.subprocesso;
-    return {
-        codigo: sp.codigo,
-        unidade: sp.unidade,
-        titular: dto.titular,
-        responsavel: dto.responsavel,
-        situacao: sp.situacao,
-        localizacaoAtual: dto.localizacaoAtual,
-        processoDescricao: sp.processoDescricao,
-        dataCriacaoProcesso: sp.dataCriacaoProcesso,
-        ultimaDataLimiteSubprocesso: obterUltimaDataLimiteSubprocesso(sp),
-        tipoProcesso: sp.tipoProcesso,
-        prazoEtapaAtual: sp.dataLimiteEtapa2 ?? sp.dataLimiteEtapa1,
-        isEmAndamento: sp.isEmAndamento,
-        etapaAtual: sp.etapaAtual ?? 1,
-        movimentacoes: dto.movimentacoes,
-        elementosProcesso: [],
-        permissoes: dto.permissoes,
-    };
-}
-
-function obterUltimaDataLimiteSubprocesso(sp: SubprocessoDetalheResponse["subprocesso"]): string {
-    const dataLimiteEtapa1 = sp.dataLimiteEtapa1;
-    const dataLimiteEtapa2 = sp.dataLimiteEtapa2;
-
-    if (!dataLimiteEtapa2) return dataLimiteEtapa1;
-    return dataLimiteEtapa1 > dataLimiteEtapa2 ? dataLimiteEtapa1 : dataLimiteEtapa2;
-}
 
 function registrarErroPreCondicaoPerfil() {
     const erro = new Error("Informações de perfil ou unidade não disponíveis.");
@@ -98,7 +68,7 @@ async function buscarSubprocessoDetalhe(codigo: number) {
             contextoAcesso.perfil,
             contextoAcesso.codUnidade as number,
         );
-        atualizarDetalheLocal(mapRespostaDetalheParaModel(dto));
+        atualizarDetalheLocal(mapSubprocessoDetalheResponseParaModel(dto));
     }, (erro) => {
         logger.error(`Erro ao buscar detalhes do subprocesso ${codigo}:`, erro);
         subprocessoDetalhe.value = null;

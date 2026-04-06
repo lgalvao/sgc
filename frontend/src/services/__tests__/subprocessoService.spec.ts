@@ -114,29 +114,40 @@ describe('subprocessoService', () => {
         codUnidade: 1,
       },
       detalhes: {
-        codigo: 1,
-        unidade: { codigo: 1, nome: 'Unidade', sigla: 'UND' },
+        subprocesso: {
+          codigo: 1,
+          unidade: { codigo: 1, nome: 'Unidade', sigla: 'UND' },
+          situacao: SituacaoSubprocesso.NAO_INICIADO,
+          dataLimiteEtapa1: '2025-01-01T00:00:00',
+          dataFimEtapa1: null,
+          dataLimiteEtapa2: '2025-02-01T00:00:00',
+          dataFimEtapa2: null,
+          processoDescricao: 'Processo',
+          dataCriacaoProcesso: '2024-01-01T00:00:00',
+          tipoProcesso: TipoProcesso.MAPEAMENTO,
+          isEmAndamento: true,
+          etapaAtual: null,
+        },
         titular: null,
         responsavel: null,
-        situacao: SituacaoSubprocesso.NAO_INICIADO,
-        localizacaoAtual: 'UND',
-        processoDescricao: 'Processo',
-        dataCriacaoProcesso: '2024-01-01T00:00:00',
-        ultimaDataLimiteSubprocesso: '2025-01-01T00:00:00',
-        tipoProcesso: TipoProcesso.MAPEAMENTO,
-        prazoEtapaAtual: '2025-01-01T00:00:00',
-        isEmAndamento: true,
-        etapaAtual: 1,
         movimentacoes: [],
-        elementosProcesso: [],
+        localizacaoAtual: 'UND',
         permissoes: {},
       },
       mapa: { codigo: 1, subprocessoCodigo: 1, observacoes: '', competencias: [], situacao: '' },
       atividadesDisponiveis: [],
     } } as never);
-    await subprocessoService.buscarContextoEdicao(1, 'ADMIN', 2);
+    const resultado = await subprocessoService.buscarContextoEdicao(1, 'ADMIN', 2);
     expect(apiClient.get).toHaveBeenCalledWith('/subprocessos/1/contexto-edicao', {
       params: { perfil: 'ADMIN', unidadeUsuario: 2 }
+    });
+    expect(resultado.detalhes).toMatchObject({
+      codigo: 1,
+      processoDescricao: 'Processo',
+      situacao: SituacaoSubprocesso.NAO_INICIADO,
+      ultimaDataLimiteSubprocesso: '2025-02-01T00:00:00',
+      etapaAtual: 1,
+      localizacaoAtual: 'UND',
     });
   });
 

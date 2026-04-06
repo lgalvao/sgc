@@ -66,6 +66,24 @@ describe("useSubprocessos", () => {
         vi.resetModules();
 
         service = await import("@/services/subprocessoService");
+        vi.mocked(service.mapSubprocessoDetalheResponseParaModel).mockImplementation((dto) => ({
+            codigo: dto.subprocesso.codigo,
+            unidade: dto.subprocesso.unidade as SubprocessoDetalhe["unidade"],
+            titular: dto.titular,
+            responsavel: dto.responsavel,
+            situacao: dto.subprocesso.situacao,
+            localizacaoAtual: dto.localizacaoAtual,
+            processoDescricao: dto.subprocesso.processoDescricao,
+            dataCriacaoProcesso: dto.subprocesso.dataCriacaoProcesso,
+            ultimaDataLimiteSubprocesso: dto.subprocesso.dataLimiteEtapa2 ?? dto.subprocesso.dataLimiteEtapa1,
+            tipoProcesso: dto.subprocesso.tipoProcesso as TipoProcesso,
+            prazoEtapaAtual: dto.subprocesso.dataLimiteEtapa2 ?? dto.subprocesso.dataLimiteEtapa1,
+            isEmAndamento: dto.subprocesso.isEmAndamento,
+            etapaAtual: dto.subprocesso.etapaAtual ?? 1,
+            movimentacoes: dto.movimentacoes,
+            elementosProcesso: [],
+            permissoes: dto.permissoes,
+        }));
         perfilStore = {
             perfilSelecionado: "ADMIN",
             unidadeAtual: 1,

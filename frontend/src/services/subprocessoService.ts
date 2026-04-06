@@ -12,6 +12,7 @@ import type {
     SalvarAjustesRequest,
     SalvarCompetenciaRequest,
     SalvarMapaRequest,
+    SubprocessoDetalhe,
     SubprocessoStatus,
     SubprocessoDetalheResponse,
     ValidacaoCadastro
@@ -27,6 +28,10 @@ interface BuscarSubprocessoPorProcessoEUnidadeResponse {
     codigo: number;
 }
 
+interface ContextoEdicaoResponseBackend extends Omit<ContextoEdicaoSubprocesso, "detalhes"> {
+    detalhes: SubprocessoDetalheResponse;
+}
+
 interface ImpactoMapaResponse {
     temImpactos: boolean;
     inseridas?: AtividadeImpactada[];
@@ -37,6 +42,38 @@ interface ImpactoMapaResponse {
     totalRemovidas?: number;
     totalAlteradas?: number;
     totalCompetenciasImpactadas?: number;
+}
+
+export function mapSubprocessoDetalheResponseParaModel(dto: SubprocessoDetalheResponse): SubprocessoDetalhe {
+    const subprocesso = dto.subprocesso;
+    return {
+        codigo: subprocesso.codigo,
+        unidade: subprocesso.unidade,
+        titular: dto.titular,
+        responsavel: dto.responsavel,
+        situacao: subprocesso.situacao,
+        localizacaoAtual: dto.localizacaoAtual,
+        processoDescricao: subprocesso.processoDescricao,
+        dataCriacaoProcesso: subprocesso.dataCriacaoProcesso,
+        ultimaDataLimiteSubprocesso: obterUltimaDataLimiteSubprocesso(subprocesso),
+        tipoProcesso: subprocesso.tipoProcesso,
+        prazoEtapaAtual: subprocesso.dataLimiteEtapa2 ?? subprocesso.dataLimiteEtapa1,
+        isEmAndamento: subprocesso.isEmAndamento,
+        etapaAtual: subprocesso.etapaAtual ?? 1,
+        movimentacoes: dto.movimentacoes,
+        elementosProcesso: [],
+        permissoes: dto.permissoes,
+    };
+}
+
+function obterUltimaDataLimiteSubprocesso(subprocesso: SubprocessoDetalheResponse["subprocesso"]): string {
+    const dataLimiteEtapa1 = subprocesso.dataLimiteEtapa1;
+    const dataLimiteEtapa2 = subprocesso.dataLimiteEtapa2;
+
+    if (!dataLimiteEtapa2) {
+        return dataLimiteEtapa1;
+    }
+    return dataLimiteEtapa1 > dataLimiteEtapa2 ? dataLimiteEtapa1 : dataLimiteEtapa2;
 }
 
 export async function importarAtividades(
@@ -91,10 +128,13 @@ export async function buscarContextoEdicao(
     perfil: string,
     unidadeCodigo: number,
 ): Promise<ContextoEdicaoSubprocesso> {
-    const response = await apiClient.get<ContextoEdicaoSubprocesso>(`/subprocessos/${codSubprocesso}/contexto-edicao`, {
+    const response = await apiClient.get<ContextoEdicaoResponseBackend>(`/subprocessos/${codSubprocesso}/contexto-edicao`, {
         params: {perfil, unidadeUsuario: unidadeCodigo},
     });
-    return response.data;
+    return {
+        ...response.data,
+        detalhes: mapSubprocessoDetalheResponseParaModel(response.data.detalhes),
+    };
 }
 
 export async function buscarSubprocessoPorProcessoEUnidade(
