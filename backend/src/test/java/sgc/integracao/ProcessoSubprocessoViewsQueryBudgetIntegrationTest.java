@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import org.hibernate.*;
 import org.hibernate.stat.*;
 import org.junit.jupiter.api.*;
+import org.slf4j.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.data.domain.*;
 import org.springframework.transaction.annotation.*;
@@ -26,6 +27,7 @@ import static org.assertj.core.api.Assertions.*;
 @Transactional
 @DisplayName("Budget de Queries de Processo e Subprocesso")
 class ProcessoSubprocessoViewsQueryBudgetIntegrationTest extends BaseIntegrationTest {
+    private static final Logger logger = LoggerFactory.getLogger(ProcessoSubprocessoViewsQueryBudgetIntegrationTest.class);
 
     @Autowired
     private EntityManager entityManager;
@@ -45,6 +47,7 @@ class ProcessoSubprocessoViewsQueryBudgetIntegrationTest extends BaseIntegration
     private Unidade unidadeFilha;
     private Usuario usuarioAdmin;
     private Subprocesso subprocesso;
+    private MetricasExecucaoTeste medidor;
 
     @BeforeEach
     void setUp() {
@@ -65,12 +68,13 @@ class ProcessoSubprocessoViewsQueryBudgetIntegrationTest extends BaseIntegration
 
         entityManager.flush();
         entityManager.clear();
+        medidor = new MetricasExecucaoTeste(entityManager, entityManagerFactory);
     }
 
     @Test
     @DisplayName("Painel deve listar processos sem lookup unitario por item")
     void painelDeveListarProcessosSemLookupUnitarioPorItem() {
-        long queriesViews = contarQueriesViews(() -> {
+        MetricasExecucaoTeste.ResultadoMedicao medicao = medir("painel.listarProcessos", () -> {
             Page<ProcessoResumoDto> pagina = painelFacade.listarProcessos(
                     Perfil.CHEFE,
                     unidadeFilha.getCodigo(),
@@ -80,28 +84,32 @@ class ProcessoSubprocessoViewsQueryBudgetIntegrationTest extends BaseIntegration
             assertThat(pagina.getContent())
                     .filteredOn(dto -> dto.descricao().startsWith("Processo budget"))
                     .hasSize(12);
-        });
+            return pagina;
+        }, "VW_UNIDADE", "PROCESSO");
 
-        assertThat(queriesViews).isLessThanOrEqualTo(2);
+        assertThat(medicao.sqlsViewsOrganizacionais()).isLessThanOrEqualTo(2);
+        medicao.validarTempoSeEstrito(500);
     }
 
     @Test
     @DisplayName("Detalhe de subprocesso deve manter budget estavel de consultas")
     void detalheDeSubprocessoDeveManterBudgetEstavel() {
-        long queriesViews = contarQueriesViews(() -> {
+        MetricasExecucaoTeste.ResultadoMedicao medicao = medir("subprocesso.obterDetalhes", () -> {
             SubprocessoDetalheResponse detalhes = subprocessoConsultaService.obterDetalhes(subprocesso.getCodigo(), usuarioAdmin);
 
             assertThat(detalhes).isNotNull();
             assertThat(detalhes.subprocesso().codigo()).isEqualTo(subprocesso.getCodigo());
-        });
+            return detalhes;
+        }, "VW_UNIDADE", "SUBPROCESSO", "MOVIMENTACAO");
 
-        assertThat(queriesViews).isLessThanOrEqualTo(7);
+        assertThat(medicao.sqlsViewsOrganizacionais()).isLessThanOrEqualTo(7);
+        medicao.validarTempoSeEstrito(800);
     }
 
     @Test
     @DisplayName("Painel deve listar alertas sem lookup unitario de leitura")
     void painelDeveListarAlertasSemLookupUnitarioDeLeitura() {
-        contarQueries(() -> {
+        MetricasExecucaoTeste.ResultadoMedicao medicao = medir("painel.listarAlertas", () -> {
             Page<Alerta> pagina = painelFacade.listarAlertas(
                     usuarioAdmin.getTituloEleitoral(),
                     unidadeFilha.getCodigo(),
@@ -111,38 +119,32 @@ class ProcessoSubprocessoViewsQueryBudgetIntegrationTest extends BaseIntegration
 
             assertThat(pagina.getContent()).hasSize(8);
             assertThat(pagina.getContent()).allMatch(alerta -> alerta.getDataHoraLeitura() != null);
-        });
+            return pagina;
+        }, "ALERTA", "ALERTA_USUARIO");
 
-        assertThat(sgc.integracao.mocks.ColetorSqlTeste.contarSqlsContendo("ALERTA_USUARIO")).isLessThanOrEqualTo(1);
-        assertThat(sgc.integracao.mocks.ColetorSqlTeste.contarSqls()).isLessThanOrEqualTo(4);
+        assertThat(medicao.contagensPorTrecho().get("ALERTA_USUARIO")).isLessThanOrEqualTo(1);
+        assertThat(medicao.totalSqls()).isLessThanOrEqualTo(4);
+        medicao.validarTempoSeEstrito(500);
     }
 
     @Test
     @DisplayName("Historico de validacao deve carregar unidades em lote")
     void historicoDeValidacaoDeveCarregarUnidadesEmLote() {
-        long queriesViews = contarQueriesViews(() -> {
+        MetricasExecucaoTeste.ResultadoMedicao medicao = medir("subprocesso.listarHistoricoValidacao", () -> {
             List<AnaliseHistoricoDto> historico = subprocessoConsultaService.listarHistoricoValidacao(subprocesso.getCodigo());
             assertThat(historico).hasSize(2);
-        });
+            return historico;
+        }, "ANALISE", "VW_UNIDADE");
 
-        assertThat(queriesViews).isLessThanOrEqualTo(2);
-        assertThat(sgc.integracao.mocks.ColetorSqlTeste.contarSqls()).isLessThanOrEqualTo(2);
+        assertThat(medicao.sqlsViewsOrganizacionais()).isLessThanOrEqualTo(2);
+        assertThat(medicao.totalSqls()).isLessThanOrEqualTo(2);
+        medicao.validarTempoSeEstrito(300);
     }
 
-    private void contarQueries(Runnable acao) {
-        Statistics estatisticas = entityManagerFactory.unwrap(SessionFactory.class).getStatistics();
-        estatisticas.setStatisticsEnabled(true);
-
-        entityManager.clear();
-        estatisticas.clear();
-        sgc.integracao.mocks.ColetorSqlTeste.limpar();
-
-        acao.run();
-    }
-
-    private long contarQueriesViews(Runnable acao) {
-        contarQueries(acao);
-        return sgc.integracao.mocks.ColetorSqlTeste.contarSqlsViewsOrganizacionais();
+    private <T> MetricasExecucaoTeste.ResultadoMedicao medir(String nome, java.util.function.Supplier<T> acao, String... trechosSql) {
+        MetricasExecucaoTeste.ResultadoMedicao medicao = medidor.medir(nome, acao, trechosSql);
+        logger.info("Medicao budget: {}", medicao.resumo());
+        return medicao;
     }
 
     private Unidade criarUnidade(String sigla, String nome, Unidade superior) {
