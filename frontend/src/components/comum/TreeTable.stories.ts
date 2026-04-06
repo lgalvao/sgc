@@ -14,9 +14,9 @@ export default meta;
 type Story = StoryObj<typeof TreeTable>;
 
 const mockColumns = [
-    {key: 'nome', label: 'Nome', width: '40%'},
-    {key: 'tipo', label: 'Tipo', width: '30%'},
-    {key: 'status', label: 'Status', width: '30%'},
+    {key: 'nome', label: 'Nome', width: '55%'},
+    {key: 'tipo', label: 'Tipo', width: '22%'},
+    {key: 'status', label: 'Status', width: '23%'},
 ];
 
 const mockData = [

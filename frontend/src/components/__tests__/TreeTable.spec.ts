@@ -59,6 +59,16 @@ describe("TreeTable.vue", () => {
         expect(headers[1].text()).toBe("Valor");
     });
 
+    it("deve aplicar estilos visuais da tabela e destacar a primeira coluna", () => {
+        const wrapper = mount(TreeTable, {
+            props: {data: [], columns: mockColumns},
+            global: {stubs: {TreeRowItem: mockTreeRow}},
+        });
+
+        expect(wrapper.find('[data-testid="tbl-tree"]').classes()).toContain("tree-table");
+        expect(wrapper.find("th").classes()).toContain("tree-table-primeira-coluna");
+    });
+
     it("não deve renderizar os cabeçalhos se hideHeaders for true", () => {
         const wrapper = mount(TreeTable, {
             props: {data: [], columns: mockColumns, hideHeaders: true},
@@ -79,7 +89,7 @@ describe("TreeTable.vue", () => {
         // Item 1 (expanded) -> SubItem 1.1, SubItem 1.2
         // Item 2 (expanded but no children)
         // Total: 1 + 2 + 1 = 4 rows
-        const trElements = wrapper.findAll("tbody tr");
+        const trElements = wrapper.findAll('[data-testid^="tree-table-row-"]');
         expect(trElements.length).toBeGreaterThan(0);
 
         const treeRows = wrapper.findAllComponents(TreeRowItem);
@@ -282,5 +292,24 @@ describe("TreeTable.vue", () => {
         expect(emptyState.props('title')).toBe("Nada aqui");
         expect(emptyState.props('description')).toBe("Vazio mesmo");
         expect(emptyState.props('icon')).toBe("bi-x-circle");
+    });
+
+    it("deve ampliar a largura padrao da primeira coluna quando nenhuma largura for informada", () => {
+        const wrapper = mount(TreeTable, {
+            props: {
+                data: [],
+                columns: [
+                    {key: "nome", label: "Nome"},
+                    {key: "value", label: "Valor"},
+                    {key: "tipo", label: "Tipo"},
+                ],
+            },
+            global: {stubs: {TreeRowItem: mockTreeRow}},
+        });
+
+        const colunas = wrapper.findAll("col");
+        expect(colunas[0].attributes("style")).toContain("width: 50%;");
+        expect(colunas[1].attributes("style")).toContain("width: 25%;");
+        expect(colunas[2].attributes("style")).toContain("width: 25%;");
     });
 });

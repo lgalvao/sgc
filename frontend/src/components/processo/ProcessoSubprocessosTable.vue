@@ -35,9 +35,9 @@ const emit = defineEmits<{
 }>();
 
 const colunas = [
-  {key: "unidadeAtual", label: TEXTOS.subprocesso.COLUNA_UNIDADE, width: "40%"},
-  {key: "situacao", label: TEXTOS.subprocesso.COLUNA_SITUACAO, width: "30%"},
-  {key: "dataLimite", label: TEXTOS.subprocesso.COLUNA_DATA_LIMITE, width: "30%"},
+  {key: "unidadeAtual", label: TEXTOS.subprocesso.COLUNA_UNIDADE, width: "55%"},
+  {key: "situacao", label: TEXTOS.subprocesso.COLUNA_SITUACAO, width: "22%"},
+  {key: "dataLimite", label: TEXTOS.subprocesso.COLUNA_DATA_LIMITE, width: "23%"},
 ];
 
 const mapeamentoHierarquia = computed(() => {

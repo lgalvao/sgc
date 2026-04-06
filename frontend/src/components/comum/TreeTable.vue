@@ -31,24 +31,28 @@
     </div>
 
     <div class="table-responsive w-100">
-      <table class="table table-striped table-hover m-0" data-testid="tbl-tree">
+      <table class="tree-table table table-striped table-hover m-0" data-testid="tbl-tree">
         <colgroup>
           <col
-              v-for="column in columns"
+              v-for="(column, index) in columns"
               :key="column.key"
-              :style="{ width: column.width || 100 / columns.length + '%' }"
+              :class="{ 'tree-table-primeira-coluna': index === 0 }"
+              :style="obterEstiloColuna(column, index)"
           />
         </colgroup>
 
         <thead v-if="!hideHeaders">
         <tr>
-          <th v-for="column in columns" :key="column.key">
+          <th
+              v-for="(column, index) in columns"
+              :key="column.key"
+              :class="{ 'tree-table-primeira-coluna': index === 0 }"
+          >
             {{ column.label }}
           </th>
         </tr>
         </thead>
-        <tbody>
-        <template v-if="flattenedData.length > 0">
+        <TransitionGroup v-if="flattenedData.length > 0" name="tree-row-transition" tag="tbody">
           <TreeRowItem
               v-for="item in flattenedData"
               :key="item.codigo"
@@ -58,8 +62,9 @@
               @toggle="toggleExpand"
               @row-click="handleTreeRowClick"
           />
-        </template>
-        <tr v-else>
+        </TransitionGroup>
+        <tbody v-else>
+        <tr>
           <td :colspan="columns.length" class="p-0 border-0">
             <EmptyState
                 :description="emptyDescription"
@@ -123,6 +128,21 @@ const emit = defineEmits<{
 }>();
 
 const internalData = ref<TreeItem[]>([]);
+
+const obterLarguraPadraoColuna = (index: number) => {
+  if (props.columns.length <= 1) {
+    return "100%";
+  }
+  if (index === 0) {
+    return "50%";
+  }
+
+  return `${50 / (props.columns.length - 1)}%`;
+};
+
+const obterEstiloColuna = (column: Column, index: number) => ({
+  width: column.width || obterLarguraPadraoColuna(index),
+});
 
 const initializeExpanded = (items: TreeItem[]): TreeItem[] => {
   return items.map((item) => ({
@@ -218,3 +238,28 @@ defineExpose({
   handleTreeRowClick,
 });
 </script>
+
+<style scoped>
+.tree-table {
+  font-size: 0.875rem;
+}
+
+.tree-table-primeira-coluna {
+  min-width: 24rem;
+}
+
+:deep(.tree-row-transition-enter-active),
+:deep(.tree-row-transition-leave-active) {
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+:deep(.tree-row-transition-move) {
+  transition: transform 0.18s ease;
+}
+
+:deep(.tree-row-transition-enter-from),
+:deep(.tree-row-transition-leave-to) {
+  opacity: 0;
+  transform: translateY(-0.25rem);
+}
+</style>

@@ -24,6 +24,29 @@ describe("TreeRowItem.vue", () => {
         expect(wrapper.text()).toContain("Ativo");
     });
 
+    it("deve indicar visualmente que a linha clicavel pode ser acionada", () => {
+        const item = {codigo: 1, nome: "Item 1", clickable: true};
+        const columns = [{key: "nome", label: "Nome"}];
+        const wrapper = mount(TreeRowItem, {
+            props: {item, columns, level: 0},
+        });
+
+        expect(wrapper.find("tr").classes()).toContain("tree-row");
+        expect(wrapper.find("td").classes()).toContain("tree-table-primeira-coluna");
+    });
+
+    it("deve renderizar faixa fixa para alinhamento da primeira coluna", () => {
+        const item = {codigo: 1, nome: "Item 1"};
+        const columns = [{key: "nome", label: "Nome"}];
+        const wrapper = mount(TreeRowItem, {
+            props: {item, columns, level: 0},
+        });
+
+        expect(wrapper.find(".tree-table-primeira-coluna-conteudo").exists()).toBe(true);
+        expect(wrapper.find(".tree-table-toggle-slot").exists()).toBe(true);
+        expect(wrapper.find(".tree-table-texto").text()).toBe("Item 1");
+    });
+
     it("deve aplicar paddingLeft com base no level", () => {
         const item = {codigo: 1, nome: "Item 1"};
         const columns = [{key: "nome", label: "Nome"}];
@@ -31,8 +54,19 @@ describe("TreeRowItem.vue", () => {
             props: {item, columns, level: 2},
         });
 
-        const firstTd = wrapper.find("td");
-        expect(firstTd.attributes().style).toContain("padding-left: 2.5rem;");
+        const conteudo = wrapper.find(".tree-table-primeira-coluna-conteudo");
+        expect(conteudo.attributes().style).toContain("--tree-table-largura-gutter: 5rem;");
+    });
+
+    it("deve manter respiro interno na primeira coluna no nivel raiz", () => {
+        const item = {codigo: 1, nome: "Item 1"};
+        const columns = [{key: "nome", label: "Nome"}];
+        const wrapper = mount(TreeRowItem, {
+            props: {item, columns, level: 0},
+        });
+
+        expect(wrapper.find(".tree-table-primeira-coluna-conteudo").attributes().style)
+            .toContain("--tree-table-largura-gutter: 2.5rem;");
     });
 
     it("deve exibir o toggle-icon se houver children", () => {
@@ -46,8 +80,24 @@ describe("TreeRowItem.vue", () => {
             props: {item, columns, level: 0},
         });
 
-        expect(wrapper.find(".toggle-icon").exists()).toBe(true);
+        expect(wrapper.find(".toggle-hit-area").exists()).toBe(true);
         expect(wrapper.find(".bi-chevron-right").exists()).toBe(true);
+        expect(wrapper.find(".toggle-icon-indicador-expandido").exists()).toBe(false);
+    });
+
+    it("deve indicar cursor de expansao no gutter quando item esta recolhido", () => {
+        const item = {
+            codigo: 1,
+            nome: "Item 1",
+            expanded: false,
+            children: [{codigo: 2, nome: "Child 1"}],
+        };
+        const columns = [{key: "nome", label: "Nome"}];
+        const wrapper = mount(TreeRowItem, {
+            props: {item, columns, level: 0},
+        });
+
+        expect(wrapper.find(".toggle-hit-area").classes()).toContain("toggle-hit-area-expandir");
     });
 
     it("não deve exibir o toggle-icon se não houver children", () => {
@@ -57,7 +107,7 @@ describe("TreeRowItem.vue", () => {
             props: {item, columns, level: 0},
         });
 
-        expect(wrapper.find(".toggle-icon").exists()).toBe(false);
+        expect(wrapper.find(".toggle-hit-area").exists()).toBe(false);
     });
 
     it("deve emitir o evento toggle ao clicar no toggle-icon", async () => {
@@ -71,13 +121,31 @@ describe("TreeRowItem.vue", () => {
             props: {item, columns, level: 0},
         });
 
-        const toggleIcon = wrapper.find(".toggle-icon");
+        const toggleIcon = wrapper.find(".toggle-hit-area");
         expect(toggleIcon.exists()).toBe(true);
 
         await toggleIcon.trigger("click");
 
         expect(wrapper.emitted("toggle")).toHaveLength(1);
         expect(wrapper.emitted("toggle")![0]).toEqual([1]);
+    });
+
+    it("deve permitir expandir ao clicar em toda a margem esquerda do toggle", async () => {
+        const item = {
+            codigo: 1,
+            nome: "Item 1",
+            clickable: true,
+            children: [{codigo: 2, nome: "Child 1"}],
+        };
+        const columns = [{key: "nome", label: "Nome"}];
+        const wrapper = mount(TreeRowItem, {
+            props: {item, columns, level: 0},
+        });
+
+        await wrapper.find(".tree-table-toggle-slot").trigger("click");
+
+        expect(wrapper.emitted("toggle")).toHaveLength(1);
+        expect(wrapper.emitted("row-click")).toBeUndefined();
     });
 
     it("deve emitir o evento row-click ao clicar na linha se clickable for true (padrao)", async () => {
@@ -129,9 +197,10 @@ describe("TreeRowItem.vue", () => {
             props: {item, columns, level: 0},
         });
 
-        expect(wrapper.find(".toggle-icon").exists()).toBe(true);
-        expect(wrapper.find(".bi-chevron-down").exists()).toBe(true);
-        expect(wrapper.find(".bi-chevron-right").exists()).toBe(false);
+        expect(wrapper.find(".toggle-hit-area").exists()).toBe(true);
+        expect(wrapper.find(".toggle-hit-area").classes()).toContain("toggle-hit-area-recolher");
+        expect(wrapper.find(".bi-chevron-right").exists()).toBe(true);
+        expect(wrapper.find(".toggle-icon-indicador-expandido").exists()).toBe(true);
     });
 
     it("deve emitir o evento toggle ao pressionar Enter no toggle-icon", async () => {
@@ -145,7 +214,7 @@ describe("TreeRowItem.vue", () => {
             props: {item, columns, level: 0},
         });
 
-        const toggleIcon = wrapper.find(".toggle-icon");
+        const toggleIcon = wrapper.find(".toggle-hit-area");
         expect(toggleIcon.exists()).toBe(true);
 
         await toggleIcon.trigger("keydown.enter");
@@ -165,7 +234,7 @@ describe("TreeRowItem.vue", () => {
             props: {item, columns, level: 0},
         });
 
-        const toggleIcon = wrapper.find(".toggle-icon");
+        const toggleIcon = wrapper.find(".toggle-hit-area");
         expect(toggleIcon.exists()).toBe(true);
 
         await toggleIcon.trigger("keydown.space");
