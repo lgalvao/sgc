@@ -281,6 +281,29 @@ async function criarProcessoMapeamentoComMapaDisponibilizadoPorFixture(
     return processo.codigo;
 }
 
+async function criarProcessoMapeamentoComCadastroDisponibilizadoPorFixture(
+    request: APIRequestContext,
+    cleanup: ReturnType<typeof useProcessoCleanup>,
+    descricao: string,
+    unidadeSigla: string
+): Promise<number> {
+    const response = await request.post('/e2e/fixtures/processo-mapeamento-com-cadastro-disponibilizado', {
+        data: {
+            descricao,
+            unidadeSigla,
+            iniciar: true,
+            diasLimite: 30
+        }
+    });
+
+    if (!response.ok()) {
+        throw new Error(`Falha ao criar fixture de cadastro disponibilizado: ${response.status()} ${await response.text()}`);
+    }
+    const processo = await response.json() as { codigo: number };
+    cleanup.registrar(processo.codigo);
+    return processo.codigo;
+}
+
 async function criarProcessoMapeamentoComMapaHomologadoPorFixture(
     request: APIRequestContext,
     cleanup: ReturnType<typeof useProcessoCleanup>,
@@ -1123,43 +1146,19 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
     // SEÇÃO 09 - OPERAÇÕES EM BLOCO (CDUs 22-26)
     test.describe('09 - Operações em Bloco', () => {
-        test('Captura fluxo de aceitar cadastros em bloco', async ({page}) => {
-            // Prepara cenário: criar processo com unidades subordinadas e disponibilizar cadastros
-            await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
-
+        test('Captura fluxo de aceitar cadastros em bloco', async ({page, request}) => {
+            test.setTimeout(60000); // Fluxo muito longo (múltiplos logins/logouts)
+            
             const descricao = `Processo bloco ${Date.now()}`;
-            // Criar com múltiplas unidades para que GESTOR veja tela de "Unidades participantes"
+            // Prepara cenário: criar processo com cadastro disponibilizado 
             // COORD_22 tem SECAO_221 e é gerido por GESTOR_COORD_22
-            await criarProcesso(page, {
+            const codProcesso = await criarProcessoMapeamentoComCadastroDisponibilizadoPorFixture(
+                request,
+                cleanup,
                 descricao,
-                tipo: 'MAPEAMENTO',
-                diasLimite: 30,
-                unidade: ['SECAO_221'],  // Usar unidade livre
-                expandir: ['SECRETARIA_2', 'COORD_22'],
-                iniciar: true
-            });
+                'SECAO_221'
+            );
 
-            // Login como Chefe da SECAO_221 para disponibilizar cadastro
-            await fazerLogout(page);
-            await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
-
-            await page.getByTestId('tbl-processos').getByText(descricao).first().click();
-            await navegarParaSubprocesso(page, 'SECAO_221');
-            await expect(page).toHaveURL(/processo\/\d+/);
-
-            // Capturar ID para cleanup (após navegar para o subprocesso)
-            const codProcesso = await extrairProcessoCodigo(page);
-            registrarProcessoParaCleanup(cleanup, codProcesso);
-            await navegarParaAtividades(page);
-            await adicionarAtividade(page, 'Atividade bloco 1');
-            await adicionarConhecimento(page, 'Atividade bloco 1', 'Conhecimento 1');
-            await page.getByTestId('btn-cad-atividades-disponibilizar').click();
-            await expect(page.getByTestId('btn-confirmar-disponibilizacao')).toBeVisible();
-            await page.getByTestId('btn-confirmar-disponibilizacao').click();
-            await verificarPaginaPainel(page);
-
-            // Login como Gestor da COORD_22 para ver botão de aceitar em bloco
-            await fazerLogout(page);
             await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
 
             await page.getByTestId('tbl-processos').getByText(descricao).first().click();
@@ -1285,15 +1284,11 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await expect(page).toHaveURL(/\/unidades/);
             await capturarTela(page, '11-unidades', '01-arvore-unidades', { fullPage: true });
 
-            const btnExpand = page.getByTestId('btn-arvore-expand-SECRETARIA_1');
-            await expect(btnExpand).toBeVisible();
-            await btnExpand.click();
-            await expect(page.getByTestId('btn-arvore-expand-COORD_12')).toBeVisible();
-
-            const btnExpandCoord12 = page.getByTestId('btn-arvore-expand-COORD_12');
-            await expect(btnExpandCoord12).toBeVisible();
-            await btnExpandCoord12.click();
+            // A árvore de unidades agora vem expandida por padrão
+            await expect(page.getByText('SECRETARIA_1').first()).toBeVisible();
+            await expect(page.getByText('COORD_12').first()).toBeVisible();
             await expect(page.getByText('SECAO_121').first()).toBeVisible();
+            
             await capturarTela(page, '11-unidades', '02-arvore-unidades-expandida', { fullPage: true });
 
             const unidade = page.getByText('SECAO_121').first();

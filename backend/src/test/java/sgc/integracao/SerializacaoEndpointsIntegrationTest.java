@@ -122,6 +122,7 @@ class SerializacaoEndpointsIntegrationTest extends BaseIntegrationTest {
         Atividade atividade = AtividadeFixture.atividadePadrao(mapa);
         atividade.setDescricao("Atividade de serialização");
         atividade = atividadeRepo.saveAndFlush(atividade);
+        mapa.getAtividades().add(atividade);
 
         Conhecimento conhecimento = Conhecimento.builder()
                 .atividade(atividade)
