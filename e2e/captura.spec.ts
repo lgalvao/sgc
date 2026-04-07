@@ -1182,7 +1182,6 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await expect(btnAceitarBloco).toBeHidden();
 
             // Login como Gestor da SECRETARIA_2 para aceitar e mover para o ADMIN
-            await fazerLogout(page);
             await loginComPerfil(
                 page,
                 USUARIOS.CHEFE_SECRETARIA_2.titulo,
@@ -1199,7 +1198,6 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await expect(btnAceitarBlocoSec2).toBeHidden();
 
             // Login como Admin para homologar em bloco
-            await fazerLogout(page);
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
             await page.getByTestId('tbl-processos').getByText(descricao).first().click();
