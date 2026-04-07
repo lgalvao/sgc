@@ -130,7 +130,7 @@ describe('UnidadeView.vue', () => {
         vi.mocked(buscarArvoreUnidade).mockClear();
         vi.mocked(buscarReferenciaMapaVigente).mockClear();
 
-        const hooks = wrapper.vm.$?.a ?? [];
+        const hooks = ((wrapper.vm.$ as {a?: Array<() => unknown>} | undefined)?.a) ?? [];
         for (const hook of hooks) {
             await hook.call(wrapper.vm);
         }

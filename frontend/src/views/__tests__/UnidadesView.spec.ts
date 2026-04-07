@@ -120,7 +120,7 @@ describe("Unidades.vue", () => {
         vi.mocked(unidadeService.buscarTodasUnidades).mockClear();
         vi.mocked(unidadeService.buscarDiagnosticoOrganizacional).mockClear();
 
-        const hooks = wrapper.vm.$?.a ?? [];
+        const hooks = ((wrapper.vm.$ as {a?: Array<() => unknown>} | undefined)?.a) ?? [];
         for (const hook of hooks) {
             await hook.call(wrapper.vm);
         }

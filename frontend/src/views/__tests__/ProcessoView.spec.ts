@@ -203,7 +203,7 @@ describe("Processo.vue", () => {
         await flushPromises();
         vi.mocked(processoService.buscarContextoCompleto).mockClear();
 
-        const hooks = wrapper.vm.$?.a ?? [];
+        const hooks = ((wrapper.vm.$ as {a?: Array<() => unknown>} | undefined)?.a) ?? [];
         for (const hook of hooks) {
             await hook.call(wrapper.vm);
         }

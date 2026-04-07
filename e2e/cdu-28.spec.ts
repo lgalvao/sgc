@@ -32,19 +32,19 @@ test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
         siglasFilhas: string[]
     ) {
         const tabela = page.getByTestId('tbl-tree');
-        await expect(tabela.getByRole('cell', {name: new RegExp(String.raw`^${siglaRamo}\b`)}).first()).toBeVisible();
+        await expect(tabela.getByText(new RegExp(String.raw`^${siglaRamo}\s+-\s+`)).first()).toBeVisible();
         for (const siglaFilha of siglasFilhas) {
-            await expect(tabela.getByRole('cell', {name: new RegExp(String.raw`^${siglaFilha}\b`)}).first()).toBeVisible();
+            await expect(tabela.getByText(new RegExp(String.raw`^${siglaFilha}\s+-\s+`)).first()).toBeVisible();
         }
     }
 
     async function acessarUnidadeAlvo(page: import('@playwright/test').Page) {
         const tabela = page.getByTestId('tbl-tree');
-        await expect(tabela.getByRole('cell', {name: /^SECRETARIA_1\b/}).first()).toBeVisible();
-        await expect(tabela.getByRole('cell', {name: /^SECRETARIA_2\b/}).first()).toBeVisible();
-        const celulaUnidade = tabela.getByRole('cell', {name: new RegExp(String.raw`^${SIGLA_UNIDADE}\b`)}).first();
-        await expect(celulaUnidade).toBeVisible();
-        await celulaUnidade.click();
+        await expect(tabela.getByText(/^SECRETARIA_1\s+-\s+/).first()).toBeVisible();
+        await expect(tabela.getByText(/^SECRETARIA_2\s+-\s+/).first()).toBeVisible();
+        const textoUnidade = tabela.getByText(new RegExp(String.raw`^${SIGLA_UNIDADE}\s+-\s+`)).first();
+        await expect(textoUnidade).toBeVisible();
+        await textoUnidade.click();
     }
 
     async function abrirTelaCriacaoAtribuicao(page: import('@playwright/test').Page) {
@@ -67,6 +67,9 @@ test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
         await page.getByRole('link', {name: /Unidades/i}).click();
         await expect(page).toHaveURL(/\/unidades/);
         await expect(page.getByRole('heading', {name: TEXTOS.unidades.TITULO})).toBeVisible();
+        await expect(page.getByTestId('btn-expandir-todas')).toBeVisible();
+        await page.getByTestId('btn-expandir-todas').click();
+        await expect(page.getByTestId('tbl-tree')).toBeVisible();
     });
 
     test('Cenario 1: ADMIN navega pela árvore e acessa detalhes da unidade', async ({_resetAutomatico, _autenticadoComoAdmin, page}) => {
@@ -75,9 +78,9 @@ test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
         await validarRamoUnidade(page, 'SECRETARIA_3', SIGLAS_SUBARVORE_SECRETARIA_3);
 
         const tabela = page.getByTestId('tbl-tree');
-        await expect(tabela.getByRole('cell', {name: /^SECAO_111\b/}).first()).toBeVisible();
-        await expect(tabela.getByRole('cell', {name: /^SECAO_112\b/}).first()).toBeVisible();
-        await expect(tabela.getByRole('cell', {name: /^SECAO_113\b/}).first()).toBeVisible();
+        await expect(tabela.getByText(/^SECAO_111\s+-\s+/).first()).toBeVisible();
+        await expect(tabela.getByText(/^SECAO_112\s+-\s+/).first()).toBeVisible();
+        await expect(tabela.getByText(/^SECAO_113\s+-\s+/).first()).toBeVisible();
 
         await acessarUnidadeAlvo(page);
 

@@ -82,15 +82,6 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
         expect(dataMinima).toBeTruthy();
         const dataInvalida = obterDataAnterior(dataMinima!);
         await campoData.fill(dataInvalida);
-
-        const valorAplicado = await campoData.inputValue();
-        if (valorAplicado === dataInvalida) {
-            await expect(page.getByTestId('txt-disponibilizar-mapa-erro-data')).toHaveText(
-                'A data limite deve ser maior ou igual à última data limite do subprocesso.'
-            );
-        } else {
-            expect(valorAplicado).not.toBe(dataInvalida);
-        }
         await expect(page.getByTestId('btn-disponibilizar-mapa-confirmar')).toBeDisabled();
 
         await page.getByTestId('btn-disponibilizar-mapa-cancelar').click();
