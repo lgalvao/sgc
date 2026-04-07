@@ -42,6 +42,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
@@ -57,6 +59,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
         "spring.datasource.driver-class-name=oracle.jdbc.OracleDriver",
         "spring.sql.init.mode=never"
 })
+@EnabledIfEnvironmentVariable(named = "DB_URL", matches = ".+")
 class ProcessoSubprocessoPerformanceOracleIntegrationTest {
     private static final Logger logger = LoggerFactory.getLogger(ProcessoSubprocessoPerformanceOracleIntegrationTest.class);
     private static final Path DIRETORIO_RELATORIOS = Path.of("etc", "benchmarks", "processo-subprocesso");

@@ -38,7 +38,7 @@ class SubprocessoServiceCoverageIntegrationTest {
     private UsuarioFacade usuarioFacade;
 
     @MockitoBean
-    private JavaMailSender javaMailSender;
+    private JavaMailSenderImpl javaMailSender;
 
     @Autowired
     private SubprocessoRepo subprocessoRepo;

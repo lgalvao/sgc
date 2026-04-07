@@ -31,7 +31,7 @@ public class TestConfig implements AsyncConfigurer {
     @Bean
     @Primary
     @Profile({"test", "e2e", "secure-test"})
-    public JavaMailSender javaMailSender(GreenMail greenMail) {
+    public JavaMailSenderImpl javaMailSender(GreenMail greenMail) {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
         mailSender.setHost("localhost");
         mailSender.setPort(greenMail.getSmtp().getPort());
