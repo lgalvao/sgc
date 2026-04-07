@@ -222,7 +222,7 @@
 
 <script lang="ts" setup>
 import {BAlert, BButton, BCard, BCardBody, BFormTextarea, BSpinner, BTable, useToast} from "bootstrap-vue-next";
-import {computed, onMounted, ref, type Ref} from "vue";
+import {computed, onActivated, onMounted, ref, type Ref} from "vue";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import SubprocessoCards from "@/components/processo/SubprocessoCards.vue";
@@ -278,6 +278,7 @@ const mostrarModalAlterarDataLimite = ref(false);
 const mostrarModalReabrir = ref(false);
 const loadingDataLimite = ref(false);
 const loadingReabertura = ref(false);
+const carregamentoInicialConcluido = ref(false);
 
 const camposMovimentacoes = [
   {key: "dataHora", label: TEXTOS.subprocesso.MOVIMENTACOES_CAMPO_DATA},
@@ -339,9 +340,9 @@ function exibirToastPendente() {
   }
 }
 
-onMounted(async () => {
-  exibirToastPendente();
+async function carregarSubprocesso() {
   subprocessosStore.subprocessoDetalhe = null;
+
   try {
     const codigo = await subprocessosStore.buscarSubprocessoPorProcessoEUnidade(
         props.codProcesso,
@@ -358,15 +359,30 @@ onMounted(async () => {
         await mapaStore.buscarMapaCompleto(codigo);
       }
     } else {
+      codSubprocesso.value = null;
       erroNaoEncontrado.value = true;
       logger.warn(`Subprocesso não encontrado para processo ${props.codProcesso} e unidade ${props.siglaUnidade}`);
     }
   } catch (error: unknown) {
     const erroNormalizado = normalizeError(error);
-    if (normalizeError(error).kind !== 'unauthorized') {
+    if (erroNormalizado.kind !== 'unauthorized') {
       logger.error(`Erro ao carregar detalhes do subprocesso:`, error, erroNormalizado.message);
     }
   }
+}
+
+onMounted(async () => {
+  exibirToastPendente();
+  await carregarSubprocesso();
+  carregamentoInicialConcluido.value = true;
+});
+
+onActivated(async () => {
+  exibirToastPendente();
+  if (!carregamentoInicialConcluido.value) {
+    return;
+  }
+  await carregarSubprocesso();
 });
 
 function abrirModalAlterarDataLimite() {

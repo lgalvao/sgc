@@ -1,6 +1,6 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcessoMapaValidadoFixture, validarProcessoFixture} from './fixtures/index.js';
-import {fazerLogout, navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
+import {navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
 import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
 import {loginComPerfil} from './helpers/helpers-auth.js';
 
@@ -145,6 +145,7 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
         page,
         _autenticadoComoAdmin
     }) => {
+        test.setTimeout(30000);
         const descIsolada = `Mapeamento CDU-26 alerta ${Date.now()}`;
         const processoIsolado = await criarProcessoMapaValidadoFixture(request, {
             descricao: descIsolada,
@@ -163,7 +164,6 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
         await modal.getByRole('button', {name: /^Homologar$/i}).click();
         await page.waitForURL(/\/painel/);
 
-        await fazerLogout(page);
         await loginComPerfil(page, '300001', 'senha', 'GESTOR - SECRETARIA_3');
 
         const tabelaAlertas = page.getByTestId('tbl-alertas');

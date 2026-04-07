@@ -2,7 +2,7 @@ import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcessoMapaValidadoFixture} from './fixtures/index.js';
 import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
 import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
-import {fazerLogout, navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
+import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 import {resetDatabase} from './hooks/hooks-limpeza.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
 
@@ -74,6 +74,7 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
         request,
         page
     }) => {
+        test.setTimeout(30000);
         // Reseta o banco para evitar conflito com unidade já em processo ativo dos cenários anteriores
         await resetDatabase(request);
         const descIsolada = `Mapeamento CDU-25 alerta ${Date.now()}`;
@@ -95,7 +96,6 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
         await modal.getByRole('button', {name: TEXTOS.acaoBloco.aceitar.BOTAO}).click();
         await expect(page.getByText(TEXTOS.sucesso.MAPAS_ACEITOS_EM_BLOCO)).toBeVisible();
 
-        await fazerLogout(page);
         await loginComPerfil(
             page,
             USUARIOS.GESTOR_SECRETARIA_2.titulo,

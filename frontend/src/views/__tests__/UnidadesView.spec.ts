@@ -114,6 +114,22 @@ describe("Unidades.vue", () => {
         expect(unidadeService.buscarTodasUnidades).toHaveBeenCalled();
     });
 
+    it("deve recarregar unidades ao reativar a view em keepAlive", async () => {
+        const wrapper = createWrapper();
+        await flushPromises();
+        vi.mocked(unidadeService.buscarTodasUnidades).mockClear();
+        vi.mocked(unidadeService.buscarDiagnosticoOrganizacional).mockClear();
+
+        const hooks = wrapper.vm.$?.a ?? [];
+        for (const hook of hooks) {
+            await hook.call(wrapper.vm);
+        }
+        await flushPromises();
+
+        expect(unidadeService.buscarTodasUnidades).toHaveBeenCalled();
+        expect(unidadeService.buscarDiagnosticoOrganizacional).toHaveBeenCalled();
+    });
+
     it("deve exibir alerta fixo com resumo do diagnostico para ADMIN", async () => {
         vi.mocked(unidadeService.buscarDiagnosticoOrganizacional).mockResolvedValueOnce({
             possuiViolacoes: true,

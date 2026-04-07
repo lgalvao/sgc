@@ -240,6 +240,22 @@ describe('SubprocessoView.vue', () => {
         expect(mapaStore.mapaCompleto.value).toEqual({codigo: 100});
     });
 
+    it('recarrega dados ao reativar a view em keepAlive', async () => {
+        const {wrapper, store} = mountComponent();
+        await flushPromises();
+        store.buscarSubprocessoPorProcessoEUnidade.mockClear();
+        store.buscarContextoEdicao.mockClear();
+
+        const hooks = wrapper.vm.$?.a ?? [];
+        for (const hook of hooks) {
+            await hook.call(wrapper.vm);
+        }
+        await flushPromises();
+
+        expect(store.buscarSubprocessoPorProcessoEUnidade).toHaveBeenCalledWith(1, 'TEST');
+        expect(store.buscarContextoEdicao).toHaveBeenCalledWith(10);
+    });
+
     it('mantem orçamento enxuto de chamadas no carregamento inicial quando o contexto já traz mapa', async () => {
         const {store, mapaStore} = mountComponent();
         await flushPromises();

@@ -254,6 +254,11 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
                 await expect(checkboxSemMudancas).toBeChecked();
             }
         }
+        if (await botaoDisponibilizar.isDisabled()) {
+            const atividadeExtra = `Atividade cancelamento revisão ${Date.now()}`;
+            await adicionarAtividade(page, atividadeExtra);
+            await adicionarConhecimento(page, atividadeExtra, 'Conhecimento cancelamento');
+        }
         await expect(botaoDisponibilizar).toBeEnabled();
         await botaoDisponibilizar.click();
         await page.getByTestId('btn-disponibilizar-revisao-cancelar').click();

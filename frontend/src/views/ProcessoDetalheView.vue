@@ -116,7 +116,7 @@
 
 <script lang="ts" setup>
 import {BAlert, BButton, BSpinner} from "bootstrap-vue-next";
-import {computed, onMounted, ref} from "vue";
+import {computed, onActivated, onMounted, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import ModalAcaoBloco from "@/components/processo/ModalAcaoBloco.vue";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
@@ -179,6 +179,7 @@ const modalBlocoRef = ref<ModalAcaoBlocoRef | null>(null);
 const mostrarModalFinalizacao = ref(false);
 const acaoBlocoAtual = ref<AcaoBloco>("aceitar");
 const processandoAcaoBloco = ref(false);
+const carregamentoInicialConcluido = ref(false);
 
 function clearError() {
   lastError.value = null;
@@ -504,9 +505,22 @@ onMounted(async () => {
   if (codProcesso) {
     try {
       await carregarContextoCompleto();
+      carregamentoInicialConcluido.value = true;
     } catch {
       // O erro já foi convertido em estado local para exibição inline.
     }
+  }
+});
+
+onActivated(async () => {
+  if (!codProcesso || !carregamentoInicialConcluido.value) {
+    return;
+  }
+
+  try {
+    await carregarContextoCompleto();
+  } catch {
+    // O erro já foi convertido em estado local para exibição inline.
   }
 });
 

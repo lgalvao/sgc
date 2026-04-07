@@ -30,6 +30,13 @@
           max="2099-12-31"
           :min="dataMinimaPermitida"
       />
+      <div
+          v-if="mensagemErroDataLimite"
+          class="invalid-feedback d-block"
+          data-testid="txt-disponibilizar-mapa-erro-data"
+      >
+        {{ mensagemErroDataLimite }}
+      </div>
     </BFormGroup>
 
     <BFormGroup

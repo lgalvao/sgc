@@ -124,6 +124,22 @@ describe('UnidadeView.vue', () => {
         expect(buscarArvoreUnidade).toHaveBeenCalledWith(1);
     });
 
+    it('recarrega dados ao reativar a view em keepAlive', async () => {
+        const {wrapper} = createWrapper();
+        await flushPromises();
+        vi.mocked(buscarArvoreUnidade).mockClear();
+        vi.mocked(buscarReferenciaMapaVigente).mockClear();
+
+        const hooks = wrapper.vm.$?.a ?? [];
+        for (const hook of hooks) {
+            await hook.call(wrapper.vm);
+        }
+        await flushPromises();
+
+        expect(buscarArvoreUnidade).toHaveBeenCalledWith(1);
+        expect(buscarReferenciaMapaVigente).toHaveBeenCalledWith(1);
+    });
+
     it('renders unit details correctly', async () => {
         const {wrapper} = createWrapper();
 

@@ -199,6 +199,19 @@ describe("Processo.vue", () => {
         expect(processoService.buscarContextoCompleto).toHaveBeenCalledWith(1);
     });
 
+    it("deve recarregar detalhes ao reativar a view em keepAlive", async () => {
+        await flushPromises();
+        vi.mocked(processoService.buscarContextoCompleto).mockClear();
+
+        const hooks = wrapper.vm.$?.a ?? [];
+        for (const hook of hooks) {
+            await hook.call(wrapper.vm);
+        }
+        await flushPromises();
+
+        expect(processoService.buscarContextoCompleto).toHaveBeenCalledWith(1);
+    });
+
     it("deve exibir erro se falhar ao carregar processo", async () => {
         wrapper.unmount();
         wrapper = createWrapper({erroCarregamento: new Error("Erro ao carregar")});

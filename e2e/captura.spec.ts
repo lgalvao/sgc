@@ -1161,7 +1161,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
 
-            await page.getByTestId('tbl-processos').getByText(descricao).first().click();
+            await page.goto(`/processo/${codProcesso}`);
             await expect(page.getByRole('heading', {name: /Unidades participantes/i})).toBeVisible();
             await capturarTela(page, '09-operacoes-bloco', '01-detalhes-processo-gestor', { 
                 fullPage: true, 

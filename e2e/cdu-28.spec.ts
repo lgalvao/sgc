@@ -31,24 +31,20 @@ test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
         siglaRamo: string,
         siglasFilhas: string[]
     ) {
-        await expect(page.getByTestId(`link-arvore-unidade-${siglaRamo}`)).toBeVisible();
-        const primeiraFilha = page.getByTestId(`link-arvore-unidade-${siglasFilhas[0]}`);
-        if (!(await primeiraFilha.isVisible())) {
-            await page.getByTestId(`btn-arvore-expand-${siglaRamo}`).click();
-        }
+        const tabela = page.getByTestId('tbl-tree');
+        await expect(tabela.getByRole('cell', {name: new RegExp(String.raw`^${siglaRamo}\b`)}).first()).toBeVisible();
         for (const siglaFilha of siglasFilhas) {
-            await expect(page.getByTestId(`link-arvore-unidade-${siglaFilha}`)).toBeVisible();
+            await expect(tabela.getByRole('cell', {name: new RegExp(String.raw`^${siglaFilha}\b`)}).first()).toBeVisible();
         }
     }
 
     async function acessarUnidadeAlvo(page: import('@playwright/test').Page) {
-        await expect(page.getByTestId('link-arvore-unidade-SECRETARIA_1')).toBeVisible();
-        await expect(page.getByTestId('link-arvore-unidade-SECRETARIA_2')).toBeVisible();
-        if (!(await page.getByTestId(`link-arvore-unidade-${SIGLA_UNIDADE}`).isVisible())) {
-            await page.getByTestId('btn-arvore-expand-SECRETARIA_1').click();
-        }
-        await expect(page.getByTestId(`link-arvore-unidade-${SIGLA_UNIDADE}`)).toBeVisible();
-        await page.getByTestId(`link-arvore-unidade-${SIGLA_UNIDADE}`).click();
+        const tabela = page.getByTestId('tbl-tree');
+        await expect(tabela.getByRole('cell', {name: /^SECRETARIA_1\b/}).first()).toBeVisible();
+        await expect(tabela.getByRole('cell', {name: /^SECRETARIA_2\b/}).first()).toBeVisible();
+        const celulaUnidade = tabela.getByRole('cell', {name: new RegExp(String.raw`^${SIGLA_UNIDADE}\b`)}).first();
+        await expect(celulaUnidade).toBeVisible();
+        await celulaUnidade.click();
     }
 
     async function abrirTelaCriacaoAtribuicao(page: import('@playwright/test').Page) {
@@ -78,10 +74,10 @@ test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
         await validarRamoUnidade(page, 'SECRETARIA_2', SIGLAS_SUBARVORE_SECRETARIA_2);
         await validarRamoUnidade(page, 'SECRETARIA_3', SIGLAS_SUBARVORE_SECRETARIA_3);
 
-        await page.getByTestId('btn-arvore-expand-COORD_11').click();
-        await expect(page.getByTestId('link-arvore-unidade-SECAO_111')).toBeVisible();
-        await expect(page.getByTestId('link-arvore-unidade-SECAO_112')).toBeVisible();
-        await expect(page.getByTestId('link-arvore-unidade-SECAO_113')).toBeVisible();
+        const tabela = page.getByTestId('tbl-tree');
+        await expect(tabela.getByRole('cell', {name: /^SECAO_111\b/}).first()).toBeVisible();
+        await expect(tabela.getByRole('cell', {name: /^SECAO_112\b/}).first()).toBeVisible();
+        await expect(tabela.getByRole('cell', {name: /^SECAO_113\b/}).first()).toBeVisible();
 
         await acessarUnidadeAlvo(page);
 

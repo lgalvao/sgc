@@ -63,7 +63,7 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, onMounted, ref} from "vue";
+import {computed, onActivated, onMounted, ref} from "vue";
 import {BAlert, BButton, BSpinner} from "bootstrap-vue-next";
 import {useRouter} from "vue-router";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
@@ -93,6 +93,7 @@ const {isAdmin} = usePerfil();
 const diagnosticoOrganizacional = ref<DiagnosticoOrganizacional | null>(null);
 const erroDiagnosticoOrganizacional = ref<string | null>(null);
 const router = useRouter();
+const carregamentoInicialConcluido = ref(false);
 
 const erroUnidades = computed(() =>
     erro.value ? {message: erro.value} : null
@@ -173,6 +174,16 @@ function abrirDetalheUnidade(item: unknown) {
 }
 
 onMounted(() => {
+  void carregarDiagnostico();
+  void carregarUnidades();
+  carregamentoInicialConcluido.value = true;
+});
+
+onActivated(() => {
+  if (!carregamentoInicialConcluido.value) {
+    return;
+  }
+
   void carregarDiagnostico();
   void carregarUnidades();
 });

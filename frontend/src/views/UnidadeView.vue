@@ -111,7 +111,7 @@
 <script lang="ts" setup>
 import {BAlert, BButton, BCard, BCardBody, BCol, BRow} from "bootstrap-vue-next";
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
-import {computed, onMounted, ref, watch} from "vue";
+import {computed, onActivated, onMounted, ref, watch} from "vue";
 import {useRouter} from "vue-router";
 import type {Unidade, Usuario} from "@/types/tipos";
 import TreeTable, { type TreeItem } from "@/components/comum/TreeTable.vue";
@@ -138,6 +138,7 @@ const unidade = ref<Unidade | null>(null);
 const titularDetalhes = ref<Usuario | null>(null);
 const mapaVigente = ref<MapaVigenteReferencia | null>(null);
 const lastError = ref<{message: string; details?: string} | null>(null);
+const carregamentoInicialConcluido = ref(false);
 
 function clearError() {
   lastError.value = null;
@@ -183,7 +184,16 @@ function visualizarMapa() {
   }
 }
 
-onMounted(carregarDados);
+onMounted(async () => {
+  await carregarDados();
+  carregamentoInicialConcluido.value = true;
+});
+onActivated(() => {
+  if (!carregamentoInicialConcluido.value) {
+    return;
+  }
+  void carregarDados();
+});
 watch(() => props.codUnidade, carregarDados);
 
 const colunasTabela = [{key: "nome", label: TEXTOS.unidade.CAMPO_UNIDADE}];
