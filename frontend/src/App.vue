@@ -6,6 +6,7 @@ import pkg from "../package.json";
 import BarraNavegacao from "./components/layout/BarraNavegacao.vue";
 import MainNavbar from "./components/layout/MainNavbar.vue";
 import {TEXTOS} from "@/constants/textos";
+import {usePerfilStore} from "@/stores/perfil";
 
 interface PackageJson {
   version: string;
@@ -14,6 +15,7 @@ interface PackageJson {
 }
 
 const route = useRoute();
+const perfilStore = usePerfilStore();
 const version = (pkg as PackageJson).version;
 
 const shouldShowNavBarExtras = computed(() => {
@@ -23,6 +25,9 @@ const shouldShowNavBarExtras = computed(() => {
 });
 
 const maximoRotasEmCache = 10;
+const chaveSessao = computed(() =>
+    `${perfilStore.usuarioCodigo ?? "anon"}-${perfilStore.perfilSelecionado ?? "sem-perfil"}-${perfilStore.unidadeSelecionada ?? "sem-unidade"}`
+);
 </script>
 
 <template>
@@ -52,13 +57,13 @@ const maximoRotasEmCache = 10;
           <component
               :is="Component"
               v-if="currentRoute.meta?.keepAlive"
-              :key="currentRoute.fullPath"
+              :key="`${chaveSessao}:${currentRoute.fullPath}`"
           />
         </KeepAlive>
         <component
             :is="Component"
             v-if="!currentRoute.meta?.keepAlive"
-            :key="currentRoute.fullPath"
+            :key="`${chaveSessao}:${currentRoute.fullPath}`"
         />
       </router-view>
     </main>
