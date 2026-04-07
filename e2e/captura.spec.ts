@@ -8,7 +8,6 @@ import {
     iniciarProcessoPeloCadastro
 } from './helpers/helpers-processos.js';
 import {
-    fazerLogout,
     navegarParaSubprocesso,
     verificarAppAlert,
     verificarPaginaPainel
