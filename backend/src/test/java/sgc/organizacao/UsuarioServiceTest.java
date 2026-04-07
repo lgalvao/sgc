@@ -46,6 +46,22 @@ class UsuarioServiceTest {
     @DisplayName("Consultas de Usuário")
     class ConsultasUsuario {
         @Test
+        @DisplayName("Deve falhar ao buscar usuario inexistente")
+        void deveFalharAoBuscarUsuarioInexistente() {
+            assertThrows(ErroEntidadeNaoEncontrada.class, () -> usuarioServiceInternal.buscar("0000"));
+        }
+
+        @Test
+        @DisplayName("Deve carregar authorities")
+        void deveCarregarAuthorities() {
+            Usuario usuario = new Usuario();
+            usuario.setTituloEleitoral(TITULO_ADMIN);
+            usuarioServiceInternal.carregarAuthorities(usuario);
+            assertNotNull(usuario.getAuthorities());
+            assertFalse(usuario.getAuthorities().isEmpty());
+        }
+
+        @Test
         @DisplayName("Deve buscar usuário por título")
         void deveBuscarUsuarioPorTitulo() {
 
@@ -98,6 +114,68 @@ class UsuarioServiceTest {
             assertNotNull(resultado);
             assertFalse(resultado.isEmpty());
             assertTrue(resultado.stream().anyMatch(usuario -> "17".equals(usuario.tituloEleitoral())));
+        }
+
+        @Test
+        @DisplayName("Deve retornar vazio ao pesquisar termo curto")
+        void deveRetornarVazioTermoCurto() {
+            List<UsuarioPesquisaDto> resultado = usuarioServiceInternal.pesquisarPorNome("a");
+            assertTrue(resultado.isEmpty());
+        }
+
+        @Test
+        @DisplayName("Deve buscar com Optional")
+        void deveBuscarComOptional() {
+            Optional<Usuario> res = usuarioServiceInternal.buscarOpt(TITULO_ADMIN);
+            assertTrue(res.isPresent());
+
+            Optional<Usuario> naoEncontrado = usuarioServiceInternal.buscarOpt("000");
+            assertTrue(naoEncontrado.isEmpty());
+        }
+
+        @Test
+        @DisplayName("Deve buscar Consulta de Leitura por titulo")
+        void deveBuscarConsultaLeituraPorTitulo() {
+            Optional<UsuarioConsultaLeitura> res = usuarioServiceInternal.buscarConsultaPorTitulo(TITULO_ADMIN);
+            assertTrue(res.isPresent());
+        }
+
+        @Test
+        @DisplayName("Deve buscar consultas de leitura por unidade lotação")
+        void deveBuscarConsultasLeituraPorLotacao() {
+            List<UsuarioConsultaLeitura> res = usuarioServiceInternal.buscarConsultasPorUnidadeLotacao(COD_UNIT_SEC1);
+            assertFalse(res.isEmpty());
+        }
+
+        @Test
+        @DisplayName("Deve buscar com Opt por titulo e lotacao")
+        void deveBuscarComOptPorTituloELotacao() {
+            Optional<Usuario> res = usuarioServiceInternal.buscarOptComUnidadeLotacao(TITULO_ADMIN);
+            assertTrue(res.isPresent());
+        }
+
+        @Test
+        @DisplayName("Deve buscar usuarios por titulos no Internal Service")
+        void deveBuscarUsuariosPorTitulosInternal() {
+            List<Usuario> res = usuarioServiceInternal.buscarPorTitulos(List.of(TITULO_ADMIN, TITULO_CHEFE_UNIT2));
+            assertFalse(res.isEmpty());
+        }
+
+        @Test
+        @DisplayName("Deve buscar autorizacoes de perfil e perfis")
+        void deveBuscarAutorizacoesEPerfis() {
+            List<UsuarioPerfilAutorizacaoLeitura> auts = usuarioServiceInternal.buscarAutorizacoesPerfil(TITULO_ADMIN);
+            assertNotNull(auts);
+
+            List<Perfil> perfis = usuarioServiceInternal.buscarPerfisPorUsuarioTitulo(TITULO_ADMIN);
+            assertNotNull(perfis);
+        }
+
+        @Test
+        @DisplayName("Deve buscar administradores")
+        void deveBuscarAdministradores() {
+            List<Administrador> admins = usuarioServiceInternal.buscarAdministradores();
+            assertFalse(admins.isEmpty());
         }
     }
 

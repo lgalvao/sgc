@@ -312,6 +312,28 @@ class LoginControllerTest {
         assertThat(Arrays.stream(response.getCookies()).allMatch(Cookie::getSecure)).isTrue();
     }
 
+    @Test
+    @DisplayName("deve higienizar o IP em extrairIp para evitar Log injection")
+    void deveHigienizarIp() {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setRemoteAddr("192.168.1.1\n\rFAKE");
+
+        String ip = invokeMethod(loginController, "extrairIp", request);
+
+        assertThat(ip).isEqualTo("192.168.1.1__FAKE");
+    }
+
+    @Test
+    @DisplayName("deve tratar IP nulo em extrairIp")
+    void deveTratarIpNulo() {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setRemoteAddr(null);
+
+        String ip = invokeMethod(loginController, "extrairIp", request);
+
+        assertThat(ip).isNull();
+    }
+
     private AutenticarRequest criarRequestPadrao() {
         return AutenticarRequest.builder()
                 .tituloEleitoral("123")

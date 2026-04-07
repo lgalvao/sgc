@@ -28,7 +28,7 @@ tasks.withType<JavaCompile>().configureEach {
     options.forkOptions.jvmArgs = (options.forkOptions.jvmArgs ?: mutableListOf()).apply {
         addAll(argumentosJvmSemAvisoUnsafe)
     }
-    options.compilerArgs.addAll(listOf("-Xlint:unchecked", "-Xlint:deprecation"))
+    options.compilerArgs.addAll(listOf("-Xlint:unchecked", "-Xlint:deprecation", "-XDaddTypeAnnotationsToSymbol=true"))
     options.errorprone {
         disableAllChecks = true
         disableWarningsInGeneratedCode = true

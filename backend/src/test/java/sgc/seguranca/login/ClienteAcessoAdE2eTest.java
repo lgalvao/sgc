@@ -28,4 +28,24 @@ class ClienteAcessoAdE2eTest {
         assertThat((String) metodo.invoke(cliente, "1234")).isEqualTo("***");
         assertThat((String) metodo.invoke(cliente, "123456")).isEqualTo("***3456");
     }
+
+    @Test
+    @DisplayName("deve mascarar titulo curto com menos de 4 digitos via fluxo normal")
+    void deveMascararTituloCurtoViaFluxoNormal() {
+        ClienteAcessoAdE2e cliente = new ClienteAcessoAdE2e(null);
+
+        // Dispara o log passando pela logica de < 4
+        assertThatCode(() -> cliente.autenticar("123", "senha"))
+                .doesNotThrowAnyException();
+    }
+
+    @Test
+    @DisplayName("deve inicializar com restClient customizado")
+    void deveInicializarComRestClientCustomizado() {
+        org.springframework.web.client.RestClient restClientMock = org.springframework.web.client.RestClient.builder().build();
+        ClienteAcessoAdE2e cliente = new ClienteAcessoAdE2e(restClientMock);
+
+        assertThatCode(() -> cliente.autenticar("123456789012", "senha"))
+                .doesNotThrowAnyException();
+    }
 }
