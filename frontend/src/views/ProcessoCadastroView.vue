@@ -45,7 +45,7 @@
         </template>
       </PageHeader>
 
-      <div v-if="exibirAlertaDiagnostico" class="sticky-top mb-3 pt-2">
+      <div v-if="exibirAlertaDiagnostico" class="mb-3 pt-2">
         <BAlert
             :model-value="true"
             variant="warning"
