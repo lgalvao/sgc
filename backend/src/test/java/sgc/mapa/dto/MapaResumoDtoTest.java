@@ -31,5 +31,7 @@ class MapaResumoDtoTest {
         assertThat(dto.subprocessoCodigo()).isEqualTo(77L);
         assertThat(dto.observacoesDisponibilizacao()).isEqualTo("Obs");
         assertThat(dto.sugestoes()).isEqualTo("Sugestões");
+        assertThat(dto.dataHoraDisponibilizado()).isEqualTo(LocalDateTime.of(2025, 1, 2, 10, 0));
+        assertThat(dto.dataHoraHomologado()).isEqualTo(LocalDateTime.of(2025, 1, 3, 10, 0));
     }
 }
