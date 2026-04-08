@@ -10,7 +10,7 @@
           class="me-2 flex-grow-1"
           @keydown.enter="save"
           @keydown.esc="cancel"
-          @vue:mounted="(el: any) => { if(el?.focus) el.focus(); else if(el?.$el?.focus) el.$el.focus(); }"
+          @vue:mounted="(el: unknown) => { const node = el as { focus?: () => void; $el?: { focus?: () => void } }; if(node?.focus) node.focus(); else if(node?.$el?.focus) node.$el.focus(); }"
       />
       <BButton
           :aria-label="ariaLabelSave"

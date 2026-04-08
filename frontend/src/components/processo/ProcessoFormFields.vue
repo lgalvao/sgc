@@ -33,7 +33,7 @@
           :options="tipoOptions"
           :state="isEdit ? null : (fieldErrors.tipo ? false : null)"
           data-testid="sel-processo-tipo"
-          @update:model-value="updateField('tipo', $event as any)"
+          @update:model-value="updateField('tipo', $event as TipoProcesso)"
       >
         <template #first>
           <BFormSelectOption :value="null" disabled>-- Selecione o tipo --</BFormSelectOption>
@@ -146,7 +146,7 @@ const emit = defineEmits<{
 }>();
 
 const inputDescricaoRef = ref<InstanceType<typeof BFormInput> | null>(null);
-const selectTipoRef = ref<any>(null);
+const selectTipoRef = ref<{ $el: HTMLElement } | null>(null);
 const inputDataLimiteRef = ref<InstanceType<typeof InputData> | null>(null);
 const containerUnidadesRef = ref<HTMLElement | null>(null);
 

@@ -1,5 +1,5 @@
 import {ref} from 'vue';
-import type {CriarAtividadeRequest} from '@/types/tipos';
+import type {AtividadeOperacaoResponse, CriarAtividadeRequest} from '@/types/tipos';
 import * as atividadeService from '@/services/atividadeService';
 
 export function useAtividadeForm() {
@@ -7,9 +7,9 @@ export function useAtividadeForm() {
     const loadingAdicionar = ref(false);
 
     async function adicionarAtividade(
-        codSubprocesso: number,
+        _codSubprocesso: number,
         codMapa: number
-    ): Promise<any> {
+    ): Promise<AtividadeOperacaoResponse | null> {
         if (!novaAtividade.value?.trim()) return null;
 
         loadingAdicionar.value = true;

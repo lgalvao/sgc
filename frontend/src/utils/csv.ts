@@ -26,7 +26,7 @@ export function gerarCSV(dados: CSVData[]): string {
 
     // Sanitize data before passing to PapaParse
     const sanitizedData = dados.map(row => {
-        const newRow: Record<string, any> = {};
+        const newRow: Record<string, string | number | undefined> = {};
         Object.keys(row).forEach(key => {
             newRow[key] = sanitizeCSVValue(row[key]);
         });

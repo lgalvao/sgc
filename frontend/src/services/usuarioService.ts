@@ -132,7 +132,7 @@ export function mapVWUsuarioToUsuario(vw: VWUsuario): Usuario {
     return {
         codigo,
         nome: vw?.nome ?? vw?.nome_completo ?? vw?.nome_usuario ?? "",
-        unidade: (vw?.unidade ?? vw?.unidade_sigla ?? vw?.unidade_codigo ?? "") as any,
+        unidade: (vw?.unidade ?? vw?.unidade_sigla ?? vw?.unidade_codigo ?? "") as unknown,
         email: vw?.email ?? null,
         ramal: vw?.ramal ?? vw?.ramal_telefone ?? null,
         tituloEleitoral: vw?.titulo_eleitoral ?? vw?.titulo ?? "",
