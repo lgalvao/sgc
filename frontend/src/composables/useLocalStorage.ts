@@ -15,13 +15,13 @@ export function useLocalStorage<T>(chave: string, valorPadrao: T): Ref<T> {
 /**
  * Composable para sincronizar múltiplas refs com localStorage
  */
-export function useLocalStorageMultiple<T extends Record<string, any>>(
+export function useLocalStorageMultiple<T extends Record<string, unknown>>(
     itens: T
 ): { [K in keyof T]: Ref<T[K]> } {
     const resultado = {} as { [K in keyof T]: Ref<T[K]> };
 
     for (const [chave, valorPadrao] of Object.entries(itens)) {
-        resultado[chave as keyof T] = useLocalStorage(chave, valorPadrao);
+        resultado[chave as keyof T] = useLocalStorage(chave, valorPadrao) as Ref<T[keyof T]>;
     }
 
     return resultado;

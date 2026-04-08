@@ -1,31 +1,31 @@
 {
-  "geradoEm": "2026-04-06T01:26:14.857Z",
+  "geradoEm": "2026-04-08T13:54:42.886Z",
   "base": "/app",
   "pontuacao": {
-    "total": 1254,
+    "total": 1249,
     "faixa": "critico",
     "porEscopo": {
-      "backend": 837,
-      "frontend": 102,
-      "frontend_testes": 315
+      "backend": 855,
+      "frontend": 72,
+      "frontend_testes": 322
     }
   },
   "contagens": {
     "backend_nullable_dto": 89,
-    "backend_null_checks": 192,
-    "backend_objects_null": 4,
-    "frontend_any_producao": 10,
-    "frontend_any_testes": 315,
+    "backend_null_checks": 200,
+    "backend_objects_null": 5,
+    "frontend_any_producao": 1,
+    "frontend_any_testes": 322,
     "frontend_catch_any": 0,
-    "frontend_null_checks": 19,
+    "frontend_null_checks": 22,
     "frontend_fallback_or": 24
   },
   "deltas": {
     "backend_nullable_dto": 0,
     "backend_null_checks": 0,
     "backend_objects_null": 0,
-    "frontend_any_producao": -9,
-    "frontend_any_testes": -3,
+    "frontend_any_producao": -2,
+    "frontend_any_testes": 0,
     "frontend_catch_any": 0,
     "frontend_null_checks": 0,
     "frontend_fallback_or": 0
@@ -37,6 +37,14 @@
       "categorias": {
         "backend_nullable_dto": 7,
         "backend_null_checks": 5
+      }
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/processo/service/ProcessoService.java",
+      "pontuacao": 32,
+      "categorias": {
+        "backend_null_checks": 15,
+        "backend_objects_null": 1
       }
     },
     {
@@ -68,14 +76,6 @@
       "categorias": {
         "backend_nullable_dto": 5,
         "backend_null_checks": 2
-      }
-    },
-    {
-      "arquivo": "backend/src/main/java/sgc/processo/service/ProcessoService.java",
-      "pontuacao": 26,
-      "categorias": {
-        "backend_null_checks": 12,
-        "backend_objects_null": 1
       }
     },
     {

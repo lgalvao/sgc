@@ -2,10 +2,10 @@ import 'vitest'
 
 declare module 'vitest' {
     interface Assertion {
-        toHaveNoViolations(): any
+        toHaveNoViolations(): Promise<void>
     }
 
     interface AsymmetricMatchersContaining {
-        toHaveNoViolations(): any
+        toHaveNoViolations(): Promise<void>
     }
 }

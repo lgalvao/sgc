@@ -1,9 +1,10 @@
 import vue from "@vitejs/plugin-vue";
 import tsconfigPaths from "vite-tsconfig-paths";
+import type {Plugin} from "vite";
 import {defineConfig} from "vitest/config";
 
 export default defineConfig({
-    plugins: [vue() as any, tsconfigPaths() as any],
+    plugins: [vue() as Plugin, tsconfigPaths() as Plugin],
     test: {
         globals: true,
         reporters: "dot",

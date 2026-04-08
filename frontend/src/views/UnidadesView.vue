@@ -133,7 +133,7 @@ function clearError() {
 async function carregarUnidades() {
   await executarSilencioso(async () => {
     const response = await buscarTodasUnidades();
-    unidades.value = mapUnidadesArray(response as any);
+    unidades.value = mapUnidadesArray(response as Unidade[]);
   }, TEXTOS.comum.ERRO_OPERACAO);
 }
 

@@ -15,7 +15,7 @@ import apiClient from '@/axios-setup';
  * const processo = await apiGet<Processo>(`/processos/${codigo}`);
  * const processos = await apiGet<Processo[]>('/processos', { status: 'ATIVO' });
  */
-export async function apiGet<T>(url: string, params?: Record<string, any>): Promise<T> {
+export async function apiGet<T>(url: string, params?: Record<string, unknown>): Promise<T> {
     const response: AxiosResponse<T> = await apiClient.get(url, {params});
     return response.data;
 }
@@ -27,7 +27,7 @@ export async function apiGet<T>(url: string, params?: Record<string, any>): Prom
  * const processo = await apiPost<Processo, CriarProcessoRequest>('/processos', request);
  * await apiPost<void>(`/processos/${codigo}/finalizar`);
  */
-export async function apiPost<T = void, D = any>(url: string, data?: D): Promise<T> {
+export async function apiPost<T = void, D = unknown>(url: string, data?: D): Promise<T> {
     const response: AxiosResponse<T> = await apiClient.post(url, data);
     return response.data;
 }

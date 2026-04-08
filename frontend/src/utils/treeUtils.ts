@@ -23,7 +23,7 @@
  * const plano = flattenTree(arvore, 'filhos');
  * // Resultado: [{ codigo: 1, ... }, { codigo: 2 }, { codigo: 3 }]
  */
-export function flattenTree<T extends Record<string, any>>(
+export function flattenTree<T extends Record<string, unknown>>(
     items: T[],
     childrenKey: string = 'subordinadas'
 ): T[] {

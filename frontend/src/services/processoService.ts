@@ -1,12 +1,13 @@
-import type {
-    AtualizarProcessoRequest,
-    CriarProcessoRequest,
-    Processo,
-    ProcessoResumo,
-    Subprocesso,
-    SubprocessoElegivel,
-    UnidadeImportacao,
-    UnidadeParticipante
+import {
+    SituacaoSubprocesso,
+    type AtualizarProcessoRequest,
+    type CriarProcessoRequest,
+    type Processo,
+    type ProcessoResumo,
+    type Subprocesso,
+    type SubprocessoElegivel,
+    type UnidadeImportacao,
+    type UnidadeParticipante
 } from "@/types/tipos";
 import type {ProcessoDetalheDto, UnidadeParticipanteDto} from "@/types/dtos";
 import apiClient from "../axios-setup";
@@ -20,7 +21,7 @@ export function mapUnidadeParticipanteDtoToFrontend(
         ...dto,
         codUnidade: dto.codUnidade,
         codSubprocesso: dto.codSubprocesso || 0,
-        situacaoSubprocesso: (dto.situacaoSubprocesso as any) || 'NAO_INICIADO',
+        situacaoSubprocesso: (dto.situacaoSubprocesso as SituacaoSubprocesso) || 'NAO_INICIADO',
         dataLimite: dto.dataLimite || '',
         filhos: dto.filhos
             ? dto.filhos.map(mapUnidadeParticipanteDtoToFrontend)
@@ -34,7 +35,7 @@ export function mapProcessoDetalheDtoToFrontend(dto: ProcessoDetalheDto): Proces
         unidades: dto.unidades
             ? dto.unidades.map(mapUnidadeParticipanteDtoToFrontend)
             : [],
-        resumoSubprocessos: (dto as any).resumoSubprocessos || [],
+        resumoSubprocessos: (dto.resumoSubprocessos as ProcessoResumo[]) || [],
     } as Processo;
 }
 

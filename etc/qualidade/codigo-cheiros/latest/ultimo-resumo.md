@@ -1,19 +1,19 @@
 # Auditoria de cheiros de codigo
 
-Gerado em: 2026-04-06T01:26:14.857Z
-Pontuacao: 1254 (critico)
+Gerado em: 2026-04-08T13:54:42.886Z
+Pontuacao: 1249 (critico)
 
 ## Contagens
 
 | Sinal | Total | Delta | Peso |
 |---|---:|---:|---:|
 | Backend DTOs com @Nullable | 89 | 0 | 5 |
-| Backend checks explicitos de null | 192 | 0 | 2 |
-| Backend Objects.isNull/nonNull | 4 | 0 | 2 |
-| Frontend producao com any explicito | 10 | -9 | 4 |
-| Frontend testes com any explicito | 315 | -3 | 1 |
+| Backend checks explicitos de null | 200 | 0 | 2 |
+| Backend Objects.isNull/nonNull | 5 | 0 | 2 |
+| Frontend producao com any explicito | 1 | -2 | 4 |
+| Frontend testes com any explicito | 322 | 0 | 1 |
 | Frontend catch tipado como any | 0 | 0 | 3 |
-| Frontend checks explicitos de null | 19 | 0 | 2 |
+| Frontend checks explicitos de null | 22 | 0 | 2 |
 | Frontend fallbacks defensivos com || | 24 | 0 | 1 |
 
 ## Hotspots
@@ -21,11 +21,11 @@ Pontuacao: 1254 (critico)
 | Arquivo | Pontos | Sinais |
 |---|---:|---|
 | backend/src/main/java/sgc/organizacao/dto/UnidadeDto.java | 45 | backend_nullable_dto: 7, backend_null_checks: 5 |
+| backend/src/main/java/sgc/processo/service/ProcessoService.java | 32 | backend_null_checks: 15, backend_objects_null: 1 |
 | backend/src/main/java/sgc/e2e/E2eController.java | 30 | backend_null_checks: 15 |
 | backend/src/main/java/sgc/organizacao/ValidadorDadosOrganizacionais.java | 30 | backend_null_checks: 14, backend_objects_null: 1 |
 | backend/src/main/java/sgc/processo/dto/ProcessoDetalheDto.java | 29 | backend_nullable_dto: 5, backend_null_checks: 2 |
 | backend/src/main/java/sgc/subprocesso/dto/SubprocessoResumoDto.java | 29 | backend_nullable_dto: 5, backend_null_checks: 2 |
-| backend/src/main/java/sgc/processo/service/ProcessoService.java | 26 | backend_null_checks: 12, backend_objects_null: 1 |
 | backend/src/main/java/sgc/subprocesso/dto/SubprocessoListagemDto.java | 25 | backend_nullable_dto: 5 |
 | backend/src/main/java/sgc/subprocesso/service/SubprocessoTransicaoService.java | 22 | backend_null_checks: 11 |
 | backend/src/main/java/sgc/mapa/dto/AtualizarEstadoMapaCommand.java | 20 | backend_nullable_dto: 4 |
@@ -38,6 +38,6 @@ Pontuacao: 1254 (critico)
 
 ## Escopos
 
-- backend: 837 ponto(s)
-- frontend: 102 ponto(s)
-- frontend_testes: 315 ponto(s)
+- backend: 855 ponto(s)
+- frontend: 72 ponto(s)
+- frontend_testes: 322 ponto(s)

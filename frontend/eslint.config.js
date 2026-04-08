@@ -1,5 +1,4 @@
 import storybook from "eslint-plugin-storybook";
-
 import globals from "globals";
 import pluginJs from "@eslint/js";
 import tseslint from "typescript-eslint";
@@ -9,9 +8,12 @@ import eslintConfigPrettier from "eslint-config-prettier";
 import pluginVueA11y from "eslint-plugin-vuejs-accessibility";
 
 export default [
+    // 1. Ignores globais
     {
         ignores: ["dist/", "node_modules/", "*.config.js", "coverage/"],
-    }, {
+    },
+    // 2. Configuração base para todos os arquivos
+    {
         languageOptions: {
             ecmaVersion: "latest",
             sourceType: "module",
@@ -21,14 +23,11 @@ export default [
             },
         },
     },
-    {
-        files: ["**/*.test.ts", "**/*.spec.ts", "**/__tests__/**"],
-        rules: {
-            "no-console": "off",
-        },
-    },
+    // 3. Configurações recomendadas
     pluginJs.configs.recommended,
-    ...tseslint.configs.recommended, {
+    ...tseslint.configs.recommended,
+    // 4. Regras para TypeScript e Vue (Geral)
+    {
         files: ["**/*.ts", "**/*.vue"],
         languageOptions: {
             parser: tseslint.parser,
@@ -39,7 +38,7 @@ export default [
             },
         },
         rules: {
-            "@typescript-eslint/no-explicit-any": "off",
+            "@typescript-eslint/no-explicit-any": "error",
             "@typescript-eslint/no-unused-vars": [
                 "warn",
                 {
@@ -47,9 +46,27 @@ export default [
                     varsIgnorePattern: "^_+$",
                 },
             ],
+            "no-console": ["error", {allow: ["error"]}],
         },
     },
-    ...pluginVue.configs["flat/recommended"], ...pluginVueA11y.configs["flat/recommended"], {
+    // 5. Overrides para Testes e Stories (Desabilita 'any' e 'no-console')
+    {
+        files: [
+            "**/__tests__/**",
+            "**/*.test.ts",
+            "**/*.spec.ts",
+            "**/*.stories.ts",
+            "**/test-utils/**"
+        ],
+        rules: {
+            "no-console": "off",
+            "@typescript-eslint/no-explicit-any": "off",
+        },
+    },
+    // 6. Configuração específica para Vue
+    ...pluginVue.configs["flat/recommended"],
+    ...pluginVueA11y.configs["flat/recommended"],
+    {
         files: ["**/*.vue"],
         languageOptions: {
             parser: vueParser,
@@ -74,9 +91,7 @@ export default [
             ],
         },
     },
-    {
-        rules: {
-            "no-console": ["error", {allow: ["error"]}],
-        },
-    },
-    eslintConfigPrettier, ...storybook.configs["flat/recommended"]];
+    // 7. Estilo e Plugins Adicionais
+    eslintConfigPrettier,
+    ...storybook.configs["flat/recommended"]
+];

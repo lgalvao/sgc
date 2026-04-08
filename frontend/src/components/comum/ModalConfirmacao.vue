@@ -32,7 +32,7 @@
         <BButton
             :data-testid="testCodigoConfirmar || 'btn-modal-confirmacao-confirmar'"
             :disabled="loading || okDisabled"
-            :variant="(okVariant || variant || 'primary') as any"
+            :variant="((okVariant || variant || 'primary') as unknown as ButtonVariant)"
             @click="confirmar"
         >
           <BSpinner
@@ -49,7 +49,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BButton, BModal, BSpinner} from "bootstrap-vue-next";
+import {BButton, BModal, BSpinner, type ButtonVariant} from "bootstrap-vue-next";
 import {computed, ref} from "vue";
 
 const props = withDefaults(defineProps<{
