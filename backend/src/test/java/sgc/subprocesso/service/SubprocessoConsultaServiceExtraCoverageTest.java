@@ -103,7 +103,7 @@ class SubprocessoConsultaServiceExtraCoverageTest {
 
             when(movimentacaoRepo.buscarUltimaPorSubprocesso(100L)).thenReturn(Optional.of(mov));
 
-            assertThat(consultaService.obterUnidadeLocalizacao(sp)).isEqualTo(u2);
+            assertThat(consultaService.obterLocalizacaoAtual(sp)).isEqualTo(u2);
         }
 
         @Test
@@ -112,7 +112,7 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             Unidade u = new Unidade();
             Subprocesso sp = criarSubprocessoComMapa(null);
             sp.setUnidade(u);
-            assertThat(consultaService.obterUnidadeLocalizacao(sp)).isEqualTo(u);
+            assertThat(consultaService.obterLocalizacaoAtual(sp)).isEqualTo(u);
         }
 
         @Test
@@ -122,7 +122,7 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             Subprocesso sp = criarSubprocessoComMapa(1L);
             sp.setUnidade(u);
             when(movimentacaoRepo.buscarUltimaPorSubprocesso(1L)).thenReturn(Optional.empty());
-            assertThat(consultaService.obterUnidadeLocalizacao(sp)).isEqualTo(u);
+            assertThat(consultaService.obterLocalizacaoAtual(sp)).isEqualTo(u);
         }
 
         @Test
@@ -134,7 +134,7 @@ class SubprocessoConsultaServiceExtraCoverageTest {
             Movimentacao mov = new Movimentacao();
             mov.setUnidadeDestino(null);
 
-            assertThat(consultaService.obterUnidadeLocalizacao(sp)).isEqualTo(u);
+            assertThat(consultaService.obterLocalizacaoAtual(sp)).isEqualTo(u);
         }
     }
 

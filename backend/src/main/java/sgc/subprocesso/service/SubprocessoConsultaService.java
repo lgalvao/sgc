@@ -164,10 +164,6 @@ public class SubprocessoConsultaService {
         return validacaoService.validarCadastro(sp);
     }
 
-    public Unidade obterUnidadeLocalizacao(Subprocesso sp) {
-        return localizacaoSubprocessoService.obterLocalizacaoAtual(sp);
-    }
-
     public SubprocessoDetalheResponse obterDetalhes(Long codigo, Usuario usuarioAutenticado) {
         Subprocesso sp = buscarSubprocesso(codigo);
         return obterDetalhes(sp, usuarioAutenticado);
@@ -381,10 +377,6 @@ public class SubprocessoConsultaService {
                 .collect(HashMap::new, (mapa, unidade) -> mapa.put(unidade.codigo(), unidade), HashMap::putAll);
     }
 
-    public List<Subprocesso> listarEntidadesPorProcessoComUnidade(Long codProcesso) {
-        return subprocessoRepo.listarPorProcessoComUnidade(codProcesso);
-    }
-
     public Unidade obterLocalizacaoAtual(Subprocesso sp) {
         return localizacaoSubprocessoService.obterLocalizacaoAtual(sp);
     }
@@ -489,7 +481,7 @@ public class SubprocessoConsultaService {
     private ContextoConsultaSubprocesso montarContextoConsulta(Subprocesso sp, Usuario usuario, List<Movimentacao> movimentacoes) {
         Processo processo = sp.getProcesso();
         Unidade unidadeUsuario = unidadeService.buscarPorCodigoComSuperior(usuario.getUnidadeAtivaCodigo());
-        Unidade localizacaoAtual = obterLocalizacaoAtual(sp, movimentacoes);
+        Unidade localizacaoAtual = resolverLocalizacaoAtual(sp, movimentacoes);
         boolean processoFinalizado = processo != null && processo.getSituacao() == SituacaoProcesso.FINALIZADO;
         boolean mesmaUnidade = !processoFinalizado
                 && Objects.equals(usuario.getUnidadeAtivaCodigo(), localizacaoAtual.getCodigo());
@@ -505,11 +497,11 @@ public class SubprocessoConsultaService {
         );
     }
 
-    private Unidade obterLocalizacaoAtual(Subprocesso sp, List<Movimentacao> movimentacoes) {
+    private Unidade resolverLocalizacaoAtual(Subprocesso sp, List<Movimentacao> movimentacoes) {
         if (!movimentacoes.isEmpty()) {
             return movimentacoes.getFirst().getUnidadeDestino();
         }
-        return obterUnidadeLocalizacao(sp);
+        return obterLocalizacaoAtual(sp);
     }
 
     private ContextoPermissaoSubprocesso montarContextoPermissao(ContextoConsultaSubprocesso contextoConsulta) {
