@@ -107,6 +107,15 @@ class AtividadeControllerTest {
         }
 
         @Test
+        @DisplayName("Deve retornar 403 ao obter atividade sem permissao")
+        void deveRetornar403AoObterAtividadeSemPermissao() throws Exception {
+            Mockito.when(permissionEvaluator.hasPermission(any(org.springframework.security.core.Authentication.class), eq(1L), eq("Atividade"), eq("VISUALIZAR_SUBPROCESSO"))).thenReturn(false);
+
+            mockMvc.perform(get("/api/atividades/1").with(user("123")))
+                    .andExpect(status().isForbidden());
+        }
+
+        @Test
         @DisplayName("Deve retornar erro quando criação não retorna atividade")
         void deveRetornarErroQuandoCriacaoNaoRetornaAtividade() throws Exception {
             AtividadeOperacaoResponse response = AtividadeOperacaoResponse.builder()
@@ -140,6 +149,17 @@ class AtividadeControllerTest {
         }
 
         @Test
+        @DisplayName("Deve retornar 403 ao atualizar atividade sem role adequada")
+        void deveRetornar403AoAtualizarAtividadeSemRole() throws Exception {
+            mockMvc.perform(post("/api/atividades/1/atualizar")
+                            .with(user("123").roles("SERVIDOR"))
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content("{\"mapaCodigo\": 1, \"descricao\": \"Teste\"}"))
+                    .andExpect(status().isForbidden());
+        }
+
+        @Test
         @DisplayName("Deve excluir atividade")
         void deveExcluirAtividade() throws Exception {
             AtividadeOperacaoResponse response = AtividadeOperacaoResponse.builder().build();
@@ -151,6 +171,15 @@ class AtividadeControllerTest {
                     .andExpect(status().isOk());
 
             Mockito.verify(atividadeFacade).excluirAtividade(1L);
+        }
+
+        @Test
+        @DisplayName("Deve retornar 403 ao excluir atividade sem role adequada")
+        void deveRetornar403AoExcluirAtividadeSemRole() throws Exception {
+            mockMvc.perform(post("/api/atividades/1/excluir")
+                            .with(user("123").roles("SERVIDOR"))
+                            .with(csrf()))
+                    .andExpect(status().isForbidden());
         }
     }
 
@@ -214,6 +243,46 @@ class AtividadeControllerTest {
                     .andExpect(status().isOk());
 
             Mockito.verify(atividadeFacade).excluirConhecimento(1L, 2L);
+        }
+
+        @Test
+        @DisplayName("Deve retornar 403 ao listar conhecimentos sem permissão")
+        void deveRetornar403AoListarConhecimentosSemPermissao() throws Exception {
+            Mockito.when(permissionEvaluator.hasPermission(any(org.springframework.security.core.Authentication.class), eq(1L), eq("Atividade"), eq("VISUALIZAR_SUBPROCESSO"))).thenReturn(false);
+
+            mockMvc.perform(get("/api/atividades/1/conhecimentos").with(user("123")))
+                    .andExpect(status().isForbidden());
+        }
+
+        @Test
+        @DisplayName("Deve retornar 403 ao criar conhecimento sem role adequada")
+        void deveRetornar403AoCriarConhecimentoSemRole() throws Exception {
+            mockMvc.perform(post("/api/atividades/1/conhecimentos")
+                            .with(user("123").roles("SERVIDOR"))
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content("{\"atividadeCodigo\": 1, \"descricao\": \"C1\"}"))
+                    .andExpect(status().isForbidden());
+        }
+
+        @Test
+        @DisplayName("Deve retornar 403 ao atualizar conhecimento sem role adequada")
+        void deveRetornar403AoAtualizarConhecimentoSemRole() throws Exception {
+            mockMvc.perform(post("/api/atividades/1/conhecimentos/2/atualizar")
+                            .with(user("123").roles("SERVIDOR"))
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content("{\"atividadeCodigo\": 1, \"descricao\": \"C1 Update\"}"))
+                    .andExpect(status().isForbidden());
+        }
+
+        @Test
+        @DisplayName("Deve retornar 403 ao excluir conhecimento sem role adequada")
+        void deveRetornar403AoExcluirConhecimentoSemRole() throws Exception {
+            mockMvc.perform(post("/api/atividades/1/conhecimentos/2/excluir")
+                            .with(user("123").roles("SERVIDOR"))
+                            .with(csrf()))
+                    .andExpect(status().isForbidden());
         }
     }
 
