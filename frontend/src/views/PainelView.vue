@@ -156,10 +156,8 @@ onMounted(async () => {
 });
 
 onActivated(async () => {
-  const exibiuToast = exibirToastPendente();
-  if (exibiuToast) {
-    await carregarDados();
-  }
+  exibirToastPendente();
+  await carregarDados();
 });
 
 const processosOrdenados = computed(() => processosPainel.value);
