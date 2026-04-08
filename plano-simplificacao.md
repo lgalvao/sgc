@@ -682,3 +682,51 @@ O corte aplicado em `SubprocessoConsultaService` foi propositalmente pequeno: re
 * **Validação executada:** tentativa de executar `SubprocessoServiceMethodsIntegrationTest`, `SubprocessoServiceExtraMethodsIntegrationTest` e `SubprocessoConsultaServiceExtraCoverageTest`.
 * **Observação de ambiente:** a validação voltou a ser bloqueada por falhas de `compileTestJava`/empacotamento do Gradle em artefatos do diretório `backend/build`, sem indicação direta de referência quebrada aos aliases removidos.
 * **Pendência aberta para próxima rodada:** seguir reduzindo superfície pública redundante e pass-throughs de `SubprocessoConsultaService`, priorizando cortes que reduzam API exposta sem mudar contrato HTTP.
+
+### Continuação da Frente 2 (2026-04-08) — alias de localização
+
+Na retomada, o alvo mais direto de simplificação em `SubprocessoConsultaService` era a coexistência de dois métodos públicos com o mesmo comportamento (`obterUnidadeLocalizacao` e `obterLocalizacaoAtual`), ambos delegando para `LocalizacaoSubprocessoService` sem regra adicional. Esse alias mantinha superfície pública redundante e também multiplicava acoplamento nos testes de transição.
+
+### Resultado objetivo da continuação (2026-04-08)
+
+Foi removido o alias público redundante `obterUnidadeLocalizacao`, e os consumidores internos do backend passaram a usar `obterLocalizacaoAtual`. No mesmo corte, a resolução interna usada no contexto de detalhe foi renomeada para helper semântico (`resolverLocalizacaoAtual`) para separar claramente o cálculo via movimentações da leitura padrão no service de localização. O contrato HTTP permaneceu inalterado; a mudança reduz apenas API de service interna e duplicação de chamadas equivalentes.
+
+### Novos achados desta rodada
+
+* A simplificação de superfície pública ainda encontra muito atrito de manutenção de testes por acoplamento em nomes de método, mesmo quando o comportamento é idêntico.
+* O hotspot de consulta segue mais relacionado à largura de API pública do que à complexidade de um único método.
+* Cortes pequenos de alias continuam seguros e cumulativos para preparar uma etapa posterior de redução de pass-throughs em leitura.
+
+### Registro da rodada
+
+* **Data da rodada:** 2026-04-08
+* **Frente principal:** Frente 2 — Redução de superfície pública redundante em `SubprocessoConsultaService`
+* **Arquivo(s) alvo:** `backend/src/main/java/sgc/subprocesso/service/SubprocessoConsultaService.java`, `backend/src/main/java/sgc/subprocesso/service/SubprocessoTransicaoService.java`, testes de cobertura/serviço de subprocesso, `plano-simplificacao.md`
+* **Corte aplicado:** remoção de alias público redundante de localização e consolidação dos pontos de chamada para `obterLocalizacaoAtual`.
+* **Risco principal observado:** quebra de testes com mock nominal do método removido, sem mudança funcional do fluxo.
+* **Validação executada:** compilação de testes do backend e suítes focadas de consulta/transição para confirmar que a remoção do alias não alterou comportamento.
+* **Pendência aberta para próxima rodada:** continuar a triagem de pass-throughs públicos em `SubprocessoConsultaService`, priorizando remoções que não alterem contratos externos nem semântica de regra.
+
+### Continuação da Frente 2 (2026-04-08, sessão estendida) — consolidação de listagem por processo
+
+Depois da remoção do alias de localização, a mesma sessão continuou na redução de superfície pública redundante: `SubprocessoConsultaService` ainda expunha duas entradas para a mesma consulta de subprocessos por processo, com implementação idêntica e sem regra adicional (`listarEntidadesPorProcesso` e `listarEntidadesPorProcessoComUnidade`).
+
+### Resultado objetivo da sessão estendida
+
+Foi removida a duplicação de API interna de listagem por processo, mantendo apenas `listarEntidadesPorProcesso` como fronteira única. `ProcessoService` e seus testes de cobertura foram ajustados para usar o método consolidado, sem alteração de regra de negócio, contrato HTTP ou composição de resposta. Na validação, um teste falhou por expectativa nominal antiga e foi corrigido para verificar chamada única ao método remanescente.
+
+### Novos achados da sessão estendida
+
+* Parte relevante do custo de simplificação continua em testes que verificam nome de método, e não comportamento observado.
+* A redução de aliases públicos no service de consulta é cumulativa: cortes pequenos geram ganho estrutural sem exigir refatoração ampla.
+* Ainda existe oportunidade de reduzir pass-throughs em `SubprocessoConsultaService`, mas com priorização por impacto em consumidores reais para evitar churn desnecessário.
+
+### Registro da sessão estendida
+
+* **Data da rodada:** 2026-04-08
+* **Frente principal:** Frente 2 — Redução de superfície pública redundante em `SubprocessoConsultaService`
+* **Arquivo(s) alvo:** `backend/src/main/java/sgc/subprocesso/service/SubprocessoConsultaService.java`, `backend/src/main/java/sgc/processo/service/ProcessoService.java`, `backend/src/test/java/sgc/processo/service/ProcessoServiceCoverageTest.java`, `backend/src/test/java/sgc/processo/service/ProcessoServiceTest.java`, `plano-simplificacao.md`
+* **Corte aplicado:** remoção do alias público `listarEntidadesPorProcessoComUnidade` e consolidação dos consumidores no método único `listarEntidadesPorProcesso`.
+* **Risco principal observado:** falhas de teste por acoplamento em verificação nominal do método removido.
+* **Validação executada:** `./gradlew :backend:compileTestJava` e `./gradlew :backend:test --tests "sgc.processo.service.ProcessoServiceCoverageTest" --tests "sgc.subprocesso.service.SubprocessoConsultaServiceExtraCoverageTest"`.
+* **Pendência aberta para próxima rodada:** continuar a triagem de pass-throughs de consulta, priorizando pontos com maior fan-out em `ProcessoService` e `RelatorioFacade`.

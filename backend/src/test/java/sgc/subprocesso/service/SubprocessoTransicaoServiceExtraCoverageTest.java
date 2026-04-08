@@ -195,7 +195,7 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         setField(sp, "situacao", SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
 
         when(consultaService.buscarSubprocesso(100L)).thenReturn(sp);
-        when(consultaService.obterUnidadeLocalizacao(sp)).thenReturn(u);
+        when(consultaService.obterLocalizacaoAtual(sp)).thenReturn(u);
         when(unidadeHierarquiaService.buscarCodigoPai(1L)).thenReturn(99L);
         when(unidadeService.buscarPorCodigo(99L)).thenReturn(admin);
 
@@ -306,7 +306,7 @@ class SubprocessoTransicaoServiceExtraCoverageTest {
         mov.setUnidadeOrigem(uOrigem);
 
         when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
-        when(consultaService.obterUnidadeLocalizacao(sp)).thenReturn(uAnalise);
+        when(consultaService.obterLocalizacaoAtual(sp)).thenReturn(uAnalise);
         when(movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(1L)).thenReturn(List.of(mov));
         when(hierarquiaService.isSubordinada(uOrigem, uAnalise)).thenReturn(true); // branch 489
 

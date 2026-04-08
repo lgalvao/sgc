@@ -486,7 +486,7 @@ public class SubprocessoTransicaoService {
                 REVISAO_MAPA_COM_SUGESTOES,
                 REVISAO_MAPA_VALIDADO);
 
-        Unidade unidadeAnalise = consultaService.obterUnidadeLocalizacao(sp);
+        Unidade unidadeAnalise = consultaService.obterLocalizacaoAtual(sp);
         Unidade unidadeDevolucao = obterUnidadeDevolucao(sp, unidadeAnalise);
 
         SituacaoSubprocesso novaSituacao = obterSituacaoObrigatoria(SITUACAO_MAPA_DISPONIBILIZADO, sp, "devolução de validação");
@@ -564,7 +564,7 @@ public class SubprocessoTransicaoService {
         Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
         validacaoService.validarSituacaoPermitida(sp, contexto.situacaoDisponibilizada());
 
-        Unidade unidadeAnalise = consultaService.obterUnidadeLocalizacao(sp);
+        Unidade unidadeAnalise = consultaService.obterLocalizacaoAtual(sp);
         Unidade unidadeDevolucao = obterUnidadeDevolucao(sp, unidadeAnalise);
 
         SituacaoSubprocesso novaSituacao = contexto.situacaoDisponibilizada();
@@ -619,7 +619,7 @@ public class SubprocessoTransicaoService {
     }
 
     private void registrarWorkflowParaSuperiorAtual(RegistrarWorkflowInternoCommand cmd) {
-        Unidade unidadeAtual = consultaService.obterUnidadeLocalizacao(cmd.sp());
+        Unidade unidadeAtual = consultaService.obterLocalizacaoAtual(cmd.sp());
         Unidade unidadeDestino = buscarSuperiorImediato(unidadeAtual.getCodigo());
         if (unidadeDestino != null) {
             registrarWorkflowComDestino(new RegistrarWorkflowInternoCommand(
