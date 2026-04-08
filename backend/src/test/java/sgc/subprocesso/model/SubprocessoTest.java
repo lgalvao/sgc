@@ -189,4 +189,32 @@ class SubprocessoTest {
         assertThat(sp.getUnidade()).isEqualTo(u);
         assertThat(sp.getMapa()).isEqualTo(m);
     }
+
+    @Test
+    @DisplayName("Deve retornar codigos quando existem e lidar com nulos")
+    void deveRetornarCodigosApenasQuandoDisponiveis() {
+        Processo p = new Processo();
+        p.setCodigo(1L);
+        Unidade u = new Unidade();
+        u.setCodigo(2L);
+        Mapa m = new Mapa();
+        m.setCodigo(3L);
+
+        Subprocesso spCheio = Subprocesso.builder()
+                .processo(p)
+                .unidade(u)
+                .mapa(m)
+                .build();
+
+        assertThat(spCheio.getCodProcesso()).isEqualTo(1L);
+        assertThat(spCheio.getCodUnidade()).isEqualTo(2L);
+        assertThat(spCheio.getCodMapa()).isEqualTo(3L);
+        assertThat(spCheio.getAtividades()).isEmpty(); // mock do mapa ou mapa recem criado
+
+        Subprocesso spVazio = new Subprocesso();
+        assertThat(spVazio.getCodProcesso()).isNull();
+        assertThat(spVazio.getCodUnidade()).isNull();
+        assertThat(spVazio.getCodMapa()).isNull();
+        assertThat(spVazio.getAtividades()).isEmpty();
+    }
 }

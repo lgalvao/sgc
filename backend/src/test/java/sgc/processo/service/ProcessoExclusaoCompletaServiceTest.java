@@ -83,4 +83,34 @@ class ProcessoExclusaoCompletaServiceTest {
         verify(jdbcTemplate, never()).update(contains("DELETE FROM sgc.diagnostico"), anyLong());
         verify(jdbcTemplate).update(eq("DELETE FROM sgc.processo WHERE codigo = ?"), eq(10L));
     }
+
+    @Test
+    @DisplayName("deve lidar com nulls retornados ao checar tabelas opcionais")
+    void deveLidarComNullsRetornadosAoChecarTabelasOpcionais() {
+        when(processoRepo.existsById(10L)).thenReturn(true);
+        when(cacheManager.getCacheNames()).thenReturn(Set.of());
+        when(jdbcTemplate.queryForObject(anyString(), eq(Integer.class), eq("AVALIACAO_SERVIDOR"))).thenReturn(null);
+        when(jdbcTemplate.queryForObject(anyString(), eq(Integer.class), eq("OCUPACAO_CRITICA"))).thenReturn(null);
+        when(jdbcTemplate.queryForObject(anyString(), eq(Integer.class), eq("DIAGNOSTICO"))).thenReturn(null);
+
+        service.excluirCompleto(10L);
+
+        verify(jdbcTemplate, never()).update(contains("DELETE FROM sgc.avaliacao_servidor"), anyLong(), anyLong());
+        verify(jdbcTemplate, never()).update(contains("DELETE FROM sgc.ocupacao_critica"), anyLong(), anyLong());
+        verify(jdbcTemplate, never()).update(contains("DELETE FROM sgc.diagnostico"), anyLong());
+        verify(jdbcTemplate).update(eq("DELETE FROM sgc.processo WHERE codigo = ?"), eq(10L));
+    }
+
+    @Test
+    @DisplayName("deve lidar com cache retornando null")
+    void deveLidarComCacheRetornandoNull() {
+        when(processoRepo.existsById(10L)).thenReturn(true);
+        when(cacheManager.getCacheNames()).thenReturn(Set.of("cacheC"));
+        when(cacheManager.getCache("cacheC")).thenReturn(null);
+        when(jdbcTemplate.queryForObject(anyString(), eq(Integer.class), anyString())).thenReturn(1);
+
+        service.excluirCompleto(10L);
+
+        verify(cacheManager).getCache("cacheC");
+    }
 }

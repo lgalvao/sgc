@@ -116,4 +116,79 @@ class AlertaServiceTest {
         assertThat(resultado.getContent()).hasSize(1);
         verify(alertaRepo).buscarAlertasDaUnidadeEIndividuais(1L, "123", paginacao);
     }
+
+    @Test
+    @DisplayName("Deve salvar um alerta")
+    void deveSalvarAlerta() {
+        Alerta alerta = new Alerta();
+        when(alertaRepo.save(alerta)).thenReturn(alerta);
+
+        Alerta resultado = alertaService.salvar(alerta);
+
+        assertThat(resultado).isNotNull();
+        verify(alertaRepo).save(alerta);
+    }
+
+    @Test
+    @DisplayName("Deve salvar lista de alertas")
+    void deveSalvarTodos() {
+        List<Alerta> alertas = List.of(new Alerta(), new Alerta());
+        when(alertaRepo.saveAll(alertas)).thenReturn(alertas);
+
+        List<Alerta> resultado = alertaService.salvarTodos(alertas);
+
+        assertThat(resultado).hasSize(2);
+        verify(alertaRepo).saveAll(alertas);
+    }
+
+    @Test
+    @DisplayName("Deve buscar alertaUsuario")
+    void deveBuscarAlertaUsuario() {
+        AlertaUsuario.Chave chave = AlertaUsuario.Chave.builder()
+                .alertaCodigo(1L)
+                .usuarioTitulo("123")
+                .build();
+        AlertaUsuario au = new AlertaUsuario();
+        when(alertaUsuarioRepo.findById(chave)).thenReturn(Optional.of(au));
+
+        Optional<AlertaUsuario> resultado = alertaService.alertaUsuario(chave);
+
+        assertThat(resultado).isPresent();
+        verify(alertaUsuarioRepo).findById(chave);
+    }
+
+    @Test
+    @DisplayName("Deve listar alertas por codigos")
+    void deveListarPorCodigos() {
+        List<Long> codigos = List.of(1L, 2L);
+        List<Alerta> alertas = List.of(new Alerta(), new Alerta());
+        when(alertaRepo.findAllById(codigos)).thenReturn(alertas);
+
+        List<Alerta> resultado = alertaService.listarPorCodigos(codigos);
+
+        assertThat(resultado).hasSize(2);
+        verify(alertaRepo).findAllById(codigos);
+    }
+
+    @Test
+    @DisplayName("Deve salvar alertaUsuario")
+    void deveSalvarAlertaUsuario() {
+        AlertaUsuario au = new AlertaUsuario();
+
+        alertaService.salvarAlertaUsuario(au);
+
+        verify(alertaUsuarioRepo).save(au);
+    }
+
+    @Test
+    @DisplayName("Deve salvar lista de alertasUsuarios")
+    void deveSalvarAlertasUsuarios() {
+        List<AlertaUsuario> aus = List.of(new AlertaUsuario(), new AlertaUsuario());
+        when(alertaUsuarioRepo.saveAll(aus)).thenReturn(aus);
+
+        List<AlertaUsuario> resultado = alertaService.salvarAlertasUsuarios(aus);
+
+        assertThat(resultado).hasSize(2);
+        verify(alertaUsuarioRepo).saveAll(aus);
+    }
 }

@@ -110,6 +110,17 @@ class HierarquiaServiceTest {
     }
 
     @Test
+    @DisplayName("Deve retornar false em ehMesmaOuSubordinada quando não é a mesma nem subordinada")
+    void deveRetornarFalseEmEhMesmaOuSubordinadaQuandoNaoSubordinada() {
+        Unidade unidade1 = criarUnidade(1L, null);
+        Unidade unidade2 = criarUnidade(2L, null);
+        when(unidadeHierarquiaService.buscarIdsDescendentes(2L)).thenReturn(List.of());
+        when(unidadeHierarquiaService.buscarCodigoPai(1L)).thenReturn(null);
+
+        assertThat(hierarquiaService.ehMesmaOuSubordinada(unidade1, unidade2)).isFalse();
+    }
+
+    @Test
     @DisplayName("Deve retornar false quando unidade não é subordinada")
     void deveRetornarFalseQuandoUnidadeNaoSubordinada() {
         Unidade raiz1 = criarUnidade(1L, null);

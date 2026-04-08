@@ -65,6 +65,55 @@ class MapaVisualizacaoServiceTest {
     }
 
     @Test
+    @DisplayName("Deve tratar caso mapa não seja encontrado para visualização, mas fase não exija mapa")
+    void deveRetornarVazioCasoNaoEncontreMapaMasSituacaoOk() {
+        Subprocesso sub = new Subprocesso();
+        sub.setCodigo(1L);
+        sub.setUnidade(new Unidade());
+        sub.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
+
+        when(mapaRepo.buscarCompletoPorSubprocesso(1L)).thenReturn(Optional.empty());
+
+        MapaVisualizacaoResponse response = service.obterMapaParaVisualizacao(sub);
+
+        assertThat(response).isNotNull();
+        assertThat(response.competencias()).isEmpty();
+        assertThat(response.atividadesSemCompetencia()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("Deve lançar ErroInconsistenciaInterna se situação exigir mapa mas não for encontrado")
+    void deveLancarErroSeNaoEncontrarMapaNaSituacaoDeMapa() {
+        Subprocesso sub = new Subprocesso();
+        sub.setCodigo(1L);
+        sub.setUnidade(new Unidade());
+        sub.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO);
+
+        when(mapaRepo.buscarCompletoPorSubprocesso(1L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.obterMapaParaVisualizacao(sub))
+                .isInstanceOf(sgc.comum.erros.ErroInconsistenciaInterna.class)
+                .hasMessageContaining("em etapa de mapa sem mapa vinculado para visualizacao");
+    }
+
+    @Test
+    @DisplayName("Deve retornar vazio se subprocesso sem mapa e com situacao null")
+    void deveTratarSubprocessoComSituacaoNula() {
+        Subprocesso sub = new Subprocesso();
+        sub.setCodigo(1L);
+        sub.setUnidade(new Unidade());
+        // situacao null
+        sub.setSituacaoForcada(null);
+
+        when(mapaRepo.buscarCompletoPorSubprocesso(1L)).thenReturn(Optional.empty());
+
+        MapaVisualizacaoResponse response = service.obterMapaParaVisualizacao(sub);
+
+        assertThat(response).isNotNull();
+        assertThat(response.competencias()).isEmpty();
+    }
+
+    @Test
     @DisplayName("Deve mapear conhecimentos das atividades")
     void deveMapearConhecimentos() {
         Subprocesso sub = new Subprocesso();
