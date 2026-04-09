@@ -60,10 +60,7 @@ const mockProcesso = {
         }
     ],
     podeFinalizar: true,
-    podeAceitarCadastroBloco: true,
-    podeHomologarCadastro: true,
-    podeHomologarMapa: true,
-    podeDisponibilizarMapaBloco: true
+    acoesBloco: []
 };
 
 const mockElegiveis = [
@@ -73,9 +70,11 @@ const mockElegiveis = [
         unidadeNome: "Unidade 1",
         situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO,
         localizacaoCodigo: 999,
-        habilitarAceitarBloco: true,
-        habilitarHomologarBloco: true,
-        habilitarDisponibilizarBloco: false
+        habilitarAceitarCadastroBloco: true,
+        habilitarAceitarMapaBloco: false,
+        habilitarHomologarCadastroBloco: true,
+        habilitarHomologarMapaBloco: false,
+        habilitarDisponibilizarMapaBloco: false
     },
     {
         unidadeCodigo: 103,
@@ -83,9 +82,11 @@ const mockElegiveis = [
         unidadeNome: "Unidade 3",
         situacao: SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO,
         localizacaoCodigo: 999,
-        habilitarAceitarBloco: true,
-        habilitarHomologarBloco: true,
-        habilitarDisponibilizarBloco: false
+        habilitarAceitarCadastroBloco: false,
+        habilitarAceitarMapaBloco: true,
+        habilitarHomologarCadastroBloco: false,
+        habilitarHomologarMapaBloco: true,
+        habilitarDisponibilizarMapaBloco: false
     },
     {
         unidadeCodigo: 104,
@@ -93,11 +94,104 @@ const mockElegiveis = [
         unidadeNome: "Unidade 4",
         situacao: SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO,
         localizacaoCodigo: 999,
-        habilitarAceitarBloco: false,
-        habilitarHomologarBloco: false,
-        habilitarDisponibilizarBloco: true
+        habilitarAceitarCadastroBloco: false,
+        habilitarAceitarMapaBloco: false,
+        habilitarHomologarCadastroBloco: false,
+        habilitarHomologarMapaBloco: false,
+        habilitarDisponibilizarMapaBloco: true
     }
 ];
+
+function criarAcoesBloco(elegiveis: any[]) {
+    const filtrar = (campo: string) => elegiveis.filter((item) => item[campo]);
+    const criarAcao = (
+        codigo: string,
+        acao: "ACEITAR" | "HOMOLOGAR" | "DISPONIBILIZAR",
+        campo: string,
+        rotulo: string,
+        titulo: string,
+        texto: string,
+        rotuloBotao: string,
+        mensagemSucesso: string,
+        redirecionarPainel: boolean,
+        requerDataLimite = false,
+    ) => {
+        const unidades = filtrar(campo);
+        return {
+            codigo,
+            acao,
+            mostrar: unidades.length > 0,
+            habilitar: unidades.length > 0,
+            requerDataLimite,
+            redirecionarPainel,
+            rotulo,
+            titulo,
+            texto,
+            rotuloBotao,
+            mensagemSucesso,
+            unidades,
+        };
+    };
+
+    return [
+        criarAcao(
+            "aceitar-cadastro",
+            "ACEITAR",
+            "habilitarAceitarCadastroBloco",
+            TEXTOS.acaoBloco.aceitar.ROTULO_CADASTRO,
+            TEXTOS.acaoBloco.aceitar.TITULO_CADASTRO,
+            TEXTOS.acaoBloco.aceitar.TEXTO_CADASTRO,
+            TEXTOS.acaoBloco.aceitar.BOTAO,
+            TEXTOS.sucesso.CADASTROS_ACEITOS_EM_BLOCO,
+            true,
+        ),
+        criarAcao(
+            "aceitar-mapa",
+            "ACEITAR",
+            "habilitarAceitarMapaBloco",
+            TEXTOS.acaoBloco.aceitar.ROTULO_VALIDACAO,
+            TEXTOS.acaoBloco.aceitar.TITULO_VALIDACAO,
+            TEXTOS.acaoBloco.aceitar.TEXTO_VALIDACAO,
+            TEXTOS.acaoBloco.aceitar.BOTAO,
+            TEXTOS.sucesso.MAPAS_ACEITOS_EM_BLOCO,
+            true,
+        ),
+        criarAcao(
+            "homologar-cadastro",
+            "HOMOLOGAR",
+            "habilitarHomologarCadastroBloco",
+            TEXTOS.acaoBloco.homologar.ROTULO_CADASTRO,
+            TEXTOS.acaoBloco.homologar.TITULO_CADASTRO,
+            TEXTOS.acaoBloco.homologar.TEXTO_CADASTRO,
+            TEXTOS.acaoBloco.homologar.BOTAO,
+            TEXTOS.sucesso.CADASTROS_HOMOLOGADOS_EM_BLOCO,
+            false,
+        ),
+        criarAcao(
+            "homologar-mapa",
+            "HOMOLOGAR",
+            "habilitarHomologarMapaBloco",
+            TEXTOS.acaoBloco.homologar.ROTULO_VALIDACAO,
+            TEXTOS.acaoBloco.homologar.TITULO_VALIDACAO,
+            TEXTOS.acaoBloco.homologar.TEXTO_VALIDACAO,
+            TEXTOS.acaoBloco.homologar.BOTAO,
+            TEXTOS.sucesso.MAPAS_HOMOLOGADOS_EM_BLOCO,
+            true,
+        ),
+        criarAcao(
+            "disponibilizar-mapa",
+            "DISPONIBILIZAR",
+            "habilitarDisponibilizarMapaBloco",
+            TEXTOS.acaoBloco.disponibilizar.ROTULO,
+            TEXTOS.acaoBloco.disponibilizar.TITULO,
+            TEXTOS.acaoBloco.disponibilizar.TEXTO,
+            TEXTOS.acaoBloco.disponibilizar.BOTAO,
+            TEXTOS.sucesso.MAPAS_DISPONIBILIZADOS_EM_BLOCO,
+            true,
+            true,
+        ),
+    ];
+}
 
 const modalSpies = {
     abrir: vi.fn(),
@@ -165,6 +259,7 @@ describe("Processo.vue", () => {
             vi.mocked(processoService.buscarContextoCompleto).mockResolvedValue({
                 ...processo,
                 elegiveis,
+                acoesBloco: processo.acoesBloco?.length ? processo.acoesBloco : criarAcoesBloco(elegiveis),
             } as any);
         }
 
@@ -243,7 +338,8 @@ describe("Processo.vue", () => {
         await flushPromises();
 
         expect(wrapper.find('[data-testid="btn-processo-aceitar-bloco"]').exists()).toBe(true);
-        expect(wrapper.find('[data-testid="btn-processo-aceitar-bloco"]').text()).toContain(TEXTOS.acaoBloco.aceitar.ROTULO_MISTO);
+        expect(wrapper.find('[data-testid="btn-processo-aceitar-bloco"]').text()).toContain(TEXTOS.acaoBloco.aceitar.ROTULO_CADASTRO);
+        expect(wrapper.find('[data-testid="btn-processo-aceitar-mapas-bloco"]').exists()).toBe(true);
 
         // Test ADMIN buttons
         perfilStore.$patch({perfilSelecionado: Perfil.ADMIN});
@@ -251,6 +347,7 @@ describe("Processo.vue", () => {
         await flushPromises();
 
         expect(wrapper.find('[data-testid="btn-processo-homologar-bloco"]').exists()).toBe(true);
+        expect(wrapper.find('[data-testid="btn-processo-homologar-mapas-bloco"]').exists()).toBe(true);
         expect(wrapper.find('[data-testid="btn-processo-disponibilizar-bloco"]').exists()).toBe(true);
     });
 
@@ -264,7 +361,7 @@ describe("Processo.vue", () => {
         await flushPromises();
 
         const botoesAceitar = wrapper.findAll('[data-testid="btn-processo-aceitar-bloco"]').filter(
-            (b: DOMWrapper<Element>) => b.text().includes(TEXTOS.acaoBloco.aceitar.ROTULO_MISTO)
+            (b: DOMWrapper<Element>) => b.text().includes(TEXTOS.acaoBloco.aceitar.ROTULO_CADASTRO)
         );
         expect(botoesAceitar.length).toBe(1);
 
@@ -274,7 +371,7 @@ describe("Processo.vue", () => {
         await flushPromises();
 
         const botoesHomologar = wrapper.findAll('[data-testid="btn-processo-homologar-bloco"]').filter(
-            (b: DOMWrapper<Element>) => b.text().includes(TEXTOS.acaoBloco.homologar.ROTULO_MISTO)
+            (b: DOMWrapper<Element>) => b.text().includes(TEXTOS.acaoBloco.homologar.ROTULO_CADASTRO)
         );
         expect(botoesHomologar.length).toBe(1);
     });
@@ -293,7 +390,7 @@ describe("Processo.vue", () => {
 
         const modal = wrapper.findComponent(ModalAcaoBlocoStub);
         expect(modal.exists()).toBe(true);
-        expect(modal.props("titulo")).toBe(TEXTOS.acaoBloco.aceitar.TITULO_MISTO);
+        expect(modal.props("titulo")).toBe(TEXTOS.acaoBloco.aceitar.TITULO_CADASTRO);
     });
 
     it("deve executar ação em bloco com sucesso (Aceitar cadastro)", async () => {
@@ -315,7 +412,7 @@ describe("Processo.vue", () => {
 
         expect(processoService.executarAcaoEmBloco).toHaveBeenCalledWith(1, {
             unidadeCodigos: [101],
-            acao: 'aceitar',
+            acao: 'ACEITAR',
             dataLimite: undefined,
         });
         expect(toastStore.setPending).toHaveBeenCalledWith(TEXTOS.sucesso.CADASTROS_ACEITOS_EM_BLOCO);
@@ -338,10 +435,10 @@ describe("Processo.vue", () => {
 
         expect(processoService.executarAcaoEmBloco).toHaveBeenCalledWith(1, {
             unidadeCodigos: [101],
-            acao: 'homologar',
+            acao: 'HOMOLOGAR',
             dataLimite: undefined,
         });
-        expect(modal.props("titulo")).toBe(TEXTOS.acaoBloco.homologar.TITULO_MISTO);
+        expect(modal.props("titulo")).toBe(TEXTOS.acaoBloco.homologar.TITULO_CADASTRO);
     });
 
     it("deve executar ação em bloco com sucesso (Homologar validação)", async () => {
@@ -353,14 +450,14 @@ describe("Processo.vue", () => {
         await flushPromises();
 
         const modal = wrapper.findComponent(ModalAcaoBlocoStub);
-        await wrapper.find('#btn-homologar-bloco').trigger("click"); // Abrir modal 'homologar'
+        await wrapper.find('#btn-homologar-mapas-bloco').trigger("click"); // Abrir modal 'homologar mapa'
 
         // ID 103 -> Mapa validado
         await modal.vm.$emit("confirmar", {ids: [103]});
 
         expect(processoService.executarAcaoEmBloco).toHaveBeenCalledWith(1, {
             unidadeCodigos: [103],
-            acao: 'homologar',
+            acao: 'HOMOLOGAR',
             dataLimite: undefined,
         });
     });
@@ -383,10 +480,10 @@ describe("Processo.vue", () => {
 
         await wrapper.find('#btn-homologar-bloco').trigger("click");
         expect(wrapper.find('#btn-homologar-bloco').text()).toContain(TEXTOS.acaoBloco.homologar.ROTULO_CADASTRO);
-        expect((wrapper.vm).tituloModalBloco).toBe(TEXTOS.acaoBloco.homologar.TITULO_CADASTRO);
-        expect((wrapper.vm).textoModalBloco).toBe(TEXTOS.acaoBloco.homologar.TEXTO_CADASTRO);
-        expect((wrapper.vm).rotuloBotaoBloco).toBe(TEXTOS.acaoBloco.homologar.BOTAO);
-        expect((wrapper.vm).mensagemSucessoAcaoBloco).toBe(TEXTOS.sucesso.CADASTROS_HOMOLOGADOS_EM_BLOCO);
+        expect((wrapper.vm).acaoBlocoAtual.titulo).toBe(TEXTOS.acaoBloco.homologar.TITULO_CADASTRO);
+        expect((wrapper.vm).acaoBlocoAtual.texto).toBe(TEXTOS.acaoBloco.homologar.TEXTO_CADASTRO);
+        expect((wrapper.vm).acaoBlocoAtual.rotuloBotao).toBe(TEXTOS.acaoBloco.homologar.BOTAO);
+        expect((wrapper.vm).acaoBlocoAtual.mensagemSucesso).toBe(TEXTOS.sucesso.CADASTROS_HOMOLOGADOS_EM_BLOCO);
 
         const modal = wrapper.findComponent(ModalAcaoBlocoStub);
         await modal.vm.$emit("confirmar", {ids: [101]});
@@ -415,12 +512,12 @@ describe("Processo.vue", () => {
         await nextTick();
         await flushPromises();
 
-        expect(wrapper.find('#btn-homologar-bloco').text()).toContain(TEXTOS.acaoBloco.homologar.ROTULO_VALIDACAO);
-        await wrapper.find('#btn-homologar-bloco').trigger("click");
-        expect((wrapper.vm).tituloModalBloco).toBe(TEXTOS.acaoBloco.homologar.TITULO_VALIDACAO);
-        expect((wrapper.vm).textoModalBloco).toBe(TEXTOS.acaoBloco.homologar.TEXTO_VALIDACAO);
-        expect((wrapper.vm).rotuloBotaoBloco).toBe(TEXTOS.acaoBloco.homologar.BOTAO);
-        expect((wrapper.vm).mensagemSucessoAcaoBloco).toBe(TEXTOS.sucesso.MAPAS_HOMOLOGADOS_EM_BLOCO);
+        expect(wrapper.find('#btn-homologar-mapas-bloco').text()).toContain(TEXTOS.acaoBloco.homologar.ROTULO_VALIDACAO);
+        await wrapper.find('#btn-homologar-mapas-bloco').trigger("click");
+        expect((wrapper.vm).acaoBlocoAtual.titulo).toBe(TEXTOS.acaoBloco.homologar.TITULO_VALIDACAO);
+        expect((wrapper.vm).acaoBlocoAtual.texto).toBe(TEXTOS.acaoBloco.homologar.TEXTO_VALIDACAO);
+        expect((wrapper.vm).acaoBlocoAtual.rotuloBotao).toBe(TEXTOS.acaoBloco.homologar.BOTAO);
+        expect((wrapper.vm).acaoBlocoAtual.mensagemSucesso).toBe(TEXTOS.sucesso.MAPAS_HOMOLOGADOS_EM_BLOCO);
 
         const modal = wrapper.findComponent(ModalAcaoBlocoStub);
         await modal.vm.$emit("confirmar", {ids: [103]});
@@ -444,7 +541,7 @@ describe("Processo.vue", () => {
 
         expect(processoService.executarAcaoEmBloco).toHaveBeenCalledWith(1, {
             unidadeCodigos: [104],
-            acao: 'disponibilizar',
+            acao: 'DISPONIBILIZAR',
             dataLimite: '2024-12-31',
         });
         expect(wrapper.find('#btn-disponibilizar-bloco').text()).toContain(TEXTOS.acaoBloco.disponibilizar.ROTULO);
@@ -503,11 +600,9 @@ describe("Processo.vue", () => {
         wrapper = createWrapper({
             processo: {
                 ...mockProcesso,
-                podeAceitarCadastroBloco: true,
-                podeHomologarCadastro: false,
-                podeHomologarMapa: false,
-                podeDisponibilizarMapaBloco: false,
+                acoesBloco: criarAcoesBloco([mockElegiveis[0]]),
             },
+            elegiveis: [mockElegiveis[0]],
         });
         perfilStore = usePerfilStore();
         perfilStore.$patch({perfilSelecionado: Perfil.GESTOR, unidadeSelecionada: 999});
@@ -529,11 +624,9 @@ describe("Processo.vue", () => {
         wrapper = createWrapper({
             processo: {
                 ...mockProcesso,
-                podeAceitarCadastroBloco: false,
-                podeHomologarCadastro: true,
-                podeHomologarMapa: true,
-                podeDisponibilizarMapaBloco: true,
+                acoesBloco: criarAcoesBloco([mockElegiveis[1], mockElegiveis[2]]),
             },
+            elegiveis: [mockElegiveis[1], mockElegiveis[2]],
         });
         perfilStore = usePerfilStore();
         perfilStore.$patch({perfilSelecionado: Perfil.ADMIN});
@@ -542,6 +635,7 @@ describe("Processo.vue", () => {
         await flushPromises();
 
         expect(wrapper.find('[data-testid="btn-processo-homologar-bloco"]').exists()).toBe(true);
+        expect(wrapper.find('[data-testid="btn-processo-homologar-mapas-bloco"]').exists()).toBe(true);
         expect(wrapper.find('[data-testid="btn-processo-disponibilizar-bloco"]').exists()).toBe(true);
         expect(wrapper.find('[data-testid="btn-processo-aceitar-bloco"]').exists()).toBe(false);
     });
