@@ -37,7 +37,10 @@ class UsuarioFacadeTest {
         usuario.setNome("Usuário teste");
         usuario.setEmail("usuario@test.com");
         usuario.setMatricula("12345");
-        usuario.setUnidadeLotacao(criarUnidadePadrao());
+        Unidade unidade = criarUnidadePadrao();
+        usuario.setUnidadeLotacao(unidade);
+        usuario.setUnidadeAtivaCodigo(unidade.getCodigo());
+        usuario.setPerfilAtivo(Perfil.ADMIN);
         return usuario;
     }
 

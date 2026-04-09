@@ -3,6 +3,8 @@ package sgc.organizacao;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.boot.test.context.*;
+import org.springframework.security.authentication.*;
+import org.springframework.security.core.context.*;
 import org.springframework.transaction.annotation.*;
 import sgc.comum.erros.*;
 import sgc.organizacao.dto.*;
@@ -41,6 +43,20 @@ class UsuarioServiceTest {
 
     @Autowired
     private UsuarioService usuarioServiceInternal;
+
+    private void autenticarComo(String titulo, Long unidadeAtivaCodigo, Perfil perfil) {
+        Usuario usuario = usuarioServiceInternal.buscar(titulo);
+        usuario.setUnidadeAtivaCodigo(unidadeAtivaCodigo);
+        usuario.setPerfilAtivo(perfil);
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(new UsernamePasswordAuthenticationToken(usuario, null, List.of()));
+        SecurityContextHolder.setContext(context);
+    }
+
+    @AfterEach
+    void limparContextoSeguranca() {
+        SecurityContextHolder.clearContext();
+    }
 
     @Nested
     @DisplayName("Consultas de Usuário")
@@ -344,6 +360,7 @@ class UsuarioServiceTest {
                     () -> usuarioService.adicionarAdministrador(tituloNovoAdmin));
 
             // Remover
+            autenticarComo(TITULO_ADMIN, COD_UNIT_SEC1, Perfil.ADMIN);
             usuarioService.removerAdministrador(tituloNovoAdmin);
             assertFalse(usuarioServiceInternal.isAdministrador(tituloNovoAdmin));
         }
@@ -351,6 +368,7 @@ class UsuarioServiceTest {
         @Test
         @DisplayName("Deve falhar ao remover a si mesmo")
         void deveFalharRemoverSiMesmo() {
+            autenticarComo(TITULO_ADMIN, COD_UNIT_SEC1, Perfil.ADMIN);
             assertThrows(ErroValidacao.class,
                     () -> usuarioService.removerAdministrador(TITULO_ADMIN));
         }
@@ -359,6 +377,7 @@ class UsuarioServiceTest {
         @DisplayName("Deve falhar ao remover único admin")
         void deveFalharRemoverUnicoAdmin() {
 
+            autenticarComo(TITULO_ADMIN, COD_UNIT_SEC1, Perfil.ADMIN);
             usuarioService.removerAdministrador("6");
             usuarioService.removerAdministrador("999999999999");
 

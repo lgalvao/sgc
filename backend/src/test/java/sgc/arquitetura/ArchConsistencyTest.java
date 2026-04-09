@@ -8,9 +8,11 @@ import com.tngtech.archunit.lang.*;
 import jakarta.persistence.*;
 import org.jspecify.annotations.*;
 import org.junit.jupiter.api.*;
+import org.springframework.security.core.annotation.*;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.stereotype.*;
 import org.springframework.web.bind.annotation.*;
+import sgc.organizacao.model.*;
 
 import java.lang.reflect.*;
 import java.util.*;
@@ -200,6 +202,83 @@ public class ArchConsistencyTest {
             .should()
             .beAnnotatedWith(JsonView.class)
             .because("Controllers da aplicação devem usar DTOs explícitos; @JsonView fica restrito ao adapter interno de E2E");
+
+    @ArchTest
+    static final ArchRule controllers_should_not_use_authentication_principal = methods()
+            .that()
+            .arePublic()
+            .and()
+            .areDeclaredInClassesThat()
+            .areAnnotatedWith(RestController.class)
+            .should(new ArchCondition<>("não receber parâmetros com @AuthenticationPrincipal") {
+                @Override
+                public void check(JavaMethod method, ConditionEvents events) {
+                    try {
+                        for (java.lang.reflect.Parameter parametro : method.reflect().getParameters()) {
+                            if (parametro.isAnnotationPresent(AuthenticationPrincipal.class)) {
+                                String mensagem = String.format(
+                                        "Método %s.%s usa @AuthenticationPrincipal em vez de contexto autenticado centralizado",
+                                        method.getOwner().getSimpleName(),
+                                        method.getName());
+                                events.add(SimpleConditionEvent.violated(method, mensagem));
+                            }
+                        }
+                    } catch (Exception e) {
+                        String mensagem = String.format(
+                                "Não foi possível inspecionar os parâmetros de %s.%s: %s",
+                                method.getOwner().getSimpleName(), method.getName(), e.getMessage());
+                        events.add(SimpleConditionEvent.violated(method, mensagem));
+                    }
+                }
+            })
+            .because("Controllers devem obter o contexto autenticado pelo ponto centralizado, sem repassar @AuthenticationPrincipal");
+
+    @ArchTest
+    static final ArchRule application_public_methods_should_not_receive_usuario_param = methods()
+            .that()
+            .arePublic()
+            .and()
+            .areDeclaredInClassesThat()
+            .haveSimpleNameEndingWith("Controller")
+            .or()
+            .arePublic()
+            .and()
+            .areDeclaredInClassesThat()
+            .haveSimpleNameEndingWith("Service")
+            .or()
+            .arePublic()
+            .and()
+            .areDeclaredInClassesThat()
+            .haveSimpleNameEndingWith("Facade")
+            .should(new ArchCondition<>("não receber Usuario como parâmetro de aplicação") {
+                @Override
+                public void check(JavaMethod method, ConditionEvents events) {
+                    String nomeClasse = method.getOwner().getName();
+                    if (nomeClasse.startsWith("sgc.organizacao.")
+                            || nomeClasse.startsWith("sgc.seguranca.")
+                            || nomeClasse.startsWith("sgc.e2e.")) {
+                        return;
+                    }
+
+                    try {
+                        for (java.lang.reflect.Parameter parametro : method.reflect().getParameters()) {
+                            if (parametro.getType().equals(Usuario.class)) {
+                                String mensagem = String.format(
+                                        "Método público %s.%s recebe Usuario como parâmetro; o usuário atual deve vir do contexto autenticado centralizado",
+                                        method.getOwner().getSimpleName(),
+                                        method.getName());
+                                events.add(SimpleConditionEvent.violated(method, mensagem));
+                            }
+                        }
+                    } catch (Exception e) {
+                        String mensagem = String.format(
+                                "Não foi possível inspecionar os parâmetros de %s.%s: %s",
+                                method.getOwner().getSimpleName(), method.getName(), e.getMessage());
+                        events.add(SimpleConditionEvent.violated(method, mensagem));
+                    }
+                }
+            })
+            .because("Controller, Facade e Service de aplicação não devem receber Usuario para representar o usuário autenticado atual");
 
     /**
      * Garante nomenclatura consistente de Controllers.
