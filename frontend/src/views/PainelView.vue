@@ -94,6 +94,7 @@ const router = useRouter();
 
 const criterio = ref<keyof ProcessoResumo>("descricao");
 const asc = ref(true);
+const ignorarPrimeiraAtivacao = ref(true);
 
 async function buscarProcessosPainel(
     params: painelService.ListarParams<keyof ProcessoResumo>
@@ -156,6 +157,10 @@ onMounted(async () => {
 });
 
 onActivated(async () => {
+  if (ignorarPrimeiraAtivacao.value) {
+    ignorarPrimeiraAtivacao.value = false;
+    return;
+  }
   exibirToastPendente();
   await carregarDados();
 });
