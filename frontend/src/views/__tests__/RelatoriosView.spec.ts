@@ -84,7 +84,8 @@ describe('Relatorios.vue', () => {
 
         const mountOptions = getCommonMountOptions({
             perfil: {
-                unidadeSelecionada: {codigo: 5},
+                unidadeSelecionada: 5,
+                unidadeSelecionadaSigla: "U5",
             }
         }, stubs);
 
@@ -191,7 +192,8 @@ describe('Relatorios.vue', () => {
     it('deve carregar processos no onMounted se unidade estiver selecionada', async () => {
         const _ = mount(Relatorios, getCommonMountOptions({
             perfil: {
-                unidadeSelecionada: {codigo: 5},
+                unidadeSelecionada: 5,
+                unidadeSelecionadaSigla: "U5",
             }
         }, stubs));
         await flushPromises();

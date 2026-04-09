@@ -25,7 +25,7 @@ describe("usePerfil", () => {
         expect(unidadeSelecionada.value).toBe("TESTE");
     });
 
-    it("deve retornar unidadeSelecionada como ID se sigla não disponível", () => {
+    it("deve retornar nulo se sigla não estiver disponível", () => {
         vi.mocked(usePerfilStore).mockReturnValue({
             unidadeSelecionadaSigla: null,
             unidadeSelecionada: 123,
@@ -33,7 +33,7 @@ describe("usePerfil", () => {
 
         const {unidadeSelecionada} = usePerfil();
 
-        expect(unidadeSelecionada.value).toBe(123);
+        expect(unidadeSelecionada.value).toBeNull();
     });
 
     it("deve usar unidadeSelecionadaSigla se disponível", () => {

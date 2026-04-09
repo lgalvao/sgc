@@ -103,7 +103,7 @@ async function buscarProcessosPainel(
 }
 
 async function carregarDados() {
-  const unidadeCodigo = perfilStore.unidadeAtual;
+  const unidadeCodigo = perfilStore.unidadeSelecionada;
   if (!perfil.perfilSelecionado.value || !unidadeCodigo) {
     carregandoPainel.value = false;
     return;
@@ -175,7 +175,7 @@ function ordenarPor(campo: keyof ProcessoResumo) {
     criterio.value = campo;
     asc.value = true;
   }
-  const unidadeCodigo = perfilStore.unidadeAtual;
+  const unidadeCodigo = perfilStore.unidadeSelecionada;
   if (!unidadeCodigo) {
     return;
   }

@@ -7,9 +7,7 @@ export function usePerfil() {
 
     const perfilSelecionado = computed(() => perfilStore.perfilSelecionado);
 
-    const unidadeSelecionada = computed(() => {
-        return perfilStore.unidadeSelecionadaSigla || perfilStore.unidadeSelecionada;
-    });
+    const unidadeSelecionada = computed(() => perfilStore.unidadeSelecionadaSigla);
 
     const isAdmin = computed(() => perfilStore.perfilSelecionado === Perfil.ADMIN);
     const isGestor = computed(() => perfilStore.perfilSelecionado === Perfil.GESTOR);

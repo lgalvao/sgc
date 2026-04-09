@@ -125,37 +125,16 @@ const opcoesProcessos = computed(() => {
 });
 
 const opcoesUnidades = computed<Array<{ value: number | null, text: string }>>(() => {
-  const codigoUnidade = obterCodigoUnidadeSelecionada();
+  const codigoUnidade = perfilStore.unidadeSelecionada;
   const opcoesBase = [{ value: null, text: TEXTOS.relatorios.TODAS_UNIDADES }];
+  const sigla = perfilStore.unidadeSelecionadaSigla;
 
-  if (!codigoUnidade) {
+  if (!codigoUnidade || !sigla) {
     return opcoesBase;
   }
 
-  const sigla = perfilStore.unidadeSelecionadaSigla ?? `Unidade ${codigoUnidade}`;
   return [...opcoesBase, { value: codigoUnidade, text: sigla }];
 });
-
-function possuiCodigo(valor: unknown): valor is {codigo: number | string} {
-  return typeof valor === "object" && valor !== null && "codigo" in valor;
-}
-
-function obterCodigoUnidadeSelecionada() {
-  if (!perfil.perfilSelecionado.value || !perfilStore.unidadeSelecionada) {
-    return null;
-  }
-
-  const unidadeSelecionada = perfilStore.unidadeSelecionada as unknown;
-  if (typeof unidadeSelecionada === "number") {
-    return unidadeSelecionada;
-  }
-
-  if (possuiCodigo(unidadeSelecionada)) {
-    return Number(unidadeSelecionada.codigo);
-  }
-
-  return null;
-}
 
 async function executarComCarregamento(
   acao: () => Promise<void>,
@@ -178,7 +157,7 @@ async function executarComCarregamento(
 }
 
 async function carregarProcessosDisponiveis() {
-  const unidadeCodigo = obterCodigoUnidadeSelecionada();
+  const unidadeCodigo = perfilStore.unidadeSelecionada;
   if (!unidadeCodigo) {
     processosDisponiveis.value = [];
     return;
